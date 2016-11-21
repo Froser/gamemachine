@@ -1,12 +1,16 @@
 #include <windows.h>
 #include "glut.h"
+#include "objreader/objreader.h"
+
+using namespace fglextlib;
 
 float WINDOW_WIDTH = 600;
 float WINDOW_HEIGHT = 300;
 
 void render()
 {
-
+	ObjReader reader;
+	reader.load("D:\\baymax.obj");
 }
 
 int WINAPI WinMain(

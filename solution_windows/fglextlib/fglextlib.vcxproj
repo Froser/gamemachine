@@ -66,12 +66,19 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\objreader\objreader_private.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\coding\fglextlib\common.h" />
+    <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h" />
+    <ClInclude Include="..\..\coding\fglextlib\objreader\objreader_private.h" />
     <ClInclude Include="..\..\coding\fglextlib\stdafx.h" />
+    <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

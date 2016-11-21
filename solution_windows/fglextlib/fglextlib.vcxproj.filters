@@ -8,6 +8,12 @@
     <Filter Include="coding\objreader">
       <UniqueIdentifier>{8db0c32c-c735-43fb-90d6-086ec5611470}</UniqueIdentifier>
     </Filter>
+    <Filter Include="coding\containers">
+      <UniqueIdentifier>{b4f84c7e-0e06-466e-a66e-51077aada663}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="coding\utilities">
+      <UniqueIdentifier>{5c9d3ade-27ae-4602-96a5-52b5d77c9da5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp">
@@ -16,6 +22,15 @@
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\objreader\objreader_private.cpp">
+      <Filter>coding\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp">
+      <Filter>coding\containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp">
+      <Filter>coding\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h">
@@ -23,6 +38,18 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\stdafx.h">
       <Filter>coding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\common.h">
+      <Filter>coding</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\objreader\objreader_private.h">
+      <Filter>coding\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h">
+      <Filter>coding\containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h">
+      <Filter>coding\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
