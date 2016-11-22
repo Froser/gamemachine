@@ -4,7 +4,6 @@
 #include "utilities/assert.h"
 #include <locale>
 
-#define IF_LOAD_AND_DRAW(expression) if (m_mode == LoadAndDraw) { expression; }
 #define MAX_VERTICES_IN_ONE_FACE 4
 #define NONE 0
 #define KW_REMARK "#"
@@ -60,23 +59,6 @@ GLint FaceIndices::get(Which which)
 	return -1;
 }
 
-ObjReaderCommand::ObjReaderCommand(Commands cmdType)
-	: m_type(cmdType)
-{
-}
-
-ObjReaderCommand::ObjReaderCommand(const FaceIndices& faceIndices)
-{
-	m_type = CommandDrawFace;
-	memcpy(&m_faceIndices, &faceIndices, sizeof(FaceIndices));
-}
-
-ObjReaderCommand::ObjReaderCommand(const MaterialProperties& mp)
-{
-	m_type = CommandMaterial;
-	memcpy(&m_materialProperties, &mp, sizeof(MaterialProperties));
-}
-
 void ObjReader_Private::parseLine(const char* line)
 {
 	Scanner scanner(line, isWhiteSpace);
@@ -114,8 +96,7 @@ void ObjReader_Private::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_FACE))
 	{
-		IF_LOAD_AND_DRAW(m_pCallback->onBeginFace());
-		m_commands.push_back(ObjReaderCommand(ObjReaderCommand::CommandBeginFace));
+		m_pCallback->onBeginFace();
 		for (int i = 0; i < MAX_VERTICES_IN_ONE_FACE; i++)
 		{
 			char subCmd[LINE_MAX];
@@ -133,68 +114,54 @@ void ObjReader_Private::parseLine(const char* line)
 			if (!faceScanner.nextInt(&i3))
 				i3 = NONE;
 			FaceIndices indices(i1, i2, i3);
-			IF_LOAD_AND_DRAW(m_pCallback->onDrawFace(&indices));
-			m_commands.push_back(ObjReaderCommand(indices));
+			m_pCallback->onDrawFace(&indices);
 		}
-		IF_LOAD_AND_DRAW(m_pCallback->onEndFace());
-		m_commands.push_back(ObjReaderCommand(ObjReaderCommand::CommandEndFace));
+		m_pCallback->onEndFace();
 	}
 	else if (strEqual(command, KW_MTLLIB))
 	{
 		char fn[LINE_MAX];
-		scanner.next(fn);
+		scanner.nextToTheEnd(fn);
 		std::string mtlfile = m_workingDir.append(fn);
 		mtlReader.load(mtlfile.c_str());
 	}
 	else if (strEqual(command, KW_USEMTL))
 	{
 		char name[LINE_MAX];
-		scanner.next(name);
+		scanner.nextToTheEnd(name);
 		const MaterialProperties& properties = mtlReader.getProperties(name);
-		IF_LOAD_AND_DRAW(m_pCallback->onMaterial(properties));
-		m_commands.push_back(ObjReaderCommand(properties));
+		m_pCallback->onMaterial(properties);
 	}
 }
 
 void ObjReader_Private::draw()
 {
-	for (auto iter = m_commands.begin(); iter != m_commands.end(); iter++)
-	{
-		ObjReaderCommand& cmd = *iter;
-		switch (cmd.type())
-		{
-		case ObjReaderCommand::CommandBeginFace:
-			m_pCallback->onBeginFace();
-			break;
-		case ObjReaderCommand::CommandDrawFace:
-			m_pCallback->onDrawFace(&cmd.faceIndices());
-			break;
-		case ObjReaderCommand::CommandEndFace:
-			m_pCallback->onEndFace();
-			break;
-		case ObjReaderCommand::CommandMaterial:
-			m_pCallback->onMaterial(cmd.materialProperties());
-			break;
-		default:
-			ASSERT(false);
-			break;
-		}
-	}
+	m_pCallback->draw();
 }
 
-const VectorContainer& ObjReader_Private::get(DataType dataType, Fint index)
+void ObjReader_Private::beginLoad()
 {
+	m_pCallback->onBeginLoad();
+}
+
+void ObjReader_Private::endLoad()
+{
+	m_pCallback->onEndLoad();
+}
+VectorContainer ObjReader_Private::get(DataType dataType, Fint index)
+{
+	VectorContainer def(NONE, NONE, NONE);
 	switch (dataType)
 	{
 	case Vertex:
-		return m_vertices.at(index - 1);
+		return index == NONE ? def : m_vertices.at(index - 1);
 	case Texture:
-		return m_textures.at(index - 1);
+		return index == NONE ? def : m_textures.at(index - 1);
 	case Normal:
-		return m_normals.at(index - 1);
+		return index == NONE ? def : m_normals.at(index - 1);
 	}
 	ASSERT(false);
-	return VectorContainer(NONE, NONE, NONE);
+	return def;
 }
 
 void ObjReaderCallback::onBeginFace()
@@ -216,6 +183,27 @@ void ObjReaderCallback::onMaterial(const MaterialProperties& p)
 	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Kd);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Ks);
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, p.Ns);
+}
+
+void ObjReaderCallback::draw()
+{
+	glCallList(m_listID);
+}
+
+ObjReaderCallback::~ObjReaderCallback()
+{
+	glDeleteLists(m_listID, 1);
+}
+
+void ObjReaderCallback::onBeginLoad()
+{
+	m_listID = glGenLists(1);
+	glNewList(m_listID, m_data->mode() == ObjReader_Private::LoadAndDraw ? GL_COMPILE_AND_EXECUTE : GL_COMPILE);
+}
+
+void ObjReaderCallback::onEndLoad()
+{
+	glEndList();
 }
 
 void ObjReaderCallback::onDrawFace(FaceIndices* faceIndices)

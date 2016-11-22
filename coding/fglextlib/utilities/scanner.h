@@ -12,6 +12,7 @@ public:
 
 public:
 	void next(char* out);
+	void nextToTheEnd(char* out);
 	bool nextFloat(Ffloat* out);
 	bool nextInt(Fint* out);
 

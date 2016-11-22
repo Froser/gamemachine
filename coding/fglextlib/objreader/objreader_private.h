@@ -30,51 +30,32 @@ private:
 
 struct IObjReaderCallBack
 {
+	virtual void onBeginLoad() = 0;
+	virtual void onEndLoad() = 0;
 	virtual void onDrawFace(FaceIndices* faceIndices) = 0;
 	virtual void onBeginFace() = 0;
 	virtual void onEndFace() = 0;
 	virtual void onMaterial(const MaterialProperties& p) = 0;
+	virtual void draw() = 0;
 };
 
 class ObjReader_Private;
 class ObjReaderCallback : public IObjReaderCallBack
 {
 public:
-	ObjReaderCallback(ObjReader_Private* data) : m_data(data) {};
+	ObjReaderCallback(ObjReader_Private* data) : m_data(data), m_listID(-1) {};
+	~ObjReaderCallback();
+	void onBeginLoad() override;
+	void onEndLoad() override;
 	void onDrawFace(FaceIndices* faceIndices) override;
 	void onBeginFace() override;
 	void onEndFace() override;
 	void onMaterial(const MaterialProperties& p) override;
+	void draw() override;
 
 private:
 	ObjReader_Private* m_data;
-};
-
-class ObjReaderCommand
-{
-public:
-	enum Commands
-	{
-		CommandBeginFace,
-		CommandDrawFace,
-		CommandEndFace,
-		CommandMaterial,
-	};
-
-public:
-	ObjReaderCommand(Commands commands);
-	ObjReaderCommand(const FaceIndices& faceIndices);
-	ObjReaderCommand(const MaterialProperties& mp);
-
-public:
-	Commands type() const { return m_type; }
-	FaceIndices& faceIndices() { return m_faceIndices; }
-	MaterialProperties& materialProperties() { return m_materialProperties; }
-
-private:
-	Commands m_type;
-	FaceIndices m_faceIndices;
-	MaterialProperties m_materialProperties;
+	int m_listID;
 };
 
 class ObjReader_Private
@@ -96,20 +77,22 @@ private:
 		LoadOnly
 	};
 private:
-	ObjReader_Private() { m_pCallback = new ObjReaderCallback(this); }
+	ObjReader_Private() : m_pCallback (new ObjReaderCallback(this)) {}
 	~ObjReader_Private() { delete m_pCallback; }
 	void setMode(int mode) { m_mode = mode; }
+	int mode() { return m_mode; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void parseLine(const char* line);
 	void draw();
-	const VectorContainer& get(DataType dataType, Fint index);
+	void beginLoad();
+	void endLoad();
+	VectorContainer get(DataType dataType, Fint index);
 
 private:
 	std::string m_workingDir;
 	std::vector<Vertices> m_vertices;
 	std::vector<VertexNormal> m_normals;
 	std::vector<VertexTexture> m_textures;
-	std::vector<ObjReaderCommand> m_commands;
 	IObjReaderCallBack* m_pCallback;
 	MtlReader mtlReader;
 	int m_mode;

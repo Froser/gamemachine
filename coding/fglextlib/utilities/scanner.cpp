@@ -49,6 +49,17 @@ void Scanner::next(char* out)
 	*p = 0;
 }
 
+void Scanner::nextToTheEnd(char* out)
+{
+	char* p = out;
+	while (*m_p)
+	{
+		m_p++;
+		*p = *m_p;
+		p++;
+	}
+}
+
 bool Scanner::nextFloat(Ffloat* out)
 {
 	char command[LINE_MAX];

@@ -17,17 +17,14 @@ void render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(30, 2, 10, 500);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	glLoadIdentity();	
 	gluPerspective(30, 2, 10, 500);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 	gluLookAt(eyeX, 0, eyeZ, centerX, centerY, centerZ, 0, 1, 0);
 
+	glColor3f(1, 1, 1);
 	reader.draw();
 
 	glFlush();
@@ -36,7 +33,7 @@ void render()
 void init()
 {
 	std::string path = Path::getCurrentPath();
-	reader.load(path.append("baymax.obj").c_str());
+	reader.load(path.append("jazz.obj").c_str());
 
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
