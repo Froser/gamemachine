@@ -11,7 +11,7 @@ GLfloat eyeX = 0, eyeZ = 150;
 
 void render()
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
@@ -25,16 +25,27 @@ void render()
 	glLoadIdentity();
 	gluLookAt(eyeX, 0, eyeZ, centerX, centerY, centerZ, 0, 1, 0);
 
-	glColor3f(1.0f, 1.0f, 1.0f);
 	ObjReader reader;
 	reader.load("D:\\baymax.obj");
+
 	glFlush();
 }
 
 void init()
 {
 	glClearColor(0, 0, 0, 0);
-	glClear(GL_CLEAR);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+
+	GLfloat pos[] = { 150, 150, 150, 0 };
+	glLightfv(GL_LIGHT0, GL_POSITION, pos);
+
+	GLfloat clr[] = { 1, 1, 1, 1 };
+	GLfloat b[] = { 1, 1, 1, 1 };
+	glLightfv(GL_LIGHT0, GL_AMBIENT, clr);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, clr);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, b);
+	glEnable(GL_LIGHT0);
 }
 
 void keyboard(unsigned char key, int x, int y)
@@ -84,6 +95,7 @@ int WINAPI WinMain(
 	glutInitWindowPosition(400, 400);
 	glutCreateWindow("Render");
 
+	init();
 	glutPassiveMotionFunc(motion);
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);

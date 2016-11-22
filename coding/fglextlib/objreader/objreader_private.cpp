@@ -10,6 +10,8 @@
 #define KW_VNORMAL "vn"
 #define KW_VTEXTURE "vt"
 #define KW_FACE "f"
+#define KW_MTLLIB "mtllib"
+#define KW_USEMTL "usemtl"
 
 static bool strEqual(const char* str1, const char* str2)
 {
@@ -70,8 +72,7 @@ void ObjReader_Private::parseLine(const char* line)
 		Vertices vertices (v1, v2, v3);
 		m_vertices.push_back(vertices);
 	}
-
-	if (strEqual(command, KW_VNORMAL))
+	else if (strEqual(command, KW_VNORMAL))
 	{
 		Ffloat v1, v2, v3;
 		scanner.nextFloat(&v1);
@@ -80,8 +81,7 @@ void ObjReader_Private::parseLine(const char* line)
 		VertexNormal normal(v1, v2, v3);
 		m_normals.push_back(normal);
 	}
-
-	if (strEqual(command, KW_VTEXTURE))
+	else if (strEqual(command, KW_VTEXTURE))
 	{
 		Ffloat v1, v2, v3;
 		scanner.nextFloat(&v1);
@@ -89,8 +89,7 @@ void ObjReader_Private::parseLine(const char* line)
 		VertexTexture texture(v1, v2, NONE);
 		m_textures.push_back(texture);
 	}
-
-	if (strEqual(command, KW_FACE))
+	else if (strEqual(command, KW_FACE))
 	{
 		m_pCallback->onBeginFace();
 		for (int i = 0; i < MAX_VERTICES_IN_ONE_FACE; i++)
@@ -113,6 +112,20 @@ void ObjReader_Private::parseLine(const char* line)
 			m_pCallback->onDrawFace(&indices);
 		}
 		m_pCallback->onEndFace();
+	}
+	else if (strEqual(command, KW_MTLLIB))
+	{
+		char fn[LINE_MAX];
+		scanner.next(fn);
+		std::string mtlfile = m_workingDir.append(fn);
+		mtlReader.load(mtlfile.c_str());
+	}
+	else if (strEqual(command, KW_USEMTL))
+	{
+		char name[LINE_MAX];
+		scanner.next(name);
+		const MaterialProperties& properties = mtlReader.getProperties(name);
+		m_pCallback->onMaterial(properties);
 	}
 }
 
@@ -138,6 +151,17 @@ void ObjReaderCallback::onBeginFace()
 void ObjReaderCallback::onEndFace()
 {
 	glEnd();
+}
+
+void ObjReaderCallback::onMaterial(const MaterialProperties& p)
+{
+	Ffloat Ka[] = { p.Ka_r, p.Ka_g, p.Ka_b };
+	Ffloat Kd[] = { p.Kd_r, p.Kd_g, p.Kd_b };
+	Ffloat Ks[] = { p.Ks_r, p.Ks_g, p.Ks_b };
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ka);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Kd);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Ks);
+	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, p.Ns);
 }
 
 void ObjReaderCallback::onDrawFace(FaceIndices* faceIndices)

@@ -1,9 +1,10 @@
 ﻿#ifndef __OBJREADER_PRIVATE_H__
 #include "common.h"
+#include <string.h>
 #include <vector>
 #include "gl/GL.h"
 #include "containers/basic_containers.h"
-
+#include "mtlreader.h"
 BEGIN_NS
 
 class FaceIndices
@@ -31,6 +32,7 @@ struct IObjReaderCallBack
 	virtual void onDrawFace(FaceIndices* faceIndices) = 0;
 	virtual void onBeginFace() = 0;
 	virtual void onEndFace() = 0;
+	virtual void onMaterial(const MaterialProperties& p) = 0;
 };
 
 class ObjReader_Private;
@@ -41,6 +43,7 @@ public:
 	void onDrawFace(FaceIndices* faceIndices) override;
 	void onBeginFace() override;
 	void onEndFace() override;
+	void onMaterial(const MaterialProperties& p) override;
 
 private:
 	ObjReader_Private* m_data;
@@ -62,15 +65,18 @@ private:
 private:
 	ObjReader_Private() { m_pCallback = new ObjReaderCallback(this); }
 	~ObjReader_Private() { delete m_pCallback; }
+	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void init();
 	void parseLine(const char* line);
 	const VectorContainer& get(DataType dataType, Fint index);
 
 private:
+	std::string m_workingDir;
 	std::vector<Vertices> m_vertices;
 	std::vector<VertexNormal> m_normals;
 	std::vector<VertexTexture> m_textures;
 	IObjReaderCallBack* m_pCallback;
+	MtlReader mtlReader;
 };
 
 END_NS

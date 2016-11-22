@@ -31,6 +31,15 @@
     <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp">
+      <Filter>coding\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader_private.cpp">
+      <Filter>coding\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp">
+      <Filter>coding\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h">
@@ -49,6 +58,15 @@
       <Filter>coding\containers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h">
+      <Filter>coding\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h">
+      <Filter>coding\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader_private.h">
+      <Filter>coding\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\utilities\path.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
   </ItemGroup>
