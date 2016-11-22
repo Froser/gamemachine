@@ -19,12 +19,12 @@ struct MaterialProperties
 
 typedef std::map<MaterialName, MaterialProperties> Materials;
 
-class MtlReader_Private
+class MtlReaderPrivate
 {
 	friend class MtlReader;
 
 private:
-	MtlReader_Private() : m_currentMaterial(nullptr) {}
+	MtlReaderPrivate() : m_currentMaterial(nullptr) {}
 	void parseLine(const char* line);
 	Materials& getMaterials();
 

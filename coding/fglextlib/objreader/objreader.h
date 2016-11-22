@@ -1,7 +1,7 @@
 ﻿#ifndef __OBJSCANNER_H__
 #include "common.h"
 #include <fstream>
-#include "objreader_private.h"
+#include "ObjReaderPrivate.h"
 
 BEGIN_NS
 
@@ -12,7 +12,7 @@ class ObjReader
 public:
 	enum Mode
 	{
-		LoadAndDraw = ObjReader_Private::LoadAndDraw,
+		LoadAndDraw = ObjReaderPrivate::LoadAndDraw,
 		LoadOnly
 	};
 

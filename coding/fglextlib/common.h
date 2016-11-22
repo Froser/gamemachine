@@ -2,8 +2,8 @@
 #define END_NS }
 #define DEFINE_PRIVATE(className) \
 	private: \
-	className##_Private m_data; \
-	className##_Private& dataRef() { return m_data; }
+	className##Private m_data; \
+	className##Private& dataRef() { return m_data; }
 
 // Options
 #include "gl/GL.h"

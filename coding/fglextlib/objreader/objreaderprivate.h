@@ -39,11 +39,11 @@ struct IObjReaderCallBack
 	virtual void draw() = 0;
 };
 
-class ObjReader_Private;
+class ObjReaderPrivate;
 class ObjReaderCallback : public IObjReaderCallBack
 {
 public:
-	ObjReaderCallback(ObjReader_Private* data) : m_data(data), m_listID(-1) {};
+	ObjReaderCallback(ObjReaderPrivate* data) : m_data(data), m_listID(-1) {};
 	~ObjReaderCallback();
 	void onBeginLoad() override;
 	void onEndLoad() override;
@@ -54,11 +54,11 @@ public:
 	void draw() override;
 
 private:
-	ObjReader_Private* m_data;
+	ObjReaderPrivate* m_data;
 	int m_listID;
 };
 
-class ObjReader_Private
+class ObjReaderPrivate
 {
 	friend class ObjReader;
 	friend class ObjReaderCallback;
@@ -77,8 +77,8 @@ private:
 		LoadOnly
 	};
 private:
-	ObjReader_Private() : m_pCallback (new ObjReaderCallback(this)) {}
-	~ObjReader_Private() { delete m_pCallback; }
+	ObjReaderPrivate() : m_pCallback (new ObjReaderCallback(this)) {}
+	~ObjReaderPrivate() { delete m_pCallback; }
 	void setMode(int mode) { m_mode = mode; }
 	int mode() { return m_mode; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }

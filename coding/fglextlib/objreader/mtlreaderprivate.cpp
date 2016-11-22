@@ -23,12 +23,12 @@ static bool isWhiteSpace(char c)
 	return !!isspace(c);
 }
 
-Materials& MtlReader_Private::getMaterials()
+Materials& MtlReaderPrivate::getMaterials()
 {
 	return m_materials;
 }
 
-void MtlReader_Private::parseLine(const char* line)
+void MtlReaderPrivate::parseLine(const char* line)
 {
 	Scanner scanner(line, isWhiteSpace);
 	char command[LINE_MAX];

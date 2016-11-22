@@ -68,9 +68,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader_private.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\objreader\objreader_private.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\objreader\objreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp" />
@@ -80,9 +80,9 @@
     <ClInclude Include="..\..\coding\fglextlib\common.h" />
     <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h" />
-    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader_private.h" />
+    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h" />
-    <ClInclude Include="..\..\coding\fglextlib\objreader\objreader_private.h" />
+    <ClInclude Include="..\..\coding\fglextlib\objreader\objreaderprivate.h" />
     <ClInclude Include="..\..\coding\fglextlib\stdafx.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\path.h" />

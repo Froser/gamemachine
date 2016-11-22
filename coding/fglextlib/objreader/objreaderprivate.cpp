@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "objreader_private.h"
+#include "ObjReaderPrivate.h"
 #include "utilities/scanner.h"
 #include "utilities/assert.h"
 #include <locale>
@@ -59,7 +59,7 @@ GLint FaceIndices::get(Which which)
 	return -1;
 }
 
-void ObjReader_Private::parseLine(const char* line)
+void ObjReaderPrivate::parseLine(const char* line)
 {
 	Scanner scanner(line, isWhiteSpace);
 	char command[LINE_MAX];
@@ -134,21 +134,21 @@ void ObjReader_Private::parseLine(const char* line)
 	}
 }
 
-void ObjReader_Private::draw()
+void ObjReaderPrivate::draw()
 {
 	m_pCallback->draw();
 }
 
-void ObjReader_Private::beginLoad()
+void ObjReaderPrivate::beginLoad()
 {
 	m_pCallback->onBeginLoad();
 }
 
-void ObjReader_Private::endLoad()
+void ObjReaderPrivate::endLoad()
 {
 	m_pCallback->onEndLoad();
 }
-VectorContainer ObjReader_Private::get(DataType dataType, Fint index)
+VectorContainer ObjReaderPrivate::get(DataType dataType, Fint index)
 {
 	VectorContainer def(NONE, NONE, NONE);
 	switch (dataType)
@@ -198,7 +198,7 @@ ObjReaderCallback::~ObjReaderCallback()
 void ObjReaderCallback::onBeginLoad()
 {
 	m_listID = glGenLists(1);
-	glNewList(m_listID, m_data->mode() == ObjReader_Private::LoadAndDraw ? GL_COMPILE_AND_EXECUTE : GL_COMPILE);
+	glNewList(m_listID, m_data->mode() == ObjReaderPrivate::LoadAndDraw ? GL_COMPILE_AND_EXECUTE : GL_COMPILE);
 }
 
 void ObjReaderCallback::onEndLoad()
@@ -208,8 +208,8 @@ void ObjReaderCallback::onEndLoad()
 
 void ObjReaderCallback::onDrawFace(FaceIndices* faceIndices)
 {
-	const VectorContainer& v = m_data->get(ObjReader_Private::Vertex, faceIndices->get(FaceIndices::Vertex));
-	const VectorContainer& n = m_data->get(ObjReader_Private::Normal, faceIndices->get(FaceIndices::Normal));
+	const VectorContainer& v = m_data->get(ObjReaderPrivate::Vertex, faceIndices->get(FaceIndices::Vertex));
+	const VectorContainer& n = m_data->get(ObjReaderPrivate::Normal, faceIndices->get(FaceIndices::Normal));
 	glNormal3f(n.get(VectorContainer::V1), n.get(VectorContainer::V2), n.get(VectorContainer::V3));
 	glVertex3f(v.get(VectorContainer::V1), v.get(VectorContainer::V2), v.get(VectorContainer::V3));
 }

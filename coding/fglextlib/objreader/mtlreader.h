@@ -1,7 +1,7 @@
 ﻿#ifndef __MTLREADER_H__
 #include "common.h"
 #include <fstream>
-#include "mtlreader_private.h"
+#include "MtlReaderPrivate.h"
 
 BEGIN_NS
 

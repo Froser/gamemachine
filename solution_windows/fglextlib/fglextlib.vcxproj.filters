@@ -22,9 +22,6 @@
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\objreader\objreader_private.cpp">
-      <Filter>coding\objreader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp">
       <Filter>coding\containers</Filter>
     </ClCompile>
@@ -34,14 +31,17 @@
     <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader_private.cpp">
-      <Filter>coding\objreader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp">
       <Filter>coding\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\objreader\objreaderprivate.cpp">
+      <Filter>coding\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.cpp">
+      <Filter>coding\objreader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -54,9 +54,6 @@
     <ClInclude Include="..\..\coding\fglextlib\common.h">
       <Filter>coding</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\objreader\objreader_private.h">
-      <Filter>coding\objreader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h">
       <Filter>coding\containers</Filter>
     </ClInclude>
@@ -66,14 +63,17 @@
     <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h">
       <Filter>coding\objreader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader_private.h">
-      <Filter>coding\objreader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\utilities\path.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h">
       <Filter>coding\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\objreader\objreaderprivate.h">
+      <Filter>coding\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.h">
+      <Filter>coding\objreader</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
