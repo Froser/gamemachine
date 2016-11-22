@@ -15,8 +15,8 @@ public:
 public:
 	VectorContainer(Ffloat v1, Ffloat v2, Ffloat v3);
 
-private:
-	Ffloat get(Which);
+public:
+	Ffloat get(Which) const;
 
 private:
 	Ffloat m_v1;
@@ -26,6 +26,7 @@ private:
 
 typedef VectorContainer Vertices;
 typedef VectorContainer VertexNormal;
+typedef VectorContainer VertexTexture;
 
 END_NS
 #endif

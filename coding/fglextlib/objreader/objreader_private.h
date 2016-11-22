@@ -26,19 +26,51 @@ private:
 	GLint m_normalIndex;
 };
 
+struct IObjReaderCallBack
+{
+	virtual void onDrawFace(FaceIndices* faceIndices) = 0;
+	virtual void onBeginFace() = 0;
+	virtual void onEndFace() = 0;
+};
+
+class ObjReader_Private;
+class ObjReaderCallback : public IObjReaderCallBack
+{
+public:
+	ObjReaderCallback(ObjReader_Private* data) : m_data(data) {};
+	void onDrawFace(FaceIndices* faceIndices) override;
+	void onBeginFace() override;
+	void onEndFace() override;
+
+private:
+	ObjReader_Private* m_data;
+};
+
 class ObjReader_Private
 {
 	friend class ObjReader;
+	friend class ObjReaderCallback;
 
 private:
-	ObjReader_Private() {}
+	enum DataType
+	{
+		Vertex,
+		Texture,
+		Normal,
+	};
+
+private:
+	ObjReader_Private() { m_pCallback = new ObjReaderCallback(this); }
+	~ObjReader_Private() { delete m_pCallback; }
 	void init();
 	void parseLine(const char* line);
+	const VectorContainer& get(DataType dataType, Fint index);
 
 private:
 	std::vector<Vertices> m_vertices;
 	std::vector<VertexNormal> m_normals;
-	std::vector<std::vector<FaceIndices> > m_faces;
+	std::vector<VertexTexture> m_textures;
+	IObjReaderCallBack* m_pCallback;
 };
 
 END_NS

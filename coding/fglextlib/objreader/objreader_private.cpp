@@ -8,6 +8,7 @@
 #define KW_REMARK "#"
 #define KW_VERTEX "v"
 #define KW_VNORMAL "vn"
+#define KW_VTEXTURE "vt"
 #define KW_FACE "f"
 
 static bool strEqual(const char* str1, const char* str2)
@@ -80,9 +81,18 @@ void ObjReader_Private::parseLine(const char* line)
 		m_normals.push_back(normal);
 	}
 
+	if (strEqual(command, KW_VTEXTURE))
+	{
+		Ffloat v1, v2, v3;
+		scanner.nextFloat(&v1);
+		scanner.nextFloat(&v2);
+		VertexTexture texture(v1, v2, NONE);
+		m_textures.push_back(texture);
+	}
+
 	if (strEqual(command, KW_FACE))
 	{
-		std::vector<FaceIndices> face;
+		m_pCallback->onBeginFace();
 		for (int i = 0; i < MAX_VERTICES_IN_ONE_FACE; i++)
 		{
 			char subCmd[LINE_MAX];
@@ -100,8 +110,40 @@ void ObjReader_Private::parseLine(const char* line)
 			if (!faceScanner.nextInt(&i3))
 				i3 = NONE;
 			FaceIndices indices(i1, i2, i3);
-			face.push_back(indices);
+			m_pCallback->onDrawFace(&indices);
 		}
-		m_faces.push_back(face);
+		m_pCallback->onEndFace();
 	}
+}
+
+const VectorContainer& ObjReader_Private::get(DataType dataType, Fint index)
+{
+	switch (dataType)
+	{
+	case Vertex:
+		return m_vertices.at(index - 1);
+	case Texture:
+		return m_textures.at(index - 1);
+	case Normal:
+		return m_normals.at(index - 1);
+	}
+	return VectorContainer(NONE, NONE, NONE);
+}
+
+void ObjReaderCallback::onBeginFace()
+{
+	glBegin(GL_POLYGON);
+}
+
+void ObjReaderCallback::onEndFace()
+{
+	glEnd();
+}
+
+void ObjReaderCallback::onDrawFace(FaceIndices* faceIndices)
+{
+	const VectorContainer& v = m_data->get(ObjReader_Private::Vertex, faceIndices->get(FaceIndices::Vertex));
+	const VectorContainer& n = m_data->get(ObjReader_Private::Normal, faceIndices->get(FaceIndices::Normal));
+	glNormal3f(n.get(VectorContainer::V1), n.get(VectorContainer::V2), n.get(VectorContainer::V3));
+	glVertex3f(v.get(VectorContainer::V1), v.get(VectorContainer::V2), v.get(VectorContainer::V3));
 }

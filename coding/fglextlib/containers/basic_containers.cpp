@@ -8,7 +8,7 @@ VectorContainer::VectorContainer(Ffloat v1, Ffloat v2, Ffloat v3)
 {
 }
 
-Ffloat VectorContainer::get(Which w)
+Ffloat VectorContainer::get(Which w) const
 {
 	switch (w)
 	{
