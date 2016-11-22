@@ -73,8 +73,8 @@ void MtlReader_Private::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_ILLUM))
 	{
-		Ffloat value;
-		scanner.nextFloat(&value);
+		Fint value;
+		scanner.nextInt(&value);
 		m_currentMaterial->illum = value;
 	}
 	else if (strEqual(command, KW_KA))

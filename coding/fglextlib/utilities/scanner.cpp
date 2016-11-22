@@ -55,7 +55,7 @@ bool Scanner::nextFloat(Ffloat* out)
 	next(command);
 	if (!strlen(command))
 		return false;
-	sscanf(command, "%f", out);
+	sscanf_s(command, "%f", out);
 	return true;
 }
 
@@ -65,6 +65,6 @@ bool Scanner::nextInt(Fint* out)
 	next(command);
 	if (!strlen(command))
 		return false;
-	sscanf(command, "%i", out);
+	sscanf_s(command, "%i", out);
 	return true;
 }

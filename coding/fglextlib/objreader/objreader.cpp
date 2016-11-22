@@ -2,9 +2,9 @@
 #include "objreader.h"
 #include "utilities/path.h"
 
-ObjReader::ObjReader()
+ObjReader::ObjReader(Mode mode)
 {
-
+	dataRef().setMode(mode);
 }
 
 void ObjReader::load(const char* filename)
@@ -14,6 +14,11 @@ void ObjReader::load(const char* filename)
 	file.open(filename, std::ios::in);
 	parse(file);
 	file.close();
+}
+
+void ObjReader::draw()
+{
+	dataRef().draw();
 }
 
 void ObjReader::parse(std::ifstream& file)

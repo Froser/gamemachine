@@ -1,8 +1,10 @@
 ﻿#include "stdafx.h"
 #include "objreader_private.h"
 #include "utilities/scanner.h"
+#include "utilities/assert.h"
 #include <locale>
 
+#define IF_LOAD_AND_DRAW(expression) if (m_mode == LoadAndDraw) { expression; }
 #define MAX_VERTICES_IN_ONE_FACE 4
 #define NONE 0
 #define KW_REMARK "#"
@@ -28,6 +30,14 @@ static bool isSeparator(char c)
 	return c == '/';
 }
 
+FaceIndices::FaceIndices()
+	: m_vertexIndex(NONE)
+	, m_textureIndex(NONE)
+	, m_normalIndex(NONE)
+{
+
+}
+
 FaceIndices::FaceIndices(GLint vertexIndex, GLint textureIndex, GLint normalIndex)
 	: m_vertexIndex(vertexIndex)
 	, m_textureIndex(textureIndex)
@@ -46,12 +56,25 @@ GLint FaceIndices::get(Which which)
 	case Normal:
 		return m_normalIndex;
 	}
+	ASSERT(false);
 	return -1;
 }
 
-void ObjReader_Private::init()
+ObjReaderCommand::ObjReaderCommand(Commands cmdType)
+	: m_type(cmdType)
 {
+}
 
+ObjReaderCommand::ObjReaderCommand(const FaceIndices& faceIndices)
+{
+	m_type = CommandDrawFace;
+	memcpy(&m_faceIndices, &faceIndices, sizeof(FaceIndices));
+}
+
+ObjReaderCommand::ObjReaderCommand(const MaterialProperties& mp)
+{
+	m_type = CommandMaterial;
+	memcpy(&m_materialProperties, &mp, sizeof(MaterialProperties));
 }
 
 void ObjReader_Private::parseLine(const char* line)
@@ -83,7 +106,7 @@ void ObjReader_Private::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_VTEXTURE))
 	{
-		Ffloat v1, v2, v3;
+		Ffloat v1, v2;
 		scanner.nextFloat(&v1);
 		scanner.nextFloat(&v2);
 		VertexTexture texture(v1, v2, NONE);
@@ -91,7 +114,8 @@ void ObjReader_Private::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_FACE))
 	{
-		m_pCallback->onBeginFace();
+		IF_LOAD_AND_DRAW(m_pCallback->onBeginFace());
+		m_commands.push_back(ObjReaderCommand(ObjReaderCommand::CommandBeginFace));
 		for (int i = 0; i < MAX_VERTICES_IN_ONE_FACE; i++)
 		{
 			char subCmd[LINE_MAX];
@@ -109,9 +133,11 @@ void ObjReader_Private::parseLine(const char* line)
 			if (!faceScanner.nextInt(&i3))
 				i3 = NONE;
 			FaceIndices indices(i1, i2, i3);
-			m_pCallback->onDrawFace(&indices);
+			IF_LOAD_AND_DRAW(m_pCallback->onDrawFace(&indices));
+			m_commands.push_back(ObjReaderCommand(indices));
 		}
-		m_pCallback->onEndFace();
+		IF_LOAD_AND_DRAW(m_pCallback->onEndFace());
+		m_commands.push_back(ObjReaderCommand(ObjReaderCommand::CommandEndFace));
 	}
 	else if (strEqual(command, KW_MTLLIB))
 	{
@@ -125,7 +151,34 @@ void ObjReader_Private::parseLine(const char* line)
 		char name[LINE_MAX];
 		scanner.next(name);
 		const MaterialProperties& properties = mtlReader.getProperties(name);
-		m_pCallback->onMaterial(properties);
+		IF_LOAD_AND_DRAW(m_pCallback->onMaterial(properties));
+		m_commands.push_back(ObjReaderCommand(properties));
+	}
+}
+
+void ObjReader_Private::draw()
+{
+	for (auto iter = m_commands.begin(); iter != m_commands.end(); iter++)
+	{
+		ObjReaderCommand& cmd = *iter;
+		switch (cmd.type())
+		{
+		case ObjReaderCommand::CommandBeginFace:
+			m_pCallback->onBeginFace();
+			break;
+		case ObjReaderCommand::CommandDrawFace:
+			m_pCallback->onDrawFace(&cmd.faceIndices());
+			break;
+		case ObjReaderCommand::CommandEndFace:
+			m_pCallback->onEndFace();
+			break;
+		case ObjReaderCommand::CommandMaterial:
+			m_pCallback->onMaterial(cmd.materialProperties());
+			break;
+		default:
+			ASSERT(false);
+			break;
+		}
 	}
 }
 
@@ -140,6 +193,7 @@ const VectorContainer& ObjReader_Private::get(DataType dataType, Fint index)
 	case Normal:
 		return m_normals.at(index - 1);
 	}
+	ASSERT(false);
 	return VectorContainer(NONE, NONE, NONE);
 }
 

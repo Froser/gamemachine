@@ -40,6 +40,9 @@
     <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp">
+      <Filter>coding\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h">
@@ -67,6 +70,9 @@
       <Filter>coding\objreader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\utilities\path.h">
+      <Filter>coding\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
   </ItemGroup>

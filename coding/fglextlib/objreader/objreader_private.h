@@ -1,7 +1,7 @@
 ﻿#ifndef __OBJREADER_PRIVATE_H__
 #include "common.h"
 #include <string.h>
-#include <vector>
+#include <queue>
 #include "gl/GL.h"
 #include "containers/basic_containers.h"
 #include "mtlreader.h"
@@ -18,6 +18,7 @@ public:
 	};
 
 public:
+	FaceIndices();
 	FaceIndices(GLint vertexIndex, GLint textureIndex, GLint normalIndex);
 	GLint get(Which);
 
@@ -49,6 +50,33 @@ private:
 	ObjReader_Private* m_data;
 };
 
+class ObjReaderCommand
+{
+public:
+	enum Commands
+	{
+		CommandBeginFace,
+		CommandDrawFace,
+		CommandEndFace,
+		CommandMaterial,
+	};
+
+public:
+	ObjReaderCommand(Commands commands);
+	ObjReaderCommand(const FaceIndices& faceIndices);
+	ObjReaderCommand(const MaterialProperties& mp);
+
+public:
+	Commands type() const { return m_type; }
+	FaceIndices& faceIndices() { return m_faceIndices; }
+	MaterialProperties& materialProperties() { return m_materialProperties; }
+
+private:
+	Commands m_type;
+	FaceIndices m_faceIndices;
+	MaterialProperties m_materialProperties;
+};
+
 class ObjReader_Private
 {
 	friend class ObjReader;
@@ -62,12 +90,18 @@ private:
 		Normal,
 	};
 
+	enum Mode
+	{
+		LoadAndDraw,
+		LoadOnly
+	};
 private:
 	ObjReader_Private() { m_pCallback = new ObjReaderCallback(this); }
 	~ObjReader_Private() { delete m_pCallback; }
+	void setMode(int mode) { m_mode = mode; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
-	void init();
 	void parseLine(const char* line);
+	void draw();
 	const VectorContainer& get(DataType dataType, Fint index);
 
 private:
@@ -75,8 +109,10 @@ private:
 	std::vector<Vertices> m_vertices;
 	std::vector<VertexNormal> m_normals;
 	std::vector<VertexTexture> m_textures;
+	std::vector<ObjReaderCommand> m_commands;
 	IObjReaderCallBack* m_pCallback;
 	MtlReader mtlReader;
+	int m_mode;
 };
 
 END_NS

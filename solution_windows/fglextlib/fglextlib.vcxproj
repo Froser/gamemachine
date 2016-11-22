@@ -57,7 +57,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/fglextlib</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -72,6 +72,7 @@
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader_private.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp" />
   </ItemGroup>
@@ -83,6 +84,7 @@
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader_private.h" />
     <ClInclude Include="..\..\coding\fglextlib\stdafx.h" />
+    <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\path.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h" />
   </ItemGroup>

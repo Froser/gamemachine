@@ -8,3 +8,14 @@ std::string Path::directoryName(const std::string& fileName)
 		return fileName;
 	return fileName.substr(0, pos + 1);
 }
+
+std::string Path::getCurrentPath()
+{
+#if _WINDOWS
+	const int MAX = 255;
+	CHAR fn[MAX];
+	::GetModuleFileName(NULL, fn, MAX);
+	return directoryName(fn);
+#endif
+	return "";
+}

@@ -10,13 +10,24 @@ class ObjReader
 	DEFINE_PRIVATE(ObjReader);
 
 public:
-	ObjReader();
+	enum Mode
+	{
+		LoadAndDraw = ObjReader_Private::LoadAndDraw,
+		LoadOnly
+	};
+
+public:
+	ObjReader(Mode mode);
 
 public:
 	void load(const char* filename);
+	void draw();
 
 private:
 	void parse(std::ifstream& file);
+
+private:
+	Mode m_mode;
 };
 
 END_NS

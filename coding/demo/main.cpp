@@ -1,6 +1,7 @@
 #include <windows.h>
 #include "glut.h"
 #include "objreader/objreader.h"
+#include "utilities/path.h"
 
 using namespace fglextlib;
 
@@ -8,6 +9,8 @@ float width = 600;
 float height = 300;
 GLfloat centerX = 0, centerY = 0, centerZ = 0;
 GLfloat eyeX = 0, eyeZ = 150;
+
+ObjReader reader(ObjReader::LoadOnly);
 
 void render()
 {
@@ -25,14 +28,16 @@ void render()
 	glLoadIdentity();
 	gluLookAt(eyeX, 0, eyeZ, centerX, centerY, centerZ, 0, 1, 0);
 
-	ObjReader reader;
-	reader.load("D:\\baymax.obj");
+	reader.draw();
 
 	glFlush();
 }
 
 void init()
 {
+	std::string path = Path::getCurrentPath();
+	reader.load(path.append("baymax.obj").c_str());
+
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
