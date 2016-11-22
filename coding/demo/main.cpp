@@ -33,7 +33,7 @@ void render()
 void init()
 {
 	std::string path = Path::getCurrentPath();
-	reader.load(path.append("jazz.obj").c_str());
+	reader.load(path.append("cat.obj").c_str());
 
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
