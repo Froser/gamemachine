@@ -63,11 +63,11 @@ void keyboard(unsigned char key, int x, int y)
 	switch (key)
 	{
 	case 'a':
-		camera.moveRight(-1);
+		camera.moveRight(-.75f);
 		render();
 		break;
 	case 'd':
-		camera.moveRight(1);
+		camera.moveRight(.75f);
 		render();
 		break;
 	case 's':

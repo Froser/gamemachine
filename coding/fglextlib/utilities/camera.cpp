@@ -111,5 +111,7 @@ void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int Win
 void CameraUtility::lookAt(Camera& camera)
 {
 	CameraLookAt c = camera.getCameraLookAt();
-	gluLookAt(c.position_x, c.position_y, c.position_z, c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z, c.lookUp_x, c.lookUp_y, c.lookUp_z);
+	gluLookAt(c.position_x, c.position_y, c.position_z, 
+		c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z, 
+		c.lookUp_x, c.lookUp_y, c.lookUp_z);
 }
