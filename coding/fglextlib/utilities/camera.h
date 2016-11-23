@@ -5,7 +5,6 @@ BEGIN_NS
 struct CameraLookAt
 {
 	Ffloat lookAt_x, lookAt_y, lookAt_z;
-	Ffloat lookUp_x, lookUp_y, lookUp_z;
 	Ffloat position_x, position_y, position_z;
 };
 
@@ -16,6 +15,7 @@ public:
 
 public:
 	void setPosition(Ffloat x, Ffloat y, Ffloat z);
+	void setLookUpLimitDegree(Ffloat deg);
 	void lookRight(Ffloat degree);
 	void lookUp(Ffloat degree);
 	void moveFront(Ffloat distance);
@@ -33,6 +33,7 @@ private:
 	Ffloat m_lookAtRad;
 	Ffloat m_lookUpRad;
 	Ffloat m_positionX, m_positionY, m_positionZ;
+	Ffloat m_lookUpLimitRad;
 };
 
 struct CameraUtility

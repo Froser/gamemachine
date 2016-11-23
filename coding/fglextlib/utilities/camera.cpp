@@ -4,11 +4,21 @@
 #include "camera.h"
 #include "assert.h"
 
-static const Ffloat PI = std::acos(-1.0f);
-static const Ffloat SC = PI / 2;
+static Ffloat PI()
+{
+	static const Ffloat _PI = std::acos(-1.0f);
+	return _PI;
+}
+
+static Ffloat SC()
+{
+	static Ffloat _SC = PI() / 2;
+	return _SC;
+}
+
 inline Ffloat rad(Ffloat deg)
 {
-	return PI * deg / 180;
+	return PI() * deg / 180;
 }
 
 Camera::Camera()
@@ -18,6 +28,7 @@ Camera::Camera()
 	, m_positionX(0)
 	, m_positionY(0)
 	, m_positionZ(0)
+	, m_lookUpLimitRad(SC() - rad(3))
 {
 }
 
@@ -28,6 +39,11 @@ void Camera::setPosition(Ffloat x, Ffloat y, Ffloat z)
 	m_positionZ = z;
 }
 
+void Camera::setLookUpLimitDegree(Ffloat deg)
+{
+	m_lookUpLimitRad = SC() - rad(deg);
+}
+
 void Camera::lookRight(Ffloat degree)
 {
 	m_lookAtRad += rad(degree);
@@ -36,10 +52,10 @@ void Camera::lookRight(Ffloat degree)
 void Camera::lookUp(Ffloat degree)
 {
 	m_lookUpRad += rad(degree);
-	if (m_lookUpRad > SC)
-		m_lookUpRad = SC;
-	else if (m_lookUpRad < -SC)
-		m_lookUpRad = -SC;
+	if (m_lookUpRad > m_lookUpLimitRad)
+		m_lookUpRad = m_lookUpLimitRad;
+	else if (m_lookUpRad < -m_lookUpLimitRad)
+		m_lookUpRad = -m_lookUpLimitRad;
 }
 
 void Camera::moveFront(Ffloat distance)
@@ -69,11 +85,6 @@ CameraLookAt Camera::getCameraLookAt()
 	lookAt.lookAt_x = l * std::sin(m_lookAtRad);
 	lookAt.lookAt_z = -l * std::cos(m_lookAtRad);
 
-	lookAt.lookUp_y = std::cos(m_lookUpRad);
-	Ffloat _l = std::sin(m_lookUpRad);
-	lookAt.lookUp_x = _l * std::sin(m_lookAtRad);
-	lookAt.lookUp_z = _l * std::cos(m_lookAtRad);
-
 	lookAt.position_x = m_positionX;
 	lookAt.position_y = m_positionY;
 	lookAt.position_z = m_positionZ;
@@ -101,7 +112,7 @@ void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int Win
 	m_currentMouseX = pos.x;
 	m_currentMouseY = pos.y;
 	int deltaX = m_currentMouseX - centerX, deltaY = m_currentMouseY - centerY;
-	// 先不考虑灵敏度
+
 	lookRight(deltaX * m_sensibility);
 	lookUp(-deltaY * m_sensibility);
 	::SetCursorPos(centerX, centerY);
@@ -111,7 +122,7 @@ void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int Win
 void CameraUtility::lookAt(Camera& camera)
 {
 	CameraLookAt c = camera.getCameraLookAt();
-	gluLookAt(c.position_x, c.position_y, c.position_z, 
-		c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z, 
-		c.lookUp_x, c.lookUp_y, c.lookUp_z);
+	gluLookAt(c.position_x, c.position_y, c.position_z,
+		c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z,
+		0, 1, 0);
 }
