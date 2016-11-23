@@ -5,6 +5,12 @@
 	className##Private m_data; \
 	className##Private& dataRef() { return m_data; }
 
+#ifdef FGLEXTLIB
+#	define FGLEXTLIBAPI __declspec(dllexport)
+#else
+#	define FGLEXTLIBAPI __declspec(dllimport)
+#endif
+
 // Options
 #include "gl/GL.h"
 #define Ffloat GLfloat

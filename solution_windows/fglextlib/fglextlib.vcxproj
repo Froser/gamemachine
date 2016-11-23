@@ -74,6 +74,7 @@
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\utilities\camera.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -86,6 +87,7 @@
     <ClInclude Include="..\..\coding\fglextlib\stdafx.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\path.h" />
+    <ClInclude Include="..\..\coding\fglextlib\utilities\camera.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

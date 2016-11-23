@@ -77,7 +77,7 @@ private:
 		LoadOnly
 	};
 private:
-	ObjReaderPrivate() : m_pCallback (new ObjReaderCallback(this)) {}
+	ObjReaderPrivate() { m_pCallback = new ObjReaderCallback(this); }
 	~ObjReaderPrivate() { delete m_pCallback; }
 	void setMode(int mode) { m_mode = mode; }
 	int mode() { return m_mode; }

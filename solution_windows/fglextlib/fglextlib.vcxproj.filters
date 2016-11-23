@@ -43,6 +43,9 @@
     <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\utilities\camera.cpp">
+      <Filter>coding\utilities</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h">
@@ -74,6 +77,9 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.h">
       <Filter>coding\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\utilities\camera.h">
+      <Filter>coding\utilities</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
