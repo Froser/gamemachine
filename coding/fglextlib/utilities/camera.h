@@ -5,6 +5,7 @@ BEGIN_NS
 struct CameraLookAt
 {
 	Ffloat lookAt_x, lookAt_y, lookAt_z;
+	Ffloat lookUp_x, lookUp_y, lookUp_z;
 	Ffloat position_x, position_y, position_z;
 };
 

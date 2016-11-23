@@ -68,6 +68,12 @@ CameraLookAt Camera::getCameraLookAt()
 	Ffloat l = std::cos(m_lookUpRad);
 	lookAt.lookAt_x = l * std::sin(m_lookAtRad);
 	lookAt.lookAt_z = -l * std::cos(m_lookAtRad);
+
+	lookAt.lookUp_y = std::cos(m_lookUpRad);
+	Ffloat _l = std::sin(m_lookUpRad);
+	lookAt.lookUp_x = _l * std::sin(m_lookAtRad);
+	lookAt.lookUp_z = _l * std::cos(m_lookAtRad);
+
 	lookAt.position_x = m_positionX;
 	lookAt.position_y = m_positionY;
 	lookAt.position_z = m_positionZ;
@@ -105,5 +111,5 @@ void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int Win
 void CameraUtility::lookAt(Camera& camera)
 {
 	CameraLookAt c = camera.getCameraLookAt();
-	gluLookAt(c.position_x, c.position_y, c.position_z, c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z, 0, 1, 0);
+	gluLookAt(c.position_x, c.position_y, c.position_z, c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z, c.lookUp_x, c.lookUp_y, c.lookUp_z);
 }
