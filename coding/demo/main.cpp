@@ -5,6 +5,7 @@
 #include "utilities/camera.h"
 #include "utilities/assert.h"
 #include "gameloop/gameloop.h"
+#include "io/keyboard.h"
 
 using namespace fglextlib;
 
@@ -15,9 +16,6 @@ GLfloat eyeX = 0, eyeY = 0, eyeZ = 150;
 
 ObjReader reader(ObjReader::LoadOnly);
 Camera camera;
-
-#define KEYDOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
-#define KEYUP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1) 
 
 Ffloat fps = 60;
 GameLoopSettings s = { fps };
@@ -58,15 +56,15 @@ public:
 	{
 		Ffloat dis = 50;
 		Ffloat v = dis / fps;
-		if (KEYDOWN(VK_ESCAPE) || KEYDOWN('Q'))
+		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 			m_gl->terminate();
-		if (KEYDOWN('A'))
+		if (Keyboard::isKeyDown('A'))
 			camera.moveRight(-v);
-		if (KEYDOWN('D'))
+		if (Keyboard::isKeyDown('D'))
 			camera.moveRight(v);
-		if (KEYDOWN('W'))
+		if (Keyboard::isKeyDown('W'))
 			camera.moveFront(v);
-		if (KEYDOWN('S'))
+		if (Keyboard::isKeyDown('S'))
 			camera.moveFront(-v);
 	}
 

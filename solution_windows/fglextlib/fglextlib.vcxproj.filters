@@ -17,6 +17,9 @@
     <Filter Include="coding\gameloop">
       <UniqueIdentifier>{47ac030f-863b-4537-92c0-2b451abd08e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="coding\io">
+      <UniqueIdentifier>{99168037-8899-4207-bf00-072e91b20b4d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp">
@@ -54,6 +57,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\fglextlib\utilities\stopwatch.cpp">
       <Filter>coding\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\io\mouse.cpp">
+      <Filter>coding\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\io\keyboard.cpp">
+      <Filter>coding\io</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -95,6 +104,12 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\utilities\stopwatch.h">
       <Filter>coding\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\io\keyboard.h">
+      <Filter>coding\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\io\mouse.h">
+      <Filter>coding\io</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -3,6 +3,7 @@
 #include <gl/GLU.h>
 #include "camera.h"
 #include "assert.h"
+#include "io/mouse.h"
 
 static Ffloat PI()
 {
@@ -93,30 +94,26 @@ CameraLookAt Camera::getCameraLookAt()
 
 void Camera::mouseInitReaction(int windowPosX, int windowPosY, int windowWidth, int WindowHeight)
 {
-#ifdef _WINDOWS
 	const int centerX = windowPosX + windowWidth / 2;
 	const int centerY = windowPosY + WindowHeight / 2;
-	::SetCursorPos(centerX, centerY);
-	::ShowCursor(FALSE);
-#endif
+	Mouse::setCursorPosition(centerX, centerY);
+	Mouse::showCursor(false);
 }
 
 void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int WindowHeight)
 {
-#ifdef _WINDOWS
 	const int centerX = windowPosX + windowWidth / 2;
 	const int centerY = windowPosY + WindowHeight / 2;
 
-	POINT pos;
-	::GetCursorPos(&pos);
-	m_currentMouseX = pos.x;
-	m_currentMouseY = pos.y;
+	int x = 0, y = 0;
+	Mouse::getCursorPosition(&x, &y);
+	m_currentMouseX = x;
+	m_currentMouseY = y;
 	int deltaX = m_currentMouseX - centerX, deltaY = m_currentMouseY - centerY;
 
 	lookRight(deltaX * m_sensibility);
 	lookUp(-deltaY * m_sensibility);
-	::SetCursorPos(centerX, centerY);
-#endif
+	Mouse::setCursorPosition(centerX, centerY);
 }
 
 void CameraUtility::fglextlib_gl_LookAt(Camera& camera)
