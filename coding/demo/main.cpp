@@ -3,6 +3,8 @@
 #include "objreader/objreader.h"
 #include "utilities/path.h"
 #include "utilities/camera.h"
+#include "utilities/assert.h"
+#include "gameloop/gameloop.h"
 
 using namespace fglextlib;
 
@@ -14,33 +16,76 @@ GLfloat eyeX = 0, eyeY = 0, eyeZ = 150;
 ObjReader reader(ObjReader::LoadOnly);
 Camera camera;
 
-void render()
+#define KEYDOWN(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 1 : 0)
+#define KEYUP(vk_code) ((GetAsyncKeyState(vk_code) & 0x8000) ? 0 : 1) 
+
+Ffloat fps = 60;
+GameLoopSettings s = { fps };
+class GameHandler : public IGameHandler
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+public:
+	void setGameLoop(GameLoop* l)
+	{
+		m_gl = l;
+	}
 
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();	
-	gluPerspective(30, 2, 10, 500);
+	void render()
+	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	CameraUtility::lookAt(camera);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		gluPerspective(30, 2, 10, 500);
 
-	glColor3f(1, 1, 1);
-	reader.draw();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		CameraUtility::fglextlib_gl_LookAt(camera);
 
-	glFlush();
-}
+		glColor3f(1, 1, 1);
+		reader.draw();
+
+		glFlush();
+	}
+
+	void mouse()
+	{
+		int wx = glutGet(GLUT_WINDOW_X),
+			wy = glutGet(GLUT_WINDOW_Y);
+		camera.mouseReact(wx, wy, width, height);
+	}
+
+	void keyboard()
+	{
+		Ffloat dis = 50;
+		Ffloat v = dis / fps;
+		if (KEYDOWN(VK_ESCAPE) || KEYDOWN('Q'))
+			m_gl->terminate();
+		if (KEYDOWN('A'))
+			camera.moveRight(-v);
+		if (KEYDOWN('D'))
+			camera.moveRight(v);
+		if (KEYDOWN('W'))
+			camera.moveFront(v);
+		if (KEYDOWN('S'))
+			camera.moveFront(-v);
+	}
+
+	GameLoop* m_gl;
+};
+
+GameHandler handler;
+GameLoop gl(s, &handler);
 
 void init()
 {
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
 	camera.mouseInitReaction(wx, wy, width, height);
+	handler.setGameLoop(&gl);
 
 	std::string path = Path::getCurrentPath();
 	reader.load(path.append("cat.obj").c_str());
-	camera.setSensibility(.5f);
+	camera.setSensibility(.25f);
 	camera.setPosition(eyeX, eyeY, eyeZ);
 
 	glClearColor(0, 0, 0, 0);
@@ -58,41 +103,15 @@ void init()
 	glEnable(GL_LIGHT0);
 }
 
-void keyboard(unsigned char key, int x, int y)
+void render()
 {
-	switch (key)
-	{
-	case 'a':
-		camera.moveRight(-.75f);
-		render();
-		break;
-	case 'd':
-		camera.moveRight(.75f);
-		render();
-		break;
-	case 's':
-		camera.moveFront(-1);
-		render();
-		break;
-	case 'w':
-		camera.moveFront(1);
-		render();
-		break;
-	}
 }
+
 void resharp(GLint w, GLint h)
 {
 	glViewport(0, 0, w, h);
 	width = w;
 	height = h;
-}
-
-void motion(int x, int y)
-{
-	int wx = glutGet(GLUT_WINDOW_X),
-		wy = glutGet(GLUT_WINDOW_Y);
-	camera.mouseReact(wx, wy, width, height);
-	render();
 }
 
 int WINAPI WinMain(
@@ -106,7 +125,7 @@ int WINAPI WinMain(
 	char* l = "";
 	char* argv[1];
 	argv[0] = l;
-
+	
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize(width, height);
@@ -114,10 +133,11 @@ int WINAPI WinMain(
 	glutCreateWindow("Render");
 
 	init();
-	glutPassiveMotionFunc(motion);
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);
-	glutKeyboardFunc(keyboard);
+
+	GameLoopUtilities::fglextlib_gl_registerGameLoop(gl);
+
 	glutMainLoop();
 
 	return 0;

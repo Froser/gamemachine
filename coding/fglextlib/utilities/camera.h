@@ -38,7 +38,7 @@ private:
 
 struct CameraUtility
 {
-	static void lookAt(Camera& camera);
+	static void fglextlib_gl_LookAt(Camera& camera);
 };
 
 END_NS

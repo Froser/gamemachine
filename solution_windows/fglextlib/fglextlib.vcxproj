@@ -67,6 +67,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\gameloop\gameloop.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp" />
@@ -76,10 +77,12 @@
     <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\camera.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\utilities\stopwatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\fglextlib\common.h" />
     <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h" />
+    <ClInclude Include="..\..\coding\fglextlib\gameloop\gameloop.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h" />
@@ -89,6 +92,7 @@
     <ClInclude Include="..\..\coding\fglextlib\utilities\path.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\camera.h" />
     <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h" />
+    <ClInclude Include="..\..\coding\fglextlib\utilities\stopwatch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

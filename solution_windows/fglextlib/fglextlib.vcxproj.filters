@@ -14,6 +14,9 @@
     <Filter Include="coding\utilities">
       <UniqueIdentifier>{5c9d3ade-27ae-4602-96a5-52b5d77c9da5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="coding\gameloop">
+      <UniqueIdentifier>{47ac030f-863b-4537-92c0-2b451abd08e8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp">
@@ -44,6 +47,12 @@
       <Filter>coding\objreader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\fglextlib\utilities\camera.cpp">
+      <Filter>coding\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\gameloop\gameloop.cpp">
+      <Filter>coding\gameloop</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\fglextlib\utilities\stopwatch.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
   </ItemGroup>
@@ -79,6 +88,12 @@
       <Filter>coding\objreader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\fglextlib\utilities\camera.h">
+      <Filter>coding\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\gameloop\gameloop.h">
+      <Filter>coding\gameloop</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\fglextlib\utilities\stopwatch.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
   </ItemGroup>

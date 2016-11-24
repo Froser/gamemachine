@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "assert.h"
+#include <sstream>
 
 void Assert::noop()
 {
@@ -7,7 +8,7 @@ void Assert::noop()
 
 void Assert::assert(const char *assertion, const char *file, int line)
 {
-#if defined(OS_WINDOWS) && defined(_DEBUG)
+#if defined(_WINDOWS) && defined(_DEBUG)
 	std::wstringstream buf, wfile;
 	buf << assertion;
 	wfile << file;

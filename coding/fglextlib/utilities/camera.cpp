@@ -119,7 +119,7 @@ void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int Win
 #endif
 }
 
-void CameraUtility::lookAt(Camera& camera)
+void CameraUtility::fglextlib_gl_LookAt(Camera& camera)
 {
 	CameraLookAt c = camera.getCameraLookAt();
 	gluLookAt(c.position_x, c.position_y, c.position_z,
