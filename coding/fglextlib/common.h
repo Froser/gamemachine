@@ -5,8 +5,18 @@
 	className##Private m_data; \
 	className##Private& dataRef() { return m_data; }
 
+#ifndef _WINDOWS
+typedef unsigned short WORD;
+typedef unsigned long DWORD;
+typedef long LONG;
+typedef unsigned char BYTE;
+#endif
+
+
+
 // Options
 #include "gl/GL.h"
-#define Ffloat GLfloat
-#define Fint GLint
+typedef unsigned char FByte;
+typedef GLfloat Ffloat;
+typedef GLint Fint;
 #define LINE_MAX 256

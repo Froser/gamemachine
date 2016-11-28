@@ -1,24 +1,33 @@
 ﻿#include "stdafx.h"
 #include "imagereader.h"
+#include "utilities/assert.h"
+#include <fstream>
 
-void ImageReaderPrivate::setFilename(const char* filename)
+void ImageReaderPrivate::load(const char* filename, Image* img)
 {
-	m_filename = filename;
+	std::ifstream file;
+	file.open(filename, std::ios::in | std::ios::binary);
+	if (file.good())
+	{
+		BitmapFile& bitmapFile = img->getRawFile();
+
+		file.read(reinterpret_cast<char*>(&bitmapFile.bitmapHeader), sizeof(BitmapHeader));
+		file.read(reinterpret_cast<char*>(&bitmapFile.bitmapInfoHeader), sizeof(BitmapInfoHeader));
+
+		long paletteLen = bitmapFile.bitmapHeader.bfOffBits - sizeof(BitmapHeader) - sizeof(BitmapInfoHeader);
+		file.read(reinterpret_cast<char*>(&bitmapFile.palette), paletteLen);
+
+		ASSERT(bitmapFile.bitmapInfoHeader.biHeight > 0
+			&& bitmapFile.bitmapInfoHeader.biBitCount == 24
+			&& bitmapFile.bitmapInfoHeader.biCompression == 0);
+
+		long cnt = bitmapFile.bitmapInfoHeader.biWidth * bitmapFile.bitmapInfoHeader.biHeight * 3;
+		bitmapFile.buffer = new BYTE[cnt];
+		file.read(reinterpret_cast<char*>(bitmapFile.buffer), cnt);
+	}
 }
 
-void ImageReaderPrivate::load()
+ImagePrivate::~ImagePrivate()
 {
-#ifdef _WINDOWS
-	HBITMAP h = (HBITMAP)::LoadImage(NULL, m_filename.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-	if (h)
-	{
-		BITMAP bitmap = { 0 };
-		int ret = GetObject(h, sizeof(BITMAP), &bitmap);
-		if (ret)
-		{
-			BYTE* pPixel = (BYTE*)bitmap.bmBits;
-		}
-	}
-	DeleteObject(h);
-#endif
+	delete[] m_bitmapFile.buffer;
 }

@@ -105,7 +105,7 @@ static void gameLoop(int v)
 
 		char title[100];
 		char fps[20];
-		sprintf(title, "FPS: %d", gl->getCurrentFPS());
+		sprintf_s(title, "FPS: %d", gl->getCurrentFPS());
 		glutSetIconTitle(title);
 
 		glutTimerFunc(1, gameLoop, 1);

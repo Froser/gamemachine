@@ -4,6 +4,7 @@
 #include "utilities/path.h"
 #include "utilities/camera.h"
 #include "utilities/assert.h"
+#include "imagereader/imagereader.h"
 #include "gameloop/gameloop.h"
 #include "io/keyboard.h"
 
@@ -19,6 +20,9 @@ Camera camera;
 
 Ffloat fps = 60;
 GameLoopSettings s = { fps };
+
+GLuint tex;
+
 class GameHandler : public IGameHandler
 {
 public:
@@ -40,7 +44,18 @@ public:
 		CameraUtility::fglextlib_gl_LookAt(camera);
 
 		glColor3f(1, 1, 1);
-		reader.draw();
+		//reader.draw();
+
+		glEnable(GL_TEXTURE_2D);
+		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+		glBindTexture(GL_TEXTURE_2D, tex);
+
+		glBegin(GL_POLYGON);
+		glTexCoord2f(0, 0); glVertex3d(0, 0, 0);
+		glTexCoord2f(0, 1); glVertex3d(0, 30, 0);
+		glTexCoord2f(1, 1); glVertex3d(30, 30, 0);
+		glTexCoord2f(1, 0); glVertex3d(30, 0, 0);
+		glEnd();
 
 		glFlush();
 	}
@@ -76,6 +91,20 @@ GameLoop gl(s, &handler);
 
 void init()
 {
+	ImageReader r;
+	Image img;
+	r.load("D:\\test.bmp", &img);
+
+	FByte* buf = img.asTexture();
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, buf);
+
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
 	camera.mouseInitReaction(wx, wy, width, height);

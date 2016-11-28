@@ -68,6 +68,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\gameloop\gameloop.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\imagereader\imagereader.cpp" />
+    <ClCompile Include="..\..\coding\fglextlib\imagereader\imagereaderprivate.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\io\mouse.cpp" />
     <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp" />
@@ -85,6 +87,8 @@
     <ClInclude Include="..\..\coding\fglextlib\common.h" />
     <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h" />
     <ClInclude Include="..\..\coding\fglextlib\gameloop\gameloop.h" />
+    <ClInclude Include="..\..\coding\fglextlib\imagereader\imagereader.h" />
+    <ClInclude Include="..\..\coding\fglextlib\imagereader\imagereaderprivate.h" />
     <ClInclude Include="..\..\coding\fglextlib\io\keyboard.h" />
     <ClInclude Include="..\..\coding\fglextlib\io\mouse.h" />
     <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h" />
