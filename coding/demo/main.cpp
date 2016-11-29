@@ -13,7 +13,7 @@ using namespace fglextlib;
 float width = 600;
 float height = 300;
 GLfloat centerX = 0, centerY = 0, centerZ = 149;
-GLfloat eyeX = 0, eyeY = 0, eyeZ = 150;
+GLfloat eyeX = 0, eyeY = 750, eyeZ = 500;
 
 ObjReader reader(ObjReader::LoadOnly);
 Camera camera;
@@ -106,7 +106,7 @@ void init()
 	handler.setGameLoop(&gl);
 
 	std::string path = Path::getCurrentPath();
-	reader.load(path.append("fn57.obj").c_str());
+	reader.load(path.append("newgirl.obj").c_str());
 	camera.setSensibility(.25f);
 	camera.setPosition(eyeX, eyeY, eyeZ);
 
@@ -117,7 +117,7 @@ void init()
 	GLfloat pos[] = { 150, 150, 150, 0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
 
-	GLfloat clr[] = { 1, 1, 1, 1 };
+	GLfloat clr[] = { .5, .5, .5, 1 };
 	GLfloat b[] = { 1, 1, 1, 1 };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, clr);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, clr);

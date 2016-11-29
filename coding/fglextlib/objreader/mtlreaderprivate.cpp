@@ -142,6 +142,8 @@ void MtlReaderPrivate::parseLine(const char* line)
 			{
 				m_pCurrentMaterial->hasTexture = true;
 				m_pCallback->onAddTexture(tex, &m_pCurrentMaterial->textureID);
+				TextureInfo info = { tex, m_pCurrentMaterial->textureID };
+				m_texMap[filename] = info;
 			}
 			else
 			{
@@ -154,8 +156,5 @@ void MtlReaderPrivate::parseLine(const char* line)
 				m_pCurrentMaterial->hasTexture = true;
 			m_pCurrentMaterial->textureID = m_texMap[filename].id;
 		}
-
-		TextureInfo info = { tex, m_pCurrentMaterial->textureID };
-		m_texMap[filename] = info;
 	}
 }
