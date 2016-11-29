@@ -100,6 +100,8 @@ void init()
 // 	glBindTexture(GL_TEXTURE_2D, tex);
 // 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, buf);
 
+	glEnable(GL_LINE_SMOOTH);
+
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
 	camera.mouseInitReaction(wx, wy, width, height);
