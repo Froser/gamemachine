@@ -104,7 +104,6 @@ static void gameLoop(int v)
 		gl->drawFrame();
 
 		char title[100];
-		char fps[20];
 		sprintf_s(title, "FPS: %d", gl->getCurrentFPS());
 		glutSetIconTitle(title);
 

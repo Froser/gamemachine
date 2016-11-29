@@ -37,27 +37,27 @@ public:
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(30, 2, 10, 500);
+		gluPerspective(30, 2, 10, 1500);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		CameraUtility::fglextlib_gl_LookAt(camera);
 
 		glColor3f(1, 1, 1);
-		//reader.draw();
+		reader.draw();
 
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-		glBindTexture(GL_TEXTURE_2D, tex);
+// 		glBindTexture(GL_TEXTURE_2D, tex);
+// 
+// 		glBegin(GL_POLYGON);
+// 		glTexCoord2f(0, 0); glVertex3d(0, 0, 0);
+// 		glTexCoord2f(0, 1); glVertex3d(0, 30, 0);
+// 		glTexCoord2f(1, 1); glVertex3d(30, 30, 0);
+// 		glTexCoord2f(1, 0); glVertex3d(30, 0, 0);
+// 		glEnd();
 
-		glBegin(GL_POLYGON);
-		glTexCoord2f(0, 0); glVertex3d(0, 0, 0);
-		glTexCoord2f(0, 1); glVertex3d(0, 30, 0);
-		glTexCoord2f(1, 1); glVertex3d(30, 30, 0);
-		glTexCoord2f(1, 0); glVertex3d(30, 0, 0);
-		glEnd();
-
-		glFlush();
+		glutSwapBuffers();
 	}
 
 	void mouse()
@@ -91,19 +91,14 @@ GameLoop gl(s, &handler);
 
 void init()
 {
-	ImageReader r;
-	Image img;
-	r.load("D:\\test.bmp", &img);
-
-	FByte* buf = img.asTexture();
-
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, buf);
+// 	ImageReader r;
+// 	Image img;
+// 	r.load("D:\\test.bmp", &img);
+// 
+// 	FByte* buf = img.asTexture();
+// 	glGenTextures(1, &tex);
+// 	glBindTexture(GL_TEXTURE_2D, tex);
+// 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, buf);
 
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
@@ -111,7 +106,7 @@ void init()
 	handler.setGameLoop(&gl);
 
 	std::string path = Path::getCurrentPath();
-	reader.load(path.append("cat.obj").c_str());
+	reader.load(path.append("fn57.obj").c_str());
 	camera.setSensibility(.25f);
 	camera.setPosition(eyeX, eyeY, eyeZ);
 
@@ -154,7 +149,7 @@ int WINAPI WinMain(
 	argv[0] = l;
 	
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
 	glutInitWindowSize(width, height);
 	glutInitWindowPosition(400, 400);
 	glutCreateWindow("Render");

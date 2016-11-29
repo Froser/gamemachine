@@ -1,4 +1,5 @@
 ﻿#ifndef __PHOTOGRAPHER_H__
+#define __PHOTOGRAPHER_H__
 #include "common.h"
 BEGIN_NS
 

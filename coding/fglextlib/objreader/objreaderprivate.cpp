@@ -2,6 +2,7 @@
 #include "ObjReaderPrivate.h"
 #include "utilities/scanner.h"
 #include "utilities/assert.h"
+#include "imagereader/imagereader.h"
 #include <locale>
 
 #define MAX_VERTICES_IN_ONE_FACE 4
@@ -122,14 +123,15 @@ void ObjReaderPrivate::parseLine(const char* line)
 	{
 		char fn[LINE_MAX];
 		scanner.nextToTheEnd(fn);
-		std::string mtlfile = m_workingDir.append(fn);
-		mtlReader.load(mtlfile.c_str());
+		std::string mtlfile = m_workingDir;
+		mtlfile.append(fn);
+		mtlReader->load(mtlfile.c_str());
 	}
 	else if (strEqual(command, KW_USEMTL))
 	{
 		char name[LINE_MAX];
 		scanner.nextToTheEnd(name);
-		const MaterialProperties& properties = mtlReader.getProperties(name);
+		const MaterialProperties& properties = mtlReader->getProperties(name);
 		m_pCallback->onMaterial(properties);
 	}
 }
@@ -148,6 +150,7 @@ void ObjReaderPrivate::endLoad()
 {
 	m_pCallback->onEndLoad();
 }
+
 VectorContainer ObjReaderPrivate::get(DataType dataType, Fint index)
 {
 	VectorContainer def(NONE, NONE, NONE);
@@ -164,6 +167,8 @@ VectorContainer ObjReaderPrivate::get(DataType dataType, Fint index)
 	return def;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Callback:
 void ObjReaderCallback::onBeginFace()
 {
 	glBegin(GL_POLYGON);
@@ -176,13 +181,60 @@ void ObjReaderCallback::onEndFace()
 
 void ObjReaderCallback::onMaterial(const MaterialProperties& p)
 {
-	Ffloat Ka[] = { p.Ka_r, p.Ka_g, p.Ka_b };
-	Ffloat Kd[] = { p.Kd_r, p.Kd_g, p.Kd_b };
-	Ffloat Ks[] = { p.Ks_r, p.Ks_g, p.Ks_b };
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ka);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Kd);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Ks);
+	if (p.hasTexture)
+	{
+		glBindTexture(GL_TEXTURE_2D, p.textureID);
+	}
+
+	if (p.Ka_switch)
+	{
+		Ffloat Ka[] = { p.Ka_r, p.Ka_g, p.Ka_b };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ka);
+	}
+
+	if (p.Kd_switch)
+	{
+		Ffloat Kd[] = { p.Kd_r, p.Kd_g, p.Kd_b };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Kd);
+	}
+
+	if (p.Ks_switch)
+	{
+		Ffloat Ks[] = { p.Ks_r, p.Ks_g, p.Ks_b };
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Ks);
+	}
+
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, p.Ns);
+}
+
+void ObjReaderCallback::onAddTexture(Image* in, Fuint* textureIDOut)
+{
+	glGenTextures(1, textureIDOut);
+	glBindTexture(GL_TEXTURE_2D, *textureIDOut);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, in->getWidth(), in->getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, in->asTexture());
+}
+
+ObjReaderPrivate::ObjReaderPrivate()
+{
+	m_pCallback = new ObjReaderCallback(this);
+	mtlReader = new MtlReader();
+	mtlReader->setCallback(m_pCallback);
+}
+
+ObjReaderPrivate::~ObjReaderPrivate()
+{
+	delete mtlReader;
+	delete m_pCallback;
+}
+
+void ObjReaderCallback::onRemoveTexture(Fuint textureIDOut)
+{
+	Fuint id[] = { textureIDOut };
+	glDeleteTextures(1, id);
 }
 
 void ObjReaderCallback::draw()
@@ -208,8 +260,18 @@ void ObjReaderCallback::onEndLoad()
 
 void ObjReaderCallback::onDrawFace(FaceIndices* faceIndices)
 {
+	if (faceIndices->get(FaceIndices::Texture) != NONE)
+	{
+		const VectorContainer& t = m_data->get(ObjReaderPrivate::Texture, faceIndices->get(FaceIndices::Texture));
+		glTexCoord2f(t.get(VectorContainer::V1), t.get(VectorContainer::V2));
+	}
+
+	if (faceIndices->get(FaceIndices::Normal) != NONE)
+	{
+		const VectorContainer& n = m_data->get(ObjReaderPrivate::Normal, faceIndices->get(FaceIndices::Normal));
+		glNormal3f(n.get(VectorContainer::V1), n.get(VectorContainer::V2), n.get(VectorContainer::V3));
+	}
+
 	const VectorContainer& v = m_data->get(ObjReaderPrivate::Vertex, faceIndices->get(FaceIndices::Vertex));
-	const VectorContainer& n = m_data->get(ObjReaderPrivate::Normal, faceIndices->get(FaceIndices::Normal));
-	glNormal3f(n.get(VectorContainer::V1), n.get(VectorContainer::V2), n.get(VectorContainer::V3));
 	glVertex3f(v.get(VectorContainer::V1), v.get(VectorContainer::V2), v.get(VectorContainer::V3));
 }

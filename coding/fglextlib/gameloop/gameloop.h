@@ -1,4 +1,5 @@
 ﻿#ifndef __GAMELOOP_H__
+#define __GAMELOOP_H__
 #include "common.h"
 #include "utilities/stopwatch.h"
 BEGIN_NS

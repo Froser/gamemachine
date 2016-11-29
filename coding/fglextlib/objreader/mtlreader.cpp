@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "mtlreader.h"
+#include "utilities/path.h"
 
 MtlReader::MtlReader()
 {
@@ -8,6 +9,7 @@ MtlReader::MtlReader()
 
 void MtlReader::load(const char* filename)
 {
+	dataRef().setWorkingDir(Path::directoryName(filename));
 	std::ifstream file;
 	file.open(filename, std::ios::in);
 	if (file.good())

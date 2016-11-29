@@ -1,4 +1,5 @@
 ﻿#ifndef __STOPWATCH_H__
+#define __STOPWATCH_H__
 #include "common.h"
 BEGIN_NS
 class Stopwatch

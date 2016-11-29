@@ -1,4 +1,5 @@
-﻿#ifndef __OBJSCANNER_H__
+﻿#ifndef __OBJREADER_H__
+#define __OBJREADER_H__
 #include "common.h"
 #include <fstream>
 #include "ObjReaderPrivate.h"

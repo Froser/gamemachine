@@ -3,7 +3,7 @@
 #include "utilities/assert.h"
 #include <fstream>
 
-void ImageReaderPrivate::load(const char* filename, Image* img)
+bool ImageReaderPrivate::load(const char* filename, Image* img)
 {
 	std::ifstream file;
 	file.open(filename, std::ios::in | std::ios::binary);
@@ -24,7 +24,9 @@ void ImageReaderPrivate::load(const char* filename, Image* img)
 		long cnt = bitmapFile.bitmapInfoHeader.biWidth * bitmapFile.bitmapInfoHeader.biHeight * 3;
 		bitmapFile.buffer = new BYTE[cnt];
 		file.read(reinterpret_cast<char*>(bitmapFile.buffer), cnt);
+		return true;
 	}
+	return false;
 }
 
 ImagePrivate::~ImagePrivate()

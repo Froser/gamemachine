@@ -15,9 +15,9 @@ ImageReader::ImageReader()
 {
 }
 
-void ImageReader::load(const char* filename, Image* img)
+bool ImageReader::load(const char* filename, Image* img)
 {
-	dataRef().load(filename, img);
+	return dataRef().load(filename, img);
 }
 
 ImageRGB Image::getRGB(long x, long y)

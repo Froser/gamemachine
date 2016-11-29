@@ -19,4 +19,5 @@ typedef unsigned char BYTE;
 typedef unsigned char FByte;
 typedef GLfloat Ffloat;
 typedef GLint Fint;
+typedef GLuint Fuint;
 #define LINE_MAX 256

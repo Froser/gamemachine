@@ -1,4 +1,5 @@
 ﻿#ifndef __ASSERT_H__
+#define __ASSERT_H__
 #include "common.h"
 BEGIN_NS
 #define ASSERT(cond) ((!(cond)) ? Assert::assert(#cond, __FILE__, __LINE__) : Assert::noop())

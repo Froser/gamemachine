@@ -1,4 +1,5 @@
 ﻿#ifndef __OBJREADER_PRIVATE_H__
+#define __OBJREADER_PRIVATE_H__
 #include "common.h"
 #include <string.h>
 #include <queue>
@@ -28,19 +29,23 @@ private:
 	GLint m_normalIndex;
 };
 
-struct IObjReaderCallBack
+class Image;
+struct IObjReaderCallback
 {
+	virtual ~IObjReaderCallback() {};
 	virtual void onBeginLoad() = 0;
 	virtual void onEndLoad() = 0;
 	virtual void onDrawFace(FaceIndices* faceIndices) = 0;
 	virtual void onBeginFace() = 0;
 	virtual void onEndFace() = 0;
 	virtual void onMaterial(const MaterialProperties& p) = 0;
+	virtual void onAddTexture(Image* in, Fuint* textureIDOut) = 0;
+	virtual void onRemoveTexture(Fuint textureIDOut) = 0;
 	virtual void draw() = 0;
 };
 
 class ObjReaderPrivate;
-class ObjReaderCallback : public IObjReaderCallBack
+class ObjReaderCallback : public IObjReaderCallback
 {
 public:
 	ObjReaderCallback(ObjReaderPrivate* data) : m_data(data), m_listID(-1) {};
@@ -51,6 +56,8 @@ public:
 	void onBeginFace() override;
 	void onEndFace() override;
 	void onMaterial(const MaterialProperties& p) override;
+	void onAddTexture(Image* in, Fuint* textureIDOut) override;
+	void onRemoveTexture(Fuint textureIDOut) override;
 	void draw() override;
 
 private:
@@ -77,8 +84,8 @@ private:
 		LoadOnly
 	};
 private:
-	ObjReaderPrivate() { m_pCallback = new ObjReaderCallback(this); }
-	~ObjReaderPrivate() { delete m_pCallback; }
+	ObjReaderPrivate();
+	~ObjReaderPrivate();
 	void setMode(int mode) { m_mode = mode; }
 	int mode() { return m_mode; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
@@ -93,8 +100,8 @@ private:
 	std::vector<Vertices> m_vertices;
 	std::vector<VertexNormal> m_normals;
 	std::vector<VertexTexture> m_textures;
-	IObjReaderCallBack* m_pCallback;
-	MtlReader mtlReader;
+	IObjReaderCallback* m_pCallback;
+	MtlReader* mtlReader;
 	int m_mode;
 };
 

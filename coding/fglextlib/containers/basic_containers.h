@@ -1,4 +1,5 @@
 ﻿#ifndef __BASIC_CONTAINERS_H__
+#define __BASIC_CONTAINERS_H__
 #include "common.h"
 BEGIN_NS
 

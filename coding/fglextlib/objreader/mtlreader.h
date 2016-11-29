@@ -1,11 +1,12 @@
 ﻿#ifndef __MTLREADER_H__
+#define __MTLREADER_H__
 #include "common.h"
 #include <fstream>
-#include "MtlReaderPrivate.h"
+#include "mtlreaderprivate.h"
 
 BEGIN_NS
 
-class ObjReader;
+struct IObjReaderCallback;
 
 class MtlReader
 {
@@ -17,6 +18,7 @@ public:
 public:
 	void load(const char* filename);
 	const MaterialProperties& getProperties(const char* name);
+	void setCallback(IObjReaderCallback* callback) { dataRef().setCallback(callback); }
 
 private:
 	void parse(std::ifstream& file);
