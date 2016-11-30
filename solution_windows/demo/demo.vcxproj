@@ -44,7 +44,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/fglextlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/gamemachine</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -59,7 +59,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/fglextlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/gamemachine</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
