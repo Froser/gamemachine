@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{4D427091-FFFC-4AF5-A0C2-6A728D124966}</ProjectGUID>
+    <ProjectGUID>{0E64EF06-C597-4630-A5E2-EF1811095995}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>App_ExampleBrowser</ProjectName>
@@ -49,35 +49,36 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">App_ExampleBrowser.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">App_ExampleBrowser</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">App_ExampleBrowser.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">App_ExampleBrowser</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">App_ExampleBrowser.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">App_ExampleBrowser</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">App_ExampleBrowser.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">App_ExampleBrowser</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">App_ExampleBrowser.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">App_ExampleBrowser.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">App_ExampleBrowser.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\examples\ExampleBrowser\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">App_ExampleBrowser.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">App_ExampleBrowser</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ExampleBrowser\.;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\src;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ThirdPartyLibs;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -111,7 +112,8 @@
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message></Message>
+      <Message>
+      </Message>
       <Command>setlocal
 "C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy_directory D:/Coding/git/gamemachine/coding/3rdparty/bullet3/data D:/Coding/git/gamemachine/bullet3_windows/data
 if %errorlevel% neq 0 goto :cmEnd
@@ -130,7 +132,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/Debug/App_ExampleBrowser.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/Debug/App_ExampleBrowser.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -151,7 +154,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -168,7 +172,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message></Message>
+      <Message>
+      </Message>
       <Command>setlocal
 "C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy_directory D:/Coding/git/gamemachine/coding/3rdparty/bullet3/data D:/Coding/git/gamemachine/bullet3_windows/data
 if %errorlevel% neq 0 goto :cmEnd
@@ -187,7 +192,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/Release/App_ExampleBrowser.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/Release/App_ExampleBrowser.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -208,7 +214,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -225,7 +232,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message></Message>
+      <Message>
+      </Message>
       <Command>setlocal
 "C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy_directory D:/Coding/git/gamemachine/coding/3rdparty/bullet3/data D:/Coding/git/gamemachine/bullet3_windows/data
 if %errorlevel% neq 0 goto :cmEnd
@@ -244,7 +252,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/MinSizeRel/App_ExampleBrowser.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/MinSizeRel/App_ExampleBrowser.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -282,7 +291,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ProxyFileName>%(Filename)_p.c</ProxyFileName>
     </Midl>
     <PostBuildEvent>
-      <Message></Message>
+      <Message>
+      </Message>
       <Command>setlocal
 "C:\Program Files (x86)\CMake\bin\cmake.exe" -E copy_directory D:/Coding/git/gamemachine/coding/3rdparty/bullet3/data D:/Coding/git/gamemachine/bullet3_windows/data
 if %errorlevel% neq 0 goto :cmEnd
@@ -301,7 +311,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/RelWithDebInfo/App_ExampleBrowser.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/RelWithDebInfo/App_ExampleBrowser.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -448,128 +459,128 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\Dof6Spring2Setup.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\ConstraintPhysicsSetup.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.h" />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\main.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\ExampleEntries.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\Chain.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\Bridge.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\RigidBodyFromObj.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\SimpleBox.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\MultipleBoxes.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\SimpleCloth.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\SimpleJoint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\NewtonsCradle.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\InclinedPlane.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\MultiPendulum.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\geometry.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\model.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\tgaimage.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\our_gl.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\TinyRenderer.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\TinyRendererVisualShapeConverter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\IKTrajectoryHelper.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServer.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory_C_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClient.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PosixSharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\Win32SharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\InProcessMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerSharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirect.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirectC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\SharedMemoryInProcessPhysicsC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBack.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBackC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerCommandProcessor.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\BasicDemo\BasicExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\InverseDynamics\InverseDynamicsExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\InverseKinematics\InverseKinematicsExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ForkLift\ForkLiftDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreadedDemo\MultiThreadedDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreadedDemo\CommonRigidBodyMTBase.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Tutorial\Tutorial.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Tutorial\Dof6ConstraintTutorial.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Evolution\NN3DWalkers.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\NewtonsRopeCradle.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\CollisionSdkC_Api.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\CollisionTutorialBullet2.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\Internal\Bullet2CollisionSdk.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\Internal\RealTimeBullet3CollisionSdk.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\GyroscopicDemo\GyroscopicSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Planar2D\Planar2D.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RollingFrictionDemo\RollingFrictionDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\FractureDemo\FractureDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\FractureDemo\btFractureBody.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\FractureDemo\btFractureDynamicsWorld.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\DynamicControlDemo\MotorDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\MultiThreadingExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\b3PosixThreadSupport.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\b3Win32ThreadSupport.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\b3ThreadSupportInterface.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TinyRendererSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TimeSeriesCanvas.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TimeSeriesFontData.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\DynamicTexturedCubeDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TinyVRGui.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\GripperGraspExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\b3RobotSimAPI.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\R2D2GraspExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\KukaGraspExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\CoordinateSystemDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\RaytracerSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\RenderInstancingDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TimeSeriesExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Benchmarks\BenchmarkDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Raycast\RaytestDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBullet\SerializeSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btWorldImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btBulletWorldImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bChunk.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bFile.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bDNA.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\btBulletFile.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspConverter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspLoader.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\ImportBspExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\ImportColladaSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\ImportObjExample.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportSTLDemo\ImportSTLSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportSDFDemo\ImportSDFSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\ImportURDFSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\UrdfParser.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\VoronoiFracture\VoronoiFractureDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\VoronoiFracture\btConvexConvexMprAlgorithm.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Vehicles\Hinge2Vehicle.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\Pendulum.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\MultiBodySoftContact.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\TestJointTorqueSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\InvertedPendulumPDControl.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\MultiBodyConstraintFeedback.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\MultiDofDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RigidBody\RigidBodySoftContact.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\TestHingeTorque.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\ConstraintDemo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\Dof6Spring2Setup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\ConstraintPhysicsSetup.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinystr.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\InProcessExampleBrowser.cpp"  />
-    <ResourceCompile Include="..\..\..\coding\3rdparty\bullet3\build3\bullet.rc"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\main.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\ExampleEntries.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\Chain.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\Bridge.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\RigidBodyFromObj.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\SimpleBox.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\MultipleBoxes.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\SimpleCloth.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\SimpleJoint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\NewtonsCradle.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\InclinedPlane.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\MultiPendulum.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\geometry.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\model.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\tgaimage.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\our_gl.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\TinyRenderer.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\TinyRendererVisualShapeConverter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\IKTrajectoryHelper.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServer.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory_C_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClient.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PosixSharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\Win32SharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\InProcessMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerSharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirect.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirectC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\SharedMemoryInProcessPhysicsC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBack.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBackC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerCommandProcessor.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\BasicDemo\BasicExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\InverseDynamics\InverseDynamicsExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\InverseKinematics\InverseKinematicsExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ForkLift\ForkLiftDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreadedDemo\MultiThreadedDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreadedDemo\CommonRigidBodyMTBase.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Tutorial\Tutorial.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Tutorial\Dof6ConstraintTutorial.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Evolution\NN3DWalkers.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExtendedTutorials\NewtonsRopeCradle.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\CollisionSdkC_Api.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\CollisionTutorialBullet2.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\Internal\Bullet2CollisionSdk.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Collision\Internal\RealTimeBullet3CollisionSdk.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\GyroscopicDemo\GyroscopicSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Planar2D\Planar2D.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RollingFrictionDemo\RollingFrictionDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\FractureDemo\FractureDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\FractureDemo\btFractureBody.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\FractureDemo\btFractureDynamicsWorld.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\DynamicControlDemo\MotorDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\MultiThreadingExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\b3PosixThreadSupport.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\b3Win32ThreadSupport.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiThreading\b3ThreadSupportInterface.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TinyRendererSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TimeSeriesCanvas.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TimeSeriesFontData.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\DynamicTexturedCubeDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TinyVRGui.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\GripperGraspExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\b3RobotSimAPI.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\R2D2GraspExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RoboticsLearning\KukaGraspExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\CoordinateSystemDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\RaytracerSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\RenderInstancingDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RenderingExamples\TimeSeriesExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Benchmarks\BenchmarkDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Raycast\RaytestDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBullet\SerializeSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btWorldImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btBulletWorldImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bChunk.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bFile.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bDNA.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\btBulletFile.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspConverter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspLoader.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\ImportBspExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\ImportColladaSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\ImportObjExample.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportSTLDemo\ImportSTLSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportSDFDemo\ImportSDFSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\ImportURDFSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\UrdfParser.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\VoronoiFracture\VoronoiFractureDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\VoronoiFracture\btConvexConvexMprAlgorithm.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Vehicles\Hinge2Vehicle.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\Pendulum.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\MultiBodySoftContact.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\TestJointTorqueSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\InvertedPendulumPDControl.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\MultiBodyConstraintFeedback.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\MultiBody\MultiDofDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\RigidBody\RigidBodySoftContact.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\TestHingeTorque.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\ConstraintDemo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\Dof6Spring2Setup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Constraints\ConstraintPhysicsSetup.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\InProcessExampleBrowser.cpp" />
+    <ResourceCompile Include="..\..\..\coding\3rdparty\bullet3\build3\bullet.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/src/Bullet3Common/Bullet3Common.vcxproj">

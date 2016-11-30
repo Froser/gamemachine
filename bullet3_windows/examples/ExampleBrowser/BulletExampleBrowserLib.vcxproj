@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{6F0912C8-6BB3-4F39-95E6-3892C1AEDD62}</ProjectGUID>
+    <ProjectGUID>{58DE2A64-BE83-4DFA-AE7D-BBD3C987922E}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>BulletExampleBrowserLib</ProjectName>
@@ -49,27 +49,28 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletExampleBrowserLib.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletExampleBrowserLib_Debug</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletExampleBrowserLib.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletExampleBrowserLib</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletExampleBrowserLib.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletExampleBrowserLib_MinsizeRel</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletExampleBrowserLib.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletExampleBrowserLib_RelWithDebugInfo</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletExampleBrowserLib.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletExampleBrowserLib_Debug</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletExampleBrowserLib.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletExampleBrowserLib</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletExampleBrowserLib.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletExampleBrowserLib_MinsizeRel</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletExampleBrowserLib.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletExampleBrowserLib_RelWithDebugInfo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ExampleBrowser\.;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\src;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ThirdPartyLibs;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -150,7 +152,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -263,17 +266,17 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenProfileWindow.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenTextureWindow.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\gwenUserInterface.h" />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\OpenGLExampleBrowser.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\OpenGLGuiHelper.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GL_ShapeDrawer.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\CollisionShape2TriangleMesh.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3Clock.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3ResourcePath.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GraphingTexture.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenParameterInterface.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenProfileWindow.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenTextureWindow.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\gwenUserInterface.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\OpenGLExampleBrowser.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\OpenGLGuiHelper.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GL_ShapeDrawer.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\CollisionShape2TriangleMesh.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3Clock.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3ResourcePath.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GraphingTexture.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenParameterInterface.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenProfileWindow.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\GwenTextureWindow.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GwenGUISupport\gwenUserInterface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/ZERO_CHECK.vcxproj">

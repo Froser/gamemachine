@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{1B9D33DE-B7F6-4BE6-96A5-B9E9A6E318B8}</ProjectGUID>
+    <ProjectGUID>{DCB01501-F59D-4D74-92D1-2F7B0C7422DA}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>BulletInverseDynamicsUtils</ProjectName>
@@ -49,27 +49,28 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletInverseDynamicsUtils.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletInverseDynamicsUtils_Debug</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletInverseDynamicsUtils.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletInverseDynamicsUtils</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletInverseDynamicsUtils.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletInverseDynamicsUtils_MinsizeRel</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletInverseDynamicsUtils.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletInverseDynamicsUtils_RelWithDebugInfo</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletInverseDynamicsUtils.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletInverseDynamicsUtils_Debug</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletInverseDynamicsUtils.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletInverseDynamicsUtils</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletInverseDynamicsUtils.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletInverseDynamicsUtils_MinsizeRel</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletInverseDynamicsUtils.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletInverseDynamicsUtils_RelWithDebugInfo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -150,7 +152,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -252,18 +255,18 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\CloneTreeCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\CoilCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\MultiBodyTreeCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\btMultiBodyTreeCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\DillCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\MultiBodyTreeDebugGraph.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\invdyn_bullet_comparison.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\IDRandomUtil.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\RandomTreeCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\SimpleTreeCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\MultiBodyNameMap.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\User2InternalIndex.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\CloneTreeCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\CoilCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\MultiBodyTreeCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\btMultiBodyTreeCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\DillCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\MultiBodyTreeDebugGraph.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\invdyn_bullet_comparison.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\IDRandomUtil.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\RandomTreeCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\SimpleTreeCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\MultiBodyNameMap.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\InverseDynamics\User2InternalIndex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/ZERO_CHECK.vcxproj">

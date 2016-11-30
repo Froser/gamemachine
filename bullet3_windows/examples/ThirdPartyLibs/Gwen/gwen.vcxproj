@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{F7865B29-9650-4980-B16C-D78BE394C23A}</ProjectGUID>
+    <ProjectGUID>{FB76E7F5-2940-45C1-A6DA-5E76EB289FE6}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>gwen</ProjectName>
@@ -49,27 +49,28 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gwen.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gwen_Debug</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gwen.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gwen</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">gwen.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">gwen_MinsizeRel</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">gwen.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">gwen_RelWithDebugInfo</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gwen.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">gwen_Debug</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gwen.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">gwen</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">gwen.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">gwen_MinsizeRel</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">gwen.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">gwen_RelWithDebugInfo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\src;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ThirdPartyLibs;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;GWEN_COMPILE_STATIC;_HAS_EXCEPTIONS=0;_STATIC_CPPLIB;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -150,7 +152,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;GLEW_STATIC;GWEN_COMPILE_STATIC;_HAS_EXCEPTIONS=0;_STATIC_CPPLIB;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -346,70 +349,70 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skins\Simple.h" />
     <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skins\TexturedBase.h" />
     <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skins\Texturing.h" />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Anim.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\BaseRender.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\DragAndDrop.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\events.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Gwen.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Hook.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\inputhandler.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skin.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\ToolTip.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Utility.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Base.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Button.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Canvas.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CheckBox.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorControls.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorPicker.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ComboBox.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CrossSplitter.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockBase.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockedTabControl.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dragger.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\GroupBox.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalScrollBar.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalSlider.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HSVColorPicker.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ImagePanel.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Label.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\LabelClickable.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ListBox.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Menu.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuItem.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuStrip.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\NumericUpDown.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\PanelListPanel.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ProgressBar.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Properties.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButton.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButtonController.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ResizableControl.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Resizer.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RichLabel.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBar.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarBar.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarButton.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollControl.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Slider.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\SplitterBar.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabButton.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabControl.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabStrip.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Text.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBox.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBoxNumeric.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeControl.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeNode.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalScrollBar.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalSlider.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\WindowControl.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\FileOpen.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\FileSave.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\Query.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platforms\Null.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platforms\Windows.cpp"  />
-    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\OpenGL_DebugFont.cpp"  />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Anim.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\BaseRender.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\DragAndDrop.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\events.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Gwen.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Hook.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\inputhandler.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skin.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\ToolTip.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Utility.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Base.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Button.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Canvas.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CheckBox.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorControls.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorPicker.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ComboBox.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CrossSplitter.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockBase.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockedTabControl.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dragger.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\GroupBox.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalScrollBar.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalSlider.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HSVColorPicker.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ImagePanel.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Label.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\LabelClickable.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ListBox.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Menu.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuItem.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuStrip.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\NumericUpDown.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\PanelListPanel.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ProgressBar.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Properties.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButton.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButtonController.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ResizableControl.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Resizer.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RichLabel.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBar.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarBar.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarButton.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollControl.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Slider.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\SplitterBar.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabButton.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabControl.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabStrip.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Text.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBox.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBoxNumeric.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeControl.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeNode.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalScrollBar.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalSlider.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\WindowControl.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\FileOpen.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\FileSave.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\Query.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platforms\Null.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platforms\Windows.cpp" />
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\OpenGL_DebugFont.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/ZERO_CHECK.vcxproj">

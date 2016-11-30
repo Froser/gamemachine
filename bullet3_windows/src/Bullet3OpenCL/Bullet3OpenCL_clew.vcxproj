@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{6CA05762-E30F-44CA-AC07-07A2B90A3696}</ProjectGUID>
+    <ProjectGUID>{34350725-F289-4872-95D5-1779837D8A86}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>Bullet3OpenCL_clew</ProjectName>
@@ -49,27 +49,28 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Bullet3OpenCL_clew.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Bullet3OpenCL_clew_Debug</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bullet3OpenCL_clew.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bullet3OpenCL_clew</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Bullet3OpenCL_clew.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Bullet3OpenCL_clew_MinsizeRel</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Bullet3OpenCL_clew.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Bullet3OpenCL_clew_RelWithDebugInfo</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Bullet3OpenCL_clew.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Bullet3OpenCL_clew_Debug</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bullet3OpenCL_clew.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Bullet3OpenCL_clew</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Bullet3OpenCL_clew.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Bullet3OpenCL_clew_MinsizeRel</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Bullet3OpenCL_clew.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Bullet3OpenCL_clew_RelWithDebugInfo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_CLEW;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -150,7 +152,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_CLEW;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -252,41 +255,41 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\clew\clew.c" >
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\clew\clew.c">
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">CompileAsC</CompileAs>
       <CompileAs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">CompileAsC</CompileAs>
     </ClCompile>
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuGridBroadphase.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuSapBroadphase.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuParallelLinearBvhBroadphase.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuParallelLinearBvh.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\Initialize\b3OpenCLUtils.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3ContactCache.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3ConvexHullContact.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3GjkEpa.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3GjkPairDetector.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3OptimizedBvh.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3QuantizedBvh.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3StridingMeshInterface.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3TriangleCallback.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3TriangleIndexVertexArray.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3VoronoiSimplexSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3BoundSearchCL.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3FillCL.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3LauncherCL.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3PrefixScanCL.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3PrefixScanFloat4CL.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3RadixSort32CL.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\Raycast\b3GpuRaycast.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuGenericConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuJacobiContactSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuNarrowPhase.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuPgsConstraintSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuPgsContactSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuRigidBodyPipeline.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3Solver.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuGridBroadphase.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuSapBroadphase.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuParallelLinearBvhBroadphase.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\BroadphaseCollision\b3GpuParallelLinearBvh.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\Initialize\b3OpenCLUtils.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3ContactCache.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3ConvexHullContact.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3GjkEpa.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3GjkPairDetector.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3OptimizedBvh.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3QuantizedBvh.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3StridingMeshInterface.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3TriangleCallback.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3TriangleIndexVertexArray.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\NarrowphaseCollision\b3VoronoiSimplexSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3BoundSearchCL.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3FillCL.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3LauncherCL.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3PrefixScanCL.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3PrefixScanFloat4CL.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\ParallelPrimitives\b3RadixSort32CL.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\Raycast\b3GpuRaycast.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuGenericConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuJacobiContactSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuNarrowPhase.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuPgsConstraintSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuPgsContactSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3GpuRigidBodyPipeline.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\Bullet3OpenCL\RigidBody\b3Solver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/ZERO_CHECK.vcxproj">

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{0C238BD0-AB51-4137-A86D-5C98A1383E16}</ProjectGUID>
+    <ProjectGUID>{43F8DD6A-8048-468A-A36A-74FA8410476E}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>BulletDynamics</ProjectName>
@@ -49,27 +49,28 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletDynamics.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletDynamics_Debug</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletDynamics.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletDynamics</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletDynamics.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletDynamics_MinsizeRel</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletDynamics.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletDynamics_RelWithDebugInfo</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletDynamics.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletDynamics_Debug</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletDynamics.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletDynamics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletDynamics.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletDynamics_MinsizeRel</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletDynamics.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletDynamics_RelWithDebugInfo</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -150,7 +152,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -307,42 +310,42 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btSolveProjectedGaussSeidel.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeSolver.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeAlgorithm.h" />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Character\btKinematicCharacterController.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btConeTwistConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btContactConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btFixedConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGearConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpringConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpring2Constraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHinge2Constraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHingeConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btPoint2PointConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btNNCGConstraintSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSliderConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSolve2LinearConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btTypedConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btUniversalConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorldMt.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimulationIslandManagerMt.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btRigidBody.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimpleDynamicsWorld.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btWheelInfo.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBody.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraintSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyDynamicsWorld.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointLimitConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyPoint2Point.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyFixedConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodySliderConstraint.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointMotor.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btDantzigLCP.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btMLCPSolver.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeAlgorithm.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Character\btKinematicCharacterController.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btConeTwistConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btContactConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btFixedConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGearConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpringConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpring2Constraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHinge2Constraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHingeConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btPoint2PointConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btNNCGConstraintSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSliderConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSolve2LinearConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btTypedConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btUniversalConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorldMt.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimulationIslandManagerMt.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btRigidBody.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimpleDynamicsWorld.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btWheelInfo.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBody.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraintSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyDynamicsWorld.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointLimitConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyPoint2Point.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyFixedConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodySliderConstraint.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointMotor.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btDantzigLCP.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btMLCPSolver.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeAlgorithm.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/ZERO_CHECK.vcxproj">

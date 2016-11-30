@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{8B8FE864-CDCF-44D3-A74A-73CDF590C56F}</ProjectGUID>
+    <ProjectGUID>{CFC9FCA2-7DEC-4B34-83E4-7C0A5551387F}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>Test_BulletInverseForwardDynamics</ProjectName>
@@ -49,35 +49,36 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_BulletInverseForwardDynamics.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_BulletInverseForwardDynamics</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_BulletInverseForwardDynamics.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_BulletInverseForwardDynamics</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_BulletInverseForwardDynamics.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_BulletInverseForwardDynamics</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_BulletInverseForwardDynamics.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_BulletInverseForwardDynamics</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_BulletInverseForwardDynamics.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_BulletInverseForwardDynamics.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_BulletInverseForwardDynamics.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\InverseDynamics\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_BulletInverseForwardDynamics.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_BulletInverseForwardDynamics</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\InverseDynamics\.;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\InverseDynamics\..\..\src;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\InverseDynamics\..\gtest-1.7.0\include;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\InverseDynamics\..\..\Extras\InverseDynamics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/Debug/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/Debug/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -139,7 +141,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -163,7 +166,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/Release/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/Release/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -184,7 +188,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;_VARIADIC_MAX=10;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -208,7 +213,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/MinSizeRel/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/MinSizeRel/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -253,7 +259,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/RelWithDebInfo/Test_BulletInverseForwardDynamics.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/RelWithDebInfo/Test_BulletInverseForwardDynamics.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -323,30 +330,30 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportSTLDemo\ImportSTLSetup.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportSTLDemo\LoadMeshFromSTL.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\ColladaGraphicsInstance.h" />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\test\InverseDynamics\test_invdyn_bullet.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3ResourcePath.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\UrdfParser.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3Clock.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btBulletWorldImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btWorldImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bChunk.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bFile.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bDNA.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\btBulletFile.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinystr.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\test\InverseDynamics\test_invdyn_bullet.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3ResourcePath.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\UrdfParser.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3Clock.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btBulletWorldImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletWorldImporter\btWorldImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bChunk.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bFile.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bDNA.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\btBulletFile.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/src/Bullet3Common/Bullet3Common.vcxproj">

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="Windows-1252"?>
+<?xml version="1.0" encoding="us-ascii"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{02C1D8F7-365A-4961-8F64-9FB038A94F5C}</ProjectGUID>
+    <ProjectGUID>{7E289500-D080-4FC3-BE9D-E2122534D813}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>Win32</Platform>
     <ProjectName>Test_PhysicsClientServer</ProjectName>
@@ -49,35 +49,36 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-    <PropertyGroup>
-      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\Debug\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_PhysicsClientServer.dir\Debug\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_PhysicsClientServer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\Release\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_PhysicsClientServer.dir\Release\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_PhysicsClientServer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\MinSizeRel\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_PhysicsClientServer.dir\MinSizeRel\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_PhysicsClientServer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\RelWithDebInfo\</OutDir>
-      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_PhysicsClientServer.dir\RelWithDebInfo\</IntDir>
-      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_PhysicsClientServer</TargetName>
-      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
-      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
-      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
-    </PropertyGroup>
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_PhysicsClientServer.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Test_PhysicsClientServer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_PhysicsClientServer.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Test_PhysicsClientServer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_PhysicsClientServer.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Test_PhysicsClientServer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\bullet3_windows\test\SharedMemory\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_PhysicsClientServer.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Test_PhysicsClientServer</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\SharedMemory\.;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\SharedMemory\..\..\src;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\SharedMemory\..\gtest-1.7.0\include;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\SharedMemory\..\..\examples;D:\Coding\git\gamemachine\coding\3rdparty\bullet3\test\SharedMemory\..\..\examples\ThirdPartyLibs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -118,7 +119,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/Debug/Test_PhysicsClientServer.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/Debug/Test_PhysicsClientServer.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -139,7 +141,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;PHYSICS_LOOP_BACK;PHYSICS_SERVER_DIRECT;ENABLE_GTEST;_VARIADIC_MAX=10;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -163,7 +166,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/Release/Test_PhysicsClientServer.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/Release/Test_PhysicsClientServer.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -184,7 +188,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat></DebugInformationFormat>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
       <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;PHYSICS_LOOP_BACK;PHYSICS_SERVER_DIRECT;ENABLE_GTEST;_VARIADIC_MAX=10;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ObjectFileName>$(IntDir)</ObjectFileName>
     </ClCompile>
@@ -208,7 +213,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/MinSizeRel/Test_PhysicsClientServer.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/MinSizeRel/Test_PhysicsClientServer.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -253,7 +259,8 @@
       <ImportLibrary>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/RelWithDebInfo/Test_PhysicsClientServer.lib</ImportLibrary>
       <ProgramDataBaseFile>D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/RelWithDebInfo/Test_PhysicsClientServer.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
-      <Version></Version>
+      <Version>
+      </Version>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>false</LinkLibraryDependencies>
@@ -330,44 +337,44 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\TinyRendererVisualShapeConverter.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleCamera.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.h" />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\test\SharedMemory\gtestwrap.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClient.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\IKTrajectoryHelper.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServer.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerSharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirect.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirectC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerCommandProcessor.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory_C_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBack.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBackC_API.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\Win32SharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PosixSharedMemory.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3ResourcePath.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\TinyRendererVisualShapeConverter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleCamera.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\geometry.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\model.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\tgaimage.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\our_gl.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\TinyRenderer.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinystr.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\UrdfParser.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp"  />
-    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\test\SharedMemory\gtestwrap.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClient.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\IKTrajectoryHelper.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServer.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerSharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirect.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsDirectC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsServerCommandProcessor.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientSharedMemory_C_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsClientC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBack.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PhysicsLoopBackC_API.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\Win32SharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\PosixSharedMemory.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3ResourcePath.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\SharedMemory\TinyRendererVisualShapeConverter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleCamera.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\geometry.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\model.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\tgaimage.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\our_gl.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\TinyRenderer\TinyRenderer.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\tinyxml\tinyxmlparser.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Wavefront\tiny_obj_loader.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\UrdfParser.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMeshUtility\b3ImportMeshUtility.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\stb_image\stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="D:/Coding/git/gamemachine/bullet3_windows/src/Bullet3Common/Bullet3Common.vcxproj">
