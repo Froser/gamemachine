@@ -20,7 +20,7 @@ void Stopwatch::stop()
 	m_end = clock();
 }
 
-Fint Stopwatch::getMillisecond()
+GMint Stopwatch::getMillisecond()
 {
 	return m_end - m_start;
 }

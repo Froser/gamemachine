@@ -39,8 +39,8 @@ struct IObjReaderCallback
 	virtual void onBeginFace() = 0;
 	virtual void onEndFace() = 0;
 	virtual void onMaterial(const MaterialProperties& p) = 0;
-	virtual void onAddTexture(Image* in, Fuint* textureIDOut) = 0;
-	virtual void onRemoveTexture(Fuint textureIDOut) = 0;
+	virtual void onAddTexture(Image* in, GMuint* textureIDOut) = 0;
+	virtual void onRemoveTexture(GMuint textureIDOut) = 0;
 	virtual void draw() = 0;
 };
 
@@ -56,8 +56,8 @@ public:
 	void onBeginFace() override;
 	void onEndFace() override;
 	void onMaterial(const MaterialProperties& p) override;
-	void onAddTexture(Image* in, Fuint* textureIDOut) override;
-	void onRemoveTexture(Fuint textureIDOut) override;
+	void onAddTexture(Image* in, GMuint* textureIDOut) override;
+	void onRemoveTexture(GMuint textureIDOut) override;
 	void draw() override;
 
 private:
@@ -93,7 +93,7 @@ private:
 	void draw();
 	void beginLoad();
 	void endLoad();
-	VectorContainer get(DataType dataType, Fint index);
+	VectorContainer get(DataType dataType, GMint index);
 
 private:
 	std::string m_workingDir;

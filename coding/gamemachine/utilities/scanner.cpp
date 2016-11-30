@@ -60,7 +60,7 @@ void Scanner::nextToTheEnd(char* out)
 	}
 }
 
-bool Scanner::nextFloat(Ffloat* out)
+bool Scanner::nextFloat(GMfloat* out)
 {
 	char command[LINE_MAX];
 	next(command);
@@ -70,7 +70,7 @@ bool Scanner::nextFloat(Ffloat* out)
 	return true;
 }
 
-bool Scanner::nextInt(Fint* out)
+bool Scanner::nextInt(GMint* out)
 {
 	char command[LINE_MAX];
 	next(command);

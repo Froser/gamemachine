@@ -1,14 +1,14 @@
 ﻿#include "stdafx.h"
 #include "basic_containers.h"
 
-VectorContainer::VectorContainer(Ffloat v1, Ffloat v2, Ffloat v3)
+VectorContainer::VectorContainer(GMfloat v1, GMfloat v2, GMfloat v3)
 	: m_v1(v1)
 	, m_v2(v2)
 	, m_v3(v3)
 {
 }
 
-Ffloat VectorContainer::get(Which w) const
+GMfloat VectorContainer::get(Which w) const
 {
 	switch (w)
 	{

@@ -6,9 +6,9 @@ BEGIN_NS
 
 struct ImageRGB
 {
-	Fint r;
-	Fint g;
-	Fint b;
+	GMint r;
+	GMint g;
+	GMint b;
 };
 
 struct BitmapFile;

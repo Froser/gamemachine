@@ -10,18 +10,18 @@ typedef std::string MaterialName;
 const int TEXTURE_ERROR = 0;
 struct MaterialProperties
 {
-	Fuint textureID;
+	GMuint textureID;
 	bool hasTexture : 1;
-	Ffloat Ns;
-	Ffloat d;
-	Ffloat Tr;
-	Ffloat Tf_r, Tf_g, Tf_b;
-	Fint illum;
-	Ffloat Ka_r, Ka_g, Ka_b;
+	GMfloat Ns;
+	GMfloat d;
+	GMfloat Tr;
+	GMfloat Tf_r, Tf_g, Tf_b;
+	GMint illum;
+	GMfloat Ka_r, Ka_g, Ka_b;
 	bool Ka_switch : 1;
-	Ffloat Kd_r, Kd_g, Kd_b;
+	GMfloat Kd_r, Kd_g, Kd_b;
 	bool Kd_switch : 1;
-	Ffloat Ks_r, Ks_g, Ks_b;
+	GMfloat Ks_r, Ks_g, Ks_b;
 	bool Ks_switch : 1;
 };
 
@@ -31,7 +31,7 @@ class Image;
 struct TextureInfo
 {
 	Image* texture;
-	Fuint id;
+	GMuint id;
 };
 
 struct IObjReaderCallback;

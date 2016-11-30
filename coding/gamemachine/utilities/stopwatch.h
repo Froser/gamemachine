@@ -8,12 +8,12 @@ public:
 	Stopwatch();
 	void start();
 	void stop();
-	Fint getMillisecond();
+	GMint getMillisecond();
 	bool isStarted();
 
 private:
-	Fint m_start;
-	Fint m_end;
+	GMint m_start;
+	GMint m_end;
 	bool m_bStart;
 };
 END_NS

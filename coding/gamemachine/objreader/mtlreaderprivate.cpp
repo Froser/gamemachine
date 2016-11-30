@@ -61,25 +61,25 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_NS))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->Ns = value;
 	}
 	else if (strEqual(command, KW_D))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->d = value;
 	}
 	else if (strEqual(command, KW_TR))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->Tr = value;
 	}
 	else if (strEqual(command, KW_TF))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->Tf_r = value;
 		scanner.nextFloat(&value);
@@ -89,13 +89,13 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_ILLUM))
 	{
-		Fint value;
+		GMint value;
 		scanner.nextInt(&value);
 		m_pCurrentMaterial->illum = value;
 	}
 	else if (strEqual(command, KW_KA))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->Ka_r = value;
 		scanner.nextFloat(&value);
@@ -106,7 +106,7 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_KD))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->Kd_r = value;
 		scanner.nextFloat(&value);
@@ -117,7 +117,7 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_KS))
 	{
-		Ffloat value;
+		GMfloat value;
 		scanner.nextFloat(&value);
 		m_pCurrentMaterial->Ks_r = value;
 		scanner.nextFloat(&value);

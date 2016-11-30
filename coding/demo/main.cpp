@@ -20,7 +20,7 @@ GLfloat eyeX = 0, eyeY = 750, eyeZ = 500;
 ObjReader reader(ObjReader::LoadOnly);
 Camera camera;
 
-Ffloat fps = 60;
+GMfloat fps = 60;
 GameLoopSettings s = { fps };
 
 GLuint tex;
@@ -71,8 +71,8 @@ public:
 
 	void keyboard()
 	{
-		Ffloat dis = 50;
-		Ffloat v = dis / fps;
+		GMfloat dis = 50;
+		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 			m_gl->terminate();
 		if (Keyboard::isKeyDown('A'))

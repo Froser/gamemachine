@@ -5,8 +5,8 @@ BEGIN_NS
 
 struct CameraLookAt
 {
-	Ffloat lookAt_x, lookAt_y, lookAt_z;
-	Ffloat position_x, position_y, position_z;
+	GMfloat lookAt_x, lookAt_y, lookAt_z;
+	GMfloat position_x, position_y, position_z;
 };
 
 class Camera
@@ -15,14 +15,14 @@ public:
 	Camera();
 
 public:
-	void setPosition(Ffloat x, Ffloat y, Ffloat z);
-	void setLookUpLimitDegree(Ffloat deg);
-	void lookRight(Ffloat degree);
-	void lookUp(Ffloat degree);
-	void moveFront(Ffloat distance);
-	void moveRight(Ffloat distance);
+	void setPosition(GMfloat x, GMfloat y, GMfloat z);
+	void setLookUpLimitDegree(GMfloat deg);
+	void lookRight(GMfloat degree);
+	void lookUp(GMfloat degree);
+	void moveFront(GMfloat distance);
+	void moveRight(GMfloat distance);
 
-	void setSensibility(Ffloat sensibility);
+	void setSensibility(GMfloat sensibility);
 	CameraLookAt getCameraLookAt();
 
 	void mouseInitReaction(int windowPosX, int windowPosY, int windowWidth, int WindowHeight);
@@ -30,11 +30,11 @@ public:
 
 private:
 	int m_currentMouseX, m_currentMouseY;
-	Ffloat m_sensibility;
-	Ffloat m_lookAtRad;
-	Ffloat m_lookUpRad;
-	Ffloat m_positionX, m_positionY, m_positionZ;
-	Ffloat m_lookUpLimitRad;
+	GMfloat m_sensibility;
+	GMfloat m_lookAtRad;
+	GMfloat m_lookUpRad;
+	GMfloat m_positionX, m_positionY, m_positionZ;
+	GMfloat m_lookUpLimitRad;
 };
 
 struct CameraUtility

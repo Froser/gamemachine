@@ -14,15 +14,15 @@ public:
 	};
 
 public:
-	VectorContainer(Ffloat v1, Ffloat v2, Ffloat v3);
+	VectorContainer(GMfloat v1, GMfloat v2, GMfloat v3);
 
 public:
-	Ffloat get(Which) const;
+	GMfloat get(Which) const;
 
 private:
-	Ffloat m_v1;
-	Ffloat m_v2;
-	Ffloat m_v3;
+	GMfloat m_v1;
+	GMfloat m_v2;
+	GMfloat m_v3;
 };
 
 typedef VectorContainer Vertices;

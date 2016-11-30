@@ -5,19 +5,19 @@
 #include "assert.h"
 #include "io/mouse.h"
 
-static Ffloat PI()
+static GMfloat PI()
 {
-	static const Ffloat _PI = std::acos(-1.0f);
+	static const GMfloat _PI = std::acos(-1.0f);
 	return _PI;
 }
 
-static Ffloat SC()
+static GMfloat SC()
 {
-	static Ffloat _SC = PI() / 2;
+	static GMfloat _SC = PI() / 2;
 	return _SC;
 }
 
-inline Ffloat rad(Ffloat deg)
+inline GMfloat rad(GMfloat deg)
 {
 	return PI() * deg / 180;
 }
@@ -33,24 +33,24 @@ Camera::Camera()
 {
 }
 
-void Camera::setPosition(Ffloat x, Ffloat y, Ffloat z)
+void Camera::setPosition(GMfloat x, GMfloat y, GMfloat z)
 {
 	m_positionX = x;
 	m_positionY = y;
 	m_positionZ = z;
 }
 
-void Camera::setLookUpLimitDegree(Ffloat deg)
+void Camera::setLookUpLimitDegree(GMfloat deg)
 {
 	m_lookUpLimitRad = SC() - rad(deg);
 }
 
-void Camera::lookRight(Ffloat degree)
+void Camera::lookRight(GMfloat degree)
 {
 	m_lookAtRad += rad(degree);
 }
 
-void Camera::lookUp(Ffloat degree)
+void Camera::lookUp(GMfloat degree)
 {
 	m_lookUpRad += rad(degree);
 	if (m_lookUpRad > m_lookUpLimitRad)
@@ -59,21 +59,21 @@ void Camera::lookUp(Ffloat degree)
 		m_lookUpRad = -m_lookUpLimitRad;
 }
 
-void Camera::moveFront(Ffloat distance)
+void Camera::moveFront(GMfloat distance)
 {
 	m_positionY += distance * std::sin(m_lookUpRad);
-	Ffloat l = distance * std::cos(m_lookUpRad);
+	GMfloat l = distance * std::cos(m_lookUpRad);
 	m_positionX += l * std::sin(m_lookAtRad);
 	m_positionZ -= l * std::cos(m_lookAtRad);
 }
 
-void Camera::moveRight(Ffloat distance)
+void Camera::moveRight(GMfloat distance)
 {
 	m_positionX += distance * std::cos(m_lookAtRad);
 	m_positionZ += distance * std::sin(m_lookAtRad);
 }
 
-void Camera::setSensibility(Ffloat sensibility)
+void Camera::setSensibility(GMfloat sensibility)
 {
 	m_sensibility = sensibility;
 }
@@ -82,7 +82,7 @@ CameraLookAt Camera::getCameraLookAt()
 {
 	CameraLookAt lookAt;
 	lookAt.lookAt_y = std::sin(m_lookUpRad);
-	Ffloat l = std::cos(m_lookUpRad);
+	GMfloat l = std::cos(m_lookUpRad);
 	lookAt.lookAt_x = l * std::sin(m_lookAtRad);
 	lookAt.lookAt_z = -l * std::cos(m_lookAtRad);
 

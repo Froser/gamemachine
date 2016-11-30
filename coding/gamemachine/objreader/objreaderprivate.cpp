@@ -71,7 +71,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 
 	if (strEqual(command, KW_VERTEX))
 	{
-		Ffloat v1, v2, v3;
+		GMfloat v1, v2, v3;
 		scanner.nextFloat(&v1);
 		scanner.nextFloat(&v2);
 		scanner.nextFloat(&v3);
@@ -80,7 +80,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_VNORMAL))
 	{
-		Ffloat v1, v2, v3;
+		GMfloat v1, v2, v3;
 		scanner.nextFloat(&v1);
 		scanner.nextFloat(&v2);
 		scanner.nextFloat(&v3);
@@ -89,7 +89,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_VTEXTURE))
 	{
-		Ffloat v1, v2;
+		GMfloat v1, v2;
 		scanner.nextFloat(&v1);
 		scanner.nextFloat(&v2);
 		VertexTexture texture(v1, v2, NONE);
@@ -151,7 +151,7 @@ void ObjReaderPrivate::endLoad()
 	m_pCallback->onEndLoad();
 }
 
-VectorContainer ObjReaderPrivate::get(DataType dataType, Fint index)
+VectorContainer ObjReaderPrivate::get(DataType dataType, GMint index)
 {
 	VectorContainer def(NONE, NONE, NONE);
 	switch (dataType)
@@ -188,26 +188,26 @@ void ObjReaderCallback::onMaterial(const MaterialProperties& p)
 
 	if (p.Ka_switch)
 	{
-		Ffloat Ka[] = { p.Ka_r, p.Ka_g, p.Ka_b };
+		GMfloat Ka[] = { p.Ka_r, p.Ka_g, p.Ka_b };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, Ka);
 	}
 
 	if (p.Kd_switch)
 	{
-		Ffloat Kd[] = { p.Kd_r, p.Kd_g, p.Kd_b };
+		GMfloat Kd[] = { p.Kd_r, p.Kd_g, p.Kd_b };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Kd);
 	}
 
 	if (p.Ks_switch)
 	{
-		Ffloat Ks[] = { p.Ks_r, p.Ks_g, p.Ks_b };
+		GMfloat Ks[] = { p.Ks_r, p.Ks_g, p.Ks_b };
 		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Ks);
 	}
 
 	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, p.Ns);
 }
 
-void ObjReaderCallback::onAddTexture(Image* in, Fuint* textureIDOut)
+void ObjReaderCallback::onAddTexture(Image* in, GMuint* textureIDOut)
 {
 	glGenTextures(1, textureIDOut);
 	glBindTexture(GL_TEXTURE_2D, *textureIDOut);
@@ -231,9 +231,9 @@ ObjReaderPrivate::~ObjReaderPrivate()
 	delete m_pCallback;
 }
 
-void ObjReaderCallback::onRemoveTexture(Fuint textureIDOut)
+void ObjReaderCallback::onRemoveTexture(GMuint textureIDOut)
 {
-	Fuint id[] = { textureIDOut };
+	GMuint id[] = { textureIDOut };
 	glDeleteTextures(1, id);
 }
 

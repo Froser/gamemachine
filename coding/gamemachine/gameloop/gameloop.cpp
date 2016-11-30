@@ -14,7 +14,7 @@ GameLoop::GameLoop(const GameLoopSettings& settings, IGameHandler* handler)
 
 void GameLoop::drawFrame()
 {
-	Fint elapse = 0;
+	GMint elapse = 0;
 	if (!m_drawStopwatch.isStarted())
 	{
 		m_drawStopwatch.start();
@@ -26,8 +26,8 @@ void GameLoop::drawFrame()
 
 	m_handler->render();
 
-	Ffloat nextFrameInterval = 0;
-	Ffloat skipFrameNum = 0;
+	GMfloat nextFrameInterval = 0;
+	GMfloat skipFrameNum = 0;
 	if (elapse < m_eachFrameElapse)
 	{
 		nextFrameInterval = m_eachFrameElapse - elapse;
@@ -35,7 +35,7 @@ void GameLoop::drawFrame()
 	}
 	else
 	{
-		skipFrameNum = (Fint)(elapse / m_eachFrameElapse);
+		skipFrameNum = (GMint)(elapse / m_eachFrameElapse);
 		nextFrameInterval = elapse - skipFrameNum * m_eachFrameElapse;
 		m_currentFps = 1000 / (elapse + nextFrameInterval);
 		if (m_currentFps < 0)
@@ -49,7 +49,7 @@ void GameLoop::drawFrame()
 
 void GameLoop::messageLoop()
 {
-	Fint elapse = 0;
+	GMint elapse = 0;
 	if (!m_drawStopwatch.isStarted())
 	{
 		m_drawStopwatch.start();
@@ -62,15 +62,15 @@ void GameLoop::messageLoop()
 	m_handler->mouse();
 	m_handler->keyboard();
 
-	Ffloat nextFrameInterval = 0;
-	Ffloat skipFrameNum = 0;
+	GMfloat nextFrameInterval = 0;
+	GMfloat skipFrameNum = 0;
 	if (elapse < m_eachFrameElapse)
 	{
 		nextFrameInterval = m_eachFrameElapse - elapse;
 	}
 	else
 	{
-		skipFrameNum = (Fint)(elapse / m_eachFrameElapse);
+		skipFrameNum = (GMint)(elapse / m_eachFrameElapse);
 		nextFrameInterval = elapse - skipFrameNum * m_eachFrameElapse;
 	}
 #ifdef _WINDOWS

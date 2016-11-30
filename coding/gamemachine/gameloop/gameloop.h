@@ -6,7 +6,7 @@ BEGIN_NS
 
 struct GameLoopSettings
 {
-	Fint fps;
+	GMint fps;
 };
 
 struct IGameHandler
@@ -28,7 +28,7 @@ public:
 	void terminate();
 	bool isTerminated();
 
-	Fint getCurrentFPS() { return m_currentFps; }
+	GMint getCurrentFPS() { return m_currentFps; }
 	const GameLoopSettings& getSettings() const { return m_settings; }
 
 private:
@@ -38,8 +38,8 @@ private:
 	bool m_running;
 	GameLoopSettings m_settings;
 	IGameHandler* m_handler;
-	Ffloat m_eachFrameElapse;
-	Fint m_currentFps;
+	GMfloat m_eachFrameElapse;
+	GMint m_currentFps;
 	Stopwatch m_drawStopwatch;
 	bool m_terminate;
 };

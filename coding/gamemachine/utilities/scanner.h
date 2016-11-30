@@ -14,8 +14,8 @@ public:
 public:
 	void next(char* out);
 	void nextToTheEnd(char* out);
-	bool nextFloat(Ffloat* out);
-	bool nextInt(Fint* out);
+	bool nextFloat(GMfloat* out);
+	bool nextInt(GMint* out);
 
 private:
 	const char* m_p;
