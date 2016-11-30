@@ -25,105 +25,105 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\stdafx.cpp">
       <Filter>coding</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\objreader\objreader.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\containers\basic_containers.cpp">
       <Filter>coding\containers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\utilities\scanner.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\objreader\mtlreader.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\utilities\path.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\utilities\assert.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\objreader\objreaderprivate.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\objreader\objreaderprivate.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\objreader\mtlreaderprivate.cpp">
       <Filter>coding\objreader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\utilities\camera.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\utilities\camera.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\gameloop\gameloop.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\gameloop\gameloop.cpp">
       <Filter>coding\gameloop</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\utilities\stopwatch.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\utilities\stopwatch.cpp">
       <Filter>coding\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\io\mouse.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\io\mouse.cpp">
       <Filter>coding\io</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\io\keyboard.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\io\keyboard.cpp">
       <Filter>coding\io</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\imagereader\imagereader.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereader.cpp">
       <Filter>coding\imagereader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\fglextlib\imagereader\imagereaderprivate.cpp">
+    <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.cpp">
       <Filter>coding\imagereader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h">
+    <ClInclude Include="..\..\coding\gamemachine\objreader\objreader.h">
       <Filter>coding\objreader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\stdafx.h">
+    <ClInclude Include="..\..\coding\gamemachine\stdafx.h">
       <Filter>coding</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\common.h">
+    <ClInclude Include="..\..\coding\gamemachine\common.h">
       <Filter>coding</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h">
+    <ClInclude Include="..\..\coding\gamemachine\containers\basic_containers.h">
       <Filter>coding\containers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h">
+    <ClInclude Include="..\..\coding\gamemachine\utilities\scanner.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h">
+    <ClInclude Include="..\..\coding\gamemachine\objreader\mtlreader.h">
       <Filter>coding\objreader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\utilities\path.h">
+    <ClInclude Include="..\..\coding\gamemachine\utilities\path.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h">
+    <ClInclude Include="..\..\coding\gamemachine\utilities\assert.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\objreader\objreaderprivate.h">
+    <ClInclude Include="..\..\coding\gamemachine\objreader\objreaderprivate.h">
       <Filter>coding\objreader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.h">
+    <ClInclude Include="..\..\coding\gamemachine\objreader\mtlreaderprivate.h">
       <Filter>coding\objreader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\utilities\camera.h">
+    <ClInclude Include="..\..\coding\gamemachine\utilities\camera.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\gameloop\gameloop.h">
+    <ClInclude Include="..\..\coding\gamemachine\gameloop\gameloop.h">
       <Filter>coding\gameloop</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\utilities\stopwatch.h">
+    <ClInclude Include="..\..\coding\gamemachine\utilities\stopwatch.h">
       <Filter>coding\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\io\keyboard.h">
+    <ClInclude Include="..\..\coding\gamemachine\io\keyboard.h">
       <Filter>coding\io</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\io\mouse.h">
+    <ClInclude Include="..\..\coding\gamemachine\io\mouse.h">
       <Filter>coding\io</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\imagereader\imagereader.h">
+    <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereader.h">
       <Filter>coding\imagereader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\fglextlib\imagereader\imagereaderprivate.h">
+    <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.h">
       <Filter>coding\imagereader</Filter>
     </ClInclude>
   </ItemGroup>

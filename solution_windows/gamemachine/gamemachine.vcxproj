@@ -12,7 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{421D5CC0-A094-40E3-9570-4C0DB51B4B8F}</ProjectGuid>
-    <RootNamespace>fglextlib</RootNamespace>
+    <RootNamespace>gamemachine</RootNamespace>
+    <ProjectName>gamemachine</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -41,7 +42,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/fglextlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/gamemachine</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -55,7 +56,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/fglextlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glut;../../coding/gamemachine</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -66,41 +67,41 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\coding\fglextlib\containers\basic_containers.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\gameloop\gameloop.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\imagereader\imagereader.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\imagereader\imagereaderprivate.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\io\keyboard.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\io\mouse.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreader.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\objreader\objreader.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\objreader\objreaderprivate.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\stdafx.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\utilities\assert.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\utilities\path.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\utilities\camera.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\utilities\scanner.cpp" />
-    <ClCompile Include="..\..\coding\fglextlib\utilities\stopwatch.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\containers\basic_containers.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\gameloop\gameloop.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereader.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\io\keyboard.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\io\mouse.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\objreader\mtlreader.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\objreader\mtlreaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\objreader\objreader.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\objreader\objreaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\stdafx.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\utilities\assert.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\utilities\path.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\utilities\camera.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\utilities\scanner.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\utilities\stopwatch.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\coding\fglextlib\common.h" />
-    <ClInclude Include="..\..\coding\fglextlib\containers\basic_containers.h" />
-    <ClInclude Include="..\..\coding\fglextlib\gameloop\gameloop.h" />
-    <ClInclude Include="..\..\coding\fglextlib\imagereader\imagereader.h" />
-    <ClInclude Include="..\..\coding\fglextlib\imagereader\imagereaderprivate.h" />
-    <ClInclude Include="..\..\coding\fglextlib\io\keyboard.h" />
-    <ClInclude Include="..\..\coding\fglextlib\io\mouse.h" />
-    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreader.h" />
-    <ClInclude Include="..\..\coding\fglextlib\objreader\mtlreaderprivate.h" />
-    <ClInclude Include="..\..\coding\fglextlib\objreader\objreader.h" />
-    <ClInclude Include="..\..\coding\fglextlib\objreader\objreaderprivate.h" />
-    <ClInclude Include="..\..\coding\fglextlib\stdafx.h" />
-    <ClInclude Include="..\..\coding\fglextlib\utilities\assert.h" />
-    <ClInclude Include="..\..\coding\fglextlib\utilities\path.h" />
-    <ClInclude Include="..\..\coding\fglextlib\utilities\camera.h" />
-    <ClInclude Include="..\..\coding\fglextlib\utilities\scanner.h" />
-    <ClInclude Include="..\..\coding\fglextlib\utilities\stopwatch.h" />
+    <ClInclude Include="..\..\coding\gamemachine\common.h" />
+    <ClInclude Include="..\..\coding\gamemachine\containers\basic_containers.h" />
+    <ClInclude Include="..\..\coding\gamemachine\gameloop\gameloop.h" />
+    <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereader.h" />
+    <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\io\keyboard.h" />
+    <ClInclude Include="..\..\coding\gamemachine\io\mouse.h" />
+    <ClInclude Include="..\..\coding\gamemachine\objreader\mtlreader.h" />
+    <ClInclude Include="..\..\coding\gamemachine\objreader\mtlreaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\objreader\objreader.h" />
+    <ClInclude Include="..\..\coding\gamemachine\objreader\objreaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\stdafx.h" />
+    <ClInclude Include="..\..\coding\gamemachine\utilities\assert.h" />
+    <ClInclude Include="..\..\coding\gamemachine\utilities\path.h" />
+    <ClInclude Include="..\..\coding\gamemachine\utilities\camera.h" />
+    <ClInclude Include="..\..\coding\gamemachine\utilities\scanner.h" />
+    <ClInclude Include="..\..\coding\gamemachine\utilities\stopwatch.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
