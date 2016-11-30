@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
+#include "camera.h"
 #include <cmath>
 #include <gl/GLU.h>
-#include "camera.h"
 #include "assert.h"
 #include "io/mouse.h"
 

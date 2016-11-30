@@ -12,10 +12,10 @@ typedef long LONG;
 typedef unsigned char BYTE;
 #endif
 
-
+#define GLEW_STATIC
+#include "GL/glew.h"
 
 // Options
-#include "gl/GL.h"
 typedef unsigned char FByte;
 typedef GLfloat Ffloat;
 typedef GLint Fint;

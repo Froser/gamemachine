@@ -1,4 +1,6 @@
+#define GLEW_STATIC
 #include <windows.h>
+#include "GL/glew.h"
 #include "glut.h"
 #include "objreader/objreader.h"
 #include "utilities/path.h"
@@ -156,6 +158,7 @@ int WINAPI WinMain(
 	glutInitWindowPosition(400, 400);
 	glutCreateWindow("Render");
 
+	GLenum err = glewInit();
 	init();
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);
