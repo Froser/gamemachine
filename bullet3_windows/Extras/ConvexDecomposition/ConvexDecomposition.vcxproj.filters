@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\bestfitobb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\ConvexBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\cd_wavefront.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\fitsphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\meshvolume.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\raytri.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\vlookup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\bestfit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\cd_hull.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\ConvexDecomposition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\concavity.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\float_math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\planetri.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\splitplane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\ConvexDecomposition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\cd_vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\concavity.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\bestfitobb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\ConvexBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\cd_wavefront.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\fitsphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\meshvolume.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\raytri.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\vlookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\bestfit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\cd_hull.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\coding\3rdparty\bullet3\Extras\ConvexDecomposition\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6D70A597-9214-411D-B0A8-C3748DD291F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{94516990-B5DB-430F-8857-7F34AFA0F594}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

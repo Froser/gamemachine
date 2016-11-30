@@ -1,0 +1,492 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Anim.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\BaseRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\DragAndDrop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\events.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Gwen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Hook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\inputhandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\ToolTip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Utility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Base.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Button.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Canvas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CheckBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorControls.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorPicker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ComboBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CrossSplitter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockedTabControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dragger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\GroupBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalScrollBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalSlider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HSVColorPicker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ImagePanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Label.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\LabelClickable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ListBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Menu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuStrip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\NumericUpDown.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\PanelListPanel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ProgressBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Properties.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButtonController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ResizableControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Resizer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RichLabel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Slider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\SplitterBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabStrip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBoxNumeric.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeNode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalScrollBar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalSlider.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\WindowControl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\FileOpen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\FileSave.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialog\Query.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platforms\Null.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platforms\Windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\OpenGL_DebugFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Align.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Anim.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\BaseRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Config.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\DragAndDrop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Events.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Exports.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Gwen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Hook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\InputHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Macros.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Platform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Structures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\TextObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\ToolTip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Button.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Canvas.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CheckBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorControls.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ColorPicker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ComboBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\CrossSplitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\DockedTabControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dragger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\GroupBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Highlight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalScrollBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HorizontalSlider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\HSVColorPicker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ImagePanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Label.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\LabelClickable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ListBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\MenuStrip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Modal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\NumericUpDown.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\PanelListPanel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ProgressBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Properties.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\PropertyTree.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RadioButtonController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ResizableControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Resizer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\RichLabel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollBarButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ScrollControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Slider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\SplitterBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\StatusBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Symbol.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabStrip.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TabTitleBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TextBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\ToolBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\TreeNode.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalScrollBar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\VerticalSlider.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\WindowControl.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialogs\FileOpen.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialogs\FileSave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Dialogs\Query.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Layout\Splitter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Layout\Table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Property\BaseProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Property\ColorSelector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Controls\Property\Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Input\SDL13.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Input\SFML.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Input\Windows.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\DirectX9.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\FontData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\GDIPlus.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\OpenGL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\OpenGL_DebugFont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Renderers\SFML.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skins\Simple.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skins\TexturedBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\Skins\Texturing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Gwen\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6D70A597-9214-411D-B0A8-C3748DD291F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{94516990-B5DB-430F-8857-7F34AFA0F594}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

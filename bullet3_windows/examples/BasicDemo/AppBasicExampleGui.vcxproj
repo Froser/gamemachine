@@ -1,0 +1,346 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{8C63BD5D-2D6D-4B53-A48F-E819D8C57039}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>AppBasicExampleGui</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AppBasicExampleGui.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AppBasicExampleGui</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AppBasicExampleGui.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AppBasicExampleGui</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">AppBasicExampleGui.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">AppBasicExampleGui</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">false</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">true</GenerateManifest>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">AppBasicExampleGui.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">AppBasicExampleGui</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.exe</TargetExt>
+      <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</LinkIncremental>
+      <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">true</GenerateManifest>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_DEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_DEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\lib\Debug\BulletDynamics_Debug.lib;..\..\lib\Debug\BulletCollision_Debug.lib;..\..\lib\Debug\LinearMath_Debug.lib;..\..\lib\Debug\BulletDynamics_Debug.lib;..\..\lib\Debug\BulletCollision_Debug.lib;..\..\lib\Debug\LinearMath_Debug.lib;..\..\lib\Debug\OpenGLWindow_Debug.lib;..\..\lib\Debug\Bullet3Common_Debug.lib;opengl32.lib;glu32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/Debug/AppBasicExampleGui.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/Debug/AppBasicExampleGui.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat></DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\lib\Release\BulletDynamics.lib;..\..\lib\Release\BulletCollision.lib;..\..\lib\Release\LinearMath.lib;..\..\lib\Release\BulletDynamics.lib;..\..\lib\Release\BulletCollision.lib;..\..\lib\Release\LinearMath.lib;..\..\lib\Release\OpenGLWindow.lib;..\..\lib\Release\Bullet3Common.lib;opengl32.lib;glu32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ImportLibrary>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/Release/AppBasicExampleGui.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/Release/AppBasicExampleGui.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat></DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\lib\MinSizeRel\BulletDynamics_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletCollision_MinsizeRel.lib;..\..\lib\MinSizeRel\LinearMath_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletDynamics_MinsizeRel.lib;..\..\lib\MinSizeRel\BulletCollision_MinsizeRel.lib;..\..\lib\MinSizeRel\LinearMath_MinsizeRel.lib;..\..\lib\MinSizeRel\OpenGLWindow_MinsizeRel.lib;..\..\lib\MinSizeRel\Bullet3Common_MinsizeRel.lib;opengl32.lib;glu32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+      <ImportLibrary>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/MinSizeRel/AppBasicExampleGui.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/MinSizeRel/AppBasicExampleGui.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;B3_USE_STANDALONE_EXAMPLE;GLEW_STATIC;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\btgui\OpenGLWindow\GlewWindows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Link>
+      <AdditionalOptions> /machine:X86 /debug %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib;..\..\lib\RelWithDebInfo\BulletDynamics_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletCollision_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\LinearMath_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletDynamics_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\BulletCollision_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\LinearMath_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\OpenGLWindow_RelWithDebugInfo.lib;..\..\lib\RelWithDebInfo\Bullet3Common_RelWithDebugInfo.lib;opengl32.lib;glu32.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ImportLibrary>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/RelWithDebInfo/AppBasicExampleGui.lib</ImportLibrary>
+      <ProgramDataBaseFile>D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/RelWithDebInfo/AppBasicExampleGui.pdb</ProgramDataBaseFile>
+      <SubSystem>Console</SubSystem>
+      <Version></Version>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples/BasicDemo/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\examples\BasicDemo\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\fglextlib\bullet3_windows\examples\BasicDemo\CMakeFiles\generate.stamp</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\BasicDemo\BasicExample.cpp"  />
+    <ResourceCompile Include="..\..\..\coding\3rdparty\bullet3\build3\bullet.rc"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\StandaloneMain\main_opengl_single_example.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\OpenGLGuiHelper.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\GL_ShapeDrawer.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ExampleBrowser\CollisionShape2TriangleMesh.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Utils\b3Clock.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/src/Bullet3Common/Bullet3Common.vcxproj">
+      <Project>3F36B224-009A-46FD-85DD-F8CC46057692</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/src/BulletCollision/BulletCollision.vcxproj">
+      <Project>2439E096-368D-471C-A38F-DDC6D7C74756</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/src/BulletDynamics/BulletDynamics.vcxproj">
+      <Project>43F8DD6A-8048-468A-A36A-74FA8410476E</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/src/LinearMath/LinearMath.vcxproj">
+      <Project>35DF9AAA-8E91-4B9D-9CFC-01909820D429</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/examples/OpenGLWindow/OpenGLWindow.vcxproj">
+      <Project>7E1AD272-3BB8-4740-A8C3-C87889113D09</Project>
+    </ProjectReference>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/ZERO_CHECK.vcxproj">
+      <Project>DE1FA815-A79D-4119-A425-E9F08A393373</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

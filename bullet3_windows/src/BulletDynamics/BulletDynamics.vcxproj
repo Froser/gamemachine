@@ -1,0 +1,355 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{43F8DD6A-8048-468A-A36A-74FA8410476E}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>BulletDynamics</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\fglextlib\bullet3_windows\lib\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletDynamics.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">BulletDynamics_Debug</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\fglextlib\bullet3_windows\lib\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletDynamics.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">BulletDynamics</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\fglextlib\bullet3_windows\lib\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletDynamics.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">BulletDynamics_MinsizeRel</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\fglextlib\bullet3_windows\lib\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletDynamics.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">BulletDynamics_RelWithDebugInfo</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_DEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_DEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat></DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat></DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4244;4267</DisableSpecificWarnings>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FloatingPointModel>Fast</FloatingPointModel>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;USE_GRAPHICAL_BENCHMARK;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_WARNINGS;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/fglextlib/coding/3rdparty/bullet3 -BD:/Coding/git/fglextlib/bullet3_windows --check-stamp-file D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletDynamics/CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;D:\Coding\git\fglextlib\coding\3rdparty\bullet3\src\BulletDynamics\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\fglextlib\bullet3_windows\src\BulletDynamics\CMakeFiles\generate.stamp</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\btBulletDynamicsCommon.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\btBulletCollisionCommon.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btConeTwistConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btConstraintSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btContactConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btContactSolverInfo.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btFixedConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGearConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpringConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpring2Constraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHinge2Constraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHingeConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btJacobianEntry.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btPoint2PointConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btNNCGConstraintSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSliderConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSolve2LinearConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSolverBody.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSolverConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btTypedConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btUniversalConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btActionInterface.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorldMt.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimulationIslandManagerMt.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDynamicsWorld.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimpleDynamicsWorld.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btRigidBody.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btRaycastVehicle.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btVehicleRaycaster.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btWheelInfo.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Character\btCharacterControllerInterface.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Character\btKinematicCharacterController.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBody.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraintSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyDynamicsWorld.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyLink.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyLinkCollider.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodySolverConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointLimitConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyPoint2Point.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyFixedConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodySliderConstraint.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointMotor.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btDantzigLCP.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btDantzigSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btMLCPSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btMLCPSolverInterface.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btPATHSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btSolveProjectedGaussSeidel.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeSolver.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeAlgorithm.h" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Character\btKinematicCharacterController.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btConeTwistConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btContactConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btFixedConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGearConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpringConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btGeneric6DofSpring2Constraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHinge2Constraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btHingeConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btPoint2PointConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSequentialImpulseConstraintSolver.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btNNCGConstraintSolver.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSliderConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btSolve2LinearConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btTypedConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\ConstraintSolver\btUniversalConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorld.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btDiscreteDynamicsWorldMt.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimulationIslandManagerMt.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btRigidBody.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Dynamics\btSimpleDynamicsWorld.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btRaycastVehicle.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Vehicle\btWheelInfo.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBody.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraintSolver.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyDynamicsWorld.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointLimitConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyPoint2Point.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyFixedConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodySliderConstraint.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\Featherstone\btMultiBodyJointMotor.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btDantzigLCP.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btMLCPSolver.cpp"  />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\src\BulletDynamics\MLCPSolvers\btLemkeAlgorithm.cpp"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Coding/git/fglextlib/bullet3_windows/ZERO_CHECK.vcxproj">
+      <Project>DE1FA815-A79D-4119-A425-E9F08A393373</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

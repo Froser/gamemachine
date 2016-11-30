@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\ThirdPartyLibs\Glew\glew.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\Win32OpenGLWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\Win32Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\fontstash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLInstancingRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLPrimitiveRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLRenderToTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\LoadShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\opengl_fontstashcallbacks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\OpenSans.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleCamera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleOpenGL2App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleOpenGL2Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleOpenGL3App.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\TwFonts.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\fontstash.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLInstanceGraphicsShape.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLInstanceRendererInternalData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLInstancingRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLPrimInternalData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLPrimitiveRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GLRenderToTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\GwenOpenGL3CoreRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\LoadShader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\MacOpenGLWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\OpenGL2Include.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\OpenGLInclude.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\opengl_fontstashcallbacks.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\ShapeData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleOpenGL2App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleOpenGL2Renderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\SimpleOpenGL3App.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\stb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\TwFonts.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\Win32InternalWindowData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\Win32OpenGLWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\Win32Window.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\X11OpenGLWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\coding\3rdparty\bullet3\examples\OpenGLWindow\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{6D70A597-9214-411D-B0A8-C3748DD291F7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{94516990-B5DB-430F-8857-7F34AFA0F594}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
