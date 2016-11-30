@@ -8,7 +8,7 @@
 #include "gameloop/gameloop.h"
 #include "io/keyboard.h"
 
-using namespace fglextlib;
+using namespace gm;
 
 float width = 600;
 float height = 300;

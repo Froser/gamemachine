@@ -2,5 +2,5 @@
 #include <windows.h>
 #endif
 
-namespace fglextlib {};
-using namespace fglextlib;
+namespace gm {};
+using namespace gm;

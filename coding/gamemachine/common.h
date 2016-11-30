@@ -1,4 +1,4 @@
-﻿#define BEGIN_NS namespace fglextlib {
+﻿#define BEGIN_NS namespace gm {
 #define END_NS }
 #define DEFINE_PRIVATE(className) \
 	private: \
