@@ -1,4 +1,4 @@
-# Install script for directory: D:/Coding/git/fglextlib/coding/3rdparty/bullet3/Extras/GIMPACTUtils
+# Install script for directory: D:/Coding/git/gamemachine/coding/3rdparty/bullet3/Extras/GIMPACTUtils
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

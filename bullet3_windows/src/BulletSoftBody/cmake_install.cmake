@@ -1,4 +1,4 @@
-# Install script for directory: D:/Coding/git/fglextlib/coding/3rdparty/bullet3/src/BulletSoftBody
+# Install script for directory: D:/Coding/git/gamemachine/coding/3rdparty/bullet3/src/BulletSoftBody
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)

@@ -1,4 +1,4 @@
-# Install script for directory: D:/Coding/git/fglextlib/coding/3rdparty/bullet3/examples
+# Install script for directory: D:/Coding/git/gamemachine/coding/3rdparty/bullet3/examples
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,12 +29,12 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("D:/Coding/git/fglextlib/bullet3_windows/examples/HelloWorld/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/examples/BasicDemo/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/examples/ExampleBrowser/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/examples/ThirdPartyLibs/Gwen/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/examples/ThirdPartyLibs/BussIK/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/examples/OpenGLWindow/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/examples/HelloWorld/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/examples/BasicDemo/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/examples/ExampleBrowser/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/examples/ThirdPartyLibs/Gwen/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/examples/ThirdPartyLibs/BussIK/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/examples/OpenGLWindow/cmake_install.cmake")
 
 endif()
 

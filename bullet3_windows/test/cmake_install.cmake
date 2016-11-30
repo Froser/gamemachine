@@ -1,4 +1,4 @@
-# Install script for directory: D:/Coding/git/fglextlib/coding/3rdparty/bullet3/test
+# Install script for directory: D:/Coding/git/gamemachine/coding/3rdparty/bullet3/test
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -29,11 +29,11 @@ endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
-  include("D:/Coding/git/fglextlib/bullet3_windows/test/InverseDynamics/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/test/SharedMemory/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/test/gtest-1.7.0/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/test/collision/cmake_install.cmake")
-  include("D:/Coding/git/fglextlib/bullet3_windows/test/BulletDynamics/pendulum/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/test/InverseDynamics/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/test/SharedMemory/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/test/gtest-1.7.0/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/test/collision/cmake_install.cmake")
+  include("D:/Coding/git/gamemachine/bullet3_windows/test/BulletDynamics/pendulum/cmake_install.cmake")
 
 endif()
 

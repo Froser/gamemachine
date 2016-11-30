@@ -1,4 +1,4 @@
-# Install script for directory: D:/Coding/git/fglextlib/coding/3rdparty/bullet3/test/InverseDynamics
+# Install script for directory: D:/Coding/git/gamemachine/coding/3rdparty/bullet3/test/InverseDynamics
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
