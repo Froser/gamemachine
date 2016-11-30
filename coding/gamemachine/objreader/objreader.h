@@ -2,10 +2,10 @@
 #define __OBJREADER_H__
 #include "common.h"
 #include <fstream>
-#include "ObjReaderPrivate.h"
+#include "objreaderprivate.h"
 
 BEGIN_NS
-
+class Object;
 class ObjReader
 {
 	DEFINE_PRIVATE(ObjReader);
@@ -21,8 +21,7 @@ public:
 	ObjReader(Mode mode);
 
 public:
-	void load(const char* filename);
-	void draw();
+	void load(const char* filename, Object* obj);
 
 private:
 	void parse(std::ifstream& file);

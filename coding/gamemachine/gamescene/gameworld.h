@@ -1,7 +1,6 @@
 ﻿#ifndef __GAMESCENE_H__
 #define __GAMESCENE_H__
 #include "common.h"
-#include "utilities/autoptr.h"
 #include "gameworldprivate.h"
 
 class btDefaultCollisionConfiguration;
@@ -19,12 +18,6 @@ class GameWorld
 public:
 	void init();
 
-private:
-	AutoPtr<btDefaultCollisionConfiguration> m_collisionConfiguration;
-	AutoPtr<btCollisionDispatcher> m_dispatcher;
-	AutoPtr<btBroadphaseInterface> m_overlappingPairCache;
-	AutoPtr<btSequentialImpulseConstraintSolver> m_solver;
-	AutoPtr<btDiscreteDynamicsWorld> m_dynamicsWorld;
 };
 
 END_NS

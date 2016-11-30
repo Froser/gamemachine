@@ -1,13 +1,14 @@
 ﻿#include "stdafx.h"
 #include "objreader.h"
 #include "utilities/path.h"
+#include "core/objstruct.h"
 
 ObjReader::ObjReader(Mode mode)
 {
 	dataRef().setMode(mode);
 }
 
-void ObjReader::load(const char* filename)
+void ObjReader::load(const char* filename, Object* obj)
 {
 	dataRef().setWorkingDir(Path::directoryName(filename));
 	dataRef().beginLoad();
@@ -19,11 +20,8 @@ void ObjReader::load(const char* filename)
 	}
 	file.close();
 	dataRef().endLoad();
-}
 
-void ObjReader::draw()
-{
-	dataRef().draw();
+	dataRef().getObject(obj);
 }
 
 void ObjReader::parse(std::ifstream& file)

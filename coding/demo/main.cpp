@@ -3,6 +3,7 @@
 #include "GL/glew.h"
 #include "glut.h"
 #include "objreader/objreader.h"
+#include "core/objstruct.h"
 #include "utilities/path.h"
 #include "utilities/camera.h"
 #include "utilities/assert.h"
@@ -23,7 +24,7 @@ Camera camera;
 GMfloat fps = 60;
 GameLoopSettings s = { fps };
 
-GLuint tex;
+Object obj;
 
 class GameHandler : public IGameHandler
 {
@@ -46,7 +47,7 @@ public:
 		CameraUtility::fglextlib_gl_LookAt(camera);
 
 		glColor3f(1, 1, 1);
-		reader.draw();
+		obj.draw();
 
 		glEnable(GL_TEXTURE_2D);
 		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -102,6 +103,7 @@ void init()
 // 	glBindTexture(GL_TEXTURE_2D, tex);
 // 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, buf);
 
+
 	glEnable(GL_LINE_SMOOTH);
 
 	int wx = glutGet(GLUT_WINDOW_X),
@@ -110,7 +112,8 @@ void init()
 	handler.setGameLoop(&gl);
 
 	std::string path = Path::getCurrentPath();
-	reader.load(path.append("newgirl.obj").c_str());
+	reader.load(path.append("fn57.obj").c_str(), &obj);
+
 	camera.setSensibility(.25f);
 	camera.setPosition(eyeX, eyeY, eyeZ);
 

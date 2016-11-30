@@ -3,6 +3,7 @@
 #include "common.h"
 #include <string>
 #include <map>
+#include "core/objstruct.h"
 
 BEGIN_NS
 typedef std::string MaterialName;
@@ -27,13 +28,6 @@ struct MaterialProperties
 
 typedef std::map<MaterialName, MaterialProperties> Materials;
 
-class Image;
-struct TextureInfo
-{
-	Image* texture;
-	GMuint id;
-};
-
 struct IObjReaderCallback;
 class MtlReaderPrivate
 {
@@ -41,18 +35,18 @@ class MtlReaderPrivate
 
 private:
 	MtlReaderPrivate() : m_pCurrentMaterial(nullptr) {}
-	~MtlReaderPrivate();
 	void parseLine(const char* line);
 	Materials& getMaterials();
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void setCallback(IObjReaderCallback* callback) { m_pCallback = callback; }
+	TextureMap getTextureMap() { return m_texMap; }
 
 private:
 	MaterialProperties* m_pCurrentMaterial;
 	Materials m_materials;
 	std::string m_workingDir;
 	IObjReaderCallback* m_pCallback;
-	std::map<std::string, TextureInfo> m_texMap;
+	TextureMap m_texMap;
 };
 END_NS
 #endif

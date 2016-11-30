@@ -55,8 +55,7 @@ struct BitmapFile
 class ImagePrivate
 {
 	friend class Image;
-
-private:
+public:
 	~ImagePrivate();
 
 private:

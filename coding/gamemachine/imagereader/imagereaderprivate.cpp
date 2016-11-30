@@ -3,6 +3,11 @@
 #include "utilities/assert.h"
 #include <fstream>
 
+ImagePrivate::~ImagePrivate()
+{
+	delete[] m_bitmapFile.buffer;
+}
+
 bool ImageReaderPrivate::load(const char* filename, Image* img)
 {
 	std::ifstream file;
@@ -27,9 +32,4 @@ bool ImageReaderPrivate::load(const char* filename, Image* img)
 		return true;
 	}
 	return false;
-}
-
-ImagePrivate::~ImagePrivate()
-{
-	delete[] m_bitmapFile.buffer;
 }

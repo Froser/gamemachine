@@ -23,6 +23,12 @@
     <Filter Include="coding\imagereader">
       <UniqueIdentifier>{3663cf2a-03b5-461f-b415-40777a0342bd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="coding\gamescene">
+      <UniqueIdentifier>{77c171d3-264b-4202-8703-13b7c8e0b795}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="coding\core">
+      <UniqueIdentifier>{f4a0f70b-7f83-47a9-a0b1-0f71017dc9d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\stdafx.cpp">
@@ -72,6 +78,21 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.cpp">
       <Filter>coding\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworld.cpp">
+      <Filter>coding\gamescene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworldprivate.cpp">
+      <Filter>coding\gamescene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobject.cpp">
+      <Filter>coding\gamescene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.cpp">
+      <Filter>coding\gamescene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\core\objstruct.cpp">
+      <Filter>coding\core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +146,24 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.h">
       <Filter>coding\imagereader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworld.h">
+      <Filter>coding\gamescene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\utilities\autoptr.h">
+      <Filter>coding\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworldprivate.h">
+      <Filter>coding\gamescene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobject.h">
+      <Filter>coding\gamescene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.h">
+      <Filter>coding\gamescene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\core\objstruct.h">
+      <Filter>coding\core</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

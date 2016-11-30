@@ -26,19 +26,6 @@ static bool isWhiteSpace(char c)
 	return !!isspace(c);
 }
 
-MtlReaderPrivate::~MtlReaderPrivate()
-{
-	for (auto iter = m_texMap.begin(); iter != m_texMap.end(); iter++)
-	{
-		TextureInfo& info = (*iter).second;
-		if (info.id == TEXTURE_ERROR)
-			continue;
-
-		m_pCallback->onRemoveTexture(info.id);
-		delete info.texture;
-	}
-}
-
 Materials& MtlReaderPrivate::getMaterials()
 {
 	return m_materials;

@@ -42,7 +42,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glut;../../coding/gamemachine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glut;../../coding/gamemachine;../../coding/3rdparty/bullet3/src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -56,7 +56,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/glut;../../coding/gamemachine</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/glut;../../coding/gamemachine;../../coding/3rdparty/bullet3/src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
@@ -68,7 +68,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\containers\basic_containers.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\core\objstruct.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\gameloop\gameloop.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobject.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworld.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\io\keyboard.cpp" />
@@ -87,7 +92,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\containers\basic_containers.h" />
+    <ClInclude Include="..\..\coding\gamemachine\core\objstruct.h" />
     <ClInclude Include="..\..\coding\gamemachine\gameloop\gameloop.h" />
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobject.h" />
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworld.h" />
+    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereader.h" />
     <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\io\keyboard.h" />
@@ -98,6 +108,7 @@
     <ClInclude Include="..\..\coding\gamemachine\objreader\objreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\utilities\assert.h" />
+    <ClInclude Include="..\..\coding\gamemachine\utilities\autoptr.h" />
     <ClInclude Include="..\..\coding\gamemachine\utilities\path.h" />
     <ClInclude Include="..\..\coding\gamemachine\utilities\camera.h" />
     <ClInclude Include="..\..\coding\gamemachine\utilities\scanner.h" />

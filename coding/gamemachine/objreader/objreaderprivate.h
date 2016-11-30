@@ -6,6 +6,7 @@
 #include "gl/GL.h"
 #include "containers/basic_containers.h"
 #include "mtlreader.h"
+#include "core/objstruct.h"
 BEGIN_NS
 
 class FaceIndices
@@ -40,8 +41,7 @@ struct IObjReaderCallback
 	virtual void onEndFace() = 0;
 	virtual void onMaterial(const MaterialProperties& p) = 0;
 	virtual void onAddTexture(Image* in, GMuint* textureIDOut) = 0;
-	virtual void onRemoveTexture(GMuint textureIDOut) = 0;
-	virtual void draw() = 0;
+	virtual void getObject(Object* obj) = 0;
 };
 
 class ObjReaderPrivate;
@@ -49,7 +49,6 @@ class ObjReaderCallback : public IObjReaderCallback
 {
 public:
 	ObjReaderCallback(ObjReaderPrivate* data) : m_data(data), m_listID(-1) {};
-	~ObjReaderCallback();
 	void onBeginLoad() override;
 	void onEndLoad() override;
 	void onDrawFace(FaceIndices* faceIndices) override;
@@ -57,8 +56,7 @@ public:
 	void onEndFace() override;
 	void onMaterial(const MaterialProperties& p) override;
 	void onAddTexture(Image* in, GMuint* textureIDOut) override;
-	void onRemoveTexture(GMuint textureIDOut) override;
-	void draw() override;
+	void getObject(Object* obj) override;
 
 private:
 	ObjReaderPrivate* m_data;
@@ -90,7 +88,7 @@ private:
 	int mode() { return m_mode; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void parseLine(const char* line);
-	void draw();
+	void getObject(Object* obj);
 	void beginLoad();
 	void endLoad();
 	VectorContainer get(DataType dataType, GMint index);
@@ -101,7 +99,7 @@ private:
 	std::vector<VertexNormal> m_normals;
 	std::vector<VertexTexture> m_textures;
 	IObjReaderCallback* m_pCallback;
-	MtlReader* mtlReader;
+	MtlReader* m_pMtlReader;
 	int m_mode;
 };
 

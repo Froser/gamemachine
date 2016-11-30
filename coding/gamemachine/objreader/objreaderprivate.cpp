@@ -125,20 +125,20 @@ void ObjReaderPrivate::parseLine(const char* line)
 		scanner.nextToTheEnd(fn);
 		std::string mtlfile = m_workingDir;
 		mtlfile.append(fn);
-		mtlReader->load(mtlfile.c_str());
+		m_pMtlReader->load(mtlfile.c_str());
 	}
 	else if (strEqual(command, KW_USEMTL))
 	{
 		char name[LINE_MAX];
 		scanner.nextToTheEnd(name);
-		const MaterialProperties& properties = mtlReader->getProperties(name);
+		const MaterialProperties& properties = m_pMtlReader->getProperties(name);
 		m_pCallback->onMaterial(properties);
 	}
 }
 
-void ObjReaderPrivate::draw()
+void ObjReaderPrivate::getObject(Object* obj)
 {
-	m_pCallback->draw();
+	m_pCallback->getObject(obj);
 }
 
 void ObjReaderPrivate::beginLoad()
@@ -221,30 +221,20 @@ void ObjReaderCallback::onAddTexture(Image* in, GMuint* textureIDOut)
 ObjReaderPrivate::ObjReaderPrivate()
 {
 	m_pCallback = new ObjReaderCallback(this);
-	mtlReader = new MtlReader();
-	mtlReader->setCallback(m_pCallback);
+	m_pMtlReader = new MtlReader();
+	m_pMtlReader->setCallback(m_pCallback);
 }
 
 ObjReaderPrivate::~ObjReaderPrivate()
 {
-	delete mtlReader;
+	delete m_pMtlReader;
 	delete m_pCallback;
 }
 
-void ObjReaderCallback::onRemoveTexture(GMuint textureIDOut)
+void ObjReaderCallback::getObject(Object* obj)
 {
-	GMuint id[] = { textureIDOut };
-	glDeleteTextures(1, id);
-}
-
-void ObjReaderCallback::draw()
-{
-	glCallList(m_listID);
-}
-
-ObjReaderCallback::~ObjReaderCallback()
-{
-	glDeleteLists(m_listID, 1);
+	obj->m_objectId = m_listID;
+	obj->m_textureMap = m_data->m_pMtlReader->getTextureMap();
 }
 
 void ObjReaderCallback::onBeginLoad()
