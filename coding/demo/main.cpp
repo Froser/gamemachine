@@ -10,13 +10,17 @@
 #include "imagereader/imagereader.h"
 #include "gameloop/gameloop.h"
 #include "io/keyboard.h"
+#include "gamescene/gameworld.h"
+#include "gamescene/gameobject.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 using namespace gm;
 
 float width = 600;
 float height = 300;
-GLfloat centerX = 0, centerY = 0, centerZ = 149;
-GLfloat eyeX = 0, eyeY = 750, eyeZ = 500;
+GLfloat centerX = 0, centerY = 0, centerZ = 0;
+GLfloat eyeX = 0, eyeY = 0, eyeZ = 300;
 
 ObjReader reader(ObjReader::LoadOnly);
 Camera camera;
@@ -25,6 +29,35 @@ GMfloat fps = 60;
 GameLoopSettings s = { fps };
 
 Object obj;
+GameWorld world;
+
+class SimpleGameObject : public GameObject
+{
+public:
+	SimpleGameObject(const btVector3& vec, const btTransform& trans)
+		: m_vec(vec)
+		, m_trans(trans)
+	{
+	}
+
+	virtual btMotionState* createMotionState() override
+	{
+		return new btDefaultMotionState(m_trans);
+	}
+
+	virtual void drawObject() override
+	{
+		glutSolidCube(50);
+	}
+
+	virtual btCollisionShape* createCollisionShape() override
+	{
+		return new btBoxShape(m_vec);
+	}
+
+	btVector3 m_vec;
+	btTransform m_trans;
+};
 
 class GameHandler : public IGameHandler
 {
@@ -40,25 +73,21 @@ public:
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(30, 2, 10, 1500);
+		gluPerspective(30, 2, 10, 300);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		CameraUtility::fglextlib_gl_LookAt(camera);
 
-		glColor3f(1, 1, 1);
-		obj.draw();
+		//glColor3f(1, 1, 1);
+		//obj.draw();
+
+		world.renderGameWorld(m_gl->getSettings().fps);
+
+		glEnd();
 
 		glEnable(GL_TEXTURE_2D);
-		glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-// 		glBindTexture(GL_TEXTURE_2D, tex);
-// 
-// 		glBegin(GL_POLYGON);
-// 		glTexCoord2f(0, 0); glVertex3d(0, 0, 0);
-// 		glTexCoord2f(0, 1); glVertex3d(0, 30, 0);
-// 		glTexCoord2f(1, 1); glVertex3d(30, 30, 0);
-// 		glTexCoord2f(1, 0); glVertex3d(30, 0, 0);
-// 		glEnd();
+
 
 		glutSwapBuffers();
 	}
@@ -94,15 +123,12 @@ GameLoop gl(s, &handler);
 
 void init()
 {
-// 	ImageReader r;
-// 	Image img;
-// 	r.load("D:\\test.bmp", &img);
-// 
-// 	FByte* buf = img.asTexture();
-// 	glGenTextures(1, &tex);
-// 	glBindTexture(GL_TEXTURE_2D, tex);
-// 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, img.getWidth(), img.getHeight(), 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, buf);
-
+	btTransform groundTransform;
+	groundTransform.setIdentity();
+	groundTransform.setOrigin(btVector3(0, -0, 0));
+	SimpleGameObject* gameObj = new SimpleGameObject(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)), groundTransform);
+	gameObj->setMass(5);
+	world.appendObject(gameObj);
 
 	glEnable(GL_LINE_SMOOTH);
 
@@ -119,7 +145,7 @@ void init()
 
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
+	//glEnable(GL_LIGHTING);
 
 	GLfloat pos[] = { 150, 150, 150, 0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
@@ -129,7 +155,7 @@ void init()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, clr);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, clr);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, b);
-	glEnable(GL_LIGHT0);
+	//glEnable(GL_LIGHT0);
 }
 
 void render()

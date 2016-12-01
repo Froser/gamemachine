@@ -21,3 +21,6 @@ typedef GLfloat GMfloat;
 typedef GLint GMint;
 typedef GLuint GMuint;
 #define LINE_MAX 256
+
+// Callbacks settings
+#define NEW_GameWorldRenderCallback new GLGameWorldRenderCallback
