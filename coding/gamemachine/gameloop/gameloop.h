@@ -14,7 +14,7 @@ struct IGameHandler
 	virtual void mouse() = 0;
 	virtual void keyboard() = 0;
 	virtual void render() = 0;
-	virtual void logicFrame() = 0;
+	virtual void logicalFrame() = 0;
 };
 
 class GameLoop

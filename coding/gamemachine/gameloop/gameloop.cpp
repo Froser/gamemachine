@@ -61,7 +61,7 @@ void GameLoop::messageLoop()
 
 	m_handler->mouse();
 	m_handler->keyboard();
-	m_handler->logicFrame();
+	m_handler->logicalFrame();
 
 	GMfloat nextFrameInterval = 0;
 	GMfloat skipFrameNum = 0;

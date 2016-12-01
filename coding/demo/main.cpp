@@ -83,7 +83,7 @@ public:
 			camera.moveFront(-v);
 	}
 
-	void logicFrame()
+	void logicalFrame()
 	{
 		world.simulateGameWorld(m_gl->getSettings().fps);
 	}
