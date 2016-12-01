@@ -2,10 +2,10 @@
 #define __OBJSTRUCT_H__
 #include "common.h"
 #include <map>
+#include "image.h"
 
 BEGIN_NS
 
-class Image;
 struct TextureInfo
 {
 	Image* texture;

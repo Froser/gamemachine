@@ -2,11 +2,7 @@
 #include "imagereader.h"
 #include "utilities/assert.h"
 #include <fstream>
-
-ImagePrivate::~ImagePrivate()
-{
-	delete[] m_bitmapFile.buffer;
-}
+#include "core/image.h"
 
 bool ImageReaderPrivate::load(const char* filename, Image* img)
 {

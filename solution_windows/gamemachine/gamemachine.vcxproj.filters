@@ -94,6 +94,9 @@
     <ClCompile Include="..\..\coding\gamemachine\core\objstruct.cpp">
       <Filter>coding\core</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\core\image.cpp">
+      <Filter>coding\core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\objreader\objreader.h">
@@ -163,6 +166,9 @@
       <Filter>coding\gamescene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\core\objstruct.h">
+      <Filter>coding\core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\core\image.h">
       <Filter>coding\core</Filter>
     </ClInclude>
   </ItemGroup>

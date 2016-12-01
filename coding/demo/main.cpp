@@ -96,6 +96,10 @@ GameLoop gl(s, &handler);
 
 void init()
 {
+	Image img;
+	ImageReader ir;
+	ir.load("D:\\tests.bmp", &img);
+
 	btTransform boxTransform;
 	boxTransform.setIdentity();
 	boxTransform.setOrigin(btVector3(0, 70, 0));

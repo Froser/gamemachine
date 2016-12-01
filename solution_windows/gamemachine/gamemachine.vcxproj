@@ -68,6 +68,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\containers\basic_containers.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\core\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\core\objstruct.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\gameloop\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobject.cpp" />
@@ -92,6 +93,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\containers\basic_containers.h" />
+    <ClInclude Include="..\..\coding\gamemachine\core\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\core\objstruct.h" />
     <ClInclude Include="..\..\coding\gamemachine\gameloop\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobject.h" />
