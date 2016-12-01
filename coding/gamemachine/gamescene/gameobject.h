@@ -32,11 +32,20 @@ private:
 class GLCubeGameObject : public GameObject
 {
 public:
-	GLCubeGameObject(GMfloat width, GMfloat height, GMfloat depth, const btTransform& position);
+	GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color);
+
+public:
+	btMotionState* createMotionState();
+	void drawObject();
+
+private:
+	btCollisionShape* createCollisionShape();
 
 private:
 	btVector3 m_extents;
 	btTransform m_transform;
+	GMfloat m_color[3];
+	GMfloat m_size;
 };
 
 END_NS

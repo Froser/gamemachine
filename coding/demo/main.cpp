@@ -31,34 +31,6 @@ GameLoopSettings s = { fps };
 Object obj;
 GameWorld world;
 
-class SimpleGameObject : public GameObject
-{
-public:
-	SimpleGameObject(const btVector3& vec, const btTransform& trans)
-		: m_vec(vec)
-		, m_trans(trans)
-	{
-	}
-
-	virtual btMotionState* createMotionState() override
-	{
-		return new btDefaultMotionState(m_trans);
-	}
-
-	virtual void drawObject() override
-	{
-		glutSolidCube(50);
-	}
-
-	virtual btCollisionShape* createCollisionShape() override
-	{
-		return new btBoxShape(m_vec);
-	}
-
-	btVector3 m_vec;
-	btTransform m_trans;
-};
-
 class GameHandler : public IGameHandler
 {
 public:
@@ -73,7 +45,7 @@ public:
 
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		gluPerspective(30, 2, 10, 300);
+		gluPerspective(30, 2, 10, 3000);
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
@@ -82,12 +54,8 @@ public:
 		//glColor3f(1, 1, 1);
 		//obj.draw();
 
-		world.renderGameWorld(m_gl->getSettings().fps);
-
-		glEnd();
-
+		world.renderGameWorld();
 		glEnable(GL_TEXTURE_2D);
-
 
 		glutSwapBuffers();
 	}
@@ -115,6 +83,11 @@ public:
 			camera.moveFront(-v);
 	}
 
+	void logicFrame()
+	{
+		world.simulateGameWorld(m_gl->getSettings().fps);
+	}
+
 	GameLoop* m_gl;
 };
 
@@ -123,12 +96,41 @@ GameLoop gl(s, &handler);
 
 void init()
 {
+	btTransform boxTransform;
+	boxTransform.setIdentity();
+	boxTransform.setOrigin(btVector3(0, 70, 0));
+	
+	GMfloat cubeClr[] = { 0.5f, 1.0f, 0.5f };
+	GLCubeGameObject* gameObj = new GLCubeGameObject(
+		25, 
+		boxTransform,
+		cubeClr);
+	gameObj->setMass(5);
+	world.appendObject(gameObj);
+
+	btTransform boxTransform2;
+	boxTransform.setIdentity();
+	boxTransform.setOrigin(btVector3(20, 120, 10));
+
+	GLCubeGameObject* gameObj3 = new GLCubeGameObject(
+		25,
+		boxTransform,
+		cubeClr);
+	gameObj3->setMass(10);
+	world.appendObject(gameObj3);
+
+
 	btTransform groundTransform;
 	groundTransform.setIdentity();
 	groundTransform.setOrigin(btVector3(0, -0, 0));
-	SimpleGameObject* gameObj = new SimpleGameObject(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)), groundTransform);
-	gameObj->setMass(5);
-	world.appendObject(gameObj);
+
+	GMfloat cubeClr2[] = { 1.f, 1.0f, 0.5f };
+	GLCubeGameObject* ground = new GLCubeGameObject(
+		50,
+		groundTransform,
+		cubeClr);
+	ground->setMass(0);
+	world.appendObject(ground);
 
 	glEnable(GL_LINE_SMOOTH);
 
@@ -145,7 +147,7 @@ void init()
 
 	glClearColor(0, 0, 0, 0);
 	glEnable(GL_DEPTH_TEST);
-	//glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHTING);
 
 	GLfloat pos[] = { 150, 150, 150, 0 };
 	glLightfv(GL_LIGHT0, GL_POSITION, pos);
@@ -155,7 +157,7 @@ void init()
 	glLightfv(GL_LIGHT0, GL_AMBIENT, clr);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, clr);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, b);
-	//glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT0);
 }
 
 void render()

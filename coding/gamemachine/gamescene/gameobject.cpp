@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gameobject.h"
+#include "glut.h"
 
 void GameObject::setObject(Object* obj)
 {
@@ -43,7 +44,28 @@ btVector3& GameObject::getLocalInertia()
 //////////////////////////////////////////////////////////////////////////
 // Simple game object:
 
-GLCubeGameObject::GLCubeGameObject(GMfloat width, GMfloat height, GMfloat depth, const btTransform& position)
+GLCubeGameObject::GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color)
+	: m_extents(size / 2, size / 2, size / 2)
+	, m_size(size)
+	, m_transform(position)
 {
+	m_color[0] = color[0];
+	m_color[1] = color[1];
+	m_color[2] = color[2];
+}
 
+btMotionState* GLCubeGameObject::createMotionState()
+{
+	return new btDefaultMotionState(m_transform);
+}
+
+void GLCubeGameObject::drawObject()
+{
+	glColor3fv(m_color);
+	glutSolidCube(m_size);
+}
+
+btCollisionShape* GLCubeGameObject::createCollisionShape()
+{
+	return new btBoxShape(m_extents);
 }

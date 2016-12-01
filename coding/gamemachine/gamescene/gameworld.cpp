@@ -44,10 +44,13 @@ void GameWorld::appendObject(GameObject* obj)
 	dataRef().appendObject(obj);
 }
 
-void GameWorld::renderGameWorld(GMint fps)
+void GameWorld::simulateGameWorld(GMint fps)
 {
 	dataRef().m_dynamicsWorld->stepSimulation(1.f / fps);
+}
 
+void GameWorld::renderGameWorld()
+{
 	for (int i = dataRef().m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
 	{
 		btCollisionObject* obj = dataRef().m_dynamicsWorld->getCollisionObjectArray()[i];

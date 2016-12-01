@@ -1,6 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gameworldprivate.h"
 #include "gameobject.h"
+#include "utilities/assert.h"
+#include <algorithm>
 
 GameWorldPrivate::GameWorldPrivate()
 	: m_gravity(0, -10, 0)
@@ -46,6 +48,8 @@ void GameWorldPrivate::init()
 
 void GameWorldPrivate::appendObject(GameObject* obj)
 {
+	ASSERT(std::find(m_shapes.begin(), m_shapes.end(), obj) == m_shapes.end());
+
 	btMotionState* motionState = obj->createMotionState();
 	btRigidBody::btRigidBodyConstructionInfo rbInfo(obj->getMass(), motionState, obj->getCollisionShape(), obj->getLocalInertia());
 	btRigidBody* rigidObj = new btRigidBody(rbInfo);

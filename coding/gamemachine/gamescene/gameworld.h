@@ -32,7 +32,8 @@ public:
 
 public:
 	void appendObject(GameObject* obj);
-	void renderGameWorld(GMint fps);
+	void simulateGameWorld(GMint fps);
+	void renderGameWorld();
 
 private:
 	AutoPtr<IGameWorldRenderCallback> m_pCallback;
