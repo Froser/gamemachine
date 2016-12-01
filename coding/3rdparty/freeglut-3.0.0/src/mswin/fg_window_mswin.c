@@ -744,7 +744,7 @@ void fgPlatformOpenWindow( SFG_Window* window, const char* title,
     }
 #endif /* defined(_WIN32_WCE) */
 
-    ShowCursor( TRUE );
+    // ShowCursor( TRUE );
 }
 
 
