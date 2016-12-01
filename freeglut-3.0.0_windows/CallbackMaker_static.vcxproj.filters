@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\progs\demos\CallbackMaker\CallbackMaker.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{B9E7B717-71E0-45E2-90B8-B2F115F15C81}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

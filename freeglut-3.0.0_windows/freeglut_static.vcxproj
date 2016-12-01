@@ -1,0 +1,301 @@
+﻿<?xml version="1.0" encoding="Windows-1252"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|Win32">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|Win32">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{53C2D66F-D153-4A24-8489-6B8B6DF19579}</ProjectGUID>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>Win32</Platform>
+    <ProjectName>freeglut_static</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\lib\Debug\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">freeglut_static.dir\Debug\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">freeglut_staticd</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\lib\Release\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">freeglut_static.dir\Release\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">freeglut_static</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\lib\MinSizeRel\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">freeglut_static.dir\MinSizeRel\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">freeglut_static</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">.lib</TargetExt>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\lib\RelWithDebInfo\</OutDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">freeglut_static.dir\RelWithDebInfo\</IntDir>
+      <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">freeglut_static</TargetName>
+      <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">.lib</TargetExt>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Debug/</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>Release/</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat></DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>MinSizeRel/</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat></DebugInformationFormat>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AssemblerListingLocation>RelWithDebInfo/</AssemblerListingLocation>
+      <CompileAs>CompileAsC</CompileAs>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ExceptionHandling>
+      </ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;FREEGLUT_STATIC;_CRT_SECURE_NO_WARNINGS;_WIN32_WINNT=0x0500;WINVER=0x0500;HAVE_CONFIG_H;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\include;D:\Coding\git\gamemachine\freeglut-3.0.0_windows;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Building Custom Rule D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0 -BD:/Coding/git/gamemachine/freeglut-3.0.0_windows --check-stamp-file D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystem.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompilerABI.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\GNUInstallDirs.cmake;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\fg_version.h.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFiles.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\config.h.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.rc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\freeglutdll.def.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.pc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Building Custom Rule D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0 -BD:/Coding/git/gamemachine/freeglut-3.0.0_windows --check-stamp-file D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystem.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompilerABI.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\GNUInstallDirs.cmake;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\fg_version.h.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFiles.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\config.h.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.rc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\freeglutdll.def.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.pc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">Building Custom Rule D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0 -BD:/Coding/git/gamemachine/freeglut-3.0.0_windows --check-stamp-file D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystem.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompilerABI.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\GNUInstallDirs.cmake;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\fg_version.h.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFiles.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\config.h.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.rc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\freeglutdll.def.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.pc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp</Outputs>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">Building Custom Rule D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">setlocal
+"C:\Program Files (x86)\CMake\bin\cmake.exe" -HD:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0 -BD:/Coding/git/gamemachine/freeglut-3.0.0_windows --check-stamp-file D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:/Coding/git/gamemachine/coding/3rdparty/freeglut-3.0.0/CMakeLists.txt;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystem.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerId.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CompilerId\VS-10.vcxproj.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeFindBinUtils.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeClDeps.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeSystemSpecificInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeGenericSystem.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\WindowsPaths.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-C.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeRCInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestRCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompilerABI.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXInformation.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\Platform\Windows-MSVC.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCommonLanguageInclude.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeTestCompilerCommon.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeDetermineCompilerABI.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompilerABI.cpp;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeCXXCompiler.cmake.in;D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\3.0.0\CMakeCXXCompiler.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\GNUInstallDirs.cmake;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\fg_version.h.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindOpenGL.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\FindPackageMessage.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeParseArguments.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFiles.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckTypeSize.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckIncludeFile.cmake;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CMakeConfigurableFile.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\config.h.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.rc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\src\freeglutdll.def.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\freeglut.pc.in;D:\Coding\git\gamemachine\coding\3rdparty\freeglut-3.0.0\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|Win32'">D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\generate.stamp</Outputs>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\include\GL\freeglut.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\include\GL\freeglut_ext.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\include\GL\freeglut_std.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\include\GL\glut.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_gl2.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_init.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_internal.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_teapot_data.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_internal_mswin.h" />
+    <ClInclude Include="..\coding\3rdparty\freeglut-3.0.0\src\util\xparsegeometry_repl.h" />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_callbacks.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_cursor.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_display.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_ext.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_font_data.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_gamemode.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_geometry.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_gl2.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_init.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_input_devices.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_joystick.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_main.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_misc.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_overlay.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_spaceball.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_state.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_stroke_mono_roman.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_stroke_roman.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_structure.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_teapot.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_videoresize.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_window.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_font.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\fg_menu.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_cursor_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_display_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_ext_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_gamemode_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_init_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_input_devices_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_joystick_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_main_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_menu_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_spaceball_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_state_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_structure_mswin.c"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\mswin\fg_window_mswin.c"  />
+    <ResourceCompile Include="freeglut.rc"  />
+    <ClCompile Include="..\coding\3rdparty\freeglut-3.0.0\src\util\xparsegeometry_repl.c"  />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="D:/Coding/git/gamemachine/freeglut-3.0.0_windows/ZERO_CHECK.vcxproj">
+      <Project>0CA5766F-B512-4E4D-8181-2DDCE975DBAC</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

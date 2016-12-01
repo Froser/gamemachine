@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gameobject.h"
-#include "glut.h"
+#include "GL/freeglut.h"
 
 void GameObject::setObject(Object* obj)
 {

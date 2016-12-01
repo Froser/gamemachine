@@ -1,7 +1,9 @@
 #define GLEW_STATIC
+#define FREEGLUT_STATIC
+
 #include <windows.h>
 #include "GL/glew.h"
-#include "glut.h"
+#include "GL/freeglut.h"
 #include "objreader/objreader.h"
 #include "core/objstruct.h"
 #include "utilities/path.h"

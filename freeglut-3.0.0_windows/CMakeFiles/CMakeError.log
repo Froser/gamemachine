@@ -1,0 +1,398 @@
+Determining if files unistd.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec1184193382.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:06。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184193382.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec1184193382.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec1184193382.dir\Debug\cmTryCompileExec1184193382.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1184193382.dir\Debug\\" /Fd"cmTryCompileExec1184193382.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1184193382.dir\Debug\\" /Fd"cmTryCompileExec1184193382.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'unistd.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184193382.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184193382.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184193382.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'unistd.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184193382.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.14
+
+Source:
+/* */
+#include <unistd.h>
+
+
+int main(){return 0;}
+
+Determining if files sys/time.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec1184248709.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:06。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184248709.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec1184248709.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec1184248709.dir\Debug\cmTryCompileExec1184248709.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1184248709.dir\Debug\\" /Fd"cmTryCompileExec1184248709.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1184248709.dir\Debug\\" /Fd"cmTryCompileExec1184248709.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'sys/time.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184248709.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184248709.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184248709.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'sys/time.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1184248709.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.17
+
+Source:
+/* */
+#include <sys/time.h>
+
+
+int main(){return 0;}
+
+Determining if files stdbool.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec666264718.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:07。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec666264718.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec666264718.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec666264718.dir\Debug\cmTryCompileExec666264718.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec666264718.dir\Debug\\" /Fd"cmTryCompileExec666264718.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec666264718.dir\Debug\\" /Fd"cmTryCompileExec666264718.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'stdbool.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec666264718.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec666264718.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec666264718.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'stdbool.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec666264718.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.14
+
+Source:
+/* */
+#include <stdbool.h>
+
+
+int main(){return 0;}
+
+Determining if files sys/param.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec1285480534.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:07。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1285480534.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec1285480534.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec1285480534.dir\Debug\cmTryCompileExec1285480534.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1285480534.dir\Debug\\" /Fd"cmTryCompileExec1285480534.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1285480534.dir\Debug\\" /Fd"cmTryCompileExec1285480534.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'sys/param.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1285480534.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1285480534.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1285480534.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'sys/param.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1285480534.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.14
+
+Source:
+/* */
+#include <sys/param.h>
+
+
+int main(){return 0;}
+
+Determining if files sys/ioctl.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec1821771359.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:07。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1821771359.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec1821771359.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec1821771359.dir\Debug\cmTryCompileExec1821771359.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1821771359.dir\Debug\\" /Fd"cmTryCompileExec1821771359.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1821771359.dir\Debug\\" /Fd"cmTryCompileExec1821771359.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'sys/ioctl.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1821771359.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1821771359.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1821771359.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'sys/ioctl.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1821771359.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.14
+
+Source:
+/* */
+#include <sys/ioctl.h>
+
+
+int main(){return 0;}
+
+Determining if files usbhid.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec3085277983.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:08。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3085277983.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec3085277983.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec3085277983.dir\Debug\cmTryCompileExec3085277983.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec3085277983.dir\Debug\\" /Fd"cmTryCompileExec3085277983.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec3085277983.dir\Debug\\" /Fd"cmTryCompileExec3085277983.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'usbhid.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3085277983.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3085277983.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3085277983.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'usbhid.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3085277983.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.15
+
+Source:
+/* */
+#include <usbhid.h>
+
+
+int main(){return 0;}
+
+Determining if the function gettimeofday exists failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec1165025439.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:08。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec1165025439.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec1165025439.dir\Debug\cmTryCompileExec1165025439.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=gettimeofday /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1165025439.dir\Debug\\" /Fd"cmTryCompileExec1165025439.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue "C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c"
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=gettimeofday /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec1165025439.dir\Debug\\" /Fd"cmTryCompileExec1165025439.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue "C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c"
+  
+  CheckFunctionExists.c
+ManifestResourceCompile:
+  C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"cmTryCompileExec1165025439.dir\Debug\cmTryCompileExec1165025439.exe.embed.manifest.res" cmTryCompileExec1165025439.dir\Debug\cmTryCompileExec1165025439_manifest.rc 
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1165025439.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /ManifestFile:"cmTryCompileExec1165025439.dir\Debug\cmTryCompileExec1165025439.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1165025439.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec1165025439.lib" /MACHINE:X86 cmTryCompileExec1165025439.dir\Debug\cmTryCompileExec1165025439.exe.embed.manifest.res
+  cmTryCompileExec1165025439.dir\Debug\CheckFunctionExists.obj  /machine:X86 /debug 
+CheckFunctionExists.obj : error LNK2019: unresolved external symbol _gettimeofday referenced in function _main [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj]
+D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1165025439.exe : fatal error LNK1120: 1 unresolved externals [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj”(默认目标) (1) ->
+(Link 目标) -> 
+  CheckFunctionExists.obj : error LNK2019: unresolved external symbol _gettimeofday referenced in function _main [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj]
+  D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec1165025439.exe : fatal error LNK1120: 1 unresolved externals [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec1165025439.vcxproj]
+
+    0 个警告
+    2 个错误
+
+已用时间 00:00:00.28
+
+
+Determining if the function XParseGeometry exists failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec4088894355.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:09。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec4088894355.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec4088894355.dir\Debug\cmTryCompileExec4088894355.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=XParseGeometry /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec4088894355.dir\Debug\\" /Fd"cmTryCompileExec4088894355.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue "C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c"
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D CHECK_FUNCTION_EXISTS=XParseGeometry /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec4088894355.dir\Debug\\" /Fd"cmTryCompileExec4088894355.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue "C:\Program Files (x86)\CMake\share\cmake-3.0\Modules\CheckFunctionExists.c"
+  
+  CheckFunctionExists.c
+ManifestResourceCompile:
+  C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\bin\rc.exe /nologo /fo"cmTryCompileExec4088894355.dir\Debug\cmTryCompileExec4088894355.exe.embed.manifest.res" cmTryCompileExec4088894355.dir\Debug\cmTryCompileExec4088894355_manifest.rc 
+Link:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\link.exe /ERRORREPORT:QUEUE /OUT:"D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4088894355.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib /MANIFEST /ManifestFile:"cmTryCompileExec4088894355.dir\Debug\cmTryCompileExec4088894355.exe.intermediate.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /DEBUG /PDB:"D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4088894355.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp/Debug/cmTryCompileExec4088894355.lib" /MACHINE:X86 cmTryCompileExec4088894355.dir\Debug\cmTryCompileExec4088894355.exe.embed.manifest.res
+  cmTryCompileExec4088894355.dir\Debug\CheckFunctionExists.obj  /machine:X86 /debug 
+CheckFunctionExists.obj : error LNK2019: unresolved external symbol _XParseGeometry referenced in function _main [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj]
+D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4088894355.exe : fatal error LNK1120: 1 unresolved externals [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj”(默认目标) (1) ->
+(Link 目标) -> 
+  CheckFunctionExists.obj : error LNK2019: unresolved external symbol _XParseGeometry referenced in function _main [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj]
+  D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\cmTryCompileExec4088894355.exe : fatal error LNK1120: 1 unresolved externals [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec4088894355.vcxproj]
+
+    0 个警告
+    2 个错误
+
+已用时间 00:00:00.25
+
+
+Determining if files inttypes.h exist failed with the following output:
+Change Dir: D:/Coding/git/gamemachine/freeglut-3.0.0_windows/CMakeFiles/CMakeTmp
+
+Run Build Command:"C:/WINDOWS/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe" "cmTryCompileExec3214692410.vcxproj" "/p:Configuration=Debug" "/p:VisualStudioVersion=10.0"
+Microsoft(R) 生成引擎版本 4.6.1055.0
+[Microsoft .NET Framework 版本 4.0.30319.42000]
+版权所有 (C) Microsoft Corporation。保留所有权利。
+
+生成启动时间为 2016/12/1 18:31:10。
+节点 1 上的项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3214692410.vcxproj”(默认目标)。
+PrepareForBuild:
+  正在创建目录“cmTryCompileExec3214692410.dir\Debug\”。
+  正在创建目录“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\Debug\”。
+InitializeBuildStatus:
+  正在创建“cmTryCompileExec3214692410.dir\Debug\cmTryCompileExec3214692410.unsuccessfulbuild”，因为已指定“AlwaysCreate”。
+ClCompile:
+  C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec3214692410.dir\Debug\\" /Fd"cmTryCompileExec3214692410.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  Microsoft (R) 32-bit C/C++ Optimizing Compiler Version 16.00.40219.01 for 80x86
+  Copyright (C) Microsoft Corporation.  All rights reserved.
+  
+  cl /c /Zi /W3 /WX- /Od /Ob0 /Oy- /D WIN32 /D _WINDOWS /D _DEBUG /D "CMAKE_INTDIR=\"Debug\"" /D _MBCS /Gm- /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"cmTryCompileExec3214692410.dir\Debug\\" /Fd"cmTryCompileExec3214692410.dir\Debug\vc100.pdb" /Gd /TC /analyze- /errorReport:queue CheckIncludeFiles.c
+  
+  CheckIncludeFiles.c
+CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'inttypes.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3214692410.vcxproj]
+已完成生成项目“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3214692410.vcxproj”(默认目标)的操作 - 失败。
+
+生成失败。
+
+“D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3214692410.vcxproj”(默认目标) (1) ->
+(ClCompile 目标) -> 
+  CheckIncludeFiles.c(2): fatal error C1083: Cannot open include file: 'inttypes.h': No such file or directory [D:\Coding\git\gamemachine\freeglut-3.0.0_windows\CMakeFiles\CMakeTmp\cmTryCompileExec3214692410.vcxproj]
+
+    0 个警告
+    1 个错误
+
+已用时间 00:00:00.15
+
+Source:
+/* */
+#include <inttypes.h>
+
+
+int main(){return 0;}
+

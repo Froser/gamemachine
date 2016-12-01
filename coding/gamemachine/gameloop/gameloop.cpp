@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include <cstdio>
 #include "gameloop.h"
-#include "glut.h"
+#include "GL/freeglut.h"
 
 GameLoop::GameLoop(const GameLoopSettings& settings, IGameHandler* handler)
 	: m_settings(settings)

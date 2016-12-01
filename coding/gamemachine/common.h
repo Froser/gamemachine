@@ -12,6 +12,7 @@ typedef long LONG;
 typedef unsigned char BYTE;
 #endif
 
+#define FREEGLUT_STATIC
 #define GLEW_STATIC
 #include "GL/glew.h"
 
