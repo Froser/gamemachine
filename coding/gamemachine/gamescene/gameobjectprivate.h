@@ -17,6 +17,7 @@ public:
 private:
 	void setMass(btScalar mass);
 	void setObject(Object* obj);
+	void setTransform(const btTransform& transform);
 
 private:
 	btTransform m_transform;

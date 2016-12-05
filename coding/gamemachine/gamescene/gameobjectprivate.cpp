@@ -23,3 +23,8 @@ void GameObjectPrivate::setObject(Object* obj)
 {
 	m_pObject.reset(obj);
 }
+
+void GameObjectPrivate::setTransform(const btTransform& transform)
+{
+	m_transform = transform;
+}

@@ -16,10 +16,14 @@ public:
 	void setObject(Object* obj);
 	Object* getObject();
 	btCollisionShape* getCollisionShape();
-	void setMass(btScalar mass);
-	btScalar getMass();
 	bool isDynamic();
 	btVector3& getLocalInertia();
+
+	void setMass(btScalar mass);
+	btScalar getMass();
+
+	void setTransform(const btTransform& transform);
+	btTransform& getTransform();
 
 public:
 	virtual btMotionState* createMotionState() = 0;
@@ -38,14 +42,16 @@ public:
 	btMotionState* createMotionState();
 	void drawObject();
 
+	void setExtents(const btVector3& extents);
+	btVector3& getExtents();
+
 private:
 	btCollisionShape* createCollisionShape();
 
 private:
-	btVector3 m_extents;
-	btTransform m_transform;
 	GMfloat m_color[3];
 	GMfloat m_size;
+	btVector3 m_extents;
 };
 
 END_NS

@@ -41,14 +41,25 @@ btVector3& GameObject::getLocalInertia()
 	return dataRef().m_localInertia;
 }
 
+void GameObject::setTransform(const btTransform& transform)
+{
+	dataRef().setTransform(transform);
+}
+
+btTransform& GameObject::getTransform()
+{
+	return dataRef().m_transform;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Simple game object:
 
 GLCubeGameObject::GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color)
-	: m_extents(size / 2, size / 2, size / 2)
-	, m_size(size)
-	, m_transform(position)
+	: m_size(size)
 {
+	setExtents(btVector3(size / 2, size / 2, size / 2));
+	setTransform(position);
+
 	m_color[0] = color[0];
 	m_color[1] = color[1];
 	m_color[2] = color[2];
@@ -56,7 +67,7 @@ GLCubeGameObject::GLCubeGameObject(GMfloat size, const btTransform& position, GM
 
 btMotionState* GLCubeGameObject::createMotionState()
 {
-	return new btDefaultMotionState(m_transform);
+	return new btDefaultMotionState(getTransform());
 }
 
 void GLCubeGameObject::drawObject()
@@ -67,5 +78,15 @@ void GLCubeGameObject::drawObject()
 
 btCollisionShape* GLCubeGameObject::createCollisionShape()
 {
-	return new btBoxShape(m_extents);
+	return new btBoxShape(getExtents());
+}
+
+void GLCubeGameObject::setExtents(const btVector3& extents)
+{
+	m_extents = extents;
+}
+
+btVector3& GLCubeGameObject::getExtents()
+{
+	return m_extents;
 }
