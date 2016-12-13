@@ -120,7 +120,7 @@ static void gameLoop(int v)
 	}
 }
 
-void GameLoopUtilities::fglextlib_gl_registerGameLoop(GameLoop& gl)
+void GameLoopUtilities::gm_gl_registerGameLoop(GameLoop& gl)
 {
 	s_gameLoop = &gl;
 	glutTimerFunc(1, gameLoop, 1);

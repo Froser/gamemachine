@@ -48,7 +48,7 @@ private:
 class GameLoopUtilities
 {
 public:
-	static void fglextlib_gl_registerGameLoop(GameLoop& gl);
+	static void gm_gl_registerGameLoop(GameLoop& gl);
 	static GameLoop* getRegisteredGameLoop() { return s_gameLoop; }
 
 private:

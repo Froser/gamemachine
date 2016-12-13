@@ -30,6 +30,7 @@ Camera::Camera()
 	, m_positionY(0)
 	, m_positionZ(0)
 	, m_lookUpLimitRad(SC() - rad(3))
+	, m_type(FreeCamera)
 {
 }
 
@@ -38,6 +39,11 @@ void Camera::setPosition(GMfloat x, GMfloat y, GMfloat z)
 	m_positionX = x;
 	m_positionY = y;
 	m_positionZ = z;
+}
+
+void Camera::setType(Type type)
+{
+	m_type = type;
 }
 
 void Camera::setLookUpLimitDegree(GMfloat deg)
@@ -61,7 +67,8 @@ void Camera::lookUp(GMfloat degree)
 
 void Camera::moveFront(GMfloat distance)
 {
-	m_positionY += distance * std::sin(m_lookUpRad);
+	if (m_type == FreeCamera)
+		m_positionY += distance * std::sin(m_lookUpRad);
 	GMfloat l = distance * std::cos(m_lookUpRad);
 	m_positionX += l * std::sin(m_lookAtRad);
 	m_positionZ -= l * std::cos(m_lookAtRad);
@@ -71,6 +78,13 @@ void Camera::moveRight(GMfloat distance)
 {
 	m_positionX += distance * std::cos(m_lookAtRad);
 	m_positionZ += distance * std::sin(m_lookAtRad);
+}
+
+void Camera::moveTo(GMfloat x, GMfloat y, GMfloat z)
+{
+	m_positionX = x;
+	m_positionY = y;
+	m_positionZ = z;
 }
 
 void Camera::setSensibility(GMfloat sensibility)

@@ -14,6 +14,9 @@ public:
 	GameObjectPrivate();
 	~GameObjectPrivate();
 
+public:
+	btTransform& getTransform();
+
 private:
 	void setMass(btScalar mass);
 	void setObject(Object* obj);
@@ -25,6 +28,7 @@ private:
 	bool m_isDynamic;
 	btVector3 m_localInertia;
 	AutoPtr<btCollisionShape> m_pColShape;
+	btCollisionObject* m_pColObj;
 	AutoPtr<btMotionState> m_pMotionState;
 	AutoPtr<Object> m_pObject;
 };

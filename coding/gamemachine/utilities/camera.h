@@ -12,15 +12,24 @@ struct CameraLookAt
 class Camera
 {
 public:
+	enum Type
+	{
+		FreeCamera,
+		PhysicalCamera,
+	};
+
+public:
 	Camera();
 
 public:
+	void setType(Type type);
 	void setPosition(GMfloat x, GMfloat y, GMfloat z);
 	void setLookUpLimitDegree(GMfloat deg);
 	void lookRight(GMfloat degree);
 	void lookUp(GMfloat degree);
 	void moveFront(GMfloat distance);
 	void moveRight(GMfloat distance);
+	void moveTo(GMfloat x, GMfloat y, GMfloat z);
 
 	void setSensibility(GMfloat sensibility);
 	CameraLookAt getCameraLookAt();
@@ -29,6 +38,7 @@ public:
 	void mouseReact(int windowPosX, int windowPosY, int windowWidth, int WindowHeight);
 
 private:
+	Type m_type;
 	int m_currentMouseX, m_currentMouseY;
 	GMfloat m_sensibility;
 	GMfloat m_lookAtRad;

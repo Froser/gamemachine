@@ -14,6 +14,7 @@
 #include "io/keyboard.h"
 #include "gamescene/gameworld.h"
 #include "gamescene/gameobject.h"
+#include "gamescene/character.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 
@@ -25,13 +26,13 @@ GLfloat centerX = 0, centerY = 0, centerZ = 0;
 GLfloat eyeX = 0, eyeY = 0, eyeZ = 300;
 
 ObjReader reader(ObjReader::LoadOnly);
-Camera camera;
 
 GMfloat fps = 60;
 GameLoopSettings s = { fps };
 
 Object obj;
 GameWorld world;
+Character* character;
 
 class GameHandler : public IGameHandler
 {
@@ -51,6 +52,8 @@ public:
 
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
+
+		Camera& camera = world.getMajorCharacter()->getCamera();
 		CameraUtility::fglextlib_gl_LookAt(camera);
 
 		//glColor3f(1, 1, 1);
@@ -64,6 +67,8 @@ public:
 
 	void mouse()
 	{
+		Camera& camera = world.getMajorCharacter()->getCamera();
+		CameraUtility::fglextlib_gl_LookAt(camera);
 		int wx = glutGet(GLUT_WINDOW_X),
 			wy = glutGet(GLUT_WINDOW_Y);
 		camera.mouseReact(wx, wy, width, height);
@@ -71,18 +76,21 @@ public:
 
 	void keyboard()
 	{
+		Character* character = world.getMajorCharacter();
 		GMfloat dis = 50;
 		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 			m_gl->terminate();
 		if (Keyboard::isKeyDown('A'))
-			camera.moveRight(-v);
+			character->moveRight(-v);
 		if (Keyboard::isKeyDown('D'))
-			camera.moveRight(v);
+			character->moveRight(v);
 		if (Keyboard::isKeyDown('W'))
-			camera.moveFront(v);
+			character->moveFront(v);
 		if (Keyboard::isKeyDown('S'))
-			camera.moveFront(-v);
+			character->moveFront(-v);
+		if (Keyboard::isKeyDown(VK_SPACE))
+			character->jump();
 	}
 
 	void logicalFrame()
@@ -98,13 +106,19 @@ GameLoop gl(s, &handler);
 
 void init()
 {
-	Image img;
-	ImageReader ir;
-	ir.load("D:\\tests.bmp", &img);
+	world.setGravity(0, -50, 0);
+
+	btTransform charTransform;
+	charTransform.setIdentity();
+	charTransform.setOrigin(btVector3(0, 270, 0));
+	character = new Character(charTransform, 20, 20, 10);
+	character->setCanFreeMove(false);
+	character->setJumpSpeed(btVector3(0, 50, 0));
+	world.setMajorCharacter(character);
 
 	btTransform boxTransform;
 	boxTransform.setIdentity();
-	boxTransform.setOrigin(btVector3(0, 70, 0));
+	boxTransform.setOrigin(btVector3(0, 170, 0));
 	
 	GMfloat cubeClr[] = { 0.5f, 1.0f, 0.5f };
 	GLCubeGameObject* gameObj = new GLCubeGameObject(
@@ -116,7 +130,7 @@ void init()
 
 	btTransform boxTransform2;
 	boxTransform.setIdentity();
-	boxTransform.setOrigin(btVector3(20, 120, 10));
+	boxTransform.setOrigin(btVector3(20, 220, 10));
 
 	GLCubeGameObject* gameObj3 = new GLCubeGameObject(
 		25,
@@ -132,7 +146,7 @@ void init()
 
 	GMfloat cubeClr2[] = { 1.f, 1.0f, 0.5f };
 	GLCubeGameObject* ground = new GLCubeGameObject(
-		50,
+		340,
 		groundTransform,
 		cubeClr);
 	ground->setMass(0);
@@ -142,7 +156,10 @@ void init()
 
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
+	
+	Camera& camera = world.getMajorCharacter()->getCamera();
 	camera.mouseInitReaction(wx, wy, width, height);
+
 	handler.setGameLoop(&gl);
 
 	std::string path = Path::getCurrentPath();
@@ -200,7 +217,7 @@ int WINAPI WinMain(
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);
 
-	GameLoopUtilities::fglextlib_gl_registerGameLoop(gl);
+	GameLoopUtilities::gm_gl_registerGameLoop(gl);
 
 	glutMainLoop();
 

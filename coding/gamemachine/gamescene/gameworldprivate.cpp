@@ -5,7 +5,7 @@
 #include <algorithm>
 
 GameWorldPrivate::GameWorldPrivate()
-	: m_gravity(0, -10, 0)
+	: m_character(nullptr)
 {
 
 }
@@ -32,9 +32,7 @@ GameWorldPrivate::~GameWorldPrivate()
 
 void GameWorldPrivate::setGravity(GMfloat x, GMfloat y, GMfloat z)
 {
-	m_gravity.setX(x);
-	m_gravity.setY(x);
-	m_gravity.setZ(z);
+	m_dynamicsWorld->setGravity(btVector3(x, y, z));
 }
 
 void GameWorldPrivate::init()
@@ -43,17 +41,15 @@ void GameWorldPrivate::init()
 	m_dispatcher.reset(new btCollisionDispatcher(m_collisionConfiguration));
 	m_overlappingPairCache.reset(new btDbvtBroadphase());
 	m_solver.reset(new btSequentialImpulseConstraintSolver);
+	m_ghostPairCallback.reset(new btGhostPairCallback());
 	m_dynamicsWorld.reset(new btDiscreteDynamicsWorld(m_dispatcher, m_overlappingPairCache, m_solver, m_collisionConfiguration));
+
+	m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghostPairCallback);
 }
 
 void GameWorldPrivate::appendObject(GameObject* obj)
 {
 	ASSERT(std::find(m_shapes.begin(), m_shapes.end(), obj) == m_shapes.end());
-
-	btMotionState* motionState = obj->createMotionState();
-	btRigidBody::btRigidBodyConstructionInfo rbInfo(obj->getMass(), motionState, obj->getCollisionShape(), obj->getLocalInertia());
-	btRigidBody* rigidObj = new btRigidBody(rbInfo);
-
-	m_dynamicsWorld->addRigidBody(rigidObj);
+	obj->appendObjectToWorld(m_dynamicsWorld);
 	m_shapes.push_back(obj);
 }

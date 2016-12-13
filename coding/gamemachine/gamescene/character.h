@@ -2,34 +2,51 @@
 #define __CHARACTER_H__
 #include "common.h"
 #include "gameobject.h"
+#include "utilities/camera.h"
+#include "utilities/autoptr.h"
+#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+
 class btMotionState;
 class btCollisionShape;
+class btKinematicCharacterController;
 
 BEGIN_NS
 class Character : public GameObject
 {
 public:
-	enum CharacterModelType
-	{
-		Sphere,
-		Box,
-	};
+	Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight);
 
 public:
-	Character(CharacterModelType type, const btTransform& position, btScalar radius);
-	Character(CharacterModelType type, const btTransform& position, const btVector3& extents);
-
-public:
-	virtual btMotionState* createMotionState() override;
 	virtual void drawObject() override;
+
+public:
+	void setJumpSpeed(const btVector3& jumpSpeed) { m_jumpSpeed = jumpSpeed; }
+
+	void setCanFreeMove(bool freeMove);
+	void updateCamera();
+	Camera& getCamera();
+
+	void moveFront(GMfloat distance);
+	void moveRight(GMfloat distance);
+	void jump();
+
+private:
+	void move();
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
+	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
 
 private:
-	CharacterModelType m_type;
+	Camera m_camera;
+
+	btScalar m_height;
 	btScalar m_radius;
-	btVector3 m_extents;
+	btScalar m_stepHeight;
+	btVector3 m_jumpSpeed;
+
+	btKinematicCharacterController* m_controller;
+	AutoPtr<btPairCachingGhostObject> m_ghostObject;
 };
 
 END_NS

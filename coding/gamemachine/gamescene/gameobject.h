@@ -4,6 +4,9 @@
 #include "gameobjectprivate.h"
 #include <vector>
 #include "btBulletCollisionCommon.h"
+
+class btDynamicsWorld;
+
 BEGIN_NS
 
 class GameObject
@@ -16,6 +19,10 @@ public:
 	void setObject(Object* obj);
 	Object* getObject();
 	btCollisionShape* getCollisionShape();
+
+	btCollisionObject* getCollisionObject();
+	void setCollisionObject(btCollisionObject* obj);
+
 	bool isDynamic();
 	btVector3& getLocalInertia();
 
@@ -26,7 +33,7 @@ public:
 	btTransform& getTransform();
 
 public:
-	virtual btMotionState* createMotionState() = 0;
+	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
 	virtual void drawObject() = 0;
 
 private:
@@ -39,11 +46,12 @@ public:
 	GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color);
 
 public:
-	btMotionState* createMotionState();
 	void drawObject();
-
 	void setExtents(const btVector3& extents);
 	btVector3& getExtents();
+
+public:
+	virtual void appendObjectToWorld(btDynamicsWorld* world);
 
 private:
 	btCollisionShape* createCollisionShape();

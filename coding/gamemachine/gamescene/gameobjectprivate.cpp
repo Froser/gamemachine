@@ -28,3 +28,8 @@ void GameObjectPrivate::setTransform(const btTransform& transform)
 {
 	m_transform = transform;
 }
+
+btTransform& GameObjectPrivate::getTransform()
+{
+	return m_transform;
+}

@@ -3,6 +3,7 @@
 #define DEFINE_PRIVATE(className) \
 	private: \
 	className##Private m_data; \
+	protected: \
 	className##Private& dataRef() { return m_data; }
 
 #ifndef _WINDOWS
