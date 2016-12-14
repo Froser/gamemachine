@@ -17,6 +17,7 @@
 #include "gamescene/character.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
+#include "gl/shaders.h"
 
 using namespace gm;
 
@@ -30,9 +31,10 @@ ObjReader reader(ObjReader::LoadOnly);
 GMfloat fps = 60;
 GameLoopSettings s = { fps };
 
-Object obj;
 GameWorld world;
 Character* character;
+
+GMGLShaders shaders;
 
 class GameHandler : public IGameHandler
 {
@@ -104,6 +106,8 @@ public:
 GameHandler handler;
 GameLoop gl(s, &handler);
 
+GLuint VAOs[1], Buffers[1];
+
 void init()
 {
 	world.setGravity(0, -50, 0);
@@ -161,10 +165,6 @@ void init()
 	camera.mouseInitReaction(wx, wy, width, height);
 
 	handler.setGameLoop(&gl);
-
-	std::string path = Path::getCurrentPath();
-	reader.load(path.append("fn57.obj").c_str(), &obj);
-
 	camera.setSensibility(.25f);
 	camera.setPosition(eyeX, eyeY, eyeZ);
 
@@ -181,10 +181,45 @@ void init()
 	glLightfv(GL_LIGHT0, GL_DIFFUSE, clr);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, b);
 	glEnable(GL_LIGHT0);
+
+
+
+	//VAO, VBO
+	glGenVertexArrays(1, VAOs);
+	glBindVertexArray(VAOs[0]);
+
+	GLfloat  vertices[][2] = {
+		{ -0.90f, -0.90f },{ 0.85f, -0.90f },{ -0.90f,  0.85f },  // Triangle 1
+		{ 0.90f, -0.85f },{ 0.90f,  0.90f },{ -0.85f,  0.90f }   // Triangle 2
+	};
+
+	glGenBuffers(1, Buffers);
+	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
+		vertices, GL_STATIC_DRAW);
+
+	GMGLShaderInfo shadersInfo[] = {
+		{ GL_VERTEX_SHADER, "D:/shaders/test/test.vert" },
+		{ GL_FRAGMENT_SHADER, "D:/shaders/test/test.frag" },
+	};
+	shaders.appendShader(shadersInfo[0]);
+	shaders.appendShader(shadersInfo[1]);
+	GMGLShadersLoader::loadShaders(shaders);
+	shaders.useProgram();
+
+	glVertexAttribPointer(0, 2, GL_FLOAT,
+		GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(0);
 }
 
 void render()
 {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glBindVertexArray(VAOs[0]);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glutSwapBuffers();
 }
 
 void resharp(GLint w, GLint h)
@@ -192,6 +227,12 @@ void resharp(GLint w, GLint h)
 	glViewport(0, 0, w, h);
 	width = w;
 	height = h;
+}
+
+int main()
+{
+	WinMain(NULL, NULL, NULL, 0);
+	return 0;
 }
 
 int WINAPI WinMain(
@@ -217,7 +258,7 @@ int WINAPI WinMain(
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);
 
-	GameLoopUtilities::gm_gl_registerGameLoop(gl);
+	//GameLoopUtilities::gm_gl_registerGameLoop(gl);
 
 	glutMainLoop();
 

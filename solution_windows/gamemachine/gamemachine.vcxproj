@@ -76,6 +76,7 @@
     <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworldprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\gl\shaders.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\io\keyboard.cpp" />
@@ -102,6 +103,7 @@
     <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworldprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\gl\shaders.h" />
     <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereader.h" />
     <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\io\keyboard.h" />
