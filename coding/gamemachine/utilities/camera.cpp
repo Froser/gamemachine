@@ -129,11 +129,3 @@ void Camera::mouseReact(int windowPosX, int windowPosY, int windowWidth, int Win
 	lookUp(-deltaY * m_sensibility);
 	Mouse::setCursorPosition(centerX, centerY);
 }
-
-void CameraUtility::fglextlib_gl_LookAt(Camera& camera)
-{
-	CameraLookAt c = camera.getCameraLookAt();
-	gluLookAt(c.position_x, c.position_y, c.position_z,
-		c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z,
-		0, 1, 0);
-}

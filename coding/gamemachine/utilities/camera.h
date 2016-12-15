@@ -47,10 +47,5 @@ private:
 	GMfloat m_lookUpLimitRad;
 };
 
-struct CameraUtility
-{
-	static void fglextlib_gl_LookAt(Camera& camera);
-};
-
 END_NS
 #endif

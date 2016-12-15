@@ -1,5 +1,5 @@
-﻿#ifndef __SHADER_H__
-#define __SHADER_H__
+﻿#ifndef __SHADERS_H__
+#define __SHADERS_H__
 #include "common.h"
 #include <vector>
 BEGIN_NS
@@ -19,6 +19,7 @@ public:
 	~GMGLShaders();
 
 	void useProgram();
+	GLuint getProgram() { return m_shaderProgram; }
 
 	void appendShader(const GMGLShaderInfo& shader);
 	GMGLShadersInfo& getShaders() { return m_shaders; }

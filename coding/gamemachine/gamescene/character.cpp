@@ -11,6 +11,7 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	, m_stepHeight(stepHeight)
 {
 	setTransform(position);
+	m_camera.setPosition(position.getOrigin().x(), position.getOrigin().y(), position.getOrigin().z());
 }
 
 void gm::Character::drawObject()

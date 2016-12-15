@@ -29,7 +29,7 @@
     <Filter Include="coding\core">
       <UniqueIdentifier>{f4a0f70b-7f83-47a9-a0b1-0f71017dc9d6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\gl">
+    <Filter Include="coding\gmgl">
       <UniqueIdentifier>{8eefad08-d9ce-4ec6-8480-a07b3b838130}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -103,8 +103,11 @@
     <ClCompile Include="..\..\coding\gamemachine\gamescene\character.cpp">
       <Filter>coding\gamescene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gl\shaders.cpp">
-      <Filter>coding\gl</Filter>
+    <ClCompile Include="..\..\coding\gamemachine\gmgl\shaders.cpp">
+      <Filter>coding\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\gmgl\gmgl_func.cpp">
+      <Filter>coding\gmgl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -183,8 +186,11 @@
     <ClInclude Include="..\..\coding\gamemachine\gamescene\character.h">
       <Filter>coding\gamescene</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gl\shaders.h">
-      <Filter>coding\gl</Filter>
+    <ClInclude Include="..\..\coding\gamemachine\gmgl\shaders.h">
+      <Filter>coding\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\gmgl\gmgl_func.h">
+      <Filter>coding\gmgl</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
