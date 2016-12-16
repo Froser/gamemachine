@@ -28,7 +28,9 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName)
 	GLuint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
 
 	vmath::mat4 view_matrix(
-		vmath::lookat(vmath::vec3(c.position_x, c.position_y, c.position_z), vmath::vec3(c.lookAt_x, c.lookAt_y, c.lookAt_z), vmath::vec3(0, 1, 0))
+		vmath::lookat(vmath::vec3(c.position_x, c.position_y, c.position_z), 
+			vmath::vec3(c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z),
+			vmath::vec3(0, 1, 0))
 	);
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
