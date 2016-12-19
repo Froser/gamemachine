@@ -3,7 +3,7 @@
 #include <cmath>
 #include <gl/GLU.h>
 #include "assert.h"
-#include "io/mouse.h"
+#include "gmengine/io/mouse.h"
 
 static GMfloat PI()
 {

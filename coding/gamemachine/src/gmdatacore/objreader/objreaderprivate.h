@@ -4,9 +4,9 @@
 #include <string.h>
 #include <queue>
 #include "gl/GL.h"
-#include "containers/basic_containers.h"
+#include "gmdatacore/containers.h"
 #include "mtlreader.h"
-#include "core/objstruct.h"
+#include "gmdatacore/objstruct.h"
 BEGIN_NS
 
 class FaceIndices

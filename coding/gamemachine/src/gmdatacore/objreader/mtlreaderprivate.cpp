@@ -2,7 +2,7 @@
 #include "mtlreaderprivate.h"
 #include "objreaderprivate.h"
 #include "utilities/scanner.h"
-#include "imagereader/imagereader.h"
+#include "gmdatacore/imagereader/imagereader.h"
 
 #define KW_REMARK "#"
 #define KW_NEWMATERIAL "newmtl"

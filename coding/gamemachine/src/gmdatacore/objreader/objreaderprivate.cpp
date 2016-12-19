@@ -2,7 +2,7 @@
 #include "ObjReaderPrivate.h"
 #include "utilities/scanner.h"
 #include "utilities/assert.h"
-#include "imagereader/imagereader.h"
+#include "gmdatacore/imagereader/imagereader.h"
 #include <locale>
 
 #define MAX_VERTICES_IN_ONE_FACE 4

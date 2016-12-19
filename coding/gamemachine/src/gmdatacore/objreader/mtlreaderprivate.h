@@ -3,7 +3,7 @@
 #include "common.h"
 #include <string>
 #include <map>
-#include "core/objstruct.h"
+#include "gmdatacore/objstruct.h"
 
 BEGIN_NS
 typedef std::string MaterialName;

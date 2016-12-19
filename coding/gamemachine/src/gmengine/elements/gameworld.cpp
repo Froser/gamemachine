@@ -2,7 +2,7 @@
 #include "gameworld.h"
 #include "gameobject.h"
 #include "btBulletDynamicsCommon.h"
-#include "core/objstruct.h"
+#include "gmdatacore/objstruct.h"
 #include "utilities/assert.h"
 #include "character.h"
 

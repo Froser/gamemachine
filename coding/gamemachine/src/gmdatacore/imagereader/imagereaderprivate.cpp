@@ -2,7 +2,7 @@
 #include "imagereader.h"
 #include "utilities/assert.h"
 #include <fstream>
-#include "core/image.h"
+#include "gmdatacore/image.h"
 
 bool ImageReaderPrivate::load(const char* filename, Image* img)
 {

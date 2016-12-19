@@ -1,7 +1,7 @@
 ﻿#ifndef __GAMEOBJECT_PRIVATE_H__
 #define __GAMEOBJECT_PRIVATE_H__
 #include "common.h"
-#include "core/objstruct.h"
+#include "gmdatacore/objstruct.h"
 #include "utilities/autoptr.h"
 #include "btBulletCollisionCommon.h"
 BEGIN_NS

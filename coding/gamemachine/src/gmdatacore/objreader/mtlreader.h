@@ -3,7 +3,7 @@
 #include "common.h"
 #include <fstream>
 #include "mtlreaderprivate.h"
-#include "core/objstruct.h"
+#include "gmdatacore/objstruct.h"
 
 BEGIN_NS
 

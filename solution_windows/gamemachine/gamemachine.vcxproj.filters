@@ -1,196 +1,205 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="coding">
+    <Filter Include="src">
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="coding\objreader">
-      <UniqueIdentifier>{8db0c32c-c735-43fb-90d6-086ec5611470}</UniqueIdentifier>
+    <Filter Include="src\utilities">
+      <UniqueIdentifier>{61a7264e-4f95-40f2-bea5-bce9af8e55e0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\containers">
-      <UniqueIdentifier>{b4f84c7e-0e06-466e-a66e-51077aada663}</UniqueIdentifier>
+    <Filter Include="src\gmdatacore">
+      <UniqueIdentifier>{81839e85-637e-476e-9714-fe5c5450e256}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\utilities">
-      <UniqueIdentifier>{5c9d3ade-27ae-4602-96a5-52b5d77c9da5}</UniqueIdentifier>
+    <Filter Include="src\gmdatacore\objreader">
+      <UniqueIdentifier>{748c51b3-e2aa-426c-9534-a7bd670e1d66}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\gameloop">
-      <UniqueIdentifier>{47ac030f-863b-4537-92c0-2b451abd08e8}</UniqueIdentifier>
+    <Filter Include="src\gmengine">
+      <UniqueIdentifier>{49533294-0e5e-402a-9f55-2fb1c5fb3484}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\io">
-      <UniqueIdentifier>{99168037-8899-4207-bf00-072e91b20b4d}</UniqueIdentifier>
+    <Filter Include="src\gmengine\flow">
+      <UniqueIdentifier>{219ef65f-2f77-4689-967e-97cfad7f2145}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\imagereader">
-      <UniqueIdentifier>{3663cf2a-03b5-461f-b415-40777a0342bd}</UniqueIdentifier>
+    <Filter Include="src\gmengine\elements">
+      <UniqueIdentifier>{60074d52-f0a0-458b-84ea-907f4538f7a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\gamescene">
-      <UniqueIdentifier>{77c171d3-264b-4202-8703-13b7c8e0b795}</UniqueIdentifier>
+    <Filter Include="src\gmdatacore\imagereader">
+      <UniqueIdentifier>{5a91d71d-2ba3-4006-909e-473282139808}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\core">
-      <UniqueIdentifier>{f4a0f70b-7f83-47a9-a0b1-0f71017dc9d6}</UniqueIdentifier>
+    <Filter Include="src\gmengine\io">
+      <UniqueIdentifier>{696d3c57-5155-4967-bb98-86885d0bc26f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="coding\gmgl">
-      <UniqueIdentifier>{8eefad08-d9ce-4ec6-8480-a07b3b838130}</UniqueIdentifier>
+    <Filter Include="src\gmgl">
+      <UniqueIdentifier>{e408792a-3c5b-479f-bcd3-8f3e61d45704}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\coding\gamemachine\stdafx.cpp">
-      <Filter>coding</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\objreader\objreader.cpp">
-      <Filter>coding\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\containers\basic_containers.cpp">
-      <Filter>coding\containers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\utilities\scanner.cpp">
-      <Filter>coding\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\objreader\mtlreader.cpp">
-      <Filter>coding\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\utilities\path.cpp">
-      <Filter>coding\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\utilities\assert.cpp">
-      <Filter>coding\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\objreader\objreaderprivate.cpp">
-      <Filter>coding\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\objreader\mtlreaderprivate.cpp">
-      <Filter>coding\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\utilities\camera.cpp">
-      <Filter>coding\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gameloop\gameloop.cpp">
-      <Filter>coding\gameloop</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\utilities\stopwatch.cpp">
-      <Filter>coding\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\io\mouse.cpp">
-      <Filter>coding\io</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\io\keyboard.cpp">
-      <Filter>coding\io</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereader.cpp">
-      <Filter>coding\imagereader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.cpp">
-      <Filter>coding\imagereader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworld.cpp">
-      <Filter>coding\gamescene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameworldprivate.cpp">
-      <Filter>coding\gamescene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobject.cpp">
-      <Filter>coding\gamescene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.cpp">
-      <Filter>coding\gamescene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\core\objstruct.cpp">
-      <Filter>coding\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\core\image.cpp">
-      <Filter>coding\core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gamescene\character.cpp">
-      <Filter>coding\gamescene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gmgl\shaders.cpp">
-      <Filter>coding\gmgl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\gmgl\gmgl_func.cpp">
-      <Filter>coding\gmgl</Filter>
-    </ClCompile>
+    <ClInclude Include="..\..\coding\gamemachine\src\common.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\camera.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\stopwatch.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\vmath.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\containers.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objstruct.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.h">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h">
+      <Filter>src\gmengine\flow</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereaderprivate.h">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h">
+      <Filter>src\gmengine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h">
+      <Filter>src\gmengine\io</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shaders.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\coding\gamemachine\objreader\objreader.h">
-      <Filter>coding\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\stdafx.h">
-      <Filter>coding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\common.h">
-      <Filter>coding</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\containers\basic_containers.h">
-      <Filter>coding\containers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\utilities\scanner.h">
-      <Filter>coding\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\objreader\mtlreader.h">
-      <Filter>coding\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\utilities\path.h">
-      <Filter>coding\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\utilities\assert.h">
-      <Filter>coding\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\objreader\objreaderprivate.h">
-      <Filter>coding\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\objreader\mtlreaderprivate.h">
-      <Filter>coding\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\utilities\camera.h">
-      <Filter>coding\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gameloop\gameloop.h">
-      <Filter>coding\gameloop</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\utilities\stopwatch.h">
-      <Filter>coding\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\io\keyboard.h">
-      <Filter>coding\io</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\io\mouse.h">
-      <Filter>coding\io</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereader.h">
-      <Filter>coding\imagereader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\imagereader\imagereaderprivate.h">
-      <Filter>coding\imagereader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworld.h">
-      <Filter>coding\gamescene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\utilities\autoptr.h">
-      <Filter>coding\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameworldprivate.h">
-      <Filter>coding\gamescene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobject.h">
-      <Filter>coding\gamescene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gamescene\gameobjectprivate.h">
-      <Filter>coding\gamescene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\core\objstruct.h">
-      <Filter>coding\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\core\image.h">
-      <Filter>coding\core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gamescene\character.h">
-      <Filter>coding\gamescene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gmgl\shaders.h">
-      <Filter>coding\gmgl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\gmgl\gmgl_func.h">
-      <Filter>coding\gmgl</Filter>
-    </ClInclude>
+    <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\stopwatch.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\containers.cpp">
+      <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp">
+      <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objstruct.cpp">
+      <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.cpp">
+      <Filter>src\gmdatacore\objreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp">
+      <Filter>src\gmengine\flow</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereaderprivate.cpp">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp">
+      <Filter>src\gmengine\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp">
+      <Filter>src\gmengine\io</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\shaders.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

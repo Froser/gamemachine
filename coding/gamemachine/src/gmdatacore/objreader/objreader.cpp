@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "objreader.h"
 #include "utilities/path.h"
-#include "core/objstruct.h"
+#include "gmdatacore/objstruct.h"
 
 ObjReader::ObjReader(Mode mode)
 {
