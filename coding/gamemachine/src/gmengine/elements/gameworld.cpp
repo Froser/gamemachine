@@ -2,45 +2,21 @@
 #include "gameworld.h"
 #include "gameobject.h"
 #include "btBulletDynamicsCommon.h"
-#include "gmdatacore/objstruct.h"
+#include "gmdatacore/object.h"
 #include "utilities/assert.h"
 #include "character.h"
 
-void GLGameWorldRenderCallback::renderObject(btScalar* trans, GameObject* obj)
-{
-	glPushMatrix();
-	glMultMatrixf(trans);
-	glCallList(obj->getObject()->m_objectId);
-	glPopMatrix();
-}
-
-void GLGameWorldRenderCallback::createObject(GameObject* obj, Object** out)
-{
-	GMuint id = glGenLists(1);
-	glNewList(id, GL_COMPILE);
-	glPushMatrix();
-	obj->drawObject();
-	glPopMatrix();
-	glEndList();
-
-	if (*out)
-	{
-		TextureMap tm;
-		*out = new Object(id, tm);
-	}
-}
-
 GameWorld::GameWorld()
 {
-	m_pCallback.reset(NEW_GameWorldRenderCallback);
+	//m_pCallback.reset(NEW_GameWorldRenderCallback);
 	dataRef().init();
 }
 
 void GameWorld::appendObject(GameObject* obj)
 {
-	Object* coreObj;
-	m_pCallback->createObject(obj, &coreObj);
-	obj->setObject(coreObj);
+	//Object* coreObj = nullptr;
+	//m_pCallback->createObject(obj, &coreObj);
+	//obj->setObject(coreObj);
 
 	dataRef().appendObject(obj);
 }
@@ -77,7 +53,7 @@ void GameWorld::renderGameWorld()
 			trans.getOpenGLMatrix(glTrans);
 
 			GameObject* gameObj = dataRef().m_shapes.at(i);
-			m_pCallback->renderObject(glTrans, gameObj);
+			//m_pCallback->renderObject(glTrans, gameObj);
 		}
 	}
 }

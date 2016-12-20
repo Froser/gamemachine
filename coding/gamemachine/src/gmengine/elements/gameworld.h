@@ -11,19 +11,6 @@ class btDiscreteDynamicsWorld;
 
 BEGIN_NS
 class Object;
-struct IGameWorldRenderCallback
-{
-	virtual void renderObject(btScalar* trans, GameObject* obj) = 0;
-	virtual void createObject(GameObject* obj, Object** out) = 0;
-};
-
-class GLGameWorldRenderCallback : public IGameWorldRenderCallback
-{
-public:
-	void renderObject(btScalar* trans, GameObject* obj) override;
-	void createObject(GameObject* obj, Object** out) override;
-};
-
 class Character;
 class GameWorld
 {
@@ -38,9 +25,6 @@ public:
 	void simulateGameWorld(GMint fps);
 	void renderGameWorld();
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
-
-private:
-	AutoPtr<IGameWorldRenderCallback> m_pCallback;
 };
 
 END_NS

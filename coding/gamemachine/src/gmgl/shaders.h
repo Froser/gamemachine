@@ -18,6 +18,8 @@ class GMGLShaders
 public:
 	~GMGLShaders();
 
+	void load();
+
 	void useProgram();
 	GLuint getProgram() { return m_shaderProgram; }
 
@@ -28,12 +30,6 @@ public:
 private:
 	GMGLShadersInfo m_shaders;
 	GLuint m_shaderProgram;
-};
-
-class GMGLShadersLoader
-{
-public:
-	static void loadShaders(GMGLShaders& shaders);
 };
 
 END_NS

@@ -115,33 +115,32 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_MAP_KD))
 	{
-		Image* tex = new Image();
+		Image* tex = nullptr;
 		char name[LINE_MAX];
 		scanner.next(name);
 
 		std::string filename = m_workingDir;
 		filename.append(name);
 
-		if (m_texMap.find(filename) == m_texMap.end())
-		{
-			ImageReader reader;
-			if (reader.load(filename.c_str(), tex))
-			{
-				m_pCurrentMaterial->hasTexture = true;
-				m_pCallback->onAddTexture(tex, &m_pCurrentMaterial->textureID);
-				TextureInfo info = { tex, m_pCurrentMaterial->textureID };
-				m_texMap[filename] = info;
-			}
-			else
-			{
-				m_pCurrentMaterial->textureID = TEXTURE_ERROR;
-			}
-		}
-		else
-		{
-			if (m_pCurrentMaterial->textureID != TEXTURE_ERROR)
-				m_pCurrentMaterial->hasTexture = true;
-			m_pCurrentMaterial->textureID = m_texMap[filename].id;
-		}
+		//if (m_texMap.find(filename) == m_texMap.end())
+		//{
+		//	if (ImageReader::load(filename.c_str(), BMP, &tex))
+		//	{
+		//		m_pCurrentMaterial->hasTexture = true;
+		//		m_pCallback->onAddTexture(tex, &m_pCurrentMaterial->textureID);
+		//		TextureInfo info = { tex, m_pCurrentMaterial->textureID };
+		//		m_texMap[filename] = info;
+		//	}
+		//	else
+		//	{
+		//		m_pCurrentMaterial->textureID = TEXTURE_ERROR;
+		//	}
+		//}
+		//else
+		//{
+		//	if (m_pCurrentMaterial->textureID != TEXTURE_ERROR)
+		//		m_pCurrentMaterial->hasTexture = true;
+		//	m_pCurrentMaterial->textureID = m_texMap[filename].id;
+		//}
 	}
 }

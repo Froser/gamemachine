@@ -3,7 +3,7 @@
 #include "common.h"
 #include <string>
 #include <map>
-#include "gmdatacore/objstruct.h"
+#include "gmdatacore/object.h"
 
 BEGIN_NS
 typedef std::string MaterialName;
@@ -39,14 +39,14 @@ private:
 	Materials& getMaterials();
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void setCallback(IObjReaderCallback* callback) { m_pCallback = callback; }
-	TextureMap getTextureMap() { return m_texMap; }
+	//TextureMap getTextureMap() { return m_texMap; }
 
 private:
 	MaterialProperties* m_pCurrentMaterial;
 	Materials m_materials;
 	std::string m_workingDir;
 	IObjReaderCallback* m_pCallback;
-	TextureMap m_texMap;
+	//TextureMap m_texMap;
 };
 END_NS
 #endif

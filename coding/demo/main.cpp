@@ -5,7 +5,6 @@
 #include "GL/glew.h"
 #include "GL/freeglut.h"
 #include "gmdatacore/objreader/objreader.h"
-#include "gmdatacore/objstruct.h"
 #include "utilities/path.h"
 #include "utilities/camera.h"
 #include "utilities/assert.h"
@@ -20,6 +19,7 @@
 #include "gmgl/shaders.h"
 #include "utilities/vmath.h"
 #include "gmgl/gmgl_func.h"
+#include "gmgl/texture.h"
 
 using namespace gm;
 
@@ -38,10 +38,13 @@ Character* character;
 
 GMGLShaders shaders;
 
-GLuint VAOs[1], Buffers[1];
+GLuint VAOs[1], Buffers[1], EBOs[1];
 
 GLint render_model_matrix_loc;
 
+GMGLTexture texture;
+
+Object* obj;
 class GameHandler : public IGameHandler
 {
 public:
@@ -57,8 +60,13 @@ public:
 		Camera& camera = world.getMajorCharacter()->getCamera();
 
 		GMGL::lookAt(camera, shaders, "view_matrix");
-		glBindVertexArray(VAOs[0]);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		obj->getDrawer()->draw(obj);
+
+		//glBindVertexArray(VAOs[0]);
+		//glEnable(GL_PRIMITIVE_RESTART);
+		//glPrimitiveRestartIndex(0xFFFF);
+		//glDrawElements(GL_TRIANGLE_FAN, 9, GL_UNSIGNED_SHORT, NULL);
+		//glDisable(GL_PRIMITIVE_RESTART);
 
 		//glColor3f(1, 1, 1);
 		//obj.draw();
@@ -70,7 +78,6 @@ public:
 	void mouse()
 	{
 		Camera& camera = world.getMajorCharacter()->getCamera();
-		//CameraUtility::fglextlib_gl_LookAt(camera);
 		GMGL::lookAt(camera, shaders, "view_matrix");
 		int wx = glutGet(GLUT_WINDOW_X),
 			wy = glutGet(GLUT_WINDOW_Y);
@@ -111,13 +118,20 @@ GameLoop gl(s, &handler);
 
 void init()
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//GMGLTexture::loadTexture("D:\\curiosity.dds", texture);
+	obj = nullptr;
+	ObjReader r(ObjReader::LoadOnly);
+	r.load("D:\\cat.obj", &obj);
+	obj->getDrawer()->init(obj);
+
 	world.setGravity(0, 0, 0);
 
 	btTransform charTransform;
 	charTransform.setIdentity();
-	charTransform.setOrigin(btVector3(0, 0, 10));
+	charTransform.setOrigin(btVector3(0, 10, 10));
 	character = new Character(charTransform, 0, 10, 15);
-	character->setCanFreeMove(false);
+	character->setCanFreeMove(true);
 	character->setJumpSpeed(btVector3(0, 50, 0));
 	world.setMajorCharacter(character);
 
@@ -132,35 +146,35 @@ void init()
 	handler.setGameLoop(&gl);
 	camera.setSensibility(.25f);
 
-	glClearColor(0, 0, 0, 0);
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LIGHTING);
-
-	GLfloat pos[] = { 150, 150, 150, 0 };
-	glLightfv(GL_LIGHT0, GL_POSITION, pos);
-
-	GLfloat clr[] = { .5, .5, .5, 1 };
-	GLfloat b[] = { 1, 1, 1, 1 };
-	glLightfv(GL_LIGHT0, GL_AMBIENT, clr);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, clr);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, b);
-	glEnable(GL_LIGHT0);
-
-
-
 	//VAO, VBO
-	glGenVertexArrays(1, VAOs);
-	glBindVertexArray(VAOs[0]);
-
-	GLfloat  vertices[][2] = {
-		{ -0.90f, -0.90f },{ 0.85f, -0.90f },{ -0.90f,  0.85f },  // Triangle 1
-		{ 0.90f, -0.85f },{ 0.90f,  0.90f },{ -0.85f,  0.90f }   // Triangle 2
+	GMfloat pos[] = {
+		1.0000,  1.0000,  1.0000,
+		-1.0000,  1.0000,  1.0000,
+		-1.0000, -1.0000,  1.0000,
+		1.0000, -1.0000,  1.0000,
+		1.0000,  1.0000, -1.0000,
+		-1.0000,  1.0000, -1.0000,
+		-1.0000, -1.0000, -1.0000,
+		1.0000, -1.0000, -1.0000,
+	};
+	GLushort indices[] = {
+		0, 1, 2, 3,
+		0xFFFF,
+		1, 5, 6, 2,
 	};
 
-	glGenBuffers(1, Buffers);
-	glBindBuffer(GL_ARRAY_BUFFER, Buffers[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices),
-		vertices, GL_STATIC_DRAW);
+	glGenVertexArrays(1, &VAOs[0]);
+	glBindVertexArray(VAOs[0]);
+
+	GLuint vbo[1];
+	glGenBuffers(1, &vbo[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(pos), pos, GL_STATIC_DRAW);
+
+	GLuint ebo[1];
+	glGenBuffers(1, &ebo[0]);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	GMGLShaderInfo shadersInfo[] = {
 		{ GL_VERTEX_SHADER, "D:/shaders/test/test.vert" },
@@ -168,21 +182,19 @@ void init()
 	};
 	shaders.appendShader(shadersInfo[0]);
 	shaders.appendShader(shadersInfo[1]);
-	GMGLShadersLoader::loadShaders(shaders);
+	shaders.load();
 	shaders.useProgram();
 
 	render_model_matrix_loc = glGetUniformLocation(shaders.getProgram(), "model_matrix");
 
 	using namespace vmath;
-	const vmath::vec3 Y(0.0f, 1.0f, 0.0f);
-	vmath::mat4 model_matrix(translate(0.0f, 0.0f, -5.0f));
-
+	vmath::mat4 model_matrix(mat4::identity());
 	glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
-	GMGL::perspective(30, 2, 1, 500, shaders, "projection_matrix");
+	GMGL::perspective(30, 2, 1, 1000, shaders, "projection_matrix");
 
-	glVertexAttribPointer(0, 2, GL_FLOAT,
-		GL_FALSE, 0, 0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
 }
 
 void render()

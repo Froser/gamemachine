@@ -13,15 +13,15 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\containers.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objstruct.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
@@ -31,7 +31,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shaders.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h" />
@@ -43,15 +45,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\containers.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objstruct.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
@@ -61,7 +63,9 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\shaders.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\texture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />

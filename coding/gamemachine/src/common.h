@@ -6,6 +6,10 @@
 	protected: \
 	className##Private& dataRef() { return m_data; }
 
+#define OUT
+#define USE_OPENGL
+#define RESTART_INDEX (GMuint)(-1)
+
 #ifndef _WINDOWS
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
@@ -26,3 +30,7 @@ typedef GLuint GMuint;
 
 // Callbacks settings
 #define NEW_GameWorldRenderCallback new GLGameWorldRenderCallback
+
+#ifdef USE_OPENGL
+#define DEFAULT_DRAWER new GMGLObjectDrawer()
+#endif

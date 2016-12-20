@@ -5,12 +5,10 @@
 BEGIN_NS
 
 class Image;
-class ImageReaderPrivate
+class ImageReader_BMP
 {
-	friend class ImageReader;
-
-private:
-	bool load(const char* filename, Image* img);
+public:
+	static bool load(const char* filename, OUT Image** img);
 };
 
 END_NS

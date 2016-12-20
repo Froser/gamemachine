@@ -58,14 +58,14 @@ static const GLchar* readShader(const char* filename)
 	return const_cast<const GLchar*>(source);
 }
 
-void GMGLShadersLoader::loadShaders(GMGLShaders& shaders)
+void GMGLShaders::load()
 {
-	GMGLShadersInfo& shadersInfo = shaders.getShaders();
+	GMGLShadersInfo& shadersInfo = getShaders();
 	if (shadersInfo.size() == 0)
 		return;
 
 	GLuint program = glCreateProgram();
-	shaders.setProgram(program);
+	setProgram(program);
 
 	for (auto iter = shadersInfo.begin(); iter != shadersInfo.end(); iter++)
 	{
@@ -77,7 +77,7 @@ void GMGLShadersLoader::loadShaders(GMGLShaders& shaders)
 		const GLchar* source = readShader(entry->filename);
 		if (source == NULL)
 		{
-			removeShaders(shaders);
+			removeShaders(*this);
 			return;
 		}
 
@@ -121,6 +121,6 @@ void GMGLShadersLoader::loadShaders(GMGLShaders& shaders)
 		delete[] log;
 #endif /* DEBUG */
 
-		removeShaders(shaders);
+		removeShaders(*this);
 	}
 }

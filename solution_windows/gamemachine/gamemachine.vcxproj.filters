@@ -61,13 +61,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\containers.h">
-      <Filter>src\gmdatacore</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h">
-      <Filter>src\gmdatacore</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objstruct.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.h">
@@ -100,9 +94,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h">
       <Filter>src\gmengine\flow</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereaderprivate.h">
-      <Filter>src\gmdatacore\imagereader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
@@ -120,6 +111,21 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shaders.h">
       <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.h">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\texture.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h">
+      <Filter>src\gmdatacore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -141,13 +147,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\containers.cpp">
-      <Filter>src\gmdatacore</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp">
-      <Filter>src\gmdatacore</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objstruct.cpp">
       <Filter>src\gmdatacore</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp">
@@ -183,9 +183,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereaderprivate.cpp">
-      <Filter>src\gmdatacore\imagereader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp">
       <Filter>src\gmengine\io</Filter>
     </ClCompile>
@@ -200,6 +197,21 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.cpp">
       <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.cpp">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\texture.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp">
+      <Filter>src\gmdatacore</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

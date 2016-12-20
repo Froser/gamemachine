@@ -21,10 +21,10 @@ public:
 	ObjReader(Mode mode);
 
 public:
-	void load(const char* filename, Object* obj);
+	void load(const char* filename, OUT Object** obj);
 
 private:
-	void parse(std::ifstream& file);
+	void parse(std::ifstream& file, OUT Object** obj);
 
 private:
 	Mode m_mode;
