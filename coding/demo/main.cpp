@@ -92,7 +92,10 @@ public:
 		GMfloat dis = 25;
 		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
+		{
+			delete obj;
 			m_gl->terminate();
+		}
 		if (Keyboard::isKeyDown('A'))
 			camera->moveRight(-v);
 		if (Keyboard::isKeyDown('D'))

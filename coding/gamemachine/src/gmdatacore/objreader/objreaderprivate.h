@@ -13,7 +13,6 @@ class Image;
 class ObjReaderPrivate
 {
 	friend class ObjReader;
-	friend class ObjReaderCallback;
 
 private:
 	ObjReaderPrivate();

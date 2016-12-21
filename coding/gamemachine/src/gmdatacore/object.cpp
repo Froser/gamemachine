@@ -26,6 +26,8 @@ Object::Object()
 
 Object::~Object()
 {
+	m_drawer->dispose(this);
+
 	for (auto iter = m_components.begin(); iter != m_components.cend(); iter++)
 	{
 		delete *iter;

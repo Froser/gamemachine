@@ -7,8 +7,6 @@
 
 BEGIN_NS
 typedef std::string MaterialName;
-
-const int TEXTURE_ERROR = 0;
 struct MaterialProperties
 {
 	GMuint textureID;
@@ -28,7 +26,6 @@ struct MaterialProperties
 
 typedef std::map<MaterialName, MaterialProperties> Materials;
 
-struct IObjReaderCallback;
 class MtlReaderPrivate
 {
 	friend class MtlReader;
@@ -38,15 +35,11 @@ private:
 	void parseLine(const char* line);
 	Materials& getMaterials();
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
-	void setCallback(IObjReaderCallback* callback) { m_pCallback = callback; }
-	//TextureMap getTextureMap() { return m_texMap; }
 
 private:
 	MaterialProperties* m_pCurrentMaterial;
 	Materials m_materials;
 	std::string m_workingDir;
-	IObjReaderCallback* m_pCallback;
-	//TextureMap m_texMap;
 };
 END_NS
 #endif
