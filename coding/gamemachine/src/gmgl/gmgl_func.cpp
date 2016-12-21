@@ -35,3 +35,9 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName)
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
 }
+
+void IMPL ambient(GMfloat* rgb, GMGLShaders& shaders, char* ambientMatrixName)
+{
+	GLuint ambientLocation = glGetUniformLocation(shaders.getProgram(), ambientMatrixName);
+	glUniformMatrix4fv(ambientLocation, 1, GL_FALSE, vmath::vec4(rgb[0], rgb[1], rgb[2], 1.0f));
+}

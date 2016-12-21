@@ -3,9 +3,8 @@
 #include "utilities/path.h"
 #include "gmdatacore/object.h"
 
-ObjReader::ObjReader(Mode mode)
+ObjReader::ObjReader()
 {
-	dataRef().setMode(mode);
 }
 
 void ObjReader::load(const char* filename, OUT Object** obj)
@@ -22,11 +21,10 @@ void ObjReader::load(const char* filename, OUT Object** obj)
 
 void ObjReader::parse(std::ifstream& file, OUT Object** obj)
 {
-	Object* object;
 	if (obj)
 	{
 		*obj = new Object();
-		object = *obj;
+		dataRef().setObject(*obj);
 	}
 	else
 	{
@@ -38,5 +36,5 @@ void ObjReader::parse(std::ifstream& file, OUT Object** obj)
 	{
 		dataRef().parseLine(line);
 	}
-	dataRef().writeData(object);
+	dataRef().endParse();
 }

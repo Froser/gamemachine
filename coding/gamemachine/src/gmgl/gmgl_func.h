@@ -16,6 +16,7 @@ BEGIN_GMGL_FUNCS
 void API frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f, GMGLShaders& shaders, char* projectionMatrixName);
 void API perspective(float fovy, float aspect, float n, float f, GMGLShaders& shaders, char* projectionMatrixName);
 void API lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName);
+void API ambient(GMfloat* rgb, GMGLShaders& shaders, char* ambientMatrixName);
 
 END_GMGL_FUNCS
 

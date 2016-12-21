@@ -115,13 +115,13 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_MAP_KD))
 	{
-		Image* tex = nullptr;
-		char name[LINE_MAX];
-		scanner.next(name);
-
-		std::string filename = m_workingDir;
-		filename.append(name);
-
+		//Image* tex = nullptr;
+		//char name[LINE_MAX];
+		//scanner.next(name);
+		//
+		//std::string filename = m_workingDir;
+		//filename.append(name);
+		//
 		//if (m_texMap.find(filename) == m_texMap.end())
 		//{
 		//	if (ImageReader::load(filename.c_str(), BMP, &tex))

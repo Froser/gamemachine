@@ -9,7 +9,7 @@ class GMGLObjectDrawer : public ObjectDrawer
 {
 public:
 	virtual void init(Object*) override;
-	virtual void draw(Object*) override;
+	virtual void draw(GMGLShaders&, Object*) override;
 	virtual void dispose(Object*) override;
 };
 

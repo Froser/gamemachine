@@ -31,8 +31,10 @@ static bool isSeparator(char c)
 }
 
 ObjReaderPrivate::ObjReaderPrivate()
+	: m_currentComponent(new Component())
+	, m_pMtlReader(new MtlReader())
+	, m_currentMaterial(nullptr)
 {
-	m_pMtlReader = new MtlReader();
 }
 
 ObjReaderPrivate::~ObjReaderPrivate()
@@ -109,14 +111,34 @@ void ObjReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_USEMTL))
 	{
+		pushData();
+
 		char name[LINE_MAX];
 		scanner.nextToTheEnd(name);
-		const MaterialProperties& properties = m_pMtlReader->getProperties(name);
+		m_currentMaterial = &m_pMtlReader->getProperties(name);
 	}
 }
 
-void ObjReaderPrivate::writeData(Object* obj)
+void ObjReaderPrivate::pushData()
 {
+	GMuint size = m_indices.size();
+	if (size == 0)
+		return;
+
+	Material& m = m_currentComponent->getMaterial();
+	m.Ka[0] = m_currentMaterial->Ka_r;
+	m.Ka[1] = m_currentMaterial->Ka_g;
+	m.Ka[2] = m_currentMaterial->Ka_b;
+	m_object->appendComponent(m_currentComponent, size - m_currentComponent->getOffset());
+
+	m_currentComponent = new Component();
+	m_currentComponent->setOffset(size);
+}
+
+void ObjReaderPrivate::endParse()
+{
+	pushData();
+
 	GMuint size = m_vertices.size() * 3;
 	GMfloat* vertices = new GMfloat[size];
 	int cnt = 0;
@@ -125,9 +147,8 @@ void ObjReaderPrivate::writeData(Object* obj)
 		vertices[cnt] = *iter;
 	}
 	ArrayData<GMfloat> vao = { vertices, size };
-	obj->setVertices(vao);
+	m_object->setVertices(vao);
 
-	size = m_indices.size();
 	GMuint* indices = new GMuint[size];
 	cnt = 0;
 	for (auto iter = m_indices.begin(); iter != m_indices.end(); iter++, cnt++)
@@ -135,5 +156,5 @@ void ObjReaderPrivate::writeData(Object* obj)
 		indices[cnt] = (*iter - 1);
 	}
 	ArrayData<GMuint> ebo = { indices, size };
-	obj->setIndices(ebo);
+	m_object->setIndices(ebo);
 }

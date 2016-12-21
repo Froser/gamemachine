@@ -127,6 +127,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">

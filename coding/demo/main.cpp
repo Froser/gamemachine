@@ -20,6 +20,7 @@
 #include "utilities/vmath.h"
 #include "gmgl/gmgl_func.h"
 #include "gmgl/texture.h"
+#include "gmgl/shader_constants.h"
 
 using namespace gm;
 
@@ -27,8 +28,6 @@ float width = 600;
 float height = 300;
 GLfloat centerX = 0, centerY = 0, centerZ = 0;
 GLfloat eyeX = 0, eyeY = 0, eyeZ = 5;
-
-ObjReader reader(ObjReader::LoadOnly);
 
 GMfloat fps = 60;
 GameLoopSettings s = { fps };
@@ -56,11 +55,13 @@ public:
 	void render()
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(GL_LEQUAL);
 
 		Camera& camera = world.getMajorCharacter()->getCamera();
 
-		GMGL::lookAt(camera, shaders, "view_matrix");
-		obj->getDrawer()->draw(obj);
+		GMGL::lookAt(camera, shaders, GMSHADER_VIEW_MATRIX);
+		obj->getDrawer()->draw(shaders, obj);
 
 		//glBindVertexArray(VAOs[0]);
 		//glEnable(GL_PRIMITIVE_RESTART);
@@ -78,7 +79,7 @@ public:
 	void mouse()
 	{
 		Camera& camera = world.getMajorCharacter()->getCamera();
-		GMGL::lookAt(camera, shaders, "view_matrix");
+		GMGL::lookAt(camera, shaders, GMSHADER_VIEW_MATRIX);
 		int wx = glutGet(GLUT_WINDOW_X),
 			wy = glutGet(GLUT_WINDOW_Y);
 		camera.mouseReact(wx, wy, width, height);
@@ -88,7 +89,7 @@ public:
 	{
 		Character* character = world.getMajorCharacter();
 		Camera* camera = &character->getCamera();
-		GMfloat dis = 5;
+		GMfloat dis = 25;
 		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 			m_gl->terminate();
@@ -121,15 +122,15 @@ void init()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//GMGLTexture::loadTexture("D:\\curiosity.dds", texture);
 	obj = nullptr;
-	ObjReader r(ObjReader::LoadOnly);
-	r.load("D:\\cat.obj", &obj);
+	ObjReader r;
+	r.load("D:\\baymax.obj", &obj);
 	obj->getDrawer()->init(obj);
 
 	world.setGravity(0, 0, 0);
 
 	btTransform charTransform;
 	charTransform.setIdentity();
-	charTransform.setOrigin(btVector3(0, 10, 10));
+	charTransform.setOrigin(btVector3(0, 100, 100));
 	character = new Character(charTransform, 0, 10, 15);
 	character->setCanFreeMove(true);
 	character->setJumpSpeed(btVector3(0, 50, 0));
@@ -146,36 +147,6 @@ void init()
 	handler.setGameLoop(&gl);
 	camera.setSensibility(.25f);
 
-	//VAO, VBO
-	GMfloat pos[] = {
-		1.0000,  1.0000,  1.0000,
-		-1.0000,  1.0000,  1.0000,
-		-1.0000, -1.0000,  1.0000,
-		1.0000, -1.0000,  1.0000,
-		1.0000,  1.0000, -1.0000,
-		-1.0000,  1.0000, -1.0000,
-		-1.0000, -1.0000, -1.0000,
-		1.0000, -1.0000, -1.0000,
-	};
-	GLushort indices[] = {
-		0, 1, 2, 3,
-		0xFFFF,
-		1, 5, 6, 2,
-	};
-
-	glGenVertexArrays(1, &VAOs[0]);
-	glBindVertexArray(VAOs[0]);
-
-	GLuint vbo[1];
-	glGenBuffers(1, &vbo[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(pos), pos, GL_STATIC_DRAW);
-
-	GLuint ebo[1];
-	glGenBuffers(1, &ebo[0]);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo[0]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
 	GMGLShaderInfo shadersInfo[] = {
 		{ GL_VERTEX_SHADER, "D:/shaders/test/test.vert" },
 		{ GL_FRAGMENT_SHADER, "D:/shaders/test/test.frag" },
@@ -185,12 +156,12 @@ void init()
 	shaders.load();
 	shaders.useProgram();
 
-	render_model_matrix_loc = glGetUniformLocation(shaders.getProgram(), "model_matrix");
+	render_model_matrix_loc = glGetUniformLocation(shaders.getProgram(), GMSHADER_MODEL_MATRIX);
 
 	using namespace vmath;
 	vmath::mat4 model_matrix(mat4::identity());
 	glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
-	GMGL::perspective(30, 2, 1, 1000, shaders, "projection_matrix");
+	GMGL::perspective(30, 2, 1, 1000, shaders, GMSHADER_PROJECTION_MATRIX);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);

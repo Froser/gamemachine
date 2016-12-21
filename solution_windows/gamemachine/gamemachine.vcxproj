@@ -33,6 +33,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shaders.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />

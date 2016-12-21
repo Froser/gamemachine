@@ -2,7 +2,7 @@
 #define __OBJREADER_PRIVATE_H__
 #include "common.h"
 #include <string.h>
-#include <queue>
+#include <vector>
 #include "gl/GL.h"
 #include "mtlreader.h"
 #include "gmdatacore/object.h"
@@ -16,37 +16,22 @@ class ObjReaderPrivate
 	friend class ObjReaderCallback;
 
 private:
-	enum DataType
-	{
-		Vertex,
-		Texture,
-		Normal,
-	};
-
-	enum Mode
-	{
-		LoadAndDraw,
-		LoadOnly
-	};
-private:
 	ObjReaderPrivate();
 	~ObjReaderPrivate();
-	void setMode(int mode) { m_mode = mode; }
-	int mode() { return m_mode; }
+	void setObject(Object* obj) { m_object = obj; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void parseLine(const char* line);
-	void writeData(Object* obj);
+	void pushData();
+	void endParse();
 
 private:
 	Object* m_object;
 	std::string m_workingDir;
 	std::vector<GMfloat> m_vertices;
 	std::vector<GMuint> m_indices;
-	//std::vector<VertexNormal> m_normals;
-	//std::vector<VertexTexture> m_textures;
-	//std::vector<FaceIndices> m_indices;
 	MtlReader* m_pMtlReader;
-	int m_mode;
+	Component* m_currentComponent;
+	const MaterialProperties* m_currentMaterial;
 };
 
 END_NS

@@ -1,5 +1,7 @@
 ﻿#include "stdafx.h"
 #include "objectdrawer.h"
+#include "gmgl/shader_constants.h"
+#include "gmgl/gmgl_func.h"
 
 void GMGLObjectDrawer::init(Object* obj)
 {
@@ -22,16 +24,24 @@ void GMGLObjectDrawer::init(Object* obj)
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
+
+	glBindVertexArray(0);
 }
 
-void GMGLObjectDrawer::draw(Object* obj)
+void GMGLObjectDrawer::draw(GMGLShaders& shaders, Object* obj)
 {
 	glBindVertexArray(obj->getArrayId());
-
 	glEnable(GL_PRIMITIVE_RESTART);
 	glPrimitiveRestartIndex(RESTART_INDEX);
-	glDrawElements(GL_TRIANGLE_FAN, obj->ebo().size - 1, GL_UNSIGNED_INT, NULL);
+
+	for (auto iter = obj->getComponents().cbegin(); iter != obj->getComponents().cend(); iter++)
+	{
+		Component* component = (*iter);
+		GMGL::ambient(component->getMaterial().Ka, shaders, GMSHADER_LIGHT_KA);
+		glDrawElements(GL_TRIANGLE_FAN, component->getCount() - 1, GL_UNSIGNED_INT, (void*) (sizeof(GMuint) * component->getOffset()));
+	}
 	glDisable(GL_PRIMITIVE_RESTART);
+	glBindVertexArray(0);
 }
 
 void GMGLObjectDrawer::dispose(Object* obj)
@@ -39,6 +49,7 @@ void GMGLObjectDrawer::dispose(Object* obj)
 	GLuint vao[1] = { obj->getArrayId() },
 		vbo[1] = { obj->getBufferId() },
 		ebo[1] = { obj->getElementBufferId() };
+
 	glDeleteVertexArrays(1, vao);
 	glDeleteBuffers(1, vbo);
 	glDeleteBuffers(1, ebo);
