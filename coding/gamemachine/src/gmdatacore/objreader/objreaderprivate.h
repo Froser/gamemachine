@@ -27,6 +27,7 @@ private:
 	Object* m_object;
 	std::string m_workingDir;
 	std::vector<GMfloat> m_vertices;
+	std::vector<GMfloat> m_normals;
 	std::vector<GMuint> m_indices;
 	MtlReader* m_pMtlReader;
 	Component* m_currentComponent;

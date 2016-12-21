@@ -10,10 +10,14 @@ void GMGLObjectDrawer::init(Object* obj)
 	glBindVertexArray(vao[0]);
 	obj->setArrayId(vao[0]);
 
+	GLuint vaoSize = sizeof(GMfloat) * obj->vao().size,
+		normalsSize = sizeof(GMfloat) * obj->normals().size;
 	GLuint vbo[1];
 	glGenBuffers(1, &vbo[0]);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GMfloat) * obj->vao().size, obj->vao().data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vaoSize + normalsSize, NULL, GL_STATIC_DRAW);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, vaoSize, obj->vao().data);
+	glBufferSubData(GL_ARRAY_BUFFER, vaoSize, normalsSize, obj->normals().data);
 	obj->setBufferId(vbo[0]);
 
 	GLuint ebo[1];
@@ -23,6 +27,7 @@ void GMGLObjectDrawer::init(Object* obj)
 	obj->setElementBufferId(ebo[0]);
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
@@ -38,7 +43,7 @@ void GMGLObjectDrawer::draw(GMGLShaders& shaders, Object* obj)
 	{
 		Component* component = (*iter);
 		GMGL::ambient(component->getMaterial().Ka, shaders, GMSHADER_LIGHT_KA);
-		glDrawElements(GL_TRIANGLE_FAN, component->getCount() - 1, GL_UNSIGNED_INT, (void*) (sizeof(GMuint) * component->getOffset()));
+		glDrawElements(GL_LINE_LOOP, component->getCount() - 1, GL_UNSIGNED_INT, (void*) (sizeof(GMuint) * component->getOffset()));
 	}
 	glDisable(GL_PRIMITIVE_RESTART);
 	glBindVertexArray(0);

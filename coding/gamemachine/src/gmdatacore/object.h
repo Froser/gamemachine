@@ -83,7 +83,7 @@ public:
 		return m_components;
 	}
 
-	void setVertices(ArrayData<GMfloat> vertices)
+	void setVertices(ArrayData<GMfloat>& vertices)
 	{
 		m_vertices = vertices;
 	}
@@ -98,9 +98,19 @@ public:
 		return m_indices;
 	}
 
-	void setIndices(ArrayData<GMuint> indices)
+	void setIndices(ArrayData<GMuint>& indices)
 	{
 		m_indices = indices;
+	}
+
+	void setNormals(ArrayData<GMfloat>& normals)
+	{
+		m_normals = normals;
+	}
+
+	ArrayData<GMfloat>& normals()
+	{
+		return m_normals;
 	}
 
 	GMuint getElementBufferId() { return m_elementBufferId; }
@@ -112,6 +122,7 @@ public:
 
 private:
 	ArrayData<GMfloat> m_vertices;
+	ArrayData<GMfloat> m_normals;
 	ArrayData<GMuint> m_indices;
 	GMuint m_arrayId;
 	GMuint m_bufferId;

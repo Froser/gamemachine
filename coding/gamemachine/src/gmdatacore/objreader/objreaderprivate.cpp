@@ -68,8 +68,10 @@ void ObjReaderPrivate::parseLine(const char* line)
 		scanner.nextFloat(&v1);
 		scanner.nextFloat(&v2);
 		scanner.nextFloat(&v3);
-		//VertexNormal normal(v1, v2, v3);
-		//m_normals.push_back(normal);
+		m_normals.push_back(v1);
+		m_normals.push_back(v2);
+		m_normals.push_back(v3);
+		m_normals.push_back(1.0f);
 	}
 	else if (strEqual(command, KW_VTEXTURE))
 	{
@@ -139,22 +141,42 @@ void ObjReaderPrivate::endParse()
 {
 	pushData();
 
-	GMuint size = m_vertices.size() * 3;
-	GMfloat* vertices = new GMfloat[size];
-	int cnt = 0;
-	for (auto iter = m_vertices.cbegin(); iter != m_vertices.cend(); iter++, cnt++)
+	// 顶点
 	{
-		vertices[cnt] = *iter;
+		GMuint size = m_vertices.size();
+		GMfloat* vertices = new GMfloat[size];
+		GMuint cnt = 0;
+		for (auto iter = m_vertices.cbegin(); iter != m_vertices.cend(); iter++, cnt++)
+		{
+			vertices[cnt] = *iter;
+		}
+		ArrayData<GMfloat> vao = { vertices, size };
+		m_object->setVertices(vao);
 	}
-	ArrayData<GMfloat> vao = { vertices, size };
-	m_object->setVertices(vao);
 
-	GMuint* indices = new GMuint[size];
-	cnt = 0;
-	for (auto iter = m_indices.begin(); iter != m_indices.end(); iter++, cnt++)
+	// 法向量
 	{
-		indices[cnt] = (*iter - 1);
+		GMuint size = m_normals.size();
+		GMfloat* ns = new GMfloat[size];
+		GMuint cnt = 0;
+		for (auto iter = m_normals.cbegin(); iter != m_normals.cend(); iter++, cnt++)
+		{
+			ns[cnt] = *iter;
+		}
+		ArrayData<GMfloat> normals = { ns, size };
+		m_object->setNormals(normals);
 	}
-	ArrayData<GMuint> ebo = { indices, size };
-	m_object->setIndices(ebo);
+
+	// 索引
+	{
+		GMuint size = m_indices.size();
+		GMuint* indices = new GMuint[size];
+		GMuint cnt = 0;
+		for (auto iter = m_indices.begin(); iter != m_indices.end(); iter++, cnt++)
+		{
+			indices[cnt] = (*iter - 1);
+		}
+		ArrayData<GMuint> ebo = { indices, size };
+		m_object->setIndices(ebo);
+	}
 }
