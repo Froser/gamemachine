@@ -7,6 +7,15 @@
 
 namespace vmath
 {
+inline float fastInvSqrt(float x)
+{
+	float xhalf = 0.5f*x;
+	int i = *(int*)&x; // get bits for floating VALUE
+	i = 0x5f375a86 - (i >> 1); // gives initial guess y0
+	x = *(float*)&i; // convert bits BACK to float
+	x = x*(1.5f - xhalf*x*x); // Newton step, repeating increases accuracy
+	return x;
+}
 
 template <typename T, const int w, const int h> class matNM;
 template <typename T, const int len> class vecN;
@@ -467,9 +476,28 @@ static inline T length(const vecN<T,len>& v)
 }
 
 template <typename T, int len>
+static inline T lengthSquare(const vecN<T, len>& v)
+{
+	T result(0);
+
+	for (int i = 0; i < v.size(); ++i)
+	{
+		result += v[i] * v[i];
+	}
+
+	return result;
+}
+
+template <typename T, int len>
 static inline vecN<T,len> normalize(const vecN<T,len>& v)
 {
     return v / length(v);
+}
+
+template <int len>
+static inline vecN<float, len> normalize(const vecN<float, len>& v)
+{
+	return v * fastInvSqrt(lengthSquare(v));
 }
 
 template <typename T, int len>
@@ -716,6 +744,12 @@ template <typename T>
 static inline Tquaternion<T> normalize(const Tquaternion<T>& q)
 {
     return q / length(vecN<T,4>(q));
+}
+
+template <>
+static inline Tquaternion<float> normalize(const Tquaternion<float>& q)
+{
+	return q * fastInvSqrt(lengthSquare(vecN<float, 4>(q)));
 }
 
 template <typename T, const int w, const int h>
