@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
-#include "gmgl_func.h"
-#include "shaders.h"
+#include "gmglfunc.h"
+#include "gmglshaders.h"
+#include "gmgllight.h"
 #include "utilities/vmath.h"
 #include "utilities/camera.h"
 
@@ -27,6 +28,9 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName)
 	CameraLookAt c = camera.getCameraLookAt();
 	GLuint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
 
+	GMfloat vec[4] = { c.position_x, c.position_y, c.position_z, 1.0f };
+	GMGLLight(shaders).setViewPosition(vec);
+
 	vmath::mat4 view_matrix(
 		vmath::lookat(vmath::vec3(c.position_x, c.position_y, c.position_z), 
 			vmath::vec3(c.lookAt_x + c.position_x, c.lookAt_y + c.position_y, c.lookAt_z + c.position_z),
@@ -34,10 +38,4 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName)
 	);
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
-}
-
-void IMPL ambient(GMfloat* rgb, GMGLShaders& shaders, char* ambientMatrixName)
-{
-	GLuint ambientLocation = glGetUniformLocation(shaders.getProgram(), ambientMatrixName);
-	glUniformMatrix4fv(ambientLocation, 1, GL_FALSE, vmath::vec4(rgb[0], rgb[1], rgb[2], 1.0f));
 }

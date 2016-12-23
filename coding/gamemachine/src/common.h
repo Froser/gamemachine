@@ -8,7 +8,7 @@
 
 #define OUT
 #define USE_OPENGL
-#define RESTART_INDEX (GMuint)(-1)
+#define OFFSET(type, count) (void*)(sizeof(type) * count)
 
 #ifndef _WINDOWS
 typedef unsigned short WORD;

@@ -2,7 +2,7 @@
 #define __OBJECT_DRAWER_H__
 #include "common.h"
 #include "gmdatacore/object.h"
-#include "shaders.h"
+#include "gmglshaders.h"
 BEGIN_NS
 
 class GMGLObjectDrawer : public ObjectDrawer

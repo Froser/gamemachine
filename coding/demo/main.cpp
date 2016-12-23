@@ -14,13 +14,12 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/gameobject.h"
 #include "gmengine/elements/character.h"
-#include "btBulletCollisionCommon.h"
-#include "btBulletDynamicsCommon.h"
-#include "gmgl/shaders.h"
-#include "utilities/vmath.h"
-#include "gmgl/gmgl_func.h"
-#include "gmgl/texture.h"
+#include "gmgl/gmglshaders.h"
+#include "gmgl/gmglfunc.h"
+#include "gmgl/gmgltexture.h"
 #include "gmgl/shader_constants.h"
+#include "gmgl/gmgllight.h"
+#include "utilities/vmath.h"
 
 using namespace gm;
 
@@ -44,6 +43,7 @@ GLint render_model_matrix_loc;
 GMGLTexture texture;
 
 Object* obj;
+
 class GameHandler : public IGameHandler
 {
 public:
@@ -122,8 +122,7 @@ GameLoop gl(s, &handler);
 
 void init()
 {
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//GMGLTexture::loadTexture("D:\\curiosity.dds", texture);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	obj = nullptr;
 	ObjReader r;
 	r.load("D:\\baymax.obj", &obj);
@@ -166,9 +165,12 @@ void init()
 	glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
 	GMGL::perspective(30, 2, 1, 1000, shaders, GMSHADER_PROJECTION_MATRIX);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(0);
-	glBindVertexArray(0);
+	GMfloat ambient[3] = { .5, .5, .5 };
+	GMGLLight(shaders).setAmbient(ambient);
+
+	GMfloat pos[3] = { 100,100,100 };
+	GMGLLight(shaders).setLightPosition(pos);
+	GMGLLight(shaders).setLightColor(ambient);
 }
 
 void render()

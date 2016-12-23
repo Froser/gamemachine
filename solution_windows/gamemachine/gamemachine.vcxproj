@@ -22,6 +22,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
@@ -30,11 +31,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shaders.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h" />
@@ -55,6 +57,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
@@ -63,10 +66,11 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\shaders.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\texture.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
@@ -108,7 +112,8 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

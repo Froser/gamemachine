@@ -32,6 +32,9 @@
     <Filter Include="src\gmgl">
       <UniqueIdentifier>{e408792a-3c5b-479f-bcd3-8f3e61d45704}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gmengine\controllers">
+      <UniqueIdentifier>{b1e7c19d-ad08-46b7-9208-6a6c9f0ff9a0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -106,28 +109,34 @@
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shaders.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\texture.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -195,26 +204,32 @@
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\shaders.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgl_func.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\texture.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\objectdrawer.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp">
       <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp">
+      <Filter>src\gmgl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

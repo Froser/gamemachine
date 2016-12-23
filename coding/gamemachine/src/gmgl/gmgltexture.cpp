@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "texture.h"
+#include "gmgltexture.h"
 #include "gmdatacore/imagereader/imagereader.h"
 
 GMGLTexture::~GMGLTexture()

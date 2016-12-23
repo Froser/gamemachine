@@ -31,7 +31,7 @@ static bool isSeparator(char c)
 }
 
 ObjReaderPrivate::ObjReaderPrivate()
-	: m_currentComponent(new Component())
+	: m_currentComponent(new Component(MAX_VERTICES_IN_ONE_FACE))
 	, m_pMtlReader(new MtlReader())
 	, m_currentMaterial(nullptr)
 {
@@ -99,9 +99,9 @@ void ObjReaderPrivate::parseLine(const char* line)
 				i2 = NONE;
 			if (!faceScanner.nextInt(&i3))
 				i3 = NONE;
-			m_indices.push_back(i1);
+			m_vertexIndices.push_back(i1);
+			m_normalIndices.push_back(i3);
 		}
-		m_indices.push_back(RESTART_INDEX);
 	}
 	else if (strEqual(command, KW_MTLLIB))
 	{
@@ -123,7 +123,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 
 void ObjReaderPrivate::pushData()
 {
-	GMuint size = m_indices.size();
+	GMuint size = m_vertexIndices.size();
 	if (size == 0)
 		return;
 
@@ -131,9 +131,16 @@ void ObjReaderPrivate::pushData()
 	m.Ka[0] = m_currentMaterial->Ka_r;
 	m.Ka[1] = m_currentMaterial->Ka_g;
 	m.Ka[2] = m_currentMaterial->Ka_b;
+	m.Kd[0] = m_currentMaterial->Kd_r;
+	m.Kd[1] = m_currentMaterial->Kd_g;
+	m.Kd[2] = m_currentMaterial->Kd_b;
+	m.Ks[0] = m_currentMaterial->Ks_r;
+	m.Ks[1] = m_currentMaterial->Ks_g;
+	m.Ks[2] = m_currentMaterial->Ks_b;
+	m.shininess = m_currentMaterial->Ns;
 	m_object->appendComponent(m_currentComponent, size - m_currentComponent->getOffset());
 
-	m_currentComponent = new Component();
+	m_currentComponent = new Component(MAX_VERTICES_IN_ONE_FACE);
 	m_currentComponent->setOffset(size);
 }
 
@@ -141,42 +148,37 @@ void ObjReaderPrivate::endParse()
 {
 	pushData();
 
-	// 顶点
+	// 顶点坐标
 	{
-		GMuint size = m_vertices.size();
-		GMfloat* vertices = new GMfloat[size];
+		GMuint size = m_vertexIndices.size() * 4;
+		GMfloat* vs = new GMfloat[size];
 		GMuint cnt = 0;
-		for (auto iter = m_vertices.cbegin(); iter != m_vertices.cend(); iter++, cnt++)
+		for (auto iter = m_vertexIndices.cbegin(); iter != m_vertexIndices.cend(); iter++)
 		{
-			vertices[cnt] = *iter;
+			vs[cnt++] = m_vertices[(*iter - 1) * 4];
+			vs[cnt++] = m_vertices[(*iter - 1) * 4 + 1];
+			vs[cnt++] = m_vertices[(*iter - 1) * 4 + 2];
+			vs[cnt++] = 1.0f;
 		}
-		ArrayData<GMfloat> vao = { vertices, size };
-		m_object->setVertices(vao);
+
+		ArrayData<GMfloat> vertices = { vs, size };
+		m_object->setVertices(vertices);
 	}
 
-	// 法向量
+	// 法向量坐标
 	{
-		GMuint size = m_normals.size();
+		GMuint size = m_normalIndices.size() * 4;
 		GMfloat* ns = new GMfloat[size];
 		GMuint cnt = 0;
-		for (auto iter = m_normals.cbegin(); iter != m_normals.cend(); iter++, cnt++)
+		for (auto iter = m_normalIndices.cbegin(); iter != m_normalIndices.cend(); iter++)
 		{
-			ns[cnt] = *iter;
+			ns[cnt++] = m_normals[(*iter - 1) * 4];
+			ns[cnt++] = m_normals[(*iter - 1) * 4 + 1];
+			ns[cnt++] = m_normals[(*iter - 1) * 4 + 2];
+			ns[cnt++] = 1.0f;
 		}
+
 		ArrayData<GMfloat> normals = { ns, size };
 		m_object->setNormals(normals);
-	}
-
-	// 索引
-	{
-		GMuint size = m_indices.size();
-		GMuint* indices = new GMuint[size];
-		GMuint cnt = 0;
-		for (auto iter = m_indices.begin(); iter != m_indices.end(); iter++, cnt++)
-		{
-			indices[cnt] = (*iter - 1);
-		}
-		ArrayData<GMuint> ebo = { indices, size };
-		m_object->setIndices(ebo);
 	}
 }

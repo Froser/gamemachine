@@ -25,6 +25,9 @@ struct ArrayData
 struct Material
 {
 	GMfloat Ka[3];
+	GMfloat Kd[3];
+	GMfloat Ks[3];
+	GMfloat shininess;
 };
 
 class Component
@@ -32,7 +35,7 @@ class Component
 	friend Object;
 
 public:
-	Component();
+	Component(GMuint edgeCountPerPolygon);
 	~Component();
 
 	Material& getMaterial()
@@ -55,10 +58,32 @@ public:
 		return m_count;
 	}
 
+	GMint* getFirstPtr()
+	{
+		return m_firstPtr;
+	}
+
+	GMint* getCountPtr()
+	{
+		return m_countPtr;
+	}
+
+	GMuint getPolygonCount()
+	{
+		return m_count / m_edgeCountPerPolygon;
+	}
+
+	void generatePolygonProperties();
+
 private:
 	GMuint m_count;
 	GMuint m_offset;
 	Material m_material;
+	GMuint m_edgeCountPerPolygon;
+
+// 多边形属性
+	GMint* m_firstPtr;
+	GMint* m_countPtr;
 };
 
 class Object
@@ -72,11 +97,7 @@ public:
 		return m_drawer;
 	}
 
-	void appendComponent(Component* component, GMuint count)
-	{
-		component->m_count = count;
-		m_components.push_back(component);
-	}
+	void appendComponent(Component* component, GMuint count);
 
 	std::vector<Component*>& getComponents()
 	{
@@ -93,16 +114,6 @@ public:
 		return m_vertices;
 	}
 
-	ArrayData<GMuint>& ebo()
-	{
-		return m_indices;
-	}
-
-	void setIndices(ArrayData<GMuint>& indices)
-	{
-		m_indices = indices;
-	}
-
 	void setNormals(ArrayData<GMfloat>& normals)
 	{
 		m_normals = normals;
@@ -113,8 +124,6 @@ public:
 		return m_normals;
 	}
 
-	GMuint getElementBufferId() { return m_elementBufferId; }
-	void setElementBufferId(GMuint id) { m_elementBufferId = id; }
 	GMuint getBufferId() { return m_bufferId; }
 	GMuint getArrayId() { return m_arrayId; }
 	void setBufferId(GMuint id) { m_bufferId = id; }
@@ -123,10 +132,8 @@ public:
 private:
 	ArrayData<GMfloat> m_vertices;
 	ArrayData<GMfloat> m_normals;
-	ArrayData<GMuint> m_indices;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
-	GMuint m_elementBufferId;
 	ObjectDrawer* m_drawer;
 	std::vector<Component*> m_components;
 };

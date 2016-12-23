@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include <stdio.h>
 #include "utilities/assert.h"
-#include "shaders.h"
+#include "gmglshaders.h"
 
 static void removeShaders(GMGLShaders& shaders)
 {
@@ -96,6 +96,7 @@ void GMGLShaders::load()
 
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
+			printf("%s", log);
 			ASSERT("Shader compilation failed: " && FALSE);
 			delete[] log;
 #endif /* DEBUG */
@@ -117,6 +118,7 @@ void GMGLShaders::load()
 
 		GLchar* log = new GLchar[len + 1];
 		glGetProgramInfoLog(program, len, &len, log);
+		printf("%s", log);
 		ASSERT("Shader linking failed: " && FALSE);
 		delete[] log;
 #endif /* DEBUG */
