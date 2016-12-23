@@ -17,13 +17,10 @@ public:
 	Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight);
 
 public:
-	virtual void drawObject() override;
-
-public:
 	void setJumpSpeed(const btVector3& jumpSpeed) { m_jumpSpeed = jumpSpeed; }
 
 	void setCanFreeMove(bool freeMove);
-	void updateCamera();
+	void simulateCamera();
 	Camera& getCamera();
 
 	void moveFront(GMfloat distance);

@@ -2,13 +2,24 @@
 #include "object.h"
 
 #ifdef USE_OPENGL
-#include "gmgl/gmglobjectdrawer.h"
+#include "gmgl/gmglobjectpainter.h"
 #endif
 
-Component::Component(GMuint edgeCountPerPolygon)
+ObjectPainter::ObjectPainter(Object* obj)
+	: m_object(obj)
+{
+
+}
+
+Object* ObjectPainter::getObject()
+{
+	return m_object;
+}
+
+Component::Component()
 	: m_offset(0)
 	, m_count(0)
-	, m_edgeCountPerPolygon(edgeCountPerPolygon)
+	, m_edgeCountPerPolygon(DefaultEdgesCount)
 	, m_firstPtr(nullptr)
 	, m_countPtr(nullptr)
 {
@@ -28,7 +39,7 @@ void Component::generatePolygonProperties()
 	m_firstPtr = new GMint[m_count];
 	m_countPtr = new GMint[m_count];
 	GMint first = m_offset;
-	for (GMint i = 0; i < m_count / m_edgeCountPerPolygon; i++)
+	for (GMuint i = 0; i < m_count / m_edgeCountPerPolygon; i++)
 	{
 		m_firstPtr[i] = offset;
 		m_countPtr[i] = m_edgeCountPerPolygon;
@@ -37,25 +48,20 @@ void Component::generatePolygonProperties()
 }
 
 Object::Object()
-	: m_drawer(DEFAULT_DRAWER)
+	: m_painter(nullptr)
 	, m_arrayId(0)
 	, m_bufferId(0)
 {
-	memset(&m_vertices, 0, sizeof(m_vertices));
-	memset(&m_vertices, 0, sizeof(m_normals));
 }
 
 Object::~Object()
 {
-	m_drawer->dispose(this);
+	m_painter->dispose();
 
 	for (auto iter = m_components.begin(); iter != m_components.cend(); iter++)
 	{
 		delete *iter;
 	}
-
-	if (m_vertices.data)
-		delete[] m_vertices.data;
 }
 
 void Object::appendComponent(Component* component, GMuint count)
@@ -63,4 +69,10 @@ void Object::appendComponent(Component* component, GMuint count)
 	component->m_count = count;
 	component->generatePolygonProperties();
 	m_components.push_back(component);
+}
+
+void Object::disposeMemory()
+{
+	m_vertices.clear();
+	m_normals.clear();
 }

@@ -12,6 +12,7 @@ class btDiscreteDynamicsWorld;
 BEGIN_NS
 class Object;
 class Character;
+class IGraphicEngine;
 class GameWorld
 {
 	DEFINE_PRIVATE(GameWorld)
@@ -25,6 +26,8 @@ public:
 	void simulateGameWorld(GMint fps);
 	void renderGameWorld();
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
+
+	IGraphicEngine* getGraphicEngine();
 };
 
 END_NS

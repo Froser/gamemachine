@@ -3,9 +3,9 @@
 #include "common.h"
 BEGIN_NS
 
-struct LightController
+struct ILightController
 {
-	virtual ~LightController();
+	virtual ~ILightController();
 	virtual void setAmbient(GMfloat rgb[3]) = 0;
 	virtual void setAmbientCoefficient(GMfloat ka[3]) = 0;
 	virtual void setLightColor(GMfloat rgb[3]) = 0;

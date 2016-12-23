@@ -34,7 +34,6 @@ public:
 
 public:
 	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
-	virtual void drawObject() = 0;
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;
@@ -46,7 +45,6 @@ public:
 	GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color);
 
 public:
-	void drawObject();
 	void setExtents(const btVector3& extents);
 	btVector3& getExtents();
 

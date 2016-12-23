@@ -30,5 +30,5 @@ typedef GLuint GMuint;
 
 // Callbacks settings
 #ifdef USE_OPENGL
-#define DEFAULT_DRAWER new GMGLObjectDrawer()
+#define GRAPHIC_ENGINE new GMGLGraphicEngine()
 #endif

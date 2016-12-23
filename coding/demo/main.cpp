@@ -19,6 +19,8 @@
 #include "gmgl/gmgltexture.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgllight.h"
+#include "gmgl/gmglgraphic_engine.h"
+#include "gmgl/gmglobjectpainter.h"
 #include "utilities/vmath.h"
 
 using namespace gm;
@@ -33,8 +35,6 @@ GameLoopSettings s = { fps };
 
 GameWorld world;
 Character* character;
-
-GMGLShaders shaders;
 
 GLuint VAOs[1], Buffers[1], EBOs[1];
 
@@ -59,9 +59,10 @@ public:
 		glDepthFunc(GL_LEQUAL);
 
 		Camera& camera = world.getMajorCharacter()->getCamera();
+		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
+		GMGLShaders& shaders = engine->getShaders();
 
-		GMGL::lookAt(camera, shaders, GMSHADER_VIEW_MATRIX);
-		obj->getDrawer()->draw(shaders, obj);
+		obj->getPainter()->draw();
 
 		//glBindVertexArray(VAOs[0]);
 		//glEnable(GL_PRIMITIVE_RESTART);
@@ -71,13 +72,15 @@ public:
 
 		//glColor3f(1, 1, 1);
 		//obj.draw();
-		//world.renderGameWorld();
+		world.renderGameWorld();
 
 		glutSwapBuffers();
 	}
 
 	void mouse()
 	{
+		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
+		GMGLShaders& shaders = engine->getShaders();
 		Camera& camera = world.getMajorCharacter()->getCamera();
 		GMGL::lookAt(camera, shaders, GMSHADER_VIEW_MATRIX);
 		int wx = glutGet(GLUT_WINDOW_X),
@@ -97,20 +100,20 @@ public:
 			m_gl->terminate();
 		}
 		if (Keyboard::isKeyDown('A'))
-			camera->moveRight(-v);
+			character->moveRight(-v);
 		if (Keyboard::isKeyDown('D'))
-			camera->moveRight(v);
+			character->moveRight(v);
 		if (Keyboard::isKeyDown('W'))
-			camera->moveFront(v);
+			character->moveFront(v);
 		if (Keyboard::isKeyDown('S'))
-			camera->moveFront(-v);
+			character->moveFront(-v);
 		//if (Keyboard::isKeyDown(VK_SPACE))
 		//	camera->jump();
 	}
 
 	void logicalFrame()
 	{
-		//world.simulateGameWorld(m_gl->getSettings().fps);
+		world.simulateGameWorld(m_gl->getSettings().fps);
 	}
 
 	GameLoop* m_gl;
@@ -123,12 +126,25 @@ GameLoop gl(s, &handler);
 void init()
 {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	obj = nullptr;
+
 	ObjReader r;
 	r.load("D:\\baymax.obj", &obj);
-	obj->getDrawer()->init(obj);
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
+	GMGLShaders& shaders = engine->getShaders();
 
-	world.setGravity(0, 0, 0);
+	GMGLShaderInfo shadersInfo[] = {
+		{ GL_VERTEX_SHADER, "D:/shaders/test/test.vert" },
+		{ GL_FRAGMENT_SHADER, "D:/shaders/test/test.frag" },
+	};
+	shaders.appendShader(shadersInfo[0]);
+	shaders.appendShader(shadersInfo[1]);
+	shaders.load();
+	shaders.useProgram();
+
+	obj->setPainter(new GMGLObjectPainter(shaders, obj));
+	obj->getPainter()->init();
+
+	world.setGravity(0, -10, 0);
 
 	btTransform charTransform;
 	charTransform.setIdentity();
@@ -137,6 +153,14 @@ void init()
 	character->setCanFreeMove(true);
 	character->setJumpSpeed(btVector3(0, 50, 0));
 	world.setMajorCharacter(character);
+
+
+	btTransform groundTrans;
+	groundTrans.setIdentity();
+	groundTrans.setOrigin(btVector3(0, -150, 0));
+	GMfloat rgb[3] = { 1, 1, 0 };
+	GLCubeGameObject* cube = new GLCubeGameObject(200, groundTrans, rgb);
+	//world.appendObject(cube);
 
 	glEnable(GL_LINE_SMOOTH);
 
@@ -148,15 +172,6 @@ void init()
 
 	handler.setGameLoop(&gl);
 	camera.setSensibility(.25f);
-
-	GMGLShaderInfo shadersInfo[] = {
-		{ GL_VERTEX_SHADER, "D:/shaders/test/test.vert" },
-		{ GL_FRAGMENT_SHADER, "D:/shaders/test/test.frag" },
-	};
-	shaders.appendShader(shadersInfo[0]);
-	shaders.appendShader(shadersInfo[1]);
-	shaders.load();
-	shaders.useProgram();
 
 	render_model_matrix_loc = glGetUniformLocation(shaders.getProgram(), GMSHADER_MODEL_MATRIX);
 

@@ -16,6 +16,7 @@ typedef std::vector<GMGLShaderInfo> GMGLShadersInfo;
 class GMGLShaders
 {
 public:
+	GMGLShaders() : m_shaderProgram(0) {}
 	~GMGLShaders();
 
 	void load();

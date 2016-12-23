@@ -39,3 +39,9 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName)
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
 }
+
+void IMPL transform(GMGLShaders& shaders, GMfloat* mat, char* transformMatrixName)
+{
+	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), transformMatrixName);
+	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
+}

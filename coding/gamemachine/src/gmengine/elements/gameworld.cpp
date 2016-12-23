@@ -5,6 +5,7 @@
 #include "gmdatacore/object.h"
 #include "utilities/assert.h"
 #include "character.h"
+#include "gmengine/controller/graphic_engine.h"
 
 GameWorld::GameWorld()
 {
@@ -14,10 +15,6 @@ GameWorld::GameWorld()
 
 void GameWorld::appendObject(GameObject* obj)
 {
-	//Object* coreObj = nullptr;
-	//m_pCallback->createObject(obj, &coreObj);
-	//obj->setObject(coreObj);
-
 	dataRef().appendObject(obj);
 }
 
@@ -35,7 +32,7 @@ Character* GameWorld::getMajorCharacter()
 void GameWorld::simulateGameWorld(GMint fps)
 {
 	dataRef().m_dynamicsWorld->stepSimulation(1.f / fps);
-	dataRef().m_character->updateCamera();
+	dataRef().m_character->simulateCamera();
 }
 
 void GameWorld::renderGameWorld()
@@ -53,12 +50,19 @@ void GameWorld::renderGameWorld()
 			trans.getOpenGLMatrix(glTrans);
 
 			GameObject* gameObj = dataRef().m_shapes.at(i);
-			//m_pCallback->renderObject(glTrans, gameObj);
+			dataRef().m_pEngine->drawObject(glTrans, gameObj);
 		}
 	}
+
+	dataRef().m_pEngine->updateCameraView(dataRef().m_character->getCamera());
 }
 
 void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
 {
 	dataRef().setGravity(x, y, z);
+}
+
+IGraphicEngine* GameWorld::getGraphicEngine()
+{
+	return dataRef().m_pEngine;
 }

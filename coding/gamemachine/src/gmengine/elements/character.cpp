@@ -14,11 +14,6 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	m_camera.setPosition(position.getOrigin().x(), position.getOrigin().y(), position.getOrigin().z());
 }
 
-void gm::Character::drawObject()
-{
-	
-}
-
 btCollisionShape* Character::createCollisionShape()
 {
 	return new btCapsuleShape(m_radius, m_height);
@@ -50,7 +45,7 @@ void Character::setCanFreeMove(bool freeMove)
 		m_camera.setType(Camera::PhysicalCamera);
 }
 
-void Character::updateCamera()
+void Character::simulateCamera()
 {
 	btTransform& transform = getCollisionObject()->getWorldTransform();
 	btVector3 pos = transform.getOrigin();

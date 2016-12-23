@@ -28,10 +28,9 @@ private:
 	std::string m_workingDir;
 	std::vector<GMfloat> m_vertices;
 	std::vector<GMfloat> m_normals;
-	std::vector<GMuint> m_vertexIndices;
-	std::vector<GMuint> m_normalIndices;
 	MtlReader* m_pMtlReader;
 	Component* m_currentComponent;
+	GMuint m_vertexOffset;
 	const MaterialProperties* m_currentMaterial;
 };
 

@@ -11,6 +11,7 @@ BEGIN_NS
 
 class GameObject;
 class Character;
+struct IGraphicEngine;
 class GameWorldPrivate
 {
 	friend class GameWorld;
@@ -30,6 +31,7 @@ private:
 	AutoPtr<btSequentialImpulseConstraintSolver> m_solver;
 	AutoPtr<btGhostPairCallback> m_ghostPairCallback;
 	AutoPtr<btDiscreteDynamicsWorld> m_dynamicsWorld;
+	AutoPtr<IGraphicEngine> m_pEngine;
 	std::vector<GameObject*> m_shapes;
 	Character* m_character;
 };

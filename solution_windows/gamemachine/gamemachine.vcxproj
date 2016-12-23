@@ -22,6 +22,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
@@ -32,8 +33,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
@@ -57,6 +59,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
@@ -67,8 +70,9 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp" />

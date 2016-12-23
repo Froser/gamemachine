@@ -5,7 +5,7 @@
 BEGIN_NS
 
 class GMGLShaders;
-class GMGLLight : public LightController
+class GMGLLight : public ILightController
 {
 public:
 	GMGLLight(GMGLShaders& shaders);

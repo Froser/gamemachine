@@ -2,10 +2,12 @@
 #include "gameworldprivate.h"
 #include "gameobject.h"
 #include "utilities/assert.h"
+#include "gmgl/gmglgraphic_engine.h"
 #include <algorithm>
 
 GameWorldPrivate::GameWorldPrivate()
 	: m_character(nullptr)
+	, m_pEngine(GRAPHIC_ENGINE)
 {
 
 }

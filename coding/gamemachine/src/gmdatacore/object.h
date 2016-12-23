@@ -3,23 +3,28 @@
 #include "common.h"
 #include <vector>
 #include "image.h"
+#include "utilities/assert.h"
+#include "utilities/autoptr.h"
 
 BEGIN_NS
 
 class Object;
 class GMGLShaders;
-struct ObjectDrawer
+class ObjectPainter
 {
-	virtual void init(Object*) = 0;
-	virtual void draw(GMGLShaders&, Object*) = 0;
-	virtual void dispose(Object*) = 0;
-};
+public:
+	ObjectPainter(Object* obj);
 
-template <typename T>
-struct ArrayData
-{
-	T* data;
-	GMuint size;
+public:
+	virtual void init() = 0;
+	virtual void draw() = 0;
+	virtual void dispose() = 0;
+
+protected:
+	Object* getObject();
+
+private:
+	Object* m_object;
 };
 
 struct Material
@@ -35,8 +40,24 @@ class Component
 	friend Object;
 
 public:
-	Component(GMuint edgeCountPerPolygon);
+	enum
+	{
+		DefaultEdgesCount = 3,
+	};
+
+	Component();
 	~Component();
+
+	void setEdgeCountPerPolygon(GMuint edgeCountPerPolygon)
+	{
+		if (edgeCountPerPolygon > m_edgeCountPerPolygon)
+			m_edgeCountPerPolygon = edgeCountPerPolygon;
+	}
+
+	GMuint getEdgeCountPerPolygon()
+	{
+		return m_edgeCountPerPolygon;
+	}
 
 	Material& getMaterial()
 	{
@@ -92,9 +113,17 @@ public:
 	Object();
 	~Object();
 
-	ObjectDrawer* getDrawer()
+	void disposeMemory();
+
+	void setPainter(ObjectPainter* painter)
 	{
-		return m_drawer;
+		m_painter.reset(painter);
+	}
+
+	ObjectPainter* getPainter()
+	{
+		ASSERT(m_painter);
+		return m_painter;
 	}
 
 	void appendComponent(Component* component, GMuint count);
@@ -104,22 +133,22 @@ public:
 		return m_components;
 	}
 
-	void setVertices(ArrayData<GMfloat>& vertices)
+	void setVertices(std::vector<GMfloat>& vertices)
 	{
 		m_vertices = vertices;
 	}
 
-	ArrayData<GMfloat>& vao()
+	std::vector<GMfloat>& vao()
 	{
 		return m_vertices;
 	}
 
-	void setNormals(ArrayData<GMfloat>& normals)
+	void setNormals(std::vector<GMfloat>& normals)
 	{
 		m_normals = normals;
 	}
 
-	ArrayData<GMfloat>& normals()
+	std::vector<GMfloat>& normals()
 	{
 		return m_normals;
 	}
@@ -130,11 +159,11 @@ public:
 	void setArrayId(GMuint id) { m_arrayId = id; }
 
 private:
-	ArrayData<GMfloat> m_vertices;
-	ArrayData<GMfloat> m_normals;
+	std::vector<GMfloat> m_vertices;
+	std::vector<GMfloat> m_normals;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
-	ObjectDrawer* m_drawer;
+	AutoPtr<ObjectPainter> m_painter;
 	std::vector<Component*> m_components;
 };
 

@@ -124,9 +124,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
@@ -137,6 +134,15 @@
       <Filter>src\gmgl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -216,9 +222,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp">
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectdrawer.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
@@ -229,6 +232,15 @@
       <Filter>src\gmgl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp">
+      <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
   </ItemGroup>

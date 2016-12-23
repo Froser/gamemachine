@@ -76,12 +76,6 @@ GLCubeGameObject::GLCubeGameObject(GMfloat size, const btTransform& position, GM
 	m_color[2] = color[2];
 }
 
-void GLCubeGameObject::drawObject()
-{
-	glColor3fv(m_color);
-	glutSolidCube(m_size);
-}
-
 btCollisionShape* GLCubeGameObject::createCollisionShape()
 {
 	return new btBoxShape(getExtents());

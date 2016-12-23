@@ -5,7 +5,6 @@
 #include "gmdatacore/imagereader/imagereader.h"
 #include <locale>
 
-#define MAX_VERTICES_IN_ONE_FACE 4
 #define NONE 0
 #define KW_REMARK "#"
 #define KW_VERTEX "v"
@@ -30,10 +29,19 @@ static bool isSeparator(char c)
 	return c == '/';
 }
 
+static void pushVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indicesVector, GMuint indices)
+{
+	to.push_back(indicesVector.data()[(indices - 1) * 4]);
+	to.push_back(indicesVector.data()[(indices - 1) * 4 + 1]);
+	to.push_back(indicesVector.data()[(indices - 1) * 4 + 2]);
+	to.push_back(1.0f);
+}
+
 ObjReaderPrivate::ObjReaderPrivate()
-	: m_currentComponent(new Component(MAX_VERTICES_IN_ONE_FACE))
+	: m_currentComponent(new Component())
 	, m_pMtlReader(new MtlReader())
 	, m_currentMaterial(nullptr)
+	, m_vertexOffset(0)
 {
 }
 
@@ -83,13 +91,18 @@ void ObjReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_FACE))
 	{
-		for (int i = 0; i < MAX_VERTICES_IN_ONE_FACE; i++)
+		GMuint edgeCount = 0;
+		do
 		{
 			char subCmd[LINE_MAX];
 			scanner.next(subCmd);
 			if (strlen(subCmd) == 0)
+			{
+				m_currentComponent->setEdgeCountPerPolygon(edgeCount);
 				break;
+			}
 
+			edgeCount++;
 			Scanner faceScanner(subCmd, false, isSeparator);
 
 			GLint i1, i2, i3;
@@ -99,9 +112,11 @@ void ObjReaderPrivate::parseLine(const char* line)
 				i2 = NONE;
 			if (!faceScanner.nextInt(&i3))
 				i3 = NONE;
-			m_vertexIndices.push_back(i1);
-			m_normalIndices.push_back(i3);
-		}
+
+			m_vertexOffset++;
+			pushVector(m_object->vao(), m_vertices, i1);
+			pushVector(m_object->normals(), m_normals, i3);
+		} while (true);
 	}
 	else if (strEqual(command, KW_MTLLIB))
 	{
@@ -123,8 +138,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 
 void ObjReaderPrivate::pushData()
 {
-	GMuint size = m_vertexIndices.size();
-	if (size == 0)
+	if (m_vertexOffset == 0)
 		return;
 
 	Material& m = m_currentComponent->getMaterial();
@@ -138,47 +152,13 @@ void ObjReaderPrivate::pushData()
 	m.Ks[1] = m_currentMaterial->Ks_g;
 	m.Ks[2] = m_currentMaterial->Ks_b;
 	m.shininess = m_currentMaterial->Ns;
-	m_object->appendComponent(m_currentComponent, size - m_currentComponent->getOffset());
+	m_object->appendComponent(m_currentComponent, m_vertexOffset - m_currentComponent->getOffset());
 
-	m_currentComponent = new Component(MAX_VERTICES_IN_ONE_FACE);
-	m_currentComponent->setOffset(size);
+	m_currentComponent = new Component();
+	m_currentComponent->setOffset(m_vertexOffset);
 }
 
 void ObjReaderPrivate::endParse()
 {
 	pushData();
-
-	// 顶点坐标
-	{
-		GMuint size = m_vertexIndices.size() * 4;
-		GMfloat* vs = new GMfloat[size];
-		GMuint cnt = 0;
-		for (auto iter = m_vertexIndices.cbegin(); iter != m_vertexIndices.cend(); iter++)
-		{
-			vs[cnt++] = m_vertices[(*iter - 1) * 4];
-			vs[cnt++] = m_vertices[(*iter - 1) * 4 + 1];
-			vs[cnt++] = m_vertices[(*iter - 1) * 4 + 2];
-			vs[cnt++] = 1.0f;
-		}
-
-		ArrayData<GMfloat> vertices = { vs, size };
-		m_object->setVertices(vertices);
-	}
-
-	// 法向量坐标
-	{
-		GMuint size = m_normalIndices.size() * 4;
-		GMfloat* ns = new GMfloat[size];
-		GMuint cnt = 0;
-		for (auto iter = m_normalIndices.cbegin(); iter != m_normalIndices.cend(); iter++)
-		{
-			ns[cnt++] = m_normals[(*iter - 1) * 4];
-			ns[cnt++] = m_normals[(*iter - 1) * 4 + 1];
-			ns[cnt++] = m_normals[(*iter - 1) * 4 + 2];
-			ns[cnt++] = 1.0f;
-		}
-
-		ArrayData<GMfloat> normals = { ns, size };
-		m_object->setNormals(normals);
-	}
 }

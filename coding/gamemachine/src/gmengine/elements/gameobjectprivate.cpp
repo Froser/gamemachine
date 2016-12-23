@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gameobjectprivate.h"
+#include "gmgl/gmglgraphic_engine.h"
 
 GameObjectPrivate::GameObjectPrivate()
 {
