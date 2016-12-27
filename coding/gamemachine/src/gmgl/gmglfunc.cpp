@@ -5,7 +5,7 @@
 #include "utilities/vmath.h"
 #include "utilities/camera.h"
 
-void projection(const vmath::mat4& mat, GMGLShaders& shaders, char* projectionMatrixName)
+void IMPL projection(const vmath::mat4& mat, GMGLShaders& shaders, char* projectionMatrixName)
 {
 	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), projectionMatrixName);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
@@ -43,5 +43,11 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName)
 void IMPL transform(GMGLShaders& shaders, GMfloat* mat, char* transformMatrixName)
 {
 	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), transformMatrixName);
+	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
+}
+
+void IMPL uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, char* matrixName)
+{
+	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), matrixName);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
 }

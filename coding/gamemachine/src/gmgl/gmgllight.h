@@ -18,9 +18,11 @@ public:
 	virtual void setShininess(GMfloat n) override;
 	virtual void setSpecularCoefficient(GMfloat ks[3]) override;
 	virtual void setLightPosition(GMfloat xyz[3]) override;
+	virtual GMfloat* getLightPosition() override;
 	virtual void setViewPosition(GMfloat xyz[3]) override;
 
 private:
+	GMfloat m_lightPosition[3];
 	GMGLShaders& m_shaders;
 };
 

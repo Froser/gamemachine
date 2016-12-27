@@ -6,10 +6,11 @@
 BEGIN_NS
 
 class GMGLShaders;
+class GMGLShadowMapping;
 class GMGLObjectPainter : public ObjectPainter
 {
 public:
-	GMGLObjectPainter(GMGLShaders& shaders, Object* obj);
+	GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& shadowMapping, Object* obj);
 
 public:
 	virtual void init() override;
@@ -18,6 +19,7 @@ public:
 
 private:
 	GMGLShaders& m_shaders;
+	GMGLShadowMapping& m_shadowMapping;
 };
 
 END_NS

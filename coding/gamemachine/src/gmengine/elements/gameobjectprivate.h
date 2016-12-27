@@ -19,7 +19,7 @@ public:
 
 private:
 	void setMass(btScalar mass);
-	void setObject(Object* obj);
+	void setObject(AUTORELEASE  Object* obj);
 	void setTransform(const btTransform& transform);
 
 private:

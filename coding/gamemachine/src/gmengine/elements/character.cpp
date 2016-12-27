@@ -75,6 +75,11 @@ void Character::jump()
 		m_controller->jump(m_jumpSpeed);
 }
 
+bool Character::isJumping()
+{
+	return !m_controller->canJump();
+}
+
 void Character::move()
 {
 	btCollisionObject* colObj = getCollisionObject();

@@ -6,6 +6,7 @@
 	protected: \
 	className##Private& dataRef() { return m_data; }
 
+#define AUTORELEASE
 #define OUT
 #define USE_OPENGL
 #define OFFSET(type, count) (void*)(sizeof(type) * count)

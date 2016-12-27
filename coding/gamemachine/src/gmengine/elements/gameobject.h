@@ -16,7 +16,7 @@ public:
 	virtual ~GameObject() {};
 
 public:
-	void setObject(Object* obj);
+	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
 	btCollisionShape* getCollisionShape();
 
@@ -37,27 +37,6 @@ public:
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;
-};
-
-class GLCubeGameObject : public GameObject
-{
-public:
-	GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color);
-
-public:
-	void setExtents(const btVector3& extents);
-	btVector3& getExtents();
-
-public:
-	virtual void appendObjectToWorld(btDynamicsWorld* world);
-
-private:
-	btCollisionShape* createCollisionShape();
-
-private:
-	GMfloat m_color[3];
-	GMfloat m_size;
-	btVector3 m_extents;
 };
 
 END_NS

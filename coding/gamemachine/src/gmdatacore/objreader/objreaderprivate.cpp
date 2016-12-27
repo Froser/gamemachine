@@ -31,6 +31,9 @@ static bool isSeparator(char c)
 
 static void pushVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indicesVector, GMuint indices)
 {
+	if (indicesVector.size() == 0)
+		return;
+
 	to.push_back(indicesVector.data()[(indices - 1) * 4]);
 	to.push_back(indicesVector.data()[(indices - 1) * 4 + 1]);
 	to.push_back(indicesVector.data()[(indices - 1) * 4 + 2]);
@@ -114,7 +117,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 				i3 = NONE;
 
 			m_vertexOffset++;
-			pushVector(m_object->vao(), m_vertices, i1);
+			pushVector(m_object->vertices(), m_vertices, i1);
 			pushVector(m_object->normals(), m_normals, i3);
 		} while (true);
 	}
@@ -141,17 +144,20 @@ void ObjReaderPrivate::pushData()
 	if (m_vertexOffset == 0)
 		return;
 
-	Material& m = m_currentComponent->getMaterial();
-	m.Ka[0] = m_currentMaterial->Ka_r;
-	m.Ka[1] = m_currentMaterial->Ka_g;
-	m.Ka[2] = m_currentMaterial->Ka_b;
-	m.Kd[0] = m_currentMaterial->Kd_r;
-	m.Kd[1] = m_currentMaterial->Kd_g;
-	m.Kd[2] = m_currentMaterial->Kd_b;
-	m.Ks[0] = m_currentMaterial->Ks_r;
-	m.Ks[1] = m_currentMaterial->Ks_g;
-	m.Ks[2] = m_currentMaterial->Ks_b;
-	m.shininess = m_currentMaterial->Ns;
+	if (m_currentMaterial)
+	{
+		Material& m = m_currentComponent->getMaterial();
+		m.Ka[0] = m_currentMaterial->Ka_r;
+		m.Ka[1] = m_currentMaterial->Ka_g;
+		m.Ka[2] = m_currentMaterial->Ka_b;
+		m.Kd[0] = m_currentMaterial->Kd_r;
+		m.Kd[1] = m_currentMaterial->Kd_g;
+		m.Kd[2] = m_currentMaterial->Kd_b;
+		m.Ks[0] = m_currentMaterial->Ks_r;
+		m.Ks[1] = m_currentMaterial->Ks_g;
+		m.Ks[2] = m_currentMaterial->Ks_b;
+		m.shininess = m_currentMaterial->Ns;
+	}
 	m_object->appendComponent(m_currentComponent, m_vertexOffset - m_currentComponent->getOffset());
 
 	m_currentComponent = new Component();

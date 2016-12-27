@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
 #include "object.h"
-
-#ifdef USE_OPENGL
-#include "gmgl/gmglobjectpainter.h"
-#endif
+#include "utilities/vmath.h"
 
 ObjectPainter::ObjectPainter(Object* obj)
 	: m_object(obj)
@@ -18,11 +15,12 @@ Object* ObjectPainter::getObject()
 
 Component::Component()
 	: m_offset(0)
-	, m_count(0)
+	, m_verticesCount(0)
 	, m_edgeCountPerPolygon(DefaultEdgesCount)
 	, m_firstPtr(nullptr)
 	, m_countPtr(nullptr)
 {
+	memset(&m_material, 0, sizeof(m_material));
 }
 
 Component::~Component()
@@ -36,10 +34,10 @@ Component::~Component()
 void Component::generatePolygonProperties()
 {
 	GMint offset = m_offset;
-	m_firstPtr = new GMint[m_count];
-	m_countPtr = new GMint[m_count];
+	m_firstPtr = new GMint[m_verticesCount];
+	m_countPtr = new GMint[m_verticesCount];
 	GMint first = m_offset;
-	for (GMuint i = 0; i < m_count / m_edgeCountPerPolygon; i++)
+	for (GMuint i = 0; i < m_verticesCount / m_edgeCountPerPolygon; i++)
 	{
 		m_firstPtr[i] = offset;
 		m_countPtr[i] = m_edgeCountPerPolygon;
@@ -66,7 +64,7 @@ Object::~Object()
 
 void Object::appendComponent(Component* component, GMuint count)
 {
-	component->m_count = count;
+	component->m_verticesCount = count;
 	component->generatePolygonProperties();
 	m_components.push_back(component);
 }

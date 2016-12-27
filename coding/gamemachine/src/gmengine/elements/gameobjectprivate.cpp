@@ -3,6 +3,9 @@
 #include "gmgl/gmglgraphic_engine.h"
 
 GameObjectPrivate::GameObjectPrivate()
+	: m_mass(0)
+	, m_isDynamic(true)
+	, m_localInertia(0, 0, 0)
 {
 	m_transform.setIdentity();
 }
@@ -20,7 +23,7 @@ void GameObjectPrivate::setMass(btScalar mass)
 		m_isDynamic = true;
 }
 
-void GameObjectPrivate::setObject(Object* obj)
+void GameObjectPrivate::setObject(AUTORELEASE Object* obj)
 {
 	m_pObject.reset(obj);
 }

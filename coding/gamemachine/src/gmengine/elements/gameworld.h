@@ -12,7 +12,8 @@ class btDiscreteDynamicsWorld;
 BEGIN_NS
 class Object;
 class Character;
-class IGraphicEngine;
+struct IGraphicEngine;
+
 class GameWorld
 {
 	DEFINE_PRIVATE(GameWorld)
@@ -20,7 +21,10 @@ public:
 	GameWorld();
 
 public:
-	void appendObject(GameObject* obj);
+	void initialize();
+
+public:
+	void appendObject(AUTORELEASE GameObject* obj);
 	void setMajorCharacter(Character* character);
 	Character* getMajorCharacter();
 	void simulateGameWorld(GMint fps);

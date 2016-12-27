@@ -4,6 +4,7 @@
 BEGIN_NS
 
 #define		GMSHADER_MODEL_MATRIX		"model_matrix"
+#define		GMSHADER_SHADOW_MATRIX		"shadow_matrix"
 #define		GMSHADER_PROJECTION_MATRIX	"projection_matrix"
 #define		GMSHADER_VIEW_MATRIX		"view_matrix"
 #define		GMSHADER_VIEW_POSITION		"view_position"

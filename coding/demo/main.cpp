@@ -22,6 +22,8 @@
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglobjectpainter.h"
 #include "utilities/vmath.h"
+#include "gmengine/elements/cubegameobject.h"
+#include "gmengine/elements/convexhullgameobject.h"
 
 using namespace gm;
 
@@ -42,8 +44,6 @@ GLint render_model_matrix_loc;
 
 GMGLTexture texture;
 
-Object* obj;
-
 class GameHandler : public IGameHandler
 {
 public:
@@ -54,24 +54,10 @@ public:
 
 	void render()
 	{
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-		glDepthFunc(GL_LEQUAL);
-
 		Camera& camera = world.getMajorCharacter()->getCamera();
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
 		GMGLShaders& shaders = engine->getShaders();
 
-		obj->getPainter()->draw();
-
-		//glBindVertexArray(VAOs[0]);
-		//glEnable(GL_PRIMITIVE_RESTART);
-		//glPrimitiveRestartIndex(0xFFFF);
-		//glDrawElements(GL_TRIANGLE_FAN, 9, GL_UNSIGNED_SHORT, NULL);
-		//glDisable(GL_PRIMITIVE_RESTART);
-
-		//glColor3f(1, 1, 1);
-		//obj.draw();
 		world.renderGameWorld();
 
 		glutSwapBuffers();
@@ -96,7 +82,6 @@ public:
 		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 		{
-			delete obj;
 			m_gl->terminate();
 		}
 		if (Keyboard::isKeyDown('A'))
@@ -107,8 +92,8 @@ public:
 			character->moveFront(v);
 		if (Keyboard::isKeyDown('S'))
 			character->moveFront(-v);
-		//if (Keyboard::isKeyDown(VK_SPACE))
-		//	camera->jump();
+		if (Keyboard::isKeyDown(VK_SPACE))
+			character->jump();
 	}
 
 	void logicalFrame()
@@ -127,40 +112,108 @@ void init()
 {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	ObjReader r;
-	r.load("D:\\baymax.obj", &obj);
+	std::string currentPath("D:\\shaders\\test\\");//Path::getCurrentPath();
+
+	world.initialize();
+
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
 	GMGLShaders& shaders = engine->getShaders();
+	ILightController& lightCtrl = engine->getLightController();
 
-	GMGLShaderInfo shadersInfo[] = {
-		{ GL_VERTEX_SHADER, "D:/shaders/test/test.vert" },
-		{ GL_FRAGMENT_SHADER, "D:/shaders/test/test.frag" },
-	};
-	shaders.appendShader(shadersInfo[0]);
-	shaders.appendShader(shadersInfo[1]);
-	shaders.load();
-	shaders.useProgram();
+	GMGLShadowMapping& shadow = engine->getShadowMapping();
+	GMGLShaders& shadowShaders = shadow.getShaders();
 
-	obj->setPainter(new GMGLObjectPainter(shaders, obj));
-	obj->getPainter()->init();
+	{
+		std::string vert = std::string(currentPath).append("gmshader.vert"),
+			frag = std::string(currentPath).append("gmshader.frag");
+		GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, vert.c_str() },
+			{ GL_FRAGMENT_SHADER, frag.c_str() },
+		};
+		shaders.appendShader(shadersInfo[0]);
+		shaders.appendShader(shadersInfo[1]);
+		shaders.load();
+		shaders.useProgram();
+	}
 
-	world.setGravity(0, -10, 0);
+	{
+		std::string vert = std::string(currentPath).append("gmshadowmapping.vert"),
+			frag = std::string(currentPath).append("gmshadowmapping.frag");
+		GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, vert.c_str() },
+			{ GL_FRAGMENT_SHADER, frag.c_str() },
+		};
+		shadowShaders.appendShader(shadersInfo[0]);
+		shadowShaders.appendShader(shadersInfo[1]);
+		shadowShaders.load();
+	}
+
+	world.setGravity(0, -100, 0);
 
 	btTransform charTransform;
 	charTransform.setIdentity();
-	charTransform.setOrigin(btVector3(0, 100, 100));
-	character = new Character(charTransform, 0, 10, 15);
-	character->setCanFreeMove(true);
+	charTransform.setOrigin(btVector3(0, 0, 100));
+	character = new Character(charTransform, 10, 10, 15);
+	character->setCanFreeMove(false);
 	character->setJumpSpeed(btVector3(0, 50, 0));
 	world.setMajorCharacter(character);
 
+	{
+		btTransform groundTrans;
+		groundTrans.setIdentity();
+		groundTrans.setOrigin(btVector3(0, -100, 100));
+		
+		
+		Material m [6] = {
+			{ { .1f, .2f, .3f },{ .4f, .5f, .6f },{ .7f, .8f, .9f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+		};
+		CubeGameObject* cube = new CubeGameObject(btVector3(300, 30, 500), groundTrans, m);
+		cube->setMass(0);
+		cube->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, cube->getObject()));
+		cube->getObject()->getPainter()->init();
+		world.appendObject(cube);
+	}
 
-	btTransform groundTrans;
-	groundTrans.setIdentity();
-	groundTrans.setOrigin(btVector3(0, -150, 0));
-	GMfloat rgb[3] = { 1, 1, 0 };
-	GLCubeGameObject* cube = new GLCubeGameObject(200, groundTrans, rgb);
-	//world.appendObject(cube);
+	{
+		btTransform boxTrans;
+		boxTrans.setIdentity();
+		boxTrans.setOrigin(btVector3(0, 0, 40));
+		Material m[6] = {
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .2f, .3f, .7f },{ .4f, .1f, .8f },{ .7f, .5f, .3f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+		};
+		CubeGameObject* cube = new CubeGameObject(btVector3(10, 10, 10), boxTrans, m);
+		cube->setMass(20);
+		cube->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, cube->getObject()));
+		cube->getObject()->getPainter()->init();
+		world.appendObject(cube);
+	}
+
+	{
+		ObjReader r;
+		Object* obj;
+		std::string objPath(std::string(currentPath).append("baymax.obj"));
+		r.load("D:\\baymax.obj", &obj);
+		btTransform boxTrans;
+		boxTrans.setIdentity();
+		boxTrans.setOrigin(btVector3(30, 100, 40));
+		
+		ConvexHullGameObject* convex = new ConvexHullGameObject(obj);
+		convex->setMass(10);
+		convex->setTransform(boxTrans);
+		convex->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, convex->getObject()));
+		convex->getObject()->getPainter()->init();
+		world.appendObject(convex);
+	}
 
 	glEnable(GL_LINE_SMOOTH);
 
@@ -173,19 +226,12 @@ void init()
 	handler.setGameLoop(&gl);
 	camera.setSensibility(.25f);
 
-	render_model_matrix_loc = glGetUniformLocation(shaders.getProgram(), GMSHADER_MODEL_MATRIX);
-
-	using namespace vmath;
-	vmath::mat4 model_matrix(mat4::identity());
-	glUniformMatrix4fv(render_model_matrix_loc, 1, GL_FALSE, model_matrix);
-	GMGL::perspective(30, 2, 1, 1000, shaders, GMSHADER_PROJECTION_MATRIX);
-
 	GMfloat ambient[3] = { .5, .5, .5 };
-	GMGLLight(shaders).setAmbient(ambient);
+	lightCtrl.setAmbient(ambient);
 
 	GMfloat pos[3] = { 100,100,100 };
-	GMGLLight(shaders).setLightPosition(pos);
-	GMGLLight(shaders).setLightColor(ambient);
+	lightCtrl.setLightPosition(pos);
+	lightCtrl.setLightColor(ambient);
 }
 
 void render()

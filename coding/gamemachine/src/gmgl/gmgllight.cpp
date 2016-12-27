@@ -55,6 +55,12 @@ void GMGLLight::setSpecularCoefficient(GMfloat ks[3])
 void GMGLLight::setLightPosition(GMfloat xyz[3])
 {
 	setVec4(m_shaders, GMSHADER_LIGHT_POSITION, xyz);
+	memcpy(m_lightPosition, xyz, sizeof(m_lightPosition));
+}
+
+GMfloat* GMGLLight::getLightPosition()
+{
+	return m_lightPosition;
 }
 
 void GMGLLight::setViewPosition(GMfloat xyz[3])

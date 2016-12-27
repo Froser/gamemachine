@@ -119,7 +119,7 @@ public:
 
 	void reset(Type *ptr = nullptr)
 	{
-		if (ptr != m_ptr)
+		if (m_ptr && ptr != m_ptr)
 			delete m_ptr;
 		m_ptr = ptr;
 	}

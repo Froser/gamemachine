@@ -26,6 +26,7 @@ public:
 	void moveFront(GMfloat distance);
 	void moveRight(GMfloat distance);
 	void jump();
+	bool isJumping();
 
 private:
 	void move();

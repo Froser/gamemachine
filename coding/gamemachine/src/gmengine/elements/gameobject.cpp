@@ -3,13 +3,15 @@
 #include "GL/freeglut.h"
 #include "btBulletDynamicsCommon.h"
 
-void GameObject::setObject(Object* obj)
+void GameObject::setObject(AUTORELEASE Object* obj)
 {
 	dataRef().setObject(obj);
 }
 
 Object* GameObject::getObject()
 {
+	if (!dataRef().m_pObject)
+		dataRef().m_pObject.reset(new Object());
 	return dataRef().m_pObject;
 }
 
@@ -34,7 +36,11 @@ void GameObject::setMass(btScalar mass)
 {
 	dataRef().setMass(mass);
 	if (dataRef().m_isDynamic)
-		getCollisionShape()->calculateLocalInertia(dataRef().m_mass, dataRef().m_localInertia);
+	{
+		btVector3 localInertia;
+		getCollisionShape()->calculateLocalInertia(dataRef().m_mass, localInertia);
+		dataRef().m_localInertia = localInertia;
+	}
 }
 
 btScalar GameObject::getMass()
@@ -60,42 +66,4 @@ void GameObject::setTransform(const btTransform& transform)
 btTransform& GameObject::getTransform()
 {
 	return dataRef().m_transform;
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Simple game object:
-
-GLCubeGameObject::GLCubeGameObject(GMfloat size, const btTransform& position, GMfloat* color)
-	: m_size(size)
-{
-	setExtents(btVector3(size / 2, size / 2, size / 2));
-	setTransform(position);
-
-	m_color[0] = color[0];
-	m_color[1] = color[1];
-	m_color[2] = color[2];
-}
-
-btCollisionShape* GLCubeGameObject::createCollisionShape()
-{
-	return new btBoxShape(getExtents());
-}
-
-void GLCubeGameObject::setExtents(const btVector3& extents)
-{
-	m_extents = extents;
-}
-
-btVector3& GLCubeGameObject::getExtents()
-{
-	return m_extents;
-}
-
-void GLCubeGameObject::appendObjectToWorld(btDynamicsWorld* world)
-{
-	btMotionState* motionState = new btDefaultMotionState(getTransform());
-	btRigidBody::btRigidBodyConstructionInfo rbInfo(getMass(), motionState, getCollisionShape(), getLocalInertia());
-	btRigidBody* rigidObj = new btRigidBody(rbInfo);
-	world->addRigidBody(rigidObj);
-	setCollisionObject(rigidObj);
 }

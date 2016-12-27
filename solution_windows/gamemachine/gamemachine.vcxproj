@@ -25,6 +25,8 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
@@ -37,6 +39,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
@@ -62,6 +65,8 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
@@ -74,6 +79,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
@@ -116,8 +122,8 @@
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <PrecompiledHeader>Use</PrecompiledHeader>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PrecompiledHeader>Use</PrecompiledHeader>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

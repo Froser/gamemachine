@@ -9,11 +9,15 @@
 
 GameWorld::GameWorld()
 {
-	//m_pCallback.reset(NEW_GameWorldRenderCallback);
 	dataRef().init();
 }
 
-void GameWorld::appendObject(GameObject* obj)
+void GameWorld::initialize()
+{
+	getGraphicEngine()->initialize(this);
+}
+
+void GameWorld::appendObject(AUTORELEASE GameObject* obj)
 {
 	dataRef().appendObject(obj);
 }
@@ -37,9 +41,13 @@ void GameWorld::simulateGameWorld(GMint fps)
 
 void GameWorld::renderGameWorld()
 {
-	for (int i = dataRef().m_dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+	dataRef().m_pEngine->newFrame();
+	DrawingList list;
+
+	for (auto iter = dataRef().m_shapes.begin(); iter != dataRef().m_shapes.end(); iter++)
 	{
-		btCollisionObject* obj = dataRef().m_dynamicsWorld->getCollisionObjectArray()[i];
+		GameObject* gameObj = *iter;
+		btCollisionObject* obj = gameObj->getCollisionObject();
 		btRigidBody* body = btRigidBody::upcast(obj);
 		if (body)
 		{
@@ -49,11 +57,14 @@ void GameWorld::renderGameWorld()
 			btScalar glTrans[16];
 			trans.getOpenGLMatrix(glTrans);
 
-			GameObject* gameObj = dataRef().m_shapes.at(i);
-			dataRef().m_pEngine->drawObject(glTrans, gameObj);
+			DrawingItem item;
+			memcpy(item.trans, glTrans, sizeof(glTrans));
+			item.gameObject = gameObj;
+			list.push_back(item);
 		}
 	}
 
+	dataRef().m_pEngine->drawObjects(list);
 	dataRef().m_pEngine->updateCameraView(dataRef().m_character->getCamera());
 }
 

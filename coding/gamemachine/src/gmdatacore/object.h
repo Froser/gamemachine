@@ -5,6 +5,7 @@
 #include "image.h"
 #include "utilities/assert.h"
 #include "utilities/autoptr.h"
+#include "utilities/vmath.h"
 
 BEGIN_NS
 
@@ -76,7 +77,7 @@ public:
 
 	GMuint getCount()
 	{
-		return m_count;
+		return m_verticesCount;
 	}
 
 	GMint* getFirstPtr()
@@ -91,13 +92,13 @@ public:
 
 	GMuint getPolygonCount()
 	{
-		return m_count / m_edgeCountPerPolygon;
+		return m_verticesCount / m_edgeCountPerPolygon;
 	}
 
 	void generatePolygonProperties();
 
 private:
-	GMuint m_count;
+	GMuint m_verticesCount;
 	GMuint m_offset;
 	Material m_material;
 	GMuint m_edgeCountPerPolygon;
@@ -110,6 +111,8 @@ private:
 class Object
 {
 public:
+	typedef GMfloat DataType;
+
 	Object();
 	~Object();
 
@@ -133,22 +136,12 @@ public:
 		return m_components;
 	}
 
-	void setVertices(std::vector<GMfloat>& vertices)
-	{
-		m_vertices = vertices;
-	}
-
-	std::vector<GMfloat>& vao()
+	std::vector<DataType>& vertices()
 	{
 		return m_vertices;
 	}
 
-	void setNormals(std::vector<GMfloat>& normals)
-	{
-		m_normals = normals;
-	}
-
-	std::vector<GMfloat>& normals()
+	std::vector<DataType>& normals()
 	{
 		return m_normals;
 	}
@@ -159,8 +152,8 @@ public:
 	void setArrayId(GMuint id) { m_arrayId = id; }
 
 private:
-	std::vector<GMfloat> m_vertices;
-	std::vector<GMfloat> m_normals;
+	std::vector<DataType> m_vertices;
+	std::vector<DataType> m_normals;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
 	AutoPtr<ObjectPainter> m_painter;
