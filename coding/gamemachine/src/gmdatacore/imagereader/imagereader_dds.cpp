@@ -10,37 +10,6 @@
 #include <cstdio>
 #include <cstring>
 
-// Enough mips for 16K x 16K, which is the minumum required for OpenGL 4.x
-#define MAX_TEXTURE_MIPS    14
-
-// Each texture image data structure contains an array of MAX_TEXTURE_MIPS
-// of these mipmap structures. The structure represents the mipmap data for
-// all slices at that level.
-struct ImageMipData
-{
-	GLsizei width;                              // Width of this mipmap level
-	GLsizei height;                             // Height of this mipmap level
-	GLsizei depth;                              // Depth pof mipmap level
-	GLsizeiptr mipStride;                       // Distance in bytes between mip levels in memory
-	GLvoid* data;                               // Pointer to data
-};
-
-// This is the main image data structure. It contains all the parameters needed
-// to place texture data into a texture object using OpenGL.
-struct ImageData
-{
-	GLenum target;                              // Texture target (1D, 2D, cubemap, array, etc.)
-	GLenum internalFormat;                      // Recommended internal format (GL_RGBA32F, etc).
-	GLenum format;                              // Format in memory
-	GLenum type;                                // Type in memory (GL_RED, GL_RGB, etc.)
-	GLenum swizzle[4];                          // Swizzle for RGBA
-	GLsizei mipLevels;                          // Number of present mipmap levels
-	GLsizei slices;                             // Number of slices (for arrays)
-	GLsizeiptr sliceStride;                     // Distance in bytes between slices of an array texture
-	GLsizeiptr totalDataSize;                   // Complete amount of data allocated for texture
-	ImageMipData mip[MAX_TEXTURE_MIPS];         // Actual mipmap data
-};
-
 enum DDS_FORMAT
 {
 	DDS_FORMAT_UNKNOWN = 0,
@@ -637,12 +606,12 @@ bool loadDDS(const char* filename, ImageData* image)
 	fseek(f, (long)current_pos, SEEK_SET);
 
 	image->totalDataSize = file_size - current_pos;
-	image->mip[0].data = new uint8_t[image->totalDataSize];
+	image->mip[0].data = new GMbyte[image->totalDataSize];
 
 	fread(image->mip[0].data, file_size - current_pos, 1, f);
 
 	int level;
-	GLubyte * ptr = reinterpret_cast<GLubyte*>(image->mip[0].data);
+	GMbyte * ptr = reinterpret_cast<GMbyte*>(image->mip[0].data);
 
 	int width = file_header.std_header.width;
 	int height = file_header.std_header.height;
@@ -676,159 +645,18 @@ done_close_file:
 	return bSuc;
 }
 
-class ImageDDS : public Image
-{
-public:
-	ImageDDS() {}
-
-public:
-	void dispose() override
-	{
-		delete[] reinterpret_cast<uint8_t *>(m_imageData.mip[0].data);
-	}
-
-	unsigned int loadTexture() override
-	{
-		int level;
-		unsigned int id;
-		glGenTextures(1, &id);
-		glBindTexture(m_imageData.target, id);
-		GLubyte * ptr = (GLubyte *)m_imageData.mip[0].data;
-
-		switch (m_imageData.target)
-		{
-		case GL_TEXTURE_1D:
-			glTexStorage1D(m_imageData.target,
-				m_imageData.mipLevels,
-				m_imageData.internalFormat,
-				m_imageData.mip[0].width);
-			for (level = 0; level < m_imageData.mipLevels; ++level)
-			{
-				glTexSubImage1D(GL_TEXTURE_1D,
-					level,
-					0,
-					m_imageData.mip[level].width,
-					m_imageData.format, m_imageData.type,
-					m_imageData.mip[level].data);
-			}
-			break;
-		case GL_TEXTURE_1D_ARRAY:
-			glTexStorage2D(m_imageData.target,
-				m_imageData.mipLevels,
-				m_imageData.internalFormat,
-				m_imageData.mip[0].width,
-				m_imageData.slices);
-			for (level = 0; level < m_imageData.mipLevels; ++level)
-			{
-				glTexSubImage2D(GL_TEXTURE_1D,
-					level,
-					0, 0,
-					m_imageData.mip[level].width, m_imageData.slices,
-					m_imageData.format, m_imageData.type,
-					m_imageData.mip[level].data);
-			}
-			break;
-		case GL_TEXTURE_2D:
-			glTexStorage2D(m_imageData.target,
-				m_imageData.mipLevels,
-				m_imageData.internalFormat,
-				m_imageData.mip[0].width,
-				m_imageData.mip[0].height);
-			for (level = 0; level < m_imageData.mipLevels; ++level)
-			{
-				glTexSubImage2D(GL_TEXTURE_2D,
-					level,
-					0, 0,
-					m_imageData.mip[level].width, m_imageData.mip[level].height,
-					m_imageData.format, m_imageData.type,
-					m_imageData.mip[level].data);
-			}
-			break;
-		case GL_TEXTURE_CUBE_MAP:
-			for (level = 0; level < m_imageData.mipLevels; ++level)
-			{
-				ptr = (GLubyte *)m_imageData.mip[level].data;
-				for (int face = 0; face < 6; face++)
-				{
-					glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
-						level,
-						m_imageData.internalFormat,
-						m_imageData.mip[level].width, m_imageData.mip[level].height,
-						0,
-						m_imageData.format, m_imageData.type,
-						ptr + m_imageData.sliceStride * face);
-				}
-			}
-			break;
-		case GL_TEXTURE_2D_ARRAY:
-			glTexStorage3D(m_imageData.target,
-				m_imageData.mipLevels,
-				m_imageData.internalFormat,
-				m_imageData.mip[0].width,
-				m_imageData.mip[0].height,
-				m_imageData.slices);
-			for (level = 0; level < m_imageData.mipLevels; ++level)
-			{
-				glTexSubImage3D(GL_TEXTURE_2D_ARRAY,
-					level,
-					0, 0, 0,
-					m_imageData.mip[level].width, m_imageData.mip[level].height, m_imageData.slices,
-					m_imageData.format, m_imageData.type,
-					m_imageData.mip[level].data);
-			}
-			break;
-		case GL_TEXTURE_CUBE_MAP_ARRAY:
-			glTexStorage3D(m_imageData.target,
-				m_imageData.mipLevels,
-				m_imageData.internalFormat,
-				m_imageData.mip[0].width,
-				m_imageData.mip[0].height,
-				m_imageData.slices);
-			break;
-		case GL_TEXTURE_3D:
-			glTexStorage3D(m_imageData.target,
-				m_imageData.mipLevels,
-				m_imageData.internalFormat,
-				m_imageData.mip[0].width,
-				m_imageData.mip[0].height,
-				m_imageData.mip[0].depth);
-			for (level = 0; level < m_imageData.mipLevels; ++level)
-			{
-				glTexSubImage3D(GL_TEXTURE_3D,
-					level,
-					0, 0, 0,
-					m_imageData.mip[level].width, m_imageData.mip[level].height, m_imageData.mip[level].depth,
-					m_imageData.format, m_imageData.type,
-					m_imageData.mip[level].data);
-			}
-			break;
-		default:
-			break;
-		}
-
-		glTexParameteriv(m_imageData.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(m_imageData.swizzle));
-
-		return id;
-	}
-
-	ImageData& getRawFile() { return m_imageData; }
-
-private:
-	ImageData m_imageData;
-};
-
 bool ImageReader_DDS::load(const char* filename, OUT Image** img)
 {
-	ImageDDS* image;
+	Image* image;
 	if (img)
 	{
-		*img = new ImageDDS();
-		image = static_cast<ImageDDS*>(*img);
+		*img = new Image();
+		image = *img;
 	}
 	else
 	{
 		return false;
 	}
 
-	return loadDDS(filename, &image->getRawFile());
+	return loadDDS(filename, &image->getData());
 }

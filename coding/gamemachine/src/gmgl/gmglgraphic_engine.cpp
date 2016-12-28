@@ -38,15 +38,11 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 {
-	static const vmath::mat4 biasMatrix = vmath::mat4(
-		vmath::vec4(0.5f, 0.0f, 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.5f, 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.0f, 0.5f, 0.0f),
-		vmath::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
 	bool shadowMapping = m_shadowMapping.hasBegun();
 	GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : m_shaders;
 	shaders.useProgram();
+	if (!shadowMapping)
+		bindAllTextures();
 
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
@@ -54,19 +50,41 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 		GMGL::transform(shaders, item.trans, GMSHADER_MODEL_MATRIX);
 		if (!shadowMapping)
 		{
-			const GMGLShadowMapping::State& state = m_shadowMapping.getState();
-			glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
-			GMGL::uniformMatrix4(shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
-			GMGL::perspective(30, 2, 1, 800, shaders, GMSHADER_PROJECTION_MATRIX);
-
-			glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
-			glGenerateMipmap(GL_TEXTURE_2D);
+			setEyeViewport();
+			activeShadowTexture();
 		}
 
 		Object* coreObj = item.gameObject->getObject();
 		ObjectPainter* painter = coreObj->getPainter();
 		painter->draw();
 	}
+}
+
+void GMGLGraphicEngine::setEyeViewport()
+{
+	static const vmath::mat4 biasMatrix = vmath::mat4(
+		vmath::vec4(0.5f, 0.0f, 0.0f, 0.0f),
+		vmath::vec4(0.0f, 0.5f, 0.0f, 0.0f),
+		vmath::vec4(0.0f, 0.0f, 0.5f, 0.0f),
+		vmath::vec4(0.5f, 0.5f, 0.5f, 1.0f));
+
+	const GMGLShadowMapping::State& state = m_shadowMapping.getState();
+	glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
+	GMGL::uniformMatrix4(m_shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
+	GMGL::perspective(30, 2, 1, 800, m_shaders, GMSHADER_PROJECTION_MATRIX);
+}
+
+void GMGLGraphicEngine::bindAllTextures()
+{
+	GMGL::uniformTextureIndex(m_shaders, 0, GMSHADER_DEPTH_TEXTURE);
+	GMGL::uniformTextureIndex(m_shaders, 1, GMSHADER_AMBIENT_TEXTURE);
+}
+
+void GMGLGraphicEngine::activeShadowTexture()
+{
+	glActiveTexture(GMTEXTURE_SHADOW);
+	glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 GMGLShaders& GMGLGraphicEngine::getShaders()

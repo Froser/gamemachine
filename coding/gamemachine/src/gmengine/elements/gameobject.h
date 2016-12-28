@@ -32,6 +32,8 @@ public:
 	void setTransform(const btTransform& transform);
 	btTransform& getTransform();
 
+	void setLocalScaling(const btVector3& scale);
+
 public:
 	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
 

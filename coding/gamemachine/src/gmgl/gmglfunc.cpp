@@ -51,3 +51,8 @@ void IMPL uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, char* matrixName)
 	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), matrixName);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
 }
+
+void IMPL uniformTextureIndex(GMGLShaders& shaders, GMint id, char* textureName)
+{
+	glUniform1i(glGetUniformLocation(shaders.getProgram(), textureName), id);
+}

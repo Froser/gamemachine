@@ -73,11 +73,7 @@ public:
 	{
 		if (m_bitmapFile.buffer)
 			delete[] m_bitmapFile.buffer;
-	}
-
-	unsigned int loadTexture() override
-	{
-		return 0;
+		Image::dispose();
 	}
 
 	BitmapFile& getRawFile() { return m_bitmapFile; }
@@ -118,6 +114,9 @@ bool ImageReader_BMP::load(const char* filename, OUT Image** img)
 		long cnt = bitmapFile.bitmapInfoHeader.biWidth * bitmapFile.bitmapInfoHeader.biHeight * 3;
 		bitmapFile.buffer = new BYTE[cnt];
 		file.read(reinterpret_cast<char*>(bitmapFile.buffer), cnt);
+
+		ASSERT(false);
+
 		return true;
 	}
 	return false;

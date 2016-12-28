@@ -42,8 +42,6 @@ GLuint VAOs[1], Buffers[1], EBOs[1];
 
 GLint render_model_matrix_loc;
 
-GMGLTexture texture;
-
 class GameHandler : public IGameHandler
 {
 public:
@@ -163,33 +161,37 @@ void init()
 		groundTrans.setIdentity();
 		groundTrans.setOrigin(btVector3(0, -100, 100));
 		
-		
 		Material m [6] = {
-			{ { .1f, .2f, .3f },{ .4f, .5f, .6f },{ .7f, .8f, .9f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .1f, .2f, .3f },{ .4f, .5f, .6f },{ .7f, .8f, .9f }, 1 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1 },
 		};
-		CubeGameObject* cube = new CubeGameObject(btVector3(300, 30, 500), groundTrans, m);
-		cube->setMass(0);
-		cube->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, cube->getObject()));
-		cube->getObject()->getPainter()->init();
-		world.appendObject(cube);
+		CubeGameObject* ground = new CubeGameObject(btVector3(300, 30, 500), groundTrans, m);
+		ground->setMass(0);
+		ground->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, ground->getObject()));
+		ground->getObject()->getPainter()->init();
+		world.appendObject(ground);
 	}
 
 	{
+		Image* tex;
+		ImageReader::load("D:\\test.dds", DDS, &tex);
+		GMGLTexture* texture = new GMGLTexture(tex);
+		texture->init();
+
 		btTransform boxTrans;
 		boxTrans.setIdentity();
 		boxTrans.setOrigin(btVector3(0, 0, 40));
 		Material m[6] = {
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .2f, .3f, .7f },{ .4f, .1f, .8f },{ .7f, .5f, .3f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 20 },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
+			{ { .2f, .3f, .7f },{ .4f, .1f, .8f },{ .7f, .5f, .3f }, 1, texture },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
+			{ { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 }, 1, texture },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
 		};
 		CubeGameObject* cube = new CubeGameObject(btVector3(10, 10, 10), boxTrans, m);
 		cube->setMass(20);
@@ -205,9 +207,10 @@ void init()
 		r.load("D:\\baymax.obj", &obj);
 		btTransform boxTrans;
 		boxTrans.setIdentity();
-		boxTrans.setOrigin(btVector3(30, 100, 40));
+		boxTrans.setOrigin(btVector3(30, 70, 40));
 		
 		ConvexHullGameObject* convex = new ConvexHullGameObject(obj);
+		convex->setLocalScaling(btVector3(0.5f, 0.5f, 0.5f));
 		convex->setMass(10);
 		convex->setTransform(boxTrans);
 		convex->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, convex->getObject()));
@@ -229,7 +232,7 @@ void init()
 	GMfloat ambient[3] = { .5, .5, .5 };
 	lightCtrl.setAmbient(ambient);
 
-	GMfloat pos[3] = { 100,100,100 };
+	GMfloat pos[3] = { 400,400,400 };
 	lightCtrl.setLightPosition(pos);
 	lightCtrl.setLightColor(ambient);
 }

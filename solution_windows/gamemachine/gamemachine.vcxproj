@@ -22,6 +22,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
@@ -62,6 +63,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />

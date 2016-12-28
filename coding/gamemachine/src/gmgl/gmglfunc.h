@@ -20,6 +20,7 @@ void API perspective(float fovy, float aspect, float n, float f, GMGLShaders& sh
 void API lookAt(Camera& camera, GMGLShaders& shaders, char* viewMatrixName);
 void API transform(GMGLShaders& shaders, GMfloat* mat, char* transformMatrixName);
 void API uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, char* matrixName);
+void API uniformTextureIndex(GMGLShaders& shaders, GMint id, char* textureName);
 
 END_GMGL_FUNCS
 

@@ -6,6 +6,7 @@
 #include "utilities/assert.h"
 #include "utilities/autoptr.h"
 #include "utilities/vmath.h"
+#include "gmdatacore/texture.h"
 
 BEGIN_NS
 
@@ -34,6 +35,7 @@ struct Material
 	GMfloat Kd[3];
 	GMfloat Ks[3];
 	GMfloat shininess;
+	ITexture* texture;
 };
 
 class Component
@@ -129,7 +131,7 @@ public:
 		return m_painter;
 	}
 
-	void appendComponent(Component* component, GMuint count);
+	void appendComponent(AUTORELEASE Component* component, GMuint count);
 
 	std::vector<Component*>& getComponents()
 	{
@@ -146,6 +148,11 @@ public:
 		return m_normals;
 	}
 
+	std::vector<DataType>& uvs()
+	{
+		return m_uvs;
+	}
+
 	GMuint getBufferId() { return m_bufferId; }
 	GMuint getArrayId() { return m_arrayId; }
 	void setBufferId(GMuint id) { m_bufferId = id; }
@@ -154,6 +161,7 @@ public:
 private:
 	std::vector<DataType> m_vertices;
 	std::vector<DataType> m_normals;
+	std::vector<DataType> m_uvs;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
 	AutoPtr<ObjectPainter> m_painter;

@@ -28,6 +28,9 @@ public:
 
 private:
 	void drawObjectsOnce(DrawingList& drawingList);
+	void setEyeViewport();
+	void bindAllTextures();
+	void activeShadowTexture();
 
 private:
 	GMGLShaders m_shaders;

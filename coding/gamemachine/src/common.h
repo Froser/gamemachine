@@ -23,10 +23,12 @@ typedef unsigned char BYTE;
 #include "GL/glew.h"
 
 // Options
-typedef unsigned char FByte;
+typedef unsigned char GMbyte;
 typedef GLfloat GMfloat;
 typedef GLint GMint;
 typedef GLuint GMuint;
+typedef GLsizei GMsizei;
+typedef GLsizeiptr GMsizeiptr;
 #define LINE_MAX 256
 
 // Callbacks settings

@@ -62,7 +62,7 @@ Object::~Object()
 	}
 }
 
-void Object::appendComponent(Component* component, GMuint count)
+void Object::appendComponent(AUTORELEASE Component* component, GMuint count)
 {
 	component->m_verticesCount = count;
 	component->generatePolygonProperties();

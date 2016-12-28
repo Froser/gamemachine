@@ -2,17 +2,23 @@
 #define __GMGL_TEXTURE_H__
 #include "common.h"
 #include "gmdatacore/image.h"
+#include "gmdatacore/texture.h"
 #include "utilities/autoptr.h"
 
 BEGIN_NS
 
-class GMGLTexture
+class GMGLTexture : public ITexture
 {
 public:
-	static void loadTexture(const char* filename, GMGLTexture& texture);
+	GMGLTexture(AUTORELEASE Image* image);
+	~GMGLTexture();
 
 public:
-	~GMGLTexture();
+	void init();
+
+public:
+	virtual void beginTexture() override;
+	virtual void endTexture() override;
 
 private:
 	AutoPtr<Image> m_image;
