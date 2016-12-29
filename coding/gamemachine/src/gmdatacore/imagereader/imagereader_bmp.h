@@ -2,13 +2,19 @@
 #define __IMAGEREADER_PRIVATE_H__
 #include "common.h"
 #include <string>
+#include "imagereader.h"
 BEGIN_NS
 
 class Image;
-class ImageReader_BMP
+struct BitmapFile;
+class ImageReader_BMP : public IImageReader
 {
 public:
-	static bool load(const char* filename, OUT Image** img);
+	virtual bool load(const char* filename, OUT Image** img) override;
+	virtual bool test(const char* filename) override;
+
+private:
+	void writeDataToImage(BitmapFile& bitmap, Image* img);
 };
 
 END_NS

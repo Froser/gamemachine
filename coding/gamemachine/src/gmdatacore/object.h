@@ -29,13 +29,30 @@ private:
 	Object* m_object;
 };
 
+enum TextureType
+{
+	TextureTypeShadow = 0,
+	TextureTypeAmbient,
+};
+
+struct TextureInfo
+{
+	ITexture* texture;
+	TextureType type;
+};
+
+enum
+{
+	MaxTextureCount = 5
+};
+
 struct Material
 {
 	GMfloat Ka[3];
 	GMfloat Kd[3];
 	GMfloat Ks[3];
 	GMfloat shininess;
-	ITexture* texture;
+	TextureInfo textures[MaxTextureCount];
 };
 
 class Component

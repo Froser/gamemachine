@@ -5,6 +5,7 @@
 #include "gmdatacore/object.h"
 #include "gmengine/elements/gameobject.h"
 #include "gmengine/controller/graphic_engine.h"
+#include "gmgltexture.h"
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_lightController(m_shaders)
@@ -41,8 +42,6 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 	bool shadowMapping = m_shadowMapping.hasBegun();
 	GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : m_shaders;
 	shaders.useProgram();
-	if (!shadowMapping)
-		bindAllTextures();
 
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
@@ -74,15 +73,10 @@ void GMGLGraphicEngine::setEyeViewport()
 	GMGL::perspective(30, 2, 1, 800, m_shaders, GMSHADER_PROJECTION_MATRIX);
 }
 
-void GMGLGraphicEngine::bindAllTextures()
-{
-	GMGL::uniformTextureIndex(m_shaders, 0, GMSHADER_DEPTH_TEXTURE);
-	GMGL::uniformTextureIndex(m_shaders, 1, GMSHADER_AMBIENT_TEXTURE);
-}
-
 void GMGLGraphicEngine::activeShadowTexture()
 {
-	glActiveTexture(GMTEXTURE_SHADOW);
+	GMGL::uniformTextureIndex(m_shaders, TextureTypeShadow, getTextureUniformName(TextureTypeShadow));
+	glActiveTexture(TextureTypeShadow + GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
 	glGenerateMipmap(GL_TEXTURE_2D);
 }

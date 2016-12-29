@@ -28,6 +28,7 @@ private:
 	std::string m_workingDir;
 	std::vector<GMfloat> m_vertices;
 	std::vector<GMfloat> m_normals;
+	std::vector<GMfloat> m_uvs;
 	MtlReader* m_pMtlReader;
 	Component* m_currentComponent;
 	GMuint m_vertexOffset;

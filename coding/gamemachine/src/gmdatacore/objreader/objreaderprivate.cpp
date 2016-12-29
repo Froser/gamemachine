@@ -40,6 +40,15 @@ static void pushVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indicesVe
 	to.push_back(1.0f);
 }
 
+static void pushUVVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indicesVector, GMuint indices)
+{
+	if (indicesVector.size() == 0)
+		return;
+
+	to.push_back(indicesVector.data()[(indices - 1) * 4]);
+	to.push_back(indicesVector.data()[(indices - 1) * 4 + 1]);
+}
+
 ObjReaderPrivate::ObjReaderPrivate()
 	: m_currentComponent(new Component())
 	, m_pMtlReader(new MtlReader())
@@ -89,8 +98,8 @@ void ObjReaderPrivate::parseLine(const char* line)
 		GMfloat v1, v2;
 		scanner.nextFloat(&v1);
 		scanner.nextFloat(&v2);
-		//VertexTexture texture(v1, v2, NONE);
-		//m_textures.push_back(texture);
+		m_uvs.push_back(v1);
+		m_uvs.push_back(v2);
 	}
 	else if (strEqual(command, KW_FACE))
 	{
@@ -118,6 +127,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 
 			m_vertexOffset++;
 			pushVector(m_object->vertices(), m_vertices, i1);
+			pushUVVector(m_object->uvs(), m_uvs, i2);
 			pushVector(m_object->normals(), m_normals, i3);
 		} while (true);
 	}

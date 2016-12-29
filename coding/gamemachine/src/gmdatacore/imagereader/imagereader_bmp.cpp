@@ -12,6 +12,8 @@
 #include <pshpack2.h>
 #endif
 
+BEGIN_NS
+
 struct BitmapHeader
 {
 	WORD  bfType;
@@ -62,6 +64,7 @@ struct ImageRGB
 	GMint g;
 	GMint b;
 };
+END_NS
 
 class ImageBMP : public Image
 {
@@ -69,13 +72,6 @@ public:
 	ImageBMP() {}
 
 public:
-	void dispose() override
-	{
-		if (m_bitmapFile.buffer)
-			delete[] m_bitmapFile.buffer;
-		Image::dispose();
-	}
-
 	BitmapFile& getRawFile() { return m_bitmapFile; }
 
 private:
@@ -115,9 +111,49 @@ bool ImageReader_BMP::load(const char* filename, OUT Image** img)
 		bitmapFile.buffer = new BYTE[cnt];
 		file.read(reinterpret_cast<char*>(bitmapFile.buffer), cnt);
 
-		ASSERT(false);
+		writeDataToImage(bitmapFile, image);
 
+		file.close();
 		return true;
 	}
+	file.close();
 	return false;
+}
+
+bool ImageReader_BMP::test(const char* filename)
+{
+	std::ifstream file;
+	file.open(filename, std::ios::in | std::ios::binary);
+	if (file.good())
+	{
+		BitmapHeader header;
+		file.read(reinterpret_cast<char*>(&header), sizeof(BitmapHeader));
+		file.close();
+		return header.bfType == 19778;
+	}
+	file.close();
+	return false;
+}
+
+void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img)
+{
+	ASSERT(img);
+	ImageData& data = img->getData();
+#ifdef USE_OPENGL
+	data.target = GL_TEXTURE_2D;
+	data.mipLevels = 1;
+	data.internalFormat = GL_RGB16;
+	data.format = GL_BGR;
+	data.swizzle[0] = GL_RED;
+	data.swizzle[1] = GL_GREEN;
+	data.swizzle[2] = GL_BLUE;
+	data.swizzle[3] = GL_ALPHA;
+	data.type = GL_UNSIGNED_BYTE;
+	data.mip[0].height = bitmap.bitmapInfoHeader.biHeight;
+	data.mip[0].width = bitmap.bitmapInfoHeader.biWidth;
+	// Buffer 移交给 Image 管理
+	data.mip[0].data = bitmap.buffer;
+#else
+	ASSERT(false);
+#endif
 }

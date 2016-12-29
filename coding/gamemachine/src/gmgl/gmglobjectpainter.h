@@ -18,6 +18,12 @@ public:
 	virtual void dispose() override;
 
 private:
+	void setLights(Material& material);
+	void beginTextures(TextureInfo* startTexture);
+	void endTextures(TextureInfo* startTexture);
+	void textureCalculateSwitch(bool on);
+
+private:
 	GMGLShaders& m_shaders;
 	GMGLShadowMapping& m_shadowMapping;
 };

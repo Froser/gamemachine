@@ -2,6 +2,20 @@
 #include "gmgltexture.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include "shader_constants.h"
+#include "gmdatacore/object.h"
+#include "utilities/assert.h"
+
+GMGLTextureShaderNames::GMGLTextureShaderNames()
+{
+	m_uniformNames[TextureTypeShadow] = GMSHADER_SHADOW_TEXTURE;
+	m_uniformNames[TextureTypeAmbient] = GMSHADER_AMBIENT_TEXTURE;
+}
+
+const char* GMGLTextureShaderNames::operator [](TextureType t)
+{
+	ASSERT(m_uniformNames.find(t) != m_uniformNames.end());
+	return m_uniformNames[t].c_str();
+}
 
 GMGLTexture::GMGLTexture(AUTORELEASE Image* image)
 {
@@ -139,10 +153,10 @@ void GMGLTexture::init()
 	glBindTexture(image.target, 0);
 }
 
-void GMGLTexture::beginTexture()
+void GMGLTexture::beginTexture(GMuint type)
 {
 	const ImageData& image = m_image->getData();
-	glActiveTexture(GMTEXTURE_AMBIENT);
+	glActiveTexture(type + GL_TEXTURE0);
 	glBindTexture(image.target, m_id);
 }
 

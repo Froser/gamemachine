@@ -29,7 +29,6 @@ public:
 private:
 	void drawObjectsOnce(DrawingList& drawingList);
 	void setEyeViewport();
-	void bindAllTextures();
 	void activeShadowTexture();
 
 private:

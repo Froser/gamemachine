@@ -177,8 +177,8 @@ void init()
 	}
 
 	{
-		Image* tex;
-		ImageReader::load("D:\\test.dds", DDS, &tex);
+		Image* tex;	
+		ImageReader::load("D:\\test.dds", &tex);
 		GMGLTexture* texture = new GMGLTexture(tex);
 		texture->init();
 
@@ -186,12 +186,12 @@ void init()
 		boxTrans.setIdentity();
 		boxTrans.setOrigin(btVector3(0, 0, 40));
 		Material m[6] = {
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
-			{ { .2f, .3f, .7f },{ .4f, .1f, .8f },{ .7f, .5f, .3f }, 1, texture },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
-			{ { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 }, 1, texture },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, texture },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1, { texture, TextureTypeAmbient} },
+			{ { .2f, .3f, .7f },{ .4f, .1f, .8f },{ .7f, .5f, .3f }, 1,{ texture, TextureTypeAmbient } },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1,{ texture, TextureTypeAmbient } },
+			{ { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 }, 1,{ texture, TextureTypeAmbient } },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1,{ texture, TextureTypeAmbient } },
+			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, 1,{ texture, TextureTypeAmbient } },
 		};
 		CubeGameObject* cube = new CubeGameObject(btVector3(10, 10, 10), boxTrans, m);
 		cube->setMass(20);
