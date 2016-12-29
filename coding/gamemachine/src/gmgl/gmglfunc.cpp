@@ -40,12 +40,6 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, const char* viewMatrixNam
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
 }
 
-void IMPL transform(GMGLShaders& shaders, GMfloat* mat, const char* transformMatrixName)
-{
-	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), transformMatrixName);
-	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
-}
-
 void IMPL uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixName)
 {
 	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), matrixName);
@@ -54,5 +48,22 @@ void IMPL uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixN
 
 void IMPL uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textureName)
 {
+	GLenum e;
 	glUniform1i(glGetUniformLocation(shaders.getProgram(), textureName), id);
+	e = glGetError();
+
+	char _switch[64] = "has_";
+	strcat(_switch, textureName);
+	GLint loc = glGetUniformLocation(shaders.getProgram(), _switch);
+	e = glGetError();
+
+	glUniform1i(loc, 1);
+	e = glGetError();
+}
+
+void IMPL disableTexture(GMGLShaders& shaders, const char* textureName)
+{
+	char _switch[64] = "has_";
+	strcat(_switch, textureName);
+	glUniform1i(glGetUniformLocation(shaders.getProgram(), _switch), 0);
 }

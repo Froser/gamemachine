@@ -9,6 +9,8 @@ GMGLTextureShaderNames::GMGLTextureShaderNames()
 {
 	m_uniformNames[TextureTypeShadow] = GMSHADER_SHADOW_TEXTURE;
 	m_uniformNames[TextureTypeAmbient] = GMSHADER_AMBIENT_TEXTURE;
+	m_uniformNames[TextureTypeCubeMap] = GMSHADER_CUBEMAP_TEXTURE;
+	m_uniformNames[TextureTypeReflectionCubeMap] = GMSHADER_REFLECTION_CUBEMAP_TEXTURE;
 }
 
 const char* GMGLTextureShaderNames::operator [](TextureType t)
@@ -18,17 +20,23 @@ const char* GMGLTextureShaderNames::operator [](TextureType t)
 }
 
 GMGLTexture::GMGLTexture(AUTORELEASE Image* image)
+	: m_inited(false)
 {
 	m_image.reset(image);
+	init();
 }
 
 GMGLTexture::~GMGLTexture()
 {
 	glDeleteTextures(1, &m_id);
+	m_inited = false;
 }
 
 void GMGLTexture::init()
 {
+	if (m_inited)
+		return;
+
 	GMuint level;
 	const ImageData& image = m_image->getData();
 
@@ -147,10 +155,9 @@ void GMGLTexture::init()
 	}
 
 	glTexParameteriv(image.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(image.swizzle));
-	
-	m_image->dispose();
-
 	glBindTexture(image.target, 0);
+	m_image->dispose();
+	m_inited = true;
 }
 
 void GMGLTexture::beginTexture(GMuint type)

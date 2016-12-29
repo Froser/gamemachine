@@ -32,6 +32,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
@@ -73,6 +74,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />

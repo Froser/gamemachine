@@ -7,6 +7,7 @@
 
 GameWorldPrivate::GameWorldPrivate()
 	: m_character(nullptr)
+	, m_sky(nullptr)
 	, m_pEngine(GRAPHIC_ENGINE)
 {
 
@@ -51,7 +52,13 @@ void GameWorldPrivate::init()
 
 void GameWorldPrivate::appendObject(GameObject* obj)
 {
-	ASSERT(std::find(m_shapes.begin(), m_shapes.end(), obj) == m_shapes.end());
+	if (std::find(m_shapes.begin(), m_shapes.end(), obj) != m_shapes.end())
+		return;
+
+	ObjectPainter* painter = obj->getObject()->getPainter();
+	if (painter)
+		painter->init();
+
 	obj->appendObjectToWorld(m_dynamicsWorld);
 	m_shapes.push_back(obj);
 }

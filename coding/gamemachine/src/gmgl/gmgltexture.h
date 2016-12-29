@@ -40,6 +40,7 @@ public:
 	virtual void endTexture() override;
 
 private:
+	bool m_inited;
 	AutoPtr<Image> m_image;
 	GLuint m_id;
 };

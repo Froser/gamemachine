@@ -52,6 +52,11 @@ void GMGLLight::setSpecularCoefficient(GMfloat ks[3])
 	setVec4(m_shaders, GMSHADER_LIGHT_KS, ks);
 }
 
+void GMGLLight::setEnvironmentCoefficient(GMfloat ke[3])
+{
+	setVec4(m_shaders, GMSHADER_LIGHT_KE, ke);
+}
+
 void GMGLLight::setLightPosition(GMfloat xyz[3])
 {
 	setVec4(m_shaders, GMSHADER_LIGHT_POSITION, xyz);

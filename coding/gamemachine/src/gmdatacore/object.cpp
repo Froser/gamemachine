@@ -54,7 +54,8 @@ Object::Object()
 
 Object::~Object()
 {
-	m_painter->dispose();
+	if (m_painter)
+		m_painter->dispose();
 
 	for (auto iter = m_components.begin(); iter != m_components.cend(); iter++)
 	{

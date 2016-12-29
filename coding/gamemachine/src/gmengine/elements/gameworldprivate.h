@@ -34,6 +34,7 @@ private:
 	AutoPtr<IGraphicEngine> m_pEngine;
 	std::vector<GameObject*> m_shapes;
 	Character* m_character;
+	GameObject* m_sky;
 };
 
 END_NS

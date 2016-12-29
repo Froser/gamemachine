@@ -6,6 +6,7 @@
 #include "gmengine/elements/gameobject.h"
 #include "gmengine/controller/graphic_engine.h"
 #include "gmgltexture.h"
+#include "gmengine/elements/gameworld.h"
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_lightController(m_shaders)
@@ -43,10 +44,13 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 	GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : m_shaders;
 	shaders.useProgram();
 
+	if (!shadowMapping)
+		beginSetSky();
+
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
 		DrawingItem& item = *iter;
-		GMGL::transform(shaders, item.trans, GMSHADER_MODEL_MATRIX);
+		GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
 		if (!shadowMapping)
 		{
 			setEyeViewport();
@@ -57,6 +61,9 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 		ObjectPainter* painter = coreObj->getPainter();
 		painter->draw();
 	}
+
+	if (!shadowMapping)
+		endSetSky();
 }
 
 void GMGLGraphicEngine::setEyeViewport()
@@ -79,6 +86,27 @@ void GMGLGraphicEngine::activeShadowTexture()
 	glActiveTexture(TextureTypeShadow + GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
 	glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+void GMGLGraphicEngine::beginSetSky()
+{
+	GameObject* sky = getWorld()->getSky();
+	if (sky)
+	{
+		GMGL::uniformTextureIndex(m_shaders, TextureTypeReflectionCubeMap, getTextureUniformName(TextureTypeReflectionCubeMap));
+		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
+		info.texture->beginTexture(TextureTypeReflectionCubeMap);
+	}
+}
+
+void GMGLGraphicEngine::endSetSky()
+{
+	GameObject* sky = getWorld()->getSky();
+	if (sky)
+	{
+		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
+		info.texture->endTexture();
+	}
 }
 
 GMGLShaders& GMGLGraphicEngine::getShaders()

@@ -6,6 +6,7 @@
 #include "btBulletCollisionCommon.h"
 BEGIN_NS
 
+class GameWorld;
 class GameObjectPrivate
 {
 	friend class GameObject;
@@ -31,6 +32,7 @@ private:
 	btCollisionObject* m_pColObj;
 	AutoPtr<btMotionState> m_pMotionState;
 	AutoPtr<Object> m_pObject;
+	GameWorld* m_world;
 };
 
 END_NS

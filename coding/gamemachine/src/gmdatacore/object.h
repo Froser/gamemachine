@@ -32,7 +32,15 @@ private:
 enum TextureType
 {
 	TextureTypeShadow = 0,
-	TextureTypeAmbient,
+
+	// 从Start到End表示每个对象绘制时需要清理掉的纹理
+	TextureTypeResetStart,
+	TextureTypeAmbient = TextureTypeResetStart,
+	TextureTypeCubeMap,
+	TextureTypeResetEnd,
+
+	// 由于反射的天空纹理存在于环境，所以不需要清理
+	TextureTypeReflectionCubeMap,
 };
 
 struct TextureInfo
@@ -51,6 +59,7 @@ struct Material
 	GMfloat Ka[3];
 	GMfloat Kd[3];
 	GMfloat Ks[3];
+	GMfloat Ke[3];	//对于环境（如天空）的反射系数
 	GMfloat shininess;
 	TextureInfo textures[MaxTextureCount];
 };
@@ -144,13 +153,12 @@ public:
 
 	ObjectPainter* getPainter()
 	{
-		ASSERT(m_painter);
 		return m_painter;
 	}
 
 	void appendComponent(AUTORELEASE Component* component, GMuint count);
 
-	std::vector<Component*>& getComponents()
+	std::vector<AUTORELEASE Component*>& getComponents()
 	{
 		return m_components;
 	}

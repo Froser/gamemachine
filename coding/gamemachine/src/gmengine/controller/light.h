@@ -12,6 +12,7 @@ struct ILightController
 	virtual void setDiffuseCoefficient(GMfloat kd[3]) = 0;
 	virtual void setShininess(GMfloat n) = 0;
 	virtual void setSpecularCoefficient(GMfloat ks[3]) = 0;
+	virtual void setEnvironmentCoefficient(GMfloat ke[3]) = 0;
 	virtual void setLightPosition(GMfloat xyz[3]) = 0;
 	virtual GMfloat* getLightPosition() = 0;
 	virtual void setViewPosition(GMfloat xyz[3]) = 0;

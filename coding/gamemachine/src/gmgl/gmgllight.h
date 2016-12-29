@@ -17,6 +17,7 @@ public:
 	virtual void setDiffuseCoefficient(GMfloat kd[3]) override;
 	virtual void setShininess(GMfloat n) override;
 	virtual void setSpecularCoefficient(GMfloat ks[3]) override;
+	virtual void setEnvironmentCoefficient(GMfloat ke[3]) override;
 	virtual void setLightPosition(GMfloat xyz[3]) override;
 	virtual GMfloat* getLightPosition() override;
 	virtual void setViewPosition(GMfloat xyz[3]) override;

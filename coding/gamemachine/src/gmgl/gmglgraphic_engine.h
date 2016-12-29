@@ -30,6 +30,8 @@ private:
 	void drawObjectsOnce(DrawingList& drawingList);
 	void setEyeViewport();
 	void activeShadowTexture();
+	void beginSetSky();
+	void endSetSky();
 
 private:
 	GMGLShaders m_shaders;

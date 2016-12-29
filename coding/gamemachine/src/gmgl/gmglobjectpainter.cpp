@@ -11,11 +11,15 @@ GMGLObjectPainter::GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& sh
 	: ObjectPainter(obj)
 	, m_shaders(shaders)
 	, m_shadowMapping(shadowMapping)
+	, m_inited(false)
 {
 }
 
 void GMGLObjectPainter::init()
 {
+	if (m_inited)
+		return;
+
 	Object* obj = getObject();
 
 	GLuint vao[1];
@@ -45,6 +49,8 @@ void GMGLObjectPainter::init()
 
 	glBindVertexArray(0);
 	obj->disposeMemory();
+
+	m_inited = true;
 }
 
 void GMGLObjectPainter::draw()
@@ -54,6 +60,7 @@ void GMGLObjectPainter::draw()
 	glBindVertexArray(obj->getArrayId());
 	GLint params[2];
 	glGetIntegerv(GL_POLYGON_MODE, params);
+	resetTextures();
 	
 	for (auto iter = obj->getComponents().cbegin(); iter != obj->getComponents().cend(); iter++)
 	{
@@ -84,6 +91,8 @@ void GMGLObjectPainter::dispose()
 
 	glDeleteVertexArrays(1, vao);
 	glDeleteBuffers(1, vbo);
+
+	m_inited = false;
 }
 
 void GMGLObjectPainter::setLights(Material& material)
@@ -92,12 +101,12 @@ void GMGLObjectPainter::setLights(Material& material)
 	light.setAmbientCoefficient(material.Ka);
 	light.setDiffuseCoefficient(material.Kd);
 	light.setSpecularCoefficient(material.Ks);
+	light.setEnvironmentCoefficient(material.Ke);
 	light.setShininess(material.shininess);
 }
 
 void GMGLObjectPainter::beginTextures(TextureInfo* startTexture)
 {
-	bool hasTexture = false;
 	for (GMuint i = 0; i < MaxTextureCount; i++)
 	{
 		TextureInfo& info = startTexture[i];
@@ -106,14 +115,8 @@ void GMGLObjectPainter::beginTextures(TextureInfo* startTexture)
 		{
 			t->beginTexture(info.type);
 			GMGL::uniformTextureIndex(m_shaders, info.type, getTextureUniformName(info.type));
-			hasTexture = true;
 		}
 	}
-
-	if (hasTexture)
-		textureCalculateSwitch(1);
-	else
-		textureCalculateSwitch(0);
 }
 
 void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
@@ -128,7 +131,10 @@ void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
 	}
 }
 
-void GMGLObjectPainter::textureCalculateSwitch(bool on)
+void GMGLObjectPainter::resetTextures()
 {
-	glUniform1i(glGetUniformLocation(m_shaders.getProgram(), GMSHADER_ENABLE_TEXTURE), on ? 1 : 0);
+	for (TextureType t = TextureTypeAmbient; t < TextureTypeResetEnd; t = (TextureType) ((GMuint)(t) + 1))
+	{
+		GMGL::disableTexture(m_shaders, getTextureUniformName(t));
+	}
 }

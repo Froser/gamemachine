@@ -6,6 +6,7 @@ GameObjectPrivate::GameObjectPrivate()
 	: m_mass(0)
 	, m_isDynamic(true)
 	, m_localInertia(0, 0, 0)
+	, m_world(nullptr)
 {
 	m_transform.setIdentity();
 }
