@@ -30,7 +30,7 @@ in float specular;
 in vec4 shadow_coord;
 in vec2 ambient_texture_uv;
 in vec3 cubemap_texture_uv;
-in vec3 normalized;
+in vec3 normalized_view_coord;
 in vec3 view_direction;
 
 out vec4 frag_color;
@@ -77,9 +77,12 @@ void drawObject()
 	// 根据环境反射度来反射天空盒（如果有的话）
 	if (has_reflection_cubemap_texture == 1)
 	{
-		vec3 reflection_coord = reflect(-view_direction, normalized);
+		vec3 reflection_coord = reflect(-view_direction, normalized_view_coord);
 
-		ambientLight += texture(reflection_cubemap_texture, reflection_coord) * vec3(light_ke);
+		// 乘以shadeFactor是因为阴影会遮挡反射光
+		vec3 color_from_reflection = shadeFactor * (texture(reflection_cubemap_texture, reflection_coord) * vec3(light_ke));
+
+		ambientLight += color_from_reflection;
 	}
 
 	vec3 rgb = ambientLight + min(shadeFactor + 0.3, 1) * (diffuseLight + specularLight);

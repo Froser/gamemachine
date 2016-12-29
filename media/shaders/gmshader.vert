@@ -22,16 +22,16 @@ out vec4 shadow_coord;
 out vec2 ambient_texture_uv;
 out vec3 cubemap_texture_uv;
 
-out vec3 normalized;
+out vec3 normalized_view_coord;
 out vec3 view_direction;
 
 void main(void)
 {
 	vec4 world_coord = model_matrix * position;
 
-    vec4 mv_coord = view_matrix * world_coord;
+    vec4 model_view_matrix = view_matrix * world_coord;
 
-    gl_Position = projection_matrix * view_matrix * world_coord;
+    gl_Position = projection_matrix * model_view_matrix;
 
     vec3 light_direction = normalize(light_position.xyz - world_coord.xyz);
 
@@ -39,15 +39,18 @@ void main(void)
 
     vec3 half_vector = 0.5 * (light_direction + view_direction);
 
-    normalized = normalize(normal.xyz * mv_coord);
+    vec3 normalized_world_coord = normal.xyz;
 
-    diffuse = dot(light_direction, normalized);
+    diffuse = dot(light_direction, normalized_world_coord);
 
-    specular = pow(dot(half_vector, normalized), light_shininess);
+    specular = pow(dot(half_vector, normalized_world_coord), light_shininess);
 
 	shadow_coord = shadow_matrix * world_coord;
 
     ambient_texture_uv = uv;
 
     cubemap_texture_uv = -vec3(view_direction);
+
+    // 这个是基于视角的法向量
+    normalized_view_coord = vec3(normalize(model_view_matrix * normalized_world_coord));
 }
