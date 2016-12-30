@@ -29,7 +29,7 @@ public:
 	Character* getMajorCharacter();
 	void setSky(GameObject* sky);
 	GameObject* getSky();
-	void simulateGameWorld(GMint fps);
+	void simulateGameWorld(GMfloat elapsed);
 	void renderGameWorld();
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 

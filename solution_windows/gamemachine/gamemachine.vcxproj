@@ -33,6 +33,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\spheregameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
@@ -45,6 +46,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\algorithm.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\camera.h" />
@@ -75,6 +77,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\spheregameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
@@ -86,6 +89,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\algorithm.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />

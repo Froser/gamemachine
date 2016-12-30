@@ -29,6 +29,7 @@ typedef GLint GMint;
 typedef GLuint GMuint;
 typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
+typedef GMuint GMvertexoffset;
 #define LINE_MAX 256
 
 // Callbacks settings

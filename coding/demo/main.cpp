@@ -25,6 +25,7 @@
 #include "gmengine/elements/cubegameobject.h"
 #include "gmengine/elements/convexhullgameobject.h"
 #include "gmengine/elements/skygameobject.h"
+#include "gmengine/elements/spheregameobject.h"
 
 using namespace gm;
 
@@ -95,9 +96,9 @@ public:
 			character->jump();
 	}
 
-	void logicalFrame()
+	void logicalFrame(GMfloat elapsed)
 	{
-		world.simulateGameWorld(m_gl->getSettings().fps);
+		world.simulateGameWorld(elapsed);
 	}
 
 	GameLoop* m_gl;
@@ -110,6 +111,7 @@ GameLoop gl(s, &handler);
 void init()
 {
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glEnable(GL_POLYGON_SMOOTH);
 
 	std::string currentPath("D:\\shaders\\test\\");//Path::getCurrentPath();
 
@@ -229,9 +231,26 @@ void init()
 		Image* tex;
 		ImageReader::load("D:\\env.dds", &tex);
 		GMGLTexture* texture = new GMGLTexture(tex);
-		SkyGameObject* sky = new SkyGameObject(500, texture);
+		SkyGameObject* sky = new SkyGameObject(1000, texture);
 		sky->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, sky->getObject()));
 		world.setSky(sky);
+	}
+
+	{
+		//Image* tex;
+		//ImageReader::load("D:\\test.bmp", &tex);
+		//GMGLTexture* texture = new GMGLTexture(tex);
+
+		btTransform sphereTrans;
+		sphereTrans.setIdentity();
+		sphereTrans.setOrigin(btVector3(0, 40, 40));
+		Material m = {
+			 { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ .5, .5, .5 }, 1
+		};
+		SphereGameObject* sphere = new SphereGameObject(20, 30, 30, sphereTrans, m);
+		sphere->setMass(20);
+		sphere->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, sphere->getObject()));
+		world.appendObject(sphere);
 	}
 
 	glEnable(GL_LINE_SMOOTH);
@@ -293,7 +312,7 @@ int WINAPI WinMain(
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);
 
-	GameLoopUtilities::gm_gl_registerGameLoop(gl);
+	gl.start();
 
 	glutMainLoop();
 

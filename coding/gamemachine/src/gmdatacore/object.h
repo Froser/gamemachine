@@ -93,12 +93,12 @@ public:
 		return m_material;
 	}
 
-	void setOffset(GMuint offset)
+	void setOffset(GMvertexoffset offset)
 	{
 		m_offset = offset;
 	}
 
-	GMuint getOffset()
+	GMvertexoffset getOffset()
 	{
 		return m_offset;
 	}
@@ -127,7 +127,7 @@ public:
 
 private:
 	GMuint m_verticesCount;
-	GMuint m_offset;
+	GMvertexoffset m_offset;
 	Material m_material;
 	GMuint m_edgeCountPerPolygon;
 
@@ -156,7 +156,7 @@ public:
 		return m_painter;
 	}
 
-	void appendComponent(AUTORELEASE Component* component, GMuint count);
+	void appendComponent(AUTORELEASE Component* component, GMuint verticesCount);
 
 	std::vector<AUTORELEASE Component*>& getComponents()
 	{

@@ -14,7 +14,7 @@ struct IGameHandler
 	virtual void mouse() = 0;
 	virtual void keyboard() = 0;
 	virtual void render() = 0;
-	virtual void logicalFrame() = 0;
+	virtual void logicalFrame(GMfloat elapsed) = 0;
 };
 
 class GameLoop
@@ -24,13 +24,15 @@ public:
 
 public:
 	void drawFrame();
-	void messageLoop();
 
+	void start();
 	void terminate();
 	bool isTerminated();
 
 	GMint getCurrentFPS() { return m_currentFps; }
 	const GameLoopSettings& getSettings() const { return m_settings; }
+
+	void exit();
 
 private:
 	void updateSettings();
@@ -42,7 +44,9 @@ private:
 	GMfloat m_eachFrameElapse;
 	GMint m_currentFps;
 	Stopwatch m_drawStopwatch;
+	Stopwatch m_logicStopwatch;
 	bool m_terminate;
+	GMfloat m_timeElapsed;
 };
 
 class GameLoopUtilities

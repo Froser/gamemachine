@@ -77,7 +77,7 @@ void GMGLGraphicEngine::setEyeViewport()
 	const GMGLShadowMapping::State& state = m_shadowMapping.getState();
 	glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
 	GMGL::uniformMatrix4(m_shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
-	GMGL::perspective(30, 2, 1, 800, m_shaders, GMSHADER_PROJECTION_MATRIX);
+	GMGL::perspective(30, 2, 1, 2000, m_shaders, GMSHADER_PROJECTION_MATRIX);
 }
 
 void GMGLGraphicEngine::activeShadowTexture()
@@ -95,6 +95,7 @@ void GMGLGraphicEngine::beginSetSky()
 	{
 		GMGL::uniformTextureIndex(m_shaders, TextureTypeReflectionCubeMap, getTextureUniformName(TextureTypeReflectionCubeMap));
 		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
+		ASSERT(info.texture);
 		info.texture->beginTexture(TextureTypeReflectionCubeMap);
 	}
 }

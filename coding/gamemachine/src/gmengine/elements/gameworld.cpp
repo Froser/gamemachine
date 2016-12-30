@@ -45,9 +45,9 @@ GameObject* GameWorld::getSky()
 	return dataRef().m_sky;
 }
 
-void GameWorld::simulateGameWorld(GMint fps)
+void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
-	dataRef().m_dynamicsWorld->stepSimulation(1.f / fps);
+	dataRef().m_dynamicsWorld->stepSimulation(elapsed, 0);
 	dataRef().m_character->simulateCamera();
 }
 
