@@ -22,23 +22,23 @@ void GMGLObjectPainter::init()
 
 	Object* obj = getObject();
 
-	GLuint vao[1];
-	glGenVertexArrays(1, &vao[0]);
-	glBindVertexArray(vao[0]);
-	getObject()->setArrayId(vao[0]);
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	getObject()->setArrayId(vao);
 
 	GLuint vaoSize = sizeof(Object::DataType) * obj->vertices().size();
 	GLuint normalSize = sizeof(Object::DataType) * obj->normals().size();
 	GLuint uvSize = sizeof(Object::DataType) * obj->uvs().size();
 
-	GLuint vbo[1];
-	glGenBuffers(1, &vbo[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+	GLuint vbo;
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize, NULL, GL_STATIC_DRAW);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, vaoSize, obj->vertices().data());
 	glBufferSubData(GL_ARRAY_BUFFER, vaoSize, normalSize, obj->normals().data());
 	glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize, uvSize, obj->uvs().data());
-	obj->setBufferId(vbo[0]);
+	obj->setBufferId(vbo);
 
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (void*)vaoSize);

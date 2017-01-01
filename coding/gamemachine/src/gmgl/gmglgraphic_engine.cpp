@@ -51,6 +51,7 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 	{
 		DrawingItem& item = *iter;
 		GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
+
 		if (!shadowMapping)
 		{
 			setEyeViewport();

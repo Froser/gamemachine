@@ -267,7 +267,7 @@ void init()
 	GMfloat ambient[3] = { .5, .5, .5 };
 	lightCtrl.setAmbient(ambient);
 
-	GMfloat pos[3] = { 400,400,400 };
+	GMfloat pos[3] = { 200,200,200 };
 	lightCtrl.setLightPosition(pos);
 	lightCtrl.setLightColor(ambient);
 }

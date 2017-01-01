@@ -35,4 +35,7 @@ typedef GMuint GMvertexoffset;
 // Callbacks settings
 #ifdef USE_OPENGL
 #define GRAPHIC_ENGINE new GMGLGraphicEngine()
+#define ASSERT_GL() (glGetError() == GL_NO_ERROR)
+#else
+#define ASSERT_GL()
 #endif
