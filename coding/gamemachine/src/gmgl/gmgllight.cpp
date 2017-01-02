@@ -3,12 +3,16 @@
 #include "gmglshaders.h"
 #include "shader_constants.h"
 #include "utilities/vmath.h"
+#include "utilities/assert.h"
 
 static void setVec4(GMGLShaders& s, char* name, GMfloat* value)
 {
 	GLuint loc = glGetUniformLocation(s.getProgram(), name);
+	ASSERT_GL();
+
 	GMfloat vec[4] = { value[0], value[1], value[2], 1.0f };
 	glUniform4fv(loc, 1, vec);
+	ASSERT_GL();
 }
 
 static void setFloat(GMGLShaders& s, char* name, GMfloat value)

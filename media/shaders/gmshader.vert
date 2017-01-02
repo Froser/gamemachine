@@ -1,13 +1,13 @@
-#version 400
+#version 330
 
+uniform mat4 GM_shadow_matrix;
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_model_matrix;
 uniform mat4 GM_projection_matrix;
-uniform mat4 GM_shadow_matrix;
 
-uniform vec4 light_position;
-uniform vec4 view_position;
-uniform float light_shininess;
+uniform vec4 GM_light_position;
+uniform vec4 GM_view_position;
+uniform float GM_light_shininess;
 
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 normal;
@@ -28,7 +28,7 @@ struct _Coords
     vec4 position;
 
     // 变换后的世界坐标标准法向量
-    vec4 worldNormalCoord;
+    vec3 worldNormalCoord;
 
     // 灯光照射方向（目前灯光最多数量为1）
     vec3 lightDirection;
@@ -65,8 +65,8 @@ out _LightFactors lightFactors;
 // 由顶点变换矩阵计算法向量变换矩阵
 mat4 calcNormalWorldTransformMatrix(mat4 modelMatrix)
 {
-    mat4 normalInverseMatrix = inverse(modelMatrix);
-    mat4 normalWorldTransformMatrix = transpose(normalInverseMatrix);
+    mat4 normalInverseMatrix = transpose(modelMatrix);
+    mat4 normalWorldTransformMatrix = inverse(normalInverseMatrix);
     return normalWorldTransformMatrix;
 }
 
@@ -76,9 +76,13 @@ _Coords calcCoords()
     coords.worldCoord = GM_model_matrix * position;
     coords.modelViewCoord = GM_view_matrix * coords.worldCoord;
     coords.position = GM_projection_matrix * coords.modelViewCoord;
-    coords.worldNormalCoord = normalize(calcNormalWorldTransformMatrix(GM_model_matrix) * normal);
-    coords.lightDirection = normalize(light_position.xyz - coords.worldCoord.xyz);
-    coords.viewDirection = normalize(view_position.xyz - coords.worldCoord.xyz);
+
+    mat4 normalTransform = calcNormalWorldTransformMatrix(GM_model_matrix);
+    vec4 normalWorld = normalTransform * normal;
+    coords.worldNormalCoord = normalize(normalWorld.xyz);
+
+    coords.lightDirection = normalize(GM_light_position.xyz - coords.worldCoord.xyz);
+    coords.viewDirection = normalize(GM_view_position.xyz - coords.worldCoord.xyz);
     coords.shadowCoord = GM_shadow_matrix * coords.worldCoord;
     return coords;
 }
@@ -94,22 +98,29 @@ _TextureUVs calcTexture(vec3 viewDirection)
 // 计算漫反射率
 float calcDiffuse(_Coords coords)
 {
-    return dot(coords.lightDirection, vec3(coords.worldNormalCoord));
+    float diffuse = dot(coords.lightDirection, coords.worldNormalCoord);
+    diffuse = clamp(diffuse, 0.0f, 1.0f);
+    return diffuse;
 }
 
 // 计算镜面反射率
 float calcSpecular(_Coords coords, float shininess)
 {
-    vec3 halfVector = 0.5 * (coords.lightDirection + coords.viewDirection);
-    float specularPower = dot(halfVector, coords.worldNormalCoord.xyz);
-    return pow(specularPower, shininess);
+    vec3 halfVector = normalize(coords.lightDirection + coords.viewDirection);
+    float specularPower = dot(halfVector, coords.worldNormalCoord);
+    float specular = pow(specularPower, GM_light_shininess);
+    specular = clamp(specular, 0.0f, 1.0f);
+
+    return specular;
 }
 
 _LightFactors calcLightFactors(_Coords coords)
 {
     _LightFactors lightFactors;
     lightFactors.diffuse = calcDiffuse(coords);
-    lightFactors.specular = calcSpecular(coords, light_shininess);
+
+    float shininess = GM_light_shininess;
+    lightFactors.specular = calcSpecular(coords, shininess);
     return lightFactors;
 }
 
@@ -118,5 +129,7 @@ void main(void)
     coords = calcCoords();
     textureUVs = calcTexture(coords.viewDirection);
     lightFactors = calcLightFactors(coords);
+    //if (lightFactors.diffuse <= 0.001)
+        //return;
     gl_Position = coords.position;
 }

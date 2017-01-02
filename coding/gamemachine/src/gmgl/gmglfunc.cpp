@@ -4,13 +4,13 @@
 #include "gmgllight.h"
 #include "utilities/vmath.h"
 #include "utilities/camera.h"
+#include "utilities/assert.h"
 
 void IMPL projection(const vmath::mat4& mat, GMGLShaders& shaders, const char* projectionMatrixName)
 {
-	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), projectionMatrixName);
-	ASSERT_GL();
+	GLint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), projectionMatrixName);
+	CHECK_GL_LOC(projectionMatrixLocation);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
-	ASSERT_GL();
 }
 
 void IMPL frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f, GMGLShaders& shaders, const char* projectionMatrixName)
@@ -28,7 +28,7 @@ void IMPL perspective(float fovy, float aspect, float n, float f, GMGLShaders& s
 void IMPL lookAt(Camera& camera, GMGLShaders& shaders, const char* viewMatrixName)
 {
 	CameraLookAt c = camera.getCameraLookAt();
-	GLuint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
+	GLint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
 	ASSERT_GL();
 
 	GMfloat vec[4] = { c.position_x, c.position_y, c.position_z, 1.0f };
@@ -41,34 +41,30 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, const char* viewMatrixNam
 	);
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
-	ASSERT_GL();
+	CHECK_GL_LOC(viewMatrixLocation);
 }
 
 void IMPL uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixName)
 {
-	GLuint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), matrixName);
-	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
-	ASSERT_GL();
+	GLint loc = glGetUniformLocation(shaders.getProgram(), matrixName);
+	glUniformMatrix4fv(loc, 1, GL_FALSE, mat);
 }
 
 void IMPL uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textureName)
 {
-	GLenum e;
-	glUniform1i(glGetUniformLocation(shaders.getProgram(), textureName), id);
-	ASSERT_GL();
-	char _switch[64] = "has_";
+	GLint loc = glGetUniformLocation(shaders.getProgram(), textureName);
+	glUniform1i(loc, id);
+	char _switch[64] = "";
 	strcat(_switch, textureName);
-	GLint loc = glGetUniformLocation(shaders.getProgram(), _switch);
-	ASSERT_GL();
+	strcat(_switch, "_switch");
+	loc = glGetUniformLocation(shaders.getProgram(), _switch);
 	glUniform1i(loc, 1);
-	ASSERT_GL();
 }
 
 void IMPL disableTexture(GMGLShaders& shaders, const char* textureName)
 {
-	char _switch[64];
+	char _switch[64] = "";
 	strcat(_switch, textureName);
 	strcat(_switch, "_switch");
 	glUniform1i(glGetUniformLocation(shaders.getProgram(), _switch), 0);
-	ASSERT_GL();
 }

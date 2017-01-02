@@ -88,7 +88,7 @@ void GMGLShadowMapping::beginDrawDepthBuffer()
 	);
 	GMGL::uniformMatrix4(m_shaders, m_state.lightViewMatrix, GMSHADER_VIEW_MATRIX);
 
-	m_state.lightProjectionMatrix = vmath::perspective(30, 2, 1, 800);
+	m_state.lightProjectionMatrix = vmath::perspective(30, 2, 1, 2000);
 	GMGL::projection(m_state.lightProjectionMatrix, m_shaders, GMSHADER_PROJECTION_MATRIX);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);

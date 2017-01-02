@@ -23,6 +23,8 @@ GMGLShaders::~GMGLShaders()
 void GMGLShaders::useProgram()
 {
 	glUseProgram(m_shaderProgram);
+	GLint i = glGetError();
+	ASSERT_GL();
 }
 
 void GMGLShaders::appendShader(const GMGLShaderInfo& shader)

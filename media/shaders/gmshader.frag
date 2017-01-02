@@ -1,6 +1,4 @@
-#version 400 core
-#define ZERO_BREAK(n) if (n <= 0.001) return;
-#define MORE_THAN_ONE_BREAK(n) if (n >= 1) return;
+#version 330 core
 
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
@@ -37,7 +35,7 @@ struct _Coords
     vec4 position;
 
     // 变换后的世界坐标标准法向量
-    vec4 worldNormalCoord;
+    vec3 worldNormalCoord;
 
     // 灯光照射方向（目前灯光最多数量为1）
     vec3 lightDirection;
@@ -79,15 +77,10 @@ float calcuateShadeFactor(_Coords coords)
 		return 0;
 
 	float shadeFactor = 0.0;
-
 	shadeFactor += textureProjOffset(GM_shadow_texture, coords.shadowCoord, ivec2(-1, -1));
-
 	shadeFactor += textureProjOffset(GM_shadow_texture, coords.shadowCoord, ivec2(1, -1));
-
 	shadeFactor += textureProjOffset(GM_shadow_texture, coords.shadowCoord, ivec2(-1, 1));
-
 	shadeFactor += textureProjOffset(GM_shadow_texture, coords.shadowCoord, ivec2(1, 1));
-
 	shadeFactor /= 4;
 
 	return shadeFactor;
@@ -115,7 +108,7 @@ void drawObject()
 	// 根据环境反射度来反射天空盒（如果有的话）
 	if (GM_reflection_cubemap_texture_switch == 1)
 	{
-		vec3 reflectionCoord = reflect(-coords.viewDirection, coords.worldNormalCoord.xyz); //- coords.viewDirection;
+		vec3 reflectionCoord = reflect(-coords.viewDirection, coords.worldNormalCoord.xyz);
 		// 乘以shadeFactor是因为阴影会遮挡反射光
 		if (GM_light_ke.x > 0 && GM_light_ke.y > 0 && GM_light_ke.z > 0)
 		{
@@ -125,7 +118,7 @@ void drawObject()
 	}
 
 	// 最终结果
-	vec3 color = specularLight;// ambientLight + min(shadeFactor + 0.3, 1) * (diffuseLight + specularLight);
+	vec3 color = ambientLight + min(shadeFactor + 0.3, 1) * (diffuseLight + specularLight);
 	frag_color = vec4(color, 1.0f);
 }
 
