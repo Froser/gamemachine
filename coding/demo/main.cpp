@@ -105,8 +105,7 @@ public:
 };
 
 GameHandler handler;
-GameLoop gl(s, &handler);
-
+GameLoop* gl = GameLoop::getInstance();
 
 void init()
 {
@@ -261,8 +260,9 @@ void init()
 	Camera& camera = world.getMajorCharacter()->getCamera();
 	camera.mouseInitReaction(wx, wy, width, height);
 
-	handler.setGameLoop(&gl);
+	handler.setGameLoop(gl);
 	camera.setSensibility(.25f);
+	gl->init(s, &handler);
 
 	GMfloat ambient[3] = { .5, .5, .5 };
 	lightCtrl.setAmbient(ambient);
@@ -312,7 +312,7 @@ int WINAPI WinMain(
 	glutReshapeFunc(resharp);
 	glutDisplayFunc(render);
 
-	gl.start();
+	gl->start();
 
 	glutMainLoop();
 

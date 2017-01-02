@@ -4,13 +4,42 @@
 #include "GL/freeglut.h"
 #include "utilities/assert.h"
 
-GameLoop::GameLoop(const GameLoopSettings& settings, IGameHandler* handler)
-	: m_settings(settings)
-	, m_running(false)
-	, m_handler(handler)
+static void renderLoop(int i)
+{
+	if (i == 0)
+	{
+		GameLoop* loop = GameLoop::getInstance();
+		loop->drawFrame();
+		if (!loop->isTerminated())
+			glutTimerFunc(1, renderLoop, 0);
+		else
+			loop->exit();
+	}
+}
+
+GameLoop* GameLoop::getInstance()
+{
+	static GameLoop s_gameLoop;
+	return &s_gameLoop;
+}
+
+GameLoop::GameLoop()
+	: m_running(false)
 	, m_terminate(false)
 	, m_timeElapsed(1.f / 60.f)
+	, m_handler(nullptr)
 {
+}
+
+GameLoop::~GameLoop()
+{
+
+}
+
+void GameLoop::init(const GameLoopSettings& settings, IGameHandler* handler)
+{
+	m_settings = settings;
+	m_handler = handler;
 	updateSettings();
 }
 
@@ -28,11 +57,7 @@ void GameLoop::drawFrame()
 
 void GameLoop::start()
 {
-	while (!isTerminated())
-	{
-		drawFrame();
-	}
-	exit();
+	glutTimerFunc(1, renderLoop, 0);
 }
 
 void GameLoop::terminate()

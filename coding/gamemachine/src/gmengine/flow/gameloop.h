@@ -20,9 +20,14 @@ struct IGameHandler
 class GameLoop
 {
 public:
-	GameLoop(const GameLoopSettings& settings, IGameHandler* handler);
+	static GameLoop* getInstance();
+	~GameLoop();
+
+private:
+	GameLoop();
 
 public:
+	void init(const GameLoopSettings& settings, IGameHandler* handler);
 	void drawFrame();
 
 	void start();
@@ -47,16 +52,6 @@ private:
 	Stopwatch m_logicStopwatch;
 	bool m_terminate;
 	GMfloat m_timeElapsed;
-};
-
-class GameLoopUtilities
-{
-public:
-	static void gm_gl_registerGameLoop(GameLoop& gl);
-	static GameLoop* getRegisteredGameLoop() { return s_gameLoop; }
-
-private:
-	static GameLoop* s_gameLoop;
 };
 END_NS
 #endif
