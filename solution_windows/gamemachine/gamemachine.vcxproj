@@ -88,7 +88,9 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\algorithm.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
