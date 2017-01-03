@@ -2,7 +2,7 @@
 #define __GMMAP_H__
 #include "common.h"
 #include <string>
-#include <vector>
+#include <set>
 #include "gmdatacore/object.h"
 
 BEGIN_NS
@@ -20,6 +20,26 @@ public:
 	}
 };
 
+template <typename T>
+class ID_Less
+{
+public:
+	bool operator ()(const T& left, const T& right)
+	{
+		return left.id < right.id;
+	}
+};
+
+template <typename T>
+const T* GMMap_find(std::set<T, ID_Less<T>>& set, T& key)
+{
+	auto it = set.find(key);
+	if (it == set.end())
+		return nullptr;
+
+	return &(*it);
+}
+
 struct GMMapMeta
 {
 	GMMapString author;
@@ -28,16 +48,10 @@ struct GMMapMeta
 
 struct GMMapTexture
 {
-	enum GMMapTexturesType
-	{
-		Error = -1,
-		Ambient,
-	};
-
-	static GMMapTexturesType getType(const char* name);
+	static TextureType getType(const char* name);
 
 	ID id;
-	GMMapTexturesType type;
+	TextureType type;
 	GMMapString path;
 };
 
@@ -46,6 +60,7 @@ struct GMMapObject
 	enum GMMapObjectType
 	{
 		Error = -1,
+		Default,
 		FromFile,
 		Cube,
 		Sphere,
@@ -57,6 +72,8 @@ struct GMMapObject
 	ID id;
 	GMMapObjectType type;
 	GMMapString path;
+	GMfloat width, height, depth;
+	GMfloat slices, stacks, radius;
 };
 
 struct GMMapMaterial
@@ -67,38 +84,34 @@ struct GMMapMaterial
 
 struct GMMapEntity
 {
+	enum
+	{
+		MAX_REF = 6
+	};
+
 	ID id;
 	ID objRef;
-	ID materialRef_0;
-	ID materialRef_1;
-	ID materialRef_2;
-	ID materialRef_3;
-	ID materialRef_4;
-	ID materialRef_5;
-	ID textureRef_0;
-	ID textureRef_1;
-	ID textureRef_2;
-	ID textureRef_3;
-	ID textureRef_4;
-	ID textureRef_5;
+	ID materialRef[MAX_REF];
+	ID textureRef[MAX_REF];
 };
 
 struct GMMapInstance
 {
 	ID id;
 	ID entityRef;
-	GMfloat x, y, z, radius, scale;
+	GMfloat x, y, z;
+	GMfloat scale[3];
 	GMfloat mass;
 };
 
 struct GMMap
 {
 	GMMapMeta meta;
-	std::vector<GMMapTexture> textures;
-	std::vector<GMMapObject> objects;
-	std::vector<GMMapMaterial> materials;
-	std::vector<GMMapEntity> entities;
-	std::vector<GMMapInstance> instances;
+	std::set<GMMapTexture, ID_Less<GMMapTexture>> textures;
+	std::set<GMMapObject, ID_Less<GMMapObject>> objects;
+	std::set<GMMapMaterial, ID_Less<GMMapMaterial>> materials;
+	std::set<GMMapEntity, ID_Less<GMMapEntity>> entities;
+	std::set<GMMapInstance, ID_Less<GMMapInstance>> instances;
 	std::string workingDir;
 };
 

@@ -22,8 +22,6 @@ public:
 
 public:
 	void initialize();
-
-public:
 	void appendObject(AUTORELEASE GameObject* obj);
 	void setMajorCharacter(Character* character);
 	Character* getMajorCharacter();
@@ -34,6 +32,7 @@ public:
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 
 	IGraphicEngine* getGraphicEngine();
+	void setGraphicEngine(IGraphicEngine* engine);
 };
 
 END_NS

@@ -31,6 +31,7 @@ private:
 
 enum TextureType
 {
+	TextureTypeUnknown = -1,
 	TextureTypeShadow = 0,
 
 	// 从Start到End表示每个对象绘制时需要清理掉的纹理

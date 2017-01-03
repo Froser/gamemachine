@@ -8,7 +8,6 @@
 GameWorldPrivate::GameWorldPrivate()
 	: m_character(nullptr)
 	, m_sky(nullptr)
-	, m_pEngine(GRAPHIC_ENGINE)
 {
 
 }

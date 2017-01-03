@@ -32,7 +32,7 @@ bool handleTextures(TiXmlElement& elem, GMMap* map)
 		SAFE_SSCANF(child->Attribute("id"), "%i", &texture.id);
 		texture.path = child->Attribute("path");
 		texture.type = GMMapTexture::getType(child->Attribute("type"));
-		map->textures.push_back(texture);
+		map->textures.insert(texture);
 	}
 
 	return true;
@@ -44,9 +44,15 @@ bool handleObjects(TiXmlElement& elem, GMMap* map)
 	{
 		GMMapObject object = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &object.id);
+		SAFE_SSCANF(child->Attribute("width"), "%f", &object.width);
+		SAFE_SSCANF(child->Attribute("height"), "%f", &object.depth);
+		SAFE_SSCANF(child->Attribute("depth"), "%f", &object.height);
+		SAFE_SSCANF(child->Attribute("radius"), "%f", &object.radius);
+		SAFE_SSCANF(child->Attribute("slices"), "%f", &object.slices);
+		SAFE_SSCANF(child->Attribute("stacks"), "%f", &object.stacks);
 		object.path = child->Attribute("path");
 		object.type = GMMapObject::getType(child->Attribute("type"));
-		map->objects.push_back(object);
+		map->objects.insert(object);
 	}
 
 	return true;
@@ -91,7 +97,7 @@ bool handleMaterals(TiXmlElement& elem, GMMap* map)
 		if (shininess)
 			SAFE_SSCANF(shininess, "%f", &material.material.shininess);
 
-		map->materials.push_back(material);
+		map->materials.insert(material);
 	}
 	return true;
 }
@@ -103,19 +109,47 @@ bool handleEntities(TiXmlElement& elem, GMMap* map)
 		GMMapEntity entity = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &entity.id);
 		SAFE_SSCANF(child->Attribute("objref"), "%i", &entity.objRef);
-		SAFE_SSCANF(child->Attribute("textureref_0"), "%i", &entity.textureRef_0);
-		SAFE_SSCANF(child->Attribute("textureref_1"), "%i", &entity.textureRef_1);
-		SAFE_SSCANF(child->Attribute("textureref_2"), "%i", &entity.textureRef_2);
-		SAFE_SSCANF(child->Attribute("textureref_3"), "%i", &entity.textureRef_3);
-		SAFE_SSCANF(child->Attribute("textureref_4"), "%i", &entity.textureRef_4);
-		SAFE_SSCANF(child->Attribute("textureref_5"), "%i", &entity.textureRef_5);
-		SAFE_SSCANF(child->Attribute("materialref_0"), "%i", &entity.materialRef_0);
-		SAFE_SSCANF(child->Attribute("materialref_1"), "%i", &entity.materialRef_1);
-		SAFE_SSCANF(child->Attribute("materialref_2"), "%i", &entity.materialRef_2);
-		SAFE_SSCANF(child->Attribute("materialref_3"), "%i", &entity.materialRef_3);
-		SAFE_SSCANF(child->Attribute("materialref_4"), "%i", &entity.materialRef_4);
-		SAFE_SSCANF(child->Attribute("materialref_5"), "%i", &entity.materialRef_5);
-		map->entities.push_back(entity);
+
+		{
+			const char* r = child->Attribute("textureref");
+			if (r)
+			{
+				for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
+				{
+					SAFE_SSCANF(r, "%i", &entity.textureRef[i]);
+				}
+			}
+
+			for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
+			{
+				char ref[32] = "textureref_";
+				char str[32];
+				sprintf(str, "%d", i + 1);
+				strcat(ref, str);
+				SAFE_SSCANF(child->Attribute(ref), "%i", &entity.textureRef[i]);
+			}
+		}
+
+		{
+			const char* r = child->Attribute("materialref");
+			if (r)
+			{
+				for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
+				{
+					SAFE_SSCANF(r, "%i", &entity.materialRef[i]);
+				}
+			}
+
+			for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
+			{
+				char ref[32] = "materialref_";
+				char str[32];
+				sprintf(str, "%d", i + 1);
+				strcat(ref, str);
+				SAFE_SSCANF(child->Attribute(ref), "%i", &entity.materialRef[i]);
+			}
+		}
+		map->entities.insert(entity);
 	}
 
 	return true;
@@ -126,22 +160,35 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
 		GMMapInstance instance = { 0 };
-		SAFE_SSCANF(child->Attribute("id"), "%f", &instance.id);
+		SAFE_SSCANF(child->Attribute("id"), "%i", &instance.id);
+		SAFE_SSCANF(child->Attribute("entityref"), "%i", &instance.entityRef);
 		SAFE_SSCANF(child->Attribute("x"), "%f", &instance.x);
 		SAFE_SSCANF(child->Attribute("y"), "%f", &instance.y);
 		SAFE_SSCANF(child->Attribute("z"), "%f", &instance.z);
-		SAFE_SSCANF(child->Attribute("radius"), "%f", &instance.radius);
-		SAFE_SSCANF(child->Attribute("scale"), "%f", &instance.scale);
 		SAFE_SSCANF(child->Attribute("mass"), "%f", &instance.mass);
-		map->instances.push_back(instance);
+
+		Scanner scanner (child->Attribute("scale"));
+		scanner.nextFloat(&instance.scale[0]);
+		bool b = scanner.nextFloat(&instance.scale[1]);
+		if (b)
+		{
+			scanner.nextFloat(&instance.scale[2]);
+		}
+		else
+		{
+			instance.scale[1] = instance.scale[0];
+			instance.scale[2] = instance.scale[0];
+		}
+
+		map->instances.insert(instance);
 	}
 
 	return true;
 }
 
-struct __rootFuncs
+struct __Handlers
 {
-	__rootFuncs()
+	__Handlers()
 	{
 		__map["meta"] = handleMeta;
 		__map["textures"] = handleTextures;
@@ -156,7 +203,7 @@ struct __rootFuncs
 
 __Handler& getFunc(const char* name)
 {
-	static __rootFuncs rootFuncs;
+	static __Handlers rootFuncs;
 	return rootFuncs.__map[name];
 }
 

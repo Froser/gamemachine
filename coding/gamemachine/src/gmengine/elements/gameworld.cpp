@@ -73,5 +73,11 @@ void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
 
 IGraphicEngine* GameWorld::getGraphicEngine()
 {
+	ASSERT(dataRef().m_pEngine);
 	return dataRef().m_pEngine;
+}
+
+void GameWorld::setGraphicEngine(IGraphicEngine* engine)
+{
+	dataRef().m_pEngine.reset(engine);
 }

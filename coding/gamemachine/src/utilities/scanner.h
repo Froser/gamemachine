@@ -8,9 +8,9 @@ typedef bool(*CharPredicate)(char in);
 class Scanner
 {
 public:
-	Scanner(const char* line);
-	Scanner(const char* line, CharPredicate predicate);
-	Scanner(const char* line, bool skipSame, CharPredicate predicate);
+	explicit Scanner(const char* line);
+	explicit Scanner(const char* line, CharPredicate predicate);
+	explicit Scanner(const char* line, bool skipSame, CharPredicate predicate);
 
 public:
 	void next(char* out);

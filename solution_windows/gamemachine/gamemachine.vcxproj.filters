@@ -184,6 +184,15 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.h">
       <Filter>src\utilities\tinyxml</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.h">
+      <Filter>src\gmdatacore\gmmap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\factory.h">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h">
+      <Filter>src\gmgl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -320,6 +329,15 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.cpp">
       <Filter>src\utilities\tinyxml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.cpp">
+      <Filter>src\gmdatacore\gmmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\factory.cpp">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp">
+      <Filter>src\gmgl</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

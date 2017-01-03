@@ -31,8 +31,3 @@ typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
 typedef GMuint GMvertexoffset;
 #define LINE_MAX 256
-
-// Callbacks settings
-#ifdef USE_OPENGL
-#define GRAPHIC_ENGINE new GMGLGraphicEngine()
-#endif

@@ -27,6 +27,8 @@
 #include "gmengine/elements/skygameobject.h"
 #include "gmengine/elements/spheregameobject.h"
 #include "gmdatacore/gmmap/gmmapreader.h"
+#include "gmdatacore/gmmap/gameworldcreator.h"
+#include "gmgl/gmglfactory.h"
 
 using namespace gm;
 
@@ -38,8 +40,9 @@ GLfloat eyeX = 0, eyeY = 0, eyeZ = 5;
 GMfloat fps = 60;
 GameLoopSettings s = { fps };
 
-GameWorld world;
+GameWorld* world;
 Character* character;
+GMGLFactory factory;
 
 class GameHandler : public IGameHandler
 {
@@ -51,20 +54,20 @@ public:
 
 	void render()
 	{
-		Camera& camera = world.getMajorCharacter()->getCamera();
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
+		Camera& camera = world->getMajorCharacter()->getCamera();
+		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
 		GMGLShaders& shaders = engine->getShaders();
 
-		world.renderGameWorld();
+		world->renderGameWorld();
 
 		glutSwapBuffers();
 	}
 
 	void mouse()
 	{
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
+		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
 		GMGLShaders& shaders = engine->getShaders();
-		Camera& camera = world.getMajorCharacter()->getCamera();
+		Camera& camera = world->getMajorCharacter()->getCamera();
 		GMGL::lookAt(camera, shaders, GMSHADER_VIEW_MATRIX);
 		int wx = glutGet(GLUT_WINDOW_X),
 			wy = glutGet(GLUT_WINDOW_Y);
@@ -73,7 +76,7 @@ public:
 
 	void keyboard()
 	{
-		Character* character = world.getMajorCharacter();
+		Character* character = world->getMajorCharacter();
 		Camera* camera = &character->getCamera();
 		GMfloat dis = 25;
 		GMfloat v = dis / fps;
@@ -95,7 +98,7 @@ public:
 
 	void logicalFrame(GMfloat elapsed)
 	{
-		world.simulateGameWorld(elapsed);
+		world->simulateGameWorld(elapsed);
 	}
 
 	GameLoop* m_gl;
@@ -106,23 +109,21 @@ GameLoop* gl = GameLoop::getInstance();
 
 void init()
 {
-	GMMap* map;
-	GMMapReader::ReadGMM("D:\\gmm\\demo.xml", &map);
-
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_POLYGON_SMOOTH);
 
-	std::string currentPath("D:\\shaders\\test\\");//Path::getCurrentPath();
+	GMMap* map;
+	GMMapReader::ReadGMM("D:\\gmm\\demo.xml", &map);
+	GameWorldCreator::createGameWorld(&factory, map, &world);
 
-	world.initialize();
-
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world.getGraphicEngine());
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
 	GMGLShaders& shaders = engine->getShaders();
 	ILightController& lightCtrl = engine->getLightController();
 
 	GMGLShadowMapping& shadow = engine->getShadowMapping();
 	GMGLShaders& shadowShaders = shadow.getShaders();
 
+	std::string currentPath("D:\\shaders\\test\\");//Path::getCurrentPath();
 	{
 		std::string vert = std::string(currentPath).append("gmshader.vert"),
 			frag = std::string(currentPath).append("gmshader.frag");
@@ -148,7 +149,7 @@ void init()
 		shadowShaders.load();
 	}
 
-	world.setGravity(0, -100, 0);
+	world->setGravity(0, -100, 0);
 
 	{
 		btTransform charTransform;
@@ -157,7 +158,7 @@ void init()
 		character = new Character(charTransform, 10, 10, 15);
 		character->setCanFreeMove(false);
 		character->setJumpSpeed(btVector3(0, 50, 0));
-		world.setMajorCharacter(character);
+		world->setMajorCharacter(character);
 	}
 
 	{
@@ -177,7 +178,7 @@ void init()
 		ground->setMass(0);
 		ground->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, ground->getObject()));
 		ground->getObject()->getPainter()->init();
-		world.appendObject(ground);
+		world->appendObject(ground);
 	}
 
 	{
@@ -199,7 +200,7 @@ void init()
 		CubeGameObject* cube = new CubeGameObject(btVector3(10, 10, 10), boxTrans, m);
 		cube->setMass(20);
 		cube->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, cube->getObject()));
-		world.appendObject(cube);
+		//world->appendObject(cube);
 	}
 
 	{
@@ -223,7 +224,7 @@ void init()
 		convex->setMass(10);
 		convex->setTransform(boxTrans);
 		convex->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, convex->getObject()));
-		world.appendObject(convex);
+		//world->appendObject(convex);
 	}
 
 	{
@@ -232,7 +233,7 @@ void init()
 		GMGLTexture* texture = new GMGLTexture(tex);
 		SkyGameObject* sky = new SkyGameObject(1000, texture);
 		sky->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, sky->getObject()));
-		world.setSky(sky);
+		world->setSky(sky);
 	}
 
 	{
@@ -249,7 +250,7 @@ void init()
 		SphereGameObject* sphere = new SphereGameObject(20, 30, 30, sphereTrans, m);
 		sphere->setMass(20);
 		sphere->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, sphere->getObject()));
-		world.appendObject(sphere);
+		//world->appendObject(sphere);
 	}
 
 	glEnable(GL_LINE_SMOOTH);
@@ -257,7 +258,7 @@ void init()
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
 
-	Camera& camera = world.getMajorCharacter()->getCamera();
+	Camera& camera = world->getMajorCharacter()->getCamera();
 	camera.mouseInitReaction(wx, wy, width, height);
 
 	handler.setGameLoop(gl);

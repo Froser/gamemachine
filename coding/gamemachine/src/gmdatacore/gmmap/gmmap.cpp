@@ -7,17 +7,23 @@ static bool strEqual(const char* str1, const char* str2)
 	return !strcmp(str1, str2);
 }
 
-GMMapTexture::GMMapTexturesType GMMapTexture::getType(const char* name)
+TextureType GMMapTexture::getType(const char* name)
 {
+	if (!name)
+		return TextureTypeAmbient;
+
 	if (strEqual("ambient", name))
-		return GMMapTexture::Ambient;
+		return TextureType::TextureTypeAmbient;
 
 	ASSERT(false);
-	return GMMapTexture::Error;
+	return TextureTypeUnknown;
 }
 
 GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 {
+	if (!name)
+		return GMMapObject::Default;
+
 	if (strEqual("fromfile", name))
 		return GMMapObject::FromFile;
 	if (strEqual("cube", name))

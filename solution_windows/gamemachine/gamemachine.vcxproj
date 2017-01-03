@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
@@ -25,6 +26,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\factory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
@@ -39,6 +41,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h" />
@@ -61,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
@@ -73,6 +77,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\factory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
@@ -87,6 +92,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp" />
