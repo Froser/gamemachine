@@ -19,11 +19,6 @@ static bool strEqual(const char* str1, const char* str2)
 	return !strcmp(str1, str2);
 }
 
-static bool isWhiteSpace(char c)
-{
-	return !!isspace(c);
-}
-
 static bool isSeparator(char c)
 {
 	return c == '/';
@@ -64,7 +59,7 @@ ObjReaderPrivate::~ObjReaderPrivate()
 
 void ObjReaderPrivate::parseLine(const char* line)
 {
-	Scanner scanner(line, isWhiteSpace);
+	Scanner scanner(line);
 	char command[LINE_MAX];
 	scanner.next(command);
 

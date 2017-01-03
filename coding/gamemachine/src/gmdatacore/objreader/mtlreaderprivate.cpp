@@ -21,11 +21,6 @@ static bool strEqual(const char* str1, const char* str2)
 	return !strcmp(str1, str2);
 }
 
-static bool isWhiteSpace(char c)
-{
-	return !!isspace(c);
-}
-
 Materials& MtlReaderPrivate::getMaterials()
 {
 	return m_materials;
@@ -33,7 +28,7 @@ Materials& MtlReaderPrivate::getMaterials()
 
 void MtlReaderPrivate::parseLine(const char* line)
 {
-	Scanner scanner(line, isWhiteSpace);
+	Scanner scanner(line);
 	char command[LINE_MAX];
 	scanner.next(command);
 

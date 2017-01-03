@@ -13,6 +13,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h" />
@@ -53,10 +55,14 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\stopwatch.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\vmath.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp" />
@@ -97,6 +103,10 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\stopwatch.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxmlerror.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxmlparser.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{421D5CC0-A094-40E3-9570-4C0DB51B4B8F}</ProjectGuid>

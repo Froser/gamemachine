@@ -2,6 +2,18 @@
 #include <stdio.h>
 #include "scanner.h"
 
+static bool isWhiteSpace(char c)
+{
+	return !!isspace(c);
+}
+
+Scanner::Scanner(const char* line)
+	: m_p(line)
+	, m_predicate(isWhiteSpace)
+	, m_skipSame(true)
+{
+}
+
 Scanner::Scanner(const char* line, CharPredicate predicate)
 	: m_p(line)
 	, m_predicate(predicate)
@@ -21,6 +33,9 @@ void Scanner::next(char* out)
 {
 	char* p = out;
 	bool b = false;
+	if (!m_p)
+		return;
+
 	while (*m_p && m_predicate(*m_p))
 	{
 		if (b && !m_skipSame)

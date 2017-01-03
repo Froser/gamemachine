@@ -26,6 +26,7 @@
 #include "gmengine/elements/convexhullgameobject.h"
 #include "gmengine/elements/skygameobject.h"
 #include "gmengine/elements/spheregameobject.h"
+#include "gmdatacore/gmmap/gmmapreader.h"
 
 using namespace gm;
 
@@ -39,10 +40,6 @@ GameLoopSettings s = { fps };
 
 GameWorld world;
 Character* character;
-
-GLuint VAOs[1], Buffers[1], EBOs[1];
-
-GLint render_model_matrix_loc;
 
 class GameHandler : public IGameHandler
 {
@@ -109,6 +106,9 @@ GameLoop* gl = GameLoop::getInstance();
 
 void init()
 {
+	GMMap* map;
+	GMMapReader::ReadGMM("D:\\gmm\\demo.xml", &map);
+
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	glEnable(GL_POLYGON_SMOOTH);
 
