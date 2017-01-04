@@ -38,3 +38,17 @@ GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 	ASSERT(false);
 	return GMMapObject::Error;
 }
+
+GMMapLight::GMMapLightType GMMapLight::getType(const char* name)
+{
+	if (!name)
+		return GMMapLight::Specular;
+
+	if (strEqual("ambient", name))
+		return GMMapLight::Ambient;
+	if (strEqual("specular", name))
+		return GMMapLight::Specular;
+
+	ASSERT(false);
+	return GMMapLight::Error;
+}

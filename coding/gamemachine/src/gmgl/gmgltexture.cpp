@@ -164,6 +164,8 @@ void GMGLTexture::beginTexture(GMuint type)
 {
 	const ImageData& image = m_image->getData();
 	glActiveTexture(type + GL_TEXTURE0);
+	glTexParameteri(image.target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(image.target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glBindTexture(image.target, m_id);
 }
 

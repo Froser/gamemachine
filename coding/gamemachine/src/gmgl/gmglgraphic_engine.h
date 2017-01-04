@@ -34,6 +34,7 @@ private:
 	void activeShadowTexture();
 	void beginSetSky();
 	void endSetSky();
+	void activateLights();
 
 private:
 	GMGLShaders m_shaders;

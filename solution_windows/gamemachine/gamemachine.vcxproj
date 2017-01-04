@@ -33,6 +33,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
@@ -85,6 +86,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />

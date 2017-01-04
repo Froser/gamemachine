@@ -30,6 +30,11 @@ GameWorldPrivate::~GameWorldPrivate()
 	{
 		delete *iter;
 	}
+
+	for (auto iter = m_lights.begin(); iter != m_lights.end(); iter++)
+	{
+		delete *iter;
+	}
 }
 
 void GameWorldPrivate::setGravity(GMfloat x, GMfloat y, GMfloat z)
@@ -49,7 +54,7 @@ void GameWorldPrivate::init()
 	m_dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(m_ghostPairCallback);
 }
 
-void GameWorldPrivate::appendObject(GameObject* obj)
+void GameWorldPrivate::appendObject(AUTORELEASE GameObject* obj)
 {
 	if (std::find(m_shapes.begin(), m_shapes.end(), obj) != m_shapes.end())
 		return;
@@ -60,4 +65,12 @@ void GameWorldPrivate::appendObject(GameObject* obj)
 
 	obj->appendObjectToWorld(m_dynamicsWorld);
 	m_shapes.push_back(obj);
+}
+
+void GameWorldPrivate::appendLight(AUTORELEASE GameLight* light)
+{
+	if (std::find(m_lights.begin(), m_lights.end(), light) != m_lights.end())
+		return;
+
+	m_lights.push_back(light);
 }

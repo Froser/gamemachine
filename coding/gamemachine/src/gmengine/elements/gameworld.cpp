@@ -6,6 +6,7 @@
 #include "utilities/assert.h"
 #include "character.h"
 #include "gmengine/controller/graphic_engine.h"
+#include "gmengine/elements/gamelight.h"
 
 GameWorld::GameWorld()
 {
@@ -21,6 +22,17 @@ void GameWorld::appendObject(AUTORELEASE GameObject* obj)
 {
 	dataRef().appendObject(obj);
 	obj->setWorld(this);
+}
+
+void GameWorld::appendLight(AUTORELEASE GameLight* light)
+{
+	dataRef().appendLight(light);
+	light->setWorld(this);
+}
+
+std::vector<GameLight*>& GameWorld::getLights()
+{
+	return dataRef().m_lights;
 }
 
 void GameWorld::setMajorCharacter(Character* character)

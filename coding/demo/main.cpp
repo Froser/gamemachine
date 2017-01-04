@@ -112,7 +112,7 @@ void init()
 	glEnable(GL_POLYGON_SMOOTH);
 
 	GMMap* map;
-	GMMapReader::readGMM("D:\\gmm\\demo.xml", &map);
+	GMMapReader::readGMM("D:\\scene\\demo.xml", &map);
 	GameWorldCreator::createGameWorld(&factory, map, &world);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -174,12 +174,12 @@ void init()
 	camera.setSensibility(.25f);
 	gl->init(s, &handler);
 
-	GMfloat ambient[3] = { .5, .5, .5 };
-	lightCtrl.setAmbient(ambient);
+	//GMfloat ambient[3] = { .5, .5, .5 };
+	//lightCtrl.setAmbient(ambient);
 
-	GMfloat pos[3] = { 300,300,300 };
-	lightCtrl.setLightPosition(pos);
-	lightCtrl.setLightColor(ambient);
+	//GMfloat pos[3] = { 300,300,300 };
+	//lightCtrl.setLightPosition(pos);
+	//lightCtrl.setLightColor(ambient);
 }
 
 void render()

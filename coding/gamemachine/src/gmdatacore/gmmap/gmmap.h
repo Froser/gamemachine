@@ -75,6 +75,7 @@ struct GMMapObject
 	GMMapString path;
 	GMfloat width, height, depth;
 	GMfloat slices, stacks, radius;
+	GMfloat magnification;
 };
 
 struct GMMapMaterial
@@ -105,6 +106,24 @@ struct GMMapInstance
 	GMfloat mass;
 };
 
+struct GMMapLight
+{
+	enum GMMapLightType
+	{
+		Error = -1,
+		Ambient,
+		Specular
+	};
+
+	static GMMapLightType getType(const char* name);
+
+	ID id;
+	GMfloat rgb[3];
+	GMfloat position[3];
+	GMfloat range;
+	GMMapLightType type;
+};
+
 struct GMMap
 {
 	GMMapMeta meta;
@@ -113,6 +132,7 @@ struct GMMap
 	std::set<GMMapMaterial, ID_Less<GMMapMaterial>> materials;
 	std::set<GMMapEntity, ID_Less<GMMapEntity>> entities;
 	std::set<GMMapInstance, ID_Less<GMMapInstance>> instances;
+	std::set<GMMapLight, ID_Less<GMMapLight>> lights;
 	std::string workingDir;
 };
 

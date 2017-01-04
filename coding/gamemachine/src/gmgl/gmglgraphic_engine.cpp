@@ -7,6 +7,7 @@
 #include "gmengine/controller/graphic_engine.h"
 #include "gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
+#include "gmengine/elements/gamelight.h"
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_lightController(m_shaders)
@@ -45,7 +46,10 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 	shaders.useProgram();
 
 	if (!shadowMapping)
+	{
+		activateLights();
 		beginSetSky();
+	}
 
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
@@ -108,6 +112,18 @@ void GMGLGraphicEngine::endSetSky()
 	{
 		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
 		info.texture->endTexture();
+	}
+}
+
+void GMGLGraphicEngine::activateLights()
+{
+	std::vector<GameLight*>& lights = getWorld()->getLights();
+
+	for (auto iter = lights.begin(); iter != lights.end(); iter++)
+	{
+		GameLight* light = (*iter);
+		if (light->isAvailable())
+			light->activateLight();
 	}
 }
 

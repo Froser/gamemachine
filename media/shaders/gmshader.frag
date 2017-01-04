@@ -200,7 +200,8 @@ void drawObject()
 
     // 计算环境光和环境光贴图
     vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,ambientUV))) : vec3(0);
-    ambientLight += (vec3(GM_light_ambient) + shadeFactor * ambientTextureColor) * vec3(GM_light_ka);
+    ambientLight += vec3(GM_light_ka + shadeFactor * ambientTextureColor);
+    ambientLight *= vec3(GM_light_ambient);
 
     // 最终结果
     vec3 color = ambientLight + shadeFactor * (diffuseLight + specularLight);

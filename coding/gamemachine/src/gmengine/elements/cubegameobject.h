@@ -9,11 +9,11 @@ class CubeGameObject : public GameObject
 {
 public:
 	CubeGameObject(const btVector3& extents, const Material eachMaterial[6]);
+	CubeGameObject(const btVector3& extents, GMfloat magnification, const Material eachMaterial[6]);
 
 public:
 	void setExtents(const btVector3& extents);
 	btVector3& getExtents();
-
 public:
 	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
 
@@ -26,6 +26,9 @@ private:
 private:
 	btVector3 m_extents;
 	Material m_eachMaterial[6];
+
+	// 纹理的放大率
+	GMfloat m_magnification;
 };
 
 END_NS

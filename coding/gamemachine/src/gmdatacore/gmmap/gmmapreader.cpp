@@ -50,6 +50,7 @@ bool handleObjects(TiXmlElement& elem, GMMap* map)
 		SAFE_SSCANF(child->Attribute("radius"), "%f", &object.radius);
 		SAFE_SSCANF(child->Attribute("slices"), "%f", &object.slices);
 		SAFE_SSCANF(child->Attribute("stacks"), "%f", &object.stacks);
+		SAFE_SSCANF(child->Attribute("mag"), "%f", &object.magnification);
 		object.path = child->Attribute("path");
 		object.type = GMMapObject::getType(child->Attribute("type"));
 		map->objects.insert(object);
@@ -184,6 +185,9 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 				instance.scale[1] = instance.scale[0];
 				instance.scale[2] = instance.scale[0];
 			}
+
+			if (instance.scale[0] == 0 || instance.scale[1] == 0 || instance.scale[2] == 0)
+				instance.scale[0] = instance.scale[1] = instance.scale[2] = 1;
 		}
 
 		{
@@ -211,6 +215,35 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
+bool handleLights(TiXmlElement& elem, GMMap* map)
+{
+	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
+	{
+		GMMapLight light = { 0 };
+		SAFE_SSCANF(child->Attribute("id"), "%i", &light.id);
+		SAFE_SSCANF(child->Attribute("id"), "%f", &light.range);
+		light.type = GMMapLight::getType(child->Attribute("type"));
+
+		{
+			Scanner scanner(child->Attribute("position"));
+			scanner.nextFloat(&light.position[0]);
+			scanner.nextFloat(&light.position[1]);
+			scanner.nextFloat(&light.position[2]);
+		}
+
+		{
+			Scanner scanner(child->Attribute("rgb"));
+			scanner.nextFloat(&light.rgb[0]);
+			scanner.nextFloat(&light.rgb[1]);
+			scanner.nextFloat(&light.rgb[2]);
+		}
+
+		map->lights.insert(light);
+	}
+
+	return true;
+}
+
 struct __Handlers
 {
 	__Handlers()
@@ -221,6 +254,7 @@ struct __Handlers
 		__map["materials"] = handleMaterals;
 		__map["entities"] = handleEntities;
 		__map["instances"] = handleInstances;
+		__map["lights"] = handleLights;
 	}
 
 	std::map<std::string, __Handler> __map;

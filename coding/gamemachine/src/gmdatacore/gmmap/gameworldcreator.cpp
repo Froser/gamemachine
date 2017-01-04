@@ -13,6 +13,7 @@
 #include "gmengine/elements/convexhullgameobject.h"
 #include "gmdatacore/objreader/objreader.h"
 #include "gmengine/controller/resource_container.h"
+#include "gmengine/elements/gamelight.h"
 
 #define CREATE_FUNC
 #define RESOURCE_FUNC
@@ -112,7 +113,7 @@ CREATE_FUNC void createCube(IFactory* factory,
 	}
 
 	btVector3 extents(object->width, object->height, object->depth);
-	*gameObj = new CubeGameObject(extents, materials);
+	*gameObj = new CubeGameObject(extents, object->magnification, materials);
 	setPropertiesFromInstance(instance, *gameObj);
 	if (materials)
 		delete[] materials;
@@ -246,6 +247,33 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 		factory->createPainter(engine, gameObject->getObject(), &painter);
 		gameObject->getObject()->setPainter(painter);
 		world->appendObject(gameObject);
+	}
+
+	for (auto iter = map->lights.begin(); iter != map->lights.end(); iter++)
+	{
+		const GMMapLight& ioLight = (*iter);
+		GameLight* gameLight = nullptr;
+		switch (ioLight.type)
+		{
+		case GMMapLight::Ambient:
+			gameLight = new AmbientLight();
+			break;
+		case GMMapLight::Specular:
+			ASSERT(false);
+			break;
+		default:
+			ASSERT(false);
+			break;
+		}
+		
+		if (gameLight)
+		{
+			gameLight->setColor(ioLight.rgb);
+			gameLight->setPosition(ioLight.position);
+			gameLight->setRange(ioLight.range);
+			gameLight->setWorld(world);
+			world->appendLight(gameLight);
+		}
 	}
 
 	world->initialize();

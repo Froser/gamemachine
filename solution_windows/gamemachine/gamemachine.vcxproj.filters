@@ -196,6 +196,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.h">
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -344,6 +347,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.cpp">
       <Filter>src\gmengine\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.cpp">
+      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

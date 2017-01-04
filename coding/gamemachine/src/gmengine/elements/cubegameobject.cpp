@@ -5,6 +5,15 @@
 
 CubeGameObject::CubeGameObject(const btVector3& extents, const Material eachMaterial[6])
 	: m_extents(extents)
+	, m_magnification(1)
+{
+	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
+	createCoreObject();
+}
+
+CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, const Material eachMaterial[6])
+	: m_extents(extents)
+	, m_magnification(magnification <= 0 ? 1 : magnification)
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
 	createCoreObject();
@@ -111,35 +120,35 @@ void CubeGameObject::createCoreObject()
 	};
 
 	GMfloat uvs[] = {
+		0, m_magnification,
 		0, 0,
-		0, 1,
-		1, 1,
-		1, 0,
+		m_magnification, 0,
+		m_magnification, m_magnification,
+
+		m_magnification, m_magnification,
+		m_magnification, 0,
+		0, 0,
+		0, m_magnification,
+
+		0, m_magnification,
+		m_magnification, m_magnification,
+		m_magnification, 0,
+		0, 0,
+
+		m_magnification, m_magnification,
+		0, m_magnification,
+		0, 0,
+		m_magnification, 0,
+
+		0, m_magnification,
+		0, 0,
+		m_magnification, 0,
+		m_magnification, m_magnification,
 
 		0, 0,
-		0, 1,
-		1, 1,
-		1, 0,
-
-		0, 0,
-		0, 1,
-		1, 1,
-		1, 0,
-
-		0, 0,
-		0, 1,
-		1, 1,
-		1, 0,
-
-		0, 0,
-		0, 1,
-		1, 1,
-		1, 0,
-
-		0, 0,
-		0, 1,
-		1, 1,
-		1, 0,
+		0, m_magnification,
+		m_magnification, m_magnification,
+		m_magnification, 0,
 	};
 
 	Object* coreObj = getObject();

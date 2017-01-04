@@ -13,6 +13,7 @@ BEGIN_NS
 class Object;
 class Character;
 struct IGraphicEngine;
+class GameLight;
 
 class GameWorld
 {
@@ -23,6 +24,8 @@ public:
 public:
 	void initialize();
 	void appendObject(AUTORELEASE GameObject* obj);
+	void appendLight(AUTORELEASE GameLight* light);
+	std::vector<GameLight*>& getLights();
 	void setMajorCharacter(Character* character);
 	Character* getMajorCharacter();
 	void setSky(GameObject* sky);
