@@ -27,7 +27,7 @@ public:
 	bool isDynamic();
 	btVector3& getLocalInertia();
 
-	void setMass(btScalar mass);
+	virtual void setMass(btScalar mass);
 	btScalar getMass();
 
 	void setTransform(const btTransform& transform);
@@ -35,7 +35,7 @@ public:
 
 	void setLocalScaling(const btVector3& scale);
 
-	void setWorld(GameWorld* world);
+	virtual void setWorld(GameWorld* world);
 	GameWorld* getWorld();
 
 public:

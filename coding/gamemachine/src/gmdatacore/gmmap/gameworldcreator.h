@@ -4,8 +4,8 @@
 BEGIN_NS
 
 class GameWorld;
-class GMMap;
-class IFactory;
+struct GMMap;
+struct IFactory;
 class GameWorldCreator
 {
 public:

@@ -29,6 +29,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\factory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.h" />
@@ -80,6 +81,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\factory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.cpp" />

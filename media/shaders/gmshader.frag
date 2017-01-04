@@ -169,18 +169,22 @@ void drawSky(vec3 cubemapUV)
     frag_color = GM_light_ambient + vec4(cubemapTextureColor, 1.0f);
 }
 
+float shadeFactorFactor(float shadeFactor)
+{
+    return min(shadeFactor + 0.3, 1);
+}
+
 void drawObject()
 {
-    // 计算环境光和环境光贴图
-    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,ambientUV))) : vec3(0);
-    vec3 ambientLight = (vec3(GM_light_ambient) + ambientTextureColor) * vec3(GM_light_ka);
+    // 环境光
+    vec3 ambientLight = vec3(0);
 
     // 计算点光源
     vec3 diffuseLight = MEMBER(lightFactors, diffuse) * vec3(GM_light_color) * vec3(GM_light_kd);
     vec3 specularLight = MEMBER(lightFactors, specular) * vec3(GM_light_color) * vec3(GM_light_ks);
 
     // 计算阴影系数
-    float shadeFactor = calcuateShadeFactor(MEMBER(coords, shadowCoord));
+    float shadeFactor = shadeFactorFactor(calcuateShadeFactor(MEMBER(coords, shadowCoord)));
 
     // 根据环境反射度来反射天空盒（如果有的话）
     if (GM_reflection_cubemap_texture_switch == 1)
@@ -194,8 +198,12 @@ void drawObject()
         }
     }
 
+    // 计算环境光和环境光贴图
+    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,ambientUV))) : vec3(0);
+    ambientLight += (vec3(GM_light_ambient) + shadeFactor * ambientTextureColor) * vec3(GM_light_ka);
+
     // 最终结果
-    vec3 color = ambientLight + min(shadeFactor + 0.3, 1) * (diffuseLight + specularLight);
+    vec3 color = ambientLight + shadeFactor * (diffuseLight + specularLight);
     frag_color = vec4(color, 1.0f);
 }
 

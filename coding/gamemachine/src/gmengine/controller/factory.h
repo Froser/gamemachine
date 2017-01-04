@@ -4,9 +4,9 @@
 BEGIN_NS
 
 class Image;
-class ITexture;
+struct ITexture;
 class ObjectPainter;
-class IGraphicEngine;
+struct IGraphicEngine;
 class Object;
 struct IFactory
 {

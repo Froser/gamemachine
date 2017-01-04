@@ -26,7 +26,6 @@ void GameWorld::appendObject(AUTORELEASE GameObject* obj)
 void GameWorld::setMajorCharacter(Character* character)
 {
 	dataRef().m_character = character;
-	appendObject(character);
 }
 
 Character* GameWorld::getMajorCharacter()
@@ -37,7 +36,6 @@ Character* GameWorld::getMajorCharacter()
 void GameWorld::setSky(GameObject* sky)
 {
 	dataRef().m_sky = sky;
-	appendObject(sky);
 }
 
 GameObject* GameWorld::getSky()
@@ -77,7 +75,7 @@ IGraphicEngine* GameWorld::getGraphicEngine()
 	return dataRef().m_pEngine;
 }
 
-void GameWorld::setGraphicEngine(IGraphicEngine* engine)
+void GameWorld::setGraphicEngine(AUTORELEASE IGraphicEngine* engine)
 {
 	dataRef().m_pEngine.reset(engine);
 }

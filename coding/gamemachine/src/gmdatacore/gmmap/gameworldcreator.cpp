@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include <map>
+#include <set>
 #include "gameworldcreator.h"
 #include "gmmap.h"
 #include "gmengine/elements/gameworld.h"
@@ -8,17 +9,85 @@
 #include "gmengine/controller/factory.h"
 #include "gmengine/elements/cubegameobject.h"
 #include "gmengine/elements/spheregameobject.h"
+#include "gmengine/elements/skygameobject.h"
+#include "gmengine/elements/convexhullgameobject.h"
+#include "gmdatacore/objreader/objreader.h"
+#include "gmengine/controller/resource_container.h"
 
-typedef void (*__ObjectCreateFunc)(IFactory* factory, GMMap* map, const GMMapInstance* instance, const GMMapEntity* entity, const GMMapObject* object, OUT GameObject** gameObj);
+#define CREATE_FUNC
+#define RESOURCE_FUNC
 
-void createTexture(IFactory* factory, const char* path, OUT ITexture** texture)
+typedef void (*__ObjectCreateFunc)(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj);
+
+void createTexture(IFactory* factory, std::string& path, OUT ITexture** texture)
 {
 	Image* image;
-	ImageReader::load(path, &image);
+	ImageReader::load(path.c_str(), &image);
 	factory->createTexture(image, texture);
 }
 
-void createCube(IFactory* factory, GMMap* map, const GMMapInstance* instance, const GMMapEntity* entity, const GMMapObject* object, OUT GameObject** gameObj)
+btTransform getTransform(const GMMapInstance* instance)
+{
+	btTransform trans;
+	trans.setIdentity();
+	trans.setOrigin(btVector3(instance->position[0], instance->position[1], instance->position[2]));
+	trans.setRotation(btQuaternion(btVector3(instance->rotation[0], instance->rotation[1], instance->rotation[2]), RAD(instance->rotation[3])));
+	return trans;
+}
+
+void setPropertiesFromInstance(const GMMapInstance* instance, GameObject* gameObj)
+{
+	gameObj->setMass(instance->mass);
+	gameObj->setLocalScaling(btVector3(instance->scale[0], instance->scale[1], instance->scale[2]));
+	gameObj->setTransform(getTransform(instance));
+}
+
+void copyUniqueMaterialProperties(const Material& material, Object* coreObject)
+{
+	// 拷贝obj文件中不存在的一些属性
+	for (auto iter = coreObject->getComponents().begin(); iter != coreObject->getComponents().end(); iter++)
+	{
+		Component* c = *iter;
+		c->getMaterial().Ke[0] = material.Ke[0];
+		c->getMaterial().Ke[1] = material.Ke[1];
+		c->getMaterial().Ke[2] = material.Ke[2];
+	}
+}
+
+RESOURCE_FUNC std::string getTexturePath(GMMap* map, const GMMapString& texturePath)
+{
+	std::string dir = map->workingDir;
+	return dir.append("textures/").append(texturePath);
+}
+
+RESOURCE_FUNC std::string getModelPath(GMMap* map, const GMMapString& name)
+{
+	std::string dir = map->workingDir;
+	return dir.append("models/").append(name).append("/entity");
+}
+
+typedef std::pair<ITexture*, TextureType> TextureFindResult;
+TextureFindResult getTextureForResourceContainer(ResourceContainer* resContainer, ID textureID)
+{
+	const TextureContainer::TextureItem* texture = resContainer->getTextureContainer().find(textureID);
+	ITexture* coreTexture = texture ? texture->texture : nullptr;
+	TextureType type = texture ? texture->type : TextureTypeResetStart;
+	return std::make_pair(coreTexture, type);
+}
+
+CREATE_FUNC void createCube(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
 {
 	ASSERT(gameObj);
 	Material* materials = new Material[6];
@@ -26,25 +95,15 @@ void createCube(IFactory* factory, GMMap* map, const GMMapInstance* instance, co
 	ASSERT(GMMapEntity::MAX_REF >= 6);
 	for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
 	{
-		// 读取纹理，纹理存放在textures目录下
-		ITexture* coreTexture = nullptr;
-		GMMapTexture textureKey = { entity->textureRef[i] };
-		const GMMapTexture* texture = GMMap_find(map->textures, textureKey);
-		if (texture)
-		{
-			std::string texImgPath = map->workingDir;
-			texImgPath.append("textures/").append(texture->path);
-			createTexture(factory, texImgPath.c_str(), &coreTexture);
-		}
+		TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[i]);
 
 		// 拷贝材质
-		GMMapMaterial materialKey = { entity->materialRef[i] };
-		const GMMapMaterial* material = GMMap_find(map->materials, materialKey);
+		const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[i]);
 		if (material)
 		{
 			materials[i] = material->material;
-			materials[i].textures->texture = coreTexture;
-			materials[i].textures->type = texture->type;
+			materials[i].textures->texture = texture.first;
+			materials[i].textures->type = texture.second;
 		}
 		else
 		{
@@ -52,44 +111,74 @@ void createCube(IFactory* factory, GMMap* map, const GMMapInstance* instance, co
 		}
 	}
 
-	btTransform pos;
-	pos.setIdentity();
-	pos.setOrigin(btVector3(instance->x, instance->y, instance->z));
 	btVector3 extents(object->width, object->height, object->depth);
-	*gameObj = new CubeGameObject(extents, pos, materials);
-	(*gameObj)->setMass(instance->mass);
-	(*gameObj)->setLocalScaling(btVector3(instance->scale[0], instance->scale[1], instance->scale[2]));
+	*gameObj = new CubeGameObject(extents, materials);
+	setPropertiesFromInstance(instance, *gameObj);
 	if (materials)
 		delete[] materials;
 }
 
-void createSphere(IFactory* factory, GMMap* map, const GMMapInstance* instance, const GMMapEntity* entity, const GMMapObject* object, OUT GameObject** gameObj)
+CREATE_FUNC void createSphere(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
 {
 	ASSERT(gameObj);
 
-	ITexture* coreTexture = nullptr;
 
-	GMMapMaterial materialKey = { entity->materialRef[0] };
-	const GMMapMaterial* material = GMMap_find(map->materials, materialKey);
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	Material m = material ? material->material : Material();
 
-	GMMapTexture textureKey = { entity->textureRef[0] };
-	const GMMapTexture* texture = GMMap_find(map->textures, textureKey);
-	if (texture)
-	{
-		std::string texImgPath = map->workingDir;
-		texImgPath.append("textures/").append(texture->path);
-		createTexture(factory, texImgPath.c_str(), &coreTexture);
-		m.textures->type = texture->type;
-	}
-	m.textures->texture = coreTexture;
+	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	m.textures->texture = texture.first;
+	m.textures->type = texture.second;
 
-	btTransform pos;
-	pos.setIdentity();
-	pos.setOrigin(btVector3(instance->x, instance->y, instance->z));
-	*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, pos, m);
-	(*gameObj)->setMass(instance->mass);
-	(*gameObj)->setLocalScaling(btVector3(instance->scale[0], instance->scale[1], instance->scale[2]));
+	*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, m);
+	setPropertiesFromInstance(instance, *gameObj);
+}
+
+CREATE_FUNC void createSky(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	ASSERT(texture.first != nullptr);
+
+	*gameObj = new SkyGameObject(object->radius, texture.first);
+	setPropertiesFromInstance(instance, *gameObj);
+}
+
+CREATE_FUNC void createConvexHull(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	// 目前先用objreader来读取obj
+	ObjReader reader;
+	Object* coreObject;
+	std::string modelPath = getModelPath(map, object->path);
+	reader.load(modelPath.c_str(), &coreObject);
+
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
+	if (material)
+		copyUniqueMaterialProperties(material->material, coreObject);
+
+	*gameObj = new ConvexHullGameObject(coreObject);
+	setPropertiesFromInstance(instance, *gameObj);
 }
 
 struct __ObjectCreateFuncs
@@ -98,6 +187,8 @@ struct __ObjectCreateFuncs
 	{
 		__map[GMMapObject::Cube] = createCube;
 		__map[GMMapObject::Sphere] = createSphere;
+		__map[GMMapObject::Sky] = createSky;
+		__map[GMMapObject::ConvexHull] = createConvexHull;
 	}
 
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;
@@ -109,15 +200,27 @@ __ObjectCreateFunc& getObjectCreateFunc(GMMapObject::GMMapObjectType type)
 	return createFuncs.__map[type];
 }
 
-void createGameObjectFromInstance(IFactory* factory, GMMap* map, const GMMapInstance* instance, OUT GameObject** gameObject)
+void loadTextures(IGraphicEngine* engine, IFactory* factory, GMMap* map)
 {
-	GMMapEntity entityKey = { instance->entityRef };
-	const GMMapEntity& entity = *map->entities.find(entityKey);
+	ResourceContainer* resContainer = engine->getResourceContainer();
+	TextureContainer& textures = resContainer->getTextureContainer();
+	for (auto iter = map->textures.begin(); iter != map->textures.end(); iter++)
+	{
+		TextureContainer::TextureItem item;
+		const GMMapTexture& texture = (*iter);
+		item.id = texture.id;
+		item.type = texture.type;
+		createTexture(factory, getTexturePath(map, texture.path), &item.texture);
+		resContainer->getTextureContainer().insert(item);
+	}
+}
 
-	GMMapObject objectKey = { entity.objRef };
-	const GMMapObject& object = *map->objects.find(objectKey);
-
-	getObjectCreateFunc(object.type)(factory, map, instance, &entity, &object, gameObject);
+void createGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMMap* map, const GMMapInstance* instance, OUT GameObject** gameObject)
+{
+	const GMMapEntity* entity = GMMap_find(map->entities, instance->entityRef);
+	const GMMapObject* object = GMMap_find(map->objects, entity->objRef);
+	ResourceContainer* resContainer = engine->getResourceContainer();
+	getObjectCreateFunc(object->type)(factory, resContainer, map, instance, entity, object, gameObject);
 }
 
 void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWorld** gameWorld)
@@ -132,11 +235,12 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 	IGraphicEngine* engine;
 	factory->createGraphicEngine(&engine);
 	world->setGraphicEngine(engine);
+	loadTextures(engine, factory, map);
 
 	for (auto iter = map->instances.begin(); iter != map->instances.end(); iter++)
 	{
 		GameObject* gameObject;
-		createGameObjectFromInstance(factory, map, &(*iter), &gameObject);
+		createGameObjectFromInstance(engine, factory, map, &(*iter), &gameObject);
 
 		ObjectPainter* painter;
 		factory->createPainter(engine, gameObject->getObject(), &painter);

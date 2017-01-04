@@ -45,8 +45,8 @@ bool handleObjects(TiXmlElement& elem, GMMap* map)
 		GMMapObject object = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &object.id);
 		SAFE_SSCANF(child->Attribute("width"), "%f", &object.width);
-		SAFE_SSCANF(child->Attribute("height"), "%f", &object.depth);
-		SAFE_SSCANF(child->Attribute("depth"), "%f", &object.height);
+		SAFE_SSCANF(child->Attribute("height"), "%f", &object.height);
+		SAFE_SSCANF(child->Attribute("depth"), "%f", &object.depth);
 		SAFE_SSCANF(child->Attribute("radius"), "%f", &object.radius);
 		SAFE_SSCANF(child->Attribute("slices"), "%f", &object.slices);
 		SAFE_SSCANF(child->Attribute("stacks"), "%f", &object.stacks);
@@ -145,7 +145,7 @@ bool handleEntities(TiXmlElement& elem, GMMap* map)
 				char ref[32] = "materialref_";
 				char str[32];
 				sprintf(str, "%d", i + 1);
-				strcat(ref, str);
+				strcat_s(ref, str);
 				SAFE_SSCANF(child->Attribute(ref), "%i", &entity.materialRef[i]);
 			}
 		}
@@ -162,22 +162,47 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 		GMMapInstance instance = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &instance.id);
 		SAFE_SSCANF(child->Attribute("entityref"), "%i", &instance.entityRef);
-		SAFE_SSCANF(child->Attribute("x"), "%f", &instance.x);
-		SAFE_SSCANF(child->Attribute("y"), "%f", &instance.y);
-		SAFE_SSCANF(child->Attribute("z"), "%f", &instance.z);
 		SAFE_SSCANF(child->Attribute("mass"), "%f", &instance.mass);
 
-		Scanner scanner (child->Attribute("scale"));
-		scanner.nextFloat(&instance.scale[0]);
-		bool b = scanner.nextFloat(&instance.scale[1]);
-		if (b)
 		{
-			scanner.nextFloat(&instance.scale[2]);
+			Scanner scanner(child->Attribute("position"));
+			scanner.nextFloat(&instance.position[0]);
+			scanner.nextFloat(&instance.position[1]);
+			scanner.nextFloat(&instance.position[2]);
 		}
-		else
+
 		{
-			instance.scale[1] = instance.scale[0];
-			instance.scale[2] = instance.scale[0];
+			Scanner scanner(child->Attribute("scale"));
+			scanner.nextFloat(&instance.scale[0]);
+			bool b = scanner.nextFloat(&instance.scale[1]);
+			if (b)
+			{
+				scanner.nextFloat(&instance.scale[2]);
+			}
+			else
+			{
+				instance.scale[1] = instance.scale[0];
+				instance.scale[2] = instance.scale[0];
+			}
+		}
+
+		{
+			const char* rotation = child->Attribute("rotation");
+			if (rotation)
+			{
+				Scanner scanner(rotation);
+				scanner.nextFloat(&instance.rotation[0]);
+				scanner.nextFloat(&instance.rotation[1]);
+				scanner.nextFloat(&instance.rotation[2]);
+				scanner.nextFloat(&instance.rotation[3]);
+			}
+			else
+			{
+				instance.rotation[0] = 1;
+				instance.rotation[1] = 0;
+				instance.rotation[2] = 0;
+				instance.rotation[3] = 0;
+			}
 		}
 
 		map->instances.insert(instance);
@@ -217,7 +242,7 @@ void readHead(TiXmlDocument& doc, GMMap* map)
 	}
 }
 
-void GMMapReader::ReadGMM(const char* filename, OUT GMMap** map)
+void GMMapReader::readGMM(const char* filename, OUT GMMap** map)
 {
 	TiXmlDocument doc;
 	bool b = doc.LoadFile(filename);

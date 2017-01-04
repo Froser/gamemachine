@@ -70,7 +70,9 @@ btTransform& GameObject::getTransform()
 
 void GameObject::setLocalScaling(const btVector3& scale)
 {
-	getCollisionShape()->setLocalScaling(scale);
+	btCollisionShape* pShape = getCollisionShape();
+	if (pShape)
+		pShape->setLocalScaling(scale);
 }
 
 void GameObject::setWorld(GameWorld* world)

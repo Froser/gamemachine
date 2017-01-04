@@ -4,13 +4,12 @@
 #include "btBulletDynamicsCommon.h"
 #include "utilities/algorithm.h"
 
-SphereGameObject::SphereGameObject(GMfloat radius, GMfloat slices, GMfloat stacks, const btTransform& position, const Material& material)
+SphereGameObject::SphereGameObject(GMfloat radius, GMfloat slices, GMfloat stacks, const Material& material)
 	: m_radius(radius)
 	, m_slices(slices)
 	, m_stacks(stacks)
 {
 	memcpy(&m_material, &material, sizeof(Material));
-	setTransform(position);
 	createCoreObject();
 }
 

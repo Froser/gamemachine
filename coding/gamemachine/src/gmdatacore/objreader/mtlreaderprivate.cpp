@@ -110,32 +110,7 @@ void MtlReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_MAP_KD))
 	{
-		//Image* tex = nullptr;
-		//char name[LINE_MAX];
-		//scanner.next(name);
-		//
-		//std::string filename = m_workingDir;
-		//filename.append(name);
-		//
-		//if (m_texMap.find(filename) == m_texMap.end())
-		//{
-		//	if (ImageReader::load(filename.c_str(), BMP, &tex))
-		//	{
-		//		m_pCurrentMaterial->hasTexture = true;
-		//		m_pCallback->onAddTexture(tex, &m_pCurrentMaterial->textureID);
-		//		TextureInfo info = { tex, m_pCurrentMaterial->textureID };
-		//		m_texMap[filename] = info;
-		//	}
-		//	else
-		//	{
-		//		m_pCurrentMaterial->textureID = TEXTURE_ERROR;
-		//	}
-		//}
-		//else
-		//{
-		//	if (m_pCurrentMaterial->textureID != TEXTURE_ERROR)
-		//		m_pCurrentMaterial->hasTexture = true;
-		//	m_pCurrentMaterial->textureID = m_texMap[filename].id;
-		//}
+		ASSERT(false);
+		// 暂时不支持obj导入纹理，如果要导入，要考虑内存释放
 	}
 }

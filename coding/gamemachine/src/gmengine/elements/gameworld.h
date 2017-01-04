@@ -32,7 +32,7 @@ public:
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 
 	IGraphicEngine* getGraphicEngine();
-	void setGraphicEngine(IGraphicEngine* engine);
+	void setGraphicEngine(AUTORELEASE IGraphicEngine* engine);
 };
 
 END_NS

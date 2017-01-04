@@ -8,7 +8,7 @@ BEGIN_NS
 class CubeGameObject : public GameObject
 {
 public:
-	CubeGameObject(const btVector3& extents, const btTransform& position, const Material eachMaterial[6]);
+	CubeGameObject(const btVector3& extents, const Material eachMaterial[6]);
 
 public:
 	void setExtents(const btVector3& extents);

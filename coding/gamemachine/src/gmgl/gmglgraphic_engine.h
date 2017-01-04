@@ -5,6 +5,7 @@
 #include "gmglshaders.h"
 #include "gmgllight.h"
 #include "gmglshadowmapping.h"
+#include "gmengine/controller/resource_container.h"
 BEGIN_NS
 
 class Camera;
@@ -20,6 +21,7 @@ public:
 	virtual void drawObjects(DrawingList& drawingList) override;
 	virtual void updateCameraView(Camera& camera) override;
 	virtual ILightController& getLightController() override;
+	virtual ResourceContainer* getResourceContainer() override;
 
 public:
 	GMGLShaders& getShaders();
@@ -38,6 +40,7 @@ private:
 	GMGLLight m_lightController;
 	GMGLShadowMapping m_shadowMapping;
 	GameWorld* m_world;
+	ResourceContainer m_resourceContainer;
 };
 
 END_NS

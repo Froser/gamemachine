@@ -3,17 +3,16 @@
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 
-CubeGameObject::CubeGameObject(const btVector3& extents, const btTransform& position, const Material eachMaterial[6])
+CubeGameObject::CubeGameObject(const btVector3& extents, const Material eachMaterial[6])
 	: m_extents(extents)
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
-	setTransform(position);
 	createCoreObject();
 }
 
 btCollisionShape* CubeGameObject::createCollisionShape()
 {
-	return new btBoxShape(getExtents());
+	return new btBoxShape(getExtents() / 2);
 }
 
 void CubeGameObject::setExtents(const btVector3& extents)
@@ -37,9 +36,9 @@ void CubeGameObject::appendObjectToWorld(btDynamicsWorld* world)
 
 void CubeGameObject::createCoreObject()
 {
-	btScalar x = m_extents.x(),
-		y = m_extents.y(),
-		z = m_extents.z();
+	btScalar x = m_extents.x() / 2,
+		y = m_extents.y() / 2,
+		z = m_extents.z() / 2;
 
 	GMfloat vertices[] = {
 		//Front

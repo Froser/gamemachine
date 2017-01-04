@@ -3,7 +3,9 @@
 
 std::string Path::directoryName(const std::string& fileName)
 {
-	int pos = fileName.find_last_of('\\');
+	int pos1 = fileName.find_last_of('\\'),
+		pos2 = fileName.find_last_of('/');
+	int pos = pos1 > pos2 ? pos1 : pos2;
 	if (pos == std::string::npos)
 		return fileName;
 	return fileName.substr(0, pos + 1);

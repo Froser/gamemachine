@@ -112,7 +112,7 @@ void init()
 	glEnable(GL_POLYGON_SMOOTH);
 
 	GMMap* map;
-	GMMapReader::ReadGMM("D:\\gmm\\demo.xml", &map);
+	GMMapReader::readGMM("D:\\gmm\\demo.xml", &map);
 	GameWorldCreator::createGameWorld(&factory, map, &world);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -158,99 +158,8 @@ void init()
 		character = new Character(charTransform, 10, 10, 15);
 		character->setCanFreeMove(false);
 		character->setJumpSpeed(btVector3(0, 50, 0));
+		world->appendObject(character);
 		world->setMajorCharacter(character);
-	}
-
-	{
-		btTransform groundTrans;
-		groundTrans.setIdentity();
-		groundTrans.setOrigin(btVector3(0, -100, 100));
-		
-		Material m [6] = {
-			{ { .1f, .2f, .3f },{ .4f, .5f, .6f },{ .7f, .8f, .9f },{ 0, 0, 0 },1 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ 0, 0, 0 }, 1 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ 0, 0, 0 }, 1 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ 0, 0, 0 }, 1 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ 0, 0, 0 }, 1 },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ 0, 0, 0 }, 1 },
-		};
-		CubeGameObject* ground = new CubeGameObject(btVector3(300, 30, 500), groundTrans, m);
-		ground->setMass(0);
-		ground->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, ground->getObject()));
-		ground->getObject()->getPainter()->init();
-		world->appendObject(ground);
-	}
-
-	{
-		Image* tex;	
-		ImageReader::load("D:\\test.bmp", &tex);
-		GMGLTexture* texture = new GMGLTexture(tex);
-
-		btTransform boxTrans;
-		boxTrans.setIdentity();
-		boxTrans.setOrigin(btVector3(0, 0, 40));
-		Material m[6] = {
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f }, { .8f, .8f, .8f }, 1, { texture, TextureTypeAmbient} },
-			{ { .2f, .3f, .7f },{ .4f, .1f, .8f },{ .7f, .5f, .3f },{ .8f, .8f, .8f },  1,{ texture, TextureTypeAmbient } },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ .8f, .8f, .8f },  1,{ texture, TextureTypeAmbient } },
-			{ { 1, 0, 0 },{ 0, 1, 0 },{ 0, 0, 1 },{ .8f, .8f, .8f },  1,{ texture, TextureTypeAmbient } },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ .8f, .8f, .8f },  1,{ texture, TextureTypeAmbient } },
-			{ { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ .8f, .8f, .8f },  1,{ texture, TextureTypeAmbient } },
-		};
-		CubeGameObject* cube = new CubeGameObject(btVector3(10, 10, 10), boxTrans, m);
-		cube->setMass(20);
-		cube->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, cube->getObject()));
-		//world->appendObject(cube);
-	}
-
-	{
-		ObjReader r;
-		Object* obj;
-		std::string objPath(std::string(currentPath).append("baymax.obj"));
-		r.load("D:\\baymax.obj", &obj);
-		for (auto iter = obj->getComponents().begin(); iter != obj->getComponents().end(); iter++)
-		{
-			(*iter)->getMaterial().Ke[0] = .5f;
-			(*iter)->getMaterial().Ke[1] = .5f;
-			(*iter)->getMaterial().Ke[2] = .5f;
-		}
-
-		btTransform boxTrans;
-		boxTrans.setIdentity();
-		boxTrans.setOrigin(btVector3(30, 70, 40));
-		
-		ConvexHullGameObject* convex = new ConvexHullGameObject(obj);
-		convex->setLocalScaling(btVector3(0.5f, 0.5f, 0.5f));
-		convex->setMass(10);
-		convex->setTransform(boxTrans);
-		convex->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, convex->getObject()));
-		//world->appendObject(convex);
-	}
-
-	{
-		Image* tex;
-		ImageReader::load("D:\\env.dds", &tex);
-		GMGLTexture* texture = new GMGLTexture(tex);
-		SkyGameObject* sky = new SkyGameObject(1000, texture);
-		sky->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, sky->getObject()));
-		world->setSky(sky);
-	}
-
-	{
-		//Image* tex;
-		//ImageReader::load("D:\\test.bmp", &tex);
-		//GMGLTexture* texture = new GMGLTexture(tex);
-
-		btTransform sphereTrans;
-		sphereTrans.setIdentity();
-		sphereTrans.setOrigin(btVector3(0, 40, 40));
-		Material m = {
-			 { .5f, .5f, .25f },{ .66f, .25f, .4f },{ .3f, .8f, .76f },{ .5, .5, .5 }, 1
-		};
-		SphereGameObject* sphere = new SphereGameObject(20, 30, 30, sphereTrans, m);
-		sphere->setMass(20);
-		sphere->getObject()->setPainter(new GMGLObjectPainter(shaders, shadow, sphere->getObject()));
-		//world->appendObject(sphere);
 	}
 
 	glEnable(GL_LINE_SMOOTH);

@@ -10,10 +10,23 @@ SkyGameObject::SkyGameObject(GMfloat len, ITexture* skyTexture)
 {
 	// 注意，Texture一定要是个CUBE_MAP
 	createCoreObject();
+	GameObject::setMass(0.0f);
+	setLocalScaling(btVector3(1, 1, 1));
 }
 
 void SkyGameObject::appendObjectToWorld(btDynamicsWorld* world)
 {
+}
+
+void SkyGameObject::setWorld(GameWorld* world)
+{
+	world->setSky(this);
+	GameObject::setWorld(world);
+}
+
+void SkyGameObject::setMass(btScalar)
+{
+	// 不起作用
 }
 
 btCollisionShape* SkyGameObject::createCollisionShape()

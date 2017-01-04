@@ -193,6 +193,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.h">
+      <Filter>src\gmengine\controllers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -338,6 +341,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp">
       <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.cpp">
+      <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -7,7 +7,7 @@ struct GMMap;
 class GMMapReader
 {
 public:
-	static void ReadGMM(const char* filename, OUT GMMap** map);
+	static void readGMM(const char* filename, OUT GMMap** map);
 };
 
 END_NS

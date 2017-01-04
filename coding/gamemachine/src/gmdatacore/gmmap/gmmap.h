@@ -31,9 +31,10 @@ public:
 };
 
 template <typename T>
-const T* GMMap_find(std::set<T, ID_Less<T>>& set, T& key)
+const T* GMMap_find(std::set<T, ID_Less<T>>& set, ID key)
 {
-	auto it = set.find(key);
+	T _key = { key };
+	auto it = set.find(_key);
 	if (it == set.end())
 		return nullptr;
 
@@ -61,9 +62,9 @@ struct GMMapObject
 	{
 		Error = -1,
 		Default,
-		FromFile,
 		Cube,
 		Sphere,
+		ConvexHull,
 		Sky,
 	};
 
@@ -99,7 +100,7 @@ struct GMMapInstance
 {
 	ID id;
 	ID entityRef;
-	GMfloat x, y, z;
+	GMfloat position[3], rotation[4];
 	GMfloat scale[3];
 	GMfloat mass;
 };

@@ -40,8 +40,8 @@ static void pushUVVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indices
 	if (indicesVector.size() == 0)
 		return;
 
-	to.push_back(indicesVector.data()[(indices - 1) * 4]);
-	to.push_back(indicesVector.data()[(indices - 1) * 4 + 1]);
+	to.push_back(indicesVector.data()[(indices - 1) * 2]);
+	to.push_back(indicesVector.data()[(indices - 1) * 2 + 1]);
 }
 
 ObjReaderPrivate::ObjReaderPrivate()

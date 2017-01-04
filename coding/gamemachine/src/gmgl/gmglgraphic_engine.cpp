@@ -135,3 +135,8 @@ ILightController& GMGLGraphicEngine::getLightController()
 {
 	return m_lightController;
 }
+
+ResourceContainer* GMGLGraphicEngine::getResourceContainer()
+{
+	return &m_resourceContainer;
+}

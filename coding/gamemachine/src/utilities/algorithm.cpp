@@ -2,7 +2,6 @@
 #include "algorithm.h"
 #include "gmdatacore/object.h"
 
-const GMfloat PI = 3.141592653f;
 const GMfloat PI2 = 6.283185306f;
 const GMfloat PIPI2 = 19.73920879476716;
 

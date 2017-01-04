@@ -13,6 +13,8 @@ public:
 	SkyGameObject(GMfloat len, ITexture* skyTexture);
 
 public:
+	virtual void setWorld(GameWorld* world) override;
+	virtual void setMass(btScalar) override;
 	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
 	virtual btCollisionShape* createCollisionShape() override;
 

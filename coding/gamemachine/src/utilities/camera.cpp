@@ -5,21 +5,10 @@
 #include "assert.h"
 #include "gmengine/io/mouse.h"
 
-static GMfloat PI()
-{
-	static const GMfloat _PI = std::acos(-1.0f);
-	return _PI;
-}
-
 static GMfloat SC()
 {
-	static GMfloat _SC = PI() / 2;
+	static GMfloat _SC = PI / 2;
 	return _SC;
-}
-
-inline GMfloat rad(GMfloat deg)
-{
-	return PI() * deg / 180;
 }
 
 Camera::Camera()
@@ -29,7 +18,7 @@ Camera::Camera()
 	, m_positionX(0)
 	, m_positionY(0)
 	, m_positionZ(0)
-	, m_lookUpLimitRad(SC() - rad(3))
+	, m_lookUpLimitRad(SC() - RAD(3))
 	, m_type(FreeCamera)
 {
 }
@@ -48,17 +37,17 @@ void Camera::setType(Type type)
 
 void Camera::setLookUpLimitDegree(GMfloat deg)
 {
-	m_lookUpLimitRad = SC() - rad(deg);
+	m_lookUpLimitRad = SC() - RAD(deg);
 }
 
 void Camera::lookRight(GMfloat degree)
 {
-	m_lookAtRad += rad(degree);
+	m_lookAtRad += RAD(degree);
 }
 
 void Camera::lookUp(GMfloat degree)
 {
-	m_lookUpRad += rad(degree);
+	m_lookUpRad += RAD(degree);
 	if (m_lookUpRad > m_lookUpLimitRad)
 		m_lookUpRad = m_lookUpLimitRad;
 	else if (m_lookUpRad < -m_lookUpLimitRad)

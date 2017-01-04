@@ -22,7 +22,6 @@ typedef unsigned char BYTE;
 #define GLEW_STATIC
 #include "GL/glew.h"
 
-// Options
 typedef unsigned char GMbyte;
 typedef GLfloat GMfloat;
 typedef GLint GMint;
@@ -31,3 +30,7 @@ typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
 typedef GMuint GMvertexoffset;
 #define LINE_MAX 256
+
+//Math:
+#define PI 3.141592653f
+#define RAD(deg) deg * PI / 180

@@ -2,6 +2,7 @@
 #define __GRAPHIC_ENGINE_H__
 #include "common.h"
 #include <vector>
+
 BEGIN_NS
 class GameObject;
 struct DrawingItem
@@ -14,6 +15,7 @@ typedef std::vector<DrawingItem> DrawingList;
 class Camera;
 class GameWorld;
 struct ILightController;
+class ResourceContainer;
 struct IGraphicEngine
 {
 	virtual ~IGraphicEngine();
@@ -22,6 +24,7 @@ struct IGraphicEngine
 	virtual void drawObjects(DrawingList& drawingList) = 0;
 	virtual void updateCameraView(Camera& camera) = 0;
 	virtual ILightController& getLightController() = 0;
+	virtual ResourceContainer* getResourceContainer() = 0;
 };
 
 END_NS
