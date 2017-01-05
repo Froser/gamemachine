@@ -16,11 +16,6 @@
 #define KW_KS "Ks"
 #define KW_MAP_KD "map_Kd"
 
-static bool strEqual(const char* str1, const char* str2)
-{
-	return !strcmp(str1, str2);
-}
-
 Materials& MtlReaderPrivate::getMaterials()
 {
 	return m_materials;

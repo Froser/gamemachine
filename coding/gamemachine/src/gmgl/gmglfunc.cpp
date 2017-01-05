@@ -32,7 +32,6 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, const char* viewMatrixNam
 	ASSERT_GL();
 
 	GMfloat vec[4] = { c.position_x, c.position_y, c.position_z, 1.0f };
-	GMGLLight(shaders).setViewPosition(vec);
 
 	vmath::mat4 view_matrix(
 		vmath::lookat(vmath::vec3(c.position_x, c.position_y, c.position_z), 
@@ -42,6 +41,16 @@ void IMPL lookAt(Camera& camera, GMGLShaders& shaders, const char* viewMatrixNam
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
 	CHECK_GL_LOC(viewMatrixLocation);
+}
+
+void IMPL cameraPosition(Camera& camera, GMGLShaders& shaders, const char* matrixName)
+{
+	CameraLookAt c = camera.getCameraLookAt();
+	GMfloat vec[4] = { c.position_x, c.position_y, c.position_z, 1.0f };
+	GLuint loc = glGetUniformLocation(shaders.getProgram(), matrixName);
+	ASSERT_GL();
+	glUniform4fv(loc, 1, vec);
+	ASSERT_GL();
 }
 
 void IMPL uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixName)

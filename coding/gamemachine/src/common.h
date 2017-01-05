@@ -31,6 +31,7 @@ typedef GLsizeiptr GMsizeiptr;
 typedef GMuint GMvertexoffset;
 #define LINE_MAX 256
 
-//Math:
+//Tools:
 #define PI 3.141592653f
 #define RAD(deg) deg * PI / 180
+#define strEqual(str1, str2) !strcmp(str1, str2)

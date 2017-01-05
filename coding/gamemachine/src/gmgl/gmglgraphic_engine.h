@@ -10,6 +10,7 @@ BEGIN_NS
 
 class Camera;
 class GameWorld;
+class GameLight;
 class GMGLGraphicEngine : public IGraphicEngine
 {
 public:
@@ -20,7 +21,6 @@ public:
 	virtual void newFrame() override;
 	virtual void drawObjects(DrawingList& drawingList) override;
 	virtual void updateCameraView(Camera& camera) override;
-	virtual ILightController& getLightController() override;
 	virtual ResourceContainer* getResourceContainer() override;
 
 public:
@@ -29,16 +29,15 @@ public:
 	GameWorld* getWorld();
 
 private:
-	void drawObjectsOnce(DrawingList& drawingList);
-	void setEyeViewport();
-	void activeShadowTexture();
+	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
+	void setEyeViewport(bool shadowOn);
+	void shadowTexture(bool shadowOn);
 	void beginSetSky();
 	void endSetSky();
-	void activateLights();
+	GameLight* getShadowSourceLight();
 
 private:
 	GMGLShaders m_shaders;
-	GMGLLight m_lightController;
 	GMGLShadowMapping m_shadowMapping;
 	GameWorld* m_world;
 	ResourceContainer m_resourceContainer;

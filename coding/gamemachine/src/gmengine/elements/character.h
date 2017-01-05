@@ -17,7 +17,8 @@ public:
 	Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight);
 
 public:
-	void setJumpSpeed(const btVector3& jumpSpeed) { m_jumpSpeed = jumpSpeed; }
+	void setJumpSpeed(const btVector3& jumpSpeed);
+	void setFallSpeed(GMfloat speed);
 
 	void setCanFreeMove(bool freeMove);
 	void simulateCamera();
@@ -42,8 +43,9 @@ private:
 	btScalar m_radius;
 	btScalar m_stepHeight;
 	btVector3 m_jumpSpeed;
+	btScalar m_fallSpeed;
 
-	btKinematicCharacterController* m_controller;
+	AutoPtr<btKinematicCharacterController> m_controller;
 	AutoPtr<btPairCachingGhostObject> m_ghostObject;
 };
 

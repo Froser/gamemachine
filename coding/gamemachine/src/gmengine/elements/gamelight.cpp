@@ -2,9 +2,9 @@
 #include "gamelight.h"
 #include "gameworld.h"
 #include "gmengine/controller/graphic_engine.h"
-#include "gmengine/controller/light.h"
 
 GameLight::GameLight()
+	: m_shadowSource(false)
 {
 }
 
@@ -56,14 +56,12 @@ GameWorld* GameLight::getWorld()
 	return m_world;
 }
 
-void AmbientLight::activateLight()
+void GameLight::setShadowSource(bool shadowSource)
 {
-	ILightController& lightCtrl = getWorld()->getGraphicEngine()->getLightController();
-	lightCtrl.setLightPosition(getPosition());
-	lightCtrl.setAmbient(getColor());
+	m_shadowSource = shadowSource;
 }
 
-bool AmbientLight::isAvailable()
+bool GameLight::getShadowSource()
 {
-	return true;
+	return m_shadowSource;
 }

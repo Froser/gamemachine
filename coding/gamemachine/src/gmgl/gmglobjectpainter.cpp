@@ -6,12 +6,14 @@
 #include "gmglshadowmapping.h"
 #include "utilities/assert.h"
 #include "gmgltexture.h"
+#include "gmengine/elements/gameworld.h"
 
 GMGLObjectPainter::GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& shadowMapping, Object* obj)
 	: ObjectPainter(obj)
 	, m_shaders(shaders)
 	, m_shadowMapping(shadowMapping)
 	, m_inited(false)
+	, m_world(nullptr)
 {
 }
 
@@ -97,12 +99,17 @@ void GMGLObjectPainter::dispose()
 
 void GMGLObjectPainter::setLights(Material& material)
 {
-	GMGLLight light(m_shaders);
-	light.setAmbientCoefficient(material.Ka);
-	light.setDiffuseCoefficient(material.Kd);
-	light.setSpecularCoefficient(material.Ks);
-	light.setEnvironmentCoefficient(material.Ke);
-	light.setShininess(material.shininess);
+	if (m_world)
+	{
+		std::vector<GameLight*>& lights = m_world->getLights();
+
+		for (auto iter = lights.begin(); iter != lights.end(); iter++)
+		{
+			GameLight* light = (*iter);
+			if (light->isAvailable())
+				light->activateLight(material);
+		}
+	}
 }
 
 void GMGLObjectPainter::beginTextures(TextureInfo* startTexture)
@@ -137,4 +144,9 @@ void GMGLObjectPainter::resetTextures()
 	{
 		GMGL::disableTexture(m_shaders, getTextureUniformName(t));
 	}
+}
+
+void GMGLObjectPainter::setWorld(GameWorld* world)
+{
+	m_world = world;
 }

@@ -14,7 +14,6 @@ struct DrawingItem
 typedef std::vector<DrawingItem> DrawingList;
 class Camera;
 class GameWorld;
-struct ILightController;
 class ResourceContainer;
 struct IGraphicEngine
 {
@@ -23,7 +22,6 @@ struct IGraphicEngine
 	virtual void newFrame() = 0;
 	virtual void drawObjects(DrawingList& drawingList) = 0;
 	virtual void updateCameraView(Camera& camera) = 0;
-	virtual ILightController& getLightController() = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
 };
 

@@ -221,7 +221,8 @@ bool handleLights(TiXmlElement& elem, GMMap* map)
 	{
 		GMMapLight light = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &light.id);
-		SAFE_SSCANF(child->Attribute("id"), "%f", &light.range);
+		SAFE_SSCANF(child->Attribute("range"), "%f", &light.range);
+		SAFE_SSCANF(child->Attribute("shadow"), "%i", &light.shadow);
 		light.type = GMMapLight::getType(child->Attribute("type"));
 
 		{
@@ -244,6 +245,43 @@ bool handleLights(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
+bool handleSettings(TiXmlElement& elem, GMMap* map)
+{
+	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
+	{
+		if (strEqual(child->Value(), "gravity"))
+		{
+			Scanner scanner (child->Attribute("vector"));
+			scanner.nextFloat(&map->settings.gravity.vector[0]);
+			scanner.nextFloat(&map->settings.gravity.vector[1]);
+			scanner.nextFloat(&map->settings.gravity.vector[2]);
+		}
+		else if (strEqual(child->Value(), "character"))
+		{
+			{
+				Scanner scanner(child->Attribute("position"));
+				scanner.nextFloat(&map->settings.character.position[0]);
+				scanner.nextFloat(&map->settings.character.position[1]);
+				scanner.nextFloat(&map->settings.character.position[2]);
+			}
+
+			{
+				Scanner scanner(child->Attribute("jumpspeed"));
+				scanner.nextFloat(&map->settings.character.jumpSpeed[0]);
+				scanner.nextFloat(&map->settings.character.jumpSpeed[1]);
+				scanner.nextFloat(&map->settings.character.jumpSpeed[2]);
+			}
+
+			SAFE_SSCANF(child->Attribute("radius"), "%f", &map->settings.character.radius);
+			SAFE_SSCANF(child->Attribute("height"), "%f", &map->settings.character.height);
+			SAFE_SSCANF(child->Attribute("stepheight"), "%f", &map->settings.character.stepHeight);
+			SAFE_SSCANF(child->Attribute("fallspeed"), "%f", &map->settings.character.fallSpeed);
+			SAFE_SSCANF(child->Attribute("freemove"), "%i", &map->settings.character.freemove);
+		}
+	}
+	return true;
+}
+
 struct __Handlers
 {
 	__Handlers()
@@ -255,6 +293,7 @@ struct __Handlers
 		__map["entities"] = handleEntities;
 		__map["instances"] = handleInstances;
 		__map["lights"] = handleLights;
+		__map["settings"] = handleSettings;
 	}
 
 	std::map<std::string, __Handler> __map;

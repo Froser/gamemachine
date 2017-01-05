@@ -18,7 +18,6 @@
 #include "gmgl/gmglfunc.h"
 #include "gmgl/gmgltexture.h"
 #include "gmgl/shader_constants.h"
-#include "gmgl/gmgllight.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglobjectpainter.h"
 #include "utilities/vmath.h"
@@ -78,7 +77,7 @@ public:
 	{
 		Character* character = world->getMajorCharacter();
 		Camera* camera = &character->getCamera();
-		GMfloat dis = 25;
+		GMfloat dis = 45;
 		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 		{
@@ -101,6 +100,11 @@ public:
 		world->simulateGameWorld(elapsed);
 	}
 
+	void onExit()
+	{
+		delete world;
+	}
+
 	GameLoop* m_gl;
 };
 
@@ -112,13 +116,12 @@ void init()
 	glEnable(GL_POLYGON_SMOOTH);
 
 	GMMap* map;
-	GMMapReader::readGMM("D:\\scene\\demo.xml", &map);
+	GMMapReader::readGMM("D:\\gmm\\demo.xml", &map);
 	GameWorldCreator::createGameWorld(&factory, map, &world);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
 	GMGLShaders& shaders = engine->getShaders();
-	ILightController& lightCtrl = engine->getLightController();
 
 	GMGLShadowMapping& shadow = engine->getShadowMapping();
 	GMGLShaders& shadowShaders = shadow.getShaders();
@@ -149,19 +152,6 @@ void init()
 		shadowShaders.load();
 	}
 
-	world->setGravity(0, -100, 0);
-
-	{
-		btTransform charTransform;
-		charTransform.setIdentity();
-		charTransform.setOrigin(btVector3(0, 0, 100));
-		character = new Character(charTransform, 10, 10, 15);
-		character->setCanFreeMove(false);
-		character->setJumpSpeed(btVector3(0, 50, 0));
-		world->appendObject(character);
-		world->setMajorCharacter(character);
-	}
-
 	glEnable(GL_LINE_SMOOTH);
 
 	int wx = glutGet(GLUT_WINDOW_X),
@@ -173,13 +163,6 @@ void init()
 	handler.setGameLoop(gl);
 	camera.setSensibility(.25f);
 	gl->init(s, &handler);
-
-	//GMfloat ambient[3] = { .5, .5, .5 };
-	//lightCtrl.setAmbient(ambient);
-
-	//GMfloat pos[3] = { 300,300,300 };
-	//lightCtrl.setLightPosition(pos);
-	//lightCtrl.setLightColor(ambient);
 }
 
 void render()

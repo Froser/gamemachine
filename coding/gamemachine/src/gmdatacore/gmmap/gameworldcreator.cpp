@@ -11,6 +11,7 @@
 #include "gmengine/elements/spheregameobject.h"
 #include "gmengine/elements/skygameobject.h"
 #include "gmengine/elements/convexhullgameobject.h"
+#include "gmengine/elements/character.h"
 #include "gmdatacore/objreader/objreader.h"
 #include "gmengine/controller/resource_container.h"
 #include "gmengine/elements/gamelight.h"
@@ -238,6 +239,29 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 	world->setGraphicEngine(engine);
 	loadTextures(engine, factory, map);
 
+	// 装载设定
+	GMMapSettings& settings = map->settings;
+	{
+		// 万物当先，先要初始化重力
+		GMMapSettings::Gravity& gravity = settings.gravity;
+		world->setGravity(gravity.vector[0], gravity.vector[1], gravity.vector[2]);
+
+		GMMapSettings::Character& character = settings.character;
+		if (character.height > 0 && character.radius > 0)
+		{
+			btTransform trans;
+			trans.setIdentity();
+			trans.setOrigin(btVector3(character.position[0], character.position[1], character.position[2]));
+			Character* coreCharacter = new Character(trans, character.radius, character.height, character.stepHeight);
+			coreCharacter->setCanFreeMove(!!character.freemove);
+			coreCharacter->setJumpSpeed(btVector3(character.jumpSpeed[0], character.jumpSpeed[1], character.jumpSpeed[2]));
+			coreCharacter->setFallSpeed(character.fallSpeed);
+			world->appendObject(coreCharacter);
+			world->setMajorCharacter(coreCharacter);
+		}
+	}
+
+	// 装载实例
 	for (auto iter = map->instances.begin(); iter != map->instances.end(); iter++)
 	{
 		GameObject* gameObject;
@@ -249,22 +273,12 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 		world->appendObject(gameObject);
 	}
 
+	// 装载光源
 	for (auto iter = map->lights.begin(); iter != map->lights.end(); iter++)
 	{
 		const GMMapLight& ioLight = (*iter);
 		GameLight* gameLight = nullptr;
-		switch (ioLight.type)
-		{
-		case GMMapLight::Ambient:
-			gameLight = new AmbientLight();
-			break;
-		case GMMapLight::Specular:
-			ASSERT(false);
-			break;
-		default:
-			ASSERT(false);
-			break;
-		}
+		factory->createLight(ioLight.type, &gameLight);
 		
 		if (gameLight)
 		{
@@ -272,6 +286,7 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 			gameLight->setPosition(ioLight.position);
 			gameLight->setRange(ioLight.range);
 			gameLight->setWorld(world);
+			gameLight->setShadowSource(!!ioLight.shadow);
 			world->appendLight(gameLight);
 		}
 	}

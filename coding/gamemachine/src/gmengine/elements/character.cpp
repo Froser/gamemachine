@@ -9,6 +9,9 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	: m_radius(radius)
 	, m_height(height)
 	, m_stepHeight(stepHeight)
+	, m_controller(nullptr)
+	, m_jumpSpeed(btVector3(0, 10, 0))
+	, m_fallSpeed(10)
 {
 	setTransform(position);
 	m_camera.setPosition(position.getOrigin().x(), position.getOrigin().y(), position.getOrigin().z());
@@ -28,13 +31,26 @@ void Character::appendObjectToWorld(btDynamicsWorld* world)
 	ghostObj->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
 	setCollisionObject(ghostObj);
 
-	m_controller = new btKinematicCharacterController(ghostObj, static_cast<btConvexShape*>(getCollisionShape()), m_stepHeight);
+	m_controller.reset(new btKinematicCharacterController(ghostObj, static_cast<btConvexShape*>(getCollisionShape()), m_stepHeight));
 	m_controller->setGravity(world->getGravity());
+	m_controller->setFallSpeed(m_fallSpeed);
 
 	world->addCollisionObject(ghostObj,
 		btBroadphaseProxy::CharacterFilter,
 		btBroadphaseProxy::StaticFilter | btBroadphaseProxy::AllFilter);
 	world->addAction(m_controller);
+}
+
+void Character::setJumpSpeed(const btVector3& jumpSpeed)
+{
+	m_jumpSpeed = jumpSpeed;
+}
+
+void Character::setFallSpeed(GMfloat speed)
+{
+	m_fallSpeed = speed;
+	if (m_controller)
+		m_controller->setFallSpeed(m_fallSpeed);
 }
 
 void Character::setCanFreeMove(bool freeMove)

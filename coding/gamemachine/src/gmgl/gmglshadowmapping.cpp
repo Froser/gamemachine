@@ -69,7 +69,7 @@ void GMGLShadowMapping::init()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GMGLShadowMapping::beginDrawDepthBuffer()
+void GMGLShadowMapping::beginDrawDepthBuffer(GameLight* shadowSourceLight)
 {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -79,8 +79,7 @@ void GMGLShadowMapping::beginDrawDepthBuffer()
 	memcpy(m_state.viewport, dims, sizeof(dims));
 
 	m_shaders.useProgram();
-	ILightController& lightCtrl = m_engine.getLightController();
-	GMfloat* lightXYZ = lightCtrl.getLightPosition();
+	GMfloat* lightXYZ = shadowSourceLight->getPosition();
 	
 	m_state.lightViewMatrix = vmath::lookat(
 		vmath::vec3(lightXYZ[0], lightXYZ[1], lightXYZ[2]),

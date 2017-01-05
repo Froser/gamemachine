@@ -52,7 +52,14 @@ void GameLoop::drawFrame()
 	m_handler->keyboard();
 	m_handler->render();
 	m_drawStopwatch.stop();
-	m_timeElapsed = (m_drawStopwatch.getMillisecond()) / 1000 + (1.f / 60.f);
+	GMfloat elapsed = m_drawStopwatch.getMillisecond();
+	m_timeElapsed = elapsed / 1000 + (1.f / 60.f);
+
+#ifdef _WINDOWS
+	GMfloat wait = 1000 / m_settings.fps - elapsed;
+	if (wait > 0)
+		::Sleep(wait);
+#endif
 }
 
 void GameLoop::start()
@@ -77,5 +84,6 @@ void GameLoop::updateSettings()
 
 void GameLoop::exit()
 {
+	m_handler->onExit();
 	::exit(0);
 }

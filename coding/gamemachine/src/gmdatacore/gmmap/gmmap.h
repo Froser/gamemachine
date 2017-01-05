@@ -4,6 +4,7 @@
 #include <string>
 #include <set>
 #include "gmdatacore/object.h"
+#include "gmengine/controller/factory.h"
 
 BEGIN_NS
 
@@ -108,20 +109,33 @@ struct GMMapInstance
 
 struct GMMapLight
 {
-	enum GMMapLightType
-	{
-		Error = -1,
-		Ambient,
-		Specular
-	};
-
-	static GMMapLightType getType(const char* name);
+	static LightType getType(const char* name);
 
 	ID id;
 	GMfloat rgb[3];
 	GMfloat position[3];
 	GMfloat range;
-	GMMapLightType type;
+	LightType type;
+	GMuint shadow;
+};
+
+struct GMMapSettings
+{
+	struct Character
+	{
+		GMfloat position[3];
+		GMfloat radius;
+		GMfloat height;
+		GMfloat stepHeight;
+		GMfloat jumpSpeed[3];
+		GMfloat fallSpeed;
+		GMuint freemove;
+	} character;
+
+	struct Gravity
+	{
+		GMfloat vector[3];
+	} gravity;
 };
 
 struct GMMap
@@ -133,6 +147,7 @@ struct GMMap
 	std::set<GMMapEntity, ID_Less<GMMapEntity>> entities;
 	std::set<GMMapInstance, ID_Less<GMMapInstance>> instances;
 	std::set<GMMapLight, ID_Less<GMMapLight>> lights;
+	GMMapSettings settings;
 	std::string workingDir;
 };
 

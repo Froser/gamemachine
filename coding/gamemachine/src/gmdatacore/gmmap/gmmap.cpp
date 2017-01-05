@@ -2,11 +2,6 @@
 #include "gmmap.h"
 #include "utilities/assert.h"
 
-static bool strEqual(const char* str1, const char* str2)
-{
-	return !strcmp(str1, str2);
-}
-
 TextureType GMMapTexture::getType(const char* name)
 {
 	if (!name)
@@ -39,16 +34,16 @@ GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 	return GMMapObject::Error;
 }
 
-GMMapLight::GMMapLightType GMMapLight::getType(const char* name)
+LightType GMMapLight::getType(const char* name)
 {
 	if (!name)
-		return GMMapLight::Specular;
+		return Specular;
 
 	if (strEqual("ambient", name))
-		return GMMapLight::Ambient;
+		return Ambient;
 	if (strEqual("specular", name))
-		return GMMapLight::Specular;
+		return Specular;
 
 	ASSERT(false);
-	return GMMapLight::Error;
+	return Specular;
 }

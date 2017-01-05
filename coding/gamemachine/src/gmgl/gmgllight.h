@@ -1,30 +1,22 @@
 ﻿#ifndef __GMGLLIGHT_H__
 #define __GMGLLIGHT_H__
 #include "common.h"
-#include "gmengine/controller/light.h"
+#include "gmengine/elements/gamelight.h"
 BEGIN_NS
 
-class GMGLShaders;
-class GMGLLight : public ILightController
+struct Material;
+class GMGLAmbientLight : public GameLight
 {
 public:
-	GMGLLight(GMGLShaders& shaders);
+	virtual void activateLight(Material& material) override;
+	virtual bool isAvailable() override;
+};
 
+class GMGLSpecularLight : public GameLight
+{
 public:
-	virtual void setAmbient(GMfloat rgb[3]) override;
-	virtual void setAmbientCoefficient(GMfloat ka[3]) override;
-	virtual void setLightColor(GMfloat rgb[3]) override;
-	virtual void setDiffuseCoefficient(GMfloat kd[3]) override;
-	virtual void setShininess(GMfloat n) override;
-	virtual void setSpecularCoefficient(GMfloat ks[3]) override;
-	virtual void setEnvironmentCoefficient(GMfloat ke[3]) override;
-	virtual void setLightPosition(GMfloat xyz[3]) override;
-	virtual GMfloat* getLightPosition() override;
-	virtual void setViewPosition(GMfloat xyz[3]) override;
-
-private:
-	GMfloat m_lightPosition[3];
-	GMGLShaders& m_shaders;
+	virtual void activateLight(Material& material) override;
+	virtual bool isAvailable() override;
 };
 
 END_NS

@@ -6,6 +6,7 @@
 BEGIN_NS
 
 class GMGLGraphicEngine;
+class GameLight;
 class GMGLShadowMapping
 {
 public:
@@ -23,7 +24,7 @@ public:
 public:
 	void init();
 	void dispose();
-	void beginDrawDepthBuffer();
+	void beginDrawDepthBuffer(GameLight* shadowSourceLight);
 	void endDrawDepthBuffer();
 	bool hasBegun();
 	GMGLShaders& getShaders();

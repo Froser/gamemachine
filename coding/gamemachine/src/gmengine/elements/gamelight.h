@@ -4,6 +4,7 @@
 BEGIN_NS
 
 class GameWorld;
+struct Material;
 class GameLight
 {
 public:
@@ -19,25 +20,23 @@ public:
 
 	void setColor(const GMfloat color[3]);
 	GMfloat* getColor();
+
 public:
-	virtual void activateLight() = 0;
+	virtual void activateLight(Material& material) = 0;
 	virtual bool isAvailable() = 0;
 
 	void setWorld(GameWorld* world);
 	GameWorld* getWorld();
+
+	void setShadowSource(bool shadowSource);
+	bool getShadowSource();
 
 private:
 	GMfloat m_range;
 	GMfloat m_position[3];
 	GMfloat m_color[3];
 	GameWorld* m_world;
-};
-
-class AmbientLight : public GameLight
-{
-public:
-	virtual void activateLight() override;
-	virtual bool isAvailable() override;
+	bool m_shadowSource;
 };
 
 END_NS

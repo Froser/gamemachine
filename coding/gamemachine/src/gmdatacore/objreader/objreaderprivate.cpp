@@ -14,11 +14,6 @@
 #define KW_MTLLIB "mtllib"
 #define KW_USEMTL "usemtl"
 
-static bool strEqual(const char* str1, const char* str2)
-{
-	return !strcmp(str1, str2);
-}
-
 static bool isSeparator(char c)
 {
 	return c == '/';

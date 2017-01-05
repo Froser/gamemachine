@@ -18,5 +18,9 @@ ImageData& Image::getData()
 
 void Image::dispose()
 {
-	delete[] reinterpret_cast<GMbyte *>(m_data.mip[0].data);
+	if (m_data.mip[0].data)
+	{
+		delete[] reinterpret_cast<GMbyte *>(m_data.mip[0].data);
+		m_data.mip[0].data = nullptr;
+	}
 }

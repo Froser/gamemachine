@@ -178,7 +178,7 @@ float calcDiffuse(vec3 lightDirection, vec3 worldNormalCoord)
 
 
     float diffuse = dot(lightDirection, worldNormalCoord);
-    //diffuse = clamp(diffuse, 0.0f, 1.0f);
+    diffuse = clamp(diffuse, 0.0f, 1.0f);
     return diffuse;
 }
 

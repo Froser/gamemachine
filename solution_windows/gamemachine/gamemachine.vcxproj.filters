@@ -124,9 +124,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\light.h">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
@@ -272,9 +269,6 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp">
       <Filter>src\gmdatacore</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\light.cpp">
-      <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp">
       <Filter>src\gmgl</Filter>

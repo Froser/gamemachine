@@ -7,6 +7,7 @@ BEGIN_NS
 
 class GMGLShaders;
 class GMGLShadowMapping;
+class GameWorld;
 class GMGLObjectPainter : public ObjectPainter
 {
 public:
@@ -16,6 +17,7 @@ public:
 	virtual void init() override;
 	virtual void draw() override;
 	virtual void dispose() override;
+	void setWorld(GameWorld* world);
 
 private:
 	void setLights(Material& material);
@@ -26,6 +28,7 @@ private:
 private:
 	GMGLShaders& m_shaders;
 	GMGLShadowMapping& m_shadowMapping;
+	GameWorld* m_world;
 
 private:
 	bool m_inited;

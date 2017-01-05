@@ -13,7 +13,7 @@ BEGIN_NS
 #define		GMSHADER_LIGHT_POSITION				GMSHADER("light_position")
 #define		GMSHADER_LIGHT_KA					GMSHADER("light_ka")
 #define		GMSHADER_LIGHT_AMBIENT				GMSHADER("light_ambient")
-#define		GMSHADER_LIGHT_COLOR				GMSHADER("light_color")
+#define		GMSHADER_LIGHT_SPECULAR				GMSHADER("light_specular")
 #define		GMSHADER_LIGHT_KD					GMSHADER("light_kd")
 #define		GMSHADER_LIGHT_KS					GMSHADER("light_ks")
 #define		GMSHADER_LIGHT_KE					GMSHADER("light_ke")

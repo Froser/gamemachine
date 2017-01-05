@@ -99,7 +99,7 @@ uniform int GM_reflection_cubemap_texture_switch = 0;
 
 uniform vec4 GM_light_ambient;
 uniform vec4 GM_light_ka;
-uniform vec4 GM_light_color;
+uniform vec4 GM_light_specular;
 uniform vec4 GM_light_kd;
 uniform vec4 GM_light_ks;
 uniform vec4 GM_light_ke;
@@ -180,8 +180,8 @@ void drawObject()
     vec3 ambientLight = vec3(0);
 
     // 计算点光源
-    vec3 diffuseLight = MEMBER(lightFactors, diffuse) * vec3(GM_light_color) * vec3(GM_light_kd);
-    vec3 specularLight = MEMBER(lightFactors, specular) * vec3(GM_light_color) * vec3(GM_light_ks);
+    vec3 diffuseLight = MEMBER(lightFactors, diffuse) * vec3(GM_light_specular) * vec3(GM_light_kd);
+    vec3 specularLight = MEMBER(lightFactors, specular) * vec3(GM_light_specular) * vec3(GM_light_ks);
 
     // 计算阴影系数
     float shadeFactor = shadeFactorFactor(calcuateShadeFactor(MEMBER(coords, shadowCoord)));
@@ -200,8 +200,8 @@ void drawObject()
 
     // 计算环境光和环境光贴图
     vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,ambientUV))) : vec3(0);
-    ambientLight += vec3(GM_light_ka + shadeFactor * ambientTextureColor);
-    ambientLight *= vec3(GM_light_ambient);
+    ambientLight += GM_light_ambient.xyz + GM_light_ambient.xyz * shadeFactor * ambientTextureColor;
+    ambientLight *= vec3(GM_light_ka);
 
     // 最终结果
     vec3 color = ambientLight + shadeFactor * (diffuseLight + specularLight);
