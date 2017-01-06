@@ -55,7 +55,7 @@ void Character::appendObjectToWorld(btDynamicsWorld* world)
 
 GMfloat Character::calcMoveDistance()
 {
-	return m_moveSpeed / getWorld()->getGraphicEngine()->getGraphicSettings().fps;
+	return m_moveSpeed / getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
 }
 
 void Character::moveForwardOrBackward(bool forward)

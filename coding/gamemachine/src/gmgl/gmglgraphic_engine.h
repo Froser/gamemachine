@@ -22,12 +22,13 @@ public:
 	virtual void drawObjects(DrawingList& drawingList) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
-	virtual GraphicSettings& getGraphicSettings() override;
+	virtual GraphicSettings* getGraphicSettings() override;
 
 public:
 	GMGLShaders& getShaders();
 	GMGLShadowMapping& getShadowMapping();
 	GameWorld* getWorld();
+	void setGraphicSettings(GraphicSettings* settings);
 
 private:
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
@@ -42,7 +43,7 @@ private:
 	GMGLShadowMapping m_shadowMapping;
 	GameWorld* m_world;
 	ResourceContainer m_resourceContainer;
-	GraphicSettings m_settings;
+	GraphicSettings* m_settings;
 };
 
 END_NS

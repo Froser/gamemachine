@@ -14,6 +14,7 @@ struct DrawingItem
 struct GraphicSettings
 {
 	GMuint fps;
+	GMuint window_
 };
 
 typedef std::vector<DrawingItem> DrawingList;
@@ -29,7 +30,7 @@ struct IGraphicEngine
 	virtual void drawObjects(DrawingList& drawingList) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
-	virtual GraphicSettings& getGraphicSettings() = 0;
+	virtual GraphicSettings* getGraphicSettings() = 0;
 };
 
 END_NS

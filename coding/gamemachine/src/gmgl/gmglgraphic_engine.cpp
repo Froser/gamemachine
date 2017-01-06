@@ -22,6 +22,7 @@ struct __shadowSourcePred
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_world(nullptr)
 	, m_shadowMapping(*this)
+	, m_settings(nullptr)
 {
 }
 
@@ -179,7 +180,13 @@ ResourceContainer* GMGLGraphicEngine::getResourceContainer()
 	return &m_resourceContainer;
 }
 
-GraphicSettings& GMGLGraphicEngine::getGraphicSettings()
+GraphicSettings* GMGLGraphicEngine::getGraphicSettings()
 {
+	ASSERT(m_settings);
 	return m_settings;
+}
+
+void GMGLGraphicEngine::setGraphicSettings(GraphicSettings* settings)
+{
+	m_settings = settings;
 }

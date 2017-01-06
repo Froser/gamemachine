@@ -4,37 +4,23 @@
 #include <windows.h>
 #include "GL/glew.h"
 #include "GL/freeglut.h"
-#include "gmdatacore/objreader/objreader.h"
-#include "utilities/path.h"
-#include "utilities/camera.h"
-#include "utilities/assert.h"
-#include "gmdatacore/imagereader/imagereader.h"
-#include "gmengine/flow/gameloop.h"
-#include "gmengine/io/keyboard.h"
 #include "gmengine/elements/gameworld.h"
-#include "gmengine/elements/gameobject.h"
 #include "gmengine/elements/character.h"
-#include "gmgl/gmglshaders.h"
-#include "gmgl/gmglfunc.h"
-#include "gmgl/shader_constants.h"
-#include "gmgl/gmglgraphic_engine.h"
-#include "gmgl/gmglobjectpainter.h"
-#include "utilities/vmath.h"
-#include "gmengine/elements/cubegameobject.h"
-#include "gmengine/elements/convexhullgameobject.h"
-#include "gmengine/elements/skygameobject.h"
-#include "gmengine/elements/spheregameobject.h"
-#include "gmdatacore/gmmap/gmmapreader.h"
-#include "gmdatacore/gmmap/gameworldcreator.h"
 #include "gmgl/gmglfactory.h"
 #include "gmengine/io/mouse.h"
+#include "gmengine/flow/gameloop.h"
+#include "gmdatacore/gmmap/gmmap.h"
+#include "gmdatacore/gmmap/gmmapreader.h"
+#include "gmdatacore/gmmap/gameworldcreator.h"
+#include "gmgl/gmglgraphic_engine.h"
+#include "gmengine/io/keyboard.h"
+#include "gmgl/gmglfunc.h"
+#include "gmgl/shader_constants.h"
 
 using namespace gm;
 
 float width = 600;
 float height = 300;
-GLfloat centerX = 0, centerY = 0, centerZ = 0;
-GLfloat eyeX = 0, eyeY = 0, eyeZ = 5;
 
 GameWorld* world;
 Character* character;
@@ -126,6 +112,7 @@ public:
 };
 
 GameHandler handler;
+GraphicSettings settings = { 60 };
 GameLoop* gl = GameLoop::getInstance();
 
 void init()
@@ -154,8 +141,7 @@ void init()
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
-	GraphicSettings& settings = engine->getGraphicSettings();
-	settings.fps = 60;
+	engine->setGraphicSettings(&settings);
 
 	GMGLShaders& shaders = engine->getShaders();
 
