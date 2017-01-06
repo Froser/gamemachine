@@ -162,11 +162,11 @@ GMGLShadowMapping& GMGLGraphicEngine::getShadowMapping()
 	return m_shadowMapping;
 }
 
-void GMGLGraphicEngine::updateCameraView(Camera& camera)
+void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
 	m_shaders.useProgram();
-	GMGL::lookAt(camera, m_shaders, GMSHADER_VIEW_MATRIX);
-	GMGL::cameraPosition(camera, m_shaders, GMSHADER_VIEW_POSITION);
+	GMGL::lookAt(lookAt, m_shaders, GMSHADER_VIEW_MATRIX);
+	GMGL::cameraPosition(lookAt, m_shaders, GMSHADER_VIEW_POSITION);
 }
 
 GameWorld* GMGLGraphicEngine::getWorld()
@@ -177,4 +177,9 @@ GameWorld* GMGLGraphicEngine::getWorld()
 ResourceContainer* GMGLGraphicEngine::getResourceContainer()
 {
 	return &m_resourceContainer;
+}
+
+GraphicSettings& GMGLGraphicEngine::getGraphicSettings()
+{
+	return m_settings;
 }

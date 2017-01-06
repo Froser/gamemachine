@@ -2,12 +2,8 @@
 #define __GAMELOOP_H__
 #include "common.h"
 #include "utilities/stopwatch.h"
+#include "gmengine/controller/graphic_engine.h"
 BEGIN_NS
-
-struct GameLoopSettings
-{
-	GMint fps;
-};
 
 struct IGameHandler
 {
@@ -28,7 +24,7 @@ private:
 	GameLoop();
 
 public:
-	void init(const GameLoopSettings& settings, IGameHandler* handler);
+	void init(const GraphicSettings& settings, IGameHandler* handler);
 	void drawFrame();
 
 	void start();
@@ -36,7 +32,7 @@ public:
 	bool isTerminated();
 
 	GMint getCurrentFPS() { return m_currentFps; }
-	const GameLoopSettings& getSettings() const { return m_settings; }
+	const GraphicSettings& getSettings() const { return m_settings; }
 
 	void exit();
 
@@ -45,7 +41,7 @@ private:
 
 private:
 	bool m_running;
-	GameLoopSettings m_settings;
+	GraphicSettings m_settings;
 	IGameHandler* m_handler;
 	GMfloat m_eachFrameElapse;
 	GMint m_currentFps;

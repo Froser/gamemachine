@@ -130,6 +130,7 @@ struct GMMapSettings
 		GMfloat jumpSpeed[3];
 		GMfloat fallSpeed;
 		GMuint freemove;
+		GMuint movespeed;
 	} character;
 
 	struct Gravity

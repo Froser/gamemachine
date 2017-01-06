@@ -36,7 +36,7 @@ GameLoop::~GameLoop()
 
 }
 
-void GameLoop::init(const GameLoopSettings& settings, IGameHandler* handler)
+void GameLoop::init(const GraphicSettings& settings, IGameHandler* handler)
 {
 	m_settings = settings;
 	m_handler = handler;

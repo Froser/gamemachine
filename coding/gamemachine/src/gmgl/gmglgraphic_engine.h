@@ -20,8 +20,9 @@ public:
 	virtual void initialize(GameWorld*) override;
 	virtual void newFrame() override;
 	virtual void drawObjects(DrawingList& drawingList) override;
-	virtual void updateCameraView(Camera& camera) override;
+	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
+	virtual GraphicSettings& getGraphicSettings() override;
 
 public:
 	GMGLShaders& getShaders();
@@ -41,6 +42,7 @@ private:
 	GMGLShadowMapping m_shadowMapping;
 	GameWorld* m_world;
 	ResourceContainer m_resourceContainer;
+	GraphicSettings m_settings;
 };
 
 END_NS

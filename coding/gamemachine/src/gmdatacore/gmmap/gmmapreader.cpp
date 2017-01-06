@@ -277,6 +277,7 @@ bool handleSettings(TiXmlElement& elem, GMMap* map)
 			SAFE_SSCANF(child->Attribute("stepheight"), "%f", &map->settings.character.stepHeight);
 			SAFE_SSCANF(child->Attribute("fallspeed"), "%f", &map->settings.character.fallSpeed);
 			SAFE_SSCANF(child->Attribute("freemove"), "%i", &map->settings.character.freemove);
+			SAFE_SSCANF(child->Attribute("movespeed"), "%i", &map->settings.character.movespeed);
 		}
 	}
 	return true;

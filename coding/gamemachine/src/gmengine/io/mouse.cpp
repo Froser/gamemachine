@@ -33,3 +33,32 @@ void Mouse::showCursor(bool show)
 	ASSERT(false);
 #endif
 }
+
+
+MouseReaction::MouseReaction(AUTORELEASE IMouseReactionHandler* handler)
+	: m_handler(handler)
+{
+
+}
+
+void MouseReaction::initReaction(int windowPosX, int windowPosY, int windowWidth, int WindowHeight)
+{
+	const int centerX = windowPosX + windowWidth / 2;
+	const int centerY = windowPosY + WindowHeight / 2;
+	Mouse::setCursorPosition(centerX, centerY);
+	Mouse::showCursor(false);
+}
+
+void MouseReaction::mouseReact(int windowPosX, int windowPosY, int windowWidth, int WindowHeight)
+{
+	const int centerX = windowPosX + windowWidth / 2;
+	const int centerY = windowPosY + WindowHeight / 2;
+
+	int x = 0, y = 0;
+	Mouse::getCursorPosition(&x, &y);
+	int deltaX = x - centerX, deltaY = y - centerY;
+	m_handler->onMouseMove(deltaX, deltaY);
+	Mouse::setCursorPosition(centerX, centerY);
+}
+
+

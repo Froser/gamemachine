@@ -256,6 +256,7 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 			coreCharacter->setCanFreeMove(!!character.freemove);
 			coreCharacter->setJumpSpeed(btVector3(character.jumpSpeed[0], character.jumpSpeed[1], character.jumpSpeed[2]));
 			coreCharacter->setFallSpeed(character.fallSpeed);
+			coreCharacter->setMoveSpeed(character.movespeed);
 			world->appendObject(coreCharacter);
 			world->setMajorCharacter(coreCharacter);
 		}

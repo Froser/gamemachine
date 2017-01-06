@@ -39,8 +39,8 @@ void SkyGameObject::getReadyForRender(DrawingList& list)
 	// 需要把天空盒放到人物原点
 	GameWorld* world = getWorld();
 	Character* character = world->getMajorCharacter();
-	CameraLookAt lookAt = character->getCamera().getCameraLookAt();
-	
+	CameraLookAt lookAt;
+	Camera::calcCameraLookAt(character->getPositionState(), &lookAt);
 	vmath::mat4 trans = vmath::translate(lookAt.position_x, lookAt.position_y, lookAt.position_z);
 	DrawingItem item;
 	memcpy(item.trans, trans, sizeof(vmath::mat4));

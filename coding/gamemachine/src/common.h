@@ -8,6 +8,7 @@
 
 #define AUTORELEASE
 #define OUT
+#define REF
 #define USE_OPENGL
 #define OFFSET(type, count) (void*)(sizeof(type) * count)
 
@@ -33,5 +34,6 @@ typedef GMuint GMvertexoffset;
 
 //Tools:
 #define PI 3.141592653f
+#define HALF_PI 1.5707963265f
 #define RAD(deg) deg * PI / 180
 #define strEqual(str1, str2) !strcmp(str1, str2)

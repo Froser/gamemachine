@@ -16,7 +16,6 @@
 #include "gmengine/elements/character.h"
 #include "gmgl/gmglshaders.h"
 #include "gmgl/gmglfunc.h"
-#include "gmgl/gmgltexture.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglobjectpainter.h"
@@ -28,6 +27,7 @@
 #include "gmdatacore/gmmap/gmmapreader.h"
 #include "gmdatacore/gmmap/gameworldcreator.h"
 #include "gmgl/gmglfactory.h"
+#include "gmengine/io/mouse.h"
 
 using namespace gm;
 
@@ -36,12 +36,31 @@ float height = 300;
 GLfloat centerX = 0, centerY = 0, centerZ = 0;
 GLfloat eyeX = 0, eyeY = 0, eyeZ = 5;
 
-GMfloat fps = 60;
-GameLoopSettings s = { fps };
-
 GameWorld* world;
 Character* character;
 GMGLFactory factory;
+
+class MouseReactionHandler : public IMouseReactionHandler
+{
+public:
+	MouseReactionHandler(GameWorld* world)
+		: m_world(world)
+	{
+
+	}
+
+public:
+	virtual void onMouseMove(GMfloat deltaX, GMfloat deltaY)
+	{
+		world->getMajorCharacter()->lookRight(deltaX * .25);
+		world->getMajorCharacter()->lookUp(-deltaY * .25);
+	}
+
+private:
+	GameWorld* m_world;
+};
+
+MouseReaction* reaction;
 
 class GameHandler : public IGameHandler
 {
@@ -53,7 +72,6 @@ public:
 
 	void render()
 	{
-		Camera& camera = world->getMajorCharacter()->getCamera();
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
 		GMGLShaders& shaders = engine->getShaders();
 
@@ -66,31 +84,29 @@ public:
 	{
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
 		GMGLShaders& shaders = engine->getShaders();
-		Camera& camera = world->getMajorCharacter()->getCamera();
-		GMGL::lookAt(camera, shaders, GMSHADER_VIEW_MATRIX);
+		CameraLookAt lookAt;
+		Camera::calcCameraLookAt(world->getMajorCharacter()->getPositionState(), &lookAt);
+		GMGL::lookAt(lookAt, shaders, GMSHADER_VIEW_MATRIX);
 		int wx = glutGet(GLUT_WINDOW_X),
 			wy = glutGet(GLUT_WINDOW_Y);
-		camera.mouseReact(wx, wy, width, height);
+		reaction->mouseReact(wx, wy, width, height);
 	}
 
 	void keyboard()
 	{
 		Character* character = world->getMajorCharacter();
-		Camera* camera = &character->getCamera();
-		GMfloat dis = 45;
-		GMfloat v = dis / fps;
 		if (Keyboard::isKeyDown(VK_ESCAPE) || Keyboard::isKeyDown('Q'))
 		{
 			m_gl->terminate();
 		}
 		if (Keyboard::isKeyDown('A'))
-			character->moveRight(-v);
+			character->moveLeft();
 		if (Keyboard::isKeyDown('D'))
-			character->moveRight(v);
+			character->moveRight();
 		if (Keyboard::isKeyDown('W'))
-			character->moveFront(v);
+			character->moveForward();
 		if (Keyboard::isKeyDown('S'))
-			character->moveFront(-v);
+			character->moveBackward();
 		if (Keyboard::isKeyDown(VK_SPACE))
 			character->jump();
 	}
@@ -103,6 +119,7 @@ public:
 	void onExit()
 	{
 		delete world;
+		delete reaction;
 	}
 
 	GameLoop* m_gl;
@@ -116,20 +133,38 @@ void init()
 	glEnable(GL_POLYGON_SMOOTH);
 
 	GMMap* map;
-	GMMapReader::readGMM("D:\\gmm\\demo.xml", &map);
+#if _DEBUG
+	GMMapReader::readGMM("D:/gmm/demo.xml", &map);
+	std::string currentPath("D:/shaders/test/");
+	std::string shaderPath("D:/shaders/test/");
+#else
+	std::string currentPath(Path::getCurrentPath());
+	std::string demoPath(currentPath);
+	demoPath.append("map/demo.xml");
+	GMMapReader::readGMM(demoPath.c_str(), &map);
+	std::string shaderPath(currentPath);
+	shaderPath.append("shaders/");
+#endif
+
 	GameWorldCreator::createGameWorld(&factory, map, &world);
+	delete map;
+
+	MouseReactionHandler* mouseHandler = new MouseReactionHandler(world);
+	reaction = new MouseReaction(mouseHandler);
 
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
+	GraphicSettings& settings = engine->getGraphicSettings();
+	settings.fps = 60;
+
 	GMGLShaders& shaders = engine->getShaders();
 
 	GMGLShadowMapping& shadow = engine->getShadowMapping();
 	GMGLShaders& shadowShaders = shadow.getShaders();
 
-	std::string currentPath("D:\\shaders\\test\\");//Path::getCurrentPath();
 	{
-		std::string vert = std::string(currentPath).append("gmshader.vert"),
-			frag = std::string(currentPath).append("gmshader.frag");
+		std::string vert = std::string(shaderPath).append("gmshader.vert"),
+			frag = std::string(shaderPath).append("gmshader.frag");
 		GMGLShaderInfo shadersInfo[] = {
 			{ GL_VERTEX_SHADER, vert.c_str() },
 			{ GL_FRAGMENT_SHADER, frag.c_str() },
@@ -141,8 +176,8 @@ void init()
 	}
 
 	{
-		std::string vert = std::string(currentPath).append("gmshadowmapping.vert"),
-			frag = std::string(currentPath).append("gmshadowmapping.frag");
+		std::string vert = std::string(shaderPath).append("gmshadowmapping.vert"),
+			frag = std::string(shaderPath).append("gmshadowmapping.frag");
 		GMGLShaderInfo shadersInfo[] = {
 			{ GL_VERTEX_SHADER, vert.c_str() },
 			{ GL_FRAGMENT_SHADER, frag.c_str() },
@@ -157,12 +192,9 @@ void init()
 	int wx = glutGet(GLUT_WINDOW_X),
 		wy = glutGet(GLUT_WINDOW_Y);
 
-	Camera& camera = world->getMajorCharacter()->getCamera();
-	camera.mouseInitReaction(wx, wy, width, height);
-
+	reaction->initReaction(wx, wy, width, height);
 	handler.setGameLoop(gl);
-	camera.setSensibility(.25f);
-	gl->init(s, &handler);
+	gl->init(settings, &handler);
 }
 
 void render()

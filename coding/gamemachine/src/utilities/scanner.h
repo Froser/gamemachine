@@ -22,6 +22,7 @@ private:
 	const char* m_p;
 	bool m_skipSame;
 	CharPredicate m_predicate;
+	bool m_valid;
 };
 
 END_NS
