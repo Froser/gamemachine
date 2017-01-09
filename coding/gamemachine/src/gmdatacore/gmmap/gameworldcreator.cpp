@@ -6,7 +6,6 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/gameobject.h"
 #include "gmdatacore/imagereader/imagereader.h"
-#include "gmengine/controller/factory.h"
 #include "gmengine/elements/cubegameobject.h"
 #include "gmengine/elements/spheregameobject.h"
 #include "gmengine/elements/skygameobject.h"
@@ -15,6 +14,7 @@
 #include "gmdatacore/objreader/objreader.h"
 #include "gmengine/controller/resource_container.h"
 #include "gmengine/elements/gamelight.h"
+#include "gmengine/controller/gamemachine.h"
 
 #define CREATE_FUNC
 #define RESOURCE_FUNC
@@ -225,7 +225,7 @@ void createGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMM
 	getObjectCreateFunc(object->type)(factory, resContainer, map, instance, entity, object, gameObject);
 }
 
-void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWorld** gameWorld)
+void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorld** gameWorld)
 {
 	GameWorld* world;
 	if (gameWorld)
@@ -234,8 +234,8 @@ void GameWorldCreator::createGameWorld(IFactory* factory, GMMap* map, OUT GameWo
 		*gameWorld = world;
 	}
 
-	IGraphicEngine* engine;
-	factory->createGraphicEngine(&engine);
+	IFactory* factory = gm->getFactory();
+	IGraphicEngine* engine = gm->getGraphicEngine();
 	world->setGraphicEngine(engine);
 	loadTextures(engine, factory, map);
 

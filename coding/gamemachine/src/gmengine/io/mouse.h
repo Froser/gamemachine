@@ -22,8 +22,8 @@ public:
 	MouseReaction(AUTORELEASE IMouseReactionHandler* handler);
 
 public:
-	void initReaction(int windowPosX, int windowPosY, int windowWidth, int WindowHeight);
-	void mouseReact(int windowPosX, int windowPosY, int windowWidth, int WindowHeight);
+	void initReaction(GMRect rect);
+	void mouseReact(GMRect rect);
 
 private:
 	AutoPtr<IMouseReactionHandler> m_handler;

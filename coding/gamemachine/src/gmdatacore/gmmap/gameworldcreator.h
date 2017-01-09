@@ -5,11 +5,11 @@ BEGIN_NS
 
 class GameWorld;
 struct GMMap;
-struct IFactory;
+struct GameMachine;
 class GameWorldCreator
 {
 public:
-	static void createGameWorld(IFactory* factory, GMMap* map, OUT GameWorld** gameWorld);
+	static void createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorld** gameWorld);
 };
 
 END_NS

@@ -5,8 +5,11 @@
 #include "gmengine/controller/graphic_engine.h"
 BEGIN_NS
 
+struct GameMachine;
 struct IGameHandler
 {
+	virtual void setGameMachine(GameMachine* gm) = 0;
+	virtual void init() = 0;
 	virtual void mouse() = 0;
 	virtual void keyboard() = 0;
 	virtual void render() = 0;

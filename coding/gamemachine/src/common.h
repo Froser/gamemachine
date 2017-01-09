@@ -1,4 +1,6 @@
-﻿#define BEGIN_NS namespace gm {
+﻿#ifndef __COMMON_H__
+#define __COMMON_H__
+#define BEGIN_NS namespace gm {
 #define END_NS }
 #define DEFINE_PRIVATE(className) \
 	private: \
@@ -23,6 +25,7 @@ typedef unsigned char BYTE;
 #define GLEW_STATIC
 #include "GL/glew.h"
 
+BEGIN_NS
 typedef unsigned char GMbyte;
 typedef GLfloat GMfloat;
 typedef GLint GMint;
@@ -30,6 +33,12 @@ typedef GLuint GMuint;
 typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
 typedef GMuint GMvertexoffset;
+struct GMRect
+{
+	GMfloat x, y, width, height;
+};
+END_NS
+
 #define LINE_MAX 256
 
 //Tools:
@@ -37,3 +46,5 @@ typedef GMuint GMvertexoffset;
 #define HALF_PI 1.5707963265f
 #define RAD(deg) deg * PI / 180
 #define strEqual(str1, str2) !strcmp(str1, str2)
+
+#endif

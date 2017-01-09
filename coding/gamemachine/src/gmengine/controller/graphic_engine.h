@@ -14,7 +14,10 @@ struct DrawingItem
 struct GraphicSettings
 {
 	GMuint fps;
-	GMuint window_
+	GMuint windowSize[2];
+	GMuint resolution[2];
+	GMuint startPosition[2];
+	bool fullscreen;
 };
 
 typedef std::vector<DrawingItem> DrawingList;
@@ -31,6 +34,7 @@ struct IGraphicEngine
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
 	virtual GraphicSettings* getGraphicSettings() = 0;
+	virtual void setGraphicSettings(GraphicSettings* settings) = 0;
 };
 
 END_NS

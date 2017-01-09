@@ -41,18 +41,18 @@ MouseReaction::MouseReaction(AUTORELEASE IMouseReactionHandler* handler)
 
 }
 
-void MouseReaction::initReaction(int windowPosX, int windowPosY, int windowWidth, int WindowHeight)
+void MouseReaction::initReaction(GMRect rect)
 {
-	const int centerX = windowPosX + windowWidth / 2;
-	const int centerY = windowPosY + WindowHeight / 2;
+	const int centerX = rect.x + rect.width / 2;
+	const int centerY = rect.y + rect.height / 2;
 	Mouse::setCursorPosition(centerX, centerY);
 	Mouse::showCursor(false);
 }
 
-void MouseReaction::mouseReact(int windowPosX, int windowPosY, int windowWidth, int WindowHeight)
+void MouseReaction::mouseReact(GMRect rect)
 {
-	const int centerX = windowPosX + windowWidth / 2;
-	const int centerY = windowPosY + WindowHeight / 2;
+	const int centerX = rect.x + rect.width / 2;
+	const int centerY = rect.y + rect.height/ 2;
 
 	int x = 0, y = 0;
 	Mouse::getCursorPosition(&x, &y);
