@@ -64,7 +64,7 @@ void Character::moveForwardOrBackward(bool forward)
 	if (m_freeMove)
 		m_state.positionY += distance * std::sin(m_state.lookUpRad);
 
-	GMfloat l = m_freeMove ? distance * std::cos(m_state.lookUpRad) : (forward ? 1 : -1);
+	GMfloat l = m_freeMove ? distance * std::cos(m_state.lookUpRad) : distance;
 	m_state.positionX += l * std::sin(m_state.lookAtRad);
 	m_state.positionZ -= l * std::cos(m_state.lookAtRad);
 }
@@ -179,4 +179,16 @@ void Character::jump()
 bool Character::isJumping()
 {
 	return !m_controller->canJump();
+}
+
+void Character::setEyeOffset(GMfloat* offset)
+{
+	memcpy(&m_eyeOffset, offset, sizeof(m_eyeOffset));
+}
+
+void Character::applyEyeOffset(CameraLookAt& lookAt)
+{
+	lookAt.position_x += m_eyeOffset[0];
+	lookAt.position_y += m_eyeOffset[1];
+	lookAt.position_z += m_eyeOffset[2];
 }

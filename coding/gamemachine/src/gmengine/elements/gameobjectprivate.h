@@ -6,7 +6,20 @@
 #include "btBulletCollisionCommon.h"
 BEGIN_NS
 
+#define PARAM(type, name)	\
+	bool name##_flag : 1;	\
+	type name;
+#define PARAM_F(name) PARAM(GMfloat, name)
+
+struct Frictions
+{
+	PARAM_F(friction);
+	PARAM_F(rollingFriction);
+	PARAM_F(spinningFriction);
+};
+
 class GameWorld;
+struct Frictions;
 class GameObjectPrivate
 {
 	friend class GameObject;
@@ -22,6 +35,8 @@ private:
 	void setMass(btScalar mass);
 	void setObject(AUTORELEASE Object* obj);
 	void setTransform(const btTransform& transform);
+	void setFrictions(const Frictions& frictions);
+	void setFrictions();
 
 private:
 	btTransform m_transform;
@@ -33,6 +48,7 @@ private:
 	AutoPtr<btMotionState> m_pMotionState;
 	AutoPtr<Object> m_pObject;
 	GameWorld* m_world;
+	Frictions m_frictions;
 };
 
 END_NS

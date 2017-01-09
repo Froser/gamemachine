@@ -38,6 +38,9 @@ public:
 
 	const PositionState& getPositionState();
 
+	void setEyeOffset(GMfloat* offset);
+	void applyEyeOffset(CameraLookAt& lookAt);
+
 private:
 	virtual btCollisionShape* createCollisionShape() override;
 	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
@@ -54,6 +57,7 @@ private:
 	btVector3 m_jumpSpeed;
 	btScalar m_fallSpeed;
 	GMfloat m_moveSpeed;
+	GMfloat m_eyeOffset[3];
 
 	AutoPtr<btKinematicCharacterController> m_controller;
 	AutoPtr<btPairCachingGhostObject> m_ghostObject;

@@ -15,6 +15,7 @@
 #include "gmengine/controller/resource_container.h"
 #include "gmengine/elements/gamelight.h"
 #include "gmengine/controller/gamemachine.h"
+#include "utilities/assert.h"
 
 #define CREATE_FUNC
 #define RESOURCE_FUNC
@@ -46,8 +47,11 @@ btTransform getTransform(const GMMapInstance* instance)
 void setPropertiesFromInstance(const GMMapInstance* instance, GameObject* gameObj)
 {
 	gameObj->setMass(instance->mass);
+
+	LOG_ASSERT_MSG(instance->scale[0] == 0 || instance->scale[1] == 0 || instance->scale[2], "Invalid scale.");
 	gameObj->setLocalScaling(btVector3(instance->scale[0], instance->scale[1], instance->scale[2]));
 	gameObj->setTransform(getTransform(instance));
+	gameObj->setFrictions(instance->frictions);
 }
 
 void copyUniqueMaterialProperties(const Material& material, Object* coreObject)
@@ -171,9 +175,10 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 
 	// 目前先用objreader来读取obj
 	ObjReader reader;
-	Object* coreObject;
+	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
 	reader.load(modelPath.c_str(), &coreObject);
+	LOG_ASSERT_MSG(coreObject, (std::string("Model loading error: ") + modelPath).c_str());
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)
@@ -220,7 +225,9 @@ void loadTextures(IGraphicEngine* engine, IFactory* factory, GMMap* map)
 void createGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMMap* map, const GMMapInstance* instance, OUT GameObject** gameObject)
 {
 	const GMMapEntity* entity = GMMap_find(map->entities, instance->entityRef);
+	LOG_ASSERT_MSG(entity, "You may bind wrong entityref.");
 	const GMMapObject* object = GMMap_find(map->objects, entity->objRef);
+	LOG_ASSERT_MSG(object, "You may bind wrong objref.");
 	ResourceContainer* resContainer = engine->getResourceContainer();
 	getObjectCreateFunc(object->type)(factory, resContainer, map, instance, entity, object, gameObject);
 }
@@ -232,6 +239,10 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 	{
 		world = new GameWorld();
 		*gameWorld = world;
+	}
+	else
+	{
+		return;
 	}
 
 	IFactory* factory = gm->getFactory();
@@ -257,6 +268,7 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 			coreCharacter->setJumpSpeed(btVector3(character.jumpSpeed[0], character.jumpSpeed[1], character.jumpSpeed[2]));
 			coreCharacter->setFallSpeed(character.fallSpeed);
 			coreCharacter->setMoveSpeed(character.movespeed);
+			coreCharacter->setEyeOffset(character.eyeOffset);
 			world->appendObject(coreCharacter);
 			world->setMajorCharacter(coreCharacter);
 		}
@@ -292,5 +304,6 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 		}
 	}
 
+	LOG_ASSERT_MSG(map->lights.size() > 0, "There is no light in the world.");
 	world->initialize();
 }

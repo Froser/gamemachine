@@ -202,6 +202,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\log.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -356,6 +359,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp">
       <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\log.cpp">
+      <Filter>src\utilities</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

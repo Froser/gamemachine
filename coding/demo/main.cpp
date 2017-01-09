@@ -67,7 +67,7 @@ public:
 
 		GMMap* map;
 #if _DEBUG
-		GMMapReader::readGMM("D:/gmm/demo.xml", &map);
+		GMMapReader::readGMM("D:/stage1/demo.xml", &map);
 		std::string currentPath("D:/shaders/test/");
 		std::string shaderPath("D:/shaders/test/");
 #else
@@ -177,7 +177,7 @@ public:
 	GameMachine* m_gm;
 };
 
-GraphicSettings settings = { 60, { 640, 480 } ,{ 100, 100 }, {400, 400}, false };
+GraphicSettings settings = { 60, { 700, 400 } ,{ 100, 100 }, {400, 400}, false };
 
 int main()
 {

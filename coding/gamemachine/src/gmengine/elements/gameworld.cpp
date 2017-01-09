@@ -72,10 +72,12 @@ void GameWorld::renderGameWorld()
 		gameObj->getReadyForRender(list);
 	}
 
-	dataRef().m_pEngine->drawObjects(list);
 	CameraLookAt lookAt;
 	Camera::calcCameraLookAt(dataRef().m_character->getPositionState(), &lookAt);
+	dataRef().m_character->applyEyeOffset(lookAt);
 	dataRef().m_pEngine->updateCameraView(lookAt);
+
+	dataRef().m_pEngine->drawObjects(list);
 }
 
 void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)

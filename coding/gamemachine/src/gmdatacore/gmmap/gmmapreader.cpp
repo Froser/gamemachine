@@ -209,6 +209,29 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 			}
 		}
 
+		{
+			{
+				const char* attr = child->Attribute("friction");
+				instance.frictions.friction_flag = !!attr;
+				if (attr)
+					SAFE_SSCANF(attr, "%f", &instance.frictions.friction);
+			}
+
+			{
+				const char* attr = child->Attribute("rollingfriction");
+				instance.frictions.rollingFriction_flag = !!attr;
+				if (attr)
+					SAFE_SSCANF(attr, "%f", &instance.frictions.rollingFriction);
+			}
+
+			{
+				const char* attr = child->Attribute("spinningfriction");
+				instance.frictions.spinningFriction_flag = !!attr;
+				if (attr)
+					SAFE_SSCANF(attr, "%f", &instance.frictions.spinningFriction);
+			}
+		}
+
 		map->instances.insert(instance);
 	}
 
@@ -247,6 +270,12 @@ bool handleLights(TiXmlElement& elem, GMMap* map)
 
 bool handleSettings(TiXmlElement& elem, GMMap* map)
 {
+	struct _flag
+	{
+		bool character_flag : 1;
+	};
+	_flag t = { 0 };
+
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
 		if (strEqual(child->Value(), "gravity"))
@@ -272,14 +301,25 @@ bool handleSettings(TiXmlElement& elem, GMMap* map)
 				scanner.nextFloat(&map->settings.character.jumpSpeed[2]);
 			}
 
+			{
+				Scanner scanner(child->Attribute("eyeoffset"));
+				scanner.nextFloat(&map->settings.character.eyeOffset[0]);
+				scanner.nextFloat(&map->settings.character.eyeOffset[1]);
+				scanner.nextFloat(&map->settings.character.eyeOffset[2]);
+			}
+
 			SAFE_SSCANF(child->Attribute("radius"), "%f", &map->settings.character.radius);
 			SAFE_SSCANF(child->Attribute("height"), "%f", &map->settings.character.height);
 			SAFE_SSCANF(child->Attribute("stepheight"), "%f", &map->settings.character.stepHeight);
 			SAFE_SSCANF(child->Attribute("fallspeed"), "%f", &map->settings.character.fallSpeed);
 			SAFE_SSCANF(child->Attribute("freemove"), "%i", &map->settings.character.freemove);
 			SAFE_SSCANF(child->Attribute("movespeed"), "%i", &map->settings.character.movespeed);
+
+			t.character_flag = true;
 		}
 	}
+
+	LOG_ASSERT_MSG(t.character_flag, "Character is missing.");
 	return true;
 }
 

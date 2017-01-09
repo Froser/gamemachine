@@ -5,6 +5,7 @@
 #include <set>
 #include "gmdatacore/object.h"
 #include "gmengine/controller/factory.h"
+#include "gmengine/elements/gameobjectprivate.h"
 
 BEGIN_NS
 
@@ -105,6 +106,7 @@ struct GMMapInstance
 	GMfloat position[3], rotation[4];
 	GMfloat scale[3];
 	GMfloat mass;
+	Frictions frictions;
 };
 
 struct GMMapLight
@@ -128,6 +130,7 @@ struct GMMapSettings
 		GMfloat height;
 		GMfloat stepHeight;
 		GMfloat jumpSpeed[3];
+		GMfloat eyeOffset[3];
 		GMfloat fallSpeed;
 		GMuint freemove;
 		GMuint movespeed;

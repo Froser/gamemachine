@@ -30,6 +30,7 @@ btCollisionObject* GameObject::getCollisionObject()
 void GameObject::setCollisionObject(btCollisionObject* obj)
 {
 	dataRef().m_pColObj = obj;
+	dataRef().setFrictions();
 }
 
 void GameObject::setMass(btScalar mass)
@@ -117,4 +118,9 @@ void GameObject::getReadyForRender(DrawingList& list)
 		item.gameObject = this;
 		list.push_back(item);
 	}
+}
+
+void GameObject::setFrictions(const Frictions& frictions)
+{
+	dataRef().setFrictions(frictions);
 }

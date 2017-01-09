@@ -16,6 +16,10 @@ void ObjReader::load(const char* filename, OUT Object** obj)
 	{
 		parse(file, obj);
 	}
+	else
+	{
+		*obj = nullptr;
+	}
 	file.close();
 }
 

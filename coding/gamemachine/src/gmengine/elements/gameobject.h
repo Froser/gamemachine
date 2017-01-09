@@ -9,6 +9,8 @@
 class btDynamicsWorld;
 
 BEGIN_NS
+
+struct Frictions;
 class GameWorld;
 class GameObject
 {
@@ -37,6 +39,8 @@ public:
 
 	virtual void setWorld(GameWorld* world);
 	GameWorld* getWorld();
+
+	void setFrictions(const Frictions& frictions);
 
 public:
 	virtual void getReadyForRender(DrawingList& list);
