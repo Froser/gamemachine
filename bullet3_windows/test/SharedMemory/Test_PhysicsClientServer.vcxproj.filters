@@ -94,6 +94,9 @@
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

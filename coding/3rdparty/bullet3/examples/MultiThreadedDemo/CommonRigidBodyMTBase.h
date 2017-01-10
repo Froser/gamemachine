@@ -52,6 +52,8 @@ struct CommonRigidBodyMTBase : public CommonExampleInterface
 		}
 	}
 
+    virtual void drawScreenText();
+    virtual void renderScene();
 	virtual void physicsDebugDraw(int debugFlags);
 
 	virtual void exitPhysics()
@@ -406,20 +408,19 @@ struct CommonRigidBodyMTBase : public CommonExampleInterface
 		return body;
 	}
 
+    btRigidBody* createKinematicBody(const btTransform& startTransform, btCollisionShape* shape)
+    {
+        btAssert( ( !shape || shape->getShapeType() != INVALID_SHAPE_PROXYTYPE ) );
 
-	
-	virtual void renderScene()
-	{
-		{
-			
-			m_guiHelper->syncPhysicsToGraphics(m_dynamicsWorld);
-		}
-		
-		{
-			
-			m_guiHelper->render(m_dynamicsWorld);
-		}
-	}
+        btRigidBody* body = new btRigidBody( 0.0f, NULL, shape );
+        body->setWorldTransform( startTransform );
+        body->setCollisionFlags( body->getCollisionFlags() | btCollisionObject::CF_KINEMATIC_OBJECT );
+        body->setUserIndex( -1 );
+        m_dynamicsWorld->addRigidBody( body );
+        return body;
+    }
+
+
 };
 
 #endif //#define COMMON_RIGID_BODY_MT_BASE_H

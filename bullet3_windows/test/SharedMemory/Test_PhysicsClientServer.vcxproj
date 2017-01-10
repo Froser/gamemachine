@@ -368,6 +368,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportColladaDemo\LoadMeshFromCollada.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\LoadMeshFromObj.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportObjDemo\Wavefront2GLInstanceGraphicsShape.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.cpp" />

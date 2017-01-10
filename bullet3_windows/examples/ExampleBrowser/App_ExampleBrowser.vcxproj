@@ -445,6 +445,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\ImportURDFSetup.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\URDF2Bullet.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdf_samples.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.h" />
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\ImportMJCFSetup.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdfStringSplit.h" />
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\BulletUrdfImporter.h" />
@@ -543,6 +545,8 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bFile.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\bDNA.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\btBulletFile.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.cpp" />
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\ImportMJCFSetup.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspConverter.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspLoader.cpp" />
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\ImportBspExample.cpp" />

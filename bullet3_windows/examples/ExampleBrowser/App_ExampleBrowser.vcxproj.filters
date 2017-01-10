@@ -253,6 +253,12 @@
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\Extras\Serialize\BulletFileLoader\btBulletFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\ImportMJCFSetup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportBsp\BspConverter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -586,6 +592,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\urdf_samples.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\BulletMJCFImporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportMJCFDemo\ImportMJCFSetup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\coding\3rdparty\bullet3\examples\Importers\ImportURDFDemo\MyMultiBodyCreator.h">

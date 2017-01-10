@@ -17,7 +17,7 @@
 #endif //_WIN32
 #endif//__APPLE__
 #include "../ThirdPartyLibs/Gwen/Renderers/OpenGL_DebugFont.h"
-
+#include "LinearMath/btThreads.h"
 #include "Bullet3Common/b3Vector3.h"
 #include "assert.h"
 #include <stdio.h>
@@ -25,7 +25,9 @@
 #include "GwenGUISupport/gwenUserInterface.h"
 #include "../Utils/b3Clock.h"
 #include "GwenGUISupport/GwenParameterInterface.h"
+#ifndef BT_NO_PROFILE
 #include "GwenGUISupport/GwenProfileWindow.h"
+#endif
 #include "GwenGUISupport/GwenTextureWindow.h"
 #include "GwenGUISupport/GraphingTexture.h"
 #include "../CommonInterfaces/Common2dCanvasInterface.h"
@@ -68,7 +70,9 @@ struct OpenGLExampleBrowserInternalData
 {
 	Gwen::Renderer::Base* m_gwenRenderer;
 	CommonGraphicsApp* m_app;
-//	MyProfileWindow* m_profWindow;
+#ifndef BT_NO_PROFILE
+	MyProfileWindow* m_profWindow;
+#endif //BT_NO_PROFILE
 	btAlignedObjectArray<Gwen::Controls::TreeNode*> m_nodes;
 	GwenUserInterface* m_gui;
 	GL3TexLoader* m_myTexLoader;
@@ -93,7 +97,9 @@ static CommonWindowInterface* s_window = 0;
 static CommonParameterInterface*	s_parameterInterface=0;
 static CommonRenderInterface*	s_instancingRenderer=0;
 static OpenGLGuiHelper*	s_guiHelper=0;
-//static MyProfileWindow* s_profWindow =0;
+#ifndef BT_NO_PROFILE
+static MyProfileWindow* s_profWindow =0;
+#endif //BT_NO_PROFILE
 static SharedMemoryInterface* sSharedMem = 0;
 
 #define DEMO_SELECTION_COMBOBOX 13
@@ -110,7 +116,6 @@ bool gAllowRetina = true;
 bool gDisableDemoSelection = false;
 static class ExampleEntries* gAllExamples=0;
 bool sUseOpenGL2 = false;
-bool drawGUI=true;
 #ifndef USE_OPENGL3
 extern bool useShadowMap;
 #endif
@@ -144,6 +149,226 @@ int gGpuArraySizeZ=45;
 
 
 
+struct btTiming
+{
+	const char* m_name;
+	int m_threadId;
+	unsigned long long int m_usStartTime;
+	unsigned long long int m_usEndTime;
+};
+
+FILE* gTimingFile = 0;
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif //__STDC_FORMAT_MACROS
+
+//see http://stackoverflow.com/questions/18107426/printf-format-for-unsigned-int64-on-windows
+#ifndef _WIN32
+#include <inttypes.h>
+#endif
+
+#define BT_TIMING_CAPACITY 16*65536
+static bool m_firstTiming = true;
+
+
+struct btTimings
+{
+	btTimings()
+		:m_numTimings(0),
+		m_activeBuffer(0)
+	{
+		
+	}
+	void flush()
+	{
+		for (int i=0;i<m_numTimings;i++)
+		{
+			const char* name = m_timings[m_activeBuffer][i].m_name;
+			int threadId = m_timings[m_activeBuffer][i].m_threadId;
+			unsigned long long int startTime = m_timings[m_activeBuffer][i].m_usStartTime;
+			unsigned long long int endTime = m_timings[m_activeBuffer][i].m_usEndTime;
+
+			if (!m_firstTiming)
+			{
+				fprintf(gTimingFile,",\n");
+			}
+
+			m_firstTiming = false;
+
+            unsigned long long int startTimeDiv1000 = startTime/1000;
+            unsigned long long int endTimeDiv1000 = endTime/1000;
+
+#if 0
+
+            fprintf(gTimingFile,"{\"cat\":\"timing\",\"pid\":1,\"tid\":%d,\"ts\":%" PRIu64 ".123 ,\"ph\":\"B\",\"name\":\"%s\",\"args\":{}},\n",
+                    threadId, startTimeDiv1000, name);
+            fprintf(gTimingFile,"{\"cat\":\"timing\",\"pid\":1,\"tid\":%d,\"ts\":%" PRIu64 ".234 ,\"ph\":\"E\",\"name\":\"%s\",\"args\":{}}",
+                    threadId, endTimeDiv1000,name);
+
+#else
+         
+			
+			if (startTime>endTime)
+			{
+				endTime = startTime;
+			}
+            unsigned int startTimeRem1000 = startTime%1000;
+            unsigned int endTimeRem1000 = endTime%1000;
+
+            char startTimeRem1000Str[16];
+            char endTimeRem1000Str[16];
+            
+            if (startTimeRem1000<10)
+            {
+                sprintf(startTimeRem1000Str,"00%d",startTimeRem1000);
+            }
+            else
+            {
+                if (startTimeRem1000<100)
+                {
+                    sprintf(startTimeRem1000Str,"0%d",startTimeRem1000);
+                } else
+                {
+                    sprintf(startTimeRem1000Str,"%d",startTimeRem1000);
+                }
+            }
+            
+            if (endTimeRem1000<10)
+            {
+                sprintf(endTimeRem1000Str,"00%d",endTimeRem1000);
+            }
+            else
+            {
+                if (endTimeRem1000<100)
+                {
+                    sprintf(endTimeRem1000Str,"0%d",endTimeRem1000);
+                } else
+                {
+                    sprintf(endTimeRem1000Str,"%d",endTimeRem1000);
+                }
+            }
+            
+            char newname[1024];
+			static int counter2=0;
+            sprintf(newname,"%s%d",name,counter2++);
+         
+#ifdef _WIN32
+			
+			fprintf(gTimingFile,"{\"cat\":\"timing\",\"pid\":1,\"tid\":%d,\"ts\":%I64d.%s ,\"ph\":\"B\",\"name\":\"%s\",\"args\":{}},\n",
+				threadId, startTimeDiv1000,startTimeRem1000Str, newname);
+			fprintf(gTimingFile,"{\"cat\":\"timing\",\"pid\":1,\"tid\":%d,\"ts\":%I64d.%s ,\"ph\":\"E\",\"name\":\"%s\",\"args\":{}}",
+				threadId, endTimeDiv1000,endTimeRem1000Str,newname);
+
+#else
+			fprintf(gTimingFile,"{\"cat\":\"timing\",\"pid\":1,\"tid\":%d,\"ts\":%" PRIu64 ".%s ,\"ph\":\"B\",\"name\":\"%s\",\"args\":{}},\n",
+				threadId, startTimeDiv1000,startTimeRem1000Str, newname);
+			fprintf(gTimingFile,"{\"cat\":\"timing\",\"pid\":1,\"tid\":%d,\"ts\":%" PRIu64 ".%s ,\"ph\":\"E\",\"name\":\"%s\",\"args\":{}}",
+				threadId, endTimeDiv1000,endTimeRem1000Str,newname);
+#endif
+#endif
+
+		}
+		m_numTimings = 0;
+
+	}
+
+	void addTiming(const char* name, int threadId, unsigned long long int startTime,  unsigned long long int endTime)
+	{
+		if (m_numTimings>=BT_TIMING_CAPACITY)
+		{
+			return;
+		}
+
+		if (m_timings[0].size()==0)
+		{
+			m_timings[0].resize(BT_TIMING_CAPACITY);
+		}
+
+		int slot = m_numTimings++;
+
+		m_timings[m_activeBuffer][slot].m_name = name;
+		m_timings[m_activeBuffer][slot].m_threadId = threadId;
+		m_timings[m_activeBuffer][slot].m_usStartTime = startTime;
+		m_timings[m_activeBuffer][slot].m_usEndTime = endTime;
+	}
+
+
+	int m_numTimings;
+	int m_activeBuffer;
+	btAlignedObjectArray<btTiming> m_timings[1];
+};
+#ifndef BT_NO_PROFILE
+btTimings gTimings[BT_QUICKPROF_MAX_THREAD_COUNT];
+#define MAX_NESTING 1024
+int gStackDepths[BT_QUICKPROF_MAX_THREAD_COUNT] = {0};
+const char* gFuncNames[BT_QUICKPROF_MAX_THREAD_COUNT][MAX_NESTING];
+unsigned long long int gStartTimes[BT_QUICKPROF_MAX_THREAD_COUNT][MAX_NESTING];
+#endif
+
+btClock clk;
+
+
+
+bool gProfileDisabled = true;
+
+
+void MyDummyEnterProfileZoneFunc(const char* msg)
+{
+}
+
+void MyDummyLeaveProfileZoneFunc()
+{
+}
+
+void MyEnterProfileZoneFunc(const char* msg)
+{
+	if (gProfileDisabled)
+		return;
+#ifndef BT_NO_PROFILE
+	int threadId = btQuickprofGetCurrentThreadIndex2();
+	if (threadId<0)
+		return;
+	
+	if (gStackDepths[threadId]>=MAX_NESTING)
+	{
+		btAssert(0);
+		return;
+	}
+	gFuncNames[threadId][gStackDepths[threadId]] = msg;
+	gStartTimes[threadId][gStackDepths[threadId]] = clk.getTimeNanoseconds();
+	if (gStartTimes[threadId][gStackDepths[threadId]]<=gStartTimes[threadId][gStackDepths[threadId]-1])
+	{
+		gStartTimes[threadId][gStackDepths[threadId]]=1+gStartTimes[threadId][gStackDepths[threadId]-1];
+	}
+	gStackDepths[threadId]++;
+#endif
+
+}
+void MyLeaveProfileZoneFunc()
+{
+	if (gProfileDisabled)
+		return;
+#ifndef BT_NO_PROFILE
+	int threadId = btQuickprofGetCurrentThreadIndex2();
+	if (threadId<0)
+		return;
+	
+	if (gStackDepths[threadId]<=0)
+	{
+		return;
+	}
+
+	gStackDepths[threadId]--;
+
+	const char* name = gFuncNames[threadId][gStackDepths[threadId]];
+	unsigned long long int startTime = gStartTimes[threadId][gStackDepths[threadId]];
+	
+	unsigned long long int endTime = clk.getTimeNanoseconds();
+	gTimings[threadId].addTiming(name,threadId,startTime,endTime);
+#endif //BT_NO_PROFILE
+}
+
+
 void deleteDemo()
 {
     if (sCurrentDemo)
@@ -154,6 +379,7 @@ void deleteDemo()
 		sCurrentDemo=0;
 		delete s_guiHelper;
 		s_guiHelper = 0;
+//		CProfileManager::CleanupMemory();
 	}
 }
 
@@ -237,6 +463,48 @@ void MyKeyboardCallback(int key, int state)
 		singleStepSimulation = true;
 	}
 
+	if (key=='p')
+	{
+#ifndef BT_NO_PROFILE
+		if (state)
+		{
+			m_firstTiming = true;
+			gProfileDisabled = false;//true;
+			b3SetCustomEnterProfileZoneFunc(MyEnterProfileZoneFunc);
+			b3SetCustomLeaveProfileZoneFunc(MyLeaveProfileZoneFunc);
+
+			//also for Bullet 2.x API
+			btSetCustomEnterProfileZoneFunc(MyEnterProfileZoneFunc);
+			btSetCustomLeaveProfileZoneFunc(MyLeaveProfileZoneFunc);
+		} else
+		{
+
+			b3SetCustomEnterProfileZoneFunc(MyDummyEnterProfileZoneFunc);
+			b3SetCustomLeaveProfileZoneFunc(MyDummyLeaveProfileZoneFunc);
+			//also for Bullet 2.x API
+			btSetCustomEnterProfileZoneFunc(MyDummyEnterProfileZoneFunc);
+			btSetCustomLeaveProfileZoneFunc(MyDummyLeaveProfileZoneFunc);
+			char fileName[1024];
+			static int fileCounter = 0;
+			sprintf(fileName,"timings_%d.json",fileCounter++);
+			gTimingFile = fopen(fileName,"w");
+			fprintf(gTimingFile,"{\"traceEvents\":[\n");
+			//dump the content to file
+			for (int i=0;i<BT_QUICKPROF_MAX_THREAD_COUNT;i++)
+			{
+				if (gTimings[i].m_numTimings)
+				{
+					printf("Writing %d timings for thread %d\n", gTimings[i].m_numTimings, i);
+					gTimings[i].flush();
+				}
+			}
+			fprintf(gTimingFile,"\n],\n\"displayTimeUnit\": \"ns\"}");
+			fclose(gTimingFile);
+			gTimingFile = 0;
+
+		}
+#endif //BT_NO_PROFILE
+	}
 
 #ifndef NO_OPENGL3
 	if (key=='s' && state)
@@ -333,15 +601,7 @@ void OpenGLExampleBrowser::registerFileImporter(const char* extension, CommonExa
 void openFileDemo(const char* filename)
 {
 
-    if (sCurrentDemo)
-    {
-		sCurrentDemo->exitPhysics();
-		s_instancingRenderer->removeAllInstances();
-		delete sCurrentDemo;
-		sCurrentDemo=0;
-		delete s_guiHelper;
-		s_guiHelper = 0;
-    }
+	deleteDemo();
    
 	s_guiHelper= new OpenGLGuiHelper(s_app, sUseOpenGL2);
     s_parameterInterface->removeAllParameters();
@@ -387,6 +647,7 @@ void selectDemo(int demoIndex)
 		demoIndex = 0;
 	}
 	deleteDemo();
+
     
 	CommonExampleInterface::CreateFunc* func = gAllExamples->getExampleCreateFunc(demoIndex);
 	if (func)
@@ -497,11 +758,13 @@ void	MyComboBoxCallback(int comboId, const char* item)
 
 }
 
+//in case of multi-threading, don't submit messages while the GUI is rendering (causing crashes)
+static bool gBlockGuiMessages = false;
 
 void MyGuiPrintf(const char* msg)
 {
 	printf("b3Printf: %s\n",msg);
-	if (!gDisableDemoSelection)
+	if (!gDisableDemoSelection && !gBlockGuiMessages)
 	{
 		gui2->textOutput(msg);
 		gui2->forceUpdateScrollBars();
@@ -513,7 +776,7 @@ void MyGuiPrintf(const char* msg)
 void MyStatusBarPrintf(const char* msg)
 {
 	printf("b3Printf: %s\n", msg);
-	if (!gDisableDemoSelection)
+	if (!gDisableDemoSelection && !gBlockGuiMessages)
 	{
 		bool isLeft = true;
 		gui2->setStatusBarMessage(msg,isLeft);
@@ -524,7 +787,7 @@ void MyStatusBarPrintf(const char* msg)
 void MyStatusBarError(const char* msg)
 {
 	printf("Warning: %s\n", msg);
-	if (!gDisableDemoSelection)
+	if (!gDisableDemoSelection && !gBlockGuiMessages)
 	{
 		bool isLeft = false;
 		gui2->setStatusBarMessage(msg,isLeft);
@@ -775,6 +1038,8 @@ OpenGLExampleBrowser::~OpenGLExampleBrowser()
 	gAllExamples = 0;
 }
 
+
+
 #include "EmptyExample.h"
 
 bool OpenGLExampleBrowser::init(int argc, char* argv[])
@@ -782,7 +1047,22 @@ bool OpenGLExampleBrowser::init(int argc, char* argv[])
     b3CommandLineArgs args(argc,argv);
     
 	loadCurrentSettings(startFileName, args);
+	if (args.CheckCmdLineFlag("nogui"))
+	{
+		renderGrid = false;
+		renderGui = false;
+	}
+	if (args.CheckCmdLineFlag("tracing"))
+	{
+		m_firstTiming = true;
+		gProfileDisabled = false;//true;
+		b3SetCustomEnterProfileZoneFunc(MyEnterProfileZoneFunc);
+		b3SetCustomLeaveProfileZoneFunc(MyLeaveProfileZoneFunc);
 
+		//also for Bullet 2.x API
+		btSetCustomEnterProfileZoneFunc(MyEnterProfileZoneFunc);
+		btSetCustomLeaveProfileZoneFunc(MyLeaveProfileZoneFunc);
+	}
 	args.GetCmdLineArgument("fixed_timestep",gFixedTimeStep);
 	args.GetCmdLineArgument("png_skip_frames", gPngSkipFrames);	
 	///The OpenCL rigid body pipeline is experimental and 
@@ -795,6 +1075,7 @@ bool OpenGLExampleBrowser::init(int argc, char* argv[])
 		enable_experimental_opencl = true;
 		gAllExamples->initOpenCLExampleEntries();
 	}
+	
 	if (args.CheckCmdLineFlag("disable_retina"))
 	{
 		gAllowRetina = false;
@@ -886,6 +1167,7 @@ bool OpenGLExampleBrowser::init(int argc, char* argv[])
 	b3SetCustomPrintfFunc(MyGuiPrintf);
 	b3SetCustomErrorMessageFunc(MyStatusBarError);
 	
+	
 
     assert(glGetError()==GL_NO_ERROR);
 	
@@ -940,10 +1222,11 @@ bool OpenGLExampleBrowser::init(int argc, char* argv[])
 
 		//gui->getInternalData()->pRenderer->setTextureLoader(myTexLoader);
 
-
-//		s_profWindow= setupProfileWindow(gui2->getInternalData());
-		//m_internalData->m_profWindow = s_profWindow;
-	//	profileWindowSetVisible(s_profWindow,false);
+#ifndef BT_NO_PROFILE
+		s_profWindow= setupProfileWindow(gui2->getInternalData());
+		m_internalData->m_profWindow = s_profWindow;
+		profileWindowSetVisible(s_profWindow,false);
+#endif //BT_NO_PROFILE
 		gui2->setFocus();
 
 		s_parameterInterface = s_app->m_parameterInterface = new GwenParameterInterface(gui2->getInternalData());
@@ -1073,7 +1356,6 @@ bool OpenGLExampleBrowser::init(int argc, char* argv[])
 }
 
 
-
 CommonExampleInterface* OpenGLExampleBrowser::getCurrentExample()
 {
 	btAssert(sCurrentDemo);
@@ -1087,6 +1369,8 @@ bool OpenGLExampleBrowser::requestedExit()
 
 void OpenGLExampleBrowser::update(float deltaTime)
 {
+	gProfileDisabled = false;
+
 		B3_PROFILE("OpenGLExampleBrowser::update");
 		assert(glGetError()==GL_NO_ERROR);
 		s_instancingRenderer->init();
@@ -1136,7 +1420,7 @@ void OpenGLExampleBrowser::update(float deltaTime)
 		{
 			if (!pauseSimulation || singleStepSimulation)
 			{
-				singleStepSimulation = false;
+				
 				//printf("---------------------------------------------------\n");
 				//printf("Framecount = %d\n",frameCount);
 				B3_PROFILE("sCurrentDemo->stepSimulation");
@@ -1167,7 +1451,8 @@ void OpenGLExampleBrowser::update(float deltaTime)
 				}
                 BT_PROFILE("Render Scene");
                 sCurrentDemo->renderScene();
-            } else
+            }
+			//else
             {
 				B3_PROFILE("physicsDebugDraw");
 				glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -1198,9 +1483,18 @@ void OpenGLExampleBrowser::update(float deltaTime)
 		if (renderGui)
 		{
 			B3_PROFILE("renderGui");
-			//            if (!pauseSimulation)
-			//                processProfileData(s_profWindow,false);
+#ifndef BT_NO_PROFILE
 
+			if (!pauseSimulation || singleStepSimulation)
+			{
+				if (isProfileWindowVisible(s_profWindow))
+				{
+				    processProfileData(s_profWindow,false);
+				}
+			}
+#endif //#ifndef BT_NO_PROFILE
+
+			
 			if (sUseOpenGL2)
 			{
 
@@ -1209,7 +1503,11 @@ void OpenGLExampleBrowser::update(float deltaTime)
 			
 			if (m_internalData->m_gui)
 			{
+				gBlockGuiMessages = true;
 				m_internalData->m_gui->draw(s_instancingRenderer->getScreenWidth(), s_instancingRenderer->getScreenHeight());
+				
+
+				gBlockGuiMessages = false;
 			}
 			
             if (sUseOpenGL2)
@@ -1219,7 +1517,7 @@ void OpenGLExampleBrowser::update(float deltaTime)
 
 		}
 	
-	
+	singleStepSimulation = false;
 	
 				
 		toggle=1-toggle;

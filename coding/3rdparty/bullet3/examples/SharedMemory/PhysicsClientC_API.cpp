@@ -146,11 +146,11 @@ b3SharedMemoryCommandHandle	b3LoadMJCFCommandInit(b3PhysicsClientHandle physClie
 		int len = strlen(fileName);
 		if (len < MAX_URDF_FILENAME_LENGTH)
 		{
-			strcpy(command->m_fileArguments.m_fileName, fileName);
+			strcpy(command->m_mjcfArguments.m_mjcfFileName, fileName);
 		}
 		else
 		{
-			command->m_fileArguments.m_fileName[0] = 0;
+			command->m_mjcfArguments.m_mjcfFileName[0] = 0;
 		}
 		command->m_updateFlags = 0;
 
@@ -314,6 +314,26 @@ int     b3PhysicsParamSetInternalSimFlags(b3SharedMemoryCommandHandle commandHan
 	b3Assert(command->m_type == CMD_SEND_PHYSICS_SIMULATION_PARAMETERS);
 	command->m_physSimParamArgs.m_internalSimFlags = flags;
 	command->m_updateFlags |= SIM_PARAM_UPDATE_INTERNAL_SIMULATION_FLAGS;
+	return 0;
+}
+
+int b3PhysicsParamSetUseSplitImpulse(b3SharedMemoryCommandHandle commandHandle, int useSplitImpulse)
+{
+	struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+	b3Assert(command->m_type == CMD_SEND_PHYSICS_SIMULATION_PARAMETERS);
+
+	command->m_physSimParamArgs.m_useSplitImpulse = useSplitImpulse;
+	command->m_updateFlags |= SIM_PARAM_UPDATE_USE_SPLIT_IMPULSE;
+	return 0;
+}
+
+int b3PhysicsParamSetSplitImpulsePenetrationThreshold(b3SharedMemoryCommandHandle commandHandle, double splitImpulsePenetrationThreshold)
+{
+	struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+	b3Assert(command->m_type == CMD_SEND_PHYSICS_SIMULATION_PARAMETERS);
+
+	command->m_physSimParamArgs.m_splitImpulsePenetrationThreshold = splitImpulsePenetrationThreshold;
+	command->m_updateFlags |= SIM_PARAM_UPDATE_SPLIT_IMPULSE_PENETRATION_THRESHOLD;
 	return 0;
 }
 
@@ -829,6 +849,7 @@ int b3GetStatusBodyIndices(b3SharedMemoryStatusHandle statusHandle, int* bodyInd
 	{
 			switch (status->m_type)
 			{
+				case CMD_MJCF_LOADING_COMPLETED:
 				case CMD_BULLET_LOADING_COMPLETED:
 				case CMD_SDF_LOADING_COMPLETED:
 				{
@@ -1102,6 +1123,38 @@ b3SharedMemoryCommandHandle b3RemovePickingConstraint(b3PhysicsClientHandle phys
     return (b3SharedMemoryCommandHandle)command;
 }
 
+b3SharedMemoryCommandHandle b3CreateRaycastCommandInit(b3PhysicsClientHandle physClient, double rayFromWorldX,
+                                       double rayFromWorldY, double rayFromWorldZ,
+                                       double rayToWorldX, double rayToWorldY, double rayToWorldZ)
+{
+    PhysicsClient *cl = (PhysicsClient *)physClient;
+    b3Assert(cl);
+    b3Assert(cl->canSubmitCommand());
+    struct SharedMemoryCommand *command = cl->getAvailableSharedMemoryCommand();
+    b3Assert(command);
+    command->m_type = CMD_REQUEST_RAY_CAST_INTERSECTIONS;
+	command->m_requestRaycastIntersections.m_rayFromPosition[0] = rayFromWorldX;
+	command->m_requestRaycastIntersections.m_rayFromPosition[1] = rayFromWorldY;
+	command->m_requestRaycastIntersections.m_rayFromPosition[2] = rayFromWorldZ;
+	command->m_requestRaycastIntersections.m_rayToPosition[0] = rayToWorldX;
+	command->m_requestRaycastIntersections.m_rayToPosition[1] = rayToWorldY;
+	command->m_requestRaycastIntersections.m_rayToPosition[2] = rayToWorldZ;
+
+    return (b3SharedMemoryCommandHandle)command;
+
+}
+
+void b3GetRaycastInformation(b3PhysicsClientHandle physClient, struct b3RaycastInformation* raycastInfo)
+{
+	PhysicsClient* cl = (PhysicsClient* ) physClient;
+	if (cl)
+	{
+		cl->getCachedRaycastHits(raycastInfo);
+	}
+}
+
+
+
 b3SharedMemoryCommandHandle b3InitRequestDebugLinesCommand(b3PhysicsClientHandle physClient, int debugMode)
 {
     PhysicsClient* cl = (PhysicsClient* ) physClient;
@@ -1330,6 +1383,51 @@ void b3RequestCameraImageSetLightColor(b3SharedMemoryCommandHandle commandHandle
         command->m_requestPixelDataArguments.m_lightColor[i] = lightColor[i];
     }
     command->m_updateFlags |= REQUEST_PIXEL_ARGS_SET_LIGHT_COLOR;
+}
+
+void b3RequestCameraImageSetLightDistance(b3SharedMemoryCommandHandle commandHandle, float lightDistance)
+{
+    struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_REQUEST_CAMERA_IMAGE_DATA);
+    command->m_requestPixelDataArguments.m_lightDistance = lightDistance;
+    command->m_updateFlags |= REQUEST_PIXEL_ARGS_SET_LIGHT_DISTANCE;
+}
+
+void b3RequestCameraImageSetLightAmbientCoeff(b3SharedMemoryCommandHandle commandHandle, float lightAmbientCoeff)
+{
+    struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_REQUEST_CAMERA_IMAGE_DATA);
+    command->m_requestPixelDataArguments.m_lightAmbientCoeff = lightAmbientCoeff;
+    command->m_updateFlags |= REQUEST_PIXEL_ARGS_SET_AMBIENT_COEFF;
+}
+
+void b3RequestCameraImageSetLightDiffuseCoeff(b3SharedMemoryCommandHandle commandHandle, float lightDiffuseCoeff)
+{
+    struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_REQUEST_CAMERA_IMAGE_DATA);
+    command->m_requestPixelDataArguments.m_lightDiffuseCoeff = lightDiffuseCoeff;
+    command->m_updateFlags |= REQUEST_PIXEL_ARGS_SET_DIFFUSE_COEFF;
+}
+
+void b3RequestCameraImageSetLightSpecularCoeff(b3SharedMemoryCommandHandle commandHandle, float lightSpecularCoeff)
+{
+    struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_REQUEST_CAMERA_IMAGE_DATA);
+    command->m_requestPixelDataArguments.m_lightSpecularCoeff = lightSpecularCoeff;
+    command->m_updateFlags |= REQUEST_PIXEL_ARGS_SET_SPECULAR_COEFF;
+}
+
+void b3RequestCameraImageSetShadow(b3SharedMemoryCommandHandle commandHandle, int hasShadow)
+{
+    struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_REQUEST_CAMERA_IMAGE_DATA);
+    command->m_requestPixelDataArguments.m_hasShadow = hasShadow;
+    command->m_updateFlags |= REQUEST_PIXEL_ARGS_SET_SHADOW;
 }
 
 void b3ComputeViewMatrixFromPositions(const float cameraPosition[3], const float cameraTargetPosition[3], const float cameraUp[3], float viewMatrix[16])
@@ -2070,3 +2168,77 @@ int b3GetStatusInverseKinematicsJointPositions(b3SharedMemoryStatusHandle status
 
 	return true;
 }
+
+b3SharedMemoryCommandHandle	b3RequestVREventsCommandInit(b3PhysicsClientHandle physClient)
+{
+	PhysicsClient* cl = (PhysicsClient*)physClient;
+	b3Assert(cl);
+	b3Assert(cl->canSubmitCommand());
+	struct SharedMemoryCommand* command = cl->getAvailableSharedMemoryCommand();
+	b3Assert(command);
+
+	command->m_type = CMD_REQUEST_VR_EVENTS_DATA;
+	command->m_updateFlags = 0;
+
+	return (b3SharedMemoryCommandHandle)command;
+}
+
+void b3GetVREventsData(b3PhysicsClientHandle physClient, struct b3VREventsData* vrEventsData)
+{
+	PhysicsClient* cl = (PhysicsClient* ) physClient;
+	if (cl)
+	{
+		cl->getCachedVREvents(vrEventsData);
+	}
+}
+
+b3SharedMemoryCommandHandle	b3SetVRCameraStateCommandInit(b3PhysicsClientHandle physClient)
+{
+	PhysicsClient* cl = (PhysicsClient*)physClient;
+	b3Assert(cl);
+	b3Assert(cl->canSubmitCommand());
+	struct SharedMemoryCommand* command = cl->getAvailableSharedMemoryCommand();
+	b3Assert(command);
+
+	command->m_type = CMD_SET_VR_CAMERA_STATE;
+	command->m_updateFlags = 0;
+
+	return (b3SharedMemoryCommandHandle)command;
+
+}
+
+int b3SetVRCameraRootPosition(b3SharedMemoryCommandHandle commandHandle, double rootPos[3])
+{
+	struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_SET_VR_CAMERA_STATE);
+    command->m_updateFlags |= VR_CAMERA_ROOT_POSITION;
+	command->m_vrCameraStateArguments.m_rootPosition[0] = rootPos[0];
+	command->m_vrCameraStateArguments.m_rootPosition[1] = rootPos[1];
+	command->m_vrCameraStateArguments.m_rootPosition[2] = rootPos[2];
+	return 0;
+
+}
+
+int b3SetVRCameraRootOrientation(b3SharedMemoryCommandHandle commandHandle, double rootOrn[4])
+{
+	struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_SET_VR_CAMERA_STATE);
+    command->m_updateFlags |= VR_CAMERA_ROOT_ORIENTATION;
+	command->m_vrCameraStateArguments.m_rootOrientation[0] = rootOrn[0];
+	command->m_vrCameraStateArguments.m_rootOrientation[1] = rootOrn[1];
+	command->m_vrCameraStateArguments.m_rootOrientation[2] = rootOrn[2];
+	return 0;
+}
+
+int b3SetVRCameraTrackingObject(b3SharedMemoryCommandHandle commandHandle, int objectUniqueId)
+{
+	struct SharedMemoryCommand* command = (struct SharedMemoryCommand*) commandHandle;
+    b3Assert(command);
+    b3Assert(command->m_type == CMD_SET_VR_CAMERA_STATE);
+    command->m_updateFlags |= VR_CAMERA_ROOT_TRACKING_OBJECT;
+	command->m_vrCameraStateArguments.m_trackingObjectUniqueId = objectUniqueId;
+	return 0;
+}
+

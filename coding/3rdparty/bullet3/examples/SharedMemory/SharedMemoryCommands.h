@@ -91,6 +91,11 @@ struct UrdfArgs
 	int m_useFixedBase;
 };
 
+struct MjcfArgs
+{
+	char m_mjcfFileName[MAX_URDF_FILENAME_LENGTH];
+	int m_useMultiBody;
+};
 
 struct BulletDataStreamArgs
 {
@@ -144,6 +149,11 @@ struct RequestPixelDataArgs
 	int m_pixelHeight;
 	float m_lightDirection[3];
     float m_lightColor[3];
+    float m_lightDistance;
+    float m_lightAmbientCoeff;
+    float m_lightDiffuseCoeff;
+    float m_lightSpecularCoeff;
+    int m_hasShadow;
 };
 
 enum EnumRequestPixelDataUpdateFlags
@@ -152,6 +162,11 @@ enum EnumRequestPixelDataUpdateFlags
 	REQUEST_PIXEL_ARGS_SET_PIXEL_WIDTH_HEIGHT=2,
 	REQUEST_PIXEL_ARGS_SET_LIGHT_DIRECTION=4,
     REQUEST_PIXEL_ARGS_SET_LIGHT_COLOR=8,
+    REQUEST_PIXEL_ARGS_SET_LIGHT_DISTANCE=16,
+    REQUEST_PIXEL_ARGS_SET_SHADOW=32,
+    REQUEST_PIXEL_ARGS_SET_AMBIENT_COEFF=64,
+    REQUEST_PIXEL_ARGS_SET_DIFFUSE_COEFF=128,
+    REQUEST_PIXEL_ARGS_SET_SPECULAR_COEFF=256,
 	//don't exceed (1<<15), because this enum is shared with EnumRenderer in SharedMemoryPublic.h
 	
 };
@@ -162,6 +177,18 @@ enum EnumRequestContactDataUpdateFlags
 	CMD_REQUEST_CONTACT_POINT_HAS_CLOSEST_DISTANCE_THRESHOLD=2,
 	CMD_REQUEST_CONTACT_POINT_HAS_LINK_INDEX_A_FILTER = 4,
 	CMD_REQUEST_CONTACT_POINT_HAS_LINK_INDEX_B_FILTER = 8,
+};
+
+struct RequestRaycastIntersections
+{
+	double m_rayFromPosition[3];
+	double m_rayToPosition[3];
+};
+
+struct SendRaycastHits
+{
+	int m_numRaycastHits;
+	b3RayHitInfo m_rayHits[MAX_RAY_HITS];
 };
 
 struct RequestContactDataArgs
@@ -283,7 +310,9 @@ enum EnumSimParamUpdateFlags
 	SIM_PARAM_UPDATE_NUM_SIMULATION_SUB_STEPS=8,
 	SIM_PARAM_UPDATE_REAL_TIME_SIMULATION = 16,
 	SIM_PARAM_UPDATE_DEFAULT_CONTACT_ERP=32,
-	SIM_PARAM_UPDATE_INTERNAL_SIMULATION_FLAGS=64
+	SIM_PARAM_UPDATE_INTERNAL_SIMULATION_FLAGS=64,
+	SIM_PARAM_UPDATE_USE_SPLIT_IMPULSE=128,
+	SIM_PARAM_UPDATE_SPLIT_IMPULSE_PENETRATION_THRESHOLD = 256,
 };
 
 enum EnumLoadBunnyUpdateFlags
@@ -308,6 +337,8 @@ struct SendPhysicsSimulationParameters
 	int m_numSimulationSubSteps;
 	int m_numSolverIterations;
 	bool m_allowRealTimeSimulation;
+	int m_useSplitImpulse;
+	double m_splitImpulsePenetrationThreshold;
 	int m_internalSimFlags;
 	double m_defaultContactERP;
 };
@@ -563,6 +594,26 @@ struct UserDebugDrawResultArgs
 	int m_debugItemUniqueId;
 };
 
+struct SendVREvents
+{
+	int m_numVRControllerEvents;
+	b3VRControllerEvent m_controllerEvents[MAX_VR_CONTROLLERS];
+};
+
+enum eVRCameraEnums
+{
+	VR_CAMERA_ROOT_POSITION=1,
+	VR_CAMERA_ROOT_ORIENTATION=2,
+	VR_CAMERA_ROOT_TRACKING_OBJECT=4
+};
+
+struct VRCameraState
+{
+	double m_rootPosition[3];
+	double m_rootOrientation[4];
+	int m_trackingObjectUniqueId;
+};
+
 
 struct SharedMemoryCommand
 {
@@ -578,6 +629,7 @@ struct SharedMemoryCommand
     {
         struct UrdfArgs m_urdfArguments;
 		struct SdfArgs m_sdfArguments;
+		struct MjcfArgs	m_mjcfArguments;
 		struct FileArgs m_fileArguments;
 		struct SdfRequestInfoArgs m_sdfRequestInfoArgs;
 		struct InitPoseArgs m_initPoseArgs;
@@ -601,7 +653,9 @@ struct SharedMemoryCommand
         struct LoadTextureArgs m_loadTextureArguments;
 		struct CalculateInverseKinematicsArgs m_calculateInverseKinematicsArguments;
 		struct UserDebugDrawArgs m_userDebugDrawArgs;
+		struct RequestRaycastIntersections m_requestRaycastIntersections;
         struct LoadBunnyArgs m_loadBunnyArguments;
+		struct VRCameraState m_vrCameraStateArguments;
     };
 };
 
@@ -623,6 +677,11 @@ struct SendOverlappingObjectsArgs
 	int m_numOverlappingObjectsCopied;
 	int m_numRemainingOverlappingObjects;
 };
+
+
+
+
+
 
 struct SharedMemoryStatus
 {
@@ -651,6 +710,8 @@ struct SharedMemoryStatus
 		struct SendVisualShapeDataArgs m_sendVisualShapeArgs;
 		struct UserDebugDrawResultArgs m_userDebugDrawArgs;
 		struct UserConstraintResultArgs m_userConstraintResultArgs;
+		struct SendVREvents m_sendVREvents;
+		struct SendRaycastHits m_raycastHits;
 	};
 };
 

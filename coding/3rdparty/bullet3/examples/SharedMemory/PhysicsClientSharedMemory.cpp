@@ -42,6 +42,8 @@ struct PhysicsClientSharedMemoryInternalData {
     btAlignedObjectArray<b3ContactPointData> m_cachedContactPoints;
 	btAlignedObjectArray<b3OverlappingObject> m_cachedOverlappingObjects;
 	btAlignedObjectArray<b3VisualShapeData> m_cachedVisualShapes;
+	btAlignedObjectArray<b3VRControllerEvent> m_cachedVREvents;
+	btAlignedObjectArray<b3RayHitInfo>	m_raycastHits;
 
     btAlignedObjectArray<int> m_bodyIdsRequestInfo;
     SharedMemoryStatus m_tempBackupServerStatus;
@@ -205,7 +207,7 @@ bool PhysicsClientSharedMemory::connect() {
             m_data->m_isConnected = true;
         }
     } else {
-        b3Error("Cannot connect to shared memory");
+        b3Warning("Cannot connect to shared memory");
         return false;
     }
 #if 0
@@ -316,6 +318,14 @@ const SharedMemoryStatus* PhysicsClientSharedMemory::processServerStatus() {
                 }
                 break;
             }
+
+			case CMD_MJCF_LOADING_COMPLETED:
+			{
+                if (m_data->m_verboseOutput) {
+                    b3Printf("Server loading the MJCF OK\n");
+                }
+                break;
+			}
             case CMD_SDF_LOADING_COMPLETED: {
                 
                 if (m_data->m_verboseOutput) {
@@ -400,6 +410,13 @@ const SharedMemoryStatus* PhysicsClientSharedMemory::processServerStatus() {
 
                 break;
             }
+			case CMD_MJCF_LOADING_FAILED:
+			{
+                if (m_data->m_verboseOutput) {
+                    b3Printf("Server failed loading the MJCF...\n");
+                }
+                break;
+			}
              case CMD_SDF_LOADING_FAILED: {
                 if (m_data->m_verboseOutput) {
                     b3Printf("Server failed loading the SDF...\n");
@@ -631,6 +648,35 @@ const SharedMemoryStatus* PhysicsClientSharedMemory::processServerStatus() {
 				b3Warning("Overlapping object query failed");
 				break;
 			}
+
+				case CMD_REQUEST_RAY_CAST_INTERSECTIONS_COMPLETED:
+				{
+					if (m_data->m_verboseOutput)
+					{
+						b3Printf("Raycast completed");
+					}
+					m_data->m_raycastHits.clear();
+					for (int i=0;i<serverCmd.m_raycastHits.m_numRaycastHits;i++)
+					{
+						m_data->m_raycastHits.push_back(serverCmd.m_raycastHits.m_rayHits[i]);
+					}
+					break;
+				}
+
+			case CMD_REQUEST_VR_EVENTS_DATA_COMPLETED:
+			{
+				if (m_data->m_verboseOutput)
+				{
+					b3Printf("Request VR Events completed");
+				}
+				m_data->m_cachedVREvents.clear();
+				for (int i=0;i< serverCmd.m_sendVREvents.m_numVRControllerEvents;i++)
+				{
+					m_data->m_cachedVREvents.push_back(serverCmd.m_sendVREvents.m_controllerEvents[i]);
+				}
+				break;
+			}
+
 			case CMD_REQUEST_AABB_OVERLAP_COMPLETED:
 			{
 				if (m_data->m_verboseOutput)
@@ -747,11 +793,6 @@ const SharedMemoryStatus* PhysicsClientSharedMemory::processServerStatus() {
 				b3Warning("Save .bullet failed");
 				break;
 			}
-			case CMD_MJCF_LOADING_FAILED:
-			{
-				b3Warning("Load .mjcf failed");
-				break;
-			}
 			case CMD_USER_DEBUG_DRAW_COMPLETED:
 			{
 				break;
@@ -788,7 +829,8 @@ const SharedMemoryStatus* PhysicsClientSharedMemory::processServerStatus() {
             m_data->m_waitingForServer = true;
         }
 
-        if (serverCmd.m_type == CMD_SDF_LOADING_COMPLETED)
+
+        if ((serverCmd.m_type == CMD_SDF_LOADING_COMPLETED) || (serverCmd.m_type == CMD_MJCF_LOADING_COMPLETED))
         {
             int numBodies = serverCmd.m_sdfLoadedArgs.m_numBodies;
             if (numBodies>0)
@@ -983,6 +1025,19 @@ void PhysicsClientSharedMemory::getCachedOverlappingObjects(struct b3AABBOverlap
 		&m_data->m_cachedOverlappingObjects[0] : 0;
 }
 
+void PhysicsClientSharedMemory::getCachedVREvents(struct b3VREventsData* vrEventsData)
+{
+	vrEventsData->m_numControllerEvents = m_data->m_cachedVREvents.size();
+	vrEventsData->m_controllerEvents = vrEventsData->m_numControllerEvents?
+							&m_data->m_cachedVREvents[0] : 0;
+}
+
+void PhysicsClientSharedMemory::getCachedRaycastHits(struct b3RaycastInformation* raycastHits)
+{
+	raycastHits->m_numRayHits = m_data->m_raycastHits.size();
+	raycastHits->m_rayHits = raycastHits->m_numRayHits? &m_data->m_raycastHits[0] : 0;
+}
+
 
 void PhysicsClientSharedMemory::getCachedVisualShapeInformation(struct b3VisualShapeInformation* visualShapesInfo)
 {
@@ -1010,3 +1065,4 @@ const float* PhysicsClientSharedMemory::getDebugLinesColor() const {
     return 0;
 }
 int PhysicsClientSharedMemory::getNumDebugLines() const { return m_data->m_debugLinesFrom.size(); }
+

@@ -224,6 +224,8 @@ enum TestExampleBrowserCommunicationEnums
 	eExampleBrowserHasTerminated
 };
 
+static double gMinUpdateTimeMicroSecs = 4000.;
+
 void	ExampleBrowserThreadFunc(void* userPtr,void* lsMemory)
 {
 	printf("ExampleBrowserThreadFunc started\n");
@@ -253,9 +255,24 @@ void	ExampleBrowserThreadFunc(void* userPtr,void* lsMemory)
 
 		do
 		{
+			B3_PROFILE("ExampleBrowserThreadFunc");
 			float deltaTimeInSeconds = clock.getTimeMicroseconds()/1000000.f;
-			clock.reset();
-			exampleBrowser->update(deltaTimeInSeconds);
+			{
+				if (deltaTimeInSeconds > 0.1)
+				{
+					deltaTimeInSeconds = 0.1;
+				}
+				if (deltaTimeInSeconds < (gMinUpdateTimeMicroSecs/1e6))
+				{
+					B3_PROFILE("clock.usleep");
+					clock.usleep(gMinUpdateTimeMicroSecs/10.);
+				} else
+				{
+					B3_PROFILE("exampleBrowser->update");
+					clock.reset();
+					exampleBrowser->update(deltaTimeInSeconds);
+				}
+			}
 
 		} while (!exampleBrowser->requestedExit() && (args->m_cs->getSharedParam(0)!=eRequestTerminateExampleBrowser));
 	} else

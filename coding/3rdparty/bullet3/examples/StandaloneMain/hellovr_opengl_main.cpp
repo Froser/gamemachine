@@ -10,7 +10,7 @@
 #include "Bullet3Common/b3Transform.h"
 #include "Bullet3Common/b3CommandLineArgs.h"
 
-
+#include "../Utils/b3Clock.h"
 #include "../ExampleBrowser/OpenGLGuiHelper.h"
 #include "../CommonInterfaces/CommonExampleInterface.h"
 #include "../CommonInterfaces/CommonGUIHelperInterface.h"
@@ -21,6 +21,7 @@
 #include "LinearMath/btIDebugDraw.h"
 int gSharedMemoryKey = -1;
 int  gDebugDrawFlags = 0;
+bool gDisplayDistortion = false;
 
 //how can you try typing on a keyboard, without seeing it?
 //it is pretty funny, to see the desktop in VR!
@@ -155,6 +156,7 @@ private:
 	uint32_t m_nWindowWidth;
 	uint32_t m_nWindowHeight;
 	bool m_hasContext;
+	b3Clock m_clock;
 
 private: // OpenGL bookkeeping
 	int m_iTrackedControllerCount;
@@ -676,7 +678,7 @@ bool CMainApplication::HandleInput()
 	for( vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++ )
 	{
 		vr::VRControllerState_t state;
-		if( m_pHMD->GetControllerState( unDevice, &state ) )
+		if( m_pHMD->GetControllerState( unDevice, &state ,sizeof(vr::VRControllerState_t)) )
 		{
 			//we need to have the 'move' events, so no early out here
 			//if (sPrevStates[unDevice].unPacketNum != state.unPacketNum)
@@ -704,7 +706,7 @@ bool CMainApplication::HandleInput()
 //							printf("Device PRESSED: %d, button %d\n", unDevice, button);
 							if (button==2)
 							{
-								glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
+								//glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 								///todo(erwincoumans) can't use reguar debug drawer, because physics/graphics are not in sync
 								///so it can (and likely will) cause crashes
 								///add a special debug drawer that deals with this
@@ -831,15 +833,31 @@ void CMainApplication::RenderFrame()
 			DrawControllers();
 		}
 		RenderStereoTargets();
+
+		if (gDisplayDistortion)
 		{
 			B3_PROFILE("RenderDistortion");
 			RenderDistortion();
+		} else
+		{
+			glBindFramebuffer( GL_FRAMEBUFFER, 0 );
+			glDisable( GL_MULTISAMPLE );
+	 		glBindFramebuffer(GL_READ_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId );
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	
+			glBlitFramebuffer( 0, 0, m_nRenderWidth, m_nRenderHeight, 0, 0, m_nRenderWidth, m_nRenderHeight, 
+				GL_COLOR_BUFFER_BIT,
+ 				GL_LINEAR  );
+
+ 			glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+			glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0 );
 		}
 
 		vr::Texture_t leftEyeTexture = {(void*)leftEyeDesc.m_nResolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
 		vr::Texture_t rightEyeTexture = {(void*)rightEyeDesc.m_nResolveTextureId, vr::API_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture );
+		
 	}
 
 	if ( m_bVblank && m_bGlFinishHack )
@@ -855,7 +873,7 @@ void CMainApplication::RenderFrame()
 	// SwapWindow
 	{
 		B3_PROFILE("m_app->swapBuffer");
-//		m_app->swapBuffer();
+		m_app->swapBuffer();
 		//SDL_GL_SwapWindow( m_pWindow );
 		
 	}
@@ -1488,8 +1506,9 @@ void CMainApplication::SetupDistortion()
 			u = x*w; v = 1-y*h;
 			vert.position = Vector2( Xoffset+u, -1+2*y*h );
 
-			vr::DistortionCoordinates_t dc0 = m_pHMD->ComputeDistortion(vr::Eye_Left, u, v);
-
+			vr::DistortionCoordinates_t dc0;
+			bool result = m_pHMD->ComputeDistortion(vr::Eye_Left, u, v,&dc0);
+			btAssert(result);
 			vert.texCoordRed = Vector2(dc0.rfRed[0], 1 - dc0.rfRed[1]);
 			vert.texCoordGreen =  Vector2(dc0.rfGreen[0], 1 - dc0.rfGreen[1]);
 			vert.texCoordBlue = Vector2(dc0.rfBlue[0], 1 - dc0.rfBlue[1]);
@@ -1507,8 +1526,9 @@ void CMainApplication::SetupDistortion()
 			u = x*w; v = 1-y*h;
 			vert.position = Vector2( Xoffset+u, -1+2*y*h );
 
-			vr::DistortionCoordinates_t dc0 = m_pHMD->ComputeDistortion( vr::Eye_Right, u, v );
-
+			vr::DistortionCoordinates_t dc0;
+			bool result = m_pHMD->ComputeDistortion( vr::Eye_Right, u, v,&dc0 );
+			btAssert(result);
 			vert.texCoordRed = Vector2(dc0.rfRed[0], 1 - dc0.rfRed[1]);
 			vert.texCoordGreen = Vector2(dc0.rfGreen[0], 1 - dc0.rfGreen[1]);
 			vert.texCoordBlue = Vector2(dc0.rfBlue[0], 1 - dc0.rfBlue[1]);
@@ -1601,7 +1621,10 @@ void CMainApplication::RenderStereoTargets()
 {
 	B3_PROFILE("CMainApplication::RenderStereoTargets");
 
-	sExample->stepSimulation(1./60.);
+	btScalar dtSec = btScalar(m_clock.getTimeInSeconds());
+	dtSec = b3Min(dtSec,0.1);
+	sExample->stepSimulation(dtSec);
+	m_clock.reset();
 
 	glClearColor( 0.15f, 0.15f, 0.18f, 1.0f ); // nice background color, but not black
 	glEnable( GL_MULTISAMPLE );
