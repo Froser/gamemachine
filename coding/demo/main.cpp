@@ -18,6 +18,7 @@
 #include "gmgl/shader_constants.h"
 #include "gmengine/controller/gamemachine.h"
 #include "gmgl/gmglwindow.h"
+#include "utilities/path.h"
 
 using namespace gm;
 
