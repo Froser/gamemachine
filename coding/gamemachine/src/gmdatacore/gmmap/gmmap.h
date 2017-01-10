@@ -78,6 +78,7 @@ struct GMMapObject
 	GMfloat width, height, depth;
 	GMfloat slices, stacks, radius;
 	GMfloat magnification;
+	GMfloat collisionExtents[3];
 };
 
 struct GMMapMaterial
@@ -103,6 +104,8 @@ struct GMMapInstance
 {
 	ID id;
 	ID entityRef;
+	ID animationRef;
+	GMfloat animationDuration;
 	GMfloat position[3], rotation[4];
 	GMfloat scale[3];
 	GMfloat mass;
@@ -119,6 +122,29 @@ struct GMMapLight
 	GMfloat range;
 	LightType type;
 	GMuint shadow;
+};
+
+struct GMMapKeyframe
+{
+	Keyframe keyframe;
+};
+
+class Keyframe_Less
+{
+public:
+	bool operator ()(const GMMapKeyframe& left, const GMMapKeyframe& right)
+	{
+		return left.keyframe.percentage < right.keyframe.percentage;
+	}
+};
+
+struct GMMapKeyframes
+{
+	static Keyframes::Interpolation getType(const char* name);
+
+	ID id;
+	Keyframes::Interpolation functor;
+	std::set<GMMapKeyframe, Keyframe_Less> keyframes;
 };
 
 struct GMMapSettings
@@ -151,6 +177,7 @@ struct GMMap
 	std::set<GMMapEntity, ID_Less<GMMapEntity>> entities;
 	std::set<GMMapInstance, ID_Less<GMMapInstance>> instances;
 	std::set<GMMapLight, ID_Less<GMMapLight>> lights;
+	std::set<GMMapKeyframes, ID_Less<GMMapKeyframes>> animations;
 	GMMapSettings settings;
 	std::string workingDir;
 };

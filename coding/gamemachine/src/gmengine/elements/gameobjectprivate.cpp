@@ -8,6 +8,9 @@ GameObjectPrivate::GameObjectPrivate()
 	, m_localInertia(0, 0, 0)
 	, m_world(nullptr)
 	, m_pColObj(nullptr)
+	, m_animationStartTick(0)
+	, m_animationDuration(0)
+	, m_animationState(Stopped)
 {
 	m_transform.setIdentity();
 	memset(&m_frictions, 0, sizeof(Frictions));

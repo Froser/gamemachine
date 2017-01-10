@@ -8,6 +8,7 @@ CubeGameObject::CubeGameObject(const btVector3& extents, const Material eachMate
 	, m_magnification(1)
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
+	m_collisionExtents = m_extents;
 	createCoreObject();
 }
 
@@ -16,12 +17,13 @@ CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, 
 	, m_magnification(magnification <= 0 ? 1 : magnification)
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
+	m_collisionExtents = m_extents;
 	createCoreObject();
 }
 
 btCollisionShape* CubeGameObject::createCollisionShape()
 {
-	return new btBoxShape(getExtents() / 2);
+	return new btBoxShape(m_collisionExtents / 2);
 }
 
 void CubeGameObject::setExtents(const btVector3& extents)
@@ -32,6 +34,11 @@ void CubeGameObject::setExtents(const btVector3& extents)
 btVector3& CubeGameObject::getExtents()
 {
 	return m_extents;
+}
+
+void CubeGameObject::setCollisionExtents(const btVector3& colHalfExtents)
+{
+	m_collisionExtents = colHalfExtents;
 }
 
 void CubeGameObject::appendObjectToWorld(btDynamicsWorld* world)

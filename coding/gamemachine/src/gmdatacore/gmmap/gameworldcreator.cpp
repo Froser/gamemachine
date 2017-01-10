@@ -16,6 +16,7 @@
 #include "gmengine/elements/gamelight.h"
 #include "gmengine/controller/gamemachine.h"
 #include "utilities/assert.h"
+#include "gmengine/controller/animation.h"
 
 #define CREATE_FUNC
 #define RESOURCE_FUNC
@@ -44,7 +45,7 @@ btTransform getTransform(const GMMapInstance* instance)
 	return trans;
 }
 
-void setPropertiesFromInstance(const GMMapInstance* instance, GameObject* gameObj)
+void setPropertiesFromInstance(GMMap* map, const GMMapInstance* instance, GameObject* gameObj)
 {
 	gameObj->setMass(instance->mass);
 
@@ -52,6 +53,18 @@ void setPropertiesFromInstance(const GMMapInstance* instance, GameObject* gameOb
 	gameObj->setLocalScaling(btVector3(instance->scale[0], instance->scale[1], instance->scale[2]));
 	gameObj->setTransform(getTransform(instance));
 	gameObj->setFrictions(instance->frictions);
+
+	const GMMapKeyframes* keyframes = GMMap_find(map->animations, instance->animationRef);
+	if (keyframes)
+	{
+		Keyframes& coreKeyframes = gameObj->getKeyframes();
+		coreKeyframes.setFunctor(keyframes->functor);
+		for (auto iter = keyframes->keyframes.begin(); iter != keyframes->keyframes.end(); iter++)
+		{
+			gameObj->getKeyframes().insert( (*iter).keyframe );
+		}
+		gameObj->startAnimation(instance->animationDuration);
+	}
 }
 
 void copyUniqueMaterialProperties(const Material& material, Object* coreObject)
@@ -119,7 +132,13 @@ CREATE_FUNC void createCube(IFactory* factory,
 
 	btVector3 extents(object->width, object->height, object->depth);
 	*gameObj = new CubeGameObject(extents, object->magnification, materials);
-	setPropertiesFromInstance(instance, *gameObj);
+	if (object->collisionExtents[0] > 0 && object->collisionExtents[1] > 0 && object->collisionExtents[2] > 0)
+		static_cast<CubeGameObject*>(*gameObj)->setCollisionExtents(
+			btVector3(object->collisionExtents[0], object->collisionExtents[1], object->collisionExtents[2])
+		);
+
+	setPropertiesFromInstance(map, instance, *gameObj);
+
 	if (materials)
 		delete[] materials;
 }
@@ -134,7 +153,6 @@ CREATE_FUNC void createSphere(IFactory* factory,
 {
 	ASSERT(gameObj);
 
-
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	Material m = material ? material->material : Material();
 
@@ -143,7 +161,7 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	m.textures->type = texture.second;
 
 	*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, m);
-	setPropertiesFromInstance(instance, *gameObj);
+	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
 CREATE_FUNC void createSky(IFactory* factory,
@@ -160,7 +178,7 @@ CREATE_FUNC void createSky(IFactory* factory,
 	ASSERT(texture.first != nullptr);
 
 	*gameObj = new SkyGameObject(object->radius, texture.first);
-	setPropertiesFromInstance(instance, *gameObj);
+	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
 CREATE_FUNC void createConvexHull(IFactory* factory,
@@ -185,7 +203,7 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 		copyUniqueMaterialProperties(material->material, coreObject);
 
 	*gameObj = new ConvexHullGameObject(coreObject);
-	setPropertiesFromInstance(instance, *gameObj);
+	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
 struct __ObjectCreateFuncs
@@ -247,7 +265,7 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 
 	IFactory* factory = gm->getFactory();
 	IGraphicEngine* engine = gm->getGraphicEngine();
-	world->setGraphicEngine(engine);
+	world->setGameMachine(gm);
 	loadTextures(engine, factory, map);
 
 	// 装载设定
@@ -283,6 +301,7 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 		ObjectPainter* painter;
 		factory->createPainter(engine, gameObject->getObject(), &painter);
 		gameObject->getObject()->setPainter(painter);
+
 		world->appendObject(gameObject);
 	}
 

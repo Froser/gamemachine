@@ -4,6 +4,7 @@
 #include "gmdatacore/object.h"
 #include "utilities/autoptr.h"
 #include "btBulletCollisionCommon.h"
+#include "../controller/animation.h"
 BEGIN_NS
 
 #define PARAM(type, name)	\
@@ -16,6 +17,12 @@ struct Frictions
 	PARAM_F(friction);
 	PARAM_F(rollingFriction);
 	PARAM_F(spinningFriction);
+};
+
+enum AnimationState
+{
+	Stopped,
+	Running,
 };
 
 class GameWorld;
@@ -49,6 +56,10 @@ private:
 	AutoPtr<Object> m_pObject;
 	GameWorld* m_world;
 	Frictions m_frictions;
+	Keyframes m_keyframes;
+	GMint m_animationStartTick;
+	GMint m_animationDuration;
+	AnimationState m_animationState;
 };
 
 END_NS

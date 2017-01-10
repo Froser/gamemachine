@@ -52,6 +52,18 @@ bool handleObjects(TiXmlElement& elem, GMMap* map)
 		SAFE_SSCANF(child->Attribute("stacks"), "%f", &object.stacks);
 		SAFE_SSCANF(child->Attribute("mag"), "%f", &object.magnification);
 		object.path = child->Attribute("path");
+
+		{
+			const char* colextents = child->Attribute("collisionextents");
+			if (colextents)
+			{
+				Scanner scanner(colextents);
+				scanner.nextFloat(&object.collisionExtents[0]);
+				scanner.nextFloat(&object.collisionExtents[1]);
+				scanner.nextFloat(&object.collisionExtents[2]);
+			}
+		}
+
 		object.type = GMMapObject::getType(child->Attribute("type"));
 		map->objects.insert(object);
 	}
@@ -163,6 +175,8 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 		GMMapInstance instance = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &instance.id);
 		SAFE_SSCANF(child->Attribute("entityref"), "%i", &instance.entityRef);
+		SAFE_SSCANF(child->Attribute("animationref"), "%i", &instance.animationRef);
+		SAFE_SSCANF(child->Attribute("animationduration"), "%f", &instance.animationDuration);
 		SAFE_SSCANF(child->Attribute("mass"), "%f", &instance.mass);
 
 		{
@@ -323,6 +337,34 @@ bool handleSettings(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
+bool handleAnimations(TiXmlElement& elem, GMMap* map)
+{
+	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
+	{
+		GMMapKeyframes keyframes;
+		SAFE_SSCANF(child->Attribute("id"), "%i", &keyframes.id);
+		keyframes.functor = GMMapKeyframes::getType(child->Attribute("functor"));
+
+		for (TiXmlElement* eachKeyframe = child->FirstChildElement(); eachKeyframe; eachKeyframe = eachKeyframe->NextSiblingElement())
+		{
+			GMMapKeyframe keyframe;
+			SAFE_SSCANF(eachKeyframe->Attribute("percentage"), "%f", &keyframe.keyframe.percentage);
+			{
+				Scanner scanner(eachKeyframe->Attribute("value"));
+				scanner.nextFloat(&keyframe.keyframe.movement.direction[0]);
+				scanner.nextFloat(&keyframe.keyframe.movement.direction[1]);
+				scanner.nextFloat(&keyframe.keyframe.movement.direction[2]);
+				scanner.nextFloat(&keyframe.keyframe.movement.value);
+			}
+			keyframes.keyframes.insert(keyframe);
+		}
+
+		map->animations.insert(keyframes);
+	}
+
+	return true;
+}
+
 struct __Handlers
 {
 	__Handlers()
@@ -335,6 +377,7 @@ struct __Handlers
 		__map["instances"] = handleInstances;
 		__map["lights"] = handleLights;
 		__map["settings"] = handleSettings;
+		__map["animations"] = handleAnimations;
 	}
 
 	std::map<std::string, __Handler> __map;

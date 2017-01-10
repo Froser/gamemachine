@@ -9,6 +9,7 @@ public:
 	void start();
 	void stop();
 	GMint getMillisecond();
+	GMint getElapsedMillisecond();
 	bool isStarted();
 
 private:

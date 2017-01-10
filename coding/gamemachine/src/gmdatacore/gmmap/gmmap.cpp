@@ -44,6 +44,18 @@ LightType GMMapLight::getType(const char* name)
 	if (strEqual("specular", name))
 		return Specular;
 
-	ASSERT(false);
+	LOG_ASSERT_MSG(false, "Wrong light type");
 	return Specular;
+}
+
+Keyframes::Interpolation GMMapKeyframes::getType(const char* name)
+{
+	if (!name)
+		return Keyframes::Linear;
+
+	if (strEqual("linear", name))
+		return Keyframes::Linear;
+
+	LOG_ASSERT_MSG(false, "Wrong keyframes functor type");
+	return Keyframes::Linear;
 }

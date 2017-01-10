@@ -2,6 +2,7 @@
 #include "gameobject.h"
 #include "btBulletDynamicsCommon.h"
 #include "gmengine/controller/graphic_engine.h"
+#include "gmengine/elements/gameworld.h"
 
 void GameObject::setObject(AUTORELEASE Object* obj)
 {
@@ -113,8 +114,21 @@ void GameObject::getReadyForRender(DrawingList& list)
 			vmath::vec4(0, 0, 0, 1)
 		);
 
+		vmath::mat4 M = T * S;
+
+		if (dataRef().m_animationState == Running)
+		{
+			GMfloat current = dataRef().m_world->getElapsed();
+			GMfloat start = dataRef().m_animationStartTick;
+			GMfloat percentage = current / (start + dataRef().m_animationDuration);
+			if (percentage > 1)
+				percentage -= (int)percentage;
+			vmath::quaternion rotation = dataRef().m_keyframes.calculateRotation(percentage);
+			M = M * vmath::rotate(rotation[3], vmath::vec3(rotation[0], rotation[1], rotation[2]));
+		}
+
 		DrawingItem item;
-		memcpy(item.trans, T * S, sizeof(T));
+		memcpy(item.trans, M, sizeof(T));
 		item.gameObject = this;
 		list.push_back(item);
 	}
@@ -123,4 +137,21 @@ void GameObject::getReadyForRender(DrawingList& list)
 void GameObject::setFrictions(const Frictions& frictions)
 {
 	dataRef().setFrictions(frictions);
+}
+
+Keyframes& GameObject::getKeyframes()
+{
+	return dataRef().m_keyframes;
+}
+
+void GameObject::startAnimation(GMuint duration)
+{
+	dataRef().m_animationStartTick = dataRef().m_world ? dataRef().m_world->getElapsed() : 0;
+	dataRef().m_animationDuration = duration;
+	dataRef().m_animationState = Running;
+}
+
+void GameObject::stopAnimation()
+{
+	dataRef().m_animationState = Stopped;
 }

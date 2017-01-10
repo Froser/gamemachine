@@ -25,6 +25,11 @@ GMint Stopwatch::getMillisecond()
 	return m_end - m_start;
 }
 
+GMint Stopwatch::getElapsedMillisecond()
+{
+	return clock() - m_start;
+}
+
 bool Stopwatch::isStarted()
 {
 	return m_bStart;

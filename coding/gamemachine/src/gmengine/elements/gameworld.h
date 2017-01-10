@@ -12,6 +12,7 @@ class btDiscreteDynamicsWorld;
 BEGIN_NS
 class Object;
 class Character;
+class GameMachine;
 struct IGraphicEngine;
 class GameLight;
 
@@ -35,7 +36,9 @@ public:
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 
 	IGraphicEngine* getGraphicEngine();
-	void setGraphicEngine(AUTORELEASE IGraphicEngine* engine);
+	void setGameMachine(GameMachine* gm);
+	GameMachine* getGameMachine();
+	GMfloat getElapsed();
 };
 
 END_NS

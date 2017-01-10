@@ -10,7 +10,7 @@ struct Point
 	GMfloat x, y, z;
 };
 
-typedef Point Vector;
+typedef Point __vector;
 
 static Point getNormal(GMfloat u, GMfloat v)
 {

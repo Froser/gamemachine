@@ -14,6 +14,8 @@ public:
 public:
 	void setExtents(const btVector3& extents);
 	btVector3& getExtents();
+	void setCollisionExtents(const btVector3& colHalfExtents);
+
 public:
 	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
 
@@ -26,6 +28,7 @@ private:
 private:
 	btVector3 m_extents;
 	Material m_eachMaterial[6];
+	btVector3 m_collisionExtents;
 
 	// 纹理的放大率
 	GMfloat m_magnification;

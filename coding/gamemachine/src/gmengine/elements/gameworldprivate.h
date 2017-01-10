@@ -11,7 +11,7 @@ BEGIN_NS
 
 class GameObject;
 class Character;
-struct IGraphicEngine;
+class GameMachine;
 class GameLight;
 class GameWorldPrivate
 {
@@ -33,11 +33,12 @@ private:
 	AutoPtr<btSequentialImpulseConstraintSolver> m_solver;
 	AutoPtr<btGhostPairCallback> m_ghostPairCallback;
 	AutoPtr<btDiscreteDynamicsWorld> m_dynamicsWorld;
-	AutoPtr<IGraphicEngine> m_pEngine;
+	GameMachine* m_gameMachine;
 	std::vector<GameObject*> m_shapes;
 	std::vector<GameLight*> m_lights;
 	Character* m_character;
 	GameObject* m_sky;
+	GMfloat m_ellapsed;
 };
 
 END_NS

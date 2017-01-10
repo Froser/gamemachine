@@ -7,6 +7,7 @@
 #include "character.h"
 #include "gmengine/controller/graphic_engine.h"
 #include "gmengine/elements/gamelight.h"
+#include "../controller/gamemachine.h"
 
 GameWorld::GameWorld()
 {
@@ -59,11 +60,13 @@ void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
 	dataRef().m_dynamicsWorld->stepSimulation(elapsed, 0);
 	dataRef().m_character->simulateCamera();
+	dataRef().m_ellapsed += elapsed;
 }
 
 void GameWorld::renderGameWorld()
 {
-	dataRef().m_pEngine->newFrame();
+	IGraphicEngine* engine = getGraphicEngine();
+	engine->newFrame();
 	DrawingList list;
 
 	for (auto iter = dataRef().m_shapes.begin(); iter != dataRef().m_shapes.end(); iter++)
@@ -75,9 +78,9 @@ void GameWorld::renderGameWorld()
 	CameraLookAt lookAt;
 	Camera::calcCameraLookAt(dataRef().m_character->getPositionState(), &lookAt);
 	dataRef().m_character->applyEyeOffset(lookAt);
-	dataRef().m_pEngine->updateCameraView(lookAt);
+	engine->updateCameraView(lookAt);
 
-	dataRef().m_pEngine->drawObjects(list);
+	engine->drawObjects(list);
 }
 
 void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
@@ -87,11 +90,20 @@ void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
 
 IGraphicEngine* GameWorld::getGraphicEngine()
 {
-	ASSERT(dataRef().m_pEngine);
-	return dataRef().m_pEngine;
+	return dataRef().m_gameMachine->getGraphicEngine();
 }
 
-void GameWorld::setGraphicEngine(AUTORELEASE IGraphicEngine* engine)
+void GameWorld::setGameMachine(GameMachine* gm)
 {
-	dataRef().m_pEngine.reset(engine);
+	dataRef().m_gameMachine = gm;
+}
+
+GameMachine* GameWorld::getGameMachine()
+{
+	return dataRef().m_gameMachine;
+}
+
+GMfloat GameWorld::getElapsed()
+{
+	return dataRef().m_ellapsed;
 }

@@ -3,6 +3,7 @@
 #include "common.h"
 #include "graphic_engine.h"
 #include "utilities/autoptr.h"
+#include "utilities/stopwatch.h"
 BEGIN_NS
 
 struct IWindow
@@ -37,6 +38,7 @@ public:
 	GameLoop* getGameLoop();
 	GraphicSettings& getSettings();
 	void startGameMachine();
+	GMint getTick();
 
 private:
 	void init();

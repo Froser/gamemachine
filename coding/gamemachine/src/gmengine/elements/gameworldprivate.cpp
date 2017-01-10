@@ -8,6 +8,7 @@
 GameWorldPrivate::GameWorldPrivate()
 	: m_character(nullptr)
 	, m_sky(nullptr)
+	, m_ellapsed(0)
 {
 
 }

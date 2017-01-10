@@ -42,6 +42,11 @@ public:
 
 	void setFrictions(const Frictions& frictions);
 
+	Keyframes& getKeyframes();
+	void startAnimation(GMuint duration);
+	void stopAnimation();
+
+
 public:
 	virtual void getReadyForRender(DrawingList& list);
 	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
