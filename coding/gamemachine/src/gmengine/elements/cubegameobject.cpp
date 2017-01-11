@@ -21,6 +21,11 @@ CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, 
 	createCoreObject();
 }
 
+CubeGameObject::CubeGameObject(AUTORELEASE Object* obj)
+{
+	setObject(obj);
+}
+
 btCollisionShape* CubeGameObject::createCollisionShape()
 {
 	return new btBoxShape(m_collisionExtents / 2);

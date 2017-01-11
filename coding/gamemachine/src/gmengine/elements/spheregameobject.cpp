@@ -13,6 +13,12 @@ SphereGameObject::SphereGameObject(GMfloat radius, GMfloat slices, GMfloat stack
 	createCoreObject();
 }
 
+SphereGameObject::SphereGameObject(GMfloat radius, AUTORELEASE Object* obj)
+	: m_radius(radius)
+{
+	setObject(obj);
+}
+
 btCollisionShape* SphereGameObject::createCollisionShape()
 {
 	return new btSphereShape(m_radius);

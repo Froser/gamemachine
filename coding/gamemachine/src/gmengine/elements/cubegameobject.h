@@ -10,6 +10,7 @@ class CubeGameObject : public GameObject
 public:
 	CubeGameObject(const btVector3& extents, const Material eachMaterial[6]);
 	CubeGameObject(const btVector3& extents, GMfloat magnification, const Material eachMaterial[6]);
+	CubeGameObject(AUTORELEASE Object* obj);
 
 public:
 	void setExtents(const btVector3& extents);

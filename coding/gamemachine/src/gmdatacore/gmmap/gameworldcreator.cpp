@@ -30,14 +30,14 @@ typedef void (*__ObjectCreateFunc)(IFactory* factory,
 	const GMMapObject* object,
 	OUT GameObject** gameObj);
 
-void createTexture(IFactory* factory, std::string& path, OUT ITexture** texture)
+static void createTexture(IFactory* factory, std::string& path, OUT ITexture** texture)
 {
 	Image* image;
 	ImageReader::load(path.c_str(), &image);
 	factory->createTexture(image, texture);
 }
 
-btTransform getTransform(const GMMapInstance* instance)
+static btTransform getTransform(const GMMapInstance* instance)
 {
 	btTransform trans;
 	trans.setIdentity();
@@ -46,7 +46,7 @@ btTransform getTransform(const GMMapInstance* instance)
 	return trans;
 }
 
-void setPropertiesFromInstance(GMMap* map, const GMMapInstance* instance, GameObject* gameObj)
+static void setPropertiesFromInstance(GMMap* map, const GMMapInstance* instance, GameObject* gameObj)
 {
 	gameObj->setMass(instance->mass);
 
@@ -88,7 +88,7 @@ void setPropertiesFromInstance(GMMap* map, const GMMapInstance* instance, GameOb
 	}
 }
 
-void copyUniqueMaterialProperties(const Material& material, Object* coreObject)
+static void copyUniqueMaterialProperties(const Material& material, Object* coreObject)
 {
 	// 拷贝obj文件中不存在的一些属性
 	for (auto iter = coreObject->getComponents().begin(); iter != coreObject->getComponents().end(); iter++)
@@ -113,12 +113,19 @@ RESOURCE_FUNC std::string getModelPath(GMMap* map, const GMMapString& name)
 }
 
 typedef std::pair<ITexture*, TextureType> TextureFindResult;
-TextureFindResult getTextureForResourceContainer(ResourceContainer* resContainer, ID textureID)
+static TextureFindResult getTextureForResourceContainer(ResourceContainer* resContainer, ID textureID)
 {
 	const TextureContainer::TextureItem* texture = resContainer->getTextureContainer().find(textureID);
 	ITexture* coreTexture = texture ? texture->texture : nullptr;
 	TextureType type = texture ? texture->type : TextureTypeResetStart;
 	return std::make_pair(coreTexture, type);
+}
+
+static void loadObject(const char* path, IFactory* factory, OUT Object** obj)
+{
+	// 目前先用objreader来读取obj
+	ObjReader reader(factory);
+	reader.load(path, obj);
 }
 
 CREATE_FUNC void createCube(IFactory* factory,
@@ -152,7 +159,18 @@ CREATE_FUNC void createCube(IFactory* factory,
 	}
 
 	btVector3 extents(object->width, object->height, object->depth);
-	*gameObj = new CubeGameObject(extents, object->magnification, materials);
+	if (object->path.length() > 0)
+	{
+		Object* coreObject = nullptr;
+		std::string modelPath = getModelPath(map, object->path);
+		loadObject(modelPath.c_str(), factory, &coreObject);
+		*gameObj = new CubeGameObject(coreObject);
+	}
+	else
+	{
+		*gameObj = new CubeGameObject(extents, object->magnification, materials);
+	}
+
 	if (object->collisionExtents[0] > 0 && object->collisionExtents[1] > 0 && object->collisionExtents[2] > 0)
 		static_cast<CubeGameObject*>(*gameObj)->setCollisionExtents(
 			btVector3(object->collisionExtents[0], object->collisionExtents[1], object->collisionExtents[2])
@@ -181,7 +199,18 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
-	*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, m);
+	if (object->path.length() > 0)
+	{
+		Object* coreObject = nullptr;
+		std::string modelPath = getModelPath(map, object->path);
+		loadObject(modelPath.c_str(), factory, &coreObject);
+		*gameObj = new SphereGameObject(object->radius, coreObject);
+	}
+	else
+	{
+		*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, m);
+	}
+
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
@@ -212,11 +241,9 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 {
 	ASSERT(gameObj);
 
-	// 目前先用objreader来读取obj
-	ObjReader reader(factory);
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
-	reader.load(modelPath.c_str(), &coreObject);
+	loadObject(modelPath.c_str(), factory, &coreObject);
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)
@@ -236,11 +263,9 @@ CREATE_FUNC void createHallucination(IFactory* factory,
 {
 	ASSERT(gameObj);
 
-	// 目前先用objreader来读取obj
-	ObjReader reader(factory);
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
-	reader.load(modelPath.c_str(), &coreObject);
+	loadObject(modelPath.c_str(), factory, &coreObject);
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)

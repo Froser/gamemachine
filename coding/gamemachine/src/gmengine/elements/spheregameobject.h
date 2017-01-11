@@ -9,6 +9,7 @@ class SphereGameObject : public GameObject
 {
 public:
 	SphereGameObject(GMfloat radius, GMfloat slices, GMfloat stacks, const Material& material);
+	SphereGameObject(GMfloat radius, AUTORELEASE Object* obj);
 
 public:
 	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
