@@ -62,3 +62,8 @@ void GameObjectPrivate::setFrictions()
 	if (m_frictions.spinningFriction_flag)
 		m_pColObj->setSpinningFriction(m_frictions.spinningFriction);
 }
+
+AnimationState GameObjectPrivate::animationState()
+{
+	return m_animationState;
+}

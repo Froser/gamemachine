@@ -35,7 +35,7 @@ public:
 	void setTransform(const btTransform& transform);
 	btTransform& getTransform();
 
-	void setLocalScaling(const btVector3& scale);
+	virtual void setLocalScaling(const btVector3& scale);
 
 	virtual void setWorld(GameWorld* world);
 	GameWorld* getWorld();
@@ -46,10 +46,13 @@ public:
 	void startAnimation(GMuint duration);
 	void stopAnimation();
 
-
 public:
 	virtual void getReadyForRender(DrawingList& list);
 	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
+
+protected:
+	virtual vmath::mat4 getAnimationMatrix();
+	virtual vmath::mat4 getScalingAndTransformMatrix(btScalar glTrans[16], const btVector3& scaling);
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;

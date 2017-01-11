@@ -45,6 +45,9 @@ private:
 	void setFrictions(const Frictions& frictions);
 	void setFrictions();
 
+public:
+	AnimationState animationState();
+
 private:
 	btTransform m_transform;
 	btScalar m_mass;

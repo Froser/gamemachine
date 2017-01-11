@@ -208,6 +208,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\animation.h">
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -368,6 +371,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\animation.cpp">
       <Filter>src\gmengine\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

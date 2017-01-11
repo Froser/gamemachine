@@ -29,6 +29,8 @@ GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 		return GMMapObject::Sky;
 	if (strEqual("convexhull", name))
 		return GMMapObject::ConvexHull;
+	if (strEqual("hallucination", name))
+		return GMMapObject::Hallucination;
 
 	ASSERT(false);
 	return GMMapObject::Error;

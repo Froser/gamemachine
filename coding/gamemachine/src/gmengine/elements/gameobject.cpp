@@ -91,47 +91,59 @@ GameWorld* GameObject::getWorld()
 void GameObject::getReadyForRender(DrawingList& list)
 {
 	btCollisionObject* obj = getCollisionObject();
-	btRigidBody* body = btRigidBody::upcast(obj);
-	if (body)
+	vmath::mat4 M = vmath::mat4::identity();
+
+	if (obj)
 	{
-		btTransform trans;
-		body->getMotionState()->getWorldTransform(trans);
-
-		btScalar glTrans[16];
-		trans.getOpenGLMatrix(glTrans);
-
-		btVector3 scaling = obj->getCollisionShape()->getLocalScaling();
-		vmath::mat4 T(
-			vmath::vec4(glTrans[0], glTrans[1], glTrans[2], glTrans[3]),
-			vmath::vec4(glTrans[4], glTrans[5], glTrans[6], glTrans[7]),
-			vmath::vec4(glTrans[8], glTrans[9], glTrans[10], glTrans[11]),
-			vmath::vec4(glTrans[12], glTrans[13], glTrans[14], glTrans[15])
-		);
-		vmath::mat4 S(
-			vmath::vec4(scaling[0], 0, 0, 0),
-			vmath::vec4(0, scaling[1], 0, 0),
-			vmath::vec4(0, 0, scaling[2], 0),
-			vmath::vec4(0, 0, 0, 1)
-		);
-
-		vmath::mat4 M = T * S;
-
-		if (dataRef().m_animationState == Running)
+		btRigidBody* body = btRigidBody::upcast(obj);
+		if (body)
 		{
-			GMfloat current = dataRef().m_world->getElapsed();
-			GMfloat start = dataRef().m_animationStartTick;
-			GMfloat percentage = current / (start + dataRef().m_animationDuration);
-			if (percentage > 1)
-				percentage -= (int)percentage;
-			vmath::quaternion rotation = dataRef().m_keyframes.calculateRotation(percentage);
-			M = M * vmath::rotate(rotation[3], vmath::vec3(rotation[0], rotation[1], rotation[2]));
+			btTransform trans;
+			body->getMotionState()->getWorldTransform(trans);
+
+			btScalar glTrans[16];
+			trans.getOpenGLMatrix(glTrans);
+
+			btVector3 scaling = obj->getCollisionShape()->getLocalScaling();
+			M = getScalingAndTransformMatrix(glTrans, scaling);
 		}
 
+		if (dataRef().m_animationState == Running)
+			M = M * getAnimationMatrix();
+
 		DrawingItem item;
-		memcpy(item.trans, M, sizeof(T));
+		memcpy(item.trans, M, sizeof(M));
 		item.gameObject = this;
 		list.push_back(item);
 	}
+}
+
+vmath::mat4 GameObject::getScalingAndTransformMatrix(btScalar glTrans[16], const btVector3& scaling)
+{
+	vmath::mat4 T(
+		vmath::vec4(glTrans[0], glTrans[1], glTrans[2], glTrans[3]),
+		vmath::vec4(glTrans[4], glTrans[5], glTrans[6], glTrans[7]),
+		vmath::vec4(glTrans[8], glTrans[9], glTrans[10], glTrans[11]),
+		vmath::vec4(glTrans[12], glTrans[13], glTrans[14], glTrans[15])
+	);
+	vmath::mat4 S(
+		vmath::vec4(scaling[0], 0, 0, 0),
+		vmath::vec4(0, scaling[1], 0, 0),
+		vmath::vec4(0, 0, scaling[2], 0),
+		vmath::vec4(0, 0, 0, 1)
+	);
+	return T * S;
+}
+
+vmath::mat4 GameObject::getAnimationMatrix()
+{
+	GMfloat current = dataRef().m_world->getElapsed();
+	GMfloat start = dataRef().m_animationStartTick;
+	GMfloat percentage = current / (start + dataRef().m_animationDuration);
+	if (percentage > 1)
+		percentage -= (int)percentage;
+	vmath::quaternion rotation = dataRef().m_keyframes.calculateRotation(percentage);
+	return vmath::rotate(rotation[3], vmath::vec3(rotation[0], rotation[1], rotation[2]));
 }
 
 void GameObject::setFrictions(const Frictions& frictions)

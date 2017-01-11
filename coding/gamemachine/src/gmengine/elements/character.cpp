@@ -192,3 +192,7 @@ void Character::applyEyeOffset(CameraLookAt& lookAt)
 	lookAt.position_y += m_eyeOffset[1];
 	lookAt.position_z += m_eyeOffset[2];
 }
+
+void Character::getReadyForRender(DrawingList& list)
+{
+}

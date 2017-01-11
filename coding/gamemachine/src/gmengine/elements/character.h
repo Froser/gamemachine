@@ -41,6 +41,9 @@ public:
 	void setEyeOffset(GMfloat* offset);
 	void applyEyeOffset(CameraLookAt& lookAt);
 
+public:
+	virtual void getReadyForRender(DrawingList& list) override;
+
 private:
 	virtual btCollisionShape* createCollisionShape() override;
 	virtual void appendObjectToWorld(btDynamicsWorld* world) override;

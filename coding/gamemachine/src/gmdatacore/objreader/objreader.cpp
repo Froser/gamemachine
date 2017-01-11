@@ -18,7 +18,7 @@ void ObjReader::load(const char* filename, OUT Object** obj)
 	}
 	else
 	{
-		*obj = nullptr;
+		LOG_ASSERT_MSG(false, (std::string("Model loading error: ") + filename));
 	}
 	file.close();
 }

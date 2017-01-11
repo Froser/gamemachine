@@ -17,6 +17,7 @@
 #include "gmengine/controller/gamemachine.h"
 #include "utilities/assert.h"
 #include "gmengine/controller/animation.h"
+#include "gmengine/elements/hallucinationgameobject.h"
 
 #define CREATE_FUNC
 #define RESOURCE_FUNC
@@ -196,13 +197,36 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
 	reader.load(modelPath.c_str(), &coreObject);
-	LOG_ASSERT_MSG(coreObject, (std::string("Model loading error: ") + modelPath).c_str());
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)
 		copyUniqueMaterialProperties(material->material, coreObject);
 
 	*gameObj = new ConvexHullGameObject(coreObject);
+	setPropertiesFromInstance(map, instance, *gameObj);
+}
+
+CREATE_FUNC void createHallucination(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	// 目前先用objreader来读取obj
+	ObjReader reader;
+	Object* coreObject = nullptr;
+	std::string modelPath = getModelPath(map, object->path);
+	reader.load(modelPath.c_str(), &coreObject);
+
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
+	if (material)
+		copyUniqueMaterialProperties(material->material, coreObject);
+
+	*gameObj = new HallucinationGameObject(coreObject);
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
@@ -214,6 +238,7 @@ struct __ObjectCreateFuncs
 		__map[GMMapObject::Sphere] = createSphere;
 		__map[GMMapObject::Sky] = createSky;
 		__map[GMMapObject::ConvexHull] = createConvexHull;
+		__map[GMMapObject::Hallucination] = createHallucination;
 	}
 
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;
