@@ -17,14 +17,14 @@
 
 typedef bool (*__Handler)(TiXmlElement&, GMMap*);
 
-bool handleMeta(TiXmlElement& elem, GMMap* map)
+static bool handleMeta(TiXmlElement& elem, GMMap* map)
 {
 	map->meta.author = elem.Attribute("author");
 	map->meta.name = elem.Attribute("name");
 	return true;
 }
 
-bool handleTextures(TiXmlElement& elem, GMMap* map)
+static bool handleTextures(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
@@ -38,7 +38,7 @@ bool handleTextures(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleObjects(TiXmlElement& elem, GMMap* map)
+static bool handleObjects(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
@@ -71,7 +71,7 @@ bool handleObjects(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleMaterals(TiXmlElement& elem, GMMap* map)
+static bool handleMaterals(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
@@ -115,7 +115,7 @@ bool handleMaterals(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleEntities(TiXmlElement& elem, GMMap* map)
+static bool handleEntities(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
@@ -168,16 +168,24 @@ bool handleEntities(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleInstances(TiXmlElement& elem, GMMap* map)
+static bool handleInstances(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
 		GMMapInstance instance = { 0 };
 		SAFE_SSCANF(child->Attribute("id"), "%i", &instance.id);
 		SAFE_SSCANF(child->Attribute("entityref"), "%i", &instance.entityRef);
-		SAFE_SSCANF(child->Attribute("animationref"), "%i", &instance.animationRef);
 		SAFE_SSCANF(child->Attribute("animationduration"), "%f", &instance.animationDuration);
 		SAFE_SSCANF(child->Attribute("mass"), "%f", &instance.mass);
+
+		{
+			Scanner scanner(child->Attribute("animationref"));
+			GMint i = 0, ref = GMMapInstance::INVALID_ID;
+			while (scanner.nextInt(&ref) && i < GMMapInstance::MAX_ANIMATION_TYPE)
+			{
+				instance.animationRef[i++] = ref;
+			}
+		}
 
 		{
 			Scanner scanner(child->Attribute("position"));
@@ -252,7 +260,7 @@ bool handleInstances(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleLights(TiXmlElement& elem, GMMap* map)
+static bool handleLights(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
@@ -282,7 +290,7 @@ bool handleLights(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleSettings(TiXmlElement& elem, GMMap* map)
+static bool handleSettings(TiXmlElement& elem, GMMap* map)
 {
 	struct _flag
 	{
@@ -337,13 +345,14 @@ bool handleSettings(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-bool handleAnimations(TiXmlElement& elem, GMMap* map)
+static bool handleAnimations(TiXmlElement& elem, GMMap* map)
 {
 	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
 	{
 		GMMapKeyframes keyframes;
 		SAFE_SSCANF(child->Attribute("id"), "%i", &keyframes.id);
-		keyframes.functor = GMMapKeyframes::getType(child->Attribute("functor"));
+		keyframes.functor = GMMapKeyframes::getFunctorType(child->Attribute("functor"));
+		keyframes.type = GMMapKeyframes::getType(child->Attribute("type"));
 
 		for (TiXmlElement* eachKeyframe = child->FirstChildElement(); eachKeyframe; eachKeyframe = eachKeyframe->NextSiblingElement())
 		{

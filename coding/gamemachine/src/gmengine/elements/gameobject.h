@@ -10,6 +10,13 @@ class btDynamicsWorld;
 
 BEGIN_NS
 
+struct AnimationMatrices
+{
+	vmath::mat4 rotation;
+	vmath::mat4 tranlation;
+	vmath::mat4 scaling;
+};
+
 struct Frictions;
 class GameWorld;
 class GameObject
@@ -44,7 +51,9 @@ public:
 	void setFrictions(const Frictions& frictions);
 	void setFrictions();
 
-	Keyframes& getKeyframes();
+	Keyframes& getKeyframesRotation();
+	Keyframes& getKeyframesTranslation();
+	Keyframes& getKeyframesScaling();
 	void startAnimation(GMuint duration);
 	void stopAnimation();
 
@@ -53,7 +62,7 @@ public:
 	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
 
 protected:
-	virtual vmath::mat4 getAnimationMatrix();
+	virtual AnimationMatrices getAnimationMatrix();
 	virtual vmath::mat4 getScalingAndTransformMatrix(btScalar glTrans[16], const btVector3& scaling);
 
 private:

@@ -133,7 +133,10 @@ void GameObject::getReadyForRender(DrawingList& list)
 		}
 
 		if (d.animationState == Running)
-			M = M * getAnimationMatrix();
+		{
+			AnimationMatrices mat = getAnimationMatrix();
+			M = mat.tranlation * M * mat.rotation * mat.scaling;
+		}
 
 		DrawingItem item;
 		memcpy(item.trans, M, sizeof(M));
@@ -159,7 +162,7 @@ vmath::mat4 GameObject::getScalingAndTransformMatrix(btScalar glTrans[16], const
 	return T * S;
 }
 
-vmath::mat4 GameObject::getAnimationMatrix()
+AnimationMatrices GameObject::getAnimationMatrix()
 {
 	D(d);
 	GMfloat current = d.world->getElapsed();
@@ -167,8 +170,18 @@ vmath::mat4 GameObject::getAnimationMatrix()
 	GMfloat percentage = current / (start + d.animationDuration);
 	if (percentage > 1)
 		percentage -= (int)percentage;
-	vmath::quaternion rotation = d.keyframes.calculateRotation(percentage);
-	return vmath::rotate(rotation[3], vmath::vec3(rotation[0], rotation[1], rotation[2]));
+
+	vmath::quaternion rotation = d.keyframesRotation.isEmpty() ? vmath::quaternion(1, 0, 0, 0) : d.keyframesRotation.calculateInterpolation(percentage, true);
+	vmath::quaternion translation = d.keyframesTranslation.isEmpty() ? vmath::quaternion(0, 0, 0, 0) : d.keyframesTranslation.calculateInterpolation(percentage, false);
+	vmath::quaternion scaling = d.keyframesScaling.isEmpty() ? vmath::quaternion(1, 1, 1, 1) : d.keyframesScaling.calculateInterpolation(percentage, false);
+
+	AnimationMatrices mat = {
+		vmath::rotate(rotation[3], rotation[0], rotation[1], rotation[2]),
+		vmath::translate(translation[0], translation[1], translation[2]),
+		vmath::scale(scaling[0], scaling[1], scaling[2]),
+	};
+
+	return mat;
 }
 
 void GameObject::setFrictions(const Frictions& frictions)
@@ -192,10 +205,22 @@ void GameObject::setFrictions()
 		d.colObj->setSpinningFriction(d.frictions.spinningFriction);
 }
 
-Keyframes& GameObject::getKeyframes()
+Keyframes& GameObject::getKeyframesRotation()
 {
 	D(d);
-	return d.keyframes;
+	return d.keyframesRotation;
+}
+
+Keyframes& GameObject::getKeyframesTranslation()
+{
+	D(d);
+	return d.keyframesTranslation;
+}
+
+Keyframes& GameObject::getKeyframesScaling()
+{
+	D(d);
+	return d.keyframesScaling;
 }
 
 void GameObject::startAnimation(GMuint duration)

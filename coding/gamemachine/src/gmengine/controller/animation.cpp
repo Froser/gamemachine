@@ -36,19 +36,28 @@ void Keyframes::insert(const Keyframe& keyframe)
 	m_keyframes.insert(keyframe);
 }
 
-vmath::quaternion Keyframes::calculateRotation(GMfloat percentage)
+vmath::quaternion Keyframes::calculateInterpolation(GMfloat percentage, bool normalize)
 {
 	std::pair<const Keyframe*, const Keyframe*> lp = findLowerAndUpper(percentage);
 	LOG_ASSERT_MSG(lp.first && lp.second, "Missing '1' in animation keyframe percentage");
 
 	vmath::quaternion ret = interpolation(percentage, lp.first, lp.first->movement, lp.second, lp.second->movement, getFunctor());
-	vmath::vec3 dir = vmath::normalize(vmath::vec3(ret[0], ret[1], ret[2]));
-	return vmath::quaternion(dir[0], dir[1], dir[2], ret[3]);
+	if (normalize)
+	{
+		vmath::vec3 dir = vmath::normalize(vmath::vec3(ret[0], ret[1], ret[2]));
+		return vmath::quaternion(dir[0], dir[1], dir[2], ret[3]);
+	}
+	return vmath::quaternion(ret[0], ret[1], ret[2], ret[3]);
 }
 
 void Keyframes::setFunctor(Interpolation functor)
 {
 	m_functor = functor;
+}
+
+bool Keyframes::isEmpty()
+{
+	return m_keyframes.size() == 0;
 }
 
 std::pair<const Keyframe*, const Keyframe*> Keyframes::findLowerAndUpper(GMfloat percentage)

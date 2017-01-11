@@ -19,8 +19,8 @@
 #include "gmengine/controller/animation.h"
 #include "gmengine/elements/hallucinationgameobject.h"
 
-#define CREATE_FUNC
-#define RESOURCE_FUNC
+#define CREATE_FUNC static
+#define RESOURCE_FUNC static
 
 typedef void (*__ObjectCreateFunc)(IFactory* factory,
 	ResourceContainer* resContainer,
@@ -55,16 +55,36 @@ void setPropertiesFromInstance(GMMap* map, const GMMapInstance* instance, GameOb
 	gameObj->setTransform(getTransform(instance));
 	gameObj->setFrictions(instance->frictions);
 
-	const GMMapKeyframes* keyframes = GMMap_find(map->animations, instance->animationRef);
-	if (keyframes)
+	for (GMuint i = 0; i < GMMapInstance::MAX_ANIMATION_TYPE; i++)
 	{
-		Keyframes& coreKeyframes = gameObj->getKeyframes();
-		coreKeyframes.setFunctor(keyframes->functor);
-		for (auto iter = keyframes->keyframes.begin(); iter != keyframes->keyframes.end(); iter++)
+		const GMMapKeyframes* keyframes = GMMap_find(map->animations, instance->animationRef[i]);
+		if (keyframes)
 		{
-			gameObj->getKeyframes().insert( (*iter).keyframe );
+			Keyframes* coreKeyframes = nullptr;
+			switch (keyframes->type)
+			{
+			case GMMapKeyframes::Rotation:
+				coreKeyframes = &gameObj->getKeyframesRotation();
+				break;
+			case GMMapKeyframes::Translation:
+				coreKeyframes = &gameObj->getKeyframesTranslation();
+				break;
+			case GMMapKeyframes::Scaling:
+				coreKeyframes = &gameObj->getKeyframesScaling();
+				break;
+			default:
+				ASSERT(false);
+				LOG_ASSERT_MSG(false, "Wrong keyframes type.");
+				break;
+			}
+
+			coreKeyframes->setFunctor(keyframes->functor);
+			for (auto iter = keyframes->keyframes.begin(); iter != keyframes->keyframes.end(); iter++)
+			{
+				coreKeyframes->insert((*iter).keyframe);
+			}
+			gameObj->startAnimation(instance->animationDuration);
 		}
-		gameObj->startAnimation(instance->animationDuration);
 	}
 }
 
@@ -244,13 +264,13 @@ struct __ObjectCreateFuncs
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;
 };
 
-__ObjectCreateFunc& getObjectCreateFunc(GMMapObject::GMMapObjectType type)
+static __ObjectCreateFunc& getObjectCreateFunc(GMMapObject::GMMapObjectType type)
 {
 	static __ObjectCreateFuncs createFuncs;
 	return createFuncs.__map[type];
 }
 
-void loadTextures(IGraphicEngine* engine, IFactory* factory, GMMap* map)
+static void loadTextures(IGraphicEngine* engine, IFactory* factory, GMMap* map)
 {
 	ResourceContainer* resContainer = engine->getResourceContainer();
 	TextureContainer& textures = resContainer->getTextureContainer();
@@ -265,7 +285,7 @@ void loadTextures(IGraphicEngine* engine, IFactory* factory, GMMap* map)
 	}
 }
 
-void createGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMMap* map, const GMMapInstance* instance, OUT GameObject** gameObject)
+static void createGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMMap* map, const GMMapInstance* instance, OUT GameObject** gameObject)
 {
 	const GMMapEntity* entity = GMMap_find(map->entities, instance->entityRef);
 	LOG_ASSERT_MSG(entity, "You may bind wrong entityref.");

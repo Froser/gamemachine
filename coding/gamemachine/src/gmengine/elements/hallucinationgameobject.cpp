@@ -34,7 +34,10 @@ void HallucinationGameObject::getReadyForRender(DrawingList& list)
 
 	vmath::mat4 M = getScalingAndTransformMatrix(glTrans, m_scale);
 	if (d.animationState == Running)
-		M = M * getAnimationMatrix();
+	{
+		AnimationMatrices mat = getAnimationMatrix();
+		M = mat.tranlation * M * mat.rotation * mat.scaling;
+	}
 
 	DrawingItem item;
 	memcpy(item.trans, M, sizeof(M));

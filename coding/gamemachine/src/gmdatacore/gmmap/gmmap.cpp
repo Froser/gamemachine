@@ -50,7 +50,7 @@ LightType GMMapLight::getType(const char* name)
 	return Specular;
 }
 
-Keyframes::Interpolation GMMapKeyframes::getType(const char* name)
+Keyframes::Interpolation GMMapKeyframes::getFunctorType(const char* name)
 {
 	if (!name)
 		return Keyframes::Linear;
@@ -60,4 +60,20 @@ Keyframes::Interpolation GMMapKeyframes::getType(const char* name)
 
 	LOG_ASSERT_MSG(false, "Wrong keyframes functor type");
 	return Keyframes::Linear;
+}
+
+GMMapKeyframes::Type GMMapKeyframes::getType(const char* name)
+{
+	if (!name)
+		return Type::Rotation;
+
+	if (strEqual("rotation", name))
+		return Type::Rotation;
+	if (strEqual("translation", name))
+		return Type::Translation;
+	if (strEqual("scaling", name))
+		return Type::Scaling;
+
+	LOG_ASSERT_MSG(false, "Wrong keyframes type");
+	return Type::Scaling;
 }

@@ -50,8 +50,9 @@ public:
 
 public:
 	void insert(const Keyframe& keyframe);
-	vmath::quaternion calculateRotation(GMfloat percentage);
+	vmath::quaternion calculateInterpolation(GMfloat percentage, bool normalize);
 	void setFunctor(Interpolation functor);
+	bool isEmpty();
 
 private:
 	std::pair<const Keyframe*, const Keyframe*> findLowerAndUpper(GMfloat percentage);

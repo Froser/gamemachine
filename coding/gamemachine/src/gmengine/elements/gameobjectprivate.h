@@ -41,7 +41,9 @@ struct GameObjectPrivate
 	AutoPtr<Object> object;
 	GameWorld* world;
 	Frictions frictions;
-	Keyframes keyframes;
+	Keyframes keyframesRotation;
+	Keyframes keyframesTranslation;
+	Keyframes keyframesScaling;
 	GMint animationStartTick;
 	GMint animationDuration;
 	AnimationState animationState;

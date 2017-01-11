@@ -103,9 +103,15 @@ struct GMMapEntity
 
 struct GMMapInstance
 {
+	enum
+	{
+		INVALID_ID = 0,
+		MAX_ANIMATION_TYPE = 3
+	};
+
 	ID id;
 	ID entityRef;
-	ID animationRef;
+	ID animationRef[MAX_ANIMATION_TYPE];
 	GMfloat animationDuration;
 	GMfloat position[3], rotation[4];
 	GMfloat scale[3];
@@ -141,11 +147,20 @@ public:
 
 struct GMMapKeyframes
 {
-	static Keyframes::Interpolation getType(const char* name);
+	enum Type
+	{
+		Rotation,
+		Translation,
+		Scaling,
+	};
+
+	static Keyframes::Interpolation getFunctorType(const char* name);
+	static Type getType(const char* name);
 
 	ID id;
 	Keyframes::Interpolation functor;
 	std::set<GMMapKeyframe, Keyframe_Less> keyframes;
+	Type type;
 };
 
 struct GMMapSettings
