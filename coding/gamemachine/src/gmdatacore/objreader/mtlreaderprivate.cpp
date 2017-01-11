@@ -14,6 +14,7 @@
 #define KW_KA "Ka"
 #define KW_KD "Kd"
 #define KW_KS "Ks"
+#define KW_MAP_KA "map_Ka"
 #define KW_MAP_KD "map_Kd"
 
 Materials& MtlReaderPrivate::getMaterials()
@@ -103,9 +104,14 @@ void MtlReaderPrivate::parseLine(const char* line)
 		m_pCurrentMaterial->Ks_b = value;
 		m_pCurrentMaterial->Ks_switch = true;
 	}
+	else if (strEqual(command, KW_MAP_KA))
+	{
+		m_pCurrentMaterial->map_Ka_switch = true;
+		scanner.nextToTheEnd(m_pCurrentMaterial->map_Ka);
+	}
 	else if (strEqual(command, KW_MAP_KD))
 	{
-		ASSERT(false);
-		// 暂时不支持obj导入纹理，如果要导入，要考虑内存释放
+		m_pCurrentMaterial->map_Kd_switch = true;
+		scanner.nextToTheEnd(m_pCurrentMaterial->map_Kd);
 	}
 }

@@ -4,6 +4,7 @@
 #include "utilities/assert.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include <locale>
+#include "gmengine/controller/factory.h"
 
 #define NONE 0
 #define KW_REMARK "#"
@@ -39,11 +40,20 @@ static void pushUVVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indices
 	to.push_back(indicesVector.data()[(indices - 1) * 2 + 1]);
 }
 
+static void createTexture(IFactory* factory, const char* path, OUT ITexture** texture)
+{
+	Image* img;
+	bool b = ImageReader::load(path, &img);
+	ASSERT(b);
+	factory->createTexture(img, texture);
+}
+
 ObjReaderPrivate::ObjReaderPrivate()
 	: m_currentComponent(new Component())
 	, m_pMtlReader(new MtlReader())
 	, m_currentMaterial(nullptr)
 	, m_vertexOffset(0)
+	, m_factory(nullptr)
 {
 }
 
@@ -157,6 +167,25 @@ void ObjReaderPrivate::pushData()
 		m.Ks[1] = m_currentMaterial->Ks_g;
 		m.Ks[2] = m_currentMaterial->Ks_b;
 		m.shininess = m_currentMaterial->Ns;
+		
+		// 创建纹理
+		GMuint textureIdx = 0;
+		if (m_currentMaterial->map_Ka_switch)
+		{
+			ASSERT(m_factory);
+			std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Ka);
+			ITexture* texture;
+			createTexture(m_factory, texturePath.c_str(), &texture);
+			m.textures[textureIdx].texture = texture;
+			m.textures[textureIdx].type = TextureTypeAmbient;
+			m.textures[textureIdx].autorelease = 1;
+			textureIdx++;
+		}
+
+		if (m_currentMaterial->map_Kd_switch)
+		{
+			ASSERT(false && "暂时不支持Kd");
+		}
 	}
 	m_object->appendComponent(m_currentComponent, m_vertexOffset - m_currentComponent->getOffset());
 

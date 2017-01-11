@@ -193,7 +193,7 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 	ASSERT(gameObj);
 
 	// 目前先用objreader来读取obj
-	ObjReader reader;
+	ObjReader reader(factory);
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
 	reader.load(modelPath.c_str(), &coreObject);
@@ -217,7 +217,7 @@ CREATE_FUNC void createHallucination(IFactory* factory,
 	ASSERT(gameObj);
 
 	// 目前先用objreader来读取obj
-	ObjReader reader;
+	ObjReader reader(factory);
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
 	reader.load(modelPath.c_str(), &coreObject);

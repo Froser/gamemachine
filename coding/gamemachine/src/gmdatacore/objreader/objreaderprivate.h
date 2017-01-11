@@ -8,8 +8,8 @@
 #include "gmdatacore/object.h"
 BEGIN_NS
 
-class Image;
-
+struct IFactory;
+class TextureContainer;
 class ObjReaderPrivate
 {
 	friend class ObjReader;
@@ -19,6 +19,7 @@ private:
 	~ObjReaderPrivate();
 	void setObject(Object* obj) { m_object = obj; }
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
+	void setFactory(IFactory* factory) { m_factory = factory; }
 	void parseLine(const char* line);
 	void pushData();
 	void endParse();
@@ -33,6 +34,7 @@ private:
 	Component* m_currentComponent;
 	GMuint m_vertexOffset;
 	const MaterialProperties* m_currentMaterial;
+	IFactory* m_factory;
 };
 
 END_NS

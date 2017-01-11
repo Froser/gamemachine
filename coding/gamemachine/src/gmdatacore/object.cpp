@@ -29,6 +29,13 @@ Component::~Component()
 		delete[] m_firstPtr;
 	if (m_countPtr)
 		delete[] m_countPtr;
+
+	for (GMuint i = 0; i < MaxTextureCount; i++)
+	{
+		TextureInfo texture = getMaterial().textures[i];
+		if (texture.autorelease)
+			delete texture.texture;
+	}
 }
 
 void Component::generatePolygonProperties()

@@ -3,8 +3,9 @@
 #include "utilities/path.h"
 #include "gmdatacore/object.h"
 
-ObjReader::ObjReader()
+ObjReader::ObjReader(IFactory* factory)
 {
+	dataRef().m_factory = factory;
 }
 
 void ObjReader::load(const char* filename, OUT Object** obj)

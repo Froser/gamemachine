@@ -11,7 +11,7 @@ class ObjReader
 	DEFINE_PRIVATE(ObjReader);
 
 public:
-	ObjReader();
+	ObjReader(IFactory* factory);
 
 public:
 	void load(const char* filename, OUT Object** obj);

@@ -9,8 +9,6 @@ BEGIN_NS
 typedef std::string MaterialName;
 struct MaterialProperties
 {
-	GMuint textureID;
-	bool hasTexture : 1;
 	GMfloat Ns;
 	GMfloat d;
 	GMfloat Tr;
@@ -22,6 +20,10 @@ struct MaterialProperties
 	bool Kd_switch : 1;
 	GMfloat Ks_r, Ks_g, Ks_b;
 	bool Ks_switch : 1;
+	bool map_Ka_switch : 1;
+	char map_Ka[LINE_MAX];
+	bool map_Kd_switch : 1;
+	char map_Kd[LINE_MAX];
 };
 
 typedef std::map<MaterialName, MaterialProperties> Materials;

@@ -48,6 +48,7 @@ struct TextureInfo
 {
 	ITexture* texture;
 	TextureType type;
+	GMuint autorelease : 1;
 };
 
 enum
