@@ -21,7 +21,8 @@ CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, 
 	createCoreObject();
 }
 
-CubeGameObject::CubeGameObject(AUTORELEASE Object* obj)
+CubeGameObject::CubeGameObject(const btVector3& extents, AUTORELEASE Object* obj)
+	: m_collisionExtents(extents)
 {
 	setObject(obj);
 }
