@@ -4,70 +4,91 @@
 #include "gmengine/controller/graphic_engine.h"
 #include "gmengine/elements/gameworld.h"
 
+GameObject::GameObject()
+{
+
+}
+
 void GameObject::setObject(AUTORELEASE Object* obj)
 {
-	dataRef().setObject(obj);
+	D(d);
+	d.object.reset(obj);
 }
 
 Object* GameObject::getObject()
 {
-	if (!dataRef().m_pObject)
-		dataRef().m_pObject.reset(new Object());
-	return dataRef().m_pObject;
+	D(d);
+	if (!d.object)
+		d.object.reset(new Object());
+	return d.object;
 }
 
 btCollisionShape* GameObject::getCollisionShape()
 {
-	if (!dataRef().m_pColShape)
-		dataRef().m_pColShape.reset(createCollisionShape());
-	return dataRef().m_pColShape;
+	D(d);
+	if (!d.colShape)
+		d.colShape.reset(createCollisionShape());
+	return d.colShape;
 }
 
 btCollisionObject* GameObject::getCollisionObject()
 {
-	return dataRef().m_pColObj;
+	D(d);
+	return d.colObj;
 }
 
 void GameObject::setCollisionObject(btCollisionObject* obj)
 {
-	dataRef().m_pColObj = obj;
-	dataRef().setFrictions();
+	D(d);
+	d.colObj = obj;
+	setFrictions();
 }
 
 void GameObject::setMass(btScalar mass)
 {
-	dataRef().setMass(mass);
-	if (dataRef().m_isDynamic)
+	D(d);
+	d.mass = mass;
+	if (d.mass == 0)
+		d.isDynamic = false;
+	else
+		d.isDynamic = true;
+
+	if (d.isDynamic)
 	{
 		btVector3 localInertia;
-		getCollisionShape()->calculateLocalInertia(dataRef().m_mass, localInertia);
-		dataRef().m_localInertia = localInertia;
+		getCollisionShape()->calculateLocalInertia(d.mass, localInertia);
+		d.localInertia = localInertia;
 	}
 }
 
 btScalar GameObject::getMass()
 {
-	return dataRef().m_mass;
+	D(d);
+	return d.mass;
 }
 
 bool GameObject::isDynamic()
 {
-	return dataRef().m_isDynamic;
+	D(d);
+	return d.isDynamic;
 }
 
 btVector3& GameObject::getLocalInertia()
 {
-	return dataRef().m_localInertia;
+	D(d);
+	return d.localInertia;
 }
 
 void GameObject::setTransform(const btTransform& transform)
 {
-	dataRef().setTransform(transform);
+	D(d);
+	d.transform = transform;
 }
 
 btTransform& GameObject::getTransform()
 {
-	return dataRef().m_transform;
+	D(d);
+	return d.transform;
 }
 
 void GameObject::setLocalScaling(const btVector3& scale)
@@ -79,17 +100,20 @@ void GameObject::setLocalScaling(const btVector3& scale)
 
 void GameObject::setWorld(GameWorld* world)
 {
-	ASSERT(!dataRef().m_world);
-	dataRef().m_world = world;
+	D(d);
+	ASSERT(!d.world);
+	d.world = world;
 }
 
 GameWorld* GameObject::getWorld()
 {
-	return dataRef().m_world;
+	D(d);
+	return d.world;
 }
 
 void GameObject::getReadyForRender(DrawingList& list)
 {
+	D(d);
 	btCollisionObject* obj = getCollisionObject();
 	vmath::mat4 M = vmath::mat4::identity();
 
@@ -108,7 +132,7 @@ void GameObject::getReadyForRender(DrawingList& list)
 			M = getScalingAndTransformMatrix(glTrans, scaling);
 		}
 
-		if (dataRef().m_animationState == Running)
+		if (d.animationState == Running)
 			M = M * getAnimationMatrix();
 
 		DrawingItem item;
@@ -137,33 +161,53 @@ vmath::mat4 GameObject::getScalingAndTransformMatrix(btScalar glTrans[16], const
 
 vmath::mat4 GameObject::getAnimationMatrix()
 {
-	GMfloat current = dataRef().m_world->getElapsed();
-	GMfloat start = dataRef().m_animationStartTick;
-	GMfloat percentage = current / (start + dataRef().m_animationDuration);
+	D(d);
+	GMfloat current = d.world->getElapsed();
+	GMfloat start = d.animationStartTick;
+	GMfloat percentage = current / (start + d.animationDuration);
 	if (percentage > 1)
 		percentage -= (int)percentage;
-	vmath::quaternion rotation = dataRef().m_keyframes.calculateRotation(percentage);
+	vmath::quaternion rotation = d.keyframes.calculateRotation(percentage);
 	return vmath::rotate(rotation[3], vmath::vec3(rotation[0], rotation[1], rotation[2]));
 }
 
 void GameObject::setFrictions(const Frictions& frictions)
 {
-	dataRef().setFrictions(frictions);
+	D(d);
+	d.frictions = frictions;
+	setFrictions();
+}
+
+void GameObject::setFrictions()
+{
+	D(d);
+	if (!d.colObj)
+		return;
+
+	if (d.frictions.friction_flag)
+		d.colObj->setFriction(d.frictions.friction);
+	if (d.frictions.rollingFriction_flag)
+		d.colObj->setRollingFriction(d.frictions.rollingFriction);
+	if (d.frictions.spinningFriction_flag)
+		d.colObj->setSpinningFriction(d.frictions.spinningFriction);
 }
 
 Keyframes& GameObject::getKeyframes()
 {
-	return dataRef().m_keyframes;
+	D(d);
+	return d.keyframes;
 }
 
 void GameObject::startAnimation(GMuint duration)
 {
-	dataRef().m_animationStartTick = dataRef().m_world ? dataRef().m_world->getElapsed() : 0;
-	dataRef().m_animationDuration = duration;
-	dataRef().m_animationState = Running;
+	D(d);
+	d.animationStartTick = d.world ? d.world->getElapsed() : 0;
+	d.animationDuration = duration;
+	d.animationState = Running;
 }
 
 void GameObject::stopAnimation()
 {
-	dataRef().m_animationState = Stopped;
+	D(d);
+	d.animationState = Stopped;
 }

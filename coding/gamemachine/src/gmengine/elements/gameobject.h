@@ -16,6 +16,7 @@ class GameObject
 {
 	DEFINE_PRIVATE(GameObject)
 public:
+	GameObject();
 	virtual ~GameObject() {};
 
 public:
@@ -41,6 +42,7 @@ public:
 	GameWorld* getWorld();
 
 	void setFrictions(const Frictions& frictions);
+	void setFrictions();
 
 	Keyframes& getKeyframes();
 	void startAnimation(GMuint duration);

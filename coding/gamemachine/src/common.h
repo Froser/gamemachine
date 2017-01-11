@@ -6,7 +6,8 @@
 	private: \
 	className##Private m_data; \
 	protected: \
-	className##Private& dataRef() { return m_data; }
+	className##Private& data() { return m_data; }
+#define D(d) auto& d = data()
 
 #define AUTORELEASE
 #define OUT

@@ -10,7 +10,8 @@ MtlReader::MtlReader()
 
 void MtlReader::load(const char* filename)
 {
-	dataRef().setWorkingDir(Path::directoryName(filename));
+	D(d);
+	d.setWorkingDir(Path::directoryName(filename));
 	std::ifstream file;
 	file.open(filename, std::ios::in);
 	if (file.good())
@@ -26,16 +27,18 @@ void MtlReader::load(const char* filename)
 
 const MaterialProperties& MtlReader::getProperties(const char* name)
 {
-	LOG_ASSERT_MSG(dataRef().getMaterials().find(std::string(name)) != dataRef().getMaterials().end(), "warning: material" + std::string(name) + " not found.");
+	D(d);
+	LOG_ASSERT_MSG(d.getMaterials().find(std::string(name)) != d.getMaterials().end(), "warning: material" + std::string(name) + " not found.");
 
-	return (dataRef().getMaterials())[std::string(name)];
+	return (d.getMaterials())[std::string(name)];
 }
 
 void MtlReader::parse(std::ifstream& file)
 {
+	D(d);
 	char line[LINE_MAX];
 	while (file.getline(line, LINE_MAX))
 	{
-		dataRef().parseLine(line);
+		d.parseLine(line);
 	}
 }

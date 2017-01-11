@@ -5,12 +5,14 @@
 
 ObjReader::ObjReader(IFactory* factory)
 {
-	dataRef().m_factory = factory;
+	D(d);
+	d.m_factory = factory;
 }
 
 void ObjReader::load(const char* filename, OUT Object** obj)
 {
-	dataRef().setWorkingDir(Path::directoryName(filename));
+	D(d);
+	d.setWorkingDir(Path::directoryName(filename));
 	std::ifstream file;
 	file.open(filename, std::ios::in);
 	if (file.good())
@@ -26,10 +28,11 @@ void ObjReader::load(const char* filename, OUT Object** obj)
 
 void ObjReader::parse(std::ifstream& file, OUT Object** obj)
 {
+	D(d);
 	if (obj)
 	{
 		*obj = new Object();
-		dataRef().setObject(*obj);
+		d.setObject(*obj);
 	}
 	else
 	{
@@ -39,7 +42,7 @@ void ObjReader::parse(std::ifstream& file, OUT Object** obj)
 	char line[LINE_MAX];
 	while (file.getline(line, LINE_MAX))
 	{
-		dataRef().parseLine(line);
+		d.parseLine(line);
 	}
-	dataRef().endParse();
+	d.endParse();
 }

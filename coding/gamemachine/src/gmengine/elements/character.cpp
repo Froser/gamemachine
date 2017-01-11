@@ -32,9 +32,10 @@ btCollisionShape* Character::createCollisionShape()
 
 void Character::appendObjectToWorld(btDynamicsWorld* world)
 {
+	D(d);
 	btPairCachingGhostObject* ghostObj = new btPairCachingGhostObject();
 
-	ghostObj->setWorldTransform(dataRef().getTransform());
+	ghostObj->setWorldTransform(d.transform);
 	ghostObj->setCollisionShape(getCollisionShape());
 	ghostObj->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
 	setCollisionObject(ghostObj);

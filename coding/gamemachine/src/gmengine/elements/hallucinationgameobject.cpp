@@ -27,12 +27,13 @@ btCollisionShape* HallucinationGameObject::createCollisionShape()
 
 void HallucinationGameObject::getReadyForRender(DrawingList& list)
 {
-	btTransform trans = dataRef().getTransform();
+	D(d);
+	btTransform trans = d.transform;
 	GMfloat glTrans[16];
 	trans.getOpenGLMatrix(glTrans);
 
 	vmath::mat4 M = getScalingAndTransformMatrix(glTrans, m_scale);
-	if (dataRef().animationState() == Running)
+	if (d.animationState == Running)
 		M = M * getAnimationMatrix();
 
 	DrawingItem item;

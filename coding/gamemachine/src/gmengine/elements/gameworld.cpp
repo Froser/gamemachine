@@ -7,11 +7,45 @@
 #include "character.h"
 #include "gmengine/controller/graphic_engine.h"
 #include "gmengine/elements/gamelight.h"
-#include "../controller/gamemachine.h"
+#include "gmengine/controller/gamemachine.h"
+#include <algorithm>
 
 GameWorld::GameWorld()
 {
-	dataRef().init();
+	D(d);
+	d.collisionConfiguration.reset(new btDefaultCollisionConfiguration());
+	d.dispatcher.reset(new btCollisionDispatcher(d.collisionConfiguration));
+	d.overlappingPairCache.reset(new btDbvtBroadphase());
+	d.solver.reset(new btSequentialImpulseConstraintSolver);
+	d.ghostPairCallback.reset(new btGhostPairCallback());
+	d.dynamicsWorld.reset(new btDiscreteDynamicsWorld(d.dispatcher, d.overlappingPairCache, d.solver, d.collisionConfiguration));
+	d.dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(d.ghostPairCallback);
+}
+
+GameWorld::~GameWorld()
+{
+	D(d);
+	for (int i = d.dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+	{
+		btCollisionObject* obj = d.dynamicsWorld->getCollisionObjectArray()[i];
+		btRigidBody* body = btRigidBody::upcast(obj);
+		if (body && body->getMotionState())
+		{
+			delete body->getMotionState();
+		}
+		d.dynamicsWorld->removeCollisionObject(obj);
+		delete obj;
+	}
+
+	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
+	{
+		delete *iter;
+	}
+
+	for (auto iter = d.lights.begin(); iter != d.lights.end(); iter++)
+	{
+		delete *iter;
+	}
 }
 
 void GameWorld::initialize()
@@ -21,63 +55,84 @@ void GameWorld::initialize()
 
 void GameWorld::appendObject(AUTORELEASE GameObject* obj)
 {
-	dataRef().appendObject(obj);
+	D(d);
+	if (std::find(d.shapes.begin(), d.shapes.end(), obj) != d.shapes.end())
+		return;
+
+	ObjectPainter* painter = obj->getObject()->getPainter();
+	if (painter)
+		painter->init();
+
+	obj->appendObjectToWorld(d.dynamicsWorld);
+	d.shapes.push_back(obj);
+
 	obj->setWorld(this);
 }
 
 void GameWorld::appendLight(AUTORELEASE GameLight* light)
 {
-	dataRef().appendLight(light);
+	D(d);
+	if (std::find(d.lights.begin(), d.lights.end(), light) != d.lights.end())
+		return;
+
+	d.lights.push_back(light);
 	light->setWorld(this);
 }
 
 std::vector<GameLight*>& GameWorld::getLights()
 {
-	return dataRef().m_lights;
+	D(d);
+	return d.lights;
 }
 
 void GameWorld::setMajorCharacter(Character* character)
 {
-	dataRef().m_character = character;
+	D(d);
+	d.character = character;
 }
 
 Character* GameWorld::getMajorCharacter()
 {
-	return dataRef().m_character;
+	D(d);
+	return d.character;
 }
 
 void GameWorld::setSky(GameObject* sky)
 {
-	dataRef().m_sky = sky;
+	D(d);
+	d.sky = sky;
 }
 
 GameObject* GameWorld::getSky()
 {
-	return dataRef().m_sky;
+	D(d);
+	return d.sky;
 }
 
 void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
-	dataRef().m_dynamicsWorld->stepSimulation(elapsed, 0);
-	dataRef().m_character->simulateCamera();
-	dataRef().m_ellapsed += elapsed;
+	D(d);
+	d.dynamicsWorld->stepSimulation(elapsed, 0);
+	d.character->simulateCamera();
+	d.ellapsed += elapsed;
 }
 
 void GameWorld::renderGameWorld()
 {
+	D(d);
 	IGraphicEngine* engine = getGraphicEngine();
 	engine->newFrame();
 	DrawingList list;
 
-	for (auto iter = dataRef().m_shapes.begin(); iter != dataRef().m_shapes.end(); iter++)
+	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
 	{
 		GameObject* gameObj = *iter;
 		gameObj->getReadyForRender(list);
 	}
 
 	CameraLookAt lookAt;
-	Camera::calcCameraLookAt(dataRef().m_character->getPositionState(), &lookAt);
-	dataRef().m_character->applyEyeOffset(lookAt);
+	Camera::calcCameraLookAt(d.character->getPositionState(), &lookAt);
+	d.character->applyEyeOffset(lookAt);
 	engine->updateCameraView(lookAt);
 
 	engine->drawObjects(list);
@@ -85,25 +140,30 @@ void GameWorld::renderGameWorld()
 
 void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
 {
-	dataRef().setGravity(x, y, z);
+	D(d);
+	d.dynamicsWorld->setGravity(btVector3(x, y, z));
 }
 
 IGraphicEngine* GameWorld::getGraphicEngine()
 {
-	return dataRef().m_gameMachine->getGraphicEngine();
+	D(d);
+	return d.gameMachine->getGraphicEngine();
 }
 
 void GameWorld::setGameMachine(GameMachine* gm)
 {
-	dataRef().m_gameMachine = gm;
+	D(d);
+	d.gameMachine = gm;
 }
 
 GameMachine* GameWorld::getGameMachine()
 {
-	return dataRef().m_gameMachine;
+	D(d);
+	return d.gameMachine;
 }
 
 GMfloat GameWorld::getElapsed()
 {
-	return dataRef().m_ellapsed;
+	D(d);
+	return d.ellapsed;
 }

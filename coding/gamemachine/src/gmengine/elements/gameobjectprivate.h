@@ -27,42 +27,24 @@ enum AnimationState
 
 class GameWorld;
 struct Frictions;
-class GameObjectPrivate
+struct GameObjectPrivate
 {
-	friend class GameObject;
-
-public:
 	GameObjectPrivate();
-	~GameObjectPrivate();
 
-public:
-	btTransform& getTransform();
-
-private:
-	void setMass(btScalar mass);
-	void setObject(AUTORELEASE Object* obj);
-	void setTransform(const btTransform& transform);
-	void setFrictions(const Frictions& frictions);
-	void setFrictions();
-
-public:
-	AnimationState animationState();
-
-private:
-	btTransform m_transform;
-	btScalar m_mass;
-	bool m_isDynamic;
-	btVector3 m_localInertia;
-	AutoPtr<btCollisionShape> m_pColShape;
-	btCollisionObject* m_pColObj;
-	AutoPtr<btMotionState> m_pMotionState;
-	AutoPtr<Object> m_pObject;
-	GameWorld* m_world;
-	Frictions m_frictions;
-	Keyframes m_keyframes;
-	GMint m_animationStartTick;
-	GMint m_animationDuration;
-	AnimationState m_animationState;
+	btTransform transform;
+	btScalar mass;
+	bool isDynamic;
+	btVector3 localInertia;
+	AutoPtr<btCollisionShape> colShape;
+	btCollisionObject* colObj;
+	AutoPtr<btMotionState> motionState;
+	AutoPtr<Object> object;
+	GameWorld* world;
+	Frictions frictions;
+	Keyframes keyframes;
+	GMint animationStartTick;
+	GMint animationDuration;
+	AnimationState animationState;
 };
 
 END_NS

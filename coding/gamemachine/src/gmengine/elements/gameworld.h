@@ -21,6 +21,7 @@ class GameWorld
 	DEFINE_PRIVATE(GameWorld)
 public:
 	GameWorld();
+	~GameWorld();
 
 public:
 	void initialize();
