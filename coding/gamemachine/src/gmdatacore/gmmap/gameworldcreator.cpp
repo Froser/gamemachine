@@ -164,7 +164,7 @@ CREATE_FUNC void createCube(IFactory* factory,
 		Object* coreObject = nullptr;
 		std::string modelPath = getModelPath(map, object->path);
 		loadObject(modelPath.c_str(), factory, &coreObject);
-		*gameObj = new CubeGameObject(coreObject);
+		*gameObj = new CubeGameObject(extents, coreObject);
 	}
 	else
 	{
