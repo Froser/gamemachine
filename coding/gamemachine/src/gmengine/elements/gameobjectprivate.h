@@ -26,17 +26,17 @@ enum AnimationState
 };
 
 class GameWorld;
-struct Frictions;
 struct GameObjectPrivate
 {
 	GameObjectPrivate();
 
+	btVector3 localScaling;
 	btTransform transform;
 	btScalar mass;
 	bool isDynamic;
 	btVector3 localInertia;
-	AutoPtr<btCollisionShape> colShape;
-	btCollisionObject* colObj;
+	AutoPtr<btCollisionShape> collisionShape;
+	btCollisionObject* collisionObject;
 	AutoPtr<btMotionState> motionState;
 	AutoPtr<Object> object;
 	GameWorld* world;

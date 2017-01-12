@@ -11,13 +11,18 @@ void HallucinationGameObject::setLocalScaling(const btVector3& scale)
 	m_scale = scale;
 }
 
-void HallucinationGameObject::appendObjectToWorld(btDynamicsWorld* world)
+void HallucinationGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
 {
 }
 
-void HallucinationGameObject::setMass(btScalar)
+void HallucinationGameObject::initPhysics(btDynamicsWorld* world)
 {
 	// 不起作用
+}
+
+btCollisionObject* HallucinationGameObject::createCollisionObject()
+{
+	return nullptr;
 }
 
 btCollisionShape* HallucinationGameObject::createCollisionShape()

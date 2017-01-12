@@ -11,10 +11,11 @@ public:
 
 public:
 	virtual void setLocalScaling(const btVector3& scale) override;
-	virtual void setMass(btScalar) override;
-	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
+	virtual void initPhysics(btDynamicsWorld* world) override;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
 	virtual btCollisionShape* createCollisionShape() override;
 	virtual void getReadyForRender(DrawingList& list) override;
+	virtual btCollisionObject* createCollisionObject() override;
 
 private:
 	btVector3 m_scale;

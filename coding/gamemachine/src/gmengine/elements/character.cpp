@@ -30,28 +30,34 @@ btCollisionShape* Character::createCollisionShape()
 	return new btCapsuleShape(m_radius, m_height);
 }
 
-void Character::appendObjectToWorld(btDynamicsWorld* world)
+void Character::appendThisObjectToWorld(btDynamicsWorld* world)
 {
 	D(d);
-	btPairCachingGhostObject* ghostObj = new btPairCachingGhostObject();
 
-	ghostObj->setWorldTransform(d.transform);
-	ghostObj->setCollisionShape(getCollisionShape());
-	ghostObj->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
-	setCollisionObject(ghostObj);
-
-	m_controller.reset(new btKinematicCharacterController(ghostObj, static_cast<btConvexShape*>(getCollisionShape()), m_stepHeight));
+	// gravity
+	btPairCachingGhostObject* collisionObject = static_cast<btPairCachingGhostObject*>(d.collisionObject);
+	m_controller.reset(new btKinematicCharacterController(collisionObject, static_cast<btConvexShape*>(d.collisionShape.get()), m_stepHeight));
 	if (m_freeMove)
 		m_controller->setGravity(btVector3(0, 0, 0));
 	else
 		m_controller->setGravity(world->getGravity());
 	m_controller->setFallSpeed(m_fallSpeed);
 
-	world->addCollisionObject(ghostObj,
+	world->addCollisionObject(d.collisionObject,
 		btBroadphaseProxy::CharacterFilter,
 		btBroadphaseProxy::StaticFilter | btBroadphaseProxy::AllFilter);
 	world->addAction(m_controller);
 	m_dynamicWorld = world;
+}
+
+btCollisionObject* Character::createCollisionObject()
+{
+	D(d);
+	btPairCachingGhostObject* ghostObj = new btPairCachingGhostObject();
+	ghostObj->setWorldTransform(d.transform);
+	ghostObj->setCollisionShape(d.collisionShape);
+	ghostObj->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+	return ghostObj;
 }
 
 GMfloat Character::calcMoveDistance()

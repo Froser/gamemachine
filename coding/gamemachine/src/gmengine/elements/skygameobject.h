@@ -2,21 +2,20 @@
 #define __SKYGAMEOBJECT_H__
 #include "common.h"
 #include "gameobject.h"
+#include "hallucinationgameobject.h"
 
 class btDynamicsWorld;
 class btCollisionShape;
 BEGIN_NS
 
-class SkyGameObject : public GameObject
+class SkyGameObject : public HallucinationGameObject
 {
 public:
 	SkyGameObject(GMfloat len, ITexture* skyTexture);
 
 public:
 	virtual void setWorld(GameWorld* world) override;
-	virtual void setMass(btScalar) override;
-	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
-	virtual btCollisionShape* createCollisionShape() override;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
 
 protected:
 	virtual void getReadyForRender(DrawingList& list) override;

@@ -3,16 +3,14 @@
 #include "common.h"
 #include "gameobject.h"
 #include "gmdatacore/object.h"
+#include "rigidgameobject.h"
 BEGIN_NS
 
-class SphereGameObject : public GameObject
+class SphereGameObject : public RigidGameObject
 {
 public:
 	SphereGameObject(GMfloat radius, GMfloat slices, GMfloat stacks, const Material& material);
 	SphereGameObject(GMfloat radius, AUTORELEASE Object* obj);
-
-public:
-	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;

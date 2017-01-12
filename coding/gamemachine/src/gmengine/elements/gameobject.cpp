@@ -9,6 +9,33 @@ GameObject::GameObject()
 
 }
 
+void GameObject::initPhysics(btDynamicsWorld* world)
+{
+	D(d);
+	ASSERT(!d.collisionShape);
+	d.collisionShape.reset(createCollisionShape());
+
+	// scaling
+	btVector3 scaling = d.localScaling;
+	d.collisionShape->setLocalScaling(scaling);
+
+	// mass, localInertia, dynamic
+	if (d.mass == 0)
+		d.isDynamic = false;
+	else
+		d.isDynamic = true;
+
+	if (d.isDynamic)
+	{
+		btVector3 localInertia;
+		d.collisionShape->calculateLocalInertia(d.mass, localInertia);
+		d.localInertia = localInertia;
+	}
+
+	// frictions
+	setFrictions();
+}
+
 void GameObject::setObject(AUTORELEASE Object* obj)
 {
 	D(d);
@@ -23,42 +50,16 @@ Object* GameObject::getObject()
 	return d.object;
 }
 
-btCollisionShape* GameObject::getCollisionShape()
-{
-	D(d);
-	if (!d.colShape)
-		d.colShape.reset(createCollisionShape());
-	return d.colShape;
-}
-
 btCollisionObject* GameObject::getCollisionObject()
 {
 	D(d);
-	return d.colObj;
-}
-
-void GameObject::setCollisionObject(btCollisionObject* obj)
-{
-	D(d);
-	d.colObj = obj;
-	setFrictions();
+	return d.collisionObject;
 }
 
 void GameObject::setMass(btScalar mass)
 {
 	D(d);
 	d.mass = mass;
-	if (d.mass == 0)
-		d.isDynamic = false;
-	else
-		d.isDynamic = true;
-
-	if (d.isDynamic)
-	{
-		btVector3 localInertia;
-		getCollisionShape()->calculateLocalInertia(d.mass, localInertia);
-		d.localInertia = localInertia;
-	}
 }
 
 btScalar GameObject::getMass()
@@ -73,29 +74,16 @@ bool GameObject::isDynamic()
 	return d.isDynamic;
 }
 
-btVector3& GameObject::getLocalInertia()
-{
-	D(d);
-	return d.localInertia;
-}
-
 void GameObject::setTransform(const btTransform& transform)
 {
 	D(d);
 	d.transform = transform;
 }
 
-btTransform& GameObject::getTransform()
-{
-	D(d);
-	return d.transform;
-}
-
 void GameObject::setLocalScaling(const btVector3& scale)
 {
-	btCollisionShape* pShape = getCollisionShape();
-	if (pShape)
-		pShape->setLocalScaling(scale);
+	D(d);
+	d.localScaling = scale;
 }
 
 void GameObject::setWorld(GameWorld* world)
@@ -162,6 +150,14 @@ vmath::mat4 GameObject::getScalingAndTransformMatrix(btScalar glTrans[16], const
 	return T * S;
 }
 
+void GameObject::appendObjectToWorld(btDynamicsWorld* world)
+{
+	D(d);
+	initPhysics(world);
+	d.collisionObject = createCollisionObject();
+	appendThisObjectToWorld(world);
+}
+
 AnimationMatrices GameObject::getAnimationMatrix()
 {
 	D(d);
@@ -194,15 +190,15 @@ void GameObject::setFrictions(const Frictions& frictions)
 void GameObject::setFrictions()
 {
 	D(d);
-	if (!d.colObj)
+	if (!d.collisionObject)
 		return;
 
 	if (d.frictions.friction_flag)
-		d.colObj->setFriction(d.frictions.friction);
+		d.collisionObject->setFriction(d.frictions.friction);
 	if (d.frictions.rollingFriction_flag)
-		d.colObj->setRollingFriction(d.frictions.rollingFriction);
+		d.collisionObject->setRollingFriction(d.frictions.rollingFriction);
 	if (d.frictions.spinningFriction_flag)
-		d.colObj->setSpinningFriction(d.frictions.spinningFriction);
+		d.collisionObject->setSpinningFriction(d.frictions.spinningFriction);
 }
 
 Keyframes& GameObject::getKeyframesRotation()

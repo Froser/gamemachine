@@ -27,21 +27,18 @@ public:
 	virtual ~GameObject() {};
 
 public:
+	virtual void initPhysics(btDynamicsWorld* world);
+
 	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
-	btCollisionShape* getCollisionShape();
-
 	btCollisionObject* getCollisionObject();
-	void setCollisionObject(btCollisionObject* obj);
 
 	bool isDynamic();
-	btVector3& getLocalInertia();
 
 	virtual void setMass(btScalar mass);
 	btScalar getMass();
 
 	void setTransform(const btTransform& transform);
-	btTransform& getTransform();
 
 	virtual void setLocalScaling(const btVector3& scale);
 
@@ -51,6 +48,8 @@ public:
 	void setFrictions(const Frictions& frictions);
 	void setFrictions();
 
+	void appendObjectToWorld(btDynamicsWorld* world);
+
 	Keyframes& getKeyframesRotation();
 	Keyframes& getKeyframesTranslation();
 	Keyframes& getKeyframesScaling();
@@ -59,11 +58,12 @@ public:
 
 public:
 	virtual void getReadyForRender(DrawingList& list);
-	virtual void appendObjectToWorld(btDynamicsWorld* world) = 0;
+	virtual btCollisionObject* createCollisionObject() = 0;
 
 protected:
 	virtual AnimationMatrices getAnimationMatrix();
 	virtual vmath::mat4 getScalingAndTransformMatrix(btScalar glTrans[16], const btVector3& scaling);
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;

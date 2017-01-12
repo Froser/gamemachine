@@ -17,7 +17,7 @@ GMGLObjectPainter::GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& sh
 {
 }
 
-void GMGLObjectPainter::init()
+void GMGLObjectPainter::transfer()
 {
 	if (m_inited)
 		return;

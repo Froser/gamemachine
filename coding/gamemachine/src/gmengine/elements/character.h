@@ -46,7 +46,8 @@ public:
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
-	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
+	virtual btCollisionObject* createCollisionObject() override;
 
 private:
 	GMfloat calcMoveDistance();

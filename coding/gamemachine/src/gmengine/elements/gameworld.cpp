@@ -59,12 +59,13 @@ void GameWorld::appendObject(AUTORELEASE GameObject* obj)
 	if (std::find(d.shapes.begin(), d.shapes.end(), obj) != d.shapes.end())
 		return;
 
-	ObjectPainter* painter = obj->getObject()->getPainter();
-	if (painter)
-		painter->init();
-
 	obj->appendObjectToWorld(d.dynamicsWorld);
 	d.shapes.push_back(obj);
+
+	// Painter在transfer之后，会删除Object顶点数据，所以放到最后transfer
+	ObjectPainter* painter = obj->getObject()->getPainter();
+	if (painter)
+		painter->transfer();
 
 	obj->setWorld(this);
 }

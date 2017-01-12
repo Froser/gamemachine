@@ -7,6 +7,7 @@
 SkyGameObject::SkyGameObject(GMfloat len, ITexture* skyTexture)
 	: m_length(len)
 	, m_texture(skyTexture)
+	, HallucinationGameObject(nullptr)
 {
 	// 注意，Texture一定要是个CUBE_MAP
 	createCoreObject();
@@ -14,7 +15,7 @@ SkyGameObject::SkyGameObject(GMfloat len, ITexture* skyTexture)
 	setLocalScaling(btVector3(1, 1, 1));
 }
 
-void SkyGameObject::appendObjectToWorld(btDynamicsWorld* world)
+void SkyGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
 {
 }
 
@@ -22,16 +23,6 @@ void SkyGameObject::setWorld(GameWorld* world)
 {
 	world->setSky(this);
 	GameObject::setWorld(world);
-}
-
-void SkyGameObject::setMass(btScalar)
-{
-	// 不起作用
-}
-
-btCollisionShape* SkyGameObject::createCollisionShape()
-{
-	return nullptr;
 }
 
 void SkyGameObject::getReadyForRender(DrawingList& list)

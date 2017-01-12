@@ -7,10 +7,12 @@ GameObjectPrivate::GameObjectPrivate()
 	, isDynamic(true)
 	, localInertia(0, 0, 0)
 	, world(nullptr)
-	, colObj(nullptr)
+	, collisionObject(nullptr)
+	, collisionShape(nullptr)
 	, animationStartTick(0)
 	, animationDuration(0)
 	, animationState(Stopped)
+	, localScaling(btVector3(1, 1, 1))
 {
 	transform.setIdentity();
 	memset(&frictions, 0, sizeof(Frictions));

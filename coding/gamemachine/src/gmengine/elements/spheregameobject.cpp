@@ -24,15 +24,6 @@ btCollisionShape* SphereGameObject::createCollisionShape()
 	return new btSphereShape(m_radius);
 }
 
-void SphereGameObject::appendObjectToWorld(btDynamicsWorld* world)
-{
-	btMotionState* motionState = new btDefaultMotionState(getTransform());
-	btRigidBody::btRigidBodyConstructionInfo rbInfo(getMass(), motionState, getCollisionShape(), getLocalInertia());
-	btRigidBody* rigidObj = new btRigidBody(rbInfo);
-	world->addRigidBody(rigidObj);
-	setCollisionObject(rigidObj);
-}
-
 void SphereGameObject::createCoreObject()
 {
 	Object* coreObj = nullptr;

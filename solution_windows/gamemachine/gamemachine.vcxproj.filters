@@ -211,6 +211,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -373,6 +379,12 @@
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp">
       <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>

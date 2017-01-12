@@ -47,15 +47,6 @@ void CubeGameObject::setCollisionExtents(const btVector3& colHalfExtents)
 	m_collisionExtents = colHalfExtents;
 }
 
-void CubeGameObject::appendObjectToWorld(btDynamicsWorld* world)
-{
-	btMotionState* motionState = new btDefaultMotionState(getTransform());
-	btRigidBody::btRigidBodyConstructionInfo rbInfo(getMass(), motionState, getCollisionShape(), getLocalInertia());
-	btRigidBody* rigidObj = new btRigidBody(rbInfo);
-	world->addRigidBody(rigidObj);
-	setCollisionObject(rigidObj);
-}
-
 void CubeGameObject::createCoreObject()
 {
 	btScalar x = m_extents.x() / 2,

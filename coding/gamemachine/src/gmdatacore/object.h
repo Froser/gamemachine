@@ -18,7 +18,7 @@ public:
 	ObjectPainter(Object* obj);
 
 public:
-	virtual void init() = 0;
+	virtual void transfer() = 0;
 	virtual void draw() = 0;
 	virtual void dispose() = 0;
 

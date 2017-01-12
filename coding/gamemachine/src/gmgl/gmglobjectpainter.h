@@ -14,7 +14,7 @@ public:
 	GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& shadowMapping, Object* obj);
 
 public:
-	virtual void init() override;
+	virtual void transfer() override;
 	virtual void draw() override;
 	virtual void dispose() override;
 	void setWorld(GameWorld* world);

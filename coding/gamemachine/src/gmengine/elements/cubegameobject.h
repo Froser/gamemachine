@@ -3,9 +3,10 @@
 #include "common.h"
 #include "gameobject.h"
 #include "gmdatacore/object.h"
+#include "rigidgameobject.h"
 BEGIN_NS
 
-class CubeGameObject : public GameObject
+class CubeGameObject : public RigidGameObject
 {
 public:
 	CubeGameObject(const btVector3& extents, const Material eachMaterial[6]);
@@ -16,9 +17,6 @@ public:
 	void setExtents(const btVector3& extents);
 	btVector3& getExtents();
 	void setCollisionExtents(const btVector3& colHalfExtents);
-
-public:
-	virtual void appendObjectToWorld(btDynamicsWorld* world) override;
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
