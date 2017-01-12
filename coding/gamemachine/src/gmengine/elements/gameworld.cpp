@@ -9,6 +9,7 @@
 #include "gmengine/elements/gamelight.h"
 #include "gmengine/controller/gamemachine.h"
 #include <algorithm>
+#include "gmengine/controller/factory.h"
 
 GameWorld::GameWorld()
 {
@@ -61,6 +62,9 @@ void GameWorld::appendObject(AUTORELEASE GameObject* obj)
 
 	obj->appendObjectToWorld(d.dynamicsWorld);
 	d.shapes.push_back(obj);
+
+	// 创建一个Painter
+	createPainterForObject(obj);
 
 	// Painter在transfer之后，会删除Object顶点数据，所以放到最后transfer
 	ObjectPainter* painter = obj->getObject()->getPainter();
@@ -167,4 +171,16 @@ GMfloat GameWorld::getElapsed()
 {
 	D(d);
 	return d.ellapsed;
+}
+
+void GameWorld::createPainterForObject(GameObject* obj)
+{
+	D(d);
+	GameMachine* gm = d.gameMachine;
+	IFactory* factory = gm->getFactory();
+	IGraphicEngine* engine = gm->getGraphicEngine();
+	ObjectPainter* painter;
+	factory->createPainter(engine, obj->getObject(), &painter);
+	ASSERT(!obj->getObject()->getPainter());
+	obj->getObject()->setPainter(painter);
 }

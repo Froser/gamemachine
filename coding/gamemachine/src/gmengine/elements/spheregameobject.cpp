@@ -10,7 +10,6 @@ SphereGameObject::SphereGameObject(GMfloat radius, GMfloat slices, GMfloat stack
 	, m_stacks(stacks)
 {
 	memcpy(&m_material, &material, sizeof(Material));
-	createCoreObject();
 }
 
 SphereGameObject::SphereGameObject(GMfloat radius, AUTORELEASE Object* obj)
@@ -24,10 +23,17 @@ btCollisionShape* SphereGameObject::createCollisionShape()
 	return new btSphereShape(m_radius);
 }
 
-void SphereGameObject::createCoreObject()
+void SphereGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
 {
+	initCoreObject();
+	RigidGameObject::appendThisObjectToWorld(world);
+}
+
+void SphereGameObject::initCoreObject()
+{
+	D(d);
 	Object* coreObj = nullptr;
-	Algorithm::createSphere(m_radius, m_slices, m_stacks, &coreObj);
+	Algorithm::createSphere(m_radius * d.localScaling[0], m_slices, m_stacks, &coreObj);
 	setObject(coreObj);
 	std::vector<Component*>& components = coreObj->getComponents();
 	for (auto iter = components.begin(); iter != components.end(); iter++)

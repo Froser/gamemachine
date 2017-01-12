@@ -20,9 +20,10 @@ public:
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
 
 private:
-	void createCoreObject();
+	void initCoreShape();
 
 private:
 	btVector3 m_extents;

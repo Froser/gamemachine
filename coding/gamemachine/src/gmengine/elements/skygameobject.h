@@ -21,7 +21,7 @@ protected:
 	virtual void getReadyForRender(DrawingList& list) override;
 
 private:
-	void createCoreObject();
+	void initCoreObject();
 
 private:
 	GMfloat m_length;

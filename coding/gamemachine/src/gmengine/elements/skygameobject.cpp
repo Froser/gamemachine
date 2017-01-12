@@ -9,8 +9,8 @@ SkyGameObject::SkyGameObject(GMfloat len, ITexture* skyTexture)
 	, m_texture(skyTexture)
 	, HallucinationGameObject(nullptr)
 {
+	initCoreObject();
 	// 注意，Texture一定要是个CUBE_MAP
-	createCoreObject();
 	GameObject::setMass(0.0f);
 	setLocalScaling(btVector3(1, 1, 1));
 }
@@ -39,8 +39,7 @@ void SkyGameObject::getReadyForRender(DrawingList& list)
 	list.push_back(item);
 }
 
-
-void SkyGameObject::createCoreObject()
+void SkyGameObject::initCoreObject()
 {
 	GMfloat vertices[] = {
 		//Front

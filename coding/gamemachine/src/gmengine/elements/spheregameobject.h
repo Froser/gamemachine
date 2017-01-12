@@ -14,9 +14,10 @@ public:
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
 
 private:
-	void createCoreObject();
+	void initCoreObject();
 
 private:
 	GMfloat m_radius;

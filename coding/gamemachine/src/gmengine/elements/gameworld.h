@@ -40,6 +40,9 @@ public:
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();
 	GMfloat getElapsed();
+
+private:
+	void createPainterForObject(GameObject* obj);
 };
 
 END_NS

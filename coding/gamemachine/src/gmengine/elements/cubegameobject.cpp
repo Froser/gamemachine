@@ -9,7 +9,6 @@ CubeGameObject::CubeGameObject(const btVector3& extents, const Material eachMate
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
 	m_collisionExtents = m_extents;
-	createCoreObject();
 }
 
 CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, const Material eachMaterial[6])
@@ -18,7 +17,6 @@ CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, 
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
 	m_collisionExtents = m_extents;
-	createCoreObject();
 }
 
 CubeGameObject::CubeGameObject(const btVector3& extents, AUTORELEASE Object* obj)
@@ -30,6 +28,12 @@ CubeGameObject::CubeGameObject(const btVector3& extents, AUTORELEASE Object* obj
 btCollisionShape* CubeGameObject::createCollisionShape()
 {
 	return new btBoxShape(m_collisionExtents / 2);
+}
+
+void CubeGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
+{
+	initCoreShape();
+	RigidGameObject::appendThisObjectToWorld(world);
 }
 
 void CubeGameObject::setExtents(const btVector3& extents)
@@ -47,11 +51,12 @@ void CubeGameObject::setCollisionExtents(const btVector3& colHalfExtents)
 	m_collisionExtents = colHalfExtents;
 }
 
-void CubeGameObject::createCoreObject()
+void CubeGameObject::initCoreShape()
 {
-	btScalar x = m_extents.x() / 2,
-		y = m_extents.y() / 2,
-		z = m_extents.z() / 2;
+	D(d);
+	btScalar x = m_extents.x() * d.localScaling[0] / 2,
+		y = m_extents.y() * d.localScaling[1] / 2,
+		z = m_extents.z() * d.localScaling[2] / 2;
 
 	GMfloat vertices[] = {
 		//Front

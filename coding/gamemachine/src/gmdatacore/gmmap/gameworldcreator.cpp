@@ -18,6 +18,7 @@
 #include "utilities/assert.h"
 #include "gmengine/controller/animation.h"
 #include "gmengine/elements/hallucinationgameobject.h"
+#include "gmengine/elements/singleprimitivegameobject.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -199,6 +200,7 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
+	
 	if (object->path.length() > 0)
 	{
 		Object* coreObject = nullptr;
@@ -210,7 +212,8 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	{
 		*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, m);
 	}
-
+	//SinglePrimitiveGameObject* single = new SinglePrimitiveGameObject(SinglePrimitiveGameObject::Sphere, object->radius, m);
+	//*gameObj = single;
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
@@ -367,11 +370,6 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 	{
 		GameObject* gameObject;
 		createGameObjectFromInstance(engine, factory, map, &(*iter), &gameObject);
-
-		ObjectPainter* painter;
-		factory->createPainter(engine, gameObject->getObject(), &painter);
-		gameObject->getObject()->setPainter(painter);
-
 		world->appendObject(gameObject);
 	}
 

@@ -38,7 +38,6 @@ public:
 	GameLoop* getGameLoop();
 	GraphicSettings& getSettings();
 	void startGameMachine();
-	GMint getTick();
 
 private:
 	void init();

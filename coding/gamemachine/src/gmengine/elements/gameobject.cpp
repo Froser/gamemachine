@@ -117,7 +117,7 @@ void GameObject::getReadyForRender(DrawingList& list)
 			trans.getOpenGLMatrix(glTrans);
 
 			btVector3 scaling = obj->getCollisionShape()->getLocalScaling();
-			M = getScalingAndTransformMatrix(glTrans, scaling);
+			M = getTransformMatrix(glTrans, scaling);
 		}
 
 		if (d.animationState == Running)
@@ -133,7 +133,7 @@ void GameObject::getReadyForRender(DrawingList& list)
 	}
 }
 
-vmath::mat4 GameObject::getScalingAndTransformMatrix(btScalar glTrans[16], const btVector3& scaling)
+vmath::mat4 GameObject::getTransformMatrix(btScalar glTrans[16], const btVector3& scaling)
 {
 	vmath::mat4 T(
 		vmath::vec4(glTrans[0], glTrans[1], glTrans[2], glTrans[3]),
@@ -141,13 +141,7 @@ vmath::mat4 GameObject::getScalingAndTransformMatrix(btScalar glTrans[16], const
 		vmath::vec4(glTrans[8], glTrans[9], glTrans[10], glTrans[11]),
 		vmath::vec4(glTrans[12], glTrans[13], glTrans[14], glTrans[15])
 	);
-	vmath::mat4 S(
-		vmath::vec4(scaling[0], 0, 0, 0),
-		vmath::vec4(0, scaling[1], 0, 0),
-		vmath::vec4(0, 0, scaling[2], 0),
-		vmath::vec4(0, 0, 0, 1)
-	);
-	return T * S;
+	return T;
 }
 
 void GameObject::appendObjectToWorld(btDynamicsWorld* world)

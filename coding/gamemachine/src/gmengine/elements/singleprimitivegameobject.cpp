@@ -3,8 +3,22 @@
 #include "utilities\assert.h"
 #include "btBulletCollisionCommon.h"
 #include "BulletCollision\CollisionShapes\btShapeHull.h"
+#include <vector>
 
-void collisionShape2TriangleMesh(btCollisionShape* collisionShape, const btTransform& parentTransform, btAlignedObjectArray<btVector3>& vertexPositions, btAlignedObjectArray<btVector3>& vertexNormals, btAlignedObjectArray<int>& indicesOut)
+static void push_back(std::vector<Object::DataType>& vector, const btVector3& pos)
+{
+	vector.push_back(pos[0]);
+	vector.push_back(pos[1]);
+	vector.push_back(pos[2]);
+	vector.push_back(1);
+}
+
+static void collisionShape2TriangleMesh(btCollisionShape* collisionShape,
+	const btTransform& parentTransform,
+	std::vector<Object::DataType>& vertexPositions,
+	std::vector<Object::DataType>& vertexNormals,
+	std::vector<GMuint>& indicesOut
+)
 {
 	//todo: support all collision shape types
 	switch (collisionShape->getShapeType())
@@ -41,13 +55,12 @@ void collisionShape2TriangleMesh(btCollisionShape* collisionShape, const btTrans
 
 		btVector3 triNormal = parentTransform.getBasis()*planeNormal;
 
-
 		for (int i = 0; i < 4; i++)
 		{
 			btVector3 vtxPos;
 			btVector3 pos = parentTransform*verts[i];
-			vertexPositions.push_back(pos);
-			vertexNormals.push_back(triNormal);
+			push_back(vertexPositions, pos);
+			push_back(vertexNormals, triNormal);
 		}
 		break;
 	}
@@ -114,8 +127,8 @@ void collisionShape2TriangleMesh(btCollisionShape* collisionShape, const btTrans
 
 					btVector3 pos = parentTransform*triangleVerts[v];
 					indicesOut.push_back(vertexPositions.size());
-					vertexPositions.push_back(pos);
-					vertexNormals.push_back(triNormal);
+					push_back(vertexPositions, pos);
+					push_back(vertexNormals, triNormal);
 				}
 			}
 		}
@@ -155,8 +168,8 @@ void collisionShape2TriangleMesh(btCollisionShape* collisionShape, const btTrans
 							int index = hull->getIndexPointer()[t * 3 + v];
 							btVector3 pos = parentTransform*hull->getVertexPointer()[index];
 							indicesOut.push_back(vertexPositions.size());
-							vertexPositions.push_back(pos);
-							vertexNormals.push_back(triNormal);
+							push_back(vertexPositions, pos);
+							push_back(vertexNormals, triNormal);
 						}
 					}
 				}
@@ -184,14 +197,41 @@ void collisionShape2TriangleMesh(btCollisionShape* collisionShape, const btTrans
 	};
 }
 
-SinglePrimitiveGameObject::SinglePrimitiveGameObject(Type type, Material& material)
+SinglePrimitiveGameObject::SinglePrimitiveGameObject(Type type, GMfloat radius, Material& material)
 	: m_type(type)
 	, m_material(material)
+	, m_radius(radius)
 {
 
 }
 
-void SinglePrimitiveGameObject::createCoreShape()
+btCollisionShape* SinglePrimitiveGameObject::createCollisionShape()
 {
+	return new btSphereShape(m_radius);
+}
 
+void SinglePrimitiveGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
+{
+	createMesh();
+	RigidGameObject::appendThisObjectToWorld(world);
+}
+
+void SinglePrimitiveGameObject::createMesh()
+{
+	D(d);
+	Object* obj = new Object();
+
+	ASSERT(d.collisionShape);
+	btTransform trans;
+	trans.setIdentity();
+
+	std::vector<GMuint> indices;
+	collisionShape2TriangleMesh(d.collisionShape, trans, obj->vertices(), obj->normals(), indices);
+
+	Component* component = new Component();
+	component->setEdgeCountPerPolygon(3);
+	memcpy(&component->getMaterial(), &m_material, sizeof(Material));
+	obj->appendComponent(component, indices.size());
+
+	setObject(obj);
 }

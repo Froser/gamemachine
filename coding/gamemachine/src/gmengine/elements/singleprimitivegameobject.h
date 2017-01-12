@@ -3,9 +3,10 @@
 #include "common.h"
 #include "gameobject.h"
 #include "gmdatacore/object.h"
+#include "rigidgameobject.h"
 BEGIN_NS
 
-class SinglePrimitiveGameObject : public GameObject
+class SinglePrimitiveGameObject : public RigidGameObject
 {
 public:
 	enum Type
@@ -14,14 +15,19 @@ public:
 	};
 
 public:
-	SinglePrimitiveGameObject(Type type, Material& material);
+	SinglePrimitiveGameObject(Type type, GMfloat radius, Material& material);
+
+public:
+	virtual btCollisionShape* createCollisionShape() override;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
 
 private:
-	void createCoreShape();
+	void createMesh();
 
 private:
 	Type m_type;
 	Material m_material;
+	GMfloat m_radius;
 };
 
 END_NS
