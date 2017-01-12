@@ -63,6 +63,7 @@ public:
 protected:
 	virtual AnimationMatrices getAnimationMatrix();
 	virtual vmath::mat4 getTransformMatrix(btScalar glTrans[16], const btVector3& scaling);
+	virtual void initPhysicsAfterCollisionObjectCreated();
 	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
 
 private:

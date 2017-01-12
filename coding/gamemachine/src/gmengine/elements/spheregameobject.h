@@ -14,7 +14,7 @@ public:
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
-	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
+	virtual void initPhysicsAfterCollisionObjectCreated() override;
 
 private:
 	void initCoreObject();
@@ -24,6 +24,7 @@ private:
 	GMfloat m_slices;
 	GMfloat m_stacks;
 	Material m_material;
+	bool m_externalObject;
 };
 
 

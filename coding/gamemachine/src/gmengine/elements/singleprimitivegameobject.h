@@ -4,22 +4,34 @@
 #include "gameobject.h"
 #include "gmdatacore/object.h"
 #include "rigidgameobject.h"
+#include "gmdatacore/gmmap/gmmap.h"
 BEGIN_NS
 
 class SinglePrimitiveGameObject : public RigidGameObject
 {
 public:
-	enum Type
+	struct Size
 	{
-		Sphere,
+		GMfloat height;
+		GMfloat radius;
+		btVector3 halfExtents;
 	};
 
+	enum Type
+	{
+		Capsule,
+		Cylinder,
+		Cone,
+	};
+
+	static Type fromGMMapObjectType(GMMapObject::GMMapObjectType type);
+
 public:
-	SinglePrimitiveGameObject(Type type, GMfloat radius, Material& material);
+	SinglePrimitiveGameObject(Type type, const Size& size, Material& material);
 
 public:
 	virtual btCollisionShape* createCollisionShape() override;
-	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
+	virtual void initPhysicsAfterCollisionObjectCreated() override;
 
 private:
 	void createMesh();
@@ -27,7 +39,7 @@ private:
 private:
 	Type m_type;
 	Material m_material;
-	GMfloat m_radius;
+	Size m_size;
 };
 
 END_NS

@@ -31,6 +31,12 @@ GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 		return GMMapObject::ConvexHull;
 	if (strEqual("hallucination", name))
 		return GMMapObject::Hallucination;
+	if (strEqual("capsule", name))
+		return GMMapObject::Capsule;
+	if (strEqual("cylinder", name))
+		return GMMapObject::Cylinder;
+	if (strEqual("cone", name))
+		return GMMapObject::Cone;
 
 	ASSERT(false);
 	return GMMapObject::Error;

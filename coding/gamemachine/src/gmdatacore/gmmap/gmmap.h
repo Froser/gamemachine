@@ -69,6 +69,9 @@ struct GMMapObject
 		ConvexHull,
 		Sky,
 		Hallucination,
+		Capsule = 6,
+		Cylinder,
+		Cone,
 	};
 
 	static GMMapObjectType getType(const char* name);

@@ -197,23 +197,38 @@ static void collisionShape2TriangleMesh(btCollisionShape* collisionShape,
 	};
 }
 
-SinglePrimitiveGameObject::SinglePrimitiveGameObject(Type type, GMfloat radius, Material& material)
+SinglePrimitiveGameObject::SinglePrimitiveGameObject(Type type, const Size& size, Material& material)
 	: m_type(type)
 	, m_material(material)
-	, m_radius(radius)
+	, m_size(size)
 {
 
+}
+
+SinglePrimitiveGameObject::Type SinglePrimitiveGameObject::fromGMMapObjectType(GMMapObject::GMMapObjectType type)
+{
+	return (SinglePrimitiveGameObject::Type)((GMuint)type - 6);
 }
 
 btCollisionShape* SinglePrimitiveGameObject::createCollisionShape()
 {
-	return new btSphereShape(m_radius);
+	switch (m_type)
+	{
+	case SinglePrimitiveGameObject::Capsule:
+		return new btCapsuleShape(m_size.radius, m_size.height);
+	case SinglePrimitiveGameObject::Cylinder:
+		return new btCylinderShape(m_size.halfExtents);
+	case SinglePrimitiveGameObject::Cone:
+		return new btConeShape(m_size.radius, m_size.height);
+	}
+	ASSERT(false);
+	return nullptr;
 }
 
-void SinglePrimitiveGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
+void SinglePrimitiveGameObject::initPhysicsAfterCollisionObjectCreated()
 {
 	createMesh();
-	RigidGameObject::appendThisObjectToWorld(world);
+	RigidGameObject::initPhysicsAfterCollisionObjectCreated();
 }
 
 void SinglePrimitiveGameObject::createMesh()
@@ -226,8 +241,10 @@ void SinglePrimitiveGameObject::createMesh()
 	trans.setIdentity();
 
 	std::vector<GMuint> indices;
+	// 生成网格，形状的缩放、位置都会考虑在内
 	collisionShape2TriangleMesh(d.collisionShape, trans, obj->vertices(), obj->normals(), indices);
 
+	// 所有的Mesh，都采用同一材质
 	Component* component = new Component();
 	component->setEdgeCountPerPolygon(3);
 	memcpy(&component->getMaterial(), &m_material, sizeof(Material));

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<gmmap>
+	<meta author="demo" name="" />
+	<textures>
+		<texture id="1" path="floor.bmp" type="ambient"/>
+		<texture id="2" path="box.bmp" type="ambient"/>
+		<texture id="3" path="box2.bmp" type="ambient"/>
+		<texture id="4" path="sky.dds" type="cubemap"/>
+	</textures>
+	<objects>
+		<object id="1" type="cube" width="1000" height="1" depth="1000" mag="10"/>
+		<object id="2" type="cube" width="20" height="20" depth="20" collisionextents="40 40 40"/>
+		<object id="3" type="sky" radius="1000"/>
+		<object id="4" type="sphere" slices="20" stacks="20" radius="25"/>
+		<object id="5" type="cylinder" width="15" depth="15" radius="15" height="30" />
+	</objects>
+	<materials>
+		<material id="1" ka=".5 .5 .25"/>
+		<material id="2" ka=".5 .5 .5" kd=".2 .2 .2" ks=".1 .1 .1" shininess="99"/>
+	</materials>
+	<entities>
+		<entity id="1" objref="1" materialref_5="1" textureref_5="1"/>
+		<entity id="2" objref="2" materialref="2" textureref="2"/>
+		<entity id="3" objref="2" materialref="2" textureref="3"/>
+		<entity id="4" objref="3" textureref="4"/>
+		<entity id="5" objref="4" materialref="2"/>
+		<entity id="6" objref="5" materialref="2"/>
+	</entities>
+	<animations>
+		<keyframes id="1" functor="linear" type="rotation">
+			<keyframe percentage="0" value="0 1 0 0"/>
+			<keyframe percentage=".5" value="1 1 0 180"/>
+			<keyframe percentage="1" value="0 1 0 360"/>
+		</keyframes>
+		<keyframes id="2" functor="linear" type="translation">
+			<keyframe percentage="0" value="0 10 0"/>
+			<keyframe percentage=".5" value="10 10 0"/>
+			<keyframe percentage="1" value="0 10 0"/>
+		</keyframes>
+		<keyframes id="3" functor="linear" type="scaling">
+			<keyframe percentage="0" value="1 1 1"/>
+			<keyframe percentage=".5" value="2 2 2"/>
+			<keyframe percentage="1" value="1 1 1"/>
+		</keyframes>
+	</animations>
+	<instances>
+		<instance id="1" entityref="1" position="0 0 0" scale="5" mass="0" friction="50" rollingfriction="50" spinningfriction="50"/>
+		<instance id="2" entityref="2" position="10 71 20" scale="1" mass="0" animationref="1" animationduration="7"/>
+		<instance id="3" entityref="3" position="-10 44 35" scale="1" mass="0" rotation="0 1 0 25" animationref="1" animationduration="5"/>
+		<instance id="4" entityref="3" position="130 31 17" scale="1" mass="0" rotation="0 1 0 45" animationref="1" animationduration="3"/>
+		<instance id="5" entityref="4" />
+		<instance id="6" entityref="5" position="50 100 30" scale="1" mass="30" friction="50" rollingfriction="50" spinningfriction="50"/>
+		<instance id="7" entityref="6" position="0 90 0" scale="1" mass="10" friction="50" rollingfriction="50" spinningfriction="50" rotation="1 0 0 90"/>
+	</instances>
+	<lights>
+		<light id="1" type="ambient" rgb=".6 .6 .6" position="300 300 300"/>
+		<light id="2" type="specular" rgb="1.9 1.5 1.9" position="300 700 300" shadow="0"/>
+	</lights>
+	<settings>
+		<gravity vector="0 -800 0" />
+		<character position="0 5 100" radius="10" height="10" stepheight="1" freemove="0" jumpspeed="0 200 0" fallspeed="300" movespeed="200" eyeoffset="0 10 0"/>
+	</settings>
+</gmmap>

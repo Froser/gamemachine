@@ -200,7 +200,6 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
-	
 	if (object->path.length() > 0)
 	{
 		Object* coreObject = nullptr;
@@ -212,8 +211,6 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	{
 		*gameObj = new SphereGameObject(object->radius, object->slices, object->stacks, m);
 	}
-	//SinglePrimitiveGameObject* single = new SinglePrimitiveGameObject(SinglePrimitiveGameObject::Sphere, object->radius, m);
-	//*gameObj = single;
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
@@ -278,6 +275,34 @@ CREATE_FUNC void createHallucination(IFactory* factory,
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
+CREATE_FUNC void createSinglePrimitive(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
+	Material m = material ? material->material : Material();
+
+	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	m.textures->texture = texture.first;
+	m.textures->type = texture.second;
+
+	SinglePrimitiveGameObject::Size size = {
+		object->height,
+		object->radius,
+		btVector3(object->width / 2, object->height / 2, object->depth / 2),
+	};
+
+	SinglePrimitiveGameObject* coreObject = new SinglePrimitiveGameObject(SinglePrimitiveGameObject::fromGMMapObjectType(object->type), size, m);
+	*gameObj = coreObject;
+	setPropertiesFromInstance(map, instance, coreObject);
+}
+
 struct __ObjectCreateFuncs
 {
 	__ObjectCreateFuncs()
@@ -287,6 +312,7 @@ struct __ObjectCreateFuncs
 		__map[GMMapObject::Sky] = createSky;
 		__map[GMMapObject::ConvexHull] = createConvexHull;
 		__map[GMMapObject::Hallucination] = createHallucination;
+		__map[GMMapObject::Capsule] = __map[GMMapObject::Cylinder] = __map[GMMapObject::Cone] = createSinglePrimitive;
 	}
 
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;

@@ -6,6 +6,7 @@
 CubeGameObject::CubeGameObject(const btVector3& extents, const Material eachMaterial[6])
 	: m_extents(extents)
 	, m_magnification(1)
+	, m_externalObject(false)
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
 	m_collisionExtents = m_extents;
@@ -14,6 +15,7 @@ CubeGameObject::CubeGameObject(const btVector3& extents, const Material eachMate
 CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, const Material eachMaterial[6])
 	: m_extents(extents)
 	, m_magnification(magnification <= 0 ? 1 : magnification)
+	, m_externalObject(false)
 {
 	memcpy(m_eachMaterial, eachMaterial, sizeof(Material) * 6);
 	m_collisionExtents = m_extents;
@@ -21,6 +23,7 @@ CubeGameObject::CubeGameObject(const btVector3& extents, GMfloat magnification, 
 
 CubeGameObject::CubeGameObject(const btVector3& extents, AUTORELEASE Object* obj)
 	: m_collisionExtents(extents)
+	, m_externalObject(true)
 {
 	setObject(obj);
 }
@@ -30,10 +33,11 @@ btCollisionShape* CubeGameObject::createCollisionShape()
 	return new btBoxShape(m_collisionExtents / 2);
 }
 
-void CubeGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
+void CubeGameObject::initPhysicsAfterCollisionObjectCreated()
 {
-	initCoreShape();
-	RigidGameObject::appendThisObjectToWorld(world);
+	if (!m_externalObject)
+		initCoreObject();
+	RigidGameObject::initPhysicsAfterCollisionObjectCreated();
 }
 
 void CubeGameObject::setExtents(const btVector3& extents)
@@ -51,7 +55,7 @@ void CubeGameObject::setCollisionExtents(const btVector3& colHalfExtents)
 	m_collisionExtents = colHalfExtents;
 }
 
-void CubeGameObject::initCoreShape()
+void CubeGameObject::initCoreObject()
 {
 	D(d);
 	btScalar x = m_extents.x() * d.localScaling[0] / 2,

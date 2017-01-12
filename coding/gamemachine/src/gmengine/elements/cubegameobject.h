@@ -20,15 +20,16 @@ public:
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;
-	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
+	virtual void initPhysicsAfterCollisionObjectCreated() override;
 
 private:
-	void initCoreShape();
+	void initCoreObject();
 
 private:
 	btVector3 m_extents;
 	Material m_eachMaterial[6];
 	btVector3 m_collisionExtents;
+	bool m_externalObject;
 
 	// 纹理的放大率
 	GMfloat m_magnification;

@@ -31,9 +31,6 @@ void GameObject::initPhysics(btDynamicsWorld* world)
 		d.collisionShape->calculateLocalInertia(d.mass, localInertia);
 		d.localInertia = localInertia;
 	}
-
-	// frictions
-	setFrictions();
 }
 
 void GameObject::setObject(AUTORELEASE Object* obj)
@@ -149,7 +146,14 @@ void GameObject::appendObjectToWorld(btDynamicsWorld* world)
 	D(d);
 	initPhysics(world);
 	d.collisionObject = createCollisionObject();
+	initPhysicsAfterCollisionObjectCreated();
 	appendThisObjectToWorld(world);
+}
+
+void GameObject::initPhysicsAfterCollisionObjectCreated()
+{
+	// frictions
+	setFrictions();
 }
 
 AnimationMatrices GameObject::getAnimationMatrix()
