@@ -69,7 +69,7 @@ std::pair<const Keyframe*, const Keyframe*> Keyframes::findLowerAndUpper(GMfloat
 		const Keyframe& keyframe = (*iter);
 		if (percentage >= keyframe.percentage)
 			first = &keyframe;
-		if (!second && percentage < keyframe.percentage)
+		if (!second && percentage <= keyframe.percentage)
 			second = &keyframe;
 	}
 	return std::make_pair(first, second);
