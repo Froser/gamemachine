@@ -13,7 +13,7 @@ GMGLWindow::GMGLWindow(char* cmdLine, char* windowTitle, bool fullScreen)
 	argv[0] = cmdLine;
 
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
 	strcpy(m_windowTitle, windowTitle);
 }
