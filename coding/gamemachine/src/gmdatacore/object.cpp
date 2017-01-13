@@ -23,6 +23,17 @@ Component::Component()
 	memset(&m_material, 0, sizeof(m_material));
 }
 
+Component::Component(GMuint edgeCountPerPolygon)
+	: m_offset(0)
+	, m_verticesCount(0)
+	, m_edgeCountPerPolygon(DefaultEdgesCount)
+	, m_firstPtr(nullptr)
+	, m_countPtr(nullptr)
+{
+	memset(&m_material, 0, sizeof(m_material));
+	setEdgeCountPerPolygon(edgeCountPerPolygon);
+}
+
 Component::~Component()
 {
 	if (m_firstPtr)
@@ -57,6 +68,7 @@ Object::Object()
 	, m_arrayId(0)
 	, m_bufferId(0)
 	, m_type(NormalObject)
+	, m_mode(Triangle_Fan)
 {
 }
 

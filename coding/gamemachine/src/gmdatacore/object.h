@@ -21,6 +21,7 @@ public:
 	virtual void transfer() = 0;
 	virtual void draw() = 0;
 	virtual void dispose() = 0;
+	virtual void clone(Object* obj, OUT ObjectPainter** painter) = 0;
 
 protected:
 	Object* getObject();
@@ -77,6 +78,7 @@ public:
 	};
 
 	Component();
+	Component(GMuint edgeCountPerPolygon);
 	~Component();
 
 	void setEdgeCountPerPolygon(GMuint edgeCountPerPolygon)
@@ -156,12 +158,21 @@ public:
 		ObjectTypeEnd,
 	};
 
+	// 绘制时候的排列方式
+	enum ArrangementMode
+	{
+		// 默认排列，按照Components，并按照一个个三角形来画
+		Triangle_Fan,
+
+		Triangle_Strip,
+	};
+
 	Object();
 	~Object();
 
 	void disposeMemory();
 
-	void setPainter(ObjectPainter* painter)
+	void setPainter(AUTORELEASE ObjectPainter* painter)
 	{
 		m_painter.reset(painter);
 	}
@@ -203,6 +214,16 @@ public:
 		m_type = type;
 	}
 
+	void setArrangementMode(ArrangementMode mode)
+	{
+		m_mode = mode;
+	}
+
+	ArrangementMode getArrangementMode()
+	{
+		return m_mode;
+	}
+
 	GMuint getBufferId() { return m_bufferId; }
 	GMuint getArrayId() { return m_arrayId; }
 	void setBufferId(GMuint id) { m_bufferId = id; }
@@ -217,6 +238,7 @@ private:
 	AutoPtr<ObjectPainter> m_painter;
 	std::vector<Component*> m_components;
 	ObjectType m_type;
+	ArrangementMode m_mode;
 };
 
 END_NS

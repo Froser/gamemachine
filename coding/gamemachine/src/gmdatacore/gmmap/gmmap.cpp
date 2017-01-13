@@ -37,6 +37,8 @@ GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 		return GMMapObject::Cylinder;
 	if (strEqual("cone", name))
 		return GMMapObject::Cone;
+	if (strEqual("gerstnerwave", name))
+		return GMMapObject::GerstnerWave;
 
 	ASSERT(false);
 	return GMMapObject::Error;

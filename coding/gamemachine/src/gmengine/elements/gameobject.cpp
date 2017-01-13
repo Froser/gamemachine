@@ -113,8 +113,7 @@ void GameObject::getReadyForRender(DrawingList& list)
 			btScalar glTrans[16];
 			trans.getOpenGLMatrix(glTrans);
 
-			btVector3 scaling = obj->getCollisionShape()->getLocalScaling();
-			M = getTransformMatrix(glTrans, scaling);
+			M = getTransformMatrix(glTrans);
 		}
 
 		if (d.animationState == Running)
@@ -130,7 +129,7 @@ void GameObject::getReadyForRender(DrawingList& list)
 	}
 }
 
-vmath::mat4 GameObject::getTransformMatrix(btScalar glTrans[16], const btVector3& scaling)
+vmath::mat4 GameObject::getTransformMatrix(btScalar glTrans[16])
 {
 	vmath::mat4 T(
 		vmath::vec4(glTrans[0], glTrans[1], glTrans[2], glTrans[3]),

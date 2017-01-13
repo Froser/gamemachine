@@ -19,6 +19,7 @@
 #include "gmengine/controller/animation.h"
 #include "gmengine/elements/hallucinationgameobject.h"
 #include "gmengine/elements/singleprimitivegameobject.h"
+#include "gmengine/elements/gerstnerwavegameobject.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -303,6 +304,28 @@ CREATE_FUNC void createSinglePrimitive(IFactory* factory,
 	setPropertiesFromInstance(map, instance, coreObject);
 }
 
+CREATE_FUNC void createGerstnerWave(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
+	Material m = material ? material->material : Material();
+
+	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	m.textures->texture = texture.first;
+	m.textures->type = texture.second;
+
+	GerstnerWaveGameObject* coreObject = new GerstnerWaveGameObject(m);
+	*gameObj = coreObject;
+	setPropertiesFromInstance(map, instance, coreObject);
+}
+
 struct __ObjectCreateFuncs
 {
 	__ObjectCreateFuncs()
@@ -313,6 +336,7 @@ struct __ObjectCreateFuncs
 		__map[GMMapObject::ConvexHull] = createConvexHull;
 		__map[GMMapObject::Hallucination] = createHallucination;
 		__map[GMMapObject::Capsule] = __map[GMMapObject::Cylinder] = __map[GMMapObject::Cone] = createSinglePrimitive;
+		__map[GMMapObject::GerstnerWave] = createGerstnerWave;
 	}
 
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;

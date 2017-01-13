@@ -37,7 +37,9 @@ void HallucinationGameObject::getReadyForRender(DrawingList& list)
 	GMfloat glTrans[16];
 	trans.getOpenGLMatrix(glTrans);
 
-	vmath::mat4 M = getTransformMatrix(glTrans, m_scale);
+	vmath::mat4 M = getTransformMatrix(glTrans);
+	vmath::mat4 S = vmath::scale(m_scale[0], m_scale[1], m_scale[2]);
+
 	if (d.animationState == Running)
 	{
 		AnimationMatrices mat = getAnimationMatrix();
@@ -45,7 +47,7 @@ void HallucinationGameObject::getReadyForRender(DrawingList& list)
 	}
 
 	DrawingItem item;
-	memcpy(item.trans, M, sizeof(M));
+	memcpy(item.trans, M * S, sizeof(M));
 	item.gameObject = this;
 	list.push_back(item);
 }

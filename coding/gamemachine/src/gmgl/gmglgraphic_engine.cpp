@@ -71,10 +71,9 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 		Object::ObjectType type = (*iter).gameObject->getObject()->getType();
 		GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : *getShaders(type);
 
+		shaders.useProgram();
 		if (!shadowMapping)
 			beginSetSky(shaders);
-
-		shaders.useProgram();
 
 		DrawingItem& item = *iter;
 		GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);

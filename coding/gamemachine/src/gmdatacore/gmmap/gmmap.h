@@ -72,6 +72,7 @@ struct GMMapObject
 		Capsule = 6,
 		Cylinder,
 		Cone,
+		GerstnerWave,
 	};
 
 	static GMMapObjectType getType(const char* name);

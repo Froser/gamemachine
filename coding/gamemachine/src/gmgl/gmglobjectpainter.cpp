@@ -9,6 +9,20 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmglgraphic_engine.h"
 
+GLenum getMode(Object* obj)
+{
+	switch (obj->getArrangementMode())
+	{
+	case Object::Triangle_Fan:
+		return GL_TRIANGLE_FAN;
+	case Object::Triangle_Strip:
+		return GL_TRIANGLE_STRIP;
+	default:
+		ASSERT(false);
+		return GL_TRIANGLE_FAN;
+	}
+}
+
 GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* obj)
 	: ObjectPainter(obj)
 	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
@@ -76,7 +90,8 @@ void GMGLObjectPainter::draw()
 			beginTextures(textureInfos, obj->getType());
 		}
 
-		glMultiDrawArrays(params[1] == GL_FILL ? GL_TRIANGLE_FAN : GL_LINE_LOOP,
+		GLenum mode = getMode(obj);
+		glMultiDrawArrays(params[1] == GL_FILL ? mode : GL_LINE_LOOP,
 			component->getFirstPtr(), component->getCountPtr(), component->getPolygonCount());
 
 		if (!m_shadowMapping.hasBegun())
@@ -96,6 +111,12 @@ void GMGLObjectPainter::dispose()
 	glDeleteBuffers(1, vbo);
 
 	m_inited = false;
+}
+
+void GMGLObjectPainter::clone(Object* obj, OUT ObjectPainter** painter)
+{
+	ASSERT(painter);
+	*painter = new GMGLObjectPainter(m_engine, m_shadowMapping, obj);
 }
 
 void GMGLObjectPainter::setLights(Material& material, Object::ObjectType type)

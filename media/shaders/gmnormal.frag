@@ -200,6 +200,5 @@ void drawObject()
 
 void main()
 {
-    // 按照正常的流程绘制光照、阴影
     drawObject();
 }

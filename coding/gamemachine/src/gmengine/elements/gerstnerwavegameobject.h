@@ -2,18 +2,26 @@
 #define __GERSTNERWAVEGAMEOBJECT_H__
 #include "common.h"
 #include "hallucinationgameobject.h"
+#include "gmdatacore\object.h"
 BEGIN_NS
 
 class GerstnerWaveGameObject : public HallucinationGameObject
 {
 public:
-	GerstnerWaveGameObject(const btVector3& extents, GMfloat Q, GMfloat D, GMfloat A);
+	GerstnerWaveGameObject(const Material& material);
+
+public:
+	virtual void getReadyForRender(DrawingList& list) override;
 
 private:
-	btVector3 m_extents;
-	GMfloat m_Q;
-	GMfloat m_D;
-	GMfloat m_A;
+	Object* createCoreObject();
+	void initAll();
+	void initWave();
+	void calcWave();
+
+private:
+	Material m_material;
+	GMfloat m_lastTick;
 };
 
 END_NS

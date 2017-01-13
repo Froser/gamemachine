@@ -34,7 +34,7 @@ public:
 	virtual void initPhysicsAfterCollisionObjectCreated() override;
 
 private:
-	void createMesh();
+	void createTriangleMesh();
 
 private:
 	Type m_type;

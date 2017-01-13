@@ -227,11 +227,11 @@ btCollisionShape* SinglePrimitiveGameObject::createCollisionShape()
 
 void SinglePrimitiveGameObject::initPhysicsAfterCollisionObjectCreated()
 {
-	createMesh();
+	createTriangleMesh();
 	RigidGameObject::initPhysicsAfterCollisionObjectCreated();
 }
 
-void SinglePrimitiveGameObject::createMesh()
+void SinglePrimitiveGameObject::createTriangleMesh()
 {
 	D(d);
 	Object* obj = new Object();
@@ -245,8 +245,7 @@ void SinglePrimitiveGameObject::createMesh()
 	collisionShape2TriangleMesh(d.collisionShape, trans, obj->vertices(), obj->normals(), indices);
 
 	// 所有的Mesh，都采用同一材质
-	Component* component = new Component();
-	component->setEdgeCountPerPolygon(3);
+	Component* component = new Component(3);
 	memcpy(&component->getMaterial(), &m_material, sizeof(Material));
 	obj->appendComponent(component, indices.size());
 

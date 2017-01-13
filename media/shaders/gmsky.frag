@@ -102,6 +102,5 @@ void drawSky(vec3 cubemapUV)
 
 void main()
 {
-    // 如果存在立方体纹理，说明是环境（天空）的绘制，那么只考虑环境光，并将Ka全部设置为1
     drawSky(MEMBER(textureUVs, cubemapUV));
 }
