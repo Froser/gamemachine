@@ -51,11 +51,18 @@ static struct {
 		wave_start[WAVE_COUNT * 2];
 } values;
 
-GerstnerWaveGameObject::GerstnerWaveGameObject(const Material& material)
+GerstnerWaveGameObject::GerstnerWaveGameObject(const Material& material, const GerstnerWavesProperties& props)
 	: HallucinationGameObject(nullptr)
 	, m_material(material)
+	, m_props(props)
 {
 	initAll();
+}
+
+void GerstnerWaveGameObject::initSize()
+{
+	m_dataLength = (m_props.stripCount - 1) * m_props.stripLength * 2 * 4;
+	m_rawPointsLength = m_props.stripCount * m_props.stripLength * 4;
 }
 
 void GerstnerWaveGameObject::initAll()
@@ -67,6 +74,11 @@ void GerstnerWaveGameObject::initAll()
 
 void GerstnerWaveGameObject::initWave()
 {
+	D(d);
+	m_rawStrips.resize(m_rawPointsLength);
+	m_rawNormals.resize(m_rawPointsLength);
+
+	/*
 	values.time = 0.0;
 	for (int w = 0; w < WAVE_COUNT; w++)
 	{
@@ -77,7 +89,9 @@ void GerstnerWaveGameObject::initWave()
 		values.wave_start[w * 2] = wave_para[w][4];
 		values.wave_start[w * 2 + 1] = wave_para[w][5];
 	}
+	*/
 
+	/*
 	//Initialize pt_strip[]
 	int index = 0;
 	for (int i = 0; i < STRIP_COUNT; i++)
@@ -88,6 +102,21 @@ void GerstnerWaveGameObject::initWave()
 			pt_strip[index + 1] = START_Y + j*LENGTH_Y;
 			pt_strip[index + 3] = 1.f;
 			index += 4;
+		}
+	}
+	*/
+	btVector3 origin = d.transform.getOrigin();
+
+	GMfloat deltaX = m_props.length / m_props.stripLength,
+		deltaY = m_props.width / m_props.stripCount;
+	for (GMuint i = 0; i < m_props.stripCount; i++)
+	{
+		for (GMuint j = 0; j < m_props.stripLength; j++)
+		{
+			m_rawStrips.push_back(origin[0] + i * deltaX);
+			m_rawStrips.push_back(origin[1] + j * deltaY);
+			m_rawStrips.push_back(0); //随便放一个值，这个是要求的高度
+			m_rawStrips.push_back(1);
 		}
 	}
 }
@@ -248,10 +277,48 @@ void push(std::vector<Object::DataType>& v, GMfloat* f, GMuint cnt)
 	}
 }
 
+void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
+{
+	obj->vertices().resize(m_dataLength);
+	obj->normals().resize(m_dataLength);
+	GMfloat wave = 0.0f;
+	GMuint index = 0;
+	GMfloat d = 0.0f;
+	for (GMuint i = 0; i < m_props.stripCount; i++)
+	{
+		for (GMuint j = 0; j < m_props.stripLength; j++)
+		{
+			wave = 0.0f;
+			for (GMuint w = 0; w < m_props.wavesCount; w++)
+			{
+				d = (m_rawStrips[index] - m_props.waves[w].startX + (m_rawStrips[index + 1] - m_props.waves[w].startY) 
+					* tan(m_props.waves[w].waveDirection))
+					* cos(m_props.waves[w].waveDirection);
+				if (gerstner_sort[w] == 1)
+					wave += m_props.waves[w].waveAmplitude - gerstnerZ(
+						m_props.waves[w].waveLength,
+						m_props.waves[w].waveAmplitude,
+						d + m_props.waves[w].waveSpeed * elapsed,
+						gerstner_pt_a
+					);
+				else
+					wave += m_props.waves[w].waveAmplitude - gerstnerZ(
+						m_props.waves[w].waveLength,
+						m_props.waves[w].waveAmplitude,
+						d + m_props.waves[w].waveSpeed * elapsed,
+						gerstner_pt_b
+					);
+				m_rawStrips[index + 2] = wave * m_props.waveHeightScale;
+			}
+		}
+	}
+}
+
 Object* GerstnerWaveGameObject::createCoreObject()
 {
 	Object* newObject = new Object();
 	newObject->setArrangementMode(Object::Triangle_Strip);
+	//calcWave(newObject, m_lastTick);
 
 	calcWave();
 	push(newObject->vertices(), vertex_data, DATA_LENGTH * 4);
