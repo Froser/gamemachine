@@ -26,6 +26,15 @@ GMGLGraphicEngine::GMGLGraphicEngine()
 {
 }
 
+GMGLGraphicEngine::~GMGLGraphicEngine()
+{
+	for (auto iter = m_allShaders.begin(); iter != m_allShaders.end(); iter++)
+	{
+		if ((*iter).second)
+			delete (*iter).second;
+	}
+}
+
 void GMGLGraphicEngine::initialize(GameWorld* world)
 {
 	glEnable(GL_DEPTH_TEST);
@@ -56,14 +65,17 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 {
 	bool shadowMapping = m_shadowMapping.hasBegun();
-	GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : m_shaders;
-	shaders.useProgram();
-
-	if (!shadowMapping)
-		beginSetSky();
 
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
+		Object::ObjectType type = (*iter).gameObject->getObject()->getType();
+		GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : *getShaders(type);
+
+		if (!shadowMapping)
+			beginSetSky(shaders);
+
+		shaders.useProgram();
+
 		DrawingItem& item = *iter;
 		GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
 
@@ -72,8 +84,8 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 
 		if (!shadowMapping)
 		{
-			setEyeViewport(shadowOn);
-			shadowTexture(shadowOn);
+			setEyeViewport(shadowOn, shaders);
+			shadowTexture(shadowOn, shaders);
 
 			painter->setWorld(m_world);
 		}
@@ -83,13 +95,13 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 		}
 
 		painter->draw();
-	}
 
-	if (!shadowMapping)
-		endSetSky();
+		if (!shadowMapping)
+			endSetSky();
+	}
 }
 
-void GMGLGraphicEngine::setEyeViewport(bool shadowOn)
+void GMGLGraphicEngine::setEyeViewport(bool shadowOn, GMGLShaders& shaders)
 {
 	static const vmath::mat4 biasMatrix = vmath::mat4(
 		vmath::vec4(0.5f, 0.0f, 0.0f, 0.0f),
@@ -101,32 +113,32 @@ void GMGLGraphicEngine::setEyeViewport(bool shadowOn)
 	{
 		const GMGLShadowMapping::State& state = m_shadowMapping.getState();
 		glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
-		GMGL::uniformMatrix4(m_shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
+		GMGL::uniformMatrix4(shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
 	}
-	GMGL::perspective(30, 2, 1, 2000, m_shaders, GMSHADER_PROJECTION_MATRIX);
+	GMGL::perspective(30, 2, 1, 2000, shaders, GMSHADER_PROJECTION_MATRIX);
 }
 
-void GMGLGraphicEngine::shadowTexture(bool shadowOn)
+void GMGLGraphicEngine::shadowTexture(bool shadowOn, GMGLShaders& shaders)
 {
 	if (shadowOn)
 	{
-		GMGL::uniformTextureIndex(m_shaders, TextureTypeShadow, getTextureUniformName(TextureTypeShadow));
+		GMGL::uniformTextureIndex(shaders, TextureTypeShadow, getTextureUniformName(TextureTypeShadow));
 		glActiveTexture(TextureTypeShadow + GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
-		GMGL::disableTexture(m_shaders, getTextureUniformName(TextureTypeShadow));
+		GMGL::disableTexture(shaders, getTextureUniformName(TextureTypeShadow));
 	}
 }
 
-void GMGLGraphicEngine::beginSetSky()
+void GMGLGraphicEngine::beginSetSky(GMGLShaders& shaders)
 {
 	GameObject* sky = getWorld()->getSky();
 	if (sky)
 	{
-		GMGL::uniformTextureIndex(m_shaders, TextureTypeReflectionCubeMap, getTextureUniformName(TextureTypeReflectionCubeMap));
+		GMGL::uniformTextureIndex(shaders, TextureTypeReflectionCubeMap, getTextureUniformName(TextureTypeReflectionCubeMap));
 		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
 		ASSERT(info.texture);
 		info.texture->beginTexture(TextureTypeReflectionCubeMap);
@@ -153,11 +165,6 @@ GameLight* GMGLGraphicEngine::getShadowSourceLight()
 	return *result;
 }
 
-GMGLShaders& GMGLGraphicEngine::getShaders()
-{
-	return m_shaders;
-}
-
 GMGLShadowMapping& GMGLGraphicEngine::getShadowMapping()
 {
 	return m_shadowMapping;
@@ -165,14 +172,34 @@ GMGLShadowMapping& GMGLGraphicEngine::getShadowMapping()
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
-	m_shaders.useProgram();
-	GMGL::lookAt(lookAt, m_shaders, GMSHADER_VIEW_MATRIX);
-	GMGL::cameraPosition(lookAt, m_shaders, GMSHADER_VIEW_POSITION);
+	BEGIN_ENUM(i, Object::ObjectTypeBegin, Object::ObjectTypeEnd)
+	{
+		GMGLShaders* shaders = getShaders(i);
+		if (!shaders)
+			continue;
+		shaders->useProgram();
+		GMGL::lookAt(lookAt, *shaders, GMSHADER_VIEW_MATRIX);
+		GMGL::cameraPosition(lookAt, *shaders, GMSHADER_VIEW_POSITION);
+	}
+	END_ENUM
 }
 
 GameWorld* GMGLGraphicEngine::getWorld()
 {
 	return m_world;
+}
+
+void GMGLGraphicEngine::registerShader(Object::ObjectType objectType, AUTORELEASE GMGLShaders* shaders)
+{
+	m_allShaders[objectType] = shaders;
+}
+
+GMGLShaders* GMGLGraphicEngine::getShaders(Object::ObjectType objectType)
+{
+	if (m_allShaders.find(objectType) == m_allShaders.end())
+		return nullptr;
+	
+	return m_allShaders[objectType];
 }
 
 ResourceContainer* GMGLGraphicEngine::getResourceContainer()

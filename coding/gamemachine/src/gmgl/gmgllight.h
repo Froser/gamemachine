@@ -5,14 +5,27 @@
 BEGIN_NS
 
 struct Material;
-class GMGLAmbientLight : public GameLight
+class GMGLShaders;
+class GMGLLight : public GameLight
+{
+public:
+	GMGLLight();
+
+public:
+	void setShaders(GMGLShaders* shaders);
+
+protected:
+	GMGLShaders* m_shaders;
+};
+
+class GMGLAmbientLight : public GMGLLight
 {
 public:
 	virtual void activateLight(Material& material) override;
 	virtual bool isAvailable() override;
 };
 
-class GMGLSpecularLight : public GameLight
+class GMGLSpecularLight : public GMGLLight
 {
 public:
 	virtual void activateLight(Material& material) override;

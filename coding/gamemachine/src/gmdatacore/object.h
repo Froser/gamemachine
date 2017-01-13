@@ -143,6 +143,19 @@ class Object
 public:
 	typedef GMfloat DataType;
 
+	enum ObjectType
+	{
+		ObjectTypeBegin,
+
+		// 表示一个不透明的对象
+		NormalObject,
+
+		// 表示一个天空
+		Sky,
+
+		ObjectTypeEnd,
+	};
+
 	Object();
 	~Object();
 
@@ -180,6 +193,16 @@ public:
 		return m_uvs;
 	}
 
+	ObjectType getType()
+	{
+		return m_type;
+	}
+
+	void setType(ObjectType type)
+	{
+		m_type = type;
+	}
+
 	GMuint getBufferId() { return m_bufferId; }
 	GMuint getArrayId() { return m_arrayId; }
 	void setBufferId(GMuint id) { m_bufferId = id; }
@@ -193,6 +216,7 @@ private:
 	GMuint m_bufferId;
 	AutoPtr<ObjectPainter> m_painter;
 	std::vector<Component*> m_components;
+	ObjectType m_type;
 };
 
 END_NS

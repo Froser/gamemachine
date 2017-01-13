@@ -89,10 +89,6 @@ uniform int GM_shadow_texture_switch = 0;
 uniform sampler2D GM_ambient_texture;
 uniform int GM_ambient_texture_switch = 0;
 
-// 环境立方体纹理（绘制天空时）
-uniform samplerCube GM_cubemap_texture;
-uniform int GM_cubemap_texture_switch = 0;
-
 // 环境立方体纹理（反射天空时）
 uniform samplerCube GM_reflection_cubemap_texture;
 uniform int GM_reflection_cubemap_texture_switch = 0;
@@ -163,12 +159,6 @@ float calcuateShadeFactor(vec4 shadowCoord)
     return shadeFactor;
 }
 
-void drawSky(vec3 cubemapUV)
-{
-    vec3 cubemapTextureColor = vec3(texture(GM_cubemap_texture, cubemapUV));
-    frag_color = GM_light_ambient + vec4(cubemapTextureColor, 1.0f);
-}
-
 float shadeFactorFactor(float shadeFactor)
 {
     return min(shadeFactor + 0.3, 1);
@@ -210,14 +200,6 @@ void drawObject()
 
 void main()
 {
-    if (GM_cubemap_texture_switch == 1)
-    {
-        // 如果存在立方体纹理，说明是环境（天空）的绘制，那么只考虑环境光，并将Ka全部设置为1
-        drawSky(MEMBER(textureUVs, cubemapUV));
-    }
-    else
-    {
-        // 按照正常的流程绘制光照、阴影
-        drawObject();
-    }
+    // 按照正常的流程绘制光照、阴影
+    drawObject();
 }

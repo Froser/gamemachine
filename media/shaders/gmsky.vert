@@ -82,14 +82,10 @@
 #endif
 /////////////////////////////////////////////////////
 
-uniform mat4 GM_shadow_matrix;
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_model_matrix;
 uniform mat4 GM_projection_matrix;
-
-uniform vec4 GM_light_position;
 uniform vec4 GM_view_position;
-uniform float GM_light_shininess;
 
 layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 normal;
@@ -105,45 +101,16 @@ BEGIN_STRUCT(_Coords)
     // 投影后的最终坐标
     STRUCT_MEMBER_OUT vec4 projectionCoord;
 
-    // 变换后的世界坐标标准法向量
-    STRUCT_MEMBER_OUT vec3 worldNormalCoord;
-
-    // 灯光照射方向（目前灯光最多数量为1）
-    STRUCT_MEMBER_OUT vec3 lightDirection;
-
     // 视角方向
     STRUCT_MEMBER_OUT vec3 viewDirection;
-
-    // 阴影坐标
-    STRUCT_MEMBER_OUT vec4 shadowCoord;
 END_STRUCT;
 OUT(_Coords, coords);
 
 BEGIN_STRUCT(_TextureUVs)
-    // 环境光贴图坐标
-    STRUCT_MEMBER_OUT vec2 ambientUV;
-
     // CubeMap贴图坐标
     STRUCT_MEMBER_OUT vec3 cubemapUV;
 END_STRUCT;
 OUT(_TextureUVs, textureUVs);
-
-BEGIN_STRUCT(_LightFactors)
-    // 漫反射系数
-    STRUCT_MEMBER_OUT float diffuse;
-
-    // 镜面反射系数
-    STRUCT_MEMBER_OUT float specular;
-END_STRUCT;
-OUT(_LightFactors, lightFactors);
-
-// 由顶点变换矩阵计算法向量变换矩阵
-mat4 calcNormalWorldTransformMatrix(mat4 modelMatrix)
-{
-    mat4 normalInverseMatrix = inverse(modelMatrix);
-    mat4 normalWorldTransformMatrix = transpose(normalInverseMatrix);
-    return normalWorldTransformMatrix;
-}
 
 RET(_Coords) calcCoords()
 {
@@ -151,65 +118,21 @@ RET(_Coords) calcCoords()
     MEMBER(coords, worldCoord) = GM_model_matrix * position;
     MEMBER(coords, modelViewCoord) = GM_view_matrix * MEMBER(coords, worldCoord);
     MEMBER(coords, projectionCoord) = GM_projection_matrix * MEMBER(coords, modelViewCoord);
-
-    mat4 normalTransform = calcNormalWorldTransformMatrix(GM_model_matrix);
-    vec4 normalWorld = normalTransform * normal;
-    MEMBER(coords, worldNormalCoord) = normalize(normalWorld.xyz);
-
-    MEMBER(coords, lightDirection) = normalize(GM_light_position.xyz - MEMBER(coords, worldCoord.xyz));
     MEMBER(coords, viewDirection) = normalize(GM_view_position.xyz - MEMBER(coords, worldCoord.xyz));
-    MEMBER(coords, shadowCoord) = GM_shadow_matrix * MEMBER(coords, worldCoord);
     RETURN(coords);
 }
 
 RET(_TextureUVs) calcTexture(vec3 viewDirection)
 {
     DIM(_TextureUVs, uvs);
-    MEMBER(uvs, ambientUV) = uv;
     MEMBER(uvs, cubemapUV) = -viewDirection;
     RETURN(uvs);
-}
-
-// 计算漫反射率
-float calcDiffuse(vec3 lightDirection, vec3 worldNormalCoord)
-{
-    if (worldNormalCoord.x == 0 && worldNormalCoord.y == 0 && worldNormalCoord.z == 0)
-        return 1;
-
-
-    float diffuse = dot(lightDirection, worldNormalCoord);
-    diffuse = clamp(diffuse, 0.0f, 1.0f);
-    return diffuse;
-}
-
-// 计算镜面反射率
-float calcSpecular(vec3 lightDirection, vec3 viewDirection, vec3 worldNormalCoord)
-{
-    vec3 halfVector = normalize(lightDirection + viewDirection);
-    float specularPower = dot(halfVector, worldNormalCoord);
-    float specular = pow(specularPower, GM_light_shininess);
-    specular = clamp(specular, 0.0f, 1.0f);
-
-    return specular;
-}
-
-RET(_LightFactors) calcLightFactors(vec3 lightDirection, vec3 viewDirection, vec3 worldNormalCoord)
-{
-    DIM(_LightFactors, lightFactors);
-    MEMBER(lightFactors, diffuse) = calcDiffuse(lightDirection, worldNormalCoord);
-    MEMBER(lightFactors, specular) = calcSpecular(lightDirection, viewDirection, worldNormalCoord);
-    RETURN(lightFactors);
 }
 
 void main(void)
 {
     ASSIGN(coords, calcCoords());
     ASSIGN(textureUVs, calcTexture(MEMBER(coords, viewDirection)));
-    ASSIGN(lightFactors, calcLightFactors(
-        MEMBER(coords, lightDirection),
-        MEMBER(coords, viewDirection),
-        MEMBER(coords, worldNormalCoord)
-        ));
 
     gl_Position = MEMBER(coords, projectionCoord);
 }

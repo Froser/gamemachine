@@ -11,11 +11,9 @@
 static void setVec4(GMGLShaders& s, char* name, GMfloat* value)
 {
 	GLuint loc = glGetUniformLocation(s.getProgram(), name);
-	CHECK_GL_LOC(loc);
 
 	GMfloat vec[4] = { value[0], value[1], value[2], 1.0f };
 	glUniform4fv(loc, 1, vec);
-	ASSERT_GL();
 }
 
 static void setFloat(GMGLShaders& s, char* name, GMfloat value)
@@ -24,13 +22,21 @@ static void setFloat(GMGLShaders& s, char* name, GMfloat value)
 	glUniform1f(loc, value);
 }
 
+GMGLLight::GMGLLight()
+	: m_shaders(nullptr)
+{
+}
+
+void GMGLLight::setShaders(GMGLShaders* shaders)
+{
+	m_shaders = shaders;
+}
+
 void GMGLAmbientLight::activateLight(Material& material)
 {
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(getWorld()->getGraphicEngine());
-	GMGLShaders& shaders = engine->getShaders();
-	setVec4(shaders, GMSHADER_LIGHT_AMBIENT, getColor());
-	setVec4(shaders, GMSHADER_LIGHT_KA, material.Ka);
-	setVec4(shaders, GMSHADER_LIGHT_KE, material.Ke);
+	setVec4(*m_shaders, GMSHADER_LIGHT_AMBIENT, getColor());
+	setVec4(*m_shaders, GMSHADER_LIGHT_KA, material.Ka);
+	setVec4(*m_shaders, GMSHADER_LIGHT_KE, material.Ke);
 }
 
 bool GMGLAmbientLight::isAvailable()
@@ -40,12 +46,10 @@ bool GMGLAmbientLight::isAvailable()
 
 void GMGLSpecularLight::activateLight(Material& material)
 {
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(getWorld()->getGraphicEngine());
-	GMGLShaders& shaders = engine->getShaders();
-	setVec4(shaders, GMSHADER_LIGHT_SPECULAR, getColor());
-	setVec4(shaders, GMSHADER_LIGHT_KD, material.Kd);
-	setVec4(shaders, GMSHADER_LIGHT_KS, material.Ks);
-	setFloat(shaders, GMSHADER_LIGHT_SHININESS, material.shininess);
+	setVec4(*m_shaders, GMSHADER_LIGHT_SPECULAR, getColor());
+	setVec4(*m_shaders, GMSHADER_LIGHT_KD, material.Kd);
+	setVec4(*m_shaders, GMSHADER_LIGHT_KS, material.Ks);
+	setFloat(*m_shaders, GMSHADER_LIGHT_SHININESS, material.shininess);
 }
 
 bool GMGLSpecularLight::isAvailable()

@@ -7,10 +7,11 @@
 #include "utilities/assert.h"
 #include "gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
+#include "gmglgraphic_engine.h"
 
-GMGLObjectPainter::GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& shadowMapping, Object* obj)
+GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* obj)
 	: ObjectPainter(obj)
-	, m_shaders(shaders)
+	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
 	, m_shadowMapping(shadowMapping)
 	, m_inited(false)
 	, m_world(nullptr)
@@ -62,7 +63,7 @@ void GMGLObjectPainter::draw()
 	glBindVertexArray(obj->getArrayId());
 	GLint params[2];
 	glGetIntegerv(GL_POLYGON_MODE, params);
-	resetTextures();
+	resetTextures(obj->getType());
 	
 	for (auto iter = obj->getComponents().cbegin(); iter != obj->getComponents().cend(); iter++)
 	{
@@ -71,8 +72,8 @@ void GMGLObjectPainter::draw()
 
 		if (!m_shadowMapping.hasBegun())
 		{
-			setLights(component->getMaterial());
-			beginTextures(textureInfos);
+			setLights(component->getMaterial(), obj->getType());
+			beginTextures(textureInfos, obj->getType());
 		}
 
 		glMultiDrawArrays(params[1] == GL_FILL ? GL_TRIANGLE_FAN : GL_LINE_LOOP,
@@ -97,7 +98,7 @@ void GMGLObjectPainter::dispose()
 	m_inited = false;
 }
 
-void GMGLObjectPainter::setLights(Material& material)
+void GMGLObjectPainter::setLights(Material& material, Object::ObjectType type)
 {
 	if (m_world)
 	{
@@ -105,14 +106,17 @@ void GMGLObjectPainter::setLights(Material& material)
 
 		for (auto iter = lights.begin(); iter != lights.end(); iter++)
 		{
-			GameLight* light = (*iter);
+			GMGLLight* light = static_cast<GMGLLight*>(*iter);
 			if (light->isAvailable())
+			{
+				light->setShaders(m_engine->getShaders(type));
 				light->activateLight(material);
+			}
 		}
 	}
 }
 
-void GMGLObjectPainter::beginTextures(TextureInfo* startTexture)
+void GMGLObjectPainter::beginTextures(TextureInfo* startTexture, Object::ObjectType type)
 {
 	for (GMuint i = 0; i < MaxTextureCount; i++)
 	{
@@ -121,7 +125,7 @@ void GMGLObjectPainter::beginTextures(TextureInfo* startTexture)
 		if (t)
 		{
 			t->beginTexture(info.type);
-			GMGL::uniformTextureIndex(m_shaders, info.type, getTextureUniformName(info.type));
+			GMGL::uniformTextureIndex(*m_engine->getShaders(type), info.type, getTextureUniformName(info.type));
 		}
 	}
 }
@@ -138,11 +142,11 @@ void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
 	}
 }
 
-void GMGLObjectPainter::resetTextures()
+void GMGLObjectPainter::resetTextures(Object::ObjectType type)
 {
 	for (TextureType t = TextureTypeAmbient; t < TextureTypeResetEnd; t = (TextureType) ((GMuint)(t) + 1))
 	{
-		GMGL::disableTexture(m_shaders, getTextureUniformName(t));
+		GMGL::disableTexture(*m_engine->getShaders(type), getTextureUniformName(t));
 	}
 }
 

@@ -5,13 +5,15 @@
 #include "gmglshaders.h"
 BEGIN_NS
 
+struct IGraphicEngine;
+class GMGLGraphicEngine;
 class GMGLShaders;
 class GMGLShadowMapping;
 class GameWorld;
 class GMGLObjectPainter : public ObjectPainter
 {
 public:
-	GMGLObjectPainter(GMGLShaders& shaders, GMGLShadowMapping& shadowMapping, Object* obj);
+	GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* obj);
 
 public:
 	virtual void transfer() override;
@@ -20,13 +22,13 @@ public:
 	void setWorld(GameWorld* world);
 
 private:
-	void setLights(Material& material);
-	void beginTextures(TextureInfo* startTexture);
+	void setLights(Material& material, Object::ObjectType type);
+	void beginTextures(TextureInfo* startTexture, Object::ObjectType type);
 	void endTextures(TextureInfo* startTexture);
-	void resetTextures();
+	void resetTextures(Object::ObjectType type);
 
 private:
-	GMGLShaders& m_shaders;
+	GMGLGraphicEngine* m_engine;
 	GMGLShadowMapping& m_shadowMapping;
 	GameWorld* m_world;
 

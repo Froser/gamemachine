@@ -39,6 +39,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.h" />
@@ -98,6 +99,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.cpp" />

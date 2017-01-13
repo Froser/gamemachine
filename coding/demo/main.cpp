@@ -88,25 +88,40 @@ public:
 
 		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(m_gm->getGraphicEngine());
-		GMGLShaders& shaders = engine->getShaders();
-
-		GMGLShadowMapping& shadow = engine->getShadowMapping();
-		GMGLShaders& shadowShaders = shadow.getShaders();
 
 		{
-			std::string vert = std::string(shaderPath).append("gmshader.vert"),
-				frag = std::string(shaderPath).append("gmshader.frag");
+			GMGLShaders* shaders = new GMGLShaders();
+			std::string vert = std::string(shaderPath).append("gmnormal.vert"),
+				frag = std::string(shaderPath).append("gmnormal.frag");
 			GMGLShaderInfo shadersInfo[] = {
 				{ GL_VERTEX_SHADER, vert.c_str() },
 				{ GL_FRAGMENT_SHADER, frag.c_str() },
 			};
-			shaders.appendShader(shadersInfo[0]);
-			shaders.appendShader(shadersInfo[1]);
-			shaders.load();
-			shaders.useProgram();
+			shaders->appendShader(shadersInfo[0]);
+			shaders->appendShader(shadersInfo[1]);
+			shaders->load();
+			shaders->useProgram();
+			engine->registerShader(Object::NormalObject, shaders);
 		}
 
 		{
+			GMGLShaders* shaders = new GMGLShaders();
+			std::string vert = std::string(shaderPath).append("gmsky.vert"),
+				frag = std::string(shaderPath).append("gmsky.frag");
+			GMGLShaderInfo shadersInfo[] = {
+				{ GL_VERTEX_SHADER, vert.c_str() },
+				{ GL_FRAGMENT_SHADER, frag.c_str() },
+			};
+			shaders->appendShader(shadersInfo[0]);
+			shaders->appendShader(shadersInfo[1]);
+			shaders->load();
+			shaders->useProgram();
+			engine->registerShader(Object::Sky, shaders);
+		}
+
+		{
+			GMGLShadowMapping& shadow = engine->getShadowMapping();
+			GMGLShaders& shadowShaders = shadow.getShaders();
 			std::string vert = std::string(shaderPath).append("gmshadowmapping.vert"),
 				frag = std::string(shaderPath).append("gmshadowmapping.frag");
 			GMGLShaderInfo shadersInfo[] = {
@@ -126,21 +141,12 @@ public:
 
 	void render()
 	{
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
-		GMGLShaders& shaders = engine->getShaders();
-
 		world->renderGameWorld();
-
 		glutSwapBuffers();
 	}
 
 	void mouse()
 	{
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(world->getGraphicEngine());
-		GMGLShaders& shaders = engine->getShaders();
-		CameraLookAt lookAt;
-		Camera::calcCameraLookAt(world->getMajorCharacter()->getPositionState(), &lookAt);
-		GMGL::lookAt(lookAt, shaders, GMSHADER_VIEW_MATRIX);
 		GMRect rect = m_gm->getWindow()->getWindowRect();
 		reaction->mouseReact(rect);
 	}

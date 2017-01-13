@@ -56,6 +56,7 @@ Object::Object()
 	: m_painter(nullptr)
 	, m_arrayId(0)
 	, m_bufferId(0)
+	, m_type(NormalObject)
 {
 }
 

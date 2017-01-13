@@ -166,4 +166,6 @@ void SkyGameObject::initCoreObject()
 		if (i < 48)
 			coreObj->uvs().push_back(uvs[i]);
 	}
+
+	coreObj->setType(Object::Sky);
 }
