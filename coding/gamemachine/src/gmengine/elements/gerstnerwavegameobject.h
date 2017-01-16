@@ -14,11 +14,11 @@ struct GerstnerWaveProperties
 	// 水波振幅
 	GMfloat waveAmplitude;
 
-	// 水波速度
-	GMfloat waveSpeed;
-
 	// 水波传播角度
 	GMfloat waveDirection;
+
+	// 水波速度
+	GMfloat waveSpeed;
 
 	// 开始坐标
 	GMfloat startX;
@@ -27,9 +27,9 @@ struct GerstnerWaveProperties
 
 struct GerstnerWavesProperties
 {
-	// 总大小
-	GMuint length;
-	GMuint width;
+	// 每个网格的X-Y坐标递增值
+	GMfloat deltaX;
+	GMfloat deltaY;
 
 	// 水波条状数量
 	GMuint stripCount;
@@ -50,14 +50,21 @@ struct GerstnerWavesProperties
 class GerstnerWaveGameObject : public HallucinationGameObject
 {
 public:
+	static GerstnerWavesProperties& defaultProperties();
+
+public:
 	GerstnerWaveGameObject(const Material& material, const GerstnerWavesProperties& props);
+	virtual ~GerstnerWaveGameObject();
 
 public:
 	virtual void getReadyForRender(DrawingList& list) override;
 
+public:
+	void init();
+
 private:
 	Object* createCoreObject();
-	void initAll();
+	void copyProperties(const GerstnerWavesProperties& props);
 	void initSize();
 	void initWave();
 	void calcWave();

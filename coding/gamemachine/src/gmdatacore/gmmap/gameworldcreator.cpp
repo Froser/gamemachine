@@ -299,9 +299,9 @@ CREATE_FUNC void createSinglePrimitive(IFactory* factory,
 		btVector3(object->width / 2, object->height / 2, object->depth / 2),
 	};
 
-	SinglePrimitiveGameObject* coreObject = new SinglePrimitiveGameObject(SinglePrimitiveGameObject::fromGMMapObjectType(object->type), size, m);
-	*gameObj = coreObject;
-	setPropertiesFromInstance(map, instance, coreObject);
+	SinglePrimitiveGameObject* obj = new SinglePrimitiveGameObject(SinglePrimitiveGameObject::fromGMMapObjectType(object->type), size, m);
+	*gameObj = obj;
+	setPropertiesFromInstance(map, instance, obj);
 }
 
 CREATE_FUNC void createGerstnerWave(IFactory* factory,
@@ -321,9 +321,10 @@ CREATE_FUNC void createGerstnerWave(IFactory* factory,
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
-	GerstnerWaveGameObject* coreObject = new GerstnerWaveGameObject(m, GerstnerWavesProperties());
-	*gameObj = coreObject;
-	setPropertiesFromInstance(map, instance, coreObject);
+	GerstnerWaveGameObject* obj = new GerstnerWaveGameObject(m, GerstnerWaveGameObject::defaultProperties());
+	*gameObj = obj;
+	setPropertiesFromInstance(map, instance, obj);
+	obj->init();
 }
 
 struct __ObjectCreateFuncs
