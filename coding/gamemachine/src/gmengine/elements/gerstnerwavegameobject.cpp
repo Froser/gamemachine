@@ -30,8 +30,8 @@ GerstnerWavesProperties& GerstnerWaveGameObject::defaultProperties()
 	static GerstnerWavesProperties properties = {
 		0.1f,
 		0.1f,
-		2,
-		3,
+		50,
+		50,
 		6,
 		1.2,
 		waves
@@ -43,9 +43,19 @@ GerstnerWavesProperties& GerstnerWaveGameObject::defaultProperties()
 GerstnerWaveGameObject::GerstnerWaveGameObject(const Material& material, const GerstnerWavesProperties& props)
 	: HallucinationGameObject(nullptr)
 	, m_material(material)
+	, m_magnification(1)
 {
 	copyProperties(props);
 }
+
+GerstnerWaveGameObject::GerstnerWaveGameObject(const Material& material, GMfloat magnification, const GerstnerWavesProperties& props)
+	: HallucinationGameObject(nullptr)
+	, m_material(material)
+	, m_magnification(magnification <= 0 ? 1 : magnification)
+{
+	copyProperties(props);
+}
+
 
 GerstnerWaveGameObject::~GerstnerWaveGameObject()
 {
@@ -202,7 +212,7 @@ void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 		}
 	}
 
-	GMint pt;
+	GMuint pt;
 	for (int c = 0; c < (m_props.stripCount - 1); c++)
 	{
 		for (int l = 0; l < 2 * m_props.stripLength; l++)
@@ -214,14 +224,16 @@ void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 			else
 			{
 				pt = c * m_props.stripLength + l / 2 + m_props.stripLength;
-				//obj->uvs()[index * 2] = ;
-				//obj->uvs()[index * 2 + 1] = ;
 			}
 			index = m_props.stripLength * 2 * c + l;
 			for (int i = 0; i < 4; i++) {
 				obj->vertices()[index * 4 + i] = m_rawStrips[pt * 4 + i];
 				obj->normals()[index * 4 + i] = m_rawNormals[pt * 4 + i];
 			}
+			GMfloat uv_x = (GMfloat)(pt / m_props.stripLength) * m_magnification / m_props.stripCount;
+			GMfloat uv_y = (GMfloat)(pt % m_props.stripLength) * m_magnification / m_props.stripLength;
+			obj->uvs()[index * 2] = uv_x;
+			obj->uvs()[index * 2 + 1] = uv_y;
 		}
 	}
 }

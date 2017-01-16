@@ -321,7 +321,7 @@ CREATE_FUNC void createGerstnerWave(IFactory* factory,
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
-	GerstnerWaveGameObject* obj = new GerstnerWaveGameObject(m, GerstnerWaveGameObject::defaultProperties());
+	GerstnerWaveGameObject* obj = new GerstnerWaveGameObject(m, object->magnification, GerstnerWaveGameObject::defaultProperties());
 	*gameObj = obj;
 	setPropertiesFromInstance(map, instance, obj);
 	obj->init();

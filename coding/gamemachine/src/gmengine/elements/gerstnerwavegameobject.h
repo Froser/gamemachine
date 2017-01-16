@@ -35,7 +35,7 @@ struct GerstnerWavesProperties
 	GMuint stripCount;
 
 	// 水波长度
-	GMfloat stripLength;
+	GMuint stripLength;
 
 	// 水波数量
 	GMfloat wavesCount;
@@ -54,6 +54,7 @@ public:
 
 public:
 	GerstnerWaveGameObject(const Material& material, const GerstnerWavesProperties& props);
+	GerstnerWaveGameObject(const Material& material, GMfloat magnification, const GerstnerWavesProperties& props);
 	virtual ~GerstnerWaveGameObject();
 
 public:
@@ -73,6 +74,7 @@ private:
 	Material m_material;
 	GMfloat m_lastTick;
 	GerstnerWavesProperties m_props;
+	GMfloat m_magnification;
 
 private:
 	// 原始顶点所有浮点数的个数

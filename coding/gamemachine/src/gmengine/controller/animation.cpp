@@ -4,7 +4,8 @@
 
 static GMfloat linearFunctor(const __vector& v1, const __vector& v2, GMfloat x)
 {
-	ASSERT(v2.x != v1.x);
+	if (v2.x == v1.x)
+		return v1.y;
 	return v1.y + (v2.y - v1.y) * (x - v1.x) / (v2.x - v1.x);
 }
 
