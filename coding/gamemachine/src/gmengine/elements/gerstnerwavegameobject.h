@@ -67,7 +67,6 @@ private:
 	void copyProperties(const GerstnerWavesProperties& props);
 	void initSize();
 	void initWave();
-	void calcWave();
 	void calcWave(Object* obj, GMfloat elapsed);
 
 private:
@@ -83,6 +82,7 @@ private:
 
 	std::vector<GMfloat> m_rawStrips;
 	std::vector<GMfloat> m_rawNormals;
+	std::vector<GMfloat> m_uvs;
 };
 
 END_NS

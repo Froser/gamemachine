@@ -30,8 +30,8 @@ GerstnerWavesProperties& GerstnerWaveGameObject::defaultProperties()
 	static GerstnerWavesProperties properties = {
 		0.1f,
 		0.1f,
-		50,
-		50,
+		2,
+		3,
 		6,
 		1.2,
 		waves
@@ -120,6 +120,7 @@ void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 {
 	D(_d);
 	m_rawNormals.resize(m_rawPointsLength);
+	obj->uvs().resize(m_dataLength / 2);
 	obj->vertices().resize(m_dataLength);
 	obj->normals().resize(m_dataLength);
 	GMfloat wave = 0.0f;
@@ -206,11 +207,15 @@ void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 	{
 		for (int l = 0; l < 2 * m_props.stripLength; l++)
 		{
-			if (l % 2 == 1) {
+			if (l % 2 == 1)
+			{
 				pt = c * m_props.stripLength + l / 2;
 			}
-			else {
+			else
+			{
 				pt = c * m_props.stripLength + l / 2 + m_props.stripLength;
+				//obj->uvs()[index * 2] = ;
+				//obj->uvs()[index * 2 + 1] = ;
 			}
 			index = m_props.stripLength * 2 * c + l;
 			for (int i = 0; i < 4; i++) {
