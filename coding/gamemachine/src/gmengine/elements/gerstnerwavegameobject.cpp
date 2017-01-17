@@ -91,14 +91,13 @@ void GerstnerWaveGameObject::init()
 void GerstnerWaveGameObject::initWave()
 {
 	D(d);
-	btVector3 origin = d.transform.getOrigin();
 
 	for (GMuint i = 0; i < m_props.stripCount; i++)
 	{
 		for (GMuint j = 0; j < m_props.stripLength; j++)
 		{
-			m_rawStrips.push_back(origin[0] + i * m_props.deltaX);
-			m_rawStrips.push_back(origin[1] + j * m_props.deltaY);
+			m_rawStrips.push_back(i * m_props.deltaX);
+			m_rawStrips.push_back(j * m_props.deltaY);
 			m_rawStrips.push_back(0); //随便放一个值，这个是要求的高度
 			m_rawStrips.push_back(1);
 		}
@@ -128,7 +127,6 @@ static float gerstnerZ(float w_length, float w_height, float x_in, const GLfloat
 
 void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 {
-	D(_d);
 	m_rawNormals.resize(m_rawPointsLength);
 	obj->uvs().resize(m_dataLength / 2);
 	obj->vertices().resize(m_dataLength);
@@ -160,7 +158,7 @@ void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 						d + m_props.waves[w].waveSpeed * elapsed,
 						gerstner_pt_b
 					);
-				m_rawStrips[index + 2] = wave * m_props.waveHeightScale + _d.transform.getOrigin()[2];
+				m_rawStrips[index + 2] = wave * m_props.waveHeightScale;
 			}
 			index += 4;
 		}
@@ -271,5 +269,6 @@ void GerstnerWaveGameObject::getReadyForRender(DrawingList& list)
 		d.object->setPainter(newPainter);
 		newPainter->transfer();
 	}
+	
 	HallucinationGameObject::getReadyForRender(list);
 }

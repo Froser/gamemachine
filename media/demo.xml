@@ -13,7 +13,7 @@
 		<object id="2" type="cube" width="20" height="20" depth="20" collisionextents="40 40 40"/>
 		<object id="3" type="sky" radius="1000"/>
 		<object id="4" type="sphere" slices="20" stacks="20" radius="25"/>
-		<object id="5" type="gerstnerwave" width="15" depth="15" radius="15" height="30" />
+		<object id="5" type="gerstnerwave" mag="2"/>
 		<object id="6" type="convexhull" path="stairs" />
 	</objects>
 	<materials>
@@ -51,13 +51,13 @@
 		<!--
 		<instance id="1" entityref="1" position="0 -275 0" scale="5" mass="0" friction="50" rollingfriction="50" spinningfriction="50"/>
 	-->
-		<instance id="2" entityref="2" position="10 61 20" scale="1" mass="0"/>
-		<instance id="3" entityref="3" position="-10 40 35" scale="1" mass="0" rotation="0 1 0 25"/>
-		<instance id="4" entityref="3" position="130 10 17" scale="1" mass="0" rotation="0 1 0 45"/>
+		<instance id="2" entityref="2" position="10 81 20" scale="1" mass="0"/>
+		<instance id="3" entityref="3" position="-10 60 35" scale="1" mass="0" rotation="0 1 0 25" animationref="1" animationduration="5"/>
+		<instance id="4" entityref="3" position="130 60 17" scale="1" mass="0" rotation="0 1 0 45" animationref="1" animationduration="5"/>
 		<instance id="5" entityref="4" />
 		<instance id="6" entityref="5" position="50 100 30" scale="1" mass="30" friction="50" rollingfriction="50" spinningfriction="50"/>
-		<instance id="7" entityref="6" position="-4 -2.5 .01" scale="40" mass="10" friction="50" rollingfriction="50" spinningfriction="50" rotation="1 0 0 90"/>
-		<instance id="8" entityref="7" scale="60" position="10 10 10"/>
+		<instance id="8" entityref="7" scale="40" position="0 0 0"/>
+		<instance id="7" entityref="6" position="-800 5 -1600" scale="1024 1024 256" rotation="1 0 0 90"/>
 	</instances>
 	<lights>
 		<light id="1" type="ambient" rgb=".6 .6 .6" position="300 300 300"/>

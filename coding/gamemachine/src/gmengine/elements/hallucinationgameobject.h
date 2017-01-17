@@ -17,6 +17,9 @@ public:
 	virtual void getReadyForRender(DrawingList& list) override;
 	virtual btCollisionObject* createCollisionObject() override;
 
+protected:
+	const btVector3& getLocalScaling();
+
 private:
 	btVector3 m_scale;
 };

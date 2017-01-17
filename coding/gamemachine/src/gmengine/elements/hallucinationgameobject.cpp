@@ -51,3 +51,8 @@ void HallucinationGameObject::getReadyForRender(DrawingList& list)
 	item.gameObject = this;
 	list.push_back(item);
 }
+
+const btVector3& HallucinationGameObject::getLocalScaling()
+{
+	return m_scale;
+}
