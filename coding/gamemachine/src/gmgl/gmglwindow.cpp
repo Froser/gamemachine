@@ -56,6 +56,7 @@ void GMGLWindow::setWindowPosition(GMuint x, GMuint y)
 void GMGLWindow::createWindow()
 {
 	glutCreateWindow(m_windowTitle);
+	m_hwnd = GetActiveWindow();
 	glutDisplayFunc(noop);
 
 	GLenum err;
@@ -78,3 +79,10 @@ GMRect GMGLWindow::getWindowRect()
 	};
 	return bound;
 }
+
+#ifdef _WINDOWS
+HWND GMGLWindow::getHWND()
+{
+	return m_hwnd;
+}
+#endif

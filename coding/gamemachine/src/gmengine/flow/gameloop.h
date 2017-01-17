@@ -15,6 +15,7 @@ struct IGameHandler
 	virtual void render() = 0;
 	virtual void logicalFrame(GMfloat elapsed) = 0;
 	virtual void onExit() = 0;
+	virtual bool isWindowActivate() = 0;
 };
 
 class GameLoop

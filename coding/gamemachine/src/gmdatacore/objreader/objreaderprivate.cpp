@@ -184,7 +184,13 @@ void ObjReaderPrivate::pushData()
 
 		if (m_currentMaterial->map_Kd_switch)
 		{
-			ASSERT(false && "暂时不支持Kd");
+			std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Kd);
+			ITexture* texture;
+			createTexture(m_factory, texturePath.c_str(), &texture);
+			m.textures[textureIdx].texture = texture;
+			m.textures[textureIdx].type = TextureTypeDiffuse;
+			m.textures[textureIdx].autorelease = 1;
+			textureIdx++;
 		}
 	}
 	m_object->appendComponent(m_currentComponent, m_vertexOffset - m_currentComponent->getOffset());

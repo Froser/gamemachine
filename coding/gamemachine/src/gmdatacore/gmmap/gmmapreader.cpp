@@ -374,9 +374,9 @@ static bool handleAnimations(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
-struct __Handlers
+struct __Map_Handlers
 {
-	__Handlers()
+	__Map_Handlers()
 	{
 		__map["meta"] = handleMeta;
 		__map["textures"] = handleTextures;
@@ -392,13 +392,13 @@ struct __Handlers
 	std::map<std::string, __Handler> __map;
 };
 
-__Handler& getFunc(const char* name)
+static __Handler& getFunc(const char* name)
 {
-	static __Handlers rootFuncs;
+	static __Map_Handlers rootFuncs;
 	return rootFuncs.__map[name];
 }
 
-void readHead(TiXmlDocument& doc, GMMap* map)
+void read(TiXmlDocument& doc, GMMap* map)
 {
 	TiXmlElement* root = doc.RootElement();
 	for (TiXmlElement* item = root->FirstChildElement(); item; item = item->NextSiblingElement())
@@ -424,5 +424,5 @@ void GMMapReader::readGMM(const char* filename, OUT GMMap** map)
 		gmmMap->workingDir = currentPath;
 	}
 
-	readHead(doc, gmmMap);
+	read(doc, gmmMap);
 }

@@ -1,5 +1,6 @@
 #define GLEW_STATIC
 #define FREEGLUT_STATIC
+#define _WINDOWS
 
 #include <windows.h>
 #include "GL/glew.h"
@@ -179,6 +180,12 @@ public:
 	{
 		delete world;
 		delete reaction;
+	}
+
+	bool isWindowActivate()
+	{
+		GMGLWindow* window = static_cast<GMGLWindow*> (m_gm->getWindow());
+		return GetActiveWindow() == window->getHWND();
 	}
 
 	GameMachine* m_gm;

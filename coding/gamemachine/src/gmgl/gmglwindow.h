@@ -17,10 +17,18 @@ public:
 	virtual void createWindow() override;
 	virtual void startWindowLoop() override;
 	virtual GMRect getWindowRect() override;
+	
+#ifdef _WINDOWS
+public:
+	HWND getHWND();
+#endif
 
 private:
 	char m_windowTitle[128];
 	bool m_fullscreen;
+#ifdef _WINDOWS
+	HWND m_hwnd;
+#endif
 };
 
 END_NS

@@ -12,6 +12,9 @@ class ConvexHullGameObject : public RigidGameObject
 public:
 	ConvexHullGameObject(AUTORELEASE Object* obj);
 
+public:
+	virtual void getReadyForRender(DrawingList& list);
+
 private:
 	virtual btCollisionShape* createCollisionShape() override;
 };

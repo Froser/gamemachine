@@ -39,6 +39,7 @@ enum TextureType
 	TextureTypeResetStart,
 	TextureTypeAmbient = TextureTypeResetStart,
 	TextureTypeCubeMap,
+	TextureTypeDiffuse,
 	TextureTypeResetEnd,
 
 	// 由于反射的天空纹理存在于环境，所以不需要清理

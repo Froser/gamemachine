@@ -20,6 +20,8 @@
 #include "gmengine/elements/hallucinationgameobject.h"
 #include "gmengine/elements/singleprimitivegameobject.h"
 #include "gmengine/elements/gerstnerwavegameobject.h"
+#include "gmmodelreader.h"
+#include "utilities/path.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -111,7 +113,7 @@ RESOURCE_FUNC std::string getTexturePath(GMMap* map, const GMMapString& textureP
 RESOURCE_FUNC std::string getModelPath(GMMap* map, const GMMapString& name)
 {
 	std::string dir = map->workingDir;
-	return dir.append("models/").append(name).append("/entity");
+	return dir.append("models/").append(name).append("/entity.xml");
 }
 
 typedef std::pair<ITexture*, TextureType> TextureFindResult;
@@ -123,11 +125,11 @@ static TextureFindResult getTextureForResourceContainer(ResourceContainer* resCo
 	return std::make_pair(coreTexture, type);
 }
 
-static void loadObject(const char* path, IFactory* factory, OUT Object** obj)
+static void loadModel(const char* path, IFactory* factory, OUT Object** obj)
 {
-	// 目前先用objreader来读取obj
-	ObjReader reader(factory);
-	reader.load(path, obj);
+	std::string workingDir = Path::directoryName(path);
+	GMModelReader reader(factory, workingDir.c_str());
+	reader.loadModel(path, obj);
 }
 
 CREATE_FUNC void createCube(IFactory* factory,
@@ -165,7 +167,7 @@ CREATE_FUNC void createCube(IFactory* factory,
 	{
 		Object* coreObject = nullptr;
 		std::string modelPath = getModelPath(map, object->path);
-		loadObject(modelPath.c_str(), factory, &coreObject);
+		loadModel(modelPath.c_str(), factory, &coreObject);
 		*gameObj = new CubeGameObject(extents, coreObject);
 	}
 	else
@@ -205,7 +207,7 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	{
 		Object* coreObject = nullptr;
 		std::string modelPath = getModelPath(map, object->path);
-		loadObject(modelPath.c_str(), factory, &coreObject);
+		loadModel(modelPath.c_str(), factory, &coreObject);
 		*gameObj = new SphereGameObject(object->radius, coreObject);
 	}
 	else
@@ -244,7 +246,7 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
-	loadObject(modelPath.c_str(), factory, &coreObject);
+	loadModel(modelPath.c_str(), factory, &coreObject);
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)
@@ -266,7 +268,7 @@ CREATE_FUNC void createHallucination(IFactory* factory,
 
 	Object* coreObject = nullptr;
 	std::string modelPath = getModelPath(map, object->path);
-	loadObject(modelPath.c_str(), factory, &coreObject);
+	loadModel(modelPath.c_str(), factory, &coreObject);
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)

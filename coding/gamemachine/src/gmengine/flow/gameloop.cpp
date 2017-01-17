@@ -48,8 +48,11 @@ void GameLoop::drawFrame()
 	m_handler->logicalFrame(m_timeElapsed);
 
 	m_drawStopwatch.start();
-	m_handler->mouse();
-	m_handler->keyboard();
+	if (m_handler->isWindowActivate())
+	{
+		m_handler->mouse();
+		m_handler->keyboard();
+	}
 	m_handler->render();
 	m_drawStopwatch.stop();
 	GMfloat elapsed = m_drawStopwatch.getMillisecond();

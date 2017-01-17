@@ -220,6 +220,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.h">
+      <Filter>src\gmdatacore\gmmap</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -392,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.cpp">
       <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.cpp">
+      <Filter>src\gmdatacore\gmmap</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
