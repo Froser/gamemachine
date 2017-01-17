@@ -121,7 +121,7 @@ OUT(_Coords, coords);
 
 BEGIN_STRUCT(_TextureUVs)
     // 环境光贴图坐标
-    STRUCT_MEMBER_OUT vec2 ambientUV;
+    STRUCT_MEMBER_OUT vec2 textureUV;
 
     // CubeMap贴图坐标
     STRUCT_MEMBER_OUT vec3 cubemapUV;
@@ -165,7 +165,7 @@ RET(_Coords) calcCoords()
 RET(_TextureUVs) calcTexture(vec3 viewDirection)
 {
     DIM(_TextureUVs, uvs);
-    MEMBER(uvs, ambientUV) = uv;
+    MEMBER(uvs, textureUV) = uv;
     MEMBER(uvs, cubemapUV) = -viewDirection;
     RETURN(uvs);
 }

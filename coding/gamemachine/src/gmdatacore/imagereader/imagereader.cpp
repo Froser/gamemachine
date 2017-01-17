@@ -4,6 +4,7 @@
 #include "imagereader_dds.h"
 #include "utilities/assert.h"
 #include <map>
+#include "imagereader_png.h"
 
 class ImageReaderContainer
 {
@@ -12,6 +13,7 @@ public:
 	{
 		m_readers[ImageType_BMP] = new ImageReader_BMP();
 		m_readers[ImageType_DDS] = new ImageReader_DDS();
+		m_readers[ImageType_PNG] = new ImageReader_PNG();
 	}
 
 	~ImageReaderContainer()

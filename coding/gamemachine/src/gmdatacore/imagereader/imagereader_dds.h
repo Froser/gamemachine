@@ -1,5 +1,5 @@
-﻿#ifndef __IMAGEREADER_DDS_H
-#define __IMAGEREADER_DDS_H
+﻿#ifndef __IMAGEREADER_DDS_H__
+#define __IMAGEREADER_DDS_H__
 #include "common.h"
 #include "imagereader.h"
 

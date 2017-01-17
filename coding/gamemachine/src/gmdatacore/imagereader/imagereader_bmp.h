@@ -1,5 +1,5 @@
-﻿#ifndef __IMAGEREADER_PRIVATE_H__
-#define __IMAGEREADER_PRIVATE_H__
+﻿#ifndef __IMAGEREADER_BMP_H__
+#define __IMAGEREADER_BMP_H__
 #include "common.h"
 #include <string>
 #include "imagereader.h"

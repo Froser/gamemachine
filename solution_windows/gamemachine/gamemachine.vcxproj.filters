@@ -223,6 +223,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.h">
       <Filter>src\gmdatacore\gmmap</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -398,6 +401,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.cpp">
       <Filter>src\gmdatacore\gmmap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp">
+      <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

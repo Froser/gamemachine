@@ -2,22 +2,24 @@
 <gmmap>
 	<meta author="demo" name="" />
 	<textures>
-		<texture id="1" path="floor.bmp" type="ambient"/>
-		<texture id="2" path="box.bmp" type="ambient"/>
-		<texture id="3" path="box2.bmp" type="ambient"/>
+		<texture id="1" path="floor.png" type="ambient"/>
+		<texture id="2" path="box.png" type="ambient"/>
+		<texture id="3" path="box2.png" type="ambient"/>
 		<texture id="4" path="sky.dds" type="cubemap"/>
+		<texture id="5" path="ocean.png" type="ambient"/>
 	</textures>
 	<objects>
 		<object id="1" type="cube" width="1000" height="100" depth="1000" mag="10"/>
 		<object id="2" type="cube" width="20" height="20" depth="20" collisionextents="40 40 40"/>
 		<object id="3" type="sky" radius="1000"/>
 		<object id="4" type="sphere" slices="20" stacks="20" radius="25"/>
-		<object id="5" type="gerstnerwave" width="15" depth="15" radius="15" height="30"  />
+		<object id="5" type="gerstnerwave" width="15" depth="15" radius="15" height="30" />
+		<object id="6" type="convexhull" path="stairs" />
 	</objects>
 	<materials>
 		<material id="1" ka=".5 .5 .25"/>
 		<material id="2" ka=".5 .5 .5" kd=".2 .2 .2" ks=".5 .5 .5" ke=".3 .3 .3" shininess="99"/>
-		<material id="3" ka=".5 .5 .8" ke="1 1 1"/>
+		<material id="3" ka=".5 .5 .5"/>
 	</materials>
 	<entities>
 		<entity id="1" objref="1" materialref_5="1" textureref_5="1"/>
@@ -25,7 +27,8 @@
 		<entity id="3" objref="2" materialref="2" textureref="3"/>
 		<entity id="4" objref="3" textureref="4"/>
 		<entity id="5" objref="4" materialref="2"/>
-		<entity id="6" objref="5" materialref="3"/>
+		<entity id="6" objref="5" materialref="3" textureref="5"/>
+		<entity id="7" objref="6" />
 	</entities>
 	<animations>
 		<keyframes id="1" functor="linear" type="rotation">
@@ -34,9 +37,9 @@
 			<keyframe percentage="1" value="0 1 0 360"/>
 		</keyframes>
 		<keyframes id="2" functor="linear" type="translation">
-			<keyframe percentage="0" value="0 10 0"/>
+			<keyframe percentage="0" value="0 100 0"/>
 			<keyframe percentage=".5" value="10 10 0"/>
-			<keyframe percentage="1" value="0 10 0"/>
+			<keyframe percentage="1" value="0 100 0"/>
 		</keyframes>
 		<keyframes id="3" functor="linear" type="scaling">
 			<keyframe percentage="0" value="1 1 1"/>
@@ -45,17 +48,16 @@
 		</keyframes>
 	</animations>
 	<instances>
+		<!--
 		<instance id="1" entityref="1" position="0 -275 0" scale="5" mass="0" friction="50" rollingfriction="50" spinningfriction="50"/>
-		<!--
-		<instance id="2" entityref="2" position="10 21 20" scale="1" mass="0" animationref="1" animationduration="7"/>
-		<instance id="3" entityref="3" position="-10 4 35" scale="1" mass="0" rotation="0 1 0 25" animationref="1" animationduration="5"/>
-		<instance id="4" entityref="3" position="130 1 17" scale="1" mass="0" rotation="0 1 0 45" animationref="1" animationduration="3"/>
-		-->
-		<instance id="5" entityref="4" />
-		<!--
-		<instance id="6" entityref="5" position="50 100 30" scale="1" mass="30" friction="50" rollingfriction="50" spinningfriction="50"/>
 	-->
-		<instance id="7" entityref="6" position="-50 -5 0" scale="40" mass="10" friction="50" rollingfriction="50" spinningfriction="50" rotation="1 0 0 90"/>
+		<instance id="2" entityref="2" position="10 61 20" scale="1" mass="0"/>
+		<instance id="3" entityref="3" position="-10 40 35" scale="1" mass="0" rotation="0 1 0 25"/>
+		<instance id="4" entityref="3" position="130 10 17" scale="1" mass="0" rotation="0 1 0 45"/>
+		<instance id="5" entityref="4" />
+		<instance id="6" entityref="5" position="50 100 30" scale="1" mass="30" friction="50" rollingfriction="50" spinningfriction="50"/>
+		<instance id="7" entityref="6" position="-4 -2.5 .01" scale="40" mass="10" friction="50" rollingfriction="50" spinningfriction="50" rotation="1 0 0 90"/>
+		<instance id="8" entityref="7" scale="60" position="10 10 10"/>
 	</instances>
 	<lights>
 		<light id="1" type="ambient" rgb=".6 .6 .6" position="300 300 300"/>

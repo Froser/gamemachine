@@ -85,9 +85,13 @@
 uniform sampler2DShadow GM_shadow_texture;
 uniform int GM_shadow_texture_switch = 0;
 
-// 环境光纹理
+// 受环境系数影响的纹理 (Ka)
 uniform sampler2D GM_ambient_texture;
 uniform int GM_ambient_texture_switch = 0;
+
+// 受漫反射系数影响的纹理 (kd)
+uniform sampler2D GM_diffuse_texture;
+uniform int GM_diffuse_texture_switch = 0;
 
 // 环境立方体纹理（反射天空时）
 uniform samplerCube GM_reflection_cubemap_texture;
@@ -126,7 +130,7 @@ IN(_Coords, coords);
 
 BEGIN_STRUCT(_TextureUVs)
     // 环境光贴图坐标
-    STRUCT_MEMBER_IN vec2 ambientUV;
+    STRUCT_MEMBER_IN vec2 textureUV;
 
     // CubeMap贴图坐标
     STRUCT_MEMBER_IN vec3 cubemapUV;
@@ -166,15 +170,19 @@ float shadeFactorFactor(float shadeFactor)
 
 void drawObject()
 {
+    // 计算阴影系数
+    float shadeFactor = shadeFactorFactor(calcuateShadeFactor(MEMBER(coords, shadowCoord)));
+
     // 环境光
     vec3 ambientLight = vec3(0);
 
-    // 计算点光源
-    vec3 diffuseLight = MEMBER(lightFactors, diffuse) * vec3(GM_light_specular) * vec3(GM_light_kd);
-    vec3 specularLight = MEMBER(lightFactors, specular) * vec3(GM_light_specular) * vec3(GM_light_ks);
+    // 计算点光源（漫反射、Kd和镜面反射）
+    vec3 diffuseLight = MEMBER(lightFactors, diffuse) * vec3(GM_light_specular);
+    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(texture(GM_diffuse_texture, MEMBER(textureUVs,textureUV))) : vec3(0);
+    diffuseLight += diffuseTextureColor;
+    diffuseLight *= vec3(GM_light_kd);
 
-    // 计算阴影系数
-    float shadeFactor = shadeFactorFactor(calcuateShadeFactor(MEMBER(coords, shadowCoord)));
+    vec3 specularLight = MEMBER(lightFactors, specular) * vec3(GM_light_specular) * vec3(GM_light_ks);
 
     // 根据环境反射度来反射天空盒（如果有的话）
     if (GM_reflection_cubemap_texture_switch == 1)
@@ -188,9 +196,9 @@ void drawObject()
         }
     }
 
-    // 计算环境光和环境光贴图
-    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,ambientUV))) : vec3(0);
-    ambientLight += GM_light_ambient.xyz + GM_light_ambient.xyz * shadeFactor * ambientTextureColor;
+    // 计算环境光和Ka贴图
+    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,textureUV))) : vec3(0);
+    ambientLight += GM_light_ambient.xyz + shadeFactor * ambientTextureColor;
     ambientLight *= vec3(GM_light_ka);
 
     // 最终结果
