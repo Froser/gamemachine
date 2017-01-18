@@ -6,10 +6,33 @@
 #include "gmdatacore/object.h"
 #include "gmengine/controller/factory.h"
 #include "gmengine/elements/gameobjectprivate.h"
+#include "gmengine/elements/gerstnerwavegameobject.h"
 
 BEGIN_NS
 
 typedef GMuint ID;
+
+template <typename T>
+struct NO_DESTRUCTOR
+{
+	void operator()(const T& each)
+	{
+	}
+};
+
+template <typename T, typename LESS, typename DESTRUCTOR = NO_DESTRUCTOR<T> >
+class GMMapSet : public std::set<T, LESS>
+{
+	typedef std::set<T, LESS> Base;
+public:
+	~GMMapSet()
+	{
+		for (auto iter = begin(); iter != end(); iter++)
+		{
+			DESTRUCTOR()(*iter);
+		}
+	}
+};
 
 class GMMapString : public std::string
 {
@@ -42,6 +65,17 @@ const T* GMMap_find(std::set<T, ID_Less<T>>& set, ID key)
 
 	return &(*it);
 }
+
+enum VariantPropertyType
+{
+	None = 0,
+	Waves,
+};
+
+union VariantProperty
+{
+	GerstnerWavesProperties wavesProperites;
+};
 
 struct GMMapMeta
 {
@@ -84,6 +118,17 @@ struct GMMapObject
 	GMfloat slices, stacks, radius;
 	GMfloat magnification;
 	GMfloat collisionExtents[3];
+	VariantPropertyType propertyType;
+	VariantProperty property;
+};
+
+struct GMMapObject_DESCTRUCTOR
+{
+	void operator() (const GMMapObject& object)
+	{
+		if (object.propertyType == Waves)
+			delete[] object.property.wavesProperites.waves;
+	}
 };
 
 struct GMMapMaterial
@@ -191,13 +236,13 @@ struct GMMapSettings
 struct GMMap
 {
 	GMMapMeta meta;
-	std::set<GMMapTexture, ID_Less<GMMapTexture>> textures;
-	std::set<GMMapObject, ID_Less<GMMapObject>> objects;
-	std::set<GMMapMaterial, ID_Less<GMMapMaterial>> materials;
-	std::set<GMMapEntity, ID_Less<GMMapEntity>> entities;
-	std::set<GMMapInstance, ID_Less<GMMapInstance>> instances;
-	std::set<GMMapLight, ID_Less<GMMapLight>> lights;
-	std::set<GMMapKeyframes, ID_Less<GMMapKeyframes>> animations;
+	GMMapSet<GMMapTexture, ID_Less<GMMapTexture>> textures;
+	GMMapSet<GMMapObject, ID_Less<GMMapObject>, GMMapObject_DESCTRUCTOR> objects;
+	GMMapSet<GMMapMaterial, ID_Less<GMMapMaterial>> materials;
+	GMMapSet<GMMapEntity, ID_Less<GMMapEntity>> entities;
+	GMMapSet<GMMapInstance, ID_Less<GMMapInstance>> instances;
+	GMMapSet<GMMapLight, ID_Less<GMMapLight>> lights;
+	GMMapSet<GMMapKeyframes, ID_Less<GMMapKeyframes>> animations;
 	GMMapSettings settings;
 	std::string workingDir;
 };

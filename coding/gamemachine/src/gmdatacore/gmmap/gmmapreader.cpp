@@ -64,6 +64,49 @@ static bool handleObjects(TiXmlElement& elem, GMMap* map)
 			}
 		}
 
+		{
+			TiXmlElement* property = child->FirstChildElement();
+			if (property)
+			{
+				if (strEqual(property->Value(), "waves"))
+				{
+					object.propertyType = Waves;
+					{
+						Scanner scanner(property->Attribute("delta"));
+						scanner.nextFloat(&object.property.wavesProperites.deltaX);
+						scanner.nextFloat(&object.property.wavesProperites.deltaY);
+					}
+					{
+						Scanner scanner(property->Attribute("strip"));
+						scanner.nextInt(&object.property.wavesProperites.stripLength);
+						scanner.nextInt(&object.property.wavesProperites.stripCount);
+					}
+					SAFE_SSCANF(property->Attribute("heightscale"), "%f", &object.property.wavesProperites.waveHeightScale);
+
+					GMuint idx = 0;
+					for (TiXmlElement* wave = property->FirstChildElement(); wave; wave = wave->NextSiblingElement(), idx++)
+					{
+					}
+					object.property.wavesProperites.wavesCount = idx;
+					object.property.wavesProperites.waves = new GerstnerWaveProperties[idx];
+					idx = 0;
+					for (TiXmlElement* wave = property->FirstChildElement(); wave; wave = wave->NextSiblingElement(), idx++)
+					{
+						GerstnerWaveProperties& waveProps = object.property.wavesProperites.waves[idx];
+						SAFE_SSCANF(wave->Attribute("length"), "%f", &waveProps.waveLength);
+						SAFE_SSCANF(wave->Attribute("amplitude"), "%f", &waveProps.waveAmplitude);
+						SAFE_SSCANF(wave->Attribute("direction"), "%f", &waveProps.waveDirection);
+						SAFE_SSCANF(wave->Attribute("speed"), "%f", &waveProps.waveSpeed);
+						{
+							Scanner scanner(wave->Attribute("start"));
+							scanner.nextFloat(&waveProps.startX);
+							scanner.nextFloat(&waveProps.startY);
+						}
+					}
+				}
+			}
+		}
+
 		object.type = GMMapObject::getType(child->Attribute("type"));
 		map->objects.insert(object);
 	}

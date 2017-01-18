@@ -13,7 +13,16 @@
 		<object id="2" type="cube" width="20" height="20" depth="20" collisionextents="40 40 40"/>
 		<object id="3" type="sky" radius="1000"/>
 		<object id="4" type="sphere" slices="20" stacks="20" radius="25"/>
-		<object id="5" type="gerstnerwave" mag="2"/>
+		<object id="5" type="gerstnerwave" mag="2">
+			<waves delta=".1 .1" strip="40 40" heightscale="1.2">
+				<wave length="1.6" amplitude=".12" direction=".9" speed=".06" start="0 0"/>
+				<wave length="1.3" amplitude=".1" direction="1.14" speed=".09" start="0 0"/>
+				<wave length=".2" amplitude=".01" direction=".8" speed=".08" start="0 0"/>
+				<wave length=".18" amplitude=".008" direction="1.05" speed=".1" start="0 0"/>
+				<wave length=".23" amplitude=".005" direction="1.15" speed=".09" start="0 0"/>
+				<wave length=".12" amplitude=".003" direction=".97" speed=".14" start="0 0"/>
+			</waves>
+		</object>
 		<object id="6" type="convexhull" path="stairs" />
 	</objects>
 	<materials>

@@ -32,10 +32,10 @@ struct GerstnerWavesProperties
 	GMfloat deltaY;
 
 	// 水波条状数量
-	GMuint stripCount;
+	GMint stripCount;
 
 	// 水波长度
-	GMuint stripLength;
+	GMint stripLength;
 
 	// 水波数量
 	GMfloat wavesCount;
@@ -46,6 +46,12 @@ struct GerstnerWavesProperties
 	// 每个水波属性
 	GerstnerWaveProperties *waves;
 };
+
+inline void releaseGerstnerWavesProperties(GerstnerWavesProperties* props)
+{
+	if (props->waves)
+		delete [] props->waves;
+}
 
 class GerstnerWaveGameObject : public HallucinationGameObject
 {

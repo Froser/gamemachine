@@ -59,7 +59,7 @@ GerstnerWaveGameObject::GerstnerWaveGameObject(const Material& material, GMfloat
 
 GerstnerWaveGameObject::~GerstnerWaveGameObject()
 {
-	delete[] m_props.waves;
+	releaseGerstnerWavesProperties(&m_props);
 }
 
 void GerstnerWaveGameObject::copyProperties(const GerstnerWavesProperties& props)
@@ -123,6 +123,8 @@ static float gerstnerZ(float w_length, float w_height, float x_in, const GLfloat
 		return gerstner[i + 1] * yScale;
 	if (x_in > gerstner[i])
 		return ((gerstner[i + 3] - gerstner[i + 1]) * (x_in - gerstner[i]) / (gerstner[i + 2] - gerstner[i]) + gerstner[i + 3]) * yScale;
+	ASSERT(false);
+	return 0;
 }
 
 void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
