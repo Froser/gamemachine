@@ -9,13 +9,13 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmglgraphic_engine.h"
 
-GLenum getMode(Object* obj)
+GLenum getMode(ChildObject* obj)
 {
 	switch (obj->getArrangementMode())
 	{
-	case Object::Triangle_Fan:
+	case ChildObject::Triangle_Fan:
 		return GL_TRIANGLE_FAN;
-	case Object::Triangle_Strip:
+	case ChildObject::Triangle_Strip:
 		return GL_TRIANGLE_STRIP;
 	default:
 		ASSERT(false);
@@ -23,8 +23,8 @@ GLenum getMode(Object* obj)
 	}
 }
 
-GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* obj)
-	: ObjectPainter(obj)
+GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* objs)
+	: ObjectPainter(objs)
 	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
 	, m_shadowMapping(shadowMapping)
 	, m_inited(false)
@@ -39,33 +39,37 @@ void GMGLObjectPainter::transfer()
 
 	Object* obj = getObject();
 
-	GLuint vao;
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	getObject()->setArrayId(vao);
+	BEGIN_FOREACH_OBJ(obj, childObj)
+	{
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		childObj->setArrayId(vao);
 
-	GLuint vaoSize = sizeof(Object::DataType) * obj->vertices().size();
-	GLuint normalSize = sizeof(Object::DataType) * obj->normals().size();
-	GLuint uvSize = sizeof(Object::DataType) * obj->uvs().size();
+		GLuint vaoSize = sizeof(Object::DataType) * childObj->vertices().size();
+		GLuint normalSize = sizeof(Object::DataType) * childObj->normals().size();
+		GLuint uvSize = sizeof(Object::DataType) * childObj->uvs().size();
 
-	GLuint vbo;
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize, NULL, GL_STATIC_DRAW);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, vaoSize, obj->vertices().data());
-	glBufferSubData(GL_ARRAY_BUFFER, vaoSize, normalSize, obj->normals().data());
-	glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize, uvSize, obj->uvs().data());
-	obj->setBufferId(vbo);
+		GLuint vbo;
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize, NULL, GL_STATIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, vaoSize, childObj->vertices().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize, normalSize, childObj->normals().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize, uvSize, childObj->uvs().data());
+		childObj->setBufferId(vbo);
 
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (void*)vaoSize);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (void*)vaoSize);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize));
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
 
-	glBindVertexArray(0);
-	obj->disposeMemory();
+		glBindVertexArray(0);
+		childObj->disposeMemory();
+	}
+	END_FOREACH_OBJ
 
 	m_inited = true;
 }
@@ -74,41 +78,49 @@ void GMGLObjectPainter::draw()
 {
 	Object* obj = getObject();
 
-	glBindVertexArray(obj->getArrayId());
-	GLint params[2];
-	glGetIntegerv(GL_POLYGON_MODE, params);
-	resetTextures(obj->getType());
-	
-	for (auto iter = obj->getComponents().cbegin(); iter != obj->getComponents().cend(); iter++)
+	BEGIN_FOREACH_OBJ(obj, childObj)
 	{
-		Component* component = (*iter);
-		TextureInfo* textureInfos = component->getMaterial().textures;
+		glBindVertexArray(childObj->getArrayId());
+		GLint params[2];
+		glGetIntegerv(GL_POLYGON_MODE, params);
+		resetTextures(childObj->getType());
 
-		if (!m_shadowMapping.hasBegun())
+		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
-			setLights(component->getMaterial(), obj->getType());
-			beginTextures(textureInfos, obj->getType());
+			Component* component = (*iter);
+			TextureInfo* textureInfos = component->getMaterial().textures;
+
+			if (!m_shadowMapping.hasBegun())
+			{
+				setLights(component->getMaterial(), childObj->getType());
+				beginTextures(textureInfos, childObj->getType());
+			}
+
+			GLenum mode = getMode(childObj);
+			glMultiDrawArrays(params[1] == GL_FILL ? mode : GL_LINE_LOOP,
+				component->getFirstPtr(), component->getCountPtr(), component->getPolygonCount());
+
+			if (!m_shadowMapping.hasBegun())
+				endTextures(textureInfos);
 		}
-
-		GLenum mode = getMode(obj);
-		glMultiDrawArrays(params[1] == GL_FILL ? mode : GL_LINE_LOOP,
-			component->getFirstPtr(), component->getCountPtr(), component->getPolygonCount());
-
-		if (!m_shadowMapping.hasBegun())
-			endTextures(textureInfos);
+		glBindVertexArray(0);
 	}
-	glBindVertexArray(0);
+	END_FOREACH_OBJ
 }
 
 void GMGLObjectPainter::dispose()
 {
 	Object* obj = getObject();
 
-	GLuint vao[1] = { obj->getArrayId() },
-		vbo[1] = { obj->getBufferId() };
+	BEGIN_FOREACH_OBJ(obj, childObj)
+	{
+		GLuint vao[1] = { childObj->getArrayId() },
+			vbo[1] = { childObj->getBufferId() };
 
-	glDeleteVertexArrays(1, vao);
-	glDeleteBuffers(1, vbo);
+		glDeleteVertexArrays(1, vao);
+		glDeleteBuffers(1, vbo);
+	}
+	END_FOREACH_OBJ
 
 	m_inited = false;
 }
@@ -119,7 +131,7 @@ void GMGLObjectPainter::clone(Object* obj, OUT ObjectPainter** painter)
 	*painter = new GMGLObjectPainter(m_engine, m_shadowMapping, obj);
 }
 
-void GMGLObjectPainter::setLights(Material& material, Object::ObjectType type)
+void GMGLObjectPainter::setLights(Material& material, ChildObject::ObjectType type)
 {
 	if (m_world)
 	{
@@ -137,7 +149,7 @@ void GMGLObjectPainter::setLights(Material& material, Object::ObjectType type)
 	}
 }
 
-void GMGLObjectPainter::beginTextures(TextureInfo* startTexture, Object::ObjectType type)
+void GMGLObjectPainter::beginTextures(TextureInfo* startTexture, ChildObject::ObjectType type)
 {
 	for (GMuint i = 0; i < MaxTextureCount; i++)
 	{
@@ -163,7 +175,7 @@ void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
 	}
 }
 
-void GMGLObjectPainter::resetTextures(Object::ObjectType type)
+void GMGLObjectPainter::resetTextures(ChildObject::ObjectType type)
 {
 	for (TextureType t = TextureTypeAmbient; t < TextureTypeResetEnd; t = (TextureType) ((GMuint)(t) + 1))
 	{

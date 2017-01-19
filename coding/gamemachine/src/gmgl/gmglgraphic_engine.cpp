@@ -68,35 +68,39 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
-		Object::ObjectType type = (*iter).gameObject->getObject()->getType();
-		GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : *getShaders(type);
-
-		shaders.useProgram();
-		if (!shadowMapping)
-			beginSetSky(shaders);
-
 		DrawingItem& item = *iter;
-		GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
-
 		Object* coreObj = item.gameObject->getObject();
-		GMGLObjectPainter* painter = static_cast<GMGLObjectPainter*>(coreObj->getPainter());
-
-		if (!shadowMapping)
+		BEGIN_FOREACH_OBJ(coreObj, coreChildObj)
 		{
-			setEyeViewport(shadowOn, shaders);
-			shadowTexture(shadowOn, shaders);
+			ChildObject::ObjectType type = coreChildObj->getType();
+			GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : *getShaders(type);
 
-			painter->setWorld(m_world);
+			shaders.useProgram();
+			if (!shadowMapping)
+				beginSetSky(shaders);
+
+			GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
+
+			GMGLObjectPainter* painter = static_cast<GMGLObjectPainter*>(coreObj->getPainter());
+
+			if (!shadowMapping)
+			{
+				setEyeViewport(shadowOn, shaders);
+				shadowTexture(shadowOn, shaders);
+
+				painter->setWorld(m_world);
+			}
+			else
+			{
+				painter->setWorld(nullptr);
+			}
+
+			painter->draw();
+
+			if (!shadowMapping)
+				endSetSky();
 		}
-		else
-		{
-			painter->setWorld(nullptr);
-		}
-
-		painter->draw();
-
-		if (!shadowMapping)
-			endSetSky();
+		END_FOREACH_OBJ
 	}
 }
 
@@ -138,7 +142,7 @@ void GMGLGraphicEngine::beginSetSky(GMGLShaders& shaders)
 	if (sky)
 	{
 		GMGL::uniformTextureIndex(shaders, TextureTypeReflectionCubeMap, getTextureUniformName(TextureTypeReflectionCubeMap));
-		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
+		TextureInfo& info = sky->getObject()->getChildObjects()[0]->getComponents()[0]->getMaterial().textures[0];
 		ASSERT(info.texture);
 		info.texture->beginTexture(TextureTypeReflectionCubeMap);
 	}
@@ -149,7 +153,7 @@ void GMGLGraphicEngine::endSetSky()
 	GameObject* sky = getWorld()->getSky();
 	if (sky)
 	{
-		TextureInfo& info = sky->getObject()->getComponents()[0]->getMaterial().textures[0];
+		TextureInfo& info = sky->getObject()->getChildObjects()[0]->getComponents()[0]->getMaterial().textures[0];
 		info.texture->endTexture();
 	}
 }
@@ -171,7 +175,7 @@ GMGLShadowMapping& GMGLGraphicEngine::getShadowMapping()
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
-	BEGIN_ENUM(i, Object::ObjectTypeBegin, Object::ObjectTypeEnd)
+	BEGIN_ENUM(i, ChildObject::ObjectTypeBegin, ChildObject::ObjectTypeEnd)
 	{
 		GMGLShaders* shaders = getShaders(i);
 		if (!shaders)
@@ -188,12 +192,12 @@ GameWorld* GMGLGraphicEngine::getWorld()
 	return m_world;
 }
 
-void GMGLGraphicEngine::registerShader(Object::ObjectType objectType, AUTORELEASE GMGLShaders* shaders)
+void GMGLGraphicEngine::registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders)
 {
 	m_allShaders[objectType] = shaders;
 }
 
-GMGLShaders* GMGLGraphicEngine::getShaders(Object::ObjectType objectType)
+GMGLShaders* GMGLGraphicEngine::getShaders(ChildObject::ObjectType objectType)
 {
 	if (m_allShaders.find(objectType) == m_allShaders.end())
 		return nullptr;

@@ -144,6 +144,8 @@ void SkyGameObject::initCoreObject()
 	};
 
 	Object* coreObj = getObject();
+	ChildObject* coreChildObj = new ChildObject();
+
 	TextureInfo textureInfo = {
 		m_texture, TextureTypeCubeMap
 	};
@@ -158,14 +160,15 @@ void SkyGameObject::initCoreObject()
 			c->getMaterial().Ka[0] = 1.0f;
 			c->getMaterial().Ka[1] = 1.0f;
 			c->getMaterial().Ka[2] = 1.0f;
-			coreObj->appendComponent(c, 4);
+			coreChildObj->appendComponent(c, 4);
 		}
-		coreObj->vertices().push_back(vertices[i]);
-		coreObj->normals().push_back(normals[i]);
+		coreChildObj->vertices().push_back(vertices[i]);
+		coreChildObj->normals().push_back(normals[i]);
 
 		if (i < 48)
-			coreObj->uvs().push_back(uvs[i]);
+			coreChildObj->uvs().push_back(uvs[i]);
 	}
 
-	coreObj->setType(Object::Sky);
+	coreChildObj->setType(ChildObject::Sky);
+	coreObj->append(coreChildObj);
 }

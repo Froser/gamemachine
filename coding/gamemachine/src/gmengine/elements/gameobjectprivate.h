@@ -4,7 +4,7 @@
 #include "gmdatacore/object.h"
 #include "utilities/autoptr.h"
 #include "btBulletCollisionCommon.h"
-#include "../controller/animation.h"
+#include "gmengine/controller/animation.h"
 BEGIN_NS
 
 #define PARAM(type, name)	\

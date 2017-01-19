@@ -22,6 +22,7 @@
 #include "gmengine/elements/gerstnerwavegameobject.h"
 #include "gmmodelreader.h"
 #include "utilities/path.h"
+#include "gmengine/elements/compoundconvexhullgameobject.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -94,14 +95,18 @@ static void setPropertiesFromInstance(GMMap* map, const GMMapInstance* instance,
 
 static void copyUniqueMaterialProperties(const Material& material, Object* coreObject)
 {
-	// 拷贝obj文件中不存在的一些属性
-	for (auto iter = coreObject->getComponents().begin(); iter != coreObject->getComponents().end(); iter++)
+	BEGIN_FOREACH_OBJ(coreObject, coreChildObject)
 	{
-		Component* c = *iter;
-		c->getMaterial().Ke[0] = material.Ke[0];
-		c->getMaterial().Ke[1] = material.Ke[1];
-		c->getMaterial().Ke[2] = material.Ke[2];
+		// 拷贝obj文件中不存在的一些属性
+		for (auto iter = coreChildObject->getComponents().begin(); iter != coreChildObject->getComponents().end(); iter++)
+		{
+			Component* c = *iter;
+			c->getMaterial().Ke[0] = material.Ke[0];
+			c->getMaterial().Ke[1] = material.Ke[1];
+			c->getMaterial().Ke[2] = material.Ke[2];
+		}
 	}
+	END_FOREACH_OBJ
 }
 
 RESOURCE_FUNC std::string getTexturePath(GMMap* map, const GMMapString& texturePath)
@@ -256,6 +261,28 @@ CREATE_FUNC void createConvexHull(IFactory* factory,
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
+CREATE_FUNC void createCompound(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	Object* coreObject = nullptr;
+	std::string modelPath = getModelPath(map, object->path);
+	loadModel(modelPath.c_str(), factory, &coreObject);
+
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
+	if (material)
+		copyUniqueMaterialProperties(material->material, coreObject);
+
+	*gameObj = new CompoundConvexHullGameObject(coreObject);
+	setPropertiesFromInstance(map, instance, *gameObj);
+}
+
 CREATE_FUNC void createHallucination(IFactory* factory,
 	ResourceContainer* resContainer,
 	GMMap* map,
@@ -343,6 +370,7 @@ struct __ObjectCreateFuncs
 		__map[GMMapObject::Hallucination] = createHallucination;
 		__map[GMMapObject::Capsule] = __map[GMMapObject::Cylinder] = __map[GMMapObject::Cone] = createSinglePrimitive;
 		__map[GMMapObject::GerstnerWave] = createGerstnerWave;
+		__map[GMMapObject::Compound] = createCompound;
 	}
 
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;

@@ -32,8 +32,8 @@ public:
 	GMGLShadowMapping& getShadowMapping();
 	GameWorld* getWorld();
 
-	void registerShader(Object::ObjectType objectType, AUTORELEASE GMGLShaders* shaders);
-	GMGLShaders* getShaders(Object::ObjectType objectType);
+	void registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders);
+	GMGLShaders* getShaders(ChildObject::ObjectType objectType);
 
 private:
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
@@ -44,7 +44,7 @@ private:
 	GameLight* getShadowSourceLight();
 
 private:
-	std::map<Object::ObjectType, GMGLShaders*> m_allShaders;
+	std::map<ChildObject::ObjectType, GMGLShaders*> m_allShaders;
 	GMGLShadowMapping m_shadowMapping;
 	GameWorld* m_world;
 	ResourceContainer m_resourceContainer;

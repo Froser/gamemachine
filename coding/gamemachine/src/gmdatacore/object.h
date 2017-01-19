@@ -8,6 +8,9 @@
 #include "utilities/vmath.h"
 #include "gmdatacore/texture.h"
 
+#define BEGIN_FOREACH_OBJ(obj, childObj) for (auto iter = (obj)->getChildObjects().begin(); iter != (obj)->getChildObjects().end(); iter++) { ChildObject* childObj = *iter;
+#define END_FOREACH_OBJ }
+
 BEGIN_NS
 
 class Object;
@@ -15,7 +18,7 @@ class GMGLShaders;
 class ObjectPainter
 {
 public:
-	ObjectPainter(Object* obj);
+	ObjectPainter(Object* objs);
 
 public:
 	virtual void transfer() = 0;
@@ -68,9 +71,10 @@ struct Material
 	TextureInfo textures[MaxTextureCount];
 };
 
+class ChildObject;
 class Component
 {
-	friend Object;
+	friend class ChildObject;
 
 public:
 	enum
@@ -141,11 +145,52 @@ private:
 	GMint* m_countPtr;
 };
 
+struct Group
+{
+	GMuint vertexCount;
+	GMuint vertexOffset;
+	std::string name;
+};
+
 class Object
 {
 public:
 	typedef GMfloat DataType;
 
+public:
+	~Object();
+
+public:
+	void setPainter(AUTORELEASE ObjectPainter* painter)
+	{
+		m_painter.reset(painter);
+	}
+
+	ObjectPainter* getPainter()
+	{
+		return m_painter;
+	}
+
+	std::vector<ChildObject*>& getChildObjects()
+	{
+		return m_objects;
+	}
+
+	void append(AUTORELEASE ChildObject* obj)
+	{
+		m_objects.push_back(obj);
+	}
+
+private:
+	AutoPtr<ObjectPainter> m_painter;
+	std::vector<ChildObject*> m_objects;
+};
+
+class ChildObject
+{
+	friend class Object_Less;
+
+public:
 	enum ObjectType
 	{
 		ObjectTypeBegin,
@@ -168,20 +213,11 @@ public:
 		Triangle_Strip,
 	};
 
-	Object();
-	~Object();
+	ChildObject();
+	ChildObject(const std::string& name);
+	~ChildObject();
 
 	void disposeMemory();
-
-	void setPainter(AUTORELEASE ObjectPainter* painter)
-	{
-		m_painter.reset(painter);
-	}
-
-	ObjectPainter* getPainter()
-	{
-		return m_painter;
-	}
 
 	void appendComponent(AUTORELEASE Component* component, GMuint verticesCount);
 
@@ -190,17 +226,17 @@ public:
 		return m_components;
 	}
 
-	std::vector<DataType>& vertices()
+	std::vector<Object::DataType>& vertices()
 	{
 		return m_vertices;
 	}
 
-	std::vector<DataType>& normals()
+	std::vector<Object::DataType>& normals()
 	{
 		return m_normals;
 	}
 
-	std::vector<DataType>& uvs()
+	std::vector<Object::DataType>& uvs()
 	{
 		return m_uvs;
 	}
@@ -225,21 +261,26 @@ public:
 		return m_mode;
 	}
 
+	void setName(const char* name)
+	{
+		m_name = name;
+	}
+
 	GMuint getBufferId() { return m_bufferId; }
 	GMuint getArrayId() { return m_arrayId; }
 	void setBufferId(GMuint id) { m_bufferId = id; }
 	void setArrayId(GMuint id) { m_arrayId = id; }
 
 private:
-	std::vector<DataType> m_vertices;
-	std::vector<DataType> m_normals;
-	std::vector<DataType> m_uvs;
+	std::vector<Object::DataType> m_vertices;
+	std::vector<Object::DataType> m_normals;
+	std::vector<Object::DataType> m_uvs;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
-	AutoPtr<ObjectPainter> m_painter;
 	std::vector<Component*> m_components;
 	ObjectType m_type;
 	ArrangementMode m_mode;
+	std::string m_name;
 };
 
 END_NS

@@ -235,6 +235,7 @@ void SinglePrimitiveGameObject::createTriangleMesh()
 {
 	D(d);
 	Object* obj = new Object();
+	ChildObject* childObj = new ChildObject();
 
 	ASSERT(d.collisionShape);
 	btTransform trans;
@@ -242,12 +243,13 @@ void SinglePrimitiveGameObject::createTriangleMesh()
 
 	std::vector<GMuint> indices;
 	// 生成网格，形状的缩放、位置都会考虑在内
-	collisionShape2TriangleMesh(d.collisionShape, trans, obj->vertices(), obj->normals(), indices);
+	collisionShape2TriangleMesh(d.collisionShape, trans, childObj->vertices(), childObj->normals(), indices);
 
 	// 所有的Mesh，都采用同一材质
 	Component* component = new Component(3);
 	memcpy(&component->getMaterial(), &m_material, sizeof(Material));
-	obj->appendComponent(component, indices.size());
+	childObj->appendComponent(component, indices.size());
 
+	obj->append(childObj);
 	setObject(obj);
 }

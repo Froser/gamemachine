@@ -6,7 +6,7 @@
 #include "rigidgameobject.h"
 BEGIN_NS
 
-class Object;
+class ChildObject;
 class ConvexHullGameObject : public RigidGameObject
 {
 public:

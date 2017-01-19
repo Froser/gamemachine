@@ -39,6 +39,8 @@ GMMapObject::GMMapObjectType GMMapObject::getType(const char* name)
 		return GMMapObject::Cone;
 	if (strEqual("gerstnerwave", name))
 		return GMMapObject::GerstnerWave;
+	if (strEqual("compound", name))
+		return GMMapObject::Compound;
 
 	ASSERT(false);
 	return GMMapObject::Error;

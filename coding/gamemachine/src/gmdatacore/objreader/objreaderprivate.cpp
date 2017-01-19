@@ -14,6 +14,7 @@
 #define KW_FACE "f"
 #define KW_MTLLIB "mtllib"
 #define KW_USEMTL "usemtl"
+#define KW_OBJECT "o"
 
 static bool isSeparator(char c)
 {
@@ -25,9 +26,15 @@ static void pushVector(std::vector<GMfloat>& to, std::vector<GMfloat>& indicesVe
 	if (indicesVector.size() == 0)
 		return;
 
-	to.push_back(indicesVector.data()[(indices - 1) * 4]);
-	to.push_back(indicesVector.data()[(indices - 1) * 4 + 1]);
-	to.push_back(indicesVector.data()[(indices - 1) * 4 + 2]);
+#if _DEBUG
+	to.push_back(indicesVector.at((indices - 1) * 4));
+	to.push_back(indicesVector.at((indices - 1) * 4 + 1));
+	to.push_back(indicesVector.at((indices - 1) * 4 + 2));
+#else
+	to.push_back(indicesVector[(indices - 1) * 4]);
+	to.push_back(indicesVector[(indices - 1) * 4 + 1]);
+	to.push_back(indicesVector[(indices - 1) * 4 + 2]);
+#endif
 	to.push_back(1.0f);
 }
 
@@ -49,11 +56,12 @@ static void createTexture(IFactory* factory, const char* path, OUT ITexture** te
 }
 
 ObjReaderPrivate::ObjReaderPrivate()
-	: m_currentComponent(new Component())
+	: m_currentComponent(nullptr)
 	, m_pMtlReader(new MtlReader())
 	, m_currentMaterial(nullptr)
 	, m_vertexOffset(0)
 	, m_factory(nullptr)
+	, m_currentChildObject(nullptr)
 {
 }
 
@@ -64,6 +72,9 @@ ObjReaderPrivate::~ObjReaderPrivate()
 
 void ObjReaderPrivate::parseLine(const char* line)
 {
+	if (!m_currentChildObject)
+		m_currentChildObject = new ChildObject();
+
 	Scanner scanner(line);
 	char command[LINE_MAX];
 	scanner.next(command);
@@ -126,9 +137,9 @@ void ObjReaderPrivate::parseLine(const char* line)
 				i3 = NONE;
 
 			m_vertexOffset++;
-			pushVector(m_object->vertices(), m_vertices, i1);
-			pushUVVector(m_object->uvs(), m_uvs, i2);
-			pushVector(m_object->normals(), m_normals, i3);
+			pushVector(m_currentChildObject->vertices(), m_vertices, i1);
+			pushUVVector(m_currentChildObject->uvs(), m_uvs, i2);
+			pushVector(m_currentChildObject->normals(), m_normals, i3);
 		} while (true);
 	}
 	else if (strEqual(command, KW_MTLLIB))
@@ -141,65 +152,94 @@ void ObjReaderPrivate::parseLine(const char* line)
 	}
 	else if (strEqual(command, KW_USEMTL))
 	{
-		pushData();
-
+		pushMaterial();
 		char name[LINE_MAX];
 		scanner.nextToTheEnd(name);
 		m_currentMaterial = &m_pMtlReader->getProperties(name);
 	}
+	else if (strEqual(command, KW_OBJECT))
+	{
+		char name[LINE_MAX];
+		scanner.nextToTheEnd(name);
+		pushChildObject(name);
+	}
 }
 
-void ObjReaderPrivate::pushData()
+void ObjReaderPrivate::pushMaterial()
 {
-	if (m_vertexOffset == 0)
+	if (!m_currentComponent)
+	{
+		m_currentComponent = new Component();
+		return;
+	}
+
+	GMuint vertexCount = m_vertexOffset - m_currentComponent->getOffset();
+	if (vertexCount == 0)
 		return;
 
-	if (m_currentMaterial)
-	{
-		Material& m = m_currentComponent->getMaterial();
-		m.Ka[0] = m_currentMaterial->Ka_r;
-		m.Ka[1] = m_currentMaterial->Ka_g;
-		m.Ka[2] = m_currentMaterial->Ka_b;
-		m.Kd[0] = m_currentMaterial->Kd_r;
-		m.Kd[1] = m_currentMaterial->Kd_g;
-		m.Kd[2] = m_currentMaterial->Kd_b;
-		m.Ks[0] = m_currentMaterial->Ks_r;
-		m.Ks[1] = m_currentMaterial->Ks_g;
-		m.Ks[2] = m_currentMaterial->Ks_b;
-		m.shininess = m_currentMaterial->Ns;
-		
-		// 创建纹理
-		GMuint textureIdx = 0;
-		if (m_currentMaterial->map_Ka_switch)
-		{
-			ASSERT(m_factory);
-			std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Ka);
-			ITexture* texture;
-			createTexture(m_factory, texturePath.c_str(), &texture);
-			m.textures[textureIdx].texture = texture;
-			m.textures[textureIdx].type = TextureTypeAmbient;
-			m.textures[textureIdx].autorelease = 1;
-			textureIdx++;
-		}
+	Material& m = m_currentComponent->getMaterial();
+	m.Ka[0] = m_currentMaterial->Ka_r;
+	m.Ka[1] = m_currentMaterial->Ka_g;
+	m.Ka[2] = m_currentMaterial->Ka_b;
+	m.Kd[0] = m_currentMaterial->Kd_r;
+	m.Kd[1] = m_currentMaterial->Kd_g;
+	m.Kd[2] = m_currentMaterial->Kd_b;
+	m.Ks[0] = m_currentMaterial->Ks_r;
+	m.Ks[1] = m_currentMaterial->Ks_g;
+	m.Ks[2] = m_currentMaterial->Ks_b;
+	m.shininess = m_currentMaterial->Ns;
 
-		if (m_currentMaterial->map_Kd_switch)
-		{
-			std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Kd);
-			ITexture* texture;
-			createTexture(m_factory, texturePath.c_str(), &texture);
-			m.textures[textureIdx].texture = texture;
-			m.textures[textureIdx].type = TextureTypeDiffuse;
-			m.textures[textureIdx].autorelease = 1;
-			textureIdx++;
-		}
+	// 创建纹理
+	GMuint textureIdx = 0;
+	if (m_currentMaterial->map_Ka_switch)
+	{
+		ASSERT(m_factory);
+		std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Ka);
+		ITexture* texture;
+		createTexture(m_factory, texturePath.c_str(), &texture);
+		m.textures[textureIdx].texture = texture;
+		m.textures[textureIdx].type = TextureTypeAmbient;
+		m.textures[textureIdx].autorelease = 1;
+		textureIdx++;
 	}
-	m_object->appendComponent(m_currentComponent, m_vertexOffset - m_currentComponent->getOffset());
+
+	if (m_currentMaterial->map_Kd_switch)
+	{
+		std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Kd);
+		ITexture* texture;
+		createTexture(m_factory, texturePath.c_str(), &texture);
+		m.textures[textureIdx].texture = texture;
+		m.textures[textureIdx].type = TextureTypeDiffuse;
+		m.textures[textureIdx].autorelease = 1;
+		textureIdx++;
+	}
+
+	m_currentChildObject->appendComponent(m_currentComponent, vertexCount);
 
 	m_currentComponent = new Component();
 	m_currentComponent->setOffset(m_vertexOffset);
 }
 
+void ObjReaderPrivate::pushChildObject(const char* nextChildObjectName)
+{
+	if (m_vertexOffset == 0)
+	{
+		m_currentChildObject->setName(nextChildObjectName);
+		return;
+	}
+
+	pushMaterial();
+	m_vertexOffset = 0;
+	m_currentComponent->setOffset(0);
+
+	ASSERT(m_currentChildObject);
+	m_object->append(m_currentChildObject);
+
+	if (nextChildObjectName)
+		m_currentChildObject = new ChildObject(nextChildObjectName);
+}
+
 void ObjReaderPrivate::endParse()
 {
-	pushData();
+	pushChildObject(nullptr);
 }

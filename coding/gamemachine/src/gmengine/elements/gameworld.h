@@ -10,7 +10,6 @@ class btSequentialImpulseConstraintSolver;
 class btDiscreteDynamicsWorld;
 
 BEGIN_NS
-class Object;
 class Character;
 class GameMachine;
 struct IGraphicEngine;

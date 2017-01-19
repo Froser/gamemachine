@@ -21,7 +21,8 @@ private:
 	void setWorkingDir(const std::string& workingDir) { m_workingDir = workingDir; }
 	void setFactory(IFactory* factory) { m_factory = factory; }
 	void parseLine(const char* line);
-	void pushData();
+	void pushMaterial();
+	void pushChildObject(const char* nextChildObjectName);
 	void endParse();
 
 private:
@@ -34,6 +35,7 @@ private:
 	Component* m_currentComponent;
 	GMuint m_vertexOffset;
 	const MaterialProperties* m_currentMaterial;
+	ChildObject* m_currentChildObject;
 	IFactory* m_factory;
 };
 

@@ -102,7 +102,7 @@ public:
 			shaders->appendShader(shadersInfo[1]);
 			shaders->load();
 			shaders->useProgram();
-			engine->registerShader(Object::NormalObject, shaders);
+			engine->registerShader(ChildObject::NormalObject, shaders);
 		}
 
 		{
@@ -117,7 +117,7 @@ public:
 			shaders->appendShader(shadersInfo[1]);
 			shaders->load();
 			shaders->useProgram();
-			engine->registerShader(Object::Sky, shaders);
+			engine->registerShader(ChildObject::Sky, shaders);
 		}
 
 		{

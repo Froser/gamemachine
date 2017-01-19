@@ -165,6 +165,8 @@ void CubeGameObject::initCoreObject()
 	};
 
 	Object* coreObj = getObject();
+	ChildObject* coreChildObject = new ChildObject();
+
 	for (GMuint i = 0; i < 4 * 6 * 4; i++)
 	{
 		if (i % 16 == 0)
@@ -173,12 +175,14 @@ void CubeGameObject::initCoreObject()
 			c->setEdgeCountPerPolygon(4);
 			memcpy(&c->getMaterial(), &m_eachMaterial[(int)(i / 16)], sizeof(Material));
 			c->setOffset(i / 4);
-			coreObj->appendComponent(c, 4);
+			coreChildObject->appendComponent(c, 4);
 		}
-		coreObj->vertices().push_back(vertices[i]);
-		coreObj->normals().push_back(normals[i]);
+		coreChildObject->vertices().push_back(vertices[i]);
+		coreChildObject->normals().push_back(normals[i]);
 
 		if (i < 48)
-			coreObj->uvs().push_back(uvs[i]);
+			coreChildObject->uvs().push_back(uvs[i]);
 	}
+
+	coreObj->append(coreChildObject);
 }

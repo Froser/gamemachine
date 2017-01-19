@@ -226,6 +226,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -404,6 +410,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp">
+      <Filter>src\gmdatacore\imagereader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

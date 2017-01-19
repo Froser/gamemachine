@@ -107,6 +107,7 @@ struct GMMapObject
 		Cylinder,
 		Cone,
 		GerstnerWave,
+		Compound,
 	};
 
 	static GMMapObjectType getType(const char* name);

@@ -127,7 +127,7 @@ static float gerstnerZ(float w_length, float w_height, float x_in, const GLfloat
 	return 0;
 }
 
-void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
+void GerstnerWaveGameObject::calcWave(ChildObject* obj, GMfloat elapsed)
 {
 	m_rawNormals.resize(m_rawPointsLength);
 	obj->uvs().resize(m_dataLength / 2);
@@ -240,19 +240,21 @@ void GerstnerWaveGameObject::calcWave(Object* obj, GMfloat elapsed)
 
 Object* GerstnerWaveGameObject::createCoreObject()
 {
-	Object* newObject = new Object();
-	newObject->setArrangementMode(Object::Triangle_Strip);
-	calcWave(newObject, m_lastTick);
+	Object* obj = new Object();
+	ChildObject* childObj = new ChildObject();
+	childObj->setArrangementMode(ChildObject::Triangle_Strip);
+	calcWave(childObj, m_lastTick);
 
 	for (int c = 0; c < (m_props.stripCount - 1); c++)
 	{
 		Component* component = new Component(m_props.stripLength * 2);
 		memcpy(&component->getMaterial(), &m_material, sizeof(Material));
 		component->setOffset(m_props.stripLength * 2 * c);
-		newObject->appendComponent(component, m_props.stripLength * 2);
+		childObj->appendComponent(component, m_props.stripLength * 2);
 	}
 
-	return newObject;
+	obj->append(childObj);
+	return obj;
 }
 
 void GerstnerWaveGameObject::getReadyForRender(DrawingList& list)

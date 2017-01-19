@@ -33,12 +33,12 @@ static void pushPoint(std::vector<GMfloat>& vertices, std::vector<GMfloat>& norm
 	normals.push_back(1.0f);
 }
 
-void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Object** obj)
+void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT ChildObject** obj)
 {
-	Object* sphere = nullptr;
+	ChildObject* sphere = nullptr;
 	if (obj)
 	{
-		*obj = new Object;
+		*obj = new ChildObject;
 		sphere = *obj;
 	}
 

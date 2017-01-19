@@ -13,7 +13,7 @@ class GameWorld;
 class GMGLObjectPainter : public ObjectPainter
 {
 public:
-	GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* obj);
+	GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* objs);
 
 public:
 	virtual void transfer() override;
@@ -23,10 +23,10 @@ public:
 	void setWorld(GameWorld* world);
 
 private:
-	void setLights(Material& material, Object::ObjectType type);
-	void beginTextures(TextureInfo* startTexture, Object::ObjectType type);
+	void setLights(Material& material, ChildObject::ObjectType type);
+	void beginTextures(TextureInfo* startTexture, ChildObject::ObjectType type);
 	void endTextures(TextureInfo* startTexture);
-	void resetTextures(Object::ObjectType type);
+	void resetTextures(ChildObject::ObjectType type);
 
 private:
 	GMGLGraphicEngine* m_engine;

@@ -53,6 +53,12 @@ btCollisionObject* GameObject::getCollisionObject()
 	return d.collisionObject;
 }
 
+btCollisionShape* GameObject::getCollisionShape()
+{
+	D(d);
+	return d.collisionShape;
+}
+
 void GameObject::setMass(btScalar mass)
 {
 	D(d);
@@ -75,6 +81,12 @@ void GameObject::setTransform(const btTransform& transform)
 {
 	D(d);
 	d.transform = transform;
+}
+
+btTransform& GameObject::getTransform()
+{
+	D(d);
+	return d.transform;
 }
 
 void GameObject::setLocalScaling(const btVector3& scale)

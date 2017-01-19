@@ -8,6 +8,7 @@
 	protected: \
 	className##Private& data() { return m_data; }
 #define D(d) auto& d = data()
+#define D_BASE(base, d) auto& d = base::data()
 
 #define AUTORELEASE
 #define OUT
@@ -57,5 +58,4 @@ END_NS
 #define HALF_PI 1.5707963265f
 #define RAD(deg) deg * PI / 180
 #define strEqual(str1, str2) !strcmp(str1, str2)
-
 #endif

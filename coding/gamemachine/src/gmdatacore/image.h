@@ -38,6 +38,7 @@ enum ImageType
 	ImageType_BMP = ImageType_Begin,
 	ImageType_DDS,
 	ImageType_PNG,
+	ImageType_TGA,
 	ImageType_End,
 };
 

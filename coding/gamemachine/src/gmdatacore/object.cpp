@@ -13,6 +13,19 @@ Object* ObjectPainter::getObject()
 	return m_object;
 }
 
+Object::~Object()
+{
+	if (m_painter)
+		m_painter->dispose();
+
+	BEGIN_FOREACH_OBJ(this, childObj)
+	{
+		if (childObj)
+			delete childObj;
+	}
+	END_FOREACH_OBJ
+}
+
 Component::Component()
 	: m_offset(0)
 	, m_verticesCount(0)
@@ -63,34 +76,40 @@ void Component::generatePolygonProperties()
 	}
 }
 
-Object::Object()
-	: m_painter(nullptr)
-	, m_arrayId(0)
+ChildObject::ChildObject()
+	: m_arrayId(0)
+	, m_bufferId(0)
+	, m_type(NormalObject)
+	, m_mode(Triangle_Fan)
+	, m_name("default")
+{
+}
+
+ChildObject::ChildObject(const std::string& name)
+	: m_arrayId(0)
 	, m_bufferId(0)
 	, m_type(NormalObject)
 	, m_mode(Triangle_Fan)
 {
+	m_name = name;
 }
 
-Object::~Object()
+ChildObject::~ChildObject()
 {
-	if (m_painter)
-		m_painter->dispose();
-
 	for (auto iter = m_components.begin(); iter != m_components.cend(); iter++)
 	{
 		delete *iter;
 	}
 }
 
-void Object::appendComponent(AUTORELEASE Component* component, GMuint verticesCount)
+void ChildObject::appendComponent(AUTORELEASE Component* component, GMuint verticesCount)
 {
 	component->m_verticesCount = verticesCount;
 	component->generatePolygonProperties();
 	m_components.push_back(component);
 }
 
-void Object::disposeMemory()
+void ChildObject::disposeMemory()
 {
 	m_vertices.clear();
 	m_normals.clear();

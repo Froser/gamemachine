@@ -74,7 +74,7 @@ private:
 	void copyProperties(const GerstnerWavesProperties& props);
 	void initSize();
 	void initWave();
-	void calcWave(Object* obj, GMfloat elapsed);
+	void calcWave(ChildObject* obj, GMfloat elapsed);
 
 private:
 	Material m_material;

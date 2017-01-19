@@ -32,6 +32,7 @@ public:
 	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
 	btCollisionObject* getCollisionObject();
+	btCollisionShape* getCollisionShape();
 
 	bool isDynamic();
 
@@ -39,6 +40,7 @@ public:
 	btScalar getMass();
 
 	void setTransform(const btTransform& transform);
+	btTransform& getTransform();
 
 	virtual void setLocalScaling(const btVector3& scale);
 
@@ -59,12 +61,12 @@ public:
 public:
 	virtual void getReadyForRender(DrawingList& list);
 	virtual btCollisionObject* createCollisionObject() = 0;
+	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
 
 protected:
 	virtual AnimationMatrices getAnimationMatrix();
 	virtual vmath::mat4 getTransformMatrix(btScalar glTrans[16]);
 	virtual void initPhysicsAfterCollisionObjectCreated();
-	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;

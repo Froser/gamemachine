@@ -11,7 +11,25 @@ ConvexHullGameObject::ConvexHullGameObject(AUTORELEASE Object* obj)
 
 btCollisionShape* ConvexHullGameObject::createCollisionShape()
 {
-	return new btConvexHullShape(getObject()->vertices().data(), getObject()->vertices().size() / 4, sizeof(Object::DataType) * 4 );
+	std::vector<Object::DataType> vertices;
+	GMuint cnt = 0;
+	BEGIN_FOREACH_OBJ(getObject(), childObj)
+	{
+		cnt += childObj->vertices().size();
+	}
+	END_FOREACH_OBJ;
+
+	vertices.reserve(cnt);
+	BEGIN_FOREACH_OBJ(getObject(), childObj)
+	{
+		for (auto iter = childObj->vertices().begin(); iter != childObj->vertices().end(); iter++)
+		{
+			vertices.push_back(*iter);
+		}
+	}
+	END_FOREACH_OBJ;
+
+	return new btConvexHullShape(vertices.data(), cnt / 4, sizeof(Object::DataType) * 4 );
 }
 
 void ConvexHullGameObject::getReadyForRender(DrawingList& list)

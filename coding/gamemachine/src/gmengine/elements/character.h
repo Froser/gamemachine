@@ -44,7 +44,7 @@ public:
 public:
 	virtual void getReadyForRender(DrawingList& list) override;
 
-private:
+protected:
 	virtual btCollisionShape* createCollisionShape() override;
 	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
 	virtual btCollisionObject* createCollisionObject() override;

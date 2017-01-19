@@ -89,7 +89,7 @@ bool loadPng(const char *filepath, PngData *out)
 	}
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-	return 0;
+	return true;
 }
 struct PNGTestHeader
 {
