@@ -29,50 +29,18 @@ Object::~Object()
 Component::Component()
 	: m_offset(0)
 	, m_verticesCount(0)
-	, m_edgeCountPerPolygon(DefaultEdgesCount)
-	, m_firstPtr(nullptr)
-	, m_countPtr(nullptr)
+	, m_polygonCount(0)
 {
 	memset(&m_material, 0, sizeof(m_material));
-}
-
-Component::Component(GMuint edgeCountPerPolygon)
-	: m_offset(0)
-	, m_verticesCount(0)
-	, m_edgeCountPerPolygon(DefaultEdgesCount)
-	, m_firstPtr(nullptr)
-	, m_countPtr(nullptr)
-{
-	memset(&m_material, 0, sizeof(m_material));
-	setEdgeCountPerPolygon(edgeCountPerPolygon);
 }
 
 Component::~Component()
 {
-	if (m_firstPtr)
-		delete[] m_firstPtr;
-	if (m_countPtr)
-		delete[] m_countPtr;
-
 	for (GMuint i = 0; i < MaxTextureCount; i++)
 	{
 		TextureInfo texture = getMaterial().textures[i];
 		if (texture.autorelease)
 			delete texture.texture;
-	}
-}
-
-void Component::generatePolygonProperties()
-{
-	GMint offset = m_offset;
-	m_firstPtr = new GMint[m_verticesCount];
-	m_countPtr = new GMint[m_verticesCount];
-	GMint first = m_offset;
-	for (GMuint i = 0; i < m_verticesCount / m_edgeCountPerPolygon; i++)
-	{
-		m_firstPtr[i] = offset;
-		m_countPtr[i] = m_edgeCountPerPolygon;
-		offset += m_edgeCountPerPolygon;
 	}
 }
 
@@ -105,7 +73,6 @@ ChildObject::~ChildObject()
 void ChildObject::appendComponent(AUTORELEASE Component* component, GMuint verticesCount)
 {
 	component->m_verticesCount = verticesCount;
-	component->generatePolygonProperties();
 	m_components.push_back(component);
 }
 

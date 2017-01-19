@@ -172,9 +172,9 @@ void CubeGameObject::initCoreObject()
 		if (i % 16 == 0)
 		{
 			Component* c = new Component();
-			c->setEdgeCountPerPolygon(4);
 			memcpy(&c->getMaterial(), &m_eachMaterial[(int)(i / 16)], sizeof(Material));
 			c->setOffset(i / 4);
+			c->pushBackVertexOffset(4);
 			coreChildObject->appendComponent(c, 4);
 		}
 		coreChildObject->vertices().push_back(vertices[i]);

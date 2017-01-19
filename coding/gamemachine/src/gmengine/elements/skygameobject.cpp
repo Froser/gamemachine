@@ -154,12 +154,12 @@ void SkyGameObject::initCoreObject()
 		if (i % 16 == 0)
 		{
 			Component* c = new Component();
-			c->setEdgeCountPerPolygon(4);
 			c->setOffset(i / 4);
 			c->getMaterial().textures[(int)(i / 16)] = textureInfo;
 			c->getMaterial().Ka[0] = 1.0f;
 			c->getMaterial().Ka[1] = 1.0f;
 			c->getMaterial().Ka[2] = 1.0f;
+			c->pushBackVertexOffset(4);
 			coreChildObj->appendComponent(c, 4);
 		}
 		coreChildObj->vertices().push_back(vertices[i]);

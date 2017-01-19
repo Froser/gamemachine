@@ -49,7 +49,6 @@ void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Chi
 	// Top
 	{
 		Component* c = new Component();
-		c->setEdgeCountPerPolygon(3);
 		c->setOffset(0);
 		Point top = getNormal(0, 0);
 		Point first = getNormal(0, vStep);
@@ -62,6 +61,7 @@ void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Chi
 			pushPoint(sphere->vertices(), sphere->normals(), first, radius);
 			pushPoint(sphere->vertices(), sphere->normals(), next, radius);
 			first = next;
+			c->pushBackVertexOffset(3);
 		}
 		offset = 3 * slices;
 		sphere->appendComponent(c, offset);
@@ -70,7 +70,6 @@ void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Chi
 	// Mid
 	{
 		Component* c = new Component();
-		c->setEdgeCountPerPolygon(4);
 		c->setOffset(offset);
 		GMfloat u = 0, v = vStep;
 	
@@ -86,6 +85,7 @@ void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Chi
 				pushPoint(sphere->vertices(), sphere->normals(), bl, radius);
 				pushPoint(sphere->vertices(), sphere->normals(), br, radius);
 				pushPoint(sphere->vertices(), sphere->normals(), tr, radius);
+				c->pushBackVertexOffset(4);
 			}
 		}
 	
@@ -98,7 +98,6 @@ void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Chi
 	{
 		GMfloat v = 1 - vStep;
 		Component* c = new Component();
-		c->setEdgeCountPerPolygon(3);
 		c->setOffset(offset);
 		Point bottom = getNormal(0, 1);
 		Point first = getNormal(0, v);
@@ -109,6 +108,7 @@ void Algorithm::createSphere(GMfloat radius, GMint slices, GLint stacks, OUT Chi
 			pushPoint(sphere->vertices(), sphere->normals(), first, radius);
 			pushPoint(sphere->vertices(), sphere->normals(), bottom, radius);
 			pushPoint(sphere->vertices(), sphere->normals(), next, radius);
+			c->pushBackVertexOffset(3);
 			first = next;
 		}
 		sphere->appendComponent(c, 3 * slices);

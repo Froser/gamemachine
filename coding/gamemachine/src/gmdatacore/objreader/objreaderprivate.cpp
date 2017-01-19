@@ -120,10 +120,7 @@ void ObjReaderPrivate::parseLine(const char* line)
 			char subCmd[LINE_MAX];
 			scanner.next(subCmd);
 			if (strlen(subCmd) == 0)
-			{
-				m_currentComponent->setEdgeCountPerPolygon(edgeCount);
 				break;
-			}
 
 			edgeCount++;
 			Scanner faceScanner(subCmd, false, isSeparator);
@@ -141,6 +138,8 @@ void ObjReaderPrivate::parseLine(const char* line)
 			pushUVVector(m_currentChildObject->uvs(), m_uvs, i2);
 			pushVector(m_currentChildObject->normals(), m_normals, i3);
 		} while (true);
+
+		m_currentComponent->pushBackVertexOffset(edgeCount);
 	}
 	else if (strEqual(command, KW_MTLLIB))
 	{

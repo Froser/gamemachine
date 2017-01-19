@@ -58,7 +58,7 @@ struct TextureInfo
 
 enum
 {
-	MaxTextureCount = 5
+	MaxTextureCount = 6
 };
 
 struct Material
@@ -83,19 +83,7 @@ public:
 	};
 
 	Component();
-	Component(GMuint edgeCountPerPolygon);
 	~Component();
-
-	void setEdgeCountPerPolygon(GMuint edgeCountPerPolygon)
-	{
-		if (edgeCountPerPolygon > m_edgeCountPerPolygon)
-			m_edgeCountPerPolygon = edgeCountPerPolygon;
-	}
-
-	GMuint getEdgeCountPerPolygon()
-	{
-		return m_edgeCountPerPolygon;
-	}
 
 	Material& getMaterial()
 	{
@@ -117,39 +105,40 @@ public:
 		return m_verticesCount;
 	}
 
-	GMint* getFirstPtr()
+	// 每增加一个面的时候，应该调用此函数记录这个面有多少条边
+	void pushBackVertexOffset(GMuint edgesCount)
 	{
-		return m_firstPtr;
+		m_vertexOffsets.push_back(m_polygonEdges.empty() ?
+			m_offset : m_vertexOffsets.back() + m_polygonEdges.back()
+		);
+		m_polygonEdges.push_back(edgesCount);
+		m_polygonCount++;
 	}
 
-	GMint* getCountPtr()
+	GMint* getOffsetPtr()
 	{
-		return m_countPtr;
+		return m_vertexOffsets.data();
+	}
+
+	GMint* getEdgeCountPtr()
+	{
+		return m_polygonEdges.data();
 	}
 
 	GMuint getPolygonCount()
 	{
-		return m_verticesCount / m_edgeCountPerPolygon;
+		return m_polygonCount;
 	}
-
-	void generatePolygonProperties();
 
 private:
 	GMuint m_verticesCount;
 	GMvertexoffset m_offset;
 	Material m_material;
-	GMuint m_edgeCountPerPolygon;
 
-// 多边形属性
-	GMint* m_firstPtr;
-	GMint* m_countPtr;
-};
-
-struct Group
-{
-	GMuint vertexCount;
-	GMuint vertexOffset;
-	std::string name;
+	// 每一个面的顶点个数
+	std::vector<GMint> m_polygonEdges;
+	std::vector<GMint> m_vertexOffsets;
+	GMuint m_polygonCount;
 };
 
 class Object

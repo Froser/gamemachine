@@ -246,8 +246,15 @@ void SinglePrimitiveGameObject::createTriangleMesh()
 	collisionShape2TriangleMesh(d.collisionShape, trans, childObj->vertices(), childObj->normals(), indices);
 
 	// 所有的Mesh，都采用同一材质
-	Component* component = new Component(3);
+	Component* component = new Component();
 	memcpy(&component->getMaterial(), &m_material, sizeof(Material));
+
+	// 把每个面的顶点数（边数）传入Component
+	for (GMuint i = 0; i < childObj->vertices().size() / 4; i++)
+	{
+		component->pushBackVertexOffset(3);
+	}
+
 	childObj->appendComponent(component, indices.size());
 
 	obj->append(childObj);

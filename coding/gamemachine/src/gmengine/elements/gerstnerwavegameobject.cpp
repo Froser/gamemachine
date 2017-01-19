@@ -247,9 +247,10 @@ Object* GerstnerWaveGameObject::createCoreObject()
 
 	for (int c = 0; c < (m_props.stripCount - 1); c++)
 	{
-		Component* component = new Component(m_props.stripLength * 2);
+		Component* component = new Component();
 		memcpy(&component->getMaterial(), &m_material, sizeof(Material));
 		component->setOffset(m_props.stripLength * 2 * c);
+		component->pushBackVertexOffset(m_props.stripLength * 2);
 		childObj->appendComponent(component, m_props.stripLength * 2);
 	}
 

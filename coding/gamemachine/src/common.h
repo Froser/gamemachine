@@ -51,7 +51,7 @@ T* GM_new()
 
 END_NS
 
-#define LINE_MAX 256
+#define LINE_MAX 2048
 
 //Tools:
 #define PI 3.141592653f

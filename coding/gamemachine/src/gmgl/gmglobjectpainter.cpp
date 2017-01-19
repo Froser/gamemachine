@@ -98,7 +98,7 @@ void GMGLObjectPainter::draw()
 
 			GLenum mode = getMode(childObj);
 			glMultiDrawArrays(params[1] == GL_FILL ? mode : GL_LINE_LOOP,
-				component->getFirstPtr(), component->getCountPtr(), component->getPolygonCount());
+				component->getOffsetPtr(), component->getEdgeCountPtr(), component->getPolygonCount());
 
 			if (!m_shadowMapping.hasBegun())
 				endTextures(textureInfos);
