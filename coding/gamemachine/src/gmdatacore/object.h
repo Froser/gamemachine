@@ -206,6 +206,8 @@ public:
 	ChildObject(const std::string& name);
 	~ChildObject();
 
+	void clone(OUT ChildObject** childObject);
+
 	void disposeMemory();
 
 	void appendComponent(AUTORELEASE Component* component, GMuint verticesCount);
@@ -253,6 +255,11 @@ public:
 	void setName(const char* name)
 	{
 		m_name = name;
+	}
+
+	const std::string& getName()
+	{
+		return m_name;
 	}
 
 	GMuint getBufferId() { return m_bufferId; }

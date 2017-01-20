@@ -3,6 +3,8 @@
 #include "common.h"
 #include "convexhullgameobject.h"
 #include <vector>
+#include <map>
+#include <string>
 BEGIN_NS
 
 class CompoundConvexHullGameObject : public ConvexHullGameObject
@@ -16,6 +18,7 @@ private:
 
 private:
 	std::vector<btConvexHullShape*> m_childs;
+	std::multimap<std::string, btCollisionShape*> m_nameSet;
 };
 
 END_NS

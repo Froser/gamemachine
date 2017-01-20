@@ -118,7 +118,7 @@ void GMGLGraphicEngine::setEyeViewport(bool shadowOn, GMGLShaders& shaders)
 		glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
 		GMGL::uniformMatrix4(shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
 	}
-	GMGL::perspective(30, 2, 1, 2000, shaders, GMSHADER_PROJECTION_MATRIX);
+	GMGL::perspective(60, 2, 1, 2000, shaders, GMSHADER_PROJECTION_MATRIX);
 }
 
 void GMGLGraphicEngine::shadowTexture(bool shadowOn, GMGLShaders& shaders)

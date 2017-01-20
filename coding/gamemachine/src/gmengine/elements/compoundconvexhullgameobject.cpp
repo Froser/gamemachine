@@ -25,6 +25,7 @@ btCollisionShape* CompoundConvexHullGameObject::createCollisionShape()
 		btConvexHullShape* convex = new btConvexHullShape(childObj->vertices().data(), childObj->vertices().size() / 4, sizeof(Object::DataType) * 4);
 		compound->addChildShape(btTransform::getIdentity(), convex);
 		m_childs.push_back(convex);
+		m_nameSet.insert(std::make_pair(childObj->getName(), convex));
 	}
 	END_FOREACH_OBJ
 
