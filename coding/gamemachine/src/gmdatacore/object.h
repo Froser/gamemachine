@@ -212,6 +212,8 @@ public:
 
 	void appendComponent(AUTORELEASE Component* component, GMuint verticesCount);
 
+	void calculateTangentSpace();
+
 	std::vector<AUTORELEASE Component*>& getComponents()
 	{
 		return m_components;
@@ -230,6 +232,11 @@ public:
 	std::vector<Object::DataType>& uvs()
 	{
 		return m_uvs;
+	}
+
+	std::vector<Object::DataType>& tangents()
+	{
+		return m_tangents;
 	}
 
 	ObjectType getType()
@@ -271,6 +278,7 @@ private:
 	std::vector<Object::DataType> m_vertices;
 	std::vector<Object::DataType> m_normals;
 	std::vector<Object::DataType> m_uvs;
+	std::vector<Object::DataType> m_tangents;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
 	std::vector<Component*> m_components;

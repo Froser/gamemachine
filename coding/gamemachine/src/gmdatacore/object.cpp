@@ -82,3 +82,44 @@ void ChildObject::disposeMemory()
 	m_normals.clear();
 	m_uvs.clear();
 }
+
+void ChildObject::calculateTangentSpace()
+{
+	if (m_uvs.size() == 0)
+		return;
+
+	for (auto iter = m_components.begin(); iter != m_components.end(); iter++)
+	{
+		Component* component = (*iter);
+		for (GMuint i = 0; i < component->getPolygonCount(); i++)
+		{
+			GMint offset = component->getOffsetPtr()[i];
+			GMint edgeCount = component->getEdgeCountPtr()[i];
+
+			// 开始计算每条边切线空间
+			for (GMuint j = 0; j < edgeCount; j++)
+			{
+				vmath::vec2 uv0(m_uvs[(offset + j) * 2], m_uvs[(offset + j) * 2 + 1]);
+				vmath::vec2 uv1, uv2;
+				if (j == edgeCount - 2)
+				{
+					uv1 = vmath::vec2(m_uvs[(offset + j + 1) * 2], m_uvs[(offset + j + 1) * 2 + 1]);
+					uv2 = vmath::vec2(m_uvs[offset * 2], m_uvs[offset * 2 + 1]);
+				}
+				else if (j == edgeCount - 1)
+				{
+					uv1 = vmath::vec2(m_uvs[offset * 2], m_uvs[offset * 2 + 1]);
+					uv1 = vmath::vec2(m_uvs[(offset + 1) * 2], m_uvs[(offset + 1) * 2 + 1]);
+				}
+				else
+				{
+					uv1 = vmath::vec2(m_uvs[(offset + j + 1) * 2], m_uvs[(offset + j + 1) * 2 + 1]);
+					uv2 = vmath::vec2(m_uvs[(offset + j + 2) * 2], m_uvs[(offset + j + 2) * 2 + 1]);
+				}
+
+				vmath::vec2 deltaUV1 = uv1 - uv0;
+				vmath::vec2 deltaUV2 = uv2 - uv0;
+			}
+		}
+	}
+}

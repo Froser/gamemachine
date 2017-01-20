@@ -38,9 +38,10 @@ void GMGLObjectPainter::transfer()
 		return;
 
 	Object* obj = getObject();
-
 	BEGIN_FOREACH_OBJ(obj, childObj)
 	{
+		childObj->calculateTangentSpace();
+
 		GLuint vao;
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
@@ -49,14 +50,16 @@ void GMGLObjectPainter::transfer()
 		GLuint vaoSize = sizeof(Object::DataType) * childObj->vertices().size();
 		GLuint normalSize = sizeof(Object::DataType) * childObj->normals().size();
 		GLuint uvSize = sizeof(Object::DataType) * childObj->uvs().size();
+		GLuint tangentSize = sizeof(Object::DataType) * childObj->tangents().size();
 
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize, NULL, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize, NULL, GL_STATIC_DRAW);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, vaoSize, childObj->vertices().data());
 		glBufferSubData(GL_ARRAY_BUFFER, vaoSize, normalSize, childObj->normals().data());
 		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize, uvSize, childObj->uvs().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize, tangentSize, childObj->tangents().data());
 		childObj->setBufferId(vbo);
 
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
