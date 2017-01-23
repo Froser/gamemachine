@@ -1,86 +1,10 @@
 #version 330 core
 
-// 这是一套非常恶心的宏定义，是用于兼容不同机器对glsl的支持
-// 有些显卡不支持结构体，因此我用一套宏来进行区分
-#define STRUCT_SUPPORT 0
+in vec4 position_world;
+in vec4 _normal;
+in vec2 _uv;
+in vec4 _tangent;
 
-// 定义一个结构体
-#if STRUCT_SUPPORT
-#define BEGIN_STRUCT(name) struct name {
-#else
-#define BEGIN_STRUCT(name)
-#endif
-
-// 定义结构体成员
-#if STRUCT_SUPPORT
-#define STRUCT_MEMBER_OUT
-#else
-#define STRUCT_MEMBER_OUT out
-#endif
-
-// 定义结构体成员
-#if STRUCT_SUPPORT
-#define STRUCT_MEMBER_IN
-#else
-#define STRUCT_MEMBER_IN in
-#endif
-
-// 结束一个结构体
-#if STRUCT_SUPPORT
-#define END_STRUCT }
-#else
-#define END_STRUCT
-#endif
-
-// 实例化一个结构体
-#if STRUCT_SUPPORT
-#define DIM(type, name) type name
-#else
-#define DIM(type, name)
-#endif
-
-// 取结构体成员
-#if STRUCT_SUPPORT
-#define MEMBER(name, value) name.value
-#else
-#define MEMBER(name, value) value
-#endif
-
-// 结构体返回类型
-#if STRUCT_SUPPORT
-#define RET(type) type
-#else
-#define RET(type) void
-#endif
-
-// 返回成员
-#if STRUCT_SUPPORT
-#define RETURN(name) return name
-#else
-#define RETURN(name)
-#endif
-
-// 定义out结构体变量
-#if STRUCT_SUPPORT
-#define OUT(type, name) out type name
-#else
-#define OUT(type, name)
-#endif
-
-// 定义out结构体变量
-#if STRUCT_SUPPORT
-#define IN(type, name) in type name
-#else
-#define IN(type, name)
-#endif
-
-// 结构体赋值
-#if STRUCT_SUPPORT
-#define ASSIGN(var, value) var = value
-#else
-#define ASSIGN(var, value) value
-#endif
-/////////////////////////////////////////////////////
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
 uniform int GM_shadow_texture_switch = 0;
@@ -97,6 +21,11 @@ uniform int GM_diffuse_texture_switch = 0;
 uniform samplerCube GM_reflection_cubemap_texture;
 uniform int GM_reflection_cubemap_texture_switch = 0;
 
+// 法线贴图纹理
+uniform sampler2D GM_normal_mapping_texture;
+uniform int GM_normal_mapping_texture_switch = 0;
+
+uniform mat4 GM_view_matrix;
 uniform vec4 GM_light_ambient;
 uniform vec4 GM_light_ka;
 uniform vec4 GM_light_specular;
@@ -104,48 +33,16 @@ uniform vec4 GM_light_kd;
 uniform vec4 GM_light_ks;
 uniform vec4 GM_light_ke;
 
-BEGIN_STRUCT(_Coords)
-    // 顶点世界坐标
-    STRUCT_MEMBER_IN vec4 worldCoord;
+uniform vec4 GM_light_position;
+uniform float GM_light_shininess;
+uniform mat4 GM_model_matrix;
 
-    // 顶点在视角变换后的坐标
-    STRUCT_MEMBER_IN vec4 modelViewCoord;
+vec3 DEBUG;
 
-    // 投影后的最终坐标
-    STRUCT_MEMBER_IN vec4 projectionCoord;
-
-    // 变换后的世界坐标标准法向量
-    STRUCT_MEMBER_IN vec3 worldNormalCoord;
-
-    // 灯光照射方向（目前灯光最多数量为1）
-    STRUCT_MEMBER_IN vec3 lightDirection;
-
-    // 视角方向
-    STRUCT_MEMBER_IN vec3 viewDirection;
-
-    // 阴影坐标
-    STRUCT_MEMBER_IN vec4 shadowCoord;
-END_STRUCT;
-IN(_Coords, coords);
-
-BEGIN_STRUCT(_TextureUVs)
-    // 环境光贴图坐标
-    STRUCT_MEMBER_IN vec2 textureUV;
-
-    // CubeMap贴图坐标
-    STRUCT_MEMBER_IN vec3 cubemapUV;
-END_STRUCT;
-IN(_TextureUVs, textureUVs);
-
-BEGIN_STRUCT(_LightFactors)
-    // 漫反射系数
-    STRUCT_MEMBER_IN float diffuse;
-
-    // 镜面反射系数
-    STRUCT_MEMBER_IN float specular;
-END_STRUCT;
-IN(_LightFactors, lightFactors);
-
+// 漫反射系数
+float g_diffuse;
+// 镜面反射系数
+float g_specular;
 out vec4 frag_color;
 
 float calcuateShadeFactor(vec4 shadowCoord)
@@ -168,26 +65,86 @@ float shadeFactorFactor(float shadeFactor)
     return min(shadeFactor + 0.3, 1);
 }
 
+void calcDiffuseAndSpecular(vec3 lightDirection, vec3 eyeDirection, vec3 normal)
+{
+    //diffuse:
+    {
+        g_diffuse = dot(lightDirection, normal);
+        g_diffuse = clamp(g_diffuse, 0.0f, 1.0f);
+    }
+
+    // specular
+    {
+        vec3 E = normalize(eyeDirection);
+        vec3 R = reflect(-E, normal);
+        float theta = dot(E, R);
+        g_specular = pow(theta, GM_light_shininess);
+        g_specular = clamp(g_specular, 0.0f, 1.0f);
+    }
+}
+
+// 由顶点变换矩阵计算法向量变换矩阵
+mat4 calcNormalWorldTransformMatrix()
+{
+    mat4 normalInverseMatrix = inverse(GM_model_matrix);
+    mat4 normalWorldTransformMatrix = transpose(normalInverseMatrix);
+    return normalWorldTransformMatrix;
+}
+
+void calcLights()
+{
+    vec4 position_eye = GM_view_matrix * position_world;
+    vec3 eyeDirection_eye = normalize(vec3(0,0,0) - position_eye.xyz);
+    vec3 lightPosition_eye = (GM_view_matrix * GM_light_position).xyz;
+    vec3 lightDirection_eye = normalize(lightPosition_eye + eyeDirection_eye);
+    vec3 normal_eye = normalize((GM_view_matrix * calcNormalWorldTransformMatrix() * _normal).xyz);
+
+    if (GM_normal_mapping_texture_switch == 0)
+    {
+        calcDiffuseAndSpecular(lightDirection_eye, eyeDirection_eye, normal_eye);
+    }
+    else
+    {
+        vec3 tangent_eye = normalize((GM_view_matrix * calcNormalWorldTransformMatrix() * _tangent).xyz);
+        vec3 bitangent_eye = cross(tangent_eye, normal_eye);
+        mat3 TBN = transpose(mat3(
+            tangent_eye,
+            bitangent_eye,
+            normal_eye.xyz
+        ));
+
+        vec3 lightDirection_tangent = normalize(TBN * lightDirection_eye);
+        vec3 eyeDirection_tangent = normalize(TBN * eyeDirection_eye);
+        vec3 normal_tangent = normalize(texture(GM_normal_mapping_texture, _uv).rgb * 2.0 - 1.0);
+
+        calcDiffuseAndSpecular(lightDirection_tangent, eyeDirection_tangent, normal_tangent);
+        //DEBUG.rgb = _tangent.xyz;
+    }
+}
+
 void drawObject()
 {
+    calcLights();
+
     // 计算阴影系数
-    float shadeFactor = shadeFactorFactor(calcuateShadeFactor(MEMBER(coords, shadowCoord)));
+    float shadeFactor = 1;//shadeFactorFactor(calcuateShadeFactor(shadowCoord));
 
     // 环境光
     vec3 ambientLight = vec3(0);
 
     // 计算点光源（漫反射、Kd和镜面反射）
-    vec3 diffuseLight = MEMBER(lightFactors, diffuse) * vec3(GM_light_specular);
-    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(texture(GM_diffuse_texture, MEMBER(textureUVs,textureUV))) : vec3(0);
+    vec3 diffuseLight = g_diffuse * vec3(GM_light_kd);
+    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(texture(GM_diffuse_texture, _uv)) : vec3(0);
     diffuseLight += diffuseTextureColor;
-    diffuseLight *= vec3(GM_light_kd);
+    diffuseLight *= vec3(GM_light_specular);
 
-    vec3 specularLight = MEMBER(lightFactors, specular) * vec3(GM_light_specular) * vec3(GM_light_ks);
+    vec3 specularLight = g_specular * vec3(GM_light_specular) * vec3(GM_light_ks);
 
+/*
     // 根据环境反射度来反射天空盒（如果有的话）
     if (GM_reflection_cubemap_texture_switch == 1)
     {
-        vec3 reflectionCoord = reflect(-MEMBER(coords, viewDirection), MEMBER(coords, worldNormalCoord).xyz);
+        vec3 reflectionCoord = reflect(-viewDirection, worldNormalCoord.xyz);
         // 乘以shadeFactor是因为阴影会遮挡反射光
         if (GM_light_ke.x > 0 && GM_light_ke.y > 0 && GM_light_ke.z > 0)
         {
@@ -195,15 +152,17 @@ void drawObject()
             ambientLight += color_from_reflection;
         }
     }
+*/
 
     // 计算环境光和Ka贴图
-    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, MEMBER(textureUVs,textureUV))) : vec3(0);
-    ambientLight += GM_light_ambient.xyz + shadeFactor * ambientTextureColor;
-    ambientLight *= vec3(GM_light_ka);
+    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(0);
+    ambientLight += GM_light_ka.xyz + shadeFactor * ambientTextureColor;
+    ambientLight *= vec3(GM_light_ambient);
 
     // 最终结果
     vec3 color = ambientLight + shadeFactor * (diffuseLight + specularLight);
     frag_color = vec4(color, 1.0f);
+    //frag_color = vec4(DEBUG, 1);
 }
 
 void main()

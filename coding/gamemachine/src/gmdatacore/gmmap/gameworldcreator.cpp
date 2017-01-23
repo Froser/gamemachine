@@ -122,7 +122,7 @@ RESOURCE_FUNC std::string getModelPath(GMMap* map, const GMMapString& name)
 }
 
 typedef std::pair<ITexture*, TextureType> TextureFindResult;
-static TextureFindResult getTextureForResourceContainer(ResourceContainer* resContainer, ID textureID)
+static TextureFindResult getTextureFormResourceContainer(ResourceContainer* resContainer, ID textureID)
 {
 	const TextureContainer::TextureItem* texture = resContainer->getTextureContainer().find(textureID);
 	ITexture* coreTexture = texture ? texture->texture : nullptr;
@@ -151,7 +151,8 @@ CREATE_FUNC void createCube(IFactory* factory,
 	ASSERT(GMMapEntity::MAX_REF >= 6);
 	for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
 	{
-		TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[i]);
+		TextureFindResult texture = getTextureFormResourceContainer(resContainer, entity->textureRef[i]);
+		TextureFindResult normalMappingTexture = getTextureFormResourceContainer(resContainer, entity->normalMappingRef[i]);
 
 		// 拷贝材质
 		const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[i]);
@@ -160,10 +161,12 @@ CREATE_FUNC void createCube(IFactory* factory,
 			materials[i] = material->material;
 			materials[i].textures->texture = texture.first;
 			materials[i].textures->type = texture.second;
+			materials[i].textures->normalMapping = normalMappingTexture.first;
 		}
 		else
 		{
-			materials[i] = Material();
+			Material m = { 0 };
+			materials[i] = m;
 		}
 	}
 
@@ -204,7 +207,7 @@ CREATE_FUNC void createSphere(IFactory* factory,
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	Material m = material ? material->material : Material();
 
-	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	TextureFindResult texture = getTextureFormResourceContainer(resContainer, entity->textureRef[0]);
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
@@ -232,7 +235,7 @@ CREATE_FUNC void createSky(IFactory* factory,
 {
 	ASSERT(gameObj);
 
-	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	TextureFindResult texture = getTextureFormResourceContainer(resContainer, entity->textureRef[0]);
 	ASSERT(texture.first != nullptr);
 
 	*gameObj = new SkyGameObject(object->radius, texture.first);
@@ -318,7 +321,7 @@ CREATE_FUNC void createSinglePrimitive(IFactory* factory,
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	Material m = material ? material->material : Material();
 
-	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	TextureFindResult texture = getTextureFormResourceContainer(resContainer, entity->textureRef[0]);
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 
@@ -346,7 +349,7 @@ CREATE_FUNC void createGerstnerWave(IFactory* factory,
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	Material m = material ? material->material : Material();
 
-	TextureFindResult texture = getTextureForResourceContainer(resContainer, entity->textureRef[0]);
+	TextureFindResult texture = getTextureFormResourceContainer(resContainer, entity->textureRef[0]);
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
 

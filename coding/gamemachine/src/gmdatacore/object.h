@@ -43,6 +43,7 @@ enum TextureType
 	TextureTypeAmbient = TextureTypeResetStart,
 	TextureTypeCubeMap,
 	TextureTypeDiffuse,
+	TextureTypeNormalMapping,
 	TextureTypeResetEnd,
 
 	// 由于反射的天空纹理存在于环境，所以不需要清理
@@ -52,6 +53,7 @@ enum TextureType
 struct TextureInfo
 {
 	ITexture* texture;
+	ITexture* normalMapping;
 	TextureType type;
 	GMuint autorelease : 1;
 };

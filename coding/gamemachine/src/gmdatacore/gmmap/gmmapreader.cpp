@@ -186,6 +186,27 @@ static bool handleEntities(TiXmlElement& elem, GMMap* map)
 			}
 		}
 
+
+		{
+			const char* r = child->Attribute("normalmappingref");
+			if (r)
+			{
+				for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
+				{
+					SAFE_SSCANF(r, "%i", &entity.normalMappingRef[i]);
+				}
+			}
+
+			for (GMuint i = 0; i < GMMapEntity::MAX_REF; i++)
+			{
+				char ref[32] = "normalmappingref_";
+				char str[32];
+				sprintf(str, "%d", i + 1);
+				strcat_s(ref, str);
+				SAFE_SSCANF(child->Attribute(ref), "%i", &entity.normalMappingRef[i]);
+			}
+		}
+
 		{
 			const char* r = child->Attribute("materialref");
 			if (r)
@@ -205,6 +226,7 @@ static bool handleEntities(TiXmlElement& elem, GMMap* map)
 				SAFE_SSCANF(child->Attribute(ref), "%i", &entity.materialRef[i]);
 			}
 		}
+
 		map->entities.insert(entity);
 	}
 

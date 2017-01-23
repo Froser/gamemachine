@@ -11,6 +11,7 @@ GMGLTextureShaderNames::GMGLTextureShaderNames()
 	m_uniformNames[TextureTypeAmbient] = GMSHADER_AMBIENT_TEXTURE;
 	m_uniformNames[TextureTypeCubeMap] = GMSHADER_CUBEMAP_TEXTURE;
 	m_uniformNames[TextureTypeDiffuse] = GMSHADER_DIFFUSE_TEXTURE;
+	m_uniformNames[TextureTypeNormalMapping] = GMSHADER_NORMAL_MAPPING_TEXTURE;
 	m_uniformNames[TextureTypeReflectionCubeMap] = GMSHADER_REFLECTION_CUBEMAP_TEXTURE;
 }
 

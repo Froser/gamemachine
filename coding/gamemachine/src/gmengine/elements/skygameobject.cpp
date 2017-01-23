@@ -147,7 +147,7 @@ void SkyGameObject::initCoreObject()
 	ChildObject* coreChildObj = new ChildObject();
 
 	TextureInfo textureInfo = {
-		m_texture, TextureTypeCubeMap
+		m_texture, nullptr, TextureTypeCubeMap
 	};
 	for (GMuint i = 0; i < 4 * 6 * 4; i++)
 	{

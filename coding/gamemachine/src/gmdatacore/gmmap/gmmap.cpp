@@ -11,6 +11,8 @@ TextureType GMMapTexture::getType(const char* name)
 		return TextureType::TextureTypeAmbient;
 	if (strEqual("cubemap", name))
 		return TextureType::TextureTypeCubeMap;
+	if (strEqual("normalmapping", name))
+		return TextureType::TextureTypeNormalMapping;
 
 	ASSERT(false);
 	return TextureTypeUnknown;

@@ -148,6 +148,7 @@ struct GMMapEntity
 	ID id;
 	ID objRef;
 	ID materialRef[MAX_REF];
+	ID normalMappingRef[MAX_REF];
 	ID textureRef[MAX_REF];
 };
 

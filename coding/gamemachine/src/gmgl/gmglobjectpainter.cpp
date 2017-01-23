@@ -165,6 +165,13 @@ void GMGLObjectPainter::beginTextures(TextureInfo* startTexture, ChildObject::Ob
 			t->beginTexture(info.type);
 			GMGL::uniformTextureIndex(*m_engine->getShaders(type), info.type, getTextureUniformName(info.type));
 		}
+
+		t = info.normalMapping;
+		if (t)
+		{
+			t->beginTexture(TextureTypeNormalMapping);
+			GMGL::uniformTextureIndex(*m_engine->getShaders(type), TextureTypeNormalMapping, getTextureUniformName(TextureTypeNormalMapping));
+		}
 	}
 }
 
@@ -174,9 +181,11 @@ void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
 	{
 		ITexture* t = startTexture[i].texture;
 		if (t)
-		{
 			t->endTexture();
-		}
+
+		t = startTexture[i].normalMapping;
+		if (t)
+			t->endTexture();
 	}
 }
 

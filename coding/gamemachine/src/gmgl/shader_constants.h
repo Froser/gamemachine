@@ -22,6 +22,7 @@ BEGIN_NS
 #define		GMSHADER_AMBIENT_TEXTURE			GMSHADER("ambient_texture")
 #define		GMSHADER_CUBEMAP_TEXTURE			GMSHADER("cubemap_texture")
 #define		GMSHADER_DIFFUSE_TEXTURE			GMSHADER("diffuse_texture")
+#define		GMSHADER_NORMAL_MAPPING_TEXTURE		GMSHADER("normal_mapping_texture")
 #define		GMSHADER_REFLECTION_CUBEMAP_TEXTURE	GMSHADER("reflection_cubemap_texture")
 
 END_NS
