@@ -350,8 +350,10 @@ CREATE_FUNC void createGerstnerWave(IFactory* factory,
 	Material m = material ? material->material : Material();
 
 	TextureFindResult texture = getTextureFormResourceContainer(resContainer, entity->textureRef[0]);
+	TextureFindResult normalMappingTexture = getTextureFormResourceContainer(resContainer, entity->normalMappingRef[0]);
 	m.textures->texture = texture.first;
 	m.textures->type = texture.second;
+	m.textures->normalMapping = normalMappingTexture.first;
 
 	GerstnerWaveGameObject* obj = new GerstnerWaveGameObject(
 		m, object->magnification, 

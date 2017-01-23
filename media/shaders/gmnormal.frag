@@ -4,6 +4,7 @@ in vec4 position_world;
 in vec4 _normal;
 in vec2 _uv;
 in vec4 _tangent;
+in vec4 shadowCoord;
 
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
@@ -36,6 +37,7 @@ uniform vec4 GM_light_ke;
 uniform vec4 GM_light_position;
 uniform float GM_light_shininess;
 uniform mat4 GM_model_matrix;
+uniform vec4 GM_view_position;
 
 vec3 DEBUG;
 
@@ -127,7 +129,7 @@ void drawObject()
     calcLights();
 
     // 计算阴影系数
-    float shadeFactor = 1;//shadeFactorFactor(calcuateShadeFactor(shadowCoord));
+    float shadeFactor = shadeFactorFactor(calcuateShadeFactor(shadowCoord));
 
     // 环境光
     vec3 ambientLight = vec3(0);
@@ -140,11 +142,11 @@ void drawObject()
 
     vec3 specularLight = g_specular * vec3(GM_light_specular) * vec3(GM_light_ks);
 
-/*
     // 根据环境反射度来反射天空盒（如果有的话）
     if (GM_reflection_cubemap_texture_switch == 1)
     {
-        vec3 reflectionCoord = reflect(-viewDirection, worldNormalCoord.xyz);
+        vec3 viewDirection = normalize(GM_view_position.xyz - position_world.xyz);
+        vec3 reflectionCoord = reflect(-viewDirection, (calcNormalWorldTransformMatrix() * _normal).xyz);
         // 乘以shadeFactor是因为阴影会遮挡反射光
         if (GM_light_ke.x > 0 && GM_light_ke.y > 0 && GM_light_ke.z > 0)
         {
@@ -152,7 +154,6 @@ void drawObject()
             ambientLight += color_from_reflection;
         }
     }
-*/
 
     // 计算环境光和Ka贴图
     vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(0);
