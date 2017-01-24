@@ -271,6 +271,16 @@ public:
 		return m_name;
 	}
 
+	void setVisibility(bool v)
+	{
+		m_visibility = v;
+	}
+
+	bool getVisibility()
+	{
+		return m_visibility;
+	}
+
 	GMuint getBufferId() { return m_bufferId; }
 	GMuint getArrayId() { return m_arrayId; }
 	void setBufferId(GMuint id) { m_bufferId = id; }
@@ -287,6 +297,7 @@ private:
 	ObjectType m_type;
 	ArrangementMode m_mode;
 	std::string m_name;
+	bool m_visibility;
 };
 
 END_NS

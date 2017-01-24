@@ -206,6 +206,7 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
+	glEnable(GL_CULL_FACE);
 	gameMachine = new GameMachine(
 		settings,
 		new GMGLWindow(lpCmdLine, "GM", false ),

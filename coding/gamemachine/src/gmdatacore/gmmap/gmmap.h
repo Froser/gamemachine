@@ -168,6 +168,7 @@ struct GMMapInstance
 	GMfloat scale[3];
 	GMfloat mass;
 	Frictions frictions;
+	GMuint invisible;
 };
 
 struct GMMapLight
@@ -214,6 +215,13 @@ struct GMMapKeyframes
 	Type type;
 };
 
+struct GMMapReplacement
+{
+	ID source;
+	ID dest;
+	GMMapString objectname;
+};
+
 struct GMMapSettings
 {
 	struct Character
@@ -245,6 +253,7 @@ struct GMMap
 	GMMapSet<GMMapInstance, ID_Less<GMMapInstance>> instances;
 	GMMapSet<GMMapLight, ID_Less<GMMapLight>> lights;
 	GMMapSet<GMMapKeyframes, ID_Less<GMMapKeyframes>> animations;
+	std::vector<GMMapReplacement> replacements;
 	GMMapSettings settings;
 	std::string workingDir;
 };

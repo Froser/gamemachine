@@ -30,6 +30,7 @@ struct GameObjectPrivate
 {
 	GameObjectPrivate();
 
+	GMuint id;
 	btVector3 localScaling;
 	btTransform transform;
 	btScalar mass;

@@ -184,3 +184,15 @@ void GameWorld::createPainterForObject(GameObject* obj)
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
 }
+
+GameObject* GameWorld::findGameObjectById(GMuint id)
+{
+	D(d);
+	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
+	{
+		if ((*iter)->getId() == id)
+			return (*iter);
+	}
+
+	return nullptr;
+}

@@ -85,6 +85,9 @@ void GMGLObjectPainter::draw()
 
 	BEGIN_FOREACH_OBJ(obj, childObj)
 	{
+		if (!childObj->getVisibility())
+			continue;
+
 		glBindVertexArray(childObj->getArrayId());
 		GLint params[2];
 		glGetIntegerv(GL_POLYGON_MODE, params);

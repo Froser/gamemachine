@@ -14,6 +14,7 @@ class Character;
 class GameMachine;
 struct IGraphicEngine;
 class GameLight;
+class GameObject;
 
 class GameWorld
 {
@@ -39,6 +40,8 @@ public:
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();
 	GMfloat getElapsed();
+	
+	GameObject* findGameObjectById(GMuint id);
 
 private:
 	void createPainterForObject(GameObject* obj);

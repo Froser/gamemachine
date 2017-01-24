@@ -242,6 +242,7 @@ static bool handleInstances(TiXmlElement& elem, GMMap* map)
 		SAFE_SSCANF(child->Attribute("entityref"), "%i", &instance.entityRef);
 		SAFE_SSCANF(child->Attribute("animationduration"), "%f", &instance.animationDuration);
 		SAFE_SSCANF(child->Attribute("mass"), "%f", &instance.mass);
+		SAFE_SSCANF(child->Attribute("invisible"), "%i", &instance.invisible);
 
 		{
 			Scanner scanner(child->Attribute("animationref"));
@@ -439,6 +440,20 @@ static bool handleAnimations(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
+static bool handleReplacements(TiXmlElement& elem, GMMap* map)
+{
+	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
+	{
+		GMMapReplacement replacement;
+		SAFE_SSCANF(child->Attribute("source"), "%i", &replacement.source);
+		SAFE_SSCANF(child->Attribute("dest"), "%i", &replacement.dest);
+		replacement.objectname = child->Attribute("objectname");
+		map->replacements.push_back(replacement);
+	}
+
+	return true;
+}
+
 struct __Map_Handlers
 {
 	__Map_Handlers()
@@ -452,6 +467,7 @@ struct __Map_Handlers
 		__map["lights"] = handleLights;
 		__map["settings"] = handleSettings;
 		__map["animations"] = handleAnimations;
+		__map["replacements"] = handleReplacements;
 	}
 
 	std::map<std::string, __Handler> __map;

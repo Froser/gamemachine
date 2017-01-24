@@ -13,6 +13,7 @@ GameObjectPrivate::GameObjectPrivate()
 	, animationDuration(0)
 	, animationState(Stopped)
 	, localScaling(btVector3(1, 1, 1))
+	, id(0)
 {
 	transform.setIdentity();
 	memset(&frictions, 0, sizeof(Frictions));

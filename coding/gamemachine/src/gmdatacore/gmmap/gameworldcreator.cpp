@@ -404,12 +404,43 @@ static void loadTextures(IGraphicEngine* engine, IFactory* factory, GMMap* map)
 
 static void createGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMMap* map, const GMMapInstance* instance, OUT GameObject** gameObject)
 {
+	if (instance->invisible)
+		return;
+
 	const GMMapEntity* entity = GMMap_find(map->entities, instance->entityRef);
 	LOG_ASSERT_MSG(entity, "You may bind wrong entityref.");
 	const GMMapObject* object = GMMap_find(map->objects, entity->objRef);
 	LOG_ASSERT_MSG(object, "You may bind wrong objref.");
 	ResourceContainer* resContainer = engine->getResourceContainer();
 	getObjectCreateFunc(object->type)(factory, resContainer, map, instance, entity, object, gameObject);
+	(*gameObject)->setId(instance->id);
+}
+
+static void replaceGameObjectFromInstance(IGraphicEngine* engine, IFactory* factory, GMMap* map, const GMMapReplacement* replacement, GameWorld* world, OUT GameObject** gameObject)
+{
+	// 找到替换物体
+	const GMMapInstance* instance = GMMap_find(map->instances, replacement->dest);
+	LOG_ASSERT_MSG(instance, "You may bind wrong 'from' (instance id).");
+	const GMMapEntity* entity = GMMap_find(map->entities, instance->entityRef);
+	LOG_ASSERT_MSG(entity, "You may bind wrong entityref.");
+	const GMMapObject* object = GMMap_find(map->objects, entity->objRef);
+	LOG_ASSERT_MSG(object, "You may bind wrong objref.");
+	ResourceContainer* resContainer = engine->getResourceContainer();
+	getObjectCreateFunc(object->type)(factory, resContainer, map, instance, entity, object, gameObject);
+	(*gameObject)->setId(instance->id);
+
+	// 放入dest
+	GameObject* source = world->findGameObjectById(replacement->source);
+	GameObjectFindResults results = source->findChildObjectByName(replacement->objectname.c_str());
+
+	// 替换位置
+	LOG_ASSERT_MSG(results.size() == 1, "Warning: replacements count is more or less than 1.");
+	GameObjectFindResult& result = (*results.begin());
+	btTransform transform = result.gameObject->getCollisionShapeTransform(result.collisionShape);
+	(*gameObject)->setTransform(transform);
+
+	// 删除原图形位置
+	source->removeShapeByName(replacement->objectname.c_str());
 }
 
 void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorld** gameWorld)
@@ -459,6 +490,14 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 	{
 		GameObject* gameObject;
 		createGameObjectFromInstance(engine, factory, map, &(*iter), &gameObject);
+		world->appendObject(gameObject);
+	}
+
+	// 替换物体并装载
+	for (auto iter = map->replacements.begin(); iter != map->replacements.end(); iter++)
+	{
+		GameObject* gameObject;
+		replaceGameObjectFromInstance(engine, factory, map, &(*iter), world, &gameObject);
 		world->appendObject(gameObject);
 	}
 

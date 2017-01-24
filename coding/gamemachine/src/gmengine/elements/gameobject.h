@@ -5,10 +5,31 @@
 #include <vector>
 #include "btBulletCollisionCommon.h"
 #include "gmengine/controller/graphic_engine.h"
+#include "gameworld.h"
 
 class btDynamicsWorld;
 
 BEGIN_NS
+
+struct GameObjectFindResult
+{
+	GameObject* gameObject;
+	ChildObject* childObject;
+	btCollisionShape* collisionShape;
+	btCollisionObject* collisionObject;
+};
+
+class GameObjectFindResults : public std::vector<GameObjectFindResult>
+{
+public:
+	void push_back_results(const GameObjectFindResults& results)
+	{
+		for (auto iter = results.begin(); iter != results.end(); iter++)
+		{
+			push_back(*iter);
+		}
+	}
+};
 
 struct AnimationMatrices
 {
@@ -28,6 +49,9 @@ public:
 
 public:
 	virtual void initPhysics(btDynamicsWorld* world);
+
+	void setId(GMuint id);
+	GMuint getId();
 
 	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
@@ -59,9 +83,12 @@ public:
 	void stopAnimation();
 
 public:
+	virtual GameObjectFindResults findChildObjectByName(const char* name);
 	virtual void getReadyForRender(DrawingList& list);
 	virtual btCollisionObject* createCollisionObject() = 0;
 	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
+	virtual btTransform getCollisionShapeTransform(btCollisionShape* shape);
+	virtual void removeShapeByName(const char* name);
 
 protected:
 	virtual AnimationMatrices getAnimationMatrix();

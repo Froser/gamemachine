@@ -33,6 +33,18 @@ void GameObject::initPhysics(btDynamicsWorld* world)
 	}
 }
 
+void GameObject::setId(GMuint id)
+{
+	D(d);
+	d.id = id;
+}
+
+GMuint GameObject::getId()
+{
+	D(d);
+	return d.id;
+}
+
 void GameObject::setObject(AUTORELEASE Object* obj)
 {
 	D(d);
@@ -108,6 +120,25 @@ GameWorld* GameObject::getWorld()
 	return d.world;
 }
 
+GameObjectFindResults GameObject::findChildObjectByName(const char* name)
+{
+	D(d);
+	GameObjectFindResults result;
+	if (!d.object)
+		return result;
+
+	for (auto iter = d.object->getChildObjects().begin(); iter != d.object->getChildObjects().end(); iter++)
+	{
+		ChildObject* child = (*iter);
+		if (strEqual(child->getName().c_str(), name))
+		{
+			GameObjectFindResult found = { this, child, d.collisionShape, d.collisionObject };
+			result.push_back(found);
+		}
+	}
+	return result;
+}
+
 void GameObject::getReadyForRender(DrawingList& list)
 {
 	D(d);
@@ -159,6 +190,22 @@ void GameObject::appendObjectToWorld(btDynamicsWorld* world)
 	d.collisionObject = createCollisionObject();
 	initPhysicsAfterCollisionObjectCreated();
 	appendThisObjectToWorld(world);
+}
+
+btTransform GameObject::getCollisionShapeTransform(btCollisionShape* shape)
+{
+	D(d);
+	return d.transform;
+}
+
+void GameObject::removeShapeByName(const char* name)
+{
+	GameObjectFindResults found = findChildObjectByName(name);
+	for (auto iter = found.begin(); iter != found.end(); iter++)
+	{
+		ChildObject* obj = (*iter).childObject;
+		obj->setVisibility(false);
+	}
 }
 
 void GameObject::initPhysicsAfterCollisionObjectCreated()

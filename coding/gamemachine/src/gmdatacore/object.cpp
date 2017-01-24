@@ -55,6 +55,7 @@ ChildObject::ChildObject()
 	, m_type(NormalObject)
 	, m_mode(Triangle_Fan)
 	, m_name("default")
+	, m_visibility(true)
 {
 }
 
@@ -63,6 +64,7 @@ ChildObject::ChildObject(const std::string& name)
 	, m_bufferId(0)
 	, m_type(NormalObject)
 	, m_mode(Triangle_Fan)
+	, m_visibility(true)
 {
 	m_name = name;
 }
