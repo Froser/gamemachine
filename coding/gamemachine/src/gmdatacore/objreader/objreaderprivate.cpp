@@ -213,6 +213,17 @@ void ObjReaderPrivate::pushMaterial()
 		textureIdx++;
 	}
 
+	if (m_currentMaterial->map_Bump_switch)
+	{
+		std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Bump);
+		ITexture* texture;
+		createTexture(m_factory, texturePath.c_str(), &texture);
+		m.textures[textureIdx].texture = texture;
+		m.textures[textureIdx].type = TextureTypeNormalMapping;
+		m.textures[textureIdx].autorelease = 1;
+		textureIdx++;
+	}
+
 	m_currentChildObject->appendComponent(m_currentComponent, vertexCount);
 
 	m_currentComponent = new Component();

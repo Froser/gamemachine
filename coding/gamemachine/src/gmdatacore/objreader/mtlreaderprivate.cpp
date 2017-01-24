@@ -16,6 +16,7 @@
 #define KW_KS "Ks"
 #define KW_MAP_KA "map_Ka"
 #define KW_MAP_KD "map_Kd"
+#define KW_MAP_BUMP "map_Bump"
 
 Materials& MtlReaderPrivate::getMaterials()
 {
@@ -113,5 +114,10 @@ void MtlReaderPrivate::parseLine(const char* line)
 	{
 		m_pCurrentMaterial->map_Kd_switch = true;
 		scanner.nextToTheEnd(m_pCurrentMaterial->map_Kd);
+	}
+	else if (strEqual(command, KW_MAP_BUMP))
+	{
+		m_pCurrentMaterial->map_Bump_switch = true;
+		scanner.nextToTheEnd(m_pCurrentMaterial->map_Bump);
 	}
 }

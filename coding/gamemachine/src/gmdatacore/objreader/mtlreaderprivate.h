@@ -24,6 +24,8 @@ struct MaterialProperties
 	char map_Ka[LINE_MAX];
 	bool map_Kd_switch : 1;
 	char map_Kd[LINE_MAX];
+	bool map_Bump_switch : 1;
+	char map_Bump[LINE_MAX];
 };
 
 typedef std::map<MaterialName, MaterialProperties> Materials;
