@@ -50,3 +50,14 @@ void Log::warning(const char* output)
 	std::cout << "] ";
 	std::cout << output << std::endl;
 }
+
+void Log::error(const char* output)
+{
+	char tm[64];
+	time(tm);
+
+	std::cout << "ERROR [";
+	std::cout << tm;
+	std::cout << "] ";
+	std::cout << output << std::endl;
+}

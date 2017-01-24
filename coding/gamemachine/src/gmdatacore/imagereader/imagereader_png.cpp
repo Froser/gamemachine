@@ -7,7 +7,7 @@
 
 #define PNG_BYTES_TO_CHECK 4
 
-bool loadPng(const char *filepath, PngData *out)
+bool loadPng(const char *filepath, PngData *out, bool flip = false)
 {
 	FILE *pic_fp;
 	pic_fp = fopen(filepath, "rb");
@@ -48,6 +48,8 @@ bool loadPng(const char *filepath, PngData *out)
 	out->height = png_get_image_height(png_ptr, info_ptr);
 	size = out->width * out->height;
 
+	// 根据flip来决定是否翻转Y轴
+
 	if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 	{
 		size *= (4 * sizeof(unsigned char));
@@ -57,12 +59,16 @@ bool loadPng(const char *filepath, PngData *out)
 		temp = (4 * out->width);
 		for (i = 0; i < out->height; i++)
 		{
+			int _i = i;
+			if (flip)
+				_i = out->height - i - 1;
+
 			for (j = 0; j < temp; j += 4)
 			{
-				out->rgba[pos++] = row_pointers[i][j]; // red
-				out->rgba[pos++] = row_pointers[i][j + 1]; // green
-				out->rgba[pos++] = row_pointers[i][j + 2];  // blue
-				out->rgba[pos++] = row_pointers[i][j + 3]; // alpha
+				out->rgba[pos++] = row_pointers[_i][j]; // red
+				out->rgba[pos++] = row_pointers[_i][j + 1]; // green
+				out->rgba[pos++] = row_pointers[_i][j + 2];  // blue
+				out->rgba[pos++] = row_pointers[_i][j + 3]; // alpha
 			}
 		}
 	}
@@ -75,6 +81,10 @@ bool loadPng(const char *filepath, PngData *out)
 		temp = (3 * out->width);
 		for (i = 0; i < out->height; i++)
 		{
+			int _i = i;
+			if (flip)
+				_i = out->height - i - 1;
+
 			for (j = 0; j < temp; j += 3)
 			{
 				out->rgba[pos++] = row_pointers[i][j]; // red
@@ -102,7 +112,7 @@ bool ImageReader_PNG::load(const char* filename, OUT Image** img)
 	*img = new Image();
 
 	PngData data;
-	bool b = loadPng(filename, &data);
+	bool b = loadPng(filename, &data, true);
 	writeDataToImage(data, *img);
 	return b;
 }

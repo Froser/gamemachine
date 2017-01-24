@@ -377,6 +377,7 @@ bool ImageReader_TGA::load(const char* filename, OUT Image** img)
 	*img = new Image();
 	TGAImage tga;
 	bool b = tga.read_tga_file(filename);
+	tga.flip_vertically();
 	writeDataToImage(tga, *img);
 	return b;
 }

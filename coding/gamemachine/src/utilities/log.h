@@ -21,6 +21,7 @@ private:
 public:
 	void info(const char* output);
 	void warning(const char* output);
+	void error(const char* output);
 };
 
 END_NS

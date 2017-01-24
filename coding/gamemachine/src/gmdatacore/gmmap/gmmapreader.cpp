@@ -493,7 +493,10 @@ void GMMapReader::readGMM(const char* filename, OUT GMMap** map)
 {
 	TiXmlDocument doc;
 	bool b = doc.LoadFile(filename);
+	
 	ASSERT(b);
+	if (!b)
+		Log::getInstance().error(doc.ErrorDesc());
 
 	GMMap* gmmMap;
 	if (map)

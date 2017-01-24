@@ -52,8 +52,13 @@ public:
 	ImageData& getData();
 	virtual void dispose();
 
+public:
+	bool isNeedFlip();
+	void setNeedFlip(bool b);
+
 private:
 	ImageData m_data;
+	bool m_needFlip;
 };
 
 END_NS
