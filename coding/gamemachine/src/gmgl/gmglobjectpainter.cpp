@@ -51,25 +51,29 @@ void GMGLObjectPainter::transfer()
 		GLuint normalSize = sizeof(Object::DataType) * childObj->normals().size();
 		GLuint uvSize = sizeof(Object::DataType) * childObj->uvs().size();
 		GLuint tangentSize = sizeof(Object::DataType) * childObj->tangents().size();
+		GLuint bitangentSize = sizeof(Object::DataType) * childObj->bitangents().size();
 
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize, NULL, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0, vaoSize, childObj->vertices().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize, normalSize, childObj->normals().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize, uvSize, childObj->uvs().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize, tangentSize, childObj->tangents().data());
+		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize, NULL, GL_STATIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0												, vaoSize, childObj->vertices().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize										, normalSize, childObj->normals().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize							, uvSize, childObj->uvs().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize					, tangentSize, childObj->tangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize	, bitangentSize, childObj->bitangents().data());
 		childObj->setBufferId(vbo);
 
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (void*)vaoSize);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize));
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize));
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize));
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
+		glEnableVertexAttribArray(4);
 
 		glBindVertexArray(0);
 		childObj->disposeMemory();

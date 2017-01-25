@@ -65,7 +65,7 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 {
 	bool shadowMapping = m_shadowMapping.hasBegun();
-
+	int i = 0;
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
 		DrawingItem& item = *iter;

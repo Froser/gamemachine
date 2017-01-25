@@ -135,8 +135,8 @@ void GameWorld::renderGameWorld()
 		gameObj->getReadyForRender(list);
 	}
 
-	CameraLookAt lookAt;
-	Camera::calcCameraLookAt(d.character->getPositionState(), &lookAt);
+	d.character->updateLookAt();
+	CameraLookAt& lookAt = d.character->getLookAt();
 	d.character->applyEyeOffset(lookAt);
 	engine->updateCameraView(lookAt);
 

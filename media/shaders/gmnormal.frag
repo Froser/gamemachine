@@ -4,6 +4,7 @@ in vec4 position_world;
 in vec4 _normal;
 in vec2 _uv;
 in vec4 _tangent;
+in vec4 _bitangent;
 in vec4 shadowCoord;
 
 // 阴影纹理
@@ -86,12 +87,8 @@ void calcDiffuseAndSpecular(vec3 lightDirection, vec3 eyeDirection, vec3 normal)
 }
 
 // 由顶点变换矩阵计算法向量变换矩阵
-mat4 calcNormalWorldTransformMatrix()
-{
-    mat4 normalInverseMatrix = inverse(GM_model_matrix);
-    mat4 normalWorldTransformMatrix = transpose(normalInverseMatrix);
-    return normalWorldTransformMatrix;
-}
+mat4 normalTransform = transpose(inverse(GM_model_matrix));
+mat4 normalEyeTransform = GM_view_matrix * normalTransform;
 
 void calcLights()
 {
@@ -99,7 +96,7 @@ void calcLights()
     vec3 eyeDirection_eye = normalize(vec3(0,0,0) - position_eye.xyz);
     vec3 lightPosition_eye = (GM_view_matrix * GM_light_position).xyz;
     vec3 lightDirection_eye = normalize(lightPosition_eye + eyeDirection_eye);
-    vec3 normal_eye = normalize((GM_view_matrix * calcNormalWorldTransformMatrix() * _normal).xyz);
+    vec3 normal_eye = normalize((normalEyeTransform * _normal).xyz);
 
     if (GM_normal_mapping_texture_switch == 0)
     {
@@ -107,8 +104,8 @@ void calcLights()
     }
     else
     {
-        vec3 tangent_eye = normalize((GM_view_matrix * calcNormalWorldTransformMatrix() * _tangent).xyz);
-        vec3 bitangent_eye = cross(tangent_eye, normal_eye);
+        vec3 tangent_eye = normalize((normalEyeTransform * _tangent).xyz);
+        vec3 bitangent_eye = normalize((normalEyeTransform * _bitangent).xyz);
         mat3 TBN = transpose(mat3(
             tangent_eye,
             bitangent_eye,
@@ -146,7 +143,7 @@ void drawObject()
     if (GM_reflection_cubemap_texture_switch == 1)
     {
         vec3 viewDirection = normalize(GM_view_position.xyz - position_world.xyz);
-        vec3 reflectionCoord = reflect(-viewDirection, (calcNormalWorldTransformMatrix() * _normal).xyz);
+        vec3 reflectionCoord = reflect(-viewDirection, (normalTransform * _normal).xyz);
         // 乘以shadeFactor是因为阴影会遮挡反射光
         if (GM_light_ke.x > 0 && GM_light_ke.y > 0 && GM_light_ke.z > 0)
         {

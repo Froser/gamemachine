@@ -149,16 +149,30 @@ void ChildObject::calculateTangentSpace()
 
 				GMfloat t1 = deltaUV1[0], b1 = deltaUV1[1], t2 = deltaUV2[0], b2 = deltaUV2[1];
 				GMfloat s = 1.0f / (t1 * b2 - b1 * t2);
-				GMfloat t[3] = {
-					s * (b2 * E1[0] - b1 * E2[0]),
-					s * (b2 * E1[1] - b1 * E2[1]),
-					s * (b2 * E1[2] - b1 * E2[2])
-				};
-				vmath::vec3 v_t = vmath::normalize(vmath::vec3(t[0], t[1], t[2]));
-				m_tangents.push_back(v_t[0]);
-				m_tangents.push_back(v_t[1]);
-				m_tangents.push_back(v_t[2]);
-				m_tangents.push_back(1.0f);
+				{
+					GMfloat t[3] = {
+						s * (b2 * E1[0] - b1 * E2[0]),
+						s * (b2 * E1[1] - b1 * E2[1]),
+						s * (b2 * E1[2] - b1 * E2[2])
+					};
+					vmath::vec3 v_t = vmath::normalize(vmath::vec3(t[0], t[1], t[2]));
+					m_tangents.push_back(v_t[0]);
+					m_tangents.push_back(v_t[1]);
+					m_tangents.push_back(v_t[2]);
+					m_tangents.push_back(1.0f);
+				}
+				{
+					GMfloat t[3] = {
+						s * (t1 * E2[0] - t2 * E1[0]),
+						s * (t1 * E2[1] - t2 * E1[1]),
+						s * (t1 * E2[2] - t2 * E1[2])
+					};
+					vmath::vec3 v_t = vmath::normalize(vmath::vec3(t[0], t[1], t[2]));
+					m_bitangents.push_back(v_t[0]);
+					m_bitangents.push_back(v_t[1]);
+					m_bitangents.push_back(v_t[2]);
+					m_bitangents.push_back(1.0f);
+				}
 			}
 		}
 	}

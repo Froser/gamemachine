@@ -41,6 +41,9 @@ public:
 	void setEyeOffset(GMfloat* offset);
 	void applyEyeOffset(CameraLookAt& lookAt);
 
+	void updateLookAt();
+	CameraLookAt& getLookAt();
+
 public:
 	virtual void getReadyForRender(DrawingList& list) override;
 
@@ -70,6 +73,8 @@ private:
 	bool m_freeMove;
 
 	btDynamicsWorld* m_dynamicWorld;
+
+	CameraLookAt m_lookAt;
 };
 
 END_NS

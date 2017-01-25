@@ -241,6 +241,11 @@ public:
 		return m_tangents;
 	}
 
+	std::vector<Object::DataType>& bitangents()
+	{
+		return m_bitangents;
+	}
+
 	ObjectType getType()
 	{
 		return m_type;
@@ -291,6 +296,7 @@ private:
 	std::vector<Object::DataType> m_normals;
 	std::vector<Object::DataType> m_uvs;
 	std::vector<Object::DataType> m_tangents;
+	std::vector<Object::DataType> m_bitangents;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
 	std::vector<Component*> m_components;

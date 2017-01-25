@@ -29,7 +29,9 @@ btCollisionShape* ConvexHullGameObject::createCollisionShape()
 	}
 	END_FOREACH_OBJ;
 
-	return new btConvexHullShape(vertices.data(), cnt / 4, sizeof(Object::DataType) * 4 );
+	btConvexHullShape* shape = new btConvexHullShape(vertices.data(), cnt / 4, sizeof(Object::DataType) * 4 );
+	shape->optimizeConvexHull();
+	return shape;
 }
 
 void ConvexHullGameObject::getReadyForRender(DrawingList& list)

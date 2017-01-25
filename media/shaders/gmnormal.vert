@@ -9,11 +9,13 @@ layout (location = 0) in vec4 position;
 layout (location = 1) in vec4 normal;
 layout (location = 2) in vec2 uv;
 layout (location = 3) in vec4 tangent;
+layout (location = 4) in vec4 bitangent;
 
 out vec4 shadowCoord;
 out vec4 _normal;
 out vec2 _uv;
 out vec4 _tangent;
+out vec4 _bitangent;
 out vec4 position_world;
 
 // 由顶点变换矩阵计算法向量变换矩阵
@@ -33,6 +35,7 @@ void calcCoords()
     shadowCoord = GM_shadow_matrix * position_world;
     _normal = normal;
     _tangent = tangent;
+    _bitangent = bitangent;
     _uv = uv;
 }
 

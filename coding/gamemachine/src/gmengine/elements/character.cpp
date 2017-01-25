@@ -203,3 +203,13 @@ void Character::applyEyeOffset(CameraLookAt& lookAt)
 void Character::getReadyForRender(DrawingList& list)
 {
 }
+
+void Character::updateLookAt()
+{
+	Camera::calcCameraLookAt(getPositionState(), &m_lookAt);
+}
+
+CameraLookAt& Character::getLookAt()
+{
+	return m_lookAt;
+}
