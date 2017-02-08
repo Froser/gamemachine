@@ -8,13 +8,6 @@
 #include "utilities/assert.h"
 #include "utilities/scanner.h"
 
-#define SAFE_SSCANF(in, format, out)	\
-{										\
-	const char* _str = in;				\
-	if (_str)							\
-		sscanf_s(_str, format, out);	\
-}
-
 typedef bool (*__Handler)(TiXmlElement&, GMMap*);
 
 static bool handleMeta(TiXmlElement& elem, GMMap* map)
@@ -454,6 +447,18 @@ static bool handleReplacements(TiXmlElement& elem, GMMap* map)
 	return true;
 }
 
+static bool handleScripts(TiXmlElement& elem, GMMap* map)
+{
+	for (TiXmlElement* child = elem.FirstChildElement(); child; child = child->NextSiblingElement())
+	{
+		GMMapScript script;
+		script.path = child->Attribute("path");
+		map->scripts.push_back(script);
+	}
+
+	return true;
+}
+
 struct __Map_Handlers
 {
 	__Map_Handlers()
@@ -468,6 +473,7 @@ struct __Map_Handlers
 		__map["settings"] = handleSettings;
 		__map["animations"] = handleAnimations;
 		__map["replacements"] = handleReplacements;
+		__map["scripts"] = handleScripts;
 	}
 
 	std::map<std::string, __Handler> __map;

@@ -243,6 +243,11 @@ struct GMMapSettings
 	} gravity;
 };
 
+struct GMMapScript
+{
+	std::string path;
+};
+
 struct GMMap
 {
 	GMMapMeta meta;
@@ -254,6 +259,7 @@ struct GMMap
 	GMMapSet<GMMapLight, ID_Less<GMMapLight>> lights;
 	GMMapSet<GMMapKeyframes, ID_Less<GMMapKeyframes>> animations;
 	std::vector<GMMapReplacement> replacements;
+	std::vector<GMMapScript> scripts;
 	GMMapSettings settings;
 	std::string workingDir;
 };

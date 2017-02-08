@@ -69,7 +69,7 @@ public:
 
 		GMMap* map;
 #if _DEBUG
-		GMMapReader::readGMM("D:/stage1/demo.xml", &map);
+		GMMapReader::readGMM("D:/escape/demo.xml", &map);
 		std::string currentPath("D:/shaders/test/");
 		std::string shaderPath("D:/shaders/test/");
 #else

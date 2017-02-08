@@ -58,4 +58,11 @@ END_NS
 #define HALF_PI 1.5707963265f
 #define RAD(deg) deg * PI / 180
 #define strEqual(str1, str2) !strcmp(str1, str2)
+#define SAFE_SSCANF(in, format, out)	\
+{										\
+	const char* _str = in;				\
+	if (_str)							\
+		sscanf_s(_str, format, out);	\
+}
+
 #endif

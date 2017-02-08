@@ -23,6 +23,7 @@
 #include "gmmodelreader.h"
 #include "utilities/path.h"
 #include "gmengine/elements/compoundconvexhullgameobject.h"
+#include "gmengine/controller/script.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -297,8 +298,12 @@ CREATE_FUNC void createHallucination(IFactory* factory,
 	ASSERT(gameObj);
 
 	Object* coreObject = nullptr;
-	std::string modelPath = getModelPath(map, object->path);
-	loadModel(modelPath.c_str(), factory, &coreObject);
+
+	if (!object->path.empty())
+	{
+		std::string modelPath = getModelPath(map, object->path);
+		loadModel(modelPath.c_str(), factory, &coreObject);
+	}
 
 	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
 	if (material)
@@ -510,6 +515,7 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 		
 		if (gameLight)
 		{
+			gameLight->setId(ioLight.id);
 			gameLight->setColor(ioLight.rgb);
 			gameLight->setPosition(ioLight.position);
 			gameLight->setRange(ioLight.range);
@@ -517,6 +523,15 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 			gameLight->setShadowSource(!!ioLight.shadow);
 			world->appendLight(gameLight);
 		}
+	}
+
+	// 装载脚本
+	Script* script = world->getScript();
+	for (auto iter = map->scripts.begin(); iter != map->scripts.end(); iter++)
+	{
+		std::string dir = map->workingDir;
+		dir.append("scripts/").append((*iter).path);
+		script->loadScript(dir.c_str());
 	}
 
 	LOG_ASSERT_MSG(map->lights.size() > 0, "There is no light in the world.");

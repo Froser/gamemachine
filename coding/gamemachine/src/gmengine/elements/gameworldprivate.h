@@ -13,6 +13,7 @@ class GameObject;
 class Character;
 class GameMachine;
 class GameLight;
+class Script;
 struct GameWorldPrivate
 {
 	GameWorldPrivate();
@@ -29,6 +30,7 @@ struct GameWorldPrivate
 	Character* character;
 	GameObject* sky;
 	GMfloat ellapsed;
+	AutoPtr<Script> scriptController;
 };
 
 END_NS

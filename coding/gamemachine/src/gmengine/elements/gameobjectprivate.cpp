@@ -2,6 +2,18 @@
 #include "gameobjectprivate.h"
 #include "gmgl/gmglgraphic_engine.h"
 
+struct _RegionPredicator : public IEventPredicator
+{
+	virtual bool eventPredicate(GameObject* source, EventItem& item) override
+	{
+		GameObject* target = item.targetObject;
+
+		// TODO:
+
+		return true;
+	}
+};
+
 GameObjectPrivate::GameObjectPrivate()
 	: mass(0)
 	, isDynamic(true)
@@ -17,4 +29,18 @@ GameObjectPrivate::GameObjectPrivate()
 {
 	transform.setIdentity();
 	memset(&frictions, 0, sizeof(Frictions));
+	setupPredicator();
+}
+
+void GameObjectPrivate::setupPredicator()
+{
+	predicators[EventItem::Region] = new _RegionPredicator();
+}
+
+GameObjectPrivate::~GameObjectPrivate()
+{
+	for (GMuint i = 0; i < EventItem::EventItemEnd; i++)
+	{
+		delete predicators[i];
+	}
 }

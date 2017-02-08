@@ -12,6 +12,16 @@ GameLight::~GameLight()
 {
 }
 
+void GameLight::setId(GMuint id)
+{
+	m_id = id;
+}
+
+GMuint GameLight::getId()
+{
+	return m_id;
+}
+
 void GameLight::setRange(GMfloat range)
 {
 	m_range = range;

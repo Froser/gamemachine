@@ -5,6 +5,7 @@
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
 #include "utilities/assert.h"
 #include "gmengine/elements/gameworld.h"
+#include "../flow/gameloop.h"
 
 Character::Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight)
 	: m_radius(radius)
@@ -62,7 +63,13 @@ btCollisionObject* Character::createCollisionObject()
 
 GMfloat Character::calcMoveDistance()
 {
-	return m_moveSpeed / getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
+	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
+	GMfloat fps = getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
+	GMfloat skipFrame = elapsed / (1.0f / fps);
+	if (skipFrame > 1)
+		return m_moveSpeed * skipFrame / fps;
+	else
+		return m_moveSpeed / fps;
 }
 
 void Character::moveForwardOrBackward(bool forward)

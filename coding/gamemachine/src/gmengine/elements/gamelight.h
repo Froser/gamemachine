@@ -12,6 +12,9 @@ public:
 	virtual ~GameLight();
 
 public:
+	void setId(GMuint id);
+	GMuint getId();
+
 	void setRange(GMfloat range);
 	GMfloat getRange();
 
@@ -36,6 +39,7 @@ private:
 	GMfloat m_position[3];
 	GMfloat m_color[3];
 	GameWorld* m_world;
+	GMuint m_id;
 	bool m_shadowSource;
 };
 

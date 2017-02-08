@@ -39,6 +39,7 @@ public:
 	const GraphicSettings& getSettings() const { return m_settings; }
 
 	void exit();
+	GMfloat getElapsedAfterLastFrame();
 
 private:
 	void updateSettings();

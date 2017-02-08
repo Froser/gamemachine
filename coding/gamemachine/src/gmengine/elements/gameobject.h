@@ -82,6 +82,9 @@ public:
 	void startAnimation(GMuint duration);
 	void stopAnimation();
 
+	void addEvent(EventItem& evt);
+	virtual void event();
+
 public:
 	virtual GameObjectFindResults findChildObjectByName(const char* name);
 	virtual void getReadyForRender(DrawingList& list);

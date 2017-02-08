@@ -32,6 +32,7 @@ public:
 	Character* getMajorCharacter();
 	void setSky(GameObject* sky);
 	GameObject* getSky();
+	Script* getScript();
 	void simulateGameWorld(GMfloat elapsed);
 	void renderGameWorld();
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
@@ -42,6 +43,8 @@ public:
 	GMfloat getElapsed();
 	
 	GameObject* findGameObjectById(GMuint id);
+
+	void dispatchEvents();
 
 private:
 	void createPainterForObject(GameObject* obj);

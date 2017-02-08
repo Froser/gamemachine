@@ -288,3 +288,25 @@ void GameObject::stopAnimation()
 	D(d);
 	d.animationState = Stopped;
 }
+
+void GameObject::addEvent(EventItem& evt)
+{
+	D(d);
+	d.eventItems.push_back(evt);
+}
+
+void GameObject::event()
+{
+	D(d);
+	for (auto iter = d.eventItems.begin(); iter != d.eventItems.end(); iter++)
+	{
+		if ( d.predicators[EventItem::Region]->eventPredicate(this, (*iter)))
+		{
+			Script* script = d.world->getScript();
+			for (auto actionIter = (*iter).actions.begin(); actionIter != (*iter).actions.end(); actionIter++)
+			{
+				script->invoke((*actionIter).name, (*actionIter).args);
+			}
+		}
+	}
+}

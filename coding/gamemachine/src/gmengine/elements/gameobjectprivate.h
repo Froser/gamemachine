@@ -5,6 +5,7 @@
 #include "utilities/autoptr.h"
 #include "btBulletCollisionCommon.h"
 #include "gmengine/controller/animation.h"
+#include "gmengine/controller/script.h"
 BEGIN_NS
 
 #define PARAM(type, name)	\
@@ -25,10 +26,39 @@ enum AnimationState
 	Running,
 };
 
+struct EventItem
+{
+	enum Type
+	{
+		Region,
+		
+		EventItemEnd,
+	};
+
+	struct Action
+	{
+		std::string name;
+		Arguments args;
+	};
+
+	Type condition;
+	GameObject* targetObject;
+	std::vector<Action> actions;
+};
+
+struct IEventPredicator
+{
+	virtual ~IEventPredicator() { }
+	virtual bool eventPredicate(GameObject* source, EventItem& item) = 0;
+};
+
+
 class GameWorld;
 struct GameObjectPrivate
 {
 	GameObjectPrivate();
+	~GameObjectPrivate();
+	void setupPredicator();
 
 	GMuint id;
 	btVector3 localScaling;
@@ -48,6 +78,8 @@ struct GameObjectPrivate
 	GMint animationStartTick;
 	GMint animationDuration;
 	AnimationState animationState;
+	std::vector<EventItem> eventItems;
+	IEventPredicator* predicators[EventItem::EventItemEnd];
 };
 
 END_NS
