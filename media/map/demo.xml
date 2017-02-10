@@ -2,7 +2,8 @@
 <gmmap>
 	<meta author="demo" name="" />
 	<objects>
-		<object id="1" type="compound" path="ground" />
+		<object id="1" type="compound" path="map" />
+		<object id="2" type="hallucination" />
 	</objects>
 	<materials>
 		<material id="1" ka=".5 .5 .25"/>
@@ -13,13 +14,20 @@
 	</entities>
 	<instances>
 		<instance id="1" entityref="1" position="0 0 0" scale="100" mass="0"/>
+		<instance id="2" entityref="2" invisible="1" />
 	</instances>
 	<lights>
-		<light id="1" type="ambient" rgb=".3 .3 .3" position="300 300 300"/>
-		<light id="2" type="specular" rgb=".5 .5 .5" position="300 1700 300" shadow="0"/>
+		<light id="1" type="ambient" rgb=".03 .03 .03" position="300 300 300"/>
+		<light id="2" type="specular" rgb=".03 .03 .03" position="300 1700 300" shadow="0"/>
 	</lights>
 	<settings>
-		<gravity vector="0 -200 0" />
-		<character position="0 20 10" radius="15" height="10" stepheight="1" freemove="0" jumpspeed="0 100 0" fallspeed="300" movespeed="150" eyeoffset="0 .5 0"/>
+		<gravity vector="0 -800 0" />
+		<character position="0 40 10" radius="20" height="20" stepheight="1" freemove="0" jumpspeed="0 250 0" fallspeed="300" movespeed="75" eyeoffset="0 15 0"/>
 	</settings>
+	<replacements>
+		<replacement source="1" dest="2" objectname="LightSwitch_Cube.007"/>
+	</replacements>
+	<scripts>
+		<script path="script.gms" />
+	</scripts>
 </gmmap>

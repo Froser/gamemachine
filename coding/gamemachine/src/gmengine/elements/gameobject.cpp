@@ -300,7 +300,7 @@ void GameObject::event()
 	D(d);
 	for (auto iter = d.eventItems.begin(); iter != d.eventItems.end(); iter++)
 	{
-		if ( d.predicators[EventItem::Region]->eventPredicate(this, (*iter)))
+		if ( d.predicators[(*iter).condition]->eventPredicate(this, (*iter)))
 		{
 			Script* script = d.world->getScript();
 			for (auto actionIter = (*iter).actions.begin(); actionIter != (*iter).actions.end(); actionIter++)

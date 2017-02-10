@@ -24,6 +24,7 @@
 #include "utilities/path.h"
 #include "gmengine/elements/compoundconvexhullgameobject.h"
 #include "gmengine/controller/script.h"
+#include "gmengine/elements/hingegameobject.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -287,6 +288,28 @@ CREATE_FUNC void createCompound(IFactory* factory,
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 
+CREATE_FUNC void createHinge(IFactory* factory,
+	ResourceContainer* resContainer,
+	GMMap* map,
+	const GMMapInstance* instance,
+	const GMMapEntity* entity,
+	const GMMapObject* object,
+	OUT GameObject** gameObj)
+{
+	ASSERT(gameObj);
+
+	Object* coreObject = nullptr;
+	std::string modelPath = getModelPath(map, object->path);
+	loadModel(modelPath.c_str(), factory, &coreObject);
+
+	const GMMapMaterial* material = GMMap_find(map->materials, entity->materialRef[0]);
+	if (material)
+		copyUniqueMaterialProperties(material->material, coreObject);
+
+	*gameObj = new HingeGameObject(coreObject);
+	setPropertiesFromInstance(map, instance, *gameObj);
+}
+
 CREATE_FUNC void createHallucination(IFactory* factory,
 	ResourceContainer* resContainer,
 	GMMap* map,
@@ -381,6 +404,7 @@ struct __ObjectCreateFuncs
 		__map[GMMapObject::Capsule] = __map[GMMapObject::Cylinder] = __map[GMMapObject::Cone] = createSinglePrimitive;
 		__map[GMMapObject::GerstnerWave] = createGerstnerWave;
 		__map[GMMapObject::Compound] = createCompound;
+		__map[GMMapObject::Hinge] = createHinge;
 	}
 
 	std::map<GMMapObject::GMMapObjectType, __ObjectCreateFunc> __map;

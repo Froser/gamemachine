@@ -18,9 +18,9 @@ struct ScriptPrivate
 
 	GameObject* findObject(const char* identifier);
 
-	STMT_RESULT stmt_first(Expression& expr);
-	STMT_RESULT stmt_region(Expression& expr, Expression::iterator& iter);
-	STMT_RESULT stmt_region_statements(Expression& expr, Expression::iterator& iter, GameObject* source, GameObject* dest);
+	STMT_RESULT stmt_first(Expression& expr, Expression::iterator& iter);
+	STMT_RESULT stmt_reach(Expression& expr, Expression::iterator& iter, bool reached);
+	STMT_RESULT stmt_reach_statements(Expression& expr, Expression::iterator& iter, GameObject* source, GameObject* dest, bool reached);
 
 	Expression expression;
 	Script* script;

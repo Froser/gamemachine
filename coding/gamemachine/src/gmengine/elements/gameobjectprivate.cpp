@@ -2,16 +2,32 @@
 #include "gameobjectprivate.h"
 #include "gmgl/gmglgraphic_engine.h"
 
-struct _RegionPredicator : public IEventPredicator
+struct _ReachPredicator : public IEventPredicator
 {
+	_ReachPredicator(bool _reached)
+		: reached(_reached)
+	{
+	}
+
 	virtual bool eventPredicate(GameObject* source, EventItem& item) override
 	{
 		GameObject* target = item.targetObject;
 
-		// TODO:
+		btTransform destTrans = target->getTransform();
+		btVector3 origin = destTrans.getOrigin();
 
-		return true;
+		btCollisionShape* sourceShape = source->getCollisionShape();
+		btTransform myTrans = source->getCollisionObject()->getWorldTransform();
+		btVector3 aabbMin, aabbMax;
+		sourceShape->getAabb(myTrans, aabbMin, aabbMax);
+
+		return (!reached) ^ ( aabbMin.x() <= origin.x() && origin.x() <= aabbMax.x()
+			&& aabbMin.y() <= origin.y() && origin.y() <= aabbMax.y()
+			&& aabbMin.z() <= origin.z() && origin.z() <= aabbMax.z()
+			);
 	}
+
+	bool reached;
 };
 
 GameObjectPrivate::GameObjectPrivate()
@@ -34,7 +50,8 @@ GameObjectPrivate::GameObjectPrivate()
 
 void GameObjectPrivate::setupPredicator()
 {
-	predicators[EventItem::Region] = new _RegionPredicator();
+	predicators[EventItem::Reached] = new _ReachPredicator(true);
+	predicators[EventItem::Unreached] = new _ReachPredicator(false);
 }
 
 GameObjectPrivate::~GameObjectPrivate()

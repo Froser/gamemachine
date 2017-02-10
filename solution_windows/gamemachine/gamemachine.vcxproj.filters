@@ -238,6 +238,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.h">
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hingegameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -428,6 +431,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.cpp">
       <Filter>src\gmengine\controllers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hingegameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

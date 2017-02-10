@@ -13,7 +13,9 @@
 
 // Keywords:
 #define BEGIN "begin"
-#define REGION "region"
+#define REACHED "reached"
+#define UNREACHED "unreached"
+#define CHARACTER "character"
 #define END "end"
 
 static bool isSeparator(char c)
@@ -40,12 +42,15 @@ void ScriptPrivate::parseLine(const char* line)
 
 void ScriptPrivate::parseExpressions()
 {
-	stmt_first(expression);
+	auto begin = expression.begin();
+	while (stmt_first(expression, begin) == SCRIPT_OK)
+	{
+	};
 }
 
 GameObject* ScriptPrivate::findObject(const char* identifier)
 {
-	if (strEqual(identifier, "camera"))
+	if (strEqual(identifier, CHARACTER))
 		return script->getWorld()->getMajorCharacter();
 
 	GMuint id;
@@ -53,17 +58,21 @@ GameObject* ScriptPrivate::findObject(const char* identifier)
 	return script->getWorld()->findGameObjectById(id);
 }
 
-STMT_RESULT ScriptPrivate::stmt_first(Expression& expr)
+STMT_RESULT ScriptPrivate::stmt_first(Expression& expr, Expression::iterator& iter)
 {
-	auto iter = expr.begin();
+	if (iter == expr.end())
+		return SCRIPT_FAILED;
 
-	if (TOKEN_EQUAL(iter, REGION))
-		return stmt_region(expr, ++iter);
+	if (TOKEN_EQUAL(iter, REACHED))
+		return stmt_reach(expr, ++iter, true);
+
+	if (TOKEN_EQUAL(iter, UNREACHED))
+		return stmt_reach(expr, ++iter, false);
 
 	return SCRIPT_FAILED;
 }
 
-STMT_RESULT ScriptPrivate::stmt_region(Expression& expr, Expression::iterator& iter)
+STMT_RESULT ScriptPrivate::stmt_reach(Expression& expr, Expression::iterator& iter, bool reached)
 {
 	std::string source, target;
 	SCRIPT_IF(iter != expr.end())
@@ -76,15 +85,14 @@ STMT_RESULT ScriptPrivate::stmt_region(Expression& expr, Expression::iterator& i
 		target = *(iter++);
 	}
 
-	GameObject* sourceObj = findObject(source.c_str()), *targetObj = findObject(target.c_str());
-	GameWorld* world = script->getWorld();
-
 	CHECK_TOKEN_AND_MOVE_FORWARD(iter, BEGIN);
-	stmt_region_statements(expr, iter, sourceObj, targetObj);
+	GameObject* sourceObj = findObject(source.c_str()), *targetObj = findObject(target.c_str());
+	stmt_reach_statements(expr, iter, sourceObj, targetObj, reached);
 	CHECK_TOKEN_AND_MOVE_FORWARD(iter, END);
+	return SCRIPT_OK;
 }
 
-STMT_RESULT ScriptPrivate::stmt_region_statements(Expression& expr, Expression::iterator& iter, GameObject* source, GameObject* dest)
+STMT_RESULT ScriptPrivate::stmt_reach_statements(Expression& expr, Expression::iterator& iter, GameObject* source, GameObject* dest, bool reached)
 {
 	std::vector<EventItem::Action> actions;
 	while (!TOKEN_EQUAL(iter, END) )
@@ -106,7 +114,7 @@ STMT_RESULT ScriptPrivate::stmt_region_statements(Expression& expr, Expression::
 	}
 
 	EventItem evt = {
-		EventItem::Region,
+		reached ? EventItem::Reached : EventItem::Unreached,
 		dest,
 		actions
 	};

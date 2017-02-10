@@ -30,7 +30,8 @@ struct EventItem
 {
 	enum Type
 	{
-		Region,
+		Reached,
+		Unreached,
 		
 		EventItemEnd,
 	};
