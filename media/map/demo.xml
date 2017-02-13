@@ -4,6 +4,7 @@
 	<objects>
 		<object id="1" type="compound" path="map" />
 		<object id="2" type="hallucination" />
+		<object id="3" type="compound" path="door"/>
 	</objects>
 	<materials>
 		<material id="1" ka=".5 .5 .25"/>
@@ -11,21 +12,24 @@
 	<entities>
 		<entity id="1" objref="1"/>
 		<entity id="2" objref="2"/>
+		<entity id="3" objref="3"/>
 	</entities>
 	<instances>
 		<instance id="1" entityref="1" position="0 0 0" scale="100" mass="0"/>
 		<instance id="2" entityref="2" invisible="1" />
+		<instance id="3" entityref="3" invisible="1" sensor="1" scale="100"/>
 	</instances>
 	<lights>
-		<light id="1" type="ambient" rgb=".03 .03 .03" position="300 300 300"/>
-		<light id="2" type="specular" rgb=".03 .03 .03" position="300 1700 300" shadow="0"/>
+		<light id="1" type="ambient" rgb=".1 .1 .1" position="300 300 300"/>
+		<light id="2" type="specular" rgb=".1 .1 .1" position="300 1700 300" shadow="0"/>
 	</lights>
 	<settings>
 		<gravity vector="0 -800 0" />
 		<character position="0 40 10" radius="20" height="20" stepheight="1" freemove="0" jumpspeed="0 250 0" fallspeed="300" movespeed="75" eyeoffset="0 15 0"/>
 	</settings>
 	<replacements>
-		<replacement source="1" dest="2" objectname="LightSwitch_Cube.007"/>
+		<replacement source="1" dest="2" objectname="DoorSwitch_Cube.007"/>
+		<replacement source="1" dest="3" objectname="DoorSensor_Cube.009"/>
 	</replacements>
 	<scripts>
 		<script path="script.gms" />

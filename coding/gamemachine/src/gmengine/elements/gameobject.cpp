@@ -101,6 +101,22 @@ btTransform& GameObject::getTransform()
 	return d.transform;
 }
 
+btTransform GameObject::getRuntimeTransform()
+{
+	D(d);
+	btTransform trans;
+	btRigidBody* body = btRigidBody::upcast(d.collisionObject);
+	if (body)
+	{
+		body->getMotionState()->getWorldTransform(trans);
+	}
+	else
+	{
+		ASSERT(false);
+	}
+	return trans;
+}
+
 void GameObject::setLocalScaling(const btVector3& scale)
 {
 	D(d);
@@ -150,8 +166,7 @@ void GameObject::getReadyForRender(DrawingList& list)
 		btRigidBody* body = btRigidBody::upcast(obj);
 		if (body)
 		{
-			btTransform trans;
-			body->getMotionState()->getWorldTransform(trans);
+			btTransform trans = getRuntimeTransform();
 
 			btScalar glTrans[16];
 			trans.getOpenGLMatrix(glTrans);
@@ -302,11 +317,58 @@ void GameObject::event()
 	{
 		if ( d.predicators[(*iter).condition]->eventPredicate(this, (*iter)))
 		{
+			if (!needTriggerEvent(&(*iter)))
+				continue;
+
 			Script* script = d.world->getScript();
 			for (auto actionIter = (*iter).actions.begin(); actionIter != (*iter).actions.end(); actionIter++)
 			{
-				script->invoke((*actionIter).name, (*actionIter).args);
+				script->invoke(this, &(*iter), (*actionIter).name, (*actionIter).args);
 			}
+			setEventState(&(*iter), true);
+		}
+		else
+		{
+			setEventState(&(*iter), false);
 		}
 	}
+
+	if (d.currentAction)
+		d.currentAction->handleAction();
+}
+
+void GameObject::setEventState(EventItem* eventItem, bool turnedOn)
+{
+	D(d);
+	d.eventStates[eventItem] = turnedOn;
+}
+
+bool GameObject::needTriggerEvent(EventItem* eventItem)
+{
+	D(d);
+	if (d.eventStates.find(eventItem) == d.eventStates.end())
+		return true;
+
+	return !(*(d.eventStates.find(eventItem))).second;
+}
+
+void GameObject::activateAction(AUTORELEASE IAction* action)
+{
+	D(d);
+
+	d.currentAction.reset(action);
+	d.actionStartTick = d.world ? d.world->getElapsed() : 0;
+	d.currentAction->activate(this);
+}
+
+void GameObject::deactivateAction()
+{
+	D(d);
+	d.currentAction.reset(nullptr);
+}
+
+GMfloat GameObject::getActionStartTick()
+{
+	D(d);
+	return d.actionStartTick;
 }

@@ -170,6 +170,7 @@ struct GMMapInstance
 	GMfloat mass;
 	Frictions frictions;
 	GMuint invisible;
+	GMuint sensor;
 };
 
 struct GMMapLight

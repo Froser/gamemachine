@@ -19,7 +19,8 @@ GameObjectFindResults CompoundConvexHullGameObject::findChildObjectByName(const 
 {
 	D_BASE(GameObject, d);
 	GameObjectFindResults results;
-	for (auto iter = m_nameSet.find(name); iter != m_nameSet.end(); iter++)
+	auto iter = m_nameSet.find(name);
+	if (iter != m_nameSet.end())
 	{
 		GameObjectFindResult found = { this, (*iter).second.first, (*iter).second.second, d.collisionObject };
 		results.push_back(found);

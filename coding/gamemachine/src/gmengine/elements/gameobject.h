@@ -65,6 +65,8 @@ public:
 
 	void setTransform(const btTransform& transform);
 	btTransform& getTransform();
+	// 获取游戏时的变换
+	virtual btTransform getRuntimeTransform();
 
 	virtual void setLocalScaling(const btVector3& scale);
 
@@ -84,6 +86,11 @@ public:
 
 	void addEvent(EventItem& evt);
 	virtual void event();
+	void setEventState(EventItem* eventItem, bool turnedOn);
+
+	void activateAction(AUTORELEASE IAction* action);
+	void deactivateAction();
+	GMfloat getActionStartTick();
 
 public:
 	virtual GameObjectFindResults findChildObjectByName(const char* name);
@@ -100,6 +107,9 @@ protected:
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;
+
+private:
+	bool needTriggerEvent(EventItem* eventItem);
 };
 
 END_NS

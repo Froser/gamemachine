@@ -8,12 +8,14 @@
 BEGIN_NS
 
 class GameWorld;
+struct EventItem;
+class GameObject;
 typedef std::vector<std::string> Arguments;
 
 struct IInvokable
 {
 	IInvokable() {}
-	virtual void invoke(GameWorld* world, Arguments& args) = 0;
+	virtual void invoke(GameObject* sourceObj, EventItem* evt, GameWorld* world, Arguments& args) = 0;
 };
 
 class Script
@@ -25,7 +27,7 @@ public:
 
 public:
 	void loadScript(const char* filename);
-	void invoke(std::string& func, Arguments& args);
+	void invoke(GameObject* sourceObj, EventItem* evt, std::string& func, Arguments& args);
 	GameWorld* getWorld() { return m_world; }
 
 private:

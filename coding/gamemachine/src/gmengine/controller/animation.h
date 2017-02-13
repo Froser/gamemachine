@@ -4,6 +4,7 @@
 #include <set>
 #include <vector>
 #include "utilities\vmath.h"
+#include "utilities\algorithm.h"
 BEGIN_NS
 
 struct KeyframeMovement
@@ -25,18 +26,6 @@ struct Keyframe_LESS
 		return l.percentage < r.percentage;
 	}
 };
-
-struct __vector
-{
-	__vector(GMfloat _x, GMfloat _y)
-		: x(_x)
-		, y(_y)
-	{
-	}
-
-	GMfloat x, y;
-};
-typedef GMfloat(*InterpolationFunctor) (const __vector& v1, const __vector& v2, GMfloat x);
 
 class Keyframes
 {

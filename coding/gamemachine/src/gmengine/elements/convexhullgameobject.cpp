@@ -37,7 +37,8 @@ btCollisionShape* ConvexHullGameObject::createCollisionShape()
 void ConvexHullGameObject::getReadyForRender(DrawingList& list)
 {
 	D(d);
-	btTransform trans = d.transform;
+	btTransform trans = getRuntimeTransform();
+
 	GMfloat glTrans[16];
 	trans.getOpenGLMatrix(glTrans);
 
@@ -55,4 +56,16 @@ void ConvexHullGameObject::getReadyForRender(DrawingList& list)
 	memcpy(item.trans, M * S, sizeof(M));
 	item.gameObject = this;
 	list.push_back(item);
+}
+
+btTransform ConvexHullGameObject::getRuntimeTransform()
+{
+	D(d);
+	btTransform trans;
+	// 如果是机关（门，etc），使用世界变换。
+	if (!m_isSensor)
+		trans = d.transform;
+	else
+		trans = d.collisionObject->getWorldTransform();
+	return trans;
 }

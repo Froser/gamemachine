@@ -284,7 +284,10 @@ CREATE_FUNC void createCompound(IFactory* factory,
 	if (material)
 		copyUniqueMaterialProperties(material->material, coreObject);
 
-	*gameObj = new CompoundConvexHullGameObject(coreObject);
+	CompoundConvexHullGameObject* compoundObj = new CompoundConvexHullGameObject(coreObject);
+	compoundObj->setIsSensor(!!instance->sensor);
+
+	*gameObj = compoundObj;
 	setPropertiesFromInstance(map, instance, *gameObj);
 }
 

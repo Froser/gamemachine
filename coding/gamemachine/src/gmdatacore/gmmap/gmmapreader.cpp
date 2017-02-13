@@ -236,6 +236,7 @@ static bool handleInstances(TiXmlElement& elem, GMMap* map)
 		SAFE_SSCANF(child->Attribute("animationduration"), "%f", &instance.animationDuration);
 		SAFE_SSCANF(child->Attribute("mass"), "%f", &instance.mass);
 		SAFE_SSCANF(child->Attribute("invisible"), "%i", &instance.invisible);
+		SAFE_SSCANF(child->Attribute("sensor"), "%i", &instance.sensor);
 
 		{
 			Scanner scanner(child->Attribute("animationref"));
@@ -311,6 +312,7 @@ static bool handleInstances(TiXmlElement& elem, GMMap* map)
 				if (attr)
 					SAFE_SSCANF(attr, "%f", &instance.frictions.spinningFriction);
 			}
+
 		}
 
 		map->instances.insert(instance);

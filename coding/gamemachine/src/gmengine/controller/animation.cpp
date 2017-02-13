@@ -1,13 +1,7 @@
 ﻿#include "stdafx.h"
 #include "animation.h"
 #include "utilities\assert.h"
-
-static GMfloat linearFunctor(const __vector& v1, const __vector& v2, GMfloat x)
-{
-	if (v2.x == v1.x)
-		return v1.y;
-	return v1.y + (v2.y - v1.y) * (x - v1.x) / (v2.x - v1.x);
-}
+#include "utilities\algorithm.h"
 
 static vmath::quaternion interpolation(GMfloat v,
 	const Keyframe* lower, 
@@ -18,10 +12,10 @@ static vmath::quaternion interpolation(GMfloat v,
 {
 	GMfloat l = lower->percentage, u = upper->percentage;
 
-	GMfloat x = functor(__vector(l, lowerMovement.direction[0]), __vector(u, upperMovement.direction[0]), v);
-	GMfloat y = functor(__vector(l, lowerMovement.direction[1]), __vector(u, upperMovement.direction[1]), v);
-	GMfloat z = functor(__vector(l, lowerMovement.direction[2]), __vector(u, upperMovement.direction[2]), v);
-	GMfloat a = functor(__vector(l, lowerMovement.value), __vector(u, upperMovement.value), v);
+	GMfloat x = functor(InterpolationVector2(l, lowerMovement.direction[0]), InterpolationVector2(u, upperMovement.direction[0]), v);
+	GMfloat y = functor(InterpolationVector2(l, lowerMovement.direction[1]), InterpolationVector2(u, upperMovement.direction[1]), v);
+	GMfloat z = functor(InterpolationVector2(l, lowerMovement.direction[2]), InterpolationVector2(u, upperMovement.direction[2]), v);
+	GMfloat a = functor(InterpolationVector2(l, lowerMovement.value), InterpolationVector2(u, upperMovement.value), v);
 
 	return vmath::quaternion(x, y, z, a);
 }

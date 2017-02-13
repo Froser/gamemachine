@@ -14,6 +14,7 @@ public:
 
 public:
 	virtual void getReadyForRender(DrawingList& list);
+	virtual btTransform getRuntimeTransform();
 
 private:
 	virtual btCollisionShape* createCollisionShape() override;

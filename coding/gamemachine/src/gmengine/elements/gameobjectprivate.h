@@ -6,6 +6,7 @@
 #include "btBulletCollisionCommon.h"
 #include "gmengine/controller/animation.h"
 #include "gmengine/controller/script.h"
+#include <map>
 BEGIN_NS
 
 #define PARAM(type, name)	\
@@ -47,6 +48,14 @@ struct EventItem
 	std::vector<Action> actions;
 };
 
+struct IAction
+{
+	virtual ~IAction() {};
+	virtual void activate(GameObject* obj) = 0;
+	virtual void handleAction() = 0;
+	virtual void finish() = 0;
+};
+
 struct IEventPredicator
 {
 	virtual ~IEventPredicator() { }
@@ -81,6 +90,10 @@ struct GameObjectPrivate
 	AnimationState animationState;
 	std::vector<EventItem> eventItems;
 	IEventPredicator* predicators[EventItem::EventItemEnd];
+	std::map<EventItem*, bool> eventStates;
+
+	GMfloat actionStartTick;
+	AutoPtr<IAction> currentAction;
 };
 
 END_NS
