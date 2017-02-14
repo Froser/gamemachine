@@ -16,6 +16,9 @@ public:
 	virtual void activate(GameObject* obj) override;
 	virtual void finish();
 
+private:
+	void resetEventState();
+
 protected:
 	GameObject* m_sourceObject;
 	GameObject* m_activateObject;

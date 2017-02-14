@@ -327,10 +327,6 @@ void GameObject::event()
 			}
 			setEventState(&(*iter), true);
 		}
-		else
-		{
-			setEventState(&(*iter), false);
-		}
 	}
 
 	if (d.currentAction)

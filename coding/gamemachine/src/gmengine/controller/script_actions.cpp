@@ -25,7 +25,14 @@ void Action::activate(GameObject* obj)
 
 void Action::finish()
 {
+	resetEventState();
 	m_activateObject->deactivateAction();
+}
+
+void Action::resetEventState()
+{
+	if (m_parentEvent)
+		m_sourceObject->setEventState(m_parentEvent, false);
 }
 
 Action_Move::Action_Move(GameObject* sourceObj, EventItem* parent, GMint duration, btVector3& to)
