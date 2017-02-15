@@ -1,5 +1,5 @@
-﻿#ifndef __GAMESCENE_H__
-#define __GAMESCENE_H__
+﻿#ifndef __GAMEWORLD_H__
+#define __GAMEWORLD_H__
 #include "common.h"
 #include "gameworldprivate.h"
 

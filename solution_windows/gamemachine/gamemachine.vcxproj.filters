@@ -244,6 +244,15 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.h">
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -441,5 +450,19 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.cpp">
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp">
+      <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\coding\gamemachine\src\gmdatacore\bsp_interior.inl">
+      <Filter>src\gmdatacore</Filter>
+    </None>
   </ItemGroup>
 </Project>

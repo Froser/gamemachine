@@ -20,10 +20,11 @@
 #include "gmengine/controller/gamemachine.h"
 #include "gmgl/gmglwindow.h"
 #include "utilities/path.h"
+#include "gmengine/elements/bspgameworld.h"
 
 using namespace gm;
 
-GameWorld* world;
+BSPGameWorld* world;
 Character* character;
 GMGLFactory factory;
 GameMachine* gameMachine;
@@ -80,8 +81,9 @@ public:
 		std::string shaderPath(currentPath);
 		shaderPath.append("shaders/");
 #endif
+	
+		GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
 
-		GameWorldCreator::createGameWorld(m_gm, map, &world);
 		delete map;
 
 		MouseReactionHandler* mouseHandler = new MouseReactionHandler(world);

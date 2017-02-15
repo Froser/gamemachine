@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.h" />
@@ -37,6 +38,8 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h" />
@@ -81,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.cpp" />
@@ -105,6 +109,8 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp" />
@@ -147,6 +153,9 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxmlerror.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxmlparser.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\coding\gamemachine\src\gmdatacore\bsp_interior.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{421D5CC0-A094-40E3-9570-4C0DB51B4B8F}</ProjectGuid>

@@ -25,6 +25,7 @@
 #include "gmengine/elements/compoundconvexhullgameobject.h"
 #include "gmengine/controller/script.h"
 #include "gmengine/elements/hingegameobject.h"
+#include "gmengine/elements/bspgameworld.h"
 
 #define CREATE_FUNC static
 #define RESOURCE_FUNC static
@@ -562,5 +563,21 @@ void GameWorldCreator::createGameWorld(GameMachine* gm, GMMap* map, OUT GameWorl
 	}
 
 	LOG_ASSERT_MSG(map->lights.size() > 0, "There is no light in the world.");
+	world->initialize();
+}
+
+// BSP Gameworld
+void GameWorldCreator::createBSPGameWorld(GameMachine* gm, const char* bspPath, OUT BSPGameWorld** gameWorld)
+{
+	ASSERT(gameWorld);
+
+	BSPGameWorld* world = new BSPGameWorld();
+	*gameWorld = world;
+
+	IFactory* factory = gm->getFactory();
+	IGraphicEngine* engine = gm->getGraphicEngine();
+	world->setGameMachine(gm);
+
+	world->loadBSP(bspPath);
 	world->initialize();
 }
