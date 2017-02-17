@@ -10,27 +10,6 @@
 class btDynamicsWorld;
 
 BEGIN_NS
-
-struct GameObjectFindResult
-{
-	GameObject* gameObject;
-	ChildObject* childObject;
-	btCollisionShape* collisionShape;
-	btCollisionObject* collisionObject;
-};
-
-class GameObjectFindResults : public std::vector<GameObjectFindResult>
-{
-public:
-	void push_back_results(const GameObjectFindResults& results)
-	{
-		for (auto iter = results.begin(); iter != results.end(); iter++)
-		{
-			push_back(*iter);
-		}
-	}
-};
-
 struct AnimationMatrices
 {
 	vmath::mat4 rotation;
@@ -65,7 +44,6 @@ public:
 
 	void setTransform(const btTransform& transform);
 	btTransform& getTransform();
-	// 获取游戏时的变换
 	virtual btTransform getRuntimeTransform();
 
 	virtual void setLocalScaling(const btVector3& scale);
@@ -84,21 +62,10 @@ public:
 	void startAnimation(GMuint duration);
 	void stopAnimation();
 
-	void addEvent(EventItem& evt);
-	virtual void event();
-	void setEventState(EventItem* eventItem, bool turnedOn);
-
-	void activateAction(AUTORELEASE IAction* action);
-	void deactivateAction();
-	GMfloat getActionStartTick();
-
 public:
-	virtual GameObjectFindResults findChildObjectByName(const char* name);
 	virtual void getReadyForRender(DrawingList& list);
 	virtual btCollisionObject* createCollisionObject() = 0;
 	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
-	virtual btTransform getCollisionShapeTransform(btCollisionShape* shape);
-	virtual void removeShapeByName(const char* name);
 
 protected:
 	virtual AnimationMatrices getAnimationMatrix();
@@ -107,9 +74,6 @@ protected:
 
 private:
 	virtual btCollisionShape* createCollisionShape() = 0;
-
-private:
-	bool needTriggerEvent(EventItem* eventItem);
 };
 
 END_NS

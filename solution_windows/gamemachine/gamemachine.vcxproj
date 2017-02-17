@@ -14,10 +14,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h" />
@@ -35,27 +32,18 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\gamemachine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hingegameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\spheregameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
@@ -85,10 +73,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp" />
@@ -106,27 +91,18 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\gamemachine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hingegameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\spheregameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
@@ -167,12 +143,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

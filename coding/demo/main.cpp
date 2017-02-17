@@ -10,9 +10,6 @@
 #include "gmgl/gmglfactory.h"
 #include "gmengine/io/mouse.h"
 #include "gmengine/flow/gameloop.h"
-#include "gmdatacore/gmmap/gmmap.h"
-#include "gmdatacore/gmmap/gmmapreader.h"
-#include "gmdatacore/gmmap/gameworldcreator.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmengine/io/keyboard.h"
 #include "gmgl/gmglfunc.h"
@@ -21,6 +18,7 @@
 #include "gmgl/gmglwindow.h"
 #include "utilities/path.h"
 #include "gmengine/elements/bspgameworld.h"
+#include "gmdatacore/gameworldcreator.h"
 
 using namespace gm;
 
@@ -67,23 +65,18 @@ public:
 	{
 		glEnable(GL_POLYGON_SMOOTH);
 
-		GMMap* map;
 #if _DEBUG
-		GMMapReader::readGMM("D:/escape/demo.xml", &map);
 		std::string currentPath("D:/shaders/test/");
 		std::string shaderPath("D:/shaders/test/");
 #else
 		std::string currentPath(Path::getCurrentPath());
 		std::string demoPath(currentPath);
 		demoPath.append("map/demo.xml");
-		GMMapReader::readGMM(demoPath.c_str(), &map);
 		std::string shaderPath(currentPath);
 		shaderPath.append("shaders/");
 #endif
-	
-		GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
 
-		delete map;
+		GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
 
 		MouseReactionHandler* mouseHandler = new MouseReactionHandler(world);
 		reaction = new MouseReaction(mouseHandler);

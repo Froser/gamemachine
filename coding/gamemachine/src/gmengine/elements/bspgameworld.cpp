@@ -82,7 +82,7 @@ void BSPGameWorld::importPlayer()
 		LOG_INFO("found playerstart\n");
 		btTransform playerStart;
 		playerStart.setIdentity();
-		playerStart.setOrigin(makeVector(origin[0], origin[2], origin[1], getUpAxis()));
+		playerStart.setOrigin(makeVector(origin[0], origin[1], origin[2], getUpAxis()));
 		Character* character = new Character(playerStart, d.scaling, 10, 10);
 
 		character->setMoveSpeed(500);
@@ -168,13 +168,6 @@ void BSPGameWorld::addConvexVerticesCollider(btAlignedObjectArray<btVector3>& ve
 
 	if (vertices.size() > 0)
 	{
-		float mass = 0.f;
-		btTransform startTransform;
-		//can use a shift
-		startTransform.setIdentity();
-		startTransform.setOrigin(btVector3(0, 0, -10.f));
-		//this create an internal copy of the vertices
-
 		btVector4& vec = sColors[i % 4];
 
 		Material m = { 0 };

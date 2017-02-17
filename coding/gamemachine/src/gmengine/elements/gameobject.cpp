@@ -136,25 +136,6 @@ GameWorld* GameObject::getWorld()
 	return d.world;
 }
 
-GameObjectFindResults GameObject::findChildObjectByName(const char* name)
-{
-	D(d);
-	GameObjectFindResults result;
-	if (!d.object)
-		return result;
-
-	for (auto iter = d.object->getChildObjects().begin(); iter != d.object->getChildObjects().end(); iter++)
-	{
-		ChildObject* child = (*iter);
-		if (strEqual(child->getName().c_str(), name))
-		{
-			GameObjectFindResult found = { this, child, d.collisionShape, d.collisionObject };
-			result.push_back(found);
-		}
-	}
-	return result;
-}
-
 void GameObject::getReadyForRender(DrawingList& list)
 {
 	D(d);
@@ -205,22 +186,6 @@ void GameObject::appendObjectToWorld(btDynamicsWorld* world)
 	d.collisionObject = createCollisionObject();
 	initPhysicsAfterCollisionObjectCreated();
 	appendThisObjectToWorld(world);
-}
-
-btTransform GameObject::getCollisionShapeTransform(btCollisionShape* shape)
-{
-	D(d);
-	return d.transform;
-}
-
-void GameObject::removeShapeByName(const char* name)
-{
-	GameObjectFindResults found = findChildObjectByName(name);
-	for (auto iter = found.begin(); iter != found.end(); iter++)
-	{
-		ChildObject* obj = (*iter).childObject;
-		obj->setVisibility(false);
-	}
 }
 
 void GameObject::initPhysicsAfterCollisionObjectCreated()
@@ -302,69 +267,4 @@ void GameObject::stopAnimation()
 {
 	D(d);
 	d.animationState = Stopped;
-}
-
-void GameObject::addEvent(EventItem& evt)
-{
-	D(d);
-	d.eventItems.push_back(evt);
-}
-
-void GameObject::event()
-{
-	D(d);
-	for (auto iter = d.eventItems.begin(); iter != d.eventItems.end(); iter++)
-	{
-		if ( d.predicators[(*iter).condition]->eventPredicate(this, (*iter)))
-		{
-			if (!needTriggerEvent(&(*iter)))
-				continue;
-
-			Script* script = d.world->getScript();
-			for (auto actionIter = (*iter).actions.begin(); actionIter != (*iter).actions.end(); actionIter++)
-			{
-				script->invoke(this, &(*iter), (*actionIter).name, (*actionIter).args);
-			}
-			setEventState(&(*iter), true);
-		}
-	}
-
-	if (d.currentAction)
-		d.currentAction->handleAction();
-}
-
-void GameObject::setEventState(EventItem* eventItem, bool turnedOn)
-{
-	D(d);
-	d.eventStates[eventItem] = turnedOn;
-}
-
-bool GameObject::needTriggerEvent(EventItem* eventItem)
-{
-	D(d);
-	if (d.eventStates.find(eventItem) == d.eventStates.end())
-		return true;
-
-	return !(*(d.eventStates.find(eventItem))).second;
-}
-
-void GameObject::activateAction(AUTORELEASE IAction* action)
-{
-	D(d);
-
-	d.currentAction.reset(action);
-	d.actionStartTick = d.world ? d.world->getElapsed() : 0;
-	d.currentAction->activate(this);
-}
-
-void GameObject::deactivateAction()
-{
-	D(d);
-	d.currentAction.reset(nullptr);
-}
-
-GMfloat GameObject::getActionStartTick()
-{
-	D(d);
-	return d.actionStartTick;
 }

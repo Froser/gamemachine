@@ -38,7 +38,7 @@ struct Geometry
 	static void getVerticesFromPlaneEquations(const btAlignedObjectArray<btVector3>& planeEquations, btAlignedObjectArray<btVector3>& verticesOut, UpAxis up = Y_AXIS);
 };
 
-btVector3 makeVector(GMfloat x, GMfloat y, GMfloat z, UpAxis up = Y_AXIS)
+inline btVector3 makeVector(GMfloat x, GMfloat y, GMfloat z, UpAxis up = Y_AXIS)
 {
 	return up == Y_AXIS ? btVector3(x, y, z) : btVector3(x, z, y);
 }

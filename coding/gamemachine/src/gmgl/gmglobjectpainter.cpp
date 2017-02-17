@@ -95,6 +95,7 @@ void GMGLObjectPainter::draw()
 		glBindVertexArray(childObj->getArrayId());
 		GLint params[2];
 		glGetIntegerv(GL_POLYGON_MODE, params);
+		GLenum mode = params[1] == GL_FILL ? mode : GL_LINE_LOOP;
 		resetTextures(childObj->getType());
 
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
@@ -109,8 +110,7 @@ void GMGLObjectPainter::draw()
 			}
 
 			GLenum mode = getMode(childObj);
-			glMultiDrawArrays(params[1] == GL_FILL ? mode : GL_LINE_LOOP,
-				component->getOffsetPtr(), component->getEdgeCountPtr(), component->getPolygonCount());
+			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getEdgeCountPtr(), component->getPolygonCount());
 
 			if (!m_shadowMapping.hasBegun())
 				endTextures(textureInfos);

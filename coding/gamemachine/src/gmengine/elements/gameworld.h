@@ -24,6 +24,7 @@ public:
 	~GameWorld();
 
 public:
+	UpAxis getUpAxis();
 	void initialize();
 	void appendObject(AUTORELEASE GameObject* obj);
 	void appendLight(AUTORELEASE GameLight* light);
@@ -32,7 +33,6 @@ public:
 	Character* getMajorCharacter();
 	void setSky(GameObject* sky);
 	GameObject* getSky();
-	Script* getScript();
 	void simulateGameWorld(GMfloat elapsed);
 	void renderGameWorld();
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
@@ -41,12 +41,6 @@ public:
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();
 	GMfloat getElapsed();
-	
-	GameObject* findGameObjectById(GMuint id);
-
-	void dispatchEvents();
-
-	UpAxis getUpAxis();
 
 private:
 	void createPainterForObject(GameObject* obj);

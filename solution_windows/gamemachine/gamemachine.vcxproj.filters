@@ -35,9 +35,6 @@
     <Filter Include="src\gmengine\controllers">
       <UniqueIdentifier>{b1e7c19d-ad08-46b7-9208-6a6c9f0ff9a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\gmdatacore\gmmap">
-      <UniqueIdentifier>{65e2eb12-099c-4147-a1a5-c3656aa2e7c7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\utilities\tinyxml">
       <UniqueIdentifier>{164a89ac-9be1-424a-9f62-8508c2d8111a}</UniqueIdentifier>
     </Filter>
@@ -148,9 +145,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
@@ -166,23 +160,11 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\algorithm.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\spheregameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.h">
-      <Filter>src\gmdatacore\gmmap</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.h">
-      <Filter>src\gmdatacore\gmmap</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.h">
       <Filter>src\utilities\tinyxml</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.h">
       <Filter>src\utilities\tinyxml</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.h">
-      <Filter>src\gmdatacore\gmmap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\factory.h">
       <Filter>src\gmengine\controllers</Filter>
@@ -208,41 +190,14 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\animation.h">
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h">
       <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.h">
-      <Filter>src\gmdatacore\gmmap</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h">
       <Filter>src\gmdatacore\imagereader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script.h">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.h">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hingegameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.h">
-      <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h">
       <Filter>src\gmdatacore</Filter>
@@ -252,6 +207,12 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h">
       <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h">
+      <Filter>src\gmdatacore</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -348,9 +309,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\cubegameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp">
       <Filter>src\gmengine\elements</Filter>
     </ClCompile>
@@ -366,15 +324,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\algorithm.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\spheregameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmap.cpp">
-      <Filter>src\gmdatacore\gmmap</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmapreader.cpp">
-      <Filter>src\gmdatacore\gmmap</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.cpp">
       <Filter>src\utilities\tinyxml</Filter>
     </ClCompile>
@@ -386,9 +335,6 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.cpp">
       <Filter>src\utilities\tinyxml</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gameworldcreator.cpp">
-      <Filter>src\gmdatacore\gmmap</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\factory.cpp">
       <Filter>src\gmengine\controllers</Filter>
@@ -414,41 +360,14 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\animation.cpp">
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\singleprimitivegameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp">
       <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gerstnerwavegameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gmmap\gmmodelreader.cpp">
-      <Filter>src\gmdatacore\gmmap</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\compoundconvexhullgameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script.cpp">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_private.cpp">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hingegameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\script_actions.cpp">
-      <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp">
       <Filter>src\gmdatacore</Filter>
@@ -458,6 +377,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp">
       <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp">
+      <Filter>src\gmdatacore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

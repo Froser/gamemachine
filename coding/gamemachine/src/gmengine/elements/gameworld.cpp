@@ -10,7 +10,6 @@
 #include "gmengine/controller/gamemachine.h"
 #include <algorithm>
 #include "gmengine/controller/factory.h"
-#include "gmengine/controller/script.h"
 
 GameWorld::GameWorld()
 {
@@ -22,7 +21,6 @@ GameWorld::GameWorld()
 	d.ghostPairCallback.reset(new btGhostPairCallback());
 	d.dynamicsWorld.reset(new btDiscreteDynamicsWorld(d.dispatcher, d.overlappingPairCache, d.solver, d.collisionConfiguration));
 	d.dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(d.ghostPairCallback);
-	d.scriptController.reset(new Script(this));
 }
 
 GameWorld::~GameWorld()
@@ -116,19 +114,12 @@ GameObject* GameWorld::getSky()
 	return d.sky;
 }
 
-Script* GameWorld::getScript()
-{
-	D(d);
-	return d.scriptController;
-}
-
 void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
 	D(d);
 	d.dynamicsWorld->stepSimulation(elapsed, 0);
 	d.character->simulateCamera();
 	d.ellapsed += elapsed;
-	dispatchEvents();
 }
 
 void GameWorld::renderGameWorld()
@@ -192,27 +183,6 @@ void GameWorld::createPainterForObject(GameObject* obj)
 	factory->createPainter(engine, obj->getObject(), &painter);
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
-}
-
-GameObject* GameWorld::findGameObjectById(GMuint id)
-{
-	D(d);
-	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
-	{
-		if ((*iter)->getId() == id)
-			return (*iter);
-	}
-
-	return nullptr;
-}
-
-void GameWorld::dispatchEvents()
-{
-	D(d);
-	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
-	{
-		(*iter)->event();
-	}
 }
 
 UpAxis GameWorld::getUpAxis()

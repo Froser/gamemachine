@@ -2,8 +2,20 @@
 #define __RESOURCE_CONTAINER_H__
 #include "common.h"
 #include <set>
-#include "gmdatacore/gmmap/gmmap.h"
+#include "gmdatacore/object.h"
 BEGIN_NS
+
+template <typename T>
+class ID_Less
+{
+public:
+	bool operator ()(const T& left, const T& right)
+	{
+		return left.id < right.id;
+	}
+};
+
+typedef GMuint ID;
 
 class TextureContainer
 {
