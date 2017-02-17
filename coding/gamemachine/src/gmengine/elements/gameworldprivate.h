@@ -31,6 +31,7 @@ struct GameWorldPrivate
 	GameObject* sky;
 	GMfloat ellapsed;
 	AutoPtr<Script> scriptController;
+	UpAxis upAxis;
 };
 
 END_NS

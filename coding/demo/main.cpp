@@ -56,7 +56,6 @@ class GameHandler : public IGameHandler
 public:
 	GameHandler()
 	{
-
 	}
 
 	void setGameMachine(GameMachine* gm)

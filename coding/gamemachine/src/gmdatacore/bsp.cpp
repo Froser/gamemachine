@@ -21,47 +21,32 @@ void BSP::loadBsp(const char* filename)
 	d.filename = filename;
 	readFile();
 	swapBsp();
+	parseEntities();
 }
 
-const BSPData& BSP::bspData()
+BSPData& BSP::bspData()
 {
 	D(d);
 	return d;
 }
 
-bool BSP::findVectorByName(float* outvec, const char* name)
+bool BSP::findEntityByClassName(const char* classname, OUT BSPEntity*& out)
 {
 	D(d);
 	const char *cl;
-	BSPVector3 origin;
-
 	bool found = false;
-
-	parseEntities();
-
-	for (int i = 1; i < d.numentities; i++) {
-		cl = valueForKey(&d.entities[i], "classname");
-		if (!strcmp(cl, "info_player_start")) {
-			vectorForKey(&d.entities[i], "origin", origin);
-			found = true;
-			break;
-		}
-		if (!strcmp(cl, "info_player_deathmatch")) {
-			vectorForKey(&d.entities[i], "origin", origin);
-			found = true;
-			break;
-		}
-	}
-
-	if (found)
+	for (int i = 0; i < d.numentities; i++)
 	{
-		outvec[0] = origin[0];
-		outvec[1] = origin[1];
-		outvec[2] = origin[2];
+		cl = valueForKey(&d.entities[i], "classname");
+		if (strEqual(cl, classname)) {
+			out = &d.entities[i];
+			found = true;
+			break;
+		}
 	}
+
 	return found;
 }
-
 
 void BSP::readFile()
 {
@@ -431,6 +416,19 @@ bool BSP::vectorForKey(const BSPEntity *ent, const char *key, BSPVector3 vec)
 	if (strcmp(k, ""))
 	{
 		sscanf(k, "%f %f %f", &vec[0], &vec[1], &vec[2]);
+		return true;
+	}
+	return false;
+}
+
+bool BSP::floatForKey(const BSPEntity *ent, const char *key, OUT float* f)
+{
+	const char	*k;
+	k = valueForKey(ent, key);
+	if (!strEqual(k, ""))
+	{
+		SAFE_SSCANF(k, "%f", f);
+		sscanf(k, "%f", f);
 		return true;
 	}
 	return false;

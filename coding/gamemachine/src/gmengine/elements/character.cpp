@@ -20,6 +20,7 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 {
 	setTransform(position);
 	memset(&m_state, 0, sizeof(m_state));
+	memset(&m_eyeOffset, 0, sizeof(m_eyeOffset));
 	m_state.positionX = position.getOrigin().x();
 	m_state.positionY = position.getOrigin().y();
 	m_state.positionZ = position.getOrigin().z();
@@ -117,10 +118,13 @@ void Character::setCanFreeMove(bool freeMove)
 
 void Character::simulateCamera()
 {
-	btTransform& trans = getCollisionObject()->getWorldTransform();
-	m_state.positionX = trans.getOrigin().x();
-	m_state.positionY = trans.getOrigin().y();
-	m_state.positionZ = trans.getOrigin().z();
+	if (!m_freeMove)
+	{
+		btTransform& trans = getCollisionObject()->getWorldTransform();
+		m_state.positionX = trans.getOrigin().x();
+		m_state.positionY = trans.getOrigin().y();
+		m_state.positionZ = trans.getOrigin().z();
+	}
 }
 
 void Character::setMoveSpeed(GMfloat moveSpeed)
@@ -159,10 +163,13 @@ void Character::moveLeft()
 
 void Character::moveCollisionObject()
 {
-	btTransform trans;
-	trans.setIdentity();
-	trans.setOrigin(btVector3(m_state.positionX, m_state.positionY, m_state.positionZ));
-	getCollisionObject()->setWorldTransform(trans);
+	if (!m_freeMove)
+	{
+		btTransform trans;
+		trans.setIdentity();
+		trans.setOrigin(btVector3(m_state.positionX, m_state.positionY, m_state.positionZ));
+		getCollisionObject()->setWorldTransform(trans);
+	}
 }
 
 void Character::lookRight(GMfloat degree)

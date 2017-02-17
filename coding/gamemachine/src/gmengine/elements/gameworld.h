@@ -46,6 +46,8 @@ public:
 
 	void dispatchEvents();
 
+	UpAxis getUpAxis();
+
 private:
 	void createPainterForObject(GameObject* obj);
 };

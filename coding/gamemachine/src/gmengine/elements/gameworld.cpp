@@ -214,3 +214,9 @@ void GameWorld::dispatchEvents()
 		(*iter)->event();
 	}
 }
+
+UpAxis GameWorld::getUpAxis()
+{
+	D(d);
+	return d.upAxis;
+}

@@ -35,7 +35,8 @@ void IMPL lookAt(const CameraLookAt& lookAt, GMGLShaders& shaders, const char* v
 	vmath::mat4 view_matrix(
 		vmath::lookat(vmath::vec3(lookAt.position_x, lookAt.position_y, lookAt.position_z),
 			vmath::vec3(lookAt.lookAt_x + lookAt.position_x, lookAt.lookAt_y + lookAt.position_y, lookAt.lookAt_z + lookAt.position_z),
-			vmath::vec3(0, 1, 0))
+			vmath::vec3(0, 1, 0)
+		)
 	);
 
 	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);

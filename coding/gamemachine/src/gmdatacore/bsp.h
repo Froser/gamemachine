@@ -36,6 +36,9 @@ BEGIN_NS
 #define	LUMP_VISIBILITY		16
 #define	HEADER_LUMPS		17
 
+// Surface flags
+#define	CONTENTS_SOLID		1		// an eye is never valid in a solid
+
 typedef struct {
 	int		fileofs, filelen;
 } BSPLump;
@@ -213,8 +216,11 @@ public:
 
 public:
 	void loadBsp(const char* filename);
-	const BSPData& bspData();
-	bool findVectorByName(float* outvec, const char* name);
+	BSPData& bspData();
+	bool findEntityByClassName(const char* classname, OUT BSPEntity*& out);
+	const char* valueForKey(const BSPEntity *ent, const char *key);
+	bool vectorForKey(const BSPEntity *ent, const char *key, BSPVector3 vec);
+	bool floatForKey(const BSPEntity *ent, const char *key, OUT float* f);
 
 private:
 	void readFile();
@@ -226,8 +232,6 @@ private:
 	BSPKeyValuePair* parseEpair();
 	void addScriptToStack(const char *filename);
 	bool endOfScript(bool crossline);
-	const char* valueForKey(const BSPEntity *ent, const char *key);
-	bool vectorForKey(const BSPEntity *ent, const char *key, BSPVector3 vec);
 };
 
 END_NS

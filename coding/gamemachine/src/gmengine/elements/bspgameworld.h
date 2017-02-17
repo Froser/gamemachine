@@ -8,12 +8,18 @@ BEGIN_NS
 class BSPGameWorld : public GameWorld
 {
 	DEFINE_PRIVATE(BSPGameWorld);
+public:
+	BSPGameWorld(GMfloat scaling);
 
 public:
 	void loadBSP(const char* bspPath);
 
 private:
 	void importBSP();
+	void importPlayer();
+	void importWorldSpawn();
+	void importLeafs();
+	void addConvexVerticesCollider(btAlignedObjectArray<btVector3>& vertices, bool isEntity, const btVector3& entityTargetLocation);
 };
 
 END_NS

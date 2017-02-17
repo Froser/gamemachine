@@ -7,6 +7,7 @@ BEGIN_NS
 struct BSPGameWorldPrivate
 {
 	BSP bsp;
+	GMfloat scaling;
 };
 
 END_NS
