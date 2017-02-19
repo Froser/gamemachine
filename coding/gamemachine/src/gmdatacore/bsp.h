@@ -391,7 +391,7 @@ public:
 public:
 	void loadBsp(const char* filename);
 	BSPData& bspData();
-	bool findEntityByClassName(const char* classname, OUT BSPEntity*& out);
+	bool findEntityByClassName(const char* classname, REF BSPEntity*& out);
 	const char* valueForKey(const BSPEntity *ent, const char *key);
 	bool vectorForKey(const BSPEntity *ent, const char *key, BSPVector3 vec);
 	bool floatForKey(const BSPEntity *ent, const char *key, OUT float* f);

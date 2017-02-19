@@ -125,7 +125,7 @@ BSPData& BSP::bspData()
 	return d;
 }
 
-bool BSP::findEntityByClassName(const char* classname, OUT BSPEntity*& out)
+bool BSP::findEntityByClassName(const char* classname, REF BSPEntity*& out)
 {
 	D(d);
 	const char *cl;
