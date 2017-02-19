@@ -743,12 +743,12 @@ void BSP::generateBSPData()
 		d.drawingPlanes[i].intercept /= 64;	//scale down
 	}
 
-	// visBytes占两个int
+	// visBytes头两个int表示clusters，后面的字节表示bitsets
 	memcpy(&d.visibilityData, d.visBytes.data(), sizeof(int) * 2);
 	int bitsetSize = d.visibilityData.numClusters * d.visibilityData.bytesPerCluster;
 	d.visibilityData.bitset = new GMbyte[bitsetSize];
 	// TODO: read bitset
 	int offset = d.header->lumps[LUMP_VISIBILITY].fileofs;
-	int length = d.header->lumps[LUMP_VISIBILITY].filelen;
+	int length = sizeof(int) * 2;
 	memcpy(d.visibilityData.bitset, (byte *)d.header + offset + length, bitsetSize);
 }
