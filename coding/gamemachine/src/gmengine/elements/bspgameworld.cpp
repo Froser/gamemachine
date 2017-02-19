@@ -8,6 +8,9 @@
 #include "gmengine/controller/factory.h"
 #include "gmengine/controller/gamemachine.h"
 #include "utilities/algorithm.h"
+#include "utilities\plane.h"
+
+#define M(x, y, z) makeVector(x, y, z, getUpAxis())
 
 BSPGameWorld::BSPGameWorld(GMfloat scaling)
 {
@@ -24,13 +27,91 @@ void BSPGameWorld::loadBSP(const char* bspPath)
 	importBSP();
 }
 
+void BSPGameWorld::renderGameWorld()
+{
+	D(d);
+	calculateVisibleFaces();
+	drawFaces();
+}
+
+void BSPGameWorld::calculateVisibleFaces()
+{
+	D(d);
+	D_BASE(GameWorld, dbase);
+	Character* character = getMajorCharacter();
+	PositionState pos = character->getPositionState();
+	BSPData& bsp = d.bsp.bspData();
+
+	GMint cameraLeaf = calculateCameraLeaf(M(pos.positionX, pos.positionY, pos.positionZ));
+	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
+
+	for (int i = 0; i < bsp.numleafs; ++i)
+	{
+		//if the leaf is not in the PVS, continue
+		if (!isClusterVisible(cameraCluster, bsp.leafs[i].cluster))
+			continue;
+
+		//if this leaf does not lie in the frustum, continue
+		//if (!frustum.isBoundingBoxInside(bsp.leafs[i]))
+		//	continue;
+
+		//loop through faces in this leaf and mark them to be drawn
+		for (int j = 0; j < bsp.leafs[i].numLeafSurfaces; ++j)
+		{
+			bsp.facesToDraw.set(bsp.leafsurfaces[bsp.leafs[i].firstLeafSurface + j]);
+		}
+	}
+}
+
+int BSPGameWorld::calculateCameraLeaf(const btVector3& cameraPosition)
+{
+	D(d);
+	BSPData& bsp = d.bsp.bspData();
+
+	int currentNode = 0;
+
+	//loop until we find a negative index
+	while (currentNode >= 0)
+	{
+		//if the camera is in front of the plane for this node, assign i to be the front node
+		BSPPlane& bspplane = bsp.planes[bsp.nodes[currentNode].planeNum];
+		Plane plane(btVector3(bspplane.normal[0], bspplane.normal[1], bspplane.normal[2]), bspplane.dist);
+
+		if (plane.classifyPoint(cameraPosition) == POINT_IN_FRONT_OF_PLANE)
+			currentNode = bsp.nodes[currentNode].children[0]; //front
+		else
+			currentNode = bsp.nodes[currentNode].children[1]; //back
+	}
+
+	//return leaf index
+	return ~currentNode;
+}
+
+int BSPGameWorld::isClusterVisible(int cameraCluster, int testCluster)
+{
+	/*
+	int index = cameraCluster * visibilityData.bytesPerCluster + testCluster / 8;
+
+	int returnValue = visibilityData.bitset[index] & (1 << (testCluster & 7));
+
+	return returnValue;
+	*/
+	return true;
+}
+
+void BSPGameWorld::drawFaces()
+{
+
+}
+
 void BSPGameWorld::importBSP()
 {
 	D(d);
 	const BSPData& bsp = d.bsp.bspData();
+
 	importWorldSpawn();
 	importPlayer();
-	importLeafs();
+	//importLeafs();
 	initialize();
 }
 
@@ -82,7 +163,7 @@ void BSPGameWorld::importPlayer()
 		LOG_INFO("found playerstart\n");
 		btTransform playerStart;
 		playerStart.setIdentity();
-		playerStart.setOrigin(makeVector(origin[0], origin[1], origin[2], getUpAxis()));
+		playerStart.setOrigin(M(origin[0], origin[1], origin[2]));
 		Character* character = new Character(playerStart, d.scaling, 10, 10);
 
 		character->setMoveSpeed(500);

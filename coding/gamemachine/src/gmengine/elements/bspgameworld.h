@@ -14,6 +14,17 @@ public:
 public:
 	void loadBSP(const char* bspPath);
 
+public:
+	virtual void renderGameWorld() override;
+
+	//renders:
+private:
+	void calculateVisibleFaces();
+	void drawFaces();
+	int calculateCameraLeaf(const btVector3& cameraPosition);
+	int isClusterVisible(int cameraCluster, int testCluster);
+
+	//imports:
 private:
 	void importBSP();
 	void importPlayer();

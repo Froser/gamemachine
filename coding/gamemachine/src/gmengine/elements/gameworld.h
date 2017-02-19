@@ -34,7 +34,7 @@ public:
 	void setSky(GameObject* sky);
 	GameObject* getSky();
 	void simulateGameWorld(GMfloat elapsed);
-	void renderGameWorld();
+	virtual void renderGameWorld();
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 
 	IGraphicEngine* getGraphicEngine();

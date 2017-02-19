@@ -61,9 +61,11 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\algorithm.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\bitset.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\camera.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\log.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\plane.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\stopwatch.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.h" />
@@ -120,9 +122,11 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\algorithm.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\bitset.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\log.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\plane.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\stopwatch.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.cpp" />
