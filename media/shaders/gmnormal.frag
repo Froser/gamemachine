@@ -5,6 +5,7 @@ in vec4 _normal;
 in vec2 _uv;
 in vec4 _tangent;
 in vec4 _bitangent;
+in vec2 _lightmapuv;
 in vec4 shadowCoord;
 
 // 阴影纹理
@@ -26,6 +27,10 @@ uniform int GM_reflection_cubemap_texture_switch = 0;
 // 法线贴图纹理
 uniform sampler2D GM_normal_mapping_texture;
 uniform int GM_normal_mapping_texture_switch = 0;
+
+// 光照贴图纹理
+uniform sampler2D GM_lightmap_texture;
+uniform int GM_lightmap_texture_switch = 0;
 
 uniform mat4 GM_view_matrix;
 uniform vec4 GM_light_ambient;
@@ -133,13 +138,14 @@ void drawObject()
 
     // 计算点光源（漫反射、Kd和镜面反射）
     vec3 diffuseLight = g_diffuse * vec3(GM_light_kd);
-    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(texture(GM_diffuse_texture, _uv)) : vec3(0);
+    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(0) /*vec3(texture(GM_diffuse_texture, _uv))*/ : vec3(0);
     diffuseLight += diffuseTextureColor;
     diffuseLight *= vec3(GM_light_specular);
 
     vec3 specularLight = g_specular * vec3(GM_light_specular) * vec3(GM_light_ks);
 
     // 根据环境反射度来反射天空盒（如果有的话）
+    /*
     if (GM_reflection_cubemap_texture_switch == 1)
     {
         vec3 viewDirection = normalize(GM_view_position.xyz - position_world.xyz);
@@ -151,15 +157,18 @@ void drawObject()
             ambientLight += color_from_reflection;
         }
     }
+    */
 
     // 计算环境光和Ka贴图
     vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(0);
-    ambientLight += GM_light_ka.xyz + shadeFactor * ambientTextureColor;
+    ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(0);
+    ambientLight += GM_light_ka.xyz * shadeFactor * ambientTextureColor;
     ambientLight *= vec3(GM_light_ambient);
 
     // 最终结果
     vec3 color = ambientLight + shadeFactor * (diffuseLight + specularLight);
     frag_color = vec4(color, 1.0f);
+    //frag_color = vec4(1, 1, 1, 1.0f);
     //frag_color = vec4(DEBUG, 1);
 }
 

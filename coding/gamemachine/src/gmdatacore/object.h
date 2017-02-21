@@ -44,16 +44,21 @@ enum TextureType
 	TextureTypeCubeMap,
 	TextureTypeDiffuse,
 	TextureTypeNormalMapping,
+	TextureTypeLightmap,
 	TextureTypeResetEnd,
 
 	// 由于反射的天空纹理存在于环境，所以不需要清理
 	TextureTypeReflectionCubeMap,
 };
 
+// 表示一套纹理，包括普通纹理、法线贴图、光照贴图，以后可能还有高光贴图等
 struct TextureInfo
 {
 	ITexture* texture;
 	ITexture* normalMapping;
+	ITexture* lightmap;
+
+	// 表示texture的类型
 	TextureType type;
 	GMuint autorelease : 1;
 };
@@ -84,6 +89,9 @@ public:
 		DefaultEdgesCount = 3,
 	};
 
+	Component(ChildObject* parent);
+
+	//deprecated:
 	Component();
 	~Component();
 
@@ -92,29 +100,15 @@ public:
 		return m_material;
 	}
 
-	void setOffset(GMvertexoffset offset)
-	{
-		m_offset = offset;
-	}
-
-	GMvertexoffset getOffset()
-	{
-		return m_offset;
-	}
-
-	GMuint getCount()
-	{
-		return m_verticesCount;
-	}
-
-	// 每增加一个面的时候，应该调用此函数记录这个面有多少条边
+	// deprecated:
+	// 每增加一个面的时候，应该调用此函数记录这个面由多少点组成
 	void pushBackVertexOffset(GMuint edgesCount)
 	{
-		m_vertexOffsets.push_back(m_polygonEdges.empty() ?
-			m_offset : m_vertexOffsets.back() + m_polygonEdges.back()
+		m_vertexOffsets.push_back(m_primitiveVertices.empty() ?
+			m_offset: m_vertexOffsets.back() + m_primitiveVertices.back()
 		);
-		m_polygonEdges.push_back(edgesCount);
-		m_polygonCount++;
+		m_primitiveVertices.push_back(edgesCount);
+		m_primitiveCount++;
 	}
 
 	GMint* getOffsetPtr()
@@ -122,25 +116,38 @@ public:
 		return m_vertexOffsets.data();
 	}
 
-	GMint* getEdgeCountPtr()
+	GMint* getPrimitiveVerticesCountPtr()
 	{
-		return m_polygonEdges.data();
+		return m_primitiveVertices.data();
 	}
 
-	GMuint getPolygonCount()
+	GMuint getPrimitiveCount()
 	{
-		return m_polygonCount;
+		return m_primitiveCount;
 	}
+
+	// suggested methods
+	void setVertexOffset(GMuint offset);
+	void beginFace();
+	void vertex(GMfloat x, GMfloat y, GMfloat z);
+	void normal(GMfloat x, GMfloat y, GMfloat z);
+	void uv(GMfloat u, GMfloat v);
+	void lightmap(GMfloat u, GMfloat v);
+	void endFace();
 
 private:
-	GMuint m_verticesCount;
-	GMvertexoffset m_offset;
+	GMuint m_offset;
 	Material m_material;
 
-	// 每一个面的顶点个数
-	std::vector<GMint> m_polygonEdges;
+	// 图元顶点数量
+	std::vector<GMint> m_primitiveVertices;
+	// 绘制图元数量
+	GMuint m_primitiveCount;
+	// 顶点在ChildObject的偏移
 	std::vector<GMint> m_vertexOffsets;
-	GMuint m_polygonCount;
+
+	ChildObject* m_parent;
+	GMuint m_currentFaceVerticesCount;
 };
 
 class Object
@@ -202,6 +209,8 @@ public:
 		Triangle_Fan,
 
 		Triangle_Strip,
+
+		Triangles,
 	};
 
 	ChildObject();
@@ -212,7 +221,7 @@ public:
 
 	void disposeMemory();
 
-	void appendComponent(AUTORELEASE Component* component, GMuint verticesCount);
+	void appendComponent(AUTORELEASE Component* component);
 
 	void calculateTangentSpace();
 
@@ -244,6 +253,11 @@ public:
 	std::vector<Object::DataType>& bitangents()
 	{
 		return m_bitangents;
+	}
+
+	std::vector<Object::DataType>& lightmaps()
+	{
+		return m_lightmaps;
 	}
 
 	ObjectType getType()
@@ -297,6 +311,7 @@ private:
 	std::vector<Object::DataType> m_uvs;
 	std::vector<Object::DataType> m_tangents;
 	std::vector<Object::DataType> m_bitangents;
+	std::vector<Object::DataType> m_lightmaps;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
 	std::vector<Component*> m_components;

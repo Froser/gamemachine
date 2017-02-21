@@ -3,7 +3,6 @@
 #include "btBulletDynamicsCommon.h"
 
 RigidGameObject::RigidGameObject()
-	: m_isSensor(false)
 {
 
 }
@@ -21,12 +20,5 @@ void RigidGameObject::appendThisObjectToWorld(btDynamicsWorld* world)
 {
 	D(d);
 	btRigidBody* collisionObject = static_cast<btRigidBody*>(d.collisionObject);
-	if (m_isSensor)
-	{
-		world->addRigidBody(collisionObject, short(btBroadphaseProxy::SensorTrigger), short(btBroadphaseProxy::CharacterFilter));
-	}
-	else
-	{
-		world->addRigidBody(collisionObject);
-	}
+	world->addRigidBody(collisionObject);
 }

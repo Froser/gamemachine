@@ -5,6 +5,7 @@
 #include "utilities/vmath.h"
 #include "utilities/camera.h"
 #include "utilities/assert.h"
+#include "utilities/frustum.h"
 
 void IMPL projection(const vmath::mat4& mat, GMGLShaders& shaders, const char* projectionMatrixName)
 {
@@ -19,27 +20,17 @@ void IMPL frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfl
 	projection(mat, shaders, projectionMatrixName);
 }
 
-void IMPL perspective(float fovy, float aspect, float n, float f, GMGLShaders& shaders, const char* projectionMatrixName)
+void IMPL perspective(vmath::mat4 projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName)
 {
-	vmath::mat4 mat(vmath::perspective(fovy, aspect, n, f));
-	projection(mat, shaders, projectionMatrixName);
+	projection(projectionMatrix, shaders, projectionMatrixName);
 }
 
-void IMPL lookAt(const CameraLookAt& lookAt, GMGLShaders& shaders, const char* viewMatrixName)
+void IMPL lookAt(vmath::mat4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName)
 {
 	GLint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
 	ASSERT_GL();
 
-	GMfloat vec[4] = { lookAt.position_x, lookAt.position_y, lookAt.position_z, 1.0f };
-
-	vmath::mat4 view_matrix(
-		vmath::lookat(vmath::vec3(lookAt.position_x, lookAt.position_y, lookAt.position_z),
-			vmath::vec3(lookAt.lookAt_x + lookAt.position_x, lookAt.lookAt_y + lookAt.position_y, lookAt.lookAt_z + lookAt.position_z),
-			vmath::vec3(0, 1, 0)
-		)
-	);
-
-	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, view_matrix);
+	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, viewMatrix);
 	CHECK_GL_LOC(viewMatrixLocation);
 }
 

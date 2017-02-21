@@ -2,7 +2,6 @@
 #include "bspgameworld.h"
 
 BSPGameWorldPrivate::BSPGameWorldPrivate()
-	: scaling(1)
 {
 
 }

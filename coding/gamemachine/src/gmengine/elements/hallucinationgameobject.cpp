@@ -2,6 +2,7 @@
 #include "hallucinationgameobject.h"
 
 HallucinationGameObject::HallucinationGameObject(AUTORELEASE Object* obj)
+	: m_scale(btVector3(1, 1, 1))
 {
 	setObject(obj);
 }

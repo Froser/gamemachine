@@ -16,6 +16,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.h" />
@@ -63,6 +64,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\bitset.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\camera.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\frustum.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\log.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\plane.h" />
@@ -77,6 +79,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.cpp" />
@@ -124,6 +127,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\bitset.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\frustum.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\log.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\plane.cpp" />
@@ -141,20 +145,20 @@
     <ProjectGuid>{421D5CC0-A094-40E3-9570-4C0DB51B4B8F}</ProjectGuid>
     <RootNamespace>gamemachine</RootNamespace>
     <ProjectName>gamemachine</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

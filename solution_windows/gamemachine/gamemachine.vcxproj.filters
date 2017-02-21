@@ -220,6 +220,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\plane.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\frustum.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -395,6 +401,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\plane.cpp">
       <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\frustum.cpp">
+      <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp">
+      <Filter>src\gmdatacore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

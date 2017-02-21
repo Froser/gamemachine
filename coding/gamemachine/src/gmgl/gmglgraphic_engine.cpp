@@ -10,6 +10,7 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/gamelight.h"
 #include "gmglobjectpainter.h"
+#include "gmengine/elements/character.h"
 
 struct __shadowSourcePred
 {
@@ -66,6 +67,7 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 {
 	bool shadowMapping = m_shadowMapping.hasBegun();
 	int i = 0;
+	GMGLShaders* lastShaders = nullptr;
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
 		DrawingItem& item = *iter;
@@ -80,12 +82,15 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 				beginSetSky(shaders);
 
 			GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
-
 			GMGLObjectPainter* painter = static_cast<GMGLObjectPainter*>(coreObj->getPainter());
 
 			if (!shadowMapping)
 			{
-				setEyeViewport(shadowOn, shaders);
+				if (lastShaders != &shaders)
+				{
+					setEyeViewport(shadowOn, shaders);
+					lastShaders = &shaders;
+				}
 				shadowTexture(shadowOn, shaders);
 
 				painter->setWorld(m_world);
@@ -118,7 +123,8 @@ void GMGLGraphicEngine::setEyeViewport(bool shadowOn, GMGLShaders& shaders)
 		glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
 		GMGL::uniformMatrix4(shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
 	}
-	GMGL::perspective(60, 2, 1, 2000, shaders, GMSHADER_PROJECTION_MATRIX);
+
+	GMGL::perspective(m_projectionMatrix, shaders, GMSHADER_PROJECTION_MATRIX);
 }
 
 void GMGLGraphicEngine::shadowTexture(bool shadowOn, GMGLShaders& shaders)
@@ -175,16 +181,30 @@ GMGLShadowMapping& GMGLGraphicEngine::getShadowMapping()
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
+	updateMatrices(lookAt);
+
 	BEGIN_ENUM(i, ChildObject::ObjectTypeBegin, ChildObject::ObjectTypeEnd)
 	{
 		GMGLShaders* shaders = getShaders(i);
 		if (!shaders)
 			continue;
 		shaders->useProgram();
-		GMGL::lookAt(lookAt, *shaders, GMSHADER_VIEW_MATRIX);
+		GMGL::lookAt(m_viewMatrix, *shaders, GMSHADER_VIEW_MATRIX);
 		GMGL::cameraPosition(lookAt, *shaders, GMSHADER_VIEW_POSITION);
 	}
 	END_ENUM
+}
+
+void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
+{
+	Character* character = getWorld()->getMajorCharacter();
+
+	//TODO 
+	m_projectionMatrix = character->getFrustum().getPerspective();
+	m_viewMatrix = getViewMatrix(lookAt);
+
+	character->getFrustum().updateViewMatrix(m_viewMatrix, m_projectionMatrix);
+	character->getFrustum().update();
 }
 
 GameWorld* GMGLGraphicEngine::getWorld()

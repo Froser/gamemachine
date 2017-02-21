@@ -5,13 +5,6 @@
 #include "LinearMath\btVector3.h"
 BEGIN_NS
 
-class ChildObject;
-class Algorithm
-{
-public:
-	static void createSphere(GMfloat radius, GMint slices, GLint stacks, OUT ChildObject** obj);
-};
-
 // interpolations
 struct InterpolationVector2
 {

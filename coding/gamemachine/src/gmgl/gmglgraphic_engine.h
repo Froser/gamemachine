@@ -36,6 +36,7 @@ public:
 	GMGLShaders* getShaders(ChildObject::ObjectType objectType);
 
 private:
+	void updateMatrices(const CameraLookAt& lookAt);
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
 	void setEyeViewport(bool shadowOn, GMGLShaders& shaders);
 	void shadowTexture(bool shadowOn, GMGLShaders& shaders);
@@ -49,6 +50,9 @@ private:
 	GameWorld* m_world;
 	ResourceContainer m_resourceContainer;
 	GraphicSettings* m_settings;
+
+	vmath::mat4 m_viewMatrix;
+	vmath::mat4 m_projectionMatrix;
 };
 
 END_NS

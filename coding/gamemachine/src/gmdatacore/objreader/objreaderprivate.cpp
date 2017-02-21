@@ -172,9 +172,15 @@ void ObjReaderPrivate::pushMaterial()
 		return;
 	}
 
+
+	//TODO:
+	ASSERT(false);
+	GMuint vertexCount = 0;
+	/*
 	GMuint vertexCount = m_vertexOffset - m_currentComponent->getOffset();
 	if (vertexCount == 0)
 		return;
+		*/
 
 	Material& m = m_currentComponent->getMaterial();
 	m.Ka[0] = m_currentMaterial->Ka_r;
@@ -224,10 +230,10 @@ void ObjReaderPrivate::pushMaterial()
 		textureIdx++;
 	}
 
-	m_currentChildObject->appendComponent(m_currentComponent, vertexCount);
+	m_currentChildObject->appendComponent(m_currentComponent);
 
 	m_currentComponent = new Component();
-	m_currentComponent->setOffset(m_vertexOffset);
+	//m_currentComponent->setOffset(m_vertexOffset);
 }
 
 void ObjReaderPrivate::pushChildObject(const char* nextChildObjectName)
@@ -240,7 +246,7 @@ void ObjReaderPrivate::pushChildObject(const char* nextChildObjectName)
 
 	pushMaterial();
 	m_vertexOffset = 0;
-	m_currentComponent->setOffset(0);
+	//m_currentComponent->setOffset(0);
 
 	ASSERT(m_currentChildObject);
 	m_object->append(m_currentChildObject);

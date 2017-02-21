@@ -87,15 +87,6 @@ bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 	return true;
 }
 
-
-//Draw a biquadratic patch
-void BSP_Drawing_BiquadraticPatch::draw()
-{
-	ASSERT(false);
-}
-
-
-
 //////////////////////////////////////////////////////////////////////////
 BSP::BSP()
 {
@@ -147,7 +138,7 @@ void BSP::readFile()
 {
 	D(d);
 	FILE* file = nullptr;
-	file = fopen(d.filename.c_str(), "r");
+	file = fopen(d.filename.c_str(), "rb");
 	if (file)
 	{
 		GMuint size;
@@ -347,7 +338,7 @@ skipspace:
 		if (*d.script->script_p++ == '\n')
 		{
 			if (!crossline)
-				LOG_ASSERT_MSG(false, "Line %i is incomplete\n", scriptline);
+				printf(false, "Line %i is incomplete\n", d.scriptline);
 			d.scriptline = d.script->line++;
 		}
 	}
@@ -372,7 +363,10 @@ skipspace:
 	if (d.script->script_p[0] == '/' && d.script->script_p[1] == '*')
 	{
 		if (!crossline)
-			LOG_ASSERT_MSG(false, "Line %i is incomplete\n", scriptline);
+		{
+			printf("Line %i is incomplete\n", d.scriptline);
+			ASSERT(false);
+		}
 		d.script->script_p += 2;
 		while (d.script->script_p[0] != '*' && d.script->script_p[1] != '/')
 		{
@@ -402,7 +396,7 @@ skipspace:
 			if (d.script->script_p == d.script->end_p)
 				break;
 			if (token_p == &d.token[MAXTOKEN])
-				LOG_ASSERT_MSG(false, "Token too large.");
+				printf("Token too large.");
 		}
 		d.script->script_p++;
 	}
@@ -413,7 +407,7 @@ skipspace:
 			if (d.script->script_p == d.script->end_p)
 				break;
 			if (token_p == &d.token[MAXTOKEN])
-				LOG_ASSERT_MSG(false, "Token too large on line %i\n", scriptline);
+				printf("Token too large on line %i\n", d.scriptline);
 		}
 
 	*token_p = 0;
@@ -480,7 +474,10 @@ bool BSP::endOfScript(bool crossline)
 {
 	D(d);
 	if (!crossline)
-		LOG_ASSERT_MSG(false, "Line %i is incomplete\n", scriptline);
+	{
+		printf(false, "Line %i is incomplete\n", d.scriptline);
+		ASSERT(false);
+	}
 
 	if (!strcmp(d.script->filename, "memory buffer"))
 	{
@@ -681,7 +678,7 @@ void BSP::generateFaces()
 				//tesselate the patch
 
 				//TODO  curveTesselation
-				GMint curveTesselation = 1;
+				GMint curveTesselation = 8;
 				d.drawingPatches[currentPatch].quadraticPatches[y*numPatchesWide + x].tesselate(curveTesselation);
 			}
 		}
@@ -744,11 +741,10 @@ void BSP::generateBSPData()
 	}
 
 	// visBytes头两个int表示clusters，后面的字节表示bitsets
-	memcpy(&d.visibilityData, d.visBytes.data(), sizeof(int) * 2);
+	size_t sz = sizeof(int) * 2;
+	memcpy(&d.visibilityData, d.visBytes.data(), sz);
 	int bitsetSize = d.visibilityData.numClusters * d.visibilityData.bytesPerCluster;
 	d.visibilityData.bitset = new GMbyte[bitsetSize];
 	// TODO: read bitset
-	int offset = d.header->lumps[LUMP_VISIBILITY].fileofs;
-	int length = sizeof(int) * 2;
-	memcpy(d.visibilityData.bitset, (byte *)d.header + offset + length, bitsetSize);
+	memcpy(d.visibilityData.bitset, d.visBytes.data() + sz, bitsetSize);
 }

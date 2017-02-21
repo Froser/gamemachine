@@ -147,20 +147,19 @@ void SkyGameObject::initCoreObject()
 	ChildObject* coreChildObj = new ChildObject();
 
 	TextureInfo textureInfo = {
-		m_texture, nullptr, TextureTypeCubeMap
+		m_texture, nullptr, nullptr, TextureTypeCubeMap
 	};
 	for (GMuint i = 0; i < 4 * 6 * 4; i++)
 	{
 		if (i % 16 == 0)
 		{
 			Component* c = new Component();
-			c->setOffset(i / 4);
 			c->getMaterial().textures[(int)(i / 16)] = textureInfo;
 			c->getMaterial().Ka[0] = 1.0f;
 			c->getMaterial().Ka[1] = 1.0f;
 			c->getMaterial().Ka[2] = 1.0f;
 			c->pushBackVertexOffset(4);
-			coreChildObj->appendComponent(c, 4);
+			coreChildObj->appendComponent(c);
 		}
 		coreChildObj->vertices().push_back(vertices[i]);
 		coreChildObj->normals().push_back(normals[i]);

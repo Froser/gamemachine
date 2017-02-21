@@ -39,6 +39,9 @@ public:
 	virtual void beginTexture(GMuint type) override;
 	virtual void endTexture() override;
 
+public:
+	GLuint textureId();
+
 private:
 	bool m_inited;
 	AutoPtr<Image> m_image;

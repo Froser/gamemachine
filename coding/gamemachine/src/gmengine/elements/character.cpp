@@ -17,6 +17,7 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	, m_freeMove(true)
 	, m_dynamicWorld(nullptr)
 	, m_moveSpeed(10)
+	, m_frustum(75, 1.333f, 0.1, 100)
 {
 	setTransform(position);
 	memset(&m_state, 0, sizeof(m_state));
@@ -226,4 +227,9 @@ void Character::updateLookAt()
 CameraLookAt& Character::getLookAt()
 {
 	return m_lookAt;
+}
+
+Frustum& Character::getFrustum()
+{
+	return m_frustum;
 }

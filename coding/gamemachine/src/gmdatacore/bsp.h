@@ -6,6 +6,7 @@
 #include "utilities/bitset.h"
 #include "LinearMath/btVector3.h"
 #include "utilities/plane.h"
+#include "LinearMath/btAlignedObjectArray.h"
 BEGIN_NS
 
 // key / value pair sizes in the entities lump
@@ -241,7 +242,6 @@ class BSP_Drawing_BiquadraticPatch
 {
 public:
 	bool tesselate(int newTesselation);
-	void draw();
 
 	BSP_Drawing_Vertex controlPoints[9];
 
@@ -259,11 +259,11 @@ public:
 	{
 		if (vertices)
 			delete[] vertices;
-		vertices = NULL;
+		vertices = nullptr;
 
 		if (indices)
 			delete[] indices;
-		indices = NULL;
+		indices = nullptr;
 	}
 };
 
@@ -301,7 +301,7 @@ public:
 	{
 		if (bitset)
 			delete[] bitset;
-		bitset = NULL;
+		bitset = nullptr;
 	}
 };
 
@@ -356,17 +356,17 @@ struct BSPPrivate
 	std::vector<BSPFog> fogs;
 
 //data for render:
-	std::vector<BSP_Drawing_Vertex> drawingVertices;
+	btAlignedObjectArray<BSP_Drawing_Vertex> drawingVertices;
 	Bitset facesToDraw;
 	GMint numPolygonFaces;
 	GMint numPatches;
 	GMint numMeshFaces;
-	std::vector<BSP_Drawing_FaceDirectoryEntry> drawingFaceDirectory;
-	std::vector<BSP_Drawing_PolygonFace> drawingPolygonFaces;
-	std::vector<BSP_Drawing_MeshFace> drawingMeshFaces;
-	std::vector<BSP_Drawing_Patch> drawingPatches;
-	std::vector<BSP_Drawing_Leaf> drawingLeafs;
-	std::vector<Plane> drawingPlanes;
+	btAlignedObjectArray<BSP_Drawing_FaceDirectoryEntry> drawingFaceDirectory;
+	btAlignedObjectArray<BSP_Drawing_PolygonFace> drawingPolygonFaces;
+	btAlignedObjectArray<BSP_Drawing_MeshFace> drawingMeshFaces;
+	btAlignedObjectArray<BSP_Drawing_Patch> drawingPatches;
+	btAlignedObjectArray<BSP_Drawing_Leaf> drawingLeafs;
+	btAlignedObjectArray<Plane> drawingPlanes;
 	BSP_VisibilityData visibilityData;
 
 private:

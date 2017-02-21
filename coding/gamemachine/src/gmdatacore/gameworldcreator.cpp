@@ -10,7 +10,7 @@ void GameWorldCreator::createBSPGameWorld(GameMachine* gm, const char* bspPath, 
 {
 	ASSERT(gameWorld);
 
-	BSPGameWorld* world = new BSPGameWorld(1);
+	BSPGameWorld* world = new BSPGameWorld();
 	*gameWorld = world;
 
 	IFactory* factory = gm->getFactory();

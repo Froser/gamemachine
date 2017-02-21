@@ -5,6 +5,7 @@
 #include "utilities/camera.h"
 #include "utilities/autoptr.h"
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "utilities/frustum.h"
 
 class btMotionState;
 class btCollisionShape;
@@ -43,6 +44,7 @@ public:
 
 	void updateLookAt();
 	CameraLookAt& getLookAt();
+	Frustum& getFrustum();
 
 public:
 	virtual void getReadyForRender(DrawingList& list) override;
@@ -65,6 +67,7 @@ private:
 	btScalar m_fallSpeed;
 	GMfloat m_moveSpeed;
 	GMfloat m_eyeOffset[3];
+	Frustum m_frustum;
 
 	AutoPtr<btKinematicCharacterController> m_controller;
 	AutoPtr<btPairCachingGhostObject> m_ghostObject;

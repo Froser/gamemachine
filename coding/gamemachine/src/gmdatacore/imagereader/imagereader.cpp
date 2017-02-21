@@ -46,6 +46,9 @@ bool ImageReader::load(const char* filename, ImageType type, OUT Image** image)
 	if (type == ImageType_AUTO)
 		type = test(filename);
 
+	if (type == ImageType_End)
+		return false;
+
 	return getReader(type)->load(filename, image);
 }
 
@@ -62,6 +65,5 @@ ImageType ImageReader::test(const char* filename)
 		if (getReader(i)->test(filename))
 			return i;
 	}
-	ASSERT(false);
 	return ImageType_End;
 }

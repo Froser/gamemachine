@@ -12,6 +12,7 @@ GMGLTextureShaderNames::GMGLTextureShaderNames()
 	m_uniformNames[TextureTypeCubeMap] = GMSHADER_CUBEMAP_TEXTURE;
 	m_uniformNames[TextureTypeDiffuse] = GMSHADER_DIFFUSE_TEXTURE;
 	m_uniformNames[TextureTypeNormalMapping] = GMSHADER_NORMAL_MAPPING_TEXTURE;
+	m_uniformNames[TextureTypeLightmap] = GMSHADER_LIGHTMAP_TEXTURE;
 	m_uniformNames[TextureTypeReflectionCubeMap] = GMSHADER_REFLECTION_CUBEMAP_TEXTURE;
 }
 
@@ -175,4 +176,9 @@ void GMGLTexture::endTexture()
 {
 	const ImageData& image = m_image->getData();
 	glBindTexture(image.target, 0);
+}
+
+GLuint GMGLTexture::textureId()
+{
+	return m_id;
 }

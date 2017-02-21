@@ -34,7 +34,6 @@ typedef GLint GMint;
 typedef GLuint GMuint;
 typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
-typedef GMuint GMvertexoffset;
 struct GMRect
 {
 	GMfloat x, y, width, height;

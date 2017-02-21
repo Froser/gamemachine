@@ -26,10 +26,23 @@ Object::~Object()
 	END_FOREACH_OBJ
 }
 
+Component::Component(ChildObject* parent)
+	: m_offset(0)
+	, m_primitiveVertices(0)
+	, m_parent(parent)
+	, m_primitiveCount(0)
+{
+	memset(&m_material, 0, sizeof(m_material));
+
+	setVertexOffset(m_parent->vertices().size());
+}
+
+
 Component::Component()
 	: m_offset(0)
-	, m_verticesCount(0)
-	, m_polygonCount(0)
+	, m_primitiveVertices(0)
+	, m_parent(nullptr)
+	, m_primitiveCount(0)
 {
 	memset(&m_material, 0, sizeof(m_material));
 }
@@ -45,8 +58,65 @@ Component::~Component()
 				delete texture.texture;
 			if (texture.normalMapping)
 				delete texture.normalMapping;
+			if (texture.lightmap)
+				delete texture.lightmap;
 		}
 	}
+}
+
+// 设置此component的第一个顶点位于ChildObject.vertices()中的偏移位置
+// 一般不需要手动调用
+void Component::setVertexOffset(GMuint offset)
+{
+	m_offset = offset;
+}
+
+void Component::beginFace()
+{
+	m_currentFaceVerticesCount = 0;
+}
+
+void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
+{
+	std::vector<Object::DataType>& vertices = m_parent->vertices();
+	vertices.push_back(x);
+	vertices.push_back(y);
+	vertices.push_back(z);
+	vertices.push_back(1.0f);
+	m_currentFaceVerticesCount++;
+}
+
+void Component::normal(GMfloat x, GMfloat y, GMfloat z)
+{
+	std::vector<Object::DataType>& normals = m_parent->normals();
+	normals.push_back(x);
+	normals.push_back(y);
+	normals.push_back(z);
+	normals.push_back(1.0f);
+}
+
+void Component::uv(GMfloat u, GMfloat v)
+{
+	std::vector<Object::DataType>& uvs = m_parent->uvs();
+	uvs.push_back(u);
+	uvs.push_back(v);
+}
+
+void Component::lightmap(GMfloat u, GMfloat v)
+{
+	std::vector<Object::DataType>& lightmaps = m_parent->lightmaps();
+	lightmaps.push_back(u);
+	lightmaps.push_back(v);
+}
+
+void Component::endFace()
+{
+	// 由于一个顶点由4元数组成，所以顶点的偏移应该除以4
+	m_vertexOffsets.push_back(m_primitiveVertices.empty() ?
+		m_offset / 4 : m_vertexOffsets.back() + m_primitiveVertices.back() / 4
+	);
+	m_primitiveVertices.push_back(m_currentFaceVerticesCount);
+	m_primitiveCount++;
 }
 
 ChildObject::ChildObject()
@@ -77,9 +147,8 @@ ChildObject::~ChildObject()
 	}
 }
 
-void ChildObject::appendComponent(AUTORELEASE Component* component, GMuint verticesCount)
+void ChildObject::appendComponent(AUTORELEASE Component* component)
 {
-	component->m_verticesCount = verticesCount;
 	m_components.push_back(component);
 }
 
@@ -88,6 +157,9 @@ void ChildObject::disposeMemory()
 	m_vertices.clear();
 	m_normals.clear();
 	m_uvs.clear();
+	m_tangents.clear();
+	m_bitangents.clear();
+	m_lightmaps.clear();
 }
 
 void ChildObject::calculateTangentSpace()
@@ -98,10 +170,10 @@ void ChildObject::calculateTangentSpace()
 	for (auto iter = m_components.begin(); iter != m_components.end(); iter++)
 	{
 		Component* component = (*iter);
-		for (GMuint i = 0; i < component->getPolygonCount(); i++)
+		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
 		{
 			GMint offset = component->getOffsetPtr()[i];
-			GMint edgeCount = component->getEdgeCountPtr()[i];
+			GMint edgeCount = component->getPrimitiveVerticesCountPtr()[i];
 
 			// 开始计算每条边切线空间
 			for (GMuint j = 0; j < edgeCount; j++)

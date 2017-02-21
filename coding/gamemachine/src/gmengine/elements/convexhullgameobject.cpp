@@ -282,11 +282,7 @@ btTransform ConvexHullGameObject::getRuntimeTransform()
 {
 	D(d);
 	btTransform trans;
-	// 如果是机关（门，etc），使用世界变换。
-	if (!m_isSensor)
-		trans = d.transform;
-	else
-		trans = d.collisionObject->getWorldTransform();
+	trans = d.transform;
 	return trans;
 }
 
@@ -314,7 +310,7 @@ void ConvexHullGameObject::createTriangleMesh()
 		component->pushBackVertexOffset(3);
 	}
 
-	childObj->appendComponent(component, indices.size());
+	childObj->appendComponent(component);
 
 	obj->append(childObj);
 	setObject(obj);

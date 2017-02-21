@@ -17,6 +17,8 @@ GLenum getMode(ChildObject* obj)
 		return GL_TRIANGLE_FAN;
 	case ChildObject::Triangle_Strip:
 		return GL_TRIANGLE_STRIP;
+	case ChildObject::Triangles:
+		return GL_TRIANGLES;
 	default:
 		ASSERT(false);
 		return GL_TRIANGLE_FAN;
@@ -52,16 +54,18 @@ void GMGLObjectPainter::transfer()
 		GLuint uvSize = sizeof(Object::DataType) * childObj->uvs().size();
 		GLuint tangentSize = sizeof(Object::DataType) * childObj->tangents().size();
 		GLuint bitangentSize = sizeof(Object::DataType) * childObj->bitangents().size();
+		GLuint lightmapSize = sizeof(Object::DataType) * childObj->lightmaps().size();
 
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize, NULL, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0												, vaoSize, childObj->vertices().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize										, normalSize, childObj->normals().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize							, uvSize, childObj->uvs().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize					, tangentSize, childObj->tangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize	, bitangentSize, childObj->bitangents().data());
+		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, NULL, GL_STATIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0															, vaoSize, childObj->vertices().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize													, normalSize, childObj->normals().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize										, uvSize, childObj->uvs().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize								, tangentSize, childObj->tangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize				, bitangentSize, childObj->bitangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + lightmapSize	, lightmapSize, childObj->lightmaps().data());
 		childObj->setBufferId(vbo);
 
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -69,11 +73,13 @@ void GMGLObjectPainter::transfer()
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize));
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize));
 		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize));
+		glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize + lightmapSize));
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
 		glEnableVertexAttribArray(3);
 		glEnableVertexAttribArray(4);
+		glEnableVertexAttribArray(5);
 
 		glBindVertexArray(0);
 		childObj->disposeMemory();
@@ -96,7 +102,7 @@ void GMGLObjectPainter::draw()
 		GLint params[2];
 		glGetIntegerv(GL_POLYGON_MODE, params);
 		GLenum mode = params[1] == GL_FILL ? mode : GL_LINE_LOOP;
-		resetTextures(childObj->getType());
+//		resetTextures(childObj->getType());
 
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
@@ -110,7 +116,7 @@ void GMGLObjectPainter::draw()
 			}
 
 			GLenum mode = getMode(childObj);
-			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getEdgeCountPtr(), component->getPolygonCount());
+			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 
 			if (!m_shadowMapping.hasBegun())
 				endTextures(textureInfos);
@@ -165,19 +171,41 @@ void GMGLObjectPainter::beginTextures(TextureInfo* startTexture, ChildObject::Ob
 {
 	for (GMuint i = 0; i < MaxTextureCount; i++)
 	{
+		// 开始绘制一套纹理
+
 		TextureInfo& info = startTexture[i];
 		ITexture* t = info.texture;
 		if (t)
 		{
-			t->beginTexture(info.type);
-			GMGL::uniformTextureIndex(*m_engine->getShaders(type), info.type, getTextureUniformName(info.type));
+			GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_ambient_texture");
+			glUniform1i(loc, 1);
+			loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_ambient_texture_switch");
+			glUniform1i(loc, 1);
+			glActiveTexture(GL_TEXTURE1);
+			glBindTexture(GL_TEXTURE_2D, ((GMGLTexture*)t)->textureId());
+
+			//loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_lightmap_texture_switch");
+			//glUniform1i(loc, 1);
+			//GMGL::uniformTextureIndex(*m_engine->getShaders(type), info.type, getTextureUniformName(info.type));
+			//t->beginTexture(info.type);
 		}
 
 		t = info.normalMapping;
 		if (t)
 		{
-			t->beginTexture(TextureTypeNormalMapping);
 			GMGL::uniformTextureIndex(*m_engine->getShaders(type), TextureTypeNormalMapping, getTextureUniformName(TextureTypeNormalMapping));
+			t->beginTexture(TextureTypeNormalMapping);
+		}
+
+		t = info.lightmap;
+		if (t)
+		{
+			GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_lightmap_texture");
+			glUniform1i(loc, 5);
+			loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_lightmap_texture_switch");
+			glUniform1i(loc, 1);
+			glActiveTexture(GL_TEXTURE5);
+			glBindTexture(GL_TEXTURE_2D, ((GMGLTexture*)t)->textureId());
 		}
 	}
 }
@@ -189,10 +217,14 @@ void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
 		ITexture* t = startTexture[i].texture;
 		if (t)
 			t->endTexture();
-
-		t = startTexture[i].normalMapping;
-		if (t)
-			t->endTexture();
+		//
+		//t = startTexture[i].normalMapping;
+		//if (t)
+		//	t->endTexture();
+		//
+		//t = startTexture[i].lightmap;
+		//if (t)
+		//	t->endTexture();
 	}
 }
 

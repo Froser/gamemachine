@@ -5,6 +5,11 @@
 #include "gmdatacore/object.h"
 BEGIN_NS
 
+enum
+{
+	TEXTURE_CONTAINER_COUNT = 2
+};
+
 template <typename T>
 class ID_Less
 {
@@ -15,7 +20,7 @@ public:
 	}
 };
 
-typedef GMuint ID;
+typedef GMint ID;
 
 class TextureContainer
 {
@@ -41,11 +46,16 @@ class ResourceContainer
 public:
 	TextureContainer& getTextureContainer()
 	{
-		return m_textureContainer;
+		return m_textureContainer[0];
+	}
+
+	TextureContainer& getLightmapContainer()
+	{
+		return m_textureContainer[1];
 	}
 
 private:
-	TextureContainer m_textureContainer;
+	TextureContainer m_textureContainer[TEXTURE_CONTAINER_COUNT];
 };
 
 END_NS
