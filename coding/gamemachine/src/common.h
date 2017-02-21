@@ -46,12 +46,6 @@ T* GM_new()
 	return t;
 }
 
-enum UpAxis
-{
-	Y_AXIS,
-	Z_AXIS,
-};
-
 #define BEGIN_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMuint)var)+1) )
 #define END_ENUM
 

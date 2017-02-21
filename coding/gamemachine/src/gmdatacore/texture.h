@@ -6,7 +6,7 @@ BEGIN_NS
 struct ITexture
 {
 	virtual ~ITexture();
-	virtual void beginTexture(GMuint type) = 0;
+	virtual void beginTexture() = 0;
 	virtual void endTexture() = 0;
 };
 

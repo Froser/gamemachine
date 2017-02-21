@@ -15,13 +15,10 @@
 #include "utilities\path.h"
 #include "gmdatacore\imagebuffer.h"
 
-#define M(x, y, z) makeVector(x, y, z, getUpAxis())
-
 BSPGameWorld::BSPGameWorld()
 {
 	D(d);
 	D_BASE(GameWorld, dbase);
-	dbase.upAxis = Z_AXIS;
 }
 
 void BSPGameWorld::loadBSP(const char* bspPath)
@@ -316,9 +313,8 @@ bool BSPGameWorld::setMaterialTexture(ID textureid, REF Material& m)
 	if (!item)
 		return false;
 
-	m.textures[0].autorelease = false;
-	m.textures[0].texture = item->texture;
-	m.textures[0].type = item->type;
+	m.textures.autorelease = false;
+	m.textures.texture[TEXTURE_INDEX_AMBIENT] = item->texture;
 	return true;
 }
 
@@ -330,8 +326,8 @@ void BSPGameWorld::setMaterialLightmap(ID lightmapid, REF Material& m)
 	TextureContainer& tc = rc->getLightmapContainer();
 	const TextureContainer::TextureItem* item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	m.textures[0].autorelease = false;
-	m.textures[0].lightmap = item->texture;
+	m.textures.autorelease = false;
+	m.textures.texture[TEXTURE_INDEX_LIGHTMAP] = item->texture;
 }
 
 void BSPGameWorld::importBSP()
@@ -367,7 +363,6 @@ void BSPGameWorld::initTextures()
 
 			TextureContainer::TextureItem item;
 			item.id = i;
-			item.type = TextureTypeAmbient;
 			item.texture = texture;
 			rc->getTextureContainer().insert(item);
 		}

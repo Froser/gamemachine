@@ -29,7 +29,6 @@ struct GameWorldPrivate
 	Character* character;
 	GameObject* sky;
 	GMfloat ellapsed;
-	UpAxis upAxis;
 };
 
 END_NS

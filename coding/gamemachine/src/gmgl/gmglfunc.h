@@ -22,7 +22,6 @@ void API lookAt(vmath::mat4& viewMatrix, GMGLShaders& shaders, const char* viewM
 void API cameraPosition(const CameraLookAt& lookAt, GMGLShaders& shaders, const char* matrixName);
 void API uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixName);
 void API uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textureName);
-void API disableTexture(GMGLShaders& shaders, const char* textureName);
 
 END_GMGL_FUNCS
 

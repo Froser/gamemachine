@@ -102,24 +102,23 @@ void GMGLObjectPainter::draw()
 		GLint params[2];
 		glGetIntegerv(GL_POLYGON_MODE, params);
 		GLenum mode = params[1] == GL_FILL ? mode : GL_LINE_LOOP;
-//		resetTextures(childObj->getType());
 
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
 			Component* component = (*iter);
-			TextureInfo* textureInfos = component->getMaterial().textures;
+			TextureInfo& textureInfos = component->getMaterial().textures;
 
 			if (!m_shadowMapping.hasBegun())
 			{
 				setLights(component->getMaterial(), childObj->getType());
-				beginTextures(textureInfos, childObj->getType());
+				beginTextures(&textureInfos, childObj->getType());
 			}
 
 			GLenum mode = getMode(childObj);
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 
 			if (!m_shadowMapping.hasBegun())
-				endTextures(textureInfos);
+				endTextures(&textureInfos);
 		}
 		glBindVertexArray(0);
 	}
@@ -167,72 +166,39 @@ void GMGLObjectPainter::setLights(Material& material, ChildObject::ObjectType ty
 	}
 }
 
-void GMGLObjectPainter::beginTextures(TextureInfo* startTexture, ChildObject::ObjectType type)
+void GMGLObjectPainter::activeTexture(TextureIndex i, ChildObject::ObjectType type)
 {
-	for (GMuint i = 0; i < MaxTextureCount; i++)
+	std::string uniform = getTextureUniformName(i);
+	GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), uniform.c_str());
+	glUniform1i(loc, i + 1);
+	loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), uniform.append("_switch").c_str());
+	glUniform1i(loc, 1);
+	glActiveTexture(i + GL_TEXTURE1);
+}
+
+void GMGLObjectPainter::beginTextures(TextureInfo* textures, ChildObject::ObjectType type)
+{
+	ITexture** texs = textures->texture;
+	for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
-		// 开始绘制一套纹理
-
-		TextureInfo& info = startTexture[i];
-		ITexture* t = info.texture;
+		// GL_TEXTURE0留给shadow mapping
+		ITexture* t = texs[i];
 		if (t)
 		{
-			GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_ambient_texture");
-			glUniform1i(loc, 1);
-			loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_ambient_texture_switch");
-			glUniform1i(loc, 1);
-			glActiveTexture(GL_TEXTURE1);
-			glBindTexture(GL_TEXTURE_2D, ((GMGLTexture*)t)->textureId());
-
-			//loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_lightmap_texture_switch");
-			//glUniform1i(loc, 1);
-			//GMGL::uniformTextureIndex(*m_engine->getShaders(type), info.type, getTextureUniformName(info.type));
-			//t->beginTexture(info.type);
-		}
-
-		t = info.normalMapping;
-		if (t)
-		{
-			GMGL::uniformTextureIndex(*m_engine->getShaders(type), TextureTypeNormalMapping, getTextureUniformName(TextureTypeNormalMapping));
-			t->beginTexture(TextureTypeNormalMapping);
-		}
-
-		t = info.lightmap;
-		if (t)
-		{
-			GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_lightmap_texture");
-			glUniform1i(loc, 5);
-			loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), "GM_lightmap_texture_switch");
-			glUniform1i(loc, 1);
-			glActiveTexture(GL_TEXTURE5);
-			glBindTexture(GL_TEXTURE_2D, ((GMGLTexture*)t)->textureId());
+			activeTexture((TextureIndex)i, type);
+			t->beginTexture();
 		}
 	}
 }
 
-void GMGLObjectPainter::endTextures(TextureInfo* startTexture)
+void GMGLObjectPainter::endTextures(TextureInfo* textures)
 {
-	for (GMuint i = 0; i < MaxTextureCount; i++)
+	ITexture** texs = textures->texture;
+	for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
-		ITexture* t = startTexture[i].texture;
+		ITexture* t = texs[i];
 		if (t)
 			t->endTexture();
-		//
-		//t = startTexture[i].normalMapping;
-		//if (t)
-		//	t->endTexture();
-		//
-		//t = startTexture[i].lightmap;
-		//if (t)
-		//	t->endTexture();
-	}
-}
-
-void GMGLObjectPainter::resetTextures(ChildObject::ObjectType type)
-{
-	for (TextureType t = TextureTypeAmbient; t < TextureTypeResetEnd; t = (TextureType) ((GMuint)(t) + 1))
-	{
-		GMGL::disableTexture(*m_engine->getShaders(type), getTextureUniformName(t));
 	}
 }
 

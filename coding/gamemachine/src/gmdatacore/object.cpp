@@ -49,17 +49,14 @@ Component::Component()
 
 Component::~Component()
 {
-	for (GMuint i = 0; i < MaxTextureCount; i++)
+	TextureInfo& texture = getMaterial().textures;
+	if (texture.autorelease)
 	{
-		TextureInfo texture = getMaterial().textures[i];
-		if (texture.autorelease)
+		for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
-			if (texture.texture)
-				delete texture.texture;
-			if (texture.normalMapping)
-				delete texture.normalMapping;
-			if (texture.lightmap)
-				delete texture.lightmap;
+			ITexture* t = texture.texture[i];
+			if (t)
+				delete t;
 		}
 	}
 }

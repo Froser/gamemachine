@@ -198,52 +198,33 @@ static void collisionShape2TriangleMesh(btCollisionShape* collisionShape,
 }
 
 ConvexHullGameObject::ConvexHullGameObject(AUTORELEASE Object* obj)
-	: m_fromVertices(false)
 {
 	setObject(obj);
 }
 
-ConvexHullGameObject::ConvexHullGameObject(GMfloat* vertices, GMuint count, Material& material)
-	: m_vertices(vertices)
-	, m_verticesCount(count)
-	, m_material(material)
-	, m_fromVertices(true)
-{
-}
-
 btCollisionShape* ConvexHullGameObject::createCollisionShape()
 {
-	if (!m_fromVertices)
+	std::vector<Object::DataType> vertices;
+	GMuint cnt = 0;
+	BEGIN_FOREACH_OBJ(getObject(), childObj)
 	{
-		std::vector<Object::DataType> vertices;
-		GMuint cnt = 0;
-		BEGIN_FOREACH_OBJ(getObject(), childObj)
-		{
-			cnt += childObj->vertices().size();
-		}
-		END_FOREACH_OBJ;
-
-		vertices.reserve(cnt);
-		BEGIN_FOREACH_OBJ(getObject(), childObj)
-		{
-			for (auto iter = childObj->vertices().begin(); iter != childObj->vertices().end(); iter++)
-			{
-				vertices.push_back(*iter);
-			}
-		}
-		END_FOREACH_OBJ;
-
-		btConvexHullShape* shape = new btConvexHullShape(vertices.data(), cnt / 4, sizeof(Object::DataType) * 4);
-		shape->optimizeConvexHull();
-		return shape;
+		cnt += childObj->vertices().size();
 	}
-	else
+	END_FOREACH_OBJ;
+
+	vertices.reserve(cnt);
+	BEGIN_FOREACH_OBJ(getObject(), childObj)
 	{
-		// 从vertices创建
-		btConvexHullShape* shape = new btConvexHullShape(m_vertices, m_verticesCount);
-		shape->optimizeConvexHull();
-		return shape;
+		for (auto iter = childObj->vertices().begin(); iter != childObj->vertices().end(); iter++)
+		{
+			vertices.push_back(*iter);
+		}
 	}
+	END_FOREACH_OBJ;
+
+	btConvexHullShape* shape = new btConvexHullShape(vertices.data(), cnt / 4, sizeof(Object::DataType) * 4);
+	shape->optimizeConvexHull();
+	return shape;
 }
 
 void ConvexHullGameObject::getReadyForRender(DrawingList& list)
@@ -270,48 +251,10 @@ void ConvexHullGameObject::getReadyForRender(DrawingList& list)
 	list.push_back(item);
 }
 
-void ConvexHullGameObject::initPhysicsAfterCollisionObjectCreated()
-{
-	if (m_fromVertices)
-		createTriangleMesh();
-
-	RigidGameObject::initPhysicsAfterCollisionObjectCreated();
-}
-
 btTransform ConvexHullGameObject::getRuntimeTransform()
 {
 	D(d);
 	btTransform trans;
 	trans = d.transform;
 	return trans;
-}
-
-void ConvexHullGameObject::createTriangleMesh()
-{
-	D(d);
-	Object* obj = new Object();
-	ChildObject* childObj = new ChildObject();
-
-	ASSERT(d.collisionShape);
-	btTransform trans;
-	trans.setIdentity();
-
-	std::vector<GMuint> indices;
-	// 生成网格，形状的缩放、位置都会考虑在内
-	collisionShape2TriangleMesh(d.collisionShape, trans, childObj->vertices(), childObj->normals(), indices);
-
-	// 所有的Mesh，都采用同一材质
-	Component* component = new Component();
-	memcpy(&component->getMaterial(), &m_material, sizeof(Material));
-
-	// 把每个面的顶点数（边数）传入Component
-	for (GMuint i = 0; i < childObj->vertices().size() / 4; i++)
-	{
-		component->pushBackVertexOffset(3);
-	}
-
-	childObj->appendComponent(component);
-
-	obj->append(childObj);
-	setObject(obj);
 }

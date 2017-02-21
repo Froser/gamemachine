@@ -40,8 +40,6 @@ private:
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
 	void setEyeViewport(bool shadowOn, GMGLShaders& shaders);
 	void shadowTexture(bool shadowOn, GMGLShaders& shaders);
-	void beginSetSky(GMGLShaders& shaders);
-	void endSetSky();
 	GameLight* getShadowSourceLight();
 
 private:

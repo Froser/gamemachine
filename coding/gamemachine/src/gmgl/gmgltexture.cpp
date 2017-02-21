@@ -7,16 +7,13 @@
 
 GMGLTextureShaderNames::GMGLTextureShaderNames()
 {
-	m_uniformNames[TextureTypeShadow] = GMSHADER_SHADOW_TEXTURE;
-	m_uniformNames[TextureTypeAmbient] = GMSHADER_AMBIENT_TEXTURE;
-	m_uniformNames[TextureTypeCubeMap] = GMSHADER_CUBEMAP_TEXTURE;
-	m_uniformNames[TextureTypeDiffuse] = GMSHADER_DIFFUSE_TEXTURE;
-	m_uniformNames[TextureTypeNormalMapping] = GMSHADER_NORMAL_MAPPING_TEXTURE;
-	m_uniformNames[TextureTypeLightmap] = GMSHADER_LIGHTMAP_TEXTURE;
-	m_uniformNames[TextureTypeReflectionCubeMap] = GMSHADER_REFLECTION_CUBEMAP_TEXTURE;
+	m_uniformNames[TEXTURE_INDEX_AMBIENT] = GMSHADER_AMBIENT_TEXTURE;
+	m_uniformNames[TEXTURE_INDEX_DIFFUSE] = GMSHADER_DIFFUSE_TEXTURE;
+	m_uniformNames[TEXTURE_INDEX_NORMAL_MAPPING] = GMSHADER_NORMAL_MAPPING_TEXTURE;
+	m_uniformNames[TEXTURE_INDEX_LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURE;
 }
 
-const char* GMGLTextureShaderNames::operator [](TextureType t)
+const char* GMGLTextureShaderNames::operator [](TextureIndex t)
 {
 	ASSERT(m_uniformNames.find(t) != m_uniformNames.end());
 	return m_uniformNames[t].c_str();
@@ -158,17 +155,15 @@ void GMGLTexture::init()
 	}
 
 	glTexParameteriv(image.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(image.swizzle));
+
 	glBindTexture(image.target, 0);
 	m_image->dispose();
 	m_inited = true;
 }
 
-void GMGLTexture::beginTexture(GMuint type)
+void GMGLTexture::beginTexture()
 {
 	const ImageData& image = m_image->getData();
-	glActiveTexture(type + GL_TEXTURE0);
-	glTexParameteri(image.target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(image.target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glBindTexture(image.target, m_id);
 }
 
@@ -176,9 +171,4 @@ void GMGLTexture::endTexture()
 {
 	const ImageData& image = m_image->getData();
 	glBindTexture(image.target, 0);
-}
-
-GLuint GMGLTexture::textureId()
-{
-	return m_id;
 }

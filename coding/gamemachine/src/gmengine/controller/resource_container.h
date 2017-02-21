@@ -28,7 +28,6 @@ public:
 	struct TextureItem
 	{
 		ID id;
-		TextureType type;
 		ITexture* texture;
 	};
 

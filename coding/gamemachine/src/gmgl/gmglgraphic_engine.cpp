@@ -78,9 +78,6 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 			GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : *getShaders(type);
 
 			shaders.useProgram();
-			if (!shadowMapping)
-				beginSetSky(shaders);
-
 			GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
 			GMGLObjectPainter* painter = static_cast<GMGLObjectPainter*>(coreObj->getPainter());
 
@@ -101,9 +98,6 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 			}
 
 			painter->draw();
-
-			if (!shadowMapping)
-				endSetSky();
 		}
 		END_FOREACH_OBJ
 	}
@@ -131,36 +125,14 @@ void GMGLGraphicEngine::shadowTexture(bool shadowOn, GMGLShaders& shaders)
 {
 	if (shadowOn)
 	{
-		GMGL::uniformTextureIndex(shaders, TextureTypeShadow, getTextureUniformName(TextureTypeShadow));
-		glActiveTexture(TextureTypeShadow + GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
-		glGenerateMipmap(GL_TEXTURE_2D);
+		// GMGL::uniformTextureIndex(shaders, TextureTypeShadow, getTextureUniformName(TextureTypeShadow));
+		// glActiveTexture(TextureTypeShadow + GL_TEXTURE0);
+		// glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
+		// glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
 	{
-		GMGL::disableTexture(shaders, getTextureUniformName(TextureTypeShadow));
-	}
-}
-
-void GMGLGraphicEngine::beginSetSky(GMGLShaders& shaders)
-{
-	GameObject* sky = getWorld()->getSky();
-	if (sky)
-	{
-		GMGL::uniformTextureIndex(shaders, TextureTypeReflectionCubeMap, getTextureUniformName(TextureTypeReflectionCubeMap));
-		TextureInfo& info = sky->getObject()->getChildObjects()[0]->getComponents()[0]->getMaterial().textures[0];
-		ASSERT(info.texture);
-		info.texture->beginTexture(TextureTypeReflectionCubeMap);
-	}
-}
-
-void GMGLGraphicEngine::endSetSky()
-{
-	GameObject* sky = getWorld()->getSky();
-	if (sky)
-	{
-		TextureInfo& info = sky->getObject()->getChildObjects()[0]->getComponents()[0]->getMaterial().textures[0];
-		info.texture->endTexture();
+		// GMGL::disableTexture(shaders, getTextureUniformName(TextureTypeShadow));
 	}
 }
 

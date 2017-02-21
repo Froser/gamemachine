@@ -36,7 +36,6 @@ void GMGLAmbientLight::activateLight(Material& material)
 {
 	setVec4(*m_shaders, GMSHADER_LIGHT_AMBIENT, getColor());
 	setVec4(*m_shaders, GMSHADER_LIGHT_KA, material.Ka);
-	setVec4(*m_shaders, GMSHADER_LIGHT_KE, material.Ke);
 }
 
 bool GMGLAmbientLight::isAvailable()

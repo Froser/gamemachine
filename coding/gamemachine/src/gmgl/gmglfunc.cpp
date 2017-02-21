@@ -59,11 +59,3 @@ void IMPL uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textur
 	loc = glGetUniformLocation(shaders.getProgram(), _switch);
 	glUniform1i(loc, 1);
 }
-
-void IMPL disableTexture(GMGLShaders& shaders, const char* textureName)
-{
-	char _switch[64] = "";
-	strcat(_switch, textureName);
-	strcat(_switch, "_switch");
-	glUniform1i(glGetUniformLocation(shaders.getProgram(), _switch), 0);
-}

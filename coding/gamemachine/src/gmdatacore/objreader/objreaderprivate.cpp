@@ -139,7 +139,8 @@ void ObjReaderPrivate::parseLine(const char* line)
 			pushVector(m_currentChildObject->normals(), m_normals, i3);
 		} while (true);
 
-		m_currentComponent->pushBackVertexOffset(edgeCount);
+		ASSERT(false);
+		//m_currentComponent->pushBackVertexOffset(edgeCount);
 	}
 	else if (strEqual(command, KW_MTLLIB))
 	{
@@ -202,9 +203,8 @@ void ObjReaderPrivate::pushMaterial()
 		std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Ka);
 		ITexture* texture;
 		createTexture(m_factory, texturePath.c_str(), &texture);
-		m.textures[textureIdx].texture = texture;
-		m.textures[textureIdx].type = TextureTypeAmbient;
-		m.textures[textureIdx].autorelease = 1;
+		m.textures.texture[TEXTURE_INDEX_AMBIENT] = texture;
+		m.textures.autorelease = 1;
 		textureIdx++;
 	}
 
@@ -213,9 +213,8 @@ void ObjReaderPrivate::pushMaterial()
 		std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Kd);
 		ITexture* texture;
 		createTexture(m_factory, texturePath.c_str(), &texture);
-		m.textures[textureIdx].texture = texture;
-		m.textures[textureIdx].type = TextureTypeDiffuse;
-		m.textures[textureIdx].autorelease = 1;
+		m.textures.texture[TEXTURE_INDEX_DIFFUSE] = texture;
+		m.textures.autorelease = 1;
 		textureIdx++;
 	}
 
@@ -224,9 +223,8 @@ void ObjReaderPrivate::pushMaterial()
 		std::string texturePath = std::string(m_workingDir).append(m_currentMaterial->map_Bump);
 		ITexture* texture;
 		createTexture(m_factory, texturePath.c_str(), &texture);
-		m.textures[textureIdx].texture = texture;
-		m.textures[textureIdx].type = TextureTypeNormalMapping;
-		m.textures[textureIdx].autorelease = 1;
+		m.textures.texture[TEXTURE_INDEX_NORMAL_MAPPING] = texture;
+		m.textures.autorelease = 1;
 		textureIdx++;
 	}
 

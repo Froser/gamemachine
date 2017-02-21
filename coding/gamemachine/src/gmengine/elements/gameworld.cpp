@@ -184,9 +184,3 @@ void GameWorld::createPainterForObject(GameObject* obj)
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
 }
-
-UpAxis GameWorld::getUpAxis()
-{
-	D(d);
-	return d.upAxis;
-}

@@ -33,39 +33,21 @@ private:
 	Object* m_object;
 };
 
-enum TextureType
+// 表示一套纹理，包括普通纹理、漫反射纹理、法线贴图、光照贴图，以后可能还有高光贴图等
+enum TextureIndex
 {
-	TextureTypeUnknown = -1,
-	TextureTypeShadow = 0,
+	TEXTURE_INDEX_AMBIENT,
+	TEXTURE_INDEX_DIFFUSE,
+	TEXTURE_INDEX_NORMAL_MAPPING,
+	TEXTURE_INDEX_LIGHTMAP,
 
-	// 从Start到End表示每个对象绘制时需要清理掉的纹理
-	TextureTypeResetStart,
-	TextureTypeAmbient = TextureTypeResetStart,
-	TextureTypeCubeMap,
-	TextureTypeDiffuse,
-	TextureTypeNormalMapping,
-	TextureTypeLightmap,
-	TextureTypeResetEnd,
-
-	// 由于反射的天空纹理存在于环境，所以不需要清理
-	TextureTypeReflectionCubeMap,
+	TEXTURE_INDEX_MAX,
 };
 
-// 表示一套纹理，包括普通纹理、法线贴图、光照贴图，以后可能还有高光贴图等
 struct TextureInfo
 {
-	ITexture* texture;
-	ITexture* normalMapping;
-	ITexture* lightmap;
-
-	// 表示texture的类型
-	TextureType type;
+	ITexture* texture[TEXTURE_INDEX_MAX];
 	GMuint autorelease : 1;
-};
-
-enum
-{
-	MaxTextureCount = 6
 };
 
 struct Material
@@ -73,9 +55,8 @@ struct Material
 	GMfloat Ka[3];
 	GMfloat Kd[3];
 	GMfloat Ks[3];
-	GMfloat Ke[3];	//对于环境（如天空）的反射系数
 	GMfloat shininess;
-	TextureInfo textures[MaxTextureCount];
+	TextureInfo textures;
 };
 
 class ChildObject;
@@ -98,17 +79,6 @@ public:
 	Material& getMaterial()
 	{
 		return m_material;
-	}
-
-	// deprecated:
-	// 每增加一个面的时候，应该调用此函数记录这个面由多少点组成
-	void pushBackVertexOffset(GMuint edgesCount)
-	{
-		m_vertexOffsets.push_back(m_primitiveVertices.empty() ?
-			m_offset: m_vertexOffsets.back() + m_primitiveVertices.back()
-		);
-		m_primitiveVertices.push_back(edgesCount);
-		m_primitiveCount++;
 	}
 
 	GMint* getOffsetPtr()

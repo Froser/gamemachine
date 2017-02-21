@@ -24,7 +24,6 @@ public:
 	~GameWorld();
 
 public:
-	UpAxis getUpAxis();
 	void initialize();
 	void appendObject(AUTORELEASE GameObject* obj);
 	void appendLight(AUTORELEASE GameLight* light);

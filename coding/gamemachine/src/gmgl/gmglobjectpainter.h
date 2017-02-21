@@ -24,9 +24,9 @@ public:
 
 private:
 	void setLights(Material& material, ChildObject::ObjectType type);
-	void beginTextures(TextureInfo* startTexture, ChildObject::ObjectType type);
-	void endTextures(TextureInfo* startTexture);
-	void resetTextures(ChildObject::ObjectType type);
+	void activeTexture(TextureIndex i, ChildObject::ObjectType type);
+	void beginTextures(TextureInfo* textures, ChildObject::ObjectType type);
+	void endTextures(TextureInfo* textures);
 
 private:
 	GMGLGraphicEngine* m_engine;
