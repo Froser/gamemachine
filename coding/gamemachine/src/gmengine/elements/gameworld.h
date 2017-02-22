@@ -21,7 +21,7 @@ class GameWorld
 	DEFINE_PRIVATE(GameWorld)
 public:
 	GameWorld();
-	~GameWorld();
+	virtual ~GameWorld();
 
 public:
 	void initialize();
@@ -33,7 +33,7 @@ public:
 	void setSky(GameObject* sky);
 	GameObject* getSky();
 	void simulateGameWorld(GMfloat elapsed);
-	virtual void renderGameWorld();
+	virtual void renderGameWorld() = 0;
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 
 	IGraphicEngine* getGraphicEngine();

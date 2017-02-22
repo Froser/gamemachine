@@ -5,6 +5,12 @@ Image::Image()
 	: m_needFlip(false)
 {
 	memset(&m_data, 0, sizeof(m_data));
+#ifdef USE_OPENGL
+	m_data.magFilter = GL_LINEAR;
+	m_data.minFilter = GL_LINEAR_MIPMAP_LINEAR;
+	m_data.wrapS = GL_REPEAT;
+	m_data.wrapT = GL_REPEAT;
+#endif
 }
 
 Image::~Image()

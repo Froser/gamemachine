@@ -18,7 +18,7 @@ void ImageBuffer::generateData()
 #ifdef USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
-	data.internalFormat = GL_RGB16;
+	data.internalFormat = GL_RGBA8;
 	data.format = GL_RGB;
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;

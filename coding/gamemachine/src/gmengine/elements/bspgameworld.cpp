@@ -385,7 +385,7 @@ void BSPGameWorld::initLightmaps()
 
 	for (GMuint i = 0; i < numLightmaps; i++)
 	{
-		GMbyte* lightmapBytes = &bsp.lightBytes[i];
+		GMbyte* lightmapBytes = bsp.lightBytes.data() + i * BSP_LIGHTMAP_SIZE;
 		ImageBuffer* imgBuf = new ImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);

@@ -122,27 +122,6 @@ void GameWorld::simulateGameWorld(GMfloat elapsed)
 	d.ellapsed += elapsed;
 }
 
-void GameWorld::renderGameWorld()
-{
-	D(d);
-	IGraphicEngine* engine = getGraphicEngine();
-	engine->newFrame();
-	DrawingList list;
-
-	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
-	{
-		GameObject* gameObj = *iter;
-		gameObj->getReadyForRender(list);
-	}
-
-	d.character->updateLookAt();
-	CameraLookAt& lookAt = d.character->getLookAt();
-	d.character->applyEyeOffset(lookAt);
-	engine->updateCameraView(lookAt);
-
-	engine->drawObjects(list);
-}
-
 void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
 {
 	D(d);

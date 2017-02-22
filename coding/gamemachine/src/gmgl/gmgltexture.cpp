@@ -155,6 +155,10 @@ void GMGLTexture::init()
 	}
 
 	glTexParameteriv(image.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(image.swizzle));
+	glTexParameteri(image.target, GL_TEXTURE_MIN_FILTER, image.minFilter);
+	glTexParameteri(image.target, GL_TEXTURE_MAG_FILTER, image.magFilter);
+	glTexParameteri(image.target, GL_TEXTURE_WRAP_S, image.wrapS);
+	glTexParameteri(image.target, GL_TEXTURE_WRAP_T, image.wrapT);
 
 	glBindTexture(image.target, 0);
 	m_image->dispose();
