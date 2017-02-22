@@ -11,9 +11,6 @@
     <Filter Include="src\gmdatacore">
       <UniqueIdentifier>{81839e85-637e-476e-9714-fe5c5450e256}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\gmdatacore\objreader">
-      <UniqueIdentifier>{748c51b3-e2aa-426c-9534-a7bd670e1d66}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\gmengine">
       <UniqueIdentifier>{49533294-0e5e-402a-9f55-2fb1c5fb3484}</UniqueIdentifier>
     </Filter>
@@ -69,18 +66,6 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h">
       <Filter>src\gmdatacore</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.h">
-      <Filter>src\gmdatacore\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h">
-      <Filter>src\gmdatacore\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h">
-      <Filter>src\gmdatacore\objreader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h">
-      <Filter>src\gmdatacore\objreader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h">
       <Filter>src\gmengine\elements</Filter>
@@ -245,18 +230,6 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp">
       <Filter>src\gmdatacore</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp">
-      <Filter>src\gmdatacore\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp">
-      <Filter>src\gmdatacore\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp">
-      <Filter>src\gmdatacore\objreader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.cpp">
-      <Filter>src\gmdatacore\objreader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp">
       <Filter>src\gmengine\elements</Filter>

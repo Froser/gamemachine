@@ -101,7 +101,6 @@ void GMGLObjectPainter::draw()
 		glBindVertexArray(childObj->getArrayId());
 		GLint params[2];
 		glGetIntegerv(GL_POLYGON_MODE, params);
-		GLenum mode = params[1] == GL_FILL ? mode : GL_LINE_LOOP;
 
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
@@ -115,6 +114,8 @@ void GMGLObjectPainter::draw()
 			}
 
 			GLenum mode = getMode(childObj);
+			if (params[1] == GL_LINE)
+				mode = GL_LINE_LOOP;
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 
 			if (!m_shadowMapping.hasBegun())

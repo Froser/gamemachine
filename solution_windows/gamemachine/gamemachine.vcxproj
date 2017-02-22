@@ -23,10 +23,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\animation.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\factory.h" />
@@ -85,10 +81,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreader.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\mtlreaderprivate.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreader.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\objreader\objreaderprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\animation.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\factory.cpp" />
@@ -150,7 +142,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

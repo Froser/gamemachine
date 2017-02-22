@@ -21,6 +21,7 @@ public:
 
 	//renders:
 private:
+	void updateCamera();
 	void calculateVisibleFaces();
 	void drawFaces();
 	void drawFace(GMint idx);

@@ -71,9 +71,6 @@ public:
 	};
 
 	Component(ChildObject* parent);
-
-	//deprecated:
-	Component();
 	~Component();
 
 	Material& getMaterial()

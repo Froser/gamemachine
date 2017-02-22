@@ -81,7 +81,7 @@ public:
 		MouseReactionHandler* mouseHandler = new MouseReactionHandler(world);
 		reaction = new MouseReaction(mouseHandler);
 
-		 //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(m_gm->getGraphicEngine());
 
 		{

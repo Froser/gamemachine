@@ -7,7 +7,6 @@
 
 GameWorldPrivate::GameWorldPrivate()
 	: character(nullptr)
-	, sky(nullptr)
 	, ellapsed(0)
 {
 

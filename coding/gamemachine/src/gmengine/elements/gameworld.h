@@ -24,16 +24,16 @@ public:
 	virtual ~GameWorld();
 
 public:
+	virtual void renderGameWorld() = 0;
+
+public:
 	void initialize();
-	void appendObject(AUTORELEASE GameObject* obj);
+	void appendObjectAndInit(AUTORELEASE GameObject* obj);
 	void appendLight(AUTORELEASE GameLight* light);
 	std::vector<GameLight*>& getLights();
 	void setMajorCharacter(Character* character);
 	Character* getMajorCharacter();
-	void setSky(GameObject* sky);
-	GameObject* getSky();
 	void simulateGameWorld(GMfloat elapsed);
-	virtual void renderGameWorld() = 0;
 	void setGravity(GMfloat x, GMfloat y, GMfloat z);
 
 	IGraphicEngine* getGraphicEngine();

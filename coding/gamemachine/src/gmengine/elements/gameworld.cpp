@@ -54,7 +54,7 @@ void GameWorld::initialize()
 	getGraphicEngine()->initialize(this);
 }
 
-void GameWorld::appendObject(AUTORELEASE GameObject* obj)
+void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 {
 	D(d);
 	if (std::find(d.shapes.begin(), d.shapes.end(), obj) != d.shapes.end())
@@ -100,18 +100,6 @@ Character* GameWorld::getMajorCharacter()
 {
 	D(d);
 	return d.character;
-}
-
-void GameWorld::setSky(GameObject* sky)
-{
-	D(d);
-	d.sky = sky;
-}
-
-GameObject* GameWorld::getSky()
-{
-	D(d);
-	return d.sky;
 }
 
 void GameWorld::simulateGameWorld(GMfloat elapsed)

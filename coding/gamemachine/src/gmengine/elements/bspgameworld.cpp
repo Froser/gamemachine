@@ -9,11 +9,10 @@
 #include "gmengine/controller/gamemachine.h"
 #include "utilities/algorithm.h"
 #include "utilities/plane.h"
-#include "hallucinationgameobject.h"
-#include "..\controller\resource_container.h"
-#include "gmdatacore\imagereader\imagereader.h"
-#include "utilities\path.h"
-#include "gmdatacore\imagebuffer.h"
+#include "gmengine/controller/resource_container.h"
+#include "gmdatacore/imagereader/imagereader.h"
+#include "utilities/path.h"
+#include "gmdatacore/imagebuffer.h"
 
 BSPGameWorld::BSPGameWorld()
 {
@@ -29,18 +28,25 @@ void BSPGameWorld::loadBSP(const char* bspPath)
 	importBSP();
 }
 
+void BSPGameWorld::updateCamera()
+{
+	D(d);
+
+	IGraphicEngine* engine = getGraphicEngine();
+	Character* character = getMajorCharacter();
+	character->updateLookAt();
+	CameraLookAt& lookAt = character->getLookAt();
+	character->applyEyeOffset(lookAt);
+	engine->updateCameraView(lookAt);
+}
+
 void BSPGameWorld::renderGameWorld()
 {
 	D(d);
 	IGraphicEngine* engine = getGraphicEngine();
 	engine->newFrame();
 
-	Character* character = getMajorCharacter();
-	character->updateLookAt();
-	CameraLookAt& lookAt = character->getLookAt();
-	character->applyEyeOffset(lookAt);
-	engine->updateCameraView(lookAt);
-
+	updateCamera();
 	calculateVisibleFaces();
 	drawFaces();
 
@@ -179,9 +185,10 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 		component->endFace();
 		child->appendComponent(component);
 		coreObj->append(child);
-		obj = new HallucinationGameObject(coreObj);
+		obj = new ConvexHullGameObject(coreObj);
+
 		d.polygonFaceObjects[&polygonFace] = obj;
-		appendObject(obj);
+		appendObjectAndInit(obj);
 	}
 	else
 	{
@@ -229,9 +236,9 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 		child->appendComponent(component);
 
 		coreObj->append(child);
-		obj = new HallucinationGameObject(coreObj);
+		obj = new ConvexHullGameObject(coreObj);
 		d.meshFaceObjects[&meshFace] = obj;
-		appendObject(obj);
+		appendObjectAndInit(obj);
 	}
 	else
 	{
@@ -268,12 +275,12 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 		ChildObject* child = new ChildObject();
 		child->setArrangementMode(ChildObject::Triangle_Strip);
 		
+		Component* component = new Component(child);
+		component->getMaterial() = material;
+
 		int numVertices = 2 * (biqp.tesselation + 1);
 		for (int row = 0; row < biqp.tesselation; ++row)
 		{
-			Component* component = new Component(child);
-			component->getMaterial() = material;
-
 			component->beginFace();
 			GLuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 			for (int i = 0; i < numVertices; i++)
@@ -287,13 +294,13 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 			}
 			component->endFace();
 
-			child->appendComponent(component);
 		}
+		child->appendComponent(component);
 
 		coreObj->append(child);
-		obj = new HallucinationGameObject(coreObj);
+		obj = new ConvexHullGameObject(coreObj);
 		d.biquadraticPatchObjects[&biqp] = obj;
-		appendObject(obj);
+		appendObjectAndInit(obj);
 	}
 	else
 	{
@@ -490,6 +497,8 @@ void BSPGameWorld::importWorldSpawn()
 		}
 	}
 #endif
+
+	setGravity(0, -800, 0);
 }
 
 void BSPGameWorld::importPlayer()
@@ -505,12 +514,12 @@ void BSPGameWorld::importPlayer()
 		playerStart.setIdentity();
 		//playerStart.setOrigin(M(origin[0], origin[1], origin[2]));
 		playerStart.setOrigin(btVector3(0, 0.875, 0));
-		Character* character = new Character(playerStart, 1, 10, 10);
+		Character* character = new Character(playerStart, .1, .1, 10);
 
-		character->setMoveSpeed(5);
-		character->setCanFreeMove(true);
+		character->setMoveSpeed(1);
+		character->setCanFreeMove(false);
 
-		appendObject(character);
+		appendObjectAndInit(character);
 		setMajorCharacter(character);
 
 		//TODO

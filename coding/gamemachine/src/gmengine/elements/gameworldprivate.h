@@ -27,7 +27,6 @@ struct GameWorldPrivate
 	std::vector<GameObject*> shapes;
 	std::vector<GameLight*> lights;
 	Character* character;
-	GameObject* sky;
 	GMfloat ellapsed;
 };
 

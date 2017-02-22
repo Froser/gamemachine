@@ -37,16 +37,6 @@ Component::Component(ChildObject* parent)
 	setVertexOffset(m_parent->vertices().size());
 }
 
-
-Component::Component()
-	: m_offset(0)
-	, m_primitiveVertices(0)
-	, m_parent(nullptr)
-	, m_primitiveCount(0)
-{
-	memset(&m_material, 0, sizeof(m_material));
-}
-
 Component::~Component()
 {
 	TextureInfo& texture = getMaterial().textures;
@@ -108,9 +98,8 @@ void Component::lightmap(GMfloat u, GMfloat v)
 
 void Component::endFace()
 {
-	// 由于一个顶点由4元数组成，所以顶点的偏移应该除以4
 	m_vertexOffsets.push_back(m_primitiveVertices.empty() ?
-		m_offset / 4 : m_vertexOffsets.back() + m_primitiveVertices.back() / 4
+		m_offset : m_vertexOffsets.back() + m_primitiveVertices.back()
 	);
 	m_primitiveVertices.push_back(m_currentFaceVerticesCount);
 	m_primitiveCount++;
@@ -169,7 +158,7 @@ void ChildObject::calculateTangentSpace()
 		Component* component = (*iter);
 		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
 		{
-			GMint offset = component->getOffsetPtr()[i];
+			GMint offset = component->getOffsetPtr()[i] / 4;
 			GMint edgeCount = component->getPrimitiveVerticesCountPtr()[i];
 
 			// 开始计算每条边切线空间
