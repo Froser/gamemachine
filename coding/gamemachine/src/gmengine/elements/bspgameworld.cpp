@@ -361,7 +361,7 @@ void BSPGameWorld::initTextures()
 
 		std::string fn = d.bspWorkingDirectory;
 		fn.append(shader.shader);
-		fn.append(".png");
+		fn.append(".jpg");
 		if (imgReader.load(fn.c_str(), &tex))
 		{
 			ITexture* texture;
@@ -517,7 +517,7 @@ void BSPGameWorld::importPlayer()
 
 		character->setMoveSpeed(3);
 		character->setFallSpeed(400);
-		character->setJumpSpeed(btVector3(0, 50, 0));
+		character->setJumpSpeed(btVector3(0, 30, 0));
 		character->setCanFreeMove(false);
 
 		appendObjectAndInit(character);

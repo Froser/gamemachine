@@ -56,7 +56,7 @@ void GameLoop::drawFrame()
 	m_handler->render();
 	m_drawStopwatch.stop();
 	GMfloat elapsed = m_drawStopwatch.getMillisecond();
-	m_timeElapsed = elapsed / 1000;
+	m_timeElapsed = elapsed == 0 ? 0.001 : elapsed / 1000;
 
 #ifdef _WINDOWS
 	GMfloat wait = 1000 / m_settings.fps - elapsed;

@@ -2,7 +2,6 @@
 #include "image.h"
 
 Image::Image()
-	: m_needFlip(false)
 {
 	memset(&m_data, 0, sizeof(m_data));
 #ifdef USE_OPENGL
@@ -32,13 +31,22 @@ void Image::dispose()
 	}
 }
 
-// 以下函数表示，作为材质时是否需要翻转y轴
-bool Image::isNeedFlip()
+void Image::flipVertically(GMuint mipId)
 {
-	return m_needFlip;
-}
+	ImageMipData* mip = &m_data.mip[mipId];
+	GMint width = mip->width,
+		height = mip->height;
+	GMbyte* buffer = mip->data;
+	GMuint rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;
 
-void Image::setNeedFlip(bool b)
-{
-	m_needFlip = b;
+	GMbyte* tempRow = new GMbyte[width * mip->depth / 8];
+	for (int i = 0; i < rowsToSwap; ++i)
+	{
+		memcpy(tempRow, &mip->data[i * width * mip->depth / 8], width * mip->depth / 8);
+		memcpy(&mip->data[i * width * mip->depth / 8], &mip->data[(height - i - 1) * width * mip->depth / 8], width * mip->depth / 8);
+		memcpy(&mip->data[(height - i - 1) * width * mip->depth / 8], tempRow, width * mip->depth / 8);
+	}
+
+	if (tempRow)
+		delete[] tempRow;
 }

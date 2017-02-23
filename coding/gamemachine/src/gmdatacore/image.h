@@ -7,11 +7,11 @@ BEGIN_NS
 
 struct ImageMipData
 {
-	GLsizei width;
-	GLsizei height;
-	GLsizei depth;
+	GMint width;
+	GMint height;
+	GMint depth;
 	GLsizeiptr mipStride;
-	GLvoid* data;
+	GMbyte* data;
 };
 
 // This is the main image data structure. It contains all the parameters needed
@@ -29,7 +29,7 @@ struct ImageData
 	GMsizeiptr totalDataSize;
 	ImageMipData mip[MAX_MIP_CNT];
 
-	// texture params:
+	// (optional) texture params:
 	GMuint minFilter;
 	GMuint magFilter;
 	GMuint wrapS;
@@ -45,6 +45,7 @@ enum ImageType
 	ImageType_DDS,
 	ImageType_PNG,
 	ImageType_TGA,
+	ImageType_JPG,
 	ImageType_End,
 };
 
@@ -57,14 +58,10 @@ public:
 public:
 	ImageData& getData();
 	virtual void dispose();
-
-public:
-	bool isNeedFlip();
-	void setNeedFlip(bool b);
+	void flipVertically(GMuint mipId);
 
 private:
 	ImageData m_data;
-	bool m_needFlip;
 };
 
 END_NS

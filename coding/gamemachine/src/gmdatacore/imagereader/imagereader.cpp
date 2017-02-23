@@ -6,6 +6,7 @@
 #include <map>
 #include "imagereader_png.h"
 #include "imagereader_tga.h"
+#include "imagereader_jpg.h"
 
 class ImageReaderContainer
 {
@@ -16,6 +17,7 @@ public:
 		m_readers[ImageType_DDS] = new ImageReader_DDS();
 		m_readers[ImageType_PNG] = new ImageReader_PNG();
 		m_readers[ImageType_TGA] = new ImageReader_TGA();
+		m_readers[ImageType_JPG] = new ImageReader_JPG();
 	}
 
 	~ImageReaderContainer()

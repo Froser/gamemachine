@@ -68,15 +68,16 @@ public:
 #if _DEBUG
 		std::string currentPath("D:/shaders/test/");
 		std::string shaderPath("D:/shaders/test/");
+		GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
 #else
 		std::string currentPath(Path::getCurrentPath());
-		std::string demoPath(currentPath);
-		demoPath.append("map/demo.xml");
 		std::string shaderPath(currentPath);
 		shaderPath.append("shaders/");
+		std::string demoPath(currentPath);
+		demoPath.append("gv.bsp");
+		GameWorldCreator::createBSPGameWorld(m_gm, demoPath.c_str(), &world);
 #endif
 
-		GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
 
 		MouseReactionHandler* mouseHandler = new MouseReactionHandler(world);
 		reaction = new MouseReaction(mouseHandler);
