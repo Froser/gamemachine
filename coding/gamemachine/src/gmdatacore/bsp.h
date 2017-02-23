@@ -4,9 +4,8 @@
 #include <string>
 #include <vector>
 #include "utilities/bitset.h"
-#include "LinearMath/btVector3.h"
 #include "utilities/plane.h"
-#include "LinearMath/btAlignedObjectArray.h"
+#include "utilities/vmath.h"
 BEGIN_NS
 
 // key / value pair sizes in the entities lump
@@ -180,7 +179,7 @@ typedef struct {
 class BSP_Drawing_Vertex
 {
 public:
-	btVector3 position;
+	vmath::vec3 position;
 	float decalS, decalT;
 	float lightmapS, lightmapT;
 
@@ -283,7 +282,7 @@ class BSP_Drawing_Leaf
 {
 public:
 	int cluster;	//cluster index for visdata
-	btVector3 boundingBoxVertices[8];
+	vmath::vec3 boundingBoxVertices[8];
 	int firstLeafFace;	//first index in leafFaces array
 	int numFaces;
 };
@@ -356,17 +355,17 @@ struct BSPPrivate
 	std::vector<BSPFog> fogs;
 
 //data for render:
-	btAlignedObjectArray<BSP_Drawing_Vertex> drawingVertices;
+	std::vector<BSP_Drawing_Vertex> drawingVertices;
 	Bitset facesToDraw;
 	GMint numPolygonFaces;
 	GMint numPatches;
 	GMint numMeshFaces;
-	btAlignedObjectArray<BSP_Drawing_FaceDirectoryEntry> drawingFaceDirectory;
-	btAlignedObjectArray<BSP_Drawing_PolygonFace> drawingPolygonFaces;
-	btAlignedObjectArray<BSP_Drawing_MeshFace> drawingMeshFaces;
-	btAlignedObjectArray<BSP_Drawing_Patch> drawingPatches;
-	btAlignedObjectArray<BSP_Drawing_Leaf> drawingLeafs;
-	btAlignedObjectArray<Plane> drawingPlanes;
+	std::vector<BSP_Drawing_FaceDirectoryEntry> drawingFaceDirectory;
+	std::vector<BSP_Drawing_PolygonFace> drawingPolygonFaces;
+	std::vector<BSP_Drawing_MeshFace> drawingMeshFaces;
+	std::vector<BSP_Drawing_Patch> drawingPatches;
+	std::vector<BSP_Drawing_Leaf> drawingLeafs;
+	std::vector<Plane> drawingPlanes;
 	BSP_VisibilityData visibilityData;
 
 private:

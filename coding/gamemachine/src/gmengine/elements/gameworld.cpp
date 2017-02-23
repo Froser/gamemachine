@@ -105,8 +105,8 @@ Character* GameWorld::getMajorCharacter()
 void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
 	D(d);
+	d.character->simulation();
 	d.dynamicsWorld->stepSimulation(elapsed, 0);
-	d.character->simulateCamera();
 	d.ellapsed += elapsed;
 }
 

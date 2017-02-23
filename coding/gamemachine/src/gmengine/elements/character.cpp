@@ -18,6 +18,7 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	, m_dynamicWorld(nullptr)
 	, m_moveSpeed(10)
 	, m_frustum(75, 1.333f, 0.1, 100)
+	, m_moveDirection(0)
 {
 	setTransform(position);
 	memset(&m_state, 0, sizeof(m_state));
@@ -25,7 +26,8 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	m_state.positionX = position.getOrigin().x();
 	m_state.positionY = position.getOrigin().y();
 	m_state.positionZ = position.getOrigin().z();
-	m_state.lookUpLimitRad = HALF_PI - RAD(3);
+	m_state.pitchLimitRad = HALF_PI - RAD(3);
+	setMoveSpeed(1);
 }
 
 btCollisionShape* Character::createCollisionShape()
@@ -78,18 +80,22 @@ void Character::moveForwardOrBackward(bool forward)
 {
 	GMfloat distance = (forward ? 1 : -1 ) * calcMoveDistance();
 	if (m_freeMove)
-		m_state.positionY += distance * std::sin(m_state.lookUpRad);
+		m_state.positionY += distance * std::sin(m_state.pitch);
 
-	GMfloat l = m_freeMove ? distance * std::cos(m_state.lookUpRad) : distance;
-	m_state.positionX += l * std::sin(m_state.lookAtRad);
-	m_state.positionZ -= l * std::cos(m_state.lookAtRad);
+	GMfloat l = m_freeMove ? distance * std::cos(m_state.pitch) : distance;
+	m_walkDirectionFB[0] = l * std::sin(m_state.yaw);
+	m_walkDirectionFB[1] = m_freeMove ? distance * std::sin(m_state.pitch) : 0;
+	m_walkDirectionFB[2] = -l * std::cos(m_state.yaw);
+	applyWalkDirection();
 }
 
-void Character::moveLeftOrRight(bool right)
+void Character::moveLeftOrRight(bool left)
 {
-	GMfloat distance = (right ? 1 : -1) * calcMoveDistance();
-	m_state.positionX += distance * std::cos(m_state.lookAtRad);
-	m_state.positionZ += distance * std::sin(m_state.lookAtRad);
+	GMfloat distance = (left ? -1 : 1) * calcMoveDistance();
+	m_walkDirectionLR[0] = distance * std::cos(m_state.yaw);
+	m_walkDirectionLR[1] = 0;
+	m_walkDirectionLR[2] = distance * std::sin(m_state.yaw);
+	applyWalkDirection();
 }
 
 void Character::setJumpSpeed(const btVector3& jumpSpeed)
@@ -117,17 +123,6 @@ void Character::setCanFreeMove(bool freeMove)
 	}
 }
 
-void Character::simulateCamera()
-{
-	if (!m_freeMove)
-	{
-		btTransform& trans = getCollisionObject()->getWorldTransform();
-		m_state.positionX = trans.getOrigin().x();
-		m_state.positionY = trans.getOrigin().y();
-		m_state.positionZ = trans.getOrigin().z();
-	}
-}
-
 void Character::setMoveSpeed(GMfloat moveSpeed)
 {
 	m_moveSpeed = moveSpeed;
@@ -138,69 +133,28 @@ const PositionState& Character::getPositionState()
 	return m_state;
 }
 
-void Character::moveForward()
+void Character::action(MoveDirection md)
 {
-	moveForwardOrBackward(true);
-	moveCollisionObject();
-}
-
-void Character::moveBackward()
-{
-	moveForwardOrBackward(false);
-	moveCollisionObject();
-}
-
-void Character::moveRight()
-{
-	moveLeftOrRight(true);
-	moveCollisionObject();
-}
-
-void Character::moveLeft()
-{
-	moveLeftOrRight(false);
-	moveCollisionObject();
-}
-
-void Character::moveCollisionObject()
-{
-	if (!m_freeMove)
-	{
-		btTransform trans;
-		trans.setIdentity();
-		trans.setOrigin(btVector3(m_state.positionX, m_state.positionY, m_state.positionZ));
-		getCollisionObject()->setWorldTransform(trans);
-	}
+	m_moveDirection = md;
 }
 
 void Character::lookRight(GMfloat degree)
 {
-	m_state.lookAtRad += RAD(degree);
+	m_state.yaw += RAD(degree);
 }
 
 void Character::lookUp(GMfloat degree)
 {
-	m_state.lookUpRad += RAD(degree);
-	if (m_state.lookUpRad > m_state.lookUpLimitRad)
-		m_state.lookUpRad = m_state.lookUpLimitRad;
-	else if (m_state.lookUpRad < -m_state.lookUpLimitRad)
-		m_state.lookUpRad = -m_state.lookUpLimitRad;
+	m_state.pitch += RAD(degree);
+	if (m_state.pitch > m_state.pitchLimitRad)
+		m_state.pitch = m_state.pitchLimitRad;
+	else if (m_state.pitch < -m_state.pitchLimitRad)
+		m_state.pitch = -m_state.pitchLimitRad;
 }
 
-void Character::setLookUpLimitDegree(GMfloat deg)
+void Character::setPitchLimitDegree(GMfloat deg)
 {
-	m_state.lookUpLimitRad = HALF_PI - RAD(deg);
-}
-
-void Character::jump()
-{
-	if (m_controller->canJump())
-		m_controller->jump(m_jumpSpeed);
-}
-
-bool Character::isJumping()
-{
-	return !m_controller->canJump();
+	m_state.pitchLimitRad = HALF_PI - RAD(deg);
 }
 
 void Character::setEyeOffset(GMfloat* offset)
@@ -208,20 +162,70 @@ void Character::setEyeOffset(GMfloat* offset)
 	memcpy(&m_eyeOffset, offset, sizeof(m_eyeOffset));
 }
 
-void Character::applyEyeOffset(CameraLookAt& lookAt)
-{
-	lookAt.position_x += m_eyeOffset[0];
-	lookAt.position_y += m_eyeOffset[1];
-	lookAt.position_z += m_eyeOffset[2];
-}
-
 void Character::getReadyForRender(DrawingList& list)
 {
+
 }
 
-void Character::updateLookAt()
+void Character::simulation()
 {
-	Camera::calcCameraLookAt(getPositionState(), &m_lookAt);
+	// forward has priority
+	if (m_moveDirection & MD_FORWARD)
+	{
+		moveForwardOrBackward(true);
+	}
+	else if (m_moveDirection & MD_BACKWARD)
+	{
+		moveForwardOrBackward(false);
+	}
+	else
+	{
+		memset(m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
+		applyWalkDirection();
+	}
+
+	if (m_moveDirection & MD_LEFT)
+	{
+		moveLeftOrRight(true);
+	}
+	else if (m_moveDirection & MD_RIGHT)
+	{
+		moveLeftOrRight(false);
+	}
+	else
+	{
+		memset(m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
+		applyWalkDirection();
+	}
+
+	if (m_moveDirection & MD_JUMP)
+	{
+		if (m_controller->canJump())
+			m_controller->jump(m_jumpSpeed);
+	}
+}
+
+void Character::updateCamera()
+{
+	update();
+	Camera::calcCameraLookAt(m_state, &m_lookAt);
+}
+
+void Character::update()
+{
+	btTransform trans = m_controller->getGhostObject()->getWorldTransform();
+	m_state.positionX = trans.getOrigin().x() + m_eyeOffset[0];
+	m_state.positionY = trans.getOrigin().y() + m_eyeOffset[1];
+	m_state.positionZ = trans.getOrigin().z() + m_eyeOffset[2];
+}
+
+void Character::applyWalkDirection()
+{
+	m_controller->setWalkDirection(btVector3(
+		m_walkDirectionFB[0] + m_walkDirectionLR[0], 
+		m_walkDirectionFB[1] + m_walkDirectionLR[1],
+		m_walkDirectionFB[2] + m_walkDirectionLR[2])
+	);
 }
 
 CameraLookAt& Character::getLookAt()

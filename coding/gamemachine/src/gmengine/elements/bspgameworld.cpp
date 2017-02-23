@@ -34,9 +34,8 @@ void BSPGameWorld::updateCamera()
 
 	IGraphicEngine* engine = getGraphicEngine();
 	Character* character = getMajorCharacter();
-	character->updateLookAt();
+	character->updateCamera();
 	CameraLookAt& lookAt = character->getLookAt();
-	character->applyEyeOffset(lookAt);
 	engine->updateCameraView(lookAt);
 }
 
@@ -62,7 +61,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	BSPData& bsp = d.bsp.bspData();
 
 	bsp.facesToDraw.clearAll();
-	GMint cameraLeaf = calculateCameraLeaf(btVector3(pos.positionX, pos.positionY, pos.positionZ));
+	GMint cameraLeaf = calculateCameraLeaf(vmath::vec3(pos.positionX, pos.positionY, pos.positionZ));
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
 	for (int i = 0; i < bsp.numleafs; ++i)
@@ -84,7 +83,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-int BSPGameWorld::calculateCameraLeaf(const btVector3& cameraPosition)
+int BSPGameWorld::calculateCameraLeaf(const vmath::vec3& cameraPosition)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -177,7 +176,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 		for (GMuint i = 0; i < polygonFace.numVertices; i++)
 		{
 			BSP_Drawing_Vertex& vertex = bsp.drawingVertices[i + polygonFace.firstVertexIndex];
-			component->vertex(vertex.position.x(), vertex.position.y(), vertex.position.z());
+			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
@@ -228,7 +227,7 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 		{
 			GMuint idx = *(idxStart + i);
 			BSP_Drawing_Vertex& vertex = bsp.drawingVertices[offset + idx];
-			component->vertex(vertex.position.x(), vertex.position.y(), vertex.position.z());
+			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
@@ -288,7 +287,7 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 				GMuint idx = *(idxStart + i);
 				BSP_Drawing_Vertex& vertex = biqp.vertices[idx];
 
-				component->vertex(vertex.position.x(), vertex.position.y(), vertex.position.z());
+				component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 				component->uv(vertex.decalS, vertex.decalT);
 				component->lightmap(vertex.lightmapS, vertex.lightmapT);
 			}
@@ -514,9 +513,11 @@ void BSPGameWorld::importPlayer()
 		playerStart.setIdentity();
 		//playerStart.setOrigin(M(origin[0], origin[1], origin[2]));
 		playerStart.setOrigin(btVector3(0, 0.875, 0));
-		Character* character = new Character(playerStart, .1, .1, 10);
+		Character* character = new Character(playerStart, .6, .1, .1);
 
-		character->setMoveSpeed(1);
+		character->setMoveSpeed(3);
+		character->setFallSpeed(400);
+		character->setJumpSpeed(btVector3(0, 50, 0));
 		character->setCanFreeMove(false);
 
 		appendObjectAndInit(character);

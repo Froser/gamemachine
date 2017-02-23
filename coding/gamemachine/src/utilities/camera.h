@@ -12,10 +12,10 @@ struct CameraLookAt
 
 struct PositionState
 {
-	GMfloat lookAtRad;
-	GMfloat lookUpRad;
+	GMfloat yaw;
+	GMfloat pitch;
 	GMfloat positionX, positionY, positionZ;
-	GMfloat lookUpLimitRad;
+	GMfloat pitchLimitRad;
 };
 
 inline vmath::mat4 getViewMatrix(const CameraLookAt& lookAt)

@@ -31,7 +31,7 @@ private:
 	void draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material);
 	bool setMaterialTexture(ID textureid, REF Material& m);
 	void setMaterialLightmap(ID lightmapid, REF Material& m);
-	int calculateCameraLeaf(const btVector3& cameraPosition);
+	int calculateCameraLeaf(const vmath::vec3& cameraPosition);
 	int isClusterVisible(int cameraCluster, int testCluster);
 
 	//imports:

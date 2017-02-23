@@ -1,7 +1,7 @@
 ﻿#ifndef __PLANE_H__
 #define __PLANE_H__
 #include "common.h"
-#include "LinearMath\btVector3.h"
+#include "vmath.h"
 BEGIN_NS
 
 enum PointPosition
@@ -14,9 +14,9 @@ enum PointPosition
 class Plane
 {
 public:
-	Plane() : normal(btVector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
+	Plane() : normal(vmath::vec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{}
-	Plane(const btVector3& newNormal, float newIntercept) : normal(newNormal), intercept(newIntercept)
+	Plane(const vmath::vec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
 	{}
 	Plane(const Plane & rhs)
 	{
@@ -25,24 +25,24 @@ public:
 
 	~Plane() {}
 
-	void setNormal(const btVector3 & rhs) { normal = rhs; }
-	void setIntercept(float newIntercept) { intercept = newIntercept; }
-	void setFromPoints(const btVector3 & p0, const btVector3 & p1, const btVector3 & p2);
+	void setNormal(const vmath::vec3 & rhs) { normal = rhs; }
+	void setIntercept(GMfloat newIntercept) { intercept = newIntercept; }
+	void setFromPoints(const vmath::vec3 & p0, const vmath::vec3 & p1, const vmath::vec3 & p2);
 
-	void calculateIntercept(const btVector3 & pointOnPlane) { intercept = -normal.dot(pointOnPlane); }
+	void calculateIntercept(const vmath::vec3 & pointOnPlane) { intercept = -vmath::dot(normal ,pointOnPlane); }
 
 	void normalize(void);
 
-	btVector3 getNormal() { return normal; }
-	float getIntercept() { return intercept; }
+	vmath::vec3 getNormal() { return normal; }
+	GMfloat getIntercept() { return intercept; }
 
 	//find point of intersection of 3 planes
-	bool intersect3(const Plane & p2, const Plane & p3, btVector3 & result);
+	bool intersect3(const Plane & p2, const Plane & p3, vmath::vec3 & result);
 
-	float getDistance(const btVector3 & point) const;
-	PointPosition classifyPoint(const btVector3 & point) const;
+	GMfloat getDistance(const vmath::vec3 & point) const;
+	PointPosition classifyPoint(const vmath::vec3 & point) const;
 
-	Plane lerp(const Plane & p2, float factor);
+	Plane lerp(const Plane & p2, GMfloat factor);
 
 	//operators
 	bool operator==(const Plane & rhs) const;
@@ -56,8 +56,8 @@ public:
 	Plane operator+(void) const { return (*this); }
 
 	//member variables
-	btVector3 normal;	//X.N+intercept=0
-	float intercept;
+	vmath::vec3 normal;	//X.N+intercept=0
+	GMfloat intercept;
 };
 
 END_NS

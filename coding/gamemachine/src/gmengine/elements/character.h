@@ -12,6 +12,18 @@ class btCollisionShape;
 class btKinematicCharacterController;
 
 BEGIN_NS
+
+// bits:  r, l, b, f
+typedef GMbyte MoveDirection;
+enum
+{
+	MD_FORWARD = 1,
+	MD_BACKWARD = 2,
+	MD_LEFT = 4,
+	MD_RIGHT = 8,
+	MD_JUMP = 16,
+};
+
 class Character : public GameObject
 {
 public:
@@ -22,27 +34,15 @@ public:
 	void setFallSpeed(GMfloat speed);
 
 	void setCanFreeMove(bool freeMove);
-	void simulateCamera();
-
 	void setMoveSpeed(GMfloat moveSpeed);
-
-	void moveForward();
-	void moveBackward();
-	void moveRight();
-	void moveLeft();
-	void moveCollisionObject();
+	void simulation();
+	void action(MoveDirection md);
 	void lookUp(GMfloat degree);
 	void lookRight(GMfloat degree);
-	void setLookUpLimitDegree(GMfloat deg);
-	void jump();
-	bool isJumping();
-
+	void setPitchLimitDegree(GMfloat deg);
 	const PositionState& getPositionState();
-
 	void setEyeOffset(GMfloat* offset);
-	void applyEyeOffset(CameraLookAt& lookAt);
-
-	void updateLookAt();
+	void updateCamera();
 	CameraLookAt& getLookAt();
 	Frustum& getFrustum();
 
@@ -57,7 +57,9 @@ protected:
 private:
 	GMfloat calcMoveDistance();
 	void moveForwardOrBackward(bool forward);
-	void moveLeftOrRight(bool right);
+	void moveLeftOrRight(bool left);
+	void update();
+	void applyWalkDirection();
 
 private:
 	btScalar m_height;
@@ -68,6 +70,9 @@ private:
 	GMfloat m_moveSpeed;
 	GMfloat m_eyeOffset[3];
 	Frustum m_frustum;
+	GMfloat m_walkDirectionFB[3];
+	GMfloat m_walkDirectionLR[3];
+	MoveDirection m_moveDirection;
 
 	AutoPtr<btKinematicCharacterController> m_controller;
 	AutoPtr<btPairCachingGhostObject> m_ghostObject;

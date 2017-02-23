@@ -40,34 +40,34 @@ void Frustum::update()
 	}
 
 	//calculate planes
-	planes[RIGHT_PLANE].normal.setX(clip[3] - clip[0]);
-	planes[RIGHT_PLANE].normal.setY(clip[7] - clip[4]);
-	planes[RIGHT_PLANE].normal.setZ(clip[11] - clip[8]);
+	planes[RIGHT_PLANE].normal[0] = clip[3] - clip[0];
+	planes[RIGHT_PLANE].normal[1] = clip[7] - clip[4];
+	planes[RIGHT_PLANE].normal[2] = clip[11] - clip[8];
 	planes[RIGHT_PLANE].intercept = clip[15] - clip[12];
 
-	planes[LEFT_PLANE].normal.setX(clip[3] + clip[0]);
-	planes[LEFT_PLANE].normal.setY(clip[7] + clip[4]);
-	planes[LEFT_PLANE].normal.setZ(clip[11] + clip[8]);
+	planes[LEFT_PLANE].normal[0] = clip[3] + clip[0];
+	planes[LEFT_PLANE].normal[1] = clip[7] + clip[4];
+	planes[LEFT_PLANE].normal[2] = clip[11] + clip[8];
 	planes[LEFT_PLANE].intercept = clip[15] + clip[12];
 
-	planes[BOTTOM_PLANE].normal.setX(clip[3] + clip[1]);
-	planes[BOTTOM_PLANE].normal.setY(clip[7] + clip[5]);
-	planes[BOTTOM_PLANE].normal.setZ(clip[11] + clip[9]);
+	planes[BOTTOM_PLANE].normal[0] = clip[3] + clip[1];
+	planes[BOTTOM_PLANE].normal[1] = clip[7] + clip[5];
+	planes[BOTTOM_PLANE].normal[2] = clip[11] + clip[9];
 	planes[BOTTOM_PLANE].intercept = clip[15] + clip[13];
 
-	planes[TOP_PLANE].normal.setX(clip[3] - clip[1]);
-	planes[TOP_PLANE].normal.setY(clip[7] - clip[5]);
-	planes[TOP_PLANE].normal.setZ(clip[11] - clip[9]);
+	planes[TOP_PLANE].normal[0] = clip[3] - clip[1];
+	planes[TOP_PLANE].normal[1] = clip[7] - clip[5];
+	planes[TOP_PLANE].normal[2] = clip[11] - clip[9];
 	planes[TOP_PLANE].intercept = clip[15] - clip[13];
 
-	planes[FAR_PLANE].normal.setX(clip[3] - clip[2]);
-	planes[FAR_PLANE].normal.setY(clip[7] - clip[6]);
-	planes[FAR_PLANE].normal.setZ(clip[11] - clip[10]);
+	planes[FAR_PLANE].normal[0] = clip[3] - clip[2];
+	planes[FAR_PLANE].normal[1] = clip[7] - clip[6];
+	planes[FAR_PLANE].normal[2] = clip[11] - clip[10];
 	planes[FAR_PLANE].intercept = clip[15] - clip[14];
 
-	planes[NEAR_PLANE].normal.setX(clip[3] + clip[2]);
-	planes[NEAR_PLANE].normal.setY(clip[7] + clip[6]);
-	planes[NEAR_PLANE].normal.setZ(clip[11] + clip[10]);
+	planes[NEAR_PLANE].normal[0] = clip[3] + clip[2];
+	planes[NEAR_PLANE].normal[1] = clip[7] + clip[6];
+	planes[NEAR_PLANE].normal[2] = clip[11] + clip[10];
 	planes[NEAR_PLANE].intercept = clip[15] + clip[14];
 
 	//normalize planes
@@ -76,7 +76,7 @@ void Frustum::update()
 }
 
 //is a point in the Frustum?
-bool Frustum::isPointInside(const btVector3 & point)
+bool Frustum::isPointInside(const vmath::vec3 & point)
 {
 	for (int i = 0; i < 6; ++i)
 	{
@@ -88,7 +88,7 @@ bool Frustum::isPointInside(const btVector3 & point)
 }
 
 //is a bounding box in the Frustum?
-bool Frustum::isBoundingBoxInside(const btVector3 * vertices)
+bool Frustum::isBoundingBoxInside(const vmath::vec3 * vertices)
 {
 	//loop through planes
 	for (int i = 0; i < 6; ++i)

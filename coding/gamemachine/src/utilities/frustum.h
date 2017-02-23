@@ -13,8 +13,8 @@ public:
 
 public:
 	void update();
-	bool isPointInside(const btVector3& point);
-	bool isBoundingBoxInside(const btVector3* vertices);
+	bool isPointInside(const vmath::vec3& point);
+	bool isBoundingBoxInside(const vmath::vec3* vertices);
 	vmath::mat4 getPerspective();
 	void updateViewMatrix(vmath::mat4& viewMatrix, vmath::mat4& projMatrix);
 

@@ -10,13 +10,13 @@ bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 {
 	tesselation = newTesselation;
 
-	float px, py;
+	GMfloat px, py;
 	BSP_Drawing_Vertex temp[3];
 	vertices = new BSP_Drawing_Vertex[(tesselation + 1)*(tesselation + 1)];
 
 	for (int v = 0; v <= tesselation; ++v)
 	{
-		px = (float)v / tesselation;
+		px = (GMfloat)v / tesselation;
 
 		vertices[v] = controlPoints[0] * ((1.0f - px)*(1.0f - px)) +
 			controlPoints[3] * ((1.0f - px)*px * 2) +
@@ -25,7 +25,7 @@ bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 
 	for (int u = 1; u <= tesselation; ++u)
 	{
-		py = (float)u / tesselation;
+		py = (GMfloat)u / tesselation;
 
 		temp[0] = controlPoints[0] * ((1.0f - py)*(1.0f - py)) +
 			controlPoints[1] * ((1.0f - py)*py * 2) +
@@ -41,7 +41,7 @@ bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 
 		for (int v = 0; v <= tesselation; ++v)
 		{
-			px = (float)v / tesselation;
+			px = (GMfloat)v / tesselation;
 
 			vertices[u*(tesselation + 1) + v] = temp[0] * ((1.0f - px)*(1.0f - px)) +
 				temp[1] * ((1.0f - px)*px * 2) +
@@ -521,7 +521,7 @@ bool BSP::vectorForKey(const BSPEntity *ent, const char *key, BSPVector3 vec)
 	return false;
 }
 
-bool BSP::floatForKey(const BSPEntity *ent, const char *key, OUT float* f)
+bool BSP::floatForKey(const BSPEntity *ent, const char *key, OUT GMfloat* f)
 {
 	const char	*k;
 	k = valueForKey(ent, key);
@@ -712,14 +712,14 @@ void BSP::generateBSPData()
 		d.drawingLeafs[i].numFaces = d.leafs[i].numLeafSurfaces;
 
 		//Create the bounding box
-		d.drawingLeafs[i].boundingBoxVertices[0] = btVector3((float)d.leafs[i].mins[0], (float)d.leafs[i].mins[2], -(float)d.leafs[i].mins[1]);
-		d.drawingLeafs[i].boundingBoxVertices[1] = btVector3((float)d.leafs[i].mins[0], (float)d.leafs[i].mins[2], -(float)d.leafs[i].maxs[1]);
-		d.drawingLeafs[i].boundingBoxVertices[2] = btVector3((float)d.leafs[i].mins[0], (float)d.leafs[i].maxs[2], -(float)d.leafs[i].mins[1]);
-		d.drawingLeafs[i].boundingBoxVertices[3] = btVector3((float)d.leafs[i].mins[0], (float)d.leafs[i].maxs[2], -(float)d.leafs[i].maxs[1]);
-		d.drawingLeafs[i].boundingBoxVertices[4] = btVector3((float)d.leafs[i].maxs[0], (float)d.leafs[i].mins[2], -(float)d.leafs[i].mins[1]);
-		d.drawingLeafs[i].boundingBoxVertices[5] = btVector3((float)d.leafs[i].maxs[0], (float)d.leafs[i].mins[2], -(float)d.leafs[i].maxs[1]);
-		d.drawingLeafs[i].boundingBoxVertices[6] = btVector3((float)d.leafs[i].maxs[0], (float)d.leafs[i].maxs[2], -(float)d.leafs[i].mins[1]);
-		d.drawingLeafs[i].boundingBoxVertices[7] = btVector3((float)d.leafs[i].maxs[0], (float)d.leafs[i].maxs[2], -(float)d.leafs[i].maxs[1]);
+		d.drawingLeafs[i].boundingBoxVertices[0] = vmath::vec3(d.leafs[i].mins[0], d.leafs[i].mins[2], -d.leafs[i].mins[1]);
+		d.drawingLeafs[i].boundingBoxVertices[1] = vmath::vec3(d.leafs[i].mins[0], d.leafs[i].mins[2], -d.leafs[i].maxs[1]);
+		d.drawingLeafs[i].boundingBoxVertices[2] = vmath::vec3(d.leafs[i].mins[0], d.leafs[i].maxs[2], -d.leafs[i].mins[1]);
+		d.drawingLeafs[i].boundingBoxVertices[3] = vmath::vec3(d.leafs[i].mins[0], d.leafs[i].maxs[2], -d.leafs[i].maxs[1]);
+		d.drawingLeafs[i].boundingBoxVertices[4] = vmath::vec3(d.leafs[i].maxs[0], d.leafs[i].mins[2], -d.leafs[i].mins[1]);
+		d.drawingLeafs[i].boundingBoxVertices[5] = vmath::vec3(d.leafs[i].maxs[0], d.leafs[i].mins[2], -d.leafs[i].maxs[1]);
+		d.drawingLeafs[i].boundingBoxVertices[6] = vmath::vec3(d.leafs[i].maxs[0], d.leafs[i].maxs[2], -d.leafs[i].mins[1]);
+		d.drawingLeafs[i].boundingBoxVertices[7] = vmath::vec3(d.leafs[i].maxs[0], d.leafs[i].maxs[2], -d.leafs[i].maxs[1]);
 
 		for (int j = 0; j < 8; ++j)
 			d.drawingLeafs[i].boundingBoxVertices[j] /= 64;
@@ -730,11 +730,11 @@ void BSP::generateBSPData()
 	d.drawingPlanes.resize(d.numplanes);
 	for (GMint i = 0; i < d.numplanes; ++i)
 	{
-		d.drawingPlanes[i] = Plane(btVector3(d.planes[i].normal[0], d.planes[i].normal[1], d.planes[i].normal[2]), d.planes[i].dist);
+		d.drawingPlanes[i] = Plane(vmath::vec3(d.planes[i].normal[0], d.planes[i].normal[1], d.planes[i].normal[2]), d.planes[i].dist);
 		//swap y and z and negate z
-		GMfloat temp = d.drawingPlanes[i].normal.y();
-		d.drawingPlanes[i].normal.setY(d.drawingPlanes[i].normal.z());
-		d.drawingPlanes[i].normal.setZ(-temp);
+		GMfloat temp = d.drawingPlanes[i].normal[1];
+		d.drawingPlanes[i].normal[1] = d.drawingPlanes[i].normal[2];
+		d.drawingPlanes[i].normal[2] = -temp;
 
 		d.drawingPlanes[i].intercept = -d.drawingPlanes[i].intercept;
 		d.drawingPlanes[i].intercept /= 64;	//scale down

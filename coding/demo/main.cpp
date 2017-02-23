@@ -153,16 +153,20 @@ public:
 		{
 			m_gm->getGameLoop()->terminate();
 		}
+
+		MoveDirection moveTag = 0;
 		if (Keyboard::isKeyDown('A'))
-			character->moveLeft();
+			moveTag |= MD_LEFT;
 		if (Keyboard::isKeyDown('D'))
-			character->moveRight();
+			moveTag |= MD_RIGHT;
 		if (Keyboard::isKeyDown('W'))
-			character->moveForward();
+			moveTag |= MD_FORWARD;
 		if (Keyboard::isKeyDown('S'))
-			character->moveBackward();
+			moveTag |= MD_BACKWARD;
 		if (Keyboard::isKeyDown(VK_SPACE))
-			character->jump();
+			moveTag |= MD_JUMP;
+
+		character->action(moveTag);
 	}
 
 	void logicalFrame(GMfloat elapsed)
