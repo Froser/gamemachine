@@ -6,6 +6,7 @@
 #include "utilities/bitset.h"
 #include "utilities/plane.h"
 #include "utilities/vmath.h"
+#include "bsp_surface_flags.h"
 BEGIN_NS
 
 // key / value pair sizes in the entities lump
@@ -38,9 +39,6 @@ BEGIN_NS
 #define	LUMP_LIGHTGRID		15
 #define	LUMP_VISIBILITY		16
 #define	HEADER_LUMPS		17
-
-// Surface flags
-#define	CONTENTS_SOLID		1		// an eye is never valid in a solid
 
 // Surface type
 typedef enum {
@@ -390,10 +388,6 @@ public:
 public:
 	void loadBsp(const char* filename);
 	BSPData& bspData();
-	bool findEntityByClassName(const char* classname, REF BSPEntity*& out);
-	const char* valueForKey(const BSPEntity *ent, const char *key);
-	bool vectorForKey(const BSPEntity *ent, const char *key, BSPVector3 vec);
-	bool floatForKey(const BSPEntity *ent, const char *key, OUT float* f);
 
 private:
 	void readFile();

@@ -13,7 +13,8 @@
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h" />
@@ -72,7 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp" />
@@ -131,7 +132,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxmlparser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\coding\gamemachine\src\gmdatacore\bsp_interior.inl" />
+    <None Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_interior.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{421D5CC0-A094-40E3-9570-4C0DB51B4B8F}</ProjectGuid>

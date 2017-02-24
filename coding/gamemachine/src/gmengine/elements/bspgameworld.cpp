@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "bspgameworld.h"
 #include "character.h"
-#include "convexhullgameobject.h"
+#include "hallucinationgameobject.h"
 #include "gamelight.h"
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"
@@ -10,6 +10,8 @@
 #include "gmdatacore/imagereader/imagereader.h"
 #include "utilities/path.h"
 #include "gmdatacore/imagebuffer.h"
+
+#define SolidGameObject HallucinationGameObject
 
 BSPGameWorld::BSPGameWorld()
 {
@@ -184,7 +186,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 		component->endFace();
 		child->appendComponent(component);
 		coreObj->append(child);
-		obj = new ConvexHullGameObject(coreObj);
+		obj = new SolidGameObject(coreObj);
 
 		d.polygonFaceObjects[&polygonFace] = obj;
 		appendObjectAndInit(obj);
@@ -235,7 +237,7 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 		child->appendComponent(component);
 
 		coreObj->append(child);
-		obj = new ConvexHullGameObject(coreObj);
+		obj = new SolidGameObject(coreObj);
 		d.meshFaceObjects[&meshFace] = obj;
 		appendObjectAndInit(obj);
 	}
@@ -297,7 +299,7 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 		child->appendComponent(component);
 
 		coreObj->append(child);
-		obj = new ConvexHullGameObject(coreObj);
+		obj = new SolidGameObject(coreObj);
 		d.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
 	}
@@ -340,8 +342,7 @@ void BSPGameWorld::importBSP()
 {
 	initTextures();
 	initLightmaps();
-	importWorldSpawn();
-	importPlayer();
+	importEntities();
 	initialize();
 }
 
@@ -356,13 +357,11 @@ void BSPGameWorld::initTextures()
 	for (GMuint i = 0; i < bsp.numShaders; i++)
 	{
 		BSPShader& shader = bsp.shaders[i];
-		ImageReader imgReader;
 		Image* tex = nullptr;
-
 		std::string fn = d.bspWorkingDirectory;
 		fn.append(shader.shader);
-		fn.append(".jpg");
-		if (imgReader.load(fn.c_str(), &tex))
+
+		if (findTexture(fn.c_str(), &tex))
 		{
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
@@ -372,16 +371,40 @@ void BSPGameWorld::initTextures()
 			item.texture = texture;
 			rc->getTextureContainer().insert(item);
 		}
+		else
+		{
+			gm_warning("Cannot find texture %s", fn.c_str());
+		}
 	}
+}
 
+bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
+{
+	const int maxChars = 128;
+	static char priorities[][maxChars] =
+	{
+		".jpg",
+		".tga",
+		".png",
+		".bmp"
+	};
+	static GMint dem = sizeof(priorities) / maxChars / sizeof(GMbyte);
+
+	ImageReader imgReader;
+	for (GMint i = 0; i < dem; i++)
+	{
+		std::string fn(textureFilename);
+		fn.append(priorities[i]);
+		if (imgReader.load(fn.c_str(), img))
+			return true;
+	}
+	return false;
 }
 
 void BSPGameWorld::initLightmaps()
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
-	adjustLightmapGamma();
-
 	IFactory* factory = getGameMachine()->getFactory();
 	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
 
@@ -416,118 +439,12 @@ void BSPGameWorld::initLightmaps()
 	}
 }
 
-void BSPGameWorld::adjustLightmapGamma()
+void BSPGameWorld::importEntities()
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
-	/*
-	float gamma = 2.5f;
-	for (int i = 0; i < bsp.numLightBytes; ++i)
+	for (auto iter = bsp.entities.begin(); iter != bsp.entities.end(); iter++)
 	{
-		for (int j = 0; j < 128 * 128; ++j)
-		{
-			float r, g, b;
-			r = bsp.lightBytes[i].lightmapData[j * 3 + 0];
-			g = bsp.lightBytes[i].lightmapData[j * 3 + 1];
-			b = bsp.lightBytes[i].lightmapData[j * 3 + 2];
-
-			r *= gamma / 255.0f;
-			g *= gamma / 255.0f;
-			b *= gamma / 255.0f;
-
-			//find the value to scale back up
-			float scale = 1.0f;
-			float temp;
-			if (r > 1.0f && (temp = (1.0f / r)) < scale) scale = temp;
-			if (g > 1.0f && (temp = (1.0f / g)) < scale) scale = temp;
-			if (b > 1.0f && (temp = (1.0f / b)) < scale) scale = temp;
-
-			// scale up color values
-			scale *= 255.0f;
-			r *= scale;
-			g *= scale;
-			b *= scale;
-
-			//fill data back in
-			bsp.lightBytes[i].lightmapData[j * 3 + 0] = (GLubyte)r;
-			bsp.lightBytes[i].lightmapData[j * 3 + 1] = (GLubyte)g;
-			bsp.lightBytes[i].lightmapData[j * 3 + 2] = (GLubyte)b;
-		}
-	}
-	*/
-}
-
-void BSPGameWorld::importWorldSpawn()
-{
-	D(d);
-	BSPEntity* entity;
-	// ASSERT: 第一个entity一定是worldspawn
-#if 0
-	if (d.bsp.findEntityByClassName("worldspawn", entity))
-	{
-		{
-			GMfloat ambient;
-			bool b = d.bsp.floatForKey(entity, "ambient", &ambient);
-			if (b)
-			{
-#endif
-				GameLight* ambientLight;
-				IFactory* factory = getGameMachine()->getFactory();
-				factory->createLight(Ambient, &ambientLight);
-				if (ambientLight)
-				{
-					ambientLight->setId(0);
-					//ambientLight->setColor(btVector3(ambient * .01f, ambient * .01f, ambient * .01f));
-					ambientLight->setColor(btVector3(1, 1, 1));
-					ambientLight->setPosition(btVector3(0, 0, 0));
-					ambientLight->setRange(0);
-					ambientLight->setWorld(this);
-					ambientLight->setShadowSource(false);
-					appendLight(ambientLight);
-				}
-#if 0
-			}
-		}
-
-		{
-			GMfloat gravity;
-			bool b = d.bsp.floatForKey(entity, "gravity", &gravity);
-			setGravity(0, 0, 0);
-		}
-	}
-#endif
-
-	setGravity(0, -800, 0);
-}
-
-void BSPGameWorld::importPlayer()
-{
-	D(d);
-	BSPEntity* entity;
-	if (d.bsp.findEntityByClassName("info_player_deathmatch", entity))
-	{
-		BSPVector3 origin;
-		d.bsp.vectorForKey(entity, "origin", origin);
-		gm_info("found playerstart\n");
-		btTransform playerStart;
-		playerStart.setIdentity();
-		//playerStart.setOrigin(M(origin[0], origin[1], origin[2]));
-		playerStart.setOrigin(btVector3(0, 0.875, 0));
-		Character* character = new Character(playerStart, .6, .1, .1);
-
-		character->setMoveSpeed(3);
-		character->setFallSpeed(250);
-		character->setJumpSpeed(vmath::vec3(0, 50, 0));
-		character->setCanFreeMove(false);
-
-		appendObjectAndInit(character);
-		setMajorCharacter(character);
-
-		//TODO
-		/*
-		character->setJumpSpeed(btVector3(character.jumpSpeed[0], character.jumpSpeed[1], character.jumpSpeed[2]));
-		character->setFallSpeed(character.fallSpeed);
-		character->setEyeOffset(character.eyeOffset);
-		*/
+		BSPGameWorldEntityReader::import(*iter, this);
 	}
 }

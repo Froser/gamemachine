@@ -25,6 +25,8 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	setTransform(position);
 	memset(&m_state, 0, sizeof(m_state));
 	memset(&m_eyeOffset, 0, sizeof(m_eyeOffset));
+	memset(&m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
+	memset(&m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
 	m_state.positionX = position.getOrigin().x();
 	m_state.positionY = position.getOrigin().y();
 	m_state.positionZ = position.getOrigin().z();
@@ -44,11 +46,12 @@ void Character::appendThisObjectToWorld(btDynamicsWorld* world)
 	// gravity
 	btPairCachingGhostObject* collisionObject = static_cast<btPairCachingGhostObject*>(d.collisionObject);
 	m_controller.reset(new btKinematicCharacterController(collisionObject, static_cast<btConvexShape*>(d.collisionShape.get()), m_stepHeight));
+	applyWalkDirection();
+
 	if (m_freeMove)
 		m_controller->setGravity(btVector3(0, 0, 0));
 	else
 		m_controller->setGravity(world->getGravity());
-	m_controller->setFallSpeed(m_fallSpeed);
 
 	world->addCollisionObject(d.collisionObject,
 		btBroadphaseProxy::CharacterFilter,

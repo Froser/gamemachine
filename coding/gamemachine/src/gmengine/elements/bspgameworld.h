@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gameworld.h"
 #include "bspgameworldprivate.h"
-#include "gmengine\controllers/resource_container.h"
+#include "gmengine/controllers/resource_container.h"
 BEGIN_NS
 
 struct Material;
@@ -38,10 +38,9 @@ private:
 private:
 	void importBSP();
 	void initTextures();
+	bool findTexture(const char* textureFilename, OUT Image** img);
 	void initLightmaps();
-	void adjustLightmapGamma();
-	void importPlayer();
-	void importWorldSpawn();
+	void importEntities();
 };
 
 END_NS

@@ -32,6 +32,9 @@
     <Filter Include="src\gmengine\controllers">
       <UniqueIdentifier>{7fd5da58-f867-4a48-a961-8704ca2548b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gmdatacore\bsp">
+      <UniqueIdentifier>{0943dc23-7934-4990-9ddf-9a15cf9d35f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -157,9 +160,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp.h">
-      <Filter>src\gmdatacore</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
@@ -207,6 +207,12 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\graphic_engine.h">
       <Filter>src\gmengine\controllers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.h">
+      <Filter>src\gmdatacore\bsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h">
+      <Filter>src\gmdatacore\bsp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -327,9 +333,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp.cpp">
-      <Filter>src\gmdatacore</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp">
       <Filter>src\gmengine\elements</Filter>
     </ClCompile>
@@ -378,10 +381,13 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\resource_container.cpp">
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.cpp">
+      <Filter>src\gmdatacore\bsp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\coding\gamemachine\src\gmdatacore\bsp_interior.inl">
-      <Filter>src\gmdatacore</Filter>
+    <None Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_interior.inl">
+      <Filter>src\gmdatacore\bsp</Filter>
     </None>
   </ItemGroup>
 </Project>

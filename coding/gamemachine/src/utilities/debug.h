@@ -57,7 +57,7 @@ inline void gm_print(const char *format, ...)
 	printf("%s: ", t);
 	va_list ap;
 	va_start(ap, format);
-	printf(format, ap);
+	vprintf(format, ap);
 	va_end(ap);
 	printf("\n");
 }
