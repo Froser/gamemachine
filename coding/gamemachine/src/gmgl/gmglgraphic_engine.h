@@ -1,11 +1,11 @@
 ﻿#ifndef __GMGLGRAPHIC_ENGINE_H__
 #define __GMGLGRAPHIC_ENGINE_H__
 #include "common.h"
-#include "gmengine/controller/graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 #include "gmglshaders.h"
 #include "gmgllight.h"
 #include "gmglshadowmapping.h"
-#include "gmengine/controller/resource_container.h"
+#include "gmengine/controllers/resource_container.h"
 #include <map>
 #include "utilities/camera.h"
 BEGIN_NS
@@ -36,6 +36,7 @@ public:
 	GMGLShaders* getShaders(ChildObject::ObjectType objectType);
 
 private:
+	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
 	void setEyeViewport(bool shadowOn, GMGLShaders& shaders);

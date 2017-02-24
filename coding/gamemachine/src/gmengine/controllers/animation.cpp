@@ -34,7 +34,8 @@ void Keyframes::insert(const Keyframe& keyframe)
 vmath::quaternion Keyframes::calculateInterpolation(GMfloat percentage, bool normalize)
 {
 	std::pair<const Keyframe*, const Keyframe*> lp = findLowerAndUpper(percentage);
-	LOG_ASSERT_MSG(lp.first && lp.second, "Missing '1' in animation keyframe percentage or missing animationduration");
+	if (!(lp.first && lp.second))
+		gm_error("Missing '1' in animation keyframe percentage or missing animationduration");
 
 	vmath::quaternion ret = interpolation(percentage, lp.first, lp.first->movement, lp.second, lp.second->movement, getFunctor());
 	if (normalize)

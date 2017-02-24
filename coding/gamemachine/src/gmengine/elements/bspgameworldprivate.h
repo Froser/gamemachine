@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gmdatacore\bsp.h"
 #include <map>
-#include "gmengine\controller\graphic_engine.h"
+#include "gmengine\controllers/graphic_engine.h"
 BEGIN_NS
 
 class GameObject;

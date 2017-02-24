@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gameworld.h"
 #include "bspgameworldprivate.h"
-#include "gmengine\controller\resource_container.h"
+#include "gmengine\controllers/resource_container.h"
 BEGIN_NS
 
 struct Material;

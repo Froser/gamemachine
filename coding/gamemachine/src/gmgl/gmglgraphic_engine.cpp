@@ -5,7 +5,7 @@
 #include "gmglfunc.h"
 #include "gmdatacore/object.h"
 #include "gmengine/elements/gameobject.h"
-#include "gmengine/controller/graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 #include "gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/gamelight.h"
@@ -52,6 +52,8 @@ void GMGLGraphicEngine::newFrame()
 
 void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 {
+	applyGraphicSettings();
+
 	GameLight* shadowSourceLight = getShadowSourceLight();
 	if (shadowSourceLight)
 	{
@@ -61,6 +63,19 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 	}
 
 	drawObjectsOnce(drawingList, !!shadowSourceLight);
+}
+
+void GMGLGraphicEngine::applyGraphicSettings()
+{
+	if (DBG_INT(CULL_FACE))
+	{
+		glFrontFace(GL_CW);
+		glEnable(GL_CULL_FACE);
+	}
+	else
+	{
+		glDisable(GL_CULL_FACE);
+	}
 }
 
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)

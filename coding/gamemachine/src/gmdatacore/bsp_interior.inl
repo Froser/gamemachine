@@ -84,7 +84,7 @@ int CopyLump(BSPHeader* header, int lump, void *dest, int size)
 	ofs = header->lumps[lump].fileofs;
 
 	if (length % size) {
-		LOG_ASSERT_MSG(false, "LoadBSPFile: odd lump size");
+		gm_error("LoadBSPFile: odd lump size");
 	}
 
 	memcpy(dest, (byte *)header + ofs, length);
@@ -191,7 +191,7 @@ int Q_filelength(FILE *f)
 void SafeRead(FILE *f, void *buffer, int count)
 {
 	if (fread(buffer, 1, count, f) != (size_t)count)
-		LOG_ASSERT_MSG(false, "File read failure");
+		gm_error("File read failure");
 }
 
 FILE *SafeOpenRead(const char *filename)
@@ -201,7 +201,7 @@ FILE *SafeOpenRead(const char *filename)
 	f = fopen(filename, "rb");
 
 	if (!f)
-		LOG_ASSERT_MSG(false, "Error opening %s: %s", filename, strerror(errno));
+		gm_error("Error opening %s: %s", filename, strerror(errno));
 
 	return f;
 }

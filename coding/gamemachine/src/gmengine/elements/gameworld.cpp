@@ -5,11 +5,11 @@
 #include "gmdatacore/object.h"
 #include "utilities/assert.h"
 #include "character.h"
-#include "gmengine/controller/graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/elements/gamelight.h"
-#include "gmengine/controller/gamemachine.h"
+#include "gmengine/controllers/gamemachine.h"
 #include <algorithm>
-#include "gmengine/controller/factory.h"
+#include "gmengine/controllers/factory.h"
 
 GameWorld::GameWorld()
 {

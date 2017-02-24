@@ -53,7 +53,7 @@ bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 	indices = new GLuint[tesselation*(tesselation + 1) * 2];
 	if (!indices)
 	{
-		LOG_ASSERT_MSG(false, "Unable to allocate memory for surface indices");
+		gm_error("Unable to allocate memory for surface indices");
 		return false;
 	}
 
@@ -74,7 +74,7 @@ bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 	rowIndexPointers = new unsigned int *[tesselation];
 	if (!trianglesPerRow || !rowIndexPointers)
 	{
-		LOG_ASSERT_MSG(false, "Unable to allocate memory for indices for multi_draw_arrays");
+		gm_error("Unable to allocate memory for indices for multi_draw_arrays");
 		return false;
 	}
 
@@ -144,7 +144,7 @@ void BSP::readFile()
 		GMuint size;
 		if (fseek(file, 0, SEEK_END) || (size = ftell(file)) == EOF || fseek(file, 0, SEEK_SET))
 		{
-			LOG_ASSERT_MSG(false, "Cannot get filesize.");
+			gm_error("Cannot get filesize.");
 			goto FINALLY;
 		}
 		d.buffer = malloc(size + 1);
@@ -162,10 +162,10 @@ void BSP::swapBsp()
 	SwapBlock((int *)d.header, sizeof(*d.header));
 
 	if (d.header->ident != BSP_IDENT) {
-		LOG_ASSERT_MSG(false, "Invalid IBSP file");
+		gm_error("Invalid IBSP file");
 	}
 	if (d.header->version != BSP_VERSION) {
-		LOG_ASSERT_MSG(false, "Bad version of bsp.");
+		gm_error("Bad version of bsp.");
 	}
 
 	const int extrasize = 1;
@@ -258,7 +258,7 @@ void BSP::parseFromMemory(char *buffer, int size)
 	d.script = d.scriptstack;
 	d.script++;
 	if (d.script == &d.scriptstack[MAX_INCLUDES])
-		LOG_ASSERT_MSG(false, "script file exceeded MAX_INCLUDES");
+		gm_error("script file exceeded MAX_INCLUDES");
 	strcpy(d.script->filename, "memory buffer");
 
 	d.script->buffer = buffer;
@@ -282,7 +282,7 @@ bool BSP::parseEntity()
 	}
 
 	if (strcmp(d.token, "{")) {
-		Log::getInstance().warning("parseEntity: { not found");
+		gm_warning("parseEntity: { not found");
 	}
 
 	BSPEntity bla;
@@ -300,7 +300,7 @@ bool BSP::parseEntity()
 
 	do {
 		if (!getToken(true)) {
-			Log::getInstance().warning("parseEntity: EOF without closing brace");
+			gm_warning("parseEntity: EOF without closing brace");
 		}
 		if (!strcmp(d.token, "}")) {
 			break;
@@ -351,7 +351,7 @@ skipspace:
 		|| (d.script->script_p[0] == '/' && d.script->script_p[1] == '/'))
 	{
 		if (!crossline)
-			LOG_ASSERT_MSG(false, "Line %i is incomplete\n", scriptline);
+			gm_error("Line %i is incomplete\n", d.scriptline);
 		while (*d.script->script_p++ != '\n')
 			if (d.script->script_p >= d.script->end_p)
 				return endOfScript(crossline);
@@ -456,7 +456,7 @@ void BSP::addScriptToStack(const char *filename)
 
 	d.script++;
 	if (d.script == &d.scriptstack[MAX_INCLUDES])
-		LOG_ASSERT_MSG(false, "script file exceeded MAX_INCLUDES");
+		gm_error("script file exceeded MAX_INCLUDES");
 	strcpy(d.script->filename, expandPath(filename).c_str());
 
 	size = LoadFile(d.script->filename, (void **)&d.script->buffer);

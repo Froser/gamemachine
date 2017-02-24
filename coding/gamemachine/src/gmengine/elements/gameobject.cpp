@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gameobject.h"
 #include "btBulletDynamicsCommon.h"
-#include "gmengine/controller/graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/elements/gameworld.h"
 
 GameObject::GameObject()

@@ -5,14 +5,16 @@
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
 #include "utilities/assert.h"
 #include "gmengine/elements/gameworld.h"
-#include "../flow/gameloop.h"
+#include "gmengine/controllers/gameloop.h"
+
+#define TO_BT(v) btVector3(v[0], v[1], v[2])
 
 Character::Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight)
 	: m_radius(radius)
 	, m_height(height)
 	, m_stepHeight(stepHeight)
 	, m_controller(nullptr)
-	, m_jumpSpeed(btVector3(0, 10, 0))
+	, m_jumpSpeed(vmath::vec3(0, 10, 0))
 	, m_fallSpeed(10)
 	, m_freeMove(true)
 	, m_dynamicWorld(nullptr)
@@ -76,6 +78,17 @@ GMfloat Character::calcMoveDistance()
 		return m_moveSpeed / fps;
 }
 
+GMfloat Character::calcFallSpeed()
+{
+	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
+	GMfloat fps = getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
+	GMfloat skipFrame = elapsed / (1.0f / fps);
+	if (skipFrame > 1)
+		return m_fallSpeed * skipFrame / fps;
+	else
+		return m_fallSpeed / fps;
+}
+
 void Character::moveForwardOrBackward(bool forward)
 {
 	GMfloat distance = (forward ? 1 : -1 ) * calcMoveDistance();
@@ -98,7 +111,7 @@ void Character::moveLeftOrRight(bool left)
 	applyWalkDirection();
 }
 
-void Character::setJumpSpeed(const btVector3& jumpSpeed)
+void Character::setJumpSpeed(const vmath::vec3& jumpSpeed)
 {
 	m_jumpSpeed = jumpSpeed;
 }
@@ -106,8 +119,6 @@ void Character::setJumpSpeed(const btVector3& jumpSpeed)
 void Character::setFallSpeed(GMfloat speed)
 {
 	m_fallSpeed = speed;
-	if (m_controller)
-		m_controller->setFallSpeed(m_fallSpeed);
 }
 
 void Character::setCanFreeMove(bool freeMove)
@@ -133,7 +144,7 @@ const PositionState& Character::getPositionState()
 	return m_state;
 }
 
-void Character::action(MoveDirection md)
+void Character::action(MoveAction md)
 {
 	m_moveDirection = md;
 }
@@ -198,10 +209,13 @@ void Character::simulation()
 		applyWalkDirection();
 	}
 
+	m_controller->setFallSpeed(calcFallSpeed());
 	if (m_moveDirection & MD_JUMP)
 	{
 		if (m_controller->canJump())
-			m_controller->jump(m_jumpSpeed);
+		{
+			m_controller->jump(TO_BT(m_jumpSpeed));
+		}
 	}
 }
 

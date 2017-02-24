@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gamelight.h"
 #include "gameworld.h"
-#include "gmengine/controller/graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 
 GameLight::GameLight()
 	: m_shadowSource(false)

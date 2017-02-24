@@ -3,6 +3,9 @@
 #include "gameloop.h"
 #include "GL/freeglut.h"
 #include "utilities/assert.h"
+#include "gamemachine.h"
+
+#define GM GameLoop::getInstance()->getHandler()->getGameMachine()
 
 static void renderLoop(int i)
 {
@@ -56,13 +59,15 @@ void GameLoop::drawFrame()
 	m_handler->render();
 	m_drawStopwatch.stop();
 	GMfloat elapsed = m_drawStopwatch.getMillisecond();
-	m_timeElapsed = elapsed == 0 ? 0.001 : elapsed / 1000;
 
 #ifdef _WINDOWS
 	GMfloat wait = 1000 / m_settings.fps - elapsed;
 	if (wait > 0)
 		::Sleep(wait);
 #endif
+
+	GMfloat min = 1.f / m_settings.fps;
+	m_timeElapsed = elapsed / 1000 < min ? min : elapsed / 1000;
 }
 
 GMfloat GameLoop::getElapsedAfterLastFrame()
@@ -70,9 +75,15 @@ GMfloat GameLoop::getElapsedAfterLastFrame()
 	return m_timeElapsed;
 }
 
+IGameHandler* GameLoop::getHandler()
+{
+	return m_handler;
+}
+
 void GameLoop::start()
 {
 	glutTimerFunc(1, renderLoop, 0);
+	startWindowLoop();
 }
 
 void GameLoop::terminate()
@@ -94,4 +105,10 @@ void GameLoop::exit()
 {
 	m_handler->onExit();
 	::exit(0);
+}
+
+void GameLoop::startWindowLoop()
+{
+	IWindow* window = m_handler->getGameMachine()->getWindow();
+	window->startWindowLoop();
 }

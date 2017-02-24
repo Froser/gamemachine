@@ -2,8 +2,8 @@
 #include "gameworldcreator.h"
 #include "utilities/assert.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "gmengine/controller/factory.h"
-#include "gmengine/controller/gamemachine.h"
+#include "gmengine/controllers/factory.h"
+#include "gmengine/controllers/gamemachine.h"
 
 // BSP Gameworld
 void GameWorldCreator::createBSPGameWorld(GameMachine* gm, const char* bspPath, OUT BSPGameWorld** gameWorld)
@@ -16,7 +16,5 @@ void GameWorldCreator::createBSPGameWorld(GameMachine* gm, const char* bspPath, 
 	IFactory* factory = gm->getFactory();
 	IGraphicEngine* engine = gm->getGraphicEngine();
 	world->setGameMachine(gm);
-
 	world->loadBSP(bspPath);
-	world->initialize();
 }

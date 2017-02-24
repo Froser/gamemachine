@@ -23,6 +23,11 @@ class GameLoop;
 
 class GameMachine
 {
+	enum
+	{
+		MAX_KEY_STATE_BITS = 512,
+	};
+
 public:
 	GameMachine(
 		GraphicSettings settings,
@@ -41,6 +46,7 @@ public:
 
 private:
 	void init();
+	void initDebugger();
 
 private:
 	GraphicSettings m_settings;

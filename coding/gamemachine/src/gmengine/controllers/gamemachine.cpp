@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gamemachine.h"
 #include "factory.h"
-#include "..\flow\gameloop.h"
+#include "gameloop.h"
 
 GameMachine::GameMachine(
 	GraphicSettings settings,
@@ -26,6 +26,14 @@ void GameMachine::init()
 	m_engine.reset(engine);
 
 	getGameLoop()->init(m_settings, m_gameHandler);
+	initDebugger();
+}
+
+void GameMachine::initDebugger()
+{
+	DBG_SET_INT(CULL_FACE, 1);
+	DBG_SET_INT(CALCULATE_BSP_FACE, 1);
+	DBG_SET_INT(POLYGON_LINE_MODE, 0);
 }
 
 IGraphicEngine* GameMachine::getGraphicEngine()
@@ -62,5 +70,4 @@ void GameMachine::startGameMachine()
 	m_gameHandler->init();
 	getGameLoop()->init(m_settings, m_gameHandler);
 	getGameLoop()->start();
-	m_window->startWindowLoop();
 }

@@ -4,7 +4,7 @@
 #include "gmdatacore/object.h"
 #include "utilities/autoptr.h"
 #include "btBulletCollisionCommon.h"
-#include "gmengine/controller/animation.h"
+#include "gmengine/controllers/animation.h"
 #include <map>
 BEGIN_NS
 

@@ -50,8 +50,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>freeglut_staticd.lib;glu32.lib;opengl32.lib;glew32s.lib;gamemachine.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;zlibstaticd.lib;libpng16_staticd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(TargetDir);../../coding/3rdparty/glew/lib/release/win32;../../bullet3_windows/lib/Debug;../../freeglut-3.0.0_windows/lib/Debug;../../libpng_windows/Debug;../../zlib_windows/Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>freeglut_staticd.lib;glu32.lib;opengl32.lib;glew32s.lib;gamemachine.lib;BulletDynamics_Debug.lib;BulletCollision_Debug.lib;LinearMath_Debug.lib;zlibstaticd.lib;libpng16_staticd.lib;libjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(TargetDir);../../coding/3rdparty/glew/lib/release/win32;../../bullet3_windows/lib/Debug;../../freeglut-3.0.0_windows/lib/Debug;../../libpng_windows/Debug;../../zlib_windows/Debug;../../coding/3rdparty/jpeg-6;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -68,9 +68,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>freeglut_static.lib;glu32.lib;opengl32.lib;glew32s.lib;gamemachine.lib;BulletDynamics.lib;BulletCollision.lib;LinearMath.lib;zlibstatic.lib;libpng16_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(TargetDir);../../coding/3rdparty/glew/lib/release/win32;../../bullet3_windows/lib/Release;../../freeglut-3.0.0_windows/lib/Release;../../freeglut-3.0.0_windows/lib/Debug;../../libpng_windows/Release;../../zlib_windows/Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>freeglut_static.lib;glu32.lib;opengl32.lib;glew32s.lib;gamemachine.lib;BulletDynamics.lib;BulletCollision.lib;LinearMath.lib;zlibstatic.lib;libpng16_static.lib;libjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(TargetDir);../../coding/3rdparty/glew/lib/release/win32;../../bullet3_windows/lib/Release;../../freeglut-3.0.0_windows/lib/Release;../../freeglut-3.0.0_windows/lib/Debug;../../libpng_windows/Release;../../zlib_windows/Release;../../coding/3rdparty/jpeg-6;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

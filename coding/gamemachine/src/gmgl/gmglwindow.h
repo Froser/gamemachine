@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGLWINDOW_H__
 #define __GMGLWINDOW_H__
 #include "common.h"
-#include "gmengine\controller\gamemachine.h"
+#include "gmengine\controllers/gamemachine.h"
 BEGIN_NS
 
 class GMGLWindow : public IWindow
@@ -28,6 +28,7 @@ private:
 	bool m_fullscreen;
 #ifdef _WINDOWS
 	HWND m_hwnd;
+	MSG m_msg;
 #endif
 };
 

@@ -1,15 +1,12 @@
 ﻿#include "stdafx.h"
 #include "bspgameworld.h"
-#include "utilities\log.h"
 #include "character.h"
-#include "LinearMath\btGeometryUtil.h"
 #include "convexhullgameobject.h"
 #include "gamelight.h"
-#include "gmengine/controller/factory.h"
-#include "gmengine/controller/gamemachine.h"
+#include "gmengine/controllers/factory.h"
+#include "gmengine/controllers/gamemachine.h"
 #include "utilities/algorithm.h"
-#include "utilities/plane.h"
-#include "gmengine/controller/resource_container.h"
+#include "gmengine/controllers/resource_container.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include "utilities/path.h"
 #include "gmdatacore/imagebuffer.h"
@@ -46,7 +43,10 @@ void BSPGameWorld::renderGameWorld()
 	engine->newFrame();
 
 	updateCamera();
-	calculateVisibleFaces();
+
+	if (DBG_INT(CALCULATE_BSP_FACE))
+		calculateVisibleFaces();
+
 	drawFaces();
 
 	engine->drawObjects(d.drawingList);
@@ -508,7 +508,7 @@ void BSPGameWorld::importPlayer()
 	{
 		BSPVector3 origin;
 		d.bsp.vectorForKey(entity, "origin", origin);
-		LOG_INFO("found playerstart\n");
+		gm_info("found playerstart\n");
 		btTransform playerStart;
 		playerStart.setIdentity();
 		//playerStart.setOrigin(M(origin[0], origin[1], origin[2]));
@@ -516,8 +516,8 @@ void BSPGameWorld::importPlayer()
 		Character* character = new Character(playerStart, .6, .1, .1);
 
 		character->setMoveSpeed(3);
-		character->setFallSpeed(400);
-		character->setJumpSpeed(btVector3(0, 30, 0));
+		character->setFallSpeed(250);
+		character->setJumpSpeed(vmath::vec3(0, 50, 0));
 		character->setCanFreeMove(false);
 
 		appendObjectAndInit(character);

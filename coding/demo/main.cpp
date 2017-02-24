@@ -9,16 +9,17 @@
 #include "gmengine/elements/character.h"
 #include "gmgl/gmglfactory.h"
 #include "gmengine/io/mouse.h"
-#include "gmengine/flow/gameloop.h"
+#include "gmengine/controllers/gameloop.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmengine/io/keyboard.h"
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
-#include "gmengine/controller/gamemachine.h"
+#include "gmengine/controllers/gamemachine.h"
 #include "gmgl/gmglwindow.h"
 #include "utilities/path.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmdatacore/gameworldcreator.h"
+#include "utilities/debug.h"
 
 using namespace gm;
 
@@ -155,7 +156,7 @@ public:
 			m_gm->getGameLoop()->terminate();
 		}
 
-		MoveDirection moveTag = 0;
+		MoveAction moveTag = 0;
 		if (Keyboard::isKeyDown('A'))
 			moveTag |= MD_LEFT;
 		if (Keyboard::isKeyDown('D'))
@@ -168,6 +169,11 @@ public:
 			moveTag |= MD_JUMP;
 
 		character->action(moveTag);
+
+		if (Keyboard::isKeyDown('P'))
+			DBG_SET_INT(CALCULATE_BSP_FACE, !DBG_INT(CALCULATE_BSP_FACE));
+		if (Keyboard::isKeyDown('L'))
+			DBG_SET_INT(POLYGON_LINE_MODE, !DBG_INT(POLYGON_LINE_MODE));
 	}
 
 	void logicalFrame(GMfloat elapsed)
@@ -185,6 +191,11 @@ public:
 	{
 		GMGLWindow* window = static_cast<GMGLWindow*> (m_gm->getWindow());
 		return GetActiveWindow() == window->getHWND();
+	}
+
+	GameMachine* getGameMachine()
+	{
+		return m_gm;
 	}
 
 	GameMachine* m_gm;
@@ -205,7 +216,6 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	glEnable(GL_CULL_FACE);
 	gameMachine = new GameMachine(
 		settings,
 		new GMGLWindow(lpCmdLine, "GM", false ),

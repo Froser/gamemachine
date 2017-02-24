@@ -16,7 +16,7 @@ bool Bitset::init(int numberOfBits)
 	bits = new unsigned char[numBytes];
 	if (!bits)
 	{
-		LOG_ASSERT_MSG(false, "Unable to allocate space for a Bitset of %d bits", numberOfBits);
+		gm_error("Unable to allocate space for a Bitset of %d bits", numberOfBits);
 		return false;
 	}
 

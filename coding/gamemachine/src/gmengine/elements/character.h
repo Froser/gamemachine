@@ -14,7 +14,7 @@ class btKinematicCharacterController;
 BEGIN_NS
 
 // bits:  r, l, b, f
-typedef GMbyte MoveDirection;
+typedef GMbyte MoveAction;
 enum
 {
 	MD_FORWARD = 1,
@@ -30,13 +30,13 @@ public:
 	Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight);
 
 public:
-	void setJumpSpeed(const btVector3& jumpSpeed);
+	void setJumpSpeed(const vmath::vec3& jumpSpeed);
 	void setFallSpeed(GMfloat speed);
 
 	void setCanFreeMove(bool freeMove);
 	void setMoveSpeed(GMfloat moveSpeed);
 	void simulation();
-	void action(MoveDirection md);
+	void action(MoveAction md);
 	void lookUp(GMfloat degree);
 	void lookRight(GMfloat degree);
 	void setPitchLimitDegree(GMfloat deg);
@@ -56,23 +56,24 @@ protected:
 
 private:
 	GMfloat calcMoveDistance();
+	GMfloat calcFallSpeed();
 	void moveForwardOrBackward(bool forward);
 	void moveLeftOrRight(bool left);
 	void update();
 	void applyWalkDirection();
 
 private:
-	btScalar m_height;
-	btScalar m_radius;
-	btScalar m_stepHeight;
-	btVector3 m_jumpSpeed;
+	GMfloat m_height;
+	GMfloat m_radius;
+	GMfloat m_stepHeight;
+	vmath::vec3 m_jumpSpeed;
 	btScalar m_fallSpeed;
 	GMfloat m_moveSpeed;
 	GMfloat m_eyeOffset[3];
 	Frustum m_frustum;
 	GMfloat m_walkDirectionFB[3];
 	GMfloat m_walkDirectionLR[3];
-	MoveDirection m_moveDirection;
+	MoveAction m_moveDirection;
 
 	AutoPtr<btKinematicCharacterController> m_controller;
 	AutoPtr<btPairCachingGhostObject> m_ghostObject;

@@ -20,15 +20,17 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_jpg.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\animation.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\factory.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\gamemachine.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gamemachine.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\graphic_engine.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\resource_container.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
@@ -40,7 +42,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h" />
@@ -59,8 +60,8 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\autoptr.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\bitset.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\camera.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\debug.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\frustum.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\utilities\log.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\plane.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h" />
@@ -78,15 +79,17 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_bmp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_dds.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_jpg.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\animation.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\factory.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\gamemachine.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\graphic_engine.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controller\resource_container.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gamemachine.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\graphic_engine.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\resource_container.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
@@ -98,7 +101,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\flow\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp" />
@@ -117,8 +119,8 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\bitset.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\debug.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\frustum.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\utilities\log.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\plane.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp" />
@@ -165,7 +167,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src;../../coding/3rdparty/libpng</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -180,7 +182,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src;../../coding/3rdparty/libpng</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>

@@ -4,7 +4,7 @@
 #include "gameobjectprivate.h"
 #include <vector>
 #include "btBulletCollisionCommon.h"
-#include "gmengine/controller/graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 #include "gameworld.h"
 
 class btDynamicsWorld;

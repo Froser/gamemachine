@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGLFACTORY_H__
 #define __GMGLFACTORY_H__
 #include "common.h"
-#include "gmengine/controller/factory.h"
+#include "gmengine/controllers/factory.h"
 #include "gmglshaders.h"
 #include "utilities/autoptr.h"
 BEGIN_NS
