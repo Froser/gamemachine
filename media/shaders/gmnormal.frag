@@ -161,7 +161,7 @@ void drawObject()
 
     // 计算环境光和Ka贴图
     vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(0);
-    ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(0);
+    ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(1);
     ambientLight += GM_light_ka.xyz * shadeFactor * ambientTextureColor;
     ambientLight *= vec3(GM_light_ambient);
 

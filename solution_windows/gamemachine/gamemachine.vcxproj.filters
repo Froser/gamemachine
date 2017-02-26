@@ -214,6 +214,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h">
       <Filter>src\gmdatacore\bsp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.h">
+      <Filter>src\gmdatacore\bsp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -382,6 +385,9 @@
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.cpp">
+      <Filter>src\gmdatacore\bsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.cpp">
       <Filter>src\gmdatacore\bsp</Filter>
     </ClCompile>
   </ItemGroup>

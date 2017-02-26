@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<gmshader>
+	<item name="textures/sfx/xflame2_2250">
+		<surfaceparm>nomarks</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<cull>none</cull>
+		<content>
+			<animMap count="10" blendFunc="GL_ONE GL_ONE">
+				<src>textures/sfx/flame1.tga</src>
+				<src>textures/sfx/flame2.tga</src>
+				<src>textures/sfx/flame3.tga</src>
+				<src>textures/sfx/flame4.tga</src>
+				<src>textures/sfx/flame5.tga</src>
+				<src>textures/sfx/flame6.tga</src>
+				<src>textures/sfx/flame7.tga</src>
+				<src>textures/sfx/flame8.tga</src>
+			</animMap>
+		</content>
+	</item>
+</gmshader>

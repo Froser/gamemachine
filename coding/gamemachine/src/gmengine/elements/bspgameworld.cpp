@@ -396,7 +396,10 @@ bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 		std::string fn(textureFilename);
 		fn.append(priorities[i]);
 		if (imgReader.load(fn.c_str(), img))
+		{
+			gm_info("loaded texture %s", fn.c_str());
 			return true;
+		}
 	}
 	return false;
 }
