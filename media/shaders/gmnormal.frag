@@ -15,6 +15,10 @@ uniform int GM_shadow_texture_switch = 0;
 // 受环境系数影响的纹理 (Ka)
 uniform sampler2D GM_ambient_texture;
 uniform int GM_ambient_texture_switch = 0;
+uniform sampler2D GM_ambient_texture_2;
+uniform int GM_ambient_texture_2_switch = 0;
+uniform sampler2D GM_ambient_texture_3;
+uniform int GM_ambient_texture_3_switch = 0;
 
 // 受漫反射系数影响的纹理 (kd)
 uniform sampler2D GM_diffuse_texture;
@@ -137,30 +141,16 @@ void drawObject()
     vec3 ambientLight = vec3(0);
 
     // 计算点光源（漫反射、Kd和镜面反射）
-    vec3 diffuseLight = g_diffuse * vec3(GM_light_kd);
-    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(0) /*vec3(texture(GM_diffuse_texture, _uv))*/ : vec3(0);
-    diffuseLight += diffuseTextureColor;
+    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(texture(GM_diffuse_texture, _uv)) : vec3(1);
+    vec3 diffuseLight = g_diffuse * vec3(GM_light_kd) * diffuseTextureColor;
     diffuseLight *= vec3(GM_light_specular);
 
     vec3 specularLight = g_specular * vec3(GM_light_specular) * vec3(GM_light_ks);
 
-    // 根据环境反射度来反射天空盒（如果有的话）
-    /*
-    if (GM_reflection_cubemap_texture_switch == 1)
-    {
-        vec3 viewDirection = normalize(GM_view_position.xyz - position_world.xyz);
-        vec3 reflectionCoord = reflect(-viewDirection, (normalTransform * _normal).xyz);
-        // 乘以shadeFactor是因为阴影会遮挡反射光
-        if (GM_light_ke.x > 0 && GM_light_ke.y > 0 && GM_light_ke.z > 0)
-        {
-            vec3 color_from_reflection = shadeFactor * (texture(GM_reflection_cubemap_texture, reflectionCoord).rgb * vec3(GM_light_ke));
-            ambientLight += color_from_reflection;
-        }
-    }
-    */
-
     // 计算环境光和Ka贴图
-    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(0);
+    //ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(1);
+    vec3  ambientTextureColor = GM_ambient_texture_2_switch == 1 ? vec3(texture(GM_ambient_texture_2, _uv)) : vec3(1);
+    //ambientTextureColor *= GM_ambient_texture_3_switch == 1 ? vec3(texture(GM_ambient_texture_3, _uv)) : vec3(1);
     ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(1);
     ambientLight += GM_light_ka.xyz * shadeFactor * ambientTextureColor;
     ambientLight *= vec3(GM_light_ambient);
@@ -169,7 +159,6 @@ void drawObject()
     vec3 color = ambientLight + shadeFactor * (diffuseLight + specularLight);
     frag_color = vec4(color, 1.0f);
     //frag_color = vec4(1, 1, 1, 1.0f);
-    //frag_color = vec4(DEBUG, 1);
 }
 
 void main()

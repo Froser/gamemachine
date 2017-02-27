@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <gmshader>
-	<item name="textures/sfx/flame1">
+	<item name="textures/sfx/flame1side">
 		<surfaceparm>nomarks</surfaceparm>
 		<surfaceparm>nolightmap</surfaceparm>
 		<cull>none</cull>
-		<animMap blendFunc="GMS_ONE GMS_ONE" ms="100">
+		<animMap ms="100" blendFunc="GMS_ONE GMS_ONE">
 			<src>textures/sfx/flame1.jpg</src>
 			<src>textures/sfx/flame2.jpg</src>
 			<src>textures/sfx/flame3.jpg</src>
@@ -14,5 +14,22 @@
 			<src>textures/sfx/flame7.jpg</src>
 			<src>textures/sfx/flame8.jpg</src>
 		</animMap>
+		<animMap ms="100" blendFunc="GMS_ONE GMS_ONE">
+			<src>textures/sfx/flame2.jpg</src>
+			<src>textures/sfx/flame3.jpg</src>
+			<src>textures/sfx/flame4.jpg</src>
+			<src>textures/sfx/flame5.jpg</src>
+			<src>textures/sfx/flame6.jpg</src>
+			<src>textures/sfx/flame7.jpg</src>
+			<src>textures/sfx/flame8.jpg</src>
+			<src>textures/sfx/flame1.jpg</src>
+		</animMap>
+	</item>
+	<item name="models/mapobjects/baph/bapholamp_fx">
+		<surfaceparm>nonsolid</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<cull>cull</cull>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<clampmap>models/mapobjects/baph/bapholamp_fx.jpg</clampmap>
 	</item>
 </gmshader>
