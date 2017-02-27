@@ -67,15 +67,8 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 
 void GMGLGraphicEngine::applyGraphicSettings()
 {
-	if (DBG_INT(CULL_FACE))
-	{
-		glFrontFace(GL_CW);
-		glEnable(GL_CULL_FACE);
-	}
-	else
-	{
-		glDisable(GL_CULL_FACE);
-	}
+	glFrontFace(GL_CW);
+	glEnable(GL_CULL_FACE);
 }
 
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)

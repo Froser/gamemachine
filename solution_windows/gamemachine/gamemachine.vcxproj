@@ -26,6 +26,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\shader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.h" />
@@ -86,6 +87,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\shader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.cpp" />
@@ -147,7 +149,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

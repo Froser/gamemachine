@@ -10,13 +10,12 @@
 #include "gmdatacore/imagereader/imagereader.h"
 #include "utilities/path.h"
 #include "gmdatacore/imagebuffer.h"
+#include "gmdatacore/bsp/bsp_shader_loader.h"
 
 #define SolidGameObject HallucinationGameObject
 
 BSPGameWorld::BSPGameWorld()
 {
-	D(d);
-	D_BASE(GameWorld, dbase);
 }
 
 void BSPGameWorld::loadBSP(const char* bspPath)
@@ -312,38 +311,61 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 	obj->getReadyForRender(d.drawingList);
 }
 
-bool BSPGameWorld::setMaterialTexture(ID textureid, REF Material& m)
+bool BSPGameWorld::setMaterialTexture(GMuint textureid, REF Material& m)
 {
 	D(d);
-	ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
-	TextureContainer& tc = rc->getTextureContainer();
-	const TextureContainer::TextureItem* item = tc.find(textureid);
-	if (!item)
-		return false;
+	BSPData& bsp = d.bsp.bspData();
+	const char* name = bsp.shaders[textureid].shader;
 
-	m.textures.autorelease = false;
-	m.textures.texture[TEXTURE_INDEX_AMBIENT] = item->texture;
-	return true;
+	// 先从地图Shaders中找，如果找不到，就直接读取材质
+	auto shader = d.shaders.find(name);
+	if (shader == d.shaders.end())
+	{
+		ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
+		TextureContainer& tc = rc->getTextureContainer();
+		const TextureContainer::TextureItem* item = tc.find(bsp.shaders[textureid].shader);
+		if (!item)
+			return false;
+		m.shader.textures[0].autorelease = false;
+		m.shader.textures[0].texture[TEXTURE_INDEX_AMBIENT] = item->texture;
+		m.shader.frameCount = 1;
+		return true;
+	}
+	else
+	{
+		Shader& s = (*shader).second;
+		m.shader = s;
+		return true;
+	}
 }
 
-void BSPGameWorld::setMaterialLightmap(ID lightmapid, REF Material& m)
+void BSPGameWorld::setMaterialLightmap(GMuint lightmapid, REF Material& m)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
 	ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
-	TextureContainer& tc = rc->getLightmapContainer();
-	const TextureContainer::TextureItem* item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
+	TextureContainer_ID& tc = rc->getLightmapContainer();
+	const TextureContainer_ID::TextureItem* item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	m.textures.autorelease = false;
-	m.textures.texture[TEXTURE_INDEX_LIGHTMAP] = item->texture;
+	for (GMuint i = 0; i < m.shader.frameCount; i++)
+	{
+		m.shader.textures[i].texture[TEXTURE_INDEX_LIGHTMAP] = item->texture;
+	}
 }
 
 void BSPGameWorld::importBSP()
 {
+	initShaders();
 	initTextures();
 	initLightmaps();
 	importEntities();
 	initialize();
+}
+
+void BSPGameWorld::initShaders()
+{
+	BSPShaderLoader shaderLoader("D:/scr/", *this);
+	shaderLoader.parseAll();
 }
 
 void BSPGameWorld::initTextures()
@@ -367,7 +389,7 @@ void BSPGameWorld::initTextures()
 			factory->createTexture(tex, &texture);
 
 			TextureContainer::TextureItem item;
-			item.id = i;
+			item.name = shader.shader;
 			item.texture = texture;
 			rc->getTextureContainer().insert(item);
 		}
@@ -422,7 +444,7 @@ void BSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 
-		TextureContainer::TextureItem item;
+		TextureContainer_ID::TextureItem item;
 		item.id = i;
 		item.texture = texture;
 		rc->getLightmapContainer().insert(item);
@@ -435,7 +457,7 @@ void BSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 
-		TextureContainer::TextureItem item;
+		TextureContainer_ID::TextureItem item;
 		item.id = -1;
 		item.texture = texture;
 		rc->getLightmapContainer().insert(item);
@@ -450,4 +472,17 @@ void BSPGameWorld::importEntities()
 	{
 		BSPGameWorldEntityReader::import(*iter, this);
 	}
+}
+
+const char* BSPGameWorld::bspWorkingDirectory()
+{
+	D(d);
+	return d.bspWorkingDirectory.c_str();
+}
+
+void BSPGameWorld::addShader(const char* name, const Shader& shader)
+{
+	D(d);
+	ASSERT(d.shaders.find(name) == d.shaders.end());
+	d.shaders[name] = shader;
 }

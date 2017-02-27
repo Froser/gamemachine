@@ -217,6 +217,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.h">
       <Filter>src\gmdatacore\bsp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\shader.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -389,6 +392,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.cpp">
       <Filter>src\gmdatacore\bsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\shader.cpp">
+      <Filter>src\gmdatacore</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -103,19 +103,19 @@ void GMGLObjectPainter::draw()
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
 			Component* component = (*iter);
-			TextureInfo& textureInfos = component->getMaterial().textures;
+			Shader& shader = component->getMaterial().shader;
 
 			if (!m_shadowMapping.hasBegun())
 			{
 				setLights(component->getMaterial(), childObj->getType());
-				beginTextures(&textureInfos, childObj->getType());
+				beginShader(&shader, childObj->getType());
 			}
 
 			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(childObj);
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 
 			if (!m_shadowMapping.hasBegun())
-				endTextures(&textureInfos);
+				endShader(&shader);
 		}
 		glBindVertexArray(0);
 	}
@@ -173,29 +173,89 @@ void GMGLObjectPainter::activeTexture(TextureIndex i, ChildObject::ObjectType ty
 	glActiveTexture(i + GL_TEXTURE1);
 }
 
-void GMGLObjectPainter::beginTextures(TextureInfo* textures, ChildObject::ObjectType type)
+ITexture** GMGLObjectPainter::getTexture(Shader* shader)
 {
-	ITexture** texs = textures->texture;
-	for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
+	if (shader->frameCount == 1)
+		return shader->textures[0].texture;
+
+	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
+	// TODO
+	GMint elapsed = m_world->getElapsed() * 1000;
+
+	return shader->textures[(elapsed / shader->animationMs) % shader->frameCount].texture;
+
+	return nullptr;
+}
+
+void GMGLObjectPainter::activeShader(Shader* shader)
+{
+	if (shader->blend)
 	{
-		// GL_TEXTURE0留给shadow mapping
-		ITexture* t = texs[i];
-		if (t)
+		glEnable(GL_BLEND);
+		GLenum factors[2];
+		for (GMuint i = 0; i < 2; i++)
 		{
-			activeTexture((TextureIndex)i, type);
-			t->beginTexture();
+			switch (shader->blendFactors[i])
+			{
+			case GMS_ZERO:
+				factors[i] = GL_ZERO;
+				break;
+			case GMS_ONE:
+				factors[i] = GL_ONE;
+				break;
+			default:
+				ASSERT(false);
+				break;
+			}
+		}
+		glBlendFunc(factors[0], factors[1]);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+	}
+
+	if (shader->cull == GMS_NONE)
+	{
+		glDisable(GL_CULL_FACE);
+	}
+	else
+	{
+		glFrontFace(GL_CW);
+		glEnable(GL_CULL_FACE);
+	}
+}
+
+void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type)
+{
+	activeShader(shader);
+	ITexture** texs = getTexture(shader);
+	if (texs)
+	{
+		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
+		{
+			// GL_TEXTURE0留给shadow mapping
+			ITexture* t = texs[i];
+			if (t)
+			{
+				activeTexture((TextureIndex)i, type);
+				t->beginTexture();
+			}
 		}
 	}
 }
 
-void GMGLObjectPainter::endTextures(TextureInfo* textures)
+void GMGLObjectPainter::endShader(Shader* shader)
 {
-	ITexture** texs = textures->texture;
-	for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
+	ITexture** texs = getTexture(shader);
+	if (texs)
 	{
-		ITexture* t = texs[i];
-		if (t)
-			t->endTexture();
+		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
+		{
+			ITexture* t = texs[i];
+			if (t)
+				t->endTexture();
+		}
 	}
 }
 

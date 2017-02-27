@@ -39,14 +39,18 @@ Component::Component(ChildObject* parent)
 
 Component::~Component()
 {
-	TextureInfo& texture = getMaterial().textures;
-	if (texture.autorelease)
+	TextureInfo* textures = getMaterial().shader.textures;
+	for (GMint i = 0; i < getMaterial().shader.frameCount; i++)
 	{
-		for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
+		TextureInfo& texture = textures[i];
+		if (texture.autorelease)
 		{
-			ITexture* t = texture.texture[i];
-			if (t)
-				delete t;
+			for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
+			{
+				ITexture* t = texture.texture[i];
+				if (t)
+					delete t;
+			}
 		}
 	}
 }

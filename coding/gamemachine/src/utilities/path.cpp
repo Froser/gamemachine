@@ -37,9 +37,9 @@ std::vector<std::string> Path::getAllFiles(const char* directory)
 	{
 		do
 		{
-			if ((d.attrib &  _A_NORMAL))
+			if ((d.attrib &  _A_ARCH))
 			{
-				if (strcmp(d.name, ".") != 0 && strcmp(d.name, "..") != 0)
+				if (!strEqual(d.name, ".") && !strEqual(d.name, ".."))
 					res.push_back(std::string(directory).append(d.name));
 			}
 		} while (_findnext(hFile, &d) == 0);

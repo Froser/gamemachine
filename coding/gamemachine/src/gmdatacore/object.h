@@ -7,6 +7,7 @@
 #include "utilities/autoptr.h"
 #include "utilities/vmath.h"
 #include "gmdatacore/texture.h"
+#include "shader.h"
 
 #define BEGIN_FOREACH_OBJ(obj, childObj) for (auto iter = (obj)->getChildObjects().begin(); iter != (obj)->getChildObjects().end(); iter++) { ChildObject* childObj = *iter;
 #define END_FOREACH_OBJ }
@@ -33,30 +34,13 @@ private:
 	Object* m_object;
 };
 
-// 表示一套纹理，包括普通纹理、漫反射纹理、法线贴图、光照贴图，以后可能还有高光贴图等
-enum TextureIndex
-{
-	TEXTURE_INDEX_AMBIENT,
-	TEXTURE_INDEX_DIFFUSE,
-	TEXTURE_INDEX_NORMAL_MAPPING,
-	TEXTURE_INDEX_LIGHTMAP,
-
-	TEXTURE_INDEX_MAX,
-};
-
-struct TextureInfo
-{
-	ITexture* texture[TEXTURE_INDEX_MAX];
-	GMuint autorelease : 1;
-};
-
 struct Material
 {
 	GMfloat Ka[3];
 	GMfloat Kd[3];
 	GMfloat Ks[3];
 	GMfloat shininess;
-	TextureInfo textures;
+	Shader shader;
 };
 
 class ChildObject;

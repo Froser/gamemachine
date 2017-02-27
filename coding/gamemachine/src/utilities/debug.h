@@ -7,7 +7,6 @@ BEGIN_NS
 // Debug options:
 enum DebugOptions
 {
-	CULL_FACE,
 	CALCULATE_BSP_FACE,
 	POLYGON_LINE_MODE,
 
