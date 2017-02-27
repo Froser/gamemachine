@@ -326,8 +326,7 @@ bool BSPGameWorld::setMaterialTexture(GMuint textureid, REF Material& m)
 		const TextureContainer::TextureItem* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		m.shader.textures[0].autorelease = false;
-		m.shader.textures[0].texture[TEXTURE_INDEX_AMBIENT] = item->texture;
+		m.shader.textures[0].textures[TEXTURE_INDEX_AMBIENT] = item->texture;
 		m.shader.frameCount = 1;
 		return true;
 	}
@@ -345,11 +344,15 @@ void BSPGameWorld::setMaterialLightmap(GMuint lightmapid, REF Material& m)
 	const GMint WHITE_LIGHTMAP = -1;
 	ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 	TextureContainer_ID& tc = rc->getLightmapContainer();
-	const TextureContainer_ID::TextureItem* item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
+	const TextureContainer_ID::TextureItem* item = nullptr;
+	if (m.shader.surfaceFlag & SURF_NOLIGHTMAP)
+		item = tc.find(WHITE_LIGHTMAP);
+	else
+		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
 	for (GMuint i = 0; i < m.shader.frameCount; i++)
 	{
-		m.shader.textures[i].texture[TEXTURE_INDEX_LIGHTMAP] = item->texture;
+		m.shader.textures[i].textures[TEXTURE_INDEX_LIGHTMAP] = item->texture;
 	}
 }
 
@@ -379,6 +382,10 @@ void BSPGameWorld::initTextures()
 	for (GMuint i = 0; i < bsp.numShaders; i++)
 	{
 		BSPShader& shader = bsp.shaders[i];
+		// 如果一个texture在shader中已经定义，那么不读取它了，而使用shader中的材质
+		if (d.shaders.find(shader.shader) != d.shaders.end())
+			continue;
+
 		Image* tex = nullptr;
 		std::string fn = d.bspWorkingDirectory;
 		fn.append(shader.shader);

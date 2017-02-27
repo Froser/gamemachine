@@ -25,7 +25,7 @@ public:
 private:
 	void setLights(Material& material, ChildObject::ObjectType type);
 	void activeTexture(TextureIndex i, ChildObject::ObjectType type);
-	ITexture** getTexture(Shader* shader);
+	TextureInfo* getTexture(Shader* shader);
 	void activeShader(Shader* shader);
 	void beginShader(Shader* shader, ChildObject::ObjectType type);
 	void endShader(Shader* shader);

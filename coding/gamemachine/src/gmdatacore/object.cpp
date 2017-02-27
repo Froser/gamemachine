@@ -47,7 +47,7 @@ Component::~Component()
 		{
 			for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 			{
-				ITexture* t = texture.texture[i];
+				ITexture* t = texture.textures[i];
 				if (t)
 					delete t;
 			}

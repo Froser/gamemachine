@@ -3,10 +3,11 @@
 #include "common.h"
 BEGIN_NS
 
+struct TextureInfo;
 struct ITexture
 {
 	virtual ~ITexture();
-	virtual void beginTexture() = 0;
+	virtual void beginTexture(TextureInfo* ti) = 0;
 	virtual void endTexture() = 0;
 };
 

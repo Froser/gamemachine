@@ -8,6 +8,8 @@
 GMGLTextureShaderNames::GMGLTextureShaderNames()
 {
 	m_uniformNames[TEXTURE_INDEX_AMBIENT] = GMSHADER_AMBIENT_TEXTURE;
+	m_uniformNames[TEXTURE_INDEX_AMBIENT_2] = GMSHADER_AMBIENT_TEXTURE_2;
+	m_uniformNames[TEXTURE_INDEX_AMBIENT_3] = GMSHADER_AMBIENT_TEXTURE_3;
 	m_uniformNames[TEXTURE_INDEX_DIFFUSE] = GMSHADER_DIFFUSE_TEXTURE;
 	m_uniformNames[TEXTURE_INDEX_NORMAL_MAPPING] = GMSHADER_NORMAL_MAPPING_TEXTURE;
 	m_uniformNames[TEXTURE_INDEX_LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURE;
@@ -155,20 +157,74 @@ void GMGLTexture::init()
 	}
 
 	glTexParameteriv(image.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(image.swizzle));
-	glTexParameteri(image.target, GL_TEXTURE_MIN_FILTER, image.minFilter);
-	glTexParameteri(image.target, GL_TEXTURE_MAG_FILTER, image.magFilter);
-	glTexParameteri(image.target, GL_TEXTURE_WRAP_S, image.wrapS);
-	glTexParameteri(image.target, GL_TEXTURE_WRAP_T, image.wrapT);
-
 	glBindTexture(image.target, 0);
 	m_image->dispose();
 	m_inited = true;
 }
 
-void GMGLTexture::beginTexture()
+void GMGLTexture::beginTexture(TextureInfo* ti)
 {
 	const ImageData& image = m_image->getData();
 	glBindTexture(image.target, m_id);
+
+	// Apply params
+	if (ti->blend)
+	{
+		glEnable(GL_BLEND);
+		GLenum factors[2];
+		for (GMuint i = 0; i < 2; i++)
+		{
+			switch (ti->blendFactors[i])
+			{
+			case GMS_ZERO:
+				factors[i] = GL_ZERO;
+				break;
+			case GMS_ONE:
+				factors[i] = GL_ONE;
+				break;
+			default:
+				ASSERT(false);
+				break;
+			}
+		}
+		glBlendFunc(factors[0], factors[1]);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+	}
+
+	glTexParameteri(image.target, GL_TEXTURE_MIN_FILTER,
+		ti->minFilter == GMS_LINEAR ? GL_LINEAR :
+		ti->minFilter == GMS_NEAREST ? GL_NEAREST :
+		ti->minFilter == GMS_LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+		ti->minFilter == GMS_NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+		ti->minFilter == GMS_LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+		ti->minFilter == GMS_NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+	);
+
+	glTexParameteri(image.target, GL_TEXTURE_MAG_FILTER,
+		ti->magFilter == GMS_LINEAR ? GL_LINEAR :
+		ti->magFilter == GMS_NEAREST ? GL_NEAREST :
+		ti->magFilter == GMS_LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+		ti->magFilter == GMS_NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+		ti->magFilter == GMS_LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+		ti->magFilter == GMS_NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+	);
+
+	glTexParameteri(image.target, GL_TEXTURE_WRAP_S, 
+		ti->wrapS == GMS_REPEAT ? GL_REPEAT :
+		ti->wrapS == GMS_CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+		ti->wrapS == GMS_CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+		ti->wrapS == GMS_MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+	);
+	
+	glTexParameteri(image.target, GL_TEXTURE_WRAP_T,
+		ti->wrapT == GMS_REPEAT ? GL_REPEAT :
+		ti->wrapT == GMS_CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+		ti->wrapT == GMS_CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+		ti->wrapT == GMS_MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+	);
 }
 
 void GMGLTexture::endTexture()

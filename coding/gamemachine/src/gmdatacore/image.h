@@ -28,12 +28,6 @@ struct ImageData
 	GMsizeiptr sliceStride;
 	GMsizeiptr totalDataSize;
 	ImageMipData mip[MAX_MIP_CNT];
-
-	// (optional) texture params:
-	GMuint minFilter;
-	GMuint magFilter;
-	GMuint wrapS;
-	GMuint wrapT;
 };
 
 enum ImageType

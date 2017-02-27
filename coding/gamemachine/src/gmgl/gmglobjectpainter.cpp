@@ -173,48 +173,23 @@ void GMGLObjectPainter::activeTexture(TextureIndex i, ChildObject::ObjectType ty
 	glActiveTexture(i + GL_TEXTURE1);
 }
 
-ITexture** GMGLObjectPainter::getTexture(Shader* shader)
+TextureInfo* GMGLObjectPainter::getTexture(Shader* shader)
 {
+	if (shader->frameCount == 0)
+		return nullptr;
+
 	if (shader->frameCount == 1)
-		return shader->textures[0].texture;
+		return &shader->textures[0];
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
 	GMint elapsed = m_world->getElapsed() * 1000;
 
-	return shader->textures[(elapsed / shader->animationMs) % shader->frameCount].texture;
-
-	return nullptr;
+	return &shader->textures[(elapsed / shader->animationMs) % shader->frameCount];
 }
 
 void GMGLObjectPainter::activeShader(Shader* shader)
 {
-	if (shader->blend)
-	{
-		glEnable(GL_BLEND);
-		GLenum factors[2];
-		for (GMuint i = 0; i < 2; i++)
-		{
-			switch (shader->blendFactors[i])
-			{
-			case GMS_ZERO:
-				factors[i] = GL_ZERO;
-				break;
-			case GMS_ONE:
-				factors[i] = GL_ONE;
-				break;
-			default:
-				ASSERT(false);
-				break;
-			}
-		}
-		glBlendFunc(factors[0], factors[1]);
-	}
-	else
-	{
-		glDisable(GL_BLEND);
-	}
-
 	if (shader->cull == GMS_NONE)
 	{
 		glDisable(GL_CULL_FACE);
@@ -229,17 +204,17 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type)
 {
 	activeShader(shader);
-	ITexture** texs = getTexture(shader);
-	if (texs)
+	TextureInfo* ti = getTexture(shader);
+	if (ti)
 	{
 		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
 			// GL_TEXTURE0留给shadow mapping
-			ITexture* t = texs[i];
+			ITexture* t = ti->textures[i];
 			if (t)
 			{
 				activeTexture((TextureIndex)i, type);
-				t->beginTexture();
+				t->beginTexture(ti);
 			}
 		}
 	}
@@ -247,12 +222,12 @@ void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type
 
 void GMGLObjectPainter::endShader(Shader* shader)
 {
-	ITexture** texs = getTexture(shader);
-	if (texs)
+	TextureInfo* ti = getTexture(shader);
+	if (ti)
 	{
 		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
-			ITexture* t = texs[i];
+			ITexture* t = ti->textures[i];
 			if (t)
 				t->endTexture();
 		}

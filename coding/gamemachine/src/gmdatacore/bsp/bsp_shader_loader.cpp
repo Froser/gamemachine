@@ -68,10 +68,70 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
+static void parseBlendFunc(TextureFrames* frame, TiXmlElement* elem)
+{
+	const char* b = elem->Attribute("blendFunc");
+	if (b)
+	{
+		Scanner s(b);
+		char blendFunc[LINE_MAX];
+		s.next(blendFunc);
+		frame->blendFactors[0] = parseBlendFunc(blendFunc);
+		s.next(blendFunc);
+		frame->blendFactors[1] = parseBlendFunc(blendFunc);
+		frame->blend = true;
+	}
+	else
+	{
+		frame->blend = false;
+	}
+}
+
+static void loadImage(const char* filename, OUT Image** image)
+{
+	ImageReader imgReader;
+	if (imgReader.load(filename, image))
+		gm_info("loaded texture %s from shader", filename);
+	else
+		gm_error("texture %s not found", filename);
+}
+
 BSPShaderLoader::BSPShaderLoader(const char* directory, BSPGameWorld& world)
 	: m_world(world)
 	, m_directory(directory)
 {
+}
+
+ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
+{
+	ResourceContainer* rc = m_world.getGraphicEngine()->getResourceContainer();
+	TextureContainer& tc = rc->getTextureContainer();
+	const TextureContainer::TextureItem* item = tc.find(name);
+	if (!item)
+	{
+		std::string fn = m_world.bspWorkingDirectory();
+		fn.append(name);
+		Image* img = nullptr;
+		loadImage(fn.c_str(), &img);
+
+		if (img)
+		{
+			ITexture* texture;
+			IFactory* factory = m_world.getGameMachine()->getFactory();
+			factory->createTexture(img, &texture);
+
+			TextureContainer::TextureItem ti;
+			ti.name = name;
+			ti.texture = texture;
+			tc.insert(ti);
+			return texture;
+		}
+		return nullptr;
+	}
+	else
+	{
+		return item->texture;
+	}
 }
 
 void BSPShaderLoader::parseAll()
@@ -103,6 +163,7 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem)
 	if (!strEqual(elem->Value(), "item"))
 		gm_warning("First node must be 'item'.");
 
+	m_textureNum = 0;
 	Shader shader;
 	const char* name = elem->Attribute("name");
 
@@ -110,7 +171,9 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem)
 	{
 		BEGIN_PARSE(surfaceparm);
 		PARSE(cull);
-		PARSE(animMap);
+		PARSE(animMap, m_textureNum);
+		PARSE(clampmap, m_textureNum);
+		PARSE(map, m_textureNum);
 		END_PARSE;
 	}
 
@@ -135,61 +198,56 @@ void BSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 
 void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 {
-	const char* blendFunc = elem->Attribute("blendFunc");
-	if (strlen(blendFunc) > 0)
-	{
-		shader.blend = true;
-		Scanner s(blendFunc);
-		char param[LINE_MAX];
-		s.next(param);
-		shader.blendFactors[0] = parseBlendFunc(param);
-		s.next(param);
-		shader.blendFactors[1] = parseBlendFunc(param);
-	}
-
+	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
 	GMint ms;
 	SAFE_SSCANF(elem->Attribute("ms"), "%d", &ms);
-	shader.animationMs = ms;
+	frame->animationMs = ms;
 
 	GMuint frameCount = 0;
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement(), frameCount++)
 	{
+		parseBlendFunc(frame, elem);
 		BEGIN_PARSE_I(src, frameCount);
 		END_PARSE;
 	}
-	shader.frameCount = frameCount;
+	frame->frameCount = frameCount;
+	m_textureNum++;
 }
 
 void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
-	ResourceContainer* rc = m_world.getGraphicEngine()->getResourceContainer();
-	TextureContainer& tc = rc->getTextureContainer();
-	const char* name = elem->GetText();
-	const TextureContainer::TextureItem* item = tc.find(name);
-	if (!item)
+	ITexture* texture = addTextureToWorld(shader, elem->GetText());
+	if (texture)
+		shader.textures[i].textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
+}
+
+void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
+{
+	ITexture* texture = addTextureToWorld(shader, elem->GetText());
+	if (texture)
 	{
-		std::string fn = m_world.bspWorkingDirectory();
-		fn.append(name);
-		ImageReader imgReader;
-		Image* img = nullptr;
-		if (imgReader.load(fn.c_str(), &img))
-			gm_info("loaded texture %s from shader", fn.c_str());
-		else
-			gm_error("texture %s not found", fn.c_str());
-
-		ITexture* texture;
-		IFactory* factory = m_world.getGameMachine()->getFactory();
-		factory->createTexture(img, &texture);
-
-		TextureContainer::TextureItem ti;
-		ti.name = name;
-		ti.texture = texture;
-		tc.insert(ti);
-
-		shader.textures[i].texture[TEXTURE_INDEX_AMBIENT] = texture;
+		parseBlendFunc(shader.textures[0], elem);
+		shader.textures[0].wrapS = GMS_MIRRORED_REPEAT;
+		shader.textures[0].wrapT = GMS_MIRRORED_REPEAT;
+		shader.textures[0].textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
 	}
-	else
+
+	// TODO
+	shader.frameCount = 1;
+	m_textureNum++;
+}
+
+void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
+{
+	ITexture* texture = addTextureToWorld(shader, elem->GetText());
+	if (texture)
 	{
-		shader.textures[i].texture[TEXTURE_INDEX_AMBIENT] = item->texture;
+		parseBlendFunc(shader.textures[0], elem);
+		shader.textures[0].wrapS = GMS_REPEAT;
+		shader.textures[0].wrapT = GMS_REPEAT;
+		shader.textures[0].textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
 	}
+
+	shader.frameCount = 1;
+	m_textureNum++;
 }
