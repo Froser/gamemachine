@@ -36,7 +36,7 @@ public:
 	void init();
 
 public:
-	virtual void beginTexture(TextureInfo* ti) override;
+	virtual void beginTexture(TextureFrames* frames) override;
 	virtual void endTexture() override;
 
 private:

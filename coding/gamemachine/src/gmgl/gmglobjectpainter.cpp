@@ -173,19 +173,19 @@ void GMGLObjectPainter::activeTexture(TextureIndex i, ChildObject::ObjectType ty
 	glActiveTexture(i + GL_TEXTURE1);
 }
 
-TextureInfo* GMGLObjectPainter::getTexture(Shader* shader)
+ITexture* GMGLObjectPainter::getTexture(TextureFrames& frames)
 {
-	if (shader->frameCount == 0)
+	if (frames.frameCount == 0)
 		return nullptr;
 
-	if (shader->frameCount == 1)
-		return &shader->textures[0];
+	if (frames.frameCount == 1)
+		return frames.textures[0];
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
 	GMint elapsed = m_world->getElapsed() * 1000;
 
-	return &shader->textures[(elapsed / shader->animationMs) % shader->frameCount];
+	return frames.textures[(elapsed / frames.animationMs) % frames.frameCount];
 }
 
 void GMGLObjectPainter::activeShader(Shader* shader)
@@ -204,33 +204,29 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type)
 {
 	activeShader(shader);
-	TextureInfo* ti = getTexture(shader);
-	if (ti)
+	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
-		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
-		{
-			// GL_TEXTURE0留给shadow mapping
-			ITexture* t = ti->textures[i];
-			if (t)
-			{
-				activeTexture((TextureIndex)i, type);
-				t->beginTexture(ti);
-			}
-		}
+		// 按照贴图类型选择纹理动画序列
+		TextureFrames& frames = shader->texture.textureFrames[i];
+
+		// 激活动画序列
+		activeTexture((TextureIndex)i, type);
+
+		// 获取序列中的这一帧
+		ITexture* texture = getTexture(frames);
+		if (texture)
+			texture->beginTexture(&frames);
 	}
 }
 
 void GMGLObjectPainter::endShader(Shader* shader)
 {
-	TextureInfo* ti = getTexture(shader);
-	if (ti)
+	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
-		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
-		{
-			ITexture* t = ti->textures[i];
-			if (t)
-				t->endTexture();
-		}
+		TextureFrames& frames = shader->texture.textureFrames[i];
+		ITexture* texture = getTexture(frames);
+		if (texture)
+			texture->endTexture();
 	}
 }
 

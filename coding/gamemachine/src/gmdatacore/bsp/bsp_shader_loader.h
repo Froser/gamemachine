@@ -32,6 +32,8 @@ private:
 private:
 	std::string m_directory;
 	BSPGameWorld& m_world;
+
+	// 纹理列表
 	GMint m_textureNum;
 };
 

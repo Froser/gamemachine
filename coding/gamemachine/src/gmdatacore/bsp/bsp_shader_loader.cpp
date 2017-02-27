@@ -216,38 +216,41 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 
 void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
+	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
-		shader.textures[i].textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
+		frame->textures[i] = texture;
 }
 
 void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 {
+	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
 	{
-		parseBlendFunc(shader.textures[0], elem);
-		shader.textures[0].wrapS = GMS_MIRRORED_REPEAT;
-		shader.textures[0].wrapT = GMS_MIRRORED_REPEAT;
-		shader.textures[0].textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
+		parseBlendFunc(frame, elem);
+		frame->wrapS = GMS_MIRRORED_REPEAT;
+		frame->wrapT = GMS_MIRRORED_REPEAT;
+		frame->textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
 	}
 
 	// TODO
-	shader.frameCount = 1;
+	frame->frameCount = 1;
 	m_textureNum++;
 }
 
 void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 {
+	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
 	{
-		parseBlendFunc(shader.textures[0], elem);
-		shader.textures[0].wrapS = GMS_REPEAT;
-		shader.textures[0].wrapT = GMS_REPEAT;
-		shader.textures[0].textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
+		parseBlendFunc(frame, elem);
+		frame->wrapS = GMS_REPEAT;
+		frame->wrapT = GMS_REPEAT;
+		frame->textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
 	}
 
-	shader.frameCount = 1;
+	frame->frameCount = 1;
 	m_textureNum++;
 }

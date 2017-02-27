@@ -326,8 +326,8 @@ bool BSPGameWorld::setMaterialTexture(GMuint textureid, REF Material& m)
 		const TextureContainer::TextureItem* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		m.shader.textures[0].textures[TEXTURE_INDEX_AMBIENT] = item->texture;
-		m.shader.frameCount = 1;
+		m.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].textures[0] = item->texture;
+		m.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 		return true;
 	}
 	else
@@ -350,10 +350,8 @@ void BSPGameWorld::setMaterialLightmap(GMuint lightmapid, REF Material& m)
 	else
 		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	for (GMuint i = 0; i < m.shader.frameCount; i++)
-	{
-		m.shader.textures[i].textures[TEXTURE_INDEX_LIGHTMAP] = item->texture;
-	}
+	m.shader.texture.textureFrames[TEXTURE_INDEX_LIGHTMAP].textures[0] = item->texture;
+	m.shader.texture.textureFrames[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
 }
 
 void BSPGameWorld::importBSP()

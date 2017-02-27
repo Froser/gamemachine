@@ -39,15 +39,15 @@ Component::Component(ChildObject* parent)
 
 Component::~Component()
 {
-	TextureInfo* textures = getMaterial().shader.textures;
-	for (GMint i = 0; i < getMaterial().shader.frameCount; i++)
+	TextureInfo& ti = getMaterial().shader.texture;
+	if (ti.autorelease)
 	{
-		TextureInfo& texture = textures[i];
-		if (texture.autorelease)
+		TextureFrames* frames = getMaterial().shader.texture.textureFrames;
+		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
-			for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
+			for (GMint j = 0; j < frames[i].frameCount; j++)
 			{
-				ITexture* t = texture.textures[i];
+				ITexture* t = frames[i].textures[i];
 				if (t)
 					delete t;
 			}
