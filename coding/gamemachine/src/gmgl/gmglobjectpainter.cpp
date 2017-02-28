@@ -115,7 +115,7 @@ void GMGLObjectPainter::draw()
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 
 			if (!m_shadowMapping.hasBegun())
-				endShader(&shader);
+				endShader(&shader, childObj->getType());
 		}
 		glBindVertexArray(0);
 	}
@@ -173,6 +173,14 @@ void GMGLObjectPainter::activeTexture(TextureIndex i, ChildObject::ObjectType ty
 	glActiveTexture(i + GL_TEXTURE1);
 }
 
+void GMGLObjectPainter::deactiveTexture(TextureIndex i, ChildObject::ObjectType type)
+{
+	std::string uniform = getTextureUniformName(i);
+	GMint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), uniform.append("_switch").c_str());
+	glUniform1i(loc, 0);
+	glActiveTexture(i + GL_TEXTURE1);
+}
+
 ITexture* GMGLObjectPainter::getTexture(TextureFrames& frames)
 {
 	if (frames.frameCount == 0)
@@ -199,6 +207,45 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 		glFrontFace(GL_CW);
 		glEnable(GL_CULL_FACE);
 	}
+
+	if (shader->blend)
+	{
+		glEnable(GL_BLEND);
+		GLenum factors[2];
+		for (GMuint i = 0; i < 2; i++)
+		{
+			switch (shader->blendFactors[i])
+			{
+			case GMS_ZERO:
+				factors[i] = GL_ZERO;
+				break;
+			case GMS_ONE:
+				factors[i] = GL_ONE;
+				break;
+			default:
+				ASSERT(false);
+				break;
+			}
+		}
+		glBlendFunc(factors[0], factors[1]);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+	}
+
+	if (shader->blend)
+	{
+		glDepthMask(GL_FALSE);
+	}
+}
+
+void GMGLObjectPainter::deactiveShader(Shader* shader)
+{
+	if (shader->blend)
+	{
+		glDepthMask(GL_TRUE);
+	}
 }
 
 void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type)
@@ -209,24 +256,23 @@ void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type
 		// 按照贴图类型选择纹理动画序列
 		TextureFrames& frames = shader->texture.textureFrames[i];
 
-		// 激活动画序列
-		activeTexture((TextureIndex)i, type);
-
 		// 获取序列中的这一帧
 		ITexture* texture = getTexture(frames);
 		if (texture)
-			texture->beginTexture(&frames);
+		{
+			// 激活动画序列
+			activeTexture((TextureIndex)i, type);
+			texture->drawTexture(&frames);
+		}
 	}
 }
 
-void GMGLObjectPainter::endShader(Shader* shader)
+void GMGLObjectPainter::endShader(Shader* shader, ChildObject::ObjectType type)
 {
+	deactiveShader(shader);
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
-		TextureFrames& frames = shader->texture.textureFrames[i];
-		ITexture* texture = getTexture(frames);
-		if (texture)
-			texture->endTexture();
+		deactiveTexture((TextureIndex)i, type);
 	}
 }
 

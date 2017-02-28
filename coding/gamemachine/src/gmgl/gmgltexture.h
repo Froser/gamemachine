@@ -36,8 +36,7 @@ public:
 	void init();
 
 public:
-	virtual void beginTexture(TextureFrames* frames) override;
-	virtual void endTexture() override;
+	virtual void drawTexture(TextureFrames* frames) override;
 
 private:
 	bool m_inited;

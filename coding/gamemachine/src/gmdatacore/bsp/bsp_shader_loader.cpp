@@ -68,25 +68,6 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
-static void parseBlendFunc(TextureFrames* frame, TiXmlElement* elem)
-{
-	const char* b = elem->Attribute("blendFunc");
-	if (b)
-	{
-		Scanner s(b);
-		char blendFunc[LINE_MAX];
-		s.next(blendFunc);
-		frame->blendFactors[0] = parseBlendFunc(blendFunc);
-		s.next(blendFunc);
-		frame->blendFactors[1] = parseBlendFunc(blendFunc);
-		frame->blend = true;
-	}
-	else
-	{
-		frame->blend = false;
-	}
-}
-
 static void loadImage(const char* filename, OUT Image** image)
 {
 	ImageReader imgReader;
@@ -150,15 +131,15 @@ void BSPShaderLoader::parse(const char* filename)
 	{
 		gm_error("xml load error at %d: %s", doc.ErrorRow(), doc.ErrorDesc());
 	}
-	TiXmlElement* elem = doc.RootElement();
-	TiXmlElement* it = elem->FirstChildElement();
+	TiXmlElement* root = doc.RootElement();
+	TiXmlElement* it = root->FirstChildElement();
 	for (; it; it = it->NextSiblingElement())
 	{
-		parseItem(it);
+		parseItem(root, it);
 	}
 }
 
-void BSPShaderLoader::parseItem(TiXmlElement* elem)
+void BSPShaderLoader::parseItem(TiXmlElement* root, TiXmlElement* elem)
 {
 	if (!strEqual(elem->Value(), "item"))
 		gm_warning("First node must be 'item'.");
@@ -166,13 +147,27 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem)
 	m_textureNum = 0;
 	Shader shader;
 	const char* name = elem->Attribute("name");
+	const char* ref = elem->Attribute("ref");
+	// 使用ref，可以引用另外一个item
+	if (ref)
+	{
+		for (TiXmlElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
+		{
+			if (strEqual(ref, it->Attribute("name")))
+			{
+				elem = it;
+				break;
+			}
+		}
+	}
 
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm);
 		PARSE(cull);
-		PARSE(animMap, m_textureNum);
-		PARSE(clampmap, m_textureNum);
+		PARSE(blendFunc);
+		PARSE(animMap);
+		PARSE(clampmap);
 		PARSE(map, m_textureNum);
 		END_PARSE;
 	}
@@ -196,6 +191,25 @@ void BSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 		gm_error("wrong cull param %s", text);
 }
 
+void BSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
+{
+	const char* b = elem->GetText();
+	if (b)
+	{
+		Scanner s(b);
+		char blendFunc[LINE_MAX];
+		s.next(blendFunc);
+		shader.blendFactors[0] = parseBlendFunc(blendFunc);
+		s.next(blendFunc);
+		shader.blendFactors[1] = parseBlendFunc(blendFunc);
+		shader.blend = true;
+	}
+	else
+	{
+		shader.blend = false;
+	}
+}
+
 void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 {
 	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
@@ -206,7 +220,6 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 	GMuint frameCount = 0;
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement(), frameCount++)
 	{
-		parseBlendFunc(frame, elem);
 		BEGIN_PARSE_I(src, frameCount);
 		END_PARSE;
 	}
@@ -228,15 +241,13 @@ void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
 	{
-		parseBlendFunc(frame, elem);
+		// TODO: GL_CLAMP
 		frame->wrapS = GMS_MIRRORED_REPEAT;
 		frame->wrapT = GMS_MIRRORED_REPEAT;
-		frame->textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
+		frame->textures[0] = texture;
+		frame->frameCount = 1;
+		m_textureNum++;
 	}
-
-	// TODO
-	frame->frameCount = 1;
-	m_textureNum++;
 }
 
 void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
@@ -245,12 +256,10 @@ void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
 	{
-		parseBlendFunc(frame, elem);
 		frame->wrapS = GMS_REPEAT;
 		frame->wrapT = GMS_REPEAT;
-		frame->textures[TEXTURE_INDEX_AMBIENT + m_textureNum] = texture;
+		frame->textures[0] = texture;
+		frame->frameCount = 1;
+		m_textureNum++;
 	}
-
-	frame->frameCount = 1;
-	m_textureNum++;
 }

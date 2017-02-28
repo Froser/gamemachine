@@ -25,10 +25,12 @@ public:
 private:
 	void setLights(Material& material, ChildObject::ObjectType type);
 	void activeTexture(TextureIndex i, ChildObject::ObjectType type);
+	void deactiveTexture(TextureIndex i, ChildObject::ObjectType type);
 	ITexture* getTexture(TextureFrames& frames);
 	void activeShader(Shader* shader);
+	void deactiveShader(Shader* shader);
 	void beginShader(Shader* shader, ChildObject::ObjectType type);
-	void endShader(Shader* shader);
+	void endShader(Shader* shader, ChildObject::ObjectType type);
 
 private:
 	GMGLGraphicEngine* m_engine;

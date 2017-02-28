@@ -162,38 +162,12 @@ void GMGLTexture::init()
 	m_inited = true;
 }
 
-void GMGLTexture::beginTexture(TextureFrames* frames)
+void GMGLTexture::drawTexture(TextureFrames* frames)
 {
 	const ImageData& image = m_image->getData();
 	glBindTexture(image.target, m_id);
 
 	// Apply params
-	if (frames->blend)
-	{
-		glEnable(GL_BLEND);
-		GLenum factors[2];
-		for (GMuint i = 0; i < 2; i++)
-		{
-			switch (frames->blendFactors[i])
-			{
-			case GMS_ZERO:
-				factors[i] = GL_ZERO;
-				break;
-			case GMS_ONE:
-				factors[i] = GL_ONE;
-				break;
-			default:
-				ASSERT(false);
-				break;
-			}
-		}
-		glBlendFunc(factors[0], factors[1]);
-	}
-	else
-	{
-		glDisable(GL_BLEND);
-	}
-
 	glTexParameteri(image.target, GL_TEXTURE_MIN_FILTER,
 		frames->minFilter == GMS_LINEAR ? GL_LINEAR :
 		frames->minFilter == GMS_NEAREST ? GL_NEAREST :
@@ -225,10 +199,4 @@ void GMGLTexture::beginTexture(TextureFrames* frames)
 		frames->wrapT == GMS_CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
 		frames->wrapT == GMS_MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
 	);
-}
-
-void GMGLTexture::endTexture()
-{
-	const ImageData& image = m_image->getData();
-	glBindTexture(image.target, 0);
 }

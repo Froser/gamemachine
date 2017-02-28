@@ -7,8 +7,7 @@ struct TextureFrames;
 struct ITexture
 {
 	virtual ~ITexture();
-	virtual void beginTexture(TextureFrames* frames) = 0;
-	virtual void endTexture() = 0;
+	virtual void drawTexture(TextureFrames* frames) = 0;
 };
 
 END_NS

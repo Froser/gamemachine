@@ -61,18 +61,13 @@ struct TextureFrames
 		, minFilter(GMS_LINEAR_MIPMAP_LINEAR)
 		, wrapS(GMS_REPEAT)
 		, wrapT(GMS_REPEAT)
-		, blend(false)
 	{
-		blendFactors[0] = GMS_ZERO;
-		blendFactors[1] = GMS_ZERO;
 		memset(textures, 0, MAX_ANIMATION_FRAME * sizeof(ITexture*));
 	}
 
 	ITexture* textures[MAX_ANIMATION_FRAME];
 	GMint frameCount;
 	GMint animationMs; //每一帧动画间隔 (ms)
-	bool blend;
-	GMS_BlendFunc blendFactors[2];
 	GMS_TextureFilter magFilter;
 	GMS_TextureFilter minFilter;
 	GMS_Wrap wrapS;
@@ -97,13 +92,18 @@ struct Shader
 	Shader()
 		: surfaceFlag(0)
 		, cull(GMS_CULL)
+		, blend(false)
 	{
 		memset(this, 0, sizeof(this));
+		blendFactors[0] = GMS_ZERO;
+		blendFactors[1] = GMS_ZERO;
 	}
 
 	TextureInfo texture;
 	GMuint surfaceFlag;
 	GMS_Cull cull;
+	bool blend;
+	GMS_BlendFunc blendFactors[2];
 };
 END_NS
 #endif

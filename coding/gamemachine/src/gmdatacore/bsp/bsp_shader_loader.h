@@ -21,9 +21,10 @@ public:
 private:
 	ITexture* addTextureToWorld(Shader& shader, const char* name);
 	void parse(const char* filename);
-	void parseItem(TiXmlElement* elem);
+	void parseItem(TiXmlElement* root, TiXmlElement* elem);
 	void parse_surfaceparm(Shader& shader, TiXmlElement* elem);
 	void parse_cull(Shader& shader, TiXmlElement* elem);
+	void parse_blendFunc(Shader& shader, TiXmlElement* elem);
 	void parse_animMap(Shader& shader, TiXmlElement* elem);
 	void parse_src(Shader& shader, TiXmlElement* elem, GMuint i);
 	void parse_clampmap(Shader& shader, TiXmlElement* elem);
