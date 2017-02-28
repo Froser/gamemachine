@@ -236,10 +236,10 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 	if (shader->blend)
 		glDepthMask(GL_FALSE);
 
-	if (shader->nodepthmask)
-		glDepthMask(GL_FALSE);
+	if (shader->noDepthTest)
+		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);
 	else
-		glDepthMask(GL_TRUE);
+		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 }
 
 void GMGLObjectPainter::deactiveShader(Shader* shader)

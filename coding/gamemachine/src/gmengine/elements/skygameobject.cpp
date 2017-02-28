@@ -63,7 +63,7 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 		m_min[0], m_max[1], m_min[2],
 		m_min[0], m_max[1], m_max[2],
 		m_min[0], m_min[1], m_max[2],
-		m_min[0], m_min[1], -1,
+		m_min[0], m_min[1], m_min[2],
 
 		//Right
 		m_max[0], m_max[1], m_min[2],
@@ -92,7 +92,7 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 	material.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 	material.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].textures[0] = m_texture;
 	material.shader.cull = GMS_NONE;
-	material.shader.nodepthmask = true;
+	material.shader.noDepthTest = true;
 
 	ChildObject* child = new ChildObject();
 	child->setType(ChildObject::Sky);

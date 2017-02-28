@@ -94,7 +94,7 @@ struct Shader
 		, cull(GMS_CULL)
 		, blend(false)
 		, nodraw(false)
-		, nodepthmask(false)
+		, noDepthTest(false)
 	{
 		blendFactors[0] = GMS_ZERO;
 		blendFactors[1] = GMS_ZERO;
@@ -106,7 +106,7 @@ struct Shader
 	bool blend;
 	GMS_BlendFunc blendFactors[2];
 	bool nodraw;
-	bool nodepthmask;
+	bool noDepthTest;
 };
 END_NS
 #endif
