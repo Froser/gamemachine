@@ -53,9 +53,12 @@ public:
 	ImageData& getData();
 	virtual void dispose();
 	void flipVertically(GMuint mipId);
+	void transformToCubemap();
+	bool isTreatAsCubemap();
 
 private:
 	ImageData m_data;
+	bool m_asCubemap;
 };
 
 END_NS

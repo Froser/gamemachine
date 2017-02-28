@@ -15,6 +15,7 @@ public:
 
 public:
 	void loadBSP(const char* bspPath);
+	void setSky(AUTORELEASE GameObject* sky);
 
 public:
 	virtual void renderGameWorld() override;
@@ -23,6 +24,8 @@ public:
 private:
 	void updateCamera();
 	void calculateVisibleFaces();
+	void drawAll();
+	void drawSky();
 	void drawFaces();
 	void drawFace(GMint idx);
 	void drawPolygonFace(int polygonFaceNumber);

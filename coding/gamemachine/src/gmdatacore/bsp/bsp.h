@@ -9,6 +9,11 @@
 #include "bsp_surface_flags.h"
 BEGIN_NS
 
+enum
+{
+	BOUNDING = 99999,
+};
+
 // key / value pair sizes in the entities lump
 #define	MAX_KEY				32
 #define	MAX_VALUE			1024
@@ -309,6 +314,8 @@ struct BSPPrivate
 		: numPolygonFaces(0)
 		, numPatches(0)
 		, numMeshFaces(0)
+		, boundMin(BOUNDING)
+		, boundMax(-BOUNDING)
 	{
 	}
 
@@ -365,6 +372,10 @@ struct BSPPrivate
 	std::vector<BSP_Drawing_Leaf> drawingLeafs;
 	std::vector<Plane> drawingPlanes;
 	BSP_VisibilityData visibilityData;
+
+	// 用于绘制天空
+	vmath::vec3 boundMin;
+	vmath::vec3 boundMax;
 
 private:
 	char token[MAXTOKEN];

@@ -2,6 +2,7 @@
 #define __BSP_SHADER_LOADER_H__
 #include "common.h"
 #include <string>
+#include "bsp.h"
 
 class TiXmlElement;
 
@@ -13,11 +14,12 @@ struct ITexture;
 class BSPShaderLoader
 {
 public:
-	BSPShaderLoader(const char* directory, BSPGameWorld& world);
+	BSPShaderLoader(const char* directory, BSPGameWorld& world, BSPData* bsp);
 
 public:
 	void parseAll();
 
+	// parsers:
 private:
 	ITexture* addTextureToWorld(Shader& shader, const char* name);
 	void parse(const char* filename);
@@ -29,10 +31,12 @@ private:
 	void parse_src(Shader& shader, TiXmlElement* elem, GMuint i);
 	void parse_clampmap(Shader& shader, TiXmlElement* elem);
 	void parse_map(Shader& shader, TiXmlElement* elem);
+	void createSky(Shader& shader);
 
 private:
 	std::string m_directory;
 	BSPGameWorld& m_world;
+	BSPData* m_bsp;
 
 	// 纹理列表
 	GMint m_textureNum;

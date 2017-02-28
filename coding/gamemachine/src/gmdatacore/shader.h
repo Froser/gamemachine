@@ -93,8 +93,9 @@ struct Shader
 		: surfaceFlag(0)
 		, cull(GMS_CULL)
 		, blend(false)
+		, nodraw(false)
+		, nodepthmask(false)
 	{
-		memset(this, 0, sizeof(this));
 		blendFactors[0] = GMS_ZERO;
 		blendFactors[1] = GMS_ZERO;
 	}
@@ -104,6 +105,8 @@ struct Shader
 	GMS_Cull cull;
 	bool blend;
 	GMS_BlendFunc blendFactors[2];
+	bool nodraw;
+	bool nodepthmask;
 };
 END_NS
 #endif

@@ -10,6 +10,7 @@
 #include "gmdatacore/imagereader/imagereader.h"
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"
+#include "gmengine/elements/skygameobject.h"
 
 #define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
 #define BEGIN_PARSE_I(name, i) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it, i)
@@ -19,6 +20,12 @@
 enum
 {
 	GMS_SURFACE_FLAG_MAX = 19
+};
+
+enum
+{
+	SKY_SUBDIVISIONS = 8,
+	HALF_SKY_SUBDIVISIONS = SKY_SUBDIVISIONS / 2,
 };
 
 struct SurfaceFlags
@@ -77,9 +84,10 @@ static void loadImage(const char* filename, OUT Image** image)
 		gm_error("texture %s not found", filename);
 }
 
-BSPShaderLoader::BSPShaderLoader(const char* directory, BSPGameWorld& world)
+BSPShaderLoader::BSPShaderLoader(const char* directory, BSPGameWorld& world, BSPData* bsp)
 	: m_world(world)
 	, m_directory(directory)
+	, m_bsp(bsp)
 {
 }
 
@@ -97,6 +105,9 @@ ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
 
 		if (img)
 		{
+			if (shader.surfaceFlag & SURF_SKY)
+				img->transformToCubemap();
+
 			ITexture* texture;
 			IFactory* factory = m_world.getGameMachine()->getFactory();
 			factory->createTexture(img, &texture);
@@ -163,7 +174,7 @@ void BSPShaderLoader::parseItem(TiXmlElement* root, TiXmlElement* elem)
 
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
-		BEGIN_PARSE(surfaceparm);
+		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
 		PARSE(cull);
 		PARSE(blendFunc);
 		PARSE(animMap);
@@ -172,12 +183,15 @@ void BSPShaderLoader::parseItem(TiXmlElement* root, TiXmlElement* elem)
 		END_PARSE;
 	}
 
+	if (shader.surfaceFlag & SURF_SKY)
+		createSky(shader);
+
 	m_world.addShader(name, shader);
 }
 
 void BSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
 {
-	shader.surfaceFlag |= parseSurfaceParm(elem->GetText());
+	shader.surfaceFlag |= parseSurfaceParm(elem->GetText());;
 }
 
 void BSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
@@ -262,4 +276,12 @@ void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 		frame->frameCount = 1;
 		m_textureNum++;
 	}
+}
+
+void BSPShaderLoader::createSky(Shader& shader)
+{
+	ITexture* texture = shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].textures[0];
+	shader.nodraw = true;
+	SkyGameObject* sky = new SkyGameObject(texture, m_bsp->boundMin, m_bsp->boundMax);
+	m_world.setSky(sky);
 }

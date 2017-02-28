@@ -26,6 +26,13 @@ void BSPGameWorld::loadBSP(const char* bspPath)
 	importBSP();
 }
 
+void BSPGameWorld::setSky(AUTORELEASE GameObject* sky)
+{
+	D(d);
+	d.sky = sky;
+	appendObjectAndInit(sky);
+}
+
 void BSPGameWorld::updateCamera()
 {
 	D(d);
@@ -42,14 +49,8 @@ void BSPGameWorld::renderGameWorld()
 	D(d);
 	IGraphicEngine* engine = getGraphicEngine();
 	engine->newFrame();
-
 	updateCamera();
-
-	if (DBG_INT(CALCULATE_BSP_FACE))
-		calculateVisibleFaces();
-
-	drawFaces();
-
+	drawAll();
 	engine->drawObjects(d.drawingList);
 }
 
@@ -119,11 +120,26 @@ int BSPGameWorld::isClusterVisible(int cameraCluster, int testCluster)
 	return returnValue;
 }
 
+void BSPGameWorld::drawAll()
+{
+	D(d);
+	d.drawingList.clear();
+	drawSky();
+	if (DBG_INT(CALCULATE_BSP_FACE))
+		calculateVisibleFaces();
+	drawFaces();
+}
+
+void BSPGameWorld::drawSky()
+{
+	D(d);
+	d.sky->getReadyForRender(d.drawingList);
+}
+
 void BSPGameWorld::drawFaces()
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
-	d.drawingList.clear();
 
 	//loop through faces
 	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
@@ -365,7 +381,8 @@ void BSPGameWorld::importBSP()
 
 void BSPGameWorld::initShaders()
 {
-	BSPShaderLoader shaderLoader("D:/scr/", *this);
+	D(d);
+	BSPShaderLoader shaderLoader("D:/scr/", *this, &d.bsp.bspData());
 	shaderLoader.parseAll();
 }
 

@@ -14,6 +14,7 @@ struct BSPGameWorldPrivate
 {
 	BSP bsp;
 	std::string bspWorkingDirectory;
+	GameObject* sky;
 
 	std::map<BSP_Drawing_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
 	std::map<BSP_Drawing_PolygonFace*, GameObject*> polygonFaceObjects;

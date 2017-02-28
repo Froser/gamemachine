@@ -95,15 +95,14 @@ void GMGLObjectPainter::draw()
 
 	BEGIN_FOREACH_OBJ(obj, childObj)
 	{
-		if (!childObj->getVisibility())
-			continue;
-
 		glBindVertexArray(childObj->getArrayId());
 
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
 			Component* component = (*iter);
 			Shader& shader = component->getMaterial().shader;
+			if (shader.nodraw)
+				continue;
 
 			if (!m_shadowMapping.hasBegun())
 			{
@@ -235,9 +234,12 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 	}
 
 	if (shader->blend)
-	{
 		glDepthMask(GL_FALSE);
-	}
+
+	if (shader->nodepthmask)
+		glDepthMask(GL_FALSE);
+	else
+		glDepthMask(GL_TRUE);
 }
 
 void GMGLObjectPainter::deactiveShader(Shader* shader)

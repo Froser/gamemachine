@@ -513,8 +513,15 @@ void BSP::generateVertices()
 		//Transfer lightmap coordinates
 		d.drawingVertices[i].lightmapS = d.vertices[i].lightmap[0];
 		d.drawingVertices[i].lightmapT = d.vertices[i].lightmap[1];
-	}
 
+		for (GMuint j = 0; j < 3; j++)
+		{
+			if (d.drawingVertices[i].position[j] < d.boundMin[j])
+				d.boundMin[j] = d.drawingVertices[i].position[j];
+			if (d.drawingVertices[i].position[j] > d.boundMax[j])
+				d.boundMax[j] = d.drawingVertices[i].position[j];
+		}
+	}
 }
 
 void BSP::generateFaces()

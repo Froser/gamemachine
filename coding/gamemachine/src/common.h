@@ -57,6 +57,7 @@ END_NS
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
 #define RAD(deg) deg * PI / 180
+#define SQR(a) ((a) * (a))
 #define strEqual(str1, str2) !strcmp(str1, str2)
 #define SAFE_SSCANF(in, format, out)	\
 {										\

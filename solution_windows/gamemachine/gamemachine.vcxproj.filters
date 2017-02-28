@@ -220,6 +220,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\shader.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -395,6 +398,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\shader.cpp">
       <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
