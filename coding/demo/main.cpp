@@ -20,6 +20,7 @@
 #include "gmengine/elements/bspgameworld.h"
 #include "gmdatacore/gameworldcreator.h"
 #include "utilities/debug.h"
+#include "utilities/input.h"
 
 using namespace gm;
 
@@ -64,7 +65,7 @@ public:
 
 	void init()
 	{
-		glEnable(GL_POLYGON_SMOOTH);
+		m_input.reset(new Input());
 
 #if _DEBUG
 		std::string currentPath("D:/shaders/test/");
@@ -201,6 +202,7 @@ public:
 	}
 
 	GameMachine* m_gm;
+	AutoPtr<Input> m_input;
 };
 
 GraphicSettings settings = { 60, { 700, 400 } ,{ 100, 100 }, {400, 400}, false };

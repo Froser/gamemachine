@@ -223,6 +223,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\input.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -401,6 +404,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp">
       <Filter>src\gmengine\elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\input.cpp">
+      <Filter>src\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

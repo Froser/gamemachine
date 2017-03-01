@@ -38,9 +38,6 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 
 void GMGLGraphicEngine::initialize(GameWorld* world)
 {
-	glEnable(GL_DEPTH_TEST);
-	glDepthFunc(GL_LEQUAL);
-
 	m_world = world;
 	m_shadowMapping.init();
 }
@@ -67,6 +64,8 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 
 void GMGLGraphicEngine::applyGraphicSettings()
 {
+	glLineWidth(0);
+	glDepthFunc(GL_LEQUAL);
 	glFrontFace(GL_CW);
 	glEnable(GL_CULL_FACE);
 }
