@@ -33,6 +33,12 @@ void BSPGameWorld::setSky(AUTORELEASE GameObject* sky)
 	appendObjectAndInit(sky);
 }
 
+GameObject* BSPGameWorld::getSky()
+{
+	D(d);
+	return d.sky;
+}
+
 void BSPGameWorld::updateCamera()
 {
 	D(d);
@@ -51,7 +57,11 @@ void BSPGameWorld::renderGameWorld()
 	engine->newFrame();
 	updateCamera();
 	drawAll();
-	engine->drawObjects(d.drawingList);
+
+	if (!d.ready)
+		d.ready = true;
+	else
+		engine->drawObjects(d.drawingList);
 }
 
 void BSPGameWorld::calculateVisibleFaces()
@@ -120,20 +130,25 @@ int BSPGameWorld::isClusterVisible(int cameraCluster, int testCluster)
 	return returnValue;
 }
 
+// drawAll将所要需要绘制的对象放入列表
 void BSPGameWorld::drawAll()
 {
 	D(d);
 	d.drawingList.clear();
 	drawSky();
-	if (DBG_INT(CALCULATE_BSP_FACE))
-		calculateVisibleFaces();
-	drawFaces();
+	if (!DBG_INT(DRAW_ONLY_SKY))
+	{
+		if (DBG_INT(CALCULATE_BSP_FACE))
+			calculateVisibleFaces();
+		drawFaces();
+	}
 }
 
 void BSPGameWorld::drawSky()
 {
 	D(d);
-	d.sky->getReadyForRender(d.drawingList);
+	if (d.sky)
+		d.sky->getReadyForRender(d.drawingList);
 }
 
 void BSPGameWorld::drawFaces()
@@ -334,24 +349,17 @@ bool BSPGameWorld::setMaterialTexture(GMuint textureid, REF Material& m)
 	const char* name = bsp.shaders[textureid].shader;
 
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
-	auto shader = d.shaders.find(name);
-	if (shader == d.shaders.end())
+	if (!d.shaderLoader.findItem(name, &m.shader))
 	{
 		ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 		TextureContainer& tc = rc->getTextureContainer();
 		const TextureContainer::TextureItem* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		m.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].textures[0] = item->texture;
-		m.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].frameCount = 1;
-		return true;
+		m.shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
+		m.shader.texture.textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 	}
-	else
-	{
-		Shader& s = (*shader).second;
-		m.shader = s;
-		return true;
-	}
+	return true;
 }
 
 void BSPGameWorld::setMaterialLightmap(GMuint lightmapid, REF Material& m)
@@ -366,12 +374,13 @@ void BSPGameWorld::setMaterialLightmap(GMuint lightmapid, REF Material& m)
 	else
 		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	m.shader.texture.textureFrames[TEXTURE_INDEX_LIGHTMAP].textures[0] = item->texture;
-	m.shader.texture.textureFrames[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
+	m.shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frames[0] = item->texture;
+	m.shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
 }
 
 void BSPGameWorld::importBSP()
 {
+	D(d);
 	initShaders();
 	initTextures();
 	initLightmaps();
@@ -382,8 +391,11 @@ void BSPGameWorld::importBSP()
 void BSPGameWorld::initShaders()
 {
 	D(d);
-	BSPShaderLoader shaderLoader("D:/scr/", *this, &d.bsp.bspData());
-	shaderLoader.parseAll();
+	//TODO
+	std::string scrPath(d.bspWorkingDirectory);
+	scrPath.append("scr/");
+	d.shaderLoader.init(scrPath.c_str(), this, &d.bsp.bspData());
+	d.shaderLoader.load();
 }
 
 void BSPGameWorld::initTextures()
@@ -398,7 +410,7 @@ void BSPGameWorld::initTextures()
 	{
 		BSPShader& shader = bsp.shaders[i];
 		// 如果一个texture在shader中已经定义，那么不读取它了，而使用shader中的材质
-		if (d.shaders.find(shader.shader) != d.shaders.end())
+		if (d.shaderLoader.findItem(shader.shader, nullptr))
 			continue;
 
 		Image* tex = nullptr;
@@ -502,9 +514,8 @@ const char* BSPGameWorld::bspWorkingDirectory()
 	return d.bspWorkingDirectory.c_str();
 }
 
-void BSPGameWorld::addShader(const char* name, const Shader& shader)
+BSPData& BSPGameWorld::bspData()
 {
 	D(d);
-	ASSERT(d.shaders.find(name) == d.shaders.end());
-	d.shaders[name] = shader;
+	return d.bsp.bspData();
 }

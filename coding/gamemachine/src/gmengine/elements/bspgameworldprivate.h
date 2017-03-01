@@ -6,12 +6,19 @@
 #include <map>
 #include <string>
 #include "gmengine/controllers/graphic_engine.h"
+#include "gmdatacore/bsp/bsp_shader_loader.h"
 BEGIN_NS
 
 class GameObject;
 class BSPGameWorld;
 struct BSPGameWorldPrivate
 {
+	BSPGameWorldPrivate()
+		: sky(nullptr)
+		, ready(false)
+	{
+	}
+
 	BSP bsp;
 	std::string bspWorkingDirectory;
 	GameObject* sky;
@@ -23,8 +30,8 @@ struct BSPGameWorldPrivate
 	// list to be drawn each frame
 	DrawingList drawingList;
 
-	// shaders read from file
-	std::map<std::string, Shader> shaders;
+	BSPShaderLoader shaderLoader;
+	bool ready;
 };
 
 struct BSPGameWorldEntityReader

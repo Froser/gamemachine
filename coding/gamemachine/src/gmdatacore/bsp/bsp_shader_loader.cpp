@@ -84,21 +84,35 @@ static void loadImage(const char* filename, OUT Image** image)
 		gm_error("texture %s not found", filename);
 }
 
-BSPShaderLoader::BSPShaderLoader(const char* directory, BSPGameWorld& world, BSPData* bsp)
-	: m_world(world)
-	, m_directory(directory)
-	, m_bsp(bsp)
+BSPShaderLoader::BSPShaderLoader()
+	: m_world(nullptr)
+	, m_bsp(nullptr)
 {
+}
+
+BSPShaderLoader::~BSPShaderLoader()
+{
+	for (auto iter = m_shaderDocs.begin(); iter != m_shaderDocs.end(); iter++)
+	{
+		delete *iter;
+	}
+}
+
+void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPData* bsp)
+{
+	m_directory = directory;
+	m_world = world;
+	m_bsp = bsp;
 }
 
 ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
 {
-	ResourceContainer* rc = m_world.getGraphicEngine()->getResourceContainer();
+	ResourceContainer* rc = m_world->getGraphicEngine()->getResourceContainer();
 	TextureContainer& tc = rc->getTextureContainer();
 	const TextureContainer::TextureItem* item = tc.find(name);
 	if (!item)
 	{
-		std::string fn = m_world.bspWorkingDirectory();
+		std::string fn = m_world->bspWorkingDirectory();
 		fn.append(name);
 		Image* img = nullptr;
 		loadImage(fn.c_str(), &img);
@@ -106,7 +120,7 @@ ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
 		if (img)
 		{
 			ITexture* texture;
-			IFactory* factory = m_world.getGameMachine()->getFactory();
+			IFactory* factory = m_world->getGameMachine()->getFactory();
 			factory->createTexture(img, &texture);
 
 			TextureContainer::TextureItem ti;
@@ -123,52 +137,74 @@ ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
 	}
 }
 
-void BSPShaderLoader::parseAll()
+void BSPShaderLoader::load()
 {
 	std::vector<std::string> files = Path::getAllFiles(m_directory.c_str());
+	// load all item tag, but not parse them until item is needed
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
 		parse((*iter).c_str());
 	}
 }
 
+bool BSPShaderLoader::findItem(const char* name, REF Shader* shader)
+{
+	auto foundResult = m_items.find(name);
+	if (foundResult == m_items.end())
+		return false;
+
+	// If we found it, parse it.
+	parseItem((*foundResult).second, shader);
+	return true;
+}
+
 void BSPShaderLoader::parse(const char* filename)
 {
-	TiXmlDocument doc;
-	if (!doc.LoadFile(filename))
+	TiXmlDocument* doc = new TiXmlDocument();
+
+	if (!doc->LoadFile(filename))
 	{
-		gm_error("xml load error at %d: %s", doc.ErrorRow(), doc.ErrorDesc());
+		gm_error("xml load error at %d: %s", doc->ErrorRow(), doc->ErrorDesc());
+		delete doc;
+		return;
 	}
-	TiXmlElement* root = doc.RootElement();
+
+	m_shaderDocs.push_back(doc);
+	TiXmlElement* root = doc->RootElement();
 	TiXmlElement* it = root->FirstChildElement();
 	for (; it; it = it->NextSiblingElement())
 	{
-		parseItem(root, it);
+		TiXmlElement* elem = it;
+		if (!strEqual(elem->Value(), "item"))
+			gm_warning("First node must be 'item'.");
+
+		Shader shader;
+		const char* name = elem->Attribute("name");
+		const char* ref = elem->Attribute("ref");
+		// 使用ref，可以引用另外一个item
+		if (ref)
+		{
+			for (TiXmlElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
+			{
+				if (strEqual(ref, it->Attribute("name")))
+				{
+					elem = it;
+					break;
+				}
+			}
+		}
+
+		m_items.insert(std::make_pair(name, elem));
 	}
 }
 
-void BSPShaderLoader::parseItem(TiXmlElement* root, TiXmlElement* elem)
+void BSPShaderLoader::parseItem(TiXmlElement* elem, REF Shader* shaderPtr)
 {
-	if (!strEqual(elem->Value(), "item"))
-		gm_warning("First node must be 'item'.");
+	if (!shaderPtr)
+		return;
 
+	Shader& shader = *shaderPtr;
 	m_textureNum = 0;
-	Shader shader;
-	const char* name = elem->Attribute("name");
-	const char* ref = elem->Attribute("ref");
-	// 使用ref，可以引用另外一个item
-	if (ref)
-	{
-		for (TiXmlElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
-		{
-			if (strEqual(ref, it->Attribute("name")))
-			{
-				elem = it;
-				break;
-			}
-		}
-	}
-
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
@@ -176,14 +212,12 @@ void BSPShaderLoader::parseItem(TiXmlElement* root, TiXmlElement* elem)
 		PARSE(blendFunc);
 		PARSE(animMap);
 		PARSE(clampmap);
-		PARSE(map, m_textureNum);
+		PARSE(map);
 		END_PARSE;
 	}
 
 	if (shader.surfaceFlag & SURF_SKY)
 		createSky(shader);
-
-	m_world.addShader(name, shader);
 }
 
 void BSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
@@ -223,7 +257,7 @@ void BSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
 
 void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 {
-	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
+	TextureFrames* frame = &shader.texture.textures[m_textureNum];
 	GMint ms;
 	SAFE_SSCANF(elem->Attribute("ms"), "%d", &ms);
 	frame->animationMs = ms;
@@ -235,50 +269,90 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 		END_PARSE;
 	}
 	frame->frameCount = frameCount;
+	parse_map_tcMod(shader, elem);
 	m_textureNum++;
 }
 
 void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
-	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
+	TextureFrames* frame = &shader.texture.textures[m_textureNum];
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
-		frame->textures[i] = texture;
+		frame->frames[i] = texture;
 }
 
 void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 {
-	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
+	TextureFrames* frame = &shader.texture.textures[m_textureNum];
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
 	{
 		// TODO: GL_CLAMP
 		frame->wrapS = GMS_MIRRORED_REPEAT;
 		frame->wrapT = GMS_MIRRORED_REPEAT;
-		frame->textures[0] = texture;
+		frame->frames[0] = texture;
 		frame->frameCount = 1;
+		parse_map_tcMod(shader, elem);
 		m_textureNum++;
 	}
 }
 
 void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 {
-	TextureFrames* frame = &shader.texture.textureFrames[m_textureNum];
+	TextureFrames* frame = &shader.texture.textures[m_textureNum];
 	ITexture* texture = addTextureToWorld(shader, elem->GetText());
 	if (texture)
 	{
 		frame->wrapS = GMS_REPEAT;
 		frame->wrapT = GMS_REPEAT;
-		frame->textures[0] = texture;
+		frame->frames[0] = texture;
 		frame->frameCount = 1;
+		parse_map_tcMod(shader, elem);
 		m_textureNum++;
+	}
+}
+
+void BSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
+{
+	// tcMod <type> <...>
+	const char* tcMod = elem->Attribute("tcMod");
+	GMuint tcModNum = 0;
+	while (tcModNum < MAX_TEX_MOD && shader.texture.textures[m_textureNum].texMod[tcModNum].type != GMS_NO_TEXTURE_MOD)
+	{
+		tcModNum++;
+	}
+	GMS_TextureMod* currentMod = &shader.texture.textures[m_textureNum].texMod[tcModNum];
+
+	if (tcMod)
+	{
+		Scanner s(tcMod);
+		char type[LINE_MAX];
+		s.next(type);
+		char value[LINE_MAX];
+		s.nextToTheEnd(value);
+
+		if (strEqual(type, "scroll"))
+		{
+			currentMod->type = GMS_SCROLL;
+			Scanner valueScanner(value);
+			valueScanner.nextFloat(&currentMod->p1);
+			valueScanner.nextFloat(&currentMod->p2);
+		}
 	}
 }
 
 void BSPShaderLoader::createSky(Shader& shader)
 {
-	ITexture* texture = shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].textures[0];
+	ITexture* texture = shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0];
 	shader.nodraw = true;
-	SkyGameObject* sky = new SkyGameObject(texture, m_bsp->boundMin, m_bsp->boundMax);
-	m_world.setSky(sky);
+	if (!m_world->getSky())
+	{
+		Shader skyShader = shader;
+		skyShader.nodraw = false;
+		skyShader.cull = GMS_NONE;
+		skyShader.noDepthTest = true;
+
+		SkyGameObject* sky = new SkyGameObject(skyShader, m_bsp->boundMin, m_bsp->boundMax);
+		m_world->setSky(sky);
+	}
 }

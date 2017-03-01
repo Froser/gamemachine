@@ -5,8 +5,6 @@
 #include "utilities\path.h"
 #include "bsp_interior.inl"
 
-static const int SCALING_DOWN = 64;
-
 //Tesselate a biquadratic patch
 bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 {

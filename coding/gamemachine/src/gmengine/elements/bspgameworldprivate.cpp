@@ -78,8 +78,9 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 
 	btTransform playerStart;
 	playerStart.setIdentity();
-	//playerStart.setOrigin(btVector3(origin[0], origin[1], origin[2]));
-	playerStart.setOrigin(btVector3(0, 0.875,0));
+	vmath::vec3 center = (world->bspData().boundMax + world->bspData().boundMin) / 2;
+	playerStart.setOrigin(btVector3(center[0], 1.8, center[2]));
+	//playerStart.setOrigin(btVector3(0, 0.875,0));
 	//btQuaternion rotation(btVector3(0, 1, 0), RAD(yaw));
 	//playerStart.setRotation(rotation);
 

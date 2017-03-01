@@ -19,6 +19,7 @@ enum TextureIndex
 enum
 {
 	MAX_ANIMATION_FRAME = 16,
+	MAX_TEX_MOD = 3,
 };
 
 enum GMS_BlendFunc
@@ -51,6 +52,19 @@ enum GMS_Wrap
 	GMS_MIRRORED_REPEAT,
 };
 
+enum GMS_TextureModType
+{
+	GMS_NO_TEXTURE_MOD = 0,
+	GMS_SCROLL,
+};
+
+struct GMS_TextureMod
+{
+	GMS_TextureModType type;
+	GMfloat p1;
+	GMfloat p2;
+};
+
 // 表示一系列动画帧
 struct TextureFrames
 {
@@ -62,10 +76,12 @@ struct TextureFrames
 		, wrapS(GMS_REPEAT)
 		, wrapT(GMS_REPEAT)
 	{
-		memset(textures, 0, MAX_ANIMATION_FRAME * sizeof(ITexture*));
+		memset(frames, 0, MAX_ANIMATION_FRAME * sizeof(ITexture*));
+		memset(texMod, 0, MAX_TEX_MOD * sizeof(GMS_TextureMod));
 	}
 
-	ITexture* textures[MAX_ANIMATION_FRAME];
+	ITexture* frames[MAX_ANIMATION_FRAME];
+	GMS_TextureMod texMod[MAX_TEX_MOD];
 	GMint frameCount;
 	GMint animationMs; //每一帧动画间隔 (ms)
 	GMS_TextureFilter magFilter;
@@ -78,12 +94,12 @@ struct TextureInfo
 {
 	TextureInfo()
 	{
-		memset(this, 0, sizeof(this));
-		memset(textureFrames, 0, sizeof(textureFrames));
+		autorelease = 0;
+		memset(textures, 0, sizeof(textures));
 	}
 
 	// 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
-	TextureFrames textureFrames[TEXTURE_INDEX_MAX];
+	TextureFrames textures[TEXTURE_INDEX_MAX];
 	GMuint autorelease : 1;
 };
 

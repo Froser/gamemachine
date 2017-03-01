@@ -174,6 +174,8 @@ public:
 			DBG_SET_INT(CALCULATE_BSP_FACE, !DBG_INT(CALCULATE_BSP_FACE));
 		if (Keyboard::isKeyDown('L'))
 			DBG_SET_INT(POLYGON_LINE_MODE, !DBG_INT(POLYGON_LINE_MODE));
+		if (Keyboard::isKeyDown('O'))
+			DBG_SET_INT(DRAW_ONLY_SKY, !DBG_INT(DRAW_ONLY_SKY));
 	}
 
 	void logicalFrame(GMfloat elapsed)

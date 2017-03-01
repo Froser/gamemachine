@@ -35,9 +35,9 @@ static vmath::vec2 uvs[24] = {
 	*/
 };
 
-SkyGameObject::SkyGameObject(ITexture* texture, vmath::vec3& min, vmath::vec3 max)
+SkyGameObject::SkyGameObject(const Shader& shader, vmath::vec3& min, vmath::vec3 max)
 	: HallucinationGameObject(nullptr)
-	, m_texture(texture)
+	, m_shader(shader)
 	, m_min(min)
 	, m_max(max)
 {
@@ -108,10 +108,7 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 
 	Material material = { 0 };
 	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	material.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].frameCount = 1;
-	material.shader.texture.textureFrames[TEXTURE_INDEX_AMBIENT].textures[0] = m_texture;
-	material.shader.cull = GMS_NONE;
-	material.shader.noDepthTest = true;
+	material.shader = m_shader;
 
 	ChildObject* child = new ChildObject();
 	child->setType(ChildObject::Sky);

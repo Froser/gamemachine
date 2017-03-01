@@ -11,6 +11,7 @@ BEGIN_NS
 
 enum
 {
+	SCALING_DOWN = 64,
 	BOUNDING = 99999,
 };
 

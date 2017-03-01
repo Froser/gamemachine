@@ -41,7 +41,9 @@
 		<surfaceparm>nomarks</surfaceparm>
 		<surfaceparm>nolightmap</surfaceparm>
 		<surfaceparm>sky</surfaceparm>
-		<map>textures/skies/killsky_1.jpg</map>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<map tcMod="scroll 0.05 .1" >textures/skies/killsky_1.jpg</map>
+		<map tcMod="scroll 0.05 .06">textures/skies/killsky_2.jpg</map>
 	</item>
 	<item name="models/mapobjects/baph/bapholamp_fx">
 		<surfaceparm>nonsolid</surfaceparm>

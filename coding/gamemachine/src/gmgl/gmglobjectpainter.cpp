@@ -162,20 +162,50 @@ void GMGLObjectPainter::setLights(Material& material, ChildObject::ObjectType ty
 	}
 }
 
-void GMGLObjectPainter::activeTexture(TextureIndex i, ChildObject::ObjectType type)
+void GMGLObjectPainter::activeTexture(Shader* shader, TextureIndex i, ChildObject::ObjectType type)
 {
 	std::string uniform = getTextureUniformName(i);
 	GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), uniform.c_str());
 	glUniform1i(loc, i + 1);
-	loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), uniform.append("_switch").c_str());
+	loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), std::string(uniform).append("_switch").c_str());
 	glUniform1i(loc, 1);
+
+	activeTextureTransform(shader, i, type);
 	glActiveTexture(i + GL_TEXTURE1);
+}
+
+void GMGLObjectPainter::activeTextureTransform(Shader* shader, TextureIndex i, ChildObject::ObjectType type)
+{
+	std::string uniform = getTextureUniformName(i);
+
+	const std::string SCROLL_S = std::string(uniform).append("_scroll_s");
+	const std::string SCROLL_T = std::string(uniform).append("_scroll_t");
+
+	GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_S.c_str());
+	glUniform1f(loc, 0.f);
+	loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str());
+	glUniform1f(loc, 0.f);
+
+	GMuint n = 0;
+	while (n < MAX_TEX_MOD && shader->texture.textures[i].texMod[n].type != GMS_NO_TEXTURE_MOD)
+	{
+		GMS_TextureMod* tc = &shader->texture.textures[i].texMod[n];
+		if (tc->type == GMS_SCROLL)
+		{
+			GMfloat s = m_world->getElapsed() * tc->p1,
+				t = m_world->getElapsed() * tc->p2;
+			glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), t);
+			glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), s);
+		}
+		n++;
+	}
+
 }
 
 void GMGLObjectPainter::deactiveTexture(TextureIndex i, ChildObject::ObjectType type)
 {
 	std::string uniform = getTextureUniformName(i);
-	GMint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), uniform.append("_switch").c_str());
+	GMint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), std::string(uniform).append("_switch").c_str());
 	glUniform1i(loc, 0);
 	glActiveTexture(i + GL_TEXTURE1);
 }
@@ -186,13 +216,13 @@ ITexture* GMGLObjectPainter::getTexture(TextureFrames& frames)
 		return nullptr;
 
 	if (frames.frameCount == 1)
-		return frames.textures[0];
+		return frames.frames[0];
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
 	GMint elapsed = m_world->getElapsed() * 1000;
 
-	return frames.textures[(elapsed / frames.animationMs) % frames.frameCount];
+	return frames.frames[(elapsed / frames.animationMs) % frames.frameCount];
 }
 
 void GMGLObjectPainter::activeShader(Shader* shader)
@@ -256,15 +286,15 @@ void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		// 按照贴图类型选择纹理动画序列
-		TextureFrames& frames = shader->texture.textureFrames[i];
+		TextureFrames& textures = shader->texture.textures[i];
 
 		// 获取序列中的这一帧
-		ITexture* texture = getTexture(frames);
+		ITexture* texture = getTexture(textures);
 		if (texture)
 		{
 			// 激活动画序列
-			activeTexture((TextureIndex)i, type);
-			texture->drawTexture(&frames);
+			activeTexture(shader, (TextureIndex)i, type);
+			texture->drawTexture(&textures);
 		}
 	}
 }

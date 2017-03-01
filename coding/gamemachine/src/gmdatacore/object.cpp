@@ -42,12 +42,12 @@ Component::~Component()
 	TextureInfo& ti = getMaterial().shader.texture;
 	if (ti.autorelease)
 	{
-		TextureFrames* frames = getMaterial().shader.texture.textureFrames;
+		TextureFrames* frames = getMaterial().shader.texture.textures;
 		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
 			for (GMint j = 0; j < frames[i].frameCount; j++)
 			{
-				ITexture* t = frames[i].textures[i];
+				ITexture* t = frames[i].frames[i];
 				if (t)
 					delete t;
 			}

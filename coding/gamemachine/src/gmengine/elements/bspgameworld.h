@@ -16,6 +16,7 @@ public:
 public:
 	void loadBSP(const char* bspPath);
 	void setSky(AUTORELEASE GameObject* sky);
+	GameObject* getSky();
 
 public:
 	virtual void renderGameWorld() override;
@@ -46,10 +47,10 @@ private:
 	void initLightmaps();
 	void importEntities();
 
-	// this is ususally used by BSPShaderLoader
+	// this is ususally used by BSPShaderLoader, BSPGameWorldEntityReader
 public:
 	const char* bspWorkingDirectory();
-	void addShader(const char* name, const Shader& shader);
+	BSPData& bspData();
 };
 
 END_NS

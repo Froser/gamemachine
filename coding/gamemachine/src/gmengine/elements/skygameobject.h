@@ -7,15 +7,15 @@ BEGIN_NS
 class SkyGameObject : public HallucinationGameObject
 {
 public:
-	SkyGameObject(ITexture* texture, vmath::vec3& min, vmath::vec3 max);
+	SkyGameObject(const Shader& shader, vmath::vec3& min, vmath::vec3 max);
 
 private:
 	void createSkyBox(OUT Object** obj);
 
 private:
-	ITexture* m_texture;
 	vmath::vec3 m_min;
 	vmath::vec3 m_max;
+	Shader m_shader;
 };
 
 END_NS
