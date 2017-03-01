@@ -294,7 +294,7 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 		END_PARSE;
 	}
 	frame->frameCount = frameCount;
-	parse_map_fromLightmap(shader, elem);
+	parse_map_tcMod(shader, elem);
 	m_textureNum++;
 }
 
@@ -317,12 +317,12 @@ void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 		frame->wrapT = GMS_MIRRORED_REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
-		parse_map_fromLightmap(shader, elem);
+		parse_map_tcMod(shader, elem);
 		m_textureNum++;
 	}
 	else
 	{
-
+		parse_map_fromLightmap(shader, elem);
 	}
 }
 
@@ -336,7 +336,7 @@ void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 		frame->wrapT = GMS_REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
-		parse_map_fromLightmap(shader, elem);
+		parse_map_tcMod(shader, elem);
 		m_textureNum++;
 	}
 	else
