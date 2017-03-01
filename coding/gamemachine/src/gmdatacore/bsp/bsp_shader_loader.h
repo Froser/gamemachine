@@ -22,13 +22,15 @@ public:
 public:
 	void init(const char* directory, BSPGameWorld* world, BSPData* bsp);
 	void load();
-	bool findItem(const char* name, REF Shader* shader);
+	bool findItem(const char* name, GMuint lightmapId, REF Shader* shader);
 
 	// parsers:
 private:
 	ITexture* addTextureToWorld(Shader& shader, const char* name);
 	void parse(const char* filename);
-	void parseItem(TiXmlElement* elem, REF Shader* shaderPtr);
+	void parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr);
+	void parseStart();
+	void parseEnd();
 
 private:
 	void parse_surfaceparm(Shader& shader, TiXmlElement* elem);
@@ -39,6 +41,7 @@ private:
 	void parse_clampmap(Shader& shader, TiXmlElement* elem);
 	void parse_map(Shader& shader, TiXmlElement* elem);
 	void parse_map_tcMod(Shader& shader, TiXmlElement* elem);
+	void parse_map_fromLightmap(Shader& shader, TiXmlElement* elem);
 
 private:
 	void createSky(Shader& shader);
@@ -52,6 +55,7 @@ private:
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
 	GMint m_textureNum;
+	GMint m_lightmapId;
 };
 
 END_NS

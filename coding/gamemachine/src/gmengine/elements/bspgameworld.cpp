@@ -195,7 +195,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 	{
 		Material material = { 0 };
 		material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-		if (!setMaterialTexture(polygonFace.textureIndex, material))
+		if (!setMaterialTexture(polygonFace, material))
 			return;
 		setMaterialLightmap(polygonFace.lightmapIndex, material);
 
@@ -242,7 +242,7 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 	{
 		Material material = { 0 };
 		material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-		if (!setMaterialTexture(meshFace.textureIndex, material))
+		if (!setMaterialTexture(meshFace, material))
 			return;
 		setMaterialLightmap(meshFace.lightmapIndex, material);
 
@@ -287,7 +287,7 @@ void BSPGameWorld::drawPatch(int patchNumber)
 
 	Material material = { 0 };
 	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	if (!setMaterialTexture(bsp.drawingPatches[patchNumber].textureIndex, material))
+	if (!setMaterialTexture(bsp.drawingPatches[patchNumber], material))
 		return;
 	setMaterialLightmap(bsp.drawingPatches[patchNumber].lightmapIndex, material);
 
@@ -342,14 +342,17 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 	obj->getReadyForRender(d.drawingList);
 }
 
-bool BSPGameWorld::setMaterialTexture(GMuint textureid, REF Material& m)
+template <typename T>
+bool BSPGameWorld::setMaterialTexture(T face, REF Material& m)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
+	GMuint textureid = face.textureIndex;
+	GMuint lightmapid = face.lightmapIndex;
 	const char* name = bsp.shaders[textureid].shader;
 
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
-	if (!d.shaderLoader.findItem(name, &m.shader))
+	if (!d.shaderLoader.findItem(name, lightmapid, &m.shader))
 	{
 		ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 		TextureContainer& tc = rc->getTextureContainer();
@@ -362,7 +365,7 @@ bool BSPGameWorld::setMaterialTexture(GMuint textureid, REF Material& m)
 	return true;
 }
 
-void BSPGameWorld::setMaterialLightmap(GMuint lightmapid, REF Material& m)
+void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Material& m)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
@@ -382,8 +385,8 @@ void BSPGameWorld::importBSP()
 {
 	D(d);
 	initShaders();
-	initTextures();
 	initLightmaps();
+	initTextures();
 	importEntities();
 	initialize();
 }
@@ -410,7 +413,7 @@ void BSPGameWorld::initTextures()
 	{
 		BSPShader& shader = bsp.shaders[i];
 		// 如果一个texture在shader中已经定义，那么不读取它了，而使用shader中的材质
-		if (d.shaderLoader.findItem(shader.shader, nullptr))
+		if (d.shaderLoader.findItem(shader.shader, 0, nullptr))
 			continue;
 
 		Image* tex = nullptr;

@@ -33,8 +33,8 @@ private:
 	void drawMeshFace(int meshFaceNumber);
 	void drawPatch(int patchNumber);
 	void draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material);
-	bool setMaterialTexture(GMuint textureid, REF Material& m);
-	void setMaterialLightmap(GMuint lightmapid, REF Material& m);
+	template <typename T> bool setMaterialTexture(T face, REF Material& m);
+	void setMaterialLightmap(GMint lightmapid, REF Material& m);
 	int calculateCameraLeaf(const vmath::vec3& cameraPosition);
 	int isClusterVisible(int cameraCluster, int testCluster);
 

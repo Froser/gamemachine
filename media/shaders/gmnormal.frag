@@ -16,16 +16,22 @@ uniform int GM_shadow_texture_switch = 0;
 uniform sampler2D GM_ambient_texture;
 uniform float GM_ambient_texture_scroll_s;
 uniform float GM_ambient_texture_scroll_t;
+uniform float GM_ambient_texture_scale_s;
+uniform float GM_ambient_texture_scale_t;
 uniform int GM_ambient_texture_switch = 0;
 
 uniform sampler2D GM_ambient_texture_2;
 uniform float GM_ambient_texture_2_scroll_s;
 uniform float GM_ambient_texture_2_scroll_t;
+uniform float GM_ambient_texture_2_scale_s;
+uniform float GM_ambient_texture_2_scale_t;
 uniform int GM_ambient_texture_2_switch = 0;
 
 uniform sampler2D GM_ambient_texture_3;
 uniform float GM_ambient_texture_3_scroll_s;
 uniform float GM_ambient_texture_3_scroll_t;
+uniform float GM_ambient_texture_3_scale_s;
+uniform float GM_ambient_texture_3_scale_t;
 uniform int GM_ambient_texture_3_switch = 0;
 
 // 受漫反射系数影响的纹理 (kd)
@@ -155,9 +161,9 @@ void drawObject()
     vec3 specularLight = g_specular * vec3(GM_light_specular) * vec3(GM_light_ks);
 
     // 计算环境光和Ka贴图
-    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv + vec2(GM_ambient_texture_scroll_s, GM_ambient_texture_scroll_t))) : vec3(1);
-    ambientTextureColor += GM_ambient_texture_2_switch == 1 ? vec3(texture(GM_ambient_texture_2, _uv + vec2(GM_ambient_texture_2_scroll_s, GM_ambient_texture_2_scroll_t))) : vec3(0);
-    ambientTextureColor += GM_ambient_texture_3_switch == 1 ? vec3(texture(GM_ambient_texture_3, _uv + vec2(GM_ambient_texture_3_scroll_s, GM_ambient_texture_3_scroll_t))) : vec3(0);
+    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv * vec2(GM_ambient_texture_scale_s, GM_ambient_texture_scale_t) + vec2(GM_ambient_texture_scroll_s, GM_ambient_texture_scroll_t))) : vec3(1);
+    ambientTextureColor += GM_ambient_texture_2_switch == 1 ? vec3(texture(GM_ambient_texture_2, _uv * vec2(GM_ambient_texture_2_scale_s, GM_ambient_texture_2_scale_t) + vec2(GM_ambient_texture_2_scroll_s, GM_ambient_texture_2_scroll_t))) : vec3(0);
+    ambientTextureColor += GM_ambient_texture_3_switch == 1 ? vec3(texture(GM_ambient_texture_3, _uv * vec2(GM_ambient_texture_3_scale_s, GM_ambient_texture_3_scale_t) + vec2(GM_ambient_texture_3_scroll_s, GM_ambient_texture_3_scroll_t))) : vec3(0);
     ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(1);
     ambientLight += GM_light_ka.xyz * shadeFactor * ambientTextureColor;
     ambientLight *= vec3(GM_light_ambient);

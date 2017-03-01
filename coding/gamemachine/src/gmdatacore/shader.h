@@ -26,6 +26,7 @@ enum GMS_BlendFunc
 {
 	GMS_ZERO = 0,
 	GMS_ONE,
+	GMS_DST_COLOR,
 };
 
 enum GMS_Cull
@@ -56,6 +57,7 @@ enum GMS_TextureModType
 {
 	GMS_NO_TEXTURE_MOD = 0,
 	GMS_SCROLL,
+	GMS_SCALE,
 };
 
 struct GMS_TextureMod

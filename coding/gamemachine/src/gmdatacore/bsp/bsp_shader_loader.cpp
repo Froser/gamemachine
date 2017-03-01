@@ -69,9 +69,16 @@ static GMuint parseSurfaceParm(const char* p)
 
 static GMS_BlendFunc parseBlendFunc(const char* p)
 {
+	if (strEqual(p, "GMS_ZERO"))
+		return GMS_ZERO;
+
 	if (strEqual(p, "GMS_ONE"))
 		return GMS_ONE;
 
+	if (strEqual(p, "GMS_DST_COLOR"))
+		return GMS_ONE;
+
+	gm_warning("Unknown blendFunc %s treated as GMS_ZERO", p);
 	return GMS_ZERO;
 }
 
@@ -107,6 +114,9 @@ void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPData* 
 
 ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
 {
+	if (!name)
+		return nullptr;
+
 	ResourceContainer* rc = m_world->getGraphicEngine()->getResourceContainer();
 	TextureContainer& tc = rc->getTextureContainer();
 	const TextureContainer::TextureItem* item = tc.find(name);
@@ -147,14 +157,14 @@ void BSPShaderLoader::load()
 	}
 }
 
-bool BSPShaderLoader::findItem(const char* name, REF Shader* shader)
+bool BSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* shader)
 {
 	auto foundResult = m_items.find(name);
 	if (foundResult == m_items.end())
 		return false;
 
 	// If we found it, parse it.
-	parseItem((*foundResult).second, shader);
+	parseItem((*foundResult).second, lightmapId, shader);
 	return true;
 }
 
@@ -198,13 +208,16 @@ void BSPShaderLoader::parse(const char* filename)
 	}
 }
 
-void BSPShaderLoader::parseItem(TiXmlElement* elem, REF Shader* shaderPtr)
+void BSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr)
 {
 	if (!shaderPtr)
 		return;
 
+	parseStart();
+	// 这个是用于追踪from=lightmap的纹理使用的
+	m_lightmapId = lightmapId;
+
 	Shader& shader = *shaderPtr;
-	m_textureNum = 0;
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
@@ -218,6 +231,18 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem, REF Shader* shaderPtr)
 
 	if (shader.surfaceFlag & SURF_SKY)
 		createSky(shader);
+
+	parseEnd();
+}
+
+void BSPShaderLoader::parseStart()
+{
+	m_textureNum = 0;
+}
+
+void BSPShaderLoader::parseEnd()
+{
+	m_lightmapId = -1;
 }
 
 void BSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
@@ -269,7 +294,7 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 		END_PARSE;
 	}
 	frame->frameCount = frameCount;
-	parse_map_tcMod(shader, elem);
+	parse_map_fromLightmap(shader, elem);
 	m_textureNum++;
 }
 
@@ -292,8 +317,12 @@ void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 		frame->wrapT = GMS_MIRRORED_REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
-		parse_map_tcMod(shader, elem);
+		parse_map_fromLightmap(shader, elem);
 		m_textureNum++;
+	}
+	else
+	{
+
 	}
 }
 
@@ -307,8 +336,40 @@ void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 		frame->wrapT = GMS_REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
-		parse_map_tcMod(shader, elem);
+		parse_map_fromLightmap(shader, elem);
 		m_textureNum++;
+	}
+	else
+	{
+		parse_map_fromLightmap(shader, elem);
+	}
+}
+
+void BSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
+{
+	// from "lightmap"
+	const char* from = elem->Attribute("from");
+	if (from)
+	{
+		if (strEqual(from, "lightmap"))
+		{
+			ResourceContainer* rc = m_world->getGameMachine()->getGraphicEngine()->getResourceContainer();
+			TextureContainer_ID& tc = rc->getLightmapContainer();
+
+			TextureFrames* frame = &shader.texture.textures[m_textureNum];
+			memset(frame->frames, 0, sizeof(frame->frames));
+			const TextureContainer_ID::TextureItem* tex = tc.find(m_lightmapId);
+			if (tex)
+			{
+				frame->frames[0] = tc.find(m_lightmapId)->texture;
+				frame->frameCount = 1;
+				gm_info("found map from lightmap %d", m_lightmapId);
+			}
+			else
+			{
+				gm_error("lightmap not found: %d", m_lightmapId);
+			}
+		}
 	}
 }
 
@@ -328,15 +389,33 @@ void BSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 		Scanner s(tcMod);
 		char type[LINE_MAX];
 		s.next(type);
-		char value[LINE_MAX];
-		s.nextToTheEnd(value);
 
-		if (strEqual(type, "scroll"))
+		while (true)
 		{
-			currentMod->type = GMS_SCROLL;
-			Scanner valueScanner(value);
-			valueScanner.nextFloat(&currentMod->p1);
-			valueScanner.nextFloat(&currentMod->p2);
+			if (strEqual(type, "scroll"))
+			{
+				currentMod->type = GMS_SCROLL;
+				s.nextFloat(&currentMod->p1);
+				s.nextFloat(&currentMod->p2);
+			}
+			else if (strEqual(type, "scale"))
+			{
+				currentMod->type = GMS_SCALE;
+				s.nextFloat(&currentMod->p1);
+				s.nextFloat(&currentMod->p2);
+			}
+			
+			s.next(type);
+			if (!strlen(type))
+				break;
+			tcModNum++;
+			if (tcModNum == MAX_TEX_MOD)
+			{
+				if (strlen(type))
+					gm_warning("warning: you have tcMods more than %d, please increase MAX_TEX_MOD", MAX_TEX_MOD);
+				break;
+			}
+			currentMod = &shader.texture.textures[m_textureNum].texMod[tcModNum];
 		}
 	}
 }

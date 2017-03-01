@@ -34,12 +34,18 @@ Scanner::Scanner(const char* line, bool skipSame, CharPredicate predicate)
 void Scanner::next(char* out)
 {
 	if (!m_valid)
+	{
+		strcpy(out, "");
 		return;
+	}
 
 	char* p = out;
 	bool b = false;
 	if (!m_p)
+	{
+		strcpy(out, "");
 		return;
+	}
 
 	while (*m_p && m_predicate(*m_p))
 	{

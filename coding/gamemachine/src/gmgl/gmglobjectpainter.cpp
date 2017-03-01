@@ -180,22 +180,36 @@ void GMGLObjectPainter::activeTextureTransform(Shader* shader, TextureIndex i, C
 
 	const std::string SCROLL_S = std::string(uniform).append("_scroll_s");
 	const std::string SCROLL_T = std::string(uniform).append("_scroll_t");
+	const std::string SCALE_S = std::string(uniform).append("_scale_s");
+	const std::string SCALE_T = std::string(uniform).append("_scale_t");
 
-	GLint loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_S.c_str());
-	glUniform1f(loc, 0.f);
-	loc = glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str());
-	glUniform1f(loc, 0.f);
+	glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_S.c_str()), 0.f);
+	glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), 0.f);
+	glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCALE_S.c_str()), 1.f);
+	glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCALE_T.c_str()), 1.f);
 
 	GMuint n = 0;
 	while (n < MAX_TEX_MOD && shader->texture.textures[i].texMod[n].type != GMS_NO_TEXTURE_MOD)
 	{
 		GMS_TextureMod* tc = &shader->texture.textures[i].texMod[n];
-		if (tc->type == GMS_SCROLL)
+		switch (tc->type)
 		{
-			GMfloat s = m_world->getElapsed() * tc->p1,
-				t = m_world->getElapsed() * tc->p2;
-			glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), t);
-			glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), s);
+		case GMS_SCROLL:
+			{
+				GMfloat s = m_world->getElapsed() * tc->p1, t = m_world->getElapsed() * tc->p2;
+				glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), t);
+				glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCROLL_T.c_str()), s);
+			}
+			break;
+		case GMS_SCALE:
+			{
+				GMfloat s = tc->p1, t = tc->p2;
+				glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCALE_T.c_str()), t);
+				glUniform1f(glGetUniformLocation(m_engine->getShaders(type)->getProgram(), SCALE_T.c_str()), s);
+				break;
+			}
+		default:
+			break;
 		}
 		n++;
 	}
@@ -250,6 +264,9 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 				break;
 			case GMS_ONE:
 				factors[i] = GL_ONE;
+				break;
+			case GMS_DST_COLOR:
+				factors[i] = GL_DST_COLOR;
 				break;
 			default:
 				ASSERT(false);

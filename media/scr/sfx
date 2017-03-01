@@ -42,8 +42,8 @@
 		<surfaceparm>nolightmap</surfaceparm>
 		<surfaceparm>sky</surfaceparm>
 		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
-		<map tcMod="scroll 0.05 .1" >textures/skies/killsky_1.jpg</map>
-		<map tcMod="scroll 0.05 .06">textures/skies/killsky_2.jpg</map>
+		<map tcMod="scroll 0.05 .1 scale 2 2" >textures/skies/killsky_1.jpg</map>
+		<map tcMod="scroll 0.05 .06 scale 3 2">textures/skies/killsky_2.jpg</map>
 	</item>
 	<item name="models/mapobjects/baph/bapholamp_fx">
 		<surfaceparm>nonsolid</surfaceparm>
@@ -51,5 +51,11 @@
 		<cull>cull</cull>
 		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
 		<clampmap>models/mapobjects/baph/bapholamp_fx.jpg</clampmap>
+	</item>
+	<item name="textures/gothic_light/pentagram_light1_1K">
+		<blendFunc>GMS_DST_COLOR GMS_ZERO</blendFunc>
+		<map from="lightmap" />
+		<map>textures/gothic_light/pentagram_light1.jpg</map>
+		<map>textures/gothic_light/pentagram_light1_blend.jpg</map>
 	</item>
 </gmshader>
