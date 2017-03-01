@@ -4,7 +4,8 @@
 		<surfaceparm>nomarks</surfaceparm>
 		<surfaceparm>nolightmap</surfaceparm>
 		<cull>none</cull>
-		<animMap ms="100" blendFunc="GMS_ONE GMS_ONE">
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<animMap ms="100">
 			<src>textures/sfx/flame1.jpg</src>
 			<src>textures/sfx/flame2.jpg</src>
 			<src>textures/sfx/flame3.jpg</src>
@@ -14,7 +15,7 @@
 			<src>textures/sfx/flame7.jpg</src>
 			<src>textures/sfx/flame8.jpg</src>
 		</animMap>
-		<animMap ms="100" blendFunc="GMS_ONE GMS_ONE">
+		<animMap ms="100">
 			<src>textures/sfx/flame2.jpg</src>
 			<src>textures/sfx/flame3.jpg</src>
 			<src>textures/sfx/flame4.jpg</src>
@@ -24,6 +25,23 @@
 			<src>textures/sfx/flame8.jpg</src>
 			<src>textures/sfx/flame1.jpg</src>
 		</animMap>
+		<map>textures/sfx/flameball.jpg</map>
+	</item>
+	<item name="textures/sfx/xflame2" ref="textures/sfx/flame1side" />
+	<item name="textures/sfx/flame1dark" ref="textures/sfx/flame1side" />
+	<item name="textures/sfx/flame1" ref="textures/sfx/flame1side" />
+	<item name="textures/sfx/flame2" ref="textures/sfx/flame1side" />
+	<item name="flareShader">
+		<cull>none</cull>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<map>gfx/misc/flare.jpg</map>
+	</item>
+	<item name="textures/skies/killsky">
+		<surfaceparm>noimpact</surfaceparm>
+		<surfaceparm>nomarks</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<surfaceparm>sky</surfaceparm>
+		<map>textures/skies/killsky_1.jpg</map>
 	</item>
 	<item name="models/mapobjects/baph/bapholamp_fx">
 		<surfaceparm>nonsolid</surfaceparm>

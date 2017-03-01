@@ -1,36 +1,38 @@
 ﻿#include "stdafx.h"
 #include "skygameobject.h"
 
-static GMfloat uvs[24][2] = {
-	0, 0,
-	0, 1,
-	1, 1,
-	1, 0,
+static vmath::vec2 uvs[24] = {
+	vmath::vec2(0, 0),
+	vmath::vec2(0, 1),
+	vmath::vec2(1, 1),
+	vmath::vec2(1, 0),
 
-	0, 0,
-	0, 1,
-	1, 1,
-	1, 0,
+	vmath::vec2(0, 0),
+	vmath::vec2(0, 1),
+	vmath::vec2(1, 1),
+	vmath::vec2(1, 0),
 
-	0, 0,
-	0, 1,
-	1, 1,
-	1, 0,
+	vmath::vec2(0, 0),
+	vmath::vec2(0, 1),
+	vmath::vec2(1, 1),
+	vmath::vec2(1, 0),
 
-	0, 0,
-	0, 1,
-	1, 1,
-	1, 0,
+	vmath::vec2(0, 0),
+	vmath::vec2(0, 1),
+	vmath::vec2(1, 1),
+	vmath::vec2(1, 0),
 
-	0, 0,
-	0, 1,
-	1, 1,
-	1, 0,
+	vmath::vec2(0, 0),
+	vmath::vec2(0, 1),
+	vmath::vec2(1, 1),
+	vmath::vec2(1, 0),
 
-	0, 0,
-	0, 1,
-	1, 1,
-	1, 0,
+	/*
+	vmath::vec2(0, 0),
+	vmath::vec2(0, 1),
+	vmath::vec2(1, 1),
+	vmath::vec2(1, 0),
+	*/
 };
 
 SkyGameObject::SkyGameObject(ITexture* texture, vmath::vec3& min, vmath::vec3 max)
@@ -46,43 +48,60 @@ SkyGameObject::SkyGameObject(ITexture* texture, vmath::vec3& min, vmath::vec3 ma
 
 void SkyGameObject::createSkyBox(OUT Object** obj)
 {
-	GMfloat vertices[24][3] = {
+	vmath::vec3 vertices[20] = {
 		//Front
-		m_min[0], m_max[1], m_max[2],
-		m_min[0], m_min[1], m_max[2],
-		m_max[0], m_min[1], m_max[2],
-		m_max[0], m_max[1], m_max[2],
+		vmath::vec3(m_min[0], m_max[1], m_max[2]),
+		vmath::vec3(m_min[0], m_min[1], m_max[2]),
+		vmath::vec3(m_max[0], m_min[1], m_max[2]),
+		vmath::vec3(m_max[0], m_max[1], m_max[2]),
 
 		//Back
-		m_min[0], m_max[1], m_min[2],
-		m_min[0], m_min[1], m_min[2],
-		m_max[0], m_min[1], m_min[2],
-		m_max[0], m_max[1], m_min[2],
+		vmath::vec3(m_min[0], m_max[1], m_min[2]),
+		vmath::vec3(m_min[0], m_min[1], m_min[2]),
+		vmath::vec3(m_max[0], m_min[1], m_min[2]),
+		vmath::vec3(m_max[0], m_max[1], m_min[2]),
 
 		//Left
-		m_min[0], m_max[1], m_min[2],
-		m_min[0], m_max[1], m_max[2],
-		m_min[0], m_min[1], m_max[2],
-		m_min[0], m_min[1], m_min[2],
+		vmath::vec3(m_min[0], m_max[1], m_min[2]),
+		vmath::vec3(m_min[0], m_max[1], m_max[2]),
+		vmath::vec3(m_min[0], m_min[1], m_max[2]),
+		vmath::vec3(m_min[0], m_min[1], m_min[2]),
 
 		//Right
-		m_max[0], m_max[1], m_min[2],
-		m_max[0], m_max[1], m_max[2],
-		m_max[0], m_min[1], m_max[2],
-		m_max[0], m_min[1], m_min[2],
+		vmath::vec3(m_max[0], m_max[1], m_min[2]),
+		vmath::vec3(m_max[0], m_max[1], m_max[2]),
+		vmath::vec3(m_max[0], m_min[1], m_max[2]),
+		vmath::vec3(m_max[0], m_min[1], m_min[2]),
 
 		//Up
-		m_min[0], m_max[1], m_min[2],
-		m_min[0], m_max[1], m_max[2],
-		m_max[0], m_max[1], m_max[2],
-		m_max[0], m_max[1], m_min[2],
+		vmath::vec3(m_min[0], m_max[1], m_min[2]),
+		vmath::vec3(m_min[0], m_max[1], m_max[2]),
+		vmath::vec3(m_max[0], m_max[1], m_max[2]),
+		vmath::vec3(m_max[0], m_max[1], m_min[2]),
 
 		//Down
-		m_min[0], m_min[1], m_min[2],
-		m_min[0], m_min[1], m_max[2],
-		m_max[0], m_min[1], m_max[2],
-		m_max[0], m_min[1], m_min[2],
+		/*
+		vmath::vec3(m_min[0], m_min[1], m_min[2]),
+		vmath::vec3(m_min[0], m_min[1], m_max[2]),
+		vmath::vec3(m_max[0], m_min[1], m_max[2]),
+		vmath::vec3(m_max[0], m_min[1], m_min[2]),
+		*/
 	};
+
+	// Scaling surface
+	const GMint SCALING = 2;
+	vmath::vec3 center = (m_min + m_max) / 2;
+	vmath::mat4 transScale = vmath::scale(vmath::vec3(SCALING, 1, SCALING));
+	for (GMuint i = 0; i < 20; i++)
+	{
+		vmath::mat4 transRestore = vmath::translate(center);
+		vmath::mat4 transMoveToAxisOrigin = vmath::translate(-center);
+		vmath::mat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
+		
+		// 因为vmath::mat为列优先，所以与vec相乘的时候应该先transpose
+		vmath::vec4 pt = vmath::vec4(vertices[i], 1) * transFinal.transpose();
+		vertices[i] = vmath::vec3(pt[0], pt[1], pt[2]);
+	}
 
 	Object* object = new Object();
 	*obj = object;
@@ -96,18 +115,22 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 
 	ChildObject* child = new ChildObject();
 	child->setType(ChildObject::Sky);
+
 	Component* component = new Component(child);
 	component->getMaterial() = material;
 
-	for (GMuint i = 0; i < 6; i++)
+	// We don't draw surface beneath us
+	for (GMuint i = 0; i < 5; i++)
 	{
 		component->beginFace();
 		component->vertex(vertices[i * 4][0], vertices[i * 4][1], vertices[i * 4][2]);
 		component->vertex(vertices[i * 4 + 1][0], vertices[i * 4 + 1][1], vertices[i * 4 + 1][2]);
 		component->vertex(vertices[i * 4 + 2][0], vertices[i * 4 + 2][1], vertices[i * 4 + 2][2]);
 		component->vertex(vertices[i * 4 + 3][0], vertices[i * 4 + 3][1], vertices[i * 4 + 3][2]);
-		component->uv(uvs[i * 4][0], vertices[i * 4][1]);
-		component->uv(uvs[i * 4 + 1][0], vertices[i * 4 + 1][1]);
+		component->uv(uvs[i * 4][0], uvs[i * 4][1]);
+		component->uv(uvs[i * 4 + 1][0], uvs[i * 4 + 1][1]);
+		component->uv(uvs[i * 4 + 2][0], uvs[i * 4 + 2][1]);
+		component->uv(uvs[i * 4 + 3][0], uvs[i * 4 + 3][1]);
 		component->endFace();
 	}
 	child->appendComponent(component);

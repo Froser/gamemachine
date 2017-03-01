@@ -2,7 +2,6 @@
 #include "image.h"
 
 Image::Image()
-	: m_asCubemap(false)
 {
 	memset(&m_data, 0, sizeof(m_data));
 }
@@ -44,18 +43,4 @@ void Image::flipVertically(GMuint mipId)
 
 	if (tempRow)
 		delete[] tempRow;
-}
-
-void Image::transformToCubemap()
-{
-	if (m_data.target != GL_TEXTURE_CUBE_MAP)
-	{
-		m_data.target = GL_TEXTURE_CUBE_MAP;
-		m_asCubemap = true;
-	}
-}
-
-bool Image::isTreatAsCubemap()
-{
-	return m_asCubemap;
 }

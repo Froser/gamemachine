@@ -47,7 +47,6 @@ uniform vec4 GM_light_ke;
 uniform vec4 GM_light_position;
 uniform float GM_light_shininess;
 uniform mat4 GM_model_matrix;
-uniform vec4 GM_view_position;
 
 vec3 DEBUG;
 
@@ -148,9 +147,9 @@ void drawObject()
     vec3 specularLight = g_specular * vec3(GM_light_specular) * vec3(GM_light_ks);
 
     // 计算环境光和Ka贴图
-    //ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(1);
-    vec3  ambientTextureColor = GM_ambient_texture_2_switch == 1 ? vec3(texture(GM_ambient_texture_2, _uv)) : vec3(1);
-    //ambientTextureColor *= GM_ambient_texture_3_switch == 1 ? vec3(texture(GM_ambient_texture_3, _uv)) : vec3(1);
+    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv)) : vec3(1);
+    //ambientTextureColor += GM_ambient_texture_2_switch == 1 ? vec3(texture(GM_ambient_texture_2, _uv)) : vec3(0);
+    ambientTextureColor += GM_ambient_texture_3_switch == 1 ? vec3(texture(GM_ambient_texture_3, _uv)) : vec3(0);
     ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(1);
     ambientLight += GM_light_ka.xyz * shadeFactor * ambientTextureColor;
     ambientLight *= vec3(GM_light_ambient);

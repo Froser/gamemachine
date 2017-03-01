@@ -105,9 +105,6 @@ ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
 
 		if (img)
 		{
-			if (shader.surfaceFlag & SURF_SKY)
-				img->transformToCubemap();
-
 			ITexture* texture;
 			IFactory* factory = m_world.getGameMachine()->getFactory();
 			factory->createTexture(img, &texture);
