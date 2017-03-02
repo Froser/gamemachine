@@ -11,7 +11,6 @@ BEGIN_NS
 
 enum
 {
-	SCALING_DOWN = 64,
 	BOUNDING = 99999,
 };
 
@@ -308,6 +307,15 @@ public:
 	}
 };
 
+struct BSP_Drawing_LightVolumes
+{
+	vmath::vec3 lightVolOrigin;
+	vmath::vec3 lightVolSize;
+	vmath::vec3 lightVolInverseSize;
+	vmath::vec3 lightVolBounds;
+	GMbyte* volData;
+};
+
 struct BSPPrivate
 {
 	friend class BSP;
@@ -346,11 +354,11 @@ struct BSPPrivate
 	GMint numbrushsides;
 	std::vector<BSPBrushSide> brushsides;
 	GMint numLightBytes;
-	std::vector<unsigned char> lightBytes;
+	std::vector<GMbyte> lightBytes;
 	GMint numGridPoints;
-	std::vector<unsigned char> gridData;
+	std::vector<GMbyte> gridData;
 	GMint numVisBytes;
-	std::vector<unsigned char> visBytes;
+	std::vector<GMbyte> visBytes;
 	GMint numDrawVertices;
 	std::vector<BSPDrawVertices> vertices;
 	GMint numDrawIndexes;
@@ -373,6 +381,7 @@ struct BSPPrivate
 	std::vector<BSP_Drawing_Leaf> drawingLeafs;
 	std::vector<Plane> drawingPlanes;
 	BSP_VisibilityData visibilityData;
+	BSP_Drawing_LightVolumes lightVols;
 
 	// 用于绘制天空
 	vmath::vec3 boundMin;
@@ -406,7 +415,7 @@ private:
 	void swapBsp();
 	void parseFromMemory(char *buffer, int size);
 	void parseEntities();
-	bool parseEntity();
+	BSPEntity* parseEntity();
 	bool getToken(bool crossline);
 	BSPKeyValuePair* parseEpair();
 	void addScriptToStack(const char *filename);
@@ -417,6 +426,7 @@ private:
 	void generateFaces();
 	void generateShaders();
 	void generateLightmaps();
+	void generateLightVolumes();
 	void generateBSPData();
 };
 

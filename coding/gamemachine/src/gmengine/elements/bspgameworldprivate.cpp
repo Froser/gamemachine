@@ -85,7 +85,7 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	//playerStart.setRotation(rotation);
 
 	Character* character = new Character(playerStart, .6, .1, .1);
-	character->setMoveSpeed(3);
+	character->setMoveSpeed(192);
 	character->setFallSpeed(250);
 	character->setJumpSpeed(vmath::vec3(0, 50, 0));
 	character->setCanFreeMove(true);

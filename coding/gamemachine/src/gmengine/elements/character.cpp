@@ -19,7 +19,7 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	, m_freeMove(true)
 	, m_dynamicWorld(nullptr)
 	, m_moveSpeed(10)
-	, m_frustum(75, 1.333f, 0.1, 100)
+	, m_frustum(75, 1.333f, 0.1, 6400)
 	, m_moveDirection(0)
 {
 	setTransform(position);

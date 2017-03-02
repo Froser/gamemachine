@@ -5,6 +5,18 @@
 #include "utilities\path.h"
 #include "bsp_interior.inl"
 
+static const char* getValue(const BSPEntity* entity, const char* key)
+{
+	BSPKeyValuePair* e = entity->epairs;
+	while (e)
+	{
+		if (strEqual(e->key, key))
+			return e->value;
+		e = e->next;
+	}
+	return nullptr;
+}
+
 //Tesselate a biquadratic patch
 bool BSP_Drawing_BiquadraticPatch::tesselate(int newTesselation)
 {
@@ -104,7 +116,6 @@ void BSP::loadBsp(const char* filename)
 	d.filename = filename;
 	readFile();
 	swapBsp();
-	parseEntities();
 
 	// 将原始数据组装起来
 	generateRenderData();
@@ -227,10 +238,22 @@ void BSP::swapBsp()
 void BSP::parseEntities()
 {
 	D(d);
+	d.lightVols.lightVolSize[0] = 64;
+	d.lightVols.lightVolSize[1] = 64;
+	d.lightVols.lightVolSize[2] = 128;
+
 	d.numentities = 0;
 	parseFromMemory(d.entdata.data(), d.entdatasize);
 
-	while (parseEntity()) {
+	BSPEntity* entity;
+	while (entity = parseEntity())
+	{
+		const char* gridSize = getValue(entity, "gridsize");
+		if (gridSize)
+		{
+			SAFE_SSCANF(gridSize, "%f %f %f", &d.lightVols.lightVolSize[0], &d.lightVols.lightVolSize[1], &d.lightVols.lightVolSize[2]);
+			gm_info("gridSize reseted to %f, %f, %f", &d.lightVols.lightVolSize[0], &d.lightVols.lightVolSize[1], &d.lightVols.lightVolSize[2]);
+		}
 	}
 }
 
@@ -252,18 +275,18 @@ void BSP::parseFromMemory(char *buffer, int size)
 	d.tokenready = false;
 }
 
-bool BSP::parseEntity()
+BSPEntity* BSP::parseEntity()
 {
 	D(d);
 
-	BSPKeyValuePair *e;
-	BSPEntity	*mapent;
+	BSPKeyValuePair* e;
+	BSPEntity *mapent;
 
 	if (!getToken(true)) {
-		return false;
+		return nullptr;
 	}
 
-	if (strcmp(d.token, "{")) {
+	if (!strEqual(d.token, "{")) {
 		gm_warning("parseEntity: { not found");
 	}
 
@@ -284,7 +307,7 @@ bool BSP::parseEntity()
 		if (!getToken(true)) {
 			gm_warning("parseEntity: EOF without closing brace");
 		}
-		if (!strcmp(d.token, "}")) {
+		if (strEqual(d.token, "}")) {
 			break;
 		}
 		e = (struct BSPPair*)parseEpair();
@@ -292,7 +315,7 @@ bool BSP::parseEntity()
 		mapent->epairs = e;
 	} while (1);
 
-	return true;
+	return &*(d.entities.end() - 1);
 }
 
 bool BSP::getToken(bool crossline)
@@ -481,10 +504,12 @@ bool BSP::endOfScript(bool crossline)
 void BSP::generateRenderData()
 {
 	D(d);
+	parseEntities();
 	generateVertices();
 	generateFaces();
 	generateShaders();
 	generateLightmaps();
+	generateLightVolumes();
 	generateBSPData();
 }
 
@@ -502,7 +527,7 @@ void BSP::generateVertices()
 		d.drawingVertices[i].position[3] = 1.0f;
 
 		//scale down
-		d.drawingVertices[i].position /= SCALING_DOWN;
+		// d.drawingVertices[i].position /= SCALING_DOWN;
 
 		//Transfer texture coordinates (Invert t)
 		d.drawingVertices[i].decalS = d.vertices[i].st[0];
@@ -644,6 +669,31 @@ void BSP::generateLightmaps()
 	// Nothing to do
 }
 
+void BSP::generateLightVolumes()
+{
+	D(d);
+	d.lightVols.lightVolInverseSize = 1.f / d.lightVols.lightVolSize;
+	GMfloat* wMins = d.models[0].mins;
+	GMfloat* wMaxs = d.models[0].maxs;
+	vmath::vec3 maxs;
+	GMint numGridPoints = 0;
+
+	for (GMuint i = 0; i < 3; i++)
+	{
+		d.lightVols.lightVolOrigin[i] = d.lightVols.lightVolSize[i] * ceil(wMins[i] / d.lightVols.lightVolSize[i]);
+		maxs[i] = d.lightVols.lightVolSize[i] * floor(wMaxs[i] / d.lightVols.lightVolSize[i]);
+		d.lightVols.lightVolBounds[i] = (maxs[i] - d.lightVols.lightVolOrigin[i]) / d.lightVols.lightVolSize[i] + 1;
+	}
+	numGridPoints = d.lightVols.lightVolBounds[0] * d.lightVols.lightVolBounds[1] * d.lightVols.lightVolBounds[2];
+
+	if (d.header->lumps[LUMP_LIGHTGRID].filelen != numGridPoints * 8)
+	{
+		gm_warning("light volumes mismatch.");
+		d.lightBytes.clear();
+		return;
+	}
+}
+
 void BSP::generateBSPData()
 {
 	D(d);
@@ -665,8 +715,8 @@ void BSP::generateBSPData()
 		d.drawingLeafs[i].boundingBoxVertices[6] = vmath::vec3(d.leafs[i].maxs[0], d.leafs[i].maxs[2], -d.leafs[i].mins[1]);
 		d.drawingLeafs[i].boundingBoxVertices[7] = vmath::vec3(d.leafs[i].maxs[0], d.leafs[i].maxs[2], -d.leafs[i].maxs[1]);
 
-		for (int j = 0; j < 8; ++j)
-			d.drawingLeafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
+		// for (int j = 0; j < 8; ++j)
+		// 	d.drawingLeafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
 	}
 
 	//planes
@@ -681,7 +731,7 @@ void BSP::generateBSPData()
 		d.drawingPlanes[i].normal[2] = -temp;
 
 		d.drawingPlanes[i].intercept = -d.drawingPlanes[i].intercept;
-		d.drawingPlanes[i].intercept /= SCALING_DOWN;	//scale down
+		// d.drawingPlanes[i].intercept /= SCALING_DOWN;	//scale down
 	}
 
 	// visBytes头两个int表示clusters，后面的字节表示bitsets
@@ -689,6 +739,5 @@ void BSP::generateBSPData()
 	memcpy(&d.visibilityData, d.visBytes.data(), sz);
 	int bitsetSize = d.visibilityData.numClusters * d.visibilityData.bytesPerCluster;
 	d.visibilityData.bitset = new GMbyte[bitsetSize];
-	// TODO: read bitset
 	memcpy(d.visibilityData.bitset, d.visBytes.data() + sz, bitsetSize);
 }

@@ -46,8 +46,11 @@ public:
 
 public:
 	JoystickState getJoystickState();
+	void joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed);
+
 	KeyboardState getKeyboardState();
 	MouseState getMouseState();
+
 private:
 	bool m_mouseReady;
 	IWindow* m_window;

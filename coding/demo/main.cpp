@@ -161,6 +161,11 @@ public:
 			if (kbState[VK_SPACE])
 				moveTag |= MD_JUMP;
 
+			if (kbState['V'])
+				m_input.joystickVibrate(30000, 30000);
+			else if (kbState['C'])
+				m_input.joystickVibrate(0, 0);
+
 			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
 				GMfloat rate = (GMfloat) joyState.thumbRX / (

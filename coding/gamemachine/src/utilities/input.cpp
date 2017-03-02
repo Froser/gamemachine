@@ -41,6 +41,12 @@ JoystickState Input_Windows::getJoystickState()
 	return result;
 }
 
+void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
+{
+	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
+	XInputSetState(0, &v);
+}
+
 KeyboardState Input_Windows::getKeyboardState()
 {
 	KeyboardState state;
