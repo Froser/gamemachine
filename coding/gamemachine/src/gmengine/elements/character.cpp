@@ -27,6 +27,7 @@ Character::Character(const btTransform& position, btScalar radius, btScalar heig
 	memset(&m_eyeOffset, 0, sizeof(m_eyeOffset));
 	memset(&m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
 	memset(&m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
+	memset(&m_moveRate, 0, sizeof(m_moveRate));
 	m_state.positionX = position.getOrigin().x();
 	m_state.positionY = position.getOrigin().y();
 	m_state.positionZ = position.getOrigin().z();
@@ -70,15 +71,15 @@ btCollisionObject* Character::createCollisionObject()
 	return ghostObj;
 }
 
-GMfloat Character::calcMoveDistance()
+GMfloat Character::calcMoveDistance(GMfloat rate)
 {
 	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
 	GMfloat fps = getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
 	GMfloat skipFrame = elapsed / (1.0f / fps);
 	if (skipFrame > 1)
-		return m_moveSpeed * skipFrame / fps;
+		return m_moveSpeed * rate * skipFrame / fps;
 	else
-		return m_moveSpeed / fps;
+		return m_moveSpeed * rate / fps;
 }
 
 GMfloat Character::calcFallSpeed()
@@ -94,7 +95,7 @@ GMfloat Character::calcFallSpeed()
 
 void Character::moveForwardOrBackward(bool forward)
 {
-	GMfloat distance = (forward ? 1 : -1 ) * calcMoveDistance();
+	GMfloat distance = (forward ? 1 : -1 ) * calcMoveDistance(forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD));
 	if (m_freeMove)
 		m_state.positionY += distance * std::sin(m_state.pitch);
 
@@ -107,7 +108,7 @@ void Character::moveForwardOrBackward(bool forward)
 
 void Character::moveLeftOrRight(bool left)
 {
-	GMfloat distance = (left ? -1 : 1) * calcMoveDistance();
+	GMfloat distance = (left ? -1 : 1) * calcMoveDistance(left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT));
 	m_walkDirectionLR[0] = distance * std::cos(m_state.yaw);
 	m_walkDirectionLR[1] = 0;
 	m_walkDirectionLR[2] = distance * std::sin(m_state.yaw);
@@ -147,9 +148,11 @@ const PositionState& Character::getPositionState()
 	return m_state;
 }
 
-void Character::action(MoveAction md)
+// rate表示移动的速度，如果来自键盘，那么应该为1，如果来自手柄，应该是手柄的delta/delta最大值
+void Character::action(MoveAction md, MoveRate rate)
 {
 	m_moveDirection = md;
+	m_moveRate = rate;
 }
 
 void Character::lookRight(GMfloat degree)

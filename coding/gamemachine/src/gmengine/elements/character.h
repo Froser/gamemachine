@@ -15,13 +15,41 @@ BEGIN_NS
 
 // bits:  r, l, b, f
 typedef GMbyte MoveAction;
-enum
+enum 
 {
 	MD_FORWARD = 1,
 	MD_BACKWARD = 2,
 	MD_LEFT = 4,
 	MD_RIGHT = 8,
 	MD_JUMP = 16,
+
+	// 以上MoveAction数目
+	MD_ACTION_COUNT = 5,
+};
+
+class MoveRate
+{
+public:
+	MoveRate()
+	{
+		for (GMuint i = 0; i < MD_ACTION_COUNT; i++)
+		{
+			m_moveRate[i] = 1;
+		}
+	}
+
+	void setMoveRate(MoveAction action, GMfloat rate)
+	{
+		m_moveRate[(GMint)std::log((GMfloat)action)] = rate;
+	}
+
+	GMfloat getMoveRate(MoveAction action)
+	{
+		return m_moveRate[(GMint)std::log((GMfloat)action)];
+	}
+
+private:
+	GMfloat m_moveRate[MD_ACTION_COUNT];
 };
 
 class Character : public GameObject
@@ -36,7 +64,7 @@ public:
 	void setCanFreeMove(bool freeMove);
 	void setMoveSpeed(GMfloat moveSpeed);
 	void simulation();
-	void action(MoveAction md);
+	void action(MoveAction md, MoveRate rate);
 	void lookUp(GMfloat degree);
 	void lookRight(GMfloat degree);
 	void setPitchLimitDegree(GMfloat deg);
@@ -55,7 +83,7 @@ protected:
 	virtual btCollisionObject* createCollisionObject() override;
 
 private:
-	GMfloat calcMoveDistance();
+	GMfloat calcMoveDistance(GMfloat rate);
 	GMfloat calcFallSpeed();
 	void moveForwardOrBackward(bool forward);
 	void moveLeftOrRight(bool left);
@@ -74,6 +102,7 @@ private:
 	GMfloat m_walkDirectionFB[3];
 	GMfloat m_walkDirectionLR[3];
 	MoveAction m_moveDirection;
+	MoveRate m_moveRate;
 
 	AutoPtr<btKinematicCharacterController> m_controller;
 	AutoPtr<btPairCachingGhostObject> m_ghostObject;

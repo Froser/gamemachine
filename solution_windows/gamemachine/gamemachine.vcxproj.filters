@@ -20,9 +20,6 @@
     <Filter Include="src\gmdatacore\imagereader">
       <UniqueIdentifier>{5a91d71d-2ba3-4006-909e-473282139808}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\gmengine\io">
-      <UniqueIdentifier>{696d3c57-5155-4967-bb98-86885d0bc26f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\gmgl">
       <UniqueIdentifier>{e408792a-3c5b-479f-bcd3-8f3e61d45704}</UniqueIdentifier>
     </Filter>
@@ -84,12 +81,6 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h">
       <Filter>src\gmdatacore\imagereader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.h">
-      <Filter>src\gmengine\io</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\io\mouse.h">
-      <Filter>src\gmengine\io</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h">
       <Filter>src</Filter>
@@ -266,12 +257,6 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\mouse.cpp">
-      <Filter>src\gmengine\io</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\io\keyboard.cpp">
-      <Filter>src\gmengine\io</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
       <Filter>src</Filter>

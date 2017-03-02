@@ -5,8 +5,6 @@
 #include "utilities/assert.h"
 #include "gamemachine.h"
 
-#define GM GameLoop::getInstance()->getHandler()->getGameMachine()
-
 static void renderLoop(int i)
 {
 	if (i == 0)
@@ -52,11 +50,9 @@ void GameLoop::drawFrame()
 
 	m_drawStopwatch.start();
 	if (m_handler->isWindowActivate())
-	{
-		m_handler->mouse();
-		m_handler->keyboard();
-	}
-	m_handler->render();
+		m_handler->event(GAME_LOOP_ACTIVATE_MESSAGE);
+
+	m_handler->event(GAME_LOOP_RENDER);
 	m_drawStopwatch.stop();
 	GMfloat elapsed = m_drawStopwatch.getMillisecond();
 
@@ -64,6 +60,8 @@ void GameLoop::drawFrame()
 	GMfloat wait = 1000 / m_settings.fps - elapsed;
 	if (wait > 0)
 		::Sleep(wait);
+#else
+#error we must sleep here
 #endif
 
 	GMfloat min = 1.f / m_settings.fps;

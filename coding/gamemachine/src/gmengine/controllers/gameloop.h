@@ -5,15 +5,19 @@
 #include "gmengine/controllers/graphic_engine.h"
 BEGIN_NS
 
+enum GameLoopEvent
+{
+	GAME_LOOP_RENDER,
+	GAME_LOOP_ACTIVATE_MESSAGE,
+};
+
 struct GameMachine;
 struct IGameHandler
 {
 	virtual void setGameMachine(GameMachine* gm) = 0;
 	virtual GameMachine* getGameMachine() = 0;
 	virtual void init() = 0;
-	virtual void mouse() = 0;
-	virtual void keyboard() = 0;
-	virtual void render() = 0;
+	virtual void event(GameLoopEvent evt) = 0;
 	virtual void logicalFrame(GMfloat elapsed) = 0;
 	virtual void onExit() = 0;
 	virtual bool isWindowActivate() = 0;

@@ -21,6 +21,7 @@ typedef unsigned short WORD;
 typedef unsigned long DWORD;
 typedef long LONG;
 typedef unsigned char BYTE;
+typedef short SHORT;
 #endif
 
 #define FREEGLUT_STATIC
