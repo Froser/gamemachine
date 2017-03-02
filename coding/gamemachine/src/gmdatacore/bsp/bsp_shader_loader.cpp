@@ -84,8 +84,7 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 
 static void loadImage(const char* filename, OUT Image** image)
 {
-	ImageReader imgReader;
-	if (imgReader.load(filename, image))
+	if (ImageReader::load(filename, image))
 		gm_info("loaded texture %s from shader", filename);
 	else
 		gm_error("texture %s not found", filename);

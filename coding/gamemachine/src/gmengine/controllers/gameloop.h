@@ -11,7 +11,7 @@ enum GameLoopEvent
 	GAME_LOOP_ACTIVATE_MESSAGE,
 };
 
-struct GameMachine;
+class GameMachine;
 struct IGameHandler
 {
 	virtual void setGameMachine(GameMachine* gm) = 0;

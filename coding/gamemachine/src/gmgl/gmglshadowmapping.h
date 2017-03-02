@@ -38,8 +38,8 @@ private:
 	GMGLGraphicEngine& m_engine;
 	bool m_beginDraw;
 	State m_state;
-	GMuint m_shadowMapWidth;
-	GMuint m_shadowMapHeight;
+	GMint m_shadowMapWidth;
+	GMint m_shadowMapHeight;
 };
 
 END_NS

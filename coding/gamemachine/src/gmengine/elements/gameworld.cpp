@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gameworld.h"
 #include "gameobject.h"
-#include "btBulletDynamicsCommon.h"
 #include "gmdatacore/object.h"
 #include "utilities/assert.h"
 #include "character.h"
@@ -14,30 +13,12 @@
 GameWorld::GameWorld()
 {
 	D(d);
-	d.collisionConfiguration.reset(new btDefaultCollisionConfiguration());
-	d.dispatcher.reset(new btCollisionDispatcher(d.collisionConfiguration));
-	d.overlappingPairCache.reset(new btDbvtBroadphase());
-	d.solver.reset(new btSequentialImpulseConstraintSolver);
-	d.ghostPairCallback.reset(new btGhostPairCallback());
-	d.dynamicsWorld.reset(new btDiscreteDynamicsWorld(d.dispatcher, d.overlappingPairCache, d.solver, d.collisionConfiguration));
-	d.dynamicsWorld->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(d.ghostPairCallback);
+	d.physics.reset(new PhysicsWorld());
 }
 
 GameWorld::~GameWorld()
 {
 	D(d);
-	for (int i = d.dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
-	{
-		btCollisionObject* obj = d.dynamicsWorld->getCollisionObjectArray()[i];
-		btRigidBody* body = btRigidBody::upcast(obj);
-		if (body && body->getMotionState())
-		{
-			delete body->getMotionState();
-		}
-		d.dynamicsWorld->removeCollisionObject(obj);
-		delete obj;
-	}
-
 	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
 	{
 		delete *iter;
@@ -60,18 +41,17 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	if (std::find(d.shapes.begin(), d.shapes.end(), obj) != d.shapes.end())
 		return;
 
-	obj->appendObjectToWorld(d.dynamicsWorld);
+	d.physics->addToPhysics(obj);
+	obj->setWorld(this);
+	obj->onAppendingObjectToWorld();
+
 	d.shapes.push_back(obj);
 
 	// 创建一个Painter
 	createPainterForObject(obj);
-
-	// Painter在transfer之后，会删除Object顶点数据，所以放到最后transfer
 	ObjectPainter* painter = obj->getObject()->getPainter();
 	if (painter)
 		painter->transfer();
-
-	obj->setWorld(this);
 }
 
 void GameWorld::appendLight(AUTORELEASE GameLight* light)
@@ -106,14 +86,14 @@ void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
 	D(d);
 	d.character->simulation();
-	d.dynamicsWorld->stepSimulation(elapsed, 0);
+	d.physics->simulate();
 	d.ellapsed += elapsed;
 }
 
-void GameWorld::setGravity(GMfloat x, GMfloat y, GMfloat z)
+PhysicsWorld* GameWorld::physicsWorld()
 {
 	D(d);
-	d.dynamicsWorld->setGravity(btVector3(x, y, z));
+	return d.physics;
 }
 
 IGraphicEngine* GameWorld::getGraphicEngine()

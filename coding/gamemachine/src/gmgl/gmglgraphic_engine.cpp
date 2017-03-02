@@ -22,7 +22,7 @@ struct __shadowSourcePred
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_world(nullptr)
-	, m_shadowMapping(*this)
+	, m_shadowMapping(*this) //TODO WARNING HERE
 	, m_settings(nullptr)
 {
 }

@@ -4,16 +4,10 @@
 #include "gameobject.h"
 #include "utilities/camera.h"
 #include "utilities/autoptr.h"
-#include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "utilities/frustum.h"
-
-class btMotionState;
-class btCollisionShape;
-class btKinematicCharacterController;
 
 BEGIN_NS
 
-// bits:  r, l, b, f
 typedef GMbyte MoveAction;
 enum 
 {
@@ -55,12 +49,10 @@ private:
 class Character : public GameObject
 {
 public:
-	Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight);
+	Character(const vmath::vec3& position, GMfloat radius, GMfloat height);
 
 public:
 	void setJumpSpeed(const vmath::vec3& jumpSpeed);
-	void setFallSpeed(GMfloat speed);
-
 	void setCanFreeMove(bool freeMove);
 	void setMoveSpeed(GMfloat moveSpeed);
 	void simulation();
@@ -76,15 +68,10 @@ public:
 
 public:
 	virtual void getReadyForRender(DrawingList& list) override;
-
-protected:
-	virtual btCollisionShape* createCollisionShape() override;
-	virtual void appendThisObjectToWorld(btDynamicsWorld* world) override;
-	virtual btCollisionObject* createCollisionObject() override;
+	virtual void onAppendingObjectToWorld() override;
 
 private:
 	GMfloat calcMoveDistance(GMfloat rate);
-	GMfloat calcFallSpeed();
 	void moveForwardOrBackward(bool forward);
 	void moveLeftOrRight(bool left);
 	void update();
@@ -95,7 +82,6 @@ private:
 	GMfloat m_radius;
 	GMfloat m_stepHeight;
 	vmath::vec3 m_jumpSpeed;
-	btScalar m_fallSpeed;
 	GMfloat m_moveSpeed;
 	GMfloat m_eyeOffset[3];
 	Frustum m_frustum;
@@ -104,14 +90,8 @@ private:
 	MoveAction m_moveDirection;
 	MoveRate m_moveRate;
 
-	AutoPtr<btKinematicCharacterController> m_controller;
-	AutoPtr<btPairCachingGhostObject> m_ghostObject;
-
 	PositionState m_state;
 	bool m_freeMove;
-
-	btDynamicsWorld* m_dynamicWorld;
-
 	CameraLookAt m_lookAt;
 };
 

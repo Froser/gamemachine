@@ -20,7 +20,7 @@ struct KeyboardState
 {
 	BYTE keystate[256];
 
-	bool operator [](BYTE key)
+	GMint operator [](BYTE key)
 	{
 		return keystate[key] & 0x80;
 	}

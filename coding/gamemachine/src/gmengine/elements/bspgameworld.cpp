@@ -205,7 +205,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 		component->getMaterial() = material;
 		component->beginFace();
 
-		for (GMuint i = 0; i < polygonFace.numVertices; i++)
+		for (GMint i = 0; i < polygonFace.numVertices; i++)
 		{
 			BSP_Drawing_Vertex& vertex = bsp.drawingVertices[i + polygonFace.firstVertexIndex];
 			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
@@ -409,7 +409,7 @@ void BSPGameWorld::initTextures()
 	IFactory* factory = getGameMachine()->getFactory();
 	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
 
-	for (GMuint i = 0; i < bsp.numShaders; i++)
+	for (GMint i = 0; i < bsp.numShaders; i++)
 	{
 		BSPShader& shader = bsp.shaders[i];
 		// 如果一个texture在shader中已经定义，那么不读取它了，而使用shader中的材质
@@ -449,12 +449,11 @@ bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 	};
 	static GMint dem = sizeof(priorities) / maxChars / sizeof(GMbyte);
 
-	ImageReader imgReader;
 	for (GMint i = 0; i < dem; i++)
 	{
 		std::string fn(textureFilename);
 		fn.append(priorities[i]);
-		if (imgReader.load(fn.c_str(), img))
+		if (ImageReader::load(fn.c_str(), img))
 		{
 			gm_info("loaded texture %s", fn.c_str());
 			return true;
@@ -474,7 +473,7 @@ void BSPGameWorld::initLightmaps()
 	const int BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
 	int numLightmaps = bsp.numLightBytes / (BSP_LIGHTMAP_SIZE * sizeof(GMbyte));
 
-	for (GMuint i = 0; i < numLightmaps; i++)
+	for (GMint i = 0; i < numLightmaps; i++)
 	{
 		GMbyte* lightmapBytes = bsp.lightBytes.data() + i * BSP_LIGHTMAP_SIZE;
 		ImageBuffer* imgBuf = new ImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);

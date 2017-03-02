@@ -3,9 +3,7 @@
 #include "common.h"
 #include <vector>
 #include "utilities/autoptr.h"
-#include "btBulletCollisionCommon.h"
-#include "btBulletDynamicsCommon.h"
-#include "BulletCollision/CollisionDispatch/btGhostObject.h"
+#include "gmphysics/physicsworld.h"
 
 BEGIN_NS
 
@@ -16,18 +14,12 @@ class GameLight;
 struct GameWorldPrivate
 {
 	GameWorldPrivate();
-
-	AutoPtr<btDefaultCollisionConfiguration> collisionConfiguration;
-	AutoPtr<btCollisionDispatcher> dispatcher;
-	AutoPtr<btBroadphaseInterface> overlappingPairCache;
-	AutoPtr<btSequentialImpulseConstraintSolver> solver;
-	AutoPtr<btGhostPairCallback> ghostPairCallback;
-	AutoPtr<btDiscreteDynamicsWorld> dynamicsWorld;
 	GameMachine* gameMachine;
 	std::vector<GameObject*> shapes;
 	std::vector<GameLight*> lights;
 	Character* character;
 	GMfloat ellapsed;
+	AutoPtr<PhysicsWorld> physics;
 };
 
 END_NS

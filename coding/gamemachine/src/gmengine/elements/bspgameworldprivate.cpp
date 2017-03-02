@@ -39,16 +39,14 @@ PARSE_FUNC(worldspawn, entity, world)
 			if (ambientLight)
 			{
 				ambientLight->setId(0);
-				ambientLight->setColor(btVector3(1, 1, 1));
-				ambientLight->setPosition(btVector3(0, 0, 0));
+				ambientLight->setColor(vmath::vec3(1, 1, 1));
+				ambientLight->setPosition(vmath::vec3(0, 0, 0));
 				ambientLight->setWorld(world);
 				ambientLight->setShadowSource(false);
 				world->appendLight(ambientLight);
 			}
 		}
 	}
-
-	world->setGravity(0, 0, 0);
 }
 
 PARSE_FUNC(info_player_deathmatch, entity, world)
@@ -76,17 +74,11 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 		}
 	}
 
-	btTransform playerStart;
-	playerStart.setIdentity();
 	vmath::vec3 center = (world->bspData().boundMax + world->bspData().boundMin) / 2;
-	playerStart.setOrigin(btVector3(center[0], 1.8, center[2]));
-	//playerStart.setOrigin(btVector3(0, 0.875,0));
-	//btQuaternion rotation(btVector3(0, 1, 0), RAD(yaw));
-	//playerStart.setRotation(rotation);
+	vmath::vec3 playerStart (center[0], 1.8, center[2]);
 
-	Character* character = new Character(playerStart, .6, .1, .1);
+	Character* character = new Character(playerStart, 6, 1);
 	character->setMoveSpeed(192);
-	character->setFallSpeed(250);
 	character->setJumpSpeed(vmath::vec3(0, 50, 0));
 	character->setCanFreeMove(true);
 	world->appendObjectAndInit(character);

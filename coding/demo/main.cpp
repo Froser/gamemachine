@@ -112,8 +112,8 @@ public:
 			glutSwapBuffers();
 			break;
 		case GAME_LOOP_ACTIVATE_MESSAGE:
-			static GMfloat mouseSensitivity = 0.25;
-			static GMfloat joystickSensitivity = 0.0003;
+			static GMfloat mouseSensitivity = 0.25f;
+			static GMfloat joystickSensitivity = 0.0003f;
 
 			Character* character = world->getMajorCharacter();
 			KeyboardState kbState = m_input.getKeyboardState();

@@ -140,16 +140,6 @@ void ChildObject::appendComponent(AUTORELEASE Component* component)
 	m_components.push_back(component);
 }
 
-void ChildObject::disposeMemory()
-{
-	m_vertices.clear();
-	m_normals.clear();
-	m_uvs.clear();
-	m_tangents.clear();
-	m_bitangents.clear();
-	m_lightmaps.clear();
-}
-
 void ChildObject::calculateTangentSpace()
 {
 	if (m_uvs.size() == 0)
@@ -164,7 +154,7 @@ void ChildObject::calculateTangentSpace()
 			GMint edgeCount = component->getPrimitiveVerticesCountPtr()[i];
 
 			// 开始计算每条边切线空间
-			for (GMuint j = 0; j < edgeCount; j++)
+			for (GMint j = 0; j < edgeCount; j++)
 			{
 				vmath::vec3 e0(m_vertices[(offset + j) * 4], m_vertices[(offset + j) * 4 + 1], m_vertices[(offset + j) * 4 + 3]);
 				vmath::vec3 e1, e2;

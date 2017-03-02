@@ -82,7 +82,6 @@ void GMGLObjectPainter::transfer()
 		glEnableVertexAttribArray(5);
 
 		glBindVertexArray(0);
-		childObj->disposeMemory();
 	}
 	END_FOREACH_OBJ
 

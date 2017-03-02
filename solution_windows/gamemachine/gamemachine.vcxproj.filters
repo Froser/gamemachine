@@ -32,6 +32,9 @@
     <Filter Include="src\gmdatacore\bsp">
       <UniqueIdentifier>{0943dc23-7934-4990-9ddf-9a15cf9d35f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gmphysics">
+      <UniqueIdentifier>{e696c9df-f741-4472-b49f-6a9ec00658e7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -115,9 +118,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
@@ -141,9 +141,6 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h">
       <Filter>src\gmgl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h">
-      <Filter>src\gmengine\elements</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h">
       <Filter>src\gmdatacore\imagereader</Filter>
@@ -217,6 +214,15 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\input.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h">
+      <Filter>src\gmphysics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstruct.h">
+      <Filter>src\gmphysics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h">
+      <Filter>src\gmphysics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -288,9 +294,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
@@ -320,9 +323,6 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp">
       <Filter>src\gmgl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp">
-      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
@@ -392,6 +392,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\input.cpp">
       <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.cpp">
+      <Filter>src\gmphysics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp">
+      <Filter>src\gmphysics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

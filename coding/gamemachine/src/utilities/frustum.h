@@ -2,7 +2,6 @@
 #define __FRUSTUM_H__
 #include "common.h"
 #include "plane.h"
-#include "LinearMath\btVector3.h"
 #include "vmath.h"
 BEGIN_NS
 

@@ -3,7 +3,6 @@
 #include "common.h"
 #include "gameobjectprivate.h"
 #include <vector>
-#include "btBulletCollisionCommon.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gameworld.h"
 
@@ -27,26 +26,11 @@ public:
 	virtual ~GameObject() {};
 
 public:
-	virtual void initPhysics(btDynamicsWorld* world);
-
 	void setId(GMuint id);
 	GMuint getId();
 
 	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
-	btCollisionObject* getCollisionObject();
-	btCollisionShape* getCollisionShape();
-
-	bool isDynamic();
-
-	virtual void setMass(btScalar mass);
-	btScalar getMass();
-
-	void setTransform(const btTransform& transform);
-	btTransform& getTransform();
-	virtual btTransform getRuntimeTransform();
-
-	virtual void setLocalScaling(const btVector3& scale);
 
 	virtual void setWorld(GameWorld* world);
 	GameWorld* getWorld();
@@ -54,7 +38,6 @@ public:
 	void setFrictions(const Frictions& frictions);
 	void setFrictions();
 
-	void appendObjectToWorld(btDynamicsWorld* world);
 
 	Keyframes& getKeyframesRotation();
 	Keyframes& getKeyframesTranslation();
@@ -64,16 +47,11 @@ public:
 
 public:
 	virtual void getReadyForRender(DrawingList& list);
-	virtual btCollisionObject* createCollisionObject() = 0;
-	virtual void appendThisObjectToWorld(btDynamicsWorld* world) = 0;
+	virtual void onAppendingObjectToWorld();
 
 protected:
 	virtual AnimationMatrices getAnimationMatrix();
-	virtual vmath::mat4 getTransformMatrix(btScalar glTrans[16]);
-	virtual void initPhysicsAfterCollisionObjectCreated();
-
-private:
-	virtual btCollisionShape* createCollisionShape() = 0;
+	virtual vmath::mat4 getTransformMatrix(GMfloat glTrans[16]);
 };
 
 END_NS

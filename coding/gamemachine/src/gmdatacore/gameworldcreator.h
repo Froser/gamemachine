@@ -4,7 +4,7 @@
 BEGIN_NS
 
 class BSPGameWorld;
-struct GameMachine;
+class GameMachine;
 class GameWorldCreator
 {
 public:

@@ -1,5 +1,8 @@
 ﻿#ifndef __COMMON_H__
 #define __COMMON_H__
+
+#pragma warning(disable:4244)
+
 #define BEGIN_NS namespace gm {
 #define END_NS }
 #define DEFINE_PRIVATE(className) \

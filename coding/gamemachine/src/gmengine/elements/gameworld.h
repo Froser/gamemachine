@@ -3,12 +3,6 @@
 #include "common.h"
 #include "gameworldprivate.h"
 
-class btDefaultCollisionConfiguration;
-class btCollisionDispatcher;
-class btBroadphaseInterface;
-class btSequentialImpulseConstraintSolver;
-class btDiscreteDynamicsWorld;
-
 BEGIN_NS
 class Character;
 class GameMachine;
@@ -34,8 +28,7 @@ public:
 	void setMajorCharacter(Character* character);
 	Character* getMajorCharacter();
 	void simulateGameWorld(GMfloat elapsed);
-	void setGravity(GMfloat x, GMfloat y, GMfloat z);
-
+	PhysicsWorld* physicsWorld();
 	IGraphicEngine* getGraphicEngine();
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();

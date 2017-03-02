@@ -1,54 +1,38 @@
 ﻿#include "stdafx.h"
 #include "character.h"
-#include "btBulletCollisionCommon.h"
-#include "btBulletDynamicsCommon.h"
-#include "BulletDynamics/Character/btKinematicCharacterController.h"
 #include "utilities/assert.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/controllers/gameloop.h"
 
-#define TO_BT(v) btVector3(v[0], v[1], v[2])
-
-Character::Character(const btTransform& position, btScalar radius, btScalar height, btScalar stepHeight)
+Character::Character(const vmath::vec3& position, GMfloat radius, GMfloat height)
 	: m_radius(radius)
 	, m_height(height)
-	, m_stepHeight(stepHeight)
-	, m_controller(nullptr)
 	, m_jumpSpeed(vmath::vec3(0, 10, 0))
-	, m_fallSpeed(10)
 	, m_freeMove(true)
-	, m_dynamicWorld(nullptr)
 	, m_moveSpeed(10)
-	, m_frustum(75, 1.333f, 0.1, 6400)
+	, m_frustum(75, 1.333f, 0.1f, 3200)
 	, m_moveDirection(0)
 {
-	setTransform(position);
 	memset(&m_state, 0, sizeof(m_state));
 	memset(&m_eyeOffset, 0, sizeof(m_eyeOffset));
 	memset(&m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
 	memset(&m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
 	memset(&m_moveRate, 0, sizeof(m_moveRate));
-	m_state.positionX = position.getOrigin().x();
-	m_state.positionY = position.getOrigin().y();
-	m_state.positionZ = position.getOrigin().z();
+	m_state.positionX = position[0];
+	m_state.positionY = position[1];
+	m_state.positionZ = position[2];
 	m_state.pitchLimitRad = HALF_PI - RAD(3);
 	setMoveSpeed(1);
 }
 
-btCollisionShape* Character::createCollisionShape()
-{
-	return new btCapsuleShape(m_radius, m_height);
-}
-
-void Character::appendThisObjectToWorld(btDynamicsWorld* world)
+void Character::onAppendingObjectToWorld()
 {
 	D(d);
 
 	// gravity
-	btPairCachingGhostObject* collisionObject = static_cast<btPairCachingGhostObject*>(d.collisionObject);
-	m_controller.reset(new btKinematicCharacterController(collisionObject, static_cast<btConvexShape*>(d.collisionShape.get()), m_stepHeight));
 	applyWalkDirection();
 
+	/*
 	if (m_freeMove)
 		m_controller->setGravity(btVector3(0, 0, 0));
 	else
@@ -59,16 +43,7 @@ void Character::appendThisObjectToWorld(btDynamicsWorld* world)
 		btBroadphaseProxy::StaticFilter | btBroadphaseProxy::AllFilter);
 	world->addAction(m_controller);
 	m_dynamicWorld = world;
-}
-
-btCollisionObject* Character::createCollisionObject()
-{
-	D(d);
-	btPairCachingGhostObject* ghostObj = new btPairCachingGhostObject();
-	ghostObj->setWorldTransform(d.transform);
-	ghostObj->setCollisionShape(d.collisionShape);
-	ghostObj->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
-	return ghostObj;
+		*/
 }
 
 GMfloat Character::calcMoveDistance(GMfloat rate)
@@ -80,17 +55,6 @@ GMfloat Character::calcMoveDistance(GMfloat rate)
 		return m_moveSpeed * rate * skipFrame / fps;
 	else
 		return m_moveSpeed * rate / fps;
-}
-
-GMfloat Character::calcFallSpeed()
-{
-	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
-	GMfloat fps = getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
-	GMfloat skipFrame = elapsed / (1.0f / fps);
-	if (skipFrame > 1)
-		return m_fallSpeed * skipFrame / fps;
-	else
-		return m_fallSpeed / fps;
 }
 
 void Character::moveForwardOrBackward(bool forward)
@@ -120,22 +84,16 @@ void Character::setJumpSpeed(const vmath::vec3& jumpSpeed)
 	m_jumpSpeed = jumpSpeed;
 }
 
-void Character::setFallSpeed(GMfloat speed)
-{
-	m_fallSpeed = speed;
-}
-
 void Character::setCanFreeMove(bool freeMove)
 {
 	m_freeMove = freeMove;
 
-	if (m_dynamicWorld)
-	{
-		if (m_freeMove)
-			m_controller->setGravity(btVector3(0, 0, 0));
-		else
-			m_controller->setGravity(m_dynamicWorld->getGravity());
-	}
+	/*
+	if (m_freeMove)
+		m_controller->setGravity(btVector3(0, 0, 0));
+	else
+		m_controller->setGravity(m_dynamicWorld->getGravity());
+		*/
 }
 
 void Character::setMoveSpeed(GMfloat moveSpeed)
@@ -181,7 +139,6 @@ void Character::setEyeOffset(GMfloat* offset)
 
 void Character::getReadyForRender(DrawingList& list)
 {
-
 }
 
 void Character::simulation()
@@ -215,13 +172,14 @@ void Character::simulation()
 		applyWalkDirection();
 	}
 
-	m_controller->setFallSpeed(calcFallSpeed());
 	if (m_moveDirection & MD_JUMP)
 	{
+		/*
 		if (m_controller->canJump())
 		{
 			m_controller->jump(TO_BT(m_jumpSpeed));
 		}
+		*/
 	}
 }
 
@@ -233,19 +191,34 @@ void Character::updateCamera()
 
 void Character::update()
 {
-	btTransform trans = m_controller->getGhostObject()->getWorldTransform();
-	m_state.positionX = trans.getOrigin().x() + m_eyeOffset[0];
-	m_state.positionY = trans.getOrigin().y() + m_eyeOffset[1];
-	m_state.positionZ = trans.getOrigin().z() + m_eyeOffset[2];
+	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	if (c)
+	{
+		m_state.positionX = c->translate[0] + m_eyeOffset[0];
+		m_state.positionY = c->translate[1] + m_eyeOffset[1];
+		m_state.positionZ = c->translate[2] + m_eyeOffset[2];
+	}
+	else
+	{
+		gm_error("cannot found character in physics world");
+	}
 }
 
 void Character::applyWalkDirection()
 {
-	m_controller->setWalkDirection(btVector3(
-		m_walkDirectionFB[0] + m_walkDirectionLR[0], 
-		m_walkDirectionFB[1] + m_walkDirectionLR[1],
-		m_walkDirectionFB[2] + m_walkDirectionLR[2])
-	);
+	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	if (c)
+	{
+		c->velocity = vmath::vec3(
+			m_walkDirectionFB[0] + m_walkDirectionLR[0],
+			m_walkDirectionFB[1] + m_walkDirectionLR[1],
+			m_walkDirectionFB[2] + m_walkDirectionLR[2]
+		);
+	}
+	else
+	{
+		gm_error("cannot found character in physics world");
+	}
 }
 
 CameraLookAt& Character::getLookAt()

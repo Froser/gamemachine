@@ -1,36 +1,11 @@
 ﻿#include "stdafx.h"
 #include "gameobject.h"
-#include "btBulletDynamicsCommon.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/elements/gameworld.h"
 
 GameObject::GameObject()
 {
 
-}
-
-void GameObject::initPhysics(btDynamicsWorld* world)
-{
-	D(d);
-	ASSERT(!d.collisionShape);
-	d.collisionShape.reset(createCollisionShape());
-
-	// scaling
-	btVector3 scaling = d.localScaling;
-	d.collisionShape->setLocalScaling(scaling);
-
-	// mass, localInertia, dynamic
-	if (d.mass == 0)
-		d.isDynamic = false;
-	else
-		d.isDynamic = true;
-
-	if (d.isDynamic)
-	{
-		btVector3 localInertia;
-		d.collisionShape->calculateLocalInertia(d.mass, localInertia);
-		d.localInertia = localInertia;
-	}
 }
 
 void GameObject::setId(GMuint id)
@@ -59,70 +34,6 @@ Object* GameObject::getObject()
 	return d.object;
 }
 
-btCollisionObject* GameObject::getCollisionObject()
-{
-	D(d);
-	return d.collisionObject;
-}
-
-btCollisionShape* GameObject::getCollisionShape()
-{
-	D(d);
-	return d.collisionShape;
-}
-
-void GameObject::setMass(btScalar mass)
-{
-	D(d);
-	d.mass = mass;
-}
-
-btScalar GameObject::getMass()
-{
-	D(d);
-	return d.mass;
-}
-
-bool GameObject::isDynamic()
-{
-	D(d);
-	return d.isDynamic;
-}
-
-void GameObject::setTransform(const btTransform& transform)
-{
-	D(d);
-	d.transform = transform;
-}
-
-btTransform& GameObject::getTransform()
-{
-	D(d);
-	return d.transform;
-}
-
-btTransform GameObject::getRuntimeTransform()
-{
-	D(d);
-	btTransform trans;
-	btRigidBody* body = btRigidBody::upcast(d.collisionObject);
-	if (body)
-	{
-		body->getMotionState()->getWorldTransform(trans);
-	}
-	else
-	{
-		ASSERT(false);
-	}
-	return trans;
-}
-
-void GameObject::setLocalScaling(const btVector3& scale)
-{
-	D(d);
-	d.localScaling = scale;
-}
-
 void GameObject::setWorld(GameWorld* world)
 {
 	D(d);
@@ -139,36 +50,26 @@ GameWorld* GameObject::getWorld()
 void GameObject::getReadyForRender(DrawingList& list)
 {
 	D(d);
-	btCollisionObject* obj = getCollisionObject();
 	vmath::mat4 M = vmath::mat4::identity();
 
-	if (obj)
+	if (d.animationState == Running)
 	{
-		btRigidBody* body = btRigidBody::upcast(obj);
-		if (body)
-		{
-			btTransform trans = getRuntimeTransform();
-
-			btScalar glTrans[16];
-			trans.getOpenGLMatrix(glTrans);
-
-			M = getTransformMatrix(glTrans);
-		}
-
-		if (d.animationState == Running)
-		{
-			AnimationMatrices mat = getAnimationMatrix();
-			M = mat.tranlation * M * mat.rotation * mat.scaling;
-		}
-
-		DrawingItem item;
-		memcpy(item.trans, M, sizeof(M));
-		item.gameObject = this;
-		list.push_back(item);
+		AnimationMatrices mat = getAnimationMatrix();
+		M = mat.tranlation * M * mat.rotation * mat.scaling;
 	}
+
+	DrawingItem item;
+	memcpy(item.trans, M, sizeof(M));
+	item.gameObject = this;
+	list.push_back(item);
 }
 
-vmath::mat4 GameObject::getTransformMatrix(btScalar glTrans[16])
+void GameObject::onAppendingObjectToWorld()
+{
+
+}
+
+vmath::mat4 GameObject::getTransformMatrix(GMfloat glTrans[16])
 {
 	vmath::mat4 T(
 		vmath::vec4(glTrans[0], glTrans[1], glTrans[2], glTrans[3]),
@@ -177,21 +78,6 @@ vmath::mat4 GameObject::getTransformMatrix(btScalar glTrans[16])
 		vmath::vec4(glTrans[12], glTrans[13], glTrans[14], glTrans[15])
 	);
 	return T;
-}
-
-void GameObject::appendObjectToWorld(btDynamicsWorld* world)
-{
-	D(d);
-	initPhysics(world);
-	d.collisionObject = createCollisionObject();
-	initPhysicsAfterCollisionObjectCreated();
-	appendThisObjectToWorld(world);
-}
-
-void GameObject::initPhysicsAfterCollisionObjectCreated()
-{
-	// frictions
-	setFrictions();
 }
 
 AnimationMatrices GameObject::getAnimationMatrix()
@@ -214,27 +100,6 @@ AnimationMatrices GameObject::getAnimationMatrix()
 	};
 
 	return mat;
-}
-
-void GameObject::setFrictions(const Frictions& frictions)
-{
-	D(d);
-	d.frictions = frictions;
-	setFrictions();
-}
-
-void GameObject::setFrictions()
-{
-	D(d);
-	if (!d.collisionObject)
-		return;
-
-	if (d.frictions.friction_flag)
-		d.collisionObject->setFriction(d.frictions.friction);
-	if (d.frictions.rollingFriction_flag)
-		d.collisionObject->setRollingFriction(d.frictions.rollingFriction);
-	if (d.frictions.spinningFriction_flag)
-		d.collisionObject->setSpinningFriction(d.frictions.spinningFriction);
 }
 
 Keyframes& GameObject::getKeyframesRotation()

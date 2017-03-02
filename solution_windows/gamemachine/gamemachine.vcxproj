@@ -37,14 +37,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
@@ -56,6 +54,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstruct.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\algorithm.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
@@ -98,14 +99,12 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\convexhullgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\rigidgameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
@@ -116,6 +115,8 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>

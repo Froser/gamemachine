@@ -6,9 +6,9 @@
 #include "utilities/autoptr.h"
 BEGIN_NS
 
-class IGraphicEngine;
+struct IGraphicEngine;
 class Image;
-class ITexture;
+struct ITexture;
 class ObjectPainter;
 class GameLight;
 class GMGLFactory : public IFactory

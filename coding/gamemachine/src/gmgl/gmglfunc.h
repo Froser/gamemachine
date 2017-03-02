@@ -5,7 +5,7 @@
 BEGIN_NS
 
 class GMGLShaders;
-class CameraLookAt;
+struct CameraLookAt;
 class Frustum;
 
 #define BEGIN_GMGL_FUNCS class GMGL { public:

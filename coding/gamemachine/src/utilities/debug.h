@@ -39,7 +39,7 @@ inline void format_time(char* in)
 #ifdef _WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
-	sprintf(in, "%d-%02d-%02d %02d:%02d:%02d",
+	sprintf_s(in, LINE_MAX, "%d-%02d-%02d %02d:%02d:%02d",
 		time.wYear,
 		time.wMonth,
 		time.wDay,
@@ -50,7 +50,7 @@ inline void format_time(char* in)
 #endif
 }
 
-#define f_time(t) char t[128]; format_time(t);
+#define f_time(t) char t[LINE_MAX]; format_time(t);
 inline void gm_print(const char *format, ...)
 {
 	f_time(t);

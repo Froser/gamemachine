@@ -3,7 +3,6 @@
 #include "common.h"
 #include "gmdatacore/object.h"
 #include "utilities/autoptr.h"
-#include "btBulletCollisionCommon.h"
 #include "gmengine/controllers/animation.h"
 #include <map>
 BEGIN_NS
@@ -32,17 +31,8 @@ struct GameObjectPrivate
 	GameObjectPrivate();
 	
 	GMuint id;
-	btVector3 localScaling;
-	btTransform transform;
-	btScalar mass;
-	bool isDynamic;
-	btVector3 localInertia;
-	AutoPtr<btCollisionShape> collisionShape;
-	btCollisionObject* collisionObject;
-	AutoPtr<btMotionState> motionState;
 	AutoPtr<Object> object;
 	GameWorld* world;
-	Frictions frictions;
 	Keyframes keyframesRotation;
 	Keyframes keyframesTranslation;
 	Keyframes keyframesScaling;

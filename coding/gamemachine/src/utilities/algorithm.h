@@ -1,8 +1,6 @@
 ﻿#ifndef __ALGORITHMN_H__
 #define __ALGORITHMN_H__
 #include "common.h"
-#include "LinearMath\btAlignedObjectArray.h"
-#include "LinearMath\btVector3.h"
 BEGIN_NS
 
 // interpolations

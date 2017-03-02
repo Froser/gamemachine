@@ -165,8 +165,6 @@ public:
 
 	void clone(OUT ChildObject** childObject);
 
-	void disposeMemory();
-
 	void appendComponent(AUTORELEASE Component* component);
 
 	void calculateTangentSpace();

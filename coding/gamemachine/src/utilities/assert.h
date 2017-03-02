@@ -5,8 +5,8 @@
 
 BEGIN_NS
 #define ASSERT(cond) ((!(cond)) ? Assert::assert(#cond, __FILE__, __LINE__) : Assert::noop())
-#ifdef assert(x)
-#undef assert(x)
+#ifdef assert
+#undef assert
 #endif
 class Assert
 {
