@@ -35,7 +35,7 @@ void Scanner::next(char* out)
 {
 	if (!m_valid)
 	{
-		strcpy(out, "");
+		strcpy_s(out, 1, "");
 		return;
 	}
 
@@ -43,7 +43,7 @@ void Scanner::next(char* out)
 	bool b = false;
 	if (!m_p)
 	{
-		strcpy(out, "");
+		strcpy_s(out, 1, "");
 		return;
 	}
 

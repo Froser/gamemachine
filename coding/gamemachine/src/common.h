@@ -69,5 +69,4 @@ END_NS
 	if (_str)							\
 		sscanf_s(_str, format, out);	\
 }
-
 #endif

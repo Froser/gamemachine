@@ -223,6 +223,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h">
       <Filter>src\gmphysics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworld.h">
+      <Filter>src\gmphysics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworldprivate.h">
+      <Filter>src\gmphysics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -397,6 +403,12 @@
       <Filter>src\gmphysics</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp">
+      <Filter>src\gmphysics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworld.cpp">
+      <Filter>src\gmphysics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworldprivate.cpp">
       <Filter>src\gmphysics</Filter>
     </ClCompile>
   </ItemGroup>

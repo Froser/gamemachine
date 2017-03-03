@@ -9,8 +9,8 @@
 
 bool loadPng(const char *filepath, PngData *out, bool flip = false)
 {
-	FILE *pic_fp;
-	pic_fp = fopen(filepath, "rb");
+	FILE *pic_fp = nullptr;
+	fopen_s(&pic_fp, filepath, "rb");
 	if (pic_fp == nullptr)
 		return false;
 

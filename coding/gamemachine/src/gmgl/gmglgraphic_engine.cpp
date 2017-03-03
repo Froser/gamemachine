@@ -22,9 +22,9 @@ struct __shadowSourcePred
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_world(nullptr)
-	, m_shadowMapping(*this) //TODO WARNING HERE
 	, m_settings(nullptr)
 {
+	m_shadowMapping.reset(new GMGLShadowMapping(*this));
 }
 
 GMGLGraphicEngine::~GMGLGraphicEngine()
@@ -39,7 +39,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 void GMGLGraphicEngine::initialize(GameWorld* world)
 {
 	m_world = world;
-	m_shadowMapping.init();
+	m_shadowMapping->init();
 }
 
 void GMGLGraphicEngine::newFrame()
@@ -54,9 +54,9 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 	GameLight* shadowSourceLight = getShadowSourceLight();
 	if (shadowSourceLight)
 	{
-		m_shadowMapping.beginDrawDepthBuffer(shadowSourceLight);
+		m_shadowMapping->beginDrawDepthBuffer(shadowSourceLight);
 		drawObjectsOnce(drawingList, !!shadowSourceLight);
-		m_shadowMapping.endDrawDepthBuffer();
+		m_shadowMapping->endDrawDepthBuffer();
 	}
 
 	drawObjectsOnce(drawingList, !!shadowSourceLight);
@@ -72,7 +72,7 @@ void GMGLGraphicEngine::applyGraphicSettings()
 
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 {
-	bool shadowMapping = m_shadowMapping.hasBegun();
+	bool shadowMapping = m_shadowMapping->hasBegun();
 	int i = 0;
 	GMGLShaders* lastShaders = nullptr;
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
@@ -82,7 +82,7 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 		BEGIN_FOREACH_OBJ(coreObj, coreChildObj)
 		{
 			ChildObject::ObjectType type = coreChildObj->getType();
-			GMGLShaders& shaders = shadowMapping ? m_shadowMapping.getShaders() : *getShaders(type);
+			GMGLShaders& shaders = shadowMapping ? m_shadowMapping->getShaders() : *getShaders(type);
 
 			shaders.useProgram();
 			GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
@@ -120,7 +120,7 @@ void GMGLGraphicEngine::setEyeViewport(bool shadowOn, GMGLShaders& shaders)
 
 	if (shadowOn)
 	{
-		const GMGLShadowMapping::State& state = m_shadowMapping.getState();
+		const GMGLShadowMapping::State& state = m_shadowMapping->getState();
 		glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
 		GMGL::uniformMatrix4(shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
 	}
@@ -153,7 +153,7 @@ GameLight* GMGLGraphicEngine::getShadowSourceLight()
 	return *result;
 }
 
-GMGLShadowMapping& GMGLGraphicEngine::getShadowMapping()
+GMGLShadowMapping* GMGLGraphicEngine::getShadowMapping()
 {
 	return m_shadowMapping;
 }

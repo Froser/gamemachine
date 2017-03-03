@@ -75,7 +75,7 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	}
 
 	vmath::vec3 center = (world->bspData().boundMax + world->bspData().boundMin) / 2;
-	vmath::vec3 playerStart (center[0], 1.8, center[2]);
+	vmath::vec3 playerStart (center[0], 108.f, center[2]);
 
 	Character* character = new Character(playerStart, 6, 1);
 	character->setMoveSpeed(192);
@@ -83,6 +83,10 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	character->setCanFreeMove(true);
 	world->appendObjectAndInit(character);
 	world->setMajorCharacter(character);
+
+	// Setup physical properties
+	CollisionProperties& prop = world->physicsWorld()->find(character)->properties;
+	prop.translation = playerStart;
 }
 
 void BSPGameWorldEntityReader::import(const BSPEntity& entity, BSPGameWorld* world)

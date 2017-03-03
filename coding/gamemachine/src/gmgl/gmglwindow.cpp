@@ -15,7 +15,7 @@ GMGLWindow::GMGLWindow(char* cmdLine, char* windowTitle, bool fullScreen)
 	glutInit(&argc, argv);
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
 
-	strcpy(m_windowTitle, windowTitle);
+	strcpy_s(m_windowTitle, windowTitle);
 }
 
 void GMGLWindow::initWindowSize(GMfloat width, GMfloat height)

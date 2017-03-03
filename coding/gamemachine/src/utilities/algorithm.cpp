@@ -3,7 +3,7 @@
 #include "gmdatacore/object.h"
 
 const GMfloat PI2 = 6.283185306f;
-const GMfloat PIPI2 = 19.73920879476716;
+const GMfloat PIPI2 = 19.73920879476716f;
 
 struct Point
 {

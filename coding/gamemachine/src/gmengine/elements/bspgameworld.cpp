@@ -16,6 +16,8 @@
 
 BSPGameWorld::BSPGameWorld()
 {
+	D(d);
+	d.physics.reset(new BSPPhysicsWorld(this));
 }
 
 void BSPGameWorld::loadBSP(const char* bspPath)
@@ -64,6 +66,19 @@ void BSPGameWorld::renderGameWorld()
 		engine->drawObjects(d.drawingList);
 }
 
+PhysicsWorld* BSPGameWorld::physicsWorld()
+{
+	D(d);
+	return d.physics;
+}
+
+void BSPGameWorld::setMajorCharacter(Character* character)
+{
+	D(d);
+	d.physics->setCamera(character);
+	GameWorld::setMajorCharacter(character);
+}
+
 void BSPGameWorld::calculateVisibleFaces()
 {
 	D(d);
@@ -73,7 +88,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	BSPData& bsp = d.bsp.bspData();
 
 	bsp.facesToDraw.clearAll();
-	GMint cameraLeaf = calculateCameraLeaf(vmath::vec3(pos.positionX, pos.positionY, pos.positionZ));
+	GMint cameraLeaf = calculateCameraLeaf(pos.position);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
 	for (int i = 0; i < bsp.numleafs; ++i)

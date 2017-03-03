@@ -88,8 +88,8 @@ public:
 		}
 
 		{
-			GMGLShadowMapping& shadow = engine->getShadowMapping();
-			GMGLShaders& shadowShaders = shadow.getShaders();
+			GMGLShadowMapping* shadow = engine->getShadowMapping();
+			GMGLShaders& shadowShaders = shadow->getShaders();
 			std::string vert = std::string(shaderPath).append("gmshadowmapping.vert"),
 				frag = std::string(shaderPath).append("gmshadowmapping.frag");
 			GMGLShaderInfo shadersInfo[] = {

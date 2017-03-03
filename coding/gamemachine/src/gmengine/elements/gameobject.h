@@ -6,8 +6,6 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "gameworld.h"
 
-class btDynamicsWorld;
-
 BEGIN_NS
 struct AnimationMatrices
 {
@@ -16,7 +14,6 @@ struct AnimationMatrices
 	vmath::mat4 scaling;
 };
 
-struct Frictions;
 class GameWorld;
 class GameObject
 {
@@ -34,10 +31,6 @@ public:
 
 	virtual void setWorld(GameWorld* world);
 	GameWorld* getWorld();
-
-	void setFrictions(const Frictions& frictions);
-	void setFrictions();
-
 
 	Keyframes& getKeyframesRotation();
 	Keyframes& getKeyframesTranslation();

@@ -29,7 +29,7 @@ public:
 	virtual void setGraphicSettings(GraphicSettings* settings) override;
 
 public:
-	GMGLShadowMapping& getShadowMapping();
+	GMGLShadowMapping* getShadowMapping();
 	GameWorld* getWorld();
 
 	void registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders);
@@ -45,7 +45,7 @@ private:
 
 private:
 	std::map<ChildObject::ObjectType, GMGLShaders*> m_allShaders;
-	GMGLShadowMapping m_shadowMapping;
+	AutoPtr<GMGLShadowMapping> m_shadowMapping;
 	GameWorld* m_world;
 	ResourceContainer m_resourceContainer;
 	GraphicSettings* m_settings;

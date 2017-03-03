@@ -5,13 +5,12 @@
 #include "physicsstruct.h"
 BEGIN_NS
 
+class GameWorld;
 struct PhysicsWorldPrivate
 {
 	PhysicsWorldPrivate();
 
-	CollisionTree tree;
-	CollisionObject camera;
-
+	GameWorld* world;
 	vmath::vec3 gravity;
 };
 

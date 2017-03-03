@@ -145,9 +145,10 @@ void SwapBSPFile(BSPPrivate& d) {
 
 char* copystring(const char *s)
 {
-	char	*b;
-	b = (char*)malloc(strlen(s) + 1);
-	strcpy(b, s);
+	char *b;
+	GMint len = strlen(s) + 1;
+	b = (char*)malloc(len);
+	strcpy_s(b, len, s);
 	return b;
 }
 
@@ -196,12 +197,12 @@ void SafeRead(FILE *f, void *buffer, int count)
 
 FILE *SafeOpenRead(const char *filename)
 {
-	FILE	*f;
+	FILE *f = nullptr;
 
-	f = fopen(filename, "rb");
+	fopen_s(&f, filename, "rb");
 
 	if (!f)
-		gm_error("Error opening %s: %s", filename, strerror(errno));
+		gm_error("Error opening %s.", filename);
 
 	return f;
 }

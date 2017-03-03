@@ -54,6 +54,8 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworld.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstruct.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h" />
@@ -115,6 +117,8 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworld.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
@@ -178,6 +182,7 @@
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PrecompiledHeader>Use</PrecompiledHeader>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -192,6 +197,7 @@
       <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/bullet3/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

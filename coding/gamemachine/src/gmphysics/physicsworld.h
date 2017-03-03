@@ -4,17 +4,18 @@
 #include "physicsworldprivate.h"
 BEGIN_NS
 
-class GameObject;
-class Character;
+class GameWorld;
 class PhysicsWorld
 {
 	DEFINE_PRIVATE(PhysicsWorld)
 
 public:
-	void addToPhysics(GameObject* obj);
-	void simulate();
-	CollisionObject* find(GameObject* o);
+	PhysicsWorld(GameWorld* world);
+	virtual ~PhysicsWorld();
 
+public:
+	virtual void simulate() = 0;
+	virtual CollisionObject* find(GameObject* obj) = 0;
 };
 
 END_NS

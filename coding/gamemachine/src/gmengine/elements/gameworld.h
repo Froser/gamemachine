@@ -19,20 +19,23 @@ public:
 
 public:
 	virtual void renderGameWorld() = 0;
+	virtual PhysicsWorld* physicsWorld() = 0;
 
 public:
 	void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
 	void appendLight(AUTORELEASE GameLight* light);
 	std::vector<GameLight*>& getLights();
-	void setMajorCharacter(Character* character);
-	Character* getMajorCharacter();
 	void simulateGameWorld(GMfloat elapsed);
-	PhysicsWorld* physicsWorld();
 	IGraphicEngine* getGraphicEngine();
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();
 	GMfloat getElapsed();
+
+	// characters:
+public:
+	virtual void setMajorCharacter(Character* character);
+	Character* getMajorCharacter();
 
 private:
 	void createPainterForObject(GameObject* obj);

@@ -14,7 +14,7 @@ struct PositionState
 {
 	GMfloat yaw;
 	GMfloat pitch;
-	GMfloat positionX, positionY, positionZ;
+	vmath::vec3 position;
 	GMfloat pitchLimitRad;
 };
 

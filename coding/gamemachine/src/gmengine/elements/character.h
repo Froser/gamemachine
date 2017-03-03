@@ -83,7 +83,7 @@ private:
 	GMfloat m_stepHeight;
 	vmath::vec3 m_jumpSpeed;
 	GMfloat m_moveSpeed;
-	GMfloat m_eyeOffset[3];
+	vmath::vec3 m_eyeOffset;
 	Frustum m_frustum;
 	GMfloat m_walkDirectionFB[3];
 	GMfloat m_walkDirectionLR[3];

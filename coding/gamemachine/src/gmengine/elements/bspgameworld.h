@@ -20,6 +20,8 @@ public:
 
 public:
 	virtual void renderGameWorld() override;
+	virtual PhysicsWorld* physicsWorld() override;
+	virtual void setMajorCharacter(Character* character) override;
 
 	//renders:
 private:
@@ -47,7 +49,7 @@ private:
 	void initLightmaps();
 	void importEntities();
 
-	// this is ususally used by BSPShaderLoader, BSPGameWorldEntityReader
+	// this is ususally used by BSPShaderLoader, BSPGameWorldEntityReader, etc
 public:
 	const char* bspWorkingDirectory();
 	BSPData& bspData();

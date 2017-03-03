@@ -12,8 +12,6 @@
 
 GameWorld::GameWorld()
 {
-	D(d);
-	d.physics.reset(new PhysicsWorld());
 }
 
 GameWorld::~GameWorld()
@@ -41,7 +39,6 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	if (std::find(d.shapes.begin(), d.shapes.end(), obj) != d.shapes.end())
 		return;
 
-	d.physics->addToPhysics(obj);
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 
@@ -86,14 +83,8 @@ void GameWorld::simulateGameWorld(GMfloat elapsed)
 {
 	D(d);
 	d.character->simulation();
-	d.physics->simulate();
+	physicsWorld()->simulate();
 	d.ellapsed += elapsed;
-}
-
-PhysicsWorld* GameWorld::physicsWorld()
-{
-	D(d);
-	return d.physics;
 }
 
 IGraphicEngine* GameWorld::getGraphicEngine()

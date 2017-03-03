@@ -54,8 +54,8 @@ void IMPL uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textur
 	GLint loc = glGetUniformLocation(shaders.getProgram(), textureName);
 	glUniform1i(loc, id);
 	char _switch[64] = "";
-	strcat(_switch, textureName);
-	strcat(_switch, "_switch");
+	strcat_s(_switch, textureName);
+	strcat_s(_switch, "_switch");
 	loc = glGetUniformLocation(shaders.getProgram(), _switch);
 	glUniform1i(loc, 1);
 }

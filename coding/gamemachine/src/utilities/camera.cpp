@@ -9,7 +9,7 @@ void Camera::calcCameraLookAt(const PositionState& state, REF CameraLookAt* look
 	lookAt->lookAt_x = l * std::sin(state.yaw);
 	lookAt->lookAt_z = -l * std::cos(state.yaw);
 
-	lookAt->position_x = state.positionX;
-	lookAt->position_y = state.positionY;
-	lookAt->position_z = state.positionZ;
+	lookAt->position_x = state.position[0];
+	lookAt->position_y = state.position[1];
+	lookAt->position_z = state.position[2];
 }

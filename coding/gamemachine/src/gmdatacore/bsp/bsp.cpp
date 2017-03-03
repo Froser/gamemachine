@@ -1,9 +1,10 @@
 ﻿#include "stdafx.h"
 #include "bsp.h"
 #include <stdio.h>
-#include "utilities\assert.h"
-#include "utilities\path.h"
+#include "utilities/assert.h"
+#include "utilities/path.h"
 #include "bsp_interior.inl"
+#include "utilities/scanner.h"
 
 static const char* getValue(const BSPEntity* entity, const char* key)
 {
@@ -131,7 +132,7 @@ void BSP::readFile()
 {
 	D(d);
 	FILE* file = nullptr;
-	file = fopen(d.filename.c_str(), "rb");
+	fopen_s(&file, d.filename.c_str(), "rb");
 	if (file)
 	{
 		GMuint size;
@@ -251,7 +252,10 @@ void BSP::parseEntities()
 		const char* gridSize = getValue(entity, "gridsize");
 		if (gridSize)
 		{
-			SAFE_SSCANF(gridSize, "%f %f %f", &d.lightVols.lightVolSize[0], &d.lightVols.lightVolSize[1], &d.lightVols.lightVolSize[2]);
+			Scanner s(gridSize);
+			s.nextFloat(&d.lightVols.lightVolSize[0]);
+			s.nextFloat(&d.lightVols.lightVolSize[1]);
+			s.nextFloat(&d.lightVols.lightVolSize[2]);
 			gm_info("gridSize reseted to %f, %f, %f", &d.lightVols.lightVolSize[0], &d.lightVols.lightVolSize[1], &d.lightVols.lightVolSize[2]);
 		}
 	}
@@ -264,7 +268,7 @@ void BSP::parseFromMemory(char *buffer, int size)
 	d.script++;
 	if (d.script == &d.scriptstack[MAX_INCLUDES])
 		gm_error("script file exceeded MAX_INCLUDES");
-	strcpy(d.script->filename, "memory buffer");
+	strcpy_s(d.script->filename, "memory buffer");
 
 	d.script->buffer = buffer;
 	d.script->line = 1;
@@ -462,7 +466,7 @@ void BSP::addScriptToStack(const char *filename)
 	d.script++;
 	if (d.script == &d.scriptstack[MAX_INCLUDES])
 		gm_error("script file exceeded MAX_INCLUDES");
-	strcpy(d.script->filename, expandPath(filename).c_str());
+	strcpy_s(d.script->filename, expandPath(filename).c_str());
 
 	size = LoadFile(d.script->filename, (void **)&d.script->buffer);
 

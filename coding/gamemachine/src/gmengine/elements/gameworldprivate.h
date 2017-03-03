@@ -19,7 +19,6 @@ struct GameWorldPrivate
 	std::vector<GameLight*> lights;
 	Character* character;
 	GMfloat ellapsed;
-	AutoPtr<PhysicsWorld> physics;
 };
 
 END_NS

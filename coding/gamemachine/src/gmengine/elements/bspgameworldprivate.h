@@ -7,10 +7,10 @@
 #include <string>
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
+#include "gmphysics/bspphysicsworld.h"
 BEGIN_NS
 
 class GameObject;
-class BSPGameWorld;
 struct BSPGameWorldPrivate
 {
 	BSPGameWorldPrivate()
@@ -19,6 +19,7 @@ struct BSPGameWorldPrivate
 	{
 	}
 
+	AutoPtr<BSPPhysicsWorld> physics;
 	BSP bsp;
 	std::string bspWorkingDirectory;
 	GameObject* sky;
@@ -34,6 +35,7 @@ struct BSPGameWorldPrivate
 	bool ready;
 };
 
+class BSPGameWorld;
 struct BSPGameWorldEntityReader
 {
 	static void import(const BSPEntity& entity, BSPGameWorld* world);
