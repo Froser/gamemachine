@@ -13,7 +13,10 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 void BSPPhysicsWorld::simulate()
 {
 	D(d);
+	BSPData& bsp = d.world->bspData();
+
 	d.camera.properties.translation += d.camera.properties.velocity;
+	GMint node = d.world->calculateLeafNode(d.camera.properties.translation);
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)

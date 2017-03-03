@@ -88,7 +88,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	BSPData& bsp = d.bsp.bspData();
 
 	bsp.facesToDraw.clearAll();
-	GMint cameraLeaf = calculateCameraLeaf(pos.position);
+	GMint cameraLeaf = calculateLeafNode(pos.position);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
 	for (int i = 0; i < bsp.numleafs; ++i)
@@ -110,7 +110,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-int BSPGameWorld::calculateCameraLeaf(const vmath::vec3& cameraPosition)
+GMint BSPGameWorld::calculateLeafNode(const vmath::vec3& position)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -121,7 +121,7 @@ int BSPGameWorld::calculateCameraLeaf(const vmath::vec3& cameraPosition)
 	while (currentNode >= 0)
 	{
 		//if the camera is in front of the plane for this node, assign i to be the front node
-		if (bsp.drawingPlanes[bsp.nodes[currentNode].planeNum].classifyPoint(cameraPosition) == POINT_IN_FRONT_OF_PLANE)
+		if (bsp.drawingPlanes[bsp.nodes[currentNode].planeNum].classifyPoint(position) == POINT_IN_FRONT_OF_PLANE)
 			currentNode = bsp.nodes[currentNode].children[0]; //front
 		else
 			currentNode = bsp.nodes[currentNode].children[1]; //back

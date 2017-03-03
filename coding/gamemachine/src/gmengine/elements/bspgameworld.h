@@ -37,7 +37,6 @@ private:
 	void draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material);
 	template <typename T> bool setMaterialTexture(T face, REF Material& m);
 	void setMaterialLightmap(GMint lightmapid, REF Material& m);
-	int calculateCameraLeaf(const vmath::vec3& cameraPosition);
 	int isClusterVisible(int cameraCluster, int testCluster);
 
 	//imports:
@@ -49,8 +48,9 @@ private:
 	void initLightmaps();
 	void importEntities();
 
-	// this is ususally used by BSPShaderLoader, BSPGameWorldEntityReader, etc
+	// this is ususally used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
 public:
+	GMint calculateLeafNode(const vmath::vec3& position);
 	const char* bspWorkingDirectory();
 	BSPData& bspData();
 };

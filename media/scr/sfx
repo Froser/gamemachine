@@ -58,4 +58,10 @@
 		<map>textures/gothic_light/pentagram_light1.jpg</map>
 		<map>textures/gothic_light/pentagram_light1_blend.jpg</map>
 	</item>
+	<item name="textures/liquids/lavahell">
+		<surfaceparm>noimpact</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<cull>none</cull>
+		<map tcMod="scroll 0.1 0.1" >textures/liquids/lavahell.jpg</map>
+	</item>
 </gmshader>
