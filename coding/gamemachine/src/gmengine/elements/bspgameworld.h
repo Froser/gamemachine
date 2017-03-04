@@ -47,10 +47,10 @@ private:
 	bool findTexture(const char* textureFilename, OUT Image** img);
 	void initLightmaps();
 	void importEntities();
-
-	// this is ususally used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
-public:
 	GMint calculateLeafNode(const vmath::vec3& position);
+
+	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
+public:
 	const char* bspWorkingDirectory();
 	BSPData& bspData();
 };

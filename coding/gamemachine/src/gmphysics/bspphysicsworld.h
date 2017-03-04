@@ -19,6 +19,9 @@ public:
 
 public:
 	void setCamera(GameObject* obj);
+
+private:
+	void getTouchedLeafs(GMint nodeNum);
 };
 
 END_NS

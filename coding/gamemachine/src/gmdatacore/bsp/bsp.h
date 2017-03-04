@@ -80,10 +80,7 @@ typedef struct {
 	int			contentFlags;
 } BSPShader;
 
-typedef struct {
-	float		normal[3];
-	float		dist;
-} BSPPlane;
+typedef Plane BSPPlane;
 
 typedef struct {
 	int			planeNum;
@@ -379,7 +376,6 @@ struct BSPPrivate
 	std::vector<BSP_Drawing_MeshFace> drawingMeshFaces;
 	std::vector<BSP_Drawing_Patch> drawingPatches;
 	std::vector<BSP_Drawing_Leaf> drawingLeafs;
-	std::vector<Plane> drawingPlanes;
 	BSP_VisibilityData visibilityData;
 	BSP_Drawing_LightVolumes lightVols;
 

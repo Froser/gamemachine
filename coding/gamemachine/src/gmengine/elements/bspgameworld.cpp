@@ -121,7 +121,7 @@ GMint BSPGameWorld::calculateLeafNode(const vmath::vec3& position)
 	while (currentNode >= 0)
 	{
 		//if the camera is in front of the plane for this node, assign i to be the front node
-		if (bsp.drawingPlanes[bsp.nodes[currentNode].planeNum].classifyPoint(position) == POINT_IN_FRONT_OF_PLANE)
+		if (bsp.planes[bsp.nodes[currentNode].planeNum].classifyPoint(position) == POINT_IN_FRONT_OF_PLANE)
 			currentNode = bsp.nodes[currentNode].children[0]; //front
 		else
 			currentNode = bsp.nodes[currentNode].children[1]; //back

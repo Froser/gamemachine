@@ -725,17 +725,15 @@ void BSP::generateBSPData()
 
 	//planes
 	//reverse the intercept on the planes and convert planes to OGL coordinates
-	d.drawingPlanes.resize(d.numplanes);
 	for (GMint i = 0; i < d.numplanes; ++i)
 	{
-		d.drawingPlanes[i] = Plane(vmath::vec3(d.planes[i].normal[0], d.planes[i].normal[1], d.planes[i].normal[2]), d.planes[i].dist);
 		//swap y and z and negate z
-		GMfloat temp = d.drawingPlanes[i].normal[1];
-		d.drawingPlanes[i].normal[1] = d.drawingPlanes[i].normal[2];
-		d.drawingPlanes[i].normal[2] = -temp;
+		GMfloat temp = d.planes[i].normal[1];
+		d.planes[i].normal[1] = d.planes[i].normal[2];
+		d.planes[i].normal[2] = -temp;
 
-		d.drawingPlanes[i].intercept = -d.drawingPlanes[i].intercept;
-		// d.drawingPlanes[i].intercept /= SCALING_DOWN;	//scale down
+		d.planes[i].intercept = -d.planes[i].intercept;
+		// d.planes[i].intercept /= SCALING_DOWN;	//scale down
 	}
 
 	// visBytes头两个int表示clusters，后面的字节表示bitsets
