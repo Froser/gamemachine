@@ -7,7 +7,12 @@ BEGIN_NS
 
 class GameObject;
 
-struct CollisionProperties
+struct ShapeProperties
+{
+	GMfloat radius;
+};
+
+struct MotionProperties
 {
 	vmath::vec3 translation;
 	vmath::vec3 velocity;
@@ -16,7 +21,8 @@ struct CollisionProperties
 struct CollisionObject
 {
 	GameObject* object;
-	CollisionProperties properties;
+	MotionProperties motions;
+	ShapeProperties shapeProps;
 };
 
 struct CollisionTree : public std::map<GameObject*, CollisionObject>

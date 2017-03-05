@@ -11,16 +11,16 @@ enum PointPosition
 	POINT_BEHIND_PLANE,
 };
 
-class Plane
+struct Plane
 {
-public:
 	Plane() : normal(vmath::vec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{}
 	Plane(const vmath::vec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
 	{}
 	Plane(const Plane & rhs)
 	{
-		normal = rhs.normal;	intercept = rhs.intercept;
+		normal = rhs.normal;
+		intercept = rhs.intercept;
 	}
 
 	~Plane() {}

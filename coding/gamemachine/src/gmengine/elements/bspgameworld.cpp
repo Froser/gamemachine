@@ -26,6 +26,7 @@ void BSPGameWorld::loadBSP(const char* bspPath)
 	d.bspWorkingDirectory = Path::directoryName(bspPath);
 	d.bsp.loadBsp(bspPath);
 	importBSP();
+	d.physics->initBSPPhysicsWorld();
 }
 
 void BSPGameWorld::setSky(AUTORELEASE GameObject* sky)
@@ -137,10 +138,6 @@ int BSPGameWorld::isClusterVisible(int cameraCluster, int testCluster)
 	BSPData& bsp = d.bsp.bspData();
 
 	int index = cameraCluster * bsp.visibilityData.bytesPerCluster + testCluster / 8;
-
-	if (index < 0)
-		return 1;
-
 	int returnValue = bsp.visibilityData.bitset[index] & (1 << (testCluster & 7));
 	return returnValue;
 }

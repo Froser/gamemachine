@@ -4,9 +4,8 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/controllers/gameloop.h"
 
-Character::Character(const vmath::vec3& position, GMfloat radius, GMfloat height)
+Character::Character(GMfloat radius)
 	: m_radius(radius)
-	, m_height(height)
 	, m_jumpSpeed(vmath::vec3(0, 10, 0))
 	, m_freeMove(true)
 	, m_moveSpeed(10)
@@ -18,7 +17,6 @@ Character::Character(const vmath::vec3& position, GMfloat radius, GMfloat height
 	memset(&m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
 	memset(&m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
 	memset(&m_moveRate, 0, sizeof(m_moveRate));
-	m_state.position = position;
 	m_state.pitchLimitRad = HALF_PI - RAD(3);
 	setMoveSpeed(1);
 }
@@ -27,7 +25,6 @@ void Character::onAppendingObjectToWorld()
 {
 	D(d);
 
-	// gravity
 	applyWalkDirection();
 
 	/*
@@ -58,9 +55,6 @@ GMfloat Character::calcMoveDistance(GMfloat rate)
 void Character::moveForwardOrBackward(bool forward)
 {
 	GMfloat distance = (forward ? 1 : -1 ) * calcMoveDistance(forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD));
-	if (m_freeMove)
-		m_state.position[1] += distance * std::sin(m_state.pitch);
-
 	GMfloat l = m_freeMove ? distance * std::cos(m_state.pitch) : distance;
 	m_walkDirectionFB[0] = l * std::sin(m_state.yaw);
 	m_walkDirectionFB[1] = m_freeMove ? distance * std::sin(m_state.pitch) : 0;
@@ -192,7 +186,7 @@ void Character::update()
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 	{
-		m_state.position = c->properties.translation + m_eyeOffset;
+		m_state.position = c->motions.translation + m_eyeOffset;
 	}
 	else
 	{
@@ -205,7 +199,7 @@ void Character::applyWalkDirection()
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 	{
-		c->properties.velocity = vmath::vec3(
+		c->motions.velocity = vmath::vec3(
 			m_walkDirectionFB[0] + m_walkDirectionLR[0],
 			m_walkDirectionFB[1] + m_walkDirectionLR[1],
 			m_walkDirectionFB[2] + m_walkDirectionLR[2]

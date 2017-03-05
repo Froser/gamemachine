@@ -18,10 +18,15 @@ public:
 	virtual CollisionObject* find(GameObject* obj) override;
 
 public:
+	void initBSPPhysicsWorld();
 	void setCamera(GameObject* obj);
 
 private:
-	void getTouchedLeafs(GMint nodeNum);
+	void generatePhysicsPlaneData();
+	void trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin);
+	void positionTest(BSPTraceWork& tw);
+	void getTouchedLeafs(REF BSPLeafList& leafList, int nodeNum);
+	void storeLeafs(REF BSPLeafList& lst, GMint nodeNum);
 };
 
 END_NS

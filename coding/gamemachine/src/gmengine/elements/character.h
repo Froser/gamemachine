@@ -49,7 +49,7 @@ private:
 class Character : public GameObject
 {
 public:
-	Character(const vmath::vec3& position, GMfloat radius, GMfloat height);
+	Character(GMfloat radius);
 
 public:
 	void setJumpSpeed(const vmath::vec3& jumpSpeed);
@@ -78,9 +78,7 @@ private:
 	void applyWalkDirection();
 
 private:
-	GMfloat m_height;
 	GMfloat m_radius;
-	GMfloat m_stepHeight;
 	vmath::vec3 m_jumpSpeed;
 	GMfloat m_moveSpeed;
 	vmath::vec3 m_eyeOffset;
