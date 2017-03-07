@@ -31,7 +31,30 @@ struct BSPLeafList
 	GMint lastLeaf;
 };
 
-struct BSPTrace {
+struct BSPPatchPlane {
+	vmath::vec4 plane;
+	int signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
+};
+
+typedef struct {
+	GMint surfacePlane;
+	GMint numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
+	GMint borderPlanes[4 + 6 + 16];
+	GMint borderInward[4 + 6 + 16];
+	bool borderNoAdjust[4 + 6 + 16];
+} BSPFacet;
+
+struct BSPPatchCollide
+{
+	vmath::vec3 bounds[2];
+	int numPlanes; // surface planes plus edge planes
+	BSPPatchPlane	*planes; // TODO need release
+	int numFacets;
+	BSPFacet* facets; //TODO need release
+};
+
+struct BSPTrace
+{
 	bool allsolid; // if true, plane is not valid
 	bool startsolid; // if true, the initial point was in a solid area
 	float fraction; // time completed, 1.0 = didn't hit anything
@@ -50,6 +73,35 @@ struct BSPSphere
 	vmath::vec3 offset;
 };
 
+struct BSP_Physics_BrushSide
+{
+	BSPBrushSide* side;
+	BSP_Physics_Plane* plane;
+	GMint surfaceFlags;
+};
+
+struct BSP_Physics_Brush
+{
+	BSPBrush* brush;
+	GMint contents;
+	vmath::vec3 bounds[2];
+	BSP_Physics_BrushSide *sides;
+	GMint checkcount;
+};
+
+struct BSP_Physics_Patch
+{
+	int checkcount;
+	int surfaceFlags;
+	int contents;
+	BSPPatchCollide *pc;
+
+	~BSP_Physics_Patch()
+	{
+		delete pc;
+	}
+};
+
 struct BSPTraceWork
 {
 	vmath::vec3 start;
@@ -61,9 +113,20 @@ struct BSPTraceWork
 	vmath::vec3 bounds[2];	// enclosing box of start and end surrounding by size
 	vmath::vec3 modelOrigin;// origin of the model tracing through
 	GMint contents; // ored contents of the model tracing through
-	//qboolean	isPoint; // optimized case
+	bool isPoint; // optimized case
 	BSPTrace trace; // returned from trace call
 	BSPSphere sphere; // sphere for oriendted capsule collision
+};
+
+#define	MAX_GRID_SIZE	129
+
+struct BSPGrid
+{
+	GMint width;
+	GMint height;
+	bool wrapWidth;
+	bool wrapHeight;
+	vmath::vec3 points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
 };
 
 class BSPGameWorld;
@@ -73,6 +136,12 @@ struct BSPPhysicsWorldPrivate
 	CollisionObject camera;
 
 	std::vector<BSP_Physics_Plane> planes;
+	std::vector<BSP_Physics_Brush> brushes;
+	std::vector<BSP_Physics_BrushSide> brushsides;
+	std::vector<BSP_Physics_Patch> patches;
+
+//tags:
+	GMint checkcount;
 };
 
 END_NS
