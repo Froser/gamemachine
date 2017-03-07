@@ -56,7 +56,7 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	if (world->getMajorCharacter())
 		return;
 
-	BSPVector3 origin = { 0, 0, 0 };
+	BSPVector3 origin = BSPVector3(0);
 	GMfloat yaw = 0;
 
 	EACH_PAIR_OF_ENTITY(entity, e)

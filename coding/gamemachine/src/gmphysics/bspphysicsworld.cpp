@@ -50,7 +50,7 @@ struct BSPWinding
 
 	static BSPWinding* alloc(GMint pointNum)
 	{
-		BSPWinding* p = new BSPWinding();
+		BSPWinding* p = GM_new<BSPWinding>();
 		p->p = new vmath::vec3[pointNum];
 		p->mysize = sizeof(vmath::vec3) * pointNum;
 		memset(p->p, 0, p->mysize);
@@ -1190,9 +1190,9 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	pf->numPlanes = context.numPlanes;
 	pf->numFacets = context.numFacets;
 
-	pf->facets = new BSPFacet();
+	pf->facets = GM_new<BSPFacet>();
 	memcpy(pf->facets, context.facets, context.numFacets * sizeof(*pf->facets));
-	pf->planes = new BSPPatchPlane();
+	pf->planes = GM_new<BSPPatchPlane>();
 	memcpy(pf->planes, context.planes, context.numPlanes * sizeof(*pf->planes));
 }
 
@@ -1277,7 +1277,7 @@ void BSPPhysicsWorld::generatePhysicsBrushSideData()
 	{
 		BSP_Physics_BrushSide* bs = &d.brushsides[i];
 		bs->side = &bsp.brushsides[i];
-		bs->plane = &d.planes[bsp.brushsides[i].planeNum];
+		bs->plane = &d.planes[bs->side->planeNum];
 		bs->surfaceFlags = bsp.shaders[bs->side->shaderNum].surfaceFlags;
 	}
 }
@@ -1313,23 +1313,23 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 		if (bsp.drawSurfaces[i].surfaceType != MST_PATCH)
 			continue;
 
-		BSPDrawVertices* v = &bsp.vertices[bsp.drawSurfaces[i].firstVert];
 		GMint width = bsp.drawSurfaces[i].patchWidth, height = bsp.drawSurfaces[i].patchHeight;
 		GMint c = width * height;
 		std::vector<vmath::vec3> points;
 		points.resize(c);
+		BSPDrawVertices* v = &bsp.vertices[bsp.drawSurfaces[i].firstVert];
 		for (GMint j = 0; j < c; j++)
 		{
-			points[j][0] = v->xyz[0];
-			points[j][1] = v->xyz[1];
-			points[j][2] = v->xyz[2];
+			points[j] = v->xyz;
 		}
 		GMint shaderNum = bsp.drawSurfaces[i].shaderNum;
 
-		BSP_Physics_Patch patch;
-		patch.contents = bsp.shaders[shaderNum].contentFlags;
-		patch.surfaceFlags = bsp.shaders[shaderNum].surfaceFlags;
-		generatePatchCollide(width, height, points.data(), &patch.pc); //TODO
+		BSP_Physics_Patch* patch = GM_new<BSP_Physics_Patch>();
+		patch->contents = bsp.shaders[shaderNum].contentFlags;
+		patch->surfaceFlags = bsp.shaders[shaderNum].surfaceFlags;
+		generatePatchCollide(width, height, points.data(), &patch->pc);
+
+		d.patches.push_back(patch);
 	}
 }
 
@@ -1583,7 +1583,7 @@ void BSPPhysicsWorld::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 	}
 
 	for (GMint k = 0; k < leaf->numLeafSurfaces; k++) {
-		BSP_Physics_Patch* patch = &d.patches[bsp.leafsurfaces[leaf->firstLeafSurface + k]];
+		BSP_Physics_Patch* patch = d.patches[bsp.leafsurfaces[leaf->firstLeafSurface + k]];
 		if (!patch) {
 			continue;
 		}
@@ -1916,7 +1916,7 @@ BSPPatchCollide* BSPPhysicsWorld::generatePatchCollide(GMint width, GMint height
 	// we now have a grid of points exactly on the curve
 	// the aproximate surface defined by these points will be
 	// collided against
-	BSPPatchCollide* pf = new BSPPatchCollide();
+	BSPPatchCollide* pf = GM_new<BSPPatchCollide>();
 	*pc = pf;
 	clearBounds(pf->bounds[0], pf->bounds[1]);
 	for (i = 0; i < grid.width; i++) {

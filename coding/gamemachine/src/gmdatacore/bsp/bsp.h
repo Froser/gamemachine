@@ -59,7 +59,7 @@ typedef struct {
 	int		fileofs, filelen;
 } BSPLump;
 
-typedef float BSPVector3[3];
+typedef vmath::vec3 BSPVector3;
 
 typedef struct {
 	int			ident;

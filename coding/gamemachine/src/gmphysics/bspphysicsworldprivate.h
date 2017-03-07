@@ -132,13 +132,15 @@ struct BSPGrid
 class BSPGameWorld;
 struct BSPPhysicsWorldPrivate
 {
+	~BSPPhysicsWorldPrivate();
+
 	BSPGameWorld* world;
 	CollisionObject camera;
 
 	std::vector<BSP_Physics_Plane> planes;
 	std::vector<BSP_Physics_Brush> brushes;
 	std::vector<BSP_Physics_BrushSide> brushsides;
-	std::vector<BSP_Physics_Patch> patches;
+	AUTORELEASE std::vector<BSP_Physics_Patch*> patches;
 
 //tags:
 	GMint checkcount;

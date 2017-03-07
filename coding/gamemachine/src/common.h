@@ -42,11 +42,12 @@ struct GMRect
 {
 	GMfloat x, y, width, height;
 };
+
 template <typename T>
 T* GM_new()
 {
 	T* t = new T;
-	memset(t, 0, typeof(T));
+	memset(t, 0, sizeof(T));
 	return t;
 }
 

@@ -1,6 +1,14 @@
 ﻿#include "stdafx.h"
 #include "bspphysicsworldprivate.h"
 
+BSPPhysicsWorldPrivate::~BSPPhysicsWorldPrivate()
+{
+	for (auto iter = patches.begin(); iter != patches.end(); iter++)
+	{
+		delete *iter;
+	}
+}
+
 GMint BSP_Physics_Plane::classifyBox(vmath::vec3& emins, vmath::vec3& emaxs)
 {
 	GMfloat dist1, dist2;
