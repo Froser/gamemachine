@@ -30,7 +30,7 @@ private:
 
 	// trace
 private:
-	void trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin, const vmath::vec3& mins, const vmath::vec3& maxs);
+	void trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin, const vmath::vec3& mins, const vmath::vec3& maxs, REF BSPTrace& trace);
 	void traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, vmath::vec3 p1, vmath::vec3 p2);
 	void traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf);
 	void traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush* brush);

@@ -1203,15 +1203,18 @@ void BSPPhysicsWorld::simulate()
 
 	d.camera.motions.translation += d.camera.motions.velocity;
 
-	// TODO
-	// camera position test
-	//TODO:
-	trace(d.camera.motions.translation, 
-		d.camera.motions.translation + d.camera.motions.velocity,
-		d.camera.motions.translation,
-		vmath::vec3(0),
-		vmath::vec3(0)
-		);
+
+	vmath::vec3 n(d.camera.motions.translation);
+	n[2] -= 25.f;
+
+	BSPTrace t;
+	trace(d.camera.motions.translation,
+		n,
+		vmath::vec3(0, 0, 0),
+		vmath::vec3(-10),
+		vmath::vec3(10),
+		t
+	);
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
@@ -1325,14 +1328,21 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 	}
 }
 
-void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin, const vmath::vec3& mins, const vmath::vec3& maxs)
+void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin, const vmath::vec3& mins, const vmath::vec3& maxs, REF BSPTrace& trace)
 {
 	D(d);
+	BSPData& bsp = d.world->bspData();
 	d.checkcount++;
 
 	BSPTraceWork tw = { 0 };
 	tw.trace.fraction = 1;
 	tw.modelOrigin = origin;
+
+	if (!bsp.numnodes) {
+		trace = tw.trace;
+		return;	// map not loaded, shouldn't happen
+	}
+
 	tw.contents = 1; //TODO brushmask
 	tw.maxOffset = tw.size[1][0] + tw.size[1][1] + tw.size[1][2];
 
@@ -1422,6 +1432,24 @@ void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, co
 	}
 #endif
 	traceThroughTree(tw, 0, 0, 1, tw.start, tw.end);
+
+	// generate endpos from the original, unmodified start/end
+	if (tw.trace.fraction == 1) {
+		tw.trace.endpos = end;
+	}
+	else {
+		for (GMint i = 0; i<3; i++) {
+			tw.trace.endpos[i] = start[i] + tw.trace.fraction * (end[i] - start[i]);
+		}
+	}
+
+	// If allsolid is set (was entirely inside something solid), the plane is not valid.
+	// If fraction == 1.0, we never hit anything, and thus the plane is not valid.
+	// Otherwise, the normal on the plane should have unit length
+	ASSERT(tw.trace.allsolid ||
+		tw.trace.fraction == 1.0 ||
+		vmath::lengthSquare(tw.trace.plane.plane->normal) > 0.9999f);
+	trace = tw.trace;
 }
 
 void BSPPhysicsWorld::positionTest(BSPTraceWork& tw)
