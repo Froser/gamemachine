@@ -65,8 +65,8 @@ struct BSPWinding
 
 //tools
 static void clearBounds(vmath::vec3& mins, vmath::vec3& maxs) {
-	mins[0] = mins[1] = mins[2] = 99999;
-	maxs[0] = maxs[1] = maxs[2] = -99999;
+	mins = vmath::vec3(99999);
+	maxs = vmath::vec3(-99999);
 }
 
 static void addPointToBounds(const vmath::vec3& v, vmath::vec3& mins, vmath::vec3& maxs) {
@@ -92,10 +92,9 @@ static void addPointToBounds(const vmath::vec3& v, vmath::vec3& mins, vmath::vec
 	}
 }
 
-
 static void setGridWrapWidth(BSPGrid* grid) {
-	int		i, j;
-	float	d;
+	GMint i, j;
+	GMfloat d;
 
 	for (i = 0; i < grid->height; i++) {
 		for (j = 0; j < 3; j++) {
@@ -116,22 +115,17 @@ static void setGridWrapWidth(BSPGrid* grid) {
 	}
 }
 
-static bool needsSubdivision(vmath::vec3& a, vmath::vec3& b, vmath::vec3& c) {
+static bool needsSubdivision(const vmath::vec3& a, const vmath::vec3& b, const vmath::vec3& c) {
 	vmath::vec3 cmid;
 	vmath::vec3 lmid;
 	vmath::vec3 delta;
 	GMfloat dist;
-	GMint i;
 
 	// calculate the linear midpoint
-	for (i = 0; i < 3; i++) {
-		lmid[i] = 0.5*(a[i] + c[i]);
-	}
+	lmid = (a + c) * .5f;
 
 	// calculate the exact curve midpoint
-	for (i = 0; i < 3; i++) {
-		cmid[i] = 0.5 * (0.5*(a[i] + b[i]) + 0.5*(b[i] + c[i]));
-	}
+	cmid = ((a + b) * .5f + (b + c) * .5f) * .5f;
 
 	// see if the curve is far enough away from the linear mid
 	delta = cmid - lmid;
@@ -147,7 +141,7 @@ static void subdivide(vmath::vec3& a, vmath::vec3& b, vmath::vec3& c, vmath::vec
 }
 
 static void subdivideGridColumns(BSPGrid* grid) {
-	int i, j, k;
+	GMint i, j, k;
 
 	for (i = 0; i < grid->width - 2; ) {
 		// grid->points[i][x] is an interpolating control point
@@ -210,7 +204,7 @@ static void subdivideGridColumns(BSPGrid* grid) {
 }
 
 #define	POINT_EPSILON	0.1
-static bool comparePoints(vmath::vec3& a, vmath::vec3& b) {
+static bool comparePoints(const vmath::vec3& a, const vmath::vec3& b) {
 	GMfloat d;
 
 	d = a[0] - b[0];
@@ -229,7 +223,7 @@ static bool comparePoints(vmath::vec3& a, vmath::vec3& b) {
 }
 
 static void removeDegenerateColumns(BSPGrid* grid) {
-	int		i, j, k;
+	GMint i, j, k;
 
 	for (i = 0; i < grid->width - 1; i++) {
 		for (j = 0; j < grid->height; j++) {
@@ -257,9 +251,9 @@ static void removeDegenerateColumns(BSPGrid* grid) {
 
 static void transposeGrid(BSPGrid* grid)
 {
-	int			i, j, l;
+	GMint i, j, l;
 	vmath::vec3	temp;
-	bool	tempWrap;
+	bool tempWrap;
 
 	if (grid->width > grid->height) {
 		for (i = 0; i < grid->height; i++) {
@@ -303,23 +297,21 @@ static void transposeGrid(BSPGrid* grid)
 	grid->wrapHeight = tempWrap;
 }
 
-static bool planeFromPoints(vmath::vec4& plane, vmath::vec3& a, vmath::vec3& b, vmath::vec3& c) {
+static bool planeFromPoints(vmath::vec4& plane, const vmath::vec3& a, const vmath::vec3& b, const vmath::vec3& c) {
 	vmath::vec3 d1, d2;
 	d1 = b - a;
 	d2 = c - a;
 	vmath::vec3 t = vmath::cross(d2, d1);
-	plane = VEC4(t, plane);
-
-	plane = vmath::normalize(plane);
-	if (vmath::length(plane) == 0) {
+	t = vmath::normalize(t);
+	if (vmath::length(t) == 0)
 		return false;
-	}
 
-	plane[3] = vmath::dot(a, VEC3(plane));
+	plane = VEC4(t, plane);
+	plane[3] = vmath::dot(a, plane);
 	return true;
 }
 
-static int signbitsForNormal(vmath::vec4& normal) {
+static int signbitsForNormal(const vmath::vec4& normal) {
 	GMint bits, j;
 
 	bits = 0;
@@ -331,7 +323,7 @@ static int signbitsForNormal(vmath::vec4& normal) {
 	return bits;
 }
 
-static GMint planeEqual(BSPPatchPlane* p, vmath::vec4& plane, GMint *flipped)
+static GMint planeEqual(BSPPatchPlane* p, const vmath::vec4& plane, GMint *flipped)
 {
 	vmath::vec4 invplane;
 
@@ -361,15 +353,14 @@ static GMint planeEqual(BSPPatchPlane* p, vmath::vec4& plane, GMint *flipped)
 	return false;
 }
 
-static int findPlane(PatchCollideContext& context, vmath::vec3& p1, vmath::vec3& p2, vmath::vec3& p3)
+static int findPlane(PatchCollideContext& context, const vmath::vec3& p1, const vmath::vec3& p2, const vmath::vec3& p3)
 {
 	vmath::vec4 plane;
-	int		i;
-	float	d;
+	GMint i;
+	GMfloat d;
 
-	if (!planeFromPoints(plane, p1, p2, p3)) {
+	if (!planeFromPoints(plane, p1, p2, p3))
 		return -1;
-	}
 
 	// see if the points are close enough to an existing plane
 	for (i = 0; i < context.numPlanes; i++) {
@@ -407,7 +398,7 @@ static int findPlane(PatchCollideContext& context, vmath::vec3& p1, vmath::vec3&
 	return context.numPlanes - 1;
 }
 
-static GMint findPlane2(PatchCollideContext& context, vmath::vec4& plane, GMint *flipped)
+static GMint findPlane2(PatchCollideContext& context, const vmath::vec4& plane, GMint *flipped)
 {
 	GMint i;
 
@@ -507,20 +498,20 @@ static int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint gridP
 
 	}
 
-	gm_error("CM_EdgePlaneNum: bad k");
+	gm_error("edgePlaneNum: bad k");
 	return -1;
 }
 
-static int pointOnPlaneSide(PatchCollideContext& context, vmath::vec3& p, int planeNum) {
+static int pointOnPlaneSide(PatchCollideContext& context, const vmath::vec3& p, GMint planeNum) {
 	float	d;
 
 	if (planeNum == -1) {
 		return SIDE_ON;
 	}
 
-	vmath::vec4& plane = context.planes[planeNum].plane;
+	const vmath::vec4& plane = context.planes[planeNum].plane;
 
-	d = vmath::dot(p, VEC3(plane)) - plane[3];
+	d = vmath::dot(p, plane) - plane[3];
 
 	if (d > PLANE_TRI_EPSILON) {
 		return SIDE_FRONT;
@@ -534,10 +525,10 @@ static int pointOnPlaneSide(PatchCollideContext& context, vmath::vec3& p, int pl
 }
 
 
-static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGrid* grid, int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2],
-	GMint i, GMint j, GMint which) {
+static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGrid* grid, int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint which)
+{
 	static bool debugBlock = false;
-	GMint		k, l;
+	GMint k, l;
 	vmath::vec3 points[4];
 	GMint numPoints;
 
@@ -612,7 +603,7 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 	}
 }
 
-static void baseWindingForPlane(vmath::vec3& normal, GMfloat dist, OUT BSPWinding** out)
+static void baseWindingForPlane(const vmath::vec3& normal, GMfloat dist, OUT BSPWinding** out)
 {
 	int		i, x;
 	GMfloat max, v;
@@ -675,7 +666,7 @@ static void baseWindingForPlane(vmath::vec3& normal, GMfloat dist, OUT BSPWindin
 	*out = w;
 }
 
-static void chopWindingInPlace(BSPWinding** inout, vmath::vec3& normal, GMfloat dist, GMfloat epsilon)
+static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GMfloat dist, GMfloat epsilon)
 {
 	BSPWinding* in;
 	GMfloat dists[MAX_POINTS_ON_WINDING + 4];
@@ -776,8 +767,8 @@ static void windingBounds(BSPWinding* w, vmath::vec3& mins, vmath::vec3& maxs)
 	GMfloat v;
 	GMint i, j;
 
-	mins[0] = mins[1] = mins[2] = MAX_MAP_BOUNDS;
-	maxs[0] = maxs[1] = maxs[2] = -MAX_MAP_BOUNDS;
+	mins = vmath::vec3(MAX_MAP_BOUNDS);
+	maxs = vmath::vec3(-MAX_MAP_BOUNDS);
 
 	for (i = 0; i < w->numpoints; i++)
 	{
@@ -911,10 +902,10 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 				vec2 = vmath::vec3(0);
 				vec2[axis] = dir;
 				vmath::vec3 t = vmath::cross(vec, vec2);
-				plane = VEC4(t, plane);
-				plane = vmath::normalize(plane);
+				t = vmath::normalize(t);
 				if (vmath::length(t) < 0.5)
 					continue;
+				plane = VEC4(t, plane);
 				plane[3] = vmath::dot(w->p[j], VEC3(plane));
 
 				// if all the points of the facet winding are
@@ -1290,6 +1281,7 @@ void BSPPhysicsWorld::generatePhysicsBrushData()
 	for (GMint i = 0; i < bsp.numbrushes; i++)
 	{
 		BSP_Physics_Brush* b = &d.brushes[i];
+		b->checkcount = 0;
 		b->brush = &bsp.brushes[i];
 		b->sides = &d.brushsides[b->brush->firstSide];
 		b->contents = bsp.shaders[b->brush->shaderNum].contentFlags;
@@ -1341,7 +1333,7 @@ void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, co
 	BSPTraceWork tw = { 0 };
 	tw.trace.fraction = 1;
 	tw.modelOrigin = origin;
-	tw.contents = 0; //TODO brushmask
+	tw.contents = 1; //TODO brushmask
 	tw.maxOffset = tw.size[1][0] + tw.size[1][1] + tw.size[1][2];
 
 	vmath::vec3 offset = (mins + maxs) * 0.5;

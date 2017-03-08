@@ -454,8 +454,30 @@ static inline T dot(const vecN<T,len>& a, const vecN<T,len>& b)
     return total;
 }
 
+// Ignore b[len]
+template <typename T, int len>
+static inline T dot(const vecN<T,len>& a, const vecN<T,len+1>& b)
+{
+    int n;
+    T total = T(0);
+    for (n = 0; n < len; n++)
+    {
+        total += a[n] * b[n];
+    }
+    return total;
+}
+
 template <typename T>
 static inline vecN<T,3> cross(const vecN<T,3>& a, const vecN<T,3>& b)
+{
+    return Tvec3<T>(a[1] * b[2] - b[1] * a[2],
+                    a[2] * b[0] - b[2] * a[0],
+                    a[0] * b[1] - b[0] * a[1]);
+}
+
+// Ignore b[3]
+template <typename T>
+static inline vecN<T,3> cross(const vecN<T,3>& a, const vecN<T,4>& b)
 {
     return Tvec3<T>(a[1] * b[2] - b[1] * a[2],
                     a[2] * b[0] - b[2] * a[0],

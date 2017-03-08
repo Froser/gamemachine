@@ -132,6 +132,12 @@ struct BSPGrid
 class BSPGameWorld;
 struct BSPPhysicsWorldPrivate
 {
+
+	BSPPhysicsWorldPrivate::BSPPhysicsWorldPrivate()
+		: checkcount(0)
+	{
+	}
+
 	~BSPPhysicsWorldPrivate();
 
 	BSPGameWorld* world;
