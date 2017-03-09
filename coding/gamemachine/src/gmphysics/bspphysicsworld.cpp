@@ -1205,14 +1205,14 @@ void BSPPhysicsWorld::simulate()
 
 
 	vmath::vec3 n(d.camera.motions.translation);
-	n[2] -= 25.f;
+	n[2] -= 325.f;
 
 	BSPTrace t;
 	trace(d.camera.motions.translation,
 		n,
 		vmath::vec3(0, 0, 0),
-		vmath::vec3(-10),
-		vmath::vec3(10),
+		vmath::vec3(-100),
+		vmath::vec3(100),
 		t
 	);
 }
@@ -1344,7 +1344,6 @@ void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, co
 	}
 
 	tw.contents = 1; //TODO brushmask
-	tw.maxOffset = tw.size[1][0] + tw.size[1][1] + tw.size[1][2];
 
 	vmath::vec3 offset = (mins + maxs) * 0.5;
 	tw.size[0] = mins - offset;
@@ -1352,7 +1351,10 @@ void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, co
 	tw.start = start + offset;
 	tw.end = end + offset;
 
+	tw.maxOffset = tw.size[1][0] + tw.size[1][1] + tw.size[1][2];
+
 	// tw.offsets[signbits] = vector to appropriate corner from origin
+	// 以原点为中心，offsets[8]表示立方体的8个顶点
 	tw.offsets[0][0] = tw.size[0][0];
 	tw.offsets[0][1] = tw.size[0][1];
 	tw.offsets[0][2] = tw.size[0][2];
@@ -1431,16 +1433,26 @@ void BSPPhysicsWorld::trace(const vmath::vec3& start, const vmath::vec3& end, co
 			positionTest(tw);
 	}
 #endif
+	if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0)
+	{
+		tw.isPoint = true;
+		tw.extents = vmath::vec3(0);
+	}
+	else {
+		tw.isPoint = false;
+		tw.extents = tw.size[1];
+	}
+
 	traceThroughTree(tw, 0, 0, 1, tw.start, tw.end);
 
 	// generate endpos from the original, unmodified start/end
-	if (tw.trace.fraction == 1) {
+	if (tw.trace.fraction == 1)
+	{
 		tw.trace.endpos = end;
 	}
-	else {
-		for (GMint i = 0; i<3; i++) {
-			tw.trace.endpos[i] = start[i] + tw.trace.fraction * (end[i] - start[i]);
-		}
+	else
+	{
+		tw.trace.endpos = start + tw.trace.fraction * (end - start);
 	}
 
 	// If allsolid is set (was entirely inside something solid), the plane is not valid.
@@ -1479,7 +1491,7 @@ void BSPPhysicsWorld::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f,
 	// if < 0, we are in a leaf node
 	if (num < 0)
 	{
-		traceThroughLeaf(tw, &bsp.leafs[-1 - num]);
+		traceThroughLeaf(tw, &bsp.leafs[~num]);
 		return;
 	}
 
@@ -1490,6 +1502,8 @@ void BSPPhysicsWorld::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f,
 	node = &bsp.nodes[num];
 	plane = &d.planes[node->planeNum];
 	
+	// t1, t2表示p1和p2与plane的垂直距离
+	// 如果平面是与坐标系垂直，可以直接用p[plane->planeType]来拿距离
 	GMfloat t1, t2, offset;
 	if (plane->planeType < PLANE_NON_AXIAL) {
 		t1 = p1[plane->planeType] - plane->plane->intercept;
@@ -1510,11 +1524,11 @@ void BSPPhysicsWorld::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f,
 
 	// see which sides we need to consider
 	if (t1 >= offset + 1 && t2 >= offset + 1) {
-		traceThroughTree(tw, node->children[0], p1f, p2f, p1, p2);
+		traceThroughTree(tw, node->children[0], p1f, p2f, p1, p2); // 在平面前
 		return;
 	}
 	if (t1 < -offset - 1 && t2 < -offset - 1) {
-		traceThroughTree(tw, node->children[1], p1f, p2f, p1, p2);
+		traceThroughTree(tw, node->children[1], p1f, p2f, p1, p2); // 在平面后
 		return;
 	}
 

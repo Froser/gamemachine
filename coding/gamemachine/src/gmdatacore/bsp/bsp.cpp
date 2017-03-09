@@ -525,17 +525,24 @@ void BSP::generateVertices()
 	for (GMint i = 0; i < d.numDrawVertices; i++)
 	{
 		//swap y and z and negate z
-		d.drawingVertices[i].position[0] = d.vertices[i].xyz[0];
-		d.drawingVertices[i].position[1] = d.vertices[i].xyz[2];
-		d.drawingVertices[i].position[2] = -d.vertices[i].xyz[1];
+		GMfloat &_0 = d.vertices[i].xyz[0],
+			&_1 = d.vertices[i].xyz[1],
+			&_2 = d.vertices[i].xyz[2];
+		SWAP(_1, _2);
+		_2 = -_2;
+
+		d.drawingVertices[i].position[0] = _0;
+		d.drawingVertices[i].position[1] = _1;
+		d.drawingVertices[i].position[2] = _2;
 		d.drawingVertices[i].position[3] = 1.0f;
 
 		//scale down
 		// d.drawingVertices[i].position /= SCALING_DOWN;
 
 		//Transfer texture coordinates (Invert t)
+		d.vertices[i].st[1] = -d.vertices[i].st[1];
 		d.drawingVertices[i].decalS = d.vertices[i].st[0];
-		d.drawingVertices[i].decalT = -d.vertices[i].st[1];
+		d.drawingVertices[i].decalT = d.vertices[i].st[1];
 
 		//Transfer lightmap coordinates
 		d.drawingVertices[i].lightmapS = d.vertices[i].lightmap[0];
@@ -728,9 +735,8 @@ void BSP::generateBSPData()
 	for (GMint i = 0; i < d.numplanes; ++i)
 	{
 		//swap y and z and negate z
-		GMfloat temp = d.planes[i].normal[1];
-		d.planes[i].normal[1] = d.planes[i].normal[2];
-		d.planes[i].normal[2] = -temp;
+		SWAP(d.planes[i].normal[1], d.planes[i].normal[2])
+		d.planes[i].normal[2] = -d.planes[i].normal[2];
 
 		d.planes[i].intercept = -d.planes[i].intercept;
 		// d.planes[i].intercept /= SCALING_DOWN;	//scale down

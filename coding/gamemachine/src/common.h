@@ -70,4 +70,5 @@ END_NS
 	if (_str)							\
 		sscanf_s(_str, format, out);	\
 }
+#define SWAP(a, b) { auto t = a; a = b; b = t; }
 #endif

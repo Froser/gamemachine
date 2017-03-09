@@ -18,7 +18,7 @@ enum PlaneType
 struct BSP_Physics_Plane
 {
 	BSPPlane* plane;
-	PlaneType planeType;
+	GMbyte planeType;
 	GMint signbits;
 
 	GMint classifyBox(vmath::vec3& emins, vmath::vec3& emaxs);
@@ -107,7 +107,7 @@ struct BSPTraceWork
 	vmath::vec3 start;
 	vmath::vec3 end;
 	vmath::vec3 size[2];	// size of the box being swept through the model
-	vmath::vec3 offsets[8];	// [signbits][x] = either size[0][x] or size[1][x]
+	vmath::vec3 offsets[8];	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
 	GMfloat maxOffset;	// longest corner length from origin
 	vmath::vec3 extents;	// greatest of abs(size[0]) and abs(size[1])
 	vmath::vec3 bounds[2];	// enclosing box of start and end surrounding by size
