@@ -6,7 +6,7 @@
 #include <string>
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
-#include "gmphysics/bspphysicsworld.h"
+#include "gmphysics/bsp/bspphysicsworld.h"
 #include "gmdatacore/bsp/bsp_render.h"
 BEGIN_NS
 

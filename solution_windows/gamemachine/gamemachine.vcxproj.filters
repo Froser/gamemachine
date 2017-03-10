@@ -35,6 +35,9 @@
     <Filter Include="src\gmphysics">
       <UniqueIdentifier>{e696c9df-f741-4472-b49f-6a9ec00658e7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gmphysics\bsp">
+      <UniqueIdentifier>{33ea52d2-a873-4a5a-963d-47e92854307b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -223,14 +226,17 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h">
       <Filter>src\gmphysics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworld.h">
-      <Filter>src\gmphysics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworldprivate.h">
-      <Filter>src\gmphysics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.h">
       <Filter>src\gmdatacore\bsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsptrace.h">
+      <Filter>src\gmphysics\bsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworld.h">
+      <Filter>src\gmphysics\bsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworldprivate.h">
+      <Filter>src\gmphysics\bsp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -408,14 +414,17 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp">
       <Filter>src\gmphysics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworld.cpp">
-      <Filter>src\gmphysics</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bspphysicsworldprivate.cpp">
-      <Filter>src\gmphysics</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.cpp">
       <Filter>src\gmdatacore\bsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsptrace.cpp">
+      <Filter>src\gmphysics\bsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworld.cpp">
+      <Filter>src\gmphysics\bsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworldprivate.cpp">
+      <Filter>src\gmphysics\bsp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

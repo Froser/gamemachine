@@ -1,6 +1,8 @@
 #ifndef __VMATH_H__
 #define __VMATH_H__
 
+#define VEC3(v4) vmath::vec3(v4[0], v4[1], v4[2])
+#define VEC4(v3, v4) vmath::vec4(v3[0], v3[1], v3[2], v4[3])
 
 #define _USE_MATH_DEFINES  1 // Include constants defined in math.h
 #include <math.h>
