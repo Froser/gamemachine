@@ -55,10 +55,11 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsstructs.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsptrace.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstruct.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstructs.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
@@ -158,14 +159,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

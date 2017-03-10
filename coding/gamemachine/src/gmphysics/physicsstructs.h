@@ -1,5 +1,5 @@
-﻿#ifndef __PHYSICSSTRUCT_H__
-#define __PHYSICSSTRUCT_H__
+﻿#ifndef __PHYSICSSTRUCTS_H__
+#define __PHYSICSSTRUCTS_H__
 #include "common.h"
 #include <map>
 #include "utilities/vmath.h"

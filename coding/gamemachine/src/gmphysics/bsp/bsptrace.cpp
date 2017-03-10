@@ -2,6 +2,7 @@
 #include "bsptrace.h"
 #include "utilities/vmath.h"
 #include "utilities/assert.h"
+#include "bspphysicsworld.h"
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues

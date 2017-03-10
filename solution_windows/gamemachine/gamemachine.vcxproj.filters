@@ -220,9 +220,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h">
       <Filter>src\gmphysics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstruct.h">
-      <Filter>src\gmphysics</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h">
       <Filter>src\gmphysics</Filter>
     </ClInclude>
@@ -237,6 +234,12 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworldprivate.h">
       <Filter>src\gmphysics\bsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsstructs.h">
+      <Filter>src\gmphysics\bsp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstructs.h">
+      <Filter>src\gmphysics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

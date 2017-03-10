@@ -1,9 +1,8 @@
 ﻿#ifndef __BSPTRACE_H__
 #define __BSPTRACE_H__
 #include "common.h"
-#include "bsptrace.h"
 #include "gmdatacore/bsp/bsp.h"
-#include "bspphysicsworld.h"
+#include "bspphysicsstructs.h"
 BEGIN_NS
 
 struct BSPTraceResult

@@ -2,7 +2,7 @@
 #define __PHYSICSWORLD_PRIVATE_H__
 #include "common.h"
 #include "utilities/vmath.h"
-#include "physicsstruct.h"
+#include "physicsstructs.h"
 BEGIN_NS
 
 class GameWorld;

@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bspphysicsworld.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "bsptrace.h"
 
 #define	SUBDIVIDE_DISTANCE	16	//4	// never more than this units away from curve
 #define	WRAP_POINT_EPSILON 0.1
@@ -1183,6 +1182,27 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	memcpy(pf->planes, context.planes, context.numPlanes * sizeof(*pf->planes));
 }
 
+static void clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vmath::vec3& out, GMfloat overbounce)
+{
+	GMfloat backoff;
+	GMfloat change;
+	GMint i;
+
+	backoff = vmath::dot(in, normal);
+
+	if (backoff < 0) {
+		backoff *= overbounce;
+	}
+	else {
+		backoff /= overbounce;
+	}
+
+	for (i = 0; i < 3; i++) {
+		change = normal[i] * backoff;
+		out[i] = in[i] - change;
+	}
+}
+
 //class
 BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	: PhysicsWorld(world)
@@ -1204,19 +1224,90 @@ void BSPPhysicsWorld::simulate()
 	D(d);
 	BSPData& bsp = d.world->bspData();
 
-	vmath::vec3 next = d.camera.motions.translation + d.camera.motions.velocity;
 	//d.camera.motions.translation += d.camera.motions.velocity;
 
-	BSPTraceResult t;
+	BSPTraceResult groundTrace;
+	vmath::vec3 floor = d.camera.motions.translation;
+	floor[2] -= .25f;
 	d.trace.trace(d.camera.motions.translation,
-		next,
+		floor,
 		vmath::vec3(0, 0, 0),
 		vmath::vec3(-10),
 		vmath::vec3(10),
-		t
+		groundTrace
 	);
 
-	d.camera.motions.translation = t.endpos;
+	std::vector<vmath::vec3> planes;
+	planes.push_back(groundTrace.plane.plane ? groundTrace.plane.plane->normal : vmath::vec3(0, 1, 0));
+	planes.push_back(vmath::normalize(d.camera.motions.velocity));
+
+	BSPTraceResult moveTrace;
+	d.trace.trace(d.camera.motions.translation,
+		d.camera.motions.translation + d.camera.motions.velocity,
+		vmath::vec3(0, 0, 0),
+		vmath::vec3(-10),
+		vmath::vec3(10),
+		moveTrace
+	);
+
+	if (moveTrace.fraction > 0)
+		d.camera.motions.translation = moveTrace.endpos;
+	if (moveTrace.fraction == 1.0f)
+		return;
+
+	// 碰撞到平面，分解速度
+	GMint numplanes = planes.size();
+	GMint i;
+	for (i = 0; i < numplanes; i++)
+	{
+		if (vmath::dot(moveTrace.plane.plane->normal, planes[i]) > 0.99)
+			d.camera.motions.velocity += moveTrace.plane.plane->normal;
+	}
+	if (i < numplanes)
+		return;
+
+	planes.push_back(moveTrace.plane.plane->normal);
+	numplanes++;
+
+	vmath::vec3 cv;
+	for (i = 0; i < numplanes; i++)
+	{
+		if (vmath::dot(d.camera.motions.velocity, planes[i]) >= 0.1)
+			continue; // 朝着平面前方移动，不会有交汇
+
+		clipVelocity(d.camera.motions.velocity, planes[i], cv, 1.0f);
+		// see if there is a second plane that the new move enters
+		for (GMint j = 0; j < numplanes; j++)
+		{
+			if (j == i)
+				continue;
+			if (vmath::dot(d.camera.motions.velocity, planes[j]) >= 0.1)
+				continue;
+			clipVelocity(d.camera.motions.velocity, planes[j], cv, 1.0f);
+			if (vmath::dot(cv, planes[i]) >= 0)
+				continue;
+
+			vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
+			dir = vmath::normalize(dir);
+			GMfloat s = vmath::dot(dir, d.camera.motions.velocity);
+			// see if there is a third plane the the new move enters
+			for (GMint k = 0; k < numplanes; k++) {
+				if (k == i || k == j) {
+					continue;
+				}
+				if (vmath::dot(cv, planes[k]) >= 0.1) {
+					continue;		// move doesn't interact with the plane
+				}
+
+				// stop dead at a tripple plane interaction
+				d.camera.motions.velocity = vmath::vec3(0);
+				return;
+			}
+		}
+	}
+
+	d.camera.motions.velocity = cv;
+	d.camera.motions.translation += cv;
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
