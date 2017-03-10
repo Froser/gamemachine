@@ -26,7 +26,6 @@ void BSPGameWorld::loadBSP(const char* bspPath)
 	d.bspWorkingDirectory = Path::directoryName(bspPath);
 	d.bsp.loadBsp(bspPath);
 	importBSP();
-	d.physics->initBSPPhysicsWorld();
 }
 
 void BSPGameWorld::setSky(AUTORELEASE GameObject* sky)
@@ -84,11 +83,13 @@ void BSPGameWorld::calculateVisibleFaces()
 {
 	D(d);
 	D_BASE(GameWorld, dbase);
+	BSPRenderData& rd = d.render.renderData();
+
 	Character* character = getMajorCharacter();
 	PositionState pos = character->getPositionState();
 	BSPData& bsp = d.bsp.bspData();
 
-	bsp.facesToDraw.clearAll();
+	rd.facesToDraw.clearAll();
 	GMint cameraLeaf = calculateLeafNode(pos.position);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
@@ -100,13 +101,13 @@ void BSPGameWorld::calculateVisibleFaces()
 
 		//if this leaf does not lie in the frustum, continue
 		Character* character = getMajorCharacter();
-		if (!character->getFrustum().isBoundingBoxInside(bsp.drawingLeafs[i].boundingBoxVertices))
+		if (!character->getFrustum().isBoundingBoxInside(rd.leafs[i].boundingBoxVertices))
 			continue;
 
 		//loop through faces in this leaf and mark them to be drawn
 		for (int j = 0; j < bsp.leafs[i].numLeafSurfaces; ++j)
 		{
-			bsp.facesToDraw.set(bsp.leafsurfaces[bsp.leafs[i].firstLeafSurface + j]);
+			rd.facesToDraw.set(bsp.leafsurfaces[bsp.leafs[i].firstLeafSurface + j]);
 		}
 	}
 }
@@ -136,10 +137,10 @@ int BSPGameWorld::isClusterVisible(int cameraCluster, int testCluster)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
 
-	int index = cameraCluster * bsp.visibilityData.bytesPerCluster + testCluster / 8;
-	int returnValue = bsp.visibilityData.bitset[index] & (1 << (testCluster & 7));
-	return returnValue;
+	int index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
+	return rd.visibilityData.bitset[index] & (1 << (testCluster & 7));
 }
 
 // drawAll将所要需要绘制的对象放入列表
@@ -167,12 +168,13 @@ void BSPGameWorld::drawFaces()
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
 
 	//loop through faces
 	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
 	{
 		//if this face is to be drawn, draw it
-		if (bsp.facesToDraw.isSet(i))
+		if (rd.facesToDraw.isSet(i))
 			drawFace(i);
 	}
 }
@@ -181,29 +183,33 @@ void BSPGameWorld::drawFace(GMint idx)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
+
 	//look this face up in the face directory
-	if (bsp.drawingFaceDirectory[idx].faceType == 0)
+	if (rd.faceDirectory[idx].faceType == 0)
 		return;
 
-	if (bsp.drawingFaceDirectory[idx].faceType == MST_PLANAR)
-		drawPolygonFace(bsp.drawingFaceDirectory[idx].typeFaceNumber);
+	if (rd.faceDirectory[idx].faceType == MST_PLANAR)
+		drawPolygonFace(rd.faceDirectory[idx].typeFaceNumber);
 
-	if (bsp.drawingFaceDirectory[idx].faceType == MST_TRIANGLE_SOUP)
-		drawMeshFace(bsp.drawingFaceDirectory[idx].typeFaceNumber);
+	if (rd.faceDirectory[idx].faceType == MST_TRIANGLE_SOUP)
+		drawMeshFace(rd.faceDirectory[idx].typeFaceNumber);
 
-	if (bsp.drawingFaceDirectory[idx].faceType == MST_PATCH)
-		drawPatch(bsp.drawingFaceDirectory[idx].typeFaceNumber);
+	if (rd.faceDirectory[idx].faceType == MST_PATCH)
+		drawPatch(rd.faceDirectory[idx].typeFaceNumber);
 }
 
 void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
-	auto& polygonFace = bsp.drawingPolygonFaces[polygonFaceNumber];
+	BSPRenderData& rd = d.render.renderData();
+
+	auto& polygonFace = rd.polygonFaces[polygonFaceNumber];
 
 	GameObject* obj = nullptr;
-	auto findResult = d.polygonFaceObjects.find(&polygonFace);
-	if (findResult == d.polygonFaceObjects.end())
+	auto findResult = rd.polygonFaceObjects.find(&polygonFace);
+	if (findResult == rd.polygonFaceObjects.end())
 	{
 		Material material = { 0 };
 		material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
@@ -219,7 +225,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 
 		for (GMint i = 0; i < polygonFace.numVertices; i++)
 		{
-			BSP_Drawing_Vertex& vertex = bsp.drawingVertices[i + polygonFace.firstVertexIndex];
+			BSP_Render_Vertex& vertex = rd.vertices[i + polygonFace.firstVertexIndex];
 			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
@@ -230,7 +236,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 		coreObj->append(child);
 		obj = new SolidGameObject(coreObj);
 
-		d.polygonFaceObjects[&polygonFace] = obj;
+		rd.polygonFaceObjects[&polygonFace] = obj;
 		appendObjectAndInit(obj);
 	}
 	else
@@ -246,11 +252,12 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
-	auto& meshFace = bsp.drawingMeshFaces[meshFaceNumber];
+	BSPRenderData& rd = d.render.renderData();
+	auto& meshFace = rd.meshFaces[meshFaceNumber];
 
 	GameObject* obj = nullptr;
-	auto findResult = d.meshFaceObjects.find(&meshFace);
-	if (findResult == d.meshFaceObjects.end())
+	auto findResult = rd.meshFaceObjects.find(&meshFace);
+	if (findResult == rd.meshFaceObjects.end())
 	{
 		Material material = { 0 };
 		material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
@@ -270,7 +277,7 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 		for (int i = 0; i < meshFace.numMeshIndices; ++i)
 		{
 			GMuint idx = *(idxStart + i);
-			BSP_Drawing_Vertex& vertex = bsp.drawingVertices[offset + idx];
+			BSP_Render_Vertex& vertex = rd.vertices[offset + idx];
 			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
@@ -280,7 +287,7 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 
 		coreObj->append(child);
 		obj = new SolidGameObject(coreObj);
-		d.meshFaceObjects[&meshFace] = obj;
+		rd.meshFaceObjects[&meshFace] = obj;
 		appendObjectAndInit(obj);
 	}
 	else
@@ -296,23 +303,26 @@ void BSPGameWorld::drawPatch(int patchNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
 
 	Material material = { 0 };
 	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	if (!setMaterialTexture(bsp.drawingPatches[patchNumber], material))
+	if (!setMaterialTexture(rd.patches[patchNumber], material))
 		return;
-	setMaterialLightmap(bsp.drawingPatches[patchNumber].lightmapIndex, material);
+	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, material);
 
-	for (int i = 0; i < bsp.drawingPatches[patchNumber].numQuadraticPatches; ++i)
-		draw(bsp.drawingPatches[patchNumber].quadraticPatches[i], material);
+	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
+		draw(rd.patches[patchNumber].quadraticPatches[i], material);
 }
 
-void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
+void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp, Material& material)
 {
 	D(d);
+	BSPRenderData& rd = d.render.renderData();
+
 	GameObject* obj = nullptr;
-	auto findResult = d.biquadraticPatchObjects.find(&biqp);
-	if (findResult == d.biquadraticPatchObjects.end())
+	auto findResult = rd.biquadraticPatchObjects.find(&biqp);
+	if (findResult == rd.biquadraticPatchObjects.end())
 	{
 		Object* coreObj = new Object();
 		ChildObject* child = new ChildObject();
@@ -329,7 +339,7 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 			for (int i = 0; i < numVertices; i++)
 			{
 				GMuint idx = *(idxStart + i);
-				BSP_Drawing_Vertex& vertex = biqp.vertices[idx];
+				BSP_Render_Vertex& vertex = biqp.vertices[idx];
 
 				component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 				component->uv(vertex.decalS, vertex.decalT);
@@ -342,7 +352,7 @@ void BSPGameWorld::draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material)
 
 		coreObj->append(child);
 		obj = new SolidGameObject(coreObj);
-		d.biquadraticPatchObjects[&biqp] = obj;
+		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
 	}
 	else
@@ -396,11 +406,13 @@ void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Material& m)
 void BSPGameWorld::importBSP()
 {
 	D(d);
+	d.render.generateRenderData(&d.bsp.bspData());
 	initShaders();
 	initLightmaps();
 	initTextures();
 	importEntities();
 	initialize();
+	d.physics->initBSPPhysicsWorld();
 }
 
 void BSPGameWorld::initShaders()
@@ -409,7 +421,7 @@ void BSPGameWorld::initShaders()
 	//TODO
 	std::string scrPath(d.bspWorkingDirectory);
 	scrPath.append("scr/");
-	d.shaderLoader.init(scrPath.c_str(), this, &d.bsp.bspData());
+	d.shaderLoader.init(scrPath.c_str(), this, &d.render.renderData());
 	d.shaderLoader.load();
 }
 
@@ -532,4 +544,10 @@ BSPData& BSPGameWorld::bspData()
 {
 	D(d);
 	return d.bsp.bspData();
+}
+
+BSPRenderData& BSPGameWorld::renderData()
+{
+	D(d);
+	return d.render.renderData();
 }

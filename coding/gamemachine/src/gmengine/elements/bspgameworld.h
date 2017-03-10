@@ -34,7 +34,7 @@ private:
 	void drawPolygonFace(int polygonFaceNumber);
 	void drawMeshFace(int meshFaceNumber);
 	void drawPatch(int patchNumber);
-	void draw(BSP_Drawing_BiquadraticPatch& biqp, Material& material);
+	void draw(BSP_Render_BiquadraticPatch& biqp, Material& material);
 	template <typename T> bool setMaterialTexture(T face, REF Material& m);
 	void setMaterialLightmap(GMint lightmapid, REF Material& m);
 	int isClusterVisible(int cameraCluster, int testCluster);
@@ -53,6 +53,7 @@ private:
 public:
 	const char* bspWorkingDirectory();
 	BSPData& bspData();
+	BSPRenderData& renderData();
 };
 
 END_NS

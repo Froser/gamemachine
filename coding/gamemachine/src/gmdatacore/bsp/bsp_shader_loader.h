@@ -3,7 +3,7 @@
 #include "common.h"
 #include <string>
 #include <map>
-#include "bsp.h"
+#include "bsp_render.h"
 
 class TiXmlElement;
 class TiXmlDocument;
@@ -20,7 +20,7 @@ public:
 	~BSPShaderLoader();
 
 public:
-	void init(const char* directory, BSPGameWorld* world, BSPData* bsp);
+	void init(const char* directory, BSPGameWorld* world, BSPRenderData* bspRenderData);
 	void load();
 	bool findItem(const char* name, GMuint lightmapId, REF Shader* shader);
 
@@ -49,7 +49,7 @@ private:
 private:
 	std::string m_directory;
 	BSPGameWorld* m_world;
-	BSPData* m_bsp;
+	BSPRenderData* m_bspRender;
 	std::map<std::string, TiXmlElement*> m_items;
 	std::vector<TiXmlDocument*> m_shaderDocs;
 

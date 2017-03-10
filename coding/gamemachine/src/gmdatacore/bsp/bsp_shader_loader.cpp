@@ -92,7 +92,7 @@ static void loadImage(const char* filename, OUT Image** image)
 
 BSPShaderLoader::BSPShaderLoader()
 	: m_world(nullptr)
-	, m_bsp(nullptr)
+	, m_bspRender(nullptr)
 {
 }
 
@@ -104,11 +104,11 @@ BSPShaderLoader::~BSPShaderLoader()
 	}
 }
 
-void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPData* bsp)
+void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPRenderData* bspRender)
 {
 	m_directory = directory;
 	m_world = world;
-	m_bsp = bsp;
+	m_bspRender = bspRender;
 }
 
 ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
@@ -430,7 +430,7 @@ void BSPShaderLoader::createSky(Shader& shader)
 		skyShader.cull = GMS_NONE;
 		skyShader.noDepthTest = true;
 
-		SkyGameObject* sky = new SkyGameObject(skyShader, m_bsp->boundMin, m_bsp->boundMax);
+		SkyGameObject* sky = new SkyGameObject(skyShader, m_bspRender->boundMin, m_bspRender->boundMax);
 		m_world->setSky(sky);
 	}
 }

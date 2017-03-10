@@ -9,11 +9,6 @@
 #include "bsp_surface_flags.h"
 BEGIN_NS
 
-enum
-{
-	BOUNDING = 99999,
-};
-
 // key / value pair sizes in the entities lump
 #define	MAX_KEY				32
 #define	MAX_VALUE			1024
@@ -175,136 +170,7 @@ typedef struct {
 #define	MAXTOKEN 1024
 #define	MAX_INCLUDES	8
 
-// structs for drawing
-class BSP_Drawing_Vertex
-{
-public:
-	vmath::vec3 position;
-	float decalS, decalT;
-	float lightmapS, lightmapT;
-
-	BSP_Drawing_Vertex operator+(const BSP_Drawing_Vertex & rhs) const
-	{
-		BSP_Drawing_Vertex result;
-		result.position = position + rhs.position;
-		result.decalS = decalS + rhs.decalS;
-		result.decalT = decalT + rhs.decalT;
-		result.lightmapS = lightmapS + rhs.lightmapS;
-		result.lightmapT = lightmapT + rhs.lightmapT;
-
-		return result;
-	}
-
-	BSP_Drawing_Vertex operator*(const float rhs) const
-	{
-		BSP_Drawing_Vertex result;
-		result.position = position*rhs;
-		result.decalS = decalS*rhs;
-		result.decalT = decalT*rhs;
-		result.lightmapS = lightmapS*rhs;
-		result.lightmapT = lightmapT*rhs;
-
-		return result;
-	}
-};
-
-class BSP_Drawing_PolygonFace
-{
-public:
-	int firstVertexIndex;
-	int numVertices;
-	int textureIndex;
-	int lightmapIndex;
-};
-
-//mesh face for drawing
-class BSP_Drawing_FaceDirectoryEntry
-{
-public:
-	BSPSurfaceType faceType;
-	int typeFaceNumber;		//face number in the list of faces of this type
-};
-
-class BSP_Drawing_MeshFace
-{
-public:
-	int firstVertexIndex;
-	int numVertices;
-	int textureIndex;
-	int lightmapIndex;
-	int firstMeshIndex;
-	int numMeshIndices;
-};
-
-//every patch (curved surface) is split into biquadratic (3x3) patches
-class BSP_Drawing_BiquadraticPatch
-{
-public:
-	bool tesselate(int newTesselation);
-
-	BSP_Drawing_Vertex controlPoints[9];
-
-	int tesselation;
-	BSP_Drawing_Vertex* vertices;
-	GLuint * indices;
-
-	//arrays for multi_draw_arrays
-	int * trianglesPerRow;
-	unsigned int ** rowIndexPointers;
-
-	BSP_Drawing_BiquadraticPatch() : vertices(NULL)
-	{}
-	~BSP_Drawing_BiquadraticPatch()
-	{
-		if (vertices)
-			delete[] vertices;
-		vertices = nullptr;
-
-		if (indices)
-			delete[] indices;
-		indices = nullptr;
-	}
-};
-
-//curved surface
-class BSP_Drawing_Patch
-{
-public:
-	int textureIndex;
-	int lightmapIndex;
-	int width, height;
-
-	int numQuadraticPatches;
-	BSP_Drawing_BiquadraticPatch* quadraticPatches;
-};
-
-class BSP_Drawing_Leaf
-{
-public:
-	int cluster;	//cluster index for visdata
-	vmath::vec3 boundingBoxVertices[8];
-	int firstLeafFace;	//first index in leafFaces array
-	int numFaces;
-};
-
-class BSP_VisibilityData
-{
-public:
-	int numClusters;
-	int bytesPerCluster;
-	GMbyte * bitset;
-
-	BSP_VisibilityData() : bitset(nullptr)
-	{}
-	~BSP_VisibilityData()
-	{
-		if (bitset)
-			delete[] bitset;
-		bitset = nullptr;
-	}
-};
-
-struct BSP_Drawing_LightVolumes
+struct BSPLightVolumes
 {
 	vmath::vec3 lightVolOrigin;
 	vmath::vec3 lightVolSize;
@@ -317,11 +183,6 @@ struct BSPPrivate
 {
 	friend class BSP;
 	BSPPrivate()
-		: numPolygonFaces(0)
-		, numPatches(0)
-		, numMeshFaces(0)
-		, boundMin(BOUNDING)
-		, boundMax(-BOUNDING)
 	{
 	}
 
@@ -365,23 +226,7 @@ struct BSPPrivate
 	GMint numFogs;
 	std::vector<BSPFog> fogs;
 
-//data for render:
-	std::vector<BSP_Drawing_Vertex> drawingVertices;
-	Bitset facesToDraw;
-	GMint numPolygonFaces;
-	GMint numPatches;
-	GMint numMeshFaces;
-	std::vector<BSP_Drawing_FaceDirectoryEntry> drawingFaceDirectory;
-	std::vector<BSP_Drawing_PolygonFace> drawingPolygonFaces;
-	std::vector<BSP_Drawing_MeshFace> drawingMeshFaces;
-	std::vector<BSP_Drawing_Patch> drawingPatches;
-	std::vector<BSP_Drawing_Leaf> drawingLeafs;
-	BSP_VisibilityData visibilityData;
-	BSP_Drawing_LightVolumes lightVols;
-
-	// 用于绘制天空
-	vmath::vec3 boundMin;
-	vmath::vec3 boundMax;
+	BSPLightVolumes lightVols;
 
 private:
 	char token[MAXTOKEN];
@@ -410,20 +255,13 @@ private:
 	void readFile();
 	void swapBsp();
 	void parseFromMemory(char *buffer, int size);
+	void generateLightVolumes();
 	void parseEntities();
 	BSPEntity* parseEntity();
 	bool getToken(bool crossline);
 	BSPKeyValuePair* parseEpair();
 	void addScriptToStack(const char *filename);
 	bool endOfScript(bool crossline);
-
-	void generateRenderData();
-	void generateVertices();
-	void generateFaces();
-	void generateShaders();
-	void generateLightmaps();
-	void generateLightVolumes();
-	void generateBSPData();
 };
 
 END_NS

@@ -14,6 +14,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\common.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\empty_template.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h" />
@@ -79,6 +80,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
