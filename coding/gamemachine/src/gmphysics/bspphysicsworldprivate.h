@@ -91,9 +91,10 @@ struct BSP_Physics_Brush
 
 struct BSP_Physics_Patch
 {
-	int checkcount;
-	int surfaceFlags;
-	int contents;
+	BSPSurface* surface;
+	GMint checkcount;
+	GMint surfaceFlags;
+	GMint contents;
 	BSPPatchCollide *pc;
 
 	~BSP_Physics_Patch()

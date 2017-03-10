@@ -1205,14 +1205,14 @@ void BSPPhysicsWorld::simulate()
 
 
 	vmath::vec3 n(d.camera.motions.translation);
-	n[2] -= 325.f;
+	n[2] -= 1.f;
 
 	BSPTrace t;
 	trace(d.camera.motions.translation,
 		n,
 		vmath::vec3(0, 0, 0),
-		vmath::vec3(-100),
-		vmath::vec3(100),
+		vmath::vec3(0),
+		vmath::vec3(0),
 		t
 	);
 }
@@ -1288,12 +1288,12 @@ void BSPPhysicsWorld::generatePhysicsBrushData()
 		b->brush = &bsp.brushes[i];
 		b->sides = &d.brushsides[b->brush->firstSide];
 		b->contents = bsp.shaders[b->brush->shaderNum].contentFlags;
-		b->bounds[0][0] = -b->sides[0].plane->plane->intercept;
-		b->bounds[1][0] = b->sides[1].plane->plane->intercept;
-		b->bounds[0][1] = -b->sides[2].plane->plane->intercept;
-		b->bounds[1][1] = b->sides[3].plane->plane->intercept;
-		b->bounds[0][2] = -b->sides[4].plane->plane->intercept;
-		b->bounds[1][2] = b->sides[5].plane->plane->intercept;
+		b->bounds[0][0] = --b->sides[0].plane->plane->intercept;
+		b->bounds[1][0] = -b->sides[1].plane->plane->intercept;
+		b->bounds[0][1] = --b->sides[2].plane->plane->intercept;
+		b->bounds[1][1] = -b->sides[3].plane->plane->intercept;
+		b->bounds[0][2] = --b->sides[4].plane->plane->intercept;
+		b->bounds[1][2] = -b->sides[5].plane->plane->intercept;
 	}
 }
 
@@ -1301,6 +1301,7 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 {
 	D(d);
 	BSPData& bsp = d.world->bspData();
+	d.patches.resize(bsp.numDrawSurfaces);
 	// scan through all the surfaces, but only load patches,
 	// not planar faces
 	for (GMint i = 0; i < bsp.numDrawSurfaces; i++)
@@ -1320,11 +1321,12 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 		GMint shaderNum = bsp.drawSurfaces[i].shaderNum;
 
 		BSP_Physics_Patch* patch = GM_new<BSP_Physics_Patch>();
+		patch->surface = &bsp.drawSurfaces[i];
 		patch->contents = bsp.shaders[shaderNum].contentFlags;
 		patch->surfaceFlags = bsp.shaders[shaderNum].surfaceFlags;
 		generatePatchCollide(width, height, points.data(), &patch->pc);
 
-		d.patches.push_back(patch);
+		d.patches[i] = patch;
 	}
 }
 
@@ -1505,14 +1507,18 @@ void BSPPhysicsWorld::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f,
 	// t1, t2表示p1和p2与plane的垂直距离
 	// 如果平面是与坐标系垂直，可以直接用p[plane->planeType]来拿距离
 	GMfloat t1, t2, offset;
+
+	// 由于把BSP坐标系变为了OpenGL坐标系，导致intercept变成了原来的负数 (bsp.cpp)
+	GMfloat dist = -plane->plane->intercept;
+
 	if (plane->planeType < PLANE_NON_AXIAL) {
-		t1 = p1[plane->planeType] - plane->plane->intercept;
-		t2 = p2[plane->planeType] - plane->plane->intercept;
+		t1 = p1[plane->planeType] - dist;
+		t2 = p2[plane->planeType] - dist;
 		offset = tw.extents[plane->planeType];
 	}
 	else {
-		t1 = vmath::dot(plane->plane->normal, p1) - plane->plane->intercept;
-		t2 = vmath::dot(plane->plane->normal, p2) - plane->plane->intercept;
+		t1 = vmath::dot(plane->plane->normal, p1) - dist;
+		t2 = vmath::dot(plane->plane->normal, p2) - dist;
 		if (tw.isPoint) {
 			offset = 0;
 		}
@@ -2000,7 +2006,8 @@ void BSPPhysicsWorld::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *bru
 			plane = &d.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for radius
-			GMfloat dist = plane->plane->intercept + tw.sphere.radius;
+			GMfloat _intercept = -plane->plane->intercept; // bsp.cpp
+			GMfloat dist = _intercept + tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
 			GMfloat t = vmath::dot(plane->plane->normal, tw.sphere.offset);
@@ -2070,7 +2077,8 @@ void BSPPhysicsWorld::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *bru
 			plane = &d.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for mins/maxs
-			GMfloat dist = plane->plane->intercept - vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
+			GMfloat _intercept = -plane->plane->intercept; // bsp.cpp
+			GMfloat dist = _intercept - vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
 
 			GMfloat d1 = vmath::dot(tw.start, plane->plane->normal) - dist;
 			GMfloat d2 = vmath::dot(tw.end, plane->plane->normal) - dist;
