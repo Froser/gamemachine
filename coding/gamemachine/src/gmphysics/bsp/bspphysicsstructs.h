@@ -72,8 +72,7 @@ struct BSP_Physics_Patch
 {
 	BSPSurface* surface;
 	GMint checkcount;
-	GMint surfaceFlags;
-	GMint contents;
+	BSPShader* shader;
 	BSPPatchCollide *pc;
 
 	~BSP_Physics_Patch()

@@ -111,23 +111,13 @@ void BSPRender::generateVertices()
 	d.vertices.resize(d.bsp->numDrawVertices);
 	for (GMint i = 0; i < d.bsp->numDrawVertices; i++)
 	{
-		//swap y and z and negate z
-		GMfloat &_0 = d.bsp->vertices[i].xyz[0],
-			&_1 = d.bsp->vertices[i].xyz[1],
-			&_2 = d.bsp->vertices[i].xyz[2];
-		SWAP(_1, _2);
-		_2 = -_2;
-
-		d.vertices[i].position[0] = _0;
-		d.vertices[i].position[1] = _1;
-		d.vertices[i].position[2] = _2;
+		d.vertices[i].position[0] = d.bsp->vertices[i].xyz[0];
+		d.vertices[i].position[1] = d.bsp->vertices[i].xyz[1];
+		d.vertices[i].position[2] = d.bsp->vertices[i].xyz[2];
 		d.vertices[i].position[3] = 1.0f;
 
 		//scale down
 		// d.vertices[i].position /= SCALING_DOWN;
-
-		//Transfer texture coordinates (Invert t)
-		d.bsp->vertices[i].st[1] = -d.bsp->vertices[i].st[1];
 		d.vertices[i].decalS = d.bsp->vertices[i].st[0];
 		d.vertices[i].decalT = d.bsp->vertices[i].st[1];
 
@@ -296,17 +286,7 @@ void BSPRender::generateLeafs()
 void BSPRender::generatePlanes()
 {
 	D(d);
-	//planes
-	//reverse the intercept on the planes and convert planes to OGL coordinates
-	for (GMint i = 0; i < d.bsp->numplanes; ++i)
-	{
-		//swap y and z and negate z
-		SWAP(d.bsp->planes[i].normal[1], d.bsp->planes[i].normal[2])
-			d.bsp->planes[i].normal[2] = -d.bsp->planes[i].normal[2];
-
-		d.bsp->planes[i].intercept = -d.bsp->planes[i].intercept;
-		// d.planes[i].intercept /= SCALING_DOWN;	//scale down
-	}
+	// Nothing to do
 }
 
 void BSPRender::generateVisibilityData()

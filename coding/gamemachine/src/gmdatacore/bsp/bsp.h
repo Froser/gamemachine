@@ -254,6 +254,7 @@ public:
 private:
 	void readFile();
 	void swapBsp();
+	void toGLCoord();
 	void parseFromMemory(char *buffer, int size);
 	void generateLightVolumes();
 	void parseEntities();

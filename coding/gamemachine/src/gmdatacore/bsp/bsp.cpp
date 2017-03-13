@@ -36,6 +36,7 @@ void BSP::loadBsp(const char* filename)
 	readFile();
 	swapBsp();
 	parseEntities();
+	toGLCoord();
 	generateLightVolumes();
 }
 
@@ -151,6 +152,33 @@ void BSP::swapBsp()
 
 	// swap everything
 	SwapBSPFile(d);
+}
+
+// 将坐标系转化为xyz(OpenGL)坐标系
+void BSP::toGLCoord()
+{
+	D(d);
+	for (GMint i = 0; i < d.numDrawVertices; i++)
+	{
+		//swap y and z and negate z
+		GMfloat &_0 = d.vertices[i].xyz[0],
+			&_1 = d.vertices[i].xyz[1],
+			&_2 = d.vertices[i].xyz[2];
+		SWAP(_1, _2);
+		_2 = -_2;
+
+
+		//Transfer texture coordinates (Invert t)
+		d.vertices[i].st[1] = -d.vertices[i].st[1];
+	}
+
+	for (GMint i = 0; i < d.numplanes; ++i)
+	{
+		//swap y and z and negate z
+		SWAP(d.planes[i].normal[1], d.planes[i].normal[2]);
+		d.planes[i].normal[2] = -d.planes[i].normal[2];
+		d.planes[i].intercept = -d.planes[i].intercept;
+	}
 }
 
 void BSP::parseEntities()

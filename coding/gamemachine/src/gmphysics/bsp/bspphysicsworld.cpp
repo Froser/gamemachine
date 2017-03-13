@@ -40,21 +40,15 @@ struct PatchCollideContext
 struct BSPWinding
 {
 	GMint numpoints;
-	vmath::vec3* p;
-	GMint mysize;
+	std::vector<vmath::vec3> p;
 
 	static BSPWinding* alloc(GMint pointNum)
 	{
-		BSPWinding* p = GM_new<BSPWinding>();
-		p->p = new vmath::vec3[pointNum];
-		p->mysize = sizeof(vmath::vec3) * pointNum;
-		memset(p->p, 0, p->mysize);
+		ASSERT(pointNum != 0);
+		BSPWinding* p = new BSPWinding();
+		p->numpoints = pointNum;
+		p->p.resize(pointNum);
 		return p;
-	}
-
-	~BSPWinding()
-	{
-		delete p;
 	}
 };
 
@@ -102,12 +96,10 @@ static void setGridWrapWidth(BSPGrid* grid) {
 			break;
 		}
 	}
-	if (i == grid->height) {
+	if (i == grid->height)
 		grid->wrapWidth = true;
-	}
-	else {
+	else
 		grid->wrapWidth = false;
-	}
 }
 
 static bool needsSubdivision(const vmath::vec3& a, const vmath::vec3& b, const vmath::vec3& c) {
@@ -621,15 +613,16 @@ static void baseWindingForPlane(const vmath::vec3& normal, GMfloat dist, OUT BSP
 	if (x == -1)
 		gm_error("baseWindingForPlane: no axis found");
 
+	// 找到向上轴，openGL中y坐标轴表示向上
 	vup = vmath::vec3(0, 0, 0);
 	switch (x)
 	{
 	case 0:
 	case 1:
-		vup[2] = 1;
+		vup[1] = 1;
 		break;
 	case 2:
-		vup[0] = 1;
+		vup[2] = 1;
 		break;
 	}
 
@@ -782,7 +775,9 @@ static void copyWinding(BSPWinding* w, REF BSPWinding** out)
 {
 	BSPWinding *c;
 	c = BSPWinding::alloc(w->numpoints);
-	memcpy(c, w, w->mysize);
+	c->numpoints = w->numpoints;
+	c->p = w->p;
+	*out = c;
 }
 
 void snapVector(vmath::vec3& normal) {
@@ -969,7 +964,8 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 	facet->numBorders++;
 }
 
-static bool validateFacet(PatchCollideContext& context, BSPFacet* facet) {
+static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
+{
 	vmath::vec4 plane;
 	GMint j;
 	BSPWinding* w;
@@ -983,14 +979,14 @@ static bool validateFacet(PatchCollideContext& context, BSPFacet* facet) {
 	plane = context.planes[facet->surfacePlane].plane;
 	baseWindingForPlane(VEC3(plane), plane[3], &w);
 	for (j = 0; j < facet->numBorders && w; j++) {
-		if (facet->borderPlanes[j] == -1) {
+		if (facet->borderPlanes[j] == -1)
+		{
+			delete w;
 			return false;
 		}
 		plane = context.planes[facet->borderPlanes[j]].plane;
 		if (!facet->borderInward[j]) {
-			vmath::vec3 t = origin - VEC3(plane);
-			plane = VEC4(t, plane);
-			plane[3] = -plane[3];
+			plane = -plane;
 		}
 		chopWindingInPlace(&w, VEC3(plane), plane[3], 0.1f);
 	}
@@ -1407,16 +1403,14 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 		std::vector<vmath::vec3> points;
 		points.resize(c);
 		BSPDrawVertices* v = &bsp.vertices[bsp.drawSurfaces[i].firstVert];
-		for (GMint j = 0; j < c; j++)
+		for (GMint j = 0; j < c; j++, v++)
 		{
 			points[j] = v->xyz;
 		}
-		GMint shaderNum = bsp.drawSurfaces[i].shaderNum;
-
 		BSP_Physics_Patch* patch = GM_new<BSP_Physics_Patch>();
 		patch->surface = &bsp.drawSurfaces[i];
-		patch->contents = bsp.shaders[shaderNum].contentFlags;
-		patch->surfaceFlags = bsp.shaders[shaderNum].surfaceFlags;
+		GMint shaderNum = patch->surface->shaderNum;
+		patch->shader = &bsp.shaders[shaderNum];
 		generatePatchCollide(width, height, points.data(), &patch->pc);
 
 		d.patches[i] = patch;

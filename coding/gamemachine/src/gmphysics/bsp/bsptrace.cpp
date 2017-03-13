@@ -304,7 +304,6 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 			return;
 		}
 	}
-
 	for (GMint k = 0; k < leaf->numLeafSurfaces; k++) {
 		BSP_Physics_Patch* patch = pw.patches[bsp.leafsurfaces[leaf->firstLeafSurface + k]];
 		if (!patch) {
@@ -315,7 +314,7 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 		}
 		patch->checkcount = d.checkcount;
 
-		if (!(patch->contents & tw.contents)) {
+		if (!(patch->shader->contentFlags & tw.contents)) {
 			continue;
 		}
 
@@ -335,8 +334,8 @@ void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
 	traceThroughPatchCollide(tw, patch->pc);
 
 	if (tw.trace.fraction < oldFrac) {
-		tw.trace.surfaceFlags = patch->surfaceFlags;
-		tw.trace.contents = patch->contents;
+		tw.trace.surfaceFlags = patch->shader->surfaceFlags;
+		tw.trace.contents = patch->shader->contentFlags;
 	}
 }
 
