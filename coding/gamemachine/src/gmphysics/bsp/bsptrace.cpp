@@ -348,7 +348,8 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 	vmath::vec4 plane, bestplane;
 	vmath::vec3 startp, endp;
 
-	if (tw.isPoint) {
+	if (tw.isPoint)
+	{
 		tracePointThroughPatchCollide(tw, pc);
 		return;
 	}

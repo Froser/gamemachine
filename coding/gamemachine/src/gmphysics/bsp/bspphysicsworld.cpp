@@ -618,10 +618,10 @@ static void baseWindingForPlane(const vmath::vec3& normal, GMfloat dist, OUT BSP
 	switch (x)
 	{
 	case 0:
-	case 1:
+	case 2:
 		vup[1] = 1;
 		break;
-	case 2:
+	case 1:
 		vup[2] = 1;
 		break;
 	}

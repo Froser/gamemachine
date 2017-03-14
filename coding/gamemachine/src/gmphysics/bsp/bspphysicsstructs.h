@@ -30,24 +30,26 @@ struct BSPLeafList
 	GMint lastLeaf;
 };
 
-struct BSPPatchPlane {
+struct BSPPatchPlane
+{
 	vmath::vec4 plane;
 	int signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 };
 
-typedef struct {
+struct BSPFacet
+{
 	GMint surfacePlane;
 	GMint numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
 	GMint borderPlanes[4 + 6 + 16];
 	GMint borderInward[4 + 6 + 16];
 	bool borderNoAdjust[4 + 6 + 16];
-} BSPFacet;
+};
 
 struct BSPPatchCollide
 {
 	vmath::vec3 bounds[2];
 	int numPlanes; // surface planes plus edge planes
-	BSPPatchPlane	*planes; // TODO need release
+	BSPPatchPlane *planes; // TODO need release
 	int numFacets;
 	BSPFacet* facets; //TODO need release
 };
