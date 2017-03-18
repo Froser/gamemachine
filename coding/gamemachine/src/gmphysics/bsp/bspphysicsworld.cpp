@@ -46,7 +46,7 @@ struct BSPWinding
 	{
 		ASSERT(pointNum != 0);
 		BSPWinding* p = new BSPWinding();
-		p->numpoints = pointNum;
+		p->numpoints = 0;
 		p->p.resize(pointNum);
 		return p;
 	}
@@ -498,7 +498,7 @@ static int pointOnPlaneSide(PatchCollideContext& context, const vmath::vec3& p, 
 
 	const vmath::vec4& plane = context.planes[planeNum].plane;
 
-	d = vmath::dot(p, plane) - plane[3];
+	d = vmath::dot(p, plane) + plane[3];
 
 	if (d > PLANE_TRI_EPSILON) {
 		return SIDE_FRONT;
@@ -584,7 +584,6 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 				VectorCopy(grid->points[i + 1][j + 1], debugBlockPoints[2]);
 				VectorCopy(grid->points[i][j + 1], debugBlockPoints[3]);
 				*/
-				ASSERT(false);
 			}
 		}
 	}
@@ -674,16 +673,14 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GM
 	for (i = 0; i < in->numpoints; i++)
 	{
 		dot = vmath::dot(in->p[i], normal);
-		dot -= dist;
+		dot += dist;
 		dists[i] = dot;
 		if (dot > epsilon)
 			sides[i] = SIDE_FRONT;
 		else if (dot < -epsilon)
 			sides[i] = SIDE_BACK;
 		else
-		{
 			sides[i] = SIDE_ON;
-		}
 		counts[sides[i]]++;
 	}
 	sides[i] = sides[0];
@@ -1172,9 +1169,9 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	pf->numPlanes = context.numPlanes;
 	pf->numFacets = context.numFacets;
 
-	pf->facets = GM_new<BSPFacet>();
+	pf->facets = GM_new_arr<BSPFacet>(context.numFacets);
 	memcpy(pf->facets, context.facets, context.numFacets * sizeof(*pf->facets));
-	pf->planes = GM_new<BSPPatchPlane>();
+	pf->planes = GM_new_arr<BSPPatchPlane>(context.numPlanes);
 	memcpy(pf->planes, context.planes, context.numPlanes * sizeof(*pf->planes));
 }
 
@@ -1224,7 +1221,7 @@ void BSPPhysicsWorld::simulate()
 
 	BSPTraceResult groundTrace;
 	vmath::vec3 floor = d.camera.motions.translation;
-	floor[2] -= .25f;
+	floor[1] -= 6.f;
 	d.trace.trace(d.camera.motions.translation,
 		floor,
 		vmath::vec3(0, 0, 0),
@@ -1234,7 +1231,7 @@ void BSPPhysicsWorld::simulate()
 	);
 
 	std::vector<vmath::vec3> planes;
-	planes.push_back(groundTrace.plane.plane ? groundTrace.plane.plane->normal : vmath::vec3(0, 1, 0));
+	planes.push_back(groundTrace.plane.normal);
 	planes.push_back(vmath::normalize(d.camera.motions.velocity));
 
 	BSPTraceResult moveTrace;
@@ -1256,16 +1253,16 @@ void BSPPhysicsWorld::simulate()
 	GMint i;
 	for (i = 0; i < numplanes; i++)
 	{
-		if (vmath::dot(moveTrace.plane.plane->normal, planes[i]) > 0.99)
-			d.camera.motions.velocity += moveTrace.plane.plane->normal;
+		if (vmath::dot(moveTrace.plane.normal, planes[i]) > 0.99)
+			d.camera.motions.velocity += moveTrace.plane.normal;
 	}
 	if (i < numplanes)
 		return;
 
-	planes.push_back(moveTrace.plane.plane->normal);
+	planes.push_back(moveTrace.plane.normal);
 	numplanes++;
 
-	vmath::vec3 cv;
+	vmath::vec3 cv = d.camera.motions.velocity;
 	for (i = 0; i < numplanes; i++)
 	{
 		if (vmath::dot(d.camera.motions.velocity, planes[i]) >= 0.1)
@@ -1300,6 +1297,7 @@ void BSPPhysicsWorld::simulate()
 				return;
 			}
 		}
+		break;
 	}
 
 	d.camera.motions.velocity = cv;

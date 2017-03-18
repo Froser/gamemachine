@@ -155,6 +155,7 @@ void BSP::swapBsp()
 }
 
 // 将坐标系转化为xyz(OpenGL)坐标系
+// Quake的坐标系为：z正向朝上，y正向朝内，x正向朝右
 void BSP::toGLCoord()
 {
 	D(d);

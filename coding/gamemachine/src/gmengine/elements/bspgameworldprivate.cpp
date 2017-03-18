@@ -28,6 +28,7 @@ static const char* getClassname(const BSPEntity& entity)
 
 PARSE_FUNC(worldspawn, entity, world)
 {
+	/*
 	EACH_PAIR_OF_ENTITY(entity, e)
 	{
 		if (SAME_KEY(e, "ambient")); //nothing
@@ -46,6 +47,19 @@ PARSE_FUNC(worldspawn, entity, world)
 				world->appendLight(ambientLight);
 			}
 		}
+	}
+	*/
+	GameLight* ambientLight;
+	IFactory* factory = world->getGameMachine()->getFactory();
+	factory->createLight(Ambient, &ambientLight);
+	if (ambientLight)
+	{
+		ambientLight->setId(0);
+		ambientLight->setColor(vmath::vec3(1, 1, 1));
+		ambientLight->setPosition(vmath::vec3(0, 0, 0));
+		ambientLight->setWorld(world);
+		ambientLight->setShadowSource(false);
+		world->appendLight(ambientLight);
 	}
 }
 
@@ -75,7 +89,7 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	}
 
 	vmath::vec3 center = (world->renderData().boundMax + world->renderData().boundMin) / 2;
-	vmath::vec3 playerStart (center[0], 118.f, center[2]);
+	vmath::vec3 playerStart (center[0], center[1], center[2]);
 
 	Character* character = new Character(6);
 	character->setMoveSpeed(192);

@@ -50,6 +50,7 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 
 	// tw.offsets[signbits] = vector to appropriate corner from origin
 	// 以原点为中心，offsets[8]表示立方体的8个顶点
+	// 使用offsets[signbits]可以找到3个平面相交的那个角
 	tw.offsets[0][0] = tw.size[0][0];
 	tw.offsets[0][1] = tw.size[0][1];
 	tw.offsets[0][2] = tw.size[0][2];
@@ -155,7 +156,7 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 	// Otherwise, the normal on the plane should have unit length
 	ASSERT(tw.trace.allsolid ||
 		tw.trace.fraction == 1.0 ||
-		vmath::lengthSquare(tw.trace.plane.plane->normal) > 0.9999f);
+		vmath::lengthSquare(tw.trace.plane.normal) > 0.9999f);
 	trace = tw.trace;
 }
 
@@ -190,23 +191,23 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	// 如果平面是与坐标系垂直，可以直接用p[plane->planeType]来拿距离
 	GMfloat t1, t2, offset;
 
-	// 由于把BSP坐标系变为了OpenGL坐标系，导致intercept变成了原来的负数 (bsp.cpp)
-	GMfloat dist = -plane->plane->intercept;
+	GMfloat dist = plane->plane->intercept;
 
 	if (plane->planeType < PLANE_NON_AXIAL) {
-		t1 = p1[plane->planeType] - dist;
-		t2 = p2[plane->planeType] - dist;
+		t1 = p1[plane->planeType] + dist;
+		t2 = p2[plane->planeType] + dist;
 		offset = tw.extents[plane->planeType];
 	}
 	else {
-		t1 = vmath::dot(plane->plane->normal, p1) - dist;
-		t2 = vmath::dot(plane->plane->normal, p2) - dist;
+		t1 = vmath::dot(plane->plane->normal, p1) + dist;
+		t2 = vmath::dot(plane->plane->normal, p2) + dist;
 		if (tw.isPoint) {
 			offset = 0;
 		}
 		else {
 			// this is silly
-			offset = 2048;
+			//offset = 2048;// vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
+			offset = 0;
 		}
 	}
 
@@ -255,8 +256,6 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	midf = p1f + (p2f - p1f)*frac;
 
 	mid = p1 + frac*(p2 - p1);
-	mid = p1 + frac*(p2 - p1);
-	mid = p1 + frac*(p2 - p1);
 
 	traceThroughTree(tw, node->children[side], p1f, midf, p1, mid);
 
@@ -271,9 +270,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 
 	midf = p1f + (p2f - p1f)*frac2;
 
-	mid[0] = p1[0] + frac2*(p2[0] - p1[0]);
-	mid[1] = p1[1] + frac2*(p2[1] - p1[1]);
-	mid[2] = p1[2] + frac2*(p2[2] - p1[2]);
+	mid = p1 + frac2*(p2 - p1);
 
 	traceThroughTree(tw, node->children[side ^ 1], midf, p2f, mid, p2);
 }
@@ -304,6 +301,8 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 			return;
 		}
 	}
+
+	/*
 	for (GMint k = 0; k < leaf->numLeafSurfaces; k++) {
 		BSP_Physics_Patch* patch = pw.patches[bsp.leafsurfaces[leaf->firstLeafSurface + k]];
 		if (!patch) {
@@ -323,6 +322,7 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 			return;
 		}
 	}
+	*/
 }
 
 void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
@@ -447,8 +447,8 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 				}
 
 				tw.trace.fraction = enterFrac;
-				tw.trace.plane.plane->normal = VEC3(bestplane);
-				tw.trace.plane.plane->intercept = bestplane[3];
+				tw.trace.plane.normal = VEC3(bestplane);
+				tw.trace.plane.intercept = bestplane[3];
 			}
 		}
 	}
@@ -547,8 +547,8 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 				tw.trace.fraction = 0;
 			}
 
-			tw.trace.plane.plane->normal = VEC3(planes->plane);
-			tw.trace.plane.plane->intercept = planes->plane[3];
+			tw.trace.plane.normal = VEC3(planes->plane);
+			tw.trace.plane.intercept = planes->plane[3];
 		}
 	}
 }
@@ -621,8 +621,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for radius
-			GMfloat _intercept = -plane->plane->intercept; // bsp.cpp
-			GMfloat dist = _intercept + tw.sphere.radius;
+			GMfloat dist = plane->plane->intercept - tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
 			GMfloat t = vmath::dot(plane->plane->normal, tw.sphere.offset);
@@ -637,8 +636,8 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 				endp = tw.end + tw.sphere.offset;
 			}
 
-			GMfloat d1 = vmath::dot(startp, plane->plane->normal) - dist;
-			GMfloat d2 = vmath::dot(endp, plane->plane->normal) - dist;
+			GMfloat d1 = vmath::dot(startp, plane->plane->normal) + dist;
+			GMfloat d2 = vmath::dot(endp, plane->plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -692,11 +691,11 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for mins/maxs
-			GMfloat _intercept = -plane->plane->intercept; // bsp.cpp
-			GMfloat dist = _intercept - vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
+			GMfloat bound = vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
+			GMfloat dist = plane->plane->intercept + bound;
 
-			GMfloat d1 = vmath::dot(tw.start, plane->plane->normal) - dist;
-			GMfloat d2 = vmath::dot(tw.end, plane->plane->normal) - dist;
+			GMfloat d1 = vmath::dot(tw.start, plane->plane->normal) + dist;
+			GMfloat d2 = vmath::dot(tw.end, plane->plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid

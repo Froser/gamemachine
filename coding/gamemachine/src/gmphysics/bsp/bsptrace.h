@@ -5,13 +5,28 @@
 #include "bspphysicsstructs.h"
 BEGIN_NS
 
+struct BSPTracePlane : BSPPlane
+{
+	GMbyte planeType;
+	GMint signbits;
+
+	BSPTracePlane& operator =(BSP_Physics_Plane& p)
+	{
+		this->planeType = p.planeType;
+		this->signbits = p.signbits;
+		this->normal = p.plane->normal;
+		this->intercept = p.plane->intercept;
+		return *this;
+	}
+};
+
 struct BSPTraceResult
 {
 	bool allsolid; // if true, plane is not valid
 	bool startsolid; // if true, the initial point was in a solid area
 	float fraction; // time completed, 1.0 = didn't hit anything
 	vmath::vec3 endpos; // final position
-	BSP_Physics_Plane plane; // surface normal at impact, transformed to world space
+	BSPTracePlane plane; // surface normal at impact, transformed to world space
 	int surfaceFlags; // surface hit
 	int contents; // contents on other side of surface hit
 	int entityNum; // entity the contacted sirface is a part of

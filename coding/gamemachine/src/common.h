@@ -51,6 +51,14 @@ T* GM_new()
 	return t;
 }
 
+template <typename T>
+T* GM_new_arr(int cnt)
+{
+	T* t = new T[cnt];
+	memset(t, 0, cnt * sizeof(T));
+	return t;
+}
+
 #define BEGIN_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMuint)var)+1) )
 #define END_ENUM
 

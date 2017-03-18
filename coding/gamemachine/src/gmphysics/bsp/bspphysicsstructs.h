@@ -33,7 +33,7 @@ struct BSPLeafList
 struct BSPPatchPlane
 {
 	vmath::vec4 plane;
-	int signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
+	GMint signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 };
 
 struct BSPFacet
@@ -47,11 +47,19 @@ struct BSPFacet
 
 struct BSPPatchCollide
 {
+	~BSPPatchCollide()
+	{
+		if (numPlanes > 0)
+			delete[] planes;
+		if (numFacets > 0)
+			delete[] facets;
+	}
+
 	vmath::vec3 bounds[2];
 	int numPlanes; // surface planes plus edge planes
-	BSPPatchPlane *planes; // TODO need release
+	BSPPatchPlane *planes; //need release
 	int numFacets;
-	BSPFacet* facets; //TODO need release
+	BSPFacet* facets; //need release
 };
 
 struct BSP_Physics_BrushSide

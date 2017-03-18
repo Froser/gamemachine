@@ -203,6 +203,7 @@ void BSPRender::generateFaces()
 			d.faceDirectory[i].typeFaceNumber = currentPatch;
 
 			//Create space to hold quadratic patches
+			// 一个patch有3x3个顶点组成
 			int numPatchesWide = (d.patches[currentPatch].width - 1) / 2;
 			int numPatchesHigh = (d.patches[currentPatch].height - 1) / 2;
 

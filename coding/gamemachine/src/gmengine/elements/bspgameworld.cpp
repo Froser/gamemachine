@@ -194,7 +194,7 @@ void BSPGameWorld::drawFace(GMint idx)
 
 	if (rd.faceDirectory[idx].faceType == MST_TRIANGLE_SOUP)
 		drawMeshFace(rd.faceDirectory[idx].typeFaceNumber);
-
+	
 	if (rd.faceDirectory[idx].faceType == MST_PATCH)
 		drawPatch(rd.faceDirectory[idx].typeFaceNumber);
 }
