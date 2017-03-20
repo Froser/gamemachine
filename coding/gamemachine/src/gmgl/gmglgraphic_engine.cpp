@@ -67,7 +67,6 @@ void GMGLGraphicEngine::applyGraphicSettings()
 	glLineWidth(0);
 	glDepthFunc(GL_LEQUAL);
 	glFrontFace(GL_CW);
-	glEnable(GL_CULL_FACE);
 }
 
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)

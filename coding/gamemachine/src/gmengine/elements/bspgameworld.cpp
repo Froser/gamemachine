@@ -219,19 +219,30 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 
 		Object* coreObj = new Object();
 		ChildObject* child = new ChildObject();
+		child->setArrangementMode(ChildObject::Triangles);
 		Component* component = new Component(child);
 		component->getMaterial() = material;
-		component->beginFace();
 
-		for (GMint i = 0; i < polygonFace.numVertices; i++)
+		ASSERT(polygonFace.numVertices > 3);
+		for (GMint t = 0; t < polygonFace.numVertices - 1; t++)
 		{
-			BSP_Render_Vertex& vertex = rd.vertices[i + polygonFace.firstVertexIndex];
-			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
-			component->uv(vertex.decalS, vertex.decalT);
-			component->lightmap(vertex.lightmapS, vertex.lightmapT);
+			component->beginFace();
+			for (GMint i = 0; i < 3; i++)
+			{
+				const BSP_Render_Vertex* vertex;
+
+				if (i + t <= 3)
+					vertex = &rd.vertices[i + t + polygonFace.firstVertexIndex];
+				else
+					vertex = &rd.vertices[i + t - polygonFace.numVertices + polygonFace.firstVertexIndex];
+
+				component->vertex(vertex->position[0], vertex->position[1], vertex->position[2]);
+				component->uv(vertex->decalS, vertex->decalT);
+				component->lightmap(vertex->lightmapS, vertex->lightmapT);
+			}
+			component->endFace();
 		}
 
-		component->endFace();
 		child->appendComponent(component);
 		coreObj->append(child);
 		obj = new SolidGameObject(coreObj);

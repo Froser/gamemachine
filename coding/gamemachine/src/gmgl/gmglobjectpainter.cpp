@@ -82,6 +82,13 @@ void GMGLObjectPainter::transfer()
 		glEnableVertexAttribArray(5);
 
 		glBindVertexArray(0);
+
+		childObj->vertices().clear();
+		childObj->normals().clear();
+		childObj->uvs().clear();
+		childObj->tangents().clear();
+		childObj->bitangents().clear();
+		childObj->lightmaps().clear();
 	}
 	END_FOREACH_OBJ
 
@@ -240,16 +247,6 @@ ITexture* GMGLObjectPainter::getTexture(TextureFrames& frames)
 
 void GMGLObjectPainter::activeShader(Shader* shader)
 {
-	if (shader->cull == GMS_NONE)
-	{
-		glDisable(GL_CULL_FACE);
-	}
-	else
-	{
-		glFrontFace(GL_CW);
-		glEnable(GL_CULL_FACE);
-	}
-
 	if (shader->blend)
 	{
 		glEnable(GL_BLEND);
