@@ -223,22 +223,17 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 		Component* component = new Component(child);
 		component->getMaterial() = material;
 
-		ASSERT(polygonFace.numVertices > 3);
-		for (GMint t = 0; t < polygonFace.numVertices - 1; t++)
+		ASSERT(polygonFace.numIndices % 3 == 0);
+		for (GMint i = 0; i < polygonFace.numIndices / 3; i++)
 		{
 			component->beginFace();
-			for (GMint i = 0; i < 3; i++)
+			for (GMint j = 0; j < 3; j++)
 			{
-				const BSP_Render_Vertex* vertex;
-
-				if (i + t <= 3)
-					vertex = &rd.vertices[i + t + polygonFace.firstVertexIndex];
-				else
-					vertex = &rd.vertices[i + t - polygonFace.numVertices + polygonFace.firstVertexIndex];
-
-				component->vertex(vertex->position[0], vertex->position[1], vertex->position[2]);
-				component->uv(vertex->decalS, vertex->decalT);
-				component->lightmap(vertex->lightmapS, vertex->lightmapT);
+				GMint idx = bsp.drawIndexes[polygonFace.firstIndex + i * 3 + j];
+				BSP_Render_Vertex& vertex = rd.vertices[polygonFace.firstVertex + idx];
+				component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
+				component->uv(vertex.decalS, vertex.decalT);
+				component->lightmap(vertex.lightmapS, vertex.lightmapT);
 			}
 			component->endFace();
 		}
@@ -283,9 +278,9 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 		component->getMaterial() = material;
 		component->beginFace();
 
-		GMuint* idxStart = (GMuint*)&bsp.drawIndexes[meshFace.firstMeshIndex];
-		GMuint offset = meshFace.firstVertexIndex;
-		for (int i = 0; i < meshFace.numMeshIndices; ++i)
+		GMuint* idxStart = (GMuint*)&bsp.drawIndexes[meshFace.firstIndex];
+		GMuint offset = meshFace.firstVertex;
+		for (int i = 0; i < meshFace.numIndices; ++i)
 		{
 			GMuint idx = *(idxStart + i);
 			BSP_Render_Vertex& vertex = rd.vertices[offset + idx];

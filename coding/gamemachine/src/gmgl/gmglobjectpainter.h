@@ -28,8 +28,8 @@ private:
 	void activeTextureTransform(Shader* shader, TextureIndex i, ChildObject::ObjectType type);
 	void deactiveTexture(TextureIndex i, ChildObject::ObjectType type);
 	ITexture* getTexture(TextureFrames& frames);
-	void activeShader(Shader* shader);
-	void deactiveShader(Shader* shader);
+	void activateShader(Shader* shader);
+	void deactivateShader(Shader* shader);
 	void beginShader(Shader* shader, ChildObject::ObjectType type);
 	void endShader(Shader* shader, ChildObject::ObjectType type);
 

@@ -245,8 +245,18 @@ ITexture* GMGLObjectPainter::getTexture(TextureFrames& frames)
 	return frames.frames[(elapsed / frames.animationMs) % frames.frameCount];
 }
 
-void GMGLObjectPainter::activeShader(Shader* shader)
+void GMGLObjectPainter::activateShader(Shader* shader)
 {
+	if (shader->cull == GMS_NONE)
+	{
+		glDisable(GL_CULL_FACE);
+	}
+	else
+	{
+		glFrontFace(GL_CW);
+		glEnable(GL_CULL_FACE);
+	}
+
 	if (shader->blend)
 	{
 		glEnable(GL_BLEND);
@@ -285,7 +295,7 @@ void GMGLObjectPainter::activeShader(Shader* shader)
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 }
 
-void GMGLObjectPainter::deactiveShader(Shader* shader)
+void GMGLObjectPainter::deactivateShader(Shader* shader)
 {
 	if (shader->blend)
 	{
@@ -295,7 +305,7 @@ void GMGLObjectPainter::deactiveShader(Shader* shader)
 
 void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type)
 {
-	activeShader(shader);
+	activateShader(shader);
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		// 按照贴图类型选择纹理动画序列
@@ -314,7 +324,7 @@ void GMGLObjectPainter::beginShader(Shader* shader, ChildObject::ObjectType type
 
 void GMGLObjectPainter::endShader(Shader* shader, ChildObject::ObjectType type)
 {
-	deactiveShader(shader);
+	deactivateShader(shader);
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		deactiveTexture((TextureIndex)i, type);

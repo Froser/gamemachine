@@ -43,32 +43,20 @@ public:
 	}
 };
 
-class BSP_Render_PolygonFace
+struct BSP_Render_Face
 {
-public:
-	int firstVertexIndex;
+	int firstVertex;
 	int numVertices;
 	int textureIndex;
 	int lightmapIndex;
+	int firstIndex;
+	int numIndices;
 };
 
-//mesh face for drawing
-class BSP_Render_FaceDirectoryEntry
+struct BSP_Render_FaceDirectoryEntry
 {
-public:
 	BSPSurfaceType faceType;
 	int typeFaceNumber;		//face number in the list of faces of this type
-};
-
-class BSP_Render_MeshFace
-{
-public:
-	int firstVertexIndex;
-	int numVertices;
-	int textureIndex;
-	int lightmapIndex;
-	int firstMeshIndex;
-	int numMeshIndices;
 };
 
 //every patch (curved surface) is split into biquadratic (3x3) patches
@@ -164,15 +152,15 @@ struct BSPRenderPrivate
 	GMint numPatches;
 	GMint numMeshFaces;
 	std::vector<BSP_Render_FaceDirectoryEntry> faceDirectory;
-	std::vector<BSP_Render_PolygonFace> polygonFaces;
-	std::vector<BSP_Render_MeshFace> meshFaces;
+	std::vector<BSP_Render_Face> polygonFaces;
+	std::vector<BSP_Render_Face> meshFaces;
 	std::vector<BSP_Render_Patch> patches;
 	std::vector<BSP_Render_Leaf> leafs;
 	BSP_Render_VisibilityData visibilityData;
 
 	std::map<BSP_Render_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
-	std::map<BSP_Render_PolygonFace*, GameObject*> polygonFaceObjects;
-	std::map<BSP_Render_MeshFace*, GameObject*> meshFaceObjects;
+	std::map<BSP_Render_Face*, GameObject*> polygonFaceObjects;
+	std::map<BSP_Render_Face*, GameObject*> meshFaceObjects;
 
 	// 用于绘制天空
 	vmath::vec3 boundMin;

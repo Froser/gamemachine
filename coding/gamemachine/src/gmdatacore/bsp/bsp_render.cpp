@@ -163,10 +163,12 @@ void BSPRender::generateFaces()
 	{
 		if (d.bsp->drawSurfaces[i].surfaceType == MST_PLANAR)		//skip this loadFace if it is not a polygon face
 		{
-			d.polygonFaces[currentFace].firstVertexIndex = d.bsp->drawSurfaces[i].firstVert;
+			d.polygonFaces[currentFace].firstVertex = d.bsp->drawSurfaces[i].firstVert;
 			d.polygonFaces[currentFace].numVertices = d.bsp->drawSurfaces[i].numVerts;
 			d.polygonFaces[currentFace].textureIndex = d.bsp->drawSurfaces[i].shaderNum;
 			d.polygonFaces[currentFace].lightmapIndex = d.bsp->drawSurfaces[i].lightmapNum;
+			d.polygonFaces[currentFace].firstIndex = d.bsp->drawSurfaces[i].firstIndex;
+			d.polygonFaces[currentFace].numIndices = d.bsp->drawSurfaces[i].numIndexes;
 
 			//fill in this entry on the face directory
 			d.faceDirectory[i].faceType = MST_PLANAR;
@@ -177,12 +179,12 @@ void BSPRender::generateFaces()
 
 		if (d.bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)		//skip this loadFace if it is not a mesh face
 		{
-			d.meshFaces[currentMeshFace].firstVertexIndex = d.bsp->drawSurfaces[i].firstVert;
+			d.meshFaces[currentMeshFace].firstVertex = d.bsp->drawSurfaces[i].firstVert;
 			d.meshFaces[currentMeshFace].numVertices = d.bsp->drawSurfaces[i].numVerts;
 			d.meshFaces[currentMeshFace].textureIndex = d.bsp->drawSurfaces[i].shaderNum;
 			d.meshFaces[currentMeshFace].lightmapIndex = d.bsp->drawSurfaces[i].lightmapNum;
-			d.meshFaces[currentMeshFace].firstMeshIndex = d.bsp->drawSurfaces[i].firstIndex;
-			d.meshFaces[currentMeshFace].numMeshIndices = d.bsp->drawSurfaces[i].numIndexes;
+			d.meshFaces[currentMeshFace].firstIndex = d.bsp->drawSurfaces[i].firstIndex;
+			d.meshFaces[currentMeshFace].numIndices = d.bsp->drawSurfaces[i].numIndexes;
 
 			//fill in this entry on the face directory
 			d.faceDirectory[i].faceType = MST_TRIANGLE_SOUP;
