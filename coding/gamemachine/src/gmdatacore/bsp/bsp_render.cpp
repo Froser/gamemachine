@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bsp_render.h"
+#include "gmdatacore/object.h"
 
 BSPRenderData& BSPRender::renderData()
 {
@@ -301,4 +302,35 @@ void BSPRender::generateVisibilityData()
 	int bitsetSize = d.visibilityData.numClusters * d.visibilityData.bytesPerCluster;
 	d.visibilityData.bitset = new GMbyte[bitsetSize];
 	memcpy(d.visibilityData.bitset, d.bsp->visBytes.data() + sz, bitsetSize);
+}
+
+void BSPRender::createObject(const BSP_Render_Face& face, const Material& material, OUT Object** obj)
+{
+	D(d);
+
+	Object* coreObj = new Object();
+	ChildObject* child = new ChildObject();
+	child->setArrangementMode(ChildObject::Triangles);
+	Component* component = new Component(child);
+	component->getMaterial() = material;
+
+	ASSERT(face.numIndices % 3 == 0);
+	for (GMint i = 0; i < face.numIndices / 3; i++)
+	{
+		component->beginFace();
+		for (GMint j = 0; j < 3; j++)
+		{
+			GMint idx = d.bsp->drawIndexes[face.firstIndex + i * 3 + j];
+			BSP_Render_Vertex& vertex = d.vertices[face.firstVertex + idx];
+			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
+			component->uv(vertex.decalS, vertex.decalT);
+			component->lightmap(vertex.lightmapS, vertex.lightmapT);
+		}
+		component->endFace();
+	}
+
+	child->appendComponent(component);
+	coreObj->append(child);
+
+	*obj = coreObj;
 }

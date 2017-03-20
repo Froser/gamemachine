@@ -217,29 +217,8 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 			return;
 		setMaterialLightmap(polygonFace.lightmapIndex, material);
 
-		Object* coreObj = new Object();
-		ChildObject* child = new ChildObject();
-		child->setArrangementMode(ChildObject::Triangles);
-		Component* component = new Component(child);
-		component->getMaterial() = material;
-
-		ASSERT(polygonFace.numIndices % 3 == 0);
-		for (GMint i = 0; i < polygonFace.numIndices / 3; i++)
-		{
-			component->beginFace();
-			for (GMint j = 0; j < 3; j++)
-			{
-				GMint idx = bsp.drawIndexes[polygonFace.firstIndex + i * 3 + j];
-				BSP_Render_Vertex& vertex = rd.vertices[polygonFace.firstVertex + idx];
-				component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
-				component->uv(vertex.decalS, vertex.decalT);
-				component->lightmap(vertex.lightmapS, vertex.lightmapT);
-			}
-			component->endFace();
-		}
-
-		child->appendComponent(component);
-		coreObj->append(child);
+		Object* coreObj;
+		d.render.createObject(polygonFace, material, &coreObj);
 		obj = new SolidGameObject(coreObj);
 
 		rd.polygonFaceObjects[&polygonFace] = obj;
@@ -271,27 +250,8 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 			return;
 		setMaterialLightmap(meshFace.lightmapIndex, material);
 
-		Object* coreObj = new Object();
-		ChildObject* child = new ChildObject();
-		child->setArrangementMode(ChildObject::Triangles);
-		Component* component = new Component(child);
-		component->getMaterial() = material;
-		component->beginFace();
-
-		GMuint* idxStart = (GMuint*)&bsp.drawIndexes[meshFace.firstIndex];
-		GMuint offset = meshFace.firstVertex;
-		for (int i = 0; i < meshFace.numIndices; ++i)
-		{
-			GMuint idx = *(idxStart + i);
-			BSP_Render_Vertex& vertex = rd.vertices[offset + idx];
-			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
-			component->uv(vertex.decalS, vertex.decalT);
-			component->lightmap(vertex.lightmapS, vertex.lightmapT);
-		}
-		component->endFace();
-		child->appendComponent(component);
-
-		coreObj->append(child);
+		Object* coreObj;
+		d.render.createObject(meshFace, material, &coreObj);
 		obj = new SolidGameObject(coreObj);
 		rd.meshFaceObjects[&meshFace] = obj;
 		appendObjectAndInit(obj);

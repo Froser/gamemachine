@@ -168,6 +168,8 @@ struct BSPRenderPrivate
 };
 
 typedef BSPRenderPrivate BSPRenderData;
+class Object;
+struct Material;
 class BSPRender
 {
 	DEFINE_PRIVATE(BSPRender);
@@ -175,6 +177,7 @@ class BSPRender
 public:
 	BSPRenderData& renderData();
 	void generateRenderData(BSPData* bsp);
+	void createObject(const BSP_Render_Face& face, const Material& material, OUT Object** obj);
 
 private:
 	void generateVertices();
