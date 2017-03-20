@@ -10,12 +10,10 @@ struct BSPTracePlane : BSPPlane
 	GMbyte planeType;
 	GMint signbits;
 
-	BSPTracePlane& operator =(BSP_Physics_Plane& p)
+	BSPTracePlane& operator =(BSPPlane& p)
 	{
-		this->planeType = p.planeType;
-		this->signbits = p.signbits;
-		this->normal = p.plane->normal;
-		this->intercept = p.plane->intercept;
+		this->normal = p.normal;
+		this->intercept = p.intercept;
 		return *this;
 	}
 };

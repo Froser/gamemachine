@@ -1249,28 +1249,26 @@ void BSPPhysicsWorld::simulate()
 		return;
 
 	// 碰撞到平面，分解速度
-	GMint numplanes = planes.size();
-	GMint i;
-	for (i = 0; i < numplanes; i++)
+	GMuint i;
+	for (i = 0; i < planes.size(); i++)
 	{
 		if (vmath::dot(moveTrace.plane.normal, planes[i]) > 0.99)
 			d.camera.motions.velocity += moveTrace.plane.normal;
 	}
-	if (i < numplanes)
+	if (i < planes.size())
 		return;
 
 	planes.push_back(moveTrace.plane.normal);
-	numplanes++;
 
 	vmath::vec3 cv = d.camera.motions.velocity;
-	for (i = 0; i < numplanes; i++)
+	for (i = 0; i < planes.size(); i++)
 	{
 		if (vmath::dot(d.camera.motions.velocity, planes[i]) >= 0.1)
 			continue; // 朝着平面前方移动，不会有交汇
 
 		clipVelocity(d.camera.motions.velocity, planes[i], cv, 1.0f);
 		// see if there is a second plane that the new move enters
-		for (GMint j = 0; j < numplanes; j++)
+		for (GMuint j = 0; j < planes.size(); j++)
 		{
 			if (j == i)
 				continue;
@@ -1284,7 +1282,7 @@ void BSPPhysicsWorld::simulate()
 			dir = vmath::normalize(dir);
 			GMfloat s = vmath::dot(dir, d.camera.motions.velocity);
 			// see if there is a third plane the the new move enters
-			for (GMint k = 0; k < numplanes; k++) {
+			for (GMuint k = 0; k < planes.size(); k++) {
 				if (k == i || k == j) {
 					continue;
 				}
@@ -1338,7 +1336,7 @@ void BSPPhysicsWorld::generatePhysicsPlaneData()
 	d.planes.resize(bsp.numplanes);
 	for (GMint i = 0; i < bsp.numplanes; i++)
 	{
-		d.planes[i].plane = &bsp.planes[i];
+		d.planes[i] = bsp.planes[i];
 		d.planes[i].planeType = PlaneTypeForNormal(bsp.planes[i].normal);
 		d.planes[i].signbits = 0;
 		for (GMint j = 0; j < 3; j++)
@@ -1375,12 +1373,12 @@ void BSPPhysicsWorld::generatePhysicsBrushData()
 		b->brush = &bsp.brushes[i];
 		b->sides = &d.brushsides[b->brush->firstSide];
 		b->contents = bsp.shaders[b->brush->shaderNum].contentFlags;
-		b->bounds[0][0] = --b->sides[0].plane->plane->intercept;
-		b->bounds[1][0] = -b->sides[1].plane->plane->intercept;
-		b->bounds[0][1] = --b->sides[2].plane->plane->intercept;
-		b->bounds[1][1] = -b->sides[3].plane->plane->intercept;
-		b->bounds[0][2] = --b->sides[4].plane->plane->intercept;
-		b->bounds[1][2] = -b->sides[5].plane->plane->intercept;
+		b->bounds[0][0] = --b->sides[0].plane->intercept;
+		b->bounds[1][0] = -b->sides[1].plane->intercept;
+		b->bounds[0][1] = --b->sides[2].plane->intercept;
+		b->bounds[1][1] = -b->sides[3].plane->intercept;
+		b->bounds[0][2] = --b->sides[4].plane->intercept;
+		b->bounds[1][2] = -b->sides[5].plane->intercept;
 	}
 }
 

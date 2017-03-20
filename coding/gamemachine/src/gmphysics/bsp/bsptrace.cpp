@@ -166,7 +166,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	BSPData& bsp = *d.bsp;
 	BSPPhysicsWorldData& pw = d.p_world->physicsData();
 	BSPNode* node;
-	BSP_Physics_Plane* plane;
+	BSPTracePlane* plane;
 
 	if (tw.trace.fraction <= p1f)
 	{
@@ -191,7 +191,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	// 如果平面是与坐标系垂直，可以直接用p[plane->planeType]来拿距离
 	GMfloat t1, t2, offset;
 
-	GMfloat dist = plane->plane->intercept;
+	GMfloat dist = plane->intercept;
 
 	if (plane->planeType < PLANE_NON_AXIAL) {
 		t1 = p1[plane->planeType] + dist;
@@ -199,15 +199,14 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 		offset = tw.extents[plane->planeType];
 	}
 	else {
-		t1 = vmath::dot(plane->plane->normal, p1) + dist;
-		t2 = vmath::dot(plane->plane->normal, p2) + dist;
+		t1 = vmath::dot(plane->normal, p1) + dist;
+		t2 = vmath::dot(plane->normal, p2) + dist;
 		if (tw.isPoint) {
 			offset = 0;
 		}
 		else {
 			// this is silly
-			//offset = 2048;// vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
-			offset = 0;
+			offset = 2048;
 		}
 	}
 
@@ -608,7 +607,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 
 	bool getout = false, startout = false;
 	BSP_Physics_BrushSide* side = nullptr, *leadside = nullptr;
-	BSP_Physics_Plane* plane = nullptr, *clipplane = nullptr;
+	BSPTracePlane* plane = nullptr, *clipplane = nullptr;
 	GMfloat f = 0;
 	GMfloat enterFrac = -1.0;
 	GMfloat leaveFrac = 1.0;
@@ -621,10 +620,10 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for radius
-			GMfloat dist = plane->plane->intercept - tw.sphere.radius;
+			GMfloat dist = plane->intercept - tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			GMfloat t = vmath::dot(plane->plane->normal, tw.sphere.offset);
+			GMfloat t = vmath::dot(plane->normal, tw.sphere.offset);
 			if (t > 0)
 			{
 				startp = tw.start - tw.sphere.offset;
@@ -636,8 +635,8 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 				endp = tw.end + tw.sphere.offset;
 			}
 
-			GMfloat d1 = vmath::dot(startp, plane->plane->normal) + dist;
-			GMfloat d2 = vmath::dot(endp, plane->plane->normal) + dist;
+			GMfloat d1 = vmath::dot(startp, plane->normal) + dist;
+			GMfloat d2 = vmath::dot(endp, plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -691,11 +690,11 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for mins/maxs
-			GMfloat bound = vmath::dot(tw.offsets[plane->signbits], plane->plane->normal);
-			GMfloat dist = plane->plane->intercept + bound;
+			GMfloat bound = vmath::dot(tw.offsets[plane->signbits], plane->normal);
+			GMfloat dist = plane->intercept + bound;
 
-			GMfloat d1 = vmath::dot(tw.start, plane->plane->normal) + dist;
-			GMfloat d2 = vmath::dot(tw.end, plane->plane->normal) + dist;
+			GMfloat d1 = vmath::dot(tw.start, plane->normal) + dist;
+			GMfloat d2 = vmath::dot(tw.end, plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid

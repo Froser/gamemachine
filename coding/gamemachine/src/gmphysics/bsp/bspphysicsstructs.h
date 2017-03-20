@@ -14,15 +14,6 @@ enum PlaneType
 	PLANE_NON_AXIAL,
 };
 
-struct BSP_Physics_Plane
-{
-	BSPPlane* plane;
-	GMbyte planeType;
-	GMint signbits;
-
-	GMint classifyBox(vmath::vec3& emins, vmath::vec3& emaxs);
-};
-
 struct BSPLeafList
 {
 	std::vector<GMint> list;
@@ -62,10 +53,11 @@ struct BSPPatchCollide
 	BSPFacet* facets; //need release
 };
 
+struct BSPTracePlane;
 struct BSP_Physics_BrushSide
 {
 	BSPBrushSide* side;
-	BSP_Physics_Plane* plane;
+	BSPTracePlane* plane;
 	GMint surfaceFlags;
 };
 

@@ -21,7 +21,7 @@ struct BSPPhysicsWorldPrivate
 	BSPGameWorld* world;
 	CollisionObject camera;
 
-	std::vector<BSP_Physics_Plane> planes;
+	std::vector<BSPTracePlane> planes;
 	std::vector<BSP_Physics_Brush> brushes;
 	std::vector<BSP_Physics_BrushSide> brushsides;
 	AUTORELEASE std::vector<BSP_Physics_Patch*> patches;
