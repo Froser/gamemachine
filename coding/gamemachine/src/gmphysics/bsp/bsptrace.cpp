@@ -109,9 +109,9 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 		}
 	}
 
-#if 0
-	if (start[0] == end[0] && start[1] == end[1] && start[2] == end[2])
+	if (vmath::equals(start, end))
 	{
+		/*
 		if (model) {
 			if (model == CAPSULE_MODEL_HANDLE) {
 				if (tw.sphere.use) {
@@ -127,19 +127,22 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 		}
 		else
 			positionTest(tw);
+		*/
 	}
-#endif
-	if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0)
+	else
 	{
-		tw.isPoint = true;
-		tw.extents = vmath::vec3(0);
-	}
-	else {
-		tw.isPoint = false;
-		tw.extents = tw.size[1];
-	}
+		if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0)
+		{
+			tw.isPoint = true;
+			tw.extents = vmath::vec3(0);
+		}
+		else {
+			tw.isPoint = false;
+			tw.extents = tw.size[1];
+		}
 
-	traceThroughTree(tw, 0, 0, 1, tw.start, tw.end);
+		traceThroughTree(tw, 0, 0, 1, tw.start, tw.end);
+	}
 
 	// generate endpos from the original, unmodified start/end
 	if (tw.trace.fraction == 1)

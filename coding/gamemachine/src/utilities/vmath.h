@@ -1364,6 +1364,20 @@ static inline T mix(const T& A, const T& B, const T& t)
     return B + t * (B - A);
 }
 
-};
+static inline bool fuzzyCompare(float p1, float p2)
+{
+    return (abs(p1 - p2) <= 0.00001f * std::min(abs(p1), abs(p2)));
+}
 
+static inline bool equals(const vmath::vec3& a, const vmath::vec3& b)
+{
+    for (int i = 0; i < 3; i++)
+    {
+        if (!fuzzyCompare(a[i], b[i]))
+            return false;
+    }
+    return true;
+}
+
+};
 #endif /* __VMATH_H__ */

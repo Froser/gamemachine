@@ -1272,15 +1272,17 @@ void BSPPhysicsWorld::simulate()
 		{
 			if (j == i)
 				continue;
-			if (vmath::dot(d.camera.motions.velocity, planes[j]) >= 0.1)
+			if (vmath::dot(cv, planes[j]) >= 0.1)
 				continue;
-			clipVelocity(d.camera.motions.velocity, planes[j], cv, 1.0f);
+			clipVelocity(cv, planes[j], cv, 1.0f);
 			if (vmath::dot(cv, planes[i]) >= 0)
 				continue;
 
 			vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
 			dir = vmath::normalize(dir);
 			GMfloat s = vmath::dot(dir, d.camera.motions.velocity);
+			cv = dir * s;
+
 			// see if there is a third plane the the new move enters
 			for (GMuint k = 0; k < planes.size(); k++) {
 				if (k == i || k == j) {
@@ -1373,12 +1375,12 @@ void BSPPhysicsWorld::generatePhysicsBrushData()
 		b->brush = &bsp.brushes[i];
 		b->sides = &d.brushsides[b->brush->firstSide];
 		b->contents = bsp.shaders[b->brush->shaderNum].contentFlags;
-		b->bounds[0][0] = --b->sides[0].plane->intercept;
-		b->bounds[1][0] = -b->sides[1].plane->intercept;
-		b->bounds[0][1] = --b->sides[2].plane->intercept;
-		b->bounds[1][1] = -b->sides[3].plane->intercept;
-		b->bounds[0][2] = --b->sides[4].plane->intercept;
-		b->bounds[1][2] = -b->sides[5].plane->intercept;
+		b->bounds[0][0] = -b->sides[0].plane->intercept;
+		b->bounds[1][0] = b->sides[1].plane->intercept;
+		b->bounds[0][1] = -b->sides[2].plane->intercept;
+		b->bounds[1][1] = b->sides[3].plane->intercept;
+		b->bounds[0][2] = -b->sides[4].plane->intercept;
+		b->bounds[1][2] = b->sides[5].plane->intercept;
 	}
 }
 
