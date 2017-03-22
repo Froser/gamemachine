@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "bspphysicsworld.h"
 #include "gmengine/elements/bspgameworld.h"
+#include "gmengine/controllers/gameloop.h"
 
 #define	SUBDIVIDE_DISTANCE	16	//4	// never more than this units away from curve
 #define	WRAP_POINT_EPSILON 0.1
@@ -1230,78 +1231,98 @@ void BSPPhysicsWorld::simulate()
 		groundTrace
 	);
 
+	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
+	GMfloat fps = d.world->getGraphicEngine()->getGraphicSettings()->fps;
+	GMfloat skipFrame = elapsed / (1.0f / fps);
+
+	vmath::vec3 velocity = skipFrame > 1 ? d.camera.motions.velocity * skipFrame / fps : d.camera.motions.velocity / fps;
+
+	GMint numbumps = 4, bumpcount;
 	std::vector<vmath::vec3> planes;
 	planes.push_back(groundTrace.plane.normal);
-	planes.push_back(vmath::normalize(d.camera.motions.velocity));
+	planes.push_back(vmath::normalize(velocity));
 
-	BSPTraceResult moveTrace;
-	d.trace.trace(d.camera.motions.translation,
-		d.camera.motions.translation + d.camera.motions.velocity,
-		vmath::vec3(0, 0, 0),
-		vmath::vec3(-10),
-		vmath::vec3(10),
-		moveTrace
-	);
+	GMfloat t = 1.0f;
 
-	if (moveTrace.fraction > 0)
-		d.camera.motions.translation = moveTrace.endpos;
-	if (moveTrace.fraction == 1.0f)
-		return;
-
-	// 碰撞到平面，分解速度
-	GMuint i;
-	for (i = 0; i < planes.size(); i++)
+	for (bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
-		if (vmath::dot(moveTrace.plane.normal, planes[i]) > 0.99)
-			d.camera.motions.velocity += moveTrace.plane.normal;
-	}
-	if (i < planes.size())
-		return;
+		BSPTraceResult moveTrace;
+		d.trace.trace(d.camera.motions.translation,
+			d.camera.motions.translation + velocity * t,
+			vmath::vec3(0, 0, 0),
+			vmath::vec3(-10),
+			vmath::vec3(10),
+			moveTrace
+		);
 
-	planes.push_back(moveTrace.plane.normal);
+		if (moveTrace.fraction > 0)
+			d.camera.motions.translation = moveTrace.endpos;
+		if (moveTrace.fraction == 1.0f)
+			break;
 
-	vmath::vec3 cv = d.camera.motions.velocity;
-	for (i = 0; i < planes.size(); i++)
-	{
-		if (vmath::dot(d.camera.motions.velocity, planes[i]) >= 0.1)
-			continue; // 朝着平面前方移动，不会有交汇
+		t -= t * moveTrace.fraction;
 
-		clipVelocity(d.camera.motions.velocity, planes[i], cv, 1.0f);
-		// see if there is a second plane that the new move enters
-		for (GMuint j = 0; j < planes.size(); j++)
+		GMuint i;
+		for (i = 0; i < planes.size(); i++)
 		{
-			if (j == i)
-				continue;
-			if (vmath::dot(cv, planes[j]) >= 0.1)
-				continue;
-			clipVelocity(cv, planes[j], cv, 1.0f);
-			if (vmath::dot(cv, planes[i]) >= 0)
-				continue;
-
-			vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
-			dir = vmath::normalize(dir);
-			GMfloat s = vmath::dot(dir, d.camera.motions.velocity);
-			cv = dir * s;
-
-			// see if there is a third plane the the new move enters
-			for (GMuint k = 0; k < planes.size(); k++) {
-				if (k == i || k == j) {
-					continue;
-				}
-				if (vmath::dot(cv, planes[k]) >= 0.1) {
-					continue;		// move doesn't interact with the plane
-				}
-
-				// stop dead at a tripple plane interaction
-				d.camera.motions.velocity = vmath::vec3(0);
-				return;
-			}
+			if (vmath::dot(moveTrace.plane.normal, planes[i]) > 0.99)
+				velocity += moveTrace.plane.normal;
 		}
-		break;
-	}
+		if (i < planes.size())
+			continue;
 
-	d.camera.motions.velocity = cv;
-	d.camera.motions.translation += cv;
+		planes.push_back(moveTrace.plane.normal);
+
+		//
+		// modify velocity so it parallels all of the clip planes
+		//
+
+		// find a plane that it enters
+		vmath::vec3 cv;
+		const GMfloat OVERCLIP = 1.01f;
+		for (i = 0; i < planes.size(); i++)
+		{
+			if (vmath::dot(velocity, planes[i]) >= 0.1)
+				continue; // 朝着平面前方移动，不会有交汇
+			clipVelocity(velocity, planes[i], cv, OVERCLIP);
+
+			for (GMuint j = 0; j < planes.size(); j++)
+			{
+				if (i == j)
+					continue;
+				if (vmath::dot(cv, planes[j]) >= 0.1)
+					continue;
+
+				// try clipping the move to the plane
+				clipVelocity(cv, planes[j], cv, OVERCLIP);
+
+				// see if it goes back into the first clip plane
+				if (vmath::dot(cv, planes[i]) >= 0)
+					continue;
+
+				// slide the original velocity along the crease
+				vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
+				dir = vmath::normalize(dir);
+				GMfloat s = vmath::dot(dir, velocity);
+				cv = dir * s;
+
+				for (GMuint k = 0; k < planes.size(); k++)
+				{
+					if (k == i || k == j)
+						continue;
+
+					if (vmath::dot(cv, planes[k]) >= 0.1)
+						continue;
+
+					velocity = vmath::vec3(0);
+					return;
+				}
+			}
+
+			velocity = cv;
+			break;
+		}
+	}
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)

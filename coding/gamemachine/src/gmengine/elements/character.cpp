@@ -23,33 +23,13 @@ Character::Character(GMfloat radius)
 
 void Character::onAppendingObjectToWorld()
 {
-	D(d);
-
 	applyWalkDirection();
-
-	/*
-	if (m_freeMove)
-		m_controller->setGravity(btVector3(0, 0, 0));
-	else
-		m_controller->setGravity(world->getGravity());
-
-	world->addCollisionObject(d.collisionObject,
-		btBroadphaseProxy::CharacterFilter,
-		btBroadphaseProxy::StaticFilter | btBroadphaseProxy::AllFilter);
-	world->addAction(m_controller);
-	m_dynamicWorld = world;
-		*/
 }
 
 GMfloat Character::calcMoveDistance(GMfloat rate)
 {
-	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
 	GMfloat fps = getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
-	GMfloat skipFrame = elapsed / (1.0f / fps);
-	if (skipFrame > 1)
-		return m_moveSpeed * rate * skipFrame / fps;
-	else
-		return m_moveSpeed * rate / fps;
+	return m_moveSpeed;
 }
 
 void Character::moveForwardOrBackward(bool forward)
