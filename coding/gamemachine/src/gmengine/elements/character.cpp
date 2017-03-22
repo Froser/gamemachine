@@ -26,15 +26,9 @@ void Character::onAppendingObjectToWorld()
 	applyWalkDirection();
 }
 
-GMfloat Character::calcMoveDistance(GMfloat rate)
-{
-	GMfloat fps = getWorld()->getGraphicEngine()->getGraphicSettings()->fps;
-	return m_moveSpeed;
-}
-
 void Character::moveForwardOrBackward(bool forward)
 {
-	GMfloat distance = (forward ? 1 : -1 ) * calcMoveDistance(forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD));
+	GMfloat distance = (forward ? 1 : -1 ) * m_moveSpeed * (forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD));
 	GMfloat l = m_freeMove ? distance * std::cos(m_state.pitch) : distance;
 	m_walkDirectionFB[0] = l * std::sin(m_state.yaw);
 	m_walkDirectionFB[1] = m_freeMove ? distance * std::sin(m_state.pitch) : 0;
@@ -44,7 +38,7 @@ void Character::moveForwardOrBackward(bool forward)
 
 void Character::moveLeftOrRight(bool left)
 {
-	GMfloat distance = (left ? -1 : 1) * calcMoveDistance(left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT));
+	GMfloat distance = (left ? -1 : 1) * m_moveSpeed * (left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT));
 	m_walkDirectionLR[0] = distance * std::cos(m_state.yaw);
 	m_walkDirectionLR[1] = 0;
 	m_walkDirectionLR[2] = distance * std::sin(m_state.yaw);

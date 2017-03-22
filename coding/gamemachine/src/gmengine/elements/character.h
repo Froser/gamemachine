@@ -71,7 +71,6 @@ public:
 	virtual void onAppendingObjectToWorld() override;
 
 private:
-	GMfloat calcMoveDistance(GMfloat rate);
 	void moveForwardOrBackward(bool forward);
 	void moveLeftOrRight(bool left);
 	void update();
