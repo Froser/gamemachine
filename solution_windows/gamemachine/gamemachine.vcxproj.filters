@@ -157,9 +157,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.h">
-      <Filter>src\gmengine\elements</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
@@ -352,9 +349,6 @@
       <Filter>src\gmengine\elements</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp">
-      <Filter>src\gmengine\elements</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\hallucinationgameobject.cpp">
       <Filter>src\gmengine\elements</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp">

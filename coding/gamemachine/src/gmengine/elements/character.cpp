@@ -5,7 +5,8 @@
 #include "gmengine/controllers/gameloop.h"
 
 Character::Character(GMfloat radius)
-	: m_radius(radius)
+	: GameObject(nullptr)
+	, m_radius(radius)
 	, m_jumpSpeed(vmath::vec3(0, 10, 0))
 	, m_freeMove(true)
 	, m_moveSpeed(10)

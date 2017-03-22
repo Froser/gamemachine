@@ -3,21 +3,9 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/elements/gameworld.h"
 
-GameObject::GameObject()
+GameObject::GameObject(AUTORELEASE Object* obj)
 {
-
-}
-
-void GameObject::setId(GMuint id)
-{
-	D(d);
-	d.id = id;
-}
-
-GMuint GameObject::getId()
-{
-	D(d);
-	return d.id;
+	setObject(obj);
 }
 
 void GameObject::setObject(AUTORELEASE Object* obj)

@@ -19,13 +19,10 @@ class GameObject
 {
 	DEFINE_PRIVATE(GameObject)
 public:
-	GameObject();
+	GameObject(AUTORELEASE Object* obj);
 	virtual ~GameObject() {};
 
 public:
-	void setId(GMuint id);
-	GMuint getId();
-
 	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
 

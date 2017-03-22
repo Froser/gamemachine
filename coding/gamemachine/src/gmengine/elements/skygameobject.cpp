@@ -36,7 +36,7 @@ static vmath::vec2 uvs[24] = {
 };
 
 SkyGameObject::SkyGameObject(const Shader& shader, vmath::vec3& min, vmath::vec3 max)
-	: HallucinationGameObject(nullptr)
+	: GameObject(nullptr)
 	, m_shader(shader)
 	, m_min(min)
 	, m_max(max)

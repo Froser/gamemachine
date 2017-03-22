@@ -34,7 +34,7 @@ private:
 	void drawPolygonFace(int polygonFaceNumber);
 	void drawMeshFace(int meshFaceNumber);
 	void drawPatch(int patchNumber);
-	void draw(BSP_Render_BiquadraticPatch& biqp, Material& material);
+	void draw(BSP_Render_BiquadraticPatch& biqp);
 	template <typename T> bool setMaterialTexture(T face, REF Material& m);
 	void setMaterialLightmap(GMint lightmapid, REF Material& m);
 	int isClusterVisible(int cameraCluster, int testCluster);
@@ -47,6 +47,10 @@ private:
 	bool findTexture(const char* textureFilename, OUT Image** img);
 	void initLightmaps();
 	void importEntities();
+	void prepareFaces();
+	void preparePolygonFace(int polygonFaceNumber);
+	void prepareMeshFace(int meshFaceNumber);
+	void preparePatch(int patchNumber);
 	GMint calculateLeafNode(const vmath::vec3& position);
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world

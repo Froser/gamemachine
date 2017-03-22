@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bspgameworld.h"
 #include "character.h"
-#include "hallucinationgameobject.h"
 #include "gamelight.h"
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"
@@ -11,8 +10,6 @@
 #include "utilities/path.h"
 #include "gmdatacore/imagebuffer.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
-
-#define SolidGameObject HallucinationGameObject
 
 BSPGameWorld::BSPGameWorld()
 {
@@ -199,73 +196,58 @@ void BSPGameWorld::drawFace(GMint idx)
 		drawPatch(rd.faceDirectory[idx].typeFaceNumber);
 }
 
-void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
+void BSPGameWorld::preparePolygonFace(int polygonFaceNumber)
 {
 	D(d);
-	BSPData& bsp = d.bsp.bspData();
 	BSPRenderData& rd = d.render.renderData();
 
-	auto& polygonFace = rd.polygonFaces[polygonFaceNumber];
-
+	BSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
 	GameObject* obj = nullptr;
-	auto findResult = rd.polygonFaceObjects.find(&polygonFace);
-	if (findResult == rd.polygonFaceObjects.end())
+	ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
+
+	Material material = { 0 };
+	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
+	if (!setMaterialTexture(polygonFace, material))
 	{
-		Material material = { 0 };
-		material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-		if (!setMaterialTexture(polygonFace, material))
-			return;
-		setMaterialLightmap(polygonFace.lightmapIndex, material);
-
-		Object* coreObj;
-		d.render.createObject(polygonFace, material, &coreObj);
-		obj = new SolidGameObject(coreObj);
-
-		rd.polygonFaceObjects[&polygonFace] = obj;
-		appendObjectAndInit(obj);
+		gm_warning("polygon: %d texture missing.", polygonFaceNumber);
+		return;
 	}
-	else
-	{
-		obj = (*findResult).second;
-	}
+	setMaterialLightmap(polygonFace.lightmapIndex, material);
 
-	ASSERT(obj);
-	obj->getReadyForRender(d.drawingList);
+	Object* coreObj;
+	d.render.createObject(polygonFace, material, &coreObj);
+	obj = new GameObject(coreObj);
+
+	rd.polygonFaceObjects[&polygonFace] = obj;
+	appendObjectAndInit(obj);
 }
 
-void BSPGameWorld::drawMeshFace(int meshFaceNumber)
+void BSPGameWorld::prepareMeshFace(int meshFaceNumber)
 {
 	D(d);
-	BSPData& bsp = d.bsp.bspData();
 	BSPRenderData& rd = d.render.renderData();
-	auto& meshFace = rd.meshFaces[meshFaceNumber];
 
+	BSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
 	GameObject* obj = nullptr;
-	auto findResult = rd.meshFaceObjects.find(&meshFace);
-	if (findResult == rd.meshFaceObjects.end())
-	{
-		Material material = { 0 };
-		material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-		if (!setMaterialTexture(meshFace, material))
-			return;
-		setMaterialLightmap(meshFace.lightmapIndex, material);
 
-		Object* coreObj;
-		d.render.createObject(meshFace, material, &coreObj);
-		obj = new SolidGameObject(coreObj);
-		rd.meshFaceObjects[&meshFace] = obj;
-		appendObjectAndInit(obj);
-	}
-	else
+	ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
+	Material material = { 0 };
+	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
+	if (!setMaterialTexture(meshFace, material))
 	{
-		obj = (*findResult).second;
+		gm_warning("mesh: %d texture missing.", meshFaceNumber);
+		return;
 	}
+	setMaterialLightmap(meshFace.lightmapIndex, material);
 
-	ASSERT(obj);
-	obj->getReadyForRender(d.drawingList);
+	Object* coreObj;
+	d.render.createObject(meshFace, material, &coreObj);
+	obj = new GameObject(coreObj);
+	rd.meshFaceObjects[&meshFace] = obj;
+	appendObjectAndInit(obj);
 }
 
-void BSPGameWorld::drawPatch(int patchNumber)
+void BSPGameWorld::preparePatch(int patchNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -274,38 +256,35 @@ void BSPGameWorld::drawPatch(int patchNumber)
 	Material material = { 0 };
 	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
 	if (!setMaterialTexture(rd.patches[patchNumber], material))
+	{
+		gm_warning("patch: %d texture missing.", patchNumber);
 		return;
+	}
 	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, material);
 
 	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
-		draw(rd.patches[patchNumber].quadraticPatches[i], material);
-}
-
-void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp, Material& material)
-{
-	D(d);
-	BSPRenderData& rd = d.render.renderData();
-
-	GameObject* obj = nullptr;
-	auto findResult = rd.biquadraticPatchObjects.find(&biqp);
-	if (findResult == rd.biquadraticPatchObjects.end())
 	{
+		BSP_Render_BiquadraticPatch* biqp = &rd.patches[patchNumber].quadraticPatches[i];
+
+		GameObject* obj = nullptr;
+		ASSERT(rd.biquadraticPatchObjects.find(biqp) == rd.biquadraticPatchObjects.end());
+
 		Object* coreObj = new Object();
 		ChildObject* child = new ChildObject();
 		child->setArrangementMode(ChildObject::Triangle_Strip);
-		
+
 		Component* component = new Component(child);
 		component->getMaterial() = material;
 
-		int numVertices = 2 * (biqp.tesselation + 1);
-		for (int row = 0; row < biqp.tesselation; ++row)
+		int numVertices = 2 * (biqp->tesselation + 1);
+		for (int row = 0; row < biqp->tesselation; ++row)
 		{
 			component->beginFace();
-			GLuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
+			GLuint* idxStart = &biqp->indices[row * 2 * (biqp->tesselation + 1)];
 			for (int i = 0; i < numVertices; i++)
 			{
 				GMuint idx = *(idxStart + i);
-				BSP_Render_Vertex& vertex = biqp.vertices[idx];
+				BSP_Render_Vertex& vertex = biqp->vertices[idx];
 
 				component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 				component->uv(vertex.decalS, vertex.decalT);
@@ -317,14 +296,69 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp, Material& material)
 		child->appendComponent(component);
 
 		coreObj->append(child);
-		obj = new SolidGameObject(coreObj);
-		rd.biquadraticPatchObjects[&biqp] = obj;
+		obj = new GameObject(coreObj);
+		rd.biquadraticPatchObjects[biqp] = obj;
 		appendObjectAndInit(obj);
 	}
-	else
-	{
+}
+
+void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
+{
+	D(d);
+	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
+
+	BSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
+	GameObject* obj = nullptr;
+	auto findResult = rd.polygonFaceObjects.find(&polygonFace);
+	if (findResult != rd.polygonFaceObjects.end())
 		obj = (*findResult).second;
-	}
+	else
+		return;
+
+	ASSERT(obj);
+	obj->getReadyForRender(d.drawingList);
+}
+
+void BSPGameWorld::drawMeshFace(int meshFaceNumber)
+{
+	D(d);
+	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
+
+	BSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
+	GameObject* obj = nullptr;
+	auto findResult = rd.meshFaceObjects.find(&meshFace);
+	if (findResult != rd.meshFaceObjects.end())
+		obj = (*findResult).second;
+	else
+		return;
+
+	ASSERT(obj);
+	obj->getReadyForRender(d.drawingList);
+}
+
+void BSPGameWorld::drawPatch(int patchNumber)
+{
+	D(d);
+	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
+
+	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
+		draw(rd.patches[patchNumber].quadraticPatches[i]);
+}
+
+void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
+{
+	D(d);
+	BSPRenderData& rd = d.render.renderData();
+
+	GameObject* obj = nullptr;
+	auto findResult = rd.biquadraticPatchObjects.find(&biqp);
+	if (findResult != rd.biquadraticPatchObjects.end())
+		obj = (*findResult).second;
+	else
+		return;
 
 	ASSERT(obj);
 	obj->getReadyForRender(d.drawingList);
@@ -377,6 +411,7 @@ void BSPGameWorld::importBSP()
 	initLightmaps();
 	initTextures();
 	importEntities();
+	prepareFaces();
 	initialize();
 	d.physics->initBSPPhysicsWorld();
 }
@@ -497,6 +532,29 @@ void BSPGameWorld::importEntities()
 	for (auto iter = bsp.entities.begin(); iter != bsp.entities.end(); iter++)
 	{
 		BSPGameWorldEntityReader::import(*iter, this);
+	}
+}
+
+void BSPGameWorld::prepareFaces()
+{
+	D(d);
+	BSPData& bsp = d.bsp.bspData();
+	BSPRenderData& rd = d.render.renderData();
+
+	//loop through faces
+	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
+	{
+		if (rd.faceDirectory[i].faceType == 0)
+			return;
+
+		if (rd.faceDirectory[i].faceType == MST_PLANAR)
+			preparePolygonFace(rd.faceDirectory[i].typeFaceNumber);
+
+		if (rd.faceDirectory[i].faceType == MST_TRIANGLE_SOUP)
+			prepareMeshFace(rd.faceDirectory[i].typeFaceNumber);
+
+		if (rd.faceDirectory[i].faceType == MST_PATCH)
+			preparePatch(rd.faceDirectory[i].typeFaceNumber);
 	}
 }
 

@@ -1,10 +1,10 @@
 ﻿#ifndef __SKYGAMEOBJECT_H__
 #define __SKYGAMEOBJECT_H__
 #include "common.h"
-#include "hallucinationgameobject.h"
+#include "gameobject.h"
 BEGIN_NS
 
-class SkyGameObject : public HallucinationGameObject
+class SkyGameObject : public GameObject
 {
 public:
 	SkyGameObject(const Shader& shader, vmath::vec3& min, vmath::vec3 max);
