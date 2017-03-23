@@ -1025,8 +1025,10 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	context.numFacets = 0;
 
 	// find the planes for each triangle of the grid
-	for (i = 0; i < grid->width - 1; i++) {
-		for (j = 0; j < grid->height - 1; j++) {
+	for (i = 0; i < grid->width - 1; i++)
+	{
+		for (j = 0; j < grid->height - 1; j++)
+		{
 			p1 = grid->points[i][j];
 			p2 = grid->points[i + 1][j];
 			p3 = grid->points[i + 1][j + 1];

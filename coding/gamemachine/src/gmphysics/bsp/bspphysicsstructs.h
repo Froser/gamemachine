@@ -63,6 +63,11 @@ struct BSP_Physics_BrushSide
 
 struct BSP_Physics_Brush
 {
+	BSP_Physics_Brush()
+		: checkcount(0)
+	{
+	}
+
 	BSPBrush* brush;
 	GMint contents;
 	vmath::vec3 bounds[2];
@@ -76,6 +81,11 @@ struct BSP_Physics_Patch
 	GMint checkcount;
 	BSPShader* shader;
 	BSPPatchCollide *pc;
+
+	BSP_Physics_Patch()
+		: checkcount(0)
+	{
+	}
 
 	~BSP_Physics_Patch()
 	{

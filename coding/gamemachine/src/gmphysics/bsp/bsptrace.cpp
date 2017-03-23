@@ -304,7 +304,6 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 		}
 	}
 
-	/*
 	for (GMint k = 0; k < leaf->numLeafSurfaces; k++) {
 		BSP_Physics_Patch* patch = pw.patches[bsp.leafsurfaces[leaf->firstLeafSurface + k]];
 		if (!patch) {
@@ -324,7 +323,6 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 			return;
 		}
 	}
-	*/
 }
 
 void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
@@ -357,7 +355,8 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 	}
 
 	facet = pc->facets;
-	for (i = 0; i < pc->numFacets; i++, facet++) {
+	for (i = 0; i < pc->numFacets; i++, facet++)
+	{
 		enterFrac = -1.0;
 		leaveFrac = 1.0;
 		hitnum = -1;

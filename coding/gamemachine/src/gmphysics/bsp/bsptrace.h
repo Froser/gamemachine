@@ -57,6 +57,7 @@ struct BSPTraceWork
 class BSPPhysicsWorld;
 struct BSPTracePrivate
 {
+	BSPTracePrivate() : checkcount(0) {}
 	BSPData* bsp;
 	BSPPhysicsWorld* p_world;
 	GMint checkcount;
