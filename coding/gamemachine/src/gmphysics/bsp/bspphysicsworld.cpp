@@ -1461,10 +1461,14 @@ BSPPatchCollide* BSPPhysicsWorld::generatePatchCollide(GMint width, GMint height
 	grid.height = height;
 	grid.wrapWidth = false;
 	grid.wrapHeight = false;
-	for (i = 0; i < width; i++) {
-		for (j = 0; j < height; j++) {
+	for (i = 0; i < width; i++)
+	{
+		for (j = 0; j < height; j++)
+		{
 			grid.points[i][j] = points[j*width + i];
+			gm_info("Patch vertices: (%f, %f, %f)", points[j*width + i][0], points[j*width + i][1], points[j*width + i][2]);
 		}
+		gm_info("----------------------");
 	}
 
 	// subdivide the grid

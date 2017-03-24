@@ -88,8 +88,7 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 		}
 	}
 
-	vmath::vec3 center = (world->renderData().boundMax + world->renderData().boundMin) / 2;
-	vmath::vec3 playerStart (center[0], center[1], center[2]);
+	vmath::vec3 playerStart (origin[0], origin[2], -origin[1]);
 
 	Character* character = new Character(6);
 	character->setMoveSpeed(192);
