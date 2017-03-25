@@ -295,7 +295,8 @@ static bool planeFromPoints(vmath::vec4& plane, const vmath::vec3& a, const vmat
 		return false;
 
 	plane = VEC4(t, plane);
-	plane[3] = vmath::dot(a, plane);
+	plane[3] = -vmath::dot(a, plane);
+	ASSERT(a[0] * plane[0] + a[1] * plane[1] + a[2] * plane[2] + plane[3] < NORMAL_EPSILON);
 	return true;
 }
 
@@ -356,17 +357,17 @@ static int findPlane(PatchCollideContext& context, const vmath::vec3& p1, const 
 			continue;	// allow backwards planes?
 		}
 
-		d = vmath::dot(p1, VEC3(context.planes[i].plane)) - context.planes[i].plane[3];
+		d = vmath::dot(p1, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
 			continue;
 		}
 
-		d = vmath::dot(p2, VEC3(context.planes[i].plane)) - context.planes[i].plane[3];
+		d = vmath::dot(p2, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
 			continue;
 		}
 
-		d = vmath::dot(p3, VEC3(context.planes[i].plane)) - context.planes[i].plane[3];
+		d = vmath::dot(p3, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
 			continue;
 		}
@@ -376,7 +377,8 @@ static int findPlane(PatchCollideContext& context, const vmath::vec3& p1, const 
 	}
 
 	// add a new plane
-	if (context.numPlanes == MAX_PATCH_PLANES) {
+	if (context.numPlanes == MAX_PATCH_PLANES)
+	{
 		gm_error("MAX_PATCH_PLANES");
 	}
 
@@ -546,14 +548,15 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 		break;
 	}
 
-	for (k = 0; k < facet->numBorders; k++) {
-		int		front, back;
+	for (k = 0; k < facet->numBorders; k++)
+	{
+		GMint front, back;
 
 		front = 0;
 		back = 0;
 
 		for (l = 0; l < numPoints; l++) {
-			int		side;
+			GMint side;
 
 			side = pointOnPlaneSide(context, points[l], facet->borderPlanes[k]);
 			if (side == SIDE_FRONT) {
@@ -563,36 +566,33 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 			}
 		}
 
-		if (front && !back) {
+		if (front && !back)
+		{
 			facet->borderInward[k] = true;
 		}
-		else if (back && !front) {
+		else if (back && !front)
+		{
 			facet->borderInward[k] = false;
 		}
-		else if (!front && !back) {
+		else if (!front && !back)
+		{
 			// flat side border
 			facet->borderPlanes[k] = -1;
 		}
-		else {
+		else
+		{
 			// bisecting side border
 			gm_error("WARNING: setBorderInward: mixed plane sides\n");
 			facet->borderInward[k] = false;
-			if (!debugBlock) {
-				debugBlock = true;
-				/*
-				VectorCopy(grid->points[i][j], debugBlockPoints[0]);
-				VectorCopy(grid->points[i + 1][j], debugBlockPoints[1]);
-				VectorCopy(grid->points[i + 1][j + 1], debugBlockPoints[2]);
-				VectorCopy(grid->points[i][j + 1], debugBlockPoints[3]);
-				*/
-			}
 		}
 	}
 }
 
-static void baseWindingForPlane(const vmath::vec3& normal, GMfloat dist, OUT BSPWinding** out)
+static void baseWindingForPlane(const vmath::vec4& plane, OUT BSPWinding** out)
 {
-	int		i, x;
+	vmath::vec3 normal = VEC3(plane);
+	GMfloat dist = plane[3];
+	GMint i, x;
 	GMfloat max, v;
 	vmath::vec3 org, vright, vup;
 	BSPWinding* w;
@@ -629,7 +629,7 @@ static void baseWindingForPlane(const vmath::vec3& normal, GMfloat dist, OUT BSP
 	v = vmath::dot(vup, normal);
 	vup = vup - normal * v;
 	vup = vmath::normalize(vup);
-	org = normal * dist;
+	org = normal * -dist;
 	vright = vmath::cross(vup, normal);
 	vup = vup * MAX_MAP_BOUNDS;
 	vright = vright * MAX_MAP_BOUNDS;
@@ -654,7 +654,7 @@ static void baseWindingForPlane(const vmath::vec3& normal, GMfloat dist, OUT BSP
 	*out = w;
 }
 
-static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GMfloat dist, GMfloat epsilon)
+static void chopWindingInPlace(BSPWinding** inout, const vmath::vec4& plane, GMfloat epsilon)
 {
 	BSPWinding* in;
 	GMfloat dists[MAX_POINTS_ON_WINDING + 4];
@@ -662,10 +662,12 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GM
 	GMint counts[3];
 	GMfloat dot;		// VC 4.2 optimizer bug if not static
 	GMint i, j;
-	vmath::vec3 *p1, *p2;
 	vmath::vec3 mid;
 	BSPWinding *f;
 	GMint maxpts;
+
+	vmath::vec3 normal = VEC3(plane);
+	GMfloat dist = plane[3];
 
 	in = *inout;
 	counts[0] = counts[1] = counts[2] = 0;
@@ -703,18 +705,18 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GM
 
 	for (i = 0; i < in->numpoints; i++)
 	{
-		p1 = &in->p[i];
+		vmath::vec3 p1 = in->p[i];
 
 		if (sides[i] == SIDE_ON)
 		{
-			f->p[f->numpoints] = *p1;
+			f->p[f->numpoints] = p1;
 			f->numpoints++;
 			continue;
 		}
 
 		if (sides[i] == SIDE_FRONT)
 		{
-			f->p[f->numpoints] = *p1;
+			f->p[f->numpoints] = p1;
 			f->numpoints++;
 		}
 
@@ -722,7 +724,7 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GM
 			continue;
 
 		// generate a split point
-		p2 = &in->p[(i + 1) % in->numpoints];
+		vmath::vec3 p2 = in->p[(i + 1) % in->numpoints];
 
 		dot = dists[i] / (dists[i] - dists[i + 1]);
 		for (j = 0; j < 3; j++)
@@ -732,7 +734,7 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec3& normal, GM
 			else if (normal[j] == -1)
 				mid[j] = -dist;
 			else
-				mid[j] = *p1[j] + dot*(*p2[j] - *p1[j]);
+				mid[j] = p1[j] + dot*(p2[j] - p1[j]);
 		}
 
 		f->p[f->numpoints] = mid;
@@ -779,7 +781,7 @@ static void copyWinding(BSPWinding* w, REF BSPWinding** out)
 }
 
 void snapVector(vmath::vec3& normal) {
-	int		i;
+	GMint i;
 
 	for (i = 0; i < 3; i++)
 	{
@@ -810,18 +812,16 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 
 	plane = context.planes[facet->surfacePlane].plane;
 
-	baseWindingForPlane(VEC3(plane), plane[3], &w);
+	baseWindingForPlane(plane, &w);
 	for (j = 0; j < facet->numBorders && w; j++) {
 		if (facet->borderPlanes[j] == facet->surfacePlane) continue;
 		plane = context.planes[facet->borderPlanes[j]].plane;
 
 		if (!facet->borderInward[j]) {
-			vmath::vec3 t = vmath::vec3(0) - plane;
-			plane = VEC4(t, plane);
-			plane[3] = -plane[3];
+			plane = -plane;
 		}
 
-		chopWindingInPlace(&w, VEC3(plane), plane[3], 0.1f);
+		chopWindingInPlace(&w, plane, 0.1f);
 	}
 	if (!w) {
 		return;
@@ -900,7 +900,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 				// behind this plane, it is a proper edge bevel
 				for (l = 0; l < w->numpoints; l++)
 				{
-					d = vmath::dot(w->p[l], VEC3(plane)) - plane[3];
+					d = vmath::dot(w->p[l], plane) + plane[3];
 					if (d > 0.1)
 						break;	// point in front
 				}
@@ -935,9 +935,8 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 					if (!facet->borderInward[facet->numBorders])
 					{
 						newplane = -newplane;
-						newplane[3] = -newplane[3];
 					} //end if
-					chopWindingInPlace(&w2, VEC3(newplane), newplane[3], 0.1f);
+					chopWindingInPlace(&w2, newplane, 0.1f);
 					if (!w2) {
 						gm_warning("WARNING: addFacetBevels... invalid bevel\n");
 						continue;
@@ -975,7 +974,7 @@ static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
 	}
 
 	plane = context.planes[facet->surfacePlane].plane;
-	baseWindingForPlane(VEC3(plane), plane[3], &w);
+	baseWindingForPlane(plane, &w);
 	for (j = 0; j < facet->numBorders && w; j++) {
 		if (facet->borderPlanes[j] == -1)
 		{
@@ -986,7 +985,7 @@ static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
 		if (!facet->borderInward[j]) {
 			plane = -plane;
 		}
-		chopWindingInPlace(&w, VEC3(plane), plane[3], 0.1f);
+		chopWindingInPlace(&w, plane, 0.1f);
 	}
 
 	if (!w) {
@@ -1488,10 +1487,15 @@ BSPPatchCollide* BSPPhysicsWorld::generatePatchCollide(GMint width, GMint height
 	BSPPatchCollide* pf = GM_new<BSPPatchCollide>();
 	*pc = pf;
 	clearBounds(pf->bounds[0], pf->bounds[1]);
-	for (i = 0; i < grid.width; i++) {
-		for (j = 0; j < grid.height; j++) {
+	gm_info("------------After subdivide------------");
+	for (i = 0; i < grid.width; i++)
+	{
+		for (j = 0; j < grid.height; j++)
+		{
 			addPointToBounds(grid.points[i][j], pf->bounds[0], pf->bounds[1]);
+			gm_info("Patch vertices: (%f, %f, %f)", grid.points[i][j][0], grid.points[i][j][1], grid.points[i][j][2]);
 		}
+		gm_info("----------------------");
 	}
 
 	//c_totalPatchBlocks += (grid.width - 1) * (grid.height - 1);

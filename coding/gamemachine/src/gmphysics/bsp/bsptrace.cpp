@@ -379,7 +379,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 			}
 		}
 		else {
-			offset = vmath::dot(tw.offsets[planes->signbits], VEC3(plane));
+			offset = vmath::dot(tw.offsets[planes->signbits], plane);
 			plane[3] -= offset;
 			startp = tw.start;
 			endp = tw.end;
@@ -419,7 +419,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 			}
 			else {
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
-				offset = vmath::dot(tw.offsets[planes->signbits], VEC3(plane));
+				offset = vmath::dot(tw.offsets[planes->signbits], plane);
 				plane[3] += fabs(offset);
 				startp = tw.start;
 				endp = tw.end;
@@ -560,8 +560,8 @@ GMint BSPTrace::checkFacetPlane(const vmath::vec4& plane, const vmath::vec3& sta
 
 	*hit = false;
 
-	d1 = vmath::dot(start, vmath::vec3(plane[0], plane[1], plane[2])) - plane[3];
-	d2 = vmath::dot(end, vmath::vec3(plane[0], plane[1], plane[2])) - plane[3];
+	d1 = vmath::dot(start, vmath::vec3(plane[0], plane[1], plane[2])) + plane[3];
+	d2 = vmath::dot(end, vmath::vec3(plane[0], plane[1], plane[2])) + plane[3];
 
 	// if completely in front of face, no intersection with the entire facet
 	if (d1 > 0 && (d2 >= SURFACE_CLIP_EPSILON || d2 >= d1)) {
