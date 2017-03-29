@@ -327,7 +327,6 @@ static GMint planeEqual(BSPPatchPlane* p, const vmath::vec4& plane, GMint *flipp
 	}
 
 	invplane = -plane;
-	invplane[3] = -plane[3];
 
 	if (
 		fabs(p->plane[0] - invplane[0]) < NORMAL_EPSILON
@@ -750,7 +749,7 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec4& plane, GMf
 	*inout = f;
 }
 
-static void windingBounds(BSPWinding* w, vmath::vec3& mins, vmath::vec3& maxs)
+static void windingBounds(const BSPWinding* w, vmath::vec3& mins, vmath::vec3& maxs)
 {
 	GMfloat v;
 	GMint i, j;
@@ -803,7 +802,7 @@ void snapVector(vmath::vec3& normal) {
 static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 {
 	GMint i, j, k, l;
-	GMint axis, dir, order, flipped;
+	GMint axis, dir, flipped;
 	vmath::vec4 plane;
 	GMfloat d;
 	vmath::vec4 newplane;
@@ -830,18 +829,17 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 	windingBounds(w, mins, maxs);
 
 	// add the axial planes
-	order = 0;
 	for (axis = 0; axis < 3; axis++)
 	{
-		for (dir = -1; dir <= 1; dir += 2, order++)
+		for (dir = -1; dir <= 1; dir += 2)
 		{
 			plane = vmath::vec4(0);
 			plane[axis] = dir;
 			if (dir == 1) {
-				plane[3] = maxs[axis];
+				plane[3] = -maxs[axis];
 			}
 			else {
-				plane[3] = -mins[axis];
+				plane[3] = mins[axis];
 			}
 			//if it's the surface plane
 			if (planeEqual(&context.planes[facet->surfacePlane], plane, &flipped)) {
@@ -876,7 +874,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 			continue;
 		snapVector(vec);
 		for (k = 0; k < 3; k++)
-			if (vec[k] == -1 || vec[k] == 1)
+			if (vmath::fuzzyCompare(vec[k], -1) || vmath::fuzzyCompare(vec[k], 1))
 				break;	// axial
 		if (k < 3)
 			continue;	// only test non-axial edges
@@ -894,7 +892,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 				if (vmath::length(t) < 0.5)
 					continue;
 				plane = VEC4(t, plane);
-				plane[3] = vmath::dot(w->p[j], VEC3(plane));
+				plane[3] = -vmath::dot(w->p[j], plane);
 
 				// if all the points of the facet winding are
 				// behind this plane, it is a proper edge bevel

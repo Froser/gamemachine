@@ -380,7 +380,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		}
 		else {
 			offset = vmath::dot(tw.offsets[planes->signbits], plane);
-			plane[3] -= offset;
+			plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
 		}

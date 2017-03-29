@@ -1366,7 +1366,7 @@ static inline T mix(const T& A, const T& B, const T& t)
 
 static inline bool fuzzyCompare(float p1, float p2)
 {
-    return (abs(p1 - p2) <= 0.00001f * std::min(abs(p1), abs(p2)));
+    return (abs(p1 - p2) <= 0.01f);
 }
 
 static inline bool equals(const vmath::vec3& a, const vmath::vec3& b)
