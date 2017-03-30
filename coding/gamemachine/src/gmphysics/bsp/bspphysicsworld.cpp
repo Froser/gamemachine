@@ -290,7 +290,7 @@ static bool planeFromPoints(vmath::vec4& plane, const vmath::vec3& a, const vmat
 	d1 = b - a;
 	d2 = c - a;
 	vmath::vec3 t = vmath::cross(d2, d1);
-	t = vmath::normalize(t);
+	t = vmath::precise_normalize(t);
 	if (vmath::length(t) == 0)
 		return false;
 
@@ -387,7 +387,7 @@ static int findPlane(PatchCollideContext& context, const vmath::vec3& p1, const 
 	return context.numPlanes - 1;
 }
 
-static GMint findPlane2(PatchCollideContext& context, const vmath::vec4& plane, GMint *flipped)
+static GMint findPlane(PatchCollideContext& context, const vmath::vec4& plane, GMint *flipped)
 {
 	GMint i;
 
@@ -554,7 +554,8 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 		front = 0;
 		back = 0;
 
-		for (l = 0; l < numPoints; l++) {
+		for (l = 0; l < numPoints; l++)
+		{
 			GMint side;
 
 			side = pointOnPlaneSide(context, points[l], facet->borderPlanes[k]);
@@ -627,7 +628,7 @@ static void baseWindingForPlane(const vmath::vec4& plane, OUT BSPWinding** out)
 
 	v = vmath::dot(vup, normal);
 	vup = vup - normal * v;
-	vup = vmath::normalize(vup);
+	vup = vmath::precise_normalize(vup);
 	org = normal * -dist;
 	vright = vmath::cross(vup, normal);
 	vup = vup * MAX_MAP_BOUNDS;
@@ -729,9 +730,9 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec4& plane, GMf
 		for (j = 0; j < 3; j++)
 		{	// avoid round off error when possible
 			if (normal[j] == 1)
-				mid[j] = dist;
-			else if (normal[j] == -1)
 				mid[j] = -dist;
+			else if (normal[j] == -1)
+				mid[j] = dist;
 			else
 				mid[j] = p1[j] + dot*(p2[j] - p1[j]);
 		}
@@ -853,7 +854,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 
 			if (i == facet->numBorders) {
 				if (facet->numBorders > 4 + 6 + 16) gm_error("ERROR: too many bevels\n");
-				facet->borderPlanes[facet->numBorders] = findPlane2(context, plane, &flipped);
+				facet->borderPlanes[facet->numBorders] = findPlane(context, plane, &flipped);
 				facet->borderNoAdjust[facet->numBorders] = 0;
 				facet->borderInward[facet->numBorders] = flipped;
 				facet->numBorders++;
@@ -869,7 +870,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 		k = (j + 1) % w->numpoints;
 		vec = w->p[j] - w->p[k];
 		//if it's a degenerate edge
-		vec = vmath::normalize(vec);
+		vec = vmath::precise_normalize(vec);
 		if (vmath::length(vec) < 0.5)
 			continue;
 		snapVector(vec);
@@ -888,7 +889,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 				vec2 = vmath::vec3(0);
 				vec2[axis] = dir;
 				vmath::vec3 t = vmath::cross(vec, vec2);
-				t = vmath::normalize(t);
+				t = vmath::precise_normalize(t);
 				if (vmath::length(t) < 0.5)
 					continue;
 				plane = VEC4(t, plane);
@@ -918,7 +919,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 
 				if (i == facet->numBorders) {
 					if (facet->numBorders > 4 + 6 + 16) gm_error("ERROR: too many bevels\n");
-					facet->borderPlanes[facet->numBorders] = findPlane2(context, plane, &flipped);
+					facet->borderPlanes[facet->numBorders] = findPlane(context, plane, &flipped);
 
 					for (k = 0; k < facet->numBorders; k++) {
 						if (facet->borderPlanes[facet->numBorders] ==
@@ -1222,13 +1223,13 @@ void BSPPhysicsWorld::simulate()
 	BSPTraceResult groundTrace;
 	vmath::vec3 floor = d.camera.motions.translation;
 	floor[1] -= 6.f;
-	d.trace.trace(d.camera.motions.translation,
-		floor,
-		vmath::vec3(0, 0, 0),
-		vmath::vec3(-10),
-		vmath::vec3(10),
-		groundTrace
-	);
+	//d.trace.trace(d.camera.motions.translation,
+	//	floor,
+	//	vmath::vec3(0, 0, 0),
+	//	vmath::vec3(-5),
+	//	vmath::vec3(5),
+	//	groundTrace
+	//);
 
 	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
 	GMfloat fps = d.world->getGraphicEngine()->getGraphicSettings()->fps;
@@ -1238,7 +1239,7 @@ void BSPPhysicsWorld::simulate()
 
 	GMint numbumps = 4, bumpcount;
 	std::vector<vmath::vec3> planes;
-	planes.push_back(groundTrace.plane.normal);
+	//planes.push_back(groundTrace.plane.normal);
 	planes.push_back(vmath::normalize(velocity));
 
 	GMfloat t = 1.0f;
@@ -1249,8 +1250,8 @@ void BSPPhysicsWorld::simulate()
 		d.trace.trace(d.camera.motions.translation,
 			d.camera.motions.translation + velocity * t,
 			vmath::vec3(0, 0, 0),
-			vmath::vec3(-10),
-			vmath::vec3(10),
+			vmath::vec3(-5),
+			vmath::vec3(5),
 			moveTrace
 		);
 
@@ -1463,9 +1464,7 @@ BSPPatchCollide* BSPPhysicsWorld::generatePatchCollide(GMint width, GMint height
 		for (j = 0; j < height; j++)
 		{
 			grid.points[i][j] = points[j*width + i];
-			gm_info("Patch vertices: (%f, %f, %f)", points[j*width + i][0], points[j*width + i][1], points[j*width + i][2]);
 		}
-		gm_info("----------------------");
 	}
 
 	// subdivide the grid
@@ -1485,7 +1484,7 @@ BSPPatchCollide* BSPPhysicsWorld::generatePatchCollide(GMint width, GMint height
 	BSPPatchCollide* pf = GM_new<BSPPatchCollide>();
 	*pc = pf;
 	clearBounds(pf->bounds[0], pf->bounds[1]);
-	gm_info("------------After subdivide------------");
+	gm_info("------------Patches------------");
 	for (i = 0; i < grid.width; i++)
 	{
 		for (j = 0; j < grid.height; j++)

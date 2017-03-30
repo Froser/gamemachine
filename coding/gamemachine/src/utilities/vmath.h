@@ -521,7 +521,13 @@ static inline vecN<T,len> normalize(const vecN<T,len>& v)
 template <int len>
 static inline vecN<float, len> normalize(const vecN<float, len>& v)
 {
-	return v * fastInvSqrt(lengthSquare(v));
+    return v * fastInvSqrt(lengthSquare(v));
+}
+
+template <int len>
+static inline vecN<float, len> precise_normalize(const vecN<float, len>& v)
+{
+    return v / length(v);
 }
 
 template <typename T, int len>

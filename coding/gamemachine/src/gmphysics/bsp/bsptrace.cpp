@@ -394,13 +394,14 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 
 		for (j = 0; j < facet->numBorders; j++) {
 			planes = &pc->planes[facet->borderPlanes[j]];
-			if (facet->borderInward[j]) {
+			if (facet->borderInward[j])
+			{
 				plane = planes->plane;
 				plane[3] = -planes->plane[3];
 			}
-			else {
+			else
+			{
 				plane = planes->plane;
-				plane[3] = planes->plane[3];
 			}
 			if (tw.sphere.use) {
 				// adjust the plane distance apropriately for radius
