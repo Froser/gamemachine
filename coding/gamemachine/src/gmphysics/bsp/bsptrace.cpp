@@ -341,7 +341,8 @@ void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
 
 void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 {
-	int i, j, hit, hitnum;
+	static GMint debug_i;
+	GMint i, j, hit, hitnum;
 	float offset, enterFrac, leaveFrac, t;
 	BSPPatchPlane* planes;
 	BSPFacet* facet;
@@ -380,7 +381,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		}
 		else {
 			offset = vmath::dot(tw.offsets[planes->signbits], plane);
-			plane[3] += offset;
+			//plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
 		}
@@ -390,14 +391,16 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		}
 		if (hit) {
 			bestplane = plane;
+			gm_info("Plane %d %fx+%fy+%fz+%f=0 hitted", i, plane[0], plane[1], plane[2], plane[3]);
+			debug_i = i;
+			gm_info("Start: (%f, %f, %f); End: (%f, %f, %f)", startp[0], startp[1], startp[2], endp[0], endp[1], endp[2]);
 		}
 
 		for (j = 0; j < facet->numBorders; j++) {
 			planes = &pc->planes[facet->borderPlanes[j]];
 			if (facet->borderInward[j])
 			{
-				plane = planes->plane;
-				plane[3] = -planes->plane[3];
+				plane = -planes->plane;
 			}
 			else
 			{
@@ -421,12 +424,15 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 			else {
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
 				offset = vmath::dot(tw.offsets[planes->signbits], plane);
-				plane[3] += fabs(offset);
+				//plane[3] += fabs(offset);
 				startp = tw.start;
 				endp = tw.end;
 			}
 
-			if (!checkFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit)) {
+			if (!checkFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit))
+			{
+				if (debug_i == i)
+					gm_info("check facet break.");
 				break;
 			}
 			if (hit) {

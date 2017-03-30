@@ -393,7 +393,8 @@ static GMint findPlane(PatchCollideContext& context, const vmath::vec4& plane, G
 
 	// see if the points are close enough to an existing plane
 	for (i = 0; i < context.numPlanes; i++) {
-		if (planeEqual(&context.planes[i], plane, flipped)) return i;
+		if (planeEqual(&context.planes[i], plane, flipped))
+			return i;
 	}
 
 	// add a new plane
