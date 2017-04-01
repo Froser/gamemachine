@@ -4,7 +4,12 @@
 #include <string>
 
 BEGIN_NS
+#if _DEBUG
 #define ASSERT(cond) ((!(cond)) ? Assert::assert(#cond, __FILE__, __LINE__) : Assert::noop())
+#else
+#define ASSERT(cond)
+#endif
+
 #ifdef assert
 #undef assert
 #endif

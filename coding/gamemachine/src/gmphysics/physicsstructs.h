@@ -25,9 +25,5 @@ struct CollisionObject
 	ShapeProperties shapeProps;
 };
 
-struct CollisionTree : public std::map<GameObject*, CollisionObject>
-{
-};
-
 END_NS
 #endif

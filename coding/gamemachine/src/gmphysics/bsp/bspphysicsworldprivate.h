@@ -7,10 +7,13 @@
 #include "bspphysicsstructs.h"
 #include "bsptrace.h"
 #include "bsppatch.h"
+#include "utilities/autoptr.h"
+#include "gmphysics/physicsworld.h"
 BEGIN_NS
 
 class BSPGameWorld;
-struct BSPPhysicsWorldPrivate
+class BSPMove;
+struct BSPPhysicsWorldPrivate : public PhysicsWorldPrivate
 {
 	BSPGameWorld* world;
 	CollisionObject camera;

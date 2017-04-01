@@ -6,6 +6,7 @@
 BEGIN_NS
 
 class BSPGameWorld;
+class BSPMove;
 class BSPPhysicsWorld : public PhysicsWorld
 {
 	DEFINE_PRIVATE(BSPPhysicsWorld)

@@ -2,27 +2,7 @@
 #include "bspphysicsworld.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/gameloop.h"
-
-static void clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vmath::vec3& out, GMfloat overbounce)
-{
-	GMfloat backoff;
-	GMfloat change;
-	GMint i;
-
-	backoff = vmath::dot(in, normal);
-
-	if (backoff < 0) {
-		backoff *= overbounce;
-	}
-	else {
-		backoff /= overbounce;
-	}
-
-	for (i = 0; i < 3; i++) {
-		change = normal[i] * backoff;
-		out[i] = in[i] - change;
-	}
-}
+#include "bspmove.h"
 
 //class
 BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
@@ -32,6 +12,9 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	d.world = static_cast<BSPGameWorld*>(world);
 	d.trace.initTrace(&d.world->bspData(), this);
 	memset(&d.camera, 0, sizeof(d.camera));
+
+	//TODO TEST
+	d.gravity = vmath::vec3(0, -10, 0);
 }
 
 BSPPhysicsWorldData& BSPPhysicsWorld::physicsData()
@@ -58,98 +41,8 @@ void BSPPhysicsWorld::simulate()
 	//	groundTrace
 	//);
 
-	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
-	GMfloat fps = d.world->getGraphicEngine()->getGraphicSettings()->fps;
-	GMfloat skipFrame = elapsed / (1.0f / fps);
-
-	vmath::vec3 velocity = skipFrame > 1 ? d.camera.motions.velocity * skipFrame / fps : d.camera.motions.velocity / fps;
-
-	GMint numbumps = 4, bumpcount;
-	std::vector<vmath::vec3> planes;
-	//planes.push_back(groundTrace.plane.normal);
-	planes.push_back(vmath::normalize(velocity));
-
-	GMfloat t = 1.0f;
-
-	for (bumpcount = 0; bumpcount < numbumps; bumpcount++)
-	{
-		BSPTraceResult moveTrace;
-		d.trace.trace(d.camera.motions.translation,
-			d.camera.motions.translation + velocity * t,
-			vmath::vec3(0, 0, 0),
-			vmath::vec3(-15),
-			vmath::vec3(15),
-			moveTrace
-		);
-
-		if (moveTrace.fraction > 0)
-			d.camera.motions.translation = moveTrace.endpos;
-		if (moveTrace.fraction == 1.0f)
-			break;
-
-		t -= t * moveTrace.fraction;
-
-		GMuint i;
-		for (i = 0; i < planes.size(); i++)
-		{
-			if (vmath::dot(moveTrace.plane.normal, planes[i]) > 0.99)
-				velocity += moveTrace.plane.normal;
-		}
-		if (i < planes.size())
-			continue;
-
-		planes.push_back(moveTrace.plane.normal);
-
-		//
-		// modify velocity so it parallels all of the clip planes
-		//
-
-		// find a plane that it enters
-		vmath::vec3 cv;
-		const GMfloat OVERCLIP = 1.01f;
-		for (i = 0; i < planes.size(); i++)
-		{
-			if (vmath::dot(velocity, planes[i]) >= 0.1)
-				continue; // 朝着平面前方移动，不会有交汇
-			clipVelocity(velocity, planes[i], cv, OVERCLIP);
-
-			for (GMuint j = 0; j < planes.size(); j++)
-			{
-				if (i == j)
-					continue;
-				if (vmath::dot(cv, planes[j]) >= 0.1)
-					continue;
-
-				// try clipping the move to the plane
-				clipVelocity(cv, planes[j], cv, OVERCLIP);
-
-				// see if it goes back into the first clip plane
-				if (vmath::dot(cv, planes[i]) >= 0)
-					continue;
-
-				// slide the original velocity along the crease
-				vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
-				dir = vmath::normalize(dir);
-				GMfloat s = vmath::dot(dir, velocity);
-				cv = dir * s;
-
-				for (GMuint k = 0; k < planes.size(); k++)
-				{
-					if (k == i || k == j)
-						continue;
-
-					if (vmath::dot(cv, planes[k]) >= 0.1)
-						continue;
-
-					velocity = vmath::vec3(0);
-					return;
-				}
-			}
-
-			velocity = cv;
-			break;
-		}
-	}
+	//TODO 应该针对各种情况move，slideMove应该是个私有函数
+	BSPMove(this, &d.camera).slideMove(true);
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
@@ -254,10 +147,10 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 		{
 			points[j] = v->xyz;
 		}
+
 		BSP_Physics_Patch* patch = GM_new<BSP_Physics_Patch>();
 		patch->surface = &bsp.drawSurfaces[i];
-		GMint shaderNum = patch->surface->shaderNum;
-		patch->shader = &bsp.shaders[shaderNum];
+		patch->shader = &bsp.shaders[patch->surface->shaderNum];
 		d.patch.generatePatchCollide(i, width, height, points.data(), patch);
 	}
 }

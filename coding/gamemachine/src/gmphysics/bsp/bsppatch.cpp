@@ -1207,15 +1207,12 @@ void BSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, cons
 	// collided against
 	BSPPatchCollide* pf = new BSPPatchCollide();
 	clearBounds(pf->bounds[0], pf->bounds[1]);
-	gm_info("------------Patches------------");
 	for (i = 0; i < grid.width; i++)
 	{
 		for (j = 0; j < grid.height; j++)
 		{
 			addPointToBounds(grid.points[i][j], pf->bounds[0], pf->bounds[1]);
-			gm_info("Patch vertices: (%f, %f, %f)", grid.points[i][j][0], grid.points[i][j][1], grid.points[i][j][2]);
 		}
-		gm_info("----------------------");
 	}
 
 	// generate a bsp tree for the surface
