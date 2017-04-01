@@ -304,8 +304,9 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 		}
 	}
 
-	for (GMint k = 0; k < leaf->numLeafSurfaces; k++) {
-		BSP_Physics_Patch* patch = pw.patches[bsp.leafsurfaces[leaf->firstLeafSurface + k]];
+	for (GMint k = 0; k < leaf->numLeafSurfaces; k++)
+	{
+		BSP_Physics_Patch* patch = pw.patch.patches(bsp.leafsurfaces[leaf->firstLeafSurface + k]);
 		if (!patch) {
 			continue;
 		}

@@ -21,6 +21,29 @@ struct BSPLeafList
 	GMint lastLeaf;
 };
 
+struct BSPTracePlane;
+struct BSP_Physics_BrushSide
+{
+	BSPBrushSide* side;
+	BSPTracePlane* plane;
+	GMint surfaceFlags;
+};
+
+struct BSP_Physics_Brush
+{
+	BSP_Physics_Brush()
+		: checkcount(0)
+	{
+	}
+
+	BSPBrush* brush;
+	GMint contents;
+	vmath::vec3 bounds[2];
+	BSP_Physics_BrushSide *sides;
+	GMint checkcount;
+};
+
+// Begin patches definitions
 struct BSPPatchPlane
 {
 	vmath::vec4 plane;
@@ -53,28 +76,7 @@ struct BSPPatchCollide
 	BSPFacet* facets; //need release
 };
 
-struct BSPTracePlane;
-struct BSP_Physics_BrushSide
-{
-	BSPBrushSide* side;
-	BSPTracePlane* plane;
-	GMint surfaceFlags;
-};
-
-struct BSP_Physics_Brush
-{
-	BSP_Physics_Brush()
-		: checkcount(0)
-	{
-	}
-
-	BSPBrush* brush;
-	GMint contents;
-	vmath::vec3 bounds[2];
-	BSP_Physics_BrushSide *sides;
-	GMint checkcount;
-};
-
+// End patches definitions
 struct BSP_Physics_Patch
 {
 	BSPSurface* surface;
@@ -92,18 +94,6 @@ struct BSP_Physics_Patch
 		delete pc;
 	}
 };
-
-#define	MAX_GRID_SIZE	129
-
-struct BSPGrid
-{
-	GMint width;
-	GMint height;
-	bool wrapWidth;
-	bool wrapHeight;
-	vmath::vec3 points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
-};
-
 
 END_NS
 #endif

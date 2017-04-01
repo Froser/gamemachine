@@ -6,27 +6,21 @@
 #include "gmdatacore/bsp/bsp.h"
 #include "bspphysicsstructs.h"
 #include "bsptrace.h"
+#include "bsppatch.h"
 BEGIN_NS
 
 class BSPGameWorld;
 struct BSPPhysicsWorldPrivate
 {
-
-	BSPPhysicsWorldPrivate::BSPPhysicsWorldPrivate()
-	{
-	}
-
-	~BSPPhysicsWorldPrivate();
-
 	BSPGameWorld* world;
 	CollisionObject camera;
 
 	std::vector<BSPTracePlane> planes;
 	std::vector<BSP_Physics_Brush> brushes;
 	std::vector<BSP_Physics_BrushSide> brushsides;
-	AUTORELEASE std::vector<BSP_Physics_Patch*> patches;
 
 	BSPTrace trace;
+	BSPPatch patch;
 };
 
 typedef BSPPhysicsWorldPrivate BSPPhysicsWorldData;

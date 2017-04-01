@@ -27,7 +27,6 @@ private:
 	void generatePhysicsBrushSideData();
 	void generatePhysicsBrushData();
 	void generatePhysicsPatches();
-	BSPPatchCollide* generatePatchCollide(GMint width, GMint height, const vmath::vec3* points, OUT BSPPatchCollide** pc);
 };
 
 END_NS
