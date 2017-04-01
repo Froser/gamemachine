@@ -341,13 +341,17 @@ void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
 
 void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 {
-	static GMint debug_i;
 	GMint i, j, hit, hitnum;
-	float offset, enterFrac, leaveFrac, t;
+	GMfloat offset, enterFrac, leaveFrac, t;
 	BSPPatchPlane* planes;
 	BSPFacet* facet;
 	vmath::vec4 plane, bestplane;
 	vmath::vec3 startp, endp;
+
+	if (!boundsIntersect(tw.bounds[0], tw.bounds[1],
+		pc->bounds[0], pc->bounds[1])) {
+		return;
+	}
 
 	if (tw.isPoint)
 	{
@@ -379,34 +383,29 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 				endp = tw.end + tw.sphere.offset;
 			}
 		}
-		else {
+		else
+		{
 			offset = vmath::dot(tw.offsets[planes->signbits], plane);
-			//plane[3] += offset;
+			plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
 		}
 
-		if (!checkFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit)) {
+		if (!checkFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit))
 			continue;
-		}
-		if (hit) {
+
+		if (hit)
 			bestplane = plane;
-			gm_info("Plane %d %fx+%fy+%fz+%f=0 hitted", i, plane[0], plane[1], plane[2], plane[3]);
-			debug_i = i;
-			gm_info("Start: (%f, %f, %f); End: (%f, %f, %f)", startp[0], startp[1], startp[2], endp[0], endp[1], endp[2]);
-		}
 
 		for (j = 0; j < facet->numBorders; j++) {
 			planes = &pc->planes[facet->borderPlanes[j]];
 			if (facet->borderInward[j])
-			{
 				plane = -planes->plane;
-			}
 			else
-			{
 				plane = planes->plane;
-			}
-			if (tw.sphere.use) {
+
+			if (tw.sphere.use)
+			{
 				// adjust the plane distance apropriately for radius
 				plane[3] += tw.sphere.radius;
 
@@ -421,21 +420,19 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 					endp = tw.end + tw.sphere.offset;
 				}
 			}
-			else {
+			else
+			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
 				offset = vmath::dot(tw.offsets[planes->signbits], plane);
-				//plane[3] += fabs(offset);
+				plane[3] -= fabs(offset);
 				startp = tw.start;
-				endp = tw.end;
 			}
 
 			if (!checkFacetPlane(plane, startp, endp, &enterFrac, &leaveFrac, &hit))
-			{
-				if (debug_i == i)
-					gm_info("check facet break.");
 				break;
-			}
-			if (hit) {
+
+			if (hit)
+			{
 				hitnum = j;
 				bestplane = plane;
 			}
@@ -448,8 +445,10 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		if (hitnum == facet->numBorders - 1)
 			continue;
 
-		if (enterFrac < leaveFrac && enterFrac >= 0) {
-			if (enterFrac < tw.trace.fraction) {
+		if (enterFrac < leaveFrac && enterFrac >= 0)
+		{
+			if (enterFrac < tw.trace.fraction)
+			{
 				if (enterFrac < 0) {
 					enterFrac = 0;
 				}
@@ -771,4 +770,19 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			tw.trace.contents = brush->contents;
 		}
 	}
+}
+
+bool BSPTrace::boundsIntersect(const vmath::vec3& mins, const vmath::vec3& maxs, const vmath::vec3& mins2, const vmath::vec3& maxs2)
+{
+	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
+		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||
+		maxs[2] < mins2[2] - SURFACE_CLIP_EPSILON ||
+		mins[0] > maxs2[0] + SURFACE_CLIP_EPSILON ||
+		mins[1] > maxs2[1] + SURFACE_CLIP_EPSILON ||
+		mins[2] > maxs2[2] + SURFACE_CLIP_EPSILON)
+	{
+		return false;
+	}
+
+	return true;
 }

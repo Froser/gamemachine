@@ -10,7 +10,7 @@
 #define	MAX_PATCH_PLANES	2048
 #define MAX_MAP_BOUNDS		65535
 #define	MAX_POINTS_ON_WINDING	96
-#define	NORMAL_EPSILON	0.0001
+#define	NORMAL_EPSILON	0.001
 #define	DIST_EPSILON	0.02
 
 typedef enum {
@@ -290,12 +290,13 @@ static bool planeFromPoints(vmath::vec4& plane, const vmath::vec3& a, const vmat
 	d1 = b - a;
 	d2 = c - a;
 	vmath::vec3 t = vmath::cross(d2, d1);
-	t = vmath::precise_normalize(t);
 	if (vmath::length(t) == 0)
 		return false;
 
+	t = vmath::precise_normalize(t);
 	plane = VEC4(t, plane);
 	plane[3] = -vmath::dot(a, plane);
+
 	ASSERT(a[0] * plane[0] + a[1] * plane[1] + a[2] * plane[2] + plane[3] < NORMAL_EPSILON);
 	return true;
 }
@@ -955,10 +956,12 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 	delete w;
 
 	//add opposite plane
+	/*
 	facet->borderPlanes[facet->numBorders] = facet->surfacePlane;
 	facet->borderNoAdjust[facet->numBorders] = 0;
 	facet->borderInward[facet->numBorders] = true;
 	facet->numBorders++;
+	*/
 }
 
 static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
@@ -1251,8 +1254,8 @@ void BSPPhysicsWorld::simulate()
 		d.trace.trace(d.camera.motions.translation,
 			d.camera.motions.translation + velocity * t,
 			vmath::vec3(0, 0, 0),
-			vmath::vec3(-5),
-			vmath::vec3(5),
+			vmath::vec3(-15),
+			vmath::vec3(15),
 			moveTrace
 		);
 
@@ -1502,13 +1505,8 @@ BSPPatchCollide* BSPPhysicsWorld::generatePatchCollide(GMint width, GMint height
 	patchCollideFromGrid(&grid, pf);
 
 	// expand by one unit for epsilon purposes
-	pf->bounds[0][0] -= 1;
-	pf->bounds[0][1] -= 1;
-	pf->bounds[0][2] -= 1;
-
-	pf->bounds[1][0] += 1;
-	pf->bounds[1][1] += 1;
-	pf->bounds[1][2] += 1;
+	pf->bounds[0] -= 1;
+	pf->bounds[1] += 1;
 
 	return pf;
 }

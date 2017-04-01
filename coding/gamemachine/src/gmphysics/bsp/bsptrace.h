@@ -80,6 +80,7 @@ public:
 	void traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc);
 	void tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCollide *pc);
 	GMint checkFacetPlane(const vmath::vec4& plane, const vmath::vec3& start, const vmath::vec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit);
+	bool boundsIntersect(const vmath::vec3& mins, const vmath::vec3& maxs, const vmath::vec3& mins2, const vmath::vec3& maxs2);
 };
 
 END_NS
