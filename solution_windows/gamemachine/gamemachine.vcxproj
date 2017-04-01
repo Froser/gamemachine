@@ -54,6 +54,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsppatch.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsstructs.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworldprivate.h" />
@@ -119,6 +120,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsppatch.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsptrace.cpp" />

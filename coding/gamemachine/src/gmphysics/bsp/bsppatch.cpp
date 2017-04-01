@@ -15,7 +15,6 @@
 #define MAX_MAP_BOUNDS 65535
 #define	MAX_GRID_SIZE 129
 #define	MAX_FACETS 1024
-#define	MAX_POINTS_ON_WINDING 96
 
 typedef enum
 {
@@ -51,16 +50,12 @@ struct BSPGrid
 //a winding gives the bounding points of a convex polygon
 struct BSPWinding
 {
-	GMint numpoints;
 	std::vector<vmath::vec3> p;
 
-	static BSPWinding* alloc(GMint pointNum)
+	void alloc(GMint pointNum)
 	{
 		ASSERT(pointNum != 0);
-		BSPWinding* p = new BSPWinding();
-		p->numpoints = 0;
-		p->p.resize(pointNum);
-		return p;
+		p.resize(pointNum);
 	}
 };
 
@@ -593,20 +588,19 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 		else
 		{
 			// bisecting side border
-			gm_error("WARNING: setBorderInward: mixed plane sides\n");
+			gm_error("WARNING: setBorderInward: mixed plane sides");
 			facet->borderInward[k] = false;
 		}
 	}
 }
 
-static void baseWindingForPlane(const vmath::vec4& plane, OUT BSPWinding** out)
+static void baseWindingForPlane(const vmath::vec4& plane, REF BSPWinding& w)
 {
 	vmath::vec3 normal = VEC3(plane);
 	GMfloat dist = plane[3];
 	GMint i, x;
 	GMfloat max, v;
 	vmath::vec3 org, vright, vup;
-	BSPWinding* w;
 
 	// find the major axis
 
@@ -646,96 +640,82 @@ static void baseWindingForPlane(const vmath::vec4& plane, OUT BSPWinding** out)
 	vright = vright * MAX_MAP_BOUNDS;
 
 	// project a really big	axis aligned box onto the plane
-	w = BSPWinding::alloc(4);
+	w.alloc(4);
 
-	w->p[0] = org - vright;
-	w->p[0] = w->p[0] + vup;
+	w.p[0] = org - vright;
+	w.p[0] = w.p[0] + vup;
 
-	w->p[1] = org + vright;
-	w->p[1] = w->p[1] + vup;
+	w.p[1] = org + vright;
+	w.p[1] = w.p[1] + vup;
 
-	w->p[2] = org + vright;
-	w->p[2] = w->p[2] - vup;
+	w.p[2] = org + vright;
+	w.p[2] = w.p[2] - vup;
 
-	w->p[3] = org - vright;
-	w->p[3] = w->p[3] - vup;
-
-	w->numpoints = 4;
-
-	*out = w;
+	w.p[3] = org - vright;
+	w.p[3] = w.p[3] - vup;
 }
 
-static void chopWindingInPlace(BSPWinding** inout, const vmath::vec4& plane, GMfloat epsilon)
+static bool chopWindingInPlace(REF BSPWinding& inout, const vmath::vec4& plane, GMfloat epsilon)
 {
-	BSPWinding* in;
-	GMfloat dists[MAX_POINTS_ON_WINDING + 4];
-	GMint sides[MAX_POINTS_ON_WINDING + 4];
+	std::vector<GMfloat> dists;
+	std::vector<GMint> sides;
 	GMint counts[3];
-	GMfloat dot;		// VC 4.2 optimizer bug if not static
-	GMint i, j;
+	GMfloat dot;
+	GMint j;
 	vmath::vec3 mid;
-	BSPWinding *f;
-	GMint maxpts;
 
 	vmath::vec3 normal = VEC3(plane);
 	GMfloat dist = plane[3];
 
-	in = *inout;
+	BSPWinding& in = inout;
+	BSPWinding f;
+
 	counts[0] = counts[1] = counts[2] = 0;
 
 	// determine sides for each point
-	for (i = 0; i < in->numpoints; i++)
+	for (auto iter = in.p.begin(); iter != in.p.end(); iter++)
 	{
-		dot = vmath::dot(in->p[i], normal);
+		vmath::vec3& p = *iter;
+		dot = vmath::dot(p, normal);
 		dot += dist;
-		dists[i] = dot;
+		dists.push_back(dot);
 		if (dot > epsilon)
-			sides[i] = SIDE_FRONT;
+			sides.push_back(SIDE_FRONT);
 		else if (dot < -epsilon)
-			sides[i] = SIDE_BACK;
+			sides.push_back(SIDE_BACK);
 		else
-			sides[i] = SIDE_ON;
-		counts[sides[i]]++;
+			sides.push_back(SIDE_ON);
+		counts[sides.back()]++;
 	}
-	sides[i] = sides[0];
-	dists[i] = dists[0];
+	sides.push_back(sides.front());
+	dists.push_back(dists.front());
 
 	if (!counts[0])
-	{
-		delete in;
-		*inout = NULL;
-		return;
-	}
+		return false;
+
 	if (!counts[1])
-		return;		// inout stays the same
+		return true; // inout stays the same
 
-	maxpts = in->numpoints + 4;	// cant use counts[0]+2 because
-								// of fp grouping errors
-
-	f = BSPWinding::alloc(maxpts);
-
-	for (i = 0; i < in->numpoints; i++)
+	for (GMuint i = 0; i < in.p.size(); i++)
 	{
-		vmath::vec3 p1 = in->p[i];
+		vmath::vec3 p1 = in.p[i];
 
 		if (sides[i] == SIDE_ON)
 		{
-			f->p[f->numpoints] = p1;
-			f->numpoints++;
+			f.p.push_back(p1);
 			continue;
 		}
 
 		if (sides[i] == SIDE_FRONT)
 		{
-			f->p[f->numpoints] = p1;
-			f->numpoints++;
+			f.p.push_back(p1);
 		}
 
 		if (sides[i + 1] == SIDE_ON || sides[i + 1] == sides[i])
 			continue;
 
 		// generate a split point
-		vmath::vec3 p2 = in->p[(i + 1) % in->numpoints];
+		vmath::vec3 p2 = in.p[(i + 1) % in.p.size()];
 
 		dot = dists[i] / (dists[i] - dists[i + 1]);
 		for (j = 0; j < 3; j++)
@@ -748,47 +728,31 @@ static void chopWindingInPlace(BSPWinding** inout, const vmath::vec4& plane, GMf
 				mid[j] = p1[j] + dot*(p2[j] - p1[j]);
 		}
 
-		f->p[f->numpoints] = mid;
-		f->numpoints++;
+		f.p.push_back(mid);
 	}
 
-	if (f->numpoints > maxpts)
-		gm_error("clipWinding: points exceeded estimate");
-	if (f->numpoints > MAX_POINTS_ON_WINDING)
-		gm_error("clipWinding: MAX_POINTS_ON_WINDING");
-
-	delete in;
-	*inout = f;
+	inout = f;
+	return true;
 }
 
-static void windingBounds(const BSPWinding* w, vmath::vec3& mins, vmath::vec3& maxs)
+static void windingBounds(const BSPWinding& w, vmath::vec3& mins, vmath::vec3& maxs)
 {
 	GMfloat v;
-	GMint i, j;
 
 	mins = vmath::vec3(MAX_MAP_BOUNDS);
 	maxs = vmath::vec3(-MAX_MAP_BOUNDS);
 
-	for (i = 0; i < w->numpoints; i++)
+	for (GMuint i = 0; i < w.p.size(); i++)
 	{
-		for (j = 0; j < 3; j++)
+		for (GMint j = 0; j < 3; j++)
 		{
-			v = w->p[i][j];
+			v = w.p[i][j];
 			if (v < mins[j])
 				mins[j] = v;
 			if (v > maxs[j])
 				maxs[j] = v;
 		}
 	}
-}
-
-static void copyWinding(BSPWinding* w, REF BSPWinding** out)
-{
-	BSPWinding *c;
-	c = BSPWinding::alloc(w->numpoints);
-	c->numpoints = w->numpoints;
-	c->p = w->p;
-	*out = c;
 }
 
 void snapVector(vmath::vec3& normal) {
@@ -813,18 +777,19 @@ void snapVector(vmath::vec3& normal) {
 
 static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 {
-	GMint i, j, k, l;
 	GMint axis, dir, flipped;
 	vmath::vec4 plane;
 	GMfloat d;
 	vmath::vec4 newplane;
-	BSPWinding *w, *w2;
 	vmath::vec3 mins, maxs, vec, vec2;
 
 	plane = context.planes[facet->surfacePlane].plane;
 
-	baseWindingForPlane(plane, &w);
-	for (j = 0; j < facet->numBorders && w; j++)
+	BSPWinding w, w2;
+	baseWindingForPlane(plane, w);
+
+	GMint j;
+	for (j = 0; j < facet->numBorders; j++)
 	{
 		if (facet->borderPlanes[j] == facet->surfacePlane)
 			continue;
@@ -833,10 +798,11 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 		if (!facet->borderInward[j])
 			plane = -plane;
 
-		chopWindingInPlace(&w, plane, 0.1f);
+		if (!chopWindingInPlace(w, plane, 0.1f))
+			break;
 	}
 
-	if (!w)
+	if (j < facet->numBorders)
 		return;
 
 	windingBounds(w, mins, maxs);
@@ -858,13 +824,15 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 			if (planeEqual(&context.planes[facet->surfacePlane], plane, &flipped)) {
 				continue;
 			}
-			// see if the plane is allready present
+			// see if the plane is already present
+			GMint i;
 			for (i = 0; i < facet->numBorders; i++) {
 				if (planeEqual(&context.planes[facet->borderPlanes[i]], plane, &flipped))
 					break;
 			}
 
-			if (i == facet->numBorders) {
+			if (i == facet->numBorders)
+			{
 				if (facet->numBorders > 4 + 6 + 16) gm_error("ERROR: too many bevels\n");
 				facet->borderPlanes[facet->numBorders] = findPlane(context, plane, &flipped);
 				facet->borderNoAdjust[facet->numBorders] = 0;
@@ -877,18 +845,21 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 	// add the edge bevels
 	//
 	// test the non-axial plane edges
-	for (j = 0; j < w->numpoints; j++)
+	GMint k;
+	for (j = 0; j < (GMint) w.p.size(); j++)
 	{
-		k = (j + 1) % w->numpoints;
-		vec = w->p[j] - w->p[k];
+		k = (j + 1) % w.p.size();
+		vec = w.p[j] - w.p[k];
 		//if it's a degenerate edge
 		vec = vmath::precise_normalize(vec);
 		if (vmath::length(vec) < 0.5)
 			continue;
 		snapVector(vec);
 		for (k = 0; k < 3; k++)
+		{
 			if (vmath::fuzzyCompare(vec[k], -1) || vmath::fuzzyCompare(vec[k], 1))
 				break;	// axial
+		}
 		if (k < 3)
 			continue;	// only test non-axial edges
 
@@ -905,17 +876,19 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 				if (vmath::length(t) < 0.5)
 					continue;
 				plane = VEC4(t, plane);
-				plane[3] = -vmath::dot(w->p[j], plane);
+				plane[3] = -vmath::dot(w.p[j], plane);
 
 				// if all the points of the facet winding are
 				// behind this plane, it is a proper edge bevel
-				for (l = 0; l < w->numpoints; l++)
+				GMuint l;
+				for (l = 0; l < w.p.size(); l++)
 				{
-					d = vmath::dot(w->p[l], plane) + plane[3];
+					d = vmath::dot(w.p[l], plane) + plane[3];
 					if (d > 0.1)
 						break;	// point in front
 				}
-				if (l < w->numpoints)
+
+				if (l < w.p.size())
 					continue;
 
 				//if it's the surface plane
@@ -923,37 +896,37 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 					continue;
 				}
 				// see if the plane is allready present
+				GMint i;
 				for (i = 0; i < facet->numBorders; i++) {
 					if (planeEqual(&context.planes[facet->borderPlanes[i]], plane, &flipped)) {
 						break;
 					}
 				}
 
-				if (i == facet->numBorders) {
-					if (facet->numBorders > 4 + 6 + 16) gm_error("ERROR: too many bevels\n");
+				if (i == facet->numBorders)
+				{
+					if (facet->numBorders > 4 + 6 + 16)
+						gm_error("ERROR: too many bevels\n");
+
 					facet->borderPlanes[facet->numBorders] = findPlane(context, plane, &flipped);
 
-					for (k = 0; k < facet->numBorders; k++) {
+					for (k = 0; k < facet->numBorders; k++)
+					{
 						if (facet->borderPlanes[facet->numBorders] ==
 							facet->borderPlanes[k]) gm_warning("WARNING: bevel plane already used\n");
 					}
 
 					facet->borderNoAdjust[facet->numBorders] = 0;
 					facet->borderInward[facet->numBorders] = flipped;
-					//
-					copyWinding(w, &w2);
+					w2 = w;
 					newplane = context.planes[facet->borderPlanes[facet->numBorders]].plane;
 					if (!facet->borderInward[facet->numBorders])
-					{
 						newplane = -newplane;
-					} //end if
-					chopWindingInPlace(&w2, newplane, 0.1f);
-					if (!w2) {
-						gm_warning("WARNING: addFacetBevels... invalid bevel\n");
+
+					if (!chopWindingInPlace(w2, newplane, 0.1f))
+					{
+						gm_warning("WARNING: addFacetBevels... invalid bevel");
 						continue;
-					}
-					else {
-						delete w2;
 					}
 					//
 					facet->numBorders++;
@@ -961,52 +934,51 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 			}
 		}
 	}
-	delete w;
 }
 
 static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
 {
 	vmath::vec4 plane;
-	GMint j;
-	BSPWinding* w;
 	vmath::vec3 bounds[2];
 	vmath::vec3 origin(0, 0, 0);
 
-	if (facet->surfacePlane == -1) {
+	if (facet->surfacePlane == -1)
 		return false;
-	}
 
 	plane = context.planes[facet->surfacePlane].plane;
-	baseWindingForPlane(plane, &w);
-	for (j = 0; j < facet->numBorders && w; j++) {
-		if (facet->borderPlanes[j] == -1)
-		{
-			delete w;
+
+	BSPWinding w;
+	baseWindingForPlane(plane, w);
+
+	GMint i;
+	for (i = 0; i < facet->numBorders; i++)
+	{
+		if (facet->borderPlanes[i] == -1)
 			return false;
-		}
-		plane = context.planes[facet->borderPlanes[j]].plane;
-		if (!facet->borderInward[j]) {
+
+		plane = context.planes[facet->borderPlanes[i]].plane;
+		if (!facet->borderInward[i])
 			plane = -plane;
-		}
-		chopWindingInPlace(&w, plane, 0.1f);
+
+		if (!chopWindingInPlace(w, plane, 0.1f))
+			break;
 	}
 
-	if (!w) {
+	if (i < facet->numBorders)
 		return false;		// winding was completely chopped away
-	}
 
 	// see if the facet is unreasonably large
 	windingBounds(w, bounds[0], bounds[1]);
-	delete w;
 
-	for (j = 0; j < 3; j++) {
-		if (bounds[1][j] - bounds[0][j] > MAX_MAP_BOUNDS) {
+	for (i = 0; i < 3; i++)
+	{
+		if (bounds[1][i] - bounds[0][i] > MAX_MAP_BOUNDS) {
 			return false;		// we must be missing a plane
 		}
-		if (bounds[0][j] >= MAX_MAP_BOUNDS) {
+		if (bounds[0][i] >= MAX_MAP_BOUNDS) {
 			return false;
 		}
-		if (bounds[1][j] <= -MAX_MAP_BOUNDS) {
+		if (bounds[1][i] <= -MAX_MAP_BOUNDS) {
 			return false;
 		}
 	}
@@ -1115,7 +1087,8 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 					context.facets.push_back(facet);
 				}
 			}
-			else {
+			else
+			{
 				// two seperate triangles
 				facet.surfacePlane = gridPlanes[i][j][0];
 				facet.numBorders = 3;
