@@ -61,22 +61,12 @@ struct BSPFacet
 
 struct BSPPatchCollide
 {
-	~BSPPatchCollide()
-	{
-		if (numPlanes > 0)
-			delete[] planes;
-		if (numFacets > 0)
-			delete[] facets;
-	}
-
 	vmath::vec3 bounds[2];
-	int numPlanes; // surface planes plus edge planes
-	BSPPatchPlane *planes; //need release
-	int numFacets;
-	BSPFacet* facets; //need release
+	std::vector<BSPPatchPlane> planes;
+	std::vector<BSPFacet> facets;
 };
-
 // End patches definitions
+
 struct BSP_Physics_Patch
 {
 	BSPSurface* surface;

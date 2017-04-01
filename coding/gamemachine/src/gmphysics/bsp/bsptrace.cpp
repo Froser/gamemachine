@@ -320,9 +320,8 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 		}
 
 		traceThroughPatch(tw, patch);
-		if (!tw.trace.fraction) {
+		if (!tw.trace.fraction)
 			return;
-		}
 	}
 }
 
@@ -334,7 +333,8 @@ void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
 
 	traceThroughPatchCollide(tw, patch->pc);
 
-	if (tw.trace.fraction < oldFrac) {
+	if (tw.trace.fraction < oldFrac)
+	{
 		tw.trace.surfaceFlags = patch->shader->surfaceFlags;
 		tw.trace.contents = patch->shader->contentFlags;
 	}
@@ -342,10 +342,9 @@ void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
 
 void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 {
-	GMint i, j, hit, hitnum;
+	GMint j, hit, hitnum;
 	GMfloat offset, enterFrac, leaveFrac, t;
 	BSPPatchPlane* planes;
-	BSPFacet* facet;
 	vmath::vec4 plane, bestplane;
 	vmath::vec3 startp, endp;
 
@@ -360,9 +359,10 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		return;
 	}
 
-	facet = pc->facets;
-	for (i = 0; i < pc->numFacets; i++, facet++)
+	for (auto iter = pc->facets.begin(); iter != pc->facets.end(); iter++)
 	{
+		const BSPFacet* facet = &*iter;
+
 		enterFrac = -1.0;
 		leaveFrac = 1.0;
 		hitnum = -1;
@@ -398,7 +398,8 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		if (hit)
 			bestplane = plane;
 
-		for (j = 0; j < facet->numBorders; j++) {
+		for (j = 0; j < facet->numBorders; j++)
+		{
 			planes = &pc->planes[facet->borderPlanes[j]];
 			if (facet->borderInward[j])
 				plane = -planes->plane;
@@ -465,39 +466,35 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCollide *pc)
 {
 	GMfloat intersect;
-	GMint i, j, k;
+	GMint j, k;
 	GMfloat offset;
 	GMfloat d1, d2;
-#if 0
-	static cvar_t *cv;
-	if (!cm_playerCurveClip->integer || !tw->isPoint) {
-		return;
-	}
-#endif
 
-	BSPPatchPlane* planes;
-	BSPFacet* facet;
 	std::vector<GMint> frontFacing;
-	frontFacing.resize(pc->numPlanes);
+	frontFacing.resize(pc->planes.size());
 	std::vector<GMfloat> intersection;
-	intersection.resize(pc->numPlanes);
+	intersection.resize(pc->planes.size());
 
 	// determine the trace's relationship to all planes
-	planes = pc->planes;
-	for (i = 0; i < pc->numPlanes; i++, planes++) {
-		offset = vmath::dot(tw.offsets[planes->signbits], VEC3(planes->plane));
-		d1 = vmath::dot(tw.start, VEC3(planes->plane)) - planes->plane[3] + offset;
-		d2 = vmath::dot(tw.end, VEC3(planes->plane)) - planes->plane[3] + offset;
-		if (d1 <= 0) {
+	const std::vector<BSPPatchPlane>& planes = pc->planes;
+	GMint i = 0;
+	for (auto iter = planes.begin(); iter != planes.end(); iter++, i++)
+	{
+		const BSPPatchPlane& plane = *iter;
+		offset = vmath::dot(tw.offsets[plane.signbits], VEC3(plane.plane));
+		d1 = vmath::dot(tw.start, VEC3(plane.plane)) - plane.plane[3] + offset;
+		d2 = vmath::dot(tw.end, VEC3(plane.plane)) - plane.plane[3] + offset;
+		if (d1 <= 0)
 			frontFacing[i] = 0;
-		}
-		else {
+		else
 			frontFacing[i] = 1;
-		}
-		if (d1 == d2) {
+
+		if (d1 == d2)
+		{
 			intersection[i] = 99999;
 		}
-		else {
+		else
+		{
 			intersection[i] = d1 / (d1 - d2);
 			if (intersection[i] <= 0) {
 				intersection[i] = 99999;
@@ -507,21 +504,24 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 
 
 	// see if any of the surface planes are intersected
-	facet = pc->facets;
-	for (i = 0; i < pc->numFacets; i++, facet++) {
-		if (!frontFacing[facet->surfacePlane]) {
+	const std::vector<BSPFacet>& facet = pc->facets;
+	i = 0;
+	for (auto iter = facet.begin(); iter != facet.end(); iter++, i++)
+	{
+		const BSPFacet& facet = *iter;
+		if (!frontFacing[facet.surfacePlane]) {
 			continue;
 		}
-		intersect = intersection[facet->surfacePlane];
+		intersect = intersection[facet.surfacePlane];
 		if (intersect < 0) {
 			continue;		// surface is behind the starting point
 		}
 		if (intersect > tw.trace.fraction) {
 			continue;		// already hit something closer
 		}
-		for (j = 0; j < facet->numBorders; j++) {
-			k = facet->borderPlanes[j];
-			if (frontFacing[k] ^ facet->borderInward[j]) {
+		for (j = 0; j < facet.numBorders; j++) {
+			k = facet.borderPlanes[j];
+			if (frontFacing[k] ^ facet.borderInward[j]) {
 				if (intersection[k] > intersect) {
 					break;
 				}
@@ -532,18 +532,9 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 				}
 			}
 		}
-		if (j == facet->numBorders) {
-			// we hit this facet
-#if 0
-			if (!cv) {
-				cv = Cvar_Get("r_debugSurfaceUpdate", "1", 0);
-			}
-			if (cv->integer) {
-				debugPatchCollide = pc;
-				debugFacet = facet;
-			}
-#endif //BSPC
-			planes = &pc->planes[facet->surfacePlane];
+		if (j == facet.numBorders)
+		{
+			const BSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
 
 			// calculate intersection with a slight pushoff
 			offset = vmath::dot(tw.offsets[planes->signbits], VEC3(planes->plane));
@@ -551,7 +542,8 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 			d2 = vmath::dot(tw.end, VEC3(planes->plane)) - planes->plane[3] + offset;
 			tw.trace.fraction = (d1 - SURFACE_CLIP_EPSILON) / (d1 - d2);
 
-			if (tw.trace.fraction < 0) {
+			if (tw.trace.fraction < 0)
+			{
 				tw.trace.fraction = 0;
 			}
 

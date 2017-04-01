@@ -15,7 +15,6 @@
 #define MAX_MAP_BOUNDS 65535
 #define	MAX_GRID_SIZE 129
 #define	MAX_FACETS 1024
-#define	MAX_PATCH_PLANES 2048
 #define	MAX_POINTS_ON_WINDING 96
 
 typedef enum
@@ -36,11 +35,8 @@ enum
 
 struct PatchCollideContext
 {
-	int numPlanes;
-	BSPPatchPlane planes[MAX_PATCH_PLANES];
-
-	int numFacets;
-	BSPFacet facets[MAX_PATCH_PLANES];
+	std::vector<BSPPatchPlane> planes;
+	std::vector<BSPFacet> facets;
 };
 
 struct BSPGrid
@@ -372,27 +368,24 @@ static GMint planeEqual(BSPPatchPlane* p, const vmath::vec4& plane, GMint *flipp
 static int findPlane(PatchCollideContext& context, const vmath::vec3& p1, const vmath::vec3& p2, const vmath::vec3& p3)
 {
 	vmath::vec4 plane;
-	GMint i;
 	GMfloat d;
 
 	if (!planeFromPoints(plane, p1, p2, p3))
 		return -1;
 
 	// see if the points are close enough to an existing plane
-	for (i = 0; i < context.numPlanes; i++) {
-		if (vmath::dot(VEC3(plane), VEC3(context.planes[i].plane)) < 0) {
+	for (GMuint i = 0; i < context.planes.size(); i++)
+	{
+		if (vmath::dot(VEC3(plane), VEC3(context.planes[i].plane)) < 0)
 			continue;	// allow backwards planes?
-		}
 
 		d = vmath::dot(p1, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
-		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
+		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON)
 			continue;
-		}
 
 		d = vmath::dot(p2, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
-		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
+		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON)
 			continue;
-		}
 
 		d = vmath::dot(p3, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
@@ -403,41 +396,30 @@ static int findPlane(PatchCollideContext& context, const vmath::vec3& p1, const 
 		return i;
 	}
 
-	// add a new plane
-	if (context.numPlanes == MAX_PATCH_PLANES)
-	{
-		gm_error("MAX_PATCH_PLANES");
-	}
-
-	context.planes[context.numPlanes].plane = plane;
-	context.planes[context.numPlanes].signbits = signbitsForNormal(plane);
-	context.numPlanes++;
-	return context.numPlanes - 1;
+	context.planes.push_back(BSPPatchPlane());
+	BSPPatchPlane& p = context.planes.back();
+	p.plane = plane;
+	p.signbits = signbitsForNormal(plane);
+	return context.planes.size() - 1;
 }
 
 static GMint findPlane(PatchCollideContext& context, const vmath::vec4& plane, GMint *flipped)
 {
-	GMint i;
-
 	// see if the points are close enough to an existing plane
-	for (i = 0; i < context.numPlanes; i++) {
+	for (GMuint i = 0; i < context.planes.size(); i++)
+	{
 		if (planeEqual(&context.planes[i], plane, flipped))
 			return i;
 	}
 
-	// add a new plane
-	if (context.numPlanes == MAX_PATCH_PLANES) {
-		gm_error("MAX_PATCH_PLANES");
-	}
-
-	context.planes[context.numPlanes].plane = plane;
-	context.planes[context.numPlanes].signbits = signbitsForNormal(plane);
-
-	context.numPlanes++;
+	context.planes.push_back(BSPPatchPlane());
+	BSPPatchPlane& p = context.planes.back();
+	p.plane = plane;
+	p.signbits = signbitsForNormal(plane);
 
 	*flipped = false;
 
-	return context.numPlanes - 1;
+	return context.planes.size() - 1;
 }
 
 static GMint gridPlane(int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint tri)
@@ -842,19 +824,20 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 	plane = context.planes[facet->surfacePlane].plane;
 
 	baseWindingForPlane(plane, &w);
-	for (j = 0; j < facet->numBorders && w; j++) {
-		if (facet->borderPlanes[j] == facet->surfacePlane) continue;
-		plane = context.planes[facet->borderPlanes[j]].plane;
+	for (j = 0; j < facet->numBorders && w; j++)
+	{
+		if (facet->borderPlanes[j] == facet->surfacePlane)
+			continue;
 
-		if (!facet->borderInward[j]) {
+		plane = context.planes[facet->borderPlanes[j]].plane;
+		if (!facet->borderInward[j])
 			plane = -plane;
-		}
 
 		chopWindingInPlace(&w, plane, 0.1f);
 	}
-	if (!w) {
+
+	if (!w)
 		return;
-	}
 
 	windingBounds(w, mins, maxs);
 
@@ -974,21 +957,11 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 					}
 					//
 					facet->numBorders++;
-					//already got a bevel
-					//					break;
 				}
 			}
 		}
 	}
 	delete w;
-
-	//add opposite plane
-	/*
-	facet->borderPlanes[facet->numBorders] = facet->surfacePlane;
-	facet->borderNoAdjust[facet->numBorders] = 0;
-	facet->borderInward[facet->numBorders] = true;
-	facet->numBorders++;
-	*/
 }
 
 static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
@@ -1045,13 +1018,9 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	GMint i, j;
 	vmath::vec3 p1, p2, p3;
 	GMint gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2];
-	BSPFacet *facet;
 	GMint borders[4];
 	bool noAdjust[4];
 	PatchCollideContext context;
-
-	context.numPlanes = 0;
-	context.numFacets = 0;
 
 	// find the planes for each triangle of the grid
 	for (i = 0; i < grid->width - 1; i++)
@@ -1122,89 +1091,78 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 				borders[EN_RIGHT] = edgePlaneNum(context, grid, gridPlanes, i, j, 1);
 			}
 
-			if (context.numFacets == MAX_FACETS) {
-				gm_error("MAX_FACETS");
-			}
-			facet = &context.facets[context.numFacets];
-			memset(facet, 0, sizeof(*facet));
+			BSPFacet facet;
+			memset(&facet, 0, sizeof(facet));
 
 			if (gridPlanes[i][j][0] == gridPlanes[i][j][1]) {
 				if (gridPlanes[i][j][0] == -1) {
 					continue;		// degenrate
 				}
-				facet->surfacePlane = gridPlanes[i][j][0];
-				facet->numBorders = 4;
-				facet->borderPlanes[0] = borders[EN_TOP];
-				facet->borderNoAdjust[0] = noAdjust[EN_TOP];
-				facet->borderPlanes[1] = borders[EN_RIGHT];
-				facet->borderNoAdjust[1] = noAdjust[EN_RIGHT];
-				facet->borderPlanes[2] = borders[EN_BOTTOM];
-				facet->borderNoAdjust[2] = noAdjust[EN_BOTTOM];
-				facet->borderPlanes[3] = borders[EN_LEFT];
-				facet->borderNoAdjust[3] = noAdjust[EN_LEFT];
-				setBorderInward(context, facet, grid, gridPlanes, i, j, -1);
-				if (validateFacet(context, facet)) {
-					addFacetBevels(context, facet);
-					context.numFacets++;
+				facet.surfacePlane = gridPlanes[i][j][0];
+				facet.numBorders = 4;
+				facet.borderPlanes[0] = borders[EN_TOP];
+				facet.borderNoAdjust[0] = noAdjust[EN_TOP];
+				facet.borderPlanes[1] = borders[EN_RIGHT];
+				facet.borderNoAdjust[1] = noAdjust[EN_RIGHT];
+				facet.borderPlanes[2] = borders[EN_BOTTOM];
+				facet.borderNoAdjust[2] = noAdjust[EN_BOTTOM];
+				facet.borderPlanes[3] = borders[EN_LEFT];
+				facet.borderNoAdjust[3] = noAdjust[EN_LEFT];
+				setBorderInward(context, &facet, grid, gridPlanes, i, j, -1);
+				if (validateFacet(context, &facet))
+				{
+					addFacetBevels(context, &facet);
+					context.facets.push_back(facet);
 				}
 			}
 			else {
 				// two seperate triangles
-				facet->surfacePlane = gridPlanes[i][j][0];
-				facet->numBorders = 3;
-				facet->borderPlanes[0] = borders[EN_TOP];
-				facet->borderNoAdjust[0] = noAdjust[EN_TOP];
-				facet->borderPlanes[1] = borders[EN_RIGHT];
-				facet->borderNoAdjust[1] = noAdjust[EN_RIGHT];
-				facet->borderPlanes[2] = gridPlanes[i][j][1];
-				if (facet->borderPlanes[2] == -1) {
-					facet->borderPlanes[2] = borders[EN_BOTTOM];
-					if (facet->borderPlanes[2] == -1) {
-						facet->borderPlanes[2] = edgePlaneNum(context, grid, gridPlanes, i, j, 4);
-					}
+				facet.surfacePlane = gridPlanes[i][j][0];
+				facet.numBorders = 3;
+				facet.borderPlanes[0] = borders[EN_TOP];
+				facet.borderNoAdjust[0] = noAdjust[EN_TOP];
+				facet.borderPlanes[1] = borders[EN_RIGHT];
+				facet.borderNoAdjust[1] = noAdjust[EN_RIGHT];
+				facet.borderPlanes[2] = gridPlanes[i][j][1];
+				if (facet.borderPlanes[2] == -1)
+				{
+					facet.borderPlanes[2] = borders[EN_BOTTOM];
+					if (facet.borderPlanes[2] == -1)
+						facet.borderPlanes[2] = edgePlaneNum(context, grid, gridPlanes, i, j, 4);
 				}
-				setBorderInward(context, facet, grid, gridPlanes, i, j, 0);
-				if (validateFacet(context, facet)) {
-					addFacetBevels(context, facet);
-					context.numFacets++;
+				setBorderInward(context, &facet, grid, gridPlanes, i, j, 0);
+				if (validateFacet(context, &facet))
+				{
+					addFacetBevels(context, &facet);
+					context.facets.push_back(facet);
 				}
 
-				if (context.numFacets == MAX_FACETS) {
-					gm_error("MAX_FACETS");
-				}
-				facet = &context.facets[context.numFacets];
-				memset(facet, 0, sizeof(*facet));
-
-				facet->surfacePlane = gridPlanes[i][j][1];
-				facet->numBorders = 3;
-				facet->borderPlanes[0] = borders[EN_BOTTOM];
-				facet->borderNoAdjust[0] = noAdjust[EN_BOTTOM];
-				facet->borderPlanes[1] = borders[EN_LEFT];
-				facet->borderNoAdjust[1] = noAdjust[EN_LEFT];
-				facet->borderPlanes[2] = gridPlanes[i][j][0];
-				if (facet->borderPlanes[2] == -1) {
-					facet->borderPlanes[2] = borders[EN_TOP];
-					if (facet->borderPlanes[2] == -1) {
-						facet->borderPlanes[2] = edgePlaneNum(context, grid, gridPlanes, i, j, 5);
+				memset(&facet, 0, sizeof(facet));
+				facet.surfacePlane = gridPlanes[i][j][1];
+				facet.numBorders = 3;
+				facet.borderPlanes[0] = borders[EN_BOTTOM];
+				facet.borderNoAdjust[0] = noAdjust[EN_BOTTOM];
+				facet.borderPlanes[1] = borders[EN_LEFT];
+				facet.borderNoAdjust[1] = noAdjust[EN_LEFT];
+				facet.borderPlanes[2] = gridPlanes[i][j][0];
+				if (facet.borderPlanes[2] == -1) {
+					facet.borderPlanes[2] = borders[EN_TOP];
+					if (facet.borderPlanes[2] == -1) {
+						facet.borderPlanes[2] = edgePlaneNum(context, grid, gridPlanes, i, j, 5);
 					}
 				}
-				setBorderInward(context, facet, grid, gridPlanes, i, j, 1);
-				if (validateFacet(context, facet)) {
-					addFacetBevels(context, facet);
-					context.numFacets++;
+				setBorderInward(context, &facet, grid, gridPlanes, i, j, 1);
+				if (validateFacet(context, &facet)) {
+					addFacetBevels(context, &facet);
+					context.facets.push_back(facet);
 				}
 			}
 		}
 	}
 
 	// copy the results out
-	pf->numPlanes = context.numPlanes;
-	pf->numFacets = context.numFacets;
-
-	pf->facets = GM_new_arr<BSPFacet>(context.numFacets);
-	memcpy(pf->facets, context.facets, context.numFacets * sizeof(*pf->facets));
-	pf->planes = GM_new_arr<BSPPatchPlane>(context.numPlanes);
-	memcpy(pf->planes, context.planes, context.numPlanes * sizeof(*pf->planes));
+	pf->facets = context.facets;
+	pf->planes = context.planes;
 }
 
 BSPPatchPrivate::~BSPPatchPrivate()
@@ -1274,7 +1232,7 @@ void BSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, cons
 	// we now have a grid of points exactly on the curve
 	// the aproximate surface defined by these points will be
 	// collided against
-	BSPPatchCollide* pf = GM_new<BSPPatchCollide>();
+	BSPPatchCollide* pf = new BSPPatchCollide();
 	clearBounds(pf->bounds[0], pf->bounds[1]);
 	gm_info("------------Patches------------");
 	for (i = 0; i < grid.width; i++)
