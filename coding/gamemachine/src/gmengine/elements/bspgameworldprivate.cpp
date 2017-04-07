@@ -99,6 +99,9 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 
 	MotionProperties& prop = world->physicsWorld()->find(character)->motions;
 	prop.translation = playerStart;
+	
+	ShapeProperties& sp = world->physicsWorld()->find(character)->shapeProps;
+	sp.stepHeight = 18.f;
 }
 
 void BSPGameWorldEntityReader::import(const BSPEntity& entity, BSPGameWorld* world)

@@ -38,22 +38,6 @@ struct BSPSphere
 	vmath::vec3 offset;
 };
 
-struct BSPTraceWork
-{
-	vmath::vec3 start;
-	vmath::vec3 end;
-	vmath::vec3 size[2];	// size of the box being swept through the model
-	vmath::vec3 offsets[8];	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
-	GMfloat maxOffset;	// longest corner length from origin
-	vmath::vec3 extents;	// greatest of abs(size[0]) and abs(size[1])
-	vmath::vec3 bounds[2];	// enclosing box of start and end surrounding by size
-	vmath::vec3 modelOrigin;// origin of the model tracing through
-	GMint contents; // ored contents of the model tracing through
-	bool isPoint; // optimized case
-	BSPTraceResult trace; // returned from trace call
-	BSPSphere sphere; // sphere for oriendted capsule collision
-};
-
 class BSPPhysicsWorld;
 struct BSPTracePrivate
 {
@@ -66,6 +50,7 @@ struct BSPTracePrivate
 struct BSP_Physics_Brush;
 struct BSP_Physics_Patch;
 struct BSPPatchCollide;
+struct BSPTraceWork;
 class BSPTrace
 {
 	DEFINE_PRIVATE(BSPTrace)

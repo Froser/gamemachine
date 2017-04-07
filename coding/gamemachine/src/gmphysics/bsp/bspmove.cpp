@@ -3,15 +3,119 @@
 #include "gmengine/controllers/gameloop.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/graphic_engine.h"
+#include "gmphysics/physicsstructs.h"
+
+enum
+{
+	GRAVITY_DIRECTION = 1
+};
+
+static const GMfloat OVERCLIP = 1.01f;
 
 BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
 {
 	D(d);
 	d.world = world;
 	d.object = obj;
+	d.trace = &world->physicsData().trace;
 }
 
-void BSPMove::slideMove(bool hasGravity)
+void BSPMove::move()
+{
+	D(d);
+	memset(&d.movement, 0, sizeof(d.movement));
+	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
+	d.movement.origin = d.object->motions.translation;
+	d.movement.velocity = d.object->motions.velocity;
+	d.movement.startTime = d.world->physicsData().world->getElapsed();
+
+	groundTrace();
+	if (d.movement.walking)
+		walkMove();
+	else
+		airMove();
+
+	synchronizeMove();
+}
+
+void BSPMove::groundTrace()
+{
+	D(d);
+	vmath::vec3 p(d.movement.origin);
+	p[1] -= .25f;
+
+	d.trace->trace(d.movement.origin, p, vmath::vec3(0),
+		vmath::vec3(-15),
+		vmath::vec3(15),
+		d.movement.groundTrace
+	);
+
+	if (d.movement.groundTrace.fraction == 1.0)
+	{
+		// free fall
+		d.movement.freefall = true;
+		d.movement.walking = false;
+		return;
+	}
+
+	d.movement.freefall = false;
+	d.movement.walking = true;
+}
+
+void BSPMove::walkMove()
+{
+	D(d);
+	stepSlideMove(false);
+}
+
+void BSPMove::airMove()
+{
+	D(d);
+	stepSlideMove(true);
+}
+
+void BSPMove::stepSlideMove(bool hasGravity)
+{
+	D(d);
+	if (!slideMove(hasGravity))
+		return;
+
+	vmath::vec3 startVelocity = d.movement.velocity;
+
+	//step down
+	vmath::vec3 down = d.movement.origin;
+	down[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
+
+	BSPTraceResult t;
+	d.trace->trace(d.movement.origin, down, vmath::vec3(0), vmath::vec3(-15),
+		vmath::vec3(15), t);
+
+	vmath::vec3 up(0, 1, 0);
+	if (d.movement.velocity[GRAVITY_DIRECTION] > 0 && t.fraction == 1.0 || vmath::dot(t.plane.normal, up) < .7f)
+		return;
+
+	//step up
+	up = d.movement.origin;
+	up[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
+	d.trace->trace(d.movement.origin, up, vmath::vec3(0), vmath::vec3(-15),
+		vmath::vec3(15), t);
+
+	if (t.allsolid)
+		return;
+
+	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - d.movement.origin[GRAVITY_DIRECTION];
+	d.movement.origin = t.endpos;
+	d.movement.velocity = startVelocity;
+	slideMove(hasGravity);
+
+	down = d.movement.origin;
+	down[1] -= stepSize;
+	d.trace->trace(d.movement.origin, down, vmath::vec3(0), vmath::vec3(0), vmath::vec3(-15), t);
+	if (t.fraction < 1.0f)
+		clipVelocity(d.object->motions.velocity, t.plane.normal, d.object->motions.velocity, OVERCLIP);
+}
+
+bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	BSPPhysicsWorldData& wd = d.world->physicsData();
@@ -21,18 +125,21 @@ void BSPMove::slideMove(bool hasGravity)
 	if (skipFrame < 1)
 		skipFrame = 1;
 
-	vmath::vec3 velocity = d.object->motions.velocity * skipFrame / fps;
+	vmath::vec3& velocity = d.movement.velocity;// *skipFrame / fps;
 	GMint numbumps = 4, bumpcount;
 
 	vmath::vec3 endVelocity, endClipVelocity;
 	if (hasGravity)
 	{
-		endVelocity = wd.gravity;//TODO *skipFrame / fps;
-		velocity += endVelocity;
+		endVelocity = velocity;
+		endVelocity[GRAVITY_DIRECTION] += wd.gravity;// *skipFrame / fps;
+		velocity[GRAVITY_DIRECTION] = (velocity[GRAVITY_DIRECTION] + endVelocity[GRAVITY_DIRECTION]) * .5f;
 	}
 
 	std::vector<vmath::vec3> planes;
-	//planes.push_back(groundTrace.plane.normal); //TODO
+	if (!d.movement.freefall)
+		planes.push_back(d.movement.groundTrace.plane.normal);
+
 	planes.push_back(vmath::normalize(velocity));
 
 	GMfloat t = 1.0f;
@@ -40,7 +147,7 @@ void BSPMove::slideMove(bool hasGravity)
 	for (bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
 		BSPTraceResult moveTrace;
-		wd.trace.trace(d.object->motions.translation,
+		d.trace->trace(d.object->motions.translation,
 			d.object->motions.translation + velocity * t,
 			vmath::vec3(0, 0, 0),
 			vmath::vec3(-15),
@@ -49,8 +156,14 @@ void BSPMove::slideMove(bool hasGravity)
 			);
 		//TODO -15和15应该取自CollisionObject的形状参数
 
+		if (moveTrace.allsolid)
+		{
+			// entity is completely trapped in another solid
+			d.movement.velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
+			return true;
+		}
 		if (moveTrace.fraction > 0)
-			d.object->motions.translation = moveTrace.endpos;
+			d.movement.origin = moveTrace.endpos;
 		if (moveTrace.fraction == 1.0f)
 			break;
 
@@ -73,7 +186,6 @@ void BSPMove::slideMove(bool hasGravity)
 
 		// find a plane that it enters
 		vmath::vec3 cv; //clipVelocity
-		const GMfloat OVERCLIP = 1.01f;
 		for (i = 0; i < planes.size(); i++)
 		{
 			if (vmath::dot(velocity, planes[i]) >= 0.1)
@@ -120,18 +232,24 @@ void BSPMove::slideMove(bool hasGravity)
 						continue;
 
 					velocity = vmath::vec3(0);
-					return;
+					return true;
 				}
 			}
 
 			velocity = cv;
 			endVelocity = endClipVelocity;
+			d.movement.velocity = velocity;
 			break;
 		}
 	}
 
 	if (hasGravity)
+	{
 		velocity = endVelocity;
+		d.movement.velocity = velocity;
+	}
+
+	return (bumpcount != 0);
 }
 
 void BSPMove::clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vmath::vec3& out, GMfloat overbounce)
@@ -153,4 +271,10 @@ void BSPMove::clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vma
 		change = normal[i] * backoff;
 		out[i] = in[i] - change;
 	}
+}
+
+void BSPMove::synchronizeMove()
+{
+	D(d);
+	d.object->motions.translation = d.movement.origin;
 }

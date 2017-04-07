@@ -14,7 +14,7 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	memset(&d.camera, 0, sizeof(d.camera));
 
 	//TODO TEST
-	d.gravity = vmath::vec3(0, -10, 0);
+	d.gravity = -10.f;
 }
 
 BSPPhysicsWorldData& BSPPhysicsWorld::physicsData()
@@ -42,7 +42,7 @@ void BSPPhysicsWorld::simulate()
 	//);
 
 	//TODO 应该针对各种情况move，slideMove应该是个私有函数
-	BSPMove(this, &d.camera).slideMove(true);
+	BSPMove(this, &d.camera).move();
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)

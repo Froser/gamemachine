@@ -10,6 +10,7 @@ class GameObject;
 struct ShapeProperties
 {
 	GMfloat radius;
+	GMfloat stepHeight;
 };
 
 struct MotionProperties

@@ -11,7 +11,7 @@ struct PhysicsWorldPrivate
 	PhysicsWorldPrivate();
 
 	GameWorld* world;
-	vmath::vec3 gravity;
+	GMfloat gravity;
 };
 
 END_NS
