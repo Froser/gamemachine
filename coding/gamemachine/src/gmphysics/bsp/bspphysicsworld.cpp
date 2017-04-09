@@ -14,7 +14,7 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	memset(&d.camera, 0, sizeof(d.camera));
 
 	//TODO TEST
-	d.gravity = -10.f;
+	d.gravity = -600.f;
 }
 
 BSPPhysicsWorldData& BSPPhysicsWorld::physicsData()

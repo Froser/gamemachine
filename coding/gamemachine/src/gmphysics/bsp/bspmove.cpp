@@ -27,15 +27,19 @@ void BSPMove::move()
 	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
 	d.movement.origin = d.object->motions.translation;
 	d.movement.velocity = d.object->motions.velocity;
-	d.movement.startTime = d.world->physicsData().world->getElapsed();
+	d.movement.startTime = now();
 
 	groundTrace();
 	if (d.movement.walking)
 		walkMove();
 	else
 		airMove();
+}
 
-	synchronizeMove();
+GMfloat BSPMove::now()
+{
+	D(d);
+	return d.world->physicsData().world->getElapsed();
 }
 
 void BSPMove::groundTrace()
@@ -80,7 +84,9 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	if (!slideMove(hasGravity))
 		return;
 
-	vmath::vec3 startVelocity = d.movement.velocity;
+	BSPPhysicsWorldData& wd = d.world->physicsData();
+	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
+	vmath::vec3 startVelocity = d.movement.velocity * elapsed;
 
 	//step down
 	vmath::vec3 down = d.movement.origin;
@@ -109,7 +115,7 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	slideMove(hasGravity);
 
 	down = d.movement.origin;
-	down[1] -= stepSize;
+	down[GRAVITY_DIRECTION] -= stepSize;
 	d.trace->trace(d.movement.origin, down, vmath::vec3(0), vmath::vec3(0), vmath::vec3(-15), t);
 	if (t.fraction < 1.0f)
 		clipVelocity(d.object->motions.velocity, t.plane.normal, d.object->motions.velocity, OVERCLIP);
@@ -120,19 +126,14 @@ bool BSPMove::slideMove(bool hasGravity)
 	D(d);
 	BSPPhysicsWorldData& wd = d.world->physicsData();
 	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
-	GMfloat fps = wd.world->getGraphicEngine()->getGraphicSettings()->fps;
-	GMfloat skipFrame = elapsed / (1.0f / fps);
-	if (skipFrame < 1)
-		skipFrame = 1;
+	vmath::vec3 velocity = d.movement.velocity * elapsed;
 
-	vmath::vec3& velocity = d.movement.velocity;// *skipFrame / fps;
 	GMint numbumps = 4, bumpcount;
-
 	vmath::vec3 endVelocity, endClipVelocity;
 	if (hasGravity)
 	{
 		endVelocity = velocity;
-		endVelocity[GRAVITY_DIRECTION] += wd.gravity;// *skipFrame / fps;
+		endVelocity[GRAVITY_DIRECTION] += wd.gravity * elapsed;
 		velocity[GRAVITY_DIRECTION] = (velocity[GRAVITY_DIRECTION] + endVelocity[GRAVITY_DIRECTION]) * .5f;
 	}
 
@@ -249,6 +250,7 @@ bool BSPMove::slideMove(bool hasGravity)
 		d.movement.velocity = velocity;
 	}
 
+	synchronizeMove();
 	return (bumpcount != 0);
 }
 

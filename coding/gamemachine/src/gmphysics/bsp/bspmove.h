@@ -36,6 +36,7 @@ public:
 	void move();
 
 private:
+	GMfloat now();
 	void groundTrace();
 	void walkMove();
 	void airMove();
