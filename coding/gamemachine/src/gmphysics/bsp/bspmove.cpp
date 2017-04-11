@@ -23,12 +23,7 @@ BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
 void BSPMove::move()
 {
 	D(d);
-	memset(&d.movement, 0, sizeof(d.movement));
-	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
-	d.movement.origin = d.object->motions.translation;
-	d.movement.velocity = d.object->motions.velocity;
-	d.movement.startTime = now();
-
+	generateMovement();
 	groundTrace();
 	if (d.movement.walking)
 		walkMove();
@@ -40,6 +35,28 @@ GMfloat BSPMove::now()
 {
 	D(d);
 	return d.world->physicsData().world->getElapsed();
+}
+
+void BSPMove::generateMovement()
+{
+	D(d);
+	memset(&d.movement, 0, sizeof(d.movement));
+	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
+	d.movement.origin = d.object->motions.translation;
+	d.movement.startTime = now();
+
+	// 本次的速度等于上次的速度加上物体期望的速度
+	d.movement.velocity = d.object->wishVelocity + d.object->motions.velocity;
+}
+
+void BSPMove::decomposeVelocity()
+{
+	D(d);
+	// 将速度分解成水平面平行的分量
+	GMfloat len = 1.f / vmath::fastInvSqrt(vmath::lengthSquare(d.movement.velocity));
+	vmath::vec3 planeDir = vmath::vec3(d.movement.velocity[0], 0.f, d.movement.velocity[2]);
+	vmath::vec3 normal = vmath::normalize(planeDir);
+	d.movement.velocity = normal * len;
 }
 
 void BSPMove::groundTrace()
@@ -84,46 +101,24 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	if (!slideMove(hasGravity))
 		return;
 
-	BSPPhysicsWorldData& wd = d.world->physicsData();
-	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
-	vmath::vec3 startVelocity = d.movement.velocity * elapsed;
-
-	//step down
-	vmath::vec3 down = d.movement.origin;
-	down[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
-
 	BSPTraceResult t;
-	d.trace->trace(d.movement.origin, down, vmath::vec3(0), vmath::vec3(-15),
-		vmath::vec3(15), t);
-
-	vmath::vec3 up(0, 1, 0);
-	if (d.movement.velocity[GRAVITY_DIRECTION] > 0 && t.fraction == 1.0 || vmath::dot(t.plane.normal, up) < .7f)
-		return;
-
-	//step up
-	up = d.movement.origin;
-	up[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
-	d.trace->trace(d.movement.origin, up, vmath::vec3(0), vmath::vec3(-15),
-		vmath::vec3(15), t);
+	vmath::vec3 stepUp = d.movement.origin;
+	stepUp[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
+	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
 
 	if (t.allsolid)
 		return;
 
 	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - d.movement.origin[GRAVITY_DIRECTION];
 	d.movement.origin = t.endpos;
-	d.movement.velocity = startVelocity;
 	slideMove(hasGravity);
-
-	down = d.movement.origin;
-	down[GRAVITY_DIRECTION] -= stepSize;
-	d.trace->trace(d.movement.origin, down, vmath::vec3(0), vmath::vec3(0), vmath::vec3(-15), t);
-	if (t.fraction < 1.0f)
-		clipVelocity(d.object->motions.velocity, t.plane.normal, d.object->motions.velocity, OVERCLIP);
 }
 
 bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
+	decomposeVelocity();
+
 	BSPPhysicsWorldData& wd = d.world->physicsData();
 	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
 	vmath::vec3 velocity = d.movement.velocity * elapsed;
@@ -148,8 +143,8 @@ bool BSPMove::slideMove(bool hasGravity)
 	for (bumpcount = 0; bumpcount < numbumps; bumpcount++)
 	{
 		BSPTraceResult moveTrace;
-		d.trace->trace(d.object->motions.translation,
-			d.object->motions.translation + velocity * t,
+		d.trace->trace(d.movement.origin,
+			d.movement.origin + velocity * t,
 			vmath::vec3(0, 0, 0),
 			vmath::vec3(-15),
 			vmath::vec3(15),

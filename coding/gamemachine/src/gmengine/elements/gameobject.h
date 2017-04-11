@@ -18,6 +18,7 @@ class GameWorld;
 class GameObject
 {
 	DEFINE_PRIVATE(GameObject)
+
 public:
 	GameObject(AUTORELEASE Object* obj);
 	virtual ~GameObject() {};

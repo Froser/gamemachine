@@ -93,7 +93,6 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	Character* character = new Character(6);
 	character->setMoveSpeed(192);
 	character->setJumpSpeed(vmath::vec3(0, 50, 0));
-	character->setCanFreeMove(true);
 	world->appendObjectAndInit(character);
 	world->setMajorCharacter(character);
 

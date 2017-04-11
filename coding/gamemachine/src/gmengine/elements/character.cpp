@@ -8,7 +8,6 @@ Character::Character(GMfloat radius)
 	: GameObject(nullptr)
 	, m_radius(radius)
 	, m_jumpSpeed(vmath::vec3(0, 10, 0))
-	, m_freeMove(true)
 	, m_moveSpeed(10)
 	, m_frustum(75, 1.333f, 0.1f, 3200)
 	, m_moveDirection(0)
@@ -30,9 +29,9 @@ void Character::onAppendingObjectToWorld()
 void Character::moveForwardOrBackward(bool forward)
 {
 	GMfloat distance = (forward ? 1 : -1 ) * m_moveSpeed * (forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD));
-	GMfloat l = m_freeMove ? distance * std::cos(m_state.pitch) : distance;
+	GMfloat l = distance * std::cos(m_state.pitch);
 	m_walkDirectionFB[0] = l * std::sin(m_state.yaw);
-	m_walkDirectionFB[1] = m_freeMove ? distance * std::sin(m_state.pitch) : 0;
+	m_walkDirectionFB[1] = distance * std::sin(m_state.pitch);
 	m_walkDirectionFB[2] = -l * std::cos(m_state.yaw);
 	applyWalkDirection();
 }
@@ -49,18 +48,6 @@ void Character::moveLeftOrRight(bool left)
 void Character::setJumpSpeed(const vmath::vec3& jumpSpeed)
 {
 	m_jumpSpeed = jumpSpeed;
-}
-
-void Character::setCanFreeMove(bool freeMove)
-{
-	m_freeMove = freeMove;
-
-	/*
-	if (m_freeMove)
-		m_controller->setGravity(btVector3(0, 0, 0));
-	else
-		m_controller->setGravity(m_dynamicWorld->getGravity());
-		*/
 }
 
 void Character::setMoveSpeed(GMfloat moveSpeed)
@@ -174,7 +161,7 @@ void Character::applyWalkDirection()
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 	{
-		c->motions.velocity = vmath::vec3(
+		c->wishVelocity = vmath::vec3(
 			m_walkDirectionFB[0] + m_walkDirectionLR[0],
 			m_walkDirectionFB[1] + m_walkDirectionLR[1],
 			m_walkDirectionFB[2] + m_walkDirectionLR[2]

@@ -37,6 +37,8 @@ public:
 
 private:
 	GMfloat now();
+	void generateMovement();
+	void decomposeVelocity();
 	void groundTrace();
 	void walkMove();
 	void airMove();

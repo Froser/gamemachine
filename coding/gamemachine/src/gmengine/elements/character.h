@@ -53,7 +53,6 @@ public:
 
 public:
 	void setJumpSpeed(const vmath::vec3& jumpSpeed);
-	void setCanFreeMove(bool freeMove);
 	void setMoveSpeed(GMfloat moveSpeed);
 	void simulation();
 	void action(MoveAction md, MoveRate rate);
@@ -88,7 +87,6 @@ private:
 	MoveRate m_moveRate;
 
 	PositionState m_state;
-	bool m_freeMove;
 	CameraLookAt m_lookAt;
 };
 

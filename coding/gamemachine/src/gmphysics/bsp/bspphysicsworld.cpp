@@ -27,21 +27,6 @@ void BSPPhysicsWorld::simulate()
 {
 	D(d);
 	BSPData& bsp = d.world->bspData();
-
-	//d.camera.motions.translation += d.camera.motions.velocity;
-
-	BSPTraceResult groundTrace;
-	vmath::vec3 floor = d.camera.motions.translation;
-	floor[1] -= 6.f;
-	//d.trace.trace(d.camera.motions.translation,
-	//	floor,
-	//	vmath::vec3(0, 0, 0),
-	//	vmath::vec3(-5),
-	//	vmath::vec3(5),
-	//	groundTrace
-	//);
-
-	//TODO 应该针对各种情况move，slideMove应该是个私有函数
 	BSPMove(this, &d.camera).move();
 }
 
@@ -66,10 +51,7 @@ void BSPPhysicsWorld::initBSPPhysicsWorld()
 void BSPPhysicsWorld::setCamera(GameObject* obj)
 {
 	D(d);
-	CollisionObject c;
-	// Setup physical properties
-	c.object = obj;
-	d.camera = c;
+	d.camera.object = obj;
 }
 
 void BSPPhysicsWorld::generatePhysicsPlaneData()
