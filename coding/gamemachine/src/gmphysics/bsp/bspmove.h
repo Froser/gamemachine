@@ -39,6 +39,7 @@ public:
 private:
 	GMfloat now();
 	void generateMovement();
+	void composeVelocityWithGravity();
 	vmath::vec3 decomposeVelocity(const vmath::vec3& v);
 	void groundTrace();
 	void walkMove();

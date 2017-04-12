@@ -49,14 +49,21 @@ void BSPMove::generateMovement()
 	}
 	else
 	{
-		GMfloat gravityVelocity = d.movement.velocity[GRAVITY_DIRECTION];
-		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
-		d.movement.velocity[GRAVITY_DIRECTION] = gravityVelocity;
+		composeVelocityWithGravity();
 	}
 
 	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
 	d.movement.origin = d.object->motions.translation;
 	d.movement.startTime = now();
+}
+
+void BSPMove::composeVelocityWithGravity()
+{
+	// 获取当前纵向速度，并叠加上加速度
+	D(d);
+	GMfloat gravityVelocity = d.movement.velocity[GRAVITY_DIRECTION];
+	d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
+	d.movement.velocity[GRAVITY_DIRECTION] = gravityVelocity;
 }
 
 vmath::vec3 BSPMove::decomposeVelocity(const vmath::vec3& v)
@@ -138,7 +145,15 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - d.movement.origin[GRAVITY_DIRECTION];
 	d.movement.origin = d.object->motions.translation;
 	d.movement.origin[GRAVITY_DIRECTION] += stepSize;
-	d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
+	if (hasGravity)
+	{
+		composeVelocityWithGravity();
+	}
+	else
+	{
+		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
+	}
+
 	slideMove(hasGravity);
 
 	// 走下来
