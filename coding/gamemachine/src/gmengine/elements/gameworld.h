@@ -22,7 +22,7 @@ public:
 	virtual PhysicsWorld* physicsWorld() = 0;
 
 public:
-	void initialize();
+	virtual void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
 	void appendLight(AUTORELEASE GameLight* light);
 	std::vector<GameLight*>& getLights();

@@ -17,6 +17,16 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	d.gravity = -600.f;
 }
 
+BSPPhysicsWorld::~BSPPhysicsWorld()
+{
+	D(d);
+	for (auto iter = d.objectMoves.begin(); iter != d.objectMoves.end(); iter++)
+	{
+		delete iter->second;
+	}
+	d.objectMoves.clear();
+}
+
 BSPPhysicsWorldData& BSPPhysicsWorld::physicsData()
 {
 	D(d);
@@ -27,7 +37,9 @@ void BSPPhysicsWorld::simulate()
 {
 	D(d);
 	BSPData& bsp = d.world->bspData();
-	BSPMove(this, &d.camera).move();
+
+	BSPMove* move = getMove(&d.camera);
+	move->move();
 }
 
 CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
@@ -52,6 +64,24 @@ void BSPPhysicsWorld::setCamera(GameObject* obj)
 {
 	D(d);
 	d.camera.object = obj;
+}
+
+BSPMove* BSPPhysicsWorld::getMove(CollisionObject* o)
+{
+	D(d);
+	BSPMove* m = nullptr;
+	if (d.objectMoves.find(o) == d.objectMoves.end())
+	{
+		m = new BSPMove(this, o);
+		d.objectMoves[o] = m;
+	}
+	else
+	{
+		m = d.objectMoves[o];
+	}
+
+	ASSERT(m);
+	return m;
 }
 
 void BSPPhysicsWorld::generatePhysicsPlaneData()

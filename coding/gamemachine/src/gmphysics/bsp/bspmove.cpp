@@ -15,6 +15,7 @@ static const GMfloat OVERCLIP = 1.01f;
 BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
 {
 	D(d);
+	d.inited = false;
 	d.world = world;
 	d.object = obj;
 	d.trace = &world->physicsData().trace;
@@ -40,11 +41,22 @@ GMfloat BSPMove::now()
 void BSPMove::generateMovement()
 {
 	D(d);
-	memset(&d.movement, 0, sizeof(d.movement));
+	if (!d.inited)
+	{
+		memset(&d.movement, 0, sizeof(d.movement));
+		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
+		d.inited = true;
+	}
+	else
+	{
+		GMfloat gravityVelocity = d.movement.velocity[GRAVITY_DIRECTION];
+		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
+		d.movement.velocity[GRAVITY_DIRECTION] = gravityVelocity;
+	}
+
 	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
 	d.movement.origin = d.object->motions.translation;
 	d.movement.startTime = now();
-	d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
 }
 
 vmath::vec3 BSPMove::decomposeVelocity(const vmath::vec3& v)
@@ -83,13 +95,11 @@ void BSPMove::groundTrace()
 
 void BSPMove::walkMove()
 {
-	D(d);
 	stepSlideMove(false);
 }
 
 void BSPMove::airMove()
 {
-	D(d);
 	stepSlideMove(true);
 }
 
@@ -145,7 +155,7 @@ bool BSPMove::slideMove(bool hasGravity)
 	D(d);
 	BSPPhysicsWorldData& wd = d.world->physicsData();
 	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
-	vmath::vec3 velocity = d.movement.velocity * elapsed;
+	vmath::vec3 velocity = d.movement.velocity;
 
 	GMint numbumps = 4, bumpcount;
 	vmath::vec3 endVelocity, endClipVelocity;
@@ -155,6 +165,8 @@ bool BSPMove::slideMove(bool hasGravity)
 		endVelocity[GRAVITY_DIRECTION] += wd.gravity * elapsed;
 		velocity[GRAVITY_DIRECTION] = (velocity[GRAVITY_DIRECTION] + endVelocity[GRAVITY_DIRECTION]) * .5f;
 	}
+
+	velocity *= elapsed;
 
 	std::vector<vmath::vec3> planes;
 	if (!d.movement.freefall)
@@ -264,10 +276,7 @@ bool BSPMove::slideMove(bool hasGravity)
 	}
 
 	if (hasGravity)
-	{
-		velocity = endVelocity;
-		d.movement.velocity = velocity;
-	}
+		d.movement.velocity = endVelocity;
 
 	return (bumpcount != 0);
 }

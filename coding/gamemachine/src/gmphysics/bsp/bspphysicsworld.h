@@ -13,17 +13,19 @@ class BSPPhysicsWorld : public PhysicsWorld
 
 public:
 	BSPPhysicsWorld(GameWorld* world);
+	~BSPPhysicsWorld();
 
 public:
-	BSPPhysicsWorldData& physicsData();
 	virtual void simulate() override;
 	virtual CollisionObject* find(GameObject* obj) override;
 
 public:
+	BSPPhysicsWorldData& physicsData();
 	void initBSPPhysicsWorld();
 	void setCamera(GameObject* obj);
 
 private:
+	BSPMove* getMove(CollisionObject* o);
 	void generatePhysicsPlaneData();
 	void generatePhysicsBrushSideData();
 	void generatePhysicsBrushData();

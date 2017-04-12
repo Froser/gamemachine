@@ -24,6 +24,7 @@ struct BSPPhysicsWorldPrivate : public PhysicsWorldPrivate
 
 	BSPTrace trace;
 	BSPPatch patch;
+	std::map<CollisionObject*, BSPMove*> objectMoves;
 };
 
 typedef BSPPhysicsWorldPrivate BSPPhysicsWorldData;

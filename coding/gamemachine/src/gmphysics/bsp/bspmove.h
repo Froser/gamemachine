@@ -21,6 +21,7 @@ struct BSPMovement
 
 struct BSPMovePrivate
 {
+	bool inited;
 	BSPPhysicsWorld* world;
 	CollisionObject* object;
 	BSPTrace* trace;
