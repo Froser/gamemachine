@@ -76,8 +76,8 @@ void BSPMove::groundTrace()
 	p[1] -= .25f;
 
 	d.trace->trace(d.movement.origin, p, vmath::vec3(0),
-		vmath::vec3(-15),
-		vmath::vec3(15),
+		d.object->shapeProps.bounding[0],
+		d.object->shapeProps.bounding[1],
 		d.movement.groundTrace
 	);
 
@@ -118,7 +118,7 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	// 看看是否拥有向上速度，如果有，则不stepUp
 	vmath::vec3 stepDown = d.movement.origin;
 	stepDown[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
-	d.trace->trace(startOrigin, stepDown, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
+	d.trace->trace(startOrigin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (d.movement.velocity[GRAVITY_DIRECTION] > 0 && (t.fraction == 1.f || vmath::dot(t.plane.normal, vmath::vec3(0, 1, 0)) < .7f) )
 	{
 		synchronizePosition();
@@ -127,7 +127,7 @@ void BSPMove::stepSlideMove(bool hasGravity)
 
 	vmath::vec3 stepUp = d.movement.origin;
 	stepUp[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
-	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
+	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 
 	if (t.allsolid)
 	{
@@ -144,7 +144,7 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	// 走下来
 	stepDown = d.movement.origin;
 	stepDown[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
-	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
+	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
 	synchronizePosition();
@@ -182,12 +182,11 @@ bool BSPMove::slideMove(bool hasGravity)
 		d.trace->trace(d.movement.origin,
 			d.movement.origin + velocity * t,
 			vmath::vec3(0, 0, 0),
-			vmath::vec3(-15),
-			vmath::vec3(15),
+			d.object->shapeProps.bounding[0],
+			d.object->shapeProps.bounding[1],
 			moveTrace
 			);
-		//TODO -15和15应该取自CollisionObject的形状参数
-
+		
 		if (moveTrace.allsolid)
 		{
 			// entity is completely trapped in another solid

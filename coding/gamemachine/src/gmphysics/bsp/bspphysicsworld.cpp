@@ -3,6 +3,7 @@
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/gameloop.h"
 #include "bspmove.h"
+#include "gmphysics/collisionobjectfactory.h"
 
 //class
 BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
@@ -11,7 +12,8 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	D(d);
 	d.world = static_cast<BSPGameWorld*>(world);
 	d.trace.initTrace(&d.world->bspData(), this);
-	memset(&d.camera, 0, sizeof(d.camera));
+
+	d.camera = CollisionObjectFactory::defaultCamera();
 
 	//TODO TEST
 	d.gravity = -600.f;

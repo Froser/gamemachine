@@ -9,8 +9,8 @@ class GameObject;
 
 struct ShapeProperties
 {
-	GMfloat radius;
 	GMfloat stepHeight;
+	vmath::vec3 bounding[2]; //最小边界和最大边界
 };
 
 struct MotionProperties

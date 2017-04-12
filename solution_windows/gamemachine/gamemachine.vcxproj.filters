@@ -244,6 +244,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspmove.h">
       <Filter>src\gmphysics\bsp</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\collisionobjectfactory.h">
+      <Filter>src\gmphysics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -434,6 +437,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspmove.cpp">
       <Filter>src\gmphysics\bsp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\collisionobjectfactory.cpp">
+      <Filter>src\gmphysics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

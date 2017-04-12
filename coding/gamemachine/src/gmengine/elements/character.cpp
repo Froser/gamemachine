@@ -148,7 +148,7 @@ void Character::update()
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 	{
-		m_state.position = c->motions.translation + m_eyeOffset;
+		m_state.position = c->motions.translation + m_eyeOffset; //TODO 这个offset是相机中心沿着朝向的一个偏移，不能直接加上去
 	}
 	else
 	{
