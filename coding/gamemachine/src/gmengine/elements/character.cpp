@@ -161,7 +161,7 @@ void Character::applyWalkDirection()
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 	{
-		c->wishVelocity = vmath::vec3(
+		c->motions.velocity = vmath::vec3(
 			m_walkDirectionFB[0] + m_walkDirectionLR[0],
 			m_walkDirectionFB[1] + m_walkDirectionLR[1],
 			m_walkDirectionFB[2] + m_walkDirectionLR[2]

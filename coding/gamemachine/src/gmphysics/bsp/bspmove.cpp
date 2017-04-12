@@ -44,19 +44,17 @@ void BSPMove::generateMovement()
 	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
 	d.movement.origin = d.object->motions.translation;
 	d.movement.startTime = now();
-
-	// 本次的速度等于上次的速度加上物体期望的速度
-	d.movement.velocity = d.object->wishVelocity + d.object->motions.velocity;
+	d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
 }
 
-void BSPMove::decomposeVelocity()
+vmath::vec3 BSPMove::decomposeVelocity(const vmath::vec3& v)
 {
 	D(d);
 	// 将速度分解成水平面平行的分量
-	GMfloat len = 1.f / vmath::fastInvSqrt(vmath::lengthSquare(d.movement.velocity));
-	vmath::vec3 planeDir = vmath::vec3(d.movement.velocity[0], 0.f, d.movement.velocity[2]);
+	GMfloat len = 1.f / vmath::fastInvSqrt(vmath::lengthSquare(v));
+	vmath::vec3 planeDir = vmath::vec3(v[0], 0.f, v[2]);
 	vmath::vec3 normal = vmath::normalize(planeDir);
-	d.movement.velocity = normal * len;
+	return normal * len;
 }
 
 void BSPMove::groundTrace()
@@ -98,27 +96,53 @@ void BSPMove::airMove()
 void BSPMove::stepSlideMove(bool hasGravity)
 {
 	D(d);
+	vmath::vec3 startOrigin = d.movement.origin;
 	if (!slideMove(hasGravity))
+	{
+		synchronizePosition();
 		return;
+	}
 
 	BSPTraceResult t;
+
+	// 看看是否拥有向上速度，如果有，则不stepUp
+	vmath::vec3 stepDown = d.movement.origin;
+	stepDown[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
+	d.trace->trace(startOrigin, stepDown, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
+	if (d.movement.velocity[GRAVITY_DIRECTION] > 0 && (t.fraction == 1.f || vmath::dot(t.plane.normal, vmath::vec3(0, 1, 0)) < .7f) )
+	{
+		synchronizePosition();
+		return;
+	}
+
 	vmath::vec3 stepUp = d.movement.origin;
 	stepUp[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
 	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
 
 	if (t.allsolid)
+	{
+		synchronizePosition();
 		return;
+	}
 
 	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - d.movement.origin[GRAVITY_DIRECTION];
-	d.movement.origin = t.endpos;
+	d.movement.origin = d.object->motions.translation;
+	d.movement.origin[GRAVITY_DIRECTION] += stepSize;
+	d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
 	slideMove(hasGravity);
+
+	// 走下来
+	stepDown = d.movement.origin;
+	stepDown[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
+	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), vmath::vec3(-15), vmath::vec3(15), t);
+	if (!t.allsolid)
+		d.movement.origin = t.endpos;
+	synchronizePosition();
 }
 
 bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
-	decomposeVelocity();
-
 	BSPPhysicsWorldData& wd = d.world->physicsData();
 	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
 	vmath::vec3 velocity = d.movement.velocity * elapsed;
@@ -245,7 +269,6 @@ bool BSPMove::slideMove(bool hasGravity)
 		d.movement.velocity = velocity;
 	}
 
-	synchronizeMove();
 	return (bumpcount != 0);
 }
 
@@ -270,7 +293,7 @@ void BSPMove::clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vma
 	}
 }
 
-void BSPMove::synchronizeMove()
+void BSPMove::synchronizePosition()
 {
 	D(d);
 	d.object->motions.translation = d.movement.origin;

@@ -24,7 +24,6 @@ struct CollisionObject
 	GameObject* object;
 	MotionProperties motions;
 	ShapeProperties shapeProps;
-	vmath::vec3 wishVelocity;
 };
 
 END_NS

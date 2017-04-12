@@ -38,13 +38,13 @@ public:
 private:
 	GMfloat now();
 	void generateMovement();
-	void decomposeVelocity();
+	vmath::vec3 decomposeVelocity(const vmath::vec3& v);
 	void groundTrace();
 	void walkMove();
 	void airMove();
 	void stepSlideMove(bool hasGravity);
 	bool slideMove(bool hasGravity);
-	void synchronizeMove();
+	void synchronizePosition();
 	void clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vmath::vec3& out, GMfloat overbounce);
 };
 
