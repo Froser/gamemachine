@@ -70,7 +70,7 @@ vmath::vec3 BSPMove::decomposeVelocity(const vmath::vec3& v)
 {
 	D(d);
 	// 将速度分解成水平面平行的分量
-	GMfloat len = 1.f / vmath::fastInvSqrt(vmath::lengthSquare(v));
+	GMfloat len = vmath::fast_length(v);
 	vmath::vec3 planeDir = vmath::vec3(v[0], 0.f, v[2]);
 	vmath::vec3 normal = vmath::normalize(planeDir);
 	return normal * len;
@@ -102,6 +102,10 @@ void BSPMove::groundTrace()
 
 void BSPMove::walkMove()
 {
+	D(d);
+	if (vmath::equals(d.movement.velocity, vmath::vec3(0)))
+		return;
+
 	stepSlideMove(false);
 }
 

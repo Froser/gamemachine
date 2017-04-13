@@ -499,6 +499,12 @@ static inline T length(const vecN<T,len>& v)
     return (T)sqrt(result);
 }
 
+template <int len>
+static inline float fast_length(const vecN<float, len>& v)
+{
+    return 1.f / (float)fastInvSqrt(lengthSquare(v));
+}
+
 template <typename T, int len>
 static inline T lengthSquare(const vecN<T, len>& v)
 {

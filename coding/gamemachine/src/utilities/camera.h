@@ -6,8 +6,8 @@ BEGIN_NS
 
 struct CameraLookAt
 {
-	GMfloat lookAt_x, lookAt_y, lookAt_z;
-	GMfloat position_x, position_y, position_z;
+	vmath::vec3 lookAt;
+	vmath::vec3 position;
 };
 
 struct PositionState
@@ -20,18 +20,14 @@ struct PositionState
 
 inline vmath::mat4 getViewMatrix(const CameraLookAt& lookAt)
 {
-	return vmath::mat4 (
-		vmath::lookat(vmath::vec3(lookAt.position_x, lookAt.position_y, lookAt.position_z),
-			vmath::vec3(lookAt.lookAt_x + lookAt.position_x, lookAt.lookAt_y + lookAt.position_y, lookAt.lookAt_z + lookAt.position_z),
-			vmath::vec3(0, 1, 0)
-		)
-	);
+	return vmath::lookat(lookAt.position, lookAt.lookAt + lookAt.position, vmath::vec3(0, 1, 0));
 }
 
 class Camera
 {
 public:
-	static void calcCameraLookAt(const PositionState& state, REF CameraLookAt* cameraLookAt);
+	static void calcCameraLookAt(const PositionState& state, REF CameraLookAt& lookAt);
+	static void adjustEyeOffset(const PositionState& state, const vmath::vec3& eyeOffset, REF CameraLookAt& lookAt);
 };
 
 END_NS

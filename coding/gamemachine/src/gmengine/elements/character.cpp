@@ -140,7 +140,8 @@ void Character::simulation()
 void Character::updateCamera()
 {
 	update();
-	Camera::calcCameraLookAt(m_state, &m_lookAt);
+	Camera::calcCameraLookAt(m_state, m_lookAt);
+	Camera::adjustEyeOffset(m_state, m_eyeOffset, m_lookAt);
 }
 
 void Character::update()
