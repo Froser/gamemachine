@@ -27,7 +27,6 @@ class Camera
 {
 public:
 	static void calcCameraLookAt(const PositionState& state, REF CameraLookAt& lookAt);
-	static void adjustEyeOffset(const PositionState& state, const vmath::vec3& eyeOffset, REF CameraLookAt& lookAt);
 };
 
 END_NS

@@ -60,7 +60,6 @@ public:
 	void lookRight(GMfloat degree);
 	void setPitchLimitDegree(GMfloat deg);
 	const PositionState& getPositionState();
-	void setEyeOffset(GMfloat* offset);
 	void updateCamera();
 	CameraLookAt& getLookAt();
 	Frustum& getFrustum();
@@ -79,7 +78,6 @@ private:
 	GMfloat m_radius;
 	vmath::vec3 m_jumpSpeed;
 	GMfloat m_moveSpeed;
-	vmath::vec3 m_eyeOffset;
 	Frustum m_frustum;
 	GMfloat m_walkDirectionFB[3];
 	GMfloat m_walkDirectionLR[3];

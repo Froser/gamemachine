@@ -166,6 +166,8 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
+	if (t.fraction < 1.f)
+		clipVelocity(d.movement.velocity, t.plane.normal, d.movement.velocity, OVERCLIP);
 	synchronizePosition();
 }
 

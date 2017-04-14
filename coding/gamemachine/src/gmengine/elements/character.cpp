@@ -13,10 +13,10 @@ Character::Character(GMfloat radius)
 	, m_moveDirection(0)
 {
 	memset(&m_state, 0, sizeof(m_state));
-	memset(&m_eyeOffset, 0, sizeof(m_eyeOffset));
 	memset(&m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
 	memset(&m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
 	memset(&m_moveRate, 0, sizeof(m_moveRate));
+
 	m_state.pitchLimitRad = HALF_PI - RAD(3);
 	setMoveSpeed(1);
 }
@@ -86,11 +86,6 @@ void Character::setPitchLimitDegree(GMfloat deg)
 	m_state.pitchLimitRad = HALF_PI - RAD(deg);
 }
 
-void Character::setEyeOffset(GMfloat* offset)
-{
-	memcpy(&m_eyeOffset, offset, sizeof(m_eyeOffset));
-}
-
 void Character::getReadyForRender(DrawingList& list)
 {
 }
@@ -141,7 +136,6 @@ void Character::updateCamera()
 {
 	update();
 	Camera::calcCameraLookAt(m_state, m_lookAt);
-	Camera::adjustEyeOffset(m_state, m_eyeOffset, m_lookAt);
 }
 
 void Character::update()
@@ -149,7 +143,7 @@ void Character::update()
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 	{
-		m_state.position = c->motions.translation + m_eyeOffset; //TODO 这个offset是相机中心沿着朝向的一个偏移，不能直接加上去
+		m_state.position = c->motions.translation;
 	}
 	else
 	{
