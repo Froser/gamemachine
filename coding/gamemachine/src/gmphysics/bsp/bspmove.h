@@ -3,6 +3,7 @@
 #include "common.h"
 #include "utilities/vmath.h"
 #include "bsptrace.h"
+#include "../physicsworld.h"
 BEGIN_NS
 
 class BSPPhysicsWorld;
@@ -19,6 +20,12 @@ struct BSPMovement
 	vmath::vec3 origin;
 };
 
+struct BSPMoveCommand
+{
+	Command command;
+	void* data;
+};
+
 struct BSPMovePrivate
 {
 	bool inited;
@@ -26,6 +33,7 @@ struct BSPMovePrivate
 	CollisionObject* object;
 	BSPTrace* trace;
 	BSPMovement movement;
+	BSPMoveCommand moveCommand;
 };
 
 class BSPMove
@@ -35,9 +43,12 @@ class BSPMove
 public:
 	BSPMove(BSPPhysicsWorld* world, CollisionObject* obj);
 	void move();
+	void sendCommand(Command cmd, void* dataParam);
 
 private:
 	GMfloat now();
+	void processCommand();
+	void processJump();
 	void generateMovement();
 	void composeVelocityWithGravity();
 	vmath::vec3 decomposeVelocity(const vmath::vec3& v);

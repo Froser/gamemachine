@@ -90,9 +90,9 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 
 	vmath::vec3 playerStart (origin[0], origin[2], -origin[1]);
 
-	Character* character = new Character(6);
+	Character* character = new Character(6); 
 	character->setMoveSpeed(192);
-	character->setJumpSpeed(vmath::vec3(0, 50, 0));
+	character->setJumpSpeed(vmath::vec3(0, 150, 0));
 	world->appendObjectAndInit(character);
 	world->setMajorCharacter(character);
 

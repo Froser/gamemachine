@@ -26,10 +26,38 @@ void BSPMove::move()
 	D(d);
 	generateMovement();
 	groundTrace();
+	processCommand();
 	if (d.movement.walking)
 		walkMove();
 	else
 		airMove();
+}
+
+void BSPMove::processCommand()
+{
+	D(d);
+	if (d.moveCommand.command & CMD_JUMP)
+	{
+		processJump();
+		d.moveCommand.command &= ~CMD_JUMP;
+	}
+}
+
+void BSPMove::processJump()
+{
+	D(d);
+	if (!d.movement.freefall)
+	{
+		// 能够跳跃的场合
+		d.movement.velocity = *(vmath::vec3*)d.moveCommand.data;
+	}
+}
+
+void BSPMove::sendCommand(Command cmd, void* dataParam)
+{
+	D(d);
+	d.moveCommand.command |= cmd;
+	d.moveCommand.data = dataParam;
 }
 
 GMfloat BSPMove::now()
@@ -46,6 +74,7 @@ void BSPMove::generateMovement()
 		memset(&d.movement, 0, sizeof(d.movement));
 		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
 		d.inited = true;
+		d.moveCommand.command = CMD_NONE;
 	}
 	else
 	{

@@ -5,8 +5,11 @@
 #include "utilities/vmath.h"
 BEGIN_NS
 
-class GameObject;
+typedef GMint Command;
+#define CMD_NONE 0x0000
+#define CMD_JUMP 0x0001
 
+class GameObject;
 struct ShapeProperties
 {
 	GMfloat stepHeight;

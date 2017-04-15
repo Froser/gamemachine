@@ -18,7 +18,6 @@ Character::Character(GMfloat radius)
 	memset(&m_moveRate, 0, sizeof(m_moveRate));
 
 	m_state.pitchLimitRad = HALF_PI - RAD(3);
-	setMoveSpeed(1);
 }
 
 void Character::onAppendingObjectToWorld()
@@ -123,12 +122,12 @@ void Character::simulation()
 
 	if (m_moveDirection & MD_JUMP)
 	{
-		/*
-		if (m_controller->canJump())
-		{
-			m_controller->jump(TO_BT(m_jumpSpeed));
-		}
-		*/
+		PhysicsWorld* world = getWorld()->physicsWorld();
+		CollisionObject* c = getWorld()->physicsWorld()->find(this);
+		if (c)
+			world->sendCommand(c, CMD_JUMP, &m_jumpSpeed);
+		else
+			gm_error("cannot found character in physics world");
 	}
 }
 
@@ -142,13 +141,9 @@ void Character::update()
 {
 	CollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
-	{
 		m_state.position = c->motions.translation;
-	}
 	else
-	{
 		gm_error("cannot found character in physics world");
-	}
 }
 
 void Character::applyWalkDirection()

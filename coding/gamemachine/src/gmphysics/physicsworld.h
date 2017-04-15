@@ -16,6 +16,7 @@ public:
 public:
 	virtual void simulate() = 0;
 	virtual CollisionObject* find(GameObject* obj) = 0;
+	virtual void sendCommand(CollisionObject* obj, Command cmd, void* dataParam) = 0;
 };
 
 END_NS
