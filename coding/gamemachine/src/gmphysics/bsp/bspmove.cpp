@@ -147,6 +147,7 @@ void BSPMove::stepSlideMove(bool hasGravity)
 {
 	D(d);
 	vmath::vec3 startOrigin = d.movement.origin;
+	vmath::vec3 startVelocity = d.movement.velocity;
 	if (!slideMove(hasGravity))
 	{
 		synchronizePosition();
@@ -165,7 +166,7 @@ void BSPMove::stepSlideMove(bool hasGravity)
 		return;
 	}
 
-	vmath::vec3 stepUp = d.movement.origin;
+	vmath::vec3 stepUp = startOrigin;
 	stepUp[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
 	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 
@@ -175,23 +176,17 @@ void BSPMove::stepSlideMove(bool hasGravity)
 		return;
 	}
 
-	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - d.movement.origin[GRAVITY_DIRECTION];
-	d.movement.origin = d.object->motions.translation;
-	d.movement.origin[GRAVITY_DIRECTION] += stepSize;
-	if (hasGravity)
-	{
-		composeVelocityWithGravity();
-	}
-	else
-	{
-		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
-	}
+	// 从原位置stepUp
+	d.movement.origin = t.endpos;
+	d.movement.velocity = startVelocity;
+	composeVelocityWithGravity();
 
 	slideMove(hasGravity);
 
 	// 走下来
+	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - startOrigin[GRAVITY_DIRECTION];
 	stepDown = d.movement.origin;
-	stepDown[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
+	stepDown[GRAVITY_DIRECTION] -= stepSize;
 	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
