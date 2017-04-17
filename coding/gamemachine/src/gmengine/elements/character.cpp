@@ -7,7 +7,6 @@
 Character::Character(GMfloat radius)
 	: GameObject(nullptr)
 	, m_radius(radius)
-	, m_jumpSpeed(vmath::vec3(0, 10, 0))
 	, m_frustum(75, 1.333f, 0.1f, 3200)
 	, m_moveDirection(0)
 {
@@ -27,19 +26,20 @@ void Character::moveForwardOrBackward(bool forward)
 {
 	GMfloat moveRate = forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD);
 	m_moveCmdArgFB = vmath::vec3(forward, moveRate, USELESS_PARAM);
-	sendMoveCommand();
 }
 
 void Character::moveLeftOrRight(bool left)
 {
 	GMfloat moveRate = left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT);
 	m_moveCmdArgLR = vmath::vec3(left, moveRate, USELESS_PARAM);
-	sendMoveCommand();
 }
 
 void Character::setJumpSpeed(const vmath::vec3& jumpSpeed)
 {
-	m_jumpSpeed = jumpSpeed;
+	D(d);
+	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	if (c)
+		c->motions.jumpSpeed = jumpSpeed;
 }
 
 void Character::setMoveSpeed(GMfloat moveSpeed)
@@ -90,23 +90,31 @@ void Character::simulation()
 	clearMoveArgs();
 
 	// forward has priority
+	bool moved = false;
 	if (m_moveDirection & MD_FORWARD)
 	{
 		moveForwardOrBackward(true);
+		moved = true;
 	}
 	else if (m_moveDirection & MD_BACKWARD)
 	{
 		moveForwardOrBackward(false);
+		moved = true;
 	}
 
 	if (m_moveDirection & MD_LEFT)
 	{
 		moveLeftOrRight(true);
+		moved = true;
 	}
 	else if (m_moveDirection & MD_RIGHT)
 	{
 		moveLeftOrRight(false);
+		moved = true;
 	}
+
+	if (moved)
+		sendMoveCommand();
 
 	if (m_moveDirection & MD_JUMP)
 	{
@@ -114,7 +122,7 @@ void Character::simulation()
 		CollisionObject* c = getWorld()->physicsWorld()->find(this);
 		if (c)
 		{
-			CommandParams cmdParams = PhysicsWorld::makeCommand(CMD_JUMP, &m_jumpSpeed, 1);
+			CommandParams cmdParams = PhysicsWorld::makeCommand(CMD_JUMP, nullptr, 0);
 			world->sendCommand(c, cmdParams);
 		}
 		else
@@ -122,6 +130,8 @@ void Character::simulation()
 			gm_error("cannot found character in physics world");
 		}
 	}
+
+	m_moveDirection = MD_NONE;
 }
 
 void Character::updateCamera()

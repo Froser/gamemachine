@@ -90,6 +90,8 @@ void BSPMove::processMove()
 		walkDirectionFB[1] + walkDirectionLR[1],
 		walkDirectionFB[2] + walkDirectionLR[2]
 	);
+
+	composeVelocityWithGravity();
 }
 
 void BSPMove::processJump()
@@ -98,7 +100,9 @@ void BSPMove::processJump()
 	if (!d.movement.freefall)
 	{
 		// 能够跳跃的场合
-		d.movement.velocity = d.moveCommand.params[CMD_JUMP][0];
+		d.movement.velocity[0] += d.object->motions.jumpSpeed[0];
+		d.movement.velocity[1] = d.object->motions.jumpSpeed[1];
+		d.movement.velocity[2] += d.object->motions.jumpSpeed[2];
 	}
 }
 
@@ -131,7 +135,6 @@ void BSPMove::generateMovement()
 		composeVelocityWithGravity();
 	}
 
-	memset(&d.movement.groundTrace, 0, sizeof(d.movement.groundTrace));
 	d.movement.origin = d.object->motions.translation;
 	d.movement.startTime = now();
 }
@@ -240,8 +243,10 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
-	if (t.fraction < 1.f)
-		clipVelocity(d.movement.velocity, t.plane.normal, d.movement.velocity, OVERCLIP);
+	//if (t.fraction < 1.f)
+	//	clipVelocity(d.movement.velocity, t.plane.normal, d.movement.velocity, OVERCLIP);
+	//TODO
+	d.movement.velocity = startVelocity;
 	synchronizePosition();
 }
 

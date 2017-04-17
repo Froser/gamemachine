@@ -11,6 +11,7 @@ BEGIN_NS
 typedef GMbyte MoveAction;
 enum 
 {
+	MD_NONE = 0,
 	MD_FORWARD = 1,
 	MD_BACKWARD = 2,
 	MD_LEFT = 4,
@@ -77,7 +78,6 @@ private:
 
 private:
 	GMfloat m_radius;
-	vmath::vec3 m_jumpSpeed;
 	Frustum m_frustum;
 	MoveAction m_moveDirection;
 	MoveRate m_moveRate;

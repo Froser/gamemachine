@@ -26,6 +26,7 @@ struct MotionProperties
 {
 	vmath::vec3 translation;
 	vmath::vec3 velocity;
+	vmath::vec3 jumpSpeed;
 	GMfloat moveSpeed;
 };
 

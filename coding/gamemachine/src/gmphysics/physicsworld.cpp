@@ -16,9 +16,16 @@ PhysicsWorld::~PhysicsWorld()
 CommandParams PhysicsWorld::makeCommand(Command cmd, vmath::vec3* list, GMuint count)
 {
 	CommandParams p;
-	for (GMuint i = 0; i < count ; i++)
+	if (!list)
 	{
-		p[cmd].push_back(list[i]);
+		p[cmd];
+	}
+	else
+	{
+		for (GMuint i = 0; i < count; i++)
+		{
+			p[cmd].push_back(list[i]);
+		}
 	}
 	return p;
 }
