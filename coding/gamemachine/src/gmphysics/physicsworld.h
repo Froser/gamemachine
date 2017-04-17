@@ -16,7 +16,10 @@ public:
 public:
 	virtual void simulate() = 0;
 	virtual CollisionObject* find(GameObject* obj) = 0;
-	virtual void sendCommand(CollisionObject* obj, Command cmd, void* dataParam) = 0;
+	virtual void sendCommand(CollisionObject* obj, const CommandParams& dataParam) = 0;
+
+public:
+	static CommandParams makeCommand(Command cmd, vmath::vec3* list, GMuint count);
 };
 
 END_NS

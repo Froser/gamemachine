@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "physicsworld.h"
+#include "physicsstructs.h"
 
 PhysicsWorld::PhysicsWorld(GameWorld* world)
 {
@@ -10,4 +11,14 @@ PhysicsWorld::PhysicsWorld(GameWorld* world)
 PhysicsWorld::~PhysicsWorld()
 {
 
+}
+
+CommandParams PhysicsWorld::makeCommand(Command cmd, vmath::vec3* list, GMuint count)
+{
+	CommandParams p;
+	for (GMuint i = 0; i < count ; i++)
+	{
+		p[cmd].push_back(list[i]);
+	}
+	return p;
 }

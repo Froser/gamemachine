@@ -19,6 +19,7 @@ BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
 	d.world = world;
 	d.object = obj;
 	d.trace = &world->physicsData().trace;
+	d.moveCommand.command = CMD_NONE;
 }
 
 void BSPMove::move()
@@ -36,11 +37,59 @@ void BSPMove::move()
 void BSPMove::processCommand()
 {
 	D(d);
+	if (d.moveCommand.command & CMD_MOVE)
+	{
+		processMove();
+		d.moveCommand.command &= ~CMD_MOVE;
+	}
+	else
+	{
+		//TODO 没有在move的时候，可以考虑摩擦使速度减小
+		//这里我们先清空速度
+		d.object->motions.velocity = vmath::vec3(0);
+	}
+
 	if (d.moveCommand.command & CMD_JUMP)
 	{
 		processJump();
 		d.moveCommand.command &= ~CMD_JUMP;
 	}
+}
+
+void BSPMove::processMove()
+{
+	D(d);
+	//moveCommand: {pitch, yaw, USELESS}, {forward(bool), moveRate, USELESS}, {left(bool), moveRate(LR), USELESS}
+	vmath::vec3& arg0 = d.moveCommand.params[CMD_MOVE][0],
+		&arg1 = d.moveCommand.params[CMD_MOVE][1],
+		&arg2 = d.moveCommand.params[CMD_MOVE][2];
+		
+	GMfloat& pitch = arg0[0], &yaw = arg0[1];
+	bool forward = arg1[0] == 1, left = arg2[0] == 1;
+	GMfloat moveRate_fb = arg1[1], moveRate_lr = arg2[1];
+
+	vmath::vec3 walkDirectionFB;
+	{
+		GMfloat distance = (forward ? 1 : -1) * d.object->motions.moveSpeed * moveRate_fb;
+		GMfloat l = distance * std::cos(pitch);
+		walkDirectionFB[0] = l * std::sin(yaw);
+		walkDirectionFB[1] = distance * std::sin(pitch);
+		walkDirectionFB[2] = -l * std::cos(yaw);
+	}
+
+	vmath::vec3 walkDirectionLR;
+	{
+		GMfloat distance = (left ? -1 : 1) * d.object->motions.moveSpeed * moveRate_lr;
+		walkDirectionLR[0] = distance * std::cos(yaw);
+		walkDirectionLR[1] = 0;
+		walkDirectionLR[2] = distance * std::sin(yaw);
+	}
+
+	d.object->motions.velocity = vmath::vec3(
+		walkDirectionFB[0] + walkDirectionLR[0],
+		walkDirectionFB[1] + walkDirectionLR[1],
+		walkDirectionFB[2] + walkDirectionLR[2]
+	);
 }
 
 void BSPMove::processJump()
@@ -49,15 +98,17 @@ void BSPMove::processJump()
 	if (!d.movement.freefall)
 	{
 		// 能够跳跃的场合
-		d.movement.velocity = *(vmath::vec3*)d.moveCommand.data;
+		d.movement.velocity = d.moveCommand.params[CMD_JUMP][0];
 	}
 }
 
-void BSPMove::sendCommand(Command cmd, void* dataParam)
+void BSPMove::sendCommand(Command cmd, const CommandParams& dataParam)
 {
 	D(d);
 	d.moveCommand.command |= cmd;
-	d.moveCommand.data = dataParam;
+	auto iter = dataParam.find(cmd);
+	ASSERT(iter != dataParam.end());
+	d.moveCommand.params[cmd] = (*iter).second;
 }
 
 GMfloat BSPMove::now()
@@ -74,7 +125,6 @@ void BSPMove::generateMovement()
 		memset(&d.movement, 0, sizeof(d.movement));
 		d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
 		d.inited = true;
-		d.moveCommand.command = CMD_NONE;
 	}
 	else
 	{

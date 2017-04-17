@@ -9,5 +9,6 @@ CollisionObject CollisionObjectFactory::defaultCamera()
 	o.shapeProps.bounding[0] = vmath::vec3(-15, -35, -15);
 	o.shapeProps.bounding[1] = vmath::vec3(15, 35, 15);
 	o.shapeProps.stepHeight = 18.f;
+	o.motions.velocity = vmath::vec3(0);
 	return o;
 }

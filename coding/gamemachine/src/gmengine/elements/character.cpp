@@ -8,40 +8,33 @@ Character::Character(GMfloat radius)
 	: GameObject(nullptr)
 	, m_radius(radius)
 	, m_jumpSpeed(vmath::vec3(0, 10, 0))
-	, m_moveSpeed(10)
 	, m_frustum(75, 1.333f, 0.1f, 3200)
 	, m_moveDirection(0)
 {
 	memset(&m_state, 0, sizeof(m_state));
-	memset(&m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
-	memset(&m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
 	memset(&m_moveRate, 0, sizeof(m_moveRate));
+	clearMoveArgs();
 
 	m_state.pitchLimitRad = HALF_PI - RAD(3);
 }
 
 void Character::onAppendingObjectToWorld()
 {
-	applyWalkDirection();
+	sendMoveCommand();
 }
 
 void Character::moveForwardOrBackward(bool forward)
 {
-	GMfloat distance = (forward ? 1 : -1 ) * m_moveSpeed * (forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD));
-	GMfloat l = distance * std::cos(m_state.pitch);
-	m_walkDirectionFB[0] = l * std::sin(m_state.yaw);
-	m_walkDirectionFB[1] = distance * std::sin(m_state.pitch);
-	m_walkDirectionFB[2] = -l * std::cos(m_state.yaw);
-	applyWalkDirection();
+	GMfloat moveRate = forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD);
+	m_moveCmdArgFB = vmath::vec3(forward, moveRate, USELESS_PARAM);
+	sendMoveCommand();
 }
 
 void Character::moveLeftOrRight(bool left)
 {
-	GMfloat distance = (left ? -1 : 1) * m_moveSpeed * (left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT));
-	m_walkDirectionLR[0] = distance * std::cos(m_state.yaw);
-	m_walkDirectionLR[1] = 0;
-	m_walkDirectionLR[2] = distance * std::sin(m_state.yaw);
-	applyWalkDirection();
+	GMfloat moveRate = left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT);
+	m_moveCmdArgLR = vmath::vec3(left, moveRate, USELESS_PARAM);
+	sendMoveCommand();
 }
 
 void Character::setJumpSpeed(const vmath::vec3& jumpSpeed)
@@ -51,7 +44,10 @@ void Character::setJumpSpeed(const vmath::vec3& jumpSpeed)
 
 void Character::setMoveSpeed(GMfloat moveSpeed)
 {
-	m_moveSpeed = moveSpeed;
+	D(d);
+	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	if (c)
+		c->motions.moveSpeed = moveSpeed;
 }
 
 const PositionState& Character::getPositionState()
@@ -91,6 +87,8 @@ void Character::getReadyForRender(DrawingList& list)
 
 void Character::simulation()
 {
+	clearMoveArgs();
+
 	// forward has priority
 	if (m_moveDirection & MD_FORWARD)
 	{
@@ -99,11 +97,6 @@ void Character::simulation()
 	else if (m_moveDirection & MD_BACKWARD)
 	{
 		moveForwardOrBackward(false);
-	}
-	else
-	{
-		memset(m_walkDirectionFB, 0, sizeof(m_walkDirectionFB));
-		applyWalkDirection();
 	}
 
 	if (m_moveDirection & MD_LEFT)
@@ -114,20 +107,20 @@ void Character::simulation()
 	{
 		moveLeftOrRight(false);
 	}
-	else
-	{
-		memset(m_walkDirectionLR, 0, sizeof(m_walkDirectionLR));
-		applyWalkDirection();
-	}
 
 	if (m_moveDirection & MD_JUMP)
 	{
 		PhysicsWorld* world = getWorld()->physicsWorld();
 		CollisionObject* c = getWorld()->physicsWorld()->find(this);
 		if (c)
-			world->sendCommand(c, CMD_JUMP, &m_jumpSpeed);
+		{
+			CommandParams cmdParams = PhysicsWorld::makeCommand(CMD_JUMP, &m_jumpSpeed, 1);
+			world->sendCommand(c, cmdParams);
+		}
 		else
+		{
 			gm_error("cannot found character in physics world");
+		}
 	}
 }
 
@@ -146,21 +139,20 @@ void Character::update()
 		gm_error("cannot found character in physics world");
 }
 
-void Character::applyWalkDirection()
+void Character::sendMoveCommand()
 {
-	CollisionObject* c = getWorld()->physicsWorld()->find(this);
-	if (c)
-	{
-		c->motions.velocity = vmath::vec3(
-			m_walkDirectionFB[0] + m_walkDirectionLR[0],
-			m_walkDirectionFB[1] + m_walkDirectionLR[1],
-			m_walkDirectionFB[2] + m_walkDirectionLR[2]
-		);
-	}
-	else
-	{
-		gm_error("cannot found character in physics world");
-	}
+	D(d);
+	PhysicsWorld* pw = getWorld()->physicsWorld();
+	vmath::vec3 args[] = {
+		vmath::vec3(m_state.pitch, m_state.yaw, USELESS_PARAM), m_moveCmdArgFB, m_moveCmdArgLR,
+	};
+	pw->sendCommand(pw->find(this), PhysicsWorld::makeCommand(CMD_MOVE, args, 3));
+}
+
+void Character::clearMoveArgs()
+{
+	m_moveCmdArgFB = vmath::vec3(0);
+	m_moveCmdArgLR = vmath::vec3(0);
 }
 
 CameraLookAt& Character::getLookAt()

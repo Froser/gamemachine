@@ -72,20 +72,20 @@ private:
 	void moveForwardOrBackward(bool forward);
 	void moveLeftOrRight(bool left);
 	void update();
-	void applyWalkDirection();
+	void sendMoveCommand();
+	void clearMoveArgs();
 
 private:
 	GMfloat m_radius;
 	vmath::vec3 m_jumpSpeed;
-	GMfloat m_moveSpeed;
 	Frustum m_frustum;
-	GMfloat m_walkDirectionFB[3];
-	GMfloat m_walkDirectionLR[3];
 	MoveAction m_moveDirection;
 	MoveRate m_moveRate;
 
 	PositionState m_state;
 	CameraLookAt m_lookAt;
+	vmath::vec3 m_moveCmdArgFB;
+	vmath::vec3 m_moveCmdArgLR;
 };
 
 END_NS

@@ -18,7 +18,7 @@ public:
 public:
 	virtual void simulate() override;
 	virtual CollisionObject* find(GameObject* obj) override;
-	virtual void sendCommand(CollisionObject* obj, Command cmd, void* dataParam) override;
+	virtual void sendCommand(CollisionObject* obj, const CommandParams& dataParam) override;
 
 public:
 	BSPPhysicsWorldData& physicsData();

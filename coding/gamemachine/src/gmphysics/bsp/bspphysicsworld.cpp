@@ -54,9 +54,11 @@ CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
 	return nullptr;
 }
 
-void BSPPhysicsWorld::sendCommand(CollisionObject* obj, Command cmd, void* dataParam)
+void BSPPhysicsWorld::sendCommand(CollisionObject* obj, const CommandParams& dataParam)
 {
 	D(d);
+	ASSERT(dataParam.size() == 1);
+	Command cmd = (*dataParam.begin()).first;
 	BSPMove* move = getMove(&d.camera);
 	move->sendCommand(cmd, dataParam);
 }

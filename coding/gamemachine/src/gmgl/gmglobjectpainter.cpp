@@ -9,7 +9,7 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmglgraphic_engine.h"
 
-GLenum getMode(ChildObject* obj)
+static GLenum getMode(ChildObject* obj)
 {
 	switch (obj->getArrangementMode())
 	{
