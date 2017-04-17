@@ -143,9 +143,9 @@ void BSPMove::composeVelocityWithGravity()
 {
 	// 获取当前纵向速度，并叠加上加速度
 	D(d);
-	GMfloat gravityVelocity = d.movement.velocity[GRAVITY_DIRECTION];
+	GMfloat accelerationVelocity = d.movement.velocity[GRAVITY_DIRECTION];
 	d.movement.velocity = decomposeVelocity(d.object->motions.velocity);
-	d.movement.velocity[GRAVITY_DIRECTION] = gravityVelocity;
+	d.movement.velocity[GRAVITY_DIRECTION] = accelerationVelocity;
 }
 
 vmath::vec3 BSPMove::decomposeVelocity(const vmath::vec3& v)
@@ -208,17 +208,6 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	}
 
 	BSPTraceResult t;
-
-	// 看看是否拥有向上速度，如果有，则不stepUp
-	vmath::vec3 stepDown = d.movement.origin;
-	stepDown[GRAVITY_DIRECTION] -= d.object->shapeProps.stepHeight;
-	d.trace->trace(startOrigin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
-	if (d.movement.velocity[GRAVITY_DIRECTION] > 0 && (t.fraction == 1.f || vmath::dot(t.plane.normal, vmath::vec3(0, 1, 0)) < .7f) )
-	{
-		synchronizePosition();
-		return;
-	}
-
 	vmath::vec3 stepUp = startOrigin;
 	stepUp[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
 	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
@@ -232,21 +221,18 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	// 从原位置stepUp
 	d.movement.origin = t.endpos;
 	d.movement.velocity = startVelocity;
-	composeVelocityWithGravity();
 
 	slideMove(hasGravity);
 
 	// 走下来
 	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - startOrigin[GRAVITY_DIRECTION];
-	stepDown = d.movement.origin;
+	vmath::vec3 stepDown = d.movement.origin;
 	stepDown[GRAVITY_DIRECTION] -= stepSize;
 	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
 	//if (t.fraction < 1.f)
 	//	clipVelocity(d.movement.velocity, t.plane.normal, d.movement.velocity, OVERCLIP);
-	//TODO
-	d.movement.velocity = startVelocity;
 	synchronizePosition();
 }
 
@@ -369,7 +355,6 @@ bool BSPMove::slideMove(bool hasGravity)
 
 			velocity = cv;
 			endVelocity = endClipVelocity;
-			d.movement.velocity = velocity;
 			break;
 		}
 	}
