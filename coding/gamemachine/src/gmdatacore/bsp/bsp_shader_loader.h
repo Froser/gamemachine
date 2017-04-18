@@ -26,7 +26,7 @@ public:
 
 	// parsers:
 private:
-	ITexture* addTextureToWorld(Shader& shader, const char* name);
+	ITexture* addTextureToTextureContainer(const char* name);
 	void parse(const char* filename);
 	void parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr);
 	void parseStart();
@@ -42,6 +42,7 @@ private:
 	void parse_map(Shader& shader, TiXmlElement* elem);
 	void parse_map_tcMod(Shader& shader, TiXmlElement* elem);
 	void parse_map_fromLightmap(Shader& shader, TiXmlElement* elem);
+	void parse_normalmap(Shader& shader, TiXmlElement* elem);
 
 private:
 	void createSky(Shader& shader);

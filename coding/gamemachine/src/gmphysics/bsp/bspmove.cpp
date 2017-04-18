@@ -46,7 +46,8 @@ void BSPMove::processCommand()
 	{
 		//TODO 没有在move的时候，可以考虑摩擦使速度减小
 		//这里我们先清空速度
-		d.object->motions.velocity = vmath::vec3(0);
+		if (!d.movement.freefall)
+			d.object->motions.velocity = vmath::vec3(0);
 	}
 
 	if (d.moveCommand.command & CMD_JUMP)
@@ -59,6 +60,10 @@ void BSPMove::processCommand()
 void BSPMove::processMove()
 {
 	D(d);
+	// 空中不允许改变运动状态
+	if (d.movement.freefall)
+		return;
+
 	//moveCommand: {pitch, yaw, USELESS}, {forward(bool), moveRate, USELESS}, {left(bool), moveRate(LR), USELESS}
 	vmath::vec3& arg0 = d.moveCommand.params[CMD_MOVE][0],
 		&arg1 = d.moveCommand.params[CMD_MOVE][1],

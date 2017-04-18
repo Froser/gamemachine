@@ -18,6 +18,7 @@ struct BSPMovement
 	bool walking;
 	vmath::vec3 velocity;
 	vmath::vec3 origin;
+	vmath::vec3 targetPosition;
 };
 
 struct BSPMoveCommand

@@ -111,7 +111,7 @@ void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPRender
 	m_bspRender = bspRender;
 }
 
-ITexture* BSPShaderLoader::addTextureToWorld(Shader& shader, const char* name)
+ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 {
 	if (!name)
 		return nullptr;
@@ -225,6 +225,7 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shade
 		PARSE(animMap);
 		PARSE(clampmap);
 		PARSE(map);
+		PARSE(normalmap);
 		END_PARSE;
 	}
 
@@ -300,7 +301,7 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
 	TextureFrames* frame = &shader.texture.textures[m_textureNum];
-	ITexture* texture = addTextureToWorld(shader, elem->GetText());
+	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 		frame->frames[i] = texture;
 }
@@ -308,7 +309,7 @@ void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 {
 	TextureFrames* frame = &shader.texture.textures[m_textureNum];
-	ITexture* texture = addTextureToWorld(shader, elem->GetText());
+	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
 		// TODO: GL_CLAMP
@@ -328,7 +329,7 @@ void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 {
 	TextureFrames* frame = &shader.texture.textures[m_textureNum];
-	ITexture* texture = addTextureToWorld(shader, elem->GetText());
+	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
 		frame->wrapS = GMS_REPEAT;
@@ -369,6 +370,19 @@ void BSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
 				gm_error("lightmap not found: %d", m_lightmapId);
 			}
 		}
+	}
+}
+
+void BSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
+{
+	TextureFrames* frame = &shader.texture.textures[TEXTURE_INDEX_NORMAL_MAPPING];
+	ITexture* texture = addTextureToTextureContainer(elem->GetText());
+	if (texture)
+	{
+		frame->wrapS = GMS_REPEAT;
+		frame->wrapT = GMS_REPEAT;
+		frame->frames[0] = texture;
+		frame->frameCount = 1;
 	}
 }
 

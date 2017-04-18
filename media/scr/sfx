@@ -45,6 +45,14 @@
 		<map tcMod="scroll 0.05 .1 scale 2 2" >textures/skies/killsky_1.jpg</map>
 		<map tcMod="scroll 0.05 .06 scale 3 2">textures/skies/killsky_2.jpg</map>
 	</item>
+	<item name="textures/skies/toxicskydim">
+		<surfaceparm>noimpact</surfaceparm>
+		<surfaceparm>nomarks</surfaceparm>
+		<surfaceparm>nolightmap</surfaceparm>
+		<surfaceparm>sky</surfaceparm>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+		<map tcMod="scroll 0.05 .1 scale 2 2" >textures/skies/inteldimclouds.jpg</map>
+	</item>
 	<item name="models/mapobjects/baph/bapholamp_fx">
 		<surfaceparm>nonsolid</surfaceparm>
 		<surfaceparm>nolightmap</surfaceparm>
@@ -63,5 +71,15 @@
 		<surfaceparm>nolightmap</surfaceparm>
 		<cull>none</cull>
 		<map tcMod="scroll 0.1 0.1" >textures/liquids/lavahell.jpg</map>
+	</item>
+	<item name="textures/gothic_light/ironcrosslt2_5000">
+		<surfaceparm>nomarks</surfaceparm>
+		<map from="lightmap" />
+		<map>textures/gothic_light/ironcrosslt2.blend.jpg</map>
+		<blendFunc>GMS_ONE GMS_ONE</blendFunc>
+	</item>
+	<item name="textures/base_wall/atech2_c">
+		<map>textures/base_wall/atech2_c.jpg</map>
+		<normalmap>textures/base_wall/atech2_c.jpg</normalmap>
 	</item>
 </gmshader>
