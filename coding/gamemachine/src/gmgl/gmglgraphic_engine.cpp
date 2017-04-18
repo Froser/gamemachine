@@ -8,10 +8,10 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
-#include "gmengine/elements/gamelight.h"
 #include "gmglobjectpainter.h"
 #include "gmengine/elements/character.h"
 
+/*
 struct __shadowSourcePred
 {
 	bool operator() (GameLight* light)
@@ -19,6 +19,7 @@ struct __shadowSourcePred
 		return light->getShadowSource();
 	}
 };
+*/
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 	: m_world(nullptr)
@@ -50,7 +51,7 @@ void GMGLGraphicEngine::newFrame()
 void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 {
 	applyGraphicSettings();
-
+	/*
 	GameLight* shadowSourceLight = getShadowSourceLight();
 	if (shadowSourceLight)
 	{
@@ -58,8 +59,8 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 		drawObjectsOnce(drawingList, !!shadowSourceLight);
 		m_shadowMapping->endDrawDepthBuffer();
 	}
-
-	drawObjectsOnce(drawingList, !!shadowSourceLight);
+	*/
+	drawObjectsOnce(drawingList, false);
 }
 
 void GMGLGraphicEngine::applyGraphicSettings()
@@ -142,6 +143,7 @@ void GMGLGraphicEngine::shadowTexture(bool shadowOn, GMGLShaders& shaders)
 	}
 }
 
+/*
 GameLight* GMGLGraphicEngine::getShadowSourceLight()
 {
 	std::vector<GameLight*>& lights = getWorld()->getLights();
@@ -151,6 +153,7 @@ GameLight* GMGLGraphicEngine::getShadowSourceLight()
 
 	return *result;
 }
+*/
 
 GMGLShadowMapping* GMGLGraphicEngine::getShadowMapping()
 {

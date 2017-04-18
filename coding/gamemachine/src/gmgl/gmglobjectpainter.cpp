@@ -2,7 +2,6 @@
 #include "gmglobjectpainter.h"
 #include "shader_constants.h"
 #include "gmglfunc.h"
-#include "gmgllight.h"
 #include "gmglshadowmapping.h"
 #include "utilities/assert.h"
 #include "gmgltexture.h"
@@ -23,6 +22,20 @@ static GLenum getMode(ChildObject* obj)
 		ASSERT(false);
 		return GL_TRIANGLE_FAN;
 	}
+}
+
+static void setUniformVec4(GMGLShaders* s, char* name, GMfloat* value)
+{
+	GLuint loc = glGetUniformLocation(s->getProgram(), name);
+
+	GMfloat vec[4] = { value[0], value[1], value[2], 1.0f };
+	glUniform4fv(loc, 1, vec);
+}
+
+static void setUniformFloat(GMGLShaders* s, char* name, GMfloat value)
+{
+	GLuint loc = glGetUniformLocation(s->getProgram(), name);
+	glUniform1f(loc, value);
 }
 
 GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* objs)
@@ -112,7 +125,10 @@ void GMGLObjectPainter::draw()
 
 			if (!m_shadowMapping.hasBegun())
 			{
-				setLights(component->getMaterial(), childObj->getType());
+				for (GMint i = LT_BEGIN; i < LT_END; i++)
+				{
+					activateLight((LightType)i, shader.lights[i], childObj->getType(), component->getMaterial());
+				}
 				beginShader(&shader, childObj->getType());
 			}
 
@@ -125,6 +141,36 @@ void GMGLObjectPainter::draw()
 		glBindVertexArray(0);
 	}
 	END_FOREACH_OBJ
+}
+
+void GMGLObjectPainter::activateLight(LightType t, LightInfo& light, ChildObject::ObjectType objectType, Material& material)
+{
+	if (light.on)
+	{
+		GMGLShaders* gmglShaders = m_engine->getShaders(objectType);
+		switch (t)
+		{
+		case gm::LT_AMBIENT:
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_AMBIENT, &light.lightColor[0]);
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KA, material.Ka);
+			break;
+		case gm::LT_SPECULAR:
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_SPECULAR, &light.lightColor[0]);
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KD, material.Kd);
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KS, material.Ks);
+			setUniformFloat(gmglShaders, GMSHADER_LIGHT_SHININESS, material.shininess);
+			break;
+		default:
+			ASSERT(false);
+			break;
+		}
+	}
+	else if (t == LT_AMBIENT)
+	{
+		GMGLShaders* gmglShaders = m_engine->getShaders(objectType);
+		setUniformVec4(gmglShaders, GMSHADER_LIGHT_AMBIENT, &(m_world->getDefaultAmbientLight().lightColor)[0]);
+		setUniformVec4(gmglShaders, GMSHADER_LIGHT_KA, material.Ka);
+	}
 }
 
 void GMGLObjectPainter::dispose()
@@ -148,24 +194,6 @@ void GMGLObjectPainter::clone(Object* obj, OUT ObjectPainter** painter)
 {
 	ASSERT(painter);
 	*painter = new GMGLObjectPainter(m_engine, m_shadowMapping, obj);
-}
-
-void GMGLObjectPainter::setLights(Material& material, ChildObject::ObjectType type)
-{
-	if (m_world)
-	{
-		std::vector<GameLight*>& lights = m_world->getLights();
-
-		for (auto iter = lights.begin(); iter != lights.end(); iter++)
-		{
-			GMGLLight* light = static_cast<GMGLLight*>(*iter);
-			if (light->isAvailable())
-			{
-				light->setShaders(m_engine->getShaders(type));
-				light->activateLight(material);
-			}
-		}
-	}
 }
 
 void GMGLObjectPainter::activeTexture(Shader* shader, TextureIndex i, ChildObject::ObjectType type)

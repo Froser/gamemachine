@@ -43,6 +43,8 @@ private:
 	void parse_map_tcMod(Shader& shader, TiXmlElement* elem);
 	void parse_map_fromLightmap(Shader& shader, TiXmlElement* elem);
 	void parse_normalmap(Shader& shader, TiXmlElement* elem);
+	void parse_lights(Shader& shader, TiXmlElement* elem);
+	void parse_light(Shader& shader, TiXmlElement* elem);
 
 private:
 	void createSky(Shader& shader);

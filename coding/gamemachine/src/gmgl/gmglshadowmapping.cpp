@@ -71,6 +71,7 @@ void GMGLShadowMapping::init()
 
 void GMGLShadowMapping::beginDrawDepthBuffer(GameLight* shadowSourceLight)
 {
+#if 0
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
@@ -100,6 +101,7 @@ void GMGLShadowMapping::beginDrawDepthBuffer(GameLight* shadowSourceLight)
 	glEnable(GL_POLYGON_OFFSET_FILL);
 	glPolygonOffset(2.0f, 4.0f);
 	m_beginDraw = true;
+#endif
 }
 
 void GMGLShadowMapping::endDrawDepthBuffer()

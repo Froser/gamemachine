@@ -3,7 +3,6 @@
 #include "common.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmglshaders.h"
-#include "gmgllight.h"
 #include "gmglshadowmapping.h"
 #include "gmengine/controllers/resource_container.h"
 #include <map>
@@ -41,7 +40,7 @@ private:
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
 	void setEyeViewport(bool shadowOn, GMGLShaders& shaders);
 	void shadowTexture(bool shadowOn, GMGLShaders& shaders);
-	GameLight* getShadowSourceLight();
+	//GameLight* getShadowSourceLight();
 
 private:
 	std::map<ChildObject::ObjectType, GMGLShaders*> m_allShaders;

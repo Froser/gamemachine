@@ -90,6 +90,17 @@ static void loadImage(const char* filename, OUT Image** image)
 		gm_error("texture %s not found", filename);
 }
 
+static void readTernaryFloatsFromString(const char* str, vmath::vec3& vec)
+{
+	Scanner s(str);
+	for (GMint i = 0; i < 3; i++)
+	{
+		GMfloat f;
+		s.nextFloat(&f);
+		vec[i] = f;
+	}
+}
+
 BSPShaderLoader::BSPShaderLoader()
 	: m_world(nullptr)
 	, m_bspRender(nullptr)
@@ -226,6 +237,7 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shade
 		PARSE(clampmap);
 		PARSE(map);
 		PARSE(normalmap);
+		PARSE(lights);
 		END_PARSE;
 	}
 
@@ -384,6 +396,59 @@ void BSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
 	}
+}
+
+void BSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
+{
+	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
+	{
+		BEGIN_PARSE(light);
+		END_PARSE;
+	}
+}
+
+void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
+{
+	const char* type = elem->Attribute("type");
+	if (!type)
+	{
+		gm_error("light type missing.");
+		return;
+	}
+
+	LightInfo lightInfo;
+	lightInfo.on = true;
+	LightType lightType;
+	const char* color = elem->Attribute("color");
+	if (!color)
+	{
+		gm_error("light color missing.");
+		return;
+	}
+
+	vmath::vec3 vecColor;
+	readTernaryFloatsFromString(color, vecColor);
+	lightInfo.lightColor = vecColor;
+
+	if (strEqual(type, "ambient"))
+	{
+		lightType = LT_AMBIENT;
+	}
+	else if (strEqual(type, "specular"))
+	{
+		lightType = LT_SPECULAR;
+		const char* position = elem->Attribute("position");
+		if (!position)
+		{
+			gm_error("specular light position missing.");
+			return;
+		}
+		Scanner s(color);
+		vmath::vec3 vecPosition;
+		readTernaryFloatsFromString(position, vecPosition);
+		lightInfo.lightPosition = vecPosition;
+	}
+	shader.lights[lightType] = lightInfo;
 }
 
 void BSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)

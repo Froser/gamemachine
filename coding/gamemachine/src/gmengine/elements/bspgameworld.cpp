@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bspgameworld.h"
 #include "character.h"
-#include "gamelight.h"
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"
 #include "utilities/algorithm.h"

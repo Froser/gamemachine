@@ -158,7 +158,7 @@ public:
 				rate.setMoveRate(MD_FORWARD, GMfloat(joyState.thumbLY) / std::numeric_limits<decltype(joyState.thumbLY)>::max());
 			}
 
-			if (kbState[VK_SPACE])
+			if (kbState[VK_SPACE] || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				moveTag |= MD_JUMP;
 
 			if (kbState['V'])

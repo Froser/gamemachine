@@ -10,14 +10,12 @@ struct IGraphicEngine;
 class Image;
 struct ITexture;
 class ObjectPainter;
-class GameLight;
 class GMGLFactory : public IFactory
 {
 public:
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;
 	virtual void createTexture(Image* image, OUT ITexture** texture) override;
 	virtual void createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectPainter** painter) override;
-	virtual void createLight(LightType type, OUT GameLight**) override;
 };
 
 END_NS

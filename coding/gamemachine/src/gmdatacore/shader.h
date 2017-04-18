@@ -1,6 +1,7 @@
 ﻿#ifndef __SHADER_H__
 #define __SHADER_H__
 #include "common.h"
+#include "utilities/vmath.h"
 BEGIN_NS
 
 struct ITexture;
@@ -105,6 +106,21 @@ struct TextureInfo
 	GMuint autorelease : 1;
 };
 
+struct LightInfo
+{
+	bool on;
+	vmath::vec3 lightPosition;
+	vmath::vec3 lightColor;
+};
+
+enum LightType
+{
+	LT_BEGIN = 0,
+	LT_AMBIENT = 0,
+	LT_SPECULAR,
+	LT_END,
+};
+
 struct Shader
 {
 	Shader()
@@ -116,6 +132,7 @@ struct Shader
 	{
 		blendFactors[0] = GMS_ZERO;
 		blendFactors[1] = GMS_ZERO;
+		memset(&lights, 0, sizeof(lights));
 	}
 
 	TextureInfo texture;
@@ -125,6 +142,7 @@ struct Shader
 	GMS_BlendFunc blendFactors[2];
 	bool nodraw;
 	bool noDepthTest;
+	LightInfo lights[LT_END];
 };
 END_NS
 #endif

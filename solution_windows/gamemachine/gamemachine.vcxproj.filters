@@ -100,9 +100,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h">
       <Filter>src\gmdatacore</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
@@ -138,9 +135,6 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h">
       <Filter>src\gmgl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.h">
-      <Filter>src\gmengine\elements</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h">
       <Filter>src\gmgl</Filter>
@@ -309,9 +303,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
@@ -341,9 +332,6 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp">
       <Filter>src\gmgl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.cpp">
-      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp">
       <Filter>src\gmgl</Filter>

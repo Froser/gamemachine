@@ -7,7 +7,6 @@ BEGIN_NS
 class Character;
 class GameMachine;
 struct IGraphicEngine;
-class GameLight;
 class GameObject;
 
 class GameWorld
@@ -24,15 +23,15 @@ public:
 public:
 	virtual void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
-	void appendLight(AUTORELEASE GameLight* light);
-	std::vector<GameLight*>& getLights();
 	void simulateGameWorld(GMfloat elapsed);
 	IGraphicEngine* getGraphicEngine();
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();
 	GMfloat getElapsed();
+	void setDefaultAmbientLight(const LightInfo& lightInfo);
+	LightInfo& getDefaultAmbientLight();
 
-	// characters:
+// characters:
 public:
 	virtual void setMajorCharacter(Character* character);
 	Character* getMajorCharacter();

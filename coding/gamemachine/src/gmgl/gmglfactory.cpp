@@ -4,7 +4,6 @@
 #include "gmgltexture.h"
 #include "gmglgraphic_engine.h"
 #include "gmglobjectpainter.h"
-#include "gmgllight.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -23,22 +22,4 @@ void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectP
 	ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
 	(*painter) = new GMGLObjectPainter(gmglEngine, *gmglEngine->getShadowMapping(), obj);
-}
-
-void GMGLFactory::createLight(LightType type, OUT GameLight** light)
-{
-	ASSERT(light);
-
-	switch (type)
-	{
-	case Ambient:
-		*light = new GMGLAmbientLight();
-		break;
-	case Specular:
-		*light = new GMGLSpecularLight();
-		break;
-	default:
-		ASSERT(false);
-		break;
-	}
 }

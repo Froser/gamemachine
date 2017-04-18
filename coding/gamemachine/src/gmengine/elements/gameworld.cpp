@@ -5,7 +5,6 @@
 #include "utilities/assert.h"
 #include "character.h"
 #include "gmengine/controllers/graphic_engine.h"
-#include "gmengine/elements/gamelight.h"
 #include "gmengine/controllers/gamemachine.h"
 #include <algorithm>
 #include "gmengine/controllers/factory.h"
@@ -18,11 +17,6 @@ GameWorld::~GameWorld()
 {
 	D(d);
 	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
-	{
-		delete *iter;
-	}
-
-	for (auto iter = d.lights.begin(); iter != d.lights.end(); iter++)
 	{
 		delete *iter;
 	}
@@ -49,22 +43,6 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	ObjectPainter* painter = obj->getObject()->getPainter();
 	if (painter)
 		painter->transfer();
-}
-
-void GameWorld::appendLight(AUTORELEASE GameLight* light)
-{
-	D(d);
-	if (std::find(d.lights.begin(), d.lights.end(), light) != d.lights.end())
-		return;
-
-	d.lights.push_back(light);
-	light->setWorld(this);
-}
-
-std::vector<GameLight*>& GameWorld::getLights()
-{
-	D(d);
-	return d.lights;
 }
 
 void GameWorld::setMajorCharacter(Character* character)
@@ -121,4 +99,16 @@ void GameWorld::createPainterForObject(GameObject* obj)
 	factory->createPainter(engine, obj->getObject(), &painter);
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
+}
+
+void GameWorld::setDefaultAmbientLight(const LightInfo& lightInfo)
+{
+	D(d);
+	d.ambientLight = lightInfo;
+}
+
+LightInfo& GameWorld::getDefaultAmbientLight()
+{
+	D(d);
+	return d.ambientLight;
 }

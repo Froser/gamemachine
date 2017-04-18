@@ -2,7 +2,6 @@
 #include "bspgameworld.h"
 #include "gmengine/controllers/gamemachine.h"
 #include "gmengine/controllers/factory.h"
-#include "gmengine/elements/gamelight.h"
 #include "character.h"
 #include "utilities/scanner.h"
 
@@ -49,18 +48,9 @@ PARSE_FUNC(worldspawn, entity, world)
 		}
 	}
 	*/
-	GameLight* ambientLight;
-	IFactory* factory = world->getGameMachine()->getFactory();
-	factory->createLight(Ambient, &ambientLight);
-	if (ambientLight)
-	{
-		ambientLight->setId(0);
-		ambientLight->setColor(vmath::vec3(1, 1, 1));
-		ambientLight->setPosition(vmath::vec3(0, 0, 0));
-		ambientLight->setWorld(world);
-		ambientLight->setShadowSource(false);
-		world->appendLight(ambientLight);
-	}
+	LightInfo ambientLight;
+	ambientLight.lightColor = vmath::vec3(1, 1, 1);
+	world->setDefaultAmbientLight(ambientLight);
 }
 
 PARSE_FUNC(info_player_deathmatch, entity, world)

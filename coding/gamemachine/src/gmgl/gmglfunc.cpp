@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmglfunc.h"
 #include "gmglshaders.h"
-#include "gmgllight.h"
 #include "utilities/vmath.h"
 #include "utilities/camera.h"
 #include "utilities/assert.h"

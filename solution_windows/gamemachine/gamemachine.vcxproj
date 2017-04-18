@@ -38,7 +38,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\character.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.h" />
@@ -47,7 +46,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgllight.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.h" />
@@ -107,7 +105,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\character.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gamelight.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameobjectprivate.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\gameworld.cpp" />
@@ -116,7 +113,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgllight.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
@@ -163,14 +159,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
