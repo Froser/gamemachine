@@ -50,6 +50,8 @@ PARSE_FUNC(worldspawn, entity, world)
 	*/
 	LightInfo ambientLight;
 	ambientLight.lightColor = vmath::vec3(1, 1, 1);
+	for (GMint i = 0; i < 3; i++)
+		ambientLight.args[LA_KA + i] = 1.f;
 	world->setDefaultAmbientLight(ambientLight);
 }
 

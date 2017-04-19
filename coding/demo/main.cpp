@@ -166,6 +166,9 @@ public:
 			else if (kbState['C'])
 				m_input.joystickVibrate(0, 0);
 
+			if (kbState['N'])
+				DBG_SET_INT(DRAW_NORMAL, (DBG_INT(DRAW_NORMAL) + 1) % DRAW_NORMAL_MAX);
+
 			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
 				GMfloat rate = (GMfloat) joyState.thumbRX / (

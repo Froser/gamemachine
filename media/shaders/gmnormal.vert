@@ -20,14 +20,6 @@ out vec4 _bitangent;
 out vec2 _lightmapuv;
 out vec4 position_world;
 
-// 由顶点变换矩阵计算法向量变换矩阵
-mat4 calcNormalWorldTransformMatrix()
-{
-    mat4 normalInverseMatrix = inverse(GM_model_matrix);
-    mat4 normalWorldTransformMatrix = transpose(normalInverseMatrix);
-    return normalWorldTransformMatrix;
-}
-
 void calcCoords()
 {
     position_world = GM_model_matrix * position;

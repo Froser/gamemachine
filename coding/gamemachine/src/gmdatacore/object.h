@@ -34,15 +34,6 @@ private:
 	Object* m_object;
 };
 
-struct Material
-{
-	GMfloat Ka[3];
-	GMfloat Kd[3];
-	GMfloat Ks[3];
-	GMfloat shininess;
-	Shader shader;
-};
-
 class ChildObject;
 class Component
 {
@@ -57,9 +48,9 @@ public:
 	Component(ChildObject* parent);
 	~Component();
 
-	Material& getMaterial()
+	Shader& getShader()
 	{
-		return m_material;
+		return m_shader;
 	}
 
 	GMint* getOffsetPtr()
@@ -88,7 +79,7 @@ public:
 
 private:
 	GMuint m_offset;
-	Material m_material;
+	Shader m_shader;
 
 	// 图元顶点数量
 	std::vector<GMint> m_primitiveVertices;

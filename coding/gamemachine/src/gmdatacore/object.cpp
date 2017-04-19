@@ -32,17 +32,17 @@ Component::Component(ChildObject* parent)
 	, m_parent(parent)
 	, m_primitiveCount(0)
 {
-	memset(&m_material, 0, sizeof(m_material));
+	memset(&m_shader, 0, sizeof(m_shader));
 
 	setVertexOffset(m_parent->vertices().size());
 }
 
 Component::~Component()
 {
-	TextureInfo& ti = getMaterial().shader.texture;
+	TextureInfo& ti = m_shader.texture;
 	if (ti.autorelease)
 	{
-		TextureFrames* frames = getMaterial().shader.texture.textures;
+		TextureFrames* frames = m_shader.texture.textures;
 		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
 			for (GMint j = 0; j < frames[i].frameCount; j++)

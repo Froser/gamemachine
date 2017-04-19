@@ -40,7 +40,6 @@ private:
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
 	void setEyeViewport(bool shadowOn, GMGLShaders& shaders);
 	void shadowTexture(bool shadowOn, GMGLShaders& shaders);
-	//GameLight* getShadowSourceLight();
 
 private:
 	std::map<ChildObject::ObjectType, GMGLShaders*> m_allShaders;

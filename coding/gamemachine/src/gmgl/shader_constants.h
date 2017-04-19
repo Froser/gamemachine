@@ -24,5 +24,8 @@ BEGIN_NS
 #define		GMSHADER_NORMAL_MAPPING_TEXTURE		GMSHADER("normal_mapping_texture")
 #define		GMSHADER_LIGHTMAP_TEXTURE			GMSHADER("lightmap_texture")
 
+//绘制调试
+#define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
+
 END_NS
 #endif

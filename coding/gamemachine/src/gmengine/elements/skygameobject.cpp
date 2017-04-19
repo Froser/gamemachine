@@ -106,15 +106,11 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 	Object* object = new Object();
 	*obj = object;
 
-	Material material = { 0 };
-	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	material.shader = m_shader;
-
 	ChildObject* child = new ChildObject();
 	child->setType(ChildObject::Sky);
 
 	Component* component = new Component(child);
-	component->getMaterial() = material;
+	component->getShader() = m_shader;
 
 	// We don't draw surface beneath us
 	for (GMuint i = 0; i < 5; i++)

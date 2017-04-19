@@ -119,7 +119,7 @@ void GMGLObjectPainter::draw()
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
 			Component* component = (*iter);
-			Shader& shader = component->getMaterial().shader;
+			Shader& shader = component->getShader();
 			if (shader.nodraw)
 				continue;
 
@@ -127,11 +127,12 @@ void GMGLObjectPainter::draw()
 			{
 				for (GMint i = LT_BEGIN; i < LT_END; i++)
 				{
-					activateLight((LightType)i, shader.lights[i], childObj->getType(), component->getMaterial());
+					activateLight((LightType)i, shader.lights[i], childObj->getType());
 				}
 				beginShader(&shader, childObj->getType());
 			}
 
+			drawDebug(childObj->getType());
 			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(childObj);
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 
@@ -143,33 +144,29 @@ void GMGLObjectPainter::draw()
 	END_FOREACH_OBJ
 }
 
-void GMGLObjectPainter::activateLight(LightType t, LightInfo& light, ChildObject::ObjectType objectType, Material& material)
+void GMGLObjectPainter::activateLight(LightType t, LightInfo& light, ChildObject::ObjectType objectType)
 {
-	if (light.on)
+	GMGLShaders* gmglShaders = m_engine->getShaders(objectType);
+	switch (t)
 	{
-		GMGLShaders* gmglShaders = m_engine->getShaders(objectType);
-		switch (t)
+	case gm::LT_AMBIENT:
 		{
-		case gm::LT_AMBIENT:
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_AMBIENT, &light.lightColor[0]);
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KA, material.Ka);
-			break;
-		case gm::LT_SPECULAR:
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_SPECULAR, &light.lightColor[0]);
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KD, material.Kd);
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KS, material.Ks);
-			setUniformFloat(gmglShaders, GMSHADER_LIGHT_SHININESS, material.shininess);
-			break;
-		default:
-			ASSERT(false);
-			break;
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_AMBIENT, light.on ? &light.lightColor[0] : &(m_world->getDefaultAmbientLight().lightColor)[0]);
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KA, light.on ? &light.args[LA_KA] : &m_world->getDefaultAmbientLight().args[LA_KA]);
 		}
-	}
-	else if (t == LT_AMBIENT)
-	{
-		GMGLShaders* gmglShaders = m_engine->getShaders(objectType);
-		setUniformVec4(gmglShaders, GMSHADER_LIGHT_AMBIENT, &(m_world->getDefaultAmbientLight().lightColor)[0]);
-		setUniformVec4(gmglShaders, GMSHADER_LIGHT_KA, material.Ka);
+		break;
+	case gm::LT_SPECULAR:
+		{
+			GMfloat zero[3] = { 0 };
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_SPECULAR, light.on ? &light.lightColor[0] : zero);
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KD, light.on ? &light.args[LA_KD] : zero);
+			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KS, light.on ? &light.args[LA_KS] : zero);
+			setUniformFloat(gmglShaders, GMSHADER_LIGHT_SHININESS, light.on ? light.args[LA_SHINESS] : 0.f);
+		}
+		break;
+	default:
+		ASSERT(false);
+		break;
 	}
 }
 
@@ -362,4 +359,10 @@ void GMGLObjectPainter::endShader(Shader* shader, ChildObject::ObjectType type)
 void GMGLObjectPainter::setWorld(GameWorld* world)
 {
 	m_world = world;
+}
+
+// 是否需要做一些调试方面的绘制
+void GMGLObjectPainter::drawDebug(ChildObject::ObjectType type)
+{
+	GMGL::uniformInt(*m_engine->getShaders(type), DBG_INT(DRAW_NORMAL), GMSHADER_DEBUG_DRAW_NORMAL);
 }

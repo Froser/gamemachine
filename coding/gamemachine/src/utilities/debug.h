@@ -10,8 +10,18 @@ enum DebugOptions
 	CALCULATE_BSP_FACE,
 	POLYGON_LINE_MODE,
 	DRAW_ONLY_SKY,
+	DRAW_NORMAL, // see DrawNormalOptions
 
 	DEBUG_OPTIONS_END,
+};
+
+//Draw normal options
+enum DrawNormalOptions
+{
+	DRAW_NORMAL_OFF,
+	DRAW_NORMAL_EYESPACE,
+	DRAW_NORMAL_CAMERASPACE,
+	DRAW_NORMAL_MAX
 };
 
 #define DBG Debug::getDebugger()

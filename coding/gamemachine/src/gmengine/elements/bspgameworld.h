@@ -35,8 +35,8 @@ private:
 	void drawMeshFace(int meshFaceNumber);
 	void drawPatch(int patchNumber);
 	void draw(BSP_Render_BiquadraticPatch& biqp);
-	template <typename T> bool setMaterialTexture(T face, REF Material& m);
-	void setMaterialLightmap(GMint lightmapid, REF Material& m);
+	template <typename T> bool setMaterialTexture(T face, REF Shader& shader);
+	void setMaterialLightmap(GMint lightmapid, REF Shader& shader);
 	int isClusterVisible(int cameraCluster, int testCluster);
 
 	//imports:

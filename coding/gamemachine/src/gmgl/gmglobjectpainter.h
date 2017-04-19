@@ -31,7 +31,8 @@ private:
 	void deactivateShader(Shader* shader);
 	void beginShader(Shader* shader, ChildObject::ObjectType type);
 	void endShader(Shader* shader, ChildObject::ObjectType type);
-	void activateLight(LightType t, LightInfo& light, ChildObject::ObjectType objectType, Material& material);
+	void activateLight(LightType t, LightInfo& light, ChildObject::ObjectType objectType);
+	void drawDebug(ChildObject::ObjectType type);
 
 private:
 	GMGLGraphicEngine* m_engine;

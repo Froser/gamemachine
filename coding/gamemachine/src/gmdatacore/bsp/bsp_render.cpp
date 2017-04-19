@@ -304,7 +304,7 @@ void BSPRender::generateVisibilityData()
 	memcpy(d.visibilityData.bitset, d.bsp->visBytes.data() + sz, bitsetSize);
 }
 
-void BSPRender::createObject(const BSP_Render_Face& face, const Material& material, OUT Object** obj)
+void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj)
 {
 	D(d);
 
@@ -312,7 +312,7 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Material& materi
 	ChildObject* child = new ChildObject();
 	child->setArrangementMode(ChildObject::Triangles);
 	Component* component = new Component(child);
-	component->getMaterial() = material;
+	component->getShader() = shader;
 
 	ASSERT(face.numIndices % 3 == 0);
 	for (GMint i = 0; i < face.numIndices / 3; i++)
@@ -322,7 +322,16 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Material& materi
 		{
 			GMint idx = d.bsp->drawIndexes[face.firstIndex + i * 3 + j];
 			BSP_Render_Vertex& vertex = d.vertices[face.firstVertex + idx];
+			
+			GMint idx_prev = d.bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
+			GMint idx_next = d.bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
+			vmath::vec3& vertex_prev = d.vertices[face.firstVertex + idx_prev].position,
+				&vertex_next = d.vertices[face.firstVertex + idx_next].position;
+			vmath::vec3 normal = vmath::cross(vertex.position - vertex_prev, vertex_next - vertex.position);
+			normal = vmath::normalize(normal);
+
 			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
+			component->normal(normal[0], normal[1], normal[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}

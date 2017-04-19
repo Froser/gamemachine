@@ -106,11 +106,21 @@ struct TextureInfo
 	GMuint autorelease : 1;
 };
 
+enum LightArgs
+{
+	LA_KA = 0,
+	LA_KD = 3,
+	LA_KS = 6,
+	LA_SHINESS = 9,
+	LA_END,
+};
+
 struct LightInfo
 {
 	bool on;
 	vmath::vec3 lightPosition;
 	vmath::vec3 lightColor;
+	GMfloat args[LA_END];
 };
 
 enum LightType

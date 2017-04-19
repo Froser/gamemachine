@@ -34,6 +34,7 @@ void GameMachine::initDebugger()
 	DBG_SET_INT(CALCULATE_BSP_FACE, 1);
 	DBG_SET_INT(POLYGON_LINE_MODE, 0);
 	DBG_SET_INT(DRAW_ONLY_SKY, 0);
+	DBG_SET_INT(DRAW_NORMAL, DRAW_NORMAL_OFF);
 }
 
 IGraphicEngine* GameMachine::getGraphicEngine()

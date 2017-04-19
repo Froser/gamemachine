@@ -416,7 +416,7 @@ void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	LightInfo lightInfo;
+	LightInfo lightInfo = { 0 };
 	lightInfo.on = true;
 	LightType lightType;
 	const char* color = elem->Attribute("color");
@@ -447,6 +447,24 @@ void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		vmath::vec3 vecPosition;
 		readTernaryFloatsFromString(position, vecPosition);
 		lightInfo.lightPosition = vecPosition;
+
+		const char* k = elem->Attribute("ks");
+		if (!k)
+			readTernaryFloatsFromString("1 1 1", (vmath::vec3&)lightInfo.args[LA_KS]);
+		else
+			readTernaryFloatsFromString(k, (vmath::vec3&)lightInfo.args[LA_KS]);
+
+		k = elem->Attribute("kd");
+		if (!k)
+			readTernaryFloatsFromString("1 1 1", (vmath::vec3&)lightInfo.args[LA_KD]);
+		else
+			readTernaryFloatsFromString(k, (vmath::vec3&)lightInfo.args[LA_KD]);
+
+		k = elem->Attribute("shininess");
+		if (!k)
+			lightInfo.args[LA_SHINESS] = 0;
+		else
+			SAFE_SSCANF(k, "%f", &lightInfo.args[LA_SHINESS]);
 	}
 	shader.lights[lightType] = lightInfo;
 }

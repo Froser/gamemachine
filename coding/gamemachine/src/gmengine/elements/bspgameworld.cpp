@@ -204,17 +204,16 @@ void BSPGameWorld::preparePolygonFace(int polygonFaceNumber)
 	GameObject* obj = nullptr;
 	ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
 
-	Material material = { 0 };
-	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	if (!setMaterialTexture(polygonFace, material))
+	Shader shader;
+	if (!setMaterialTexture(polygonFace, shader))
 	{
 		gm_warning("polygon: %d texture missing.", polygonFaceNumber);
 		return;
 	}
-	setMaterialLightmap(polygonFace.lightmapIndex, material);
+	setMaterialLightmap(polygonFace.lightmapIndex, shader);
 
 	Object* coreObj;
-	d.render.createObject(polygonFace, material, &coreObj);
+	d.render.createObject(polygonFace, shader, &coreObj);
 	obj = new GameObject(coreObj);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
@@ -230,17 +229,16 @@ void BSPGameWorld::prepareMeshFace(int meshFaceNumber)
 	GameObject* obj = nullptr;
 
 	ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
-	Material material = { 0 };
-	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	if (!setMaterialTexture(meshFace, material))
+	Shader shader;
+	if (!setMaterialTexture(meshFace, shader))
 	{
 		gm_warning("mesh: %d texture missing.", meshFaceNumber);
 		return;
 	}
-	setMaterialLightmap(meshFace.lightmapIndex, material);
+	setMaterialLightmap(meshFace.lightmapIndex, shader);
 
 	Object* coreObj;
-	d.render.createObject(meshFace, material, &coreObj);
+	d.render.createObject(meshFace, shader, &coreObj);
 	obj = new GameObject(coreObj);
 	rd.meshFaceObjects[&meshFace] = obj;
 	appendObjectAndInit(obj);
@@ -252,14 +250,13 @@ void BSPGameWorld::preparePatch(int patchNumber)
 	BSPData& bsp = d.bsp.bspData();
 	BSPRenderData& rd = d.render.renderData();
 
-	Material material = { 0 };
-	material.Ka[0] = 1.0f; material.Ka[1] = 1.0f; material.Ka[2] = 1.0f;
-	if (!setMaterialTexture(rd.patches[patchNumber], material))
+	Shader shader;
+	if (!setMaterialTexture(rd.patches[patchNumber], shader))
 	{
 		gm_warning("patch: %d texture missing.", patchNumber);
 		return;
 	}
-	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, material);
+	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, shader);
 
 	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 	{
@@ -273,7 +270,7 @@ void BSPGameWorld::preparePatch(int patchNumber)
 		child->setArrangementMode(ChildObject::Triangle_Strip);
 
 		Component* component = new Component(child);
-		component->getMaterial() = material;
+		component->getShader() = shader;
 
 		int numVertices = 2 * (biqp->tesselation + 1);
 		for (int row = 0; row < biqp->tesselation; ++row)
@@ -364,7 +361,7 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 }
 
 template <typename T>
-bool BSPGameWorld::setMaterialTexture(T face, REF Material& m)
+bool BSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -373,33 +370,33 @@ bool BSPGameWorld::setMaterialTexture(T face, REF Material& m)
 	const char* name = bsp.shaders[textureid].shader;
 
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
-	if (!d.shaderLoader.findItem(name, lightmapid, &m.shader))
+	if (!d.shaderLoader.findItem(name, lightmapid, &shader))
 	{
 		ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 		TextureContainer& tc = rc->getTextureContainer();
 		const TextureContainer::TextureItem* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		m.shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
-		m.shader.texture.textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
+		shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
+		shader.texture.textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 	}
 	return true;
 }
 
-void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Material& m)
+void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
 	ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 	TextureContainer_ID& tc = rc->getLightmapContainer();
 	const TextureContainer_ID::TextureItem* item = nullptr;
-	if (m.shader.surfaceFlag & SURF_NOLIGHTMAP)
+	if (shader.surfaceFlag & SURF_NOLIGHTMAP)
 		item = tc.find(WHITE_LIGHTMAP);
 	else
 		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	m.shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frames[0] = item->texture;
-	m.shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
+	shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frames[0] = item->texture;
+	shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
 }
 
 void BSPGameWorld::importBSP()

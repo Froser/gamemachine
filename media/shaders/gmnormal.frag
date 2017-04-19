@@ -62,7 +62,8 @@ uniform vec4 GM_light_position;
 uniform float GM_light_shininess;
 uniform mat4 GM_model_matrix;
 
-vec3 DEBUG;
+// 调试变量
+uniform int GM_debug_draw_normal;
 
 // 漫反射系数
 float g_diffuse;
@@ -92,33 +93,38 @@ float shadeFactorFactor(float shadeFactor)
 
 void calcDiffuseAndSpecular(vec3 lightDirection, vec3 eyeDirection, vec3 normal)
 {
+    vec3 N = normalize(normal);
+    vec3 L = normalize(lightDirection);
+
     //diffuse:
     {
-        g_diffuse = dot(lightDirection, normal);
+        g_diffuse = dot(L, N);
         g_diffuse = clamp(g_diffuse, 0.0f, 1.0f);
     }
 
     // specular
     {
-        vec3 E = normalize(eyeDirection);
-        vec3 R = reflect(-E, normal);
-        float theta = dot(E, R);
+        vec3 V = normalize(eyeDirection);
+        vec3 R = reflect(-L, N);
+        float theta = dot(V, R);
         g_specular = pow(theta, GM_light_shininess);
         g_specular = clamp(g_specular, 0.0f, 1.0f);
     }
+    //g_specular = 0;
 }
 
-// 由顶点变换矩阵计算法向量变换矩阵
-mat4 normalTransform = transpose(inverse(GM_model_matrix));
-mat4 normalEyeTransform = GM_view_matrix * normalTransform;
-
+vec3 normal_eye;
 void calcLights()
 {
-    vec4 position_eye = GM_view_matrix * position_world;
-    vec3 eyeDirection_eye = normalize(vec3(0,0,0) - position_eye.xyz);
+    vec4 vertex_eye = GM_view_matrix * position_world;
+    vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
     vec3 lightPosition_eye = (GM_view_matrix * GM_light_position).xyz;
-    vec3 lightDirection_eye = normalize(lightPosition_eye + eyeDirection_eye);
-    vec3 normal_eye = normalize((normalEyeTransform * _normal).xyz);
+    vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
+
+    // 由顶点变换矩阵计算法向量变换矩阵
+    mat4 normalModelTransform = transpose(inverse(GM_model_matrix));
+    mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
+    normal_eye = normalize((normalEyeTransform * vec4(_normal.xyz, 0)).xyz);
 
     if (GM_normal_mapping_texture_switch == 0)
     {
@@ -134,9 +140,9 @@ void calcLights()
             normal_eye.xyz
         ));
 
-        vec3 lightDirection_tangent = normalize(TBN * lightDirection_eye);
-        vec3 eyeDirection_tangent = normalize(TBN * eyeDirection_eye);
-        vec3 normal_tangent = normalize(texture(GM_normal_mapping_texture, _uv).rgb * 2.0 - 1.0);
+        vec3 lightDirection_tangent = TBN * lightDirection_eye;
+        vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
+        vec3 normal_tangent = texture(GM_normal_mapping_texture, _uv).rgb * 2.0 - 1.0;
 
         calcDiffuseAndSpecular(lightDirection_tangent, eyeDirection_tangent, normal_tangent);
         //DEBUG.rgb = _tangent.xyz;
@@ -146,6 +152,19 @@ void calcLights()
 void drawObject()
 {
     calcLights();
+
+    if (GM_debug_draw_normal == 1)
+    {
+        // 画眼睛视角的法向量
+        frag_color = vec4((normal_eye.xyz + 1.f) / 2.f, 1.f);
+        return;
+    }
+    else if (GM_debug_draw_normal == 2)
+    {
+        // 画世界视觉的法向量
+        frag_color = vec4((_normal.xyz + 1.f) / 2.f, 1.f);
+        return;
+    }
 
     // 计算阴影系数
     float shadeFactor = shadeFactorFactor(calcuateShadeFactor(shadowCoord));

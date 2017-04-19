@@ -58,3 +58,11 @@ void IMPL uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textur
 	loc = glGetUniformLocation(shaders.getProgram(), _switch);
 	glUniform1i(loc, 1);
 }
+
+void IMPL uniformInt(GMGLShaders& shaders, int value, const char* name)
+{
+	GLint loc = glGetUniformLocation(shaders.getProgram(), name);
+	ASSERT_GL();
+	glUniform1i(loc, value);
+	ASSERT_GL();
+}
