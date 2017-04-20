@@ -3,17 +3,20 @@
 #include "common.h"
 BEGIN_NS
 
-class Image;
 struct ITexture;
-class ObjectPainter;
 struct IGraphicEngine;
+struct IGamePackageHandler;
+class Image;
 class Object;
+class ObjectPainter;
+class GamePackage;
 struct IFactory
 {
 	virtual ~IFactory();
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(Image*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;
+	virtual void createGamePackage(GamePackage*, OUT IGamePackageHandler**) = 0;
 };
 
 END_NS

@@ -4,6 +4,7 @@
 #include "gmgltexture.h"
 #include "gmglgraphic_engine.h"
 #include "gmglobjectpainter.h"
+#include "gmglgamepackagehandler.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -22,4 +23,10 @@ void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectP
 	ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
 	(*painter) = new GMGLObjectPainter(gmglEngine, *gmglEngine->getShadowMapping(), obj);
+}
+
+void gm::GMGLFactory::createGamePackage(GamePackage* pk, OUT IGamePackageHandler** handler)
+{
+	DefaultGMGLGamePackageHandler* h = new DefaultGMGLGamePackageHandler(pk);
+	*handler = h;
 }

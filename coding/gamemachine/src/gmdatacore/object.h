@@ -134,7 +134,7 @@ public:
 	enum ObjectType
 	{
 		ObjectTypeBegin,
-		NormalObject,
+		NormalObject = ObjectTypeBegin,
 		Sky,
 		ObjectTypeEnd,
 	};

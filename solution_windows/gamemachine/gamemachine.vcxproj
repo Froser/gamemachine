@@ -17,7 +17,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
@@ -45,6 +45,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
@@ -84,7 +85,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
@@ -112,6 +113,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\skygameobject.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
@@ -159,7 +161,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

@@ -16,9 +16,9 @@
 #include "gmgl/gmglwindow.h"
 #include "utilities/path.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "gmdatacore/gameworldcreator.h"
 #include "utilities/debug.h"
 #include "utilities/input.h"
+#include "gmdatacore/gamepackage.h"
 
 using namespace gm;
 
@@ -42,11 +42,14 @@ public:
 	void init()
 	{
 		m_input.initMouse(m_gm->getWindow());
+		GamePackage pk(m_gm, &factory);
+		pk.loadPackage("D:/gmpk");
+		pk.createBSPGameWorld("D:/gv.bsp", &world);
 
 #if _DEBUG
 		std::string currentPath("D:/shaders/test/");
 		std::string shaderPath("D:/shaders/test/");
-		GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
+		//GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
 #else
 		std::string currentPath(Path::getCurrentPath());
 		std::string shaderPath(currentPath);
@@ -57,36 +60,7 @@ public:
 #endif
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(m_gm->getGraphicEngine());
 
-		{
-			GMGLShaders* shaders = new GMGLShaders();
-			std::string vert = std::string(shaderPath).append("gmnormal.vert"),
-				frag = std::string(shaderPath).append("gmnormal.frag");
-			GMGLShaderInfo shadersInfo[] = {
-				{ GL_VERTEX_SHADER, vert.c_str() },
-				{ GL_FRAGMENT_SHADER, frag.c_str() },
-			};
-			shaders->appendShader(shadersInfo[0]);
-			shaders->appendShader(shadersInfo[1]);
-			shaders->load();
-			shaders->useProgram();
-			engine->registerShader(ChildObject::NormalObject, shaders);
-		}
-
-		{
-			GMGLShaders* shaders = new GMGLShaders();
-			std::string vert = std::string(shaderPath).append("gmsky.vert"),
-				frag = std::string(shaderPath).append("gmsky.frag");
-			GMGLShaderInfo shadersInfo[] = {
-				{ GL_VERTEX_SHADER, vert.c_str() },
-				{ GL_FRAGMENT_SHADER, frag.c_str() },
-			};
-			shaders->appendShader(shadersInfo[0]);
-			shaders->appendShader(shadersInfo[1]);
-			shaders->load();
-			shaders->useProgram();
-			engine->registerShader(ChildObject::Sky, shaders);
-		}
-
+		/*
 		{
 			GMGLShadowMapping* shadow = engine->getShadowMapping();
 			GMGLShaders& shadowShaders = shadow->getShaders();
@@ -100,7 +74,7 @@ public:
 			shadowShaders.appendShader(shadersInfo[1]);
 			shadowShaders.load();
 		}
-
+		*/
 	}
 
 	void event(GameLoopEvent evt)

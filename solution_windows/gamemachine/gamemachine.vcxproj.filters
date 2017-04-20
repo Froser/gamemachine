@@ -151,9 +151,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.h">
       <Filter>src\gmengine\elements</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.h">
-      <Filter>src\gmdatacore</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\bitset.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
@@ -240,6 +237,12 @@
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\collisionobjectfactory.h">
       <Filter>src\gmphysics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.h">
+      <Filter>src\gmdatacore</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.h">
+      <Filter>src\gmgl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -348,9 +351,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\bspgameworldprivate.cpp">
       <Filter>src\gmengine\elements</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gameworldcreator.cpp">
-      <Filter>src\gmdatacore</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\bitset.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
@@ -428,6 +428,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\collisionobjectfactory.cpp">
       <Filter>src\gmphysics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.cpp">
+      <Filter>src\gmdatacore</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.cpp">
+      <Filter>src\gmgl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
