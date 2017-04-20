@@ -111,7 +111,6 @@ void calcDiffuseAndSpecular(vec3 lightDirection, vec3 eyeDirection, vec3 normal)
         g_specular = pow(theta, GM_light_shininess);
         g_specular = clamp(g_specular, 0.0f, 1.0f);
     }
-    g_specular = 0;
 }
 
 void calcLights()
