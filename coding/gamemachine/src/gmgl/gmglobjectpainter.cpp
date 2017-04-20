@@ -144,7 +144,7 @@ void GMGLObjectPainter::activateLight(LightType t, LightInfo& light, ChildObject
 	case gm::LT_SPECULAR:
 		{
 			GMfloat zero[3] = { 0 };
-			GMGL::uniformVec3(*gmglShaders, light.on ? &light.lightColor[0] : zero, GMSHADER_LIGHT_SPECULAR);
+			GMGL::uniformVec3(*gmglShaders, light.on ? &light.lightColor[0] : zero, GMSHADER_LIGHT_POWER);
 			GMGL::uniformVec3(*gmglShaders, light.on ? &light.args[LA_KD] : zero, GMSHADER_LIGHT_KD);
 			GMGL::uniformVec3(*gmglShaders, light.on ? &light.args[LA_KS] : zero, GMSHADER_LIGHT_KS);
 			GMGL::uniformFloat(*gmglShaders, light.on ? light.args[LA_SHINESS] : 0.f, GMSHADER_LIGHT_SHININESS);
