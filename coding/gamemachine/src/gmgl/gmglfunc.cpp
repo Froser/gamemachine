@@ -62,9 +62,7 @@ void GMGL::uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textu
 void GMGL::uniformInt(GMGLShaders& shaders, int value, const char* name)
 {
 	GLint loc = glGetUniformLocation(shaders.getProgram(), name);
-	ASSERT_GL();
 	glUniform1i(loc, value);
-	ASSERT_GL();
 }
 
 void GMGL::uniformVec3(GMGLShaders& s, GMfloat* value, char* name)
@@ -78,7 +76,5 @@ void GMGL::uniformVec3(GMGLShaders& s, GMfloat* value, char* name)
 void GMGL::uniformFloat(GMGLShaders& shaders, GMfloat value, char* name)
 {
 	GLint loc = glGetUniformLocation(shaders.getProgram(), name);
-	ASSERT_GL();
 	glUniform1f(loc, value);
-	ASSERT_GL();
 }

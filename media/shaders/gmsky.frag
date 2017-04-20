@@ -21,7 +21,7 @@ uniform float GM_ambient_texture_3_scale_s;
 uniform float GM_ambient_texture_3_scale_t;
 uniform int GM_ambient_texture_3_switch = 0;
 
-uniform vec4 GM_light_ambient;
+uniform vec3 GM_light_ambient;
 
 in vec2 _uv;
 out vec4 frag_color;
