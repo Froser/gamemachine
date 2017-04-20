@@ -343,3 +343,48 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 
 	*obj = coreObj;
 }
+
+void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj)
+{
+	Object* coreObj = new Object();
+	ChildObject* child = new ChildObject();
+	child->setArrangementMode(ChildObject::Triangle_Strip);
+
+	Component* component = new Component(child);
+	component->getShader() = shader;
+
+	int numVertices = 2 * (biqp.tesselation + 1);
+	for (int row = 0; row < biqp.tesselation; ++row)
+	{
+		component->beginFace();
+		GLuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
+		vmath::vec3 normal;
+		for (int i = 0; i < numVertices; i++)
+		{
+			GMint idx = *(idxStart + i);
+			BSP_Render_Vertex& vertex = biqp.vertices[idx];
+
+			if (i < numVertices - 2)
+			{
+				GMint idx_prev = *(idxStart + i + 2);
+				GMint idx_next = *(idxStart + i + 1);
+
+				if (i & 1) //奇数点应该调换一下前后向量，最后再改变法线方向
+					SWAP(idx_prev, idx_next);
+
+				vmath::vec3& vertex_prev = biqp.vertices[idx_prev].position,
+					&vertex_next = biqp.vertices[idx_next].position;
+				normal = -vmath::normalize(vmath::cross(vertex.position - vertex_prev, vertex_next - vertex.position));
+			}
+			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
+			component->normal(normal[0], normal[1], normal[2]);
+			component->uv(vertex.decalS, vertex.decalT);
+			component->lightmap(vertex.lightmapS, vertex.lightmapT);
+		}
+		component->endFace();
+
+	}
+	child->appendComponent(component);
+	coreObj->append(child);
+	*obj = coreObj;
+}

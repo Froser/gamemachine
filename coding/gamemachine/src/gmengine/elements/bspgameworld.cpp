@@ -260,40 +260,13 @@ void BSPGameWorld::preparePatch(int patchNumber)
 
 	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 	{
-		BSP_Render_BiquadraticPatch* biqp = &rd.patches[patchNumber].quadraticPatches[i];
+		BSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
+		ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
 
-		GameObject* obj = nullptr;
-		ASSERT(rd.biquadraticPatchObjects.find(biqp) == rd.biquadraticPatchObjects.end());
-
-		Object* coreObj = new Object();
-		ChildObject* child = new ChildObject();
-		child->setArrangementMode(ChildObject::Triangle_Strip);
-
-		Component* component = new Component(child);
-		component->getShader() = shader;
-
-		int numVertices = 2 * (biqp->tesselation + 1);
-		for (int row = 0; row < biqp->tesselation; ++row)
-		{
-			component->beginFace();
-			GLuint* idxStart = &biqp->indices[row * 2 * (biqp->tesselation + 1)];
-			for (int i = 0; i < numVertices; i++)
-			{
-				GMuint idx = *(idxStart + i);
-				BSP_Render_Vertex& vertex = biqp->vertices[idx];
-
-				component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
-				component->uv(vertex.decalS, vertex.decalT);
-				component->lightmap(vertex.lightmapS, vertex.lightmapT);
-			}
-			component->endFace();
-
-		}
-		child->appendComponent(component);
-
-		coreObj->append(child);
-		obj = new GameObject(coreObj);
-		rd.biquadraticPatchObjects[biqp] = obj;
+		Object* coreObj;
+		d.render.createObject(biqp, shader, &coreObj);
+		GameObject* obj = new GameObject(coreObj);
+		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
 	}
 }
