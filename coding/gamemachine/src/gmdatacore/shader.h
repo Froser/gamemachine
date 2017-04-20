@@ -106,12 +106,13 @@ struct TextureInfo
 	GMuint autorelease : 1;
 };
 
+#define ARG_OFFSET(arg, size) arg+size
 enum LightArgs
 {
 	LA_KA = 0,
-	LA_KD = 3,
-	LA_KS = 6,
-	LA_SHINESS = 9,
+	LA_KD = LA_KA,
+	LA_KS = ARG_OFFSET(LA_KD, 3),
+	LA_SHINESS = ARG_OFFSET(LA_KS, 3),
 	LA_END,
 };
 
