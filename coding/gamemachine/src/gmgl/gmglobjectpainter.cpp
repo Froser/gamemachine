@@ -24,20 +24,6 @@ static GLenum getMode(ChildObject* obj)
 	}
 }
 
-static void setUniformVec4(GMGLShaders* s, char* name, GMfloat* value)
-{
-	GLuint loc = glGetUniformLocation(s->getProgram(), name);
-
-	GMfloat vec[4] = { value[0], value[1], value[2], 1.0f };
-	glUniform4fv(loc, 1, vec);
-}
-
-static void setUniformFloat(GMGLShaders* s, char* name, GMfloat value)
-{
-	GLuint loc = glGetUniformLocation(s->getProgram(), name);
-	glUniform1f(loc, value);
-}
-
 GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* objs)
 	: ObjectPainter(objs)
 	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
@@ -151,17 +137,17 @@ void GMGLObjectPainter::activateLight(LightType t, LightInfo& light, ChildObject
 	{
 	case gm::LT_AMBIENT:
 		{
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_AMBIENT, light.on ? &light.lightColor[0] : &(m_world->getDefaultAmbientLight().lightColor)[0]);
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KA, light.on ? &light.args[LA_KA] : &m_world->getDefaultAmbientLight().args[LA_KA]);
+			GMGL::uniformVec3(*gmglShaders, light.on ? &light.lightColor[0] : &(m_world->getDefaultAmbientLight().lightColor)[0], GMSHADER_LIGHT_AMBIENT);
+			GMGL::uniformVec3(*gmglShaders, light.on ? &light.args[LA_KA] : &m_world->getDefaultAmbientLight().args[LA_KA], GMSHADER_LIGHT_KA);
 		}
 		break;
 	case gm::LT_SPECULAR:
 		{
 			GMfloat zero[3] = { 0 };
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_SPECULAR, light.on ? &light.lightColor[0] : zero);
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KD, light.on ? &light.args[LA_KD] : zero);
-			setUniformVec4(gmglShaders, GMSHADER_LIGHT_KS, light.on ? &light.args[LA_KS] : zero);
-			setUniformFloat(gmglShaders, GMSHADER_LIGHT_SHININESS, light.on ? light.args[LA_SHINESS] : 0.f);
+			GMGL::uniformVec3(*gmglShaders, light.on ? &light.lightColor[0] : zero, GMSHADER_LIGHT_SPECULAR);
+			GMGL::uniformVec3(*gmglShaders, light.on ? &light.args[LA_KD] : zero, GMSHADER_LIGHT_KD);
+			GMGL::uniformVec3(*gmglShaders, light.on ? &light.args[LA_KS] : zero, GMSHADER_LIGHT_KS);
+			GMGL::uniformFloat(*gmglShaders, light.on ? light.args[LA_SHINESS] : 0.f, GMSHADER_LIGHT_SHININESS);
 		}
 		break;
 	default:

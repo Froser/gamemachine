@@ -18,6 +18,8 @@ struct GMGL
 	static void uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixName);
 	static void uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textureName);
 	static void uniformInt(GMGLShaders& shaders, int value, const char* name);
+	static void uniformVec3(GMGLShaders& s, GMfloat* value, char* name);
+	static void uniformFloat(GMGLShaders& s, GMfloat value, char* name);
 };
 
 END_NS

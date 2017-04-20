@@ -24,9 +24,7 @@ void calcCoords()
 {
     position_world = GM_model_matrix * position;
     vec4 position_eye = GM_view_matrix * position_world;
-
     gl_Position = GM_projection_matrix * position_eye;
-
     shadowCoord = GM_shadow_matrix * position_world;
     _normal = normal;
     _tangent = tangent;

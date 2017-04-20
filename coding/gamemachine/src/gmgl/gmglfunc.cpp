@@ -66,3 +66,19 @@ void GMGL::uniformInt(GMGLShaders& shaders, int value, const char* name)
 	glUniform1i(loc, value);
 	ASSERT_GL();
 }
+
+void GMGL::uniformVec3(GMGLShaders& s, GMfloat* value, char* name)
+{
+	GLuint loc = glGetUniformLocation(s.getProgram(), name);
+
+	GMfloat vec[4] = { value[0], value[1], value[2] };
+	glUniform3fv(loc, 1, vec);
+}
+
+void GMGL::uniformFloat(GMGLShaders& shaders, GMfloat value, char* name)
+{
+	GLint loc = glGetUniformLocation(shaders.getProgram(), name);
+	ASSERT_GL();
+	glUniform1f(loc, value);
+	ASSERT_GL();
+}
