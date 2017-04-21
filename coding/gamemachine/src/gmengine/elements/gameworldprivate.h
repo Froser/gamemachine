@@ -11,9 +11,11 @@ BEGIN_NS
 class GameObject;
 class Character;
 class GameMachine;
+class GamePackage;
 struct GameWorldPrivate
 {
 	GameWorldPrivate();
+	GamePackage* gamePackage;
 	GameMachine* gameMachine;
 	std::vector<GameObject*> shapes;
 	Character* character;

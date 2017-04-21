@@ -26,14 +26,13 @@ BSP::BSP()
 BSP::~BSP()
 {
 	D(d);
-	free(d.buffer);
+	delete d.buffer;
 }
 
-void BSP::loadBsp(const char* filename)
+void BSP::loadBsp(AUTORELEASE GMbyte* buffer)
 {
 	D(d);
-	d.filename = filename;
-	readFile();
+	d.buffer = buffer;
 	swapBsp();
 	parseEntities();
 	toGLCoord();
@@ -44,27 +43,6 @@ BSPData& BSP::bspData()
 {
 	D(d);
 	return d;
-}
-
-void BSP::readFile()
-{
-	D(d);
-	FILE* file = nullptr;
-	fopen_s(&file, d.filename.c_str(), "rb");
-	if (file)
-	{
-		GMuint size;
-		if (fseek(file, 0, SEEK_END) || (size = ftell(file)) == EOF || fseek(file, 0, SEEK_SET))
-		{
-			gm_error("Cannot get filesize.");
-			goto FINALLY;
-		}
-		d.buffer = malloc(size + 1);
-		fread(d.buffer, 1, size, file);
-	}
-
-FINALLY:
-	fclose(file);
 }
 
 void BSP::swapBsp()

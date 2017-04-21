@@ -19,6 +19,12 @@ GamePackageData& GamePackage::gamePackageData()
 	return d;
 }
 
+IGamePackageHandler* GamePackage::getHandler()
+{
+	D(d);
+	return d.handler;
+}
+
 void GamePackage::loadPackage(const char* path)
 {
 	// TODO 可能读取多个pk，分优先级
@@ -49,16 +55,23 @@ void GamePackage::loadPackage(const char* path)
 	d.handler->init();
 }
 
-void GamePackage::createBSPGameWorld(const char* bspPath, OUT BSPGameWorld** gameWorld)
+void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld)
 {
 	D(d);
 	ASSERT(gameWorld);
 
-	BSPGameWorld* world = new BSPGameWorld();
+	BSPGameWorld* world = new BSPGameWorld(this);
 	*gameWorld = world;
 
 	IFactory* factory = d.gameMachine->getFactory();
 	IGraphicEngine* engine = d.gameMachine->getGraphicEngine();
 	world->setGameMachine(d.gameMachine);
-	world->loadBSP(bspPath);
+	world->loadBSP(path(PI_MAPS, map).c_str());
+}
+
+std::string GamePackage::path(PackageIndex index, const char* filename)
+{
+	D(d);
+	ASSERT(d.handler);
+	return d.handler->pathRoot(index) + filename;
 }

@@ -4,11 +4,6 @@
 #include "gmdatacore/gamepackage.h"
 BEGIN_NS
 
-enum GMGLGamePackageFileType
-{
-	GMPF_SHADERS, //GLSL着色器
-};
-
 class DefaultGMGLGamePackageHandler : public IGamePackageHandler
 {
 public:
@@ -16,10 +11,8 @@ public:
 
 public:
 	virtual void init() override;
-	virtual GMbyte* readFileFromPath(const char* path) override;
-
-private:
-	virtual GMbyte* readFileFromPath(GMGLGamePackageFileType type, const char* path);
+	virtual void readFileFromPath(const char* path, OUT GMbyte** buffer) override;
+	std::string pathRoot(PackageIndex index);
 
 private:
 	GamePackage* m_pk;

@@ -9,18 +9,22 @@
 #include "utilities/path.h"
 #include "gmdatacore/imagebuffer.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
+#include "gmdatacore/gamepackage.h"
 
-BSPGameWorld::BSPGameWorld()
+BSPGameWorld::BSPGameWorld(GamePackage* pk)
+	: GameWorld(pk)
 {
 	D(d);
 	d.physics.reset(new BSPPhysicsWorld(this));
 }
 
-void BSPGameWorld::loadBSP(const char* bspPath)
+void BSPGameWorld::loadBSP(const char* mapPath)
 {
 	D(d);
-	d.bspWorkingDirectory = Path::directoryName(bspPath);
-	d.bsp.loadBsp(bspPath);
+	D_BASE(GameWorld, db);
+	GMbyte* bspBinaryBuffer = nullptr;
+	db.gamePackage->getHandler()->readFileFromPath(mapPath, &bspBinaryBuffer);
+	d.bsp.loadBsp(bspBinaryBuffer);
 	importBSP();
 }
 
@@ -388,16 +392,16 @@ void BSPGameWorld::importBSP()
 void BSPGameWorld::initShaders()
 {
 	D(d);
-	//TODO
-	std::string scrPath(d.bspWorkingDirectory);
-	scrPath.append("scr/");
-	d.shaderLoader.init(scrPath.c_str(), this, &d.render.renderData());
+	D_BASE(GameWorld, db);
+	std::string texShadersPath = db.gamePackage->path(PI_TEXSHADERS, "");
+	d.shaderLoader.init(texShadersPath.c_str(), this, &d.render.renderData());
 	d.shaderLoader.load();
 }
 
 void BSPGameWorld::initTextures()
 {
 	D(d);
+	D_BASE(GameWorld, db);
 	BSPData& bsp = d.bsp.bspData();
 
 	IFactory* factory = getGameMachine()->getFactory();
@@ -411,8 +415,7 @@ void BSPGameWorld::initTextures()
 			continue;
 
 		Image* tex = nullptr;
-		std::string fn = d.bspWorkingDirectory;
-		fn.append(shader.shader);
+		std::string fn = db.gamePackage->path(PI_TEXTURES, shader.shader);
 
 		if (findTexture(fn.c_str(), &tex))
 		{
@@ -525,12 +528,6 @@ void BSPGameWorld::prepareFaces()
 		if (rd.faceDirectory[i].faceType == MST_PATCH)
 			preparePatch(rd.faceDirectory[i].typeFaceNumber);
 	}
-}
-
-const char* BSPGameWorld::bspWorkingDirectory()
-{
-	D(d);
-	return d.bspWorkingDirectory.c_str();
 }
 
 BSPData& BSPGameWorld::bspData()

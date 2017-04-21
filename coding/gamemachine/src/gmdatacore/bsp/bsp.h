@@ -187,7 +187,6 @@ struct BSPPrivate
 	}
 
 	void* buffer;
-	std::string filename;
 	BSPHeader* header;
 	GMint numentities;
 	std::vector<BSPEntity> entities;
@@ -248,11 +247,10 @@ public:
 	~BSP();
 
 public:
-	void loadBsp(const char* filename);
+	void loadBsp(AUTORELEASE GMbyte* buffer);
 	BSPData& bspData();
 
 private:
-	void readFile();
 	void swapBsp();
 	void toGLCoord();
 	void parseFromMemory(char *buffer, int size);

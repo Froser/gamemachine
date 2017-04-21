@@ -21,7 +21,6 @@ struct BSPGameWorldPrivate
 
 	AutoPtr<BSPPhysicsWorld> physics;
 	BSP bsp;
-	std::string bspWorkingDirectory;
 	GameObject* sky;
 
 	// list to be drawn each frame

@@ -44,21 +44,7 @@ public:
 		m_input.initMouse(m_gm->getWindow());
 		GamePackage pk(m_gm, &factory);
 		pk.loadPackage("D:/gmpk");
-		pk.createBSPGameWorld("D:/gv.bsp", &world);
-
-#if _DEBUG
-		std::string currentPath("D:/shaders/test/");
-		std::string shaderPath("D:/shaders/test/");
-		//GameWorldCreator::createBSPGameWorld(m_gm, "D:/gv.bsp", &world);
-#else
-		std::string currentPath(Path::getCurrentPath());
-		std::string shaderPath(currentPath);
-		shaderPath.append("shaders/");
-		std::string demoPath(currentPath);
-		demoPath.append("gv.bsp");
-		GameWorldCreator::createBSPGameWorld(m_gm, demoPath.c_str(), &world);
-#endif
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(m_gm->getGraphicEngine());
+		pk.createBSPGameWorld("gv.bsp", &world);
 
 		/*
 		{

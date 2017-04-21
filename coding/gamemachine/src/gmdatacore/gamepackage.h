@@ -5,10 +5,20 @@
 #include "utilities/autoptr.h"
 BEGIN_NS
 
+enum PackageIndex
+{
+	PI_MAPS,
+	PI_SHADERS,
+	PI_TEXSHADERS,
+	PI_TEXTURES,
+};
+
+class BSPGameWorld;
 struct IGamePackageHandler
 {
 	virtual void init() = 0;
-	virtual GMbyte* readFileFromPath(const char* path) = 0;
+	virtual void readFileFromPath(const char* path, OUT GMbyte** buffer) = 0;
+	virtual std::string pathRoot(PackageIndex index) = 0;
 };
 
 struct IFactory;
@@ -32,8 +42,10 @@ public:
 
 public:
 	GamePackageData& gamePackageData();
+	IGamePackageHandler* getHandler();
 	void loadPackage(const char* path);
-	void createBSPGameWorld(const char* bspPath, OUT BSPGameWorld** gameWorld);
+	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
+	std::string path(PackageIndex index, const char* filename);
 };
 
 END_NS

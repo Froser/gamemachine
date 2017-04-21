@@ -6,15 +6,14 @@
 #include "gmengine/controllers/resource_container.h"
 BEGIN_NS
 
-struct Material;
 class BSPGameWorld : public GameWorld
 {
 	DEFINE_PRIVATE(BSPGameWorld);
 public:
-	BSPGameWorld();
+	BSPGameWorld(GamePackage* pk);
 
 public:
-	void loadBSP(const char* bspPath);
+	void loadBSP(const char* mapPath);
 	void setSky(AUTORELEASE GameObject* sky);
 	GameObject* getSky();
 
@@ -55,7 +54,6 @@ private:
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
 public:
-	const char* bspWorkingDirectory();
 	BSPData& bspData();
 	BSPRenderData& renderData();
 };

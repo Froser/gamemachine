@@ -80,9 +80,8 @@
 	</item>
 	<item name="textures/base_wall/atech2_c">
 		<map>textures/base_wall/atech2_c.jpg</map>
-		<normalmap>textures/base_wall/atech2_c.jpg</normalmap>
 		<lights>
-			<light type="specular" color="1.f 1.f 1.f" position="100 100 100" />
+			<light type="specular" color=".6f .6f .6f" ks=".1 .1 .1" kd="0 0 0" shininess="2" position="10 10 10" />
 		</lights>
 	</item>
 </gmshader>

@@ -9,8 +9,10 @@
 #include <algorithm>
 #include "gmengine/controllers/factory.h"
 
-GameWorld::GameWorld()
+GameWorld::GameWorld(GamePackage* pk)
 {
+	D(d);
+	d.gamePackage = pk;
 }
 
 GameWorld::~GameWorld()
@@ -81,6 +83,12 @@ GameMachine* GameWorld::getGameMachine()
 {
 	D(d);
 	return d.gameMachine;
+}
+
+GamePackage* GameWorld::getGamePackage()
+{
+	D(d);
+	return d.gamePackage;
 }
 
 GMfloat GameWorld::getElapsed()

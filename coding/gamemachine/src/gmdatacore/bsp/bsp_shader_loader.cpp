@@ -11,6 +11,7 @@
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"
 #include "gmengine/elements/skygameobject.h"
+#include "gmdatacore/gamepackage.h"
 
 #define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
 #define BEGIN_PARSE_I(name, i) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it, i)
@@ -132,8 +133,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 	const TextureContainer::TextureItem* item = tc.find(name);
 	if (!item)
 	{
-		std::string fn = m_world->bspWorkingDirectory();
-		fn.append(name);
+		std::string fn = m_world->getGamePackage()->path(PI_TEXTURES, name);
 		Image* img = nullptr;
 		loadImage(fn.c_str(), &img);
 

@@ -5,6 +5,10 @@
 #include "gmengine/controllers/gamemachine.h"
 #include <string>
 #include "utilities/path.h"
+#include <fstream>
+#include "gmengine/elements/bspgameworld.h"
+
+#define PKD(d) GamePackageData& d = m_pk->gamePackageData();
 
 DefaultGMGLGamePackageHandler::DefaultGMGLGamePackageHandler(GamePackage* pk)
 	: m_pk(pk)
@@ -12,14 +16,27 @@ DefaultGMGLGamePackageHandler::DefaultGMGLGamePackageHandler(GamePackage* pk)
 
 }
 
-GMbyte* DefaultGMGLGamePackageHandler::readFileFromPath(const char* path)
+void DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, OUT GMbyte** buffer)
 {
-	return nullptr;
+	std::ifstream file;
+	file.open(path, std::ios::in | std::ios::binary);
+	if (file.good())
+	{
+		file.seekg(0, std::ios::end);
+		GMint size = file.tellg();
+		*buffer = (GMbyte*)malloc(size + 1);
+		file.seekg(0);
+		file.read((char*)(*buffer), size + 1);
+	}
+	else
+	{
+		ASSERT(false);
+	}
 }
 
 void DefaultGMGLGamePackageHandler::init()
 {
-	GamePackageData& d = m_pk->gamePackageData();
+	PKD(d);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d.gameMachine->getGraphicEngine());
 
 	// 装载所有shaders
@@ -33,8 +50,8 @@ void DefaultGMGLGamePackageHandler::init()
 	{
 		GMGLShaders* shaders = new GMGLShaders();
 		
-		std::string vert = d.packagePath + shaderMap[i] + ".vert",
-			frag = d.packagePath + shaderMap[i] + ".vert";
+		std::string vert = pathRoot(PI_SHADERS) + shaderMap[i] + ".vert",
+			frag = pathRoot(PI_SHADERS) + shaderMap[i] + ".frag";
 		GMGLShaderInfo shadersInfo[] = {
 			{ GL_VERTEX_SHADER, vert.c_str() },
 			{ GL_FRAGMENT_SHADER, frag.c_str() },
@@ -42,11 +59,28 @@ void DefaultGMGLGamePackageHandler::init()
 
 		shaders->appendShader(shadersInfo[0]);
 		shaders->appendShader(shadersInfo[1]);
-		engine->registerShader(ChildObject::NormalObject, shaders);
+		shaders->load();
+		engine->registerShader((ChildObject::ObjectType)i, shaders);
 	}
 }
 
-GMbyte* DefaultGMGLGamePackageHandler::readFileFromPath(GMGLGamePackageFileType type, const char* path)
+std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 {
-	return nullptr;
+	PKD(d);
+
+	switch (index)
+	{
+	case PI_MAPS:
+		return d.packagePath + "maps/";
+	case PI_SHADERS:
+		return d.packagePath + "shaders/";
+	case PI_TEXSHADERS:
+		return d.packagePath + "texshaders/";
+	case PI_TEXTURES:
+		return d.packagePath + "textures/";
+	default:
+		ASSERT(false);
+		break;
+	}
+	return "";
 }

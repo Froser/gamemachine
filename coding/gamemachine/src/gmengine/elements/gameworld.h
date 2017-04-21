@@ -13,7 +13,7 @@ class GameWorld
 {
 	DEFINE_PRIVATE(GameWorld)
 public:
-	GameWorld();
+	GameWorld(GamePackage* pk);
 	virtual ~GameWorld();
 
 public:
@@ -27,6 +27,7 @@ public:
 	IGraphicEngine* getGraphicEngine();
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();
+	GamePackage* getGamePackage();
 	GMfloat getElapsed();
 	void setDefaultAmbientLight(const LightInfo& lightInfo);
 	LightInfo& getDefaultAmbientLight();
