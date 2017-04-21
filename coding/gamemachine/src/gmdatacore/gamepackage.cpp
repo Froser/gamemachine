@@ -30,17 +30,19 @@ void GamePackage::loadPackage(const char* path)
 	// TODO 可能读取多个pk，分优先级
 	// 这个以后再做
 	D(d);
+	size_t len = strlen(path);
+	char path_temp[255];
+	strcpy_s(path_temp, path);
+	if (path_temp[len - 1] == '/' || path_temp[len - 1] == '\\')
+		*(path_temp + len - 1) = 0;
+
 	struct stat s;
-	stat(path, &s);
+	stat(path_temp, &s);
 
 	if ((s.st_mode & S_IFMT) == S_IFDIR)
 	{
 		// 读取整个目录
-		size_t len = strlen(path);
-		if (path[len - 2] == '/' || path[len - 2] == '\\')
-			d.packagePath = path;
-		else
-			d.packagePath = std::string(path) + '/';
+		d.packagePath = std::string(path_temp) + '/';
 
 		IGamePackageHandler* handler = nullptr;
 		d.factory->createGamePackage(this, &handler);
