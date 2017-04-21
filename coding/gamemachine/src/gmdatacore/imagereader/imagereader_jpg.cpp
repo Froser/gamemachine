@@ -9,7 +9,7 @@ extern "C"
 	#include "jpeglib.h"
 }
 
-bool ImageReader_JPG::load(const char* filename, OUT Image** image)
+bool ImageReader_JPG::load(const GMbyte* data, OUT Image** image)
 {
 	FILE* file = nullptr;
 	fopen_s(&file, filename, "rb");
@@ -18,16 +18,16 @@ bool ImageReader_JPG::load(const char* filename, OUT Image** image)
 
 	Image* img = new Image();
 	*image = img;
-	ImageData& data = img->getData();
+	ImageData& imgData = img->getData();
 	//init image data
-	data.target = GL_TEXTURE_2D;
-	data.mipLevels = 1;
-	data.format = GL_RGB16;
-	data.swizzle[0] = GL_RED;
-	data.swizzle[1] = GL_GREEN;
-	data.swizzle[2] = GL_BLUE;
-	data.swizzle[3] = GL_ALPHA;
-	data.type = GL_UNSIGNED_BYTE;
+	imgData.target = GL_TEXTURE_2D;
+	imgData.mipLevels = 1;
+	imgData.format = GL_RGB16;
+	imgData.swizzle[0] = GL_RED;
+	imgData.swizzle[1] = GL_GREEN;
+	imgData.swizzle[2] = GL_BLUE;
+	imgData.swizzle[3] = GL_ALPHA;
+	imgData.type = GL_UNSIGNED_BYTE;
 
 	//Create struct
 	struct jpeg_decompress_struct cinfo;
@@ -54,27 +54,27 @@ bool ImageReader_JPG::load(const char* filename, OUT Image** image)
 	//get the number of color channels
 	int channels = cinfo.num_components;
 
-	data.mip[0].depth = channels * 8;
-	data.mip[0].width = cinfo.image_width;
-	data.mip[0].height = cinfo.image_height;
+	imgData.mip[0].depth = channels * 8;
+	imgData.mip[0].width = cinfo.image_width;
+	imgData.mip[0].height = cinfo.image_height;
 
-	if (data.mip[0].depth == 32)
+	if (imgData.mip[0].depth == 32)
 	{
-		data.format = GL_RGBA;
-		data.internalFormat = GL_RGBA8;
+		imgData.format = GL_RGBA;
+		imgData.internalFormat = GL_RGBA8;
 	}
 	else
 	{
-		data.format = GL_RGB;
-		data.internalFormat = GL_RGB8;
+		imgData.format = GL_RGB;
+		imgData.internalFormat = GL_RGB8;
 	}
 
-	data.mip[0].data = new GMbyte[data.mip[0].width * data.mip[0].height * channels];
+	imgData.mip[0].data = new GMbyte[imgData.mip[0].width * imgData.mip[0].height * channels];
 
-	GMbyte** rowPtr = new GMbyte*[data.mip[0].height];
+	GMbyte** rowPtr = new GMbyte*[imgData.mip[0].height];
 
-	for (GMint i = 0; i < data.mip[0].height; ++i)
-		rowPtr[i] = &(data.mip[0].data[i * data.mip[0].width * channels]);
+	for (GMint i = 0; i < imgData.mip[0].height; ++i)
+		rowPtr[i] = &(imgData.mip[0].data[i * imgData.mip[0].width * channels]);
 
 	//Extract the pixel data
 	int rowsRead = 0;
@@ -98,17 +98,7 @@ bool ImageReader_JPG::load(const char* filename, OUT Image** image)
 	return true;
 }
 
-bool ImageReader_JPG::test(const char* filename)
+bool ImageReader_JPG::test(const GMbyte* data)
 {
-	std::ifstream file;
-	file.open(filename, std::ios::in | std::ios::binary);
-	if (file.good())
-	{
-		char jpgeHead[1];
-		file.read(jpgeHead, 1);
-		file.close();
-		return jpgeHead[0] == (char) 0xff;
-	}
-	file.close();
-	return false;
+	return data[1] == (char) 0xff;
 }

@@ -16,8 +16,8 @@ class Image;
 class ImageReader_PNG : public IImageReader
 {
 public:
-	virtual bool load(const char* filename, OUT Image** img) override;
-	virtual bool test(const char* filename) override;
+	virtual bool load(const GMbyte* data, OUT Image** img) override;
+	virtual bool test(const GMbyte* data) override;
 
 private:
 	void writeDataToImage(PngData& png, Image* img);

@@ -365,12 +365,12 @@ bool TGAImage::scale(int w, int h) {
 }
 
 
-bool ImageReader_TGA::load(const char* filename, OUT Image** img)
+bool ImageReader_TGA::load(const GMbyte* data, OUT Image** img)
 {
 	ASSERT(img);
 	*img = new Image();
 	TGAImage tga;
-	bool b = tga.read_tga_file(filename);
+	bool b = tga.read_tga_file(data);
 	if (b)
 	{
 		tga.flip_vertically();
@@ -379,10 +379,9 @@ bool ImageReader_TGA::load(const char* filename, OUT Image** img)
 	return b;
 }
 
-bool ImageReader_TGA::test(const char* filename)
+bool ImageReader_TGA::test(const GMbyte* data)
 {
-	std::string strFilename(filename);
-	return endsWith(strFilename, ".tga");
+	return data[0] == 0 && data[1] == 0;
 }
 
 void ImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)

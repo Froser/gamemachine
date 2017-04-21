@@ -22,9 +22,9 @@ void BSPGameWorld::loadBSP(const char* mapPath)
 {
 	D(d);
 	D_BASE(GameWorld, db);
-	GMbyte* bspBinaryBuffer = nullptr;
-	db.gamePackage->getHandler()->readFileFromPath(mapPath, &bspBinaryBuffer);
-	d.bsp.loadBsp(bspBinaryBuffer);
+	GamePackageBuffer buffer;
+	db.gamePackage->getHandler()->readFileFromPath(mapPath, &buffer);
+	d.bsp.loadBsp(buffer.buffer);
 	importBSP();
 }
 
@@ -445,6 +445,7 @@ bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 		".bmp"
 	};
 	static GMint dem = sizeof(priorities) / maxChars / sizeof(GMbyte);
+	GamePackage* pk = getGamePackage();
 
 	for (GMint i = 0; i < dem; i++)
 	{

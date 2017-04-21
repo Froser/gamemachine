@@ -25,8 +25,24 @@ void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectP
 	(*painter) = new GMGLObjectPainter(gmglEngine, *gmglEngine->getShadowMapping(), obj);
 }
 
-void gm::GMGLFactory::createGamePackage(GamePackage* pk, OUT IGamePackageHandler** handler)
+void GMGLFactory::createGamePackage(GamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)
 {
-	DefaultGMGLGamePackageHandler* h = new DefaultGMGLGamePackageHandler(pk);
-	*handler = h;
+	switch (t)
+	{
+	case gm::GPT_DIRECTORY:
+		{
+			DefaultGMGLGamePackageHandler* h = new DefaultGMGLGamePackageHandler(pk);
+			*handler = h;
+		}
+		break;
+	case gm::GPT_ZIP:
+		{
+			ZipGMGLGamePackageHandler* h = new ZipGMGLGamePackageHandler(pk);
+			*handler = h;
+		}
+		break;
+	default:
+		ASSERT(false);
+		break;
+	}
 }

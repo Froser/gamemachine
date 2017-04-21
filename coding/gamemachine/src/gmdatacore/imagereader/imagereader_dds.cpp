@@ -645,7 +645,7 @@ done_close_file:
 	return bSuc;
 }
 
-bool ImageReader_DDS::load(const char* filename, OUT Image** img)
+bool ImageReader_DDS::load(const GMbyte* data, OUT Image** img)
 {
 	Image* image;
 	if (img)
@@ -661,18 +661,8 @@ bool ImageReader_DDS::load(const char* filename, OUT Image** img)
 	return loadDDS(filename, &image->getData());
 }
 
-bool ImageReader_DDS::test(const char* filename)
+bool ImageReader_DDS::test(const GMbyte* data)
 {
-	FILE* f;
-#if _WINDOWS
-	fopen_s(&f, filename, "rb");
-#else
-	f = fopen(filename, "rb");
-#endif
-	if (f == NULL)
-		return false;
-	DDS_FILE_HEADER file_header = { 0, };
-	fread(&file_header, sizeof(file_header.magic) + sizeof(file_header.std_header), 1, f);
-	fclose(f);
-	return file_header.magic == DDS_MAGIC;
+	const DDS_FILE_HEADER* file_header = reinterpret_cast<const DDS_FILE_HEADER*>(data);
+	return file_header->magic == DDS_MAGIC;
 }

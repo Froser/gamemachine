@@ -7,19 +7,19 @@ BEGIN_NS
 class Image;
 struct IImageReader
 {
-	virtual bool load(const char* filename, OUT Image** image) = 0;
-	virtual bool test(const char* filename) = 0;
+	virtual bool load(const GMbyte* data, OUT Image** image) = 0;
+	virtual bool test(const GMbyte* data) = 0;
 };
 
 class ImageReader
 {
 public:
-	static bool load(const char* filename, OUT Image** image);
-	static bool load(const char* filename, ImageType type, OUT Image** image);
+	static bool load(const GMbyte* data, OUT Image** image);
+	static bool load(const GMbyte* data, ImageType type, OUT Image** image);
 	static IImageReader* getReader(ImageType type);
 
 private:
-	static ImageType test(const char* filename);
+	static ImageType test(const GMbyte* data);
 };
 
 END_NS

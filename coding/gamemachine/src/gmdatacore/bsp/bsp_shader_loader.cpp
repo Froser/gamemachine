@@ -83,9 +83,9 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
-static void loadImage(const char* filename, OUT Image** image)
+static void loadImage(const char* filename, const GMbyte* data, OUT Image** image)
 {
-	if (ImageReader::load(filename, image))
+	if (ImageReader::load(data, image))
 		gm_info("loaded texture %s from shader", filename);
 	else
 		gm_error("texture %s not found", filename);
@@ -133,9 +133,14 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 	const TextureContainer::TextureItem* item = tc.find(name);
 	if (!item)
 	{
-		std::string fn = m_world->getGamePackage()->path(PI_TEXTURES, name);
+		GamePackage* pk = m_world->getGamePackage();
+		std::string fn = pk->path(PI_TEXTURES, name);
+
+		GamePackageBuffer buf;
+		pk->readFileFromPath(fn.c_str(), &buf);
+
 		Image* img = nullptr;
-		loadImage(fn.c_str(), &img);
+		loadImage(fn.c_str(), buf.buffer, &img);
 
 		if (img)
 		{
@@ -159,11 +164,15 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 
 void BSPShaderLoader::load()
 {
-	std::vector<std::string> files = Path::getAllFiles(m_directory.c_str());
+	GamePackage* pk = m_world->getGamePackage();
+	std::vector<std::string> files = pk->getAllFiles(m_directory.c_str());
+
 	// load all item tag, but not parse them until item is needed
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
-		parse((*iter).c_str());
+		GamePackageBuffer buf;
+		pk->readFileFromPath((*iter).c_str(), &buf);
+		parse((const char*) buf.buffer);
 	}
 }
 
@@ -178,11 +187,10 @@ bool BSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* 
 	return true;
 }
 
-void BSPShaderLoader::parse(const char* filename)
+void BSPShaderLoader::parse(const char* data)
 {
 	TiXmlDocument* doc = new TiXmlDocument();
-
-	if (!doc->LoadFile(filename))
+	if (!doc->Parse(data))
 	{
 		gm_error("xml load error at %d: %s", doc->ErrorRow(), doc->ErrorDesc());
 		delete doc;

@@ -27,7 +27,7 @@ public:
 	// parsers:
 private:
 	ITexture* addTextureToTextureContainer(const char* name);
-	void parse(const char* filename);
+	void parse(const char* data);
 	void parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr);
 	void parseStart();
 	void parseEnd();

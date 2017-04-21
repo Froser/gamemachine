@@ -10,8 +10,8 @@ struct BitmapFile;
 class ImageReader_BMP : public IImageReader
 {
 public:
-	virtual bool load(const char* filename, OUT Image** img) override;
-	virtual bool test(const char* filename) override;
+	virtual bool load(const GMbyte* byte, OUT Image** img) override;
+	virtual bool test(const GMbyte* byte) override;
 
 private:
 	void writeDataToImage(BitmapFile& bitmap, Image* img);

@@ -31,7 +31,7 @@ void GamePackage::loadPackage(const char* path)
 	// 这个以后再做
 	D(d);
 	size_t len = strlen(path);
-	char path_temp[255];
+	char path_temp[FILENAME_MAX];
 	strcpy_s(path_temp, path);
 	if (path_temp[len - 1] == '/' || path_temp[len - 1] == '\\')
 		*(path_temp + len - 1) = 0;
@@ -39,21 +39,20 @@ void GamePackage::loadPackage(const char* path)
 	struct stat s;
 	stat(path_temp, &s);
 
+	IGamePackageHandler* handler = nullptr;
 	if ((s.st_mode & S_IFMT) == S_IFDIR)
 	{
 		// 读取整个目录
 		d.packagePath = std::string(path_temp) + '/';
-
-		IGamePackageHandler* handler = nullptr;
-		d.factory->createGamePackage(this, &handler);
-		d.handler.reset(handler);
+		d.factory->createGamePackage(this, GPT_DIRECTORY, &handler);
 	}
 	else
 	{
-		// 可能是.7z等情况
-		ASSERT(false);
+		d.packagePath = std::string(path_temp);
+		d.factory->createGamePackage(this, GPT_ZIP, &handler);
 	}
 
+	d.handler.reset(handler);
 	d.handler->init();
 }
 
@@ -71,9 +70,23 @@ void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWor
 	world->loadBSP(path(PI_MAPS, map).c_str());
 }
 
+void GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+{
+	D(d);
+	ASSERT(d.handler);
+	return d.handler->readFileFromPath(path, buffer);
+}
+
 std::string GamePackage::path(PackageIndex index, const char* filename)
 {
 	D(d);
 	ASSERT(d.handler);
 	return d.handler->pathRoot(index) + filename;
+}
+
+std::vector<std::string> GamePackage::getAllFiles(const char* directory)
+{
+	D(d);
+	ASSERT(d.handler);
+	return d.handler->getAllFiles(directory);
 }

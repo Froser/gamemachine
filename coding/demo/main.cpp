@@ -20,6 +20,8 @@
 #include "utilities/input.h"
 #include "gmdatacore/gamepackage.h"
 
+#include "contrib/minizip/unzip.h"
+
 using namespace gm;
 
 BSPGameWorld* world;
@@ -43,7 +45,7 @@ public:
 	{
 		m_input.initMouse(m_gm->getWindow());
 		GamePackage pk(m_gm, &factory);
-		pk.loadPackage("D:/gmpk");
+		pk.loadPackage("D:/gmpk.pk0");
 		pk.createBSPGameWorld("gv.bsp", &world);
 
 		/*

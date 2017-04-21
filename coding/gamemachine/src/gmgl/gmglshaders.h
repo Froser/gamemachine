@@ -7,7 +7,7 @@ BEGIN_NS
 struct GMGLShaderInfo
 {
 	GLenum type;
-	const char* filename;
+	const char* data;
 	GLuint shader;
 };
 

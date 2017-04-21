@@ -16,7 +16,7 @@ public:
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;
 	virtual void createTexture(Image* image, OUT ITexture** texture) override;
 	virtual void createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectPainter** painter) override;
-	virtual void createGamePackage(GamePackage* pk, OUT IGamePackageHandler** handler) override;
+	virtual void createGamePackage(GamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler) override;
 };
 
 END_NS

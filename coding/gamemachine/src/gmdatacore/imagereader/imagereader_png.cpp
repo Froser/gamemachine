@@ -7,7 +7,7 @@
 
 #define PNG_BYTES_TO_CHECK 4
 
-bool loadPng(const char *filepath, PngData *out, bool flip = false)
+bool loadPng(const GMbyte* data, PngData *out, bool flip = false)
 {
 	FILE *pic_fp = nullptr;
 	fopen_s(&pic_fp, filepath, "rb");
@@ -106,30 +106,22 @@ struct PNGTestHeader
 	DWORD magic1, magic2;
 };
 
-bool ImageReader_PNG::load(const char* filename, OUT Image** img)
+bool ImageReader_PNG::load(const GMbyte* data, OUT Image** img)
 {
 	ASSERT(img);
 	*img = new Image();
 
-	PngData data;
-	bool b = loadPng(filename, &data, true);
-	writeDataToImage(data, *img);
+	PngData png;
+	bool b = loadPng(data, &png, true);
+	writeDataToImage(png, *img);
 	return b;
 }
 
-bool ImageReader_PNG::test(const char* filename)
+bool ImageReader_PNG::test(const GMbyte* data)
 {
 	std::ifstream file;
-	file.open(filename, std::ios::in | std::ios::binary);
-	if (file.good())
-	{
-		PNGTestHeader header;
-		file.read(reinterpret_cast<char*>(&header), sizeof(PNGTestHeader));
-		file.close();
-		return header.magic1 == 1196314761 && header.magic2 == 169478669;
-	}
-	file.close();
-	return false;
+	const PNGTestHeader* header = reinterpret_cast<const PNGTestHeader*>(data);
+	return header->magic1 == 1196314761 && header->magic2 == 169478669;
 }
 
 void ImageReader_PNG::writeDataToImage(PngData& png, Image* img)

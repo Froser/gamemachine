@@ -38,20 +38,20 @@ private:
 	std::map<ImageType, IImageReader*> m_readers;
 };
 
-bool ImageReader::load(const char* filename, OUT Image** image)
+bool ImageReader::load(const GMbyte* data, OUT Image** image)
 {
-	return load(filename, ImageType_AUTO, image);
+	return load(data, ImageType_AUTO, image);
 }
 
-bool ImageReader::load(const char* filename, ImageType type, OUT Image** image)
+bool ImageReader::load(const GMbyte* data, ImageType type, OUT Image** image)
 {
 	if (type == ImageType_AUTO)
-		type = test(filename);
+		type = test(data);
 
 	if (type == ImageType_End)
 		return false;
 
-	return getReader(type)->load(filename, image);
+	return getReader(type)->load(data, image);
 }
 
 IImageReader* ImageReader::getReader(ImageType type)
@@ -60,11 +60,11 @@ IImageReader* ImageReader::getReader(ImageType type)
 	return readers.getReader(type);
 }
 
-ImageType ImageReader::test(const char* filename)
+ImageType ImageReader::test(const GMbyte* data)
 {
 	for (ImageType i = ImageType_Begin; i < ImageType_End; i = (ImageType)((GMuint)i + 1))
 	{
-		if (getReader(i)->test(filename))
+		if (getReader(i)->test(data))
 			return i;
 	}
 	return ImageType_End;

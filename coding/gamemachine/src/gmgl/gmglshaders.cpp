@@ -32,34 +32,6 @@ void GMGLShaders::appendShader(const GMGLShaderInfo& shader)
 	m_shaders.push_back(shader);
 }
 
-static const GLchar* readShader(const char* filename)
-{
-#ifdef WIN32
-	FILE* infile;
-	fopen_s(&infile, filename, "rb");
-#else
-	FILE* infile = fopen(filename, "rb");
-#endif // WIN32
-
-	if (!infile) {
-		ASSERT(false);
-		return NULL;
-	}
-
-	fseek(infile, 0, SEEK_END);
-	int len = ftell(infile);
-	fseek(infile, 0, SEEK_SET);
-
-	GLchar* source = new GLchar[len + 1];
-
-	fread(source, 1, len, infile);
-	fclose(infile);
-
-	source[len] = 0;
-
-	return const_cast<const GLchar*>(source);
-}
-
 void GMGLShaders::load()
 {
 	GMGLShadersInfo& shadersInfo = getShaders();
@@ -76,7 +48,7 @@ void GMGLShaders::load()
 		GLuint shader = glCreateShader(entry->type);
 		entry->shader = shader;
 
-		const GLchar* source = readShader(entry->filename);
+		const GLchar* source = entry->data;
 		if (source == NULL)
 		{
 			removeShaders(*this);
@@ -84,8 +56,6 @@ void GMGLShaders::load()
 		}
 
 		glShaderSource(shader, 1, &source, NULL);
-		delete[] source;
-
 		glCompileShader(shader);
 
 		GLint compiled;

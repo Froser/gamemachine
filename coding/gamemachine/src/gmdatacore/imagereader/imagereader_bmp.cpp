@@ -78,7 +78,7 @@ private:
 	BitmapFile m_bitmapFile;
 };
 
-bool ImageReader_BMP::load(const char* filename, OUT Image** img)
+bool ImageReader_BMP::load(const GMbyte* byte, OUT Image** img)
 {
 	ImageBMP* image;
 	if (img)
@@ -120,19 +120,10 @@ bool ImageReader_BMP::load(const char* filename, OUT Image** img)
 	return false;
 }
 
-bool ImageReader_BMP::test(const char* filename)
+bool ImageReader_BMP::test(const GMbyte* byte)
 {
-	std::ifstream file;
-	file.open(filename, std::ios::in | std::ios::binary);
-	if (file.good())
-	{
-		BitmapHeader header;
-		file.read(reinterpret_cast<char*>(&header), sizeof(BitmapHeader));
-		file.close();
-		return header.bfType == 19778;
-	}
-	file.close();
-	return false;
+	BitmapHeader* header = reinterpret_cast<BitmapHeader*>(&header);
+	return header->bfType == 19778;
 }
 
 void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img)

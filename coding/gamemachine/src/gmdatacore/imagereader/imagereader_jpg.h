@@ -6,8 +6,8 @@ BEGIN_NS
 
 class ImageReader_JPG : public IImageReader
 {
-	virtual bool load(const char* filename, OUT Image** image) override;
-	virtual bool test(const char* filename) override;
+	virtual bool load(const GMbyte* data, OUT Image** image) override;
+	virtual bool test(const GMbyte* data) override;
 };
 
 END_NS
