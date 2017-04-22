@@ -75,7 +75,9 @@ bool GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buff
 {
 	D(d);
 	ASSERT(d.handler);
-	return d.handler->readFileFromPath(path, buffer);
+	bool b = d.handler->readFileFromPath(path, buffer);
+	gm_hook2(GamePackage, readFileFromPath, path, buffer);
+	return b;
 }
 
 std::string GamePackage::path(PackageIndex index, const char* filename)

@@ -20,7 +20,7 @@
 #include "utilities/input.h"
 #include "gmdatacore/gamepackage.h"
 
-#include "contrib/minizip/unzip.h"
+#include <fstream>
 
 using namespace gm;
 
@@ -28,6 +28,31 @@ BSPGameWorld* world;
 Character* character;
 GMGLFactory factory;
 GameMachine* gameMachine;
+
+// 这是一个导出所有资源的钩子，用gm_install_hook(GamePackage, readFileFromPath, resOutputHook)绑定此钩子
+// 可以将所有场景中的资源导出到指定目录
+static void resOutputHook(void* path, void* buffer)
+{
+	const char* resPath = (const char*)path;
+	GamePackageBuffer* buf = (GamePackageBuffer*)buffer;
+	if (buf->size == 0)
+		return;
+
+	std::fstream out;
+	std::string p = std::string("D:/output/") + resPath;
+	std::string dir = Path::directoryName(p);
+	dir = dir.substr(0, dir.size() - 1);
+	Path::createDirectory(dir);
+
+	out.open(p, std::ios::out | std::ios::trunc | std::ios::binary);
+	if (out.good())
+	{
+		GMint sz = buf->size;
+		out.seekg(0, std::ios::beg);
+		out.write((char*)buf->buffer, sz);
+		out.close();
+	}
+}
 
 class GameHandler : public IGameHandler
 {
@@ -43,9 +68,14 @@ public:
 
 	void init()
 	{
+		//gm_install_hook(GamePackage, readFileFromPath, resOutputHook);
 		m_input.initMouse(m_gm->getWindow());
 		GamePackage pk(m_gm, &factory);
-		pk.loadPackage("D:/gmpk.pk0");
+#ifdef _DEBUG
+		pk.loadPackage("D:/gm.pk0");
+#else
+		pk.loadPackage((Path::getCurrentPath() + "gm.pk0").c_str());
+#endif
 		pk.createBSPGameWorld("gv.bsp", &world);
 
 		/*

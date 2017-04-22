@@ -23,7 +23,7 @@ void BSPGameWorld::loadBSP(const char* mapPath)
 	D(d);
 	D_BASE(GameWorld, db);
 	GamePackageBuffer buffer;
-	db.gamePackage->getHandler()->readFileFromPath(mapPath, &buffer);
+	db.gamePackage->readFileFromPath(mapPath, &buffer);
 	d.bsp.loadBsp(buffer);
 	importBSP();
 }

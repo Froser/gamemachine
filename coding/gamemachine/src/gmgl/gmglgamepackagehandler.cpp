@@ -59,8 +59,8 @@ void DefaultGMGLGamePackageHandler::init()
 			frag = gamePackage()->path(PI_SHADERS, (shaderMap[i] + ".frag").c_str());
 
 		GamePackageBuffer vertBuf, fragBuf;
-		readFileFromPath(vert.c_str(), &vertBuf);
-		readFileFromPath(frag.c_str(), &fragBuf);
+		gamePackage()->readFileFromPath(vert.c_str(), &vertBuf);
+		gamePackage()->readFileFromPath(frag.c_str(), &fragBuf);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
