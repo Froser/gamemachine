@@ -13,7 +13,7 @@ public:
 
 public:
 	virtual void init() override;
-	virtual void readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
+	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
 	virtual std::vector<std::string> getAllFiles(const char* directory) override;
 
@@ -52,7 +52,7 @@ public:
 
 public:
 	virtual void init() override;
-	virtual void readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
+	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
 	virtual std::vector<std::string> getAllFiles(const char* directory) override;
 

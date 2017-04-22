@@ -5,6 +5,7 @@
 #include "utilities/path.h"
 #include "bsp_interior.inl"
 #include "utilities/scanner.h"
+#include "gmdatacore/gamepackage.h"
 
 static const char* getValue(const BSPEntity* entity, const char* key)
 {
@@ -26,13 +27,14 @@ BSP::BSP()
 BSP::~BSP()
 {
 	D(d);
-	delete d.buffer;
+	delete[] d.buffer;
 }
 
-void BSP::loadBsp(AUTORELEASE GMbyte* buffer)
+void BSP::loadBsp(const GamePackageBuffer& buf)
 {
 	D(d);
-	d.buffer = buffer;
+	d.buffer = new GMbyte[buf.size];
+	memcpy(d.buffer, buf.buffer, buf.size);
 	swapBsp();
 	parseEntities();
 	toGLCoord();

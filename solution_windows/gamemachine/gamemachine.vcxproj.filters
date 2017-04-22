@@ -244,6 +244,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\memorystream.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -434,6 +437,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.cpp">
       <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\memorystream.cpp">
+      <Filter>src\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -35,11 +35,11 @@ enum ImageType
 	ImageType_AUTO,
 
 	ImageType_Begin = 0,
-	ImageType_BMP = ImageType_Begin,
-	ImageType_DDS,
+	ImageType_JPG = ImageType_Begin,
 	ImageType_PNG,
 	ImageType_TGA,
-	ImageType_JPG,
+	ImageType_BMP,
+	ImageType_DDS,
 	ImageType_End,
 };
 

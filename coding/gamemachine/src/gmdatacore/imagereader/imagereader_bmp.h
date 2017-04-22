@@ -10,7 +10,7 @@ struct BitmapFile;
 class ImageReader_BMP : public IImageReader
 {
 public:
-	virtual bool load(const GMbyte* byte, OUT Image** img) override;
+	virtual bool load(const GMbyte* byte, GMuint size, OUT Image** img) override;
 	virtual bool test(const GMbyte* byte) override;
 
 private:

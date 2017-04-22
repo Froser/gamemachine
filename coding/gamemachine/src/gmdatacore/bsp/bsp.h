@@ -186,7 +186,7 @@ struct BSPPrivate
 	{
 	}
 
-	void* buffer;
+	GMbyte* buffer;
 	BSPHeader* header;
 	GMint numentities;
 	std::vector<BSPEntity> entities;
@@ -237,7 +237,7 @@ private:
 };
 
 typedef BSPPrivate BSPData;
-
+struct GamePackageBuffer;
 class BSP
 {
 	DEFINE_PRIVATE(BSP);
@@ -247,7 +247,7 @@ public:
 	~BSP();
 
 public:
-	void loadBsp(AUTORELEASE GMbyte* buffer);
+	void loadBsp(const GamePackageBuffer& buf);
 	BSPData& bspData();
 
 private:

@@ -1,7 +1,7 @@
 #ifndef __IMAGEREADER_TGA_H__
 #define __IMAGEREADER_TGA_H__
 #include "common.h"
-#include <fstream>
+#include <sstream>
 #include "imagereader.h"
 BEGIN_NS
 
@@ -64,15 +64,17 @@ struct TGAColor {
 	}
 };
 
-class TGAImage {
+class MemoryStream;
+class TGAImage
+{
 protected:
-	unsigned char* data;
+	GMbyte* d;
 	int width;
 	int height;
 	int bytespp;
 	size_t nbytes;
 
-	bool load_rle_data(std::ifstream &in);
+	bool load_rle_data(MemoryStream& in);
 	bool unload_rle_data(std::ofstream &out) const;
 public:
 	enum Format {
@@ -82,7 +84,7 @@ public:
 	TGAImage();
 	TGAImage(int w, int h, int bpp);
 	TGAImage(const TGAImage &img);
-	bool read_tga_file(const char *filename);
+	bool read_tga_file(const GMbyte* data, GMuint size);
 	bool write_tga_file(const char *filename, bool rle=true) const;
 	bool flip_horizontally();
 	bool flip_vertically();
@@ -105,7 +107,7 @@ class Image;
 class ImageReader_TGA : public IImageReader
 {
 public:
-	virtual bool load(const GMbyte* data, OUT Image** img) override;
+	virtual bool load(const GMbyte* data, GMuint size, OUT Image** img) override;
 	virtual bool test(const GMbyte* data) override;
 
 private:

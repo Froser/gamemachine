@@ -16,24 +16,27 @@ DefaultGMGLGamePackageHandler::DefaultGMGLGamePackageHandler(GamePackage* pk)
 
 }
 
-void DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
 {
-
 	std::ifstream file;
-	file.open(path, std::ios::in | std::ios::binary);
+	file.open(path, std::ios::in | std::ios::binary | std::ios::ate);
 	if (file.good())
 	{
-		file.seekg(0, std::ios::end);
 		GMint size = file.tellg();
-		buffer->buffer = new GMbyte(size + 1);
-		file.seekg(0);
-		file.read((char*)(buffer->buffer), size + 1);
+		buffer->size = size;
+		buffer->buffer = new GMbyte[buffer->size];
 		buffer->needRelease = true;
+
+		file.seekg(0, std::ios::beg);
+		file.read(reinterpret_cast<char*>(buffer->buffer), size);
+		file.close();
+		return true;
 	}
 	else
 	{
-		ASSERT(false);
+		gm_warning("cannot read file from path: %s", path);
 	}
+	return false;
 }
 
 void DefaultGMGLGamePackageHandler::init()
@@ -58,6 +61,8 @@ void DefaultGMGLGamePackageHandler::init()
 		GamePackageBuffer vertBuf, fragBuf;
 		readFileFromPath(vert.c_str(), &vertBuf);
 		readFileFromPath(frag.c_str(), &fragBuf);
+		vertBuf.convertToStringBuffer();
+		fragBuf.convertToStringBuffer();
 
 		GMGLShaderInfo shadersInfo[] = {
 			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
@@ -127,12 +132,17 @@ void ZipGMGLGamePackageHandler::init()
 	Base::init();
 }
 
-void ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
 {
-	ASSERT(m_buffers.find(path) != m_buffers.end());
-	ZipBuffer* buf = m_buffers[path];
-	buffer->needRelease = false;
-	buffer->buffer = buf->buffer;
+	if (m_buffers.find(path) != m_buffers.end())
+	{
+		ZipBuffer* buf = m_buffers[path];
+		buffer->needRelease = false;
+		buffer->buffer = buf->buffer;
+		buffer->size = buf->size;
+		return true;
+	}
+	return false;
 }
 
 bool ZipGMGLGamePackageHandler::loadZip()
@@ -175,7 +185,6 @@ bool ZipGMGLGamePackageHandler::loadZip()
 				if (err > 0)
 					ptr += err;
 			} while (err > 0);
-
 			ASSERT(m_buffers.find(filename) == m_buffers.end());
 
 			ZipBuffer* buf = new ZipBuffer();

@@ -24,7 +24,7 @@ void BSPGameWorld::loadBSP(const char* mapPath)
 	D_BASE(GameWorld, db);
 	GamePackageBuffer buffer;
 	db.gamePackage->getHandler()->readFileFromPath(mapPath, &buffer);
-	d.bsp.loadBsp(buffer.buffer);
+	d.bsp.loadBsp(buffer);
 	importBSP();
 }
 
@@ -415,9 +415,7 @@ void BSPGameWorld::initTextures()
 			continue;
 
 		Image* tex = nullptr;
-		std::string fn = db.gamePackage->path(PI_TEXTURES, shader.shader);
-
-		if (findTexture(fn.c_str(), &tex))
+		if (findTexture(shader.shader, &tex))
 		{
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
@@ -429,7 +427,7 @@ void BSPGameWorld::initTextures()
 		}
 		else
 		{
-			gm_warning("Cannot find texture %s", fn.c_str());
+			gm_warning("Cannot find texture %s", shader.shader);
 		}
 	}
 }
@@ -437,21 +435,25 @@ void BSPGameWorld::initTextures()
 bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 {
 	const int maxChars = 128;
-	static char priorities[][maxChars] =
+	static std::string priorities[maxChars] =
 	{
 		".jpg",
 		".tga",
 		".png",
 		".bmp"
 	};
-	static GMint dem = sizeof(priorities) / maxChars / sizeof(GMbyte);
+	static GMint dem = 4;
 	GamePackage* pk = getGamePackage();
 
 	for (GMint i = 0; i < dem; i++)
 	{
-		std::string fn(textureFilename);
-		fn.append(priorities[i]);
-		if (ImageReader::load(fn.c_str(), img))
+		std::string fn = textureFilename + priorities[i];
+
+		GamePackageBuffer buf;
+		if (!pk->readFileFromPath(pk->path(PI_TEXTURES, fn.c_str()).c_str(), &buf))
+			continue;
+
+		if (ImageReader::load(buf.buffer, buf.size, img))
 		{
 			gm_info("loaded texture %s", fn.c_str());
 			return true;

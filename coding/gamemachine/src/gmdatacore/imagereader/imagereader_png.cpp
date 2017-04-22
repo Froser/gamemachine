@@ -6,32 +6,39 @@
 #include "utilities/assert.h"
 
 #define PNG_BYTES_TO_CHECK 4
-
-bool loadPng(const GMbyte* data, PngData *out, bool flip = false)
+struct PngImage
 {
-	FILE *pic_fp = nullptr;
-	fopen_s(&pic_fp, filepath, "rb");
-	if (pic_fp == nullptr)
-		return false;
+	const GMbyte* data;
+	GMuint size;
+	GMuint offset;
+};
 
+static void pngReadCallback(png_structp png_ptr, png_bytep data, png_size_t length)
+{
+	PngImage* isource = (PngImage*)png_get_io_ptr(png_ptr);
+	if (isource->offset + length <= isource->size)
+	{
+		memcpy(data, isource->data + isource->offset, length);
+		isource->offset += length;
+	}
+	else
+		png_error(png_ptr, "pngReaderCallback failed");
+}
+
+static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, bool flip = false)
+{
 	png_structp png_ptr;
 	png_infop  info_ptr;
-	char buf[PNG_BYTES_TO_CHECK];
-	int temp;
 
 	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
 	info_ptr = png_create_info_struct(png_ptr);
-
 	setjmp(png_jmpbuf(png_ptr));
 
-	temp = fread(buf, 1, PNG_BYTES_TO_CHECK, pic_fp);
-	temp = png_sig_cmp((png_const_bytep) buf, (png_size_t)0, PNG_BYTES_TO_CHECK);
-
+	GMint temp = png_sig_cmp((png_const_bytep)data, (png_size_t)0, PNG_BYTES_TO_CHECK);
 	// 检测是否为png文件
 	ASSERT(temp == 0);
-
-	rewind(pic_fp);
-	png_init_io(png_ptr, pic_fp);
+	PngImage imgsource = { data, dataSize, 0 };
+	png_set_read_fn(png_ptr, &imgsource, pngReadCallback);
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
 
 	int color_type, channels;
@@ -106,20 +113,19 @@ struct PNGTestHeader
 	DWORD magic1, magic2;
 };
 
-bool ImageReader_PNG::load(const GMbyte* data, OUT Image** img)
+bool ImageReader_PNG::load(const GMbyte* data, GMuint size, OUT Image** img)
 {
 	ASSERT(img);
 	*img = new Image();
 
 	PngData png;
-	bool b = loadPng(data, &png, true);
+	bool b = loadPng(data, size, &png, true);
 	writeDataToImage(png, *img);
 	return b;
 }
 
 bool ImageReader_PNG::test(const GMbyte* data)
 {
-	std::ifstream file;
 	const PNGTestHeader* header = reinterpret_cast<const PNGTestHeader*>(data);
 	return header->magic1 == 1196314761 && header->magic2 == 169478669;
 }

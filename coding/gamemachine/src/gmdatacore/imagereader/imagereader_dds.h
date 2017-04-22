@@ -8,7 +8,7 @@ class Image;
 class ImageReader_DDS : public IImageReader
 {
 public:
-	virtual bool load(const GMbyte* data, OUT Image** img) override;
+	virtual bool load(const GMbyte* data, GMuint size, OUT Image** img) override;
 	virtual bool test(const GMbyte* data) override;
 };
 END_NS

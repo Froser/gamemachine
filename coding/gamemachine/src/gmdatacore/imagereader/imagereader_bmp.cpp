@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
 #include "imagereader_bmp.h"
 #include "utilities/assert.h"
-#include <fstream>
+#include <sstream>
 #include "gmdatacore/image.h"
+#include "utilities/memorystream.h"
 
 #ifdef _WINDOWS
 #include <wtypes.h>
@@ -78,7 +79,7 @@ private:
 	BitmapFile m_bitmapFile;
 };
 
-bool ImageReader_BMP::load(const GMbyte* byte, OUT Image** img)
+bool ImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT Image** img)
 {
 	ImageBMP* image;
 	if (img)
@@ -91,38 +92,31 @@ bool ImageReader_BMP::load(const GMbyte* byte, OUT Image** img)
 		return false;
 	}
 
-	std::ifstream file;
-	file.open(filename, std::ios::in | std::ios::binary);
-	if (file.good())
-	{
-		BitmapFile& bitmapFile = image->getRawFile();
+	MemoryStream ms(byte, size);
+	BitmapFile& bitmapFile = image->getRawFile();
 
-		file.read(reinterpret_cast<char*>(&bitmapFile.bitmapHeader), sizeof(BitmapHeader));
-		file.read(reinterpret_cast<char*>(&bitmapFile.bitmapInfoHeader), sizeof(BitmapInfoHeader));
+	ms.read(reinterpret_cast<GMbyte*>(&bitmapFile.bitmapHeader), sizeof(BitmapHeader));
+	ms.read(reinterpret_cast<GMbyte*>(&bitmapFile.bitmapInfoHeader), sizeof(BitmapInfoHeader));
 
-		long paletteLen = bitmapFile.bitmapHeader.bfOffBits - sizeof(BitmapHeader) - sizeof(BitmapInfoHeader);
-		file.read(reinterpret_cast<char*>(&bitmapFile.palette), paletteLen);
+	long paletteLen = bitmapFile.bitmapHeader.bfOffBits - sizeof(BitmapHeader)-sizeof(BitmapInfoHeader);
+	ms.read(reinterpret_cast<GMbyte*>(&bitmapFile.palette), paletteLen);
 
-		ASSERT(bitmapFile.bitmapInfoHeader.biHeight > 0
-			&& bitmapFile.bitmapInfoHeader.biBitCount == 24
-			&& bitmapFile.bitmapInfoHeader.biCompression == 0);
+	ASSERT(bitmapFile.bitmapInfoHeader.biHeight > 0
+		&& bitmapFile.bitmapInfoHeader.biBitCount == 24
+		&& bitmapFile.bitmapInfoHeader.biCompression == 0);
 
-		long cnt = bitmapFile.bitmapInfoHeader.biWidth * bitmapFile.bitmapInfoHeader.biHeight * 3;
-		bitmapFile.buffer = new BYTE[cnt];
-		file.read(reinterpret_cast<char*>(bitmapFile.buffer), cnt);
+	long cnt = bitmapFile.bitmapInfoHeader.biWidth * bitmapFile.bitmapInfoHeader.biHeight * 3;
+	bitmapFile.buffer = new BYTE[cnt];
+	ms.read(reinterpret_cast<GMbyte*>(bitmapFile.buffer), cnt);
 
-		writeDataToImage(bitmapFile, image);
+	writeDataToImage(bitmapFile, image);
 
-		file.close();
-		return true;
-	}
-	file.close();
-	return false;
+	return true;
 }
 
 bool ImageReader_BMP::test(const GMbyte* byte)
 {
-	BitmapHeader* header = reinterpret_cast<BitmapHeader*>(&header);
+	const BitmapHeader* header = reinterpret_cast<const BitmapHeader*>(byte);
 	return header->bfType == 19778;
 }
 

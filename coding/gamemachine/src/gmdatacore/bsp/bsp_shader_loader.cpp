@@ -83,9 +83,9 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
-static void loadImage(const char* filename, const GMbyte* data, OUT Image** image)
+static void loadImage(const char* filename, const GamePackageBuffer* buf, OUT Image** image)
 {
-	if (ImageReader::load(data, image))
+	if (ImageReader::load(buf->buffer, buf->size, image))
 		gm_info("loaded texture %s from shader", filename);
 	else
 		gm_error("texture %s not found", filename);
@@ -140,7 +140,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 		pk->readFileFromPath(fn.c_str(), &buf);
 
 		Image* img = nullptr;
-		loadImage(fn.c_str(), buf.buffer, &img);
+		loadImage(fn.c_str(), &buf, &img);
 
 		if (img)
 		{
@@ -172,6 +172,7 @@ void BSPShaderLoader::load()
 	{
 		GamePackageBuffer buf;
 		pk->readFileFromPath((*iter).c_str(), &buf);
+		buf.convertToStringBuffer();
 		parse((const char*) buf.buffer);
 	}
 }
@@ -190,7 +191,7 @@ bool BSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* 
 void BSPShaderLoader::parse(const char* data)
 {
 	TiXmlDocument* doc = new TiXmlDocument();
-	if (!doc->Parse(data))
+	if (doc->Parse(data) != 0)
 	{
 		gm_error("xml load error at %d: %s", doc->ErrorRow(), doc->ErrorDesc());
 		delete doc;

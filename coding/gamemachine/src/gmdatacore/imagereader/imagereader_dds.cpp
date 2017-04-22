@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include "utilities/memorystream.h"
 
 enum DDS_FORMAT
 {
@@ -560,62 +561,38 @@ static GLenum getTargetFromDDSHeader(const DDS_FILE_HEADER& header)
 	return GL_TEXTURE_2D;
 }
 
-bool loadDDS(const char* filename, ImageData* image)
+static bool loadDDS(const GMbyte* data, GMuint size, ImageData* image)
 {
 	bool bSuc = false;
-
-	FILE* f;
-
 	memset(image, 0, sizeof(*image));
+	MemoryStream ms(data, size);
+	DDS_FILE_HEADER file_header = { 0 };
 
-#if _WINDOWS
-	fopen_s(&f, filename, "rb");
-#else
-	f = fopen(filename, "rb");
-#endif
-
-	if (f == NULL)
-		return bSuc;
-
-	DDS_FILE_HEADER file_header = { 0, };
-
-	fread(&file_header, sizeof(file_header.magic) + sizeof(file_header.std_header), 1, f);
+	ms.read(reinterpret_cast<GMbyte*>(&file_header), sizeof(file_header.magic) + sizeof(file_header.std_header));
 
 	if (file_header.magic != DDS_MAGIC)
-	{
-		goto done_close_file;
-	}
+		return false;
 
 	if (file_header.std_header.ddspf.dwFourCC == DDS_FOURCC_DX10)
-	{
-		fread(&file_header.dxt10_header, sizeof(file_header.dxt10_header), 1, f);
-	}
+		ms.read(reinterpret_cast<GMbyte*>(&file_header.dxt10_header), sizeof(file_header.dxt10_header));
 
 	if (!DDSHeaderToImageDataHeader(file_header, image))
-		goto done_close_file;
+		return false;
 
 	image->target = getTargetFromDDSHeader(file_header);
 
 	if (image->target == GL_NONE)
-		goto done_close_file;
+		return false;
 
-	size_t current_pos = ftell(f);
-	size_t file_size;
-	fseek(f, 0, SEEK_END);
-	file_size = ftell(f);
-	fseek(f, (long)current_pos, SEEK_SET);
-
-	image->totalDataSize = file_size - current_pos;
+	GMuint current_pos = ms.tell();
+	image->totalDataSize = size - current_pos;
 	image->mip[0].data = new GMbyte[image->totalDataSize];
+	ms.read(reinterpret_cast<GMbyte*>(image->mip[0].data), size - current_pos);
 
-	fread(image->mip[0].data, file_size - current_pos, 1, f);
-
-	int level;
-	GMbyte * ptr = reinterpret_cast<GMbyte*>(image->mip[0].data);
-
-	int width = file_header.std_header.width;
-	int height = file_header.std_header.height;
-	int depth = file_header.std_header.depth;
+	GMbyte* ptr = image->mip[0].data;
+	GMint width = file_header.std_header.width;
+	GMint height = file_header.std_header.height;
+	GMint depth = file_header.std_header.depth;
 
 	image->sliceStride = 0;
 
@@ -624,7 +601,7 @@ bool loadDDS(const char* filename, ImageData* image)
 		image->mipLevels = 1;
 	}
 
-	for (level = 0; level < image->mipLevels; ++level)
+	for (GMint level = 0; level < image->mipLevels; ++level)
 	{
 		image->mip[level].data = ptr;
 		image->mip[level].width = width;
@@ -637,15 +614,10 @@ bool loadDDS(const char* filename, ImageData* image)
 		height >>= 1;
 		depth >>= 1;
 	}
-
-	bSuc = true;
-
-done_close_file:
-	fclose(f);
-	return bSuc;
+	return true;
 }
 
-bool ImageReader_DDS::load(const GMbyte* data, OUT Image** img)
+bool ImageReader_DDS::load(const GMbyte* data, GMuint size, OUT Image** img)
 {
 	Image* image;
 	if (img)
@@ -658,7 +630,7 @@ bool ImageReader_DDS::load(const GMbyte* data, OUT Image** img)
 		return false;
 	}
 
-	return loadDDS(filename, &image->getData());
+	return loadDDS(data, size, &image->getData());
 }
 
 bool ImageReader_DDS::test(const GMbyte* data)

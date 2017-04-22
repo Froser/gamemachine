@@ -72,6 +72,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\debug.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\frustum.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\input.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\memorystream.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\plane.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h" />
@@ -138,6 +139,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\debug.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\frustum.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\input.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\memorystream.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\plane.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp" />
@@ -161,7 +163,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
