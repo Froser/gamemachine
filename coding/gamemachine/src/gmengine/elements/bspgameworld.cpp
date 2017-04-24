@@ -90,6 +90,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	BSPData& bsp = d.bsp.bspData();
 
 	rd.facesToDraw.clearAll();
+	rd.entitiesToDraw.clearAll();
 	GMint cameraLeaf = calculateLeafNode(pos.position);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
@@ -109,6 +110,8 @@ void BSPGameWorld::calculateVisibleFaces()
 		{
 			rd.facesToDraw.set(bsp.leafsurfaces[bsp.leafs[i].firstLeafSurface + j]);
 		}
+
+		rd.entitiesToDraw.set(i);
 	}
 }
 
@@ -133,7 +136,7 @@ GMint BSPGameWorld::calculateLeafNode(const vmath::vec3& position)
 	return ~currentNode;
 }
 
-int BSPGameWorld::isClusterVisible(int cameraCluster, int testCluster)
+int BSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -176,6 +179,12 @@ void BSPGameWorld::drawFaces()
 		//if this face is to be drawn, draw it
 		if (rd.facesToDraw.isSet(i))
 			drawFace(i);
+	}
+
+	for (GMint i = 0; i < bsp.numleafs; i++)
+	{
+		if (rd.entitiesToDraw.isSet(i))
+			drawEntity(i);
 	}
 }
 
@@ -275,7 +284,7 @@ void BSPGameWorld::preparePatch(int patchNumber)
 	}
 }
 
-void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
+void BSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -293,7 +302,7 @@ void BSPGameWorld::drawPolygonFace(int polygonFaceNumber)
 	obj->getReadyForRender(d.drawingList);
 }
 
-void BSPGameWorld::drawMeshFace(int meshFaceNumber)
+void BSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -311,7 +320,7 @@ void BSPGameWorld::drawMeshFace(int meshFaceNumber)
 	obj->getReadyForRender(d.drawingList);
 }
 
-void BSPGameWorld::drawPatch(int patchNumber)
+void BSPGameWorld::drawPatch(GMint patchNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -335,6 +344,11 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 
 	ASSERT(obj);
 	obj->getReadyForRender(d.drawingList);
+}
+
+void BSPGameWorld::drawEntity(GMint id)
+{
+
 }
 
 template <typename T>
@@ -383,8 +397,8 @@ void BSPGameWorld::importBSP()
 	initShaders();
 	initLightmaps();
 	initTextures();
-	importEntities();
 	prepareFaces();
+	prepareEntities();
 	initialize();
 	d.physics->initBSPPhysicsWorld();
 }
@@ -500,16 +514,6 @@ void BSPGameWorld::initLightmaps()
 	}
 }
 
-void BSPGameWorld::importEntities()
-{
-	D(d);
-	BSPData& bsp = d.bsp.bspData();
-	for (auto iter = bsp.entities.begin(); iter != bsp.entities.end(); iter++)
-	{
-		BSPGameWorldEntityReader::import(*iter, this);
-	}
-}
-
 void BSPGameWorld::prepareFaces()
 {
 	D(d);
@@ -531,6 +535,43 @@ void BSPGameWorld::prepareFaces()
 		if (rd.faceDirectory[i].faceType == MST_PATCH)
 			preparePatch(rd.faceDirectory[i].typeFaceNumber);
 	}
+}
+
+void BSPGameWorld::prepareEntities()
+{
+	D(d);
+	BSPData& bsp = d.bsp.bspData();
+
+	for (auto iter = bsp.entities.begin(); iter != bsp.entities.end(); iter++)
+	{
+		BSPGameWorldEntityReader::import(*iter, this);
+
+		GMint cameraLeaf = calculateLeafNode((*iter).origin);
+		d.entities[cameraLeaf].push_back(&(*iter));
+		createEntity(&(*iter));
+	}
+}
+
+void BSPGameWorld::createEntity(BSPEntity* entity)
+{
+	D(d);
+	BSPRenderData& rd = d.render.renderData();
+
+	GameObject* obj = nullptr;
+	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
+	Shader shader;
+	//if (!setMaterialTexture(meshFace, shader))
+	//{
+	//	gm_warning("mesh: %d texture missing.", meshFaceNumber);
+	//	return;
+	//}
+	//setMaterialLightmap(meshFace.lightmapIndex, shader);
+
+	Object* coreObj;
+	d.render.createBox(5/*TODO*/, shader, &coreObj);
+	obj = new GameObject(coreObj);
+	rd.entitiyObjects[entity] = obj;
+	appendObjectAndInit(obj);
 }
 
 BSPData& BSPGameWorld::bspData()

@@ -247,13 +247,11 @@ BSPEntity* BSP::parseEntity()
 	}
 
 	BSPEntity bla;
-	bla.brushes = 0;
 	bla.epairs = 0;
 	bla.firstDrawSurf = 0;
 	bla.origin[0] = 0.f;
 	bla.origin[1] = 0.f;
 	bla.origin[2] = 0.f;
-	bla.patches = 0;
 
 	d.entities.push_back(bla);
 	mapent = &d.entities[d.entities.size() - 1];

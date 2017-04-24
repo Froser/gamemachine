@@ -30,13 +30,14 @@ private:
 	void drawSky();
 	void drawFaces();
 	void drawFace(GMint idx);
-	void drawPolygonFace(int polygonFaceNumber);
-	void drawMeshFace(int meshFaceNumber);
-	void drawPatch(int patchNumber);
+	void drawPolygonFace(GMint polygonFaceNumber);
+	void drawMeshFace(GMint meshFaceNumber);
+	void drawPatch(GMint patchNumber);
 	void draw(BSP_Render_BiquadraticPatch& biqp);
+	void drawEntity(GMint entityId);
 	template <typename T> bool setMaterialTexture(T face, REF Shader& shader);
 	void setMaterialLightmap(GMint lightmapid, REF Shader& shader);
-	int isClusterVisible(int cameraCluster, int testCluster);
+	int isClusterVisible(GMint cameraCluster, GMint testCluster);
 
 	//imports:
 private:
@@ -45,11 +46,12 @@ private:
 	void initTextures();
 	bool findTexture(const char* textureFilename, OUT Image** img);
 	void initLightmaps();
-	void importEntities();
 	void prepareFaces();
 	void preparePolygonFace(int polygonFaceNumber);
 	void prepareMeshFace(int meshFaceNumber);
 	void preparePatch(int patchNumber);
+	void prepareEntities();
+	void createEntity(BSPEntity* entity);
 	GMint calculateLeafNode(const vmath::vec3& position);
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world

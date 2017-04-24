@@ -54,7 +54,7 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 	}
 
 	//Create indices
-	indices = new GLuint[tesselation*(tesselation + 1) * 2];
+	indices = new GMuint[tesselation*(tesselation + 1) * 2];
 	if (!indices)
 	{
 		gm_error("Unable to allocate memory for surface indices");
@@ -142,6 +142,7 @@ void BSPRender::generateFaces()
 	// create faces for drawing
 	d.faceDirectory.resize(d.bsp->numDrawSurfaces);
 	d.facesToDraw.init(d.bsp->numDrawSurfaces);
+	d.entitiesToDraw.init(d.bsp->numleafs);
 
 	for (GMint i = 0; i < d.bsp->numDrawSurfaces; i++)
 	{
@@ -357,7 +358,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	for (int row = 0; row < biqp.tesselation; ++row)
 	{
 		component->beginFace();
-		GLuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
+		GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 		vmath::vec3 normal;
 		for (int i = 0; i < numVertices; i++)
 		{
@@ -386,5 +387,73 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	}
 	child->appendComponent(component);
 	coreObj->append(child);
+	*obj = coreObj;
+}
+
+void BSPRender::createBox(GMfloat extents, const Shader& shader, OUT Object** obj)
+{
+	static GMfloat v[24] = {
+		1, -1, 1,
+		1, -1, -1,
+		-1, -1, 1,
+		-1, -1, -1,
+		1, 1, 1,
+		1, 1, -1,
+		-1, 1, 1,
+		-1, 1, -1,
+	};
+	static GMfloat indices[] = {
+		0, 1, 2,
+		2, 1, 3,
+		0, 5, 6,
+		6, 5, 7,
+		0, 1, 4,
+		1, 5, 4,
+		2, 6, 3,
+		3, 6, 7,
+		0, 4, 2,
+		2, 4, 6,
+		1, 3, 5,
+		3, 7, 5,
+	};
+
+	Object* coreObj = new Object();
+	ChildObject* child = new ChildObject();
+	child->setArrangementMode(ChildObject::Triangle_Strip);
+
+	GMfloat t[24];
+	for (GMint i = 0; i < 24; i++)
+	{
+		t[i] = extents * v[i];
+	}
+
+	Component* component = new Component(child);
+	component->getShader() = shader;
+
+	vmath::vec3 normal;
+	for (int i = 0; i < 12; i++)
+	{
+		component->beginFace();
+		for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+		{
+			GMint idx = i * 3 + j; //顶点的开始
+			GMint idx_prev = i * 3 + (j + 1) % 3;
+			GMint idx_next = i * 3 + (j + 2) % 3;
+			vmath::vec3 vertex(t[idx], t[idx + 1], t[idx + 2]);
+			vmath::vec3 vertex_prev(t[idx_prev * 3], t[idx_prev * 3 + 1], t[idx_prev * 3 + 2]),
+				vertex_next(t[idx_next * 3], t[idx_next * 3 + 1], t[idx_next * 3 + 2]);
+			vmath::vec3 normal = vmath::cross(vertex - vertex_prev, vertex_next - vertex);
+			normal = vmath::normalize(normal);
+
+			component->vertex(vertex[0], vertex[1], vertex[2]);
+			component->normal(normal[0], normal[1], normal[2]);
+			//TODO
+			//component->uv(vertex.decalS, vertex.decalT);
+			//component->lightmap(1.f, 1.f);
+		}
+		component->endFace();
+	}
+	component->endFace();
+
 	*obj = coreObj;
 }

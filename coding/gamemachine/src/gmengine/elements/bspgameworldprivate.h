@@ -4,6 +4,8 @@
 #include "gmdatacore/bsp/bsp.h"
 #include "gmdatacore/shader.h"
 #include <string>
+#include <map>
+#include <vector>
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmphysics/bsp/bspphysicsworld.h"
@@ -28,6 +30,7 @@ struct BSPGameWorldPrivate
 
 	BSPRender render;
 	BSPShaderLoader shaderLoader;
+	std::map<GMint, std::vector<BSPEntity*> > entities;
 	bool ready;
 };
 

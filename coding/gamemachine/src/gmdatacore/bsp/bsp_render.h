@@ -148,6 +148,7 @@ struct BSPRenderPrivate
 	//data for render:
 	std::vector<BSP_Render_Vertex> vertices;
 	Bitset facesToDraw;
+	Bitset entitiesToDraw;
 	GMint numPolygonFaces;
 	GMint numPatches;
 	GMint numMeshFaces;
@@ -161,6 +162,7 @@ struct BSPRenderPrivate
 	std::map<BSP_Render_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
 	std::map<BSP_Render_Face*, GameObject*> polygonFaceObjects;
 	std::map<BSP_Render_Face*, GameObject*> meshFaceObjects;
+	std::map<BSPEntity*, GameObject*> entitiyObjects;
 
 	// 用于绘制天空
 	vmath::vec3 boundMin;
@@ -179,6 +181,7 @@ public:
 	void generateRenderData(BSPData* bsp);
 	void createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj);
 	void createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);
+	void createBox(GMfloat extents, const Shader& shader, OUT Object** obj);
 
 private:
 	void generateVertices();

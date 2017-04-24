@@ -118,8 +118,6 @@ typedef struct BSPPair {
 
 typedef struct {
 	BSPVector3		origin;
-	struct bspbrush_s	*brushes;
-	struct parseMesh_s	*patches;
 	int			firstDrawSurf;
 	BSPKeyValuePair		*epairs;
 } BSPEntity;
