@@ -169,7 +169,6 @@ void BSP::parseEntities()
 	d.lightVols.lightVolSize[1] = 64;
 	d.lightVols.lightVolSize[2] = 128;
 
-	d.numentities = 0;
 	parseFromMemory(d.entdata.data(), d.entdatasize);
 
 	BSPEntity* entity;
@@ -238,9 +237,8 @@ BSPEntity* BSP::parseEntity()
 	BSPKeyValuePair* e;
 	BSPEntity *mapent;
 
-	if (!getToken(true)) {
+	if (!getToken(true))
 		return nullptr;
-	}
 
 	if (!strEqual(d.token, "{")) {
 		gm_warning("parseEntity: { not found");
@@ -252,12 +250,9 @@ BSPEntity* BSP::parseEntity()
 	bla.origin[0] = 0.f;
 	bla.origin[1] = 0.f;
 	bla.origin[2] = 0.f;
-
-	d.entities.push_back(bla);
-	mapent = &d.entities[d.entities.size() - 1];
-	d.numentities++;
-
-	do {
+	mapent = &bla;
+	do
+	{
 		if (!getToken(true)) {
 			gm_warning("parseEntity: EOF without closing brace");
 		}
@@ -267,7 +262,19 @@ BSPEntity* BSP::parseEntity()
 		e = (struct BSPPair*)parseEpair();
 		e->next = mapent->epairs;
 		mapent->epairs = e;
-	} while (1);
+
+		if (strEqual(e->key, "origin"))
+		{
+			Scanner s(e->value);
+			s.nextFloat(&bla.origin[0]); // x
+			s.nextFloat(&bla.origin[1]); // z
+			s.nextFloat(&bla.origin[2]); // y
+			SWAP(bla.origin[1], bla.origin[2]);
+			bla.origin[2] = -bla.origin[2];
+		}
+	} while (true);
+
+	d.entities.push_back(bla);
 
 	return &*(d.entities.end() - 1);
 }

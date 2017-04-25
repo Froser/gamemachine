@@ -181,7 +181,7 @@ public:
 	void generateRenderData(BSPData* bsp);
 	void createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj);
 	void createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);
-	void createBox(GMfloat extents, const Shader& shader, OUT Object** obj);
+	void createBox(GMfloat extents, const vmath::vec3& position, const Shader& shader, OUT Object** obj);
 
 private:
 	void generateVertices();

@@ -34,7 +34,7 @@ private:
 	void drawMeshFace(GMint meshFaceNumber);
 	void drawPatch(GMint patchNumber);
 	void draw(BSP_Render_BiquadraticPatch& biqp);
-	void drawEntity(GMint entityId);
+	void drawEntity(GMint leafId);
 	template <typename T> bool setMaterialTexture(T face, REF Shader& shader);
 	void setMaterialLightmap(GMint lightmapid, REF Shader& shader);
 	int isClusterVisible(GMint cameraCluster, GMint testCluster);

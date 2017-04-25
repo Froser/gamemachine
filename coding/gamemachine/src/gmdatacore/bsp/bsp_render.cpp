@@ -390,7 +390,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	*obj = coreObj;
 }
 
-void BSPRender::createBox(GMfloat extents, const Shader& shader, OUT Object** obj)
+void BSPRender::createBox(GMfloat extents, const vmath::vec3& position, const Shader& shader, OUT Object** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,
@@ -402,10 +402,10 @@ void BSPRender::createBox(GMfloat extents, const Shader& shader, OUT Object** ob
 		-1, 1, 1,
 		-1, 1, -1,
 	};
-	static GMfloat indices[] = {
-		0, 1, 2,
-		2, 1, 3,
-		0, 5, 6,
+	static GMint indices[] = {
+		0, 2, 1,
+		2, 3, 1,
+		4, 5, 6,
 		6, 5, 7,
 		0, 1, 4,
 		1, 5, 4,
@@ -424,7 +424,7 @@ void BSPRender::createBox(GMfloat extents, const Shader& shader, OUT Object** ob
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)
 	{
-		t[i] = extents * v[i];
+		t[i] = extents * v[i] + position[i % 3];
 	}
 
 	Component* component = new Component(child);
@@ -437,11 +437,11 @@ void BSPRender::createBox(GMfloat extents, const Shader& shader, OUT Object** ob
 		for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
 		{
 			GMint idx = i * 3 + j; //顶点的开始
-			GMint idx_prev = i * 3 + (j + 1) % 3;
-			GMint idx_next = i * 3 + (j + 2) % 3;
-			vmath::vec3 vertex(t[idx], t[idx + 1], t[idx + 2]);
-			vmath::vec3 vertex_prev(t[idx_prev * 3], t[idx_prev * 3 + 1], t[idx_prev * 3 + 2]),
-				vertex_next(t[idx_next * 3], t[idx_next * 3 + 1], t[idx_next * 3 + 2]);
+			GMint idx_next = i * 3 + (j + 1) % 3;
+			GMint idx_prev = i * 3 + (j + 2) % 3;
+			vmath::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+			vmath::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+				vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
 			vmath::vec3 normal = vmath::cross(vertex - vertex_prev, vertex_next - vertex);
 			normal = vmath::normalize(normal);
 
@@ -455,5 +455,7 @@ void BSPRender::createBox(GMfloat extents, const Shader& shader, OUT Object** ob
 	}
 	component->endFace();
 
+	child->appendComponent(component);
+	coreObj->append(child);
 	*obj = coreObj;
 }

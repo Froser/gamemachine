@@ -10,6 +10,7 @@
 #include "gmdatacore/imagebuffer.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmdatacore/gamepackage.h"
+#include <algorithm>
 
 BSPGameWorld::BSPGameWorld(GamePackage* pk)
 	: GameWorld(pk)
@@ -346,9 +347,16 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 	obj->getReadyForRender(d.drawingList);
 }
 
-void BSPGameWorld::drawEntity(GMint id)
+void BSPGameWorld::drawEntity(GMint leafId)
 {
+	D(d);
+	BSPRenderData& rd = d.render.renderData();
 
+	std::vector<BSPEntity*>& entities = d.entities[leafId];
+	std::for_each(entities.begin(), entities.end(), [&rd, &d](BSPEntity* e)
+	{
+		rd.entitiyObjects[e]->getReadyForRender(d.drawingList);
+	});
 }
 
 template <typename T>
@@ -546,8 +554,8 @@ void BSPGameWorld::prepareEntities()
 	{
 		BSPGameWorldEntityReader::import(*iter, this);
 
-		GMint cameraLeaf = calculateLeafNode((*iter).origin);
-		d.entities[cameraLeaf].push_back(&(*iter));
+		GMint leaf = calculateLeafNode((*iter).origin);
+		d.entities[leaf].push_back(&(*iter));
 		createEntity(&(*iter));
 	}
 }
@@ -568,7 +576,7 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 	//setMaterialLightmap(meshFace.lightmapIndex, shader);
 
 	Object* coreObj;
-	d.render.createBox(5/*TODO*/, shader, &coreObj);
+	d.render.createBox(5, entity->origin, shader, &coreObj);
 	obj = new GameObject(coreObj);
 	rd.entitiyObjects[entity] = obj;
 	appendObjectAndInit(obj);

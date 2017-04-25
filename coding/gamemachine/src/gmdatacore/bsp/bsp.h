@@ -186,7 +186,6 @@ struct BSPPrivate
 
 	GMbyte* buffer;
 	BSPHeader* header;
-	GMint numentities;
 	std::vector<BSPEntity> entities;
 	GMint nummodels;
 	std::vector<BSPModel> models;
