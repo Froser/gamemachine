@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmglgamepackagehandler.h"
+#include "gmengine/controllers/gamepackagehandler.h"
 #include "gmglshaders.h"
 #include "gmglgraphic_engine.h"
 #include "gmengine/controllers/gamemachine.h"
@@ -10,13 +10,13 @@
 
 #define PKD(d) GamePackageData& d = gamePackage()->gamePackageData();
 
-DefaultGMGLGamePackageHandler::DefaultGMGLGamePackageHandler(GamePackage* pk)
+DefaultGMGamePackageHandler::DefaultGMGamePackageHandler(GamePackage* pk)
 	: m_pk(pk)
 {
 
 }
 
-bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool DefaultGMGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
 {
 	std::ifstream file;
 	file.open(path, std::ios::in | std::ios::binary | std::ios::ate);
@@ -39,7 +39,7 @@ bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GameP
 	return false;
 }
 
-void DefaultGMGLGamePackageHandler::init()
+void DefaultGMGamePackageHandler::init()
 {
 	PKD(d);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d.gameMachine->getGraphicEngine());
@@ -76,7 +76,7 @@ void DefaultGMGLGamePackageHandler::init()
 	}
 }
 
-std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
+std::string DefaultGMGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 
@@ -90,8 +90,6 @@ std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 		return d.packagePath + "texshaders/";
 	case PI_TEXTURES:
 		return d.packagePath + "textures/";
-	case PI_MODELS:
-		return d.packagePath + "models/";
 	default:
 		ASSERT(false);
 		break;
@@ -99,31 +97,31 @@ std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 	return "";
 }
 
-GamePackage* DefaultGMGLGamePackageHandler::gamePackage()
+GamePackage* DefaultGMGamePackageHandler::gamePackage()
 {
 	return m_pk;
 }
 
-std::vector<std::string> DefaultGMGLGamePackageHandler::getAllFiles(const char* directory)
+std::vector<std::string> DefaultGMGamePackageHandler::getAllFiles(const char* directory)
 {
 	return Path::getAllFiles(directory);
 }
 
 #define CHECK(err) if (err != UNZ_OK) return false
 
-ZipGMGLGamePackageHandler::ZipGMGLGamePackageHandler(GamePackage* pk)
-	: DefaultGMGLGamePackageHandler(pk)
+ZipGMGamePackageHandler::ZipGMGamePackageHandler(GamePackage* pk)
+	: DefaultGMGamePackageHandler(pk)
 	, m_uf(nullptr)
 {
 }
 
-ZipGMGLGamePackageHandler::~ZipGMGLGamePackageHandler()
+ZipGMGamePackageHandler::~ZipGMGamePackageHandler()
 {
 	releaseUnzFile();
 	releaseBuffers();
 }
 
-void ZipGMGLGamePackageHandler::init()
+void ZipGMGamePackageHandler::init()
 {
 	PKD(d);
 	if (!loadZip())
@@ -134,7 +132,7 @@ void ZipGMGLGamePackageHandler::init()
 	Base::init();
 }
 
-bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool ZipGMGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
 {
 	if (m_buffers.find(path) != m_buffers.end())
 	{
@@ -147,7 +145,7 @@ bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePacka
 	return false;
 }
 
-bool ZipGMGLGamePackageHandler::loadZip()
+bool ZipGMGamePackageHandler::loadZip()
 {
 	const GMuint bufSize = 4096;
 
@@ -207,7 +205,7 @@ bool ZipGMGLGamePackageHandler::loadZip()
 	return true;
 }
 
-void ZipGMGLGamePackageHandler::releaseUnzFile()
+void ZipGMGamePackageHandler::releaseUnzFile()
 {
 	if (m_uf)
 	{
@@ -216,7 +214,7 @@ void ZipGMGLGamePackageHandler::releaseUnzFile()
 	}
 }
 
-void ZipGMGLGamePackageHandler::releaseBuffers()
+void ZipGMGamePackageHandler::releaseBuffers()
 {
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
@@ -224,7 +222,7 @@ void ZipGMGLGamePackageHandler::releaseBuffers()
 	}
 }
 
-std::vector<std::string> ZipGMGLGamePackageHandler::getAllFiles(const char* directory)
+std::vector<std::string> ZipGMGamePackageHandler::getAllFiles(const char* directory)
 {
 	std::vector<std::string> result;
 	std::string d = directory;
@@ -238,7 +236,7 @@ std::vector<std::string> ZipGMGLGamePackageHandler::getAllFiles(const char* dire
 	return result;
 }
 
-std::string ZipGMGLGamePackageHandler::pathRoot(PackageIndex index)
+std::string ZipGMGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 
@@ -252,8 +250,6 @@ std::string ZipGMGLGamePackageHandler::pathRoot(PackageIndex index)
 		return "texshaders/";
 	case PI_TEXTURES:
 		return "textures/";
-	case PI_MODELS:
-		return "models/";
 	default:
 		ASSERT(false);
 		break;

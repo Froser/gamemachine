@@ -207,7 +207,6 @@ void BSPShaderLoader::parse(const char* data)
 		if (!strEqual(elem->Value(), "item"))
 			gm_warning("First node must be 'item'.");
 
-		Shader shader;
 		const char* name = elem->Attribute("name");
 		const char* ref = elem->Attribute("ref");
 		// 使用ref，可以引用另外一个item

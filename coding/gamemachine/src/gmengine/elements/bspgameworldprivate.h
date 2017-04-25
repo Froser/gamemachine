@@ -10,6 +10,7 @@
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmphysics/bsp/bspphysicsworld.h"
 #include "gmdatacore/bsp/bsp_render.h"
+#include "gmdatacore/bsp_model_loader.h"
 BEGIN_NS
 
 class GameObject;
@@ -30,6 +31,7 @@ struct BSPGameWorldPrivate
 
 	BSPRender render;
 	BSPShaderLoader shaderLoader;
+	BSPModelLoader modelLoader;
 	std::map<GMint, std::vector<BSPEntity*> > entities;
 	bool ready;
 };

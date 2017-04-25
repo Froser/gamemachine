@@ -13,6 +13,7 @@ enum PackageIndex
 	PI_SHADERS,
 	PI_TEXSHADERS,
 	PI_TEXTURES,
+	PI_MODELS,
 };
 
 struct GamePackageBuffer

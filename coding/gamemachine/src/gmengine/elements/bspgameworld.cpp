@@ -355,7 +355,9 @@ void BSPGameWorld::drawEntity(GMint leafId)
 	std::vector<BSPEntity*>& entities = d.entities[leafId];
 	std::for_each(entities.begin(), entities.end(), [&rd, &d](BSPEntity* e)
 	{
-		rd.entitiyObjects[e]->getReadyForRender(d.drawingList);
+		GameObject* obj = rd.entitiyObjects[e];
+		if (obj)
+			obj->getReadyForRender(d.drawingList);
 	});
 }
 
@@ -402,6 +404,7 @@ void BSPGameWorld::importBSP()
 {
 	D(d);
 	d.render.generateRenderData(&d.bsp.bspData());
+	initModels();
 	initShaders();
 	initLightmaps();
 	initTextures();
@@ -409,6 +412,15 @@ void BSPGameWorld::importBSP()
 	prepareEntities();
 	initialize();
 	d.physics->initBSPPhysicsWorld();
+}
+
+void BSPGameWorld::initModels()
+{
+	D(d);
+	D_BASE(GameWorld, db);
+	std::string modelPath = db.gamePackage->path(PI_MODELS, "");
+	d.modelLoader.init(modelPath.c_str(), this);
+	d.modelLoader.load();
 }
 
 void BSPGameWorld::initShaders()
@@ -563,6 +575,27 @@ void BSPGameWorld::prepareEntities()
 void BSPGameWorld::createEntity(BSPEntity* entity)
 {
 	D(d);
+
+	BSPKeyValuePair* p = entity->epairs;
+	const char* classname = nullptr;
+	while (p)
+	{
+		if (strEqual("classname", p->key))
+			classname = p->value;
+		p = p->next;
+	}
+
+	Model* m = d.modelLoader.find(classname);
+	if (!m)
+	{
+		gm_warning("model '%s' is not defined in model list, skipped.", classname);
+		return;
+	}
+
+	// 不创建这个实体
+	if (!m->create)
+		return;
+
 	BSPRenderData& rd = d.render.renderData();
 
 	GameObject* obj = nullptr;

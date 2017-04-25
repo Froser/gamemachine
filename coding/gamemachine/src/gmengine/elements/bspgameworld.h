@@ -42,6 +42,7 @@ private:
 	//imports:
 private:
 	void importBSP();
+	void initModels();
 	void initShaders();
 	void initTextures();
 	bool findTexture(const char* textureFilename, OUT Image** img);

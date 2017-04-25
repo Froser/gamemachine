@@ -17,6 +17,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp_model_loader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h" />
@@ -26,6 +27,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_jpg.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\model.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\shader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
@@ -86,6 +88,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_render.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp_model_loader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp" />
@@ -95,6 +98,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_jpg.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_tga.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\model.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\shader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
