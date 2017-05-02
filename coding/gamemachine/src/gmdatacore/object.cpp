@@ -137,6 +137,7 @@ ChildObject::~ChildObject()
 
 void ChildObject::appendComponent(AUTORELEASE Component* component)
 {
+	ASSERT(std::find(m_components.begin(), m_components.end(), component) == m_components.end());
 	m_components.push_back(component);
 }
 

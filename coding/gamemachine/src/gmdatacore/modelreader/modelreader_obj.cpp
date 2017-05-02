@@ -4,7 +4,7 @@
 #include "gmdatacore/gamepackage.h"
 #include "utilities/scanner.h"
 
-#define RESERVED 2048
+#define RESERVED 4096
 #define INVALID -1
 
 static bool slashPredicate(char c)
@@ -75,7 +75,7 @@ ModelReader_Obj::ModelReader_Obj()
 	d.currentComponent = nullptr;
 }
 
-bool ModelReader_Obj::load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, OUT Object** object)
+bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object)
 {
 	D(d);
 	buffer.convertToStringBuffer();
@@ -88,6 +88,8 @@ bool ModelReader_Obj::load(const vmath::vec3 extents, const vmath::vec3& positio
 
 	// 事先分配一些内存，提高效率
 	d.vertices.reserve(RESERVED);
+	d.textures.reserve(RESERVED);
+	d.normals.reserve(RESERVED);
 
 	while (sr.readLine(line))
 	{
@@ -102,7 +104,7 @@ bool ModelReader_Obj::load(const vmath::vec3 extents, const vmath::vec3& positio
 		else if (strEqual(token, "v"))
 		{
 			// vertex
-			pushBackData(extents, position, s, d.vertices);
+			pushBackData(settings.extents, settings.position, s, d.vertices);
 		}
 		else if (strEqual(token, "vn"))
 		{
@@ -124,6 +126,8 @@ bool ModelReader_Obj::load(const vmath::vec3 extents, const vmath::vec3& positio
 			char name[LINE_MAX];
 			s.next(name);
 			d.currentMaterialName = name;
+			if (d.currentComponent)
+				child->appendComponent(d.currentComponent);
 			d.currentComponent = nullptr;
 		}
 		else if (strEqual(token, "f"))
@@ -133,7 +137,10 @@ bool ModelReader_Obj::load(const vmath::vec3 extents, const vmath::vec3& positio
 		}
 	}
 
+	if (d.currentComponent)
+		child->appendComponent(d.currentComponent);
 	*object = d.object;
+
 	return true;
 }
 
@@ -167,17 +174,18 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 		faceScanner.nextInt(&t);
 		faceScanner.nextInt(&n);
 
-		if (v != INVALID)
+		ASSERT(v != INVALID);
 		{
 			auto& vec = d.vertices[v - 1];
 			d.currentComponent->vertex(vec[0], vec[1], vec[2]);
 		}
-		if (t != INVALID)
+
 		{
-			auto& vec = d.textures[t - 1];
+			auto& vec = t != INVALID ? d.textures[t - 1] : vmath::vec2(0, 0);
 			d.currentComponent->uv(vec[0], vec[1]);
 		}
-		if (n != INVALID)
+
+		ASSERT(n != INVALID);
 		{
 			auto& vec = d.normals[n - 1];
 			d.currentComponent->normal(vec[0], vec[1], vec[2]);

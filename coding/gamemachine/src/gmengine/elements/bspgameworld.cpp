@@ -600,10 +600,8 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 
 	BSPRenderData& rd = d.render.renderData();
 
-	GameObject* obj = nullptr;
 	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
-	
-	Object* coreObj;
+	Object* coreObj = nullptr;
 
 	if (!strlen(m->model))
 	{
@@ -626,11 +624,21 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 		fn.append(".obj");
 
 		std::string path = db.gamePackage->path(PI_MODELS, fn.c_str());
-		db.gamePackage->readFileFromPath(path.c_str(), &buf);
-		ModelReader::load(m->extents, entity->origin, buf, &coreObj);
+		ModelLoadSettings settings = {
+			*db.gamePackage,
+			m->extents,
+			entity->origin,
+			path.c_str()
+		};
+		ModelReader::load(settings, &coreObj);
+		if (!coreObj)
+		{
+			gm_warning("parse model file failed.");
+			return;
+		}
 	}
 
-	obj = new GameObject(coreObj);
+	GameObject* obj = new GameObject(coreObj);
 	rd.entitiyObjects[entity] = obj;
 	appendObjectAndInit(obj);
 }

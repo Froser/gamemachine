@@ -43,8 +43,8 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	// 创建一个Painter
 	createPainterForObject(obj);
 	ObjectPainter* painter = obj->getObject()->getPainter();
-	if (painter)
-		painter->transfer();
+	ASSERT(painter);
+	painter->transfer();
 }
 
 void GameWorld::setMajorCharacter(Character* character)

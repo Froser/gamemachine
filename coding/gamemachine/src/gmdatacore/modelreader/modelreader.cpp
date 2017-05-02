@@ -47,18 +47,21 @@ ModelType ModelReader::test(const GamePackageBuffer& buffer)
 }
 
 
-bool ModelReader::load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, OUT Object** image)
+bool ModelReader::load(const ModelLoadSettings& settings, OUT Object** image)
 {
-	return load(extents, position, buffer, ModelType_AUTO, image);
+	return load(settings, ModelType_AUTO, image);
 }
 
-bool ModelReader::load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, ModelType type, OUT Object** object)
+bool ModelReader::load(const ModelLoadSettings& settings, ModelType type, OUT Object** object)
 {
+	GamePackageBuffer buffer;
+	settings.gamePackage.readFileFromPath(settings.path, &buffer);
+
 	if (type == ModelType_AUTO)
 		type = test(buffer);
 
 	if (type == ModelType_End)
 		return false;
 
-	return getReader(type)->load(extents, position, buffer, object);
+	return getReader(type)->load(settings, buffer, object);
 }

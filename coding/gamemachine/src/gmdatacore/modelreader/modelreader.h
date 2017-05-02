@@ -6,9 +6,10 @@ BEGIN_NS
 
 class Object;
 struct GamePackageBuffer;
+struct ModelLoadSettings;
 struct IModelReader
 {
-	virtual bool load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, OUT Object** object) = 0;
+	virtual bool load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) = 0;
 	virtual bool test(const GamePackageBuffer& buffer) = 0;
 };
 
@@ -20,11 +21,20 @@ enum ModelType
 	ModelType_End,
 };
 
+class GamePackage;
+struct ModelLoadSettings
+{
+	GamePackage& gamePackage;
+	const vmath::vec3& extents;
+	const vmath::vec3& position;
+	const char* path;
+};
+
 class ModelReader
 {
 public:
-	static bool load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, OUT Object** object);
-	static bool load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, ModelType type, OUT Object** object);
+	static bool load(const ModelLoadSettings& settings, OUT Object** object);
+	static bool load(const ModelLoadSettings& settings, ModelType type, OUT Object** object);
 	static IModelReader* getReader(ModelType type);
 
 private:

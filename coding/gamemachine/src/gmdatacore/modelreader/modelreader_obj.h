@@ -37,7 +37,7 @@ public:
 	ModelReader_Obj();
 
 public:
-	virtual bool load(const vmath::vec3 extents, const vmath::vec3& position, GamePackageBuffer& buffer, OUT Object** object) override;
+	virtual bool load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) override;
 	virtual bool test(const GamePackageBuffer& buffer) override;
 
 private:
