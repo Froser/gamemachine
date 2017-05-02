@@ -390,7 +390,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	*obj = coreObj;
 }
 
-void BSPRender::createBox(GMfloat extents, const vmath::vec3& position, const Shader& shader, OUT Object** obj)
+void BSPRender::createBox(const vmath::vec3& extents, const vmath::vec3& position, const Shader& shader, OUT Object** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,
@@ -424,7 +424,7 @@ void BSPRender::createBox(GMfloat extents, const vmath::vec3& position, const Sh
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)
 	{
-		t[i] = extents * v[i] + position[i % 3];
+		t[i] = extents[i % 3] * v[i] + position[i % 3];
 	}
 
 	Component* component = new Component(child);
@@ -453,7 +453,6 @@ void BSPRender::createBox(GMfloat extents, const vmath::vec3& position, const Sh
 		}
 		component->endFace();
 	}
-	component->endFace();
 
 	child->appendComponent(component);
 	coreObj->append(child);

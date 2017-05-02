@@ -98,5 +98,19 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		m.create = value != 0;
 	}
 
+	if ((b = ti->Attribute("extents")) != nullptr)
+	{
+		Scanner s(b);
+		for (GMint i = 0; i < 3; i++)
+		{
+			s.nextFloat(&m.extents[i]);
+		}
+	}
+
+	if ((b = ti->Attribute("model")) != nullptr)
+	{
+		strcpy_s(m.model, b);
+	}
+
 	m_items[m.classname] = m;
 }

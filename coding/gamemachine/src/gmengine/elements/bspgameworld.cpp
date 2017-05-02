@@ -11,6 +11,7 @@
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmdatacore/gamepackage.h"
 #include <algorithm>
+#include "gmdatacore/modelreader/modelreader.h"
 
 BSPGameWorld::BSPGameWorld(GamePackage* pk)
 	: GameWorld(pk)
@@ -575,6 +576,7 @@ void BSPGameWorld::prepareEntities()
 void BSPGameWorld::createEntity(BSPEntity* entity)
 {
 	D(d);
+	D_BASE(GameWorld, db);
 
 	BSPKeyValuePair* p = entity->epairs;
 	const char* classname = nullptr;
@@ -600,16 +602,34 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 
 	GameObject* obj = nullptr;
 	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
-	Shader shader;
-	//if (!setMaterialTexture(meshFace, shader))
-	//{
-	//	gm_warning("mesh: %d texture missing.", meshFaceNumber);
-	//	return;
-	//}
-	//setMaterialLightmap(meshFace.lightmapIndex, shader);
-
+	
 	Object* coreObj;
-	d.render.createBox(5, entity->origin, shader, &coreObj);
+
+	if (!strlen(m->model))
+	{
+		// 如果没有指定model，先创建一个默认的立方体model吧
+		Shader shader;
+		//if (!setMaterialTexture(meshFace, shader))
+		//{
+		//	gm_warning("mesh: %d texture missing.", meshFaceNumber);
+		//	return;
+		//}
+		//setMaterialLightmap(meshFace.lightmapIndex, shader);
+		d.render.createBox(m->extents, entity->origin, shader, &coreObj);
+	}
+	else
+	{
+		GamePackageBuffer buf;
+		std::string fn(m->model);
+		fn.append("/");
+		fn.append(m->model);
+		fn.append(".obj");
+
+		std::string path = db.gamePackage->path(PI_MODELS, fn.c_str());
+		db.gamePackage->readFileFromPath(path.c_str(), &buf);
+		ModelReader::load(m->extents, entity->origin, buf, &coreObj);
+	}
+
 	obj = new GameObject(coreObj);
 	rd.entitiyObjects[entity] = obj;
 	appendObjectAndInit(obj);
