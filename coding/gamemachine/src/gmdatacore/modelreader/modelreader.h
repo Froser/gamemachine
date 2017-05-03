@@ -28,6 +28,7 @@ struct ModelLoadSettings
 	const vmath::vec3& extents;
 	const vmath::vec3& position;
 	const char* path;
+	const char* modelName;
 };
 
 class ModelReader

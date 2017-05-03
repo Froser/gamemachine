@@ -10,7 +10,10 @@ BEGIN_NS
 
 struct ModelReader_Obj_Material
 {
-
+	GMfloat ns;
+	vmath::vec3 kd;
+	vmath::vec3 ka;
+	vmath::vec3 ks;
 };
 
 class Object;
@@ -41,7 +44,9 @@ public:
 	virtual bool test(const GamePackageBuffer& buffer) override;
 
 private:
+	void init();
 	void appendFace(Scanner& scanner);
+	void loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename);
 };
 
 END_NS

@@ -70,7 +70,13 @@ static void pushBackData(const vmath::vec3 extents, const vmath::vec3& position,
 
 ModelReader_Obj::ModelReader_Obj()
 {
+	init();
+}
+
+void ModelReader_Obj::init()
+{
 	D(d);
+	d = ModelReader_ObjPrivate();
 	d.object = nullptr;
 	d.currentComponent = nullptr;
 }
@@ -78,6 +84,8 @@ ModelReader_Obj::ModelReader_Obj()
 bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object)
 {
 	D(d);
+	init();
+
 	buffer.convertToStringBuffer();
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);
@@ -119,6 +127,9 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 		else if (strEqual(token, "mtllib"))
 		{
 			// material
+			char name[LINE_MAX];
+			s.next(name);
+			loadMaterial(settings, name);
 		}
 		else if (strEqual(token, "usemtl"))
 		{
@@ -192,4 +203,59 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 		}
 	};
 	d.currentComponent->endFace();
+}
+
+void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename)
+{
+	D(d);
+	std::string mtlPath = settings.modelName;
+	mtlPath.append("/");
+	mtlPath.append(mtlFilename);
+	std::string mtlFullPath = settings.gamePackage.path(PI_MODELS, mtlPath.c_str());
+	GamePackageBuffer buffer;
+	settings.gamePackage.readFileFromPath(mtlFullPath.c_str(), &buffer);
+	buffer.convertToStringBuffer();
+	char line[LINE_MAX];
+	StringReader sr((char*)buffer.buffer);
+
+	ModelReader_Obj_Material* material = nullptr;
+	while (sr.readLine(line))
+	{
+		Scanner s(line);
+		char token[LINE_MAX];
+		s.next(token);
+		if (strEqual(token, "newmtl"))
+		{
+			char name[LINE_MAX];
+			s.next(name);
+			material = &(d.materials[name]);
+			memset(material, 0, sizeof(*material));
+		}
+		else if (strEqual(token, "Ns"))
+		{
+			ASSERT(material);
+			s.nextFloat(&material->ns);
+		}
+		else if (strEqual(token, "Kd"))
+		{
+			ASSERT(material);
+			s.nextFloat(&material->kd[0]);
+			s.nextFloat(&material->kd[1]);
+			s.nextFloat(&material->kd[2]);
+		}
+		else if (strEqual(token, "Ka"))
+		{
+			ASSERT(material);
+			s.nextFloat(&material->ka[0]);
+			s.nextFloat(&material->ka[1]);
+			s.nextFloat(&material->ka[2]);
+		}
+		else if (strEqual(token, "Ks"))
+		{
+			ASSERT(material);
+			s.nextFloat(&material->ks[0]);
+			s.nextFloat(&material->ks[1]);
+			s.nextFloat(&material->ks[2]);
+		}
+	}
 }

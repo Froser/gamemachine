@@ -628,7 +628,8 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 			*db.gamePackage,
 			m->extents,
 			entity->origin,
-			path.c_str()
+			path.c_str(),
+			m->model
 		};
 		ModelReader::load(settings, &coreObj);
 		if (!coreObj)
