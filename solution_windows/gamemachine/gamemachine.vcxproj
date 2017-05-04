@@ -180,7 +180,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -214,7 +214,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib;../../coding/3rdparty/freetype-2.3.5/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <TreatWarningAsError>true</TreatWarningAsError>
