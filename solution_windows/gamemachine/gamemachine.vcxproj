@@ -33,6 +33,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\shader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\typo\typopainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.h" />
@@ -106,6 +107,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\shader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\typo\typopainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.cpp" />
@@ -171,7 +173,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -195,7 +197,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib;../../coding/3rdparty/freetype-2.3.5/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PrecompiledHeader>Use</PrecompiledHeader>

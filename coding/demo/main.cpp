@@ -21,6 +21,7 @@
 #include "gmdatacore/gamepackage.h"
 
 #include <fstream>
+#include "gmdatacore/typo/typopainter.h"
 
 using namespace gm;
 
@@ -72,7 +73,7 @@ public:
 		m_input.initMouse(m_gm->getWindow());
 		GamePackage pk(m_gm, &factory);
 #ifdef _DEBUG
-		pk.loadPackage("D:/gm.pk0");
+		pk.loadPackage("D:/gmpk");
 #else
 		pk.loadPackage((Path::getCurrentPath() + "gm.pk0").c_str());
 #endif
@@ -241,6 +242,8 @@ int WINAPI WinMain(
 		new GMGLFactory(),
 		new GameHandler()
 	);
+
+	TypoPainter p;
 
 	gameMachine->startGameMachine();
 	return 0;

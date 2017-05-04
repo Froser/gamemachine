@@ -41,6 +41,9 @@
     <Filter Include="src\gmdatacore\modelreader">
       <UniqueIdentifier>{304455d1-608f-4b3b-8e1b-cdd29e984439}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gmdatacore\typo">
+      <UniqueIdentifier>{c37d05bb-62a5-4e75-9d13-241a57a351c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -262,6 +265,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\modelreader\modelreader.h">
       <Filter>src\gmdatacore\modelreader</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\typo\typopainter.h">
+      <Filter>src\gmdatacore\typo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -467,6 +473,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\modelreader\modelreader_obj.cpp">
       <Filter>src\gmdatacore\modelreader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\typo\typopainter.cpp">
+      <Filter>src\gmdatacore\typo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

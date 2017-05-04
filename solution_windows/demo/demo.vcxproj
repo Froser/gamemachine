@@ -23,7 +23,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -53,8 +53,8 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>xinput.lib;freeglut_staticd.lib;glu32.lib;opengl32.lib;glew32s.lib;gamemachine.lib;zlibstaticd.lib;libpng16_staticd.lib;libjpeg.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(TargetDir);../../coding/3rdparty/glew/lib/release/win32;../../bullet3_windows/lib/Debug;../../freeglut-3.0.0_windows/lib/Debug;../../libpng_windows/Debug;../../zlib_windows/Debug;../../coding/3rdparty/jpeg-6;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>xinput.lib;freeglut_staticd.lib;glu32.lib;opengl32.lib;glew32s.lib;gamemachine.lib;zlibstaticd.lib;libpng16_staticd.lib;libjpeg.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(TargetDir);../../coding/3rdparty/glew/lib/release/win32;../../bullet3_windows/lib/Debug;../../freeglut-3.0.0_windows/lib/Debug;../../libpng_windows/Debug;../../zlib_windows/Debug;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/freetype-2.3.5/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <SubSystem>Console</SubSystem>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
