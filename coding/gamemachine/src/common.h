@@ -33,6 +33,7 @@ typedef short SHORT;
 
 BEGIN_NS
 typedef unsigned char GMbyte;
+typedef GMbyte* PBYTE;
 typedef GLfloat GMfloat;
 typedef GLint GMint;
 typedef GLuint GMuint;

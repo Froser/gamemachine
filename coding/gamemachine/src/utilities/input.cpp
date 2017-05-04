@@ -3,6 +3,48 @@
 #include "gmengine/controllers/gamemachine.h"
 #ifdef _WINDOWS
 
+XInputWrapper::XInputWrapper()
+	: m_xinputGetState(nullptr)
+	, m_xinputSetState(nullptr)
+	, m_module(0)
+{
+#ifdef _WINDOWS
+	m_module = LoadLibrary("xinput1_4.dll");
+	if (!m_module)
+	{
+		gm_warning("cannot find xinput dll, xinput disabled.");
+		FreeLibrary(m_module);
+		return;
+	}
+
+	m_xinputGetState = (XInputGetState_Delegate)GetProcAddress(m_module, "XInputGetState");
+	m_xinputSetState = (XInputSetState_Delegate)GetProcAddress(m_module, "XInputSetState");
+#endif
+}
+
+DWORD XInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
+{
+	if (m_xinputGetState)
+		return m_xinputGetState(dwUserIndex, pState);
+	else
+		gm_warning("cannot invoke XInputGetState");
+	return ERROR_DLL_INIT_FAILED;
+}
+
+DWORD XInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
+{
+	if (m_xinputSetState)
+		return m_xinputSetState(dwUserIndex, pVibration);
+	else
+		gm_warning("cannot invoke XInputGetState");
+	return ERROR_DLL_INIT_FAILED;
+}
+
+XInputWrapper::~XInputWrapper()
+{
+	FreeLibrary(m_module);
+}
+
 Input_Windows::Input_Windows()
 	: m_mouseReady(false)
 {
@@ -26,7 +68,7 @@ JoystickState Input_Windows::getJoystickState()
 	XINPUT_STATE state;
 	JoystickState result = { false };
 
-	if (XInputGetState(0, &state) == ERROR_SUCCESS)
+	if (m_xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
 	{
 		result.valid = true;
 		result.leftTrigger = state.Gamepad.bLeftTrigger;
@@ -44,7 +86,7 @@ JoystickState Input_Windows::getJoystickState()
 void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
 {
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
-	XInputSetState(0, &v);
+	m_xinput.XInputSetState(0, &v);
 }
 
 KeyboardState Input_Windows::getKeyboardState()
