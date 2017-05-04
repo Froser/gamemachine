@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 #include "object.h"
 #include "utilities/vmath.h"
+#include <algorithm>
+
+#define VERTEX_DEMENSION 4 //顶点的维度，最高维度是齐次维度，恒为1
 
 ObjectPainter::ObjectPainter(Object* obj)
 	: m_object(obj)
@@ -34,7 +37,7 @@ Component::Component(ChildObject* parent)
 {
 	memset(&m_shader, 0, sizeof(m_shader));
 
-	setVertexOffset(m_parent->vertices().size());
+	setVertexOffset(m_parent->vertices().size() / VERTEX_DEMENSION);
 }
 
 Component::~Component()
@@ -151,28 +154,28 @@ void ChildObject::calculateTangentSpace()
 		Component* component = (*iter);
 		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
 		{
-			GMint offset = component->getOffsetPtr()[i] / 4;
+			GMint offset = component->getOffsetPtr()[i] / VERTEX_DEMENSION;
 			GMint edgeCount = component->getPrimitiveVerticesCountPtr()[i];
 
 			// 开始计算每条边切线空间
 			for (GMint j = 0; j < edgeCount; j++)
 			{
-				vmath::vec3 e0(m_vertices[(offset + j) * 4], m_vertices[(offset + j) * 4 + 1], m_vertices[(offset + j) * 4 + 3]);
+				vmath::vec3 e0(m_vertices[(offset + j) * VERTEX_DEMENSION], m_vertices[(offset + j) * VERTEX_DEMENSION + 1], m_vertices[(offset + j) * VERTEX_DEMENSION + 3]);
 				vmath::vec3 e1, e2;
 				if (j == edgeCount - 2)
 				{
-					e1 = vmath::vec3(m_vertices[(offset + j + 1) * 4], m_vertices[(offset + j + 1) * 4 + 1], m_vertices[(offset + j + 1) * 4 + 2]);
-					e2 = vmath::vec3(m_vertices[offset * 4], m_vertices[offset * 4 + 1], m_vertices[offset * 4 + 3]);
+					e1 = vmath::vec3(m_vertices[(offset + j + 1) * VERTEX_DEMENSION], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 1], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
+					e2 = vmath::vec3(m_vertices[offset * VERTEX_DEMENSION], m_vertices[offset * VERTEX_DEMENSION + 1], m_vertices[offset * VERTEX_DEMENSION + 3]);
 				}
 				else if (j == edgeCount - 1)
 				{
-					e1 = vmath::vec3(m_vertices[offset * 4], m_vertices[offset * 2 + 1], m_vertices[offset * 4 + 2]);
-					e2 = vmath::vec3(m_vertices[(offset + 1) * 4], m_vertices[(offset + 1) * 4 + 1], m_vertices[offset * 4 + 2]);
+					e1 = vmath::vec3(m_vertices[offset * VERTEX_DEMENSION], m_vertices[offset * 2 + 1], m_vertices[offset * VERTEX_DEMENSION + 2]);
+					e2 = vmath::vec3(m_vertices[(offset + 1) * VERTEX_DEMENSION], m_vertices[(offset + 1) * VERTEX_DEMENSION + 1], m_vertices[offset * VERTEX_DEMENSION + 2]);
 				}
 				else
 				{
-					e1 = vmath::vec3(m_vertices[(offset + j + 1) * 4], m_vertices[(offset + j + 1) * 4 + 1], m_vertices[(offset + j + 1) * 4 + 2]);
-					e2 = vmath::vec3(m_vertices[(offset + j + 2) * 4], m_vertices[(offset + j + 2) * 4 + 1], m_vertices[(offset + j + 1) * 4 + 2]);
+					e1 = vmath::vec3(m_vertices[(offset + j + 1) * VERTEX_DEMENSION], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 1], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
+					e2 = vmath::vec3(m_vertices[(offset + j + 2) * VERTEX_DEMENSION], m_vertices[(offset + j + 2) * VERTEX_DEMENSION + 1], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
 				}
 
 				vmath::vec2 uv0(m_uvs[(offset + j) * 2], m_uvs[(offset + j) * 2 + 1]);

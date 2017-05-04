@@ -167,8 +167,10 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 
 	ChildObject* child = d.object->getChildObjects()[0];
 	if (!d.currentComponent)
+	{
 		d.currentComponent = new Component(child);
-	// setup component by material
+		applyMaterial(material, d.currentComponent->getShader());
+	}
 
 	char face[LINE_MAX];
 	d.currentComponent->beginFace();
@@ -257,5 +259,26 @@ void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char
 			s.nextFloat(&material->ks[1]);
 			s.nextFloat(&material->ks[2]);
 		}
+	}
+}
+
+void ModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Shader& shader)
+{
+	shader.cull = GMS_NONE;
+
+	shader.lights[LT_AMBIENT].on = true;
+	shader.lights[LT_AMBIENT].useGlobalLightColor = true;
+	for (GMint i = 0; i < 3; i++)
+	{
+		shader.lights[LT_AMBIENT].args[LA_KA + i] = material.ka[i];
+	}
+
+	shader.lights[LT_SPECULAR].on = true;
+	shader.lights[LT_SPECULAR].useGlobalLightColor = true;
+	shader.lights[LT_SPECULAR].args[LA_SHINESS] = material.ns;
+	for (GMint i = 0; i < 3; i++)
+	{
+		shader.lights[LT_SPECULAR].args[LA_KD + i] = material.kd[i];
+		shader.lights[LT_SPECULAR].args[LA_KS + i] = material.ks[i];
 	}
 }

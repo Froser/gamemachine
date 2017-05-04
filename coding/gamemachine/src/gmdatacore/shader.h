@@ -119,6 +119,7 @@ enum LightArgs
 struct LightInfo
 {
 	bool on;
+	bool useGlobalLightColor; // true表示使用全局的光的颜色
 	vmath::vec3 lightPosition;
 	vmath::vec3 lightColor;
 	GMfloat args[LA_END];

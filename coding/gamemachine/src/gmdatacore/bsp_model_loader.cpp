@@ -60,6 +60,9 @@ void BSPModelLoader::parse(const char* data)
 		return;
 	}
 
+	if (doc->Error())
+		return;
+
 	m_modelDocs.push_back(doc);
 	TiXmlElement* root = doc->RootElement();
 	TiXmlElement* it = root->FirstChildElement();

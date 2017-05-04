@@ -20,6 +20,7 @@ class Object;
 struct GamePackageBuffer;
 class Scanner;
 class Component;
+struct Shader;
 struct ModelReader_ObjPrivate
 {
 	Object* object;
@@ -47,6 +48,7 @@ private:
 	void init();
 	void appendFace(Scanner& scanner);
 	void loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename);
+	void applyMaterial(const ModelReader_Obj_Material& material, Shader& shader);
 };
 
 END_NS
