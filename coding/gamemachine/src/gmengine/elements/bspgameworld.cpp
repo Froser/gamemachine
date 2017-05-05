@@ -457,6 +457,7 @@ void BSPGameWorld::initTextures()
 
 		Image* tex = nullptr;
 
+#if 0 //DEBUG
 		p.getImage(&tex);
 		ITexture* texture;
 		factory->createTexture(tex, &texture);
@@ -464,8 +465,7 @@ void BSPGameWorld::initTextures()
 		item.name = shader.shader;
 		item.texture = texture;
 		rc->getTextureContainer().insert(item);
-
-		/*
+#endif
 		if (findTexture(shader.shader, &tex))
 		{
 			ITexture* texture;
@@ -480,7 +480,6 @@ void BSPGameWorld::initTextures()
 		{
 			gm_warning("Cannot find texture %s", shader.shader);
 		}
-		*/
 	}
 }
 
