@@ -102,7 +102,9 @@ bool ImageReader_JPG::load(const GMbyte* data, GMuint size, OUT Image** image)
 		imgData.internalFormat = GL_RGB8;
 	}
 
-	imgData.mip[0].data = new GMbyte[imgData.mip[0].width * imgData.mip[0].height * channels];
+	GMuint bufferSize = imgData.mip[0].width * imgData.mip[0].height * channels;
+	imgData.mip[0].data = new GMbyte[bufferSize];
+	imgData.size = bufferSize;
 
 	GMbyte** rowPtr = new GMbyte*[imgData.mip[0].height];
 

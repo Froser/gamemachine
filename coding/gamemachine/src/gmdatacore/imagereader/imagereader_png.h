@@ -20,7 +20,7 @@ public:
 	virtual bool test(const GMbyte* data) override;
 
 private:
-	void writeDataToImage(PngData& png, Image* img);
+	void writeDataToImage(PngData& png, Image* img, GMuint size);
 };
 
 END_NS

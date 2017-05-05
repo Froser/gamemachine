@@ -14,7 +14,7 @@ public:
 	virtual bool test(const GMbyte* byte) override;
 
 private:
-	void writeDataToImage(BitmapFile& bitmap, Image* img);
+	void writeDataToImage(BitmapFile& bitmap, Image* img, GMuint size);
 };
 
 END_NS

@@ -19,6 +19,8 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_surface_flags.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp_model_loader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphmanager.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
@@ -33,7 +35,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\object.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\shader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\typo\typopainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.h" />
@@ -93,6 +94,8 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp\bsp_shader_loader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp_model_loader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphmanager.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
@@ -107,7 +110,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\object.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\shader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\typo\typopainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.cpp" />
@@ -173,14 +175,14 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">

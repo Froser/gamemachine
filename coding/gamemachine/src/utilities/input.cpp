@@ -3,13 +3,25 @@
 #include "gmengine/controllers/gamemachine.h"
 #ifdef _WINDOWS
 
+static char* xinputDlls[] = {
+	"xinput1_3.dll",
+	"xinput1_4.dll",
+	"xinput9_1_0.dll",
+};
+
 XInputWrapper::XInputWrapper()
 	: m_xinputGetState(nullptr)
 	, m_xinputSetState(nullptr)
 	, m_module(0)
 {
 #ifdef _WINDOWS
-	m_module = LoadLibrary("xinput1_4.dll");
+	for (GMint i = 0; i < 3; i++)
+	{
+		m_module = LoadLibrary(xinputDlls[i]);
+		if (m_module)
+			break;
+	}
+
 	if (!m_module)
 	{
 		gm_warning("cannot find xinput dll, xinput disabled.");

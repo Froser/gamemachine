@@ -109,7 +109,7 @@ bool ImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT Image** img)
 	bitmapFile.buffer = new BYTE[cnt];
 	ms.read(reinterpret_cast<GMbyte*>(bitmapFile.buffer), cnt);
 
-	writeDataToImage(bitmapFile, image);
+	writeDataToImage(bitmapFile, image, cnt);
 
 	return true;
 }
@@ -120,7 +120,7 @@ bool ImageReader_BMP::test(const GMbyte* byte)
 	return header->bfType == 19778;
 }
 
-void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img)
+void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img, GMuint size)
 {
 	ASSERT(img);
 	ImageData& data = img->getData();
@@ -138,6 +138,7 @@ void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img)
 	data.mip[0].width = bitmap.bitmapInfoHeader.biWidth;
 	// Buffer 移交给 Image 管理
 	data.mip[0].data = bitmap.buffer;
+	data.size = size;
 #else
 	ASSERT(false);
 #endif

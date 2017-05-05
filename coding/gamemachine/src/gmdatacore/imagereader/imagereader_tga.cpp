@@ -391,9 +391,9 @@ void ImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)
 	data.swizzle[2] = GL_BLUE;
 	data.swizzle[3] = GL_ALPHA;
 	data.type = GL_UNSIGNED_BYTE;
+	data.size = tga.get_nbytes();
 	data.mip[0].height = tga.get_height();
 	data.mip[0].width = tga.get_width();
-
 	data.mip[0].data = new GMbyte[tga.get_nbytes()];
 	memcpy(data.mip[0].data, tga.buffer(), tga.get_nbytes());
 #else

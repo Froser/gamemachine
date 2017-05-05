@@ -11,6 +11,12 @@
 	protected: \
 	className##Private& data() { return m_data; }
 #define D(d) auto& d = data()
+#define DEFINE_PRIVATE_ON_HEAP(className) \
+	private: \
+	typedef className##Private DataType; \
+	className##Private* m_data; \
+	protected: \
+	className##Private*& data() { return m_data; }
 #define D_BASE(base, d) auto& d = base::data()
 
 #define AUTORELEASE

@@ -586,6 +586,7 @@ static bool loadDDS(const GMbyte* data, GMuint size, ImageData* image)
 
 	GMuint current_pos = ms.tell();
 	image->totalDataSize = size - current_pos;
+	image->size = image->totalDataSize;
 	image->mip[0].data = new GMbyte[image->totalDataSize];
 	ms.read(reinterpret_cast<GMbyte*>(image->mip[0].data), size - current_pos);
 

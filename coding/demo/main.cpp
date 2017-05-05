@@ -21,8 +21,6 @@
 #include "gmdatacore/gamepackage.h"
 
 #include <fstream>
-#include "gmdatacore/typo/typopainter.h"
-
 using namespace gm;
 
 BSPGameWorld* world;
@@ -242,8 +240,6 @@ int WINAPI WinMain(
 		new GMGLFactory(),
 		new GameHandler()
 	);
-
-	TypoPainter p;
 
 	gameMachine->startGameMachine();
 	return 0;

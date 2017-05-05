@@ -25,7 +25,7 @@ static void pngReadCallback(png_structp png_ptr, png_bytep data, png_size_t leng
 		png_error(png_ptr, "pngReaderCallback failed");
 }
 
-static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, bool flip = false)
+static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuint& bufferSize, bool flip = false)
 {
 	png_structp png_ptr;
 	png_infop  info_ptr;
@@ -61,7 +61,7 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, bool flip
 	{
 		size *= (4 * sizeof(unsigned char));
 		out->hasAlpha = true;
-		out->rgba = new unsigned char[size];
+		out->rgba = new GMbyte[size];
 
 		temp = (4 * out->width);
 		for (i = 0; i < out->height; i++)
@@ -81,9 +81,9 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, bool flip
 	}
 	else if (channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
 	{
-		size *= (3 * sizeof(unsigned char));
+		size *= (3 * sizeof(GMbyte));
 		out->hasAlpha = false;
-		out->rgba = new unsigned char[size];
+		out->rgba = new GMbyte[size];
 
 		temp = (3 * out->width);
 		for (i = 0; i < out->height; i++)
@@ -106,6 +106,7 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, bool flip
 	}
 
 	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+	bufferSize = size;
 	return true;
 }
 struct PNGTestHeader
@@ -119,8 +120,9 @@ bool ImageReader_PNG::load(const GMbyte* data, GMuint size, OUT Image** img)
 	*img = new Image();
 
 	PngData png;
-	bool b = loadPng(data, size, &png, true);
-	writeDataToImage(png, *img);
+	GMuint bufferSize;
+	bool b = loadPng(data, size, &png, bufferSize, true);
+	writeDataToImage(png, *img, bufferSize);
 	return b;
 }
 
@@ -130,7 +132,7 @@ bool ImageReader_PNG::test(const GMbyte* data)
 	return header->magic1 == 1196314761 && header->magic2 == 169478669;
 }
 
-void ImageReader_PNG::writeDataToImage(PngData& png, Image* img)
+void ImageReader_PNG::writeDataToImage(PngData& png, Image* img, GMuint size)
 {
 	ASSERT(img);
 	ImageData& data = img->getData();
@@ -152,6 +154,7 @@ void ImageReader_PNG::writeDataToImage(PngData& png, Image* img)
 	data.mip[0].width = png.width;
 	// Buffer 移交给 Image 管理
 	data.mip[0].data = png.rgba;
+	data.size = size;
 #else
 	ASSERT(false);
 #endif
