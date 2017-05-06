@@ -90,13 +90,15 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 
 			if (!shadowMapping)
 			{
-				if (lastShaders != &shaders)
+				if (type != ChildObject::Glyph)
 				{
-					setEyeViewport(shadowOn, shaders);
-					lastShaders = &shaders;
+					if (lastShaders != &shaders)
+					{
+						setEyeViewport(shadowOn, shaders);
+						lastShaders = &shaders;
+					}
 				}
 				shadowTexture(shadowOn, shaders);
-
 				painter->setWorld(m_world);
 			}
 			else
@@ -166,6 +168,9 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 
 	BEGIN_ENUM(i, ChildObject::ObjectTypeBegin, ChildObject::ObjectTypeEnd)
 	{
+		if (i == ChildObject::Glyph)
+			continue;
+
 		GMGLShaders* shaders = getShaders(i);
 		if (!shaders)
 			continue;

@@ -152,6 +152,7 @@ struct BSPRenderPrivate
 	GMint numPolygonFaces;
 	GMint numPatches;
 	GMint numMeshFaces;
+	std::vector<GameObject*> alwaysVisibleObjects;
 	std::vector<BSP_Render_FaceDirectoryEntry> faceDirectory;
 	std::vector<BSP_Render_Face> polygonFaces;
 	std::vector<BSP_Render_Face> meshFaces;

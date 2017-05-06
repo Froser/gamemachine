@@ -1,7 +1,7 @@
 ﻿#ifndef __GAMEWORLD_PRIVATE_H__
 #define __GAMEWORLD_PRIVATE_H__
 #include "common.h"
-#include <vector>
+#include <set>
 #include "utilities/autoptr.h"
 #include "gmphysics/physicsworld.h"
 #include "gmdatacore/shader.h"
@@ -17,7 +17,7 @@ struct GameWorldPrivate
 	GameWorldPrivate();
 	GamePackage* gamePackage;
 	GameMachine* gameMachine;
-	std::vector<GameObject*> shapes;
+	std::set<GameObject*> shapes;
 	Character* character;
 	GMfloat ellapsed;
 	LightInfo ambientLight;

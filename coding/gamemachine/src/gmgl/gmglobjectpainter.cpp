@@ -230,7 +230,6 @@ void GMGLObjectPainter::activeTextureTransform(Shader* shader, TextureIndex i, C
 		}
 		n++;
 	}
-
 }
 
 void GMGLObjectPainter::deactiveTexture(TextureIndex i, ChildObject::ObjectType type)

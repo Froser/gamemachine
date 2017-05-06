@@ -16,6 +16,8 @@ public:
 	void loadBSP(const char* mapPath);
 	void setSky(AUTORELEASE GameObject* sky);
 	GameObject* getSky();
+	void appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysVisible);
+	using GameWorld::appendObjectAndInit;
 
 public:
 	virtual void renderGameWorld() override;
@@ -35,6 +37,7 @@ private:
 	void drawPatch(GMint patchNumber);
 	void draw(BSP_Render_BiquadraticPatch& biqp);
 	void drawEntity(GMint leafId);
+	void drawAlwaysVisibleObjects();
 	template <typename T> bool setMaterialTexture(T face, REF Shader& shader);
 	void setMaterialLightmap(GMint lightmapid, REF Shader& shader);
 	int isClusterVisible(GMint cameraCluster, GMint testCluster);

@@ -136,6 +136,7 @@ public:
 		ObjectTypeBegin,
 		NormalObject = ObjectTypeBegin,
 		Sky,
+		Glyph,
 		ObjectTypeEnd,
 	};
 

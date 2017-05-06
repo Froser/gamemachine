@@ -48,7 +48,8 @@ void DefaultGMGLGamePackageHandler::init()
 	const std::string shaderMap[] = 
 	{
 		"object",
-		"sky"
+		"sky",
+		"glyph",
 	};
 
 	for (GMint i = ChildObject::ObjectTypeBegin; i < ChildObject::ObjectTypeEnd; i++)

@@ -38,11 +38,10 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 
-	d.shapes.push_back(obj);
+	d.shapes.insert(obj);
 
 	// 创建一个Painter
-	createPainterForObject(obj);
-	ObjectPainter* painter = obj->getObject()->getPainter();
+	ObjectPainter* painter = createPainterForObject(obj);
 	ASSERT(painter);
 	painter->transfer();
 }
@@ -97,7 +96,7 @@ GMfloat GameWorld::getElapsed()
 	return d.ellapsed;
 }
 
-void GameWorld::createPainterForObject(GameObject* obj)
+ObjectPainter* GameWorld::createPainterForObject(GameObject* obj)
 {
 	D(d);
 	GameMachine* gm = d.gameMachine;
@@ -107,6 +106,7 @@ void GameWorld::createPainterForObject(GameObject* obj)
 	factory->createPainter(engine, obj->getObject(), &painter);
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
+	return painter;
 }
 
 void GameWorld::setDefaultAmbientLight(const LightInfo& lightInfo)

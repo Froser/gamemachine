@@ -271,6 +271,9 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphpainter.h">
       <Filter>src\gmdatacore\glyph</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\elements\glyphobject.h">
+      <Filter>src\gmengine\elements</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -482,6 +485,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphmanager.cpp">
       <Filter>src\gmdatacore\glyph</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\elements\glyphobject.cpp">
+      <Filter>src\gmengine\elements</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

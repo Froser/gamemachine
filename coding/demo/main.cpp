@@ -21,6 +21,8 @@
 #include "gmdatacore/gamepackage.h"
 
 #include <fstream>
+#include "gmengine/elements/glyphobject.h"
+
 using namespace gm;
 
 BSPGameWorld* world;
@@ -76,6 +78,10 @@ public:
 		pk.loadPackage((Path::getCurrentPath() + "gm.pk0").c_str());
 #endif
 		pk.createBSPGameWorld("gv.bsp", &world);
+
+		GlyphObject* glyph = new GlyphObject();
+		glyph->setGeometry(-1, -1, 1, 1);
+		world->appendObjectAndInit(glyph, true);
 
 		/*
 		{

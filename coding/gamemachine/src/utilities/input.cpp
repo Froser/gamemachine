@@ -4,9 +4,9 @@
 #ifdef _WINDOWS
 
 static char* xinputDlls[] = {
-	"xinput1_3.dll",
-	"xinput1_4.dll",
 	"xinput9_1_0.dll",
+	"xinput1_4.dll",
+	"xinput1_3.dll",
 };
 
 XInputWrapper::XInputWrapper()

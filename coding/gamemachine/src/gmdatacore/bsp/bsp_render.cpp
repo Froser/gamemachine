@@ -8,7 +8,6 @@ BSPRenderData& BSPRender::renderData()
 	return d;
 }
 
-
 //Tesselate a biquadratic patch
 bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 {

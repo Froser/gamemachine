@@ -8,7 +8,7 @@ class Character;
 class GameMachine;
 struct IGraphicEngine;
 class GameObject;
-
+class ObjectPainter;
 class GameWorld
 {
 	DEFINE_PRIVATE(GameWorld)
@@ -21,7 +21,7 @@ public:
 	virtual PhysicsWorld* physicsWorld() = 0;
 
 public:
-	virtual void initialize();
+	void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
 	void simulateGameWorld(GMfloat elapsed);
 	IGraphicEngine* getGraphicEngine();
@@ -38,7 +38,7 @@ public:
 	Character* getMajorCharacter();
 
 private:
-	void createPainterForObject(GameObject* obj);
+	ObjectPainter* createPainterForObject(GameObject* obj);
 };
 
 END_NS

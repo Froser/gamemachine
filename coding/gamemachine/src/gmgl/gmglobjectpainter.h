@@ -20,6 +20,8 @@ public:
 	virtual void draw() override;
 	virtual void dispose() override;
 	virtual void clone(Object* obj, OUT ObjectPainter** painter) override;
+
+public:
 	void setWorld(GameWorld* world);
 
 private:

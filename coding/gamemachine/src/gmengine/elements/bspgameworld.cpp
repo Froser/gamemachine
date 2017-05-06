@@ -82,6 +82,14 @@ void BSPGameWorld::setMajorCharacter(Character* character)
 	GameWorld::setMajorCharacter(character);
 }
 
+void BSPGameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysVisible)
+{
+	D(d);
+	GameWorld::appendObjectAndInit(obj);
+	if (alwaysVisible)
+		d.render.renderData().alwaysVisibleObjects.push_back(obj);
+}
+
 void BSPGameWorld::calculateVisibleFaces()
 {
 	D(d);
@@ -97,7 +105,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	GMint cameraLeaf = calculateLeafNode(pos.position);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
-	for (int i = 0; i < bsp.numleafs; ++i)
+	for (GMint i = 0; i < bsp.numleafs; ++i)
 	{
 		//if the leaf is not in the PVS, continue
 		if (!isClusterVisible(cameraCluster, bsp.leafs[i].cluster))
@@ -109,7 +117,7 @@ void BSPGameWorld::calculateVisibleFaces()
 			continue;
 
 		//loop through faces in this leaf and mark them to be drawn
-		for (int j = 0; j < bsp.leafs[i].numLeafSurfaces; ++j)
+		for (GMint j = 0; j < bsp.leafs[i].numLeafSurfaces; ++j)
 		{
 			rd.facesToDraw.set(bsp.leafsurfaces[bsp.leafs[i].firstLeafSurface + j]);
 		}
@@ -123,7 +131,7 @@ GMint BSPGameWorld::calculateLeafNode(const vmath::vec3& position)
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
 
-	int currentNode = 0;
+	GMint currentNode = 0;
 
 	//loop until we find a negative index
 	while (currentNode >= 0)
@@ -139,13 +147,13 @@ GMint BSPGameWorld::calculateLeafNode(const vmath::vec3& position)
 	return ~currentNode;
 }
 
-int BSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
+GMint BSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
 	BSPRenderData& rd = d.render.renderData();
 
-	int index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
+	GMint index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
 	return rd.visibilityData.bitset[index] & (1 << (testCluster & 7));
 }
 
@@ -161,6 +169,8 @@ void BSPGameWorld::drawAll()
 			calculateVisibleFaces();
 		drawFaces();
 	}
+	
+	drawAlwaysVisibleObjects();
 }
 
 void BSPGameWorld::drawSky()
@@ -211,7 +221,7 @@ void BSPGameWorld::drawFace(GMint idx)
 		drawPatch(rd.faceDirectory[idx].typeFaceNumber);
 }
 
-void BSPGameWorld::preparePolygonFace(int polygonFaceNumber)
+void BSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
 {
 	D(d);
 	BSPRenderData& rd = d.render.renderData();
@@ -236,7 +246,7 @@ void BSPGameWorld::preparePolygonFace(int polygonFaceNumber)
 	appendObjectAndInit(obj);
 }
 
-void BSPGameWorld::prepareMeshFace(int meshFaceNumber)
+void BSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
 {
 	D(d);
 	BSPRenderData& rd = d.render.renderData();
@@ -260,7 +270,7 @@ void BSPGameWorld::prepareMeshFace(int meshFaceNumber)
 	appendObjectAndInit(obj);
 }
 
-void BSPGameWorld::preparePatch(int patchNumber)
+void BSPGameWorld::preparePatch(GMint patchNumber)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -274,7 +284,7 @@ void BSPGameWorld::preparePatch(int patchNumber)
 	}
 	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, shader);
 
-	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
+	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 	{
 		BSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
 		ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
@@ -329,7 +339,7 @@ void BSPGameWorld::drawPatch(GMint patchNumber)
 	BSPData& bsp = d.bsp.bspData();
 	BSPRenderData& rd = d.render.renderData();
 
-	for (int i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
+	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 		draw(rd.patches[patchNumber].quadraticPatches[i]);
 }
 
@@ -361,6 +371,16 @@ void BSPGameWorld::drawEntity(GMint leafId)
 		if (obj)
 			obj->getReadyForRender(d.drawingList);
 	});
+}
+
+void BSPGameWorld::drawAlwaysVisibleObjects()
+{
+	D(d);
+	std::vector<GameObject*>& objs = d.render.renderData().alwaysVisibleObjects;
+	for (auto iter = objs.begin(); iter != objs.end(); iter++)
+	{
+		(*iter)->getReadyForRender(d.drawingList);
+	}
 }
 
 template <typename T>
@@ -485,7 +505,7 @@ void BSPGameWorld::initTextures()
 
 bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 {
-	const int maxChars = 128;
+	const GMint maxChars = 128;
 	static std::string priorities[maxChars] =
 	{
 		".jpg",
@@ -520,9 +540,9 @@ void BSPGameWorld::initLightmaps()
 	IFactory* factory = getGameMachine()->getFactory();
 	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
 
-	const int BSP_LIGHTMAP_EXT = 128;
-	const int BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
-	int numLightmaps = bsp.numLightBytes / (BSP_LIGHTMAP_SIZE * sizeof(GMbyte));
+	const GMint BSP_LIGHTMAP_EXT = 128;
+	const GMint BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
+	GMint numLightmaps = bsp.numLightBytes / (BSP_LIGHTMAP_SIZE * sizeof(GMbyte));
 
 	for (GMint i = 0; i < numLightmaps; i++)
 	{
