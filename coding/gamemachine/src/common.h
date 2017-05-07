@@ -45,6 +45,7 @@ typedef GLint GMint;
 typedef GLuint GMuint;
 typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
+typedef wchar_t GMWChar;
 struct GMRect
 {
 	GMfloat x, y, width, height;

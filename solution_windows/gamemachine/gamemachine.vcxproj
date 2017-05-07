@@ -53,6 +53,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglglyphmanager.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
@@ -129,6 +130,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfunc.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgamepackagehandler.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglglyphmanager.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
