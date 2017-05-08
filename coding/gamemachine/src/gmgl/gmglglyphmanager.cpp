@@ -108,25 +108,11 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	glyphInfo.width = bitmapGlyph->bitmap.width;
 	glyphInfo.height = bitmapGlyph->bitmap.rows;
 
-	d.cursor_x += bitmapGlyph->bitmap.width;
-	//d.cursor_y += bitmapGlyph->bitmap.rows; //TODO
-
-	// 创建数据
-	GMuint size = bitmapGlyph->bitmap.width * bitmapGlyph->bitmap.rows;
-	GMbyte* buf = new GMbyte[size];
-	for (GMint j = 0; j < bitmapGlyph->bitmap.rows; j++)
-	{
-		for (GMint i = 0; i < bitmapGlyph->bitmap.width; i++)
-		{
-			buf[(i + j * bitmapGlyph->bitmap.width)] = 
-				(i >= bitmapGlyph->bitmap.width || j >= bitmapGlyph->bitmap.rows) ?
-				0 : bitmapGlyph->bitmap.buffer[i + bitmapGlyph->bitmap.width * j];
-		}
-	}
-
 	// 创建纹理
 	glBindTexture(GL_TEXTURE_2D, d.texture->getTextureId());
+	ASSERT(!glGetError());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 使用一个字节保存，必须设置对齐为1
+	ASSERT(!glGetError());
 	glTexSubImage2D(GL_TEXTURE_2D,
 		0,
 		glyphInfo.x,
@@ -135,9 +121,11 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 		glyphInfo.height,
 		GL_RED,
 		GL_UNSIGNED_BYTE,
-		buf);
+		bitmapGlyph->bitmap.buffer);
+	ASSERT(!glGetError());
 	glBindTexture(GL_TEXTURE_2D, 0);
-	delete[] buf;
+
+	d.cursor_x += bitmapGlyph->bitmap.width + 1;
 
 	// 存入缓存
 	CharList::_Pairib result = getCharList().insert(std::make_pair(c, glyphInfo));
