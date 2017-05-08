@@ -28,6 +28,8 @@ enum GMS_BlendFunc
 	GMS_ZERO = 0,
 	GMS_ONE,
 	GMS_DST_COLOR,
+	GMS_SRC_ALPHA,
+	GMS_ONE_MINUS_SRC_ALPHA,
 };
 
 enum GMS_Cull

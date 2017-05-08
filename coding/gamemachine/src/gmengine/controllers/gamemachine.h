@@ -20,6 +20,7 @@ struct IWindow
 struct IFactory;
 struct IGameHandler;
 class GameLoop;
+class GlyphManager;
 
 class GameMachine
 {
@@ -42,6 +43,7 @@ public:
 	IFactory* getFactory();
 	GameLoop* getGameLoop();
 	GraphicSettings& getSettings();
+	GlyphManager* getGlyphManager();
 	void startGameMachine();
 
 private:
@@ -54,6 +56,7 @@ private:
 	AutoPtr<IFactory> m_factory;
 	AutoPtr<IGraphicEngine> m_engine;
 	AutoPtr<IGameHandler> m_gameHandler;
+	AutoPtr<GlyphManager> m_glyphManager;
 };
 
 END_NS

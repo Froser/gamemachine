@@ -284,6 +284,12 @@ void GMGLObjectPainter::activateShader(Shader* shader)
 			case GMS_DST_COLOR:
 				factors[i] = GL_DST_COLOR;
 				break;
+			case GMS_SRC_ALPHA:
+				factors[i] = GL_SRC_ALPHA;
+				break;
+			case GMS_ONE_MINUS_SRC_ALPHA:
+				factors[i] = GL_ONE_MINUS_SRC_ALPHA;
+				break;
 			default:
 				ASSERT(false);
 				break;

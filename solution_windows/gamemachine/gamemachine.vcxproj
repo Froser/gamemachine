@@ -20,7 +20,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\bsp_model_loader.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphmanager.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\image.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.h" />
@@ -97,7 +96,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\bsp_model_loader.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\gamepackage.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphmanager.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\glyph\glyphpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\image.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagebuffer.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader.cpp" />
@@ -179,7 +177,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

@@ -80,7 +80,8 @@ public:
 		pk.createBSPGameWorld("gv.bsp", &world);
 
 		GlyphObject* glyph = new GlyphObject();
-		glyph->setGeometry(-1, -1, 1, 1);
+		glyph->setGeometry(0, 0, 1, 1);
+		glyph->setText(L"ba");
 		world->appendObjectAndInit(glyph, true);
 
 		/*

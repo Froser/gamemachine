@@ -4,9 +4,15 @@
 #include "gameobject.h"
 BEGIN_NS
 
+struct GlyphProperties
+{
+	GMfloat fontSize;
+};
+
 struct GlyphObjectPrivate
 {
 	std::wstring text;
+	GlyphProperties properties;
 	GMfloat left, bottom, width, height;
 	ITexture* texture;
 };
@@ -20,7 +26,7 @@ public:
 	GlyphObject();
 
 public:
-	void setText(const wchar_t* text);
+	void setText(const GMWChar* text);
 	void setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height);
 
 private:
@@ -28,7 +34,6 @@ private:
 
 private:
 	void constructObject();
-	void drawText(Component* component);
 };
 
 END_NS

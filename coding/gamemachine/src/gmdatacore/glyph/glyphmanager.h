@@ -4,6 +4,8 @@
 #include <map>
 BEGIN_NS
 
+struct ITexture;
+
 // 用于管理字形的类
 struct GlyphInfo
 {
@@ -21,8 +23,11 @@ public:
 public:
 	const GlyphInfo getChar(GMWChar c);
 
+public:
+	virtual ITexture* glyphTexture() = 0;
+
 protected:
-	virtual GlyphInfo createChar(GMWChar c) = 0;
+	virtual const GlyphInfo& createChar(GMWChar c) = 0;
 
 protected:
 	CharList& getCharList();

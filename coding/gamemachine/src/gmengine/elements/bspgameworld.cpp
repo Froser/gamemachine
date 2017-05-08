@@ -12,7 +12,6 @@
 #include "gmdatacore/gamepackage.h"
 #include <algorithm>
 #include "gmdatacore/modelreader/modelreader.h"
-#include "gmdatacore/glyph/glyphpainter.h"
 
 BSPGameWorld::BSPGameWorld(GamePackage* pk)
 	: GameWorld(pk)
@@ -470,22 +469,7 @@ void BSPGameWorld::initTextures()
 		if (d.shaderLoader.findItem(shader.shader, 0, nullptr))
 			continue;
 
-		GlyphPainter p;
-		GMRect rect = db.gameMachine->getWindow()->getWindowRect();
-		FontAttributes attr = { "", 48, rect.width, rect.height };
-		p.drawString(attr, L"下");
-
 		Image* tex = nullptr;
-
-#if 0 //DEBUG
-		p.getImage(&tex);
-		ITexture* texture;
-		factory->createTexture(tex, &texture);
-		TextureContainer::TextureItem item;
-		item.name = shader.shader;
-		item.texture = texture;
-		rc->getTextureContainer().insert(item);
-#endif
 		if (findTexture(shader.shader, &tex))
 		{
 			ITexture* texture;

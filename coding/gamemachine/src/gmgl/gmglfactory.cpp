@@ -5,6 +5,7 @@
 #include "gmglgraphic_engine.h"
 #include "gmglobjectpainter.h"
 #include "gmglgamepackagehandler.h"
+#include "gmglglyphmanager.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -45,4 +46,9 @@ void GMGLFactory::createGamePackage(GamePackage* pk, GamePackageType t, OUT IGam
 		ASSERT(false);
 		break;
 	}
+}
+
+void GMGLFactory::createGlyphManager(OUT GlyphManager** glyphManager)
+{
+	*glyphManager = new GMGLGlyphManager();
 }

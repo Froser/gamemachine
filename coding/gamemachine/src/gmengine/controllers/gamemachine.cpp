@@ -2,6 +2,7 @@
 #include "gamemachine.h"
 #include "factory.h"
 #include "gameloop.h"
+#include "gmdatacore/glyph/glyphmanager.h"
 
 GameMachine::GameMachine(
 	GraphicSettings settings,
@@ -62,12 +63,24 @@ GraphicSettings& GameMachine::getSettings()
 	return m_settings;
 }
 
+GlyphManager* GameMachine::getGlyphManager()
+{
+	return m_glyphManager;
+}
+
 void GameMachine::startGameMachine()
 {
+	// 创建Window (createWindow会初始化glew，所有GL操作必须要放在create之后）
 	m_window->initWindowSize(m_settings.windowSize[0], m_settings.windowSize[1]);
 	m_window->setWindowResolution(m_settings.resolution[0], m_settings.resolution[1]);
 	m_window->setWindowPosition(m_settings.startPosition[0], m_settings.startPosition[1]);
 	m_window->createWindow();
+
+	// 创建Glyph管理器
+	GlyphManager* glyphManager;
+	m_factory->createGlyphManager(&glyphManager);
+	m_glyphManager.reset(glyphManager);
+
 	m_gameHandler->init();
 	getGameLoop()->init(m_settings, m_gameHandler);
 	getGameLoop()->start();

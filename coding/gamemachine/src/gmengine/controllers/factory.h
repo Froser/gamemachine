@@ -16,6 +16,7 @@ class Image;
 class Object;
 class ObjectPainter;
 class GamePackage;
+class GlyphManager;
 struct IFactory
 {
 	virtual ~IFactory();
@@ -23,6 +24,7 @@ struct IFactory
 	virtual void createTexture(AUTORELEASE Image*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;
 	virtual void createGamePackage(GamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
+	virtual void createGlyphManager(OUT GlyphManager**) = 0;
 };
 
 END_NS
