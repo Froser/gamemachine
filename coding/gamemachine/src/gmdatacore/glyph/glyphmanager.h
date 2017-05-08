@@ -9,8 +9,8 @@ struct ITexture;
 // 用于管理字形的类
 struct GlyphInfo
 {
-	GMint x, y;
-	GMint width, height;
+	GMfloat x, y;
+	GMfloat width, height;
 };
 
 class GlyphManager

@@ -48,8 +48,8 @@ public:
 	virtual void drawTexture(TextureFrames* frames) override
 	{
 		glBindTexture(GL_TEXTURE_2D, m_id);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	}
 
 	GMuint getTextureId()
@@ -90,12 +90,10 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	//	FT_UInt glyphIndex;
 	FT_Face face;
 	FT_Glyph glyph;
-	error = FT_New_Face(g_lib.library, "C:\\Windows\\Fonts\\simsunb.TTF", 0, &face);
+	error = FT_New_Face(g_lib.library, "D://default.TTF", 0, &face);
 	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
 	error = FT_Set_Char_Size(face, 0, FONT_SIZE << 6, RESOLUTION, RESOLUTION);
-	//glyphIndex = FT_Get_Char_Index(face, 'a');
-	//error = FT_Load_Glyph(face, glyphIndex, FT_LOAD_DEFAULT);
-	error = FT_Load_Char(face, c, FT_LOAD_DEFAULT);
+	error = FT_Load_Glyph(face, FT_Get_Char_Index(face, c), FT_LOAD_DEFAULT);
 	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 	error = FT_Get_Glyph(face->glyph, &glyph);
 	error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 1);
@@ -110,9 +108,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 
 	// 创建纹理
 	glBindTexture(GL_TEXTURE_2D, d.texture->getTextureId());
-	ASSERT(!glGetError());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 使用一个字节保存，必须设置对齐为1
-	ASSERT(!glGetError());
 	glTexSubImage2D(GL_TEXTURE_2D,
 		0,
 		glyphInfo.x,
@@ -122,7 +118,6 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 		GL_RED,
 		GL_UNSIGNED_BYTE,
 		bitmapGlyph->bitmap.buffer);
-	ASSERT(!glGetError());
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	d.cursor_x += bitmapGlyph->bitmap.width + 1;

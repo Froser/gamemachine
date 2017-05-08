@@ -7,14 +7,14 @@
 
 #define VERTEX_X(i) i / resolutionWidth
 #define VERTEX_Y(i) i / resolutionHeight
-#define UV_X(i) ((GMfloat)i / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
-#define UV_Y(i) ((GMfloat)i / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
+#define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
+#define UV_Y(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
 
 GlyphObject::GlyphObject()
 	: GameObject(nullptr)
 {
 	D(d);
-	d.properties.fontSize = GMGLGlyphManager::FONT_SIZE * 2;
+	d.properties.fontSize = GMGLGlyphManager::FONT_SIZE * 4;
 }
 
 void GlyphObject::setText(const GMWChar* text)
@@ -64,6 +64,7 @@ void GlyphObject::constructObject()
 	const GMWChar* p = d.text.c_str();
 	const GMfloat Z = 0;
 	GMfloat offsetX = d.left, offsetY = d.bottom;
+
 	while (*p)
 	{
 		component->beginFace();
@@ -81,7 +82,7 @@ void GlyphObject::constructObject()
 		component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
 		component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
 		component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
-		
+
 		offsetX += VERTEX_X(d.properties.fontSize); //TODO 先不考虑换行
 		component->endFace();
 		p++;

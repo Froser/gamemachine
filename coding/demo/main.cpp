@@ -81,7 +81,7 @@ public:
 
 		GlyphObject* glyph = new GlyphObject();
 		glyph->setGeometry(0, 0, 1, 1);
-		glyph->setText(L"ha");
+		glyph->setText(L"ÄãºÃ£¬ÊÀ½ç");
 		world->appendObjectAndInit(glyph, true);
 
 		/*
