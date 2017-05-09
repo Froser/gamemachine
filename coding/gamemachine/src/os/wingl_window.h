@@ -1,12 +1,12 @@
-﻿#ifndef __WIN_WINDOW_H__
-#define __WIN_WINDOW_H__
+﻿#ifndef __WINGL_WINDOW_H__
+#define __WINGL_WINDOW_H__
 #include "common.h"
 #include "gmengine/controllers/gamemachine.h"
 BEGIN_NS
 
 #ifdef _WINDOWS
 
-struct WinWindowPrivate
+struct WinGLWindowPrivate
 {
 	char windowTitle[128];
 	LONG left, top, width, height;
@@ -21,13 +21,13 @@ struct WinWindowPrivate
 };
 
 // Windows下的Window类
-class WinWindow : public IWindow
+class WinGLWindow : public IWindow
 {
-	DEFINE_PRIVATE(WinWindow)
+	DEFINE_PRIVATE(WinGLWindow)
 
 public:
-	WinWindow();
-	~WinWindow();
+	WinGLWindow();
+	~WinGLWindow();
 
 public:
 	virtual bool createWindow() override;

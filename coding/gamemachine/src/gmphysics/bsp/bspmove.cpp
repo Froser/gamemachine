@@ -3,13 +3,14 @@
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmphysics/physicsstructs.h"
+#include "gmengine/controllers/gamemachine.h"
 
 enum
 {
 	GRAVITY_DIRECTION = 1
 };
 
-static const GMfloat OVERCLIP = 1.01f;
+static const GMfloat OVERCLIP = 1.f;
 static const GMfloat CLIP_IGNORE = .2f;
 
 BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
@@ -249,7 +250,7 @@ bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	BSPPhysicsWorldData& wd = d.world->physicsData();
-	GMfloat elapsed = .01f; // GameLoop::getInstance()->getElapsedAfterLastFrame();
+	GMfloat elapsed = wd.world->getGameMachine()->getElapsedSinceLastFrame();
 	vmath::vec3 velocity = d.movement.velocity;
 
 	GMint numbumps = 4, bumpcount;
@@ -280,7 +281,7 @@ bool BSPMove::slideMove(bool hasGravity)
 			d.object->shapeProps.bounding[0],
 			d.object->shapeProps.bounding[1],
 			moveTrace
-			);
+		);
 		
 		if (moveTrace.allsolid)
 		{

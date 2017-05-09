@@ -13,6 +13,7 @@ class ObjectPainter;
 class GMGLFactory : public IFactory
 {
 public:
+	virtual void createWindow(OUT IWindow**) override;
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;
 	virtual void createTexture(AUTORELEASE Image* image, OUT ITexture** texture) override;
 	virtual void createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectPainter** painter) override;

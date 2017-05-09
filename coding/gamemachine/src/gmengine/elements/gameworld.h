@@ -24,7 +24,7 @@ public:
 	void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
 	void initObject(GameObject* obj);
-	void simulateGameWorld(GMfloat elapsed);
+	void simulateGameWorld();
 	IGraphicEngine* getGraphicEngine();
 	void setGameMachine(GameMachine* gm);
 	GameMachine* getGameMachine();

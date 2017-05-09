@@ -31,11 +31,9 @@ class GameMachine;
 struct IGameHandler
 {
 	virtual void setGameMachine(GameMachine* gm) = 0;
-	virtual GameMachine* getGameMachine() = 0;
 	virtual void init() = 0;
 	virtual void event(GameMachineEvent evt) = 0;
-	virtual void logicalFrame(GMfloat elapsed) = 0;
-	virtual void onExit() = 0;
+	virtual void logicalFrame() = 0;
 	virtual bool isWindowActivate() = 0;
 };
 
@@ -67,7 +65,6 @@ class GameMachine
 public:
 	GameMachine(
 		GraphicSettings settings,
-		AUTORELEASE IWindow* window,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
@@ -78,9 +75,10 @@ public:
 	IFactory* getFactory();
 	GraphicSettings& getSettings();
 	GlyphManager* getGlyphManager();
+	GMfloat getFPS();
+	GMfloat getElapsedSinceLastFrame();
 	void startGameMachine();
 	void postMessage(GameMachineMessage msg);
-	
 
 private:
 	void init();

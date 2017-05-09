@@ -68,7 +68,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstructs.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\os\win_window.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\os\wingl_window.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\algorithm.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
@@ -140,7 +140,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\collisionobjectfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\os\win_window.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\os\wingl_window.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -175,7 +175,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

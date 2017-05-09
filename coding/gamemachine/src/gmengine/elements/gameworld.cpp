@@ -8,11 +8,14 @@
 #include "gmengine/controllers/gamemachine.h"
 #include <algorithm>
 #include "gmengine/controllers/factory.h"
+#include <time.h>
 
 GameWorld::GameWorld(GamePackage* pk)
 {
 	D(d);
 	d.gamePackage = pk;
+	d.elapsed = 0;
+	d.start = false;
 }
 
 GameWorld::~GameWorld()
@@ -59,12 +62,21 @@ Character* GameWorld::getMajorCharacter()
 	return d.character;
 }
 
-void GameWorld::simulateGameWorld(GMfloat elapsed)
+void GameWorld::simulateGameWorld()
 {
 	D(d);
-	d.character->simulation();
 	physicsWorld()->simulate();
-	d.ellapsed += elapsed;
+	d.character->simulation();
+	if (!d.start) // 第一次simulate
+	{
+		d.startTick = clock();
+		d.elapsed = 0;
+		d.start = true;
+	}
+	else
+	{
+		d.elapsed = (GMfloat)(clock() - d.startTick) * .001f;
+	}
 }
 
 IGraphicEngine* GameWorld::getGraphicEngine()
@@ -94,7 +106,7 @@ GamePackage* GameWorld::getGamePackage()
 GMfloat GameWorld::getElapsed()
 {
 	D(d);
-	return d.ellapsed;
+	return d.elapsed;
 }
 
 ObjectPainter* GameWorld::createPainterForObject(GameObject* obj)

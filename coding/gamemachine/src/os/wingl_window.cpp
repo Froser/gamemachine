@@ -1,26 +1,32 @@
 ﻿#include "stdafx.h"
-#include "win_window.h"
+#include "wingl_window.h"
 #include "utilities/assert.h"
 
 #ifdef _WINDOWS
 
 const char* CLASSNAME = "GameMachine Window";
 
-WinWindow::WinWindow()
+WinGLWindow::WinGLWindow()
 {
 	D(d);
+	strcpy_s(d.windowTitle, "GM");
 	d.depthBits = 24;
 	d.stencilBits = 8;
 	d.width = 700;
 	d.height = 400;
+
+	GMint screenWidth = GetSystemMetrics(SM_CXSCREEN),
+		screenHeight = GetSystemMetrics(SM_CYSCREEN);
+	d.left = (screenWidth - d.width) * .5f;
+	d.top = (screenHeight - d.height) * .5f;
 }
 
-WinWindow::~WinWindow()
+WinGLWindow::~WinGLWindow()
 {
 	dispose();
 }
 
-bool WinWindow::createWindow()
+bool WinGLWindow::createWindow()
 {
 	D(d);
 
@@ -28,11 +34,11 @@ bool WinWindow::createWindow()
 	DWORD dwExStyle;
 	DWORD dwStyle;
 
-	RECT WindowRect;
-	WindowRect.left = d.left;
-	WindowRect.right = d.left + d.width;
-	WindowRect.top = d.top;
-	WindowRect.bottom = d.top + d.height;
+	RECT windowRect;
+	windowRect.left = d.left;
+	windowRect.right = d.left + d.width;
+	windowRect.top = d.top;
+	windowRect.bottom = d.top + d.height;
 
 	d.hInstance = GetModuleHandle(NULL);
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -56,7 +62,7 @@ bool WinWindow::createWindow()
 	dwStyle = WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_VISIBLE;
 
 	// 在非全屏的时候才有效
-	AdjustWindowRectEx(&WindowRect, dwStyle, FALSE, dwExStyle);
+	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
 	if (!(d.hWnd = CreateWindowEx(dwExStyle,
 		CLASSNAME,							//class name
@@ -64,9 +70,9 @@ bool WinWindow::createWindow()
 		WS_CLIPSIBLINGS |					//required style
 		WS_CLIPCHILDREN |					//required style
 		dwStyle,							//Selected style
-		0, 0,								//window position
-		WindowRect.right - WindowRect.left,	//calculate adjusted width
-		WindowRect.bottom - WindowRect.top,	//calculate adjusted height
+		windowRect.left, windowRect.top,	//window position
+		windowRect.right - windowRect.left,	//calculate adjusted width
+		windowRect.bottom - windowRect.top,	//calculate adjusted height
 		NULL,								// no parent window
 		NULL,								//No Menu
 		d.hInstance,						//Instance
@@ -150,7 +156,7 @@ bool WinWindow::createWindow()
 	return true;
 }
 
-LRESULT CALLBACK WinWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK WinGLWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -163,14 +169,16 @@ LRESULT CALLBACK WinWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM 
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-GMRect WinWindow::getWindowRect()
+GMRect WinGLWindow::getWindowRect()
 {
 	D(d);
-	GMRect rect = { 0, 0, d.width, d.height };
-	return rect;
+	RECT rect;
+	GetWindowRect(d.hWnd, &rect);
+	GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
+	return r;
 }
 
-bool WinWindow::handleMessages()
+bool WinGLWindow::handleMessages()
 {
 	D(d);
 	while (PeekMessage(&d.msg, NULL, 0, 0, PM_REMOVE))
@@ -184,19 +192,19 @@ bool WinWindow::handleMessages()
 	return true;
 }
 
-void WinWindow::swapBuffers()
+void WinGLWindow::swapBuffers()
 {
 	D(d);
 	::SwapBuffers(d.hDC);
 }
 
-HWND WinWindow::hwnd()
+HWND WinGLWindow::hwnd()
 {
 	D(d);
 	return d.hWnd;
 }
 
-void WinWindow::dispose()
+void WinGLWindow::dispose()
 {
 	D(d);
 	if (d.hRC)

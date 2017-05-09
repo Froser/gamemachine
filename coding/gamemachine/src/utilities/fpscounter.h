@@ -9,6 +9,9 @@ struct FPSCounterPrivate
 	GMfloat lastTime;
 	GMlong frames;
 	GMfloat time;
+
+	GMfloat immediate_lastTime;
+	GMfloat elapsed_since_last_frame;
 };
 
 class FPSCounter
@@ -22,6 +25,7 @@ public:
 public:
 	void update();
 	GMfloat getFps();
+	GMfloat getElapsedSinceLastFrame();
 };
 
 

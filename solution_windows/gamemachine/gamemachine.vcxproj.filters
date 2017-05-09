@@ -268,11 +268,11 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglglyphmanager.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\os\win_window.h">
-      <Filter>src\os</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\fpscounter.h">
       <Filter>src\utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\os\wingl_window.h">
+      <Filter>src\os</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -480,11 +480,11 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglglyphmanager.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\os\win_window.cpp">
-      <Filter>src\os</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\fpscounter.cpp">
       <Filter>src\utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\os\wingl_window.cpp">
+      <Filter>src\os</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,7 @@ struct ITexture;
 // 用于管理字形的类
 struct GlyphInfo
 {
+	bool valid;
 	GMfloat x, y;
 	GMfloat width, height;
 	GMfloat bearingX, bearingY;

@@ -5,14 +5,12 @@
 
 GameMachine::GameMachine(
 	GraphicSettings settings,
-	AUTORELEASE IWindow* window,
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
 )
 {
 	D(d);
 	d.settings = settings;
-	d.window.reset(window);
 	d.factory.reset(factory);
 	d.gameHandler.reset(gameHandler);
 	d.gameHandler->setGameMachine(this);
@@ -22,6 +20,10 @@ GameMachine::GameMachine(
 void GameMachine::init()
 {
 	D(d);
+	IWindow* window;
+	d.factory->createWindow(&window);
+	d.window.reset(window);
+
 	IGraphicEngine* engine;
 	d.factory->createGraphicEngine(&engine);
 	engine->setGraphicSettings(&d.settings);
@@ -74,6 +76,18 @@ GlyphManager* GameMachine::getGlyphManager()
 	return d.glyphManager;
 }
 
+GMfloat GameMachine::getFPS()
+{
+	D(d);
+	return d.fpsCounter.getFps();
+}
+
+GMfloat GameMachine::getElapsedSinceLastFrame()
+{
+	D(d);
+	return d.fpsCounter.getElapsedSinceLastFrame();
+}
+
 void GameMachine::startGameMachine()
 {
 	D(d);
@@ -100,7 +114,7 @@ void GameMachine::startGameMachine()
 		if (!handleMessages())
 			break;
 		
-		d.gameHandler->logicalFrame(.016f); //TODO
+		d.gameHandler->logicalFrame(); //TODO
 
 		//d.drawStopwatch.start();
 		if (d.gameHandler->isWindowActivate())

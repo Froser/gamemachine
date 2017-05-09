@@ -6,6 +6,10 @@
 #include "utilities/assert.h"
 #include "gmgltexture.h"
 
+#ifdef _WINDOWS
+#include <shlobj.h>
+#endif
+
 struct TypoLibrary
 {
 	TypoLibrary()
@@ -22,6 +26,37 @@ struct TypoLibrary
 };
 
 static TypoLibrary g_lib;
+
+// 从系统获取字体文件，从上到下遍历，越靠前优先级越高
+struct FontList
+{
+	char fontName[MAX_PATH];
+};
+static FontList fontNameList[] = {
+	{ "msyh.ttf" },
+	{ "times.ttf" }
+};
+static GMuint fontNameNum = 2;
+
+static FT_Error loadFace(FT_Face* face)
+{
+	FT_Error err = FT_Err_Cannot_Open_Resource;
+#ifdef _WINDOWS
+	char path[MAX_PATH];
+	SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
+
+	for (GMuint i = 0; i < fontNameNum; i++)
+	{
+		std::string p(path);
+		p.append("/");
+		p.append(fontNameList[i].fontName);
+		err = FT_New_Face(g_lib.library, p.c_str(), 0, face);
+		if (err == FT_Err_Ok)
+			break;
+	}
+#endif
+	return err;
+}
 
 BEGIN_NS
 class GMGLGlyphTexture : public ITexture
@@ -86,11 +121,17 @@ ITexture* GMGLGlyphManager::glyphTexture()
 const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 {
 	D(d);
-	// 先获取字形
+	static GlyphInfo errGlyph = { false };
 	FT_Error error;
 	FT_Face face;
 	FT_Glyph glyph;
-	error = FT_New_Face(g_lib.library, "D://default.TTF", 0, &face);
+	error = loadFace(&face);
+	if (error != FT_Err_Ok)
+	{
+		gm_error("cannot found font file, cannot draw characters.");
+		return errGlyph;
+	}
+
 	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
 	error = FT_Set_Char_Size(face, 0, FONT_SIZE << 6, RESOLUTION, RESOLUTION);
 	error = FT_Load_Glyph(face, FT_Get_Char_Index(face, c), FT_LOAD_DEFAULT);
@@ -112,6 +153,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	}
 
 	GlyphInfo glyphInfo = { 0 };
+	glyphInfo.valid = true;
 	glyphInfo.x = d.cursor_u;
 	glyphInfo.y = d.cursor_v;
 	glyphInfo.width = bitmapGlyph->bitmap.width;

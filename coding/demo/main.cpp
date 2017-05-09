@@ -20,7 +20,7 @@
 
 #include <fstream>
 #include "gmengine/elements/glyphobject.h"
-#include "os/win_window.h"
+#include "os/wingl_window.h"
 
 using namespace gm;
 
@@ -108,16 +108,19 @@ public:
 			world->renderGameWorld();
 			{
 				const PositionState& position = world->getMajorCharacter()->getPositionState();
-				GMWChar x[32], y[32], z[32];
+				GMWChar x[32], y[32], z[32], fps[32];
 				swprintf_s(x, L"%f", position.position[0]);
 				swprintf_s(y, L"%f", position.position[1]);
 				swprintf_s(z, L"%f", position.position[2]);
+				swprintf_s(fps, L"%f", gameMachine->getFPS());
 				std::wstring str;
 				str.append(x);
 				str.append(L",");
 				str.append(y);
 				str.append(L",");
 				str.append(z);
+				str.append(L" fps: ");
+				str.append(fps);
 				glyph->setText(str.c_str());
 			}
 			break;
@@ -213,27 +216,17 @@ public:
 		}
 	}
 
-	void logicalFrame(GMfloat elapsed)
+	void logicalFrame()
 	{
-		world->simulateGameWorld(elapsed);
-	}
-
-	void onExit()
-	{
-		delete world;
+		world->simulateGameWorld();
 	}
 
 	bool isWindowActivate()
 	{
-		WinWindow* window = static_cast<WinWindow*> (m_gm->getWindow());
+		WinGLWindow* window = static_cast<WinGLWindow*> (m_gm->getWindow());
 		return GetActiveWindow() == window->hwnd();
 	}
-
-	GameMachine* getGameMachine()
-	{
-		return m_gm;
-	}
-
+	
 	GameMachine* m_gm;
 	Input m_input;
 };
@@ -253,11 +246,8 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	WinWindow* window = new WinWindow();
-
 	gameMachine = new GameMachine(
 		settings,
-		window,
 		new GMGLFactory(),
 		new GameHandler()
 	);

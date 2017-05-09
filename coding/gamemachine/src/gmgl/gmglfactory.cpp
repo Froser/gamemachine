@@ -6,6 +6,17 @@
 #include "gmglobjectpainter.h"
 #include "gmglgamepackagehandler.h"
 #include "gmglglyphmanager.h"
+#include "os/wingl_window.h"
+
+void GMGLFactory::createWindow(OUT IWindow** window)
+{
+	ASSERT(window);
+#ifdef _WINDOWS
+	*window = new WinGLWindow();
+#else
+#error need implement
+#endif
+}
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {

@@ -17,9 +17,11 @@ class Object;
 class ObjectPainter;
 class GamePackage;
 class GlyphManager;
+struct IWindow;
 struct IFactory
 {
 	virtual ~IFactory();
+	virtual void createWindow(OUT IWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE Image*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;

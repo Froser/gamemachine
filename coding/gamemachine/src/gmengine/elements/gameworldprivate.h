@@ -19,7 +19,9 @@ struct GameWorldPrivate
 	GameMachine* gameMachine;
 	std::set<GameObject*> shapes;
 	Character* character;
-	GMfloat ellapsed;
+	GMfloat elapsed;
+	GMlong startTick;
+	bool start;
 	LightInfo ambientLight;
 };
 
