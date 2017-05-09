@@ -6,7 +6,7 @@ BEGIN_NS
 
 struct GlyphProperties
 {
-	GMfloat fontSize;
+	GMfloat spaceWidth;
 };
 
 struct GlyphObjectPrivate

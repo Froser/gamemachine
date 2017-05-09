@@ -11,6 +11,8 @@ struct GlyphInfo
 {
 	GMfloat x, y;
 	GMfloat width, height;
+	GMfloat bearingX, bearingY;
+	GMfloat advance;
 };
 
 class GlyphManager

@@ -81,7 +81,7 @@ public:
 
 		GlyphObject* glyph = new GlyphObject();
 		glyph->setGeometry(0, 0, 1, 1);
-		glyph->setText(L"你好，世界");
+		glyph->setText(L"hello world 你好世界");
 		world->appendObjectAndInit(glyph, true);
 
 		/*

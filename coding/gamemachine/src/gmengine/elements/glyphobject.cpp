@@ -5,8 +5,8 @@
 #include "gmdatacore/glyph/glyphmanager.h"
 #include "gmgl/gmglglyphmanager.h"
 
-#define VERTEX_X(i) i / resolutionWidth
-#define VERTEX_Y(i) i / resolutionHeight
+#define X(i) (i) / resolutionWidth
+#define Y(i) (i) / resolutionHeight
 #define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
 #define UV_Y(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
 
@@ -14,7 +14,7 @@ GlyphObject::GlyphObject()
 	: GameObject(nullptr)
 {
 	D(d);
-	d.properties.fontSize = GMGLGlyphManager::FONT_SIZE * 4;
+	d.properties.spaceWidth = GMGLGlyphManager::FONT_SIZE / 2;
 }
 
 void GlyphObject::setText(const GMWChar* text)
@@ -63,27 +63,32 @@ void GlyphObject::constructObject()
 
 	const GMWChar* p = d.text.c_str();
 	const GMfloat Z = 0;
-	GMfloat offsetX = d.left, offsetY = d.bottom;
+	GMfloat x = d.left, y = d.bottom;
 
 	while (*p)
 	{
 		component->beginFace();
 		const GlyphInfo& glyph = glyphManager->getChar(*p);
 
-		// 按照条带顺序，创建顶点
-		// 0 2
-		//  1 3
-		component->vertex(offsetX, offsetY + VERTEX_Y(d.properties.fontSize), Z);
-		component->vertex(offsetX, offsetY, Z);
-		component->vertex(offsetX + VERTEX_X(d.properties.fontSize), offsetY + VERTEX_Y(d.properties.fontSize), Z);
-		component->vertex(offsetX + VERTEX_X(d.properties.fontSize), offsetY, Z);
-		
-		component->uv(UV_X(glyph.x), UV_Y(glyph.y));
-		component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
-		component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
-		component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
+		if (glyph.width > 0 && glyph.height > 0)
+		{
+			// 如果width和height为0，视为空格，只占用空间而已
+			// 否则：按照条带顺序，创建顶点
+			// 0 2
+			// 1 3
+			// 让所有字体origin开始的x轴平齐
+			component->vertex(x + X(glyph.bearingX), y + Y(glyph.bearingY), Z);
+			component->vertex(x + X(glyph.bearingX), y + Y(glyph.bearingY - glyph.height), Z);
+			component->vertex(x + X(glyph.bearingX + glyph.width), y + Y(glyph.bearingY), Z);
+			component->vertex(x + X(glyph.bearingX + glyph.width), y + Y(glyph.bearingY - glyph.height), Z);
 
-		offsetX += VERTEX_X(d.properties.fontSize); //TODO 先不考虑换行
+			component->uv(UV_X(glyph.x), UV_Y(glyph.y));
+			component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
+			component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
+			component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
+		}
+		x += X(glyph.advance);
+
 		component->endFace();
 		p++;
 	}

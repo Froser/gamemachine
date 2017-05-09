@@ -7,7 +7,7 @@ BEGIN_NS
 class GMGLGlyphTexture;
 struct GMGLGlyphManagerPrivate
 {
-	GMint cursor_x, cursor_y;
+	GMint cursor_x;
 	GMGLGlyphTexture* texture;
 };
 
@@ -19,7 +19,7 @@ public:
 	enum
 	{
 		FONT_SIZE = 24,
-		RESOLUTION = 100,
+		RESOLUTION = 150,
 		CANVAS_WIDTH = RESOLUTION * 100,
 		CANVAS_HEIGHT = RESOLUTION * 100,
 	};

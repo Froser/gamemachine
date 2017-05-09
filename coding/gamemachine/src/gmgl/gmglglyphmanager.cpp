@@ -65,7 +65,7 @@ END_NS
 GMGLGlyphManager::GMGLGlyphManager()
 {
 	D(d);
-	d.cursor_x = d.cursor_y = 0;
+	d.cursor_x = 0;
 	d.texture = new GMGLGlyphTexture();
 }
 
@@ -102,9 +102,12 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	// 创建结构
 	GlyphInfo glyphInfo = { 0 };
 	glyphInfo.x = d.cursor_x;
-	glyphInfo.y = d.cursor_y;
+	glyphInfo.y = 0;
 	glyphInfo.width = bitmapGlyph->bitmap.width;
 	glyphInfo.height = bitmapGlyph->bitmap.rows;
+	glyphInfo.bearingX = bitmapGlyph->left;
+	glyphInfo.bearingY = bitmapGlyph->top;
+	glyphInfo.advance = face->glyph->metrics.horiAdvance >> 6;
 
 	// 创建纹理
 	glBindTexture(GL_TEXTURE_2D, d.texture->getTextureId());
