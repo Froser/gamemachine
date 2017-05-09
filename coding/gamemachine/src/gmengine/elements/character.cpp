@@ -2,7 +2,6 @@
 #include "character.h"
 #include "utilities/assert.h"
 #include "gmengine/elements/gameworld.h"
-#include "gmengine/controllers/gameloop.h"
 
 Character::Character(GMfloat radius)
 	: GameObject(nullptr)

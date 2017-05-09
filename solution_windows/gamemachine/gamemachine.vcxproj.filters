@@ -44,6 +44,9 @@
     <Filter Include="src\gmdatacore\glyph">
       <UniqueIdentifier>{903be366-c3f5-4b85-b833-def2fa9f1841}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\os">
+      <UniqueIdentifier>{205725b6-0550-41c7-af1a-77047a3af403}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -59,9 +62,6 @@
       <Filter>src\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h">
-      <Filter>src\utilities</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\utilities\stopwatch.h">
       <Filter>src\utilities</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\vmath.h">
@@ -142,9 +142,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h">
-      <Filter>src\gmgl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.h">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClInclude>
@@ -182,9 +179,6 @@
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.h">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.h">
       <Filter>src\gmengine\controllers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gamemachine.h">
@@ -274,6 +268,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglglyphmanager.h">
       <Filter>src\gmgl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\os\win_window.h">
+      <Filter>src\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\fpscounter.h">
+      <Filter>src\utilities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -283,9 +283,6 @@
       <Filter>src\utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp">
-      <Filter>src\utilities</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\utilities\stopwatch.cpp">
       <Filter>src\utilities</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\assert.cpp">
@@ -366,9 +363,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglfactory.cpp">
       <Filter>src\gmgl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp">
-      <Filter>src\gmgl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\imagereader\imagereader_png.cpp">
       <Filter>src\gmdatacore\imagereader</Filter>
     </ClCompile>
@@ -403,9 +397,6 @@
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.cpp">
-      <Filter>src\gmengine\controllers</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.cpp">
       <Filter>src\gmengine\controllers</Filter>
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gamemachine.cpp">
@@ -488,6 +479,12 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglglyphmanager.cpp">
       <Filter>src\gmgl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\os\win_window.cpp">
+      <Filter>src\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\fpscounter.cpp">
+      <Filter>src\utilities</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

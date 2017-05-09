@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "bspmove.h"
-#include "gmengine/controllers/gameloop.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmphysics/physicsstructs.h"
@@ -250,7 +249,7 @@ bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	BSPPhysicsWorldData& wd = d.world->physicsData();
-	GMfloat elapsed = GameLoop::getInstance()->getElapsedAfterLastFrame();
+	GMfloat elapsed = .01f; // GameLoop::getInstance()->getElapsedAfterLastFrame();
 	vmath::vec3 velocity = d.movement.velocity;
 
 	GMint numbumps = 4, bumpcount;

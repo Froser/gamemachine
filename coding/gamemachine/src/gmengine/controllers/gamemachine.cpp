@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gamemachine.h"
 #include "factory.h"
-#include "gameloop.h"
 #include "gmdatacore/glyph/glyphmanager.h"
 
 GameMachine::GameMachine(
@@ -10,23 +9,24 @@ GameMachine::GameMachine(
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
 )
-	: m_settings(settings)
-	, m_window(window)
-	, m_factory(factory)
-	, m_gameHandler(gameHandler)
 {
-	m_gameHandler->setGameMachine(this);
+	D(d);
+	d.settings = settings;
+	d.window.reset(window);
+	d.factory.reset(factory);
+	d.gameHandler.reset(gameHandler);
+	d.gameHandler->setGameMachine(this);
 	init();
 }
 
 void GameMachine::init()
 {
+	D(d);
 	IGraphicEngine* engine;
-	m_factory->createGraphicEngine(&engine);
-	engine->setGraphicSettings(&m_settings);
-	m_engine.reset(engine);
+	d.factory->createGraphicEngine(&engine);
+	engine->setGraphicSettings(&d.settings);
+	d.engine.reset(engine);
 
-	getGameLoop()->init(m_settings, m_gameHandler);
 	initDebugger();
 }
 
@@ -40,48 +40,111 @@ void GameMachine::initDebugger()
 
 IGraphicEngine* GameMachine::getGraphicEngine()
 {
-	return m_engine;
+	D(d);
+	return d.engine;
 }
 
 IWindow* GameMachine::getWindow()
 {
-	return m_window;
+	D(d);
+	return d.window;
 }
 
 IFactory* GameMachine::getFactory()
 {
-	return m_factory;
+	D(d);
+	return d.factory;
 }
 
-GameLoop* GameMachine::getGameLoop()
+void GameMachine::postMessage(GameMachineMessage msg)
 {
-	return GameLoop::getInstance();
+	D(d);
+	d.messageQueue.push(msg);
 }
 
 GraphicSettings& GameMachine::getSettings()
 {
-	return m_settings;
+	D(d);
+	return d.settings;
 }
 
 GlyphManager* GameMachine::getGlyphManager()
 {
-	return m_glyphManager;
+	D(d);
+	return d.glyphManager;
 }
 
 void GameMachine::startGameMachine()
 {
+	D(d);
 	// 创建Window (createWindow会初始化glew，所有GL操作必须要放在create之后）
-	m_window->initWindowSize(m_settings.windowSize[0], m_settings.windowSize[1]);
-	m_window->setWindowResolution(m_settings.resolution[0], m_settings.resolution[1]);
-	m_window->setWindowPosition(m_settings.startPosition[0], m_settings.startPosition[1]);
-	m_window->createWindow();
+	/*
+	d.window->initWindowSize(d.settings.windowSize[0], d.settings.windowSize[1]);
+	d.window->setWindowResolution(d.settings.resolution[0], d.settings.resolution[1]);
+	d.window->setWindowPosition(d.settings.startPosition[0], d.settings.startPosition[1]);
+	*/
+	d.window->createWindow();
 
 	// 创建Glyph管理器
 	GlyphManager* glyphManager;
-	m_factory->createGlyphManager(&glyphManager);
-	m_glyphManager.reset(glyphManager);
+	d.factory->createGlyphManager(&glyphManager);
+	d.glyphManager.reset(glyphManager);
+	d.gameHandler->init();
 
-	m_gameHandler->init();
-	getGameLoop()->init(m_settings, m_gameHandler);
+	// 消息循环
+	while (true)
+	{
+		if (!(d.window->handleMessages()))
+			break;
+
+		if (!handleMessages())
+			break;
+		
+		d.gameHandler->logicalFrame(.016f); //TODO
+
+		//d.drawStopwatch.start();
+		if (d.gameHandler->isWindowActivate())
+			d.gameHandler->event(GM_EVENT_ACTIVATE_MESSAGE);
+
+		d.gameHandler->event(GM_EVENT_RENDER);
+
+		d.fpsCounter.update();
+		d.window->swapBuffers();
+
+		/*
+		GMfloat elapsed = d.drawStopwatch.getMillisecond();
+		GMfloat wait = 1000 / d.settings.fps - elapsed;
+		if (wait > 0)
+			::Sleep(wait);
+
+		GMfloat min = 1.f / d.settings.fps;
+		d.timeElapsed = elapsed / 1000 < min ? min : elapsed / 1000;
+		*/
+	}
+
+	/*
+	getGameLoop()->init(d.settings, d.gameHandler);
 	getGameLoop()->start();
+	*/
+}
+
+bool GameMachine::handleMessages()
+{
+	D(d);
+	GameMachineMessage msg;
+	while (d.messageQueue.size() > 0)
+	{
+		msg = d.messageQueue.back();
+
+		switch (msg)
+		{
+		case gm::GM_MESSAGE_EXIT:
+			return false;
+		default:
+			break;
+		}
+
+		d.messageQueue.pop();
+	}
+	return true;
 }

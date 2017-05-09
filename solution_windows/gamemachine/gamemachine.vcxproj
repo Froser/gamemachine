@@ -36,7 +36,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmdatacore\texture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\gamemachine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\graphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmengine\controllers\resource_container.h" />
@@ -58,7 +57,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\shader_constants.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspmove.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsppatch.h" />
@@ -70,6 +68,7 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsstructs.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\os\win_window.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\stdafx.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\algorithm.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\assert.h" />
@@ -77,13 +76,13 @@
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\bitset.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\camera.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\debug.h" />
+    <ClInclude Include="..\..\coding\gamemachine\src\utilities\fpscounter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\frustum.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\input.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\memorystream.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\path.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\plane.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\scanner.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\utilities\stopwatch.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\utilities\vmath.h" />
@@ -112,7 +111,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmdatacore\texture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\animation.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\factory.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gameloop.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\gamemachine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\graphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmengine\controllers\resource_container.cpp" />
@@ -134,7 +132,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglwindow.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspmove.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bsppatch.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspphysicsworld.cpp" />
@@ -143,6 +140,7 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\collisionobjectfactory.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworld.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\physicsworldprivate.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\os\win_window.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
@@ -151,13 +149,13 @@
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\bitset.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\camera.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\debug.cpp" />
+    <ClCompile Include="..\..\coding\gamemachine\src\utilities\fpscounter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\frustum.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\input.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\memorystream.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\path.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\plane.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\scanner.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\utilities\stopwatch.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinystr.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxml.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\utilities\tinyxml\tinyxmlerror.cpp" />
@@ -184,7 +182,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v100</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -201,7 +199,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib;../../coding/3rdparty/freetype-2.3.5/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib;../../coding/3rdparty/freetype-2.3.5/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <PrecompiledHeader>Use</PrecompiledHeader>
@@ -218,7 +216,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/3rdparty/freeglut-3.0.0/include;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib;../../coding/3rdparty/freetype-2.3.5/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../coding/3rdparty/glew/include;../../coding/3rdparty/glew;../../coding/gamemachine/include;../../coding/gamemachine/src;../../coding/3rdparty/libpng;../../coding/3rdparty/jpeg-6;../../coding/3rdparty/zlib;../../coding/3rdparty/freetype-2.3.5/include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>_WINDOWS;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <TreatWarningAsError>true</TreatWarningAsError>

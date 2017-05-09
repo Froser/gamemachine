@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bspphysicsworld.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "gmengine/controllers/gameloop.h"
 #include "bspmove.h"
 #include "gmphysics/collisionobjectfactory.h"
 

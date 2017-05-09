@@ -5,16 +5,13 @@
 #define UNICODE
 #include <windows.h>
 #include "GL/glew.h"
-#include "GL/freeglut.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/character.h"
 #include "gmgl/gmglfactory.h"
-#include "gmengine/controllers/gameloop.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "gmengine/controllers/gamemachine.h"
-#include "gmgl/gmglwindow.h"
 #include "utilities/path.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "utilities/debug.h"
@@ -23,6 +20,7 @@
 
 #include <fstream>
 #include "gmengine/elements/glyphobject.h"
+#include "os/win_window.h"
 
 using namespace gm;
 
@@ -102,11 +100,11 @@ public:
 		*/
 	}
 
-	void event(GameLoopEvent evt)
+	void event(GameMachineEvent evt)
 	{
 		switch (evt)
 		{
-		case GAME_LOOP_RENDER:
+		case GM_EVENT_RENDER:
 			world->renderGameWorld();
 			{
 				const PositionState& position = world->getMajorCharacter()->getPositionState();
@@ -122,9 +120,8 @@ public:
 				str.append(z);
 				glyph->setText(str.c_str());
 			}
-			glutSwapBuffers();
 			break;
-		case GAME_LOOP_ACTIVATE_MESSAGE:
+		case GM_EVENT_ACTIVATE_MESSAGE:
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
@@ -134,7 +131,7 @@ public:
 			MouseState mouseState = m_input.getMouseState();
 
 			if (kbState['Q'] || kbState[VK_ESCAPE])
-				m_gm->getGameLoop()->terminate();
+				m_gm->postMessage(GM_MESSAGE_EXIT);
 
 			MoveAction moveTag = 0;
 			MoveRate rate;
@@ -228,8 +225,8 @@ public:
 
 	bool isWindowActivate()
 	{
-		GMGLWindow* window = static_cast<GMGLWindow*> (m_gm->getWindow());
-		return GetActiveWindow() == window->getHWND();
+		WinWindow* window = static_cast<WinWindow*> (m_gm->getWindow());
+		return GetActiveWindow() == window->hwnd();
 	}
 
 	GameMachine* getGameMachine()
@@ -256,9 +253,11 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
+	WinWindow* window = new WinWindow();
+
 	gameMachine = new GameMachine(
 		settings,
-		new GMGLWindow(lpCmdLine, "GM", false ),
+		window,
 		new GMGLFactory(),
 		new GameHandler()
 	);
