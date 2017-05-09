@@ -2,6 +2,7 @@
 #define FREEGLUT_STATIC
 #define _WINDOWS
 
+#define UNICODE
 #include <windows.h>
 #include "GL/glew.h"
 #include "GL/freeglut.h"
@@ -29,6 +30,7 @@ BSPGameWorld* world;
 Character* character;
 GMGLFactory factory;
 GameMachine* gameMachine;
+GlyphObject* glyph;
 
 // 这是一个导出所有资源的钩子，用gm_install_hook(GamePackage, readFileFromPath, resOutputHook)绑定此钩子
 // 可以将所有场景中的资源导出到指定目录
@@ -79,9 +81,8 @@ public:
 #endif
 		pk.createBSPGameWorld("gv.bsp", &world);
 
-		GlyphObject* glyph = new GlyphObject();
-		glyph->setGeometry(0, 0, 1, 1);
-		glyph->setText(L"hello world 你好世界");
+		glyph = new GlyphObject();
+		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
 
 		/*
@@ -107,6 +108,20 @@ public:
 		{
 		case GAME_LOOP_RENDER:
 			world->renderGameWorld();
+			{
+				const PositionState& position = world->getMajorCharacter()->getPositionState();
+				GMWChar x[32], y[32], z[32];
+				swprintf_s(x, L"%f", position.position[0]);
+				swprintf_s(y, L"%f", position.position[1]);
+				swprintf_s(z, L"%f", position.position[2]);
+				std::wstring str;
+				str.append(x);
+				str.append(L",");
+				str.append(y);
+				str.append(L",");
+				str.append(z);
+				glyph->setText(str.c_str());
+			}
 			glutSwapBuffers();
 			break;
 		case GAME_LOOP_ACTIVATE_MESSAGE:

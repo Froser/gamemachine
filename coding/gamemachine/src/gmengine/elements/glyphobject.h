@@ -6,11 +6,11 @@ BEGIN_NS
 
 struct GlyphProperties
 {
-	GMfloat spaceWidth;
 };
 
 struct GlyphObjectPrivate
 {
+	std::wstring lastRenderText;
 	std::wstring text;
 	GlyphProperties properties;
 	GMfloat left, bottom, width, height;
@@ -28,8 +28,10 @@ public:
 public:
 	void setText(const GMWChar* text);
 	void setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height);
+	void updateObject();
 
 private:
+	virtual void getReadyForRender(DrawingList& list) override;
 	virtual void onAppendingObjectToWorld() override;
 
 private:

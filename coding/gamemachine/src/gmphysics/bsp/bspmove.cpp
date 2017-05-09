@@ -11,6 +11,7 @@ enum
 };
 
 static const GMfloat OVERCLIP = 1.01f;
+static const GMfloat CLIP_IGNORE = .2f;
 
 BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
 {
@@ -237,7 +238,11 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
 	if (t.fraction < 1.f)
+	{
 		clipVelocity(d.movement.velocity, t.plane.normal, d.movement.velocity, OVERCLIP);
+		if (d.movement.velocity[GRAVITY_DIRECTION] < CLIP_IGNORE)
+			d.movement.velocity[GRAVITY_DIRECTION] = 0;
+	}
 	synchronizePosition();
 }
 

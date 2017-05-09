@@ -23,6 +23,7 @@ public:
 public:
 	void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
+	void initObject(GameObject* obj);
 	void simulateGameWorld(GMfloat elapsed);
 	IGraphicEngine* getGraphicEngine();
 	void setGameMachine(GameMachine* gm);

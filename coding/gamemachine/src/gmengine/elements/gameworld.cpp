@@ -32,14 +32,15 @@ void GameWorld::initialize()
 void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 {
 	D(d);
-	if (std::find(d.shapes.begin(), d.shapes.end(), obj) != d.shapes.end())
-		return;
-
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
-
 	d.shapes.insert(obj);
+	initObject(obj);
+}
 
+// initObject在于初始化GameObject中的Object，为其创建一个Painter，并且将数据传送到显卡
+void GameWorld::initObject(GameObject* obj)
+{
 	// 创建一个Painter
 	ObjectPainter* painter = createPainterForObject(obj);
 	ASSERT(painter);

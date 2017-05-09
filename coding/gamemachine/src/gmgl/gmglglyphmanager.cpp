@@ -65,7 +65,8 @@ END_NS
 GMGLGlyphManager::GMGLGlyphManager()
 {
 	D(d);
-	d.cursor_x = 0;
+	d.cursor_u = d.cursor_v = 0;
+	d.maxHeight = 0;
 	d.texture = new GMGLGlyphTexture();
 }
 
@@ -87,7 +88,6 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	D(d);
 	// 先获取字形
 	FT_Error error;
-	//	FT_UInt glyphIndex;
 	FT_Face face;
 	FT_Glyph glyph;
 	error = FT_New_Face(g_lib.library, "D://default.TTF", 0, &face);
@@ -100,14 +100,29 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
 
 	// 创建结构
+	if (d.cursor_u + bitmapGlyph->bitmap.width > CANVAS_WIDTH)
+	{
+		d.cursor_v += d.maxHeight + 1;
+		d.maxHeight = 0;
+		d.cursor_u = 0;
+		if (d.cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
+		{
+			gm_error("no texture space for glyph!");
+		}
+	}
+
 	GlyphInfo glyphInfo = { 0 };
-	glyphInfo.x = d.cursor_x;
-	glyphInfo.y = 0;
+	glyphInfo.x = d.cursor_u;
+	glyphInfo.y = d.cursor_v;
 	glyphInfo.width = bitmapGlyph->bitmap.width;
 	glyphInfo.height = bitmapGlyph->bitmap.rows;
 	glyphInfo.bearingX = bitmapGlyph->left;
 	glyphInfo.bearingY = bitmapGlyph->top;
 	glyphInfo.advance = face->glyph->metrics.horiAdvance >> 6;
+
+	if (d.maxHeight < glyphInfo.height)
+		d.maxHeight = glyphInfo.height;
+	d.cursor_u += bitmapGlyph->bitmap.width + 1;
 
 	// 创建纹理
 	glBindTexture(GL_TEXTURE_2D, d.texture->getTextureId());
@@ -122,8 +137,6 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 		GL_UNSIGNED_BYTE,
 		bitmapGlyph->bitmap.buffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	d.cursor_x += bitmapGlyph->bitmap.width + 1;
 
 	// 存入缓存
 	CharList::_Pairib result = getCharList().insert(std::make_pair(c, glyphInfo));

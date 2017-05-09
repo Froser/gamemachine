@@ -14,7 +14,6 @@ GlyphObject::GlyphObject()
 	: GameObject(nullptr)
 {
 	D(d);
-	d.properties.spaceWidth = GMGLGlyphManager::FONT_SIZE / 2;
 }
 
 void GlyphObject::setText(const GMWChar* text)
@@ -55,11 +54,9 @@ void GlyphObject::constructObject()
 	shader.texture.textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 	shader.noDepthTest = true;
 	shader.cull = GMS_NONE;
-	/*
 	shader.blend = true;
-	shader.blendFactors[0] = GMS_SRC_ALPHA;
-	shader.blendFactors[1] = GMS_ONE_MINUS_SRC_ALPHA;
-	*/
+	shader.blendFactors[0] = GMS_ONE;
+	shader.blendFactors[1] = GMS_ONE;
 
 	const GMWChar* p = d.text.c_str();
 	const GMfloat Z = 0;
@@ -77,6 +74,7 @@ void GlyphObject::constructObject()
 			// 0 2
 			// 1 3
 			// 让所有字体origin开始的x轴平齐
+			
 			component->vertex(x + X(glyph.bearingX), y + Y(glyph.bearingY), Z);
 			component->vertex(x + X(glyph.bearingX), y + Y(glyph.bearingY - glyph.height), Z);
 			component->vertex(x + X(glyph.bearingX + glyph.width), y + Y(glyph.bearingY), Z);
@@ -97,7 +95,28 @@ void GlyphObject::constructObject()
 	setObject(obj);
 }
 
+
 void GlyphObject::onAppendingObjectToWorld()
 {
+	D(d);
+	d.lastRenderText = d.text;
 	constructObject();
+}
+
+void GlyphObject::getReadyForRender(DrawingList& list)
+{
+	D(d);
+	if (d.lastRenderText != d.text)
+	{
+		updateObject();
+		d.lastRenderText = d.text;
+	}
+	GameObject::getReadyForRender(list);
+}
+
+void GlyphObject::updateObject()
+{
+	D_BASE(GameObject, d);
+	constructObject();
+	d.world->initObject(this);
 }

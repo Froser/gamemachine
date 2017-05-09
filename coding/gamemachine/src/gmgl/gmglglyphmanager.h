@@ -7,7 +7,8 @@ BEGIN_NS
 class GMGLGlyphTexture;
 struct GMGLGlyphManagerPrivate
 {
-	GMint cursor_x;
+	GMint cursor_u, cursor_v;
+	GMfloat maxHeight;
 	GMGLGlyphTexture* texture;
 };
 
@@ -20,8 +21,8 @@ public:
 	{
 		FONT_SIZE = 24,
 		RESOLUTION = 150,
-		CANVAS_WIDTH = RESOLUTION * 100,
-		CANVAS_HEIGHT = RESOLUTION * 100,
+		CANVAS_WIDTH = 1024,
+		CANVAS_HEIGHT = 1024,
 	};
 
 public:

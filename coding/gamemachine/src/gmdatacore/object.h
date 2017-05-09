@@ -20,6 +20,7 @@ class ObjectPainter
 {
 public:
 	ObjectPainter(Object* objs);
+	virtual ~ObjectPainter() {}
 
 public:
 	virtual void transfer() = 0;
