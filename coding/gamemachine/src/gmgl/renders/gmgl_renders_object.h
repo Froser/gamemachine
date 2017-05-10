@@ -7,6 +7,7 @@
 BEGIN_NS
 
 class GMGLGraphicEngine;
+class GameWorld;
 struct ITexture;
 struct GMGLRenders_ObjectPrivate
 {
@@ -15,6 +16,7 @@ struct GMGLRenders_ObjectPrivate
 	ChildObject::ObjectType type;
 	Shader* shader;
 	GMGLShaders* gmglShaders;
+	GameWorld* world;
 };
 
 class GMGLRenders_Object : public IRender
@@ -22,8 +24,9 @@ class GMGLRenders_Object : public IRender
 	DEFINE_PRIVATE(GMGLRenders_Object)
 
 public:
-	virtual void begin(IGraphicEngine* engine, ChildObject* childObj) override;
+	virtual void begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform) override;
 	virtual void beginShader(Shader& shader) override;
+	virtual void updateVPMatrices(const vmath::mat4& projection, const vmath::mat4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;
 	virtual void end() override;
 

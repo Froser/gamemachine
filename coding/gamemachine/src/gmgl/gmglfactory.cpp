@@ -34,7 +34,7 @@ void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectP
 {
 	ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
-	(*painter) = new GMGLObjectPainter(gmglEngine, *gmglEngine->getShadowMapping(), obj);
+	(*painter) = new GMGLObjectPainter(gmglEngine, obj);
 }
 
 void GMGLFactory::createGamePackage(GamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)

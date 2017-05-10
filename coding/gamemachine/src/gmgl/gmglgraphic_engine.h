@@ -3,7 +3,6 @@
 #include "common.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmglshaders.h"
-#include "gmglshadowmapping.h"
 #include "gmengine/controllers/resource_container.h"
 #include <map>
 #include "utilities/camera.h"
@@ -18,7 +17,6 @@ struct GMGLGraphicEnginePrivate
 {
 	std::map<ChildObject::ObjectType, GMGLShaders*> allShaders;
 	std::map<ChildObject::ObjectType, IRender*> allRenders;
-	AutoPtr<GMGLShadowMapping> shadowMapping;
 	GameWorld* world;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings;
@@ -44,7 +42,6 @@ public:
 	virtual void setGraphicSettings(GraphicSettings* settings) override;
 
 public:
-	GMGLShadowMapping* getShadowMapping();
 	GameWorld* getWorld();
 
 	void registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders);
@@ -56,7 +53,7 @@ public:
 private:
 	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
-	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
+	void drawObjectsOnce(DrawingList& drawingList);
 };
 
 END_NS

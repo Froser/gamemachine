@@ -55,7 +55,6 @@
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.h" />
-    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\renders\gmgl_render.h" />
     <ClInclude Include="..\..\coding\gamemachine\src\gmgl\renders\gmgl_renders_object.h" />
@@ -132,7 +131,6 @@
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglgraphic_engine.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglobjectpainter.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshaders.cpp" />
-    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmglshadowmapping.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\gmgltexture.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmgl\renders\gmgl_renders_object.cpp" />
     <ClCompile Include="..\..\coding\gamemachine\src\gmphysics\bsp\bspmove.cpp" />
@@ -178,7 +176,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v100</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>

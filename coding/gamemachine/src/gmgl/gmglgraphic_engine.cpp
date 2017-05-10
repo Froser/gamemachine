@@ -10,23 +10,13 @@
 #include "gmengine/elements/gameworld.h"
 #include "gmglobjectpainter.h"
 #include "gmengine/elements/character.h"
-
-/*
-struct __shadowSourcePred
-{
-	bool operator() (GameLight* light)
-	{
-		return light->getShadowSource();
-	}
-};
-*/
+#include "renders/gmgl_render.h"
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 {
 	D(d);
 	d.world = nullptr;
 	d.settings = nullptr;
-	d.shadowMapping.reset(new GMGLShadowMapping(*this));
 }
 
 GMGLGraphicEngine::~GMGLGraphicEngine()
@@ -49,7 +39,6 @@ void GMGLGraphicEngine::initialize(GameWorld* world)
 {
 	D(d);
 	d.world = world;
-	d.shadowMapping->init();
 }
 
 void GMGLGraphicEngine::newFrame()
@@ -60,16 +49,7 @@ void GMGLGraphicEngine::newFrame()
 void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 {
 	applyGraphicSettings();
-	/*
-	GameLight* shadowSourceLight = getShadowSourceLight();
-	if (shadowSourceLight)
-	{
-		d.shadowMapping->beginDrawDepthBuffer(shadowSourceLight);
-		drawObjectsOnce(drawingList, !!shadowSourceLight);
-		d.shadowMapping->endDrawDepthBuffer();
-	}
-	*/
-	drawObjectsOnce(drawingList, false);
+	drawObjectsOnce(drawingList);
 }
 
 void GMGLGraphicEngine::applyGraphicSettings()
@@ -79,58 +59,17 @@ void GMGLGraphicEngine::applyGraphicSettings()
 	glFrontFace(GL_CW);
 }
 
-void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
+void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 {
 	D(d);
-	bool shadowMapping = d.shadowMapping->hasBegun();
 	int i = 0;
 	GMGLShaders* lastShaders = nullptr;
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
 		DrawingItem& item = *iter;
 		Object* coreObj = item.gameObject->getObject();
-		coreObj->getPainter()->draw();
-
-		/*
-		Object* coreObj = item.gameObject->getObject();
-		BEGIN_FOREACH_OBJ(coreObj, coreChildObj)
-		{
-			ChildObject::ObjectType type = coreChildObj->getType();
-			GMGLShaders& shaders = shadowMapping ? d.shadowMapping->getShaders() : *getShaders(type);
-
-			shaders.useProgram();
-			GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
-			GMGLObjectPainter* painter = static_cast<GMGLObjectPainter*>(coreObj->getPainter());
-
-			if (!shadowMapping)
-			{
-				if (type != ChildObject::Glyph)
-				{
-					if (lastShaders != &shaders)
-					{
-						setEyeViewport(shadowOn, shaders);
-						lastShaders = &shaders;
-					}
-				}
-				shadowTexture(shadowOn, shaders);
-				painter->setWorld(d.world);
-			}
-			else
-			{
-				painter->setWorld(nullptr);
-			}
-
-			painter->draw();
-		}
-		END_FOREACH_OBJ
-		*/
+		coreObj->getPainter()->draw(item.trans);
 	}
-}
-
-GMGLShadowMapping* GMGLGraphicEngine::getShadowMapping()
-{
-	D(d);
-	return d.shadowMapping;
 }
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
@@ -140,15 +79,13 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 
 	BEGIN_ENUM(i, ChildObject::ObjectTypeBegin, ChildObject::ObjectTypeEnd)
 	{
-		if (i == ChildObject::Glyph)
-			continue;
+		IRender* render = getRender(i);
+		ChildObject dummy;
+		dummy.setType(i);
 
-		GMGLShaders* shaders = getShaders(i);
-		if (!shaders)
-			continue;
-		shaders->useProgram();
-		GMGL::lookAt(d.viewMatrix, *shaders, GMSHADER_VIEW_MATRIX);
-		GMGL::cameraPosition(lookAt, *shaders, GMSHADER_VIEW_POSITION);
+		render->begin(this, &dummy, nullptr);
+		render->updateVPMatrices(d.projectionMatrix, d.viewMatrix, lookAt);
+		render->end();
 	}
 	END_ENUM
 }

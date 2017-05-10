@@ -19,12 +19,12 @@ void GMGL::frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMf
 	projection(mat, shaders, projectionMatrixName);
 }
 
-void GMGL::perspective(vmath::mat4 projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName)
+void GMGL::perspective(const vmath::mat4& projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName)
 {
 	projection(projectionMatrix, shaders, projectionMatrixName);
 }
 
-void GMGL::lookAt(vmath::mat4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName)
+void GMGL::lookAt(const vmath::mat4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName)
 {
 	GLint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
 	ASSERT_GL();

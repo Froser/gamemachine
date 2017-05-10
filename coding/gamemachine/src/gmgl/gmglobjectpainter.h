@@ -16,24 +16,9 @@ public:
 
 public:
 	virtual void transfer() override;
-	virtual void draw() override;
+	virtual void draw(GMfloat* modelTransform) override;
 	virtual void dispose() override;
 	virtual void clone(Object* obj, OUT ObjectPainter** painter) override;
-
-public:
-	void setWorld(GameWorld* world);
-
-private:
-	void activeTexture(Shader* shader, TextureIndex i, ChildObject::ObjectType type);
-	void activeTextureTransform(Shader* shader, TextureIndex i, ChildObject::ObjectType type);
-	void deactiveTexture(TextureIndex i, ChildObject::ObjectType type);
-	ITexture* getTexture(TextureFrames& frames);
-	void activateShader(Shader* shader);
-	void deactivateShader(Shader* shader);
-	void beginShader(Shader* shader, ChildObject::ObjectType type);
-	void endShader(Shader* shader, ChildObject::ObjectType type);
-	void activateLight(LightType t, LightInfo& light, ChildObject::ObjectType objectType);
-	void drawDebug(ChildObject::ObjectType type);
 
 private:
 	GMGLGraphicEngine* m_engine;

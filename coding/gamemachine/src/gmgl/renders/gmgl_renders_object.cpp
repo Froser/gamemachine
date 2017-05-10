@@ -4,17 +4,8 @@
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgltexture.h"
-
-static void setEyeViewport(GMGLShaders& shaders, const vmath::mat4& projectionMatrix)
-{
-	static const vmath::mat4 biasMatrix = vmath::mat4(
-		vmath::vec4(0.5f, 0.0f, 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.5f, 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.0f, 0.5f, 0.0f),
-		vmath::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
-	GMGL::perspective(projectionMatrix, shaders, GMSHADER_PROJECTION_MATRIX);
-}
+#include "gmengine/elements/gameworld.h"
+#include "utilities/vmath.h"
 
 static void activateShader(Shader* shader)
 {
@@ -80,7 +71,7 @@ static void deactivateShader(Shader* shader)
 	}
 }
 
-void GMGLRenders_Object::begin(IGraphicEngine* engine, ChildObject* childObj)
+void GMGLRenders_Object::begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform)
 {
 	D(d);
 	clearData();
@@ -88,23 +79,11 @@ void GMGLRenders_Object::begin(IGraphicEngine* engine, ChildObject* childObj)
 	d.childObj = childObj;
 	d.type = childObj->getType();
 	d.gmglShaders = d.engine->getShaders(d.type);
+	d.world = d.engine->getWorld();
+	d.gmglShaders->useProgram();
 
-	GMGLShaders* shaders = d.engine->getShaders(d.type);
-	shaders->useProgram();
-
-	//GMGL::uniformMatrix4(*shaders, item.trans, GMSHADER_MODEL_MATRIX);
-
-	switch (d.type)
-	{
-	case ChildObject::NormalObject:
-	case ChildObject::Sky:
-		setEyeViewport(*shaders, d.engine->projectionMatrix);
-		break;
-	case ChildObject::Glyph:
-		break;
-	default:
-		break;
-	}
+	if (modelTransform)
+		GMGL::uniformMatrix4(*d.gmglShaders, modelTransform, GMSHADER_MODEL_MATRIX);
 }
 
 void GMGLRenders_Object::beginShader(Shader& shader)
@@ -155,6 +134,26 @@ void GMGLRenders_Object::end()
 	clearData();
 }
 
+void GMGLRenders_Object::updateVPMatrices(const vmath::mat4& projection, const vmath::mat4& view, const CameraLookAt& lookAt)
+{
+	D(d);
+
+	switch (d.type)
+	{
+	case ChildObject::NormalObject:
+	case ChildObject::Sky:
+		GMGL::perspective(projection, *d.gmglShaders, GMSHADER_PROJECTION_MATRIX);
+		GMGL::lookAt(view, *d.gmglShaders, GMSHADER_VIEW_MATRIX);
+		break;
+	case ChildObject::Glyph:
+		break;
+	default:
+		break;
+	}
+
+	GMGL::cameraPosition(lookAt, *d.gmglShaders, GMSHADER_VIEW_POSITION);
+}
+
 void GMGLRenders_Object::clearData()
 {
 	D(d);
@@ -163,6 +162,7 @@ void GMGLRenders_Object::clearData()
 
 ITexture* GMGLRenders_Object::getTexture(TextureFrames& frames)
 {
+	D(d);
 	if (frames.frameCount == 0)
 		return nullptr;
 
@@ -171,7 +171,7 @@ ITexture* GMGLRenders_Object::getTexture(TextureFrames& frames)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = m_world->getElapsed() * 1000;
+	GMint elapsed = d.world->getElapsed() * 1000;
 
 	return frames.frames[(elapsed / frames.animationMs) % frames.frameCount];
 }
@@ -183,14 +183,14 @@ void GMGLRenders_Object::activateLight(LightType t, LightInfo& light)
 	{
 	case gm::LT_AMBIENT:
 	{
-		GMGL::uniformVec3(*d.gmglShaders, light.on && !light.useGlobalLightColor ? &light.lightColor[0] : &(m_world->getDefaultAmbientLight().lightColor)[0], GMSHADER_LIGHT_AMBIENT);
-		GMGL::uniformVec3(*d.gmglShaders, light.on ? &light.args[LA_KA] : &m_world->getDefaultAmbientLight().args[LA_KA], GMSHADER_LIGHT_KA);
+		GMGL::uniformVec3(*d.gmglShaders, light.on && !light.useGlobalLightColor ? &light.lightColor[0] : &(d.world->getDefaultAmbientLight().lightColor)[0], GMSHADER_LIGHT_AMBIENT);
+		GMGL::uniformVec3(*d.gmglShaders, light.on ? &light.args[LA_KA] : &d.world->getDefaultAmbientLight().args[LA_KA], GMSHADER_LIGHT_KA);
 	}
 	break;
 	case gm::LT_SPECULAR:
 	{
 		GMfloat zero[3] = { 0 };
-		GMGL::uniformVec3(*d.gmglShaders, light.on ? (!light.useGlobalLightColor ? &light.lightColor[0] : &(m_world->getDefaultAmbientLight().lightColor)[0]) : zero, GMSHADER_LIGHT_POWER);
+		GMGL::uniformVec3(*d.gmglShaders, light.on ? (!light.useGlobalLightColor ? &light.lightColor[0] : &(d.world->getDefaultAmbientLight().lightColor)[0]) : zero, GMSHADER_LIGHT_POWER);
 		GMGL::uniformVec3(*d.gmglShaders, light.on ? &light.args[LA_KD] : zero, GMSHADER_LIGHT_KD);
 		GMGL::uniformVec3(*d.gmglShaders, light.on ? &light.args[LA_KS] : zero, GMSHADER_LIGHT_KS);
 		GMGL::uniformFloat(*d.gmglShaders, light.on ? light.args[LA_SHINESS] : 0.f, GMSHADER_LIGHT_SHININESS);
@@ -231,7 +231,7 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
 		{
 		case GMS_SCROLL:
 		{
-			GMfloat s = m_world->getElapsed() * tc->p1, t = m_world->getElapsed() * tc->p2;
+			GMfloat s = d.world->getElapsed() * tc->p1, t = d.world->getElapsed() * tc->p2;
 			glUniform1f(glGetUniformLocation(d.gmglShaders->getProgram(), SCROLL_T.c_str()), t);
 			glUniform1f(glGetUniformLocation(d.gmglShaders->getProgram(), SCROLL_T.c_str()), s);
 		}
