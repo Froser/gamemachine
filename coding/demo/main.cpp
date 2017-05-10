@@ -104,6 +104,9 @@ public:
 	{
 		switch (evt)
 		{
+		case GM_EVENT_SIMULATE:
+			world->simulateGameWorld();
+			break;
 		case GM_EVENT_RENDER:
 			world->renderGameWorld();
 			{
@@ -124,7 +127,7 @@ public:
 				glyph->setText(str.c_str());
 			}
 			break;
-		case GM_EVENT_ACTIVATE_MESSAGE:
+		case GM_EVENT_ACTIVATE:
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
@@ -214,11 +217,6 @@ public:
 				DBG_SET_INT(DRAW_ONLY_SKY, !DBG_INT(DRAW_ONLY_SKY));
 			break;
 		}
-	}
-
-	void logicalFrame()
-	{
-		world->simulateGameWorld();
 	}
 
 	bool isWindowActivate()

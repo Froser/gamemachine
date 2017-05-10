@@ -114,13 +114,10 @@ void GameMachine::startGameMachine()
 		if (!handleMessages())
 			break;
 		
-		d.gameHandler->logicalFrame(); //TODO
-
+		d.gameHandler->event(GM_EVENT_SIMULATE);
 		if (d.gameHandler->isWindowActivate())
-			d.gameHandler->event(GM_EVENT_ACTIVATE_MESSAGE);
-
+			d.gameHandler->event(GM_EVENT_ACTIVATE);
 		d.gameHandler->event(GM_EVENT_RENDER);
-
 		d.fpsCounter.update();
 		d.window->swapBuffers();
 	}

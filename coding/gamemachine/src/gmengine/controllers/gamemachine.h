@@ -9,8 +9,9 @@ BEGIN_NS
 
 enum GameMachineEvent
 {
+	GM_EVENT_SIMULATE,
 	GM_EVENT_RENDER,
-	GM_EVENT_ACTIVATE_MESSAGE,
+	GM_EVENT_ACTIVATE,
 };
 
 enum GameMachineMessage
@@ -33,7 +34,6 @@ struct IGameHandler
 	virtual void setGameMachine(GameMachine* gm) = 0;
 	virtual void init() = 0;
 	virtual void event(GameMachineEvent evt) = 0;
-	virtual void logicalFrame() = 0;
 	virtual bool isWindowActivate() = 0;
 };
 
