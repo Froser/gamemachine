@@ -7,6 +7,7 @@
 #include "utilities/path.h"
 #include <fstream>
 #include "gmengine/elements/bspgameworld.h"
+#include "renders/gmgl_renders_object.h"
 
 #define PKD(d) GamePackageData& d = gamePackage()->gamePackageData();
 
@@ -52,6 +53,13 @@ void DefaultGMGLGamePackageHandler::init()
 		"glyph",
 	};
 
+	// 按照Object顺序创建renders
+	IRender* renders[] = {
+		new GMGLRenders_Object(),
+		new GMGLRenders_Object(),
+		new GMGLRenders_Object(),
+	};
+
 	for (GMint i = ChildObject::ObjectTypeBegin; i < ChildObject::ObjectTypeEnd; i++)
 	{
 		GMGLShaders* shaders = new GMGLShaders();
@@ -74,6 +82,7 @@ void DefaultGMGLGamePackageHandler::init()
 		shaders->appendShader(shadersInfo[1]);
 		shaders->load();
 		engine->registerShader((ChildObject::ObjectType)i, shaders);
+		engine->registerRender((ChildObject::ObjectType)i, renders[i]);
 	}
 }
 

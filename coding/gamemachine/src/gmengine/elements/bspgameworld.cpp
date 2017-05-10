@@ -47,10 +47,10 @@ void BSPGameWorld::updateCamera()
 {
 	D(d);
 
-	IGraphicEngine* engine = getGraphicEngine();
 	Character* character = getMajorCharacter();
 	character->updateCamera();
 	CameraLookAt& lookAt = character->getLookAt();
+	IGraphicEngine* engine = getGraphicEngine();
 	engine->updateCameraView(lookAt);
 }
 

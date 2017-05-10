@@ -7,6 +7,7 @@
 #include "gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmglgraphic_engine.h"
+#include "renders/gmgl_render.h"
 
 static GLenum getMode(ChildObject* obj)
 {
@@ -24,10 +25,9 @@ static GLenum getMode(ChildObject* obj)
 	}
 }
 
-GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* objs)
+GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, Object* objs)
 	: ObjectPainter(objs)
 	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
-	, m_shadowMapping(shadowMapping)
 	, m_inited(false)
 	, m_world(nullptr)
 {
@@ -100,8 +100,10 @@ void GMGLObjectPainter::draw()
 
 	BEGIN_FOREACH_OBJ(obj, childObj)
 	{
-		glBindVertexArray(childObj->getArrayId());
+		IRender* render = m_engine->getRender(childObj->getType());
+		render->begin(m_engine, childObj);
 
+		glBindVertexArray(childObj->getArrayId());
 		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
 		{
 			Component* component = (*iter);
@@ -109,23 +111,28 @@ void GMGLObjectPainter::draw()
 			if (shader.nodraw)
 				continue;
 
-			if (!m_shadowMapping.hasBegun())
+			render->beginShader(shader);
+			/*
+			for (GMint i = LT_BEGIN; i < LT_END; i++)
 			{
-				for (GMint i = LT_BEGIN; i < LT_END; i++)
-				{
-					activateLight((LightType)i, shader.lights[i], childObj->getType());
-				}
-				beginShader(&shader, childObj->getType());
+				activateLight((LightType)i, shader.lights[i], childObj->getType());
 			}
+			beginShader(&shader, childObj->getType());
 
 			drawDebug(childObj->getType());
 			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(childObj);
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+			
+			endShader(&shader, childObj->getType());
+			*/
 
-			if (!m_shadowMapping.hasBegun())
-				endShader(&shader, childObj->getType());
+			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(childObj);
+			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+			render->endShader();
 		}
 		glBindVertexArray(0);
+
+		render->end();
 	}
 	END_FOREACH_OBJ
 }
@@ -176,7 +183,7 @@ void GMGLObjectPainter::dispose()
 void GMGLObjectPainter::clone(Object* obj, OUT ObjectPainter** painter)
 {
 	ASSERT(painter);
-	*painter = new GMGLObjectPainter(m_engine, m_shadowMapping, obj);
+	*painter = new GMGLObjectPainter(m_engine, obj);
 }
 
 void GMGLObjectPainter::activeTexture(Shader* shader, TextureIndex i, ChildObject::ObjectType type)

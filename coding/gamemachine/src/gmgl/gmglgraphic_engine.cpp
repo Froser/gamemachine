@@ -22,15 +22,23 @@ struct __shadowSourcePred
 */
 
 GMGLGraphicEngine::GMGLGraphicEngine()
-	: m_world(nullptr)
-	, m_settings(nullptr)
 {
-	m_shadowMapping.reset(new GMGLShadowMapping(*this));
+	D(d);
+	d.world = nullptr;
+	d.settings = nullptr;
+	d.shadowMapping.reset(new GMGLShadowMapping(*this));
 }
 
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
-	for (auto iter = m_allShaders.begin(); iter != m_allShaders.end(); iter++)
+	D(d);
+	for (auto iter = d.allShaders.begin(); iter != d.allShaders.end(); iter++)
+	{
+		if ((*iter).second)
+			delete (*iter).second;
+	}
+
+	for (auto iter = d.allRenders.begin(); iter != d.allRenders.end(); iter++)
 	{
 		if ((*iter).second)
 			delete (*iter).second;
@@ -39,8 +47,9 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 
 void GMGLGraphicEngine::initialize(GameWorld* world)
 {
-	m_world = world;
-	m_shadowMapping->init();
+	D(d);
+	d.world = world;
+	d.shadowMapping->init();
 }
 
 void GMGLGraphicEngine::newFrame()
@@ -55,9 +64,9 @@ void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
 	GameLight* shadowSourceLight = getShadowSourceLight();
 	if (shadowSourceLight)
 	{
-		m_shadowMapping->beginDrawDepthBuffer(shadowSourceLight);
+		d.shadowMapping->beginDrawDepthBuffer(shadowSourceLight);
 		drawObjectsOnce(drawingList, !!shadowSourceLight);
-		m_shadowMapping->endDrawDepthBuffer();
+		d.shadowMapping->endDrawDepthBuffer();
 	}
 	*/
 	drawObjectsOnce(drawingList, false);
@@ -72,17 +81,22 @@ void GMGLGraphicEngine::applyGraphicSettings()
 
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 {
-	bool shadowMapping = m_shadowMapping->hasBegun();
+	D(d);
+	bool shadowMapping = d.shadowMapping->hasBegun();
 	int i = 0;
 	GMGLShaders* lastShaders = nullptr;
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
 		DrawingItem& item = *iter;
 		Object* coreObj = item.gameObject->getObject();
+		coreObj->getPainter()->draw();
+
+		/*
+		Object* coreObj = item.gameObject->getObject();
 		BEGIN_FOREACH_OBJ(coreObj, coreChildObj)
 		{
 			ChildObject::ObjectType type = coreChildObj->getType();
-			GMGLShaders& shaders = shadowMapping ? m_shadowMapping->getShaders() : *getShaders(type);
+			GMGLShaders& shaders = shadowMapping ? d.shadowMapping->getShaders() : *getShaders(type);
 
 			shaders.useProgram();
 			GMGL::uniformMatrix4(shaders, item.trans, GMSHADER_MODEL_MATRIX);
@@ -99,7 +113,7 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 					}
 				}
 				shadowTexture(shadowOn, shaders);
-				painter->setWorld(m_world);
+				painter->setWorld(d.world);
 			}
 			else
 			{
@@ -109,61 +123,19 @@ void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList, bool shadowOn)
 			painter->draw();
 		}
 		END_FOREACH_OBJ
+		*/
 	}
 }
-
-void GMGLGraphicEngine::setEyeViewport(bool shadowOn, GMGLShaders& shaders)
-{
-	static const vmath::mat4 biasMatrix = vmath::mat4(
-		vmath::vec4(0.5f, 0.0f, 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.5f, 0.0f, 0.0f),
-		vmath::vec4(0.0f, 0.0f, 0.5f, 0.0f),
-		vmath::vec4(0.5f, 0.5f, 0.5f, 1.0f));
-
-	if (shadowOn)
-	{
-		const GMGLShadowMapping::State& state = m_shadowMapping->getState();
-		glViewport(state.viewport[0], state.viewport[1], state.viewport[2], state.viewport[3]);
-		GMGL::uniformMatrix4(shaders, biasMatrix * state.lightProjectionMatrix * state.lightViewMatrix, GMSHADER_SHADOW_MATRIX);
-	}
-
-	GMGL::perspective(m_projectionMatrix, shaders, GMSHADER_PROJECTION_MATRIX);
-}
-
-void GMGLGraphicEngine::shadowTexture(bool shadowOn, GMGLShaders& shaders)
-{
-	if (shadowOn)
-	{
-		// GMGL::uniformTextureIndex(shaders, TextureTypeShadow, getTextureUniformName(TextureTypeShadow));
-		// glActiveTexture(TextureTypeShadow + GL_TEXTURE0);
-		// glBindTexture(GL_TEXTURE_2D, m_shadowMapping.getDepthTexture());
-		// glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		// GMGL::disableTexture(shaders, getTextureUniformName(TextureTypeShadow));
-	}
-}
-
-/*
-GameLight* GMGLGraphicEngine::getShadowSourceLight()
-{
-	std::vector<GameLight*>& lights = getWorld()->getLights();
-	auto result = std::find_if(lights.begin(), lights.end(), __shadowSourcePred());
-	if (result == lights.end())
-		return nullptr;
-
-	return *result;
-}
-*/
 
 GMGLShadowMapping* GMGLGraphicEngine::getShadowMapping()
 {
-	return m_shadowMapping;
+	D(d);
+	return d.shadowMapping;
 }
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
+	D(d);
 	updateMatrices(lookAt);
 
 	BEGIN_ENUM(i, ChildObject::ObjectTypeBegin, ChildObject::ObjectTypeEnd)
@@ -175,7 +147,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 		if (!shaders)
 			continue;
 		shaders->useProgram();
-		GMGL::lookAt(m_viewMatrix, *shaders, GMSHADER_VIEW_MATRIX);
+		GMGL::lookAt(d.viewMatrix, *shaders, GMSHADER_VIEW_MATRIX);
 		GMGL::cameraPosition(lookAt, *shaders, GMSHADER_VIEW_POSITION);
 	}
 	END_ENUM
@@ -183,46 +155,68 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 {
+	D(d);
 	Character* character = getWorld()->getMajorCharacter();
 
 	//TODO 
-	m_projectionMatrix = character->getFrustum().getPerspective();
-	m_viewMatrix = getViewMatrix(lookAt);
+	d.projectionMatrix = character->getFrustum().getPerspective();
+	d.viewMatrix = getViewMatrix(lookAt);
 
-	character->getFrustum().updateViewMatrix(m_viewMatrix, m_projectionMatrix);
+	character->getFrustum().updateViewMatrix(d.viewMatrix, d.projectionMatrix);
 	character->getFrustum().update();
 }
 
 GameWorld* GMGLGraphicEngine::getWorld()
 {
-	return m_world;
+	D(d);
+	return d.world;
 }
 
 void GMGLGraphicEngine::registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders)
 {
-	m_allShaders[objectType] = shaders;
+	D(d);
+	d.allShaders[objectType] = shaders;
 }
 
 GMGLShaders* GMGLGraphicEngine::getShaders(ChildObject::ObjectType objectType)
 {
-	if (m_allShaders.find(objectType) == m_allShaders.end())
+	D(d);
+	if (d.allShaders.find(objectType) == d.allShaders.end())
 		return nullptr;
 	
-	return m_allShaders[objectType];
+	return d.allShaders[objectType];
+}
+
+void GMGLGraphicEngine::registerRender(ChildObject::ObjectType objectType, AUTORELEASE IRender* render)
+{
+	D(d);
+	d.allRenders[objectType] = render;
+}
+
+IRender* GMGLGraphicEngine::getRender(ChildObject::ObjectType objectType)
+{
+	D(d);
+	if (d.allRenders.find(objectType) == d.allRenders.end())
+		return nullptr;
+
+	return d.allRenders[objectType];
 }
 
 ResourceContainer* GMGLGraphicEngine::getResourceContainer()
 {
-	return &m_resourceContainer;
+	D(d);
+	return &d.resourceContainer;
 }
 
 GraphicSettings* GMGLGraphicEngine::getGraphicSettings()
 {
-	ASSERT(m_settings);
-	return m_settings;
+	D(d);
+	ASSERT(d.settings);
+	return d.settings;
 }
 
 void GMGLGraphicEngine::setGraphicSettings(GraphicSettings* settings)
 {
-	m_settings = settings;
+	D(d);
+	d.settings = settings;
 }

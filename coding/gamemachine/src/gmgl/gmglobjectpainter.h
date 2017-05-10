@@ -8,12 +8,11 @@ BEGIN_NS
 struct IGraphicEngine;
 class GMGLGraphicEngine;
 class GMGLShaders;
-class GMGLShadowMapping;
 class GameWorld;
 class GMGLObjectPainter : public ObjectPainter
 {
 public:
-	GMGLObjectPainter(IGraphicEngine* engine, GMGLShadowMapping& shadowMapping, Object* objs);
+	GMGLObjectPainter(IGraphicEngine* engine, Object* objs);
 
 public:
 	virtual void transfer() override;
@@ -38,7 +37,6 @@ private:
 
 private:
 	GMGLGraphicEngine* m_engine;
-	GMGLShadowMapping& m_shadowMapping;
 	GameWorld* m_world;
 
 private:

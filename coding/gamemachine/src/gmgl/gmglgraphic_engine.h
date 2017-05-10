@@ -12,8 +12,24 @@ BEGIN_NS
 class Camera;
 class GameWorld;
 class GameLight;
+struct IRender;
+
+struct GMGLGraphicEnginePrivate
+{
+	std::map<ChildObject::ObjectType, GMGLShaders*> allShaders;
+	std::map<ChildObject::ObjectType, IRender*> allRenders;
+	AutoPtr<GMGLShadowMapping> shadowMapping;
+	GameWorld* world;
+	ResourceContainer resourceContainer;
+	GraphicSettings* settings;
+	vmath::mat4 viewMatrix;
+	vmath::mat4 projectionMatrix;
+};
+
 class GMGLGraphicEngine : public IGraphicEngine
 {
+	DEFINE_PRIVATE(GMGLGraphicEngine)
+
 public:
 	GMGLGraphicEngine();
 	virtual ~GMGLGraphicEngine();
@@ -34,22 +50,13 @@ public:
 	void registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders);
 	GMGLShaders* getShaders(ChildObject::ObjectType objectType);
 
+	void registerRender(ChildObject::ObjectType objectType, AUTORELEASE IRender* render);
+	IRender* getRender(ChildObject::ObjectType objectType);
+
 private:
 	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
 	void drawObjectsOnce(DrawingList& drawingList, bool shadowOn);
-	void setEyeViewport(bool shadowOn, GMGLShaders& shaders);
-	void shadowTexture(bool shadowOn, GMGLShaders& shaders);
-
-private:
-	std::map<ChildObject::ObjectType, GMGLShaders*> m_allShaders;
-	AutoPtr<GMGLShadowMapping> m_shadowMapping;
-	GameWorld* m_world;
-	ResourceContainer m_resourceContainer;
-	GraphicSettings* m_settings;
-
-	vmath::mat4 m_viewMatrix;
-	vmath::mat4 m_projectionMatrix;
 };
 
 END_NS

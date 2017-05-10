@@ -103,6 +103,8 @@ void GameMachine::startGameMachine()
 	GlyphManager* glyphManager;
 	d.factory->createGlyphManager(&glyphManager);
 	d.glyphManager.reset(glyphManager);
+
+	// 初始化gameHandler
 	d.gameHandler->init();
 
 	// 消息循环

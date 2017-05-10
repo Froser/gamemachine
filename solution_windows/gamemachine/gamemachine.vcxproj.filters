@@ -47,6 +47,9 @@
     <Filter Include="src\os">
       <UniqueIdentifier>{205725b6-0550-41c7-af1a-77047a3af403}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gmgl\renders">
+      <UniqueIdentifier>{155e2513-eaec-4007-bb54-9b01fcb7b5ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\coding\gamemachine\src\common.h">
@@ -274,6 +277,12 @@
     <ClInclude Include="..\..\coding\gamemachine\src\os\wingl_window.h">
       <Filter>src\os</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\renders\gmgl_renders_object.h">
+      <Filter>src\gmgl\renders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\coding\gamemachine\src\gmgl\renders\gmgl_render.h">
+      <Filter>src\gmgl\renders</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\coding\gamemachine\src\empty_template.cpp">
@@ -485,6 +494,9 @@
     </ClCompile>
     <ClCompile Include="..\..\coding\gamemachine\src\os\wingl_window.cpp">
       <Filter>src\os</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\coding\gamemachine\src\gmgl\renders\gmgl_renders_object.cpp">
+      <Filter>src\gmgl\renders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

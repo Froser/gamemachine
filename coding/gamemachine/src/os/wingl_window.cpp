@@ -85,7 +85,7 @@ bool WinGLWindow::createWindow()
 
 	const GMbyte colorDepth = 32, alphaBits = 8;
 	GMuint pixelFormat;
-	static PIXELFORMATDESCRIPTOR pfd =				//pfd tells windows how we want things to be
+	static PIXELFORMATDESCRIPTOR pfd =						//pfd tells windows how we want things to be
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),						//size of Pixel format descriptor
 		1,													//Version Number
