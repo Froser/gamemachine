@@ -7,7 +7,7 @@
 #include "gmengine/elements/gameworld.h"
 #include "utilities/vmath.h"
 
-static void activateShader(Shader* shader)
+void GMGLRenders_Object::activateShader(Shader* shader)
 {
 	if (shader->cull == GMS_NONE)
 	{
@@ -63,7 +63,7 @@ static void activateShader(Shader* shader)
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 }
 
-static void deactivateShader(Shader* shader)
+void GMGLRenders_Object::deactivateShader(Shader* shader)
 {
 	if (shader->blend)
 	{
@@ -131,26 +131,13 @@ void GMGLRenders_Object::endShader()
 
 void GMGLRenders_Object::end()
 {
-	clearData();
 }
 
 void GMGLRenders_Object::updateVPMatrices(const vmath::mat4& projection, const vmath::mat4& view, const CameraLookAt& lookAt)
 {
 	D(d);
-
-	switch (d.type)
-	{
-	case ChildObject::NormalObject:
-	case ChildObject::Sky:
-		GMGL::perspective(projection, *d.gmglShaders, GMSHADER_PROJECTION_MATRIX);
-		GMGL::lookAt(view, *d.gmglShaders, GMSHADER_VIEW_MATRIX);
-		break;
-	case ChildObject::Glyph:
-		break;
-	default:
-		break;
-	}
-
+	GMGL::perspective(projection, *d.gmglShaders, GMSHADER_PROJECTION_MATRIX);
+	GMGL::lookAt(view, *d.gmglShaders, GMSHADER_VIEW_MATRIX);
 	GMGL::cameraPosition(lookAt, *d.gmglShaders, GMSHADER_VIEW_POSITION);
 }
 

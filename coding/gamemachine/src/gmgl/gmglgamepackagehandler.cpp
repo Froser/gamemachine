@@ -8,6 +8,8 @@
 #include <fstream>
 #include "gmengine/elements/bspgameworld.h"
 #include "renders/gmgl_renders_object.h"
+#include "renders/gmgl_renders_sky.h"
+#include "renders/gmgl_renders_glyph.h"
 
 #define PKD(d) GamePackageData& d = gamePackage()->gamePackageData();
 
@@ -56,8 +58,8 @@ void DefaultGMGLGamePackageHandler::init()
 	// 按照Object顺序创建renders
 	IRender* renders[] = {
 		new GMGLRenders_Object(),
-		new GMGLRenders_Object(),
-		new GMGLRenders_Object(),
+		new GMGLRenders_Sky(),
+		new GMGLRenders_Glyph(),
 	};
 
 	for (GMint i = ChildObject::ObjectTypeBegin; i < ChildObject::ObjectTypeEnd; i++)

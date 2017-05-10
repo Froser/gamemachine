@@ -11,6 +11,7 @@ void GMGL::projection(const vmath::mat4& mat, GMGLShaders& shaders, const char* 
 	GLint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), projectionMatrixName);
 	CHECK_GL_LOC(projectionMatrixLocation);
 	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
+	ASSERT_GL();
 }
 
 void GMGL::frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f, GMGLShaders& shaders, const char* projectionMatrixName)

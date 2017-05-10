@@ -30,7 +30,7 @@ public:
 	virtual void endShader() override;
 	virtual void end() override;
 
-private:
+protected:
 	void clearData();
 	void activateLight(LightType t, LightInfo& light);
 	void drawDebug();
@@ -38,6 +38,8 @@ private:
 	void activeTextureTransform(Shader* shader, TextureIndex i);
 	void activeTexture(Shader* shader, TextureIndex i);
 	void deactiveTexture(TextureIndex i);
+	void activateShader(Shader* shader);
+	void deactivateShader(Shader* shader);
 };
 
 END_NS

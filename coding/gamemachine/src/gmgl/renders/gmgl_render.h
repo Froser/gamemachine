@@ -11,6 +11,7 @@ struct Shader;
 struct CameraLookAt;
 struct IRender
 {
+	virtual ~IRender() {}
 	virtual void begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform) = 0;
 	virtual void beginShader(Shader& shader) = 0;
 	virtual void endShader() = 0;
