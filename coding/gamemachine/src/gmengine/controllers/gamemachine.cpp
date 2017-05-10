@@ -116,7 +116,6 @@ void GameMachine::startGameMachine()
 		
 		d.gameHandler->logicalFrame(); //TODO
 
-		//d.drawStopwatch.start();
 		if (d.gameHandler->isWindowActivate())
 			d.gameHandler->event(GM_EVENT_ACTIVATE_MESSAGE);
 
@@ -124,22 +123,7 @@ void GameMachine::startGameMachine()
 
 		d.fpsCounter.update();
 		d.window->swapBuffers();
-
-		/*
-		GMfloat elapsed = d.drawStopwatch.getMillisecond();
-		GMfloat wait = 1000 / d.settings.fps - elapsed;
-		if (wait > 0)
-			::Sleep(wait);
-
-		GMfloat min = 1.f / d.settings.fps;
-		d.timeElapsed = elapsed / 1000 < min ? min : elapsed / 1000;
-		*/
 	}
-
-	/*
-	getGameLoop()->init(d.settings, d.gameHandler);
-	getGameLoop()->start();
-	*/
 }
 
 bool GameMachine::handleMessages()

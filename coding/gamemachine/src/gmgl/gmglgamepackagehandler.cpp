@@ -145,6 +145,7 @@ bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePacka
 		buffer->size = buf->size;
 		return true;
 	}
+	gm_warning("cannot find path %s", path);
 	return false;
 }
 

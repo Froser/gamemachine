@@ -10,6 +10,7 @@ FPSCounter::FPSCounter()
 	d.frames = 0.f;
 	d.time = 0.f;
 	d.immediate_lastTime = 0.f;
+	d.elapsed_since_last_frame = 0.f;
 }
 
 // 每一帧运行一次update
