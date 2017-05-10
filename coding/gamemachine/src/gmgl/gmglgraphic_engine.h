@@ -33,7 +33,7 @@ public:
 	virtual ~GMGLGraphicEngine();
 
 public:
-	virtual void initialize(GameWorld*) override;
+	virtual void setCurrentWorld(GameWorld*) override;
 	virtual void newFrame() override;
 	virtual void drawObjects(DrawingList& drawingList) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;

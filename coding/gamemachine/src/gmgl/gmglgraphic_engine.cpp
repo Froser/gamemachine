@@ -35,7 +35,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	}
 }
 
-void GMGLGraphicEngine::initialize(GameWorld* world)
+void GMGLGraphicEngine::setCurrentWorld(GameWorld* world)
 {
 	D(d);
 	d.world = world;

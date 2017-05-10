@@ -29,7 +29,7 @@ GameWorld::~GameWorld()
 
 void GameWorld::initialize()
 {
-	getGraphicEngine()->initialize(this);
+	getGraphicEngine()->setCurrentWorld(this);
 }
 
 void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)

@@ -28,7 +28,6 @@ GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, Object* objs)
 	: ObjectPainter(objs)
 	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
 	, m_inited(false)
-	, m_world(nullptr)
 {
 }
 

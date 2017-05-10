@@ -28,7 +28,7 @@ struct CameraLookAt;
 struct IGraphicEngine
 {
 	virtual ~IGraphicEngine();
-	virtual void initialize(GameWorld*) = 0;
+	virtual void setCurrentWorld(GameWorld*) = 0;
 	virtual void newFrame() = 0;
 	virtual void drawObjects(DrawingList& drawingList) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;

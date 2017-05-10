@@ -22,7 +22,6 @@ public:
 
 private:
 	GMGLGraphicEngine* m_engine;
-	GameWorld* m_world;
 
 private:
 	bool m_inited;
