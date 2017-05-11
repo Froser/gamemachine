@@ -2,23 +2,39 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 PROJECT (demo)
 
-INCLUDE_DIRECTORIES(
+include_directories(
 		../3rdparty/glew/include
 		../3rdparty/glew
 		../3rdparty/zlib
 		../gamemachine/src
 	)
 
-LINK_DIRECTORIES(
-		../3rdparty/glew/lib/release/win32
-		../3rdparty/jpeg-6
-		../3rdparty/freetype-2.3.5/lib
+link_directories(
+		${demo_SOURCE_DIR}/../3rdparty/glew/lib/release/win32
+		${demo_SOURCE_DIR}/../3rdparty/jpeg-6
+		${demo_SOURCE_DIR}/../3rdparty/freetype-2.3.5/lib
+		${demo_SOURCE_DIR}/../3rdparty/glew/lib/Release/win32
 	)
 
-LINK_LIBRARIES(
-	freetype.lib
-)
+link_libraries(
+		glu32.lib
+		opengl32.lib
+		glew32s.lib
+		glew32s.lib
+		freetype.lib
+		libjpeg.lib
+	)
 
-ADD_EXECUTABLE(demo
-	main.cpp
-)
+set(SOURCES
+		main.cpp
+	)
+
+source_group_by_dir(SOURCES)
+
+add_executable(demo
+		${SOURCES}
+	)
+
+target_link_libraries(${PROJECT_NAME} gamemachine)
+target_link_libraries(${PROJECT_NAME} png_static)
+target_link_libraries(${PROJECT_NAME} zlibstatic)

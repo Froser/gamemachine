@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmengine/controllers/gamepackagehandler.h"
-#include "gmglshaders.h"
-#include "gmglgraphic_engine.h"
+#include "gmgl/gmglshaders.h"
+#include "gmgl/gmglgraphic_engine.h"
 #include "gmengine/controllers/gamemachine.h"
 #include <string>
 #include "utilities/path.h"
