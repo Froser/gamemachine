@@ -34,9 +34,7 @@ public:
 	virtual GMRect getWindowRect() override;
 	virtual bool handleMessages() override;
 	virtual void swapBuffers() override;
-
-public:
-	HWND hwnd();
+	virtual HWND hwnd() override;
 
 private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

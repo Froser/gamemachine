@@ -68,7 +68,7 @@ void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWor
 	IGraphicEngine* engine = d.gameMachine->getGraphicEngine();
 	world->setGameMachine(d.gameMachine);
 	world->loadBSP(path(PI_MAPS, map).c_str());
-	d.handler->~IGamePackageHandler();
+	d.handler->dispose();
 }
 
 bool GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)

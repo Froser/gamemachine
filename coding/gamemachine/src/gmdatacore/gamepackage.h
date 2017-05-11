@@ -56,6 +56,7 @@ struct IGamePackageHandler
 {
 	virtual ~IGamePackageHandler() {}
 	virtual void init() = 0;
+	virtual void dispose() = 0;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) = 0;
 	virtual std::string pathRoot(PackageIndex index) = 0;
 	virtual std::vector<std::string> getAllFiles(const char* directory) = 0;

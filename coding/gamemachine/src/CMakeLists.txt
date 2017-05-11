@@ -38,6 +38,10 @@ set(SOURCES
 		gmdatacore/modelreader/modelreader.cpp
 		gmdatacore/modelreader/modelreader_obj.h
 		gmdatacore/modelreader/modelreader_obj.cpp
+		gmdatacore/soundreader/soundreader.h
+		gmdatacore/soundreader/soundreader.cpp
+		gmdatacore/soundreader/soundreader_wav.h
+		gmdatacore/soundreader/soundreader_wav.cpp
 		gmdatacore/bsp_model_loader.h
 		gmdatacore/bsp_model_loader.cpp
 		gmdatacore/gamepackage.h
@@ -169,3 +173,8 @@ source_group_by_dir(SOURCES)
 add_library(gamemachine
 		${SOURCES}
 	)
+
+if(MSVC)
+	set_target_properties(gamemachine PROPERTIES COMPILE_FLAGS "/W3" ) 
+	set_target_properties(gamemachine PROPERTIES COMPILE_FLAGS "/WX" ) 
+endif(MSVC)

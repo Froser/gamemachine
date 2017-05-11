@@ -5,13 +5,13 @@
 #include <dsound.h>
 BEGIN_NS
 
-#ifndef _WINDOWS
-#error need windows env
-#endif
+#ifdef _WINDOWS
 
+struct IWindow;
 struct DirectSound_SoundPlayerPrivate
 {
 	LPDIRECTSOUND8 directSound;
+	IWindow* window;
 };
 
 class DirectSound_SoundPlayer
@@ -19,8 +19,10 @@ class DirectSound_SoundPlayer
 	DEFINE_PRIVATE(DirectSound_SoundPlayer)
 
 public:
-	DirectSound_SoundPlayer();
+	DirectSound_SoundPlayer(IWindow* window);
 };
+
+#endif
 
 END_NS
 #endif

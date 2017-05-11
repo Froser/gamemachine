@@ -88,6 +88,10 @@ void DefaultGMGLGamePackageHandler::init()
 	}
 }
 
+void DefaultGMGLGamePackageHandler::dispose()
+{
+}
+
 std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
@@ -129,12 +133,6 @@ ZipGMGLGamePackageHandler::ZipGMGLGamePackageHandler(GamePackage* pk)
 {
 }
 
-ZipGMGLGamePackageHandler::~ZipGMGLGamePackageHandler()
-{
-	releaseUnzFile();
-	releaseBuffers();
-}
-
 void ZipGMGLGamePackageHandler::init()
 {
 	PKD(d);
@@ -144,6 +142,12 @@ void ZipGMGLGamePackageHandler::init()
 		return;
 	}
 	Base::init();
+}
+
+void ZipGMGLGamePackageHandler::dispose()
+{
+	releaseUnzFile();
+	releaseBuffers();
 }
 
 bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)

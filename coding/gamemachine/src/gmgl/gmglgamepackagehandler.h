@@ -13,6 +13,7 @@ public:
 
 public:
 	virtual void init() override;
+	virtual void dispose() override;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
 	virtual std::vector<std::string> getAllFiles(const char* directory) override;
@@ -48,10 +49,10 @@ class ZipGMGLGamePackageHandler : public DefaultGMGLGamePackageHandler
 
 public:
 	ZipGMGLGamePackageHandler(GamePackage* pk);
-	~ZipGMGLGamePackageHandler();
 
 public:
 	virtual void init() override;
+	virtual void dispose() override;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
 	virtual std::vector<std::string> getAllFiles(const char* directory) override;

@@ -19,6 +19,7 @@
 #include <fstream>
 #include "gmengine/elements/glyphobject.h"
 #include "os/wingl_window.h"
+#include "gmdatacore/soundreader/soundreader.h"
 
 using namespace gm;
 
@@ -80,6 +81,10 @@ public:
 		glyph = new GlyphObject();
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
+
+		GamePackageBuffer buf;
+		pk.readFileFromPath("D:\\test.wav", &buf);
+		SoundReader::load(buf, nullptr);
 
 		/*
 		{
