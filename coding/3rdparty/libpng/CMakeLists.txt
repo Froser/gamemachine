@@ -40,7 +40,11 @@ set(PNGLIB_NAME libpng${PNGLIB_MAJOR}${PNGLIB_MINOR})
 set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 
 # needed packages
-find_package(ZLIB REQUIRED)
+# we don't need to found zlib because zlib is already exists
+# find_package(ZLIB REQUIRED)
+set (ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
+set (ZLIB_LIBRARY zlib)
+
 include_directories(${ZLIB_INCLUDE_DIR})
 
 if(NOT WIN32)
@@ -510,130 +514,130 @@ function(png_add_test)
   endif()
 endfunction()
 
-if(PNG_TESTS AND PNG_SHARED)
-  # Find test PNG files by globbing, but sort lists to ensure
-  # consistency between different filesystems.
-  file(GLOB PNGSUITE_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/*.png")
-  list(SORT PNGSUITE_PNGS)
-  file(GLOB TEST_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/*.png")
-  list(SORT TEST_PNGS)
-
-  set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
-
-  add_executable(pngtest ${pngtest_sources})
-  set_target_properties(pngtest PROPERTIES FOLDER ${PROJECT_NAME})
-  target_link_libraries(pngtest png)
-
-  png_add_test(NAME pngtest COMMAND pngtest FILES "${PNGTEST_PNG}")
-
-  add_executable(pngvalid ${pngvalid_sources})
-  set_target_properties(pngvalid PROPERTIES FOLDER ${PROJECT_NAME})
-  target_link_libraries(pngvalid png)
-
-  png_add_test(NAME pngvalid-gamma-16-to-8
-               COMMAND pngvalid OPTIONS --gamma-16-to-8)
-  png_add_test(NAME pngvalid-gamma-alpha-mode
-               COMMAND pngvalid OPTIONS --gamma-alpha-mode)
-  png_add_test(NAME pngvalid-gamma-background
-               COMMAND pngvalid OPTIONS --gamma-background)
-  png_add_test(NAME pngvalid-gamma-expand16-alpha-mode
-               COMMAND pngvalid OPTIONS --gamma-alpha-mode --expand16)
-  png_add_test(NAME pngvalid-gamma-expand16-background
-               COMMAND pngvalid OPTIONS --gamma-background --expand16)
-  png_add_test(NAME pngvalid-gamma-expand16-transform
-               COMMAND pngvalid OPTIONS --gamma-transform --expand16)
-  png_add_test(NAME pngvalid-gamma-sbit
-               COMMAND pngvalid OPTIONS --gamma-sbit)
-  png_add_test(NAME pngvalid-gamma-threshold
-               COMMAND pngvalid OPTIONS --gamma-threshold)
-  png_add_test(NAME pngvalid-gamma-transform
-               COMMAND pngvalid OPTIONS --gamma-transform)
-  png_add_test(NAME pngvalid-progressive-interlace-standard
-               COMMAND pngvalid OPTIONS --standard --progressive-read --interlace)
-  png_add_test(NAME pngvalid-progressive-size
-               COMMAND pngvalid OPTIONS --size --progressive-read)
-  png_add_test(NAME pngvalid-progressive-standard
-               COMMAND pngvalid OPTIONS --standard --progressive-read)
-  png_add_test(NAME pngvalid-standard
-               COMMAND pngvalid OPTIONS --standard)
-  png_add_test(NAME pngvalid-transform
-               COMMAND pngvalid OPTIONS --transform)
-
-  add_executable(pngstest ${pngstest_sources})
-  set_target_properties(pngstest PROPERTIES FOLDER ${PROJECT_NAME}) 
-  target_link_libraries(pngstest png)
-
-  foreach(gamma_type 1.8 linear none sRGB)
-    foreach(alpha_type none alpha)
-      set(PNGSTEST_FILES)
-      foreach(test_png ${TEST_PNGS})
-        string(REGEX MATCH ".*-linear[-.].*" TEST_PNG_LINEAR "${test_png}")
-        string(REGEX MATCH ".*-sRGB[-.].*" TEST_PNG_SRGB "${test_png}")
-        string(REGEX MATCH ".*-1.8[-.].*" TEST_PNG_G18 "${test_png}")
-        string(REGEX MATCH ".*-alpha-.*" TEST_PNG_ALPHA "${test_png}")
-
-        set(TEST_PNG_VALID TRUE)
-
-        if(TEST_PNG_ALPHA)
-          if (NOT "${alpha_type}" STREQUAL "alpha")
-            set(TEST_PNG_VALID FALSE)
-          endif()
-        else()
-          if ("${alpha_type}" STREQUAL "alpha")
-            set(TEST_PNG_VALID FALSE)
-          endif()
-        endif()
-
-        if(TEST_PNG_LINEAR)
-          if(NOT "${gamma_type}" STREQUAL "linear")
-            set(TEST_PNG_VALID FALSE)
-          endif()
-        elseif(TEST_PNG_SRGB)
-          if(NOT "${gamma_type}" STREQUAL "sRGB")
-            set(TEST_PNG_VALID FALSE)
-          endif()
-        elseif(TEST_PNG_G18)
-          if(NOT "${gamma_type}" STREQUAL "1.8")
-            set(TEST_PNG_VALID FALSE)
-          endif()
-        else()
-          if(NOT "${gamma_type}" STREQUAL "none")
-            set(TEST_PNG_VALID FALSE)
-          endif()
-        endif()
-
-        if(TEST_PNG_VALID)
-          list(APPEND PNGSTEST_FILES "${test_png}")
-        endif()
-      endforeach()
-      # Should already be sorted, but sort anyway to be certain.
-      list(SORT PNGSTEST_FILES)
-      png_add_test(NAME pngstest-${gamma_type}-${alpha_type}
-                   COMMAND pngstest
-                   OPTIONS --tmpfile "${gamma_type}-${alpha_type}-" --log
-                   FILES ${PNGSTEST_FILES})
-    endforeach()
-  endforeach()
-
-  add_executable(pngunknown ${pngunknown_sources})
-  set_target_properties(pngunknown PROPERTIES FOLDER ${PROJECT_NAME})
-  target_link_libraries(pngunknown png)
-
-  png_add_test(NAME pngunknown-discard COMMAND pngunknown OPTIONS --strict default=discard FILES "${PNGTEST_PNG}")
-  png_add_test(NAME pngunknown-IDAT COMMAND pngunknown OPTIONS --strict default=discard IDAT=save FILES "${PNGTEST_PNG}")
-  png_add_test(NAME pngunknown-if-safe COMMAND pngunknown OPTIONS --strict default=if-safe FILES "${PNGTEST_PNG}")
-  png_add_test(NAME pngunknown-sAPI COMMAND pngunknown OPTIONS --strict bKGD=save cHRM=save gAMA=save all=discard iCCP=save sBIT=save sRGB=save FILES "${PNGTEST_PNG}")
-  png_add_test(NAME pngunknown-save COMMAND pngunknown OPTIONS --strict default=save FILES "${PNGTEST_PNG}")
-  png_add_test(NAME pngunknown-sTER COMMAND pngunknown OPTIONS --strict sTER=if-safe FILES "${PNGTEST_PNG}")
-  png_add_test(NAME pngunknown-vpAg COMMAND pngunknown OPTIONS --strict vpAg=if-safe FILES "${PNGTEST_PNG}")
-
-  add_executable(pngimage ${pngimage_sources})
-  set_target_properties(pngimage PROPERTIES FOLDER ${PROJECT_NAME})
-  target_link_libraries(pngimage png)
-
-  png_add_test(NAME pngimage-quick COMMAND pngimage OPTIONS --list-combos --log FILES ${PNGSUITE_PNGS})
-  png_add_test(NAME pngimage-full COMMAND pngimage OPTIONS --exhaustive --list-combos --log FILES ${PNGSUITE_PNGS})
-endif()
+#if(PNG_TESTS AND PNG_SHARED)
+#  # Find test PNG files by globbing, but sort lists to ensure
+#  # consistency between different filesystems.
+#  file(GLOB PNGSUITE_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/pngsuite/*.png")
+#  list(SORT PNGSUITE_PNGS)
+#  file(GLOB TEST_PNGS "${CMAKE_CURRENT_SOURCE_DIR}/contrib/testpngs/*.png")
+#  list(SORT TEST_PNGS)
+#
+#  set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
+#
+#  add_executable(pngtest ${pngtest_sources})
+#  set_target_properties(pngtest PROPERTIES FOLDER ${PROJECT_NAME})
+#  target_link_libraries(pngtest png)
+#
+#  png_add_test(NAME pngtest COMMAND pngtest FILES "${PNGTEST_PNG}")
+#
+#  add_executable(pngvalid ${pngvalid_sources})
+#  set_target_properties(pngvalid PROPERTIES FOLDER ${PROJECT_NAME})
+#  target_link_libraries(pngvalid png)
+#
+#  png_add_test(NAME pngvalid-gamma-16-to-8
+#               COMMAND pngvalid OPTIONS --gamma-16-to-8)
+#  png_add_test(NAME pngvalid-gamma-alpha-mode
+#               COMMAND pngvalid OPTIONS --gamma-alpha-mode)
+#  png_add_test(NAME pngvalid-gamma-background
+#               COMMAND pngvalid OPTIONS --gamma-background)
+#  png_add_test(NAME pngvalid-gamma-expand16-alpha-mode
+#               COMMAND pngvalid OPTIONS --gamma-alpha-mode --expand16)
+#  png_add_test(NAME pngvalid-gamma-expand16-background
+#               COMMAND pngvalid OPTIONS --gamma-background --expand16)
+#  png_add_test(NAME pngvalid-gamma-expand16-transform
+#               COMMAND pngvalid OPTIONS --gamma-transform --expand16)
+#  png_add_test(NAME pngvalid-gamma-sbit
+#               COMMAND pngvalid OPTIONS --gamma-sbit)
+#  png_add_test(NAME pngvalid-gamma-threshold
+#               COMMAND pngvalid OPTIONS --gamma-threshold)
+#  png_add_test(NAME pngvalid-gamma-transform
+#               COMMAND pngvalid OPTIONS --gamma-transform)
+#  png_add_test(NAME pngvalid-progressive-interlace-standard
+#               COMMAND pngvalid OPTIONS --standard --progressive-read --interlace)
+#  png_add_test(NAME pngvalid-progressive-size
+#               COMMAND pngvalid OPTIONS --size --progressive-read)
+#  png_add_test(NAME pngvalid-progressive-standard
+#               COMMAND pngvalid OPTIONS --standard --progressive-read)
+#  png_add_test(NAME pngvalid-standard
+#               COMMAND pngvalid OPTIONS --standard)
+#  png_add_test(NAME pngvalid-transform
+#               COMMAND pngvalid OPTIONS --transform)
+#
+#  add_executable(pngstest ${pngstest_sources})
+#  set_target_properties(pngstest PROPERTIES FOLDER ${PROJECT_NAME}) 
+#  target_link_libraries(pngstest png)
+#
+#  foreach(gamma_type 1.8 linear none sRGB)
+#    foreach(alpha_type none alpha)
+#      set(PNGSTEST_FILES)
+#      foreach(test_png ${TEST_PNGS})
+#        string(REGEX MATCH ".*-linear[-.].*" TEST_PNG_LINEAR "${test_png}")
+#        string(REGEX MATCH ".*-sRGB[-.].*" TEST_PNG_SRGB "${test_png}")
+#        string(REGEX MATCH ".*-1.8[-.].*" TEST_PNG_G18 "${test_png}")
+#        string(REGEX MATCH ".*-alpha-.*" TEST_PNG_ALPHA "${test_png}")
+#
+#        set(TEST_PNG_VALID TRUE)
+#
+#        if(TEST_PNG_ALPHA)
+#          if (NOT "${alpha_type}" STREQUAL "alpha")
+#            set(TEST_PNG_VALID FALSE)
+#          endif()
+#        else()
+#          if ("${alpha_type}" STREQUAL "alpha")
+#            set(TEST_PNG_VALID FALSE)
+#          endif()
+#        endif()
+#
+#        if(TEST_PNG_LINEAR)
+#          if(NOT "${gamma_type}" STREQUAL "linear")
+#            set(TEST_PNG_VALID FALSE)
+#          endif()
+#        elseif(TEST_PNG_SRGB)
+#          if(NOT "${gamma_type}" STREQUAL "sRGB")
+#            set(TEST_PNG_VALID FALSE)
+#          endif()
+#        elseif(TEST_PNG_G18)
+#          if(NOT "${gamma_type}" STREQUAL "1.8")
+#            set(TEST_PNG_VALID FALSE)
+#          endif()
+#        else()
+#          if(NOT "${gamma_type}" STREQUAL "none")
+#            set(TEST_PNG_VALID FALSE)
+#          endif()
+#        endif()
+#
+#        if(TEST_PNG_VALID)
+#          list(APPEND PNGSTEST_FILES "${test_png}")
+#        endif()
+#      endforeach()
+#      # Should already be sorted, but sort anyway to be certain.
+#      list(SORT PNGSTEST_FILES)
+#      png_add_test(NAME pngstest-${gamma_type}-${alpha_type}
+#                   COMMAND pngstest
+#                   OPTIONS --tmpfile "${gamma_type}-${alpha_type}-" --log
+#                   FILES ${PNGSTEST_FILES})
+#    endforeach()
+#  endforeach()
+#
+#  add_executable(pngunknown ${pngunknown_sources})
+#  set_target_properties(pngunknown PROPERTIES FOLDER ${PROJECT_NAME})
+#  target_link_libraries(pngunknown png)
+#
+#  png_add_test(NAME pngunknown-discard COMMAND pngunknown OPTIONS --strict default=discard FILES "${PNGTEST_PNG}")
+#  png_add_test(NAME pngunknown-IDAT COMMAND pngunknown OPTIONS --strict default=discard IDAT=save FILES "${PNGTEST_PNG}")
+#  png_add_test(NAME pngunknown-if-safe COMMAND pngunknown OPTIONS --strict default=if-safe FILES "${PNGTEST_PNG}")
+#  png_add_test(NAME pngunknown-sAPI COMMAND pngunknown OPTIONS --strict bKGD=save cHRM=save gAMA=save all=discard iCCP=save sBIT=save sRGB=save #FILES "${PNGTEST_PNG}")
+#  png_add_test(NAME pngunknown-save COMMAND pngunknown OPTIONS --strict default=save FILES "${PNGTEST_PNG}")
+#  png_add_test(NAME pngunknown-sTER COMMAND pngunknown OPTIONS --strict sTER=if-safe FILES "${PNGTEST_PNG}")
+#  png_add_test(NAME pngunknown-vpAg COMMAND pngunknown OPTIONS --strict vpAg=if-safe FILES "${PNGTEST_PNG}")
+#
+#  add_executable(pngimage ${pngimage_sources})
+#  set_target_properties(pngimage PROPERTIES FOLDER ${PROJECT_NAME})
+#  target_link_libraries(pngimage png)
+#
+#  png_add_test(NAME pngimage-quick COMMAND pngimage OPTIONS --list-combos --log FILES ${PNGSUITE_PNGS})
+#  png_add_test(NAME pngimage-full COMMAND pngimage OPTIONS --exhaustive --list-combos --log FILES ${PNGSUITE_PNGS})
+#endif()
 
 if(PNG_SHARED)
   add_executable(pngfix ${pngfix_sources})

@@ -1,7 +1,5 @@
 #define GLEW_STATIC
 #define FREEGLUT_STATIC
-#define _WINDOWS
-
 #define UNICODE
 #include <windows.h>
 #include "GL/glew.h"

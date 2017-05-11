@@ -52,6 +52,8 @@ set(SOURCES
 		gmdatacore/shader.cpp
 		gmdatacore/texture.h
 		gmdatacore/texture.cpp
+		gmdatacore/model.h
+		gmdatacore/model.cpp
 		gmengine/controllers/resource_container.h
 		gmengine/controllers/resource_container.cpp
 		gmengine/controllers/graphic_engine.h
@@ -126,6 +128,8 @@ set(SOURCES
 		gmphysics/collisionobjectfactory.cpp
 		os/wingl_window.h
 		os/wingl_window.cpp
+		os/directsound_soundplayer.h
+		os/directsound_soundplayer.cpp
 		utilities/tinyxml/tinystr.cpp
 		utilities/tinyxml/tinystr.h
 		utilities/tinyxml/tinyxml.cpp
