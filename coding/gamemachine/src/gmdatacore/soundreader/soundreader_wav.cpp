@@ -55,8 +55,7 @@ bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 	data->data = new GMbyte[data->dwSize];
 	ms.read(data->data, data->dwSize);
 
-	WAVEFORMATEX f = format.waveFormatEx;
-	SoundFile* _sf = new SoundFile(f, data);
+	SoundFile* _sf = new SoundFile(format.waveFormatEx, data);
 	*sf = _sf;
 	return true;
 }
