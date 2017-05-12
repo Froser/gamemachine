@@ -83,12 +83,11 @@ public:
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
 
-		GamePackageBuffer buf;
-		pk.readFileFromPath("D://test.wav", &buf);
-		ISoundFile* sf;
-		SoundReader::load(buf, &sf);
-		
-		m_gm->getSoundPlayer()->play(sf, PlayOptions());
+		//GamePackageBuffer buf;
+		//pk.readFileFromPath("D://test.wav", &buf);
+		//ISoundFile* sf;
+		//SoundReader::load(buf, &sf);
+		//m_gm->getSoundPlayer()->play(sf, PlayOptions());
 
 		/*
 		{

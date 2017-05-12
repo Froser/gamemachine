@@ -35,5 +35,6 @@ endmacro(add_msvc_precompiled_header)
 
 add_subdirectory(./3rdparty/zlib zlib)
 add_subdirectory(./3rdparty/libpng libpng)
+add_subdirectory(./3rdparty/libmad libmad)
 add_subdirectory(gamemachine gamemachine)
 add_subdirectory(demo demo)
