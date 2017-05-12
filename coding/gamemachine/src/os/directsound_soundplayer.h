@@ -25,16 +25,18 @@ class DirectSound_SoundPlayer : public ISoundPlayer
 	DEFINE_PRIVATE(DirectSound_SoundPlayer)
 
 public:
+	typedef DirectSound_SoundPlayerPrivate Data;
+
+public:
 	DirectSound_SoundPlayer(IWindow* window);
 	~DirectSound_SoundPlayer();
 
 public:
-	virtual void play(ISoundFile* sf) override;
+	virtual void play(ISoundFile* sf, PlayOptions options) override;
 	virtual void stop() override;
 
 private:
-	void loadSound(ISoundFile* sf);
-	void processBuffer();
+	void loadSound(ISoundFile* sf, PlayOptions options);
 };
 
 #endif

@@ -88,7 +88,7 @@ public:
 		ISoundFile* sf;
 		SoundReader::load(buf, &sf);
 		
-		m_gm->getSoundPlayer()->play(sf);
+		m_gm->getSoundPlayer()->play(sf, PlayOptions());
 
 		/*
 		{

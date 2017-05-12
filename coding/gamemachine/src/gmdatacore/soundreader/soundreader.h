@@ -67,10 +67,14 @@ private:
 	WaveData* m_waveData;
 };
 
+struct PlayOptions
+{
+};
+
 struct ISoundPlayer
 {
 	virtual ~ISoundPlayer() {};
-	virtual void play(ISoundFile* sf) = 0;
+	virtual void play(ISoundFile* sf, PlayOptions options) = 0;
 	virtual void stop() = 0;
 };
 
