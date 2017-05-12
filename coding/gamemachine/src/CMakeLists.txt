@@ -159,6 +159,7 @@ set(SOURCES
 		utilities/debug.cpp
 		utilities/camera.h
 		utilities/camera.cpp
+		utilities/comptr.h
 		utilities/bitset.h
 		utilities/bitset.cpp
 		utilities/autoptr.h
@@ -169,6 +170,7 @@ set(SOURCES
 	)
 
 source_group_by_dir(SOURCES)
+add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 add_library(gamemachine
 		${SOURCES}

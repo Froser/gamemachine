@@ -14,6 +14,7 @@ link_directories(
 		${demo_SOURCE_DIR}/../3rdparty/jpeg-6
 		${demo_SOURCE_DIR}/../3rdparty/freetype-2.3.5/lib
 		${demo_SOURCE_DIR}/../3rdparty/glew/lib/Release/win32
+		${demo_SOURCE_DIR}/../3rdparty/dx #windows only
 	)
 
 link_libraries(
@@ -23,6 +24,7 @@ link_libraries(
 		glew32s.lib
 		freetype.lib
 		libjpeg.lib
+		dxguid.lib #windows only
 	)
 
 set(SOURCES

@@ -7,6 +7,7 @@
 #include "gmglgamepackagehandler.h"
 #include "gmglglyphmanager.h"
 #include "os/wingl_window.h"
+#include "os/directsound_soundplayer.h"
 
 void GMGLFactory::createWindow(OUT IWindow** window)
 {
@@ -62,4 +63,11 @@ void GMGLFactory::createGamePackage(GamePackage* pk, GamePackageType t, OUT IGam
 void GMGLFactory::createGlyphManager(OUT GlyphManager** glyphManager)
 {
 	*glyphManager = new GMGLGlyphManager();
+}
+
+void GMGLFactory::createSoundPlayer(IWindow* window, OUT ISoundPlayer** soundPlayer)
+{
+#ifdef _WINDOWS
+	*soundPlayer = new DirectSound_SoundPlayer(window);
+#endif
 }

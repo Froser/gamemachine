@@ -18,6 +18,7 @@ class ObjectPainter;
 class GamePackage;
 class GlyphManager;
 struct IWindow;
+struct ISoundPlayer;
 struct IFactory
 {
 	virtual ~IFactory();
@@ -27,6 +28,7 @@ struct IFactory
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;
 	virtual void createGamePackage(GamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GlyphManager**) = 0;
+	virtual void createSoundPlayer(IWindow* window, OUT ISoundPlayer**) = 0;
 };
 
 END_NS

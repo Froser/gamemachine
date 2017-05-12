@@ -1,8 +1,11 @@
 ﻿#ifndef __DIRECTSOUND_SOUNDPLAYER_H__
 #define __DIRECTSOUND_SOUNDPLAYER_H__
 #include "common.h"
-#include <mmsystem.h>
+#include "utilities/comptr.h"
 #include <dsound.h>
+#include <mmsystem.h>
+#include "gmdatacore/soundreader/soundreader.h"
+
 BEGIN_NS
 
 #ifdef _WINDOWS
@@ -10,16 +13,28 @@ BEGIN_NS
 struct IWindow;
 struct DirectSound_SoundPlayerPrivate
 {
-	LPDIRECTSOUND8 directSound;
+	ComPtr<IDirectSound8> cpDirectSound;
+	ComPtr<IDirectSoundBuffer8> cpDirectSoundBuffer;
 	IWindow* window;
+	bool playing;
 };
 
-class DirectSound_SoundPlayer
+struct ISoundFile;
+class DirectSound_SoundPlayer : public ISoundPlayer
 {
 	DEFINE_PRIVATE(DirectSound_SoundPlayer)
 
 public:
 	DirectSound_SoundPlayer(IWindow* window);
+	~DirectSound_SoundPlayer();
+
+public:
+	virtual void play(ISoundFile* sf) override;
+	virtual void stop() override;
+
+private:
+	void loadSound(ISoundFile* sf);
+	void processBuffer();
 };
 
 #endif

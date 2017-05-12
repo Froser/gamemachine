@@ -29,6 +29,27 @@ private:
 	std::map<SoundType, ISoundReader*> m_readers;
 };
 
+SoundFile::SoundFile(const WAVEFORMATEX& fmt, AUTORELEASE WaveData* waveData)
+	: m_waveFormat(fmt)
+	, m_waveData(waveData)
+{
+}
+
+SoundFile::~SoundFile()
+{
+	if (m_waveData)
+		delete m_waveData;
+}
+
+WAVEFORMATEX* SoundFile::getWaveFormat()
+{
+	return &m_waveFormat;
+}
+
+WaveData* SoundFile::getData()
+{
+	return m_waveData;
+}
 
 ISoundReader* SoundReader::getReader(SoundType type)
 {
@@ -46,12 +67,12 @@ SoundType SoundReader::test(const GamePackageBuffer& buffer)
 	return SoundType_End;
 }
 
-bool SoundReader::load(GamePackageBuffer& buffer, OUT Object** image)
+bool SoundReader::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 {
-	return load(buffer, SoundType_AUTO, image);
+	return load(buffer, SoundType_AUTO, sf);
 }
 
-bool SoundReader::load(GamePackageBuffer& buffer, SoundType type, OUT Object** object)
+bool SoundReader::load(GamePackageBuffer& buffer, SoundType type, OUT ISoundFile** sf)
 {
 	if (type == SoundType_AUTO)
 		type = test(buffer);
@@ -59,5 +80,5 @@ bool SoundReader::load(GamePackageBuffer& buffer, SoundType type, OUT Object** o
 	if (type == SoundType_End)
 		return false;
 
-	return getReader(type)->load(buffer, object);
+	return getReader(type)->load(buffer, sf);
 }

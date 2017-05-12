@@ -20,6 +20,7 @@
 #include "gmengine/elements/glyphobject.h"
 #include "os/wingl_window.h"
 #include "gmdatacore/soundreader/soundreader.h"
+#include "os/directsound_soundplayer.h"
 
 using namespace gm;
 
@@ -83,8 +84,11 @@ public:
 		world->appendObjectAndInit(glyph, true);
 
 		GamePackageBuffer buf;
-		pk.readFileFromPath("D:\\test.wav", &buf);
-		SoundReader::load(buf, nullptr);
+		pk.readFileFromPath("D://test.wav", &buf);
+		ISoundFile* sf;
+		SoundReader::load(buf, &sf);
+		
+		m_gm->getSoundPlayer()->play(sf);
 
 		/*
 		{

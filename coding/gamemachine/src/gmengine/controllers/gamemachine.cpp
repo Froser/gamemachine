@@ -58,6 +58,12 @@ IFactory* GameMachine::getFactory()
 	return d.factory;
 }
 
+ISoundPlayer* GameMachine::getSoundPlayer()
+{
+	D(d);
+	return d.soundPlayer;
+}
+
 void GameMachine::postMessage(GameMachineMessage msg)
 {
 	D(d);
@@ -98,6 +104,11 @@ void GameMachine::startGameMachine()
 	d.window->setWindowPosition(d.settings.startPosition[0], d.settings.startPosition[1]);
 	*/
 	d.window->createWindow();
+
+	// 创建声音播放器
+	ISoundPlayer* soundPlayer;
+	d.factory->createSoundPlayer(d.window, &soundPlayer);
+	d.soundPlayer.reset(soundPlayer);
 
 	// 创建Glyph管理器
 	GlyphManager* glyphManager;

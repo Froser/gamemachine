@@ -7,7 +7,7 @@ BEGIN_NS
 class SoundReader_Wav : public ISoundReader
 {
 public:
-	virtual bool load(GamePackageBuffer& buffer, OUT Object** object) override;
+	virtual bool load(GamePackageBuffer& buffer, OUT ISoundFile** sf) override;
 	virtual bool test(const GamePackageBuffer& buffer) override;
 };
 
