@@ -2,6 +2,7 @@
 #include "soundreader.h"
 #include "utilities/assert.h"
 #include "soundreader_wav.h"
+#include "soundreader_mp3.h"
 
 class SoundReaderContainer
 {
@@ -9,6 +10,7 @@ public:
 	SoundReaderContainer()
 	{
 		m_readers[SoundType_Wav] = new SoundReader_Wav();
+		m_readers[SoundType_MP3] = new SoundReader_MP3();
 	}
 
 	~SoundReaderContainer()

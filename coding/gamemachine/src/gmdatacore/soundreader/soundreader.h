@@ -46,6 +46,7 @@ enum SoundType
 	SoundType_AUTO,
 	SoundType_Begin,
 	SoundType_Wav = SoundType_Begin,
+	SoundType_MP3,
 	SoundType_End,
 };
 

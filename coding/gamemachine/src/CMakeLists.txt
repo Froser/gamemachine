@@ -5,6 +5,7 @@ include_directories(
 		../../3rdparty/jpeg-6
 		../../3rdparty/zlib
 		../../3rdparty/freetype-2.3.5/include
+		../../3rdparty/libmad
 	)
 
 set(SOURCES
@@ -42,6 +43,8 @@ set(SOURCES
 		gmdatacore/soundreader/soundreader.cpp
 		gmdatacore/soundreader/soundreader_wav.h
 		gmdatacore/soundreader/soundreader_wav.cpp
+		gmdatacore/soundreader/soundreader_mp3.h
+		gmdatacore/soundreader/soundreader_mp3.cpp
 		gmdatacore/bsp_model_loader.h
 		gmdatacore/bsp_model_loader.cpp
 		gmdatacore/gamepackage.h
@@ -175,6 +178,8 @@ add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 add_library(gamemachine
 		${SOURCES}
 	)
+
+add_definitions(-DFPM_DEFAULT)
 
 if(MSVC)
 	set_target_properties(gamemachine PROPERTIES COMPILE_FLAGS "/W3" ) 
