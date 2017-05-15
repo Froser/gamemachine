@@ -83,7 +83,7 @@ public:
 		world->appendObjectAndInit(glyph, true);
 
 		GamePackageBuffer buf;
-		pk.readFileFromPath("D://test.wav", &buf);
+		pk.readFileFromPath("D://test.mp3", &buf);
 		ISoundFile* sf;
 		SoundReader::load(buf, &sf);
 		sf->play();
