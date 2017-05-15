@@ -19,7 +19,6 @@ public:
 	virtual void createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectPainter** painter) override;
 	virtual void createGamePackage(GamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler) override;
 	virtual void createGlyphManager(OUT GlyphManager**) override;
-	virtual void createSoundPlayer(IWindow* window, OUT ISoundPlayer**) override;
 };
 
 END_NS

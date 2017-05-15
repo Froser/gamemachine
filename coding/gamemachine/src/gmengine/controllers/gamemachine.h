@@ -54,7 +54,6 @@ struct GameMachinePrivate
 	AutoPtr<IGraphicEngine> engine;
 	AutoPtr<IGameHandler> gameHandler;
 	AutoPtr<GlyphManager> glyphManager;
-	AutoPtr<ISoundPlayer> soundPlayer;
 	std::queue<GameMachineMessage> messageQueue;
 };
 
@@ -78,7 +77,6 @@ public:
 	IGraphicEngine* getGraphicEngine();
 	IWindow* getWindow();
 	IFactory* getFactory();
-	ISoundPlayer* getSoundPlayer();
 	GraphicSettings& getSettings();
 	GlyphManager* getGlyphManager();
 	GMfloat getFPS();

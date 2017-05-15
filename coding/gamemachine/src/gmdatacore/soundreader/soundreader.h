@@ -26,7 +26,19 @@ private:
 	WaveData() : data(nullptr) {};
 };
 
-struct ISoundFile
+struct PlayOptions
+{
+};
+
+struct ISoundFile;
+struct ISoundPlayer
+{
+	virtual ~ISoundPlayer() {};
+	virtual void play() = 0;
+	virtual void stop() = 0;
+};
+
+struct ISoundFile : public ISoundPlayer
 {
 	virtual ~ISoundFile() {}
 	virtual WAVEFORMATEX* getWaveFormat() = 0;
@@ -58,7 +70,7 @@ public:
 
 public:
 	SoundFile(const WAVEFORMATEX& fmt, AUTORELEASE WaveData* waveData);
-	~SoundFile();
+	virtual ~SoundFile();
 
 public:
 	virtual WAVEFORMATEX* getWaveFormat() override;
@@ -67,17 +79,6 @@ public:
 private:
 	WAVEFORMATEX m_waveFormat;
 	WaveData* m_waveData;
-};
-
-struct PlayOptions
-{
-};
-
-struct ISoundPlayer
-{
-	virtual ~ISoundPlayer() {};
-	virtual void play(ISoundFile* sf, PlayOptions options) = 0;
-	virtual void stop() = 0;
 };
 
 class SoundReader

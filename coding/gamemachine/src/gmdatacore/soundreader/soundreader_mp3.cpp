@@ -89,8 +89,8 @@ bool SoundReader_MP3::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 	wd->dwSize = d.bufferOut.size();
 	wd->data = new GMbyte[wd->dwSize];
 	memcpy(wd->data, d.bufferOut.data(), wd->dwSize);
-	SoundFile* f = new SoundFile(d.format, wd);
-	*sf = f;
+	//SoundFile* f = new SoundFile(d.format, wd);
+	//*sf = f;
 	return b;
 }
 

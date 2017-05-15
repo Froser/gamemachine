@@ -3,6 +3,10 @@
 #include "factory.h"
 #include "gmdatacore/glyph/glyphmanager.h"
 
+#ifdef _WINDOWS
+#include "os/directsound_sounddevice.h"
+#endif
+
 GameMachine::GameMachine(
 	GraphicSettings settings,
 	AUTORELEASE IFactory* factory,
@@ -58,12 +62,6 @@ IFactory* GameMachine::getFactory()
 	return d.factory;
 }
 
-ISoundPlayer* GameMachine::getSoundPlayer()
-{
-	D(d);
-	return d.soundPlayer;
-}
-
 void GameMachine::postMessage(GameMachineMessage msg)
 {
 	D(d);
@@ -105,10 +103,10 @@ void GameMachine::startGameMachine()
 	*/
 	d.window->createWindow();
 
-	// 创建声音播放器
-	ISoundPlayer* soundPlayer;
-	d.factory->createSoundPlayer(d.window, &soundPlayer);
-	d.soundPlayer.reset(soundPlayer);
+#ifdef _WINDOWS
+	// 创建声音设备
+	SoundPlayerDevice::createInstance(d.window);
+#endif
 
 	// 创建Glyph管理器
 	GlyphManager* glyphManager;

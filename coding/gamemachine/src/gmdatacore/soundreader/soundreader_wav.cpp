@@ -2,6 +2,13 @@
 #include "soundreader_wav.h"
 #include "utilities/memorystream.h"
 #include "gmdatacore/gamepackage.h"
+#include <dsound.h>
+#include "utilities/comptr.h"
+#include "soundreader.h"
+
+#ifdef _WINDOWS
+#include "os/directsound_sounddevice.h"
+#endif
 
 struct GM_WAVERIFF
 {
@@ -23,6 +30,78 @@ struct GM_WAVEFACT
 	DWORD dwSize;
 	DWORD data;
 };
+
+#ifdef _WINDOWS
+struct WavSoundFilePrivate
+{
+	ComPtr<IDirectSoundBuffer8> cpDirectSoundBuffer;
+	bool playing;
+};
+
+class WavSoundFile : public SoundFile
+{
+	DEFINE_PRIVATE(WavSoundFile)
+
+	typedef SoundFile Base;
+
+public:
+	WavSoundFile(const WAVEFORMATEX& fmt, AUTORELEASE WaveData* waveData)
+		: Base(fmt, waveData)
+	{
+		D(d);
+		d.playing = false;
+	}
+
+public:
+	virtual void play() override
+	{
+		D(d);
+		loadSound();
+		d.playing = true;
+		HRESULT hr = d.cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
+		ASSERT(SUCCEEDED(hr));
+	}
+
+	virtual void stop() override
+	{
+		D(d);
+		d.cpDirectSoundBuffer->Stop();
+		d.playing = false;
+	}
+
+private:
+	void loadSound()
+	{
+		D(d);
+		DSBUFFERDESC dsbd = { 0 };
+		dsbd.dwSize = sizeof(DSBUFFERDESC);
+		dsbd.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFX | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GETCURRENTPOSITION2;
+		dsbd.dwBufferBytes = getData()->dwSize;
+		dsbd.lpwfxFormat = (LPWAVEFORMATEX)getWaveFormat();
+
+		ComPtr<IDirectSoundBuffer> cpBuffer;
+		HRESULT hr;
+		if (FAILED(hr = SoundPlayerDevice::getInstance()->CreateSoundBuffer(&dsbd, &cpBuffer, NULL)))
+		{
+			gm_error("create sound buffer error.");
+			return;
+		}
+
+		if (FAILED(hr = cpBuffer->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&d.cpDirectSoundBuffer)))
+		{
+			gm_error("QueryInterface to IDirectSoundBuffer8 error");
+			return;
+		}
+
+		LPVOID lpLockBuf;
+		DWORD len;
+		d.cpDirectSoundBuffer->Lock(0, 0, &lpLockBuf, &len, NULL, NULL, DSBLOCK_ENTIREBUFFER);
+		memcpy(lpLockBuf, getData()->data, len);
+		d.cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
+		d.cpDirectSoundBuffer->SetCurrentPosition(0);
+	}
+};
+#endif
 
 bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 {
@@ -55,7 +134,7 @@ bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 	data->data = new GMbyte[data->dwSize];
 	ms.read(data->data, data->dwSize);
 
-	SoundFile* _sf = new SoundFile(format.waveFormatEx, data);
+	SoundFile* _sf = new WavSoundFile(format.waveFormatEx, data);
 	*sf = _sf;
 	return true;
 }

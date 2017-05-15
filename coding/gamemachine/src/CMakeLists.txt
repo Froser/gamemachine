@@ -135,8 +135,8 @@ set(SOURCES
 		gmphysics/collisionobjectfactory.cpp
 		os/wingl_window.h
 		os/wingl_window.cpp
-		os/directsound_soundplayer.h
-		os/directsound_soundplayer.cpp
+		os/directsound_sounddevice.h
+		os/directsound_sounddevice.cpp
 		utilities/tinyxml/tinystr.cpp
 		utilities/tinyxml/tinystr.h
 		utilities/tinyxml/tinyxml.cpp
