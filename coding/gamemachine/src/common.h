@@ -6,6 +6,8 @@
 #define BEGIN_NS namespace gm {
 #define END_NS }
 #define DEFINE_PRIVATE(className) \
+	public: \
+	typedef className##Private Data; \
 	private: \
 	className##Private m_data; \
 	protected: \

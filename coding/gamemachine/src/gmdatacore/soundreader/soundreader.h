@@ -37,6 +37,7 @@ struct GamePackageBuffer;
 class Object;
 struct ISoundReader
 {
+	virtual ~ISoundReader() {}
 	virtual bool load(GamePackageBuffer& buffer, OUT ISoundFile** sf) = 0;
 	virtual bool test(const GamePackageBuffer& buffer) = 0;
 };

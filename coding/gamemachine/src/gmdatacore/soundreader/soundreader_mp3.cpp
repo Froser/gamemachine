@@ -20,17 +20,31 @@ static inline GMint scale(mad_fixed_t sample)
 
 static mad_flow input(void *data, mad_stream *stream)
 {
-	GamePackageBuffer* buffer = (GamePackageBuffer*)data;
+	SoundReader_MP3::Data* d = (SoundReader_MP3::Data*)data;
 
-	if (!buffer->size)
+	if (d->bufferLoaded)
 		return MAD_FLOW_STOP;
 
-	mad_stream_buffer(stream, buffer->buffer, buffer->size);
+	mad_stream_buffer(stream, d->bufferIn->buffer, d->bufferIn->size);
+	d->bufferLoaded = true;
 	return MAD_FLOW_CONTINUE;
 }
 
 static mad_flow output(void *data, struct mad_header const *header, struct mad_pcm *pcm)
 {
+	SoundReader_MP3::Data* d = (SoundReader_MP3::Data*)data;
+	if (!d->formatCreated)
+	{
+		d->format.cbSize = sizeof(WAVEFORMATEX);
+		d->format.nChannels = pcm->channels;
+		d->format.nBlockAlign = 4;
+		d->format.wFormatTag = 1;
+		d->format.nSamplesPerSec = pcm->samplerate;
+		d->format.nAvgBytesPerSec = d->format.nSamplesPerSec * sizeof(unsigned short) * pcm->channels;
+		d->format.wBitsPerSample = 16;
+		d->formatCreated = true;
+	}
+
 	GMuint nchannels, nsamples;
 	mad_fixed_t const *left_ch, *right_ch;
 
@@ -41,42 +55,43 @@ static mad_flow output(void *data, struct mad_header const *header, struct mad_p
 	left_ch = pcm->samples[0];
 	right_ch = pcm->samples[1];
 
+	d->bufferOut.reserve(d->bufferOut.size() + (nchannels == 2 ? nsamples * 4 : nsamples * 2));
+
 	while (nsamples--) {
 		signed int sample;
 
 		/* output sample(s) in 16-bit signed little-endian PCM */
 
 		sample = scale(*left_ch++);
-		putchar((sample >> 0) & 0xff);
-		putchar((sample >> 8) & 0xff);
+		d->bufferOut.push_back((sample >> 0) & 0xff);
+		d->bufferOut.push_back((sample >> 8) & 0xff);
 
 		if (nchannels == 2) {
 			sample = scale(*right_ch++);
-			putchar((sample >> 0) & 0xff);
-			putchar((sample >> 8) & 0xff);
+			d->bufferOut.push_back((sample >> 0) & 0xff);
+			d->bufferOut.push_back((sample >> 8) & 0xff);
 		}
 	}
 
 	return MAD_FLOW_CONTINUE;
 }
 
-static mad_flow __cdecl error(void *data, struct mad_stream *stream, struct mad_frame *frame)
-{
-	GamePackageBuffer *buffer = (GamePackageBuffer*)data;
-
-	gm_error("decoding error 0x%04x (%s) at byte offset %u\n",
-		stream->error, mad_stream_errorstr(stream),
-		stream->this_frame - buffer->buffer);
-
-	/* return MAD_FLOW_BREAK here to stop decoding (and propagate an error) */
-
-	return MAD_FLOW_CONTINUE;
-}
-
 bool SoundReader_MP3::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 {
-	decode(buffer);
-	return true;
+	D(d);
+	d.formatCreated = false;
+	d.bufferLoaded = false;
+	d.bufferIn = &buffer;
+
+	bool b = decode();
+	WaveData* wd;
+	WaveData::newWaveData(&wd);
+	wd->dwSize = d.bufferOut.size();
+	wd->data = new GMbyte[wd->dwSize];
+	memcpy(wd->data, d.bufferOut.data(), wd->dwSize);
+	SoundFile* f = new SoundFile(d.format, wd);
+	*sf = f;
+	return b;
 }
 
 bool SoundReader_MP3::test(const GamePackageBuffer& buffer)
@@ -84,11 +99,11 @@ bool SoundReader_MP3::test(const GamePackageBuffer& buffer)
 	return buffer.buffer[0] == 'I' && buffer.buffer[1] == 'D' && buffer.buffer[2] == '3';
 }
 
-bool SoundReader_MP3::decode(GamePackageBuffer& buffer)
+bool SoundReader_MP3::decode()
 {
+	D(d);
 	mad_decoder decoder;
-	mad_decoder_init(&decoder, &buffer, input, nullptr, nullptr, output, error, nullptr);
+	mad_decoder_init(&decoder, &d, input, nullptr, nullptr, output, nullptr, nullptr);
 	GMint result = mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
-	mad_decoder_finish(&decoder);
-	return 0;// result == 0;
+	return mad_decoder_finish(&decoder) == 0;
 }
