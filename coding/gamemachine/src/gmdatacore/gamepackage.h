@@ -30,8 +30,17 @@ struct GamePackageBuffer
 		if (needRelease)
 		{
 			ASSERT(buffer);
-			delete buffer;
+			delete[] buffer;
 		}
+	}
+
+	GamePackageBuffer& operator =(const GamePackageBuffer& rhs)
+	{
+		this->needRelease = rhs.needRelease;
+		this->size = rhs.size;
+		buffer = new GMbyte[this->size];
+		memcpy(buffer, rhs.buffer, this->size);
+		return *this;
 	}
 
 	void convertToStringBuffer()
@@ -41,7 +50,7 @@ struct GamePackageBuffer
 		newBuffer[size] = 0;
 		size++;
 		if (needRelease && buffer)
-			delete buffer;
+			delete[] buffer;
 		needRelease = true;
 		buffer = newBuffer;
 	}
