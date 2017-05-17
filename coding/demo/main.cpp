@@ -87,6 +87,9 @@ public:
 		ISoundFile* sf;
 		SoundReader::load(buf, &sf);
 		sf->play();
+		Sleep(1000);
+		sf->stop();
+		delete sf;
 
 		/*
 		{

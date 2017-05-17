@@ -9,7 +9,7 @@
 #include "os/directsound_sounddevice.h"
 
 #define FRAME_BUFFER 50 // 每一份缓存包含的帧数
-#define BUFFER_COUNT 3 // 将缓存分为多少部分
+#define BUFFER_COUNT 2 // 将缓存分为多少部分
 
 class MP3SoundFile;
 struct MP3SoundFilePrivate
@@ -22,12 +22,11 @@ struct MP3SoundFilePrivate
 	GamePackageBuffer bufferIn; // MP3文件数据
 	std::vector<GMbyte> bufferOut; // 缓存的字节
 	GMuint bufferOffset; // 缓存偏移
-	GMuint bufferSize; // 单位缓存，每次读取这么多大小的缓存
+	GMuint unitBufferSize; // 单位缓存，每次读取这么多大小的缓存
 	bool playing; // 是否正在播放
 	GMlong frame; // MP3已经解码的帧数
 
 #ifdef _WINDOWS
-	ComPtr<IDirectSoundNotify> cpDirectSoundNotify;
 	DSBPOSITIONNOTIFY notifyPos[BUFFER_COUNT];
 	HANDLE events[BUFFER_COUNT];
 	ComPtr<IDirectSoundBuffer8> cpDirectSoundBuffer;
@@ -62,11 +61,6 @@ public:
 
 	~MP3SoundFile()
 	{
-		D(d);
-		for (GMint i = 0; i < BUFFER_COUNT; i++)
-		{
-			::CloseHandle(d.notifyPos[i].hEventNotify);
-		}
 	}
 
 public:
@@ -81,6 +75,13 @@ public:
 	{
 		D(d);
 		d.playing = false;
+		if (d.cpDirectSoundBuffer)
+			d.cpDirectSoundBuffer->Stop();
+
+		for (GMint i = 0; i < BUFFER_COUNT; i++)
+		{
+			::SetEvent(d.events[i]);
+		}
 	}
 
 public:
@@ -103,9 +104,9 @@ private:
 		DSBUFFERDESC dsbd = { 0 };
 		dsbd.dwSize = sizeof(DSBUFFERDESC);
 		dsbd.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFX | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GETCURRENTPOSITION2;
-		dsbd.dwBufferBytes = size * BUFFER_COUNT; // 我们先填充一部分数据，剩下的在接到通知后再填充
+		dsbd.dwBufferBytes = size;
 		dsbd.lpwfxFormat = (LPWAVEFORMATEX)&d.format;
-		d.bufferSize = size;
+		d.unitBufferSize = size / BUFFER_COUNT;
 
 		ComPtr<IDirectSoundBuffer> cpBuffer;
 		HRESULT hr;
@@ -121,7 +122,8 @@ private:
 			return;
 		}
 
-		if (FAILED(hr = d.cpDirectSoundBuffer->QueryInterface(IID_IDirectSoundNotify, (LPVOID*)&d.cpDirectSoundNotify)))
+		ComPtr<IDirectSoundNotify> cpDirectSoundNotify;
+		if (FAILED(hr = d.cpDirectSoundBuffer->QueryInterface(IID_IDirectSoundNotify, (LPVOID*)&cpDirectSoundNotify)))
 		{
 			gm_error("QueryInterface to IDirectSoundNotify error");
 			return;
@@ -129,11 +131,11 @@ private:
 
 		for (GMint i = 0; i < BUFFER_COUNT; i++)
 		{
-			d.notifyPos[i].dwOffset = i * d.bufferSize;
+			d.notifyPos[i].dwOffset = (i + 1) * d.unitBufferSize - 1;
 			d.notifyPos[i].hEventNotify = ::CreateEvent(NULL, FALSE, FALSE, NULL);
 			d.events[i] = d.notifyPos[i].hEventNotify;
 		}
-		hr = d.cpDirectSoundNotify->SetNotificationPositions(2, d.notifyPos);
+		hr = cpDirectSoundNotify->SetNotificationPositions(2, d.notifyPos);
 		ASSERT(SUCCEEDED(hr));
 
 		LPVOID lpLockBuf;
@@ -148,7 +150,6 @@ private:
 		ASSERT(SUCCEEDED(hr));
 		hr = d.cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
 		ASSERT(SUCCEEDED(hr));
-
 	}
 };
 #endif
@@ -171,6 +172,9 @@ static inline GMint scale(mad_fixed_t sample)
 static mad_flow input(void *data, mad_stream *stream)
 {
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)data;
+
+	if (!d->playing)
+		return MAD_FLOW_STOP;
 
 	if (d->bufferLoaded)
 		return MAD_FLOW_STOP;
@@ -229,7 +233,7 @@ static mad_flow output(void *data, struct mad_header const *header, struct mad_p
 	if (d->frame == FRAME_BUFFER * BUFFER_COUNT)
 	{
 		// 先读取BUFFER_COUNT倍的数据到内存
-		GMint transfered = d->bufferOut.size() / BUFFER_COUNT;
+		GMint transfered = d->bufferOut.size();
 		d->parent->transfer(d->bufferOut.data() + d->bufferOffset, transfered);
 		d->bufferOffset += transfered;
 	}
@@ -251,25 +255,54 @@ static DWORD WINAPI decode(LPVOID lpThreadParameter)
 static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 {
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)lpThreadParameter;
-	GMint part = 0;
+	DWORD bufferOffset = 0;
+
+	// 手动增加个计数，防止调用到一半被析构
+	ComPtr<IDirectSoundBuffer8> dummy = d->cpDirectSoundBuffer;
+
 	while (d->playing)
 	{
 		WaitForMultipleObjects(BUFFER_COUNT, d->events, FALSE, INFINITE);
-		part = (part + 1) % BUFFER_COUNT;
+
+		LPVOID lpvPtr1;
+		DWORD dwBytes1;
+		LPVOID lpvPtr2;
+		DWORD dwBytes2;
 		HRESULT hr;
-		LPVOID lpLockBuf;
-		DWORD len;
-		hr = d->cpDirectSoundBuffer->Lock(part * d->bufferSize, d->bufferSize, &lpLockBuf, &len, 0, 0, DSBLOCK_ENTIREBUFFER);
-		ASSERT(SUCCEEDED(hr));
-		memcpy(lpLockBuf, d->bufferOut.data() + d->bufferOffset, d->bufferSize);
-		hr = d->cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
-		ASSERT(SUCCEEDED(hr));
-		d->bufferOffset += d->bufferSize;
+		hr = d->cpDirectSoundBuffer->Lock(bufferOffset, d->unitBufferSize, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0);
+		// If the buffer was lost, restore and retry lock. 
+		if (DSERR_BUFFERLOST == hr)
+		{
+			d->cpDirectSoundBuffer->Restore();
+			hr = d->cpDirectSoundBuffer->Lock(bufferOffset, d->unitBufferSize, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			memcpy(lpvPtr1, d->bufferOut.data() + d->bufferOffset, dwBytes1);
+			if (lpvPtr2)
+				memcpy(lpvPtr2, d->bufferOut.data() + d->bufferOffset + dwBytes1, dwBytes2);
+
+			// Release the data back to DirectSound. 
+			hr = d->cpDirectSoundBuffer->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
+			ASSERT(SUCCEEDED(hr));
+		}
+
+		DWORD step = dwBytes1 + dwBytes2;
+		d->bufferOffset += step;
+		bufferOffset += step;
+		bufferOffset %= d->unitBufferSize * BUFFER_COUNT;
+
 		if (d->bufferOffset > d->bufferOut.size())
 		{
 			//TODO: do not loop
 			break;
 		}
+	}
+
+	for (GMint i = 0; i < BUFFER_COUNT; i++)
+	{
+		::CloseHandle(d->events[i]);
 	}
 	return 0;
 }
