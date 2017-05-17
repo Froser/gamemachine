@@ -213,9 +213,8 @@ void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char
 	std::string mtlPath = settings.modelName;
 	mtlPath.append("/");
 	mtlPath.append(mtlFilename);
-	std::string mtlFullPath = settings.gamePackage.path(PI_MODELS, mtlPath.c_str());
 	GamePackageBuffer buffer;
-	settings.gamePackage.readFileFromPath(mtlFullPath.c_str(), &buffer);
+	settings.gamePackage.readFile(PI_MODELS, mtlPath.c_str(), &buffer);
 	buffer.convertToStringBuffer();
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);

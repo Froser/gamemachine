@@ -19,12 +19,6 @@ GamePackageData& GamePackage::gamePackageData()
 	return d;
 }
 
-IGamePackageHandler* GamePackage::getHandler()
-{
-	D(d);
-	return d.handler;
-}
-
 void GamePackage::loadPackage(const char* path)
 {
 	// TODO 可能读取多个pk，分优先级
@@ -67,8 +61,30 @@ void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWor
 	IFactory* factory = d.gameMachine->getFactory();
 	IGraphicEngine* engine = d.gameMachine->getGraphicEngine();
 	world->setGameMachine(d.gameMachine);
-	world->loadBSP(path(PI_MAPS, map).c_str());
-	d.handler->dispose();
+	world->loadBSP(map);
+}
+
+bool GamePackage::readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename)
+{
+	D(d);
+	std::string p = pathOf(index, filename);
+	if (fullFilename)
+		*fullFilename = p;
+	return readFileFromPath(p.c_str(), buffer);
+}
+
+std::vector<std::string> GamePackage::getAllFiles(const char* directory)
+{
+	D(d);
+	ASSERT(d.handler);
+	return d.handler->getAllFiles(directory);
+}
+
+std::string GamePackage::pathOf(PackageIndex index, const char* filename)
+{
+	D(d);
+	ASSERT(d.handler);
+	return d.handler->pathRoot(index) + filename;
 }
 
 bool GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
@@ -78,18 +94,4 @@ bool GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buff
 	bool b = d.handler->readFileFromPath(path, buffer);
 	gm_hook2(GamePackage, readFileFromPath, path, buffer);
 	return b;
-}
-
-std::string GamePackage::path(PackageIndex index, const char* filename)
-{
-	D(d);
-	ASSERT(d.handler);
-	return d.handler->pathRoot(index) + filename;
-}
-
-std::vector<std::string> GamePackage::getAllFiles(const char* directory)
-{
-	D(d);
-	ASSERT(d.handler);
-	return d.handler->getAllFiles(directory);
 }

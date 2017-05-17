@@ -28,6 +28,7 @@ Character* character;
 GMGLFactory factory;
 GameMachine* gameMachine;
 GlyphObject* glyph;
+ISoundFile* sf;
 
 // 这是一个导出所有资源的钩子，用gm_install_hook(GamePackage, readFileFromPath, resOutputHook)绑定此钩子
 // 可以将所有场景中的资源导出到指定目录
@@ -82,14 +83,10 @@ public:
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
 
-		GamePackageBuffer buf;
-		pk.readFileFromPath("D://test.mp3", &buf);
-		ISoundFile* sf;
-		SoundReader::load(buf, &sf);
+		GamePackageBuffer bg;
+		pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
+		SoundReader::load(bg, &sf);
 		sf->play();
-		Sleep(1000);
-		sf->stop();
-		delete sf;
 
 		/*
 		{

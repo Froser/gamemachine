@@ -14,6 +14,7 @@ enum PackageIndex
 	PI_TEXSHADERS,
 	PI_TEXTURES,
 	PI_MODELS,
+	PI_SOUNDS,
 };
 
 struct GamePackageBuffer
@@ -65,7 +66,6 @@ struct IGamePackageHandler
 {
 	virtual ~IGamePackageHandler() {}
 	virtual void init() = 0;
-	virtual void dispose() = 0;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) = 0;
 	virtual std::string pathRoot(PackageIndex index) = 0;
 	virtual std::vector<std::string> getAllFiles(const char* directory) = 0;
@@ -92,12 +92,15 @@ public:
 
 public:
 	GamePackageData& gamePackageData();
-	IGamePackageHandler* getHandler();
 	void loadPackage(const char* path);
 	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
-	bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer);
-	std::string path(PackageIndex index, const char* filename);
+	bool readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename = nullptr);
 	std::vector<std::string> getAllFiles(const char* directory);
+
+public:
+	std::string pathOf(PackageIndex index, const char* filename);
+	// 一般情况下，建议用readFile代替readFileFromPath，除非是想指定特殊的路径
+	bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer);
 };
 
 END_NS

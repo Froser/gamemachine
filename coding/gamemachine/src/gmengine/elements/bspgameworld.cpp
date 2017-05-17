@@ -20,12 +20,12 @@ BSPGameWorld::BSPGameWorld(GamePackage* pk)
 	d.physics.reset(new BSPPhysicsWorld(this));
 }
 
-void BSPGameWorld::loadBSP(const char* mapPath)
+void BSPGameWorld::loadBSP(const char* mapName)
 {
 	D(d);
 	D_BASE(GameWorld, db);
 	GamePackageBuffer buffer;
-	db.gamePackage->readFileFromPath(mapPath, &buffer);
+	db.gamePackage->readFile(PI_MAPS, mapName, &buffer);
 	d.bsp.loadBsp(buffer);
 	importBSP();
 }
@@ -439,7 +439,7 @@ void BSPGameWorld::initModels()
 {
 	D(d);
 	D_BASE(GameWorld, db);
-	std::string modelPath = db.gamePackage->path(PI_MODELS, "");
+	std::string modelPath = db.gamePackage->pathOf(PI_MODELS, "");
 	d.modelLoader.init(modelPath.c_str(), this);
 	d.modelLoader.load();
 }
@@ -448,7 +448,7 @@ void BSPGameWorld::initShaders()
 {
 	D(d);
 	D_BASE(GameWorld, db);
-	std::string texShadersPath = db.gamePackage->path(PI_TEXSHADERS, "");
+	std::string texShadersPath = db.gamePackage->pathOf(PI_TEXSHADERS, "");
 	d.shaderLoader.init(texShadersPath.c_str(), this, &d.render.renderData());
 	d.shaderLoader.load();
 }
@@ -503,9 +503,8 @@ bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 	for (GMint i = 0; i < dem; i++)
 	{
 		std::string fn = textureFilename + priorities[i];
-
 		GamePackageBuffer buf;
-		if (!pk->readFileFromPath(pk->path(PI_TEXTURES, fn.c_str()).c_str(), &buf))
+		if (!pk->readFile(PI_TEXTURES, fn.c_str(), &buf))
 			continue;
 
 		if (ImageReader::load(buf.buffer, buf.size, img))
@@ -643,7 +642,7 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 		fn.append(m->model);
 		fn.append(".obj");
 
-		std::string path = db.gamePackage->path(PI_MODELS, fn.c_str());
+		std::string path = db.gamePackage->pathOf(PI_MODELS, fn.c_str());
 		ModelLoadSettings settings = {
 			*db.gamePackage,
 			m->extents,

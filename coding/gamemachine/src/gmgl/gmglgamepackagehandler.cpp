@@ -66,12 +66,9 @@ void DefaultGMGLGamePackageHandler::init()
 	{
 		GMGLShaders* shaders = new GMGLShaders();
 		
-		std::string vert = gamePackage()->path(PI_SHADERS, (shaderMap[i] + ".vert").c_str()),
-			frag = gamePackage()->path(PI_SHADERS, (shaderMap[i] + ".frag").c_str());
-
 		GamePackageBuffer vertBuf, fragBuf;
-		gamePackage()->readFileFromPath(vert.c_str(), &vertBuf);
-		gamePackage()->readFileFromPath(frag.c_str(), &fragBuf);
+		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".vert").c_str(), &vertBuf);
+		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".frag").c_str(), &fragBuf);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -86,10 +83,6 @@ void DefaultGMGLGamePackageHandler::init()
 		engine->registerShader((ChildObject::ObjectType)i, shaders);
 		engine->registerRender((ChildObject::ObjectType)i, renders[i]);
 	}
-}
-
-void DefaultGMGLGamePackageHandler::dispose()
-{
 }
 
 std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
@@ -108,6 +101,8 @@ std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 		return d.packagePath + "textures/";
 	case PI_MODELS:
 		return d.packagePath + "models/";
+	case PI_SOUNDS:
+		return d.packagePath + "sounds/";
 	default:
 		ASSERT(false);
 		break;
@@ -144,7 +139,7 @@ void ZipGMGLGamePackageHandler::init()
 	Base::init();
 }
 
-void ZipGMGLGamePackageHandler::dispose()
+ZipGMGLGamePackageHandler::~ZipGMGLGamePackageHandler()
 {
 	releaseUnzFile();
 	releaseBuffers();
@@ -271,6 +266,8 @@ std::string ZipGMGLGamePackageHandler::pathRoot(PackageIndex index)
 		return "textures/";
 	case PI_MODELS:
 		return "models/";
+	case PI_SOUNDS:
+		return "sounds/";
 	default:
 		ASSERT(false);
 		break;

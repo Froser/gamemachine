@@ -55,12 +55,9 @@ void DefaultGMGamePackageHandler::init()
 	{
 		GMGLShaders* shaders = new GMGLShaders();
 		
-		std::string vert = gamePackage()->path(PI_SHADERS, (shaderMap[i] + ".vert").c_str()),
-			frag = gamePackage()->path(PI_SHADERS, (shaderMap[i] + ".frag").c_str());
-
 		GamePackageBuffer vertBuf, fragBuf;
-		gamePackage()->readFileFromPath(vert.c_str(), &vertBuf);
-		gamePackage()->readFileFromPath(frag.c_str(), &fragBuf);
+		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".vert").c_str(), &vertBuf);
+		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".frag").c_str(), &fragBuf);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 

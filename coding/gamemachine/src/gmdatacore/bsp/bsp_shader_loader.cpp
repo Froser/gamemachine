@@ -134,10 +134,10 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 	if (!item)
 	{
 		GamePackage* pk = m_world->getGamePackage();
-		std::string fn = pk->path(PI_TEXTURES, name);
+		std::string fn;
 
 		GamePackageBuffer buf;
-		if (!pk->readFileFromPath(fn.c_str(), &buf))
+		if (!pk->readFile(PI_TEXTURES, name, &buf, &fn))
 		{
 			gm_warning("file %s not found.", fn.c_str());
 			return nullptr;

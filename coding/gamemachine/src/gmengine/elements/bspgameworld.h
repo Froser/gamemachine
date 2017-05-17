@@ -13,7 +13,7 @@ public:
 	BSPGameWorld(GamePackage* pk);
 
 public:
-	void loadBSP(const char* mapPath);
+	void loadBSP(const char* mapName);
 	void setSky(AUTORELEASE GameObject* sky);
 	GameObject* getSky();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysVisible);
