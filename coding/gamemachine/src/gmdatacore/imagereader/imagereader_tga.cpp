@@ -5,8 +5,8 @@
 #include <math.h>
 #include "imagereader_tga.h"
 #include "utilities/assert.h"
+#include "utilities/utilities.h"
 #include <fstream>
-#include "utilities/memorystream.h"
 
 bool endsWith(const std::string& str, const std::string& substr)
 {

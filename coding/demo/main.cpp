@@ -10,10 +10,10 @@
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "gmengine/controllers/gamemachine.h"
-#include "utilities/path.h"
+#include "utilities/utilities.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "utilities/debug.h"
-#include "utilities/input.h"
+#include "os/input.h"
 #include "gmdatacore/gamepackage.h"
 
 #include <fstream>

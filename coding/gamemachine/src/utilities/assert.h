@@ -5,7 +5,7 @@
 
 BEGIN_NS
 #if _DEBUG
-#define ASSERT(cond) ((!(cond)) ? Assert::assert(#cond, __FILE__, __LINE__) : Assert::noop())
+#define ASSERT(cond) ((!(cond)) ? Assert::gm_assert(#cond, __FILE__, __LINE__) : Assert::noop())
 #else
 #define ASSERT(cond)
 #endif
@@ -17,7 +17,7 @@ class Assert
 {
 public:
 	static void noop();
-	static void assert(const char *assertion, const char *file, int line);
+	static void gm_assert(const char *assertion, const char *file, int line);
 };
 
 #ifdef USE_OPENGL

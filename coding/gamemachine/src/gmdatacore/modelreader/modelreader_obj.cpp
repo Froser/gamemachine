@@ -2,7 +2,7 @@
 #include "modelreader_obj.h"
 #include "gmdatacore/object.h"
 #include "gmdatacore/gamepackage.h"
-#include "utilities/scanner.h"
+#include "utilities/utilities.h"
 
 #define RESERVED 4096
 #define INVALID -1

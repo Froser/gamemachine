@@ -6,7 +6,7 @@
 #include "utilities/tinyxml/tinyxml.h"
 #include "shader.h"
 #include "model.h"
-#include "utilities/scanner.h"
+#include "utilities/utilities.h"
 
 BSPModelLoader::BSPModelLoader()
 	: m_world(nullptr)

@@ -2,9 +2,8 @@
 #include "gmglfunc.h"
 #include "gmglshaders.h"
 #include "utilities/vmath.h"
-#include "utilities/camera.h"
+#include "utilities/utilities.h"
 #include "utilities/assert.h"
-#include "utilities/frustum.h"
 
 void GMGL::projection(const vmath::mat4& mat, GMGLShaders& shaders, const char* projectionMatrixName)
 {

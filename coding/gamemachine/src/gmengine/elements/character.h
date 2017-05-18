@@ -2,9 +2,7 @@
 #define __CHARACTER_H__
 #include "common.h"
 #include "gameobject.h"
-#include "utilities/camera.h"
-#include "utilities/autoptr.h"
-#include "utilities/frustum.h"
+#include "utilities/utilities.h"
 
 BEGIN_NS
 

@@ -137,6 +137,8 @@ set(SOURCES
 		os/wingl_window.cpp
 		os/directsound_sounddevice.h
 		os/directsound_sounddevice.cpp
+		os/input.h
+		os/input.cpp
 		utilities/tinyxml/tinystr.cpp
 		utilities/tinyxml/tinystr.h
 		utilities/tinyxml/tinyxml.cpp
@@ -144,32 +146,14 @@ set(SOURCES
 		utilities/tinyxml/tinyxmlerror.cpp
 		utilities/tinyxml/tinyxmlparser.cpp
 		utilities/vmath.h
-		utilities/scanner.h
-		utilities/scanner.cpp
-		utilities/plane.h
-		utilities/plane.cpp
-		utilities/path.h
-		utilities/path.cpp
-		utilities/memorystream.h
-		utilities/memorystream.cpp
-		utilities/input.h
-		utilities/input.cpp
-		utilities/frustum.h
-		utilities/frustum.cpp
-		utilities/fpscounter.h
-		utilities/fpscounter.cpp
 		utilities/debug.h
 		utilities/debug.cpp
-		utilities/camera.h
-		utilities/camera.cpp
-		utilities/comptr.h
-		utilities/bitset.h
-		utilities/bitset.cpp
-		utilities/autoptr.h
 		utilities/assert.h
 		utilities/assert.cpp
 		utilities/algorithm.h
 		utilities/algorithm.cpp
+		utilities/utilities.h
+		utilities/utilities.cpp
 	)
 
 source_group_by_dir(SOURCES)

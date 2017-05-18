@@ -7,7 +7,7 @@
 #include "bspphysicsstructs.h"
 #include "bsptrace.h"
 #include "bsppatch.h"
-#include "utilities/autoptr.h"
+#include "utilities/utilities.h"
 #include "gmphysics/physicsworld.h"
 BEGIN_NS
 

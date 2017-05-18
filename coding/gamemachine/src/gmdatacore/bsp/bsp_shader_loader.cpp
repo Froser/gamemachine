@@ -2,11 +2,10 @@
 #include "bsp_shader_loader.h"
 #include <vector>
 #include <string>
-#include "utilities/path.h"
+#include "utilities/utilities.h"
 #include "utilities/tinyxml/tinyxml.h"
 #include "gmdatacore/shader.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "utilities/scanner.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"

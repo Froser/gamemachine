@@ -2,9 +2,8 @@
 #define __GAMEMACHINE_H__
 #include "common.h"
 #include "graphic_engine.h"
-#include "utilities/autoptr.h"
+#include "utilities/utilities.h"
 #include <queue>
-#include "utilities/fpscounter.h"
 #include "gmdatacore/soundreader/soundreader.h"
 BEGIN_NS
 

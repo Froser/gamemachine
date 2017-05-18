@@ -6,7 +6,7 @@
 #include "utilities/algorithm.h"
 #include "gmengine/controllers/resource_container.h"
 #include "gmdatacore/imagereader/imagereader.h"
-#include "utilities/path.h"
+#include "utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmdatacore/gamepackage.h"

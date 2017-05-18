@@ -6,7 +6,7 @@ void Assert::noop()
 {
 }
 
-void Assert::assert(const char *assertion, const char *file, int line)
+void Assert::gm_assert(const char *assertion, const char *file, int line)
 {
 #if defined(_WINDOWS) && defined(_DEBUG)
 	std::wstringstream buf, wfile;

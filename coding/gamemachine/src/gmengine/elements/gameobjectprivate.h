@@ -2,7 +2,7 @@
 #define __GAMEOBJECT_PRIVATE_H__
 #include "common.h"
 #include "gmdatacore/object.h"
-#include "utilities/autoptr.h"
+#include "utilities/utilities.h"
 #include "gmengine/controllers/animation.h"
 #include <map>
 BEGIN_NS

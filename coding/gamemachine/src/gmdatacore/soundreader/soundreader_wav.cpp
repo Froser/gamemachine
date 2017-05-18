@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
 #include "soundreader_wav.h"
-#include "utilities/memorystream.h"
+#include "utilities/utilities.h"
 #include "gmdatacore/gamepackage.h"
 #include <dsound.h>
-#include "utilities/comptr.h"
 #include "soundreader.h"
 
 #ifdef _WINDOWS

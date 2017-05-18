@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gmengine/controllers/factory.h"
 #include "gmglshaders.h"
-#include "utilities/autoptr.h"
+#include "utilities/utilities.h"
 BEGIN_NS
 
 struct IGraphicEngine;

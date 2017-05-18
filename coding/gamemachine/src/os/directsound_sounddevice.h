@@ -1,7 +1,7 @@
 ﻿#ifndef __DIRECTSOUND_SOUNDPLAYER_H__
 #define __DIRECTSOUND_SOUNDPLAYER_H__
 #include "common.h"
-#include "utilities/comptr.h"
+#include "utilities/utilities.h"
 #include <dsound.h>
 #include <mmsystem.h>
 #include "gmdatacore/soundreader/soundreader.h"

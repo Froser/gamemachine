@@ -2,9 +2,8 @@
 #include "bsp.h"
 #include <stdio.h>
 #include "utilities/assert.h"
-#include "utilities/path.h"
+#include "utilities/utilities.h"
 #include "bsp_interior.inl"
-#include "utilities/scanner.h"
 #include "gmdatacore/gamepackage.h"
 
 static const char* getValue(const BSPEntity* entity, const char* key)

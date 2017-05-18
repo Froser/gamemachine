@@ -3,8 +3,7 @@
 #include "common.h"
 #include <string>
 #include <vector>
-#include "utilities/bitset.h"
-#include "utilities/plane.h"
+#include "utilities/utilities.h"
 #include "utilities/vmath.h"
 #include "bsp_surface_flags.h"
 BEGIN_NS

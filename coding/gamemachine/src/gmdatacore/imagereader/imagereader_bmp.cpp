@@ -3,7 +3,7 @@
 #include "utilities/assert.h"
 #include <sstream>
 #include "gmdatacore/image.h"
-#include "utilities/memorystream.h"
+#include "utilities/utilities.h"
 
 #ifdef _WINDOWS
 #include <wtypes.h>

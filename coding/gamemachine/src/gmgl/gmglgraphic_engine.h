@@ -4,8 +4,8 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmglshaders.h"
 #include "gmengine/controllers/resource_container.h"
+#include "utilities/utilities.h"
 #include <map>
-#include "utilities/camera.h"
 BEGIN_NS
 
 class Camera;

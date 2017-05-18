@@ -4,7 +4,7 @@
 #include "gmglgraphic_engine.h"
 #include "gmengine/controllers/gamemachine.h"
 #include <string>
-#include "utilities/path.h"
+#include "utilities/utilities.h"
 #include <fstream>
 #include "gmengine/elements/bspgameworld.h"
 #include "renders/gmgl_renders_object.h"

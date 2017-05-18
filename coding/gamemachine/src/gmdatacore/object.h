@@ -4,7 +4,7 @@
 #include <vector>
 #include "image.h"
 #include "utilities/assert.h"
-#include "utilities/autoptr.h"
+#include "utilities/utilities.h"
 #include "utilities/vmath.h"
 #include "gmdatacore/texture.h"
 #include "shader.h"

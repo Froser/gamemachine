@@ -2,8 +2,7 @@
 #define __GAMEPACKAGE_H__
 #include "common.h"
 #include <string>
-#include "utilities/autoptr.h"
-#include "utilities/assert.h"
+#include "utilities/utilities.h"
 #include <vector>
 BEGIN_NS
 

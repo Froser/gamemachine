@@ -2,7 +2,7 @@
 #define __GAMEWORLD_PRIVATE_H__
 #include "common.h"
 #include <set>
-#include "utilities/autoptr.h"
+#include "utilities/utilities.h"
 #include "gmphysics/physicsworld.h"
 #include "gmdatacore/shader.h"
 

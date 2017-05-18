@@ -2,7 +2,7 @@
 #define __BSP_RENDER_H__
 #include "common.h"
 #include "utilities/vmath.h"
-#include "utilities/bitset.h"
+#include "utilities/utilities.h"
 #include <vector>
 #include <map>
 #include "bsp.h"

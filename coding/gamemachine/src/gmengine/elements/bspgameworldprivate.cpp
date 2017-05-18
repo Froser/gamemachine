@@ -3,7 +3,7 @@
 #include "gmengine/controllers/gamemachine.h"
 #include "gmengine/controllers/factory.h"
 #include "character.h"
-#include "utilities/scanner.h"
+#include "utilities/utilities.h"
 
 #define PARSE_FUNC(name, entity, world) void import_##name(const BSPEntity& entity, BSPGameWorld* world)
 #define BEGIN_PARSE_CLASS(value) if (strEqual(classname, #value)) import_##value(entity, world)
