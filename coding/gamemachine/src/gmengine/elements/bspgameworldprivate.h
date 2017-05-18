@@ -5,7 +5,7 @@
 #include "gmdatacore/shader.h"
 #include <string>
 #include <map>
-#include <vector>
+#include <set>
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmphysics/bsp/bspphysicsworld.h"
@@ -32,7 +32,7 @@ struct BSPGameWorldPrivate
 	BSPRender render;
 	BSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;
-	std::map<GMint, std::vector<BSPEntity*> > entities;
+	std::map<GMint, std::set<BSPEntity*> > entities;
 	bool ready;
 };
 

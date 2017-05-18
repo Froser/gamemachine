@@ -5,6 +5,8 @@
 #include "bspphysicsstructs.h"
 BEGIN_NS
 
+#define MAX_TOUCHED_ENTITY_NUM 1024
+
 struct BSPTracePlane : BSPPlane
 {
 	GMbyte planeType;
@@ -22,12 +24,14 @@ struct BSPTraceResult
 {
 	bool allsolid; // if true, plane is not valid
 	bool startsolid; // if true, the initial point was in a solid area
-	float fraction; // time completed, 1.0 = didn't hit anything
+	GMfloat fraction; // time completed, 1.0 = didn't hit anything
 	vmath::vec3 endpos; // final position
 	BSPTracePlane plane; // surface normal at impact, transformed to world space
-	int surfaceFlags; // surface hit
-	int contents; // contents on other side of surface hit
-	int entityNum; // entity the contacted sirface is a part of
+	GMint surfaceFlags; // surface hit
+	GMint contents; // contents on other side of surface hit
+
+	GMint entityNum;
+	GMint entities[MAX_TOUCHED_ENTITY_NUM];
 };
 
 struct BSPSphere
@@ -39,10 +43,13 @@ struct BSPSphere
 };
 
 class BSPPhysicsWorld;
+class EntityObject;
 struct BSPTracePrivate
 {
 	BSPTracePrivate() : checkcount(0) {}
 	BSPData* bsp;
+	std::map<GMint, std::set<BSPEntity*> >* entities;
+	std::map<BSPEntity*, EntityObject*>* entityObjects;
 	BSPPhysicsWorld* p_world;
 	GMint checkcount;
 };
@@ -56,12 +63,13 @@ class BSPTrace
 	DEFINE_PRIVATE(BSPTrace)
 
 public:
-	void initTrace(BSPData* bsp, BSPPhysicsWorld* world);
+	void initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, EntityObject*>* entityObjects, BSPPhysicsWorld* world);
 	void trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin, const vmath::vec3& min, const vmath::vec3& max, REF BSPTraceResult& trace);
 	void traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, vmath::vec3 p1, vmath::vec3 p2);
 	void traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf);
 	void traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush* brush);
 	void traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch);
+	void traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& entity);
 	void traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc);
 	void tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCollide *pc);
 	GMint checkFacetPlane(const vmath::vec4& plane, const vmath::vec3& start, const vmath::vec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit);

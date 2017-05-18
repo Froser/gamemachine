@@ -132,6 +132,7 @@ public:
 	}
 };
 
+class EntityObject;
 struct BSPRenderPrivate
 {
 	BSPRenderPrivate()
@@ -163,7 +164,7 @@ struct BSPRenderPrivate
 	std::map<BSP_Render_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
 	std::map<BSP_Render_Face*, GameObject*> polygonFaceObjects;
 	std::map<BSP_Render_Face*, GameObject*> meshFaceObjects;
-	std::map<BSPEntity*, GameObject*> entitiyObjects;
+	std::map<BSPEntity*, EntityObject*> entitiyObjects;
 
 	// 用于绘制天空
 	vmath::vec3 boundMin;

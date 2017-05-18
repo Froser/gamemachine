@@ -89,6 +89,12 @@ void BSPGameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysV
 		d.render.renderData().alwaysVisibleObjects.push_back(obj);
 }
 
+std::map<GMint, std::set<BSPEntity*> >& BSPGameWorld::getEntities()
+{
+	D(d);
+	return d.entities;
+}
+
 void BSPGameWorld::calculateVisibleFaces()
 {
 	D(d);
@@ -363,7 +369,7 @@ void BSPGameWorld::drawEntity(GMint leafId)
 	D(d);
 	BSPRenderData& rd = d.render.renderData();
 
-	std::vector<BSPEntity*>& entities = d.entities[leafId];
+	std::set<BSPEntity*>& entities = d.entities[leafId];
 	std::for_each(entities.begin(), entities.end(), [&rd, &d](BSPEntity* e)
 	{
 		GameObject* obj = rd.entitiyObjects[e];
@@ -587,7 +593,7 @@ void BSPGameWorld::prepareEntities()
 		BSPGameWorldEntityReader::import(*iter, this);
 
 		GMint leaf = calculateLeafNode((*iter).origin);
-		d.entities[leaf].push_back(&(*iter));
+		d.entities[leaf].insert(&(*iter));
 		createEntity(&(*iter));
 	}
 }
@@ -658,7 +664,7 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 		}
 	}
 
-	GameObject* obj = new GameObject(coreObj);
+	EntityObject* obj = new EntityObject(coreObj);
 	rd.entitiyObjects[entity] = obj;
 	appendObjectAndInit(obj);
 }

@@ -75,14 +75,10 @@ set(SOURCES
 		gmengine/controllers/animation.cpp
 		gmengine/elements/skygameobject.h
 		gmengine/elements/skygameobject.cpp
-		gmengine/elements/glyphobject.h
-		gmengine/elements/glyphobject.cpp
 		gmengine/elements/gameworldprivate.h
 		gmengine/elements/gameworldprivate.cpp
 		gmengine/elements/gameworld.h
 		gmengine/elements/gameworld.cpp
-		gmengine/elements/gameobjectprivate.h
-		gmengine/elements/gameobjectprivate.cpp
 		gmengine/elements/gameobject.h
 		gmengine/elements/gameobject.cpp
 		gmengine/elements/character.h

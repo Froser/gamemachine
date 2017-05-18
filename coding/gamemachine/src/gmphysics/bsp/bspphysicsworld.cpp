@@ -10,7 +10,12 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 {
 	D(d);
 	d.world = static_cast<BSPGameWorld*>(world);
-	d.trace.initTrace(&d.world->bspData(), this);
+	d.trace.initTrace(
+		&d.world->bspData(), 
+		&d.world->getEntities(),
+		&d.world->renderData().entitiyObjects, 
+		this
+	);
 
 	d.camera = CollisionObjectFactory::defaultCamera();
 

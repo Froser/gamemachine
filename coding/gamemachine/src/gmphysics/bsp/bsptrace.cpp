@@ -3,6 +3,7 @@
 #include "utilities/vmath.h"
 #include "utilities/assert.h"
 #include "bspphysicsworld.h"
+#include "gmengine/elements/gameobject.h"
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues
@@ -26,11 +27,13 @@ struct BSPTraceWork
 };
 END_NS
 
-void BSPTrace::initTrace(BSPData* bsp, BSPPhysicsWorld* world)
+void BSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, EntityObject*>* entityObjects, BSPPhysicsWorld* world)
 {
 	D(d);
 	d.bsp = bsp;
 	d.p_world = world;
+	d.entities = entities;
+	d.entityObjects = entityObjects;
 }
 
 /* 获得碰撞状态
@@ -198,6 +201,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	if (num < 0)
 	{
 		traceThroughLeaf(tw, &bsp.leafs[~num]);
+		traceEntityThroughLeaf(tw, (*d.entities)[~num]);
 		return;
 	}
 
@@ -476,6 +480,31 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 				tw.trace.fraction = enterFrac;
 				tw.trace.plane.normal = VEC3(bestplane);
 				tw.trace.plane.intercept = bestplane[3];
+			}
+		}
+	}
+}
+
+void BSPTrace::traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& entity)
+{
+	D(d);
+	tw.trace.entityNum = 0;
+	for (auto iter = entity.begin(); iter != entity.end(); iter++)
+	{
+		auto objIter = (d.entityObjects->find(*iter));
+		if (objIter != d.entityObjects->end())
+		{
+			EntityObject* obj = objIter->second;
+			if (!obj)
+				continue;
+
+			for (GMint i = 0; i < EntityPlaneNum; i++)
+			{
+				// 首先判断起点和终点是否在AABB中，如果没有，肯定没有接触到entity
+				vmath::vec3 mins, maxs;
+				obj->getBounds(mins, maxs);
+				if (!boundsIntersect(tw.bounds[0], tw.bounds[1], mins, maxs))
+					continue;
 			}
 		}
 	}

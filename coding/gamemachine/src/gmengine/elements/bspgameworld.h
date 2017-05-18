@@ -4,6 +4,7 @@
 #include "gameworld.h"
 #include "bspgameworldprivate.h"
 #include "gmengine/controllers/resource_container.h"
+#include "gmdatacore/bsp/bsp.h"
 BEGIN_NS
 
 class BSPGameWorld : public GameWorld
@@ -17,6 +18,7 @@ public:
 	void setSky(AUTORELEASE GameObject* sky);
 	GameObject* getSky();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysVisible);
+	std::map<GMint, std::set<BSPEntity*> >& getEntities();
 	using GameWorld::appendObjectAndInit;
 
 public:
