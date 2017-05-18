@@ -17,7 +17,6 @@
 #include "gmdatacore/gamepackage.h"
 
 #include <fstream>
-#include "gmengine/elements/glyphobject.h"
 #include "os/wingl_window.h"
 #include "gmdatacore/soundreader/soundreader.h"
 
@@ -83,10 +82,10 @@ public:
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
 
-		GamePackageBuffer bg;
-		pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
-		SoundReader::load(bg, &sf);
-		sf->play();
+		//GamePackageBuffer bg;
+		//pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
+		//SoundReader::load(bg, &sf);
+		//sf->play();
 
 		/*
 		{

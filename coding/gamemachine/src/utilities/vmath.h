@@ -95,6 +95,36 @@ namespace vmath
 	template <typename T, const int len>
 	class vecN
 	{
+	private:
+		class Dimension_Default {};
+		class Dimension_2 {};
+		class Dimension_3 {};
+		class Dimension_4 {};
+
+		template <int T>
+		class DimensionTraits
+		{
+			typedef Dimension_Default Dimension;
+		};
+
+		template <>
+		class DimensionTraits<2>
+		{
+			typedef Dimension_2 Dimension;
+		};
+
+		template <>
+		class DimensionTraits<3>
+		{
+			typedef Dimension_3 Dimension;
+		};
+
+		template <>
+		class DimensionTraits<4>
+		{
+			typedef Dimension_4 Dimension;
+		};
+
 	public:
 		typedef class vecN<T, len> my_type;
 		typedef T element_type;
@@ -140,9 +170,24 @@ namespace vmath
 		inline vecN operator+(const vecN& that) const
 		{
 			my_type result;
-			int n;
-			for (n = 0; n < len; n++)
+#if USE_SIMD
+			bool support;
+			GM_SIMD_float f_this[4], f_that[4];
+			simd_float(DimensionTraits<len>::Dimension, that, f_this, &support);
+
+			GM_SIMD_float f_this[] = { data[0], data[1], data[2], 0 };
+			GM_SIMD_float f_that[] = { that.data[0], that.data[1], that.data[2], 0 };
+			GM_SIMD_float f_result[4];
+			__m128 __this = _mm_load_ps(&f_this[0]);
+			__m128 __that = _mm_load_ps(&f_that[0]);
+			__m128 __result = _mm_add_ps(__this, __that);
+			_mm_store_ps(f_result, __result);
+			//for (GMint n = 0; n < len; n++)
+			//	result.data[n] = f_result[n];
+#else
+			for (GMint n = 0; n < len; n++)
 				result.data[n] = data[n] + that.data[n];
+#endif
 			return result;
 		}
 
@@ -263,6 +308,13 @@ namespace vmath
 			for (n = 0; n < len; n++)
 				data[n] = that.data[n];
 		}
+
+#if USE_SIMD
+		void simd_float(Dimension_Default, const vecN& that, GM_SIMD_float* in, bool* support)
+		{
+			*support = false;
+		}
+#endif
 	};
 
 	template <typename T>

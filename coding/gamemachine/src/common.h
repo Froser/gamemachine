@@ -92,4 +92,12 @@ END_NS
 		sscanf_s(_str, format, out);	\
 }
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
+
+#ifdef _MSC_VER
+#define USE_SIMD 1
+#define GM_SIMD_float __declspec(align(16)) GMfloat
+#else
+#define USE_SIMD 0
+#endif
+
 #endif
