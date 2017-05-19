@@ -172,7 +172,7 @@ namespace vmath
 #endif
 	}
 
-	template <typename vec_type, typename T>
+	template <typename vec_type>
 	static inline vec_type div(const vec_type& _left, const vec_type& _right)
 	{
 #if USE_SIMD
@@ -199,25 +199,53 @@ namespace vmath
 #endif
 	}
 
-	template <typename vec_type, typename T>
+	template <typename vec_type>
 	static inline const vec_type add(const vec_type& _left, const vec_type& _right)
 	{
 		vec_type result;
 #if USE_SIMD
 		bool support;
-		GM_SIMD_float f_this[4], f_that[4];
-		simd_float<vec_type::dimension>(&_left[0], f_this, &support);
+		GM_SIMD_float f_left[4], f_right[4];
+		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
 		if (!support)
 		{
 			for (int n = 0; n < vec_type::dimension; n++)
 				result[n] = _left[n] + _right[n];
 			return result;
 		}
-		simd_float<vec_type::dimension>(&_right[0], f_that, &support);
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
 		GM_SIMD_float f_result[4];
-		__m128 __left = _mm_load_ps(&f_this[0]);
-		__m128 __right = _mm_load_ps(&f_that[0]);
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
 		__m128 __result = _mm_add_ps(__left, __right);
+		_mm_store_ps(f_result, __result);
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+#else
+		for (int n = 0; n < vec_type::dimension; n++)
+			result[n] = _left[n] + _right[n];
+#endif
+		return result;
+	}
+
+	template <typename vec_type>
+	static inline const vec_type subtract(const vec_type& _left, const vec_type& _right)
+	{
+		vec_type result;
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_left[4], f_right[4];
+		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
+		if (!support)
+		{
+			for (int n = 0; n < vec_type::dimension; n++)
+				result[n] = _left[n] + _right[n];
+			return result;
+		}
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_sub_ps(__left, __right);
 		_mm_store_ps(f_result, __result);
 		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
 #else
@@ -236,6 +264,35 @@ namespace vmath
 		GM_SIMD_float f_left[4], f_right[4];
 		T left_arr[] = { _left, _left, _left, _left };
 		simd_float<vec_type::dimension>(left_arr, f_left, &support);
+		if (!support)
+		{
+			for (int n = 0; n < vec_type::dimension; n++)
+				result[n] = _right[n] * _left;
+			return result;
+		}
+
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_mul_ps(__right, __left);
+		_mm_store_ps(f_result, __result);
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+#else
+		for (int n = 0; n < vec_type::dimension; n++)
+			result[n] = _right[n] * _left;
+#endif
+		return result;
+	}
+
+	template <typename vec_type>
+	static inline vec_type mul(vec_type _left, const vec_type& _right)
+	{
+		vec_type result;
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_left[4], f_right[4];
+		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
 		if (!support)
 		{
 			for (int n = 0; n < vec_type::dimension; n++)
@@ -290,6 +347,31 @@ namespace vmath
 		return result;
 	}
 
+	template <typename T>
+	static inline vecN<T, 3> fast_cross(const vecN<T, 3>& _left, const vecN<T, 3>& _right)
+	{
+#if USE_SIMD
+		GM_SIMD_float	result[4];
+		GM_SIMD_float	t0[] = { _left[1],  _left[2],  _left[0],  0 },
+						t1[] = { _right[2], _right[0], _right[1], 0 },
+						t2[] = { _left[2],  _left[0],  _left[1],  0 },
+						t3[] = { _right[1], _right[2], _right[0], 0 };
+		__m128			__t0 = _mm_load_ps(t0),
+						__t1 = _mm_load_ps(t1),
+						__t2 = _mm_load_ps(t2),
+						__t3 = _mm_load_ps(t3);
+		__m128			__m1 = _mm_mul_ps(__t0, __t1),
+						__m2 = _mm_mul_ps(__t2, __t3);
+		__m128			__r  = _mm_sub_ps(__m1, __m2);
+		_mm_store_ps(result, __r);
+		return Tvec3<T>(result[0], result[1], result[2]);
+#else
+		return Tvec3<T>(a[1] * b[2] - b[1] * a[2],
+			a[2] * b[0] - b[2] * a[0],
+			a[0] * b[1] - b[0] * a[1]);
+#endif
+	}
+
 	// Vector
 	template <typename T, const int len>
 	class vecN
@@ -339,7 +421,7 @@ namespace vmath
 
 		inline vecN operator+(const vecN& that) const
 		{
-			return add<vecN, T>(*this, that);
+			return add<vecN>(*this, that);
 		}
 
 		inline vecN& operator+=(const vecN& that)
@@ -358,11 +440,7 @@ namespace vmath
 
 		inline vecN operator-(const vecN& that) const
 		{
-			my_type result;
-			int n;
-			for (n = 0; n < len; n++)
-				result.data[n] = data[n] - that.data[n];
-			return result;
+			return subtract<vecN>(*this, that);
 		}
 
 		inline vecN& operator-=(const vecN& that)
@@ -372,11 +450,7 @@ namespace vmath
 
 		inline vecN operator*(const vecN& that) const
 		{
-			my_type result;
-			int n;
-			for (n = 0; n < len; n++)
-				result.data[n] = data[n] * that.data[n];
-			return result;
+			return mul(that, *this);
 		}
 
 		inline vecN& operator*=(const vecN& that)
@@ -637,18 +711,7 @@ namespace vmath
 	template <typename T>
 	static inline vecN<T, 3> cross(const vecN<T, 3>& a, const vecN<T, 3>& b)
 	{
-		return Tvec3<T>(a[1] * b[2] - b[1] * a[2],
-			a[2] * b[0] - b[2] * a[0],
-			a[0] * b[1] - b[0] * a[1]);
-	}
-
-	// Ignore b[3]
-	template <typename T>
-	static inline vecN<T, 3> cross(const vecN<T, 3>& a, const vecN<T, 4>& b)
-	{
-		return Tvec3<T>(a[1] * b[2] - b[1] * a[2],
-			a[2] * b[0] - b[2] * a[0],
-			a[0] * b[1] - b[0] * a[1]);
+		return fast_cross(a, b);
 	}
 
 	template <typename T, int len>
@@ -808,10 +871,12 @@ namespace vmath
 			const T z2 = q.a[2];
 			const T w2 = q.a[3];
 
-			return Tquaternion(w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+			return Tquaternion(
+				w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
 				w1 * y2 + y1 * w2 + z1 * x2 - x1 * z2,
 				w1 * z2 + z1 * w2 + x1 * y2 - y1 * x2,
-				w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2);
+				w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2
+				);
 		}
 
 		inline Tquaternion operator/(const T s) const
@@ -1015,18 +1080,12 @@ namespace vmath
 
 		inline my_type operator*(const T& that) const
 		{
-			my_type result;
-			int n;
-			for (n = 0; n < w; n++)
-				result.data[n] = data[n] * that;
-			return result;
+			return mul<my_type>(that, *this);
 		}
 
 		inline my_type& operator*=(const T& that)
 		{
-			int n;
-			for (n = 0; n < w; n++)
-				data[n] = data[n] * that;
+			*this = mul<my_type&>(*this, that);
 			return *this;
 		}
 
@@ -1034,24 +1093,37 @@ namespace vmath
 		// TODO: This only works for square matrices. Need more template skill to make a non-square version.
 		inline my_type operator*(const my_type& that) const
 		{
-			my_type result(0);
+			static_assert(w == h, "square matrices is required");
+#if USE_SIMD
+			if (w != 4 || h != 4)
+				return regular_mul(that);
 
-			for (int j = 0; j < w; j++)
-			{
-				for (int i = 0; i < h; i++)
-				{
-					T sum(0);
+			__m128 __result;
 
-					for (int n = 0; n < w; n++)
-					{
-						sum += data[n][i] * that[j][n];
-					}
+			GM_SIMD_float v[] = { data[0][0], data[0][1], data[0][2], data[0][3] };
+			GM_SIMD_float row0[] = { that.data[0][0], that.data[0][1], that.data[0][2], that.data[0][3] };
+			GM_SIMD_float row1[] = { that.data[1][0], that.data[1][1], that.data[1][2], that.data[1][3] };
+			GM_SIMD_float row2[] = { that.data[2][0], that.data[2][1], that.data[2][2], that.data[2][3] };
+			GM_SIMD_float row3[] = { that.data[3][0], that.data[3][1], that.data[3][2], that.data[3][3] };
+			__m128	__v = _mm_load_ps(v);
+			__m128	__row0 = _mm_load_ps(row0),
+					__row1 = _mm_load_ps(row1),
+					__row2 = _mm_load_ps(row2),
+					__row3 = _mm_load_ps(row3);
+			__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(0, 0, 0, 0)), __row0),
+					__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(1, 1, 1, 1)), __row1),
+					__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(2, 2, 2, 2)), __row2),
+					__x_mul_row3 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(3, 3, 3, 3)), __row3);
+			__result = _mm_add_ps(__x_mul_row0, __x_mul_row1);
+			__result = _mm_add_ps(__result, __x_mul_row2);
+			__result = _mm_add_ps(__result, __x_mul_row3);
 
-					result[j][i] = sum;
-				}
-			}
+			//TODO
+			return regular_mul(that);
 
-			return result;
+#else
+			return regular_mul(that);
+#endif
 		}
 
 		inline my_type& operator*=(const my_type& that)
@@ -1105,6 +1177,24 @@ namespace vmath
 			int n;
 			for (n = 0; n < w; n++)
 				data[n] = that.data[n];
+		}
+
+		inline my_type regular_mul(const my_type& right) const
+		{
+			my_type result(0);
+			for (int j = 0; j < w; j++)
+			{
+				for (int i = 0; i < w; i++)
+				{
+					T sum(0);
+					for (int n = 0; n < w; n++)
+					{
+						sum += data[n][i] * right[j][n];
+					}
+					result[j][i] = sum;
+				}
+			}
+			return result;
 		}
 	};
 
@@ -1547,7 +1637,6 @@ namespace vmath
 	template <int len, typename T>
 	struct regular
 	{
-		// causes error
 	};
 
 	template <typename T>
@@ -1562,7 +1651,6 @@ namespace vmath
 		{
 			return Tvec2<T>(v[0] / x, v[1] / x);
 		}
-
 	};
 
 	template <typename T>

@@ -97,6 +97,7 @@ END_NS
 #define USE_SIMD 1
 #define GM_SIMD_float __declspec(align(16)) GMfloat
 #define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
+#define simd_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
 #else
 #define USE_SIMD 0
 #endif
