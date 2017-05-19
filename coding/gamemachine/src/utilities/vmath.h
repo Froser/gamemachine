@@ -654,13 +654,7 @@ namespace vmath
 	template <typename T, int len>
 	static inline T length(const vecN<T, len>& v)
 	{
-		T result(0);
-
-		for (int i = 0; i < v.size(); ++i)
-		{
-			result += v[i] * v[i];
-		}
-
+		T result = fast_dot<vecN<T, len>, T>(v, v);
 		return (T)sqrt(result);
 	}
 
@@ -673,14 +667,7 @@ namespace vmath
 	template <typename T, int len>
 	static inline T lengthSquare(const vecN<T, len>& v)
 	{
-		T result(0);
-
-		for (int i = 0; i < v.size(); ++i)
-		{
-			result += v[i] * v[i];
-		}
-
-		return result;
+		return fast_dot<vecN<T, len>, T>(v, v);
 	}
 
 	template <typename T, int len>
