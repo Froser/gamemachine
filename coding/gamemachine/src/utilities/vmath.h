@@ -92,42 +92,178 @@ namespace vmath
 		}
 	};
 
+#if USE_SIMD
+	template<int len>
+	inline static void simd_float(const float* vec, float* out, bool* support)
+	{
+		if (len != 2 && len != 3 && len != 4)
+		{
+			*support = false;
+			return;
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (i < len)
+				out[i] = vec[i];
+			else
+				out[i] = 0;
+		}
+	}
+
+#endif
+
+	// vector div x
+	template <typename vec_type, typename T>
+	static inline vec_type div(const vec_type& v, T x)
+	{
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_this[4], f_that[4];
+		simd_float<vec_type::dimension>(&v[0], f_this, &support);
+		if (!support)
+		{
+			return regular<vec_type::dimension, T>::div(x, v);
+		}
+
+		T data_arr[] = { x, x, x, x };
+		simd_float<vec_type::dimension>(data_arr, f_that, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __this = _mm_load_ps(&f_this[0]);
+		__m128 __that = _mm_load_ps(&f_that[0]);
+		__m128 __result = _mm_div_ps(__this, __that);
+		_mm_store_ps(f_result, __result);
+
+		vec_type result;
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+		return result;
+#else
+		return regular<vec_type::dimension, T>::div(x, v);
+#endif
+	}
+
+	// x div vector
+	template <typename vec_type, typename T>
+	static inline vec_type div(T x, const vec_type& v)
+	{
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_this[4], f_that[4];
+		simd_float<vec_type::dimension>(&v[0], f_that, &support);
+		if (!support)
+		{
+			return regular<vec_type::dimension, T>::div(x, v);
+		}
+
+		T data_arr[] = { x, x, x, x };
+		simd_float<vec_type::dimension>(data_arr, f_this, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __this = _mm_load_ps(&f_this[0]);
+		__m128 __that = _mm_load_ps(&f_that[0]);
+		__m128 __result = _mm_div_ps(__this, __that);
+		_mm_store_ps(f_result, __result);
+
+		vec_type result;
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+		return result;
+#else
+		return regular<vec_type::dimension, T>::div(x, v);
+#endif
+	}
+
+	template <typename vec_type, typename T>
+	static inline vec_type div(const vec_type& left, const vec_type& right)
+	{
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_left[4], f_right[4];
+		simd_float<vec_type::dimension>(&left[0], f_left, &support);
+		if (!support)
+		{
+			return regular<vec_type::dimension, T>::div(left, right);
+		}
+
+		simd_float<vec_type::dimension>(&right[0], f_right, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_div_ps(__left, __right);
+		_mm_store_ps(f_result, __result);
+
+		vec_type result;
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+		return result;
+#else
+		return regular<vec_type::dimension, T>::div(left, right);
+#endif
+	}
+
+	template <typename vec_type, typename T>
+	static inline const vec_type add(const vec_type& _this, const vec_type& _that)
+	{
+		vec_type result;
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_this[4], f_that[4];
+		simd_float<vec_type::dimension>(&_this[0], f_this, &support);
+		if (!support)
+		{
+			for (GMint n = 0; n < vec_type::dimension; n++)
+				result[n] = _this[n] + _that[n];
+			return result;
+		}
+		simd_float<vec_type::dimension>(&_that[0], f_that, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __this = _mm_load_ps(&f_this[0]);
+		__m128 __that = _mm_load_ps(&f_that[0]);
+		__m128 __result = _mm_add_ps(__this, __that);
+		_mm_store_ps(f_result, __result);
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+#else
+		for (GMint n = 0; n < vec_type::dimension; n++)
+			result[n] = _this[n] + _that[n];
+#endif
+		return result;
+	}
+
+	template <typename vec_type, typename T>
+	static inline vec_type mul(T x, const vec_type& _this)
+	{
+		vec_type result;
+#if USE_SIMD
+		bool support;
+		T that_arr[] = { x, x, x, x };
+		GM_SIMD_float f_this[4], f_that[4];
+		simd_float<vec_type::dimension>(&_this[0], f_this, &support);
+		if (!support)
+		{
+			for (GMint n = 0; n < vec_type::dimension; n++)
+				result[n] = _this[n] * x;
+			return result;
+		}
+
+		simd_float<vec_type::dimension>(that_arr, f_that, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __this = _mm_load_ps(&f_this[0]);
+		__m128 __that = _mm_load_ps(&f_that[0]);
+		__m128 __result = _mm_mul_ps(__this, __that);
+		_mm_store_ps(f_result, __result);
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+#else
+		for (GMint n = 0; n < vec_type::dimension; n++)
+			result[n] = _this[n] * x;
+#endif
+		return result;
+	}
+
+	// Vector
 	template <typename T, const int len>
 	class vecN
 	{
-	private:
-		class Dimension_Default {};
-		class Dimension_2 {};
-		class Dimension_3 {};
-		class Dimension_4 {};
-
-		template <int T>
-		class DimensionTraits
-		{
-			typedef Dimension_Default Dimension;
-		};
-
-		template <>
-		class DimensionTraits<2>
-		{
-			typedef Dimension_2 Dimension;
-		};
-
-		template <>
-		class DimensionTraits<3>
-		{
-			typedef Dimension_3 Dimension;
-		};
-
-		template <>
-		class DimensionTraits<4>
-		{
-			typedef Dimension_4 Dimension;
-		};
-
 	public:
 		typedef class vecN<T, len> my_type;
 		typedef T element_type;
+		enum { dimension = len };
 
 		// Default constructor does nothing, just like built-in types
 		inline vecN()
@@ -169,26 +305,7 @@ namespace vmath
 
 		inline vecN operator+(const vecN& that) const
 		{
-			my_type result;
-#if USE_SIMD
-			bool support;
-			GM_SIMD_float f_this[4], f_that[4];
-			simd_float(DimensionTraits<len>::Dimension, that, f_this, &support);
-
-			GM_SIMD_float f_this[] = { data[0], data[1], data[2], 0 };
-			GM_SIMD_float f_that[] = { that.data[0], that.data[1], that.data[2], 0 };
-			GM_SIMD_float f_result[4];
-			__m128 __this = _mm_load_ps(&f_this[0]);
-			__m128 __that = _mm_load_ps(&f_that[0]);
-			__m128 __result = _mm_add_ps(__this, __that);
-			_mm_store_ps(f_result, __result);
-			//for (GMint n = 0; n < len; n++)
-			//	result.data[n] = f_result[n];
-#else
-			for (GMint n = 0; n < len; n++)
-				result.data[n] = data[n] + that.data[n];
-#endif
-			return result;
+			return add<vecN, T>(*this, that);
 		}
 
 		inline vecN& operator+=(const vecN& that)
@@ -235,11 +352,7 @@ namespace vmath
 
 		inline vecN operator*(const T& that) const
 		{
-			my_type result;
-			int n;
-			for (n = 0; n < len; n++)
-				result.data[n] = data[n] * that;
-			return result;
+			return mul(that, *this);
 		}
 
 		inline vecN& operator*=(const T& that)
@@ -251,11 +364,7 @@ namespace vmath
 
 		inline vecN operator/(const vecN& that) const
 		{
-			my_type result;
-			int n;
-			for (n = 0; n < len; n++)
-				result.data[n] = data[n] / that.data[n];
-			return result;
+			return div<vecN, T>(*this, that);
 		}
 
 		inline vecN& operator/=(const vecN& that)
@@ -267,11 +376,7 @@ namespace vmath
 
 		inline vecN operator/(const T& that) const
 		{
-			my_type result;
-			int n;
-			for (n = 0; n < len; n++)
-				result.data[n] = data[n] / that;
-			return result;
+			return div<vecN, T>(*this, that);
 		}
 
 		inline vecN& operator/=(const T& that)
@@ -308,13 +413,6 @@ namespace vmath
 			for (n = 0; n < len; n++)
 				data[n] = that.data[n];
 		}
-
-#if USE_SIMD
-		void simd_float(Dimension_Default, const vecN& that, GM_SIMD_float* in, bool* support)
-		{
-			*support = false;
-		}
-#endif
 	};
 
 	template <typename T>
@@ -481,19 +579,19 @@ namespace vmath
 	template <typename T>
 	static inline const Tvec2<T> operator / (T x, const Tvec2<T>& v)
 	{
-		return Tvec2<T>(x / v[0], x / v[1]);
+		return div<Tvec2<T>, T>(x, v);
 	}
 
 	template <typename T>
 	static inline const Tvec3<T> operator / (T x, const Tvec3<T>& v)
 	{
-		return Tvec3<T>(x / v[0], x / v[1], x / v[2]);
+		return div<Tvec3<T>, T>(x, v);
 	}
 
 	template <typename T>
 	static inline const Tvec4<T> operator / (T x, const Tvec4<T>& v)
 	{
-		return Tvec4<T>(x / v[0], x / v[1], x / v[2], x / v[3]);
+		return div<Tvec4<T>, T>(x, v);
 	}
 
 	template <typename T, int len>
@@ -1442,6 +1540,56 @@ namespace vmath
 		}
 		return true;
 	}
+
+	// regulars
+	template <int len, typename T>
+	struct regular
+	{
+		// causes error
+	};
+
+	template <typename T>
+	struct regular<2, T>
+	{
+		inline static Tvec2<T> div(T x, const Tvec2<T>& v)
+		{
+			return Tvec2<T>(x / v[0], x / v[1]);
+		}
+
+		inline static Tvec2<T> div(const Tvec2<T>& v, T x)
+		{
+			return Tvec2<T>(v[0] / x, v[1] / x);
+		}
+
+	};
+
+	template <typename T>
+	struct regular<3, T>
+	{
+		inline static Tvec3<T> div(T x, const Tvec3<T>& v)
+		{
+			return Tvec3<T>(x / v[0], x / v[1], x / v[2]);
+		}
+
+		inline static Tvec3<T> div(const Tvec3<T>& v, T x)
+		{
+			return Tvec3<T>(v[0] / x, v[1] / x, v[2] / x);
+		}
+	};
+
+	template <typename T>
+	struct regular<4, T>
+	{
+		inline static Tvec4<T> div(T x, const Tvec4<T>& v)
+		{
+			return Tvec4<T>(x / v[0], x / v[1], x / v[2], x / v[3]);
+		}
+
+		inline static Tvec4<T> div(const Tvec4<T>& v, T x)
+		{
+			return Tvec4<T>(v[0] / x, v[1] / x, v[2] / x, v[3] / x);
+		}
+	};
 
 };
 #endif /* __VMATH_H__ */
