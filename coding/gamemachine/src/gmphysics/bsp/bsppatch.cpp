@@ -312,7 +312,7 @@ static bool planeFromPoints(vmath::vec4& plane, const vmath::vec3& a, const vmat
 
 	t = vmath::precise_normalize(t);
 	plane = VEC4(t, plane);
-	plane[3] = -vmath::dot(a, plane);
+	plane[3] = -vmath::dot(a, VEC3(plane));
 
 	ASSERT(a[0] * plane[0] + a[1] * plane[1] + a[2] * plane[2] + plane[3] < NORMAL_EPSILON);
 	return true;
@@ -506,7 +506,7 @@ static int pointOnPlaneSide(PatchCollideContext& context, const vmath::vec3& p, 
 
 	const vmath::vec4& plane = context.planes[planeNum].plane;
 
-	d = vmath::dot(p, plane) + plane[3];
+	d = vmath::dot(p, VEC3(plane)) + plane[3];
 
 	if (d > PLANE_TRI_EPSILON) {
 		return SIDE_FRONT;
@@ -876,14 +876,14 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 				if (vmath::length(t) < 0.5)
 					continue;
 				plane = VEC4(t, plane);
-				plane[3] = -vmath::dot(w.p[j], plane);
+				plane[3] = -vmath::dot(w.p[j], VEC3(plane));
 
 				// if all the points of the facet winding are
 				// behind this plane, it is a proper edge bevel
 				GMuint l;
 				for (l = 0; l < w.p.size(); l++)
 				{
-					d = vmath::dot(w.p[l], plane) + plane[3];
+					d = vmath::dot(w.p[l], VEC3(plane)) + plane[3];
 					if (d > 0.1)
 						break;	// point in front
 				}

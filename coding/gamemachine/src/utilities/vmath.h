@@ -109,81 +109,26 @@ namespace vmath
 			else
 				out[i] = 0;
 		}
+		*support = true;
 	}
 
 #endif
 
 	// vector div x
 	template <typename vec_type, typename T>
-	static inline vec_type div(const vec_type& v, T x)
-	{
-#if USE_SIMD
-		bool support;
-		GM_SIMD_float f_this[4], f_that[4];
-		simd_float<vec_type::dimension>(&v[0], f_this, &support);
-		if (!support)
-		{
-			return regular<vec_type::dimension, T>::div(x, v);
-		}
-
-		T data_arr[] = { x, x, x, x };
-		simd_float<vec_type::dimension>(data_arr, f_that, &support);
-		GM_SIMD_float f_result[4];
-		__m128 __this = _mm_load_ps(&f_this[0]);
-		__m128 __that = _mm_load_ps(&f_that[0]);
-		__m128 __result = _mm_div_ps(__this, __that);
-		_mm_store_ps(f_result, __result);
-
-		vec_type result;
-		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
-		return result;
-#else
-		return regular<vec_type::dimension, T>::div(x, v);
-#endif
-	}
-
-	// x div vector
-	template <typename vec_type, typename T>
-	static inline vec_type div(T x, const vec_type& v)
-	{
-#if USE_SIMD
-		bool support;
-		GM_SIMD_float f_this[4], f_that[4];
-		simd_float<vec_type::dimension>(&v[0], f_that, &support);
-		if (!support)
-		{
-			return regular<vec_type::dimension, T>::div(x, v);
-		}
-
-		T data_arr[] = { x, x, x, x };
-		simd_float<vec_type::dimension>(data_arr, f_this, &support);
-		GM_SIMD_float f_result[4];
-		__m128 __this = _mm_load_ps(&f_this[0]);
-		__m128 __that = _mm_load_ps(&f_that[0]);
-		__m128 __result = _mm_div_ps(__this, __that);
-		_mm_store_ps(f_result, __result);
-
-		vec_type result;
-		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
-		return result;
-#else
-		return regular<vec_type::dimension, T>::div(x, v);
-#endif
-	}
-
-	template <typename vec_type, typename T>
-	static inline vec_type div(const vec_type& left, const vec_type& right)
+	static inline vec_type div(const vec_type& _left, T _right)
 	{
 #if USE_SIMD
 		bool support;
 		GM_SIMD_float f_left[4], f_right[4];
-		simd_float<vec_type::dimension>(&left[0], f_left, &support);
+		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
 		if (!support)
 		{
-			return regular<vec_type::dimension, T>::div(left, right);
+			return regular<vec_type::dimension, T>::div(_right, _left);
 		}
 
-		simd_float<vec_type::dimension>(&right[0], f_right, &support);
+		T data_arr[] = { _right, _right, _right, _right };
+		simd_float<vec_type::dimension>(data_arr, f_right, &support);
 		GM_SIMD_float f_result[4];
 		__m128 __left = _mm_load_ps(&f_left[0]);
 		__m128 __right = _mm_load_ps(&f_right[0]);
@@ -194,64 +139,153 @@ namespace vmath
 		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
 		return result;
 #else
-		return regular<vec_type::dimension, T>::div(left, right);
+		return regular<vec_type::dimension, T>::div(_left, _right);
+#endif
+	}
+
+	// x div vector
+	template <typename vec_type, typename T>
+	static inline vec_type div(T _left, const vec_type& _right)
+	{
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_left[4], f_right[4];
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
+		if (!support)
+		{
+			return regular<vec_type::dimension, T>::div(_left, _right);
+		}
+
+		T left_arr[] = { _left, _left, _left, _left };
+		simd_float<vec_type::dimension>(left_arr, f_left, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __this = _mm_load_ps(&f_left[0]);
+		__m128 __that = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_div_ps(__this, __that);
+		_mm_store_ps(f_result, __result);
+
+		vec_type result;
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+		return result;
+#else
+		return regular<vec_type::dimension, T>::div(_left, _right);
 #endif
 	}
 
 	template <typename vec_type, typename T>
-	static inline const vec_type add(const vec_type& _this, const vec_type& _that)
+	static inline vec_type div(const vec_type& _left, const vec_type& _right)
+	{
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_left[4], f_right[4];
+		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
+		if (!support)
+		{
+			return regular<vec_type::dimension, T>::div(_left, _right);
+		}
+
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
+		GM_SIMD_float f_result[4];
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_div_ps(__left, __right);
+		_mm_store_ps(f_result, __result);
+
+		vec_type result;
+		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
+		return result;
+#else
+		return regular<vec_type::dimension, T>::div(_left, _right);
+#endif
+	}
+
+	template <typename vec_type, typename T>
+	static inline const vec_type add(const vec_type& _left, const vec_type& _right)
 	{
 		vec_type result;
 #if USE_SIMD
 		bool support;
 		GM_SIMD_float f_this[4], f_that[4];
-		simd_float<vec_type::dimension>(&_this[0], f_this, &support);
+		simd_float<vec_type::dimension>(&_left[0], f_this, &support);
 		if (!support)
 		{
-			for (GMint n = 0; n < vec_type::dimension; n++)
-				result[n] = _this[n] + _that[n];
+			for (int n = 0; n < vec_type::dimension; n++)
+				result[n] = _left[n] + _right[n];
 			return result;
 		}
-		simd_float<vec_type::dimension>(&_that[0], f_that, &support);
+		simd_float<vec_type::dimension>(&_right[0], f_that, &support);
 		GM_SIMD_float f_result[4];
-		__m128 __this = _mm_load_ps(&f_this[0]);
-		__m128 __that = _mm_load_ps(&f_that[0]);
-		__m128 __result = _mm_add_ps(__this, __that);
+		__m128 __left = _mm_load_ps(&f_this[0]);
+		__m128 __right = _mm_load_ps(&f_that[0]);
+		__m128 __result = _mm_add_ps(__left, __right);
 		_mm_store_ps(f_result, __result);
 		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
 #else
-		for (GMint n = 0; n < vec_type::dimension; n++)
-			result[n] = _this[n] + _that[n];
+		for (int n = 0; n < vec_type::dimension; n++)
+			result[n] = _left[n] + _right[n];
 #endif
 		return result;
 	}
 
 	template <typename vec_type, typename T>
-	static inline vec_type mul(T x, const vec_type& _this)
+	static inline vec_type mul(T _left, const vec_type& _right)
 	{
 		vec_type result;
 #if USE_SIMD
 		bool support;
-		T that_arr[] = { x, x, x, x };
-		GM_SIMD_float f_this[4], f_that[4];
-		simd_float<vec_type::dimension>(&_this[0], f_this, &support);
+		GM_SIMD_float f_left[4], f_right[4];
+		T left_arr[] = { _left, _left, _left, _left };
+		simd_float<vec_type::dimension>(left_arr, f_left, &support);
 		if (!support)
 		{
-			for (GMint n = 0; n < vec_type::dimension; n++)
-				result[n] = _this[n] * x;
+			for (int n = 0; n < vec_type::dimension; n++)
+				result[n] = _right[n] * _left;
 			return result;
 		}
 
-		simd_float<vec_type::dimension>(that_arr, f_that, &support);
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
 		GM_SIMD_float f_result[4];
-		__m128 __this = _mm_load_ps(&f_this[0]);
-		__m128 __that = _mm_load_ps(&f_that[0]);
-		__m128 __result = _mm_mul_ps(__this, __that);
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_mul_ps(__right, __left);
 		_mm_store_ps(f_result, __result);
 		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
 #else
-		for (GMint n = 0; n < vec_type::dimension; n++)
-			result[n] = _this[n] * x;
+		for (int n = 0; n < vec_type::dimension; n++)
+			result[n] = _right[n] * _left;
+#endif
+		return result;
+	}
+
+	template <typename vec_type, typename T>
+	static inline T fast_dot(const vec_type& _left, const vec_type& _right)
+	{
+		T result = T(0);
+#if USE_SIMD
+		bool support;
+		GM_SIMD_float f_left[4], f_right[4], f_result[4];
+		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
+		if (!support)
+		{
+			for (int n = 0; n < vec_type::dimension; n++)
+			{
+				result += _left[n] * _right[n];
+			}
+		}
+		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
+		__m128 __left = _mm_load_ps(&f_left[0]);
+		__m128 __right = _mm_load_ps(&f_right[0]);
+		__m128 __result = _mm_mul_ps(__left, __right);
+		_mm_store_ps(f_result, __result);
+		for (int i = 0; i < vec_type::dimension; i++)
+		{
+			result += f_result[i];
+		}
+#else
+		for (int n = 0; n < vec_type::dimension; n++)
+		{
+			result += _left[n] * _right[n];
+		}
 #endif
 		return result;
 	}
@@ -597,26 +631,7 @@ namespace vmath
 	template <typename T, int len>
 	static inline T dot(const vecN<T, len>& a, const vecN<T, len>& b)
 	{
-		int n;
-		T total = T(0);
-		for (n = 0; n < len; n++)
-		{
-			total += a[n] * b[n];
-		}
-		return total;
-	}
-
-	// Ignore b[len]
-	template <typename T, int len>
-	static inline T dot(const vecN<T, len>& a, const vecN<T, len + 1>& b)
-	{
-		int n;
-		T total = T(0);
-		for (n = 0; n < len; n++)
-		{
-			total += a[n] * b[n];
-		}
-		return total;
+		return fast_dot<vecN<T, len>, T>(a, b);
 	}
 
 	template <typename T>

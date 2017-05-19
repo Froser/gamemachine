@@ -96,6 +96,7 @@ END_NS
 #ifdef _MSC_VER
 #define USE_SIMD 1
 #define GM_SIMD_float __declspec(align(16)) GMfloat
+#define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
 #else
 #define USE_SIMD 0
 #endif

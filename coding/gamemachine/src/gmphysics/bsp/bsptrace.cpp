@@ -408,7 +408,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		}
 		else
 		{
-			offset = vmath::dot(tw.offsets[planes->signbits], plane);
+			offset = vmath::dot(tw.offsets[planes->signbits], VEC3(plane));
 			plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
@@ -447,7 +447,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 			else
 			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
-				offset = vmath::dot(tw.offsets[planes->signbits], plane);
+				offset = vmath::dot(tw.offsets[planes->signbits], VEC3(plane));
 				plane[3] -= fabs(offset);
 				startp = tw.start;
 			}
