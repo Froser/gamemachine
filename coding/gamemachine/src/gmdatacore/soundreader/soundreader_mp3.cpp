@@ -171,6 +171,7 @@ static inline GMint scale(mad_fixed_t sample)
 
 static mad_flow input(void *data, mad_stream *stream)
 {
+#ifdef _WINDOWS
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)data;
 
 	if (!d->playing)
@@ -182,10 +183,14 @@ static mad_flow input(void *data, mad_stream *stream)
 	mad_stream_buffer(stream, d->bufferIn.buffer, d->bufferIn.size);
 	d->bufferLoaded = true;
 	return MAD_FLOW_CONTINUE;
+#else
+	return MAD_FLOW_CONTINUE;
+#endif
 }
 
 static mad_flow output(void *data, struct mad_header const *header, struct mad_pcm *pcm)
 {
+#ifdef _WINDOWS
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)data;
 
 	if (!d->playing)
@@ -241,8 +246,13 @@ static mad_flow output(void *data, struct mad_header const *header, struct mad_p
 		d->frame++;
 
 	return MAD_FLOW_CONTINUE;
+#else
+	return MAD_FLOW_CONTINUE;
+#endif
 }
 
+
+#ifdef _WINDOWS
 static DWORD WINAPI decode(LPVOID lpThreadParameter)
 {
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)lpThreadParameter;
@@ -306,13 +316,19 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 	}
 	return 0;
 }
+#endif
 
 bool SoundReader_MP3::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 {
+#ifdef _WINDOWS
 	D(d);
 	MP3SoundFile* file = new MP3SoundFile(&buffer);
 	*sf = file;
 	return 0;
+#else
+	ASSERT(false);
+	return 0;
+#endif
 }
 
 bool SoundReader_MP3::test(const GamePackageBuffer& buffer)

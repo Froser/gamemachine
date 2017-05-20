@@ -13,6 +13,8 @@ void GMGLFactory::createWindow(OUT IWindow** window)
 	ASSERT(window);
 #ifdef _WINDOWS
 	*window = new WinGLWindow();
+#elif defined __APPLE__
+	;
 #else
 #error need implement
 #endif

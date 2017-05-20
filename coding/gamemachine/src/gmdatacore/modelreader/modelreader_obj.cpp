@@ -194,7 +194,7 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 		}
 
 		{
-			auto& vec = t != INVALID ? d.textures[t - 1] : vmath::vec2(0, 0);
+			auto&& vec = t != INVALID ? d.textures[t - 1] : vmath::vec2(0, 0);
 			d.currentComponent->uv(vec[0], vec[1]);
 		}
 

@@ -58,8 +58,6 @@ void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWor
 	BSPGameWorld* world = new BSPGameWorld(this);
 	*gameWorld = world;
 
-	IFactory* factory = d.gameMachine->getFactory();
-	IGraphicEngine* engine = d.gameMachine->getGraphicEngine();
 	world->setGameMachine(d.gameMachine);
 	world->loadBSP(map);
 }

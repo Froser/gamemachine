@@ -77,18 +77,18 @@ void BSPMove::processMove()
 	vmath::vec3 walkDirectionFB;
 	{
 		GMfloat distance = (forward ? 1 : -1) * d.object->motions.moveSpeed * moveRate_fb;
-		GMfloat l = distance * std::cos(pitch);
-		walkDirectionFB[0] = l * std::sin(yaw);
-		walkDirectionFB[1] = distance * std::sin(pitch);
-		walkDirectionFB[2] = -l * std::cos(yaw);
+		GMfloat l = distance * cos(pitch);
+		walkDirectionFB[0] = l * sin(yaw);
+		walkDirectionFB[1] = distance * sin(pitch);
+		walkDirectionFB[2] = -l * cos(yaw);
 	}
 
 	vmath::vec3 walkDirectionLR;
 	{
 		GMfloat distance = (left ? -1 : 1) * d.object->motions.moveSpeed * moveRate_lr;
-		walkDirectionLR[0] = distance * std::cos(yaw);
+		walkDirectionLR[0] = distance * cos(yaw);
 		walkDirectionLR[1] = 0;
-		walkDirectionLR[2] = distance * std::sin(yaw);
+		walkDirectionLR[2] = distance * sin(yaw);
 	}
 
 	d.object->motions.velocity = vmath::vec3(

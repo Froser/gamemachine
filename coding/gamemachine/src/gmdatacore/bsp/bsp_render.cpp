@@ -251,14 +251,10 @@ void BSPRender::generateFaces()
 
 void BSPRender::generateShaders()
 {
-	D(d);
-	// Nothing to do
 }
 
 void BSPRender::generateLightmaps()
 {
-	D(d);
-	// Nothing to do
 }
 
 void BSPRender::generateLeafs()

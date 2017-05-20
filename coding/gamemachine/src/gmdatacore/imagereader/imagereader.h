@@ -7,6 +7,7 @@ BEGIN_NS
 class Image;
 struct IImageReader
 {
+	virtual ~IImageReader() {};
 	virtual bool load(const GMbyte* data, GMuint size, OUT Image** image) = 0;
 	virtual bool test(const GMbyte* data) = 0;
 };

@@ -30,7 +30,6 @@ void Image::flipVertically(GMuint mipId)
 	ImageMipData* mip = &m_data.mip[mipId];
 	GMint width = mip->width,
 		height = mip->height;
-	GMbyte* buffer = mip->data;
 	GMuint rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;
 
 	GMbyte* tempRow = new GMbyte[width * mip->depth / 8];

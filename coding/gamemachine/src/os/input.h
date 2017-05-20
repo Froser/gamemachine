@@ -1,8 +1,10 @@
 ﻿#ifndef __INPUT_H__
 #define __INPUT_H__
 #include "common.h"
-#include <Xinput.h>
 BEGIN_NS
+
+#ifdef _WINDOWS
+#include <Xinput.h>
 
 struct JoystickState
 {
@@ -53,7 +55,6 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
-#ifdef _WINDOWS
 class Input_Windows
 {
 public:

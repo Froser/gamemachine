@@ -22,6 +22,9 @@ namespace vmath
 	template <typename T, const int w, const int h> class matNM;
 	template <typename T, const int len> class vecN;
 	template <typename T> class Tquaternion;
+	template <typename T> class Tvec2;
+	template <typename T> class Tvec3;
+	template <typename T> class Tvec4;
 
 	template <typename T>
 	inline T degrees(T angleInRadians)
@@ -92,6 +95,55 @@ namespace vmath
 		}
 	};
 
+	
+	// regulars
+	template <int len, typename T>
+	struct regular
+	{
+	};
+	
+	template <typename T>
+	struct regular<2, T>
+	{
+		inline static Tvec2<T> div(T x, const Tvec2<T>& v)
+		{
+			return Tvec2<T>(x / v[0], x / v[1]);
+		}
+		
+		inline static Tvec2<T> div(const Tvec2<T>& v, T x)
+		{
+			return Tvec2<T>(v[0] / x, v[1] / x);
+		}
+	};
+	
+	template <typename T>
+	struct regular<3, T>
+	{
+		inline static Tvec3<T> div(T x, const Tvec3<T>& v)
+		{
+			return Tvec3<T>(x / v[0], x / v[1], x / v[2]);
+		}
+		
+		inline static Tvec3<T> div(const Tvec3<T>& v, T x)
+		{
+			return Tvec3<T>(v[0] / x, v[1] / x, v[2] / x);
+		}
+	};
+	
+	template <typename T>
+	struct regular<4, T>
+	{
+		inline static Tvec4<T> div(T x, const Tvec4<T>& v)
+		{
+			return Tvec4<T>(x / v[0], x / v[1], x / v[2], x / v[3]);
+		}
+		
+		inline static Tvec4<T> div(const Tvec4<T>& v, T x)
+		{
+			return Tvec4<T>(v[0] / x, v[1] / x, v[2] / x, v[3] / x);
+		}
+	};
+	
 #if USE_SIMD
 	template<int len>
 	inline static void simd_float(const float* vec, float* out, bool* support)
@@ -124,7 +176,7 @@ namespace vmath
 		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
 		if (!support)
 		{
-			return regular<vec_type::dimension, T>::div(_right, _left);
+			return regular<vec_type::dimension, T>::div(_left, _right);
 		}
 
 		T data_arr[] = { _right, _right, _right, _right };
@@ -181,7 +233,7 @@ namespace vmath
 		simd_float<vec_type::dimension>(&_left[0], f_left, &support);
 		if (!support)
 		{
-			return regular<vec_type::dimension, T>::div(_left, _right);
+			return regular<vec_type::dimension, vec_type::element_type>::div(_left, _right);
 		}
 
 		simd_float<vec_type::dimension>(&_right[0], f_right, &support);
@@ -195,7 +247,7 @@ namespace vmath
 		memcpy(&result[0], f_result, sizeof(f_result[0]) * vec_type::dimension);
 		return result;
 #else
-		return regular<vec_type::dimension, T>::div(_left, _right);
+		return regular<vec_type::dimension, typename vec_type::element_type>::div(_left, _right);
 #endif
 	}
 
@@ -366,9 +418,9 @@ namespace vmath
 		_mm_store_ps(result, __r);
 		return Tvec3<T>(result[0], result[1], result[2]);
 #else
-		return Tvec3<T>(a[1] * b[2] - b[1] * a[2],
-			a[2] * b[0] - b[2] * a[0],
-			a[0] * b[1] - b[0] * a[1]);
+		return Tvec3<T>(_left[1] * _right[2] - _right[1] * _left[2],
+			_left[2] * _right[0] - _right[2] * _left[0],
+			_left[0] * _right[1] - _right[0] * _left[1]);
 #endif
 	}
 
@@ -958,7 +1010,11 @@ namespace vmath
 		*/
 
 	private:
+#ifdef _WINDOWS
 		union
+#else
+		struct
+#endif
 		{
 			struct
 			{
@@ -997,12 +1053,6 @@ namespace vmath
 	static inline Tquaternion<T> normalize(const Tquaternion<T>& q)
 	{
 		return q / length(vecN<T, 4>(q));
-	}
-
-	template <>
-	static inline Tquaternion<float> normalize(const Tquaternion<float>& q)
-	{
-		return q * fastInvSqrt(lengthSquare(vecN<float, 4>(q)));
 	}
 
 	template <typename T, const int w, const int h>
@@ -1620,7 +1670,7 @@ namespace vmath
 
 	static inline bool fuzzyCompare(float p1, float p2)
 	{
-		return (abs(p1 - p2) <= 0.01f);
+		return (fabs(p1 - p2) <= 0.01f);
 	}
 
 	static inline bool equals(const vmath::vec3& a, const vmath::vec3& b)
@@ -1632,54 +1682,5 @@ namespace vmath
 		}
 		return true;
 	}
-
-	// regulars
-	template <int len, typename T>
-	struct regular
-	{
-	};
-
-	template <typename T>
-	struct regular<2, T>
-	{
-		inline static Tvec2<T> div(T x, const Tvec2<T>& v)
-		{
-			return Tvec2<T>(x / v[0], x / v[1]);
-		}
-
-		inline static Tvec2<T> div(const Tvec2<T>& v, T x)
-		{
-			return Tvec2<T>(v[0] / x, v[1] / x);
-		}
-	};
-
-	template <typename T>
-	struct regular<3, T>
-	{
-		inline static Tvec3<T> div(T x, const Tvec3<T>& v)
-		{
-			return Tvec3<T>(x / v[0], x / v[1], x / v[2]);
-		}
-
-		inline static Tvec3<T> div(const Tvec3<T>& v, T x)
-		{
-			return Tvec3<T>(v[0] / x, v[1] / x, v[2] / x);
-		}
-	};
-
-	template <typename T>
-	struct regular<4, T>
-	{
-		inline static Tvec4<T> div(T x, const Tvec4<T>& v)
-		{
-			return Tvec4<T>(x / v[0], x / v[1], x / v[2], x / v[3]);
-		}
-
-		inline static Tvec4<T> div(const Tvec4<T>& v, T x)
-		{
-			return Tvec4<T>(v[0] / x, v[1] / x, v[2] / x, v[3] / x);
-		}
-	};
-
 };
 #endif /* __VMATH_H__ */

@@ -34,6 +34,7 @@ struct IWindow
 class GameMachine;
 struct IGameHandler
 {
+	virtual ~IGameHandler() {}
 	virtual void setGameMachine(GameMachine* gm) = 0;
 	virtual void init() = 0;
 	virtual void event(GameMachineEvent evt) = 0;

@@ -25,7 +25,7 @@ enum AnimationState
 class GameWorld;
 struct GameObjectPrivate
 {
-	GameObjectPrivate::GameObjectPrivate()
+	GameObjectPrivate()
 		: world(nullptr)
 		, animationStartTick(0)
 		, animationDuration(0)

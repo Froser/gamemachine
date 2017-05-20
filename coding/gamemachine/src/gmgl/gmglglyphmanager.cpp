@@ -181,7 +181,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// 存入缓存
-	CharList::_Pairib result = getCharList().insert(std::make_pair(c, glyphInfo));
+	auto result = getCharList().insert(std::make_pair(c, glyphInfo));
 	ASSERT(result.second);
 	return (*(result.first)).second;
 }

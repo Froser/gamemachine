@@ -1,5 +1,7 @@
 ﻿#ifndef __COMMON_H__
 #define __COMMON_H__
+#include <stdio.h>
+#include <string.h>
 
 #pragma warning(disable:4244)
 
@@ -35,7 +37,6 @@ typedef unsigned char BYTE;
 typedef short SHORT;
 #endif
 
-#define FREEGLUT_STATIC
 #define GLEW_STATIC
 #include "GL/glew.h"
 
@@ -101,5 +102,40 @@ END_NS
 #else
 #define USE_SIMD 0
 #endif
+
+// 平台差异
+#ifdef __APPLE__
+#define strcat_s strcat
+
+inline static void strcpy_s(char* dest, size_t len, const char* source)
+{
+	strcpy(dest, source);
+}
+
+inline static void strcpy_s(char* dest, const char* source)
+{
+	strcpy(dest, source);
+}
+
+inline static void fopen_s(FILE** f, const char* filename, const char* mode)
+{
+	*f = fopen(filename, mode);
+}
+
+#ifdef SAFE_SSCANF
+#undef SAFE_SSCANF
+#define SAFE_SSCANF(in, format, out)	\
+{										\
+	const char* _str = in;				\
+	if (_str)							\
+		sscanf(_str, format, out);		\
+}
+#endif
+
+#define MAX_PATH 256
+
+#define NO_LAMBDA
+
+#endif // __APPLE__
 
 #endif

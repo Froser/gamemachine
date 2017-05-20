@@ -2,9 +2,12 @@
 #define __DIRECTSOUND_SOUNDPLAYER_H__
 #include "common.h"
 #include "utilities/utilities.h"
+#include "gmdatacore/soundreader/soundreader.h"
+
+#ifdef _WINDOWS
 #include <dsound.h>
 #include <mmsystem.h>
-#include "gmdatacore/soundreader/soundreader.h"
+#endif
 
 BEGIN_NS
 

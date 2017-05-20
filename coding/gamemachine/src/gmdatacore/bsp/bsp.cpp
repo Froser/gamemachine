@@ -1,4 +1,7 @@
 ﻿#include "stdafx.h"
+#ifdef __APPLE__
+#include <stdlib.h>
+#endif
 #include "bsp.h"
 #include <stdio.h>
 #include "utilities/assert.h"
@@ -141,9 +144,8 @@ void BSP::toGLCoord()
 	for (GMint i = 0; i < d.numDrawVertices; i++)
 	{
 		//swap y and z and negate z
-		GMfloat &_0 = d.vertices[i].xyz[0],
-			&_1 = d.vertices[i].xyz[1],
-			&_2 = d.vertices[i].xyz[2];
+		GMfloat &_1 = d.vertices[i].xyz[1],
+				&_2 = d.vertices[i].xyz[2];
 		SWAP(_1, _2);
 		_2 = -_2;
 
@@ -171,7 +173,7 @@ void BSP::parseEntities()
 	parseFromMemory(d.entdata.data(), d.entdatasize);
 
 	BSPEntity* entity;
-	while (entity = parseEntity())
+	while ((entity = parseEntity()))
 	{
 		const char* gridSize = getValue(entity, "gridsize");
 		if (gridSize)

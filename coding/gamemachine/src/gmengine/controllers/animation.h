@@ -3,8 +3,8 @@
 #include "common.h"
 #include <set>
 #include <vector>
-#include "utilities\vmath.h"
-#include "utilities\algorithm.h"
+#include "utilities/vmath.h"
+#include "utilities/algorithm.h"
 BEGIN_NS
 
 struct KeyframeMovement

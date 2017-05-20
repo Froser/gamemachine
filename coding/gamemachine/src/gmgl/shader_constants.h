@@ -3,7 +3,7 @@
 #include "common.h"
 BEGIN_NS
 
-#define		GMSHADER(memberName)			"GM_"##memberName
+#define		GMSHADER(memberName)			"GM_" memberName
 
 #define		GMSHADER_MODEL_MATRIX				GMSHADER("model_matrix")
 #define		GMSHADER_SHADOW_MATRIX				GMSHADER("shadow_matrix")

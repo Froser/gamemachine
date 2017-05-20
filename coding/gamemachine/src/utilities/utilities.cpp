@@ -351,7 +351,7 @@ bool Scanner::nextFloat(GMfloat* out)
 	next(command);
 	if (!strlen(command))
 		return false;
-	sscanf_s(command, "%f", out);
+	SAFE_SSCANF(command, "%f", out);
 	return true;
 }
 
@@ -364,7 +364,7 @@ bool Scanner::nextInt(GMint* out)
 	next(command);
 	if (!strlen(command))
 		return false;
-	sscanf_s(command, "%i", out);
+	SAFE_SSCANF(command, "%i", out);
 	return true;
 }
 
@@ -484,10 +484,10 @@ unsigned char Bitset::isSet(int bitNumber)
 //Camera
 void Camera::calcCameraLookAt(const PositionState& state, REF CameraLookAt& lookAt)
 {
-	lookAt.lookAt[1] = std::sin(state.pitch);
-	GMfloat l = std::cos(state.pitch);
-	lookAt.lookAt[0] = l * std::sin(state.yaw);
-	lookAt.lookAt[2] = -l * std::cos(state.yaw);
+	lookAt.lookAt[1] = sin(state.pitch);
+	GMfloat l = cos(state.pitch);
+	lookAt.lookAt[0] = l * sin(state.yaw);
+	lookAt.lookAt[2] = -l * cos(state.yaw);
 
 	lookAt.position = state.position;
 }
@@ -545,6 +545,9 @@ std::vector<std::string> Path::getAllFiles(const char* directory)
 		} while (_findnext(hFile, &d) == 0);
 		_findclose(hFile);
 	}
+#elif defined __APPLE__
+	ASSERT(false);
+	return std::vector<std::string>();
 #else
 #error need implement
 #endif
@@ -561,6 +564,9 @@ bool Path::directoryExists(const std::string& dir)
 	bool b = hFind != INVALID_HANDLE_VALUE;
 	FindClose(hFind);
 	return b;
+#elif defined __APPLE__
+	ASSERT(false);
+	return false;
 #else
 #error need implement
 #endif
@@ -586,6 +592,8 @@ void Path::createDirectory(const std::string& dir)
 
 	createDirectory(up);
 	_mkdir(dir.c_str());
+#elif defined __APPLE__
+	ASSERT(false);
 #else
 #error need implement
 #endif

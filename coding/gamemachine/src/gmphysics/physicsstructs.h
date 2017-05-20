@@ -8,7 +8,7 @@ BEGIN_NS
 
 typedef GMint Command;
 
-typedef std::map<Command, std::vector<vmath::vec3>> CommandParams;
+typedef std::map<Command, std::vector<vmath::vec3> > CommandParams;
 
 #define USELESS_PARAM 0
 #define CMD_NONE 0x0000

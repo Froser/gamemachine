@@ -50,7 +50,8 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 	BSPData& bsp = *d.bsp;
 	d.checkcount++;
 
-	BSPTraceWork tw = { 0 };
+	BSPTraceWork tw;
+	memset(&tw, 0, sizeof(tw));
 	tw.trace.fraction = 1;
 	tw.modelOrigin = origin;
 

@@ -4,14 +4,12 @@
 #include "utilities/vmath.h"
 BEGIN_NS
 
-#define NAME_MAX 64
-
 struct Model
 {
-	char classname[NAME_MAX];
-	char model[NAME_MAX];
-	bool create;
 	vmath::vec3 extents;
+	bool create;
+	char classname[64];
+	char model[64];
 };
 
 END_NS

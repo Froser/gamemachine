@@ -33,12 +33,12 @@ public:
 
 	void setMoveRate(MoveAction action, GMfloat rate)
 	{
-		m_moveRate[(GMint)std::log((GMfloat)action)] = rate;
+		m_moveRate[(GMint)log((GMfloat)action)] = rate;
 	}
 
 	GMfloat getMoveRate(MoveAction action)
 	{
-		return m_moveRate[(GMint)std::log((GMfloat)action)];
+		return m_moveRate[(GMint)log((GMfloat)action)];
 	}
 
 private:

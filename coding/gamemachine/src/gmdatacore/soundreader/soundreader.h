@@ -4,7 +4,10 @@
 BEGIN_NS
 
 #ifndef _WINDOWS
-#error you must define or typedef WAVEFORMATEX;
+struct WAVEFORMATEX
+{
+	
+};
 #endif
 
 struct WaveData

@@ -364,18 +364,39 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 	obj->getReadyForRender(d.drawingList);
 }
 
+#ifdef NO_LAMBDA
+struct __renderIter
+{
+	__renderIter(BSPRenderData& _rd, BSPGameWorld::Data& _d) : rd(_rd), d(_d) {}
+	void operator()(BSPEntity* e)
+	{
+		GameObject* obj = rd.entitiyObjects[e];
+		if (obj)
+			obj->getReadyForRender(d.drawingList);
+	}
+	
+	BSPRenderData& rd;
+	BSPGameWorld::Data d;
+};
+#endif
+
 void BSPGameWorld::drawEntity(GMint leafId)
 {
 	D(d);
 	BSPRenderData& rd = d.render.renderData();
 
 	std::set<BSPEntity*>& entities = d.entities[leafId];
+#ifdef NO_LAMBDA
+	__renderIter func(rd, d);
+	std::for_each(entities.begin(), entities.end(), func);
+#else
 	std::for_each(entities.begin(), entities.end(), [&rd, &d](BSPEntity* e)
 	{
 		GameObject* obj = rd.entitiyObjects[e];
 		if (obj)
 			obj->getReadyForRender(d.drawingList);
 	});
+#endif
 }
 
 void BSPGameWorld::drawAlwaysVisibleObjects()

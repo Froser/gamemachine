@@ -22,6 +22,7 @@ class GlyphManager
 
 public:
 	GlyphManager();
+	virtual ~GlyphManager() {}
 
 public:
 	const GlyphInfo getChar(GMWChar c);

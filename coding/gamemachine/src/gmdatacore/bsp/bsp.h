@@ -161,7 +161,7 @@ typedef struct {
 	float		st[2];
 	float		lightmap[2];
 	BSPVector3	normal;
-	byte		color[4];
+	GMbyte		color[4];
 } BSPDrawVertices;
 
 #define	MAXTOKEN 1024

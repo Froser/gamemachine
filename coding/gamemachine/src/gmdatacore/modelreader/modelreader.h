@@ -9,6 +9,7 @@ struct GamePackageBuffer;
 struct ModelLoadSettings;
 struct IModelReader
 {
+	virtual ~IModelReader() {}
 	virtual bool load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) = 0;
 	virtual bool test(const GamePackageBuffer& buffer) = 0;
 };

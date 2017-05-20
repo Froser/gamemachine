@@ -19,9 +19,9 @@ enum PackageIndex
 struct GamePackageBuffer
 {
 	GamePackageBuffer()
-		: needRelease(false)
-		, buffer(nullptr)
+		: buffer(nullptr)
 		, size(0)
+		, needRelease(false)
 	{
 	}
 

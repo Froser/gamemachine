@@ -14,9 +14,6 @@ class SoundReader_MP3 : public ISoundReader
 	DEFINE_PRIVATE(SoundReader_MP3)
 
 public:
-	typedef SoundReader_MP3Private Data;
-
-public:
 	virtual bool load(GamePackageBuffer& buffer, OUT ISoundFile** sf) override;
 	virtual bool test(const GamePackageBuffer& buffer) override;
 };

@@ -2,10 +2,10 @@
 #include "soundreader_wav.h"
 #include "utilities/utilities.h"
 #include "gmdatacore/gamepackage.h"
-#include <dsound.h>
 #include "soundreader.h"
 
 #ifdef _WINDOWS
+#include <dsound.h>
 #include "os/directsound_sounddevice.h"
 #endif
 
@@ -104,6 +104,7 @@ private:
 
 bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 {
+#ifdef _WINDOWS
 	// 假设都是小端模式
 	GM_WAVERIFF riff;
 	GM_WAVEFORMATEX format;
@@ -136,6 +137,10 @@ bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 	SoundFile* _sf = new WavSoundFile(format.waveFormatEx, data);
 	*sf = _sf;
 	return true;
+#else
+	ASSERT(false);
+	return false;
+#endif
 }
 
 bool SoundReader_Wav::test(const GamePackageBuffer& buffer)

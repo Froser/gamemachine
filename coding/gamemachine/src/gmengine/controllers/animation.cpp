@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "animation.h"
-#include "utilities\assert.h"
-#include "utilities\algorithm.h"
+#include "utilities/assert.h"
+#include "utilities/algorithm.h"
 
 static vmath::quaternion interpolation(GMfloat v,
 	const Keyframe* lower, 

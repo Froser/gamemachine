@@ -32,8 +32,8 @@ Object::~Object()
 Component::Component(ChildObject* parent)
 	: m_offset(0)
 	, m_primitiveVertices(0)
-	, m_parent(parent)
 	, m_primitiveCount(0)
+	, m_parent(parent)
 {
 	memset(&m_shader, 0, sizeof(m_shader));
 
