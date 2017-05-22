@@ -1,7 +1,7 @@
 ﻿#ifndef __GRAPHIC_ENGINE_H__
 #define __GRAPHIC_ENGINE_H__
 #include "common.h"
-#include <vector>
+#include "utilities/vector.h"
 
 BEGIN_NS
 class GameObject;
@@ -20,7 +20,7 @@ struct GraphicSettings
 	bool fullscreen;
 };
 
-typedef std::vector<DrawingItem> DrawingList;
+typedef Vector<DrawingItem> DrawingList;
 class Camera;
 class GameWorld;
 class ResourceContainer;

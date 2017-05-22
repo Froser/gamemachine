@@ -58,7 +58,7 @@ private:
 	void preparePatch(int patchNumber);
 	void prepareEntities();
 	void createEntity(BSPEntity* entity);
-	GMint calculateLeafNode(const vmath::vec3& position);
+	GMint calculateLeafNode(const linear_math::Vector3& position);
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
 public:

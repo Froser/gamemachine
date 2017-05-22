@@ -1,7 +1,7 @@
 ﻿#ifndef __BSPMOVE_H__
 #define __BSPMOVE_H__
 #include "common.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "bsptrace.h"
 #include "gmphysics/physicsworld.h"
 BEGIN_NS
@@ -16,9 +16,9 @@ struct BSPMovement
 	BSPTraceResult groundTrace;
 	bool freefall;
 	bool walking;
-	vmath::vec3 velocity;
-	vmath::vec3 origin;
-	vmath::vec3 targetPosition;
+	linear_math::Vector3 velocity;
+	linear_math::Vector3 origin;
+	linear_math::Vector3 targetPosition;
 };
 
 struct BSPMoveCommand
@@ -54,13 +54,13 @@ private:
 	void processMove();
 	void processJump();
 	void composeVelocityWithGravity();
-	vmath::vec3 decomposeVelocity(const vmath::vec3& v);
+	linear_math::Vector3 decomposeVelocity(const linear_math::Vector3& v);
 	void walkMove();
 	void airMove();
 	void stepSlideMove(bool hasGravity);
 	bool slideMove(bool hasGravity);
 	void synchronizePosition();
-	void clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vmath::vec3& out, GMfloat overbounce);
+	void clipVelocity(const linear_math::Vector3& in, const linear_math::Vector3& normal, linear_math::Vector3& out, GMfloat overbounce);
 };
 
 END_NS

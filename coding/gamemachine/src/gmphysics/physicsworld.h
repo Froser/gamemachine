@@ -19,7 +19,7 @@ public:
 	virtual void sendCommand(CollisionObject* obj, const CommandParams& dataParam) = 0;
 
 public:
-	static CommandParams makeCommand(Command cmd, vmath::vec3* list, GMuint count);
+	static CommandParams makeCommand(Command cmd, linear_math::Vector3* list, GMuint count);
 };
 
 END_NS

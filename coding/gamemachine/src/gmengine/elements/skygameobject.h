@@ -7,14 +7,14 @@ BEGIN_NS
 class SkyGameObject : public GameObject
 {
 public:
-	SkyGameObject(const Shader& shader, vmath::vec3& min, vmath::vec3 max);
+	SkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
 
 private:
 	void createSkyBox(OUT Object** obj);
 
 private:
-	vmath::vec3 m_min;
-	vmath::vec3 m_max;
+	linear_math::Vector3 m_min;
+	linear_math::Vector3 m_max;
 	Shader m_shader;
 };
 

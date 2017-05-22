@@ -2,7 +2,7 @@
 #define __BSPPHYSICSWORLDPRIVATE_H__
 #include "common.h"
 #include "gmphysics/physicsstructs.h"
-#include <vector>
+#include "utilities/vector.h"
 #include "gmdatacore/bsp/bsp.h"
 #include "bspphysicsstructs.h"
 #include "bsptrace.h"
@@ -18,9 +18,9 @@ struct BSPPhysicsWorldPrivate : public PhysicsWorldPrivate
 	BSPGameWorld* world;
 	CollisionObject camera;
 
-	std::vector<BSPTracePlane> planes;
-	std::vector<BSP_Physics_Brush> brushes;
-	std::vector<BSP_Physics_BrushSide> brushsides;
+	AlignedVector<BSPTracePlane> planes;
+	AlignedVector<BSP_Physics_Brush> brushes;
+	Vector<BSP_Physics_BrushSide> brushsides;
 
 	BSPTrace trace;
 	BSPPatch patch;

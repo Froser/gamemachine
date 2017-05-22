@@ -1,35 +1,35 @@
 ﻿#include "stdafx.h"
 #include "gmglfunc.h"
 #include "gmglshaders.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "utilities/utilities.h"
 #include "utilities/assert.h"
 
-void GMGL::projection(const vmath::mat4& mat, GMGLShaders& shaders, const char* projectionMatrixName)
+void GMGL::projection(const linear_math::Matrix4x4& mat, GMGLShaders& shaders, const char* projectionMatrixName)
 {
 	GLint projectionMatrixLocation = glGetUniformLocation(shaders.getProgram(), projectionMatrixName);
 	CHECK_GL_LOC(projectionMatrixLocation);
-	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat);
+	glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, mat.data());
 	ASSERT_GL();
 }
 
 void GMGL::frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f, GMGLShaders& shaders, const char* projectionMatrixName)
 {
-	vmath::mat4 mat(vmath::frustum(left, right, bottom, top, n, f));
+	linear_math::Matrix4x4 mat(linear_math::frustum(left, right, bottom, top, n, f));
 	projection(mat, shaders, projectionMatrixName);
 }
 
-void GMGL::perspective(const vmath::mat4& projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName)
+void GMGL::perspective(const linear_math::Matrix4x4& projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName)
 {
 	projection(projectionMatrix, shaders, projectionMatrixName);
 }
 
-void GMGL::lookAt(const vmath::mat4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName)
+void GMGL::lookAt(const linear_math::Matrix4x4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName)
 {
 	GLint viewMatrixLocation = glGetUniformLocation(shaders.getProgram(), viewMatrixName);
 	ASSERT_GL();
 
-	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, viewMatrix);
+	glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, viewMatrix.data());
 	CHECK_GL_LOC(viewMatrixLocation);
 }
 

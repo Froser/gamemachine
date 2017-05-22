@@ -2,10 +2,11 @@
 #define __BSP_H__
 #include "common.h"
 #include <string>
-#include <vector>
+#include "utilities/vector.h"
 #include "utilities/utilities.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "bsp_surface_flags.h"
+#include "utilities/vector.h"
 BEGIN_NS
 
 // key / value pair sizes in the entities lump
@@ -53,7 +54,7 @@ typedef struct {
 	int		fileofs, filelen;
 } BSPLump;
 
-typedef vmath::vec3 BSPVector3;
+typedef linear_math::Vector3 BSPVector3;
 
 typedef struct {
 	int			ident;
@@ -169,10 +170,10 @@ typedef struct {
 
 struct BSPLightVolumes
 {
-	vmath::vec3 lightVolOrigin;
-	vmath::vec3 lightVolSize;
-	vmath::vec3 lightVolInverseSize;
-	vmath::vec3 lightVolBounds;
+	linear_math::Vector3 lightVolOrigin;
+	linear_math::Vector3 lightVolSize;
+	linear_math::Vector3 lightVolInverseSize;
+	linear_math::Vector3 lightVolBounds;
 	GMbyte* volData;
 };
 
@@ -185,41 +186,41 @@ struct BSPPrivate
 
 	GMbyte* buffer;
 	BSPHeader* header;
-	std::vector<BSPEntity> entities;
+	AlignedVector<BSPEntity> entities;
 	GMint nummodels;
-	std::vector<BSPModel> models;
+	Vector<BSPModel> models;
 	GMint numShaders;
-	std::vector<BSPShader> shaders;
+	Vector<BSPShader> shaders;
 	GMint entdatasize;
-	std::vector<char> entdata;
+	Vector<char> entdata;
 	GMint numleafs;
-	std::vector<BSPLeaf> leafs;
+	Vector<BSPLeaf> leafs;
 	GMint numplanes;
-	std::vector<BSPPlane> planes;
+	AlignedVector<BSPPlane> planes;
 	GMint numnodes;
-	std::vector<BSPNode> nodes;
+	Vector<BSPNode> nodes;
 	GMint numleafsurfaces;
-	std::vector<int> leafsurfaces;
+	Vector<GMint> leafsurfaces;
 	GMint numleafbrushes;
-	std::vector<int> leafbrushes;
+	Vector<GMint> leafbrushes;
 	GMint numbrushes;
-	std::vector<BSPBrush> brushes;
+	Vector<BSPBrush> brushes;
 	GMint numbrushsides;
-	std::vector<BSPBrushSide> brushsides;
+	Vector<BSPBrushSide> brushsides;
 	GMint numLightBytes;
-	std::vector<GMbyte> lightBytes;
+	Vector<GMbyte> lightBytes;
 	GMint numGridPoints;
-	std::vector<GMbyte> gridData;
+	Vector<GMbyte> gridData;
 	GMint numVisBytes;
-	std::vector<GMbyte> visBytes;
+	Vector<GMbyte> visBytes;
 	GMint numDrawVertices;
-	std::vector<BSPDrawVertices> vertices;
+	AlignedVector<BSPDrawVertices> vertices;
 	GMint numDrawIndexes;
-	std::vector<int> drawIndexes;
+	Vector<int> drawIndexes;
 	GMint numDrawSurfaces;
-	std::vector<BSPSurface> drawSurfaces;
+	AlignedVector<BSPSurface> drawSurfaces;
 	GMint numFogs;
-	std::vector<BSPFog> fogs;
+	Vector<BSPFog> fogs;
 
 	BSPLightVolumes lightVols;
 

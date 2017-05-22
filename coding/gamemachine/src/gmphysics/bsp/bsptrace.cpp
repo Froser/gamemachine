@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bsptrace.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "utilities/assert.h"
 #include "bspphysicsworld.h"
 #include "gmengine/elements/gameobject.h"
@@ -12,14 +12,14 @@
 BEGIN_NS
 struct BSPTraceWork
 {
-	vmath::vec3 start;
-	vmath::vec3 end;
-	vmath::vec3 size[2];	// size of the box being swept through the model
-	vmath::vec3 offsets[8];	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
+	linear_math::Vector3 start;
+	linear_math::Vector3 end;
+	linear_math::Vector3 size[2];	// size of the box being swept through the model
+	linear_math::Vector3 offsets[8];	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
 	GMfloat maxOffset;	// longest corner length from origin
-	vmath::vec3 extents;	// greatest of abs(size[0]) and abs(size[1])
-	vmath::vec3 bounds[2];	// enclosing box of start and end surrounding by size
-	vmath::vec3 modelOrigin;// origin of the model tracing through
+	linear_math::Vector3 extents;	// greatest of abs(size[0]) and abs(size[1])
+	linear_math::Vector3 bounds[2];	// enclosing box of start and end surrounding by size
+	linear_math::Vector3 modelOrigin;// origin of the model tracing through
 	GMint contents; // ored contents of the model tracing through
 	bool isPoint; // optimized case
 	BSPTraceResult trace; // returned from trace call
@@ -44,7 +44,7 @@ min: 物体包围盒最小向量
 max: 物体包围盒最大向量
 trace: 返回的碰撞跟踪结果
 */
-void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vmath::vec3& origin, const vmath::vec3& min, const vmath::vec3& max, REF BSPTraceResult& trace)
+void BSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vector3& end, const linear_math::Vector3& origin, const linear_math::Vector3& min, const linear_math::Vector3& max, REF BSPTraceResult& trace)
 {
 	D(d);
 	BSPData& bsp = *d.bsp;
@@ -62,7 +62,7 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 
 	tw.contents = 1; //TODO brushmask
 
-	vmath::vec3 offset = (min + max) * 0.5;
+	linear_math::Vector3 offset = (min + max) * 0.5;
 	tw.size[0] = min - offset;
 	tw.size[1] = max - offset;
 	tw.start = start + offset;
@@ -131,7 +131,7 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 		}
 	}
 
-	if (vmath::equals(start, end))
+	if (linear_math::equals(start, end))
 	{
 		/*
 		if (model) {
@@ -156,7 +156,7 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 		if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0)
 		{
 			tw.isPoint = true;
-			tw.extents = vmath::vec3(0);
+			tw.extents = linear_math::Vector3(0);
 		}
 		else {
 			tw.isPoint = false;
@@ -181,11 +181,11 @@ void BSPTrace::trace(const vmath::vec3& start, const vmath::vec3& end, const vma
 	// Otherwise, the normal on the plane should have unit length
 	ASSERT(tw.trace.allsolid ||
 		tw.trace.fraction == 1.0 ||
-		vmath::lengthSquare(tw.trace.plane.normal) > 0.9999f);
+		linear_math::lengthSquare(tw.trace.plane.normal) > 0.9999f);
 	trace = tw.trace;
 }
 
-void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, vmath::vec3 p1, vmath::vec3 p2)
+void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const linear_math::Vector3& p1, const linear_math::Vector3& p2)
 {
 	D(d);
 	BSPData& bsp = *d.bsp;
@@ -225,8 +225,8 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 		offset = tw.extents[plane->planeType];
 	}
 	else {
-		t1 = vmath::dot(plane->normal, p1) + dist;
-		t2 = vmath::dot(plane->normal, p2) + dist;
+		t1 = linear_math::dot(plane->normal, p1) + dist;
+		t2 = linear_math::dot(plane->normal, p2) + dist;
 		if (tw.isPoint) {
 			offset = 0;
 		}
@@ -277,7 +277,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	}
 
 	GMfloat midf;
-	vmath::vec3 mid;
+	linear_math::Vector3 mid;
 	midf = p1f + (p2f - p1f)*frac;
 
 	mid = p1 + frac*(p2 - p1);
@@ -368,8 +368,8 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 	GMint j, hit, hitnum;
 	GMfloat offset, enterFrac, leaveFrac, t;
 	BSPPatchPlane* planes;
-	vmath::vec4 plane, bestplane;
-	vmath::vec3 startp, endp;
+	linear_math::Vector4 plane, bestplane;
+	linear_math::Vector3 startp, endp;
 
 	if (!boundsIntersect(tw.bounds[0], tw.bounds[1],
 		pc->bounds[0], pc->bounds[1])) {
@@ -397,7 +397,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 			plane[3] += tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			t = vmath::dot(VEC3(plane), tw.sphere.offset);
+			t = linear_math::dot(VEC3(plane), tw.sphere.offset);
 			if (t > 0.0f) {
 				startp = tw.start - tw.sphere.offset;
 				endp = tw.end - tw.sphere.offset;
@@ -409,7 +409,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 		}
 		else
 		{
-			offset = vmath::dot(tw.offsets[planes->signbits], VEC3(plane));
+			offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(plane));
 			plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
@@ -435,7 +435,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 				plane[3] += tw.sphere.radius;
 
 				// find the closest point on the capsule to the plane
-				t = vmath::dot(VEC3(plane), tw.sphere.offset);
+				t = linear_math::dot(VEC3(plane), tw.sphere.offset);
 				if (t > 0.0f) {
 					startp = tw.start - tw.sphere.offset;
 					endp = tw.end - tw.sphere.offset;
@@ -448,7 +448,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 			else
 			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
-				offset = vmath::dot(tw.offsets[planes->signbits], VEC3(plane));
+				offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(plane));
 				plane[3] -= fabs(offset);
 				startp = tw.start;
 			}
@@ -502,7 +502,7 @@ void BSPTrace::traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& en
 			for (GMint i = 0; i < EntityPlaneNum; i++)
 			{
 				// 首先判断起点和终点是否在AABB中，如果没有，肯定没有接触到entity
-				vmath::vec3 mins, maxs;
+				linear_math::Vector3 mins, maxs;
 				obj->getBounds(mins, maxs);
 				if (!boundsIntersect(tw.bounds[0], tw.bounds[1], mins, maxs))
 					continue;
@@ -518,20 +518,20 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 	GMfloat offset;
 	GMfloat d1, d2;
 
-	std::vector<GMint> frontFacing;
+	Vector<GMint> frontFacing;
 	frontFacing.resize(pc->planes.size());
-	std::vector<GMfloat> intersection;
+	Vector<GMfloat> intersection;
 	intersection.resize(pc->planes.size());
 
 	// determine the trace's relationship to all planes
-	const std::vector<BSPPatchPlane>& planes = pc->planes;
+	const AlignedVector<BSPPatchPlane>& planes = pc->planes;
 	GMint i = 0;
 	for (auto iter = planes.begin(); iter != planes.end(); iter++, i++)
 	{
 		const BSPPatchPlane& plane = *iter;
-		offset = vmath::dot(tw.offsets[plane.signbits], VEC3(plane.plane));
-		d1 = vmath::dot(tw.start, VEC3(plane.plane)) - plane.plane[3] + offset;
-		d2 = vmath::dot(tw.end, VEC3(plane.plane)) - plane.plane[3] + offset;
+		offset = linear_math::dot(tw.offsets[plane.signbits], VEC3(plane.plane));
+		d1 = linear_math::dot(tw.start, VEC3(plane.plane)) - plane.plane[3] + offset;
+		d2 = linear_math::dot(tw.end, VEC3(plane.plane)) - plane.plane[3] + offset;
 		if (d1 <= 0)
 			frontFacing[i] = 0;
 		else
@@ -552,7 +552,7 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 
 
 	// see if any of the surface planes are intersected
-	const std::vector<BSPFacet>& facet = pc->facets;
+	const AlignedVector<BSPFacet>& facet = pc->facets;
 	i = 0;
 	for (auto iter = facet.begin(); iter != facet.end(); iter++, i++)
 	{
@@ -585,9 +585,9 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 			const BSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
 
 			// calculate intersection with a slight pushoff
-			offset = vmath::dot(tw.offsets[planes->signbits], VEC3(planes->plane));
-			d1 = vmath::dot(tw.start, VEC3(planes->plane)) - planes->plane[3] + offset;
-			d2 = vmath::dot(tw.end, VEC3(planes->plane)) - planes->plane[3] + offset;
+			offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(planes->plane));
+			d1 = linear_math::dot(tw.start, VEC3(planes->plane)) - planes->plane[3] + offset;
+			d2 = linear_math::dot(tw.end, VEC3(planes->plane)) - planes->plane[3] + offset;
 			tw.trace.fraction = (d1 - SURFACE_CLIP_EPSILON) / (d1 - d2);
 
 			if (tw.trace.fraction < 0)
@@ -601,14 +601,14 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 	}
 }
 
-GMint BSPTrace::checkFacetPlane(const vmath::vec4& plane, const vmath::vec3& start, const vmath::vec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
+GMint BSPTrace::checkFacetPlane(const linear_math::Vector4& plane, const linear_math::Vector3& start, const linear_math::Vector3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
 {
 	float d1, d2, f;
 
 	*hit = false;
 
-	d1 = vmath::dot(start, vmath::vec3(plane[0], plane[1], plane[2])) + plane[3];
-	d2 = vmath::dot(end, vmath::vec3(plane[0], plane[1], plane[2])) + plane[3];
+	d1 = linear_math::dot(start, linear_math::Vector3(plane[0], plane[1], plane[2])) + plane[3];
+	d2 = linear_math::dot(end, linear_math::Vector3(plane[0], plane[1], plane[2])) + plane[3];
 
 	// if completely in front of face, no intersection with the entire facet
 	if (d1 > 0 && (d2 >= SURFACE_CLIP_EPSILON || d2 >= d1)) {
@@ -660,7 +660,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 	GMfloat f = 0;
 	GMfloat enterFrac = -1.0;
 	GMfloat leaveFrac = 1.0;
-	vmath::vec3 startp, endp;
+	linear_math::Vector3 startp, endp;
 
 	if (tw.sphere.use)
 	{
@@ -672,7 +672,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			GMfloat dist = plane->intercept - tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			GMfloat t = vmath::dot(plane->normal, tw.sphere.offset);
+			GMfloat t = linear_math::dot(plane->normal, tw.sphere.offset);
 			if (t > 0)
 			{
 				startp = tw.start - tw.sphere.offset;
@@ -684,8 +684,8 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 				endp = tw.end + tw.sphere.offset;
 			}
 
-			GMfloat d1 = vmath::dot(startp, plane->normal) + dist;
-			GMfloat d2 = vmath::dot(endp, plane->normal) + dist;
+			GMfloat d1 = linear_math::dot(startp, plane->normal) + dist;
+			GMfloat d2 = linear_math::dot(endp, plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -739,11 +739,11 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for mins/maxs
-			GMfloat bound = vmath::dot(tw.offsets[plane->signbits], plane->normal);
+			GMfloat bound = linear_math::dot(tw.offsets[plane->signbits], plane->normal);
 			GMfloat dist = plane->intercept + bound;
 
-			GMfloat d1 = vmath::dot(tw.start, plane->normal) + dist;
-			GMfloat d2 = vmath::dot(tw.end, plane->normal) + dist;
+			GMfloat d1 = linear_math::dot(tw.start, plane->normal) + dist;
+			GMfloat d2 = linear_math::dot(tw.end, plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -813,7 +813,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 	}
 }
 
-bool BSPTrace::boundsIntersect(const vmath::vec3& mins, const vmath::vec3& maxs, const vmath::vec3& mins2, const vmath::vec3& maxs2)
+bool BSPTrace::boundsIntersect(const linear_math::Vector3& mins, const linear_math::Vector3& maxs, const linear_math::Vector3& mins2, const linear_math::Vector3& maxs2)
 {
 	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||

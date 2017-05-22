@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bsp_model_loader.h"
-#include <vector>
+#include "utilities/vector.h"
 #include "gamepackage.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "utilities/tinyxml/tinyxml.h"
@@ -30,7 +30,7 @@ void BSPModelLoader::init(const char* directory, BSPGameWorld* world)
 void BSPModelLoader::load()
 {
 	GamePackage* pk = m_world->getGamePackage();
-	std::vector<std::string> files = pk->getAllFiles(m_directory.c_str());
+	Vector<std::string> files = pk->getAllFiles(m_directory.c_str());
 
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{

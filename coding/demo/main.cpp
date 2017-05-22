@@ -151,7 +151,7 @@ public:
 			if (joyState.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_LEFT;
-				rate.setMoveRate(MD_LEFT, GMfloat(joyState.thumbLX) / std::numeric_limits<decltype(joyState.thumbLX)>::min());
+				rate.setMoveRate(MD_LEFT, GMfloat(joyState.thumbLX) / SHRT_MIN);
 			}
 
 			if (kbState['D'])
@@ -159,7 +159,7 @@ public:
 			if (joyState.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_RIGHT;
-				rate.setMoveRate(MD_RIGHT, GMfloat(joyState.thumbLX) / std::numeric_limits<decltype(joyState.thumbLX)>::max());
+				rate.setMoveRate(MD_RIGHT, GMfloat(joyState.thumbLX) / SHRT_MAX);
 			}
 
 			if (kbState['S'])
@@ -167,7 +167,7 @@ public:
 			if (joyState.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_BACKWARD;
-				rate.setMoveRate(MD_BACKWARD, GMfloat(joyState.thumbLY) / std::numeric_limits<decltype(joyState.thumbLY)>::min());
+				rate.setMoveRate(MD_BACKWARD, GMfloat(joyState.thumbLY) / SHRT_MIN);
 			}
 
 			if (kbState['W'])
@@ -175,7 +175,7 @@ public:
 			if (joyState.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_FORWARD;
-				rate.setMoveRate(MD_FORWARD, GMfloat(joyState.thumbLY) / std::numeric_limits<decltype(joyState.thumbLY)>::max());
+				rate.setMoveRate(MD_FORWARD, GMfloat(joyState.thumbLY) / SHRT_MAX);
 			}
 
 			if (kbState[VK_SPACE] || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
@@ -193,8 +193,8 @@ public:
 			{
 				GMfloat rate = (GMfloat) joyState.thumbRX / (
 					joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
-					std::numeric_limits<decltype(joyState.thumbRX)>::min() :
-					std::numeric_limits<decltype(joyState.thumbRX)>::max() );
+					SHRT_MIN :
+					SHRT_MAX);
 
 				world->getMajorCharacter()->lookRight(joyState.thumbRX * joystickSensitivity * rate);
 			}
@@ -202,8 +202,8 @@ public:
 			{
 				GMfloat rate = (GMfloat)joyState.thumbRY / (
 					joyState.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
-					std::numeric_limits<decltype(joyState.thumbRY)>::min() :
-					std::numeric_limits<decltype(joyState.thumbRY)>::max() );
+					SHRT_MIN :
+					SHRT_MAX);
 
 				world->getMajorCharacter()->lookUp(joyState.thumbRY * joystickSensitivity * rate);
 			}

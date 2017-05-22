@@ -194,7 +194,7 @@ void BSP::generateLightVolumes()
 	d.lightVols.lightVolInverseSize = 1.f / d.lightVols.lightVolSize;
 	GMfloat* wMins = d.models[0].mins;
 	GMfloat* wMaxs = d.models[0].maxs;
-	vmath::vec3 maxs;
+	linear_math::Vector3 maxs;
 	GMint numGridPoints = 0;
 
 	for (GMuint i = 0; i < 3; i++)
@@ -277,7 +277,7 @@ BSPEntity* BSP::parseEntity()
 
 	d.entities.push_back(bla);
 
-	return &*(d.entities.end() - 1);
+	return &d.entities.back();
 }
 
 bool BSP::getToken(bool crossline)

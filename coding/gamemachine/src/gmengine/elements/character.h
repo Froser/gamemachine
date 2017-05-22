@@ -51,7 +51,7 @@ public:
 	Character(GMfloat radius);
 
 public:
-	void setJumpSpeed(const vmath::vec3& jumpSpeed);
+	void setJumpSpeed(const linear_math::Vector3& jumpSpeed);
 	void setMoveSpeed(GMfloat moveSpeed);
 	void simulation();
 	void action(MoveAction md, MoveRate rate);
@@ -82,8 +82,8 @@ private:
 
 	PositionState m_state;
 	CameraLookAt m_lookAt;
-	vmath::vec3 m_moveCmdArgFB;
-	vmath::vec3 m_moveCmdArgLR;
+	linear_math::Vector3 m_moveCmdArgFB;
+	linear_math::Vector3 m_moveCmdArgLR;
 };
 
 END_NS

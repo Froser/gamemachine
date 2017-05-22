@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGL_FUNC_H__
 #define __GMGL_FUNC_H__
 #include "common.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 BEGIN_NS
 
 class GMGLShaders;
@@ -10,10 +10,10 @@ class Frustum;
 
 struct GMGL
 {
-	static void projection(const vmath::mat4& mat, GMGLShaders& shaders, const char* projectionMatrixName);
+	static void projection(const linear_math::Matrix4x4& mat, GMGLShaders& shaders, const char* projectionMatrixName);
 	static void frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f, GMGLShaders& shaders, const char* projectionMatrixName);
-	static void perspective(const vmath::mat4& projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName);
-	static void lookAt(const vmath::mat4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName);
+	static void perspective(const linear_math::Matrix4x4& projectionMatrix, GMGLShaders& shaders, const char* projectionMatrixName);
+	static void lookAt(const linear_math::Matrix4x4& viewMatrix, GMGLShaders& shaders, const char* viewMatrixName);
 	static void cameraPosition(const CameraLookAt& lookAt, GMGLShaders& shaders, const char* matrixName);
 	static void uniformMatrix4(GMGLShaders& shaders, GMfloat* mat, const char* matrixName);
 	static void uniformTextureIndex(GMGLShaders& shaders, GMint id, const char* textureName);

@@ -20,8 +20,8 @@ struct GMGLGraphicEnginePrivate
 	GameWorld* world;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings;
-	vmath::mat4 viewMatrix;
-	vmath::mat4 projectionMatrix;
+	linear_math::Matrix4x4 viewMatrix;
+	linear_math::Matrix4x4 projectionMatrix;
 };
 
 class GMGLGraphicEngine : public IGraphicEngine

@@ -2,7 +2,7 @@
 #define __SOUNDREADER_MP3_H__
 #include "common.h"
 #include "soundreader.h"
-#include <vector>
+#include "utilities/vector.h"
 BEGIN_NS
 
 struct SoundReader_MP3Private

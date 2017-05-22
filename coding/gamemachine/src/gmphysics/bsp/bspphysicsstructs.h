@@ -2,7 +2,8 @@
 #define __BSPPHYSICSSTRUCTS_H__
 #include "common.h"
 #include "gmdatacore/bsp/bsp.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
+#include "utilities/vector.h"
 BEGIN_NS
 
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
@@ -16,8 +17,8 @@ enum PlaneType
 
 struct BSPLeafList
 {
-	std::vector<GMint> list;
-	vmath::vec3 bounds[2];
+	Vector<GMint> list;
+	linear_math::Vector3 bounds[2];
 	GMint lastLeaf;
 };
 
@@ -38,7 +39,7 @@ struct BSP_Physics_Brush
 
 	BSPBrush* brush;
 	GMint contents;
-	vmath::vec3 bounds[2];
+	linear_math::Vector3 bounds[2];
 	BSP_Physics_BrushSide *sides;
 	GMint checkcount;
 };
@@ -46,7 +47,7 @@ struct BSP_Physics_Brush
 // Begin patches definitions
 struct BSPPatchPlane
 {
-	vmath::vec4 plane;
+	linear_math::Vector4 plane;
 	GMint signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 };
 
@@ -61,9 +62,9 @@ struct BSPFacet
 
 struct BSPPatchCollide
 {
-	vmath::vec3 bounds[2];
-	std::vector<BSPPatchPlane> planes;
-	std::vector<BSPFacet> facets;
+	linear_math::Vector3 bounds[2];
+	AlignedVector<BSPPatchPlane> planes;
+	AlignedVector<BSPFacet> facets;
 };
 // End patches definitions
 

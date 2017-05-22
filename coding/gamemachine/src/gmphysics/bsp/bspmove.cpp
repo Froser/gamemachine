@@ -48,7 +48,7 @@ void BSPMove::processCommand()
 		//TODO 没有在move的时候，可以考虑摩擦使速度减小
 		//这里我们先清空速度
 		if (!d.movement.freefall)
-			d.object->motions.velocity = vmath::vec3(0);
+			d.object->motions.velocity = linear_math::Vector3(0);
 	}
 
 	if (d.moveCommand.command & CMD_JUMP)
@@ -66,7 +66,7 @@ void BSPMove::processMove()
 		return;
 
 	//moveCommand: {pitch, yaw, USELESS}, {forward(bool), moveRate, USELESS}, {left(bool), moveRate(LR), USELESS}
-	vmath::vec3& arg0 = d.moveCommand.params[CMD_MOVE][0],
+	linear_math::Vector3& arg0 = d.moveCommand.params[CMD_MOVE][0],
 		&arg1 = d.moveCommand.params[CMD_MOVE][1],
 		&arg2 = d.moveCommand.params[CMD_MOVE][2];
 		
@@ -74,7 +74,7 @@ void BSPMove::processMove()
 	bool forward = arg1[0] == 1, left = arg2[0] == 1;
 	GMfloat moveRate_fb = arg1[1], moveRate_lr = arg2[1];
 
-	vmath::vec3 walkDirectionFB;
+	linear_math::Vector3 walkDirectionFB;
 	{
 		GMfloat distance = (forward ? 1 : -1) * d.object->motions.moveSpeed * moveRate_fb;
 		GMfloat l = distance * cos(pitch);
@@ -83,7 +83,7 @@ void BSPMove::processMove()
 		walkDirectionFB[2] = -l * cos(yaw);
 	}
 
-	vmath::vec3 walkDirectionLR;
+	linear_math::Vector3 walkDirectionLR;
 	{
 		GMfloat distance = (left ? -1 : 1) * d.object->motions.moveSpeed * moveRate_lr;
 		walkDirectionLR[0] = distance * cos(yaw);
@@ -91,7 +91,7 @@ void BSPMove::processMove()
 		walkDirectionLR[2] = distance * sin(yaw);
 	}
 
-	d.object->motions.velocity = vmath::vec3(
+	d.object->motions.velocity = linear_math::Vector3(
 		walkDirectionFB[0] + walkDirectionLR[0],
 		walkDirectionFB[1] + walkDirectionLR[1],
 		walkDirectionFB[2] + walkDirectionLR[2]
@@ -154,23 +154,23 @@ void BSPMove::composeVelocityWithGravity()
 	d.movement.velocity[GRAVITY_DIRECTION] = accelerationVelocity;
 }
 
-vmath::vec3 BSPMove::decomposeVelocity(const vmath::vec3& v)
+linear_math::Vector3 BSPMove::decomposeVelocity(const linear_math::Vector3& v)
 {
 	D(d);
 	// 将速度分解成水平面平行的分量
-	GMfloat len = vmath::fast_length(v);
-	vmath::vec3 planeDir = vmath::vec3(v[0], 0.f, v[2]);
-	vmath::vec3 normal = vmath::normalize(planeDir);
+	GMfloat len = linear_math::fast_length(v);
+	linear_math::Vector3 planeDir = linear_math::Vector3(v[0], 0.f, v[2]);
+	linear_math::Vector3 normal = linear_math::normalize(planeDir);
 	return normal * len;
 }
 
 void BSPMove::groundTrace()
 {
 	D(d);
-	vmath::vec3 p(d.movement.origin);
+	linear_math::Vector3 p(d.movement.origin);
 	p[1] -= .25f;
 
-	d.trace->trace(d.movement.origin, p, vmath::vec3(0),
+	d.trace->trace(d.movement.origin, p, linear_math::Vector3(0),
 		d.object->shapeProps.bounding[0],
 		d.object->shapeProps.bounding[1],
 		d.movement.groundTrace
@@ -191,7 +191,7 @@ void BSPMove::groundTrace()
 void BSPMove::walkMove()
 {
 	D(d);
-	if (vmath::equals(d.movement.velocity, vmath::vec3(0)))
+	if (linear_math::equals(d.movement.velocity, linear_math::Vector3(0)))
 		return;
 
 	stepSlideMove(false);
@@ -205,8 +205,8 @@ void BSPMove::airMove()
 void BSPMove::stepSlideMove(bool hasGravity)
 {
 	D(d);
-	vmath::vec3 startOrigin = d.movement.origin;
-	vmath::vec3 startVelocity = d.movement.velocity;
+	linear_math::Vector3 startOrigin = d.movement.origin;
+	linear_math::Vector3 startVelocity = d.movement.velocity;
 	if (!slideMove(hasGravity))
 	{
 		synchronizePosition();
@@ -214,9 +214,9 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	}
 
 	BSPTraceResult t;
-	vmath::vec3 stepUp = startOrigin;
+	linear_math::Vector3 stepUp = startOrigin;
 	stepUp[GRAVITY_DIRECTION] += d.object->shapeProps.stepHeight;
-	d.trace->trace(d.movement.origin, stepUp, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
+	d.trace->trace(d.movement.origin, stepUp, linear_math::Vector3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 
 	if (t.allsolid)
 	{
@@ -232,9 +232,9 @@ void BSPMove::stepSlideMove(bool hasGravity)
 
 	// 走下来
 	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - startOrigin[GRAVITY_DIRECTION];
-	vmath::vec3 stepDown = d.movement.origin;
+	linear_math::Vector3 stepDown = d.movement.origin;
 	stepDown[GRAVITY_DIRECTION] -= stepSize;
-	d.trace->trace(d.movement.origin, stepDown, vmath::vec3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
+	d.trace->trace(d.movement.origin, stepDown, linear_math::Vector3(0), d.object->shapeProps.bounding[0], d.object->shapeProps.bounding[1], t);
 	if (!t.allsolid)
 		d.movement.origin = t.endpos;
 	if (t.fraction < 1.f)
@@ -251,10 +251,10 @@ bool BSPMove::slideMove(bool hasGravity)
 	D(d);
 	BSPPhysicsWorldData& wd = d.world->physicsData();
 	GMfloat elapsed = wd.world->getGameMachine()->getElapsedSinceLastFrame();
-	vmath::vec3 velocity = d.movement.velocity;
+	linear_math::Vector3 velocity = d.movement.velocity;
 
 	GMint numbumps = 4, bumpcount;
-	vmath::vec3 endVelocity, endClipVelocity;
+	linear_math::Vector3 endVelocity, endClipVelocity;
 	if (hasGravity)
 	{
 		endVelocity = velocity;
@@ -264,11 +264,11 @@ bool BSPMove::slideMove(bool hasGravity)
 
 	velocity *= elapsed;
 
-	std::vector<vmath::vec3> planes;
+	AlignedVector<linear_math::Vector3> planes;
 	if (!d.movement.freefall)
 		planes.push_back(d.movement.groundTrace.plane.normal);
 
-	planes.push_back(vmath::normalize(velocity));
+	planes.push_back(linear_math::normalize(velocity));
 
 	GMfloat t = 1.0f;
 
@@ -277,7 +277,7 @@ bool BSPMove::slideMove(bool hasGravity)
 		BSPTraceResult moveTrace;
 		d.trace->trace(d.movement.origin,
 			d.movement.origin + velocity * t,
-			vmath::vec3(0, 0, 0),
+			linear_math::Vector3(0, 0, 0),
 			d.object->shapeProps.bounding[0],
 			d.object->shapeProps.bounding[1],
 			moveTrace
@@ -299,7 +299,7 @@ bool BSPMove::slideMove(bool hasGravity)
 		GMuint i;
 		for (i = 0; i < planes.size(); i++)
 		{
-			if (vmath::dot(moveTrace.plane.normal, planes[i]) > 0.99)
+			if (linear_math::dot(moveTrace.plane.normal, planes[i]) > 0.99)
 				velocity += moveTrace.plane.normal;
 		}
 		if (i < planes.size())
@@ -312,10 +312,10 @@ bool BSPMove::slideMove(bool hasGravity)
 		//
 
 		// find a plane that it enters
-		vmath::vec3 cv; //clipVelocity
+		linear_math::Vector3 cv; //clipVelocity
 		for (i = 0; i < planes.size(); i++)
 		{
-			if (vmath::dot(velocity, planes[i]) >= 0.1)
+			if (linear_math::dot(velocity, planes[i]) >= 0.1)
 				continue; // 朝着平面前方移动，不会有交汇
 			clipVelocity(velocity, planes[i], cv, OVERCLIP);
 			clipVelocity(endVelocity, planes[i], endClipVelocity, OVERCLIP);
@@ -324,7 +324,7 @@ bool BSPMove::slideMove(bool hasGravity)
 			{
 				if (i == j)
 					continue;
-				if (vmath::dot(cv, planes[j]) >= 0.1)
+				if (linear_math::dot(cv, planes[j]) >= 0.1)
 					continue;
 
 				// try clipping the move to the plane
@@ -332,21 +332,21 @@ bool BSPMove::slideMove(bool hasGravity)
 				clipVelocity(endClipVelocity, planes[i], endClipVelocity, OVERCLIP);
 
 				// see if it goes back into the first clip plane
-				if (vmath::dot(cv, planes[i]) >= 0)
+				if (linear_math::dot(cv, planes[i]) >= 0)
 					continue;
 
 				// slide the original velocity along the crease
 				{
-					vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
-					dir = vmath::normalize(dir);
-					GMfloat s = vmath::dot(dir, velocity);
+					linear_math::Vector3 dir = linear_math::cross(planes[i], planes[j]);
+					dir = linear_math::normalize(dir);
+					GMfloat s = linear_math::dot(dir, velocity);
 					cv = dir * s;
 				}
 
 				{
-					vmath::vec3 dir = vmath::cross(planes[i], planes[j]);
-					dir = vmath::normalize(dir);
-					GMfloat s = vmath::dot(dir, endVelocity);
+					linear_math::Vector3 dir = linear_math::cross(planes[i], planes[j]);
+					dir = linear_math::normalize(dir);
+					GMfloat s = linear_math::dot(dir, endVelocity);
 					endClipVelocity = dir * s;
 				}
 
@@ -355,10 +355,10 @@ bool BSPMove::slideMove(bool hasGravity)
 					if (k == i || k == j)
 						continue;
 
-					if (vmath::dot(cv, planes[k]) >= 0.1)
+					if (linear_math::dot(cv, planes[k]) >= 0.1)
 						continue;
 
-					velocity = vmath::vec3(0);
+					velocity = linear_math::Vector3(0);
 					return true;
 				}
 			}
@@ -375,13 +375,13 @@ bool BSPMove::slideMove(bool hasGravity)
 	return (bumpcount != 0);
 }
 
-void BSPMove::clipVelocity(const vmath::vec3& in, const vmath::vec3& normal, vmath::vec3& out, GMfloat overbounce)
+void BSPMove::clipVelocity(const linear_math::Vector3& in, const linear_math::Vector3& normal, linear_math::Vector3& out, GMfloat overbounce)
 {
 	GMfloat backoff;
 	GMfloat change;
 	GMint i;
 
-	backoff = vmath::dot(in, normal);
+	backoff = linear_math::dot(in, normal);
 
 	if (backoff < 0) {
 		backoff *= overbounce;

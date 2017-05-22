@@ -3,7 +3,7 @@
 #include "common.h"
 #include <string>
 #include "utilities/utilities.h"
-#include <vector>
+#include "utilities/vector.h"
 BEGIN_NS
 
 enum PackageIndex
@@ -67,7 +67,7 @@ struct IGamePackageHandler
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) = 0;
 	virtual std::string pathRoot(PackageIndex index) = 0;
-	virtual std::vector<std::string> getAllFiles(const char* directory) = 0;
+	virtual Vector<std::string> getAllFiles(const char* directory) = 0;
 };
 
 struct IFactory;
@@ -94,7 +94,7 @@ public:
 	void loadPackage(const char* path);
 	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
 	bool readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename = nullptr);
-	std::vector<std::string> getAllFiles(const char* directory);
+	Vector<std::string> getAllFiles(const char* directory);
 
 public:
 	std::string pathOf(PackageIndex index, const char* filename);

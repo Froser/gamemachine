@@ -13,7 +13,7 @@ PhysicsWorld::~PhysicsWorld()
 
 }
 
-CommandParams PhysicsWorld::makeCommand(Command cmd, vmath::vec3* list, GMuint count)
+CommandParams PhysicsWorld::makeCommand(Command cmd, linear_math::Vector3* list, GMuint count)
 {
 	CommandParams p;
 	if (!list)

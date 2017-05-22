@@ -1,9 +1,9 @@
 ﻿#ifndef __BSP_RENDER_H__
 #define __BSP_RENDER_H__
 #include "common.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "utilities/utilities.h"
-#include <vector>
+#include "utilities/vector.h"
 #include <map>
 #include "bsp.h"
 BEGIN_NS
@@ -14,7 +14,7 @@ class GameObject;
 class BSP_Render_Vertex
 {
 public:
-	vmath::vec3 position;
+	linear_math::Vector3 position;
 	float decalS, decalT;
 	float lightmapS, lightmapT;
 
@@ -110,7 +110,7 @@ class BSP_Render_Leaf
 {
 public:
 	int cluster;	//cluster index for visdata
-	vmath::vec3 boundingBoxVertices[8];
+	linear_math::Vector3 boundingBoxVertices[8];
 	int firstLeafFace;	//first index in leafFaces array
 	int numFaces;
 };
@@ -147,18 +147,18 @@ struct BSPRenderPrivate
 
 	BSPData* bsp;
 	//data for render:
-	std::vector<BSP_Render_Vertex> vertices;
+	AlignedVector<BSP_Render_Vertex> vertices;
 	Bitset facesToDraw;
 	Bitset entitiesToDraw;
 	GMint numPolygonFaces;
 	GMint numPatches;
 	GMint numMeshFaces;
-	std::vector<GameObject*> alwaysVisibleObjects;
-	std::vector<BSP_Render_FaceDirectoryEntry> faceDirectory;
-	std::vector<BSP_Render_Face> polygonFaces;
-	std::vector<BSP_Render_Face> meshFaces;
-	std::vector<BSP_Render_Patch> patches;
-	std::vector<BSP_Render_Leaf> leafs;
+	Vector<GameObject*> alwaysVisibleObjects;
+	Vector<BSP_Render_FaceDirectoryEntry> faceDirectory;
+	Vector<BSP_Render_Face> polygonFaces;
+	Vector<BSP_Render_Face> meshFaces;
+	Vector<BSP_Render_Patch> patches;
+	AlignedVector<BSP_Render_Leaf> leafs;
 	BSP_Render_VisibilityData visibilityData;
 
 	std::map<BSP_Render_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
@@ -167,8 +167,8 @@ struct BSPRenderPrivate
 	std::map<BSPEntity*, EntityObject*> entitiyObjects;
 
 	// 用于绘制天空
-	vmath::vec3 boundMin;
-	vmath::vec3 boundMax;
+	linear_math::Vector3 boundMin;
+	linear_math::Vector3 boundMax;
 };
 
 typedef BSPRenderPrivate BSPRenderData;
@@ -183,7 +183,7 @@ public:
 	void generateRenderData(BSPData* bsp);
 	void createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj);
 	void createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);
-	void createBox(const vmath::vec3& extents, const vmath::vec3& position, const Shader& shader, OUT Object** obj);
+	void createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj);
 
 private:
 	void generateVertices();

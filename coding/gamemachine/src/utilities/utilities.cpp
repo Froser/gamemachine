@@ -1,13 +1,13 @@
 ﻿#include "stdafx.h"
 #include "utilities.h"
 #include <time.h>
-#include "vmath.h"
+#include "linearmath.h"
 #include "assert.h"
 #ifdef _WINDOWS
 #include <io.h>
 #include <direct.h>
 #endif
-#include <vector>
+#include "utilities/vector.h"
 
 //FPSCounter
 FPSCounter::FPSCounter()
@@ -54,46 +54,46 @@ GMfloat FPSCounter::getElapsedSinceLastFrame()
 //Plane
 #define EPSILON 0.01f
 
-void Plane::setFromPoints(const vmath::vec3 & p0, const vmath::vec3 & p1, const vmath::vec3 & p2)
+void Plane::setFromPoints(const linear_math::Vector3 & p0, const linear_math::Vector3 & p1, const linear_math::Vector3 & p2)
 {
 
-	normal = vmath::cross((p1 - p0), (p2 - p0));
+	normal = linear_math::cross((p1 - p0), (p2 - p0));
 
-	normal = vmath::normalize(normal);
+	normal = linear_math::normalize(normal);
 
 	calculateIntercept(p0);
 }
 
 void Plane::normalize()
 {
-	float normalLength = vmath::length(normal);
+	float normalLength = linear_math::length(normal);
 	normal /= normalLength;
 	intercept /= normalLength;
 }
 
-bool Plane::intersect3(const Plane & p2, const Plane & p3, vmath::vec3 & result)//find point of intersection of 3 planes
+bool Plane::intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 & result)//find point of intersection of 3 planes
 {
-	float denominator = vmath::dot(normal, (vmath::cross(p2.normal, p3.normal)));
+	float denominator = linear_math::dot(normal, (linear_math::cross(p2.normal, p3.normal)));
 	//scalar triple product of normals
 	if (denominator == 0.0f)									//if zero
 		return false;										//no intersection
 
-	vmath::vec3 temp1, temp2, temp3;
-	temp1 = (vmath::cross(p2.normal, p3.normal))*intercept;
-	temp2 = (vmath::cross(p3.normal, normal))*p2.intercept;
-	temp3 = (vmath::cross(normal, p2.normal))*p3.intercept;
+	linear_math::Vector3 temp1, temp2, temp3;
+	temp1 = (linear_math::cross(p2.normal, p3.normal))*intercept;
+	temp2 = (linear_math::cross(p3.normal, normal))*p2.intercept;
+	temp3 = (linear_math::cross(normal, p2.normal))*p3.intercept;
 
 	result = (temp1 + temp2 + temp3) / (-denominator);
 
 	return true;
 }
 
-GMfloat Plane::getDistance(const vmath::vec3 & point) const
+GMfloat Plane::getDistance(const linear_math::Vector3 & point) const
 {
 	return point[0] * normal[0] + point[1] * normal[1] + point[2] * normal[2] + intercept;
 }
 
-PointPosition Plane::classifyPoint(const vmath::vec3 & point) const
+PointPosition Plane::classifyPoint(const linear_math::Vector3 & point) const
 {
 	float distance = point[0] * normal[0] + point[1] * normal[1] + point[2] * normal[2] + intercept;
 
@@ -110,7 +110,7 @@ Plane Plane::lerp(const Plane & p2, float factor)
 {
 	Plane result;
 	result.normal = normal*(1.0f - factor) + p2.normal*factor;
-	result.normal = vmath::normalize(result.normal);
+	result.normal = linear_math::normalize(result.normal);
 
 	result.intercept = intercept*(1.0f - factor) + p2.intercept*factor;
 
@@ -119,7 +119,7 @@ Plane Plane::lerp(const Plane & p2, float factor)
 
 bool Plane::operator ==(const Plane & rhs) const
 {
-	if (normal == rhs.normal && intercept == rhs.intercept)
+	if (equals(normal, rhs.normal) && intercept == rhs.intercept)
 		return true;
 
 	return false;
@@ -147,9 +147,9 @@ Frustum::Frustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
 
 void Frustum::update()
 {
-	vmath::mat4 projection = getPerspective();
-	vmath::mat4& view = m_viewMatrix;
-	vmath::mat4 clipMat;
+	linear_math::Matrix4x4 projection = getPerspective();
+	linear_math::Matrix4x4& view = m_viewMatrix;
+	linear_math::Matrix4x4 clipMat;
 
 	//Multiply the matrices
 	clipMat = projection * view;
@@ -157,7 +157,7 @@ void Frustum::update()
 	GMfloat clip[16];
 	for (GMint i = 0; i < 4; i++)
 	{
-		vmath::vec4 vec = clipMat[i];
+		linear_math::Vector4 vec = clipMat[i];
 		for (GMint j = 0; j < 4; j++)
 		{
 			clip[i * 4 + j] = vec[j];
@@ -201,7 +201,7 @@ void Frustum::update()
 }
 
 //is a point in the Frustum?
-bool Frustum::isPointInside(const vmath::vec3 & point)
+bool Frustum::isPointInside(const linear_math::Vector3 & point)
 {
 	for (int i = 0; i < 6; ++i)
 	{
@@ -213,7 +213,7 @@ bool Frustum::isPointInside(const vmath::vec3 & point)
 }
 
 //is a bounding box in the Frustum?
-bool Frustum::isBoundingBoxInside(const vmath::vec3 * vertices)
+bool Frustum::isBoundingBoxInside(const linear_math::Vector3 * vertices)
 {
 	//loop through planes
 	for (int i = 0; i < 6; ++i)
@@ -243,12 +243,12 @@ bool Frustum::isBoundingBoxInside(const vmath::vec3 * vertices)
 	return true;
 }
 
-vmath::mat4 Frustum::getPerspective()
+linear_math::Matrix4x4 Frustum::getPerspective()
 {
-	return vmath::mat4(vmath::perspective(m_fovy, m_aspect, m_n, m_f));;
+	return linear_math::Matrix4x4(linear_math::perspective(m_fovy, m_aspect, m_n, m_f));;
 }
 
-void Frustum::updateViewMatrix(vmath::mat4& viewMatrix, vmath::mat4& projMatrix)
+void Frustum::updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix)
 {
 	m_viewMatrix = viewMatrix;
 	m_projMatrix = projMatrix;
@@ -525,9 +525,9 @@ std::string Path::getCurrentPath()
 	return "";
 }
 
-std::vector<std::string> Path::getAllFiles(const char* directory)
+Vector<std::string> Path::getAllFiles(const char* directory)
 {
-	std::vector<std::string> res;
+	Vector<std::string> res;
 #if _WINDOWS
 	std::string p = directory;
 	p.append("*");
@@ -547,7 +547,7 @@ std::vector<std::string> Path::getAllFiles(const char* directory)
 	}
 #elif defined __APPLE__
 	ASSERT(false);
-	return std::vector<std::string>();
+	return Vector<std::string>();
 #else
 #error need implement
 #endif

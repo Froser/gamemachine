@@ -39,8 +39,8 @@ PARSE_FUNC(worldspawn, entity, world)
 			if (ambientLight)
 			{
 				ambientLight->setId(0);
-				ambientLight->setColor(vmath::vec3(1, 1, 1));
-				ambientLight->setPosition(vmath::vec3(0, 0, 0));
+				ambientLight->setColor(linear_math::Vector3(1, 1, 1));
+				ambientLight->setPosition(linear_math::Vector3(0, 0, 0));
 				ambientLight->setWorld(world);
 				ambientLight->setShadowSource(false);
 				world->appendLight(ambientLight);
@@ -50,7 +50,7 @@ PARSE_FUNC(worldspawn, entity, world)
 	*/
 	LightInfo ambientLight = { 0 };
 	ambientLight.on = true;
-	ambientLight.lightColor = vmath::vec3(.5f, .5f, .5f);
+	ambientLight.lightColor = linear_math::Vector3(.5f, .5f, .5f);
 	for (GMint i = 0; i < 3; i++)
 		ambientLight.args[LA_KA + i] = 1.f;
 	world->setDefaultAmbientLight(ambientLight);
@@ -81,13 +81,13 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 		}
 	}
 
-	vmath::vec3 playerStart (origin[0], origin[2], -origin[1]);
+	linear_math::Vector3 playerStart (origin[0], origin[2], -origin[1]);
 
 	Character* character = new Character(6); 
 	world->appendObjectAndInit(character);
 	world->setMajorCharacter(character);
 	character->setMoveSpeed(192);
-	character->setJumpSpeed(vmath::vec3(0, 150, 0));
+	character->setJumpSpeed(linear_math::Vector3(0, 150, 0));
 
 	MotionProperties& prop = world->physicsWorld()->find(character)->motions;
 	prop.translation = playerStart;

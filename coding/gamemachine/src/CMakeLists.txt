@@ -71,8 +71,6 @@ set(SOURCES
 		gmengine/controllers/gamemachine.cpp
 		gmengine/controllers/factory.h
 		gmengine/controllers/factory.cpp
-		gmengine/controllers/animation.h
-		gmengine/controllers/animation.cpp
 		gmengine/elements/skygameobject.h
 		gmengine/elements/skygameobject.cpp
 		gmengine/elements/gameworldprivate.h
@@ -141,7 +139,8 @@ set(SOURCES
 		utilities/tinyxml/tinyxml.h
 		utilities/tinyxml/tinyxmlerror.cpp
 		utilities/tinyxml/tinyxmlparser.cpp
-		utilities/vmath.h
+		utilities/linearmath.h
+		utilities/linearmath.cpp
 		utilities/debug.h
 		utilities/debug.cpp
 		utilities/assert.h
@@ -150,6 +149,8 @@ set(SOURCES
 		utilities/algorithm.cpp
 		utilities/utilities.h
 		utilities/utilities.cpp
+		utilities/vector.h
+		utilities/vector.cpp
 	)
 
 source_group_by_dir(SOURCES)

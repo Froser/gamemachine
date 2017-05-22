@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bsp_shader_loader.h"
-#include <vector>
+#include "utilities/vector.h"
 #include <string>
 #include "utilities/utilities.h"
 #include "utilities/tinyxml/tinyxml.h"
@@ -90,7 +90,7 @@ static void loadImage(const char* filename, const GamePackageBuffer* buf, OUT Im
 		gm_error("texture %s not found", filename);
 }
 
-static void readTernaryFloatsFromString(const char* str, vmath::vec3& vec)
+static void readTernaryFloatsFromString(const char* str, linear_math::Vector3& vec)
 {
 	Scanner s(str);
 	for (GMint i = 0; i < 3; i++)
@@ -168,7 +168,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 void BSPShaderLoader::load()
 {
 	GamePackage* pk = m_world->getGamePackage();
-	std::vector<std::string> files = pk->getAllFiles(m_directory.c_str());
+	Vector<std::string> files = pk->getAllFiles(m_directory.c_str());
 
 	// load all item tag, but not parse them until item is needed
 	for (auto iter = files.begin(); iter != files.end(); iter++)
@@ -437,7 +437,7 @@ void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	vmath::vec3 vecColor;
+	linear_math::Vector3 vecColor;
 	readTernaryFloatsFromString(color, vecColor);
 	lightInfo.lightColor = vecColor;
 
@@ -455,21 +455,21 @@ void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 			return;
 		}
 		Scanner s(color);
-		vmath::vec3 vecPosition;
+		linear_math::Vector3 vecPosition;
 		readTernaryFloatsFromString(position, vecPosition);
 		lightInfo.lightPosition = vecPosition;
 
 		const char* k = elem->Attribute("ks");
 		if (!k)
-			readTernaryFloatsFromString("1 1 1", (vmath::vec3&)lightInfo.args[LA_KS]);
+			readTernaryFloatsFromString("1 1 1", (linear_math::Vector3&)lightInfo.args[LA_KS]);
 		else
-			readTernaryFloatsFromString(k, (vmath::vec3&)lightInfo.args[LA_KS]);
+			readTernaryFloatsFromString(k, (linear_math::Vector3&)lightInfo.args[LA_KS]);
 
 		k = elem->Attribute("kd");
 		if (!k)
-			readTernaryFloatsFromString("1 1 1", (vmath::vec3&)lightInfo.args[LA_KD]);
+			readTernaryFloatsFromString("1 1 1", (linear_math::Vector3&)lightInfo.args[LA_KD]);
 		else
-			readTernaryFloatsFromString(k, (vmath::vec3&)lightInfo.args[LA_KD]);
+			readTernaryFloatsFromString(k, (linear_math::Vector3&)lightInfo.args[LA_KD]);
 
 		k = elem->Attribute("shininess");
 		if (!k)

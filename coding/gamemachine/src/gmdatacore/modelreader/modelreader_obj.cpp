@@ -45,7 +45,7 @@ private:
 };
 
 template <GMint D, typename T>
-static void pushBackData(Scanner& scanner, std::vector<T>& container)
+static void pushBackData(Scanner& scanner, AlignedVector<T>& container)
 {
 	T data;
 	for (GMint i = 0; i < D; i++)
@@ -55,9 +55,9 @@ static void pushBackData(Scanner& scanner, std::vector<T>& container)
 	container.push_back(data);
 }
 
-static void pushBackData(const vmath::vec3 extents, const vmath::vec3& position, Scanner& scanner, std::vector<vmath::vec3>& container)
+static void pushBackData(const linear_math::Vector3& extents, const linear_math::Vector3& position, Scanner& scanner, AlignedVector<linear_math::Vector3>& container)
 {
-	vmath::vec3 data;
+	linear_math::Vector3 data;
 	for (GMint i = 0; i < 3; i++)
 	{
 		GMfloat d;
@@ -194,7 +194,7 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 		}
 
 		{
-			auto&& vec = t != INVALID ? d.textures[t - 1] : vmath::vec2(0, 0);
+			auto&& vec = t != INVALID ? d.textures[t - 1] : linear_math::Vector2(0, 0);
 			d.currentComponent->uv(vec[0], vec[1]);
 		}
 

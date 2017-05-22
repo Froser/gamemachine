@@ -41,16 +41,9 @@ GameWorld* GameObject::getWorld()
 void GameObject::getReadyForRender(DrawingList& list)
 {
 	D(d);
-	vmath::mat4 M = vmath::mat4::identity();
-
-	if (d.animationState == AS_Running)
-	{
-		AnimationMatrices mat = getAnimationMatrix();
-		M = mat.tranlation * M * mat.rotation * mat.scaling;
-	}
-
+	linear_math::Matrix4x4 M = linear_math::Matrix4x4::identity();
 	DrawingItem item;
-	memcpy(item.trans, M, sizeof(M));
+	memcpy(item.trans, &M[0], sizeof(M));
 	item.gameObject = this;
 	list.push_back(item);
 }
@@ -58,71 +51,6 @@ void GameObject::getReadyForRender(DrawingList& list)
 void GameObject::onAppendingObjectToWorld()
 {
 
-}
-
-vmath::mat4 GameObject::getTransformMatrix(GMfloat glTrans[16])
-{
-	vmath::mat4 T(
-		vmath::vec4(glTrans[0], glTrans[1], glTrans[2], glTrans[3]),
-		vmath::vec4(glTrans[4], glTrans[5], glTrans[6], glTrans[7]),
-		vmath::vec4(glTrans[8], glTrans[9], glTrans[10], glTrans[11]),
-		vmath::vec4(glTrans[12], glTrans[13], glTrans[14], glTrans[15])
-	);
-	return T;
-}
-
-AnimationMatrices GameObject::getAnimationMatrix()
-{
-	D(d);
-	GMfloat current = d.world->getElapsed();
-	GMfloat start = d.animationStartTick;
-	GMfloat percentage = current / (start + d.animationDuration);
-	if (percentage > 1)
-		percentage -= (int)percentage;
-
-	vmath::quaternion rotation = d.keyframesRotation.isEmpty() ? vmath::quaternion(1, 0, 0, 0) : d.keyframesRotation.calculateInterpolation(percentage, true);
-	vmath::quaternion translation = d.keyframesTranslation.isEmpty() ? vmath::quaternion(0, 0, 0, 0) : d.keyframesTranslation.calculateInterpolation(percentage, false);
-	vmath::quaternion scaling = d.keyframesScaling.isEmpty() ? vmath::quaternion(1, 1, 1, 1) : d.keyframesScaling.calculateInterpolation(percentage, false);
-
-	AnimationMatrices mat = {
-		vmath::rotate(rotation[3], rotation[0], rotation[1], rotation[2]),
-		vmath::translate(translation[0], translation[1], translation[2]),
-		vmath::scale(scaling[0], scaling[1], scaling[2]),
-	};
-
-	return mat;
-}
-
-Keyframes& GameObject::getKeyframesRotation()
-{
-	D(d);
-	return d.keyframesRotation;
-}
-
-Keyframes& GameObject::getKeyframesTranslation()
-{
-	D(d);
-	return d.keyframesTranslation;
-}
-
-Keyframes& GameObject::getKeyframesScaling()
-{
-	D(d);
-	return d.keyframesScaling;
-}
-
-void GameObject::startAnimation(GMuint duration)
-{
-	D(d);
-	d.animationStartTick = d.world ? d.world->getElapsed() : 0;
-	d.animationDuration = duration;
-	d.animationState = AS_Running;
-}
-
-void GameObject::stopAnimation()
-{
-	D(d);
-	d.animationState = AS_Stopped;
 }
 
 //GlyphObject
@@ -255,7 +183,7 @@ Plane* EntityObject::getPlanes()
 	return d.planes;
 }
 
-void EntityObject::getBounds(REF vmath::vec3& mins, REF vmath::vec3& maxs)
+void EntityObject::getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs)
 {
 	D(d);
 	mins = d.mins;
@@ -265,7 +193,7 @@ void EntityObject::getBounds(REF vmath::vec3& mins, REF vmath::vec3& maxs)
 void EntityObject::calc()
 {
 	D(d);
-	d.mins[0] = d.mins[1] = d.mins[2] = std::numeric_limits<GMfloat>::max();
+	d.mins[0] = d.mins[1] = d.mins[2] = 999999.f;
 	d.maxs[0] = d.maxs[1] = d.maxs[2] = -d.mins[0];
 
 	Object* obj = getObject();
@@ -293,15 +221,15 @@ void EntityObject::makePlanes()
 {
 	D(d);
 	// 前
-	d.planes[0] = Plane(vmath::vec3(0, 0, 1), -d.maxs[2]);
+	d.planes[0] = Plane(linear_math::Vector3(0, 0, 1), -d.maxs[2]);
 	// 后
-	d.planes[1] = Plane(vmath::vec3(0, 0, -1), d.mins[2]);
+	d.planes[1] = Plane(linear_math::Vector3(0, 0, -1), d.mins[2]);
 	// 左
-	d.planes[2] = Plane(vmath::vec3(-1, 0, 0), d.mins[0]);
+	d.planes[2] = Plane(linear_math::Vector3(-1, 0, 0), d.mins[0]);
 	// 右
-	d.planes[3] = Plane(vmath::vec3(1, 0, 0), -d.maxs[0]);
+	d.planes[3] = Plane(linear_math::Vector3(1, 0, 0), -d.maxs[0]);
 	// 上
-	d.planes[4] = Plane(vmath::vec3(0, 1, 0), -d.maxs[0]);
+	d.planes[4] = Plane(linear_math::Vector3(0, 1, 0), -d.maxs[0]);
 	// 下
-	d.planes[5] = Plane(vmath::vec3(0, -1, 0), d.mins[0]);
+	d.planes[5] = Plane(linear_math::Vector3(0, -1, 0), d.mins[0]);
 }

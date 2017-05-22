@@ -1,7 +1,7 @@
 ﻿#ifndef __SHADER_H__
 #define __SHADER_H__
 #include "common.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 BEGIN_NS
 
 struct ITexture;
@@ -122,8 +122,8 @@ struct LightInfo
 {
 	bool on;
 	bool useGlobalLightColor; // true表示使用全局的光的颜色
-	vmath::vec3 lightPosition;
-	vmath::vec3 lightColor;
+	linear_math::Vector3 lightPosition;
+	linear_math::Vector3 lightColor;
 	GMfloat args[LA_END];
 };
 

@@ -5,7 +5,7 @@
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 
 void GMGLRenders_Object::activateShader(Shader* shader)
 {
@@ -133,7 +133,7 @@ void GMGLRenders_Object::end()
 {
 }
 
-void GMGLRenders_Object::updateVPMatrices(const vmath::mat4& projection, const vmath::mat4& view, const CameraLookAt& lookAt)
+void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
 	GMGL::perspective(projection, *d.gmglShaders, GMSHADER_PROJECTION_MATRIX);

@@ -1,7 +1,7 @@
 ﻿#ifndef __SHADERS_H__
 #define __SHADERS_H__
 #include "common.h"
-#include <vector>
+#include "utilities/vector.h"
 BEGIN_NS
 
 struct GMGLShaderInfo
@@ -11,7 +11,7 @@ struct GMGLShaderInfo
 	GLuint shader;
 };
 
-typedef std::vector<GMGLShaderInfo> GMGLShadersInfo;
+typedef Vector<GMGLShaderInfo> GMGLShadersInfo;
 
 class GMGLShaders
 {

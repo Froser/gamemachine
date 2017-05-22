@@ -167,7 +167,7 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 
 		GMint width = bsp.drawSurfaces[i].patchWidth, height = bsp.drawSurfaces[i].patchHeight;
 		GMint c = width * height;
-		std::vector<vmath::vec3> points;
+		AlignedVector<linear_math::Vector3> points;
 		points.resize(c);
 		BSPDrawVertices* v = &bsp.vertices[bsp.drawSurfaces[i].firstVert];
 		for (GMint j = 0; j < c; j++, v++)

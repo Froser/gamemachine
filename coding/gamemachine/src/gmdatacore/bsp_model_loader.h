@@ -3,7 +3,7 @@
 #include "common.h"
 #include "model.h"
 #include <string>
-#include <vector>
+#include "utilities/vector.h"
 #include <map>
 
 class TiXmlDocument;
@@ -31,7 +31,7 @@ private:
 	std::string m_directory;
 	BSPGameWorld* m_world;
 	std::map<std::string, Model> m_items;
-	std::vector<TiXmlDocument*> m_modelDocs;
+	Vector<TiXmlDocument*> m_modelDocs;
 };
 
 END_NS

@@ -99,7 +99,7 @@ GamePackage* DefaultGMGamePackageHandler::gamePackage()
 	return m_pk;
 }
 
-std::vector<std::string> DefaultGMGamePackageHandler::getAllFiles(const char* directory)
+Vector<std::string> DefaultGMGamePackageHandler::getAllFiles(const char* directory)
 {
 	return Path::getAllFiles(directory);
 }
@@ -219,9 +219,9 @@ void ZipGMGamePackageHandler::releaseBuffers()
 	}
 }
 
-std::vector<std::string> ZipGMGamePackageHandler::getAllFiles(const char* directory)
+Vector<std::string> ZipGMGamePackageHandler::getAllFiles(const char* directory)
 {
-	std::vector<std::string> result;
+	Vector<std::string> result;
 	std::string d = directory;
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{

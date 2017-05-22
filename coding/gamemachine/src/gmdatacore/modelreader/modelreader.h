@@ -1,7 +1,7 @@
 ﻿#ifndef __MODELREADER_H__
 #define __MODELREADER_H__
 #include "common.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 BEGIN_NS
 
 class Object;
@@ -26,8 +26,8 @@ class GamePackage;
 struct ModelLoadSettings
 {
 	GamePackage& gamePackage;
-	const vmath::vec3& extents;
-	const vmath::vec3& position;
+	const linear_math::Vector3& extents;
+	const linear_math::Vector3& position;
 	const char* path;
 	const char* modelName;
 };

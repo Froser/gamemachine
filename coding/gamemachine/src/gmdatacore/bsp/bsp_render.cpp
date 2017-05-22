@@ -269,14 +269,14 @@ void BSPRender::generateLeafs()
 		d.leafs[i].numFaces = d.bsp->leafs[i].numLeafSurfaces;
 
 		//Create the bounding box
-		d.leafs[i].boundingBoxVertices[0] = vmath::vec3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[1] = vmath::vec3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].maxs[1]);
-		d.leafs[i].boundingBoxVertices[2] = vmath::vec3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[3] = vmath::vec3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].maxs[1]);
-		d.leafs[i].boundingBoxVertices[4] = vmath::vec3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[5] = vmath::vec3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].maxs[1]);
-		d.leafs[i].boundingBoxVertices[6] = vmath::vec3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[7] = vmath::vec3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].maxs[1]);
+		d.leafs[i].boundingBoxVertices[0] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].mins[1]);
+		d.leafs[i].boundingBoxVertices[1] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].maxs[1]);
+		d.leafs[i].boundingBoxVertices[2] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].mins[1]);
+		d.leafs[i].boundingBoxVertices[3] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].maxs[1]);
+		d.leafs[i].boundingBoxVertices[4] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].mins[1]);
+		d.leafs[i].boundingBoxVertices[5] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].maxs[1]);
+		d.leafs[i].boundingBoxVertices[6] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].mins[1]);
+		d.leafs[i].boundingBoxVertices[7] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].maxs[1]);
 
 		// for (int j = 0; j < 8; ++j)
 		// 	d.leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
@@ -321,10 +321,10 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 			
 			GMint idx_prev = d.bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
 			GMint idx_next = d.bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
-			vmath::vec3& vertex_prev = d.vertices[face.firstVertex + idx_prev].position,
+			linear_math::Vector3& vertex_prev = d.vertices[face.firstVertex + idx_prev].position,
 				&vertex_next = d.vertices[face.firstVertex + idx_next].position;
-			vmath::vec3 normal = vmath::cross(vertex.position - vertex_prev, vertex_next - vertex.position);
-			normal = vmath::normalize(normal);
+			linear_math::Vector3 normal = linear_math::cross(vertex.position - vertex_prev, vertex_next - vertex.position);
+			normal = linear_math::normalize(normal);
 
 			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 			component->normal(normal[0], normal[1], normal[2]);
@@ -354,7 +354,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	{
 		component->beginFace();
 		GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
-		vmath::vec3 normal;
+		linear_math::Vector3 normal;
 		for (int i = 0; i < numVertices; i++)
 		{
 			GMint idx = *(idxStart + i);
@@ -368,9 +368,9 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 				if (i & 1) //奇数点应该调换一下前后向量，最后再改变法线方向
 					SWAP(idx_prev, idx_next);
 
-				vmath::vec3& vertex_prev = biqp.vertices[idx_prev].position,
+				linear_math::Vector3& vertex_prev = biqp.vertices[idx_prev].position,
 					&vertex_next = biqp.vertices[idx_next].position;
-				normal = -vmath::normalize(vmath::cross(vertex.position - vertex_prev, vertex_next - vertex.position));
+				normal = -linear_math::normalize(linear_math::cross(vertex.position - vertex_prev, vertex_next - vertex.position));
 			}
 			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
 			component->normal(normal[0], normal[1], normal[2]);
@@ -385,7 +385,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	*obj = coreObj;
 }
 
-void BSPRender::createBox(const vmath::vec3& extents, const vmath::vec3& position, const Shader& shader, OUT Object** obj)
+void BSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,
@@ -425,7 +425,7 @@ void BSPRender::createBox(const vmath::vec3& extents, const vmath::vec3& positio
 	Component* component = new Component(child);
 	component->getShader() = shader;
 
-	vmath::vec3 normal;
+	linear_math::Vector3 normal;
 	for (int i = 0; i < 12; i++)
 	{
 		component->beginFace();
@@ -434,11 +434,11 @@ void BSPRender::createBox(const vmath::vec3& extents, const vmath::vec3& positio
 			GMint idx = i * 3 + j; //顶点的开始
 			GMint idx_next = i * 3 + (j + 1) % 3;
 			GMint idx_prev = i * 3 + (j + 2) % 3;
-			vmath::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-			vmath::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+			linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+			linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 				vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-			vmath::vec3 normal = vmath::cross(vertex - vertex_prev, vertex_next - vertex);
-			normal = vmath::normalize(normal);
+			linear_math::Vector3 normal = linear_math::cross(vertex - vertex_prev, vertex_next - vertex);
+			normal = linear_math::normalize(normal);
 
 			component->vertex(vertex[0], vertex[1], vertex[2]);
 			component->normal(normal[0], normal[1], normal[2]);

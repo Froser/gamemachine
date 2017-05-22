@@ -82,8 +82,8 @@ END_NS
 //Tools:
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
-#define RAD(deg) deg * PI / 180
-#define DEG(rad) rad * 180 / PI
+#define RAD(deg) deg * (PI / 180)
+#define DEG(rad) rad * (180 / PI)
 #define SQR(a) ((a) * (a))
 #define strEqual(str1, str2) !strcmp(str1, str2)
 #define SAFE_SSCANF(in, format, out)	\
@@ -96,11 +96,15 @@ END_NS
 
 #ifdef _MSC_VER
 #define USE_SIMD 1
-#define GM_SIMD_float __declspec(align(16)) GMfloat
+#define GM_ALIGNED_16 __declspec(align(16))
+#define GM_SIMD_float GM_ALIGNED_16 GMfloat
 #define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
 #define simd_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
+#define simd_zeroMask (_mm_set_ps(-0.0f, -0.0f, -0.0f, -0.0f))
+#define simd_FFF0Mask (_mm_set_epi32(0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF))
 #else
 #define USE_SIMD 0
+#define GM_ALIGNED_16
 #endif
 
 // 平台差异

@@ -1,8 +1,8 @@
 ﻿#ifndef __UTILITIES_H__
 #define __UTILITIES_H__
 #include "common.h"
-#include "vmath.h"
-#include <vector>
+#include "linearmath.h"
+#include "utilities/vector.h"
 #include "utilities/assert.h"
 BEGIN_NS
 
@@ -353,9 +353,9 @@ enum PointPosition
 
 struct Plane
 {
-	Plane() : normal(vmath::vec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
+	Plane() : normal(linear_math::Vector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{}
-	Plane(const vmath::vec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
+	Plane(const linear_math::Vector3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
 	{}
 	Plane(const Plane & rhs)
 	{
@@ -365,22 +365,22 @@ struct Plane
 
 	~Plane() {}
 
-	void setNormal(const vmath::vec3 & rhs) { normal = rhs; }
+	void setNormal(const linear_math::Vector3 & rhs) { normal = rhs; }
 	void setIntercept(GMfloat newIntercept) { intercept = newIntercept; }
-	void setFromPoints(const vmath::vec3 & p0, const vmath::vec3 & p1, const vmath::vec3 & p2);
+	void setFromPoints(const linear_math::Vector3 & p0, const linear_math::Vector3 & p1, const linear_math::Vector3 & p2);
 
-	void calculateIntercept(const vmath::vec3 & pointOnPlane) { intercept = -vmath::dot(normal, pointOnPlane); }
+	void calculateIntercept(const linear_math::Vector3 & pointOnPlane) { intercept = -linear_math::dot(normal, pointOnPlane); }
 
 	void normalize(void);
 
-	vmath::vec3 getNormal() { return normal; }
+	linear_math::Vector3 getNormal() { return normal; }
 	GMfloat getIntercept() { return intercept; }
 
 	//find point of intersection of 3 planes
-	bool intersect3(const Plane & p2, const Plane & p3, vmath::vec3 & result);
+	bool intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 & result);
 
-	GMfloat getDistance(const vmath::vec3 & point) const;
-	PointPosition classifyPoint(const vmath::vec3 & point) const;
+	GMfloat getDistance(const linear_math::Vector3 & point) const;
+	PointPosition classifyPoint(const linear_math::Vector3 & point) const;
 
 	Plane lerp(const Plane & p2, GMfloat factor);
 
@@ -396,7 +396,7 @@ struct Plane
 	Plane operator+(void) const { return (*this); }
 
 	//member variables
-	vmath::vec3 normal;	//X.N+intercept=0
+	linear_math::Vector3 normal;	//X.N+intercept=0
 	GMfloat intercept;
 };
 
@@ -409,10 +409,10 @@ public:
 
 public:
 	void update();
-	bool isPointInside(const vmath::vec3& point);
-	bool isBoundingBoxInside(const vmath::vec3* vertices);
-	vmath::mat4 getPerspective();
-	void updateViewMatrix(vmath::mat4& viewMatrix, vmath::mat4& projMatrix);
+	bool isPointInside(const linear_math::Vector3& point);
+	bool isBoundingBoxInside(const linear_math::Vector3* vertices);
+	linear_math::Matrix4x4 getPerspective();
+	void updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix);
 
 private:
 	Plane planes[6];
@@ -420,8 +420,8 @@ private:
 	GMfloat m_aspect;
 	GMfloat m_n;
 	GMfloat m_f;
-	vmath::mat4 m_viewMatrix;
-	vmath::mat4 m_projMatrix;
+	linear_math::Matrix4x4 m_viewMatrix;
+	linear_math::Matrix4x4 m_projMatrix;
 };
 
 //Scanner
@@ -507,21 +507,21 @@ protected:
 
 struct CameraLookAt
 {
-	vmath::vec3 lookAt;
-	vmath::vec3 position;
+	linear_math::Vector3 lookAt;
+	linear_math::Vector3 position;
 };
 
 struct PositionState
 {
 	GMfloat yaw;
 	GMfloat pitch;
-	vmath::vec3 position;
+	linear_math::Vector3 position;
 	GMfloat pitchLimitRad;
 };
 
-inline vmath::mat4 getViewMatrix(const CameraLookAt& lookAt)
+inline linear_math::Matrix4x4 getViewMatrix(const CameraLookAt& lookAt)
 {
-	return vmath::lookat(lookAt.position, lookAt.lookAt + lookAt.position, vmath::vec3(0, 1, 0));
+	return linear_math::lookat(lookAt.position, lookAt.lookAt + lookAt.position, linear_math::Vector3(0, 1, 0));
 }
 
 class Camera
@@ -536,7 +536,7 @@ struct Path
 	static std::string directoryName(const std::string& fileName);
 	static std::string filename(const std::string& fullPath);
 	static std::string getCurrentPath();
-	static std::vector<std::string> getAllFiles(const char* directory);
+	static Vector<std::string> getAllFiles(const char* directory);
 	static bool directoryExists(const std::string& dir);
 	static void createDirectory(const std::string& dir);
 };

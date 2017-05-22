@@ -26,7 +26,7 @@ class GMGLRenders_Object : public IRender
 public:
 	virtual void begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform) override;
 	virtual void beginShader(Shader& shader) override;
-	virtual void updateVPMatrices(const vmath::mat4& projection, const vmath::mat4& view, const CameraLookAt& lookAt) override;
+	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;
 	virtual void end() override;
 

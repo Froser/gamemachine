@@ -2,13 +2,14 @@
 #define __PHYSICSSTRUCTS_H__
 #include "common.h"
 #include <map>
-#include <vector>
-#include "utilities/vmath.h"
+#include "utilities/vector.h"
+#include "utilities/linearmath.h"
+#include "utilities/vector.h"
 BEGIN_NS
 
 typedef GMint Command;
 
-typedef std::map<Command, std::vector<vmath::vec3> > CommandParams;
+typedef std::map<Command, AlignedVector<linear_math::Vector3> > CommandParams;
 
 #define USELESS_PARAM 0
 #define CMD_NONE 0x0000
@@ -19,14 +20,14 @@ class GameObject;
 struct ShapeProperties
 {
 	GMfloat stepHeight;
-	vmath::vec3 bounding[2]; //最小边界和最大边界
+	linear_math::Vector3 bounding[2]; //最小边界和最大边界
 };
 
 struct MotionProperties
 {
-	vmath::vec3 translation;
-	vmath::vec3 velocity;
-	vmath::vec3 jumpSpeed;
+	linear_math::Vector3 translation;
+	linear_math::Vector3 velocity;
+	linear_math::Vector3 jumpSpeed;
 	GMfloat moveSpeed;
 };
 

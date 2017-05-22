@@ -131,7 +131,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-GMint BSPGameWorld::calculateLeafNode(const vmath::vec3& position)
+GMint BSPGameWorld::calculateLeafNode(const linear_math::Vector3& position)
 {
 	D(d);
 	BSPData& bsp = d.bsp.bspData();
@@ -402,7 +402,7 @@ void BSPGameWorld::drawEntity(GMint leafId)
 void BSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
-	std::vector<GameObject*>& objs = d.render.renderData().alwaysVisibleObjects;
+	Vector<GameObject*>& objs = d.render.renderData().alwaysVisibleObjects;
 	for (auto iter = objs.begin(); iter != objs.end(); iter++)
 	{
 		(*iter)->getReadyForRender(d.drawingList);

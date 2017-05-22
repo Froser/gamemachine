@@ -3,7 +3,7 @@
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmglfunc.h"
 
-void GMGLRenders_Glyph::updateVPMatrices(const vmath::mat4& projection, const vmath::mat4& view, const CameraLookAt& lookAt)
+void GMGLRenders_Glyph::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
 	GMGL::cameraPosition(lookAt, *d.gmglShaders, GMSHADER_VIEW_POSITION);

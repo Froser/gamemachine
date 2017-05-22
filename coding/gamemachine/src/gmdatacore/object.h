@@ -1,11 +1,11 @@
 ﻿#ifndef __OBJSTRUCT_H__
 #define __OBJSTRUCT_H__
 #include "common.h"
-#include <vector>
+#include "utilities/vector.h"
 #include "image.h"
 #include "utilities/assert.h"
 #include "utilities/utilities.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "gmdatacore/texture.h"
 #include "shader.h"
 
@@ -83,11 +83,11 @@ private:
 	Shader m_shader;
 
 	// 图元顶点数量
-	std::vector<GMint> m_primitiveVertices;
+	Vector<GMint> m_primitiveVertices;
 	// 绘制图元数量
 	GMuint m_primitiveCount;
 	// 顶点在ChildObject的偏移
-	std::vector<GMint> m_vertexOffsets;
+	Vector<GMint> m_vertexOffsets;
 
 	ChildObject* m_parent;
 	GMuint m_currentFaceVerticesCount;
@@ -112,7 +112,7 @@ public:
 		return m_painter;
 	}
 
-	std::vector<ChildObject*>& getChildObjects()
+	Vector<ChildObject*>& getChildObjects()
 	{
 		return m_objects;
 	}
@@ -124,7 +124,7 @@ public:
 
 private:
 	AutoPtr<ObjectPainter> m_painter;
-	std::vector<ChildObject*> m_objects;
+	Vector<ChildObject*> m_objects;
 };
 
 class ChildObject
@@ -162,37 +162,37 @@ public:
 
 	void calculateTangentSpace();
 
-	std::vector<AUTORELEASE Component*>& getComponents()
+	Vector<AUTORELEASE Component*>& getComponents()
 	{
 		return m_components;
 	}
 
-	std::vector<Object::DataType>& vertices()
+	Vector<Object::DataType>& vertices()
 	{
 		return m_vertices;
 	}
 
-	std::vector<Object::DataType>& normals()
+	Vector<Object::DataType>& normals()
 	{
 		return m_normals;
 	}
 
-	std::vector<Object::DataType>& uvs()
+	Vector<Object::DataType>& uvs()
 	{
 		return m_uvs;
 	}
 
-	std::vector<Object::DataType>& tangents()
+	Vector<Object::DataType>& tangents()
 	{
 		return m_tangents;
 	}
 
-	std::vector<Object::DataType>& bitangents()
+	Vector<Object::DataType>& bitangents()
 	{
 		return m_bitangents;
 	}
 
-	std::vector<Object::DataType>& lightmaps()
+	Vector<Object::DataType>& lightmaps()
 	{
 		return m_lightmaps;
 	}
@@ -233,15 +233,15 @@ public:
 	void setArrayId(GMuint id) { m_arrayId = id; }
 
 private:
-	std::vector<Object::DataType> m_vertices;
-	std::vector<Object::DataType> m_normals;
-	std::vector<Object::DataType> m_uvs;
-	std::vector<Object::DataType> m_tangents;
-	std::vector<Object::DataType> m_bitangents;
-	std::vector<Object::DataType> m_lightmaps;
+	Vector<Object::DataType> m_vertices;
+	Vector<Object::DataType> m_normals;
+	Vector<Object::DataType> m_uvs;
+	Vector<Object::DataType> m_tangents;
+	Vector<Object::DataType> m_bitangents;
+	Vector<Object::DataType> m_lightmaps;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
-	std::vector<Component*> m_components;
+	Vector<Component*> m_components;
 	ObjectType m_type;
 	ArrangementMode m_mode;
 	std::string m_name;

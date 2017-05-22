@@ -1,7 +1,7 @@
 ﻿#ifndef __PHYSICSWORLD_PRIVATE_H__
 #define __PHYSICSWORLD_PRIVATE_H__
 #include "common.h"
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include "physicsstructs.h"
 BEGIN_NS
 

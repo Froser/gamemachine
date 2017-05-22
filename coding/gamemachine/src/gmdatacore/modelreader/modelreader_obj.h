@@ -2,18 +2,18 @@
 #define __MODELREADER_OBJ_H__
 #include "common.h"
 #include "modelreader.h"
-#include <vector>
-#include "utilities/vmath.h"
+#include "utilities/linearmath.h"
 #include <map>
+#include "utilities/vector.h"
 
 BEGIN_NS
 
 struct ModelReader_Obj_Material
 {
 	GMfloat ns;
-	vmath::vec3 kd;
-	vmath::vec3 ka;
-	vmath::vec3 ks;
+	linear_math::Vector3 kd;
+	linear_math::Vector3 ka;
+	linear_math::Vector3 ks;
 };
 
 class Object;
@@ -24,9 +24,9 @@ struct Shader;
 struct ModelReader_ObjPrivate
 {
 	Object* object;
-	std::vector<vmath::vec3> vertices;
-	std::vector<vmath::vec3> normals;
-	std::vector<vmath::vec2> textures;
+	AlignedVector<linear_math::Vector3> vertices;
+	AlignedVector<linear_math::Vector3> normals;
+	AlignedVector<linear_math::Vector2> textures;
 	std::map<std::string, ModelReader_Obj_Material> materials;
 	std::string currentMaterialName;
 	Component* currentComponent;
