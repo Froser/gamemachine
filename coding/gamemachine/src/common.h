@@ -97,7 +97,6 @@ END_NS
 #ifdef _MSC_VER
 #define USE_SIMD 1
 #define GM_ALIGNED_16 __declspec(align(16))
-#define GM_SIMD_float GM_ALIGNED_16 GMfloat
 #define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
 #define simd_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
 #define simd_zeroMask (_mm_set_ps(-0.0f, -0.0f, -0.0f, -0.0f))

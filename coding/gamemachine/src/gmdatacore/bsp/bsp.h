@@ -168,7 +168,7 @@ typedef struct {
 #define	MAXTOKEN 1024
 #define	MAX_INCLUDES	8
 
-struct BSPLightVolumes
+struct GM_ALIGNED_16 BSPLightVolumes
 {
 	linear_math::Vector3 lightVolOrigin;
 	linear_math::Vector3 lightVolSize;

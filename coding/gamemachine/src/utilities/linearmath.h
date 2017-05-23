@@ -8,166 +8,338 @@ BEGIN_NS
 
 namespace linear_math
 {
-	template <GMint L>
-	class GM_ALIGNED_16 VectorBase
+	template <typename T>
+	struct _no_sse
 	{
-	public:
-		enum { dimension = L };
+		typedef T ReturnType;
 
-	public:
-		VectorBase()
+		static ReturnType negate(const ReturnType& left)
 		{
-			static_assert(L <= 4, "dimension must be less than or equal to 4");
-#if USE_SIMD
-			m_vec128.m128_u64[0] = 0;
-			m_vec128.m128_u64[1] = 0;
-#else
-			memset(m_data, 0, sizeof(m_data));
-#endif
+			ReturnType result;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = -left[n];
+			return result;
 		}
 
-#if USE_SIMD
-		VectorBase(__m128 vec128)
-			: m_vec128(vec128)
+		static ReturnType add(const ReturnType& left, const ReturnType& right)
 		{
+			ReturnType result;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = left[n] + right[n];
+			return result;
 		}
 
-		inline __m128 m128() const
+		static ReturnType sub(const ReturnType& left, const ReturnType& right)
 		{
-			return m_vec128;
+			ReturnType result;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = left[n] - right[n];
+			return result;
 		}
 
-		inline void set_m128(__m128 i)
+		static ReturnType mul(const ReturnType& left, GMfloat right)
 		{
-			m_vec128 = i;
+			ReturnType result;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = left[n] * right;
+			return result;
 		}
-#endif
 
-	public:
-		VectorBase& operator = (const VectorBase& right)
+		static ReturnType div(const ReturnType& left, GMfloat right)
 		{
-#if USE_SIMD
-			m_vec128 = right.m_vec128;
-#else
-			for (GMint i = 0; i < L; i++)
-			{
-				m_data[i] = right[i];
-			}
-#endif
+			ReturnType result;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = left[n] / right;
+			return result;
+		}
+
+		static ReturnType div(GMfloat left, const ReturnType& right)
+		{
+			ReturnType result;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = left / right[n];
+			return result;
+		}
+
+		static ReturnType& self_add(ReturnType& left, GMfloat right)
+		{
+			for (int n = 0; n < ReturnType::dimension; n++)
+				left[n] += right;
 			return *this;
 		}
 
-		VectorBase operator+(const VectorBase& right) const
+		static ReturnType& self_add(ReturnType& left, const ReturnType& right)
 		{
-			VectorBase result;
-			for (int n = 0; n < L; n++)
-				result[n] = m_data[n] + right[n];
-			return result;
-		}
-
-		VectorBase operator-(const VectorBase& right) const
-		{
-			VectorBase result;
-			for (int n = 0; n < L; n++)
-				result[n] = m_data[n] - right[n];
-			return result;
-		}
-
-		VectorBase operator*(GMfloat i) const
-		{
-			VectorBase result;
-			for (int n = 0; n < L; n++)
-				result[n] = m_data[n] * i;
-			return result;
-		}
-
-		VectorBase operator/(GMfloat i) const
-		{
-			VectorBase result;
-			for (int n = 0; n < L; n++)
-				result[n] = m_data[n] / i;
-			return result;
-		}
-
-		VectorBase& operator*=(GMfloat i)
-		{
-			for (int n = 0; n < L; n++)
-				m_data[n] *= i;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				left[n] += right[i];
 			return *this;
 		}
 
-		VectorBase& operator/=(GMfloat i)
+		static ReturnType& self_sub(ReturnType& left, GMfloat i)
 		{
-			for (int n = 0; n < L; n++)
-				m_data[n] /= i;
+			for (int n = 0; n < ReturnType::dimension; n++)
+				left[n] -= i;
 			return *this;
 		}
 
-		GMfloat& operator [](GMint i)
+		static ReturnType& self_sub(ReturnType& left, const ReturnType& right)
 		{
-			return m_data[i];
+			for (int n = 0; n < ReturnType::dimension; n++)
+				left[n] -= right[i];
+			return *this;
 		}
 
-		const GMfloat& operator [](GMint i) const
+		static ReturnType& self_mul(ReturnType& left, GMfloat i)
 		{
-			return m_data[i];
+			for (int n = 0; n < ReturnType::dimension; n++)
+				left[n] *= i;
+			return *this;
 		}
 
-	protected:
-		inline void assign(const VectorBase& that)
+		static ReturnType& self_div(ReturnType& left, GMfloat i)
 		{
-#if USE_SIMD
-			m_vec128 = that.m_vec128;
-#else
-			for (GMint n = 0; n < L; n++)
-				data[n] = that.data[n];
-#endif
+			for (int n = 0; n < ReturnType::dimension; n++)
+				left[n] /= i;
+			return *this;
 		}
-
-	protected:
-		union
-		{
-			GMfloat m_data[L];
-#if USE_SIMD
-			__m128 m_vec128;
-#endif
-		};
 	};
 
-	class Vector2 : public VectorBase<2>
+#if USE_SIMD
+	template <typename T>
+	struct _sse
 	{
-		typedef VectorBase<2> Base;
+		typedef T ReturnType;
+
+		static ReturnType negate(const ReturnType& left)
+		{
+			ReturnType result;
+			//TODO 可以优化
+			for (int n = 0; n < ReturnType::dimension; n++)
+				result[n] = -left[n];
+			return result;
+		}
+
+		static ReturnType add(const ReturnType& left, const ReturnType& right)
+		{
+			return ReturnType(_mm_add_ps(left.get128(), right.get128()));
+		}
+
+		static ReturnType sub(const ReturnType& left, const ReturnType& right)
+		{
+			return ReturnType(_mm_sub_ps(left.get128(), right.get128()));
+		}
+
+		static ReturnType mul(const ReturnType& left, GMfloat right)
+		{
+			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
+			__m128 __right = _mm_load_ps(_right);
+			return ReturnType(_mm_mul_ps(left.get128(), __right));
+		}
+
+		static ReturnType div(const ReturnType& left, GMfloat right)
+		{
+			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
+			__m128 __right = _mm_load_ps(_right);
+			return ReturnType(_mm_div_ps(left.get128(), __right));
+		}
+
+		static ReturnType div(GMfloat left, const ReturnType& right)
+		{
+			GM_ALIGNED_16 GMfloat _left[] = { left,left,left,left };
+			__m128 __left = _mm_load_ps(_left);
+			return ReturnType(_mm_div_ps(__left, right.get128()));
+		}
+
+		static ReturnType& self_add(ReturnType& left, GMfloat right)
+		{
+			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
+			__m128 __right = _mm_load_ps(_right);
+			left.set128(_mm_add_ps(left.get128(), __right));
+			return left;
+		}
+
+		static ReturnType& self_add(ReturnType& left, const ReturnType& right)
+		{
+			left.set128(_mm_add_ps(left.get128(), right.get128()));
+			return left;
+		}
+
+		static ReturnType& self_sub(ReturnType& left, GMfloat right)
+		{
+			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
+			__m128 __right = _mm_load_ps(_right);
+			left.set128(_mm_sub_ps(left.get128(), __right));
+			return left;
+		}
+
+		static ReturnType& self_sub(ReturnType& left, const ReturnType& right)
+		{
+			left.set128(_mm_sub_ps(left.get128(), right.get128()));
+			return left;
+		}
+
+		static ReturnType& self_mul(ReturnType& left, GMfloat right)
+		{
+			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
+			__m128 __right = _mm_load_ps(_right);
+			left.set128(_mm_mul_ps(left.get128(), __right));
+			return left;
+		}
+
+		static ReturnType& self_div(ReturnType& left, GMfloat right)
+		{
+			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
+			__m128 __right = _mm_load_ps(_right);
+			left.set128(_mm_div_ps(left.get128(), __right));
+			return left;
+		}
+	};
+#endif
+
+	template <typename T>
+	struct _op_selector
+	{
+#if USE_SIMD
+		typedef _sse<T> Op;
+#else
+		typedef _no_sse<T> Op;
+#endif
+	};
+
+	// Operators
+	template <typename T>
+	static inline T operator - (const T& left)
+	{
+		return _op_selector<T>::Op::negate(left);
+	}
+
+	template <typename T>
+	static inline T operator + (const T& left, const T& right)
+	{
+		return _op_selector<T>::Op::add(left, right);
+	}
+
+	template <typename T>
+	static inline T operator - (const T& left, const T& right)
+	{
+		return _op_selector<T>::Op::sub(left, right);
+	}
+
+	template <typename T>
+	static inline T operator * (const T& left, GMfloat right)
+	{
+		return _op_selector<T>::Op::mul(left, right);
+	}
+
+	template <typename T>
+	static inline T operator * (GMfloat a, const T& b)
+	{
+		return _op_selector<T>::Op::mul(b, a);
+	}
+
+	template <typename T>
+	static inline T operator / (const T& left, GMfloat right)
+	{
+		return _op_selector<T>::Op::div(left, right);
+	}
+
+	template <typename T>
+	static inline T operator / (GMfloat left, const T& right)
+	{
+		return _op_selector<T>::Op::div(left, right);
+	}
+
+	template <typename T>
+	static inline T& operator += (T& left, const T& right)
+	{
+		return _op_selector<T>::Op::self_add(left, right);
+	}
+
+	template <typename T>
+	static inline T& operator += (T& left, GMfloat right)
+	{
+		return _op_selector<T>::Op::self_add(left, right);
+	}
+
+	template <typename T>
+	static inline T& operator -= (T& left, GMfloat right)
+	{
+		return _op_selector<T>::Op::self_sub(left, right);
+	}
+
+	template <typename T>
+	static inline T& operator *= (T& left, GMfloat right)
+	{
+		return _op_selector<T>::Op::self_mul(left, right);
+	}
+
+	template <typename T>
+	static inline T& operator /= (T& left, GMfloat right)
+	{
+		return _op_selector<T>::Op::self_div(left, right);
+	}
+
+
+#if USE_SIMD
+#define DEFINE_VECTOR_DATA(l)					\
+	public:										\
+	enum { dimension = l };						\
+	__m128 get128() const { return m_128; }		\
+	void set128(__m128 _128) { m_128 = _128; }	\
+												\
+	protected:									\
+		union									\
+		{										\
+			GMfloat m_data[l];					\
+			__m128 m_128;						\
+		};
+#else
+#define DEFINE_VECTOR_DATA(l)					\
+	protected:									\
+		GMfloat m_data[l];
+#endif
+
+	class Vector2
+	{
+		DEFINE_VECTOR_DATA(2)
 
 	public:
+#if USE_SIMD
+		Vector2(__m128 _128) : m_128(_128) {};
+#endif
 		Vector2() {}
 		Vector2(GMfloat x, GMfloat y)
 		{
 			m_data[0] = x;
 			m_data[1] = y;
 		}
-		Vector2(const Base& right)
+
+		Vector2(const Vector2& right)
 		{
 #if USE_SIMD
-			m_vec128 = right.m128();
+			m_128 = right.m_128;
 #else
 			m_data[0] = right[0];
 			m_data[1] = right[1];
 #endif
 		}
+
+	public:
+		GMfloat& operator [](GMint i);
+		const GMfloat& operator [](GMint i) const;
 	};
 
-	class GM_ALIGNED_16 Vector3 : public VectorBase<3>
+	class GM_ALIGNED_16 Vector3
 	{
-		typedef VectorBase<3> Base;
+		DEFINE_VECTOR_DATA(3)
 
 	public:
 #if USE_SIMD
-		Vector3(__m128 vec128) : Base(vec128) {}
+		Vector3(__m128 _128) : m_128(_128) {};
 #endif
+		Vector3() {}
 
-		Vector3() : Base() {}
 		Vector3(GMfloat x, GMfloat y, GMfloat z)
-			: Base()
 		{
 			m_data[0] = x;
 			m_data[1] = y;
@@ -175,39 +347,40 @@ namespace linear_math
 		}
 
 		Vector3(GMfloat x)
-			: Base()
 		{
 			m_data[0] = x;
 			m_data[1] = x;
 			m_data[2] = x;
 		}
 
+		Vector3(const Vector3& right)
+		{
+#if USE_SIMD
+			m_128 = right.m_128;
+#else
+			m_data[0] = right[0];
+			m_data[1] = right[1];
+			m_data[2] = right[2];
+#endif
+		}
+
 	public:
-		Vector3 operator - () const;
-		Vector3 operator + (const Vector3& right) const;
-		Vector3 operator - (const Vector3& right) const;
-		Vector3 operator * (GMfloat right) const;
-		Vector3 operator / (GMfloat right) const;
-		Vector3& operator += (const Vector3& right);
-		Vector3& operator += (GMfloat right);
-		Vector3& operator -= (GMfloat right);
-		Vector3& operator *= (GMfloat right);
-		Vector3& operator /= (GMfloat right);
+		GMfloat& operator [](GMint i);
+		const GMfloat& operator [](GMint i) const;
 	};
 
-	class GM_ALIGNED_16 Vector4 : public VectorBase<4>
+	class GM_ALIGNED_16 Vector4
 	{
-		typedef VectorBase<4> Base;
+		DEFINE_VECTOR_DATA(4)
 
 	public:
 #if USE_SIMD
-		Vector4(__m128 vec128) : Base(vec128) {};
+		Vector4(__m128 _128) : m_128(_128) {};
 #endif
 
-		Vector4() : Base() {}
+		Vector4() {}
 
 		Vector4(GMfloat i)
-			: Base()
 		{
 			m_data[0] = i;
 			m_data[1] = i;
@@ -216,7 +389,6 @@ namespace linear_math
 		}
 
 		Vector4(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
-			: Base()
 		{
 			m_data[0] = x;
 			m_data[1] = y;
@@ -225,7 +397,6 @@ namespace linear_math
 		}
 
 		Vector4(const Vector3& v, GMfloat w)
-			: Base()
 		{
 			m_data[0] = v[0];
 			m_data[1] = v[1];
@@ -233,14 +404,21 @@ namespace linear_math
 			m_data[3] = w;
 		}
 
+		Vector4(const Vector4& right)
+		{
+#if USE_SIMD
+			m_128 = right.m_128;
+#else
+			m_data[0] = right[0];
+			m_data[1] = right[1];
+			m_data[2] = right[2];
+			m_data[3] = right[3];
+#endif
+		}
+
 	public:
-		Vector4 operator - () const;
-		Vector4 operator + (const Vector4& right) const;
-		Vector4 operator - (const Vector4& right) const;
-		Vector4 operator * (GMfloat right) const;
-		Vector4 operator / (GMfloat right) const;
-		Vector4& operator *= (GMfloat right);
-		Vector4& operator /= (GMfloat right);
+		GMfloat& operator [](GMint i);
+		const GMfloat& operator [](GMint i) const;
 	};
 
 	class GM_ALIGNED_16 Matrix4x4
@@ -269,50 +447,15 @@ namespace linear_math
 		Vector4 m_data[4];
 	};
 
-// Operators
-	static inline Vector3 operator* (GMfloat left, const Vector3& right)
-	{
-		return right * left;
-	}
-
-	static inline Vector3 operator/ (GMfloat left, const Vector3& right)
-	{
-#if USE_SIMD
-		GM_SIMD_float _left[] = { left, left, left, 0 };
-		__m128 __left = _mm_load_ps(_left);
-		__m128 __result = _mm_div_ps(__left, right.m128());
-		return Vector3(__result);
-#else
-		return typename T::Base::operator +(right);
-#endif
-	}
-
-	static inline Vector4 operator* (GMfloat left, const Vector4& right)
-	{
-		return right * left;
-	}
-
-	static inline Vector4 operator/ (GMfloat left, const Vector4& right)
-	{
-#if USE_SIMD
-		GM_SIMD_float _left[] = { left, left, left, left };
-		__m128 __left = _mm_load_ps(_left);
-		__m128 __result = _mm_div_ps(__left, right.m128());
-		return Vector4(__result);
-#else
-		return typename T::Base::operator +(right);
-#endif
-	}
-
 	static inline Vector4 operator* (const Vector4& left, const Matrix4x4& right)
 	{
 #if USE_SIMD
 		__m128 __result;
-		__m128	__v = left.m128();
-		__m128	__row0 = right[0].m128(),
-			__row1 = right[1].m128(),
-			__row2 = right[2].m128(),
-			__row3 = right[3].m128();
+		__m128	__v = left.get128();
+		__m128	__row0 = right[0].get128(),
+			__row1 = right[1].get128(),
+			__row2 = right[2].get128(),
+			__row3 = right[3].get128();
 		__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(0, 0, 0, 0)), __row0),
 			__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(1, 1, 1, 1)), __row1),
 			__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(2, 2, 2, 2)), __row2),
@@ -350,7 +493,7 @@ namespace linear_math
 	static inline GMfloat dot(const T& left, const T& right)
 	{
 #if USE_SIMD
-		__m128 vd = _mm_mul_ps(left.m128(), right.m128());
+		__m128 vd = _mm_mul_ps(left.get128(), right.get128());
 		__m128 z = _mm_movehl_ps(vd, vd);
 		__m128 y = _mm_shuffle_ps(vd, vd, 0x55);
 		vd = _mm_add_ss(vd, y);
@@ -369,7 +512,7 @@ namespace linear_math
 	static inline Vector3 cross(const Vector3& left, const Vector3& right)
 	{
 #if USE_SIMD
-		GM_SIMD_float t0[] = { left[1],  left[2],  left[0],  0 },
+		GM_ALIGNED_16 GMfloat t0[] = { left[1],  left[2],  left[0],  0 },
 			t1[] = { right[2], right[0], right[1], 0 },
 			t2[] = { left[2],  left[0],  left[1],  0 },
 			t3[] = { right[1], right[2], right[0], 0 };
@@ -400,7 +543,7 @@ namespace linear_math
 
 	static inline GMfloat fast_length(const Vector3& left)
 	{
-		return 1.f / (float)fastInvSqrt(lengthSquare(left));
+		return 1.f / (GMfloat)fastInvSqrt(lengthSquare(left));
 	}
 
 	static inline Vector3 normalize(const Vector3& left)
@@ -500,7 +643,7 @@ namespace linear_math
 	static inline bool equals(const Vector4& left, const Vector4& right)
 	{
 #if USE_SIMD
-		return left.m128().m128_f32 == right.m128().m128_f32;
+		return left.get128().m128_f32 == right.get128().m128_f32;
 #else
 		for (int i = 0; i < 4; i++)
 		{

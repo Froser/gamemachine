@@ -19,8 +19,8 @@ typedef std::map<Command, AlignedVector<linear_math::Vector3> > CommandParams;
 class GameObject;
 struct ShapeProperties
 {
-	GMfloat stepHeight;
 	linear_math::Vector3 bounding[2]; //最小边界和最大边界
+	GMfloat stepHeight;
 };
 
 struct MotionProperties
@@ -33,9 +33,9 @@ struct MotionProperties
 
 struct CollisionObject
 {
-	GameObject* object;
 	MotionProperties motions;
 	ShapeProperties shapeProps;
+	GameObject* object;
 };
 
 END_NS
