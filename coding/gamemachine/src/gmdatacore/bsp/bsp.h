@@ -248,6 +248,12 @@ public:
 	BSPData& bspData();
 
 private:
+	void loadPlanes();
+	void loadVertices();
+	void loadDrawSurfaces();
+	void loadNoAlignData();
+
+private:
 	void swapBsp();
 	void toGLCoord();
 	void parseFromMemory(char *buffer, int size);

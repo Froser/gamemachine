@@ -290,7 +290,7 @@ namespace linear_math
 	protected:									\
 		union									\
 		{										\
-			GMfloat m_data[l];					\
+			GMfloat m_data[4];					\
 			__m128 m_128;						\
 		};
 #else
@@ -304,7 +304,7 @@ namespace linear_math
 		DEFINE_VECTOR_DATA(2)
 
 	public:
-#if USE_SIMD
+#if USE_SIMD 
 		Vector2(__m128 _128) : m_128(_128) {};
 #endif
 		Vector2() {}
@@ -465,7 +465,7 @@ namespace linear_math
 		__result = _mm_add_ps(__result, __x_mul_row3);
 		return Vector4(__result);
 #else
-		GMint n, m;
+		GMint n, _;
 		Vector4 result(0.f);
 		for (m = 0; m < 4; m++)
 		{

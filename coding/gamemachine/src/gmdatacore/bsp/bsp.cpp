@@ -8,6 +8,7 @@
 #include "utilities/utilities.h"
 #include "bsp_interior.inl"
 #include "gmdatacore/gamepackage.h"
+#include "utilities/linearmath.h"
 
 static const char* getValue(const BSPEntity* entity, const char* key)
 {
@@ -20,6 +21,9 @@ static const char* getValue(const BSPEntity* entity, const char* key)
 	}
 	return nullptr;
 }
+
+#define Copy(dest, src) memcpy(dest, src, sizeof(src))
+#define CopyMember(dest, src, prop) dest.prop = src.prop
 
 //////////////////////////////////////////////////////////////////////////
 BSP::BSP()
@@ -62,19 +66,156 @@ void BSP::swapBsp()
 		gm_error("Bad version of bsp.");
 	}
 
-	const int extrasize = 1;
+	// 读取无对齐结构
+	loadNoAlignData();
 
-	int length = (d.header->lumps[LUMP_SHADERS].filelen) / sizeof(BSPShader);
+	// 以下结构有对齐，应该用特殊方式读取
+	loadPlanes();
+	loadVertices();
+	loadDrawSurfaces();
+}
+
+void BSP::loadPlanes()
+{
+	D(d);
+	struct __Tag
+	{
+		GMfloat p[4];
+	};
+
+	GMint length = (d.header->lumps[LUMP_PLANES].filelen) / sizeof(__Tag);
+	if (length > 0)
+	{
+		Vector<__Tag> t;
+		t.resize(length);
+		GMint num = CopyLump(d.header, LUMP_PLANES, &t[0], sizeof(__Tag));
+		d.numplanes = num;
+		d.planes.resize(length);
+		for (GMint i = 0; i < num; i++)
+		{
+			d.planes[i].normal = linear_math::Vector3(t[i].p[0], t[i].p[1], t[i].p[2]);
+			d.planes[i].intercept = t[i].p[3];
+		}
+	}
+	else
+	{
+		d.numplanes = 0;
+	}
+}
+
+void BSP::loadVertices()
+{
+	D(d);
+	struct __Tag
+	{
+		GMfloat xyz[3];
+		GMfloat st[2];
+		GMfloat lightmap[2];
+		GMfloat normal[3];
+		GMbyte color[4];
+	};
+
+	GMint length = (d.header->lumps[LUMP_DRAWVERTS].filelen) / sizeof(__Tag);
+	if (length > 0)
+	{
+		Vector<__Tag> t;
+		t.resize(length);
+		GMint num = CopyLump(d.header, LUMP_DRAWVERTS, &t[0], sizeof(__Tag));
+		d.numDrawVertices = num;
+		d.vertices.resize(length);
+		for (GMint i = 0; i < num; i++)
+		{
+			d.vertices[i].xyz = linear_math::Vector3(t[i].xyz[0], t[i].xyz[1], t[i].xyz[2]);
+			d.vertices[i].normal = linear_math::Vector3(t[i].normal[0], t[i].normal[1], t[i].normal[2]);
+			Copy(d.vertices[i].st, t[i].st);
+			Copy(d.vertices[i].color, t[i].color);
+			Copy(d.vertices[i].lightmap, t[i].lightmap);
+		}
+	}
+	else
+	{
+		d.numDrawVertices = 0;
+	}
+}
+
+void BSP::loadDrawSurfaces()
+{
+	D(d);
+	struct __Tag
+	{
+		GMint shaderNum;
+		GMint fogNum;
+		GMint surfaceType;
+
+		GMint firstVert;
+		GMint numVerts;
+
+		GMint firstIndex;
+		GMint numIndexes;
+
+		GMint lightmapNum;
+		GMint lightmapX, lightmapY;
+		GMint lightmapWidth, lightmapHeight;
+
+		GMfloat lightmapOrigin[3];
+		GMfloat lightmapVecs[3][3];
+
+		GMint patchWidth;
+		GMint patchHeight;
+	};
+
+	GMint length = (d.header->lumps[LUMP_SURFACES].filelen) / sizeof(__Tag);
+	if (length > 0)
+	{
+		Vector<__Tag> t;
+		t.resize(length);
+		GMint num = CopyLump(d.header, LUMP_SURFACES, &t[0], sizeof(__Tag));
+		d.numDrawSurfaces = num;
+		d.drawSurfaces.resize(length);
+		for (GMint i = 0; i < num; i++)
+		{
+			d.drawSurfaces[i].lightmapOrigin = linear_math::Vector3(t[i].lightmapOrigin[0], t[i].lightmapOrigin[1], t[i].lightmapOrigin[2]);
+			for (GMint j = 0; j < 3; j++)
+			{
+				d.drawSurfaces[i].lightmapVecs[j] = linear_math::Vector3(t[i].lightmapVecs[j][0], t[i].lightmapVecs[j][1], t[i].lightmapVecs[j][2]);
+			}
+			CopyMember(d.drawSurfaces[i], t[i], shaderNum);
+			CopyMember(d.drawSurfaces[i], t[i], fogNum);
+			CopyMember(d.drawSurfaces[i], t[i], surfaceType);
+
+			CopyMember(d.drawSurfaces[i], t[i], firstVert);
+			CopyMember(d.drawSurfaces[i], t[i], numVerts);
+
+			CopyMember(d.drawSurfaces[i], t[i], firstIndex);
+			CopyMember(d.drawSurfaces[i], t[i], numIndexes);
+
+			CopyMember(d.drawSurfaces[i], t[i], lightmapNum);
+			CopyMember(d.drawSurfaces[i], t[i], lightmapX);
+			CopyMember(d.drawSurfaces[i], t[i], lightmapY);
+			CopyMember(d.drawSurfaces[i], t[i], lightmapWidth);
+			CopyMember(d.drawSurfaces[i], t[i], lightmapHeight);
+
+			CopyMember(d.drawSurfaces[i], t[i], patchWidth);
+			CopyMember(d.drawSurfaces[i], t[i], patchHeight);
+		}
+	}
+	else
+	{
+		d.numDrawSurfaces = 0;
+	}
+}
+
+void BSP::loadNoAlignData()
+{
+	D(d);
+	const int extrasize = 1;
+	GMint length = (d.header->lumps[LUMP_SHADERS].filelen) / sizeof(BSPShader);
 	d.shaders.resize(length + extrasize);
 	d.numShaders = CopyLump(d.header, LUMP_SHADERS, &d.shaders[0], sizeof(BSPShader));
 
 	length = (d.header->lumps[LUMP_MODELS].filelen) / sizeof(BSPModel);
 	d.models.resize(length + extrasize);
 	d.nummodels = CopyLump(d.header, LUMP_MODELS, &d.models[0], sizeof(BSPModel));
-
-	length = (d.header->lumps[LUMP_PLANES].filelen) / sizeof(BSPPlane);
-	d.planes.resize(length + extrasize);
-	d.numplanes = CopyLump(d.header, LUMP_PLANES, &d.planes[0], sizeof(BSPPlane));
 
 	length = (d.header->lumps[LUMP_LEAFS].filelen) / sizeof(BSPLeaf);
 	d.leafs.resize(length + extrasize);
@@ -100,14 +241,6 @@ void BSP::swapBsp()
 	d.brushsides.resize(length + extrasize);
 	d.numbrushsides = CopyLump(d.header, LUMP_BRUSHSIDES, &d.brushsides[0], sizeof(BSPBrushSide));
 
-	length = (d.header->lumps[LUMP_DRAWVERTS].filelen) / sizeof(BSPDrawVertices);
-	d.vertices.resize(length + extrasize);
-	d.numDrawVertices = CopyLump(d.header, LUMP_DRAWVERTS, &d.vertices[0], sizeof(BSPDrawVertices));
-
-	length = (d.header->lumps[LUMP_SURFACES].filelen) / sizeof(BSPSurface);
-	d.drawSurfaces.resize(length + extrasize);
-	d.numDrawSurfaces = CopyLump(d.header, LUMP_SURFACES, &d.drawSurfaces[0], sizeof(BSPSurface));
-
 	length = (d.header->lumps[LUMP_FOGS].filelen) / sizeof(BSPFog);
 	d.fogs.resize(length + extrasize);
 	d.numFogs = CopyLump(d.header, LUMP_FOGS, &d.fogs[0], sizeof(BSPFog));
@@ -132,8 +265,6 @@ void BSP::swapBsp()
 	d.gridData.resize(length + extrasize);
 	d.numGridPoints = CopyLump(d.header, LUMP_LIGHTGRID, &d.gridData[0], 8);
 
-	// swap everything
-	SwapBSPFile(d);
 }
 
 // 将坐标系转化为xyz(OpenGL)坐标系
@@ -186,7 +317,6 @@ void BSP::parseEntities()
 		}
 	}
 }
-
 
 void BSP::generateLightVolumes()
 {
