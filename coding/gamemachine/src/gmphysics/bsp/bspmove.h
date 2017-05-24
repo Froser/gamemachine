@@ -39,6 +39,7 @@ struct BSPMovePrivate
 
 class BSPMove
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
 	DEFINE_PRIVATE(BSPMove)
 
 public:

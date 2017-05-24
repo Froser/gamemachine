@@ -54,7 +54,7 @@ private:
 	BSPGameWorld* m_world;
 	BSPRenderData* m_bspRender;
 	std::map<std::string, TiXmlElement*> m_items;
-	Vector<TiXmlDocument*> m_shaderDocs;
+	AlignedVector<TiXmlDocument*> m_shaderDocs;
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
 	GMint m_textureNum;

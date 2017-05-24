@@ -24,13 +24,13 @@ void Character::onAppendingObjectToWorld()
 void Character::moveForwardOrBackward(bool forward)
 {
 	GMfloat moveRate = forward ? m_moveRate.getMoveRate(MD_FORWARD) : m_moveRate.getMoveRate(MD_BACKWARD);
-	m_moveCmdArgFB = linear_math::Vector3(forward, moveRate, USELESS_PARAM);
+	m_moveCmdArgFB = CommandVector3(forward, moveRate, USELESS_PARAM);
 }
 
 void Character::moveLeftOrRight(bool left)
 {
 	GMfloat moveRate = left ? m_moveRate.getMoveRate(MD_LEFT) : m_moveRate.getMoveRate(MD_RIGHT);
-	m_moveCmdArgLR = linear_math::Vector3(left, moveRate, USELESS_PARAM);
+	m_moveCmdArgLR = CommandVector3(left, moveRate, USELESS_PARAM);
 }
 
 void Character::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
@@ -152,16 +152,16 @@ void Character::sendMoveCommand()
 {
 	D(d);
 	PhysicsWorld* pw = getWorld()->physicsWorld();
-	linear_math::Vector3 args[] = {
-		linear_math::Vector3(m_state.pitch, m_state.yaw, USELESS_PARAM), m_moveCmdArgFB, m_moveCmdArgLR,
+	CommandVector3 args[] = {
+		CommandVector3(m_state.pitch, m_state.yaw, USELESS_PARAM), m_moveCmdArgFB, m_moveCmdArgLR,
 	};
 	pw->sendCommand(pw->find(this), PhysicsWorld::makeCommand(CMD_MOVE, args, 3));
 }
 
 void Character::clearMoveArgs()
 {
-	m_moveCmdArgFB = linear_math::Vector3(0);
-	m_moveCmdArgLR = linear_math::Vector3(0);
+	m_moveCmdArgFB = CommandVector3(0, 0, 0);
+	m_moveCmdArgLR = CommandVector3(0, 0, 0);
 }
 
 CameraLookAt& Character::getLookAt()

@@ -83,11 +83,11 @@ private:
 	Shader m_shader;
 
 	// 图元顶点数量
-	Vector<GMint> m_primitiveVertices;
+	AlignedVector<GMint> m_primitiveVertices;
 	// 绘制图元数量
 	GMuint m_primitiveCount;
 	// 顶点在ChildObject的偏移
-	Vector<GMint> m_vertexOffsets;
+	AlignedVector<GMint> m_vertexOffsets;
 
 	ChildObject* m_parent;
 	GMuint m_currentFaceVerticesCount;
@@ -112,7 +112,7 @@ public:
 		return m_painter;
 	}
 
-	Vector<ChildObject*>& getChildObjects()
+	AlignedVector<ChildObject*>& getChildObjects()
 	{
 		return m_objects;
 	}
@@ -124,7 +124,7 @@ public:
 
 private:
 	AutoPtr<ObjectPainter> m_painter;
-	Vector<ChildObject*> m_objects;
+	AlignedVector<ChildObject*> m_objects;
 };
 
 class ChildObject
@@ -162,37 +162,37 @@ public:
 
 	void calculateTangentSpace();
 
-	Vector<AUTORELEASE Component*>& getComponents()
+	AlignedVector<AUTORELEASE Component*>& getComponents()
 	{
 		return m_components;
 	}
 
-	Vector<Object::DataType>& vertices()
+	AlignedVector<Object::DataType>& vertices()
 	{
 		return m_vertices;
 	}
 
-	Vector<Object::DataType>& normals()
+	AlignedVector<Object::DataType>& normals()
 	{
 		return m_normals;
 	}
 
-	Vector<Object::DataType>& uvs()
+	AlignedVector<Object::DataType>& uvs()
 	{
 		return m_uvs;
 	}
 
-	Vector<Object::DataType>& tangents()
+	AlignedVector<Object::DataType>& tangents()
 	{
 		return m_tangents;
 	}
 
-	Vector<Object::DataType>& bitangents()
+	AlignedVector<Object::DataType>& bitangents()
 	{
 		return m_bitangents;
 	}
 
-	Vector<Object::DataType>& lightmaps()
+	AlignedVector<Object::DataType>& lightmaps()
 	{
 		return m_lightmaps;
 	}
@@ -233,15 +233,15 @@ public:
 	void setArrayId(GMuint id) { m_arrayId = id; }
 
 private:
-	Vector<Object::DataType> m_vertices;
-	Vector<Object::DataType> m_normals;
-	Vector<Object::DataType> m_uvs;
-	Vector<Object::DataType> m_tangents;
-	Vector<Object::DataType> m_bitangents;
-	Vector<Object::DataType> m_lightmaps;
+	AlignedVector<Object::DataType> m_vertices;
+	AlignedVector<Object::DataType> m_normals;
+	AlignedVector<Object::DataType> m_uvs;
+	AlignedVector<Object::DataType> m_tangents;
+	AlignedVector<Object::DataType> m_bitangents;
+	AlignedVector<Object::DataType> m_lightmaps;
 	GMuint m_arrayId;
 	GMuint m_bufferId;
-	Vector<Component*> m_components;
+	AlignedVector<Component*> m_components;
 	ObjectType m_type;
 	ArrangementMode m_mode;
 	std::string m_name;

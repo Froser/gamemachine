@@ -86,7 +86,7 @@ void BSP::loadPlanes()
 	GMint length = (d.header->lumps[LUMP_PLANES].filelen) / sizeof(__Tag);
 	if (length > 0)
 	{
-		Vector<__Tag> t;
+		AlignedVector<__Tag> t;
 		t.resize(length);
 		GMint num = CopyLump(d.header, LUMP_PLANES, &t[0], sizeof(__Tag));
 		d.numplanes = num;
@@ -118,7 +118,7 @@ void BSP::loadVertices()
 	GMint length = (d.header->lumps[LUMP_DRAWVERTS].filelen) / sizeof(__Tag);
 	if (length > 0)
 	{
-		Vector<__Tag> t;
+		AlignedVector<__Tag> t;
 		t.resize(length);
 		GMint num = CopyLump(d.header, LUMP_DRAWVERTS, &t[0], sizeof(__Tag));
 		d.numDrawVertices = num;
@@ -167,7 +167,7 @@ void BSP::loadDrawSurfaces()
 	GMint length = (d.header->lumps[LUMP_SURFACES].filelen) / sizeof(__Tag);
 	if (length > 0)
 	{
-		Vector<__Tag> t;
+		AlignedVector<__Tag> t;
 		t.resize(length);
 		GMint num = CopyLump(d.header, LUMP_SURFACES, &t[0], sizeof(__Tag));
 		d.numDrawSurfaces = num;

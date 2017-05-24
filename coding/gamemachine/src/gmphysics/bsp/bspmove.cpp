@@ -66,7 +66,7 @@ void BSPMove::processMove()
 		return;
 
 	//moveCommand: {pitch, yaw, USELESS}, {forward(bool), moveRate, USELESS}, {left(bool), moveRate(LR), USELESS}
-	linear_math::Vector3& arg0 = d.moveCommand.params[CMD_MOVE][0],
+	CommandVector3& arg0 = d.moveCommand.params[CMD_MOVE][0],
 		&arg1 = d.moveCommand.params[CMD_MOVE][1],
 		&arg2 = d.moveCommand.params[CMD_MOVE][2];
 		

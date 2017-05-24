@@ -13,10 +13,12 @@ class GameObject;
 // structs for rendering
 class BSP_Render_Vertex
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 public:
 	linear_math::Vector3 position;
-	float decalS, decalT;
-	float lightmapS, lightmapT;
+	GMfloat decalS, decalT;
+	GMfloat lightmapS, lightmapT;
 
 	BSP_Render_Vertex operator+(const BSP_Render_Vertex & rhs) const
 	{
@@ -62,18 +64,20 @@ struct BSP_Render_FaceDirectoryEntry
 //every patch (curved surface) is split into biquadratic (3x3) patches
 class BSP_Render_BiquadraticPatch
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 public:
 	bool tesselate(int newTesselation);
 
 	BSP_Render_Vertex controlPoints[9];
 
-	int tesselation;
+	GMint tesselation;
 	BSP_Render_Vertex* vertices;
 	GLuint * indices;
 
 	//arrays for multi_draw_arrays
-	int * trianglesPerRow;
-	unsigned int ** rowIndexPointers;
+	GMint* trianglesPerRow;
+	GMuint** rowIndexPointers;
 
 	BSP_Render_BiquadraticPatch() : vertices(NULL)
 	{}
@@ -145,26 +149,26 @@ struct BSPRenderPrivate
 
 	}
 
-	BSPData* bsp;
-	//data for render:
 	AlignedVector<BSP_Render_Vertex> vertices;
-	Bitset facesToDraw;
-	Bitset entitiesToDraw;
-	GMint numPolygonFaces;
-	GMint numPatches;
-	GMint numMeshFaces;
-	Vector<GameObject*> alwaysVisibleObjects;
-	Vector<BSP_Render_FaceDirectoryEntry> faceDirectory;
-	Vector<BSP_Render_Face> polygonFaces;
-	Vector<BSP_Render_Face> meshFaces;
-	Vector<BSP_Render_Patch> patches;
+	AlignedVector<BSP_Render_FaceDirectoryEntry> faceDirectory;
+	AlignedVector<BSP_Render_Face> polygonFaces;
+	AlignedVector<BSP_Render_Face> meshFaces;
+	AlignedVector<BSP_Render_Patch> patches;
 	AlignedVector<BSP_Render_Leaf> leafs;
-	BSP_Render_VisibilityData visibilityData;
 
 	std::map<BSP_Render_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
 	std::map<BSP_Render_Face*, GameObject*> polygonFaceObjects;
 	std::map<BSP_Render_Face*, GameObject*> meshFaceObjects;
 	std::map<BSPEntity*, EntityObject*> entitiyObjects;
+
+	BSPData* bsp;
+	Bitset facesToDraw;
+	Bitset entitiesToDraw;
+	GMint numPolygonFaces;
+	GMint numPatches;
+	GMint numMeshFaces;
+	AlignedVector<GameObject*> alwaysVisibleObjects;
+	BSP_Render_VisibilityData visibilityData;
 
 	// 用于绘制天空
 	linear_math::Vector3 boundMin;

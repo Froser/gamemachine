@@ -1,70 +1,16 @@
 ﻿#ifndef __VECTOR_H__
 #define __VECTOR_H__
 #include "common.h"
-#include <vector>
 #include "assert.h"
+#include "memory.h"
+#include <vector>
+#include "debug.h"
+
 BEGIN_NS
 
 template <typename T>
-struct Vector : public std::vector<T>
+class Vector : public std::vector<T>
 {
-};
-
-class AlignedMemoryAlloc
-{
-public:
-	static void* gmAlignedAllocInternal(size_t size, GMint alignment);
-	static void gmAlignedFreeInternal(void* ptr);
-};
-
-typedef void *(gmAlignedAllocFunc)(size_t size, GMint alignment);
-typedef void (gmAlignedFreeFunc)(void *memblock);
-typedef void *(gmAllocFunc)(size_t size);
-typedef void (gmFreeFunc)(void *memblock);
-void gmAlignedAllocSetCustom(gmAllocFunc *allocFunc, gmFreeFunc *freeFunc);
-void gmAlignedAllocSetCustomAligned(gmAlignedAllocFunc *allocFunc, gmAlignedFreeFunc *freeFunc);
-
-#define gmAlignedAlloc(size,alignment) AlignedMemoryAlloc::gmAlignedAllocInternal(size,alignment)
-#define gmAlignedFree(ptr) AlignedMemoryAlloc::gmAlignedFreeInternal(ptr)
-
-template < typename T, unsigned Alignment >
-class AlignedAllocator
-{
-	typedef AlignedAllocator< T, Alignment > my_type;
-
-public:
-	AlignedAllocator() {}
-
-public:
-	template < typename Other >
-	AlignedAllocator(const AlignedAllocator< Other, Alignment > &) {}
-
-	typedef const T* const_pointer;
-	typedef const T& const_reference;
-	typedef T* pointer;
-	typedef T& reference;
-	typedef T value_type;
-
-	pointer address(reference ref) const { return &ref; }
-	const_pointer address(const_reference  ref) const { return &ref; }
-	pointer allocate(GMint n, const_pointer * hint = 0) {
-		(void)hint;
-		return reinterpret_cast< pointer >(gmAlignedAlloc(sizeof(value_type) * n, Alignment));
-	}
-	void construct(pointer ptr, const value_type & value) { new (ptr) value_type(value); }
-	void deallocate(pointer ptr) {
-		gmAlignedFree(reinterpret_cast< void * >(ptr));
-	}
-	void destroy(pointer ptr) { ptr->~value_type(); }
-
-
-	template < typename O > struct rebind {
-		typedef AlignedAllocator< O, Alignment > other;
-	};
-	template < typename O >
-	my_type & operator=(const AlignedAllocator< O, Alignment > &) { return *this; }
-
-	friend bool operator==(const my_type &, const my_type &) { return true; }
 };
 
 #define GM_USE_PLACEMENT_NEW 1
@@ -79,20 +25,20 @@ template <typename T>
 class AlignVectorIteratorBase
 {
 public:
-	AlignVectorIteratorBase(typename T::element_type* ptr)
+	AlignVectorIteratorBase(typename T::value_type* ptr)
 		: m_ptr(ptr)
 	{
 	}
 
-	typename T::element_type& operator ++()
+	typename T::value_type& operator ++()
 	{
 		m_ptr++;
 		return *m_ptr;
 	}
 
-	typename T::element_type& operator ++(int)
+	typename T::value_type& operator ++(int)
 	{
-		T::element_type& elem = *m_ptr;
+		T::value_type& elem = *m_ptr;
 		m_ptr++;
 		return elem;
 	}
@@ -108,7 +54,7 @@ public:
 	}
 
 protected:
-	typename T::element_type* m_ptr;
+	typename T::value_type* m_ptr;
 };
 
 template <typename T>
@@ -117,9 +63,9 @@ class AlignVectorIterator : public AlignVectorIteratorBase<T>
 	typedef AlignVectorIteratorBase<T> Base;
 
 public:
-	AlignVectorIterator(typename T::element_type* ptr) : Base(ptr) {}
+	AlignVectorIterator(typename T::value_type* ptr) : Base(ptr) {}
 
-	typename T::element_type& operator *()
+	typename T::value_type& operator *()
 	{
 		return *m_ptr;
 	}
@@ -131,9 +77,9 @@ class AlignVectorConstIterator : public AlignVectorIteratorBase<T>
 	typedef AlignVectorIteratorBase<T> Base;
 
 public:
-	AlignVectorConstIterator(typename T::element_type* ptr) : Base(ptr) {}
+	AlignVectorConstIterator(typename T::value_type* ptr) : Base(ptr) {}
 
-	const typename T::element_type& operator *()
+	const typename T::value_type& operator *()
 	{
 		return *m_ptr;
 	}
@@ -145,7 +91,7 @@ class AlignedVector
 public:
 	typedef AlignVectorIterator<AlignedVector> iterator;
 	typedef AlignVectorConstIterator<AlignedVector> const_iterator;
-	typedef T element_type;
+	typedef T value_type;
 
 #ifdef GM_ALLOW_ARRAY_COPY_OP
 public:
@@ -236,6 +182,11 @@ public:
 		return m_size;
 	}
 
+	bool empty()
+	{
+		return m_size == 0;
+	}
+
 	const T& at(GMuint n) const
 	{
 		ASSERT(n >= 0);
@@ -287,6 +238,24 @@ public:
 	{
 		ASSERT(m_size > 0);
 		return m_data[m_size - 1];
+	}
+
+	T& front()
+	{
+		ASSERT(m_size > 0);
+		return *m_data;
+	}
+
+	iterator find(const T& target)
+	{
+		iterator iter = begin(), e = end();
+		while (iter != e)
+		{
+			if (target == *iter)
+				return iter;
+			iter++;
+		}
+		return iter;
 	}
 
 	void resizeNoInitialize(GMint newsize)

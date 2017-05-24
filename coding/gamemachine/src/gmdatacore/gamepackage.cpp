@@ -71,7 +71,7 @@ bool GamePackage::readFile(PackageIndex index, const char* filename, REF GamePac
 	return readFileFromPath(p.c_str(), buffer);
 }
 
-Vector<std::string> GamePackage::getAllFiles(const char* directory)
+AlignedVector<std::string> GamePackage::getAllFiles(const char* directory)
 {
 	D(d);
 	ASSERT(d.handler);

@@ -82,8 +82,8 @@ private:
 
 	PositionState m_state;
 	CameraLookAt m_lookAt;
-	linear_math::Vector3 m_moveCmdArgFB;
-	linear_math::Vector3 m_moveCmdArgLR;
+	CommandVector3 m_moveCmdArgFB;
+	CommandVector3 m_moveCmdArgLR;
 };
 
 END_NS

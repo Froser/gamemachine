@@ -17,7 +17,7 @@ enum PlaneType
 
 struct BSPLeafList
 {
-	Vector<GMint> list;
+	AlignedVector<GMint> list;
 	linear_math::Vector3 bounds[2];
 	GMint lastLeaf;
 };
@@ -62,6 +62,8 @@ struct BSPFacet
 
 struct BSPPatchCollide
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 	linear_math::Vector3 bounds[2];
 	AlignedVector<BSPPatchPlane> planes;
 	AlignedVector<BSPFacet> facets;
@@ -70,6 +72,8 @@ struct BSPPatchCollide
 
 struct BSP_Physics_Patch
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 	BSPSurface* surface;
 	GMint checkcount;
 	BSPShader* shader;

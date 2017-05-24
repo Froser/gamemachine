@@ -168,7 +168,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 void BSPShaderLoader::load()
 {
 	GamePackage* pk = m_world->getGamePackage();
-	Vector<std::string> files = pk->getAllFiles(m_directory.c_str());
+	AlignedVector<std::string> files = pk->getAllFiles(m_directory.c_str());
 
 	// load all item tag, but not parse them until item is needed
 	for (auto iter = files.begin(); iter != files.end(); iter++)

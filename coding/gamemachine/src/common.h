@@ -11,7 +11,7 @@
 	public: \
 	typedef className##Private Data; \
 	private: \
-	className##Private m_data; \
+	GM_ALIGNED_16 className##Private m_data; \
 	protected: \
 	className##Private& data() { return m_data; }
 #define D(d) auto& d = data()
@@ -140,5 +140,7 @@ inline static void fopen_s(FILE** f, const char* filename, const char* mode)
 #define NO_LAMBDA
 
 #endif // __APPLE__
+
+#include "utilities/memory.h"
 
 #endif

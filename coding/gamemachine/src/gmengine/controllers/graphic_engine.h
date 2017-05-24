@@ -20,7 +20,7 @@ struct GraphicSettings
 	bool fullscreen;
 };
 
-typedef Vector<DrawingItem> DrawingList;
+typedef AlignedVector<DrawingItem> DrawingList;
 class Camera;
 class GameWorld;
 class ResourceContainer;

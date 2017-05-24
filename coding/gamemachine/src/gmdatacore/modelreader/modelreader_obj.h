@@ -10,6 +10,8 @@ BEGIN_NS
 
 struct ModelReader_Obj_Material
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 	GMfloat ns;
 	linear_math::Vector3 kd;
 	linear_math::Vector3 ka;
@@ -23,11 +25,20 @@ class Component;
 struct Shader;
 struct ModelReader_ObjPrivate
 {
+	~ModelReader_ObjPrivate()
+	{
+		for (auto iter = materials.begin(); iter != materials.end(); iter++)
+		{
+			if ((*iter).second)
+				delete (*iter).second;
+		}
+	}
+
 	Object* object;
 	AlignedVector<linear_math::Vector3> vertices;
 	AlignedVector<linear_math::Vector3> normals;
 	AlignedVector<linear_math::Vector2> textures;
-	std::map<std::string, ModelReader_Obj_Material> materials;
+	std::map<std::string, ModelReader_Obj_Material*> materials;
 	std::string currentMaterialName;
 	Component* currentComponent;
 };
@@ -49,6 +60,7 @@ private:
 	void appendFace(Scanner& scanner);
 	void loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename);
 	void applyMaterial(const ModelReader_Obj_Material& material, Shader& shader);
+	ModelReader_Obj_Material* getMaterial(const std::string& materialName);
 };
 
 END_NS

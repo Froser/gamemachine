@@ -131,29 +131,26 @@ namespace linear_math
 
 		static ReturnType mul(const ReturnType& left, GMfloat right)
 		{
-			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
-			__m128 __right = _mm_load_ps(_right);
+			__m128 __right = _mm_set_ps(right, right, right, right);
 			return ReturnType(_mm_mul_ps(left.get128(), __right));
 		}
 
 		static ReturnType div(const ReturnType& left, GMfloat right)
 		{
-			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
-			__m128 __right = _mm_load_ps(_right);
+			__m128 __right = _mm_set_ps(right, right, right, right);
 			return ReturnType(_mm_div_ps(left.get128(), __right));
 		}
 
 		static ReturnType div(GMfloat left, const ReturnType& right)
 		{
-			GM_ALIGNED_16 GMfloat _left[] = { left,left,left,left };
-			__m128 __left = _mm_load_ps(_left);
-			return ReturnType(_mm_div_ps(__left, right.get128()));
+			__m128 __left = _mm_set_ps(left, left, left, left);
+			__m128 __right = right.get128();
+			return ReturnType(_mm_div_ps(__left, __right));
 		}
 
 		static ReturnType& self_add(ReturnType& left, GMfloat right)
 		{
-			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
-			__m128 __right = _mm_load_ps(_right);
+			__m128 __right = _mm_set_ps(right, right, right, right);
 			left.set128(_mm_add_ps(left.get128(), __right));
 			return left;
 		}
@@ -166,8 +163,7 @@ namespace linear_math
 
 		static ReturnType& self_sub(ReturnType& left, GMfloat right)
 		{
-			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
-			__m128 __right = _mm_load_ps(_right);
+			__m128 __right = _mm_set_ps(right, right, right, right);
 			left.set128(_mm_sub_ps(left.get128(), __right));
 			return left;
 		}
@@ -180,16 +176,14 @@ namespace linear_math
 
 		static ReturnType& self_mul(ReturnType& left, GMfloat right)
 		{
-			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
-			__m128 __right = _mm_load_ps(_right);
+			__m128 __right = _mm_set_ps(right, right, right, right);
 			left.set128(_mm_mul_ps(left.get128(), __right));
 			return left;
 		}
 
 		static ReturnType& self_div(ReturnType& left, GMfloat right)
 		{
-			GM_ALIGNED_16 GMfloat _right[] = { right,right,right,right };
-			__m128 __right = _mm_load_ps(_right);
+			__m128 __right = _mm_set_ps(right, right, right, right);
 			left.set128(_mm_div_ps(left.get128(), __right));
 			return left;
 		}
@@ -478,7 +472,7 @@ namespace linear_math
 #endif
 	}
 
-// Vector functions
+// AlignedVector functions
 	static inline GMfloat fastInvSqrt(GMfloat x)
 	{
 		GMfloat xhalf = 0.5f*x;

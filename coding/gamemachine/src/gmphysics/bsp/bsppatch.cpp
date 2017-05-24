@@ -658,8 +658,8 @@ static void baseWindingForPlane(const linear_math::Vector4& plane, REF BSPWindin
 
 static bool chopWindingInPlace(REF BSPWinding& inout, const linear_math::Vector4& plane, GMfloat epsilon)
 {
-	Vector<GMfloat> dists;
-	Vector<GMint> sides;
+	AlignedVector<GMfloat> dists;
+	AlignedVector<GMint> sides;
 	GMint counts[3];
 	GMfloat dot;
 	GMint j;

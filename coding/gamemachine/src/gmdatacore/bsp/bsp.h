@@ -177,52 +177,52 @@ struct GM_ALIGNED_16 BSPLightVolumes
 	GMbyte* volData;
 };
 
-struct BSPPrivate
+struct GM_ALIGNED_16 BSPPrivate
 {
 	friend class BSP;
 	BSPPrivate()
 	{
 	}
 
+	BSPLightVolumes lightVols;
+	AlignedVector<BSPEntity> entities;
+	AlignedVector<BSPPlane> planes;
+	AlignedVector<BSPDrawVertices> vertices;
+	AlignedVector<BSPSurface> drawSurfaces;
+	AlignedVector<BSPModel> models;
+	AlignedVector<BSPShader> shaders;
+	AlignedVector<char> entdata;
+	AlignedVector<BSPLeaf> leafs;
+	AlignedVector<BSPNode> nodes;
+	AlignedVector<GMint> leafsurfaces;
+	AlignedVector<GMint> leafbrushes;
+	AlignedVector<BSPBrush> brushes;
+	AlignedVector<BSPBrushSide> brushsides;
+	AlignedVector<GMbyte> lightBytes;
+	AlignedVector<GMbyte> gridData;
+	AlignedVector<GMbyte> visBytes;
+	AlignedVector<GMint> drawIndexes;
+	AlignedVector<BSPFog> fogs;
+
+	GMint nummodels;
+	GMint numShaders;
+	GMint entdatasize;
+	GMint numleafs;
+	GMint numplanes;
+	GMint numnodes;
+	GMint numleafsurfaces;
+	GMint numleafbrushes;
+	GMint numbrushes;
+	GMint numbrushsides;
+	GMint numLightBytes;
+	GMint numGridPoints;
+	GMint numVisBytes;
+	GMint numDrawVertices;
+	GMint numDrawIndexes;
+	GMint numDrawSurfaces;
+	GMint numFogs;
 	GMbyte* buffer;
 	BSPHeader* header;
-	AlignedVector<BSPEntity> entities;
-	GMint nummodels;
-	Vector<BSPModel> models;
-	GMint numShaders;
-	Vector<BSPShader> shaders;
-	GMint entdatasize;
-	Vector<char> entdata;
-	GMint numleafs;
-	Vector<BSPLeaf> leafs;
-	GMint numplanes;
-	AlignedVector<BSPPlane> planes;
-	GMint numnodes;
-	Vector<BSPNode> nodes;
-	GMint numleafsurfaces;
-	Vector<GMint> leafsurfaces;
-	GMint numleafbrushes;
-	Vector<GMint> leafbrushes;
-	GMint numbrushes;
-	Vector<BSPBrush> brushes;
-	GMint numbrushsides;
-	Vector<BSPBrushSide> brushsides;
-	GMint numLightBytes;
-	Vector<GMbyte> lightBytes;
-	GMint numGridPoints;
-	Vector<GMbyte> gridData;
-	GMint numVisBytes;
-	Vector<GMbyte> visBytes;
-	GMint numDrawVertices;
-	AlignedVector<BSPDrawVertices> vertices;
-	GMint numDrawIndexes;
-	Vector<int> drawIndexes;
-	GMint numDrawSurfaces;
-	AlignedVector<BSPSurface> drawSurfaces;
-	GMint numFogs;
-	Vector<BSPFog> fogs;
-
-	BSPLightVolumes lightVols;
 
 private:
 	char token[MAXTOKEN];
@@ -235,7 +235,7 @@ private:
 
 typedef BSPPrivate BSPData;
 struct GamePackageBuffer;
-class BSP
+class GM_ALIGNED_16 BSP
 {
 	DEFINE_PRIVATE(BSP);
 

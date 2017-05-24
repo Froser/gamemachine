@@ -10,7 +10,7 @@ struct BSP_Physics_Patch;
 struct BSPPatchPrivate
 {
 	~BSPPatchPrivate();
-	AUTORELEASE Vector<BSP_Physics_Patch*> patches;
+	AUTORELEASE AlignedVector<BSP_Physics_Patch*> patches;
 };
 
 struct BSPPatchCollide;

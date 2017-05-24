@@ -19,6 +19,12 @@ BSPModelLoader::~BSPModelLoader()
 	{
 		delete *iter;
 	}
+
+	for (auto iter = m_items.begin(); iter != m_items.end(); iter++)
+	{
+		if ((*iter).second)
+			delete (*iter).second;
+	}
 }
 
 void BSPModelLoader::init(const char* directory, BSPGameWorld* world)
@@ -30,7 +36,7 @@ void BSPModelLoader::init(const char* directory, BSPGameWorld* world)
 void BSPModelLoader::load()
 {
 	GamePackage* pk = m_world->getGamePackage();
-	Vector<std::string> files = pk->getAllFiles(m_directory.c_str());
+	AlignedVector<std::string> files = pk->getAllFiles(m_directory.c_str());
 
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
@@ -43,11 +49,11 @@ void BSPModelLoader::load()
 
 Model* BSPModelLoader::find(const std::string& classname)
 {
-	std::map<std::string, Model>::iterator iter;
+	ModelMap::iterator iter;
 	if ((iter = m_items.find(classname)) == m_items.end())
 		return nullptr;
 
-	return &((*iter).second);
+	return ((*iter).second);
 }
 
 void BSPModelLoader::parse(const char* data)
@@ -89,8 +95,8 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		return;
 	}
 
-	Model m = { 0 };
-	strcpy_s(m.classname, classname);
+	Model* m = new Model;
+	strcpy_s(m->classname, classname);
 
 	const char* b;
 	if ( (b = ti->Attribute("create")) != nullptr )
@@ -98,7 +104,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		Scanner s(b);
 		GMint value;
 		s.nextInt(&value);
-		m.create = value != 0;
+		m->create = value != 0;
 	}
 
 	if ((b = ti->Attribute("extents")) != nullptr)
@@ -106,14 +112,14 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		Scanner s(b);
 		for (GMint i = 0; i < 3; i++)
 		{
-			s.nextFloat(&m.extents[i]);
+			s.nextFloat(&m->extents[i]);
 		}
 	}
 
 	if ((b = ti->Attribute("model")) != nullptr)
 	{
-		strcpy_s(m.model, b);
+		strcpy_s(m->model, b);
 	}
 
-	m_items[m.classname] = m;
+	m_items[m->classname] = m;
 }

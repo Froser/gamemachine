@@ -402,7 +402,7 @@ void BSPGameWorld::drawEntity(GMint leafId)
 void BSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
-	Vector<GameObject*>& objs = d.render.renderData().alwaysVisibleObjects;
+	AlignedVector<GameObject*>& objs = d.render.renderData().alwaysVisibleObjects;
 	for (auto iter = objs.begin(); iter != objs.end(); iter++)
 	{
 		(*iter)->getReadyForRender(d.drawingList);

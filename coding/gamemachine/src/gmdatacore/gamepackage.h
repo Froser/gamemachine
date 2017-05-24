@@ -67,7 +67,7 @@ struct IGamePackageHandler
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) = 0;
 	virtual std::string pathRoot(PackageIndex index) = 0;
-	virtual Vector<std::string> getAllFiles(const char* directory) = 0;
+	virtual AlignedVector<std::string> getAllFiles(const char* directory) = 0;
 };
 
 struct IFactory;
@@ -94,7 +94,7 @@ public:
 	void loadPackage(const char* path);
 	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
 	bool readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename = nullptr);
-	Vector<std::string> getAllFiles(const char* directory);
+	AlignedVector<std::string> getAllFiles(const char* directory);
 
 public:
 	std::string pathOf(PackageIndex index, const char* filename);

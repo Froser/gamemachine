@@ -150,7 +150,8 @@ set(SOURCES
 		utilities/utilities.h
 		utilities/utilities.cpp
 		utilities/vector.h
-		utilities/vector.cpp
+		utilities/memory.h
+		utilities/memory.cpp
 	)
 
 source_group_by_dir(SOURCES)

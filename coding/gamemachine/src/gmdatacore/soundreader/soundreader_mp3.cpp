@@ -20,7 +20,7 @@ struct MP3SoundFilePrivate
 	bool bufferLoaded; // 是否已经读取了所有MP3文件数据
 	WAVEFORMATEX format;
 	GamePackageBuffer bufferIn; // MP3文件数据
-	Vector<GMbyte> bufferOut; // 缓存的字节
+	AlignedVector<GMbyte> bufferOut; // 缓存的字节
 	GMuint bufferOffset; // 缓存偏移
 	GMuint unitBufferSize; // 单位缓存，每次读取这么多大小的缓存
 	bool playing; // 是否正在播放

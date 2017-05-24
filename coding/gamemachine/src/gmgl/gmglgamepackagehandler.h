@@ -15,7 +15,7 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
-	virtual Vector<std::string> getAllFiles(const char* directory) override;
+	virtual AlignedVector<std::string> getAllFiles(const char* directory) override;
 
 protected:
 	GamePackage* gamePackage();
@@ -54,7 +54,7 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
-	virtual Vector<std::string> getAllFiles(const char* directory) override;
+	virtual AlignedVector<std::string> getAllFiles(const char* directory) override;
 
 private:
 	bool loadZip();

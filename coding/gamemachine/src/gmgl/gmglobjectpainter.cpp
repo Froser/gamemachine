@@ -102,7 +102,7 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 		render->begin(m_engine, childObj, modelTransform);
 
 		glBindVertexArray(childObj->getArrayId());
-		for (auto iter = childObj->getComponents().cbegin(); iter != childObj->getComponents().cend(); iter++)
+		for (auto iter = childObj->getComponents().begin(); iter != childObj->getComponents().end(); iter++)
 		{
 			Component* component = (*iter);
 			Shader& shader = component->getShader();

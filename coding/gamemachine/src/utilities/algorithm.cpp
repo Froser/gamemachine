@@ -21,7 +21,7 @@ static Point getNormal(GMfloat u, GMfloat v)
 	return p;
 }
 
-static void pushPoint(Vector<GMfloat>& vertices, Vector<GMfloat>& normals, const Point& normal, GMfloat radius)
+static void pushPoint(AlignedVector<GMfloat>& vertices, AlignedVector<GMfloat>& normals, const Point& normal, GMfloat radius)
 {
 	vertices.push_back(normal.x * radius);
 	vertices.push_back(normal.y * radius);

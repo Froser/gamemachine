@@ -536,7 +536,7 @@ struct Path
 	static std::string directoryName(const std::string& fileName);
 	static std::string filename(const std::string& fullPath);
 	static std::string getCurrentPath();
-	static Vector<std::string> getAllFiles(const char* directory);
+	static AlignedVector<std::string> getAllFiles(const char* directory);
 	static bool directoryExists(const std::string& dir);
 	static void createDirectory(const std::string& dir);
 };

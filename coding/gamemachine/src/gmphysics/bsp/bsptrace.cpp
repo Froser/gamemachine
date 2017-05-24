@@ -518,9 +518,9 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 	GMfloat offset;
 	GMfloat d1, d2;
 
-	Vector<GMint> frontFacing;
+	AlignedVector<GMint> frontFacing;
 	frontFacing.resize(pc->planes.size());
-	Vector<GMfloat> intersection;
+	AlignedVector<GMfloat> intersection;
 	intersection.resize(pc->planes.size());
 
 	// determine the trace's relationship to all planes

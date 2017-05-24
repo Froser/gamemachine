@@ -20,7 +20,7 @@ struct BSPPhysicsWorldPrivate : public PhysicsWorldPrivate
 
 	AlignedVector<BSPTracePlane> planes;
 	AlignedVector<BSP_Physics_Brush> brushes;
-	Vector<BSP_Physics_BrushSide> brushsides;
+	AlignedVector<BSP_Physics_BrushSide> brushsides;
 
 	BSPTrace trace;
 	BSPPatch patch;

@@ -11,7 +11,7 @@ struct GMGLShaderInfo
 	GLuint shader;
 };
 
-typedef Vector<GMGLShaderInfo> GMGLShadersInfo;
+typedef AlignedVector<GMGLShaderInfo> GMGLShadersInfo;
 
 class GMGLShaders
 {

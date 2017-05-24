@@ -6,6 +6,8 @@ BEGIN_NS
 
 struct Model
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 	linear_math::Vector3 extents;
 	bool create;
 	char classname[64];

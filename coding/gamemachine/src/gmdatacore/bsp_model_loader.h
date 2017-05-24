@@ -14,6 +14,8 @@ BEGIN_NS
 class BSPGameWorld;
 class BSPModelLoader
 {
+	typedef std::map<std::string, Model*> ModelMap;
+
 public:
 	BSPModelLoader();
 	~BSPModelLoader();
@@ -30,8 +32,8 @@ private:
 private:
 	std::string m_directory;
 	BSPGameWorld* m_world;
-	std::map<std::string, Model> m_items;
-	Vector<TiXmlDocument*> m_modelDocs;
+	ModelMap m_items;
+	AlignedVector<TiXmlDocument*> m_modelDocs;
 };
 
 END_NS

@@ -525,9 +525,9 @@ std::string Path::getCurrentPath()
 	return "";
 }
 
-Vector<std::string> Path::getAllFiles(const char* directory)
+AlignedVector<std::string> Path::getAllFiles(const char* directory)
 {
-	Vector<std::string> res;
+	AlignedVector<std::string> res;
 #if _WINDOWS
 	std::string p = directory;
 	p.append("*");
@@ -547,7 +547,7 @@ Vector<std::string> Path::getAllFiles(const char* directory)
 	}
 #elif defined __APPLE__
 	ASSERT(false);
-	return Vector<std::string>();
+	return AlignedVector<std::string>();
 #else
 #error need implement
 #endif

@@ -29,6 +29,7 @@ struct GameObjectPrivate
 class GameWorld;
 class GameObject
 {
+	GM_DECLARE_ALIGNED_ALLOCATOR();
 	DEFINE_PRIVATE(GameObject)
 
 public:

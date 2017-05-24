@@ -12,6 +12,8 @@ class ObjectPainter;
 class GameWorld
 {
 	DEFINE_PRIVATE(GameWorld)
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
 public:
 	GameWorld(GamePackage* pk);
 	virtual ~GameWorld();

@@ -71,7 +71,7 @@ void Component::beginFace()
 
 void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 {
-	Vector<Object::DataType>& vertices = m_parent->vertices();
+	AlignedVector<Object::DataType>& vertices = m_parent->vertices();
 	vertices.push_back(x);
 	vertices.push_back(y);
 	vertices.push_back(z);
@@ -81,7 +81,7 @@ void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 
 void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 {
-	Vector<Object::DataType>& normals = m_parent->normals();
+	AlignedVector<Object::DataType>& normals = m_parent->normals();
 	normals.push_back(x);
 	normals.push_back(y);
 	normals.push_back(z);
@@ -90,14 +90,14 @@ void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 
 void Component::uv(GMfloat u, GMfloat v)
 {
-	Vector<Object::DataType>& uvs = m_parent->uvs();
+	AlignedVector<Object::DataType>& uvs = m_parent->uvs();
 	uvs.push_back(u);
 	uvs.push_back(v);
 }
 
 void Component::lightmap(GMfloat u, GMfloat v)
 {
-	Vector<Object::DataType>& lightmaps = m_parent->lightmaps();
+	AlignedVector<Object::DataType>& lightmaps = m_parent->lightmaps();
 	lightmaps.push_back(u);
 	lightmaps.push_back(v);
 }
@@ -131,7 +131,7 @@ ChildObject::ChildObject(const std::string& name)
 
 ChildObject::~ChildObject()
 {
-	for (auto iter = m_components.begin(); iter != m_components.cend(); iter++)
+	for (auto iter = m_components.begin(); iter != m_components.end(); iter++)
 	{
 		delete *iter;
 	}
@@ -139,7 +139,7 @@ ChildObject::~ChildObject()
 
 void ChildObject::appendComponent(AUTORELEASE Component* component)
 {
-	ASSERT(std::find(m_components.begin(), m_components.end(), component) == m_components.end());
+	ASSERT(m_components.find(component) == m_components.end());
 	m_components.push_back(component);
 }
 
