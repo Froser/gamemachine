@@ -12,15 +12,15 @@
 GameWorld::GameWorld(GamePackage* pk)
 {
 	D(d);
-	d.gamePackage = pk;
-	d.elapsed = 0;
-	d.start = false;
+	d->gamePackage = pk;
+	d->elapsed = 0;
+	d->start = false;
 }
 
 GameWorld::~GameWorld()
 {
 	D(d);
-	for (auto iter = d.shapes.begin(); iter != d.shapes.end(); iter++)
+	for (auto iter = d->shapes.begin(); iter != d->shapes.end(); iter++)
 	{
 		delete *iter;
 	}
@@ -36,7 +36,7 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	D(d);
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
-	d.shapes.insert(obj);
+	d->shapes.insert(obj);
 	initObject(obj);
 }
 
@@ -52,66 +52,66 @@ void GameWorld::initObject(GameObject* obj)
 void GameWorld::setMajorCharacter(Character* character)
 {
 	D(d);
-	d.character = character;
+	d->character = character;
 }
 
 Character* GameWorld::getMajorCharacter()
 {
 	D(d);
-	return d.character;
+	return d->character;
 }
 
 void GameWorld::simulateGameWorld()
 {
 	D(d);
 	physicsWorld()->simulate();
-	d.character->simulation();
-	if (!d.start) // 第一次simulate
+	d->character->simulation();
+	if (!d->start) // 第一次simulate
 	{
-		d.startTick = clock();
-		d.elapsed = 0;
-		d.start = true;
+		d->startTick = clock();
+		d->elapsed = 0;
+		d->start = true;
 	}
 	else
 	{
-		d.elapsed = (GMfloat)(clock() - d.startTick) * .001f;
+		d->elapsed = (GMfloat)(clock() - d->startTick) * .001f;
 	}
 }
 
 IGraphicEngine* GameWorld::getGraphicEngine()
 {
 	D(d);
-	return d.gameMachine->getGraphicEngine();
+	return d->gameMachine->getGraphicEngine();
 }
 
 void GameWorld::setGameMachine(GameMachine* gm)
 {
 	D(d);
-	d.gameMachine = gm;
+	d->gameMachine = gm;
 }
 
 GameMachine* GameWorld::getGameMachine()
 {
 	D(d);
-	return d.gameMachine;
+	return d->gameMachine;
 }
 
 GamePackage* GameWorld::getGamePackage()
 {
 	D(d);
-	return d.gamePackage;
+	return d->gamePackage;
 }
 
 GMfloat GameWorld::getElapsed()
 {
 	D(d);
-	return d.elapsed;
+	return d->elapsed;
 }
 
 ObjectPainter* GameWorld::createPainterForObject(GameObject* obj)
 {
 	D(d);
-	GameMachine* gm = d.gameMachine;
+	GameMachine* gm = d->gameMachine;
 	IFactory* factory = gm->getFactory();
 	IGraphicEngine* engine = gm->getGraphicEngine();
 	ObjectPainter* painter;
@@ -124,11 +124,11 @@ ObjectPainter* GameWorld::createPainterForObject(GameObject* obj)
 void GameWorld::setDefaultAmbientLight(const LightInfo& lightInfo)
 {
 	D(d);
-	d.ambientLight = lightInfo;
+	d->ambientLight = lightInfo;
 }
 
 LightInfo& GameWorld::getDefaultAmbientLight()
 {
 	D(d);
-	return d.ambientLight;
+	return d->ambientLight;
 }

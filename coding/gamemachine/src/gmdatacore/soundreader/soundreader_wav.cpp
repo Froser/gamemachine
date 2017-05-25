@@ -39,7 +39,7 @@ struct WavSoundFilePrivate
 
 class WavSoundFile : public SoundFile
 {
-	DEFINE_PRIVATE(WavSoundFile)
+	DECLARE_PRIVATE(WavSoundFile)
 
 	typedef SoundFile Base;
 
@@ -48,7 +48,7 @@ public:
 		: Base(fmt, waveData)
 	{
 		D(d);
-		d.playing = false;
+		d->playing = false;
 	}
 
 public:
@@ -56,16 +56,16 @@ public:
 	{
 		D(d);
 		loadSound();
-		d.playing = true;
-		HRESULT hr = d.cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
+		d->playing = true;
+		HRESULT hr = d->cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
 		ASSERT(SUCCEEDED(hr));
 	}
 
 	virtual void stop() override
 	{
 		D(d);
-		d.cpDirectSoundBuffer->Stop();
-		d.playing = false;
+		d->cpDirectSoundBuffer->Stop();
+		d->playing = false;
 	}
 
 private:
@@ -86,7 +86,7 @@ private:
 			return;
 		}
 
-		if (FAILED(hr = cpBuffer->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&d.cpDirectSoundBuffer)))
+		if (FAILED(hr = cpBuffer->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&d->cpDirectSoundBuffer)))
 		{
 			gm_error("QueryInterface to IDirectSoundBuffer8 error");
 			return;
@@ -94,10 +94,10 @@ private:
 
 		LPVOID lpLockBuf;
 		DWORD len;
-		d.cpDirectSoundBuffer->Lock(0, 0, &lpLockBuf, &len, NULL, NULL, DSBLOCK_ENTIREBUFFER);
+		d->cpDirectSoundBuffer->Lock(0, 0, &lpLockBuf, &len, NULL, NULL, DSBLOCK_ENTIREBUFFER);
 		memcpy(lpLockBuf, getData()->data, len);
-		d.cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
-		d.cpDirectSoundBuffer->SetCurrentPosition(0);
+		d->cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
+		d->cpDirectSoundBuffer->SetCurrentPosition(0);
 	}
 };
 #endif

@@ -76,9 +76,8 @@ ModelReader_Obj::ModelReader_Obj()
 void ModelReader_Obj::init()
 {
 	D(d);
-	d = ModelReader_ObjPrivate();
-	d.object = nullptr;
-	d.currentComponent = nullptr;
+	d->object = nullptr;
+	d->currentComponent = nullptr;
 }
 
 bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object)
@@ -90,14 +89,14 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);
 
-	d.object = new Object;
+	d->object = new Object;
 	ChildObject* child = new ChildObject();
-	d.object->append(child);
+	d->object->append(child);
 
 	// 事先分配一些内存，提高效率
-	d.vertices.reserve(RESERVED);
-	d.textures.reserve(RESERVED);
-	d.normals.reserve(RESERVED);
+	d->vertices.reserve(RESERVED);
+	d->textures.reserve(RESERVED);
+	d->normals.reserve(RESERVED);
 
 	while (sr.readLine(line))
 	{
@@ -112,17 +111,17 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 		else if (strEqual(token, "v"))
 		{
 			// vertex
-			pushBackData(settings.extents, settings.position, s, d.vertices);
+			pushBackData(settings.extents, settings.position, s, d->vertices);
 		}
 		else if (strEqual(token, "vn"))
 		{
 			// normal
-			pushBackData<3>(s, d.normals);
+			pushBackData<3>(s, d->normals);
 		}
 		else if (strEqual(token, "vt"))
 		{
 			// texture
-			pushBackData<2>(s, d.textures);
+			pushBackData<2>(s, d->textures);
 		}
 		else if (strEqual(token, "mtllib"))
 		{
@@ -136,10 +135,10 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 			// use material
 			char name[LINE_MAX];
 			s.next(name);
-			d.currentMaterialName = name;
-			if (d.currentComponent)
-				child->appendComponent(d.currentComponent);
-			d.currentComponent = nullptr;
+			d->currentMaterialName = name;
+			if (d->currentComponent)
+				child->appendComponent(d->currentComponent);
+			d->currentComponent = nullptr;
 		}
 		else if (strEqual(token, "f"))
 		{
@@ -148,9 +147,9 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 		}
 	}
 
-	if (d.currentComponent)
-		child->appendComponent(d.currentComponent);
-	*object = d.object;
+	if (d->currentComponent)
+		child->appendComponent(d->currentComponent);
+	*object = d->object;
 
 	return true;
 }
@@ -163,17 +162,17 @@ bool ModelReader_Obj::test(const GamePackageBuffer& buffer)
 void ModelReader_Obj::appendFace(Scanner& scanner)
 {
 	D(d);
-	const ModelReader_Obj_Material& material = d.materials[d.currentMaterialName];
+	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
 
-	ChildObject* child = d.object->getChildObjects()[0];
-	if (!d.currentComponent)
+	ChildObject* child = d->object->getChildObjects()[0];
+	if (!d->currentComponent)
 	{
-		d.currentComponent = new Component(child);
-		applyMaterial(material, d.currentComponent->getShader());
+		d->currentComponent = new Component(child);
+		applyMaterial(material, d->currentComponent->getShader());
 	}
 
 	char face[LINE_MAX];
-	d.currentComponent->beginFace();
+	d->currentComponent->beginFace();
 	while (true)
 	{
 		scanner.next(face);
@@ -189,22 +188,22 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 
 		ASSERT(v != INVALID);
 		{
-			auto& vec = d.vertices[v - 1];
-			d.currentComponent->vertex(vec[0], vec[1], vec[2]);
+			auto& vec = d->vertices[v - 1];
+			d->currentComponent->vertex(vec[0], vec[1], vec[2]);
 		}
 
 		{
-			auto&& vec = t != INVALID ? d.textures[t - 1] : linear_math::Vector2(0, 0);
-			d.currentComponent->uv(vec[0], vec[1]);
+			auto&& vec = t != INVALID ? d->textures[t - 1] : linear_math::Vector2(0, 0);
+			d->currentComponent->uv(vec[0], vec[1]);
 		}
 
 		ASSERT(n != INVALID);
 		{
-			auto& vec = d.normals[n - 1];
-			d.currentComponent->normal(vec[0], vec[1], vec[2]);
+			auto& vec = d->normals[n - 1];
+			d->currentComponent->normal(vec[0], vec[1], vec[2]);
 		}
 	};
-	d.currentComponent->endFace();
+	d->currentComponent->endFace();
 }
 
 void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename)
@@ -229,7 +228,7 @@ void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char
 		{
 			char name[LINE_MAX];
 			s.next(name);
-			material = &(d.materials[name]);
+			material = &(d->materials[name]);
 			memset(material, 0, sizeof(*material));
 		}
 		else if (strEqual(token, "Ns"))

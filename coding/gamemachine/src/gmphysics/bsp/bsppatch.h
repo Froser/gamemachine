@@ -7,16 +7,16 @@
 BEGIN_NS
 
 struct BSP_Physics_Patch;
-struct BSPPatchPrivate
+GM_PRIVATE_OBJECT(BSPPatch)
 {
-	~BSPPatchPrivate();
+	~GM_PRIVATE_CONSTRUCT(BSPPatch);
 	AUTORELEASE AlignedVector<BSP_Physics_Patch*> patches;
 };
 
 struct BSPPatchCollide;
 class BSPPatch
 {
-	DEFINE_PRIVATE(BSPPatch)
+	DECLARE_PRIVATE(BSPPatch)
 
 public:
 	void alloc(GMint num);

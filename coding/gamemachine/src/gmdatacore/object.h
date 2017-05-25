@@ -35,7 +35,7 @@ private:
 };
 
 class ChildObject;
-class Component
+class Component : public GMObject
 {
 	friend class ChildObject;
 

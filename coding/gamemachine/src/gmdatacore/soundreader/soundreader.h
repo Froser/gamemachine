@@ -66,7 +66,7 @@ enum SoundType
 	SoundType_End,
 };
 
-class SoundFile : public ISoundFile
+class SoundFile : public GMObject, public ISoundFile
 {
 public:
 	typedef WAVEFORMATEX DataType;

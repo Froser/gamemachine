@@ -33,9 +33,9 @@ struct ModelReader_ObjPrivate
 };
 
 // 一个Obj文件只由一个部分组成，不存在骨骼等动画，是刚体静态的
-class ModelReader_Obj : public IModelReader
+class ModelReader_Obj : public GMObject, public IModelReader
 {
-	DEFINE_PRIVATE(ModelReader_Obj);
+	DECLARE_PRIVATE(ModelReader_Obj);
 
 public:
 	ModelReader_Obj();

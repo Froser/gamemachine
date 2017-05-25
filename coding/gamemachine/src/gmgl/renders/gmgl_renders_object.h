@@ -19,9 +19,9 @@ struct GMGLRenders_ObjectPrivate
 	GameWorld* world;
 };
 
-class GMGLRenders_Object : public IRender
+class GMGLRenders_Object : public GMObject, public IRender
 {
-	DEFINE_PRIVATE(GMGLRenders_Object)
+	DECLARE_PRIVATE(GMGLRenders_Object)
 
 public:
 	virtual void begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform) override;

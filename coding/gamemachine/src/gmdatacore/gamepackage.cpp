@@ -8,11 +8,11 @@
 GamePackage::GamePackage(GameMachine* gm, IFactory* factory)
 {
 	D(d);
-	d.factory = factory;
-	d.gameMachine = gm;
+	d->factory = factory;
+	d->gameMachine = gm;
 }
 
-GamePackageData& GamePackage::gamePackageData()
+GamePackageData* GamePackage::gamePackageData()
 {
 	D(d);
 	return d;
@@ -36,17 +36,17 @@ void GamePackage::loadPackage(const char* path)
 	if ((s.st_mode & S_IFMT) == S_IFDIR)
 	{
 		// 读取整个目录
-		d.packagePath = std::string(path_temp) + '/';
-		d.factory->createGamePackage(this, GPT_DIRECTORY, &handler);
+		d->packagePath = std::string(path_temp) + '/';
+		d->factory->createGamePackage(this, GPT_DIRECTORY, &handler);
 	}
 	else
 	{
-		d.packagePath = std::string(path_temp);
-		d.factory->createGamePackage(this, GPT_ZIP, &handler);
+		d->packagePath = std::string(path_temp);
+		d->factory->createGamePackage(this, GPT_ZIP, &handler);
 	}
 
-	d.handler.reset(handler);
-	d.handler->init();
+	d->handler.reset(handler);
+	d->handler->init();
 }
 
 void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld)
@@ -57,7 +57,7 @@ void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWor
 	BSPGameWorld* world = new BSPGameWorld(this);
 	*gameWorld = world;
 
-	world->setGameMachine(d.gameMachine);
+	world->setGameMachine(d->gameMachine);
 	world->loadBSP(map);
 }
 
@@ -73,22 +73,22 @@ bool GamePackage::readFile(PackageIndex index, const char* filename, REF GamePac
 AlignedVector<std::string> GamePackage::getAllFiles(const char* directory)
 {
 	D(d);
-	ASSERT(d.handler);
-	return d.handler->getAllFiles(directory);
+	ASSERT(d->handler);
+	return d->handler->getAllFiles(directory);
 }
 
 std::string GamePackage::pathOf(PackageIndex index, const char* filename)
 {
 	D(d);
-	ASSERT(d.handler);
-	return d.handler->pathRoot(index) + filename;
+	ASSERT(d->handler);
+	return d->handler->pathRoot(index) + filename;
 }
 
 bool GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
 {
 	D(d);
-	ASSERT(d.handler);
-	bool b = d.handler->readFileFromPath(path, buffer);
+	ASSERT(d->handler);
+	bool b = d->handler->readFileFromPath(path, buffer);
 	gm_hook2(GamePackage, readFileFromPath, path, buffer);
 	return b;
 }

@@ -1138,7 +1138,7 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	pf->planes = context.planes;
 }
 
-BSPPatchPrivate::~BSPPatchPrivate()
+GM_PRIVATE_NAME(BSPPatch)::~GM_PRIVATE_CONSTRUCT(BSPPatch)
 {
 	for (auto iter = patches.begin(); iter != patches.end(); iter++)
 	{
@@ -1149,13 +1149,13 @@ BSPPatchPrivate::~BSPPatchPrivate()
 void BSPPatch::alloc(GMint num)
 {
 	D(d);
-	d.patches.resize(num);
+	d->patches.resize(num);
 }
 
 BSP_Physics_Patch* BSPPatch::patches(GMint at)
 {
 	D(d);
-	return d.patches[at];
+	return d->patches[at];
 }
 
 void BSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, const linear_math::Vector3* points, AUTORELEASE BSP_Physics_Patch* patch)
@@ -1223,5 +1223,5 @@ void BSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, cons
 	pf->bounds[1] += 1;
 
 	patch->pc = pf;
-	d.patches[index] = patch;
+	d->patches[index] = patch;
 }

@@ -14,9 +14,9 @@
 BEGIN_NS
 
 class GameObject;
-struct BSPGameWorldPrivate
+GM_PRIVATE_OBJECT(BSPGameWorld)
 {
-	BSPGameWorldPrivate()
+	GM_PRIVATE_CONSTRUCT(BSPGameWorld)
 		: sky(nullptr)
 		, ready(false)
 	{

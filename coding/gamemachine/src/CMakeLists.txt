@@ -111,8 +111,6 @@ set(SOURCES
 		gmgl/shader_constants.h
 		gmphysics/bsp/bsptrace.h
 		gmphysics/bsp/bsptrace.cpp
-		gmphysics/bsp/bspphysicsworldprivate.h
-		gmphysics/bsp/bspphysicsworldprivate.cpp
 		gmphysics/bsp/bspphysicsworld.h
 		gmphysics/bsp/bspphysicsworld.cpp
 		gmphysics/bsp/bspphysicsstructs.h
@@ -120,8 +118,6 @@ set(SOURCES
 		gmphysics/bsp/bsppatch.cpp
 		gmphysics/bsp/bspmove.h
 		gmphysics/bsp/bspmove.cpp
-		gmphysics/physicsworldprivate.h
-		gmphysics/physicsworldprivate.cpp
 		gmphysics/physicsworld.h
 		gmphysics/physicsworld.cpp
 		gmphysics/physicsstructs.h

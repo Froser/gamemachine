@@ -11,7 +11,7 @@
 #include "renders/gmgl_renders_sky.h"
 #include "renders/gmgl_renders_glyph.h"
 
-#define PKD(d) GamePackageData& d = gamePackage()->gamePackageData();
+#define PKD(d) GamePackageData* d = gamePackage()->gamePackageData();
 
 DefaultGMGLGamePackageHandler::DefaultGMGLGamePackageHandler(GamePackage* pk)
 	: m_pk(pk)
@@ -45,7 +45,7 @@ bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GameP
 void DefaultGMGLGamePackageHandler::init()
 {
 	PKD(d);
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d.gameMachine->getGraphicEngine());
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d->gameMachine->getGraphicEngine());
 
 	// 装载所有shaders
 	const std::string shaderMap[] = 
@@ -92,17 +92,17 @@ std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 	switch (index)
 	{
 	case PI_MAPS:
-		return d.packagePath + "maps/";
+		return d->packagePath + "maps/";
 	case PI_SHADERS:
-		return d.packagePath + "shaders/";
+		return d->packagePath + "shaders/";
 	case PI_TEXSHADERS:
-		return d.packagePath + "texshaders/";
+		return d->packagePath + "texshaders/";
 	case PI_TEXTURES:
-		return d.packagePath + "textures/";
+		return d->packagePath + "textures/";
 	case PI_MODELS:
-		return d.packagePath + "models/";
+		return d->packagePath + "models/";
 	case PI_SOUNDS:
-		return d.packagePath + "sounds/";
+		return d->packagePath + "sounds/";
 	default:
 		ASSERT(false);
 		break;
@@ -133,7 +133,7 @@ void ZipGMGLGamePackageHandler::init()
 	PKD(d);
 	if (!loadZip())
 	{
-		gm_error("invalid package file %s", d.packagePath.c_str());
+		gm_error("invalid package file %s", d->packagePath.c_str());
 		return;
 	}
 	Base::init();
@@ -166,7 +166,7 @@ bool ZipGMGLGamePackageHandler::loadZip()
 	PKD(d);
 	releaseUnzFile();
 
-	m_uf = unzOpen64(d.packagePath.c_str());
+	m_uf = unzOpen64(d->packagePath.c_str());
 	unz_global_info64 gi;
 	GMint err = unzGetGlobalInfo64(m_uf, &gi);
 	CHECK(err);

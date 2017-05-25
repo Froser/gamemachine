@@ -13,42 +13,42 @@
 FPSCounter::FPSCounter()
 {
 	D(d);
-	d.fps = 0;
-	d.lastTime = 0.f;
-	d.frames = 0.f;
-	d.time = 0.f;
-	d.immediate_lastTime = 0.f;
-	d.elapsed_since_last_frame = 0.f;
+	d->fps = 0;
+	d->lastTime = 0.f;
+	d->frames = 0.f;
+	d->time = 0.f;
+	d->immediate_lastTime = 0.f;
+	d->elapsed_since_last_frame = 0.f;
 }
 
 // 每一帧运行一次update
 void FPSCounter::update()
 {
 	D(d);
-	d.time = clock() * 0.001f;								//get current time in seconds
-	++d.frames;												//increase frame count
+	d->time = clock() * 0.001f;								//get current time in seconds
+	++d->frames;												//increase frame count
 
-	if (d.time - d.lastTime > 1.0f)							//if it has been 1 second
+	if (d->time - d->lastTime > 1.0f)							//if it has been 1 second
 	{
-		d.fps = d.frames / (d.time - d.lastTime);			//update fps number
-		d.lastTime = d.time;								//set beginning count
-		d.frames = 0L;										//reset frames this second
+		d->fps = d->frames / (d->time - d->lastTime);			//update fps number
+		d->lastTime = d->time;								//set beginning count
+		d->frames = 0L;										//reset frames this second
 	}
 
-	d.elapsed_since_last_frame = d.time - d.immediate_lastTime;
-	d.immediate_lastTime = d.time;
+	d->elapsed_since_last_frame = d->time - d->immediate_lastTime;
+	d->immediate_lastTime = d->time;
 }
 
 GMfloat FPSCounter::getFps()
 {
 	D(d);
-	return d.fps;
+	return d->fps;
 }
 
 GMfloat FPSCounter::getElapsedSinceLastFrame()
 {
 	D(d);
-	return d.elapsed_since_last_frame;
+	return d->elapsed_since_last_frame;
 }
 
 //Plane
@@ -531,18 +531,18 @@ AlignedVector<std::string> Path::getAllFiles(const char* directory)
 #if _WINDOWS
 	std::string p = directory;
 	p.append("*");
-	_finddata_t d;
+	_finddata_t fd;
 	long hFile = 0;
-	if ((hFile = _findfirst(p.c_str(), &d)) != -1)
+	if ((hFile = _findfirst(p.c_str(), &fd)) != -1)
 	{
 		do
 		{
-			if ((d.attrib &  _A_ARCH))
+			if ((fd.attrib &  _A_ARCH))
 			{
-				if (!strEqual(d.name, ".") && !strEqual(d.name, ".."))
-					res.push_back(std::string(directory).append(d.name));
+				if (!strEqual(fd.name, ".") && !strEqual(fd.name, ".."))
+					res.push_back(std::string(directory).append(fd.name));
 			}
-		} while (_findnext(hFile, &d) == 0);
+		} while (_findnext(hFile, &fd) == 0);
 		_findclose(hFile);
 	}
 #elif defined __APPLE__

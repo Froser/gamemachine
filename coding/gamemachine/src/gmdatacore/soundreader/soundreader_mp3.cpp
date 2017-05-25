@@ -40,7 +40,7 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter);
 
 class MP3SoundFile : public SoundFile
 {
-	DEFINE_PRIVATE(MP3SoundFile)
+	DECLARE_PRIVATE(MP3SoundFile)
 
 	typedef SoundFile Base;
 
@@ -49,14 +49,14 @@ public:
 		: Base(WAVEFORMATEX(), nullptr)
 	{
 		D(d);
-		d.parent = this;
-		d.inited = false;
-		d.bufferIn = *in;
-		d.playing = false;
-		d.formatCreated = false;
-		d.bufferLoaded = false;
-		d.frame = 0;
-		d.bufferOffset = 0;
+		d->parent = this;
+		d->inited = false;
+		d->bufferIn = *in;
+		d->playing = false;
+		d->formatCreated = false;
+		d->bufferLoaded = false;
+		d->frame = 0;
+		d->bufferOffset = 0;
 	}
 
 	~MP3SoundFile()
@@ -67,20 +67,20 @@ public:
 	virtual void play() override
 	{
 		D(d);
-		d.playing = true;
-		d.thread = ::CreateThread(NULL, NULL, ::decode, &d, NULL, NULL);
+		d->playing = true;
+		d->thread = ::CreateThread(NULL, NULL, ::decode, &d, NULL, NULL);
 	}
 
 	virtual void stop() override
 	{
 		D(d);
-		d.playing = false;
-		if (d.cpDirectSoundBuffer)
-			d.cpDirectSoundBuffer->Stop();
+		d->playing = false;
+		if (d->cpDirectSoundBuffer)
+			d->cpDirectSoundBuffer->Stop();
 
 		for (GMint i = 0; i < BUFFER_COUNT; i++)
 		{
-			::SetEvent(d.events[i]);
+			::SetEvent(d->events[i]);
 		}
 	}
 
@@ -89,10 +89,10 @@ public:
 	void transfer(GMbyte* b, GMuint size)
 	{
 		D(d);
-		if (!d.inited)
+		if (!d->inited)
 		{
 			init(b, size);
-			d.inited = true;
+			d->inited = true;
 			::CreateThread(NULL, NULL, processBuffer, &d, NULL, NULL);
 		}
 	}
@@ -105,8 +105,8 @@ private:
 		dsbd.dwSize = sizeof(DSBUFFERDESC);
 		dsbd.dwFlags = DSBCAPS_GLOBALFOCUS | DSBCAPS_CTRLFX | DSBCAPS_CTRLPOSITIONNOTIFY | DSBCAPS_GETCURRENTPOSITION2;
 		dsbd.dwBufferBytes = size;
-		dsbd.lpwfxFormat = (LPWAVEFORMATEX)&d.format;
-		d.unitBufferSize = size / BUFFER_COUNT;
+		dsbd.lpwfxFormat = (LPWAVEFORMATEX)&d->format;
+		d->unitBufferSize = size / BUFFER_COUNT;
 
 		ComPtr<IDirectSoundBuffer> cpBuffer;
 		HRESULT hr;
@@ -116,14 +116,14 @@ private:
 			return;
 		}
 
-		if (FAILED(hr = cpBuffer->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&d.cpDirectSoundBuffer)))
+		if (FAILED(hr = cpBuffer->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&d->cpDirectSoundBuffer)))
 		{
 			gm_error("QueryInterface to IDirectSoundBuffer8 error");
 			return;
 		}
 
 		ComPtr<IDirectSoundNotify> cpDirectSoundNotify;
-		if (FAILED(hr = d.cpDirectSoundBuffer->QueryInterface(IID_IDirectSoundNotify, (LPVOID*)&cpDirectSoundNotify)))
+		if (FAILED(hr = d->cpDirectSoundBuffer->QueryInterface(IID_IDirectSoundNotify, (LPVOID*)&cpDirectSoundNotify)))
 		{
 			gm_error("QueryInterface to IDirectSoundNotify error");
 			return;
@@ -131,24 +131,24 @@ private:
 
 		for (GMint i = 0; i < BUFFER_COUNT; i++)
 		{
-			d.notifyPos[i].dwOffset = (i + 1) * d.unitBufferSize - 1;
-			d.notifyPos[i].hEventNotify = ::CreateEvent(NULL, FALSE, FALSE, NULL);
-			d.events[i] = d.notifyPos[i].hEventNotify;
+			d->notifyPos[i].dwOffset = (i + 1) * d->unitBufferSize - 1;
+			d->notifyPos[i].hEventNotify = ::CreateEvent(NULL, FALSE, FALSE, NULL);
+			d->events[i] = d->notifyPos[i].hEventNotify;
 		}
-		hr = cpDirectSoundNotify->SetNotificationPositions(2, d.notifyPos);
+		hr = cpDirectSoundNotify->SetNotificationPositions(2, d->notifyPos);
 		ASSERT(SUCCEEDED(hr));
 
 		LPVOID lpLockBuf;
 		DWORD len;
-		hr = d.cpDirectSoundBuffer->Lock(0, 0, &lpLockBuf, &len, 0, 0, DSBLOCK_ENTIREBUFFER);
+		hr = d->cpDirectSoundBuffer->Lock(0, 0, &lpLockBuf, &len, 0, 0, DSBLOCK_ENTIREBUFFER);
 		ASSERT(SUCCEEDED(hr));
 		memcpy(lpLockBuf, b, size);
 		memset((GMbyte*)lpLockBuf + size, 0, len - size);
-		hr = d.cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
+		hr = d->cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
 		ASSERT(SUCCEEDED(hr));
-		hr = d.cpDirectSoundBuffer->SetCurrentPosition(0);
+		hr = d->cpDirectSoundBuffer->SetCurrentPosition(0);
 		ASSERT(SUCCEEDED(hr));
-		hr = d.cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
+		hr = d->cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
 		ASSERT(SUCCEEDED(hr));
 	}
 };

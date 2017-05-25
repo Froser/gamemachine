@@ -12,7 +12,7 @@ class GameObject;
 class Character;
 class GameMachine;
 class GamePackage;
-struct GameWorldPrivate
+GM_PRIVATE_OBJECT(GameWorld)
 {
 	GameWorldPrivate();
 	GamePackage* gamePackage;
@@ -21,8 +21,8 @@ struct GameWorldPrivate
 	Character* character;
 	GMfloat elapsed;
 	GMlong startTick;
-	bool start;
 	LightInfo ambientLight;
+	bool start;
 };
 
 END_NS

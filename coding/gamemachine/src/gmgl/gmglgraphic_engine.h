@@ -13,7 +13,7 @@ class GameWorld;
 class GameLight;
 struct IRender;
 
-struct GMGLGraphicEnginePrivate
+GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	std::map<ChildObject::ObjectType, GMGLShaders*> allShaders;
 	std::map<ChildObject::ObjectType, IRender*> allRenders;
@@ -24,9 +24,9 @@ struct GMGLGraphicEnginePrivate
 	linear_math::Matrix4x4 projectionMatrix;
 };
 
-class GMGLGraphicEngine : public IGraphicEngine
+class GMGLGraphicEngine : public GMObject, public IGraphicEngine
 {
-	DEFINE_PRIVATE(GMGLGraphicEngine)
+	DECLARE_PRIVATE(GMGLGraphicEngine)
 
 public:
 	GMGLGraphicEngine();

@@ -5,7 +5,7 @@
 PhysicsWorld::PhysicsWorld(GameWorld* world)
 {
 	D(d);
-	d.world = world;
+	d->world = world;
 }
 
 PhysicsWorld::~PhysicsWorld()

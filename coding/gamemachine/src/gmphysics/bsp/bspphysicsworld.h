@@ -2,14 +2,33 @@
 #define __BSPPHYSICSWORLD_H__
 #include "common.h"
 #include "gmphysics/physicsworld.h"
-#include "bspphysicsworldprivate.h"
+#include "bsptrace.h"
+#include "bsppatch.h"
 BEGIN_NS
 
 class BSPGameWorld;
 class BSPMove;
+
+class BSPGameWorld;
+class BSPMove;
+
+GM_PRIVATE_OBJECT_FROM(BSPPhysicsWorld, PhysicsWorld)
+{
+	BSPGameWorld* world;
+	CollisionObject camera;
+
+	AlignedVector<BSPTracePlane> planes;
+	AlignedVector<BSP_Physics_Brush> brushes;
+	AlignedVector<BSP_Physics_BrushSide> brushsides;
+
+	BSPTrace trace;
+	BSPPatch patch;
+	std::map<CollisionObject*, BSPMove*> objectMoves;
+};
+
 class BSPPhysicsWorld : public PhysicsWorld
 {
-	DEFINE_PRIVATE(BSPPhysicsWorld)
+	DECLARE_PRIVATE(BSPPhysicsWorld)
 
 public:
 	BSPPhysicsWorld(GameWorld* world);
@@ -21,7 +40,7 @@ public:
 	virtual void sendCommand(CollisionObject* obj, const CommandParams& dataParam) override;
 
 public:
-	BSPPhysicsWorldData& physicsData();
+	BSPPhysicsWorld::Data& physicsData();
 	void initBSPPhysicsWorld();
 	void setCamera(GameObject* obj);
 

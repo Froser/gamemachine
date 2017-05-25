@@ -5,7 +5,7 @@
 BSPRenderData& BSPRender::renderData()
 {
 	D(d);
-	return d;
+	return *d;
 }
 
 //Tesselate a biquadratic patch
@@ -93,7 +93,7 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 void BSPRender::generateRenderData(BSPData* bsp)
 {
 	D(d);
-	d.bsp = bsp;
+	d->bsp = bsp;
 	
 	generateVertices();
 	generateFaces();
@@ -108,29 +108,29 @@ void BSPRender::generateVertices()
 {
 	D(d);
 	// create vertices for drawing
-	d.vertices.resize(d.bsp->numDrawVertices);
-	for (GMint i = 0; i < d.bsp->numDrawVertices; i++)
+	d->vertices.resize(d->bsp->numDrawVertices);
+	for (GMint i = 0; i < d->bsp->numDrawVertices; i++)
 	{
-		d.vertices[i].position[0] = d.bsp->vertices[i].xyz[0];
-		d.vertices[i].position[1] = d.bsp->vertices[i].xyz[1];
-		d.vertices[i].position[2] = d.bsp->vertices[i].xyz[2];
-		d.vertices[i].position[3] = 1.0f;
+		d->vertices[i].position[0] = d->bsp->vertices[i].xyz[0];
+		d->vertices[i].position[1] = d->bsp->vertices[i].xyz[1];
+		d->vertices[i].position[2] = d->bsp->vertices[i].xyz[2];
+		d->vertices[i].position[3] = 1.0f;
 
 		//scale down
-		// d.vertices[i].position /= SCALING_DOWN;
-		d.vertices[i].decalS = d.bsp->vertices[i].st[0];
-		d.vertices[i].decalT = d.bsp->vertices[i].st[1];
+		// d->vertices[i].position /= SCALING_DOWN;
+		d->vertices[i].decalS = d->bsp->vertices[i].st[0];
+		d->vertices[i].decalT = d->bsp->vertices[i].st[1];
 
 		//Transfer lightmap coordinates
-		d.vertices[i].lightmapS = d.bsp->vertices[i].lightmap[0];
-		d.vertices[i].lightmapT = d.bsp->vertices[i].lightmap[1];
+		d->vertices[i].lightmapS = d->bsp->vertices[i].lightmap[0];
+		d->vertices[i].lightmapT = d->bsp->vertices[i].lightmap[1];
 
 		for (GMuint j = 0; j < 3; j++)
 		{
-			if (d.vertices[i].position[j] < d.boundMin[j])
-				d.boundMin[j] = d.vertices[i].position[j];
-			if (d.vertices[i].position[j] > d.boundMax[j])
-				d.boundMax[j] = d.vertices[i].position[j];
+			if (d->vertices[i].position[j] < d->boundMin[j])
+				d->boundMin[j] = d->vertices[i].position[j];
+			if (d->vertices[i].position[j] > d->boundMax[j])
+				d->boundMax[j] = d->vertices[i].position[j];
 		}
 	}
 }
@@ -139,84 +139,84 @@ void BSPRender::generateFaces()
 {
 	D(d);
 	// create faces for drawing
-	d.faceDirectory.resize(d.bsp->numDrawSurfaces);
-	d.facesToDraw.init(d.bsp->numDrawSurfaces);
-	d.entitiesToDraw.init(d.bsp->numleafs);
+	d->faceDirectory.resize(d->bsp->numDrawSurfaces);
+	d->facesToDraw.init(d->bsp->numDrawSurfaces);
+	d->entitiesToDraw.init(d->bsp->numleafs);
 
-	for (GMint i = 0; i < d.bsp->numDrawSurfaces; i++)
+	for (GMint i = 0; i < d->bsp->numDrawSurfaces; i++)
 	{
-		if (d.bsp->drawSurfaces[i].surfaceType == MST_PLANAR)
-			++d.numPolygonFaces;
-		else if (d.bsp->drawSurfaces[i].surfaceType == MST_PATCH)
-			++d.numPatches;
-		else if (d.bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)
-			++d.numMeshFaces;
+		if (d->bsp->drawSurfaces[i].surfaceType == MST_PLANAR)
+			++d->numPolygonFaces;
+		else if (d->bsp->drawSurfaces[i].surfaceType == MST_PATCH)
+			++d->numPatches;
+		else if (d->bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)
+			++d->numMeshFaces;
 	}
 
-	d.polygonFaces.resize(d.numPolygonFaces);
-	d.meshFaces.resize(d.numMeshFaces);
-	d.patches.resize(d.numPatches);
+	d->polygonFaces.resize(d->numPolygonFaces);
+	d->meshFaces.resize(d->numMeshFaces);
+	d->patches.resize(d->numPatches);
 	GMint currentFace = 0;
 	GMint currentMeshFace = 0;
 	GMint currentPatch = 0;
 
-	for (int i = 0; i < d.bsp->numDrawSurfaces; ++i)
+	for (int i = 0; i < d->bsp->numDrawSurfaces; ++i)
 	{
-		if (d.bsp->drawSurfaces[i].surfaceType == MST_PLANAR)		//skip this loadFace if it is not a polygon face
+		if (d->bsp->drawSurfaces[i].surfaceType == MST_PLANAR)		//skip this loadFace if it is not a polygon face
 		{
-			d.polygonFaces[currentFace].firstVertex = d.bsp->drawSurfaces[i].firstVert;
-			d.polygonFaces[currentFace].numVertices = d.bsp->drawSurfaces[i].numVerts;
-			d.polygonFaces[currentFace].textureIndex = d.bsp->drawSurfaces[i].shaderNum;
-			d.polygonFaces[currentFace].lightmapIndex = d.bsp->drawSurfaces[i].lightmapNum;
-			d.polygonFaces[currentFace].firstIndex = d.bsp->drawSurfaces[i].firstIndex;
-			d.polygonFaces[currentFace].numIndices = d.bsp->drawSurfaces[i].numIndexes;
+			d->polygonFaces[currentFace].firstVertex = d->bsp->drawSurfaces[i].firstVert;
+			d->polygonFaces[currentFace].numVertices = d->bsp->drawSurfaces[i].numVerts;
+			d->polygonFaces[currentFace].textureIndex = d->bsp->drawSurfaces[i].shaderNum;
+			d->polygonFaces[currentFace].lightmapIndex = d->bsp->drawSurfaces[i].lightmapNum;
+			d->polygonFaces[currentFace].firstIndex = d->bsp->drawSurfaces[i].firstIndex;
+			d->polygonFaces[currentFace].numIndices = d->bsp->drawSurfaces[i].numIndexes;
 
 			//fill in this entry on the face directory
-			d.faceDirectory[i].faceType = MST_PLANAR;
-			d.faceDirectory[i].typeFaceNumber = currentFace;
+			d->faceDirectory[i].faceType = MST_PLANAR;
+			d->faceDirectory[i].typeFaceNumber = currentFace;
 
 			++currentFace;
 		}
 
-		if (d.bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)		//skip this loadFace if it is not a mesh face
+		if (d->bsp->drawSurfaces[i].surfaceType == MST_TRIANGLE_SOUP)		//skip this loadFace if it is not a mesh face
 		{
-			d.meshFaces[currentMeshFace].firstVertex = d.bsp->drawSurfaces[i].firstVert;
-			d.meshFaces[currentMeshFace].numVertices = d.bsp->drawSurfaces[i].numVerts;
-			d.meshFaces[currentMeshFace].textureIndex = d.bsp->drawSurfaces[i].shaderNum;
-			d.meshFaces[currentMeshFace].lightmapIndex = d.bsp->drawSurfaces[i].lightmapNum;
-			d.meshFaces[currentMeshFace].firstIndex = d.bsp->drawSurfaces[i].firstIndex;
-			d.meshFaces[currentMeshFace].numIndices = d.bsp->drawSurfaces[i].numIndexes;
+			d->meshFaces[currentMeshFace].firstVertex = d->bsp->drawSurfaces[i].firstVert;
+			d->meshFaces[currentMeshFace].numVertices = d->bsp->drawSurfaces[i].numVerts;
+			d->meshFaces[currentMeshFace].textureIndex = d->bsp->drawSurfaces[i].shaderNum;
+			d->meshFaces[currentMeshFace].lightmapIndex = d->bsp->drawSurfaces[i].lightmapNum;
+			d->meshFaces[currentMeshFace].firstIndex = d->bsp->drawSurfaces[i].firstIndex;
+			d->meshFaces[currentMeshFace].numIndices = d->bsp->drawSurfaces[i].numIndexes;
 
 			//fill in this entry on the face directory
-			d.faceDirectory[i].faceType = MST_TRIANGLE_SOUP;
-			d.faceDirectory[i].typeFaceNumber = currentMeshFace;
+			d->faceDirectory[i].faceType = MST_TRIANGLE_SOUP;
+			d->faceDirectory[i].typeFaceNumber = currentMeshFace;
 
 			++currentMeshFace;
 		}
 
-		if (d.bsp->drawSurfaces[i].surfaceType == MST_PATCH)		//skip this loadFace if it is not a patch
+		if (d->bsp->drawSurfaces[i].surfaceType == MST_PATCH)		//skip this loadFace if it is not a patch
 		{
-			d.patches[currentPatch].textureIndex = d.bsp->drawSurfaces[i].shaderNum;
-			d.patches[currentPatch].lightmapIndex = d.bsp->drawSurfaces[i].lightmapNum;
-			d.patches[currentPatch].width = d.bsp->drawSurfaces[i].patchWidth;
-			d.patches[currentPatch].height = d.bsp->drawSurfaces[i].patchHeight;
+			d->patches[currentPatch].textureIndex = d->bsp->drawSurfaces[i].shaderNum;
+			d->patches[currentPatch].lightmapIndex = d->bsp->drawSurfaces[i].lightmapNum;
+			d->patches[currentPatch].width = d->bsp->drawSurfaces[i].patchWidth;
+			d->patches[currentPatch].height = d->bsp->drawSurfaces[i].patchHeight;
 
 			//fill in this entry on the face directory
-			d.faceDirectory[i].faceType = MST_PATCH;
-			d.faceDirectory[i].typeFaceNumber = currentPatch;
+			d->faceDirectory[i].faceType = MST_PATCH;
+			d->faceDirectory[i].typeFaceNumber = currentPatch;
 
 			//Create space to hold quadratic patches
 			// 一个patch有3x3个顶点组成
-			int numPatchesWide = (d.patches[currentPatch].width - 1) / 2;
-			int numPatchesHigh = (d.patches[currentPatch].height - 1) / 2;
+			int numPatchesWide = (d->patches[currentPatch].width - 1) / 2;
+			int numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
 
-			d.patches[currentPatch].numQuadraticPatches = numPatchesWide*numPatchesHigh;
-			d.patches[currentPatch].quadraticPatches = new BSP_Render_BiquadraticPatch
-				[d.patches[currentPatch].numQuadraticPatches];
-			if (!d.patches[currentPatch].quadraticPatches)
+			d->patches[currentPatch].numQuadraticPatches = numPatchesWide*numPatchesHigh;
+			d->patches[currentPatch].quadraticPatches = new BSP_Render_BiquadraticPatch
+				[d->patches[currentPatch].numQuadraticPatches];
+			if (!d->patches[currentPatch].quadraticPatches)
 			{
 				gm_error("Unable to allocate memory for %d quadratic patches",
-					d.patches[currentPatch].numQuadraticPatches);
+					d->patches[currentPatch].numQuadraticPatches);
 				return;
 			}
 
@@ -229,10 +229,10 @@ void BSPRender::generateFaces()
 					{
 						for (int point = 0; point < 3; ++point)
 						{
-							d.patches[currentPatch].quadraticPatches[y*numPatchesWide + x].
-								controlPoints[row * 3 + point] = d.vertices[d.bsp->drawSurfaces[i].firstVert +
-								(y * 2 * d.patches[currentPatch].width + x * 2) +
-								row*d.patches[currentPatch].width + point];
+							d->patches[currentPatch].quadraticPatches[y*numPatchesWide + x].
+								controlPoints[row * 3 + point] = d->vertices[d->bsp->drawSurfaces[i].firstVert +
+								(y * 2 * d->patches[currentPatch].width + x * 2) +
+								row*d->patches[currentPatch].width + point];
 						}
 					}
 
@@ -240,7 +240,7 @@ void BSPRender::generateFaces()
 
 					//TODO  curveTesselation
 					GMint curveTesselation = 8;
-					d.patches[currentPatch].quadraticPatches[y*numPatchesWide + x].tesselate(curveTesselation);
+					d->patches[currentPatch].quadraticPatches[y*numPatchesWide + x].tesselate(curveTesselation);
 				}
 			}
 
@@ -261,25 +261,25 @@ void BSPRender::generateLeafs()
 {
 	D(d);
 	//leafs
-	d.leafs.resize(d.bsp->numleafs);
-	for (GMint i = 0; i < d.bsp->numleafs; ++i)
+	d->leafs.resize(d->bsp->numleafs);
+	for (GMint i = 0; i < d->bsp->numleafs; ++i)
 	{
-		d.leafs[i].cluster = d.bsp->leafs[i].cluster;
-		d.leafs[i].firstLeafFace = d.bsp->leafs[i].firstLeafSurface;
-		d.leafs[i].numFaces = d.bsp->leafs[i].numLeafSurfaces;
+		d->leafs[i].cluster = d->bsp->leafs[i].cluster;
+		d->leafs[i].firstLeafFace = d->bsp->leafs[i].firstLeafSurface;
+		d->leafs[i].numFaces = d->bsp->leafs[i].numLeafSurfaces;
 
 		//Create the bounding box
-		d.leafs[i].boundingBoxVertices[0] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[1] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].maxs[1]);
-		d.leafs[i].boundingBoxVertices[2] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[3] = linear_math::Vector3(d.bsp->leafs[i].mins[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].maxs[1]);
-		d.leafs[i].boundingBoxVertices[4] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[5] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].mins[2], -d.bsp->leafs[i].maxs[1]);
-		d.leafs[i].boundingBoxVertices[6] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].mins[1]);
-		d.leafs[i].boundingBoxVertices[7] = linear_math::Vector3(d.bsp->leafs[i].maxs[0], d.bsp->leafs[i].maxs[2], -d.bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[0] = linear_math::Vector3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[1] = linear_math::Vector3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[2] = linear_math::Vector3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[3] = linear_math::Vector3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[4] = linear_math::Vector3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[5] = linear_math::Vector3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[6] = linear_math::Vector3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[7] = linear_math::Vector3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
 
 		// for (int j = 0; j < 8; ++j)
-		// 	d.leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
+		// 	d->leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
 	}
 }
 
@@ -294,10 +294,10 @@ void BSPRender::generateVisibilityData()
 	D(d);
 	// visBytes头两个int表示clusters，后面的字节表示bitsets
 	size_t sz = sizeof(int) * 2;
-	memcpy(&d.visibilityData, d.bsp->visBytes.data(), sz);
-	int bitsetSize = d.visibilityData.numClusters * d.visibilityData.bytesPerCluster;
-	d.visibilityData.bitset = new GMbyte[bitsetSize];
-	memcpy(d.visibilityData.bitset, d.bsp->visBytes.data() + sz, bitsetSize);
+	memcpy(&d->visibilityData, d->bsp->visBytes.data(), sz);
+	int bitsetSize = d->visibilityData.numClusters * d->visibilityData.bytesPerCluster;
+	d->visibilityData.bitset = new GMbyte[bitsetSize];
+	memcpy(d->visibilityData.bitset, d->bsp->visBytes.data() + sz, bitsetSize);
 }
 
 void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj)
@@ -316,13 +316,13 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 		component->beginFace();
 		for (GMint j = 0; j < 3; j++)
 		{
-			GMint idx = d.bsp->drawIndexes[face.firstIndex + i * 3 + j];
-			BSP_Render_Vertex& vertex = d.vertices[face.firstVertex + idx];
+			GMint idx = d->bsp->drawIndexes[face.firstIndex + i * 3 + j];
+			BSP_Render_Vertex& vertex = d->vertices[face.firstVertex + idx];
 			
-			GMint idx_prev = d.bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
-			GMint idx_next = d.bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
-			linear_math::Vector3& vertex_prev = d.vertices[face.firstVertex + idx_prev].position,
-				&vertex_next = d.vertices[face.firstVertex + idx_next].position;
+			GMint idx_prev = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
+			GMint idx_next = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
+			linear_math::Vector3& vertex_prev = d->vertices[face.firstVertex + idx_prev].position,
+				&vertex_next = d->vertices[face.firstVertex + idx_next].position;
 			linear_math::Vector3 normal = linear_math::cross(vertex.position - vertex_prev, vertex_next - vertex.position);
 			normal = linear_math::normalize(normal);
 

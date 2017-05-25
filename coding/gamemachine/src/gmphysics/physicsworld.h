@@ -1,13 +1,20 @@
 ﻿#ifndef __PHYSICSWORLD_H__
 #define __PHYSICSWORLD_H__
 #include "common.h"
-#include "physicsworldprivate.h"
+#include "physicsstructs.h"
 BEGIN_NS
 
 class GameWorld;
+struct CollisionObject;
+GM_PRIVATE_OBJECT(PhysicsWorld)
+{
+	GameWorld* world;
+	GMfloat gravity;
+};
+
 class PhysicsWorld : public GMObject
 {
-	DEFINE_PRIVATE(PhysicsWorld)
+	DECLARE_PRIVATE(PhysicsWorld)
 
 public:
 	PhysicsWorld(GameWorld* world);

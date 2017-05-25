@@ -330,7 +330,7 @@ struct FPSCounterPrivate
 
 class FPSCounter
 {
-	DEFINE_PRIVATE(FPSCounter)
+	DECLARE_PRIVATE(FPSCounter)
 
 public:
 	FPSCounter();

@@ -30,7 +30,7 @@ class GameWorld;
 class GameObject
 {
 	GM_DECLARE_ALIGNED_ALLOCATOR();
-	DEFINE_PRIVATE(GameObject)
+	DECLARE_PRIVATE(GameObject)
 
 public:
 	GameObject(AUTORELEASE Object* obj);
@@ -68,7 +68,7 @@ struct GlyphObjectPrivate
 class Component;
 class GlyphObject : public GameObject
 {
-	DEFINE_PRIVATE(GlyphObject)
+	DECLARE_PRIVATE(GlyphObject)
 
 public:
 	GlyphObject();
@@ -89,7 +89,7 @@ private:
 //EntityObject
 enum { EntityPlaneNum = 6 };
 
-struct EntityObjectPrivate
+GM_PRIVATE_OBJECT(EntityObject)
 {
 	linear_math::Vector3 mins, maxs;
 	Plane planes[EntityPlaneNum];
@@ -97,7 +97,7 @@ struct EntityObjectPrivate
 
 class EntityObject : public GameObject
 {
-	DEFINE_PRIVATE(EntityObject)
+	DECLARE_PRIVATE(EntityObject)
 
 public:
 	EntityObject(AUTORELEASE Object* obj);

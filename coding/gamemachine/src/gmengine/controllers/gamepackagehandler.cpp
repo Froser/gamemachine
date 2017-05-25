@@ -8,7 +8,7 @@
 #include <fstream>
 #include "gmengine/elements/bspgameworld.h"
 
-#define PKD(d) GamePackageData& d = gamePackage()->gamePackageData();
+#define PKD(d) GamePackageData* d = gamePackage()->gamePackageData();
 
 DefaultGMGamePackageHandler::DefaultGMGamePackageHandler(GamePackage* pk)
 	: m_pk(pk)
@@ -42,7 +42,7 @@ bool DefaultGMGamePackageHandler::readFileFromPath(const char* path, REF GamePac
 void DefaultGMGamePackageHandler::init()
 {
 	PKD(d);
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d.gameMachine->getGraphicEngine());
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d->gameMachine->getGraphicEngine());
 
 	// 装载所有shaders
 	const std::string shaderMap[] = 
@@ -80,13 +80,13 @@ std::string DefaultGMGamePackageHandler::pathRoot(PackageIndex index)
 	switch (index)
 	{
 	case PI_MAPS:
-		return d.packagePath + "maps/";
+		return d->packagePath + "maps/";
 	case PI_SHADERS:
-		return d.packagePath + "shaders/";
+		return d->packagePath + "shaders/";
 	case PI_TEXSHADERS:
-		return d.packagePath + "texshaders/";
+		return d->packagePath + "texshaders/";
 	case PI_TEXTURES:
-		return d.packagePath + "textures/";
+		return d->packagePath + "textures/";
 	default:
 		ASSERT(false);
 		break;
@@ -123,7 +123,7 @@ void ZipGMGamePackageHandler::init()
 	PKD(d);
 	if (!loadZip())
 	{
-		gm_error("invalid package file %s", d.packagePath.c_str());
+		gm_error("invalid package file %s", d->packagePath.c_str());
 		return;
 	}
 	Base::init();
@@ -149,7 +149,7 @@ bool ZipGMGamePackageHandler::loadZip()
 	PKD(d);
 	releaseUnzFile();
 
-	m_uf = unzOpen64(d.packagePath.c_str());
+	m_uf = unzOpen64(d->packagePath.c_str());
 	unz_global_info64 gi;
 	GMint err = unzGetGlobalInfo64(m_uf, &gi);
 	CHECK(err);
@@ -222,10 +222,10 @@ void ZipGMGamePackageHandler::releaseBuffers()
 AlignedVector<std::string> ZipGMGamePackageHandler::getAllFiles(const char* directory)
 {
 	AlignedVector<std::string> result;
-	std::string d = directory;
+	std::string dir = directory;
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
-		if ((*iter).first.compare(0, d.size(), d) == 0)
+		if ((*iter).first.compare(0, dir.size(), dir) == 0)
 		{
 			result.push_back((*iter).first);
 		}

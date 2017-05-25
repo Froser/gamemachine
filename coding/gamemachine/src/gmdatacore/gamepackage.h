@@ -84,13 +84,13 @@ class BSPGameWorld;
 typedef GamePackagePrivate GamePackageData;
 class GamePackage
 {
-	DEFINE_PRIVATE(GamePackage)
+	DECLARE_PRIVATE(GamePackage)
 
 public:
 	GamePackage(GameMachine* gm, IFactory* factory);
 
 public:
-	GamePackageData& gamePackageData();
+	GamePackageData* gamePackageData();
 	void loadPackage(const char* path);
 	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
 	bool readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename = nullptr);

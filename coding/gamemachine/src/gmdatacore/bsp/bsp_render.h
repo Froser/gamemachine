@@ -137,9 +137,9 @@ public:
 };
 
 class EntityObject;
-struct BSPRenderPrivate
+GM_PRIVATE_OBJECT(BSPRender)
 {
-	BSPRenderPrivate()
+	GM_PRIVATE_CONSTRUCT(BSPRender)
 		: numPolygonFaces(0)
 		, numPatches(0)
 		, numMeshFaces(0)
@@ -180,7 +180,7 @@ class Object;
 struct Shader;
 class BSPRender
 {
-	DEFINE_PRIVATE(BSPRender);
+	DECLARE_PRIVATE(BSPRender);
 
 public:
 	BSPRenderData& renderData();

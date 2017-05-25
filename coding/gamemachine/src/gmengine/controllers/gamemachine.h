@@ -59,7 +59,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 
 class GameMachine : public GMObject
 {
-	DEFINE_PRIVATE(GameMachine)
+	DECLARE_PRIVATE(GameMachine)
 
 	enum
 	{

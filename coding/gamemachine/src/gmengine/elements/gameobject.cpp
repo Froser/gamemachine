@@ -14,28 +14,28 @@ GameObject::GameObject(AUTORELEASE Object* obj)
 void GameObject::setObject(AUTORELEASE Object* obj)
 {
 	D(d);
-	d.object.reset(obj);
+	d->object.reset(obj);
 }
 
 Object* GameObject::getObject()
 {
 	D(d);
-	if (!d.object)
-		d.object.reset(new Object());
-	return d.object;
+	if (!d->object)
+		d->object.reset(new Object());
+	return d->object;
 }
 
 void GameObject::setWorld(GameWorld* world)
 {
 	D(d);
-	ASSERT(!d.world);
-	d.world = world;
+	ASSERT(!d->world);
+	d->world = world;
 }
 
 GameWorld* GameObject::getWorld()
 {
 	D(d);
-	return d.world;
+	return d->world;
 }
 
 void GameObject::getReadyForRender(DrawingList& list)
@@ -67,17 +67,17 @@ GlyphObject::GlyphObject()
 void GlyphObject::setText(const GMWChar* text)
 {
 	D(d);
-	d.text = text;
+	d->text = text;
 }
 
 // 窗口中央坐标为(0,0)，左下角坐标为(-1, -1)
 void GlyphObject::setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height)
 {
 	D(d);
-	d.left = left;
-	d.bottom = bottom;
-	d.width = width;
-	d.height = height;
+	d->left = left;
+	d->bottom = bottom;
+	d->width = width;
+	d->height = height;
 }
 
 void GlyphObject::constructObject()
@@ -85,8 +85,8 @@ void GlyphObject::constructObject()
 	D(d);
 	D_BASE(GameObject, db);
 
-	GlyphManager* glyphManager = db.world->getGameMachine()->getGlyphManager();
-	IWindow* window = db.world->getGameMachine()->getWindow();
+	GlyphManager* glyphManager = db->world->getGameMachine()->getGlyphManager();
+	IWindow* window = db->world->getGameMachine()->getWindow();
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
@@ -106,9 +106,9 @@ void GlyphObject::constructObject()
 	shader.blendFactors[0] = GMS_ONE;
 	shader.blendFactors[1] = GMS_ONE;
 
-	const GMWChar* p = d.text.c_str();
+	const GMWChar* p = d->text.c_str();
 	const GMfloat Z = 0;
-	GMfloat x = d.left, y = d.bottom;
+	GMfloat x = d->left, y = d->bottom;
 
 	while (*p)
 	{
@@ -147,17 +147,17 @@ void GlyphObject::constructObject()
 void GlyphObject::onAppendingObjectToWorld()
 {
 	D(d);
-	d.lastRenderText = d.text;
+	d->lastRenderText = d->text;
 	constructObject();
 }
 
 void GlyphObject::getReadyForRender(DrawingList& list)
 {
 	D(d);
-	if (d.lastRenderText != d.text)
+	if (d->lastRenderText != d->text)
 	{
 		updateObject();
-		d.lastRenderText = d.text;
+		d->lastRenderText = d->text;
 	}
 	GameObject::getReadyForRender(list);
 }
@@ -166,7 +166,7 @@ void GlyphObject::updateObject()
 {
 	D_BASE(GameObject, d);
 	constructObject();
-	d.world->initObject(this);
+	d->world->initObject(this);
 }
 
 //EntityObject
@@ -179,21 +179,21 @@ EntityObject::EntityObject(AUTORELEASE Object* obj)
 Plane* EntityObject::getPlanes()
 {
 	D(d);
-	return d.planes;
+	return d->planes;
 }
 
 void EntityObject::getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs)
 {
 	D(d);
-	mins = d.mins;
-	maxs = d.maxs;
+	mins = d->mins;
+	maxs = d->maxs;
 }
 
 void EntityObject::calc()
 {
 	D(d);
-	d.mins[0] = d.mins[1] = d.mins[2] = 999999.f;
-	d.maxs[0] = d.maxs[1] = d.maxs[2] = -d.mins[0];
+	d->mins[0] = d->mins[1] = d->mins[2] = 999999.f;
+	d->maxs[0] = d->maxs[1] = d->maxs[2] = -d->mins[0];
 
 	Object* obj = getObject();
 	for (auto iter = obj->getChildObjects().begin(); iter != obj->getChildObjects().end(); iter++)
@@ -205,10 +205,10 @@ void EntityObject::calc()
 		{
 			for (GMint j = 0; j < 3; j++)
 			{
-				if (vertices[i + j] < d.mins[j])
-					d.mins[j] = vertices[i + j];
-				if (vertices[i + j] > d.maxs[j])
-					d.maxs[j] = vertices[i + j];
+				if (vertices[i + j] < d->mins[j])
+					d->mins[j] = vertices[i + j];
+				if (vertices[i + j] > d->maxs[j])
+					d->maxs[j] = vertices[i + j];
 			}
 		}
 	}
@@ -220,15 +220,15 @@ void EntityObject::makePlanes()
 {
 	D(d);
 	// 前
-	d.planes[0] = Plane(linear_math::Vector3(0, 0, 1), -d.maxs[2]);
+	d->planes[0] = Plane(linear_math::Vector3(0, 0, 1), -d->maxs[2]);
 	// 后
-	d.planes[1] = Plane(linear_math::Vector3(0, 0, -1), d.mins[2]);
+	d->planes[1] = Plane(linear_math::Vector3(0, 0, -1), d->mins[2]);
 	// 左
-	d.planes[2] = Plane(linear_math::Vector3(-1, 0, 0), d.mins[0]);
+	d->planes[2] = Plane(linear_math::Vector3(-1, 0, 0), d->mins[0]);
 	// 右
-	d.planes[3] = Plane(linear_math::Vector3(1, 0, 0), -d.maxs[0]);
+	d->planes[3] = Plane(linear_math::Vector3(1, 0, 0), -d->maxs[0]);
 	// 上
-	d.planes[4] = Plane(linear_math::Vector3(0, 1, 0), -d.maxs[0]);
+	d->planes[4] = Plane(linear_math::Vector3(0, 1, 0), -d->maxs[0]);
 	// 下
-	d.planes[5] = Plane(linear_math::Vector3(0, -1, 0), d.mins[0]);
+	d->planes[5] = Plane(linear_math::Vector3(0, -1, 0), d->mins[0]);
 }

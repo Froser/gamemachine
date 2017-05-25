@@ -60,7 +60,7 @@ struct BSPPatchCollide;
 struct BSPTraceWork;
 class BSPTrace
 {
-	DEFINE_PRIVATE(BSPTrace)
+	DECLARE_PRIVATE(BSPTrace)
 
 public:
 	void initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, EntityObject*>* entityObjects, BSPPhysicsWorld* world);

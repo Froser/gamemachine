@@ -29,10 +29,10 @@ END_NS
 void BSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, EntityObject*>* entityObjects, BSPPhysicsWorld* world)
 {
 	D(d);
-	d.bsp = bsp;
-	d.p_world = world;
-	d.entities = entities;
-	d.entityObjects = entityObjects;
+	d->bsp = bsp;
+	d->p_world = world;
+	d->entities = entities;
+	d->entityObjects = entityObjects;
 }
 
 /* 获得碰撞状态
@@ -46,8 +46,8 @@ trace: 返回的碰撞跟踪结果
 void BSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vector3& end, const linear_math::Vector3& origin, const linear_math::Vector3& min, const linear_math::Vector3& max, REF BSPTraceResult& trace)
 {
 	D(d);
-	BSPData& bsp = *d.bsp;
-	d.checkcount++;
+	BSPData& bsp = *d->bsp;
+	d->checkcount++;
 
 	BSPTraceWork tw;
 	memset(&tw, 0, sizeof(tw));
@@ -187,8 +187,8 @@ void BSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vecto
 void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const linear_math::Vector3& p1, const linear_math::Vector3& p2)
 {
 	D(d);
-	BSPData& bsp = *d.bsp;
-	BSPPhysicsWorldData& pw = d.p_world->physicsData();
+	BSPData& bsp = *d->bsp;
+	BSPPhysicsWorld::Data& pw = d->p_world->physicsData();
 	BSPNode* node;
 	BSPTracePlane* plane;
 
@@ -201,7 +201,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	if (num < 0)
 	{
 		traceThroughLeaf(tw, &bsp.leafs[~num]);
-		traceEntityThroughLeaf(tw, (*d.entities)[~num]);
+		traceEntityThroughLeaf(tw, (*d->entities)[~num]);
 		return;
 	}
 
@@ -302,8 +302,8 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 {
 	D(d);
-	BSPData& bsp = *d.bsp;
-	BSPPhysicsWorldData& pw = d.p_world->physicsData();
+	BSPData& bsp = *d->bsp;
+	BSPPhysicsWorld::Data& pw = d->p_world->physicsData();
 	// trace line against all brushes in the leaf
 	for (GMint k = 0; k < leaf->numLeafBrushes; k++)
 	{
@@ -311,10 +311,10 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 
 		BSP_Physics_Brush* b = &pw.brushes[brushnum];
 
-		if (b->checkcount == d.checkcount) {
+		if (b->checkcount == d->checkcount) {
 			continue;	// already checked this brush in another leaf
 		}
-		b->checkcount = d.checkcount;
+		b->checkcount = d->checkcount;
 
 		if (!(b->contents & tw.contents)) {
 			continue;
@@ -332,10 +332,10 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 		if (!patch) {
 			continue;
 		}
-		if (patch->checkcount == d.checkcount) {
+		if (patch->checkcount == d->checkcount) {
 			continue;	// already checked this patch in another leaf
 		}
-		patch->checkcount = d.checkcount;
+		patch->checkcount = d->checkcount;
 
 		if (!(patch->shader->contentFlags & tw.contents)) {
 			continue;
@@ -491,8 +491,8 @@ void BSPTrace::traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& en
 	tw.trace.entityNum = 0;
 	for (auto iter = entity.begin(); iter != entity.end(); iter++)
 	{
-		auto objIter = (d.entityObjects->find(*iter));
-		if (objIter != d.entityObjects->end())
+		auto objIter = (d->entityObjects->find(*iter));
+		if (objIter != d->entityObjects->end())
 		{
 			EntityObject* obj = objIter->second;
 			if (!obj)
@@ -646,8 +646,8 @@ GMint BSPTrace::checkFacetPlane(const linear_math::Vector4& plane, const linear_
 void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 {
 	D(d);
-	BSPData& bsp = *d.bsp;
-	BSPPhysicsWorldData& pw = d.p_world->physicsData();
+	BSPData& bsp = *d->bsp;
+	BSPPhysicsWorld::Data& pw = d->p_world->physicsData();
 
 	if (!brush->brush->numSides) {
 		return;

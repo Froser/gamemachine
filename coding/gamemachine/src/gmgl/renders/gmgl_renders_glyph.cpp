@@ -6,13 +6,13 @@
 void GMGLRenders_Glyph::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
-	GMGL::cameraPosition(lookAt, *d.gmglShaders, GMSHADER_VIEW_POSITION);
+	GMGL::cameraPosition(lookAt, *d->gmglShaders, GMSHADER_VIEW_POSITION);
 }
 
 void GMGLRenders_Glyph::beginShader(Shader& shader)
 {
 	D(d);
-	d.shader = &shader;
+	d->shader = &shader;
 
 	// 纹理
 	activateShader(&shader);
@@ -25,7 +25,7 @@ void GMGLRenders_Glyph::beginShader(Shader& shader)
 	if (texture)
 	{
 		// 激活动画序列
-		activeTexture(d.shader, TEXTURE_INDEX_AMBIENT);
+		activeTexture(d->shader, TEXTURE_INDEX_AMBIENT);
 		texture->drawTexture(&textures);
 	}
 }

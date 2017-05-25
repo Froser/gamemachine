@@ -9,7 +9,7 @@ BEGIN_NS
 
 class BSPGameWorld : public GameWorld
 {
-	DEFINE_PRIVATE(BSPGameWorld);
+	DECLARE_PRIVATE(BSPGameWorld);
 
 public:
 	BSPGameWorld(GamePackage* pk);

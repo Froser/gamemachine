@@ -14,7 +14,7 @@ struct GMGLGlyphManagerPrivate
 
 class GMGLGlyphManager : public GlyphManager
 {
-	DEFINE_PRIVATE(GMGLGlyphManager);
+	DECLARE_PRIVATE(GMGLGlyphManager);
 
 public:
 	enum

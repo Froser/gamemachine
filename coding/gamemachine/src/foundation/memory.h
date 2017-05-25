@@ -60,5 +60,29 @@ public:
 	friend bool operator==(const my_type &, const my_type &) { return true; }
 };
 
+// 重在new, delete，对齐分配内存
+#if USE_SIMD
+#define GM_DECLARE_ALIGNED_ALLOCATOR() \
+	public:   \
+	inline void* operator new(size_t sizeInBytes){ return gmAlignedAlloc(sizeInBytes, 16); }   \
+	inline void  operator delete(void* ptr)         { gmAlignedFree(ptr); }   \
+	inline void* operator new(size_t, void* ptr){ return ptr; }   \
+	inline void  operator delete(void*, void*)      { }   \
+	inline void* operator new[](size_t sizeInBytes)   { return gmAlignedAlloc(sizeInBytes, 16); }   \
+	inline void  operator delete[](void* ptr)         { gmAlignedFree(ptr); }   \
+	inline void* operator new[](size_t, void* ptr)   { return ptr; }   \
+	inline void  operator delete[](void*, void*)      {}
+#else
+#define GM_DECLARE_ALIGNED_ALLOCATOR()
+#endif
+
+class GMAlignmentObject
+{
+	GM_DECLARE_ALIGNED_ALLOCATOR();
+
+public:
+	virtual ~GMAlignmentObject() {}
+};
+
 END_NS
 #endif

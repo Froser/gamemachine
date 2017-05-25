@@ -9,9 +9,9 @@ struct SoundReader_MP3Private
 {
 };
 
-class SoundReader_MP3 : public ISoundReader
+class SoundReader_MP3 : public GMObject, public ISoundReader
 {
-	DEFINE_PRIVATE(SoundReader_MP3)
+	DECLARE_PRIVATE(SoundReader_MP3)
 
 public:
 	virtual bool load(GamePackageBuffer& buffer, OUT ISoundFile** sf) override;

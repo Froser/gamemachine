@@ -99,22 +99,22 @@ END_NS
 GMGLGlyphManager::GMGLGlyphManager()
 {
 	D(d);
-	d.cursor_u = d.cursor_v = 0;
-	d.maxHeight = 0;
-	d.texture = new GMGLGlyphTexture();
+	d->cursor_u = d->cursor_v = 0;
+	d->maxHeight = 0;
+	d->texture = new GMGLGlyphTexture();
 }
 
 GMGLGlyphManager::~GMGLGlyphManager()
 {
 	D(d);
-	if (d.texture)
-		delete d.texture;
+	if (d->texture)
+		delete d->texture;
 }
 
 ITexture* GMGLGlyphManager::glyphTexture()
 {
 	D(d);
-	return d.texture;
+	return d->texture;
 }
 
 const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
@@ -140,12 +140,12 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 	FT_BitmapGlyph bitmapGlyph = (FT_BitmapGlyph)glyph;
 
 	// 创建结构
-	if (d.cursor_u + bitmapGlyph->bitmap.width > CANVAS_WIDTH)
+	if (d->cursor_u + bitmapGlyph->bitmap.width > CANVAS_WIDTH)
 	{
-		d.cursor_v += d.maxHeight + 1;
-		d.maxHeight = 0;
-		d.cursor_u = 0;
-		if (d.cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
+		d->cursor_v += d->maxHeight + 1;
+		d->maxHeight = 0;
+		d->cursor_u = 0;
+		if (d->cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
 		{
 			gm_error("no texture space for glyph!");
 		}
@@ -153,20 +153,20 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
 
 	GlyphInfo glyphInfo = { 0 };
 	glyphInfo.valid = true;
-	glyphInfo.x = d.cursor_u;
-	glyphInfo.y = d.cursor_v;
+	glyphInfo.x = d->cursor_u;
+	glyphInfo.y = d->cursor_v;
 	glyphInfo.width = bitmapGlyph->bitmap.width;
 	glyphInfo.height = bitmapGlyph->bitmap.rows;
 	glyphInfo.bearingX = bitmapGlyph->left;
 	glyphInfo.bearingY = bitmapGlyph->top;
 	glyphInfo.advance = face->glyph->metrics.horiAdvance >> 6;
 
-	if (d.maxHeight < glyphInfo.height)
-		d.maxHeight = glyphInfo.height;
-	d.cursor_u += bitmapGlyph->bitmap.width + 1;
+	if (d->maxHeight < glyphInfo.height)
+		d->maxHeight = glyphInfo.height;
+	d->cursor_u += bitmapGlyph->bitmap.width + 1;
 
 	// 创建纹理
-	glBindTexture(GL_TEXTURE_2D, d.texture->getTextureId());
+	glBindTexture(GL_TEXTURE_2D, d->texture->getTextureId());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 使用一个字节保存，必须设置对齐为1
 	glTexSubImage2D(GL_TEXTURE_2D,
 		0,

@@ -176,10 +176,10 @@ struct GM_ALIGNED_16 BSPLightVolumes
 	GMbyte* volData;
 };
 
-struct GM_ALIGNED_16 BSPPrivate
+GM_PRIVATE_OBJECT(BSP)
 {
 	friend class BSP;
-	BSPPrivate()
+	GM_PRIVATE_CONSTRUCT(BSP)
 	{
 	}
 
@@ -236,7 +236,7 @@ typedef BSPPrivate BSPData;
 struct GamePackageBuffer;
 class GM_ALIGNED_16 BSP
 {
-	DEFINE_PRIVATE(BSP);
+	DECLARE_PRIVATE(BSP);
 
 public:
 	BSP();

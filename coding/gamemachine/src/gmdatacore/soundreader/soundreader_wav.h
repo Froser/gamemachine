@@ -4,7 +4,7 @@
 #include "soundreader.h"
 BEGIN_NS
 
-class SoundReader_Wav : public ISoundReader
+class SoundReader_Wav : public GMObject, public ISoundReader
 {
 public:
 	virtual bool load(GamePackageBuffer& buffer, OUT ISoundFile** sf) override;

@@ -11,7 +11,7 @@ class GameObject;
 class ObjectPainter;
 class GameWorld
 {
-	DEFINE_PRIVATE(GameWorld)
+	DECLARE_PRIVATE(GameWorld)
 	GM_DECLARE_ALIGNED_ALLOCATOR();
 
 public:

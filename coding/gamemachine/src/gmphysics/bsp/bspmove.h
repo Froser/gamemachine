@@ -27,7 +27,7 @@ struct BSPMoveCommand
 	CommandParams params;
 };
 
-struct BSPMovePrivate
+GM_PRIVATE_OBJECT(BSPMove)
 {
 	bool inited;
 	BSPPhysicsWorld* world;
@@ -37,10 +37,9 @@ struct BSPMovePrivate
 	BSPMoveCommand moveCommand;
 };
 
-class BSPMove
+class BSPMove : public GMObject
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-	DEFINE_PRIVATE(BSPMove)
+	DECLARE_PRIVATE(BSPMove)
 
 public:
 	BSPMove(BSPPhysicsWorld* world, CollisionObject* obj);

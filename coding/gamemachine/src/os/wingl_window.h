@@ -21,9 +21,9 @@ struct WinGLWindowPrivate
 };
 
 // Windows下的Window类
-class WinGLWindow : public IWindow
+class WinGLWindow : public GMObject, public IWindow
 {
-	DEFINE_PRIVATE(WinGLWindow)
+	DECLARE_PRIVATE(WinGLWindow)
 
 public:
 	WinGLWindow();
