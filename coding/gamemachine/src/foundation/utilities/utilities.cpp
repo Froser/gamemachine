@@ -4,8 +4,8 @@
 #include "foundation/linearmath.h"
 #include "assert.h"
 #ifdef _WINDOWS
-#include <io.h>
-#include <direct.h>
+#	include <io.h>
+#	include <direct.h>
 #endif
 #include "foundation/vector.h"
 

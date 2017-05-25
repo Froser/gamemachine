@@ -45,7 +45,7 @@ struct IFactory;
 struct IGameHandler;
 class GlyphManager;
 
-struct GameMachinePrivate
+GM_PRIVATE_OBJECT(GameMachine)
 {
 	FPSCounter fpsCounter;
 	GraphicSettings settings;
@@ -57,7 +57,7 @@ struct GameMachinePrivate
 	std::queue<GameMachineMessage> messageQueue;
 };
 
-class GameMachine
+class GameMachine : public GMObject
 {
 	DEFINE_PRIVATE(GameMachine)
 

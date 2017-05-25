@@ -10,9 +10,9 @@
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "gmengine/controllers/gamemachine.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "utilities/debug.h"
+#include "foundation/debug.h"
 #include "os/input.h"
 #include "gmdatacore/gamepackage.h"
 

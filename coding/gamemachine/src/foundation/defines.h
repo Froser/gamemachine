@@ -15,23 +15,6 @@
 #define BEGIN_NS namespace gm {
 #define END_NS }
 
-// GameMachine采用数据和方法分离的方式，可以为一个类定义一个私有结构存储数据
-#define DEFINE_PRIVATE(className) \
-	public: \
-	typedef className##Private Data; \
-	private: \
-	GM_ALIGNED_16 className##Private m_data; \
-	protected: \
-	className##Private& data() { return m_data; }
-#define D(d) auto& d = data()
-#define DEFINE_PRIVATE_ON_HEAP(className) \
-	private: \
-	typedef className##Private DataType; \
-	className##Private* m_data; \
-	protected: \
-	className##Private*& data() { return m_data; }
-#define D_BASE(base, d) auto& d = base::data()
-
 // 表示此变量会被自动释放
 #define AUTORELEASE
 
@@ -105,6 +88,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #ifdef _MSC_VER
 #	define USE_SIMD 1
 #	define GM_ALIGNED_16 __declspec(align(16))
+#	define GM_ALIGNED_16_(t) t GM_ALIGNED_16
 #	define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
 #	define simd_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
 #	define simd_zeroMask (_mm_set_ps(-0.0f, -0.0f, -0.0f, -0.0f))
@@ -112,6 +96,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #else
 #	define USE_SIMD 0
 #	define GM_ALIGNED_16
+#	define GM_ALIGNED_16_(t)
 #endif
 
 // 平台差异

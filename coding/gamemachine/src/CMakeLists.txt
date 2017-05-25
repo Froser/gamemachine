@@ -141,6 +141,7 @@ set(SOURCES
 		foundation/utilities/tinyxml/tinyxmlparser.cpp
 		foundation/utilities/utilities.h
 		foundation/utilities/utilities.cpp
+		foundation/defines.h
 		foundation/debug.h
 		foundation/debug.cpp
 		foundation/assert.h
@@ -150,6 +151,8 @@ set(SOURCES
 		foundation/memory.cpp
 		foundation/linearmath.h
 		foundation/linearmath.cpp
+		foundation/gmobject.h
+		foundation/gmobject.cpp
 	)
 
 source_group_by_dir(SOURCES)

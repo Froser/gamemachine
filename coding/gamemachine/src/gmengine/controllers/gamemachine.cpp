@@ -4,7 +4,7 @@
 #include "gmdatacore/glyph/glyphmanager.h"
 
 #ifdef _WINDOWS
-#include "os/directsound_sounddevice.h"
+#	include "os/directsound_sounddevice.h"
 #endif
 
 GameMachine::GameMachine(

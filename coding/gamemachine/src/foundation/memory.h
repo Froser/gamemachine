@@ -1,6 +1,6 @@
 ﻿#ifndef __GM_MEMORY_H__
 #define __GM_MEMORY_H__
-#include "common.h"
+#include "defines.h"
 BEGIN_NS
 
 class AlignedMemoryAlloc
@@ -58,29 +58,6 @@ public:
 	my_type & operator=(const AlignedAllocator< O, Alignment > &) { return *this; }
 
 	friend bool operator==(const my_type &, const my_type &) { return true; }
-};
-
-#if USE_SIMD
-#define GM_DECLARE_ALIGNED_ALLOCATOR() \
-	public:   \
-	inline void* operator new(size_t sizeInBytes)   { return gmAlignedAlloc(sizeInBytes,16); }   \
-	inline void  operator delete(void* ptr)         { gmAlignedFree(ptr); }   \
-	inline void* operator new(size_t, void* ptr)   { return ptr; }   \
-	inline void  operator delete(void*, void*)      { }   \
-	inline void* operator new[](size_t sizeInBytes)   { return gmAlignedAlloc(sizeInBytes,16); }   \
-	inline void  operator delete[](void* ptr)         { gmAlignedFree(ptr); }   \
-	inline void* operator new[](size_t, void* ptr)   { return ptr; }   \
-	inline void  operator delete[](void*, void*)      { }
-#else
-#define GM_DECLARE_ALIGNED_ALLOCATOR()
-#endif
-
-class GMObject
-{
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-public:
-	GMObject() {}
-	virtual ~GMObject() {}
 };
 
 END_NS
