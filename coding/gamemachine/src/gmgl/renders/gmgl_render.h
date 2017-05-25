@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGL_RENDER_H__
 #define __GMGL_RENDER_H__
 #include "common.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 
 BEGIN_NS
 

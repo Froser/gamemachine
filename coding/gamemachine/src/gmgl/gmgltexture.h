@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gmdatacore/image.h"
 #include "gmdatacore/texture.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include "gmdatacore/object.h"
 #include <map>
 #include <string>

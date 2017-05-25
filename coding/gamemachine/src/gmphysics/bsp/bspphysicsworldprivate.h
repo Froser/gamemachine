@@ -2,12 +2,12 @@
 #define __BSPPHYSICSWORLDPRIVATE_H__
 #include "common.h"
 #include "gmphysics/physicsstructs.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 #include "gmdatacore/bsp/bsp.h"
 #include "bspphysicsstructs.h"
 #include "bsptrace.h"
 #include "bsppatch.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include "gmphysics/physicsworld.h"
 BEGIN_NS
 

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "modelreader.h"
-#include "utilities/assert.h"
 #include "modelreader_obj.h"
 #include "gmdatacore/gamepackage.h"
 

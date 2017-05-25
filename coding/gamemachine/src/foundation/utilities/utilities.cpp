@@ -1,13 +1,13 @@
 ﻿#include "stdafx.h"
 #include "utilities.h"
 #include <time.h>
-#include "linearmath.h"
+#include "foundation/linearmath.h"
 #include "assert.h"
 #ifdef _WINDOWS
 #include <io.h>
 #include <direct.h>
 #endif
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 
 //FPSCounter
 FPSCounter::FPSCounter()

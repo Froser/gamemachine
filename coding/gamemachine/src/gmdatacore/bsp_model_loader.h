@@ -3,7 +3,7 @@
 #include "common.h"
 #include "model.h"
 #include <string>
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 #include <map>
 
 class TiXmlDocument;

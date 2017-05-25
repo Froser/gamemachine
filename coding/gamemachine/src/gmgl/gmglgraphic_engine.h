@@ -4,7 +4,7 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmglshaders.h"
 #include "gmengine/controllers/resource_container.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include <map>
 BEGIN_NS
 

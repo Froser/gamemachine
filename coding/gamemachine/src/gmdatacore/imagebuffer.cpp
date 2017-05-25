@@ -15,7 +15,7 @@ void ImageBuffer::generateData()
 {
 	ImageData& data = getData();
 
-#ifdef USE_OPENGL
+#if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
 	data.internalFormat = GL_RGBA8;

@@ -2,9 +2,9 @@
 #define __MODELREADER_OBJ_H__
 #include "common.h"
 #include "modelreader.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 #include <map>
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 
 BEGIN_NS
 

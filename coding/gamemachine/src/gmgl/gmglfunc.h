@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGL_FUNC_H__
 #define __GMGL_FUNC_H__
 #include "common.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 BEGIN_NS
 
 class GMGLShaders;

@@ -4,8 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include "imagereader_tga.h"
-#include "utilities/assert.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include <fstream>
 
 bool endsWith(const std::string& str, const std::string& substr)
@@ -374,7 +373,7 @@ void ImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)
 {
 	ASSERT(img);
 	ImageData& data = img->getData();
-#ifdef USE_OPENGL
+#if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
 	data.internalFormat = GL_RGB16;

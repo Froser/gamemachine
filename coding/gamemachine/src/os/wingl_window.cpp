@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "wingl_window.h"
-#include "utilities/assert.h"
 
 #ifdef _WINDOWS
 

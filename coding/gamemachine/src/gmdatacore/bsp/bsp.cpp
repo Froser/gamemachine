@@ -4,11 +4,10 @@
 #endif
 #include "bsp.h"
 #include <stdio.h>
-#include "utilities/assert.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include "bsp_interior.inl"
 #include "gmdatacore/gamepackage.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 
 static const char* getValue(const BSPEntity* entity, const char* key)
 {

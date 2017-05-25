@@ -133,25 +133,23 @@ set(SOURCES
 		os/directsound_sounddevice.cpp
 		os/input.h
 		os/input.cpp
-		utilities/tinyxml/tinystr.cpp
-		utilities/tinyxml/tinystr.h
-		utilities/tinyxml/tinyxml.cpp
-		utilities/tinyxml/tinyxml.h
-		utilities/tinyxml/tinyxmlerror.cpp
-		utilities/tinyxml/tinyxmlparser.cpp
-		utilities/linearmath.h
-		utilities/linearmath.cpp
-		utilities/debug.h
-		utilities/debug.cpp
-		utilities/assert.h
-		utilities/assert.cpp
-		utilities/algorithm.h
-		utilities/algorithm.cpp
-		utilities/utilities.h
-		utilities/utilities.cpp
-		utilities/vector.h
-		utilities/memory.h
-		utilities/memory.cpp
+		foundation/utilities/tinyxml/tinystr.cpp
+		foundation/utilities/tinyxml/tinystr.h
+		foundation/utilities/tinyxml/tinyxml.cpp
+		foundation/utilities/tinyxml/tinyxml.h
+		foundation/utilities/tinyxml/tinyxmlerror.cpp
+		foundation/utilities/tinyxml/tinyxmlparser.cpp
+		foundation/utilities/utilities.h
+		foundation/utilities/utilities.cpp
+		foundation/debug.h
+		foundation/debug.cpp
+		foundation/assert.h
+		foundation/assert.cpp
+		foundation/vector.h
+		foundation/memory.h
+		foundation/memory.cpp
+		foundation/linearmath.h
+		foundation/linearmath.cpp
 	)
 
 source_group_by_dir(SOURCES)

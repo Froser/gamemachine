@@ -2,7 +2,6 @@
 #include "gmglobjectpainter.h"
 #include "shader_constants.h"
 #include "gmglfunc.h"
-#include "utilities/assert.h"
 #include "gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmglgraphic_engine.h"

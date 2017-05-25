@@ -2,11 +2,10 @@
 #define __BSP_H__
 #include "common.h"
 #include <string>
-#include "utilities/vector.h"
-#include "utilities/utilities.h"
-#include "utilities/linearmath.h"
+#include "foundation/utilities/utilities.h"
+#include "foundation/vector.h"
+#include "foundation/linearmath.h"
 #include "bsp_surface_flags.h"
-#include "utilities/vector.h"
 BEGIN_NS
 
 // key / value pair sizes in the entities lump

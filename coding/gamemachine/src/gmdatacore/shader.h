@@ -1,7 +1,7 @@
 ﻿#ifndef __SHADER_H__
 #define __SHADER_H__
 #include "common.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 BEGIN_NS
 
 struct ITexture;

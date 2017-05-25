@@ -1,9 +1,8 @@
 ﻿#ifndef __UTILITIES_H__
 #define __UTILITIES_H__
 #include "common.h"
-#include "linearmath.h"
-#include "utilities/vector.h"
-#include "utilities/assert.h"
+#include "foundation/linearmath.h"
+#include "foundation/vector.h"
 BEGIN_NS
 
 // 此类包含了各种实用工具

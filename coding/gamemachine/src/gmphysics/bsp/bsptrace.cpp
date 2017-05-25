@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bsptrace.h"
-#include "utilities/linearmath.h"
-#include "utilities/assert.h"
+#include "foundation/linearmath.h"
 #include "bspphysicsworld.h"
 #include "gmengine/elements/gameobject.h"
 

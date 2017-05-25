@@ -2,7 +2,7 @@
 #define __GAMEMACHINE_H__
 #include "common.h"
 #include "graphic_engine.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include <queue>
 #include "gmdatacore/soundreader/soundreader.h"
 BEGIN_NS

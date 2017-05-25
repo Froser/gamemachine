@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include <stdio.h>
-#include "utilities/assert.h"
 #include "gmglshaders.h"
 
 static void removeShaders(GMGLShaders& shaders)

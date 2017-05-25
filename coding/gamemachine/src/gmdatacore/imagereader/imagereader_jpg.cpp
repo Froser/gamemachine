@@ -2,8 +2,6 @@
 #include "imagereader_jpg.h"
 #include <iostream>
 #include <fstream>
-#include <stdio.h>
-#include "utilities/assert.h"
 
 extern "C"
 {

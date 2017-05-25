@@ -1,7 +1,7 @@
 ﻿#ifndef __SHADERS_H__
 #define __SHADERS_H__
 #include "common.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 BEGIN_NS
 
 struct GMGLShaderInfo

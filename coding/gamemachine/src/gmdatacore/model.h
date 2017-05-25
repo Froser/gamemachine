@@ -1,7 +1,7 @@
 ﻿#ifndef __MODEL_H__
 #define __MODEL_H__
 #include "common.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 BEGIN_NS
 
 struct Model

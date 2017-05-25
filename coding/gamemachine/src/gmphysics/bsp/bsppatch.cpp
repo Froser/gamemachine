@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "bsppatch.h"
 #include "bspphysicsstructs.h"
-#include "utilities/assert.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 
 #define SUBDIVIDE_DISTANCE 16	//4	// never more than this units away from curve
 // Epsilons

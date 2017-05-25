@@ -2,7 +2,6 @@
 #include "gamepackage.h"
 #include "gmengine/controllers/factory.h"
 #include <sys/stat.h>
-#include "utilities/assert.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/gamemachine.h"
 

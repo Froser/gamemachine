@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "debug.h"
-#include "utilities/assert.h"
 
 Debug* Debug::getDebugger()
 {

@@ -2,8 +2,8 @@
 #define __GAMEPACKAGE_H__
 #include "common.h"
 #include <string>
-#include "utilities/utilities.h"
-#include "utilities/vector.h"
+#include "foundation/utilities/utilities.h"
+#include "foundation/vector.h"
 BEGIN_NS
 
 enum PackageIndex

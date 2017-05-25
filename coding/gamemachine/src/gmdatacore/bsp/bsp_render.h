@@ -1,9 +1,9 @@
 ﻿#ifndef __BSP_RENDER_H__
 #define __BSP_RENDER_H__
 #include "common.h"
-#include "utilities/linearmath.h"
-#include "utilities/utilities.h"
-#include "utilities/vector.h"
+#include "foundation/linearmath.h"
+#include "foundation/utilities/utilities.h"
+#include "foundation/vector.h"
 #include <map>
 #include "bsp.h"
 BEGIN_NS

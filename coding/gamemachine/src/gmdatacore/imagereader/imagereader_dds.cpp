@@ -9,7 +9,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 
 enum DDS_FORMAT
 {

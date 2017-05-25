@@ -3,7 +3,6 @@
 #include "ft2build.h"
 #include "freetype/freetype.h"
 #include "freetype/ftglyph.h"
-#include "utilities/assert.h"
 #include "gmgltexture.h"
 
 #ifdef _WINDOWS

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmglfactory.h"
-#include "utilities/assert.h"
 #include "gmgltexture.h"
 #include "gmglgraphic_engine.h"
 #include "gmglobjectpainter.h"

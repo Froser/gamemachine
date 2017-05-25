@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "resource_container.h"
-#include "utilities/assert.h"
 
 TextureContainer::~TextureContainer()
 {

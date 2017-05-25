@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmglfunc.h"
 #include "gmglshaders.h"
-#include "utilities/linearmath.h"
-#include "utilities/utilities.h"
-#include "utilities/assert.h"
+#include "foundation/linearmath.h"
+#include "foundation/utilities/utilities.h"
 
 void GMGL::projection(const linear_math::Matrix4x4& mat, GMGLShaders& shaders, const char* projectionMatrixName)
 {

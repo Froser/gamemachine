@@ -2,7 +2,7 @@
 #define __CHARACTER_H__
 #include "common.h"
 #include "gameobject.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 
 BEGIN_NS
 

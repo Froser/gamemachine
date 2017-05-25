@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "object.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 #include <algorithm>
 
 #define VERTEX_DEMENSION 4 //顶点的维度，最高维度是齐次维度，恒为1

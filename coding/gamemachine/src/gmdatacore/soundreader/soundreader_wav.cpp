@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "soundreader_wav.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include "gmdatacore/gamepackage.h"
 #include "soundreader.h"
 

@@ -5,7 +5,7 @@
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 
 void GMGLRenders_Object::activateShader(Shader* shader)
 {

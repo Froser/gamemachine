@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "bsp_shader_loader.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 #include <string>
-#include "utilities/utilities.h"
-#include "utilities/tinyxml/tinyxml.h"
+#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tinyxml/tinyxml.h"
 #include "gmdatacore/shader.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmdatacore/imagereader/imagereader.h"

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "character.h"
-#include "utilities/assert.h"
 #include "gmengine/elements/gameworld.h"
 
 Character::Character(GMfloat radius)

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "directsound_sounddevice.h"
-#include "utilities/assert.h"
 #include "gmengine/controllers/gamemachine.h"
 #include "gmdatacore/soundreader/soundreader.h"
 

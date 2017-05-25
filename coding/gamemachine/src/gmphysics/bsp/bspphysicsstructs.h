@@ -2,8 +2,8 @@
 #define __BSPPHYSICSSTRUCTS_H__
 #include "common.h"
 #include "gmdatacore/bsp/bsp.h"
-#include "utilities/linearmath.h"
-#include "utilities/vector.h"
+#include "foundation/linearmath.h"
+#include "foundation/vector.h"
 BEGIN_NS
 
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )

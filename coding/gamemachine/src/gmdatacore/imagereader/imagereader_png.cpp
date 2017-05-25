@@ -3,7 +3,6 @@
 #include <fstream>
 #include "gmdatacore/image.h"
 #include "png.h"
-#include "utilities/assert.h"
 
 #define PNG_BYTES_TO_CHECK 4
 struct PngImage
@@ -136,7 +135,7 @@ void ImageReader_PNG::writeDataToImage(PngData& png, Image* img, GMuint size)
 {
 	ASSERT(img);
 	ImageData& data = img->getData();
-#ifdef USE_OPENGL
+#if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
 	data.internalFormat = GL_RGB16;

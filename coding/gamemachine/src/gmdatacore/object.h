@@ -1,11 +1,10 @@
 ﻿#ifndef __OBJSTRUCT_H__
 #define __OBJSTRUCT_H__
 #include "common.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 #include "image.h"
-#include "utilities/assert.h"
-#include "utilities/utilities.h"
-#include "utilities/linearmath.h"
+#include "foundation/utilities/utilities.h"
+#include "foundation/linearmath.h"
 #include "gmdatacore/texture.h"
 #include "shader.h"
 

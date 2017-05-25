@@ -2,9 +2,9 @@
 #define __PHYSICSSTRUCTS_H__
 #include "common.h"
 #include <map>
-#include "utilities/vector.h"
-#include "utilities/linearmath.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
+#include "foundation/linearmath.h"
+#include "foundation/vector.h"
 BEGIN_NS
 
 typedef GMint Command;

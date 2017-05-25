@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "soundreader.h"
-#include "utilities/assert.h"
 #include "soundreader_wav.h"
 #include "soundreader_mp3.h"
 

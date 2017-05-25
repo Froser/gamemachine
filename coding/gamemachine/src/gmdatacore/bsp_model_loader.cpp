@@ -1,12 +1,12 @@
 ﻿#include "stdafx.h"
 #include "bsp_model_loader.h"
-#include "utilities/vector.h"
+#include "foundation/vector.h"
 #include "gamepackage.h"
 #include "gmengine/elements/bspgameworld.h"
-#include "utilities/tinyxml/tinyxml.h"
+#include "foundation/utilities/tinyxml/tinyxml.h"
 #include "shader.h"
 #include "model.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 
 BSPModelLoader::BSPModelLoader()
 	: m_world(nullptr)

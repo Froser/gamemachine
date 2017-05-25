@@ -3,6 +3,10 @@
 #include "common.h"
 BEGIN_NS
 
+#if USE_SIMD
+#	include <xmmintrin.h>
+#endif
+
 #define VEC3(v4) linear_math::Vector3(v4[0], v4[1], v4[2])
 #define VEC4(v3, v4) linear_math::Vector4(v3, v4[3])
 

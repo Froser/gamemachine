@@ -3,7 +3,6 @@
 #include "gmdatacore/imagereader/imagereader.h"
 #include "shader_constants.h"
 #include "gmdatacore/object.h"
-#include "utilities/assert.h"
 
 GMGLTextureShaderNames::GMGLTextureShaderNames()
 {

@@ -2,7 +2,6 @@
 #include "imagereader.h"
 #include "imagereader_bmp.h"
 #include "imagereader_dds.h"
-#include "utilities/assert.h"
 #include <map>
 #include "imagereader_png.h"
 #include "imagereader_tga.h"

@@ -2,7 +2,6 @@
 #include "gameworld.h"
 #include "gameobject.h"
 #include "gmdatacore/object.h"
-#include "utilities/assert.h"
 #include "character.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/controllers/gamemachine.h"

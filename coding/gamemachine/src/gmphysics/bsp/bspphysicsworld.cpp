@@ -175,7 +175,8 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 			points[j] = v->xyz;
 		}
 
-		BSP_Physics_Patch* patch = GM_new<BSP_Physics_Patch>();
+		BSP_Physics_Patch* patch;
+		GM_new<BSP_Physics_Patch>(&patch);
 		patch->surface = &bsp.drawSurfaces[i];
 		patch->shader = &bsp.shaders[patch->surface->shaderNum];
 		d.patch.generatePatchCollide(i, width, height, points.data(), patch);

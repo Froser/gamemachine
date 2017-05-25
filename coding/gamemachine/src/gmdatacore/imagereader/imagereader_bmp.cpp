@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
 #include "imagereader_bmp.h"
-#include "utilities/assert.h"
 #include <sstream>
 #include "gmdatacore/image.h"
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 
 #ifdef _WINDOWS
 #include <wtypes.h>
@@ -124,7 +123,7 @@ void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img, GMuint si
 {
 	ASSERT(img);
 	ImageData& data = img->getData();
-#ifdef USE_OPENGL
+#if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
 	data.internalFormat = GL_RGB16;

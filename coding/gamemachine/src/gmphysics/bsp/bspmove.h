@@ -1,7 +1,7 @@
 ﻿#ifndef __BSPMOVE_H__
 #define __BSPMOVE_H__
 #include "common.h"
-#include "utilities/linearmath.h"
+#include "foundation/linearmath.h"
 #include "bsptrace.h"
 #include "gmphysics/physicsworld.h"
 BEGIN_NS

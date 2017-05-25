@@ -5,7 +5,7 @@
 #ifdef _WINDOWS
 #include <dsound.h>
 #endif
-#include "utilities/utilities.h"
+#include "foundation/utilities/utilities.h"
 #include "os/directsound_sounddevice.h"
 
 #define FRAME_BUFFER 50 // 每一份缓存包含的帧数

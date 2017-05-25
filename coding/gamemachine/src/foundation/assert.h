@@ -20,7 +20,7 @@ public:
 	static void gm_assert(const char *assertion, const char *file, int line);
 };
 
-#ifdef USE_OPENGL
+#if USE_OPENGL
 #define ASSERT_GL() ASSERT(glGetError() == GL_NO_ERROR)
 #define CHECK_GL_LOC(i) ASSERT(i != -1) 
 #else
