@@ -7,7 +7,6 @@ BEGIN_NS
 class GameObject;
 struct DrawingItem
 {
-	GMfloat trans[16];
 	GameObject* gameObject;
 };
 

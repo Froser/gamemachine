@@ -163,13 +163,13 @@ bool ModelReader_Obj::test(const GamePackageBuffer& buffer)
 void ModelReader_Obj::appendFace(Scanner& scanner)
 {
 	D(d);
-	const ModelReader_Obj_Material* material = getMaterial(d.currentMaterialName);
+	const ModelReader_Obj_Material& material = d.materials[d.currentMaterialName];
 
 	ChildObject* child = d.object->getChildObjects()[0];
 	if (!d.currentComponent)
 	{
 		d.currentComponent = new Component(child);
-		applyMaterial(*material, d.currentComponent->getShader());
+		applyMaterial(material, d.currentComponent->getShader());
 	}
 
 	char face[LINE_MAX];
@@ -229,7 +229,7 @@ void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char
 		{
 			char name[LINE_MAX];
 			s.next(name);
-			material = getMaterial(name);
+			material = &(d.materials[name]);
 			memset(material, 0, sizeof(*material));
 		}
 		else if (strEqual(token, "Ns"))
@@ -280,14 +280,4 @@ void ModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Sh
 		shader.lights[LT_SPECULAR].args[LA_KD + i] = material.kd[i];
 		shader.lights[LT_SPECULAR].args[LA_KS + i] = material.ks[i];
 	}
-}
-
-ModelReader_Obj_Material* ModelReader_Obj::getMaterial(const std::string& materialName)
-{
-	D(d);
-	ModelReader_Obj_Material*& ptr = d.materials[d.currentMaterialName];
-	if (!ptr)
-		ptr = new ModelReader_Obj_Material;
-
-	return ptr;
 }

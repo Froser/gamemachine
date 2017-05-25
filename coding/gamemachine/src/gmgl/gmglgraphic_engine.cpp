@@ -62,13 +62,13 @@ void GMGLGraphicEngine::applyGraphicSettings()
 void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
 {
 	D(d);
-	int i = 0;
+	static GMfloat trans[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	GMGLShaders* lastShaders = nullptr;
 	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
 	{
 		DrawingItem& item = *iter;
 		Object* coreObj = item.gameObject->getObject();
-		coreObj->getPainter()->draw(item.trans);
+		coreObj->getPainter()->draw(trans);
 	}
 }
 

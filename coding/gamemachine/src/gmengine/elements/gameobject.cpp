@@ -43,7 +43,6 @@ void GameObject::getReadyForRender(DrawingList& list)
 	D(d);
 	linear_math::Matrix4x4 M = linear_math::Matrix4x4::identity();
 	DrawingItem item;
-	memcpy(item.trans, &M[0], sizeof(M));
 	item.gameObject = this;
 	list.push_back(item);
 }
