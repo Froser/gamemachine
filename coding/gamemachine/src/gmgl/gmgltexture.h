@@ -2,7 +2,6 @@
 #define __GMGL_TEXTURE_H__
 #include "common.h"
 #include "gmdatacore/image.h"
-#include "gmdatacore/texture.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/object.h"
 #include <map>

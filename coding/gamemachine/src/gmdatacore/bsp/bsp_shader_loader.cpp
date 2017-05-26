@@ -9,8 +9,8 @@
 #include "gmdatacore/imagereader/imagereader.h"
 #include "gmengine/controllers/factory.h"
 #include "gmengine/controllers/gamemachine.h"
-#include "gmengine/elements/skygameobject.h"
 #include "gmdatacore/gamepackage.h"
+#include "gmengine/elements/gameobject.h"
 
 #define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
 #define BEGIN_PARSE_I(name, i) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it, i)

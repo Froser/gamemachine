@@ -372,7 +372,7 @@ bool ImageReader_TGA::test(const GMbyte* data)
 void ImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)
 {
 	ASSERT(img);
-	ImageData& data = img->getData();
+	Image::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;

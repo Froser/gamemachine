@@ -7,15 +7,15 @@
 #include "gmglgraphic_engine.h"
 #include "renders/gmgl_render.h"
 
-static GLenum getMode(ChildObject* obj)
+static GLenum getMode(Mesh* obj)
 {
 	switch (obj->getArrangementMode())
 	{
-	case ChildObject::Triangle_Fan:
+	case Mesh::Triangle_Fan:
 		return GL_TRIANGLE_FAN;
-	case ChildObject::Triangle_Strip:
+	case Mesh::Triangle_Strip:
 		return GL_TRIANGLE_STRIP;
-	case ChildObject::Triangles:
+	case Mesh::Triangles:
 		return GL_TRIANGLES;
 	default:
 		ASSERT(false);
@@ -36,33 +36,33 @@ void GMGLObjectPainter::transfer()
 		return;
 
 	Object* obj = getObject();
-	BEGIN_FOREACH_OBJ(obj, childObj)
+	BEGIN_FOREACH_OBJ(obj, mesh)
 	{
-		childObj->calculateTangentSpace();
+		mesh->calculateTangentSpace();
 
 		GLuint vao;
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
-		childObj->setArrayId(vao);
+		mesh->setArrayId(vao);
 
-		GLuint vaoSize = sizeof(Object::DataType) * childObj->vertices().size();
-		GLuint normalSize = sizeof(Object::DataType) * childObj->normals().size();
-		GLuint uvSize = sizeof(Object::DataType) * childObj->uvs().size();
-		GLuint tangentSize = sizeof(Object::DataType) * childObj->tangents().size();
-		GLuint bitangentSize = sizeof(Object::DataType) * childObj->bitangents().size();
-		GLuint lightmapSize = sizeof(Object::DataType) * childObj->lightmaps().size();
+		GLuint vaoSize = sizeof(Object::DataType) * mesh->vertices().size();
+		GLuint normalSize = sizeof(Object::DataType) * mesh->normals().size();
+		GLuint uvSize = sizeof(Object::DataType) * mesh->uvs().size();
+		GLuint tangentSize = sizeof(Object::DataType) * mesh->tangents().size();
+		GLuint bitangentSize = sizeof(Object::DataType) * mesh->bitangents().size();
+		GLuint lightmapSize = sizeof(Object::DataType) * mesh->lightmaps().size();
 
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, NULL, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0															, vaoSize, childObj->vertices().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize													, normalSize, childObj->normals().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize										, uvSize, childObj->uvs().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize								, tangentSize, childObj->tangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize				, bitangentSize, childObj->bitangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + lightmapSize	, lightmapSize, childObj->lightmaps().data());
-		childObj->setBufferId(vbo);
+		glBufferSubData(GL_ARRAY_BUFFER, 0															, vaoSize, mesh->vertices().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize													, normalSize, mesh->normals().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize										, uvSize, mesh->uvs().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize								, tangentSize, mesh->tangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize				, bitangentSize, mesh->bitangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + lightmapSize	, lightmapSize, mesh->lightmaps().data());
+		mesh->setBufferId(vbo);
 
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
 		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (void*)vaoSize);
@@ -79,12 +79,12 @@ void GMGLObjectPainter::transfer()
 
 		glBindVertexArray(0);
 
-		childObj->vertices().clear();
-		childObj->normals().clear();
-		childObj->uvs().clear();
-		childObj->tangents().clear();
-		childObj->bitangents().clear();
-		childObj->lightmaps().clear();
+		mesh->vertices().clear();
+		mesh->normals().clear();
+		mesh->uvs().clear();
+		mesh->tangents().clear();
+		mesh->bitangents().clear();
+		mesh->lightmaps().clear();
 	}
 	END_FOREACH_OBJ
 
@@ -95,13 +95,13 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 {
 	Object* obj = getObject();
 
-	BEGIN_FOREACH_OBJ(obj, childObj)
+	BEGIN_FOREACH_OBJ(obj, mesh)
 	{
-		IRender* render = m_engine->getRender(childObj->getType());
-		render->begin(m_engine, childObj, modelTransform);
+		IRender* render = m_engine->getRender(mesh->getType());
+		render->begin(m_engine, mesh, modelTransform);
 
-		glBindVertexArray(childObj->getArrayId());
-		for (auto iter = childObj->getComponents().begin(); iter != childObj->getComponents().end(); iter++)
+		glBindVertexArray(mesh->getArrayId());
+		for (auto iter = mesh->getComponents().begin(); iter != mesh->getComponents().end(); iter++)
 		{
 			Component* component = (*iter);
 			Shader& shader = component->getShader();
@@ -109,7 +109,7 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 				continue;
 
 			render->beginShader(shader);
-			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(childObj);
+			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 			render->endShader();
 		}
@@ -124,10 +124,10 @@ void GMGLObjectPainter::dispose()
 {
 	Object* obj = getObject();
 
-	BEGIN_FOREACH_OBJ(obj, childObj)
+	BEGIN_FOREACH_OBJ(obj, mesh)
 	{
-		GLuint vao[1] = { childObj->getArrayId() },
-			vbo[1] = { childObj->getBufferId() };
+		GLuint vao[1] = { mesh->getArrayId() },
+			vbo[1] = { mesh->getBufferId() };
 
 		glDeleteVertexArrays(1, vao);
 		glDeleteBuffers(1, vbo);

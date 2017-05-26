@@ -5,7 +5,7 @@
 BEGIN_NS
 
 class GMGLGlyphTexture;
-struct GMGLGlyphManagerPrivate
+GM_PRIVATE_OBJECT(GMGLGlyphManager)
 {
 	GMint cursor_u, cursor_v;
 	GMfloat maxHeight;

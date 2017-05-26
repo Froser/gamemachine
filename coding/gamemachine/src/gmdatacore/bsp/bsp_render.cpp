@@ -305,8 +305,8 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 	D(d);
 
 	Object* coreObj = new Object();
-	ChildObject* child = new ChildObject();
-	child->setArrangementMode(ChildObject::Triangles);
+	Mesh* child = new Mesh();
+	child->setArrangementMode(Mesh::Triangles);
 	Component* component = new Component(child);
 	component->getShader() = shader;
 
@@ -343,8 +343,8 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj)
 {
 	Object* coreObj = new Object();
-	ChildObject* child = new ChildObject();
-	child->setArrangementMode(ChildObject::Triangle_Strip);
+	Mesh* child = new Mesh();
+	child->setArrangementMode(Mesh::Triangle_Strip);
 
 	Component* component = new Component(child);
 	component->getShader() = shader;
@@ -413,8 +413,8 @@ void BSPRender::createBox(const linear_math::Vector3& extents, const linear_math
 	};
 
 	Object* coreObj = new Object();
-	ChildObject* child = new ChildObject();
-	child->setArrangementMode(ChildObject::Triangle_Strip);
+	Mesh* child = new Mesh();
+	child->setArrangementMode(Mesh::Triangle_Strip);
 
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)

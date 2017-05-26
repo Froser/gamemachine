@@ -8,7 +8,7 @@
 #include <fstream>
 #include "gmengine/elements/bspgameworld.h"
 
-#define PKD(d) GamePackageData* d = gamePackage()->gamePackageData();
+#define PKD(d) GamePackage::Data* d = gamePackage()->gamePackageData();
 
 DefaultGMGamePackageHandler::DefaultGMGamePackageHandler(GamePackage* pk)
 	: m_pk(pk)
@@ -51,7 +51,7 @@ void DefaultGMGamePackageHandler::init()
 		"sky"
 	};
 
-	for (GMint i = ChildObject::ObjectTypeBegin; i < ChildObject::ObjectTypeEnd; i++)
+	for (GMint i = Mesh::ObjectTypeBegin; i < Mesh::ObjectTypeEnd; i++)
 	{
 		GMGLShaders* shaders = new GMGLShaders();
 		
@@ -69,7 +69,7 @@ void DefaultGMGamePackageHandler::init()
 		shaders->appendShader(shadersInfo[0]);
 		shaders->appendShader(shadersInfo[1]);
 		shaders->load();
-		engine->registerShader((ChildObject::ObjectType)i, shaders);
+		engine->registerShader((Mesh::MeshesType)i, shaders);
 	}
 }
 

@@ -2,18 +2,20 @@
 #include "imagebuffer.h"
 
 ImageBuffer::ImageBuffer(GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer)
-	: m_width(width)
-	, m_height(height)
 {
-	m_buffer = new GMbyte[bufferSize];
-	memcpy(m_buffer, buffer, sizeof(GMbyte) * bufferSize);
+	D(d);
+	d->width = width;
+	d->height = height;
+	d->buffer = new GMbyte[bufferSize];
+	memcpy(d->buffer, buffer, sizeof(GMbyte) * bufferSize);
 
 	generateData();
 }
 
 void ImageBuffer::generateData()
 {
-	ImageData& data = getData();
+	D(d);
+	Image::Data& data = getData();
 
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
@@ -25,10 +27,10 @@ void ImageBuffer::generateData()
 	data.swizzle[2] = GL_BLUE;
 	data.swizzle[3] = GL_ALPHA;
 	data.type = GL_UNSIGNED_BYTE;
-	data.mip[0].height = m_height;
-	data.mip[0].width = m_width;
+	data.mip[0].height = d->height;
+	data.mip[0].width = d->width;
 	// Buffer 移交给 Image 管理
-	data.mip[0].data = m_buffer;
+	data.mip[0].data = d->buffer;
 #else
 	ASSERT(false);
 #endif

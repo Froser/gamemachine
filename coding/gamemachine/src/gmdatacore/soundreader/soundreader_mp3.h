@@ -5,7 +5,7 @@
 #include "foundation/vector.h"
 BEGIN_NS
 
-struct SoundReader_MP3Private
+GM_PRIVATE_OBJECT(SoundReader_MP3)
 {
 };
 

@@ -167,7 +167,7 @@ typedef struct {
 #define	MAXTOKEN 1024
 #define	MAX_INCLUDES	8
 
-struct GM_ALIGNED_16 BSPLightVolumes
+GM_ALIGNED_16(struct) BSPLightVolumes
 {
 	linear_math::Vector3 lightVolOrigin;
 	linear_math::Vector3 lightVolSize;
@@ -234,7 +234,7 @@ private:
 
 typedef BSPPrivate BSPData;
 struct GamePackageBuffer;
-class GM_ALIGNED_16 BSP
+GM_ALIGNED_16(class) BSP
 {
 	DECLARE_PRIVATE(BSP);
 

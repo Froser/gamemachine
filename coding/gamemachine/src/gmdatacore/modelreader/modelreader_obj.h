@@ -21,7 +21,7 @@ struct GamePackageBuffer;
 class Scanner;
 class Component;
 struct Shader;
-struct ModelReader_ObjPrivate
+GM_PRIVATE_OBJECT(ModelReader_Obj)
 {
 	Object* object;
 	AlignedVector<linear_math::Vector3> vertices;

@@ -39,7 +39,7 @@ void GMGLTexture::init()
 		return;
 
 	GMint level;
-	const ImageData& image = m_image->getData();
+	const Image::Data& image = m_image->getData();
 
 	glGenTextures(1, &m_id);
 	glBindTexture(image.target, m_id);
@@ -163,7 +163,7 @@ void GMGLTexture::init()
 
 void GMGLTexture::drawTexture(TextureFrames* frames)
 {
-	const ImageData& image = m_image->getData();
+	const Image::Data& image = m_image->getData();
 	glBindTexture(image.target, m_id);
 
 	// Apply params

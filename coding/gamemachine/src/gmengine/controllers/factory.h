@@ -9,9 +9,6 @@ enum GamePackageType
 	GPT_ZIP,
 };
 
-struct ITexture;
-struct IGraphicEngine;
-struct IGamePackageHandler;
 class Image;
 class Object;
 class ObjectPainter;
@@ -19,6 +16,7 @@ class GamePackage;
 class GlyphManager;
 struct IWindow;
 struct ISoundPlayer;
+struct IGamePackageHandler;
 struct IFactory
 {
 	virtual ~IFactory();

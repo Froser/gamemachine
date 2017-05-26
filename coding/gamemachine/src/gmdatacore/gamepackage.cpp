@@ -12,7 +12,7 @@ GamePackage::GamePackage(GameMachine* gm, IFactory* factory)
 	d->gameMachine = gm;
 }
 
-GamePackageData* GamePackage::gamePackageData()
+GamePackage::Data* GamePackage::gamePackageData()
 {
 	D(d);
 	return d;

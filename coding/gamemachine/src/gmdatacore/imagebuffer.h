@@ -4,19 +4,23 @@
 #include "image.h"
 BEGIN_NS
 
+GM_PRIVATE_OBJECT(ImageBuffer)
+{
+	GMuint width;
+	GMuint height;
+	GMbyte* buffer;
+};
+
 // 表示一个来自内存的图片
 class ImageBuffer : public Image
 {
+	DECLARE_PRIVATE(ImageBuffer)
+
 public:
 	ImageBuffer(GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer);
 
 private:
 	void generateData();
-
-private:
-	GMuint m_width;
-	GMuint m_height;
-	GMbyte* m_buffer;
 };
 
 END_NS

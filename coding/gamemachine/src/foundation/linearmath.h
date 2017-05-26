@@ -327,7 +327,7 @@ namespace linear_math
 		const GMfloat& operator [](GMint i) const;
 	};
 
-	class GM_ALIGNED_16 Vector3
+	GM_ALIGNED_16(class) Vector3
 	{
 		DEFINE_VECTOR_DATA(3)
 
@@ -367,7 +367,7 @@ namespace linear_math
 		const GMfloat& operator [](GMint i) const;
 	};
 
-	class GM_ALIGNED_16 Vector4
+	GM_ALIGNED_16(class) Vector4
 	{
 		DEFINE_VECTOR_DATA(4)
 
@@ -419,7 +419,7 @@ namespace linear_math
 		const GMfloat& operator [](GMint i) const;
 	};
 
-	class GM_ALIGNED_16 Matrix4x4
+	GM_ALIGNED_16(class) Matrix4x4
 	{
 	public:
 		Matrix4x4() {}
@@ -510,7 +510,7 @@ namespace linear_math
 	static inline Vector3 cross(const Vector3& left, const Vector3& right)
 	{
 #if USE_SIMD
-		GM_ALIGNED_16 GMfloat t0[] = { left[1],  left[2],  left[0],  0 },
+		GM_ALIGNED_16(GMfloat) t0[] = { left[1],  left[2],  left[0],  0 },
 			t1[] = { right[2], right[0], right[1], 0 },
 			t2[] = { left[2],  left[0],  left[1],  0 },
 			t3[] = { right[1], right[2], right[0], 0 };

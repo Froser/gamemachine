@@ -71,8 +71,7 @@ struct IGamePackageHandler
 };
 
 struct IFactory;
-class GameMachine;
-struct GamePackagePrivate
+GM_PRIVATE_OBJECT(GamePackage)
 {
 	std::string packagePath;
 	AutoPtr<IGamePackageHandler> handler;
@@ -81,7 +80,6 @@ struct GamePackagePrivate
 };
 
 class BSPGameWorld;
-typedef GamePackagePrivate GamePackageData;
 class GamePackage
 {
 	DECLARE_PRIVATE(GamePackage)
@@ -90,7 +88,7 @@ public:
 	GamePackage(GameMachine* gm, IFactory* factory);
 
 public:
-	GamePackageData* gamePackageData();
+	Data* gamePackageData();
 	void loadPackage(const char* path);
 	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
 	bool readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename = nullptr);

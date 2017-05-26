@@ -1,5 +1,5 @@
-﻿#ifndef __COMMON_H__
-#define __COMMON_H__
+﻿#ifndef __GM_COMMON_H__
+#define __GM_COMMON_H__
 #pragma warning(disable:4244)
 
 #include <stdio.h>
@@ -8,5 +8,6 @@
 #include "foundation/memory.h"
 #include "foundation/assert.h"
 #include "foundation/gmobject.h"
+#include "foundation/interfaces.h"
 
 #endif

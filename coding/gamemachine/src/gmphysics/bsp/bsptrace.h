@@ -44,9 +44,9 @@ struct BSPSphere
 
 class BSPPhysicsWorld;
 class EntityObject;
-struct BSPTracePrivate
+GM_PRIVATE_OBJECT(BSPTrace)
 {
-	BSPTracePrivate() : checkcount(0) {}
+	GM_PRIVATE_CONSTRUCT(BSPTrace) : checkcount(0) {}
 	BSPData* bsp;
 	std::map<GMint, std::set<BSPEntity*> >* entities;
 	std::map<BSPEntity*, EntityObject*>* entityObjects;

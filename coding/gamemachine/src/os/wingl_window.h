@@ -6,12 +6,11 @@ BEGIN_NS
 
 #ifdef _WINDOWS
 
-struct WinGLWindowPrivate
+GM_PRIVATE_OBJECT(WinGLWindow)
 {
 	char windowTitle[128];
 	LONG left, top, width, height;
 	GMint depthBits, stencilBits;
-
 	HWND hWnd;
 	HDC hDC;
 	HGLRC hRC;

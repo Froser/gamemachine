@@ -9,11 +9,11 @@ BEGIN_NS
 class GMGLGraphicEngine;
 class GameWorld;
 struct ITexture;
-struct GMGLRenders_ObjectPrivate
+GM_PRIVATE_OBJECT(GMGLRenders_Object)
 {
 	GMGLGraphicEngine* engine;
-	ChildObject* childObj;
-	ChildObject::ObjectType type;
+	Mesh* mesh;
+	Mesh::MeshesType type;
 	Shader* shader;
 	GMGLShaders* gmglShaders;
 	GameWorld* world;
@@ -24,7 +24,7 @@ class GMGLRenders_Object : public GMObject, public IRender
 	DECLARE_PRIVATE(GMGLRenders_Object)
 
 public:
-	virtual void begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform) override;
+	virtual void begin(IGraphicEngine* engine, Mesh* mesh, GMfloat* modelTransform) override;
 	virtual void beginShader(Shader& shader) override;
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;

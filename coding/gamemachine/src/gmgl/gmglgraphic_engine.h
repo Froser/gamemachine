@@ -15,8 +15,8 @@ struct IRender;
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
-	std::map<ChildObject::ObjectType, GMGLShaders*> allShaders;
-	std::map<ChildObject::ObjectType, IRender*> allRenders;
+	std::map<Mesh::MeshesType, GMGLShaders*> allShaders;
+	std::map<Mesh::MeshesType, IRender*> allRenders;
 	GameWorld* world;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings;
@@ -44,11 +44,11 @@ public:
 public:
 	GameWorld* getWorld();
 
-	void registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders);
-	GMGLShaders* getShaders(ChildObject::ObjectType objectType);
+	void registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaders* shaders);
+	GMGLShaders* getShaders(Mesh::MeshesType objectType);
 
-	void registerRender(ChildObject::ObjectType objectType, AUTORELEASE IRender* render);
-	IRender* getRender(ChildObject::ObjectType objectType);
+	void registerRender(Mesh::MeshesType objectType, AUTORELEASE IRender* render);
+	IRender* getRender(Mesh::MeshesType objectType);
 
 private:
 	void applyGraphicSettings();

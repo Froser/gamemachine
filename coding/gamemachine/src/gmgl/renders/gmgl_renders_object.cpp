@@ -71,13 +71,13 @@ void GMGLRenders_Object::deactivateShader(Shader* shader)
 	}
 }
 
-void GMGLRenders_Object::begin(IGraphicEngine* engine, ChildObject* childObj, GMfloat* modelTransform)
+void GMGLRenders_Object::begin(IGraphicEngine* engine, Mesh* mesh, GMfloat* modelTransform)
 {
 	D(d);
 	clearData();
 	d->engine = static_cast<GMGLGraphicEngine*>(engine);
-	d->childObj = childObj;
-	d->type = childObj->getType();
+	d->mesh = mesh;
+	d->type = mesh->getType();
 	d->gmglShaders = d->engine->getShaders(d->type);
 	d->world = d->engine->getWorld();
 	d->gmglShaders->useProgram();

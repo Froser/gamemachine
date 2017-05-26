@@ -5,7 +5,7 @@
 
 // GameMachine采用数据和方法分离的方式，可以为一个类定义一个私有结构存储数据
 template <typename T>
-GM_ALIGNED_16_(class) GMObjectPrivateWrapper
+GM_ALIGNED_16(class) GMObjectPrivateWrapper
 {
 public:
 	GMObjectPrivateWrapper()
@@ -29,38 +29,66 @@ private:
 	T* m_data;
 };
 
-#define DECLARE_PRIVATE_ON_HEAP(className) \
-	private: \
-	typedef className##Private DataType; \
-	className##Private* m_data; \
-	protected: \
-	className##Private*& data() { return m_data; }
+template <typename T>
+GM_ALIGNED_16(struct) GMObjectPrivateBase : public gm::GMAlignmentObject
+{
+	GMObjectPrivateBase() : parent(nullptr) {}
+	T* parent;
+};
 
-#define DECLARE_PRIVATE(className) \
-	public: \
-		typedef className##Private Data; \
-	private: \
-		GMObjectPrivateWrapper<className##Private> m_data; \
-	protected: \
-		className##Private* data() { return static_cast<className##Private*>(m_data.data()); }
+#define DECLARE_PRIVATE(className)														\
+	public:																				\
+		typedef className##Private Data;												\
+	private:																			\
+		GMObjectPrivateWrapper<className##Private> m_data;								\
+	protected:																			\
+		className##Private* data() { m_data.data()->parent = this; return m_data.data();}
 
 // 获取私有成员
 #define D(d) auto d = data()
 #define D_BASE(base, d) auto d = base::data()
 
 // 为一个对象定义private部分
-#define GM_PRIVATE_OBJECT(name) GM_ALIGNED_16_(struct) name##Private : public GMAlignmentObject
-#define GM_PRIVATE_OBJECT_FROM(name, extends) GM_ALIGNED_16_(struct) name##Private : public extends##Private
+#define GM_PRIVATE_OBJECT(name) class name; GM_ALIGNED_16(struct) name##Private : public GMObjectPrivateBase<name>
+#define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_CONSTRUCT(name) name##Private()
 
 BEGIN_NS
+
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
-GM_ALIGNED_16_(class) GMObject : public GMAlignmentObject
+class GMObject : public GMAlignmentObject
 {
 public:
 	virtual ~GMObject();
 };
+
+
+/* 代码规范：
+  条款一：
+  如果一个类是继承GMObject，那么它不能有成员变量。它的成员变量要用GM_PRIVATE_OBJECT和DECLARE_PRIVATE来声明和定义。
+  这样做的好处是：
+    1. 便于交往数据。两个同类型GMObject之间交换数据，只需要交换指针即可。
+    2. 便于保持对齐。GM_PRIVATE_OBJECT定义出来的结构是16字节对齐的（如果需要对齐的话），保证了此结构第1个对象的地址
+  肯定是16的倍数。如果要成员都是16字节对齐，应该用GM_ALIGNED_16为每个成员声明。
+  对于一个对齐的对象，应该用如下方式定义：
+class MyObject : public GMObject
+{
+    DECLARE_PRIVATE(MyObject)
+}
+  由于有之前的规定，MyObject不包含其他数据成员，因此DECLARE_PRIVATE定义出来的数据成员是对齐的，这样就不会产生对齐导致
+的错误。
+
+  条款二：
+  如果一个结构只有方法，没有成员，可以不用继承GMObject，也不用声明为对齐。
+
+  条款三：
+  如果一个结构中包含对齐成员数据，它必须继承GMAlignmentObject，且自身必须用GM_ALIGNED_16来声明
+
+  条款四：
+  任何参与内核的类必须继承GMObject
+*/
+
 
 END_NS
 #endif

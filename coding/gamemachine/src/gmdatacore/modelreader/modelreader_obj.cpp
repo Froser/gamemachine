@@ -90,7 +90,7 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 	StringReader sr((char*)buffer.buffer);
 
 	d->object = new Object;
-	ChildObject* child = new ChildObject();
+	Mesh* child = new Mesh();
 	d->object->append(child);
 
 	// 事先分配一些内存，提高效率
@@ -164,7 +164,7 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
 
-	ChildObject* child = d->object->getChildObjects()[0];
+	Mesh* child = d->object->getAllMeshes()[0];
 	if (!d->currentComponent)
 	{
 		d->currentComponent = new Component(child);

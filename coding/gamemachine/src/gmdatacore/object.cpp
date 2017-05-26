@@ -6,45 +6,49 @@
 #define VERTEX_DEMENSION 4 //顶点的维度，最高维度是齐次维度，恒为1
 
 ObjectPainter::ObjectPainter(Object* obj)
-	: m_object(obj)
 {
-
+	D(d);
+	d->object = obj;
 }
 
 Object* ObjectPainter::getObject()
 {
-	return m_object;
+	D(d);
+	return d->object;
 }
 
 Object::~Object()
 {
-	if (m_painter)
-		m_painter->dispose();
+	D(d);
+	if (d->painter)
+		d->painter->dispose();
 
-	BEGIN_FOREACH_OBJ(this, childObj)
+	BEGIN_FOREACH_OBJ(this, meshes)
 	{
-		if (childObj)
-			delete childObj;
+		if (meshes)
+			delete meshes;
 	}
 	END_FOREACH_OBJ
 }
 
-Component::Component(ChildObject* parent)
-	: m_offset(0)
-	, m_primitiveCount(0)
-	, m_parent(parent)
+Component::Component(Mesh* parent)
 {
-	memset(&m_shader, 0, sizeof(m_shader));
+	D(d);
+	d->offset = 0;
+	d->primitiveCount = 0;
+	d->parentMesh = parent;
+	memset(&d->shader, 0, sizeof(d->shader));
 
-	setVertexOffset(m_parent->vertices().size() / VERTEX_DEMENSION);
+	setVertexOffset(d->parentMesh->vertices().size() / VERTEX_DEMENSION);
 }
 
 Component::~Component()
 {
-	TextureInfo& ti = m_shader.texture;
+	D(d);
+	TextureInfo& ti = d->shader.texture;
 	if (ti.autorelease)
 	{
-		TextureFrames* frames = m_shader.texture.textures;
+		TextureFrames* frames = d->shader.texture.textures;
 		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
 			for (GMint j = 0; j < frames[i].frameCount; j++)
@@ -61,27 +65,31 @@ Component::~Component()
 // 一般不需要手动调用
 void Component::setVertexOffset(GMuint offset)
 {
-	m_offset = offset;
+	D(d);
+	d->offset = offset;
 }
 
 void Component::beginFace()
 {
-	m_currentFaceVerticesCount = 0;
+	D(d);
+	d->currentFaceVerticesCount = 0;
 }
 
 void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 {
-	AlignedVector<Object::DataType>& vertices = m_parent->vertices();
+	D(d);
+	AlignedVector<Object::DataType>& vertices = d->parentMesh->vertices();
 	vertices.push_back(x);
 	vertices.push_back(y);
 	vertices.push_back(z);
 	vertices.push_back(1.0f);
-	m_currentFaceVerticesCount++;
+	d->currentFaceVerticesCount++;
 }
 
 void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 {
-	AlignedVector<Object::DataType>& normals = m_parent->normals();
+	D(d);
+	AlignedVector<Object::DataType>& normals = d->parentMesh->normals();
 	normals.push_back(x);
 	normals.push_back(y);
 	normals.push_back(z);
@@ -90,28 +98,31 @@ void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 
 void Component::uv(GMfloat u, GMfloat v)
 {
-	AlignedVector<Object::DataType>& uvs = m_parent->uvs();
+	D(d);
+	AlignedVector<Object::DataType>& uvs = d->parentMesh->uvs();
 	uvs.push_back(u);
 	uvs.push_back(v);
 }
 
 void Component::lightmap(GMfloat u, GMfloat v)
 {
-	AlignedVector<Object::DataType>& lightmaps = m_parent->lightmaps();
+	D(d);
+	AlignedVector<Object::DataType>& lightmaps = d->parentMesh->lightmaps();
 	lightmaps.push_back(u);
 	lightmaps.push_back(v);
 }
 
 void Component::endFace()
 {
-	m_vertexOffsets.push_back(m_primitiveVertices.empty() ?
-		m_offset : m_vertexOffsets.back() + m_primitiveVertices.back()
+	D(d);
+	d->vertexOffsets.push_back(d->primitiveVertices.empty() ?
+		d->offset : d->vertexOffsets.back() + d->primitiveVertices.back()
 	);
-	m_primitiveVertices.push_back(m_currentFaceVerticesCount);
-	m_primitiveCount++;
+	d->primitiveVertices.push_back(d->currentFaceVerticesCount);
+	d->primitiveCount++;
 }
 
-ChildObject::ChildObject()
+Mesh::Mesh()
 	: m_arrayId(0)
 	, m_bufferId(0)
 	, m_type(NormalObject)
@@ -120,7 +131,7 @@ ChildObject::ChildObject()
 {
 }
 
-ChildObject::ChildObject(const std::string& name)
+Mesh::Mesh(const std::string& name)
 	: m_arrayId(0)
 	, m_bufferId(0)
 	, m_type(NormalObject)
@@ -129,7 +140,7 @@ ChildObject::ChildObject(const std::string& name)
 	m_name = name;
 }
 
-ChildObject::~ChildObject()
+Mesh::~Mesh()
 {
 	for (auto iter = m_components.begin(); iter != m_components.end(); iter++)
 	{
@@ -137,13 +148,13 @@ ChildObject::~ChildObject()
 	}
 }
 
-void ChildObject::appendComponent(AUTORELEASE Component* component)
+void Mesh::appendComponent(AUTORELEASE Component* component)
 {
 	ASSERT(m_components.find(component) == m_components.end());
 	m_components.push_back(component);
 }
 
-void ChildObject::calculateTangentSpace()
+void Mesh::calculateTangentSpace()
 {
 	if (m_uvs.size() == 0)
 		return;

@@ -55,8 +55,17 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
-class Input_Windows
+GM_PRIVATE_OBJECT(Input_Windows)
 {
+	bool mouseReady;
+	IWindow* window;
+	XInputWrapper xinput;
+};
+
+class Input_Windows : public GMObject
+{
+	DECLARE_PRIVATE(Input_Windows)
+
 public:
 	Input_Windows();
 	~Input_Windows();
@@ -70,11 +79,6 @@ public:
 
 	KeyboardState getKeyboardState();
 	MouseState getMouseState();
-
-private:
-	bool m_mouseReady;
-	IWindow* m_window;
-	XInputWrapper m_xinput;
 };
 
 typedef Input_Windows Input;

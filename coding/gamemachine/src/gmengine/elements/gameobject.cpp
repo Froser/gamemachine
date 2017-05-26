@@ -91,10 +91,10 @@ void GlyphObject::constructObject()
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
 	Object* obj = new Object();
-	ChildObject* child = new ChildObject();
+	Mesh* child = new Mesh();
 	obj->append(child);
-	child->setArrangementMode(ChildObject::Triangle_Strip);
-	child->setType(ChildObject::Glyph);
+	child->setArrangementMode(Mesh::Triangle_Strip);
+	child->setType(Mesh::Glyph);
 
 	Component* component = new Component(child);
 	Shader& shader = component->getShader();
@@ -196,9 +196,9 @@ void EntityObject::calc()
 	d->maxs[0] = d->maxs[1] = d->maxs[2] = -d->mins[0];
 
 	Object* obj = getObject();
-	for (auto iter = obj->getChildObjects().begin(); iter != obj->getChildObjects().end(); iter++)
+	for (auto iter = obj->getAllMeshes().begin(); iter != obj->getAllMeshes().end(); iter++)
 	{
-		ChildObject* child = *iter;
+		Mesh* child = *iter;
 		Object::DataType* vertices = child->vertices().data();
 		GMint sz = child->vertices().size();
 		for (GMint i = 0; i < sz; i += 4)
@@ -231,4 +231,138 @@ void EntityObject::makePlanes()
 	d->planes[4] = Plane(linear_math::Vector3(0, 1, 0), -d->maxs[0]);
 	// 下
 	d->planes[5] = Plane(linear_math::Vector3(0, -1, 0), d->mins[0]);
+}
+
+// 天空
+
+static linear_math::Vector2 uvs[24] = {
+	linear_math::Vector2(0, 0),
+	linear_math::Vector2(0, 1),
+	linear_math::Vector2(1, 1),
+	linear_math::Vector2(1, 0),
+
+	linear_math::Vector2(0, 0),
+	linear_math::Vector2(0, 1),
+	linear_math::Vector2(1, 1),
+	linear_math::Vector2(1, 0),
+
+	linear_math::Vector2(0, 0),
+	linear_math::Vector2(0, 1),
+	linear_math::Vector2(1, 1),
+	linear_math::Vector2(1, 0),
+
+	linear_math::Vector2(0, 0),
+	linear_math::Vector2(0, 1),
+	linear_math::Vector2(1, 1),
+	linear_math::Vector2(1, 0),
+
+	linear_math::Vector2(0, 0),
+	linear_math::Vector2(0, 1),
+	linear_math::Vector2(1, 1),
+	linear_math::Vector2(1, 0),
+
+	/*
+	linear_math::Vector2(0, 0),
+	linear_math::Vector2(0, 1),
+	linear_math::Vector2(1, 1),
+	linear_math::Vector2(1, 0),
+	*/
+};
+
+SkyGameObject::SkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
+	: GameObject(nullptr)
+{
+	D(d);
+	d->shader = shader;
+	d->min = min;
+	d->max = max;
+
+	Object* obj = nullptr;
+	createSkyBox(&obj);
+	setObject(obj);
+}
+
+void SkyGameObject::createSkyBox(OUT Object** obj)
+{
+	D(d);
+	linear_math::Vector3 vertices[20] = {
+		//Front
+		linear_math::Vector3(d->min[0], d->max[1], d->max[2]),
+		linear_math::Vector3(d->min[0], d->min[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->min[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->max[1], d->max[2]),
+
+		//Back
+		linear_math::Vector3(d->min[0], d->max[1], d->min[2]),
+		linear_math::Vector3(d->min[0], d->min[1], d->min[2]),
+		linear_math::Vector3(d->max[0], d->min[1], d->min[2]),
+		linear_math::Vector3(d->max[0], d->max[1], d->min[2]),
+
+		//Left
+		linear_math::Vector3(d->min[0], d->max[1], d->min[2]),
+		linear_math::Vector3(d->min[0], d->max[1], d->max[2]),
+		linear_math::Vector3(d->min[0], d->min[1], d->max[2]),
+		linear_math::Vector3(d->min[0], d->min[1], d->min[2]),
+
+		//Right
+		linear_math::Vector3(d->max[0], d->max[1], d->min[2]),
+		linear_math::Vector3(d->max[0], d->max[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->min[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->min[1], d->min[2]),
+
+		//Up
+		linear_math::Vector3(d->min[0], d->max[1], d->min[2]),
+		linear_math::Vector3(d->min[0], d->max[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->max[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->max[1], d->min[2]),
+
+		//Down
+		/*
+		linear_math::Vector3(d->min[0], d->min[1], d->min[2]),
+		linear_math::Vector3(d->min[0], d->min[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->min[1], d->max[2]),
+		linear_math::Vector3(d->max[0], d->min[1], d->min[2]),
+		*/
+	};
+
+	// Scaling surface
+	const GMint SCALING = 2;
+	linear_math::Vector3 center = (d->min + d->max) / 2;
+	linear_math::Matrix4x4 transScale = linear_math::scale(linear_math::Vector3(SCALING, 1, SCALING));
+	for (GMuint i = 0; i < 20; i++)
+	{
+		linear_math::Matrix4x4 transRestore = linear_math::translate(center);
+		linear_math::Matrix4x4 transMoveToAxisOrigin = linear_math::translate(-center);
+		linear_math::Matrix4x4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
+
+		// 因为linear_math::mat为列优先，所以与vec相乘的时候应该先transpose
+		linear_math::Vector4 pt = linear_math::Vector4(vertices[i], 1) * transFinal.transpose();
+		vertices[i] = linear_math::Vector3(pt[0], pt[1], pt[2]);
+	}
+
+	Object* object = new Object();
+	*obj = object;
+
+	Mesh* child = new Mesh();
+	child->setType(Mesh::Sky);
+
+	Component* component = new Component(child);
+	component->getShader() = d->shader;
+
+	// We don't draw surface beneath us
+	for (GMuint i = 0; i < 5; i++)
+	{
+		component->beginFace();
+		component->vertex(vertices[i * 4][0], vertices[i * 4][1], vertices[i * 4][2]);
+		component->vertex(vertices[i * 4 + 1][0], vertices[i * 4 + 1][1], vertices[i * 4 + 1][2]);
+		component->vertex(vertices[i * 4 + 2][0], vertices[i * 4 + 2][1], vertices[i * 4 + 2][2]);
+		component->vertex(vertices[i * 4 + 3][0], vertices[i * 4 + 3][1], vertices[i * 4 + 3][2]);
+		component->uv(uvs[i * 4][0], uvs[i * 4][1]);
+		component->uv(uvs[i * 4 + 1][0], uvs[i * 4 + 1][1]);
+		component->uv(uvs[i * 4 + 2][0], uvs[i * 4 + 2][1]);
+		component->uv(uvs[i * 4 + 3][0], uvs[i * 4 + 3][1]);
+		component->endFace();
+	}
+	child->appendComponent(component);
+	object->append(child);
 }

@@ -49,7 +49,7 @@ bool ImageReader_JPG::load(const GMbyte* data, GMuint size, OUT Image** image)
 {
 	Image* img = new Image();
 	*image = img;
-	ImageData& imgData = img->getData();
+	Image::Data& imgData = img->getData();
 	//init image data
 	imgData.target = GL_TEXTURE_2D;
 	imgData.mipLevels = 1;

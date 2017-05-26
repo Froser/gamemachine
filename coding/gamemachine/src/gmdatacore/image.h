@@ -16,7 +16,7 @@ struct ImageMipData
 
 // This is the main image data structure. It contains all the parameters needed
 // to place texture data into a texture object using OpenGL.
-struct ImageData
+GM_PRIVATE_OBJECT(Image)
 {
 	GMuint target;
 	GMuint internalFormat;
@@ -44,19 +44,18 @@ enum ImageType
 	ImageType_End,
 };
 
-class Image
+class Image : public GMObject
 {
+	DECLARE_PRIVATE(Image)
+
 public:
 	Image();
 	virtual ~Image();
 
 public:
-	ImageData& getData();
+	Data& getData();
 	virtual void dispose();
 	void flipVertically(GMuint mipId);
-
-private:
-	ImageData m_data;
 };
 
 END_NS

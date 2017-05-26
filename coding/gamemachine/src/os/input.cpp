@@ -58,8 +58,9 @@ XInputWrapper::~XInputWrapper()
 }
 
 Input_Windows::Input_Windows()
-	: m_mouseReady(false)
 {
+	D(d);
+	d->mouseReady = false;
 }
 
 Input_Windows::~Input_Windows()
@@ -68,19 +69,21 @@ Input_Windows::~Input_Windows()
 
 void Input_Windows::initMouse(IWindow* window)
 {
-	m_window = window;
-	GMRect rect = m_window->getWindowRect();
+	D(d);
+	d->window = window;
+	GMRect rect = d->window->getWindowRect();
 	::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
 	::ShowCursor(false);
-	m_mouseReady = true;
+	d->mouseReady = true;
 }
 
 JoystickState Input_Windows::getJoystickState()
 {
+	D(d);
 	XINPUT_STATE state;
 	JoystickState result = { false };
 
-	if (m_xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
+	if (d->xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
 	{
 		result.valid = true;
 		result.leftTrigger = state.Gamepad.bLeftTrigger;
@@ -97,8 +100,9 @@ JoystickState Input_Windows::getJoystickState()
 
 void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
 {
+	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
-	m_xinput.XInputSetState(0, &v);
+	d->xinput.XInputSetState(0, &v);
 }
 
 KeyboardState Input_Windows::getKeyboardState()
@@ -110,14 +114,15 @@ KeyboardState Input_Windows::getKeyboardState()
 
 MouseState Input_Windows::getMouseState()
 {
-	if (!m_mouseReady)
+	D(d);
+	if (!d->mouseReady)
 	{
 		gm_error("Mouse is not ready. Please call initMouse() first.");
 		return MouseState();
 	}
 
 	MouseState state;
-	GMRect rect = m_window->getWindowRect();
+	GMRect rect = d->window->getWindowRect();
 	const GMint centerX = rect.x + rect.width / 2;
 	const GMint centerY = rect.y + rect.height / 2;
 

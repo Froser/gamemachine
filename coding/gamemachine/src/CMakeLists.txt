@@ -56,23 +56,17 @@ set(SOURCES
 		gmdatacore/object.h
 		gmdatacore/object.cpp
 		gmdatacore/shader.h
-		gmdatacore/shader.cpp
-		gmdatacore/texture.h
-		gmdatacore/texture.cpp
 		gmdatacore/model.h
 		gmdatacore/model.cpp
 		gmengine/controllers/resource_container.h
 		gmengine/controllers/resource_container.cpp
 		gmengine/controllers/graphic_engine.h
-		gmengine/controllers/graphic_engine.cpp
 		gmengine/controllers/gamepackagehandler.h
 		gmengine/controllers/gamepackagehandler.cpp
 		gmengine/controllers/gamemachine.h
 		gmengine/controllers/gamemachine.cpp
 		gmengine/controllers/factory.h
 		gmengine/controllers/factory.cpp
-		gmengine/elements/skygameobject.h
-		gmengine/elements/skygameobject.cpp
 		gmengine/elements/gameworldprivate.h
 		gmengine/elements/gameworldprivate.cpp
 		gmengine/elements/gameworld.h
@@ -149,6 +143,7 @@ set(SOURCES
 		foundation/linearmath.cpp
 		foundation/gmobject.h
 		foundation/gmobject.cpp
+		foundation/interfaces.h
 	)
 
 source_group_by_dir(SOURCES)

@@ -5,18 +5,25 @@
 #include "image.h"
 #include "foundation/utilities/utilities.h"
 #include "foundation/linearmath.h"
-#include "gmdatacore/texture.h"
 #include "shader.h"
 
-#define BEGIN_FOREACH_OBJ(obj, childObj) for (auto iter = (obj)->getChildObjects().begin(); iter != (obj)->getChildObjects().end(); iter++) { ChildObject* childObj = *iter;
+#define BEGIN_FOREACH_OBJ(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { Mesh* mesh = *iter;
 #define END_FOREACH_OBJ }
 
 BEGIN_NS
 
 class Object;
 class GMGLShaders;
-class ObjectPainter
+
+GM_PRIVATE_OBJECT(ObjectPainter)
 {
+	Object* object;
+};
+
+class ObjectPainter : public GMObject
+{
+	DECLARE_PRIVATE(ObjectPainter)
+
 public:
 	ObjectPainter(Object* objs);
 	virtual ~ObjectPainter() {}
@@ -29,15 +36,30 @@ public:
 
 protected:
 	Object* getObject();
-
-private:
-	Object* m_object;
 };
 
-class ChildObject;
+class Mesh;
+GM_PRIVATE_OBJECT(Component)
+{
+	GMuint offset;
+	Shader shader;
+
+	// 图元顶点数量
+	AlignedVector<GMint> primitiveVertices;
+	// 绘制图元数量
+	GMuint primitiveCount;
+	// 顶点在ChildObject的偏移
+	AlignedVector<GMint> vertexOffsets;
+
+	Mesh* parentMesh;
+	GMuint currentFaceVerticesCount;
+};
+
 class Component : public GMObject
 {
-	friend class ChildObject;
+	DECLARE_PRIVATE(Component)
+
+	friend class Mesh;
 
 public:
 	enum
@@ -45,27 +67,31 @@ public:
 		DefaultEdgesCount = 3,
 	};
 
-	Component(ChildObject* parent);
+	Component(Mesh* parent);
 	~Component();
 
 	Shader& getShader()
 	{
-		return m_shader;
+		D(d);
+		return d->shader;
 	}
 
 	GMint* getOffsetPtr()
 	{
-		return m_vertexOffsets.data();
+		D(d);
+		return d->vertexOffsets.data();
 	}
 
 	GMint* getPrimitiveVerticesCountPtr()
 	{
-		return m_primitiveVertices.data();
+		D(d);
+		return d->primitiveVertices.data();
 	}
 
 	GMuint getPrimitiveCount()
 	{
-		return m_primitiveCount;
+		D(d);
+		return d->primitiveCount;
 	}
 
 	// suggested methods
@@ -76,24 +102,18 @@ public:
 	void uv(GMfloat u, GMfloat v);
 	void lightmap(GMfloat u, GMfloat v);
 	void endFace();
-
-private:
-	GMuint m_offset;
-	Shader m_shader;
-
-	// 图元顶点数量
-	AlignedVector<GMint> m_primitiveVertices;
-	// 绘制图元数量
-	GMuint m_primitiveCount;
-	// 顶点在ChildObject的偏移
-	AlignedVector<GMint> m_vertexOffsets;
-
-	ChildObject* m_parent;
-	GMuint m_currentFaceVerticesCount;
 };
 
-class Object
+GM_PRIVATE_OBJECT(Object)
 {
+	AlignedVector<Mesh*> objects;
+	AutoPtr<ObjectPainter> painter;
+};
+
+GM_ALIGNED_16(class) Object : public GMObject
+{
+	DECLARE_PRIVATE(Object)
+
 public:
 	typedef GMfloat DataType;
 
@@ -103,35 +123,35 @@ public:
 public:
 	void setPainter(AUTORELEASE ObjectPainter* painter)
 	{
-		m_painter.reset(painter);
+		D(d);
+		d->painter.reset(painter);
 	}
 
 	ObjectPainter* getPainter()
 	{
-		return m_painter;
+		D(d);
+		return d->painter;
 	}
 
-	AlignedVector<ChildObject*>& getChildObjects()
+	AlignedVector<Mesh*>& getAllMeshes()
 	{
-		return m_objects;
+		D(d);
+		return d->objects;
 	}
 
-	void append(AUTORELEASE ChildObject* obj)
+	void append(AUTORELEASE Mesh* obj)
 	{
-		m_objects.push_back(obj);
+		D(d);
+		d->objects.push_back(obj);
 	}
-
-private:
-	AutoPtr<ObjectPainter> m_painter;
-	AlignedVector<ChildObject*> m_objects;
 };
 
-class ChildObject
+class Mesh
 {
 	friend class Object_Less;
 
 public:
-	enum ObjectType
+	enum MeshesType
 	{
 		ObjectTypeBegin,
 		NormalObject = ObjectTypeBegin,
@@ -151,11 +171,11 @@ public:
 		Triangles,
 	};
 
-	ChildObject();
-	ChildObject(const std::string& name);
-	~ChildObject();
+	Mesh();
+	Mesh(const std::string& name);
+	~Mesh();
 
-	void clone(OUT ChildObject** childObject);
+	void clone(OUT Mesh** childObject);
 
 	void appendComponent(AUTORELEASE Component* component);
 
@@ -196,12 +216,12 @@ public:
 		return m_lightmaps;
 	}
 
-	ObjectType getType()
+	MeshesType getType()
 	{
 		return m_type;
 	}
 
-	void setType(ObjectType type)
+	void setType(MeshesType type)
 	{
 		m_type = type;
 	}
@@ -241,7 +261,7 @@ private:
 	GMuint m_arrayId;
 	GMuint m_bufferId;
 	AlignedVector<Component*> m_components;
-	ObjectType m_type;
+	MeshesType m_type;
 	ArrangementMode m_mode;
 	std::string m_name;
 };

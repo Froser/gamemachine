@@ -2,7 +2,6 @@
 #define FREEGLUT_STATIC
 #define UNICODE
 #include <windows.h>
-#include "GL/glew.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/character.h"
 #include "gmgl/gmglfactory.h"

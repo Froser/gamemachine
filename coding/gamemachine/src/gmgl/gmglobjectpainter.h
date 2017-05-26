@@ -5,7 +5,6 @@
 #include "gmglshaders.h"
 BEGIN_NS
 
-struct IGraphicEngine;
 class GMGLGraphicEngine;
 class GMGLShaders;
 class GameWorld;

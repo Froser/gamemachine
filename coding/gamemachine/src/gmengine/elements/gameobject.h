@@ -8,13 +8,10 @@
 #include "foundation/utilities/utilities.h"
 
 BEGIN_NS
-class GameWorld;
-struct GameObjectPrivate
+GM_PRIVATE_OBJECT(GameObject)
 {
-	GameObjectPrivate()
+	GM_PRIVATE_CONSTRUCT(GameObject)
 		: world(nullptr)
-		, animationStartTick(0)
-		, animationDuration(0)
 		, id(0)
 	{
 	}
@@ -22,14 +19,10 @@ struct GameObjectPrivate
 	GMuint id;
 	AutoPtr<Object> object;
 	GameWorld* world;
-	GMint animationStartTick;
-	GMint animationDuration;
 };
 
-class GameWorld;
-class GameObject
+class GameObject : public GMObject
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
 	DECLARE_PRIVATE(GameObject)
 
 public:
@@ -43,9 +36,6 @@ public:
 	virtual void setWorld(GameWorld* world);
 	GameWorld* getWorld();
 
-	void startAnimation(GMuint duration);
-	void stopAnimation();
-
 public:
 	virtual void getReadyForRender(DrawingList& list);
 	virtual void onAppendingObjectToWorld();
@@ -56,7 +46,7 @@ struct GlyphProperties
 {
 };
 
-struct GlyphObjectPrivate
+GM_PRIVATE_OBJECT(GlyphObject)
 {
 	std::wstring lastRenderText;
 	std::wstring text;
@@ -109,6 +99,27 @@ public:
 private:
 	void calc();
 	void makePlanes();
+};
+
+// SkyObject
+GM_PRIVATE_OBJECT(SkyGameObject)
+{
+	linear_math::Vector3 min;
+	linear_math::Vector3 max;
+	Shader shader;
+};
+
+class SkyGameObject : public GameObject
+{
+	DECLARE_PRIVATE(SkyGameObject)
+
+public:
+	SkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
+
+private:
+	void createSkyBox(OUT Object** obj);
+
+private:
 };
 
 END_NS

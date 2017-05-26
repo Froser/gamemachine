@@ -16,7 +16,7 @@ struct GlyphInfo
 	GMfloat advance;
 };
 
-GM_ALIGNED_16_(class) GlyphManager : public GMObject
+GM_ALIGNED_16(class) GlyphManager : public GMObject
 {
 	typedef std::map<GMWChar, GlyphInfo> CharList;
 

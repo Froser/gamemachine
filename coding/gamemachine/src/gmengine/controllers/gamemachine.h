@@ -7,45 +7,16 @@
 #include "gmdatacore/soundreader/soundreader.h"
 BEGIN_NS
 
-enum GameMachineEvent
-{
-	GM_EVENT_SIMULATE,
-	GM_EVENT_RENDER,
-	GM_EVENT_ACTIVATE,
-};
-
 enum GameMachineMessage
 {
 	GM_MESSAGE_EXIT,
-};
-
-struct IWindow
-{
-	virtual ~IWindow() {}
-	virtual bool createWindow() = 0;
-	virtual GMRect getWindowRect() = 0;
-	virtual bool handleMessages() = 0;
-	virtual void swapBuffers() = 0;
-#ifdef _WINDOWS
-	virtual HWND hwnd() = 0;
-#endif
-};
-
-class GameMachine;
-struct IGameHandler
-{
-	virtual ~IGameHandler() {}
-	virtual void setGameMachine(GameMachine* gm) = 0;
-	virtual void init() = 0;
-	virtual void event(GameMachineEvent evt) = 0;
-	virtual bool isWindowActivate() = 0;
 };
 
 struct IFactory;
 struct IGameHandler;
 class GlyphManager;
 
-GM_PRIVATE_OBJECT(GameMachine)
+GM_ALIGNED_16(struct) GameMachinePrivate : public GMObjectPrivateBase<GameMachine>
 {
 	FPSCounter fpsCounter;
 	GraphicSettings settings;

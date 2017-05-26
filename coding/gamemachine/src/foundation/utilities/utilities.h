@@ -315,17 +315,14 @@ protected:
 #endif
 
 //FPSCounter
-
-//FPSCounter
-struct FPSCounterPrivate
+GM_PRIVATE_OBJECT(FPSCounter)
 {
 	GMfloat fps;
 	GMfloat lastTime;
-	GMlong frames;
 	GMfloat time;
-
 	GMfloat immediate_lastTime;
 	GMfloat elapsed_since_last_frame;
+	GMlong frames;
 };
 
 class FPSCounter

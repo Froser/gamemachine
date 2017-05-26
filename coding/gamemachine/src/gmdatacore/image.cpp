@@ -3,7 +3,6 @@
 
 Image::Image()
 {
-	memset(&m_data, 0, sizeof(m_data));
 }
 
 Image::~Image()
@@ -11,23 +10,26 @@ Image::~Image()
 	dispose();
 }
 
-ImageData& Image::getData()
+Image::Data& Image::getData()
 {
-	return m_data;
+	D(d);
+	return *d;
 }
 
 void Image::dispose()
 {
-	if (m_data.mip[0].data)
+	D(d);
+	if (d->mip[0].data)
 	{
-		delete[] reinterpret_cast<GMbyte *>(m_data.mip[0].data);
-		m_data.mip[0].data = nullptr;
+		delete[] reinterpret_cast<GMbyte *>(d->mip[0].data);
+		d->mip[0].data = nullptr;
 	}
 }
 
 void Image::flipVertically(GMuint mipId)
 {
-	ImageMipData* mip = &m_data.mip[mipId];
+	D(d);
+	ImageMipData* mip = &d->mip[mipId];
 	GMint width = mip->width,
 		height = mip->height;
 	GMuint rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;

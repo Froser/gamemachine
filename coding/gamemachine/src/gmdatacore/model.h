@@ -4,14 +4,12 @@
 #include "foundation/linearmath.h"
 BEGIN_NS
 
-struct Model
+GM_ALIGNED_16(struct) Model : public GMAlignmentObject
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
 	linear_math::Vector3 extents;
-	bool create;
 	char classname[64];
 	char model[64];
+	bool create;
 };
 
 END_NS

@@ -2,17 +2,20 @@
 #define __GAMEWORLD_H__
 #include "common.h"
 #include "gameworldprivate.h"
+#include "foundation/vector.h"
 
 BEGIN_NS
+
+class DrawingList : public AlignedVector<DrawingItem>
+{
+};
+
 class Character;
-class GameMachine;
-struct IGraphicEngine;
 class GameObject;
 class ObjectPainter;
-class GameWorld
+class GameWorld : public GMObject
 {
 	DECLARE_PRIVATE(GameWorld)
-	GM_DECLARE_ALIGNED_ALLOCATOR();
 
 public:
 	GameWorld(GamePackage* pk);

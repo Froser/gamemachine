@@ -6,7 +6,6 @@
 #include "foundation/utilities/utilities.h"
 BEGIN_NS
 
-struct IGraphicEngine;
 class Image;
 struct ITexture;
 class ObjectPainter;

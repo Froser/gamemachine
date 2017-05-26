@@ -31,7 +31,7 @@ struct GM_WAVEFACT
 };
 
 #ifdef _WINDOWS
-struct WavSoundFilePrivate
+GM_PRIVATE_OBJECT(WavSoundFile)
 {
 	ComPtr<IDirectSoundBuffer8> cpDirectSoundBuffer;
 	bool playing;

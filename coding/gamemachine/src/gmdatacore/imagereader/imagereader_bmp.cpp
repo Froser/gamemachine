@@ -122,7 +122,7 @@ bool ImageReader_BMP::test(const GMbyte* byte)
 void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img, GMuint size)
 {
 	ASSERT(img);
-	ImageData& data = img->getData();
+	Image::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;

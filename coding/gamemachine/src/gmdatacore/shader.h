@@ -4,7 +4,6 @@
 #include "foundation/linearmath.h"
 BEGIN_NS
 
-struct ITexture;
 // 表示一套纹理，包括普通纹理、漫反射纹理、法线贴图、光照贴图，以后可能还有高光贴图等
 enum TextureIndex
 {
@@ -63,7 +62,7 @@ enum GMS_TextureModType
 	GMS_SCALE,
 };
 
-struct GMS_TextureMod
+GM_ALIGNED_16(struct) GMS_TextureMod
 {
 	GMS_TextureModType type;
 	GMfloat p1;
@@ -71,7 +70,7 @@ struct GMS_TextureMod
 };
 
 // 表示一系列动画帧
-struct TextureFrames
+GM_ALIGNED_16(struct) TextureFrames
 {
 	TextureFrames()
 		: frameCount(0)
@@ -95,7 +94,7 @@ struct TextureFrames
 	GMS_Wrap wrapT;
 };
 
-struct TextureInfo
+GM_ALIGNED_16(struct) TextureInfo
 {
 	TextureInfo()
 	{
@@ -118,7 +117,7 @@ enum LightArgs
 	LA_END,
 };
 
-struct LightInfo
+GM_ALIGNED_16(struct) LightInfo
 {
 	bool on;
 	bool useGlobalLightColor; // true表示使用全局的光的颜色
@@ -135,7 +134,7 @@ enum LightType
 	LT_END,
 };
 
-struct Shader
+GM_ALIGNED_16(struct) Shader
 {
 	Shader()
 		: surfaceFlag(0)
@@ -152,11 +151,11 @@ struct Shader
 	TextureInfo texture;
 	GMuint surfaceFlag;
 	GMS_Cull cull;
-	bool blend;
 	GMS_BlendFunc blendFactors[2];
+	LightInfo lights[LT_END];
+	bool blend;
 	bool nodraw;
 	bool noDepthTest;
-	LightInfo lights[LT_END];
 };
 END_NS
 #endif

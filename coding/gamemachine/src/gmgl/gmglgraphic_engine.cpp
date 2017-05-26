@@ -77,10 +77,10 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	D(d);
 	updateMatrices(lookAt);
 
-	BEGIN_ENUM(i, ChildObject::ObjectTypeBegin, ChildObject::ObjectTypeEnd)
+	BEGIN_ENUM(i, Mesh::ObjectTypeBegin, Mesh::ObjectTypeEnd)
 	{
 		IRender* render = getRender(i);
-		ChildObject dummy;
+		Mesh dummy;
 		dummy.setType(i);
 
 		render->begin(this, &dummy, nullptr);
@@ -109,13 +109,13 @@ GameWorld* GMGLGraphicEngine::getWorld()
 	return d->world;
 }
 
-void GMGLGraphicEngine::registerShader(ChildObject::ObjectType objectType, AUTORELEASE GMGLShaders* shaders)
+void GMGLGraphicEngine::registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaders* shaders)
 {
 	D(d);
 	d->allShaders[objectType] = shaders;
 }
 
-GMGLShaders* GMGLGraphicEngine::getShaders(ChildObject::ObjectType objectType)
+GMGLShaders* GMGLGraphicEngine::getShaders(Mesh::MeshesType objectType)
 {
 	D(d);
 	if (d->allShaders.find(objectType) == d->allShaders.end())
@@ -124,13 +124,13 @@ GMGLShaders* GMGLGraphicEngine::getShaders(ChildObject::ObjectType objectType)
 	return d->allShaders[objectType];
 }
 
-void GMGLGraphicEngine::registerRender(ChildObject::ObjectType objectType, AUTORELEASE IRender* render)
+void GMGLGraphicEngine::registerRender(Mesh::MeshesType objectType, AUTORELEASE IRender* render)
 {
 	D(d);
 	d->allRenders[objectType] = render;
 }
 
-IRender* GMGLGraphicEngine::getRender(ChildObject::ObjectType objectType)
+IRender* GMGLGraphicEngine::getRender(Mesh::MeshesType objectType)
 {
 	D(d);
 	if (d->allRenders.find(objectType) == d->allRenders.end())
