@@ -45,8 +45,23 @@ private:
 	GMfloat m_moveRate[MD_ACTION_COUNT];
 };
 
+GM_PRIVATE_OBJECT(Character)
+{
+	GMfloat radius;
+	Frustum frustum;
+	MoveAction moveDirection;
+	MoveRate moveRate;
+
+	PositionState state;
+	CameraLookAt lookAt;
+	CommandVector3 moveCmdArgFB;
+	CommandVector3 moveCmdArgLR;
+};
+
 class Character : public GameObject
 {
+	DECLARE_PRIVATE(Character)
+
 public:
 	Character(GMfloat radius);
 
@@ -73,17 +88,6 @@ private:
 	void update();
 	void sendMoveCommand();
 	void clearMoveArgs();
-
-private:
-	GMfloat m_radius;
-	Frustum m_frustum;
-	MoveAction m_moveDirection;
-	MoveRate m_moveRate;
-
-	PositionState m_state;
-	CameraLookAt m_lookAt;
-	CommandVector3 m_moveCmdArgFB;
-	CommandVector3 m_moveCmdArgLR;
 };
 
 END_NS

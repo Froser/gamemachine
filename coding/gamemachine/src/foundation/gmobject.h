@@ -3,6 +3,8 @@
 #include "defines.h"
 #include "memory.h"
 
+BEGIN_NS
+
 // GameMachine采用数据和方法分离的方式，可以为一个类定义一个私有结构存储数据
 template <typename T>
 GM_ALIGNED_16(class) GMObjectPrivateWrapper
@@ -25,23 +27,36 @@ public:
 		return m_data;
 	}
 
+	void swap(GMObjectPrivateWrapper* other)
+	{
+		SWAP(m_data, other->m_data);
+	}
+
 private:
 	T* m_data;
 };
 
+// 定义对齐结构体
+#define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from
+#define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, GMAlignmentObject)
+#define GM_STRUCT(name) struct name
+
+// 对象存储
 template <typename T>
-GM_ALIGNED_16(struct) GMObjectPrivateBase : public gm::GMAlignmentObject
+GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 {
 	GMObjectPrivateBase() : parent(nullptr) {}
 	T* parent;
 };
 
-#define DECLARE_PRIVATE(className)														\
-	public:																				\
-		typedef className##Private Data;												\
-	private:																			\
-		GMObjectPrivateWrapper<className##Private> m_data;								\
-	protected:																			\
+#define DECLARE_PRIVATE(className)															\
+	public:																					\
+		typedef className##Private Data;													\
+	private:																				\
+		GMObjectPrivateWrapper<className##Private> m_data;									\
+		GMObjectPrivateWrapper<GMObject>* dataWrapper() {									\
+			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(&m_data); }			\
+	protected:																				\
 		className##Private* data() { m_data.data()->parent = this; return m_data.data();}
 
 // 获取私有成员
@@ -54,15 +69,18 @@ GM_ALIGNED_16(struct) GMObjectPrivateBase : public gm::GMAlignmentObject
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_CONSTRUCT(name) name##Private()
 
-BEGIN_NS
-
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 class GMObject : public GMAlignmentObject
 {
 public:
 	virtual ~GMObject();
-};
 
+public:
+	static void swapData(GMObject* a, GMObject* b);
+
+private:
+	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();
+};
 
 /* 代码规范：
   条款一：
@@ -83,7 +101,8 @@ class MyObject : public GMObject
   如果一个结构只有方法，没有成员，可以不用继承GMObject，也不用声明为对齐。
 
   条款三：
-  如果一个结构中包含对齐成员数据，它必须继承GMAlignmentObject，且自身必须用GM_ALIGNED_16来声明
+  当定义对齐结构体时，结构体里面不能包含方法（构造、析构函数，以及一些operator重载除外），所有结构体用GM_ALIGNED_STRUCT
+来定义，它将定义一个对齐结构体。结构体只用于存储数据，没有方法和逻辑。
 
   条款四：
   任何参与内核的类必须继承GMObject

@@ -4,7 +4,7 @@
 #include "foundation/linearmath.h"
 BEGIN_NS
 
-GM_ALIGNED_16(struct) Model : public GMAlignmentObject
+GM_ALIGNED_STRUCT(Model)
 {
 	linear_math::Vector3 extents;
 	char classname[64];

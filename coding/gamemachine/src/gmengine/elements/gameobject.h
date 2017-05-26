@@ -118,8 +118,6 @@ public:
 
 private:
 	void createSkyBox(OUT Object** obj);
-
-private:
 };
 
 END_NS

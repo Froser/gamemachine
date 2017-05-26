@@ -7,7 +7,7 @@ BEGIN_NS
 
 #define MAX_TOUCHED_ENTITY_NUM 1024
 
-struct BSPTracePlane : BSPPlane
+GM_ALIGNED_STRUCT_FROM(BSPTracePlane, BSPPlane)
 {
 	GMbyte planeType;
 	GMint signbits;
@@ -20,7 +20,7 @@ struct BSPTracePlane : BSPPlane
 	}
 };
 
-struct BSPTraceResult
+GM_ALIGNED_STRUCT(BSPTraceResult)
 {
 	bool allsolid; // if true, plane is not valid
 	bool startsolid; // if true, the initial point was in a solid area
@@ -34,12 +34,12 @@ struct BSPTraceResult
 	GMint entities[MAX_TOUCHED_ENTITY_NUM];
 };
 
-struct BSPSphere
+GM_ALIGNED_STRUCT(BSPSphere)
 {
-	bool use;
+	linear_math::Vector3 offset;
 	GMfloat radius;
 	GMfloat halfheight;
-	linear_math::Vector3 offset;
+	bool use;
 };
 
 class BSPPhysicsWorld;
@@ -50,7 +50,7 @@ GM_PRIVATE_OBJECT(BSPTrace)
 	BSPData* bsp;
 	std::map<GMint, std::set<BSPEntity*> >* entities;
 	std::map<BSPEntity*, EntityObject*>* entityObjects;
-	BSPPhysicsWorld* p_world;
+	BSPPhysicsWorld* world;
 	GMint checkcount;
 };
 

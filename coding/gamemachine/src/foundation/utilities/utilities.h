@@ -325,7 +325,7 @@ GM_PRIVATE_OBJECT(FPSCounter)
 	GMlong frames;
 };
 
-class FPSCounter
+class FPSCounter : public GMObject
 {
 	DECLARE_PRIVATE(FPSCounter)
 
@@ -347,7 +347,7 @@ enum PointPosition
 	POINT_BEHIND_PLANE,
 };
 
-struct Plane
+struct Plane : public GMObject
 {
 	Plane() : normal(linear_math::Vector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{}
@@ -398,10 +398,24 @@ struct Plane
 
 
 //Frustum
-class Frustum
+GM_PRIVATE_OBJECT(Frustum)
 {
+	Plane planes[6];
+	GMfloat fovy;
+	GMfloat aspect;
+	GMfloat n;
+	GMfloat f;
+	linear_math::Matrix4x4 viewMatrix;
+	linear_math::Matrix4x4 projMatrix;
+};
+
+class Frustum : public GMObject
+{
+	DECLARE_PRIVATE(Frustum)
+
 public:
-	Frustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
+	Frustum() {}
+	void initFrustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
 	void update();
@@ -409,22 +423,23 @@ public:
 	bool isBoundingBoxInside(const linear_math::Vector3* vertices);
 	linear_math::Matrix4x4 getPerspective();
 	void updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix);
-
-private:
-	Plane planes[6];
-	GMfloat m_fovy;
-	GMfloat m_aspect;
-	GMfloat m_n;
-	GMfloat m_f;
-	linear_math::Matrix4x4 m_viewMatrix;
-	linear_math::Matrix4x4 m_projMatrix;
 };
 
 //Scanner
 typedef bool(*CharPredicate)(char in);
 
-class Scanner
+GM_PRIVATE_OBJECT(Scanner)
 {
+	const char* p;
+	bool skipSame;
+	CharPredicate predicate;
+	bool valid;
+};
+
+class Scanner : public GMObject
+{
+	DECLARE_PRIVATE(Scanner)
+
 public:
 	explicit Scanner(const char* line);
 	explicit Scanner(const char* line, CharPredicate predicate);
@@ -435,17 +450,21 @@ public:
 	void nextToTheEnd(char* out);
 	bool nextFloat(GMfloat* out);
 	bool nextInt(GMint* out);
-
-private:
-	const char* m_p;
-	bool m_skipSame;
-	CharPredicate m_predicate;
-	bool m_valid;
 };
 
 //MemoryStream
-class MemoryStream
+GM_PRIVATE_OBJECT(MemoryStream)
 {
+	const GMbyte* ptr;
+	const GMbyte* start;
+	const GMbyte* end;
+	GMuint size;
+};
+
+class MemoryStream : public GMObject
+{
+	DECLARE_PRIVATE(MemoryStream)
+
 public:
 	enum SeekMode
 	{
@@ -454,7 +473,7 @@ public:
 	};
 
 public:
-	MemoryStream(const GMbyte* data, GMuint size);
+	MemoryStream(const GMbyte* buffer, GMuint size);
 
 public:
 	GMuint read(GMbyte* buf, GMuint size);
@@ -464,43 +483,45 @@ public:
 	GMuint size();
 	GMuint tell();
 	GMbyte get();
-
-private:
-	const GMbyte* m_ptr;
-	const GMbyte* m_start;
-	const GMbyte* m_end;
-	GMuint m_size;
 };
 
 //Bitset
-class Bitset
+GM_PRIVATE_OBJECT(Bitset)
 {
+	GMint numBytes;
+	GMbyte* bits;
+};
+
+class Bitset : public GMObject
+{
+	DECLARE_PRIVATE(Bitset)
+
 public:
-	Bitset() : numBytes(0), bits(NULL)
-	{}
+	Bitset()
+	{
+		D(d);
+		d->numBytes = 0;
+		d->bits = nullptr;
+	}
 	~Bitset()
 	{
-		if (bits)
-			delete[] bits;
-		bits = NULL;
+		D(d);
+		if (d->bits)
+			delete[] d->bits;
+		d->bits = nullptr;
 	}
 
-	bool init(int numberOfBits);
+	bool init(GMint numberOfBits);
 	void clearAll();
 	void setAll();
 
-	void clear(int bitNumber);
-	void set(int bitNumber);
+	void clear(GMint bitNumber);
+	void set(GMint bitNumber);
 
-	unsigned char isSet(int bitNumber);
-
-protected:
-	GMint numBytes;	//size of bits array
-	unsigned char* bits;
+	GMbyte isSet(GMint bitNumber);
 };
 
 //Camera
-
 struct CameraLookAt
 {
 	linear_math::Vector3 lookAt;
@@ -509,9 +530,9 @@ struct CameraLookAt
 
 struct PositionState
 {
+	linear_math::Vector3 position;
 	GMfloat yaw;
 	GMfloat pitch;
-	linear_math::Vector3 position;
 	GMfloat pitchLimitRad;
 };
 

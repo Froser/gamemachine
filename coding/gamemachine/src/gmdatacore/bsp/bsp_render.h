@@ -8,14 +8,9 @@
 #include "bsp.h"
 BEGIN_NS
 
-class GameObject;
-
 // structs for rendering
-class BSP_Render_Vertex
+GM_ALIGNED_STRUCT(BSP_Render_Vertex)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
-public:
 	linear_math::Vector3 position;
 	GMfloat decalS, decalT;
 	GMfloat lightmapS, lightmapT;
@@ -45,42 +40,30 @@ public:
 	}
 };
 
-struct BSP_Render_Face
+GM_ALIGNED_STRUCT(BSP_Render_Face)
 {
-	int firstVertex;
-	int numVertices;
-	int textureIndex;
-	int lightmapIndex;
-	int firstIndex;
-	int numIndices;
+	GMint firstVertex;
+	GMint numVertices;
+	GMint textureIndex;
+	GMint lightmapIndex;
+	GMint firstIndex;
+	GMint numIndices;
 };
 
-struct BSP_Render_FaceDirectoryEntry
+GM_ALIGNED_STRUCT(BSP_Render_FaceDirectoryEntry)
 {
 	BSPSurfaceType faceType;
-	int typeFaceNumber;		//face number in the list of faces of this type
+	GMint typeFaceNumber;		//face number in the list of faces of this type
 };
 
 //every patch (curved surface) is split into biquadratic (3x3) patches
-class BSP_Render_BiquadraticPatch
+GM_ALIGNED_STRUCT(BSP_Render_BiquadraticPatch)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
+	BSP_Render_BiquadraticPatch()
+		: vertices(nullptr)
+	{
+	}
 
-public:
-	bool tesselate(int newTesselation);
-
-	BSP_Render_Vertex controlPoints[9];
-
-	GMint tesselation;
-	BSP_Render_Vertex* vertices;
-	GLuint * indices;
-
-	//arrays for multi_draw_arrays
-	GMint* trianglesPerRow;
-	GMuint** rowIndexPointers;
-
-	BSP_Render_BiquadraticPatch() : vertices(NULL)
-	{}
 	~BSP_Render_BiquadraticPatch()
 	{
 		if (vertices)
@@ -91,17 +74,25 @@ public:
 			delete[] indices;
 		indices = nullptr;
 	}
+
+	bool tesselate(int newTesselation);
+
+	BSP_Render_Vertex controlPoints[9];
+	GMint tesselation;
+	BSP_Render_Vertex* vertices;
+	GLuint * indices;
+	//arrays for multi_draw_arrays
+	GMint* trianglesPerRow;
+	GMuint** rowIndexPointers;
 };
 
 //curved surface
-class BSP_Render_Patch
+GM_ALIGNED_STRUCT(BSP_Render_Patch)
 {
-public:
-	int textureIndex;
-	int lightmapIndex;
-	int width, height;
-
-	int numQuadraticPatches;
+	GMint textureIndex;
+	GMint lightmapIndex;
+	GMint width, height;
+	GMint numQuadraticPatches;
 	BSP_Render_BiquadraticPatch* quadraticPatches;
 };
 
@@ -110,30 +101,29 @@ enum
 	BOUNDING = 99999,
 };
 
-class BSP_Render_Leaf
+GM_ALIGNED_STRUCT(BSP_Render_Leaf)
 {
-public:
-	int cluster;	//cluster index for visdata
 	linear_math::Vector3 boundingBoxVertices[8];
-	int firstLeafFace;	//first index in leafFaces array
-	int numFaces;
+	GMint cluster;	//cluster index for visdata
+	GMint firstLeafFace;	//first index in leafFaces array
+	GMint numFaces;
 };
 
-class BSP_Render_VisibilityData
+struct BSP_Render_VisibilityData
 {
-public:
-	int numClusters;
-	int bytesPerCluster;
-	GMbyte * bitset;
-
-	BSP_Render_VisibilityData() : bitset(nullptr)
-	{}
+	BSP_Render_VisibilityData() 
+		: bitset(nullptr)
+	{
+	}
 	~BSP_Render_VisibilityData()
 	{
 		if (bitset)
 			delete[] bitset;
 		bitset = nullptr;
 	}
+	GMint numClusters;
+	GMint bytesPerCluster;
+	GMbyte * bitset;
 };
 
 class EntityObject;

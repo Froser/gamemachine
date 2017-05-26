@@ -10,11 +10,27 @@ class TiXmlDocument;
 
 BEGIN_NS
 // 解析一些纹理配置，如天空、特效、动画等，并加入世界
-class BSPGameWorld;
 struct Shader;
-struct ITexture;
-class BSPShaderLoader
+class BSPGameWorld;
+
+GM_PRIVATE_OBJECT(BSPShaderLoader)
 {
+	std::string directory;
+	BSPGameWorld* world;
+	BSPRenderData* bspRender;
+	std::map<std::string, TiXmlElement*> items;
+	AlignedVector<TiXmlDocument*> shaderDocs;
+
+	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
+	GMint textureNum;
+	GMint lightmapId;
+};
+
+
+GM_ALIGNED_16(class) BSPShaderLoader : public GMObject
+{
+	DECLARE_PRIVATE(BSPShaderLoader)
+
 public:
 	BSPShaderLoader();
 	~BSPShaderLoader();
@@ -27,7 +43,7 @@ public:
 	// parsers:
 private:
 	ITexture* addTextureToTextureContainer(const char* name);
-	void parse(const char* data);
+	void parse(const char* buffer);
 	void parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr);
 	void parseStart();
 	void parseEnd();
@@ -48,17 +64,6 @@ private:
 
 private:
 	void createSky(Shader& shader);
-
-private:
-	std::string m_directory;
-	BSPGameWorld* m_world;
-	BSPRenderData* m_bspRender;
-	std::map<std::string, TiXmlElement*> m_items;
-	AlignedVector<TiXmlDocument*> m_shaderDocs;
-
-	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
-	GMint m_textureNum;
-	GMint m_lightmapId;
 };
 
 END_NS

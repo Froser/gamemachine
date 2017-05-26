@@ -16,7 +16,7 @@ struct IFactory;
 struct IGameHandler;
 class GlyphManager;
 
-GM_ALIGNED_16(struct) GameMachinePrivate : public GMObjectPrivateBase<GameMachine>
+GM_PRIVATE_OBJECT(GameMachine)
 {
 	FPSCounter fpsCounter;
 	GraphicSettings settings;

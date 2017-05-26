@@ -11,9 +11,9 @@
 #define PKD(d) GamePackage::Data* d = gamePackage()->gamePackageData();
 
 DefaultGMGamePackageHandler::DefaultGMGamePackageHandler(GamePackage* pk)
-	: m_pk(pk)
 {
-
+	D(d);
+	d->gamePackage = pk;
 }
 
 bool DefaultGMGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
@@ -96,7 +96,8 @@ std::string DefaultGMGamePackageHandler::pathRoot(PackageIndex index)
 
 GamePackage* DefaultGMGamePackageHandler::gamePackage()
 {
-	return m_pk;
+	D(d);
+	return d->gamePackage;
 }
 
 AlignedVector<std::string> DefaultGMGamePackageHandler::getAllFiles(const char* directory)

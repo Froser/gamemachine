@@ -6,8 +6,15 @@
 #include <map>
 BEGIN_NS
 
-class DefaultGMGamePackageHandler : public IGamePackageHandler
+GM_PRIVATE_OBJECT(DefaultGMGamePackageHandler)
 {
+	GamePackage* gamePackage;
+};
+
+class DefaultGMGamePackageHandler : public GMObject, public IGamePackageHandler
+{
+	DECLARE_PRIVATE(DefaultGMGamePackageHandler)
+
 public:
 	DefaultGMGamePackageHandler(GamePackage* pk);
 
@@ -19,9 +26,6 @@ public:
 
 protected:
 	GamePackage* gamePackage();
-
-private:
-	GamePackage* m_pk;
 };
 
 class ZipGMGamePackageHandler : public DefaultGMGamePackageHandler

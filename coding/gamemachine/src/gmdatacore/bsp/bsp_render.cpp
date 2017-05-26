@@ -9,7 +9,7 @@ BSPRenderData& BSPRender::renderData()
 }
 
 //Tesselate a biquadratic patch
-bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
+bool BSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 {
 	tesselation = newTesselation;
 
@@ -17,7 +17,7 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 	BSP_Render_Vertex temp[3];
 	vertices = new BSP_Render_Vertex[(tesselation + 1)*(tesselation + 1)];
 
-	for (int v = 0; v <= tesselation; ++v)
+	for (GMint v = 0; v <= tesselation; ++v)
 	{
 		px = (GMfloat)v / tesselation;
 
@@ -26,7 +26,7 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 			controlPoints[6] * (px*px);
 	}
 
-	for (int u = 1; u <= tesselation; ++u)
+	for (GMint u = 1; u <= tesselation; ++u)
 	{
 		py = (GMfloat)u / tesselation;
 
@@ -42,7 +42,7 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 			controlPoints[7] * ((1.0f - py)*py * 2) +
 			controlPoints[8] * (py*py);
 
-		for (int v = 0; v <= tesselation; ++v)
+		for (GMint v = 0; v <= tesselation; ++v)
 		{
 			px = (GMfloat)v / tesselation;
 
@@ -60,9 +60,9 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 		return false;
 	}
 
-	for (int row = 0; row < tesselation; ++row)
+	for (GMint row = 0; row < tesselation; ++row)
 	{
-		for (int point = 0; point <= tesselation; ++point)
+		for (GMint point = 0; point <= tesselation; ++point)
 		{
 			//calculate indices
 			//reverse them to reverse winding
@@ -73,15 +73,15 @@ bool BSP_Render_BiquadraticPatch::tesselate(int newTesselation)
 
 
 	//Fill in the arrays for multi_draw_arrays
-	trianglesPerRow = new int[tesselation];
-	rowIndexPointers = new unsigned int *[tesselation];
+	trianglesPerRow = new GMint[tesselation];
+	rowIndexPointers = new GMuint *[tesselation];
 	if (!trianglesPerRow || !rowIndexPointers)
 	{
 		gm_error("Unable to allocate memory for indices for multi_draw_arrays");
 		return false;
 	}
 
-	for (int row = 0; row < tesselation; ++row)
+	for (GMint row = 0; row < tesselation; ++row)
 	{
 		trianglesPerRow[row] = 2 * (tesselation + 1);
 		rowIndexPointers[row] = &indices[row * 2 * (tesselation + 1)];
@@ -160,7 +160,7 @@ void BSPRender::generateFaces()
 	GMint currentMeshFace = 0;
 	GMint currentPatch = 0;
 
-	for (int i = 0; i < d->bsp->numDrawSurfaces; ++i)
+	for (GMint i = 0; i < d->bsp->numDrawSurfaces; ++i)
 	{
 		if (d->bsp->drawSurfaces[i].surfaceType == MST_PLANAR)		//skip this loadFace if it is not a polygon face
 		{
@@ -207,8 +207,8 @@ void BSPRender::generateFaces()
 
 			//Create space to hold quadratic patches
 			// 一个patch有3x3个顶点组成
-			int numPatchesWide = (d->patches[currentPatch].width - 1) / 2;
-			int numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
+			GMint numPatchesWide = (d->patches[currentPatch].width - 1) / 2;
+			GMint numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
 
 			d->patches[currentPatch].numQuadraticPatches = numPatchesWide*numPatchesHigh;
 			d->patches[currentPatch].quadraticPatches = new BSP_Render_BiquadraticPatch
@@ -221,13 +221,13 @@ void BSPRender::generateFaces()
 			}
 
 			//fill in the quadratic patches
-			for (int y = 0; y < numPatchesHigh; ++y)
+			for (GMint y = 0; y < numPatchesHigh; ++y)
 			{
-				for (int x = 0; x < numPatchesWide; ++x)
+				for (GMint x = 0; x < numPatchesWide; ++x)
 				{
-					for (int row = 0; row < 3; ++row)
+					for (GMint row = 0; row < 3; ++row)
 					{
-						for (int point = 0; point < 3; ++point)
+						for (GMint point = 0; point < 3; ++point)
 						{
 							d->patches[currentPatch].quadraticPatches[y*numPatchesWide + x].
 								controlPoints[row * 3 + point] = d->vertices[d->bsp->drawSurfaces[i].firstVert +
@@ -278,7 +278,7 @@ void BSPRender::generateLeafs()
 		d->leafs[i].boundingBoxVertices[6] = linear_math::Vector3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
 		d->leafs[i].boundingBoxVertices[7] = linear_math::Vector3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
 
-		// for (int j = 0; j < 8; ++j)
+		// for (GMint j = 0; j < 8; ++j)
 		// 	d->leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
 	}
 }
@@ -292,10 +292,10 @@ void BSPRender::generatePlanes()
 void BSPRender::generateVisibilityData()
 {
 	D(d);
-	// visBytes头两个int表示clusters，后面的字节表示bitsets
-	size_t sz = sizeof(int) * 2;
+	// visBytes头两个GMint表示clusters，后面的字节表示bitsets
+	size_t sz = sizeof(GMint) * 2;
 	memcpy(&d->visibilityData, d->bsp->visBytes.data(), sz);
-	int bitsetSize = d->visibilityData.numClusters * d->visibilityData.bytesPerCluster;
+	GMint bitsetSize = d->visibilityData.numClusters * d->visibilityData.bytesPerCluster;
 	d->visibilityData.bitset = new GMbyte[bitsetSize];
 	memcpy(d->visibilityData.bitset, d->bsp->visBytes.data() + sz, bitsetSize);
 }
@@ -349,13 +349,13 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	Component* component = new Component(child);
 	component->getShader() = shader;
 
-	int numVertices = 2 * (biqp.tesselation + 1);
-	for (int row = 0; row < biqp.tesselation; ++row)
+	GMint numVertices = 2 * (biqp.tesselation + 1);
+	for (GMint row = 0; row < biqp.tesselation; ++row)
 	{
 		component->beginFace();
 		GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 		linear_math::Vector3 normal;
-		for (int i = 0; i < numVertices; i++)
+		for (GMint i = 0; i < numVertices; i++)
 		{
 			GMint idx = *(idxStart + i);
 			BSP_Render_Vertex& vertex = biqp.vertices[idx];
@@ -426,7 +426,7 @@ void BSPRender::createBox(const linear_math::Vector3& extents, const linear_math
 	component->getShader() = shader;
 
 	linear_math::Vector3 normal;
-	for (int i = 0; i < 12; i++)
+	for (GMint i = 0; i < 12; i++)
 	{
 		component->beginFace();
 		for (GMint j = 0; j < 3; j++) // j表示面的一个顶点

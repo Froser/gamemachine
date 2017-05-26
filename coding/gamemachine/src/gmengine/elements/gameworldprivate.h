@@ -8,10 +8,7 @@
 
 BEGIN_NS
 
-class GameObject;
 class Character;
-class GameMachine;
-class GamePackage;
 GM_PRIVATE_OBJECT(GameWorld)
 {
 	GameWorldPrivate();

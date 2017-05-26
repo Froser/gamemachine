@@ -4,8 +4,6 @@
 #include "foundation/vector.h"
 
 BEGIN_NS
-class GameObject;
-
 struct GraphicSettings
 {
 	GMuint fps;

@@ -9,6 +9,7 @@ class Camera;
 class ResourceContainer;
 class GameObject;
 class DrawingList;
+class GamePackage;
 struct GraphicSettings;
 struct TextureFrames;
 struct CameraLookAt;

@@ -11,7 +11,6 @@ class DrawingList : public AlignedVector<DrawingItem>
 };
 
 class Character;
-class GameObject;
 class ObjectPainter;
 class GameWorld : public GMObject
 {

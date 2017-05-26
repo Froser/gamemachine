@@ -62,7 +62,7 @@ enum GMS_TextureModType
 	GMS_SCALE,
 };
 
-GM_ALIGNED_16(struct) GMS_TextureMod
+GM_ALIGNED_STRUCT(GMS_TextureMod)
 {
 	GMS_TextureModType type;
 	GMfloat p1;
@@ -70,7 +70,7 @@ GM_ALIGNED_16(struct) GMS_TextureMod
 };
 
 // 表示一系列动画帧
-GM_ALIGNED_16(struct) TextureFrames
+GM_ALIGNED_STRUCT(TextureFrames)
 {
 	TextureFrames()
 		: frameCount(0)
@@ -94,7 +94,7 @@ GM_ALIGNED_16(struct) TextureFrames
 	GMS_Wrap wrapT;
 };
 
-GM_ALIGNED_16(struct) TextureInfo
+GM_ALIGNED_STRUCT(TextureInfo)
 {
 	TextureInfo()
 	{
@@ -117,13 +117,18 @@ enum LightArgs
 	LA_END,
 };
 
-GM_ALIGNED_16(struct) LightInfo
+GM_ALIGNED_STRUCT(LightInfo)
 {
-	bool on;
-	bool useGlobalLightColor; // true表示使用全局的光的颜色
+	LightInfo()
+	{
+		memset(this, 0, sizeof(LightInfo));
+	}
+
 	linear_math::Vector3 lightPosition;
 	linear_math::Vector3 lightColor;
 	GMfloat args[LA_END];
+	bool on;
+	bool useGlobalLightColor; // true表示使用全局的光的颜色
 };
 
 enum LightType
@@ -134,7 +139,7 @@ enum LightType
 	LT_END,
 };
 
-GM_ALIGNED_16(struct) Shader
+GM_ALIGNED_STRUCT(Shader)
 {
 	Shader()
 		: surfaceFlag(0)

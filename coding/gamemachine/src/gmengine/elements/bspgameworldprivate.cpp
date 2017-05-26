@@ -48,7 +48,7 @@ PARSE_FUNC(worldspawn, entity, world)
 		}
 	}
 	*/
-	LightInfo ambientLight = { 0 };
+	LightInfo ambientLight;
 	ambientLight.on = true;
 	ambientLight.lightColor = linear_math::Vector3(.5f, .5f, .5f);
 	for (GMint i = 0; i < 3; i++)

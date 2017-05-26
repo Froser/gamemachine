@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(BSPPatch)
 };
 
 struct BSPPatchCollide;
-class BSPPatch
+GM_ALIGNED_16(class) BSPPatch : public GMObject
 {
 	DECLARE_PRIVATE(BSPPatch)
 

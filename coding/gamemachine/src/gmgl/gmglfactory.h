@@ -7,7 +7,6 @@
 BEGIN_NS
 
 class Image;
-struct ITexture;
 class ObjectPainter;
 class GMGLFactory : public IFactory
 {

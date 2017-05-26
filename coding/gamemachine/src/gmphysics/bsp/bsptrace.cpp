@@ -9,7 +9,7 @@
 #define	SURFACE_CLIP_EPSILON	(0.125)
 
 BEGIN_NS
-struct BSPTraceWork
+GM_ALIGNED_STRUCT(BSPTraceWork)
 {
 	linear_math::Vector3 start;
 	linear_math::Vector3 end;
@@ -30,7 +30,7 @@ void BSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* e
 {
 	D(d);
 	d->bsp = bsp;
-	d->p_world = world;
+	d->world = world;
 	d->entities = entities;
 	d->entityObjects = entityObjects;
 }
@@ -188,7 +188,7 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
-	BSPPhysicsWorld::Data& pw = d->p_world->physicsData();
+	BSPPhysicsWorld::Data& pw = d->world->physicsData();
 	BSPNode* node;
 	BSPTracePlane* plane;
 
@@ -303,7 +303,7 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
-	BSPPhysicsWorld::Data& pw = d->p_world->physicsData();
+	BSPPhysicsWorld::Data& pw = d->world->physicsData();
 	// trace line against all brushes in the leaf
 	for (GMint k = 0; k < leaf->numLeafBrushes; k++)
 	{
@@ -647,7 +647,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
-	BSPPhysicsWorld::Data& pw = d->p_world->physicsData();
+	BSPPhysicsWorld::Data& pw = d->world->physicsData();
 
 	if (!brush->brush->numSides) {
 		return;

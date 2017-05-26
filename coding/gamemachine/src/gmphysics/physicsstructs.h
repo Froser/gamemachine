@@ -9,7 +9,7 @@ BEGIN_NS
 
 typedef GMint Command;
 
-class CommandVector3
+GM_ALIGNED_16(class) CommandVector3 : public GMObject
 {
 public:
 	CommandVector3() {}
@@ -37,29 +37,22 @@ typedef std::map<Command, AlignedVector<CommandVector3> > CommandParams;
 #define CMD_MOVE 0x0001
 #define CMD_JUMP 0x0002
 
-class GameObject;
-struct ShapeProperties
+GM_ALIGNED_STRUCT(ShapeProperties)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
 	linear_math::Vector3 bounding[2]; //最小边界和最大边界
 	GMfloat stepHeight;
 };
 
-struct MotionProperties
+GM_ALIGNED_STRUCT(MotionProperties)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
 	linear_math::Vector3 translation;
 	linear_math::Vector3 velocity;
 	linear_math::Vector3 jumpSpeed;
 	GMfloat moveSpeed;
 };
 
-struct CollisionObject
+GM_ALIGNED_STRUCT(CollisionObject)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
 	MotionProperties motions;
 	ShapeProperties shapeProps;
 	GameObject* object;

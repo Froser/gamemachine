@@ -8,7 +8,6 @@ BEGIN_NS
 
 class GMGLGraphicEngine;
 class GameWorld;
-struct ITexture;
 GM_PRIVATE_OBJECT(GMGLRenders_Object)
 {
 	GMGLGraphicEngine* engine;

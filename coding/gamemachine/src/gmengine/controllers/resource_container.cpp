@@ -3,24 +3,27 @@
 
 TextureContainer::~TextureContainer()
 {
-	for (auto iter = m_textures.begin(); iter != m_textures.end(); iter++)
+	D(d);
+	for (auto iter = d->textures.begin(); iter != d->textures.end(); iter++)
 	{
 		delete (*iter).texture;
 	}
 }
 
-void TextureContainer::insert(TextureItem& item)
+void TextureContainer::insert(TextureContainer::TextureItemType& item)
 {
-	ASSERT(m_textures.find(item) == m_textures.end());
-	m_textures.insert(item);
+	D(d);
+	ASSERT(d->textures.find(item) == d->textures.end());
+	d->textures.insert(item);
 }
 
-const TextureContainer::TextureItem* TextureContainer::find(const char* name)
+const TextureContainer::TextureItemType* TextureContainer::find(const char* name)
 {
-	TextureItem _key;
-	_key.name = name;
-	auto it = m_textures.find(_key);
-	if (it == m_textures.end())
+	D(d);
+	TextureContainer::TextureItemType _key;
+	_key.id = name;
+	auto it = d->textures.find(_key);
+	if (it == d->textures.end())
 		return nullptr;
 
 	return &(*it);
@@ -28,23 +31,26 @@ const TextureContainer::TextureItem* TextureContainer::find(const char* name)
 
 TextureContainer_ID::~TextureContainer_ID()
 {
-	for (auto iter = m_textures.begin(); iter != m_textures.end(); iter++)
+	D(d);
+	for (auto iter = d->textures.begin(); iter != d->textures.end(); iter++)
 	{
 		delete (*iter).texture;
 	}
 }
 
-void TextureContainer_ID::insert(TextureItem& item)
+void TextureContainer_ID::insert(TextureContainer_ID::TextureItemType& item)
 {
-	ASSERT(m_textures.find(item) == m_textures.end());
-	m_textures.insert(item);
+	D(d);
+	ASSERT(d->textures.find(item) == d->textures.end());
+	d->textures.insert(item);
 }
 
-const TextureContainer_ID::TextureItem* TextureContainer_ID::find(GMint id)
+const TextureContainer_ID::TextureItemType* TextureContainer_ID::find(GMint id)
 {
-	TextureItem _key = { id };
-	auto it = m_textures.find(_key);
-	if (it == m_textures.end())
+	D(d);
+	TextureContainer_ID::TextureItemType _key = { id };
+	auto it = d->textures.find(_key);
+	if (it == d->textures.end())
 		return nullptr;
 
 	return &(*it);

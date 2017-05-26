@@ -16,13 +16,13 @@
 #define	MAX_GRID_SIZE 129
 #define	MAX_FACETS 1024
 
-typedef enum
+enum EdgeName
 {
 	EN_TOP,
 	EN_RIGHT,
 	EN_BOTTOM,
 	EN_LEFT
-} EdgeName;
+};
 
 enum
 {
@@ -32,13 +32,13 @@ enum
 	SIDE_CROSS = -2,
 };
 
-struct PatchCollideContext
+GM_ALIGNED_STRUCT(PatchCollideContext)
 {
 	AlignedVector<BSPPatchPlane> planes;
 	AlignedVector<BSPFacet> facets;
 };
 
-struct BSPGrid
+GM_ALIGNED_STRUCT(BSPGrid)
 {
 	GMint width;
 	GMint height;
@@ -48,7 +48,7 @@ struct BSPGrid
 };
 
 //a winding gives the bounding points of a convex polygon
-struct BSPWinding
+GM_ALIGNED_STRUCT(BSPWinding)
 {
 	AlignedVector<linear_math::Vector3> p;
 
@@ -60,12 +60,14 @@ struct BSPWinding
 };
 
 //tools
-static void clearBounds(linear_math::Vector3& mins, linear_math::Vector3& maxs) {
+static void clearBounds(linear_math::Vector3& mins, linear_math::Vector3& maxs)
+{
 	mins = linear_math::Vector3(99999);
 	maxs = linear_math::Vector3(-99999);
 }
 
-static void addPointToBounds(const linear_math::Vector3& v, linear_math::Vector3& mins, linear_math::Vector3& maxs) {
+static void addPointToBounds(const linear_math::Vector3& v, linear_math::Vector3& mins, linear_math::Vector3& maxs)
+{
 	if (v[0] < mins[0]) {
 		mins[0] = v[0];
 	}
@@ -110,7 +112,8 @@ static void setGridWrapWidth(BSPGrid* grid)
 		grid->wrapWidth = false;
 }
 
-static bool needsSubdivision(const linear_math::Vector3& a, const linear_math::Vector3& b, const linear_math::Vector3& c) {
+static bool needsSubdivision(const linear_math::Vector3& a, const linear_math::Vector3& b, const linear_math::Vector3& c)
+{
 	linear_math::Vector3 cmid;
 	linear_math::Vector3 lmid;
 	linear_math::Vector3 delta;
@@ -129,13 +132,15 @@ static bool needsSubdivision(const linear_math::Vector3& a, const linear_math::V
 	return dist >= SUBDIVIDE_DISTANCE;
 }
 
-static void subdivide(linear_math::Vector3& a, linear_math::Vector3& b, linear_math::Vector3& c, linear_math::Vector3& out1, linear_math::Vector3& out2, linear_math::Vector3& out3) {
+static void subdivide(linear_math::Vector3& a, linear_math::Vector3& b, linear_math::Vector3& c, linear_math::Vector3& out1, linear_math::Vector3& out2, linear_math::Vector3& out3)
+{
 	out1 = (a + b) * .5f;
 	out3 = (b + c) * .5f;
 	out2 = (out1 + out3) * .5f;
 }
 
-static void subdivideGridColumns(BSPGrid* grid) {
+static void subdivideGridColumns(BSPGrid* grid)
+{
 	GMint i, j, k;
 
 	for (i = 0; i < grid->width - 2; ) {
@@ -199,29 +204,36 @@ static void subdivideGridColumns(BSPGrid* grid) {
 	}
 }
 
-static bool comparePoints(const linear_math::Vector3& a, const linear_math::Vector3& b) {
+static bool comparePoints(const linear_math::Vector3& a, const linear_math::Vector3& b)
+{
 	GMfloat d;
 
 	d = a[0] - b[0];
-	if (d < -POINT_EPSILON || d > POINT_EPSILON) {
+	if (d < -POINT_EPSILON || d > POINT_EPSILON)
+	{
 		return false;
 	}
 	d = a[1] - b[1];
-	if (d < -POINT_EPSILON || d > POINT_EPSILON) {
+	if (d < -POINT_EPSILON || d > POINT_EPSILON)
+	{
 		return false;
 	}
 	d = a[2] - b[2];
-	if (d < -POINT_EPSILON || d > POINT_EPSILON) {
+	if (d < -POINT_EPSILON || d > POINT_EPSILON)
+	{
 		return false;
 	}
 	return true;
 }
 
-static void removeDegenerateColumns(BSPGrid* grid) {
+static void removeDegenerateColumns(BSPGrid* grid)
+{
 	GMint i, j, k;
 
-	for (i = 0; i < grid->width - 1; i++) {
-		for (j = 0; j < grid->height; j++) {
+	for (i = 0; i < grid->width - 1; i++)
+	{
+		for (j = 0; j < grid->height; j++)
+		{
 			if (!comparePoints(grid->points[i][j], grid->points[i + 1][j])) {
 				break;
 			}
@@ -231,9 +243,11 @@ static void removeDegenerateColumns(BSPGrid* grid) {
 			continue;	// not degenerate
 		}
 
-		for (j = 0; j < grid->height; j++) {
+		for (j = 0; j < grid->height; j++)
+		{
 			// remove the column
-			for (k = i + 2; k < grid->width; k++) {
+			for (k = i + 2; k < grid->width; k++)
+			{
 				grid->points[k - 1][j] = grid->points[k][j];
 			}
 		}
@@ -302,7 +316,8 @@ static void transposeGrid(BSPGrid* grid)
 	grid->wrapHeight = tempWrap;
 }
 
-static bool planeFromPoints(linear_math::Vector4& plane, const linear_math::Vector3& a, const linear_math::Vector3& b, const linear_math::Vector3& c) {
+static bool planeFromPoints(linear_math::Vector4& plane, const linear_math::Vector3& a, const linear_math::Vector3& b, const linear_math::Vector3& c)
+{
 	linear_math::Vector3 d1, d2;
 	d1 = b - a;
 	d2 = c - a;
@@ -497,24 +512,22 @@ static int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint gridP
 	return -1;
 }
 
-static int pointOnPlaneSide(PatchCollideContext& context, const linear_math::Vector3& p, GMint planeNum) {
-	float	d;
+static int pointOnPlaneSide(PatchCollideContext& context, const linear_math::Vector3& p, GMint planeNum)
+{
+	GMfloat d;
 
-	if (planeNum == -1) {
+	if (planeNum == -1)
 		return SIDE_ON;
-	}
 
 	const linear_math::Vector4& plane = context.planes[planeNum].plane;
 
 	d = linear_math::dot(p, VEC3(plane)) + plane[3];
 
-	if (d > PLANE_TRI_EPSILON) {
+	if (d > PLANE_TRI_EPSILON)
 		return SIDE_FRONT;
-	}
 
-	if (d < -PLANE_TRI_EPSILON) {
+	if (d < -PLANE_TRI_EPSILON)
 		return SIDE_BACK;
-	}
 
 	return SIDE_ON;
 }
@@ -565,11 +578,10 @@ static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGr
 			GMint side;
 
 			side = pointOnPlaneSide(context, points[l], facet->borderPlanes[k]);
-			if (side == SIDE_FRONT) {
+			if (side == SIDE_FRONT)
 				front++;
-			} if (side == SIDE_BACK) {
+			if (side == SIDE_BACK)
 				back++;
-			}
 		}
 
 		if (front && !back)

@@ -136,19 +136,20 @@ enum FRUSTUM_PLANES
 	FAR_PLANE
 };
 
-Frustum::Frustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
-	: m_fovy(fovy)
-	, m_aspect(aspect)
-	, m_n(n)
-	, m_f(f)
+void Frustum::initFrustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
 {
-
+	D(d);
+	d->fovy = fovy;
+	d->aspect = aspect;
+	d->n = n;
+	d->f = f;
 }
 
 void Frustum::update()
 {
+	D(d);
 	linear_math::Matrix4x4 projection = getPerspective();
-	linear_math::Matrix4x4& view = m_viewMatrix;
+	linear_math::Matrix4x4& view = d->viewMatrix;
 	linear_math::Matrix4x4 clipMat;
 
 	//Multiply the matrices
@@ -165,47 +166,48 @@ void Frustum::update()
 	}
 
 	//calculate planes
-	planes[RIGHT_PLANE].normal[0] = clip[3] - clip[0];
-	planes[RIGHT_PLANE].normal[1] = clip[7] - clip[4];
-	planes[RIGHT_PLANE].normal[2] = clip[11] - clip[8];
-	planes[RIGHT_PLANE].intercept = clip[15] - clip[12];
+	d->planes[RIGHT_PLANE].normal[0] = clip[3] - clip[0];
+	d->planes[RIGHT_PLANE].normal[1] = clip[7] - clip[4];
+	d->planes[RIGHT_PLANE].normal[2] = clip[11] - clip[8];
+	d->planes[RIGHT_PLANE].intercept = clip[15] - clip[12];
 
-	planes[LEFT_PLANE].normal[0] = clip[3] + clip[0];
-	planes[LEFT_PLANE].normal[1] = clip[7] + clip[4];
-	planes[LEFT_PLANE].normal[2] = clip[11] + clip[8];
-	planes[LEFT_PLANE].intercept = clip[15] + clip[12];
+	d->planes[LEFT_PLANE].normal[0] = clip[3] + clip[0];
+	d->planes[LEFT_PLANE].normal[1] = clip[7] + clip[4];
+	d->planes[LEFT_PLANE].normal[2] = clip[11] + clip[8];
+	d->planes[LEFT_PLANE].intercept = clip[15] + clip[12];
 
-	planes[BOTTOM_PLANE].normal[0] = clip[3] + clip[1];
-	planes[BOTTOM_PLANE].normal[1] = clip[7] + clip[5];
-	planes[BOTTOM_PLANE].normal[2] = clip[11] + clip[9];
-	planes[BOTTOM_PLANE].intercept = clip[15] + clip[13];
+	d->planes[BOTTOM_PLANE].normal[0] = clip[3] + clip[1];
+	d->planes[BOTTOM_PLANE].normal[1] = clip[7] + clip[5];
+	d->planes[BOTTOM_PLANE].normal[2] = clip[11] + clip[9];
+	d->planes[BOTTOM_PLANE].intercept = clip[15] + clip[13];
 
-	planes[TOP_PLANE].normal[0] = clip[3] - clip[1];
-	planes[TOP_PLANE].normal[1] = clip[7] - clip[5];
-	planes[TOP_PLANE].normal[2] = clip[11] - clip[9];
-	planes[TOP_PLANE].intercept = clip[15] - clip[13];
+	d->planes[TOP_PLANE].normal[0] = clip[3] - clip[1];
+	d->planes[TOP_PLANE].normal[1] = clip[7] - clip[5];
+	d->planes[TOP_PLANE].normal[2] = clip[11] - clip[9];
+	d->planes[TOP_PLANE].intercept = clip[15] - clip[13];
 
-	planes[FAR_PLANE].normal[0] = clip[3] - clip[2];
-	planes[FAR_PLANE].normal[1] = clip[7] - clip[6];
-	planes[FAR_PLANE].normal[2] = clip[11] - clip[10];
-	planes[FAR_PLANE].intercept = clip[15] - clip[14];
+	d->planes[FAR_PLANE].normal[0] = clip[3] - clip[2];
+	d->planes[FAR_PLANE].normal[1] = clip[7] - clip[6];
+	d->planes[FAR_PLANE].normal[2] = clip[11] - clip[10];
+	d->planes[FAR_PLANE].intercept = clip[15] - clip[14];
 
-	planes[NEAR_PLANE].normal[0] = clip[3] + clip[2];
-	planes[NEAR_PLANE].normal[1] = clip[7] + clip[6];
-	planes[NEAR_PLANE].normal[2] = clip[11] + clip[10];
-	planes[NEAR_PLANE].intercept = clip[15] + clip[14];
+	d->planes[NEAR_PLANE].normal[0] = clip[3] + clip[2];
+	d->planes[NEAR_PLANE].normal[1] = clip[7] + clip[6];
+	d->planes[NEAR_PLANE].normal[2] = clip[11] + clip[10];
+	d->planes[NEAR_PLANE].intercept = clip[15] + clip[14];
 
 	//normalize planes
 	for (int i = 0; i < 6; ++i)
-		planes[i].normalize();
+		d->planes[i].normalize();
 }
 
 //is a point in the Frustum?
 bool Frustum::isPointInside(const linear_math::Vector3 & point)
 {
+	D(d);
 	for (int i = 0; i < 6; ++i)
 	{
-		if (planes[i].classifyPoint(point) == POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(point) == POINT_BEHIND_PLANE)
 			return false;
 	}
 
@@ -215,25 +217,25 @@ bool Frustum::isPointInside(const linear_math::Vector3 & point)
 //is a bounding box in the Frustum?
 bool Frustum::isBoundingBoxInside(const linear_math::Vector3 * vertices)
 {
-	//loop through planes
+	D(d);
 	for (int i = 0; i < 6; ++i)
 	{
 		//if a point is not behind this plane, try next plane
-		if (planes[i].classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
+		if (d->planes[i].classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
 			continue;
 
 		//All vertices of the box are behind this plane
@@ -245,13 +247,15 @@ bool Frustum::isBoundingBoxInside(const linear_math::Vector3 * vertices)
 
 linear_math::Matrix4x4 Frustum::getPerspective()
 {
-	return linear_math::Matrix4x4(linear_math::perspective(m_fovy, m_aspect, m_n, m_f));;
+	D(d);
+	return linear_math::Matrix4x4(linear_math::perspective(d->fovy, d->aspect, d->n, d->f));;
 }
 
 void Frustum::updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix)
 {
-	m_viewMatrix = viewMatrix;
-	m_projMatrix = projMatrix;
+	D(d);
+	d->viewMatrix = viewMatrix;
+	d->projMatrix = projMatrix;
 }
 
 //Scanner
@@ -261,32 +265,36 @@ static bool isWhiteSpace(char c)
 }
 
 Scanner::Scanner(const char* line)
-	: m_p(line)
-	, m_predicate(isWhiteSpace)
-	, m_skipSame(true)
 {
-	m_valid = !!m_p;
+	D(d);
+	d->p = line;
+	d->predicate = isWhiteSpace;
+	d->skipSame = true;
+	d->valid = !!d->p;
 }
 
 Scanner::Scanner(const char* line, CharPredicate predicate)
-	: m_p(line)
-	, m_predicate(predicate)
-	, m_skipSame(true)
 {
-	m_valid = !!m_p;
+	D(d);
+	d->p = line;
+	d->predicate = predicate;
+	d->skipSame = true;
+	d->valid = !!d->p;
 }
 
 Scanner::Scanner(const char* line, bool skipSame, CharPredicate predicate)
-	: m_p(line)
-	, m_predicate(predicate)
-	, m_skipSame(skipSame)
 {
-	m_valid = !!m_p;
+	D(d);
+	d->p = line;
+	d->predicate = predicate;
+	d->skipSame = skipSame;
+	d->valid = !!d->p;
 }
 
 void Scanner::next(char* out)
 {
-	if (!m_valid)
+	D(d);
+	if (!d->valid)
 	{
 		strcpy_s(out, 1, "");
 		return;
@@ -294,25 +302,25 @@ void Scanner::next(char* out)
 
 	char* p = out;
 	bool b = false;
-	if (!m_p)
+	if (!d->p)
 	{
 		strcpy_s(out, 1, "");
 		return;
 	}
 
-	while (*m_p && m_predicate(*m_p))
+	while (*d->p && d->predicate(*d->p))
 	{
-		if (b && !m_skipSame)
+		if (b && !d->skipSame)
 		{
 			*p = 0;
-			m_p++;
+			d->p++;
 			return;
 		}
-		m_p++;
+		d->p++;
 		b = true;
 	}
 
-	if (!*m_p)
+	if (!*d->p)
 	{
 		*p = 0;
 		return;
@@ -320,31 +328,33 @@ void Scanner::next(char* out)
 
 	do
 	{
-		*p = *m_p;
+		*p = *d->p;
 		p++;
-		m_p++;
-	} while (*m_p && !m_predicate(*m_p));
+		d->p++;
+	} while (*d->p && !d->predicate(*d->p));
 
 	*p = 0;
 }
 
 void Scanner::nextToTheEnd(char* out)
 {
-	if (!m_valid)
+	D(d);
+	if (!d->valid)
 		return;
 
 	char* p = out;
-	while (*m_p)
+	while (*d->p)
 	{
-		m_p++;
-		*p = *m_p;
+		d->p++;
+		*p = *d->p;
 		p++;
 	}
 }
 
 bool Scanner::nextFloat(GMfloat* out)
 {
-	if (!m_valid)
+	D(d);
+	if (!d->valid)
 		return false;
 
 	char command[LINE_MAX];
@@ -357,7 +367,8 @@ bool Scanner::nextFloat(GMfloat* out)
 
 bool Scanner::nextInt(GMint* out)
 {
-	if (!m_valid)
+	D(d);
+	if (!d->valid)
 		return false;
 
 	char command[LINE_MAX];
@@ -370,48 +381,54 @@ bool Scanner::nextInt(GMint* out)
 
 //MemoryStream
 
-MemoryStream::MemoryStream(const GMbyte* data, GMuint size)
-	: m_start(data)
-	, m_size(size)
-	, m_ptr(data)
+MemoryStream::MemoryStream(const GMbyte* buffer, GMuint size)
 {
-	m_end = m_start + m_size;
+	D(d);
+	d->start = buffer;
+	d->size = size;
+	d->ptr = buffer;
+	d->end = d->start + d->size;
 }
 
 GMuint MemoryStream::read(GMbyte* buf, GMuint size)
 {
-	if (m_ptr >= m_end)
+	D(d);
+	if (d->ptr >= d->end)
 		return 0;
 
-	GMuint realSize = m_ptr + size > m_end ? m_end - m_ptr : size;
-	memcpy(buf, m_ptr, realSize);
-	m_ptr += realSize;
+	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
+	memcpy(buf, d->ptr, realSize);
+	d->ptr += realSize;
 	return realSize;
 }
 
 GMuint MemoryStream::peek(GMbyte* buf, GMuint size)
 {
-	if (m_ptr >= m_end)
+	D(d);
+	if (d->ptr >= d->end)
 		return 0;
 
-	GMuint realSize = m_ptr + size > m_end ? m_end - m_ptr : size;
-	memcpy(buf, m_ptr, realSize);
+	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
+	memcpy(buf, d->ptr, realSize);
 	return realSize;
 }
 
 void MemoryStream::rewind()
 {
-	m_ptr = m_start;
+	D(d);
+	d->ptr = d->start;
 }
 
 GMuint MemoryStream::size()
 {
-	return m_size;
+	D(d);
+	return d->size;
 }
 
 GMuint MemoryStream::tell()
 {
-	return m_ptr - m_start;
+	D(d);
+	return d->ptr - d->start;
 }
 
 GMbyte MemoryStream::get()
@@ -423,29 +440,30 @@ GMbyte MemoryStream::get()
 
 void MemoryStream::seek(GMuint cnt, SeekMode mode)
 {
+	D(d);
 	if (mode == MemoryStream::FromStart)
-		m_ptr = m_start + cnt;
+		d->ptr = d->start + cnt;
 	else if (mode == MemoryStream::FromNow)
-		m_ptr += cnt;
+		d->ptr += cnt;
 	else
 		ASSERT(false);
 }
 
 //Bitset
-
-bool Bitset::init(int numberOfBits)
+bool Bitset::init(GMint numberOfBits)
 {
+	D(d);
 	//Delete any memory allocated to bits
-	if (bits)
-		delete[] bits;
-	bits = NULL;
+	if (d->bits)
+		delete[] d->bits;
+	d->bits = NULL;
 
 	//Calculate size
-	numBytes = (numberOfBits >> 3) + 1;
+	d->numBytes = (numberOfBits >> 3) + 1;
 
 	//Create memory
-	bits = new unsigned char[numBytes];
-	if (!bits)
+	d->bits = new unsigned char[d->numBytes];
+	if (!d->bits)
 	{
 		gm_error("Unable to allocate space for a Bitset of %d bits", numberOfBits);
 		return false;
@@ -458,27 +476,32 @@ bool Bitset::init(int numberOfBits)
 
 void Bitset::clearAll()
 {
-	memset(bits, 0, numBytes);
+	D(d);
+	memset(d->bits, 0, d->numBytes);
 }
 
 void Bitset::setAll()
 {
-	memset(bits, 0xFF, numBytes);
+	D(d);
+	memset(d->bits, 0xFF, d->numBytes);
 }
 
-void Bitset::clear(int bitNumber)
+void Bitset::clear(GMint bitNumber)
 {
-	bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
+	D(d);
+	d->bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
 }
 
-void Bitset::set(int bitNumber)
+void Bitset::set(GMint bitNumber)
 {
-	bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
+	D(d);
+	d->bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
 }
 
-unsigned char Bitset::isSet(int bitNumber)
+GMbyte Bitset::isSet(GMint bitNumber)
 {
-	return bits[bitNumber >> 3] & 1 << (bitNumber & 7);
+	D(d);
+	return d->bits[bitNumber >> 3] & 1 << (bitNumber & 7);
 }
 
 //Camera

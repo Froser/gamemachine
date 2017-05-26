@@ -13,7 +13,6 @@
 #include "gmdatacore/bsp_model_loader.h"
 BEGIN_NS
 
-class GameObject;
 GM_PRIVATE_OBJECT(BSPGameWorld)
 {
 	GM_PRIVATE_CONSTRUCT(BSPGameWorld)

@@ -15,22 +15,22 @@ enum PlaneType
 	PLANE_NON_AXIAL,
 };
 
-struct BSPLeafList
+GM_ALIGNED_STRUCT(BSPLeafList)
 {
-	AlignedVector<GMint> list;
 	linear_math::Vector3 bounds[2];
+	AlignedVector<GMint> list;
 	GMint lastLeaf;
 };
 
 struct BSPTracePlane;
-struct BSP_Physics_BrushSide
+GM_ALIGNED_STRUCT(BSP_Physics_BrushSide)
 {
 	BSPBrushSide* side;
 	BSPTracePlane* plane;
 	GMint surfaceFlags;
 };
 
-struct BSP_Physics_Brush
+GM_ALIGNED_STRUCT(BSP_Physics_Brush)
 {
 	BSP_Physics_Brush()
 		: checkcount(0)
@@ -45,13 +45,13 @@ struct BSP_Physics_Brush
 };
 
 // Begin patches definitions
-struct BSPPatchPlane
+GM_ALIGNED_STRUCT(BSPPatchPlane)
 {
 	linear_math::Vector4 plane;
 	GMint signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 };
 
-struct BSPFacet
+GM_ALIGNED_STRUCT(BSPFacet)
 {
 	GMint surfacePlane;
 	GMint numBorders;		// 3 or four + 6 axial bevels + 4 or 3 * 4 edge bevels
@@ -60,20 +60,16 @@ struct BSPFacet
 	bool borderNoAdjust[4 + 6 + 16];
 };
 
-struct BSPPatchCollide
+GM_ALIGNED_STRUCT(BSPPatchCollide)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
 	linear_math::Vector3 bounds[2];
 	AlignedVector<BSPPatchPlane> planes;
 	AlignedVector<BSPFacet> facets;
 };
 // End patches definitions
 
-struct BSP_Physics_Patch
+GM_ALIGNED_STRUCT(BSP_Physics_Patch)
 {
-	GM_DECLARE_ALIGNED_ALLOCATOR();
-
 	BSPSurface* surface;
 	GMint checkcount;
 	BSPShader* shader;
@@ -81,12 +77,14 @@ struct BSP_Physics_Patch
 
 	BSP_Physics_Patch()
 		: checkcount(0)
+		, pc(nullptr)
 	{
 	}
 
 	~BSP_Physics_Patch()
 	{
-		delete pc;
+		if (pc)
+			delete pc;
 	}
 };
 

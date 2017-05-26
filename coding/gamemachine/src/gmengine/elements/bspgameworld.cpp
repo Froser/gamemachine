@@ -422,7 +422,7 @@ bool BSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
 	{
 		ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 		TextureContainer& tc = rc->getTextureContainer();
-		const TextureContainer::TextureItem* item = tc.find(bsp.shaders[textureid].shader);
+		const TextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
 		shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
@@ -437,7 +437,7 @@ void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 	const GMint WHITE_LIGHTMAP = -1;
 	ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
 	TextureContainer_ID& tc = rc->getLightmapContainer();
-	const TextureContainer_ID::TextureItem* item = nullptr;
+	const TextureContainer_ID::TextureItemType* item = nullptr;
 	if (shader.surfaceFlag & SURF_NOLIGHTMAP)
 		item = tc.find(WHITE_LIGHTMAP);
 	else
@@ -501,8 +501,8 @@ void BSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
 
-			TextureContainer::TextureItem item;
-			item.name = shader.shader;
+			TextureContainer::TextureItemType item;
+			item.id = shader.shader;
 			item.texture = texture;
 			rc->getTextureContainer().insert(item);
 		}
@@ -560,7 +560,7 @@ void BSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 
-		TextureContainer_ID::TextureItem item;
+		TextureContainer_ID::TextureItemType item;
 		item.id = i;
 		item.texture = texture;
 		rc->getLightmapContainer().insert(item);
@@ -573,7 +573,7 @@ void BSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 
-		TextureContainer_ID::TextureItem item;
+		TextureContainer_ID::TextureItemType item;
 		item.id = -1;
 		item.texture = texture;
 		rc->getLightmapContainer().insert(item);

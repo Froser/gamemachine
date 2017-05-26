@@ -6,9 +6,8 @@
 BEGIN_NS
 
 template <typename T>
-class ID_Less
+struct ID_Less
 {
-public:
 	bool operator ()(const T& left, const T& right)
 	{
 		return (left.id < right.id);
@@ -16,67 +15,82 @@ public:
 };
 
 template <typename T>
-class Name_Less
+struct Name_Less
 {
-public:
 	bool operator ()(const T& left, const T& right)
 	{
-		return left.name < right.name;
+		return left.id < right.id;
 	}
 };
 
-class TextureContainer
+template <typename KeyType>
+struct TextureItem
 {
-public:
-	struct TextureItem
-	{
-		std::string name;
-		ITexture* texture;
-	};
+	KeyType id;
+	ITexture* texture;
+};
 
+GM_PRIVATE_OBJECT(TextureContainer)
+{
+	std::set<TextureItem<std::string>, Name_Less<TextureItem<std::string> > > textures;
+};
+
+class TextureContainer : public GMObject
+{
+	DECLARE_PRIVATE(TextureContainer);
+
+public:
+	typedef TextureItem<std::string> TextureItemType;
+
+public:
 	~TextureContainer();
 
-	void insert(TextureItem& item);
-	const TextureItem* find(const char* name);
-
-private:
-	std::set<TextureItem, Name_Less<TextureItem> > m_textures;
+	void insert(TextureItemType& item);
+	const TextureItemType* find(const char* name);
 };
 
-class TextureContainer_ID
+GM_PRIVATE_OBJECT(TextureContainer_ID)
 {
-public:
-	struct TextureItem
-	{
-		GMint id;
-		ITexture* texture;
-	};
+	std::set<TextureItem<GMint>, ID_Less<TextureItem<GMint> > > textures;
+};
 
+class TextureContainer_ID : public GMObject
+{
+	DECLARE_PRIVATE(TextureContainer_ID)
+
+public:
+	typedef TextureItem<GMint> TextureItemType;
+
+public:
 	~TextureContainer_ID();
 
-	void insert(TextureItem& item);
-	const TextureItem* find(GMint id);
-
-private:
-	std::set<TextureItem, ID_Less<TextureItem> > m_textures;
+public:
+	void insert(TextureItemType& item);
+	const TextureItemType* find(GMint id);
 };
 
-class ResourceContainer
+GM_PRIVATE_OBJECT(ResourceContainer)
 {
+	TextureContainer textureContainer;
+	TextureContainer_ID lightmapContainer;
+};
+
+class ResourceContainer : public GMObject
+{
+	DECLARE_PRIVATE(ResourceContainer)
+
 public:
 	TextureContainer& getTextureContainer()
 	{
-		return m_textureContainer;
+		D(d);
+		return d->textureContainer;
 	}
 
 	TextureContainer_ID& getLightmapContainer()
 	{
-		return m_lightmapContainer;
+		D(d);
+		return d->lightmapContainer;
 	}
-
-private:
-	TextureContainer m_textureContainer;
-	TextureContainer_ID m_lightmapContainer;
 };
 
 END_NS
