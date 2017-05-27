@@ -73,6 +73,11 @@ ModelReader_Obj::ModelReader_Obj()
 	init();
 }
 
+ModelReader_Obj::~ModelReader_Obj()
+{
+
+}
+
 void ModelReader_Obj::init()
 {
 	D(d);

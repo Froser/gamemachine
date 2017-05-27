@@ -39,6 +39,7 @@ class ModelReader_Obj : public GMObject, public IModelReader
 
 public:
 	ModelReader_Obj();
+	~ModelReader_Obj();
 
 public:
 	virtual bool load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) override;

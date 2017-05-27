@@ -335,8 +335,7 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 		linear_math::Matrix4x4 transMoveToAxisOrigin = linear_math::translate(-center);
 		linear_math::Matrix4x4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
 
-		// 因为linear_math::mat为列优先，所以与vec相乘的时候应该先transpose
-		linear_math::Vector4 pt = linear_math::Vector4(vertices[i], 1) * transFinal.transpose();
+		linear_math::Vector4 pt = linear_math::Vector4(vertices[i], 1) * transFinal;
 		vertices[i] = linear_math::Vector3(pt[0], pt[1], pt[2]);
 	}
 

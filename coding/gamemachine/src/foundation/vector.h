@@ -6,6 +6,10 @@
 #include <vector>
 #include "debug.h"
 
+#if !USE_SIMD
+#	include <algorithm>
+#endif
+
 BEGIN_NS
 
 template <typename T>
@@ -13,19 +17,31 @@ class Vector : public std::vector<T>
 {
 };
 
-#define GM_USE_PLACEMENT_NEW 1
-#define GM_ALLOW_ARRAY_COPY_OP
-#define GM_USE_MEMCPY 0
-
-#ifdef GM_USE_PLACEMENT_NEW
-#include <new>
-#endif
-
+#if !USE_SIMD
 template <typename T>
-class AlignVectorIteratorBase
+class AlignedVector : public std::vector<T>
 {
 public:
-	AlignVectorIteratorBase(typename T::value_type* ptr)
+	iterator find(const T& target)
+	{
+		return std::find(begin(), end(), target);
+	}
+};
+
+#else
+#	define GM_USE_PLACEMENT_NEW 1
+#	define GM_ALLOW_ARRAY_COPY_OP
+#	define GM_USE_MEMCPY 0
+
+#	ifdef GM_USE_PLACEMENT_NEW
+#		include <new>
+#	endif
+
+template <typename T>
+class AlignedVectorIteratorBase
+{
+public:
+	AlignedVectorIteratorBase(typename T::value_type* ptr)
 		: m_ptr(ptr)
 	{
 	}
@@ -43,12 +59,12 @@ public:
 		return elem;
 	}
 
-	bool operator ==(const AlignVectorIteratorBase& other)
+	bool operator ==(const AlignedVectorIteratorBase& other)
 	{
 		return m_ptr == other.m_ptr;
 	}
 
-	bool operator !=(const AlignVectorIteratorBase& other)
+	bool operator !=(const AlignedVectorIteratorBase& other)
 	{
 		return m_ptr != other.m_ptr;
 	}
@@ -58,9 +74,9 @@ protected:
 };
 
 template <typename T>
-class AlignVectorIterator : public AlignVectorIteratorBase<T>
+class AlignVectorIterator : public AlignedVectorIteratorBase<T>
 {
-	typedef AlignVectorIteratorBase<T> Base;
+	typedef AlignedVectorIteratorBase<T> Base;
 
 public:
 	AlignVectorIterator(typename T::value_type* ptr) : Base(ptr) {}
@@ -72,9 +88,9 @@ public:
 };
 
 template <typename T>
-class AlignVectorConstIterator : public AlignVectorIteratorBase<T>
+class AlignVectorConstIterator : public AlignedVectorIteratorBase<T>
 {
-	typedef AlignVectorIteratorBase<T> Base;
+	typedef AlignedVectorIteratorBase<T> Base;
 
 public:
 	AlignVectorConstIterator(typename T::value_type* ptr) : Base(ptr) {}
@@ -594,6 +610,8 @@ private:
 	T* m_data;
 	bool m_ownsMemory;
 };
+
+#endif
 
 END_NS
 #endif

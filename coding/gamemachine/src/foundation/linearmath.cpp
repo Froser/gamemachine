@@ -45,23 +45,24 @@ Matrix4x4 Matrix4x4::identity()
 #else
 	static const Matrix4x4
 		identityMatrix(
-			1.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f,
+			Vector4(1.0f, 0.0f, 0.0f, 0.0f),
+			Vector4(0.0f, 1.0f, 0.0f, 0.0f),
+			Vector4(0.0f, 0.0f, 1.0f, 0.0f),
+			Vector4(0.0f, 0.0f, 0.0f, 1.0f)
 		);
 #endif
 	return identityMatrix;
 }
 
-Matrix4x4 Matrix4x4::operator *(const Matrix4x4& right) const
+// 表示数学上左乘一个矩阵
+Matrix4x4 Matrix4x4::operator *(const Matrix4x4& left) const
 {
 #if USE_SIMD
 	Matrix4x4 ret;
 	__m128 __result;
 	for (int i = 0; i < 4; i++)
 	{
-		__m128	__v = right.m_data[i].get128();
+		__m128	__v = left.m_data[i].get128();
 		__m128	__row0 = m_data[0].get128(),
 			__row1 = m_data[1].get128(),
 			__row2 = m_data[2].get128(),
@@ -77,15 +78,15 @@ Matrix4x4 Matrix4x4::operator *(const Matrix4x4& right) const
 	}
 	return ret;
 #else
-	Matrix4x4 result(0);
-	for (GMint j = 0; j < w; j++)
+	Matrix4x4 result;
+	for (GMint j = 0; j < 4; j++)
 	{
-		for (GMint i = 0; i < w; i++)
+		for (GMint i = 0; i < 4; i++)
 		{
 			GMfloat sum = 0;
-			for (GMint n = 0; n < w; n++)
+			for (GMint n = 0; n < 4; n++)
 			{
-				sum += m_data[n][i] * right[j][n];
+				sum += m_data[n][i] * left[j][n];
 			}
 			result[j][i] = sum;
 		}

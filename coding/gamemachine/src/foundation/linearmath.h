@@ -20,7 +20,7 @@ namespace linear_math
 		static ReturnType negate(const ReturnType& left)
 		{
 			ReturnType result;
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = -left[n];
 			return result;
 		}
@@ -28,7 +28,7 @@ namespace linear_math
 		static ReturnType add(const ReturnType& left, const ReturnType& right)
 		{
 			ReturnType result;
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = left[n] + right[n];
 			return result;
 		}
@@ -36,7 +36,7 @@ namespace linear_math
 		static ReturnType sub(const ReturnType& left, const ReturnType& right)
 		{
 			ReturnType result;
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = left[n] - right[n];
 			return result;
 		}
@@ -44,7 +44,7 @@ namespace linear_math
 		static ReturnType mul(const ReturnType& left, GMfloat right)
 		{
 			ReturnType result;
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = left[n] * right;
 			return result;
 		}
@@ -52,7 +52,7 @@ namespace linear_math
 		static ReturnType div(const ReturnType& left, GMfloat right)
 		{
 			ReturnType result;
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = left[n] / right;
 			return result;
 		}
@@ -60,51 +60,51 @@ namespace linear_math
 		static ReturnType div(GMfloat left, const ReturnType& right)
 		{
 			ReturnType result;
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = left / right[n];
 			return result;
 		}
 
 		static ReturnType& self_add(ReturnType& left, GMfloat right)
 		{
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				left[n] += right;
-			return *this;
+			return left;
 		}
 
 		static ReturnType& self_add(ReturnType& left, const ReturnType& right)
 		{
-			for (int n = 0; n < ReturnType::dimension; n++)
-				left[n] += right[i];
-			return *this;
+			for (GMint n = 0; n < ReturnType::dimension; n++)
+				left[n] += right[n];
+			return left;
 		}
 
-		static ReturnType& self_sub(ReturnType& left, GMfloat i)
+		static ReturnType& self_sub(ReturnType& left, GMfloat right)
 		{
-			for (int n = 0; n < ReturnType::dimension; n++)
-				left[n] -= i;
-			return *this;
+			for (GMint n = 0; n < ReturnType::dimension; n++)
+				left[n] -= right;
+			return left;
 		}
 
 		static ReturnType& self_sub(ReturnType& left, const ReturnType& right)
 		{
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				left[n] -= right[i];
-			return *this;
+			return left;
 		}
 
-		static ReturnType& self_mul(ReturnType& left, GMfloat i)
+		static ReturnType& self_mul(ReturnType& left, GMfloat right)
 		{
-			for (int n = 0; n < ReturnType::dimension; n++)
-				left[n] *= i;
-			return *this;
+			for (GMint n = 0; n < ReturnType::dimension; n++)
+				left[n] *= right;
+			return left;
 		}
 
-		static ReturnType& self_div(ReturnType& left, GMfloat i)
+		static ReturnType& self_div(ReturnType& left, GMfloat right)
 		{
-			for (int n = 0; n < ReturnType::dimension; n++)
-				left[n] /= i;
-			return *this;
+			for (GMint n = 0; n < ReturnType::dimension; n++)
+				left[n] /= right;
+			return left;
 		}
 	};
 
@@ -118,7 +118,7 @@ namespace linear_math
 		{
 			ReturnType result;
 			//TODO 可以优化
-			for (int n = 0; n < ReturnType::dimension; n++)
+			for (GMint n = 0; n < ReturnType::dimension; n++)
 				result[n] = -left[n];
 			return result;
 		}
@@ -135,27 +135,22 @@ namespace linear_math
 
 		static ReturnType mul(const ReturnType& left, GMfloat right)
 		{
-			__m128 __right = _mm_set_ps(right, right, right, right);
-			return ReturnType(_mm_mul_ps(left.get128(), __right));
+			return ReturnType(_mm_mul_ps(left.get128(), _mm_set_ps(right, right, right, right)));
 		}
 
 		static ReturnType div(const ReturnType& left, GMfloat right)
 		{
-			__m128 __right = _mm_set_ps(right, right, right, right);
-			return ReturnType(_mm_div_ps(left.get128(), __right));
+			return ReturnType(_mm_div_ps(left.get128(), _mm_set_ps(right, right, right, right)));
 		}
 
 		static ReturnType div(GMfloat left, const ReturnType& right)
 		{
-			__m128 __left = _mm_set_ps(left, left, left, left);
-			__m128 __right = right.get128();
-			return ReturnType(_mm_div_ps(__left, __right));
+			return ReturnType(_mm_div_ps(_mm_set_ps(left, left, left, left) , right.get128()));
 		}
 
 		static ReturnType& self_add(ReturnType& left, GMfloat right)
 		{
-			__m128 __right = _mm_set_ps(right, right, right, right);
-			left.set128(_mm_add_ps(left.get128(), __right));
+			left.set128(_mm_add_ps(left.get128(), _mm_set_ps(right, right, right, right)));
 			return left;
 		}
 
@@ -167,8 +162,7 @@ namespace linear_math
 
 		static ReturnType& self_sub(ReturnType& left, GMfloat right)
 		{
-			__m128 __right = _mm_set_ps(right, right, right, right);
-			left.set128(_mm_sub_ps(left.get128(), __right));
+			left.set128(_mm_sub_ps(left.get128(), _mm_set_ps(right, right, right, right)));
 			return left;
 		}
 
@@ -180,15 +174,13 @@ namespace linear_math
 
 		static ReturnType& self_mul(ReturnType& left, GMfloat right)
 		{
-			__m128 __right = _mm_set_ps(right, right, right, right);
-			left.set128(_mm_mul_ps(left.get128(), __right));
+			left.set128(_mm_mul_ps(left.get128(), _mm_set_ps(right, right, right, right)));
 			return left;
 		}
 
 		static ReturnType& self_div(ReturnType& left, GMfloat right)
 		{
-			__m128 __right = _mm_set_ps(right, right, right, right);
-			left.set128(_mm_div_ps(left.get128(), __right));
+			left.set128(_mm_div_ps(left.get128(), _mm_set_ps(right, right, right, right)));
 			return left;
 		}
 	};
@@ -293,6 +285,8 @@ namespace linear_math
 		};
 #else
 #define DEFINE_VECTOR_DATA(l)					\
+	public:										\
+	enum { dimension = l };						\
 	protected:									\
 		GMfloat m_data[l];
 #endif
@@ -335,13 +329,21 @@ namespace linear_math
 #if USE_SIMD
 		Vector3(__m128 _128) : m_128(_128) {};
 #endif
-		Vector3() {}
+		Vector3()
+		{
+#if USE_SIMD
+			m_data[3] = 0;
+#endif
+		}
 
 		Vector3(GMfloat x, GMfloat y, GMfloat z)
 		{
 			m_data[0] = x;
 			m_data[1] = y;
 			m_data[2] = z;
+#if USE_SIMD
+			m_data[3] = 0;
+#endif
 		}
 
 		Vector3(GMfloat x)
@@ -349,6 +351,9 @@ namespace linear_math
 			m_data[0] = x;
 			m_data[1] = x;
 			m_data[2] = x;
+#if USE_SIMD
+			m_data[3] = 0;
+#endif
 		}
 
 		Vector3(const Vector3& right)
@@ -463,15 +468,11 @@ namespace linear_math
 		__result = _mm_add_ps(__result, __x_mul_row3);
 		return Vector4(__result);
 #else
-		GMint n, _;
 		Vector4 result(0.f);
-		for (m = 0; m < 4; m++)
-		{
-			for (n = 0; n < 4; n++)
-			{
-				result[n] += left[m] * right[n][m];
-			}
-		}
+		result[0] = left[0] * right[0][0] + left[1] * right[1][0] + left[2] * right[2][0] + left[3] * right[3][0];
+		result[1] = left[0] * right[0][1] + left[1] * right[1][1] + left[2] * right[2][1] + left[3] * right[3][1];
+		result[2] = left[0] * right[0][2] + left[1] * right[1][2] + left[2] * right[2][2] + left[3] * right[3][2];
+		result[3] = left[0] * right[0][3] + left[1] * right[1][3] + left[2] * right[2][3] + left[3] * right[3][3];
 		return result;
 #endif
 	}
@@ -480,7 +481,7 @@ namespace linear_math
 	static inline GMfloat fastInvSqrt(GMfloat x)
 	{
 		GMfloat xhalf = 0.5f*x;
-		int i = *(int*)&x;
+		GMint i = *(GMint*)&x;
 		i = 0x5f375a86 - (i >> 1);
 		x = *(GMfloat*)&i;
 		x = x*(1.5f - xhalf*x*x);
@@ -499,7 +500,7 @@ namespace linear_math
 		return _mm_cvtss_f32(vd);
 #else
 		GMfloat result = 0;
-		for (int n = 0; n < T::dimension; n++)
+		for (GMint n = 0; n < T::dimension; n++)
 		{
 			result += left[n] * right[n];
 		}
@@ -630,7 +631,7 @@ namespace linear_math
 	static inline bool equals(const Vector3& left, const Vector3& right)
 	{
 		//TODO 可以优化(SIMD)
-		for (int i = 0; i < 3; i++)
+		for (GMint i = 0; i < 3; i++)
 		{
 			if (!fuzzyCompare(left[i], right[i]))
 				return false;
@@ -643,7 +644,7 @@ namespace linear_math
 #if USE_SIMD
 		return left.get128().m128_f32 == right.get128().m128_f32;
 #else
-		for (int i = 0; i < 4; i++)
+		for (GMint i = 0; i < 4; i++)
 		{
 			if (!fuzzyCompare(left[i], right[i]))
 				return false;
