@@ -347,16 +347,25 @@ public:
 	void push_back(const T& _Val)
 	{
 		GMuint sz = size();
+		T __Val; // 重新分配空间的时候，如果_Val来自于自身，有可能会被销毁，这个时候应该拷贝一次
 		if (sz == capacity())
 		{
+			__Val = _Val;
 			reserve(allocSize(size()));
-		}
-
 #ifdef GM_USE_PLACEMENT_NEW
-		new (&m_data[m_size]) T(_Val);
+			new (&m_data[m_size]) T(__Val);
 #else
-		m_data[size()] = _Val;
+			m_data[size()] = __Val;
 #endif //GM_USE_PLACEMENT_NEW
+		}
+		else
+		{
+#ifdef GM_USE_PLACEMENT_NEW
+			new (&m_data[m_size]) T(_Val);
+#else
+			m_data[size()] = _Val;
+#endif //GM_USE_PLACEMENT_NEW
+		}
 
 		m_size++;
 	}
