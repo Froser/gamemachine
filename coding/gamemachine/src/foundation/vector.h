@@ -21,10 +21,12 @@ class Vector : public std::vector<T>
 template <typename T>
 class AlignedVector : public std::vector<T>
 {
+	typedef std::vector<T> Base;
+	
 public:
-	iterator find(const T& target)
+	typename Base::iterator find(const T& target)
 	{
-		return std::find(begin(), end(), target);
+		return std::find(Base::begin(), Base::end(), target);
 	}
 };
 

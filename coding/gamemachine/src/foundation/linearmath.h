@@ -7,6 +7,8 @@ BEGIN_NS
 #	include <xmmintrin.h>
 #endif
 
+#include <math.h>
+
 #define VEC3(v4) linear_math::Vector3(v4[0], v4[1], v4[2])
 #define VEC4(v3, v4) linear_math::Vector4(v3, v4[3])
 
@@ -89,7 +91,7 @@ namespace linear_math
 		static ReturnType& self_sub(ReturnType& left, const ReturnType& right)
 		{
 			for (GMint n = 0; n < ReturnType::dimension; n++)
-				left[n] -= right[i];
+				left[n] -= right[n];
 			return left;
 		}
 
