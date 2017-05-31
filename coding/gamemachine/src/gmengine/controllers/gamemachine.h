@@ -51,7 +51,7 @@ public:
 	GraphicSettings& getSettings();
 	GlyphManager* getGlyphManager();
 	GMfloat getFPS();
-	GMfloat getElapsedSinceLastFrame();
+	GMfloat evaluateDeltaTime();
 	void startGameMachine();
 	void postMessage(GameMachineMessage msg);
 

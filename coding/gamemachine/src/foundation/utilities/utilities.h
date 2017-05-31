@@ -3,6 +3,7 @@
 #include "common.h"
 #include "foundation/linearmath.h"
 #include "foundation/vector.h"
+#include <time.h>
 BEGIN_NS
 
 // 此类包含了各种实用工具
@@ -315,14 +316,19 @@ protected:
 #endif
 
 //FPSCounter
+enum { FPSCounter_MAX = 20 };
+
 GM_PRIVATE_OBJECT(FPSCounter)
 {
 	GMfloat fps;
-	GMfloat lastTime;
-	GMfloat time;
-	GMfloat immediate_lastTime;
-	GMfloat elapsed_since_last_frame;
-	GMlong frames;
+	clock_t startTime; // 此类构造的时间
+	clock_t time; // 本帧时间
+	clock_t lastTimePerSecond;
+	clock_t lastTimePerFrame;
+	GMfloat deltaTime[FPSCounter_MAX];
+	GMint currentDeltaTimeIndex;
+	GMlong framesPerSecond;
+	bool firstUpdate;
 };
 
 class FPSCounter : public GMObject
@@ -336,7 +342,7 @@ public:
 public:
 	void update();
 	GMfloat getFps();
-	GMfloat getElapsedSinceLastFrame();
+	GMfloat evaluateDeltaTime();
 };
 
 //Plane

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "utilities.h"
-#include <time.h>
 #include "foundation/linearmath.h"
 #include "assert.h"
 #ifdef _WINDOWS
@@ -14,29 +13,40 @@ FPSCounter::FPSCounter()
 {
 	D(d);
 	d->fps = 0;
-	d->lastTime = 0.f;
-	d->frames = 0.f;
+	d->startTime = clock();
+	d->lastTimePerSecond = d->startTime;
 	d->time = 0.f;
-	d->immediate_lastTime = 0.f;
-	d->elapsed_since_last_frame = 0.f;
+	d->currentDeltaTimeIndex = 0;
+	d->framesPerSecond = 0;
+	d->firstUpdate = true;
 }
 
 // 每一帧运行一次update
 void FPSCounter::update()
 {
 	D(d);
-	d->time = clock() * 0.001f;								//get current time in seconds
-	++d->frames;												//increase frame count
-
-	if (d->time - d->lastTime > 1.0f)							//if it has been 1 second
+	d->time = clock();
+	if (d->firstUpdate)
 	{
-		d->fps = d->frames / (d->time - d->lastTime);			//update fps number
-		d->lastTime = d->time;								//set beginning count
-		d->frames = 0L;										//reset frames this second
+		d->lastTimePerFrame = d->time;
+		d->firstUpdate = false;
 	}
 
-	d->elapsed_since_last_frame = d->time - d->immediate_lastTime;
-	d->immediate_lastTime = d->time;
+	++d->framesPerSecond;
+
+	if (d->time - d->lastTimePerSecond > 1000)
+	{
+		d->fps = d->framesPerSecond / (GMfloat)(d->time - d->lastTimePerSecond);
+		d->lastTimePerSecond = d->time;
+		d->framesPerSecond = 0L;
+	}
+
+	clock_t elapsed = d->time - d->lastTimePerFrame;
+	if (d->currentDeltaTimeIndex < FPSCounter_MAX && elapsed > 0)
+	{
+		d->deltaTime[d->currentDeltaTimeIndex++] = elapsed;
+		d->lastTimePerFrame = d->time;
+	}
 }
 
 GMfloat FPSCounter::getFps()
@@ -45,10 +55,16 @@ GMfloat FPSCounter::getFps()
 	return d->fps;
 }
 
-GMfloat FPSCounter::getElapsedSinceLastFrame()
+GMfloat FPSCounter::evaluateDeltaTime()
 {
 	D(d);
-	return d->elapsed_since_last_frame;
+	GMfloat sum = 0;
+	for (GMint i = 0; i < d->currentDeltaTimeIndex; i++)
+	{
+		sum += d->deltaTime[i];
+	}
+
+	return sum / d->currentDeltaTimeIndex / 1000;
 }
 
 //Plane

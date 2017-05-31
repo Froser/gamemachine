@@ -86,10 +86,10 @@ GMfloat GameMachine::getFPS()
 	return d->fpsCounter.getFps();
 }
 
-GMfloat GameMachine::getElapsedSinceLastFrame()
+GMfloat GameMachine::evaluateDeltaTime()
 {
 	D(d);
-	return d->fpsCounter.getElapsedSinceLastFrame();
+	return d->fpsCounter.evaluateDeltaTime();
 }
 
 void GameMachine::startGameMachine()

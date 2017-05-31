@@ -250,7 +250,7 @@ bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	BSPPhysicsWorld::Data& wd = d->world->physicsData();
-	GMfloat elapsed = wd.world->getGameMachine()->getElapsedSinceLastFrame();
+	GMfloat dt = wd.world->getGameMachine()->evaluateDeltaTime();
 	linear_math::Vector3 velocity = d->movement.velocity;
 
 	GMint numbumps = 4, bumpcount;
@@ -258,11 +258,11 @@ bool BSPMove::slideMove(bool hasGravity)
 	if (hasGravity)
 	{
 		endVelocity = velocity;
-		endVelocity[GRAVITY_DIRECTION] += wd.gravity * elapsed;
+		endVelocity[GRAVITY_DIRECTION] += wd.gravity * dt;
 		velocity[GRAVITY_DIRECTION] = (velocity[GRAVITY_DIRECTION] + endVelocity[GRAVITY_DIRECTION]) * .5f;
 	}
 
-	velocity *= elapsed;
+	velocity *= dt;
 
 	AlignedVector<linear_math::Vector3> planes;
 	if (!d->movement.freefall)
