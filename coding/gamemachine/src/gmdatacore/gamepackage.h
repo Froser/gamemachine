@@ -76,7 +76,6 @@ GM_PRIVATE_OBJECT(GamePackage)
 	std::string packagePath;
 	AutoPtr<IGamePackageHandler> handler;
 	IFactory* factory;
-	GameMachine* gameMachine;
 };
 
 class BSPGameWorld;
@@ -85,7 +84,7 @@ class GamePackage
 	DECLARE_PRIVATE(GamePackage)
 
 public:
-	GamePackage(GameMachine* gm, IFactory* factory);
+	GamePackage(IFactory* factory);
 
 public:
 	Data* gamePackageData();

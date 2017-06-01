@@ -2,13 +2,13 @@
 #define FREEGLUT_STATIC
 #define UNICODE
 #include <windows.h>
+#include "foundation/gamemachine.h"
 #include "gmengine/elements/gameworld.h"
 #include "gmengine/elements/character.h"
 #include "gmgl/gmglfactory.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
-#include "gmengine/controllers/gamemachine.h"
 #include "foundation/utilities/utilities.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "foundation/debug.h"
@@ -24,7 +24,6 @@ using namespace gm;
 BSPGameWorld* world;
 Character* character;
 GMGLFactory factory;
-GameMachine* gameMachine;
 GlyphObject* glyph;
 ISoundFile* sf;
 
@@ -60,16 +59,11 @@ public:
 	{
 	}
 
-	void setGameMachine(GameMachine* gm)
-	{
-		m_gm = gm;
-	}
-
 	void init()
 	{
 		//gm_install_hook(GamePackage, readFileFromPath, resOutputHook);
-		m_input.initMouse(m_gm->getWindow());
-		GamePackage pk(m_gm, &factory);
+		m_input.initMouse(GameMachine::instance().getWindow());
+		GamePackage pk(&factory);
 #ifdef _DEBUG
 		pk.loadPackage("D:/gmpk");
 #else
@@ -118,7 +112,7 @@ public:
 				swprintf_s(x, L"%f", position.position[0]);
 				swprintf_s(y, L"%f", position.position[1]);
 				swprintf_s(z, L"%f", position.position[2]);
-				swprintf_s(fps, L"%f", gameMachine->getFPS());
+				swprintf_s(fps, L"%f", GameMachine::instance().getFPS());
 				std::wstring str;
 				str.append(x);
 				str.append(L",");
@@ -140,7 +134,7 @@ public:
 			MouseState mouseState = m_input.getMouseState();
 
 			if (kbState['Q'] || kbState[VK_ESCAPE])
-				m_gm->postMessage(GM_MESSAGE_EXIT);
+				GameMachine::instance().postMessage(GM_MESSAGE_EXIT);
 
 			MoveAction moveTag = 0;
 			MoveRate rate;
@@ -224,11 +218,10 @@ public:
 
 	bool isWindowActivate()
 	{
-		WinGLWindow* window = static_cast<WinGLWindow*> (m_gm->getWindow());
+		WinGLWindow* window = static_cast<WinGLWindow*> (GameMachine::instance().getWindow());
 		return GetActiveWindow() == window->hwnd();
 	}
 	
-	GameMachine* m_gm;
 	Input m_input;
 };
 
@@ -247,12 +240,12 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	gameMachine = new GameMachine(
+	GameMachine::instance().init(
 		settings,
 		new GMGLFactory(),
 		new GameHandler()
 	);
 
-	gameMachine->startGameMachine();
+	GameMachine::instance().startGameMachine();
 	return 0;
 }

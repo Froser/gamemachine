@@ -1,8 +1,6 @@
 ﻿#include "stdafx.h"
 #include "bspgameworld.h"
 #include "character.h"
-#include "gmengine/controllers/factory.h"
-#include "gmengine/controllers/gamemachine.h"
 #include "gmengine/controllers/resource_container.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include "foundation/utilities/utilities.h"
@@ -11,6 +9,7 @@
 #include "gmdatacore/gamepackage.h"
 #include <algorithm>
 #include "gmdatacore/modelreader/modelreader.h"
+#include "foundation/gamemachine.h"
 
 BSPGameWorld::BSPGameWorld(GamePackage* pk)
 	: GameWorld(pk)
@@ -420,7 +419,7 @@ bool BSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
 	{
-		ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
+		ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 		TextureContainer& tc = rc->getTextureContainer();
 		const TextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
@@ -435,7 +434,7 @@ void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
-	ResourceContainer* rc = getGameMachine()->getGraphicEngine()->getResourceContainer();
+	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 	TextureContainer_ID& tc = rc->getLightmapContainer();
 	const TextureContainer_ID::TextureItemType* item = nullptr;
 	if (shader.surfaceFlag & SURF_NOLIGHTMAP)
@@ -485,7 +484,7 @@ void BSPGameWorld::initTextures()
 	D_BASE(GameWorld, db);
 	BSPData& bsp = d->bsp.bspData();
 
-	IFactory* factory = getGameMachine()->getFactory();
+	IFactory* factory = GameMachine::instance().getFactory();
 	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
 
 	for (GMint i = 0; i < bsp.numShaders; i++)
@@ -546,7 +545,7 @@ void BSPGameWorld::initLightmaps()
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	IFactory* factory = getGameMachine()->getFactory();
+	IFactory* factory = GameMachine::instance().getFactory();
 	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
 
 	const GMint BSP_LIGHTMAP_EXT = 128;

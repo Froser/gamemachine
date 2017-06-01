@@ -1,10 +1,10 @@
 ﻿#ifndef __GAMEMACHINE_H__
 #define __GAMEMACHINE_H__
 #include "common.h"
-#include "graphic_engine.h"
+#include "gmengine/controllers/graphic_engine.h"
 #include "foundation/utilities/utilities.h"
 #include <queue>
-#include "gmdatacore/soundreader/soundreader.h"
+#include "gmdatacore/glyph/glyphmanager.h"
 BEGIN_NS
 
 enum GameMachineMessage
@@ -12,13 +12,9 @@ enum GameMachineMessage
 	GM_MESSAGE_EXIT,
 };
 
-struct IFactory;
-struct IGameHandler;
-class GlyphManager;
-
 GM_PRIVATE_OBJECT(GameMachine)
 {
-	FPSCounter fpsCounter;
+	GMClock clock;
 	GraphicSettings settings;
 	AutoPtr<IWindow> window;
 	AutoPtr<IFactory> factory;
@@ -28,9 +24,10 @@ GM_PRIVATE_OBJECT(GameMachine)
 	std::queue<GameMachineMessage> messageQueue;
 };
 
-class GameMachine : public GMObject
+class GameMachine : public GMSingleton<GameMachine>
 {
 	DECLARE_PRIVATE(GameMachine)
+	DECLARE_SINGLETON(GameMachine)
 
 	enum
 	{
@@ -38,20 +35,25 @@ class GameMachine : public GMObject
 	};
 
 public:
-	GameMachine(
+	void init(
 		GraphicSettings settings,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
 
-public:
 	IGraphicEngine* getGraphicEngine();
 	IWindow* getWindow();
 	IFactory* getFactory();
 	GraphicSettings& getSettings();
+
+	// 字体管理
 	GlyphManager* getGlyphManager();
+
+	// 时间管理
 	GMfloat getFPS();
 	GMfloat evaluateDeltaTime();
+	GMfloat getGameTimeSeconds();
+
 	void startGameMachine();
 	void postMessage(GameMachineMessage msg);
 

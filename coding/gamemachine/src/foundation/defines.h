@@ -36,6 +36,7 @@ typedef GMbyte* PBYTE;
 typedef long GMlong;
 typedef short GMshort;
 typedef wchar_t GMWChar;
+typedef __int64 GMLargeInteger;
 
 #if USE_OPENGL
 typedef GLfloat GMfloat;

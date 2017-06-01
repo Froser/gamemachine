@@ -9,62 +9,114 @@
 #include "foundation/vector.h"
 
 //FPSCounter
-FPSCounter::FPSCounter()
+GMClock::GMClock()
 {
 	D(d);
 	d->fps = 0;
-	d->startTime = clock();
-	d->lastTimePerSecond = d->startTime;
-	d->time = 0.f;
-	d->currentDeltaTimeIndex = 0;
-	d->framesPerSecond = 0;
-	d->firstUpdate = true;
+	d->timeScale = 1.f;
+}
+
+void GMClock::setTimeScale(GMfloat s)
+{
+	D(d);
+	d->timeScale = s;
+}
+
+void GMClock::setPaused(bool b)
+{
+	D(d);
+	d->paused = b;
+}
+
+void GMClock::begin()
+{
+	D(d);
+	d->timeCycles = 0;
+	d->paused = false;
+	d->frequency = highResolutionTimerFrequency();
+	d->begin = highResolutionTimer();
+	d->frameCount = 0;
+	d->lastCycle = 0;
+	d->deltaCycles = 0;
 }
 
 // 每一帧运行一次update
-void FPSCounter::update()
+void GMClock::update()
 {
 	D(d);
-	d->time = clock();
-	if (d->firstUpdate)
+	d->end = highResolutionTimer();
+	GMLargeInteger delta = d->end - d->begin;
+
+	if (!d->paused)
 	{
-		d->lastTimePerFrame = d->time;
-		d->firstUpdate = false;
+		d->deltaCycles = delta * d->timeScale;
+		d->timeCycles += d->deltaCycles;
+	}
+	else
+	{
+		d->deltaCycles = 0;
 	}
 
-	++d->framesPerSecond;
-
-	if (d->time - d->lastTimePerSecond > 1000)
+	++d->frameCount;
+	GMLargeInteger deltaFrameCycle = d->end - d->lastCycle;
+	if (deltaFrameCycle > d->frequency)
 	{
-		d->fps = d->framesPerSecond / (GMfloat)(d->time - d->lastTimePerSecond);
-		d->lastTimePerSecond = d->time;
-		d->framesPerSecond = 0L;
+		d->fps = d->frameCount / cycleToSecond(deltaFrameCycle);
+		d->frameCount = 0;
+		d->lastCycle = d->end;
 	}
 
-	clock_t elapsed = d->time - d->lastTimePerFrame;
-	if (d->currentDeltaTimeIndex < FPSCounter_MAX && elapsed > 0)
-	{
-		d->deltaTime[d->currentDeltaTimeIndex++] = elapsed;
-		d->lastTimePerFrame = d->time;
-	}
+	d->begin = d->end;
 }
 
-GMfloat FPSCounter::getFps()
+GMfloat GMClock::getFps()
 {
 	D(d);
 	return d->fps;
 }
 
-GMfloat FPSCounter::evaluateDeltaTime()
+GMfloat GMClock::getTime()
 {
 	D(d);
-	GMfloat sum = 0;
-	for (GMint i = 0; i < d->currentDeltaTimeIndex; i++)
-	{
-		sum += d->deltaTime[i];
-	}
+	return cycleToSecond(d->timeCycles);
+}
 
-	return sum / d->currentDeltaTimeIndex / 1000;
+GMfloat GMClock::evaluateDeltaTime()
+{
+	D(d);
+	return cycleToSecond(d->deltaCycles);
+}
+
+GMLargeInteger GMClock::highResolutionTimerFrequency()
+{
+#ifdef _WINDOWS
+	LARGE_INTEGER i;
+	BOOL b = QueryPerformanceFrequency(&i);
+	ASSERT(b);
+	return i.QuadPart;
+#else
+	ASSERT(false);
+	return 0;
+#endif
+}
+
+GMLargeInteger GMClock::highResolutionTimer()
+{
+#ifdef _WINDOWS
+	LARGE_INTEGER i;
+	BOOL b = QueryPerformanceCounter(&i);
+	ASSERT(b);
+	return i.QuadPart;
+#else
+	ASSERT(false);
+	return 0;
+#endif
+}
+
+GMfloat GMClock::cycleToSecond(GMLargeInteger cycle)
+{
+	D(d);
+	return cycle / (GMfloat)d->frequency;
 }
 
 //Plane

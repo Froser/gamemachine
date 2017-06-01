@@ -7,10 +7,9 @@
 #include "gmdatacore/shader.h"
 #include "gmengine/elements/bspgameworld.h"
 #include "gmdatacore/imagereader/imagereader.h"
-#include "gmengine/controllers/factory.h"
-#include "gmengine/controllers/gamemachine.h"
 #include "gmdatacore/gamepackage.h"
 #include "gmengine/elements/gameobject.h"
+#include "foundation/gamemachine.h"
 
 #define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
 #define BEGIN_PARSE_I(name, i) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it, i)
@@ -152,7 +151,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 		if (img)
 		{
 			ITexture* texture;
-			IFactory* factory = d->world->getGameMachine()->getFactory();
+			IFactory* factory = GameMachine::instance().getFactory();
 			factory->createTexture(img, &texture);
 
 			TextureContainer::TextureItemType ti;
@@ -391,7 +390,7 @@ void BSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
 	{
 		if (strEqual(from, "lightmap"))
 		{
-			ResourceContainer* rc = d->world->getGameMachine()->getGraphicEngine()->getResourceContainer();
+			ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 			TextureContainer_ID& tc = rc->getLightmapContainer();
 
 			TextureFrames* frame = &shader.texture.textures[d->textureNum];

@@ -1,13 +1,12 @@
 ﻿#include "stdafx.h"
 #include "gamemachine.h"
-#include "factory.h"
 #include "gmdatacore/glyph/glyphmanager.h"
 
 #ifdef _WINDOWS
 #	include "os/directsound_sounddevice.h"
 #endif
 
-GameMachine::GameMachine(
+void GameMachine::init(
 	GraphicSettings settings,
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
@@ -17,7 +16,6 @@ GameMachine::GameMachine(
 	d->settings = settings;
 	d->factory.reset(factory);
 	d->gameHandler.reset(gameHandler);
-	d->gameHandler->setGameMachine(this);
 	init();
 }
 
@@ -83,13 +81,19 @@ GlyphManager* GameMachine::getGlyphManager()
 GMfloat GameMachine::getFPS()
 {
 	D(d);
-	return d->fpsCounter.getFps();
+	return d->clock.getFps();
 }
 
 GMfloat GameMachine::evaluateDeltaTime()
 {
 	D(d);
-	return d->fpsCounter.evaluateDeltaTime();
+	return d->clock.evaluateDeltaTime();
+}
+
+GMfloat GameMachine::getGameTimeSeconds()
+{
+	D(d);
+	return d->clock.getTime();
 }
 
 void GameMachine::startGameMachine()
@@ -116,6 +120,7 @@ void GameMachine::startGameMachine()
 	// 初始化gameHandler
 	d->gameHandler->init();
 
+	d->clock.begin();
 	// 消息循环
 	while (true)
 	{
@@ -129,8 +134,8 @@ void GameMachine::startGameMachine()
 		if (d->gameHandler->isWindowActivate())
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
 		d->gameHandler->event(GM_EVENT_RENDER);
-		d->fpsCounter.update();
 		d->window->swapBuffers();
+		d->clock.update();
 	}
 }
 

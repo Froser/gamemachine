@@ -1,15 +1,12 @@
 ﻿#include "stdafx.h"
 #include "gamepackage.h"
-#include "gmengine/controllers/factory.h"
 #include <sys/stat.h>
 #include "gmengine/elements/bspgameworld.h"
-#include "gmengine/controllers/gamemachine.h"
 
-GamePackage::GamePackage(GameMachine* gm, IFactory* factory)
+GamePackage::GamePackage(IFactory* factory)
 {
 	D(d);
 	d->factory = factory;
-	d->gameMachine = gm;
 }
 
 GamePackage::Data* GamePackage::gamePackageData()
@@ -56,8 +53,6 @@ void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWor
 
 	BSPGameWorld* world = new BSPGameWorld(this);
 	*gameWorld = world;
-
-	world->setGameMachine(d->gameMachine);
 	world->loadBSP(map);
 }
 

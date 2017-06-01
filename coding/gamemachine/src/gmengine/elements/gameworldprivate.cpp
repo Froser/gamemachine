@@ -3,7 +3,6 @@
 
 GameWorldPrivate::GameWorldPrivate()
 	: character(nullptr)
-	, elapsed(0)
 {
 
 }

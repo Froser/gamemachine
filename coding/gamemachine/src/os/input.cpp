@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "input.h"
-#include "gmengine/controllers/gamemachine.h"
+
 #ifdef _WINDOWS
 
 static char* xinputDlls[] = {

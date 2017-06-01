@@ -63,10 +63,6 @@ set(SOURCES
 		gmengine/controllers/graphic_engine.h
 		gmengine/controllers/gamepackagehandler.h
 		gmengine/controllers/gamepackagehandler.cpp
-		gmengine/controllers/gamemachine.h
-		gmengine/controllers/gamemachine.cpp
-		gmengine/controllers/factory.h
-		gmengine/controllers/factory.cpp
 		gmengine/elements/gameworldprivate.h
 		gmengine/elements/gameworldprivate.cpp
 		gmengine/elements/gameworld.h
@@ -143,6 +139,8 @@ set(SOURCES
 		foundation/linearmath.cpp
 		foundation/gmobject.h
 		foundation/gmobject.cpp
+		foundation/gamemachine.h
+		foundation/gamemachine.cpp
 		foundation/interfaces.h
 	)
 

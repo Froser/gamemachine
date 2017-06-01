@@ -108,6 +108,19 @@ class MyObject : public GMObject
   任何参与内核的类必须继承GMObject
 */
 
+template <typename T>
+class GMSingleton : public GMObject
+{
+public:
+	static T& instance()
+	{
+		static T _instance;
+		return _instance;
+	}
+};
+
+// 定义一个单例类，它将生成一个Private构造函数，并将GMSingleton<>设置为其友元
+#define DECLARE_SINGLETON(className) friend class GMSingleton<className>; private: className() {}
 
 END_NS
 #endif

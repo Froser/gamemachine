@@ -316,33 +316,44 @@ protected:
 #endif
 
 //FPSCounter
-enum { FPSCounter_MAX = 20 };
+enum { FPSCounter_MAX = 10 };
 
-GM_PRIVATE_OBJECT(FPSCounter)
+GM_PRIVATE_OBJECT(GMClock)
 {
+	GMLargeInteger frequency;
+	GMLargeInteger timeCycles;
+	GMLargeInteger begin, end;
+	GMLargeInteger deltaCycles;
+	GMfloat timeScale;
 	GMfloat fps;
-	clock_t startTime; // 此类构造的时间
-	clock_t time; // 本帧时间
-	clock_t lastTimePerSecond;
-	clock_t lastTimePerFrame;
-	GMfloat deltaTime[FPSCounter_MAX];
-	GMint currentDeltaTimeIndex;
-	GMlong framesPerSecond;
-	bool firstUpdate;
+	bool paused;
+
+	//以下用于计算帧率
+	GMint frameCount;
+	GMLargeInteger lastCycle;
 };
 
-class FPSCounter : public GMObject
+class GMClock : public GMObject
 {
-	DECLARE_PRIVATE(FPSCounter)
+	DECLARE_PRIVATE(GMClock)
 
 public:
-	FPSCounter();
-	~FPSCounter() {}
+	GMClock();
+	~GMClock() {}
 
 public:
+	void setTimeScale(GMfloat);
+	void setPaused(bool);
+	void begin();
 	void update();
 	GMfloat getFps();
+	GMfloat getTime();
 	GMfloat evaluateDeltaTime();
+
+private:
+	GMLargeInteger highResolutionTimerFrequency();
+	GMLargeInteger highResolutionTimer();
+	GMfloat cycleToSecond(GMLargeInteger cycle);
 };
 
 //Plane

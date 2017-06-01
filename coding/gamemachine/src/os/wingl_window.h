@@ -1,7 +1,6 @@
 ﻿#ifndef __WINGL_WINDOW_H__
 #define __WINGL_WINDOW_H__
 #include "common.h"
-#include "gmengine/controllers/gamemachine.h"
 BEGIN_NS
 
 #ifdef _WINDOWS

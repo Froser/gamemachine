@@ -6,6 +6,7 @@
 #include "gmgl/gmgltexture.h"
 #include "gmengine/elements/gameworld.h"
 #include "foundation/linearmath.h"
+#include "foundation/gamemachine.h"
 
 void GMGLRenders_Object::activateShader(Shader* shader)
 {
@@ -158,7 +159,7 @@ ITexture* GMGLRenders_Object::getTexture(TextureFrames& frames)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = d->world->getElapsed() * 1000;
+	GMint elapsed = GameMachine::instance().getGameTimeSeconds() * 1000;
 
 	return frames.frames[(elapsed / frames.animationMs) % frames.frameCount];
 }
@@ -218,7 +219,7 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
 		{
 		case GMS_SCROLL:
 		{
-			GMfloat s = d->world->getElapsed() * tc->p1, t = d->world->getElapsed() * tc->p2;
+			GMfloat s = GameMachine::instance().getGameTimeSeconds() * tc->p1, t = GameMachine::instance().getGameTimeSeconds() * tc->p2;
 			glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCROLL_T.c_str()), t);
 			glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCROLL_T.c_str()), s);
 		}

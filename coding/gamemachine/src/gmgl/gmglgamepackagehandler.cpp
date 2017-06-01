@@ -2,7 +2,6 @@
 #include "gmglgamepackagehandler.h"
 #include "gmglshaders.h"
 #include "gmglgraphic_engine.h"
-#include "gmengine/controllers/gamemachine.h"
 #include <string>
 #include "foundation/utilities/utilities.h"
 #include <fstream>
@@ -10,6 +9,7 @@
 #include "renders/gmgl_renders_object.h"
 #include "renders/gmgl_renders_sky.h"
 #include "renders/gmgl_renders_glyph.h"
+#include "foundation/gamemachine.h"
 
 #define PKD(d) GamePackage::Data* d = gamePackage()->gamePackageData();
 
@@ -45,7 +45,7 @@ bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GameP
 void DefaultGMGLGamePackageHandler::init()
 {
 	PKD(d);
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d->gameMachine->getGraphicEngine());
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
 
 	// 装载所有shaders
 	const std::string shaderMap[] = 

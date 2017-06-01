@@ -1,7 +1,5 @@
 ﻿#include "stdafx.h"
 #include "bspgameworld.h"
-#include "gmengine/controllers/gamemachine.h"
-#include "gmengine/controllers/factory.h"
 #include "character.h"
 #include "foundation/utilities/utilities.h"
 

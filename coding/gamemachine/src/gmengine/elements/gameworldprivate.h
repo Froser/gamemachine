@@ -13,11 +13,8 @@ GM_PRIVATE_OBJECT(GameWorld)
 {
 	GameWorldPrivate();
 	GamePackage* gamePackage;
-	GameMachine* gameMachine;
 	std::set<GameObject*> shapes;
 	Character* character;
-	GMfloat elapsed;
-	GMlong startTick;
 	LightInfo ambientLight;
 	bool start;
 };

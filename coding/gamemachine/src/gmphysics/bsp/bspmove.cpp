@@ -3,7 +3,7 @@
 #include "gmengine/elements/bspgameworld.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmphysics/physicsstructs.h"
-#include "gmengine/controllers/gamemachine.h"
+#include "foundation/gamemachine.h"
 
 enum
 {
@@ -124,7 +124,7 @@ void BSPMove::sendCommand(Command cmd, const CommandParams& dataParam)
 GMfloat BSPMove::now()
 {
 	D(d);
-	return d->world->physicsData().world->getElapsed();
+	return GameMachine::instance().getGameTimeSeconds();
 }
 
 void BSPMove::generateMovement()
@@ -250,7 +250,7 @@ bool BSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	BSPPhysicsWorld::Data& wd = d->world->physicsData();
-	GMfloat dt = wd.world->getGameMachine()->evaluateDeltaTime();
+	GMfloat dt = GameMachine::instance().evaluateDeltaTime();
 	linear_math::Vector3 velocity = d->movement.velocity;
 
 	GMint numbumps = 4, bumpcount;

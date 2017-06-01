@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
+#include "foundation/gamemachine.h"
 #include "gmengine/controllers/gamepackagehandler.h"
 #include "gmgl/gmglshaders.h"
 #include "gmgl/gmglgraphic_engine.h"
-#include "gmengine/controllers/gamemachine.h"
 #include <string>
 #include "foundation/utilities/utilities.h"
 #include <fstream>
@@ -42,7 +42,7 @@ bool DefaultGMGamePackageHandler::readFileFromPath(const char* path, REF GamePac
 void DefaultGMGamePackageHandler::init()
 {
 	PKD(d);
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(d->gameMachine->getGraphicEngine());
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
 
 	// 装载所有shaders
 	const std::string shaderMap[] = 
