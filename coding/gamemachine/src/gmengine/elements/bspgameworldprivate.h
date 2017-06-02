@@ -17,7 +17,6 @@ GM_PRIVATE_OBJECT(BSPGameWorld)
 {
 	GM_PRIVATE_CONSTRUCT(BSPGameWorld)
 		: sky(nullptr)
-		, ready(false)
 	{
 	}
 
@@ -25,14 +24,10 @@ GM_PRIVATE_OBJECT(BSPGameWorld)
 	BSP bsp;
 	GameObject* sky;
 
-	// list to be drawn each frame
-	DrawingList drawingList;
-
 	BSPRender render;
 	BSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;
 	std::map<GMint, std::set<BSPEntity*> > entities;
-	bool ready;
 };
 
 class BSPGameWorld;

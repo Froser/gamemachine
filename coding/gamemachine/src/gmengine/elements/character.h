@@ -79,7 +79,6 @@ public:
 	Frustum& getFrustum();
 
 public:
-	virtual void getReadyForRender(DrawingList& list) override;
 	virtual void onAppendingObjectToWorld() override;
 
 private:

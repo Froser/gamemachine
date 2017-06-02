@@ -46,10 +46,10 @@ void GMGLGraphicEngine::newFrame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GMGLGraphicEngine::drawObjects(DrawingList& drawingList)
+void GMGLGraphicEngine::drawObject(GameObject* object)
 {
 	applyGraphicSettings();
-	drawObjectsOnce(drawingList);
+	drawObjectOnce(object);
 }
 
 void GMGLGraphicEngine::applyGraphicSettings()
@@ -59,17 +59,14 @@ void GMGLGraphicEngine::applyGraphicSettings()
 	glFrontFace(GL_CW);
 }
 
-void GMGLGraphicEngine::drawObjectsOnce(DrawingList& drawingList)
+void GMGLGraphicEngine::drawObjectOnce(GameObject* object)
 {
 	D(d);
 	static GMfloat trans[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
 	GMGLShaders* lastShaders = nullptr;
-	for (auto iter = drawingList.begin(); iter != drawingList.end(); iter++)
-	{
-		DrawingItem& item = *iter;
-		Object* coreObj = item.gameObject->getObject();
-		coreObj->getPainter()->draw(trans);
-	}
+	object->onBeforeDraw();
+	Object* coreObj = object->getObject();
+	coreObj->getPainter()->draw(trans);
 }
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)

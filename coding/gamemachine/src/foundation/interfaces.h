@@ -22,11 +22,6 @@ struct GraphicSettings;
 struct TextureFrames;
 struct CameraLookAt;
 
-struct DrawingItem
-{
-	GameObject* gameObject;
-};
-
 struct IWindow
 {
 	virtual ~IWindow() {}
@@ -65,7 +60,7 @@ struct IGraphicEngine
 	virtual ~IGraphicEngine() {}
 	virtual void setCurrentWorld(GameWorld*) = 0;
 	virtual void newFrame() = 0;
-	virtual void drawObjects(DrawingList& drawingList) = 0;
+	virtual void drawObject(GameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
 	virtual GraphicSettings* getGraphicSettings() = 0;

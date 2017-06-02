@@ -38,16 +38,12 @@ GameWorld* GameObject::getWorld()
 	return d->world;
 }
 
-void GameObject::getReadyForRender(DrawingList& list)
+void GameObject::onAppendingObjectToWorld()
 {
-	D(d);
-	linear_math::Matrix4x4 M = linear_math::Matrix4x4::identity();
-	DrawingItem item;
-	item.gameObject = this;
-	list.push_back(item);
+
 }
 
-void GameObject::onAppendingObjectToWorld()
+void GameObject::onBeforeDraw()
 {
 
 }
@@ -151,7 +147,7 @@ void GlyphObject::onAppendingObjectToWorld()
 	constructObject();
 }
 
-void GlyphObject::getReadyForRender(DrawingList& list)
+void GlyphObject::onBeforeDraw()
 {
 	D(d);
 	if (d->lastRenderText != d->text)
@@ -159,14 +155,14 @@ void GlyphObject::getReadyForRender(DrawingList& list)
 		updateObject();
 		d->lastRenderText = d->text;
 	}
-	GameObject::getReadyForRender(list);
+	GameObject::onBeforeDraw();
 }
 
 void GlyphObject::updateObject()
 {
 	D_BASE(GameObject, d);
 	constructObject();
-	d->world->initObject(this);
+	GameMachine::instance().initObjectPainter(this);
 }
 
 //EntityObject

@@ -130,7 +130,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 	if (!name)
 		return nullptr;
 
-	ResourceContainer* rc = d->world->getGraphicEngine()->getResourceContainer();
+	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 	TextureContainer& tc = rc->getTextureContainer();
 	const TextureContainer::TextureItemType* item = tc.find(name);
 	if (!item)

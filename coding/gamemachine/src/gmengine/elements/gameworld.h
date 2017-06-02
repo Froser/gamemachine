@@ -6,10 +6,6 @@
 
 BEGIN_NS
 
-class DrawingList : public AlignedVector<DrawingItem>
-{
-};
-
 class Character;
 class ObjectPainter;
 class GameWorld : public GMObject
@@ -27,9 +23,7 @@ public:
 public:
 	void initialize();
 	void appendObjectAndInit(AUTORELEASE GameObject* obj);
-	void initObject(GameObject* obj);
 	void simulateGameWorld();
-	IGraphicEngine* getGraphicEngine();
 	GamePackage* getGamePackage();
 	void setDefaultAmbientLight(const LightInfo& lightInfo);
 	LightInfo& getDefaultAmbientLight();

@@ -48,22 +48,15 @@ void BSPGameWorld::updateCamera()
 	Character* character = getMajorCharacter();
 	character->updateCamera();
 	CameraLookAt& lookAt = character->getLookAt();
-	IGraphicEngine* engine = getGraphicEngine();
-	engine->updateCameraView(lookAt);
+	GameMachine::instance().getGraphicEngine()->updateCameraView(lookAt);
 }
 
 void BSPGameWorld::renderGameWorld()
 {
 	D(d);
-	IGraphicEngine* engine = getGraphicEngine();
-	engine->newFrame();
+	GameMachine::instance().getGraphicEngine()->newFrame();
 	updateCamera();
 	drawAll();
-
-	if (!d->ready)
-		d->ready = true;
-	else
-		engine->drawObjects(d->drawingList);
 }
 
 PhysicsWorld* BSPGameWorld::physicsWorld()
@@ -164,7 +157,6 @@ GMint BSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 void BSPGameWorld::drawAll()
 {
 	D(d);
-	d->drawingList.clear();
 	drawSky();
 	if (!DBG_INT(DRAW_ONLY_SKY))
 	{
@@ -180,7 +172,7 @@ void BSPGameWorld::drawSky()
 {
 	D(d);
 	if (d->sky)
-		d->sky->getReadyForRender(d->drawingList);
+		GameMachine::instance().getGraphicEngine()->drawObject(d->sky);
 }
 
 void BSPGameWorld::drawFaces()
@@ -315,7 +307,8 @@ void BSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	ASSERT(obj);
-	obj->getReadyForRender(d->drawingList);
+	
+	GameMachine::instance().getGraphicEngine()->drawObject(obj);
 }
 
 void BSPGameWorld::drawMeshFace(GMint meshFaceNumber)
@@ -333,7 +326,7 @@ void BSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 		return;
 
 	ASSERT(obj);
-	obj->getReadyForRender(d->drawingList);
+	GameMachine::instance().getGraphicEngine()->drawObject(obj);
 }
 
 void BSPGameWorld::drawPatch(GMint patchNumber)
@@ -359,7 +352,7 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 		return;
 
 	ASSERT(obj);
-	obj->getReadyForRender(d->drawingList);
+	GameMachine::instance().getGraphicEngine()->drawObject(obj);
 }
 
 #ifdef NO_LAMBDA
@@ -370,7 +363,7 @@ struct __renderIter
 	{
 		GameObject* obj = rd.entitiyObjects[e];
 		if (obj)
-			obj->getReadyForRender(d->drawingList);
+			GameMachine::instance().getGraphicEngine()->drawObject(obj);
 	}
 	
 	BSPRenderData& rd;
@@ -392,7 +385,7 @@ void BSPGameWorld::drawEntity(GMint leafId)
 	{
 		GameObject* obj = rd.entitiyObjects[e];
 		if (obj)
-			obj->getReadyForRender(d->drawingList);
+			GameMachine::instance().getGraphicEngine()->drawObject(obj);
 	});
 #endif
 }
@@ -403,7 +396,7 @@ void BSPGameWorld::drawAlwaysVisibleObjects()
 	AlignedVector<GameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
 	for (auto iter = objs.begin(); iter != objs.end(); iter++)
 	{
-		(*iter)->getReadyForRender(d->drawingList);
+		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
 	}
 }
 
@@ -485,7 +478,7 @@ void BSPGameWorld::initTextures()
 	BSPData& bsp = d->bsp.bspData();
 
 	IFactory* factory = GameMachine::instance().getFactory();
-	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
+	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 
 	for (GMint i = 0; i < bsp.numShaders; i++)
 	{
@@ -546,7 +539,7 @@ void BSPGameWorld::initLightmaps()
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	IFactory* factory = GameMachine::instance().getFactory();
-	ResourceContainer* rc = getGraphicEngine()->getResourceContainer();
+	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 
 	const GMint BSP_LIGHTMAP_EXT = 128;
 	const GMint BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);

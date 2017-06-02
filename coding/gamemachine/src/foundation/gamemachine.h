@@ -54,6 +54,9 @@ public:
 	GMfloat evaluateDeltaTime();
 	GMfloat getGameTimeSeconds();
 
+	// 绘制管理
+	void initObjectPainter(GameObject* obj);
+
 	void startGameMachine();
 	void postMessage(GameMachineMessage msg);
 

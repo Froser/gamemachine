@@ -37,8 +37,8 @@ public:
 	GameWorld* getWorld();
 
 public:
-	virtual void getReadyForRender(DrawingList& list);
 	virtual void onAppendingObjectToWorld();
+	virtual void onBeforeDraw();
 };
 
 //GlyphObject
@@ -69,7 +69,7 @@ public:
 	void updateObject();
 
 private:
-	virtual void getReadyForRender(DrawingList& list) override;
+	virtual void onBeforeDraw() override;
 	virtual void onAppendingObjectToWorld() override;
 
 private:

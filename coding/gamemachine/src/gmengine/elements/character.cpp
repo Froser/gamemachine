@@ -88,10 +88,6 @@ void Character::setPitchLimitDegree(GMfloat deg)
 	d->state.pitchLimitRad = HALF_PI - RAD(deg);
 }
 
-void Character::getReadyForRender(DrawingList& list)
-{
-}
-
 void Character::simulation()
 {
 	D(d);

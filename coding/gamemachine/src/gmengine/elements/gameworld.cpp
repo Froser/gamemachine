@@ -26,7 +26,7 @@ GameWorld::~GameWorld()
 
 void GameWorld::initialize()
 {
-	getGraphicEngine()->setCurrentWorld(this);
+	GameMachine::instance().getGraphicEngine()->setCurrentWorld(this);
 }
 
 void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
@@ -35,16 +35,7 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 	d->shapes.insert(obj);
-	initObject(obj);
-}
-
-// initObject在于初始化GameObject中的Object，为其创建一个Painter，并且将数据传送到显卡
-void GameWorld::initObject(GameObject* obj)
-{
-	// 创建一个Painter
-	ObjectPainter* painter = createPainterForObject(obj);
-	ASSERT(painter);
-	painter->transfer();
+	GameMachine::instance().initObjectPainter(obj);
 }
 
 void GameWorld::setMajorCharacter(Character* character)
@@ -66,12 +57,6 @@ void GameWorld::simulateGameWorld()
 	d->character->simulation();
 	if (!d->start) // 第一次simulate
 		d->start = true;
-}
-
-IGraphicEngine* GameWorld::getGraphicEngine()
-{
-	D(d);
-	return GameMachine::instance().getGraphicEngine();
 }
 
 GamePackage* GameWorld::getGamePackage()

@@ -35,7 +35,7 @@ public:
 public:
 	virtual void setCurrentWorld(GameWorld*) override;
 	virtual void newFrame() override;
-	virtual void drawObjects(DrawingList& drawingList) override;
+	virtual void drawObject(GameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
 	virtual GraphicSettings* getGraphicSettings() override;
@@ -53,7 +53,7 @@ public:
 private:
 	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
-	void drawObjectsOnce(DrawingList& drawingList);
+	void drawObjectOnce(GameObject* object);
 };
 
 END_NS
