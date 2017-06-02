@@ -4,12 +4,12 @@
 #include "gmglgraphic_engine.h"
 #include "gmglfunc.h"
 #include "gmdatacore/object.h"
-#include "gmengine/elements/gameobject.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmgltexture.h"
-#include "gmengine/elements/gameworld.h"
+#include "gmengine/gmgameobject.h"
+#include "gmengine/gmgameworld.h"
+#include "gmengine/gmcharacter.h"
 #include "gmglobjectpainter.h"
-#include "gmengine/elements/character.h"
 #include "renders/gmgl_render.h"
 
 GMGLGraphicEngine::GMGLGraphicEngine()
@@ -35,7 +35,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	}
 }
 
-void GMGLGraphicEngine::setCurrentWorld(GameWorld* world)
+void GMGLGraphicEngine::setCurrentWorld(GMGameWorld* world)
 {
 	D(d);
 	d->world = world;
@@ -46,7 +46,7 @@ void GMGLGraphicEngine::newFrame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void GMGLGraphicEngine::drawObject(GameObject* object)
+void GMGLGraphicEngine::drawObject(GMGameObject* object)
 {
 	applyGraphicSettings();
 	drawObjectOnce(object);
@@ -59,7 +59,7 @@ void GMGLGraphicEngine::applyGraphicSettings()
 	glFrontFace(GL_CW);
 }
 
-void GMGLGraphicEngine::drawObjectOnce(GameObject* object)
+void GMGLGraphicEngine::drawObjectOnce(GMGameObject* object)
 {
 	D(d);
 	static GMfloat trans[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
@@ -90,7 +90,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 {
 	D(d);
-	Character* character = getWorld()->getMajorCharacter();
+	GMCharacter* character = getWorld()->getMajorCharacter();
 
 	//TODO 
 	d->projectionMatrix = character->getFrustum().getPerspective();
@@ -100,7 +100,7 @@ void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 	character->getFrustum().update();
 }
 
-GameWorld* GMGLGraphicEngine::getWorld()
+GMGameWorld* GMGLGraphicEngine::getWorld()
 {
 	D(d);
 	return d->world;

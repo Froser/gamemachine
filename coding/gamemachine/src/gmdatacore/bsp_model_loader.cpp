@@ -2,7 +2,7 @@
 #include "bsp_model_loader.h"
 #include "foundation/vector.h"
 #include "gamepackage.h"
-#include "gmengine/elements/bspgameworld.h"
+#include "gmengine/gmbspgameworld.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "shader.h"
 #include "model.h"
@@ -27,7 +27,7 @@ BSPModelLoader::~BSPModelLoader()
 	}
 }
 
-void BSPModelLoader::init(const char* directory, BSPGameWorld* world)
+void BSPModelLoader::init(const char* directory, GMBSPGameWorld* world)
 {
 	m_directory = directory;
 	m_world = world;
@@ -96,6 +96,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 	}
 
 	Model* m = new Model;
+	m->model[0] = 0;
 	strcpy_s(m->classname, classname);
 
 	const char* b;

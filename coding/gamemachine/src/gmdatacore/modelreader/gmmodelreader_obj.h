@@ -1,7 +1,7 @@
 ﻿#ifndef __MODELREADER_OBJ_H__
 #define __MODELREADER_OBJ_H__
 #include "common.h"
-#include "modelreader.h"
+#include "gmmodelreader.h"
 #include "foundation/linearmath.h"
 #include <map>
 #include "foundation/vector.h"
@@ -21,7 +21,7 @@ struct GamePackageBuffer;
 class Scanner;
 class Component;
 struct Shader;
-GM_PRIVATE_OBJECT(ModelReader_Obj)
+GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
 	Object* object;
 	AlignedVector<linear_math::Vector3> vertices;
@@ -33,22 +33,22 @@ GM_PRIVATE_OBJECT(ModelReader_Obj)
 };
 
 // 一个Obj文件只由一个部分组成，不存在骨骼等动画，是刚体静态的
-class ModelReader_Obj : public GMObject, public IModelReader
+class GMModelReader_Obj : public GMObject, public IModelReader
 {
-	DECLARE_PRIVATE(ModelReader_Obj);
+	DECLARE_PRIVATE(GMModelReader_Obj);
 
 public:
-	ModelReader_Obj();
-	~ModelReader_Obj();
+	GMModelReader_Obj();
+	~GMModelReader_Obj();
 
 public:
-	virtual bool load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) override;
+	virtual bool load(const GMModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) override;
 	virtual bool test(const GamePackageBuffer& buffer) override;
 
 private:
 	void init();
 	void appendFace(Scanner& scanner);
-	void loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename);
+	void loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename);
 	void applyMaterial(const ModelReader_Obj_Material& material, Shader& shader);
 	ModelReader_Obj_Material* getMaterial(const std::string& materialName);
 };

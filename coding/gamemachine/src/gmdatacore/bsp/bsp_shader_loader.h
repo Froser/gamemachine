@@ -11,13 +11,13 @@ class TiXmlDocument;
 BEGIN_NS
 // 解析一些纹理配置，如天空、特效、动画等，并加入世界
 struct Shader;
-class BSPGameWorld;
+class GMBSPGameWorld;
 
-GM_PRIVATE_OBJECT(BSPShaderLoader)
+GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 {
 	std::string directory;
-	BSPGameWorld* world;
-	BSPRenderData* bspRender;
+	GMBSPGameWorld* world;
+	GMBSPRenderData* bspRender;
 	std::map<std::string, TiXmlElement*> items;
 	AlignedVector<TiXmlDocument*> shaderDocs;
 
@@ -27,16 +27,16 @@ GM_PRIVATE_OBJECT(BSPShaderLoader)
 };
 
 
-GM_ALIGNED_16(class) BSPShaderLoader : public GMObject
+GM_ALIGNED_16(class) GMBSPShaderLoader : public GMObject
 {
-	DECLARE_PRIVATE(BSPShaderLoader)
+	DECLARE_PRIVATE(GMBSPShaderLoader)
 
 public:
-	BSPShaderLoader();
-	~BSPShaderLoader();
+	GMBSPShaderLoader();
+	~GMBSPShaderLoader();
 
 public:
-	void init(const char* directory, BSPGameWorld* world, BSPRenderData* bspRenderData);
+	void init(const char* directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
 	void load();
 	bool findItem(const char* name, GMuint lightmapId, REF Shader* shader);
 

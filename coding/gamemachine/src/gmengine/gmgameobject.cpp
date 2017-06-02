@@ -1,23 +1,23 @@
 ﻿#include "stdafx.h"
-#include "gameobject.h"
+#include "gmgameobject.h"
 #include "gmengine/controllers/graphic_engine.h"
-#include "gmengine/elements/gameworld.h"
+#include "gmengine/gmgameworld.h"
 #include "gmdatacore/glyph/glyphmanager.h"
 #include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
 #include "foundation/gamemachine.h"
 
-GameObject::GameObject(AUTORELEASE Object* obj)
+GMGameObject::GMGameObject(AUTORELEASE Object* obj)
 {
 	setObject(obj);
 }
 
-void GameObject::setObject(AUTORELEASE Object* obj)
+void GMGameObject::setObject(AUTORELEASE Object* obj)
 {
 	D(d);
 	d->object.reset(obj);
 }
 
-Object* GameObject::getObject()
+Object* GMGameObject::getObject()
 {
 	D(d);
 	if (!d->object)
@@ -25,25 +25,25 @@ Object* GameObject::getObject()
 	return d->object;
 }
 
-void GameObject::setWorld(GameWorld* world)
+void GMGameObject::setWorld(GMGameWorld* world)
 {
 	D(d);
 	ASSERT(!d->world);
 	d->world = world;
 }
 
-GameWorld* GameObject::getWorld()
+GMGameWorld* GMGameObject::getWorld()
 {
 	D(d);
 	return d->world;
 }
 
-void GameObject::onAppendingObjectToWorld()
+void GMGameObject::onAppendingObjectToWorld()
 {
 
 }
 
-void GameObject::onBeforeDraw()
+void GMGameObject::onBeforeDraw()
 {
 
 }
@@ -54,20 +54,20 @@ void GameObject::onBeforeDraw()
 #define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
 #define UV_Y(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
 
-GlyphObject::GlyphObject()
-	: GameObject(nullptr)
+GMGlyphObject::GMGlyphObject()
+	: GMGameObject(nullptr)
 {
 	D(d);
 }
 
-void GlyphObject::setText(const GMWChar* text)
+void GMGlyphObject::setText(const GMWChar* text)
 {
 	D(d);
 	d->text = text;
 }
 
 // 窗口中央坐标为(0,0)，左下角坐标为(-1, -1)
-void GlyphObject::setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height)
+void GMGlyphObject::setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height)
 {
 	D(d);
 	d->left = left;
@@ -76,10 +76,10 @@ void GlyphObject::setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMflo
 	d->height = height;
 }
 
-void GlyphObject::constructObject()
+void GMGlyphObject::constructObject()
 {
 	D(d);
-	D_BASE(GameObject, db);
+	D_BASE(GMGameObject, db);
 
 	GlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
 	IWindow* window = GameMachine::instance().getWindow();
@@ -140,14 +140,14 @@ void GlyphObject::constructObject()
 }
 
 
-void GlyphObject::onAppendingObjectToWorld()
+void GMGlyphObject::onAppendingObjectToWorld()
 {
 	D(d);
 	d->lastRenderText = d->text;
 	constructObject();
 }
 
-void GlyphObject::onBeforeDraw()
+void GMGlyphObject::onBeforeDraw()
 {
 	D(d);
 	if (d->lastRenderText != d->text)
@@ -155,37 +155,37 @@ void GlyphObject::onBeforeDraw()
 		updateObject();
 		d->lastRenderText = d->text;
 	}
-	GameObject::onBeforeDraw();
+	GMGameObject::onBeforeDraw();
 }
 
-void GlyphObject::updateObject()
+void GMGlyphObject::updateObject()
 {
-	D_BASE(GameObject, d);
+	D_BASE(GMGameObject, d);
 	constructObject();
 	GameMachine::instance().initObjectPainter(this);
 }
 
-//EntityObject
-EntityObject::EntityObject(AUTORELEASE Object* obj)
-	: GameObject(obj)
+//GMEntityObject
+GMEntityObject::GMEntityObject(AUTORELEASE Object* obj)
+	: GMGameObject(obj)
 {
 	calc();
 }
 
-Plane* EntityObject::getPlanes()
+Plane* GMEntityObject::getPlanes()
 {
 	D(d);
 	return d->planes;
 }
 
-void EntityObject::getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs)
+void GMEntityObject::getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs)
 {
 	D(d);
 	mins = d->mins;
 	maxs = d->maxs;
 }
 
-void EntityObject::calc()
+void GMEntityObject::calc()
 {
 	D(d);
 	d->mins[0] = d->mins[1] = d->mins[2] = 999999.f;
@@ -194,9 +194,9 @@ void EntityObject::calc()
 	Object* obj = getObject();
 	for (auto iter = obj->getAllMeshes().begin(); iter != obj->getAllMeshes().end(); iter++)
 	{
-		Mesh* child = *iter;
-		Object::DataType* vertices = child->vertices().data();
-		GMint sz = child->vertices().size();
+		Mesh* mesh = *iter;
+		Object::DataType* vertices = mesh->vertices().data();
+		GMint sz = mesh->vertices().size();
 		for (GMint i = 0; i < sz; i += 4)
 		{
 			for (GMint j = 0; j < 3; j++)
@@ -212,7 +212,7 @@ void EntityObject::calc()
 	makePlanes();
 }
 
-void EntityObject::makePlanes()
+void GMEntityObject::makePlanes()
 {
 	D(d);
 	// 前
@@ -266,7 +266,7 @@ static linear_math::Vector2 uvs[24] = {
 };
 
 SkyGameObject::SkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
-	: GameObject(nullptr)
+	: GMGameObject(nullptr)
 {
 	D(d);
 	d->shader = shader;

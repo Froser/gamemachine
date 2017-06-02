@@ -35,10 +35,10 @@ set(SOURCES
 		gmdatacore/imagereader/imagereader_png.cpp
 		gmdatacore/imagereader/imagereader_tga.h
 		gmdatacore/imagereader/imagereader_tga.cpp
-		gmdatacore/modelreader/modelreader.h
-		gmdatacore/modelreader/modelreader.cpp
-		gmdatacore/modelreader/modelreader_obj.h
-		gmdatacore/modelreader/modelreader_obj.cpp
+		gmdatacore/modelreader/gmmodelreader.h
+		gmdatacore/modelreader/gmmodelreader.cpp
+		gmdatacore/modelreader/gmmodelreader_obj.h
+		gmdatacore/modelreader/gmmodelreader_obj.cpp
 		gmdatacore/soundreader/soundreader.h
 		gmdatacore/soundreader/soundreader.cpp
 		gmdatacore/soundreader/soundreader_wav.h
@@ -63,18 +63,16 @@ set(SOURCES
 		gmengine/controllers/graphic_engine.h
 		gmengine/controllers/gamepackagehandler.h
 		gmengine/controllers/gamepackagehandler.cpp
-		gmengine/elements/gameworldprivate.h
-		gmengine/elements/gameworldprivate.cpp
-		gmengine/elements/gameworld.h
-		gmengine/elements/gameworld.cpp
-		gmengine/elements/gameobject.h
-		gmengine/elements/gameobject.cpp
-		gmengine/elements/character.h
-		gmengine/elements/character.cpp
-		gmengine/elements/bspgameworldprivate.h
-		gmengine/elements/bspgameworldprivate.cpp
-		gmengine/elements/bspgameworld.h
-		gmengine/elements/bspgameworld.cpp
+		gmengine/gmgameworld.h
+		gmengine/gmgameworld.cpp
+		gmengine/gmgameobject.h
+		gmengine/gmgameobject.cpp
+		gmengine/gmcharacter.h
+		gmengine/gmcharacter.cpp
+		gmengine/gmbspgameworldprivate.h
+		gmengine/gmbspgameworldprivate.cpp
+		gmengine/gmbspgameworld.h
+		gmengine/gmbspgameworld.cpp
 		gmgl/renders/gmgl_render.h
 		gmgl/renders/gmgl_renders_glyph.cpp
 		gmgl/renders/gmgl_renders_glyph.h
@@ -99,18 +97,18 @@ set(SOURCES
 		gmgl/gmgltexture.h
 		gmgl/gmgltexture.cpp
 		gmgl/shader_constants.h
-		gmphysics/bsp/bsptrace.h
-		gmphysics/bsp/bsptrace.cpp
-		gmphysics/bsp/bspphysicsworld.h
-		gmphysics/bsp/bspphysicsworld.cpp
-		gmphysics/bsp/bspphysicsstructs.h
-		gmphysics/bsp/bsppatch.h
-		gmphysics/bsp/bsppatch.cpp
-		gmphysics/bsp/bspmove.h
-		gmphysics/bsp/bspmove.cpp
-		gmphysics/physicsworld.h
-		gmphysics/physicsworld.cpp
-		gmphysics/physicsstructs.h
+		gmphysics/bsp/gmbsptrace.h
+		gmphysics/bsp/gmbsptrace.cpp
+		gmphysics/bsp/gmbspphysicsworld.h
+		gmphysics/bsp/gmbspphysicsworld.cpp
+		gmphysics/bsp/gmbspphysicsstructs.h
+		gmphysics/bsp/gmbsppatch.h
+		gmphysics/bsp/gmbsppatch.cpp
+		gmphysics/bsp/gmbspmove.h
+		gmphysics/bsp/gmbspmove.cpp
+		gmphysics/gmphysicsworld.h
+		gmphysics/gmphysicsworld.cpp
+		gmphysics/gmphysicsstructs.h
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
 		os/wingl_window.h

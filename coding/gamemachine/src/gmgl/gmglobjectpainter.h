@@ -7,7 +7,7 @@ BEGIN_NS
 
 class GMGLGraphicEngine;
 class GMGLShaders;
-class GameWorld;
+class GMGameWorld;
 class GMGLObjectPainter : public ObjectPainter
 {
 public:

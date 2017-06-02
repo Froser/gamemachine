@@ -1,15 +1,15 @@
 ﻿#include "stdafx.h"
-#include "bspphysicsworld.h"
-#include "gmengine/elements/bspgameworld.h"
-#include "bspmove.h"
+#include "gmbspphysicsworld.h"
+#include "gmbspmove.h"
+#include "gmengine/gmbspgameworld.h"
 #include "gmphysics/collisionobjectfactory.h"
 
 //class
-BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
-	: PhysicsWorld(world)
+GMBSPPhysicsWorld::GMBSPPhysicsWorld(GMGameWorld* world)
+	: GMPhysicsWorld(world)
 {
 	D(d);
-	d->world = static_cast<BSPGameWorld*>(world);
+	d->world = static_cast<GMBSPGameWorld*>(world);
 	d->trace.initTrace(
 		&d->world->bspData(), 
 		&d->world->getEntities(),
@@ -23,7 +23,7 @@ BSPPhysicsWorld::BSPPhysicsWorld(GameWorld* world)
 	d->gravity = -600.f;
 }
 
-BSPPhysicsWorld::~BSPPhysicsWorld()
+GMBSPPhysicsWorld::~GMBSPPhysicsWorld()
 {
 	D(d);
 	for (auto iter = d->objectMoves.begin(); iter != d->objectMoves.end(); iter++)
@@ -33,22 +33,22 @@ BSPPhysicsWorld::~BSPPhysicsWorld()
 	d->objectMoves.clear();
 }
 
-BSPPhysicsWorld::Data& BSPPhysicsWorld::physicsData()
+GMBSPPhysicsWorld::Data& GMBSPPhysicsWorld::physicsData()
 {
 	D(d);
 	return *d;
 }
 
-void BSPPhysicsWorld::simulate()
+void GMBSPPhysicsWorld::simulate()
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
 
-	BSPMove* move = getMove(&d->camera);
+	GMBSPMove* move = getMove(&d->camera);
 	move->move();
 }
 
-CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
+GMCollisionObject* GMBSPPhysicsWorld::find(GMGameObject* obj)
 {
 	D(d);
 	// 优先查找视角位置
@@ -58,16 +58,16 @@ CollisionObject* BSPPhysicsWorld::find(GameObject* obj)
 	return nullptr;
 }
 
-void BSPPhysicsWorld::sendCommand(CollisionObject* obj, const CommandParams& dataParam)
+void GMBSPPhysicsWorld::sendCommand(GMCollisionObject* obj, const CommandParams& dataParam)
 {
 	D(d);
 	ASSERT(dataParam.size() == 1);
-	Command cmd = (*dataParam.begin()).first;
-	BSPMove* move = getMove(&d->camera);
+	GMCommand cmd = (*dataParam.begin()).first;
+	GMBSPMove* move = getMove(&d->camera);
 	move->sendCommand(cmd, dataParam);
 }
 
-void BSPPhysicsWorld::initBSPPhysicsWorld()
+void GMBSPPhysicsWorld::initBSPPhysicsWorld()
 {
 	generatePhysicsPlaneData();
 	generatePhysicsBrushSideData();
@@ -75,19 +75,19 @@ void BSPPhysicsWorld::initBSPPhysicsWorld()
 	generatePhysicsPatches();
 }
 
-void BSPPhysicsWorld::setCamera(GameObject* obj)
+void GMBSPPhysicsWorld::setCamera(GMGameObject* obj)
 {
 	D(d);
 	d->camera.object = obj;
 }
 
-BSPMove* BSPPhysicsWorld::getMove(CollisionObject* o)
+GMBSPMove* GMBSPPhysicsWorld::getMove(GMCollisionObject* o)
 {
 	D(d);
-	BSPMove* m = nullptr;
+	GMBSPMove* m = nullptr;
 	if (d->objectMoves.find(o) == d->objectMoves.end())
 	{
-		m = new BSPMove(this, o);
+		m = new GMBSPMove(this, o);
 		d->objectMoves[o] = m;
 	}
 	else
@@ -99,7 +99,7 @@ BSPMove* BSPPhysicsWorld::getMove(CollisionObject* o)
 	return m;
 }
 
-void BSPPhysicsWorld::generatePhysicsPlaneData()
+void GMBSPPhysicsWorld::generatePhysicsPlaneData()
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
@@ -117,28 +117,28 @@ void BSPPhysicsWorld::generatePhysicsPlaneData()
 	}
 }
 
-void BSPPhysicsWorld::generatePhysicsBrushSideData()
+void GMBSPPhysicsWorld::generatePhysicsBrushSideData()
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
 	d->brushsides.resize(bsp.numbrushsides);
 	for (GMint i = 0; i < bsp.numbrushsides; i++)
 	{
-		BSP_Physics_BrushSide* bs = &d->brushsides[i];
+		GMBSP_Physics_BrushSide* bs = &d->brushsides[i];
 		bs->side = &bsp.brushsides[i];
 		bs->plane = &d->planes[bs->side->planeNum];
 		bs->surfaceFlags = bsp.shaders[bs->side->shaderNum].surfaceFlags;
 	}
 }
 
-void BSPPhysicsWorld::generatePhysicsBrushData()
+void GMBSPPhysicsWorld::generatePhysicsBrushData()
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
 	d->brushes.resize(bsp.numbrushes);
 	for (GMint i = 0; i < bsp.numbrushes; i++)
 	{
-		BSP_Physics_Brush* b = &d->brushes[i];
+		GMBSP_Physics_Brush* b = &d->brushes[i];
 		b->checkcount = 0;
 		b->brush = &bsp.brushes[i];
 		b->sides = &d->brushsides[b->brush->firstSide];
@@ -152,7 +152,7 @@ void BSPPhysicsWorld::generatePhysicsBrushData()
 	}
 }
 
-void BSPPhysicsWorld::generatePhysicsPatches()
+void GMBSPPhysicsWorld::generatePhysicsPatches()
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
@@ -175,8 +175,8 @@ void BSPPhysicsWorld::generatePhysicsPatches()
 			points[j] = v->xyz;
 		}
 
-		BSP_Physics_Patch* patch;
-		GM_new<BSP_Physics_Patch>(&patch);
+		GMBSP_Physics_Patch* patch;
+		GM_new<GMBSP_Physics_Patch>(&patch);
 		patch->surface = &bsp.drawSurfaces[i];
 		patch->shader = &bsp.shaders[patch->surface->shaderNum];
 		d->patch.generatePatchCollide(i, width, height, points.data(), patch);

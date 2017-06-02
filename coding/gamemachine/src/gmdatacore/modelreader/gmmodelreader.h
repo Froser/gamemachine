@@ -6,24 +6,16 @@ BEGIN_NS
 
 class Object;
 struct GamePackageBuffer;
-struct ModelLoadSettings;
+struct GMModelLoadSettings;
 struct IModelReader
 {
 	virtual ~IModelReader() {}
-	virtual bool load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) = 0;
+	virtual bool load(const GMModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) = 0;
 	virtual bool test(const GamePackageBuffer& buffer) = 0;
 };
 
-enum ModelType
-{
-	ModelType_AUTO,
-	ModelType_Begin,
-	ModelType_Obj = ModelType_Begin,
-	ModelType_End,
-};
-
 class GamePackage;
-struct ModelLoadSettings
+struct GMModelLoadSettings
 {
 	GamePackage& gamePackage;
 	const linear_math::Vector3& extents;
@@ -32,11 +24,20 @@ struct ModelLoadSettings
 	const char* modelName;
 };
 
-class ModelReader
+class GMModelReader
 {
 public:
-	static bool load(const ModelLoadSettings& settings, OUT Object** object);
-	static bool load(const ModelLoadSettings& settings, ModelType type, OUT Object** object);
+	enum ModelType
+	{
+		ModelType_AUTO,
+		ModelType_Begin,
+		ModelType_Obj = ModelType_Begin,
+		ModelType_End,
+	};
+
+public:
+	static bool load(const GMModelLoadSettings& settings, OUT Object** object);
+	static bool load(const GMModelLoadSettings& settings, ModelType type, OUT Object** object);
 	static IModelReader* getReader(ModelType type);
 
 private:

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gamemachine.h"
 #include "gmdatacore/glyph/glyphmanager.h"
-#include "gmengine/elements/gameobject.h"
+#include "gmengine/gmgameobject.h"
 
 #ifdef _WINDOWS
 #	include "os/directsound_sounddevice.h"
@@ -97,7 +97,7 @@ GMfloat GameMachine::getGameTimeSeconds()
 	return d->clock.getTime();
 }
 
-void GameMachine::initObjectPainter(GameObject* obj)
+void GameMachine::initObjectPainter(GMGameObject* obj)
 {
 	D(d);
 	ObjectPainter* painter;

@@ -6,7 +6,7 @@
 #include <string>
 #include "foundation/utilities/utilities.h"
 #include <fstream>
-#include "gmengine/elements/bspgameworld.h"
+#include "gmengine/gmbspgameworld.h"
 
 #define PKD(d) GamePackage::Data* d = gamePackage()->gamePackageData();
 

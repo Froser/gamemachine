@@ -5,10 +5,10 @@
 #include "foundation/utilities/utilities.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "gmdatacore/shader.h"
-#include "gmengine/elements/bspgameworld.h"
+#include "gmengine/gmbspgameworld.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include "gmdatacore/gamepackage.h"
-#include "gmengine/elements/gameobject.h"
+#include "gmengine/gmgameobject.h"
 #include "foundation/gamemachine.h"
 
 #define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
@@ -100,14 +100,14 @@ static void readTernaryFloatsFromString(const char* str, linear_math::Vector3& v
 	}
 }
 
-BSPShaderLoader::BSPShaderLoader()
+GMBSPShaderLoader::GMBSPShaderLoader()
 {
 	D(d);
 	d->world = nullptr;
 	d->bspRender = nullptr;
 }
 
-BSPShaderLoader::~BSPShaderLoader()
+GMBSPShaderLoader::~GMBSPShaderLoader()
 {
 	D(d);
 	for (auto iter = d->shaderDocs.begin(); iter != d->shaderDocs.end(); iter++)
@@ -116,7 +116,7 @@ BSPShaderLoader::~BSPShaderLoader()
 	}
 }
 
-void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPRenderData* bspRender)
+void GMBSPShaderLoader::init(const char* directory, GMBSPGameWorld* world, GMBSPRenderData* bspRender)
 {
 	D(d);
 	d->directory = directory;
@@ -124,7 +124,7 @@ void BSPShaderLoader::init(const char* directory, BSPGameWorld* world, BSPRender
 	d->bspRender = bspRender;
 }
 
-ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
+ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 {
 	D(d);
 	if (!name)
@@ -168,7 +168,7 @@ ITexture* BSPShaderLoader::addTextureToTextureContainer(const char* name)
 	}
 }
 
-void BSPShaderLoader::load()
+void GMBSPShaderLoader::load()
 {
 	D(d);
 	GamePackage* pk = d->world->getGamePackage();
@@ -184,7 +184,7 @@ void BSPShaderLoader::load()
 	}
 }
 
-bool BSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* shader)
+bool GMBSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* shader)
 {
 	D(d);
 	auto foundResult = d->items.find(name);
@@ -196,7 +196,7 @@ bool BSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* 
 	return true;
 }
 
-void BSPShaderLoader::parse(const char* buffer)
+void GMBSPShaderLoader::parse(const char* buffer)
 {
 	D(d);
 	TiXmlDocument* doc = new TiXmlDocument();
@@ -235,7 +235,7 @@ void BSPShaderLoader::parse(const char* buffer)
 	}
 }
 
-void BSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr)
+void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr)
 {
 	D(d);
 	if (!shaderPtr)
@@ -265,24 +265,24 @@ void BSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shade
 	parseEnd();
 }
 
-void BSPShaderLoader::parseStart()
+void GMBSPShaderLoader::parseStart()
 {
 	D(d);
 	d->textureNum = 0;
 }
 
-void BSPShaderLoader::parseEnd()
+void GMBSPShaderLoader::parseEnd()
 {
 	D(d);
 	d->lightmapId = -1;
 }
 
-void BSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
 {
 	shader.surfaceFlag |= parseSurfaceParm(elem->GetText());;
 }
 
-void BSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 {
 	const char* text = elem->GetText();
 	if (strEqual(text, "none"))
@@ -293,7 +293,7 @@ void BSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 		gm_error("wrong cull param %s", text);
 }
 
-void BSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
 {
 	const char* b = elem->GetText();
 	if (b)
@@ -312,7 +312,7 @@ void BSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
 	TextureFrames* frame = &shader.texture.textures[d->textureNum];
@@ -331,7 +331,7 @@ void BSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 	d->textureNum++;
 }
 
-void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
+void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
 	D(d);
 	TextureFrames* frame = &shader.texture.textures[d->textureNum];
@@ -340,7 +340,7 @@ void BSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 		frame->frames[i] = texture;
 }
 
-void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
 	TextureFrames* frame = &shader.texture.textures[d->textureNum];
@@ -361,7 +361,7 @@ void BSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
 	TextureFrames* frame = &shader.texture.textures[d->textureNum];
@@ -381,7 +381,7 @@ void BSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
 	// from "lightmap"
@@ -410,7 +410,7 @@ void BSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 {
 	TextureFrames* frame = &shader.texture.textures[TEXTURE_INDEX_NORMAL_MAPPING];
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
@@ -423,7 +423,7 @@ void BSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
 {
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
@@ -432,7 +432,7 @@ void BSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 {
 	const char* type = elem->Attribute("type");
 	if (!type)
@@ -494,7 +494,7 @@ void BSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 	shader.lights[lightType] = lightInfo;
 }
 
-void BSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
 	// tcMod <type> <...>
@@ -542,7 +542,7 @@ void BSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void BSPShaderLoader::createSky(Shader& shader)
+void GMBSPShaderLoader::createSky(Shader& shader)
 {
 	D(d);
 	ITexture* texture = shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0];

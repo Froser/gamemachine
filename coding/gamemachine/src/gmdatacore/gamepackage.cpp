@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gamepackage.h"
 #include <sys/stat.h>
-#include "gmengine/elements/bspgameworld.h"
+#include "gmengine/gmbspgameworld.h"
 
 GamePackage::GamePackage(IFactory* factory)
 {
@@ -46,12 +46,12 @@ void GamePackage::loadPackage(const char* path)
 	d->handler->init();
 }
 
-void GamePackage::createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld)
+void GamePackage::createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld)
 {
 	D(d);
 	ASSERT(gameWorld);
 
-	BSPGameWorld* world = new BSPGameWorld(this);
+	GMBSPGameWorld* world = new GMBSPGameWorld(this);
 	*gameWorld = world;
 	world->loadBSP(map);
 }

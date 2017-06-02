@@ -134,14 +134,14 @@ void Plane::setFromPoints(const linear_math::Vector3 & p0, const linear_math::Ve
 
 void Plane::normalize()
 {
-	float normalLength = linear_math::length(normal);
+	GMfloat normalLength = linear_math::length(normal);
 	normal /= normalLength;
 	intercept /= normalLength;
 }
 
 bool Plane::intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 & result)//find point of intersection of 3 planes
 {
-	float denominator = linear_math::dot(normal, (linear_math::cross(p2.normal, p3.normal)));
+	GMfloat denominator = linear_math::dot(normal, (linear_math::cross(p2.normal, p3.normal)));
 	//scalar triple product of normals
 	if (denominator == 0.0f)									//if zero
 		return false;										//no intersection
@@ -158,12 +158,12 @@ bool Plane::intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 
 
 GMfloat Plane::getDistance(const linear_math::Vector3 & point) const
 {
-	return point[0] * normal[0] + point[1] * normal[1] + point[2] * normal[2] + intercept;
+	return linear_math::dot(point, normal) + intercept;
 }
 
 PointPosition Plane::classifyPoint(const linear_math::Vector3 & point) const
 {
-	float distance = point[0] * normal[0] + point[1] * normal[1] + point[2] * normal[2] + intercept;
+	GMfloat distance = getDistance(point);
 
 	if (distance > EPSILON)	//==0.0f is too exact, give a bit of room
 		return POINT_IN_FRONT_OF_PLANE;
@@ -174,7 +174,7 @@ PointPosition Plane::classifyPoint(const linear_math::Vector3 & point) const
 	return POINT_ON_PLANE;	//otherwise
 }
 
-Plane Plane::lerp(const Plane & p2, float factor)
+Plane Plane::lerp(const Plane & p2, GMfloat factor)
 {
 	Plane result;
 	result.normal = normal*(1.0f - factor) + p2.normal*factor;

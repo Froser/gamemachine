@@ -7,14 +7,14 @@
 #include "foundation/vector.h"
 BEGIN_NS
 
-typedef GMint Command;
+typedef GMint GMCommand;
 
-GM_ALIGNED_16(class) CommandVector3 : public GMObject
+GM_ALIGNED_16(class) GMCommandVector3 : public GMObject
 {
 public:
-	CommandVector3() {}
+	GMCommandVector3() {}
 
-	CommandVector3(GMfloat x, GMfloat y, GMfloat z)
+	GMCommandVector3(GMfloat x, GMfloat y, GMfloat z)
 	{
 		p[0] = x;
 		p[1] = y;
@@ -30,20 +30,20 @@ private:
 	GMfloat p[3];
 };
 
-typedef std::map<Command, AlignedVector<CommandVector3> > CommandParams;
+typedef std::map<GMCommand, AlignedVector<GMCommandVector3> > CommandParams;
 
 #define USELESS_PARAM 0
 #define CMD_NONE 0x0000
 #define CMD_MOVE 0x0001
 #define CMD_JUMP 0x0002
 
-GM_ALIGNED_STRUCT(ShapeProperties)
+GM_ALIGNED_STRUCT(GMShapeProperties)
 {
 	linear_math::Vector3 bounding[2]; //最小边界和最大边界
 	GMfloat stepHeight;
 };
 
-GM_ALIGNED_STRUCT(MotionProperties)
+GM_ALIGNED_STRUCT(GMMotionProperties)
 {
 	linear_math::Vector3 translation;
 	linear_math::Vector3 velocity;
@@ -51,11 +51,11 @@ GM_ALIGNED_STRUCT(MotionProperties)
 	GMfloat moveSpeed;
 };
 
-GM_ALIGNED_STRUCT(CollisionObject)
+GM_ALIGNED_STRUCT(GMCollisionObject)
 {
-	MotionProperties motions;
-	ShapeProperties shapeProps;
-	GameObject* object;
+	GMMotionProperties motions;
+	GMShapeProperties shapeProps;
+	GMGameObject* object;
 };
 
 END_NS

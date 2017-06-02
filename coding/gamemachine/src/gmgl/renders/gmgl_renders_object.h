@@ -7,7 +7,7 @@
 BEGIN_NS
 
 class GMGLGraphicEngine;
-class GameWorld;
+class GMGameWorld;
 GM_PRIVATE_OBJECT(GMGLRenders_Object)
 {
 	GMGLGraphicEngine* engine;
@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	Mesh::MeshesType type;
 	Shader* shader;
 	GMGLShaders* gmglShaders;
-	GameWorld* world;
+	GMGameWorld* world;
 };
 
 class GMGLRenders_Object : public GMObject, public IRender

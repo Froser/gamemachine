@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "modelreader_obj.h"
+#include "gmmodelreader_obj.h"
 #include "gmdatacore/object.h"
 #include "gmdatacore/gamepackage.h"
 #include "foundation/utilities/utilities.h"
@@ -68,24 +68,28 @@ static void pushBackData(const linear_math::Vector3& extents, const linear_math:
 	container.push_back(data);
 }
 
-ModelReader_Obj::ModelReader_Obj()
+GMModelReader_Obj::GMModelReader_Obj()
 {
 	init();
 }
 
-ModelReader_Obj::~ModelReader_Obj()
+GMModelReader_Obj::~GMModelReader_Obj()
 {
 
 }
 
-void ModelReader_Obj::init()
+void GMModelReader_Obj::init()
 {
 	D(d);
 	d->object = nullptr;
 	d->currentComponent = nullptr;
+	d->vertices.clear();
+	d->normals.clear();
+	d->textures.clear();
+	d->materials.clear();
 }
 
-bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object)
+bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object)
 {
 	D(d);
 	init();
@@ -159,20 +163,20 @@ bool ModelReader_Obj::load(const ModelLoadSettings& settings, GamePackageBuffer&
 	return true;
 }
 
-bool ModelReader_Obj::test(const GamePackageBuffer& buffer)
+bool GMModelReader_Obj::test(const GamePackageBuffer& buffer)
 {
-	return buffer.buffer[0] == '#';
+	return buffer.buffer && buffer.buffer[0] == '#';
 }
 
-void ModelReader_Obj::appendFace(Scanner& scanner)
+void GMModelReader_Obj::appendFace(Scanner& scanner)
 {
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
 
-	Mesh* child = d->object->getAllMeshes()[0];
+	Mesh* mesh = d->object->getAllMeshes()[0];
 	if (!d->currentComponent)
 	{
-		d->currentComponent = new Component(child);
+		d->currentComponent = new Component(mesh);
 		applyMaterial(material, d->currentComponent->getShader());
 	}
 
@@ -211,7 +215,7 @@ void ModelReader_Obj::appendFace(Scanner& scanner)
 	d->currentComponent->endFace();
 }
 
-void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char* mtlFilename)
+void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename)
 {
 	D(d);
 	std::string mtlPath = settings.modelName;
@@ -265,7 +269,7 @@ void ModelReader_Obj::loadMaterial(const ModelLoadSettings& settings, const char
 	}
 }
 
-void ModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Shader& shader)
+void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Shader& shader)
 {
 	shader.cull = GMS_NONE;
 

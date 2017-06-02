@@ -1,8 +1,9 @@
 ﻿#ifndef __CHARACTER_H__
 #define __CHARACTER_H__
 #include "common.h"
-#include "gameobject.h"
+#include "gmgameobject.h"
 #include "foundation/utilities/utilities.h"
+#include "gmphysics/gmphysicsstructs.h"
 
 BEGIN_NS
 
@@ -45,7 +46,7 @@ private:
 	GMfloat m_moveRate[MD_ACTION_COUNT];
 };
 
-GM_PRIVATE_OBJECT(Character)
+GM_PRIVATE_OBJECT(GMCharacter)
 {
 	GMfloat radius;
 	Frustum frustum;
@@ -54,16 +55,16 @@ GM_PRIVATE_OBJECT(Character)
 
 	PositionState state;
 	CameraLookAt lookAt;
-	CommandVector3 moveCmdArgFB;
-	CommandVector3 moveCmdArgLR;
+	GMCommandVector3 moveCmdArgFB;
+	GMCommandVector3 moveCmdArgLR;
 };
 
-class Character : public GameObject
+class GMCharacter : public GMGameObject
 {
-	DECLARE_PRIVATE(Character)
+	DECLARE_PRIVATE(GMCharacter)
 
 public:
-	Character(GMfloat radius);
+	GMCharacter(GMfloat radius);
 
 public:
 	void setJumpSpeed(const linear_math::Vector3& jumpSpeed);

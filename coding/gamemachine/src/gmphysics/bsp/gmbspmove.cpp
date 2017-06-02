@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "bspmove.h"
-#include "gmengine/elements/bspgameworld.h"
+#include "gmbspmove.h"
+#include "gmengine/gmbspgameworld.h"
 #include "gmengine/controllers/graphic_engine.h"
-#include "gmphysics/physicsstructs.h"
+#include "gmphysics/gmphysicsstructs.h"
 #include "foundation/gamemachine.h"
 
 enum
@@ -13,7 +13,7 @@ enum
 static const GMfloat OVERCLIP = 1.f;
 static const GMfloat CLIP_IGNORE = .2f;
 
-BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
+GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMCollisionObject* obj)
 {
 	D(d);
 	d->inited = false;
@@ -23,7 +23,7 @@ BSPMove::BSPMove(BSPPhysicsWorld* world, CollisionObject* obj)
 	d->moveCommand.command = CMD_NONE;
 }
 
-void BSPMove::move()
+void GMBSPMove::move()
 {
 	D(d);
 	generateMovement();
@@ -35,7 +35,7 @@ void BSPMove::move()
 		airMove();
 }
 
-void BSPMove::processCommand()
+void GMBSPMove::processCommand()
 {
 	D(d);
 	if (d->moveCommand.command & CMD_MOVE)
@@ -58,7 +58,7 @@ void BSPMove::processCommand()
 	}
 }
 
-void BSPMove::processMove()
+void GMBSPMove::processMove()
 {
 	D(d);
 	// 空中不允许改变运动状态
@@ -66,7 +66,7 @@ void BSPMove::processMove()
 		return;
 
 	//moveCommand: {pitch, yaw, USELESS}, {forward(bool), moveRate, USELESS}, {left(bool), moveRate(LR), USELESS}
-	CommandVector3& arg0 = d->moveCommand.params[CMD_MOVE][0],
+	GMCommandVector3& arg0 = d->moveCommand.params[CMD_MOVE][0],
 		&arg1 = d->moveCommand.params[CMD_MOVE][1],
 		&arg2 = d->moveCommand.params[CMD_MOVE][2];
 		
@@ -100,7 +100,7 @@ void BSPMove::processMove()
 	composeVelocityWithGravity();
 }
 
-void BSPMove::processJump()
+void GMBSPMove::processJump()
 {
 	D(d);
 	if (!d->movement.freefall)
@@ -112,7 +112,7 @@ void BSPMove::processJump()
 	}
 }
 
-void BSPMove::sendCommand(Command cmd, const CommandParams& dataParam)
+void GMBSPMove::sendCommand(GMCommand cmd, const CommandParams& dataParam)
 {
 	D(d);
 	d->moveCommand.command |= cmd;
@@ -121,13 +121,13 @@ void BSPMove::sendCommand(Command cmd, const CommandParams& dataParam)
 	d->moveCommand.params[cmd] = (*iter).second;
 }
 
-GMfloat BSPMove::now()
+GMfloat GMBSPMove::now()
 {
 	D(d);
 	return GameMachine::instance().getGameTimeSeconds();
 }
 
-void BSPMove::generateMovement()
+void GMBSPMove::generateMovement()
 {
 	D(d);
 	if (!d->inited)
@@ -145,7 +145,7 @@ void BSPMove::generateMovement()
 	d->movement.startTime = now();
 }
 
-void BSPMove::composeVelocityWithGravity()
+void GMBSPMove::composeVelocityWithGravity()
 {
 	// 获取当前纵向速度，并叠加上加速度
 	D(d);
@@ -154,7 +154,7 @@ void BSPMove::composeVelocityWithGravity()
 	d->movement.velocity[GRAVITY_DIRECTION] = accelerationVelocity;
 }
 
-linear_math::Vector3 BSPMove::decomposeVelocity(const linear_math::Vector3& v)
+linear_math::Vector3 GMBSPMove::decomposeVelocity(const linear_math::Vector3& v)
 {
 	D(d);
 	// 将速度分解成水平面平行的分量
@@ -164,7 +164,7 @@ linear_math::Vector3 BSPMove::decomposeVelocity(const linear_math::Vector3& v)
 	return normal * len;
 }
 
-void BSPMove::groundTrace()
+void GMBSPMove::groundTrace()
 {
 	D(d);
 	linear_math::Vector3 p(d->movement.origin);
@@ -188,7 +188,7 @@ void BSPMove::groundTrace()
 	d->movement.walking = true;
 }
 
-void BSPMove::walkMove()
+void GMBSPMove::walkMove()
 {
 	D(d);
 	if (linear_math::equals(d->movement.velocity, linear_math::Vector3(0)))
@@ -197,12 +197,12 @@ void BSPMove::walkMove()
 	stepSlideMove(false);
 }
 
-void BSPMove::airMove()
+void GMBSPMove::airMove()
 {
 	stepSlideMove(true);
 }
 
-void BSPMove::stepSlideMove(bool hasGravity)
+void GMBSPMove::stepSlideMove(bool hasGravity)
 {
 	D(d);
 	linear_math::Vector3 startOrigin = d->movement.origin;
@@ -246,10 +246,10 @@ void BSPMove::stepSlideMove(bool hasGravity)
 	synchronizePosition();
 }
 
-bool BSPMove::slideMove(bool hasGravity)
+bool GMBSPMove::slideMove(bool hasGravity)
 {
 	D(d);
-	BSPPhysicsWorld::Data& wd = d->world->physicsData();
+	GMBSPPhysicsWorld::Data& wd = d->world->physicsData();
 	GMfloat dt = GameMachine::instance().evaluateDeltaTime();
 	linear_math::Vector3 velocity = d->movement.velocity;
 
@@ -375,7 +375,7 @@ bool BSPMove::slideMove(bool hasGravity)
 	return (bumpcount != 0);
 }
 
-void BSPMove::clipVelocity(const linear_math::Vector3& in, const linear_math::Vector3& normal, linear_math::Vector3& out, GMfloat overbounce)
+void GMBSPMove::clipVelocity(const linear_math::Vector3& in, const linear_math::Vector3& normal, linear_math::Vector3& out, GMfloat overbounce)
 {
 	GMfloat backoff;
 	GMfloat change;
@@ -396,7 +396,7 @@ void BSPMove::clipVelocity(const linear_math::Vector3& in, const linear_math::Ve
 	}
 }
 
-void BSPMove::synchronizePosition()
+void GMBSPMove::synchronizePosition()
 {
 	D(d);
 	d->object->motions.translation = d->movement.origin;

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
-#include "bspgameworld.h"
-#include "character.h"
+#include "gmbspgameworld.h"
+#include "gmcharacter.h"
 #include "gmengine/controllers/resource_container.h"
 #include "gmdatacore/imagereader/imagereader.h"
 #include "foundation/utilities/utilities.h"
@@ -8,50 +8,50 @@
 #include "gmdatacore/bsp/bsp_shader_loader.h"
 #include "gmdatacore/gamepackage.h"
 #include <algorithm>
-#include "gmdatacore/modelreader/modelreader.h"
+#include "gmdatacore/modelreader/gmmodelreader.h"
 #include "foundation/gamemachine.h"
 
-BSPGameWorld::BSPGameWorld(GamePackage* pk)
-	: GameWorld(pk)
+GMBSPGameWorld::GMBSPGameWorld(GamePackage* pk)
+	: GMGameWorld(pk)
 {
 	D(d);
-	d->physics.reset(new BSPPhysicsWorld(this));
+	d->physics.reset(new GMBSPPhysicsWorld(this));
 }
 
-void BSPGameWorld::loadBSP(const char* mapName)
+void GMBSPGameWorld::loadBSP(const char* mapName)
 {
 	D(d);
-	D_BASE(GameWorld, db);
+	D_BASE(GMGameWorld, db);
 	GamePackageBuffer buffer;
 	db->gamePackage->readFile(PI_MAPS, mapName, &buffer);
 	d->bsp.loadBsp(buffer);
 	importBSP();
 }
 
-void BSPGameWorld::setSky(AUTORELEASE GameObject* sky)
+void GMBSPGameWorld::setSky(AUTORELEASE GMGameObject* sky)
 {
 	D(d);
 	d->sky = sky;
 	appendObjectAndInit(sky);
 }
 
-GameObject* BSPGameWorld::getSky()
+GMGameObject* GMBSPGameWorld::getSky()
 {
 	D(d);
 	return d->sky;
 }
 
-void BSPGameWorld::updateCamera()
+void GMBSPGameWorld::updateCamera()
 {
 	D(d);
 
-	Character* character = getMajorCharacter();
+	GMCharacter* character = getMajorCharacter();
 	character->updateCamera();
 	CameraLookAt& lookAt = character->getLookAt();
 	GameMachine::instance().getGraphicEngine()->updateCameraView(lookAt);
 }
 
-void BSPGameWorld::renderGameWorld()
+void GMBSPGameWorld::renderGameWorld()
 {
 	D(d);
 	GameMachine::instance().getGraphicEngine()->newFrame();
@@ -59,40 +59,40 @@ void BSPGameWorld::renderGameWorld()
 	drawAll();
 }
 
-PhysicsWorld* BSPGameWorld::physicsWorld()
+GMPhysicsWorld* GMBSPGameWorld::physicsWorld()
 {
 	D(d);
 	return d->physics;
 }
 
-void BSPGameWorld::setMajorCharacter(Character* character)
+void GMBSPGameWorld::setMajorCharacter(GMCharacter* character)
 {
 	D(d);
 	d->physics->setCamera(character);
-	GameWorld::setMajorCharacter(character);
+	GMGameWorld::setMajorCharacter(character);
 }
 
-void BSPGameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysVisible)
+void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)
 {
 	D(d);
-	GameWorld::appendObjectAndInit(obj);
+	GMGameWorld::appendObjectAndInit(obj);
 	if (alwaysVisible)
 		d->render.renderData().alwaysVisibleObjects.push_back(obj);
 }
 
-std::map<GMint, std::set<BSPEntity*> >& BSPGameWorld::getEntities()
+std::map<GMint, std::set<BSPEntity*> >& GMBSPGameWorld::getEntities()
 {
 	D(d);
 	return d->entities;
 }
 
-void BSPGameWorld::calculateVisibleFaces()
+void GMBSPGameWorld::calculateVisibleFaces()
 {
 	D(d);
-	D_BASE(GameWorld, dbase);
-	BSPRenderData& rd = d->render.renderData();
+	D_BASE(GMGameWorld, dbase);
+	GMBSPRenderData& rd = d->render.renderData();
 
-	Character* character = getMajorCharacter();
+	GMCharacter* character = getMajorCharacter();
 	PositionState pos = character->getPositionState();
 	BSPData& bsp = d->bsp.bspData();
 
@@ -108,7 +108,7 @@ void BSPGameWorld::calculateVisibleFaces()
 			continue;
 
 		//if this leaf does not lie in the frustum, continue
-		Character* character = getMajorCharacter();
+		GMCharacter* character = getMajorCharacter();
 		if (!character->getFrustum().isBoundingBoxInside(rd.leafs[i].boundingBoxVertices))
 			continue;
 
@@ -122,7 +122,7 @@ void BSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-GMint BSPGameWorld::calculateLeafNode(const linear_math::Vector3& position)
+GMint GMBSPGameWorld::calculateLeafNode(const linear_math::Vector3& position)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -143,18 +143,18 @@ GMint BSPGameWorld::calculateLeafNode(const linear_math::Vector3& position)
 	return ~currentNode;
 }
 
-GMint BSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
+GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	GMint index = cameraCluster * rd.visibilityData.bytesPerCluster + testCluster / 8;
 	return rd.visibilityData.bitset[index] & (1 << (testCluster & 7));
 }
 
 // drawAll将所要需要绘制的对象放入列表
-void BSPGameWorld::drawAll()
+void GMBSPGameWorld::drawAll()
 {
 	D(d);
 	drawSky();
@@ -168,18 +168,18 @@ void BSPGameWorld::drawAll()
 	drawAlwaysVisibleObjects();
 }
 
-void BSPGameWorld::drawSky()
+void GMBSPGameWorld::drawSky()
 {
 	D(d);
 	if (d->sky)
 		GameMachine::instance().getGraphicEngine()->drawObject(d->sky);
 }
 
-void BSPGameWorld::drawFaces()
+void GMBSPGameWorld::drawFaces()
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	//loop through faces
 	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
@@ -196,11 +196,11 @@ void BSPGameWorld::drawFaces()
 	}
 }
 
-void BSPGameWorld::drawFace(GMint idx)
+void GMBSPGameWorld::drawFace(GMint idx)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	//look this face up in the face directory
 	if (rd.faceDirectory[idx].faceType == 0)
@@ -216,13 +216,13 @@ void BSPGameWorld::drawFace(GMint idx)
 		drawPatch(rd.faceDirectory[idx].typeFaceNumber);
 }
 
-void BSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
+void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
 {
 	D(d);
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	BSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
-	GameObject* obj = nullptr;
+	GMGameObject* obj = nullptr;
 	ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
 
 	Shader shader;
@@ -235,19 +235,19 @@ void BSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
 
 	Object* coreObj;
 	d->render.createObject(polygonFace, shader, &coreObj);
-	obj = new GameObject(coreObj);
+	obj = new GMGameObject(coreObj);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
 	appendObjectAndInit(obj);
 }
 
-void BSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
+void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
 {
 	D(d);
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	BSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
-	GameObject* obj = nullptr;
+	GMGameObject* obj = nullptr;
 
 	ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
 	Shader shader;
@@ -260,16 +260,16 @@ void BSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
 
 	Object* coreObj;
 	d->render.createObject(meshFace, shader, &coreObj);
-	obj = new GameObject(coreObj);
+	obj = new GMGameObject(coreObj);
 	rd.meshFaceObjects[&meshFace] = obj;
 	appendObjectAndInit(obj);
 }
 
-void BSPGameWorld::preparePatch(GMint patchNumber)
+void GMBSPGameWorld::preparePatch(GMint patchNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	Shader shader;
 	if (!setMaterialTexture(rd.patches[patchNumber], shader))
@@ -286,20 +286,20 @@ void BSPGameWorld::preparePatch(GMint patchNumber)
 
 		Object* coreObj;
 		d->render.createObject(biqp, shader, &coreObj);
-		GameObject* obj = new GameObject(coreObj);
+		GMGameObject* obj = new GMGameObject(coreObj);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
 	}
 }
 
-void BSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
+void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	BSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
-	GameObject* obj = nullptr;
+	GMGameObject* obj = nullptr;
 	auto findResult = rd.polygonFaceObjects.find(&polygonFace);
 	if (findResult != rd.polygonFaceObjects.end())
 		obj = (*findResult).second;
@@ -311,14 +311,14 @@ void BSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 	GameMachine::instance().getGraphicEngine()->drawObject(obj);
 }
 
-void BSPGameWorld::drawMeshFace(GMint meshFaceNumber)
+void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	BSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
-	GameObject* obj = nullptr;
+	GMGameObject* obj = nullptr;
 	auto findResult = rd.meshFaceObjects.find(&meshFace);
 	if (findResult != rd.meshFaceObjects.end())
 		obj = (*findResult).second;
@@ -329,22 +329,22 @@ void BSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 	GameMachine::instance().getGraphicEngine()->drawObject(obj);
 }
 
-void BSPGameWorld::drawPatch(GMint patchNumber)
+void GMBSPGameWorld::drawPatch(GMint patchNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 		draw(rd.patches[patchNumber].quadraticPatches[i]);
 }
 
-void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
+void GMBSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 {
 	D(d);
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
-	GameObject* obj = nullptr;
+	GMGameObject* obj = nullptr;
 	auto findResult = rd.biquadraticPatchObjects.find(&biqp);
 	if (findResult != rd.biquadraticPatchObjects.end())
 		obj = (*findResult).second;
@@ -358,23 +358,23 @@ void BSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 #ifdef NO_LAMBDA
 struct __renderIter
 {
-	__renderIter(BSPRenderData& _rd, BSPGameWorld::Data& _d) : rd(_rd), d(_d) {}
+	__renderIter(GMBSPRenderData& _rd, GMBSPGameWorld::Data& _d) : rd(_rd), d(_d) {}
 	void operator()(BSPEntity* e)
 	{
-		GameObject* obj = rd.entitiyObjects[e];
+		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
 			GameMachine::instance().getGraphicEngine()->drawObject(obj);
 	}
 	
-	BSPRenderData& rd;
-	BSPGameWorld::Data d;
+	GMBSPRenderData& rd;
+	GMBSPGameWorld::Data d;
 };
 #endif
 
-void BSPGameWorld::drawEntity(GMint leafId)
+void GMBSPGameWorld::drawEntity(GMint leafId)
 {
 	D(d);
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	std::set<BSPEntity*>& entities = d->entities[leafId];
 #ifdef NO_LAMBDA
@@ -383,17 +383,17 @@ void BSPGameWorld::drawEntity(GMint leafId)
 #else
 	std::for_each(entities.begin(), entities.end(), [&rd, &d](BSPEntity* e)
 	{
-		GameObject* obj = rd.entitiyObjects[e];
+		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
 			GameMachine::instance().getGraphicEngine()->drawObject(obj);
 	});
 #endif
 }
 
-void BSPGameWorld::drawAlwaysVisibleObjects()
+void GMBSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
-	AlignedVector<GameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
+	AlignedVector<GMGameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
 	for (auto iter = objs.begin(); iter != objs.end(); iter++)
 	{
 		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
@@ -401,7 +401,7 @@ void BSPGameWorld::drawAlwaysVisibleObjects()
 }
 
 template <typename T>
-bool BSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
+bool GMBSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -423,7 +423,7 @@ bool BSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
 	return true;
 }
 
-void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
+void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
@@ -439,7 +439,7 @@ void BSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 	shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
 }
 
-void BSPGameWorld::importBSP()
+void GMBSPGameWorld::importBSP()
 {
 	D(d);
 	d->render.generateRenderData(&d->bsp.bspData());
@@ -453,28 +453,28 @@ void BSPGameWorld::importBSP()
 	d->physics->initBSPPhysicsWorld();
 }
 
-void BSPGameWorld::initModels()
+void GMBSPGameWorld::initModels()
 {
 	D(d);
-	D_BASE(GameWorld, db);
+	D_BASE(GMGameWorld, db);
 	std::string modelPath = db->gamePackage->pathOf(PI_MODELS, "");
 	d->modelLoader.init(modelPath.c_str(), this);
 	d->modelLoader.load();
 }
 
-void BSPGameWorld::initShaders()
+void GMBSPGameWorld::initShaders()
 {
 	D(d);
-	D_BASE(GameWorld, db);
+	D_BASE(GMGameWorld, db);
 	std::string texShadersPath = db->gamePackage->pathOf(PI_TEXSHADERS, "");
 	d->shaderLoader.init(texShadersPath.c_str(), this, &d->render.renderData());
 	d->shaderLoader.load();
 }
 
-void BSPGameWorld::initTextures()
+void GMBSPGameWorld::initTextures()
 {
 	D(d);
-	D_BASE(GameWorld, db);
+	D_BASE(GMGameWorld, db);
 	BSPData& bsp = d->bsp.bspData();
 
 	IFactory* factory = GameMachine::instance().getFactory();
@@ -505,7 +505,7 @@ void BSPGameWorld::initTextures()
 	}
 }
 
-bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
+bool GMBSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 {
 	const GMint maxChars = 128;
 	static std::string priorities[maxChars] =
@@ -534,7 +534,7 @@ bool BSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 	return false;
 }
 
-void BSPGameWorld::initLightmaps()
+void GMBSPGameWorld::initLightmaps()
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -572,11 +572,11 @@ void BSPGameWorld::initLightmaps()
 	}
 }
 
-void BSPGameWorld::prepareFaces()
+void GMBSPGameWorld::prepareFaces()
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	//loop through faces
 	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
@@ -595,7 +595,7 @@ void BSPGameWorld::prepareFaces()
 	}
 }
 
-void BSPGameWorld::prepareEntities()
+void GMBSPGameWorld::prepareEntities()
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -610,10 +610,10 @@ void BSPGameWorld::prepareEntities()
 	}
 }
 
-void BSPGameWorld::createEntity(BSPEntity* entity)
+void GMBSPGameWorld::createEntity(BSPEntity* entity)
 {
 	D(d);
-	D_BASE(GameWorld, db);
+	D_BASE(GMGameWorld, db);
 
 	BSPKeyValuePair* p = entity->epairs;
 	const char* classname = nullptr;
@@ -635,7 +635,7 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 	if (!m->create)
 		return;
 
-	BSPRenderData& rd = d->render.renderData();
+	GMBSPRenderData& rd = d->render.renderData();
 
 	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
 	Object* coreObj = nullptr;
@@ -661,33 +661,33 @@ void BSPGameWorld::createEntity(BSPEntity* entity)
 		fn.append(".obj");
 
 		std::string path = db->gamePackage->pathOf(PI_MODELS, fn.c_str());
-		ModelLoadSettings settings = {
+		GMModelLoadSettings settings = {
 			*db->gamePackage,
 			m->extents,
 			entity->origin,
 			path.c_str(),
 			m->model
 		};
-		ModelReader::load(settings, &coreObj);
-		if (!coreObj)
+		
+		if (!GMModelReader::load(settings, &coreObj))
 		{
 			gm_warning("parse model file failed.");
 			return;
 		}
 	}
 
-	EntityObject* obj = new EntityObject(coreObj);
+	GMEntityObject* obj = new GMEntityObject(coreObj);
 	rd.entitiyObjects[entity] = obj;
 	appendObjectAndInit(obj);
 }
 
-BSPData& BSPGameWorld::bspData()
+BSPData& GMBSPGameWorld::bspData()
 {
 	D(d);
 	return d->bsp.bspData();
 }
 
-BSPRenderData& BSPGameWorld::renderData()
+GMBSPRenderData& GMBSPGameWorld::renderData()
 {
 	D(d);
 	return d->render.renderData();

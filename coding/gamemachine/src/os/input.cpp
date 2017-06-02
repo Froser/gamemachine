@@ -77,11 +77,11 @@ void Input_Windows::initMouse(IWindow* window)
 	d->mouseReady = true;
 }
 
-JoystickState Input_Windows::getJoystickState()
+GMJoystickState Input_Windows::getJoystickState()
 {
 	D(d);
 	XINPUT_STATE state;
-	JoystickState result = { false };
+	GMJoystickState result = { false };
 
 	if (d->xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
 	{
@@ -105,23 +105,23 @@ void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
 	d->xinput.XInputSetState(0, &v);
 }
 
-KeyboardState Input_Windows::getKeyboardState()
+GMKeyboardState Input_Windows::getKeyboardState()
 {
-	KeyboardState state;
+	GMKeyboardState state;
 	GetKeyboardState(state.keystate);
 	return std::move(state);
 }
 
-MouseState Input_Windows::getMouseState()
+GMMouseState Input_Windows::getMouseState()
 {
 	D(d);
 	if (!d->mouseReady)
 	{
 		gm_error("Mouse is not ready. Please call initMouse() first.");
-		return MouseState();
+		return GMMouseState();
 	}
 
-	MouseState state;
+	GMMouseState state;
 	GMRect rect = d->window->getWindowRect();
 	const GMint centerX = rect.x + rect.width / 2;
 	const GMint centerY = rect.y + rect.height / 2;

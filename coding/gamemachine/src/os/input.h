@@ -6,7 +6,7 @@ BEGIN_NS
 #ifdef _WINDOWS
 #include <Xinput.h>
 
-struct JoystickState
+struct GMJoystickState
 {
 	bool valid;
 	WORD buttons;
@@ -18,7 +18,7 @@ struct JoystickState
 	SHORT thumbRY;
 };
 
-struct KeyboardState
+struct GMKeyboardState
 {
 	BYTE keystate[256];
 
@@ -28,7 +28,7 @@ struct KeyboardState
 	}
 };
 
-struct MouseState
+struct GMMouseState
 {
 	GMint deltaX;
 	GMint deltaY;
@@ -74,14 +74,14 @@ public:
 	void initMouse(IWindow* window);
 
 public:
-	JoystickState getJoystickState();
+	GMJoystickState getJoystickState();
 	void joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed);
 
-	KeyboardState getKeyboardState();
-	MouseState getMouseState();
+	GMKeyboardState getKeyboardState();
+	GMMouseState getMouseState();
 };
 
-typedef Input_Windows Input;
+typedef Input_Windows GMInput;
 #endif
 
 END_NS

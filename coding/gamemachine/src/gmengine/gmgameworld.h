@@ -1,0 +1,56 @@
+﻿#ifndef __GAMEWORLD_H__
+#define __GAMEWORLD_H__
+#include "common.h"
+#include "foundation/vector.h"
+#include "gmphysics/gmphysicsworld.h"
+#include "gmdatacore/shader.h"
+
+BEGIN_NS
+
+class GMCharacter;
+class ObjectPainter;
+
+GM_PRIVATE_OBJECT(GMGameWorld)
+{
+	GM_PRIVATE_CONSTRUCT(GMGameWorld)
+		: character(nullptr)
+	{
+	}
+	GamePackage* gamePackage;
+	std::set<GMGameObject*> shapes;
+	GMCharacter* character;
+	LightInfo ambientLight;
+	bool start;
+};
+
+class GMGameWorld : public GMObject
+{
+	DECLARE_PRIVATE(GMGameWorld)
+
+public:
+	GMGameWorld(GamePackage* pk);
+	virtual ~GMGameWorld();
+
+public:
+	virtual void renderGameWorld() = 0;
+	virtual GMPhysicsWorld* physicsWorld() = 0;
+
+public:
+	void initialize();
+	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
+	void simulateGameWorld();
+	GamePackage* getGamePackage();
+	void setDefaultAmbientLight(const LightInfo& lightInfo);
+	LightInfo& getDefaultAmbientLight();
+
+// characters:
+public:
+	virtual void setMajorCharacter(GMCharacter* character);
+	GMCharacter* getMajorCharacter();
+
+private:
+	ObjectPainter* createPainterForObject(GMGameObject* obj);
+};
+
+END_NS
+#endif

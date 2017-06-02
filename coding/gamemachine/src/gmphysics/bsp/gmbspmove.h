@@ -2,15 +2,15 @@
 #define __BSPMOVE_H__
 #include "common.h"
 #include "foundation/linearmath.h"
-#include "bsptrace.h"
-#include "gmphysics/physicsworld.h"
+#include "gmbsptrace.h"
+#include "gmphysics/gmphysicsworld.h"
 BEGIN_NS
 
-class BSPPhysicsWorld;
-struct CollisionObject;
-class BSPTrace;
+class GMBSPPhysicsWorld;
+struct GMCollisionObject;
+class GMBSPTrace;
 
-struct BSPMovement
+struct GMBSPMovement
 {
 	GMfloat startTime;
 	BSPTraceResult groundTrace;
@@ -21,30 +21,30 @@ struct BSPMovement
 	linear_math::Vector3 targetPosition;
 };
 
-struct BSPMoveCommand
+struct GMBSPMoveCommand
 {
-	Command command;
+	GMCommand command;
 	CommandParams params;
 };
 
-GM_PRIVATE_OBJECT(BSPMove)
+GM_PRIVATE_OBJECT(GMBSPMove)
 {
 	bool inited;
-	BSPPhysicsWorld* world;
-	CollisionObject* object;
-	BSPTrace* trace;
-	BSPMovement movement;
-	BSPMoveCommand moveCommand;
+	GMBSPPhysicsWorld* world;
+	GMCollisionObject* object;
+	GMBSPTrace* trace;
+	GMBSPMovement movement;
+	GMBSPMoveCommand moveCommand;
 };
 
-class BSPMove : public GMObject
+class GMBSPMove : public GMObject
 {
-	DECLARE_PRIVATE(BSPMove)
+	DECLARE_PRIVATE(GMBSPMove)
 
 public:
-	BSPMove(BSPPhysicsWorld* world, CollisionObject* obj);
+	GMBSPMove(GMBSPPhysicsWorld* world, GMCollisionObject* obj);
 	void move();
-	void sendCommand(Command cmd, const CommandParams& dataParam);
+	void sendCommand(GMCommand cmd, const CommandParams& dataParam);
 
 private:
 	GMfloat now();

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
-#include "modelreader.h"
-#include "modelreader_obj.h"
+#include "gmmodelreader.h"
+#include "gmmodelreader_obj.h"
 #include "gmdatacore/gamepackage.h"
 
 GM_ALIGNED_16(class) ModelReaderContainer : public GMObject
@@ -8,7 +8,7 @@ GM_ALIGNED_16(class) ModelReaderContainer : public GMObject
 public:
 	ModelReaderContainer()
 	{
-		m_readers[ModelType_Obj] = new ModelReader_Obj();
+		m_readers[GMModelReader::ModelType_Obj] = new GMModelReader_Obj();
 	}
 
 	~ModelReaderContainer()
@@ -19,23 +19,23 @@ public:
 		}
 	}
 
-	IModelReader* getReader(ModelType type)
+	IModelReader* getReader(GMModelReader::ModelType type)
 	{
 		ASSERT(m_readers.find(type) != m_readers.end());
 		return m_readers[type];
 	}
 
 private:
-	std::map<ModelType, IModelReader*> m_readers;
+	std::map<GMModelReader::ModelType, IModelReader*> m_readers;
 };
 
-IModelReader* ModelReader::getReader(ModelType type)
+IModelReader* GMModelReader::getReader(ModelType type)
 {
 	static ModelReaderContainer readers;
 	return readers.getReader(type);
 }
 
-ModelType ModelReader::test(const GamePackageBuffer& buffer)
+GMModelReader::ModelType GMModelReader::test(const GamePackageBuffer& buffer)
 {
 	for (ModelType i = ModelType_Begin; i < ModelType_End; i = (ModelType)((GMuint)i + 1))
 	{
@@ -46,12 +46,12 @@ ModelType ModelReader::test(const GamePackageBuffer& buffer)
 }
 
 
-bool ModelReader::load(const ModelLoadSettings& settings, OUT Object** image)
+bool GMModelReader::load(const GMModelLoadSettings& settings, OUT Object** object)
 {
-	return load(settings, ModelType_AUTO, image);
+	return load(settings, ModelType_AUTO, object);
 }
 
-bool ModelReader::load(const ModelLoadSettings& settings, ModelType type, OUT Object** object)
+bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT Object** object)
 {
 	GamePackageBuffer buffer;
 	settings.gamePackage.readFileFromPath(settings.path, &buffer);

@@ -3,14 +3,13 @@
 #include "common.h"
 #include "foundation/vector.h"
 #include "gmengine/controllers/graphic_engine.h"
-#include "gameworld.h"
 #include "gmdatacore/object.h"
 #include "foundation/utilities/utilities.h"
 
 BEGIN_NS
-GM_PRIVATE_OBJECT(GameObject)
+GM_PRIVATE_OBJECT(GMGameObject)
 {
-	GM_PRIVATE_CONSTRUCT(GameObject)
+	GM_PRIVATE_CONSTRUCT(GMGameObject)
 		: world(nullptr)
 		, id(0)
 	{
@@ -18,35 +17,35 @@ GM_PRIVATE_OBJECT(GameObject)
 
 	GMuint id;
 	AutoPtr<Object> object;
-	GameWorld* world;
+	GMGameWorld* world;
 };
 
-class GameObject : public GMObject
+class GMGameObject : public GMObject
 {
-	DECLARE_PRIVATE(GameObject)
+	DECLARE_PRIVATE(GMGameObject)
 
 public:
-	GameObject(AUTORELEASE Object* obj);
-	virtual ~GameObject() {};
+	GMGameObject(AUTORELEASE Object* obj);
+	virtual ~GMGameObject() {};
 
 public:
 	void setObject(AUTORELEASE Object* obj);
 	Object* getObject();
 
-	virtual void setWorld(GameWorld* world);
-	GameWorld* getWorld();
+	virtual void setWorld(GMGameWorld* world);
+	GMGameWorld* getWorld();
 
 public:
 	virtual void onAppendingObjectToWorld();
 	virtual void onBeforeDraw();
 };
 
-//GlyphObject
+//GMGlyphObject
 struct GlyphProperties
 {
 };
 
-GM_PRIVATE_OBJECT(GlyphObject)
+GM_PRIVATE_OBJECT(GMGlyphObject)
 {
 	std::wstring lastRenderText;
 	std::wstring text;
@@ -56,12 +55,12 @@ GM_PRIVATE_OBJECT(GlyphObject)
 };
 
 class Component;
-class GlyphObject : public GameObject
+class GMGlyphObject : public GMGameObject
 {
-	DECLARE_PRIVATE(GlyphObject)
+	DECLARE_PRIVATE(GMGlyphObject)
 
 public:
-	GlyphObject();
+	GMGlyphObject();
 
 public:
 	void setText(const GMWChar* text);
@@ -76,21 +75,21 @@ private:
 	void constructObject();
 };
 
-//EntityObject
+//GMEntityObject
 enum { EntityPlaneNum = 6 };
 
-GM_PRIVATE_OBJECT(EntityObject)
+GM_PRIVATE_OBJECT(GMEntityObject)
 {
 	linear_math::Vector3 mins, maxs;
 	Plane planes[EntityPlaneNum];
 };
 
-class EntityObject : public GameObject
+class GMEntityObject : public GMGameObject
 {
-	DECLARE_PRIVATE(EntityObject)
+	DECLARE_PRIVATE(GMEntityObject)
 
 public:
-	EntityObject(AUTORELEASE Object* obj);
+	GMEntityObject(AUTORELEASE Object* obj);
 
 public:
 	Plane* getPlanes();
@@ -109,7 +108,7 @@ GM_PRIVATE_OBJECT(SkyGameObject)
 	Shader shader;
 };
 
-class SkyGameObject : public GameObject
+class SkyGameObject : public GMGameObject
 {
 	DECLARE_PRIVATE(SkyGameObject)
 

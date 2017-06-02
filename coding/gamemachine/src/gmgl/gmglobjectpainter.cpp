@@ -3,7 +3,7 @@
 #include "shader_constants.h"
 #include "gmglfunc.h"
 #include "gmgltexture.h"
-#include "gmengine/elements/gameworld.h"
+#include "gmengine/gmgameworld.h"
 #include "gmglgraphic_engine.h"
 #include "renders/gmgl_render.h"
 

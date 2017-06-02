@@ -8,32 +8,32 @@
 #include <set>
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
-#include "gmphysics/bsp/bspphysicsworld.h"
+#include "gmphysics/bsp/gmbspphysicsworld.h"
 #include "gmdatacore/bsp/bsp_render.h"
 #include "gmdatacore/bsp_model_loader.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(BSPGameWorld)
+GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
-	GM_PRIVATE_CONSTRUCT(BSPGameWorld)
+	GM_PRIVATE_CONSTRUCT(GMBSPGameWorld)
 		: sky(nullptr)
 	{
 	}
 
-	AutoPtr<BSPPhysicsWorld> physics;
+	AutoPtr<GMBSPPhysicsWorld> physics;
 	BSP bsp;
-	GameObject* sky;
+	GMGameObject* sky;
 
 	BSPRender render;
-	BSPShaderLoader shaderLoader;
+	GMBSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;
 	std::map<GMint, std::set<BSPEntity*> > entities;
 };
 
-class BSPGameWorld;
+class GMBSPGameWorld;
 struct BSPGameWorldEntityReader
 {
-	static void import(const BSPEntity& entity, BSPGameWorld* world);
+	static void import(const BSPEntity& entity, GMBSPGameWorld* world);
 };
 
 END_NS

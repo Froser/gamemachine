@@ -1,31 +1,31 @@
 ﻿#ifndef __BSPGAMEWORLD_H__
 #define __BSPGAMEWORLD_H__
 #include "common.h"
-#include "gameworld.h"
-#include "bspgameworldprivate.h"
+#include "gmgameworld.h"
+#include "gmbspgameworldprivate.h"
 #include "gmengine/controllers/resource_container.h"
 #include "gmdatacore/bsp/bsp.h"
 BEGIN_NS
 
-class BSPGameWorld : public GameWorld
+class GMBSPGameWorld : public GMGameWorld
 {
-	DECLARE_PRIVATE(BSPGameWorld);
+	DECLARE_PRIVATE(GMBSPGameWorld);
 
 public:
-	BSPGameWorld(GamePackage* pk);
+	GMBSPGameWorld(GamePackage* pk);
 
 public:
 	void loadBSP(const char* mapName);
-	void setSky(AUTORELEASE GameObject* sky);
-	GameObject* getSky();
-	void appendObjectAndInit(AUTORELEASE GameObject* obj, bool alwaysVisible);
+	void setSky(AUTORELEASE GMGameObject* sky);
+	GMGameObject* getSky();
+	void appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
 	std::map<GMint, std::set<BSPEntity*> >& getEntities();
-	using GameWorld::appendObjectAndInit;
+	using GMGameWorld::appendObjectAndInit;
 
 public:
 	virtual void renderGameWorld() override;
-	virtual PhysicsWorld* physicsWorld() override;
-	virtual void setMajorCharacter(Character* character) override;
+	virtual GMPhysicsWorld* physicsWorld() override;
+	virtual void setMajorCharacter(GMCharacter* character) override;
 
 	//renders:
 private:
@@ -64,7 +64,7 @@ private:
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world
 public:
 	BSPData& bspData();
-	BSPRenderData& renderData();
+	GMBSPRenderData& renderData();
 };
 
 END_NS

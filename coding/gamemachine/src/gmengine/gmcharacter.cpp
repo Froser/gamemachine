@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
-#include "character.h"
-#include "gmengine/elements/gameworld.h"
+#include "gmcharacter.h"
+#include "gmengine/gmgameworld.h"
 
-Character::Character(GMfloat radius)
-	: GameObject(nullptr)
+GMCharacter::GMCharacter(GMfloat radius)
+	: GMGameObject(nullptr)
 {
 	D(d);
 	d->radius = radius;
@@ -17,62 +17,62 @@ Character::Character(GMfloat radius)
 	d->state.pitchLimitRad = HALF_PI - RAD(3);
 }
 
-void Character::onAppendingObjectToWorld()
+void GMCharacter::onAppendingObjectToWorld()
 {
 	sendMoveCommand();
 }
 
-void Character::moveForwardOrBackward(bool forward)
+void GMCharacter::moveForwardOrBackward(bool forward)
 {
 	D(d);
 	GMfloat moveRate = forward ? d->moveRate.getMoveRate(MD_FORWARD) : d->moveRate.getMoveRate(MD_BACKWARD);
-	d->moveCmdArgFB = CommandVector3(forward, moveRate, USELESS_PARAM);
+	d->moveCmdArgFB = GMCommandVector3(forward, moveRate, USELESS_PARAM);
 }
 
-void Character::moveLeftOrRight(bool left)
+void GMCharacter::moveLeftOrRight(bool left)
 {
 	D(d);
 	GMfloat moveRate = left ? d->moveRate.getMoveRate(MD_LEFT) : d->moveRate.getMoveRate(MD_RIGHT);
-	d->moveCmdArgLR = CommandVector3(left, moveRate, USELESS_PARAM);
+	d->moveCmdArgLR = GMCommandVector3(left, moveRate, USELESS_PARAM);
 }
 
-void Character::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
+void GMCharacter::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
 {
 	D(d);
-	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 		c->motions.jumpSpeed = jumpSpeed;
 }
 
-void Character::setMoveSpeed(GMfloat moveSpeed)
+void GMCharacter::setMoveSpeed(GMfloat moveSpeed)
 {
 	D(d);
-	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 		c->motions.moveSpeed = moveSpeed;
 }
 
-const PositionState& Character::getPositionState()
+const PositionState& GMCharacter::getPositionState()
 {
 	D(d);
 	return d->state;
 }
 
 // rate表示移动的速度，如果来自键盘，那么应该为1，如果来自手柄，应该是手柄的delta/delta最大值
-void Character::action(MoveAction md, MoveRate rate)
+void GMCharacter::action(MoveAction md, MoveRate rate)
 {
 	D(d);
 	d->moveDirection = md;
 	d->moveRate = rate;
 }
 
-void Character::lookRight(GMfloat degree)
+void GMCharacter::lookRight(GMfloat degree)
 {
 	D(d);
 	d->state.yaw += RAD(degree);
 }
 
-void Character::lookUp(GMfloat degree)
+void GMCharacter::lookUp(GMfloat degree)
 {
 	D(d);
 	d->state.pitch += RAD(degree);
@@ -82,13 +82,13 @@ void Character::lookUp(GMfloat degree)
 		d->state.pitch = -d->state.pitchLimitRad;
 }
 
-void Character::setPitchLimitDegree(GMfloat deg)
+void GMCharacter::setPitchLimitDegree(GMfloat deg)
 {
 	D(d);
 	d->state.pitchLimitRad = HALF_PI - RAD(deg);
 }
 
-void Character::simulation()
+void GMCharacter::simulation()
 {
 	D(d);
 	clearMoveArgs();
@@ -122,11 +122,11 @@ void Character::simulation()
 
 	if (d->moveDirection & MD_JUMP)
 	{
-		PhysicsWorld* world = getWorld()->physicsWorld();
-		CollisionObject* c = getWorld()->physicsWorld()->find(this);
+		GMPhysicsWorld* world = getWorld()->physicsWorld();
+		GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
 		if (c)
 		{
-			CommandParams cmdParams = PhysicsWorld::makeCommand(CMD_JUMP, nullptr, 0);
+			CommandParams cmdParams = GMPhysicsWorld::makeCommand(CMD_JUMP, nullptr, 0);
 			world->sendCommand(c, cmdParams);
 		}
 		else
@@ -138,47 +138,47 @@ void Character::simulation()
 	d->moveDirection = MD_NONE;
 }
 
-void Character::updateCamera()
+void GMCharacter::updateCamera()
 {
 	D(d);
 	update();
 	Camera::calcCameraLookAt(d->state, d->lookAt);
 }
 
-void Character::update()
+void GMCharacter::update()
 {
 	D(d);
-	CollisionObject* c = getWorld()->physicsWorld()->find(this);
+	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
 	if (c)
 		d->state.position = c->motions.translation;
 	else
 		gm_error("cannot found character in physics world");
 }
 
-void Character::sendMoveCommand()
+void GMCharacter::sendMoveCommand()
 {
 	D(d);
-	PhysicsWorld* pw = getWorld()->physicsWorld();
-	CommandVector3 args[] = {
-		CommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM), d->moveCmdArgFB, d->moveCmdArgLR,
+	GMPhysicsWorld* pw = getWorld()->physicsWorld();
+	GMCommandVector3 args[] = {
+		GMCommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM), d->moveCmdArgFB, d->moveCmdArgLR,
 	};
-	pw->sendCommand(pw->find(this), PhysicsWorld::makeCommand(CMD_MOVE, args, 3));
+	pw->sendCommand(pw->find(this), GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3));
 }
 
-void Character::clearMoveArgs()
+void GMCharacter::clearMoveArgs()
 {
 	D(d);
-	d->moveCmdArgFB = CommandVector3(0, 0, 0);
-	d->moveCmdArgLR = CommandVector3(0, 0, 0);
+	d->moveCmdArgFB = GMCommandVector3(0, 0, 0);
+	d->moveCmdArgLR = GMCommandVector3(0, 0, 0);
 }
 
-CameraLookAt& Character::getLookAt()
+CameraLookAt& GMCharacter::getLookAt()
 {
 	D(d);
 	return d->lookAt;
 }
 
-Frustum& Character::getFrustum()
+Frustum& GMCharacter::getFrustum()
 {
 	D(d);
 	return d->frustum;

@@ -5,7 +5,7 @@
 #include <string>
 #include "foundation/utilities/utilities.h"
 #include <fstream>
-#include "gmengine/elements/bspgameworld.h"
+#include "gmengine/gmbspgameworld.h"
 #include "renders/gmgl_renders_object.h"
 #include "renders/gmgl_renders_sky.h"
 #include "renders/gmgl_renders_glyph.h"

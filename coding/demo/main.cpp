@@ -3,14 +3,14 @@
 #define UNICODE
 #include <windows.h>
 #include "foundation/gamemachine.h"
-#include "gmengine/elements/gameworld.h"
-#include "gmengine/elements/character.h"
+#include "gmengine/gmgameworld.h"
+#include "gmengine/gmcharacter.h"
 #include "gmgl/gmglfactory.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "foundation/utilities/utilities.h"
-#include "gmengine/elements/bspgameworld.h"
+#include "gmengine/gmbspgameworld.h"
 #include "foundation/debug.h"
 #include "os/input.h"
 #include "gmdatacore/gamepackage.h"
@@ -21,10 +21,10 @@
 
 using namespace gm;
 
-BSPGameWorld* world;
-Character* character;
+GMBSPGameWorld* world;
+GMCharacter* character;
 GMGLFactory factory;
-GlyphObject* glyph;
+GMGlyphObject* glyph;
 ISoundFile* sf;
 
 // 这是一个导出所有资源的钩子，用gm_install_hook(GamePackage, readFileFromPath, resOutputHook)绑定此钩子
@@ -71,7 +71,7 @@ public:
 #endif
 		pk.createBSPGameWorld("gv.bsp", &world);
 
-		glyph = new GlyphObject();
+		glyph = new GMGlyphObject();
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
 
@@ -128,10 +128,10 @@ public:
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
-			Character* character = world->getMajorCharacter();
-			KeyboardState kbState = m_input.getKeyboardState();
-			JoystickState joyState = m_input.getJoystickState();
-			MouseState mouseState = m_input.getMouseState();
+			GMCharacter* character = world->getMajorCharacter();
+			GMKeyboardState kbState = m_input.getKeyboardState();
+			GMJoystickState joyState = m_input.getJoystickState();
+			GMMouseState mouseState = m_input.getMouseState();
 
 			if (kbState['Q'] || kbState[VK_ESCAPE])
 				GameMachine::instance().postMessage(GM_MESSAGE_EXIT);
@@ -222,7 +222,7 @@ public:
 		return GetActiveWindow() == window->hwnd();
 	}
 	
-	Input m_input;
+	GMInput m_input;
 };
 
 GraphicSettings settings = { 60, { 700, 400 } ,{ 100, 100 }, {400, 400}, false };

@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
-#include "bspgameworld.h"
-#include "character.h"
+#include "gmbspgameworld.h"
+#include "gmcharacter.h"
 #include "foundation/utilities/utilities.h"
 
-#define PARSE_FUNC(name, entity, world) void import_##name(const BSPEntity& entity, BSPGameWorld* world)
+#define PARSE_FUNC(name, entity, world) void import_##name(const BSPEntity& entity, GMBSPGameWorld* world)
 #define BEGIN_PARSE_CLASS(value) if (strEqual(classname, #value)) import_##value(entity, world)
 #define PARSE_CLASS(value) else if (strEqual(classname, #value)) import_##value(entity, world)
 #define END_PARSE_CLASS
@@ -81,17 +81,17 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 
 	linear_math::Vector3 playerStart (origin[0], origin[2], -origin[1]);
 
-	Character* character = new Character(6); 
+	GMCharacter* character = new GMCharacter(6); 
 	world->appendObjectAndInit(character);
 	world->setMajorCharacter(character);
 	character->setMoveSpeed(192);
 	character->setJumpSpeed(linear_math::Vector3(0, 150, 0));
 
-	MotionProperties& prop = world->physicsWorld()->find(character)->motions;
+	GMMotionProperties& prop = world->physicsWorld()->find(character)->motions;
 	prop.translation = playerStart;
 }
 
-void BSPGameWorldEntityReader::import(const BSPEntity& entity, BSPGameWorld* world)
+void BSPGameWorldEntityReader::import(const BSPEntity& entity, GMBSPGameWorld* world)
 {
 	const char* classname = getClassname(entity);
 

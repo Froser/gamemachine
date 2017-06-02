@@ -4,10 +4,10 @@ BEGIN_NS
 
 // 前置声明
 class GameMachine;
-class GameWorld;
+class GMGameWorld;
 class Camera;
 class ResourceContainer;
-class GameObject;
+class GMGameObject;
 class DrawingList;
 class GamePackage;
 class Image;
@@ -58,9 +58,9 @@ struct ITexture
 struct IGraphicEngine
 {
 	virtual ~IGraphicEngine() {}
-	virtual void setCurrentWorld(GameWorld*) = 0;
+	virtual void setCurrentWorld(GMGameWorld*) = 0;
 	virtual void newFrame() = 0;
-	virtual void drawObject(GameObject* obj) = 0;
+	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
 	virtual GraphicSettings* getGraphicSettings() = 0;

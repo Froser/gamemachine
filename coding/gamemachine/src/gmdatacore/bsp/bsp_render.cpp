@@ -2,7 +2,7 @@
 #include "bsp_render.h"
 #include "gmdatacore/object.h"
 
-BSPRenderData& BSPRender::renderData()
+GMBSPRenderData& BSPRender::renderData()
 {
 	D(d);
 	return *d;

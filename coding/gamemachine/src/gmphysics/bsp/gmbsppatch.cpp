@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
-#include "bsppatch.h"
-#include "bspphysicsstructs.h"
+#include "gmbsppatch.h"
+#include "gmbspphysicsstructs.h"
 #include "foundation/vector.h"
 
 #define SUBDIVIDE_DISTANCE 16	//4	// never more than this units away from curve
@@ -34,8 +34,8 @@ enum
 
 GM_ALIGNED_STRUCT(PatchCollideContext)
 {
-	AlignedVector<BSPPatchPlane> planes;
-	AlignedVector<BSPFacet> facets;
+	AlignedVector<GMBSPPatchPlane> planes;
+	AlignedVector<GMBSPFacet> facets;
 };
 
 GM_ALIGNED_STRUCT(BSPGrid)
@@ -346,7 +346,7 @@ static int signbitsForNormal(const linear_math::Vector4& normal)
 	return bits;
 }
 
-static GMint planeEqual(BSPPatchPlane* p, const linear_math::Vector4& plane, GMint *flipped)
+static GMint planeEqual(GMBSPPatchPlane* p, const linear_math::Vector4& plane, GMint *flipped)
 {
 	linear_math::Vector4 invplane;
 
@@ -406,8 +406,8 @@ static int findPlane(PatchCollideContext& context, const linear_math::Vector3& p
 		return i;
 	}
 
-	context.planes.push_back(BSPPatchPlane());
-	BSPPatchPlane& p = context.planes.back();
+	context.planes.push_back(GMBSPPatchPlane());
+	GMBSPPatchPlane& p = context.planes.back();
 	p.plane = plane;
 	p.signbits = signbitsForNormal(plane);
 	return context.planes.size() - 1;
@@ -422,8 +422,8 @@ static GMint findPlane(PatchCollideContext& context, const linear_math::Vector4&
 			return i;
 	}
 
-	context.planes.push_back(BSPPatchPlane());
-	BSPPatchPlane& p = context.planes.back();
+	context.planes.push_back(GMBSPPatchPlane());
+	GMBSPPatchPlane& p = context.planes.back();
 	p.plane = plane;
 	p.signbits = signbitsForNormal(plane);
 
@@ -533,7 +533,7 @@ static int pointOnPlaneSide(PatchCollideContext& context, const linear_math::Vec
 }
 
 
-static void setBorderInward(PatchCollideContext& context, BSPFacet* facet, BSPGrid* grid, int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint which)
+static void setBorderInward(PatchCollideContext& context, GMBSPFacet* facet, BSPGrid* grid, int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint which)
 {
 	static bool debugBlock = false;
 	GMint k, l;
@@ -787,7 +787,7 @@ void snapVector(linear_math::Vector3& normal) {
 	}
 }
 
-static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
+static void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 {
 	GMint axis, dir, flipped;
 	linear_math::Vector4 plane;
@@ -948,7 +948,7 @@ static void addFacetBevels(PatchCollideContext& context, BSPFacet *facet)
 	}
 }
 
-static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
+static bool validateFacet(PatchCollideContext& context, GMBSPFacet* facet)
 {
 	linear_math::Vector4 plane;
 	linear_math::Vector3 bounds[2];
@@ -997,7 +997,7 @@ static bool validateFacet(PatchCollideContext& context, BSPFacet* facet)
 	return true;		// winding is fine
 }
 
-static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
+static void patchCollideFromGrid(BSPGrid *grid, GMBSPPatchCollide *pf)
 {
 	GMint i, j;
 	linear_math::Vector3 p1, p2, p3;
@@ -1075,7 +1075,7 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 				borders[EN_RIGHT] = edgePlaneNum(context, grid, gridPlanes, i, j, 1);
 			}
 
-			BSPFacet facet;
+			GMBSPFacet facet;
 			memset(&facet, 0, sizeof(facet));
 
 			if (gridPlanes[i][j][0] == gridPlanes[i][j][1]) {
@@ -1150,7 +1150,7 @@ static void patchCollideFromGrid(BSPGrid *grid, BSPPatchCollide *pf)
 	pf->planes = context.planes;
 }
 
-GM_PRIVATE_NAME(BSPPatch)::~GM_PRIVATE_CONSTRUCT(BSPPatch)
+GM_PRIVATE_NAME(GMBSPPatch)::~GM_PRIVATE_CONSTRUCT(GMBSPPatch)
 {
 	for (auto iter = patches.begin(); iter != patches.end(); iter++)
 	{
@@ -1158,19 +1158,19 @@ GM_PRIVATE_NAME(BSPPatch)::~GM_PRIVATE_CONSTRUCT(BSPPatch)
 	}
 }
 
-void BSPPatch::alloc(GMint num)
+void GMBSPPatch::alloc(GMint num)
 {
 	D(d);
 	d->patches.resize(num);
 }
 
-BSP_Physics_Patch* BSPPatch::patches(GMint at)
+GMBSP_Physics_Patch* GMBSPPatch::patches(GMint at)
 {
 	D(d);
 	return d->patches[at];
 }
 
-void BSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, const linear_math::Vector3* points, AUTORELEASE BSP_Physics_Patch* patch)
+void GMBSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, const linear_math::Vector3* points, AUTORELEASE GMBSP_Physics_Patch* patch)
 {
 	D(d);
 
@@ -1217,7 +1217,7 @@ void BSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, cons
 	// we now have a grid of points exactly on the curve
 	// the aproximate surface defined by these points will be
 	// collided against
-	BSPPatchCollide* pf = new BSPPatchCollide();
+	GMBSPPatchCollide* pf = new GMBSPPatchCollide();
 	clearBounds(pf->bounds[0], pf->bounds[1]);
 	for (i = 0; i < grid.width; i++)
 	{

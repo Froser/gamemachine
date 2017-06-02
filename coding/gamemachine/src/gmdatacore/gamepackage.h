@@ -60,7 +60,7 @@ struct GamePackageBuffer
 	bool needRelease; // 表示是否需要手动释放
 };
 
-class BSPGameWorld;
+class GMBSPGameWorld;
 struct IGamePackageHandler
 {
 	virtual ~IGamePackageHandler() {}
@@ -78,7 +78,7 @@ GM_PRIVATE_OBJECT(GamePackage)
 	IFactory* factory;
 };
 
-class BSPGameWorld;
+class GMBSPGameWorld;
 class GamePackage
 {
 	DECLARE_PRIVATE(GamePackage)
@@ -89,7 +89,7 @@ public:
 public:
 	Data* gamePackageData();
 	void loadPackage(const char* path);
-	void createBSPGameWorld(const char* map, OUT BSPGameWorld** gameWorld);
+	void createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld);
 	bool readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename = nullptr);
 	AlignedVector<std::string> getAllFiles(const char* directory);
 

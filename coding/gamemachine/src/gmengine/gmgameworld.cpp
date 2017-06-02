@@ -1,21 +1,21 @@
 ﻿#include "stdafx.h"
-#include "gameworld.h"
-#include "gameobject.h"
+#include "gmgameworld.h"
+#include "gmgameobject.h"
 #include "gmdatacore/object.h"
-#include "character.h"
+#include "gmcharacter.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"
 
-GameWorld::GameWorld(GamePackage* pk)
+GMGameWorld::GMGameWorld(GamePackage* pk)
 {
 	D(d);
 	d->gamePackage = pk;
 	d->start = false;
 }
 
-GameWorld::~GameWorld()
+GMGameWorld::~GMGameWorld()
 {
 	D(d);
 	for (auto iter = d->shapes.begin(); iter != d->shapes.end(); iter++)
@@ -24,12 +24,12 @@ GameWorld::~GameWorld()
 	}
 }
 
-void GameWorld::initialize()
+void GMGameWorld::initialize()
 {
 	GameMachine::instance().getGraphicEngine()->setCurrentWorld(this);
 }
 
-void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
+void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
 	obj->setWorld(this);
@@ -38,19 +38,19 @@ void GameWorld::appendObjectAndInit(AUTORELEASE GameObject* obj)
 	GameMachine::instance().initObjectPainter(obj);
 }
 
-void GameWorld::setMajorCharacter(Character* character)
+void GMGameWorld::setMajorCharacter(GMCharacter* character)
 {
 	D(d);
 	d->character = character;
 }
 
-Character* GameWorld::getMajorCharacter()
+GMCharacter* GMGameWorld::getMajorCharacter()
 {
 	D(d);
 	return d->character;
 }
 
-void GameWorld::simulateGameWorld()
+void GMGameWorld::simulateGameWorld()
 {
 	D(d);
 	physicsWorld()->simulate();
@@ -59,13 +59,13 @@ void GameWorld::simulateGameWorld()
 		d->start = true;
 }
 
-GamePackage* GameWorld::getGamePackage()
+GamePackage* GMGameWorld::getGamePackage()
 {
 	D(d);
 	return d->gamePackage;
 }
 
-ObjectPainter* GameWorld::createPainterForObject(GameObject* obj)
+ObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 {
 	D(d);
 	GameMachine& gm = GameMachine::instance();
@@ -78,13 +78,13 @@ ObjectPainter* GameWorld::createPainterForObject(GameObject* obj)
 	return painter;
 }
 
-void GameWorld::setDefaultAmbientLight(const LightInfo& lightInfo)
+void GMGameWorld::setDefaultAmbientLight(const LightInfo& lightInfo)
 {
 	D(d);
 	d->ambientLight = lightInfo;
 }
 
-LightInfo& GameWorld::getDefaultAmbientLight()
+LightInfo& GMGameWorld::getDefaultAmbientLight()
 {
 	D(d);
 	return d->ambientLight;

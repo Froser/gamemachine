@@ -1,15 +1,15 @@
 ﻿#include "stdafx.h"
-#include "bsptrace.h"
+#include "gmbsptrace.h"
 #include "foundation/linearmath.h"
-#include "bspphysicsworld.h"
-#include "gmengine/elements/gameobject.h"
+#include "gmbspphysicsworld.h"
+#include "gmengine/gmgameobject.h"
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues
 #define	SURFACE_CLIP_EPSILON	(0.125)
 
 BEGIN_NS
-GM_ALIGNED_STRUCT(BSPTraceWork)
+GM_ALIGNED_STRUCT(GMBSPTraceWork)
 {
 	linear_math::Vector3 start;
 	linear_math::Vector3 end;
@@ -26,7 +26,7 @@ GM_ALIGNED_STRUCT(BSPTraceWork)
 };
 END_NS
 
-void BSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, EntityObject*>* entityObjects, BSPPhysicsWorld* world)
+void GMBSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
 {
 	D(d);
 	d->bsp = bsp;
@@ -43,13 +43,13 @@ min: 物体包围盒最小向量
 max: 物体包围盒最大向量
 trace: 返回的碰撞跟踪结果
 */
-void BSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vector3& end, const linear_math::Vector3& origin, const linear_math::Vector3& min, const linear_math::Vector3& max, REF BSPTraceResult& trace)
+void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vector3& end, const linear_math::Vector3& origin, const linear_math::Vector3& min, const linear_math::Vector3& max, REF BSPTraceResult& trace)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
 	d->checkcount++;
 
-	BSPTraceWork tw;
+	GMBSPTraceWork tw;
 	memset(&tw, 0, sizeof(tw));
 	tw.trace.fraction = 1;
 	tw.modelOrigin = origin;
@@ -184,11 +184,11 @@ void BSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vecto
 	trace = tw.trace;
 }
 
-void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const linear_math::Vector3& p1, const linear_math::Vector3& p2)
+void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const linear_math::Vector3& p1, const linear_math::Vector3& p2)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
-	BSPPhysicsWorld::Data& pw = d->world->physicsData();
+	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 	BSPNode* node;
 	BSPTracePlane* plane;
 
@@ -299,17 +299,17 @@ void BSPTrace::traceThroughTree(BSPTraceWork& tw, GMint num, GMfloat p1f, GMfloa
 	traceThroughTree(tw, node->children[side ^ 1], midf, p2f, mid, p2);
 }
 
-void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
+void GMBSPTrace::traceThroughLeaf(GMBSPTraceWork& tw, BSPLeaf* leaf)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
-	BSPPhysicsWorld::Data& pw = d->world->physicsData();
+	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 	// trace line against all brushes in the leaf
 	for (GMint k = 0; k < leaf->numLeafBrushes; k++)
 	{
 		GMint brushnum = bsp.leafbrushes[leaf->firstLeafBrush + k];
 
-		BSP_Physics_Brush* b = &pw.brushes[brushnum];
+		GMBSP_Physics_Brush* b = &pw.brushes[brushnum];
 
 		if (b->checkcount == d->checkcount) {
 			continue;	// already checked this brush in another leaf
@@ -328,7 +328,7 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 
 	for (GMint k = 0; k < leaf->numLeafSurfaces; k++)
 	{
-		BSP_Physics_Patch* patch = pw.patch.patches(bsp.leafsurfaces[leaf->firstLeafSurface + k]);
+		GMBSP_Physics_Patch* patch = pw.patch.patches(bsp.leafsurfaces[leaf->firstLeafSurface + k]);
 		if (!patch) {
 			continue;
 		}
@@ -347,7 +347,7 @@ void BSPTrace::traceThroughLeaf(BSPTraceWork& tw, BSPLeaf* leaf)
 	}
 }
 
-void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
+void GMBSPTrace::traceThroughPatch(GMBSPTraceWork& tw, GMBSP_Physics_Patch* patch)
 {
 	GMfloat oldFrac;
 
@@ -362,11 +362,11 @@ void BSPTrace::traceThroughPatch(BSPTraceWork& tw, BSP_Physics_Patch* patch)
 	}
 }
 
-void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
+void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide* pc)
 {
 	GMint j, hit, hitnum;
 	GMfloat offset, enterFrac, leaveFrac, t;
-	BSPPatchPlane* planes;
+	GMBSPPatchPlane* planes;
 	linear_math::Vector4 plane, bestplane;
 	linear_math::Vector3 startp, endp;
 
@@ -383,7 +383,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 
 	for (auto iter = pc->facets.begin(); iter != pc->facets.end(); iter++)
 	{
-		const BSPFacet* facet = &*iter;
+		const GMBSPFacet* facet = &*iter;
 
 		enterFrac = -1.0;
 		leaveFrac = 1.0;
@@ -485,7 +485,7 @@ void BSPTrace::traceThroughPatchCollide(BSPTraceWork& tw, BSPPatchCollide* pc)
 	}
 }
 
-void BSPTrace::traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& entity)
+void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<BSPEntity*>& entity)
 {
 	D(d);
 	tw.trace.entityNum = 0;
@@ -494,7 +494,7 @@ void BSPTrace::traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& en
 		auto objIter = (d->entityObjects->find(*iter));
 		if (objIter != d->entityObjects->end())
 		{
-			EntityObject* obj = objIter->second;
+			GMEntityObject* obj = objIter->second;
 			if (!obj)
 				continue;
 
@@ -510,7 +510,7 @@ void BSPTrace::traceEntityThroughLeaf(BSPTraceWork& tw, std::set<BSPEntity*>& en
 	}
 }
 
-void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCollide *pc)
+void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPatchCollide *pc)
 {
 	GMfloat intersect;
 	GMint j, k;
@@ -523,11 +523,11 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 	intersection.resize(pc->planes.size());
 
 	// determine the trace's relationship to all planes
-	const AlignedVector<BSPPatchPlane>& planes = pc->planes;
+	const AlignedVector<GMBSPPatchPlane>& planes = pc->planes;
 	GMint i = 0;
 	for (auto iter = planes.begin(); iter != planes.end(); iter++, i++)
 	{
-		const BSPPatchPlane& plane = *iter;
+		const GMBSPPatchPlane& plane = *iter;
 		offset = linear_math::dot(tw.offsets[plane.signbits], VEC3(plane.plane));
 		d1 = linear_math::dot(tw.start, VEC3(plane.plane)) - plane.plane[3] + offset;
 		d2 = linear_math::dot(tw.end, VEC3(plane.plane)) - plane.plane[3] + offset;
@@ -551,11 +551,11 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 
 
 	// see if any of the surface planes are intersected
-	const AlignedVector<BSPFacet>& facet = pc->facets;
+	const AlignedVector<GMBSPFacet>& facet = pc->facets;
 	i = 0;
 	for (auto iter = facet.begin(); iter != facet.end(); iter++, i++)
 	{
-		const BSPFacet& facet = *iter;
+		const GMBSPFacet& facet = *iter;
 		if (!frontFacing[facet.surfacePlane]) {
 			continue;
 		}
@@ -581,7 +581,7 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 		}
 		if (j == facet.numBorders)
 		{
-			const BSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
+			const GMBSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
 
 			// calculate intersection with a slight pushoff
 			offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(planes->plane));
@@ -600,7 +600,7 @@ void BSPTrace::tracePointThroughPatchCollide(BSPTraceWork& tw, const BSPPatchCol
 	}
 }
 
-GMint BSPTrace::checkFacetPlane(const linear_math::Vector4& plane, const linear_math::Vector3& start, const linear_math::Vector3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
+GMint GMBSPTrace::checkFacetPlane(const linear_math::Vector4& plane, const linear_math::Vector3& start, const linear_math::Vector3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
 {
 	float d1, d2, f;
 
@@ -643,18 +643,18 @@ GMint BSPTrace::checkFacetPlane(const linear_math::Vector4& plane, const linear_
 	return true;
 }
 
-void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
+void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brush)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
-	BSPPhysicsWorld::Data& pw = d->world->physicsData();
+	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
 
 	if (!brush->brush->numSides) {
 		return;
 	}
 
 	bool getout = false, startout = false;
-	BSP_Physics_BrushSide* side = nullptr, *leadside = nullptr;
+	GMBSP_Physics_BrushSide* side = nullptr, *leadside = nullptr;
 	BSPTracePlane* plane = nullptr, *clipplane = nullptr;
 	GMfloat f = 0;
 	GMfloat enterFrac = -1.0;
@@ -812,7 +812,7 @@ void BSPTrace::traceThroughBrush(BSPTraceWork& tw, BSP_Physics_Brush *brush)
 	}
 }
 
-bool BSPTrace::boundsIntersect(const linear_math::Vector3& mins, const linear_math::Vector3& maxs, const linear_math::Vector3& mins2, const linear_math::Vector3& maxs2)
+bool GMBSPTrace::boundsIntersect(const linear_math::Vector3& mins, const linear_math::Vector3& maxs, const linear_math::Vector3& mins2, const linear_math::Vector3& maxs2)
 {
 	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||

@@ -4,7 +4,7 @@
 #include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgltexture.h"
-#include "gmengine/elements/gameworld.h"
+#include "gmengine/gmgameworld.h"
 #include "foundation/linearmath.h"
 #include "foundation/gamemachine.h"
 

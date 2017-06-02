@@ -126,7 +126,7 @@ struct BSP_Render_VisibilityData
 	GMbyte * bitset;
 };
 
-class EntityObject;
+class GMEntityObject;
 GM_PRIVATE_OBJECT(BSPRender)
 {
 	GM_PRIVATE_CONSTRUCT(BSPRender)
@@ -146,10 +146,10 @@ GM_PRIVATE_OBJECT(BSPRender)
 	AlignedVector<BSP_Render_Patch> patches;
 	AlignedVector<BSP_Render_Leaf> leafs;
 
-	std::map<BSP_Render_BiquadraticPatch*, GameObject*> biquadraticPatchObjects;
-	std::map<BSP_Render_Face*, GameObject*> polygonFaceObjects;
-	std::map<BSP_Render_Face*, GameObject*> meshFaceObjects;
-	std::map<BSPEntity*, EntityObject*> entitiyObjects;
+	std::map<BSP_Render_BiquadraticPatch*, GMGameObject*> biquadraticPatchObjects;
+	std::map<BSP_Render_Face*, GMGameObject*> polygonFaceObjects;
+	std::map<BSP_Render_Face*, GMGameObject*> meshFaceObjects;
+	std::map<BSPEntity*, GMEntityObject*> entitiyObjects;
 
 	BSPData* bsp;
 	Bitset facesToDraw;
@@ -157,7 +157,7 @@ GM_PRIVATE_OBJECT(BSPRender)
 	GMint numPolygonFaces;
 	GMint numPatches;
 	GMint numMeshFaces;
-	AlignedVector<GameObject*> alwaysVisibleObjects;
+	AlignedVector<GMGameObject*> alwaysVisibleObjects;
 	BSP_Render_VisibilityData visibilityData;
 
 	// 用于绘制天空
@@ -165,7 +165,7 @@ GM_PRIVATE_OBJECT(BSPRender)
 	linear_math::Vector3 boundMax;
 };
 
-typedef BSPRenderPrivate BSPRenderData;
+typedef BSPRenderPrivate GMBSPRenderData;
 class Object;
 struct Shader;
 class BSPRender
@@ -173,7 +173,7 @@ class BSPRender
 	DECLARE_PRIVATE(BSPRender);
 
 public:
-	BSPRenderData& renderData();
+	GMBSPRenderData& renderData();
 	void generateRenderData(BSPData* bsp);
 	void createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj);
 	void createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);

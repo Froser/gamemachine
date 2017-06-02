@@ -9,7 +9,7 @@
 BEGIN_NS
 
 class Camera;
-class GameWorld;
+class GMGameWorld;
 class GameLight;
 struct IRender;
 
@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	std::map<Mesh::MeshesType, GMGLShaders*> allShaders;
 	std::map<Mesh::MeshesType, IRender*> allRenders;
-	GameWorld* world;
+	GMGameWorld* world;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings;
 	linear_math::Matrix4x4 viewMatrix;
@@ -33,16 +33,16 @@ public:
 	virtual ~GMGLGraphicEngine();
 
 public:
-	virtual void setCurrentWorld(GameWorld*) override;
+	virtual void setCurrentWorld(GMGameWorld*) override;
 	virtual void newFrame() override;
-	virtual void drawObject(GameObject* obj) override;
+	virtual void drawObject(GMGameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
 	virtual GraphicSettings* getGraphicSettings() override;
 	virtual void setGraphicSettings(GraphicSettings* settings) override;
 
 public:
-	GameWorld* getWorld();
+	GMGameWorld* getWorld();
 
 	void registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaders* shaders);
 	GMGLShaders* getShaders(Mesh::MeshesType objectType);
@@ -53,7 +53,7 @@ public:
 private:
 	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
-	void drawObjectOnce(GameObject* object);
+	void drawObjectOnce(GMGameObject* object);
 };
 
 END_NS
