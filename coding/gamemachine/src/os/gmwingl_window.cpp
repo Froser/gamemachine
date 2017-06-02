@@ -5,7 +5,7 @@
 
 const char* CLASSNAME = "GameMachine Window";
 
-WinGLWindow::WinGLWindow()
+GMWinGLWindow::GMWinGLWindow()
 {
 	D(d);
 	strcpy_s(d->windowTitle, "GM");
@@ -20,12 +20,12 @@ WinGLWindow::WinGLWindow()
 	d->top = (screenHeight - d->height) * .5f;
 }
 
-WinGLWindow::~WinGLWindow()
+GMWinGLWindow::~GMWinGLWindow()
 {
 	dispose();
 }
 
-bool WinGLWindow::createWindow()
+bool GMWinGLWindow::createWindow()
 {
 	D(d);
 
@@ -155,7 +155,7 @@ bool WinGLWindow::createWindow()
 	return true;
 }
 
-LRESULT CALLBACK WinGLWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK GMWinGLWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMsg)
 	{
@@ -168,7 +168,7 @@ LRESULT CALLBACK WinGLWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARA
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
 
-GMRect WinGLWindow::getWindowRect()
+GMRect GMWinGLWindow::getWindowRect()
 {
 	D(d);
 	RECT rect;
@@ -177,7 +177,7 @@ GMRect WinGLWindow::getWindowRect()
 	return r;
 }
 
-bool WinGLWindow::handleMessages()
+bool GMWinGLWindow::handleMessages()
 {
 	D(d);
 	while (PeekMessage(&d->msg, NULL, 0, 0, PM_REMOVE))
@@ -191,19 +191,19 @@ bool WinGLWindow::handleMessages()
 	return true;
 }
 
-void WinGLWindow::swapBuffers()
+void GMWinGLWindow::swapBuffers()
 {
 	D(d);
 	::SwapBuffers(d->hDC);
 }
 
-HWND WinGLWindow::hwnd()
+HWND GMWinGLWindow::hwnd()
 {
 	D(d);
 	return d->hWnd;
 }
 
-void WinGLWindow::dispose()
+void GMWinGLWindow::dispose()
 {
 	D(d);
 	if (d->hRC)

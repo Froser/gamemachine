@@ -25,6 +25,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<GMGlyphManager> glyphManager;
 	AutoPtr<GMGamePackage> gamePackageManager;
 	AutoPtr<GMInput> inputManager;
+	AutoPtr<GMConfig> configManager;
 	std::queue<GameMachineMessage> messageQueue;
 };
 

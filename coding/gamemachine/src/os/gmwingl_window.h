@@ -5,7 +5,7 @@ BEGIN_NS
 
 #ifdef _WINDOWS
 
-GM_PRIVATE_OBJECT(WinGLWindow)
+GM_PRIVATE_OBJECT(GMWinGLWindow)
 {
 	char windowTitle[128];
 	LONG left, top, width, height;
@@ -19,13 +19,13 @@ GM_PRIVATE_OBJECT(WinGLWindow)
 };
 
 // Windows下的Window类
-class WinGLWindow : public GMObject, public IWindow
+class GMWinGLWindow : public GMObject, public IWindow
 {
-	DECLARE_PRIVATE(WinGLWindow)
+	DECLARE_PRIVATE(GMWinGLWindow)
 
 public:
-	WinGLWindow();
-	~WinGLWindow();
+	GMWinGLWindow();
+	~GMWinGLWindow();
 
 public:
 	virtual bool createWindow() override;

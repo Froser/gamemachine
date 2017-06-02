@@ -2,6 +2,7 @@
 #include "gamemachine.h"
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmengine/gmgameobject.h"
+#include "gmconfig.h"
 
 #ifdef _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
@@ -29,6 +30,8 @@ void GameMachine::init(
 
 	d->gamePackageManager.reset(new GMGamePackage(factory));
 	d->inputManager.reset(new GMInput());
+
+	d->configManager.reset(new GMConfig());
 
 	initDebugger();
 }

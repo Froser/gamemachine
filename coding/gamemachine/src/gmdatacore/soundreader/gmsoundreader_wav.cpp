@@ -6,7 +6,7 @@
 
 #ifdef _WINDOWS
 #include <dsound.h>
-#include "os/directsound_sounddevice.h"
+#include "os/gmdirectsound_sounddevice.h"
 #endif
 
 struct GM_WAVERIFF

@@ -139,6 +139,7 @@ set(SOURCES
 		foundation/gamemachine.h
 		foundation/gamemachine.cpp
 		foundation/interfaces.h
+		foundation/gmconfig.h
 	)
 
 source_group_by_dir(SOURCES)

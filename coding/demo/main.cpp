@@ -220,7 +220,7 @@ public:
 
 	bool isWindowActivate()
 	{
-		WinGLWindow* window = static_cast<WinGLWindow*> (GameMachine::instance().getWindow());
+		GMWinGLWindow* window = static_cast<GMWinGLWindow*> (GameMachine::instance().getWindow());
 		return GetActiveWindow() == window->hwnd();
 	}
 };

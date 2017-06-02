@@ -10,5 +10,6 @@
 #include "foundation/debug.h"
 #include "foundation/gmobject.h"
 #include "foundation/interfaces.h"
+#include "foundation/gmconfig.h"
 
 #endif

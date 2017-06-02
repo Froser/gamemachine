@@ -6,7 +6,7 @@
 #include <dsound.h>
 #endif
 #include "foundation/utilities/utilities.h"
-#include "os/directsound_sounddevice.h"
+#include "os/gmdirectsound_sounddevice.h"
 
 #define FRAME_BUFFER 50 // 每一份缓存包含的帧数
 #define BUFFER_COUNT 2 // 将缓存分为多少部分
