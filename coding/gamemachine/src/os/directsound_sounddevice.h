@@ -2,7 +2,7 @@
 #define __DIRECTSOUND_SOUNDPLAYER_H__
 #include "common.h"
 #include "foundation/utilities/utilities.h"
-#include "gmdatacore/soundreader/soundreader.h"
+#include "gmdatacore/soundreader/gmsoundreader.h"
 
 #ifdef _WINDOWS
 #include <dsound.h>
@@ -14,14 +14,14 @@ BEGIN_NS
 #ifdef _WINDOWS
 
 struct IWindow;
-class SoundPlayerDevice
+class GMSoundPlayerDevice
 {
 public:
 	static void createInstance(IWindow* window);
 	static IDirectSound8* getInstance();
 
 private:
-	SoundPlayerDevice(IWindow* window);
+	GMSoundPlayerDevice(IWindow* window);
 
 private:
 	ComPtr<IDirectSound8> m_cpDirectSound;

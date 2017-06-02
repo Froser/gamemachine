@@ -233,7 +233,7 @@ private:
 };
 
 typedef BSPPrivate BSPData;
-struct GamePackageBuffer;
+struct GMBuffer;
 GM_ALIGNED_16(class) BSP
 {
 	DECLARE_PRIVATE(BSP);
@@ -243,7 +243,7 @@ public:
 	~BSP();
 
 public:
-	void loadBsp(const GamePackageBuffer& buf);
+	void loadBsp(const GMBuffer& buf);
 	BSPData& bspData();
 
 private:

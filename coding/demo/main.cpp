@@ -13,11 +13,11 @@
 #include "gmengine/gmbspgameworld.h"
 #include "foundation/debug.h"
 #include "os/input.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 
 #include <fstream>
 #include "os/wingl_window.h"
-#include "gmdatacore/soundreader/soundreader.h"
+#include "gmdatacore/soundreader/gmsoundreader.h"
 
 using namespace gm;
 
@@ -27,12 +27,12 @@ GMGLFactory factory;
 GMGlyphObject* glyph;
 ISoundFile* sf;
 
-// 这是一个导出所有资源的钩子，用gm_install_hook(GamePackage, readFileFromPath, resOutputHook)绑定此钩子
+// 这是一个导出所有资源的钩子，用gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook)绑定此钩子
 // 可以将所有场景中的资源导出到指定目录
 static void resOutputHook(void* path, void* buffer)
 {
 	const char* resPath = (const char*)path;
-	GamePackageBuffer* buf = (GamePackageBuffer*)buffer;
+	GMBuffer* buf = (GMBuffer*)buffer;
 	if (buf->size == 0)
 		return;
 
@@ -61,21 +61,21 @@ public:
 
 	void init()
 	{
-		//gm_install_hook(GamePackage, readFileFromPath, resOutputHook);
+		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		m_input.initMouse(GameMachine::instance().getWindow());
-		GamePackage pk(&factory);
+		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
-		pk.loadPackage("D:/gmpk");
+		pk->loadPackage("D:/gmpk");
 #else
-		pk.loadPackage((Path::getCurrentPath() + "gm.pk0").c_str());
+		pk->loadPackage((Path::getCurrentPath() + "gm.pk0").c_str());
 #endif
-		pk.createBSPGameWorld("gv.bsp", &world);
+		pk->createBSPGameWorld("gv.bsp", &world);
 
 		glyph = new GMGlyphObject();
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
 
-		//GamePackageBuffer bg;
+		//GMBuffer bg;
 		//pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
 		//SoundReader::load(bg, &sf);
 		//sf->play();

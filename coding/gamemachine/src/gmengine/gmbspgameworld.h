@@ -12,7 +12,7 @@ class GMBSPGameWorld : public GMGameWorld
 	DECLARE_PRIVATE(GMBSPGameWorld);
 
 public:
-	GMBSPGameWorld(GamePackage* pk);
+	GMBSPGameWorld();
 
 public:
 	void loadBSP(const char* mapName);

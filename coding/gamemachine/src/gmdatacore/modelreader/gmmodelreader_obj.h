@@ -17,7 +17,7 @@ struct ModelReader_Obj_Material
 };
 
 class Object;
-struct GamePackageBuffer;
+struct GMBuffer;
 class Scanner;
 class Component;
 struct Shader;
@@ -42,8 +42,8 @@ public:
 	~GMModelReader_Obj();
 
 public:
-	virtual bool load(const GMModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) override;
-	virtual bool test(const GamePackageBuffer& buffer) override;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT Object** object) override;
+	virtual bool test(const GMBuffer& buffer) override;
 
 private:
 	void init();

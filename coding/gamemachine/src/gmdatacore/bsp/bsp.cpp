@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "foundation/utilities/utilities.h"
 #include "bsp_interior.inl"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "foundation/linearmath.h"
 
 static const char* getValue(const BSPEntity* entity, const char* key)
@@ -35,7 +35,7 @@ BSP::~BSP()
 	delete[] d->buffer;
 }
 
-void BSP::loadBsp(const GamePackageBuffer& buf)
+void BSP::loadBsp(const GMBuffer& buf)
 {
 	D(d);
 	d->buffer = new GMbyte[buf.size];

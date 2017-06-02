@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmgltexture.h"
-#include "gmdatacore/imagereader/imagereader.h"
+#include "gmdatacore/imagereader/gmimagereader.h"
 #include "shader_constants.h"
 #include "gmdatacore/object.h"
 

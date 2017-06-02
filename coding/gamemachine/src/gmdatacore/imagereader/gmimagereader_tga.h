@@ -2,7 +2,7 @@
 #define __IMAGEREADER_TGA_H__
 #include "common.h"
 #include <sstream>
-#include "imagereader.h"
+#include "gmimagereader.h"
 BEGIN_NS
 
 #pragma pack(push,1)
@@ -104,7 +104,7 @@ public:
 };
 
 class Image;
-class ImageReader_TGA : public IImageReader
+class GMImageReader_TGA : public IImageReader
 {
 public:
 	virtual bool load(const GMbyte* data, GMuint size, OUT Image** img) override;

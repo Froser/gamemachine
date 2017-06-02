@@ -1,32 +1,32 @@
 ﻿#ifndef __GMGLGAMEPACKAGEHANDLER_H__
 #define __GMGLGAMEPACKAGEHANDLER_H__
 #include "common.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "contrib/minizip/unzip.h"
 #include <map>
 BEGIN_NS
 
-class DefaultGMGLGamePackageHandler : public IGamePackageHandler
+class GMDefaultGLGamePackageHandler : public IGamePackageHandler
 {
 public:
-	DefaultGMGLGamePackageHandler(GamePackage* pk);
+	GMDefaultGLGamePackageHandler(GMGamePackage* pk);
 
 public:
 	virtual void init() override;
-	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
+	virtual bool readFileFromPath(const char* path, REF GMBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
 	virtual AlignedVector<std::string> getAllFiles(const char* directory) override;
 
 protected:
-	GamePackage* gamePackage();
+	GMGamePackage* gamePackage();
 
 private:
-	GamePackage* m_pk;
+	GMGamePackage* m_pk;
 };
 
-class ZipGMGLGamePackageHandler : public DefaultGMGLGamePackageHandler
+class ZipGMGLGamePackageHandler : public GMDefaultGLGamePackageHandler
 {
-	typedef DefaultGMGLGamePackageHandler Base;
+	typedef GMDefaultGLGamePackageHandler Base;
 
 	struct ZipBuffer
 	{
@@ -47,12 +47,12 @@ class ZipGMGLGamePackageHandler : public DefaultGMGLGamePackageHandler
 	};
 
 public:
-	ZipGMGLGamePackageHandler(GamePackage* pk);
+	ZipGMGLGamePackageHandler(GMGamePackage* pk);
 	~ZipGMGLGamePackageHandler();
 
 public:
 	virtual void init() override;
-	virtual bool readFileFromPath(const char* path, REF GamePackageBuffer* buffer) override;
+	virtual bool readFileFromPath(const char* path, REF GMBuffer* buffer) override;
 	virtual std::string pathRoot(PackageIndex index) override;
 	virtual AlignedVector<std::string> getAllFiles(const char* directory) override;
 

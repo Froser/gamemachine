@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
-#include "imagereader_tga.h"
+#include "gmimagereader_tga.h"
 #include "foundation/utilities/utilities.h"
 #include <fstream>
 
@@ -350,7 +350,7 @@ bool TGAImage::scale(int w, int h) {
 }
 
 
-bool ImageReader_TGA::load(const GMbyte* data, GMuint size, OUT Image** img)
+bool GMImageReader_TGA::load(const GMbyte* data, GMuint size, OUT Image** img)
 {
 	ASSERT(img);
 	*img = new Image();
@@ -364,12 +364,12 @@ bool ImageReader_TGA::load(const GMbyte* data, GMuint size, OUT Image** img)
 	return b;
 }
 
-bool ImageReader_TGA::test(const GMbyte* data)
+bool GMImageReader_TGA::test(const GMbyte* data)
 {
 	return data[0] == 0 && data[1] == 0;
 }
 
-void ImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)
+void GMImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)
 {
 	ASSERT(img);
 	Image::Data& data = img->getData();

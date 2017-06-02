@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGLGLYPHMANAGER_H__
 #define __GMGLGLYPHMANAGER_H__
 #include "common.h"
-#include "gmdatacore/glyph/glyphmanager.h"
+#include "gmdatacore/glyph/gmglyphmanager.h"
 BEGIN_NS
 
 class GMGLGlyphTexture;
@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMGLGlyphManager)
 	GMGLGlyphTexture* texture;
 };
 
-class GMGLGlyphManager : public GlyphManager
+class GMGLGlyphManager : public GMGlyphManager
 {
 	DECLARE_PRIVATE(GMGLGlyphManager);
 

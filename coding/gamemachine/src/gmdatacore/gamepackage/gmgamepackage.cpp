@@ -1,21 +1,21 @@
 ﻿#include "stdafx.h"
-#include "gamepackage.h"
-#include <sys/stat.h>
+#include "gmgamepackage.h"
 #include "gmengine/gmbspgameworld.h"
+#include <sys/stat.h>
 
-GamePackage::GamePackage(IFactory* factory)
+GMGamePackage::GMGamePackage(IFactory* factory)
 {
 	D(d);
 	d->factory = factory;
 }
 
-GamePackage::Data* GamePackage::gamePackageData()
+GMGamePackage::Data* GMGamePackage::gamePackageData()
 {
 	D(d);
 	return d;
 }
 
-void GamePackage::loadPackage(const char* path)
+void GMGamePackage::loadPackage(const char* path)
 {
 	// TODO 可能读取多个pk，分优先级
 	// 这个以后再做
@@ -46,17 +46,17 @@ void GamePackage::loadPackage(const char* path)
 	d->handler->init();
 }
 
-void GamePackage::createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld)
+void GMGamePackage::createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld)
 {
 	D(d);
 	ASSERT(gameWorld);
 
-	GMBSPGameWorld* world = new GMBSPGameWorld(this);
+	GMBSPGameWorld* world = new GMBSPGameWorld();
 	*gameWorld = world;
 	world->loadBSP(map);
 }
 
-bool GamePackage::readFile(PackageIndex index, const char* filename, REF GamePackageBuffer* buffer, REF std::string* fullFilename)
+bool GMGamePackage::readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF std::string* fullFilename)
 {
 	D(d);
 	std::string p = pathOf(index, filename);
@@ -65,21 +65,21 @@ bool GamePackage::readFile(PackageIndex index, const char* filename, REF GamePac
 	return readFileFromPath(p.c_str(), buffer);
 }
 
-AlignedVector<std::string> GamePackage::getAllFiles(const char* directory)
+AlignedVector<std::string> GMGamePackage::getAllFiles(const char* directory)
 {
 	D(d);
 	ASSERT(d->handler);
 	return d->handler->getAllFiles(directory);
 }
 
-std::string GamePackage::pathOf(PackageIndex index, const char* filename)
+std::string GMGamePackage::pathOf(PackageIndex index, const char* filename)
 {
 	D(d);
 	ASSERT(d->handler);
 	return d->handler->pathRoot(index) + filename;
 }
 
-bool GamePackage::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool GMGamePackage::readFileFromPath(const char* path, REF GMBuffer* buffer)
 {
 	D(d);
 	ASSERT(d->handler);

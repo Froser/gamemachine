@@ -11,15 +11,15 @@
 #include "renders/gmgl_renders_glyph.h"
 #include "foundation/gamemachine.h"
 
-#define PKD(d) GamePackage::Data* d = gamePackage()->gamePackageData();
+#define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
 
-DefaultGMGLGamePackageHandler::DefaultGMGLGamePackageHandler(GamePackage* pk)
+GMDefaultGLGamePackageHandler::GMDefaultGLGamePackageHandler(GMGamePackage* pk)
 	: m_pk(pk)
 {
 
 }
 
-bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool GMDefaultGLGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer* buffer)
 {
 	std::ifstream file;
 	file.open(path, std::ios::in | std::ios::binary | std::ios::ate);
@@ -42,7 +42,7 @@ bool DefaultGMGLGamePackageHandler::readFileFromPath(const char* path, REF GameP
 	return false;
 }
 
-void DefaultGMGLGamePackageHandler::init()
+void GMDefaultGLGamePackageHandler::init()
 {
 	PKD(d);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
@@ -66,7 +66,7 @@ void DefaultGMGLGamePackageHandler::init()
 	{
 		GMGLShaders* shaders = new GMGLShaders();
 		
-		GamePackageBuffer vertBuf, fragBuf;
+		GMBuffer vertBuf, fragBuf;
 		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".vert").c_str(), &vertBuf);
 		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".frag").c_str(), &fragBuf);
 		vertBuf.convertToStringBuffer();
@@ -85,7 +85,7 @@ void DefaultGMGLGamePackageHandler::init()
 	}
 }
 
-std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
+std::string GMDefaultGLGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 
@@ -110,20 +110,20 @@ std::string DefaultGMGLGamePackageHandler::pathRoot(PackageIndex index)
 	return "";
 }
 
-GamePackage* DefaultGMGLGamePackageHandler::gamePackage()
+GMGamePackage* GMDefaultGLGamePackageHandler::gamePackage()
 {
 	return m_pk;
 }
 
-AlignedVector<std::string> DefaultGMGLGamePackageHandler::getAllFiles(const char* directory)
+AlignedVector<std::string> GMDefaultGLGamePackageHandler::getAllFiles(const char* directory)
 {
 	return Path::getAllFiles(directory);
 }
 
 #define CHECK(err) if (err != UNZ_OK) return false
 
-ZipGMGLGamePackageHandler::ZipGMGLGamePackageHandler(GamePackage* pk)
-	: DefaultGMGLGamePackageHandler(pk)
+ZipGMGLGamePackageHandler::ZipGMGLGamePackageHandler(GMGamePackage* pk)
+	: GMDefaultGLGamePackageHandler(pk)
 	, m_uf(nullptr)
 {
 }
@@ -145,7 +145,7 @@ ZipGMGLGamePackageHandler::~ZipGMGLGamePackageHandler()
 	releaseBuffers();
 }
 
-bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer* buffer)
 {
 	if (m_buffers.find(path) != m_buffers.end())
 	{

@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 		: character(nullptr)
 	{
 	}
-	GamePackage* gamePackage;
+
 	std::set<GMGameObject*> shapes;
 	GMCharacter* character;
 	LightInfo ambientLight;
@@ -28,7 +28,7 @@ class GMGameWorld : public GMObject
 	DECLARE_PRIVATE(GMGameWorld)
 
 public:
-	GMGameWorld(GamePackage* pk);
+	GMGameWorld();
 	virtual ~GMGameWorld();
 
 public:
@@ -39,7 +39,6 @@ public:
 	void initialize();
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
-	GamePackage* getGamePackage();
 	void setDefaultAmbientLight(const LightInfo& lightInfo);
 	LightInfo& getDefaultAmbientLight();
 

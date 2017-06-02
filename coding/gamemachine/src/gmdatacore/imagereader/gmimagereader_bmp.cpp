@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "imagereader_bmp.h"
+#include "gmimagereader_bmp.h"
 #include <sstream>
 #include "gmdatacore/image.h"
 #include "foundation/utilities/utilities.h"
@@ -78,7 +78,7 @@ private:
 	BitmapFile m_bitmapFile;
 };
 
-bool ImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT Image** img)
+bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT Image** img)
 {
 	ImageBMP* image;
 	if (img)
@@ -113,13 +113,13 @@ bool ImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT Image** img)
 	return true;
 }
 
-bool ImageReader_BMP::test(const GMbyte* byte)
+bool GMImageReader_BMP::test(const GMbyte* byte)
 {
 	const BitmapHeader* header = reinterpret_cast<const BitmapHeader*>(byte);
 	return header->bfType == 19778;
 }
 
-void ImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img, GMuint size)
+void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img, GMuint size)
 {
 	ASSERT(img);
 	Image::Data& data = img->getData();

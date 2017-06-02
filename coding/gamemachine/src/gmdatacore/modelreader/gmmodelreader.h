@@ -5,19 +5,19 @@
 BEGIN_NS
 
 class Object;
-struct GamePackageBuffer;
+struct GMBuffer;
 struct GMModelLoadSettings;
 struct IModelReader
 {
 	virtual ~IModelReader() {}
-	virtual bool load(const GMModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object) = 0;
-	virtual bool test(const GamePackageBuffer& buffer) = 0;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT Object** object) = 0;
+	virtual bool test(const GMBuffer& buffer) = 0;
 };
 
-class GamePackage;
+class GMGamePackage;
 struct GMModelLoadSettings
 {
-	GamePackage& gamePackage;
+	GMGamePackage& gamePackage;
 	const linear_math::Vector3& extents;
 	const linear_math::Vector3& position;
 	const char* path;
@@ -41,7 +41,7 @@ public:
 	static IModelReader* getReader(ModelType type);
 
 private:
-	static ModelType test(const GamePackageBuffer& buffer);
+	static ModelType test(const GMBuffer& buffer);
 };
 
 END_NS

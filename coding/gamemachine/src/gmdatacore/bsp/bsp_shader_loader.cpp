@@ -6,8 +6,8 @@
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "gmdatacore/shader.h"
 #include "gmengine/gmbspgameworld.h"
-#include "gmdatacore/imagereader/imagereader.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/imagereader/gmimagereader.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "gmengine/gmgameobject.h"
 #include "foundation/gamemachine.h"
 
@@ -81,9 +81,9 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
-static void loadImage(const char* filename, const GamePackageBuffer* buf, OUT Image** image)
+static void loadImage(const char* filename, const GMBuffer* buf, OUT Image** image)
 {
-	if (ImageReader::load(buf->buffer, buf->size, image))
+	if (GMImageReader::load(buf->buffer, buf->size, image))
 		gm_info("loaded texture %s from shader", filename);
 	else
 		gm_error("texture %s not found", filename);
@@ -135,11 +135,9 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 	const TextureContainer::TextureItemType* item = tc.find(name);
 	if (!item)
 	{
-		GamePackage* pk = d->world->getGamePackage();
 		std::string fn;
-
-		GamePackageBuffer buf;
-		if (!pk->readFile(PI_TEXTURES, name, &buf, &fn))
+		GMBuffer buf;
+		if (!GameMachine::instance().getGamePackageManager()->readFile(PI_TEXTURES, name, &buf, &fn))
 		{
 			gm_warning("file %s not found.", fn.c_str());
 			return nullptr;
@@ -171,13 +169,13 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 void GMBSPShaderLoader::load()
 {
 	D(d);
-	GamePackage* pk = d->world->getGamePackage();
+	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	AlignedVector<std::string> files = pk->getAllFiles(d->directory.c_str());
 
 	// load all item tag, but not parse them until item is needed
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
-		GamePackageBuffer buf;
+		GMBuffer buf;
 		pk->readFileFromPath((*iter).c_str(), &buf);
 		buf.convertToStringBuffer();
 		parse((const char*) buf.buffer);

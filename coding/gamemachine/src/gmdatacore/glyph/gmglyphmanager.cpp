@@ -1,11 +1,11 @@
 ﻿#include "stdafx.h"
-#include "glyphmanager.h"
+#include "gmglyphmanager.h"
 
-GlyphManager::GlyphManager()
+GMGlyphManager::GMGlyphManager()
 {
 }
 
-const GlyphInfo GlyphManager::getChar(GMWChar c)
+const GlyphInfo GMGlyphManager::getChar(GMWChar c)
 {
 	CharList::iterator iter;
 	if ((iter = m_chars.find(c)) != m_chars.end())
@@ -13,7 +13,7 @@ const GlyphInfo GlyphManager::getChar(GMWChar c)
 	return createChar(c);
 }
 
-GlyphManager::CharList& GlyphManager::getCharList()
+GMGlyphManager::CharList& GMGlyphManager::getCharList()
 {
 	return m_chars;
 }

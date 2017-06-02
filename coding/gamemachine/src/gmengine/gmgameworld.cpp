@@ -8,10 +8,9 @@
 #include <time.h>
 #include "foundation/gamemachine.h"
 
-GMGameWorld::GMGameWorld(GamePackage* pk)
+GMGameWorld::GMGameWorld()
 {
 	D(d);
-	d->gamePackage = pk;
 	d->start = false;
 }
 
@@ -57,12 +56,6 @@ void GMGameWorld::simulateGameWorld()
 	d->character->simulation();
 	if (!d->start) // 第一次simulate
 		d->start = true;
-}
-
-GamePackage* GMGameWorld::getGamePackage()
-{
-	D(d);
-	return d->gamePackage;
 }
 
 ObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)

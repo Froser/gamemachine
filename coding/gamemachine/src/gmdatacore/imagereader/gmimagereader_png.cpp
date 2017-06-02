@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "imagereader_png.h"
+#include "gmimagereader_png.h"
 #include <fstream>
 #include "gmdatacore/image.h"
 #include "png.h"
@@ -113,7 +113,7 @@ struct PNGTestHeader
 	DWORD magic1, magic2;
 };
 
-bool ImageReader_PNG::load(const GMbyte* data, GMuint size, OUT Image** img)
+bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT Image** img)
 {
 	ASSERT(img);
 	*img = new Image();
@@ -125,13 +125,13 @@ bool ImageReader_PNG::load(const GMbyte* data, GMuint size, OUT Image** img)
 	return b;
 }
 
-bool ImageReader_PNG::test(const GMbyte* data)
+bool GMImageReader_PNG::test(const GMbyte* data)
 {
 	const PNGTestHeader* header = reinterpret_cast<const PNGTestHeader*>(data);
 	return header->magic1 == 1196314761 && header->magic2 == 169478669;
 }
 
-void ImageReader_PNG::writeDataToImage(PngData& png, Image* img, GMuint size)
+void GMImageReader_PNG::writeDataToImage(PngData& png, Image* img, GMuint size)
 {
 	ASSERT(img);
 	Image::Data& data = img->getData();

@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "soundreader_wav.h"
+#include "gmsoundreader_wav.h"
 #include "foundation/utilities/utilities.h"
-#include "gmdatacore/gamepackage.h"
-#include "soundreader.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "gmsoundreader.h"
 
 #ifdef _WINDOWS
 #include <dsound.h>
@@ -37,14 +37,14 @@ GM_PRIVATE_OBJECT(WavSoundFile)
 	bool playing;
 };
 
-class WavSoundFile : public SoundFile
+class WavSoundFile : public GMSoundFile
 {
 	DECLARE_PRIVATE(WavSoundFile)
 
-	typedef SoundFile Base;
+	typedef GMSoundFile Base;
 
 public:
-	WavSoundFile(const WAVEFORMATEX& fmt, AUTORELEASE WaveData* waveData)
+	WavSoundFile(const WAVEFORMATEX& fmt, AUTORELEASE GMWaveData* waveData)
 		: Base(fmt, waveData)
 	{
 		D(d);
@@ -80,7 +80,7 @@ private:
 
 		ComPtr<IDirectSoundBuffer> cpBuffer;
 		HRESULT hr;
-		if (FAILED(hr = SoundPlayerDevice::getInstance()->CreateSoundBuffer(&dsbd, &cpBuffer, NULL)))
+		if (FAILED(hr = GMSoundPlayerDevice::getInstance()->CreateSoundBuffer(&dsbd, &cpBuffer, NULL)))
 		{
 			gm_error("create sound buffer error.");
 			return;
@@ -102,7 +102,7 @@ private:
 };
 #endif
 
-bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
+bool GMSoundReader_Wav::load(GMBuffer& buffer, OUT ISoundFile** sf)
 {
 #ifdef _WINDOWS
 	// 假设都是小端模式
@@ -127,14 +127,14 @@ bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 		ms.read((GMbyte*)&fact, sizeof(GM_WAVEFACT));
 	}
 
-	WaveData* data;
-	WaveData::newWaveData(&data);
+	GMWaveData* data;
+	GMWaveData::newWaveData(&data);
 
-	ms.read((GMbyte*)data, WaveData::HEADER_SIZE);
+	ms.read((GMbyte*)data, GMWaveData::HEADER_SIZE);
 	data->data = new GMbyte[data->dwSize];
 	ms.read(data->data, data->dwSize);
 
-	SoundFile* _sf = new WavSoundFile(format.waveFormatEx, data);
+	GMSoundFile* _sf = new WavSoundFile(format.waveFormatEx, data);
 	*sf = _sf;
 	return true;
 #else
@@ -143,7 +143,7 @@ bool SoundReader_Wav::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 #endif
 }
 
-bool SoundReader_Wav::test(const GamePackageBuffer& buffer)
+bool GMSoundReader_Wav::test(const GMBuffer& buffer)
 {
 	MemoryStream ms(buffer.buffer, buffer.size);
 	GM_WAVERIFF riff;

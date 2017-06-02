@@ -38,13 +38,13 @@ void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectP
 	(*painter) = new GMGLObjectPainter(gmglEngine, obj);
 }
 
-void GMGLFactory::createGamePackage(GamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)
+void GMGLFactory::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)
 {
 	switch (t)
 	{
 	case gm::GPT_DIRECTORY:
 		{
-			DefaultGMGLGamePackageHandler* h = new DefaultGMGLGamePackageHandler(pk);
+			GMDefaultGLGamePackageHandler* h = new GMDefaultGLGamePackageHandler(pk);
 			*handler = h;
 		}
 		break;
@@ -60,7 +60,7 @@ void GMGLFactory::createGamePackage(GamePackage* pk, GamePackageType t, OUT IGam
 	}
 }
 
-void GMGLFactory::createGlyphManager(OUT GlyphManager** glyphManager)
+void GMGLFactory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
 	*glyphManager = new GMGLGlyphManager();
 }

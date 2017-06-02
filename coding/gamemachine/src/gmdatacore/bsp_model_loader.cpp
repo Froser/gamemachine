@@ -1,12 +1,13 @@
 ﻿#include "stdafx.h"
 #include "bsp_model_loader.h"
 #include "foundation/vector.h"
-#include "gamepackage.h"
+#include "gamepackage/gmgamepackage.h"
 #include "gmengine/gmbspgameworld.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "shader.h"
 #include "model.h"
 #include "foundation/utilities/utilities.h"
+#include "foundation/gamemachine.h"
 
 BSPModelLoader::BSPModelLoader()
 	: m_world(nullptr)
@@ -35,12 +36,12 @@ void BSPModelLoader::init(const char* directory, GMBSPGameWorld* world)
 
 void BSPModelLoader::load()
 {
-	GamePackage* pk = m_world->getGamePackage();
+	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	AlignedVector<std::string> files = pk->getAllFiles(m_directory.c_str());
 
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
-		GamePackageBuffer buf;
+		GMBuffer buf;
 		pk->readFileFromPath((*iter).c_str(), &buf);
 		buf.convertToStringBuffer();
 		parse((const char*)buf.buffer);

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "foundation/gamemachine.h"
-#include "gmengine/controllers/gamepackagehandler.h"
+#include "gmdatacore/gamepackage/gmgamepackagehandler.h"
 #include "gmgl/gmglshaders.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include <string>
@@ -8,15 +8,15 @@
 #include <fstream>
 #include "gmengine/gmbspgameworld.h"
 
-#define PKD(d) GamePackage::Data* d = gamePackage()->gamePackageData();
+#define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
 
-DefaultGMGamePackageHandler::DefaultGMGamePackageHandler(GamePackage* pk)
+GMDefaultGamePackageHandler::GMDefaultGamePackageHandler(GMGamePackage* pk)
 {
 	D(d);
 	d->gamePackage = pk;
 }
 
-bool DefaultGMGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool GMDefaultGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer* buffer)
 {
 	std::ifstream file;
 	file.open(path, std::ios::in | std::ios::binary | std::ios::ate);
@@ -39,7 +39,7 @@ bool DefaultGMGamePackageHandler::readFileFromPath(const char* path, REF GamePac
 	return false;
 }
 
-void DefaultGMGamePackageHandler::init()
+void GMDefaultGamePackageHandler::init()
 {
 	PKD(d);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
@@ -55,7 +55,7 @@ void DefaultGMGamePackageHandler::init()
 	{
 		GMGLShaders* shaders = new GMGLShaders();
 		
-		GamePackageBuffer vertBuf, fragBuf;
+		GMBuffer vertBuf, fragBuf;
 		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".vert").c_str(), &vertBuf);
 		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".frag").c_str(), &fragBuf);
 		vertBuf.convertToStringBuffer();
@@ -73,7 +73,7 @@ void DefaultGMGamePackageHandler::init()
 	}
 }
 
-std::string DefaultGMGamePackageHandler::pathRoot(PackageIndex index)
+std::string GMDefaultGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 
@@ -94,32 +94,32 @@ std::string DefaultGMGamePackageHandler::pathRoot(PackageIndex index)
 	return "";
 }
 
-GamePackage* DefaultGMGamePackageHandler::gamePackage()
+GMGamePackage* GMDefaultGamePackageHandler::gamePackage()
 {
 	D(d);
 	return d->gamePackage;
 }
 
-AlignedVector<std::string> DefaultGMGamePackageHandler::getAllFiles(const char* directory)
+AlignedVector<std::string> GMDefaultGamePackageHandler::getAllFiles(const char* directory)
 {
 	return Path::getAllFiles(directory);
 }
 
 #define CHECK(err) if (err != UNZ_OK) return false
 
-ZipGMGamePackageHandler::ZipGMGamePackageHandler(GamePackage* pk)
-	: DefaultGMGamePackageHandler(pk)
+GMZipGamePackageHandler::GMZipGamePackageHandler(GMGamePackage* pk)
+	: GMDefaultGamePackageHandler(pk)
 	, m_uf(nullptr)
 {
 }
 
-ZipGMGamePackageHandler::~ZipGMGamePackageHandler()
+GMZipGamePackageHandler::~GMZipGamePackageHandler()
 {
 	releaseUnzFile();
 	releaseBuffers();
 }
 
-void ZipGMGamePackageHandler::init()
+void GMZipGamePackageHandler::init()
 {
 	PKD(d);
 	if (!loadZip())
@@ -130,7 +130,7 @@ void ZipGMGamePackageHandler::init()
 	Base::init();
 }
 
-bool ZipGMGamePackageHandler::readFileFromPath(const char* path, REF GamePackageBuffer* buffer)
+bool GMZipGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer* buffer)
 {
 	if (m_buffers.find(path) != m_buffers.end())
 	{
@@ -143,7 +143,7 @@ bool ZipGMGamePackageHandler::readFileFromPath(const char* path, REF GamePackage
 	return false;
 }
 
-bool ZipGMGamePackageHandler::loadZip()
+bool GMZipGamePackageHandler::loadZip()
 {
 	const GMuint bufSize = 4096;
 
@@ -203,7 +203,7 @@ bool ZipGMGamePackageHandler::loadZip()
 	return true;
 }
 
-void ZipGMGamePackageHandler::releaseUnzFile()
+void GMZipGamePackageHandler::releaseUnzFile()
 {
 	if (m_uf)
 	{
@@ -212,7 +212,7 @@ void ZipGMGamePackageHandler::releaseUnzFile()
 	}
 }
 
-void ZipGMGamePackageHandler::releaseBuffers()
+void GMZipGamePackageHandler::releaseBuffers()
 {
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
@@ -220,7 +220,7 @@ void ZipGMGamePackageHandler::releaseBuffers()
 	}
 }
 
-AlignedVector<std::string> ZipGMGamePackageHandler::getAllFiles(const char* directory)
+AlignedVector<std::string> GMZipGamePackageHandler::getAllFiles(const char* directory)
 {
 	AlignedVector<std::string> result;
 	std::string dir = directory;
@@ -234,7 +234,7 @@ AlignedVector<std::string> ZipGMGamePackageHandler::getAllFiles(const char* dire
 	return result;
 }
 
-std::string ZipGMGamePackageHandler::pathRoot(PackageIndex index)
+std::string GMZipGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 

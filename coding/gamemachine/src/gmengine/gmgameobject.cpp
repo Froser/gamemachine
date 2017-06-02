@@ -2,7 +2,7 @@
 #include "gmgameobject.h"
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/gmgameworld.h"
-#include "gmdatacore/glyph/glyphmanager.h"
+#include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
 #include "foundation/gamemachine.h"
 
@@ -81,7 +81,7 @@ void GMGlyphObject::constructObject()
 	D(d);
 	D_BASE(GMGameObject, db);
 
-	GlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
+	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
 	IWindow* window = GameMachine::instance().getWindow();
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;

@@ -68,6 +68,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 #define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_CONSTRUCT(name) name##Private()
+#define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 class GMObject : public GMAlignmentObject
@@ -121,6 +122,51 @@ public:
 
 // 定义一个单例类，它将生成一个Private构造函数，并将GMSingleton<>设置为其友元
 #define DECLARE_SINGLETON(className) friend class GMSingleton<className>; private: className() {}
+
+// 缓存类，用于存储缓存数据
+struct GMBuffer : public GMObject
+{
+	GMBuffer()
+		: buffer(nullptr)
+		, size(0)
+		, needRelease(false)
+	{
+	}
+
+	~GMBuffer()
+	{
+		if (needRelease)
+		{
+			if (buffer)
+				delete[] buffer;
+		}
+	}
+
+	GMBuffer& operator =(const GMBuffer& rhs)
+	{
+		this->needRelease = rhs.needRelease;
+		this->size = rhs.size;
+		buffer = new GMbyte[this->size];
+		memcpy(buffer, rhs.buffer, this->size);
+		return *this;
+	}
+
+	void convertToStringBuffer()
+	{
+		GMbyte* newBuffer = new GMbyte[size + 1];
+		memcpy(newBuffer, buffer, size);
+		newBuffer[size] = 0;
+		size++;
+		if (needRelease && buffer)
+			delete[] buffer;
+		needRelease = true;
+		buffer = newBuffer;
+	}
+
+	GMbyte* buffer;
+	GMuint size;
+	bool needRelease; // 表示是否需要手动释放
+};
 
 END_NS
 #endif

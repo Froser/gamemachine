@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
-#include "soundreader_mp3.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmsoundreader_mp3.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "mad.h"
 #ifdef _WINDOWS
 #include <dsound.h>
@@ -19,7 +19,7 @@ struct MP3SoundFilePrivate
 	bool formatCreated; // 是否已经生成了WAVEFORMATEX
 	bool bufferLoaded; // 是否已经读取了所有MP3文件数据
 	WAVEFORMATEX format;
-	GamePackageBuffer bufferIn; // MP3文件数据
+	GMBuffer bufferIn; // MP3文件数据
 	AlignedVector<GMbyte> bufferOut; // 缓存的字节
 	GMuint bufferOffset; // 缓存偏移
 	GMuint unitBufferSize; // 单位缓存，每次读取这么多大小的缓存
@@ -38,14 +38,14 @@ struct MP3SoundFilePrivate
 static DWORD WINAPI decode(LPVOID lpThreadParameter);
 static DWORD WINAPI processBuffer(LPVOID lpThreadParameter);
 
-class MP3SoundFile : public SoundFile
+class MP3SoundFile : public GMSoundFile
 {
 	DECLARE_PRIVATE(MP3SoundFile)
 
-	typedef SoundFile Base;
+	typedef GMSoundFile Base;
 
 public:
-	MP3SoundFile(GamePackageBuffer* in)
+	MP3SoundFile(GMBuffer* in)
 		: Base(WAVEFORMATEX(), nullptr)
 	{
 		D(d);
@@ -110,7 +110,7 @@ private:
 
 		ComPtr<IDirectSoundBuffer> cpBuffer;
 		HRESULT hr;
-		if (FAILED(hr = SoundPlayerDevice::getInstance()->CreateSoundBuffer(&dsbd, &cpBuffer, NULL)))
+		if (FAILED(hr = GMSoundPlayerDevice::getInstance()->CreateSoundBuffer(&dsbd, &cpBuffer, NULL)))
 		{
 			gm_error("create sound buffer error.");
 			return;
@@ -318,7 +318,7 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 }
 #endif
 
-bool SoundReader_MP3::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
+bool GMSoundReader_MP3::load(GMBuffer& buffer, OUT ISoundFile** sf)
 {
 #ifdef _WINDOWS
 	D(d);
@@ -331,7 +331,7 @@ bool SoundReader_MP3::load(GamePackageBuffer& buffer, OUT ISoundFile** sf)
 #endif
 }
 
-bool SoundReader_MP3::test(const GamePackageBuffer& buffer)
+bool GMSoundReader_MP3::test(const GMBuffer& buffer)
 {
 	return buffer.buffer[0] == 'I' && buffer.buffer[1] == 'D' && buffer.buffer[2] == '3';
 }

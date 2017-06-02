@@ -1,17 +1,17 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader.h"
 #include "gmmodelreader_obj.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 
-GM_ALIGNED_16(class) ModelReaderContainer : public GMObject
+GM_ALIGNED_16(class) GMModelReaderContainer : public GMObject
 {
 public:
-	ModelReaderContainer()
+	GMModelReaderContainer()
 	{
 		m_readers[GMModelReader::ModelType_Obj] = new GMModelReader_Obj();
 	}
 
-	~ModelReaderContainer()
+	~GMModelReaderContainer()
 	{
 		for (auto iter = m_readers.begin(); iter != m_readers.end(); iter++)
 		{
@@ -31,11 +31,11 @@ private:
 
 IModelReader* GMModelReader::getReader(ModelType type)
 {
-	static ModelReaderContainer readers;
+	static GMModelReaderContainer readers;
 	return readers.getReader(type);
 }
 
-GMModelReader::ModelType GMModelReader::test(const GamePackageBuffer& buffer)
+GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
 {
 	for (ModelType i = ModelType_Begin; i < ModelType_End; i = (ModelType)((GMuint)i + 1))
 	{
@@ -53,7 +53,7 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, OUT Object** objec
 
 bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT Object** object)
 {
-	GamePackageBuffer buffer;
+	GMBuffer buffer;
 	settings.gamePackage.readFileFromPath(settings.path, &buffer);
 
 	if (type == ModelType_AUTO)

@@ -12,8 +12,22 @@ struct IImageReader
 	virtual bool test(const GMbyte* data) = 0;
 };
 
-class ImageReader
+class GMImageReader
 {
+public:
+	enum ImageType
+	{
+		ImageType_AUTO,
+
+		ImageType_Begin = 0,
+		ImageType_JPG = ImageType_Begin,
+		ImageType_PNG,
+		ImageType_TGA,
+		ImageType_BMP,
+		ImageType_DDS,
+		ImageType_End,
+	};
+
 public:
 	static bool load(const GMbyte* data, GMuint size, OUT Image** image);
 	static bool load(const GMbyte* data, GMuint size, ImageType type, OUT Image** image);

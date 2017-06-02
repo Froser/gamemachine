@@ -2,17 +2,17 @@
 #include "gmbspgameworld.h"
 #include "gmcharacter.h"
 #include "gmengine/controllers/resource_container.h"
-#include "gmdatacore/imagereader/imagereader.h"
+#include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
 #include "gmdatacore/bsp/bsp_shader_loader.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 #include <algorithm>
 #include "gmdatacore/modelreader/gmmodelreader.h"
 #include "foundation/gamemachine.h"
 
-GMBSPGameWorld::GMBSPGameWorld(GamePackage* pk)
-	: GMGameWorld(pk)
+GMBSPGameWorld::GMBSPGameWorld()
+	: GMGameWorld()
 {
 	D(d);
 	d->physics.reset(new GMBSPPhysicsWorld(this));
@@ -21,9 +21,8 @@ GMBSPGameWorld::GMBSPGameWorld(GamePackage* pk)
 void GMBSPGameWorld::loadBSP(const char* mapName)
 {
 	D(d);
-	D_BASE(GMGameWorld, db);
-	GamePackageBuffer buffer;
-	db->gamePackage->readFile(PI_MAPS, mapName, &buffer);
+	GMBuffer buffer;
+	GameMachine::instance().getGamePackageManager()->readFile(PI_MAPS, mapName, &buffer);
 	d->bsp.loadBsp(buffer);
 	importBSP();
 }
@@ -456,8 +455,7 @@ void GMBSPGameWorld::importBSP()
 void GMBSPGameWorld::initModels()
 {
 	D(d);
-	D_BASE(GMGameWorld, db);
-	std::string modelPath = db->gamePackage->pathOf(PI_MODELS, "");
+	std::string modelPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_MODELS, "");
 	d->modelLoader.init(modelPath.c_str(), this);
 	d->modelLoader.load();
 }
@@ -465,8 +463,7 @@ void GMBSPGameWorld::initModels()
 void GMBSPGameWorld::initShaders()
 {
 	D(d);
-	D_BASE(GMGameWorld, db);
-	std::string texShadersPath = db->gamePackage->pathOf(PI_TEXSHADERS, "");
+	std::string texShadersPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_TEXSHADERS, "");
 	d->shaderLoader.init(texShadersPath.c_str(), this, &d->render.renderData());
 	d->shaderLoader.load();
 }
@@ -516,16 +513,16 @@ bool GMBSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 		".bmp"
 	};
 	static GMint dem = 4;
-	GamePackage* pk = getGamePackage();
+	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 
 	for (GMint i = 0; i < dem; i++)
 	{
 		std::string fn = textureFilename + priorities[i];
-		GamePackageBuffer buf;
+		GMBuffer buf;
 		if (!pk->readFile(PI_TEXTURES, fn.c_str(), &buf))
 			continue;
 
-		if (ImageReader::load(buf.buffer, buf.size, img))
+		if (GMImageReader::load(buf.buffer, buf.size, img))
 		{
 			gm_info("loaded texture %s", fn.c_str());
 			return true;
@@ -654,15 +651,16 @@ void GMBSPGameWorld::createEntity(BSPEntity* entity)
 	}
 	else
 	{
-		GamePackageBuffer buf;
+		GMBuffer buf;
 		std::string fn(m->model);
 		fn.append("/");
 		fn.append(m->model);
 		fn.append(".obj");
 
-		std::string path = db->gamePackage->pathOf(PI_MODELS, fn.c_str());
+		GMGamePackage& pk = *GameMachine::instance().getGamePackageManager();
+		std::string path = pk.pathOf(PI_MODELS, fn.c_str());
 		GMModelLoadSettings settings = {
-			*db->gamePackage,
+			pk,
 			m->extents,
 			entity->origin,
 			path.c_str(),

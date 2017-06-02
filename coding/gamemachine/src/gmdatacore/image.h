@@ -31,19 +31,6 @@ GM_PRIVATE_OBJECT(Image)
 	GMuint size;
 };
 
-enum ImageType
-{
-	ImageType_AUTO,
-
-	ImageType_Begin = 0,
-	ImageType_JPG = ImageType_Begin,
-	ImageType_PNG,
-	ImageType_TGA,
-	ImageType_BMP,
-	ImageType_DDS,
-	ImageType_End,
-};
-
 class Image : public GMObject
 {
 	DECLARE_PRIVATE(Image)

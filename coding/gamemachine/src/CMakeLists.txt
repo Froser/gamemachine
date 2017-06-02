@@ -21,34 +21,36 @@ set(SOURCES
 		gmdatacore/bsp/bsp_shader_loader.h
 		gmdatacore/bsp/bsp_shader_loader.cpp
 		gmdatacore/bsp/bsp_surface_flags.h
-		gmdatacore/glyph/glyphmanager.h
-		gmdatacore/glyph/glyphmanager.cpp
-		gmdatacore/imagereader/imagereader.h
-		gmdatacore/imagereader/imagereader.cpp
-		gmdatacore/imagereader/imagereader_bmp.h
-		gmdatacore/imagereader/imagereader_bmp.cpp
-		gmdatacore/imagereader/imagereader_dds.h
-		gmdatacore/imagereader/imagereader_dds.cpp
-		gmdatacore/imagereader/imagereader_jpg.h
-		gmdatacore/imagereader/imagereader_jpg.cpp
-		gmdatacore/imagereader/imagereader_png.h
-		gmdatacore/imagereader/imagereader_png.cpp
-		gmdatacore/imagereader/imagereader_tga.h
-		gmdatacore/imagereader/imagereader_tga.cpp
+		gmdatacore/glyph/gmglyphmanager.h
+		gmdatacore/glyph/gmglyphmanager.cpp
+		gmdatacore/imagereader/gmimagereader.h
+		gmdatacore/imagereader/gmimagereader.cpp
+		gmdatacore/imagereader/gmimagereader_bmp.h
+		gmdatacore/imagereader/gmimagereader_bmp.cpp
+		gmdatacore/imagereader/gmimagereader_dds.h
+		gmdatacore/imagereader/gmimagereader_dds.cpp
+		gmdatacore/imagereader/gmimagereader_jpg.h
+		gmdatacore/imagereader/gmimagereader_jpg.cpp
+		gmdatacore/imagereader/gmimagereader_png.h
+		gmdatacore/imagereader/gmimagereader_png.cpp
+		gmdatacore/imagereader/gmimagereader_tga.h
+		gmdatacore/imagereader/gmimagereader_tga.cpp
 		gmdatacore/modelreader/gmmodelreader.h
 		gmdatacore/modelreader/gmmodelreader.cpp
 		gmdatacore/modelreader/gmmodelreader_obj.h
 		gmdatacore/modelreader/gmmodelreader_obj.cpp
-		gmdatacore/soundreader/soundreader.h
-		gmdatacore/soundreader/soundreader.cpp
-		gmdatacore/soundreader/soundreader_wav.h
-		gmdatacore/soundreader/soundreader_wav.cpp
-		gmdatacore/soundreader/soundreader_mp3.h
-		gmdatacore/soundreader/soundreader_mp3.cpp
+		gmdatacore/soundreader/gmsoundreader.h
+		gmdatacore/soundreader/gmsoundreader.cpp
+		gmdatacore/soundreader/gmsoundreader_wav.h
+		gmdatacore/soundreader/gmsoundreader_wav.cpp
+		gmdatacore/soundreader/gmsoundreader_mp3.h
+		gmdatacore/soundreader/gmsoundreader_mp3.cpp
+		gmdatacore/gamepackage/gmgamepackagehandler.h
+		gmdatacore/gamepackage/gmgamepackagehandler.cpp
+		gmdatacore/gamepackage/gmgamepackage.h
+		gmdatacore/gamepackage/gmgamepackage.cpp
 		gmdatacore/bsp_model_loader.h
 		gmdatacore/bsp_model_loader.cpp
-		gmdatacore/gamepackage.h
-		gmdatacore/gamepackage.cpp
 		gmdatacore/image.h
 		gmdatacore/image.cpp
 		gmdatacore/imagebuffer.h
@@ -61,8 +63,6 @@ set(SOURCES
 		gmengine/controllers/resource_container.h
 		gmengine/controllers/resource_container.cpp
 		gmengine/controllers/graphic_engine.h
-		gmengine/controllers/gamepackagehandler.h
-		gmengine/controllers/gamepackagehandler.cpp
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
 		gmengine/gmgameobject.h

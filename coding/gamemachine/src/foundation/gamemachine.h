@@ -4,7 +4,8 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "foundation/utilities/utilities.h"
 #include <queue>
-#include "gmdatacore/glyph/glyphmanager.h"
+#include "gmdatacore/glyph/gmglyphmanager.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 BEGIN_NS
 
 enum GameMachineMessage
@@ -20,7 +21,8 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<IFactory> factory;
 	AutoPtr<IGraphicEngine> engine;
 	AutoPtr<IGameHandler> gameHandler;
-	AutoPtr<GlyphManager> glyphManager;
+	AutoPtr<GMGlyphManager> glyphManager;
+	AutoPtr<GMGamePackage> gamePackageManager;
 	std::queue<GameMachineMessage> messageQueue;
 };
 
@@ -47,7 +49,10 @@ public:
 	GraphicSettings& getSettings();
 
 	// 字体管理
-	GlyphManager* getGlyphManager();
+	GMGlyphManager* getGlyphManager();
+
+	// 资源管理
+	GMGamePackage* getGamePackageManager();
 
 	// 时间管理
 	GMfloat getFPS();
@@ -56,12 +61,11 @@ public:
 
 	// 绘制管理
 	void initObjectPainter(GMGameObject* obj);
-
 	void startGameMachine();
+
 	void postMessage(GameMachineMessage msg);
 
 private:
-	void init();
 	void initDebugger();
 	bool handleMessages();
 };

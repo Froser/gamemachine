@@ -1,7 +1,7 @@
 ﻿#ifndef __IMAGEREADER_PNG_H__
 #define __IMAGEREADER_PNG_H__
 #include "common.h"
-#include "imagereader.h"
+#include "gmimagereader.h"
 BEGIN_NS
 
 struct PngData
@@ -13,7 +13,7 @@ struct PngData
 };
 
 class Image;
-class ImageReader_PNG : public IImageReader
+class GMImageReader_PNG : public IImageReader
 {
 public:
 	virtual bool load(const GMbyte* data, GMuint size, OUT Image** img) override;

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gamemachine.h"
-#include "gmdatacore/glyph/glyphmanager.h"
+#include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmengine/gmgameobject.h"
 
 #ifdef _WINDOWS
@@ -17,12 +17,7 @@ void GameMachine::init(
 	d->settings = settings;
 	d->factory.reset(factory);
 	d->gameHandler.reset(gameHandler);
-	init();
-}
 
-void GameMachine::init()
-{
-	D(d);
 	IWindow* window;
 	d->factory->createWindow(&window);
 	d->window.reset(window);
@@ -31,6 +26,8 @@ void GameMachine::init()
 	d->factory->createGraphicEngine(&engine);
 	engine->setGraphicSettings(&d->settings);
 	d->engine.reset(engine);
+
+	d->gamePackageManager.reset(new GMGamePackage(factory));
 
 	initDebugger();
 }
@@ -73,10 +70,16 @@ GraphicSettings& GameMachine::getSettings()
 	return d->settings;
 }
 
-GlyphManager* GameMachine::getGlyphManager()
+GMGlyphManager* GameMachine::getGlyphManager()
 {
 	D(d);
 	return d->glyphManager;
+}
+
+GMGamePackage* GameMachine::getGamePackageManager()
+{
+	D(d);
+	return d->gamePackageManager;
 }
 
 GMfloat GameMachine::getFPS()
@@ -120,11 +123,11 @@ void GameMachine::startGameMachine()
 
 #ifdef _WINDOWS
 	// 创建声音设备
-	SoundPlayerDevice::createInstance(d->window);
+	GMSoundPlayerDevice::createInstance(d->window);
 #endif
 
 	// 创建Glyph管理器
-	GlyphManager* glyphManager;
+	GMGlyphManager* glyphManager;
 	d->factory->createGlyphManager(&glyphManager);
 	d->glyphManager.reset(glyphManager);
 

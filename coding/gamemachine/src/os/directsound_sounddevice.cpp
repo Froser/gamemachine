@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "directsound_sounddevice.h"
-#include "gmdatacore/soundreader/soundreader.h"
+#include "gmdatacore/soundreader/gmsoundreader.h"
 
 #ifdef _WINDOWS
 
@@ -8,9 +8,9 @@
 #pragma comment(lib,"dsound.lib")
 #endif
 
-static SoundPlayerDevice* g_device;
+static GMSoundPlayerDevice* g_device;
 
-SoundPlayerDevice::SoundPlayerDevice(IWindow* window)
+GMSoundPlayerDevice::GMSoundPlayerDevice(IWindow* window)
 {
 	HRESULT hr = DirectSoundCreate8(NULL, &m_cpDirectSound, NULL);
 	ASSERT(SUCCEEDED(hr));
@@ -19,15 +19,15 @@ SoundPlayerDevice::SoundPlayerDevice(IWindow* window)
 	ASSERT(SUCCEEDED(hr));
 }
 
-IDirectSound8* SoundPlayerDevice::getInstance()
+IDirectSound8* GMSoundPlayerDevice::getInstance()
 {
 	return g_device->m_cpDirectSound;
 }
 
-void SoundPlayerDevice::createInstance(IWindow* window)
+void GMSoundPlayerDevice::createInstance(IWindow* window)
 {
 	if (!g_device)
-		g_device = new SoundPlayerDevice(window);
+		g_device = new GMSoundPlayerDevice(window);
 }
 
 #endif

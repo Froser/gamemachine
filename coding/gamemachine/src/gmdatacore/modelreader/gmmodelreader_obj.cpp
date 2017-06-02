@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_obj.h"
 #include "gmdatacore/object.h"
-#include "gmdatacore/gamepackage.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "foundation/utilities/utilities.h"
 
 #define RESERVED 4096
@@ -89,7 +89,7 @@ void GMModelReader_Obj::init()
 	d->materials.clear();
 }
 
-bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GamePackageBuffer& buffer, OUT Object** object)
+bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT Object** object)
 {
 	D(d);
 	init();
@@ -163,7 +163,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GamePackageBuf
 	return true;
 }
 
-bool GMModelReader_Obj::test(const GamePackageBuffer& buffer)
+bool GMModelReader_Obj::test(const GMBuffer& buffer)
 {
 	return buffer.buffer && buffer.buffer[0] == '#';
 }
@@ -221,7 +221,7 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 	std::string mtlPath = settings.modelName;
 	mtlPath.append("/");
 	mtlPath.append(mtlFilename);
-	GamePackageBuffer buffer;
+	GMBuffer buffer;
 	settings.gamePackage.readFile(PI_MODELS, mtlPath.c_str(), &buffer);
 	buffer.convertToStringBuffer();
 	char line[LINE_MAX];

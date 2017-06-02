@@ -9,12 +9,12 @@ class Camera;
 class ResourceContainer;
 class GMGameObject;
 class DrawingList;
-class GamePackage;
+class GMGamePackage;
 class Image;
 class Object;
 class ObjectPainter;
-class GamePackage;
-class GlyphManager;
+class GMGamePackage;
+class GMGlyphManager;
 struct IWindow;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -80,8 +80,8 @@ struct IFactory
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE Image*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;
-	virtual void createGamePackage(GamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
-	virtual void createGlyphManager(OUT GlyphManager**) = 0;
+	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
+	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };
 
 END_NS

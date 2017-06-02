@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "imagereader_jpg.h"
+#include "gmimagereader_jpg.h"
 #include <iostream>
 #include <fstream>
 
@@ -45,7 +45,7 @@ extern "C"
 	}
 }
 
-bool ImageReader_JPG::load(const GMbyte* data, GMuint size, OUT Image** image)
+bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT Image** image)
 {
 	Image* img = new Image();
 	*image = img;
@@ -129,7 +129,7 @@ bool ImageReader_JPG::load(const GMbyte* data, GMuint size, OUT Image** image)
 	return true;
 }
 
-bool ImageReader_JPG::test(const GMbyte* data)
+bool GMImageReader_JPG::test(const GMbyte* data)
 {
 	const short* p = reinterpret_cast<const short*>(data);
 	return *p == (short) 0xd8ff;

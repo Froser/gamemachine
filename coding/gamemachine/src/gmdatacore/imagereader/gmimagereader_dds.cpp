@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "imagereader_dds.h"
+#include "gmimagereader_dds.h"
 #include "gmdatacore/image.h"
 
 #ifdef _MSC_VER
@@ -617,7 +617,7 @@ static bool loadDDS(const GMbyte* data, GMuint size, Image::Data* image)
 	return true;
 }
 
-bool ImageReader_DDS::load(const GMbyte* data, GMuint size, OUT Image** img)
+bool GMImageReader_DDS::load(const GMbyte* data, GMuint size, OUT Image** img)
 {
 	Image* image;
 	if (img)
@@ -633,7 +633,7 @@ bool ImageReader_DDS::load(const GMbyte* data, GMuint size, OUT Image** img)
 	return loadDDS(data, size, &image->getData());
 }
 
-bool ImageReader_DDS::test(const GMbyte* data)
+bool GMImageReader_DDS::test(const GMbyte* data)
 {
 	const DDS_FILE_HEADER* file_header = reinterpret_cast<const DDS_FILE_HEADER*>(data);
 	return file_header->magic == DDS_MAGIC;
