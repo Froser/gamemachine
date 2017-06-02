@@ -4,7 +4,7 @@
 #include "gmengine/gmgameobject.h"
 
 #ifdef _WINDOWS
-#	include "os/directsound_sounddevice.h"
+#	include "os/gmdirectsound_sounddevice.h"
 #endif
 
 void GameMachine::init(
@@ -28,6 +28,7 @@ void GameMachine::init(
 	d->engine.reset(engine);
 
 	d->gamePackageManager.reset(new GMGamePackage(factory));
+	d->inputManager.reset(new GMInput());
 
 	initDebugger();
 }
@@ -108,6 +109,27 @@ void GameMachine::initObjectPainter(GMGameObject* obj)
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
 	painter->transfer();
+}
+
+GMInput* GameMachine::getInputManager()
+{
+	D(d);
+	return d->inputManager;
+}
+
+GameMachine::EndiannessMode GameMachine::getMachineEndianness()
+{
+	static EndiannessMode ret = UNKNOWN_YET;
+	if (ret == UNKNOWN_YET)
+	{
+		long int i = 1;
+		const char *p = (const char *)&i;
+		if (p[0] == 1)
+			ret = LITTLE_ENDIAN;
+		else
+			ret = BIG_ENDIAN;
+	}
+	return ret;
 }
 
 void GameMachine::startGameMachine()

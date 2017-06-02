@@ -12,12 +12,12 @@
 #include "foundation/utilities/utilities.h"
 #include "gmengine/gmbspgameworld.h"
 #include "foundation/debug.h"
-#include "os/input.h"
+#include "os/gminput.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 
 #include <fstream>
-#include "os/wingl_window.h"
 #include "gmdatacore/soundreader/gmsoundreader.h"
+#include "os/gmwingl_window.h"
 
 using namespace gm;
 
@@ -62,7 +62,8 @@ public:
 	void init()
 	{
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
-		m_input.initMouse(GameMachine::instance().getWindow());
+		GMInput* inputManager = GameMachine::instance().getInputManager();
+		inputManager->initMouse(GameMachine::instance().getWindow());
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
@@ -125,13 +126,14 @@ public:
 			}
 			break;
 		case GM_EVENT_ACTIVATE:
+			GMInput* inputManager = GameMachine::instance().getInputManager();
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
 			GMCharacter* character = world->getMajorCharacter();
-			GMKeyboardState kbState = m_input.getKeyboardState();
-			GMJoystickState joyState = m_input.getJoystickState();
-			GMMouseState mouseState = m_input.getMouseState();
+			GMKeyboardState kbState = inputManager->getKeyboardState();
+			GMJoystickState joyState = inputManager->getJoystickState();
+			GMMouseState mouseState = inputManager->getMouseState();
 
 			if (kbState['Q'] || kbState[VK_ESCAPE])
 				GameMachine::instance().postMessage(GM_MESSAGE_EXIT);
@@ -175,9 +177,9 @@ public:
 				moveTag |= MD_JUMP;
 
 			if (kbState['V'])
-				m_input.joystickVibrate(30000, 30000);
+				inputManager->joystickVibrate(30000, 30000);
 			else if (kbState['C'])
-				m_input.joystickVibrate(0, 0);
+				inputManager->joystickVibrate(0, 0);
 
 			if (kbState['N'])
 				DBG_SET_INT(DRAW_NORMAL, (DBG_INT(DRAW_NORMAL) + 1) % DRAW_NORMAL_MAX);
@@ -221,8 +223,6 @@ public:
 		WinGLWindow* window = static_cast<WinGLWindow*> (GameMachine::instance().getWindow());
 		return GetActiveWindow() == window->hwnd();
 	}
-	
-	GMInput m_input;
 };
 
 GraphicSettings settings = { 60, { 700, 400 } ,{ 100, 100 }, {400, 400}, false };

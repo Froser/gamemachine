@@ -3,7 +3,7 @@
 #include "common.h"
 #include <string>
 #include <map>
-#include "bsp_render.h"
+#include "gmbsp_render.h"
 
 class TiXmlElement;
 class TiXmlDocument;

@@ -2,16 +2,15 @@
 #ifdef __APPLE__
 #include <stdlib.h>
 #endif
-#include "bsp.h"
+#include "gmbsp.h"
 #include <stdio.h>
 #include "foundation/utilities/utilities.h"
-#include "bsp_interior.inl"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "foundation/linearmath.h"
 
-static const char* getValue(const BSPEntity* entity, const char* key)
+static inline const char* getValue(const GMBSPEntity* entity, const char* key)
 {
-	BSPKeyValuePair* e = entity->epairs;
+	GMBSPKeyValuePair* e = entity->epairs;
 	while (e)
 	{
 		if (strEqual(e->key, key))
@@ -20,6 +19,97 @@ static const char* getValue(const BSPEntity* entity, const char* key)
 	}
 	return nullptr;
 }
+
+static inline GMint copyLump(GMBSPHeader* header, GMint lump, void *dest, GMint size)
+{
+	GMint length, ofs;
+
+	length = header->lumps[lump].filelen;
+	ofs = header->lumps[lump].fileofs;
+
+	if (length % size)
+		gm_error("LoadBSPFile: odd lump size");
+
+	memcpy(dest, (GMbyte *)header + ofs, length);
+
+	return length / size;
+}
+
+static inline char* copyString(const char *s)
+{
+	char *b;
+	GMint len = strlen(s) + 1;
+	b = (char*)malloc(len);
+	strcpy_s(b, len, s);
+	return b;
+}
+
+static inline void stripTrailing(char *e) {
+	char *s;
+
+	s = e + strlen(e) - 1;
+	while (s >= e && *s <= 32)
+	{
+		*s = 0;
+		s--;
+	}
+}
+
+static inline std::string expandPath(const char *path)
+{
+	std::string strPath = Path::getCurrentPath();
+	strPath.append(path);
+	return strPath;
+}
+
+static inline void safeRead(FILE *f, void *buffer, GMint count)
+{
+	if (fread(buffer, 1, count, f) != (size_t)count)
+		gm_error("File read failure");
+}
+
+static inline FILE *safeOpenRead(const char *filename)
+{
+	FILE *f = nullptr;
+
+	fopen_s(&f, filename, "rb");
+
+	if (!f)
+		gm_error("Error opening %s.", filename);
+
+	return f;
+}
+
+static inline GMint filelength(FILE *f)
+{
+	GMint pos;
+	GMint end;
+
+	pos = ftell(f);
+	fseek(f, 0, SEEK_END);
+	end = ftell(f);
+	fseek(f, pos, SEEK_SET);
+
+	return end;
+}
+
+static inline GMint LoadFile(const char *filename, void **bufferptr)
+{
+	FILE *f;
+	GMint length;
+	void* buffer;
+
+	f = safeOpenRead(filename);
+	length = filelength(f);
+	buffer = malloc(length + 1);
+	((char *)buffer)[length] = 0;
+	safeRead(f, buffer, length);
+	fclose(f);
+
+	*bufferptr = buffer;
+	return length;
+}
+
 
 #define Copy(dest, src) memcpy(dest, src, sizeof(src))
 #define CopyMember(dest, src, prop) dest.prop = src.prop
@@ -55,8 +145,7 @@ BSPData& BSP::bspData()
 void BSP::swapBsp()
 {
 	D(d);
-	d->header = (BSPHeader*)d->buffer;
-	SwapBlock((int *)d->header, sizeof(*d->header));
+	d->header = (GMBSPHeader*)d->buffer;
 
 	if (d->header->ident != BSP_IDENT) {
 		gm_error("Invalid IBSP file");
@@ -87,7 +176,7 @@ void BSP::loadPlanes()
 	{
 		AlignedVector<__Tag> t;
 		t.resize(length);
-		GMint num = CopyLump(d->header, LUMP_PLANES, &t[0], sizeof(__Tag));
+		GMint num = copyLump(d->header, LUMP_PLANES, &t[0], sizeof(__Tag));
 		d->numplanes = num;
 		d->planes.resize(length);
 		for (GMint i = 0; i < num; i++)
@@ -119,7 +208,7 @@ void BSP::loadVertices()
 	{
 		AlignedVector<__Tag> t;
 		t.resize(length);
-		GMint num = CopyLump(d->header, LUMP_DRAWVERTS, &t[0], sizeof(__Tag));
+		GMint num = copyLump(d->header, LUMP_DRAWVERTS, &t[0], sizeof(__Tag));
 		d->numDrawVertices = num;
 		d->vertices.resize(length);
 		for (GMint i = 0; i < num; i++)
@@ -168,7 +257,7 @@ void BSP::loadDrawSurfaces()
 	{
 		AlignedVector<__Tag> t;
 		t.resize(length);
-		GMint num = CopyLump(d->header, LUMP_SURFACES, &t[0], sizeof(__Tag));
+		GMint num = copyLump(d->header, LUMP_SURFACES, &t[0], sizeof(__Tag));
 		d->numDrawSurfaces = num;
 		d->drawSurfaces.resize(length);
 		for (GMint i = 0; i < num; i++)
@@ -208,61 +297,61 @@ void BSP::loadNoAlignData()
 {
 	D(d);
 	const int extrasize = 1;
-	GMint length = (d->header->lumps[LUMP_SHADERS].filelen) / sizeof(BSPShader);
+	GMint length = (d->header->lumps[LUMP_SHADERS].filelen) / sizeof(GMBSPShader);
 	d->shaders.resize(length + extrasize);
-	d->numShaders = CopyLump(d->header, LUMP_SHADERS, &d->shaders[0], sizeof(BSPShader));
+	d->numShaders = copyLump(d->header, LUMP_SHADERS, &d->shaders[0], sizeof(GMBSPShader));
 
-	length = (d->header->lumps[LUMP_MODELS].filelen) / sizeof(BSPModel);
+	length = (d->header->lumps[LUMP_MODELS].filelen) / sizeof(GMBSPModel);
 	d->models.resize(length + extrasize);
-	d->nummodels = CopyLump(d->header, LUMP_MODELS, &d->models[0], sizeof(BSPModel));
+	d->nummodels = copyLump(d->header, LUMP_MODELS, &d->models[0], sizeof(GMBSPModel));
 
-	length = (d->header->lumps[LUMP_LEAFS].filelen) / sizeof(BSPLeaf);
+	length = (d->header->lumps[LUMP_LEAFS].filelen) / sizeof(GMBSPLeaf);
 	d->leafs.resize(length + extrasize);
-	d->numleafs = CopyLump(d->header, LUMP_LEAFS, &d->leafs[0], sizeof(BSPLeaf));
+	d->numleafs = copyLump(d->header, LUMP_LEAFS, &d->leafs[0], sizeof(GMBSPLeaf));
 
-	length = (d->header->lumps[LUMP_NODES].filelen) / sizeof(BSPNode);
+	length = (d->header->lumps[LUMP_NODES].filelen) / sizeof(GMBSPNode);
 	d->nodes.resize(length + extrasize);
-	d->numnodes = CopyLump(d->header, LUMP_NODES, &d->nodes[0], sizeof(BSPNode));
+	d->numnodes = copyLump(d->header, LUMP_NODES, &d->nodes[0], sizeof(GMBSPNode));
 
 	length = (d->header->lumps[LUMP_LEAFSURFACES].filelen) / sizeof(int);
 	d->leafsurfaces.resize(length + extrasize);
-	d->numleafsurfaces = CopyLump(d->header, LUMP_LEAFSURFACES, &d->leafsurfaces[0], sizeof(int));
+	d->numleafsurfaces = copyLump(d->header, LUMP_LEAFSURFACES, &d->leafsurfaces[0], sizeof(int));
 
 	length = (d->header->lumps[LUMP_LEAFBRUSHES].filelen) / sizeof(int);
 	d->leafbrushes.resize(length + extrasize);
-	d->numleafbrushes = CopyLump(d->header, LUMP_LEAFBRUSHES, &d->leafbrushes[0], sizeof(int));
+	d->numleafbrushes = copyLump(d->header, LUMP_LEAFBRUSHES, &d->leafbrushes[0], sizeof(int));
 
-	length = (d->header->lumps[LUMP_BRUSHES].filelen) / sizeof(BSPBrush);
+	length = (d->header->lumps[LUMP_BRUSHES].filelen) / sizeof(GMBSPBrush);
 	d->brushes.resize(length + extrasize);
-	d->numbrushes = CopyLump(d->header, LUMP_BRUSHES, &d->brushes[0], sizeof(BSPBrush));
+	d->numbrushes = copyLump(d->header, LUMP_BRUSHES, &d->brushes[0], sizeof(GMBSPBrush));
 
-	length = (d->header->lumps[LUMP_BRUSHSIDES].filelen) / sizeof(BSPBrushSide);
+	length = (d->header->lumps[LUMP_BRUSHSIDES].filelen) / sizeof(GMBSPBrushSide);
 	d->brushsides.resize(length + extrasize);
-	d->numbrushsides = CopyLump(d->header, LUMP_BRUSHSIDES, &d->brushsides[0], sizeof(BSPBrushSide));
+	d->numbrushsides = copyLump(d->header, LUMP_BRUSHSIDES, &d->brushsides[0], sizeof(GMBSPBrushSide));
 
-	length = (d->header->lumps[LUMP_FOGS].filelen) / sizeof(BSPFog);
+	length = (d->header->lumps[LUMP_FOGS].filelen) / sizeof(GMBSPFog);
 	d->fogs.resize(length + extrasize);
-	d->numFogs = CopyLump(d->header, LUMP_FOGS, &d->fogs[0], sizeof(BSPFog));
+	d->numFogs = copyLump(d->header, LUMP_FOGS, &d->fogs[0], sizeof(GMBSPFog));
 
 	length = (d->header->lumps[LUMP_DRAWINDEXES].filelen) / sizeof(int);
 	d->drawIndexes.resize(length + extrasize);
-	d->numDrawIndexes = CopyLump(d->header, LUMP_DRAWINDEXES, &d->drawIndexes[0], sizeof(int));
+	d->numDrawIndexes = copyLump(d->header, LUMP_DRAWINDEXES, &d->drawIndexes[0], sizeof(int));
 
 	length = (d->header->lumps[LUMP_VISIBILITY].filelen) / 1;
 	d->visBytes.resize(length + extrasize);
-	d->numVisBytes = CopyLump(d->header, LUMP_VISIBILITY, &d->visBytes[0], 1);
+	d->numVisBytes = copyLump(d->header, LUMP_VISIBILITY, &d->visBytes[0], 1);
 
 	length = (d->header->lumps[LUMP_LIGHTMAPS].filelen) / 1;
 	d->lightBytes.resize(length + extrasize);
-	d->numLightBytes = CopyLump(d->header, LUMP_LIGHTMAPS, &d->lightBytes[0], 1);
+	d->numLightBytes = copyLump(d->header, LUMP_LIGHTMAPS, &d->lightBytes[0], 1);
 
 	length = (d->header->lumps[LUMP_ENTITIES].filelen) / 1;
 	d->entdata.resize(length + extrasize);
-	d->entdatasize = CopyLump(d->header, LUMP_ENTITIES, &d->entdata[0], 1);
+	d->entdatasize = copyLump(d->header, LUMP_ENTITIES, &d->entdata[0], 1);
 
 	length = (d->header->lumps[LUMP_LIGHTGRID].filelen) / 1;
 	d->gridData.resize(length + extrasize);
-	d->numGridPoints = CopyLump(d->header, LUMP_LIGHTGRID, &d->gridData[0], 8);
+	d->numGridPoints = copyLump(d->header, LUMP_LIGHTGRID, &d->gridData[0], 8);
 
 }
 
@@ -302,7 +391,7 @@ void BSP::parseEntities()
 
 	parseFromMemory(d->entdata.data(), d->entdatasize);
 
-	BSPEntity* entity;
+	GMBSPEntity* entity;
 	while ((entity = parseEntity()))
 	{
 		const char* gridSize = getValue(entity, "gridsize");
@@ -360,12 +449,12 @@ void BSP::parseFromMemory(char *buffer, int size)
 	d->tokenready = false;
 }
 
-BSPEntity* BSP::parseEntity()
+GMBSPEntity* BSP::parseEntity()
 {
 	D(d);
 
-	BSPKeyValuePair* e;
-	BSPEntity *mapent;
+	GMBSPKeyValuePair* e;
+	GMBSPEntity *mapent;
 
 	if (!getToken(true))
 		return nullptr;
@@ -374,7 +463,7 @@ BSPEntity* BSP::parseEntity()
 		gm_warning("parseEntity: { not found");
 	}
 
-	BSPEntity bla;
+	GMBSPEntity bla;
 	bla.epairs = 0;
 	bla.firstDrawSurf = 0;
 	bla.origin[0] = 0.f;
@@ -389,7 +478,7 @@ BSPEntity* BSP::parseEntity()
 		if (strEqual(d->token, "}")) {
 			break;
 		}
-		e = (struct BSPPair*)parseEpair();
+		e = (struct GMBSPPair*)parseEpair();
 		e->next = mapent->epairs;
 		mapent->epairs = e;
 
@@ -497,6 +586,7 @@ skipspace:
 		d->script->script_p++;
 	}
 	else	// regular token
+	{
 		while (*d->script->script_p > 32 && *d->script->script_p != ';')
 		{
 			*token_p++ = *d->script->script_p++;
@@ -505,6 +595,7 @@ skipspace:
 			if (token_p == &d->token[MAXTOKEN])
 				gm_error("Token too large on line %i\n", d->scriptline);
 		}
+	}
 
 	*token_p = 0;
 
@@ -518,24 +609,24 @@ skipspace:
 	return true;
 }
 
-BSPKeyValuePair* BSP::parseEpair(void)
+GMBSPKeyValuePair* BSP::parseEpair(void)
 {
 	D(d);
-	BSPKeyValuePair	*e;
+	GMBSPKeyValuePair	*e;
 
-	e = (struct BSPPair*) malloc(sizeof(BSPKeyValuePair));
-	memset(e, 0, sizeof(BSPKeyValuePair));
+	e = (struct GMBSPPair*) malloc(sizeof(GMBSPKeyValuePair));
+	memset(e, 0, sizeof(GMBSPKeyValuePair));
 
 	if (strlen(d->token) >= MAX_KEY - 1) {
 		//printf ("ParseEpar: token too long");
 	}
-	e->key = copystring(d->token);
+	e->key = copyString(d->token);
 	getToken(false);
 	if (strlen(d->token) >= MAX_VALUE - 1) {
 
 		//printf ("ParseEpar: token too long");
 	}
-	e->value = copystring(d->token);
+	e->value = copyString(d->token);
 
 	// strip trailing spaces that sometimes get accidentally
 	// added in the editor

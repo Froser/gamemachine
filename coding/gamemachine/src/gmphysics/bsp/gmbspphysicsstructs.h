@@ -1,7 +1,7 @@
 ﻿#ifndef __BSPPHYSICSSTRUCTS_H__
 #define __BSPPHYSICSSTRUCTS_H__
 #include "common.h"
-#include "gmdatacore/bsp/bsp.h"
+#include "gmdatacore/bsp/gmbsp.h"
 #include "foundation/linearmath.h"
 #include "foundation/vector.h"
 BEGIN_NS
@@ -25,7 +25,7 @@ GM_ALIGNED_STRUCT(GMBSPLeafList)
 struct BSPTracePlane;
 GM_ALIGNED_STRUCT(GMBSP_Physics_BrushSide)
 {
-	BSPBrushSide* side;
+	GMBSPBrushSide* side;
 	BSPTracePlane* plane;
 	GMint surfaceFlags;
 };
@@ -37,7 +37,7 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Brush)
 	{
 	}
 
-	BSPBrush* brush;
+	GMBSPBrush* brush;
 	GMint contents;
 	linear_math::Vector3 bounds[2];
 	GMBSP_Physics_BrushSide *sides;
@@ -70,9 +70,9 @@ GM_ALIGNED_STRUCT(GMBSPPatchCollide)
 
 GM_ALIGNED_STRUCT(GMBSP_Physics_Patch)
 {
-	BSPSurface* surface;
+	GMBSPSurface* surface;
 	GMint checkcount;
-	BSPShader* shader;
+	GMBSPShader* shader;
 	GMBSPPatchCollide *pc;
 
 	GMBSP_Physics_Patch()

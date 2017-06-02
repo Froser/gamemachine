@@ -5,7 +5,7 @@
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
-#include "gmdatacore/bsp/bsp_shader_loader.h"
+#include "gmdatacore/bsp/gmbsp_shader_loader.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include <algorithm>
 #include "gmdatacore/modelreader/gmmodelreader.h"
@@ -79,7 +79,7 @@ void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alw
 		d->render.renderData().alwaysVisibleObjects.push_back(obj);
 }
 
-std::map<GMint, std::set<BSPEntity*> >& GMBSPGameWorld::getEntities()
+std::map<GMint, std::set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 {
 	D(d);
 	return d->entities;
@@ -220,7 +220,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	BSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
+	GMBSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
 	GMGameObject* obj = nullptr;
 	ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
 
@@ -245,7 +245,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	BSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
+	GMBSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
 	GMGameObject* obj = nullptr;
 
 	ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
@@ -280,7 +280,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber)
 
 	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 	{
-		BSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
+		GMBSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
 		ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
 
 		Object* coreObj;
@@ -297,7 +297,7 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
-	BSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
+	GMBSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
 	GMGameObject* obj = nullptr;
 	auto findResult = rd.polygonFaceObjects.find(&polygonFace);
 	if (findResult != rd.polygonFaceObjects.end())
@@ -316,7 +316,7 @@ void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
-	BSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
+	GMBSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
 	GMGameObject* obj = nullptr;
 	auto findResult = rd.meshFaceObjects.find(&meshFace);
 	if (findResult != rd.meshFaceObjects.end())
@@ -338,7 +338,7 @@ void GMBSPGameWorld::drawPatch(GMint patchNumber)
 		draw(rd.patches[patchNumber].quadraticPatches[i]);
 }
 
-void GMBSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
+void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -358,7 +358,7 @@ void GMBSPGameWorld::draw(BSP_Render_BiquadraticPatch& biqp)
 struct __renderIter
 {
 	__renderIter(GMBSPRenderData& _rd, GMBSPGameWorld::Data& _d) : rd(_rd), d(_d) {}
-	void operator()(BSPEntity* e)
+	void operator()(GMBSPEntity* e)
 	{
 		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
@@ -375,12 +375,12 @@ void GMBSPGameWorld::drawEntity(GMint leafId)
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	std::set<BSPEntity*>& entities = d->entities[leafId];
+	std::set<GMBSPEntity*>& entities = d->entities[leafId];
 #ifdef NO_LAMBDA
 	__renderIter func(rd, d);
 	std::for_each(entities.begin(), entities.end(), func);
 #else
-	std::for_each(entities.begin(), entities.end(), [&rd, &d](BSPEntity* e)
+	std::for_each(entities.begin(), entities.end(), [&rd, &d](GMBSPEntity* e)
 	{
 		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
@@ -479,7 +479,7 @@ void GMBSPGameWorld::initTextures()
 
 	for (GMint i = 0; i < bsp.numShaders; i++)
 	{
-		BSPShader& shader = bsp.shaders[i];
+		GMBSPShader& shader = bsp.shaders[i];
 		// 如果一个texture在shader中已经定义，那么不读取它了，而使用shader中的材质
 		if (d->shaderLoader.findItem(shader.shader, 0, nullptr))
 			continue;
@@ -607,12 +607,12 @@ void GMBSPGameWorld::prepareEntities()
 	}
 }
 
-void GMBSPGameWorld::createEntity(BSPEntity* entity)
+void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 {
 	D(d);
 	D_BASE(GMGameWorld, db);
 
-	BSPKeyValuePair* p = entity->epairs;
+	GMBSPKeyValuePair* p = entity->epairs;
 	const char* classname = nullptr;
 	while (p)
 	{

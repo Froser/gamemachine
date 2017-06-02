@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "directsound_sounddevice.h"
+#include "gmdirectsound_sounddevice.h"
 #include "gmdatacore/soundreader/gmsoundreader.h"
 
 #ifdef _WINDOWS

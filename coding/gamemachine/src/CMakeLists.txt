@@ -13,14 +13,13 @@ set(SOURCES
 		stdafx.h
 		common.h
 
-		gmdatacore/bsp/bsp.h
-		gmdatacore/bsp/bsp.cpp
-		gmdatacore/bsp/bsp_interior.inl
-		gmdatacore/bsp/bsp_render.h
-		gmdatacore/bsp/bsp_render.cpp
-		gmdatacore/bsp/bsp_shader_loader.h
-		gmdatacore/bsp/bsp_shader_loader.cpp
-		gmdatacore/bsp/bsp_surface_flags.h
+		gmdatacore/bsp/gmbsp.h
+		gmdatacore/bsp/gmbsp.cpp
+		gmdatacore/bsp/gmbsp_render.h
+		gmdatacore/bsp/gmbsp_render.cpp
+		gmdatacore/bsp/gmbsp_shader_loader.h
+		gmdatacore/bsp/gmbsp_shader_loader.cpp
+		gmdatacore/bsp/gmbsp_surface_flags.h
 		gmdatacore/glyph/gmglyphmanager.h
 		gmdatacore/glyph/gmglyphmanager.cpp
 		gmdatacore/imagereader/gmimagereader.h
@@ -111,12 +110,12 @@ set(SOURCES
 		gmphysics/gmphysicsstructs.h
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
-		os/wingl_window.h
-		os/wingl_window.cpp
-		os/directsound_sounddevice.h
-		os/directsound_sounddevice.cpp
-		os/input.h
-		os/input.cpp
+		os/gmwingl_window.h
+		os/gmwingl_window.cpp
+		os/gmdirectsound_sounddevice.h
+		os/gmdirectsound_sounddevice.cpp
+		os/gminput.h
+		os/gminput.cpp
 		foundation/utilities/tinyxml/tinystr.cpp
 		foundation/utilities/tinyxml/tinystr.h
 		foundation/utilities/tinyxml/tinyxml.cpp

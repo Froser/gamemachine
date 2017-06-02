@@ -4,7 +4,7 @@
 #include "gmgameworld.h"
 #include "gmbspgameworldprivate.h"
 #include "gmengine/controllers/resource_container.h"
-#include "gmdatacore/bsp/bsp.h"
+#include "gmdatacore/bsp/gmbsp.h"
 BEGIN_NS
 
 class GMBSPGameWorld : public GMGameWorld
@@ -19,7 +19,7 @@ public:
 	void setSky(AUTORELEASE GMGameObject* sky);
 	GMGameObject* getSky();
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
-	std::map<GMint, std::set<BSPEntity*> >& getEntities();
+	std::map<GMint, std::set<GMBSPEntity*> >& getEntities();
 	using GMGameWorld::appendObjectAndInit;
 
 public:
@@ -38,7 +38,7 @@ private:
 	void drawPolygonFace(GMint polygonFaceNumber);
 	void drawMeshFace(GMint meshFaceNumber);
 	void drawPatch(GMint patchNumber);
-	void draw(BSP_Render_BiquadraticPatch& biqp);
+	void draw(GMBSP_Render_BiquadraticPatch& biqp);
 	void drawEntity(GMint leafId);
 	void drawAlwaysVisibleObjects();
 	template <typename T> bool setMaterialTexture(T face, REF Shader& shader);
@@ -58,7 +58,7 @@ private:
 	void prepareMeshFace(int meshFaceNumber);
 	void preparePatch(int patchNumber);
 	void prepareEntities();
-	void createEntity(BSPEntity* entity);
+	void createEntity(GMBSPEntity* entity);
 	GMint calculateLeafNode(const linear_math::Vector3& position);
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world

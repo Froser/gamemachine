@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "bsp_shader_loader.h"
+#include "gmbsp_shader_loader.h"
 #include "foundation/vector.h"
 #include <string>
 #include "foundation/utilities/utilities.h"

@@ -26,7 +26,7 @@ GM_ALIGNED_STRUCT(GMBSPTraceWork)
 };
 END_NS
 
-void GMBSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<BSPEntity*> >* entities, std::map<BSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
+void GMBSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<GMBSPEntity*> >* entities, std::map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
 {
 	D(d);
 	d->bsp = bsp;
@@ -189,7 +189,7 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	D(d);
 	BSPData& bsp = *d->bsp;
 	GMBSPPhysicsWorld::Data& pw = d->world->physicsData();
-	BSPNode* node;
+	GMBSPNode* node;
 	BSPTracePlane* plane;
 
 	if (tw.trace.fraction <= p1f)
@@ -299,7 +299,7 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	traceThroughTree(tw, node->children[side ^ 1], midf, p2f, mid, p2);
 }
 
-void GMBSPTrace::traceThroughLeaf(GMBSPTraceWork& tw, BSPLeaf* leaf)
+void GMBSPTrace::traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
@@ -485,7 +485,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 	}
 }
 
-void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<BSPEntity*>& entity)
+void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity*>& entity)
 {
 	D(d);
 	tw.trace.entityNum = 0;

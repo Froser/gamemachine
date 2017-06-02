@@ -72,17 +72,29 @@ public:
 
 public:
 	void initMouse(IWindow* window);
-
-public:
 	GMJoystickState getJoystickState();
 	void joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed);
 
 	GMKeyboardState getKeyboardState();
 	GMMouseState getMouseState();
 };
-
-typedef Input_Windows GMInput;
 #endif
+
+struct InputSelector
+{
+#ifdef _WINDOWS
+	typedef Input_Windows InputTarget;
+#endif
+};
+
+class GMInput : public InputSelector::InputTarget
+{
+	typedef InputSelector::InputTarget Base;
+	friend class GameMachine;
+
+private:
+	GMInput() : Base() {}
+};
 
 END_NS
 #endif

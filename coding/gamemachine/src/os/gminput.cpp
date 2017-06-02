@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "input.h"
+#include "gminput.h"
 
 #ifdef _WINDOWS
 

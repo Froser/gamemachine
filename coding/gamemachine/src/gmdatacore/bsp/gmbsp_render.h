@@ -5,19 +5,19 @@
 #include "foundation/utilities/utilities.h"
 #include "foundation/vector.h"
 #include <map>
-#include "bsp.h"
+#include "gmbsp.h"
 BEGIN_NS
 
 // structs for rendering
-GM_ALIGNED_STRUCT(BSP_Render_Vertex)
+GM_ALIGNED_STRUCT(GMBSP_Render_Vertex)
 {
 	linear_math::Vector3 position;
 	GMfloat decalS, decalT;
 	GMfloat lightmapS, lightmapT;
 
-	BSP_Render_Vertex operator+(const BSP_Render_Vertex & rhs) const
+	GMBSP_Render_Vertex operator+(const GMBSP_Render_Vertex & rhs) const
 	{
-		BSP_Render_Vertex result;
+		GMBSP_Render_Vertex result;
 		result.position = position + rhs.position;
 		result.decalS = decalS + rhs.decalS;
 		result.decalT = decalT + rhs.decalT;
@@ -27,9 +27,9 @@ GM_ALIGNED_STRUCT(BSP_Render_Vertex)
 		return result;
 	}
 
-	BSP_Render_Vertex operator*(const float rhs) const
+	GMBSP_Render_Vertex operator*(const float rhs) const
 	{
-		BSP_Render_Vertex result;
+		GMBSP_Render_Vertex result;
 		result.position = position*rhs;
 		result.decalS = decalS*rhs;
 		result.decalT = decalT*rhs;
@@ -40,7 +40,7 @@ GM_ALIGNED_STRUCT(BSP_Render_Vertex)
 	}
 };
 
-GM_ALIGNED_STRUCT(BSP_Render_Face)
+GM_ALIGNED_STRUCT(GMBSP_Render_Face)
 {
 	GMint firstVertex;
 	GMint numVertices;
@@ -50,21 +50,21 @@ GM_ALIGNED_STRUCT(BSP_Render_Face)
 	GMint numIndices;
 };
 
-GM_ALIGNED_STRUCT(BSP_Render_FaceDirectoryEntry)
+GM_ALIGNED_STRUCT(GMBSP_Render_FaceDirectoryEntry)
 {
-	BSPSurfaceType faceType;
+	GMBSPSurfaceType faceType;
 	GMint typeFaceNumber;		//face number in the list of faces of this type
 };
 
 //every patch (curved surface) is split into biquadratic (3x3) patches
-GM_ALIGNED_STRUCT(BSP_Render_BiquadraticPatch)
+GM_ALIGNED_STRUCT(GMBSP_Render_BiquadraticPatch)
 {
-	BSP_Render_BiquadraticPatch()
+	GMBSP_Render_BiquadraticPatch()
 		: vertices(nullptr)
 	{
 	}
 
-	~BSP_Render_BiquadraticPatch()
+	~GMBSP_Render_BiquadraticPatch()
 	{
 		if (vertices)
 			delete[] vertices;
@@ -77,9 +77,9 @@ GM_ALIGNED_STRUCT(BSP_Render_BiquadraticPatch)
 
 	bool tesselate(int newTesselation);
 
-	BSP_Render_Vertex controlPoints[9];
+	GMBSP_Render_Vertex controlPoints[9];
 	GMint tesselation;
-	BSP_Render_Vertex* vertices;
+	GMBSP_Render_Vertex* vertices;
 	GLuint * indices;
 	//arrays for multi_draw_arrays
 	GMint* trianglesPerRow;
@@ -87,13 +87,13 @@ GM_ALIGNED_STRUCT(BSP_Render_BiquadraticPatch)
 };
 
 //curved surface
-GM_ALIGNED_STRUCT(BSP_Render_Patch)
+GM_ALIGNED_STRUCT(GMBSP_Render_Patch)
 {
 	GMint textureIndex;
 	GMint lightmapIndex;
 	GMint width, height;
 	GMint numQuadraticPatches;
-	BSP_Render_BiquadraticPatch* quadraticPatches;
+	GMBSP_Render_BiquadraticPatch* quadraticPatches;
 };
 
 enum
@@ -101,7 +101,7 @@ enum
 	BOUNDING = 99999,
 };
 
-GM_ALIGNED_STRUCT(BSP_Render_Leaf)
+GM_ALIGNED_STRUCT(GMBSP_Render_Leaf)
 {
 	linear_math::Vector3 boundingBoxVertices[8];
 	GMint cluster;	//cluster index for visdata
@@ -109,13 +109,13 @@ GM_ALIGNED_STRUCT(BSP_Render_Leaf)
 	GMint numFaces;
 };
 
-struct BSP_Render_VisibilityData
+struct GMBSP_Render_VisibilityData
 {
-	BSP_Render_VisibilityData() 
+	GMBSP_Render_VisibilityData() 
 		: bitset(nullptr)
 	{
 	}
-	~BSP_Render_VisibilityData()
+	~GMBSP_Render_VisibilityData()
 	{
 		if (bitset)
 			delete[] bitset;
@@ -127,9 +127,9 @@ struct BSP_Render_VisibilityData
 };
 
 class GMEntityObject;
-GM_PRIVATE_OBJECT(BSPRender)
+GM_PRIVATE_OBJECT(GMBSPRender)
 {
-	GM_PRIVATE_CONSTRUCT(BSPRender)
+	GM_PRIVATE_CONSTRUCT(GMBSPRender)
 		: numPolygonFaces(0)
 		, numPatches(0)
 		, numMeshFaces(0)
@@ -139,17 +139,17 @@ GM_PRIVATE_OBJECT(BSPRender)
 
 	}
 
-	AlignedVector<BSP_Render_Vertex> vertices;
-	AlignedVector<BSP_Render_FaceDirectoryEntry> faceDirectory;
-	AlignedVector<BSP_Render_Face> polygonFaces;
-	AlignedVector<BSP_Render_Face> meshFaces;
-	AlignedVector<BSP_Render_Patch> patches;
-	AlignedVector<BSP_Render_Leaf> leafs;
+	AlignedVector<GMBSP_Render_Vertex> vertices;
+	AlignedVector<GMBSP_Render_FaceDirectoryEntry> faceDirectory;
+	AlignedVector<GMBSP_Render_Face> polygonFaces;
+	AlignedVector<GMBSP_Render_Face> meshFaces;
+	AlignedVector<GMBSP_Render_Patch> patches;
+	AlignedVector<GMBSP_Render_Leaf> leafs;
 
-	std::map<BSP_Render_BiquadraticPatch*, GMGameObject*> biquadraticPatchObjects;
-	std::map<BSP_Render_Face*, GMGameObject*> polygonFaceObjects;
-	std::map<BSP_Render_Face*, GMGameObject*> meshFaceObjects;
-	std::map<BSPEntity*, GMEntityObject*> entitiyObjects;
+	std::map<GMBSP_Render_BiquadraticPatch*, GMGameObject*> biquadraticPatchObjects;
+	std::map<GMBSP_Render_Face*, GMGameObject*> polygonFaceObjects;
+	std::map<GMBSP_Render_Face*, GMGameObject*> meshFaceObjects;
+	std::map<GMBSPEntity*, GMEntityObject*> entitiyObjects;
 
 	BSPData* bsp;
 	Bitset facesToDraw;
@@ -158,25 +158,25 @@ GM_PRIVATE_OBJECT(BSPRender)
 	GMint numPatches;
 	GMint numMeshFaces;
 	AlignedVector<GMGameObject*> alwaysVisibleObjects;
-	BSP_Render_VisibilityData visibilityData;
+	GMBSP_Render_VisibilityData visibilityData;
 
 	// 用于绘制天空
 	linear_math::Vector3 boundMin;
 	linear_math::Vector3 boundMax;
 };
 
-typedef BSPRenderPrivate GMBSPRenderData;
+typedef GMBSPRenderPrivate GMBSPRenderData;
 class Object;
 struct Shader;
-class BSPRender
+class GMBSPRender
 {
-	DECLARE_PRIVATE(BSPRender);
+	DECLARE_PRIVATE(GMBSPRender);
 
 public:
 	GMBSPRenderData& renderData();
 	void generateRenderData(BSPData* bsp);
-	void createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj);
-	void createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);
+	void createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT Object** obj);
+	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);
 	void createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj);
 
 private:

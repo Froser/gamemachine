@@ -6,6 +6,7 @@
 #include <queue>
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "os/gminput.h"
 BEGIN_NS
 
 enum GameMachineMessage
@@ -23,6 +24,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<IGameHandler> gameHandler;
 	AutoPtr<GMGlyphManager> glyphManager;
 	AutoPtr<GMGamePackage> gamePackageManager;
+	AutoPtr<GMInput> inputManager;
 	std::queue<GameMachineMessage> messageQueue;
 };
 
@@ -34,6 +36,17 @@ class GameMachine : public GMSingleton<GameMachine>
 	enum
 	{
 		MAX_KEY_STATE_BITS = 512,
+	};
+
+public:
+	enum EndiannessMode
+	{
+		// Never returns:
+		UNKNOWN_YET = -1,
+
+		// Modes:
+		LITTLE_ENDIAN = 0,
+		BIG_ENDIAN = 1,
 	};
 
 public:
@@ -61,9 +74,17 @@ public:
 
 	// 绘制管理
 	void initObjectPainter(GMGameObject* obj);
-	void startGameMachine();
 
+	// HID
+	GMInput* getInputManager();
+
+	// 大小端模式
+	EndiannessMode getMachineEndianness();
+
+	// 发送事件
 	void postMessage(GameMachineMessage msg);
+
+	void startGameMachine();
 
 private:
 	void initDebugger();

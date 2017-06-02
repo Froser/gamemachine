@@ -1,21 +1,21 @@
 ﻿#include "stdafx.h"
-#include "bsp_render.h"
+#include "gmbsp_render.h"
 #include "gmdatacore/object.h"
 
-GMBSPRenderData& BSPRender::renderData()
+GMBSPRenderData& GMBSPRender::renderData()
 {
 	D(d);
 	return *d;
 }
 
 //Tesselate a biquadratic patch
-bool BSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
+bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 {
 	tesselation = newTesselation;
 
 	GMfloat px, py;
-	BSP_Render_Vertex temp[3];
-	vertices = new BSP_Render_Vertex[(tesselation + 1)*(tesselation + 1)];
+	GMBSP_Render_Vertex temp[3];
+	vertices = new GMBSP_Render_Vertex[(tesselation + 1)*(tesselation + 1)];
 
 	for (GMint v = 0; v <= tesselation; ++v)
 	{
@@ -90,7 +90,7 @@ bool BSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 	return true;
 }
 
-void BSPRender::generateRenderData(BSPData* bsp)
+void GMBSPRender::generateRenderData(BSPData* bsp)
 {
 	D(d);
 	d->bsp = bsp;
@@ -104,7 +104,7 @@ void BSPRender::generateRenderData(BSPData* bsp)
 	generateVisibilityData();
 }
 
-void BSPRender::generateVertices()
+void GMBSPRender::generateVertices()
 {
 	D(d);
 	// create vertices for drawing
@@ -135,7 +135,7 @@ void BSPRender::generateVertices()
 	}
 }
 
-void BSPRender::generateFaces()
+void GMBSPRender::generateFaces()
 {
 	D(d);
 	// create faces for drawing
@@ -211,7 +211,7 @@ void BSPRender::generateFaces()
 			GMint numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
 
 			d->patches[currentPatch].numQuadraticPatches = numPatchesWide*numPatchesHigh;
-			d->patches[currentPatch].quadraticPatches = new BSP_Render_BiquadraticPatch
+			d->patches[currentPatch].quadraticPatches = new GMBSP_Render_BiquadraticPatch
 				[d->patches[currentPatch].numQuadraticPatches];
 			if (!d->patches[currentPatch].quadraticPatches)
 			{
@@ -249,15 +249,15 @@ void BSPRender::generateFaces()
 	}
 }
 
-void BSPRender::generateShaders()
+void GMBSPRender::generateShaders()
 {
 }
 
-void BSPRender::generateLightmaps()
+void GMBSPRender::generateLightmaps()
 {
 }
 
-void BSPRender::generateLeafs()
+void GMBSPRender::generateLeafs()
 {
 	D(d);
 	//leafs
@@ -283,13 +283,13 @@ void BSPRender::generateLeafs()
 	}
 }
 
-void BSPRender::generatePlanes()
+void GMBSPRender::generatePlanes()
 {
 	D(d);
 	// Nothing to do
 }
 
-void BSPRender::generateVisibilityData()
+void GMBSPRender::generateVisibilityData()
 {
 	D(d);
 	// visBytes头两个GMint表示clusters，后面的字节表示bitsets
@@ -300,7 +300,7 @@ void BSPRender::generateVisibilityData()
 	memcpy(d->visibilityData.bitset, d->bsp->visBytes.data() + sz, bitsetSize);
 }
 
-void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, OUT Object** obj)
+void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT Object** obj)
 {
 	D(d);
 
@@ -317,7 +317,7 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 		for (GMint j = 0; j < 3; j++)
 		{
 			GMint idx = d->bsp->drawIndexes[face.firstIndex + i * 3 + j];
-			BSP_Render_Vertex& vertex = d->vertices[face.firstVertex + idx];
+			GMBSP_Render_Vertex& vertex = d->vertices[face.firstVertex + idx];
 			
 			GMint idx_prev = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
 			GMint idx_next = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
@@ -340,7 +340,7 @@ void BSPRender::createObject(const BSP_Render_Face& face, const Shader& shader, 
 	*obj = coreObj;
 }
 
-void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj)
+void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj)
 {
 	Object* coreObj = new Object();
 	Mesh* child = new Mesh();
@@ -358,7 +358,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 		for (GMint i = 0; i < numVertices; i++)
 		{
 			GMint idx = *(idxStart + i);
-			BSP_Render_Vertex& vertex = biqp.vertices[idx];
+			GMBSP_Render_Vertex& vertex = biqp.vertices[idx];
 
 			if (i < numVertices - 2)
 			{
@@ -385,7 +385,7 @@ void BSPRender::createObject(const BSP_Render_BiquadraticPatch& biqp, const Shad
 	*obj = coreObj;
 }
 
-void BSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj)
+void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,

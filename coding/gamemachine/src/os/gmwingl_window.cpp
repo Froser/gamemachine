@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "wingl_window.h"
+#include "gmwingl_window.h"
 
 #ifdef _WINDOWS
 

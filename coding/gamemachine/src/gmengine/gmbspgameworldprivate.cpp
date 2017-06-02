@@ -3,17 +3,17 @@
 #include "gmcharacter.h"
 #include "foundation/utilities/utilities.h"
 
-#define PARSE_FUNC(name, entity, world) void import_##name(const BSPEntity& entity, GMBSPGameWorld* world)
+#define PARSE_FUNC(name, entity, world) void import_##name(const GMBSPEntity& entity, GMBSPGameWorld* world)
 #define BEGIN_PARSE_CLASS(value) if (strEqual(classname, #value)) import_##value(entity, world)
 #define PARSE_CLASS(value) else if (strEqual(classname, #value)) import_##value(entity, world)
 #define END_PARSE_CLASS
-#define EACH_PAIR_OF_ENTITY(entity, pair) BSPKeyValuePair* pair = entity.epairs; for (; pair; pair = pair->next)
+#define EACH_PAIR_OF_ENTITY(entity, pair) GMBSPKeyValuePair* pair = entity.epairs; for (; pair; pair = pair->next)
 #define SAME_KEY(pair, k) strEqual(pair->key, k)
 #define SAME_VALUE(pair, v) strEqual(pair->value, v)
 
-static const char* getClassname(const BSPEntity& entity)
+static const char* getClassname(const GMBSPEntity& entity)
 {
-	BSPKeyValuePair* e = entity.epairs;
+	GMBSPKeyValuePair* e = entity.epairs;
 	while (e)
 	{
 		if (strEqual(e->key, "classname"))
@@ -91,7 +91,7 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 	prop.translation = playerStart;
 }
 
-void BSPGameWorldEntityReader::import(const BSPEntity& entity, GMBSPGameWorld* world)
+void BSPGameWorldEntityReader::import(const GMBSPEntity& entity, GMBSPGameWorld* world)
 {
 	const char* classname = getClassname(entity);
 
