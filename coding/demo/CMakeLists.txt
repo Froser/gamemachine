@@ -11,7 +11,6 @@ include_directories(
 
 link_directories(
 		${demo_SOURCE_DIR}/../3rdparty/glew/lib/release/win32
-		${demo_SOURCE_DIR}/../3rdparty/jpeg-6
 		${demo_SOURCE_DIR}/../3rdparty/freetype-2.3.5/lib
 		${demo_SOURCE_DIR}/../3rdparty/glew/lib/Release/win32
 		${demo_SOURCE_DIR}/../3rdparty/dx #windows only
@@ -23,7 +22,6 @@ link_libraries(
 		glew32s.lib
 		glew32s.lib
 		freetype.lib
-		libjpeg.lib
 		dxguid.lib #windows only
 	)
 
@@ -41,3 +39,4 @@ target_link_libraries(${PROJECT_NAME} gamemachine)
 target_link_libraries(${PROJECT_NAME} png_static)
 target_link_libraries(${PROJECT_NAME} zlibstatic)
 target_link_libraries(${PROJECT_NAME} libmad)
+target_link_libraries(${PROJECT_NAME} libjpeg)

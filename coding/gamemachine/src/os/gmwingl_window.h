@@ -9,7 +9,7 @@ GM_PRIVATE_OBJECT(GMWinGLWindow)
 {
 	char windowTitle[128];
 	LONG left, top, width, height;
-	GMint depthBits, stencilBits;
+	BYTE depthBits, stencilBits;
 	HWND hWnd;
 	HDC hDC;
 	HGLRC hRC;

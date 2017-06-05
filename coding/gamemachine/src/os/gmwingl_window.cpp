@@ -173,7 +173,7 @@ GMRect GMWinGLWindow::getWindowRect()
 	D(d);
 	RECT rect;
 	GetWindowRect(d->hWnd, &rect);
-	GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
+	GMRect r = { (GMfloat) rect.left, (GMfloat) rect.top, (GMfloat) rect.right - rect.left, (GMfloat) rect.bottom - rect.top };
 	return r;
 }
 

@@ -8,7 +8,7 @@ BEGIN_NS
 template <typename T>
 struct ID_Less
 {
-	bool operator ()(const T& left, const T& right)
+	bool operator ()(const T& left, const T& right) const
 	{
 		return (left.id < right.id);
 	}
@@ -17,7 +17,7 @@ struct ID_Less
 template <typename T>
 struct Name_Less
 {
-	bool operator ()(const T& left, const T& right)
+	bool operator ()(const T& left, const T& right) const
 	{
 		return left.id < right.id;
 	}

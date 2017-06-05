@@ -400,7 +400,7 @@ void GMBSPGameWorld::drawAlwaysVisibleObjects()
 }
 
 template <typename T>
-bool GMBSPGameWorld::setMaterialTexture(T face, REF Shader& shader)
+bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();

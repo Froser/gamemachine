@@ -1,0 +1,99 @@
+project(libjpeg C)
+include_directories(
+		./
+	)
+
+set(SOURCES
+		jcapimin.c
+		jcapistd.c
+		jccoefct.c
+		jccolor.c
+		jcdctmgr.c
+		jchuff.c
+		jcinit.c
+		jcmainct.c
+		jcmarker.c
+		jcmaster.c
+		jcomapi.c
+		jcparam.c
+		jcphuff.c
+		jcprepct.c
+		jcsample.c
+		jctrans.c
+		jdapimin.c
+		jdapistd.c
+		jdatadst.c
+		jdatasrc.c
+		jdcoefct.c
+		jdcolor.c
+		jddctmgr.c
+		jdhuff.c
+		jdinput.c
+		jdmainct.c
+		jdmarker.c
+		jdmaster.c
+		jdmerge.c
+		jdphuff.c
+		jdpostct.c
+		jdsample.c
+		jdtrans.c
+		jerror.c
+		jfdctflt.c
+		jfdctfst.c
+		jfdctint.c
+		jidctflt.c
+		jidctfst.c
+		jidctint.c
+		jidctred.c
+		jquant1.c
+		jquant2.c
+		jutils.c
+		jmemmgr.c
+
+		#jmemansi.c
+		jmemname.c
+		#jmemnobs.c
+		#jmemdos.c
+		#jmemmac.c (MAC)
+
+		cjpeg.c
+		djpeg.c
+		jpegtran.c
+		rdjpgcom.c
+		wrjpgcom.c
+		cdjpeg.c
+		rdcolmap.c
+		rdswitch.c
+		transupp.c
+		rdppm.c
+		wrppm.c
+		rdgif.c
+		wrgif.c
+		rdtarga.c
+		wrtarga.c
+		rdbmp.c
+		wrbmp.c
+		rdrle.c
+		wrrle.c
+
+		jchuff.h
+		jdhuff.h
+		jdct.h
+		jerror.h
+		jinclude.h
+		jmemsys.h
+		jmorecfg.h
+		jpegint.h
+		jpeglib.h
+		jversion.h
+		cdjpeg.h
+		cderror.h
+		transupp.h
+	)
+
+source_group_by_dir(SOURCES)
+
+add_library(libjpeg
+		${SOURCES}
+	)
+set_target_properties(libjpeg PROPERTIES FOLDER ${PROJECT_NAME})

@@ -2,7 +2,7 @@ include_directories(
 		./
 		../../3rdparty/glew/include
 		../../3rdparty/libpng
-		../../3rdparty/jpeg-6
+		../../3rdparty/jpeg-6b
 		../../3rdparty/zlib
 		../../3rdparty/freetype-2.3.5/include
 		../../3rdparty/libmad
@@ -140,6 +140,7 @@ set(SOURCES
 		foundation/gamemachine.cpp
 		foundation/interfaces.h
 		foundation/gmconfig.h
+		foundation/gmconfig.cpp
 	)
 
 source_group_by_dir(SOURCES)
