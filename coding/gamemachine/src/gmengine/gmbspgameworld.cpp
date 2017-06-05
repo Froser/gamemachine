@@ -42,6 +42,7 @@ GMGameObject* GMBSPGameWorld::getSky()
 
 void GMBSPGameWorld::updateCamera()
 {
+	GM_PROFILE(updateCamera, renderGameWorld);
 	D(d);
 
 	GMCharacter* character = getMajorCharacter();
@@ -52,7 +53,9 @@ void GMBSPGameWorld::updateCamera()
 
 void GMBSPGameWorld::renderGameWorld()
 {
+	GM_PROFILE_ROOT(renderGameWorld);
 	D(d);
+
 	GameMachine::instance().getGraphicEngine()->newFrame();
 	updateCamera();
 	drawAll();
@@ -87,6 +90,7 @@ std::map<GMint, std::set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 
 void GMBSPGameWorld::calculateVisibleFaces()
 {
+	GM_PROFILE(calculateVisibleFaces, drawAll);
 	D(d);
 	D_BASE(GMGameWorld, dbase);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -155,6 +159,7 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 // drawAll将所要需要绘制的对象放入列表
 void GMBSPGameWorld::drawAll()
 {
+	GM_PROFILE(drawAll, renderGameWorld);
 	D(d);
 	drawSky();
 	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
@@ -169,6 +174,7 @@ void GMBSPGameWorld::drawAll()
 
 void GMBSPGameWorld::drawSky()
 {
+	GM_PROFILE(drawSky, drawAll);
 	D(d);
 	if (d->sky)
 		GameMachine::instance().getGraphicEngine()->drawObject(d->sky);
@@ -176,6 +182,7 @@ void GMBSPGameWorld::drawSky()
 
 void GMBSPGameWorld::drawFaces()
 {
+	GM_PROFILE(drawFaces, drawAll);
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();

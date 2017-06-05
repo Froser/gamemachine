@@ -7,6 +7,7 @@
 #	include <direct.h>
 #endif
 #include "foundation/vector.h"
+#include "foundation/gamemachine.h"
 
 //FPSCounter
 GMClock::GMClock()
@@ -119,16 +120,116 @@ GMfloat GMClock::cycleToSecond(GMLargeInteger cycle)
 	return cycle / (GMfloat)d->frequency;
 }
 
+//GMStopwatch
+GMStopwatch::GMStopwatch()
+{
+	D(d);
+	d->frequency = GMClock::highResolutionTimerFrequency();
+	d->start = 0;
+	d->end = 0;
+}
+
+void GMStopwatch::start()
+{
+	D(d);
+	d->start = GMClock::highResolutionTimer();
+}
+
+void GMStopwatch::stop()
+{
+	D(d);
+	d->end = GMClock::highResolutionTimer();
+}
+
+GMfloat GMStopwatch::timeInSecond()
+{
+	D(d);
+	return timeInCycle() / (GMfloat)d->frequency;
+}
+
+GMLargeInteger GMStopwatch::timeInCycle()
+{
+	D(d);
+	return d->end - d->start;
+}
+
+//Profile
+IProfileHandler& GMProfile::handler()
+{
+	static GMConsoleProfileHandler h;
+	return h;
+}
+
+GMProfile::GMProfileSession& GMProfile::profileSession()
+{
+	static GMProfileSession s;
+	return s;
+}
+
+GMProfile::GMProfile(const char* name, const char* parent)
+{
+	startRecord(name, parent);
+}
+
+GMProfile::~GMProfile()
+{
+	stopRecord();
+}
+
+void GMProfile::startRecord(const char* name, const char* parent)
+{
+	D(d);
+	if (!GMGetBuiltIn(RUN_PROFILE))
+		return;
+
+	GMProfileSession& ps = profileSession();
+
+	// 如果有指定parent，那么只有上一层stack是指定stack，才会执行profile
+	if (!parent || ps.callstack.top() == parent)
+	{
+		ps.level++;
+	}
+	else
+	{
+		if (parent)
+			gm_warning("profile stack not match. profile name: %s, target parent stack: %s \n", name, ps.callstack.top());
+		return;
+	}
+
+	strcpy_s(d->name, name);
+	ps.callstack.push(d->name);
+	d->valid = true;
+	d->stopwatch.start();
+}
+
+void GMProfile::stopRecord()
+{
+	D(d);
+	if (d->valid)
+	{
+		d->stopwatch.stop();
+		GMProfileSession& ps = profileSession();
+		GMint level = ps.level;
+		while (--level)
+		{
+			handler().write(" ");
+		}
+
+		char report[512];
+		sprintf_s(report, "'%s' : %f s\n", d->name, d->stopwatch.timeInSecond());
+		ps.level--;
+		ps.callstack.pop();
+		handler().write(report);
+	}
+}
+
 //Plane
 #define EPSILON 0.01f
 
 void Plane::setFromPoints(const linear_math::Vector3 & p0, const linear_math::Vector3 & p1, const linear_math::Vector3 & p2)
 {
-
 	normal = linear_math::cross((p1 - p0), (p2 - p0));
-
 	normal = linear_math::normalize(normal);
-
 	calculateIntercept(p0);
 }
 

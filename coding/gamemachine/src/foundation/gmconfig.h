@@ -21,6 +21,8 @@ struct GMConfig_BuiltInOptions
 		DRAW_ONLY_SKY,
 		DRAW_NORMAL, // see DrawNormalOptions
 
+		RUN_PROFILE,
+
 		BUILTIN_OPTIONS_END,
 	};
 

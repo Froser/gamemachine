@@ -4,6 +4,10 @@
 #include <map>
 #include <string>
 #include <set>
+
+#define GM_PROFILE_ROOT(name) GMProfile __profile(#name, nullptr)
+#define GM_PROFILE(name, parent) GMProfile __profile(#name, #parent)
+
 BEGIN_NS
 
 inline void format_time(char* in)

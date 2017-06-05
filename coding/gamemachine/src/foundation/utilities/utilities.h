@@ -4,6 +4,7 @@
 #include "foundation/linearmath.h"
 #include "foundation/vector.h"
 #include <time.h>
+#include <stack>
 BEGIN_NS
 
 // 此类包含了各种实用工具
@@ -315,9 +316,7 @@ protected:
 };
 #endif
 
-//FPSCounter
-enum { FPSCounter_MAX = 10 };
-
+//GMClock
 GM_PRIVATE_OBJECT(GMClock)
 {
 	GMLargeInteger frequency;
@@ -350,10 +349,82 @@ public:
 	GMfloat getTime();
 	GMfloat evaluateDeltaTime();
 
+public:
+	static GMLargeInteger highResolutionTimerFrequency();
+	static GMLargeInteger highResolutionTimer();
+
 private:
-	GMLargeInteger highResolutionTimerFrequency();
-	GMLargeInteger highResolutionTimer();
 	GMfloat cycleToSecond(GMLargeInteger cycle);
+};
+
+//GMStopwatch
+GM_PRIVATE_OBJECT(GMStopwatch)
+{
+	GMLargeInteger frequency;
+	GMLargeInteger start;
+	GMLargeInteger end;
+};
+
+class GMStopwatch : public GMObject
+{
+	DECLARE_PRIVATE(GMStopwatch);
+
+public:
+	GMStopwatch();
+
+public:
+	void start();
+	void stop();
+	GMfloat timeInSecond();
+	GMLargeInteger timeInCycle();
+};
+
+//Profile
+struct IProfileHandler
+{
+	virtual ~IProfileHandler() {}
+	virtual void write(const char*) = 0;
+};
+
+class GMConsoleProfileHandler : public IProfileHandler
+{
+public:
+	virtual void write(const char* str) override
+	{
+		printf("%s: ", str);
+	}
+};
+
+GM_PRIVATE_OBJECT(GMProfile)
+{
+	GM_PRIVATE_CONSTRUCT(GMProfile) : valid(false) {}
+	GMStopwatch stopwatch;
+	char name[128];
+	bool valid;
+};
+
+class GMProfile : public GMObject
+{
+	struct GMProfileSession : public GMObject
+	{
+		GMProfileSession() : level(0) {};
+		std::stack<std::string> callstack;
+		GMint level;
+	};
+
+	DECLARE_PRIVATE(GMProfile)
+
+public:
+	static IProfileHandler& handler();
+	static GMProfileSession& profileSession();
+
+public:
+	GMProfile(const char* name, const char* parent = nullptr);
+	~GMProfile();
+
+private:
+	void startRecord(const char* name, const char* parent);
+	void stopRecord();
 };
 
 //Plane
