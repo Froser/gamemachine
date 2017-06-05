@@ -12,7 +12,7 @@ typedef GMint GMCommand;
 GM_ALIGNED_16(class) GMCommandVector3 : public GMObject
 {
 public:
-	GMCommandVector3() {}
+	DEFAULT_CONSTRUCTOR(GMCommandVector3);
 
 	GMCommandVector3(GMfloat x, GMfloat y, GMfloat z)
 	{

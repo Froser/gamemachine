@@ -6,46 +6,6 @@
 #include <set>
 BEGIN_NS
 
-// Debug options:
-enum DebugOptions
-{
-	CALCULATE_BSP_FACE,
-	POLYGON_LINE_MODE,
-	DRAW_ONLY_SKY,
-	DRAW_NORMAL, // see DrawNormalOptions
-
-	DEBUG_OPTIONS_END,
-};
-
-//Draw normal options
-enum DrawNormalOptions
-{
-	DRAW_NORMAL_OFF,
-	DRAW_NORMAL_EYESPACE,
-	DRAW_NORMAL_CAMERASPACE,
-	DRAW_NORMAL_MAX
-};
-
-#define DBG Debug::getDebugger()
-#define DBG_SET_INT(key, value) DBG->setInt(key, value)
-#define DBG_INT(key) DBG->getInt(key)
-
-class Debug
-{
-public:
-	static Debug* getDebugger();
-
-public:
-	void setInt(GMint key, GMint value);
-	GMint getInt(GMint key);
-
-private:
-	Debug();
-
-private:
-	std::map<GMint, GMint> m_ints;
-};
-
 inline void format_time(char* in)
 {
 #ifdef _WINDOWS

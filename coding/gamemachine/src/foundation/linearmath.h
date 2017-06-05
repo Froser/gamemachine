@@ -301,7 +301,7 @@ namespace linear_math
 #if USE_SIMD 
 		Vector2(__m128 _128) : m_128(_128) {};
 #endif
-		Vector2() {}
+		DEFAULT_CONSTRUCTOR(Vector2);
 		Vector2(GMfloat x, GMfloat y)
 		{
 			m_data[0] = x;
@@ -383,7 +383,7 @@ namespace linear_math
 		Vector4(__m128 _128) : m_128(_128) {};
 #endif
 
-		Vector4() {}
+		DEFAULT_CONSTRUCTOR(Vector4);
 
 		Vector4(GMfloat i)
 		{
@@ -429,7 +429,7 @@ namespace linear_math
 	GM_ALIGNED_16(class) Matrix4x4
 	{
 	public:
-		Matrix4x4() {}
+		DEFAULT_CONSTRUCTOR(Matrix4x4);
 		Matrix4x4(const Vector4& r1, const Vector4& r2, const Vector4& r3, const Vector4& r4)
 		{
 			m_data[0] = r1;

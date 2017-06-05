@@ -26,7 +26,7 @@ class AlignedAllocator
 	typedef AlignedAllocator< T, Alignment > my_type;
 
 public:
-	AlignedAllocator() {}
+	DEFAULT_CONSTRUCTOR(AlignedAllocator);
 
 public:
 	template < typename Other >

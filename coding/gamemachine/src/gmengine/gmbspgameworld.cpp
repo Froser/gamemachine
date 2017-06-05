@@ -157,9 +157,9 @@ void GMBSPGameWorld::drawAll()
 {
 	D(d);
 	drawSky();
-	if (!DBG_INT(DRAW_ONLY_SKY))
+	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
 	{
-		if (DBG_INT(CALCULATE_BSP_FACE))
+		if (GMGetBuiltIn(CALCULATE_BSP_FACE))
 			calculateVisibleFaces();
 		drawFaces();
 	}

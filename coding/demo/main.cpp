@@ -182,7 +182,7 @@ public:
 				inputManager->joystickVibrate(0, 0);
 
 			if (kbState['N'])
-				DBG_SET_INT(DRAW_NORMAL, (DBG_INT(DRAW_NORMAL) + 1) % DRAW_NORMAL_MAX);
+				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
 
 			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
@@ -209,11 +209,11 @@ public:
 			character->action(moveTag, rate);
 
 			if (kbState['P'])
-				DBG_SET_INT(CALCULATE_BSP_FACE, !DBG_INT(CALCULATE_BSP_FACE));
+				GMSetBuiltIn(CALCULATE_BSP_FACE, !GMGetBuiltIn(CALCULATE_BSP_FACE));
 			if (kbState['L'])
-				DBG_SET_INT(POLYGON_LINE_MODE, !DBG_INT(POLYGON_LINE_MODE));
+				GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
 			if (kbState['O'])
-				DBG_SET_INT(DRAW_ONLY_SKY, !DBG_INT(DRAW_ONLY_SKY));
+				GMSetBuiltIn(DRAW_ONLY_SKY, !GMGetBuiltIn(DRAW_ONLY_SKY));
 			break;
 		}
 	}

@@ -193,7 +193,7 @@ void GMGLRenders_Object::activateLight(LightType t, LightInfo& light)
 void GMGLRenders_Object::drawDebug()
 {
 	D(d);
-	GMGL::uniformInt(*d->gmglShaders, DBG_INT(DRAW_NORMAL), GMSHADER_DEBUG_DRAW_NORMAL);
+	GMGL::uniformInt(*d->gmglShaders, GMGetBuiltIn(DRAW_NORMAL), GMSHADER_DEBUG_DRAW_NORMAL);
 }
 
 void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)

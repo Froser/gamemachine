@@ -1,6 +1,11 @@
 ﻿#include "stdafx.h"
 #include "gmconfig.h"
 
+GMConfig::GMConfig()
+{
+	initInternal();
+}
+
 GMConfig::~GMConfig()
 {
 	D(d);
@@ -182,4 +187,12 @@ void GMConfig::releaseString(const GMConfigValue* value)
 		delete[] value->value.str;
 		value->value.str = nullptr;
 	}
+}
+
+void GMConfig::initInternal()
+{
+	setInt32(GMConfig_BuiltInOptions::CALCULATE_BSP_FACE, 1);
+	setInt32(GMConfig_BuiltInOptions::POLYGON_LINE_MODE, 0);
+	setInt32(GMConfig_BuiltInOptions::DRAW_ONLY_SKY, 0);
+	setInt32(GMConfig_BuiltInOptions::DRAW_NORMAL, GMConfig_BuiltInOptions::DRAW_NORMAL_OFF);
 }

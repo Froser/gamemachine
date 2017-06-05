@@ -431,7 +431,7 @@ class Frustum : public GMObject
 	DECLARE_PRIVATE(Frustum)
 
 public:
-	Frustum() {}
+	DEFAULT_CONSTRUCTOR(Frustum);
 	void initFrustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:

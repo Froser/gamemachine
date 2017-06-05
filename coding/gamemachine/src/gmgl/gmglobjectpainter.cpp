@@ -6,6 +6,7 @@
 #include "gmengine/gmgameworld.h"
 #include "gmglgraphic_engine.h"
 #include "renders/gmgl_render.h"
+#include "foundation/gamemachine.h"
 
 static GLenum getMode(Mesh* obj)
 {
@@ -109,7 +110,7 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 				continue;
 
 			render->beginShader(shader);
-			GLenum mode = DBG_INT(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
+			GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 			render->endShader();
 		}

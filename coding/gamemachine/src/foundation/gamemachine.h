@@ -62,6 +62,9 @@ public:
 	IFactory* getFactory();
 	GraphicSettings& getSettings();
 
+	// 配置管理
+	GMConfig* getConfigManager();
+
 	// 字体管理
 	GMGlyphManager* getGlyphManager();
 
@@ -88,7 +91,6 @@ public:
 	void startGameMachine();
 
 private:
-	void initDebugger();
 	bool handleMessages();
 };
 

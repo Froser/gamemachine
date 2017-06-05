@@ -32,16 +32,6 @@ void GameMachine::init(
 	d->inputManager.reset(new GMInput());
 
 	d->configManager.reset(new GMConfig());
-
-	initDebugger();
-}
-
-void GameMachine::initDebugger()
-{
-	DBG_SET_INT(CALCULATE_BSP_FACE, 1);
-	DBG_SET_INT(POLYGON_LINE_MODE, 0);
-	DBG_SET_INT(DRAW_ONLY_SKY, 0);
-	DBG_SET_INT(DRAW_NORMAL, DRAW_NORMAL_OFF);
 }
 
 IGraphicEngine* GameMachine::getGraphicEngine()
@@ -72,6 +62,12 @@ GraphicSettings& GameMachine::getSettings()
 {
 	D(d);
 	return d->settings;
+}
+
+GMConfig* GameMachine::getConfigManager()
+{
+	D(d);
+	return d->configManager;
 }
 
 GMGlyphManager* GameMachine::getGlyphManager()

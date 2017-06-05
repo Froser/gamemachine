@@ -5,12 +5,39 @@
 #include <string>
 BEGIN_NS
 
+#define GMCfg (GameMachine::instance().getConfigManager())
+#define GMGetBuiltIn(i) (GMCfg->getInt32(GMConfig_BuiltInOptions::i, GMConfig_BuiltInOptions::BUILTIN_OPTIONS_INVALID))
+#define GMSetBuiltIn(i, value) (GMCfg->setInt32(GMConfig_BuiltInOptions::i, value))
+
+// 关于内部（如调试）的一些配置
+struct GMConfig_BuiltInOptions
+{
+	enum
+	{
+		BUILTIN_OPTIONS_INVALID = -1,
+		
+		CALCULATE_BSP_FACE = 0,
+		POLYGON_LINE_MODE,
+		DRAW_ONLY_SKY,
+		DRAW_NORMAL, // see DrawNormalOptions
+
+		BUILTIN_OPTIONS_END,
+	};
+
+	enum
+	{
+		DRAW_NORMAL_OFF,
+		DRAW_NORMAL_EYESPACE,
+		DRAW_NORMAL_CAMERASPACE,
+		DRAW_NORMAL_END
+	};
+};
+
 union GMConfigValueStruct
 {
 	GMLargeInteger i64;
 	GMint i32;
 	GMfloat f32;
-	bool boolean;
 	void* ptr;
 	char* str;
 };
@@ -35,31 +62,44 @@ struct GMConfigValue : public GMAlignmentObject
 		strcpy_s(value.str, len, str);
 	}
 
+	GMConfigValue(GMint i)
+	{
+		type = VT_Int32;
+		value.i32 = i;
+	}
+
+	GMConfigValue(GMLargeInteger i)
+	{
+		type = VT_Int64;
+		value.i64 = i;
+	}
+
+	GMConfigValue(GMfloat f)
+	{
+		type = VT_Float32;
+		value.f32 = f;
+	}
+
 	mutable GMConfigValueStruct value;
 	GMConfigValueType type;
 };
 
 inline bool operator < (const GMConfigValue& lhs, const GMConfigValue& rhs)
 {
-	return lhs.value.i32 < lhs.value.i32;
-}
-
-inline bool operator == (const GMConfigValue& lhs, const GMConfigValue& rhs)
-{
 	if (lhs.type != rhs.type)
-		return false;
+		return lhs.type < rhs.type;
 
 	switch (lhs.type)
 	{
 	case VT_String:
 		return strEqual(lhs.value.str, rhs.value.str);
 	case VT_Float32:
-		return lhs.value.f32 == rhs.value.f32;
+		return lhs.value.f32 < rhs.value.f32;
 	case VT_Int32:
-		return lhs.value.i32 == rhs.value.i32;
+		return lhs.value.i32 < rhs.value.i32;
 	case VT_Int64:
 	default:
-		return lhs.value.i64 == rhs.value.i64;
+		return lhs.value.i64 < rhs.value.i64;
 	}
 }
 
@@ -78,7 +118,7 @@ public:
 	~GMConfig();
 
 private:
-	DEFAULT_CONSTRUCTOR(GMConfig);
+	GMConfig();
 
 public:
 	void setInt32(const GMConfigValue& key, GMint i);
@@ -93,6 +133,7 @@ public:
 private:
 	GMConfigValue* find(const GMConfigValue& key);
 	void releaseString(const GMConfigValue* value);
+	void initInternal();
 };
 
 END_NS
