@@ -9,7 +9,7 @@ BEGIN_NS
 
 inline void format_time(char* in)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
 	sprintf_s(in, LINE_MAX, "%d-%02d-%02d %02d:%02d:%02d",

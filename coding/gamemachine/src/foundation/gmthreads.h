@@ -4,7 +4,7 @@
 #include "utilities/utilities.h"
 BEGIN_NS
 
-#ifdef _WINDOWS
+#if _WINDOWS
 typedef HANDLE GMThreadHandle;
 typedef DWORD GMThreadId;
 #else
@@ -46,6 +46,7 @@ public:
 	void start();
 	void wait(GMuint milliseconds = 0);
 	void setCallback(IThreadCallback* callback);
+	void terminate();
 	Data* d();
 
 public:
@@ -54,6 +55,54 @@ public:
 public:
 	static GMThreadId getCurrentThreadId();
 };
+
+// GMSustainedThread
+GM_PRIVATE_OBJECT(GMSustainedThread)
+{
+	GMEvent outterEvent;
+	GMEvent innerEvent;
+	GMEvent terminateEvent;
+	bool terminate;
+};
+
+class GMSustainedThread : public GMThread
+{
+	DECLARE_PRIVATE(GMSustainedThread)
+
+public:
+	GMSustainedThread();
+	~GMSustainedThread();
+
+public:
+	void wait(GMint milliseconds = 0);
+	void trigger();
+	void stop();
+
+public:
+	virtual void run() override;
+
+private:
+	virtual void sustainedRun() = 0;
+};
+
+class GMSustainedThreadRunner
+{
+public:
+	GMSustainedThreadRunner(GMSustainedThread* t) : th(t)
+	{
+		th->trigger();
+	}
+
+	~GMSustainedThreadRunner()
+	{
+		th->wait();
+	}
+
+private:
+	GMSustainedThread* th;
+};
+
+#define GMRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
 
 // GMJobPool
 GM_PRIVATE_OBJECT(GMJobPool)

@@ -2,7 +2,7 @@
 #include "gmdirectsound_sounddevice.h"
 #include "gmdatacore/soundreader/gmsoundreader.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 
 #ifdef _MSC_VER
 #pragma comment(lib,"dsound.lib")

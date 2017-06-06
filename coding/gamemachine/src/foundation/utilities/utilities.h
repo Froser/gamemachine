@@ -134,7 +134,7 @@ private:
 };
 
 //Shared pointer
-#ifdef _WINDOWS
+#if _WINDOWS
 #define __uuid(c) __uuidof(c)
 
 template <class E>
@@ -598,7 +598,7 @@ struct Path
 };
 
 //GMEvent
-#ifdef _WINDOWS
+#if _WINDOWS
 typedef HANDLE GMEventHandle;
 #else
 #	error need implement

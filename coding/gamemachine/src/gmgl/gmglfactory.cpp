@@ -10,7 +10,7 @@
 void GMGLFactory::createWindow(OUT IWindow** window)
 {
 	ASSERT(window);
-#ifdef _WINDOWS
+#if _WINDOWS
 	*window = new GMWinGLWindow();
 #elif defined __APPLE__
 	;

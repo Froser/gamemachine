@@ -2,7 +2,7 @@
 #include "utilities.h"
 #include "foundation/linearmath.h"
 #include "assert.h"
-#ifdef _WINDOWS
+#if _WINDOWS
 #	include <io.h>
 #	include <direct.h>
 #endif
@@ -89,7 +89,7 @@ GMfloat GMClock::evaluateDeltaTime()
 
 GMLargeInteger GMClock::highResolutionTimerFrequency()
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	LARGE_INTEGER i;
 	BOOL b = QueryPerformanceFrequency(&i);
 	ASSERT(b);
@@ -102,7 +102,7 @@ GMLargeInteger GMClock::highResolutionTimerFrequency()
 
 GMLargeInteger GMClock::highResolutionTimer()
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	LARGE_INTEGER i;
 	BOOL b = QueryPerformanceCounter(&i);
 	ASSERT(b);
@@ -677,7 +677,7 @@ AlignedVector<std::string> Path::getAllFiles(const char* directory)
 
 bool Path::directoryExists(const std::string& dir)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	WIN32_FIND_DATA findFileData;
 	HANDLE hFind;
 	hFind = FindFirstFile(dir.c_str(), &findFileData);
@@ -695,7 +695,7 @@ bool Path::directoryExists(const std::string& dir)
 
 void Path::createDirectory(const std::string& dir)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	if (directoryExists(dir) || (dir.size() == 2 && dir[1] == ':'))
 		return;
 
@@ -721,7 +721,7 @@ void Path::createDirectory(const std::string& dir)
 }
 
 //GMEvent
-#ifdef _WINDOWS
+#if _WINDOWS
 GMEvent::GMEvent(bool manualReset)
 {
 	D(d);

@@ -2,7 +2,7 @@
 #include "gmsoundreader_mp3.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "mad.h"
-#ifdef _WINDOWS
+#if _WINDOWS
 #include <dsound.h>
 #endif
 #include "foundation/utilities/utilities.h"
@@ -26,7 +26,7 @@ struct MP3SoundFilePrivate
 	bool playing; // 是否正在播放
 	GMlong frame; // MP3已经解码的帧数
 
-#ifdef _WINDOWS
+#if _WINDOWS
 	DSBPOSITIONNOTIFY notifyPos[BUFFER_COUNT];
 	HANDLE events[BUFFER_COUNT];
 	ComPtr<IDirectSoundBuffer8> cpDirectSoundBuffer;
@@ -34,7 +34,7 @@ struct MP3SoundFilePrivate
 #endif
 };
 
-#ifdef _WINDOWS
+#if _WINDOWS
 static DWORD WINAPI decode(LPVOID lpThreadParameter);
 static DWORD WINAPI processBuffer(LPVOID lpThreadParameter);
 
@@ -171,7 +171,7 @@ static inline GMint scale(mad_fixed_t sample)
 
 static mad_flow input(void *data, mad_stream *stream)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)data;
 
 	if (!d->playing)
@@ -190,7 +190,7 @@ static mad_flow input(void *data, mad_stream *stream)
 
 static mad_flow output(void *data, struct mad_header const *header, struct mad_pcm *pcm)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)data;
 
 	if (!d->playing)
@@ -252,7 +252,7 @@ static mad_flow output(void *data, struct mad_header const *header, struct mad_p
 }
 
 
-#ifdef _WINDOWS
+#if _WINDOWS
 static DWORD WINAPI decode(LPVOID lpThreadParameter)
 {
 	MP3SoundFile::Data* d = (MP3SoundFile::Data*)lpThreadParameter;
@@ -320,7 +320,7 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 
 bool GMSoundReader_MP3::load(GMBuffer& buffer, OUT ISoundFile** sf)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	D(d);
 	MP3SoundFile* file = new MP3SoundFile(&buffer);
 	*sf = file;

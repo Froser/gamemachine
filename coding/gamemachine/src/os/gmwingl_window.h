@@ -3,7 +3,7 @@
 #include "common.h"
 BEGIN_NS
 
-#ifdef _WINDOWS
+#if _WINDOWS
 
 GM_PRIVATE_OBJECT(GMWinGLWindow)
 {

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gminput.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 
 static char* xinputDlls[] = {
 	"xinput9_1_0.dll",
@@ -14,7 +14,7 @@ XInputWrapper::XInputWrapper()
 	, m_xinputSetState(nullptr)
 	, m_module(0)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	for (GMint i = 0; i < 3; i++)
 	{
 		m_module = LoadLibrary(xinputDlls[i]);

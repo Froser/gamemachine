@@ -4,14 +4,14 @@
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/soundreader/gmsoundreader.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 #include <dsound.h>
 #include <mmsystem.h>
 #endif
 
 BEGIN_NS
 
-#ifdef _WINDOWS
+#if _WINDOWS
 
 struct IWindow;
 class GMSoundPlayerDevice

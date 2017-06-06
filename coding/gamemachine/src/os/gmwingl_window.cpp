@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmwingl_window.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 
 const char* CLASSNAME = "GameMachine Window";
 

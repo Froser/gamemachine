@@ -183,7 +183,7 @@ bool ZipGMGLGamePackageHandler::loadZip()
 			err = unzOpenCurrentFilePassword(m_uf, nullptr);
 			CHECK(err);
 
-#ifdef _WINDOWS
+#if _WINDOWS
 			// 跳过文件夹
 			if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
 				break;

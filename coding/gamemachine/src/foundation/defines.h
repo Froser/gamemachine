@@ -117,7 +117,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #endif
 
 // 平台差异
-#ifdef __APPLE__
+#ifdef __GNUC__
 #define strcat_s strcat
 
 inline static void strcpy_s(char* dest, size_t len, const char* source)
@@ -148,7 +148,7 @@ inline static void fopen_s(FILE** f, const char* filename, const char* mode)
 #define MAX_PATH 256 // 最长路径
 #define NO_LAMBDA //禁止使用Lambda表达式
 
-#endif // __APPLE__
+#endif // __GNUC__
 
 END_NS
 

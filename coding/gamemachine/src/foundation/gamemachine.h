@@ -7,11 +7,31 @@
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "os/gminput.h"
+#include "gmthreads.h"
 BEGIN_NS
 
 enum GameMachineMessage
 {
 	GM_MESSAGE_EXIT,
+};
+
+// Multi-threads
+template <GameMachineEvent e>
+class GameLoopJob : public GMSustainedThread
+{
+public:
+	void setHandler(IGameHandler* h)
+	{
+		handler = h;
+	}
+
+	virtual void sustainedRun() override
+	{
+		handler->event(e);
+	}
+
+private:
+	IGameHandler* handler;
 };
 
 GM_PRIVATE_OBJECT(GameMachine)
@@ -27,6 +47,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<GMInput> inputManager;
 	AutoPtr<GMConfig> configManager;
 	std::queue<GameMachineMessage> messageQueue;
+	GameLoopJob<GM_EVENT_SIMULATE> simulateJob;
 };
 
 class GameMachine : public GMSingleton<GameMachine>

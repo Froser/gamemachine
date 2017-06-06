@@ -13,6 +13,11 @@
 #include "gmdatacore/bsp_model_loader.h"
 BEGIN_NS
 
+struct DrawPolygonFaceJob;
+struct DrawMeshFaceJob;
+struct DrawPatchJob;
+struct DrawEntityJob;
+
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
 	GM_PRIVATE_CONSTRUCT(GMBSPGameWorld)
@@ -33,6 +38,11 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	Vector<GMGameObject*> meshFaceBuffer;
 	Vector<GMGameObject*> patchBuffer;
 	Vector<GMGameObject*> entityBuffer;
+
+	DrawPolygonFaceJob* drawPolygonFaceJob;
+	DrawMeshFaceJob* drawMeshFaceJob;
+	DrawPatchJob* drawPatchJob;
+	DrawEntityJob* drawEntityJob;
 };
 
 class GMBSPGameWorld;

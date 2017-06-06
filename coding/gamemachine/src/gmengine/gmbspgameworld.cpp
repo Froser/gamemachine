@@ -14,14 +14,15 @@
 #include "foundation/gmthreads.h"
 
 // Multi-threads
-struct DrawPolygonFaceJob : public GMThread
+BEGIN_NS
+struct DrawPolygonFaceJob : public GMSustainedThread
 {
 	DrawPolygonFaceJob(GMBSPGameWorld* w)
 		: world(w)
 	{
 	}
 	
-	virtual void run() override
+	virtual void sustainedRun() override
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
@@ -43,14 +44,14 @@ private:
 	GMBSPGameWorld* world;
 };
 
-struct DrawMeshFaceJob : public GMThread
+struct DrawMeshFaceJob : public GMSustainedThread
 {
 	DrawMeshFaceJob(GMBSPGameWorld* w)
 		: world(w)
 	{
 	}
 
-	virtual void run() override
+	virtual void sustainedRun() override
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
@@ -72,14 +73,14 @@ private:
 	GMBSPGameWorld* world;
 };
 
-struct DrawPatchJob : public GMThread
+struct DrawPatchJob : public GMSustainedThread
 {
 	DrawPatchJob(GMBSPGameWorld* w)
 		: world(w)
 	{
 	}
 
-	virtual void run() override
+	virtual void sustainedRun() override
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
@@ -101,14 +102,14 @@ private:
 	GMBSPGameWorld* world;
 };
 
-struct DrawEntityJob : public GMThread
+struct DrawEntityJob : public GMSustainedThread
 {
 	DrawEntityJob(GMBSPGameWorld* w)
 		: world(w)
 	{
 	}
 
-	virtual void run() override
+	virtual void sustainedRun() override
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
@@ -123,12 +124,33 @@ struct DrawEntityJob : public GMThread
 private:
 	GMBSPGameWorld* world;
 };
+END_NS
 
 GMBSPGameWorld::GMBSPGameWorld()
 	: GMGameWorld()
 {
 	D(d);
 	d->physics.reset(new GMBSPPhysicsWorld(this));
+
+	// 初始化工作线程
+	d->drawPolygonFaceJob = new DrawPolygonFaceJob(this);
+	d->drawMeshFaceJob = new DrawMeshFaceJob(this);
+	d->drawPatchJob = new DrawPatchJob(this);
+	d->drawEntityJob = new DrawEntityJob(this);
+
+	d->drawPolygonFaceJob->start();
+	d->drawMeshFaceJob->start();
+	d->drawPatchJob->start();
+	d->drawEntityJob->start();
+}
+
+GMBSPGameWorld::~GMBSPGameWorld()
+{
+	D(d);
+	delete d->drawPolygonFaceJob;
+	delete d->drawMeshFaceJob;
+	delete d->drawPatchJob;
+	delete d->drawEntityJob;
 }
 
 void GMBSPGameWorld::loadBSP(const char* mapName)
@@ -293,14 +315,15 @@ void GMBSPGameWorld::drawSky()
 void GMBSPGameWorld::drawFaces()
 {
 	GM_PROFILE(drawFaces);
+	D(d);
 	clearBuffer();
 
-	GMJobPool jobs;
-	jobs.addJob(new DrawPolygonFaceJob(this));
-	jobs.addJob(new DrawMeshFaceJob(this));
-	jobs.addJob(new DrawPatchJob(this));
-	jobs.addJob(new DrawEntityJob(this));
-	jobs.waitJobs();
+	{
+		GMRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
+		GMRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
+		GMRunSustainedThread(drawPatchJob, d->drawPatchJob);
+		GMRunSustainedThread(drawEntityJob, d->drawEntityJob);
+	}
 
 	flushBuffer();
 }

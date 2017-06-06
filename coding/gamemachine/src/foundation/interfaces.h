@@ -29,7 +29,7 @@ struct IWindow
 	virtual GMRect getWindowRect() = 0;
 	virtual bool handleMessages() = 0;
 	virtual void swapBuffers() = 0;
-#ifdef _WINDOWS
+#if _WINDOWS
 	virtual HWND hwnd() = 0;
 #endif
 };

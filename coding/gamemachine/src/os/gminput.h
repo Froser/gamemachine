@@ -3,7 +3,7 @@
 #include "common.h"
 BEGIN_NS
 
-#ifdef _WINDOWS
+#if _WINDOWS
 #include <Xinput.h>
 
 struct GMJoystickState
@@ -82,7 +82,7 @@ public:
 
 struct InputSelector
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	typedef Input_Windows InputTarget;
 #endif
 };

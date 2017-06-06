@@ -4,7 +4,7 @@
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "gmsoundreader.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 #include <dsound.h>
 #include "os/gmdirectsound_sounddevice.h"
 #endif
@@ -30,7 +30,7 @@ struct GM_WAVEFACT
 	DWORD data;
 };
 
-#ifdef _WINDOWS
+#if _WINDOWS
 GM_PRIVATE_OBJECT(WavSoundFile)
 {
 	ComPtr<IDirectSoundBuffer8> cpDirectSoundBuffer;
@@ -104,7 +104,7 @@ private:
 
 bool GMSoundReader_Wav::load(GMBuffer& buffer, OUT ISoundFile** sf)
 {
-#ifdef _WINDOWS
+#if _WINDOWS
 	// 假设都是小端模式
 	GM_WAVERIFF riff;
 	GM_WAVEFORMATEX format;

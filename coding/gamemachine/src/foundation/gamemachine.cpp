@@ -4,27 +4,9 @@
 #include "gmengine/gmgameobject.h"
 #include "gmconfig.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
 #endif
-#include "gmthreads.h"
-
-// Multi-threads
-template <GameMachineEvent e>
-struct LoopJob : public GMThread
-{
-	LoopJob(IGameHandler* h)
-		: handler(h)
-	{
-	}
-
-	virtual void run() override
-	{
-		handler->event(e);
-	}
-
-	IGameHandler* handler;
-};
 
 void GameMachine::init(
 	GraphicSettings settings,
@@ -152,6 +134,7 @@ GameMachine::EndiannessMode GameMachine::getMachineEndianness()
 void GameMachine::startGameMachine()
 {
 	D(d);
+
 	// 创建Window (createWindow会初始化glew，所有GL操作必须要放在create之后）
 	/*
 	d->window->initWindowSize(d->settings.windowSize[0], d->settings.windowSize[1]);
@@ -160,7 +143,7 @@ void GameMachine::startGameMachine()
 	*/
 	d->window->createWindow();
 
-#ifdef _WINDOWS
+#if _WINDOWS
 	// 创建声音设备
 	GMSoundPlayerDevice::createInstance(d->window);
 #endif
@@ -173,6 +156,10 @@ void GameMachine::startGameMachine()
 	// 初始化gameHandler
 	d->gameHandler->init();
 
+	// 开始多线程工作
+	d->simulateJob.setHandler(d->gameHandler);
+	d->simulateJob.start();
+
 	d->clock.begin();
 	// 消息循环
 	while (true)
@@ -183,13 +170,14 @@ void GameMachine::startGameMachine()
 		if (!handleMessages())
 			break;
 		
-		GMJobPool jobs;
 		if (d->gameHandler->isWindowActivate())
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
-		jobs.addJob(new LoopJob<GM_EVENT_SIMULATE>(d->gameHandler));
-		d->gameHandler->event(GM_EVENT_RENDER);
-		jobs.waitJobs();
-		d->window->swapBuffers();
+
+		{
+			GMRunSustainedThread (simulateJob, &d->simulateJob);
+			d->gameHandler->event(GM_EVENT_RENDER);
+			d->window->swapBuffers();
+		}
 		d->clock.update();
 	}
 }

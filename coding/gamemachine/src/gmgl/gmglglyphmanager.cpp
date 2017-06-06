@@ -5,7 +5,7 @@
 #include "freetype/ftglyph.h"
 #include "gmgltexture.h"
 
-#ifdef _WINDOWS
+#if _WINDOWS
 #include <shlobj.h>
 #endif
 
@@ -40,7 +40,7 @@ static GMuint fontNameNum = 2;
 static FT_Error loadFace(FT_Face* face)
 {
 	FT_Error err = FT_Err_Cannot_Open_Resource;
-#ifdef _WINDOWS
+#if _WINDOWS
 	char path[MAX_PATH];
 	SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
 

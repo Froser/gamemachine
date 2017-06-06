@@ -25,7 +25,7 @@ static DWORD WINAPI gmthread_run(LPVOID lpThreadParameter)
 void GMThread::start()
 {
 	D(d);
-#ifdef _WINDOWS
+#if _WINDOWS
 	d->event.reset();
 	d->handle = ::CreateThread(NULL, NULL, gmthread_run, this, 0, 0);
 	if (d->callback)
@@ -47,6 +47,14 @@ void GMThread::setCallback(IThreadCallback* callback)
 	d->callback = callback;
 }
 
+void GMThread::terminate()
+{
+	D(d);
+#if _WINDOWS
+	::TerminateThread(d->handle, 0);
+#endif
+}
+
 GMThread::Data* GMThread::d()
 {
 	D(d);
@@ -58,6 +66,53 @@ GMThreadId GMThread::getCurrentThreadId()
 #if _WINDOWS
 	return ::GetCurrentThreadId();
 #endif
+}
+
+GMSustainedThread::GMSustainedThread()
+{
+	D(d);
+	d->terminate = false;
+	d->terminateEvent.reset();
+	d->innerEvent.reset();
+}
+
+GMSustainedThread::~GMSustainedThread()
+{
+	D(d);
+	d->innerEvent.set();
+	terminate();
+}
+
+void GMSustainedThread::run()
+{
+	D(d);
+	while (!d->terminate)
+	{
+		d->innerEvent.wait();
+		sustainedRun();
+		d->outterEvent.set();
+		d->innerEvent.reset();
+	}
+	d->terminateEvent.set();
+}
+
+void GMSustainedThread::wait(GMint milliseconds)
+{
+	D(d);
+	d->outterEvent.wait(milliseconds);
+}
+
+void GMSustainedThread::trigger()
+{
+	D(d);
+	d->innerEvent.set();
+	d->outterEvent.reset();
+}
+
+void GMSustainedThread::stop()
+{
+	D(d);
+	d->terminate = true;
 }
 
 GMJobPool::~GMJobPool()
@@ -80,7 +135,7 @@ void GMJobPool::addJob(AUTORELEASE GMThread* thread)
 void GMJobPool::waitJobs(GMuint milliseconds)
 {
 	D(d);
-#ifdef _WINDOWS
+#if _WINDOWS
 	::WaitForMultipleObjects(d->handles.size(), d->handles.data(), TRUE, milliseconds == 0 ? INFINITE : milliseconds);
 #endif
 }

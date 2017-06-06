@@ -1,4 +1,4 @@
-﻿#ifdef _WINDOWS
+﻿#if _WINDOWS
 #include <windows.h>
 #endif
 
