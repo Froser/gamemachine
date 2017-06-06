@@ -7,6 +7,24 @@
 #ifdef _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
 #endif
+#include "gmthreads.h"
+
+// Multi-threads
+template <GameMachineEvent e>
+struct LoopJob : public GMThread
+{
+	LoopJob(IGameHandler* h)
+		: handler(h)
+	{
+	}
+
+	virtual void run() override
+	{
+		handler->event(e);
+	}
+
+	IGameHandler* handler;
+};
 
 void GameMachine::init(
 	GraphicSettings settings,
@@ -165,10 +183,12 @@ void GameMachine::startGameMachine()
 		if (!handleMessages())
 			break;
 		
-		d->gameHandler->event(GM_EVENT_SIMULATE);
+		GMJobPool jobs;
 		if (d->gameHandler->isWindowActivate())
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
+		jobs.addJob(new LoopJob<GM_EVENT_SIMULATE>(d->gameHandler));
 		d->gameHandler->event(GM_EVENT_RENDER);
+		jobs.waitJobs();
 		d->window->swapBuffers();
 		d->clock.update();
 	}

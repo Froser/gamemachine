@@ -4,6 +4,7 @@
 #include "gmengine/controllers/graphic_engine.h"
 #include "gmphysics/gmphysicsstructs.h"
 #include "foundation/gamemachine.h"
+#include "foundation/gmprofile.h"
 
 enum
 {
@@ -25,6 +26,7 @@ GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMCollisionObject* obj)
 
 void GMBSPMove::move()
 {
+	GM_PROFILE(move);
 	D(d);
 	generateMovement();
 	groundTrace();

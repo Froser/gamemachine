@@ -184,6 +184,9 @@ public:
 			if (kbState['N'])
 				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
 
+			if (kbState['I'])
+				GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
+
 			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
 				GMfloat rate = (GMfloat) joyState.thumbRX / (

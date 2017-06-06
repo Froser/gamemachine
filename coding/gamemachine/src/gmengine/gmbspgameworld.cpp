@@ -155,9 +155,6 @@ GMGameObject* GMBSPGameWorld::getSky()
 
 void GMBSPGameWorld::updateCamera()
 {
-	GM_PROFILE(updateCamera);
-	D(d);
-
 	GMCharacter* character = getMajorCharacter();
 	character->updateCamera();
 	CameraLookAt& lookAt = character->getLookAt();
@@ -168,8 +165,6 @@ void GMBSPGameWorld::renderGameWorld()
 {
 	GM_PROFILE(renderGameWorld);
 	D(d);
-
-	GameMachine::instance().getGraphicEngine()->newFrame();
 	updateCamera();
 	drawAll();
 }
@@ -274,6 +269,8 @@ void GMBSPGameWorld::drawAll()
 {
 	GM_PROFILE(drawAll);
 	D(d);
+	GameMachine::instance().getGraphicEngine()->newFrame();
+
 	drawSky();
 	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
 	{
@@ -320,6 +317,7 @@ void GMBSPGameWorld::clearBuffer()
 void GMBSPGameWorld::flushBuffer()
 {
 	D(d);
+
 	for (auto iter = d->polygonFaceBuffer.begin(); iter != d->polygonFaceBuffer.end(); iter++)
 	{
 		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
