@@ -151,6 +151,11 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	std::map<GMBSP_Render_Face*, GMGameObject*> meshFaceObjects;
 	std::map<GMBSPEntity*, GMEntityObject*> entitiyObjects;
 
+	// 用于记录每种类型的面在faceDirectory中的位置
+	Vector<GMint> polygonIndices;
+	Vector<GMint> meshFaceIndices;
+	Vector<GMint> patchIndices;
+
 	BSPData* bsp;
 	Bitset facesToDraw;
 	Bitset entitiesToDraw;

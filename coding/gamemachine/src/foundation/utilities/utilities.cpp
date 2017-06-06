@@ -7,9 +7,8 @@
 #	include <direct.h>
 #endif
 #include "foundation/vector.h"
-#include "foundation/gamemachine.h"
 
-//FPSCounter
+//GMClock
 GMClock::GMClock()
 {
 	D(d);
@@ -151,76 +150,6 @@ GMLargeInteger GMStopwatch::timeInCycle()
 {
 	D(d);
 	return d->end - d->start;
-}
-
-//Profile
-IProfileHandler& GMProfile::handler()
-{
-	static GMConsoleProfileHandler h;
-	return h;
-}
-
-GMProfile::GMProfileSession& GMProfile::profileSession()
-{
-	static GMProfileSession s;
-	return s;
-}
-
-GMProfile::GMProfile(const char* name, const char* parent)
-{
-	startRecord(name, parent);
-}
-
-GMProfile::~GMProfile()
-{
-	stopRecord();
-}
-
-void GMProfile::startRecord(const char* name, const char* parent)
-{
-	D(d);
-	if (!GMGetBuiltIn(RUN_PROFILE))
-		return;
-
-	GMProfileSession& ps = profileSession();
-
-	// 如果有指定parent，那么只有上一层stack是指定stack，才会执行profile
-	if (!parent || ps.callstack.top() == parent)
-	{
-		ps.level++;
-	}
-	else
-	{
-		if (parent)
-			gm_warning("profile stack not match. profile name: %s, target parent stack: %s \n", name, ps.callstack.top());
-		return;
-	}
-
-	strcpy_s(d->name, name);
-	ps.callstack.push(d->name);
-	d->valid = true;
-	d->stopwatch.start();
-}
-
-void GMProfile::stopRecord()
-{
-	D(d);
-	if (d->valid)
-	{
-		d->stopwatch.stop();
-		GMProfileSession& ps = profileSession();
-		GMint level = ps.level;
-		while (--level)
-		{
-			handler().write(" ");
-		}
-
-		char report[512];
-		sprintf_s(report, "'%s' : %f s\n", d->name, d->stopwatch.timeInSecond());
-		ps.level--;
-		ps.callstack.pop();
-		handler().write(report);
-	}
 }
 
 //Plane
@@ -790,3 +719,37 @@ void Path::createDirectory(const std::string& dir)
 #error need implement
 #endif
 }
+
+//GMEvent
+#ifdef _WINDOWS
+GMEvent::GMEvent(bool manualReset)
+{
+	D(d);
+	d->handle = ::CreateEvent(NULL, manualReset, FALSE, "");
+}
+
+GMEvent::~GMEvent()
+{
+	D(d);
+	::CloseHandle(d->handle);
+}
+
+void GMEvent::wait(GMuint milliseconds)
+{
+	D(d);
+	milliseconds = !milliseconds ? INFINITE : milliseconds;
+	::WaitForSingleObject(d->handle, milliseconds);
+}
+
+void GMEvent::set()
+{
+	D(d);
+	::SetEvent(d->handle);
+}
+
+void GMEvent::reset()
+{
+	D(d);
+	::ResetEvent(d->handle);
+}
+#endif

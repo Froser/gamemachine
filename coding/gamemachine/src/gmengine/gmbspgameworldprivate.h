@@ -28,6 +28,11 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	GMBSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;
 	std::map<GMint, std::set<GMBSPEntity*> > entities;
+
+	Vector<GMGameObject*> polygonFaceBuffer;
+	Vector<GMGameObject*> meshFaceBuffer;
+	Vector<GMGameObject*> patchBuffer;
+	Vector<GMGameObject*> entityBuffer;
 };
 
 class GMBSPGameWorld;

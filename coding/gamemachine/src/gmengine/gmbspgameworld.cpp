@@ -10,6 +10,119 @@
 #include <algorithm>
 #include "gmdatacore/modelreader/gmmodelreader.h"
 #include "foundation/gamemachine.h"
+#include "foundation/gmprofile.h"
+#include "foundation/gmthreads.h"
+
+// Multi-threads
+struct DrawPolygonFaceJob : public GMThread
+{
+	DrawPolygonFaceJob(GMBSPGameWorld* w)
+		: world(w)
+	{
+	}
+	
+	virtual void run() override
+	{
+		BSPData& bsp = world->bspData();
+		GMBSPRenderData& renderData = world->renderData();
+		for (auto iter = renderData.polygonIndices.begin(); iter != renderData.polygonIndices.end(); ++iter)
+		{
+			const GMint& i = *iter;
+			if (renderData.facesToDraw.isSet(i))
+			{
+				if (renderData.faceDirectory[i].faceType == 0)
+					continue;
+
+				if (renderData.faceDirectory[i].faceType == MST_PLANAR)
+					world->drawPolygonFace(renderData.faceDirectory[i].typeFaceNumber);
+			}
+		}
+	}
+
+private:
+	GMBSPGameWorld* world;
+};
+
+struct DrawMeshFaceJob : public GMThread
+{
+	DrawMeshFaceJob(GMBSPGameWorld* w)
+		: world(w)
+	{
+	}
+
+	virtual void run() override
+	{
+		BSPData& bsp = world->bspData();
+		GMBSPRenderData& renderData = world->renderData();
+		for (auto iter = renderData.meshFaceIndices.begin(); iter != renderData.meshFaceIndices.end(); ++iter)
+		{
+			const GMint& i = *iter;
+			if (renderData.facesToDraw.isSet(i))
+			{
+				if (renderData.faceDirectory[i].faceType == 0)
+					continue;
+
+				if (renderData.faceDirectory[i].faceType == MST_TRIANGLE_SOUP)
+					world->drawMeshFace(renderData.faceDirectory[i].typeFaceNumber);
+			}
+		}
+	}
+
+private:
+	GMBSPGameWorld* world;
+};
+
+struct DrawPatchJob : public GMThread
+{
+	DrawPatchJob(GMBSPGameWorld* w)
+		: world(w)
+	{
+	}
+
+	virtual void run() override
+	{
+		BSPData& bsp = world->bspData();
+		GMBSPRenderData& renderData = world->renderData();
+		for (auto iter = renderData.patchIndices.begin(); iter != renderData.patchIndices.end(); ++iter)
+		{
+			const GMint& i = *iter;
+			if (renderData.facesToDraw.isSet(i))
+			{
+				if (renderData.faceDirectory[i].faceType == 0)
+					continue;
+
+				if (renderData.faceDirectory[i].faceType == MST_PATCH)
+					world->drawPatch(renderData.faceDirectory[i].typeFaceNumber);
+			}
+		}
+	}
+
+private:
+	GMBSPGameWorld* world;
+};
+
+struct DrawEntityJob : public GMThread
+{
+	DrawEntityJob(GMBSPGameWorld* w)
+		: world(w)
+	{
+	}
+
+	virtual void run() override
+	{
+		BSPData& bsp = world->bspData();
+		GMBSPRenderData& renderData = world->renderData();
+
+		for (GMint i = 0; i < bsp.numleafs; i++)
+		{
+			if (renderData.entitiesToDraw.isSet(i))
+				world->drawEntity(i);
+		}
+	}
+
+private:
+	GMBSPGameWorld* world;
+};
 
 GMBSPGameWorld::GMBSPGameWorld()
 	: GMGameWorld()
@@ -42,7 +155,7 @@ GMGameObject* GMBSPGameWorld::getSky()
 
 void GMBSPGameWorld::updateCamera()
 {
-	GM_PROFILE(updateCamera, renderGameWorld);
+	GM_PROFILE(updateCamera);
 	D(d);
 
 	GMCharacter* character = getMajorCharacter();
@@ -53,7 +166,7 @@ void GMBSPGameWorld::updateCamera()
 
 void GMBSPGameWorld::renderGameWorld()
 {
-	GM_PROFILE_ROOT(renderGameWorld);
+	GM_PROFILE(renderGameWorld);
 	D(d);
 
 	GameMachine::instance().getGraphicEngine()->newFrame();
@@ -90,7 +203,7 @@ std::map<GMint, std::set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 
 void GMBSPGameWorld::calculateVisibleFaces()
 {
-	GM_PROFILE(calculateVisibleFaces, drawAll);
+	GM_PROFILE(calculateVisibleFaces);
 	D(d);
 	D_BASE(GMGameWorld, dbase);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -159,7 +272,7 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 // drawAll将所要需要绘制的对象放入列表
 void GMBSPGameWorld::drawAll()
 {
-	GM_PROFILE(drawAll, renderGameWorld);
+	GM_PROFILE(drawAll);
 	D(d);
 	drawSky();
 	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
@@ -174,7 +287,7 @@ void GMBSPGameWorld::drawAll()
 
 void GMBSPGameWorld::drawSky()
 {
-	GM_PROFILE(drawSky, drawAll);
+	GM_PROFILE(drawSky);
 	D(d);
 	if (d->sky)
 		GameMachine::instance().getGraphicEngine()->drawObject(d->sky);
@@ -182,50 +295,57 @@ void GMBSPGameWorld::drawSky()
 
 void GMBSPGameWorld::drawFaces()
 {
-	GM_PROFILE(drawFaces, drawAll);
-	D(d);
-	BSPData& bsp = d->bsp.bspData();
-	GMBSPRenderData& rd = d->render.renderData();
+	GM_PROFILE(drawFaces);
+	clearBuffer();
 
-	//loop through faces
-	for (GMint i = 0; i < bsp.numDrawSurfaces; ++i)
+	GMJobPool jobs;
+	jobs.addJob(new DrawPolygonFaceJob(this));
+	jobs.addJob(new DrawMeshFaceJob(this));
+	jobs.addJob(new DrawPatchJob(this));
+	jobs.addJob(new DrawEntityJob(this));
+	jobs.waitJobs();
+
+	flushBuffer();
+}
+
+void GMBSPGameWorld::clearBuffer()
+{
+	D(d);
+	d->polygonFaceBuffer.clear();
+	d->meshFaceBuffer.clear();
+	d->patchBuffer.clear();
+	d->entityBuffer.clear();
+}
+
+void GMBSPGameWorld::flushBuffer()
+{
+	D(d);
+	for (auto iter = d->polygonFaceBuffer.begin(); iter != d->polygonFaceBuffer.end(); iter++)
 	{
-		//if this face is to be drawn, draw it
-		if (rd.facesToDraw.isSet(i))
-			drawFace(i);
+		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
 	}
 
-	for (GMint i = 0; i < bsp.numleafs; i++)
+	for (auto iter = d->meshFaceBuffer.begin(); iter != d->meshFaceBuffer.end(); iter++)
 	{
-		if (rd.entitiesToDraw.isSet(i))
-			drawEntity(i);
+		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+	}
+
+	for (auto iter = d->patchBuffer.begin(); iter != d->patchBuffer.end(); iter++)
+	{
+		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+	}
+
+	for (auto iter = d->entityBuffer.begin(); iter != d->entityBuffer.end(); iter++)
+	{
+		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
 	}
 }
 
-void GMBSPGameWorld::drawFace(GMint idx)
-{
-	D(d);
-	BSPData& bsp = d->bsp.bspData();
-	GMBSPRenderData& rd = d->render.renderData();
-
-	//look this face up in the face directory
-	if (rd.faceDirectory[idx].faceType == 0)
-		return;
-
-	if (rd.faceDirectory[idx].faceType == MST_PLANAR)
-		drawPolygonFace(rd.faceDirectory[idx].typeFaceNumber);
-
-	if (rd.faceDirectory[idx].faceType == MST_TRIANGLE_SOUP)
-		drawMeshFace(rd.faceDirectory[idx].typeFaceNumber);
-	
-	if (rd.faceDirectory[idx].faceType == MST_PATCH)
-		drawPatch(rd.faceDirectory[idx].typeFaceNumber);
-}
-
-void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
+void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
+	rd.polygonIndices.push_back(drawSurfaceIndex);
 
 	GMBSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
 	GMGameObject* obj = nullptr;
@@ -247,10 +367,11 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber)
 	appendObjectAndInit(obj);
 }
 
-void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
+void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceIndex)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
+	rd.meshFaceIndices.push_back(drawSurfaceIndex);
 
 	GMBSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
 	GMGameObject* obj = nullptr;
@@ -271,11 +392,12 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber)
 	appendObjectAndInit(obj);
 }
 
-void GMBSPGameWorld::preparePatch(GMint patchNumber)
+void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
+	rd.patchIndices.push_back(drawSurfaceIndex);
 
 	Shader shader;
 	if (!setMaterialTexture(rd.patches[patchNumber], shader))
@@ -313,8 +435,7 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	ASSERT(obj);
-	
-	GameMachine::instance().getGraphicEngine()->drawObject(obj);
+	d->polygonFaceBuffer.push_back(obj);
 }
 
 void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
@@ -332,7 +453,7 @@ void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 		return;
 
 	ASSERT(obj);
-	GameMachine::instance().getGraphicEngine()->drawObject(obj);
+	d->meshFaceBuffer.push_back(obj);
 }
 
 void GMBSPGameWorld::drawPatch(GMint patchNumber)
@@ -358,7 +479,7 @@ void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 		return;
 
 	ASSERT(obj);
-	GameMachine::instance().getGraphicEngine()->drawObject(obj);
+	d->patchBuffer.push_back(obj);
 }
 
 #ifdef NO_LAMBDA
@@ -369,7 +490,7 @@ struct __renderIter
 	{
 		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
-			GameMachine::instance().getGraphicEngine()->drawObject(obj);
+			d->entityBuffer.push_back(obj);
 	}
 	
 	GMBSPRenderData& rd;
@@ -391,7 +512,7 @@ void GMBSPGameWorld::drawEntity(GMint leafId)
 	{
 		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
-			GameMachine::instance().getGraphicEngine()->drawObject(obj);
+			d->entityBuffer.push_back(obj);
 	});
 #endif
 }
@@ -589,13 +710,13 @@ void GMBSPGameWorld::prepareFaces()
 			return;
 
 		if (rd.faceDirectory[i].faceType == MST_PLANAR)
-			preparePolygonFace(rd.faceDirectory[i].typeFaceNumber);
+			preparePolygonFace(rd.faceDirectory[i].typeFaceNumber, i);
 
 		if (rd.faceDirectory[i].faceType == MST_TRIANGLE_SOUP)
-			prepareMeshFace(rd.faceDirectory[i].typeFaceNumber);
+			prepareMeshFace(rd.faceDirectory[i].typeFaceNumber, i);
 
 		if (rd.faceDirectory[i].faceType == MST_PATCH)
-			preparePatch(rd.faceDirectory[i].typeFaceNumber);
+			preparePatch(rd.faceDirectory[i].typeFaceNumber, i);
 	}
 }
 

@@ -93,7 +93,7 @@ static inline GMint filelength(FILE *f)
 	return end;
 }
 
-static inline GMint LoadFile(const char *filename, void **bufferptr)
+static inline GMint loadFile(const char *filename, void **bufferptr)
 {
 	FILE *f;
 	GMint length;
@@ -646,7 +646,7 @@ void BSP::addScriptToStack(const char *filename)
 		gm_error("script file exceeded MAX_INCLUDES");
 	strcpy_s(d->script->filename, expandPath(filename).c_str());
 
-	size = LoadFile(d->script->filename, (void **)&d->script->buffer);
+	size = loadFile(d->script->filename, (void **)&d->script->buffer);
 
 	gm_info("entering %s\n", d->script->filename);
 

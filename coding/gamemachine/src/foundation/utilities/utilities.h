@@ -4,7 +4,6 @@
 #include "foundation/linearmath.h"
 #include "foundation/vector.h"
 #include <time.h>
-#include <stack>
 BEGIN_NS
 
 // 此类包含了各种实用工具
@@ -134,7 +133,7 @@ private:
 	Type *m_ptr;
 };
 
-//ComPtr:
+//Shared pointer
 #ifdef _WINDOWS
 #define __uuid(c) __uuidof(c)
 
@@ -379,54 +378,6 @@ public:
 	GMLargeInteger timeInCycle();
 };
 
-//Profile
-struct IProfileHandler
-{
-	virtual ~IProfileHandler() {}
-	virtual void write(const char*) = 0;
-};
-
-class GMConsoleProfileHandler : public IProfileHandler
-{
-public:
-	virtual void write(const char* str) override
-	{
-		printf("%s: ", str);
-	}
-};
-
-GM_PRIVATE_OBJECT(GMProfile)
-{
-	GM_PRIVATE_CONSTRUCT(GMProfile) : valid(false) {}
-	GMStopwatch stopwatch;
-	char name[128];
-	bool valid;
-};
-
-class GMProfile : public GMObject
-{
-	struct GMProfileSession : public GMObject
-	{
-		GMProfileSession() : level(0) {};
-		std::stack<std::string> callstack;
-		GMint level;
-	};
-
-	DECLARE_PRIVATE(GMProfile)
-
-public:
-	static IProfileHandler& handler();
-	static GMProfileSession& profileSession();
-
-public:
-	GMProfile(const char* name, const char* parent = nullptr);
-	~GMProfile();
-
-private:
-	void startRecord(const char* name, const char* parent);
-	void stopRecord();
-};
-
 //Plane
 enum PointPosition
 {
@@ -644,6 +595,32 @@ struct Path
 	static AlignedVector<std::string> getAllFiles(const char* directory);
 	static bool directoryExists(const std::string& dir);
 	static void createDirectory(const std::string& dir);
+};
+
+//GMEvent
+#ifdef _WINDOWS
+typedef HANDLE GMEventHandle;
+#else
+#	error need implement
+#endif
+
+GM_PRIVATE_OBJECT(GMEvent)
+{
+	GMEventHandle handle;
+};
+
+class GMEvent : public GMObject
+{
+	DECLARE_PRIVATE(GMEvent)
+
+public:
+	GMEvent(bool manualReset = false);
+	~GMEvent();
+
+public:
+	void wait(GMuint milliseconds = 0);
+	void set();
+	void reset();
 };
 
 END_NS

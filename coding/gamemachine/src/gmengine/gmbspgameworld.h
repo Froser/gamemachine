@@ -28,18 +28,21 @@ public:
 	virtual void setMajorCharacter(GMCharacter* character) override;
 
 	//renders:
+public:
+	void drawPolygonFace(GMint polygonFaceNumber);
+	void drawMeshFace(GMint meshFaceNumber);
+	void drawPatch(GMint patchNumber);
+	void drawEntity(GMint leafId);
+
 private:
+	void clearBuffer();
+	void flushBuffer();
 	void updateCamera();
 	void calculateVisibleFaces();
 	void drawAll();
 	void drawSky();
 	void drawFaces();
-	void drawFace(GMint idx);
-	void drawPolygonFace(GMint polygonFaceNumber);
-	void drawMeshFace(GMint meshFaceNumber);
-	void drawPatch(GMint patchNumber);
 	void draw(GMBSP_Render_BiquadraticPatch& biqp);
-	void drawEntity(GMint leafId);
 	void drawAlwaysVisibleObjects();
 	template <typename T> bool setMaterialTexture(T& face, REF Shader& shader);
 	void setMaterialLightmap(GMint lightmapid, REF Shader& shader);
@@ -54,9 +57,9 @@ private:
 	bool findTexture(const char* textureFilename, OUT Image** img);
 	void initLightmaps();
 	void prepareFaces();
-	void preparePolygonFace(int polygonFaceNumber);
-	void prepareMeshFace(int meshFaceNumber);
-	void preparePatch(int patchNumber);
+	void preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex);
+	void prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceIndex);
+	void preparePatch(GMint patchNumber, GMint drawSurfaceIndex);
 	void prepareEntities();
 	void createEntity(GMBSPEntity* entity);
 	GMint calculateLeafNode(const linear_math::Vector3& position);

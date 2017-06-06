@@ -10,18 +10,20 @@
 #include "foundation/gamemachine.h"
 
 BSPModelLoader::BSPModelLoader()
-	: m_world(nullptr)
 {
+	D(d);
+	d->world = nullptr;
 }
 
 BSPModelLoader::~BSPModelLoader()
 {
-	for (auto iter = m_modelDocs.begin(); iter != m_modelDocs.end(); iter++)
+	D(d);
+	for (auto iter = d->modelDocs.begin(); iter != d->modelDocs.end(); iter++)
 	{
 		delete *iter;
 	}
 
-	for (auto iter = m_items.begin(); iter != m_items.end(); iter++)
+	for (auto iter = d->items.begin(); iter != d->items.end(); iter++)
 	{
 		if ((*iter).second)
 			delete (*iter).second;
@@ -30,14 +32,16 @@ BSPModelLoader::~BSPModelLoader()
 
 void BSPModelLoader::init(const char* directory, GMBSPGameWorld* world)
 {
-	m_directory = directory;
-	m_world = world;
+	D(d);
+	directory = directory;
+	world = world;
 }
 
 void BSPModelLoader::load()
 {
+	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	AlignedVector<std::string> files = pk->getAllFiles(m_directory.c_str());
+	AlignedVector<std::string> files = pk->getAllFiles(d->directory.c_str());
 
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
@@ -50,17 +54,19 @@ void BSPModelLoader::load()
 
 Model* BSPModelLoader::find(const std::string& classname)
 {
+	D(d);
 	ModelMap::iterator iter;
-	if ((iter = m_items.find(classname)) == m_items.end())
+	if ((iter = d->items.find(classname)) == d->items.end())
 		return nullptr;
 
 	return ((*iter).second);
 }
 
-void BSPModelLoader::parse(const char* data)
+void BSPModelLoader::parse(const char* buf)
 {
+	D(d);
 	TiXmlDocument* doc = new TiXmlDocument();
-	if (doc->Parse(data) != 0)
+	if (doc->Parse(buf) != 0)
 	{
 		gm_error("xml load error at %d: %s", doc->ErrorRow(), doc->ErrorDesc());
 		delete doc;
@@ -70,7 +76,7 @@ void BSPModelLoader::parse(const char* data)
 	if (doc->Error())
 		return;
 
-	m_modelDocs.push_back(doc);
+	d->modelDocs.push_back(doc);
 	TiXmlElement* root = doc->RootElement();
 	TiXmlElement* it = root->FirstChildElement();
 	for (; it; it = it->NextSiblingElement())
@@ -89,6 +95,7 @@ void BSPModelLoader::parse(const char* data)
 
 void BSPModelLoader::parseItem(TiXmlElement* ti)
 {
+	D(d);
 	const char* classname = ti->Attribute("classname");
 	if (!classname)
 	{
@@ -123,5 +130,5 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		strcpy_s(m->model, b);
 	}
 
-	m_items[m->classname] = m;
+	d->items[m->classname] = m;
 }

@@ -141,6 +141,10 @@ set(SOURCES
 		foundation/interfaces.h
 		foundation/gmconfig.h
 		foundation/gmconfig.cpp
+		foundation/gmthreads.h
+		foundation/gmthreads.cpp
+		foundation/gmprofile.h
+		foundation/gmprofile.cpp
 	)
 
 source_group_by_dir(SOURCES)
