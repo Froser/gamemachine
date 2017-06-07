@@ -1,5 +1,31 @@
 ﻿#include "stdafx.h"
 #include "gmthreads.h"
+#if _WINDOWS
+#	include <process.h>
+#endif
+
+static GMCS cs;
+
+GMLocker::GMLocker(GMCS& _cs)
+	: cs(_cs)
+{
+#if _WINDOWS
+	::InitializeCriticalSection(&cs);
+	::EnterCriticalSection(&cs);
+#else
+#	error
+#endif
+}
+
+GMLocker::~GMLocker()
+{
+#if _WINDOWS
+	::LeaveCriticalSection(&cs);
+	::DeleteCriticalSection(&cs);
+#else
+#	error
+#endif
+}
 
 GMThread::GMThread()
 {
@@ -8,7 +34,7 @@ GMThread::GMThread()
 	d->callback = nullptr;
 }
 
-static DWORD WINAPI gmthread_run(LPVOID lpThreadParameter)
+unsigned int __stdcall gmthread_run(PVOID lpThreadParameter)
 {
 	GMThread* thread = static_cast<GMThread*>(lpThreadParameter);
 	thread->d()->state = Running;
@@ -27,7 +53,7 @@ void GMThread::start()
 	D(d);
 #if _WINDOWS
 	d->event.reset();
-	d->handle = ::CreateThread(NULL, NULL, gmthread_run, this, 0, 0);
+	d->handle = (GMThreadHandle)::_beginthreadex(NULL, NULL, gmthread_run, this, 0, 0);
 	if (d->callback)
 		d->callback->onCreateThread(this);
 #endif
@@ -72,7 +98,6 @@ GMSustainedThread::GMSustainedThread()
 {
 	D(d);
 	d->terminate = false;
-	d->terminateEvent.reset();
 	d->innerEvent.reset();
 }
 
@@ -89,11 +114,12 @@ void GMSustainedThread::run()
 	while (!d->terminate)
 	{
 		d->innerEvent.wait();
+
 		sustainedRun();
+
 		d->outterEvent.set();
 		d->innerEvent.reset();
 	}
-	d->terminateEvent.set();
 }
 
 void GMSustainedThread::wait(GMint milliseconds)
@@ -105,8 +131,8 @@ void GMSustainedThread::wait(GMint milliseconds)
 void GMSustainedThread::trigger()
 {
 	D(d);
-	d->innerEvent.set();
 	d->outterEvent.reset();
+	d->innerEvent.set();
 }
 
 void GMSustainedThread::stop()

@@ -7,9 +7,21 @@ BEGIN_NS
 #if _WINDOWS
 typedef HANDLE GMThreadHandle;
 typedef DWORD GMThreadId;
+typedef CRITICAL_SECTION GMCS;
 #else
 #error need implement
 #endif
+
+class GMLocker
+{
+public:
+	GMLocker(GMCS&);
+	~GMLocker();
+	GMCS cs;
+};
+
+#define GMBeginLock(cs) { GMLocker __gmlocker(cs);
+#define GMEndLock() }
 
 enum ThreadState
 {
@@ -61,7 +73,6 @@ GM_PRIVATE_OBJECT(GMSustainedThread)
 {
 	GMEvent outterEvent;
 	GMEvent innerEvent;
-	GMEvent terminateEvent;
 	bool terminate;
 };
 

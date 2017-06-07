@@ -174,7 +174,8 @@ void GameMachine::startGameMachine()
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
 
 		{
-			GMRunSustainedThread (simulateJob, &d->simulateJob);
+			//GMRunSustainedThread (simulateJob, &d->simulateJob);
+			d->simulateJob.sustainedRun();
 			d->gameHandler->event(GM_EVENT_RENDER);
 			d->window->swapBuffers();
 		}
