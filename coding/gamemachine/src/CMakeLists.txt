@@ -145,6 +145,8 @@ set(SOURCES
 		foundation/gmthreads.cpp
 		foundation/gmprofile.h
 		foundation/gmprofile.cpp
+		gmui/gmui.h
+		gmui/gmui_win.cpp
 	)
 
 source_group_by_dir(SOURCES)

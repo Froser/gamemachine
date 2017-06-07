@@ -27,6 +27,11 @@ public:
 		return m_data;
 	}
 
+	T* data() const
+	{
+		return m_data;
+	}
+
 	void swap(GMObjectPrivateWrapper* other)
 	{
 		SWAP(m_data, other->m_data);
@@ -45,7 +50,7 @@ template <typename T>
 GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 {
 	GMObjectPrivateBase() : parent(nullptr) {}
-	T* parent;
+	mutable T* parent;
 };
 
 #define DECLARE_PRIVATE(className)															\
@@ -53,10 +58,11 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 		typedef className##Private Data;													\
 	private:																				\
 		GMObjectPrivateWrapper<className##Private> m_data;									\
-		GMObjectPrivateWrapper<GMObject>* dataWrapper() {									\
-			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(&m_data); }			\
+		GMObjectPrivateWrapper<GMObject>* dataWrapper() const {								\
+			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(						\
+				const_cast<GMObjectPrivateWrapper<className##Private>*>(&m_data)); }		\
 	protected:																				\
-		className##Private* data() { m_data.data()->parent = this; return m_data.data();}
+		className##Private* data() const { m_data.data()->parent = const_cast<className*>(this); return m_data.data();}
 
 // 获取私有成员
 #define D(d) auto d = data()

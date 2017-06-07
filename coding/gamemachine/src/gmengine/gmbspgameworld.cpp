@@ -319,6 +319,8 @@ void GMBSPGameWorld::drawFaces()
 	clearBuffer();
 
 	{
+		GM_PROFILE(drawFaces_Jobs);
+
 		GMRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
 		GMRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
 		GMRunSustainedThread(drawPatchJob, d->drawPatchJob);
@@ -339,26 +341,29 @@ void GMBSPGameWorld::clearBuffer()
 
 void GMBSPGameWorld::flushBuffer()
 {
+	GM_PROFILE(flushBuffer);
+
 	D(d);
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 
 	for (auto iter = d->polygonFaceBuffer.begin(); iter != d->polygonFaceBuffer.end(); iter++)
 	{
-		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+		engine->drawObject(*iter);
 	}
 
 	for (auto iter = d->meshFaceBuffer.begin(); iter != d->meshFaceBuffer.end(); iter++)
 	{
-		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+		engine->drawObject(*iter);
 	}
 
 	for (auto iter = d->patchBuffer.begin(); iter != d->patchBuffer.end(); iter++)
 	{
-		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+		engine->drawObject(*iter);
 	}
 
 	for (auto iter = d->entityBuffer.begin(); iter != d->entityBuffer.end(); iter++)
 	{
-		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+		engine->drawObject(*iter);
 	}
 }
 
