@@ -182,7 +182,7 @@ GMString GMString::substr(GMint start, GMint count) const
 		return d->str.substr(start, count);
 
 	//Wide Char
-	return d->str.substr(start, count);
+	return d->wstr.substr(start, count);
 }
 
 std::wstring GMString::toStdWString() const

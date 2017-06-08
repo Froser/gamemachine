@@ -68,7 +68,7 @@ public:
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
 #else
-		pk->loadPackage((Path::getCurrentPath() + "gm.pk0").c_str());
+		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
 #endif
 		pk->createBSPGameWorld("gv.bsp", &world);
 
