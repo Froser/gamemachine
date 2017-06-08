@@ -1,6 +1,8 @@
 ﻿#ifndef __GMSTRING_H__
 #define __GMSTRING_H__
-#include "common.h"
+#include "foundation/defines.h"
+#include "foundation/gmobject.h"
+#include <string>
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMString)
@@ -16,50 +18,55 @@ GM_PRIVATE_OBJECT(GMString)
 	StringType type;
 };
 
-// GMString
 static inline GMString operator +(const GMString& left, const GMString& right);
 
-class GMString
+class GMString 
 {
 	DECLARE_PRIVATE(GMString)
 
 	friend static inline GMString operator +(const GMString& left, const GMString& right);
 
 public:
+	static size_t npos;
+
+public:
 	GMString();
+	GMString(const char c);
+	GMString(const GMWchar c);
 	GMString(const char* c);
-	GMString(const GMwchar* c);
+	GMString(const GMWchar* c);
+	GMString(const std::string& s);
+	GMString(const std::wstring& s);
 
 public:
 	bool operator == (const GMString& str) const;
 	bool operator != (const GMString& str) const;
 	bool operator < (const GMString& str) const;
-
-	bool operator == (const char* str) const;
-	bool operator != (const char* str) const;
-	bool operator < (const char* str) const;
-
-	bool operator == (const GMwchar* str) const;
-	bool operator != (const GMwchar* str) const;
-	bool operator < (const GMwchar* str) const;
+	GMString& operator = (const GMString& str);
+	GMString& operator = (const char* str);
+	GMString& operator = (const GMWchar* str);
 
 public:
+	GMString& append(const GMWchar* c);
+	GMString& append(const char* c);
+	size_t findLastOf(GMWchar c) const;
+	size_t findLastOf(char c) const;
+	GMString substr(GMint start, GMint count) const;
 	std::string toStdString() const;
 	std::wstring toStdWString() const;
-
-private:
-	Data::StringType stringType() const;
+	size_t length() const;
+	void copyString(void *dest);
 };
 
 static inline GMString operator +(const GMString& left, const GMString& right)
 {
-	if (left.stringType() == GMString::Data::WideChars)
+	if (left.data()->type == GMString::Data::WideChars)
 	{
-		left.data()->wstr += right.toStdWString();
+		return left.data()->wstr + right.toStdWString();
 	}
 	else // MultiBytes
 	{
-		left.data()->str += right.toStdString();
+		return left.data()->str + right.toStdString();
 	}
 }
 

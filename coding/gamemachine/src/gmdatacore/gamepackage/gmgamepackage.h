@@ -23,7 +23,7 @@ struct IGamePackageHandler
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const char* path, REF GMBuffer* buffer) = 0;
 	virtual std::string pathRoot(PackageIndex index) = 0;
-	virtual AlignedVector<std::string> getAllFiles(const char* directory) = 0;
+	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGamePackage)
@@ -46,13 +46,13 @@ public:
 	Data* gamePackageData();
 	void loadPackage(const char* path);
 	void createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld);
-	bool readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF std::string* fullFilename = nullptr);
-	AlignedVector<std::string> getAllFiles(const char* directory);
+	bool readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
+	AlignedVector<GMString> getAllFiles(const GMString& directory);
 
 public:
-	std::string pathOf(PackageIndex index, const char* filename);
+	GMString pathOf(PackageIndex index, const GMString& filename);
 	// 一般情况下，建议用readFile代替readFileFromPath，除非是想指定特殊的路径
-	bool readFileFromPath(const char* path, REF GMBuffer* buffer);
+	bool readFileFromPath(const GMString& path, REF GMBuffer* buffer);
 };
 
 END_NS

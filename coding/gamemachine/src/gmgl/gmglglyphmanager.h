@@ -33,7 +33,7 @@ public:
 	virtual ITexture* glyphTexture() override;
 
 protected:
-	virtual const GlyphInfo& createChar(GMWChar c) override;
+	virtual const GlyphInfo& createChar(GMWchar c) override;
 };
 
 END_NS

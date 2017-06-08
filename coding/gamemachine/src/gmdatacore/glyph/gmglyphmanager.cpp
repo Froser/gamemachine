@@ -5,7 +5,7 @@ GMGlyphManager::GMGlyphManager()
 {
 }
 
-const GlyphInfo GMGlyphManager::getChar(GMWChar c)
+const GlyphInfo GMGlyphManager::getChar(GMWchar c)
 {
 	CharList::iterator iter;
 	if ((iter = m_chars.find(c)) != m_chars.end())

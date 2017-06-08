@@ -41,15 +41,15 @@ static FT_Error loadFace(FT_Face* face)
 {
 	FT_Error err = FT_Err_Cannot_Open_Resource;
 #if _WINDOWS
-	char path[MAX_PATH];
+	GMWchar path[MAX_PATH];
 	SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
 
 	for (GMuint i = 0; i < fontNameNum; i++)
 	{
-		std::string p(path);
+		GMString p(path);
 		p.append("/");
 		p.append(fontNameList[i].fontName);
-		err = FT_New_Face(g_lib.library, p.c_str(), 0, face);
+		err = FT_New_Face(g_lib.library, p.toStdString().c_str(), 0, face);
 		if (err == FT_Err_Ok)
 			break;
 	}
@@ -117,7 +117,7 @@ ITexture* GMGLGlyphManager::glyphTexture()
 	return d->texture;
 }
 
-const GlyphInfo& GMGLGlyphManager::createChar(GMWChar c)
+const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 {
 	D(d);
 	static GlyphInfo errGlyph = { false };

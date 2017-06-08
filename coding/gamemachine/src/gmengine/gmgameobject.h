@@ -63,7 +63,7 @@ public:
 	GMGlyphObject();
 
 public:
-	void setText(const GMWChar* text);
+	void setText(const GMWchar* text);
 	void setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height);
 	void updateObject();
 

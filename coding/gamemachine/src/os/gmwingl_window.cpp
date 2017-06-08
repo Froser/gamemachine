@@ -3,7 +3,7 @@
 
 #if _WINDOWS
 
-const char* CLASSNAME = "GameMachine Window";
+GMString CLASSNAME = "GameMachine Window";
 
 GMWinGLWindow::GMWinGLWindow()
 {
@@ -49,7 +49,7 @@ bool GMWinGLWindow::createWindow()
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = CLASSNAME;
+	wc.lpszClassName = CLASSNAME.toStdWString().c_str();
 
 	if (!RegisterClass(&wc))
 	{
@@ -64,7 +64,7 @@ bool GMWinGLWindow::createWindow()
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
 	if (!(d->hWnd = CreateWindowEx(dwExStyle,
-		CLASSNAME,							//class name
+		CLASSNAME.toStdWString().c_str(),	//class name
 		d->windowTitle,						//window title
 		WS_CLIPSIBLINGS |					//required style
 		WS_CLIPCHILDREN |					//required style
@@ -229,7 +229,7 @@ void GMWinGLWindow::dispose()
 		d->hWnd = 0;
 	}
 
-	if (!UnregisterClass(CLASSNAME, d->hInstance))
+	if (!UnregisterClass(CLASSNAME.toStdWString().c_str(), d->hInstance))
 	{
 		gm_error("could not unregister class.");
 		d->hInstance = 0;

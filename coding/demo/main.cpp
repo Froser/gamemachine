@@ -41,7 +41,7 @@ static void resOutputHook(void* path, void* buffer)
 	std::string p = std::string("D:/output/") + resPath;
 	std::string dir = Path::directoryName(p);
 	dir = dir.substr(0, dir.size() - 1);
-	Path::createDirectoryW(dir);
+	Path::createDirectory(dir);
 
 	out.open(p, std::ios::out | std::ios::trunc | std::ios::binary);
 	if (out.good())
@@ -110,7 +110,7 @@ public:
 			world->renderGameWorld();
 			{
 				const PositionState& position = world->getMajorCharacter()->getPositionState();
-				GMwchar x[32], y[32], z[32], fps[32];
+				GMWchar x[32], y[32], z[32], fps[32];
 				swprintf_s(x, L"%f", position.position[0]);
 				swprintf_s(y, L"%f", position.position[1]);
 				swprintf_s(z, L"%f", position.position[2]);

@@ -60,7 +60,7 @@ GMGlyphObject::GMGlyphObject()
 	D(d);
 }
 
-void GMGlyphObject::setText(const GMWChar* text)
+void GMGlyphObject::setText(const GMWchar* text)
 {
 	D(d);
 	d->text = text;
@@ -102,7 +102,7 @@ void GMGlyphObject::constructObject()
 	shader.blendFactors[0] = GMS_ONE;
 	shader.blendFactors[1] = GMS_ONE;
 
-	const GMWChar* p = d->text.c_str();
+	const GMWchar* p = d->text.c_str();
 	const GMfloat Z = 0;
 	GMfloat x = d->left, y = d->bottom;
 

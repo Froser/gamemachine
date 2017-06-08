@@ -47,7 +47,7 @@ BEGIN_NS
 typedef unsigned char GMbyte;
 typedef long GMlong;
 typedef short GMshort;
-typedef wchar_t GMwchar;
+typedef wchar_t GMWchar;
 typedef __int64 GMLargeInteger;
 
 #if USE_OPENGL
@@ -98,7 +98,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 
 #define SAFE_SWSCANF(in, format, out)	\
 {										\
-	const GMWChar* _str = in;			\
+	const GMWchar* _str = in;			\
 	if (_str)							\
 		swscanf_s(_str, format, out);	\
 }

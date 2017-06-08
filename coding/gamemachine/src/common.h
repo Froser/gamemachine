@@ -10,6 +10,7 @@
 #include "foundation/assert.h"
 #include "foundation/debug.h"
 #include "foundation/gmobject.h"
+#include "foundation/gmstring.h"
 #include "foundation/interfaces.h"
 #include "foundation/gmconfig.h"
 

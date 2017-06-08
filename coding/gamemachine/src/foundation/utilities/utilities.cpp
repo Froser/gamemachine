@@ -615,72 +615,72 @@ void Camera::calcCameraLookAt(const PositionState& state, REF CameraLookAt& look
 
 //Path
 
-std::string Path::directoryName(const std::string& fileName)
+GMString Path::directoryName(const GMString& fileName)
 {
-	int pos1 = fileName.find_last_of('\\'),
-		pos2 = fileName.find_last_of('/');
-	int pos = pos1 > pos2 ? pos1 : pos2;
-	if (pos == std::string::npos)
+	GMint pos1 = fileName.findLastOf('\\'),
+		pos2 = fileName.findLastOf('/');
+	GMint pos = pos1 > pos2 ? pos1 : pos2;
+	if (pos == GMString::npos)
 		return fileName;
 	return fileName.substr(0, pos + 1);
 }
 
-std::string Path::filename(const std::string& fullPath)
+GMString Path::filename(const GMString& fullPath)
 {
-	int pos1 = fullPath.find_last_of('\\'),
-		pos2 = fullPath.find_last_of('/');
-	int pos = pos1 > pos2 ? pos1 : pos2;
-	if (pos == std::string::npos)
+	GMint pos1 = fullPath.findLastOf('\\'),
+		pos2 = fullPath.findLastOf('/');
+	GMint pos = pos1 > pos2 ? pos1 : pos2;
+	if (pos == GMString::npos)
 		return fullPath;
-	return fullPath.substr(pos + 1, fullPath.size());
+	return fullPath.substr(pos + 1, fullPath.length());
 }
 
-std::string Path::getCurrentPath()
+GMString Path::getCurrentPath()
 {
 #if _WINDOWS
 	const int MAX = 255;
-	CHAR fn[MAX];
+	GMWchar fn[MAX];
 	::GetModuleFileName(NULL, fn, MAX);
 	return directoryName(fn);
 #endif
 	return "";
 }
 
-AlignedVector<std::string> Path::getAllFiles(const char* directory)
+AlignedVector<GMString> Path::getAllFiles(const GMString& directory)
 {
-	AlignedVector<std::string> res;
+	AlignedVector<GMString> res;
 #if _WINDOWS
-	std::string p = directory;
+	GMString p = directory;
 	p.append("*");
 	_finddata_t fd;
 	long hFile = 0;
-	if ((hFile = _findfirst(p.c_str(), &fd)) != -1)
+	if ((hFile = _findfirst(p.toStdString().c_str(), &fd)) != -1)
 	{
 		do
 		{
 			if ((fd.attrib &  _A_ARCH))
 			{
 				if (!strEqual(fd.name, ".") && !strEqual(fd.name, ".."))
-					res.push_back(std::string(directory).append(fd.name));
+					res.push_back(GMString(directory).append(fd.name));
 			}
 		} while (_findnext(hFile, &fd) == 0);
 		_findclose(hFile);
 	}
 #elif defined __APPLE__
 	ASSERT(false);
-	return AlignedVector<std::string>();
+	return AlignedVector<GMString>();
 #else
 #error need implement
 #endif
 	return res;
 }
 
-bool Path::directoryExists(const std::string& dir)
+bool Path::directoryExists(const GMString& dir)
 {
 #if _WINDOWS
 	WIN32_FIND_DATA findFileData;
 	HANDLE hFind;
-	hFind = FindFirstFile(dir.c_str(), &findFileData);
+	hFind = FindFirstFile(dir.toStdWString().c_str(), &findFileData);
 
 	bool b = hFind != INVALID_HANDLE_VALUE;
 	FindClose(hFind);
@@ -693,26 +693,26 @@ bool Path::directoryExists(const std::string& dir)
 #endif
 }
 
-void Path::createDirectory(const std::string& dir)
+void Path::createDirectory(const GMString& dir)
 {
 #if _WINDOWS
-	if (directoryExists(dir) || (dir.size() == 2 && dir[1] == ':'))
+	if (directoryExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == _L(':')))
 		return;
 
-	std::string up = dir;
-	if (up.back() == '/' || up.back() == '\\')
-		up = up.substr(0, up.size() - 1); //去掉斜杠和反斜杠
-	up = directoryName(up);
-	for (GMuint i = 0; i < up.size(); i++)
+	std::wstring stdUp = dir.toStdWString();
+	if (stdUp.back() == '/' || stdUp.back() == '\\')
+		stdUp = stdUp.substr(0, stdUp.length() - 1); //去掉斜杠和反斜杠
+	stdUp = directoryName(stdUp).toStdWString();
+	for (GMuint i = 0; i < stdUp.length(); i++)
 	{
-		if (up[i] == '/')
-			up[i] = '\\';
+		if (stdUp[i] == '/')
+			stdUp[i] = '\\';
 	}
-	if (up.back() == '/' || up.back() == '\\')
-		up = up.substr(0, up.size() - 1);
+	if (stdUp.back() == '/' || stdUp.back() == '\\')
+		stdUp = stdUp.substr(0, stdUp.length() - 1);
 
-	createDirectory(up);
-	_mkdir(dir.c_str());
+	createDirectory(stdUp);
+	_mkdir(GMString(dir).toStdString().c_str());
 #elif defined __APPLE__
 	ASSERT(false);
 #else
@@ -725,7 +725,7 @@ void Path::createDirectory(const std::string& dir)
 GMEvent::GMEvent(bool manualReset)
 {
 	D(d);
-	d->handle = ::CreateEvent(NULL, manualReset, FALSE, "");
+	d->handle = ::CreateEvent(NULL, manualReset, FALSE, _L(""));
 }
 
 GMEvent::~GMEvent()

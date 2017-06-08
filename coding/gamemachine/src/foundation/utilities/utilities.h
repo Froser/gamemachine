@@ -589,12 +589,12 @@ public:
 //Path
 struct Path
 {
-	static std::string directoryName(const std::string& fileName);
-	static std::string filename(const std::string& fullPath);
-	static std::string getCurrentPath();
-	static AlignedVector<std::string> getAllFiles(const char* directory);
-	static bool directoryExists(const std::string& dir);
-	static void createDirectory(const std::string& dir);
+	static GMString directoryName(const GMString& fileName);
+	static GMString filename(const GMString& fullPath);
+	static GMString getCurrentPath();
+	static AlignedVector<GMString> getAllFiles(const GMString& directory);
+	static bool directoryExists(const GMString& dir);
+	static void createDirectory(const GMString& dir);
 };
 
 //GMEvent

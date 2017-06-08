@@ -55,9 +55,9 @@ static inline void stripTrailing(char *e) {
 	}
 }
 
-static inline std::string expandPath(const char *path)
+static inline GMString expandPath(const char *path)
 {
-	std::string strPath = Path::getCurrentPath();
+	GMString strPath = Path::getCurrentPath();
 	strPath.append(path);
 	return strPath;
 }
@@ -644,7 +644,7 @@ void BSP::addScriptToStack(const char *filename)
 	d->script++;
 	if (d->script == &d->scriptstack[MAX_INCLUDES])
 		gm_error("script file exceeded MAX_INCLUDES");
-	strcpy_s(d->script->filename, expandPath(filename).c_str());
+	expandPath(filename).copyString(d->script->filename);
 
 	size = loadFile(d->script->filename, (void **)&d->script->buffer);
 

@@ -3,7 +3,7 @@
 
 #if _WINDOWS
 
-static char* xinputDlls[] = {
+static GMString xinputDlls[] = {
 	"xinput9_1_0.dll",
 	"xinput1_4.dll",
 	"xinput1_3.dll",
@@ -17,7 +17,7 @@ XInputWrapper::XInputWrapper()
 #if _WINDOWS
 	for (GMint i = 0; i < 3; i++)
 	{
-		m_module = LoadLibrary(xinputDlls[i]);
+		m_module = LoadLibrary(xinputDlls[i].toStdWString().c_str());
 		if (m_module)
 			break;
 	}

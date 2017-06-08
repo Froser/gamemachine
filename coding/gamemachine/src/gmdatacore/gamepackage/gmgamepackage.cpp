@@ -56,30 +56,30 @@ void GMGamePackage::createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gam
 	world->loadBSP(map);
 }
 
-bool GMGamePackage::readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF std::string* fullFilename)
+bool GMGamePackage::readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF GMString* fullFilename)
 {
 	D(d);
-	std::string p = pathOf(index, filename);
+	GMString p = pathOf(index, filename);
 	if (fullFilename)
 		*fullFilename = p;
 	return readFileFromPath(p.c_str(), buffer);
 }
 
-AlignedVector<std::string> GMGamePackage::getAllFiles(const char* directory)
+AlignedVector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
 {
 	D(d);
 	ASSERT(d->handler);
 	return d->handler->getAllFiles(directory);
 }
 
-std::string GMGamePackage::pathOf(PackageIndex index, const char* filename)
+GMString GMGamePackage::pathOf(PackageIndex index, const GMString& filename)
 {
 	D(d);
 	ASSERT(d->handler);
 	return d->handler->pathRoot(index) + filename;
 }
 
-bool GMGamePackage::readFileFromPath(const char* path, REF GMBuffer* buffer)
+bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	D(d);
 	ASSERT(d->handler);

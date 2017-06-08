@@ -100,7 +100,7 @@ GMGamePackage* GMDefaultGamePackageHandler::gamePackage()
 	return d->gamePackage;
 }
 
-AlignedVector<std::string> GMDefaultGamePackageHandler::getAllFiles(const char* directory)
+AlignedVector<GMString> GMDefaultGamePackageHandler::getAllFiles(const GMString& directory)
 {
 	return Path::getAllFiles(directory);
 }
@@ -220,13 +220,13 @@ void GMZipGamePackageHandler::releaseBuffers()
 	}
 }
 
-AlignedVector<std::string> GMZipGamePackageHandler::getAllFiles(const char* directory)
+AlignedVector<GMString> GMZipGamePackageHandler::getAllFiles(const GMString& directory)
 {
-	AlignedVector<std::string> result;
-	std::string dir = directory;
+	AlignedVector<GMString> result;
+	GMString dir = directory;
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
-		if ((*iter).first.compare(0, dir.size(), dir) == 0)
+		if ((*iter).first.toStdWString().compare(0, dir.length(), dir.toStdWString()) == 0)
 		{
 			result.push_back((*iter).first);
 		}

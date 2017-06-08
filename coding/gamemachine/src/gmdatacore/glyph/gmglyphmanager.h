@@ -18,20 +18,20 @@ struct GlyphInfo
 
 GM_ALIGNED_16(class) GMGlyphManager : public GMObject
 {
-	typedef std::map<GMWChar, GlyphInfo> CharList;
+	typedef std::map<GMWchar, GlyphInfo> CharList;
 
 public:
 	GMGlyphManager();
 	virtual ~GMGlyphManager() {}
 
 public:
-	const GlyphInfo getChar(GMWChar c);
+	const GlyphInfo getChar(GMWchar c);
 
 public:
 	virtual ITexture* glyphTexture() = 0;
 
 protected:
-	virtual const GlyphInfo& createChar(GMWChar c) = 0;
+	virtual const GlyphInfo& createChar(GMWchar c) = 0;
 
 protected:
 	CharList& getCharList();
