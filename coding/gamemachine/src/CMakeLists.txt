@@ -145,8 +145,13 @@ set(SOURCES
 		foundation/gmthreads.cpp
 		foundation/gmprofile.h
 		foundation/gmprofile.cpp
+		foundation/gmstring.h
+		foundation/gmstring.cpp
 		gmui/gmui.h
+		gmui/gmui.cpp
 		gmui/gmui_win.cpp
+		gmui/gmuiresourcemanager_win.h
+		gmui/gmuiresourcemanager_win.cpp
 	)
 
 source_group_by_dir(SOURCES)
@@ -157,6 +162,7 @@ add_library(gamemachine
 	)
 
 add_definitions(-DFPM_DEFAULT)
+add_definitions(-DUNICODE -D_UNICODE)
 
 if(MSVC)
 	set_target_properties(gamemachine PROPERTIES COMPILE_FLAGS "/W3" ) 

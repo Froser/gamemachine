@@ -1,6 +1,12 @@
 ﻿#ifndef __DEFINES_H__
 #define __DEFINES_H__
 
+// 使用UNICODE
+#ifndef UNICODE
+#	define UNICODE 1
+#endif
+#define _L(x) L ## x
+
 // 使用OpenGL
 #define USE_OPENGL 1
 
@@ -39,10 +45,9 @@ BEGIN_NS
 
 // 基本数据类型
 typedef unsigned char GMbyte;
-typedef GMbyte* PBYTE;
 typedef long GMlong;
 typedef short GMshort;
-typedef wchar_t GMWChar;
+typedef wchar_t GMwchar;
 typedef __int64 GMLargeInteger;
 
 #if USE_OPENGL
@@ -90,6 +95,13 @@ void GM_new_arr(OUT T** out, GMint cnt)
 	if (_str)							\
 		sscanf_s(_str, format, out);	\
 }
+
+#define SAFE_SWSCANF(in, format, out)	\
+{										\
+	const GMWChar* _str = in;			\
+	if (_str)							\
+		swscanf_s(_str, format, out);	\
+}
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
 
 // 编译器相关
@@ -120,17 +132,17 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #ifdef __GNUC__
 #define strcat_s strcat
 
-inline static void strcpy_s(char* dest, size_t len, const char* source)
+inline static void strcpy_s(GMchar* dest, size_t len, const GMchar* source)
 {
 	strcpy(dest, source);
 }
 
-inline static void strcpy_s(char* dest, const char* source)
+inline static void strcpy_s(GMchar* dest, const GMchar* source)
 {
 	strcpy(dest, source);
 }
 
-inline static void fopen_s(FILE** f, const char* filename, const char* mode)
+inline static void fopen_s(FILE** f, const GMchar* filename, const GMchar* mode)
 {
 	*f = fopen(filename, mode);
 }
@@ -139,7 +151,7 @@ inline static void fopen_s(FILE** f, const char* filename, const char* mode)
 #	undef SAFE_SSCANF
 #	define SAFE_SSCANF(in, format, out)	\
 {										\
-	const char* _str = in;				\
+	const GMchar* _str = in;				\
 	if (_str)							\
 		sscanf(_str, format, out);		\
 }

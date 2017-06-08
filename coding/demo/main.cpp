@@ -18,6 +18,7 @@
 #include <fstream>
 #include "gmdatacore/soundreader/gmsoundreader.h"
 #include "os/gmwingl_window.h"
+#include "gmui/gmui.h"
 
 using namespace gm;
 
@@ -40,7 +41,7 @@ static void resOutputHook(void* path, void* buffer)
 	std::string p = std::string("D:/output/") + resPath;
 	std::string dir = Path::directoryName(p);
 	dir = dir.substr(0, dir.size() - 1);
-	Path::createDirectory(dir);
+	Path::createDirectoryW(dir);
 
 	out.open(p, std::ios::out | std::ios::trunc | std::ios::binary);
 	if (out.good())
@@ -109,7 +110,7 @@ public:
 			world->renderGameWorld();
 			{
 				const PositionState& position = world->getMajorCharacter()->getPositionState();
-				GMWChar x[32], y[32], z[32], fps[32];
+				GMwchar x[32], y[32], z[32], fps[32];
 				swprintf_s(x, L"%f", position.position[0]);
 				swprintf_s(y, L"%f", position.position[1]);
 				swprintf_s(z, L"%f", position.position[2]);
@@ -236,6 +237,21 @@ int main()
 	return 0;
 }
 
+class Console : public GMUIWindow
+{
+public:
+	Console(HINSTANCE h)
+	{
+		GMUIResourceManager::setResourceInstance(h);
+	}
+
+	virtual LPCTSTR getWindowClassName() const override
+	{
+		return L"Console";
+	}
+
+};
+
 int WINAPI WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -243,6 +259,28 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
+	HRESULT Hr = ::CoInitialize(NULL);
+	if (FAILED(Hr)) return 0;
+
+	Console* pFrame = new Console(hInstance);
+	GMUIWindowAttributes attrs =
+	{
+		NULL,
+		L"",
+		0,
+		0,
+		{ 0, 0, 1024 / 2, 738 / 2 }, 
+		NULL,
+	};
+
+	pFrame->create(attrs);
+	pFrame->centerWindow();
+	::ShowWindow(*pFrame, SW_SHOWMAXIMIZED);
+
+	//CPaintManagerUI::MessageLoop();
+
+	//::CoUninitialize();
+
 	GameMachine::instance().init(
 		settings,
 		new GMGLFactory(),

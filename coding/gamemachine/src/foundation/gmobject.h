@@ -67,6 +67,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 // 获取私有成员
 #define D(d) auto d = data()
 #define D_BASE(base, d) auto d = base::data()
+#define D_OF(d, ptr) auto d = (ptr)->data()
 
 // 为一个对象定义private部分
 #define GM_PRIVATE_OBJECT(name) class name; GM_ALIGNED_16(struct) name##Private : public GMObjectPrivateBase<name>
@@ -123,10 +124,13 @@ public:
 		static T _instance;
 		return _instance;
 	}
+
+protected:
+	GMSingleton() {}
 };
 
 // 定义一个单例类，它将生成一个Private构造函数，并将GMSingleton<>设置为其友元
-#define DECLARE_SINGLETON(className) friend class GMSingleton<className>; private: className() {}
+#define DECLARE_SINGLETON(className) friend class GMSingleton<className>;
 
 // 缓存类，用于存储缓存数据
 struct GMBuffer : public GMObject

@@ -30,6 +30,7 @@ set(SOURCES
 	)
 
 source_group_by_dir(SOURCES)
+add_definitions(-DUNICODE -D_UNICODE)
 
 add_executable(demo
 		${SOURCES}
