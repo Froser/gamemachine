@@ -44,8 +44,6 @@ set(SOURCES
 		gmdatacore/soundreader/gmsoundreader_wav.cpp
 		gmdatacore/soundreader/gmsoundreader_mp3.h
 		gmdatacore/soundreader/gmsoundreader_mp3.cpp
-		gmdatacore/gamepackage/gmgamepackagehandler.h
-		gmdatacore/gamepackage/gmgamepackagehandler.cpp
 		gmdatacore/gamepackage/gmgamepackage.h
 		gmdatacore/gamepackage/gmgamepackage.cpp
 		gmdatacore/bsp_model_loader.h

@@ -81,12 +81,12 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
-static void loadImage(const char* filename, const GMBuffer* buf, OUT Image** image)
+static void loadImage(const GMString& filename, const GMBuffer* buf, OUT Image** image)
 {
 	if (GMImageReader::load(buf->buffer, buf->size, image))
-		gm_info("loaded texture %s from shader", filename);
+		gm_info("loaded texture %s from shader", filename.toStdString().c_str());
 	else
-		gm_error("texture %s not found", filename);
+		gm_error("texture %s not found", filename.toStdString().c_str());
 }
 
 static void readTernaryFloatsFromString(const char* str, linear_math::Vector3& vec)
@@ -116,7 +116,7 @@ GMBSPShaderLoader::~GMBSPShaderLoader()
 	}
 }
 
-void GMBSPShaderLoader::init(const char* directory, GMBSPGameWorld* world, GMBSPRenderData* bspRender)
+void GMBSPShaderLoader::init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRender)
 {
 	D(d);
 	d->directory = directory;
@@ -135,16 +135,16 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 	const TextureContainer::TextureItemType* item = tc.find(name);
 	if (!item)
 	{
-		std::string fn;
+		GMString fn;
 		GMBuffer buf;
 		if (!GameMachine::instance().getGamePackageManager()->readFile(PI_TEXTURES, name, &buf, &fn))
 		{
-			gm_warning("file %s not found.", fn.c_str());
+			gm_warning("file %s not found.", fn.toStdWString().c_str());
 			return nullptr;
 		}
 
 		Image* img = nullptr;
-		loadImage(fn.c_str(), &buf, &img);
+		loadImage(fn.toStdWString().c_str(), &buf, &img);
 
 		if (img)
 		{
@@ -170,19 +170,19 @@ void GMBSPShaderLoader::load()
 {
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	AlignedVector<std::string> files = pk->getAllFiles(d->directory.c_str());
+	AlignedVector<GMString> files = pk->getAllFiles(d->directory);
 
 	// load all item tag, but not parse them until item is needed
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
 		GMBuffer buf;
-		pk->readFileFromPath((*iter).c_str(), &buf);
+		pk->readFileFromPath((*iter), &buf);
 		buf.convertToStringBuffer();
 		parse((const char*) buf.buffer);
 	}
 }
 
-bool GMBSPShaderLoader::findItem(const char* name, GMuint lightmapId, REF Shader* shader)
+bool GMBSPShaderLoader::findItem(const GMString& name, GMuint lightmapId, REF Shader* shader)
 {
 	D(d);
 	auto foundResult = d->items.find(name);

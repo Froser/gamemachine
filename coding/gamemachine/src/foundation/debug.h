@@ -1,8 +1,8 @@
 ﻿#ifndef __DEBUG_H__
 #define __DEBUG_H__
 #include "common.h"
+#include "gmstring.h"
 #include <map>
-#include <string>
 #include <set>
 
 BEGIN_NS
@@ -58,20 +58,20 @@ class Hooks
 	typedef std::set<Hook2> Hook2_t;
 
 public:
-	static void invoke0(const std::string& identifier);
-	static void invoke1(const std::string& identifier, void* arg1);
-	static void invoke2(const std::string& identifier, void* arg1, void* arg2);
-	static void install(const std::string& identifier, Hook0 hook);
-	static void install(const std::string& identifier, Hook1 hook);
-	static void install(const std::string& identifier, Hook2 hook);
+	static void invoke0(const GMString& identifier);
+	static void invoke1(const GMString& identifier, void* arg1);
+	static void invoke2(const GMString& identifier, void* arg1, void* arg2);
+	static void install(const GMString& identifier, Hook0 hook);
+	static void install(const GMString& identifier, Hook1 hook);
+	static void install(const GMString& identifier, Hook2 hook);
 
 private:
 	static Hooks& instance();
 
 private:
-	std::map<std::string, Hook0_t> m_hooks0;
-	std::map<std::string, Hook1_t> m_hooks1;
-	std::map<std::string, Hook2_t> m_hooks2;
+	std::map<GMString, Hook0_t> m_hooks0;
+	std::map<GMString, Hook1_t> m_hooks1;
+	std::map<GMString, Hook2_t> m_hooks2;
 };
 
 END_NS

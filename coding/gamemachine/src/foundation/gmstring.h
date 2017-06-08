@@ -31,6 +31,7 @@ public:
 
 public:
 	GMString();
+	GMString(const GMString&);
 	GMString(const char c);
 	GMString(const GMWchar c);
 	GMString(const char* c);
@@ -55,7 +56,8 @@ public:
 	std::string toStdString() const;
 	std::wstring toStdWString() const;
 	size_t length() const;
-	void copyString(void *dest);
+	void copyString(char* dest) const;
+	void copyString(GMWchar* dest) const;
 };
 
 static inline GMString operator +(const GMString& left, const GMString& right)

@@ -11,12 +11,12 @@ class TiXmlElement;
 
 BEGIN_NS
 // BSP中读取出来的Entity会在这里找到对应的model，来进行绘制
-typedef std::map<std::string, Model*> ModelMap;
+typedef std::map<GMString, Model*> ModelMap;
 
 class GMBSPGameWorld;
 GM_PRIVATE_OBJECT(BSPModelLoader)
 {
-	std::string directory;
+	GMString directory;
 	GMBSPGameWorld* world;
 	ModelMap items;
 	AlignedVector<TiXmlDocument*> modelDocs;
@@ -31,9 +31,9 @@ public:
 	~BSPModelLoader();
 
 public:
-	void init(const char* directory, GMBSPGameWorld* world);
+	void init(const GMString& directory, GMBSPGameWorld* world);
 	void load();
-	Model* find(const std::string& classname);
+	Model* find(const GMString& classname);
 
 private:
 	void parse(const char* buf);

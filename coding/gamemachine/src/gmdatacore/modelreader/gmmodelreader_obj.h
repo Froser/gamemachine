@@ -27,8 +27,8 @@ GM_PRIVATE_OBJECT(GMModelReader_Obj)
 	AlignedVector<linear_math::Vector3> vertices;
 	AlignedVector<linear_math::Vector3> normals;
 	AlignedVector<linear_math::Vector2> textures;
-	std::map<std::string, ModelReader_Obj_Material> materials;
-	std::string currentMaterialName;
+	std::map<GMString, ModelReader_Obj_Material> materials;
+	GMString currentMaterialName;
 	Component* currentComponent;
 };
 
@@ -50,7 +50,7 @@ private:
 	void appendFace(Scanner& scanner);
 	void loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename);
 	void applyMaterial(const ModelReader_Obj_Material& material, Shader& shader);
-	ModelReader_Obj_Material* getMaterial(const std::string& materialName);
+	ModelReader_Obj_Material* getMaterial(const GMString& materialName);
 };
 
 END_NS

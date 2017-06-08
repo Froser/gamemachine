@@ -218,11 +218,11 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename)
 {
 	D(d);
-	std::string mtlPath = settings.modelName;
+	GMString mtlPath = settings.modelName;
 	mtlPath.append("/");
 	mtlPath.append(mtlFilename);
 	GMBuffer buffer;
-	settings.gamePackage.readFile(PI_MODELS, mtlPath.c_str(), &buffer);
+	settings.gamePackage.readFile(PI_MODELS, mtlPath, &buffer);
 	buffer.convertToStringBuffer();
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);

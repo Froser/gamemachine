@@ -7,7 +7,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMWinGLWindow)
 {
-	char windowTitle[128];
+	GMString windowTitle;
 	LONG left, top, width, height;
 	BYTE depthBits, stencilBits;
 	HWND hWnd;

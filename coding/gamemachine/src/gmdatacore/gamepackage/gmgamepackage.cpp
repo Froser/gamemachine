@@ -15,14 +15,14 @@ GMGamePackage::Data* GMGamePackage::gamePackageData()
 	return d;
 }
 
-void GMGamePackage::loadPackage(const char* path)
+void GMGamePackage::loadPackage(const GMString& path)
 {
 	// TODO 可能读取多个pk，分优先级
 	// 这个以后再做
 	D(d);
-	size_t len = strlen(path);
+	size_t len = path.length();
 	char path_temp[FILENAME_MAX];
-	strcpy_s(path_temp, path);
+	path.copyString(path_temp);
 	if (path_temp[len - 1] == '/' || path_temp[len - 1] == '\\')
 		*(path_temp + len - 1) = 0;
 
@@ -46,7 +46,7 @@ void GMGamePackage::loadPackage(const char* path)
 	d->handler->init();
 }
 
-void GMGamePackage::createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld)
+void GMGamePackage::createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld** gameWorld)
 {
 	D(d);
 	ASSERT(gameWorld);
@@ -56,13 +56,13 @@ void GMGamePackage::createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gam
 	world->loadBSP(map);
 }
 
-bool GMGamePackage::readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF GMString* fullFilename)
+bool GMGamePackage::readFile(PackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename)
 {
 	D(d);
 	GMString p = pathOf(index, filename);
 	if (fullFilename)
 		*fullFilename = p;
-	return readFileFromPath(p.c_str(), buffer);
+	return readFileFromPath(p, buffer);
 }
 
 AlignedVector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
@@ -84,6 +84,6 @@ bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 	D(d);
 	ASSERT(d->handler);
 	bool b = d->handler->readFileFromPath(path, buffer);
-	gm_hook2(GamePackage, readFileFromPath, path, buffer);
+	gm_hook2(GMGamePackage, readFileFromPath, &path, buffer);
 	return b;
 }

@@ -1,6 +1,5 @@
 #define GLEW_STATIC
 #define FREEGLUT_STATIC
-#define UNICODE
 #include <windows.h>
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
@@ -38,12 +37,12 @@ static void resOutputHook(void* path, void* buffer)
 		return;
 
 	std::fstream out;
-	std::string p = std::string("D:/output/") + resPath;
-	std::string dir = Path::directoryName(p);
-	dir = dir.substr(0, dir.size() - 1);
+	GMString p = std::string("D:/output/") + resPath;
+	GMString dir = Path::directoryName(p);
+	dir = dir.substr(0, dir.length() - 1);
 	Path::createDirectory(dir);
 
-	out.open(p, std::ios::out | std::ios::trunc | std::ios::binary);
+	out.open(p.toStdWString().c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (out.good())
 	{
 		GMint sz = buf->size;
@@ -236,7 +235,7 @@ int main()
 	WinMain(NULL, NULL, NULL, 0);
 	return 0;
 }
-
+/*
 class Console : public GMUIWindow
 {
 public:
@@ -251,7 +250,7 @@ public:
 	}
 
 };
-
+*/
 int WINAPI WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -259,23 +258,23 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	HRESULT Hr = ::CoInitialize(NULL);
-	if (FAILED(Hr)) return 0;
-
-	Console* pFrame = new Console(hInstance);
-	GMUIWindowAttributes attrs =
-	{
-		NULL,
-		L"",
-		0,
-		0,
-		{ 0, 0, 1024 / 2, 738 / 2 }, 
-		NULL,
-	};
-
-	pFrame->create(attrs);
-	pFrame->centerWindow();
-	::ShowWindow(*pFrame, SW_SHOWMAXIMIZED);
+	//HRESULT Hr = ::CoInitialize(NULL);
+	//if (FAILED(Hr)) return 0;
+	//
+	//Console* pFrame = new Console(hInstance);
+	//GMUIWindowAttributes attrs =
+	//{
+	//	NULL,
+	//	L"",
+	//	0,
+	//	0,
+	//	{ 0, 0, 1024 / 2, 738 / 2 }, 
+	//	NULL,
+	//};
+	//
+	//pFrame->create(attrs);
+	//pFrame->centerWindow();
+	//::ShowWindow(*pFrame, SW_SHOWMAXIMIZED);
 
 	//CPaintManagerUI::MessageLoop();
 

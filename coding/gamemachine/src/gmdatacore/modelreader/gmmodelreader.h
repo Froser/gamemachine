@@ -20,8 +20,8 @@ struct GMModelLoadSettings
 	GMGamePackage& gamePackage;
 	const linear_math::Vector3& extents;
 	const linear_math::Vector3& position;
-	const char* path;
-	const char* modelName;
+	const GMString path;
+	const GMString modelName;
 };
 
 class GMModelReader

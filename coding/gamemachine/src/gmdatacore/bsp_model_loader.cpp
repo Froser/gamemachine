@@ -30,29 +30,29 @@ BSPModelLoader::~BSPModelLoader()
 	}
 }
 
-void BSPModelLoader::init(const char* directory, GMBSPGameWorld* world)
+void BSPModelLoader::init(const GMString& directory, GMBSPGameWorld* world)
 {
 	D(d);
-	directory = directory;
-	world = world;
+	d->directory = directory;
+	d->world = world;
 }
 
 void BSPModelLoader::load()
 {
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	AlignedVector<std::string> files = pk->getAllFiles(d->directory.c_str());
+	AlignedVector<GMString> files = pk->getAllFiles(d->directory);
 
 	for (auto iter = files.begin(); iter != files.end(); iter++)
 	{
 		GMBuffer buf;
-		pk->readFileFromPath((*iter).c_str(), &buf);
+		pk->readFileFromPath((*iter), &buf);
 		buf.convertToStringBuffer();
 		parse((const char*)buf.buffer);
 	}
 }
 
-Model* BSPModelLoader::find(const std::string& classname)
+Model* BSPModelLoader::find(const GMString& classname)
 {
 	D(d);
 	ModelMap::iterator iter;

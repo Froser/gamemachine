@@ -19,10 +19,10 @@ GMDefaultGLGamePackageHandler::GMDefaultGLGamePackageHandler(GMGamePackage* pk)
 
 }
 
-bool GMDefaultGLGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer* buffer)
+bool GMDefaultGLGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	std::ifstream file;
-	file.open(path, std::ios::in | std::ios::binary | std::ios::ate);
+	file.open(path.toStdWString(), std::ios::in | std::ios::binary | std::ios::ate);
 	if (file.good())
 	{
 		GMint size = file.tellg();
@@ -37,7 +37,7 @@ bool GMDefaultGLGamePackageHandler::readFileFromPath(const char* path, REF GMBuf
 	}
 	else
 	{
-		gm_warning("cannot read file from path: %s", path);
+		gm_warning("cannot read file from path: %s", path.toStdString().c_str());
 	}
 	return false;
 }
@@ -48,11 +48,11 @@ void GMDefaultGLGamePackageHandler::init()
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
 
 	// 装载所有shaders
-	const std::string shaderMap[] = 
+	const GMString shaderMap[] = 
 	{
-		"object",
-		"sky",
-		"glyph",
+		_L("object"),
+		_L("sky"),
+		_L("glyph"),
 	};
 
 	// 按照Object顺序创建renders
@@ -67,8 +67,8 @@ void GMDefaultGLGamePackageHandler::init()
 		GMGLShaders* shaders = new GMGLShaders();
 		
 		GMBuffer vertBuf, fragBuf;
-		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".vert").c_str(), &vertBuf);
-		gamePackage()->readFile(PI_SHADERS, (shaderMap[i] + ".frag").c_str(), &fragBuf);
+		gamePackage()->readFile(PI_SHADERS, shaderMap[i] + ".vert", &vertBuf);
+		gamePackage()->readFile(PI_SHADERS, shaderMap[i] + ".frag", &fragBuf);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -85,7 +85,7 @@ void GMDefaultGLGamePackageHandler::init()
 	}
 }
 
-std::string GMDefaultGLGamePackageHandler::pathRoot(PackageIndex index)
+GMString GMDefaultGLGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 
@@ -133,7 +133,7 @@ void ZipGMGLGamePackageHandler::init()
 	PKD(d);
 	if (!loadZip())
 	{
-		gm_error("invalid package file %s", d->packagePath.c_str());
+		gm_error("invalid package file %s", d->packagePath.toStdString().c_str());
 		return;
 	}
 	Base::init();
@@ -145,7 +145,7 @@ ZipGMGLGamePackageHandler::~ZipGMGLGamePackageHandler()
 	releaseBuffers();
 }
 
-bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer* buffer)
+bool ZipGMGLGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	if (m_buffers.find(path) != m_buffers.end())
 	{
@@ -155,7 +155,7 @@ bool ZipGMGLGamePackageHandler::readFileFromPath(const char* path, REF GMBuffer*
 		buffer->size = buf->size;
 		return true;
 	}
-	gm_warning("cannot find path %s", path);
+	gm_warning("cannot find path %s", path.toStdString().c_str());
 	return false;
 }
 
@@ -166,7 +166,7 @@ bool ZipGMGLGamePackageHandler::loadZip()
 	PKD(d);
 	releaseUnzFile();
 
-	m_uf = unzOpen64(d->packagePath.c_str());
+	m_uf = unzOpen64(d->packagePath.toStdString().c_str());
 	unz_global_info64 gi;
 	GMint err = unzGetGlobalInfo64(m_uf, &gi);
 	CHECK(err);
@@ -250,7 +250,7 @@ AlignedVector<GMString> ZipGMGLGamePackageHandler::getAllFiles(const GMString& d
 	return result;
 }
 
-std::string ZipGMGLGamePackageHandler::pathRoot(PackageIndex index)
+GMString ZipGMGLGamePackageHandler::pathRoot(PackageIndex index)
 {
 	PKD(d);
 

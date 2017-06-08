@@ -712,7 +712,8 @@ void Path::createDirectory(const GMString& dir)
 		stdUp = stdUp.substr(0, stdUp.length() - 1);
 
 	createDirectory(stdUp);
-	_mkdir(GMString(dir).toStdString().c_str());
+	std::string strDir = GMString(dir).toStdString();
+	_mkdir(strDir.c_str());
 #elif defined __APPLE__
 	ASSERT(false);
 #else

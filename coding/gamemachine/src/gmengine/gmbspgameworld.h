@@ -16,7 +16,7 @@ public:
 	~GMBSPGameWorld();
 
 public:
-	void loadBSP(const char* mapName);
+	void loadBSP(const GMString& mapName);
 	void setSky(AUTORELEASE GMGameObject* sky);
 	GMGameObject* getSky();
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
@@ -55,7 +55,7 @@ private:
 	void initModels();
 	void initShaders();
 	void initTextures();
-	bool findTexture(const char* textureFilename, OUT Image** img);
+	bool findTexture(const GMString& textureFilename, OUT Image** img);
 	void initLightmaps();
 	void prepareFaces();
 	void preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex);

@@ -15,10 +15,10 @@ class GMBSPGameWorld;
 
 GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 {
-	std::string directory;
+	GMString directory;
 	GMBSPGameWorld* world;
 	GMBSPRenderData* bspRender;
-	std::map<std::string, TiXmlElement*> items;
+	std::map<GMString, TiXmlElement*> items;
 	AlignedVector<TiXmlDocument*> shaderDocs;
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
@@ -36,9 +36,9 @@ public:
 	~GMBSPShaderLoader();
 
 public:
-	void init(const char* directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
+	void init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
 	void load();
-	bool findItem(const char* name, GMuint lightmapId, REF Shader* shader);
+	bool findItem(const GMString& name, GMuint lightmapId, REF Shader* shader);
 
 	// parsers:
 private:

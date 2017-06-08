@@ -153,7 +153,7 @@ GMBSPGameWorld::~GMBSPGameWorld()
 	delete d->drawEntityJob;
 }
 
-void GMBSPGameWorld::loadBSP(const char* mapName)
+void GMBSPGameWorld::loadBSP(const GMString& mapName)
 {
 	D(d);
 	GMBuffer buffer;
@@ -560,7 +560,7 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 	BSPData& bsp = d->bsp.bspData();
 	GMuint textureid = face.textureIndex;
 	GMuint lightmapid = face.lightmapIndex;
-	const char* name = bsp.shaders[textureid].shader;
+	const GMString& name = bsp.shaders[textureid].shader;
 
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
@@ -609,16 +609,16 @@ void GMBSPGameWorld::importBSP()
 void GMBSPGameWorld::initModels()
 {
 	D(d);
-	std::string modelPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_MODELS, "");
-	d->modelLoader.init(modelPath.c_str(), this);
+	GMString modelPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_MODELS, "");
+	d->modelLoader.init(modelPath, this);
 	d->modelLoader.load();
 }
 
 void GMBSPGameWorld::initShaders()
 {
 	D(d);
-	std::string texShadersPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_TEXSHADERS, "");
-	d->shaderLoader.init(texShadersPath.c_str(), this, &d->render.renderData());
+	GMString texShadersPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_TEXSHADERS, "");
+	d->shaderLoader.init(texShadersPath, this, &d->render.renderData());
 	d->shaderLoader.load();
 }
 
@@ -656,10 +656,10 @@ void GMBSPGameWorld::initTextures()
 	}
 }
 
-bool GMBSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
+bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT Image** img)
 {
 	const GMint maxChars = 128;
-	static std::string priorities[maxChars] =
+	static GMString priorities[maxChars] =
 	{
 		".jpg",
 		".tga",
@@ -671,14 +671,14 @@ bool GMBSPGameWorld::findTexture(const char* textureFilename, OUT Image** img)
 
 	for (GMint i = 0; i < dem; i++)
 	{
-		std::string fn = textureFilename + priorities[i];
+		GMString& fn = textureFilename + priorities[i];
 		GMBuffer buf;
-		if (!pk->readFile(PI_TEXTURES, fn.c_str(), &buf))
+		if (!pk->readFile(PI_TEXTURES, fn, &buf))
 			continue;
 
 		if (GMImageReader::load(buf.buffer, buf.size, img))
 		{
-			gm_info("loaded texture %s", fn.c_str());
+			gm_info("loaded texture %s", fn.toStdWString().c_str());
 			return true;
 		}
 	}
@@ -806,18 +806,18 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	else
 	{
 		GMBuffer buf;
-		std::string fn(m->model);
+		GMString fn(m->model);
 		fn.append("/");
 		fn.append(m->model);
 		fn.append(".obj");
 
 		GMGamePackage& pk = *GameMachine::instance().getGamePackageManager();
-		std::string path = pk.pathOf(PI_MODELS, fn.c_str());
+		GMString& path = pk.pathOf(PI_MODELS, fn);
 		GMModelLoadSettings settings = {
 			pk,
 			m->extents,
 			entity->origin,
-			path.c_str(),
+			path,
 			m->model
 		};
 		

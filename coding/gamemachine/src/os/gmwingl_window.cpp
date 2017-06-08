@@ -3,12 +3,12 @@
 
 #if _WINDOWS
 
-GMString CLASSNAME = "GameMachine Window";
+GMString CLASSNAME = _L("GameMachine Window");
 
 GMWinGLWindow::GMWinGLWindow()
 {
 	D(d);
-	strcpy_s(d->windowTitle, "GM");
+	d->windowTitle = _L("GM");
 	d->depthBits = 24;
 	d->stencilBits = 8;
 	d->width = 700;
@@ -32,6 +32,8 @@ bool GMWinGLWindow::createWindow()
 	WNDCLASS wc;
 	DWORD dwExStyle;
 	DWORD dwStyle;
+	std::wstring wstrClassName = CLASSNAME.toStdWString();
+	std::wstring wstrWindowTitle = d->windowTitle.toStdWString();
 
 	RECT windowRect;
 	windowRect.left = d->left;
@@ -49,7 +51,7 @@ bool GMWinGLWindow::createWindow()
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = NULL;
 	wc.lpszMenuName = NULL;
-	wc.lpszClassName = CLASSNAME.toStdWString().c_str();
+	wc.lpszClassName = wstrClassName.c_str();
 
 	if (!RegisterClass(&wc))
 	{
@@ -64,21 +66,22 @@ bool GMWinGLWindow::createWindow()
 	AdjustWindowRectEx(&windowRect, dwStyle, FALSE, dwExStyle);
 
 	if (!(d->hWnd = CreateWindowEx(dwExStyle,
-		CLASSNAME.toStdWString().c_str(),	//class name
-		d->windowTitle,						//window title
-		WS_CLIPSIBLINGS |					//required style
-		WS_CLIPCHILDREN |					//required style
-		dwStyle,							//Selected style
-		windowRect.left, windowRect.top,	//window position
-		windowRect.right - windowRect.left,	//calculate adjusted width
-		windowRect.bottom - windowRect.top,	//calculate adjusted height
-		NULL,								// no parent window
-		NULL,								//No Menu
-		d->hInstance,						//Instance
-		NULL)))								//Dont pass anything to WM_CREATE
+		wstrClassName.c_str(),					//class name
+		wstrWindowTitle.c_str(),				//window title
+		WS_CLIPSIBLINGS |						//required style
+		WS_CLIPCHILDREN |						//required style
+		dwStyle,								//Selected style
+		windowRect.left, windowRect.top,		//window position
+		windowRect.right - windowRect.left,		//calculate adjusted width
+		windowRect.bottom - windowRect.top,		//calculate adjusted height
+		NULL,									// no parent window
+		NULL,									//No Menu
+		d->hInstance,							//Instance
+		NULL)))									//Dont pass anything to WM_CREATE
 	{
 		dispose();
-		gm_error("window created failed.");
+		DWORD s = GetLastError();
+		gm_error("window created failed: %i", s);
 		return false;
 	}
 

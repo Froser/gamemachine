@@ -13,8 +13,8 @@ public:
 
 public:
 	virtual void init() override;
-	virtual bool readFileFromPath(const char* path, REF GMBuffer* buffer) override;
-	virtual std::string pathRoot(PackageIndex index) override;
+	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
+	virtual GMString pathRoot(PackageIndex index) override;
 	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) override;
 
 protected:
@@ -52,8 +52,8 @@ public:
 
 public:
 	virtual void init() override;
-	virtual bool readFileFromPath(const char* path, REF GMBuffer* buffer) override;
-	virtual std::string pathRoot(PackageIndex index) override;
+	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
+	virtual GMString pathRoot(PackageIndex index) override;
 	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) override;
 
 private:

@@ -5,7 +5,13 @@ size_t GMString::npos = std::string::npos;
 
 GMString::GMString()
 {
+	D(d);
+	d->type = Data::WideChars;
+}
 
+GMString::GMString(const GMString& s)
+{
+	*this = s;
 }
 
 GMString::GMString(const char c)
@@ -20,7 +26,7 @@ GMString::GMString(const GMWchar c)
 {
 	D(d);
 	d->type = Data::WideChars;
-	d->str = c;
+	d->wstr = c;
 	d->wstr.clear();
 }
 
@@ -105,9 +111,14 @@ GMString& GMString::append(const GMWchar* c)
 {
 	D(d);
 	if (d->type == Data::WideChars)
+	{
 		d->wstr.append(c);
+	}
 	else
-		(*this) = c;
+	{
+		GMString temp = toStdWString();
+		(*this) = temp.append(c);
+	}
 	return *this;
 }
 
@@ -115,9 +126,14 @@ GMString& GMString::append(const char* c)
 {
 	D(d);
 	if (d->type == Data::MuiltBytes)
+	{
 		d->str.append(c);
+	}
 	else
-		(*this) = c;
+	{
+		GMString temp = toStdString();
+		(*this) = temp.append(c);
+	}
 	return *this;
 }
 
@@ -129,8 +145,11 @@ std::string GMString::toStdString() const
 
 	std::string result;
 	result.resize(d->wstr.size());
-	size_t n;
-	wcstombs_s(&n, &result[0], result.size(), d->wstr.data(), MB_CUR_MAX);
+#if _WINDOWS
+	WideCharToMultiByte(CP_ACP, 0, d->wstr.data(), -1, (char*) result.data(), d->wstr.size(), 0, FALSE);
+#else
+#	error
+#endif
 	return result;
 }
 
@@ -174,8 +193,11 @@ std::wstring GMString::toStdWString() const
 
 	std::wstring result;
 	result.resize(d->str.size());
-	size_t n;
-	mbstowcs_s(&n, &result[0], result.size(), d->str.data(), MB_CUR_MAX);
+#if _WINDOWS
+	MultiByteToWideChar(CP_ACP, 0, d->str.data(), -1, (GMWchar*)result.data(), d->str.size());
+#else
+#	error
+#endif
 	return result;
 }
 
@@ -187,11 +209,30 @@ size_t GMString::length() const
 	return d->str.length();
 }
 
-void GMString::copyString(void *dest)
+void GMString::copyString(char *dest) const
+{
+	D(d);
+	if (d->type == Data::MuiltBytes)
+	{
+		strcpy_s(dest, length() + 1, d->str.c_str());
+	}
+	else
+	{
+		GMString temp = toStdString();
+		strcpy_s(dest, temp.length() + 1, temp.data()->str.c_str());
+	}
+}
+
+void GMString::copyString(GMWchar *dest) const
 {
 	D(d);
 	if (d->type == Data::WideChars)
-		wcscpy_s((wchar_t*)dest, length(), d->wstr.data());
+	{
+		wcscpy_s(dest, length() + 1, d->wstr.c_str());
+	}
 	else
-		strcpy_s((char*)dest, length(), d->str.data());
+	{
+		GMString temp = toStdString();
+		wcscpy_s(dest, temp.length() + 1, temp.data()->wstr.c_str());
+	}
 }

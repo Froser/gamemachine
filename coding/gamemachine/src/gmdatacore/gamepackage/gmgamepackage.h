@@ -21,14 +21,14 @@ struct IGamePackageHandler
 {
 	virtual ~IGamePackageHandler() {}
 	virtual void init() = 0;
-	virtual bool readFileFromPath(const char* path, REF GMBuffer* buffer) = 0;
-	virtual std::string pathRoot(PackageIndex index) = 0;
+	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
+	virtual GMString pathRoot(PackageIndex index) = 0;
 	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGamePackage)
 {
-	std::string packagePath;
+	GMString packagePath;
 	AutoPtr<IGamePackageHandler> handler;
 	IFactory* factory;
 };
@@ -44,9 +44,9 @@ class GMGamePackage : public GMObject
 
 public:
 	Data* gamePackageData();
-	void loadPackage(const char* path);
-	void createBSPGameWorld(const char* map, OUT GMBSPGameWorld** gameWorld);
-	bool readFile(PackageIndex index, const char* filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
+	void loadPackage(const GMString& path);
+	void createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld** gameWorld);
+	bool readFile(PackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
 	AlignedVector<GMString> getAllFiles(const GMString& directory);
 
 public:
