@@ -59,6 +59,13 @@ IFactory* GameMachine::getFactory()
 	return d->factory;
 }
 
+GMUIWindow* GameMachine::appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs)
+{
+	D(d);
+	d->childWindows.push_back(makePair(window, attrs) );
+	return window;
+}
+
 void GameMachine::postMessage(GameMachineMessage msg)
 {
 	D(d);
@@ -135,9 +142,13 @@ GameMachine::EndiannessMode GameMachine::getMachineEndianness()
 void GameMachine::startGameMachine()
 {
 	D(d);
+	// 创建主窗口
 	d->mainWindow->create(d->mainWindowAttributes);
 	d->mainWindow->centerWindow();
 	d->mainWindow->showWindow();
+
+	// 创建其他窗口
+	createChildWindows();
 
 #if _WINDOWS
 	// 创建声音设备
@@ -170,7 +181,7 @@ void GameMachine::startGameMachine()
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
 
 		{
-			GMRunSustainedThread (simulateJob, &d->simulateJob);
+			gmRunSustainedThread (simulateJob, &d->simulateJob);
 			d->gameHandler->event(GM_EVENT_RENDER);
 			d->mainWindow->swapBuffers();
 		}
@@ -213,4 +224,15 @@ void GameMachine::defaultMainWindowAttributes()
 		d->instance,
 	};
 	setMainWindowAttributes(attrs);
+}
+
+void GameMachine::createChildWindows()
+{
+	// TODO 子窗口应该作为Dialog
+	D(d);
+	for (auto childWindow : d->childWindows)
+	{
+		ASSERT(childWindow.first);
+		childWindow.first->create(childWindow.second);
+	}
 }

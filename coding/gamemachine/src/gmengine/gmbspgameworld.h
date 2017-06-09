@@ -3,7 +3,7 @@
 #include "common.h"
 #include "gmgameworld.h"
 #include "gmbspgameworldprivate.h"
-#include "gmengine/controllers/resource_container.h"
+#include "gmengine/resource_container.h"
 #include "gmdatacore/bsp/gmbsp.h"
 BEGIN_NS
 

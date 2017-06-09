@@ -2,7 +2,7 @@
 #define __GMGLGRAPHIC_ENGINE_H__
 #include "common.h"
 #include "gmglshaders.h"
-#include "gmengine/controllers/resource_container.h"
+#include "gmengine/resource_container.h"
 #include "foundation/utilities/utilities.h"
 #include <map>
 BEGIN_NS

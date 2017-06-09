@@ -21,6 +21,7 @@
 
 using namespace gm;
 
+GMUIWindow* s_window;
 GMBSPGameWorld* world;
 GMCharacter* character;
 GMGLFactory factory;
@@ -61,6 +62,8 @@ public:
 
 	void init()
 	{
+		s_window->showWindow(true, false);
+
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		GMInput* inputManager = GameMachine::instance().getInputManager();
 		inputManager->initMouse(GameMachine::instance().getWindow());
@@ -255,35 +258,27 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	//HRESULT Hr = ::CoInitialize(NULL);
-	//if (FAILED(Hr))
-	//	return 0;
-	//
-	//Console* pFrame = new Console();
-	//GMUIWindowAttributes attrs =
-	//{
-	//	NULL,
-	//	L"HELLO",
-	//	0,
-	//	0,
-	//	{ 0, 0, 1024 / 2, 738 / 2 },
-	//	NULL,
-	//};
-	//
-	//pFrame->create(attrs);
-	//pFrame->centerWindow();
-	//pFrame->showWindow(true, false);
-
-	//CPaintManagerUI::MessageLoop();
-
-	//::CoUninitialize();
+	HRESULT Hr = ::CoInitialize(NULL);
+	if (FAILED(Hr))
+		return 0;
+	GMUIWindowAttributes attrs =
+	{
+		NULL,
+		L"HELLO",
+		0,
+		0,
+		{ 0, 0, 1024 / 2, 738 / 2 },
+		NULL,
+	};
 
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
 		new GameHandler()
 	);
-
+	s_window = GameMachine::instance().appendWindow(new Console(), attrs);
 	GameMachine::instance().startGameMachine();
+
+	::CoUninitialize();
 	return 0;
 }

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
 #include "gmcharacter.h"
-#include "gmengine/controllers/resource_container.h"
+#include "gmengine/resource_container.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
@@ -320,10 +320,10 @@ void GMBSPGameWorld::drawFaces()
 	{
 		GM_PROFILE(drawFaces_Jobs);
 
-		GMRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
-		GMRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
-		GMRunSustainedThread(drawPatchJob, d->drawPatchJob);
-		GMRunSustainedThread(drawEntityJob, d->drawEntityJob);
+		gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
+		gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
+		gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
+		gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
 	}
 
 	flushBuffer();

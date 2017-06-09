@@ -12,6 +12,10 @@
 
 BEGIN_NS
 
+template <typename T1, typename T2>
+using Pair = std::pair<T1, T2>;
+#define makePair std::make_pair
+
 template <typename T>
 class Vector : public std::vector<T>
 {

@@ -127,6 +127,7 @@ public:
 
 protected:
 	GMSingleton() {}
+	~GMSingleton() {}
 };
 
 // 定义一个单例类，它将生成一个Private构造函数，并将GMSingleton<>设置为其友元

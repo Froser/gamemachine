@@ -48,6 +48,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<GMInput> inputManager;
 	AutoPtr<GMConfig> configManager;
 	std::queue<GameMachineMessage> messageQueue;
+	Vector<Pair<GMUIWindow*, GMUIWindowAttributes> > childWindows;
 	GameLoopJob<GM_EVENT_SIMULATE> simulateJob;
 };
 
@@ -85,6 +86,9 @@ public:
 	GMUIWindow* getWindow();
 	IFactory* getFactory();
 
+	// 窗口管理
+	GMUIWindow* appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs);
+
 	// 配置管理
 	GMConfig* getConfigManager();
 
@@ -116,6 +120,7 @@ public:
 private:
 	bool handleMessages();
 	void defaultMainWindowAttributes();
+	void createChildWindows();
 };
 
 END_NS

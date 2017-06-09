@@ -113,7 +113,7 @@ private:
 	GMSustainedThread* th;
 };
 
-#define GMRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
+#define gmRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
 
 // GMJobPool
 GM_PRIVATE_OBJECT(GMJobPool)

@@ -251,7 +251,8 @@ LRESULT CALLBACK GMUIWindow::__controlProc(HWND hWnd, UINT uMsg, WPARAM wParam, 
 		::SetProp(hWnd, _L("WndX"), (HANDLE)pThis);
 		d->wnd = hWnd;
 	}
-	else {
+	else
+	{
 		pThis = reinterpret_cast<GMUIWindow*>(::GetProp(hWnd, _L("WndX")));
 		if (uMsg == WM_NCDESTROY && pThis)
 		{
@@ -308,14 +309,6 @@ LRESULT GMUIWindow::handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	switch (uMsg)
 	{
 	case WM_CREATE:
-		LONG styleValue = ::GetWindowLong(*this, GWL_STYLE);
-		styleValue &= ~WS_CAPTION;
-		::SetWindowLong(*this, GWL_STYLE, styleValue | WS_CLIPSIBLINGS | WS_CLIPCHILDREN);
-		RECT rcClient;
-		::GetClientRect(*this, &rcClient);
-		::SetWindowPos(*this, NULL, rcClient.left, rcClient.top, rcClient.right - rcClient.left, \
-			rcClient.bottom - rcClient.top, SWP_FRAMECHANGED);
-
 		d->ui.initWindow(d->wnd);
 		break;
 	}
