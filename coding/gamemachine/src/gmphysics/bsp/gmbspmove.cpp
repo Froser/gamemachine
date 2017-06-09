@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbspmove.h"
 #include "gmengine/gmbspgameworld.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include "gmphysics/gmphysicsstructs.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"

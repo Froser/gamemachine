@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gminput.h"
+#include "gmui/gmui.h"
 
 #if _WINDOWS
 
@@ -67,7 +68,7 @@ Input_Windows::~Input_Windows()
 {
 }
 
-void Input_Windows::initMouse(IWindow* window)
+void Input_Windows::initMouse(GMUIWindow* window)
 {
 	D(d);
 	d->window = window;

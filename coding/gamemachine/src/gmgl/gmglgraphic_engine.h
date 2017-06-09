@@ -1,7 +1,6 @@
 ﻿#ifndef __GMGLGRAPHIC_ENGINE_H__
 #define __GMGLGRAPHIC_ENGINE_H__
 #include "common.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include "gmglshaders.h"
 #include "gmengine/controllers/resource_container.h"
 #include "foundation/utilities/utilities.h"
@@ -38,8 +37,6 @@ public:
 	virtual void drawObject(GMGameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
-	virtual GraphicSettings* getGraphicSettings() override;
-	virtual void setGraphicSettings(GraphicSettings* settings) override;
 
 public:
 	GMGameWorld* getWorld();

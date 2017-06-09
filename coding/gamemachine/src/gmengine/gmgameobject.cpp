@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmgameobject.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include "gmengine/gmgameworld.h"
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
@@ -79,10 +78,10 @@ void GMGlyphObject::setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMf
 void GMGlyphObject::constructObject()
 {
 	D(d);
-	D_BASE(GMGameObject, db);
+	D_BASE(db, GMGameObject);
 
 	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
-	IWindow* window = GameMachine::instance().getWindow();
+	GMUIWindow* window = GameMachine::instance().getWindow();
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
@@ -160,7 +159,7 @@ void GMGlyphObject::onBeforeDraw()
 
 void GMGlyphObject::updateObject()
 {
-	D_BASE(GMGameObject, d);
+	D_BASE(d, GMGameObject);
 	constructObject();
 	GameMachine::instance().initObjectPainter(this);
 }

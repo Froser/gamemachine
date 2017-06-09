@@ -34,8 +34,7 @@ struct GMMouseState
 	GMint deltaY;
 };
 
-struct IWindow;
-
+class GMUIWindow;
 class XInputWrapper
 {
 	typedef DWORD( WINAPI *XInputGetState_Delegate)(DWORD dwUserIndex, XINPUT_STATE* pState);
@@ -58,7 +57,7 @@ private:
 GM_PRIVATE_OBJECT(Input_Windows)
 {
 	bool mouseReady;
-	IWindow* window;
+	GMUIWindow* window;
 	XInputWrapper xinput;
 };
 
@@ -71,7 +70,7 @@ public:
 	~Input_Windows();
 
 public:
-	void initMouse(IWindow* window);
+	void initMouse(GMUIWindow* window);
 	GMJoystickState getJoystickState();
 	void joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed);
 

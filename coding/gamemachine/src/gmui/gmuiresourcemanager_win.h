@@ -1,14 +1,34 @@
-﻿#ifndef __GMUIRESOURCEMANAGER_H__
-#define __GMUIRESOURCEMANAGER_H__
+﻿#ifndef __GMUIRESOURCEMANAGER_WIN_H__
+#define __GMUIRESOURCEMANAGER_WIN_H__
 #if !_WINDOWS
 #	error Only windows project can include this file
 #endif
 
 #include "common.h"
-BEGIN_NS
-
 #include <wtypes.h>
 #include <commctrl.h>
+
+BEGIN_NS
+
+#if _WINDOWS
+typedef HWND GMUIWindowHandle;
+typedef WNDPROC GMUIWindowProc;
+typedef HINSTANCE GMUIInstance;
+struct GMUIWindowAttributes
+{
+	HWND hwndParent;
+	LPCTSTR pstrName;
+	DWORD dwStyle;
+	DWORD dwExStyle;
+	RECT rc;
+	HMENU hMenu;
+	GMUIInstance instance;
+};
+#else
+typedef void* GMUIWindowHandle;
+typedef void* GMUIWindowProc;
+typedef void* GMUIInstance;
+#endif
 
 GM_PRIVATE_OBJECT(GMUIResourceManager)
 {
@@ -36,20 +56,29 @@ GM_PRIVATE_OBJECT(GMUIResourceManager)
 	bool mouseTracking;
 	bool mouseCapture;
 
-	HINSTANCE instance;
+	GMUIInstance instance;
 };
 
-class GMUIResourceManager : public GMSingleton<GMUIResourceManager>
+// GMUIResourceManager 用于处理绘制流程
+class GMUIResourceManager : public GMObject
 {
 	DECLARE_PRIVATE(GMUIResourceManager)
-	DECLARE_SINGLETON(GMUIResourceManager);
 
 public:
 	GMUIResourceManager();
 
 public:
-	static void setResourceInstance(HINSTANCE hInstance);
-	static HINSTANCE getResourceInstance();
+	static bool translateMessage(const LPMSG pMsg);
+	static bool handleMessage();
+
+public:
+	void setResourceInstance(GMUIInstance hInstance);
+	GMUIInstance getResourceInstance();
+	void initWindow(GMUIWindowHandle handle);
+
+private:
+	GMUIWindowHandle getPaintWindow() const;
+	bool preMessageHandler(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lRes);
 };
 
 END_NS

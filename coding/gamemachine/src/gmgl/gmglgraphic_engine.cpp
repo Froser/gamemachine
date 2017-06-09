@@ -4,7 +4,6 @@
 #include "gmglgraphic_engine.h"
 #include "gmglfunc.h"
 #include "gmdatacore/object.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgameobject.h"
 #include "gmengine/gmgameworld.h"
@@ -140,17 +139,4 @@ ResourceContainer* GMGLGraphicEngine::getResourceContainer()
 {
 	D(d);
 	return &d->resourceContainer;
-}
-
-GraphicSettings* GMGLGraphicEngine::getGraphicSettings()
-{
-	D(d);
-	ASSERT(d->settings);
-	return d->settings;
-}
-
-void GMGLGraphicEngine::setGraphicSettings(GraphicSettings* settings)
-{
-	D(d);
-	d->settings = settings;
 }

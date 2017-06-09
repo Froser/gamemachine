@@ -7,7 +7,7 @@
 #include "gmglglyphmanager.h"
 #include "os/gmwingl_window.h"
 
-void GMGLFactory::createWindow(OUT IWindow** window)
+void GMGLFactory::createWindow(OUT GMUIWindow** window)
 {
 	ASSERT(window);
 #if _WINDOWS

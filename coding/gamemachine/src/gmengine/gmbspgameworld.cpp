@@ -222,7 +222,6 @@ void GMBSPGameWorld::calculateVisibleFaces()
 {
 	GM_PROFILE(calculateVisibleFaces);
 	D(d);
-	D_BASE(GMGameWorld, dbase);
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMCharacter* character = getMajorCharacter();
@@ -625,7 +624,7 @@ void GMBSPGameWorld::initShaders()
 void GMBSPGameWorld::initTextures()
 {
 	D(d);
-	D_BASE(GMGameWorld, db);
+	D_BASE(db, GMGameWorld);
 	BSPData& bsp = d->bsp.bspData();
 
 	IFactory* factory = GameMachine::instance().getFactory();
@@ -764,7 +763,7 @@ void GMBSPGameWorld::prepareEntities()
 void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 {
 	D(d);
-	D_BASE(GMGameWorld, db);
+	D_BASE(db, GMGameWorld);
 
 	GMBSPKeyValuePair* p = entity->epairs;
 	const char* classname = nullptr;

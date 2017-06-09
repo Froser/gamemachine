@@ -2,7 +2,6 @@
 #define __GAMEOBJECT_H__
 #include "common.h"
 #include "foundation/vector.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/object.h"
 #include "foundation/utilities/utilities.h"
 

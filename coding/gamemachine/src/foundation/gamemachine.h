@@ -1,13 +1,13 @@
 ﻿#ifndef __GAMEMACHINE_H__
 #define __GAMEMACHINE_H__
 #include "common.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include "foundation/utilities/utilities.h"
 #include <queue>
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "os/gminput.h"
 #include "gmthreads.h"
+#include "gmui/gmui.h"
 BEGIN_NS
 
 enum GameMachineMessage
@@ -36,9 +36,10 @@ private:
 
 GM_PRIVATE_OBJECT(GameMachine)
 {
+	GMUIInstance instance;
+	GMUIWindowAttributes mainWindowAttributes;
 	GMClock clock;
-	GraphicSettings settings;
-	AutoPtr<IWindow> window;
+	AutoPtr<GMUIWindow> mainWindow;
 	AutoPtr<IFactory> factory;
 	AutoPtr<IGraphicEngine> engine;
 	AutoPtr<IGameHandler> gameHandler;
@@ -73,15 +74,16 @@ public:
 
 public:
 	void init(
-		GraphicSettings settings,
+		GMUIInstance instance,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
 
+	void setMainWindowAttributes(const GMUIWindowAttributes& attrs);
+
 	IGraphicEngine* getGraphicEngine();
-	IWindow* getWindow();
+	GMUIWindow* getWindow();
 	IFactory* getFactory();
-	GraphicSettings& getSettings();
 
 	// 配置管理
 	GMConfig* getConfigManager();
@@ -113,6 +115,7 @@ public:
 
 private:
 	bool handleMessages();
+	void defaultMainWindowAttributes();
 };
 
 END_NS

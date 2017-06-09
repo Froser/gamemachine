@@ -224,33 +224,30 @@ public:
 	bool isWindowActivate()
 	{
 		GMWinGLWindow* window = static_cast<GMWinGLWindow*> (GameMachine::instance().getWindow());
-		return GetActiveWindow() == window->hwnd();
+		return GetActiveWindow() == window->getWindowHandle();
 	}
 };
-
-GraphicSettings settings = { 60, { 700, 400 } ,{ 100, 100 }, {400, 400}, false };
 
 int main()
 {
 	WinMain(NULL, NULL, NULL, 0);
 	return 0;
 }
-/*
+
 class Console : public GMUIWindow
 {
 public:
-	Console(HINSTANCE h)
+	Console()
 	{
-		GMUIResourceManager::setResourceInstance(h);
 	}
 
 	virtual LPCTSTR getWindowClassName() const override
 	{
-		return L"Console";
+		return _L("Console");
 	}
 
 };
-*/
+
 int WINAPI WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -259,29 +256,30 @@ int WINAPI WinMain(
 )
 {
 	//HRESULT Hr = ::CoInitialize(NULL);
-	//if (FAILED(Hr)) return 0;
+	//if (FAILED(Hr))
+	//	return 0;
 	//
-	//Console* pFrame = new Console(hInstance);
+	//Console* pFrame = new Console();
 	//GMUIWindowAttributes attrs =
 	//{
 	//	NULL,
-	//	L"",
+	//	L"HELLO",
 	//	0,
 	//	0,
-	//	{ 0, 0, 1024 / 2, 738 / 2 }, 
+	//	{ 0, 0, 1024 / 2, 738 / 2 },
 	//	NULL,
 	//};
 	//
 	//pFrame->create(attrs);
 	//pFrame->centerWindow();
-	//::ShowWindow(*pFrame, SW_SHOWMAXIMIZED);
+	//pFrame->showWindow(true, false);
 
 	//CPaintManagerUI::MessageLoop();
 
 	//::CoUninitialize();
 
 	GameMachine::instance().init(
-		settings,
+		hInstance,
 		new GMGLFactory(),
 		new GameHandler()
 	);

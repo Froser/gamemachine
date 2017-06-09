@@ -66,7 +66,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 
 // 获取私有成员
 #define D(d) auto d = data()
-#define D_BASE(base, d) auto d = base::data()
+#define D_BASE(d, base) auto d = base::data()
 #define D_OF(d, ptr) auto d = (ptr)->data()
 
 // 为一个对象定义private部分

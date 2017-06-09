@@ -13,15 +13,15 @@ BEGIN_NS
 
 #if _WINDOWS
 
-struct IWindow;
+class GMUIWindow;
 class GMSoundPlayerDevice
 {
 public:
-	static void createInstance(IWindow* window);
+	static void createInstance(GMUIWindow* window);
 	static IDirectSound8* getInstance();
 
 private:
-	GMSoundPlayerDevice(IWindow* window);
+	GMSoundPlayerDevice(GMUIWindow* window);
 
 private:
 	ComPtr<IDirectSound8> m_cpDirectSound;

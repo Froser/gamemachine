@@ -5,7 +5,6 @@
 #include <string>
 #include <map>
 #include <set>
-#include "gmengine/controllers/graphic_engine.h"
 #include "gmdatacore/bsp/gmbsp.h"
 #include "gmdatacore/bsp/gmbsp_shader_loader.h"
 #include "gmdatacore/bsp/gmbsp_render.h"

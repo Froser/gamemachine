@@ -15,24 +15,12 @@ class Object;
 class ObjectPainter;
 class GMGamePackage;
 class GMGlyphManager;
-struct IWindow;
+class GMUIWindow;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
 struct TextureFrames;
 struct CameraLookAt;
-
-struct IWindow
-{
-	virtual ~IWindow() {}
-	virtual bool createWindow() = 0;
-	virtual GMRect getWindowRect() = 0;
-	virtual bool handleMessages() = 0;
-	virtual void swapBuffers() = 0;
-#if _WINDOWS
-	virtual HWND hwnd() = 0;
-#endif
-};
 
 enum GameMachineEvent
 {
@@ -63,8 +51,6 @@ struct IGraphicEngine
 	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
-	virtual GraphicSettings* getGraphicSettings() = 0;
-	virtual void setGraphicSettings(GraphicSettings* settings) = 0;
 };
 
 enum GamePackageType
@@ -76,7 +62,7 @@ enum GamePackageType
 struct IFactory
 {
 	virtual ~IFactory() {};
-	virtual void createWindow(OUT IWindow**) = 0;
+	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE Image*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;

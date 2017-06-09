@@ -3,35 +3,42 @@
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmengine/gmgameobject.h"
 #include "gmconfig.h"
+#include "gmui/gmuiresourcemanager_win.h"
 
 #if _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
 #endif
 
 void GameMachine::init(
-	GraphicSettings settings,
+	GMUIInstance instance,
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
 )
 {
 	D(d);
-	d->settings = settings;
+	d->instance = instance;
 	d->factory.reset(factory);
 	d->gameHandler.reset(gameHandler);
 
-	IWindow* window;
+	GMUIWindow* window;
 	d->factory->createWindow(&window);
-	d->window.reset(window);
+	d->mainWindow.reset(window);
 
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
-	engine->setGraphicSettings(&d->settings);
 	d->engine.reset(engine);
 
 	d->gamePackageManager.reset(new GMGamePackage(factory));
 	d->inputManager.reset(new GMInput());
-
 	d->configManager.reset(new GMConfig());
+
+	defaultMainWindowAttributes();
+}
+
+void GameMachine::setMainWindowAttributes(const GMUIWindowAttributes& attrs)
+{
+	D(d);
+	d->mainWindowAttributes = attrs;
 }
 
 IGraphicEngine* GameMachine::getGraphicEngine()
@@ -40,10 +47,10 @@ IGraphicEngine* GameMachine::getGraphicEngine()
 	return d->engine;
 }
 
-IWindow* GameMachine::getWindow()
+GMUIWindow* GameMachine::getWindow()
 {
 	D(d);
-	return d->window;
+	return d->mainWindow;
 }
 
 IFactory* GameMachine::getFactory()
@@ -56,12 +63,6 @@ void GameMachine::postMessage(GameMachineMessage msg)
 {
 	D(d);
 	d->messageQueue.push(msg);
-}
-
-GraphicSettings& GameMachine::getSettings()
-{
-	D(d);
-	return d->settings;
 }
 
 GMConfig* GameMachine::getConfigManager()
@@ -134,18 +135,13 @@ GameMachine::EndiannessMode GameMachine::getMachineEndianness()
 void GameMachine::startGameMachine()
 {
 	D(d);
-
-	// 创建Window (createWindow会初始化glew，所有GL操作必须要放在create之后）
-	/*
-	d->window->initWindowSize(d->settings.windowSize[0], d->settings.windowSize[1]);
-	d->window->setWindowResolution(d->settings.resolution[0], d->settings.resolution[1]);
-	d->window->setWindowPosition(d->settings.startPosition[0], d->settings.startPosition[1]);
-	*/
-	d->window->createWindow();
+	d->mainWindow->create(d->mainWindowAttributes);
+	d->mainWindow->centerWindow();
+	d->mainWindow->showWindow();
 
 #if _WINDOWS
 	// 创建声音设备
-	GMSoundPlayerDevice::createInstance(d->window);
+	GMSoundPlayerDevice::createInstance(d->mainWindow);
 #endif
 
 	// 创建Glyph管理器
@@ -164,7 +160,7 @@ void GameMachine::startGameMachine()
 	// 消息循环
 	while (true)
 	{
-		if (!(d->window->handleMessages()))
+		if (!GMUIResourceManager::handleMessage())
 			break;
 
 		if (!handleMessages())
@@ -174,10 +170,9 @@ void GameMachine::startGameMachine()
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
 
 		{
-			//GMRunSustainedThread (simulateJob, &d->simulateJob);
-			d->simulateJob.sustainedRun();
+			GMRunSustainedThread (simulateJob, &d->simulateJob);
 			d->gameHandler->event(GM_EVENT_RENDER);
-			d->window->swapBuffers();
+			d->mainWindow->swapBuffers();
 		}
 		d->clock.update();
 	}
@@ -202,4 +197,20 @@ bool GameMachine::handleMessages()
 		d->messageQueue.pop();
 	}
 	return true;
+}
+
+void GameMachine::defaultMainWindowAttributes()
+{
+	D(d);
+	GMUIWindowAttributes attrs =
+	{
+		NULL,
+		L"DefaultGameMachineWindow",
+		0,
+		0,
+		{ 0, 0, 700, 400 },
+		NULL,
+		d->instance,
+	};
+	setMainWindowAttributes(attrs);
 }

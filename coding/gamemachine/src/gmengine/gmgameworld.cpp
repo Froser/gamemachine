@@ -3,7 +3,6 @@
 #include "gmgameobject.h"
 #include "gmdatacore/object.h"
 #include "gmcharacter.h"
-#include "gmengine/controllers/graphic_engine.h"
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"

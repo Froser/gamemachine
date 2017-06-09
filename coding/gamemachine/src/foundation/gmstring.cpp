@@ -143,14 +143,13 @@ std::string GMString::toStdString() const
 	if (d->type == Data::MuiltBytes)
 		return d->str;
 
-	std::string result;
-	result.resize(d->wstr.size());
+	d->bufString.resize(d->wstr.size());
 #if _WINDOWS
-	WideCharToMultiByte(CP_ACP, 0, d->wstr.data(), -1, (char*) result.data(), d->wstr.size(), 0, FALSE);
+	WideCharToMultiByte(CP_ACP, 0, d->wstr.data(), -1, (char*)d->bufString.data(), d->wstr.size(), 0, FALSE);
 #else
 #	error
 #endif
-	return result;
+	return d->bufString;
 }
 
 size_t GMString::findLastOf(GMWchar c) const
@@ -191,14 +190,13 @@ std::wstring GMString::toStdWString() const
 	if (d->type == Data::WideChars)
 		return d->wstr;
 
-	std::wstring result;
-	result.resize(d->str.size());
+	d->bufWString.resize(d->str.size());
 #if _WINDOWS
-	MultiByteToWideChar(CP_ACP, 0, d->str.data(), -1, (GMWchar*)result.data(), d->str.size());
+	MultiByteToWideChar(CP_ACP, 0, d->str.data(), -1, (GMWchar*)d->bufWString.data(), d->str.size());
 #else
 #	error
 #endif
-	return result;
+	return d->bufWString;
 }
 
 size_t GMString::length() const

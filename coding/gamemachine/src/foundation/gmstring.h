@@ -15,6 +15,8 @@ GM_PRIVATE_OBJECT(GMString)
 
 	std::string str;
 	std::wstring wstr;
+	std::string bufString;
+	std::wstring bufWString;
 	StringType type;
 };
 

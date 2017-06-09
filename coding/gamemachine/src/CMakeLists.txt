@@ -59,7 +59,6 @@ set(SOURCES
 		gmdatacore/model.cpp
 		gmengine/controllers/resource_container.h
 		gmengine/controllers/resource_container.cpp
-		gmengine/controllers/graphic_engine.h
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
 		gmengine/gmgameobject.h
@@ -145,11 +144,12 @@ set(SOURCES
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
 		foundation/gmstring.cpp
-		# gmui/gmui.h
-		# gmui/gmui.cpp
-		# gmui/gmui_win.cpp
-		# gmui/gmuiresourcemanager_win.h
-		# gmui/gmuiresourcemanager_win.cpp
+		gmui/gmui.h
+		gmui/gmui.cpp
+		gmui/gmui_win.cpp
+		gmui/gmuiresourcemanager_win.h
+		gmui/gmuiresourcemanager_win.cpp
+		gmui/gmuiresourcemanager.h
 	)
 
 source_group_by_dir(SOURCES)

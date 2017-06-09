@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmui.h"
 
+#if _WINDOWS
 GMUIWindowBase::GMUIWindowBase()
 {
 	D(d);
@@ -8,3 +9,5 @@ GMUIWindowBase::GMUIWindowBase()
 	d->wndProc = ::DefWindowProc;
 	d->subClassed = false;
 }
+
+#endif
