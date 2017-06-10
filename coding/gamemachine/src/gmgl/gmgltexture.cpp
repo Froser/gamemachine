@@ -20,7 +20,7 @@ const char* GMGLTextureShaderNames::operator [](TextureIndex t)
 	return m_uniformNames[t].c_str();
 }
 
-GMGLTexture::GMGLTexture(AUTORELEASE Image* image)
+GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)
 	: m_inited(false)
 {
 	m_image.reset(image);
@@ -39,7 +39,7 @@ void GMGLTexture::init()
 		return;
 
 	GMint level;
-	const Image::Data& image = m_image->getData();
+	const GMImage::Data& image = m_image->getData();
 
 	glGenTextures(1, &m_id);
 	glBindTexture(image.target, m_id);
@@ -163,7 +163,7 @@ void GMGLTexture::init()
 
 void GMGLTexture::drawTexture(TextureFrames* frames)
 {
-	const Image::Data& image = m_image->getData();
+	const GMImage::Data& image = m_image->getData();
 	glBindTexture(image.target, m_id);
 
 	// Apply params

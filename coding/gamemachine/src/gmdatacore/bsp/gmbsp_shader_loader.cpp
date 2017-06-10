@@ -81,7 +81,7 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 	return GMS_ZERO;
 }
 
-static void loadImage(const GMString& filename, const GMBuffer* buf, OUT Image** image)
+static void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
 {
 	if (GMImageReader::load(buf->buffer, buf->size, image))
 		gm_info("loaded texture %s from shader", filename.toStdString().c_str());
@@ -143,7 +143,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 			return nullptr;
 		}
 
-		Image* img = nullptr;
+		GMImage* img = nullptr;
 		loadImage(fn.toStdWString().c_str(), &buf, &img);
 
 		if (img)

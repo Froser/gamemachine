@@ -1,22 +1,22 @@
 ﻿#include "stdafx.h"
 #include "image.h"
 
-Image::Image()
+GMImage::GMImage()
 {
 }
 
-Image::~Image()
+GMImage::~GMImage()
 {
 	dispose();
 }
 
-Image::Data& Image::getData()
+GMImage::Data& GMImage::getData()
 {
 	D(d);
 	return *d;
 }
 
-void Image::dispose()
+void GMImage::dispose()
 {
 	D(d);
 	if (d->mip[0].data)
@@ -26,7 +26,7 @@ void Image::dispose()
 	}
 }
 
-void Image::flipVertically(GMuint mipId)
+void GMImage::flipVertically(GMuint mipId)
 {
 	D(d);
 	ImageMipData* mip = &d->mip[mipId];

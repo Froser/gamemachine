@@ -28,7 +28,7 @@ inline std::string getTextureUniformName(TextureIndex t)
 class GMGLTexture : public ITexture
 {
 public:
-	GMGLTexture(AUTORELEASE Image* image);
+	GMGLTexture(AUTORELEASE GMImage* image);
 	~GMGLTexture();
 
 public:
@@ -39,7 +39,7 @@ public:
 
 private:
 	bool m_inited;
-	AutoPtr<Image> m_image;
+	AutoPtr<GMImage> m_image;
 	GLuint m_id;
 };
 

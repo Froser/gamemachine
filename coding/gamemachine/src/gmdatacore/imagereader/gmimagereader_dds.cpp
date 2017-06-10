@@ -378,7 +378,7 @@ static const DDS_FORMAT_GL_INFO gl_info_table[] =
 
 #define NUM_DDS_FORMATS     (sizeof(gl_info_table) / sizeof(gl_info_table[0]))
 
-static bool DDSHeaderToImageDataHeader(const DDS_FILE_HEADER& header, Image::Data* image)
+static bool DDSHeaderToImageDataHeader(const DDS_FILE_HEADER& header, GMImage::Data* image)
 {
 	if (header.std_header.ddspf.dwFlags == DDS_DDPF_FOURCC &&
 		header.std_header.ddspf.dwFourCC == DDS_FOURCC_DX10)
@@ -561,7 +561,7 @@ static GLenum getTargetFromDDSHeader(const DDS_FILE_HEADER& header)
 	return GL_TEXTURE_2D;
 }
 
-static bool loadDDS(const GMbyte* data, GMuint size, Image::Data* image)
+static bool loadDDS(const GMbyte* data, GMuint size, GMImage::Data* image)
 {
 	memset((void*)image, 0, sizeof(*image));
 	MemoryStream ms(data, size);
@@ -617,12 +617,12 @@ static bool loadDDS(const GMbyte* data, GMuint size, Image::Data* image)
 	return true;
 }
 
-bool GMImageReader_DDS::load(const GMbyte* data, GMuint size, OUT Image** img)
+bool GMImageReader_DDS::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 {
-	Image* image;
+	GMImage* image;
 	if (img)
 	{
-		*img = new Image();
+		*img = new GMImage();
 		image = *img;
 	}
 	else

@@ -350,10 +350,10 @@ bool TGAImage::scale(int w, int h) {
 }
 
 
-bool GMImageReader_TGA::load(const GMbyte* data, GMuint size, OUT Image** img)
+bool GMImageReader_TGA::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 {
 	ASSERT(img);
-	*img = new Image();
+	*img = new GMImage();
 	TGAImage tga;
 	bool b = tga.read_tga_file(data, size);
 	if (b)
@@ -369,10 +369,10 @@ bool GMImageReader_TGA::test(const GMbyte* data)
 	return data[0] == 0 && data[1] == 0;
 }
 
-void GMImageReader_TGA::writeDataToImage(TGAImage& tga, Image* img)
+void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 {
 	ASSERT(img);
-	Image::Data& data = img->getData();
+	GMImage::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;

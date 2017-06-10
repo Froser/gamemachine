@@ -37,12 +37,12 @@ private:
 	std::map<GMImageReader::ImageType, IImageReader*> m_readers;
 };
 
-bool GMImageReader::load(const GMbyte* data, GMuint size, OUT Image** image)
+bool GMImageReader::load(const GMbyte* data, GMuint size, OUT GMImage** image)
 {
 	return load(data, size, ImageType_AUTO, image);
 }
 
-bool GMImageReader::load(const GMbyte* data, GMuint size, ImageType type, OUT Image** image)
+bool GMImageReader::load(const GMbyte* data, GMuint size, ImageType type, OUT GMImage** image)
 {
 	if (type == ImageType_AUTO)
 		type = test(data);

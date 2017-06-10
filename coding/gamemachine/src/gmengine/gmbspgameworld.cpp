@@ -637,7 +637,7 @@ void GMBSPGameWorld::initTextures()
 		if (d->shaderLoader.findItem(shader.shader, 0, nullptr))
 			continue;
 
-		Image* tex = nullptr;
+		GMImage* tex = nullptr;
 		if (findTexture(shader.shader, &tex))
 		{
 			ITexture* texture;
@@ -655,7 +655,7 @@ void GMBSPGameWorld::initTextures()
 	}
 }
 
-bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT Image** img)
+bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** img)
 {
 	const GMint maxChars = 128;
 	static GMString priorities[maxChars] =

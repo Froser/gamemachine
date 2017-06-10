@@ -10,7 +10,7 @@ class ResourceContainer;
 class GMGameObject;
 class DrawingList;
 class GMGamePackage;
-class Image;
+class GMImage;
 class Object;
 class ObjectPainter;
 class GMGamePackage;
@@ -64,7 +64,7 @@ struct IFactory
 	virtual ~IFactory() {};
 	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
-	virtual void createTexture(AUTORELEASE Image*, OUT ITexture**) = 0;
+	virtual void createTexture(AUTORELEASE GMImage*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;
 	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;

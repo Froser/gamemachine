@@ -66,7 +66,7 @@ struct ImageRGB
 };
 END_NS
 
-class ImageBMP : public Image
+class ImageBMP : public GMImage
 {
 public:
 	DEFAULT_CONSTRUCTOR(ImageBMP);
@@ -78,7 +78,7 @@ private:
 	BitmapFile m_bitmapFile;
 };
 
-bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT Image** img)
+bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT GMImage** img)
 {
 	ImageBMP* image;
 	if (img)
@@ -119,10 +119,10 @@ bool GMImageReader_BMP::test(const GMbyte* byte)
 	return header->bfType == 19778;
 }
 
-void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, Image* img, GMuint size)
+void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint size)
 {
 	ASSERT(img);
-	Image::Data& data = img->getData();
+	GMImage::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;

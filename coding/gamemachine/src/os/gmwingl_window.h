@@ -29,12 +29,12 @@ public:
 	virtual void swapBuffers() const override;
 
 private:
-	inline virtual LPCTSTR getWindowClassName() const override
+	inline virtual GMUIStringPtr getWindowClassName() const override
 	{
 		return _L("gamemachine_mainWindow");
 	}
 
-	inline virtual UINT getClassStyle() const override
+	inline virtual GMuint getClassStyle() const override
 	{
 		return 0;
 	}

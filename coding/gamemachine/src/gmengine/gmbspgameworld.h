@@ -55,7 +55,7 @@ private:
 	void initModels();
 	void initShaders();
 	void initTextures();
-	bool findTexture(const GMString& textureFilename, OUT Image** img);
+	bool findTexture(const GMString& textureFilename, OUT GMImage** img);
 	void initLightmaps();
 	void prepareFaces();
 	void preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex);

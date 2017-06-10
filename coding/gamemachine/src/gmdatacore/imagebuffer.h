@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(ImageBuffer)
 };
 
 // 表示一个来自内存的图片
-class ImageBuffer : public Image
+class ImageBuffer : public GMImage
 {
 	DECLARE_PRIVATE(ImageBuffer)
 

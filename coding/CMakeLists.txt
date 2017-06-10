@@ -34,14 +34,13 @@ macro(add_msvc_precompiled_header PrecompiledHeader PrecompiledSource SourcesVar
 	endif(MSVC)
 endmacro(add_msvc_precompiled_header)
 
-macro(WIN source_files)
-	if(WIN)
-	endif(WIN)
-endmacro(WIN)
-
 add_subdirectory(./3rdparty/zlib zlib)
 add_subdirectory(./3rdparty/libpng libpng)
 add_subdirectory(./3rdparty/libmad libmad)
 add_subdirectory(./3rdparty/jpeg-6b libjpeg)
+if(WIN32)
+	add_subdirectory(./3rdparty/duilib duilib)
+endif(WIN32)
+
 add_subdirectory(gamemachine gamemachine)
 add_subdirectory(demo demo)

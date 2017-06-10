@@ -45,11 +45,11 @@ extern "C"
 	}
 }
 
-bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT Image** image)
+bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** image)
 {
-	Image* img = new Image();
+	GMImage* img = new GMImage();
 	*image = img;
-	Image::Data& imgData = img->getData();
+	GMImage::Data& imgData = img->getData();
 	//init image data
 	imgData.target = GL_TEXTURE_2D;
 	imgData.mipLevels = 1;

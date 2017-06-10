@@ -113,10 +113,10 @@ struct PNGTestHeader
 	DWORD magic1, magic2;
 };
 
-bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT Image** img)
+bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 {
 	ASSERT(img);
-	*img = new Image();
+	*img = new GMImage();
 
 	PngData png;
 	GMuint bufferSize;
@@ -131,10 +131,10 @@ bool GMImageReader_PNG::test(const GMbyte* data)
 	return header->magic1 == 1196314761 && header->magic2 == 169478669;
 }
 
-void GMImageReader_PNG::writeDataToImage(PngData& png, Image* img, GMuint size)
+void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size)
 {
 	ASSERT(img);
-	Image::Data& data = img->getData();
+	GMImage::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;

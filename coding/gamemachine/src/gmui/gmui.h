@@ -1,76 +1,60 @@
 ﻿#ifndef __GMUI_H__
 #define __GMUI_H__
 #include "common.h"
-#include "gmuiresourcemanager.h"
 
 #if _WINDOWS
 #	include <windef.h>
+#	include "uilib.h"
+typedef DuiLib::CWindowWnd GMUIWindowBase;
+typedef HWND GMUIWindowHandle;
+typedef WNDPROC GMUIWindowProc;
+typedef HINSTANCE GMUIInstance;
+typedef LPCTSTR GMUIStringPtr;
+struct GMUIWindowAttributes
+{
+	HWND hwndParent;
+	LPCTSTR pstrName;
+	DWORD dwStyle;
+	DWORD dwExStyle;
+	RECT rc;
+	HMENU hMenu;
+	GMUIInstance instance;
+};
+#else
+typedef void* GMUIWindowHandle;
+typedef void* GMUIWindowProc;
+typedef void* GMUIInstance;
+typedef GMWchar* GMUIStringPtr;
 #endif
 
 BEGIN_NS
-GM_PRIVATE_OBJECT(GMUIWindowBase)
+class GMUIWindow : public GMObject, private GMUIWindowBase
 {
-	GMUIResourceManager ui;
-	GMUIWindowHandle wnd;
-	GMUIWindowProc wndProc;
-	bool subClassed;
-};
-
-class GMUIWindowBase : public GMObject
-{
-	DECLARE_PRIVATE(GMUIWindowBase)
+	typedef GMUIWindowBase Base;
 
 public:
-	GMUIWindowBase();
+	static bool handleMessage();
 
 public:
-	GMUIWindowHandle getWindowHandle() const { D(d); return d->wnd; }
+	GMUIWindowHandle getWindowHandle() const { return Base::GetHWND(); }
 	operator GMUIWindowHandle() const { return getWindowHandle(); }
 
 public:
-	virtual GMUIWindowHandle create(const GMUIWindowAttributes& attrs) = 0;
-	virtual void centerWindow() = 0;
-	virtual void showWindow(bool bShow = true, bool bTakeFocus = true) = 0;
-	virtual GMRect getWindowRect() = 0;
-	virtual void swapBuffers() const = 0;
-};
-
-#if _WINDOWS
-class GMUIWindow : public GMUIWindowBase
-{
-public:
-	virtual GMUIWindowHandle create(const GMUIWindowAttributes& wndAttrs) override;
-	virtual void centerWindow() override;
-	virtual GMRect getWindowRect() override;
-	virtual void swapBuffers() const override {}
-
-public:
-	HWND subclass(HWND hWnd);
-	void unsubclass();
-	void showWindow(bool bShow = true, bool bTakeFocus = true);
-	bool showModal();
-	void close();
-	void setIcon(UINT nRes);
-
-	LRESULT sendMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0L);
-	LRESULT postMessage(UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0L);
-	void resizeClient(int cx = -1, int cy = -1);
+	virtual GMUIWindowHandle create(const GMUIWindowAttributes& attrs);
+	virtual GMRect getWindowRect();
+	virtual void swapBuffers() const {}
+	virtual void centerWindow() { return Base::CenterWindow(); }
+	virtual void showWindow(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
 
 private:
-	bool registerWindowClass();
-	bool registerSuperclass();
+	inline virtual GMUIStringPtr getWindowClassName() const = 0;
+	inline virtual GMuint getClassStyle() const { return 0; }
 
+	// From base:
 protected:
-	virtual LPCTSTR getWindowClassName() const = 0;
-	virtual LPCTSTR getSuperClassName() const;
-	virtual UINT getClassStyle() const;
-
-	virtual LRESULT handleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-	virtual void onFinalMessage(HWND hWnd);
-
-	static LRESULT CALLBACK __wndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK __controlProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	virtual LPCTSTR GetWindowClassName() const { return getWindowClassName(); }
+	virtual UINT GetClassStyle() const { return getClassStyle(); }
 };
-#endif
 END_NS
+
 #endif

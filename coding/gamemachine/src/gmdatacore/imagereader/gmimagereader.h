@@ -4,11 +4,11 @@
 #include "gmdatacore/image.h"
 BEGIN_NS
 
-class Image;
+class GMImage;
 struct IImageReader
 {
 	virtual ~IImageReader() {};
-	virtual bool load(const GMbyte* data, GMuint size, OUT Image** image) = 0;
+	virtual bool load(const GMbyte* data, GMuint size, OUT GMImage** image) = 0;
 	virtual bool test(const GMbyte* data) = 0;
 };
 
@@ -29,8 +29,8 @@ public:
 	};
 
 public:
-	static bool load(const GMbyte* data, GMuint size, OUT Image** image);
-	static bool load(const GMbyte* data, GMuint size, ImageType type, OUT Image** image);
+	static bool load(const GMbyte* data, GMuint size, OUT GMImage** image);
+	static bool load(const GMbyte* data, GMuint size, ImageType type, OUT GMImage** image);
 	static IImageReader* getReader(ImageType type);
 
 private:

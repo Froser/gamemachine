@@ -15,7 +15,7 @@ ImageBuffer::ImageBuffer(GMuint width, GMuint height, GMuint bufferSize, GMbyte*
 void ImageBuffer::generateData()
 {
 	D(d);
-	Image::Data& data = getData();
+	GMImage::Data& data = getData();
 
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;

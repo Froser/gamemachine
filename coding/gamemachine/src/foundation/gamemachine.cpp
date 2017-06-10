@@ -3,7 +3,7 @@
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmengine/gmgameobject.h"
 #include "gmconfig.h"
-#include "gmui/gmuiresourcemanager_win.h"
+#include "gmui/gmui.h"
 
 #if _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
@@ -171,7 +171,7 @@ void GameMachine::startGameMachine()
 	// 消息循环
 	while (true)
 	{
-		if (!GMUIResourceManager::handleMessage())
+		if (!GMUIWindow::handleMessage())
 			break;
 
 		if (!handleMessages())

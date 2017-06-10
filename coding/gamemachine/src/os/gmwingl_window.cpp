@@ -19,7 +19,6 @@ GMWinGLWindow::~GMWinGLWindow()
 GMUIWindowHandle GMWinGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 {
 	D(d);
-	D_BASE(db, Base);
 
 	GMUIWindowAttributes attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
@@ -60,7 +59,8 @@ GMUIWindowHandle GMWinGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 		0, 0, 0												//layer masks ignored
 	};
 
-	if (!(d->hDC = GetDC(db->wnd)))
+	GMUIWindowHandle wnd = getWindowHandle();
+	if (!(d->hDC = GetDC(wnd)))
 	{
 		dispose();
 		gm_error("can't Create a GL Device context.");
@@ -95,9 +95,9 @@ GMUIWindowHandle GMWinGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 		return false;
 	}
 
-	ShowWindow(db->wnd, SW_SHOW);
-	SetForegroundWindow(db->wnd);
-	SetFocus(db->wnd);
+	::ShowWindow(wnd, SW_SHOW);
+	::SetForegroundWindow(wnd);
+	::SetFocus(wnd);
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
@@ -106,7 +106,7 @@ GMUIWindowHandle GMWinGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 		return NULL;
 	}
 
-	return db->wnd;
+	return wnd;
 }
 
 void GMWinGLWindow::swapBuffers() const
@@ -118,8 +118,7 @@ void GMWinGLWindow::swapBuffers() const
 void GMWinGLWindow::dispose()
 {
 	D(d);
-	D_BASE(db, Base);
-
+	GMUIWindowHandle wnd = getWindowHandle();
 	if (d->hRC)
 	{
 		if (!wglMakeCurrent(0, 0))
@@ -131,22 +130,16 @@ void GMWinGLWindow::dispose()
 		d->hRC = 0;
 	}
 
-	if (d->hDC && !ReleaseDC(db->wnd, d->hDC))
+	if (d->hDC && !ReleaseDC(wnd, d->hDC))
 	{
 		gm_error("release of Device Context failed.");
 		d->hDC = 0;
 	}
 
-	if (db->wnd && !DestroyWindow(db->wnd))
+	if (wnd && !DestroyWindow(wnd))
 	{
 		gm_error("could not release hWnd");
-		db->wnd = 0;
-	}
-
-	if (!UnregisterClass(getWindowClassName(), db->ui.getResourceInstance()))
-	{
-		gm_error("could not unregister class.");
-		db->ui.setResourceInstance(NULL);
+		wnd = 0;
 	}
 }
 

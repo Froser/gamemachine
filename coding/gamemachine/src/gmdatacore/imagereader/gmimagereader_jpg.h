@@ -6,7 +6,7 @@ BEGIN_NS
 
 class GMImageReader_JPG : public IImageReader
 {
-	virtual bool load(const GMbyte* data, GMuint size, OUT Image** image) override;
+	virtual bool load(const GMbyte* data, GMuint size, OUT GMImage** image) override;
 	virtual bool test(const GMbyte* data) override;
 };
 

@@ -103,15 +103,15 @@ public:
 	void clear();
 };
 
-class Image;
+class GMImage;
 class GMImageReader_TGA : public IImageReader
 {
 public:
-	virtual bool load(const GMbyte* data, GMuint size, OUT Image** img) override;
+	virtual bool load(const GMbyte* data, GMuint size, OUT GMImage** img) override;
 	virtual bool test(const GMbyte* data) override;
 
 private:
-	void writeDataToImage(TGAImage& tga, Image* img);
+	void writeDataToImage(TGAImage& tga, GMImage* img);
 };
 
 END_NS

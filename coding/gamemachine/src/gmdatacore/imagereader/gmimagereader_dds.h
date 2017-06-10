@@ -4,11 +4,11 @@
 #include "gmimagereader.h"
 
 BEGIN_NS
-class Image;
+class GMImage;
 class GMImageReader_DDS : public IImageReader
 {
 public:
-	virtual bool load(const GMbyte* data, GMuint size, OUT Image** img) override;
+	virtual bool load(const GMbyte* data, GMuint size, OUT GMImage** img) override;
 	virtual bool test(const GMbyte* data) override;
 };
 END_NS

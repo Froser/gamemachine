@@ -6,6 +6,7 @@ include_directories(
 		../3rdparty/glew/include
 		../3rdparty/glew
 		../3rdparty/zlib
+		../3rdparty/duilib
 		../gamemachine/src
 	)
 
@@ -40,4 +41,5 @@ target_link_libraries(${PROJECT_NAME} gamemachine)
 target_link_libraries(${PROJECT_NAME} png_static)
 target_link_libraries(${PROJECT_NAME} zlibstatic)
 target_link_libraries(${PROJECT_NAME} libmad)
+target_link_libraries(${PROJECT_NAME} duilib)
 target_link_libraries(${PROJECT_NAME} libjpeg)
