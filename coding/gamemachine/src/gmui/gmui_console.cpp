@@ -7,13 +7,4 @@ GMUIStringPtr GMUIConsole::getWindowClassName() const
 }
 
 #if _WINDOWS
-LongResult GMUIConsole::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam)
-{
-	if (uMsg == WM_CREATE)
-	{
-
-	}
-
-	return GMUIWindow::handleMessage(uMsg, wParam, lParam);
-}
 #endif

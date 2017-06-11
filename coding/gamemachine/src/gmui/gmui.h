@@ -6,6 +6,7 @@
 #	include <windef.h>
 #	include "uilib.h"
 typedef DuiLib::CWindowWnd GMUIWindowBase;
+typedef DuiLib::CPaintManagerUI GMUIPainter;
 typedef HWND GMUIWindowHandle;
 typedef WNDPROC GMUIWindowProc;
 typedef HINSTANCE GMUIInstance;
@@ -67,6 +68,37 @@ protected:
 	virtual UINT GetClassStyle() const override { return getClassStyle(); }
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override { return handleMessage(uMsg, wParam, lParam); }
 };
+
+#if _WINDOWS
+
+// 一个标准的Windows GUI窗体
+GM_PRIVATE_OBJECT(GMUIGUIWindow)
+{
+	GMUIPainter painter;
+};
+
+class GMUIGUIWindow : public GMUIWindow
+{
+	DECLARE_PRIVATE(GMUIGUIWindow);
+	typedef GMUIWindow Base;
+
+public:
+	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
+
+protected:
+	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+};
+
+#endif
 END_NS
 
 #endif

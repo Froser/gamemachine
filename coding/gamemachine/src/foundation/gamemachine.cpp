@@ -17,6 +17,8 @@ void GameMachine::init(
 {
 	D(d);
 	d->instance = instance;
+	GMUIPainter::SetInstance(d->instance);
+
 	d->factory.reset(factory);
 	d->gameHandler.reset(gameHandler);
 

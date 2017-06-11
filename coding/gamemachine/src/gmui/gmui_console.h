@@ -4,11 +4,10 @@
 #include "gmui.h"
 BEGIN_NS
 
-class GMUIConsole : public GMUIWindow
+class GMUIConsole : public GMUIGUIWindow
 {
 public:
 	virtual GMUIStringPtr getWindowClassName() const override;
-	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 };
 
 END_NS
