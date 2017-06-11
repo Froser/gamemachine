@@ -6,7 +6,7 @@ BEGIN_NS
 
 #if _WINDOWS
 
-GM_PRIVATE_OBJECT(GMWinGLWindow)
+GM_PRIVATE_OBJECT(GMUIGLWindow)
 {
 	BYTE depthBits, stencilBits;
 	HDC hDC;
@@ -14,15 +14,15 @@ GM_PRIVATE_OBJECT(GMWinGLWindow)
 };
 
 // Windows下的Window类
-class GMWinGLWindow : public GMUIWindow
+class GMUIGLWindow : public GMUIWindow
 {
 	typedef GMUIWindow Base;
 
-	DECLARE_PRIVATE(GMWinGLWindow)
+	DECLARE_PRIVATE(GMUIGLWindow)
 
 public:
-	GMWinGLWindow();
-	~GMWinGLWindow();
+	GMUIGLWindow();
+	~GMUIGLWindow();
 
 public:
 	virtual GMUIWindowHandle create(const GMUIWindowAttributes& wndAttrs) override;
@@ -31,7 +31,7 @@ public:
 private:
 	inline virtual GMUIStringPtr getWindowClassName() const override
 	{
-		return _L("gamemachine_mainWindow");
+		return _L("gamemachine_mainWindow_class");
 	}
 
 	inline virtual GMuint getClassStyle() const override

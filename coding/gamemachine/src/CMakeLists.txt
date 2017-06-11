@@ -108,8 +108,6 @@ set(SOURCES
 		gmphysics/gmphysicsstructs.h
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
-		os/gmwingl_window.h
-		os/gmwingl_window.cpp
 		os/gmdirectsound_sounddevice.h
 		os/gmdirectsound_sounddevice.cpp
 		os/gminput.h
@@ -147,6 +145,10 @@ set(SOURCES
 		foundation/gmstring.cpp
 		gmui/gmui.h
 		gmui/gmui.cpp
+		gmui/gmui_glwindow.h
+		gmui/gmui_glwindow.cpp
+		gmui/gmui_console.h
+		gmui/gmui_console.cpp
 	)
 
 source_group_by_dir(SOURCES)

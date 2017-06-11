@@ -1,22 +1,22 @@
 ﻿#include "stdafx.h"
-#include "gmwingl_window.h"
+#include "gmui/gmui_glwindow.h"
 #include "foundation/gamemachine.h"
 
 #if _WINDOWS
 
-GMWinGLWindow::GMWinGLWindow()
+GMUIGLWindow::GMUIGLWindow()
 {
 	D(d);
 	d->depthBits = 24;
 	d->stencilBits = 8;
 }
 
-GMWinGLWindow::~GMWinGLWindow()
+GMUIGLWindow::~GMUIGLWindow()
 {
 	dispose();
 }
 
-GMUIWindowHandle GMWinGLWindow::create(const GMUIWindowAttributes& wndAttrs)
+GMUIWindowHandle GMUIGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 {
 	D(d);
 
@@ -109,13 +109,13 @@ GMUIWindowHandle GMWinGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 	return wnd;
 }
 
-void GMWinGLWindow::swapBuffers() const
+void GMUIGLWindow::swapBuffers() const
 {
 	D(d);
 	::SwapBuffers(d->hDC);
 }
 
-void GMWinGLWindow::dispose()
+void GMUIGLWindow::dispose()
 {
 	D(d);
 	GMUIWindowHandle wnd = getWindowHandle();

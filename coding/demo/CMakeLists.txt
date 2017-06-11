@@ -13,14 +13,12 @@ include_directories(
 link_directories(
 		${demo_SOURCE_DIR}/../3rdparty/glew/lib/release/win32
 		${demo_SOURCE_DIR}/../3rdparty/freetype-2.3.5/lib
-		${demo_SOURCE_DIR}/../3rdparty/glew/lib/Release/win32
 		${demo_SOURCE_DIR}/../3rdparty/dx #windows only
 	)
 
 link_libraries(
 		glu32.lib
 		opengl32.lib
-		glew32s.lib
 		glew32s.lib
 		freetype.lib
 		dxguid.lib #windows only

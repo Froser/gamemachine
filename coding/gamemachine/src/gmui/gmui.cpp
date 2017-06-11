@@ -1,9 +1,11 @@
 ﻿#include "stdafx.h"
 #include "gmui.h"
+#include "foundation/gmprofile.h"
 
 #if _WINDOWS
 bool GMUIWindow::handleMessage()
 {
+	GM_PROFILE(handleMessage);
 	return DuiLib::CPaintManagerUI::HandleMessage();
 }
 

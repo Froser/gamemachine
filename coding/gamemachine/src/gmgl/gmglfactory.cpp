@@ -5,13 +5,13 @@
 #include "gmglobjectpainter.h"
 #include "gmglgamepackagehandler.h"
 #include "gmglglyphmanager.h"
-#include "os/gmwingl_window.h"
+#include "gmui/gmui_glwindow.h"
 
 void GMGLFactory::createWindow(OUT GMUIWindow** window)
 {
 	ASSERT(window);
 #if _WINDOWS
-	*window = new GMWinGLWindow();
+	*window = new GMUIGLWindow();
 #elif defined __APPLE__
 	;
 #else

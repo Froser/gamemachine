@@ -233,6 +233,8 @@ void GameMachine::createChildWindows()
 	for (auto childWindow : d->childWindows)
 	{
 		ASSERT(childWindow.first);
-		childWindow.first->create(childWindow.second);
+		GMUIWindowAttributes attrs = childWindow.second;
+		attrs.hwndParent = d->mainWindow->getWindowHandle();
+		childWindow.first->create(attrs);
 	}
 }

@@ -10,6 +10,10 @@ typedef HWND GMUIWindowHandle;
 typedef WNDPROC GMUIWindowProc;
 typedef HINSTANCE GMUIInstance;
 typedef LPCTSTR GMUIStringPtr;
+typedef LRESULT LongResult;
+typedef WPARAM UintPtr;
+typedef LPARAM LongPtr;
+
 struct GMUIWindowAttributes
 {
 	HWND hwndParent;
@@ -25,6 +29,10 @@ typedef void* GMUIWindowHandle;
 typedef void* GMUIWindowProc;
 typedef void* GMUIInstance;
 typedef GMWchar* GMUIStringPtr;
+typedef GMlong LongPtr;
+typedef GMuint UintPtr;
+typedef GMlong LongPtr;
+
 #endif
 
 BEGIN_NS
@@ -47,13 +55,17 @@ public:
 	virtual void showWindow(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
 
 private:
-	inline virtual GMUIStringPtr getWindowClassName() const = 0;
-	inline virtual GMuint getClassStyle() const { return 0; }
+	virtual GMUIStringPtr getWindowClassName() const = 0;
+	virtual GMuint getClassStyle() const { return 0; }
+
+protected:
+	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) { return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam); }
 
 	// From base:
 protected:
-	virtual LPCTSTR GetWindowClassName() const { return getWindowClassName(); }
-	virtual UINT GetClassStyle() const { return getClassStyle(); }
+	virtual LPCTSTR GetWindowClassName() const override { return getWindowClassName(); }
+	virtual UINT GetClassStyle() const override { return getClassStyle(); }
+	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override { return handleMessage(uMsg, wParam, lParam); }
 };
 END_NS
 

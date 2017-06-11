@@ -16,12 +16,11 @@
 
 #include <fstream>
 #include "gmdatacore/soundreader/gmsoundreader.h"
-#include "os/gmwingl_window.h"
 #include "gmui/gmui.h"
+#include "gmui/gmui_glwindow.h"
 
 using namespace gm;
 
-GMUIWindow* s_window;
 GMBSPGameWorld* world;
 GMCharacter* character;
 GMGLFactory factory;
@@ -62,8 +61,6 @@ public:
 
 	void init()
 	{
-		s_window->showWindow(true, false);
-
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		GMInput* inputManager = GameMachine::instance().getInputManager();
 		inputManager->initMouse(GameMachine::instance().getWindow());
@@ -226,7 +223,7 @@ public:
 
 	bool isWindowActivate()
 	{
-		GMWinGLWindow* window = static_cast<GMWinGLWindow*> (GameMachine::instance().getWindow());
+		GMUIGLWindow* window = static_cast<GMUIGLWindow*> (GameMachine::instance().getWindow());
 		return GetActiveWindow() == window->getWindowHandle();
 	}
 };
@@ -237,20 +234,6 @@ int main()
 	return 0;
 }
 
-class Console : public GMUIWindow
-{
-public:
-	Console()
-	{
-	}
-
-	virtual LPCTSTR getWindowClassName() const override
-	{
-		return _L("Console");
-	}
-
-};
-
 int WINAPI WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -258,9 +241,6 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	HRESULT Hr = ::CoInitialize(NULL);
-	if (FAILED(Hr))
-		return 0;
 	GMUIWindowAttributes attrs =
 	{
 		NULL,
@@ -276,9 +256,6 @@ int WINAPI WinMain(
 		new GMGLFactory(),
 		new GameHandler()
 	);
-	s_window = GameMachine::instance().appendWindow(new Console(), attrs);
 	GameMachine::instance().startGameMachine();
-
-	::CoUninitialize();
 	return 0;
 }
