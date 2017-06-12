@@ -112,20 +112,20 @@ private:
 		HRESULT hr;
 		if (FAILED(hr = GMSoundPlayerDevice::getInstance()->CreateSoundBuffer(&dsbd, &cpBuffer, NULL)))
 		{
-			gm_error("create sound buffer error.");
+			gm_error(_L("create sound buffer error."));
 			return;
 		}
 
 		if (FAILED(hr = cpBuffer->QueryInterface(IID_IDirectSoundBuffer8, (LPVOID*)&d->cpDirectSoundBuffer)))
 		{
-			gm_error("QueryInterface to IDirectSoundBuffer8 error");
+			gm_error(_L("QueryInterface to IDirectSoundBuffer8 error"));
 			return;
 		}
 
 		ComPtr<IDirectSoundNotify> cpDirectSoundNotify;
 		if (FAILED(hr = d->cpDirectSoundBuffer->QueryInterface(IID_IDirectSoundNotify, (LPVOID*)&cpDirectSoundNotify)))
 		{
-			gm_error("QueryInterface to IDirectSoundNotify error");
+			gm_error(_L("QueryInterface to IDirectSoundNotify error"));
 			return;
 		}
 

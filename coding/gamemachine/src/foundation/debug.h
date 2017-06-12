@@ -7,38 +7,59 @@
 
 BEGIN_NS
 
-inline void format_time(char* in)
+struct IDebugOutput
 {
-#if _WINDOWS
-	SYSTEMTIME time = { 0 };
-	GetLocalTime(&time);
-	sprintf_s(in, LINE_MAX, "%d-%02d-%02d %02d:%02d:%02d",
-		time.wYear,
-		time.wMonth,
-		time.wDay,
-		time.wHour,
-		time.wMinute,
-		time.wSecond
-	);
-#endif
-}
+	virtual void info(const GMString& msg) = 0;
+	virtual void warning(const GMString& msg) = 0;
+	virtual void error(const GMString& msg) = 0;
+	virtual void debug(const GMString& msg) = 0;
+};
 
-#define f_time(t) char t[LINE_MAX]; format_time(t);
-inline void gm_print(const char *format, ...)
+GM_PRIVATE_OBJECT(GMDebugger)
 {
-	f_time(t);
-	printf("%s: ", t);
-	va_list ap;
-	va_start(ap, format);
-	vprintf(format, ap);
-	va_end(ap);
-	printf("\n");
-}
+	IDebugOutput* debugger;
+};
+
+class GMDebugger : public GMSingleton<GMDebugger>
+{
+	DECLARE_PRIVATE(GMDebugger)
+	DECLARE_SINGLETON(GMDebugger)
+
+private:
+	GMDebugger()
+	{
+		D(d);
+		d->debugger = nullptr;
+	}
+
+public:
+	static void setDebugOuput(IDebugOutput* output)
+	{
+		instance().data()->debugger = output;
+	}
+
+public:
+	void info(const GMWchar* format, ...);
+	void info(const char* format, ...);
+	void error(const GMWchar* format, ...);
+	void error(const char* format, ...);
+	void warning(const GMWchar* format, ...);
+	void warning(const char* format, ...);
+#if _DEBUG
+	void debug(const GMWchar* format, ...);
+	void debug(const char* format, ...);
+#endif
+};
 
 // debug macros:
-#define gm_info gm_print
-#define gm_error gm_print
-#define gm_warning gm_print
+#define gm_info GMDebugger::instance().info
+#define gm_error GMDebugger::instance().error
+#define gm_warning GMDebugger::instance().warning
+#if _DEBUG
+#	define gm_debug GMDebugger::instance().debug
+#else
+#	define gm_debug()
+#endif
 
 // hooks
 #define gm_install_hook(cls, name, funcPtr) { Hooks::install(#cls"_"#name, funcPtr); }

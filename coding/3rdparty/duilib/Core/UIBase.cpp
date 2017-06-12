@@ -424,6 +424,7 @@ LRESULT CALLBACK CWindowWnd::__WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPAR
 			return lRes;
 		}
 	}
+
 	if( pThis != NULL ) {
 		return pThis->HandleMessage(uMsg, wParam, lParam);
 	} 

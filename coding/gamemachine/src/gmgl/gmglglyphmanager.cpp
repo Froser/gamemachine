@@ -127,7 +127,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 	error = loadFace(&face);
 	if (error != FT_Err_Ok)
 	{
-		gm_error("cannot found font file, cannot draw characters.");
+		gm_error(_L("cannot found font file, cannot draw characters."));
 		return errGlyph;
 	}
 
@@ -147,7 +147,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 		d->cursor_u = 0;
 		if (d->cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
 		{
-			gm_error("no texture space for glyph!");
+			gm_error(_L("no texture space for glyph!"));
 		}
 	}
 

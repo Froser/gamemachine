@@ -19,6 +19,8 @@ void GameMachine::init(
 	d->instance = instance;
 	GMUIPainter::SetInstance(d->instance);
 
+	defaultMainWindowAttributes();
+
 	d->factory.reset(factory);
 	d->gameHandler.reset(gameHandler);
 
@@ -34,7 +36,7 @@ void GameMachine::init(
 	d->inputManager.reset(new GMInput());
 	d->configManager.reset(new GMConfig());
 
-	defaultMainWindowAttributes();
+	initInner();
 }
 
 void GameMachine::setMainWindowAttributes(const GMUIWindowAttributes& attrs)
@@ -49,7 +51,7 @@ IGraphicEngine* GameMachine::getGraphicEngine()
 	return d->engine;
 }
 
-GMUIWindow* GameMachine::getWindow()
+GMUIWindow* GameMachine::getMainWindow()
 {
 	D(d);
 	return d->mainWindow;
@@ -64,8 +66,14 @@ IFactory* GameMachine::getFactory()
 GMUIWindow* GameMachine::appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs)
 {
 	D(d);
-	d->childWindows.push_back(makePair(window, attrs) );
+	d->windows.push_back(makePair(window, attrs) );
 	return window;
+}
+
+const GameMachineWindows& GameMachine::getWindows()
+{
+	D(d);
+	return d->windows;
 }
 
 void GameMachine::postMessage(GameMachineMessage msg)
@@ -150,7 +158,7 @@ void GameMachine::startGameMachine()
 	d->mainWindow->showWindow();
 
 	// 创建其他窗口
-	createChildWindows();
+	createWindows();
 
 #if _WINDOWS
 	// 创建声音设备
@@ -199,10 +207,14 @@ bool GameMachine::handleMessages()
 	{
 		msg = d->messageQueue.back();
 
-		switch (msg)
+		switch (msg.msgType)
 		{
 		case gm::GM_MESSAGE_EXIT:
 			return false;
+		case gm::GM_MESSAGE_CONSOLE:
+			{
+				d->consoleWindow->showWindow(true, false);
+			}
 		default:
 			break;
 		}
@@ -228,15 +240,32 @@ void GameMachine::defaultMainWindowAttributes()
 	setMainWindowAttributes(attrs);
 }
 
-void GameMachine::createChildWindows()
+void GameMachine::createWindows()
 {
-	// TODO 子窗口应该作为Dialog
 	D(d);
-	for (auto childWindow : d->childWindows)
+	for (auto& window : d->windows)
 	{
-		ASSERT(childWindow.first);
-		GMUIWindowAttributes attrs = childWindow.second;
+		ASSERT(window.first);
+		GMUIWindowAttributes attrs = window.second;
 		attrs.hwndParent = d->mainWindow->getWindowHandle();
-		childWindow.first->create(attrs);
+		window.first->create(attrs);
 	}
+}
+
+void GameMachine::initInner()
+{
+	D(d);
+	GMUIWindowAttributes attrs =
+	{
+		NULL,
+		L"GameMachineConsoleWindow",
+		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_CAPTION,
+		WS_EX_CLIENTEDGE,
+		{ 0, 0, 700, 400 },
+		NULL,
+		d->instance,
+	};
+	GMUIConsole::newConsoleWindow(&d->consoleWindow);
+	appendWindow(d->consoleWindow, attrs);
+	GMDebugger::setDebugOuput(d->consoleWindow);
 }

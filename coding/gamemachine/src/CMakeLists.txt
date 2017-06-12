@@ -148,6 +148,7 @@ set(SOURCES
 		gmui/gmui_glwindow.h
 		gmui/gmui_glwindow.cpp
 		gmui/gmui_console.h
+		gmui/gmui_console_ui.h
 		gmui/gmui_console.cpp
 	)
 
@@ -162,6 +163,6 @@ add_definitions(-DFPM_DEFAULT)
 add_definitions(-DUNICODE -D_UNICODE)
 
 if(MSVC)
-	set_target_properties(gamemachine PROPERTIES COMPILE_FLAGS "/W3" ) 
-	set_target_properties(gamemachine PROPERTIES COMPILE_FLAGS "/WX" ) 
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 
 endif(MSVC)

@@ -414,7 +414,7 @@ public:
 			ASSERT(s);
 			if (s == 0)
 			{
-				gm_error("AlignedVector reserve out-of-memory\n");
+				gm_error(_L("AlignedVector reserve out-of-memory\n"));
 				_Count = 0;
 				m_size = 0;
 			}

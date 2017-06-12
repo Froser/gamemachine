@@ -8,11 +8,34 @@
 #include "os/gminput.h"
 #include "gmthreads.h"
 #include "gmui/gmui.h"
+#include "gmui/gmui_console.h"
 BEGIN_NS
 
-enum GameMachineMessage
+enum GameMachineMessageType
 {
 	GM_MESSAGE_EXIT,
+	GM_MESSAGE_CONSOLE,
+};
+
+struct GameMachineMessage
+{
+	enum ParamType
+	{
+		Type_GMObject,
+		Type_Bool,
+		Type_Int,
+	};
+
+	union Param
+	{
+		GMObject* obj;
+		bool b;
+		GMint i;
+	};
+
+	GameMachineMessageType msgType;
+	ParamType paramType;
+	Param param;
 };
 
 // Multi-threads
@@ -34,12 +57,14 @@ private:
 	IGameHandler* handler;
 };
 
+typedef Vector<Pair<GMUIWindow*, GMUIWindowAttributes> > GameMachineWindows;
+
 GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMUIInstance instance;
 	GMUIWindowAttributes mainWindowAttributes;
 	GMClock clock;
-	AutoPtr<GMUIWindow> mainWindow;
+	AutoPtr<GMUIWindow> mainWindow; // 主窗口
 	AutoPtr<IFactory> factory;
 	AutoPtr<IGraphicEngine> engine;
 	AutoPtr<IGameHandler> gameHandler;
@@ -48,8 +73,9 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<GMInput> inputManager;
 	AutoPtr<GMConfig> configManager;
 	std::queue<GameMachineMessage> messageQueue;
-	Vector<Pair<GMUIWindow*, GMUIWindowAttributes> > childWindows;
+	GameMachineWindows windows; // 除主窗口以外的窗口列表
 	GameLoopJob<GM_EVENT_SIMULATE> simulateJob;
+	AUTORELEASE GMUIConsole* consoleWindow; // 内置调试窗口
 };
 
 class GameMachine : public GMSingleton<GameMachine>
@@ -83,11 +109,12 @@ public:
 	void setMainWindowAttributes(const GMUIWindowAttributes& attrs);
 
 	IGraphicEngine* getGraphicEngine();
-	GMUIWindow* getWindow();
+	GMUIWindow* getMainWindow();
 	IFactory* getFactory();
 
 	// 窗口管理
 	GMUIWindow* appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs);
+	const GameMachineWindows& getWindows();
 
 	// 配置管理
 	GMConfig* getConfigManager();
@@ -120,7 +147,8 @@ public:
 private:
 	bool handleMessages();
 	void defaultMainWindowAttributes();
-	void createChildWindows();
+	void createWindows();
+	void initInner();
 };
 
 END_NS

@@ -16,9 +16,16 @@ struct GlyphInfo
 	GMfloat advance;
 };
 
-GM_ALIGNED_16(class) GMGlyphManager : public GMObject
+typedef std::map<GMWchar, GlyphInfo> CharList;
+
+GM_PRIVATE_OBJECT(GMGlyphManager)
 {
-	typedef std::map<GMWchar, GlyphInfo> CharList;
+	CharList chars;
+};
+
+class GMGlyphManager : public GMObject
+{
+	DECLARE_PRIVATE(GMGlyphManager);
 
 public:
 	GMGlyphManager();
@@ -35,9 +42,6 @@ protected:
 
 protected:
 	CharList& getCharList();
-
-private:
-	CharList m_chars;
 };
 
 END_NS

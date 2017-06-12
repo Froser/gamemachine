@@ -43,6 +43,9 @@
 
 BEGIN_NS
 
+// 游戏逻辑的线程模式
+#define MULTI_THREAD 1
+
 // 基本数据类型
 typedef unsigned char GMbyte;
 typedef long GMlong;

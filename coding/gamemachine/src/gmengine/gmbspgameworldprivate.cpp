@@ -56,7 +56,7 @@ PARSE_FUNC(worldspawn, entity, world)
 
 PARSE_FUNC(info_player_deathmatch, entity, world)
 {
-	gm_info("found playerstart");
+	gm_info(_L("found playerstart"));
 
 	if (world->getMajorCharacter())
 		return;

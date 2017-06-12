@@ -25,7 +25,7 @@ XInputWrapper::XInputWrapper()
 
 	if (!m_module)
 	{
-		gm_warning("cannot find xinput dll, xinput disabled.");
+		gm_warning(_L("cannot find xinput dll, xinput disabled."));
 		FreeLibrary(m_module);
 		return;
 	}
@@ -40,7 +40,7 @@ DWORD XInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 	if (m_xinputGetState)
 		return m_xinputGetState(dwUserIndex, pState);
 	else
-		gm_warning("cannot invoke XInputGetState");
+		gm_warning(_L("cannot invoke XInputGetState"));
 	return ERROR_DLL_INIT_FAILED;
 }
 
@@ -49,7 +49,7 @@ DWORD XInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibrat
 	if (m_xinputSetState)
 		return m_xinputSetState(dwUserIndex, pVibration);
 	else
-		gm_warning("cannot invoke XInputGetState");
+		gm_warning(_L("cannot invoke XInputGetState"));
 	return ERROR_DLL_INIT_FAILED;
 }
 
@@ -118,7 +118,7 @@ GMMouseState Input_Windows::getMouseState()
 	D(d);
 	if (!d->mouseReady)
 	{
-		gm_error("Mouse is not ready. Please call initMouse() first.");
+		gm_error(_L("Mouse is not ready. Please call initMouse() first."));
 		return GMMouseState();
 	}
 

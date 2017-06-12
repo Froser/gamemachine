@@ -56,7 +56,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 	indices = new GMuint[tesselation*(tesselation + 1) * 2];
 	if (!indices)
 	{
-		gm_error("Unable to allocate memory for surface indices");
+		gm_error(_L("Unable to allocate memory for surface indices"));
 		return false;
 	}
 
@@ -77,7 +77,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 	rowIndexPointers = new GMuint *[tesselation];
 	if (!trianglesPerRow || !rowIndexPointers)
 	{
-		gm_error("Unable to allocate memory for indices for multi_draw_arrays");
+		gm_error(_L("Unable to allocate memory for indices for multi_draw_arrays"));
 		return false;
 	}
 
@@ -215,7 +215,7 @@ void GMBSPRender::generateFaces()
 				[d->patches[currentPatch].numQuadraticPatches];
 			if (!d->patches[currentPatch].quadraticPatches)
 			{
-				gm_error("Unable to allocate memory for %d quadratic patches",
+				gm_error(_L("Unable to allocate memory for %d quadratic patches"),
 					d->patches[currentPatch].numQuadraticPatches);
 				return;
 			}

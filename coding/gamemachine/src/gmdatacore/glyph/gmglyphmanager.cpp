@@ -7,13 +7,15 @@ GMGlyphManager::GMGlyphManager()
 
 const GlyphInfo GMGlyphManager::getChar(GMWchar c)
 {
+	D(d);
 	CharList::iterator iter;
-	if ((iter = m_chars.find(c)) != m_chars.end())
+	if ((iter = d->chars.find(c)) != d->chars.end())
 		return (*iter).second;
 	return createChar(c);
 }
 
-GMGlyphManager::CharList& GMGlyphManager::getCharList()
+CharList& GMGlyphManager::getCharList()
 {
-	return m_chars;
+	D(d);
+	return d->chars;
 }

@@ -37,7 +37,7 @@ bool GMDefaultGLGamePackageHandler::readFileFromPath(const GMString& path, REF G
 	}
 	else
 	{
-		gm_warning("cannot read file from path: %s", path.toStdString().c_str());
+		gm_warning(_L("cannot read file from path: %Ls"), path.toStdWString().c_str());
 	}
 	return false;
 }
@@ -133,7 +133,7 @@ void ZipGMGLGamePackageHandler::init()
 	PKD(d);
 	if (!loadZip())
 	{
-		gm_error("invalid package file %s", d->packagePath.toStdString().c_str());
+		gm_error(_L("invalid package file %Ls"), d->packagePath.toStdWString().c_str());
 		return;
 	}
 	Base::init();
@@ -155,7 +155,7 @@ bool ZipGMGLGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuf
 		buffer->size = buf->size;
 		return true;
 	}
-	gm_warning("cannot find path %s", path.toStdString().c_str());
+	gm_warning(_L("cannot find path %Ls"), path.toStdWString().c_str());
 	return false;
 }
 

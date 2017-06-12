@@ -63,7 +63,7 @@ public:
 	{
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		GMInput* inputManager = GameMachine::instance().getInputManager();
-		inputManager->initMouse(GameMachine::instance().getWindow());
+		inputManager->initMouse(GameMachine::instance().getMainWindow());
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
@@ -136,7 +136,9 @@ public:
 			GMMouseState mouseState = inputManager->getMouseState();
 
 			if (kbState['Q'] || kbState[VK_ESCAPE])
-				GameMachine::instance().postMessage(GM_MESSAGE_EXIT);
+				GameMachine::instance().postMessage({ GM_MESSAGE_EXIT });
+			if (kbState['B'])
+				GameMachine::instance().postMessage({ GM_MESSAGE_CONSOLE });
 
 			MoveAction moveTag = 0;
 			MoveRate rate;
@@ -223,8 +225,8 @@ public:
 
 	bool isWindowActivate()
 	{
-		GMUIGLWindow* window = static_cast<GMUIGLWindow*> (GameMachine::instance().getWindow());
-		return GetActiveWindow() == window->getWindowHandle();
+		GMUIWindow* window = GameMachine::instance().getMainWindow();
+		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 };
 

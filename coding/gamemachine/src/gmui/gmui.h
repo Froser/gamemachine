@@ -54,6 +54,7 @@ public:
 	virtual void swapBuffers() const {}
 	virtual void centerWindow() { return Base::CenterWindow(); }
 	virtual void showWindow(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
+	virtual void onFinalMessage(GMUIWindowHandle wndHandle) {}
 
 private:
 	virtual GMUIStringPtr getWindowClassName() const = 0;
@@ -62,11 +63,14 @@ private:
 protected:
 	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) { return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam); }
 
+#if _WINDOWS
 	// From base:
 protected:
 	virtual LPCTSTR GetWindowClassName() const override { return getWindowClassName(); }
 	virtual UINT GetClassStyle() const override { return getClassStyle(); }
 	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override { return handleMessage(uMsg, wParam, lParam); }
+	virtual void OnFinalMessage(HWND hWnd) override { onFinalMessage(hWnd); }
+#endif
 };
 
 #if _WINDOWS
@@ -86,7 +90,7 @@ public:
 	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 
 protected:
-	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
 	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
 	virtual LongResult onDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
 	virtual LongResult onNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }

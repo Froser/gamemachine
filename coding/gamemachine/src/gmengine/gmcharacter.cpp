@@ -131,7 +131,7 @@ void GMCharacter::simulation()
 		}
 		else
 		{
-			gm_error("cannot found character in physics world");
+			gm_error(_L("cannot found character in physics world"));
 		}
 	}
 
@@ -152,7 +152,7 @@ void GMCharacter::update()
 	if (c)
 		d->state.position = c->motions.translation;
 	else
-		gm_error("cannot found character in physics world");
+		gm_error(_L("cannot found character in physics world"));
 }
 
 void GMCharacter::sendMoveCommand()

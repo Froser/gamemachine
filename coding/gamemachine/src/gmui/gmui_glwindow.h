@@ -13,7 +13,6 @@ GM_PRIVATE_OBJECT(GMUIGLWindow)
 	HGLRC hRC;
 };
 
-// Windows下的Window类
 class GMUIGLWindow : public GMUIWindow
 {
 	typedef GMUIWindow Base;
@@ -27,17 +26,11 @@ public:
 public:
 	virtual GMUIWindowHandle create(const GMUIWindowAttributes& wndAttrs) override;
 	virtual void swapBuffers() const override;
+	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 
 private:
-	inline virtual GMUIStringPtr getWindowClassName() const override
-	{
-		return _L("gamemachine_mainWindow_class");
-	}
-
-	inline virtual GMuint getClassStyle() const override
-	{
-		return 0;
-	}
+	inline virtual GMUIStringPtr getWindowClassName() const override { return _L("gamemachine_mainWindow_class"); }
+	inline virtual GMuint getClassStyle() const override { return 0; }
 
 private:
 	void dispose();

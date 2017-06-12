@@ -92,7 +92,11 @@ public:
 public:
 	virtual void run() override;
 
+#if MULTI_THREAD
 private:
+#else
+public:
+#endif
 	virtual void sustainedRun() = 0;
 };
 
@@ -113,7 +117,11 @@ private:
 	GMSustainedThread* th;
 };
 
-#define gmRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
+#if MULTI_THREAD
+#	define gmRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
+#else
+#	define gmRunSustainedThread(name, thread) (thread)->sustainedRun();
+#endif
 
 // GMJobPool
 GM_PRIVATE_OBJECT(GMJobPool)

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmui.h"
 #include "foundation/gmprofile.h"
+#include "foundation/gamemachine.h"
 
 #if _WINDOWS
 bool GMUIWindow::handleMessage()
@@ -45,12 +46,5 @@ LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPa
 	if (bHandled) return lRes;
 	if (d->painter.MessageHandler(uMsg, wParam, lParam, lRes)) return lRes;
 	return Base::handleMessage(uMsg, wParam, lParam);
-}
-
-LongResult GMUIGUIWindow::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
-{
-	D(d);
-	d->painter.Init(getWindowHandle());
-	return 0;
 }
 #endif

@@ -84,9 +84,9 @@ static GMS_BlendFunc parseBlendFunc(const char* p)
 static void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
 {
 	if (GMImageReader::load(buf->buffer, buf->size, image))
-		gm_info("loaded texture %s from shader", filename.toStdString().c_str());
+		gm_info(_L("loaded texture %Ls from shader"), filename.toStdWString().c_str());
 	else
-		gm_error("texture %s not found", filename.toStdString().c_str());
+		gm_error(_L("texture %Ls not found"), filename.toStdWString().c_str());
 }
 
 static void readTernaryFloatsFromString(const char* str, linear_math::Vector3& vec)
@@ -139,7 +139,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 		GMBuffer buf;
 		if (!GameMachine::instance().getGamePackageManager()->readFile(PI_TEXTURES, name, &buf, &fn))
 		{
-			gm_warning("file %s not found.", fn.toStdWString().c_str());
+			gm_warning(_L("file %Ls not found."), fn.toStdWString().c_str());
 			return nullptr;
 		}
 
@@ -212,7 +212,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	{
 		TiXmlElement* elem = it;
 		if (!strEqual(elem->Value(), "item"))
-			gm_warning("First node must be 'item'.");
+			gm_warning(_L("First node must be 'item'."));
 
 		const char* name = elem->Attribute("name");
 		const char* ref = elem->Attribute("ref");
@@ -398,11 +398,11 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 			{
 				frame->frames[0] = tc.find(d->lightmapId)->texture;
 				frame->frameCount = 1;
-				gm_info("found map from lightmap %d", d->lightmapId);
+				gm_info(_L("found map from lightmap %d"), d->lightmapId);
 			}
 			else
 			{
-				gm_error("lightmap not found: %d", d->lightmapId);
+				gm_error(_L("lightmap not found: %d"), d->lightmapId);
 			}
 		}
 	}
@@ -435,7 +435,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 	const char* type = elem->Attribute("type");
 	if (!type)
 	{
-		gm_error("light type missing.");
+		gm_error(_L("light type missing."));
 		return;
 	}
 
@@ -445,7 +445,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 	const char* color = elem->Attribute("color");
 	if (!color)
 	{
-		gm_error("light color missing.");
+		gm_error(_L("light color missing."));
 		return;
 	}
 
@@ -463,7 +463,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		const char* position = elem->Attribute("position");
 		if (!position)
 		{
-			gm_error("specular light position missing.");
+			gm_error(_L("specular light position missing."));
 			return;
 		}
 		Scanner s(color);
@@ -532,7 +532,7 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 			if (tcModNum == MAX_TEX_MOD)
 			{
 				if (strlen(type))
-					gm_warning("warning: you have tcMods more than %d, please increase MAX_TEX_MOD", MAX_TEX_MOD);
+					gm_warning(_L("warning: you have tcMods more than %d, please increase MAX_TEX_MOD"), MAX_TEX_MOD);
 				break;
 			}
 			currentMod = &shader.texture.textures[d->textureNum].texMod[tcModNum];

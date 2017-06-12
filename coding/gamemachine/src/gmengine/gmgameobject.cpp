@@ -81,7 +81,7 @@ void GMGlyphObject::constructObject()
 	D_BASE(db, GMGameObject);
 
 	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
-	GMUIWindow* window = GameMachine::instance().getWindow();
+	GMUIWindow* window = GameMachine::instance().getMainWindow();
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
