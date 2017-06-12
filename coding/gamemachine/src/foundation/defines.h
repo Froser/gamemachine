@@ -34,13 +34,6 @@
 #define BEGIN_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMuint)var)+1) )
 #define END_ENUM
 
-// 是否支持C++11
-#if _MSC_VER <= 1600
-#	define CPP11 0
-#else
-#	define CPP11 1
-#endif
-
 BEGIN_NS
 
 // 游戏逻辑的线程模式
@@ -108,11 +101,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
 
 // 编译器相关
-#if CPP11
-#	define DEFAULT_CONSTRUCTOR(className) className() = default;
-#else
-#	define DEFAULT_CONSTRUCTOR(className) className(){}
-#endif
+#define DEFAULT_CONSTRUCTOR(className) className() = default;
 
 // SSE指令优化
 #ifdef _MSC_VER
