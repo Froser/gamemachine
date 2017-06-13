@@ -47,7 +47,10 @@ void GMUIConsole::onPrepare()
 
 void GMUIConsole::info(const GMString& msg)
 {
-	richEdit()->AppendText((msg + _L("\n")).toStdWString().c_str());
+	DuiLib::CRichEditUI* re = richEdit();
+	re->SetTextColor(0x555555);
+	re->AppendText((msg + _L("\n")).toStdWString().c_str());
+	refresh();
 }
 
 void GMUIConsole::warning(const GMString& msg)
@@ -68,6 +71,14 @@ inline DuiLib::CRichEditUI* GMUIConsole::richEdit()
 	DuiLib::CRichEditUI* re = static_cast<DuiLib::CRichEditUI*> (d->painter.FindControl(_L("Edit_Console")));
 	ASSERT(re);
 	return re;
+}
+
+void GMUIConsole::refresh()
+{
+	DuiLib::CRichEditUI* re = richEdit();
+	re->ScrollCaret();
+	//re->TxSendMessage(WM_VSCROLL, SB_BOTTOM, 0L, 0);
+	//re->TxSendMessage(WM_VSCROLL, SB_PAGEDOWN, 0L, 0);
 }
 
 #endif

@@ -31,7 +31,8 @@ public:
 
 private:
 	void onPrepare();
-	inline DuiLib::CRichEditUI* richEdit();
+	DuiLib::CRichEditUI* richEdit();
+	void refresh();
 };
 
 END_NS

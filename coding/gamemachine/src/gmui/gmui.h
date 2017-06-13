@@ -91,16 +91,16 @@ public:
 	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 
 protected:
-	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
-	virtual LongResult onSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { return 0; }
+	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual LongResult onSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
 };
 
 #endif

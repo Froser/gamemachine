@@ -36,224 +36,91 @@ inline void format_timeA(char* in)
 #define f_timeW(t) GMWchar t[LINE_MAX]; format_timeW(t);
 #define f_timeA(t) char t[LINE_MAX]; format_timeA(t);
 
-static inline void printA(const char* format, ...)
-{
-	f_timeA(t);
-	printf("%s: ", t);
-	va_list ap;
-	va_start(ap, format);
-	vprintf(format, ap);
+#define printW(format, tag) \
+	D(d);															\
+	GMWchar out[LINE_MAX];											\
+	va_list ap;														\
+	va_start(ap, format);											\
+	if (d->debugger)													\
+	{																\
+	GMWchar buf[LINE_MAX];											\
+	vswprintf(buf, LINE_MAX, format, ap);							\
+	f_timeW(t);														\
+		wsprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
+		d->debugger->tag(out);										\
+	}																\
+	else															\
+	{																\
+		GMWchar buf[LINE_MAX];										\
+		vswprintf(buf, LINE_MAX, format, ap);						\
+		f_timeW(t);													\
+		wprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
+		d->debugger->tag(out);										\
+	}																\
 	va_end(ap);
-	printf("\n");
-}
+
+#define printA(format, tag) \
+	D(d);															\
+	char out[LINE_MAX];												\
+	va_list ap;														\
+	va_start(ap, format);											\
+	if (d->debugger)													\
+	{																\
+		char buf[LINE_MAX];											\
+		vsprintf_s(buf, format, ap);								\
+		f_timeW(t);													\
+		sprintf_s(out, "[" #tag "]%s: %s", t, buf);					\
+		d->debugger->tag(out);										\
+	}																\
+	else															\
+	{																\
+		char buf[LINE_MAX];											\
+		vsprintf_s(buf, format, ap);								\
+		f_timeW(t);													\
+		printf(out, "[" #tag "]%s: %s", t, buf);					\
+		d->debugger->tag(out);										\
+	}																\
+	va_end(ap);
 
 void GMDebugger::info(const GMWchar *format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		GMWchar buf[LINE_MAX];
-		f_timeW(t);
-		wsprintf(buf, _L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vswprintf(buf, LINE_MAX, format, ap);
-		va_end(ap);
-		d->debugger->info(buf);
-	}
-	else
-	{
-		f_timeW(t);
-		wprintf(_L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vwprintf(format, ap);
-		va_end(ap);
-		wprintf(_L("\n"));
-	}
+	printW(format, info);
 }
 
 void GMDebugger::info(const char* format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		char buf[LINE_MAX];
-		f_timeA(t);
-		sprintf_s(buf, "%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vsprintf_s(buf, format, ap);
-		va_end(ap);
-		d->debugger->info(buf);
-	}
-	else
-	{
-		f_timeA(t);
-		printf("%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vprintf(format, ap);
-		va_end(ap);
-		printf("\n");
-	}
+	printA(format, info);
 }
 
 void GMDebugger::error(const GMWchar *format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		GMWchar buf[LINE_MAX];
-		f_timeW(t);
-		wsprintf(buf, _L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vswprintf(buf, LINE_MAX, format, ap);
-		va_end(ap);
-		d->debugger->error(buf);
-	}
-	else
-	{
-		f_timeW(t);
-		wprintf(_L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vwprintf(format, ap);
-		va_end(ap);
-		wprintf(_L("\n"));
-	}
+	printW(format, error);
 }
 
 void GMDebugger::error(const char* format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		char buf[LINE_MAX];
-		f_timeA(t);
-		sprintf_s(buf, "%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vsprintf_s(buf, format, ap);
-		va_end(ap);
-		d->debugger->error(buf);
-	}
-	else
-	{
-		f_timeA(t);
-		printf("%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vprintf(format, ap);
-		va_end(ap);
-		printf("\n");
-	}
+	printA(format, error);
 }
 
 void GMDebugger::warning(const GMWchar *format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		GMWchar buf[LINE_MAX];
-		f_timeW(t);
-		wsprintf(buf, _L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vswprintf(buf, LINE_MAX, format, ap);
-		va_end(ap);
-		d->debugger->warning(buf);
-	}
-	else
-	{
-		f_timeW(t);
-		wprintf(_L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vwprintf(format, ap);
-		va_end(ap);
-		wprintf(_L("\n"));
-	}
+	printW(format, warning);
 }
 
 void GMDebugger::warning(const char* format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		char buf[LINE_MAX];
-		f_timeA(t);
-		sprintf_s(buf, "%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vsprintf_s(buf, format, ap);
-		va_end(ap);
-		d->debugger->warning(buf);
-	}
-	else
-	{
-		f_timeA(t);
-		printf("%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vprintf(format, ap);
-		va_end(ap);
-		printf("\n");
-	}
+	printA(format, warning);
 }
 
 #ifdef _DEBUG
 void GMDebugger::debug(const GMWchar *format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		GMWchar buf[LINE_MAX];
-		f_timeW(t);
-		wsprintf(buf, _L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vswprintf(buf, LINE_MAX, format, ap);
-		va_end(ap);
-		d->debugger->debug(buf);
-	}
-	else
-	{
-		f_timeW(t);
-		wprintf(_L("%Ls: "), t);
-		va_list ap;
-		va_start(ap, format);
-		vwprintf(format, ap);
-		va_end(ap);
-		wprintf(_L("\n"));
-	}
+	printW(format, debug);
 }
 
 void GMDebugger::debug(const char* format, ...)
 {
-	D(d);
-	if (d->debugger)
-	{
-		char buf[LINE_MAX];
-		f_timeA(t);
-		sprintf_s(buf, "%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vsprintf_s(buf, format, ap);
-		va_end(ap);
-		d->debugger->debug(buf);
-	}
-	else
-	{
-		f_timeA(t);
-		printf("%s: ", t);
-		va_list ap;
-		va_start(ap, format);
-		vprintf(format, ap);
-		va_end(ap);
-		printf("\n");
-	}
+	printA(format, debug);
 }
 #endif
 //////////////////////////////////////////////////////////////////////////

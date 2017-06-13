@@ -43,7 +43,8 @@ LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPa
 	default:
 		bHandled = FALSE;
 	}
-	if (bHandled) return lRes;
+
+	//if (bHandled) return lRes;
 	if (d->painter.MessageHandler(uMsg, wParam, lParam, lRes)) return lRes;
 	return Base::handleMessage(uMsg, wParam, lParam);
 }
