@@ -22,9 +22,9 @@ struct GMKeyboardState
 {
 	BYTE keystate[256];
 
-	GMint operator [](BYTE key)
+	bool keydown(GMuint key)
 	{
-		return keystate[key] & 0x80;
+		return !! (keystate[key] & 0x80);
 	}
 };
 
@@ -57,6 +57,7 @@ private:
 GM_PRIVATE_OBJECT(Input_Windows)
 {
 	bool mouseReady;
+	bool mouseEnabled;
 	GMUIWindow* window;
 	XInputWrapper xinput;
 };
@@ -71,6 +72,7 @@ public:
 
 public:
 	void initMouse(GMUIWindow* window);
+	void setMouseEnable(bool center);
 	GMJoystickState getJoystickState();
 	void joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed);
 

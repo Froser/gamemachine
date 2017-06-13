@@ -213,7 +213,8 @@ bool GameMachine::handleMessages()
 			return false;
 		case gm::GM_MESSAGE_CONSOLE:
 			{
-				d->consoleWindow->showWindow(true, false);
+				d->consoleWindow->centerWindow();
+				d->consoleWindow->showWindow(true, true);
 			}
 		default:
 			break;
@@ -259,7 +260,7 @@ void GameMachine::initInner()
 	{
 		NULL,
 		L"GameMachineConsoleWindow",
-		WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_CAPTION,
+		WS_OVERLAPPEDWINDOW,
 		WS_EX_CLIENTEDGE,
 		{ 0, 0, 700, 400 },
 		NULL,

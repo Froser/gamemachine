@@ -16,6 +16,7 @@ private:
 
 public:
 	virtual GMUIStringPtr getWindowClassName() const override;
+	virtual GMuint getClassStyle() const override { return CS_DBLCLKS; }
 	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual void onFinalMessage(GMUIWindowHandle wndHandle) override;
 

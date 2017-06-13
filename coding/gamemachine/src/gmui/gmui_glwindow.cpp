@@ -95,10 +95,6 @@ GMUIWindowHandle GMUIGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 		return false;
 	}
 
-	::ShowWindow(wnd, SW_SHOW);
-	::SetForegroundWindow(wnd);
-	::SetFocus(wnd);
-
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
@@ -119,7 +115,7 @@ LongResult GMUIGLWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPar
 {
 	if (uMsg == WM_DESTROY)
 		::PostQuitMessage(0L);
-	return Base::handleMessage(uMsg, wParam, lParam);
+	return ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
 }
 
 void GMUIGLWindow::dispose()

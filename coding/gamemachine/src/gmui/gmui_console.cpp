@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmui_console.h"
 #if _WINDOWS
-#include "gmui_console_ui.h"
+#	include "gmui_console_ui.h"
 #endif
 
 void GMUIConsole::newConsoleWindow(OUT GMUIConsole** out)

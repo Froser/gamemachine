@@ -53,6 +53,7 @@ public:
 	virtual GMRect getWindowRect();
 	virtual void swapBuffers() const {}
 	virtual void centerWindow() { return Base::CenterWindow(); }
+	virtual GMuint showModal() { return Base::ShowModal(); }
 	virtual void showWindow(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
 	virtual void onFinalMessage(GMUIWindowHandle wndHandle) {}
 

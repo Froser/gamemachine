@@ -1752,8 +1752,8 @@ bool CPaintManagerUI::HandleMessage() // 处理一次消息
 			return false;
 		if (!CPaintManagerUI::TranslateMessage(&msg))
 		{
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			::TranslateMessage(&msg);
+			::DispatchMessage(&msg);
 		}
 	}
 	return true;
@@ -3520,7 +3520,7 @@ bool CPaintManagerUI::TranslateMessage(const LPMSG pMsg)
 		//		for( int i = 0; i < m_aPreMessages.GetSize(); i++ ) 
 		for( int i = m_aPreMessages.GetSize() - 1; i >= 0 ; --i ) 
 		{
-			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);        
+			CPaintManagerUI* pT = static_cast<CPaintManagerUI*>(m_aPreMessages[i]);
 			HWND hTempParent = hWndParent;
 			while(hTempParent)
 			{

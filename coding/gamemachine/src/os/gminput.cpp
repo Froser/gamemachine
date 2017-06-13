@@ -62,6 +62,7 @@ Input_Windows::Input_Windows()
 {
 	D(d);
 	d->mouseReady = false;
+	d->mouseEnabled = true;
 }
 
 Input_Windows::~Input_Windows()
@@ -74,8 +75,14 @@ void Input_Windows::initMouse(GMUIWindow* window)
 	d->window = window;
 	GMRect rect = d->window->getWindowRect();
 	::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
-	::ShowCursor(false);
 	d->mouseReady = true;
+	setMouseEnable(true);
+}
+
+void Input_Windows::setMouseEnable(bool center)
+{
+	D(d);
+	d->mouseEnabled = center;
 }
 
 GMJoystickState Input_Windows::getJoystickState()
@@ -123,15 +130,22 @@ GMMouseState Input_Windows::getMouseState()
 	}
 
 	GMMouseState state;
-	GMRect rect = d->window->getWindowRect();
-	const GMint centerX = rect.x + rect.width / 2;
-	const GMint centerY = rect.y + rect.height / 2;
 
-	POINT pos;
-	::GetCursorPos(&pos);
-	::SetCursorPos(centerX, centerY);
-	state.deltaX = pos.x - centerX;
-	state.deltaY = pos.y - centerY;
+	if (d->mouseEnabled)
+	{
+		GMRect rect = d->window->getWindowRect();
+		const GMint centerX = rect.x + rect.width / 2;
+		const GMint centerY = rect.y + rect.height / 2;
+		POINT pos;
+		::GetCursorPos(&pos);
+		::SetCursorPos(centerX, centerY);
+		state.deltaX = pos.x - centerX;
+		state.deltaY = pos.y - centerY;
+	}
+	else
+	{
+		state.deltaX = state.deltaY = 0;
+	}
 	return state;
 }
 

@@ -56,6 +56,7 @@ class GameHandler : public IGameHandler
 {
 public:
 	GameHandler()
+		: m_bMouseEnable(true)
 	{
 	}
 
@@ -135,15 +136,15 @@ public:
 			GMJoystickState joyState = inputManager->getJoystickState();
 			GMMouseState mouseState = inputManager->getMouseState();
 
-			if (kbState['Q'] || kbState[VK_ESCAPE])
+			if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
 				GameMachine::instance().postMessage({ GM_MESSAGE_EXIT });
-			if (kbState['B'])
+			if (kbState.keydown('B'))
 				GameMachine::instance().postMessage({ GM_MESSAGE_CONSOLE });
 
 			MoveAction moveTag = 0;
 			MoveRate rate;
 
-			if (kbState['A'])
+			if (kbState.keydown('A'))
 				moveTag |= MD_LEFT;
 			if (joyState.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
@@ -151,7 +152,7 @@ public:
 				rate.setMoveRate(MD_LEFT, GMfloat(joyState.thumbLX) / SHRT_MIN);
 			}
 
-			if (kbState['D'])
+			if (kbState.keydown('D'))
 				moveTag |= MD_RIGHT;
 			if (joyState.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
@@ -159,7 +160,7 @@ public:
 				rate.setMoveRate(MD_RIGHT, GMfloat(joyState.thumbLX) / SHRT_MAX);
 			}
 
-			if (kbState['S'])
+			if (kbState.keydown('S'))
 				moveTag |= MD_BACKWARD;
 			if (joyState.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
@@ -167,7 +168,7 @@ public:
 				rate.setMoveRate(MD_BACKWARD, GMfloat(joyState.thumbLY) / SHRT_MIN);
 			}
 
-			if (kbState['W'])
+			if (kbState.keydown('W'))
 				moveTag |= MD_FORWARD;
 			if (joyState.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
@@ -175,18 +176,18 @@ public:
 				rate.setMoveRate(MD_FORWARD, GMfloat(joyState.thumbLY) / SHRT_MAX);
 			}
 
-			if (kbState[VK_SPACE] || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+			if (kbState.keydown(VK_SPACE) || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				moveTag |= MD_JUMP;
 
-			if (kbState['V'])
+			if (kbState.keydown('V'))
 				inputManager->joystickVibrate(30000, 30000);
-			else if (kbState['C'])
+			else if (kbState.keydown('C'))
 				inputManager->joystickVibrate(0, 0);
 
-			if (kbState['N'])
+			if (kbState.keydown('N'))
 				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
 
-			if (kbState['I'])
+			if (kbState.keydown('I'))
 				GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
 
 			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
@@ -213,12 +214,14 @@ public:
 
 			character->action(moveTag, rate);
 
-			if (kbState['P'])
+			if (kbState.keydown('P'))
 				GMSetBuiltIn(CALCULATE_BSP_FACE, !GMGetBuiltIn(CALCULATE_BSP_FACE));
-			if (kbState['L'])
+			if (kbState.keydown('L'))
 				GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
-			if (kbState['O'])
+			if (kbState.keydown('O'))
 				GMSetBuiltIn(DRAW_ONLY_SKY, !GMGetBuiltIn(DRAW_ONLY_SKY));
+			if (kbState.keydown('R'))
+				inputManager->setMouseEnable(m_bMouseEnable = !m_bMouseEnable);
 			break;
 		}
 	}
@@ -228,6 +231,8 @@ public:
 		GMUIWindow* window = GameMachine::instance().getMainWindow();
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
+
+	bool m_bMouseEnable;
 };
 
 int main()
