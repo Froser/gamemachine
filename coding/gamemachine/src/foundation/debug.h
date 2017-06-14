@@ -35,12 +35,16 @@ private:
 public:
 	static void setDebugOutput(IDebugOutput* output)
 	{
-		instance().data()->debugger = output;
+		if (instance().data())
+			instance().data()->debugger = output;
 	}
 
 	static IDebugOutput* getDebugOutput()
 	{
-		return instance().data()->debugger;
+		if (instance().data())
+			return instance().data()->debugger;
+		// 单例已经被析构
+		return nullptr;
 	}
 
 public:
