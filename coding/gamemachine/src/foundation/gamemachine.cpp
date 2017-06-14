@@ -45,24 +45,6 @@ void GameMachine::setMainWindowAttributes(const GMUIWindowAttributes& attrs)
 	d->mainWindowAttributes = attrs;
 }
 
-IGraphicEngine* GameMachine::getGraphicEngine()
-{
-	D(d);
-	return d->engine;
-}
-
-GMUIWindow* GameMachine::getMainWindow()
-{
-	D(d);
-	return d->mainWindow;
-}
-
-IFactory* GameMachine::getFactory()
-{
-	D(d);
-	return d->factory;
-}
-
 GMUIWindow* GameMachine::appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs)
 {
 	D(d);
@@ -70,34 +52,10 @@ GMUIWindow* GameMachine::appendWindow(AUTORELEASE GMUIWindow* window, const GMUI
 	return window;
 }
 
-const GameMachineWindows& GameMachine::getWindows()
-{
-	D(d);
-	return d->windows;
-}
-
 void GameMachine::postMessage(GameMachineMessage msg)
 {
 	D(d);
 	d->messageQueue.push(msg);
-}
-
-GMConfig* GameMachine::getConfigManager()
-{
-	D(d);
-	return d->configManager;
-}
-
-GMGlyphManager* GameMachine::getGlyphManager()
-{
-	D(d);
-	return d->glyphManager;
-}
-
-GMGamePackage* GameMachine::getGamePackageManager()
-{
-	D(d);
-	return d->gamePackageManager;
 }
 
 GMfloat GameMachine::getFPS()
@@ -126,12 +84,6 @@ void GameMachine::initObjectPainter(GMGameObject* obj)
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
 	painter->transfer();
-}
-
-GMInput* GameMachine::getInputManager()
-{
-	D(d);
-	return d->inputManager;
 }
 
 GameMachine::EndiannessMode GameMachine::getMachineEndianness()
@@ -189,6 +141,8 @@ void GameMachine::startGameMachine()
 		
 		if (d->gameHandler->isWindowActivate())
 			d->gameHandler->event(GM_EVENT_ACTIVATE);
+		else
+			d->gameHandler->event(GM_EVENT_DEACTIVATE);
 
 		{
 			gmRunSustainedThread (simulateJob, &d->simulateJob);
@@ -216,6 +170,9 @@ bool GameMachine::handleMessages()
 				d->consoleWindow->centerWindow();
 				d->consoleWindow->showWindow(true, true);
 			}
+		case gm::GM_MESSAGE_WINDOW_SIZE:
+			d->engine->setViewport(d->mainWindow->getClientRect());
+			break;
 		default:
 			break;
 		}
@@ -232,7 +189,7 @@ void GameMachine::defaultMainWindowAttributes()
 	{
 		NULL,
 		L"DefaultGameMachineWindow",
-		0,
+		WS_OVERLAPPEDWINDOW,
 		0,
 		{ 0, 0, 700, 400 },
 		NULL,
@@ -260,7 +217,7 @@ void GameMachine::initInner()
 	{
 		NULL,
 		L"GameMachineConsoleWindow",
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU,
 		WS_EX_CLIENTEDGE,
 		{ 0, 0, 700, 400 },
 		NULL,
@@ -268,5 +225,5 @@ void GameMachine::initInner()
 	};
 	GMUIConsole::newConsoleWindow(&d->consoleWindow);
 	appendWindow(d->consoleWindow, attrs);
-	GMDebugger::setDebugOuput(d->consoleWindow);
+	GMDebugger::setDebugOutput(d->consoleWindow);
 }

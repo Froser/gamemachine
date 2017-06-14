@@ -45,6 +45,11 @@ void GMGLGraphicEngine::newFrame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void GMGLGraphicEngine::setViewport(const GMRect& rect)
+{
+	glViewport(rect.x, rect.y, rect.width, rect.height);
+}
+
 void GMGLGraphicEngine::drawObject(GMGameObject* object)
 {
 	applyGraphicSettings();

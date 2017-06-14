@@ -777,7 +777,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	Model* m = d->modelLoader.find(classname);
 	if (!m)
 	{
-		gm_warning("model '%s' is not defined in model list, skipped.", classname);
+		gm_info("model '%s' is not defined in model list, skipped.", classname);
 		return;
 	}
 

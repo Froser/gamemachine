@@ -51,6 +51,7 @@ public:
 public:
 	virtual GMUIWindowHandle create(const GMUIWindowAttributes& attrs);
 	virtual GMRect getWindowRect();
+	virtual GMRect getClientRect();
 	virtual void swapBuffers() const {}
 	virtual void centerWindow() { return Base::CenterWindow(); }
 	virtual GMuint showModal() { return Base::ShowModal(); }
@@ -86,6 +87,9 @@ class GMUIGUIWindow : public GMUIWindow
 {
 	DECLARE_PRIVATE(GMUIGUIWindow);
 	typedef GMUIWindow Base;
+
+public:
+	void hideWindow();
 
 public:
 	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;

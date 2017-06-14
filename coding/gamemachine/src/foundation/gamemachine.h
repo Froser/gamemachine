@@ -15,6 +15,7 @@ enum GameMachineMessageType
 {
 	GM_MESSAGE_EXIT,
 	GM_MESSAGE_CONSOLE,
+	GM_MESSAGE_WINDOW_SIZE,
 };
 
 struct GameMachineMessage
@@ -108,22 +109,30 @@ public:
 
 	void setMainWindowAttributes(const GMUIWindowAttributes& attrs);
 
-	IGraphicEngine* getGraphicEngine();
-	GMUIWindow* getMainWindow();
-	IFactory* getFactory();
+	// 绘制引擎
+	inline IGraphicEngine* getGraphicEngine() { D(d); return d->engine; }
+
+	// 主窗口
+	inline GMUIWindow* getMainWindow() { D(d); return d->mainWindow; }
+
+	// 工厂管理
+	inline IFactory* getFactory() { D(d); return d->factory; }
 
 	// 窗口管理
 	GMUIWindow* appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs);
-	const GameMachineWindows& getWindows();
+	inline const GameMachineWindows& getWindows() { D(d); return d->windows; }
 
 	// 配置管理
-	GMConfig* getConfigManager();
+	GMConfig* getConfigManager() { D(d); return d->configManager; }
 
 	// 字体管理
-	GMGlyphManager* getGlyphManager();
+	GMGlyphManager* getGlyphManager() { D(d); return d->glyphManager; }
 
 	// 资源管理
-	GMGamePackage* getGamePackageManager();
+	GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
+
+	// HID
+	GMInput* getInputManager() { D(d); return d->inputManager; }
 
 	// 时间管理
 	GMfloat getFPS();
@@ -132,9 +141,6 @@ public:
 
 	// 绘制管理
 	void initObjectPainter(GMGameObject* obj);
-
-	// HID
-	GMInput* getInputManager();
 
 	// 大小端模式
 	EndiannessMode getMachineEndianness();

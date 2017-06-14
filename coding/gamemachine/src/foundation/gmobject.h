@@ -20,6 +20,7 @@ public:
 	{
 		if (m_data)
 			delete m_data;
+		m_data = nullptr;
 	}
 
 	T* data()
@@ -62,7 +63,8 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(						\
 				const_cast<GMObjectPrivateWrapper<className##Private>*>(&m_data)); }		\
 	protected:																				\
-		className##Private* data() const { m_data.data()->parent = const_cast<className*>(this); return m_data.data();}
+		className##Private* data() const { if (!m_data.data()) return nullptr;				\
+			m_data.data()->parent = const_cast<className*>(this); return m_data.data();}
 
 // 获取私有成员
 #define D(d) auto d = data()

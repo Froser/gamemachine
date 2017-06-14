@@ -113,8 +113,18 @@ void GMUIGLWindow::swapBuffers() const
 
 LongResult GMUIGLWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam)
 {
-	if (uMsg == WM_DESTROY)
+	D(d);
+	switch (uMsg)
+	{
+	case WM_DESTROY:
 		::PostQuitMessage(0L);
+		break;
+	case WM_SIZE:
+		GameMachine::instance().postMessage({ GM_MESSAGE_WINDOW_SIZE });
+		break;
+	default:
+		break;
+	}
 	return ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
 }
 

@@ -27,6 +27,7 @@ enum GameMachineEvent
 	GM_EVENT_SIMULATE,
 	GM_EVENT_RENDER,
 	GM_EVENT_ACTIVATE,
+	GM_EVENT_DEACTIVATE,
 };
 
 struct IGameHandler
@@ -48,6 +49,7 @@ struct IGraphicEngine
 	virtual ~IGraphicEngine() {}
 	virtual void setCurrentWorld(GMGameWorld*) = 0;
 	virtual void newFrame() = 0;
+	virtual void setViewport(const GMRect& rect) = 0;
 	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;

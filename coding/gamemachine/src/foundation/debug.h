@@ -33,9 +33,14 @@ private:
 	}
 
 public:
-	static void setDebugOuput(IDebugOutput* output)
+	static void setDebugOutput(IDebugOutput* output)
 	{
 		instance().data()->debugger = output;
+	}
+
+	static IDebugOutput* getDebugOutput()
+	{
+		return instance().data()->debugger;
 	}
 
 public:
