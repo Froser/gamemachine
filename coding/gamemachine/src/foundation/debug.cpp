@@ -46,7 +46,7 @@ inline void format_timeA(char* in)
 	GMWchar buf[LINE_MAX];											\
 	vswprintf(buf, LINE_MAX, format, ap);							\
 	f_timeW(t);														\
-		wsprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
+		wsprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);	\
 		d->debugger->tag(out);										\
 	}																\
 	else															\
@@ -68,7 +68,7 @@ inline void format_timeA(char* in)
 	{																\
 		char buf[LINE_MAX];											\
 		vsprintf_s(buf, format, ap);								\
-		f_timeW(t);													\
+		f_timeA(t);													\
 		sprintf_s(out, "[" #tag "]%s: %s", t, buf);					\
 		d->debugger->tag(out);										\
 	}																\
@@ -76,7 +76,7 @@ inline void format_timeA(char* in)
 	{																\
 		char buf[LINE_MAX];											\
 		vsprintf_s(buf, format, ap);								\
-		f_timeW(t);													\
+		f_timeA(t);													\
 		printf(out, "[" #tag "]%s: %s", t, buf);					\
 		d->debugger->tag(out);										\
 	}																\
