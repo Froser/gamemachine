@@ -90,6 +90,7 @@ class GMUIGUIWindow : public GMUIWindow
 
 public:
 	void hideWindow();
+	bool isWindowVisible();
 
 public:
 	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;

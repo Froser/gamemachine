@@ -2,13 +2,32 @@
 #define __GMUI_CONSOLE_H__
 #include "common.h"
 #include "gmui.h"
+#include <queue>
 BEGIN_NS
 
 #if _WINDOWS
 GM_PRIVATE_OBJECT(GMUIConsole)
 {
-	DuiLib::CRichEditUI* richEdit;
+	enum OutputType
+	{
+		Info,
+		Warning,
+		Error,
+		Debug
+	};
+
+	struct Message
+	{
+		OutputType type;
+		GMString message;
+	};
+
+	DuiLib::CRichEditUI* consoleEdit;
+	DuiLib::CTabLayoutUI* tabLayout;
+	DuiLib::COptionUI* optLog;
+	DuiLib::COptionUI* optPerformance;
 	GMUIPainter* painter;
+	std::queue<Message> msgQueue;
 };
 
 class GMUIConsole : public GMUIGUIWindow, public DuiLib::INotifyUI, public IDebugOutput
@@ -47,6 +66,7 @@ public:
 	virtual void debug(const GMString& msg) override;
 
 private:
+	void insertText(Data::OutputType type, const GMString& msg, DWORD color);
 	void afterCreated();
 };
 

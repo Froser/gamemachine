@@ -39,6 +39,11 @@ void GMUIGUIWindow::hideWindow()
 	::ShowWindow(getWindowHandle(), SW_HIDE);
 }
 
+bool GMUIGUIWindow::isWindowVisible()
+{
+	return !! ::IsWindowVisible(getWindowHandle());
+}
+
 LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam)
 {
 	D(d);

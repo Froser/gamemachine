@@ -22,18 +22,12 @@ GMUIStringPtr GMUIConsole::getWindowClassName() const
 }
 
 #if _WINDOWS
-static void insertText(DuiLib::CRichEditUI* re, const GMString& msg, DWORD color)
+template <typename T>
+inline static T* findControl(GMUIPainter* painter, GMWchar* name)
 {
-	CHARRANGE cr1, cr2;
-	re->GetSel(cr1);
-	re->InsertText(0, (msg + _L("\n")).toStdWString().c_str());
-	re->EndRight();
-	re->GetSel(cr2);
-	re->SetSel(cr1.cpMin, cr2.cpMax);
-	CHARFORMAT2 cf;
-	re->GetSelectionCharFormat(cf);
-	cf.crTextColor = color;
-	re->SetSelectionCharFormat(cf);
+	T* control = static_cast<T*>(painter->FindControl(name));
+	ASSERT(control);
+	return control;
 }
 
 LongResult GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
@@ -67,39 +61,73 @@ void GMUIConsole::onFinalMessage(GMUIWindowHandle wndHandle)
 
 void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 {
+	D(d);
+	if (msg.sType == DUI_MSGTYPE_CLICK)
+	{
+		if (msg.pSender == d->optLog)
+			d->tabLayout->SelectItem(0);
+		else if (msg.pSender == d->optPerformance)
+			d->tabLayout->SelectItem(1);
+	}
 }
 
 void GMUIConsole::afterCreated()
 {
 	D(d);
-	DuiLib::CRichEditUI* re = static_cast<DuiLib::CRichEditUI*> (d->painter->FindControl(_L("Edit_Console")));
+	DuiLib::CRichEditUI* re = static_cast<DuiLib::CRichEditUI*> (d->painter->FindControl(ID_EDIT_CONSOLE));
 	ASSERT(re);
-	d->richEdit = re;
-	d->richEdit->SetBkColor(0);
+	d->consoleEdit = re;
+	d->consoleEdit->SetBkColor(0);
+
+	d->tabLayout = findControl<DuiLib::CTabLayoutUI>(d->painter, ID_TABLAYOUT);
+	d->optLog = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_LOG);
+	d->optPerformance = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_PERFORMACE);
 }
 
 void GMUIConsole::info(const GMString& msg)
 {
 	D(d);
-	insertText(d->richEdit, msg, 0x555555);
+	insertText(Data::Info, msg, 0x555555);
 }
 
 void GMUIConsole::warning(const GMString& msg)
 {
 	D(d);
-	insertText(d->richEdit, msg, 0x00FFFF);
+	insertText(Data::Warning, msg, 0x00FFFF);
 }
 
 void GMUIConsole::error(const GMString& msg)
 {
 	D(d);
-	insertText(d->richEdit, msg, 0x3300CC);
+	insertText(Data::Error, msg, 0x3300CC);
 }
 
 void GMUIConsole::debug(const GMString& msg)
 {
 	D(d);
-	insertText(d->richEdit, msg, 0xFF0099);
+	insertText(Data::Debug, msg, 0xFF0099);
+}
+
+void GMUIConsole::insertText(Data::OutputType type, const GMString& msg, DWORD color)
+{
+	D(d);
+	if (isWindowVisible())
+	{
+		CHARRANGE cr1, cr2;
+		d->consoleEdit->GetSel(cr1);
+		d->consoleEdit->InsertText(0, (msg + _L("\n")).toStdWString().c_str());
+		d->consoleEdit->EndRight();
+		d->consoleEdit->GetSel(cr2);
+		d->consoleEdit->SetSel(cr1.cpMin, cr2.cpMax);
+		CHARFORMAT2 cf;
+		d->consoleEdit->GetSelectionCharFormat(cf);
+		cf.crTextColor = color;
+		d->consoleEdit->SetSelectionCharFormat(cf);
+	}
+	else
+	{
+		d->msgQueue.push({ type, msg });
+	}
 }
 
 #endif
