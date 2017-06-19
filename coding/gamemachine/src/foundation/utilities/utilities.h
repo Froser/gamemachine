@@ -621,6 +621,9 @@ public:
 	void wait(GMuint milliseconds = 0);
 	void set();
 	void reset();
+
+public:
+	static void signalObjectAndWait(const GMEvent& eventToSignal, const GMEvent& eventToWait);
 };
 
 END_NS

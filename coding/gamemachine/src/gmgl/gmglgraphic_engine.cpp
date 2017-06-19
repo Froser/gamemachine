@@ -10,6 +10,12 @@
 #include "gmengine/gmcharacter.h"
 #include "gmglobjectpainter.h"
 #include "renders/gmgl_render.h"
+#include "renders/gmgl_renders_object.h"
+#include "renders/gmgl_renders_sky.h"
+#include "renders/gmgl_renders_glyph.h"
+#include "gmglgraphic_engine_default_shaders.h"
+#include "foundation/gamemachine.h"
+#include "foundation/gmconfig.h"
 
 GMGLGraphicEngine::GMGLGraphicEngine()
 {
@@ -32,6 +38,11 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 		if ((*iter).second)
 			delete (*iter).second;
 	}
+}
+
+void GMGLGraphicEngine::start()
+{
+	installShaders();
 }
 
 void GMGLGraphicEngine::setCurrentWorld(GMGameWorld* world)
@@ -67,10 +78,78 @@ void GMGLGraphicEngine::drawObjectOnce(GMGameObject* object)
 {
 	D(d);
 	static GMfloat trans[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
-	GMGLShaders* lastShaders = nullptr;
+	GMGLShaderProgram* lastShaders = nullptr;
 	object->onBeforeDraw();
 	Object* coreObj = object->getObject();
 	coreObj->getPainter()->draw(trans);
+}
+
+void GMGLGraphicEngine::installShaders()
+{
+	D(d);
+	// 装载所有OpenGL着色器
+	const GMString shaderMap[] =
+	{
+		_L("object"),
+		_L("sky"),
+		_L("glyph"),
+	};
+
+	// 按照Object顺序创建renders
+	IRender* renders[] = {
+		new GMGLRenders_Object(),
+		new GMGLRenders_Sky(),
+		new GMGLRenders_Glyph(),
+	};
+
+	GMGamePackage* package = GameMachine::instance().getGamePackageManager();
+
+	for (GMint i = Mesh::ObjectTypeBegin; i < Mesh::ObjectTypeEnd; i++)
+	{
+		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadShader((Mesh::MeshesType) i, shaderProgram)) )
+		{
+			if (!loadDefaultShaders((Mesh::MeshesType) i, shaderProgram))
+			{
+				delete shaderProgram;
+				shaderProgram = nullptr;
+			}
+		}
+
+		if (shaderProgram)
+		{
+			shaderProgram->load();
+			registerShader((Mesh::MeshesType)i, shaderProgram);
+		}
+
+		registerRender((Mesh::MeshesType)i, renders[i]);
+	}
+}
+
+bool GMGLGraphicEngine::loadDefaultShaders(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram)
+{
+	bool flag = false;
+	switch (type)
+	{
+	case Mesh::NormalObject:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object.frag });
+		flag = true;
+		break;
+	case Mesh::Sky:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::sky.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::sky.frag });
+		flag = true;
+		break;
+	case Mesh::Glyph:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::glyph.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::glyph.frag });
+		flag = true;
+		break;
+	default:
+		break;
+	}
+	return flag;
 }
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
@@ -110,13 +189,13 @@ GMGameWorld* GMGLGraphicEngine::getWorld()
 	return d->world;
 }
 
-void GMGLGraphicEngine::registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaders* shaders)
+void GMGLGraphicEngine::registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaderProgram* shaders)
 {
 	D(d);
 	d->allShaders[objectType] = shaders;
 }
 
-GMGLShaders* GMGLGraphicEngine::getShaders(Mesh::MeshesType objectType)
+GMGLShaderProgram* GMGLGraphicEngine::getShaders(Mesh::MeshesType objectType)
 {
 	D(d);
 	if (d->allShaders.find(objectType) == d->allShaders.end())

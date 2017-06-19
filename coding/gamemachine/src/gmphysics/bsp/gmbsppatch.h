@@ -9,7 +9,7 @@ BEGIN_NS
 struct GMBSP_Physics_Patch;
 GM_PRIVATE_OBJECT(GMBSPPatch)
 {
-	~GM_PRIVATE_CONSTRUCT(GMBSPPatch);
+	GM_PRIVATE_DESTRUCT(GMBSPPatch);
 	AUTORELEASE AlignedVector<GMBSP_Physics_Patch*> patches;
 };
 

@@ -2,11 +2,11 @@
 #define __OBJECT_PAINTER_H__
 #include "common.h"
 #include "gmdatacore/object.h"
-#include "gmglshaders.h"
+#include "gmglshaderprogram.h"
 BEGIN_NS
 
 class GMGLGraphicEngine;
-class GMGLShaders;
+class GMGLShaderProgram;
 class GMGameWorld;
 class GMGLObjectPainter : public ObjectPainter
 {

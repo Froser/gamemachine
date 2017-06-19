@@ -13,7 +13,7 @@
 BEGIN_NS
 
 class Object;
-class GMGLShaders;
+class GMGLShaderProgram;
 
 GM_PRIVATE_OBJECT(ObjectPainter)
 {

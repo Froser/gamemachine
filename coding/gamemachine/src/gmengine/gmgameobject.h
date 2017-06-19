@@ -8,15 +8,9 @@
 BEGIN_NS
 GM_PRIVATE_OBJECT(GMGameObject)
 {
-	GM_PRIVATE_CONSTRUCT(GMGameObject)
-		: world(nullptr)
-		, id(0)
-	{
-	}
-
-	GMuint id;
+	GMuint id = 0;
+	GMGameWorld* world = nullptr;
 	AutoPtr<Object> object;
-	GMGameWorld* world;
 };
 
 class GMGameObject : public GMObject

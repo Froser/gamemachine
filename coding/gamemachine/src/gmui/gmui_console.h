@@ -54,6 +54,7 @@ public:
 	virtual GMuint getClassStyle() const override { return CS_DBLCLKS; }
 	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+	virtual LongResult onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual void onFinalMessage(GMUIWindowHandle wndHandle) override;
 
 public:
@@ -66,7 +67,8 @@ public:
 	virtual void debug(const GMString& msg) override;
 
 private:
-	void insertText(Data::OutputType type, const GMString& msg, DWORD color);
+	void insertText(Data::OutputType type, const GMString& msg);
+	void insertTextToRichEdit(Data::OutputType type, const GMString& msg);
 	void afterCreated();
 };
 

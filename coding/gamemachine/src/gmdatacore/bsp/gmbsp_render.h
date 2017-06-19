@@ -129,16 +129,6 @@ struct GMBSP_Render_VisibilityData
 class GMEntityObject;
 GM_PRIVATE_OBJECT(GMBSPRender)
 {
-	GM_PRIVATE_CONSTRUCT(GMBSPRender)
-		: numPolygonFaces(0)
-		, numPatches(0)
-		, numMeshFaces(0)
-		, boundMin(BOUNDING)
-		, boundMax(-BOUNDING)
-	{
-
-	}
-
 	AlignedVector<GMBSP_Render_Vertex> vertices;
 	AlignedVector<GMBSP_Render_FaceDirectoryEntry> faceDirectory;
 	AlignedVector<GMBSP_Render_Face> polygonFaces;
@@ -156,18 +146,18 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	Vector<GMint> meshFaceIndices;
 	Vector<GMint> patchIndices;
 
-	BSPData* bsp;
+	BSPData* bsp = nullptr;
 	Bitset facesToDraw;
 	Bitset entitiesToDraw;
-	GMint numPolygonFaces;
-	GMint numPatches;
-	GMint numMeshFaces;
+	GMint numPolygonFaces = 0;
+	GMint numPatches = 0;
+	GMint numMeshFaces = 0;
 	AlignedVector<GMGameObject*> alwaysVisibleObjects;
 	GMBSP_Render_VisibilityData visibilityData;
 
 	// 用于绘制天空
-	linear_math::Vector3 boundMin;
-	linear_math::Vector3 boundMax;
+	linear_math::Vector3 boundMin = BOUNDING;
+	linear_math::Vector3 boundMax = -BOUNDING;
 };
 
 typedef GMBSPRenderPrivate GMBSPRenderData;

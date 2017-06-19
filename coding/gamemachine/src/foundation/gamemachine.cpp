@@ -117,18 +117,22 @@ void GameMachine::startGameMachine()
 	GMSoundPlayerDevice::createInstance(d->mainWindow);
 #endif
 
-	// 创建Glyph管理器
+	// 创建Glyph管理器，它必须在OpenGL窗口创建以后才可以初始化
 	GMGlyphManager* glyphManager;
 	d->factory->createGlyphManager(&glyphManager);
 	d->glyphManager.reset(glyphManager);
 
 	// 初始化gameHandler
-	d->gameHandler->init();
+	d->gameHandler->start();
+
+	// 开始渲染
+	d->engine->start();
 
 	// 开始多线程工作
 	d->simulateJob.setHandler(d->gameHandler);
 	d->simulateJob.start();
 
+	// 开始计时器
 	d->clock.begin();
 	// 消息循环
 	while (true)

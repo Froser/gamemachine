@@ -12,13 +12,8 @@ class ObjectPainter;
 
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
-	GM_PRIVATE_CONSTRUCT(GMGameWorld)
-		: character(nullptr)
-	{
-	}
-
 	std::set<GMGameObject*> shapes;
-	GMCharacter* character;
+	GMCharacter* character = nullptr;
 	LightInfo ambientLight;
 	bool start;
 };

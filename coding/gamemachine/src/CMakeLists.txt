@@ -87,10 +87,11 @@ set(SOURCES
 		gmgl/gmglglyphmanager.cpp
 		gmgl/gmglgraphic_engine.h
 		gmgl/gmglgraphic_engine.cpp
+		gmgl/gmglgraphic_engine_default_shaders.h
 		gmgl/gmglobjectpainter.h
 		gmgl/gmglobjectpainter.cpp
-		gmgl/gmglshaders.h
-		gmgl/gmglshaders.cpp
+		gmgl/gmglshaderprogram.h
+		gmgl/gmglshaderprogram.cpp
 		gmgl/gmgltexture.h
 		gmgl/gmgltexture.cpp
 		gmgl/shader_constants.h

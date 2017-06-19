@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmglgamepackagehandler.h"
-#include "gmglshaders.h"
+#include "gmglshaderprogram.h"
 #include "gmglgraphic_engine.h"
 #include <string>
 #include "foundation/utilities/utilities.h"
@@ -44,45 +44,6 @@ bool GMDefaultGLGamePackageHandler::readFileFromPath(const GMString& path, REF G
 
 void GMDefaultGLGamePackageHandler::init()
 {
-	PKD(d);
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
-
-	// 装载所有shaders
-	const GMString shaderMap[] = 
-	{
-		_L("object"),
-		_L("sky"),
-		_L("glyph"),
-	};
-
-	// 按照Object顺序创建renders
-	IRender* renders[] = {
-		new GMGLRenders_Object(),
-		new GMGLRenders_Sky(),
-		new GMGLRenders_Glyph(),
-	};
-
-	for (GMint i = Mesh::ObjectTypeBegin; i < Mesh::ObjectTypeEnd; i++)
-	{
-		GMGLShaders* shaders = new GMGLShaders();
-		
-		GMBuffer vertBuf, fragBuf;
-		gamePackage()->readFile(PI_SHADERS, shaderMap[i] + ".vert", &vertBuf);
-		gamePackage()->readFile(PI_SHADERS, shaderMap[i] + ".frag", &fragBuf);
-		vertBuf.convertToStringBuffer();
-		fragBuf.convertToStringBuffer();
-
-		GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
-		};
-
-		shaders->appendShader(shadersInfo[0]);
-		shaders->appendShader(shadersInfo[1]);
-		shaders->load();
-		engine->registerShader((Mesh::MeshesType)i, shaders);
-		engine->registerRender((Mesh::MeshesType)i, renders[i]);
-	}
 }
 
 GMString GMDefaultGLGamePackageHandler::pathRoot(PackageIndex index)

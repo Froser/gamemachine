@@ -1,56 +1,46 @@
 ﻿#include "stdafx.h"
 #include <stdio.h>
-#include "gmglshaders.h"
+#include "gmglshaderprogram.h"
 
-static void removeShaders(GMGLShaders& shaders)
+GMGLShaderProgram::~GMGLShaderProgram()
 {
-	GMGLShadersInfo& shadersInfo = shaders.getShaders();
-	for (auto iter = shadersInfo.begin(); iter != shadersInfo.end(); iter++)
-	{
-		GMGLShaderInfo* entry = &*iter;
-		glDeleteShader(entry->shader);
-		entry->shader = 0;
-	}
+	D(d);
+	glDeleteProgram(d->shaderProgram);
 }
 
-GMGLShaders::~GMGLShaders()
+void GMGLShaderProgram::useProgram()
 {
-	removeShaders(*this);
-	glDeleteProgram(m_shaderProgram);
-}
-
-void GMGLShaders::useProgram()
-{
-	glUseProgram(m_shaderProgram);
+	D(d);
+	glUseProgram(d->shaderProgram);
 	GLint i = glGetError();
 	ASSERT_GL();
 }
 
-void GMGLShaders::appendShader(const GMGLShaderInfo& shader)
+void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 {
-	m_shaders.push_back(shader);
+	D(d);
+	d->shaderInfos.push_back(shaderCfgs);
 }
 
-void GMGLShaders::load()
+void GMGLShaderProgram::load()
 {
-	GMGLShadersInfo& shadersInfo = getShaders();
-	if (shadersInfo.size() == 0)
+	D(d);
+	if (d->shaderInfos.size() == 0)
 		return;
 
 	GLuint program = glCreateProgram();
 	setProgram(program);
 
-	for (auto iter = shadersInfo.begin(); iter != shadersInfo.end(); iter++)
+	for (auto& entry : d->shaderInfos)
 	{
-		GMGLShaderInfo* entry = &*iter;
+		GLuint shader = glCreateShader(entry.type);
+		d->shaders.push_back(shader);
 
-		GLuint shader = glCreateShader(entry->type);
-		entry->shader = shader;
-
-		const GLchar* source = entry->data;
-		if (source == NULL)
+		std::string src = entry.source.toStdString();
+		const GLchar* source = src.c_str();
+		if (!source)
 		{
-			removeShaders(*this);
+			removeShaders();
 			return;
 		}
 
@@ -67,7 +57,7 @@ void GMGLShaders::load()
 
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
-			printf("%s", log);
+			gm_error("%s", log);
 			ASSERT("Shader compilation failed: " && FALSE);
 			delete[] log;
 #endif /* DEBUG */
@@ -94,6 +84,16 @@ void GMGLShaders::load()
 		delete[] log;
 #endif /* DEBUG */
 
-		removeShaders(*this);
+		removeShaders();
+	}
+}
+
+void GMGLShaderProgram::removeShaders()
+{
+	D(d);
+	GMGLShaderIDList& shadersInfo = d->shaders;
+	for (auto& shader : shadersInfo)
+	{
+		glDeleteShader(shader);
 	}
 }

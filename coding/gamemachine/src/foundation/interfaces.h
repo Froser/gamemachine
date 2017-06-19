@@ -30,23 +30,26 @@ enum GameMachineEvent
 	GM_EVENT_DEACTIVATE,
 };
 
-struct IGameHandler
+struct IGMInterface
 {
-	virtual ~IGameHandler() {}
-	virtual void init() = 0;
+	virtual ~IGMInterface() {}
+};
+
+struct IGameHandler : public IGMInterface
+{
+	virtual void start() = 0;
 	virtual void event(GameMachineEvent evt) = 0;
 	virtual bool isWindowActivate() = 0;
 };
 
-struct ITexture
+struct ITexture : public IGMInterface
 {
-	virtual ~ITexture() {}
 	virtual void drawTexture(TextureFrames* frames) = 0;
 };
 
-struct IGraphicEngine
+struct IGraphicEngine : public IGMInterface
 {
-	virtual ~IGraphicEngine() {}
+	virtual void start() = 0;
 	virtual void setCurrentWorld(GMGameWorld*) = 0;
 	virtual void newFrame() = 0;
 	virtual void setViewport(const GMRect& rect) = 0;
@@ -61,9 +64,8 @@ enum GamePackageType
 	GPT_ZIP,
 };
 
-struct IFactory
+struct IFactory : public IGMInterface
 {
-	virtual ~IFactory() {};
 	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE GMImage*, OUT ITexture**) = 0;
@@ -71,6 +73,5 @@ struct IFactory
 	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };
-
 END_NS
 #endif

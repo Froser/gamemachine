@@ -19,14 +19,9 @@ struct DrawEntityJob;
 
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
-	GM_PRIVATE_CONSTRUCT(GMBSPGameWorld)
-		: sky(nullptr)
-	{
-	}
-
 	AutoPtr<GMBSPPhysicsWorld> physics;
 	BSP bsp;
-	GMGameObject* sky;
+	GMGameObject* sky = nullptr;
 
 	GMBSPRender render;
 	GMBSPShaderLoader shaderLoader;

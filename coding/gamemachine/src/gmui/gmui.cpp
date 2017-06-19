@@ -60,6 +60,7 @@ LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPa
 	case WM_SIZE:          lRes = onSize(uMsg, wParam, lParam, bHandled); break;
 	case WM_GETMINMAXINFO: lRes = onGetMinMaxInfo(uMsg, wParam, lParam, bHandled); break;
 	case WM_SYSCOMMAND:    lRes = onSysCommand(uMsg, wParam, lParam, bHandled); break;
+	case WM_SHOWWINDOW:    lRes = onShowWindow(uMsg, wParam, lParam, bHandled); break;
 	default:
 		bHandled = FALSE;
 	}

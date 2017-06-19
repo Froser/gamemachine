@@ -54,6 +54,18 @@ LongResult GMUIConsole::onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& b
 	return 0;
 }
 
+LongResult GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+{
+	D(d);
+	while (!d->msgQueue.empty())
+	{
+		Data::Message& str = d->msgQueue.front();
+		insertTextToRichEdit(str.type, str.message);
+		d->msgQueue.pop();
+	}
+	return 0;
+}
+
 void GMUIConsole::onFinalMessage(GMUIWindowHandle wndHandle)
 {
 	delete this;
@@ -87,47 +99,72 @@ void GMUIConsole::afterCreated()
 void GMUIConsole::info(const GMString& msg)
 {
 	D(d);
-	insertText(Data::Info, msg, 0x555555);
+	insertText(Data::Info, msg);
 }
 
 void GMUIConsole::warning(const GMString& msg)
 {
 	D(d);
-	insertText(Data::Warning, msg, 0x00FFFF);
+	insertText(Data::Warning, msg);
 }
 
 void GMUIConsole::error(const GMString& msg)
 {
 	D(d);
-	insertText(Data::Error, msg, 0x3300CC);
+	insertText(Data::Error, msg);
 }
 
 void GMUIConsole::debug(const GMString& msg)
 {
 	D(d);
-	insertText(Data::Debug, msg, 0xFF0099);
+	insertText(Data::Debug, msg);
 }
 
-void GMUIConsole::insertText(Data::OutputType type, const GMString& msg, DWORD color)
+void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
 {
 	D(d);
 	if (isWindowVisible())
 	{
-		CHARRANGE cr1, cr2;
-		d->consoleEdit->GetSel(cr1);
-		d->consoleEdit->InsertText(0, (msg + _L("\n")).toStdWString().c_str());
-		d->consoleEdit->EndRight();
-		d->consoleEdit->GetSel(cr2);
-		d->consoleEdit->SetSel(cr1.cpMin, cr2.cpMax);
-		CHARFORMAT2 cf;
-		d->consoleEdit->GetSelectionCharFormat(cf);
-		cf.crTextColor = color;
-		d->consoleEdit->SetSelectionCharFormat(cf);
+		insertTextToRichEdit(type, msg);
 	}
 	else
 	{
 		d->msgQueue.push({ type, msg });
 	}
+}
+
+void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& msg)
+{
+	D(d);
+	DWORD color;
+	switch (type)
+	{
+	case GMUIConsolePrivate::Info:
+		color = 0x555555;
+		break;
+	case GMUIConsolePrivate::Warning:
+		color = 0x00FFFF;
+		break;
+	case GMUIConsolePrivate::Error:
+		color = 0x3300CC;
+		break;
+	case GMUIConsolePrivate::Debug:
+		color = 0xFF0099;
+		break;
+	default:
+		break;
+	}
+
+	CHARRANGE cr1, cr2;
+	d->consoleEdit->GetSel(cr1);
+	d->consoleEdit->InsertText(0, (msg + _L("\n")).toStdWString().c_str());
+	d->consoleEdit->EndRight();
+	d->consoleEdit->GetSel(cr2);
+	d->consoleEdit->SetSel(cr1.cpMin, cr2.cpMax);
+	CHARFORMAT2 cf;
+	d->consoleEdit->GetSelectionCharFormat(cf);
+	cf.crTextColor = color;
+	d->consoleEdit->SetSelectionCharFormat(cf);
 }
 
 #endif

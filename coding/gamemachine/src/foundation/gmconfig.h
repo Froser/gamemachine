@@ -37,7 +37,7 @@ struct GMConfig_BuiltInOptions
 
 union GMConfigValueStruct
 {
-	GMLargeInteger i64;
+	GMLargeInteger i64 = 0;
 	GMint i32;
 	GMfloat f32;
 	void* ptr;

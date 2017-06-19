@@ -98,13 +98,13 @@ GMSustainedThread::GMSustainedThread()
 {
 	D(d);
 	d->terminate = false;
-	d->innerEvent.reset();
+	d->jobStartEvent.reset();
 }
 
 GMSustainedThread::~GMSustainedThread()
 {
 	D(d);
-	d->innerEvent.set();
+	d->jobStartEvent.set();
 	terminate();
 }
 
@@ -113,26 +113,26 @@ void GMSustainedThread::run()
 	D(d);
 	while (!d->terminate)
 	{
-		d->innerEvent.wait();
+		d->jobStartEvent.wait();
 
 		sustainedRun();
 
-		d->outterEvent.set();
-		d->innerEvent.reset();
+		d->jobFinishedEvent.set();
+		d->jobStartEvent.reset();
 	}
 }
 
 void GMSustainedThread::wait(GMint milliseconds)
 {
 	D(d);
-	d->outterEvent.wait(milliseconds);
+	d->jobFinishedEvent.wait(milliseconds);
 }
 
 void GMSustainedThread::trigger()
 {
 	D(d);
-	d->outterEvent.reset();
-	d->innerEvent.set();
+	d->jobFinishedEvent.reset();
+	d->jobStartEvent.set();
 }
 
 void GMSustainedThread::stop()

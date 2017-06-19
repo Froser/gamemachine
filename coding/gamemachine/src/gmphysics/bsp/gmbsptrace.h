@@ -46,12 +46,11 @@ class GMBSPPhysicsWorld;
 class GMEntityObject;
 GM_PRIVATE_OBJECT(GMBSPTrace)
 {
-	GM_PRIVATE_CONSTRUCT(GMBSPTrace) : checkcount(0) {}
 	BSPData* bsp;
 	std::map<GMint, std::set<GMBSPEntity*> >* entities;
 	std::map<GMBSPEntity*, GMEntityObject*>* entityObjects;
 	GMBSPPhysicsWorld* world;
-	GMint checkcount;
+	GMint checkcount = 0;
 };
 
 struct GMBSP_Physics_Brush;

@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	Mesh* mesh;
 	Mesh::MeshesType type;
 	Shader* shader;
-	GMGLShaders* gmglShaders;
+	GMGLShaderProgram* gmglShaders;
 	GMGameWorld* world;
 };
 

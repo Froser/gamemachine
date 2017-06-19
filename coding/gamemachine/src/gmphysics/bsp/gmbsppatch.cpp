@@ -1150,7 +1150,7 @@ static void patchCollideFromGrid(BSPGrid *grid, GMBSPPatchCollide *pf)
 	pf->planes = context.planes;
 }
 
-GM_PRIVATE_NAME(GMBSPPatch)::~GM_PRIVATE_CONSTRUCT(GMBSPPatch)
+GM_PRIVATE_NAME(GMBSPPatch)::GM_PRIVATE_DESTRUCT(GMBSPPatch)
 {
 	for (auto iter = patches.begin(); iter != patches.end(); iter++)
 	{

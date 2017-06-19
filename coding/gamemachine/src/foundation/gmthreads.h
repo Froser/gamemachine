@@ -71,8 +71,8 @@ public:
 // GMSustainedThread
 GM_PRIVATE_OBJECT(GMSustainedThread)
 {
-	GMEvent outterEvent;
-	GMEvent innerEvent;
+	GMEvent jobFinishedEvent;
+	GMEvent jobStartEvent;
 	bool terminate;
 };
 

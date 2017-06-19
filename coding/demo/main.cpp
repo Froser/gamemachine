@@ -52,7 +52,7 @@ static void resOutputHook(void* path, void* buffer)
 	}
 }
 
-class GameHandler : public IGameHandler
+class GameHandler : public IGameHandler, public IShaderLoadCallback
 {
 public:
 	GameHandler()
@@ -60,7 +60,7 @@ public:
 	{
 	}
 
-	void init()
+	void start()
 	{
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		GMInput* inputManager = GameMachine::instance().getInputManager();
@@ -71,6 +71,10 @@ public:
 #else
 		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
 #endif
+
+		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
+		engine->setShaderLoadCallback(this);
+
 		pk->createBSPGameWorld("gv.bsp", &world);
 
 		glyph = new GMGlyphObject();
@@ -81,22 +85,6 @@ public:
 		//pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
 		//SoundReader::load(bg, &sf);
 		//sf->play();
-
-		/*
-		{
-			GMGLShadowMapping* shadow = engine->getShadowMapping();
-			GMGLShaders& shadowShaders = shadow->getShaders();
-			std::string vert = std::string(shaderPath).append("gmshadowmapping.vert"),
-				frag = std::string(shaderPath).append("gmshadowmapping.frag");
-			GMGLShaderInfo shadersInfo[] = {
-				{ GL_VERTEX_SHADER, vert.c_str() },
-				{ GL_FRAGMENT_SHADER, frag.c_str() },
-			};
-			shadowShaders.appendShader(shadersInfo[0]);
-			shadowShaders.appendShader(shadersInfo[1]);
-			shadowShaders.load();
-		}
-		*/
 	}
 
 	void event(GameMachineEvent evt)
@@ -232,6 +220,45 @@ public:
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
+	bool onLoadShader(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram) override
+	{
+		bool flag = false;
+		GMBuffer vertBuf, fragBuf;
+		switch (type)
+		{
+		case Mesh::NormalObject:
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
+			flag = true;
+			break;
+		case Mesh::Sky:
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "sky.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "sky.frag", &fragBuf);
+			flag = true;
+			break;
+		case Mesh::Glyph:
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.frag", &fragBuf);
+			flag = true;
+			break;
+		default:
+			flag = false;
+			break;
+		}
+
+		vertBuf.convertToStringBuffer();
+		fragBuf.convertToStringBuffer();
+
+		GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+		};
+
+		shaderProgram->attachShader(shadersInfo[0]);
+		shaderProgram->attachShader(shadersInfo[1]);
+		return flag;
+	}
+
 	bool m_bMouseEnable;
 };
 
@@ -263,6 +290,7 @@ int WINAPI WinMain(
 		new GMGLFactory(),
 		new GameHandler()
 	);
+
 	GameMachine::instance().startGameMachine();
 	return 0;
 }

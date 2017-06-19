@@ -193,9 +193,6 @@ GM_ALIGNED_STRUCT(BSPLightVolumes)
 GM_PRIVATE_OBJECT(BSP)
 {
 	friend class BSP;
-	GM_PRIVATE_CONSTRUCT(BSP)
-	{
-	}
 
 	BSPLightVolumes lightVols;
 	AlignedVector<GMBSPEntity> entities;

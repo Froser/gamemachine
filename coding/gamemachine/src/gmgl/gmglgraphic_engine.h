@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGLGRAPHIC_ENGINE_H__
 #define __GMGLGRAPHIC_ENGINE_H__
 #include "common.h"
-#include "gmglshaders.h"
+#include "gmglshaderprogram.h"
 #include "gmengine/resource_container.h"
 #include "foundation/utilities/utilities.h"
 #include <map>
@@ -12,11 +12,17 @@ class GMGameWorld;
 class GameLight;
 struct IRender;
 
+struct IShaderLoadCallback : public IGMInterface
+{
+	virtual bool onLoadShader(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram) = 0;
+};
+
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
-	std::map<Mesh::MeshesType, GMGLShaders*> allShaders;
+	std::map<Mesh::MeshesType, GMGLShaderProgram*> allShaders;
 	std::map<Mesh::MeshesType, IRender*> allRenders;
-	GMGameWorld* world;
+	GMGameWorld* world = nullptr;
+	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings;
 	linear_math::Matrix4x4 viewMatrix;
@@ -32,6 +38,7 @@ public:
 	virtual ~GMGLGraphicEngine();
 
 public:
+	virtual void start() override;
 	virtual void setCurrentWorld(GMGameWorld*) override;
 	virtual void newFrame() override;
 	virtual void setViewport(const GMRect& rect) override;
@@ -42,16 +49,19 @@ public:
 public:
 	GMGameWorld* getWorld();
 
-	void registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaders* shaders);
-	GMGLShaders* getShaders(Mesh::MeshesType objectType);
+	GMGLShaderProgram* getShaders(Mesh::MeshesType objectType);
+	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 
 	void registerRender(Mesh::MeshesType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(Mesh::MeshesType objectType);
 
 private:
+	void registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaderProgram* shaders);
 	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
 	void drawObjectOnce(GMGameObject* object);
+	void installShaders();
+	bool loadDefaultShaders(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram);
 };
 
 END_NS
