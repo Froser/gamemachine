@@ -12,7 +12,7 @@
 #define BUFFER_COUNT 2 // 将缓存分为多少部分
 
 class MP3SoundFile;
-struct MP3SoundFilePrivate
+GM_PRIVATE_OBJECT(MP3SoundFile)
 {
 	MP3SoundFile* parent;
 	bool inited; //是否已经初始化

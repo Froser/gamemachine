@@ -3,6 +3,7 @@
 #if _WINDOWS
 #	include <process.h>
 #endif
+#include <mutex>
 
 static GMCS cs;
 
@@ -94,6 +95,9 @@ GMThreadId GMThread::getCurrentThreadId()
 #endif
 }
 
+
+static std::mutex sustained_thread_mutex;
+
 GMSustainedThread::GMSustainedThread()
 {
 	D(d);
@@ -117,8 +121,10 @@ void GMSustainedThread::run()
 
 		sustainedRun();
 
+		sustained_thread_mutex.lock();
 		d->jobFinishedEvent.set();
 		d->jobStartEvent.reset();
+		sustained_thread_mutex.unlock();
 	}
 }
 
@@ -131,8 +137,10 @@ void GMSustainedThread::wait(GMint milliseconds)
 void GMSustainedThread::trigger()
 {
 	D(d);
+	sustained_thread_mutex.lock();
 	d->jobFinishedEvent.reset();
 	d->jobStartEvent.set();
+	sustained_thread_mutex.unlock();
 }
 
 void GMSustainedThread::stop()
