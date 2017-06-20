@@ -4,9 +4,9 @@
 TextureContainer::~TextureContainer()
 {
 	D(d);
-	for (auto iter = d->textures.begin(); iter != d->textures.end(); iter++)
+	for (auto& texture : d->textures)
 	{
-		delete (*iter).texture;
+		delete texture.texture;
 	}
 }
 
@@ -32,9 +32,9 @@ const TextureContainer::TextureItemType* TextureContainer::find(const char* name
 TextureContainer_ID::~TextureContainer_ID()
 {
 	D(d);
-	for (auto iter = d->textures.begin(); iter != d->textures.end(); iter++)
+	for (auto& texture : d->textures)
 	{
-		delete (*iter).texture;
+		delete texture.texture;
 	}
 }
 

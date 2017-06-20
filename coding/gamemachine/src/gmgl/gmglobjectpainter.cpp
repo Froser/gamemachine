@@ -102,9 +102,8 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 		render->begin(m_engine, mesh, modelTransform);
 
 		glBindVertexArray(mesh->getArrayId());
-		for (auto iter = mesh->getComponents().begin(); iter != mesh->getComponents().end(); iter++)
+		for (auto component : mesh->getComponents())
 		{
-			Component* component = (*iter);
 			Shader& shader = component->getShader();
 			if (shader.nodraw)
 				continue;

@@ -191,9 +191,8 @@ void GMEntityObject::calc()
 	d->maxs[0] = d->maxs[1] = d->maxs[2] = -d->mins[0];
 
 	Object* obj = getObject();
-	for (auto iter = obj->getAllMeshes().begin(); iter != obj->getAllMeshes().end(); iter++)
+	for (auto mesh : obj->getAllMeshes())
 	{
-		Mesh* mesh = *iter;
 		Object::DataType* vertices = mesh->vertices().data();
 		GMint sz = mesh->vertices().size();
 		for (GMint i = 0; i < sz; i += 4)

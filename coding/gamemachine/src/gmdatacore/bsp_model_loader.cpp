@@ -43,10 +43,10 @@ void BSPModelLoader::load()
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	AlignedVector<GMString> files = pk->getAllFiles(d->directory);
 
-	for (auto iter = files.begin(); iter != files.end(); iter++)
+	for (auto& file : files)
 	{
 		GMBuffer buf;
-		pk->readFileFromPath((*iter), &buf);
+		pk->readFileFromPath(file, &buf);
 		buf.convertToStringBuffer();
 		parse((const char*)buf.buffer);
 	}

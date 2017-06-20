@@ -381,9 +381,9 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 		return;
 	}
 
-	for (auto iter = pc->facets.begin(); iter != pc->facets.end(); iter++)
+	for (const auto& facet_ref : pc->facets)
 	{
-		const GMBSPFacet* facet = &*iter;
+		const GMBSPFacet* facet = &facet_ref;
 
 		enterFrac = -1.0;
 		leaveFrac = 1.0;
@@ -485,13 +485,13 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 	}
 }
 
-void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity*>& entity)
+void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity*>& entities)
 {
 	D(d);
 	tw.trace.entityNum = 0;
-	for (auto iter = entity.begin(); iter != entity.end(); iter++)
+	for (auto entity : entities)
 	{
-		auto objIter = (d->entityObjects->find(*iter));
+		auto objIter = (d->entityObjects->find(entity));
 		if (objIter != d->entityObjects->end())
 		{
 			GMEntityObject* obj = objIter->second;
@@ -525,9 +525,8 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 	// determine the trace's relationship to all planes
 	const AlignedVector<GMBSPPatchPlane>& planes = pc->planes;
 	GMint i = 0;
-	for (auto iter = planes.begin(); iter != planes.end(); iter++, i++)
+	for (const auto& plane : planes)
 	{
-		const GMBSPPatchPlane& plane = *iter;
 		offset = linear_math::dot(tw.offsets[plane.signbits], VEC3(plane.plane));
 		d1 = linear_math::dot(tw.start, VEC3(plane.plane)) - plane.plane[3] + offset;
 		d2 = linear_math::dot(tw.end, VEC3(plane.plane)) - plane.plane[3] + offset;
@@ -551,11 +550,9 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 
 
 	// see if any of the surface planes are intersected
-	const AlignedVector<GMBSPFacet>& facet = pc->facets;
-	i = 0;
-	for (auto iter = facet.begin(); iter != facet.end(); iter++, i++)
+	const AlignedVector<GMBSPFacet>& facets = pc->facets;
+	for (const auto& facet : facets)
 	{
-		const GMBSPFacet& facet = *iter;
 		if (!frontFacing[facet.surfacePlane]) {
 			continue;
 		}

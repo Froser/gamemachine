@@ -142,9 +142,9 @@ Mesh::Mesh(const std::string& name)
 
 Mesh::~Mesh()
 {
-	for (auto iter = m_components.begin(); iter != m_components.end(); iter++)
+	for (auto component : m_components)
 	{
-		delete *iter;
+		delete component;
 	}
 }
 
@@ -159,9 +159,8 @@ void Mesh::calculateTangentSpace()
 	if (m_uvs.size() == 0)
 		return;
 
-	for (auto iter = m_components.begin(); iter != m_components.end(); iter++)
+	for (auto component : m_components)
 	{
-		Component* component = (*iter);
 		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
 		{
 			GMint offset = component->getOffsetPtr()[i] / VERTEX_DEMENSION;

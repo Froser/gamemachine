@@ -16,9 +16,9 @@ GMGameWorld::GMGameWorld()
 GMGameWorld::~GMGameWorld()
 {
 	D(d);
-	for (auto iter = d->shapes.begin(); iter != d->shapes.end(); iter++)
+	for (auto shape : d->shapes)
 	{
-		delete *iter;
+		delete shape;
 	}
 }
 

@@ -201,11 +201,11 @@ AlignedVector<GMString> ZipGMGLGamePackageHandler::getAllFiles(const GMString& d
 {
 	AlignedVector<GMString> result;
 	GMString d = directory;
-	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
+	for (auto& buffer : m_buffers)
 	{
-		if ((*iter).first.toStdWString().compare(0, d.length(), d.toStdWString()) == 0)
+		if (buffer.first.toStdWString().compare(0, d.length(), d.toStdWString()) == 0)
 		{
-			result.push_back((*iter).first);
+			result.push_back(buffer.first);
 		}
 	}
 	return result;

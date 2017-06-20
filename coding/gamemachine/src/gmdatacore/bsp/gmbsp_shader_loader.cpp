@@ -173,10 +173,10 @@ void GMBSPShaderLoader::load()
 	AlignedVector<GMString> files = pk->getAllFiles(d->directory);
 
 	// load all item tag, but not parse them until item is needed
-	for (auto iter = files.begin(); iter != files.end(); iter++)
+	for (auto& file : files)
 	{
 		GMBuffer buf;
-		pk->readFileFromPath((*iter), &buf);
+		pk->readFileFromPath(file, &buf);
 		buf.convertToStringBuffer();
 		parse((const char*) buf.buffer);
 	}

@@ -26,9 +26,8 @@ struct DrawPolygonFaceJob : public GMSustainedThread
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
-		for (auto iter = renderData.polygonIndices.begin(); iter != renderData.polygonIndices.end(); ++iter)
+		for (auto i : renderData.polygonIndices)
 		{
-			const GMint& i = *iter;
 			if (renderData.facesToDraw.isSet(i))
 			{
 				if (renderData.faceDirectory[i].faceType == 0)
@@ -84,9 +83,8 @@ struct DrawPatchJob : public GMSustainedThread
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
-		for (auto iter = renderData.patchIndices.begin(); iter != renderData.patchIndices.end(); ++iter)
+		for (auto i : renderData.patchIndices)
 		{
-			const GMint& i = *iter;
 			if (renderData.facesToDraw.isSet(i))
 			{
 				if (renderData.faceDirectory[i].faceType == 0)
@@ -345,24 +343,24 @@ void GMBSPGameWorld::flushBuffer()
 	D(d);
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 
-	for (auto iter = d->polygonFaceBuffer.begin(); iter != d->polygonFaceBuffer.end(); iter++)
+	for (auto& obj : d->polygonFaceBuffer)
 	{
-		engine->drawObject(*iter);
+		engine->drawObject(obj);
 	}
 
-	for (auto iter = d->meshFaceBuffer.begin(); iter != d->meshFaceBuffer.end(); iter++)
+	for (auto& obj : d->meshFaceBuffer)
 	{
-		engine->drawObject(*iter);
+		engine->drawObject(obj);
 	}
 
-	for (auto iter = d->patchBuffer.begin(); iter != d->patchBuffer.end(); iter++)
+	for (auto& obj : d->patchBuffer)
 	{
-		engine->drawObject(*iter);
+		engine->drawObject(obj);
 	}
 
-	for (auto iter = d->entityBuffer.begin(); iter != d->entityBuffer.end(); iter++)
+	for (auto& obj : d->entityBuffer)
 	{
-		engine->drawObject(*iter);
+		engine->drawObject(obj);
 	}
 }
 
@@ -546,9 +544,9 @@ void GMBSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
 	AlignedVector<GMGameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
-	for (auto iter = objs.begin(); iter != objs.end(); iter++)
+	for (auto& obj : objs)
 	{
-		GameMachine::instance().getGraphicEngine()->drawObject(*iter);
+		GameMachine::instance().getGraphicEngine()->drawObject(obj);
 	}
 }
 
@@ -750,13 +748,13 @@ void GMBSPGameWorld::prepareEntities()
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 
-	for (auto iter = bsp.entities.begin(); iter != bsp.entities.end(); iter++)
+	for (auto& entity : bsp.entities)
 	{
-		BSPGameWorldEntityReader::import(*iter, this);
+		BSPGameWorldEntityReader::import(entity, this);
 
-		GMint leaf = calculateLeafNode((*iter).origin);
-		d->entities[leaf].insert(&(*iter));
-		createEntity(&(*iter));
+		GMint leaf = calculateLeafNode(entity.origin);
+		d->entities[leaf].insert(&entity);
+		createEntity(&entity);
 	}
 }
 
