@@ -551,13 +551,45 @@ public:
 	}
 
 	bool init(GMint numberOfBits);
-	void clearAll();
-	void setAll();
 
-	void clear(GMint bitNumber);
-	void set(GMint bitNumber);
+	inline void clearAll()
+	{
+		D(d);
+		memset(d->bits, 0, d->numBytes);
+	}
 
-	GMbyte isSet(GMint bitNumber);
+	inline void setAll()
+	{
+		D(d);
+		memset(d->bits, 0xFF, d->numBytes);
+	}
+
+	inline void clear(GMint bitNumber)
+	{
+		D(d);
+		d->bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
+	}
+
+	inline void set(GMint bitNumber)
+	{
+		D(d);
+		d->bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
+	}
+
+	inline GMbyte isSet(GMint bitNumber)
+	{
+		D(d);
+		return d->bits[bitNumber >> 3] & 1 << (bitNumber & 7);
+	}
+
+	inline void toggle(GMint bitNumber)
+	{
+		if (isSet(bitNumber))
+			clear(bitNumber);
+		else
+			set(bitNumber);
+	}
+
 };
 
 //Camera

@@ -5,6 +5,11 @@ BEGIN_NS
 
 #if USE_SIMD
 #	include <xmmintrin.h>
+#	define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
+#	define simd_pshufd_ps( _a, _mask ) _mm_shuffle_ps((_a), (_a), (_mask) )
+#	define simd_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
+#	define simd_zeroMask (_mm_set_ps(-0.0f, -0.0f, -0.0f, -0.0f))
+#	define simd_FFF0Mask (_mm_set_epi32(0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF))
 #endif
 
 #include <math.h>
@@ -513,18 +518,17 @@ namespace linear_math
 	static inline Vector3 cross(const Vector3& left, const Vector3& right)
 	{
 #if USE_SIMD
-		GM_ALIGNED_16(GMfloat) t0[] = { left[1],  left[2],  left[0],  0 },
-			t1[] = { right[2], right[0], right[1], 0 },
-			t2[] = { left[2],  left[0],  left[1],  0 },
-			t3[] = { right[1], right[2], right[0], 0 };
-		__m128 __t0 = _mm_load_ps(t0),
-			__t1 = _mm_load_ps(t1),
-			__t2 = _mm_load_ps(t2),
-			__t3 = _mm_load_ps(t3);
-		__m128 __m1 = _mm_mul_ps(__t0, __t1),
-			__m2 = _mm_mul_ps(__t2, __t3);
-		__m128 __r = _mm_sub_ps(__m1, __m2);
-		return Vector3(__r);
+		__m128 T, V;
+
+		T = simd_pshufd_ps(left.get128(), simd_shuffle_param(1, 2, 0, 3));	//	(Y Z X 0)
+		V = simd_pshufd_ps(right.get128(), simd_shuffle_param(1, 2, 0, 3));	//	(Y Z X 0)
+
+		V = _mm_mul_ps(V, left.get128());
+		T = _mm_mul_ps(T, right.get128());
+		V = _mm_sub_ps(V, T);
+
+		V = simd_pshufd_ps(V, simd_shuffle_param(1, 2, 0, 3));
+		return Vector3(V);
 #else
 		return Vector3(left[1] * right[2] - right[1] * left[2],
 			left[2] * right[0] - right[2] * left[0],

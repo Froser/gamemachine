@@ -80,6 +80,21 @@ void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 			d->tabLayout->SelectItem(0);
 		else if (msg.pSender == d->optPerformance)
 			d->tabLayout->SelectItem(1);
+		else
+		{
+			Data::OutputType type;
+			if (msg.pSender == d->optFltInfo)
+				type = Data::Info;
+			else if (msg.pSender == d->optFltWarning)
+				type = Data::Warning;
+			else if (msg.pSender == d->optFltError)
+				type = Data::Error;
+			else if (msg.pSender == d->optFltDebug)
+				type = Data::Debug;
+
+			d->filter.toggle(type);
+			onFilterChanged();
+		}
 	}
 }
 
@@ -94,29 +109,57 @@ void GMUIConsole::afterCreated()
 	d->tabLayout = findControl<DuiLib::CTabLayoutUI>(d->painter, ID_TABLAYOUT);
 	d->optLog = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_LOG);
 	d->optPerformance = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_PERFORMACE);
+	d->optFltInfo = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_INFO);
+	d->optFltWarning = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_WARNING);
+	d->optFltError = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_ERROR);
+	d->optFltDebug = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_DEBUG);
+}
+
+void GMUIConsole::addBuffer(Data::OutputType type, const GMString& msg)
+{
+	D(d);
+	const static GMuint MAX_BUFFER = 1000;
+	d->msgBuffer.push_back ({ type, msg });
+	if (d->msgBuffer.size() > MAX_BUFFER)
+		d->msgBuffer.pop_front();
+}
+
+void GMUIConsole::onFilterChanged()
+{
+	D(d);
+	d->consoleEdit->Clear();
+	for (auto& msg : d->msgBuffer)
+	{
+		//TODO 遍历enum
+		insertText(msg.type, msg.message);
+	}
 }
 
 void GMUIConsole::info(const GMString& msg)
 {
 	D(d);
+	addBuffer(Data::Info, msg);
 	insertText(Data::Info, msg);
 }
 
 void GMUIConsole::warning(const GMString& msg)
 {
 	D(d);
+	addBuffer(Data::Warning, msg);
 	insertText(Data::Warning, msg);
 }
 
 void GMUIConsole::error(const GMString& msg)
 {
 	D(d);
+	addBuffer(Data::Error, msg);
 	insertText(Data::Error, msg);
 }
 
 void GMUIConsole::debug(const GMString& msg)
 {
 	D(d);
+	addBuffer(Data::Debug, msg);
 	insertText(Data::Debug, msg);
 }
 
@@ -125,7 +168,8 @@ void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
 	D(d);
 	if (isWindowVisible())
 	{
-		insertTextToRichEdit(type, msg);
+		if (d->filter.isSet(type))
+			insertTextToRichEdit(type, msg);
 	}
 	else
 	{

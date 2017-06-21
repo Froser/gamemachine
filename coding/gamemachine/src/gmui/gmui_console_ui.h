@@ -12,6 +12,10 @@ namespace gmui
 #define ID_TABLAYOUT				_L("TabLayout")
 #define ID_OPTION_LOG				_L("Option_Log")
 #define ID_OPTION_PERFORMACE		_L("Option_Performance")
+#define	ID_OPTION_FILTER_INFO		_L("Option_Info")
+#define	ID_OPTION_FILTER_WARNING	_L("Option_Warning")
+#define	ID_OPTION_FILTER_ERROR		_L("Option_Error")
+#define	ID_OPTION_FILTER_DEBUG		_L("Option_Debug")
 
 const GMWchar* gmui::GMUIConsole::UI = L""
 	L"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?> "
@@ -24,6 +28,10 @@ const GMWchar* gmui::GMUIConsole::UI = L""
 	L"        <HorizontalLayout enabled=\"true\" width=\"700\"> "
 	L"            <TabLayout name=\"" ID_TABLAYOUT L"\" enabled=\"true\" width=\"698\" height=\"500\"> "
 	L"                <HorizontalLayout enabled=\"true\" width=\"698\" height=\"500\"> "
+	L"                    <Option name=\"" ID_OPTION_FILTER_INFO L"\" text=\"Info\" float=\"true\" pos=\"8,7,0,0\" enabled=\"true\" width=\"60\" height=\"30\" />"
+	L"                    <Option name=\"" ID_OPTION_FILTER_WARNING L"\" text=\"Warning\" float=\"true\" pos=\"8,27,0,0\" enabled=\"true\" width=\"60\" height=\"30\" />"
+	L"                    <Option name=\"" ID_OPTION_FILTER_ERROR L"\" text=\"Error\" float=\"true\" pos=\"8,47,0,0\" enabled=\"true\" width=\"60\" height=\"30\" />"
+	L"                    <Option name=\"" ID_OPTION_FILTER_DEBUG L"\" text=\"Debug\" float=\"true\" pos=\"8,67,0,0\" enabled=\"true\" width=\"60\" height=\"30\" />"
 	L"                    <RichEdit name=\"" ID_EDIT_CONSOLE L"\" float=\"true\" pos=\"100,10,650,810\" enabled=\"true\" width=\"550\" height=\"500\" bkcolor=\"#FFFFFFFF\" autovscroll=\"true\" vscrollbar=\"true\"/> "
 	L"                </HorizontalLayout> "
 	L"                <HorizontalLayout enabled=\"true\" width=\"698\" height=\"500\" /> "

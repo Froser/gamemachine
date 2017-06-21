@@ -572,36 +572,6 @@ bool Bitset::init(GMint numberOfBits)
 	return true;
 }
 
-void Bitset::clearAll()
-{
-	D(d);
-	memset(d->bits, 0, d->numBytes);
-}
-
-void Bitset::setAll()
-{
-	D(d);
-	memset(d->bits, 0xFF, d->numBytes);
-}
-
-void Bitset::clear(GMint bitNumber)
-{
-	D(d);
-	d->bits[bitNumber >> 3] &= ~(1 << (bitNumber & 7));
-}
-
-void Bitset::set(GMint bitNumber)
-{
-	D(d);
-	d->bits[bitNumber >> 3] |= 1 << (bitNumber & 7);
-}
-
-GMbyte Bitset::isSet(GMint bitNumber)
-{
-	D(d);
-	return d->bits[bitNumber >> 3] & 1 << (bitNumber & 7);
-}
-
 //Camera
 void Camera::calcCameraLookAt(const PositionState& state, REF CameraLookAt& lookAt)
 {

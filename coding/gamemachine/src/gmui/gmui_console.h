@@ -3,6 +3,8 @@
 #include "common.h"
 #include "gmui.h"
 #include <queue>
+#include <list>
+#include "foundation/utilities/utilities.h"
 BEGIN_NS
 
 #if _WINDOWS
@@ -10,10 +12,11 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 {
 	enum OutputType
 	{
-		Info,
+		Info = 0,
 		Warning,
 		Error,
-		Debug
+		Debug,
+		EndOfOutputType, //结束标记
 	};
 
 	struct Message
@@ -26,8 +29,14 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	DuiLib::CTabLayoutUI* tabLayout;
 	DuiLib::COptionUI* optLog;
 	DuiLib::COptionUI* optPerformance;
+	DuiLib::COptionUI* optFltInfo;
+	DuiLib::COptionUI* optFltWarning;
+	DuiLib::COptionUI* optFltError;
+	DuiLib::COptionUI* optFltDebug;
 	GMUIPainter* painter;
 	std::queue<Message> msgQueue;
+	std::list<Message> msgBuffer;
+	Bitset filter;
 };
 
 class GMUIConsole : public GMUIGUIWindow, public DuiLib::INotifyUI, public IDebugOutput
@@ -45,6 +54,8 @@ private:
 		D(d);
 		D_BASE(db, Base);
 		d->painter = &db->painter;
+		d->filter.init(Data::EndOfOutputType);
+		d->filter.setAll();
 	}
 
 	~GMUIConsole();
@@ -70,6 +81,8 @@ private:
 	void insertText(Data::OutputType type, const GMString& msg);
 	void insertTextToRichEdit(Data::OutputType type, const GMString& msg);
 	void afterCreated();
+	void addBuffer(Data::OutputType type, const GMString& msg);
+	void onFilterChanged();
 };
 
 #endif
