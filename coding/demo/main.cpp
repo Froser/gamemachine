@@ -164,10 +164,10 @@ public:
 				rate.setMoveRate(MD_FORWARD, GMfloat(joyState.thumbLY) / SHRT_MAX);
 			}
 
-			if (kbState.keydown(VK_SPACE) || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+			if (kbState.keyTriggered(VK_SPACE) || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				moveTag |= MD_JUMP;
 
-			if (kbState.keydown('V'))
+			if (kbState.keyTriggered('V'))
 				inputManager->joystickVibrate(30000, 30000);
 			else if (kbState.keydown('C'))
 				inputManager->joystickVibrate(0, 0);
@@ -175,7 +175,7 @@ public:
 			if (kbState.keyTriggered('N'))
 				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
 
-			if (kbState.keydown('I'))
+			if (kbState.keyTriggered('I'))
 				GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
 
 			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
@@ -202,13 +202,13 @@ public:
 
 			character->action(moveTag, rate);
 
-			if (kbState.keydown('P'))
+			if (kbState.keyTriggered('P'))
 				GMSetBuiltIn(CALCULATE_BSP_FACE, !GMGetBuiltIn(CALCULATE_BSP_FACE));
-			if (kbState.keydown('L'))
+			if (kbState.keyTriggered('L'))
 				GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
-			if (kbState.keydown('O'))
+			if (kbState.keyTriggered('O'))
 				GMSetBuiltIn(DRAW_ONLY_SKY, !GMGetBuiltIn(DRAW_ONLY_SKY));
-			if (kbState.keydown('R'))
+			if (kbState.keyTriggered('R'))
 				inputManager->setMouseEnable(m_bMouseEnable = !m_bMouseEnable);
 			break;
 		}
@@ -220,23 +220,23 @@ public:
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
-	bool onLoadShader(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram) override
+	bool onLoadShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) override
 	{
 		bool flag = false;
 		GMBuffer vertBuf, fragBuf;
 		switch (type)
 		{
-		case Mesh::NormalObject:
+		case GMMeshType::Normal:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.vert", &vertBuf);
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
 			flag = true;
 			break;
-		case Mesh::Sky:
+		case GMMeshType::Sky:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "sky.vert", &vertBuf);
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "sky.frag", &fragBuf);
 			flag = true;
 			break;
-		case Mesh::Glyph:
+		case GMMeshType::Glyph:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.vert", &vertBuf);
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.frag", &fragBuf);
 			flag = true;

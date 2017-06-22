@@ -20,8 +20,8 @@ struct GMJoystickState
 
 struct GMKeyboardState
 {
-	BYTE keystate[256]{ 0 };
-	bool keytriggerState[256]{ 0 };
+	BYTE keystate[256];
+	bool keytriggerState[256];
 
 	bool keydown(GMuint key)
 	{
@@ -70,7 +70,7 @@ GM_PRIVATE_OBJECT(Input_Windows)
 	XInputWrapper xinput;
 
 	// 记录上一帧的按键
-	BYTE keytriggerState[MAX_KEYS]{ 0 };
+	BYTE lastKeyState[MAX_KEYS];
 };
 
 class Input_Windows : public GMObject

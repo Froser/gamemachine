@@ -86,10 +86,10 @@ void GMGlyphObject::constructObject()
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
 	Object* obj = new Object();
-	Mesh* child = new Mesh();
+	GMMesh* child = new GMMesh();
 	obj->append(child);
-	child->setArrangementMode(Mesh::Triangle_Strip);
-	child->setType(Mesh::Glyph);
+	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	child->setType(GMMeshType::Glyph);
 
 	Component* component = new Component(child);
 	Shader& shader = component->getShader();
@@ -336,8 +336,8 @@ void SkyGameObject::createSkyBox(OUT Object** obj)
 	Object* object = new Object();
 	*obj = object;
 
-	Mesh* child = new Mesh();
-	child->setType(Mesh::Sky);
+	GMMesh* child = new GMMesh();
+	child->setType(GMMeshType::Sky);
 
 	Component* component = new Component(child);
 	component->getShader() = d->shader;

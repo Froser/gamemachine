@@ -8,15 +8,15 @@
 #include "renders/gmgl_render.h"
 #include "foundation/gamemachine.h"
 
-static GLenum getMode(Mesh* obj)
+static GLenum getMode(GMMesh* obj)
 {
 	switch (obj->getArrangementMode())
 	{
-	case Mesh::Triangle_Fan:
+	case GMArrangementMode::Triangle_Fan:
 		return GL_TRIANGLE_FAN;
-	case Mesh::Triangle_Strip:
+	case GMArrangementMode::Triangle_Strip:
 		return GL_TRIANGLE_STRIP;
-	case Mesh::Triangles:
+	case GMArrangementMode::Triangles:
 		return GL_TRIANGLES;
 	default:
 		ASSERT(false);

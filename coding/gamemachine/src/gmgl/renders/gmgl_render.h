@@ -5,13 +5,13 @@
 
 BEGIN_NS
 
-class Mesh;
+class GMMesh;
 struct Shader;
 struct CameraLookAt;
 struct IRender
 {
 	virtual ~IRender() {}
-	virtual void begin(IGraphicEngine* engine, Mesh* mesh, GMfloat* modelTransform) = 0;
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) = 0;
 	virtual void beginShader(Shader& shader) = 0;
 	virtual void endShader() = 0;
 	virtual void end() = 0;

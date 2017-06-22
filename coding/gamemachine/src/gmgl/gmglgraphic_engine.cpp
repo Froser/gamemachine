@@ -104,12 +104,12 @@ void GMGLGraphicEngine::installShaders()
 
 	GMGamePackage* package = GameMachine::instance().getGamePackageManager();
 
-	for (GMint i = Mesh::ObjectTypeBegin; i < Mesh::ObjectTypeEnd; i++)
+	for (GMint i = (GMint)GMMeshType::MeshTypeBegin; i < (GMint) GMMeshType::MeshTypeEnd; i++)
 	{
 		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadShader((Mesh::MeshesType) i, shaderProgram)) )
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadShader((GMMeshType) i, shaderProgram)) )
 		{
-			if (!loadDefaultShaders((Mesh::MeshesType) i, shaderProgram))
+			if (!loadDefaultShaders((GMMeshType) i, shaderProgram))
 			{
 				delete shaderProgram;
 				shaderProgram = nullptr;
@@ -119,29 +119,29 @@ void GMGLGraphicEngine::installShaders()
 		if (shaderProgram)
 		{
 			shaderProgram->load();
-			registerShader((Mesh::MeshesType)i, shaderProgram);
+			registerShader((GMMeshType)i, shaderProgram);
 		}
 
-		registerRender((Mesh::MeshesType)i, renders[i]);
+		registerRender((GMMeshType)i, renders[i]);
 	}
 }
 
-bool GMGLGraphicEngine::loadDefaultShaders(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram)
+bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram)
 {
 	bool flag = false;
 	switch (type)
 	{
-	case Mesh::NormalObject:
+	case GMMeshType::Normal:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object.frag });
 		flag = true;
 		break;
-	case Mesh::Sky:
+	case GMMeshType::Sky:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::sky.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::sky.frag });
 		flag = true;
 		break;
-	case Mesh::Glyph:
+	case GMMeshType::Glyph:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::glyph.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::glyph.frag });
 		flag = true;
@@ -157,10 +157,10 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	D(d);
 	updateMatrices(lookAt);
 
-	BEGIN_ENUM(i, Mesh::ObjectTypeBegin, Mesh::ObjectTypeEnd)
+	BEGIN_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		IRender* render = getRender(i);
-		Mesh dummy;
+		GMMesh dummy;
 		dummy.setType(i);
 
 		render->begin(this, &dummy, nullptr);
@@ -189,13 +189,13 @@ GMGameWorld* GMGLGraphicEngine::getWorld()
 	return d->world;
 }
 
-void GMGLGraphicEngine::registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaderProgram* shaders)
+void GMGLGraphicEngine::registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders)
 {
 	D(d);
 	d->allShaders[objectType] = shaders;
 }
 
-GMGLShaderProgram* GMGLGraphicEngine::getShaders(Mesh::MeshesType objectType)
+GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 {
 	D(d);
 	if (d->allShaders.find(objectType) == d->allShaders.end())
@@ -204,13 +204,13 @@ GMGLShaderProgram* GMGLGraphicEngine::getShaders(Mesh::MeshesType objectType)
 	return d->allShaders[objectType];
 }
 
-void GMGLGraphicEngine::registerRender(Mesh::MeshesType objectType, AUTORELEASE IRender* render)
+void GMGLGraphicEngine::registerRender(GMMeshType objectType, AUTORELEASE IRender* render)
 {
 	D(d);
 	d->allRenders[objectType] = render;
 }
 
-IRender* GMGLGraphicEngine::getRender(Mesh::MeshesType objectType)
+IRender* GMGLGraphicEngine::getRender(GMMeshType objectType)
 {
 	D(d);
 	if (d->allRenders.find(objectType) == d->allRenders.end())

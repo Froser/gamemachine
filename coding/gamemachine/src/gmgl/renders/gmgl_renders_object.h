@@ -11,8 +11,8 @@ class GMGameWorld;
 GM_PRIVATE_OBJECT(GMGLRenders_Object)
 {
 	GMGLGraphicEngine* engine;
-	Mesh* mesh;
-	Mesh::MeshesType type;
+	GMMesh* mesh;
+	GMMeshType type;
 	Shader* shader;
 	GMGLShaderProgram* gmglShaders;
 	GMGameWorld* world;
@@ -23,7 +23,7 @@ class GMGLRenders_Object : public GMObject, public IRender
 	DECLARE_PRIVATE(GMGLRenders_Object)
 
 public:
-	virtual void begin(IGraphicEngine* engine, Mesh* mesh, GMfloat* modelTransform) override;
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override;
 	virtual void beginShader(Shader& shader) override;
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;

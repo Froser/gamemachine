@@ -7,7 +7,7 @@
 #include "foundation/linearmath.h"
 #include "shader.h"
 
-#define BEGIN_FOREACH_OBJ(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { Mesh* mesh = *iter;
+#define BEGIN_FOREACH_OBJ(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;
 #define END_FOREACH_OBJ }
 
 BEGIN_NS
@@ -38,7 +38,7 @@ protected:
 	Object* getObject();
 };
 
-class Mesh;
+class GMMesh;
 GM_PRIVATE_OBJECT(Component)
 {
 	GMuint offset;
@@ -51,7 +51,7 @@ GM_PRIVATE_OBJECT(Component)
 	// 顶点在ChildObject的偏移
 	AlignedVector<GMint> vertexOffsets;
 
-	Mesh* parentMesh;
+	GMMesh* parentMesh;
 	GMuint currentFaceVerticesCount;
 };
 
@@ -59,7 +59,7 @@ class Component : public GMObject
 {
 	DECLARE_PRIVATE(Component)
 
-	friend class Mesh;
+	friend class GMMesh;
 
 public:
 	enum
@@ -67,7 +67,7 @@ public:
 		DefaultEdgesCount = 3,
 	};
 
-	Component(Mesh* parent);
+	Component(GMMesh* parent);
 	~Component();
 
 	Shader& getShader()
@@ -106,7 +106,7 @@ public:
 
 GM_PRIVATE_OBJECT(Object)
 {
-	AlignedVector<Mesh*> objects;
+	AlignedVector<GMMesh*> objects;
 	AutoPtr<ObjectPainter> painter;
 };
 
@@ -133,137 +133,173 @@ public:
 		return d->painter;
 	}
 
-	AlignedVector<Mesh*>& getAllMeshes()
+	AlignedVector<GMMesh*>& getAllMeshes()
 	{
 		D(d);
 		return d->objects;
 	}
 
-	void append(AUTORELEASE Mesh* obj)
+	void append(AUTORELEASE GMMesh* obj)
 	{
 		D(d);
 		d->objects.push_back(obj);
 	}
 };
 
-class Mesh
+
+// 绘制时候的排列方式
+enum class GMArrangementMode
 {
+	// 默认排列，按照Components，并按照一个个三角形来画
+	Triangle_Fan,
+
+	Triangle_Strip,
+
+	Triangles,
+};
+
+enum class GMMeshType
+{
+	MeshTypeBegin,
+	Normal = MeshTypeBegin,
+	Sky,
+	Glyph,
+	MeshTypeEnd,
+};
+
+GM_PRIVATE_OBJECT(GMMesh)
+{
+	AlignedVector<Object::DataType> vertices;
+	AlignedVector<Object::DataType> normals;
+	AlignedVector<Object::DataType> uvs;
+	AlignedVector<Object::DataType> tangents;
+	AlignedVector<Object::DataType> bitangents;
+	AlignedVector<Object::DataType> lightmaps;
+	GMuint arrayId = 0;
+	GMuint bufferId = 0;
+	AlignedVector<Component*> components;
+	GMMeshType type = GMMeshType::Normal;
+	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
+	GMString name = _L("default");
+};
+
+class GMMesh : public GMObject
+{
+	DECLARE_PRIVATE(GMMesh)
+
 	friend class Object_Less;
 
 public:
-	enum MeshesType
-	{
-		ObjectTypeBegin,
-		NormalObject = ObjectTypeBegin,
-		Sky,
-		Glyph,
-		ObjectTypeEnd,
-	};
+	GMMesh();
+	~GMMesh();
 
-	// 绘制时候的排列方式
-	enum ArrangementMode
-	{
-		// 默认排列，按照Components，并按照一个个三角形来画
-		Triangle_Fan,
-
-		Triangle_Strip,
-
-		Triangles,
-	};
-
-	Mesh();
-	Mesh(const std::string& name);
-	~Mesh();
-
-	void clone(OUT Mesh** childObject);
-
+public:
+	void clone(OUT GMMesh** childObject);
 	void appendComponent(AUTORELEASE Component* component);
-
 	void calculateTangentSpace();
 
+public:
 	AlignedVector<AUTORELEASE Component*>& getComponents()
 	{
-		return m_components;
+		D(d);
+		return d->components;
 	}
 
 	AlignedVector<Object::DataType>& vertices()
 	{
-		return m_vertices;
+		D(d);
+		return d->vertices;
 	}
 
 	AlignedVector<Object::DataType>& normals()
 	{
-		return m_normals;
+		D(d);
+		return d->normals;
 	}
 
 	AlignedVector<Object::DataType>& uvs()
 	{
-		return m_uvs;
+		D(d);
+		return d->uvs;
 	}
 
 	AlignedVector<Object::DataType>& tangents()
 	{
-		return m_tangents;
+		D(d);
+		return d->tangents;
 	}
 
 	AlignedVector<Object::DataType>& bitangents()
 	{
-		return m_bitangents;
+		D(d);
+		return d->bitangents;
 	}
 
 	AlignedVector<Object::DataType>& lightmaps()
 	{
-		return m_lightmaps;
+		D(d);
+		return d->lightmaps;
 	}
 
-	MeshesType getType()
+	GMMeshType getType()
 	{
-		return m_type;
+		D(d);
+		return d->type;
 	}
 
-	void setType(MeshesType type)
+	void setType(GMMeshType type)
 	{
-		m_type = type;
+		D(d);
+		d->type = type;
 	}
 
-	void setArrangementMode(ArrangementMode mode)
+	void setArrangementMode(GMArrangementMode mode)
 	{
-		m_mode = mode;
+		D(d);
+		d->mode = mode;
 	}
 
-	ArrangementMode getArrangementMode()
+	GMArrangementMode getArrangementMode()
 	{
-		return m_mode;
+		D(d);
+		return d->mode;
 	}
 
 	void setName(const char* name)
 	{
-		m_name = name;
+		D(d);
+		d->name = name;
 	}
 
-	const std::string& getName()
+	const GMString& getName()
 	{
-		return m_name;
+		D(d);
+		return d->name;
 	}
 
-	GMuint getBufferId() { return m_bufferId; }
-	GMuint getArrayId() { return m_arrayId; }
-	void setBufferId(GMuint id) { m_bufferId = id; }
-	void setArrayId(GMuint id) { m_arrayId = id; }
+	GMuint getBufferId()
+	{
+		D(d);
+		return d->bufferId;
+	}
 
-private:
-	AlignedVector<Object::DataType> m_vertices;
-	AlignedVector<Object::DataType> m_normals;
-	AlignedVector<Object::DataType> m_uvs;
-	AlignedVector<Object::DataType> m_tangents;
-	AlignedVector<Object::DataType> m_bitangents;
-	AlignedVector<Object::DataType> m_lightmaps;
-	GMuint m_arrayId;
-	GMuint m_bufferId;
-	AlignedVector<Component*> m_components;
-	MeshesType m_type;
-	ArrangementMode m_mode;
-	std::string m_name;
+	GMuint getArrayId()
+	{
+		D(d);
+		return d->arrayId;
+	}
+
+	void setBufferId(GMuint id)
+	{
+		D(d);
+		d->bufferId = id;
+	}
+
+	void setArrayId(GMuint id)
+	{
+		D(d);
+		d->arrayId = id;
+	}
 };
 
 END_NS

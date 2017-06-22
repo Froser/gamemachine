@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gminput.h"
 #include "gmui/gmui.h"
+#include "foundation/gmprofile.h"
 
 #if _WINDOWS
 
@@ -72,7 +73,7 @@ Input_Windows::~Input_Windows()
 void Input_Windows::update()
 {
 	D(d);
-	::GetKeyboardState(d->keytriggerState);
+	::GetKeyboardState(d->lastKeyState);
 }
 
 void Input_Windows::initMouse(GMUIWindow* window)
@@ -121,15 +122,15 @@ void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
 
 GMKeyboardState Input_Windows::getKeyboardState()
 {
+	GM_PROFILE(getKeyboardState);
 	D(d);
 	GMKeyboardState state;
 	GetKeyboardState(state.keystate);
 
-	// 如果按下一键键没有松开，这个键处于未触发(not triggered)状态
+	// 如果按下一键没有松开，这个键处于未触发(not triggered)状态
 	for (GMint i = 0; i < Data::MAX_KEYS; i++)
 	{
-		bool keydown = state.keydown(i);
-		// TODO 判断是否上一帧就看下了等等
+		state.keytriggerState[i] = !(d->lastKeyState[i] & 0x80) && (state.keydown(i));
 	}
 
 	return std::move(state);

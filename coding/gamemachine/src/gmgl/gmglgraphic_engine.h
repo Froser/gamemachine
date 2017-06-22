@@ -14,13 +14,13 @@ struct IRender;
 
 struct IShaderLoadCallback : public IGMInterface
 {
-	virtual bool onLoadShader(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram) = 0;
+	virtual bool onLoadShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
-	std::map<Mesh::MeshesType, GMGLShaderProgram*> allShaders;
-	std::map<Mesh::MeshesType, IRender*> allRenders;
+	std::map<GMMeshType, GMGLShaderProgram*> allShaders;
+	std::map<GMMeshType, IRender*> allRenders;
 	GMGameWorld* world = nullptr;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
@@ -49,19 +49,19 @@ public:
 public:
 	GMGameWorld* getWorld();
 
-	GMGLShaderProgram* getShaders(Mesh::MeshesType objectType);
+	GMGLShaderProgram* getShaders(GMMeshType objectType);
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 
-	void registerRender(Mesh::MeshesType objectType, AUTORELEASE IRender* render);
-	IRender* getRender(Mesh::MeshesType objectType);
+	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
+	IRender* getRender(GMMeshType objectType);
 
 private:
-	void registerShader(Mesh::MeshesType objectType, AUTORELEASE GMGLShaderProgram* shaders);
+	void registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders);
 	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
 	void drawObjectOnce(GMGameObject* object);
 	void installShaders();
-	bool loadDefaultShaders(const Mesh::MeshesType type, GMGLShaderProgram* shaderProgram);
+	bool loadDefaultShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram);
 };
 
 END_NS

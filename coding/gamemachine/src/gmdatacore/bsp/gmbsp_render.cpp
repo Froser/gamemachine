@@ -305,8 +305,8 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shad
 	D(d);
 
 	Object* coreObj = new Object();
-	Mesh* child = new Mesh();
-	child->setArrangementMode(Mesh::Triangles);
+	GMMesh* child = new GMMesh();
+	child->setArrangementMode(GMArrangementMode::Triangles);
 	Component* component = new Component(child);
 	component->getShader() = shader;
 
@@ -343,8 +343,8 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shad
 void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj)
 {
 	Object* coreObj = new Object();
-	Mesh* child = new Mesh();
-	child->setArrangementMode(Mesh::Triangle_Strip);
+	GMMesh* child = new GMMesh();
+	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 	Component* component = new Component(child);
 	component->getShader() = shader;
@@ -413,8 +413,8 @@ void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_ma
 	};
 
 	Object* coreObj = new Object();
-	Mesh* child = new Mesh();
-	child->setArrangementMode(Mesh::Triangle_Strip);
+	GMMesh* child = new GMMesh();
+	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)

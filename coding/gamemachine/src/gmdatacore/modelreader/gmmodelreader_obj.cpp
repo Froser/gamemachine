@@ -99,7 +99,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	StringReader sr((char*)buffer.buffer);
 
 	d->object = new Object;
-	Mesh* child = new Mesh();
+	GMMesh* child = new GMMesh();
 	d->object->append(child);
 
 	// 事先分配一些内存，提高效率
@@ -173,7 +173,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
 
-	Mesh* mesh = d->object->getAllMeshes()[0];
+	GMMesh* mesh = d->object->getAllMeshes()[0];
 	if (!d->currentComponent)
 	{
 		d->currentComponent = new Component(mesh);

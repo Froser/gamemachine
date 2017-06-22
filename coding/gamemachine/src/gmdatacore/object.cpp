@@ -31,7 +31,7 @@ Object::~Object()
 	END_FOREACH_OBJ
 }
 
-Component::Component(Mesh* parent)
+Component::Component(GMMesh* parent)
 {
 	D(d);
 	d->offset = 0;
@@ -122,44 +122,33 @@ void Component::endFace()
 	d->primitiveCount++;
 }
 
-Mesh::Mesh()
-	: m_arrayId(0)
-	, m_bufferId(0)
-	, m_type(NormalObject)
-	, m_mode(Triangle_Fan)
-	, m_name("default")
+GMMesh::GMMesh()
 {
 }
 
-Mesh::Mesh(const std::string& name)
-	: m_arrayId(0)
-	, m_bufferId(0)
-	, m_type(NormalObject)
-	, m_mode(Triangle_Fan)
+GMMesh::~GMMesh()
 {
-	m_name = name;
-}
-
-Mesh::~Mesh()
-{
-	for (auto component : m_components)
+	D(d);
+	for (auto component : d->components)
 	{
 		delete component;
 	}
 }
 
-void Mesh::appendComponent(AUTORELEASE Component* component)
+void GMMesh::appendComponent(AUTORELEASE Component* component)
 {
-	ASSERT(m_components.find(component) == m_components.end());
-	m_components.push_back(component);
+	D(d);
+	ASSERT(d->components.find(component) == d->components.end());
+	d->components.push_back(component);
 }
 
-void Mesh::calculateTangentSpace()
+void GMMesh::calculateTangentSpace()
 {
-	if (m_uvs.size() == 0)
+	D(d);
+	if (d->uvs.size() == 0)
 		return;
 
-	for (auto component : m_components)
+	for (auto component : d->components)
 	{
 		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
 		{
@@ -169,40 +158,40 @@ void Mesh::calculateTangentSpace()
 			// 开始计算每条边切线空间
 			for (GMint j = 0; j < edgeCount; j++)
 			{
-				linear_math::Vector3 e0(m_vertices[(offset + j) * VERTEX_DEMENSION], m_vertices[(offset + j) * VERTEX_DEMENSION + 1], m_vertices[(offset + j) * VERTEX_DEMENSION + 3]);
+				linear_math::Vector3 e0(d->vertices[(offset + j) * VERTEX_DEMENSION], d->vertices[(offset + j) * VERTEX_DEMENSION + 1], d->vertices[(offset + j) * VERTEX_DEMENSION + 3]);
 				linear_math::Vector3 e1, e2;
 				if (j == edgeCount - 2)
 				{
-					e1 = linear_math::Vector3(m_vertices[(offset + j + 1) * VERTEX_DEMENSION], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 1], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
-					e2 = linear_math::Vector3(m_vertices[offset * VERTEX_DEMENSION], m_vertices[offset * VERTEX_DEMENSION + 1], m_vertices[offset * VERTEX_DEMENSION + 3]);
+					e1 = linear_math::Vector3(d->vertices[(offset + j + 1) * VERTEX_DEMENSION], d->vertices[(offset + j + 1) * VERTEX_DEMENSION + 1], d->vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
+					e2 = linear_math::Vector3(d->vertices[offset * VERTEX_DEMENSION], d->vertices[offset * VERTEX_DEMENSION + 1], d->vertices[offset * VERTEX_DEMENSION + 3]);
 				}
 				else if (j == edgeCount - 1)
 				{
-					e1 = linear_math::Vector3(m_vertices[offset * VERTEX_DEMENSION], m_vertices[offset * 2 + 1], m_vertices[offset * VERTEX_DEMENSION + 2]);
-					e2 = linear_math::Vector3(m_vertices[(offset + 1) * VERTEX_DEMENSION], m_vertices[(offset + 1) * VERTEX_DEMENSION + 1], m_vertices[offset * VERTEX_DEMENSION + 2]);
+					e1 = linear_math::Vector3(d->vertices[offset * VERTEX_DEMENSION], d->vertices[offset * 2 + 1], d->vertices[offset * VERTEX_DEMENSION + 2]);
+					e2 = linear_math::Vector3(d->vertices[(offset + 1) * VERTEX_DEMENSION], d->vertices[(offset + 1) * VERTEX_DEMENSION + 1], d->vertices[offset * VERTEX_DEMENSION + 2]);
 				}
 				else
 				{
-					e1 = linear_math::Vector3(m_vertices[(offset + j + 1) * VERTEX_DEMENSION], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 1], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
-					e2 = linear_math::Vector3(m_vertices[(offset + j + 2) * VERTEX_DEMENSION], m_vertices[(offset + j + 2) * VERTEX_DEMENSION + 1], m_vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
+					e1 = linear_math::Vector3(d->vertices[(offset + j + 1) * VERTEX_DEMENSION], d->vertices[(offset + j + 1) * VERTEX_DEMENSION + 1], d->vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
+					e2 = linear_math::Vector3(d->vertices[(offset + j + 2) * VERTEX_DEMENSION], d->vertices[(offset + j + 2) * VERTEX_DEMENSION + 1], d->vertices[(offset + j + 1) * VERTEX_DEMENSION + 2]);
 				}
 
-				linear_math::Vector2 uv0(m_uvs[(offset + j) * 2], m_uvs[(offset + j) * 2 + 1]);
+				linear_math::Vector2 uv0(d->uvs[(offset + j) * 2], d->uvs[(offset + j) * 2 + 1]);
 				linear_math::Vector2 uv1, uv2;
 				if (j == edgeCount - 2)
 				{
-					uv1 = linear_math::Vector2(m_uvs[(offset + j + 1) * 2], m_uvs[(offset + j + 1) * 2 + 1]);
-					uv2 = linear_math::Vector2(m_uvs[offset * 2], m_uvs[offset * 2 + 1]);
+					uv1 = linear_math::Vector2(d->uvs[(offset + j + 1) * 2], d->uvs[(offset + j + 1) * 2 + 1]);
+					uv2 = linear_math::Vector2(d->uvs[offset * 2], d->uvs[offset * 2 + 1]);
 				}
 				else if (j == edgeCount - 1)
 				{
-					uv1 = linear_math::Vector2(m_uvs[offset * 2], m_uvs[offset * 2 + 1]);
-					uv1 = linear_math::Vector2(m_uvs[(offset + 1) * 2], m_uvs[(offset + 1) * 2 + 1]);
+					uv1 = linear_math::Vector2(d->uvs[offset * 2], d->uvs[offset * 2 + 1]);
+					uv1 = linear_math::Vector2(d->uvs[(offset + 1) * 2], d->uvs[(offset + 1) * 2 + 1]);
 				}
 				else
 				{
-					uv1 = linear_math::Vector2(m_uvs[(offset + j + 1) * 2], m_uvs[(offset + j + 1) * 2 + 1]);
-					uv2 = linear_math::Vector2(m_uvs[(offset + j + 2) * 2], m_uvs[(offset + j + 2) * 2 + 1]);
+					uv1 = linear_math::Vector2(d->uvs[(offset + j + 1) * 2], d->uvs[(offset + j + 1) * 2 + 1]);
+					uv2 = linear_math::Vector2(d->uvs[(offset + j + 2) * 2], d->uvs[(offset + j + 2) * 2 + 1]);
 				}
 
 				linear_math::Vector3 E1 = e1 - e0;
@@ -219,10 +208,10 @@ void Mesh::calculateTangentSpace()
 						s * (b2 * E1[2] - b1 * E2[2])
 					};
 					linear_math::Vector3 v_t = linear_math::normalize(linear_math::Vector3(t[0], t[1], t[2]));
-					m_tangents.push_back(v_t[0]);
-					m_tangents.push_back(v_t[1]);
-					m_tangents.push_back(v_t[2]);
-					m_tangents.push_back(1.0f);
+					d->tangents.push_back(v_t[0]);
+					d->tangents.push_back(v_t[1]);
+					d->tangents.push_back(v_t[2]);
+					d->tangents.push_back(1.0f);
 				}
 				{
 					GMfloat t[3] = {
@@ -231,10 +220,10 @@ void Mesh::calculateTangentSpace()
 						s * (t1 * E2[2] - t2 * E1[2])
 					};
 					linear_math::Vector3 v_t = linear_math::normalize(linear_math::Vector3(t[0], t[1], t[2]));
-					m_bitangents.push_back(v_t[0]);
-					m_bitangents.push_back(v_t[1]);
-					m_bitangents.push_back(v_t[2]);
-					m_bitangents.push_back(1.0f);
+					d->bitangents.push_back(v_t[0]);
+					d->bitangents.push_back(v_t[1]);
+					d->bitangents.push_back(v_t[2]);
+					d->bitangents.push_back(1.0f);
 				}
 			}
 		}

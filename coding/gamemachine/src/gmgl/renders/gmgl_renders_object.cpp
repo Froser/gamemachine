@@ -72,7 +72,7 @@ void GMGLRenders_Object::deactivateShader(Shader* shader)
 	}
 }
 
-void GMGLRenders_Object::begin(IGraphicEngine* engine, Mesh* mesh, GMfloat* modelTransform)
+void GMGLRenders_Object::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform)
 {
 	D(d);
 	clearData();
