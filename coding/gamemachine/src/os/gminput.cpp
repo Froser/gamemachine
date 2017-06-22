@@ -66,10 +66,6 @@ Input_Windows::Input_Windows()
 	d->mouseEnabled = true;
 }
 
-Input_Windows::~Input_Windows()
-{
-}
-
 void Input_Windows::update()
 {
 	D(d);
@@ -86,13 +82,13 @@ void Input_Windows::initMouse(GMUIWindow* window)
 	setMouseEnable(true);
 }
 
-void Input_Windows::setMouseEnable(bool center)
+void Input_Windows::setMouseEnable(bool enable)
 {
 	D(d);
-	d->mouseEnabled = center;
+	d->mouseEnabled = enable;
 }
 
-GMJoystickState Input_Windows::getJoystickState()
+GMJoystickState Input_Windows::joystickState()
 {
 	D(d);
 	XINPUT_STATE state;
@@ -110,33 +106,26 @@ GMJoystickState Input_Windows::getJoystickState()
 		result.buttons = state.Gamepad.wButtons;
 	}
 
-	return result;
+	return std::move(result);
 }
 
-void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
+void Input_Windows::joystickVibrate(GMshort leftMotorSpeed, GMshort rightMotorSpeed)
 {
 	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
 	d->xinput.XInputSetState(0, &v);
 }
 
-GMKeyboardState Input_Windows::getKeyboardState()
+IKeyboardState& Input_Windows::getKeyboardState()
 {
 	GM_PROFILE(getKeyboardState);
 	D(d);
-	GMKeyboardState state;
-	GetKeyboardState(state.keystate);
+	GetKeyboardState(d->keyState);
 
-	// 如果按下一键没有松开，这个键处于未触发(not triggered)状态
-	for (GMint i = 0; i < Data::MAX_KEYS; i++)
-	{
-		state.keytriggerState[i] = !(d->lastKeyState[i] & 0x80) && (state.keydown(i));
-	}
-
-	return std::move(state);
+	return *this;
 }
 
-GMMouseState Input_Windows::getMouseState()
+GMMouseState Input_Windows::mouseState()
 {
 	D(d);
 	if (!d->mouseReady)

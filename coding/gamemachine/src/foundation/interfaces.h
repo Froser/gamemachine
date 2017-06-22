@@ -30,24 +30,19 @@ enum GameMachineEvent
 	GM_EVENT_DEACTIVATE,
 };
 
-struct IGMInterface
-{
-	virtual ~IGMInterface() {}
-};
-
-struct IGameHandler : public IGMInterface
+GM_INTERFACE(IGameHandler)
 {
 	virtual void start() = 0;
 	virtual void event(GameMachineEvent evt) = 0;
 	virtual bool isWindowActivate() = 0;
 };
 
-struct ITexture : public IGMInterface
+GM_INTERFACE(ITexture)
 {
 	virtual void drawTexture(TextureFrames* frames) = 0;
 };
 
-struct IGraphicEngine : public IGMInterface
+GM_INTERFACE(IGraphicEngine)
 {
 	virtual void start() = 0;
 	virtual void setCurrentWorld(GMGameWorld*) = 0;
@@ -64,7 +59,7 @@ enum GamePackageType
 	GPT_ZIP,
 };
 
-struct IFactory : public IGMInterface
+GM_INTERFACE(IFactory)
 {
 	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;

@@ -12,7 +12,7 @@ class GMGameWorld;
 class GameLight;
 struct IRender;
 
-struct IShaderLoadCallback : public IGMInterface
+GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual bool onLoadShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) = 0;
 };

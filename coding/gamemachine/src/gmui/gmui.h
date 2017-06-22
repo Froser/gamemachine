@@ -33,7 +33,6 @@ typedef GMWchar* GMUIStringPtr;
 typedef GMlong LongPtr;
 typedef GMuint UintPtr;
 typedef GMlong LongPtr;
-
 #endif
 
 BEGIN_NS

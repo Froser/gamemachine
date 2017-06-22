@@ -5,6 +5,14 @@
 
 BEGIN_NS
 
+// 接口统一定义
+struct IGMInterface
+{
+	virtual ~IGMInterface() {}
+};
+
+#define GM_INTERFACE(name) struct name : public IGMInterface
+
 // GameMachine采用数据和方法分离的方式，可以为一个类定义一个私有结构存储数据
 template <typename T>
 GM_ALIGNED_16(class) GMObjectPrivateWrapper

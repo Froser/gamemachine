@@ -64,7 +64,7 @@ public:
 	{
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		GMInput* inputManager = GameMachine::instance().getInputManager();
-		inputManager->initMouse(GameMachine::instance().getMainWindow());
+		inputManager->getMouseState().initMouse(GameMachine::instance().getMainWindow());
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
@@ -120,9 +120,9 @@ public:
 			static GMfloat joystickSensitivity = 0.0003f;
 
 			GMCharacter* character = world->getMajorCharacter();
-			GMKeyboardState kbState = inputManager->getKeyboardState();
-			GMJoystickState joyState = inputManager->getJoystickState();
-			GMMouseState mouseState = inputManager->getMouseState();
+			IKeyboardState& kbState = inputManager->getKeyboardState();
+			IJoystickState& joyState = inputManager->getJoystickState();
+			IMouseState& mouseState = inputManager->getMouseState();
 
 			if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
 				GameMachine::instance().postMessage({ GM_MESSAGE_EXIT });
@@ -131,40 +131,41 @@ public:
 
 			MoveAction moveTag = 0;
 			MoveRate rate;
+			GMJoystickState state = joyState.joystickState();
 
 			if (kbState.keydown('A'))
 				moveTag |= MD_LEFT;
-			if (joyState.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_LEFT;
-				rate.setMoveRate(MD_LEFT, GMfloat(joyState.thumbLX) / SHRT_MIN);
+				rate.setMoveRate(MD_LEFT, GMfloat(state.thumbLX) / SHRT_MIN);
 			}
 
 			if (kbState.keydown('D'))
 				moveTag |= MD_RIGHT;
-			if (joyState.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_RIGHT;
-				rate.setMoveRate(MD_RIGHT, GMfloat(joyState.thumbLX) / SHRT_MAX);
+				rate.setMoveRate(MD_RIGHT, GMfloat(state.thumbLX) / SHRT_MAX);
 			}
 
 			if (kbState.keydown('S'))
 				moveTag |= MD_BACKWARD;
-			if (joyState.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_BACKWARD;
-				rate.setMoveRate(MD_BACKWARD, GMfloat(joyState.thumbLY) / SHRT_MIN);
+				rate.setMoveRate(MD_BACKWARD, GMfloat(state.thumbLY) / SHRT_MIN);
 			}
 
 			if (kbState.keydown('W'))
 				moveTag |= MD_FORWARD;
-			if (joyState.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
 				moveTag |= MD_FORWARD;
-				rate.setMoveRate(MD_FORWARD, GMfloat(joyState.thumbLY) / SHRT_MAX);
+				rate.setMoveRate(MD_FORWARD, GMfloat(state.thumbLY) / SHRT_MAX);
 			}
 
-			if (kbState.keyTriggered(VK_SPACE) || joyState.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+			if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
 				moveTag |= MD_JUMP;
 
 			if (kbState.keyTriggered('V'))
@@ -178,27 +179,28 @@ public:
 			if (kbState.keyTriggered('I'))
 				GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
 
-			if (joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+			if (state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
-				GMfloat rate = (GMfloat) joyState.thumbRX / (
-					joyState.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
+				GMfloat rate = (GMfloat) state.thumbRX / (
+					state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
 					SHRT_MIN :
 					SHRT_MAX);
 
-				world->getMajorCharacter()->lookRight(joyState.thumbRX * joystickSensitivity * rate);
+				world->getMajorCharacter()->lookRight(state.thumbRX * joystickSensitivity * rate);
 			}
-			if (joyState.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || joyState.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+			if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
-				GMfloat rate = (GMfloat)joyState.thumbRY / (
-					joyState.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
+				GMfloat rate = (GMfloat)state.thumbRY / (
+					state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
 					SHRT_MIN :
 					SHRT_MAX);
 
-				world->getMajorCharacter()->lookUp(joyState.thumbRY * joystickSensitivity * rate);
+				world->getMajorCharacter()->lookUp(state.thumbRY * joystickSensitivity * rate);
 			}
 
-			world->getMajorCharacter()->lookUp(-mouseState.deltaY * mouseSensitivity);
-			world->getMajorCharacter()->lookRight(mouseState.deltaX * mouseSensitivity);
+			GMMouseState ms = mouseState.mouseState();
+			world->getMajorCharacter()->lookUp(-ms.deltaY * mouseSensitivity);
+			world->getMajorCharacter()->lookRight(ms.deltaX * mouseSensitivity);
 
 			character->action(moveTag, rate);
 
@@ -209,7 +211,7 @@ public:
 			if (kbState.keyTriggered('O'))
 				GMSetBuiltIn(DRAW_ONLY_SKY, !GMGetBuiltIn(DRAW_ONLY_SKY));
 			if (kbState.keyTriggered('R'))
-				inputManager->setMouseEnable(m_bMouseEnable = !m_bMouseEnable);
+				mouseState.setMouseEnable(m_bMouseEnable = !m_bMouseEnable);
 			break;
 		}
 	}

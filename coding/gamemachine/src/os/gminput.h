@@ -4,8 +4,6 @@
 BEGIN_NS
 
 #if _WINDOWS
-#include <Xinput.h>
-
 struct GMJoystickState
 {
 	bool valid;
@@ -17,29 +15,39 @@ struct GMJoystickState
 	SHORT thumbRX;
 	SHORT thumbRY;
 };
-
-struct GMKeyboardState
+#else
+struct GMJoystickState
 {
-	BYTE keystate[256];
-	bool keytriggerState[256];
-
-	bool keydown(GMuint key)
-	{
-		return !! (keystate[key] & 0x80);
-	}
-
-	// 表示一个键是否按下一次，长按只算是一次
-	bool keyTriggered(GMuint key)
-	{
-		return !! keytriggerState[key];
-	}
 };
+#endif
 
 struct GMMouseState
 {
 	GMint deltaX;
 	GMint deltaY;
 };
+
+GM_INTERFACE(IJoystickState)
+{
+	virtual void joystickVibrate(GMshort leftMotorSpeed, GMshort rightMotorSpeed) = 0;
+	virtual GMJoystickState joystickState() = 0;
+};
+
+GM_INTERFACE(IKeyboardState)
+{
+	virtual bool keydown(GMuint key) = 0;
+	virtual bool keyTriggered(GMuint key) = 0;
+};
+
+GM_INTERFACE(IMouseState)
+{
+	virtual GMMouseState mouseState() = 0;
+	virtual void initMouse(GMUIWindow* window) = 0;
+	virtual void setMouseEnable(bool enable) = 0;
+};
+
+#if _WINDOWS
+#include <Xinput.h>
 
 class GMUIWindow;
 class XInputWrapper
@@ -67,30 +75,63 @@ GM_PRIVATE_OBJECT(Input_Windows)
 	bool mouseReady;
 	bool mouseEnabled;
 	GMUIWindow* window;
-	XInputWrapper xinput;
 
-	// 记录上一帧的按键
+	// joystick (xinput)
+	XInputWrapper xinput;
+	GMJoystickState joystickState;
+
+	// keyboard
+	BYTE keyState[256];
 	BYTE lastKeyState[MAX_KEYS];
+
+	// mouse
+	GMMouseState mouseState;
 };
 
-class Input_Windows : public GMObject
+class Input_Windows :
+	public GMObject,
+	public IKeyboardState,
+	public IJoystickState,
+	public IMouseState
 {
 	DECLARE_PRIVATE(Input_Windows)
 
 public:
 	Input_Windows();
-	~Input_Windows();
 
 public:
 	// 每一帧，应该调用一次update
 	void update();
-	void initMouse(GMUIWindow* window);
-	void setMouseEnable(bool center);
-	GMJoystickState getJoystickState();
-	void joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed);
 
-	GMKeyboardState getKeyboardState();
-	GMMouseState getMouseState();
+	IKeyboardState& getKeyboardState();
+	IJoystickState& getJoystickState() { return *this; }
+	IMouseState& getMouseState() { return *this; }
+
+	// IKeyboardState
+public:
+	virtual bool keydown(GMuint key) override
+	{
+		D(d);
+		return !!(d->keyState[key] & 0x80);
+	}
+
+	// 表示一个键是否按下一次，长按只算是一次
+	virtual bool keyTriggered(GMuint key) override
+	{
+		D(d);
+		return !(d->lastKeyState[key] & 0x80) && (keydown(key));
+	}
+
+	// IJoystickState
+public:
+	virtual void joystickVibrate(GMshort leftMotorSpeed, GMshort rightMotorSpeed) override;
+	virtual GMJoystickState joystickState() override;
+
+	// IMouseState
+public:
+	virtual void initMouse(GMUIWindow* window) override;
+	virtual GMMouseState mouseState() override;
+	virtual void setMouseEnable(bool center) override;
 };
 #endif
 
