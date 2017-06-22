@@ -37,6 +37,7 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	std::queue<Message> msgQueue;
 	std::list<Message> msgBuffer;
 	Bitset filter;
+	GMint tabIndex = 0;
 };
 
 class GMUIConsole : public GMUIGUIWindow, public DuiLib::INotifyUI, public IDebugOutput
@@ -81,8 +82,11 @@ private:
 	void insertText(Data::OutputType type, const GMString& msg);
 	void insertTextToRichEdit(Data::OutputType type, const GMString& msg);
 	void afterCreated();
+	void selectTab(GMint i);
 	void addBuffer(Data::OutputType type, const GMString& msg);
 	void onFilterChanged();
+	void refreshOptFilter();
+	void refreshTabs();
 };
 
 #endif

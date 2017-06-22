@@ -77,9 +77,9 @@ void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 	if (msg.sType == DUI_MSGTYPE_CLICK)
 	{
 		if (msg.pSender == d->optLog)
-			d->tabLayout->SelectItem(0);
+			selectTab(0);
 		else if (msg.pSender == d->optPerformance)
-			d->tabLayout->SelectItem(1);
+			selectTab(1);
 		else
 		{
 			Data::OutputType type;
@@ -96,13 +96,18 @@ void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 			onFilterChanged();
 		}
 	}
+	else if (msg.sType == DUI_MSGTYPE_WINDOWINIT)
+	{
+		refreshTabs();
+		refreshOptFilter();
+	}
 }
 
 void GMUIConsole::afterCreated()
 {
 	D(d);
 	DuiLib::CRichEditUI* re = static_cast<DuiLib::CRichEditUI*> (d->painter->FindControl(ID_EDIT_CONSOLE));
-	ASSERT(re);
+	ASSERT(re);	
 	d->consoleEdit = re;
 	d->consoleEdit->SetBkColor(0);
 
@@ -113,6 +118,14 @@ void GMUIConsole::afterCreated()
 	d->optFltWarning = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_WARNING);
 	d->optFltError = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_ERROR);
 	d->optFltDebug = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_DEBUG);
+}
+
+void GMUIConsole::selectTab(GMint i)
+{
+	D(d);
+	d->tabIndex = i;
+	d->tabLayout->SelectItem(i);
+	refreshTabs();
 }
 
 void GMUIConsole::addBuffer(Data::OutputType type, const GMString& msg)
@@ -127,11 +140,57 @@ void GMUIConsole::addBuffer(Data::OutputType type, const GMString& msg)
 void GMUIConsole::onFilterChanged()
 {
 	D(d);
-	d->consoleEdit->Clear();
+	refreshOptFilter();
+
+	d->consoleEdit->SetText(_L(""));
 	for (auto& msg : d->msgBuffer)
 	{
-		//TODO 遍历enum
 		insertText(msg.type, msg.message);
+	}
+}
+
+void GMUIConsole::refreshTabs()
+{
+	D(d);
+	GMint i = 0;
+	auto tabOptions = { d->optLog, d->optPerformance };
+	for (auto opt : tabOptions)
+	{
+		if (i == d->tabIndex)
+		{
+			opt->SetBorderSize(1);
+			opt->SetBorderColor(0xFFFFFF);
+		}
+		else
+		{
+			opt->SetBorderSize(1);
+			opt->SetBorderColor(0x000000);
+		}
+		i++;
+	}
+}
+
+void GMUIConsole::refreshOptFilter()
+{
+	D(d);
+	std::initializer_list<decltype(Data::Info)> typeList =  { Data::Info,		Data::Warning,		Data::Error,		Data::Debug };
+	std::initializer_list<decltype(d->optFltInfo)> uiList = { d->optFltInfo,	d->optFltWarning,	d->optFltError,		d->optFltDebug };
+	
+	auto iter = uiList.begin();
+	for (auto type : typeList)
+	{
+		DuiLib::COptionUI* opt = const_cast<DuiLib::COptionUI*>(*iter);
+		if (d->filter.isSet(type))
+		{
+			opt->SetBorderSize(1);
+			opt->SetBorderColor(0xFFFFFF);
+		}
+		else
+		{
+			opt->SetBorderSize(1);
+			opt->SetBorderColor(0x000000);
+		}
+		iter++;
 	}
 }
 
