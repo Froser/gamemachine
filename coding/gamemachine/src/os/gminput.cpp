@@ -55,7 +55,7 @@ DWORD XInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibrat
 
 XInputWrapper::~XInputWrapper()
 {
-	FreeLibrary(m_module);
+	::FreeLibrary(m_module);
 }
 
 Input_Windows::Input_Windows()
@@ -67,6 +67,12 @@ Input_Windows::Input_Windows()
 
 Input_Windows::~Input_Windows()
 {
+}
+
+void Input_Windows::update()
+{
+	D(d);
+	::GetKeyboardState(d->keytriggerState);
 }
 
 void Input_Windows::initMouse(GMUIWindow* window)
@@ -115,8 +121,17 @@ void Input_Windows::joystickVibrate(WORD leftMotorSpeed, WORD rightMotorSpeed)
 
 GMKeyboardState Input_Windows::getKeyboardState()
 {
+	D(d);
 	GMKeyboardState state;
 	GetKeyboardState(state.keystate);
+
+	// 如果按下一键键没有松开，这个键处于未触发(not triggered)状态
+	for (GMint i = 0; i < Data::MAX_KEYS; i++)
+	{
+		bool keydown = state.keydown(i);
+		// TODO 判断是否上一帧就看下了等等
+	}
+
 	return std::move(state);
 }
 

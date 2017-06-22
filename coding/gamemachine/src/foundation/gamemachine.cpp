@@ -153,6 +153,7 @@ void GameMachine::startGameMachine()
 			d->gameHandler->event(GM_EVENT_RENDER);
 			d->mainWindow->swapBuffers();
 		}
+		d->inputManager->update();
 		d->clock.update();
 	}
 }

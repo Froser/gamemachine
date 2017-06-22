@@ -172,7 +172,7 @@ public:
 			else if (kbState.keydown('C'))
 				inputManager->joystickVibrate(0, 0);
 
-			if (kbState.keydown('N'))
+			if (kbState.keyTriggered('N'))
 				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
 
 			if (kbState.keydown('I'))

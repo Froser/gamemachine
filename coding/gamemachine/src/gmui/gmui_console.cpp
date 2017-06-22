@@ -173,8 +173,8 @@ void GMUIConsole::refreshTabs()
 void GMUIConsole::refreshOptFilter()
 {
 	D(d);
-	std::initializer_list<decltype(Data::Info)> typeList =  { Data::Info,		Data::Warning,		Data::Error,		Data::Debug };
-	std::initializer_list<decltype(d->optFltInfo)> uiList = { d->optFltInfo,	d->optFltWarning,	d->optFltError,		d->optFltDebug };
+	auto typeList =  { Data::Info,		Data::Warning,		Data::Error,		Data::Debug };
+	auto uiList   =  { d->optFltInfo,	d->optFltWarning,	d->optFltError,		d->optFltDebug };
 	
 	auto iter = uiList.begin();
 	for (auto type : typeList)

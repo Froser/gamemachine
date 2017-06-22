@@ -20,11 +20,18 @@ struct GMJoystickState
 
 struct GMKeyboardState
 {
-	BYTE keystate[256];
+	BYTE keystate[256]{ 0 };
+	bool keytriggerState[256]{ 0 };
 
 	bool keydown(GMuint key)
 	{
 		return !! (keystate[key] & 0x80);
+	}
+
+	// 表示一个键是否按下一次，长按只算是一次
+	bool keyTriggered(GMuint key)
+	{
+		return !! keytriggerState[key];
 	}
 };
 
@@ -56,10 +63,14 @@ private:
 
 GM_PRIVATE_OBJECT(Input_Windows)
 {
+	enum { MAX_KEYS = 256 };
 	bool mouseReady;
 	bool mouseEnabled;
 	GMUIWindow* window;
 	XInputWrapper xinput;
+
+	// 记录上一帧的按键
+	BYTE keytriggerState[MAX_KEYS]{ 0 };
 };
 
 class Input_Windows : public GMObject
@@ -71,6 +82,8 @@ public:
 	~Input_Windows();
 
 public:
+	// 每一帧，应该调用一次update
+	void update();
 	void initMouse(GMUIWindow* window);
 	void setMouseEnable(bool center);
 	GMJoystickState getJoystickState();

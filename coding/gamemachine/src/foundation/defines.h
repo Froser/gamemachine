@@ -58,6 +58,15 @@ typedef int GMint
 typedef short GMshort;
 #endif
 
+// 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
+#define STATIC_ASSERT_SIZE(type, size) static_assert(sizeof(type) == size, "Type '" #type "' size static assert failed. Excepted size is " #size);
+STATIC_ASSERT_SIZE(GMbyte, 1);
+STATIC_ASSERT_SIZE(GMlong, 4);
+STATIC_ASSERT_SIZE(GMint, 4);
+STATIC_ASSERT_SIZE(GMuint, 4);
+STATIC_ASSERT_SIZE(GMfloat, 4);
+STATIC_ASSERT_SIZE(GMLargeInteger, 8);
+
 // 常用函数和工具、常量
 struct GMRect
 {
