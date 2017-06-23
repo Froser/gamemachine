@@ -71,7 +71,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<IGameHandler> gameHandler;
 	AutoPtr<GMGlyphManager> glyphManager;
 	AutoPtr<GMGamePackage> gamePackageManager;
-	AutoPtr<GMInput> inputManager;
+	AutoPtr<IInput> inputManager;
 	AutoPtr<GMConfig> configManager;
 	std::queue<GameMachineMessage> messageQueue;
 	GameMachineWindows windows; // 除主窗口以外的窗口列表
@@ -132,7 +132,7 @@ public:
 	GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
 
 	// HID
-	GMInput* getInputManager() { D(d); return d->inputManager; }
+	IInput* getInputManager() { D(d); return d->inputManager; }
 
 	// 时间管理
 	GMfloat getFPS();

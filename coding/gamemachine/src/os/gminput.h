@@ -29,7 +29,7 @@ struct GMMouseState
 
 GM_INTERFACE(IJoystickState)
 {
-	virtual void joystickVibrate(GMshort leftMotorSpeed, GMshort rightMotorSpeed) = 0;
+	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) = 0;
 	virtual GMJoystickState joystickState() = 0;
 };
 
@@ -88,8 +88,17 @@ GM_PRIVATE_OBJECT(Input_Windows)
 	GMMouseState mouseState;
 };
 
+GM_INTERFACE(IInput)
+{
+	virtual void update() = 0;
+	virtual IKeyboardState& getKeyboardState() = 0;
+	virtual IJoystickState& getJoystickState() = 0;
+	virtual IMouseState& getMouseState() = 0;
+};
+
 class Input_Windows :
 	public GMObject,
+	public IInput,
 	public IKeyboardState,
 	public IJoystickState,
 	public IMouseState
@@ -100,12 +109,14 @@ public:
 	Input_Windows();
 
 public:
-	// 每一帧，应该调用一次update
-	void update();
 
-	IKeyboardState& getKeyboardState();
-	IJoystickState& getJoystickState() { return *this; }
-	IMouseState& getMouseState() { return *this; }
+	// IInput
+public:
+	// 每一帧，应该调用一次update
+	virtual void update() override;
+	virtual IKeyboardState& getKeyboardState() override;
+	virtual IJoystickState& getJoystickState() override { return *this; }
+	virtual IMouseState& getMouseState() override { return *this; }
 
 	// IKeyboardState
 public:
@@ -124,7 +135,7 @@ public:
 
 	// IJoystickState
 public:
-	virtual void joystickVibrate(GMshort leftMotorSpeed, GMshort rightMotorSpeed) override;
+	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
 	virtual GMJoystickState joystickState() override;
 
 	// IMouseState

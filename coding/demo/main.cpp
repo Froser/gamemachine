@@ -63,7 +63,7 @@ public:
 	void start()
 	{
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
-		GMInput* inputManager = GameMachine::instance().getInputManager();
+		IInput* inputManager = GameMachine::instance().getInputManager();
 		inputManager->getMouseState().initMouse(GameMachine::instance().getMainWindow());
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -115,7 +115,7 @@ public:
 			}
 			break;
 		case GM_EVENT_ACTIVATE:
-			GMInput* inputManager = GameMachine::instance().getInputManager();
+			IInput* inputManager = GameMachine::instance().getInputManager();
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
@@ -169,9 +169,9 @@ public:
 				moveTag |= MD_JUMP;
 
 			if (kbState.keyTriggered('V'))
-				inputManager->joystickVibrate(30000, 30000);
+				joyState.joystickVibrate(30000, 30000);
 			else if (kbState.keydown('C'))
-				inputManager->joystickVibrate(0, 0);
+				joyState.joystickVibrate(0, 0);
 
 			if (kbState.keyTriggered('N'))
 				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);

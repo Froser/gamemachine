@@ -43,6 +43,7 @@ BEGIN_NS
 typedef unsigned char GMbyte;
 typedef long GMlong;
 typedef short GMshort;
+typedef unsigned short GMushort;
 typedef wchar_t GMWchar;
 typedef __int64 GMLargeInteger;
 

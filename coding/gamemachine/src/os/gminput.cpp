@@ -109,7 +109,7 @@ GMJoystickState Input_Windows::joystickState()
 	return std::move(result);
 }
 
-void Input_Windows::joystickVibrate(GMshort leftMotorSpeed, GMshort rightMotorSpeed)
+void Input_Windows::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
 {
 	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
