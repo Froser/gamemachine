@@ -35,8 +35,8 @@ LongResult GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	D(d);
 	d->painter->Init(getWindowHandle());
 	DuiLib::CDialogBuilder builder;
-	//CDialogBuilderCallbackEx cb;
-	DuiLib::CControlUI* pRoot = builder.Create(gmui::GMUIConsole::UI, (UINT)0, NULL, d->painter);
+	GMUIDialogBuilder db;
+	DuiLib::CControlUI* pRoot = builder.Create(gmui::GMUIConsole::UI, (UINT)0, &db, d->painter);
 	ASSERT(pRoot && "Failed to parse XML");
 	d->painter->AttachDialog(pRoot);
 	d->painter->AddNotifier(this);
@@ -84,15 +84,15 @@ void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 		{
 			Data::OutputType type;
 			if (msg.pSender == d->optFltInfo)
-				type = Data::Info;
+				type = Data::OutputType::Info;
 			else if (msg.pSender == d->optFltWarning)
-				type = Data::Warning;
+				type = Data::OutputType::Warning;
 			else if (msg.pSender == d->optFltError)
-				type = Data::Error;
+				type = Data::OutputType::Error;
 			else if (msg.pSender == d->optFltDebug)
-				type = Data::Debug;
+				type = Data::OutputType::Debug;
 
-			d->filter.toggle(type);
+			d->filter.toggle((GMint) type);
 			onFilterChanged();
 		}
 	}
@@ -118,6 +118,7 @@ void GMUIConsole::afterCreated()
 	d->optFltWarning = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_WARNING);
 	d->optFltError = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_ERROR);
 	d->optFltDebug = findControl<DuiLib::COptionUI>(d->painter, ID_OPTION_FILTER_DEBUG);
+	d->profileGraph = findControl<GMUIGraph>(d->painter, ID_PROFILE_GRAPH);
 }
 
 void GMUIConsole::selectTab(GMint i)
@@ -173,14 +174,14 @@ void GMUIConsole::refreshTabs()
 void GMUIConsole::refreshOptFilter()
 {
 	D(d);
-	auto typeList =  { Data::Info,		Data::Warning,		Data::Error,		Data::Debug };
-	auto uiList   =  { d->optFltInfo,	d->optFltWarning,	d->optFltError,		d->optFltDebug };
+	auto typeList =  { Data::OutputType::Info,	Data::OutputType::Warning,	Data::OutputType::Error,	Data::OutputType::Debug };
+	auto uiList   =  { d->optFltInfo,			d->optFltWarning,			d->optFltError,				d->optFltDebug };
 	
 	auto iter = uiList.begin();
 	for (auto type : typeList)
 	{
 		DuiLib::COptionUI* opt = const_cast<DuiLib::COptionUI*>(*iter);
-		if (d->filter.isSet(type))
+		if (d->filter.isSet((GMint) type))
 		{
 			opt->SetBorderSize(1);
 			opt->SetBorderColor(0xFFFFFF);
@@ -197,29 +198,29 @@ void GMUIConsole::refreshOptFilter()
 void GMUIConsole::info(const GMString& msg)
 {
 	D(d);
-	addBuffer(Data::Info, msg);
-	insertText(Data::Info, msg);
+	addBuffer(Data::OutputType::Info, msg);
+	insertText(Data::OutputType::Info, msg);
 }
 
 void GMUIConsole::warning(const GMString& msg)
 {
 	D(d);
-	addBuffer(Data::Warning, msg);
-	insertText(Data::Warning, msg);
+	addBuffer(Data::OutputType::Warning, msg);
+	insertText(Data::OutputType::Warning, msg);
 }
 
 void GMUIConsole::error(const GMString& msg)
 {
 	D(d);
-	addBuffer(Data::Error, msg);
-	insertText(Data::Error, msg);
+	addBuffer(Data::OutputType::Error, msg);
+	insertText(Data::OutputType::Error, msg);
 }
 
 void GMUIConsole::debug(const GMString& msg)
 {
 	D(d);
-	addBuffer(Data::Debug, msg);
-	insertText(Data::Debug, msg);
+	addBuffer(Data::OutputType::Debug, msg);
+	insertText(Data::OutputType::Debug, msg);
 }
 
 void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
@@ -227,7 +228,7 @@ void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
 	D(d);
 	if (isWindowVisible())
 	{
-		if (d->filter.isSet(type))
+		if (d->filter.isSet((GMint)type))
 			insertTextToRichEdit(type, msg);
 	}
 	else
@@ -242,16 +243,16 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& ms
 	DWORD color;
 	switch (type)
 	{
-	case GMUIConsolePrivate::Info:
+	case Data::OutputType::Info:
 		color = 0x555555;
 		break;
-	case GMUIConsolePrivate::Warning:
+	case Data::OutputType::Warning:
 		color = 0x00FFFF;
 		break;
-	case GMUIConsolePrivate::Error:
+	case Data::OutputType::Error:
 		color = 0x3300CC;
 		break;
-	case GMUIConsolePrivate::Debug:
+	case Data::OutputType::Debug:
 		color = 0xFF0099;
 		break;
 	default:
@@ -268,6 +269,29 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& ms
 	d->consoleEdit->GetSelectionCharFormat(cf);
 	cf.crTextColor = color;
 	d->consoleEdit->SetSelectionCharFormat(cf);
+}
+
+void GMUIConsole::begin(GMint id, GMint level)
+{
+	D(d);
+}
+
+void GMUIConsole::output(const GMString& name, GMint timeInSecond, GMint id, GMint level)
+{
+	D(d);
+	Data::ProfileInfo info = { name, timeInSecond, id, level };
+	d->profiles[id].push_back(info);
+}
+
+void GMUIConsole::end(GMint id, GMint level)
+{
+	D(d);
+	if (level == 0)
+	{
+		d->profiles[id].clear();
+		// TODO 最后一层PROFILE结束，准备绘制
+		// end很有可能在一个多线程当中，需要考虑线程之间的冲突，如用Event来进行等待
+	}
 }
 
 #endif

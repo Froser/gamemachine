@@ -5,18 +5,27 @@
 #include <queue>
 #include <list>
 #include "foundation/utilities/utilities.h"
+#include "foundation/gmprofile.h"
 BEGIN_NS
 
 #if _WINDOWS
 GM_PRIVATE_OBJECT(GMUIConsole)
 {
-	enum OutputType
+	enum class OutputType
 	{
 		Info = 0,
 		Warning,
 		Error,
 		Debug,
 		EndOfOutputType, //结束标记
+	};
+
+	struct ProfileInfo
+	{
+		GMString name;
+		GMfloat timeInSecond;
+		GMint id;
+		GMint level;
 	};
 
 	struct Message
@@ -33,14 +42,21 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	DuiLib::COptionUI* optFltWarning;
 	DuiLib::COptionUI* optFltError;
 	DuiLib::COptionUI* optFltDebug;
+	GMUIGraph* profileGraph;
 	GMUIPainter* painter;
 	std::queue<Message> msgQueue;
 	std::list<Message> msgBuffer;
 	Bitset filter;
 	GMint tabIndex = 0;
+
+	std::map<GMint, Vector<ProfileInfo> > profiles;
 };
 
-class GMUIConsole : public GMUIGUIWindow, public DuiLib::INotifyUI, public IDebugOutput
+class GMUIConsole :
+	public GMUIGUIWindow,
+	public DuiLib::INotifyUI,
+	public IDebugOutput,
+	public IProfileHandler
 {
 	DECLARE_PRIVATE(GMUIConsole)
 
@@ -54,8 +70,9 @@ private:
 	{
 		D(d);
 		D_BASE(db, Base);
+		GM_PROFILE_HANDLER(this);
 		d->painter = &db->painter;
-		d->filter.init(Data::EndOfOutputType);
+		d->filter.init( (GMint) Data::OutputType::EndOfOutputType);
 		d->filter.setAll();
 	}
 
@@ -72,11 +89,18 @@ public:
 public:
 	virtual void Notify(DuiLib::TNotifyUI& msg) override;
 
+	// IDebugOutput
 public:
 	virtual void info(const GMString& msg) override;
 	virtual void warning(const GMString& msg) override;
 	virtual void error(const GMString& msg) override;
 	virtual void debug(const GMString& msg) override;
+
+	// IProfileHandler
+public:
+	virtual void begin(GMint id, GMint level) override;
+	virtual void output(const GMString& name, GMint timeInSecond, GMint id, GMint level) override;
+	virtual void end(GMint id, GMint level) override;
 
 private:
 	void insertText(Data::OutputType type, const GMString& msg);

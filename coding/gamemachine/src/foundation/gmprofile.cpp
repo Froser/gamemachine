@@ -3,10 +3,11 @@
 #include "foundation/gamemachine.h"
 
 //Profile
-IProfileHandler& GMProfile::handler()
+static IProfileHandler* g_handler = nullptr;
+
+void GMProfile::setHandler(IProfileHandler* handler)
 {
-	static GMConsoleProfileHandler h;
-	return h;
+	g_handler = handler;
 }
 
 GMProfile::GMProfileSessions::GMProfileSession& GMProfile::profileSession()
@@ -18,7 +19,6 @@ GMProfile::GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 GMProfile::GMProfile(const char* name)
 {
 	D(d);
-	d->valid = false;
 	startRecord(name);
 }
 
@@ -30,10 +30,13 @@ GMProfile::~GMProfile()
 void GMProfile::startRecord(const char* name)
 {
 	D(d);
+	GMMutex m;
 	if (!GMGetBuiltIn(RUN_PROFILE))
 		return;
 
 	GMProfileSessions::GMProfileSession& ps = profileSession();
+
+	g_handler->begin(GMThread::getCurrentThreadId(), ps.level);
 	ps.level++;
 
 	d->valid = true;
@@ -44,21 +47,19 @@ void GMProfile::startRecord(const char* name)
 
 void GMProfile::stopRecord()
 {
+	GMMutex m;
 	D(d);
 	d->stopwatch.stop();
 	if (!d->valid)
 		return;
 
-	GMProfileSessions::GMProfileSession& ps = profileSession();
-	GMint level = ps.level;
-	while (--level)
-	{
-		handler().write(" ");
-	}
+	if (!g_handler)
+		return;
 
-	char report[512];
-	sprintf_s(report, "'%s' : %f s\n", d->name, d->stopwatch.timeInSecond());
-	ps.level--;
+	GMProfileSessions::GMProfileSession& ps = profileSession();
+	GMint id = GMThread::getCurrentThreadId();
+	GMint& level = ps.level;
+	g_handler->output(d->name, d->stopwatch.timeInSecond(), id, --level);
+	g_handler->end(id, level);
 	ps.callstack.pop();
-	handler().write(report);
 }

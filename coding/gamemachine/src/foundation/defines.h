@@ -95,6 +95,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #define DEG(rad) rad * (180 / PI)
 #define SQR(a) ((a) * (a))
 #define strEqual(str1, str2) !strcmp(str1, str2)
+#define wstrEqual(str1, str2) !wcscmp(str1, str2)
 #define SAFE_SSCANF(in, format, out)	\
 {										\
 	const char* _str = in;				\

@@ -6,27 +6,20 @@
 BEGIN_NS
 
 #define GM_PROFILE(name) GMProfile __profile(#name)
+#define GM_PROFILE_HANDLER(ptr) GMProfile().setHandler(ptr)
 
-struct IProfileHandler
+GM_INTERFACE(IProfileHandler)
 {
-	virtual ~IProfileHandler() {}
-	virtual void write(const char*) = 0;
-};
-
-class GMConsoleProfileHandler : public IProfileHandler
-{
-public:
-	virtual void write(const char* str) override
-	{
-		printf("%s: ", str);
-	}
+	virtual void begin(GMint id, GMint level) = 0;
+	virtual void output(const GMString& name, GMint timeInSecond, GMint id, GMint level) = 0;
+	virtual void end(GMint id, GMint level) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMProfile)
 {
 	GMStopwatch stopwatch;
 	char name[128];
-	bool valid;
+	bool valid = false;
 };
 
 class GMProfile : public GMObject
@@ -36,7 +29,7 @@ class GMProfile : public GMObject
 		struct GMProfileSession
 		{
 			GMProfileSession() : level(0) {};
-			std::stack<std::string> callstack;
+			std::stack<GMString> callstack;
 			GMint level;
 		};
 
@@ -46,12 +39,15 @@ class GMProfile : public GMObject
 	DECLARE_PRIVATE(GMProfile)
 
 public:
-	static IProfileHandler& handler();
 	static GMProfileSessions::GMProfileSession& profileSession();
 
 public:
+	GMProfile() = default;
 	GMProfile(const char* name);
 	~GMProfile();
+
+public:
+	void setHandler(IProfileHandler* handler);
 
 private:
 	void startRecord(const char* name);

@@ -146,6 +146,8 @@ set(SOURCES
 		foundation/gmstring.cpp
 		gmui/gmui.h
 		gmui/gmui.cpp
+		gmui/gmuicontrols.h
+		gmui/gmuicontrols.cpp
 		gmui/gmui_glwindow.h
 		gmui/gmui_glwindow.cpp
 		gmui/gmui_console.h

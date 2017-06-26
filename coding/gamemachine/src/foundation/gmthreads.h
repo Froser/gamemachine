@@ -2,6 +2,7 @@
 #define __GMTHREADS_H__
 #include "common.h"
 #include "utilities/utilities.h"
+#include <mutex>
 BEGIN_NS
 
 #if _WINDOWS
@@ -146,6 +147,20 @@ public:
 	virtual void onCreateThread(GMThread* thread) override;
 	virtual void beforeRun(GMThread* thread) override;
 	virtual void afterRun(GMThread* thread) override;
+};
+
+GM_PRIVATE_OBJECT(GMMutex)
+{
+	std::mutex mutex;
+};
+
+class GMMutex : public GMObject
+{
+	DECLARE_PRIVATE(GMMutex)
+
+public:
+	GMMutex() { D(d); d->mutex.lock(); }
+	~GMMutex() { D(d); d->mutex.unlock(); }
 };
 
 END_NS
