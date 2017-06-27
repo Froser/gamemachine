@@ -143,16 +143,23 @@ void GameMachine::startGameMachine()
 		if (!handleMessages())
 			break;
 		
+		d->gameHandler->event(GameMachineEvent::FrameStart);
+
 		if (d->gameHandler->isWindowActivate())
-			d->gameHandler->event(GM_EVENT_ACTIVATE);
+			d->gameHandler->event(GameMachineEvent::Activate);
 		else
-			d->gameHandler->event(GM_EVENT_DEACTIVATE);
+			d->gameHandler->event(GameMachineEvent::Deactivate);
 
 		{
 			gmRunSustainedThread (simulateJob, &d->simulateJob);
-			d->gameHandler->event(GM_EVENT_RENDER);
+			d->gameHandler->event(GameMachineEvent::Render);
 			d->mainWindow->swapBuffers();
 		}
+
+		d->gameHandler->event(GameMachineEvent::FrameEnd);
+
+		// 更新所有管理器
+		updateWindows();
 		d->inputManager->update();
 		d->clock.update();
 	}
@@ -212,6 +219,15 @@ void GameMachine::createWindows()
 		GMUIWindowAttributes attrs = window.second;
 		attrs.hwndParent = d->mainWindow->getWindowHandle();
 		window.first->create(attrs);
+	}
+}
+
+void GameMachine::updateWindows()
+{
+	D(d);
+	for (auto& window : d->windows)
+	{
+		window.first->update();
 	}
 }
 

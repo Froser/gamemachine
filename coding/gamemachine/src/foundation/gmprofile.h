@@ -11,7 +11,7 @@ BEGIN_NS
 GM_INTERFACE(IProfileHandler)
 {
 	virtual void begin(GMint id, GMint level) = 0;
-	virtual void output(const GMString& name, GMint timeInSecond, GMint id, GMint level) = 0;
+	virtual void output(const GMString& name, GMfloat timeInSecond, GMint id, GMint level) = 0;
 	virtual void end(GMint id, GMint level) = 0;
 };
 

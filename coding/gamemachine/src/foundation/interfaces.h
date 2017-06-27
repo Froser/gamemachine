@@ -22,12 +22,14 @@ struct GraphicSettings;
 struct TextureFrames;
 struct CameraLookAt;
 
-enum GameMachineEvent
+enum class GameMachineEvent
 {
-	GM_EVENT_SIMULATE,
-	GM_EVENT_RENDER,
-	GM_EVENT_ACTIVATE,
-	GM_EVENT_DEACTIVATE,
+	FrameStart,
+	FrameEnd,
+	Simulate,
+	Render,
+	Activate,
+	Deactivate,
 };
 
 GM_INTERFACE(IGameHandler)

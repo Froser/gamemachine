@@ -75,7 +75,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<GMConfig> configManager;
 	std::queue<GameMachineMessage> messageQueue;
 	GameMachineWindows windows; // 除主窗口以外的窗口列表
-	GameLoopJob<GM_EVENT_SIMULATE> simulateJob;
+	GameLoopJob<GameMachineEvent::Simulate> simulateJob;
 	AUTORELEASE GMUIConsole* consoleWindow; // 内置调试窗口
 };
 
@@ -154,6 +154,7 @@ private:
 	bool handleMessages();
 	void defaultMainWindowAttributes();
 	void createWindows();
+	void updateWindows();
 	void initInner();
 };
 

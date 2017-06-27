@@ -58,6 +58,7 @@ public:
 	virtual GMuint showModal() { return Base::ShowModal(); }
 	virtual void showWindow(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
 	virtual void onFinalMessage(GMUIWindowHandle wndHandle) {}
+	virtual void update() {};
 
 private:
 	virtual GMUIStringPtr getWindowClassName() const = 0;

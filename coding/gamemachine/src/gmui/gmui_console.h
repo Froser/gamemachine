@@ -85,6 +85,7 @@ public:
 	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual LongResult onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual void onFinalMessage(GMUIWindowHandle wndHandle) override;
+	virtual void update();
 
 public:
 	virtual void Notify(DuiLib::TNotifyUI& msg) override;
@@ -99,7 +100,7 @@ public:
 	// IProfileHandler
 public:
 	virtual void begin(GMint id, GMint level) override;
-	virtual void output(const GMString& name, GMint timeInSecond, GMint id, GMint level) override;
+	virtual void output(const GMString& name, GMfloat timeInSecond, GMint id, GMint level) override;
 	virtual void end(GMint id, GMint level) override;
 
 private:

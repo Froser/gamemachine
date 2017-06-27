@@ -273,10 +273,9 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& ms
 
 void GMUIConsole::begin(GMint id, GMint level)
 {
-	D(d);
 }
 
-void GMUIConsole::output(const GMString& name, GMint timeInSecond, GMint id, GMint level)
+void GMUIConsole::output(const GMString& name, GMfloat timeInSecond, GMint id, GMint level)
 {
 	D(d);
 	Data::ProfileInfo info = { name, timeInSecond, id, level };
@@ -285,12 +284,26 @@ void GMUIConsole::output(const GMString& name, GMint timeInSecond, GMint id, GMi
 
 void GMUIConsole::end(GMint id, GMint level)
 {
+}
+
+void GMUIConsole::update()
+{
+	// 在这里更新绘制数据
 	D(d);
-	if (level == 0)
+	if (!isWindowVisible())
+		return;
+
+	d->profileGraph->clearCommands();
+	GMGraphCommand cmd = { GMGraphCommandType::Clear };
+	d->profileGraph->addCommand(cmd);
+	for (auto& profile : d->profiles)
 	{
-		d->profiles[id].clear();
-		// TODO 最后一层PROFILE结束，准备绘制
-		// end很有可能在一个多线程当中，需要考虑线程之间的冲突，如用Event来进行等待
+		for (auto& info : profile.second)
+		{
+			GMGraphCommand cmd = { GMGraphCommandType::Draw_Text, { 0x00, 0x00, 0x00, info.name } };
+			d->profileGraph->addCommand(cmd);
+		}
+		profile.second.clear();
 	}
 }
 

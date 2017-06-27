@@ -91,10 +91,10 @@ public:
 	{
 		switch (evt)
 		{
-		case GM_EVENT_SIMULATE:
+		case GameMachineEvent::Simulate:
 			world->simulateGameWorld();
 			break;
-		case GM_EVENT_RENDER:
+		case GameMachineEvent::Render:
 			world->renderGameWorld();
 			{
 				const PositionState& position = world->getMajorCharacter()->getPositionState();
@@ -114,7 +114,7 @@ public:
 				glyph->setText(str.c_str());
 			}
 			break;
-		case GM_EVENT_ACTIVATE:
+		case GameMachineEvent::Activate:
 			IInput* inputManager = GameMachine::instance().getInputManager();
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
