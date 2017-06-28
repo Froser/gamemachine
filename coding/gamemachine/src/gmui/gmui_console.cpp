@@ -4,10 +4,17 @@
 #	include "gmui_console_ui.h"
 #endif
 
+enum
+{
+	TAB_INDEX_LOG = 0,
+	TAB_INDEX_PERFORMANCE,
+};
+
 GMUIConsole::~GMUIConsole()
 {
 	if (GMDebugger::getDebugOutput() == this)
 		GMDebugger::setDebugOutput(nullptr);
+	GM_PROFILE_CLEAR_HANDLER();
 }
 
 void GMUIConsole::newConsoleWindow(OUT GMUIConsole** out)
@@ -77,9 +84,9 @@ void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 	if (msg.sType == DUI_MSGTYPE_CLICK)
 	{
 		if (msg.pSender == d->optLog)
-			selectTab(0);
+			selectTab(TAB_INDEX_LOG);
 		else if (msg.pSender == d->optPerformance)
-			selectTab(1);
+			selectTab(TAB_INDEX_PERFORMANCE);
 		else
 		{
 			Data::OutputType type;
@@ -275,10 +282,13 @@ void GMUIConsole::begin(GMint id, GMint level)
 {
 }
 
-void GMUIConsole::output(const GMString& name, GMfloat timeInSecond, GMint id, GMint level)
+void GMUIConsole::output(const GMString& name, GMfloat timeInSecond, GMfloat durationSinceStartInSecond, GMint id, GMint level)
 {
 	D(d);
-	Data::ProfileInfo info = { name, timeInSecond, id, level };
+	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
+		return;
+
+	Data::ProfileInfo info = { name, timeInSecond, durationSinceStartInSecond, id, level };
 	d->profiles[id].push_back(info);
 }
 
@@ -289,19 +299,88 @@ void GMUIConsole::end(GMint id, GMint level)
 void GMUIConsole::update()
 {
 	// 在这里更新绘制数据
+	static constexpr GMlong colors[] = {
+		0x0033FF,
+		0x00CC00,
+		0x00CCFF,
+		0x6600CC,
+	};
+	static constexpr decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
+	static constexpr GMint magnification = 5000;
+
 	D(d);
-	if (!isWindowVisible())
+	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
 	d->profileGraph->clearCommands();
+	refreshWindow();
+
 	GMGraphCommand cmd = { GMGraphCommandType::Clear };
 	d->profileGraph->addCommand(cmd);
 	for (auto& profile : d->profiles)
 	{
-		for (auto& info : profile.second)
 		{
-			GMGraphCommand cmd = { GMGraphCommandType::Draw_Text, { 0x00, 0x00, 0x00, info.name } };
+			GMString msg = _L("Thread ") + GMString(profile.first) + _L(": ");
+			GMGraphCommand cmd = { GMGraphCommandType::Draw_Text,{ 0, 0, 0, 0, 0, 0, msg } };
 			d->profileGraph->addCommand(cmd);
+		}
+		{
+			GMGraphCommand cmd = { GMGraphCommandType::Control_Return,{ 12 } };
+			d->profileGraph->addCommand(cmd);
+		}
+		{
+			GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
+			d->profileGraph->addCommand(cmd);
+		}
+
+		for (auto iter = profile.second.rbegin(); iter != profile.second.rend(); iter++)
+		{
+			auto& info = *iter;
+			GMint w = info.durationInSecond * magnification, h = 12;
+			GMint start = info.durationSinceStartInSecond * magnification;
+
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Forward, { start, 0 } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Draw_Text, { 0, 0, 0, 0, 0, 0, info.name } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Return, { 12 } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Forward,{ start, 0 } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				const GMlong& color = colors[info.level % colorLen];
+				GMbyte r = GetRValue(color), g = GetGValue(color), b = GetBValue(color);
+				GMGraphCommand cmd = { GMGraphCommandType::Draw_Rect, { r, g, b, w, h } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Forward,{ 12, 0 } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Draw_Text,{ { 0, 0, 0 }, GMString(info.durationInSecond * 1000) + _L("ms") } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Return, { 24 } };
+				d->profileGraph->addCommand(cmd);
+			}
+			{
+				GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
+				d->profileGraph->addCommand(cmd);
+			}
 		}
 		profile.second.clear();
 	}

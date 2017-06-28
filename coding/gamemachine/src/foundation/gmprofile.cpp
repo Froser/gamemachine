@@ -10,13 +10,18 @@ void GMProfile::setHandler(IProfileHandler* handler)
 	g_handler = handler;
 }
 
+void GMProfile::clearHandler()
+{
+	setHandler(nullptr);
+}
+
 GMProfile::GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 {
 	static GMProfileSessions s;
 	return s.sessions[GMThread::getCurrentThreadId()];
 }
 
-GMProfile::GMProfile(const char* name)
+GMProfile::GMProfile(const GMString& name)
 {
 	D(d);
 	startRecord(name);
@@ -27,21 +32,25 @@ GMProfile::~GMProfile()
 	stopRecord();
 }
 
-void GMProfile::startRecord(const char* name)
+void GMProfile::startRecord(const GMString& name)
 {
 	D(d);
 	GMMutex m;
+	static GMLargeInteger frequency = GMClock::highResolutionTimerFrequency();
 	if (!GMGetBuiltIn(RUN_PROFILE))
 		return;
 
 	GMProfileSessions::GMProfileSession& ps = profileSession();
-
 	g_handler->begin(GMThread::getCurrentThreadId(), ps.level);
-	ps.level++;
 
 	d->valid = true;
-	strcpy_s(d->name, name);
-	ps.callstack.push(d->name);
+	d->name = name;
+	GMLargeInteger now = GMClock::highResolutionTimer();
+	if (ps.firstProfileTimeInCycle == 0)
+		ps.firstProfileTimeInCycle = now;
+	d->durationSinceLastProfile = (now - ps.firstProfileTimeInCycle) / (GMfloat) frequency;
+
+	ps.level++;
 	d->stopwatch.start();
 }
 
@@ -59,7 +68,8 @@ void GMProfile::stopRecord()
 	GMProfileSessions::GMProfileSession& ps = profileSession();
 	GMint id = GMThread::getCurrentThreadId();
 	GMint& level = ps.level;
-	g_handler->output(d->name, d->stopwatch.timeInSecond(), id, --level);
+	g_handler->output(d->name, d->stopwatch.timeInSecond(), d->durationSinceLastProfile, id, --level);
 	g_handler->end(id, level);
-	ps.callstack.pop();
+	if (!level)
+		ps.firstProfileTimeInCycle = 0;
 }

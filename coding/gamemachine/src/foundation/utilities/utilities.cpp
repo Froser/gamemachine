@@ -152,6 +152,19 @@ GMLargeInteger GMStopwatch::timeInCycle()
 	return d->end - d->start;
 }
 
+GMfloat GMStopwatch::nowInSecond()
+{
+	D(d);
+	return nowInCycle() / (GMfloat)d->frequency;
+}
+
+GMLargeInteger GMStopwatch::nowInCycle()
+{
+	D(d);
+	auto now = GMClock::highResolutionTimer();
+	return now - d->start;
+}
+
 //Plane
 #define EPSILON 0.01f
 

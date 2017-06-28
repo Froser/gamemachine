@@ -62,6 +62,24 @@ GMString::GMString(const std::wstring& s)
 	d->str.clear();
 }
 
+GMString::GMString(const GMfloat f)
+{
+	D(d);
+	d->type = Data::WideChars;
+	GMWchar buffer[128] = { 0 };
+	swprintf_s(buffer, _L("%f"), f);
+	d->wstr = buffer;
+}
+
+GMString::GMString(const GMint i)
+{
+	D(d);
+	d->type = Data::WideChars;
+	GMWchar buffer[128] = { 0 };
+	swprintf_s(buffer, _L("%i"), i);
+	d->wstr = buffer;
+}
+
 bool GMString::operator == (const GMString& str) const
 {
 	D(d);

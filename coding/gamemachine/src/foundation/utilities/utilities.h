@@ -376,6 +376,8 @@ public:
 	void stop();
 	GMfloat timeInSecond();
 	GMLargeInteger timeInCycle();
+	GMfloat nowInSecond();
+	GMLargeInteger nowInCycle();
 };
 
 //Plane

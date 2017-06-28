@@ -10,22 +10,19 @@
 
 BEGIN_NS
 
-GM_INTERFACE(IUIGraph)
-{
-	virtual void clear() = 0;
-	virtual void drawText(const GMString& str) = 0;
-};
-
 enum class GMGraphCommandType
 {
-	Clear,
-	Draw_Text,
-	Draw_Rect,
+	Clear, // 清屏
+	Control_Return, // 换行
+	Control_Enter, // 回车
+	Control_Forward, // 前行
+	Draw_Text, // 绘制文本
+	Draw_Rect, // 绘制矩形
 };
 
 struct GMGraphCommandArgs
 {
-	GMbyte color[3];
+	GMlong data[6];
 	GMString text;
 };
 
@@ -33,6 +30,12 @@ struct GMGraphCommand
 {
 	GMGraphCommandType type;
 	GMGraphCommandArgs args;
+};
+
+GM_INTERFACE(IUIGraph)
+{
+	virtual void addCommand(GMGraphCommand& cmd) = 0;
+	virtual void clearCommands() = 0;
 };
 
 #if _WINDOWS
@@ -53,22 +56,20 @@ class GMUIGraph : public GMObject, public DuiLib::CControlUI, public IUIGraph
 public:
 	GMUIGraph() = default;
 
-	// IUIGraph
-public:
-	virtual void clear() override;
-	virtual void drawText(const GMString& str) override;
-
 	// DuiLib::CControlUI
 public:
 	virtual bool DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStopControl) override;
 
+	// IUIGraph
 public:
-	void addCommand(GMGraphCommand& cmd) { D(d); d->drawCmd.push_back(cmd); }
-	void clearCommands() { D(d); d->drawCmd.clear(); }
+	virtual void addCommand(GMGraphCommand& cmd) override { D(d); d->drawCmd.push_back(cmd); }
+	virtual void clearCommands() override { D(d); d->drawCmd.clear(); }
 
 private:
 	void drawGraph(HDC hDC, const RECT& rcPaint);
 	void drawCommand(const GMGraphCommand& cmd, HDC hDC, const RECT& rcPaint);
+	void setPenPosition(GMint x, GMint y);
+	void movePenPosition(GMint x, GMint y);
 };
 
 class GMUIDialogBuilder : public DuiLib::IDialogBuilderCallback

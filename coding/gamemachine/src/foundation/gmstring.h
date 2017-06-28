@@ -40,6 +40,8 @@ public:
 	GMString(const GMWchar* c);
 	GMString(const std::string& s);
 	GMString(const std::wstring& s);
+	GMString(const GMfloat f);
+	GMString(const GMint i);
 
 public:
 	bool operator == (const GMString& str) const;

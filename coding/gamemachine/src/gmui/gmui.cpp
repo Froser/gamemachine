@@ -7,7 +7,6 @@
 
 bool GMUIWindow::handleMessage()
 {
-	GM_PROFILE(handleMessage);
 	return DuiLib::CPaintManagerUI::HandleMessage();
 }
 
@@ -42,6 +41,13 @@ void GMUIGUIWindow::hideWindow()
 bool GMUIGUIWindow::isWindowVisible()
 {
 	return !! ::IsWindowVisible(getWindowHandle());
+}
+
+void GMUIGUIWindow::refreshWindow()
+{
+	RECT rc;
+	::GetClientRect(getWindowHandle(), &rc);
+	::InvalidateRect(getWindowHandle(), &rc, TRUE);
 }
 
 LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam)

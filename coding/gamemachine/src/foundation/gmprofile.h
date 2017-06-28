@@ -5,21 +5,23 @@
 #include <stack>
 BEGIN_NS
 
-#define GM_PROFILE(name) GMProfile __profile(#name)
+#define GM_PROFILE(name) GMProfile __profile(_L(#name))
 #define GM_PROFILE_HANDLER(ptr) GMProfile().setHandler(ptr)
+#define GM_PROFILE_CLEAR_HANDLER() GMProfile().clearHandler()
 
 GM_INTERFACE(IProfileHandler)
 {
 	virtual void begin(GMint id, GMint level) = 0;
-	virtual void output(const GMString& name, GMfloat timeInSecond, GMint id, GMint level) = 0;
+	virtual void output(const GMString& name, GMfloat timeInSecond, GMfloat durationSinceStartInSecond, GMint id, GMint level) = 0;
 	virtual void end(GMint id, GMint level) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMProfile)
 {
 	GMStopwatch stopwatch;
-	char name[128];
+	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
 	bool valid = false;
+	GMString name;
 };
 
 class GMProfile : public GMObject
@@ -29,8 +31,8 @@ class GMProfile : public GMObject
 		struct GMProfileSession
 		{
 			GMProfileSession() : level(0) {};
-			std::stack<GMString> callstack;
 			GMint level;
+			GMLargeInteger firstProfileTimeInCycle = 0;
 		};
 
 		std::map<GMThreadId, GMProfileSession> sessions;
@@ -43,14 +45,15 @@ public:
 
 public:
 	GMProfile() = default;
-	GMProfile(const char* name);
+	GMProfile(const GMString& name);
 	~GMProfile();
 
 public:
 	void setHandler(IProfileHandler* handler);
+	void clearHandler();
 
 private:
-	void startRecord(const char* name);
+	void startRecord(const GMString&  name);
 	void stopRecord();
 };
 

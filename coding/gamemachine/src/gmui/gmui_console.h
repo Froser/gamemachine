@@ -6,6 +6,7 @@
 #include <list>
 #include "foundation/utilities/utilities.h"
 #include "foundation/gmprofile.h"
+#include "gmuicontrols.h"
 BEGIN_NS
 
 #if _WINDOWS
@@ -23,7 +24,8 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	struct ProfileInfo
 	{
 		GMString name;
-		GMfloat timeInSecond;
+		GMfloat durationInSecond;
+		GMfloat durationSinceStartInSecond;
 		GMint id;
 		GMint level;
 	};
@@ -42,7 +44,7 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	DuiLib::COptionUI* optFltWarning;
 	DuiLib::COptionUI* optFltError;
 	DuiLib::COptionUI* optFltDebug;
-	GMUIGraph* profileGraph;
+	IUIGraph* profileGraph;
 	GMUIPainter* painter;
 	std::queue<Message> msgQueue;
 	std::list<Message> msgBuffer;
@@ -100,7 +102,7 @@ public:
 	// IProfileHandler
 public:
 	virtual void begin(GMint id, GMint level) override;
-	virtual void output(const GMString& name, GMfloat timeInSecond, GMint id, GMint level) override;
+	virtual void output(const GMString& name, GMfloat timeInSecond, GMfloat durationSinceLast, GMint id, GMint level) override;
 	virtual void end(GMint id, GMint level) override;
 
 private:

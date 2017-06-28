@@ -316,8 +316,6 @@ void GMBSPGameWorld::drawFaces()
 	clearBuffer();
 
 	{
-		GM_PROFILE(drawFaces_Jobs);
-
 		gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
 		gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
 		gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
