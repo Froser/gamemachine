@@ -2,11 +2,12 @@
 #define __GMUICONTROLS_H__
 #include "common.h"
 #include <queue>
+#include "foundation/vector.h"
+#include "gmui.h"
 
 #if _WINDOWS
 #	include "uilib.h"
 #endif
-#include "foundation/vector.h"
 
 BEGIN_NS
 
@@ -34,16 +35,30 @@ struct GMGraphCommand
 
 GM_INTERFACE(IUIGraph)
 {
-	virtual void addCommand(GMGraphCommand& cmd) = 0;
-	virtual void clearCommands() = 0;
+	virtual void beginDraw() = 0;
+	virtual void endDraw() = 0;
+	virtual void clearGraph() = 0;
+	virtual void drawText(const GMString& msg) = 0;
+	virtual void drawRect(GMlong rgb, GMint width, GMint height) = 0;
+	virtual void penEnter() = 0;
+	virtual void penReturn(GMint yOffset) = 0;
+	virtual void penForward(GMint xOffset, GMint yOffset) = 0;
+};
+
+struct GMUIGraphGuard
+{
+	GMUIGraphGuard(IUIGraph* _g) : g(_g) { g->beginDraw(); }
+	~GMUIGraphGuard() { g->endDraw(); }
+private:
+	IUIGraph* g;
 };
 
 #if _WINDOWS
 
 GM_PRIVATE_OBJECT(GMUIGraph)
 {
+	GMUIGUIWindow* parentWindow = nullptr;
 	Vector<GMGraphCommand> drawCmd;
-
 	GMint currentPos[2] = { 0, 0 };
 };
 
@@ -54,7 +69,7 @@ class GMUIGraph : public GMObject, public DuiLib::CControlUI, public IUIGraph
 	typedef DuiLib::CControlUI Base;
 
 public:
-	GMUIGraph() = default;
+	GMUIGraph(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; }
 
 	// DuiLib::CControlUI
 public:
@@ -62,18 +77,35 @@ public:
 
 	// IUIGraph
 public:
-	virtual void addCommand(GMGraphCommand& cmd) override { D(d); d->drawCmd.push_back(cmd); }
-	virtual void clearCommands() override { D(d); d->drawCmd.clear(); }
+	virtual void beginDraw() override { D(d); d->drawCmd.clear(); }
+	virtual void endDraw() override { D(d); d->parentWindow->refreshWindow(); };
+	virtual void clearGraph() override;
+	virtual void drawText(const GMString& msg) override;
+	virtual void drawRect(GMlong rgb, GMint width, GMint height) override;
+	virtual void penEnter() override;
+	virtual void penReturn(GMint yOffset) override;
+	virtual void penForward(GMint xOffset, GMint yOffset) override;
 
 private:
+	void addCommand(GMGraphCommand& cmd) { D(d); d->drawCmd.push_back(cmd); }
 	void drawGraph(HDC hDC, const RECT& rcPaint);
 	void drawCommand(const GMGraphCommand& cmd, HDC hDC, const RECT& rcPaint);
 	void setPenPosition(GMint x, GMint y);
 	void movePenPosition(GMint x, GMint y);
 };
 
+GM_PRIVATE_OBJECT(GMUIDialogBuilder)
+{
+	GMUIGUIWindow* parentWindow;
+};
+
 class GMUIDialogBuilder : public DuiLib::IDialogBuilderCallback
 {
+	DECLARE_PRIVATE(GMUIDialogBuilder)
+
+public:
+	GMUIDialogBuilder(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; }
+
 public:
 	virtual DuiLib::CControlUI* CreateControl(LPCTSTR pstrClass);
 };

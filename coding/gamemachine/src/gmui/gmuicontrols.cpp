@@ -110,14 +110,52 @@ bool GMUIGraph::DoPaint(HDC hDC, const RECT& rcPaint, DuiLib::CControlUI* pStopC
 	return Base::DoPaint(hDC, rcPaint, pStopControl);
 }
 
+
+void GMUIGraph::clearGraph()
+{
+	GMGraphCommand cmd = { GMGraphCommandType::Clear };
+	addCommand(cmd);
+}
+
+void GMUIGraph::drawText(const GMString& msg)
+{
+	GMGraphCommand cmd = { GMGraphCommandType::Draw_Text,{ 0, 0, 0, 0, 0, 0, msg } };
+	addCommand(cmd);
+}
+
+void GMUIGraph::drawRect(GMlong rgb, GMint width, GMint height)
+{
+	GMbyte r = GetRValue(rgb), g = GetGValue(rgb), b = GetBValue(rgb);
+	GMGraphCommand cmd = { GMGraphCommandType::Draw_Rect,{ r, g, b, width, height } };
+	addCommand(cmd);
+}
+
+void GMUIGraph::penEnter()
+{
+	GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
+	addCommand(cmd);
+}
+
+void GMUIGraph::penReturn(GMint yOffset)
+{
+	GMGraphCommand cmd = { GMGraphCommandType::Control_Return,{ yOffset } };
+	addCommand(cmd);
+}
+
+void GMUIGraph::penForward(GMint xOffset, GMint yOffset)
+{
+	GMGraphCommand cmd = { GMGraphCommandType::Control_Forward,{ xOffset, yOffset } };
+	addCommand(cmd);
+}
+
 DuiLib::CControlUI* GMUIDialogBuilder::CreateControl(LPCTSTR pstrClass)
 {
+	D(d);
 	if (wstrEqual(pstrClass, _L("GMGraph")))
 	{
-		return new GMUIGraph();
+		return new GMUIGraph(d->parentWindow);
 	}
 	ASSERT(false);
 	return nullptr;
 }
-
 #endif

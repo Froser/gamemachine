@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmui_console.h"
+#include "foundation/gamemachine.h"
 #if _WINDOWS
 #	include "gmui_console_ui.h"
 #endif
@@ -42,7 +43,7 @@ LongResult GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	D(d);
 	d->painter->Init(getWindowHandle());
 	DuiLib::CDialogBuilder builder;
-	GMUIDialogBuilder db;
+	GMUIDialogBuilder db(this);
 	DuiLib::CControlUI* pRoot = builder.Create(gmui::GMUIConsole::UI, (UINT)0, &db, d->painter);
 	ASSERT(pRoot && "Failed to parse XML");
 	d->painter->AttachDialog(pRoot);
@@ -319,77 +320,42 @@ void GMUIConsole::update()
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
-	d->profileGraph->clearCommands();
-	refreshWindow();
+	GMUIGraphGuard guard(d->profileGraph);
+	d->profileGraph->clearGraph();
 
-	GMGraphCommand cmd = { GMGraphCommandType::Clear };
-	d->profileGraph->addCommand(cmd);
+	if (!GMGetBuiltIn(RUN_PROFILE))
+	{
+		d->profileGraph->drawText(_L("Profile function disabled. "));
+		return;
+	}
+
 	for (auto& profile : d->profiles)
 	{
-		{
-			GMString msg = _L("Thread ") + GMString(profile.first) + _L(": ");
-			GMGraphCommand cmd = { GMGraphCommandType::Draw_Text,{ 0, 0, 0, 0, 0, 0, msg } };
-			d->profileGraph->addCommand(cmd);
-		}
-		{
-			GMGraphCommand cmd = { GMGraphCommandType::Control_Return,{ 12 } };
-			d->profileGraph->addCommand(cmd);
-		}
-		{
-			GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
-			d->profileGraph->addCommand(cmd);
-		}
+		d->profileGraph->drawText(_L("Thread ") + GMString(profile.first) + _L(": "));
+		d->profileGraph->penReturn(12);
+		d->profileGraph->penEnter();
 
 		for (auto& info : profile.second)
 		{
 			GMint w = info.durationInSecond * magnification, h = 12;
 			GMint start = info.durationSinceStartInSecond * magnification;
 
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Forward, { start, 0 } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Draw_Text, { 0, 0, 0, 0, 0, 0, info.name } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Return, { 12 } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Forward,{ start, 0 } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				const GMlong& color = colors[info.level % colorLen];
-				GMbyte r = GetRValue(color), g = GetGValue(color), b = GetBValue(color);
-				GMGraphCommand cmd = { GMGraphCommandType::Draw_Rect, { r, g, b, w, h } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Forward,{ 12, 0 } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Draw_Text,{ { 0, 0, 0 }, GMString(info.durationInSecond * 1000) + _L("ms") } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Return, { 24 } };
-				d->profileGraph->addCommand(cmd);
-			}
-			{
-				GMGraphCommand cmd = { GMGraphCommandType::Control_Enter };
-				d->profileGraph->addCommand(cmd);
-			}
+			d->profileGraph->penForward(start, 0);
+			d->profileGraph->drawText(info.name);
+			d->profileGraph->penReturn(12);
+			d->profileGraph->penEnter();
+			d->profileGraph->penForward(start, 0);
+
+			const GMlong& color = colors[info.level % colorLen];
+			d->profileGraph->drawRect(color, w, h);
+			d->profileGraph->penForward(12, 0);
+			d->profileGraph->drawText(GMString(info.durationInSecond * 1000) + _L("ms"));
+			d->profileGraph->penReturn(24);
+			d->profileGraph->penEnter();
 		}
 		profile.second.clear();
 	}
+	d->profileGraph->endDraw();
 }
 
 #endif

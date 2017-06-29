@@ -5,7 +5,6 @@
 #if _WINDOWS
 #	include <windef.h>
 #	include "uilib.h"
-#	include "gmuicontrols.h"
 
 typedef DuiLib::CWindowWnd GMUIWindowBase;
 typedef DuiLib::CPaintManagerUI GMUIPainter;
