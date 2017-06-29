@@ -101,9 +101,8 @@ public:
 
 	// IProfileHandler
 public:
-	virtual void begin(GMint id, GMint level) override;
-	virtual void output(const GMString& name, GMfloat timeInSecond, GMfloat durationSinceLast, GMint id, GMint level) override;
-	virtual void end(GMint id, GMint level) override;
+	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMint id, GMint level) override;
+	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMint id, GMint level) override;
 
 private:
 	void insertText(Data::OutputType type, const GMString& msg);

@@ -278,22 +278,28 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& ms
 	d->consoleEdit->SetSelectionCharFormat(cf);
 }
 
-void GMUIConsole::begin(GMint id, GMint level)
-{
-}
-
-void GMUIConsole::output(const GMString& name, GMfloat timeInSecond, GMfloat durationSinceStartInSecond, GMint id, GMint level)
+void GMUIConsole::beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMint id, GMint level)
 {
 	D(d);
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
-	Data::ProfileInfo info = { name, timeInSecond, durationSinceStartInSecond, id, level };
+	Data::ProfileInfo info = { name, 0, durationSinceStartInSecond, id, level };
 	d->profiles[id].push_back(info);
 }
 
-void GMUIConsole::end(GMint id, GMint level)
+void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMint id, GMint level)
 {
+	D(d);
+	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
+		return;
+
+	auto& infos = d->profiles[id];
+	auto& targetInfo = std::find_if(infos.begin(), infos.end(), [id, level, &name](auto& info) {
+		return info.name == name && info.id == id && info.level == level;
+	});
+	ASSERT(targetInfo != infos.end());
+	targetInfo->durationInSecond = elapsedInSecond;
 }
 
 void GMUIConsole::update()
@@ -307,6 +313,7 @@ void GMUIConsole::update()
 	};
 	static constexpr decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
 	static constexpr GMint magnification = 5000;
+	GM_PROFILE_RESET_TIMELINE();
 
 	D(d);
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
@@ -333,9 +340,8 @@ void GMUIConsole::update()
 			d->profileGraph->addCommand(cmd);
 		}
 
-		for (auto iter = profile.second.rbegin(); iter != profile.second.rend(); iter++)
+		for (auto& info : profile.second)
 		{
-			auto& info = *iter;
 			GMint w = info.durationInSecond * magnification, h = 12;
 			GMint start = info.durationSinceStartInSecond * magnification;
 

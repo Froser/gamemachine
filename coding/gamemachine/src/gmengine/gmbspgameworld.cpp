@@ -303,7 +303,6 @@ void GMBSPGameWorld::drawAll()
 
 void GMBSPGameWorld::drawSky()
 {
-	GM_PROFILE(drawSky);
 	D(d);
 	if (d->sky)
 		GameMachine::instance().getGraphicEngine()->drawObject(d->sky);
