@@ -109,6 +109,13 @@ GMJoystickState Input_Windows::joystickState()
 	return std::move(result);
 }
 
+void Input_Windows::setIMEState(bool enabled)
+{
+	D(d);
+	HIMC hImc = ImmGetContext(d->window->getWindowHandle());
+	::ImmSetOpenStatus(hImc, enabled);
+}
+
 void Input_Windows::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
 {
 	D(d);

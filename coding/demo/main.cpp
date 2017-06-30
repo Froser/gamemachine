@@ -65,6 +65,8 @@ public:
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
 		IInput* inputManager = GameMachine::instance().getInputManager();
 		inputManager->getMouseState().initMouse(GameMachine::instance().getMainWindow());
+		inputManager->getKeyboardState().setIMEState(false);
+
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
@@ -80,6 +82,7 @@ public:
 		glyph = new GMGlyphObject();
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
+
 
 		//GMBuffer bg;
 		//pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);

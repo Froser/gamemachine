@@ -37,6 +37,7 @@ GM_INTERFACE(IKeyboardState)
 {
 	virtual bool keydown(GMuint key) = 0;
 	virtual bool keyTriggered(GMuint key) = 0;
+	virtual void setIMEState(bool enabled) = 0;
 };
 
 GM_INTERFACE(IMouseState)
@@ -137,6 +138,7 @@ public:
 public:
 	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
 	virtual GMJoystickState joystickState() override;
+	virtual void setIMEState(bool enabled) override;
 
 	// IMouseState
 public:
