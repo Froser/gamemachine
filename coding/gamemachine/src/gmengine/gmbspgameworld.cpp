@@ -15,19 +15,51 @@
 
 // Multi-threads
 BEGIN_NS
-struct DrawPolygonFaceJob : public GMSustainedThread
+
+template <typename T>
+static void vectorPushBack(Vector<T>& vector, T obj)
 {
-	DrawPolygonFaceJob(GMBSPGameWorld* w)
+	GMMutex m;
+	vector.push_back(obj);
+}
+
+// 分为若干个小工作
+struct DrawPiece : public GMSustainedThread
+{
+	DrawPiece(GMBSPGameWorld* w)
 		: world(w)
 	{
 	}
-	
+
+	void setStart(GMuint start)
+	{
+		s = start;
+	}
+
+	void setEnd(GMuint end)
+	{
+		e = end;
+	}
+
+protected:
+	GMBSPGameWorld* world;
+	GMuint s = 0, e = 0;
+};
+
+struct DrawPolygonFacePiece : public DrawPiece
+{
+	DrawPolygonFacePiece(GMBSPGameWorld* w)
+		: DrawPiece(w)
+	{
+	}
+
 	virtual void sustainedRun() override
 	{
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
-		for (auto i : renderData.polygonIndices)
+		for (GMuint x = s; x < e; )
 		{
+			auto i = renderData.polygonIndices[x];
 			if (renderData.facesToDraw.isSet(i))
 			{
 				if (renderData.faceDirectory[i].faceType == 0)
@@ -36,11 +68,9 @@ struct DrawPolygonFaceJob : public GMSustainedThread
 				if (renderData.faceDirectory[i].faceType == MST_PLANAR)
 					world->drawPolygonFace(renderData.faceDirectory[i].typeFaceNumber);
 			}
+			GMInterlock::increment(&x);
 		}
 	}
-
-private:
-	GMBSPGameWorld* world;
 };
 
 struct DrawMeshFaceJob : public GMSustainedThread
@@ -131,21 +161,29 @@ GMBSPGameWorld::GMBSPGameWorld()
 	d->physics.reset(new GMBSPPhysicsWorld(this));
 
 	// 初始化工作线程
-	d->drawPolygonFaceJob = new DrawPolygonFaceJob(this);
 	d->drawMeshFaceJob = new DrawMeshFaceJob(this);
 	d->drawPatchJob = new DrawPatchJob(this);
 	d->drawEntityJob = new DrawEntityJob(this);
 
-	d->drawPolygonFaceJob->start();
 	d->drawMeshFaceJob->start();
 	d->drawPatchJob->start();
 	d->drawEntityJob->start();
+
+	for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
+	{
+		d->drawPolygonFacePieces[i] = new DrawPolygonFacePiece(this);
+		d->drawPolygonFacePieces[i]->start();
+	}
 }
 
 GMBSPGameWorld::~GMBSPGameWorld()
 {
 	D(d);
-	delete d->drawPolygonFaceJob;
+	for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
+	{
+		delete d->drawPolygonFacePieces[i];
+	}
+
 	delete d->drawMeshFaceJob;
 	delete d->drawPatchJob;
 	delete d->drawEntityJob;
@@ -315,10 +353,34 @@ void GMBSPGameWorld::drawFaces()
 	clearBuffer();
 
 	{
-		gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
-		gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
-		gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
-		gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
+		SustainedThreadRunGuard guard;
+
+		{
+			GMuint start = 0;
+			GMBSPRenderData& rd = renderData();
+			GMuint eachGroupCount = rd.polygonIndices.size() / DRAW_PIECE_COUNT;
+			for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
+			{
+				GMuint end = start + eachGroupCount;
+				if (i == DRAW_PIECE_COUNT - 1)
+					end = rd.polygonIndices.size();
+
+				d->drawPolygonFacePieces[i]->setStart(start);
+				d->drawPolygonFacePieces[i]->setEnd(end);
+				guard.add(d->drawPolygonFacePieces[i]);
+				start = end;
+			}
+
+			for (auto& piece : d->drawPolygonFacePieces)
+			{
+				guard.trigger(piece);
+			}
+		}
+
+		//gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
+		//gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
+		//gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
+		//gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
 	}
 
 	flushBuffer();
@@ -455,7 +517,7 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	ASSERT(obj);
-	d->polygonFaceBuffer.push_back(obj);
+	vectorPushBack<GMGameObject*>(d->polygonFaceBuffer, obj);
 }
 
 void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)

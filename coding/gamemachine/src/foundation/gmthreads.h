@@ -118,11 +118,46 @@ private:
 	GMSustainedThread* th;
 };
 
+GM_PRIVATE_OBJECT(GMMutex)
+{
+	std::mutex mutex;
+};
+
+class GMMutex : public GMObject
+{
+	DECLARE_PRIVATE(GMMutex)
+
+public:
+	GMMutex() { D(d); d->mutex.lock(); }
+	~GMMutex() { D(d); d->mutex.unlock(); }
+};
+
 #if MULTI_THREAD
 #	define gmRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
 #else
 #	define gmRunSustainedThread(name, thread) (thread)->sustainedRun();
 #endif
+
+GM_PRIVATE_OBJECT(SustainedThreadRunGuard)
+{
+	Vector<GMSustainedThread*> threads;
+};
+
+class SustainedThreadRunGuard : public GMObject
+{
+	DECLARE_PRIVATE(SustainedThreadRunGuard)
+
+public:
+	SustainedThreadRunGuard() = default;
+	void add(GMSustainedThread* t) { GMMutex m; D(d); d->threads.push_back(t); }
+
+#if MULTI_THREAD
+	~SustainedThreadRunGuard() { GMMutex m; D(d); for (auto& thread : d->threads) { thread->wait(); } }
+	void trigger(GMSustainedThread* t) { GMMutex m; D(d); for (auto& thread : d->threads) { thread->trigger(); } }
+#else
+	void trigger(GMSustainedThread* t) { for (auto& thread : d->threads) { thread->sustainedRun(); } }
+#endif
+};
 
 // GMJobPool
 GM_PRIVATE_OBJECT(GMJobPool)
@@ -149,18 +184,10 @@ public:
 	virtual void afterRun(GMThread* thread) override;
 };
 
-GM_PRIVATE_OBJECT(GMMutex)
+class GMInterlock : public GMObject
 {
-	std::mutex mutex;
-};
-
-class GMMutex : public GMObject
-{
-	DECLARE_PRIVATE(GMMutex)
-
 public:
-	GMMutex() { D(d); d->mutex.lock(); }
-	~GMMutex() { D(d); d->mutex.unlock(); }
+	static GMuint increment(GMuint* i) { return ::InterlockedIncrement(i); }
 };
 
 END_NS
