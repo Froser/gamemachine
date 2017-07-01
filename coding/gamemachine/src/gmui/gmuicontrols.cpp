@@ -31,6 +31,7 @@ void GMUIGraph::drawCommand(const GMGraphCommand& cmd, HDC hDC, const RECT& rcPa
 			DuiLib::CRenderEngine::DrawGradient(hDC, rc, 0xFFFFFFFF, 0xFFFFFFFF, true, 8);
 			RECT pos = this->GetClientPos();
 			setPenPosition(MARGIN + pos.left, MARGIN + pos.top);
+			d->currentPos[0] = d->currentPos[1] = 0;
 			break;
 		}
 	case GMGraphCommandType::Control_Return:

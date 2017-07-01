@@ -59,7 +59,7 @@ GM_PRIVATE_OBJECT(GMUIGraph)
 {
 	GMUIGUIWindow* parentWindow = nullptr;
 	Vector<GMGraphCommand> drawCmd;
-	GMint currentPos[2] = { 0, 0 };
+	GMint currentPos[2];
 };
 
 class GMUIGraph : public GMObject, public DuiLib::CControlUI, public IUIGraph
@@ -69,7 +69,7 @@ class GMUIGraph : public GMObject, public DuiLib::CControlUI, public IUIGraph
 	typedef DuiLib::CControlUI Base;
 
 public:
-	GMUIGraph(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; }
+	GMUIGraph(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; d->currentPos[0] = d->currentPos[1] = 0; }
 
 	// DuiLib::CControlUI
 public:

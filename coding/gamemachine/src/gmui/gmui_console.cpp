@@ -298,7 +298,7 @@ void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMin
 		return;
 
 	auto& infos = d->profiles[id];
-	auto& targetInfo = std::find_if(infos.begin(), infos.end(), [id, level, &name](auto& info) {
+	auto& targetInfo = std::find_if(infos.begin(), infos.end(), [id, level, &name](Data::ProfileInfo& info) {
 		return info.name == name && info.id == id && info.level == level;
 	});
 	ASSERT(targetInfo != infos.end());
@@ -308,14 +308,14 @@ void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMin
 void GMUIConsole::update()
 {
 	// 在这里更新绘制数据
-	static constexpr GMlong colors[] = {
+	static CONST_EXPR GMlong colors[] = {
 		0x0033FF,
 		0x00CC00,
 		0x00CCFF,
 		0x6600CC,
 	};
-	static constexpr decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
-	static constexpr GMint magnification = 5000;
+	static CONST_EXPR decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
+	static CONST_EXPR GMint magnification = 5000;
 	GM_PROFILE_RESET_TIMELINE();
 
 	D(d);

@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "memory.h"
 
-int gm_g_numAlignedAllocs = 0;
-int gm_g_numAlignedFree = 0;
-int gm_g_totalBytesAlignedAllocs = 0;//detect memory leaks
+GMint gm_g_numAlignedAllocs = 0;
+GMint gm_g_numAlignedFree = 0;
+GMint gm_g_totalBytesAlignedAllocs = 0;//detect memory leaks
 
 static void *gmAllocDefault(size_t size)
 {
@@ -20,7 +20,7 @@ static gmFreeFunc* gm_s_freeFunc = gmFreeDefault;
 
 template <typename T>T* gmAlignPointer(T* unalignedPtr, size_t alignment)
 {
-	struct b3ConvertPointerSizeT
+	struct GMConvertPointerSizeT
 	{
 		union
 		{
@@ -28,7 +28,7 @@ template <typename T>T* gmAlignPointer(T* unalignedPtr, size_t alignment)
 			size_t integer;
 		};
 	};
-	b3ConvertPointerSizeT converter;
+	GMConvertPointerSizeT converter;
 	const size_t bit_mask = ~(alignment - 1);
 	converter.ptr = unalignedPtr;
 	converter.integer += alignment - 1;

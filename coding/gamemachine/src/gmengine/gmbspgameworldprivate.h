@@ -18,7 +18,7 @@ struct DrawPatchJob;
 struct DrawEntityJob;
 
 // 每个作业的分片数
-constexpr GMint DRAW_PIECE_COUNT = 2;
+CONST_EXPR GMint DRAW_PIECE_COUNT = 1;
 
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {

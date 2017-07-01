@@ -127,6 +127,12 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #	define GM_ALIGNED_16(t) t
 #endif
 
+#if _MSC_VER <= 1800
+#	define CONST_EXPR const
+#else
+#	define CONST_EXPR constexpr
+#endif
+
 // 平台差异
 #ifdef __GNUC__
 #define strcat_s strcat
