@@ -16,6 +16,7 @@
 // Multi-threads
 BEGIN_NS
 
+#if 0
 template <typename T>
 static void vectorPushBack(Vector<T>& vector, T obj)
 {
@@ -55,9 +56,10 @@ struct DrawPolygonFacePiece : public DrawPiece
 
 	virtual void sustainedRun() override
 	{
+		GMMutex m;
 		BSPData& bsp = world->bspData();
 		GMBSPRenderData& renderData = world->renderData();
-		for (GMuint x = s; x < e; )
+		for (GMuint x = s; x < e; GMInterlock::increment(&x))
 		{
 			auto i = renderData.polygonIndices[x];
 			if (renderData.facesToDraw.isSet(i))
@@ -68,9 +70,37 @@ struct DrawPolygonFacePiece : public DrawPiece
 				if (renderData.faceDirectory[i].faceType == MST_PLANAR)
 					world->drawPolygonFace(renderData.faceDirectory[i].typeFaceNumber);
 			}
-			GMInterlock::increment(&x);
 		}
 	}
+};
+#endif
+
+struct DrawPolygonFaceJob : public GMSustainedThread
+{
+	DrawPolygonFaceJob(GMBSPGameWorld* w)
+		: world(w)
+	{
+	}
+
+	virtual void sustainedRun() override
+	{
+		BSPData& bsp = world->bspData();
+		GMBSPRenderData& renderData = world->renderData();
+		for (auto i : renderData.polygonIndices)
+		{
+			if (renderData.facesToDraw.isSet(i))
+			{
+				if (renderData.faceDirectory[i].faceType == 0)
+					continue;
+
+				if (renderData.faceDirectory[i].faceType == MST_PLANAR)
+					world->drawPolygonFace(renderData.faceDirectory[i].typeFaceNumber);
+			}
+		}
+	}
+
+private:
+	GMBSPGameWorld* world;
 };
 
 struct DrawMeshFaceJob : public GMSustainedThread
@@ -161,29 +191,36 @@ GMBSPGameWorld::GMBSPGameWorld()
 	d->physics.reset(new GMBSPPhysicsWorld(this));
 
 	// 初始化工作线程
+	d->drawPolygonFaceJob = new DrawPolygonFaceJob(this);
 	d->drawMeshFaceJob = new DrawMeshFaceJob(this);
 	d->drawPatchJob = new DrawPatchJob(this);
 	d->drawEntityJob = new DrawEntityJob(this);
 
+	d->drawPolygonFaceJob->start();
 	d->drawMeshFaceJob->start();
 	d->drawPatchJob->start();
 	d->drawEntityJob->start();
 
+#if 0
 	for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
 	{
 		d->drawPolygonFacePieces[i] = new DrawPolygonFacePiece(this);
 		d->drawPolygonFacePieces[i]->start();
 	}
+#endif
 }
 
 GMBSPGameWorld::~GMBSPGameWorld()
 {
 	D(d);
+#if 0
 	for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
 	{
 		delete d->drawPolygonFacePieces[i];
 	}
+#endif
 
+	delete d->drawPolygonFaceJob;
 	delete d->drawMeshFaceJob;
 	delete d->drawPatchJob;
 	delete d->drawEntityJob;
@@ -353,6 +390,7 @@ void GMBSPGameWorld::drawFaces()
 	clearBuffer();
 
 	{
+#if 0
 		SustainedThreadRunGuard guard;
 
 		{
@@ -376,11 +414,12 @@ void GMBSPGameWorld::drawFaces()
 				guard.trigger(piece);
 			}
 		}
+#endif
 
-		//gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
-		//gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
-		//gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
-		//gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
+		gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
+		gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
+		gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
+		gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
 	}
 
 	flushBuffer();
@@ -517,7 +556,10 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	ASSERT(obj);
+#if 0
 	vectorPushBack<GMGameObject*>(d->polygonFaceBuffer, obj);
+#endif
+	d->polygonFaceBuffer.push_back(obj);
 }
 
 void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)

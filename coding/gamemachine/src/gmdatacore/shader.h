@@ -107,7 +107,7 @@ GM_ALIGNED_STRUCT(TextureInfo)
 	GMuint autorelease : 1;
 };
 
-#define ARG_OFFSET(arg, size) arg+size
+#define ARG_OFFSET(arg, size) ((arg)+(size))
 enum LightArgs
 {
 	LA_KA = 0,
@@ -119,16 +119,11 @@ enum LightArgs
 
 GM_ALIGNED_STRUCT(LightInfo)
 {
-	LightInfo()
-	{
-		memset(this, 0, sizeof(LightInfo));
-	}
-
 	linear_math::Vector3 lightPosition;
 	linear_math::Vector3 lightColor;
 	GMfloat args[LA_END];
-	bool on;
-	bool useGlobalLightColor; // true表示使用全局的光的颜色
+	bool on = false;
+	bool useGlobalLightColor = false; // true表示使用全局的光的颜色
 };
 
 enum LightType

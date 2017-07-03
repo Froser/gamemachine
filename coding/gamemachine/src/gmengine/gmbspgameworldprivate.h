@@ -12,13 +12,16 @@
 #include "gmdatacore/bsp_model_loader.h"
 BEGIN_NS
 
+#if 0
 struct DrawPiece;
+#endif;
+struct DrawPolygonFaceJob;
 struct DrawMeshFaceJob;
 struct DrawPatchJob;
 struct DrawEntityJob;
 
 // 每个作业的分片数
-CONST_EXPR GMint DRAW_PIECE_COUNT = 1;
+CONST_EXPR GMint DRAW_PIECE_COUNT = 2;
 
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
@@ -36,8 +39,8 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	Vector<GMGameObject*> patchBuffer;
 	Vector<GMGameObject*> entityBuffer;
 
-	//DrawPolygonFaceJob* drawPolygonFaceJob;
-	DrawPiece *drawPolygonFacePieces[DRAW_PIECE_COUNT];
+	//DrawPiece *drawPolygonFacePieces[DRAW_PIECE_COUNT];
+	DrawPolygonFaceJob* drawPolygonFaceJob;
 	DrawMeshFaceJob* drawMeshFaceJob;
 	DrawPatchJob* drawPatchJob;
 	DrawEntityJob* drawEntityJob;

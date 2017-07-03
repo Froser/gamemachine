@@ -18,6 +18,7 @@
 #include "gmdatacore/soundreader/gmsoundreader.h"
 #include "gmui/gmui.h"
 #include "gmui/gmui_glwindow.h"
+#include "gmengine/gmdemogameworld.h"
 
 using namespace gm;
 
@@ -267,6 +268,59 @@ public:
 	bool m_bMouseEnable;
 };
 
+class DemoGameHandler : public IGameHandler
+{
+	virtual void start()
+	{
+		demo = new GMDemoGameWorld();
+		GMGameObject* obj;
+		GMfloat extents[] = { .25f, .25f, .25f };
+		demo->createCube(extents, &obj);
+		demo->appendObject("cube", obj);
+
+		LightInfo light;
+		light.args[LA_KA] = light.args[LA_KA + 1] = light.args[LA_KA + 2] = 1;
+		light.lightColor = { 1,.5,1 };
+		light.on = true;
+		demo->setDefaultAmbientLight(light);
+
+		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+		CameraLookAt lookAt;
+		lookAt.lookAt = { 0, 0, -1 };
+		lookAt.position = { 0, 0, 1 };
+		engine->updateCameraView(lookAt);
+	}
+
+	virtual void event(GameMachineEvent evt)
+	{
+		switch (evt)
+		{
+		case gm::GameMachineEvent::FrameStart:
+			break;
+		case gm::GameMachineEvent::FrameEnd:
+			break;
+		case gm::GameMachineEvent::Simulate:
+			break;
+		case gm::GameMachineEvent::Render:
+			demo->renderGameWorld();
+			break;
+		case gm::GameMachineEvent::Activate:
+			break;
+		case gm::GameMachineEvent::Deactivate:
+			break;
+		default:
+			break;
+		}
+	}
+
+	virtual bool isWindowActivate()
+	{
+		return true;
+	}
+
+	GMDemoGameWorld* demo;
+};
+
 int main()
 {
 	WinMain(NULL, NULL, NULL, 0);
@@ -293,7 +347,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

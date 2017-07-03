@@ -122,11 +122,11 @@ void GameMachine::startGameMachine()
 	d->factory->createGlyphManager(&glyphManager);
 	d->glyphManager.reset(glyphManager);
 
-	// 初始化gameHandler
-	d->gameHandler->start();
-
 	// 开始渲染
 	d->engine->start();
+
+	// 初始化gameHandler
+	d->gameHandler->start();
 
 	// 开始多线程工作
 	d->simulateJob.setHandler(d->gameHandler);
