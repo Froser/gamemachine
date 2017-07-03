@@ -298,7 +298,7 @@ namespace linear_math
 		GMfloat m_data[l];
 #endif
 
-	class Vector2
+	GM_ALIGNED_16(class) Vector2
 	{
 		DEFINE_VECTOR_DATA(2)
 
@@ -306,7 +306,7 @@ namespace linear_math
 #if USE_SIMD 
 		Vector2(__m128 _128) : m_128(_128) {};
 #endif
-		DEFAULT_CONSTRUCTOR(Vector2);
+		Vector2() = default;
 		Vector2(GMfloat x, GMfloat y)
 		{
 			m_data[0] = x;
@@ -388,7 +388,7 @@ namespace linear_math
 		Vector4(__m128 _128) : m_128(_128) {};
 #endif
 
-		DEFAULT_CONSTRUCTOR(Vector4);
+		Vector4() = default;
 
 		Vector4(GMfloat i)
 		{
@@ -434,7 +434,7 @@ namespace linear_math
 	GM_ALIGNED_16(class) Matrix4x4
 	{
 	public:
-		DEFAULT_CONSTRUCTOR(Matrix4x4);
+		Matrix4x4() = default;
 		Matrix4x4(const Vector4& r1, const Vector4& r2, const Vector4& r3, const Vector4& r4)
 		{
 			m_data[0] = r1;
@@ -675,6 +675,20 @@ namespace linear_math
 
 		return result;
 	}
+
+	GM_ALIGNED_16(class) Quarternion
+	{
+		DEFINE_VECTOR_DATA(4)
+
+	public:
+		Quarternion(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
+		{
+			m_data[0] = x;
+			m_data[1] = x;
+			m_data[2] = x;
+			m_data[3] = x;
+		}
+	};
 }
 END_NS
 #endif

@@ -111,9 +111,6 @@ void GM_new_arr(OUT T** out, GMint cnt)
 }
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
 
-// 编译器相关
-#define DEFAULT_CONSTRUCTOR(className) className() = default;
-
 // SSE指令优化
 #ifdef _MSC_VER
 #	define USE_SIMD 1
