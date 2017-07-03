@@ -67,10 +67,10 @@ Matrix4x4 Matrix4x4::operator *(const Matrix4x4& left) const
 			__row1 = m_data[1].get128(),
 			__row2 = m_data[2].get128(),
 			__row3 = m_data[3].get128();
-		__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(0, 0, 0, 0)), __row0),
-			__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(1, 1, 1, 1)), __row1),
-			__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(2, 2, 2, 2)), __row2),
-			__x_mul_row3 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(3, 3, 3, 3)), __row3);
+		__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(0, 0, 0, 0)), __row0),
+			__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(1, 1, 1, 1)), __row1),
+			__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(2, 2, 2, 2)), __row2),
+			__x_mul_row3 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(3, 3, 3, 3)), __row3);
 		__result = _mm_add_ps(__x_mul_row0, __x_mul_row1);
 		__result = _mm_add_ps(__result, __x_mul_row2);
 		__result = _mm_add_ps(__result, __x_mul_row3);

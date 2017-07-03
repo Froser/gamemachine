@@ -5,14 +5,60 @@ BEGIN_NS
 
 #if USE_SIMD
 #	include <xmmintrin.h>
+#	define gm_CastfTo128i(a) (_mm_castps_si128(a))
+#	define gm_CastfTo128d(a) (_mm_castps_pd(a))
+#	define gm_CastiTo128f(a) (_mm_castsi128_ps(a))
+#	define gm_CastdTo128f(a) (_mm_castpd_ps(a))
+#	define gm_CastdTo128i(a) (_mm_castpd_si128(a))
+#	define gm_Assign128(r0, r1, r2, r3) _mm_setr_ps(r0, r1, r2, r3)
 #	define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
-#	define simd_pshufd_ps( _a, _mask ) _mm_shuffle_ps((_a), (_a), (_mask) )
-#	define simd_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
-#	define simd_zeroMask (_mm_set_ps(-0.0f, -0.0f, -0.0f, -0.0f))
-#	define simd_FFF0Mask (_mm_set_epi32(0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF))
+#	define gm_pshufd_ps( _a, _mask ) _mm_shuffle_ps((_a), (_a), (_mask) )
+#	define gm_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
+#	define gm_pshufd_ps( _a, _mask ) _mm_shuffle_ps((_a), (_a), (_mask) )
+#	define gm_splat3_ps( _a, _i ) gm_pshufd_ps((_a), gm_shuffle_param(_i,_i,_i, 3) )
+#	define gm_splat_ps( _a, _i )  gm_pshufd_ps((_a), gm_shuffle_param(_i,_i,_i,_i) )
+#	define gm_zeroMask (_mm_set_ps(-0.0f, -0.0f, -0.0f, -0.0f))
+#	define gm_FFF0Mask (_mm_set_epi32(0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF))
+#	define gm_v3AbsiMask (_mm_set_epi32(0x00000000, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF))
+#	define gm_vAbsMask (_mm_set_epi32( 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF, 0x7FFFFFFF))
+#	define gm_vFFF0Mask (_mm_set_epi32(0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF))
+#	define gm_v3AbsfMask gm_CastiTo128f(gm_v3AbsiMask)
+#	define gm_vFFF0fMask gm_CastiTo128f(gm_vFFF0Mask)
+#	define gm_vxyzMaskf gm_vFFF0fMask
+#	define gm_vAbsfMask gm_CastiTo128f(gm_vAbsMask)
+#	define vQInv (_mm_set_ps(+0.0f, -0.0f, -0.0f, -0.0f))
+#	define vPPPM (_mm_set_ps(-0.0f, +0.0f, +0.0f, +0.0f))
 #endif
 
 #include <math.h>
+
+// 数学函数
+inline GMfloat gmFabs(GMfloat x) { return fabsf(x); }
+inline GMfloat gmCos(GMfloat x) { return cosf(x); }
+inline GMfloat gmSin(GMfloat x) { return sinf(x); }
+inline GMfloat gmTan(GMfloat x) { return tanf(x); }
+inline GMfloat gmAcos(GMfloat x)
+{
+	if (x < GMfloat(-1))
+		x = GMfloat(-1);
+	if (x > GMfloat(1))
+		x = GMfloat(1);
+	return acosf(x);
+}
+inline GMfloat gmAsin(GMfloat x)
+{
+	if (x < GMfloat(-1))
+		x = GMfloat(-1);
+	if (x > GMfloat(1))
+		x = GMfloat(1);
+	return asinf(x);
+}
+inline GMfloat gmAtan(GMfloat x) { return atanf(x); }
+inline GMfloat gmAtan2(GMfloat x, GMfloat y) { return atan2f(x, y); }
+inline GMfloat gmExp(GMfloat x) { return expf(x); }
+inline GMfloat gmLog(GMfloat x) { return logf(x); }
+inline GMfloat gmPow(GMfloat x, GMfloat y) { return powf(x, y); }
+inline GMfloat gmFmod(GMfloat x, GMfloat y) { return fmodf(x, y); }
 
 #define VEC3(v4) linear_math::Vector3(v4[0], v4[1], v4[2])
 #define VEC4(v3, v4) linear_math::Vector4(v3, v4[3])
@@ -374,6 +420,13 @@ namespace linear_math
 #endif
 		}
 
+		inline GMfloat& x() { return m_data[0]; }
+		inline GMfloat& y() { return m_data[1]; }
+		inline GMfloat& z() { return m_data[2]; }
+		inline const GMfloat& x() const { return m_data[0]; }
+		inline const GMfloat& y() const { return m_data[1]; }
+		inline const GMfloat& z() const { return m_data[2]; }
+
 	public:
 		GMfloat& operator [](GMint i);
 		const GMfloat& operator [](GMint i) const;
@@ -426,6 +479,15 @@ namespace linear_math
 #endif
 		}
 
+		inline GMfloat& x() { return m_data[0]; }
+		inline GMfloat& y() { return m_data[1]; }
+		inline GMfloat& z() { return m_data[2]; }
+		inline GMfloat& w() { return m_data[3]; }
+		inline const GMfloat& x() const { return m_data[0]; }
+		inline const GMfloat& y() const { return m_data[1]; }
+		inline const GMfloat& z() const { return m_data[2]; }
+		inline const GMfloat& w() const { return m_data[3]; }
+
 	public:
 		GMfloat& operator [](GMint i);
 		const GMfloat& operator [](GMint i) const;
@@ -466,10 +528,10 @@ namespace linear_math
 			__row1 = right[1].get128(),
 			__row2 = right[2].get128(),
 			__row3 = right[3].get128();
-		__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(0, 0, 0, 0)), __row0),
-			__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(1, 1, 1, 1)), __row1),
-			__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(2, 2, 2, 2)), __row2),
-			__x_mul_row3 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, simd_shuffle_param(3, 3, 3, 3)), __row3);
+		__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(0, 0, 0, 0)), __row0),
+			__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(1, 1, 1, 1)), __row1),
+			__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(2, 2, 2, 2)), __row2),
+			__x_mul_row3 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(3, 3, 3, 3)), __row3);
 		__result = _mm_add_ps(__x_mul_row0, __x_mul_row1);
 		__result = _mm_add_ps(__result, __x_mul_row2);
 		__result = _mm_add_ps(__result, __x_mul_row3);
@@ -520,14 +582,14 @@ namespace linear_math
 #if USE_SIMD
 		__m128 T, V;
 
-		T = simd_pshufd_ps(left.get128(), simd_shuffle_param(1, 2, 0, 3));	//	(Y Z X 0)
-		V = simd_pshufd_ps(right.get128(), simd_shuffle_param(1, 2, 0, 3));	//	(Y Z X 0)
+		T = gm_pshufd_ps(left.get128(), gm_shuffle_param(1, 2, 0, 3));	//	(Y Z X 0)
+		V = gm_pshufd_ps(right.get128(), gm_shuffle_param(1, 2, 0, 3));	//	(Y Z X 0)
 
 		V = _mm_mul_ps(V, left.get128());
 		T = _mm_mul_ps(T, right.get128());
 		V = _mm_sub_ps(V, T);
 
-		V = simd_pshufd_ps(V, simd_shuffle_param(1, 2, 0, 3));
+		V = gm_pshufd_ps(V, gm_shuffle_param(1, 2, 0, 3));
 		return Vector3(V);
 #else
 		return Vector3(left[1] * right[2] - right[1] * left[2],
@@ -676,19 +738,71 @@ namespace linear_math
 		return result;
 	}
 
-	GM_ALIGNED_16(class) Quarternion
+	GM_ALIGNED_16(class) Quaternion
 	{
 		DEFINE_VECTOR_DATA(4)
 
 	public:
-		Quarternion(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
+		Quaternion(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
 		{
 			m_data[0] = x;
-			m_data[1] = x;
-			m_data[2] = x;
-			m_data[3] = x;
+			m_data[1] = y;
+			m_data[2] = z;
+			m_data[3] = w;
+		}
+
+		inline GMfloat& x() { return m_data[0]; }
+		inline GMfloat& y() { return m_data[1]; }
+		inline GMfloat& z() { return m_data[2]; }
+		inline GMfloat& w() { return m_data[3]; }
+		inline const GMfloat& x() const { return m_data[0]; }
+		inline const GMfloat& y() const { return m_data[1]; }
+		inline const GMfloat& z() const { return m_data[2]; }
+		inline const GMfloat& w() const { return m_data[3]; }
+
+		void setValue(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
+		{
+			m_data[0] = x;
+			m_data[1] = y;
+			m_data[2] = z;
+			m_data[3] = w;
+		}
+
+		void setRotation(const Vector3& axis, GMfloat angle)
+		{
+			GMfloat d = length(axis);
+			ASSERT(d != GMfloat(0.0));
+			GMfloat s = gmSin(angle * 0.5f) / d;
+			setValue(axis.x() * s, axis.y() * s, axis.z() * s,
+				gmCos(angle * 0.5f));
+		}
+
+		void setEuler(const GMfloat& yaw, const GMfloat& pitch, const GMfloat& roll)
+		{
+			GMfloat halfYaw = GMfloat(yaw) * GMfloat(0.5);
+			GMfloat halfPitch = GMfloat(pitch) * GMfloat(0.5);
+			GMfloat halfRoll = GMfloat(roll) * GMfloat(0.5);
+			GMfloat cosYaw = gmCos(halfYaw);
+			GMfloat sinYaw = gmSin(halfYaw);
+			GMfloat cosPitch = gmCos(halfPitch);
+			GMfloat sinPitch = gmSin(halfPitch);
+			GMfloat cosRoll = gmCos(halfRoll);
+			GMfloat sinRoll = gmSin(halfRoll);
+			setValue(cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw,
+				cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw,
+				sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
+				cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
 		}
 	};
+
+	inline Quaternion operator*(const Quaternion& q1, const Quaternion& q2)
+	{
+		return Quaternion(
+			q1.w() * q2.x() + q1.x() * q2.w() + q1.y() * q2.z() - q1.z() * q2.y(),
+			q1.w() * q2.y() + q1.y() * q2.w() + q1.z() * q2.x() - q1.x() * q2.z(),
+			q1.w() * q2.z() + q1.z() * q2.w() + q1.x() * q2.y() - q1.y() * q2.x(),
+			q1.w() * q2.w() - q1.x() * q2.x() - q1.y() * q2.y() - q1.z() * q2.z());
+	}
 }
 END_NS
 #endif
