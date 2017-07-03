@@ -69,7 +69,7 @@ END_NS
 class ImageBMP : public GMImage
 {
 public:
-	DEFAULT_CONSTRUCTOR(ImageBMP);
+	ImageBMP() = default;
 
 public:
 	BitmapFile& getRawFile() { return m_bitmapFile; }

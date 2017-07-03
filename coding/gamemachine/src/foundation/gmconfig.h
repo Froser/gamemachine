@@ -54,7 +54,7 @@ enum GMConfigValueType
 
 struct GMConfigValue : public GMAlignmentObject
 {
-	DEFAULT_CONSTRUCTOR(GMConfigValue);
+	GMConfigValue() = default;
 
 	GMConfigValue(const char* str)
 	{
