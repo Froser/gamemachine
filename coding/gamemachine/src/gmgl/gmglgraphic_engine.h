@@ -19,9 +19,9 @@ GM_INTERFACE(IShaderLoadCallback)
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
-	std::map<GMMeshType, GMGLShaderProgram*> allShaders;
-	std::map<GMMeshType, IRender*> allRenders;
-	GMGameWorld* world = nullptr;
+	GMGraphicEnvironment environment;
+	Map<GMMeshType, GMGLShaderProgram*> allShaders;
+	Map<GMMeshType, IRender*> allRenders;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings;
@@ -39,15 +39,15 @@ public:
 
 public:
 	virtual void start() override;
-	virtual void setCurrentWorld(GMGameWorld*) override;
 	virtual void newFrame() override;
 	virtual void setViewport(const GMRect& rect) override;
 	virtual void drawObject(GMGameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
+	virtual void setEnvironment(const GMGraphicEnvironment& env) override;
+	virtual GMGraphicEnvironment& getEnvironment() override;
 
 public:
-	GMGameWorld* getWorld();
 	GMGLShaderProgram* getShaders(GMMeshType objectType);
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);

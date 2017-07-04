@@ -44,15 +44,23 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(TextureFrames* frames) = 0;
 };
 
+// 默认的环境参数
+GM_ALIGNED_STRUCT(GMGraphicEnvironment)
+{
+	GMfloat ambientLightColor[3];
+	GMfloat ambientK[3];
+};
+
 GM_INTERFACE(IGraphicEngine)
 {
 	virtual void start() = 0;
-	virtual void setCurrentWorld(GMGameWorld*) = 0;
 	virtual void newFrame() = 0;
 	virtual void setViewport(const GMRect& rect) = 0;
 	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
+	virtual void setEnvironment(const GMGraphicEnvironment& env) = 0;
+	virtual GMGraphicEnvironment& getEnvironment() = 0;
 };
 
 enum GamePackageType

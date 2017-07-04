@@ -64,8 +64,10 @@ set(SOURCES
 		gmengine/gmgameworld.cpp
 		gmengine/gmgameobject.h
 		gmengine/gmgameobject.cpp
-		gmengine/gmcharacter.h
-		gmengine/gmcharacter.cpp
+		gmengine/gmspritegameobject.h
+		gmengine/gmspritegameobject.cpp
+		gmengine/gmcamera.h
+		gmengine/gmcamera.cpp
 		gmengine/gmbspgameworldprivate.h
 		gmengine/gmbspgameworldprivate.cpp
 		gmengine/gmbspgameworld.h

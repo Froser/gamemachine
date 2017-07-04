@@ -5,6 +5,7 @@
 #include "memory.h"
 #include <vector>
 #include <map>
+#include <set>
 #include "debug.h"
 
 #if !USE_SIMD
@@ -19,6 +20,9 @@ using Pair = std::pair<T1, T2>;
 
 template <typename T1, typename T2>
 using Map = std::map<T1, T2>;
+
+template <typename T>
+using Set = std::set<T>;
 
 template <typename T>
 class Vector : public std::vector<T>

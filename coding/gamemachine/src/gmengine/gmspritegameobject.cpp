@@ -1,42 +1,41 @@
 ﻿#include "stdafx.h"
-#include "gmcharacter.h"
-#include "gmengine/gmgameworld.h"
+#include "gmgameworld.h"
+#include "gmspritegameobject.h"
+#include "gmphysics/gmphysicsworld.h"
 
-GMCharacter::GMCharacter(GMfloat radius)
+GMSpriteGameObject::GMSpriteGameObject(GMfloat radius)
 	: GMGameObject(nullptr)
 {
 	D(d);
 	d->radius = radius;
-	d->frustum.initFrustum(75.f, 1.333f, .1f, 3200);
-	d->moveDirection = MD_NONE;
-
-	memset(&d->state, 0, sizeof(d->state));
-	memset(&d->moveRate, 0, sizeof(d->moveRate));
+	d->moveDirection = MC_NONE;
+	d->state = { 0 };
+	d->moveRate.clear();
 	clearMoveArgs();
-
-	d->state.pitchLimitRad = HALF_PI - RAD(3);
+	d->pitchLimitRadius = HALF_PI - RAD(3);
 }
 
-void GMCharacter::onAppendingObjectToWorld()
+
+void GMSpriteGameObject::onAppendingObjectToWorld()
 {
 	sendMoveCommand();
 }
 
-void GMCharacter::moveForwardOrBackward(bool forward)
+void GMSpriteGameObject::moveForwardOrBackward(bool forward)
 {
 	D(d);
-	GMfloat moveRate = forward ? d->moveRate.getMoveRate(MD_FORWARD) : d->moveRate.getMoveRate(MD_BACKWARD);
+	GMfloat moveRate = forward ? d->moveRate.getMoveRate(MC_FORWARD) : d->moveRate.getMoveRate(MC_BACKWARD);
 	d->moveCmdArgFB = GMCommandVector3(forward, moveRate, USELESS_PARAM);
 }
 
-void GMCharacter::moveLeftOrRight(bool left)
+void GMSpriteGameObject::moveLeftOrRight(bool left)
 {
 	D(d);
-	GMfloat moveRate = left ? d->moveRate.getMoveRate(MD_LEFT) : d->moveRate.getMoveRate(MD_RIGHT);
+	GMfloat moveRate = left ? d->moveRate.getMoveRate(MC_LEFT) : d->moveRate.getMoveRate(MC_RIGHT);
 	d->moveCmdArgLR = GMCommandVector3(left, moveRate, USELESS_PARAM);
 }
 
-void GMCharacter::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
+void GMSpriteGameObject::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
 {
 	D(d);
 	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -44,7 +43,7 @@ void GMCharacter::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
 		c->motions.jumpSpeed = jumpSpeed;
 }
 
-void GMCharacter::setMoveSpeed(GMfloat moveSpeed)
+void GMSpriteGameObject::setMoveSpeed(GMfloat moveSpeed)
 {
 	D(d);
 	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -52,66 +51,66 @@ void GMCharacter::setMoveSpeed(GMfloat moveSpeed)
 		c->motions.moveSpeed = moveSpeed;
 }
 
-const PositionState& GMCharacter::getPositionState()
+const PositionState& GMSpriteGameObject::getPositionState()
 {
 	D(d);
 	return d->state;
 }
 
 // rate表示移动的速度，如果来自键盘，那么应该为1，如果来自手柄，应该是手柄的delta/delta最大值
-void GMCharacter::action(MoveAction md, MoveRate rate)
+void GMSpriteGameObject::action(GMMovement movement, const GMMoveRate& rate)
 {
 	D(d);
-	d->moveDirection = md;
+	d->moveDirection = movement;
 	d->moveRate = rate;
 }
 
-void GMCharacter::lookRight(GMfloat degree)
+void GMSpriteGameObject::lookRight(GMfloat degree)
 {
 	D(d);
 	d->state.yaw += RAD(degree);
 }
 
-void GMCharacter::lookUp(GMfloat degree)
+void GMSpriteGameObject::lookUp(GMfloat degree)
 {
 	D(d);
 	d->state.pitch += RAD(degree);
-	if (d->state.pitch > d->state.pitchLimitRad)
-		d->state.pitch = d->state.pitchLimitRad;
-	else if (d->state.pitch < -d->state.pitchLimitRad)
-		d->state.pitch = -d->state.pitchLimitRad;
+	if (d->state.pitch > d->pitchLimitRadius)
+		d->state.pitch = d->pitchLimitRadius;
+	else if (d->state.pitch < -d->pitchLimitRadius)
+		d->state.pitch = -d->pitchLimitRadius;
 }
 
-void GMCharacter::setPitchLimitDegree(GMfloat deg)
+void GMSpriteGameObject::setPitchLimitDegree(GMfloat deg)
 {
 	D(d);
-	d->state.pitchLimitRad = HALF_PI - RAD(deg);
+	d->pitchLimitRadius = HALF_PI - RAD(deg);
 }
 
-void GMCharacter::simulation()
+void GMSpriteGameObject::simulate()
 {
 	D(d);
 	clearMoveArgs();
 
 	// forward has priority
 	bool moved = false;
-	if (d->moveDirection & MD_FORWARD)
+	if (d->moveDirection & MC_FORWARD)
 	{
 		moveForwardOrBackward(true);
 		moved = true;
 	}
-	else if (d->moveDirection & MD_BACKWARD)
+	else if (d->moveDirection & MC_BACKWARD)
 	{
 		moveForwardOrBackward(false);
 		moved = true;
 	}
 
-	if (d->moveDirection & MD_LEFT)
+	if (d->moveDirection & MC_LEFT)
 	{
 		moveLeftOrRight(true);
 		moved = true;
 	}
-	else if (d->moveDirection & MD_RIGHT)
+	else if (d->moveDirection & MC_RIGHT)
 	{
 		moveLeftOrRight(false);
 		moved = true;
@@ -120,7 +119,7 @@ void GMCharacter::simulation()
 	if (moved)
 		sendMoveCommand();
 
-	if (d->moveDirection & MD_JUMP)
+	if (d->moveDirection & MC_JUMP)
 	{
 		GMPhysicsWorld* world = getWorld()->physicsWorld();
 		GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -135,17 +134,10 @@ void GMCharacter::simulation()
 		}
 	}
 
-	d->moveDirection = MD_NONE;
+	d->moveDirection = MC_NONE;
 }
 
-void GMCharacter::updateCamera()
-{
-	D(d);
-	update();
-	Camera::calcCameraLookAt(d->state, d->lookAt);
-}
-
-void GMCharacter::update()
+void GMSpriteGameObject::update()
 {
 	D(d);
 	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -155,7 +147,7 @@ void GMCharacter::update()
 		gm_error(_L("cannot found character in physics world"));
 }
 
-void GMCharacter::sendMoveCommand()
+void GMSpriteGameObject::sendMoveCommand()
 {
 	D(d);
 	GMPhysicsWorld* pw = getWorld()->physicsWorld();
@@ -165,21 +157,9 @@ void GMCharacter::sendMoveCommand()
 	pw->sendCommand(pw->find(this), GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3));
 }
 
-void GMCharacter::clearMoveArgs()
+void GMSpriteGameObject::clearMoveArgs()
 {
 	D(d);
 	d->moveCmdArgFB = GMCommandVector3(0, 0, 0);
 	d->moveCmdArgLR = GMCommandVector3(0, 0, 0);
-}
-
-CameraLookAt& GMCharacter::getLookAt()
-{
-	D(d);
-	return d->lookAt;
-}
-
-Frustum& GMCharacter::getFrustum()
-{
-	D(d);
-	return d->frustum;
 }

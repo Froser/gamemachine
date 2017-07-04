@@ -6,8 +6,6 @@
 #include "gmdatacore/object.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgameobject.h"
-#include "gmengine/gmgameworld.h"
-#include "gmengine/gmcharacter.h"
 #include "gmglobjectpainter.h"
 #include "renders/gmgl_render.h"
 #include "renders/gmgl_renders_object.h"
@@ -20,7 +18,6 @@
 GMGLGraphicEngine::GMGLGraphicEngine()
 {
 	D(d);
-	d->world = nullptr;
 	d->settings = nullptr;
 }
 
@@ -43,12 +40,6 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 void GMGLGraphicEngine::start()
 {
 	installShaders();
-}
-
-void GMGLGraphicEngine::setCurrentWorld(GMGameWorld* world)
-{
-	D(d);
-	d->world = world;
 }
 
 void GMGLGraphicEngine::newFrame()
@@ -153,6 +144,18 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	return flag;
 }
 
+void GMGLGraphicEngine::setEnvironment(const GMGraphicEnvironment& env)
+{
+	D(d);
+	d->environment = env;
+}
+
+GMGraphicEnvironment& GMGLGraphicEngine::getEnvironment()
+{
+	D(d);
+	return d->environment;
+}
+
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
 	D(d);
@@ -174,20 +177,13 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 {
 	D(d);
-	GMCharacter* character = getWorld()->getMajorCharacter();
+	GMCamera& camera = GameMachine::instance().getCamera();
 
-	//TODO 
-	d->projectionMatrix = character->getFrustum().getPerspective();
+	d->projectionMatrix = camera.getFrustum().getPerspective();
 	d->viewMatrix = getViewMatrix(lookAt);
 
-	character->getFrustum().updateViewMatrix(d->viewMatrix, d->projectionMatrix);
-	character->getFrustum().update();
-}
-
-GMGameWorld* GMGLGraphicEngine::getWorld()
-{
-	D(d);
-	return d->world;
+	camera.getFrustum().updateViewMatrix(d->viewMatrix, d->projectionMatrix);
+	camera.getFrustum().update();
 }
 
 void GMGLGraphicEngine::registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders)

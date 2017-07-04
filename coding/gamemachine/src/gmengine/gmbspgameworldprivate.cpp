@@ -1,12 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
-#include "gmcharacter.h"
 #include "foundation/utilities/utilities.h"
+#include "gmspritegameobject.h"
 
-#define PARSE_FUNC(name, entity, world) void import_##name(const GMBSPEntity& entity, GMBSPGameWorld* world)
-#define BEGIN_PARSE_CLASS(value) if (strEqual(classname, #value)) import_##value(entity, world)
-#define PARSE_CLASS(value) else if (strEqual(classname, #value)) import_##value(entity, world)
-#define END_PARSE_CLASS
 #define EACH_PAIR_OF_ENTITY(entity, pair) GMBSPKeyValuePair* pair = entity.epairs; for (; pair; pair = pair->next)
 #define SAME_KEY(pair, k) strEqual(pair->key, k)
 #define SAME_VALUE(pair, v) strEqual(pair->value, v)
@@ -23,7 +19,7 @@ static const char* getClassname(const GMBSPEntity& entity)
 	return nullptr;
 }
 
-PARSE_FUNC(worldspawn, entity, world)
+void import_worldspawn(const GMBSPEntity& entity, GMBSPGameWorld* world)
 {
 	/*
 	EACH_PAIR_OF_ENTITY(entity, e)
@@ -54,11 +50,12 @@ PARSE_FUNC(worldspawn, entity, world)
 	world->setDefaultAmbientLight(ambientLight);
 }
 
-PARSE_FUNC(info_player_deathmatch, entity, world)
+void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* world)
 {
+	static bool created = false; //TODO
 	gm_info(_L("found playerstart"));
 
-	if (world->getMajorCharacter())
+	if (created)
 		return;
 
 	BSPVector3 origin = BSPVector3(0);
@@ -81,21 +78,22 @@ PARSE_FUNC(info_player_deathmatch, entity, world)
 
 	linear_math::Vector3 playerStart (origin[0], origin[2], -origin[1]);
 
-	GMCharacter* character = new GMCharacter(6); 
-	world->appendObjectAndInit(character);
-	world->setMajorCharacter(character);
-	character->setMoveSpeed(192);
-	character->setJumpSpeed(linear_math::Vector3(0, 150, 0));
+	GMSpriteGameObject* sprite = new GMSpriteGameObject(6);
+	world->appendObjectAndInit(sprite);
+	sprite->setMoveSpeed(192);
+	sprite->setJumpSpeed(linear_math::Vector3(0, 150, 0));
 
-	GMMotionProperties& prop = world->physicsWorld()->find(character)->motions;
+	GMMotionProperties& prop = world->physicsWorld()->find(sprite)->motions;
 	prop.translation = playerStart;
+	created = true;
 }
 
 void BSPGameWorldEntityReader::import(const GMBSPEntity& entity, GMBSPGameWorld* world)
 {
 	const char* classname = getClassname(entity);
 
-	BEGIN_PARSE_CLASS(worldspawn);
-	PARSE_CLASS(info_player_deathmatch);
-	END_PARSE_CLASS;
+	if (strEqual(classname, "worldspawn"))
+		import_worldspawn(entity, world);
+	else if (strEqual(classname, "info_player_deathmatch"))
+		import_info_player_deathmatch(entity, world);
 }

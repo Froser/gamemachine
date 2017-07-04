@@ -273,7 +273,7 @@ static linear_math::Vector2 uvs[24] = {
 	*/
 };
 
-SkyGameObject::SkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
+GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
 	: GMGameObject(nullptr)
 {
 	D(d);
@@ -286,7 +286,7 @@ SkyGameObject::SkyGameObject(const Shader& shader, const linear_math::Vector3& m
 	setObject(obj);
 }
 
-void SkyGameObject::createSkyBox(OUT Object** obj)
+void GMSkyGameObject::createSkyBox(OUT Object** obj)
 {
 	D(d);
 	linear_math::Vector3 vertices[20] = {

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
-#include "gmcharacter.h"
 #include "gmengine/resource_container.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
@@ -12,6 +11,7 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
 #include "foundation/gmthreads.h"
+#include "gmgameobject.h"
 
 // Multi-threads
 BEGIN_NS
@@ -248,6 +248,7 @@ GMGameObject* GMBSPGameWorld::getSky()
 	return d->sky;
 }
 
+/*
 void GMBSPGameWorld::updateCamera()
 {
 	GMCharacter* character = getMajorCharacter();
@@ -255,12 +256,12 @@ void GMBSPGameWorld::updateCamera()
 	CameraLookAt& lookAt = character->getLookAt();
 	GameMachine::instance().getGraphicEngine()->updateCameraView(lookAt);
 }
+*/
 
 void GMBSPGameWorld::renderGameWorld()
 {
 	GM_PROFILE(renderGameWorld);
 	D(d);
-	updateCamera();
 	drawAll();
 }
 
@@ -268,13 +269,6 @@ GMPhysicsWorld* GMBSPGameWorld::physicsWorld()
 {
 	D(d);
 	return d->physics;
-}
-
-void GMBSPGameWorld::setMajorCharacter(GMCharacter* character)
-{
-	D(d);
-	d->physics->setCamera(character);
-	GMGameWorld::setMajorCharacter(character);
 }
 
 void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)
@@ -297,8 +291,8 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	GMCharacter* character = getMajorCharacter();
-	PositionState pos = character->getPositionState();
+	GMCamera& camera = GameMachine::instance().getCamera();
+	PositionState pos = camera.getPositionState();
 	BSPData& bsp = d->bsp.bspData();
 
 	rd.facesToDraw.clearAll();
@@ -313,8 +307,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 			continue;
 
 		//if this leaf does not lie in the frustum, continue
-		GMCharacter* character = getMajorCharacter();
-		if (!character->getFrustum().isBoundingBoxInside(rd.leafs[i].boundingBoxVertices))
+		if (!camera.getFrustum().isBoundingBoxInside(rd.leafs[i].boundingBoxVertices))
 			continue;
 
 		//loop through faces in this leaf and mark them to be drawn
@@ -440,6 +433,13 @@ void GMBSPGameWorld::flushBuffer()
 
 	D(d);
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+
+	linear_math::Vector3& defaultAmbient = getDefaultAmbientLight().lightColor;
+	GMGraphicEnvironment env;
+	env.ambientLightColor[0] = defaultAmbient[0];
+	env.ambientLightColor[1] = defaultAmbient[1];
+	env.ambientLightColor[2] = defaultAmbient[2];
+	engine->setEnvironment(env);
 
 	for (auto& obj : d->polygonFaceBuffer)
 	{
@@ -700,7 +700,6 @@ void GMBSPGameWorld::importBSP()
 	initTextures();
 	prepareFaces();
 	prepareEntities();
-	initialize();
 	d->physics->initBSPPhysicsWorld();
 }
 

@@ -9,6 +9,8 @@
 #include "gmthreads.h"
 #include "gmui/gmui.h"
 #include "gmui/gmui_console.h"
+#include "gmengine/gmcamera.h"
+
 BEGIN_NS
 
 enum GameMachineMessageType
@@ -73,6 +75,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	AutoPtr<GMGamePackage> gamePackageManager;
 	AutoPtr<IInput> inputManager;
 	AutoPtr<GMConfig> configManager;
+	GMCamera camera;
 	std::queue<GameMachineMessage> messageQueue;
 	GameMachineWindows windows; // 除主窗口以外的窗口列表
 	GameLoopJob<GameMachineEvent::Simulate> simulateJob;
@@ -133,6 +136,9 @@ public:
 
 	// HID
 	IInput* getInputManager() { D(d); return d->inputManager; }
+
+	// 相机管理
+	GMCamera& getCamera() { D(d); return d->camera; }
 
 	// 时间管理
 	GMfloat getFPS();

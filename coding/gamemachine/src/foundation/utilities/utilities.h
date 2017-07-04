@@ -595,18 +595,17 @@ public:
 };
 
 //Camera
-struct CameraLookAt
+GM_ALIGNED_16(struct) CameraLookAt
 {
 	linear_math::Vector3 lookAt;
 	linear_math::Vector3 position;
 };
 
-struct PositionState
+GM_ALIGNED_16(struct) PositionState
 {
 	linear_math::Vector3 position;
 	GMfloat yaw;
 	GMfloat pitch;
-	GMfloat pitchLimitRad;
 };
 
 inline linear_math::Matrix4x4 getViewMatrix(const CameraLookAt& lookAt)

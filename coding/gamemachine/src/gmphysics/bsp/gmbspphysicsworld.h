@@ -13,7 +13,6 @@ class GMBSPMove;
 GM_PRIVATE_OBJECT_FROM(GMBSPPhysicsWorld, GMPhysicsWorld)
 {
 	GMBSPGameWorld* world;
-	GMCollisionObject camera;
 
 	AlignedVector<BSPTracePlane> planes;
 	AlignedVector<GMBSP_Physics_Brush> brushes;
@@ -21,7 +20,9 @@ GM_PRIVATE_OBJECT_FROM(GMBSPPhysicsWorld, GMPhysicsWorld)
 
 	GMBSPTrace trace;
 	GMBSPPatch patch;
-	std::map<GMCollisionObject*, GMBSPMove*> objectMoves;
+
+	Map<GMCollisionObject*, GMBSPMove*> objectMoves;
+	Map<GMGameObject*, GMCollisionObject> collisionObjects;
 };
 
 class GMBSPPhysicsWorld : public GMPhysicsWorld
@@ -33,14 +34,13 @@ public:
 	~GMBSPPhysicsWorld();
 
 public:
-	virtual void simulate() override;
+	virtual void simulate(GMGameObject* obj) override;
 	virtual GMCollisionObject* find(GMGameObject* obj) override;
 	virtual void sendCommand(GMCollisionObject* obj, const CommandParams& dataParam) override;
 
 public:
 	GMBSPPhysicsWorld::Data& physicsData();
 	void initBSPPhysicsWorld();
-	void setCamera(GMGameObject* obj);
 
 private:
 	GMBSPMove* getMove(GMCollisionObject* o);

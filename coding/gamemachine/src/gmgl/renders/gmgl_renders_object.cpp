@@ -76,11 +76,10 @@ void GMGLRenders_Object::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* mo
 {
 	D(d);
 	clearData();
-	d->engine = static_cast<GMGLGraphicEngine*>(engine);
+	d->engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
 	d->mesh = mesh;
 	d->type = mesh->getType();
 	d->gmglShaders = d->engine->getShaders(d->type);
-	d->world = d->engine->getWorld();
 	d->gmglShaders->useProgram();
 
 	if (modelTransform)
@@ -171,14 +170,16 @@ void GMGLRenders_Object::activateLight(LightType t, LightInfo& light)
 	{
 	case gm::LT_AMBIENT:
 	{
-		GMGL::uniformVec3(*d->gmglShaders, light.on && !light.useGlobalLightColor ? &light.lightColor[0] : &(d->world->getDefaultAmbientLight().lightColor)[0], GMSHADER_LIGHT_AMBIENT);
+		GMfloat* defaultLight = d->engine->getEnvironment().ambientLightColor;
+		GMGL::uniformVec3(*d->gmglShaders, light.on && !light.useGlobalLightColor ? &light.lightColor[0] : defaultLight, GMSHADER_LIGHT_AMBIENT);
 		GMGL::uniformVec3(*d->gmglShaders, light.on ? &light.args[LA_KA] : &d->world->getDefaultAmbientLight().args[LA_KA], GMSHADER_LIGHT_KA);
 	}
 	break;
 	case gm::LT_SPECULAR:
 	{
+		GMfloat* defaultLight = d->engine->getEnvironment().ambientLightColor;
 		GMfloat zero[3] = { 0 };
-		GMGL::uniformVec3(*d->gmglShaders, light.on ? (!light.useGlobalLightColor ? &light.lightColor[0] : &(d->world->getDefaultAmbientLight().lightColor)[0]) : zero, GMSHADER_LIGHT_POWER);
+		GMGL::uniformVec3(*d->gmglShaders, light.on ? (!light.useGlobalLightColor ? &light.lightColor[0] : defaultLight) : zero, GMSHADER_LIGHT_POWER);
 		GMGL::uniformVec3(*d->gmglShaders, light.on ? &light.args[LA_KD] : zero, GMSHADER_LIGHT_KD);
 		GMGL::uniformVec3(*d->gmglShaders, light.on ? &light.args[LA_KS] : zero, GMSHADER_LIGHT_KS);
 		GMGL::uniformFloat(*d->gmglShaders, light.on ? light.args[LA_SHINESS] : 0.f, GMSHADER_LIGHT_SHININESS);

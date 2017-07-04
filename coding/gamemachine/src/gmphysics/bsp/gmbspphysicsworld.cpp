@@ -17,8 +17,6 @@ GMBSPPhysicsWorld::GMBSPPhysicsWorld(GMGameWorld* world)
 		this
 	);
 
-	d->camera = CollisionObjectFactory::defaultCamera();
-
 	//TODO TEST
 	d->gravity = -600.f;
 }
@@ -39,23 +37,26 @@ GMBSPPhysicsWorld::Data& GMBSPPhysicsWorld::physicsData()
 	return *d;
 }
 
-void GMBSPPhysicsWorld::simulate()
+void GMBSPPhysicsWorld::simulate(GMGameObject* obj)
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
 
-	GMBSPMove* move = getMove(&d->camera);
+	GMBSPMove* move = getMove(find(obj));
 	move->move();
 }
 
 GMCollisionObject* GMBSPPhysicsWorld::find(GMGameObject* obj)
 {
 	D(d);
-	// 优先查找视角位置
-	if (d->camera.object == obj)
-		return &d->camera;
-
-	return nullptr;
+	auto target = d->collisionObjects.find(obj);
+	if (target == d->collisionObjects.end())
+	{
+		auto& constructed = d->collisionObjects[obj];
+		constructed = CollisionObjectFactory::defaultCamera();
+		return &constructed;
+	}
+	return &d->collisionObjects[obj];
 }
 
 void GMBSPPhysicsWorld::sendCommand(GMCollisionObject* obj, const CommandParams& dataParam)
@@ -63,7 +64,7 @@ void GMBSPPhysicsWorld::sendCommand(GMCollisionObject* obj, const CommandParams&
 	D(d);
 	ASSERT(dataParam.size() == 1);
 	GMCommand cmd = (*dataParam.begin()).first;
-	GMBSPMove* move = getMove(&d->camera);
+	GMBSPMove* move = getMove(obj);
 	move->sendCommand(cmd, dataParam);
 }
 
@@ -73,12 +74,6 @@ void GMBSPPhysicsWorld::initBSPPhysicsWorld()
 	generatePhysicsBrushSideData();
 	generatePhysicsBrushData();
 	generatePhysicsPatches();
-}
-
-void GMBSPPhysicsWorld::setCamera(GMGameObject* obj)
-{
-	D(d);
-	d->camera.object = obj;
 }
 
 GMBSPMove* GMBSPPhysicsWorld::getMove(GMCollisionObject* o)

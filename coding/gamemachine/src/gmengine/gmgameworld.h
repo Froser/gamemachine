@@ -4,6 +4,7 @@
 #include "foundation/vector.h"
 #include "gmphysics/gmphysicsworld.h"
 #include "gmdatacore/shader.h"
+#include "gmgameobject.h"
 
 BEGIN_NS
 
@@ -12,8 +13,7 @@ class ObjectPainter;
 
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
-	std::set<GMGameObject*> shapes;
-	GMCharacter* character = nullptr;
+	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
 	LightInfo ambientLight;
 	bool start;
 };
@@ -31,16 +31,11 @@ public:
 	virtual GMPhysicsWorld* physicsWorld() = 0;
 
 public:
-	void initialize();
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
-	void setDefaultAmbientLight(const LightInfo& lightInfo);
-	LightInfo& getDefaultAmbientLight();
-
-// characters:
-public:
-	virtual void setMajorCharacter(GMCharacter* character);
-	GMCharacter* getMajorCharacter();
+	void setDefaultAmbientLight(const LightInfo& lightInfo) { D(d); d->ambientLight = lightInfo; }
+	LightInfo& getDefaultAmbientLight() { D(d); return d->ambientLight; }
+	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 
 private:
 	ObjectPainter* createPainterForObject(GMGameObject* obj);

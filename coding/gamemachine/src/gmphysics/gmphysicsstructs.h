@@ -55,7 +55,6 @@ GM_ALIGNED_STRUCT(GMCollisionObject)
 {
 	GMMotionProperties motions;
 	GMShapeProperties shapeProps;
-	GMGameObject* object;
 };
 
 END_NS

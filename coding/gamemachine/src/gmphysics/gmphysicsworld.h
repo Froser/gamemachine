@@ -21,7 +21,7 @@ public:
 	virtual ~GMPhysicsWorld();
 
 public:
-	virtual void simulate() = 0;
+	virtual void simulate(GMGameObject* obj) = 0;
 	virtual GMCollisionObject* find(GMGameObject* obj) = 0;
 	virtual void sendCommand(GMCollisionObject* obj, const CommandParams& dataParam) = 0;
 

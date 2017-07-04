@@ -26,7 +26,6 @@ public:
 public:
 	virtual void renderGameWorld() override;
 	virtual GMPhysicsWorld* physicsWorld() override;
-	virtual void setMajorCharacter(GMCharacter* character) override;
 
 	//renders:
 public:
@@ -38,7 +37,6 @@ public:
 private:
 	void clearBuffer();
 	void flushBuffer();
-	void updateCamera();
 	void calculateVisibleFaces();
 	void drawAll();
 	void drawSky();

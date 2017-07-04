@@ -3,7 +3,6 @@
 #include <windows.h>
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
-#include "gmengine/gmcharacter.h"
 #include "gmgl/gmglfactory.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/gmglfunc.h"
@@ -19,11 +18,11 @@
 #include "gmui/gmui.h"
 #include "gmui/gmui_glwindow.h"
 #include "gmengine/gmdemogameworld.h"
+#include "gmengine/gmspritegameobject.h"
 
 using namespace gm;
 
 GMBSPGameWorld* world;
-GMCharacter* character;
 GMGLFactory factory;
 GMGlyphObject* glyph;
 ISoundFile* sf;
@@ -79,11 +78,11 @@ public:
 		engine->setShaderLoadCallback(this);
 
 		pk->createBSPGameWorld("gv.bsp", &world);
+		m_sprite = static_cast<GMSpriteGameObject*> (const_cast<GMGameObject*> (*(world->getGameObjects(GMGameObjectType::Sprite).begin())));
 
 		glyph = new GMGlyphObject();
 		glyph->setGeometry(-1, .8f, 1, 1);
 		world->appendObjectAndInit(glyph, true);
-
 
 		//GMBuffer bg;
 		//pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
@@ -99,9 +98,13 @@ public:
 			world->simulateGameWorld();
 			break;
 		case GameMachineEvent::Render:
-			world->renderGameWorld();
 			{
-				const PositionState& position = world->getMajorCharacter()->getPositionState();
+				// ¸üÐÂCamera
+				GMCamera& camera = GameMachine::instance().getCamera();
+
+				world->renderGameWorld();
+
+				const PositionState& position = m_sprite->getPositionState();
 				GMWchar x[32], y[32], z[32], fps[32];
 				swprintf_s(x, L"%f", position.position[0]);
 				swprintf_s(y, L"%f", position.position[1]);
@@ -123,7 +126,6 @@ public:
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
-			GMCharacter* character = world->getMajorCharacter();
 			IKeyboardState& kbState = inputManager->getKeyboardState();
 			IJoystickState& joyState = inputManager->getJoystickState();
 			IMouseState& mouseState = inputManager->getMouseState();
@@ -133,44 +135,44 @@ public:
 			if (kbState.keydown('B'))
 				GameMachine::instance().postMessage({ GM_MESSAGE_CONSOLE });
 
-			MoveAction moveTag = 0;
-			MoveRate rate;
+			GMMovement moveTag = MC_NONE;
+			GMMoveRate rate;
 			GMJoystickState state = joyState.joystickState();
 
 			if (kbState.keydown('A'))
-				moveTag |= MD_LEFT;
+				moveTag |= MC_LEFT;
 			if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
-				moveTag |= MD_LEFT;
-				rate.setMoveRate(MD_LEFT, GMfloat(state.thumbLX) / SHRT_MIN);
+				moveTag |= MC_LEFT;
+				rate.setMoveRate(MC_LEFT, GMfloat(state.thumbLX) / SHRT_MIN);
 			}
 
 			if (kbState.keydown('D'))
-				moveTag |= MD_RIGHT;
+				moveTag |= MC_RIGHT;
 			if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
-				moveTag |= MD_RIGHT;
-				rate.setMoveRate(MD_RIGHT, GMfloat(state.thumbLX) / SHRT_MAX);
+				moveTag |= MC_RIGHT;
+				rate.setMoveRate(MC_RIGHT, GMfloat(state.thumbLX) / SHRT_MAX);
 			}
 
 			if (kbState.keydown('S'))
-				moveTag |= MD_BACKWARD;
+				moveTag |= MC_BACKWARD;
 			if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
-				moveTag |= MD_BACKWARD;
-				rate.setMoveRate(MD_BACKWARD, GMfloat(state.thumbLY) / SHRT_MIN);
+				moveTag |= MC_BACKWARD;
+				rate.setMoveRate(MC_BACKWARD, GMfloat(state.thumbLY) / SHRT_MIN);
 			}
 
 			if (kbState.keydown('W'))
-				moveTag |= MD_FORWARD;
+				moveTag |= MC_FORWARD;
 			if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			{
-				moveTag |= MD_FORWARD;
-				rate.setMoveRate(MD_FORWARD, GMfloat(state.thumbLY) / SHRT_MAX);
+				moveTag |= MC_FORWARD;
+				rate.setMoveRate(MC_FORWARD, GMfloat(state.thumbLY) / SHRT_MAX);
 			}
 
 			if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
-				moveTag |= MD_JUMP;
+				moveTag |= MC_JUMP;
 
 			if (kbState.keyTriggered('V'))
 				joyState.joystickVibrate(30000, 30000);
@@ -190,7 +192,7 @@ public:
 					SHRT_MIN :
 					SHRT_MAX);
 
-				world->getMajorCharacter()->lookRight(state.thumbRX * joystickSensitivity * rate);
+				m_sprite->lookRight(state.thumbRX * joystickSensitivity * rate);
 			}
 			if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
@@ -199,14 +201,13 @@ public:
 					SHRT_MIN :
 					SHRT_MAX);
 
-				world->getMajorCharacter()->lookUp(state.thumbRY * joystickSensitivity * rate);
+				m_sprite->lookUp(state.thumbRY * joystickSensitivity * rate);
 			}
 
 			GMMouseState ms = mouseState.mouseState();
-			world->getMajorCharacter()->lookUp(-ms.deltaY * mouseSensitivity);
-			world->getMajorCharacter()->lookRight(ms.deltaX * mouseSensitivity);
-
-			character->action(moveTag, rate);
+			m_sprite->lookUp(-ms.deltaY * mouseSensitivity);
+			m_sprite->lookRight(ms.deltaX * mouseSensitivity);
+			m_sprite->action(moveTag, rate);
 
 			if (kbState.keyTriggered('P'))
 				GMSetBuiltIn(CALCULATE_BSP_FACE, !GMGetBuiltIn(CALCULATE_BSP_FACE));
@@ -266,6 +267,7 @@ public:
 	}
 
 	bool m_bMouseEnable;
+	GMSpriteGameObject* m_sprite;
 };
 
 class DemoGameHandler : public GMObject, public IGameHandler
@@ -365,7 +367,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

@@ -18,6 +18,14 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	linear_math::Matrix4x4 transformMatrix;
 };
 
+enum class GMGameObjectType
+{
+	Static,
+	Entity,
+	Sprite,
+	Custom,
+};
+
 class GMGameObject : public GMObject
 {
 	DECLARE_PRIVATE(GMGameObject)
@@ -32,6 +40,9 @@ public:
 
 	virtual void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
+
+	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }
+	virtual void simulate() {}
 
 public:
 	virtual void onAppendingObjectToWorld();
@@ -99,6 +110,8 @@ public:
 	GMEntityObject(AUTORELEASE Object* obj);
 
 public:
+	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
+
 	Plane* getPlanes();
 	void getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs);
 
@@ -107,20 +120,20 @@ private:
 	void makePlanes();
 };
 
-// SkyObject
-GM_PRIVATE_OBJECT(SkyGameObject)
+// GMSkyObject
+GM_PRIVATE_OBJECT(GMSkyGameObject)
 {
 	linear_math::Vector3 min;
 	linear_math::Vector3 max;
 	Shader shader;
 };
 
-class SkyGameObject : public GMGameObject
+class GMSkyGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE(SkyGameObject)
+	DECLARE_PRIVATE(GMSkyGameObject)
 
 public:
-	SkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
+	GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
 
 private:
 	void createSkyBox(OUT Object** obj);
