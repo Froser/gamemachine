@@ -5,9 +5,6 @@
 
 GMDemoGameWorld::GMDemoGameWorld()
 {
-	D(d);
-	setMajorCharacter(new GMCharacter(0));
-	GameMachine::instance().getGraphicEngine()->setCurrentWorld(this);
 }
 
 GMDemoGameWorld::~GMDemoGameWorld()
@@ -35,13 +32,13 @@ GMPhysicsWorld* GMDemoGameWorld::physicsWorld()
 	return nullptr;
 }
 
-bool GMDemoGameWorld::appendObject(const GMString& str, GMGameObject* obj)
+bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
 {
 	D(d);
-	auto& r = d->renderList.find(str);
+	auto& r = d->renderList.find(name);
 	if (r != d->renderList.end())
 		return false;
-	d->renderList[str] = obj;
+	d->renderList[name] = obj;
 	return true;
 }
 
@@ -114,4 +111,13 @@ void GMDemoGameWorld::createCube(GMfloat extents[3], OUT GMGameObject** obj)
 	GMGameObject* gameObject = new GMGameObject(coreObj);
 	*obj = gameObject;
 	GameMachine::instance().initObjectPainter(gameObject);
+}
+
+GMGameObject* GMDemoGameWorld::getGameObject(const GMString& name)
+{
+	D(d);
+	auto target = d->renderList.find(name);
+	if (target == d->renderList.end())
+		return nullptr;
+	return target->second;
 }

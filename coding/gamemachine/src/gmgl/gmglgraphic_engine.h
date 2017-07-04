@@ -48,10 +48,8 @@ public:
 
 public:
 	GMGameWorld* getWorld();
-
 	GMGLShaderProgram* getShaders(GMMeshType objectType);
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
-
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(GMMeshType objectType);
 

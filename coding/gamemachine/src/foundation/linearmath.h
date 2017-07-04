@@ -11,8 +11,7 @@ BEGIN_NS
 #	define gm_CastdTo128f(a) (_mm_castpd_ps(a))
 #	define gm_CastdTo128i(a) (_mm_castpd_si128(a))
 #	define gm_Assign128(r0, r1, r2, r3) _mm_setr_ps(r0, r1, r2, r3)
-#	define _mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
-#	define gm_pshufd_ps( _a, _mask ) _mm_shuffle_ps((_a), (_a), (_mask) )
+#	define gm_mm_madd_ps(a, b, c) _mm_add_ps(_mm_mul_ps((a), (b)), (c))
 #	define gm_shuffle_param(x, y, z, w)  ((x) | ((y) << 2) | ((z) << 4) | ((w) << 6))
 #	define gm_pshufd_ps( _a, _mask ) _mm_shuffle_ps((_a), (_a), (_mask) )
 #	define gm_splat3_ps( _a, _i ) gm_pshufd_ps((_a), gm_shuffle_param(_i,_i,_i, 3) )
@@ -26,8 +25,9 @@ BEGIN_NS
 #	define gm_vFFF0fMask gm_CastiTo128f(gm_vFFF0Mask)
 #	define gm_vxyzMaskf gm_vFFF0fMask
 #	define gm_vAbsfMask gm_CastiTo128f(gm_vAbsMask)
-#	define vQInv (_mm_set_ps(+0.0f, -0.0f, -0.0f, -0.0f))
-#	define vPPPM (_mm_set_ps(-0.0f, +0.0f, +0.0f, +0.0f))
+#	define gm_vQInv (_mm_set_ps(+0.0f, -0.0f, -0.0f, -0.0f))
+#	define gm_vPPPM (_mm_set_ps(-0.0f, +0.0f, +0.0f, +0.0f))
+#	define gm_vOnes (_mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f))
 #endif
 
 #include <math.h>
@@ -511,9 +511,11 @@ namespace linear_math
 	public:
 		inline operator Vector4*() { return &m_data[0]; }
 		inline operator const Vector4*() const { return &m_data[0]; }
+
 		Matrix4x4 operator *(const Matrix4x4& right) const;
 		Matrix4x4 transpose() const;
 		const GMfloat* data() const;
+		void toArray(GMfloat* array) const;
 
 	private:
 		Vector4 m_data[4];
@@ -743,6 +745,11 @@ namespace linear_math
 		DEFINE_VECTOR_DATA(4)
 
 	public:
+		Quaternion()
+			: Quaternion(0, 0, 0, 1)
+		{
+		}
+
 		Quaternion(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
 		{
 			m_data[0] = x;
@@ -750,6 +757,10 @@ namespace linear_math
 			m_data[2] = z;
 			m_data[3] = w;
 		}
+
+#if USE_SIMD
+		Quaternion(__m128 _128) : m_128(_128) {}
+#endif
 
 		inline GMfloat& x() { return m_data[0]; }
 		inline GMfloat& y() { return m_data[1]; }
@@ -793,6 +804,73 @@ namespace linear_math
 				sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw,
 				cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
 		}
+
+		Quaternion inverse() const
+		{
+#if USE_SIMD
+			return Quaternion(_mm_xor_ps(get128(), gm_vQInv));
+#else	
+			return Quaternion(-m_data[0], -m_data[1], -m_data[2], m_data[3]);
+#endif
+		}
+
+		Quaternion& normalize()
+		{
+#if USE_SIMD
+			__m128 vd;
+			vd = _mm_mul_ps(m_128, m_128);
+			__m128 t = _mm_movehl_ps(vd, vd);
+			vd = _mm_add_ps(vd, t);
+			t = _mm_shuffle_ps(vd, vd, 0x55);
+			vd = _mm_add_ss(vd, t);
+
+			vd = _mm_sqrt_ss(vd);
+			vd = _mm_div_ss(gm_vOnes, vd);
+			vd = gm_pshufd_ps(vd, 0); // splat
+			m_128 = _mm_mul_ps(m_128, vd);
+			return *this;
+#else
+			return *this /= length();
+#endif
+		}
+
+		Quaternion& operator*=(const Quaternion& q)
+		{
+			setValue(
+				m_data[3] * q.x() + m_data[0] * q.m_data[3] + m_data[1] * q.z() - m_data[2] * q.y(),
+				m_data[3] * q.y() + m_data[1] * q.m_data[3] + m_data[2] * q.x() - m_data[0] * q.z(),
+				m_data[3] * q.z() + m_data[2] * q.m_data[3] + m_data[0] * q.y() - m_data[1] * q.x(),
+				m_data[3] * q.m_data[3] - m_data[0] * q.x() - m_data[1] * q.y() - m_data[2] * q.z());
+			return *this;
+		}
+
+		Matrix4x4 toMatrix()
+		{
+			Matrix4x4 matrix;
+			GMfloat xx = m_data[0] * m_data[0];
+			GMfloat yy = m_data[1] * m_data[1];
+			GMfloat zz = m_data[2] * m_data[2];
+			GMfloat xy = m_data[0] * m_data[1];
+			GMfloat xz = m_data[0] * m_data[2];
+			GMfloat yz = m_data[1] * m_data[2];
+			GMfloat wx = m_data[3] * m_data[0];
+			GMfloat wy = m_data[3] * m_data[1];
+			GMfloat wz = m_data[3] * m_data[2];
+
+			matrix[0][0] = 1 - 2 * (yy + zz);
+			matrix[1][0] = 2 * (xy - wz);
+			matrix[2][0] = 2 * (xz + wy);
+			matrix[0][1] = 2 * (xy + wz);
+			matrix[1][1] = 1 - 2 * (xx + zz);
+			matrix[2][1] = 2 * (yz - wx);
+			matrix[0][2] = 2 * (xz - wy);
+			matrix[1][2] = 2 * (yz + wx);
+			matrix[2][2] = 1 - 2 * (xx + yy);
+			matrix[3][0] = matrix[3][1] = matrix[3][2] = 0.0f;
+			matrix[0][3] = matrix[1][3] = matrix[2][3] = 0.0f;
+			matrix[3][3] = 1.0f;
+			return matrix;
+		}
 	};
 
 	inline Quaternion operator*(const Quaternion& q1, const Quaternion& q2)
@@ -802,6 +880,26 @@ namespace linear_math
 			q1.w() * q2.y() + q1.y() * q2.w() + q1.z() * q2.x() - q1.x() * q2.z(),
 			q1.w() * q2.z() + q1.z() * q2.w() + q1.x() * q2.y() - q1.y() * q2.x(),
 			q1.w() * q2.w() - q1.x() * q2.x() - q1.y() * q2.y() - q1.z() * q2.z());
+	}
+
+	inline Quaternion operator*(const Quaternion& q, const Vector3& w)
+	{
+		return Quaternion(
+			q.w() * w.x() + q.y() * w.z() - q.z() * w.y(),
+			q.w() * w.y() + q.z() * w.x() - q.x() * w.z(),
+			q.w() * w.z() + q.x() * w.y() - q.y() * w.x(),
+			-q.x() * w.x() - q.y() * w.y() - q.z() * w.z());
+	}
+
+	inline Vector3 quatRotate(const Quaternion& rotation, const Vector3& v)
+	{
+		Quaternion q = rotation * v;
+		q *= rotation.inverse();
+#if USE_SIMD
+		return Vector3(_mm_and_ps(q.get128(), gm_vFFF0fMask));
+#else	
+		return Vector3(q.x(), q.y(), q.z());
+#endif
 	}
 }
 END_NS

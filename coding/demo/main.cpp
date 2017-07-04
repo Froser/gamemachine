@@ -268,8 +268,12 @@ public:
 	bool m_bMouseEnable;
 };
 
-class DemoGameHandler : public IGameHandler
+class DemoGameHandler : public GMObject, public IGameHandler
 {
+public:
+	DemoGameHandler() {}
+
+private:
 	virtual void start()
 	{
 		demo = new GMDemoGameWorld();
@@ -293,6 +297,7 @@ class DemoGameHandler : public IGameHandler
 
 	virtual void event(GameMachineEvent evt)
 	{
+		static linear_math::Vector3 dir = linear_math::normalize(linear_math::Vector3(.5f, .5f, .5f));
 		switch (evt)
 		{
 		case gm::GameMachineEvent::FrameStart:
@@ -302,8 +307,20 @@ class DemoGameHandler : public IGameHandler
 		case gm::GameMachineEvent::Simulate:
 			break;
 		case gm::GameMachineEvent::Render:
-			demo->renderGameWorld();
-			break;
+			{
+				IInput* inputManager = GameMachine::instance().getInputManager();
+				IKeyboardState& kbState = inputManager->getKeyboardState();
+				if (kbState.keyTriggered('L'))
+					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
+
+				a += .001f;
+				GMGameObject* obj = demo->getGameObject("cube");
+				linear_math::Quaternion q;
+				q.setRotation(dir, a);
+				obj->setRotation(q);
+				demo->renderGameWorld();
+				break;
+			}
 		case gm::GameMachineEvent::Activate:
 			break;
 		case gm::GameMachineEvent::Deactivate:
@@ -318,6 +335,7 @@ class DemoGameHandler : public IGameHandler
 		return true;
 	}
 
+	GMfloat a = 0;
 	GMDemoGameWorld* demo;
 };
 

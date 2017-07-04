@@ -11,6 +11,11 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	AutoPtr<Object> object;
+
+	linear_math::Matrix4x4 scaling;
+	linear_math::Matrix4x4 translation;
+	linear_math::Quaternion rotation;
+	linear_math::Matrix4x4 transformMatrix;
 };
 
 class GMGameObject : public GMObject
@@ -31,6 +36,15 @@ public:
 public:
 	virtual void onAppendingObjectToWorld();
 	virtual void onBeforeDraw();
+
+public:
+	inline void setScaling(const linear_math::Matrix4x4& scaling) { D(d); updateMatrix(); d->scaling = scaling; }
+	inline void setTranslate(const linear_math::Matrix4x4& translation) { D(d); updateMatrix(); d->translation = translation; }
+	inline void setRotation(const linear_math::Quaternion& rotation) { D(d); updateMatrix(); d->rotation = rotation; }
+	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
+
+private:
+	inline void updateMatrix();
 };
 
 //GMGlyphObject

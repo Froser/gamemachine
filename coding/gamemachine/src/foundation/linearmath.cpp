@@ -41,7 +41,7 @@ Matrix4x4 Matrix4x4::identity()
 			_mm_set_ps(0.0f, 0.0f, 0.0f, 1.0f),
 			_mm_set_ps(0.0f, 0.0f, 1.0f, 0.0f),
 			_mm_set_ps(0.0f, 1.0f, 0.0f, 0.0f),
-			_mm_set_ps(1.0f, 1.0f, 0.0f, 0.0f));
+			_mm_set_ps(1.0f, 0.0f, 0.0f, 0.0f));
 #else
 	static const Matrix4x4
 		identityMatrix(
@@ -109,6 +109,18 @@ Matrix4x4 Matrix4x4::transpose() const
 	}
 
 	return result;
+}
+
+void Matrix4x4::toArray(GMfloat* array) const
+{
+	GMint k = 0;
+	for (GMint i = 0; i < 4; i++)
+	{
+		for (GMint j = 0; j < 4; j++, k++)
+		{
+			array[k] = m_data[i][j];
+		}
+	}
 }
 
 const GMfloat* Matrix4x4::data() const

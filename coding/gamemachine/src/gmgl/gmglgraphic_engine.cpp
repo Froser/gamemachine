@@ -77,11 +77,12 @@ void GMGLGraphicEngine::applyGraphicSettings()
 void GMGLGraphicEngine::drawObjectOnce(GMGameObject* object)
 {
 	D(d);
-	static GMfloat trans[] = { 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 };
+	GMfloat transform[16];
+	object->getTransform().toArray(transform);
 	GMGLShaderProgram* lastShaders = nullptr;
 	object->onBeforeDraw();
 	Object* coreObj = object->getObject();
-	coreObj->getPainter()->draw(trans);
+	coreObj->getPainter()->draw(transform);
 }
 
 void GMGLGraphicEngine::installShaders()

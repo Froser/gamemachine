@@ -26,8 +26,9 @@ public:
 	virtual GMPhysicsWorld* physicsWorld() override;
 
 public:
-	bool appendObject(const GMString& str, GMGameObject* obj);
+	bool appendObject(const GMString& name, GMGameObject* obj);
 	void createCube(GMfloat extents[3], OUT GMGameObject** obj);
+	GMGameObject* getGameObject(const GMString& name);
 };
 
 END_NS

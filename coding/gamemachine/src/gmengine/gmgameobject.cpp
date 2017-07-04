@@ -7,7 +7,11 @@
 
 GMGameObject::GMGameObject(AUTORELEASE Object* obj)
 {
+	D(d);
 	setObject(obj);
+	d->scaling = linear_math::Matrix4x4::identity();
+	d->translation = linear_math::Matrix4x4::identity();
+	updateMatrix();
 }
 
 void GMGameObject::setObject(AUTORELEASE Object* obj)
@@ -45,6 +49,12 @@ void GMGameObject::onAppendingObjectToWorld()
 void GMGameObject::onBeforeDraw()
 {
 
+}
+
+void GMGameObject::updateMatrix()
+{
+	D(d);
+	d->transformMatrix = d->translation * d->rotation.toMatrix() * d->scaling;
 }
 
 //GlyphObject
