@@ -9,7 +9,7 @@ BEGIN_NS
 
 typedef GMint GMCommand;
 
-GM_ALIGNED_16(class) GMCommandVector3 : public GMObject
+class GMCommandVector3 : public GMObject
 {
 public:
 	GMCommandVector3() = default;
@@ -30,7 +30,7 @@ private:
 	GMfloat p[3];
 };
 
-typedef std::map<GMCommand, AlignedVector<GMCommandVector3> > CommandParams;
+typedef Map<GMCommand, AlignedVector<GMCommandVector3> > CommandParams;
 
 #define USELESS_PARAM 0
 #define CMD_NONE 0x0000

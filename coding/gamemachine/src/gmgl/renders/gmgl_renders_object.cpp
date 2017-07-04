@@ -171,8 +171,9 @@ void GMGLRenders_Object::activateLight(LightType t, LightInfo& light)
 	case gm::LT_AMBIENT:
 	{
 		GMfloat* defaultLight = d->engine->getEnvironment().ambientLightColor;
+		GMfloat* defaultKa = d->engine->getEnvironment().ambientK;
 		GMGL::uniformVec3(*d->gmglShaders, light.on && !light.useGlobalLightColor ? &light.lightColor[0] : defaultLight, GMSHADER_LIGHT_AMBIENT);
-		GMGL::uniformVec3(*d->gmglShaders, light.on ? &light.args[LA_KA] : &d->world->getDefaultAmbientLight().args[LA_KA], GMSHADER_LIGHT_KA);
+		GMGL::uniformVec3(*d->gmglShaders, light.on ? &light.args[LA_KA] : defaultKa, GMSHADER_LIGHT_KA);
 	}
 	break;
 	case gm::LT_SPECULAR:

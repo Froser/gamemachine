@@ -29,11 +29,7 @@ class GMMoveRate : public GMObject
 public:
 	GMMoveRate()
 	{
-		D(d);
-		for (GMuint i = 0; i < MC_MOVEMENT_COUNT; i++)
-		{
-			d->moveRate[i] = 1;
-		}
+		clear();
 	}
 
 	void setMoveRate(GMMovement action, GMfloat rate)
@@ -51,7 +47,17 @@ public:
 	void clear()
 	{
 		D(d);
-		memset(&d->moveRate, sizeof(d->moveRate), 0);
+		for (GMuint i = 0; i < MC_MOVEMENT_COUNT; i++)
+		{
+			d->moveRate[i] = 1;
+		}
+	}
+
+	GMMoveRate& operator = (const GMMoveRate& rhs)
+	{
+		D(d);
+		memcpy(d, rhs.data(), sizeof(rhs.data()));
+		return *this;
 	}
 };
 
@@ -62,7 +68,6 @@ public:
 GM_PRIVATE_OBJECT(GMSpriteGameObject)
 {
 	GMfloat radius;
-	Frustum frustum;
 	GMMovement moveDirection;
 	GMMoveRate moveRate;
 	GMfloat pitchLimitRadius;
@@ -81,6 +86,8 @@ public:
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Sprite; }
 	virtual void simulate() override;
+	virtual void onAppendingObjectToWorld() override;
+	virtual void updateAfterSimulate() override;
 
 public:
 	void setJumpSpeed(const linear_math::Vector3& jumpSpeed);
@@ -91,13 +98,9 @@ public:
 	void setPitchLimitDegree(GMfloat deg);
 	const PositionState& getPositionState();
 
-public:
-	virtual void onAppendingObjectToWorld() override;
-
 private:
 	void moveForwardOrBackward(bool forward);
 	void moveLeftOrRight(bool left);
-	void update();
 	void sendMoveCommand();
 	void clearMoveArgs();
 };

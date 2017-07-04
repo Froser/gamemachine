@@ -41,25 +41,6 @@ struct GameMachineMessage
 	Param param;
 };
 
-// Multi-threads
-template <GameMachineEvent e>
-class GameLoopJob : public GMSustainedThread
-{
-public:
-	void setHandler(IGameHandler* h)
-	{
-		handler = h;
-	}
-
-	virtual void sustainedRun() override
-	{
-		handler->event(e);
-	}
-
-private:
-	IGameHandler* handler;
-};
-
 typedef Vector<Pair<GMUIWindow*, GMUIWindowAttributes> > GameMachineWindows;
 
 GM_PRIVATE_OBJECT(GameMachine)
@@ -78,7 +59,6 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMCamera camera;
 	std::queue<GameMachineMessage> messageQueue;
 	GameMachineWindows windows; // 除主窗口以外的窗口列表
-	GameLoopJob<GameMachineEvent::Simulate> simulateJob;
 	AUTORELEASE GMUIConsole* consoleWindow; // 内置调试窗口
 };
 

@@ -22,6 +22,7 @@ public:
 
 public:
 	void synchronize(GMSpriteGameObject* gameObject);
+	void apply();
 
 	Frustum& getFrustum() { D(d); return d->frustum; }
 	const PositionState& getPositionState() { D(d); return d->state; }

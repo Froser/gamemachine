@@ -43,6 +43,7 @@ public:
 
 	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }
 	virtual void simulate() {}
+	virtual void updateAfterSimulate() {}
 
 public:
 	virtual void onAppendingObjectToWorld();

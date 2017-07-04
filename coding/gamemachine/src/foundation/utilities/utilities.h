@@ -613,12 +613,6 @@ inline linear_math::Matrix4x4 getViewMatrix(const CameraLookAt& lookAt)
 	return linear_math::lookat(lookAt.position, lookAt.lookAt + lookAt.position, linear_math::Vector3(0, 1, 0));
 }
 
-class Camera
-{
-public:
-	static void calcCameraLookAt(const PositionState& state, REF CameraLookAt& lookAt);
-};
-
 //Path
 struct Path
 {

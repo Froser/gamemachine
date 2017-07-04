@@ -261,7 +261,7 @@ void GMBSPGameWorld::updateCamera()
 void GMBSPGameWorld::renderGameWorld()
 {
 	GM_PROFILE(renderGameWorld);
-	D(d);
+	Base::renderGameWorld();
 	drawAll();
 }
 
@@ -355,8 +355,6 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 void GMBSPGameWorld::drawAll()
 {
 	GM_PROFILE(drawAll);
-	D(d);
-	GameMachine::instance().getGraphicEngine()->newFrame();
 
 	drawSky();
 	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
@@ -433,13 +431,6 @@ void GMBSPGameWorld::flushBuffer()
 
 	D(d);
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-
-	linear_math::Vector3& defaultAmbient = getDefaultAmbientLight().lightColor;
-	GMGraphicEnvironment env;
-	env.ambientLightColor[0] = defaultAmbient[0];
-	env.ambientLightColor[1] = defaultAmbient[1];
-	env.ambientLightColor[2] = defaultAmbient[2];
-	engine->setEnvironment(env);
 
 	for (auto& obj : d->polygonFaceBuffer)
 	{

@@ -25,7 +25,6 @@ GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMCollisionObject* obj)
 
 void GMBSPMove::move()
 {
-	GM_PROFILE(move);
 	D(d);
 	generateMovement();
 	groundTrace();

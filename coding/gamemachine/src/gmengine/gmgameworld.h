@@ -14,7 +14,7 @@ class ObjectPainter;
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
-	LightInfo ambientLight;
+	GMGraphicEnvironment graphicEnv;
 	bool start;
 };
 
@@ -27,14 +27,15 @@ public:
 	virtual ~GMGameWorld();
 
 public:
-	virtual void renderGameWorld() = 0;
 	virtual GMPhysicsWorld* physicsWorld() = 0;
+
+public:
+	virtual void renderGameWorld();
 
 public:
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
-	void setDefaultAmbientLight(const LightInfo& lightInfo) { D(d); d->ambientLight = lightInfo; }
-	LightInfo& getDefaultAmbientLight() { D(d); return d->ambientLight; }
+	void setDefaultAmbientLight(const LightInfo& lightInfo);
 	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 
 private:

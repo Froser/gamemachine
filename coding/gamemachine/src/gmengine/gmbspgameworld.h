@@ -11,6 +11,8 @@ class GMBSPGameWorld : public GMGameWorld
 {
 	DECLARE_PRIVATE(GMBSPGameWorld);
 
+	typedef GMGameWorld Base;
+
 public:
 	GMBSPGameWorld();
 	~GMBSPGameWorld();
@@ -19,8 +21,8 @@ public:
 	void loadBSP(const GMString& mapName);
 	void setSky(AUTORELEASE GMGameObject* sky);
 	GMGameObject* getSky();
+	Map<GMint, Set<GMBSPEntity*> >& getEntities();
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
-	std::map<GMint, std::set<GMBSPEntity*> >& getEntities();
 	using GMGameWorld::appendObjectAndInit;
 
 public:

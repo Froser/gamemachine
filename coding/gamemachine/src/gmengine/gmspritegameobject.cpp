@@ -137,7 +137,7 @@ void GMSpriteGameObject::simulate()
 	d->moveDirection = MC_NONE;
 }
 
-void GMSpriteGameObject::update()
+void GMSpriteGameObject::updateAfterSimulate()
 {
 	D(d);
 	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -152,9 +152,12 @@ void GMSpriteGameObject::sendMoveCommand()
 	D(d);
 	GMPhysicsWorld* pw = getWorld()->physicsWorld();
 	GMCommandVector3 args[] = {
-		GMCommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM), d->moveCmdArgFB, d->moveCmdArgLR,
+		GMCommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM),
+		d->moveCmdArgFB,
+		d->moveCmdArgLR,
 	};
-	pw->sendCommand(pw->find(this), GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3));
+	CommandParams params = GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3);
+	pw->sendCommand(pw->find(this), params);
 }
 
 void GMSpriteGameObject::clearMoveArgs()

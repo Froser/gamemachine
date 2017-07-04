@@ -128,10 +128,6 @@ void GameMachine::startGameMachine()
 	// 初始化gameHandler
 	d->gameHandler->start();
 
-	// 开始多线程工作
-	d->simulateJob.setHandler(d->gameHandler);
-	d->simulateJob.start();
-
 	// 开始计时器
 	d->clock.begin();
 	// 消息循环
@@ -150,11 +146,9 @@ void GameMachine::startGameMachine()
 		else
 			d->gameHandler->event(GameMachineEvent::Deactivate);
 
-		{
-			gmRunSustainedThread (simulateJob, &d->simulateJob);
-			d->gameHandler->event(GameMachineEvent::Render);
-			d->mainWindow->swapBuffers();
-		}
+		d->gameHandler->event(GameMachineEvent::Simulate);
+		d->gameHandler->event(GameMachineEvent::Render);
+		d->mainWindow->swapBuffers();
 
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
 

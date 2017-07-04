@@ -585,19 +585,7 @@ bool Bitset::init(GMint numberOfBits)
 	return true;
 }
 
-//Camera
-void Camera::calcCameraLookAt(const PositionState& state, REF CameraLookAt& lookAt)
-{
-	lookAt.lookAt[1] = sin(state.pitch);
-	GMfloat l = cos(state.pitch);
-	lookAt.lookAt[0] = l * sin(state.yaw);
-	lookAt.lookAt[2] = -l * cos(state.yaw);
-
-	lookAt.position = state.position;
-}
-
 //Path
-
 GMString Path::directoryName(const GMString& fileName)
 {
 	GMint pos1 = fileName.findLastOf('\\'),

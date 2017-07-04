@@ -95,13 +95,17 @@ public:
 		switch (evt)
 		{
 		case GameMachineEvent::Simulate:
-			world->simulateGameWorld();
-			break;
-		case GameMachineEvent::Render:
 			{
+				world->simulateGameWorld();
 				// ¸üÐÂCamera
 				GMCamera& camera = GameMachine::instance().getCamera();
-
+				camera.synchronize(m_sprite);
+				break;
+			}
+		case GameMachineEvent::Render:
+			{
+				GMCamera& camera = GameMachine::instance().getCamera();
+				camera.apply();
 				world->renderGameWorld();
 
 				const PositionState& position = m_sprite->getPositionState();

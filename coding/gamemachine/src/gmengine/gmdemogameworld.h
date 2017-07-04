@@ -17,6 +17,8 @@ class GMDemoGameWorld : public GMGameWorld
 {
 	DECLARE_PRIVATE(GMDemoGameWorld)
 
+	typedef GMGameWorld Base;
+
 public:
 	GMDemoGameWorld();
 	~GMDemoGameWorld();

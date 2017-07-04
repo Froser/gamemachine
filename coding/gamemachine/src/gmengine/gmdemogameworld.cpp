@@ -18,7 +18,8 @@ GMDemoGameWorld::~GMDemoGameWorld()
 void GMDemoGameWorld::renderGameWorld()
 {
 	D(d);
-	GameMachine::instance().getGraphicEngine()->newFrame();
+	Base::renderGameWorld();
+
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 	for (auto& object : d->renderList)
 	{
