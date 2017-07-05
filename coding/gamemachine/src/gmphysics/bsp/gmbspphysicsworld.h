@@ -22,7 +22,7 @@ GM_PRIVATE_OBJECT_FROM(GMBSPPhysicsWorld, GMPhysicsWorld)
 	GMBSPPatch patch;
 
 	Map<GMCollisionObject*, GMBSPMove*> objectMoves;
-	Map<GMGameObject*, GMCollisionObject> collisionObjects;
+	Map<GMGameObject*, GMCollisionObject*> collisionObjects;
 };
 
 class GMBSPPhysicsWorld : public GMPhysicsWorld

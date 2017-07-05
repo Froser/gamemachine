@@ -24,10 +24,16 @@ GMBSPPhysicsWorld::GMBSPPhysicsWorld(GMGameWorld* world)
 GMBSPPhysicsWorld::~GMBSPPhysicsWorld()
 {
 	D(d);
-	for (auto iter = d->objectMoves.begin(); iter != d->objectMoves.end(); iter++)
+	for (auto& kv : d->objectMoves)
 	{
-		delete iter->second;
+		delete kv.second;
 	}
+
+	for (auto& kv : d->collisionObjects)
+	{
+		delete kv.second;
+	}
+
 	d->objectMoves.clear();
 }
 
@@ -53,10 +59,11 @@ GMCollisionObject* GMBSPPhysicsWorld::find(GMGameObject* obj)
 	if (target == d->collisionObjects.end())
 	{
 		auto& constructed = d->collisionObjects[obj];
-		constructed = CollisionObjectFactory::defaultCamera();
-		return &constructed;
+		constructed = new GMCollisionObject();
+		*constructed = CollisionObjectFactory::defaultCamera();
+		return constructed;
 	}
-	return &d->collisionObjects[obj];
+	return d->collisionObjects[obj];
 }
 
 void GMBSPPhysicsWorld::sendCommand(GMCollisionObject* obj, const CommandParams& dataParam)
