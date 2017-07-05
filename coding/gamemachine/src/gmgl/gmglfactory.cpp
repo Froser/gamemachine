@@ -31,7 +31,7 @@ void GMGLFactory::createTexture(AUTORELEASE GMImage* image, OUT ITexture** textu
 	(*texture) = new GMGLTexture(image);
 }
 
-void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectPainter** painter)
+void GMGLFactory::createPainter(IGraphicEngine* engine, Object* obj, OUT GMObjectPainter** painter)
 {
 	ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);

@@ -6,7 +6,6 @@
 BEGIN_NS
 
 class GMMesh;
-struct Shader;
 struct CameraLookAt;
 struct IRender
 {

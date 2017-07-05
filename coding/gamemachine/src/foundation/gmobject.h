@@ -86,19 +86,6 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 #define GM_PRIVATE_CONSTRUCT(name) name##Private()
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
-// 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
-class GMObject : public GMAlignmentObject
-{
-public:
-	virtual ~GMObject();
-
-public:
-	static void swapData(GMObject* a, GMObject* b);
-
-private:
-	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();
-};
-
 /* 代码规范：
   条款一：
   如果一个类是继承GMObject，那么它不能有成员变量。它的成员变量要用GM_PRIVATE_OBJECT和DECLARE_PRIVATE来声明和定义。
@@ -124,6 +111,26 @@ class MyObject : public GMObject
   条款四：
   任何参与内核的类必须继承GMObject
 */
+
+// 在一个类中加入GMUnassignableObject，可以阻止类对象被赋值
+// 通常是因为浅拷贝有很大的副作用，如带有Private部分的GMObject仅仅拷贝了data指针
+GM_ALIGNED_STRUCT(GMUnassignableObject)
+{
+	GMUnassignableObject& operator=(const GMUnassignableObject&) = delete;
+};
+
+// 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
+class GMObject : public GMAlignmentObject
+{
+public:
+	virtual ~GMObject();
+
+public:
+	static void swapData(GMObject* a, GMObject* b);
+
+private:
+	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();
+};
 
 template <typename T>
 class GMSingleton : public GMObject

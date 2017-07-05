@@ -10,7 +10,6 @@ class TiXmlDocument;
 
 BEGIN_NS
 // 解析一些纹理配置，如天空、特效、动画等，并加入世界
-struct Shader;
 class GMBSPGameWorld;
 
 GM_PRIVATE_OBJECT(GMBSPShaderLoader)

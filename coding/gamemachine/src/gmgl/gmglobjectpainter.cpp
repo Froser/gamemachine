@@ -25,7 +25,7 @@ static GLenum getMode(GMMesh* obj)
 }
 
 GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, Object* objs)
-	: ObjectPainter(objs)
+	: GMObjectPainter(objs)
 	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
 	, m_inited(false)
 {
@@ -105,7 +105,7 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 		for (auto component : mesh->getComponents())
 		{
 			Shader& shader = component->getShader();
-			if (shader.nodraw)
+			if (shader.getNodraw())
 				continue;
 
 			render->beginShader(shader);
@@ -137,7 +137,7 @@ void GMGLObjectPainter::dispose()
 	m_inited = false;
 }
 
-void GMGLObjectPainter::clone(Object* obj, OUT ObjectPainter** painter)
+void GMGLObjectPainter::clone(Object* obj, OUT GMObjectPainter** painter)
 {
 	ASSERT(painter);
 	*painter = new GMGLObjectPainter(m_engine, obj);

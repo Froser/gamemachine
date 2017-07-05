@@ -103,13 +103,13 @@ void GMGlyphObject::constructObject()
 
 	Component* component = new Component(child);
 	Shader& shader = component->getShader();
-	shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0] = glyphManager->glyphTexture();
-	shader.texture.textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
-	shader.noDepthTest = true;
-	shader.cull = GMS_NONE;
-	shader.blend = true;
-	shader.blendFactors[0] = GMS_ONE;
-	shader.blendFactors[1] = GMS_ONE;
+	shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frames[0] = glyphManager->glyphTexture();
+	shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
+	shader.setNoDepthTest(true);
+	shader.setCull(GMS_NONE);
+	shader.setBlend(true);
+	shader.setBlendFactorSource(GMS_ONE);
+	shader.setBlendFactorDest(GMS_ONE);
 
 	const GMWchar* p = d->text.c_str();
 	const GMfloat Z = 0;
@@ -350,7 +350,7 @@ void GMSkyGameObject::createSkyBox(OUT Object** obj)
 	child->setType(GMMeshType::Sky);
 
 	Component* component = new Component(child);
-	component->getShader() = d->shader;
+	component->setShader(d->shader);
 
 	// We don't draw surface beneath us
 	for (GMuint i = 0; i < 5; i++)

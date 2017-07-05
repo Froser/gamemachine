@@ -65,7 +65,7 @@ void GMGameWorld::simulateGameWorld()
 		d->start = true;
 }
 
-void GMGameWorld::setDefaultAmbientLight(const GMLightInfo& lightInfo)
+void GMGameWorld::setDefaultAmbientLight(const GMLight& lightInfo)
 {
 	D(d);
 	d->graphicEnv.ambientLightColor[0] = lightInfo.getLightColor()[0];
@@ -76,13 +76,13 @@ void GMGameWorld::setDefaultAmbientLight(const GMLightInfo& lightInfo)
 	d->graphicEnv.ambientK[2] = lightInfo.getKa()[2];
 }
 
-ObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
+GMObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 {
 	D(d);
 	GameMachine& gm = GameMachine::instance();
 	IFactory* factory = gm.getFactory();
 	IGraphicEngine* engine = gm.getGraphicEngine();
-	ObjectPainter* painter;
+	GMObjectPainter* painter;
 	factory->createPainter(engine, obj->getObject(), &painter);
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);

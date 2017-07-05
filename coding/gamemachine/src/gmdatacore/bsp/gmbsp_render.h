@@ -161,8 +161,6 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 };
 
 typedef GMBSPRenderPrivate GMBSPRenderData;
-class Object;
-struct Shader;
 class GMBSPRender
 {
 	DECLARE_PRIVATE(GMBSPRender);

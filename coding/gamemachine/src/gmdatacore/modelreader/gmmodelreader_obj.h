@@ -20,7 +20,6 @@ class Object;
 struct GMBuffer;
 class Scanner;
 class Component;
-struct Shader;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
 	Object* object;

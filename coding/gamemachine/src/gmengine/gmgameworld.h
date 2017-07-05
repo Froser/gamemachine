@@ -9,7 +9,7 @@
 BEGIN_NS
 
 class GMCharacter;
-class ObjectPainter;
+class GMObjectPainter;
 
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
@@ -35,11 +35,11 @@ public:
 public:
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
-	void setDefaultAmbientLight(const GMLightInfo& lightInfo);
+	void setDefaultAmbientLight(const GMLight& lightInfo);
 	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 
 private:
-	ObjectPainter* createPainterForObject(GMGameObject* obj);
+	GMObjectPainter* createPainterForObject(GMGameObject* obj);
 };
 
 END_NS

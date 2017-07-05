@@ -29,7 +29,7 @@ public:
 
 protected:
 	void clearData();
-	void activateLight(LightType t, GMLightInfo& light);
+	void activateLight(LightType t, GMLight& light);
 	void drawDebug();
 	ITexture* getTexture(TextureFrames& frames);
 	void activeTextureTransform(Shader* shader, TextureIndex i);

@@ -8,7 +8,7 @@ BEGIN_NS
 class GMGLGraphicEngine;
 class GMGLShaderProgram;
 class GMGameWorld;
-class GMGLObjectPainter : public ObjectPainter
+class GMGLObjectPainter : public GMObjectPainter
 {
 public:
 	GMGLObjectPainter(IGraphicEngine* engine, Object* objs);
@@ -17,7 +17,7 @@ public:
 	virtual void transfer() override;
 	virtual void draw(GMfloat* modelTransform) override;
 	virtual void dispose() override;
-	virtual void clone(Object* obj, OUT ObjectPainter** painter) override;
+	virtual void clone(Object* obj, OUT GMObjectPainter** painter) override;
 
 private:
 	GMGLGraphicEngine* m_engine;

@@ -271,15 +271,15 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 
 void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Shader& shader)
 {
-	shader.cull = GMS_NONE;
+	shader.setCull(GMS_NONE);
 
-	shader.lights[LT_AMBIENT].setEnabled(true);
-	shader.lights[LT_AMBIENT].setUseGlobalLightColor (true);
-	shader.lights[LT_AMBIENT].setKa(linear_math::Vector3::fromArray(material.ka));
+	shader.getLight(LT_AMBIENT).setEnabled(true);
+	shader.getLight(LT_AMBIENT).setUseGlobalLightColor (true);
+	shader.getLight(LT_AMBIENT).setKa(linear_math::Vector3::fromArray(material.ka));
 
-	shader.lights[LT_SPECULAR].setEnabled(true);
-	shader.lights[LT_SPECULAR].setUseGlobalLightColor(true);
-	shader.lights[LT_SPECULAR].setShininess(material.ns);
-	shader.lights[LT_SPECULAR].setKd(linear_math::Vector3::fromArray(material.kd));
-	shader.lights[LT_SPECULAR].setKs(linear_math::Vector3::fromArray(material.ks));
+	shader.getLight(LT_SPECULAR).setEnabled(true);
+	shader.getLight(LT_SPECULAR).setUseGlobalLightColor(true);
+	shader.getLight(LT_SPECULAR).setShininess(material.ns);
+	shader.getLight(LT_SPECULAR).setKd(linear_math::Vector3::fromArray(material.kd));
+	shader.getLight(LT_SPECULAR).setKs(linear_math::Vector3::fromArray(material.ks));
 }

@@ -257,7 +257,7 @@ void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Sha
 		END_PARSE;
 	}
 
-	if (shader.surfaceFlag & SURF_SKY)
+	if (shader.getSurfaceFlag() & SURF_SKY)
 		createSky(shader);
 
 	parseEnd();
@@ -277,16 +277,16 @@ void GMBSPShaderLoader::parseEnd()
 
 void GMBSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
 {
-	shader.surfaceFlag |= parseSurfaceParm(elem->GetText());;
+	shader.setSurfaceFlag(shader.getSurfaceFlag() | parseSurfaceParm(elem->GetText()));
 }
 
 void GMBSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 {
 	const char* text = elem->GetText();
 	if (strEqual(text, "none"))
-		shader.cull = GMS_NONE;
+		shader.setCull(GMS_NONE);
 	else if (strEqual(text, "cull"))
-		shader.cull = GMS_CULL;
+		shader.setCull(GMS_CULL);
 	else
 		gm_error("wrong cull param %s", text);
 }
@@ -299,21 +299,21 @@ void GMBSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
 		Scanner s(b);
 		char blendFunc[LINE_MAX];
 		s.next(blendFunc);
-		shader.blendFactors[0] = parseBlendFunc(blendFunc);
+		shader.setBlendFactorSource(parseBlendFunc(blendFunc));
 		s.next(blendFunc);
-		shader.blendFactors[1] = parseBlendFunc(blendFunc);
-		shader.blend = true;
+		shader.setBlendFactorDest(parseBlendFunc(blendFunc));
+		shader.setBlend(true);
 	}
 	else
 	{
-		shader.blend = false;
+		shader.setBlend(false);
 	}
 }
 
 void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
-	TextureFrames* frame = &shader.texture.textures[d->textureNum];
+	TextureFrames* frame = &shader.getTexture().textures[d->textureNum];
 	GMint ms;
 	SAFE_SSCANF(elem->Attribute("ms"), "%d", &ms);
 	frame->animationMs = ms;
@@ -332,7 +332,7 @@ void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
 	D(d);
-	TextureFrames* frame = &shader.texture.textures[d->textureNum];
+	TextureFrames* frame = &shader.getTexture().textures[d->textureNum];
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 		frame->frames[i] = texture;
@@ -341,7 +341,7 @@ void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
-	TextureFrames* frame = &shader.texture.textures[d->textureNum];
+	TextureFrames* frame = &shader.getTexture().textures[d->textureNum];
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
@@ -362,7 +362,7 @@ void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
-	TextureFrames* frame = &shader.texture.textures[d->textureNum];
+	TextureFrames* frame = &shader.getTexture().textures[d->textureNum];
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
@@ -391,7 +391,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 			ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 			TextureContainer_ID& tc = rc->getLightmapContainer();
 
-			TextureFrames* frame = &shader.texture.textures[d->textureNum];
+			TextureFrames* frame = &shader.getTexture().textures[d->textureNum];
 			memset(frame->frames, 0, sizeof(frame->frames));
 			const TextureContainer_ID::TextureItemType* tex = tc.find(d->lightmapId);
 			if (tex)
@@ -410,7 +410,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 
 void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 {
-	TextureFrames* frame = &shader.texture.textures[TEXTURE_INDEX_NORMAL_MAPPING];
+	TextureFrames* frame = &shader.getTexture().textures[TEXTURE_INDEX_NORMAL_MAPPING];
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
@@ -439,7 +439,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	GMLightInfo lightInfo;
+	GMLight lightInfo;
 	lightInfo.setEnabled(true);
 	LightType lightType;
 	const char* color = elem->Attribute("color");
@@ -509,7 +509,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 			lightInfo.setShininess(shininess);
 		}
 	}
-	shader.lights[lightType] = lightInfo;
+	shader.getLight(lightType) = lightInfo;
 }
 
 void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
@@ -518,11 +518,11 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 	// tcMod <type> <...>
 	const char* tcMod = elem->Attribute("tcMod");
 	GMuint tcModNum = 0;
-	while (tcModNum < MAX_TEX_MOD && shader.texture.textures[d->textureNum].texMod[tcModNum].type != GMS_NO_TEXTURE_MOD)
+	while (tcModNum < MAX_TEX_MOD && shader.getTexture().textures[d->textureNum].texMod[tcModNum].type != GMS_NO_TEXTURE_MOD)
 	{
 		tcModNum++;
 	}
-	GMS_TextureMod* currentMod = &shader.texture.textures[d->textureNum].texMod[tcModNum];
+	GMS_TextureMod* currentMod = &shader.getTexture().textures[d->textureNum].texMod[tcModNum];
 
 	if (tcMod)
 	{
@@ -555,7 +555,7 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 					gm_warning(_L("warning: you have tcMods more than %d, please increase MAX_TEX_MOD"), MAX_TEX_MOD);
 				break;
 			}
-			currentMod = &shader.texture.textures[d->textureNum].texMod[tcModNum];
+			currentMod = &shader.getTexture().textures[d->textureNum].texMod[tcModNum];
 		}
 	}
 }
@@ -563,14 +563,14 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::createSky(Shader& shader)
 {
 	D(d);
-	ITexture* texture = shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0];
-	shader.nodraw = true;
+	ITexture* texture = shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frames[0];
+	shader.setNodraw(true);
 	if (!d->world->getSky())
 	{
 		Shader skyShader = shader;
-		skyShader.nodraw = false;
-		skyShader.cull = GMS_NONE;
-		skyShader.noDepthTest = true;
+		skyShader.setNodraw(false);
+		skyShader.setCull(GMS_NONE);
+		skyShader.setNoDepthTest(true);
 
 		GMSkyGameObject* sky = new GMSkyGameObject(skyShader, d->bspRender->boundMin, d->bspRender->boundMax);
 		d->world->setSky(sky);

@@ -5,17 +5,18 @@ BEGIN_NS
 // 前置声明
 class GameMachine;
 class GMGameWorld;
-class Camera;
+class GMCamera;
 class ResourceContainer;
 class GMGameObject;
 class DrawingList;
 class GMGamePackage;
 class GMImage;
 class Object;
-class ObjectPainter;
 class GMGamePackage;
 class GMGlyphManager;
 class GMUIWindow;
+class Shader;
+class GMObjectPainter;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
@@ -74,7 +75,7 @@ GM_INTERFACE(IFactory)
 	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE GMImage*, OUT ITexture**) = 0;
-	virtual void createPainter(IGraphicEngine*, Object*, OUT ObjectPainter**) = 0;
+	virtual void createPainter(IGraphicEngine*, Object*, OUT GMObjectPainter**) = 0;
 	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };

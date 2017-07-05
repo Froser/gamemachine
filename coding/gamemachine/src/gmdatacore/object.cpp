@@ -5,13 +5,7 @@
 
 #define VERTEX_DEMENSION 4 //顶点的维度，最高维度是齐次维度，恒为1
 
-ObjectPainter::ObjectPainter(Object* obj)
-{
-	D(d);
-	d->object = obj;
-}
-
-Object* ObjectPainter::getObject()
+Object* GMObjectPainter::getObject()
 {
 	D(d);
 	return d->object;
@@ -44,10 +38,10 @@ Component::Component(GMMesh* parent)
 Component::~Component()
 {
 	D(d);
-	TextureInfo& ti = d->shader.texture;
+	TextureInfo& ti = d->shader.getTexture();
 	if (ti.autorelease)
 	{
-		TextureFrames* frames = d->shader.texture.textures;
+		TextureFrames* frames = d->shader.getTexture().textures;
 		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
 		{
 			for (GMint j = 0; j < frames[i].frameCount; j++)

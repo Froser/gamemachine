@@ -3,7 +3,7 @@
 #include "gmmodelreader_obj.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 
-GM_ALIGNED_16(class) GMModelReaderContainer : public GMObject
+class GMModelReaderContainer : public GMObject
 {
 public:
 	GMModelReaderContainer()

@@ -6,14 +6,14 @@
 BEGIN_NS
 
 class GMImage;
-class ObjectPainter;
+class GMObjectPainter;
 class GMGLFactory : public IFactory
 {
 public:
 	virtual void createWindow(OUT GMUIWindow**) override;
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;
 	virtual void createTexture(AUTORELEASE GMImage* image, OUT ITexture** texture) override;
-	virtual void createPainter(IGraphicEngine* engine, Object* obj, OUT ObjectPainter** painter) override;
+	virtual void createPainter(IGraphicEngine* engine, Object* obj, OUT GMObjectPainter** painter) override;
 	virtual void createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler) override;
 	virtual void createGlyphManager(OUT GMGlyphManager**) override;
 };

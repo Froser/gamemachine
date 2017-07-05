@@ -10,7 +10,7 @@
 
 void GMGLRenders_Object::activateShader(Shader* shader)
 {
-	if (shader->cull == GMS_NONE)
+	if (shader->getCull() == GMS_NONE)
 	{
 		glDisable(GL_CULL_FACE);
 	}
@@ -20,13 +20,18 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 		glEnable(GL_CULL_FACE);
 	}
 
-	if (shader->blend)
+	if (shader->getBlend())
 	{
 		glEnable(GL_BLEND);
 		GLenum factors[2];
+		GMS_BlendFunc gms_factors[] = {
+			shader->getBlendFactorSource(),
+			shader->getBlendFactorDest(),
+		};
+
 		for (GMuint i = 0; i < 2; i++)
 		{
-			switch (shader->blendFactors[i])
+			switch (gms_factors[i])
 			{
 			case GMS_ZERO:
 				factors[i] = GL_ZERO;
@@ -55,10 +60,10 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 		glDisable(GL_BLEND);
 	}
 
-	if (shader->blend)
+	if (shader->getBlend())
 		glDepthMask(GL_FALSE);
 
-	if (shader->noDepthTest)
+	if (shader->getNoDepthTest())
 		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
@@ -66,7 +71,7 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 
 void GMGLRenders_Object::deactivateShader(Shader* shader)
 {
-	if (shader->blend)
+	if (shader->getBlend())
 	{
 		glDepthMask(GL_TRUE);
 	}
@@ -94,7 +99,7 @@ void GMGLRenders_Object::beginShader(Shader& shader)
 	// 光照
 	for (GMint i = LT_BEGIN; i < LT_END; i++)
 	{
-		activateLight((LightType)i, shader.lights[i]);
+		activateLight((LightType)i, shader.getLight((LightType)i));
 	}
 
 	// 纹理
@@ -103,7 +108,7 @@ void GMGLRenders_Object::beginShader(Shader& shader)
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		// 按照贴图类型选择纹理动画序列
-		TextureFrames& textures = shader.texture.textures[i];
+		TextureFrames& textures = shader.getTexture().textures[i];
 
 		// 获取序列中的这一帧
 		ITexture* texture = getTexture(textures);
@@ -163,7 +168,7 @@ ITexture* GMGLRenders_Object::getTexture(TextureFrames& frames)
 	return frames.frames[(elapsed / frames.animationMs) % frames.frameCount];
 }
 
-void GMGLRenders_Object::activateLight(LightType t, GMLightInfo& light)
+void GMGLRenders_Object::activateLight(LightType t, GMLight& light)
 {
 	D(d);
 	switch (t)
@@ -214,9 +219,9 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
 	glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCALE_T.c_str()), 1.f);
 
 	GMuint n = 0;
-	while (n < MAX_TEX_MOD && shader->texture.textures[i].texMod[n].type != GMS_NO_TEXTURE_MOD)
+	while (n < MAX_TEX_MOD && shader->getTexture().textures[i].texMod[n].type != GMS_NO_TEXTURE_MOD)
 	{
-		GMS_TextureMod* tc = &shader->texture.textures[i].texMod[n];
+		GMS_TextureMod* tc = &shader->getTexture().textures[i].texMod[n];
 		switch (tc->type)
 		{
 		case GMS_SCROLL:

@@ -288,7 +288,7 @@ private:
 		demo->createCube(extents, &obj);
 		demo->appendObject("cube", obj);
 
-		GMLightInfo light;
+		GMLight light;
 		light.setKa(linear_math::Vector3(1, 1, 1));
 		light.setLightColor(linear_math::Vector3(1,.5,1));
 		light.setEnabled(true);

@@ -15,24 +15,29 @@ BEGIN_NS
 class Object;
 class GMGLShaderProgram;
 
-GM_PRIVATE_OBJECT(ObjectPainter)
+GM_PRIVATE_OBJECT(GMObjectPainter)
 {
 	Object* object;
 };
 
-class ObjectPainter : public GMObject
+class GMObjectPainter : public GMObject
 {
-	DECLARE_PRIVATE(ObjectPainter)
+	DECLARE_PRIVATE(GMObjectPainter)
 
 public:
-	ObjectPainter(Object* objs);
-	virtual ~ObjectPainter() {}
+	GMObjectPainter(Object* obj)
+	{
+		D(d);
+		d->object = obj;
+	}
+
+	virtual ~GMObjectPainter() {}
 
 public:
 	virtual void transfer() = 0;
 	virtual void draw(GMfloat* modelTransform) = 0;
 	virtual void dispose() = 0;
-	virtual void clone(Object* obj, OUT ObjectPainter** painter) = 0;
+	virtual void clone(Object* obj, OUT GMObjectPainter** painter) = 0;
 
 protected:
 	Object* getObject();
@@ -71,6 +76,7 @@ public:
 	~Component();
 
 	inline Shader& getShader() { D(d); return d->shader; }
+	inline void setShader(const Shader& shader) { D(d); d->shader = shader; }
 	inline GMint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
 	inline GMint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
 	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }
@@ -87,7 +93,7 @@ public:
 GM_PRIVATE_OBJECT(Object)
 {
 	AlignedVector<GMMesh*> objects;
-	AutoPtr<ObjectPainter> painter;
+	AutoPtr<GMObjectPainter> painter;
 };
 
 GM_ALIGNED_16(class) Object : public GMObject
@@ -101,13 +107,13 @@ public:
 	~Object();
 
 public:
-	inline void setPainter(AUTORELEASE ObjectPainter* painter)
+	inline void setPainter(AUTORELEASE GMObjectPainter* painter)
 	{
 		D(d);
 		d->painter.reset(painter);
 	}
 
-	inline ObjectPainter* getPainter()
+	inline GMObjectPainter* getPainter()
 	{
 		D(d);
 		return d->painter;

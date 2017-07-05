@@ -42,7 +42,7 @@ void import_worldspawn(const GMBSPEntity& entity, GMBSPGameWorld* world)
 		}
 	}
 	*/
-	GMLightInfo ambientLight;
+	GMLight ambientLight;
 	ambientLight.setEnabled (true);
 	ambientLight.setLightColor (linear_math::Vector3(.5f, .5f, .5f));
 	ambientLight.setKa(linear_math::Vector3(1.f, 1.f, 1.f));

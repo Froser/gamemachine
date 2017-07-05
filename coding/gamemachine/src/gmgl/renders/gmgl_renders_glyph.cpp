@@ -18,7 +18,7 @@ void GMGLRenders_Glyph::beginShader(Shader& shader)
 	activateShader(&shader);
 
 	// 只选择环境光纹理
-	TextureFrames& textures = shader.texture.textures[TEXTURE_INDEX_AMBIENT];
+	TextureFrames& textures = shader.getTexture().textures[TEXTURE_INDEX_AMBIENT];
 
 	// 获取序列中的这一帧
 	ITexture* texture = getTexture(textures);

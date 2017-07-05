@@ -659,8 +659,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 		const TextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		shader.texture.textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
-		shader.texture.textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
+		shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
+		shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 	}
 	return true;
 }
@@ -672,13 +672,13 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 	TextureContainer_ID& tc = rc->getLightmapContainer();
 	const TextureContainer_ID::TextureItemType* item = nullptr;
-	if (shader.surfaceFlag & SURF_NOLIGHTMAP)
+	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
 		item = tc.find(WHITE_LIGHTMAP);
 	else
 		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frames[0] = item->texture;
-	shader.texture.textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
+	shader.getTexture().textures[TEXTURE_INDEX_LIGHTMAP].frames[0] = item->texture;
+	shader.getTexture().textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
 }
 
 void GMBSPGameWorld::importBSP()

@@ -308,7 +308,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shad
 	GMMesh* child = new GMMesh();
 	child->setArrangementMode(GMArrangementMode::Triangles);
 	Component* component = new Component(child);
-	component->getShader() = shader;
+	component->setShader(shader);
 
 	ASSERT(face.numIndices % 3 == 0);
 	for (GMint i = 0; i < face.numIndices / 3; i++)
@@ -347,7 +347,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 	Component* component = new Component(child);
-	component->getShader() = shader;
+	component->setShader(shader);
 
 	GMint numVertices = 2 * (biqp.tesselation + 1);
 	for (GMint row = 0; row < biqp.tesselation; ++row)
@@ -423,7 +423,7 @@ void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_ma
 	}
 
 	Component* component = new Component(child);
-	component->getShader() = shader;
+	component->setShader(shader);
 
 	linear_math::Vector3 normal;
 	for (GMint i = 0; i < 12; i++)
