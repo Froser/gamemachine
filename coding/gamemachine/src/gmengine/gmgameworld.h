@@ -35,7 +35,7 @@ public:
 public:
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
-	void setDefaultAmbientLight(const LightInfo& lightInfo);
+	void setDefaultAmbientLight(const GMLightInfo& lightInfo);
 	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 
 private:

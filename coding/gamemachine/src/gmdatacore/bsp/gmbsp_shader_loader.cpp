@@ -439,8 +439,8 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	LightInfo lightInfo;
-	lightInfo.on = true;
+	GMLightInfo lightInfo;
+	lightInfo.setEnabled(true);
 	LightType lightType;
 	const char* color = elem->Attribute("color");
 	if (!color)
@@ -451,7 +451,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 
 	linear_math::Vector3 vecColor;
 	readTernaryFloatsFromString(color, vecColor);
-	lightInfo.lightColor = vecColor;
+	lightInfo.setLightColor(vecColor);
 
 	if (strEqual(type, "ambient"))
 	{
@@ -469,25 +469,45 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		Scanner s(color);
 		linear_math::Vector3 vecPosition;
 		readTernaryFloatsFromString(position, vecPosition);
-		lightInfo.lightPosition = vecPosition;
+		lightInfo.setLightPosition(vecPosition);
+
+		linear_math::Vector3 arg;
 
 		const char* k = elem->Attribute("ks");
 		if (!k)
-			readTernaryFloatsFromString("1 1 1", (linear_math::Vector3&)lightInfo.args[LA_KS]);
+		{
+			readTernaryFloatsFromString("1 1 1", arg);
+			lightInfo.setKs(arg);
+		}
 		else
-			readTernaryFloatsFromString(k, (linear_math::Vector3&)lightInfo.args[LA_KS]);
+		{
+			readTernaryFloatsFromString(k, arg);
+			lightInfo.setKs(arg);
+		}
 
 		k = elem->Attribute("kd");
 		if (!k)
-			readTernaryFloatsFromString("1 1 1", (linear_math::Vector3&)lightInfo.args[LA_KD]);
+		{
+			readTernaryFloatsFromString("1 1 1", arg);
+			lightInfo.setKs(arg);
+		}
 		else
-			readTernaryFloatsFromString(k, (linear_math::Vector3&)lightInfo.args[LA_KD]);
+		{
+			readTernaryFloatsFromString(k, arg);
+			lightInfo.setKs(arg);
+		}
 
 		k = elem->Attribute("shininess");
+		GMfloat shininess = 0;
 		if (!k)
-			lightInfo.args[LA_SHINESS] = 0;
+		{
+			lightInfo.setShininess(shininess);
+		}
 		else
-			SAFE_SSCANF(k, "%f", &lightInfo.args[LA_SHINESS]);
+		{
+			SAFE_SSCANF(k, "%f", &shininess);
+			lightInfo.setShininess(shininess);
+		}
 	}
 	shader.lights[lightType] = lightInfo;
 }

@@ -70,31 +70,11 @@ public:
 	Component(GMMesh* parent);
 	~Component();
 
-	Shader& getShader()
-	{
-		D(d);
-		return d->shader;
-	}
+	inline Shader& getShader() { D(d); return d->shader; }
+	inline GMint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
+	inline GMint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
+	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }
 
-	GMint* getOffsetPtr()
-	{
-		D(d);
-		return d->vertexOffsets.data();
-	}
-
-	GMint* getPrimitiveVerticesCountPtr()
-	{
-		D(d);
-		return d->primitiveVertices.data();
-	}
-
-	GMuint getPrimitiveCount()
-	{
-		D(d);
-		return d->primitiveCount;
-	}
-
-	// suggested methods
 	void setVertexOffset(GMuint offset);
 	void beginFace();
 	void vertex(GMfloat x, GMfloat y, GMfloat z);
@@ -121,25 +101,25 @@ public:
 	~Object();
 
 public:
-	void setPainter(AUTORELEASE ObjectPainter* painter)
+	inline void setPainter(AUTORELEASE ObjectPainter* painter)
 	{
 		D(d);
 		d->painter.reset(painter);
 	}
 
-	ObjectPainter* getPainter()
+	inline ObjectPainter* getPainter()
 	{
 		D(d);
 		return d->painter;
 	}
 
-	AlignedVector<GMMesh*>& getAllMeshes()
+	inline AlignedVector<GMMesh*>& getAllMeshes()
 	{
 		D(d);
 		return d->objects;
 	}
 
-	void append(AUTORELEASE GMMesh* obj)
+	inline void append(AUTORELEASE GMMesh* obj)
 	{
 		D(d);
 		d->objects.push_back(obj);
@@ -199,107 +179,23 @@ public:
 	void calculateTangentSpace();
 
 public:
-	AlignedVector<AUTORELEASE Component*>& getComponents()
-	{
-		D(d);
-		return d->components;
-	}
-
-	AlignedVector<Object::DataType>& vertices()
-	{
-		D(d);
-		return d->vertices;
-	}
-
-	AlignedVector<Object::DataType>& normals()
-	{
-		D(d);
-		return d->normals;
-	}
-
-	AlignedVector<Object::DataType>& uvs()
-	{
-		D(d);
-		return d->uvs;
-	}
-
-	AlignedVector<Object::DataType>& tangents()
-	{
-		D(d);
-		return d->tangents;
-	}
-
-	AlignedVector<Object::DataType>& bitangents()
-	{
-		D(d);
-		return d->bitangents;
-	}
-
-	AlignedVector<Object::DataType>& lightmaps()
-	{
-		D(d);
-		return d->lightmaps;
-	}
-
-	GMMeshType getType()
-	{
-		D(d);
-		return d->type;
-	}
-
-	void setType(GMMeshType type)
-	{
-		D(d);
-		d->type = type;
-	}
-
-	void setArrangementMode(GMArrangementMode mode)
-	{
-		D(d);
-		d->mode = mode;
-	}
-
-	GMArrangementMode getArrangementMode()
-	{
-		D(d);
-		return d->mode;
-	}
-
-	void setName(const char* name)
-	{
-		D(d);
-		d->name = name;
-	}
-
-	const GMString& getName()
-	{
-		D(d);
-		return d->name;
-	}
-
-	GMuint getBufferId()
-	{
-		D(d);
-		return d->bufferId;
-	}
-
-	GMuint getArrayId()
-	{
-		D(d);
-		return d->arrayId;
-	}
-
-	void setBufferId(GMuint id)
-	{
-		D(d);
-		d->bufferId = id;
-	}
-
-	void setArrayId(GMuint id)
-	{
-		D(d);
-		d->arrayId = id;
-	}
+	inline AlignedVector<AUTORELEASE Component*>& getComponents() { D(d); return d->components; }
+	inline AlignedVector<Object::DataType>& vertices() { D(d); return d->vertices; }
+	inline AlignedVector<Object::DataType>& normals() { D(d); return d->normals; }
+	inline AlignedVector<Object::DataType>& uvs() { D(d); return d->uvs; }
+	inline AlignedVector<Object::DataType>& tangents() { D(d); return d->tangents; }
+	inline AlignedVector<Object::DataType>& bitangents() { D(d); return d->bitangents; }
+	inline AlignedVector<Object::DataType>& lightmaps() { D(d); return d->lightmaps; }
+	inline GMMeshType getType() { D(d); return d->type; }
+	inline void setType(GMMeshType type) { D(d); d->type = type; }
+	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }
+	inline GMArrangementMode getArrangementMode() { D(d); return d->mode; }
+	inline void setName(const char* name) { D(d); d->name = name; }
+	inline const GMString& getName() { D(d); return d->name; }
+	inline GMuint getBufferId() { D(d); return d->bufferId; }
+	inline GMuint getArrayId() { D(d); return d->arrayId; }
+	inline void setBufferId(GMuint id) { D(d); d->bufferId = id; }
+	inline void setArrayId(GMuint id) { D(d); d->arrayId = id; }
 };
 
 END_NS

@@ -107,23 +107,37 @@ GM_ALIGNED_STRUCT(TextureInfo)
 	GMuint autorelease : 1;
 };
 
-#define ARG_OFFSET(arg, size) ((arg)+(size))
-enum LightArgs
-{
-	LA_KA = 0,
-	LA_KD = LA_KA,
-	LA_KS = ARG_OFFSET(LA_KD, 3),
-	LA_SHINESS = ARG_OFFSET(LA_KS, 3),
-	LA_END,
-};
+#define DECLARE_PROPERTY(name, memberName, paramType) \
+	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; } \
+	inline paramType& get##name() { D(d); return d-> memberName; } \
+	inline const paramType& get##name() const { D(d); return d-> memberName; }
 
-GM_ALIGNED_STRUCT(LightInfo)
+GM_PRIVATE_OBJECT(GMLightInfo)
 {
+	GMLightInfoPrivate() {}
+	GMfloat shininess;
+	bool enabled = false;
+	bool useGlobalLightColor = false; // true表示使用全局的光的颜色
 	linear_math::Vector3 lightPosition;
 	linear_math::Vector3 lightColor;
-	GMfloat args[LA_END];
-	bool on = false;
-	bool useGlobalLightColor = false; // true表示使用全局的光的颜色
+	linear_math::Vector3 ka;
+	linear_math::Vector3 ks;
+	linear_math::Vector3 kd;
+};
+
+class GMLightInfo : public GMObject
+{
+	DECLARE_PRIVATE(GMLightInfo)
+
+public:
+	DECLARE_PROPERTY(LightPosition, lightPosition, linear_math::Vector3);
+	DECLARE_PROPERTY(LightColor, lightColor, linear_math::Vector3);
+	DECLARE_PROPERTY(Ka, ka, linear_math::Vector3);
+	DECLARE_PROPERTY(Ks, ks, linear_math::Vector3);
+	DECLARE_PROPERTY(Kd, kd, linear_math::Vector3);
+	DECLARE_PROPERTY(Shininess, shininess, GMfloat);
+	DECLARE_PROPERTY(Enabled, enabled, bool);
+	DECLARE_PROPERTY(UseGlobalLightColor, useGlobalLightColor, bool);
 };
 
 enum LightType
@@ -137,25 +151,19 @@ enum LightType
 GM_ALIGNED_STRUCT(Shader)
 {
 	Shader()
-		: surfaceFlag(0)
-		, cull(GMS_CULL)
-		, blend(false)
-		, nodraw(false)
-		, noDepthTest(false)
 	{
 		blendFactors[0] = GMS_ZERO;
 		blendFactors[1] = GMS_ZERO;
-		memset(&lights, 0, sizeof(lights));
 	}
 
-	TextureInfo texture;
-	GMuint surfaceFlag;
-	GMS_Cull cull;
+	GMuint surfaceFlag = 0;
+	GMS_Cull cull = GMS_CULL;
 	GMS_BlendFunc blendFactors[2];
-	LightInfo lights[LT_END];
-	bool blend;
-	bool nodraw;
-	bool noDepthTest;
+	GMLightInfo lights[LT_END];
+	bool blend = false;
+	bool nodraw = false;
+	bool noDepthTest = false;
+	TextureInfo texture;
 };
 END_NS
 #endif

@@ -46,17 +46,18 @@ void GMGameWorld::simulateGameWorld()
 {
 	D(d);
 	// 仅仅对Entity和Sprite进行simulate
+	auto phyw = physicsWorld();
 	for (auto& gameObject : d->gameObjects[GMGameObjectType::Entity])
 	{
 		gameObject->simulate();
-		physicsWorld()->simulate(gameObject);
+		phyw->simulate(gameObject);
 		gameObject->updateAfterSimulate();
 	}
 
 	for (auto& gameObject : d->gameObjects[GMGameObjectType::Sprite])
 	{
 		gameObject->simulate();
-		physicsWorld()->simulate(gameObject);
+		phyw->simulate(gameObject);
 		gameObject->updateAfterSimulate();
 	}
 
@@ -64,15 +65,15 @@ void GMGameWorld::simulateGameWorld()
 		d->start = true;
 }
 
-void GMGameWorld::setDefaultAmbientLight(const LightInfo& lightInfo)
+void GMGameWorld::setDefaultAmbientLight(const GMLightInfo& lightInfo)
 {
 	D(d);
-	d->graphicEnv.ambientLightColor[0] = lightInfo.lightColor[0];
-	d->graphicEnv.ambientLightColor[1] = lightInfo.lightColor[1];
-	d->graphicEnv.ambientLightColor[2] = lightInfo.lightColor[2];
-	d->graphicEnv.ambientK[0] = lightInfo.args[LA_KA];
-	d->graphicEnv.ambientK[1] = lightInfo.args[LA_KA + 1];
-	d->graphicEnv.ambientK[2] = lightInfo.args[LA_KA + 2];
+	d->graphicEnv.ambientLightColor[0] = lightInfo.getLightColor()[0];
+	d->graphicEnv.ambientLightColor[1] = lightInfo.getLightColor()[1];
+	d->graphicEnv.ambientLightColor[2] = lightInfo.getLightColor()[2];
+	d->graphicEnv.ambientK[0] = lightInfo.getKa()[0];
+	d->graphicEnv.ambientK[1] = lightInfo.getKa()[1];
+	d->graphicEnv.ambientK[2] = lightInfo.getKa()[2];
 }
 
 ObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)

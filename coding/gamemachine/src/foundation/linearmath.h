@@ -430,6 +430,12 @@ namespace linear_math
 	public:
 		GMfloat& operator [](GMint i);
 		const GMfloat& operator [](GMint i) const;
+
+	public:
+		inline static Vector3 fromArray(const GMfloat array[3])
+		{
+			return Vector3(array[0], array[1], array[2]);
+		}
 	};
 
 	GM_ALIGNED_16(class) Vector4

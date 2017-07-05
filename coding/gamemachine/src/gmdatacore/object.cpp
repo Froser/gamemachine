@@ -37,7 +37,6 @@ Component::Component(GMMesh* parent)
 	d->offset = 0;
 	d->primitiveCount = 0;
 	d->parentMesh = parent;
-	memset(&d->shader, 0, sizeof(d->shader));
 
 	setVertexOffset(d->parentMesh->vertices().size() / VERTEX_DEMENSION);
 }

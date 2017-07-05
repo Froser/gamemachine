@@ -273,19 +273,13 @@ void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, 
 {
 	shader.cull = GMS_NONE;
 
-	shader.lights[LT_AMBIENT].on = true;
-	shader.lights[LT_AMBIENT].useGlobalLightColor = true;
-	for (GMint i = 0; i < 3; i++)
-	{
-		shader.lights[LT_AMBIENT].args[LA_KA + i] = material.ka[i];
-	}
+	shader.lights[LT_AMBIENT].setEnabled(true);
+	shader.lights[LT_AMBIENT].setUseGlobalLightColor (true);
+	shader.lights[LT_AMBIENT].setKa(linear_math::Vector3::fromArray(material.ka));
 
-	shader.lights[LT_SPECULAR].on = true;
-	shader.lights[LT_SPECULAR].useGlobalLightColor = true;
-	shader.lights[LT_SPECULAR].args[LA_SHINESS] = material.ns;
-	for (GMint i = 0; i < 3; i++)
-	{
-		shader.lights[LT_SPECULAR].args[LA_KD + i] = material.kd[i];
-		shader.lights[LT_SPECULAR].args[LA_KS + i] = material.ks[i];
-	}
+	shader.lights[LT_SPECULAR].setEnabled(true);
+	shader.lights[LT_SPECULAR].setUseGlobalLightColor(true);
+	shader.lights[LT_SPECULAR].setShininess(material.ns);
+	shader.lights[LT_SPECULAR].setKd(linear_math::Vector3::fromArray(material.kd));
+	shader.lights[LT_SPECULAR].setKs(linear_math::Vector3::fromArray(material.ks));
 }

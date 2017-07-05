@@ -288,10 +288,10 @@ private:
 		demo->createCube(extents, &obj);
 		demo->appendObject("cube", obj);
 
-		LightInfo light;
-		light.args[LA_KA] = light.args[LA_KA + 1] = light.args[LA_KA + 2] = 1;
-		light.lightColor = { 1,.5,1 };
-		light.on = true;
+		GMLightInfo light;
+		light.setKa(linear_math::Vector3(1, 1, 1));
+		light.setLightColor(linear_math::Vector3(1,.5,1));
+		light.setEnabled(true);
 		demo->setDefaultAmbientLight(light);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
