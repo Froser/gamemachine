@@ -14,7 +14,7 @@ void GMGLRenders_Glyph::beginShader(Shader& shader)
 	D(d);
 	d->shader = &shader;
 
-	// 纹理
+	// 应用Shader
 	activateShader(&shader);
 
 	// 只选择环境光纹理

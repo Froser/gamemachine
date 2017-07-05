@@ -157,6 +157,7 @@ GM_PRIVATE_OBJECT(Shader)
 	bool blend = false;
 	bool nodraw = false;
 	bool noDepthTest = false;
+	GMfloat lineWidth = 1;
 	TextureInfo texture;
 };
 
@@ -173,6 +174,7 @@ public:
 	DECLARE_PROPERTY(Nodraw, nodraw, bool);
 	DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
 	DECLARE_PROPERTY(Texture, texture, TextureInfo);
+	DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	
 	inline GMLight& getLight(LightType type) { D(d); return d->lights[type]; }
 	inline void setLight(LightType type, const GMLight& light) { D(d); d->lights[type] = light; }

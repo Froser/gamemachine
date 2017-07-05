@@ -69,44 +69,80 @@ void GMDemoGameWorld::createCube(GMfloat extents[3], OUT GMGameObject** obj)
 		3, 7, 5,
 	};
 
-	Object* coreObj = new Object();
-	GMMesh* child = new GMMesh();
-	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	static CONST_EXPR GMint borderIndices[] = {
+		0, 2, 3, 1,
+		4, 5, 7, 6,
+		0, 1, 5, 4,
+		2, 6, 7, 3,
+		0, 4, 2, 6,
+		1, 3, 7, 5,
+	};
 
+	Object* coreObj = new Object();
+
+	// 实体
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)
 	{
 		t[i] = extents[i % 3] * v[i];
 	}
 
-	Component* component = new Component(child);
-
-	linear_math::Vector3 normal;
-	for (GMint i = 0; i < 12; i++)
 	{
-		component->beginFace();
-		for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
-		{
-			GMint idx = i * 3 + j; //顶点的开始
-			GMint idx_next = i * 3 + (j + 1) % 3;
-			GMint idx_prev = i * 3 + (j + 2) % 3;
-			linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-			linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
-				vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-			linear_math::Vector3 normal = linear_math::cross(vertex - vertex_prev, vertex_next - vertex);
-			normal = linear_math::normalize(normal);
+		GMMesh* body = new GMMesh();
+		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
-			component->vertex(vertex[0], vertex[1], vertex[2]);
-			component->normal(normal[0], normal[1], normal[2]);
-			//TODO
-			//component->uv(vertex.decalS, vertex.decalT);
-			//component->lightmap(1.f, 1.f);
+		Component* component = new Component(body);
+
+		linear_math::Vector3 normal;
+		for (GMint i = 0; i < 12; i++)
+		{
+			component->beginFace();
+			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			{
+				GMint idx = i * 3 + j; //顶点的开始
+				GMint idx_next = i * 3 + (j + 1) % 3;
+				GMint idx_prev = i * 3 + (j + 2) % 3;
+				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
+				linear_math::Vector3 normal = linear_math::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = linear_math::normalize(normal);
+
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+			}
+			component->endFace();
 		}
-		component->endFace();
+		body->appendComponent(component);
+		coreObj->append(body);
 	}
 
-	child->appendComponent(component);
-	coreObj->append(child);
+	// 边框
+	{
+		GMMesh* border = new GMMesh();
+		border->setArrangementMode(GMArrangementMode::Lines);
+		Shader shader;
+		shader.setLineWidth(2);
+		GMLight& light = shader.getLight(LT_AMBIENT);
+		light.setEnabled(true);
+		light.setLightColor( linear_math::Vector3(1, 0, 0) );
+		light.setKa(linear_math::Vector3(1, 1, 1));
+		Component* component = new Component(border);
+		for (GMint i = 0; i < 6; i++)
+		{
+			component->beginFace();
+			for (GMint j = 0; j < 4; j++) // j表示面的一个顶点
+			{
+				GMint idx = i * 4 + j; //顶点的开始
+				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+			}
+			component->endFace();
+			component->setShader(shader);
+		}
+		border->appendComponent(component);
+		coreObj->append(border);
+	}
 
 	GMGameObject* gameObject = new GMGameObject(coreObj);
 	*obj = gameObject;

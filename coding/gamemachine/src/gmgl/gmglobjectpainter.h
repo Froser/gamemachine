@@ -17,7 +17,6 @@ public:
 	virtual void transfer() override;
 	virtual void draw(GMfloat* modelTransform) override;
 	virtual void dispose() override;
-	virtual void clone(Object* obj, OUT GMObjectPainter** painter) override;
 
 private:
 	GMGLGraphicEngine* m_engine;

@@ -18,6 +18,8 @@ static GLenum getMode(GMMesh* obj)
 		return GL_TRIANGLE_STRIP;
 	case GMArrangementMode::Triangles:
 		return GL_TRIANGLES;
+	case GMArrangementMode::Lines:
+		return GL_LINE_LOOP;
 	default:
 		ASSERT(false);
 		return GL_TRIANGLE_FAN;
@@ -135,10 +137,4 @@ void GMGLObjectPainter::dispose()
 	END_FOREACH_OBJ
 
 	m_inited = false;
-}
-
-void GMGLObjectPainter::clone(Object* obj, OUT GMObjectPainter** painter)
-{
-	ASSERT(painter);
-	*painter = new GMGLObjectPainter(m_engine, obj);
 }

@@ -67,6 +67,8 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
+
+	glLineWidth(shader->getLineWidth());
 }
 
 void GMGLRenders_Object::deactivateShader(Shader* shader)

@@ -37,7 +37,6 @@ public:
 	virtual void transfer() = 0;
 	virtual void draw(GMfloat* modelTransform) = 0;
 	virtual void dispose() = 0;
-	virtual void clone(Object* obj, OUT GMObjectPainter** painter) = 0;
 
 protected:
 	Object* getObject();
@@ -142,6 +141,8 @@ enum class GMArrangementMode
 	Triangle_Strip,
 
 	Triangles,
+
+	Lines,
 };
 
 enum class GMMeshType
