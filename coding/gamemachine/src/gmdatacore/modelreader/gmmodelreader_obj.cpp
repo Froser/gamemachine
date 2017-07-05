@@ -271,7 +271,7 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 
 void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Shader& shader)
 {
-	shader.setCull(GMS_NONE);
+	shader.setCull(GMS_Cull::NONE);
 
 	shader.getLight(LT_AMBIENT).setEnabled(true);
 	shader.getLight(LT_AMBIENT).setUseGlobalLightColor (true);

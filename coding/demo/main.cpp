@@ -286,6 +286,17 @@ private:
 		GMGameObject* obj;
 		GMfloat extents[] = { .25f, .25f, .25f };
 		demo->createCube(extents, &obj);
+
+		Object* core = obj->getObject();
+		Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
+		shader.setCull(GMS_Cull::CULL);
+		GMLight& objLight = shader.getLight(LT_SPECULAR);
+		objLight.setLightColor(linear_math::Vector3(1, .5, 1));
+		objLight.setKd(linear_math::Vector3(.6f, .2f, .3f));
+		objLight.setKs(linear_math::Vector3(.1f, .2f, .3f));
+		objLight.setShininess(20);
+		objLight.setEnabled(true);
+		objLight.setLightPosition(linear_math::Vector3(1, 1, 1));
 		demo->appendObject("cube", obj);
 
 		GMLight light;
@@ -303,7 +314,7 @@ private:
 
 	virtual void event(GameMachineEvent evt)
 	{
-		static linear_math::Vector3 dir = linear_math::normalize(linear_math::Vector3(.5f, .5f, .5f));
+		static linear_math::Vector3 dir = linear_math::normalize(linear_math::Vector3(.1f, .2f, .5f));
 		switch (evt)
 		{
 		case gm::GameMachineEvent::FrameStart:
@@ -371,7 +382,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

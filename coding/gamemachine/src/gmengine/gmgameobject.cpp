@@ -106,7 +106,7 @@ void GMGlyphObject::constructObject()
 	shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frames[0] = glyphManager->glyphTexture();
 	shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
 	shader.setNoDepthTest(true);
-	shader.setCull(GMS_NONE);
+	shader.setCull(GMS_Cull::NONE);
 	shader.setBlend(true);
 	shader.setBlendFactorSource(GMS_ONE);
 	shader.setBlendFactorDest(GMS_ONE);

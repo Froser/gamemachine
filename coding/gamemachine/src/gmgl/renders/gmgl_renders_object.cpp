@@ -10,7 +10,7 @@
 
 void GMGLRenders_Object::activateShader(Shader* shader)
 {
-	if (shader->getCull() == GMS_NONE)
+	if (shader->getCull() == GMS_Cull::NONE)
 	{
 		glDisable(GL_CULL_FACE);
 	}

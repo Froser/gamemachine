@@ -31,10 +31,10 @@ enum GMS_BlendFunc
 	GMS_ONE_MINUS_SRC_ALPHA,
 };
 
-enum GMS_Cull
+enum class GMS_Cull
 {
-	GMS_CULL = 0,
-	GMS_NONE,
+	CULL = 0,
+	NONE,
 };
 
 enum GMS_TextureFilter
@@ -150,7 +150,7 @@ enum LightType
 GM_PRIVATE_OBJECT(Shader)
 {
 	GMuint surfaceFlag = 0;
-	GMS_Cull cull = GMS_CULL;
+	GMS_Cull cull = GMS_Cull::CULL;
 	GMS_BlendFunc blendFactorSrc = GMS_ZERO;
 	GMS_BlendFunc blendFactorDest = GMS_ZERO;
 	GMLight lights[LT_END];
@@ -175,6 +175,7 @@ public:
 	DECLARE_PROPERTY(Texture, texture, TextureInfo);
 	
 	inline GMLight& getLight(LightType type) { D(d); return d->lights[type]; }
+	inline void setLight(LightType type, const GMLight& light) { D(d); d->lights[type] = light; }
 
 	inline Shader& operator=(const Shader& rhs)
 	{

@@ -284,9 +284,9 @@ void GMBSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 {
 	const char* text = elem->GetText();
 	if (strEqual(text, "none"))
-		shader.setCull(GMS_NONE);
+		shader.setCull(GMS_Cull::NONE);
 	else if (strEqual(text, "cull"))
-		shader.setCull(GMS_CULL);
+		shader.setCull(GMS_Cull::CULL);
 	else
 		gm_error("wrong cull param %s", text);
 }
@@ -509,7 +509,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 			lightInfo.setShininess(shininess);
 		}
 	}
-	shader.getLight(lightType) = lightInfo;
+	shader.setLight(lightType, lightInfo);
 }
 
 void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
@@ -569,7 +569,7 @@ void GMBSPShaderLoader::createSky(Shader& shader)
 	{
 		Shader skyShader = shader;
 		skyShader.setNodraw(false);
-		skyShader.setCull(GMS_NONE);
+		skyShader.setCull(GMS_Cull::NONE);
 		skyShader.setNoDepthTest(true);
 
 		GMSkyGameObject* sky = new GMSkyGameObject(skyShader, d->bspRender->boundMin, d->bspRender->boundMax);
