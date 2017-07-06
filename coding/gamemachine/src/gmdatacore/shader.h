@@ -23,13 +23,13 @@ enum
 	MAX_TEX_MOD = 3,
 };
 
-enum GMS_BlendFunc
+enum class GMS_BlendFunc
 {
-	GMS_ZERO = 0,
-	GMS_ONE,
-	GMS_DST_COLOR,
-	GMS_SRC_ALPHA,
-	GMS_ONE_MINUS_SRC_ALPHA,
+	ZERO = 0,
+	ONE,
+	DST_COLOR,
+	SRC_ALPHA,
+	ONE_MINUS_SRC_ALPHA,
 };
 
 enum class GMS_Cull
@@ -38,34 +38,40 @@ enum class GMS_Cull
 	NONE,
 };
 
-enum GMS_TextureFilter
+enum class GMS_FrontFace
 {
-	GMS_LINEAR = 0,
-	GMS_NEAREST,
-	GMS_LINEAR_MIPMAP_LINEAR,
-	GMS_NEAREST_MIPMAP_LINEAR,
-	GMS_LINEAR_MIPMAP_NEAREST,
-	GMS_NEAREST_MIPMAP_NEAREST,
+	CLOCKWISE,
+	COUNTER_CLOCKWISE,
 };
 
-enum GMS_Wrap
+enum class GMS_TextureFilter
 {
-	GMS_REPEAT = 0,
-	GMS_CLAMP_TO_EDGE,
-	GMS_CLAMP_TO_BORDER,
-	GMS_MIRRORED_REPEAT,
+	LINEAR = 0,
+	NEAREST,
+	LINEAR_MIPMAP_LINEAR,
+	NEAREST_MIPMAP_LINEAR,
+	LINEAR_MIPMAP_NEAREST,
+	NEAREST_MIPMAP_NEAREST,
 };
 
-enum GMS_TextureModType
+enum class GMS_Wrap
 {
-	GMS_NO_TEXTURE_MOD = 0,
-	GMS_SCROLL,
-	GMS_SCALE,
+	REPEAT = 0,
+	CLAMP_TO_EDGE,
+	CLAMP_TO_BORDER,
+	MIRRORED_REPEAT,
+};
+
+enum class GMS_TextureModType
+{
+	NO_TEXTURE_MOD = 0,
+	SCROLL,
+	SCALE,
 };
 
 GM_ALIGNED_STRUCT(GMS_TextureMod)
 {
-	GMS_TextureModType type = GMS_NO_TEXTURE_MOD;
+	GMS_TextureModType type = GMS_TextureModType::NO_TEXTURE_MOD;
 	GMfloat p1 = 0;
 	GMfloat p2 = 0;
 };
@@ -82,10 +88,10 @@ GM_ALIGNED_STRUCT(TextureFrames)
 	GMS_TextureMod texMod[MAX_TEX_MOD];
 	GMint frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
-	GMS_TextureFilter magFilter = GMS_LINEAR;
-	GMS_TextureFilter minFilter = GMS_LINEAR_MIPMAP_LINEAR;
-	GMS_Wrap wrapS = GMS_REPEAT;
-	GMS_Wrap wrapT = GMS_REPEAT;
+	GMS_TextureFilter magFilter = GMS_TextureFilter::LINEAR;
+	GMS_TextureFilter minFilter = GMS_TextureFilter::LINEAR_MIPMAP_LINEAR;
+	GMS_Wrap wrapS = GMS_Wrap::REPEAT;
+	GMS_Wrap wrapT = GMS_Wrap::REPEAT;
 };
 
 GM_ALIGNED_STRUCT(TextureInfo)
@@ -152,8 +158,9 @@ GM_PRIVATE_OBJECT(Shader)
 {
 	GMuint surfaceFlag = 0;
 	GMS_Cull cull = GMS_Cull::CULL;
-	GMS_BlendFunc blendFactorSrc = GMS_ZERO;
-	GMS_BlendFunc blendFactorDest = GMS_ZERO;
+	GMS_FrontFace frontFace = GMS_FrontFace::COUNTER_CLOCKWISE;
+	GMS_BlendFunc blendFactorSrc = GMS_BlendFunc::ZERO;
+	GMS_BlendFunc blendFactorDest = GMS_BlendFunc::ZERO;
 	GMLight lights[LT_END];
 	bool blend = false;
 	bool nodraw = false;
@@ -171,6 +178,7 @@ class Shader : public GMObject
 public:
 	DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);
 	DECLARE_PROPERTY(Cull, cull, GMS_Cull);
+	DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
 	DECLARE_PROPERTY(BlendFactorSource, blendFactorSrc, GMS_BlendFunc);
 	DECLARE_PROPERTY(BlendFactorDest, blendFactorDest, GMS_BlendFunc);
 	DECLARE_PROPERTY(Blend, blend, bool);

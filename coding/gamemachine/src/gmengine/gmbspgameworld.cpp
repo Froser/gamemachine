@@ -464,6 +464,8 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
 
 	Shader shader;
+	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
+
 	if (!setMaterialTexture(polygonFace, shader))
 	{
 		gm_warning(_L("polygon: %d texture missing."), polygonFaceNumber);
@@ -490,6 +492,8 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 
 	ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
 	Shader shader;
+	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
+
 	if (!setMaterialTexture(meshFace, shader))
 	{
 		gm_warning(_L("mesh: %d texture missing."), meshFaceNumber);
@@ -512,6 +516,8 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 	rd.patchIndices.push_back(drawSurfaceIndex);
 
 	Shader shader;
+	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
+
 	if (!setMaterialTexture(rd.patches[patchNumber], shader))
 	{
 		gm_warning(_L("patch: %d texture missing."), patchNumber);

@@ -108,8 +108,8 @@ void GMGlyphObject::constructObject()
 	shader.setNoDepthTest(true);
 	shader.setCull(GMS_Cull::NONE);
 	shader.setBlend(true);
-	shader.setBlendFactorSource(GMS_ONE);
-	shader.setBlendFactorDest(GMS_ONE);
+	shader.setBlendFactorSource(GMS_BlendFunc::ONE);
+	shader.setBlendFactorDest(GMS_BlendFunc::ONE);
 
 	const GMWchar* p = d->text.c_str();
 	const GMfloat Z = 0;

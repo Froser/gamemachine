@@ -69,16 +69,16 @@ static GMuint parseSurfaceParm(const char* p)
 static GMS_BlendFunc parseBlendFunc(const char* p)
 {
 	if (strEqual(p, "GMS_ZERO"))
-		return GMS_ZERO;
+		return GMS_BlendFunc::ZERO;
 
 	if (strEqual(p, "GMS_ONE"))
-		return GMS_ONE;
+		return GMS_BlendFunc::ONE;
 
 	if (strEqual(p, "GMS_DST_COLOR"))
-		return GMS_ONE;
+		return GMS_BlendFunc::ONE;
 
 	gm_warning("Unknown blendFunc %s treated as GMS_ZERO", p);
-	return GMS_ZERO;
+	return GMS_BlendFunc::ZERO;
 }
 
 static void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
@@ -346,8 +346,8 @@ void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 	if (texture)
 	{
 		// TODO: GL_CLAMP
-		frame->wrapS = GMS_MIRRORED_REPEAT;
-		frame->wrapT = GMS_MIRRORED_REPEAT;
+		frame->wrapS = GMS_Wrap::MIRRORED_REPEAT;
+		frame->wrapT = GMS_Wrap::MIRRORED_REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
 		parse_map_tcMod(shader, elem);
@@ -366,8 +366,8 @@ void GMBSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
-		frame->wrapS = GMS_REPEAT;
-		frame->wrapT = GMS_REPEAT;
+		frame->wrapS = GMS_Wrap::REPEAT;
+		frame->wrapT = GMS_Wrap::REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
 		parse_map_tcMod(shader, elem);
@@ -414,8 +414,8 @@ void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
-		frame->wrapS = GMS_REPEAT;
-		frame->wrapT = GMS_REPEAT;
+		frame->wrapS = GMS_Wrap::REPEAT;
+		frame->wrapT = GMS_Wrap::REPEAT;
 		frame->frames[0] = texture;
 		frame->frameCount = 1;
 	}
@@ -518,7 +518,7 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 	// tcMod <type> <...>
 	const char* tcMod = elem->Attribute("tcMod");
 	GMuint tcModNum = 0;
-	while (tcModNum < MAX_TEX_MOD && shader.getTexture().textures[d->textureNum].texMod[tcModNum].type != GMS_NO_TEXTURE_MOD)
+	while (tcModNum < MAX_TEX_MOD && shader.getTexture().textures[d->textureNum].texMod[tcModNum].type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
 		tcModNum++;
 	}
@@ -534,13 +534,13 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 		{
 			if (strEqual(type, "scroll"))
 			{
-				currentMod->type = GMS_SCROLL;
+				currentMod->type = GMS_TextureModType::SCROLL;
 				s.nextFloat(&currentMod->p1);
 				s.nextFloat(&currentMod->p2);
 			}
 			else if (strEqual(type, "scale"))
 			{
-				currentMod->type = GMS_SCALE;
+				currentMod->type = GMS_TextureModType::SCALE;
 				s.nextFloat(&currentMod->p1);
 				s.nextFloat(&currentMod->p2);
 			}

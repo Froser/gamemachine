@@ -16,7 +16,11 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 	}
 	else
 	{
-		glFrontFace(GL_CW);
+		if (shader->getFrontFace() == GMS_FrontFace::CLOCKWISE)
+			glFrontFace(GL_CW);
+		else
+			glFrontFace(GL_CCW);
+
 		glEnable(GL_CULL_FACE);
 	}
 
@@ -33,19 +37,19 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 		{
 			switch (gms_factors[i])
 			{
-			case GMS_ZERO:
+			case GMS_BlendFunc::ZERO:
 				factors[i] = GL_ZERO;
 				break;
-			case GMS_ONE:
+			case GMS_BlendFunc::ONE:
 				factors[i] = GL_ONE;
 				break;
-			case GMS_DST_COLOR:
+			case GMS_BlendFunc::DST_COLOR:
 				factors[i] = GL_DST_COLOR;
 				break;
-			case GMS_SRC_ALPHA:
+			case GMS_BlendFunc::SRC_ALPHA:
 				factors[i] = GL_SRC_ALPHA;
 				break;
-			case GMS_ONE_MINUS_SRC_ALPHA:
+			case GMS_BlendFunc::ONE_MINUS_SRC_ALPHA:
 				factors[i] = GL_ONE_MINUS_SRC_ALPHA;
 				break;
 			default:
@@ -251,19 +255,19 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
 	glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCALE_T.c_str()), 1.f);
 
 	GMuint n = 0;
-	while (n < MAX_TEX_MOD && shader->getTexture().textures[i].texMod[n].type != GMS_NO_TEXTURE_MOD)
+	while (n < MAX_TEX_MOD && shader->getTexture().textures[i].texMod[n].type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
 		GMS_TextureMod* tc = &shader->getTexture().textures[i].texMod[n];
 		switch (tc->type)
 		{
-		case GMS_SCROLL:
+		case GMS_TextureModType::SCROLL:
 		{
 			GMfloat s = GameMachine::instance().getGameTimeSeconds() * tc->p1, t = GameMachine::instance().getGameTimeSeconds() * tc->p2;
 			glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCROLL_T.c_str()), t);
 			glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCROLL_T.c_str()), s);
 		}
 		break;
-		case GMS_SCALE:
+		case GMS_TextureModType::SCALE:
 		{
 			GMfloat s = tc->p1, t = tc->p2;
 			glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCALE_T.c_str()), t);
