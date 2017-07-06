@@ -5,8 +5,19 @@
 #include "foundation/utilities/utilities.h"
 BEGIN_NS
 
+#define DECLARE_GETTER(name, memberName, paramType) \
+	inline paramType& get##name() { D(d); return d-> memberName; } \
+	inline const paramType& get##name() const { D(d); return d-> memberName; }
+
+#define DECLARE_SETTER(name, memberName, paramType) \
+	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
+
+#define DECLARE_PROPERTY(name, memberName, paramType) \
+	DECLARE_GETTER(name, memberName, paramType) \
+	DECLARE_SETTER(name, memberName, paramType)
+
 // 表示一套纹理，包括普通纹理、漫反射纹理、法线贴图、光照贴图，以后可能还有高光贴图等
-enum TextureIndex
+enum GMTextureType
 {
 	TEXTURE_INDEX_AMBIENT,
 	TEXTURE_INDEX_AMBIENT_2,
@@ -76,15 +87,9 @@ GM_ALIGNED_STRUCT(GMS_TextureMod)
 	GMfloat p2 = 0;
 };
 
-// 表示一系列动画帧
-GM_ALIGNED_STRUCT(TextureFrames)
+GM_PRIVATE_OBJECT(GMTextureFrames)
 {
-	TextureFrames()
-	{
-		memset(frames, 0, MAX_ANIMATION_FRAME * sizeof(ITexture*));
-	}
-
-	ITexture* frames[MAX_ANIMATION_FRAME];
+	ITexture* frames[MAX_ANIMATION_FRAME]; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
 	GMS_TextureMod texMod[MAX_TEX_MOD];
 	GMint frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
@@ -94,23 +99,98 @@ GM_ALIGNED_STRUCT(TextureFrames)
 	GMS_Wrap wrapT = GMS_Wrap::REPEAT;
 };
 
-GM_ALIGNED_STRUCT(TextureInfo)
+class GMTextureFrames : public GMObject
 {
-	// 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
-	TextureFrames textures[TEXTURE_INDEX_MAX];
+	DECLARE_PRIVATE(GMTextureFrames)
+
+public:
+	DECLARE_PROPERTY(FrameCount, frameCount, GMint);
+	DECLARE_PROPERTY(AnimationMs, animationMs, GMint);
+	DECLARE_PROPERTY(MagFilter, magFilter, GMS_TextureFilter);
+	DECLARE_PROPERTY(MinFilter, minFilter, GMS_TextureFilter);
+	DECLARE_PROPERTY(WrapS, wrapS, GMS_Wrap);
+	DECLARE_PROPERTY(WrapT, wrapT, GMS_Wrap);
+
+public:
+	GMTextureFrames()
+	{
+		D(d);
+		GM_ZeroMemory(d->frames);
+		GM_ZeroMemory(d->texMod);
+	}
+
+public:
+	inline GMS_TextureMod& getTexMod(GMint index)
+	{
+		D(d);
+		return d->texMod[index];
+	}
+
+	inline void setTexMod(GMint index, const GMS_TextureMod& mod)
+	{
+		D(d);
+		d->texMod[index] = mod;
+	}
+
+	inline ITexture* getOneFrame(GMint frameIndex)
+	{
+		D(d);
+		return d->frames[frameIndex];
+	}
+
+	inline void setOneFrame(GMint frameIndex, ITexture* oneFrame)
+	{
+		D(d);
+		d->frames[frameIndex] = oneFrame;
+	}
+
+	inline GMTextureFrames& operator=(const GMTextureFrames& rhs)
+	{
+		D(d);
+		D_OF(rhs_d, &rhs);
+		*d = *rhs.data();
+		for (GMint i = 0; i < MAX_ANIMATION_FRAME; i++)
+		{
+			d->frames[i] = rhs_d->frames[i];
+		}
+		for (GMint i = 0; i < MAX_TEX_MOD; i++)
+		{
+			d->texMod[i] = rhs_d->texMod[i];
+		}
+		return *this;
+	}
+};
+
+GM_PRIVATE_OBJECT(GMTexture)
+{
+	GMTextureFrames textureFrames[TEXTURE_INDEX_MAX];
 	GMuint autorelease = 0;
 };
 
-#define DECLARE_GETTER(name, memberName, paramType) \
-	inline paramType& get##name() { D(d); return d-> memberName; } \
-	inline const paramType& get##name() const { D(d); return d-> memberName; }
+class GMTexture : public GMObject
+{
+	DECLARE_PRIVATE(GMTexture)
 
-#define DECLARE_SETTER(name, memberName, paramType) \
-	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
+public:
+	GMTexture()
+	{
+		D(d);
+	}
 
-#define DECLARE_PROPERTY(name, memberName, paramType) \
-	DECLARE_GETTER(name, memberName, paramType) \
-	DECLARE_SETTER(name, memberName, paramType)
+public:
+	inline GMTextureFrames& getTextureFrames(GMint type)
+	{
+		D(d);
+		return d->textureFrames[type];
+	}
+
+	inline GMTexture& operator=(const GMTexture& rhs)
+	{
+		D(d);
+		*d = *rhs.data();
+		return *this;
+	}
+};
 
 GM_PRIVATE_OBJECT(GMLight)
 {
@@ -168,7 +248,7 @@ GM_PRIVATE_OBJECT(Shader)
 	bool drawBorder = false;
 	GMfloat lineWidth = 1;
 	linear_math::Vector3 lineColor;
-	TextureInfo texture;
+	GMTexture texture;
 };
 
 class Shader : public GMObject
@@ -184,7 +264,7 @@ public:
 	DECLARE_PROPERTY(Blend, blend, bool);
 	DECLARE_PROPERTY(Nodraw, nodraw, bool);
 	DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
-	DECLARE_PROPERTY(Texture, texture, TextureInfo);
+	DECLARE_PROPERTY(Texture, texture, GMTexture);
 	DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	DECLARE_PROPERTY(LineColor, lineColor, linear_math::Vector3);
 	DECLARE_PROPERTY(DrawBorder, drawBorder, bool);

@@ -14,7 +14,7 @@ GMGLTextureShaderNames::GMGLTextureShaderNames()
 	m_uniformNames[TEXTURE_INDEX_LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURE;
 }
 
-const char* GMGLTextureShaderNames::operator [](TextureIndex t)
+const char* GMGLTextureShaderNames::operator [](GMTextureType t)
 {
 	ASSERT(m_uniformNames.find(t) != m_uniformNames.end());
 	return m_uniformNames[t].c_str();
@@ -161,41 +161,41 @@ void GMGLTexture::init()
 	m_inited = true;
 }
 
-void GMGLTexture::drawTexture(TextureFrames* frames)
+void GMGLTexture::drawTexture(GMTextureFrames* frames)
 {
 	const GMImage::Data& image = m_image->getData();
 	glBindTexture(image.target, m_id);
 
 	// Apply params
 	glTexParameteri(image.target, GL_TEXTURE_MIN_FILTER,
-		frames->minFilter == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-		frames->minFilter == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-		frames->minFilter == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-		frames->minFilter == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-		frames->minFilter == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-		frames->minFilter == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+		frames->getMinFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
+		frames->getMinFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
+		frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+		frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+		frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+		frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 	);
 
 	glTexParameteri(image.target, GL_TEXTURE_MAG_FILTER,
-		frames->magFilter == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-		frames->magFilter == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-		frames->magFilter == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-		frames->magFilter == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-		frames->magFilter == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-		frames->magFilter == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+		frames->getMagFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
+		frames->getMagFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
+		frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+		frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+		frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+		frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 	);
 
 	glTexParameteri(image.target, GL_TEXTURE_WRAP_S, 
-		frames->wrapS == GMS_Wrap::REPEAT ? GL_REPEAT :
-		frames->wrapS == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-		frames->wrapS == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-		frames->wrapS == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+		frames->getWrapS() == GMS_Wrap::REPEAT ? GL_REPEAT :
+		frames->getWrapS() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+		frames->getWrapS() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+		frames->getWrapS() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
 	);
 	
 	glTexParameteri(image.target, GL_TEXTURE_WRAP_T,
-		frames->wrapT == GMS_Wrap::REPEAT ? GL_REPEAT :
-		frames->wrapT == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-		frames->wrapT == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-		frames->wrapT == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+		frames->getWrapT() == GMS_Wrap::REPEAT ? GL_REPEAT :
+		frames->getWrapT() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+		frames->getWrapT() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+		frames->getWrapT() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
 	);
 }

@@ -31,10 +31,10 @@ protected:
 	void clearData();
 	void activateLight(LightType t, GMLight& light);
 	void drawDebug();
-	ITexture* getTexture(TextureFrames& frames);
-	void activeTextureTransform(Shader* shader, TextureIndex i);
-	void activeTexture(Shader* shader, TextureIndex i);
-	void deactiveTexture(TextureIndex i);
+	ITexture* getTexture(GMTextureFrames& frames);
+	void activeTextureTransform(Shader* shader, GMTextureType i);
+	void activeTexture(Shader* shader, GMTextureType i);
+	void deactiveTexture(GMTextureType i);
 	void activateShader(Shader* shader);
 	void deactivateShader(Shader* shader);
 };

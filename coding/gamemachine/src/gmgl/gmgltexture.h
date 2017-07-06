@@ -13,13 +13,13 @@ class GMGLTextureShaderNames
 public:
 	GMGLTextureShaderNames();
 
-	const char* operator [](TextureIndex t);
+	const char* operator [](GMTextureType t);
 
 private:
-	std::map<TextureIndex, std::string> m_uniformNames;
+	std::map<GMTextureType, std::string> m_uniformNames;
 };
 
-inline std::string getTextureUniformName(TextureIndex t)
+inline std::string getTextureUniformName(GMTextureType t)
 {
 	static GMGLTextureShaderNames s;
 	return s[t];
@@ -35,7 +35,7 @@ public:
 	void init();
 
 public:
-	virtual void drawTexture(TextureFrames* frames) override;
+	virtual void drawTexture(GMTextureFrames* frames) override;
 
 private:
 	bool m_inited;

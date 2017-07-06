@@ -45,18 +45,18 @@ protected:
 class GMMesh;
 GM_PRIVATE_OBJECT(Component)
 {
-	GMuint offset;
-	Shader shader;
+	GMuint offset = 0;
+	// 绘制图元数量
+	GMuint primitiveCount = 0;
 
 	// 图元顶点数量
 	AlignedVector<GMint> primitiveVertices;
-	// 绘制图元数量
-	GMuint primitiveCount;
 	// 顶点在ChildObject的偏移
 	AlignedVector<GMint> vertexOffsets;
 
 	GMMesh* parentMesh;
 	GMuint currentFaceVerticesCount;
+	Shader shader;
 };
 
 class Component : public GMObject

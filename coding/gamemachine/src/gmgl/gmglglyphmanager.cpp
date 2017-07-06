@@ -79,7 +79,7 @@ public:
 		glDeleteTextures(1, &m_id);
 	}
 
-	virtual void drawTexture(TextureFrames* frames) override
+	virtual void drawTexture(GMTextureFrames* frames) override
 	{
 		glBindTexture(GL_TEXTURE_2D, m_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

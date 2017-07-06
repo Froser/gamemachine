@@ -136,14 +136,14 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		// 按照贴图类型选择纹理动画序列
-		TextureFrames& textures = shader.getTexture().textures[i];
+		GMTextureFrames& textures = shader.getTexture().getTextureFrames(i);
 
 		// 获取序列中的这一帧
 		ITexture* texture = getTexture(textures);
 		if (texture)
 		{
 			// 激活动画序列
-			activeTexture(d->shader, (TextureIndex)i);
+			activeTexture(d->shader, (GMTextureType)i);
 			texture->drawTexture(&textures);
 		}
 	}
@@ -158,7 +158,7 @@ void GMGLRenders_Object::endShader()
 	deactivateShader(d->shader);
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
-		deactiveTexture((TextureIndex)i);
+		deactiveTexture((GMTextureType)i);
 	}
 
 	if (d->mode == GMDrawMode::Line)
@@ -188,20 +188,20 @@ void GMGLRenders_Object::clearData()
 	memset(&d, 0, sizeof(d));
 }
 
-ITexture* GMGLRenders_Object::getTexture(TextureFrames& frames)
+ITexture* GMGLRenders_Object::getTexture(GMTextureFrames& frames)
 {
 	D(d);
-	if (frames.frameCount == 0)
+	if (frames.getFrameCount() == 0)
 		return nullptr;
 
-	if (frames.frameCount == 1)
-		return frames.frames[0];
+	if (frames.getFrameCount() == 1)
+		return frames.getOneFrame(0);
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
 	GMint elapsed = GameMachine::instance().getGameTimeSeconds() * 1000;
 
-	return frames.frames[(elapsed / frames.animationMs) % frames.frameCount];
+	return frames.getOneFrame((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
 void GMGLRenders_Object::activateLight(LightType t, GMLight& light)
@@ -239,7 +239,7 @@ void GMGLRenders_Object::drawDebug()
 	GMGL::uniformInt(*d->gmglShaders, GMGetBuiltIn(DRAW_NORMAL), GMSHADER_DEBUG_DRAW_NORMAL);
 }
 
-void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
+void GMGLRenders_Object::activeTextureTransform(Shader* shader, GMTextureType i)
 {
 	D(d);
 	std::string uniform = getTextureUniformName(i);
@@ -255,9 +255,9 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
 	glUniform1f(glGetUniformLocation(d->gmglShaders->getProgram(), SCALE_T.c_str()), 1.f);
 
 	GMuint n = 0;
-	while (n < MAX_TEX_MOD && shader->getTexture().textures[i].texMod[n].type != GMS_TextureModType::NO_TEXTURE_MOD)
+	const GMS_TextureMod* tc = &shader->getTexture().getTextureFrames(i).getTexMod(n);
+	while (n < MAX_TEX_MOD && tc->type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
-		GMS_TextureMod* tc = &shader->getTexture().textures[i].texMod[n];
 		switch (tc->type)
 		{
 		case GMS_TextureModType::SCROLL:
@@ -281,7 +281,7 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, TextureIndex i)
 	}
 }
 
-void GMGLRenders_Object::activeTexture(Shader* shader, TextureIndex i)
+void GMGLRenders_Object::activeTexture(Shader* shader, GMTextureType i)
 {
 	D(d);
 	std::string uniform = getTextureUniformName(i);
@@ -294,7 +294,7 @@ void GMGLRenders_Object::activeTexture(Shader* shader, TextureIndex i)
 	glActiveTexture(i + GL_TEXTURE1);
 }
 
-void GMGLRenders_Object::deactiveTexture(TextureIndex i)
+void GMGLRenders_Object::deactiveTexture(GMTextureType i)
 {
 	D(d);
 	std::string uniform = getTextureUniformName(i);

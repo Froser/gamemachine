@@ -18,10 +18,11 @@ class GMUIWindow;
 class Shader;
 class GMObjectPainter;
 class GMMesh;
+class GMTextureFrames;
+class GMTexture;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
-struct TextureFrames;
 struct CameraLookAt;
 
 namespace linear_math
@@ -48,7 +49,7 @@ GM_INTERFACE(IGameHandler)
 
 GM_INTERFACE(ITexture)
 {
-	virtual void drawTexture(TextureFrames* frames) = 0;
+	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
 // 默认的环境参数
