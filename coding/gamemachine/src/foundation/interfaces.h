@@ -17,11 +17,17 @@ class GMGlyphManager;
 class GMUIWindow;
 class Shader;
 class GMObjectPainter;
+class GMMesh;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
 struct TextureFrames;
 struct CameraLookAt;
+
+namespace linear_math
+{
+	class Matrix4x4;
+}
 
 enum class GameMachineEvent
 {
@@ -63,6 +69,23 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void setEnvironment(const GMGraphicEnvironment& env) = 0;
 	virtual GMGraphicEnvironment& getEnvironment() = 0;
 };
+
+enum class GMDrawMode
+{
+	Fill,
+	Line,
+};
+
+struct IRender
+{
+	virtual ~IRender() {}
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) = 0;
+	virtual void beginShader(Shader& shader, GMDrawMode mode) = 0;
+	virtual void endShader() = 0;
+	virtual void end() = 0;
+	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) = 0;
+};
+
 
 enum GamePackageType
 {

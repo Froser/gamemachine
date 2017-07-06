@@ -93,10 +93,31 @@ void GMGLRenders_Object::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* mo
 		GMGL::uniformMatrix4(*d->gmglShaders, modelTransform, GMSHADER_MODEL_MATRIX);
 }
 
-void GMGLRenders_Object::beginShader(Shader& shader)
+void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 {
 	D(d);
 	d->shader = &shader;
+	d->mode = mode;
+
+	if (mode == GMDrawMode::Fill)
+	{
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	}
+	else
+	{
+		d->shader->stash();
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glEnable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(0.f, 1.f);
+
+		// 设置边框颜色
+		GMLight& light = d->shader->getLight(LT_AMBIENT);
+		light.setLightColor(d->shader->getLineColor());
+		light.setKa(linear_math::Vector3(1, 1, 1));
+		light.setEnabled(true);
+		light.setUseGlobalLightColor(false);
+	}
 
 	// 光照
 	for (GMint i = LT_BEGIN; i < LT_END; i++)
@@ -104,9 +125,10 @@ void GMGLRenders_Object::beginShader(Shader& shader)
 		activateLight((LightType)i, shader.getLight((LightType)i));
 	}
 
-	// 纹理
+	// 应用Shader
 	activateShader(&shader);
 
+	// 纹理
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		// 按照贴图类型选择纹理动画序列
@@ -133,6 +155,14 @@ void GMGLRenders_Object::endShader()
 	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
 	{
 		deactiveTexture((TextureIndex)i);
+	}
+
+	if (d->mode == GMDrawMode::Line)
+	{
+		// 还原所有线条Shader
+		glDisable(GL_POLYGON_OFFSET_LINE);
+		glPolygonOffset(0.f, 0.f);
+		d->shader->pop();
 	}
 }
 

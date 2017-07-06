@@ -299,7 +299,7 @@ public:
 	}
 	BOOL operator!() const
 	{
-		return m_ptr == NULL;
+		return m_ptr == nullptr;
 	}
 	BOOL operator==(E* p) const
 	{

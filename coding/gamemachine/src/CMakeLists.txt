@@ -74,7 +74,6 @@ set(SOURCES
 		gmengine/gmbspgameworld.cpp
 		gmengine/gmdemogameworld.h
 		gmengine/gmdemogameworld.cpp
-		gmgl/renders/gmgl_render.h
 		gmgl/renders/gmgl_renders_glyph.cpp
 		gmgl/renders/gmgl_renders_glyph.h
 		gmgl/renders/gmgl_renders_object.cpp

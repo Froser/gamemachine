@@ -6,10 +6,17 @@
 BEGIN_NS
 
 class GMGLGraphicEngine;
-class GMGLShaderProgram;
-class GMGameWorld;
+struct IRender;
+GM_PRIVATE_OBJECT(GMGLObjectPainter)
+{
+	GMGLGraphicEngine* engine = nullptr;
+	bool inited = false;
+};
+
 class GMGLObjectPainter : public GMObjectPainter
 {
+	DECLARE_PRIVATE(GMGLObjectPainter)
+
 public:
 	GMGLObjectPainter(IGraphicEngine* engine, Object* objs);
 
@@ -19,10 +26,7 @@ public:
 	virtual void dispose() override;
 
 private:
-	GMGLGraphicEngine* m_engine;
-
-private:
-	bool m_inited;
+	void draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill);
 };
 
 END_NS

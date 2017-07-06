@@ -7,7 +7,6 @@
 #include "gmgltexture.h"
 #include "gmengine/gmgameobject.h"
 #include "gmglobjectpainter.h"
-#include "renders/gmgl_render.h"
 #include "renders/gmgl_renders_object.h"
 #include "renders/gmgl_renders_sky.h"
 #include "renders/gmgl_renders_glyph.h"

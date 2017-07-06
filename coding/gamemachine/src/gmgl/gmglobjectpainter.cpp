@@ -5,7 +5,6 @@
 #include "gmgltexture.h"
 #include "gmengine/gmgameworld.h"
 #include "gmglgraphic_engine.h"
-#include "renders/gmgl_render.h"
 #include "foundation/gamemachine.h"
 
 static GLenum getMode(GMMesh* obj)
@@ -28,14 +27,15 @@ static GLenum getMode(GMMesh* obj)
 
 GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, Object* objs)
 	: GMObjectPainter(objs)
-	, m_engine(static_cast<GMGLGraphicEngine*>(engine))
-	, m_inited(false)
 {
+	D(d);
+	d->engine = static_cast<GMGLGraphicEngine*>(engine);
 }
 
 void GMGLObjectPainter::transfer()
 {
-	if (m_inited)
+	D(d);
+	if (d->inited)
 		return;
 
 	Object* obj = getObject();
@@ -91,17 +91,18 @@ void GMGLObjectPainter::transfer()
 	}
 	END_FOREACH_OBJ
 
-	m_inited = true;
+	d->inited = true;
 }
 
 void GMGLObjectPainter::draw(GMfloat* modelTransform)
 {
+	D(d);
 	Object* obj = getObject();
 
 	BEGIN_FOREACH_OBJ(obj, mesh)
 	{
-		IRender* render = m_engine->getRender(mesh->getType());
-		render->begin(m_engine, mesh, modelTransform);
+		IRender* render = d->engine->getRender(mesh->getType());
+		render->begin(d->engine, mesh, modelTransform);
 
 		glBindVertexArray(mesh->getArrayId());
 		for (auto component : mesh->getComponents())
@@ -110,10 +111,9 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 			if (shader.getNodraw())
 				continue;
 
-			render->beginShader(shader);
-			GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-			glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
-			render->endShader();
+			draw(render, shader, component, mesh, true);
+			if (shader.getDrawBorder())
+				draw(render, shader, component, mesh, false);
 		}
 		glBindVertexArray(0);
 
@@ -124,6 +124,7 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 
 void GMGLObjectPainter::dispose()
 {
+	D(d);
 	Object* obj = getObject();
 
 	BEGIN_FOREACH_OBJ(obj, mesh)
@@ -136,5 +137,17 @@ void GMGLObjectPainter::dispose()
 	}
 	END_FOREACH_OBJ
 
-	m_inited = false;
+	d->inited = false;
+}
+
+void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill)
+{
+	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
+	if (fill)
+		render->beginShader(shader, GMDrawMode::Fill);
+	else
+		render->beginShader(shader, GMDrawMode::Line);
+
+	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+	render->endShader();
 }

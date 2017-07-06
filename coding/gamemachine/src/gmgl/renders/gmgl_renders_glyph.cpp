@@ -9,7 +9,7 @@ void GMGLRenders_Glyph::updateVPMatrices(const linear_math::Matrix4x4& projectio
 	GMGL::cameraPosition(lookAt, *d->gmglShaders, GMSHADER_VIEW_POSITION);
 }
 
-void GMGLRenders_Glyph::beginShader(Shader& shader)
+void GMGLRenders_Glyph::beginShader(Shader& shader, GMDrawMode mode)
 {
 	D(d);
 	d->shader = &shader;

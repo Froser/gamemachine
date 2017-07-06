@@ -290,6 +290,9 @@ private:
 		Object* core = obj->getObject();
 		Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
 		shader.setCull(GMS_Cull::CULL);
+		shader.setLineWidth(5);
+		shader.setDrawBorder(true);
+		shader.setLineColor(linear_math::Vector3(1.f, .5f, .2f));
 		GMLight& objLight = shader.getLight(LT_SPECULAR);
 		objLight.setLightColor(linear_math::Vector3(1, .5, 1));
 		objLight.setKd(linear_math::Vector3(.6f, .2f, .3f));
@@ -330,7 +333,11 @@ private:
 				if (kbState.keyTriggered('L'))
 					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
 
-				a += .001f;
+				if (kbState.keyTriggered('P'))
+					rotate = !rotate;
+				if (rotate)
+					a += .001f;
+
 				GMGameObject* obj = demo->getGameObject("cube");
 				linear_math::Quaternion q;
 				q.setRotation(dir, a);
@@ -354,6 +361,7 @@ private:
 
 	GMfloat a = 0;
 	GMDemoGameWorld* demo;
+	bool rotate = true;
 };
 
 int main()
@@ -382,7 +390,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

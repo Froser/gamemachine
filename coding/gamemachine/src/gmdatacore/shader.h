@@ -2,6 +2,7 @@
 #define __SHADER_H__
 #include "common.h"
 #include "foundation/linearmath.h"
+#include "foundation/utilities/utilities.h"
 BEGIN_NS
 
 // 表示一套纹理，包括普通纹理、漫反射纹理、法线贴图、光照贴图，以后可能还有高光贴图等
@@ -157,7 +158,9 @@ GM_PRIVATE_OBJECT(Shader)
 	bool blend = false;
 	bool nodraw = false;
 	bool noDepthTest = false;
+	bool drawBorder = false;
 	GMfloat lineWidth = 1;
+	linear_math::Vector3 lineColor;
 	TextureInfo texture;
 };
 
@@ -175,6 +178,8 @@ public:
 	DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
 	DECLARE_PROPERTY(Texture, texture, TextureInfo);
 	DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
+	DECLARE_PROPERTY(LineColor, lineColor, linear_math::Vector3);
+	DECLARE_PROPERTY(DrawBorder, drawBorder, bool);
 	
 	inline GMLight& getLight(LightType type) { D(d); return d->lights[type]; }
 	inline void setLight(LightType type, const GMLight& light) { D(d); d->lights[type] = light; }
@@ -189,6 +194,24 @@ public:
 		}
 		return *this;
 	}
+
+	inline void stash()
+	{
+		D(d);
+		Shader* s = new Shader();
+		*s = *this;
+		m_stash.reset(s);
+	}
+
+	void pop()
+	{
+		D(d);
+		if (!m_stash)
+			return;
+		*this = *m_stash;
+	}
+
+	AutoPtr<Shader> m_stash;
 };
 END_NS
 #endif

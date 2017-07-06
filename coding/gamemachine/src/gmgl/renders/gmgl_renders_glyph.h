@@ -8,7 +8,7 @@ class GMGLRenders_Glyph : public GMGLRenders_Object
 {
 public:
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
-	virtual void beginShader(Shader& shader) override;
+	virtual void beginShader(Shader& shader, GMDrawMode mode) override;
 };
 
 END_NS

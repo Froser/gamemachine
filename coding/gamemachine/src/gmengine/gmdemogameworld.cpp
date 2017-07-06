@@ -117,33 +117,6 @@ void GMDemoGameWorld::createCube(GMfloat extents[3], OUT GMGameObject** obj)
 		coreObj->append(body);
 	}
 
-	// 边框
-	{
-		GMMesh* border = new GMMesh();
-		border->setArrangementMode(GMArrangementMode::Lines);
-		Shader shader;
-		shader.setLineWidth(2);
-		GMLight& light = shader.getLight(LT_AMBIENT);
-		light.setEnabled(true);
-		light.setLightColor( linear_math::Vector3(1, 0, 0) );
-		light.setKa(linear_math::Vector3(1, 1, 1));
-		Component* component = new Component(border);
-		for (GMint i = 0; i < 6; i++)
-		{
-			component->beginFace();
-			for (GMint j = 0; j < 4; j++) // j表示面的一个顶点
-			{
-				GMint idx = i * 4 + j; //顶点的开始
-				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-				component->vertex(vertex[0], vertex[1], vertex[2]);
-			}
-			component->endFace();
-			component->setShader(shader);
-		}
-		border->appendComponent(component);
-		coreObj->append(border);
-	}
-
 	GMGameObject* gameObject = new GMGameObject(coreObj);
 	*obj = gameObject;
 	GameMachine::instance().initObjectPainter(gameObject);
