@@ -182,7 +182,7 @@ void GMBSPShaderLoader::load()
 	}
 }
 
-bool GMBSPShaderLoader::findItem(const GMString& name, GMuint lightmapId, REF Shader* shader)
+bool GMBSPShaderLoader::findItem(const GMString& name, GMint lightmapId, REF Shader* shader)
 {
 	D(d);
 	auto foundResult = d->items.find(name);
@@ -233,7 +233,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	}
 }
 
-void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr)
+void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF Shader* shaderPtr)
 {
 	D(d);
 	if (!shaderPtr)

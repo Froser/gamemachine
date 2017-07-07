@@ -32,28 +32,6 @@ Component::Component(GMMesh* parent)
 	setVertexOffset(d->parentMesh->vertices().size() / VERTEX_DEMENSION);
 }
 
-Component::~Component()
-{
-	D(d);
-	ASSERT(false); //TODO 这里到底要不要释放？
-	/*
-	GMTexture& ti = d->shader.getTexture();
-	//if (ti.autorelease)
-	{
-		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
-		{
-			GMTextureFrames& frames = d->shader.getTexture().getTextureFrames(i);
-			for (GMint j = 0; j < frames.getFrameCount(); j++)
-			{
-				ITexture* t = frames.getOneFrame(i);
-				if (t)
-					delete t;
-			}
-		}
-	}
-	*/
-}
-
 // 设置此component的第一个顶点位于ChildObject.vertices()中的偏移位置
 // 一般不需要手动调用
 void Component::setVertexOffset(GMuint offset)

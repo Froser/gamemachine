@@ -72,7 +72,6 @@ public:
 	};
 
 	Component(GMMesh* parent);
-	~Component();
 
 	inline Shader& getShader() { D(d); return d->shader; }
 	inline void setShader(const Shader& shader) { D(d); d->shader = shader; }

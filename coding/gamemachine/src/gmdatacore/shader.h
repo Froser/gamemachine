@@ -116,8 +116,9 @@ public:
 	{
 		D(d);
 		GM_ZeroMemory(d->frames);
-		GM_ZeroMemory(d->texMod);
 	}
+
+	GMTextureFrames(const GMTextureFrames&) = delete;
 
 public:
 	inline GMS_TextureMod& getTexMod(GMint index)
@@ -172,10 +173,8 @@ class GMTexture : public GMObject
 	DECLARE_PRIVATE(GMTexture)
 
 public:
-	GMTexture()
-	{
-		D(d);
-	}
+	GMTexture() = default;
+	GMTexture(const GMTexture& texture) = delete;
 
 public:
 	inline GMTextureFrames& getTextureFrames(GMint type)
@@ -187,7 +186,11 @@ public:
 	inline GMTexture& operator=(const GMTexture& rhs)
 	{
 		D(d);
-		*d = *rhs.data();
+		D_OF(rhs_d, &rhs);
+		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
+		{
+			d->textureFrames[i] = rhs_d->textureFrames[i];
+		}
 		return *this;
 	}
 };
@@ -221,7 +224,8 @@ public:
 	inline GMLight& operator=(const GMLight& rhs)
 	{
 		D(d);
-		*d = *rhs.data();
+		D_OF(rhs_d, &rhs);
+		*d = *rhs_d;
 		return *this;
 	}
 };
@@ -254,6 +258,13 @@ GM_PRIVATE_OBJECT(Shader)
 class Shader : public GMObject
 {
 	DECLARE_PRIVATE(Shader)
+
+public:
+	Shader() = default;
+	Shader(const Shader& shader)
+	{
+		*this = shader;
+	}
 
 public:
 	DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);

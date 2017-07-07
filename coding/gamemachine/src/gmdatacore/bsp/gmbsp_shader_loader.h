@@ -37,13 +37,13 @@ public:
 public:
 	void init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
 	void load();
-	bool findItem(const GMString& name, GMuint lightmapId, REF Shader* shader);
+	bool findItem(const GMString& name, GMint lightmapId, REF Shader* shader);
 
 	// parsers:
 private:
 	ITexture* addTextureToTextureContainer(const char* name);
 	void parse(const char* buffer);
-	void parseItem(TiXmlElement* elem, GMuint lightmapId, REF Shader* shaderPtr);
+	void parseItem(TiXmlElement* elem, GMint lightmapId, REF Shader* shaderPtr);
 	void parseStart();
 	void parseEnd();
 

@@ -653,8 +653,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	GMuint textureid = face.textureIndex;
-	GMuint lightmapid = face.lightmapIndex;
+	GMint textureid = face.textureIndex;
+	GMint lightmapid = face.lightmapIndex;
 	const GMString& name = bsp.shaders[textureid].shader;
 
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
@@ -665,8 +665,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 		const TextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frames[0] = item->texture;
-		shader.getTexture().textures[TEXTURE_INDEX_AMBIENT].frameCount = 1;
+		shader.getTexture().getTextureFrames(TEXTURE_INDEX_AMBIENT).setOneFrame(0, item->texture);
+		shader.getTexture().getTextureFrames(TEXTURE_INDEX_AMBIENT).setFrameCount(1);
 	}
 	return true;
 }
@@ -683,8 +683,8 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 	else
 		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	shader.getTexture().textures[TEXTURE_INDEX_LIGHTMAP].frames[0] = item->texture;
-	shader.getTexture().textures[TEXTURE_INDEX_LIGHTMAP].frameCount = 1;
+	shader.getTexture().getTextureFrames(TEXTURE_INDEX_LIGHTMAP).setOneFrame(0, item->texture);
+	shader.getTexture().getTextureFrames(TEXTURE_INDEX_LIGHTMAP).setFrameCount(1);
 }
 
 void GMBSPGameWorld::importBSP()
