@@ -48,18 +48,21 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMUIInstance instance;
 	GMUIWindowAttributes mainWindowAttributes;
 	GMClock clock;
-	AutoPtr<GMUIWindow> mainWindow; // 主窗口
-	AutoPtr<IFactory> factory;
-	AutoPtr<IGraphicEngine> engine;
-	AutoPtr<IGameHandler> gameHandler;
-	AutoPtr<GMGlyphManager> glyphManager;
-	AutoPtr<GMGamePackage> gamePackageManager;
-	AutoPtr<IInput> inputManager;
-	AutoPtr<GMConfig> configManager;
+
+	GMUIWindow* mainWindow = nullptr;
+	IFactory* factory = nullptr;
+	IGraphicEngine* engine = nullptr;
+	GMGlyphManager* glyphManager = nullptr;
+	GMGamePackage* gamePackageManager = nullptr;
+	IInput* inputManager = nullptr;
+	GMConfig* configManager = nullptr;
+	IGameHandler* gameHandler = nullptr;
+	GMUIConsole* consoleWindow = nullptr; // 内置调试窗口
+
 	GMCamera camera;
-	std::queue<GameMachineMessage> messageQueue;
+	Queue<GameMachineMessage> messageQueue;
+	Vector<IDispose*> manangerQueue;
 	GameMachineWindows windows; // 除主窗口以外的窗口列表
-	AUTORELEASE GMUIConsole* consoleWindow; // 内置调试窗口
 };
 
 class GameMachine : public GMSingleton<GameMachine>
@@ -137,6 +140,8 @@ public:
 	void startGameMachine();
 
 private:
+	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
+	void terminate();
 	bool handleMessages();
 	void defaultMainWindowAttributes();
 	void createWindows();

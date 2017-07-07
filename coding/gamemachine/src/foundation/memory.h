@@ -3,13 +3,6 @@
 #include "defines.h"
 BEGIN_NS
 
-class AlignedMemoryAlloc
-{
-public:
-	static void* gmAlignedAllocInternal(size_t size, GMint alignment);
-	static void gmAlignedFreeInternal(void* ptr);
-};
-
 typedef void *(gmAlignedAllocFunc)(size_t size, GMint alignment);
 typedef void (gmAlignedFreeFunc)(void *memblock);
 typedef void *(gmAllocFunc)(size_t size);
@@ -17,8 +10,33 @@ typedef void (gmFreeFunc)(void *memblock);
 void gmAlignedAllocSetCustom(gmAllocFunc *allocFunc, gmFreeFunc *freeFunc);
 void gmAlignedAllocSetCustomAligned(gmAlignedAllocFunc *allocFunc, gmAlignedFreeFunc *freeFunc);
 
-#define gmAlignedAlloc(size,alignment) AlignedMemoryAlloc::gmAlignedAllocInternal(size,alignment)
-#define gmAlignedFree(ptr) AlignedMemoryAlloc::gmAlignedFreeInternal(ptr)
+#if _DEBUG && GM_DEBUG_MEMORY
+#	define gmCheckMemoryLeaks() AlignedMemoryAlloc::gmDumpMemoryLeaks();
+#	define gmAlignedAlloc(a,b) \
+		AlignedMemoryAlloc::gmAlignedAllocInternal(a,b,__LINE__,__FILE__)
+#	define gmAlignedFree(ptr) \
+		AlignedMemoryAlloc::gmAlignedFreeInternal(ptr,__LINE__,__FILE__)
+
+class AlignedMemoryAlloc
+{
+public:
+	static void* gmAlignedAllocInternal(size_t size, int alignment, int line, char* filename);
+	static void gmAlignedFreeInternal(void* ptr, int line, char* filename);
+	static GMint gmDumpMemoryLeaks();
+};
+
+#else
+#	define gmAlignedAlloc(size,alignment) AlignedMemoryAlloc::gmAlignedAllocInternal(size,alignment)
+#	define gmAlignedFree(ptr) AlignedMemoryAlloc::gmAlignedFreeInternal(ptr)
+#	define gmCheckMemoryLeaks()
+
+class AlignedMemoryAlloc
+{
+public:
+	static void* gmAlignedAllocInternal(size_t size, GMint alignment);
+	static void gmAlignedFreeInternal(void* ptr);
+};
+#endif
 
 template < typename T, unsigned Alignment >
 class AlignedAllocator
@@ -60,7 +78,7 @@ public:
 	friend bool operator==(const my_type &, const my_type &) { return true; }
 };
 
-// 重在new, delete，对齐分配内存
+// override new, delete，对齐分配内存
 #if USE_SIMD
 #define GM_DECLARE_ALIGNED_ALLOCATOR() \
 	public:   \

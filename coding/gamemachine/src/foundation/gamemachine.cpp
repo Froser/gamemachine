@@ -21,20 +21,20 @@ void GameMachine::init(
 
 	defaultMainWindowAttributes();
 
-	d->factory.reset(factory);
-	d->gameHandler.reset(gameHandler);
+	registerManager(factory, &d->factory);
+	registerManager(gameHandler, &d->gameHandler);
 
 	GMUIWindow* window;
 	d->factory->createWindow(&window);
-	d->mainWindow.reset(window);
+	registerManager(window, &d->mainWindow);
 
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
-	d->engine.reset(engine);
+	registerManager(engine, &d->engine);
 
-	d->gamePackageManager.reset(new GMGamePackage(factory));
-	d->inputManager.reset(new GMInput());
-	d->configManager.reset(new GMConfig());
+	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
+	registerManager(new GMInput(), &d->inputManager);
+	registerManager(new GMConfig(), &d->configManager);
 
 	initInner();
 }
@@ -120,7 +120,7 @@ void GameMachine::startGameMachine()
 	// 创建Glyph管理器，它必须在OpenGL窗口创建以后才可以初始化
 	GMGlyphManager* glyphManager;
 	d->factory->createGlyphManager(&glyphManager);
-	d->glyphManager.reset(glyphManager);
+	registerManager(glyphManager, &d->glyphManager);
 
 	// 开始渲染
 	d->engine->start();
@@ -157,6 +157,9 @@ void GameMachine::startGameMachine()
 		d->inputManager->update();
 		d->clock.update();
 	}
+
+	terminate();
+	gmCheckMemoryLeaks();
 }
 
 bool GameMachine::handleMessages()
@@ -238,7 +241,25 @@ void GameMachine::initInner()
 		NULL,
 		d->instance,
 	};
+
 	GMUIConsole::newConsoleWindow(&d->consoleWindow);
 	appendWindow(d->consoleWindow, attrs);
 	GMDebugger::setDebugOutput(d->consoleWindow);
+}
+
+template <typename T, typename U>
+void GameMachine::registerManager(T* newObject, OUT U** manager)
+{
+	D(d);
+	*manager = newObject;
+	d->manangerQueue.push_back(*manager);
+}
+
+void GameMachine::terminate()
+{
+	D(d);
+	for (auto manager : d->manangerQueue)
+	{
+		delete manager;
+	}
 }

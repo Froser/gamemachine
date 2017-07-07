@@ -738,9 +738,7 @@ void GMBSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
 
-			TextureContainer::TextureItemType item;
-			item.id = shader.shader;
-			item.texture = texture;
+			TextureContainer::TextureItemType item = { shader.shader, texture };
 			rc->getTextureContainer().insert(item);
 		}
 		else
@@ -797,9 +795,7 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 
-		TextureContainer_ID::TextureItemType item;
-		item.id = i;
-		item.texture = texture;
+		TextureContainer_ID::TextureItemType item = { i, texture };
 		rc->getLightmapContainer().insert(item);
 	}
 
@@ -810,9 +806,7 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 
-		TextureContainer_ID::TextureItemType item;
-		item.id = -1;
-		item.texture = texture;
+		TextureContainer_ID::TextureItemType item = { -1, texture };
 		rc->getLightmapContainer().insert(item);
 	}
 }

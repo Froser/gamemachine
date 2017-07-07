@@ -16,8 +16,25 @@
 #	include "GL/glew.h"
 #endif
 
-// 整个GameMachine用到的宏定义
 
+// 编译设置：
+// 游戏逻辑的线程模式
+#ifndef GM_MULTI_THREAD
+#define GM_MULTI_THREAD 1
+#endif
+
+// Debug模式下监控内存泄漏
+#ifndef GM_DETECT_MEMORY_LEAK
+#define GM_DETECT_MEMORY_LEAK 1
+#endif
+
+#if _DEBUG && GM_DETECT_MEMORY_LEAK
+#	define GM_DEBUG_MEMORY 1
+#else
+#	define GM_DEBUG_MEMORY 0
+#endif
+
+// 整个GameMachine用到的宏定义
 #define BEGIN_NS namespace gm {
 #define END_NS }
 
@@ -35,9 +52,6 @@
 #define END_ENUM
 
 BEGIN_NS
-
-// 游戏逻辑的线程模式
-#define MULTI_THREAD 1
 
 // 基本数据类型
 typedef unsigned char GMbyte;

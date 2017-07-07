@@ -20,7 +20,6 @@ GMUIConsole::~GMUIConsole()
 
 void GMUIConsole::newConsoleWindow(OUT GMUIConsole** out)
 {
-	ASSERT(*out);
 	*out = new GMUIConsole();
 }
 

@@ -6,6 +6,7 @@
 #include <vector>
 #include <map>
 #include <set>
+#include <queue>
 #include "debug.h"
 
 #if !USE_SIMD
@@ -26,6 +27,11 @@ using Set = std::set<T>;
 
 template <typename T>
 class Vector : public std::vector<T>
+{
+};
+
+template <typename T>
+class Queue : public std::queue<T>
 {
 };
 

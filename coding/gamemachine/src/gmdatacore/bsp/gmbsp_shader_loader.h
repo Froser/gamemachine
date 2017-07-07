@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 	GMString directory;
 	GMBSPGameWorld* world;
 	GMBSPRenderData* bspRender;
-	std::map<GMString, TiXmlElement*> items;
+	Map<GMString, TiXmlElement*> items;
 	AlignedVector<TiXmlDocument*> shaderDocs;
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始

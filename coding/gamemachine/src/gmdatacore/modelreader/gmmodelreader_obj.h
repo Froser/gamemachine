@@ -26,7 +26,7 @@ GM_PRIVATE_OBJECT(GMModelReader_Obj)
 	AlignedVector<linear_math::Vector3> vertices;
 	AlignedVector<linear_math::Vector3> normals;
 	AlignedVector<linear_math::Vector2> textures;
-	std::map<GMString, ModelReader_Obj_Material> materials;
+	Map<GMString, ModelReader_Obj_Material> materials;
 	GMString currentMaterialName;
 	Component* currentComponent;
 };

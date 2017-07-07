@@ -274,7 +274,7 @@ public:
 	GMSpriteGameObject* m_sprite;
 };
 
-class DemoGameHandler : public GMObject, public IGameHandler
+class DemoGameHandler : public IGameHandler
 {
 public:
 	DemoGameHandler() {}
@@ -390,7 +390,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

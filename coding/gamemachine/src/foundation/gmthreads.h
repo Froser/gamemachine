@@ -151,7 +151,7 @@ public:
 	SustainedThreadRunGuard() = default;
 	void add(GMSustainedThread* t) { GMMutex m; D(d); d->threads.push_back(t); }
 
-#if MULTI_THREAD
+#if GM_MULTI_THREAD
 	~SustainedThreadRunGuard() { GMMutex m; D(d); for (auto& thread : d->threads) { thread->wait(); } }
 	void trigger(GMSustainedThread* t) { GMMutex m; D(d); for (auto& thread : d->threads) { thread->trigger(); } }
 #else

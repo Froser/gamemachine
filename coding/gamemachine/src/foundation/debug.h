@@ -7,7 +7,7 @@
 
 BEGIN_NS
 
-struct IDebugOutput
+GM_INTERFACE(IDebugOutput)
 {
 	virtual void info(const GMString& msg) = 0;
 	virtual void warning(const GMString& msg) = 0;

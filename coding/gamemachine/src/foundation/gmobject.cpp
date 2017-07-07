@@ -1,11 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmobject.h"
 
-GMObject::~GMObject()
-{
-
-}
-
 GMObjectPrivateWrapper<GMObject>* GMObject::dataWrapper()
 {
 	return nullptr;

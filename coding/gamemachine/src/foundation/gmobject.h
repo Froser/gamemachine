@@ -5,13 +5,10 @@
 
 BEGIN_NS
 
-// 接口统一定义
-struct IGMInterface
+struct IDispose
 {
-	virtual ~IGMInterface() {}
+	virtual ~IDispose() {}
 };
-
-#define GM_INTERFACE(name) struct name : public IGMInterface
 
 // GameMachine采用数据和方法分离的方式，可以为一个类定义一个私有结构存储数据
 template <typename T>
@@ -120,17 +117,17 @@ GM_ALIGNED_STRUCT(GMUnassignableObject)
 };
 
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
-class GMObject : public GMAlignmentObject
+class GMObject : public GMAlignmentObject, public IDispose
 {
-public:
-	virtual ~GMObject();
-
 public:
 	static void swapData(GMObject* a, GMObject* b);
 
 private:
 	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();
 };
+
+// 接口统一定义
+#define GM_INTERFACE(name) struct name : public IDispose
 
 template <typename T>
 class GMSingleton : public GMObject

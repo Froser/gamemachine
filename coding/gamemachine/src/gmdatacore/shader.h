@@ -165,7 +165,6 @@ public:
 GM_PRIVATE_OBJECT(GMTexture)
 {
 	GMTextureFrames textureFrames[TEXTURE_INDEX_MAX];
-	GMuint autorelease = 0;
 };
 
 class GMTexture : public GMObject

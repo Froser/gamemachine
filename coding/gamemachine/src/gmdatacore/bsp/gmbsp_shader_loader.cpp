@@ -152,9 +152,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 			IFactory* factory = GameMachine::instance().getFactory();
 			factory->createTexture(img, &texture);
 
-			TextureContainer::TextureItemType ti;
-			ti.id = name;
-			ti.texture = texture;
+			TextureContainer::TextureItemType ti = { name, texture };
 			tc.insert(ti);
 			return texture;
 		}
