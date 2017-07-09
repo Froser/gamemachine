@@ -76,7 +76,7 @@ GMGamePackage* GMDefaultGLGamePackageHandler::gamePackage()
 	return m_pk;
 }
 
-AlignedVector<GMString> GMDefaultGLGamePackageHandler::getAllFiles(const GMString& directory)
+Vector<GMString> GMDefaultGLGamePackageHandler::getAllFiles(const GMString& directory)
 {
 	return Path::getAllFiles(directory);
 }
@@ -197,9 +197,9 @@ void ZipGMGLGamePackageHandler::releaseBuffers()
 	}
 }
 
-AlignedVector<GMString> ZipGMGLGamePackageHandler::getAllFiles(const GMString& directory)
+Vector<GMString> ZipGMGLGamePackageHandler::getAllFiles(const GMString& directory)
 {
-	AlignedVector<GMString> result;
+	Vector<GMString> result;
 	GMString d = directory;
 	for (auto& buffer : m_buffers)
 	{

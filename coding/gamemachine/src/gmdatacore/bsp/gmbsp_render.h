@@ -60,30 +60,29 @@ GM_ALIGNED_STRUCT(GMBSP_Render_FaceDirectoryEntry)
 GM_ALIGNED_STRUCT(GMBSP_Render_BiquadraticPatch)
 {
 	GMBSP_Render_BiquadraticPatch()
-		: vertices(nullptr)
 	{
 	}
 
 	~GMBSP_Render_BiquadraticPatch()
 	{
-		if (vertices)
-			delete[] vertices;
-		vertices = nullptr;
+		if (trianglesPerRow)
+			delete[] trianglesPerRow;
+		trianglesPerRow = nullptr;
 
-		if (indices)
-			delete[] indices;
-		indices = nullptr;
+		if (rowIndexPointers)
+			delete[] rowIndexPointers;
+		rowIndexPointers = nullptr;
 	}
 
 	bool tesselate(int newTesselation);
 
 	GMBSP_Render_Vertex controlPoints[9];
-	GMint tesselation;
-	GMBSP_Render_Vertex* vertices;
-	GLuint * indices;
+	GMint tesselation = 0;
+	AlignedVector<GMBSP_Render_Vertex> vertices;
+	AlignedVector<GMuint> indices;
 	//arrays for multi_draw_arrays
-	GMint* trianglesPerRow;
-	GMuint** rowIndexPointers;
+	GMint* trianglesPerRow = nullptr;
+	GMuint** rowIndexPointers = nullptr;
 };
 
 //curved surface
@@ -93,7 +92,7 @@ GM_ALIGNED_STRUCT(GMBSP_Render_Patch)
 	GMint lightmapIndex;
 	GMint width, height;
 	GMint numQuadraticPatches;
-	GMBSP_Render_BiquadraticPatch* quadraticPatches;
+	AlignedVector<GMBSP_Render_BiquadraticPatch> quadraticPatches;
 };
 
 enum

@@ -38,6 +38,7 @@ enum class GameMachineEvent
 	Render,
 	Activate,
 	Deactivate,
+	Terminate,
 };
 
 GM_INTERFACE(IGameHandler)

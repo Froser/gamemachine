@@ -5,6 +5,7 @@
 
 BEGIN_NS
 
+// IDipose接口无其它含义，表示此类有一个虚析构函数
 struct IDispose
 {
 	virtual ~IDispose() {}

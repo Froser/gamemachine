@@ -1,6 +1,7 @@
 ﻿#ifndef __VECTOR_H__
 #define __VECTOR_H__
 #include "common.h"
+#include <type_traits>
 #include "assert.h"
 #include "memory.h"
 #include <vector>
@@ -124,6 +125,11 @@ public:
 template <typename T>
 class AlignedVector
 {
+	/* forget about it
+	static_assert(std::is_base_of<GMAlignmentObject, T>::value,
+		"type T must be the derived class of GMAlignmentObject, otherwise it may cause memory leaking.");
+		*/
+
 public:
 	typedef AlignVectorIterator<AlignedVector> iterator;
 	typedef AlignVectorConstIterator<AlignedVector> const_iterator;

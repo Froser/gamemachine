@@ -15,7 +15,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 
 	GMfloat px, py;
 	GMBSP_Render_Vertex temp[3];
-	vertices = new GMBSP_Render_Vertex[(tesselation + 1)*(tesselation + 1)];
+	vertices.resize((tesselation + 1)*(tesselation + 1));
 
 	for (GMint v = 0; v <= tesselation; ++v)
 	{
@@ -53,13 +53,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 	}
 
 	//Create indices
-	indices = new GMuint[tesselation*(tesselation + 1) * 2];
-	if (!indices)
-	{
-		gm_error(_L("Unable to allocate memory for surface indices"));
-		return false;
-	}
-
+	indices.resize(tesselation*(tesselation + 1) * 2);
 	for (GMint row = 0; row < tesselation; ++row)
 	{
 		for (GMint point = 0; point <= tesselation; ++point)
@@ -211,14 +205,7 @@ void GMBSPRender::generateFaces()
 			GMint numPatchesHigh = (d->patches[currentPatch].height - 1) / 2;
 
 			d->patches[currentPatch].numQuadraticPatches = numPatchesWide*numPatchesHigh;
-			d->patches[currentPatch].quadraticPatches = new GMBSP_Render_BiquadraticPatch
-				[d->patches[currentPatch].numQuadraticPatches];
-			if (!d->patches[currentPatch].quadraticPatches)
-			{
-				gm_error(_L("Unable to allocate memory for %d quadratic patches"),
-					d->patches[currentPatch].numQuadraticPatches);
-				return;
-			}
+			d->patches[currentPatch].quadraticPatches.resize(d->patches[currentPatch].numQuadraticPatches);
 
 			//fill in the quadratic patches
 			for (GMint y = 0; y < numPatchesHigh; ++y)
@@ -353,12 +340,12 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	for (GMint row = 0; row < biqp.tesselation; ++row)
 	{
 		component->beginFace();
-		GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
+		const GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 		linear_math::Vector3 normal;
 		for (GMint i = 0; i < numVertices; i++)
 		{
 			GMint idx = *(idxStart + i);
-			GMBSP_Render_Vertex& vertex = biqp.vertices[idx];
+			const GMBSP_Render_Vertex& vertex = biqp.vertices[idx];
 
 			if (i < numVertices - 2)
 			{
@@ -368,7 +355,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 				if (i & 1) //奇数点应该调换一下前后向量，最后再改变法线方向
 					SWAP(idx_prev, idx_next);
 
-				linear_math::Vector3& vertex_prev = biqp.vertices[idx_prev].position,
+				const linear_math::Vector3& vertex_prev = biqp.vertices[idx_prev].position,
 					&vertex_next = biqp.vertices[idx_next].position;
 				normal = -linear_math::normalize(linear_math::cross(vertex.position - vertex_prev, vertex_next - vertex.position));
 			}

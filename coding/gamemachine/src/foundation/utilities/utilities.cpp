@@ -617,9 +617,9 @@ GMString Path::getCurrentPath()
 	return "";
 }
 
-AlignedVector<GMString> Path::getAllFiles(const GMString& directory)
+Vector<GMString> Path::getAllFiles(const GMString& directory)
 {
-	AlignedVector<GMString> res;
+	Vector<GMString> res;
 #if _WINDOWS
 	GMString p = directory;
 	p.append("*");

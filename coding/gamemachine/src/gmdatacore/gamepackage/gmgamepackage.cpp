@@ -65,7 +65,7 @@ bool GMGamePackage::readFile(PackageIndex index, const GMString& filename, REF G
 	return readFileFromPath(p, buffer);
 }
 
-AlignedVector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
+Vector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
 {
 	D(d);
 	ASSERT(d->handler);

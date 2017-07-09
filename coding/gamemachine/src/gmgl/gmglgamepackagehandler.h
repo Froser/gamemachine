@@ -15,7 +15,7 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual GMString pathRoot(PackageIndex index) override;
-	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) override;
+	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 protected:
 	GMGamePackage* gamePackage();
@@ -54,7 +54,7 @@ public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
 	virtual GMString pathRoot(PackageIndex index) override;
-	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) override;
+	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 private:
 	bool loadZip();
@@ -63,7 +63,7 @@ private:
 
 private:
 	unzFile m_uf;
-	std::map<GMString, ZipBuffer*> m_buffers;
+	Map<GMString, ZipBuffer*> m_buffers;
 };
 
 END_NS

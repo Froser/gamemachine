@@ -258,8 +258,10 @@ void GameMachine::registerManager(T* newObject, OUT U** manager)
 void GameMachine::terminate()
 {
 	D(d);
+	d->gameHandler->event(GameMachineEvent::Terminate);
 	for (auto manager : d->manangerQueue)
 	{
 		delete manager;
 	}
+	GMSoundPlayerDevice::terminate();
 }

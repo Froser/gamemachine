@@ -3,20 +3,18 @@
 #include "foundation/utilities/utilities.h"
 #include "gmspritegameobject.h"
 
-#define EACH_PAIR_OF_ENTITY(entity, pair) GMBSPKeyValuePair* pair = entity.epairs; for (; pair; pair = pair->next)
-#define SAME_KEY(pair, k) strEqual(pair->key, k)
-#define SAME_VALUE(pair, v) strEqual(pair->value, v)
+#define EACH_PAIR_OF_ENTITY(entity, pair) GMBSPEPair* pair = entity.epairs; for (; pair; pair = pair->next)
 
-static const char* getClassname(const GMBSPEntity& entity)
+static GMString getClassname(const GMBSPEntity& entity)
 {
-	GMBSPKeyValuePair* e = entity.epairs;
+	GMBSPEPair* e = entity.epairs;
 	while (e)
 	{
-		if (strEqual(e->key, "classname"))
+		if (e->key == "classname")
 			return e->value;
 		e = e->next;
 	}
-	return nullptr;
+	return "";
 }
 
 void import_worldspawn(const GMBSPEntity& entity, GMBSPGameWorld* world)
@@ -62,14 +60,15 @@ void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* wo
 
 	EACH_PAIR_OF_ENTITY(entity, e)
 	{
-		Scanner s(e->value);
-		if (SAME_KEY(e, "origin"))
+		std::string value = e->value.toStdString();
+		Scanner s(value.c_str());
+		if (e->key == "origin")
 		{
 			s.nextFloat(&origin[0]);
 			s.nextFloat(&origin[1]);
 			s.nextFloat(&origin[2]);
 		}
-		else if (SAME_KEY(e, "angle"))
+		else if (e->key == "angle")
 		{
 			s.nextFloat(&yaw);
 		}
@@ -89,10 +88,10 @@ void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* wo
 
 void BSPGameWorldEntityReader::import(const GMBSPEntity& entity, GMBSPGameWorld* world)
 {
-	const char* classname = getClassname(entity);
+	const GMString& classname = getClassname(entity);
 
-	if (strEqual(classname, "worldspawn"))
+	if (classname == "worldspawn")
 		import_worldspawn(entity, world);
-	else if (strEqual(classname, "info_player_deathmatch"))
+	else if (classname == "info_player_deathmatch")
 		import_info_player_deathmatch(entity, world);
 }

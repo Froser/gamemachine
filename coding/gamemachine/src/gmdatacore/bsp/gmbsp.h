@@ -116,20 +116,31 @@ struct GMBSPBrush
 	GMint shaderNum;
 };
 
-struct GMBSPPair
+GM_ALIGNED_STRUCT(GMBSPEPair)
 {
-	GMBSPPair* next;
-	char* key;
-	char* value;
+	GMBSPEPair* next = nullptr;
+	GMString key;
+	GMString value;
 };
 
-typedef GMBSPPair GMBSPKeyValuePair;
-
-struct GMBSPEntity
+GM_ALIGNED_STRUCT(GMBSPEntity)
 {
+	~GMBSPEntity()
+	{
+		remove(epairs);
+	}
+
 	BSPVector3 origin;
-	GMint firstDrawSurf;
-	GMBSPKeyValuePair* epairs;
+	GMint firstDrawSurf = 0;
+	GMBSPEPair* epairs = 0;
+
+private:
+	void remove(GMBSPEPair* node)
+	{
+		if (node->next)
+			remove(node->next);
+		delete node;
+	}
 };
 
 struct GMBSPSurface
@@ -195,7 +206,6 @@ GM_PRIVATE_OBJECT(BSP)
 	friend class BSP;
 
 	BSPLightVolumes lightVols;
-	AlignedVector<GMBSPEntity> entities;
 	AlignedVector<BSPPlane> planes;
 	AlignedVector<GMBSPDrawVertices> vertices;
 	AlignedVector<GMBSPSurface> drawSurfaces;
@@ -213,26 +223,27 @@ GM_PRIVATE_OBJECT(BSP)
 	AlignedVector<GMbyte> visBytes;
 	AlignedVector<GMint> drawIndexes;
 	AlignedVector<GMBSPFog> fogs;
+	AlignedVector<GMBSPEntity*> entities;
 
-	GMint nummodels;
-	GMint numShaders;
-	GMint entdatasize;
-	GMint numleafs;
-	GMint numplanes;
-	GMint numnodes;
-	GMint numleafsurfaces;
-	GMint numleafbrushes;
-	GMint numbrushes;
-	GMint numbrushsides;
-	GMint numLightBytes;
-	GMint numGridPoints;
-	GMint numVisBytes;
-	GMint numDrawVertices;
-	GMint numDrawIndexes;
-	GMint numDrawSurfaces;
-	GMint numFogs;
-	GMbyte* buffer;
-	GMBSPHeader* header;
+	GMint nummodels = 0;
+	GMint numShaders = 0;
+	GMint entdatasize = 0;
+	GMint numleafs = 0;
+	GMint numplanes = 0;
+	GMint numnodes = 0;
+	GMint numleafsurfaces = 0;
+	GMint numleafbrushes = 0;
+	GMint numbrushes = 0;
+	GMint numbrushsides = 0;
+	GMint numLightBytes = 0;
+	GMint numGridPoints = 0;
+	GMint numVisBytes = 0;
+	GMint numDrawVertices = 0;
+	GMint numDrawIndexes = 0;
+	GMint numDrawSurfaces = 0;
+	GMint numFogs = 0;
+	GMbyte* buffer = nullptr;
+	GMBSPHeader* header = nullptr;
 
 private:
 	char token[MAXTOKEN];
@@ -269,9 +280,9 @@ private:
 	void parseFromMemory(char *buffer, GMint size);
 	void generateLightVolumes();
 	void parseEntities();
-	GMBSPEntity* parseEntity();
+	bool parseEntity(OUT GMBSPEntity** entity);
 	bool getToken(bool crossline);
-	GMBSPKeyValuePair* parseEpair();
+	GMBSPEPair* parseEpair();
 	void addScriptToStack(const char *filename);
 	bool endOfScript(bool crossline);
 };

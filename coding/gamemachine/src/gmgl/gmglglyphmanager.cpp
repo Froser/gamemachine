@@ -179,6 +179,9 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 		bitmapGlyph->bitmap.buffer);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
+	// 释放资源
+	FT_Done_Glyph(glyph);
+
 	// 存入缓存
 	auto result = getCharList().insert(std::make_pair(c, glyphInfo));
 	ASSERT(result.second);

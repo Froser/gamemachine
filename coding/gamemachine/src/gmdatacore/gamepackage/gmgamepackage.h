@@ -23,7 +23,7 @@ struct IGamePackageHandler
 	virtual void init() = 0;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) = 0;
 	virtual GMString pathRoot(PackageIndex index) = 0;
-	virtual AlignedVector<GMString> getAllFiles(const GMString& directory) = 0;
+	virtual Vector<GMString> getAllFiles(const GMString& directory) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGamePackage)
@@ -47,7 +47,7 @@ public:
 	void loadPackage(const GMString& path);
 	void createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld** gameWorld);
 	bool readFile(PackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
-	AlignedVector<GMString> getAllFiles(const GMString& directory);
+	Vector<GMString> getAllFiles(const GMString& directory);
 
 public:
 	GMString pathOf(PackageIndex index, const GMString& filename);

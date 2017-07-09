@@ -50,9 +50,9 @@ GM_PRIVATE_OBJECT(Component)
 	GMuint primitiveCount = 0;
 
 	// 图元顶点数量
-	AlignedVector<GMint> primitiveVertices;
+	Vector<GMint> primitiveVertices;
 	// 顶点在ChildObject的偏移
-	AlignedVector<GMint> vertexOffsets;
+	Vector<GMint> vertexOffsets;
 
 	GMMesh* parentMesh;
 	GMuint currentFaceVerticesCount;
@@ -90,7 +90,7 @@ public:
 
 GM_PRIVATE_OBJECT(Object)
 {
-	AlignedVector<GMMesh*> objects;
+	Vector<GMMesh*> objects;
 	AutoPtr<GMObjectPainter> painter;
 };
 
@@ -117,7 +117,7 @@ public:
 		return d->painter;
 	}
 
-	inline AlignedVector<GMMesh*>& getAllMeshes()
+	inline Vector<GMMesh*>& getAllMeshes()
 	{
 		D(d);
 		return d->objects;

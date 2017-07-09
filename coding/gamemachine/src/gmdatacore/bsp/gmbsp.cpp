@@ -10,11 +10,11 @@
 
 static inline const char* getValue(const GMBSPEntity* entity, const char* key)
 {
-	GMBSPKeyValuePair* e = entity->epairs;
+	GMBSPEPair* e = entity->epairs;
 	while (e)
 	{
-		if (strEqual(e->key, key))
-			return e->value;
+		if (e->key ==  key)
+			return e->value.toStdString().c_str();
 		e = e->next;
 	}
 	return nullptr;
@@ -44,14 +44,12 @@ static inline char* copyString(const char *s)
 	return b;
 }
 
-static inline void stripTrailing(char *e) {
-	char *s;
-
-	s = e + strlen(e) - 1;
-	while (s >= e && *s <= 32)
+static inline void stripTrailing(GMString& e)
+{
+	for (auto& c : e.toStdString())
 	{
-		*s = 0;
-		s--;
+		if (c <= 32)
+			c = 0;
 	}
 }
 
@@ -110,7 +108,6 @@ static inline GMint loadFile(const char *filename, void **bufferptr)
 	return length;
 }
 
-
 #define Copy(dest, src) memcpy(dest, src, sizeof(src))
 #define CopyMember(dest, src, prop) dest.prop = src.prop
 
@@ -123,6 +120,11 @@ BSP::~BSP()
 {
 	D(d);
 	delete[] d->buffer;
+	
+	for (auto& entity : d->entities)
+	{
+		delete entity;
+	}
 }
 
 void BSP::loadBsp(const GMBuffer& buf)
@@ -392,8 +394,9 @@ void BSP::parseEntities()
 	parseFromMemory(d->entdata.data(), d->entdatasize);
 
 	GMBSPEntity* entity;
-	while ((entity = parseEntity()))
+	while (parseEntity(&entity))
 	{
+		d->entities.push_back(entity);
 		const char* gridSize = getValue(entity, "gridsize");
 		if (gridSize)
 		{
@@ -449,27 +452,19 @@ void BSP::parseFromMemory(char *buffer, int size)
 	d->tokenready = false;
 }
 
-GMBSPEntity* BSP::parseEntity()
+bool BSP::parseEntity(OUT GMBSPEntity** entity)
 {
 	D(d);
 
-	GMBSPKeyValuePair* e;
-	GMBSPEntity *mapent;
-
 	if (!getToken(true))
-		return nullptr;
+		return false;
 
 	if (!strEqual(d->token, "{")) {
 		gm_warning(_L("parseEntity: { not found"));
 	}
 
-	GMBSPEntity bla;
-	bla.epairs = 0;
-	bla.firstDrawSurf = 0;
-	bla.origin[0] = 0.f;
-	bla.origin[1] = 0.f;
-	bla.origin[2] = 0.f;
-	mapent = &bla;
+	GMBSPEntity* result = new GMBSPEntity();
+	GMBSPEPair* e;
 	do
 	{
 		if (!getToken(true)) {
@@ -478,24 +473,23 @@ GMBSPEntity* BSP::parseEntity()
 		if (strEqual(d->token, "}")) {
 			break;
 		}
-		e = (struct GMBSPPair*)parseEpair();
-		e->next = mapent->epairs;
-		mapent->epairs = e;
+		e = parseEpair();
+		e->next = result->epairs;
+		result->epairs = e;
 
-		if (strEqual(e->key, "origin"))
+		if (e->key == "origin")
 		{
-			Scanner s(e->value);
-			s.nextFloat(&bla.origin[0]); // x
-			s.nextFloat(&bla.origin[1]); // z
-			s.nextFloat(&bla.origin[2]); // y
-			SWAP(bla.origin[1], bla.origin[2]);
-			bla.origin[2] = -bla.origin[2];
+			Scanner s(e->value.toStdString().c_str());
+			s.nextFloat(&result->origin[0]); // x
+			s.nextFloat(&result->origin[1]); // z
+			s.nextFloat(&result->origin[2]); // y
+			SWAP(result->origin[1], result->origin[2]);
+			result->origin[2] = -result->origin[2];
 		}
 	} while (true);
 
-	d->entities.push_back(bla);
-
-	return &d->entities.back();
+	*entity = result;
+	return true;
 }
 
 bool BSP::getToken(bool crossline)
@@ -609,24 +603,19 @@ skipspace:
 	return true;
 }
 
-GMBSPKeyValuePair* BSP::parseEpair(void)
+GMBSPEPair* BSP::parseEpair()
 {
 	D(d);
-	GMBSPKeyValuePair	*e;
+	GMBSPEPair *e = new GMBSPEPair();
 
-	e = (struct GMBSPPair*) malloc(sizeof(GMBSPKeyValuePair));
-	memset(e, 0, sizeof(GMBSPKeyValuePair));
+	if (strlen(d->token) >= MAX_KEY - 1)
+		gm_error ("ParseEpar: token too long");
 
-	if (strlen(d->token) >= MAX_KEY - 1) {
-		//printf ("ParseEpar: token too long");
-	}
-	e->key = copyString(d->token);
+	e->key = d->token;
 	getToken(false);
-	if (strlen(d->token) >= MAX_VALUE - 1) {
-
-		//printf ("ParseEpar: token too long");
-	}
-	e->value = copyString(d->token);
+	if (strlen(d->token) >= MAX_VALUE - 1)
+		gm_error("ParseEpar: token too long");
+	e->value = d->token;
 
 	// strip trailing spaces that sometimes get accidentally
 	// added in the editor

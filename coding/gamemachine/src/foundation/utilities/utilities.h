@@ -619,7 +619,7 @@ struct Path
 	static GMString directoryName(const GMString& fileName);
 	static GMString filename(const GMString& fullPath);
 	static GMString getCurrentPath();
-	static AlignedVector<GMString> getAllFiles(const GMString& directory);
+	static Vector<GMString> getAllFiles(const GMString& directory);
 	static bool directoryExists(const GMString& dir);
 	static void createDirectory(const GMString& dir);
 };

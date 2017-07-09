@@ -31,4 +31,10 @@ void GMSoundPlayerDevice::createInstance(GMUIWindow* window)
 		g_device = new GMSoundPlayerDevice(window);
 }
 
+void GMSoundPlayerDevice::terminate()
+{
+	if (g_device)
+		delete g_device;
+}
+
 #endif

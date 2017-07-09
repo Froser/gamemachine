@@ -22,10 +22,8 @@
 
 using namespace gm;
 
-GMBSPGameWorld* world;
 GMGLFactory factory;
-GMGlyphObject* glyph;
-ISoundFile* sf;
+//ISoundFile* sf;
 
 // 这是一个导出所有资源的钩子，用gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook)绑定此钩子
 // 可以将所有场景中的资源导出到指定目录
@@ -77,12 +75,12 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 
-		pk->createBSPGameWorld("gv.bsp", &world);
-		m_sprite = static_cast<GMSpriteGameObject*> (const_cast<GMGameObject*> (*(world->getGameObjects(GMGameObjectType::Sprite).begin())));
+		pk->createBSPGameWorld("gv.bsp", &m_world);
+		m_sprite = static_cast<GMSpriteGameObject*> (const_cast<GMGameObject*> (*(m_world->getGameObjects(GMGameObjectType::Sprite).begin())));
 
-		glyph = new GMGlyphObject();
-		glyph->setGeometry(-1, .8f, 1, 1);
-		world->appendObjectAndInit(glyph, true);
+		m_glyph = new GMGlyphObject();
+		m_glyph->setGeometry(-1, .8f, 1, 1);
+		m_world->appendObjectAndInit(m_glyph, true);
 
 		//GMBuffer bg;
 		//pk.readFile(PI_SOUNDS, "bgm/bgm.mp3", &bg);
@@ -94,9 +92,12 @@ public:
 	{
 		switch (evt)
 		{
+		case GameMachineEvent::Terminate:
+			delete m_world;
+			break;
 		case GameMachineEvent::Simulate:
 			{
-				world->simulateGameWorld();
+				m_world->simulateGameWorld();
 				// 更新Camera
 				GMCamera& camera = GameMachine::instance().getCamera();
 				camera.synchronize(m_sprite);
@@ -106,7 +107,7 @@ public:
 			{
 				GMCamera& camera = GameMachine::instance().getCamera();
 				camera.apply();
-				world->renderGameWorld();
+				m_world->renderGameWorld();
 
 				const PositionState& position = m_sprite->getPositionState();
 				GMWchar x[32], y[32], z[32], fps[32];
@@ -122,7 +123,7 @@ public:
 				str.append(z);
 				str.append(L" fps: ");
 				str.append(fps);
-				glyph->setText(str.c_str());
+				m_glyph->setText(str.c_str());
 			}
 			break;
 		case GameMachineEvent::Activate:
@@ -272,6 +273,8 @@ public:
 
 	bool m_bMouseEnable;
 	GMSpriteGameObject* m_sprite;
+	GMBSPGameWorld* m_world;
+	GMGlyphObject* m_glyph;
 };
 
 class DemoGameHandler : public IGameHandler
@@ -349,6 +352,9 @@ private:
 			break;
 		case gm::GameMachineEvent::Deactivate:
 			break;
+		case gm::GameMachineEvent::Terminate:
+			delete demo;
+			break;
 		default:
 			break;
 		}
@@ -390,7 +396,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

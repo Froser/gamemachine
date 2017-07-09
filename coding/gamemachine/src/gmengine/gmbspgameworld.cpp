@@ -841,11 +841,10 @@ void GMBSPGameWorld::prepareEntities()
 
 	for (auto& entity : bsp.entities)
 	{
-		BSPGameWorldEntityReader::import(entity, this);
-
-		GMint leaf = calculateLeafNode(entity.origin);
-		d->entities[leaf].insert(&entity);
-		createEntity(&entity);
+		BSPGameWorldEntityReader::import(*entity, this);
+		GMint leaf = calculateLeafNode(entity->origin);
+		d->entities[leaf].insert(entity);
+		createEntity(entity);
 	}
 }
 
@@ -854,11 +853,11 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	D(d);
 	D_BASE(db, GMGameWorld);
 
-	GMBSPKeyValuePair* p = entity->epairs;
-	const char* classname = nullptr;
+	GMBSPEPair* p = entity->epairs;
+	GMString classname;
 	while (p)
 	{
-		if (strEqual("classname", p->key))
+		if (p->key == "classname")
 			classname = p->value;
 		p = p->next;
 	}
@@ -866,7 +865,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	Model* m = d->modelLoader.find(classname);
 	if (!m)
 	{
-		gm_info("model '%s' is not defined in model list, skipped.", classname);
+		gm_info("model '%s' is not defined in model list, skipped.", classname.toStdString().c_str());
 		return;
 	}
 

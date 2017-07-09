@@ -41,7 +41,7 @@ void BSPModelLoader::load()
 {
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	AlignedVector<GMString> files = pk->getAllFiles(d->directory);
+	Vector<GMString> files = pk->getAllFiles(d->directory);
 
 	for (auto& file : files)
 	{

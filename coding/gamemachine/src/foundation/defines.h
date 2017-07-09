@@ -25,13 +25,13 @@
 
 // Debug模式下监控内存泄漏
 #ifndef GM_DETECT_MEMORY_LEAK
-#define GM_DETECT_MEMORY_LEAK 1
+#define GM_DETECT_MEMORY_LEAK 0
 #endif
 
-#if _DEBUG && GM_DETECT_MEMORY_LEAK
-#	define GM_DEBUG_MEMORY 1
-#else
-#	define GM_DEBUG_MEMORY 0
+#if GM_DETECT_MEMORY_LEAK
+#	if _WINDOWS
+#		include <vld.h> // Windows环境下，确保安装了VLD，否则请将GM_DETECT_MEMORY_LEAK设置为0
+#	endif
 #endif
 
 // 整个GameMachine用到的宏定义

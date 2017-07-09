@@ -70,10 +70,10 @@ GM_ALIGNED_STRUCT(GMBSPPatchCollide)
 
 GM_ALIGNED_STRUCT(GMBSP_Physics_Patch)
 {
-	GMBSPSurface* surface;
-	GMint checkcount;
-	GMBSPShader* shader;
-	GMBSPPatchCollide *pc;
+	GMBSPSurface* surface = nullptr;
+	GMBSPShader* shader = nullptr;
+	GMBSPPatchCollide *pc = nullptr;
+	GMint checkcount = 0;
 
 	GMBSP_Physics_Patch()
 		: checkcount(0)

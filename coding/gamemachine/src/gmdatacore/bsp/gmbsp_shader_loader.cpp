@@ -168,7 +168,7 @@ void GMBSPShaderLoader::load()
 {
 	D(d);
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	AlignedVector<GMString> files = pk->getAllFiles(d->directory);
+	Vector<GMString> files = pk->getAllFiles(d->directory);
 
 	// load all item tag, but not parse them until item is needed
 	for (auto& file : files)
