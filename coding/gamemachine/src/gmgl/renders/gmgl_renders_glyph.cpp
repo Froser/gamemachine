@@ -1,12 +1,13 @@
 ﻿#include "stdafx.h"
 #include "gmgl_renders_glyph.h"
 #include "gmgl/shader_constants.h"
-#include "gmgl/gmglfunc.h"
+#include "gmgl/gmglshaderprogram.h"
 
 void GMGLRenders_Glyph::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
-	GMGL::cameraPosition(lookAt, *d->gmglShaders, GMSHADER_VIEW_POSITION);
+	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
+	d->gmglShaderProgram->setMatrix4(GMSHADER_VIEW_POSITION, vec);
 }
 
 void GMGLRenders_Glyph::beginShader(Shader& shader, GMDrawMode mode)

@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmglobjectpainter.h"
 #include "shader_constants.h"
-#include "gmglfunc.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgameworld.h"
 #include "gmglgraphic_engine.h"

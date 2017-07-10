@@ -159,7 +159,6 @@ void GameMachine::startGameMachine()
 	}
 
 	terminate();
-	gmCheckMemoryLeaks();
 }
 
 bool GameMachine::handleMessages()

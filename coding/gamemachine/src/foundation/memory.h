@@ -12,7 +12,6 @@ void gmAlignedAllocSetCustomAligned(gmAlignedAllocFunc *allocFunc, gmAlignedFree
 
 #define gmAlignedAlloc(size,alignment) AlignedMemoryAlloc::gmAlignedAllocInternal(size,alignment)
 #define gmAlignedFree(ptr) AlignedMemoryAlloc::gmAlignedFreeInternal(ptr)
-#define gmCheckMemoryLeaks()
 
 class AlignedMemoryAlloc
 {

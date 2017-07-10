@@ -82,8 +82,6 @@ set(SOURCES
 		gmgl/renders/gmgl_renders_sky.h
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
-		gmgl/gmglfunc.h
-		gmgl/gmglfunc.cpp
 		gmgl/gmglgamepackagehandler.h
 		gmgl/gmglgamepackagehandler.cpp
 		gmgl/gmglglyphmanager.h

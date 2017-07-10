@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	GMMeshType type;
 	Shader* shader;
 	GMDrawMode mode;
-	GMGLShaderProgram* gmglShaders;
+	GMGLShaderProgram* gmglShaderProgram;
 };
 
 class GMGLRenders_Object : public GMObject, public IRender

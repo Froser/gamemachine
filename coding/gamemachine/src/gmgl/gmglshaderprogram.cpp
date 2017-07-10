@@ -22,6 +22,41 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 	d->shaderInfos.push_back(shaderCfgs);
 }
 
+void GMGLShaderProgram::setMatrix4(const GMString& name, const GMfloat value[16])
+{
+	std::string stdName = name.toStdString();
+	glUniformMatrix4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, GL_FALSE, value);
+}
+
+void GMGLShaderProgram::setVec4(const GMString& name, const GMfloat value[4])
+{
+	std::string stdName = name.toStdString();
+	glUniform4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, value);
+}
+
+void GMGLShaderProgram::setVec3(const GMString& name, const GMfloat value[3])
+{
+	std::string stdName = name.toStdString();
+	glUniform3fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, value);
+}
+
+void GMGLShaderProgram::setInt(const GMString& name, GMint value)
+{
+	std::string stdName = name.toStdString();
+	glUniform1i(glGetUniformLocation(getProgram(), stdName.c_str()), value);
+}
+
+void GMGLShaderProgram::setFloat(const GMString& name, GMfloat value)
+{
+	std::string stdName = name.toStdString();
+	glUniform1f(glGetUniformLocation(getProgram(), stdName.c_str()), value);
+}
+
+void GMGLShaderProgram::setBool(const GMString& name, bool value)
+{
+	setInt(name, (GMint)value);
+}
+
 void GMGLShaderProgram::load()
 {
 	D(d);
