@@ -7,8 +7,11 @@
 #include "foundation/linearmath.h"
 #include "foundation/gamemachine.h"
 
-void GMGLRenders_Object::activateShader(Shader* shader)
+void GMGLRenders_Object::activateShader()
 {
+	D(d);
+	ASSERT(d->shader);
+	Shader* shader = d->shader;
 	if (shader->getCull() == GMS_Cull::NONE)
 	{
 		glDisable(GL_CULL_FACE);
@@ -74,9 +77,11 @@ void GMGLRenders_Object::activateShader(Shader* shader)
 	glLineWidth(shader->getLineWidth());
 }
 
-void GMGLRenders_Object::deactivateShader(Shader* shader)
+void GMGLRenders_Object::deactivateShader()
 {
-	if (shader->getBlend())
+	D(d);
+	ASSERT(d->shader);
+	if (d->shader->getBlend())
 	{
 		glDepthMask(GL_TRUE);
 	}
@@ -129,21 +134,21 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 	}
 
 	// 应用Shader
-	activateShader(&shader);
+	activateShader();
 
 	// 纹理
-	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
+	for (GMuint type = 0; type < (GMint)GMTextureType::END; type++)
 	{
-		// 按照贴图类型选择纹理动画序列
-		GMTextureFrames& textures = shader.getTexture().getTextureFrames(i);
-
-		// 获取序列中的这一帧
-		ITexture* texture = getTexture(textures);
-		if (texture)
+		if (type != (GMint) GMTextureType::NORMALMAP)
 		{
-			// 激活动画序列
-			activeTexture(d->shader, (GMTextureType)i);
-			texture->drawTexture(&textures);
+			for (GMint i = 0; i < MAX_TEXTURE_COUNT; i++)
+			{
+				drawTexture((GMTextureType)type, i);
+			}
+		}
+		else
+		{
+			drawTexture((GMTextureType)type);
 		}
 	}
 
@@ -154,10 +159,20 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 void GMGLRenders_Object::endShader()
 {
 	D(d);
-	deactivateShader(d->shader);
-	for (GMuint i = 0; i < TEXTURE_INDEX_MAX; i++)
+	deactivateShader();
+	for (GMuint type = 0; type < (GMint)GMTextureType::END; type++)
 	{
-		deactiveTexture((GMTextureType)i);
+		if (type != (GMint)GMTextureType::NORMALMAP)
+		{
+			for (GMint i = 0; i < MAX_TEXTURE_COUNT; i++)
+			{
+				deactivateTexture((GMTextureType)type, i);
+			}
+		}
+		else
+		{
+			drawTexture((GMTextureType)type);
+		}
 	}
 
 	if (d->mode == GMDrawMode::Line)
@@ -166,6 +181,22 @@ void GMGLRenders_Object::endShader()
 		glDisable(GL_POLYGON_OFFSET_LINE);
 		glPolygonOffset(0.f, 0.f);
 		d->shader->pop();
+	}
+}
+
+void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
+{
+	D(d);
+	// 按照贴图类型选择纹理动画序列
+	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, index);
+
+	// 获取序列中的这一帧
+	ITexture* texture = getTexture(textures);
+	if (texture)
+	{
+		// 激活动画序列
+		activateTexture((GMTextureType)type, index);
+		texture->drawTexture(&textures);
 	}
 }
 
@@ -244,23 +275,23 @@ void GMGLRenders_Object::drawDebug()
 	d->gmglShaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetBuiltIn(DRAW_NORMAL));
 }
 
-void GMGLRenders_Object::activeTextureTransform(Shader* shader, GMTextureType i)
+void GMGLRenders_Object::activateTextureTransform(GMTextureType i, GMint index)
 {
 	D(d);
-	std::string uniform = getTextureUniformName(i);
+	auto uniform = getTextureUniformName(i, index);
 
-	const std::string SCROLL_S = std::string(uniform).append("_scroll_s");
-	const std::string SCROLL_T = std::string(uniform).append("_scroll_t");
-	const std::string SCALE_S = std::string(uniform).append("_scale_s");
-	const std::string SCALE_T = std::string(uniform).append("_scale_t");
+	const GMString SCROLL_S = uniform + ".scroll_s";
+	const GMString SCROLL_T = uniform + ".scroll_t";
+	const GMString SCALE_S = uniform + ".scale_s";
+	const GMString SCALE_T = uniform + ".scale_t";
 
-	glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCROLL_S.c_str()), 0.f);
-	glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCROLL_T.c_str()), 0.f);
-	glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCALE_S.c_str()), 1.f);
-	glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCALE_T.c_str()), 1.f);
+	d->gmglShaderProgram->setFloat(SCROLL_S, 0.f);
+	d->gmglShaderProgram->setFloat(SCROLL_T, 0.f);
+	d->gmglShaderProgram->setFloat(SCALE_S, 1.f);
+	d->gmglShaderProgram->setFloat(SCALE_T, 1.f);
 
 	GMuint n = 0;
-	const GMS_TextureMod* tc = &shader->getTexture().getTextureFrames(i).getTexMod(n);
+	const GMS_TextureMod* tc = &d->shader->getTexture().getTextureFrames(i).getTexMod(n);
 	while (n < MAX_TEX_MOD && tc->type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
 		switch (tc->type)
@@ -268,15 +299,15 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, GMTextureType i)
 		case GMS_TextureModType::SCROLL:
 		{
 			GMfloat s = GameMachine::instance().getGameTimeSeconds() * tc->p1, t = GameMachine::instance().getGameTimeSeconds() * tc->p2;
-			glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCROLL_T.c_str()), t);
-			glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCROLL_T.c_str()), s);
+			d->gmglShaderProgram->setFloat(SCROLL_T, t);
+			d->gmglShaderProgram->setFloat(SCROLL_T, s);
 		}
 		break;
 		case GMS_TextureModType::SCALE:
 		{
 			GMfloat s = tc->p1, t = tc->p2;
-			glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCALE_T.c_str()), t);
-			glUniform1f(glGetUniformLocation(d->gmglShaderProgram->getProgram(), SCALE_T.c_str()), s);
+			d->gmglShaderProgram->setFloat(SCALE_T, t);
+			d->gmglShaderProgram->setFloat(SCALE_T, s);
 			break;
 		}
 		default:
@@ -286,24 +317,23 @@ void GMGLRenders_Object::activeTextureTransform(Shader* shader, GMTextureType i)
 	}
 }
 
-void GMGLRenders_Object::activeTexture(Shader* shader, GMTextureType i)
+void GMGLRenders_Object::activateTexture(GMTextureType type, GMint index)
 {
 	D(d);
-	std::string uniform = getTextureUniformName(i);
-	GLint loc = glGetUniformLocation(d->gmglShaderProgram->getProgram(), uniform.c_str());
-	glUniform1i(loc, i + 1);
-	loc = glGetUniformLocation(d->gmglShaderProgram->getProgram(), std::string(uniform).append("_switch").c_str());
-	glUniform1i(loc, 1);
+	GMint idx = (GMint)type;
+	auto uniform = getTextureUniformName(type, index);
+	d->gmglShaderProgram->setInt(uniform + ".texture", idx + 1);
+	d->gmglShaderProgram->setInt(uniform + ".enabled", 1);
 
-	activeTextureTransform(shader, i);
-	glActiveTexture(i + GL_TEXTURE1);
+	activateTextureTransform(type, index);
+	glActiveTexture(idx + GL_TEXTURE1);
 }
 
-void GMGLRenders_Object::deactiveTexture(GMTextureType i)
+void GMGLRenders_Object::deactivateTexture(GMTextureType type, GMint index)
 {
 	D(d);
-	std::string uniform = getTextureUniformName(i);
-	GMint loc = glGetUniformLocation(d->gmglShaderProgram->getProgram(), std::string(uniform).append("_switch").c_str());
-	glUniform1i(loc, 0);
-	glActiveTexture(i + GL_TEXTURE1);
+	GMint idx = (GMint)type;
+	auto uniform = getTextureUniformName(type, index);
+	d->gmglShaderProgram->setInt(uniform + "enabled", 0);
+	glActiveTexture(idx + GL_TEXTURE1);
 }

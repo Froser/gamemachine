@@ -103,8 +103,8 @@ void GMGlyphObject::constructObject()
 
 	Component* component = new Component(child);
 	Shader& shader = component->getShader();
-	shader.getTexture().getTextureFrames(TEXTURE_INDEX_AMBIENT).setOneFrame(0, glyphManager->glyphTexture());
-	shader.getTexture().getTextureFrames(TEXTURE_INDEX_AMBIENT).setFrameCount(1);
+	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT).setOneFrame(0, glyphManager->glyphTexture());
+	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT).setFrameCount(1);
 	shader.setNoDepthTest(true);
 	shader.setCull(GMS_Cull::NONE);
 	shader.setBlend(true);

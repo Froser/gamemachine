@@ -43,6 +43,7 @@ enum class GameMachineEvent
 
 GM_INTERFACE(IGameHandler)
 {
+	virtual void init() = 0;
 	virtual void start() = 0;
 	virtual void event(GameMachineEvent evt) = 0;
 	virtual bool isWindowActivate() = 0;

@@ -6,18 +6,19 @@
 
 GMGLTextureShaderNames::GMGLTextureShaderNames()
 {
-	m_uniformNames[TEXTURE_INDEX_AMBIENT] = GMSHADER_AMBIENT_TEXTURE;
-	m_uniformNames[TEXTURE_INDEX_AMBIENT_2] = GMSHADER_AMBIENT_TEXTURE_2;
-	m_uniformNames[TEXTURE_INDEX_AMBIENT_3] = GMSHADER_AMBIENT_TEXTURE_3;
-	m_uniformNames[TEXTURE_INDEX_DIFFUSE] = GMSHADER_DIFFUSE_TEXTURE;
-	m_uniformNames[TEXTURE_INDEX_NORMAL_MAPPING] = GMSHADER_NORMAL_MAPPING_TEXTURE;
-	m_uniformNames[TEXTURE_INDEX_LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURE;
+	m_uniformNames[GMTextureType::AMBIENT] = GMSHADER_AMBIENT_TEXTURES;
+	m_uniformNames[GMTextureType::DIFFUSE] = GMSHADER_DIFFUSE_TEXTURE;
+	m_uniformNames[GMTextureType::NORMALMAP] = GMSHADER_NORMAL_MAPPING_TEXTURE;
+	m_uniformNames[GMTextureType::LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURE;
 }
 
-const char* GMGLTextureShaderNames::operator [](GMTextureType t)
+GMString GMGLTextureShaderNames::getName(GMTextureType type, GMint index)
 {
-	ASSERT(m_uniformNames.find(t) != m_uniformNames.end());
-	return m_uniformNames[t].c_str();
+	ASSERT(m_uniformNames.find(type) != m_uniformNames.end());
+	if (type == GMTextureType::AMBIENT)
+		return m_uniformNames[GMTextureType::AMBIENT] + "[" + index + "]";
+	else
+		return m_uniformNames[type];
 }
 
 GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)

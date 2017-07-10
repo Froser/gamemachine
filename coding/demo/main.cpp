@@ -5,7 +5,6 @@
 #include "gmengine/gmgameworld.h"
 #include "gmgl/gmglfactory.h"
 #include "gmgl/gmglgraphic_engine.h"
-#include "gmgl/gmglfunc.h"
 #include "gmgl/shader_constants.h"
 #include "foundation/utilities/utilities.h"
 #include "gmengine/gmbspgameworld.h"
@@ -58,12 +57,10 @@ public:
 	{
 	}
 
-	void start()
+	void init()
 	{
-		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
-		IInput* inputManager = GameMachine::instance().getInputManager();
-		inputManager->getMouseState().initMouse(GameMachine::instance().getMainWindow());
-		inputManager->getKeyboardState().setIMEState(false);
+		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
+		engine->setShaderLoadCallback(this);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -72,9 +69,16 @@ public:
 		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
 #endif
 
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
-		engine->setShaderLoadCallback(this);
+	}
 
+	void start()
+	{
+		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
+		IInput* inputManager = GameMachine::instance().getInputManager();
+		inputManager->getMouseState().initMouse(GameMachine::instance().getMainWindow());
+		inputManager->getKeyboardState().setIMEState(false);
+
+		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 		pk->createBSPGameWorld("gv.bsp", &m_world);
 		m_sprite = static_cast<GMSpriteGameObject*> (const_cast<GMGameObject*> (*(m_world->getGameObjects(GMGameObjectType::Sprite).begin())));
 
@@ -244,8 +248,8 @@ public:
 			flag = true;
 			break;
 		case GMMeshType::Sky:
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "sky.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "sky.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
 			flag = true;
 			break;
 		case GMMeshType::Glyph:

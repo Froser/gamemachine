@@ -311,7 +311,7 @@ void GMBSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(d->textureNum);
+	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
 	GMint ms;
 	SAFE_SSCANF(elem->Attribute("ms"), "%d", &ms);
 	frame->setAnimationMs(ms);
@@ -330,7 +330,7 @@ void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 {
 	D(d);
-	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(d->textureNum);
+	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 		frame->setOneFrame(i, texture);
@@ -339,7 +339,7 @@ void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem, GMuint i)
 void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(d->textureNum);
+	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
@@ -360,7 +360,7 @@ void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(d->textureNum);
+	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
@@ -389,7 +389,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 			ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 			TextureContainer_ID& tc = rc->getLightmapContainer();
 
-			GMTextureFrames* frame = &shader.getTexture().getTextureFrames(d->textureNum);
+			GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
 			const TextureContainer_ID::TextureItemType* tex = tc.find(d->lightmapId);
 			if (tex)
 			{
@@ -407,7 +407,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 
 void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 {
-	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(TEXTURE_INDEX_NORMAL_MAPPING);
+	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
@@ -515,11 +515,11 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 	// tcMod <type> <...>
 	const char* tcMod = elem->Attribute("tcMod");
 	GMuint tcModNum = 0;
-	while (tcModNum < MAX_TEX_MOD && shader.getTexture().getTextureFrames(d->textureNum).getTexMod(tcModNum).type != GMS_TextureModType::NO_TEXTURE_MOD)
+	while (tcModNum < MAX_TEX_MOD && shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum).getTexMod(tcModNum).type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
 		tcModNum++;
 	}
-	GMS_TextureMod* currentMod = &shader.getTexture().getTextureFrames(d->textureNum).getTexMod(tcModNum);
+	GMS_TextureMod* currentMod = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum).getTexMod(tcModNum);
 
 	if (tcMod)
 	{
@@ -552,7 +552,7 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 					gm_warning(_L("warning: you have tcMods more than %d, please increase MAX_TEX_MOD"), MAX_TEX_MOD);
 				break;
 			}
-			currentMod = &shader.getTexture().getTextureFrames(d->textureNum).getTexMod(tcModNum);
+			currentMod = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum).getTexMod(tcModNum);
 		}
 	}
 }
@@ -560,7 +560,7 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::createSky(Shader& shader)
 {
 	D(d);
-	ITexture* texture = shader.getTexture().getTextureFrames(TEXTURE_INDEX_AMBIENT).getOneFrame(0);
+	ITexture* texture = shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).getOneFrame(0);
 	shader.setNodraw(true);
 	if (!d->world->getSky())
 	{

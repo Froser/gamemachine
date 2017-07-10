@@ -12,43 +12,20 @@ in vec4 shadowCoord;
 uniform sampler2DShadow GM_shadow_texture;
 uniform int GM_shadow_texture_switch = 0;
 
-// 受环境系数影响的纹理 (Ka)
-uniform sampler2D GM_ambient_texture;
-uniform float GM_ambient_texture_scroll_s;
-uniform float GM_ambient_texture_scroll_t;
-uniform float GM_ambient_texture_scale_s;
-uniform float GM_ambient_texture_scale_t;
-uniform int GM_ambient_texture_switch = 0;
-
-uniform sampler2D GM_ambient_texture_2;
-uniform float GM_ambient_texture_2_scroll_s;
-uniform float GM_ambient_texture_2_scroll_t;
-uniform float GM_ambient_texture_2_scale_s;
-uniform float GM_ambient_texture_2_scale_t;
-uniform int GM_ambient_texture_2_switch = 0;
-
-uniform sampler2D GM_ambient_texture_3;
-uniform float GM_ambient_texture_3_scroll_s;
-uniform float GM_ambient_texture_3_scroll_t;
-uniform float GM_ambient_texture_3_scale_s;
-uniform float GM_ambient_texture_3_scale_t;
-uniform int GM_ambient_texture_3_switch = 0;
-
-// 受漫反射系数影响的纹理 (kd)
-uniform sampler2D GM_diffuse_texture;
-uniform int GM_diffuse_texture_switch = 0;
-
-// 环境立方体纹理（反射天空时）
-uniform samplerCube GM_reflection_cubemap_texture;
-uniform int GM_reflection_cubemap_texture_switch = 0;
-
-// 法线贴图纹理
-uniform sampler2D GM_normal_mapping_texture;
-uniform int GM_normal_mapping_texture_switch = 0;
-
-// 光照贴图纹理
-uniform sampler2D GM_lightmap_texture;
-uniform int GM_lightmap_texture_switch = 0;
+#define MAX_TEXTURE_COUNT 3
+struct GM_texture_t
+{
+    sampler2D texture;
+    float scroll_s;
+    float scroll_t;
+    float scale_s;
+    float scale_t;
+    int enabled;
+};
+uniform GM_texture_t GM_ambient_textures[MAX_TEXTURE_COUNT];
+uniform GM_texture_t GM_diffuse_textures[MAX_TEXTURE_COUNT];
+uniform GM_texture_t GM_lightmap_texture[MAX_TEXTURE_COUNT];
+uniform GM_texture_t GM_normalmap_textures[1];
 
 uniform mat4 GM_view_matrix;
 uniform vec3 GM_light_ambient; //环境光强度
@@ -127,7 +104,7 @@ void calcLights()
     // normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
     g_normal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
 
-    if (GM_normal_mapping_texture_switch == 0)
+    if (GM_normalmap_textures[0].enabled == 0)
     {
         calcDiffuseAndSpecular(lightDirection_eye, eyeDirection_eye, g_normal_eye);
     }
@@ -143,11 +120,23 @@ void calcLights()
 
         vec3 lightDirection_tangent = TBN * lightDirection_eye;
         vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
-        vec3 normal_tangent = texture(GM_normal_mapping_texture, _uv).rgb * 2.0 - 1.0;
+        vec3 normal_tangent = texture(GM_normalmap_textures[0].texture, _uv).rgb * 2.0 - 1.0;
 
         calcDiffuseAndSpecular(lightDirection_tangent, eyeDirection_tangent, normal_tangent);
         //DEBUG.rgb = _tangent.xyz;
     }
+}
+
+vec3 calcTexture(GM_texture_t texture[MAX_TEXTURE_COUNT], int size)
+{
+    vec3 result;
+    for (int i = 0; i < size; i++)
+    {
+        result += GM_ambient_textures[i].enabled == 1
+            ? vec3(texture(GM_ambient_textures[i].texture, _uv * vec2(GM_ambient_textures[i].scale_s, GM_ambient_textures[i].scale_t) + vec2(GM_ambient_textures[i].scroll_s, GM_ambient_textures[i].scroll_t)))
+            : vec3(1);
+    }
+    return result;
 }
 
 void drawObject()
@@ -171,7 +160,7 @@ void drawObject()
     float shadeFactor = shadeFactorFactor(calcuateShadeFactor(shadowCoord));
 
     // 反射光
-    vec3 diffuseTextureColor = GM_diffuse_texture_switch == 1 ? vec3(texture(GM_diffuse_texture, _uv)) : vec3(1);
+    vec3 diffuseTextureColor = calcTexture(GM_diffuse_textures, MAX_TEXTURE_COUNT);
     vec3 diffuseLight = 
         // 漫反射光系数
         g_diffuse * 
@@ -195,10 +184,8 @@ void drawObject()
         GM_light_power;
 
     // 计算环境光和Ka贴图
-    vec3 ambientTextureColor = GM_ambient_texture_switch == 1 ? vec3(texture(GM_ambient_texture, _uv * vec2(GM_ambient_texture_scale_s, GM_ambient_texture_scale_t) + vec2(GM_ambient_texture_scroll_s, GM_ambient_texture_scroll_t))) : vec3(1);
-    ambientTextureColor += GM_ambient_texture_2_switch == 1 ? vec3(texture(GM_ambient_texture_2, _uv * vec2(GM_ambient_texture_2_scale_s, GM_ambient_texture_2_scale_t) + vec2(GM_ambient_texture_2_scroll_s, GM_ambient_texture_2_scroll_t))) : vec3(0);
-    ambientTextureColor += GM_ambient_texture_3_switch == 1 ? vec3(texture(GM_ambient_texture_3, _uv * vec2(GM_ambient_texture_3_scale_s, GM_ambient_texture_3_scale_t) + vec2(GM_ambient_texture_3_scroll_s, GM_ambient_texture_3_scroll_t))) : vec3(0);
-    ambientTextureColor *= GM_lightmap_texture_switch == 1 ? vec3(texture(GM_lightmap_texture, _lightmapuv)) : vec3(1);
+    vec3 ambientTextureColor = calcTexture(GM_ambient_textures, MAX_TEXTURE_COUNT);
+    vec3 lightmapTextureColor = calcTexture(GM_lightmap_texture, MAX_TEXTURE_COUNT);
 
     // 环境光
     vec3 ambientLight = 
@@ -209,7 +196,9 @@ void drawObject()
         // ShadowMap的阴影系数，如果没有ShadowMap则为1
         shadeFactor * 
         // 环境光纹理
-        ambientTextureColor;
+        ambientTextureColor *
+        // 光照贴图
+        lightmapTextureColor;
 
     // 最终结果
     vec3 color = ambientLight + diffuseLight + specularLight;

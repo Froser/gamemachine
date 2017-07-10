@@ -37,6 +37,7 @@ void GameMachine::init(
 	registerManager(new GMConfig(), &d->configManager);
 
 	initInner();
+	d->gameHandler->init();
 }
 
 void GameMachine::setMainWindowAttributes(const GMUIWindowAttributes& attrs)

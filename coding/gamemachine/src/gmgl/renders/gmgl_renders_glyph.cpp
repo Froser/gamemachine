@@ -16,17 +16,17 @@ void GMGLRenders_Glyph::beginShader(Shader& shader, GMDrawMode mode)
 	d->shader = &shader;
 
 	// 应用Shader
-	activateShader(&shader);
+	activateShader();
 
 	// 只选择环境光纹理
-	GMTextureFrames& textures = shader.getTexture().getTextureFrames(TEXTURE_INDEX_AMBIENT);
+	GMTextureFrames& textures = shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
 
 	// 获取序列中的这一帧
 	ITexture* texture = getTexture(textures);
 	if (texture)
 	{
 		// 激活动画序列
-		activeTexture(d->shader, TEXTURE_INDEX_AMBIENT);
+		activateTexture(GMTextureType::AMBIENT, 0);
 		texture->drawTexture(&textures);
 	}
 }

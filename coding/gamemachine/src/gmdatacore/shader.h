@@ -16,18 +16,6 @@ BEGIN_NS
 	DECLARE_GETTER(name, memberName, paramType) \
 	DECLARE_SETTER(name, memberName, paramType)
 
-// 表示一套纹理，包括普通纹理、漫反射纹理、法线贴图、光照贴图，以后可能还有高光贴图等
-enum GMTextureType
-{
-	TEXTURE_INDEX_AMBIENT,
-	TEXTURE_INDEX_AMBIENT_2,
-	TEXTURE_INDEX_AMBIENT_3,
-	TEXTURE_INDEX_DIFFUSE,
-	TEXTURE_INDEX_NORMAL_MAPPING,
-	TEXTURE_INDEX_LIGHTMAP,
-	TEXTURE_INDEX_MAX,
-};
-
 enum
 {
 	MAX_ANIMATION_FRAME = 16,
@@ -115,7 +103,7 @@ public:
 	GMTextureFrames()
 	{
 		D(d);
-		GM_ZeroMemory(d->frames);
+		memset(d->frames, 0, sizeof(*d->frames) * MAX_ANIMATION_FRAME);
 	}
 
 	GMTextureFrames(const GMTextureFrames&) = delete;
@@ -162,9 +150,26 @@ public:
 	}
 };
 
+enum
+{
+	MAX_TEXTURE_COUNT = 3,
+};
+
+enum class GMTextureType
+{
+	AMBIENT,
+	DIFFUSE,
+	NORMALMAP,
+	LIGHTMAP,
+	END,
+};
+
 GM_PRIVATE_OBJECT(GMTexture)
 {
-	GMTextureFrames textureFrames[TEXTURE_INDEX_MAX];
+	GMTextureFrames ambients[MAX_TEXTURE_COUNT];
+	GMTextureFrames diffuse;
+	GMTextureFrames normalMap;
+	GMTextureFrames lightMap;
 };
 
 class GMTexture : public GMObject
@@ -176,19 +181,32 @@ public:
 	GMTexture(const GMTexture& texture) = delete;
 
 public:
-	inline GMTextureFrames& getTextureFrames(GMint type)
+	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMint index = 0)
 	{
 		D(d);
-		return d->textureFrames[type];
+		switch (type)
+		{
+		case gm::GMTextureType::AMBIENT:
+			return d->ambients[index];
+		case gm::GMTextureType::DIFFUSE:
+			return d->diffuse;
+		case gm::GMTextureType::NORMALMAP:
+			return d->normalMap;
+		case gm::GMTextureType::LIGHTMAP:
+			return d->lightMap;
+		default:
+			ASSERT(false);
+			return d->ambients[0];
+		}
 	}
 
 	inline GMTexture& operator=(const GMTexture& rhs)
 	{
 		D(d);
 		D_OF(rhs_d, &rhs);
-		for (GMint i = 0; i < TEXTURE_INDEX_MAX; i++)
+		for (GMint i = 0; i < MAX_TEXTURE_COUNT; i++)
 		{
-			d->textureFrames[i] = rhs_d->textureFrames[i];
+			d->ambients[i] = rhs_d->ambients[i];
 		}
 		return *this;
 	}
