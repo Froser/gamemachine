@@ -86,16 +86,14 @@ void GMGLShaderProgram::load()
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 		if (!compiled)
 		{
-#ifdef _DEBUG
 			GLsizei len;
 			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &len);
 
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
-			gm_error("%s", log);
+			gm_error("Shader compilation failed: %s", log);
 			ASSERT("Shader compilation failed: " && FALSE);
 			delete[] log;
-#endif /* DEBUG */
 			return;
 		}
 

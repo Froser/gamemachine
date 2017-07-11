@@ -50,7 +50,7 @@ GM_ALIGNED_STRUCT(BSPGrid)
 //a winding gives the bounding points of a convex polygon
 GM_ALIGNED_STRUCT(BSPWinding)
 {
-	Vector<linear_math::Vector3> p;
+	AlignedVector<linear_math::Vector3> p;
 
 	void alloc(GMint pointNum)
 	{
