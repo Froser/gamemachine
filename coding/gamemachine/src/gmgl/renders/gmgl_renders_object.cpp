@@ -137,15 +137,15 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 	activateShader();
 
 	// 纹理
-	GM_BEGIN_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
 		{
-			drawTexture((GMTextureType)type, i);
+			if (!drawTexture((GMTextureType)type, i))
+				break;
 		}
 	}
-	GM_END_ENUM_CLASS
 
 	// 调试绘制
 	drawDebug();
@@ -155,7 +155,7 @@ void GMGLRenders_Object::endShader()
 {
 	D(d);
 	deactivateShader();
-	GM_BEGIN_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
@@ -163,7 +163,6 @@ void GMGLRenders_Object::endShader()
 			deactivateTexture((GMTextureType)type, i);
 		}
 	}
-	GM_END_ENUM_CLASS
 
 	if (d->mode == GMDrawMode::Line)
 	{
@@ -174,7 +173,7 @@ void GMGLRenders_Object::endShader()
 	}
 }
 
-void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
+bool GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
 {
 	D(d);
 	// 按照贴图类型选择纹理动画序列
@@ -187,7 +186,9 @@ void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
 		// 激活动画序列
 		activateTexture((GMTextureType)type, index);
 		texture->drawTexture(&textures);
+		return true;
 	}
+	return false;
 }
 
 void GMGLRenders_Object::end()

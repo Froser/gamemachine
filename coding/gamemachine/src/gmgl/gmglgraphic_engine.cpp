@@ -7,7 +7,6 @@
 #include "gmengine/gmgameobject.h"
 #include "gmglobjectpainter.h"
 #include "renders/gmgl_renders_object.h"
-#include "renders/gmgl_renders_sky.h"
 #include "renders/gmgl_renders_glyph.h"
 #include "gmglgraphic_engine_default_shaders.h"
 #include "foundation/gamemachine.h"
@@ -73,25 +72,23 @@ void GMGLGraphicEngine::installShaders()
 	const GMString shaderMap[] =
 	{
 		_L("object"),
-		_L("sky"),
 		_L("glyph"),
 	};
 
 	// 按照Object顺序创建renders
 	IRender* renders[] = {
 		new GMGLRenders_Object(),
-		new GMGLRenders_Sky(),
 		new GMGLRenders_Glyph(),
 	};
 
 	GMGamePackage* package = GameMachine::instance().getGamePackageManager();
 
-	for (GMint i = (GMint)GMMeshType::MeshTypeBegin; i < (GMint) GMMeshType::MeshTypeEnd; i++)
+	GM_FOREACH_ENUM_CLASS(type, GMMeshType, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadShader((GMMeshType) i, shaderProgram)) )
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadShader(type, shaderProgram)) )
 		{
-			if (!loadDefaultShaders((GMMeshType) i, shaderProgram))
+			if (!loadDefaultShaders(type, shaderProgram))
 			{
 				delete shaderProgram;
 				shaderProgram = nullptr;
@@ -101,10 +98,10 @@ void GMGLGraphicEngine::installShaders()
 		if (shaderProgram)
 		{
 			shaderProgram->load();
-			registerShader((GMMeshType)i, shaderProgram);
+			registerShader(type, shaderProgram);
 		}
 
-		registerRender((GMMeshType)i, renders[i]);
+		registerRender(type, renders[(GMint) type]);
 	}
 }
 
@@ -116,11 +113,6 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	case GMMeshType::Normal:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object.frag });
-		flag = true;
-		break;
-	case GMMeshType::Sky:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::sky.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::sky.frag });
 		flag = true;
 		break;
 	case GMMeshType::Glyph:
@@ -151,7 +143,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	D(d);
 	updateMatrices(lookAt);
 
-	GM_BEGIN_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
+	GM_FOREACH_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		IRender* render = getRender(i);
 		GMMesh dummy;
@@ -161,7 +153,6 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
 		render->end();
 	}
-	GM_END_ENUM
 }
 
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)

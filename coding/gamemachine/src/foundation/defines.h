@@ -48,11 +48,9 @@
 #define REF
 
 // 用于枚举的宏
-#define GM_BEGIN_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMint)var)+1) ) {
-#define GM_END_ENUM }
+#define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMint)var)+1) )
 
-#define GM_BEGIN_ENUM_CLASS(var, type, start, end) for (type var = start; (GMint) var < (GMint) end; var = (decltype(var))(((GMint)var)+1) ) {
-#define GM_END_ENUM_CLASS }
+#define GM_FOREACH_ENUM_CLASS(var, type, start, end) for (type var = start; (GMint) var < (GMint) end; var = (decltype(var))(((GMint)var)+1) )
 
 BEGIN_NS
 

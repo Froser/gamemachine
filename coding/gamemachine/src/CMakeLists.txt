@@ -78,8 +78,6 @@ set(SOURCES
 		gmgl/renders/gmgl_renders_glyph.h
 		gmgl/renders/gmgl_renders_object.cpp
 		gmgl/renders/gmgl_renders_object.h
-		gmgl/renders/gmgl_renders_sky.cpp
-		gmgl/renders/gmgl_renders_sky.h
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
 		gmgl/gmglgamepackagehandler.h

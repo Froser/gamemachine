@@ -10,14 +10,6 @@ struct GM_texture_t
 };
 uniform GM_texture_t GM_ambient_textures[1];
 
-/*
-uniform sampler2D GM_ambient_texture;
-uniform float GM_ambient_texture_scroll_s;
-uniform float GM_ambient_texture_scroll_t;
-uniform float GM_ambient_texture_scale_s;
-uniform float GM_ambient_texture_scale_t;
-*/
-
 in vec2 _uv;
 out vec4 frag_color;
 

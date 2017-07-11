@@ -7,7 +7,6 @@
 #include <fstream>
 #include "gmengine/gmbspgameworld.h"
 #include "renders/gmgl_renders_object.h"
-#include "renders/gmgl_renders_sky.h"
 #include "renders/gmgl_renders_glyph.h"
 #include "foundation/gamemachine.h"
 

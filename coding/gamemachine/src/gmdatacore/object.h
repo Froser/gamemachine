@@ -148,7 +148,6 @@ enum class GMMeshType
 {
 	MeshTypeBegin,
 	Normal = MeshTypeBegin,
-	Sky,
 	Glyph,
 	MeshTypeEnd,
 };

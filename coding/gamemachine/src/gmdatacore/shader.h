@@ -217,7 +217,7 @@ public:
 		D(d);
 		D_OF(rhs_d, &rhs);
 
-		GM_BEGIN_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
+		GM_FOREACH_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 		{
 			GMint count = GMMaxTextureCount(type);
 			for (GMint i = 0; i < count; i++)
@@ -225,7 +225,7 @@ public:
 				getTextureFrames(type, i) = rhs.getTextureFrames(type, i);
 			}
 		}
-		GM_END_ENUM_CLASS
+
 		return *this;
 	}
 };

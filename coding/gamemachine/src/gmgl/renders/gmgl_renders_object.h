@@ -31,7 +31,7 @@ protected:
 	void clearData();
 	void activateLight(LightType t, GMLight& light);
 	void drawDebug();
-	void drawTexture(GMTextureType type, GMint index = 0);
+	bool drawTexture(GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);
 	void activateTextureTransform(GMTextureType type, GMint index);
 	void activateTexture(GMTextureType type, GMint index);

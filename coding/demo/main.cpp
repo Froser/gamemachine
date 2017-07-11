@@ -247,11 +247,6 @@ public:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
 			flag = true;
 			break;
-		case GMMeshType::Sky:
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
-			flag = true;
-			break;
 		case GMMeshType::Glyph:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.vert", &vertBuf);
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.frag", &fragBuf);

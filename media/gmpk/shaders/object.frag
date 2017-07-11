@@ -24,7 +24,7 @@ struct GM_texture_t
 };
 uniform GM_texture_t GM_ambient_textures[MAX_TEXTURE_COUNT];
 uniform GM_texture_t GM_diffuse_textures[MAX_TEXTURE_COUNT];
-uniform GM_texture_t GM_lightmap_texture[MAX_TEXTURE_COUNT];
+uniform GM_texture_t GM_lightmap_textures[MAX_TEXTURE_COUNT];  // 用到的只有1个
 uniform GM_texture_t GM_normalmap_textures[1];
 
 uniform mat4 GM_view_matrix;
@@ -127,15 +127,16 @@ void calcLights()
     }
 }
 
-vec3 calcTexture(GM_texture_t texture[MAX_TEXTURE_COUNT], int size)
+vec3 calcTexture(GM_texture_t texture[MAX_TEXTURE_COUNT], vec2 uv, int size, vec3 defaultValue)
 {
-    vec3 result;
+    vec3 result = vec3(0);
     for (int i = 0; i < size; i++)
     {
-        result += GM_ambient_textures[i].enabled == 1
-            ? vec3(texture(GM_ambient_textures[i].texture, _uv * vec2(GM_ambient_textures[i].scale_s, GM_ambient_textures[i].scale_t) + vec2(GM_ambient_textures[i].scroll_s, GM_ambient_textures[i].scroll_t)))
-            : vec3(1);
+        result += texture[i].enabled == 1
+            ? vec3(texture(texture[i].texture, uv * vec2(texture[i].scale_s, texture[i].scale_t) + vec2(texture[i].scroll_s, texture[i].scroll_t)))
+            : defaultValue;
     }
+
     return result;
 }
 
@@ -160,7 +161,7 @@ void drawObject()
     float shadeFactor = shadeFactorFactor(calcuateShadeFactor(shadowCoord));
 
     // 反射光
-    vec3 diffuseTextureColor = calcTexture(GM_diffuse_textures, MAX_TEXTURE_COUNT);
+    vec3 diffuseTextureColor = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT, vec3(0));
     vec3 diffuseLight = 
         // 漫反射光系数
         g_diffuse * 
@@ -183,9 +184,9 @@ void drawObject()
         // 镜面光强度
         GM_light_power;
 
-    // 计算环境光和Ka贴图
-    vec3 ambientTextureColor = calcTexture(GM_ambient_textures, MAX_TEXTURE_COUNT);
-    vec3 lightmapTextureColor = calcTexture(GM_lightmap_texture, MAX_TEXTURE_COUNT);
+    // 计算环境光和光照贴图
+    vec3 ambientTextureColor = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT, vec3(0)) *
+        calcTexture(GM_lightmap_textures, _lightmapuv, 1, vec3(1));
 
     // 环境光
     vec3 ambientLight = 
@@ -196,9 +197,8 @@ void drawObject()
         // ShadowMap的阴影系数，如果没有ShadowMap则为1
         shadeFactor * 
         // 环境光纹理
-        ambientTextureColor *
-        // 光照贴图
-        lightmapTextureColor;
+        ambientTextureColor
+        ;
 
     // 最终结果
     vec3 color = ambientLight + diffuseLight + specularLight;

@@ -347,8 +347,6 @@ void GMSkyGameObject::createSkyBox(OUT Object** obj)
 	*obj = object;
 
 	GMMesh* child = new GMMesh();
-	child->setType(GMMeshType::Sky);
-
 	Component* component = new Component(child);
 	component->setShader(d->shader);
 
