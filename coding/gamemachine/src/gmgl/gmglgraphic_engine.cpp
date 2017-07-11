@@ -52,15 +52,8 @@ void GMGLGraphicEngine::setViewport(const GMRect& rect)
 
 void GMGLGraphicEngine::drawObject(GMGameObject* object)
 {
-	applyGraphicSettings();
-	drawObjectOnce(object);
-}
-
-void GMGLGraphicEngine::applyGraphicSettings()
-{
-	glLineWidth(0);
 	glDepthFunc(GL_LEQUAL);
-	glFrontFace(GL_CW);
+	drawObjectOnce(object);
 }
 
 void GMGLGraphicEngine::drawObjectOnce(GMGameObject* object)
@@ -68,7 +61,6 @@ void GMGLGraphicEngine::drawObjectOnce(GMGameObject* object)
 	D(d);
 	GMfloat transform[16];
 	object->getTransform().toArray(transform);
-	GMGLShaderProgram* lastShaders = nullptr;
 	object->onBeforeDraw();
 	Object* coreObj = object->getObject();
 	coreObj->getPainter()->draw(transform);
@@ -159,7 +151,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	D(d);
 	updateMatrices(lookAt);
 
-	BEGIN_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
+	GM_BEGIN_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		IRender* render = getRender(i);
 		GMMesh dummy;
@@ -169,7 +161,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
 		render->end();
 	}
-	END_ENUM
+	GM_END_ENUM
 }
 
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)

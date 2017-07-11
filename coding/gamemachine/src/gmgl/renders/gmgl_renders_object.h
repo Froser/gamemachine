@@ -33,11 +33,12 @@ protected:
 	void drawDebug();
 	void drawTexture(GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);
-	void activateTextureTransform(GMTextureType i, GMint index);
+	void activateTextureTransform(GMTextureType type, GMint index);
 	void activateTexture(GMTextureType type, GMint index);
 	void deactivateTexture(GMTextureType type, GMint index);
 	void activateShader();
 	void deactivateShader();
+	void getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId);
 };
 
 END_NS

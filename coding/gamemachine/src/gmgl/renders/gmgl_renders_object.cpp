@@ -137,20 +137,15 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 	activateShader();
 
 	// 纹理
-	for (GMuint type = 0; type < (GMint)GMTextureType::END; type++)
+	GM_BEGIN_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 	{
-		if (type != (GMint) GMTextureType::NORMALMAP)
+		GMint count = GMMaxTextureCount(type);
+		for (GMint i = 0; i < count; i++)
 		{
-			for (GMint i = 0; i < MAX_TEXTURE_COUNT; i++)
-			{
-				drawTexture((GMTextureType)type, i);
-			}
-		}
-		else
-		{
-			drawTexture((GMTextureType)type);
+			drawTexture((GMTextureType)type, i);
 		}
 	}
+	GM_END_ENUM_CLASS
 
 	// 调试绘制
 	drawDebug();
@@ -160,20 +155,15 @@ void GMGLRenders_Object::endShader()
 {
 	D(d);
 	deactivateShader();
-	for (GMuint type = 0; type < (GMint)GMTextureType::END; type++)
+	GM_BEGIN_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 	{
-		if (type != (GMint)GMTextureType::NORMALMAP)
+		GMint count = GMMaxTextureCount(type);
+		for (GMint i = 0; i < count; i++)
 		{
-			for (GMint i = 0; i < MAX_TEXTURE_COUNT; i++)
-			{
-				deactivateTexture((GMTextureType)type, i);
-			}
-		}
-		else
-		{
-			drawTexture((GMTextureType)type);
+			deactivateTexture((GMTextureType)type, i);
 		}
 	}
+	GM_END_ENUM_CLASS
 
 	if (d->mode == GMDrawMode::Line)
 	{
@@ -275,10 +265,10 @@ void GMGLRenders_Object::drawDebug()
 	d->gmglShaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetBuiltIn(DRAW_NORMAL));
 }
 
-void GMGLRenders_Object::activateTextureTransform(GMTextureType i, GMint index)
+void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
-	auto uniform = getTextureUniformName(i, index);
+	auto uniform = getTextureUniformName(type, index);
 
 	const GMString SCROLL_S = uniform + ".scroll_s";
 	const GMString SCROLL_T = uniform + ".scroll_t";
@@ -291,7 +281,7 @@ void GMGLRenders_Object::activateTextureTransform(GMTextureType i, GMint index)
 	d->gmglShaderProgram->setFloat(SCALE_T, 1.f);
 
 	GMuint n = 0;
-	const GMS_TextureMod* tc = &d->shader->getTexture().getTextureFrames(i).getTexMod(n);
+	const GMS_TextureMod* tc = &d->shader->getTexture().getTextureFrames(type, index).getTexMod(n);
 	while (n < MAX_TEX_MOD && tc->type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
 		switch (tc->type)
@@ -321,19 +311,51 @@ void GMGLRenders_Object::activateTexture(GMTextureType type, GMint index)
 {
 	D(d);
 	GMint idx = (GMint)type;
+
+	GLenum tex;
+	GMint texId;
+	getTextureID(type, index, tex, texId);
+
 	auto uniform = getTextureUniformName(type, index);
-	d->gmglShaderProgram->setInt(uniform + ".texture", idx + 1);
+	d->gmglShaderProgram->setInt(uniform + ".texture", texId);
 	d->gmglShaderProgram->setInt(uniform + ".enabled", 1);
 
 	activateTextureTransform(type, index);
-	glActiveTexture(idx + GL_TEXTURE1);
+	glActiveTexture(tex);
 }
 
 void GMGLRenders_Object::deactivateTexture(GMTextureType type, GMint index)
 {
 	D(d);
+	GLenum tex;
+	GMint texId;
+	getTextureID(type, index, tex, texId);
+
 	GMint idx = (GMint)type;
 	auto uniform = getTextureUniformName(type, index);
-	d->gmglShaderProgram->setInt(uniform + "enabled", 0);
-	glActiveTexture(idx + GL_TEXTURE1);
+	d->gmglShaderProgram->setInt(uniform + ".enabled", 0);
+	glActiveTexture(tex);
+}
+
+void GMGLRenders_Object::getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId)
+{
+	switch (type)
+	{
+	case GMTextureType::AMBIENT:
+	case GMTextureType::DIFFUSE:
+		texId = (GMint)type * GMMaxTextureCount(type) + index + 1;
+		tex = texId - 1 + GL_TEXTURE1;
+		break;
+	case GMTextureType::NORMALMAP:
+		texId = 7;
+		tex = GL_TEXTURE7;
+		break;
+	case GMTextureType::LIGHTMAP:
+		texId = 8;
+		tex = GL_TEXTURE8;
+		break;
+	default:
+		ASSERT(false);
+		return;
+	}
 }

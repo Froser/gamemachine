@@ -407,7 +407,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 
 void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 {
-	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP);
+	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{

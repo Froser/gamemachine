@@ -18,9 +18,9 @@ BEGIN_NS
 #define		GMSHADER_LIGHT_KS					GMSHADER("light_ks")
 #define		GMSHADER_LIGHT_SHININESS			GMSHADER("light_shininess")
 #define		GMSHADER_AMBIENT_TEXTURES			GMSHADER("ambient_textures")
-#define		GMSHADER_DIFFUSE_TEXTURE			GMSHADER("diffuse_texture")
-#define		GMSHADER_NORMAL_MAPPING_TEXTURE		GMSHADER("normal_mapping_texture")
-#define		GMSHADER_LIGHTMAP_TEXTURE			GMSHADER("lightmap_texture")
+#define		GMSHADER_DIFFUSE_TEXTURE			GMSHADER("diffuse_textures")
+#define		GMSHADER_NORMAL_MAPPING_TEXTURE		GMSHADER("normalmap_textures")
+#define		GMSHADER_LIGHTMAP_TEXTURE			GMSHADER("lightmap_textures")
 
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")

@@ -12,6 +12,7 @@
 #include "foundation/gmprofile.h"
 #include "foundation/gmthreads.h"
 #include "gmgameobject.h"
+#include "foundation/vector.h"
 
 // Multi-threads
 BEGIN_NS
@@ -248,16 +249,6 @@ GMGameObject* GMBSPGameWorld::getSky()
 	return d->sky;
 }
 
-/*
-void GMBSPGameWorld::updateCamera()
-{
-	GMCharacter* character = getMajorCharacter();
-	character->updateCamera();
-	CameraLookAt& lookAt = character->getLookAt();
-	GameMachine::instance().getGraphicEngine()->updateCameraView(lookAt);
-}
-*/
-
 void GMBSPGameWorld::renderGameWorld()
 {
 	GM_PROFILE(renderGameWorld);
@@ -279,7 +270,7 @@ void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alw
 		d->render.renderData().alwaysVisibleObjects.push_back(obj);
 }
 
-std::map<GMint, std::set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
+Map<GMint, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 {
 	D(d);
 	return d->entities;
@@ -624,7 +615,7 @@ void GMBSPGameWorld::drawEntity(GMint leafId)
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	std::set<GMBSPEntity*>& entities = d->entities[leafId];
+	Set<GMBSPEntity*>& entities = d->entities[leafId];
 #ifdef NO_LAMBDA
 	__renderIter func(rd, d);
 	std::for_each(entities.begin(), entities.end(), func);
@@ -642,9 +633,10 @@ void GMBSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
 	AlignedVector<GMGameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 	for (auto& obj : objs)
 	{
-		GameMachine::instance().getGraphicEngine()->drawObject(obj);
+		engine->drawObject(obj);
 	}
 }
 
@@ -665,8 +657,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 		const TextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
-		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT).setOneFrame(0, item->texture);
-		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT).setFrameCount(1);
+		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).setOneFrame(0, item->texture);
+		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).setFrameCount(1);
 	}
 	return true;
 }
@@ -683,8 +675,8 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 	else
 		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
 
-	shader.getTexture().getTextureFrames(GMTextureType::LIGHTMAP).setOneFrame(0, item->texture);
-	shader.getTexture().getTextureFrames(GMTextureType::LIGHTMAP).setFrameCount(1);
+	shader.getTexture().getTextureFrames(GMTextureType::LIGHTMAP, 0).setOneFrame(0, item->texture);
+	shader.getTexture().getTextureFrames(GMTextureType::LIGHTMAP, 0).setFrameCount(1);
 }
 
 void GMBSPGameWorld::importBSP()

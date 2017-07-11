@@ -55,7 +55,6 @@ public:
 
 private:
 	void registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders);
-	void applyGraphicSettings();
 	void updateMatrices(const CameraLookAt& lookAt);
 	void drawObjectOnce(GMGameObject* object);
 	void installShaders();

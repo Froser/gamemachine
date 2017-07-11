@@ -15,10 +15,7 @@ GMGLTextureShaderNames::GMGLTextureShaderNames()
 GMString GMGLTextureShaderNames::getName(GMTextureType type, GMint index)
 {
 	ASSERT(m_uniformNames.find(type) != m_uniformNames.end());
-	if (type == GMTextureType::AMBIENT)
-		return m_uniformNames[GMTextureType::AMBIENT] + "[" + index + "]";
-	else
-		return m_uniformNames[type];
+	return m_uniformNames[type] + "[" + index + "]";
 }
 
 GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)

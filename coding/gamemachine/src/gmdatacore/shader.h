@@ -150,11 +150,6 @@ public:
 	}
 };
 
-enum
-{
-	MAX_TEXTURE_COUNT = 3,
-};
-
 enum class GMTextureType
 {
 	AMBIENT,
@@ -164,12 +159,22 @@ enum class GMTextureType
 	END,
 };
 
+static CONST_EXPR GMint GMMaxTextureCount(GMTextureType type)
+{
+	return
+		type == GMTextureType::AMBIENT ? 3 :
+		type == GMTextureType::DIFFUSE ? 3 :
+		type == GMTextureType::NORMALMAP ? 1 :
+		type == GMTextureType::LIGHTMAP ? 1 : 0;
+}
+
 GM_PRIVATE_OBJECT(GMTexture)
 {
-	GMTextureFrames ambients[MAX_TEXTURE_COUNT];
-	GMTextureFrames diffuse;
-	GMTextureFrames normalMap;
-	GMTextureFrames lightMap;
+	//TODO VS2015一下很有可能无法编过
+	GMTextureFrames ambients[GMMaxTextureCount(GMTextureType::AMBIENT)];
+	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::DIFFUSE)];
+	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NORMALMAP)];
+	GMTextureFrames lightMap[GMMaxTextureCount(GMTextureType::LIGHTMAP)];
 };
 
 class GMTexture : public GMObject
@@ -181,33 +186,46 @@ public:
 	GMTexture(const GMTexture& texture) = delete;
 
 public:
-	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMint index = 0)
+	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMint index)
 	{
+		ASSERT(index < GMMaxTextureCount(type));
+
 		D(d);
 		switch (type)
 		{
-		case gm::GMTextureType::AMBIENT:
+		case GMTextureType::AMBIENT:
 			return d->ambients[index];
-		case gm::GMTextureType::DIFFUSE:
-			return d->diffuse;
-		case gm::GMTextureType::NORMALMAP:
-			return d->normalMap;
-		case gm::GMTextureType::LIGHTMAP:
-			return d->lightMap;
+		case GMTextureType::DIFFUSE:
+			return d->diffuse[index];
+		case GMTextureType::NORMALMAP:
+			return d->normalMap[index];
+		case GMTextureType::LIGHTMAP:
+			return d->lightMap[index];
 		default:
 			ASSERT(false);
 			return d->ambients[0];
 		}
 	}
 
+	inline const GMTextureFrames& getTextureFrames(GMTextureType type, GMint index) const
+	{
+		return const_cast<GMTexture*>(this)->getTextureFrames(type, index);
+	}
+
 	inline GMTexture& operator=(const GMTexture& rhs)
 	{
 		D(d);
 		D_OF(rhs_d, &rhs);
-		for (GMint i = 0; i < MAX_TEXTURE_COUNT; i++)
+
+		GM_BEGIN_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 		{
-			d->ambients[i] = rhs_d->ambients[i];
+			GMint count = GMMaxTextureCount(type);
+			for (GMint i = 0; i < count; i++)
+			{
+				getTextureFrames(type, i) = rhs.getTextureFrames(type, i);
+			}
 		}
+		GM_END_ENUM_CLASS
 		return *this;
 	}
 };

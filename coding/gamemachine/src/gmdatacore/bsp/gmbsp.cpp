@@ -479,7 +479,8 @@ bool BSP::parseEntity(OUT GMBSPEntity** entity)
 
 		if (e->key == "origin")
 		{
-			Scanner s(e->value.toStdString().c_str());
+			std::string origin = e->value.toStdString();
+			Scanner s(origin.c_str());
 			s.nextFloat(&result->origin[0]); // x
 			s.nextFloat(&result->origin[1]); // z
 			s.nextFloat(&result->origin[2]); // y
