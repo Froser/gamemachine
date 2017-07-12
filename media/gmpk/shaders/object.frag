@@ -127,15 +127,21 @@ void calcLights()
     }
 }
 
-vec3 calcTexture(GM_texture_t texture[MAX_TEXTURE_COUNT], vec2 uv, int size, vec3 defaultValue)
+vec3 calcTexture(GM_texture_t texture[MAX_TEXTURE_COUNT], vec2 uv, int size)
 {
+    bool hasTexture = false;
     vec3 result = vec3(0);
     for (int i = 0; i < size; i++)
     {
         result += texture[i].enabled == 1
             ? vec3(texture(texture[i].texture, uv * vec2(texture[i].scale_s, texture[i].scale_t) + vec2(texture[i].scroll_s, texture[i].scroll_t)))
-            : defaultValue;
+            : vec3(0);
+        if (texture[i].enabled == 1)
+            hasTexture = true;
     }
+
+    if (!hasTexture)
+        return vec3(1);
 
     return result;
 }
@@ -161,7 +167,7 @@ void drawObject()
     float shadeFactor = shadeFactorFactor(calcuateShadeFactor(shadowCoord));
 
     // 反射光
-    vec3 diffuseTextureColor = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT, vec3(0));
+    vec3 diffuseTextureColor = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
     vec3 diffuseLight = 
         // 漫反射光系数
         g_diffuse * 
@@ -185,8 +191,8 @@ void drawObject()
         GM_light_power;
 
     // 计算环境光和光照贴图
-    vec3 ambientTextureColor = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT, vec3(0)) *
-        calcTexture(GM_lightmap_textures, _lightmapuv, 1, vec3(1));
+    vec3 ambientTextureColor = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) *
+        calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 
     // 环境光
     vec3 ambientLight = 

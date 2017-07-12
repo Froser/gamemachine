@@ -276,12 +276,13 @@ public:
 	GMGlyphObject* m_glyph;
 };
 
-class DemoGameHandler : public IGameHandler
+class DemoGameHandler : public GameHandler
 {
 public:
 	DemoGameHandler() {}
 
 private:
+
 	virtual void start()
 	{
 		demo = new GMDemoGameWorld();
