@@ -120,18 +120,15 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 		glPolygonOffset(0.f, 1.f);
 
 		// 设置边框颜色
-		GMLight& light = d->shader->getLight(LT_AMBIENT);
-		light.setLightColor(d->shader->getLineColor());
-		light.setKa(linear_math::Vector3(1, 1, 1));
-		light.setEnabled(true);
-		light.setUseGlobalLightColor(false);
+		shader.getMaterial().ka = d->shader->getLineColor();
 	}
 
+	// 材质
+	activateMaterial(shader);
+
 	// 光照
-	for (GMint i = LT_BEGIN; i < LT_END; i++)
-	{
-		activateLight((LightType)i, shader.getLight((LightType)i));
-	}
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	activateLight(engine->getLights());
 
 	// 应用Shader
 	activateShader();
@@ -231,32 +228,43 @@ ITexture* GMGLRenders_Object::getTexture(GMTextureFrames& frames)
 	return frames.getOneFrame((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
-void GMGLRenders_Object::activateLight(LightType t, GMLight& light)
+void GMGLRenders_Object::activateMaterial(const Shader& shader)
 {
 	D(d);
-	switch (t)
+	const GMMaterial& material = shader.getMaterial();
+	d->gmglShaderProgram->setVec3(GMSHADER_MATERIAL_KA, &material.ka[0]);
+	d->gmglShaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
+	d->gmglShaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
+	d->gmglShaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.shininess);
+}
+
+void GMGLRenders_Object::activateLight(const Vector<GMLight>& lights)
+{
+	D(d);
+	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+
+	for (auto& light : lights)
 	{
-	case gm::LT_AMBIENT:
-	{
-		GMfloat* defaultLight = d->engine->getEnvironment().ambientLightColor;
-		GMfloat* defaultKa = d->engine->getEnvironment().ambientK;
-		d->gmglShaderProgram->setVec3(GMSHADER_LIGHT_AMBIENT, light.getEnabled() && !light.getUseGlobalLightColor() ? &light.getLightColor()[0] : defaultLight);
-		d->gmglShaderProgram->setVec3(GMSHADER_LIGHT_KA, light.getEnabled() ? &light.getKa()[0] : defaultKa);
-	}
-	break;
-	case gm::LT_SPECULAR:
-	{
-		GMfloat* defaultLight = d->engine->getEnvironment().ambientLightColor;
-		GMfloat zero[3] = { 0 };
-		d->gmglShaderProgram->setVec3(GMSHADER_LIGHT_POWER, light.getEnabled() ? (!light.getUseGlobalLightColor() ? &light.getLightColor()[0] : defaultLight) : zero);
-		d->gmglShaderProgram->setVec3(GMSHADER_LIGHT_KD, light.getEnabled() ? &light.getKd()[0] : zero);
-		d->gmglShaderProgram->setVec3(GMSHADER_LIGHT_KS, light.getEnabled() ? &light.getKs()[0] : zero);
-		d->gmglShaderProgram->setFloat(GMSHADER_LIGHT_SHININESS, light.getEnabled() ? light.getShininess() : 0.f);
-	}
-	break;
-	default:
-		ASSERT(false);
+		GMint id = lightId[(GMuint)light.getType()]++;
+		switch (light.getType())
+		{
+		case GMLightType::AMBIENT:
+		{
+			GMString unfAmbient = GMString(GMSHADER_AMBIENT_LIGHTS) + "[" + id + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
+			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
+		}
 		break;
+		case GMLightType::SPECULAR:
+		{
+			GMString unfAmbient = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + id + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
+			GMString unfPosition = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + id + "]" + GMSHADER_LIGHTS_LIGHTPOSITION;
+			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
+			d->gmglShaderProgram->setVec3(unfPosition, light.getLightPosition());
+		}
+		break;
+		default:
+			break;
+		}
 	}
 }
 
@@ -271,10 +279,10 @@ void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint inde
 	D(d);
 	auto uniform = getTextureUniformName(type, index);
 
-	const GMString SCROLL_S = uniform + ".scroll_s";
-	const GMString SCROLL_T = uniform + ".scroll_t";
-	const GMString SCALE_S = uniform + ".scale_s";
-	const GMString SCALE_T = uniform + ".scale_t";
+	const GMString SCROLL_S = uniform + GMSHADER_TEXTURES_SCROLL_S;
+	const GMString SCROLL_T = uniform + GMSHADER_TEXTURES_SCROLL_T;
+	const GMString SCALE_S = uniform + GMSHADER_TEXTURES_SCALE_S;
+	const GMString SCALE_T = uniform + GMSHADER_TEXTURES_SCALE_T;
 
 	d->gmglShaderProgram->setFloat(SCROLL_S, 0.f);
 	d->gmglShaderProgram->setFloat(SCROLL_T, 0.f);

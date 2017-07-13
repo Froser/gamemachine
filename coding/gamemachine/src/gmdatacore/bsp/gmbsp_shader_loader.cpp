@@ -429,6 +429,7 @@ void GMBSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
 
 void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 {
+	D(d);
 	const char* type = elem->Attribute("type");
 	if (!type)
 	{
@@ -436,9 +437,9 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	GMLight lightInfo;
-	lightInfo.setEnabled(true);
-	LightType lightType;
+	GMMaterial& material = shader.getMaterial();
+	GMLight light(GMLightType::AMBIENT);
+	GMLightType lightType;
 	const char* color = elem->Attribute("color");
 	if (!color)
 	{
@@ -448,15 +449,15 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 
 	linear_math::Vector3 vecColor;
 	readTernaryFloatsFromString(color, vecColor);
-	lightInfo.setLightColor(vecColor);
+	light.setLightColor(&vecColor[0]);
 
 	if (strEqual(type, "ambient"))
 	{
-		lightType = LT_AMBIENT;
+		lightType = GMLightType::AMBIENT;
 	}
 	else if (strEqual(type, "specular"))
 	{
-		lightType = LT_SPECULAR;
+		lightType = GMLightType::SPECULAR;
 		const char* position = elem->Attribute("position");
 		if (!position)
 		{
@@ -466,7 +467,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		Scanner s(color);
 		linear_math::Vector3 vecPosition;
 		readTernaryFloatsFromString(position, vecPosition);
-		lightInfo.setLightPosition(vecPosition);
+		light.setLightPosition(&vecPosition[0]);
 
 		linear_math::Vector3 arg;
 
@@ -474,39 +475,40 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 		if (!k)
 		{
 			readTernaryFloatsFromString("1 1 1", arg);
-			lightInfo.setKs(arg);
+			material.ks = arg;
 		}
 		else
 		{
 			readTernaryFloatsFromString(k, arg);
-			lightInfo.setKs(arg);
+			material.ks = arg;
 		}
 
 		k = elem->Attribute("kd");
 		if (!k)
 		{
 			readTernaryFloatsFromString("1 1 1", arg);
-			lightInfo.setKs(arg);
+			material.ks = arg;
 		}
 		else
 		{
 			readTernaryFloatsFromString(k, arg);
-			lightInfo.setKs(arg);
+			material.ks = arg;
 		}
 
 		k = elem->Attribute("shininess");
 		GMfloat shininess = 0;
 		if (!k)
 		{
-			lightInfo.setShininess(shininess);
+			material.shininess = shininess;
 		}
 		else
 		{
 			SAFE_SSCANF(k, "%f", &shininess);
-			lightInfo.setShininess(shininess);
+			material.shininess = shininess;
 		}
 	}
-	shader.setLight(lightType, lightInfo);
+	light.setType(lightType);
+	d->world->addLight(light);
 }
 
 void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)

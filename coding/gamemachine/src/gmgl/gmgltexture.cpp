@@ -7,9 +7,9 @@
 GMGLTextureShaderNames::GMGLTextureShaderNames()
 {
 	m_uniformNames[GMTextureType::AMBIENT] = GMSHADER_AMBIENT_TEXTURES;
-	m_uniformNames[GMTextureType::DIFFUSE] = GMSHADER_DIFFUSE_TEXTURE;
-	m_uniformNames[GMTextureType::NORMALMAP] = GMSHADER_NORMAL_MAPPING_TEXTURE;
-	m_uniformNames[GMTextureType::LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURE;
+	m_uniformNames[GMTextureType::DIFFUSE] = GMSHADER_DIFFUSE_TEXTURES;
+	m_uniformNames[GMTextureType::NORMALMAP] = GMSHADER_NORMAL_MAPPING_TEXTURES;
+	m_uniformNames[GMTextureType::LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURES;
 }
 
 GMString GMGLTextureShaderNames::getName(GMTextureType type, GMint index)

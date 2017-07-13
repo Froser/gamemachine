@@ -296,20 +296,38 @@ private:
 		shader.setLineWidth(5);
 		shader.setDrawBorder(true);
 		shader.setLineColor(linear_math::Vector3(1.f, .5f, .2f));
-		GMLight& objLight = shader.getLight(LT_SPECULAR);
-		objLight.setLightColor(linear_math::Vector3(1, .5, 1));
-		objLight.setKd(linear_math::Vector3(.6f, .2f, .3f));
-		objLight.setKs(linear_math::Vector3(.1f, .2f, .3f));
-		objLight.setShininess(20);
-		objLight.setEnabled(true);
-		objLight.setLightPosition(linear_math::Vector3(1, 1, 1));
-		demo->appendObject("cube", obj);
 
-		GMLight light;
-		light.setKa(linear_math::Vector3(1, 1, 1));
-		light.setLightColor(linear_math::Vector3(1,.5,1));
-		light.setEnabled(true);
-		demo->setDefaultAmbientLight(light);
+		shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
+		shader.getMaterial().ks = linear_math::Vector3(.1f, .2f, .3f);
+		shader.getMaterial().ka = linear_math::Vector3(1, 1, 1);
+		shader.getMaterial().shininess = 20;
+
+		{
+			GMLight light(GMLightType::SPECULAR);
+			GMfloat pos[] = { 0, 0, .2f };
+			light.setLightPosition(pos);
+			GMfloat color[] = { 1, .5f, 1 };
+			light.setLightColor(color);
+			demo->addLight(light);
+		}
+
+		{
+			GMLight light(GMLightType::SPECULAR);
+			GMfloat pos[] = { 0, 1, 1 };
+			light.setLightPosition(pos);
+			GMfloat color[] = { 0, 1, 0 };
+			light.setLightColor(color);
+			demo->addLight(light);
+		}
+
+		{
+			GMLight light(GMLightType::AMBIENT);
+			GMfloat color[] = { .2f, .5f, 1 };
+			light.setLightColor(color);
+			demo->addLight(light);
+		}
+
+		demo->appendObject("cube", obj);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 		CameraLookAt lookAt;

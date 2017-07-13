@@ -84,6 +84,17 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 #define GM_PRIVATE_CONSTRUCT(name) name##Private()
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
+#define GM_DECLARE_GETTER(name, memberName, paramType) \
+	inline paramType& get##name() { D(d); return d-> memberName; } \
+	inline const paramType& get##name() const { D(d); return d-> memberName; }
+
+#define GM_DECLARE_SETTER(name, memberName, paramType) \
+	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
+
+#define GM_DECLARE_PROPERTY(name, memberName, paramType) \
+	GM_DECLARE_GETTER(name, memberName, paramType) \
+	GM_DECLARE_SETTER(name, memberName, paramType)
+
 /* 代码规范：
   条款一：
   如果一个类是继承GMObject，那么它不能有成员变量。它的成员变量要用GM_PRIVATE_OBJECT和DECLARE_PRIVATE来声明和定义。

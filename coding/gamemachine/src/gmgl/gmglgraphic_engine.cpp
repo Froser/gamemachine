@@ -126,18 +126,6 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	return flag;
 }
 
-void GMGLGraphicEngine::setEnvironment(const GMGraphicEnvironment& env)
-{
-	D(d);
-	d->environment = env;
-}
-
-GMGraphicEnvironment& GMGLGraphicEngine::getEnvironment()
-{
-	D(d);
-	return d->environment;
-}
-
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
 	D(d);
@@ -201,4 +189,16 @@ ResourceContainer* GMGLGraphicEngine::getResourceContainer()
 {
 	D(d);
 	return &d->resourceContainer;
+}
+
+Vector<GMLight> GMGLGraphicEngine::getLights()
+{
+	D(d);
+	return d->lights;
+}
+
+void GMGLGraphicEngine::addLight(const GMLight& light)
+{
+	D(d);
+	d->lights.push_back(light);
 }

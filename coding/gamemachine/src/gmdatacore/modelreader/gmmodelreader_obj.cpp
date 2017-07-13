@@ -273,13 +273,9 @@ void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, 
 {
 	shader.setCull(GMS_Cull::NONE);
 
-	shader.getLight(LT_AMBIENT).setEnabled(true);
-	shader.getLight(LT_AMBIENT).setUseGlobalLightColor (true);
-	shader.getLight(LT_AMBIENT).setKa(linear_math::Vector3::fromArray(material.ka));
-
-	shader.getLight(LT_SPECULAR).setEnabled(true);
-	shader.getLight(LT_SPECULAR).setUseGlobalLightColor(true);
-	shader.getLight(LT_SPECULAR).setShininess(material.ns);
-	shader.getLight(LT_SPECULAR).setKd(linear_math::Vector3::fromArray(material.kd));
-	shader.getLight(LT_SPECULAR).setKs(linear_math::Vector3::fromArray(material.ks));
+	GMMaterial& m = shader.getMaterial();
+	m.ka = linear_math::Vector3::fromArray(material.ka);
+	m.kd = linear_math::Vector3::fromArray(material.kd);
+	m.ks = linear_math::Vector3::fromArray(material.ks);
+	m.shininess = material.ns;
 }

@@ -19,7 +19,7 @@ GM_INTERFACE(IShaderLoadCallback)
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
-	GMGraphicEnvironment environment;
+	Vector<GMLight> lights;
 	Map<GMMeshType, GMGLShaderProgram*> allShaders;
 	Map<GMMeshType, IRender*> allRenders;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
@@ -44,8 +44,8 @@ public:
 	virtual void drawObject(GMGameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
-	virtual void setEnvironment(const GMGraphicEnvironment& env) override;
-	virtual GMGraphicEnvironment& getEnvironment() override;
+	virtual Vector<GMLight> getLights() override;
+	virtual void addLight(const GMLight& light) override;
 
 public:
 	GMGLShaderProgram* getShaders(GMMeshType objectType);

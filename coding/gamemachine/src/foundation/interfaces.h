@@ -1,5 +1,7 @@
 ﻿#ifndef __INTERFACES_H__
 #define __INTERFACES_H__
+#include "vector.h"
+
 BEGIN_NS
 
 // 前置声明
@@ -54,12 +56,82 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
-// 默认的环境参数
-GM_ALIGNED_STRUCT(GMGraphicEnvironment)
+
+enum class GMLightType
 {
-	GMfloat ambientLightColor[3];
-	GMfloat ambientK[3];
+	AMBIENT = 0,
+	SPECULAR,
+
+	// 以上类型数目
+	COUNT,
 };
+
+GM_PRIVATE_OBJECT(GMLight)
+{
+	GMLightType type = GMLightType::AMBIENT;
+	GMfloat lightPosition[3];
+	GMfloat lightColor[3];
+};
+
+class GMLight : public GMObject
+{
+	DECLARE_PRIVATE(GMLight)
+
+public:
+	GM_DECLARE_PROPERTY(Type, type, GMLightType);
+
+	GMLight() = default;
+
+	GMLight(const GMLight& light)
+	{
+		*this = light;
+	}
+
+	GMLight(GMLightType type)
+	{
+		D(d);
+		d->type = type;
+	}
+
+	inline GMLight& operator=(const GMLight& rhs)
+	{
+		D(d);
+		D_OF(rhs_d, &rhs);
+		*d = *rhs_d;
+		setLightColor(rhs_d->lightColor);
+		setLightPosition(rhs_d->lightPosition);
+		return *this;
+	}
+
+	void setLightColor(GMfloat light[3])
+	{
+		D(d);
+		d->lightColor[0] = light[0];
+		d->lightColor[1] = light[1];
+		d->lightColor[2] = light[2];
+	}
+
+	const GMfloat* getLightColor() const
+	{
+		D(d);
+		return d->lightColor;
+	}
+
+	void setLightPosition(GMfloat light[3])
+	{
+		D(d);
+		d->lightPosition[0] = light[0];
+		d->lightPosition[1] = light[1];
+		d->lightPosition[2] = light[2];
+	}
+
+	const GMfloat* getLightPosition() const
+	{
+		D(d);
+		return d->lightPosition;
+	}
+};
+
 
 GM_INTERFACE(IGraphicEngine)
 {
@@ -69,8 +141,8 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
-	virtual void setEnvironment(const GMGraphicEnvironment& env) = 0;
-	virtual GMGraphicEnvironment& getEnvironment() = 0;
+	virtual Vector<GMLight> getLights() = 0;
+	virtual void addLight(const GMLight& light) = 0;
 };
 
 enum class GMDrawMode

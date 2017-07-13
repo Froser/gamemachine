@@ -40,11 +40,10 @@ void import_worldspawn(const GMBSPEntity& entity, GMBSPGameWorld* world)
 		}
 	}
 	*/
-	GMLight ambientLight;
-	ambientLight.setEnabled (true);
-	ambientLight.setLightColor (linear_math::Vector3(.5f, .5f, .5f));
-	ambientLight.setKa(linear_math::Vector3(1.f, 1.f, 1.f));
-	world->setDefaultAmbientLight(ambientLight);
+	GMLight ambientLight(GMLightType::AMBIENT);
+	GMfloat lightColor[] = { .5f, .5f, .5f };
+	ambientLight.setLightColor(lightColor);
+	world->addLight(ambientLight);
 }
 
 void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* world)

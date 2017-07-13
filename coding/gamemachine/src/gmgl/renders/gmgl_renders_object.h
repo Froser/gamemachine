@@ -29,7 +29,8 @@ public:
 
 protected:
 	void clearData();
-	void activateLight(LightType t, GMLight& light);
+	void activateMaterial(const Shader& shader);
+	void activateLight(const Vector<GMLight>& lights);
 	void drawDebug();
 	bool drawTexture(GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);

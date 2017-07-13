@@ -5,17 +5,6 @@
 #include "foundation/utilities/utilities.h"
 BEGIN_NS
 
-#define DECLARE_GETTER(name, memberName, paramType) \
-	inline paramType& get##name() { D(d); return d-> memberName; } \
-	inline const paramType& get##name() const { D(d); return d-> memberName; }
-
-#define DECLARE_SETTER(name, memberName, paramType) \
-	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
-
-#define DECLARE_PROPERTY(name, memberName, paramType) \
-	DECLARE_GETTER(name, memberName, paramType) \
-	DECLARE_SETTER(name, memberName, paramType)
-
 enum
 {
 	MAX_ANIMATION_FRAME = 16,
@@ -92,12 +81,12 @@ class GMTextureFrames : public GMObject
 	DECLARE_PRIVATE(GMTextureFrames)
 
 public:
-	DECLARE_PROPERTY(FrameCount, frameCount, GMint);
-	DECLARE_PROPERTY(AnimationMs, animationMs, GMint);
-	DECLARE_PROPERTY(MagFilter, magFilter, GMS_TextureFilter);
-	DECLARE_PROPERTY(MinFilter, minFilter, GMS_TextureFilter);
-	DECLARE_PROPERTY(WrapS, wrapS, GMS_Wrap);
-	DECLARE_PROPERTY(WrapT, wrapT, GMS_Wrap);
+	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMint);
+	GM_DECLARE_PROPERTY(AnimationMs, animationMs, GMint);
+	GM_DECLARE_PROPERTY(MagFilter, magFilter, GMS_TextureFilter);
+	GM_DECLARE_PROPERTY(MinFilter, minFilter, GMS_TextureFilter);
+	GM_DECLARE_PROPERTY(WrapS, wrapS, GMS_Wrap);
+	GM_DECLARE_PROPERTY(WrapT, wrapT, GMS_Wrap);
 
 public:
 	GMTextureFrames()
@@ -230,47 +219,13 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMLight)
+// 光照参数
+GM_ALIGNED_STRUCT(GMMaterial)
 {
 	GMfloat shininess = 0;
-	bool enabled = false;
-	bool useGlobalLightColor = false; // true表示使用全局的光的颜色
-	linear_math::Vector3 lightPosition;
-	linear_math::Vector3 lightColor;
 	linear_math::Vector3 ka;
 	linear_math::Vector3 ks;
 	linear_math::Vector3 kd;
-};
-
-class GMLight : public GMObject
-{
-	DECLARE_PRIVATE(GMLight)
-
-public:
-	DECLARE_PROPERTY(LightPosition, lightPosition, linear_math::Vector3);
-	DECLARE_PROPERTY(LightColor, lightColor, linear_math::Vector3);
-	DECLARE_PROPERTY(Ka, ka, linear_math::Vector3);
-	DECLARE_PROPERTY(Ks, ks, linear_math::Vector3);
-	DECLARE_PROPERTY(Kd, kd, linear_math::Vector3);
-	DECLARE_PROPERTY(Shininess, shininess, GMfloat);
-	DECLARE_PROPERTY(Enabled, enabled, bool);
-	DECLARE_PROPERTY(UseGlobalLightColor, useGlobalLightColor, bool);
-	
-	inline GMLight& operator=(const GMLight& rhs)
-	{
-		D(d);
-		D_OF(rhs_d, &rhs);
-		*d = *rhs_d;
-		return *this;
-	}
-};
-
-enum LightType
-{
-	LT_BEGIN = 0,
-	LT_AMBIENT = 0,
-	LT_SPECULAR,
-	LT_END,
 };
 
 GM_PRIVATE_OBJECT(Shader)
@@ -280,7 +235,6 @@ GM_PRIVATE_OBJECT(Shader)
 	GMS_FrontFace frontFace = GMS_FrontFace::COUNTER_CLOCKWISE;
 	GMS_BlendFunc blendFactorSrc = GMS_BlendFunc::ZERO;
 	GMS_BlendFunc blendFactorDest = GMS_BlendFunc::ZERO;
-	GMLight lights[LT_END];
 	bool blend = false;
 	bool nodraw = false;
 	bool noDepthTest = false;
@@ -288,6 +242,7 @@ GM_PRIVATE_OBJECT(Shader)
 	GMfloat lineWidth = 1;
 	linear_math::Vector3 lineColor;
 	GMTexture texture;
+	GMMaterial material;
 };
 
 class Shader : public GMObject
@@ -302,30 +257,24 @@ public:
 	}
 
 public:
-	DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);
-	DECLARE_PROPERTY(Cull, cull, GMS_Cull);
-	DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
-	DECLARE_PROPERTY(BlendFactorSource, blendFactorSrc, GMS_BlendFunc);
-	DECLARE_PROPERTY(BlendFactorDest, blendFactorDest, GMS_BlendFunc);
-	DECLARE_PROPERTY(Blend, blend, bool);
-	DECLARE_PROPERTY(Nodraw, nodraw, bool);
-	DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
-	DECLARE_PROPERTY(Texture, texture, GMTexture);
-	DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
-	DECLARE_PROPERTY(LineColor, lineColor, linear_math::Vector3);
-	DECLARE_PROPERTY(DrawBorder, drawBorder, bool);
-	
-	inline GMLight& getLight(LightType type) { D(d); return d->lights[type]; }
-	inline void setLight(LightType type, const GMLight& light) { D(d); d->lights[type] = light; }
+	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);
+	GM_DECLARE_PROPERTY(Cull, cull, GMS_Cull);
+	GM_DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
+	GM_DECLARE_PROPERTY(BlendFactorSource, blendFactorSrc, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(BlendFactorDest, blendFactorDest, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(Blend, blend, bool);
+	GM_DECLARE_PROPERTY(Nodraw, nodraw, bool);
+	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
+	GM_DECLARE_PROPERTY(Texture, texture, GMTexture);
+	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
+	GM_DECLARE_PROPERTY(LineColor, lineColor, linear_math::Vector3);
+	GM_DECLARE_PROPERTY(DrawBorder, drawBorder, bool);
+	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
 
 	inline Shader& operator=(const Shader& rhs)
 	{
 		D(d);
 		*d = *rhs.data();
-		for (GMint i = LT_BEGIN; i < LT_END; i++)
-		{
-			d->lights[i] = rhs.data()->lights[i];
-		}
 		return *this;
 	}
 

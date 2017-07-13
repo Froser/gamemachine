@@ -10,7 +10,6 @@ GMGameWorld::GMGameWorld()
 {
 	D(d);
 	d->start = false;
-	memset(&d->graphicEnv, 0, sizeof(d->graphicEnv));
 }
 
 GMGameWorld::~GMGameWorld()
@@ -30,7 +29,6 @@ void GMGameWorld::renderGameWorld()
 	D(d);
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 	engine->newFrame();
-	engine->setEnvironment(d->graphicEnv);
 }
 
 void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
@@ -63,17 +61,6 @@ void GMGameWorld::simulateGameWorld()
 
 	if (!d->start) // 第一次simulate
 		d->start = true;
-}
-
-void GMGameWorld::setDefaultAmbientLight(const GMLight& lightInfo)
-{
-	D(d);
-	d->graphicEnv.ambientLightColor[0] = lightInfo.getLightColor()[0];
-	d->graphicEnv.ambientLightColor[1] = lightInfo.getLightColor()[1];
-	d->graphicEnv.ambientLightColor[2] = lightInfo.getLightColor()[2];
-	d->graphicEnv.ambientK[0] = lightInfo.getKa()[0];
-	d->graphicEnv.ambientK[1] = lightInfo.getKa()[1];
-	d->graphicEnv.ambientK[2] = lightInfo.getKa()[2];
 }
 
 GMObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
