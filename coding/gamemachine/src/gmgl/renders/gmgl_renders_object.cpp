@@ -126,10 +126,6 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 	// 材质
 	activateMaterial(shader);
 
-	// 光照
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-	activateLight(engine->getLights());
-
 	// 应用Shader
 	activateShader();
 
@@ -192,6 +188,32 @@ void GMGLRenders_Object::end()
 {
 }
 
+void GMGLRenders_Object::activateLight(const GMLight& light, GMint lightIndex)
+{
+	D(d);
+	d->gmglShaderProgram->useProgram();
+
+	switch (light.getType())
+	{
+	case GMLightType::AMBIENT:
+		{
+			GMString unfAmbient = GMString(GMSHADER_AMBIENT_LIGHTS) + "[" + lightIndex + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
+			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
+		}
+		break;
+	case GMLightType::SPECULAR:
+		{
+			GMString unfAmbient = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + lightIndex + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
+			GMString unfPosition = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + lightIndex + "]" + GMSHADER_LIGHTS_LIGHTPOSITION;
+			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
+			d->gmglShaderProgram->setVec3(unfPosition, light.getLightPosition());
+		}
+		break;
+	default:
+		break;
+	}
+}
+
 void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
@@ -236,36 +258,6 @@ void GMGLRenders_Object::activateMaterial(const Shader& shader)
 	d->gmglShaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
 	d->gmglShaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
 	d->gmglShaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.shininess);
-}
-
-void GMGLRenders_Object::activateLight(const Vector<GMLight>& lights)
-{
-	D(d);
-	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-
-	for (auto& light : lights)
-	{
-		GMint id = lightId[(GMuint)light.getType()]++;
-		switch (light.getType())
-		{
-		case GMLightType::AMBIENT:
-		{
-			GMString unfAmbient = GMString(GMSHADER_AMBIENT_LIGHTS) + "[" + id + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
-			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
-		}
-		break;
-		case GMLightType::SPECULAR:
-		{
-			GMString unfAmbient = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + id + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
-			GMString unfPosition = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + id + "]" + GMSHADER_LIGHTS_LIGHTPOSITION;
-			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
-			d->gmglShaderProgram->setVec3(unfPosition, light.getLightPosition());
-		}
-		break;
-		default:
-			break;
-		}
-	}
 }
 
 void GMGLRenders_Object::drawDebug()

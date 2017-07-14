@@ -26,11 +26,11 @@ public:
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;
 	virtual void end() override;
+	virtual void activateLight(const GMLight& light, GMint lightIndex);
 
 protected:
 	void clearData();
 	void activateMaterial(const Shader& shader);
-	void activateLight(const Vector<GMLight>& lights);
 	void drawDebug();
 	bool drawTexture(GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);

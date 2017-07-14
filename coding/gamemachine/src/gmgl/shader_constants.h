@@ -17,8 +17,8 @@ BEGIN_NS
 #define		GMSHADER_DIFFUSE_TEXTURES			GMSHADER("diffuse_textures")
 #define		GMSHADER_NORMAL_MAPPING_TEXTURES	GMSHADER("normalmap_textures")
 #define		GMSHADER_LIGHTMAP_TEXTURES			GMSHADER("lightmap_textures")
-#define		GMSHADER_TEXTURES_SCROLL_S			".scrool_s"
-#define		GMSHADER_TEXTURES_SCROLL_T			".scrool_t"
+#define		GMSHADER_TEXTURES_SCROLL_S			".scroll_s"
+#define		GMSHADER_TEXTURES_SCROLL_T			".scroll_t"
 #define		GMSHADER_TEXTURES_SCALE_S			".scale_s"
 #define		GMSHADER_TEXTURES_SCALE_T			".scale_t"
 

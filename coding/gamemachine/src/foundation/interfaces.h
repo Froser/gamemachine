@@ -1,7 +1,5 @@
 ﻿#ifndef __INTERFACES_H__
 #define __INTERFACES_H__
-#include "vector.h"
-
 BEGIN_NS
 
 // 前置声明
@@ -141,7 +139,6 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
-	virtual Vector<GMLight> getLights() = 0;
 	virtual void addLight(const GMLight& light) = 0;
 };
 
@@ -159,6 +156,7 @@ struct IRender
 	virtual void endShader() = 0;
 	virtual void end() = 0;
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) = 0;
+	virtual void activateLight(const GMLight& light, GMint lightIndex) = 0;
 };
 
 

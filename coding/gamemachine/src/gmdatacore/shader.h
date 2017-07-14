@@ -224,8 +224,8 @@ GM_ALIGNED_STRUCT(GMMaterial)
 {
 	GMfloat shininess = 0;
 	linear_math::Vector3 ka = 1;
-	linear_math::Vector3 ks = 1;
-	linear_math::Vector3 kd = 1;
+	linear_math::Vector3 ks = 0;
+	linear_math::Vector3 kd = 0;
 };
 
 GM_PRIVATE_OBJECT(Shader)

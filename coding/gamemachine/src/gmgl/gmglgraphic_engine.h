@@ -19,6 +19,7 @@ GM_INTERFACE(IShaderLoadCallback)
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
+	bool needRefreshLights = true;
 	Vector<GMLight> lights;
 	Map<GMMeshType, GMGLShaderProgram*> allShaders;
 	Map<GMMeshType, IRender*> allRenders;
@@ -44,7 +45,6 @@ public:
 	virtual void drawObject(GMGameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
-	virtual Vector<GMLight> getLights() override;
 	virtual void addLight(const GMLight& light) override;
 
 public:
@@ -59,6 +59,7 @@ private:
 	void drawObjectOnce(GMGameObject* object);
 	void installShaders();
 	bool loadDefaultShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram);
+	void activateLight(const Vector<GMLight>& lights);
 };
 
 END_NS

@@ -40,10 +40,19 @@ void import_worldspawn(const GMBSPEntity& entity, GMBSPGameWorld* world)
 		}
 	}
 	*/
-	GMLight ambientLight(GMLightType::AMBIENT);
-	GMfloat lightColor[] = { .5f, .5f, .5f };
-	ambientLight.setLightColor(lightColor);
-	world->addLight(ambientLight);
+	{
+		GMLight ambientLight(GMLightType::AMBIENT);
+		GMfloat lightColor[] = { .9f, .9f, .9f };
+		ambientLight.setLightColor(lightColor);
+		world->addLight(ambientLight);
+	}
+
+	{
+		GMLight specularLight(GMLightType::SPECULAR);
+		GMfloat lightColor[] = { 1, 1, 1 };
+		specularLight.setLightColor(lightColor);
+		world->addLight(specularLight);
+	}
 }
 
 void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* world)

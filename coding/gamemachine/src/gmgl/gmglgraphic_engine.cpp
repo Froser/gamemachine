@@ -42,6 +42,7 @@ void GMGLGraphicEngine::start()
 void GMGLGraphicEngine::newFrame()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glDepthFunc(GL_LEQUAL);
 }
 
 void GMGLGraphicEngine::setViewport(const GMRect& rect)
@@ -51,7 +52,16 @@ void GMGLGraphicEngine::setViewport(const GMRect& rect)
 
 void GMGLGraphicEngine::drawObject(GMGameObject* object)
 {
-	glDepthFunc(GL_LEQUAL);
+	D(d);
+	if (d->needRefreshLights)
+	{
+		d->needRefreshLights = false;
+
+		// 光照
+		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+		activateLight(d->lights);
+	}
+
 	drawObjectOnce(object);
 }
 
@@ -126,6 +136,22 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	return flag;
 }
 
+void GMGLGraphicEngine::activateLight(const Vector<GMLight>& lights)
+{
+	D(d);
+	GM_FOREACH_ENUM(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
+	{
+		IRender* render = getRender(type);
+		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+
+		for (auto& light : lights)
+		{
+			GMint id = lightId[(GMuint)light.getType()]++;
+			render->activateLight(light, id);
+		}
+	}
+}
+
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
 	D(d);
@@ -191,14 +217,9 @@ ResourceContainer* GMGLGraphicEngine::getResourceContainer()
 	return &d->resourceContainer;
 }
 
-Vector<GMLight> GMGLGraphicEngine::getLights()
-{
-	D(d);
-	return d->lights;
-}
-
 void GMGLGraphicEngine::addLight(const GMLight& light)
 {
 	D(d);
 	d->lights.push_back(light);
+	d->needRefreshLights = true;
 }
