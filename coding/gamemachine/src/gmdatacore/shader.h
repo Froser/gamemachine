@@ -223,9 +223,9 @@ public:
 GM_ALIGNED_STRUCT(GMMaterial)
 {
 	GMfloat shininess = 0;
-	linear_math::Vector3 ka;
-	linear_math::Vector3 ks;
-	linear_math::Vector3 kd;
+	linear_math::Vector3 ka = 1;
+	linear_math::Vector3 ks = 1;
+	linear_math::Vector3 kd = 1;
 };
 
 GM_PRIVATE_OBJECT(Shader)
@@ -240,7 +240,7 @@ GM_PRIVATE_OBJECT(Shader)
 	bool noDepthTest = false;
 	bool drawBorder = false;
 	GMfloat lineWidth = 1;
-	linear_math::Vector3 lineColor;
+	linear_math::Vector3 lineColor = 0;
 	GMTexture texture;
 	GMMaterial material;
 };
