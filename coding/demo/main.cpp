@@ -180,7 +180,7 @@ public:
 				rate.setMoveRate(MC_FORWARD, GMfloat(state.thumbLY) / SHRT_MAX);
 			}
 
-			if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER)
+			if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 				moveTag |= MC_JUMP;
 
 			if (kbState.keyTriggered('V'))

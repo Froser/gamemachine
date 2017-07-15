@@ -56,7 +56,7 @@ public:
 	GMMoveRate& operator = (const GMMoveRate& rhs)
 	{
 		D(d);
-		memcpy(d, rhs.data(), sizeof(rhs.data()));
+		memcpy(d, rhs.data(), sizeof(*rhs.data()));
 		return *this;
 	}
 };
