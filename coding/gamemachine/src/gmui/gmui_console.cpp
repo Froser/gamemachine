@@ -307,14 +307,14 @@ void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMin
 void GMUIConsole::update()
 {
 	// 在这里更新绘制数据
-	static CONST_EXPR GMlong colors[] = {
+	static constexpr GMlong colors[] = {
 		0x0033FF,
 		0x00CC00,
 		0x00CCFF,
 		0x6600CC,
 	};
-	static CONST_EXPR decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
-	static CONST_EXPR GMint magnification = 5000;
+	static constexpr decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
+	static constexpr GMint magnification = 5000;
 	GM_PROFILE_RESET_TIMELINE();
 
 	D(d);

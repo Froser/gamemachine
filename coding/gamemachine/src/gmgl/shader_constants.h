@@ -1,6 +1,9 @@
 ﻿#ifndef __SHADER_CONSTAINS_H__
 #define __SHADER_CONSTAINS_H__
 #include "common.h"
+#include "gmdatacore/shader.h"
+#include "foundation/assert.h"
+
 BEGIN_NS
 
 #define		GMSHADER(memberName)			"GM_" memberName
@@ -13,18 +16,20 @@ BEGIN_NS
 #define		GMSHADER_VIEW_POSITION				GMSHADER("view_position")
 
 //纹理
-#define		GMSHADER_AMBIENT_TEXTURES			GMSHADER("ambient_textures")
-#define		GMSHADER_DIFFUSE_TEXTURES			GMSHADER("diffuse_textures")
-#define		GMSHADER_NORMAL_MAPPING_TEXTURES	GMSHADER("normalmap_textures")
-#define		GMSHADER_LIGHTMAP_TEXTURES			GMSHADER("lightmap_textures")
+#define		GMSHADER_AMBIENT_TEXTURES(i)		GMSHADER("ambient_textures") "[" #i "]"
+#define		GMSHADER_DIFFUSE_TEXTURES(i)		GMSHADER("diffuse_textures") "[" #i "]"
+#define		GMSHADER_NORMALMAP_TEXTURES(i)		GMSHADER("normalmap_textures") "[" #i "]"
+#define		GMSHADER_LIGHTMAP_TEXTURES(i)		GMSHADER("lightmap_textures") "[" #i "]"
+#define		GMSHADER_TEXTURES_TEXTURE			".texture"
+#define		GMSHADER_TEXTURES_ENABLED			".enabled"
 #define		GMSHADER_TEXTURES_SCROLL_S			".scroll_s"
 #define		GMSHADER_TEXTURES_SCROLL_T			".scroll_t"
 #define		GMSHADER_TEXTURES_SCALE_S			".scale_s"
 #define		GMSHADER_TEXTURES_SCALE_T			".scale_t"
 
 //光照
-#define		GMSHADER_AMBIENT_LIGHTS				GMSHADER("ambients")
-#define		GMSHADER_SPECULAR_LIGHTS			GMSHADER("speculars")
+#define		GMSHADER_AMBIENT_LIGHTS(i)			GMSHADER("ambients") "[" #i "]"
+#define		GMSHADER_SPECULAR_LIGHTS(i)			GMSHADER("speculars") "[" #i "]"
 #define		GMSHADER_LIGHTS_LIGHTCOLOR			".lightColor"
 #define		GMSHADER_LIGHTS_LIGHTPOSITION		".lightPosition"
 
@@ -36,6 +41,83 @@ BEGIN_NS
 
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
+
+// 获取名称辅助函数
+// 字符串拼接太慢，因此采用一些预设的字符串
+
+constexpr GMint GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
+constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
+
+inline const char* getTextureUniformName(GMTextureType t, GMint index)
+{
+	ASSERT(index < GMMaxTextureCount(t));
+	switch (t)
+	{
+	case GMTextureType::AMBIENT:
+		return index == 0 ? GMSHADER_AMBIENT_TEXTURES(0) :
+			index == 1 ? GMSHADER_AMBIENT_TEXTURES(1) :
+			index == 2 ? GMSHADER_AMBIENT_TEXTURES(2) : "";
+	case GMTextureType::DIFFUSE:
+		return index == 0 ? GMSHADER_DIFFUSE_TEXTURES(0) :
+			index == 1 ? GMSHADER_DIFFUSE_TEXTURES(1) :
+			index == 2 ? GMSHADER_DIFFUSE_TEXTURES(2) : "";
+	case GMTextureType::NORMALMAP:
+		return index == 0 ? GMSHADER_NORMALMAP_TEXTURES(0) :
+			index == 1 ? GMSHADER_NORMALMAP_TEXTURES(1) :
+			index == 2 ? GMSHADER_NORMALMAP_TEXTURES(2) : "";
+	case GMTextureType::LIGHTMAP:
+		return index == 0 ? GMSHADER_LIGHTMAP_TEXTURES(0) :
+			index == 1 ? GMSHADER_LIGHTMAP_TEXTURES(1) :
+			index == 2 ? GMSHADER_LIGHTMAP_TEXTURES(2) : "";
+	case GMTextureType::END:
+	default:
+		ASSERT(false);
+		break;
+	}
+	return "";
+}
+
+inline const char* getLightUniformName(GMLightType t, GMint index)
+{
+	ASSERT(index < GMGL_MAX_LIGHT_COUNT);
+	switch (t)
+	{
+	case GMLightType::AMBIENT:
+		return index == 0 ? GMSHADER_AMBIENT_LIGHTS(0) :
+			index == 1 ? GMSHADER_AMBIENT_LIGHTS(1) :
+			index == 2 ? GMSHADER_AMBIENT_LIGHTS(2) :
+			index == 3 ? GMSHADER_AMBIENT_LIGHTS(3) :
+			index == 4 ? GMSHADER_AMBIENT_LIGHTS(4) :
+			index == 5 ? GMSHADER_AMBIENT_LIGHTS(5) :
+			index == 6 ? GMSHADER_AMBIENT_LIGHTS(6) :
+			index == 7 ? GMSHADER_AMBIENT_LIGHTS(7) :
+			index == 8 ? GMSHADER_AMBIENT_LIGHTS(8) :
+			index == 9 ? GMSHADER_AMBIENT_LIGHTS(9) :
+			index == 10 ? GMSHADER_AMBIENT_LIGHTS(10) : "";
+	case GMLightType::SPECULAR:
+		return index == 0 ? GMSHADER_SPECULAR_LIGHTS(0) :
+			index == 1 ? GMSHADER_SPECULAR_LIGHTS(1) :
+			index == 2 ? GMSHADER_SPECULAR_LIGHTS(2) :
+			index == 3 ? GMSHADER_SPECULAR_LIGHTS(3) :
+			index == 4 ? GMSHADER_SPECULAR_LIGHTS(4) :
+			index == 5 ? GMSHADER_SPECULAR_LIGHTS(5) :
+			index == 6 ? GMSHADER_SPECULAR_LIGHTS(6) :
+			index == 7 ? GMSHADER_SPECULAR_LIGHTS(7) :
+			index == 8 ? GMSHADER_SPECULAR_LIGHTS(8) :
+			index == 9 ? GMSHADER_SPECULAR_LIGHTS(9) :
+			index == 10 ? GMSHADER_SPECULAR_LIGHTS(10) : "";
+	default:
+		ASSERT(false);
+		break;
+	}
+	return "";
+}
+
+inline void combineUniform(REF char* dest, const char* srcA, const char* srcB)
+{
+	strcpy_s(dest, GMGL_MAX_UNIFORM_NAME_LEN, srcA);
+	strcat_s(dest, GMGL_MAX_UNIFORM_NAME_LEN, srcB);
+}
 
 END_NS
 #endif

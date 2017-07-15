@@ -148,7 +148,7 @@ enum class GMTextureType
 	END,
 };
 
-static CONST_EXPR GMint GMMaxTextureCount(GMTextureType type)
+static constexpr GMint GMMaxTextureCount(GMTextureType type)
 {
 	return
 		type == GMTextureType::AMBIENT ? 3 :

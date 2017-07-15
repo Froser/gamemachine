@@ -6,24 +6,8 @@
 #include "gmdatacore/object.h"
 #include <map>
 #include <string>
+#include "shader_constants.h"
 BEGIN_NS
-
-class GMGLTextureShaderNames
-{
-public:
-	GMGLTextureShaderNames();
-
-	GMString getName (GMTextureType type, GMint index = 0);
-
-private:
-	Map<GMTextureType, GMString> m_uniformNames;
-};
-
-inline GMString getTextureUniformName(GMTextureType t, GMint index)
-{
-	static GMGLTextureShaderNames s;
-	return s.getName(t, index);
-}
 
 class GMGLTexture : public ITexture
 {

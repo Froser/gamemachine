@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "gmglshaderprogram.h"
 
+GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
+
 GMGLShaderProgram::~GMGLShaderProgram()
 {
 	D(d);
@@ -11,7 +13,11 @@ GMGLShaderProgram::~GMGLShaderProgram()
 void GMGLShaderProgram::useProgram()
 {
 	D(d);
+	if (d->lastUsedProgram == d->shaderProgram)
+		return;
+
 	glUseProgram(d->shaderProgram);
+	d->lastUsedProgram = d->shaderProgram;
 	GLint i = glGetError();
 	ASSERT_GL();
 }
@@ -20,6 +26,36 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 {
 	D(d);
 	d->shaderInfos.push_back(shaderCfgs);
+}
+
+void GMGLShaderProgram::setMatrix4(const char* name, const GMfloat value[16])
+{
+	glUniformMatrix4fv(glGetUniformLocation(getProgram(), name), 1, GL_FALSE, value);
+}
+
+void GMGLShaderProgram::setVec4(const char* name, const GMfloat value[4])
+{
+	glUniform4fv(glGetUniformLocation(getProgram(), name), 1, value);
+}
+
+void GMGLShaderProgram::setVec3(const char* name, const GMfloat value[3])
+{
+	glUniform3fv(glGetUniformLocation(getProgram(), name), 1, value);
+}
+
+void GMGLShaderProgram::setInt(const char* name, GMint value)
+{
+	glUniform1i(glGetUniformLocation(getProgram(), name), value);
+}
+
+void GMGLShaderProgram::setFloat(const char* name, GMfloat value)
+{
+	glUniform1f(glGetUniformLocation(getProgram(), name), value);
+}
+
+void GMGLShaderProgram::setBool(const char* name, bool value)
+{
+	setInt(name, (GMint)value);
 }
 
 void GMGLShaderProgram::setMatrix4(const GMString& name, const GMfloat value[16])

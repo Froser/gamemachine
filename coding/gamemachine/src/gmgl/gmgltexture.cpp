@@ -4,20 +4,6 @@
 #include "shader_constants.h"
 #include "gmdatacore/object.h"
 
-GMGLTextureShaderNames::GMGLTextureShaderNames()
-{
-	m_uniformNames[GMTextureType::AMBIENT] = GMSHADER_AMBIENT_TEXTURES;
-	m_uniformNames[GMTextureType::DIFFUSE] = GMSHADER_DIFFUSE_TEXTURES;
-	m_uniformNames[GMTextureType::NORMALMAP] = GMSHADER_NORMAL_MAPPING_TEXTURES;
-	m_uniformNames[GMTextureType::LIGHTMAP] = GMSHADER_LIGHTMAP_TEXTURES;
-}
-
-GMString GMGLTextureShaderNames::getName(GMTextureType type, GMint index)
-{
-	ASSERT(m_uniformNames.find(type) != m_uniformNames.end());
-	return m_uniformNames[type] + "[" + index + "]";
-}
-
 GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)
 	: m_inited(false)
 {

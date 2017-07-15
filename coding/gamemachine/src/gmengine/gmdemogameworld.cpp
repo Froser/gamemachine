@@ -44,7 +44,7 @@ bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
 
 void GMDemoGameWorld::createCube(GMfloat extents[3], OUT GMGameObject** obj)
 {
-	static CONST_EXPR GMfloat v[24] = {
+	static constexpr GMfloat v[24] = {
 		1, -1, 1,
 		1, -1, -1,
 		-1, -1, 1,
@@ -54,7 +54,7 @@ void GMDemoGameWorld::createCube(GMfloat extents[3], OUT GMGameObject** obj)
 		-1, 1, 1,
 		-1, 1, -1,
 	};
-	static CONST_EXPR GMint indices[] = {
+	static constexpr GMint indices[] = {
 		0, 2, 1,
 		2, 3, 1,
 		4, 5, 6,
@@ -69,7 +69,7 @@ void GMDemoGameWorld::createCube(GMfloat extents[3], OUT GMGameObject** obj)
 		3, 7, 5,
 	};
 
-	static CONST_EXPR GMint borderIndices[] = {
+	static constexpr GMint borderIndices[] = {
 		0, 2, 3, 1,
 		4, 5, 7, 6,
 		0, 1, 5, 4,

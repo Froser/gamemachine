@@ -53,11 +53,11 @@ void GMGLGraphicEngine::setViewport(const GMRect& rect)
 void GMGLGraphicEngine::drawObject(GMGameObject* object)
 {
 	D(d);
+
+	// 光照一般只需要设置一次，除非光照被改变
 	if (d->needRefreshLights)
 	{
 		d->needRefreshLights = false;
-
-		// 光照
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 		activateLight(d->lights);
 	}

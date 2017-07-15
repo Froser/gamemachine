@@ -7,6 +7,12 @@
 #include "foundation/linearmath.h"
 #include "foundation/gamemachine.h"
 
+GMGLRenders_Object::GMGLRenders_Object()
+{
+	D(d);
+	d->engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
+}
+
 void GMGLRenders_Object::activateShader()
 {
 	D(d);
@@ -77,25 +83,13 @@ void GMGLRenders_Object::activateShader()
 	glLineWidth(shader->getLineWidth());
 }
 
-void GMGLRenders_Object::deactivateShader()
-{
-	D(d);
-	ASSERT(d->shader);
-	if (d->shader->getBlend())
-	{
-		glDepthMask(GL_TRUE);
-	}
-}
-
 void GMGLRenders_Object::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform)
 {
 	D(d);
-	clearData();
-	d->engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
 	d->mesh = mesh;
 	d->type = mesh->getType();
-	d->gmglShaderProgram = d->engine->getShaders(d->type);
-	d->gmglShaderProgram->useProgram();
+	d->shader = nullptr;
+	initShaderProgram();
 
 	if (modelTransform)
 		d->gmglShaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
@@ -147,7 +141,9 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 void GMGLRenders_Object::endShader()
 {
 	D(d);
-	deactivateShader();
+	if (d->shader->getBlend())
+		glDepthMask(GL_TRUE);
+
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
 	{
 		GMint count = GMMaxTextureCount(type);
@@ -158,12 +154,7 @@ void GMGLRenders_Object::endShader()
 	}
 
 	if (d->mode == GMDrawMode::Line)
-	{
-		// 还原所有线条Shader
-		glDisable(GL_POLYGON_OFFSET_LINE);
-		glPolygonOffset(0.f, 0.f);
 		d->shader->pop();
-	}
 }
 
 bool GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
@@ -197,16 +188,20 @@ void GMGLRenders_Object::activateLight(const GMLight& light, GMint lightIndex)
 	{
 	case GMLightType::AMBIENT:
 		{
-			GMString unfAmbient = GMString(GMSHADER_AMBIENT_LIGHTS) + "[" + lightIndex + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
-			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
+			const char* uniform = getLightUniformName(GMLightType::AMBIENT, lightIndex);
+			char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
+			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+			d->gmglShaderProgram->setVec3(u_color, light.getLightColor());
 		}
 		break;
 	case GMLightType::SPECULAR:
 		{
-			GMString unfAmbient = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + lightIndex + "]" + GMSHADER_LIGHTS_LIGHTCOLOR;
-			GMString unfPosition = GMString(GMSHADER_SPECULAR_LIGHTS) + "[" + lightIndex + "]" + GMSHADER_LIGHTS_LIGHTPOSITION;
-			d->gmglShaderProgram->setVec3(unfAmbient, light.getLightColor());
-			d->gmglShaderProgram->setVec3(unfPosition, light.getLightPosition());
+			const char* uniform = getLightUniformName(GMLightType::SPECULAR, lightIndex);
+			char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
+			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+			combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
+			d->gmglShaderProgram->setVec3(u_color, light.getLightColor());
+			d->gmglShaderProgram->setVec3(u_position, light.getLightPosition());
 		}
 		break;
 	default:
@@ -228,10 +223,12 @@ void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projecti
 	d->gmglShaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
 }
 
-void GMGLRenders_Object::clearData()
+void GMGLRenders_Object::initShaderProgram()
 {
 	D(d);
-	memset(&d, 0, sizeof(d));
+	if (!d->gmglShaderProgram)
+		d->gmglShaderProgram = d->engine->getShaders(d->type);
+	d->gmglShaderProgram->useProgram();
 }
 
 ITexture* GMGLRenders_Object::getTexture(GMTextureFrames& frames)
@@ -269,17 +266,20 @@ void GMGLRenders_Object::drawDebug()
 void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
-	auto uniform = getTextureUniformName(type, index);
+	const char* uniform = getTextureUniformName(type, index);
+	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
+		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
+		u_scales[GMGL_MAX_UNIFORM_NAME_LEN],
+		u_scalet[GMGL_MAX_UNIFORM_NAME_LEN];
 
-	const GMString SCROLL_S = uniform + GMSHADER_TEXTURES_SCROLL_S;
-	const GMString SCROLL_T = uniform + GMSHADER_TEXTURES_SCROLL_T;
-	const GMString SCALE_S = uniform + GMSHADER_TEXTURES_SCALE_S;
-	const GMString SCALE_T = uniform + GMSHADER_TEXTURES_SCALE_T;
-
-	d->gmglShaderProgram->setFloat(SCROLL_S, 0.f);
-	d->gmglShaderProgram->setFloat(SCROLL_T, 0.f);
-	d->gmglShaderProgram->setFloat(SCALE_S, 1.f);
-	d->gmglShaderProgram->setFloat(SCALE_T, 1.f);
+	combineUniform(u_scrolls, uniform, GMSHADER_TEXTURES_SCROLL_S);
+	combineUniform(u_scrollt, uniform, GMSHADER_TEXTURES_SCROLL_T);
+	combineUniform(u_scales, uniform, GMSHADER_TEXTURES_SCALE_S);
+	combineUniform(u_scalet, uniform, GMSHADER_TEXTURES_SCALE_T);
+	d->gmglShaderProgram->setFloat(u_scrolls, 0.f);
+	d->gmglShaderProgram->setFloat(u_scrollt, 0.f);
+	d->gmglShaderProgram->setFloat(u_scales, 1.f);
+	d->gmglShaderProgram->setFloat(u_scalet, 1.f);
 
 	GMuint n = 0;
 	const GMS_TextureMod* tc = &d->shader->getTexture().getTextureFrames(type, index).getTexMod(n);
@@ -290,15 +290,15 @@ void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint inde
 		case GMS_TextureModType::SCROLL:
 		{
 			GMfloat s = GameMachine::instance().getGameTimeSeconds() * tc->p1, t = GameMachine::instance().getGameTimeSeconds() * tc->p2;
-			d->gmglShaderProgram->setFloat(SCROLL_T, t);
-			d->gmglShaderProgram->setFloat(SCROLL_T, s);
+			d->gmglShaderProgram->setFloat(u_scrollt, t);
+			d->gmglShaderProgram->setFloat(u_scrollt, s);
 		}
 		break;
 		case GMS_TextureModType::SCALE:
 		{
 			GMfloat s = tc->p1, t = tc->p2;
-			d->gmglShaderProgram->setFloat(SCALE_T, t);
-			d->gmglShaderProgram->setFloat(SCALE_T, s);
+			d->gmglShaderProgram->setFloat(u_scales, t);
+			d->gmglShaderProgram->setFloat(u_scales, s);
 			break;
 		}
 		default:
@@ -317,9 +317,12 @@ void GMGLRenders_Object::activateTexture(GMTextureType type, GMint index)
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
-	auto uniform = getTextureUniformName(type, index);
-	d->gmglShaderProgram->setInt(uniform + ".texture", texId);
-	d->gmglShaderProgram->setInt(uniform + ".enabled", 1);
+	const char* uniform = getTextureUniformName(type, index);
+	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
+	combineUniform(u_texture, uniform, GMSHADER_TEXTURES_TEXTURE);
+	combineUniform(u_enabled, uniform, GMSHADER_TEXTURES_ENABLED);
+	d->gmglShaderProgram->setInt(u_texture, texId);
+	d->gmglShaderProgram->setInt(u_enabled, 1);
 
 	activateTextureTransform(type, index);
 	glActiveTexture(tex);
@@ -333,9 +336,10 @@ void GMGLRenders_Object::deactivateTexture(GMTextureType type, GMint index)
 	getTextureID(type, index, tex, texId);
 
 	GMint idx = (GMint)type;
-	auto uniform = getTextureUniformName(type, index);
-	d->gmglShaderProgram->setInt(uniform + ".enabled", 0);
-	glActiveTexture(tex);
+	const char* uniform = getTextureUniformName(type, index);
+	char u[GMGL_MAX_UNIFORM_NAME_LEN];
+	combineUniform(u, uniform, GMSHADER_TEXTURES_ENABLED);
+	d->gmglShaderProgram->setInt(u, 0);
 }
 
 void GMGLRenders_Object::getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId)

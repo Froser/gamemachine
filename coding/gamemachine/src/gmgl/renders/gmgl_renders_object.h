@@ -8,17 +8,20 @@ BEGIN_NS
 class GMGLGraphicEngine;
 GM_PRIVATE_OBJECT(GMGLRenders_Object)
 {
-	GMGLGraphicEngine* engine;
-	GMMesh* mesh;
+	GMGLGraphicEngine* engine = nullptr;
+	GMMesh* mesh = nullptr;
+	Shader* shader = nullptr;
+	GMGLShaderProgram* gmglShaderProgram = nullptr;
 	GMMeshType type;
-	Shader* shader;
 	GMDrawMode mode;
-	GMGLShaderProgram* gmglShaderProgram;
 };
 
 class GMGLRenders_Object : public GMObject, public IRender
 {
 	DECLARE_PRIVATE(GMGLRenders_Object)
+
+public:
+	GMGLRenders_Object();
 
 public:
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override;
@@ -29,7 +32,7 @@ public:
 	virtual void activateLight(const GMLight& light, GMint lightIndex);
 
 protected:
-	void clearData();
+	void initShaderProgram();
 	void activateMaterial(const Shader& shader);
 	void drawDebug();
 	bool drawTexture(GMTextureType type, GMint index = 0);
@@ -38,7 +41,6 @@ protected:
 	void activateTexture(GMTextureType type, GMint index);
 	void deactivateTexture(GMTextureType type, GMint index);
 	void activateShader();
-	void deactivateShader();
 	void getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId);
 };
 
