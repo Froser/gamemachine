@@ -11,7 +11,7 @@ struct ImageMipData
 	GMint height;
 	GMint depth;
 	GLsizeiptr mipStride;
-	GMbyte* data;
+	GMbyte* data = nullptr;
 };
 
 // This is the main image data structure. It contains all the parameters needed
