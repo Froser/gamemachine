@@ -6,6 +6,7 @@
 #include "gmimagereader_png.h"
 #include "gmimagereader_tga.h"
 #include "gmimagereader_jpg.h"
+#include "foundation/vector.h"
 
 class GMImageReaderContainer
 {
@@ -34,7 +35,7 @@ public:
 	}
 
 private:
-	std::map<GMImageReader::ImageType, IImageReader*> m_readers;
+	Map<GMImageReader::ImageType, IImageReader*> m_readers;
 };
 
 bool GMImageReader::load(const GMbyte* data, GMuint size, OUT GMImage** image)

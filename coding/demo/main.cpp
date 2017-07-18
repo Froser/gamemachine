@@ -18,6 +18,7 @@
 #include "gmui/gmui_glwindow.h"
 #include "gmengine/gmdemogameworld.h"
 #include "gmengine/gmspritegameobject.h"
+#include "gmdatacore/imagereader/gmimagereader.h"
 
 using namespace gm;
 
@@ -285,17 +286,32 @@ private:
 
 	virtual void start()
 	{
+		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+		auto container = engine->getResourceContainer();
+		auto& textureContainer = container->getTextureContainer();
+
+		auto gp = GameMachine::instance().getGamePackageManager();
+		gp->loadPackage("D://gmpk");
+
+		GMImage* img;
+		GMBuffer buf;
+		gp->readFile(PI_TEXTURES, "bnp.png", &buf);
+		GMImageReader::load(buf.buffer, buf.size, &img);
+
+		ITexture* tex;
+		factory.createTexture(img, &tex);
+
+		TextureContainer::TextureItemType item = { "", tex };
+		textureContainer.insert(item);
+
 		demo = new GMDemoGameWorld();
 		GMGameObject* obj;
 		GMfloat extents[] = { .25f, .25f, .25f };
-		demo->createCube(extents, &obj);
+		demo->createPlane(extents, &obj);
 
 		Object* core = obj->getObject();
 		Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
 		shader.setCull(GMS_Cull::CULL);
-		shader.setLineWidth(5);
-		shader.setDrawBorder(true);
-		shader.setLineColor(linear_math::Vector3(1.f, .5f, .2f));
 
 		shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
 		shader.getMaterial().ks = linear_math::Vector3(.1f, .2f, .3f);
@@ -303,33 +319,35 @@ private:
 		shader.getMaterial().shininess = 20;
 
 		{
+			auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
+			frames.setOneFrame(0, tex);
+			frames.setFrameCount(1);
+		}
+
+		{
+			auto& frames = shader.getTexture().getTextureFrames(GMTextureType::DIFFUSE, 0);
+			frames.setOneFrame(0, tex);
+			frames.setFrameCount(1);
+		}
+
+		{
 			GMLight light(GMLightType::SPECULAR);
 			GMfloat pos[] = { 0, 0, .2f };
 			light.setLightPosition(pos);
-			GMfloat color[] = { 1, .5f, 1 };
+			GMfloat color[] = { .7f, .7f, .7f };
 			light.setLightColor(color);
 			demo->addLight(light);
 		}
 
-		{
-			GMLight light(GMLightType::SPECULAR);
-			GMfloat pos[] = { 0, 1, 1 };
-			light.setLightPosition(pos);
-			GMfloat color[] = { 0, 1, 0 };
-			light.setLightColor(color);
-			demo->addLight(light);
-		}
-
-		{
-			GMLight light(GMLightType::AMBIENT);
-			GMfloat color[] = { .2f, .5f, 1 };
-			light.setLightColor(color);
-			demo->addLight(light);
-		}
+//		{
+//			GMLight light(GMLightType::AMBIENT);
+//			GMfloat color[] = { .4f, .4f, .4f };
+//			light.setLightColor(color);
+//			demo->addLight(light);
+//		}
 
 		demo->appendObject("cube", obj);
 
-		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
 		lookAt.position = { 0, 0, 1 };
@@ -351,6 +369,9 @@ private:
 			{
 				IInput* inputManager = GameMachine::instance().getInputManager();
 				IKeyboardState& kbState = inputManager->getKeyboardState();
+				if (kbState.keyTriggered('N'))
+					GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
+
 				if (kbState.keyTriggered('L'))
 					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
 
@@ -387,12 +408,6 @@ private:
 	GMDemoGameWorld* demo;
 	bool rotate = true;
 };
-
-int main()
-{
-	WinMain(NULL, NULL, NULL, 0);
-	return 0;
-}
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
