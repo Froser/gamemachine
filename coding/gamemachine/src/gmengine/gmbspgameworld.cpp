@@ -544,9 +544,6 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	ASSERT(obj);
-#if 0
-	vectorPushBack<GMGameObject*>(d->polygonFaceBuffer, obj);
-#endif
 	d->polygonFaceBuffer.push_back(obj);
 }
 
