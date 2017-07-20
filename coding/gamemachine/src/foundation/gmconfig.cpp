@@ -195,5 +195,6 @@ void GMConfig::initInternal()
 	setInt32(GMConfig_BuiltInOptions::POLYGON_LINE_MODE, 0);
 	setInt32(GMConfig_BuiltInOptions::DRAW_ONLY_SKY, 0);
 	setInt32(GMConfig_BuiltInOptions::DRAW_NORMAL, GMConfig_BuiltInOptions::DRAW_NORMAL_OFF);
+	setInt32(GMConfig_BuiltInOptions::DRAW_LIGHTMAP_ONLY, 0);
 	setInt32(GMConfig_BuiltInOptions::RUN_PROFILE, 0);
 }

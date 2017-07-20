@@ -35,7 +35,7 @@ protected:
 	void initShaderProgram();
 	void activateMaterial(const Shader& shader);
 	void drawDebug();
-	bool drawTexture(GMTextureType type, GMint index = 0);
+	void drawTexture(GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);
 	void activateTextureTransform(GMTextureType type, GMint index);
 	void activateTexture(GMTextureType type, GMint index);

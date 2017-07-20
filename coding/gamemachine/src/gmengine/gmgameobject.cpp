@@ -111,7 +111,8 @@ void GMGlyphObject::constructObject()
 	shader.setBlendFactorSource(GMS_BlendFunc::ONE);
 	shader.setBlendFactorDest(GMS_BlendFunc::ONE);
 
-	const GMWchar* p = d->text.c_str();
+	auto& str = d->text.toStdWString();
+	const GMWchar* p = str.c_str();
 	const GMfloat Z = 0;
 	GMfloat x = d->left, y = d->bottom;
 

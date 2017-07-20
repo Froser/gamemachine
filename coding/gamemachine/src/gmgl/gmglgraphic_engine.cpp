@@ -12,12 +12,6 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfig.h"
 
-GMGLGraphicEngine::GMGLGraphicEngine()
-{
-	D(d);
-	d->settings = nullptr;
-}
-
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);

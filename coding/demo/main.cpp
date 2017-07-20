@@ -191,7 +191,8 @@ public:
 
 			if (kbState.keyTriggered('N'))
 				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
-
+			if (kbState.keyTriggered('M'))
+				GMSetBuiltIn(DRAW_LIGHTMAP_ONLY, !GMGetBuiltIn(DRAW_LIGHTMAP_ONLY));
 			if (kbState.keyTriggered('I'))
 				GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
 

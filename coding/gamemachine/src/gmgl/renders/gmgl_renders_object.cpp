@@ -129,8 +129,7 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
 		{
-			if (!drawTexture((GMTextureType)type, i))
-				break;
+			drawTexture((GMTextureType)type, i);
 		}
 	}
 
@@ -157,9 +156,12 @@ void GMGLRenders_Object::endShader()
 		d->shader->pop();
 }
 
-bool GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
+void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
 {
 	D(d);
+	if (GMGetBuiltIn(DRAW_LIGHTMAP_ONLY) && type != GMTextureType::LIGHTMAP)
+		return;
+
 	// 按照贴图类型选择纹理动画序列
 	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, index);
 
@@ -170,9 +172,7 @@ bool GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
 		// 激活动画序列
 		activateTexture((GMTextureType)type, index);
 		texture->drawTexture(&textures);
-		return true;
 	}
-	return false;
 }
 
 void GMGLRenders_Object::end()

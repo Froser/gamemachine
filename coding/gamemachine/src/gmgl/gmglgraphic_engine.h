@@ -25,7 +25,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Map<GMMeshType, IRender*> allRenders;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
-	GraphicSettings* settings;
+	GraphicSettings* settings = nullptr;
 	linear_math::Matrix4x4 viewMatrix;
 	linear_math::Matrix4x4 projectionMatrix;
 };
@@ -35,7 +35,7 @@ class GMGLGraphicEngine : public GMObject, public IGraphicEngine
 	DECLARE_PRIVATE(GMGLGraphicEngine)
 
 public:
-	GMGLGraphicEngine();
+	GMGLGraphicEngine() = default;
 	virtual ~GMGLGraphicEngine();
 
 public:

@@ -66,8 +66,8 @@ struct GlyphProperties
 
 GM_PRIVATE_OBJECT(GMGlyphObject)
 {
-	std::wstring lastRenderText;
-	std::wstring text;
+	GMString lastRenderText;
+	GMString text;
 	GlyphProperties properties;
 	GMfloat left, bottom, width, height;
 	ITexture* texture;
