@@ -53,8 +53,6 @@ uniform int GM_debug_draw_normal;
 
 // 相机视角法向量
 vec3 g_normal_eye;
-// 法线贴图向量
-vec3 g_normal_tangent;
 // ShadowMap的阴影系数，如果没有ShadowMap则为1
 float g_shadeFactor = 0;
 vec3 g_ambientLight;
@@ -138,7 +136,7 @@ void calcLights()
 	}
 	else
 	{
-		g_normal_tangent = texture(GM_normalmap_textures[0].texture, _uv).rgb * 2.0 - 1.0;
+		vec3 normal_tangent = texture(GM_normalmap_textures[0].texture, _uv).rgb * 2.0 - 1.0;
 		vec3 tangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
 		vec3 bitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
 		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
@@ -153,7 +151,7 @@ void calcLights()
 			vec3 lightDirection_tangent = TBN * lightDirection_eye;
 			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
 
-			calcDiffuseAndSpecular(GM_speculars[i], lightDirection_tangent, eyeDirection_tangent, g_normal_tangent);
+			calcDiffuseAndSpecular(GM_speculars[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
 		}
 	}
 
@@ -199,13 +197,6 @@ void calcColor()
 		frag_color = vec4((_normal.xyz + 1.f) / 2.f, 1.f);
 		return;
 	}
-	else if (GM_debug_draw_normal == 3)
-	{
-		// 画世界视角的法向量
-		frag_color = vec4((g_normal_tangent.xyz + 1.f) / 2.f, 1.f);
-		return;
-	}
-
 	vec3 diffuseTextureColor = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
 	vec3 ambientTextureColor = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) *
 		calcTexture(GM_lightmap_textures, _lightmapuv, 1);

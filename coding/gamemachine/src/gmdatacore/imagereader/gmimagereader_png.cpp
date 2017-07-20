@@ -128,7 +128,7 @@ bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 bool GMImageReader_PNG::test(const GMbyte* data)
 {
 	const PNGTestHeader* header = reinterpret_cast<const PNGTestHeader*>(data);
-	return header->magic1 == 1196314761 && header->magic2 == 169478669;
+	return header && header->magic1 == 1196314761 && header->magic2 == 169478669;
 }
 
 void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size)

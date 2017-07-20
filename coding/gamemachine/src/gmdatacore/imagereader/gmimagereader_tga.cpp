@@ -366,7 +366,7 @@ bool GMImageReader_TGA::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 
 bool GMImageReader_TGA::test(const GMbyte* data)
 {
-	return data[0] == 0 && data[1] == 0;
+	return data && data[0] == 0 && data[1] == 0;
 }
 
 void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)

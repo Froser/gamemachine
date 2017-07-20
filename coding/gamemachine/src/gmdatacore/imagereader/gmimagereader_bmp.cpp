@@ -116,7 +116,7 @@ bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT GMImage** img)
 bool GMImageReader_BMP::test(const GMbyte* byte)
 {
 	const BitmapHeader* header = reinterpret_cast<const BitmapHeader*>(byte);
-	return header->bfType == 19778;
+	return header && header->bfType == 19778;
 }
 
 void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint size)

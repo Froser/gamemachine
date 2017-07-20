@@ -635,5 +635,5 @@ bool GMImageReader_DDS::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 bool GMImageReader_DDS::test(const GMbyte* data)
 {
 	const DDS_FILE_HEADER* file_header = reinterpret_cast<const DDS_FILE_HEADER*>(data);
-	return file_header->magic == DDS_MAGIC;
+	return file_header && file_header->magic == DDS_MAGIC;
 }

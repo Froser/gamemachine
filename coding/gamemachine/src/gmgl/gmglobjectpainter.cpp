@@ -63,7 +63,7 @@ void GMGLObjectPainter::transfer()
 		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize										, uvSize, mesh->uvs().data());
 		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize								, tangentSize, mesh->tangents().data());
 		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize				, bitangentSize, mesh->bitangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + lightmapSize	, lightmapSize, mesh->lightmaps().data());
+		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize, lightmapSize, mesh->lightmaps().data());
 		mesh->setBufferId(vbo);
 
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
@@ -71,7 +71,7 @@ void GMGLObjectPainter::transfer()
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize));
 		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize));
 		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize));
-		glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize + lightmapSize));
+		glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize + bitangentSize));
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
 		glEnableVertexAttribArray(2);
