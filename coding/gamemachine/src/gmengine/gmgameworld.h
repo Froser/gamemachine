@@ -40,6 +40,7 @@ public:
 
 private:
 	GMObjectPainter* createPainterForObject(GMGameObject* obj);
+	void simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects);
 };
 
 END_NS

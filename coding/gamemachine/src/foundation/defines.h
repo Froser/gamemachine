@@ -34,6 +34,12 @@
 #	endif
 #endif
 
+#if _MSC_VER
+#	define GM_NOVTABLE __declspec(novtable)
+#else
+#	define GM_NOVTABLE
+#endif
+
 // 整个GameMachine用到的宏定义
 #define BEGIN_NS namespace gm {
 #define END_NS }

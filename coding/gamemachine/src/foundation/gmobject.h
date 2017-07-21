@@ -134,6 +134,10 @@ class GMObject : public GMAlignmentObject, public IDispose
 public:
 	static void swapData(GMObject* a, GMObject* b);
 
+public:
+	GMObject() = default;
+	GMObject(GMObject&) = delete;
+
 private:
 	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();
 };

@@ -21,7 +21,6 @@ class GMDemoGameWorld : public GMGameWorld
 
 public:
 	GMDemoGameWorld();
-	~GMDemoGameWorld();
 
 public:
 	virtual void renderGameWorld() override;
@@ -29,8 +28,6 @@ public:
 
 public:
 	bool appendObject(const GMString& name, GMGameObject* obj);
-	void createCube(GMfloat extents[3], OUT GMGameObject** obj);
-	void createPlane(GMfloat extents[3], OUT GMGameObject** obj);
 	GMGameObject* getGameObject(const GMString& name);
 };
 

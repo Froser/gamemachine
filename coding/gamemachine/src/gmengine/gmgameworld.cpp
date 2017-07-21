@@ -43,21 +43,10 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 void GMGameWorld::simulateGameWorld()
 {
 	D(d);
-	// 仅仅对Entity和Sprite进行simulate
 	auto phyw = physicsWorld();
-	for (auto& gameObject : d->gameObjects[GMGameObjectType::Entity])
-	{
-		gameObject->simulate();
-		phyw->simulate(gameObject);
-		gameObject->updateAfterSimulate();
-	}
-
-	for (auto& gameObject : d->gameObjects[GMGameObjectType::Sprite])
-	{
-		gameObject->simulate();
-		phyw->simulate(gameObject);
-		gameObject->updateAfterSimulate();
-	}
+	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Entity]);
+	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Sprite]);
+	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Particles]);
 
 	if (!d->start) // 第一次simulate
 		d->start = true;
@@ -74,4 +63,14 @@ GMObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 	ASSERT(!obj->getObject()->getPainter());
 	obj->getObject()->setPainter(painter);
 	return painter;
+}
+
+void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects)
+{
+	std::for_each(gameObjects.cbegin(), gameObjects.cend(), [phyw](GMGameObject* gameObject) {
+		gameObject->simulate();
+		if (phyw)
+			phyw->simulate(gameObject);
+		gameObject->updateAfterSimulate();
+	});
 }

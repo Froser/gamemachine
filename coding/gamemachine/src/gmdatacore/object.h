@@ -149,6 +149,7 @@ enum class GMMeshType
 	MeshTypeBegin,
 	Normal = MeshTypeBegin,
 	Glyph,
+	Particles,
 	MeshTypeEnd,
 };
 
@@ -160,6 +161,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	AlignedVector<Object::DataType> tangents;
 	AlignedVector<Object::DataType> bitangents;
 	AlignedVector<Object::DataType> lightmaps;
+	AlignedVector<Object::DataType> colors; //顶点坐标，一般渲染不会用到这个，用于粒子绘制
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
 	AlignedVector<Component*> components;
@@ -191,6 +193,7 @@ public:
 	inline AlignedVector<Object::DataType>& tangents() { D(d); return d->tangents; }
 	inline AlignedVector<Object::DataType>& bitangents() { D(d); return d->bitangents; }
 	inline AlignedVector<Object::DataType>& lightmaps() { D(d); return d->lightmaps; }
+	inline AlignedVector<Object::DataType>& colors() { D(d); return d->colors; }
 	inline GMMeshType getType() { D(d); return d->type; }
 	inline void setType(GMMeshType type) { D(d); d->type = type; }
 	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }

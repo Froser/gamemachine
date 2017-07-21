@@ -24,6 +24,9 @@ template <typename T1, typename T2>
 using Map = std::map<T1, T2>;
 
 template <typename T>
+using Hash = std::hash<T>;
+
+template <typename T>
 using Set = std::set<T>;
 
 template <typename T>

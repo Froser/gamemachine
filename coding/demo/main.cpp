@@ -19,6 +19,8 @@
 #include "gmengine/gmdemogameworld.h"
 #include "gmengine/gmspritegameobject.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
+#include "gmengine/gmparticles.h"
+#include "foundation/utilities/gmprimitivecreator.h"
 
 using namespace gm;
 
@@ -254,6 +256,11 @@ public:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.frag", &fragBuf);
 			flag = true;
 			break;
+		case GMMeshType::Particles:
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "particles.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "particles.frag", &fragBuf);
+			flag = true;
+			break;
 		default:
 			flag = false;
 			break;
@@ -278,10 +285,16 @@ public:
 	GMGlyphObject* m_glyph;
 };
 
-class DemoGameHandler : public GameHandler
+class DemoGameHandler : public GameHandler, public IParticleHandler
 {
 public:
 	DemoGameHandler() {}
+
+public:
+	// IParticleHandler
+	virtual void update(GMParticleGameObject* particle) override
+	{
+	}
 
 private:
 
@@ -306,48 +319,53 @@ private:
 		textureContainer.insert(item);
 
 		demo = new GMDemoGameWorld();
-		GMGameObject* obj;
-		GMfloat extents[] = { .25f, .25f, .25f };
-		demo->createPlane(extents, &obj);
-
-		Object* core = obj->getObject();
-		Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
-		shader.setCull(GMS_Cull::CULL);
-
-		shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
-		shader.getMaterial().ks = linear_math::Vector3(.1f, .2f, .3f);
-		shader.getMaterial().ka = linear_math::Vector3(1, 1, 1);
-		shader.getMaterial().shininess = 20;
-
 		{
-			auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
-			frames.setOneFrame(0, tex);
-			frames.setFrameCount(1);
+			GMfloat extents[] = { .25f, .25f, .25f };
+			Object* coreObj;
+			GMPrimitiveCreator::createPlane(extents, &coreObj);
+			GMGameObject* obj = new GMGameObject(coreObj);
+
+			Object* core = obj->getObject();
+			Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
+			shader.setCull(GMS_Cull::CULL);
+
+			shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
+			shader.getMaterial().ks = linear_math::Vector3(.1f, .2f, .3f);
+			shader.getMaterial().ka = linear_math::Vector3(1, 1, 1);
+			shader.getMaterial().shininess = 20;
+
+			demo->appendObject("cube", obj);
+
+			{
+				auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
+				frames.setOneFrame(0, tex);
+				frames.setFrameCount(1);
+			}
+
+			{
+				auto& frames = shader.getTexture().getTextureFrames(GMTextureType::DIFFUSE, 0);
+				frames.setOneFrame(0, tex);
+				frames.setFrameCount(1);
+			}
+
+			{
+				GMLight light(GMLightType::SPECULAR);
+				GMfloat pos[] = { 0, 0, .2f };
+				light.setLightPosition(pos);
+				GMfloat color[] = { .7f, .7f, .7f };
+				light.setLightColor(color);
+				demo->addLight(light);
+			}
+
 		}
 
+		Object* coreParticle;
 		{
-			auto& frames = shader.getTexture().getTextureFrames(GMTextureType::DIFFUSE, 0);
-			frames.setOneFrame(0, tex);
-			frames.setFrameCount(1);
+			GMfloat extents[] = { .02f, .02f, .02f };
+			GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
+			GMParticles* particles = new GMParticles(coreParticle, 20, this);
+			demo->appendObject("particles", particles);
 		}
-
-		{
-			GMLight light(GMLightType::SPECULAR);
-			GMfloat pos[] = { 0, 0, .2f };
-			light.setLightPosition(pos);
-			GMfloat color[] = { .7f, .7f, .7f };
-			light.setLightColor(color);
-			demo->addLight(light);
-		}
-
-//		{
-//			GMLight light(GMLightType::AMBIENT);
-//			GMfloat color[] = { .4f, .4f, .4f };
-//			light.setLightColor(color);
-//			demo->addLight(light);
-//		}
-
-		demo->appendObject("cube", obj);
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
@@ -365,6 +383,7 @@ private:
 		case gm::GameMachineEvent::FrameEnd:
 			break;
 		case gm::GameMachineEvent::Simulate:
+			demo->simulateGameWorld();
 			break;
 		case gm::GameMachineEvent::Render:
 			{
@@ -430,7 +449,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GameMachine::instance().startGameMachine();

@@ -8,6 +8,7 @@
 #include "gmglobjectpainter.h"
 #include "renders/gmgl_renders_object.h"
 #include "renders/gmgl_renders_glyph.h"
+#include "renders/gmgl_renders_particle.h"
 #include "gmglgraphic_engine_default_shaders.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfig.h"
@@ -56,17 +57,7 @@ void GMGLGraphicEngine::drawObject(GMGameObject* object)
 		activateLight(d->lights);
 	}
 
-	drawObjectOnce(object);
-}
-
-void GMGLGraphicEngine::drawObjectOnce(GMGameObject* object)
-{
-	D(d);
-	GMfloat transform[16];
-	object->getTransform().toArray(transform);
-	object->onBeforeDraw();
-	Object* coreObj = object->getObject();
-	coreObj->getPainter()->draw(transform);
+	object->draw();
 }
 
 void GMGLGraphicEngine::installShaders()
@@ -83,6 +74,7 @@ void GMGLGraphicEngine::installShaders()
 	IRender* renders[] = {
 		new GMGLRenders_Object(),
 		new GMGLRenders_Glyph(),
+		new GMGLRenders_Particle(),
 	};
 
 	GMGamePackage* package = GameMachine::instance().getGamePackageManager();
@@ -122,6 +114,11 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	case GMMeshType::Glyph:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::glyph.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::glyph.frag });
+		flag = true;
+		break;
+	case GMMeshType::Particles:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::particles.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::particles.frag });
 		flag = true;
 		break;
 	default:

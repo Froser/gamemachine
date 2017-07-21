@@ -14,17 +14,26 @@ GMGameObject::GMGameObject(AUTORELEASE Object* obj)
 	updateMatrix();
 }
 
+GMGameObject::~GMGameObject()
+{
+	D(d);
+	if (!d->manualDelete && d->object)
+		delete d->object; 
+}
+
 void GMGameObject::setObject(AUTORELEASE Object* obj)
 {
 	D(d);
-	d->object.reset(obj);
+	if (d->object)
+		delete d->object;
+	d->object = obj;
 }
 
 Object* GMGameObject::getObject()
 {
 	D(d);
 	if (!d->object)
-		d->object.reset(new Object());
+		d->object = new Object();
 	return d->object;
 }
 
@@ -46,9 +55,12 @@ void GMGameObject::onAppendingObjectToWorld()
 
 }
 
-void GMGameObject::onBeforeDraw()
+void GMGameObject::draw()
 {
-
+	GMfloat transform[16];
+	getTransform().toArray(transform);
+	Object* coreObj = getObject();
+	coreObj->getPainter()->draw(transform);
 }
 
 void GMGameObject::updateMatrix()
@@ -157,7 +169,7 @@ void GMGlyphObject::onAppendingObjectToWorld()
 	constructObject();
 }
 
-void GMGlyphObject::onBeforeDraw()
+void GMGlyphObject::draw()
 {
 	D(d);
 	if (d->lastRenderText != d->text)
@@ -165,7 +177,7 @@ void GMGlyphObject::onBeforeDraw()
 		updateObject();
 		d->lastRenderText = d->text;
 	}
-	GMGameObject::onBeforeDraw();
+	GMGameObject::draw();
 }
 
 void GMGlyphObject::updateObject()

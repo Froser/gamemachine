@@ -2,16 +2,17 @@
 #define __GAMEOBJECT_H__
 #include "common.h"
 #include "foundation/vector.h"
-#include "gmdatacore/object.h"
 #include "foundation/utilities/utilities.h"
+#include "gmdatacore/object.h"
 
 BEGIN_NS
+
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
-	AutoPtr<Object> object;
-
+	Object* object = false;
+	bool manualDelete = false;
 	linear_math::Matrix4x4 scaling;
 	linear_math::Matrix4x4 translation;
 	linear_math::Quaternion rotation;
@@ -23,6 +24,7 @@ enum class GMGameObjectType
 	Static,
 	Entity,
 	Sprite,
+	Particles,
 	Custom,
 };
 
@@ -32,7 +34,7 @@ class GMGameObject : public GMObject
 
 public:
 	GMGameObject(AUTORELEASE Object* obj);
-	virtual ~GMGameObject() {};
+	virtual ~GMGameObject();
 
 public:
 	void setObject(AUTORELEASE Object* obj);
@@ -40,20 +42,20 @@ public:
 
 	virtual void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
-
+	virtual void onAppendingObjectToWorld();
 	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }
+	virtual void draw();
 	virtual void simulate() {}
 	virtual void updateAfterSimulate() {}
-
-public:
-	virtual void onAppendingObjectToWorld();
-	virtual void onBeforeDraw();
 
 public:
 	inline void setScaling(const linear_math::Matrix4x4& scaling) { D(d); updateMatrix(); d->scaling = scaling; }
 	inline void setTranslate(const linear_math::Matrix4x4& translation) { D(d); updateMatrix(); d->translation = translation; }
 	inline void setRotation(const linear_math::Quaternion& rotation) { D(d); updateMatrix(); d->rotation = rotation; }
 	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
+
+protected:
+	void setManualDelete() { D(d); d->manualDelete = true; }
 
 private:
 	inline void updateMatrix();
@@ -87,7 +89,7 @@ public:
 	void updateObject();
 
 private:
-	virtual void onBeforeDraw() override;
+	virtual void draw() override;
 	virtual void onAppendingObjectToWorld() override;
 
 private:

@@ -64,6 +64,8 @@ set(SOURCES
 		gmengine/gmgameworld.cpp
 		gmengine/gmgameobject.h
 		gmengine/gmgameobject.cpp
+		gmengine/gmparticles.h
+		gmengine/gmparticles.cpp
 		gmengine/gmspritegameobject.h
 		gmengine/gmspritegameobject.cpp
 		gmengine/gmcamera.h
@@ -74,10 +76,12 @@ set(SOURCES
 		gmengine/gmbspgameworld.cpp
 		gmengine/gmdemogameworld.h
 		gmengine/gmdemogameworld.cpp
-		gmgl/renders/gmgl_renders_glyph.cpp
 		gmgl/renders/gmgl_renders_glyph.h
-		gmgl/renders/gmgl_renders_object.cpp
+		gmgl/renders/gmgl_renders_glyph.cpp
 		gmgl/renders/gmgl_renders_object.h
+		gmgl/renders/gmgl_renders_object.cpp
+		gmgl/renders/gmgl_renders_particle.h
+		gmgl/renders/gmgl_renders_particle.cpp
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
 		gmgl/gmglgamepackagehandler.h
@@ -120,6 +124,8 @@ set(SOURCES
 		foundation/utilities/tinyxml/tinyxmlparser.cpp
 		foundation/utilities/utilities.h
 		foundation/utilities/utilities.cpp
+		foundation/utilities/gmprimitivecreator.h
+		foundation/utilities/gmprimitivecreator.cpp
 		foundation/defines.h
 		foundation/debug.h
 		foundation/debug.cpp

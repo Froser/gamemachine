@@ -56,7 +56,6 @@ public:
 private:
 	void registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders);
 	void updateMatrices(const CameraLookAt& lookAt);
-	void drawObjectOnce(GMGameObject* object);
 	void installShaders();
 	bool loadDefaultShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram);
 	void activateLight(const Vector<GMLight>& lights);

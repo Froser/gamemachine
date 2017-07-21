@@ -9,11 +9,9 @@ BEGIN_NS
 
 typedef GMint GMCommand;
 
-class GMCommandVector3 : public GMObject
+struct GMCommandVector3
 {
-public:
 	GMCommandVector3() = default;
-
 	GMCommandVector3(GMfloat x, GMfloat y, GMfloat z)
 	{
 		p[0] = x;
@@ -30,7 +28,7 @@ private:
 	GMfloat p[3];
 };
 
-typedef Map<GMCommand, AlignedVector<GMCommandVector3> > CommandParams;
+typedef Map<GMCommand, Vector<GMCommandVector3> > CommandParams;
 
 #define USELESS_PARAM 0
 #define CMD_NONE 0x0000
