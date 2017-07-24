@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	Object* object = false;
-	bool manualDelete = false;
+	IDestructor* destructor = nullptr;
 	linear_math::Matrix4x4 scaling;
 	linear_math::Matrix4x4 translation;
 	linear_math::Quaternion rotation;
@@ -55,7 +55,7 @@ public:
 	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
 
 protected:
-	void setManualDelete() { D(d); d->manualDelete = true; }
+	inline void setDestructor(IDestructor* destructor) { D(d); d->destructor = destructor; }
 
 private:
 	inline void updateMatrix();

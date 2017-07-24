@@ -17,8 +17,10 @@ GMGameObject::GMGameObject(AUTORELEASE Object* obj)
 GMGameObject::~GMGameObject()
 {
 	D(d);
-	if (!d->manualDelete && d->object)
-		delete d->object; 
+	if (!d->destructor)
+		delete d->object;
+	else
+		d->destructor->destruct();
 }
 
 void GMGameObject::setObject(AUTORELEASE Object* obj)

@@ -296,6 +296,11 @@ public:
 	{
 	}
 
+	virtual GMParticleGameObject* createParticle(const GMint index)
+	{
+		return new GMParticleGameObject(coreParticle);
+	}
+
 private:
 
 	virtual void start()
@@ -359,13 +364,10 @@ private:
 
 		}
 
-		Object* coreParticle;
-		{
-			GMfloat extents[] = { .02f, .02f, .02f };
-			GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
-			GMParticles* particles = new GMParticles(coreParticle, 20, this);
-			demo->appendObject("particles", particles);
-		}
+		GMfloat extents[] = { .02f, .02f, .02f };
+		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
+		GMParticles* particles = new GMParticles(20, this);
+		demo->appendObject("particles", particles);
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
@@ -426,6 +428,7 @@ private:
 
 	GMfloat a = 0;
 	GMDemoGameWorld* demo;
+	Object* coreParticle;
 	bool rotate = true;
 };
 
