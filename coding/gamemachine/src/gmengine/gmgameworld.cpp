@@ -37,7 +37,7 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 	d->gameObjects[obj->getType()].insert(obj);
-	GameMachine::instance().initObjectPainter(obj);
+	GameMachine::instance().initObjectPainter(obj->getObject());
 }
 
 void GMGameWorld::simulateGameWorld()

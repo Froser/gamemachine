@@ -7,12 +7,14 @@
 
 BEGIN_NS
 
+typedef void(*GMGameObjectDestructor)(GMGameObject*);
+
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	Object* object = false;
-	IDestructor* destructor = nullptr;
+	GMGameObjectDestructor destructor = nullptr;
 	linear_math::Matrix4x4 scaling;
 	linear_math::Matrix4x4 translation;
 	linear_math::Quaternion rotation;
@@ -55,7 +57,7 @@ public:
 	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
 
 protected:
-	inline void setDestructor(IDestructor* destructor) { D(d); d->destructor = destructor; }
+	inline void setDestructor(GMGameObjectDestructor destructor) { D(d); d->destructor = destructor; }
 
 private:
 	inline void updateMatrix();

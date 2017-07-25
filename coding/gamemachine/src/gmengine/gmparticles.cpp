@@ -3,11 +3,13 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmthreads.h"
 
+static void destructor(GMGameObject*) {}
+
 GMParticleGameObject::GMParticleGameObject(Object* prototype)
 	: GMGameObject(prototype)
 {
 	D(d);
-	setDestructor(this);
+	setDestructor(destructor);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -23,54 +25,59 @@ GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
 	{
 		GMParticleGameObject* particle = d->particleHandler->createParticle(i);
 		ASSERT(particle);
-		addPrototype(particle->getPrototype());
 		particle->setWorld(db->world);
-		d->particles.push_back(particle);
+		addParticle(particle->getPrototype(), particle);
 	}
 
-	for (const auto& prototype : d->prototypes)
+	for (auto& particle : d->particles)
 	{
-		//GameMachine::instance().initObjectPainter(prototype);
-#error 这里存在一个transfer的问题，我们默认transfer之后删除顶点数据了，但是对于一个共享的prototype这样做不行
+		Object* prototype = particle.first;
+		GameMachine::instance().initObjectPainter(prototype);
 	}
 }
 
 GMParticles::~GMParticles()
 {
 	D(d);
-	for (const auto& prototype : d->prototypes)
+	for (const auto& kv : d->particles)
 	{
-		delete prototype;
-	}
-
-	for (const auto& particle : d->particles)
-	{
-		delete particle;
+		delete kv.first;
+		
+		for (const auto& p : kv.second)
+		{
+			delete p;
+		}
 	}
 }
 
 inline GMParticleGameObject* GMParticles::getParticle(GMint index)
 {
 	D(d);
-	return d->particles[index];
+	return d->allParticles[index];
 }
 
 void GMParticles::draw()
 {
 	D(d);
-	for (const auto& particle : d->particles)
+	for (const auto& kv : d->particles)
 	{
-		particle->draw();
+		for (const auto& particle : kv.second)
+		{
+			particle->draw();
+		}
 	}
 }
 
 void GMParticles::simulate()
 {
 	D(d);
-	for (const auto& particle : d->particles)
+	for (const auto& kv : d->particles)
 	{
-		if (d->particleHandler)
-			d->particleHandler->update(particle);
+		for (const auto& particle : kv.second)
+		{
+			if (d->particleHandler)
+				d->particleHandler->update(particle);
+		}
 	}
 }
 
@@ -101,14 +108,15 @@ GMint GMParticles::findFirstUnusedParticle()
 	return 0;
 }
 
-void GMParticles::addPrototype(AUTORELEASE Object* prototype)
+void GMParticles::addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParticleGameObject* particle)
 {
 	D(d);
-	d->prototypes.insert(prototype);
+	d->particles[prototype].insert(particle);
+	d->allParticles.push_back(particle);
 }
 
 bool GMParticles::containsPrototype(Object* prototype)
 {
 	D(d);
-	return d->prototypes.find(prototype) != d->prototypes.end();
+	return d->particles.find(prototype) != d->particles.end();
 }

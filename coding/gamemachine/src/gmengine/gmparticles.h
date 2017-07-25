@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMParticleGameObject)
 	GMParticles* parentParticles = nullptr;
 };
 
-class GMParticleGameObject : public GMGameObject, public IDestructor
+class GMParticleGameObject : public GMGameObject
 {
 	DECLARE_PRIVATE(GMParticleGameObject)
 
@@ -25,9 +25,6 @@ public:
 public:
 	inline GMfloat life() { D(d); return d->life; }
 	inline Object* getPrototype() { D_BASE(d, GMGameObject); return d->object; }
-
-private:
-	virtual void destruct() override {} // 什么都不用做，覆盖基类自动删除prototype的行为，因为它的prototype由GMParticles管理
 };
 
 GM_INTERFACE(IParticleHandler)
@@ -38,8 +35,8 @@ GM_INTERFACE(IParticleHandler)
 
 GM_PRIVATE_OBJECT(GMParticles)
 {
-	Set<Object*> prototypes;
-	Vector<GMParticleGameObject*> particles;
+	Map<Object*, Set<GMParticleGameObject*> > particles;
+	Vector<GMParticleGameObject*> allParticles;
 	GMuint lastUsedParticle = 0;
 	GMint particlesCount = 0;
 	IParticleHandler* particleHandler = nullptr;
@@ -62,7 +59,7 @@ public:
 	GMint findFirstUnusedParticle();
 
 private:
-	void addPrototype(AUTORELEASE Object* prototype);
+	void addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParticleGameObject* particle);
 	bool containsPrototype(Object* prototype);
 };
 

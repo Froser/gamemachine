@@ -77,13 +77,15 @@ GMfloat GameMachine::getGameTimeSeconds()
 	return d->clock.getTime();
 }
 
-void GameMachine::initObjectPainter(GMGameObject* obj)
+void GameMachine::initObjectPainter(Object* obj)
 {
 	D(d);
-	GMObjectPainter* painter;
-	getFactory()->createPainter(getGraphicEngine(), obj->getObject(), &painter);
-	ASSERT(!obj->getObject()->getPainter());
-	obj->getObject()->setPainter(painter);
+	GMObjectPainter* painter = obj->getPainter();
+	if (!painter)
+	{
+		getFactory()->createPainter(getGraphicEngine(), obj, &painter);
+		obj->setPainter(painter);
+	}
 	painter->transfer();
 }
 

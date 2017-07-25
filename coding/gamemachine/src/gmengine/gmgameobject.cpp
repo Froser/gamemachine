@@ -20,7 +20,7 @@ GMGameObject::~GMGameObject()
 	if (!d->destructor)
 		delete d->object;
 	else
-		d->destructor->destruct();
+		d->destructor(this);
 }
 
 void GMGameObject::setObject(AUTORELEASE Object* obj)
@@ -186,7 +186,7 @@ void GMGlyphObject::updateObject()
 {
 	D_BASE(d, GMGameObject);
 	constructObject();
-	GameMachine::instance().initObjectPainter(this);
+	GameMachine::instance().initObjectPainter(getObject());
 }
 
 //GMEntityObject

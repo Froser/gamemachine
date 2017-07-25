@@ -41,11 +41,6 @@ enum class GameMachineEvent
 	Terminate,
 };
 
-GM_INTERFACE(IDestructor)
-{
-	virtual void destruct() = 0;
-};
-
 GM_INTERFACE(IGameHandler)
 {
 	virtual void init() = 0;

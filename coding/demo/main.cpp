@@ -309,12 +309,16 @@ private:
 		auto container = engine->getResourceContainer();
 		auto& textureContainer = container->getTextureContainer();
 
-		auto gp = GameMachine::instance().getGamePackageManager();
-		gp->loadPackage("D://gmpk");
+		auto pk = GameMachine::instance().getGamePackageManager();
+#ifdef _DEBUG
+		pk->loadPackage("D:/gmpk");
+#else
+		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
+#endif
 
 		GMImage* img;
 		GMBuffer buf;
-		gp->readFile(PI_TEXTURES, "bnp.png", &buf);
+		pk->readFile(PI_TEXTURES, "bnp.png", &buf);
 		GMImageReader::load(buf.buffer, buf.size, &img);
 
 		ITexture* tex;
@@ -367,7 +371,7 @@ private:
 		GMfloat extents[] = { .02f, .02f, .02f };
 		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
 		GMParticles* particles = new GMParticles(20, this);
-		demo->appendObject("particles", particles);
+		//demo->appendObject("particles", particles);
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };

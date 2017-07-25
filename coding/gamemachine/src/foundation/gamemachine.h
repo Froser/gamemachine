@@ -129,7 +129,7 @@ public:
 	GMfloat getGameTimeSeconds();
 
 	// 绘制管理
-	void initObjectPainter(GMGameObject* obj);
+	void initObjectPainter(Object* obj);
 
 	// 大小端模式
 	EndiannessMode getMachineEndianness();
