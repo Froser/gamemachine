@@ -31,7 +31,7 @@ Component::Component(GMMesh* parent)
 {
 	D(d);
 	d->parentMesh = parent;
-	setVertexOffset(d->parentMesh->vertices().size() / VERTEX_DEMENSION);
+	setVertexOffset(d->parentMesh->positions().size() / VERTEX_DEMENSION);
 }
 
 // 设置此component的第一个顶点位于ChildObject.vertices()中的偏移位置
@@ -51,7 +51,7 @@ void Component::beginFace()
 void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 {
 	D(d);
-	AlignedVector<Object::DataType>& vertices = d->parentMesh->vertices();
+	AlignedVector<Object::DataType>& vertices = d->parentMesh->positions();
 	vertices.push_back(x);
 	vertices.push_back(y);
 	vertices.push_back(z);
@@ -128,9 +128,9 @@ void GMMesh::calculateTangentSpace()
 			// 每一个多边形拥有一个切线空间，这意味着多于3个点的多边形需要共面，否则切线空间会有问题
 			GMint o = component->getOffsetPtr()[i];
 
-			linear_math::Vector3 e0(d->vertices[VERTEX_OFFSET(o, 0)], d->vertices[VERTEX_OFFSET(o, 1)], d->vertices[VERTEX_OFFSET(o, 2)]);
-			linear_math::Vector3 e1(d->vertices[VERTEX_OFFSET(o, 4)], d->vertices[VERTEX_OFFSET(o, 5)], d->vertices[VERTEX_OFFSET(o, 6)]);
-			linear_math::Vector3 e2(d->vertices[VERTEX_OFFSET(o, 8)], d->vertices[VERTEX_OFFSET(o, 9)], d->vertices[VERTEX_OFFSET(o, 10)]);
+			linear_math::Vector3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
+			linear_math::Vector3 e1(d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)], d->positions[VERTEX_OFFSET(o, 6)]);
+			linear_math::Vector3 e2(d->positions[VERTEX_OFFSET(o, 8)], d->positions[VERTEX_OFFSET(o, 9)], d->positions[VERTEX_OFFSET(o, 10)]);
 
 			linear_math::Vector2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
 			linear_math::Vector2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);

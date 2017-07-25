@@ -83,7 +83,7 @@ void GMModelReader_Obj::init()
 	D(d);
 	d->object = nullptr;
 	d->currentComponent = nullptr;
-	d->vertices.clear();
+	d->positions.clear();
 	d->normals.clear();
 	d->textures.clear();
 	d->materials.clear();
@@ -103,7 +103,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	d->object->append(child);
 
 	// 事先分配一些内存，提高效率
-	d->vertices.reserve(RESERVED);
+	d->positions.reserve(RESERVED);
 	d->textures.reserve(RESERVED);
 	d->normals.reserve(RESERVED);
 
@@ -120,7 +120,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		else if (strEqual(token, "v"))
 		{
 			// vertex
-			pushBackData(settings.extents, settings.position, s, d->vertices);
+			pushBackData(settings.extents, settings.position, s, d->positions);
 		}
 		else if (strEqual(token, "vn"))
 		{
@@ -197,7 +197,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 
 		ASSERT(v != INVALID);
 		{
-			auto& vec = d->vertices[v - 1];
+			auto& vec = d->positions[v - 1];
 			d->currentComponent->vertex(vec[0], vec[1], vec[2]);
 		}
 

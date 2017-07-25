@@ -371,7 +371,7 @@ private:
 		GMfloat extents[] = { .02f, .02f, .02f };
 		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
 		GMParticles* particles = new GMParticles(20, this);
-		//demo->appendObject("particles", particles);
+		demo->appendObject("particles", particles);
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };

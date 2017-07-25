@@ -23,7 +23,7 @@ class Component;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
 	Object* object;
-	AlignedVector<linear_math::Vector3> vertices;
+	AlignedVector<linear_math::Vector3> positions;
 	AlignedVector<linear_math::Vector3> normals;
 	AlignedVector<linear_math::Vector2> textures;
 	Map<GMString, ModelReader_Obj_Material> materials;

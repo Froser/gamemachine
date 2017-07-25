@@ -38,6 +38,7 @@ void GMGLObjectPainter::transfer()
 		return;
 
 	Object* obj = getObject();
+	GLenum usage = obj->getHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
 	BEGIN_FOREACH_OBJ(obj, mesh)
 	{
 		mesh->calculateTangentSpace();
@@ -47,7 +48,7 @@ void GMGLObjectPainter::transfer()
 		glBindVertexArray(vao);
 		mesh->setArrayId(vao);
 
-		GLuint vaoSize = sizeof(Object::DataType) * mesh->vertices().size();
+		GLuint positionSize = sizeof(Object::DataType) * mesh->positions().size();
 		GLuint normalSize = sizeof(Object::DataType) * mesh->normals().size();
 		GLuint uvSize = sizeof(Object::DataType) * mesh->uvs().size();
 		GLuint tangentSize = sizeof(Object::DataType) * mesh->tangents().size();
@@ -58,38 +59,40 @@ void GMGLObjectPainter::transfer()
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, GL_STATIC_DRAW);
-		glBufferSubData(GL_ARRAY_BUFFER, 0																		, vaoSize, mesh->vertices().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize																, normalSize, mesh->normals().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize													, uvSize, mesh->uvs().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize											, tangentSize, mesh->tangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize							, bitangentSize, mesh->bitangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize			, lightmapSize, mesh->lightmaps().data());
-		glBufferSubData(GL_ARRAY_BUFFER, vaoSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize, lightmapSize, mesh->colors().data());
+		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
+		glBufferSubData(GL_ARRAY_BUFFER, 0																		, positionSize, mesh->positions().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize																, normalSize, mesh->normals().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize													, uvSize, mesh->uvs().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize											, tangentSize, mesh->tangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize							, bitangentSize, mesh->bitangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize			, lightmapSize, mesh->lightmaps().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize, lightmapSize, mesh->colors().data());
 		mesh->setBufferId(vbo);
 
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_TRUE, 0, (void*)vaoSize);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize));
-		glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize));
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize));
-		glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize + bitangentSize));
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 0, (void*)(vaoSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize));
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
-		glEnableVertexAttribArray(3);
-		glEnableVertexAttribArray(4);
-		glEnableVertexAttribArray(5);
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),		4, GL_FLOAT, GL_FALSE, 0, 0);
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4, GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize));
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize));
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
+		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Position));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Normal));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::UV));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Tangent));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Bitangent));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Lightmap));
+		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Color));
 
 		glBindVertexArray(0);
 
-		mesh->vertices().clear();
+		mesh->positions().clear();
 		mesh->normals().clear();
 		mesh->uvs().clear();
 		mesh->tangents().clear();
 		mesh->bitangents().clear();
 		mesh->lightmaps().clear();
+		mesh->colors().clear();
 	}
 	END_FOREACH_OBJ
 

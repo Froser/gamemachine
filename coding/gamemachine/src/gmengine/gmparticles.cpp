@@ -32,6 +32,7 @@ GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
 	for (auto& particle : d->particles)
 	{
 		Object* prototype = particle.first;
+		prototype->setHint(GMUsageHint::DynamicDraw);
 		GameMachine::instance().initObjectPainter(prototype);
 	}
 }

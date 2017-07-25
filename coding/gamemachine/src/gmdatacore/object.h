@@ -15,6 +15,20 @@ BEGIN_NS
 class Object;
 class GMGLShaderProgram;
 
+// 所有的顶点属性类型
+enum class GMVertexDataType
+{
+	Position = 0,
+	Normal,
+	UV,
+	Tangent,
+	Bitangent,
+	Lightmap,
+	Color,
+};
+
+#define gmVertexIndex(i) ((GMuint)i)
+
 GM_PRIVATE_OBJECT(GMObjectPainter)
 {
 	Object* object;
@@ -66,11 +80,6 @@ class Component : public GMObject
 	friend class GMMesh;
 
 public:
-	enum
-	{
-		DefaultEdgesCount = 3,
-	};
-
 	Component(GMMesh* parent);
 
 	inline Shader& getShader() { D(d); return d->shader; }
@@ -88,8 +97,15 @@ public:
 	void endFace();
 };
 
+enum class GMUsageHint
+{
+	StaticDraw,
+	DynamicDraw,
+};
+
 GM_PRIVATE_OBJECT(Object)
 {
+	GMUsageHint hint = GMUsageHint::StaticDraw;
 	Vector<GMMesh*> objects;
 	AutoPtr<GMObjectPainter> painter;
 };
@@ -105,31 +121,15 @@ public:
 	~Object();
 
 public:
-	inline void setPainter(AUTORELEASE GMObjectPainter* painter)
-	{
-		D(d);
-		d->painter.reset(painter);
-	}
+	inline void setPainter(AUTORELEASE GMObjectPainter* painter) { D(d); d->painter.reset(painter); }
+	inline GMObjectPainter* getPainter() { D(d); return d->painter; }
+	inline Vector<GMMesh*>& getAllMeshes() { D(d); return d->objects; }
+	inline void append(AUTORELEASE GMMesh* obj) { D(d); d->objects.push_back(obj); }
 
-	inline GMObjectPainter* getPainter()
-	{
-		D(d);
-		return d->painter;
-	}
-
-	inline Vector<GMMesh*>& getAllMeshes()
-	{
-		D(d);
-		return d->objects;
-	}
-
-	inline void append(AUTORELEASE GMMesh* obj)
-	{
-		D(d);
-		d->objects.push_back(obj);
-	}
+	// 绘制方式
+	void setHint(GMUsageHint hint) { D(d); d->hint = hint; }
+	GMUsageHint getHint() { D(d); return d->hint; }
 };
-
 
 // 绘制时候的排列方式
 enum class GMArrangementMode
@@ -155,7 +155,7 @@ enum class GMMeshType
 
 GM_PRIVATE_OBJECT(GMMesh)
 {
-	AlignedVector<Object::DataType> vertices;
+	AlignedVector<Object::DataType> positions;
 	AlignedVector<Object::DataType> normals;
 	AlignedVector<Object::DataType> uvs;
 	AlignedVector<Object::DataType> tangents;
@@ -187,7 +187,7 @@ public:
 
 public:
 	inline AlignedVector<AUTORELEASE Component*>& getComponents() { D(d); return d->components; }
-	inline AlignedVector<Object::DataType>& vertices() { D(d); return d->vertices; }
+	inline AlignedVector<Object::DataType>& positions() { D(d); return d->positions; }
 	inline AlignedVector<Object::DataType>& normals() { D(d); return d->normals; }
 	inline AlignedVector<Object::DataType>& uvs() { D(d); return d->uvs; }
 	inline AlignedVector<Object::DataType>& tangents() { D(d); return d->tangents; }

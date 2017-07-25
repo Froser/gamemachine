@@ -218,8 +218,8 @@ void GMEntityObject::calc()
 	Object* obj = getObject();
 	for (auto mesh : obj->getAllMeshes())
 	{
-		Object::DataType* vertices = mesh->vertices().data();
-		GMint sz = mesh->vertices().size();
+		Object::DataType* vertices = mesh->positions().data();
+		GMint sz = mesh->positions().size();
 		for (GMint i = 0; i < sz; i += 4)
 		{
 			for (GMint j = 0; j < 3; j++)
