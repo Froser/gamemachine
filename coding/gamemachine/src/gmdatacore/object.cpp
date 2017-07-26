@@ -85,6 +85,16 @@ void Component::lightmap(GMfloat u, GMfloat v)
 	lightmaps.push_back(v);
 }
 
+void Component::color(GMfloat r, GMfloat g, GMfloat b)
+{
+	D(d);
+	AlignedVector<Object::DataType>& colors = d->parentMesh->colors();
+	colors.push_back(r);
+	colors.push_back(g);
+	colors.push_back(b);
+	colors.push_back(1.0f);
+}
+
 void Component::endFace()
 {
 	D(d);

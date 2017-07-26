@@ -907,6 +907,15 @@ namespace linear_math
 		return Vector3(q.x(), q.y(), q.z());
 #endif
 	}
+
+	template <typename T>
+	inline void copyVector(const T& vector, GMfloat* out)
+	{
+		for (GMint i = 0; i < T::dimension; i++)
+		{
+			*(out + i) = vector[i];
+		}
+	}
 }
 END_NS
 #endif

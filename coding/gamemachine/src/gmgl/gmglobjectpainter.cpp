@@ -48,41 +48,43 @@ void GMGLObjectPainter::transfer()
 		glBindVertexArray(vao);
 		mesh->setArrayId(vao);
 
-		GLuint positionSize = sizeof(Object::DataType) * mesh->positions().size();
-		GLuint normalSize = sizeof(Object::DataType) * mesh->normals().size();
-		GLuint uvSize = sizeof(Object::DataType) * mesh->uvs().size();
-		GLuint tangentSize = sizeof(Object::DataType) * mesh->tangents().size();
-		GLuint bitangentSize = sizeof(Object::DataType) * mesh->bitangents().size();
-		GLuint lightmapSize = sizeof(Object::DataType) * mesh->lightmaps().size();
-		GLuint colorSize = sizeof(Object::DataType) * mesh->colors().size();
+		GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(Object::DataType) * mesh->positions().size();
+		GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(Object::DataType) * mesh->normals().size();
+		GLuint uvSize			= mesh->isDataDisabled(GMVertexDataType::UV)			? 0 : sizeof(Object::DataType) * mesh->uvs().size();
+		GLuint tangentSize		= mesh->isDataDisabled(GMVertexDataType::Tangent)		? 0 : sizeof(Object::DataType) * mesh->tangents().size();
+		GLuint bitangentSize	= mesh->isDataDisabled(GMVertexDataType::Bitangent)		? 0 : sizeof(Object::DataType) * mesh->bitangents().size();
+		GLuint lightmapSize		= mesh->isDataDisabled(GMVertexDataType::Lightmap)		? 0 : sizeof(Object::DataType) * mesh->lightmaps().size();
+		GLuint colorSize		= mesh->isDataDisabled(GMVertexDataType::Color)			? 0 : sizeof(Object::DataType) * mesh->colors().size();
 
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
-		glBufferSubData(GL_ARRAY_BUFFER, 0																		, positionSize, mesh->positions().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize																, normalSize, mesh->normals().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize													, uvSize, mesh->uvs().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize											, tangentSize, mesh->tangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize							, bitangentSize, mesh->bitangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize			, lightmapSize, mesh->lightmaps().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize, lightmapSize, mesh->colors().data());
+		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, NULL, usage);
+		glBufferSubData(GL_ARRAY_BUFFER, 0																								, positionSize, mesh->positions().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize																					, normalSize, mesh->normals().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize																		, uvSize, mesh->uvs().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize																, tangentSize, mesh->tangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize												, bitangentSize, mesh->bitangents().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize								, lightmapSize, mesh->lightmaps().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize					, colorSize, mesh->colors().data());
 		mesh->setBufferId(vbo);
 
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),		4, GL_FLOAT, GL_FALSE, 0, 0);
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4, GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize));
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize));
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
-		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4, GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Position));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Normal));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::UV));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Tangent));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Bitangent));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Lightmap));
-		glEnableVertexAttribArray(gmVertexIndex(GMVertexDataType::Color));
+		if (!mesh->isDataDisabled(GMVertexDataType::Position))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	4,  GL_FLOAT, GL_FALSE, 0, 0);
+		if (!mesh->isDataDisabled(GMVertexDataType::Normal))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4,  GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
+		if (!mesh->isDataDisabled(GMVertexDataType::UV))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Tangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Bitangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Lightmap))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Color))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize));
+
+		GM_FOREACH_ENUM_CLASS(type, GMVertexDataType, GMVertexDataType::Position, GMVertexDataType::Color)
+		{
+			if (!mesh->isDataDisabled(type))
+			{
+				glVertexAttribDivisor(gmVertexIndex(type), obj->getVertexDataDivisor(type));
+				glEnableVertexAttribArray(gmVertexIndex(type));
+			}
+		}
 
 		glBindVertexArray(0);
 
@@ -127,6 +129,34 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 	END_FOREACH_OBJ
 }
 
+void GMGLObjectPainter::drawInstances(GMuint count)
+{
+	D(d);
+	Object* obj = getObject();
+
+	BEGIN_FOREACH_OBJ(obj, mesh)
+	{
+		IRender* render = d->engine->getRender(mesh->getType());
+		render->begin(d->engine, mesh, nullptr);
+
+		glBindVertexArray(mesh->getArrayId());
+		for (auto component : mesh->getComponents())
+		{
+			Shader& shader = component->getShader();
+			if (shader.getNodraw())
+				continue;
+
+			drawInstances(render, shader, component, mesh, true, count);
+			if (shader.getDrawBorder())
+				drawInstances(render, shader, component, mesh, false, count);
+		}
+		glBindVertexArray(0);
+
+		render->end();
+	}
+	END_FOREACH_OBJ
+}
+
 void GMGLObjectPainter::dispose()
 {
 	D(d);
@@ -145,6 +175,22 @@ void GMGLObjectPainter::dispose()
 	d->inited = false;
 }
 
+void GMGLObjectPainter::beginUpdateBuffer(GMMesh* mesh)
+{
+	glBindVertexArray(mesh->getArrayId());
+}
+
+void GMGLObjectPainter::endUpdateBuffer()
+{
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+	glBindVertexArray(0);
+}
+
+void* GMGLObjectPainter::getBuffer()
+{
+	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+}
+
 void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill)
 {
 	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
@@ -154,5 +200,20 @@ void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* compone
 		render->beginShader(shader, GMDrawMode::Line);
 
 	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+	render->endShader();
+}
+
+void GMGLObjectPainter::drawInstances(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill, GMuint count)
+{
+	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
+	if (fill)
+		render->beginShader(shader, GMDrawMode::Fill);
+	else
+		render->beginShader(shader, GMDrawMode::Line);
+
+	for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
+	{
+		glDrawArraysInstanced(mode, component->getOffsetPtr()[i], component->getPrimitiveVerticesCountPtr()[i], count);
+	}
 	render->endShader();
 }

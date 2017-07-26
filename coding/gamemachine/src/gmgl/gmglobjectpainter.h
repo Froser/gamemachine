@@ -23,10 +23,16 @@ public:
 public:
 	virtual void transfer() override;
 	virtual void draw(GMfloat* modelTransform) override;
+	virtual void drawInstances(GMuint count) override;
 	virtual void dispose() override;
+
+	virtual void beginUpdateBuffer(GMMesh* mesh) override;
+	virtual void endUpdateBuffer() override;
+	virtual void* getBuffer() override;
 
 private:
 	void draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill);
+	void drawInstances(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill, GMuint count);
 };
 
 END_NS

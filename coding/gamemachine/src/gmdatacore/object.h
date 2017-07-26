@@ -25,15 +25,19 @@ enum class GMVertexDataType
 	Bitangent,
 	Lightmap,
 	Color,
+
+	// ---
+	EndOfVertexDataType
 };
 
 #define gmVertexIndex(i) ((GMuint)i)
 
 GM_PRIVATE_OBJECT(GMObjectPainter)
 {
-	Object* object;
+	Object* object = nullptr;
 };
 
+class GMMesh;
 class GMObjectPainter : public GMObject
 {
 	DECLARE_PRIVATE(GMObjectPainter)
@@ -50,13 +54,18 @@ public:
 public:
 	virtual void transfer() = 0;
 	virtual void draw(GMfloat* modelTransform) = 0;
+	virtual void drawInstances(GMuint count) = 0;
 	virtual void dispose() = 0;
+
+// 提供修改缓存的方法
+	virtual void beginUpdateBuffer(GMMesh* mesh) = 0;
+	virtual void endUpdateBuffer() = 0;
+	virtual void* getBuffer() = 0;
 
 protected:
 	Object* getObject();
 };
 
-class GMMesh;
 GM_PRIVATE_OBJECT(Component)
 {
 	GMuint offset = 0;
@@ -94,6 +103,7 @@ public:
 	void normal(GMfloat x, GMfloat y, GMfloat z);
 	void uv(GMfloat u, GMfloat v);
 	void lightmap(GMfloat u, GMfloat v);
+	void color(GMfloat r, GMfloat g, GMfloat b);
 	void endFace();
 };
 
@@ -108,6 +118,7 @@ GM_PRIVATE_OBJECT(Object)
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	Vector<GMMesh*> objects;
 	AutoPtr<GMObjectPainter> painter;
+	GMuint divisors[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 };
 
 GM_ALIGNED_16(class) Object : public GMObject
@@ -129,6 +140,8 @@ public:
 	// 绘制方式
 	void setHint(GMUsageHint hint) { D(d); d->hint = hint; }
 	GMUsageHint getHint() { D(d); return d->hint; }
+	void setVertexDataDivisor(GMVertexDataType type, GMuint divisor) { D(d); d->divisors[gmVertexIndex(type)] = divisor; }
+	GMuint getVertexDataDivisor(GMVertexDataType type) { D(d); return d->divisors[gmVertexIndex(type)]; }
 };
 
 // 绘制时候的排列方式
@@ -136,11 +149,8 @@ enum class GMArrangementMode
 {
 	// 默认排列，按照Components，并按照一个个三角形来画
 	Triangle_Fan,
-
 	Triangle_Strip,
-
 	Triangles,
-
 	Lines,
 };
 
@@ -161,7 +171,8 @@ GM_PRIVATE_OBJECT(GMMesh)
 	AlignedVector<Object::DataType> tangents;
 	AlignedVector<Object::DataType> bitangents;
 	AlignedVector<Object::DataType> lightmaps;
-	AlignedVector<Object::DataType> colors; //顶点坐标，一般渲染不会用到这个，用于粒子绘制
+	AlignedVector<Object::DataType> colors; //顶点颜色，一般渲染不会用到这个，用于粒子绘制
+	bool disabledData[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
 	AlignedVector<Component*> components;
@@ -186,6 +197,8 @@ public:
 	void calculateTangentSpace();
 
 public:
+	inline void disableData(GMVertexDataType type) { D(d); d->disabledData[gmVertexIndex(type)] = true; }
+	inline bool isDataDisabled(GMVertexDataType type) { D(d); return d->disabledData[gmVertexIndex(type)]; }
 	inline AlignedVector<AUTORELEASE Component*>& getComponents() { D(d); return d->components; }
 	inline AlignedVector<Object::DataType>& positions() { D(d); return d->positions; }
 	inline AlignedVector<Object::DataType>& normals() { D(d); return d->normals; }

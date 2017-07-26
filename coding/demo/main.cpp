@@ -294,6 +294,11 @@ public:
 	// IParticleHandler
 	virtual void update(GMParticleGameObject* particle) override
 	{
+		particle->position() += .001f;
+
+		particle->color()[0] = .2f;
+		particle->color()[1] = .3f;
+		particle->color()[2] = .6f;
 	}
 
 	virtual GMParticleGameObject* createParticle(const GMint index)
@@ -328,6 +333,7 @@ private:
 		textureContainer.insert(item);
 
 		demo = new GMDemoGameWorld();
+#if 0
 		{
 			GMfloat extents[] = { .25f, .25f, .25f };
 			Object* coreObj;
@@ -367,8 +373,8 @@ private:
 			}
 
 		}
-
-		GMfloat extents[] = { .02f, .02f, .02f };
+#endif
+		GMfloat extents[] = { .1f, .1f, .1f };
 		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
 		GMParticles* particles = new GMParticles(20, this);
 		demo->appendObject("particles", particles);
@@ -406,10 +412,10 @@ private:
 				if (rotate)
 					a += .001f;
 
-				GMGameObject* obj = demo->getGameObject("cube");
-				linear_math::Quaternion q;
-				q.setRotation(dir, a);
-				obj->setRotation(q);
+				//GMGameObject* obj = demo->getGameObject("cube");
+				//linear_math::Quaternion q;
+				//q.setRotation(dir, a);
+				//obj->setRotation(q);
 				demo->renderGameWorld();
 				break;
 			}

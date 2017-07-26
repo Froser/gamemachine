@@ -60,6 +60,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT Object** obj, GMMesh
 
 				component->vertex(vertex[0], vertex[1], vertex[2]);
 				component->normal(normal[0], normal[1], normal[2]);
+				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
 		}
@@ -119,6 +120,7 @@ void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT Object** obj, GMMes
 				component->vertex(vertex[0], vertex[1], vertex[2]);
 				component->normal(normal[0], normal[1], normal[2]);
 				component->uv((uv[0] + 1) / 2, (uv[1] + 1) / 2);
+				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
 		}

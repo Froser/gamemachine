@@ -10,6 +10,28 @@ GMParticleGameObject::GMParticleGameObject(Object* prototype)
 {
 	D(d);
 	setDestructor(destructor);
+
+	if (prototype->getAllMeshes().size() > 1)
+	{
+		ASSERT(false);
+		gm_warning("Only one mesh in particle's prototype is allowed.");
+	}
+}
+
+void GMParticleGameObject::updatePrototype(void* buffer)
+{
+	D(d);
+	GMfloat* vertexData = (GMfloat*)buffer;
+	GMint index = getIndexInPrototype();
+	GMint position_offset = 10 * index, // 10 = 4(pos) + 2(uv) + 4(color)
+		uv_offset = 10 * index + 2,
+		color_offset = 10 * index + 4;
+	GMfloat* ptrPos = vertexData + position_offset,
+		*ptrUv = vertexData + uv_offset,
+		*ptrColor = vertexData + color_offset;
+	copyVector(d->position, ptrPos);
+	copyVector(d->uv, ptrUv);
+	copyVector(d->color, ptrColor);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -29,10 +51,10 @@ GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
 		addParticle(particle->getPrototype(), particle);
 	}
 
-	for (auto& particle : d->particles)
+	for (auto& kv : d->particles)
 	{
-		Object* prototype = particle.first;
-		prototype->setHint(GMUsageHint::DynamicDraw);
+		Object* prototype = kv.first;
+		initPrototype(kv.first, kv.second);
 		GameMachine::instance().initObjectPainter(prototype);
 	}
 }
@@ -62,10 +84,7 @@ void GMParticles::draw()
 	D(d);
 	for (const auto& kv : d->particles)
 	{
-		for (const auto& particle : kv.second)
-		{
-			particle->draw();
-		}
+		drawInstances(kv.first, kv.second.size());
 	}
 }
 
@@ -74,11 +93,19 @@ void GMParticles::simulate()
 	D(d);
 	for (const auto& kv : d->particles)
 	{
+		Object* prototype = kv.first;
+		GMObjectPainter* painter = prototype->getPainter();
+		painter->beginUpdateBuffer(prototype->getAllMeshes()[0]);
+		void* buffer = painter->getBuffer();
+		ASSERT(buffer);
 		for (const auto& particle : kv.second)
 		{
 			if (d->particleHandler)
 				d->particleHandler->update(particle);
+
+			particle->updatePrototype(buffer);
 		}
+		painter->endUpdateBuffer();
 	}
 }
 
@@ -109,10 +136,32 @@ GMint GMParticles::findFirstUnusedParticle()
 	return 0;
 }
 
+void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameObject*>& particles)
+{
+	prototype->setHint(GMUsageHint::DynamicDraw);
+	prototype->setVertexDataDivisor(GMVertexDataType::Position, 1);
+	prototype->setVertexDataDivisor(GMVertexDataType::UV, 1);
+	prototype->setVertexDataDivisor(GMVertexDataType::Color, 1);
+
+	auto mesh = prototype->getAllMeshes()[0];
+	mesh->disableData(GMVertexDataType::Normal);
+	mesh->disableData(GMVertexDataType::Tangent);
+	mesh->disableData(GMVertexDataType::Bitangent);
+	mesh->disableData(GMVertexDataType::Lightmap);
+
+	// 拷贝若干倍数据
+	decltype(particles.size()) size = particles.size();
+	mesh->positions().resize(mesh->positions().size() * size);
+	mesh->uvs().resize(mesh->uvs().size() * size);
+	mesh->colors().resize(mesh->colors().size() * size);
+}
+
 void GMParticles::addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParticleGameObject* particle)
 {
 	D(d);
-	d->particles[prototype].insert(particle);
+	auto& vec = d->particles[prototype];
+	vec.push_back(particle);
+	particle->setIndex(vec.size() - 1);
 	d->allParticles.push_back(particle);
 }
 
@@ -120,4 +169,10 @@ bool GMParticles::containsPrototype(Object* prototype)
 {
 	D(d);
 	return d->particles.find(prototype) != d->particles.end();
+}
+
+void GMParticles::drawInstances(Object* prototype, GMuint count)
+{
+	GMObjectPainter* painter = prototype->getPainter();
+	painter->drawInstances(count);
 }
