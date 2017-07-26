@@ -59,25 +59,25 @@ void GMGLObjectPainter::transfer()
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, NULL, usage);
+		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
 		glBufferSubData(GL_ARRAY_BUFFER, 0																								, positionSize, mesh->positions().data());
 		glBufferSubData(GL_ARRAY_BUFFER, positionSize																					, normalSize, mesh->normals().data());
 		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize																		, uvSize, mesh->uvs().data());
 		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize																, tangentSize, mesh->tangents().data());
 		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize												, bitangentSize, mesh->bitangents().data());
 		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize								, lightmapSize, mesh->lightmaps().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize					, colorSize, mesh->colors().data());
+		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize				, colorSize, mesh->colors().data());
 		mesh->setBufferId(vbo);
 
 		if (!mesh->isDataDisabled(GMVertexDataType::Position))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	4,  GL_FLOAT, GL_FALSE, 0, 0);
 		if (!mesh->isDataDisabled(GMVertexDataType::Normal))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4,  GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
 		if (!mesh->isDataDisabled(GMVertexDataType::UV))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Tangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Bitangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Tangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4,  GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Bitangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4,  GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize + tangentSize));
 		if (!mesh->isDataDisabled(GMVertexDataType::Lightmap))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Color))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + colorSize));
+		if (!mesh->isDataDisabled(GMVertexDataType::Color))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize));
 
-		GM_FOREACH_ENUM_CLASS(type, GMVertexDataType, GMVertexDataType::Position, GMVertexDataType::Color)
+		GM_FOREACH_ENUM_CLASS(type, GMVertexDataType, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 		{
 			if (!mesh->isDataDisabled(type))
 			{
