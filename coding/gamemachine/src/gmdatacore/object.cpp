@@ -121,7 +121,7 @@ GMMesh::~GMMesh()
 void GMMesh::appendComponent(AUTORELEASE Component* component)
 {
 	D(d);
-	ASSERT(d->components.find(component) == d->components.end());
+	ASSERT(std::find(d->components.begin(), d->components.end(), component) == d->components.end());
 	d->components.push_back(component);
 }
 

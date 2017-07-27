@@ -21,17 +21,18 @@ GMParticleGameObject::GMParticleGameObject(Object* prototype)
 void GMParticleGameObject::updatePrototype(void* buffer)
 {
 	D(d);
-	GMfloat* vertexData = (GMfloat*)buffer;
+	GMMesh* mesh = getObject()->getAllMeshes()[0];
+	GMbyte* vertexData = (GMbyte*)buffer;
 	GMint index = getIndexInPrototype();
-	GMint position_offset = 10 * index, // 10 = 4(pos) + 2(uv) + 4(color)
-		uv_offset = 10 * index + 2,
-		color_offset = 10 * index + 4;
-	GMfloat* ptrPos = vertexData + position_offset,
-		*ptrUv = vertexData + uv_offset,
-		*ptrColor = vertexData + color_offset;
-	copyVector(d->position, ptrPos);
-	copyVector(d->uv, ptrUv);
-	copyVector(d->color, ptrColor);
+	GMint position_offset = 4 * index,
+		uv_offset = mesh->get_transferred_positions_byte_size() + 2 * index,
+		color_offset = mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size() + 4 * index;
+	GMfloat* ptrPos = (GMfloat*)(vertexData + position_offset),
+		*ptrUv = (GMfloat*)(vertexData + uv_offset),
+		*ptrColor = (GMfloat*)(vertexData + color_offset);
+	//linear_math::copyVector(d->position, ptrPos);
+	//linear_math::copyVector(d->uv, ptrUv);
+	linear_math::copyVector(d->color, ptrColor);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -82,9 +83,21 @@ inline GMParticleGameObject* GMParticles::getParticle(GMint index)
 void GMParticles::draw()
 {
 	D(d);
+	static GMfloat identityMatrix[] = {
+		1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
+	};
+
 	for (const auto& kv : d->particles)
 	{
-		drawInstances(kv.first, kv.second.size());
+		Object* prototype = kv.first;
+		GMObjectPainter* painter = prototype->getPainter();
+		void* buffer = painter->getBuffer();
+		for (const auto& particle : kv.second)
+		{
+			particle->updatePrototype(buffer);
+		}
+		painter->endUpdateBuffer();
+		kv.first->getPainter()->draw(identityMatrix);
 	}
 }
 
@@ -93,19 +106,13 @@ void GMParticles::simulate()
 	D(d);
 	for (const auto& kv : d->particles)
 	{
-		Object* prototype = kv.first;
-		GMObjectPainter* painter = prototype->getPainter();
-		painter->beginUpdateBuffer(prototype->getAllMeshes()[0]);
-		void* buffer = painter->getBuffer();
-		ASSERT(buffer);
 		for (const auto& particle : kv.second)
 		{
 			if (d->particleHandler)
 				d->particleHandler->update(particle);
 
-			particle->updatePrototype(buffer);
+			break; //////////////////////////////////////////////////////////////////////////
 		}
-		painter->endUpdateBuffer();
 	}
 }
 
@@ -139,9 +146,6 @@ GMint GMParticles::findFirstUnusedParticle()
 void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameObject*>& particles)
 {
 	prototype->setHint(GMUsageHint::DynamicDraw);
-	prototype->setVertexDataDivisor(GMVertexDataType::Position, 1);
-	prototype->setVertexDataDivisor(GMVertexDataType::UV, 1);
-	prototype->setVertexDataDivisor(GMVertexDataType::Color, 1);
 
 	auto mesh = prototype->getAllMeshes()[0];
 	mesh->disableData(GMVertexDataType::Normal);

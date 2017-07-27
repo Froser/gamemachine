@@ -33,14 +33,7 @@ vec4 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv)
 	return result;
 }
 
-void calcColor()
-{
-	// 最终结果
-	vec4 ambientTextureColor = calcTexture(GM_ambient_textures, _uv);
-	frag_color = ambientTextureColor * _color;
-}
-
 void main()
 {
-	calcColor();
+	frag_color = calcTexture(GM_ambient_textures, _uv) * _color;
 }

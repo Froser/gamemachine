@@ -246,7 +246,7 @@ public:
 		GMBuffer vertBuf, fragBuf;
 		switch (type)
 		{
-		case GMMeshType::Normal:
+		case GMMeshType::Model:
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.vert", &vertBuf);
 			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
 			flag = true;
@@ -294,7 +294,7 @@ public:
 	// IParticleHandler
 	virtual void update(GMParticleGameObject* particle) override
 	{
-		particle->position() += .001f;
+		//particle->position() += 0.1f;
 
 		particle->color()[0] = .2f;
 		particle->color()[1] = .3f;
@@ -333,6 +333,7 @@ private:
 		textureContainer.insert(item);
 
 		demo = new GMDemoGameWorld();
+
 #if 0
 		{
 			GMfloat extents[] = { .25f, .25f, .25f };
@@ -374,9 +375,10 @@ private:
 
 		}
 #endif
-		GMfloat extents[] = { .1f, .1f, .1f };
+
+		GMfloat extents[] = { .2f, .2f, .2f };
 		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
-		GMParticles* particles = new GMParticles(20, this);
+		GMParticles* particles = new GMParticles(1, this);
 		demo->appendObject("particles", particles);
 
 		CameraLookAt lookAt;

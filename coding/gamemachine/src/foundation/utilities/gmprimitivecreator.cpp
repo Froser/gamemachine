@@ -40,6 +40,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT Object** obj, GMMesh
 	{
 		GMMesh* body = new GMMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+		body->setType(type);
 
 		Component* component = new Component(body);
 
@@ -97,6 +98,7 @@ void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT Object** obj, GMMes
 	{
 		GMMesh* body = new GMMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+		body->setType(type);
 
 		Component* component = new Component(body);
 

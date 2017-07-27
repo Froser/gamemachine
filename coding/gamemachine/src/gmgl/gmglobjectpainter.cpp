@@ -69,6 +69,11 @@ void GMGLObjectPainter::transfer()
 		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize				, colorSize, mesh->colors().data());
 		mesh->setBufferId(vbo);
 
+#if _DEBUG
+		void * buffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+#endif
+
 		if (!mesh->isDataDisabled(GMVertexDataType::Position))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	4,  GL_FLOAT, GL_FALSE, 0, 0);
 		if (!mesh->isDataDisabled(GMVertexDataType::Normal))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4,  GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
 		if (!mesh->isDataDisabled(GMVertexDataType::UV))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
@@ -88,13 +93,13 @@ void GMGLObjectPainter::transfer()
 
 		glBindVertexArray(0);
 
-		mesh->positions().clear();
-		mesh->normals().clear();
-		mesh->uvs().clear();
-		mesh->tangents().clear();
-		mesh->bitangents().clear();
-		mesh->lightmaps().clear();
-		mesh->colors().clear();
+		mesh->clear_positions_and_save_byte_size();
+		mesh->clear_normals_and_save_byte_size();
+		mesh->clear_uvs_and_save_byte_size();
+		mesh->clear_tangents_and_save_byte_size();
+		mesh->clear_bitangents_and_save_byte_size();
+		mesh->clear_lightmaps_and_save_byte_size();
+		mesh->clear_colors_and_save_byte_size();
 	}
 	END_FOREACH_OBJ
 
@@ -188,7 +193,7 @@ void GMGLObjectPainter::endUpdateBuffer()
 
 void* GMGLObjectPainter::getBuffer()
 {
-	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 }
 
 void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill)

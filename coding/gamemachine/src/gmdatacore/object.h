@@ -157,26 +157,37 @@ enum class GMArrangementMode
 enum class GMMeshType
 {
 	MeshTypeBegin,
-	Normal = MeshTypeBegin,
+	Model = MeshTypeBegin,
 	Glyph,
 	Particles,
 	MeshTypeEnd,
 };
 
+#define GM_DEFINE_VERTEX_DATA(name) \
+	AlignedVector<Object::DataType> name; \
+	GMuint transferred_##name##_byte_size = 0;
+
+#define GM_DEFINE_VERTEX_PROPERTY(name) \
+	inline AlignedVector<Object::DataType>& name() { D(d); return d->name; } \
+	inline void clear_##name##_and_save_byte_size() {D(d); set_transferred_##name##_byte_size(name().size() * sizeof(Object::DataType)); name().clear(); } \
+	inline GMuint get_transferred_##name##_byte_size() { D(d); return d->transferred_##name##_byte_size; } \
+	inline void set_transferred_##name##_byte_size(GMuint size) { D(d); d->transferred_##name##_byte_size = size; }
+
 GM_PRIVATE_OBJECT(GMMesh)
 {
-	AlignedVector<Object::DataType> positions;
-	AlignedVector<Object::DataType> normals;
-	AlignedVector<Object::DataType> uvs;
-	AlignedVector<Object::DataType> tangents;
-	AlignedVector<Object::DataType> bitangents;
-	AlignedVector<Object::DataType> lightmaps;
-	AlignedVector<Object::DataType> colors; //顶点颜色，一般渲染不会用到这个，用于粒子绘制
+	GM_DEFINE_VERTEX_DATA(positions);
+	GM_DEFINE_VERTEX_DATA(normals);
+	GM_DEFINE_VERTEX_DATA(uvs);
+	GM_DEFINE_VERTEX_DATA(tangents);
+	GM_DEFINE_VERTEX_DATA(bitangents);
+	GM_DEFINE_VERTEX_DATA(lightmaps);
+	GM_DEFINE_VERTEX_DATA(colors); //顶点颜色，一般渲染不会用到这个，用于粒子绘制
+
 	bool disabledData[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
-	AlignedVector<Component*> components;
-	GMMeshType type = GMMeshType::Normal;
+	Vector<Component*> components;
+	GMMeshType type = GMMeshType::Model;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
 	GMString name = _L("default");
 };
@@ -197,16 +208,17 @@ public:
 	void calculateTangentSpace();
 
 public:
+	GM_DEFINE_VERTEX_PROPERTY(positions);
+	GM_DEFINE_VERTEX_PROPERTY(normals);
+	GM_DEFINE_VERTEX_PROPERTY(uvs);
+	GM_DEFINE_VERTEX_PROPERTY(tangents);
+	GM_DEFINE_VERTEX_PROPERTY(bitangents);
+	GM_DEFINE_VERTEX_PROPERTY(lightmaps);
+	GM_DEFINE_VERTEX_PROPERTY(colors);
+
 	inline void disableData(GMVertexDataType type) { D(d); d->disabledData[gmVertexIndex(type)] = true; }
 	inline bool isDataDisabled(GMVertexDataType type) { D(d); return d->disabledData[gmVertexIndex(type)]; }
-	inline AlignedVector<AUTORELEASE Component*>& getComponents() { D(d); return d->components; }
-	inline AlignedVector<Object::DataType>& positions() { D(d); return d->positions; }
-	inline AlignedVector<Object::DataType>& normals() { D(d); return d->normals; }
-	inline AlignedVector<Object::DataType>& uvs() { D(d); return d->uvs; }
-	inline AlignedVector<Object::DataType>& tangents() { D(d); return d->tangents; }
-	inline AlignedVector<Object::DataType>& bitangents() { D(d); return d->bitangents; }
-	inline AlignedVector<Object::DataType>& lightmaps() { D(d); return d->lightmaps; }
-	inline AlignedVector<Object::DataType>& colors() { D(d); return d->colors; }
+	inline Vector<Component*>& getComponents() { D(d); return d->components; }
 	inline GMMeshType getType() { D(d); return d->type; }
 	inline void setType(GMMeshType type) { D(d); d->type = type; }
 	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }

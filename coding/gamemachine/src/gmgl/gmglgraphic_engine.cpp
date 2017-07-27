@@ -106,7 +106,7 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	bool flag = false;
 	switch (type)
 	{
-	case GMMeshType::Normal:
+	case GMMeshType::Model:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object.frag });
 		flag = true;
