@@ -28,7 +28,6 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 	GMint index = getIndexInPrototype();
 	GMint particleCount = d->parentParticles->getParticleCount(prototype);
 
-	// 拿到此粒子的位置偏移，以GMfloat为单位，非字节
 	GMint offset_position = mesh->get_transferred_positions_byte_size() / particleCount * index;
 	GMint color_offset = (mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size())
 		+ mesh->get_transferred_colors_byte_size() / particleCount * index;
