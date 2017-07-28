@@ -30,9 +30,7 @@ template <typename T>
 using Set = std::set<T>;
 
 template <typename T>
-class Vector : public std::vector<T>
-{
-};
+using Vector = std::vector<T>;
 
 template <typename T>
 class Queue : public std::queue<T>

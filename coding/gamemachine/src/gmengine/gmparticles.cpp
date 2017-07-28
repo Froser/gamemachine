@@ -22,34 +22,40 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 {
 	D(d);
 	Object* prototype = getObject();
-	GMfloat* basePositions = d->parentParticles->getPositionArray(prototype);
 	GMMesh* mesh = prototype->getAllMeshes()[0];
 	GMbyte* vertexData = (GMbyte*)buffer;
-	GMint index = getIndexInPrototype();
-	GMint color_offset = mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size() + 4 * index;
-	GMfloat *ptrPosition = (GMfloat*)(vertexData),
-		*ptrColor = (GMfloat*)(vertexData + color_offset);
 
-	GMint offset = 0;
+	GMint index = getIndexInPrototype();
+	GMint particleCount = d->parentParticles->getParticleCount(prototype);
+
+	// 拿到此粒子的位置偏移，以GMfloat为单位，非字节
+	GMint offset_position = mesh->get_transferred_positions_byte_size() / particleCount * index;
+	GMint color_offset = (mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size())
+		+ mesh->get_transferred_colors_byte_size() / particleCount * index;
+	GMfloat *ptrPosition = (GMfloat*)(vertexData + offset_position),
+		*ptrColor = (GMfloat*)(vertexData + color_offset);
+	GMfloat* basePositions = d->parentParticles->getPositionArray(prototype)
+		+ offset_position / sizeof(decltype(basePositions[0] + 0));
+
+	GMint idx = 0;
 	for (auto& component : mesh->getComponents())
 	{
 		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
 		{
 			for (GMint j = 0; j < component->getPrimitiveVerticesCountPtr()[i]; j++)
 			{
-				//linear_math::copyVector(d->color, offset * 4);
 				linear_math::Vector4 basePositionVector(
-					*(basePositions + offset * 4 + 0),
-					*(basePositions + offset * 4 + 1),
-					*(basePositions + offset * 4 + 2),
-					*(basePositions + offset * 4 + 3)
+					*(basePositions + idx * 4 + 0),
+					*(basePositions + idx * 4 + 1),
+					*(basePositions + idx * 4 + 2),
+					*(basePositions + idx * 4 + 3)
 				);
 				linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
-				linear_math::copyVector(transformedPosition, ptrPosition + offset * 4);
+				linear_math::copyVector(transformedPosition, ptrPosition + idx * 4);
 
 				//更新颜色
-				linear_math::copyVector(d->color, ptrColor + offset * 4);
-				offset++;
+				linear_math::copyVector(d->color, ptrColor + idx * 4);
+				idx++;
 			}
 		}
 	}
@@ -133,8 +139,6 @@ void GMParticles::simulate()
 		{
 			if (d->particleHandler)
 				d->particleHandler->update(particle);
-
-			break; //////////////////////////////////////////////////////////////////////////
 		}
 	}
 }
@@ -166,6 +170,15 @@ GMint GMParticles::findFirstUnusedParticle()
 	return 0;
 }
 
+GMint GMParticles::getParticleCount(Object* prototype)
+{
+	D(d);
+	auto iter = d->particles.find(prototype);
+	if (iter == d->particles.end())
+		return 0;
+	return iter->second.size();
+}
+
 void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameObject*>& particles)
 {
 	D(d);
@@ -177,12 +190,19 @@ void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameOb
 	mesh->disableData(GMVertexDataType::Bitangent);
 	mesh->disableData(GMVertexDataType::Lightmap);
 
+	auto size = particles.size();
+	// 创建指针列表
+	GMint offset = 0;
+	for (auto& component : mesh->getComponents())
+	{
+		component->expand(size);
+	}
+
 	// 拷贝若干倍数据
-	decltype(particles.size()) size = particles.size();
 	mesh->positions().resize(mesh->positions().size() * size);
 	mesh->uvs().resize(mesh->uvs().size() * size);
 	mesh->colors().resize(mesh->colors().size() * size);
-
+	
 	// 需要把所有positions记录下来，用于做顶点变换
 	auto targetOriginalPositions = d->basePositions.find(prototype);
 	if (targetOriginalPositions == d->basePositions.end())

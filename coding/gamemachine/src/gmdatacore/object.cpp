@@ -105,6 +105,25 @@ void Component::endFace()
 	d->primitiveCount++;
 }
 
+// 复制count个当前component
+void Component::expand(GMuint count)
+{
+	D(d);
+	ASSERT(d->parentMesh->getComponents().size() == 1); //目前只支持==1的情况
+	d->primitiveCount *= count;
+	GMuint originalCounts = d->primitiveVertices.size();
+	GMuint originalOffsets = d->vertexOffsets.size();
+	GMint offset = d->parentMesh->positions().size() / Object::PositionDimension;
+	for (GMuint i = 0; i < d->primitiveCount; i++)
+	{
+		if (i < count)
+			continue;
+
+		d->primitiveVertices.push_back(d->primitiveVertices[i % originalCounts]);
+		d->vertexOffsets.push_back(offset + d->vertexOffsets[i % originalCounts]);
+	}
+}
+
 GMMesh::GMMesh()
 {
 }

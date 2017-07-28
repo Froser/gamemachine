@@ -2,7 +2,6 @@
 
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_projection_matrix;
-uniform mat4 GM_model_matrix;
 
 layout (location = 0) in vec4 position;
 layout (location = 2) in vec2 uv;
@@ -15,5 +14,5 @@ void main(void)
 {
     _uv = uv;
     _color = color;
-    gl_Position = GM_projection_matrix * GM_view_matrix * GM_model_matrix * position;
+    gl_Position = GM_projection_matrix * GM_view_matrix * position;
 }

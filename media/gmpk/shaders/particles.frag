@@ -3,7 +3,6 @@
 in vec2 _uv;
 in vec4 _color;
 
-#define MAX_TEXTURE_COUNT 3
 struct GM_texture_t
 {
 	sampler2D texture;
@@ -13,18 +12,18 @@ struct GM_texture_t
 	float scale_t;
 	int enabled;
 };
-uniform GM_texture_t GM_ambient_textures[MAX_TEXTURE_COUNT];
+uniform GM_texture_t GM_ambient_texture;
 
 out vec4 frag_color;
 
-vec4 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv)
+vec4 calcTexture(GM_texture_t texture, vec2 uv)
 {
 	bool hasTexture = false;
 	vec4 result = vec4(0);
-	result += textures[0].enabled == 1
-		? texture(textures[0].texture, uv * vec2(textures[0].scale_s, textures[0].scale_t) + vec2(textures[0].scroll_s, textures[0].scroll_t))
+	result += texture.enabled == 1
+		? texture(texture.texture, uv * vec2(texture.scale_s, texture.scale_t) + vec2(texture.scroll_s, texture.scroll_t))
 		: vec4(0);
-	if (textures[0].enabled == 1)
+	if (texture.enabled == 1)
 		hasTexture = true;
 
 	if (!hasTexture)
@@ -35,5 +34,5 @@ vec4 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv)
 
 void main()
 {
-	frag_color = calcTexture(GM_ambient_textures, _uv) * _color;
+	frag_color = calcTexture(GM_ambient_texture, _uv) * _color;
 }

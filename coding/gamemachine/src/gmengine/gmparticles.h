@@ -71,6 +71,7 @@ public:
 public:
 	inline GMParticleGameObject* getParticle(GMint index);
 	GMint findFirstUnusedParticle();
+	GMint getParticleCount(Object* prototype);
 
 private:
 	void initPrototype(Object* prototype, const Vector<GMParticleGameObject*>& particles);

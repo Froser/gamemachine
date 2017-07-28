@@ -87,6 +87,7 @@ public:
 	void lightmap(GMfloat u, GMfloat v);
 	void color(GMfloat r, GMfloat g, GMfloat b);
 	void endFace();
+	void expand(GMuint count);
 };
 
 enum class GMUsageHint
@@ -125,6 +126,11 @@ GM_ALIGNED_16(class) Object : public GMObject
 
 public:
 	typedef GMfloat DataType;
+
+	enum {
+		// 一个位置坐标的维度
+		PositionDimension = 4,
+	};
 
 public:
 	~Object();
