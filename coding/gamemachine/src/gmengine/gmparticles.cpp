@@ -21,18 +21,38 @@ GMParticleGameObject::GMParticleGameObject(Object* prototype)
 void GMParticleGameObject::updatePrototype(void* buffer)
 {
 	D(d);
-	GMMesh* mesh = getObject()->getAllMeshes()[0];
+	Object* prototype = getObject();
+	GMfloat* basePositions = d->parentParticles->getPositionArray(prototype);
+	GMMesh* mesh = prototype->getAllMeshes()[0];
 	GMbyte* vertexData = (GMbyte*)buffer;
 	GMint index = getIndexInPrototype();
-	GMint position_offset = 4 * index,
-		uv_offset = mesh->get_transferred_positions_byte_size() + 2 * index,
-		color_offset = mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size() + 4 * index;
-	GMfloat* ptrPos = (GMfloat*)(vertexData + position_offset),
-		*ptrUv = (GMfloat*)(vertexData + uv_offset),
+	GMint color_offset = mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size() + 4 * index;
+	GMfloat *ptrPosition = (GMfloat*)(vertexData),
 		*ptrColor = (GMfloat*)(vertexData + color_offset);
-	//linear_math::copyVector(d->position, ptrPos);
-	//linear_math::copyVector(d->uv, ptrUv);
-	linear_math::copyVector(d->color, ptrColor);
+
+	GMint offset = 0;
+	for (auto& component : mesh->getComponents())
+	{
+		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
+		{
+			for (GMint j = 0; j < component->getPrimitiveVerticesCountPtr()[i]; j++)
+			{
+				//linear_math::copyVector(d->color, offset * 4);
+				linear_math::Vector4 basePositionVector(
+					*(basePositions + offset * 4 + 0),
+					*(basePositions + offset * 4 + 1),
+					*(basePositions + offset * 4 + 2),
+					*(basePositions + offset * 4 + 3)
+				);
+				linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
+				linear_math::copyVector(transformedPosition, ptrPosition + offset * 4);
+
+				//更新颜色
+				linear_math::copyVector(d->color, ptrColor + offset * 4);
+				offset++;
+			}
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -63,6 +83,12 @@ GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
 GMParticles::~GMParticles()
 {
 	D(d);
+	for (auto& positions : d->basePositions)
+	{
+		if (positions.second)
+			delete[] positions.second;
+	}
+
 	for (const auto& kv : d->particles)
 	{
 		delete kv.first;
@@ -83,9 +109,6 @@ inline GMParticleGameObject* GMParticles::getParticle(GMint index)
 void GMParticles::draw()
 {
 	D(d);
-	static GMfloat identityMatrix[] = {
-		1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1
-	};
 
 	for (const auto& kv : d->particles)
 	{
@@ -97,7 +120,7 @@ void GMParticles::draw()
 			particle->updatePrototype(buffer);
 		}
 		painter->endUpdateBuffer();
-		kv.first->getPainter()->draw(identityMatrix);
+		kv.first->getPainter()->draw(nullptr);
 	}
 }
 
@@ -145,6 +168,7 @@ GMint GMParticles::findFirstUnusedParticle()
 
 void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameObject*>& particles)
 {
+	D(d);
 	prototype->setHint(GMUsageHint::DynamicDraw);
 
 	auto mesh = prototype->getAllMeshes()[0];
@@ -158,6 +182,17 @@ void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameOb
 	mesh->positions().resize(mesh->positions().size() * size);
 	mesh->uvs().resize(mesh->uvs().size() * size);
 	mesh->colors().resize(mesh->colors().size() * size);
+
+	// 需要把所有positions记录下来，用于做顶点变换
+	auto targetOriginalPositions = d->basePositions.find(prototype);
+	if (targetOriginalPositions == d->basePositions.end())
+	{
+		auto size = mesh->positions().size();
+		auto sizeInBytes = size * sizeof(mesh->positions()[0]);
+		GMfloat* positions = new GMfloat[size];
+		memcpy_s(positions, sizeInBytes, mesh->positions().data(), sizeInBytes);
+		d->basePositions.insert({ prototype, positions });
+	}
 }
 
 void GMParticles::addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParticleGameObject* particle)
@@ -165,6 +200,7 @@ void GMParticles::addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParti
 	D(d);
 	auto& vec = d->particles[prototype];
 	vec.push_back(particle);
+	particle->setParent(this);
 	particle->setIndex(vec.size() - 1);
 	d->allParticles.push_back(particle);
 }
@@ -173,10 +209,4 @@ bool GMParticles::containsPrototype(Object* prototype)
 {
 	D(d);
 	return d->particles.find(prototype) != d->particles.end();
-}
-
-void GMParticles::drawInstances(Object* prototype, GMuint count)
-{
-	GMObjectPainter* painter = prototype->getPainter();
-	painter->drawInstances(count);
 }

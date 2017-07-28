@@ -15,23 +15,6 @@ BEGIN_NS
 class Object;
 class GMGLShaderProgram;
 
-// 所有的顶点属性类型
-enum class GMVertexDataType
-{
-	Position = 0,
-	Normal,
-	UV,
-	Tangent,
-	Bitangent,
-	Lightmap,
-	Color,
-
-	// ---
-	EndOfVertexDataType
-};
-
-#define gmVertexIndex(i) ((GMuint)i)
-
 GM_PRIVATE_OBJECT(GMObjectPainter)
 {
 	Object* object = nullptr;
@@ -54,7 +37,6 @@ public:
 public:
 	virtual void transfer() = 0;
 	virtual void draw(GMfloat* modelTransform) = 0;
-	virtual void drawInstances(GMuint count) = 0;
 	virtual void dispose() = 0;
 
 // 提供修改缓存的方法
@@ -118,8 +100,24 @@ GM_PRIVATE_OBJECT(Object)
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	Vector<GMMesh*> objects;
 	AutoPtr<GMObjectPainter> painter;
-	GMuint divisors[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 };
+
+// 所有的顶点属性类型
+enum class GMVertexDataType
+{
+	Position = 0,
+	Normal,
+	UV,
+	Tangent,
+	Bitangent,
+	Lightmap,
+	Color,
+
+	// ---
+	EndOfVertexDataType
+};
+
+#define gmVertexIndex(i) ((GMuint)i)
 
 GM_ALIGNED_16(class) Object : public GMObject
 {
@@ -140,8 +138,6 @@ public:
 	// 绘制方式
 	void setHint(GMUsageHint hint) { D(d); d->hint = hint; }
 	GMUsageHint getHint() { D(d); return d->hint; }
-	void setVertexDataDivisor(GMVertexDataType type, GMuint divisor) { D(d); d->divisors[gmVertexIndex(type)] = divisor; }
-	GMuint getVertexDataDivisor(GMVertexDataType type) { D(d); return d->divisors[gmVertexIndex(type)]; }
 };
 
 // 绘制时候的排列方式

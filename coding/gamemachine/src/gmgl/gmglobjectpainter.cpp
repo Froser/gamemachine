@@ -6,6 +6,8 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
+#define IF_ENABLED(mesh, type) if (!mesh->isDataDisabled(type))
+
 static GLenum getMode(GMMesh* obj)
 {
 	switch (obj->getArrangementMode())
@@ -60,35 +62,27 @@ void GMGLObjectPainter::transfer()
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
-		glBufferSubData(GL_ARRAY_BUFFER, 0																								, positionSize, mesh->positions().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize																					, normalSize, mesh->normals().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize																		, uvSize, mesh->uvs().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize																, tangentSize, mesh->tangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize												, bitangentSize, mesh->bitangents().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize								, lightmapSize, mesh->lightmaps().data());
-		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize				, colorSize, mesh->colors().data());
+		IF_ENABLED(mesh, GMVertexDataType::Position)	glBufferSubData(GL_ARRAY_BUFFER, 0																				, positionSize	, mesh->positions().data());
+		IF_ENABLED(mesh, GMVertexDataType::Normal)		glBufferSubData(GL_ARRAY_BUFFER, positionSize																	, normalSize	, mesh->normals().data());
+		IF_ENABLED(mesh, GMVertexDataType::UV)			glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize														, uvSize		, mesh->uvs().data());
+		IF_ENABLED(mesh, GMVertexDataType::Tangent)		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize												, tangentSize	, mesh->tangents().data());
+		IF_ENABLED(mesh, GMVertexDataType::Bitangent)	glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize								, bitangentSize	, mesh->bitangents().data());
+		IF_ENABLED(mesh, GMVertexDataType::Lightmap)	glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize				, lightmapSize	, mesh->lightmaps().data());
+		IF_ENABLED(mesh, GMVertexDataType::Color)		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, colorSize		, mesh->colors().data());
 		mesh->setBufferId(vbo);
 
-#if _DEBUG
-		void * buffer = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY);
-		glUnmapBuffer(GL_ARRAY_BUFFER);
-#endif
-
-		if (!mesh->isDataDisabled(GMVertexDataType::Position))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	4,  GL_FLOAT, GL_FALSE, 0, 0);
-		if (!mesh->isDataDisabled(GMVertexDataType::Normal))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4,  GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
-		if (!mesh->isDataDisabled(GMVertexDataType::UV))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Tangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4,  GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Bitangent))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4,  GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize + tangentSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Lightmap))		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
-		if (!mesh->isDataDisabled(GMVertexDataType::Color))			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize));
+		IF_ENABLED(mesh, GMVertexDataType::Position)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	4,  GL_FLOAT, GL_FALSE, 0, 0);
+		IF_ENABLED(mesh, GMVertexDataType::Normal)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4,  GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
+		IF_ENABLED(mesh, GMVertexDataType::UV)			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
+		IF_ENABLED(mesh, GMVertexDataType::Tangent)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		4,  GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize));
+		IF_ENABLED(mesh, GMVertexDataType::Bitangent)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	4,  GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize + tangentSize));
+		IF_ENABLED(mesh, GMVertexDataType::Lightmap)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
+		IF_ENABLED(mesh, GMVertexDataType::Color)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize));
 
 		GM_FOREACH_ENUM_CLASS(type, GMVertexDataType, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 		{
 			if (!mesh->isDataDisabled(type))
-			{
-				glVertexAttribDivisor(gmVertexIndex(type), obj->getVertexDataDivisor(type));
 				glEnableVertexAttribArray(gmVertexIndex(type));
-			}
 		}
 
 		glBindVertexArray(0);
@@ -126,34 +120,6 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 			draw(render, shader, component, mesh, true);
 			if (shader.getDrawBorder())
 				draw(render, shader, component, mesh, false);
-		}
-		glBindVertexArray(0);
-
-		render->end();
-	}
-	END_FOREACH_OBJ
-}
-
-void GMGLObjectPainter::drawInstances(GMuint count)
-{
-	D(d);
-	Object* obj = getObject();
-
-	BEGIN_FOREACH_OBJ(obj, mesh)
-	{
-		IRender* render = d->engine->getRender(mesh->getType());
-		render->begin(d->engine, mesh, nullptr);
-
-		glBindVertexArray(mesh->getArrayId());
-		for (auto component : mesh->getComponents())
-		{
-			Shader& shader = component->getShader();
-			if (shader.getNodraw())
-				continue;
-
-			drawInstances(render, shader, component, mesh, true, count);
-			if (shader.getDrawBorder())
-				drawInstances(render, shader, component, mesh, false, count);
 		}
 		glBindVertexArray(0);
 
@@ -205,20 +171,5 @@ void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* compone
 		render->beginShader(shader, GMDrawMode::Line);
 
 	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
-	render->endShader();
-}
-
-void GMGLObjectPainter::drawInstances(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill, GMuint count)
-{
-	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-	if (fill)
-		render->beginShader(shader, GMDrawMode::Fill);
-	else
-		render->beginShader(shader, GMDrawMode::Line);
-
-	for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
-	{
-		glDrawArraysInstanced(mode, component->getOffsetPtr()[i], component->getPrimitiveVerticesCountPtr()[i], count);
-	}
 	render->endShader();
 }

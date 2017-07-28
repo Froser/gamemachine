@@ -294,11 +294,14 @@ public:
 	// IParticleHandler
 	virtual void update(GMParticleGameObject* particle) override
 	{
-		//particle->position() += 0.1f;
+		static GMfloat pos = 0;
+		pos += .00001f;
+		particle->transform() = linear_math::translate(linear_math::Vector3(pos, pos, pos));
 
 		particle->color()[0] = .2f;
 		particle->color()[1] = .3f;
 		particle->color()[2] = .6f;
+		particle->color()[3] = 1.f;
 	}
 
 	virtual GMParticleGameObject* createParticle(const GMint index)
