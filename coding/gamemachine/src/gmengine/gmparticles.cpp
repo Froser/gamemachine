@@ -37,7 +37,13 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 	GMfloat* basePositions = d->parentParticles->getPositionArray(prototype)
 		+ offset_position / sizeof(decltype(basePositions[0] + 0));
 
-	GMint idx = 0;
+#if _DEBUG
+	GMint totalSize = mesh->get_transferred_normals_byte_size()
+		+ mesh->get_transferred_uvs_byte_size()
+		+ mesh->get_transferred_colors_byte_size();
+#endif
+
+	GMint offset = 0;
 	for (auto& component : mesh->getComponents())
 	{
 		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
@@ -45,17 +51,18 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 			for (GMint j = 0; j < component->getPrimitiveVerticesCountPtr()[i]; j++)
 			{
 				linear_math::Vector4 basePositionVector(
-					*(basePositions + idx * 4 + 0),
-					*(basePositions + idx * 4 + 1),
-					*(basePositions + idx * 4 + 2),
-					*(basePositions + idx * 4 + 3)
+					*(basePositions + offset * 4 + 0),
+					*(basePositions + offset * 4 + 1),
+					*(basePositions + offset * 4 + 2),
+					*(basePositions + offset * 4 + 3)
 				);
 				linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
-				linear_math::copyVector(transformedPosition, ptrPosition + idx * 4);
+				linear_math::copyVector(transformedPosition, ptrPosition + offset * 4);
 
 				//更新颜色
-				linear_math::copyVector(d->color, ptrColor + idx * 4);
-				idx++;
+				ASSERT((GMLargeInteger)(ptrColor + offset * 4 + 3) < (GMLargeInteger)(vertexData + totalSize));
+				linear_math::copyVector(d->color, ptrColor + offset * 4);
+				offset++;
 			}
 		}
 	}
@@ -89,6 +96,7 @@ GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
 GMParticles::~GMParticles()
 {
 	D(d);
+	return;
 	for (auto& positions : d->basePositions)
 	{
 		if (positions.second)
@@ -197,11 +205,6 @@ void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameOb
 	{
 		component->expand(size);
 	}
-
-	// 拷贝若干倍数据
-	mesh->positions().resize(mesh->positions().size() * size);
-	mesh->uvs().resize(mesh->uvs().size() * size);
-	mesh->colors().resize(mesh->colors().size() * size);
 	
 	// 需要把所有positions记录下来，用于做顶点变换
 	auto targetOriginalPositions = d->basePositions.find(prototype);

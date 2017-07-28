@@ -298,12 +298,12 @@ public:
 		static GMfloat pos_1 = 0, pos_2 = 0;
 		if (i++ % 2)
 		{
-			pos_1 += .00001f;
+			pos_1 += .001f;
 			particle->transform() = linear_math::translate(linear_math::Vector3(pos_1, pos_1, pos_1));
 		}
 		else
 		{
-			pos_2 -= .00001f;
+			pos_2 -= .001f;
 			particle->transform() = linear_math::translate(linear_math::Vector3(pos_2, pos_2, pos_2));
 		}
 
@@ -413,16 +413,6 @@ private:
 			break;
 		case gm::GameMachineEvent::Render:
 			{
-				IInput* inputManager = GameMachine::instance().getInputManager();
-				IKeyboardState& kbState = inputManager->getKeyboardState();
-				if (kbState.keyTriggered('N'))
-					GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
-
-				if (kbState.keyTriggered('L'))
-					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
-
-				if (kbState.keyTriggered('P'))
-					rotate = !rotate;
 				if (rotate)
 					a += .001f;
 
@@ -431,9 +421,25 @@ private:
 				//q.setRotation(dir, a);
 				//obj->setRotation(q);
 				demo->renderGameWorld();
+
 				break;
 			}
 		case gm::GameMachineEvent::Activate:
+			{
+				IInput* inputManager = GameMachine::instance().getInputManager();
+				IKeyboardState& kbState = inputManager->getKeyboardState();
+				if (kbState.keyTriggered('N'))
+					GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
+
+				if (kbState.keyTriggered('L'))
+					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
+
+				if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
+					GameMachine::instance().postMessage({ GM_MESSAGE_EXIT });
+
+				if (kbState.keyTriggered('P'))
+					rotate = !rotate;
+			}
 			break;
 		case gm::GameMachineEvent::Deactivate:
 			break;

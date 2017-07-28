@@ -166,11 +166,11 @@ enum class GMMeshType
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
-	AlignedVector<Object::DataType> name; \
+	Vector<Object::DataType> name; \
 	GMuint transferred_##name##_byte_size = 0;
 
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
-	inline AlignedVector<Object::DataType>& name() { D(d); return d->name; } \
+	inline auto& name() { D(d); return d->name; } \
 	inline void clear_##name##_and_save_byte_size() {D(d); set_transferred_##name##_byte_size(name().size() * sizeof(Object::DataType)); name().clear(); } \
 	inline GMuint get_transferred_##name##_byte_size() { D(d); return d->transferred_##name##_byte_size; } \
 	inline void set_transferred_##name##_byte_size(GMuint size) { D(d); d->transferred_##name##_byte_size = size; }
@@ -232,6 +232,8 @@ public:
 	inline void setBufferId(GMuint id) { D(d); d->bufferId = id; }
 	inline void setArrayId(GMuint id) { D(d); d->arrayId = id; }
 };
+
+#define IF_ENABLED(mesh, type) if (!mesh->isDataDisabled(type))
 
 END_NS
 #endif

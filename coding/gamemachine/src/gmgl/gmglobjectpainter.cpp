@@ -6,8 +6,6 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
-#define IF_ENABLED(mesh, type) if (!mesh->isDataDisabled(type))
-
 static GLenum getMode(GMMesh* obj)
 {
 	switch (obj->getArrangementMode())
@@ -87,13 +85,13 @@ void GMGLObjectPainter::transfer()
 
 		glBindVertexArray(0);
 
-		mesh->clear_positions_and_save_byte_size();
-		mesh->clear_normals_and_save_byte_size();
-		mesh->clear_uvs_and_save_byte_size();
-		mesh->clear_tangents_and_save_byte_size();
-		mesh->clear_bitangents_and_save_byte_size();
-		mesh->clear_lightmaps_and_save_byte_size();
-		mesh->clear_colors_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::Position)	mesh->clear_positions_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::Normal)		mesh->clear_normals_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::UV)			mesh->clear_uvs_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::Tangent)		mesh->clear_tangents_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::Bitangent)	mesh->clear_bitangents_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::Lightmap)	mesh->clear_lightmaps_and_save_byte_size();
+		IF_ENABLED(mesh, GMVertexDataType::Color)		mesh->clear_colors_and_save_byte_size();
 	}
 	END_FOREACH_OBJ
 
@@ -159,7 +157,7 @@ void GMGLObjectPainter::endUpdateBuffer()
 
 void* GMGLObjectPainter::getBuffer()
 {
-	return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
 void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill)

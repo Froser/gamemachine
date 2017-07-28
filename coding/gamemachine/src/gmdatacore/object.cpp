@@ -2,6 +2,7 @@
 #include "object.h"
 #include "foundation/linearmath.h"
 #include <algorithm>
+#include <iterator>
 
 #define VERTEX_DEMENSION 4 //顶点的维度，最高维度是齐次维度，恒为1
 #define VERTEX_OFFSET(offset, idx) ((offset * VERTEX_DEMENSION) + idx)
@@ -51,7 +52,7 @@ void Component::beginFace()
 void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 {
 	D(d);
-	AlignedVector<Object::DataType>& vertices = d->parentMesh->positions();
+	auto& vertices = d->parentMesh->positions();
 	vertices.push_back(x);
 	vertices.push_back(y);
 	vertices.push_back(z);
@@ -62,7 +63,7 @@ void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 {
 	D(d);
-	AlignedVector<Object::DataType>& normals = d->parentMesh->normals();
+	auto& normals = d->parentMesh->normals();
 	normals.push_back(x);
 	normals.push_back(y);
 	normals.push_back(z);
@@ -72,7 +73,7 @@ void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 void Component::uv(GMfloat u, GMfloat v)
 {
 	D(d);
-	AlignedVector<Object::DataType>& uvs = d->parentMesh->uvs();
+	auto& uvs = d->parentMesh->uvs();
 	uvs.push_back(u);
 	uvs.push_back(v);
 }
@@ -80,7 +81,7 @@ void Component::uv(GMfloat u, GMfloat v)
 void Component::lightmap(GMfloat u, GMfloat v)
 {
 	D(d);
-	AlignedVector<Object::DataType>& lightmaps = d->parentMesh->lightmaps();
+	auto& lightmaps = d->parentMesh->lightmaps();
 	lightmaps.push_back(u);
 	lightmaps.push_back(v);
 }
@@ -88,7 +89,7 @@ void Component::lightmap(GMfloat u, GMfloat v)
 void Component::color(GMfloat r, GMfloat g, GMfloat b)
 {
 	D(d);
-	AlignedVector<Object::DataType>& colors = d->parentMesh->colors();
+	auto& colors = d->parentMesh->colors();
 	colors.push_back(r);
 	colors.push_back(g);
 	colors.push_back(b);
@@ -105,7 +106,7 @@ void Component::endFace()
 	d->primitiveCount++;
 }
 
-// 复制count个当前component
+// 复制count倍当前component
 void Component::expand(GMuint count)
 {
 	D(d);
@@ -113,14 +114,33 @@ void Component::expand(GMuint count)
 	d->primitiveCount *= count;
 	GMuint originalCounts = d->primitiveVertices.size();
 	GMuint originalOffsets = d->vertexOffsets.size();
-	GMint offset = d->parentMesh->positions().size() / Object::PositionDimension;
-	for (GMuint i = 0; i < d->primitiveCount; i++)
-	{
-		if (i < count)
-			continue;
+	auto position_size = d->parentMesh->positions().size();
+	GMint position_offset = position_size / Object::PositionDimension;
 
+	//实现分配内存
+	IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		d->parentMesh->normals().reserve(d->parentMesh->normals().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			d->parentMesh->uvs().reserve(d->parentMesh->uvs().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::Tangent)	d->parentMesh->tangents().reserve(d->parentMesh->tangents().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::Bitangent)	d->parentMesh->bitangents().reserve(d->parentMesh->bitangents().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	d->parentMesh->lightmaps().reserve(d->parentMesh->lightmaps().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		d->parentMesh->colors().reserve(d->parentMesh->colors().size() * count);
+
+	for (GMuint i = count; i < d->primitiveCount; i++)
+	{
 		d->primitiveVertices.push_back(d->primitiveVertices[i % originalCounts]);
-		d->vertexOffsets.push_back(offset + d->vertexOffsets[i % originalCounts]);
+		d->vertexOffsets.push_back(position_offset + d->vertexOffsets[i % originalCounts]);
+	}
+
+	for (GMuint i = 0; i < count - 1; i++)
+	{
+		IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	std::copy(d->parentMesh->positions().begin(), d->parentMesh->positions().end(), std::back_inserter(d->parentMesh->positions()));
+		IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		std::copy(d->parentMesh->normals().begin(), d->parentMesh->normals().end(), std::back_inserter(d->parentMesh->normals()));
+		IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			std::copy(d->parentMesh->uvs().begin(), d->parentMesh->uvs().end(), std::back_inserter(d->parentMesh->uvs()));
+		IF_ENABLED(d->parentMesh, GMVertexDataType::Tangent)	std::copy(d->parentMesh->tangents().begin(), d->parentMesh->tangents().end(), std::back_inserter(d->parentMesh->tangents()));
+		IF_ENABLED(d->parentMesh, GMVertexDataType::Bitangent)	std::copy(d->parentMesh->bitangents().begin(), d->parentMesh->bitangents().end(), std::back_inserter(d->parentMesh->bitangents()));
+		IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	std::copy(d->parentMesh->lightmaps().begin(), d->parentMesh->lightmaps().end(), std::back_inserter(d->parentMesh->lightmaps()));
+		IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		std::copy(d->parentMesh->colors().begin(), d->parentMesh->colors().end(), std::back_inserter(d->parentMesh->colors()));
 	}
 }
 
