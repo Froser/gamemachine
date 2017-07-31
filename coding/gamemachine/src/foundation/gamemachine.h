@@ -124,12 +124,12 @@ public:
 	GMCamera& getCamera() { D(d); return d->camera; }
 
 	// 时间管理
-	GMfloat getFPS();
-	GMfloat evaluateDeltaTime();
-	GMfloat getGameTimeSeconds();
+	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }
+	inline GMfloat getGameTimeSeconds() { D(d); return d->clock.getTime(); }
+	inline GMfloat getLastFrameElapsed() { D(d); return d->clock.evaluateDeltaTime(); }
 
 	// 绘制管理
-	void initObjectPainter(Object* obj);
+	void initObjectPainter(GMModel* obj);
 
 	// 大小端模式
 	EndiannessMode getMachineEndianness();

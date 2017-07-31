@@ -2,7 +2,7 @@
 #include "gmgltexture.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "shader_constants.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 
 GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)
 	: m_inited(false)

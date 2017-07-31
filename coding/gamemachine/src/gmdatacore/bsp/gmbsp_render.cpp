@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbsp_render.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 
 GMBSPRenderData& GMBSPRender::renderData()
 {
@@ -287,14 +287,14 @@ void GMBSPRender::generateVisibilityData()
 	memcpy(d->visibilityData.bitset, d->bsp->visBytes.data() + sz, bitsetSize);
 }
 
-void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT Object** obj)
+void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT GMModel** obj)
 {
 	D(d);
 
-	Object* coreObj = new Object();
+	GMModel* coreObj = new GMModel();
 	GMMesh* child = new GMMesh();
 	child->setArrangementMode(GMArrangementMode::Triangles);
-	Component* component = new Component(child);
+	GMComponent* component = new GMComponent(child);
 	component->setShader(shader);
 
 	ASSERT(face.numIndices % 3 == 0);
@@ -327,13 +327,13 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shad
 	*obj = coreObj;
 }
 
-void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj)
+void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT GMModel** obj)
 {
-	Object* coreObj = new Object();
+	GMModel* coreObj = new GMModel();
 	GMMesh* child = new GMMesh();
 	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
-	Component* component = new Component(child);
+	GMComponent* component = new GMComponent(child);
 	component->setShader(shader);
 
 	GMint numVertices = 2 * (biqp.tesselation + 1);
@@ -372,7 +372,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	*obj = coreObj;
 }
 
-void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj)
+void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT GMModel** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,
@@ -399,7 +399,7 @@ void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_ma
 		3, 7, 5,
 	};
 
-	Object* coreObj = new Object();
+	GMModel* coreObj = new GMModel();
 	GMMesh* child = new GMMesh();
 	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
@@ -409,7 +409,7 @@ void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_ma
 		t[i] = extents[i % 3] * v[i] + position[i % 3];
 	}
 
-	Component* component = new Component(child);
+	GMComponent* component = new GMComponent(child);
 	component->setShader(shader);
 
 	linear_math::Vector3 normal;

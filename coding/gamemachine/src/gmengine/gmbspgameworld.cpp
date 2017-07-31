@@ -464,7 +464,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	}
 	setMaterialLightmap(polygonFace.lightmapIndex, shader);
 
-	Object* coreObj;
+	GMModel* coreObj;
 	d->render.createObject(polygonFace, shader, &coreObj);
 	obj = new GMGameObject(coreObj);
 
@@ -492,7 +492,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	}
 	setMaterialLightmap(meshFace.lightmapIndex, shader);
 
-	Object* coreObj;
+	GMModel* coreObj;
 	d->render.createObject(meshFace, shader, &coreObj);
 	obj = new GMGameObject(coreObj);
 	rd.meshFaceObjects[&meshFace] = obj;
@@ -521,7 +521,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 		GMBSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
 		ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
 
-		Object* coreObj;
+		GMModel* coreObj;
 		d->render.createObject(biqp, shader, &coreObj);
 		GMGameObject* obj = new GMGameObject(coreObj);
 		rd.biquadraticPatchObjects[&biqp] = obj;
@@ -865,7 +865,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	GMBSPRenderData& rd = d->render.renderData();
 
 	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
-	Object* coreObj = nullptr;
+	GMModel* coreObj = nullptr;
 
 	if (!strlen(m->model))
 	{

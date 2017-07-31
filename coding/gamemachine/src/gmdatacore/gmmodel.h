@@ -1,5 +1,5 @@
-﻿#ifndef __OBJSTRUCT_H__
-#define __OBJSTRUCT_H__
+﻿#ifndef __GMMODEL_H__
+#define __GMMODEL_H__
 #include "common.h"
 #include "foundation/vector.h"
 #include "image.h"
@@ -7,17 +7,17 @@
 #include "foundation/linearmath.h"
 #include "shader.h"
 
-#define BEGIN_FOREACH_OBJ(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;
-#define END_FOREACH_OBJ }
+#define BEGIN_FOREACH_MESH(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;
+#define END_FOREACH_MESH }
 
 BEGIN_NS
 
-class Object;
+class GMModel;
 class GMGLShaderProgram;
 
 GM_PRIVATE_OBJECT(GMObjectPainter)
 {
-	Object* object = nullptr;
+	GMModel* object = nullptr;
 };
 
 class GMMesh;
@@ -26,7 +26,7 @@ class GMObjectPainter : public GMObject
 	DECLARE_PRIVATE(GMObjectPainter)
 
 public:
-	GMObjectPainter(Object* obj)
+	GMObjectPainter(GMModel* obj)
 	{
 		D(d);
 		d->object = obj;
@@ -45,10 +45,10 @@ public:
 	virtual void* getBuffer() = 0;
 
 protected:
-	Object* getObject();
+	GMModel* getModel();
 };
 
-GM_PRIVATE_OBJECT(Component)
+GM_PRIVATE_OBJECT(GMComponent)
 {
 	GMuint offset = 0;
 	// 绘制图元数量
@@ -64,14 +64,14 @@ GM_PRIVATE_OBJECT(Component)
 	Shader shader;
 };
 
-class Component : public GMObject
+class GMComponent : public GMObject
 {
-	DECLARE_PRIVATE(Component)
+	DECLARE_PRIVATE(GMComponent)
 
 	friend class GMMesh;
 
 public:
-	Component(GMMesh* parent);
+	GMComponent(GMMesh* parent);
 
 	inline Shader& getShader() { D(d); return d->shader; }
 	inline void setShader(const Shader& shader) { D(d); d->shader = shader; }
@@ -96,7 +96,7 @@ enum class GMUsageHint
 	DynamicDraw,
 };
 
-GM_PRIVATE_OBJECT(Object)
+GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	Vector<GMMesh*> objects;
@@ -120,9 +120,9 @@ enum class GMVertexDataType
 
 #define gmVertexIndex(i) ((GMuint)i)
 
-GM_ALIGNED_16(class) Object : public GMObject
+GM_ALIGNED_16(class) GMModel : public GMObject
 {
-	DECLARE_PRIVATE(Object)
+	DECLARE_PRIVATE(GMModel)
 
 public:
 	typedef GMfloat DataType;
@@ -133,7 +133,7 @@ public:
 	};
 
 public:
-	~Object();
+	~GMModel();
 
 public:
 	inline void setPainter(AUTORELEASE GMObjectPainter* painter) { D(d); d->painter.reset(painter); }
@@ -166,12 +166,12 @@ enum class GMMeshType
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
-	Vector<Object::DataType> name; \
+	Vector<GMModel::DataType> name; \
 	GMuint transferred_##name##_byte_size = 0;
 
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
 	inline auto& name() { D(d); return d->name; } \
-	inline void clear_##name##_and_save_byte_size() {D(d); set_transferred_##name##_byte_size(name().size() * sizeof(Object::DataType)); name().clear(); } \
+	inline void clear_##name##_and_save_byte_size() {D(d); set_transferred_##name##_byte_size(name().size() * sizeof(GMModel::DataType)); name().clear(); } \
 	inline GMuint get_transferred_##name##_byte_size() { D(d); return d->transferred_##name##_byte_size; } \
 	inline void set_transferred_##name##_byte_size(GMuint size) { D(d); d->transferred_##name##_byte_size = size; }
 
@@ -188,7 +188,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	bool disabledData[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
-	Vector<Component*> components;
+	Vector<GMComponent*> components;
 	GMMeshType type = GMMeshType::Model;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
 	GMString name = _L("default");
@@ -206,7 +206,7 @@ public:
 
 public:
 	void clone(OUT GMMesh** childObject);
-	void appendComponent(AUTORELEASE Component* component);
+	void appendComponent(AUTORELEASE GMComponent* component);
 	void calculateTangentSpace();
 
 public:
@@ -220,7 +220,7 @@ public:
 
 	inline void disableData(GMVertexDataType type) { D(d); d->disabledData[gmVertexIndex(type)] = true; }
 	inline bool isDataDisabled(GMVertexDataType type) { D(d); return d->disabledData[gmVertexIndex(type)]; }
-	inline Vector<Component*>& getComponents() { D(d); return d->components; }
+	inline Vector<GMComponent*>& getComponents() { D(d); return d->components; }
 	inline GMMeshType getType() { D(d); return d->type; }
 	inline void setType(GMMeshType type) { D(d); d->type = type; }
 	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }

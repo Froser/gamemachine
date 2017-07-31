@@ -16,19 +16,19 @@ struct ModelReader_Obj_Material
 	GMfloat ks[3];
 };
 
-class Object;
+class GMModel;
 struct GMBuffer;
 class Scanner;
-class Component;
+class GMComponent;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
-	Object* object;
+	GMModel* object;
 	AlignedVector<linear_math::Vector3> positions;
 	AlignedVector<linear_math::Vector3> normals;
 	AlignedVector<linear_math::Vector2> textures;
 	Map<GMString, ModelReader_Obj_Material> materials;
 	GMString currentMaterialName;
-	Component* currentComponent;
+	GMComponent* currentComponent;
 };
 
 // 一个Obj文件只由一个部分组成，不存在骨骼等动画，是刚体静态的
@@ -41,7 +41,7 @@ public:
 	~GMModelReader_Obj();
 
 public:
-	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT Object** object) override;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModel** object) override;
 	virtual bool test(const GMBuffer& buffer) override;
 
 private:

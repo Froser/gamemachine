@@ -2,7 +2,7 @@
 #define __GMGL_RENDERS_OBJECT_H__
 #include "common.h"
 #include "gmdatacore/shader.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 BEGIN_NS
 
 class GMGLGraphicEngine;

@@ -4,13 +4,13 @@
 #include "foundation/linearmath.h"
 BEGIN_NS
 
-class Object;
+class GMModel;
 struct GMBuffer;
 struct GMModelLoadSettings;
 struct IModelReader
 {
 	virtual ~IModelReader() {}
-	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT Object** object) = 0;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModel** object) = 0;
 	virtual bool test(const GMBuffer& buffer) = 0;
 };
 
@@ -36,8 +36,8 @@ public:
 	};
 
 public:
-	static bool load(const GMModelLoadSettings& settings, OUT Object** object);
-	static bool load(const GMModelLoadSettings& settings, ModelType type, OUT Object** object);
+	static bool load(const GMModelLoadSettings& settings, OUT GMModel** object);
+	static bool load(const GMModelLoadSettings& settings, ModelType type, OUT GMModel** object);
 	static IModelReader* getReader(ModelType type);
 
 private:

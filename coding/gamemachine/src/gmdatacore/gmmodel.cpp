@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "object.h"
+#include "gmmodel.h"
 #include "foundation/linearmath.h"
 #include <algorithm>
 #include <iterator>
@@ -8,27 +8,27 @@
 #define VERTEX_OFFSET(offset, idx) ((offset * VERTEX_DEMENSION) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
-Object* GMObjectPainter::getObject()
+GMModel* GMObjectPainter::getModel()
 {
 	D(d);
 	return d->object;
 }
 
-Object::~Object()
+GMModel::~GMModel()
 {
 	D(d);
 	if (d->painter)
 		d->painter->dispose();
 
-	BEGIN_FOREACH_OBJ(this, meshes)
+	BEGIN_FOREACH_MESH(this, meshes)
 	{
 		if (meshes)
 			delete meshes;
 	}
-	END_FOREACH_OBJ
+	END_FOREACH_MESH
 }
 
-Component::Component(GMMesh* parent)
+GMComponent::GMComponent(GMMesh* parent)
 {
 	D(d);
 	d->parentMesh = parent;
@@ -37,19 +37,19 @@ Component::Component(GMMesh* parent)
 
 // 设置此component的第一个顶点位于ChildObject.vertices()中的偏移位置
 // 一般不需要手动调用
-void Component::setVertexOffset(GMuint offset)
+void GMComponent::setVertexOffset(GMuint offset)
 {
 	D(d);
 	d->offset = offset;
 }
 
-void Component::beginFace()
+void GMComponent::beginFace()
 {
 	D(d);
 	d->currentFaceVerticesCount = 0;
 }
 
-void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
+void GMComponent::vertex(GMfloat x, GMfloat y, GMfloat z)
 {
 	D(d);
 	auto& vertices = d->parentMesh->positions();
@@ -60,7 +60,7 @@ void Component::vertex(GMfloat x, GMfloat y, GMfloat z)
 	d->currentFaceVerticesCount++;
 }
 
-void Component::normal(GMfloat x, GMfloat y, GMfloat z)
+void GMComponent::normal(GMfloat x, GMfloat y, GMfloat z)
 {
 	D(d);
 	auto& normals = d->parentMesh->normals();
@@ -70,7 +70,7 @@ void Component::normal(GMfloat x, GMfloat y, GMfloat z)
 	normals.push_back(1.0f);
 }
 
-void Component::uv(GMfloat u, GMfloat v)
+void GMComponent::uv(GMfloat u, GMfloat v)
 {
 	D(d);
 	auto& uvs = d->parentMesh->uvs();
@@ -78,7 +78,7 @@ void Component::uv(GMfloat u, GMfloat v)
 	uvs.push_back(v);
 }
 
-void Component::lightmap(GMfloat u, GMfloat v)
+void GMComponent::lightmap(GMfloat u, GMfloat v)
 {
 	D(d);
 	auto& lightmaps = d->parentMesh->lightmaps();
@@ -86,7 +86,7 @@ void Component::lightmap(GMfloat u, GMfloat v)
 	lightmaps.push_back(v);
 }
 
-void Component::color(GMfloat r, GMfloat g, GMfloat b, GMfloat a)
+void GMComponent::color(GMfloat r, GMfloat g, GMfloat b, GMfloat a)
 {
 	D(d);
 	auto& colors = d->parentMesh->colors();
@@ -96,7 +96,7 @@ void Component::color(GMfloat r, GMfloat g, GMfloat b, GMfloat a)
 	colors.push_back(a);
 }
 
-void Component::endFace()
+void GMComponent::endFace()
 {
 	D(d);
 	d->vertexOffsets.push_back(d->primitiveVertices.empty() ?
@@ -107,7 +107,7 @@ void Component::endFace()
 }
 
 // 复制count倍当前component
-void Component::expand(GMuint count)
+void GMComponent::expand(GMuint count)
 {
 	D(d);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
@@ -138,9 +138,11 @@ void Component::expand(GMuint count)
 				beginFace();
 			}
 
-			vertex(d->parentMesh->positions()[d->offset + i * 4 + 0], d->parentMesh->positions()[d->offset + i * 4 + 1], d->parentMesh->positions()[d->offset + i * 4 + 2]);
-			uv(d->parentMesh->uvs()[d->offset + i * 2 + 0], d->parentMesh->uvs()[d->offset + i * 2 + 1]);
-			color(d->parentMesh->colors()[d->offset + i * 4 + 0], d->parentMesh->colors()[d->offset + i * 4 + 1], d->parentMesh->colors()[d->offset + i * 4 + 2]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	vertex(d->parentMesh->positions()[d->offset + i * 4 + 0], d->parentMesh->positions()[d->offset + i * 4 + 1], d->parentMesh->positions()[d->offset + i * 4 + 2]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		normal(d->parentMesh->normals()[d->offset + i * 4 + 0], d->parentMesh->normals()[d->offset + i * 4 + 1], d->parentMesh->normals()[d->offset + i * 4 + 2]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			uv(d->parentMesh->uvs()[d->offset + i * 2 + 0], d->parentMesh->uvs()[d->offset + i * 2 + 1]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	lightmap(d->parentMesh->lightmaps()[d->offset + i * 4 + 0], d->parentMesh->lightmaps()[d->offset + i * 4 + 1]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		color(d->parentMesh->colors()[d->offset + i * 4 + 0], d->parentMesh->colors()[d->offset + i * 4 + 1], d->parentMesh->colors()[d->offset + i * 4 + 2]);
 
 			if (i == verticesCount - 1)
 				endFace();
@@ -161,7 +163,7 @@ GMMesh::~GMMesh()
 	}
 }
 
-void GMMesh::appendComponent(AUTORELEASE Component* component)
+void GMMesh::appendComponent(AUTORELEASE GMComponent* component)
 {
 	D(d);
 	ASSERT(std::find(d->components.begin(), d->components.end(), component) == d->components.end());

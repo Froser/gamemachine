@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmgameworld.h"
 #include "gmgameobject.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"
@@ -37,7 +37,7 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 	d->gameObjects[obj->getType()].insert(obj);
-	GameMachine::instance().initObjectPainter(obj->getObject());
+	GameMachine::instance().initObjectPainter(obj->getModel());
 }
 
 void GMGameWorld::simulateGameWorld()
@@ -59,9 +59,9 @@ GMObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 	IFactory* factory = gm.getFactory();
 	IGraphicEngine* engine = gm.getGraphicEngine();
 	GMObjectPainter* painter;
-	factory->createPainter(engine, obj->getObject(), &painter);
-	ASSERT(!obj->getObject()->getPainter());
-	obj->getObject()->setPainter(painter);
+	factory->createPainter(engine, obj->getModel(), &painter);
+	ASSERT(!obj->getModel()->getPainter());
+	obj->getModel()->setPainter(painter);
 	return painter;
 }
 

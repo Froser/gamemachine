@@ -46,12 +46,12 @@ GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
 }
 
 
-bool GMModelReader::load(const GMModelLoadSettings& settings, OUT Object** object)
+bool GMModelReader::load(const GMModelLoadSettings& settings, OUT GMModel** object)
 {
 	return load(settings, ModelType_AUTO, object);
 }
 
-bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT Object** object)
+bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT GMModel** object)
 {
 	GMBuffer buffer;
 	settings.gamePackage.readFileFromPath(settings.path, &buffer);

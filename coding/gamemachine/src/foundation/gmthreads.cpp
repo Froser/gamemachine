@@ -95,6 +95,14 @@ GMThreadId GMThread::getCurrentThreadId()
 #endif
 }
 
+void GMThread::sleep(GMint miliseconds)
+{
+#if _WINDOWS
+	::Sleep(miliseconds);
+#else
+	ASSERT(false);
+#endif
+}
 
 static std::mutex sustained_thread_mutex;
 

@@ -2,7 +2,7 @@
 #include "shader_constants.h"
 #include <algorithm>
 #include "gmglgraphic_engine.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgameobject.h"
 #include "gmglobjectpainter.h"

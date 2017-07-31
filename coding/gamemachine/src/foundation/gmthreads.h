@@ -67,6 +67,7 @@ public:
 
 public:
 	static GMThreadId getCurrentThreadId();
+	static void sleep(GMint miliseconds);
 };
 
 // GMSustainedThread

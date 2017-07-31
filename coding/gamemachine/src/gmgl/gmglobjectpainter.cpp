@@ -24,7 +24,7 @@ static GLenum getMode(GMMesh* obj)
 	}
 }
 
-GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, Object* objs)
+GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMModel* objs)
 	: GMObjectPainter(objs)
 {
 	D(d);
@@ -37,9 +37,9 @@ void GMGLObjectPainter::transfer()
 	if (d->inited)
 		return;
 
-	Object* obj = getObject();
+	GMModel* obj = getModel();
 	GLenum usage = obj->getHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
-	BEGIN_FOREACH_OBJ(obj, mesh)
+	BEGIN_FOREACH_MESH(obj, mesh)
 	{
 		mesh->calculateTangentSpace();
 
@@ -48,13 +48,13 @@ void GMGLObjectPainter::transfer()
 		glBindVertexArray(vao);
 		mesh->setArrayId(vao);
 
-		GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(Object::DataType) * mesh->positions().size();
-		GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(Object::DataType) * mesh->normals().size();
-		GLuint uvSize			= mesh->isDataDisabled(GMVertexDataType::UV)			? 0 : sizeof(Object::DataType) * mesh->uvs().size();
-		GLuint tangentSize		= mesh->isDataDisabled(GMVertexDataType::Tangent)		? 0 : sizeof(Object::DataType) * mesh->tangents().size();
-		GLuint bitangentSize	= mesh->isDataDisabled(GMVertexDataType::Bitangent)		? 0 : sizeof(Object::DataType) * mesh->bitangents().size();
-		GLuint lightmapSize		= mesh->isDataDisabled(GMVertexDataType::Lightmap)		? 0 : sizeof(Object::DataType) * mesh->lightmaps().size();
-		GLuint colorSize		= mesh->isDataDisabled(GMVertexDataType::Color)			? 0 : sizeof(Object::DataType) * mesh->colors().size();
+		GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(GMModel::DataType) * mesh->positions().size();
+		GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(GMModel::DataType) * mesh->normals().size();
+		GLuint uvSize			= mesh->isDataDisabled(GMVertexDataType::UV)			? 0 : sizeof(GMModel::DataType) * mesh->uvs().size();
+		GLuint tangentSize		= mesh->isDataDisabled(GMVertexDataType::Tangent)		? 0 : sizeof(GMModel::DataType) * mesh->tangents().size();
+		GLuint bitangentSize	= mesh->isDataDisabled(GMVertexDataType::Bitangent)		? 0 : sizeof(GMModel::DataType) * mesh->bitangents().size();
+		GLuint lightmapSize		= mesh->isDataDisabled(GMVertexDataType::Lightmap)		? 0 : sizeof(GMModel::DataType) * mesh->lightmaps().size();
+		GLuint colorSize		= mesh->isDataDisabled(GMVertexDataType::Color)			? 0 : sizeof(GMModel::DataType) * mesh->colors().size();
 
 		GLuint vbo;
 		glGenBuffers(1, &vbo);
@@ -93,7 +93,7 @@ void GMGLObjectPainter::transfer()
 		IF_ENABLED(mesh, GMVertexDataType::Lightmap)	mesh->clear_lightmaps_and_save_byte_size();
 		IF_ENABLED(mesh, GMVertexDataType::Color)		mesh->clear_colors_and_save_byte_size();
 	}
-	END_FOREACH_OBJ
+	END_FOREACH_MESH
 
 	d->inited = true;
 }
@@ -101,9 +101,9 @@ void GMGLObjectPainter::transfer()
 void GMGLObjectPainter::draw(GMfloat* modelTransform)
 {
 	D(d);
-	Object* obj = getObject();
+	GMModel* obj = getModel();
 
-	BEGIN_FOREACH_OBJ(obj, mesh)
+	BEGIN_FOREACH_MESH(obj, mesh)
 	{
 		IRender* render = d->engine->getRender(mesh->getType());
 		render->begin(d->engine, mesh, modelTransform);
@@ -123,15 +123,15 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 
 		render->end();
 	}
-	END_FOREACH_OBJ
+	END_FOREACH_MESH
 }
 
 void GMGLObjectPainter::dispose()
 {
 	D(d);
-	Object* obj = getObject();
+	GMModel* obj = getModel();
 
-	BEGIN_FOREACH_OBJ(obj, mesh)
+	BEGIN_FOREACH_MESH(obj, mesh)
 	{
 		GLuint vao[1] = { mesh->getArrayId() },
 			vbo[1] = { mesh->getBufferId() };
@@ -139,7 +139,7 @@ void GMGLObjectPainter::dispose()
 		glDeleteVertexArrays(1, vao);
 		glDeleteBuffers(1, vbo);
 	}
-	END_FOREACH_OBJ
+	END_FOREACH_MESH
 
 	d->inited = false;
 }
@@ -160,7 +160,7 @@ void* GMGLObjectPainter::getBuffer()
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
-void GMGLObjectPainter::draw(IRender* render, Shader& shader, Component* component, GMMesh* mesh, bool fill)
+void GMGLObjectPainter::draw(IRender* render, Shader& shader, GMComponent* component, GMMesh* mesh, bool fill)
 {
 	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 	if (fill)

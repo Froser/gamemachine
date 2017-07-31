@@ -59,25 +59,7 @@ void GameMachine::postMessage(GameMachineMessage msg)
 	d->messageQueue.push(msg);
 }
 
-GMfloat GameMachine::getFPS()
-{
-	D(d);
-	return d->clock.getFps();
-}
-
-GMfloat GameMachine::evaluateDeltaTime()
-{
-	D(d);
-	return d->clock.evaluateDeltaTime();
-}
-
-GMfloat GameMachine::getGameTimeSeconds()
-{
-	D(d);
-	return d->clock.getTime();
-}
-
-void GameMachine::initObjectPainter(Object* obj)
+void GameMachine::initObjectPainter(GMModel* obj)
 {
 	D(d);
 	GMObjectPainter* painter = obj->getPainter();
@@ -134,8 +116,15 @@ void GameMachine::startGameMachine()
 	// 开始计时器
 	d->clock.begin();
 	// 消息循环
+
+	GMfloat diff = 0;
+	GMClock frameCounter;
 	while (true)
 	{
+		GMint bNeedControlFrameRate = GMGetBuiltIn(FRAMERATE_CONTROL);
+		if (bNeedControlFrameRate)
+			frameCounter.begin();
+
 		if (!GMUIWindow::handleMessage())
 			break;
 
@@ -159,6 +148,15 @@ void GameMachine::startGameMachine()
 		updateWindows();
 		d->inputManager->update();
 		d->clock.update();
+
+		// 控制帧率
+		if (bNeedControlFrameRate)
+		{
+			frameCounter.update();
+			diff = (1 / 60.f - frameCounter.evaluateDeltaTime()) * 1000;
+			if (diff > 0)
+				GMThread::sleep(diff);
+		}
 	}
 
 	terminate();

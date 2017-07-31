@@ -49,7 +49,7 @@ struct ISoundFile : public ISoundPlayer
 };
 
 struct GMBuffer;
-class Object;
+class GMModel;
 struct ISoundReader
 {
 	virtual ~ISoundReader() {}

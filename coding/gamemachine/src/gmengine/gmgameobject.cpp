@@ -5,7 +5,7 @@
 #include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
 #include "foundation/gamemachine.h"
 
-GMGameObject::GMGameObject(AUTORELEASE Object* obj)
+GMGameObject::GMGameObject(AUTORELEASE GMModel* obj)
 {
 	D(d);
 	setObject(obj);
@@ -18,25 +18,25 @@ GMGameObject::~GMGameObject()
 {
 	D(d);
 	if (!d->destructor)
-		delete d->object;
+		delete d->model;
 	else
 		d->destructor(this);
 }
 
-void GMGameObject::setObject(AUTORELEASE Object* obj)
+void GMGameObject::setObject(AUTORELEASE GMModel* obj)
 {
 	D(d);
-	if (d->object)
-		delete d->object;
-	d->object = obj;
+	if (d->model)
+		delete d->model;
+	d->model = obj;
 }
 
-Object* GMGameObject::getObject()
+GMModel* GMGameObject::getModel()
 {
 	D(d);
-	if (!d->object)
-		d->object = new Object();
-	return d->object;
+	if (!d->model)
+		d->model = new GMModel();
+	return d->model;
 }
 
 void GMGameObject::setWorld(GMGameWorld* world)
@@ -61,7 +61,7 @@ void GMGameObject::draw()
 {
 	GMfloat transform[16];
 	getTransform().toArray(transform);
-	Object* coreObj = getObject();
+	GMModel* coreObj = getModel();
 	coreObj->getPainter()->draw(transform);
 }
 
@@ -109,13 +109,13 @@ void GMGlyphObject::constructObject()
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
-	Object* obj = new Object();
+	GMModel* obj = new GMModel();
 	GMMesh* child = new GMMesh();
 	obj->append(child);
 	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 	child->setType(GMMeshType::Glyph);
 
-	Component* component = new Component(child);
+	GMComponent* component = new GMComponent(child);
 	Shader& shader = component->getShader();
 	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).setOneFrame(0, glyphManager->glyphTexture());
 	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).setFrameCount(1);
@@ -186,11 +186,11 @@ void GMGlyphObject::updateObject()
 {
 	D_BASE(d, GMGameObject);
 	constructObject();
-	GameMachine::instance().initObjectPainter(getObject());
+	GameMachine::instance().initObjectPainter(getModel());
 }
 
 //GMEntityObject
-GMEntityObject::GMEntityObject(AUTORELEASE Object* obj)
+GMEntityObject::GMEntityObject(AUTORELEASE GMModel* obj)
 	: GMGameObject(obj)
 {
 	calc();
@@ -215,10 +215,10 @@ void GMEntityObject::calc()
 	d->mins[0] = d->mins[1] = d->mins[2] = 999999.f;
 	d->maxs[0] = d->maxs[1] = d->maxs[2] = -d->mins[0];
 
-	Object* obj = getObject();
+	GMModel* obj = getModel();
 	for (auto mesh : obj->getAllMeshes())
 	{
-		Object::DataType* vertices = mesh->positions().data();
+		GMModel::DataType* vertices = mesh->positions().data();
 		GMint sz = mesh->positions().size();
 		for (GMint i = 0; i < sz; i += 4)
 		{
@@ -296,12 +296,12 @@ GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector
 	d->min = min;
 	d->max = max;
 
-	Object* obj = nullptr;
+	GMModel* obj = nullptr;
 	createSkyBox(&obj);
 	setObject(obj);
 }
 
-void GMSkyGameObject::createSkyBox(OUT Object** obj)
+void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 {
 	D(d);
 	linear_math::Vector3 vertices[20] = {
@@ -358,11 +358,11 @@ void GMSkyGameObject::createSkyBox(OUT Object** obj)
 		vertices[i] = linear_math::Vector3(pt[0], pt[1], pt[2]);
 	}
 
-	Object* object = new Object();
+	GMModel* object = new GMModel();
 	*obj = object;
 
 	GMMesh* child = new GMMesh();
-	Component* component = new Component(child);
+	GMComponent* component = new GMComponent(child);
 	component->setShader(d->shader);
 
 	// We don't draw surface beneath us

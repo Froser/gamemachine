@@ -53,8 +53,8 @@ set(SOURCES
 		gmdatacore/image.cpp
 		gmdatacore/imagebuffer.h
 		gmdatacore/imagebuffer.cpp
-		gmdatacore/object.h
-		gmdatacore/object.cpp
+		gmdatacore/gmmodel.h
+		gmdatacore/gmmodel.cpp
 		gmdatacore/shader.h
 		gmdatacore/model.h
 		gmdatacore/model.cpp

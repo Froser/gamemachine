@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmprimitivecreator.h"
 
-void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT Object** obj, GMMeshType type)
+void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, GMMeshType type)
 {
 	static constexpr GMfloat v[24] = {
 		1, -1, 1,
@@ -28,7 +28,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT Object** obj, GMMesh
 		3, 7, 5,
 	};
 
-	Object* coreObj = new Object();
+	GMModel* coreObj = new GMModel();
 
 	// 实体
 	GMfloat t[24];
@@ -42,7 +42,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT Object** obj, GMMesh
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 		body->setType(type);
 
-		Component* component = new Component(body);
+		GMComponent* component = new GMComponent(body);
 
 		linear_math::Vector3 normal;
 		for (GMint i = 0; i < 12; i++)
@@ -72,7 +72,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT Object** obj, GMMesh
 	*obj = coreObj;
 }
 
-void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT Object** obj, GMMeshType type)
+void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT GMModel** obj, GMMeshType type)
 {
 	static constexpr GMfloat v[] = {
 		-1, 1, 0,
@@ -86,7 +86,7 @@ void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT Object** obj, GMMes
 		2, 3, 1,
 	};
 
-	Object* coreObj = new Object();
+	GMModel* coreObj = new GMModel();
 
 	// 实体
 	GMfloat t[12];
@@ -100,7 +100,7 @@ void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT Object** obj, GMMes
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 		body->setType(type);
 
-		Component* component = new Component(body);
+		GMComponent* component = new GMComponent(body);
 
 		linear_math::Vector3 normal;
 

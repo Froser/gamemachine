@@ -5,7 +5,7 @@
 
 static void destructor(GMGameObject*) {}
 
-GMParticleGameObject::GMParticleGameObject(Object* prototype)
+GMParticleGameObject::GMParticleGameObject(GMModel* prototype)
 	: GMGameObject(prototype)
 {
 	D(d);
@@ -21,7 +21,7 @@ GMParticleGameObject::GMParticleGameObject(Object* prototype)
 void GMParticleGameObject::updatePrototype(void* buffer)
 {
 	D(d);
-	Object* prototype = getObject();
+	GMModel* prototype = getModel();
 	GMMesh* mesh = prototype->getAllMeshes()[0];
 	GMbyte* vertexData = (GMbyte*)buffer;
 
@@ -44,7 +44,7 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 
 	GMint offset = 0;
 	// 这一轮需要更新的顶点数量
-	GMint vertexCountThisTurn = mesh->get_transferred_positions_byte_size() / sizeof(Object::DataType) / particleCount / Object::PositionDimension;
+	GMint vertexCountThisTurn = mesh->get_transferred_positions_byte_size() / sizeof(GMModel::DataType) / particleCount / GMModel::PositionDimension;
 	for (GMint offset = 0; offset < vertexCountThisTurn; ++offset)
 	{
 		linear_math::Vector4 basePositionVector(
@@ -82,7 +82,7 @@ GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
 
 	for (auto& kv : d->particles)
 	{
-		Object* prototype = kv.first;
+		GMModel* prototype = kv.first;
 		initPrototype(kv.first, kv.second);
 		GameMachine::instance().initObjectPainter(prototype);
 	}
@@ -121,7 +121,7 @@ void GMParticles::draw()
 
 	for (const auto& kv : d->particles)
 	{
-		Object* prototype = kv.first;
+		GMModel* prototype = kv.first;
 		GMObjectPainter* painter = prototype->getPainter();
 		void* buffer = painter->getBuffer();
 		for (const auto& particle : kv.second)
@@ -140,38 +140,22 @@ void GMParticles::simulate()
 	for (auto& particle : d->allParticles)
 	{
 		if (d->particleHandler)
-			d->particleHandler->update(i++, particle);
+		{
+			if (particle->getCurrentLife() <= 0)
+			{
+				d->particleHandler->respawn(i++, particle);
+				particle->setCurrentLife(particle->getMaxLife());
+			}
+			else
+			{
+				d->particleHandler->update(i++, particle);
+				particle->setCurrentLife(particle->getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
+			}
+		}
 	}
 }
 
-GMint GMParticles::findFirstUnusedParticle()
-{
-	D(d);
-	GMuint size = d->particles.size();
-
-	for (GMuint i = d->lastUsedParticle; i < size; ++i)
-	{
-		if (getParticle(i)->life() <= 0.0f)
-		{
-			d->lastUsedParticle = i;
-			return i;
-		}
-	}
-
-	for (GMuint i = 0; i < d->lastUsedParticle; ++i)
-	{
-		if (getParticle(i)->life() <= 0.0f)
-		{
-			d->lastUsedParticle = i;
-			return i;
-		}
-	}
-
-	d->lastUsedParticle = 0;
-	return 0;
-}
-
-GMint GMParticles::getParticleCount(Object* prototype)
+GMint GMParticles::getParticleCount(GMModel* prototype)
 {
 	D(d);
 	auto iter = d->particles.find(prototype);
@@ -180,7 +164,7 @@ GMint GMParticles::getParticleCount(Object* prototype)
 	return iter->second.size();
 }
 
-void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameObject*>& particles)
+void GMParticles::initPrototype(GMModel* prototype, const Vector<GMParticleGameObject*>& particles)
 {
 	D(d);
 	prototype->setHint(GMUsageHint::DynamicDraw);
@@ -211,7 +195,7 @@ void GMParticles::initPrototype(Object* prototype, const Vector<GMParticleGameOb
 	}
 }
 
-void GMParticles::addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParticleGameObject* particle)
+void GMParticles::addParticle(AUTORELEASE GMModel* prototype, AUTORELEASE GMParticleGameObject* particle)
 {
 	D(d);
 	auto& vec = d->particles[prototype];
@@ -221,7 +205,7 @@ void GMParticles::addParticle(AUTORELEASE Object* prototype, AUTORELEASE GMParti
 	d->allParticles.push_back(particle);
 }
 
-bool GMParticles::containsPrototype(Object* prototype)
+bool GMParticles::containsPrototype(GMModel* prototype)
 {
 	D(d);
 	return d->particles.find(prototype) != d->particles.end();

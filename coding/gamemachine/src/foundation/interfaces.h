@@ -11,7 +11,7 @@ class GMGameObject;
 class DrawingList;
 class GMGamePackage;
 class GMImage;
-class Object;
+class GMModel;
 class GMGamePackage;
 class GMGlyphManager;
 class GMUIWindow;
@@ -94,7 +94,7 @@ GM_INTERFACE(IFactory)
 	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE GMImage*, OUT ITexture**) = 0;
-	virtual void createPainter(IGraphicEngine*, Object*, OUT GMObjectPainter**) = 0;
+	virtual void createPainter(IGraphicEngine*, GMModel*, OUT GMObjectPainter**) = 0;
 	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };

@@ -22,6 +22,7 @@ struct GMConfig_BuiltInOptions
 		DRAW_NORMAL,
 		DRAW_LIGHTMAP_ONLY,
 		RUN_PROFILE,
+		FRAMERATE_CONTROL, //把最大帧率控制在60FPS
 
 		BUILTIN_OPTIONS_END,
 	};

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_obj.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "foundation/utilities/utilities.h"
 
@@ -89,7 +89,7 @@ void GMModelReader_Obj::init()
 	d->materials.clear();
 }
 
-bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT Object** object)
+bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModel** object)
 {
 	D(d);
 	init();
@@ -98,7 +98,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);
 
-	d->object = new Object;
+	d->object = new GMModel;
 	GMMesh* child = new GMMesh();
 	d->object->append(child);
 
@@ -176,7 +176,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 	GMMesh* mesh = d->object->getAllMeshes()[0];
 	if (!d->currentComponent)
 	{
-		d->currentComponent = new Component(mesh);
+		d->currentComponent = new GMComponent(mesh);
 		applyMaterial(material, d->currentComponent->getShader());
 	}
 

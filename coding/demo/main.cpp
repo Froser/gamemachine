@@ -294,32 +294,39 @@ public:
 	// IParticleHandler
 	virtual void update(const GMint index, GMParticleGameObject* particle) override
 	{
-		static GMfloat pos_1 = 0, pos_2 = 0, pos_3 = 0;
-		if (index % 3 == 2)
+		switch (index)
 		{
-			pos_1 += .0001f;
-			particle->transform() = linear_math::translate(linear_math::Vector3(pos_1, pos_1, pos_1));
+		case 0:
+			pos[index] += .001f;
+			break;
+		case 1:
+			pos[index] += .002f;
+			break;
+		case 2:
+			pos[index] -= .001f;
+			break;
+		default:
+			break;
 		}
-		else if (index % 3 == 1)
-		{
-			pos_3 += .0002f;
-			particle->transform() = linear_math::translate(linear_math::Vector3(pos_3, -pos_3, pos_3));
-		}
-		else
-		{
-			pos_2 -= .0001f;
-			particle->transform() = linear_math::translate(linear_math::Vector3(pos_2, pos_2, pos_2));
-		}
+		particle->getTransform() = linear_math::translate(linear_math::Vector3(pos[index], pos[index], pos[index]));
 
-		particle->color()[0] = .2f;
-		particle->color()[1] = .3f;
-		particle->color()[2] = .6f;
-		particle->color()[3] = 1.f;
+		particle->getColor()[0] = .2f;
+		particle->getColor()[1] = .3f;
+		particle->getColor()[2] = .6f;
+		particle->getColor()[3] = 1.f;
+	}
+
+	virtual void respawn(const GMint index, GMParticleGameObject* particle)
+	{
+		pos[index] = 0;
+		update(index, particle);
 	}
 
 	virtual GMParticleGameObject* createParticle(const GMint index)
 	{
-		return new GMParticleGameObject(coreParticle);
+		auto particle = new GMParticleGameObject(coreParticle);
+		particle->setMaxLife(1.f + .5f * index);
+		return particle;
 	}
 
 private:
@@ -462,7 +469,8 @@ private:
 
 	GMfloat a = 0;
 	GMDemoGameWorld* demo;
-	Object* coreParticle;
+	GMModel* coreParticle;
+	GMfloat pos[5] = { 0 };
 	bool rotate = true;
 };
 

@@ -3,7 +3,7 @@
 #include "common.h"
 #include "foundation/vector.h"
 #include "foundation/utilities/utilities.h"
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 
 BEGIN_NS
 
@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
-	Object* object = false;
+	GMModel* model = false;
 	GMGameObjectDestructor destructor = nullptr;
 	linear_math::Matrix4x4 scaling;
 	linear_math::Matrix4x4 translation;
@@ -35,12 +35,12 @@ class GMGameObject : public GMObject
 	DECLARE_PRIVATE(GMGameObject)
 
 public:
-	GMGameObject(AUTORELEASE Object* obj);
+	GMGameObject(AUTORELEASE GMModel* obj);
 	virtual ~GMGameObject();
 
 public:
-	void setObject(AUTORELEASE Object* obj);
-	Object* getObject();
+	void setObject(AUTORELEASE GMModel* obj);
+	GMModel* getModel();
 
 	virtual void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
@@ -77,7 +77,7 @@ GM_PRIVATE_OBJECT(GMGlyphObject)
 	ITexture* texture;
 };
 
-class Component;
+class GMComponent;
 class GMGlyphObject : public GMGameObject
 {
 	DECLARE_PRIVATE(GMGlyphObject)
@@ -112,7 +112,7 @@ class GMEntityObject : public GMGameObject
 	DECLARE_PRIVATE(GMEntityObject)
 
 public:
-	GMEntityObject(AUTORELEASE Object* obj);
+	GMEntityObject(AUTORELEASE GMModel* obj);
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
@@ -141,7 +141,7 @@ public:
 	GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
 
 private:
-	void createSkyBox(OUT Object** obj);
+	void createSkyBox(OUT GMModel** obj);
 };
 
 END_NS

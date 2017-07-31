@@ -2,7 +2,7 @@
 #define __RESOURCE_CONTAINER_H__
 #include "common.h"
 #include <set>
-#include "gmdatacore/object.h"
+#include "gmdatacore/gmmodel.h"
 BEGIN_NS
 
 template <typename T>

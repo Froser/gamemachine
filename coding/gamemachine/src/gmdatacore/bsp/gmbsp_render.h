@@ -167,9 +167,9 @@ class GMBSPRender
 public:
 	GMBSPRenderData& renderData();
 	void generateRenderData(BSPData* bsp);
-	void createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT Object** obj);
-	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT Object** obj);
-	void createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT Object** obj);
+	void createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT GMModel** obj);
+	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT GMModel** obj);
+	void createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT GMModel** obj);
 
 private:
 	void generateVertices();
