@@ -72,7 +72,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, GMMes
 	*obj = coreObj;
 }
 
-void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT GMModel** obj, GMMeshType type)
+void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, GMMeshType type)
 {
 	static constexpr GMfloat v[] = {
 		-1, 1, 0,
@@ -92,7 +92,7 @@ void GMPrimitiveCreator::createPlane(GMfloat extents[3], OUT GMModel** obj, GMMe
 	GMfloat t[12];
 	for (GMint i = 0; i < 12; i++)
 	{
-		t[i] = extents[i % 3] * v[i];
+		t[i] = (extents[i % 3] + position[3]) * v[i];
 	}
 
 	{

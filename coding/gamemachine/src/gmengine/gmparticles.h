@@ -58,20 +58,24 @@ GM_PRIVATE_OBJECT(GMParticles)
 	IParticleHandler* particleHandler = nullptr;
 };
 
+// 粒子低层设施，用它可以来编写自定义粒子
 class GMParticles : public GMGameObject
 {
 	DECLARE_PRIVATE(GMParticles)
 public:
-	GMParticles(GMint particlesCount, IParticleHandler* handler);
+	GMParticles();
 	~GMParticles();
 
 public:
 	inline GMfloat* getPositionArray(GMModel* prototype) { D(d); return d->basePositions[prototype]; }
+	inline void setParticlesCount(GMint particlesCount) { D(d); d->particlesCount = particlesCount; }
+	inline void setParticlesHandler(IParticleHandler* handler) { D(d); d->particleHandler = handler; }
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Particles; }
 	virtual void simulate() override;
 	virtual void draw() override;
+	virtual void onAppendingObjectToWorld() override;
 
 public:
 	inline GMParticleGameObject* getParticle(GMint index);
@@ -81,6 +85,73 @@ private:
 	void initPrototype(GMModel* prototype, const Vector<GMParticleGameObject*>& particles);
 	void addParticle(AUTORELEASE GMModel* prototype, AUTORELEASE GMParticleGameObject* particle);
 	bool containsPrototype(GMModel* prototype);
+};
+
+enum class GMParticlePositionType
+{
+	Free,
+};
+
+GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
+{
+	GMint particleCount = 1;
+	GMParticlePositionType positionType = GMParticlePositionType::Free;
+	linear_math::Vector3 position;
+	GMfloat emissionRate = .1f;
+};
+
+GM_ALIGNED_STRUCT(GMParticleProperties)
+{
+	GMfloat life = 1;
+	GMfloat size = .1f;
+	GMfloat angle = 0;
+	linear_math::Vector4 startColor;
+	linear_math::Vector4 endColor;
+};
+
+GM_PRIVATE_OBJECT(GMParticlesEmitter)
+{
+	GMParticleEmitterProperties emitterProps;
+	GMParticleProperties* particleProps = nullptr;
+};
+
+// 抽象的粒子发射器
+class GMParticlesEmitter : public GMParticles, public IParticleHandler
+{
+	DECLARE_PRIVATE(GMParticlesEmitter)
+
+public:
+	~GMParticlesEmitter();
+
+public:
+	void setEmitterProperties(const GMParticleEmitterProperties& props);
+	void setParticlesProperties(const GMParticleProperties* props);
+
+public:
+	virtual void onAppendingObjectToWorld() override;
+};
+
+GM_PRIVATE_OBJECT(GMDefaultParticleEmitter)
+{
+	GMModel* prototype = nullptr;
+};
+
+// 具体化的粒子发射器，提供基本的粒子变换
+class GMDefaultParticleEmitter : public GMParticlesEmitter
+{
+	DECLARE_PRIVATE(GMDefaultParticleEmitter)
+
+public:
+	~GMDefaultParticleEmitter();
+
+public:
+	virtual void onAppendingObjectToWorld() override;
+
+public:
+	// IParticleHandler
+	virtual GMParticleGameObject* createParticle(const GMint index) override;
+	virtual void update(const GMint index, GMParticleGameObject* particle) override;
+	virtual void respawn(const GMint index, GMParticleGameObject* particle) override;
 };
 
 END_NS

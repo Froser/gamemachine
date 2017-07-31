@@ -8,7 +8,7 @@ class GMModel;
 struct GMPrimitiveCreator
 {
 	static void createCube(GMfloat extents[3], OUT GMModel** obj, GMMeshType type = GMMeshType::Model);
-	static void createPlane(GMfloat extents[3], OUT GMModel** obj, GMMeshType type = GMMeshType::Model);
+	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, GMMeshType type = GMMeshType::Model);
 };
 
 END_NS

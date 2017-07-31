@@ -2,6 +2,7 @@
 #include "gmparticles.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmthreads.h"
+#include "foundation/utilities/gmprimitivecreator.h"
 
 static void destructor(GMGameObject*) {}
 
@@ -64,28 +65,9 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMParticles::GMParticles(GMint particlesCount, IParticleHandler* handler)
+GMParticles::GMParticles()
 	: GMGameObject(nullptr)
 {
-	D(d);
-	D_BASE(db, GMGameObject);
-	d->particleHandler = handler;
-	d->particlesCount = particlesCount;
-
-	for (GMint i = 0; i < d->particlesCount; i++)
-	{
-		GMParticleGameObject* particle = d->particleHandler->createParticle(i);
-		ASSERT(particle);
-		particle->setWorld(db->world);
-		addParticle(particle->getPrototype(), particle);
-	}
-
-	for (auto& kv : d->particles)
-	{
-		GMModel* prototype = kv.first;
-		initPrototype(kv.first, kv.second);
-		GameMachine::instance().initObjectPainter(prototype);
-	}
 }
 
 GMParticles::~GMParticles()
@@ -130,6 +112,29 @@ void GMParticles::draw()
 		}
 		painter->endUpdateBuffer();
 		kv.first->getPainter()->draw(nullptr);
+	}
+}
+
+void GMParticles::onAppendingObjectToWorld()
+{
+	D(d);
+	D_BASE(db, GMGameObject);
+
+	GMGameObject::onAppendingObjectToWorld();
+
+	for (GMint i = 0; i < d->particlesCount; i++)
+	{
+		GMParticleGameObject* particle = d->particleHandler->createParticle(i);
+		ASSERT(particle);
+		particle->setWorld(db->world);
+		addParticle(particle->getPrototype(), particle);
+	}
+
+	for (auto& kv : d->particles)
+	{
+		GMModel* prototype = kv.first;
+		initPrototype(kv.first, kv.second);
+		GameMachine::instance().initObjectPainter(prototype);
 	}
 }
 
@@ -209,4 +214,72 @@ bool GMParticles::containsPrototype(GMModel* prototype)
 {
 	D(d);
 	return d->particles.find(prototype) != d->particles.end();
+}
+
+GMParticlesEmitter::~GMParticlesEmitter()
+{
+	D(d);
+	if (d->particleProps)
+		delete[] d->particleProps;
+}
+
+void GMParticlesEmitter::setEmitterProperties(const GMParticleEmitterProperties& props)
+{
+	D(d);
+	d->emitterProps = props;
+}
+
+void GMParticlesEmitter::setParticlesProperties(const GMParticleProperties* props)
+{
+	D(d);
+	d->particleProps = new GMParticleProperties[d->emitterProps.particleCount];
+	for (GMint i = 0; i < d->emitterProps.particleCount; i++)
+	{
+		d->particleProps[i] = props[i];
+	}
+}
+
+void GMParticlesEmitter::onAppendingObjectToWorld()
+{
+	D(d);
+	GMParticles::onAppendingObjectToWorld();
+
+	setParticlesCount(d->emitterProps.particleCount);
+	setParticlesHandler(this);
+}
+
+//////////////////////////////////////////////////////////////////////////
+GMDefaultParticleEmitter::~GMDefaultParticleEmitter()
+{
+	D(d);
+	if (d->prototype)
+		delete d->prototype;
+}
+
+void GMDefaultParticleEmitter::onAppendingObjectToWorld()
+{
+	D(d);
+	D_BASE(db, GMParticlesEmitter);
+	// 位置、大小初始值无关紧要
+	static GMfloat size[] = { 1, 1, 1 };
+	static GMfloat position[] = { 0, 0, 0 };
+	GMPrimitiveCreator::createQuad(size, position, &d->prototype, GMMeshType::Particles);
+}
+
+GMParticleGameObject* GMDefaultParticleEmitter::createParticle(const GMint index)
+{
+	D(d);
+	D_BASE(db, GMParticlesEmitter);
+	auto particle = new GMParticleGameObject(d->prototype);
+	auto& props = db->particleProps[index];
+	particle->setMaxLife(props.life);
+	return particle;
+}
+
+void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* particle)
+{
+}
+
+void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* particle)
+{
 }

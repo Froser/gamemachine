@@ -95,7 +95,7 @@ private:
 	virtual void onAppendingObjectToWorld() override;
 
 private:
-	void constructObject();
+	void constructModel();
 };
 
 //GMEntityObject

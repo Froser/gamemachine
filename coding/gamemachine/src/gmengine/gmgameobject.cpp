@@ -99,7 +99,7 @@ void GMGlyphObject::setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMf
 	d->height = height;
 }
 
-void GMGlyphObject::constructObject()
+void GMGlyphObject::constructModel()
 {
 	D(d);
 	D_BASE(db, GMGameObject);
@@ -168,7 +168,7 @@ void GMGlyphObject::onAppendingObjectToWorld()
 {
 	D(d);
 	d->lastRenderText = d->text;
-	constructObject();
+	constructModel();
 }
 
 void GMGlyphObject::draw()
@@ -185,7 +185,7 @@ void GMGlyphObject::draw()
 void GMGlyphObject::updateObject()
 {
 	D_BASE(d, GMGameObject);
-	constructObject();
+	constructModel();
 	GameMachine::instance().initObjectPainter(getModel());
 }
 

@@ -399,10 +399,10 @@ private:
 		}
 #endif
 
-		GMfloat extents[] = { .2f, .2f, .2f };
-		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
-		GMParticles* particles = new GMParticles(3, this);
-		demo->appendObject("particles", particles);
+		//GMfloat extents[] = { .2f, .2f, .2f };
+		//GMPrimitiveCreator::createQuad(extents, &coreParticle, GMMeshType::Particles);
+		GMDefaultParticleEmitter* emitter = new GMDefaultParticleEmitter();
+		demo->appendObject("particles", emitter);
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
