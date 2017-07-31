@@ -40,7 +40,7 @@ public:
 GM_INTERFACE(IParticleHandler)
 {
 	virtual GMParticleGameObject* createParticle(const GMint index) = 0;
-	virtual void update(GMParticleGameObject* particle) = 0;
+	virtual void update(const GMint index, GMParticleGameObject* particle) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMParticles)

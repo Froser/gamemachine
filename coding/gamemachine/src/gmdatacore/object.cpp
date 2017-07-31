@@ -86,14 +86,14 @@ void Component::lightmap(GMfloat u, GMfloat v)
 	lightmaps.push_back(v);
 }
 
-void Component::color(GMfloat r, GMfloat g, GMfloat b)
+void Component::color(GMfloat r, GMfloat g, GMfloat b, GMfloat a)
 {
 	D(d);
 	auto& colors = d->parentMesh->colors();
 	colors.push_back(r);
 	colors.push_back(g);
 	colors.push_back(b);
-	colors.push_back(1.0f);
+	colors.push_back(a);
 }
 
 void Component::endFace()
@@ -110,14 +110,6 @@ void Component::endFace()
 void Component::expand(GMuint count)
 {
 	D(d);
-	ASSERT(d->parentMesh->getComponents().size() == 1); //目前只支持==1的情况
-	d->primitiveCount *= count;
-	GMuint originalCounts = d->primitiveVertices.size();
-	GMuint originalOffsets = d->vertexOffsets.size();
-	auto position_size = d->parentMesh->positions().size();
-	GMint position_offset = position_size / Object::PositionDimension;
-
-	//实现分配内存
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		d->parentMesh->normals().reserve(d->parentMesh->normals().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			d->parentMesh->uvs().reserve(d->parentMesh->uvs().size() * count);
@@ -126,21 +118,33 @@ void Component::expand(GMuint count)
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	d->parentMesh->lightmaps().reserve(d->parentMesh->lightmaps().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		d->parentMesh->colors().reserve(d->parentMesh->colors().size() * count);
 
-	for (GMuint i = count; i < d->primitiveCount; i++)
+	GMint verticesCount = 0;
+	Vector<GMint> flag;
+	for (auto& c : d->primitiveVertices)
 	{
-		d->primitiveVertices.push_back(d->primitiveVertices[i % originalCounts]);
-		d->vertexOffsets.push_back(position_offset + d->vertexOffsets[i % originalCounts]);
+		verticesCount += c;
+		flag.push_back(verticesCount);
 	}
 
-	for (GMuint i = 0; i < count - 1; i++)
+	for (GMuint turn = 0; turn < count - 1; turn++)
 	{
-		IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	std::copy(d->parentMesh->positions().begin(), d->parentMesh->positions().end(), std::back_inserter(d->parentMesh->positions()));
-		IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		std::copy(d->parentMesh->normals().begin(), d->parentMesh->normals().end(), std::back_inserter(d->parentMesh->normals()));
-		IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			std::copy(d->parentMesh->uvs().begin(), d->parentMesh->uvs().end(), std::back_inserter(d->parentMesh->uvs()));
-		IF_ENABLED(d->parentMesh, GMVertexDataType::Tangent)	std::copy(d->parentMesh->tangents().begin(), d->parentMesh->tangents().end(), std::back_inserter(d->parentMesh->tangents()));
-		IF_ENABLED(d->parentMesh, GMVertexDataType::Bitangent)	std::copy(d->parentMesh->bitangents().begin(), d->parentMesh->bitangents().end(), std::back_inserter(d->parentMesh->bitangents()));
-		IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	std::copy(d->parentMesh->lightmaps().begin(), d->parentMesh->lightmaps().end(), std::back_inserter(d->parentMesh->lightmaps()));
-		IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		std::copy(d->parentMesh->colors().begin(), d->parentMesh->colors().end(), std::back_inserter(d->parentMesh->colors()));
+		for (GMint i = 0; i < verticesCount; i++)
+		{
+			if (i == 0)
+				beginFace();
+			if (std::find(flag.begin(), flag.end(), i) != flag.end())
+			{
+				endFace();
+				beginFace();
+			}
+
+			vertex(d->parentMesh->positions()[d->offset + i * 4 + 0], d->parentMesh->positions()[d->offset + i * 4 + 1], d->parentMesh->positions()[d->offset + i * 4 + 2]);
+			uv(d->parentMesh->uvs()[d->offset + i * 2 + 0], d->parentMesh->uvs()[d->offset + i * 2 + 1]);
+			color(d->parentMesh->colors()[d->offset + i * 4 + 0], d->parentMesh->colors()[d->offset + i * 4 + 1], d->parentMesh->colors()[d->offset + i * 4 + 2]);
+
+			if (i == verticesCount - 1)
+				endFace();
+		}
 	}
 }
 

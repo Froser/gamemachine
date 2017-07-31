@@ -37,33 +37,29 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 		+ offset_position / sizeof(decltype(basePositions[0] + 0));
 
 #if _DEBUG
-	GMint totalSize = mesh->get_transferred_normals_byte_size()
+	GMint totalSize = mesh->get_transferred_positions_byte_size()
 		+ mesh->get_transferred_uvs_byte_size()
 		+ mesh->get_transferred_colors_byte_size();
 #endif
 
 	GMint offset = 0;
-	for (auto& component : mesh->getComponents())
+	// 这一轮需要更新的顶点数量
+	GMint vertexCountThisTurn = mesh->get_transferred_positions_byte_size() / sizeof(Object::DataType) / particleCount / Object::PositionDimension;
+	for (GMint offset = 0; offset < vertexCountThisTurn; ++offset)
 	{
-		for (GMuint i = 0; i < component->getPrimitiveCount(); i++)
-		{
-			for (GMint j = 0; j < component->getPrimitiveVerticesCountPtr()[i]; j++)
-			{
-				linear_math::Vector4 basePositionVector(
-					*(basePositions + offset * 4 + 0),
-					*(basePositions + offset * 4 + 1),
-					*(basePositions + offset * 4 + 2),
-					*(basePositions + offset * 4 + 3)
-				);
-				linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
-				linear_math::copyVector(transformedPosition, ptrPosition + offset * 4);
+		linear_math::Vector4 basePositionVector(
+			*(basePositions + offset * 4 + 0),
+			*(basePositions + offset * 4 + 1),
+			*(basePositions + offset * 4 + 2),
+			*(basePositions + offset * 4 + 3)
+		);
+		linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
+		ASSERT((GMLargeInteger)(ptrPosition + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
+		linear_math::copyVector(transformedPosition, ptrPosition + offset * 4);
 
-				//更新颜色
-				ASSERT((GMLargeInteger)(ptrColor + offset * 4 + 3) < (GMLargeInteger)(vertexData + totalSize));
-				linear_math::copyVector(d->color, ptrColor + offset * 4);
-				offset++;
-			}
-		}
+		//更新颜色
+		ASSERT((GMLargeInteger)(ptrColor + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
+		linear_math::copyVector(d->color, ptrColor + offset * 4);
 	}
 }
 
@@ -140,13 +136,11 @@ void GMParticles::draw()
 void GMParticles::simulate()
 {
 	D(d);
-	for (const auto& kv : d->particles)
+	GMint i = 0;
+	for (auto& particle : d->allParticles)
 	{
-		for (const auto& particle : kv.second)
-		{
-			if (d->particleHandler)
-				d->particleHandler->update(particle);
-		}
+		if (d->particleHandler)
+			d->particleHandler->update(i++, particle);
 	}
 }
 

@@ -292,18 +292,22 @@ public:
 
 public:
 	// IParticleHandler
-	virtual void update(GMParticleGameObject* particle) override
+	virtual void update(const GMint index, GMParticleGameObject* particle) override
 	{
-		static int i;
-		static GMfloat pos_1 = 0, pos_2 = 0;
-		if (i++ % 2)
+		static GMfloat pos_1 = 0, pos_2 = 0, pos_3 = 0;
+		if (index % 3 == 2)
 		{
-			pos_1 += .001f;
+			pos_1 += .0001f;
 			particle->transform() = linear_math::translate(linear_math::Vector3(pos_1, pos_1, pos_1));
+		}
+		else if (index % 3 == 1)
+		{
+			pos_3 += .0002f;
+			particle->transform() = linear_math::translate(linear_math::Vector3(pos_3, -pos_3, pos_3));
 		}
 		else
 		{
-			pos_2 -= .001f;
+			pos_2 -= .0001f;
 			particle->transform() = linear_math::translate(linear_math::Vector3(pos_2, pos_2, pos_2));
 		}
 
@@ -390,7 +394,7 @@ private:
 
 		GMfloat extents[] = { .2f, .2f, .2f };
 		GMPrimitiveCreator::createPlane(extents, &coreParticle, GMMeshType::Particles);
-		GMParticles* particles = new GMParticles(2, this);
+		GMParticles* particles = new GMParticles(3, this);
 		demo->appendObject("particles", particles);
 
 		CameraLookAt lookAt;

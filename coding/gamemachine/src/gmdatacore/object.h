@@ -85,7 +85,7 @@ public:
 	void normal(GMfloat x, GMfloat y, GMfloat z);
 	void uv(GMfloat u, GMfloat v);
 	void lightmap(GMfloat u, GMfloat v);
-	void color(GMfloat r, GMfloat g, GMfloat b);
+	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
 	void endFace();
 	void expand(GMuint count);
 };
