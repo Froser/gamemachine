@@ -106,7 +106,7 @@ void GMParticles::draw()
 	for (const auto& kv : d->particles)
 	{
 		GMModel* prototype = kv.first;
-		GMObjectPainter* painter = prototype->getPainter();
+		GMModelPainter* painter = prototype->getPainter();
 		void* buffer = painter->getBuffer();
 		for (const auto& particle : kv.second)
 		{

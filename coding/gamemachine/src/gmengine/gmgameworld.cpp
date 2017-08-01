@@ -52,13 +52,13 @@ void GMGameWorld::simulateGameWorld()
 		d->start = true;
 }
 
-GMObjectPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
+GMModelPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 {
 	D(d);
 	GameMachine& gm = GameMachine::instance();
 	IFactory* factory = gm.getFactory();
 	IGraphicEngine* engine = gm.getGraphicEngine();
-	GMObjectPainter* painter;
+	GMModelPainter* painter;
 	factory->createPainter(engine, obj->getModel(), &painter);
 	ASSERT(!obj->getModel()->getPainter());
 	obj->getModel()->setPainter(painter);

@@ -91,8 +91,8 @@ set(SOURCES
 		gmgl/gmglgraphic_engine.h
 		gmgl/gmglgraphic_engine.cpp
 		gmgl/gmglgraphic_engine_default_shaders.h
-		gmgl/gmglobjectpainter.h
-		gmgl/gmglobjectpainter.cpp
+		gmgl/gmglmodelpainter.h
+		gmgl/gmglmodelpainter.cpp
 		gmgl/gmglshaderprogram.h
 		gmgl/gmglshaderprogram.cpp
 		gmgl/gmgltexture.h

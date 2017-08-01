@@ -15,24 +15,24 @@ BEGIN_NS
 class GMModel;
 class GMGLShaderProgram;
 
-GM_PRIVATE_OBJECT(GMObjectPainter)
+GM_PRIVATE_OBJECT(GMModelPainter)
 {
 	GMModel* object = nullptr;
 };
 
 class GMMesh;
-class GMObjectPainter : public GMObject
+class GMModelPainter : public GMObject
 {
-	DECLARE_PRIVATE(GMObjectPainter)
+	DECLARE_PRIVATE(GMModelPainter)
 
 public:
-	GMObjectPainter(GMModel* obj)
+	GMModelPainter(GMModel* obj)
 	{
 		D(d);
 		d->object = obj;
 	}
 
-	virtual ~GMObjectPainter() {}
+	virtual ~GMModelPainter() {}
 
 public:
 	virtual void transfer() = 0;
@@ -100,7 +100,7 @@ GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	Vector<GMMesh*> objects;
-	AutoPtr<GMObjectPainter> painter;
+	AutoPtr<GMModelPainter> painter;
 };
 
 // 所有的顶点属性类型
@@ -136,8 +136,8 @@ public:
 	~GMModel();
 
 public:
-	inline void setPainter(AUTORELEASE GMObjectPainter* painter) { D(d); d->painter.reset(painter); }
-	inline GMObjectPainter* getPainter() { D(d); return d->painter; }
+	inline void setPainter(AUTORELEASE GMModelPainter* painter) { D(d); d->painter.reset(painter); }
+	inline GMModelPainter* getPainter() { D(d); return d->painter; }
 	inline Vector<GMMesh*>& getAllMeshes() { D(d); return d->objects; }
 	inline void append(AUTORELEASE GMMesh* obj) { D(d); d->objects.push_back(obj); }
 

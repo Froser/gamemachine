@@ -8,7 +8,7 @@
 #define VERTEX_OFFSET(offset, idx) ((offset * VERTEX_DEMENSION) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
-GMModel* GMObjectPainter::getModel()
+GMModel* GMModelPainter::getModel()
 {
 	D(d);
 	return d->object;

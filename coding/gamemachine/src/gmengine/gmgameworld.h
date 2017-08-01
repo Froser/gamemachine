@@ -10,7 +10,7 @@
 BEGIN_NS
 
 class GMCharacter;
-class GMObjectPainter;
+class GMModelPainter;
 
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
@@ -39,7 +39,7 @@ public:
 	void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
 
 private:
-	GMObjectPainter* createPainterForObject(GMGameObject* obj);
+	GMModelPainter* createPainterForObject(GMGameObject* obj);
 	void simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects);
 };
 

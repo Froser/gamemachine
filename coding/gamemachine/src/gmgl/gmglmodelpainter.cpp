@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmglobjectpainter.h"
+#include "gmglmodelpainter.h"
 #include "shader_constants.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgameworld.h"
@@ -24,14 +24,14 @@ static GLenum getMode(GMMesh* obj)
 	}
 }
 
-GMGLObjectPainter::GMGLObjectPainter(IGraphicEngine* engine, GMModel* objs)
-	: GMObjectPainter(objs)
+GMGLModelPainter::GMGLModelPainter(IGraphicEngine* engine, GMModel* objs)
+	: GMModelPainter(objs)
 {
 	D(d);
 	d->engine = static_cast<GMGLGraphicEngine*>(engine);
 }
 
-void GMGLObjectPainter::transfer()
+void GMGLModelPainter::transfer()
 {
 	D(d);
 	if (d->inited)
@@ -98,7 +98,7 @@ void GMGLObjectPainter::transfer()
 	d->inited = true;
 }
 
-void GMGLObjectPainter::draw(GMfloat* modelTransform)
+void GMGLModelPainter::draw(GMfloat* modelTransform)
 {
 	D(d);
 	GMModel* obj = getModel();
@@ -126,7 +126,7 @@ void GMGLObjectPainter::draw(GMfloat* modelTransform)
 	END_FOREACH_MESH
 }
 
-void GMGLObjectPainter::dispose()
+void GMGLModelPainter::dispose()
 {
 	D(d);
 	GMModel* obj = getModel();
@@ -144,23 +144,23 @@ void GMGLObjectPainter::dispose()
 	d->inited = false;
 }
 
-void GMGLObjectPainter::beginUpdateBuffer(GMMesh* mesh)
+void GMGLModelPainter::beginUpdateBuffer(GMMesh* mesh)
 {
 	glBindVertexArray(mesh->getArrayId());
 }
 
-void GMGLObjectPainter::endUpdateBuffer()
+void GMGLModelPainter::endUpdateBuffer()
 {
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindVertexArray(0);
 }
 
-void* GMGLObjectPainter::getBuffer()
+void* GMGLModelPainter::getBuffer()
 {
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
-void GMGLObjectPainter::draw(IRender* render, Shader& shader, GMComponent* component, GMMesh* mesh, bool fill)
+void GMGLModelPainter::draw(IRender* render, Shader& shader, GMComponent* component, GMMesh* mesh, bool fill)
 {
 	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 	if (fill)

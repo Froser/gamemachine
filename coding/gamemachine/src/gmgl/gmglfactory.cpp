@@ -2,7 +2,7 @@
 #include "gmglfactory.h"
 #include "gmgltexture.h"
 #include "gmglgraphic_engine.h"
-#include "gmglobjectpainter.h"
+#include "gmglmodelpainter.h"
 #include "gmglgamepackagehandler.h"
 #include "gmglglyphmanager.h"
 #include "gmui/gmui_glwindow.h"
@@ -31,11 +31,11 @@ void GMGLFactory::createTexture(AUTORELEASE GMImage* image, OUT ITexture** textu
 	(*texture) = new GMGLTexture(image);
 }
 
-void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* obj, OUT GMObjectPainter** painter)
+void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* obj, OUT GMModelPainter** painter)
 {
 	ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
-	(*painter) = new GMGLObjectPainter(gmglEngine, obj);
+	(*painter) = new GMGLModelPainter(gmglEngine, obj);
 }
 
 void GMGLFactory::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)

@@ -7,18 +7,18 @@ BEGIN_NS
 
 class GMGLGraphicEngine;
 struct IRender;
-GM_PRIVATE_OBJECT(GMGLObjectPainter)
+GM_PRIVATE_OBJECT(GMGLModelPainter)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	bool inited = false;
 };
 
-class GMGLObjectPainter : public GMObjectPainter
+class GMGLModelPainter : public GMModelPainter
 {
-	DECLARE_PRIVATE(GMGLObjectPainter)
+	DECLARE_PRIVATE(GMGLModelPainter)
 
 public:
-	GMGLObjectPainter(IGraphicEngine* engine, GMModel* objs);
+	GMGLModelPainter(IGraphicEngine* engine, GMModel* objs);
 
 public:
 	virtual void transfer() override;
