@@ -437,26 +437,48 @@ struct Plane : public GMObject
 	GMfloat intercept;
 };
 
-
 //Frustum
-GM_PRIVATE_OBJECT(Frustum)
+enum class GMFrustumType
 {
+	Perspective,
+	Orthographic,
+};
+
+GM_PRIVATE_OBJECT(GMFrustum)
+{
+	GMFrustumType type = GMFrustumType::Perspective;
 	Plane planes[6];
-	GMfloat fovy;
-	GMfloat aspect;
+	union
+	{
+		struct
+		{
+			GMfloat fovy;
+			GMfloat aspect;
+		};
+
+		struct
+		{
+			GMfloat left;
+			GMfloat right;
+			GMfloat bottom;
+			GMfloat top;
+		};
+	};
 	GMfloat n;
 	GMfloat f;
+
 	linear_math::Matrix4x4 viewMatrix;
 	linear_math::Matrix4x4 projMatrix;
 };
 
-class Frustum : public GMObject
+class GMFrustum : public GMObject
 {
-	DECLARE_PRIVATE(Frustum)
+	DECLARE_PRIVATE(GMFrustum)
 
 public:
-	Frustum() = default;
-	void initFrustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
+	GMFrustum() = default;
+	void initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
+	void initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
 	void update();

@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMParticleGameObject)
 	GMfloat currentLife = 0;
 	GMfloat maxLife = 0;
 	GMParticles* parentParticles = nullptr;
-	GMint index;
+	GMint index = 0;
 };
 
 class GMParticleGameObject : public GMGameObject
@@ -34,8 +34,10 @@ public:
 	inline GMint getIndexInPrototype() { D(d); return d->index; }
 	inline linear_math::Vector4& getColor() { D(d); return d->color; }
 	inline const linear_math::Vector4& getColor() const { D(d); return d->color; }
+	inline void setColor(linear_math::Vector4& color) { D(d); d->color = color; }
 	inline linear_math::Matrix4x4& getTransform() { D(d); return d->transform; }
 	inline const linear_math::Matrix4x4& getTransform() const { D(d); return d->transform; }
+	inline void setTransform(const linear_math::Matrix4x4& transform) { D(d); d->transform = transform; }
 
 public:
 	void updatePrototype(void* buffer);
@@ -94,19 +96,24 @@ enum class GMParticlePositionType
 
 GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 {
-	GMint particleCount = 1;
+	GMint particleCount = 2;
 	GMParticlePositionType positionType = GMParticlePositionType::Free;
-	linear_math::Vector3 position;
-	GMfloat emissionRate = .1f;
+	linear_math::Vector3 position = 0;
+	GMfloat emissionRate = .5f;
+	GMfloat speed = .5f;
 };
 
 GM_ALIGNED_STRUCT(GMParticleProperties)
 {
 	GMfloat life = 1;
-	GMfloat size = .1f;
-	GMfloat angle = 0;
-	linear_math::Vector4 startColor;
-	linear_math::Vector4 endColor;
+	linear_math::Quaternion angle;
+	linear_math::Vector4 startColor = 1.f;
+	linear_math::Vector4 endColor = 1.f;
+	GMfloat startSize = .1f;
+	GMfloat endSize = .1f;
+	bool visible = true;
+	bool emitted = false;
+	bool emitCountdown = false;
 };
 
 GM_PRIVATE_OBJECT(GMParticlesEmitter)
@@ -126,6 +133,10 @@ public:
 public:
 	void setEmitterProperties(const GMParticleEmitterProperties& props);
 	void setParticlesProperties(const GMParticleProperties* props);
+
+private:
+	using GMParticles::setParticlesCount;
+	using GMParticles::setParticlesHandler;
 
 public:
 	virtual void onAppendingObjectToWorld() override;

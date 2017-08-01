@@ -62,6 +62,8 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 		ASSERT((GMLargeInteger)(ptrColor + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
 		linear_math::copyVector(d->color, ptrColor + offset * 4);
 	}
+
+	setCurrentLife(getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -146,15 +148,13 @@ void GMParticles::simulate()
 	{
 		if (d->particleHandler)
 		{
-			if (particle->getCurrentLife() <= 0)
+ 			if (particle->getCurrentLife() <= 0)
 			{
 				d->particleHandler->respawn(i++, particle);
-				particle->setCurrentLife(particle->getMaxLife());
 			}
 			else
 			{
 				d->particleHandler->update(i++, particle);
-				particle->setCurrentLife(particle->getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
 			}
 		}
 	}
@@ -242,10 +242,9 @@ void GMParticlesEmitter::setParticlesProperties(const GMParticleProperties* prop
 void GMParticlesEmitter::onAppendingObjectToWorld()
 {
 	D(d);
-	GMParticles::onAppendingObjectToWorld();
-
 	setParticlesCount(d->emitterProps.particleCount);
 	setParticlesHandler(this);
+	GMParticles::onAppendingObjectToWorld();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -264,12 +263,14 @@ void GMDefaultParticleEmitter::onAppendingObjectToWorld()
 	static GMfloat size[] = { 1, 1, 1 };
 	static GMfloat position[] = { 0, 0, 0 };
 	GMPrimitiveCreator::createQuad(size, position, &d->prototype, GMMeshType::Particles);
+	GMParticlesEmitter::onAppendingObjectToWorld();
 }
 
 GMParticleGameObject* GMDefaultParticleEmitter::createParticle(const GMint index)
 {
 	D(d);
 	D_BASE(db, GMParticlesEmitter);
+	ASSERT(db->particleProps);
 	auto particle = new GMParticleGameObject(d->prototype);
 	auto& props = db->particleProps[index];
 	particle->setMaxLife(props.life);
@@ -278,8 +279,60 @@ GMParticleGameObject* GMDefaultParticleEmitter::createParticle(const GMint index
 
 void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* particle)
 {
+	D_BASE(d, GMParticlesEmitter);
+	if (!d->particleProps[index].emitted)
+	{
+		// 没有在发射期，不绘制此粒子
+		d->particleProps[index].visible = false;
+
+		// 打一个标记，进入发射倒计时，在下一次respawn的时候发射
+		d->particleProps[index].emitCountdown = true;
+	}
+
+	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
+	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
+	GMfloat size = linear_math::linearInterpolate(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
+	
+	// TODO 区分positionType
+	linear_math::Matrix4x4 transform;
+	if (d->particleProps[index].visible)
+	{
+		transform = d->particleProps[index].angle.toMatrix()
+			* linear_math::translate(d->emitterProps.position + linear_math::Vector3(d->emitterProps.speed * diff))
+			* linear_math::scale(linear_math::Vector3(size));
+	}
+	else
+	{
+		transform = linear_math::Matrix4x4(0, 0, 0, 0);
+	}
+	particle->setTransform(transform);
+
+	linear_math::Vector4 currentColor = linear_math::linearInterpolate(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
+	particle->setColor(currentColor);
 }
 
 void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* particle)
 {
+	D_BASE(d, GMParticlesEmitter);
+	if (!d->particleProps[index].emitted)
+	{
+		// 对于还没有发射的情况，计算其发射速率决定是否要发射
+		GMfloat duration = d->emitterProps.emissionRate * index;
+		particle->setCurrentLife(duration);
+		// 如果为0，表示马上发射
+		if (duration == 0)
+			d->particleProps[index].emitCountdown = true;
+	}
+	else
+	{
+		return particle->setCurrentLife(particle->getMaxLife());
+	}
+
+	if (d->particleProps[index].emitCountdown)
+	{
+		// 进入了准备发射倒计时，在此时准备发射
+		d->particleProps[index].visible = true;
+		d->particleProps[index].emitted = true;
+		particle->setCurrentLife(particle->getMaxLife());
+	}
 }

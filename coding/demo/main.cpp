@@ -285,54 +285,17 @@ public:
 	GMGlyphObject* m_glyph;
 };
 
-class DemoGameHandler : public GameHandler, public IParticleHandler
+class DemoGameHandler : public GameHandler
 {
 public:
 	DemoGameHandler() {}
 
-public:
-	// IParticleHandler
-	virtual void update(const GMint index, GMParticleGameObject* particle) override
-	{
-		switch (index)
-		{
-		case 0:
-			pos[index] += .001f;
-			break;
-		case 1:
-			pos[index] += .002f;
-			break;
-		case 2:
-			pos[index] -= .001f;
-			break;
-		default:
-			break;
-		}
-		particle->getTransform() = linear_math::translate(linear_math::Vector3(pos[index], pos[index], pos[index]));
-
-		particle->getColor()[0] = .2f;
-		particle->getColor()[1] = .3f;
-		particle->getColor()[2] = .6f;
-		particle->getColor()[3] = 1.f;
-	}
-
-	virtual void respawn(const GMint index, GMParticleGameObject* particle)
-	{
-		pos[index] = 0;
-		update(index, particle);
-	}
-
-	virtual GMParticleGameObject* createParticle(const GMint index)
-	{
-		auto particle = new GMParticleGameObject(coreParticle);
-		particle->setMaxLife(1.f + .5f * index);
-		return particle;
-	}
-
 private:
-
 	virtual void start()
 	{
+		GMCamera& camera = GameMachine::instance().getCamera();
+		camera.initOrtho(-1, 1, -1, 1, 0, 3200);
+
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 		auto container = engine->getResourceContainer();
 		auto& textureContainer = container->getTextureContainer();
@@ -357,14 +320,14 @@ private:
 
 		demo = new GMDemoGameWorld();
 
-#if 0
 		{
 			GMfloat extents[] = { .25f, .25f, .25f };
-			Object* coreObj;
-			GMPrimitiveCreator::createPlane(extents, &coreObj);
+			GMfloat size[] = { 0 };
+			GMModel* coreObj;
+			GMPrimitiveCreator::createQuad(extents, size, &coreObj);
 			GMGameObject* obj = new GMGameObject(coreObj);
 
-			Object* core = obj->getObject();
+			GMModel* core = obj->getModel();
 			Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
 			shader.setCull(GMS_Cull::CULL);
 
@@ -397,11 +360,19 @@ private:
 			}
 
 		}
-#endif
 
-		//GMfloat extents[] = { .2f, .2f, .2f };
-		//GMPrimitiveCreator::createQuad(extents, &coreParticle, GMMeshType::Particles);
 		GMDefaultParticleEmitter* emitter = new GMDefaultParticleEmitter();
+		emitter->setEmitterProperties(GMParticleEmitterProperties());
+
+		GMParticleProperties props[2];
+		props[0].startColor = linear_math::Vector4(0, 1, 0, 1);
+		props[1].startColor = linear_math::Vector4(0, 1, 0, 1);
+		props[0].startSize = props[0].endSize = .05f;
+		props[1].startSize = props[1].endSize = .05f;
+		props[0].angle.setRotation(linear_math::Vector3(0, 0, 1), .2f);
+		props[1].angle.setRotation(linear_math::Vector3(0, 0, 1), -.4f);
+		emitter->setParticlesProperties(props);
+
 		demo->appendObject("particles", emitter);
 
 		CameraLookAt lookAt;
@@ -427,10 +398,10 @@ private:
 				if (rotate)
 					a += .001f;
 
-				//GMGameObject* obj = demo->getGameObject("cube");
-				//linear_math::Quaternion q;
-				//q.setRotation(dir, a);
-				//obj->setRotation(q);
+				GMGameObject* obj = demo->getGameObject("cube");
+				linear_math::Quaternion q;
+				q.setRotation(dir, a);
+				obj->setRotation(q);
 				demo->renderGameWorld();
 
 				break;

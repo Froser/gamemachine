@@ -247,65 +247,90 @@ enum FRUSTUM_PLANES
 	FAR_PLANE
 };
 
-void Frustum::initFrustum(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
+void GMFrustum::initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
+	d->type = GMFrustumType::Orthographic;
+	d->left = left;
+	d->right = right;
+	d->bottom = bottom;
+	d->top = top;
+	d->n = n;
+	d->f = f;
+}
+
+void GMFrustum::initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
+{
+	D(d);
+	d->type = GMFrustumType::Perspective;
 	d->fovy = fovy;
 	d->aspect = aspect;
 	d->n = n;
 	d->f = f;
 }
 
-void Frustum::update()
+void GMFrustum::update()
 {
 	D(d);
 	linear_math::Matrix4x4 projection = getPerspective();
 	linear_math::Matrix4x4& view = d->viewMatrix;
 	linear_math::Matrix4x4 clipMat;
 
-	//Multiply the matrices
-	clipMat = projection * view;
-
-	GMfloat clip[16];
-	for (GMint i = 0; i < 4; i++)
+	if (d->type == GMFrustumType::Perspective)
 	{
-		linear_math::Vector4 vec = clipMat[i];
-		for (GMint j = 0; j < 4; j++)
+		//Multiply the matrices
+		clipMat = projection * view;
+
+		GMfloat clip[16];
+		for (GMint i = 0; i < 4; i++)
 		{
-			clip[i * 4 + j] = vec[j];
+			linear_math::Vector4 vec = clipMat[i];
+			for (GMint j = 0; j < 4; j++)
+			{
+				clip[i * 4 + j] = vec[j];
+			}
 		}
+
+		//calculate planes
+		d->planes[RIGHT_PLANE].normal = linear_math::Vector3(clip[3] - clip[0], clip[7] - clip[4], clip[11] - clip[8]);
+		d->planes[RIGHT_PLANE].intercept = clip[15] - clip[12];
+
+		d->planes[LEFT_PLANE].normal = linear_math::Vector3(clip[3] + clip[0], clip[7] + clip[4], clip[11] + clip[8]);
+		d->planes[LEFT_PLANE].intercept = clip[15] + clip[12];
+
+		d->planes[BOTTOM_PLANE].normal = linear_math::Vector3(clip[3] + clip[1], clip[7] + clip[5], clip[11] + clip[9]);
+		d->planes[BOTTOM_PLANE].intercept = clip[15] + clip[13];
+
+		d->planes[TOP_PLANE].normal = linear_math::Vector3(clip[3] - clip[1], clip[7] - clip[5], clip[11] - clip[9]);
+		d->planes[TOP_PLANE].intercept = clip[15] - clip[13];
+
+		d->planes[FAR_PLANE].normal = linear_math::Vector3(clip[3] - clip[2], clip[7] - clip[6], clip[11] - clip[10]);
+		d->planes[FAR_PLANE].intercept = clip[15] - clip[14];
+
+		d->planes[NEAR_PLANE].normal = linear_math::Vector3(clip[3] + clip[2], clip[7] + clip[6], clip[11] + clip[10]);
+		d->planes[NEAR_PLANE].intercept = clip[15] + clip[14];
 	}
+	else
+	{
+		ASSERT(d->type == GMFrustumType::Orthographic);
+		d->planes[RIGHT_PLANE].normal = linear_math::Vector3(1, 0, 0);
+		d->planes[RIGHT_PLANE].intercept = d->right;
 
-	//calculate planes
-	d->planes[RIGHT_PLANE].normal[0] = clip[3] - clip[0];
-	d->planes[RIGHT_PLANE].normal[1] = clip[7] - clip[4];
-	d->planes[RIGHT_PLANE].normal[2] = clip[11] - clip[8];
-	d->planes[RIGHT_PLANE].intercept = clip[15] - clip[12];
+		d->planes[LEFT_PLANE].normal = linear_math::Vector3(-1, 0, 0);
+		d->planes[LEFT_PLANE].intercept = d->left;
 
-	d->planes[LEFT_PLANE].normal[0] = clip[3] + clip[0];
-	d->planes[LEFT_PLANE].normal[1] = clip[7] + clip[4];
-	d->planes[LEFT_PLANE].normal[2] = clip[11] + clip[8];
-	d->planes[LEFT_PLANE].intercept = clip[15] + clip[12];
+		d->planes[BOTTOM_PLANE].normal = linear_math::Vector3(0, -1, 0);
+		d->planes[BOTTOM_PLANE].intercept = d->bottom;
 
-	d->planes[BOTTOM_PLANE].normal[0] = clip[3] + clip[1];
-	d->planes[BOTTOM_PLANE].normal[1] = clip[7] + clip[5];
-	d->planes[BOTTOM_PLANE].normal[2] = clip[11] + clip[9];
-	d->planes[BOTTOM_PLANE].intercept = clip[15] + clip[13];
+		d->planes[TOP_PLANE].normal = linear_math::Vector3(0, 1, 0);
+		d->planes[TOP_PLANE].intercept = d->top;
 
-	d->planes[TOP_PLANE].normal[0] = clip[3] - clip[1];
-	d->planes[TOP_PLANE].normal[1] = clip[7] - clip[5];
-	d->planes[TOP_PLANE].normal[2] = clip[11] - clip[9];
-	d->planes[TOP_PLANE].intercept = clip[15] - clip[13];
+		d->planes[NEAR_PLANE].normal = linear_math::Vector3(0, 0, 1);
+		d->planes[NEAR_PLANE].intercept = d->n;
 
-	d->planes[FAR_PLANE].normal[0] = clip[3] - clip[2];
-	d->planes[FAR_PLANE].normal[1] = clip[7] - clip[6];
-	d->planes[FAR_PLANE].normal[2] = clip[11] - clip[10];
-	d->planes[FAR_PLANE].intercept = clip[15] - clip[14];
-
-	d->planes[NEAR_PLANE].normal[0] = clip[3] + clip[2];
-	d->planes[NEAR_PLANE].normal[1] = clip[7] + clip[6];
-	d->planes[NEAR_PLANE].normal[2] = clip[11] + clip[10];
-	d->planes[NEAR_PLANE].intercept = clip[15] + clip[14];
+		d->planes[FAR_PLANE].normal = linear_math::Vector3(0, 0, -1);
+		d->planes[FAR_PLANE].intercept = d->f;
+	}
 
 	//normalize planes
 	for (int i = 0; i < 6; ++i)
@@ -313,7 +338,7 @@ void Frustum::update()
 }
 
 //is a point in the Frustum?
-bool Frustum::isPointInside(const linear_math::Vector3 & point)
+bool GMFrustum::isPointInside(const linear_math::Vector3 & point)
 {
 	D(d);
 	for (int i = 0; i < 6; ++i)
@@ -326,7 +351,7 @@ bool Frustum::isPointInside(const linear_math::Vector3 & point)
 }
 
 //is a bounding box in the Frustum?
-bool Frustum::isBoundingBoxInside(const linear_math::Vector3 * vertices)
+bool GMFrustum::isBoundingBoxInside(const linear_math::Vector3 * vertices)
 {
 	D(d);
 	for (int i = 0; i < 6; ++i)
@@ -356,13 +381,15 @@ bool Frustum::isBoundingBoxInside(const linear_math::Vector3 * vertices)
 	return true;
 }
 
-linear_math::Matrix4x4 Frustum::getPerspective()
+linear_math::Matrix4x4 GMFrustum::getPerspective()
 {
 	D(d);
-	return linear_math::Matrix4x4(linear_math::perspective(d->fovy, d->aspect, d->n, d->f));;
+	if (d->type == GMFrustumType::Perspective)
+		return linear_math::perspective(d->fovy, d->aspect, d->n, d->f);
+	return linear_math::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
 }
 
-void Frustum::updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix)
+void GMFrustum::updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix)
 {
 	D(d);
 	d->viewMatrix = viewMatrix;

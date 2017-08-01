@@ -746,6 +746,16 @@ namespace linear_math
 		return result;
 	}
 
+	static inline Matrix4x4 ortho(float left, float right, float bottom, float top, float n, float f)
+	{
+		return Matrix4x4(
+			Vector4(2.0f / (right - left),	0.0f,					0.0f,			(left + right) / (left - right)),
+			Vector4(0.0f,					2.0f / (top - bottom),	0.0f,			(bottom + top) / (bottom - top)),
+			Vector4(0.0f,					0.0f,					2.0f / (n - f),	(n + f) / (n - f)),
+			Vector4(0.0f,					0.0f,					0.0f,			1.0f)
+		);
+	}
+
 	GM_ALIGNED_16(class) Quaternion
 	{
 		DEFINE_VECTOR_DATA(4)
@@ -915,6 +925,12 @@ namespace linear_math
 		{
 			*(out + i) = vector[i];
 		}
+	}
+
+	template <typename T>
+	inline T linearInterpolate(const T& start, const T& end, GMfloat percentage)
+	{
+		return percentage * (end - start) + start;
 	}
 }
 END_NS

@@ -6,8 +6,20 @@
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.initFrustum(75.f, 1.333f, .1f, 3200);
+	d->frustum.initPerspective(75.f, 1.333f, .1f, 3200);
 	d->state = { 0 };
+}
+
+void GMCamera::initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
+{
+	D(d);
+	d->frustum.initPerspective(fovy, aspect, n, f);
+}
+
+void GMCamera::initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
+{
+	D(d);
+	d->frustum.initOrtho(left, right, bottom, top, n, f);
 }
 
 void GMCamera::synchronize(GMSpriteGameObject* gameObject)

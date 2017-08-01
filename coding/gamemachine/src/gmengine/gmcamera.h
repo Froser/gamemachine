@@ -8,7 +8,7 @@ class GMSpriteGameObject;
 
 GM_PRIVATE_OBJECT(GMCamera)
 {
-	Frustum frustum;
+	GMFrustum frustum;
 	PositionState state;
 	CameraLookAt lookAt;
 };
@@ -21,10 +21,13 @@ public:
 	GMCamera();
 
 public:
+	void initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
+	void initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
+
 	void synchronize(GMSpriteGameObject* gameObject);
 	void apply();
 
-	Frustum& getFrustum() { D(d); return d->frustum; }
+	GMFrustum& getFrustum() { D(d); return d->frustum; }
 	const PositionState& getPositionState() { D(d); return d->state; }
 };
 
