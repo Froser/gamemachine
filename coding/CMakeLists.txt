@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.0)
+cmake_minimum_required (VERSION 3.8)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 macro(source_group_by_dir source_files)
@@ -33,6 +33,20 @@ macro(add_msvc_precompiled_header PrecompiledHeader PrecompiledSource SourcesVar
 		list(APPEND ${SourcesVar} ${PrecompiledSource})
 	endif(MSVC)
 endmacro(add_msvc_precompiled_header)
+
+#Runtime library
+set(RUNTIME_LIBRARY MD)
+
+macro(apply_runtime_library)
+	if (${RUNTIME_LIBRARY} STREQUAL MD)
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
+	elseif(${RUNTIME_LIBRARY} STREQUAL MT)
+		set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+		set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
+	endif(${RUNTIME_LIBRARY} STREQUAL MD)
+endmacro(apply_runtime_library)
+apply_runtime_library()
 
 add_subdirectory(./3rdparty/zlib zlib)
 add_subdirectory(./3rdparty/libpng libpng)

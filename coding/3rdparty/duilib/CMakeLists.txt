@@ -1,4 +1,3 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 project(duilib)
 
 set (SOURCES
