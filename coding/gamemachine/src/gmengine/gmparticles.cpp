@@ -32,8 +32,6 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 	GMint offset_position = mesh->get_transferred_positions_byte_size() / particleCount * index;
 	GMint color_offset = (mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size())
 		+ mesh->get_transferred_colors_byte_size() / particleCount * index;
-	GMfloat *ptrPosition = (GMfloat*)(vertexData + offset_position),
-		*ptrColor = (GMfloat*)(vertexData + color_offset);
 	GMfloat* basePositions = d->parentParticles->getPositionArray(prototype)
 		+ offset_position / sizeof(decltype(basePositions[0] + 0));
 
@@ -43,7 +41,6 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 		+ mesh->get_transferred_colors_byte_size();
 #endif
 
-	GMint offset = 0;
 	// 这一轮需要更新的顶点数量
 	GMint vertexCountThisTurn = mesh->get_transferred_positions_byte_size() / sizeof(GMModel::DataType) / particleCount / GMModel::PositionDimension;
 	for (GMint offset = 0; offset < vertexCountThisTurn; ++offset)
@@ -55,12 +52,12 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 			*(basePositions + offset * 4 + 3)
 		);
 		linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
-		ASSERT((GMLargeInteger)(ptrPosition + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
-		linear_math::copyVector(transformedPosition, ptrPosition + offset * 4);
+		ASSERT((GMLargeInteger)(vertexData + offset_position + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
+		linear_math::copyVector(transformedPosition, (GMfloat*)(vertexData + offset_position) + offset * 4);
 
 		//更新颜色
-		ASSERT((GMLargeInteger)(ptrColor + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
-		linear_math::copyVector(d->color, ptrColor + offset * 4);
+		ASSERT((GMLargeInteger)(vertexData + color_offset + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
+		linear_math::copyVector(d->color, (GMfloat*)(vertexData + color_offset) + offset * 4);
 	}
 
 	setCurrentLife(getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
@@ -186,6 +183,12 @@ void GMParticles::initPrototype(GMModel* prototype, const Vector<GMParticleGameO
 	for (auto& component : mesh->getComponents())
 	{
 		component->expand(size);
+
+		// 开启alpha通道
+		auto& shader = component->getShader();
+		shader.setBlend(true);
+		shader.setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
+		shader.setBlendFactorDest(GMS_BlendFunc::DST_ALPHA);
 	}
 	
 	// 需要把所有positions记录下来，用于做顶点变换
@@ -229,14 +232,10 @@ void GMParticlesEmitter::setEmitterProperties(const GMParticleEmitterProperties&
 	d->emitterProps = props;
 }
 
-void GMParticlesEmitter::setParticlesProperties(const GMParticleProperties* props)
+void GMParticlesEmitter::setParticlesProperties(AUTORELEASE GMParticleProperties* props)
 {
 	D(d);
-	d->particleProps = new GMParticleProperties[d->emitterProps.particleCount];
-	for (GMint i = 0; i < d->emitterProps.particleCount; i++)
-	{
-		d->particleProps[i] = props[i];
-	}
+	d->particleProps = props;
 }
 
 void GMParticlesEmitter::onAppendingObjectToWorld()
@@ -291,7 +290,7 @@ void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* p
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
-	GMfloat size = linear_math::linearInterpolate(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
+	GMfloat size = linear_math::lerp(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
 	
 	// TODO 区分positionType
 	linear_math::Matrix4x4 transform;
@@ -307,7 +306,7 @@ void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* p
 	}
 	particle->setTransform(transform);
 
-	linear_math::Vector4 currentColor = linear_math::linearInterpolate(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
+	linear_math::Vector4 currentColor = linear_math::lerp(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
 }
 
@@ -335,4 +334,39 @@ void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* 
 		d->particleProps[index].emitted = true;
 		particle->setCurrentLife(particle->getMaxLife());
 	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+void GMEjectionParticleEmitter::create(
+	GMint count,
+	GMfloat startSize,
+	GMfloat endSize,
+	const linear_math::Vector4& startColor,
+	const linear_math::Vector4& endColor,
+	const linear_math::Quaternion& startAngleRange,
+	const linear_math::Quaternion& endAngleRange,
+	GMfloat emissionRate,
+	GMfloat speed,
+	OUT GMParticles** emitter)
+{
+	GMDefaultParticleEmitter* e = new GMDefaultParticleEmitter();
+
+	GMParticleEmitterProperties emitterProps;
+	emitterProps.particleCount = count;
+	emitterProps.emissionRate = emissionRate;
+	emitterProps.speed = speed;
+
+	GMParticleProperties* particleProps = new GMParticleProperties[count];
+	for (GMint i = 0; i < count; i++)
+	{
+		particleProps[i].angle = linear_math::lerp(startAngleRange, endAngleRange, (GMfloat)i / (count - 1));
+		particleProps[i].startSize = startSize;
+		particleProps[i].endSize = endSize;
+		particleProps[i].startColor = startColor;
+		particleProps[i].endColor = endColor;
+	}
+	
+	e->setEmitterProperties(emitterProps);
+	e->setParticlesProperties(particleProps);
+	*emitter = e;
 }

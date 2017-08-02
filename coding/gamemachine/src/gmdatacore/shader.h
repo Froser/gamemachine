@@ -92,6 +92,7 @@ enum class GMS_BlendFunc
 	ONE,
 	DST_COLOR,
 	SRC_ALPHA,
+	DST_ALPHA,
 	ONE_MINUS_SRC_ALPHA,
 };
 

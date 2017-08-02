@@ -321,14 +321,14 @@ private:
 		demo = new GMDemoGameWorld();
 
 		{
-			GMfloat extents[] = { .25f, .25f, .25f };
-			GMfloat size[] = { 0 };
+			GMfloat extents[] = { .5f, .5f, .5f };
+			GMfloat pos[] = { 0, 0, -50.f };
 			GMModel* coreObj;
-			GMPrimitiveCreator::createQuad(extents, size, &coreObj);
+			GMPrimitiveCreator::createQuad(extents, pos, &coreObj);
 			GMGameObject* obj = new GMGameObject(coreObj);
 
-			GMModel* core = obj->getModel();
-			Shader& shader = core->getAllMeshes()[0]->getComponents()[0]->getShader();
+			GMModel* model = obj->getModel();
+			Shader& shader = model->getAllMeshes()[0]->getComponents()[0]->getShader();
 			shader.setCull(GMS_Cull::CULL);
 
 			shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
@@ -361,18 +361,44 @@ private:
 
 		}
 
+#if 0
 		GMDefaultParticleEmitter* emitter = new GMDefaultParticleEmitter();
-		emitter->setEmitterProperties(GMParticleEmitterProperties());
-
-		GMParticleProperties props[2];
+		GMParticleEmitterProperties emitterProps;
+		emitterProps.particleCount = 3;
+		emitterProps.emissionRate = .3f;
+		emitter->setEmitterProperties(emitterProps);
+		GMParticleProperties* props = new GMParticleProperties[3];
 		props[0].startColor = linear_math::Vector4(0, 1, 0, 1);
 		props[1].startColor = linear_math::Vector4(0, 1, 0, 1);
+		props[2].startColor = linear_math::Vector4(0, 1, 0, 1);
+		props[0].endColor = linear_math::Vector4(0, 1, 0, 0);
+		props[1].endColor = linear_math::Vector4(0, 1, 0, 0);
+		props[2].endColor = linear_math::Vector4(0, 1, 0, 0);
 		props[0].startSize = props[0].endSize = .05f;
 		props[1].startSize = props[1].endSize = .05f;
+		props[2].startSize = props[2].endSize = .05f;
 		props[0].angle.setRotation(linear_math::Vector3(0, 0, 1), .2f);
 		props[1].angle.setRotation(linear_math::Vector3(0, 0, 1), -.4f);
+		props[2].angle.setRotation(linear_math::Vector3(0, 0, 1), -.6f);
 		emitter->setParticlesProperties(props);
-
+#else
+		GMParticles* emitter;
+		linear_math::Quaternion start, end;
+		start.setRotation(linear_math::Vector3(0, 0, 1), .2f);
+		end.setRotation(linear_math::Vector3(0, 0, 1), 3.f);
+		GMEjectionParticleEmitter::create(
+			20,
+			.1f,
+			.1f,
+			linear_math::Vector4(0, 1, 0, 1),
+			linear_math::Vector4(0, 1, 0, 0),
+			start,
+			end,
+			0.1f,
+			1.f,
+			&emitter
+		);
+#endif
 		demo->appendObject("particles", emitter);
 
 		CameraLookAt lookAt;

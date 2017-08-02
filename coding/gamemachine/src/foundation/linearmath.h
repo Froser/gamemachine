@@ -928,9 +928,15 @@ namespace linear_math
 	}
 
 	template <typename T>
-	inline T linearInterpolate(const T& start, const T& end, GMfloat percentage)
+	inline T lerp(const T& start, const T& end, GMfloat percentage)
 	{
 		return percentage * (end - start) + start;
+	}
+
+	template <>
+	inline Quaternion lerp(const Quaternion& start, const Quaternion& end, GMfloat percentage)
+	{
+		return ((1 - percentage) * start + percentage * end).normalize();
 	}
 }
 END_NS

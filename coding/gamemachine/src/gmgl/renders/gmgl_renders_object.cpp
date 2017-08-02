@@ -57,6 +57,9 @@ void GMGLRenders_Object::activateShader()
 			case GMS_BlendFunc::SRC_ALPHA:
 				factors[i] = GL_SRC_ALPHA;
 				break;
+			case GMS_BlendFunc::DST_ALPHA:
+				factors[i] = GL_DST_ALPHA;
+				break;
 			case GMS_BlendFunc::ONE_MINUS_SRC_ALPHA:
 				factors[i] = GL_ONE_MINUS_SRC_ALPHA;
 				break;

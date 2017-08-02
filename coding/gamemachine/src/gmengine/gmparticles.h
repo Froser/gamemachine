@@ -8,7 +8,7 @@ BEGIN_NS
 class GMParticles;
 GM_PRIVATE_OBJECT(GMParticleGameObject)
 {
-	linear_math::Vector4 color = linear_math::Vector4(0, 0, 0, 0);
+	linear_math::Vector4 color = linear_math::Vector4(1);
 	linear_math::Matrix4x4 transform = linear_math::Matrix4x4::identity();
 	GMfloat currentLife = 0;
 	GMfloat maxLife = 0;
@@ -132,7 +132,7 @@ public:
 
 public:
 	void setEmitterProperties(const GMParticleEmitterProperties& props);
-	void setParticlesProperties(const GMParticleProperties* props);
+	void setParticlesProperties(AUTORELEASE GMParticleProperties* props);
 
 private:
 	using GMParticles::setParticlesCount;
@@ -163,6 +163,24 @@ public:
 	virtual GMParticleGameObject* createParticle(const GMint index) override;
 	virtual void update(const GMint index, GMParticleGameObject* particle) override;
 	virtual void respawn(const GMint index, GMParticleGameObject* particle) override;
+};
+
+// 内置一些现成的粒子发射器
+class GMEjectionParticleEmitter : public GMParticlesEmitter
+{
+public:
+	static void create(
+		GMint count,
+		GMfloat startSize,
+		GMfloat endSize,
+		const linear_math::Vector4& startColor,
+		const linear_math::Vector4& endColor,
+		const linear_math::Quaternion& startAngleRange,
+		const linear_math::Quaternion& endAngleRange,
+		GMfloat emissionRate,
+		GMfloat speed,
+		OUT GMParticles** emitter
+	);
 };
 
 END_NS
