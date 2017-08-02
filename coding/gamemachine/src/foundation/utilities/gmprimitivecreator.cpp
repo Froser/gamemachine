@@ -92,7 +92,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	GMfloat t[12];
 	for (GMint i = 0; i < 12; i++)
 	{
-		t[i] = (extents[i % 3] + position[i % 3]) * v[i];
+		t[i] = extents[i % 3] * v[i] + position[i % 3];
 	}
 
 	{

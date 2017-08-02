@@ -68,7 +68,7 @@ void GMGameObject::draw()
 void GMGameObject::updateMatrix()
 {
 	D(d);
-	d->transformMatrix = d->translation * d->rotation.toMatrix() * d->scaling;
+	d->transformMatrix = d->scaling * d->rotation.toMatrix() * d->translation;
 }
 
 //GlyphObject

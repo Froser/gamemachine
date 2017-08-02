@@ -226,23 +226,17 @@ GMParticlesEmitter::~GMParticlesEmitter()
 		delete[] d->particleProps;
 }
 
-void GMParticlesEmitter::setEmitterProperties(const GMParticleEmitterProperties& props)
-{
-	D(d);
-	d->emitterProps = props;
-}
-
-void GMParticlesEmitter::setParticlesProperties(AUTORELEASE GMParticleProperties* props)
-{
-	D(d);
-	d->particleProps = props;
-}
-
 void GMParticlesEmitter::onAppendingObjectToWorld()
 {
 	D(d);
 	setParticlesCount(d->emitterProps.particleCount);
 	setParticlesHandler(this);
+	for (GMint i = 0; i < d->emitterProps.particleCount; i++)
+	{
+		d->particleProps[i].direction = linear_math::normalize(d->particleProps[i].direction);
+		d->particleProps[i].startupPosition = d->emitterProps.position;
+	}
+
 	GMParticles::onAppendingObjectToWorld();
 }
 
@@ -276,7 +270,7 @@ GMParticleGameObject* GMDefaultParticleEmitter::createParticle(const GMint index
 	return particle;
 }
 
-void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* particle)
+void GMDefaultParticleEmitter::checkEmit(const GMint index)
 {
 	D_BASE(d, GMParticlesEmitter);
 	if (!d->particleProps[index].emitted)
@@ -287,6 +281,12 @@ void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* p
 		// 打一个标记，进入发射倒计时，在下一次respawn的时候发射
 		d->particleProps[index].emitCountdown = true;
 	}
+}
+
+void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* particle)
+{
+	D_BASE(d, GMParticlesEmitter);
+	checkEmit(index);
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
@@ -296,9 +296,18 @@ void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* p
 	linear_math::Matrix4x4 transform;
 	if (d->particleProps[index].visible)
 	{
-		transform = d->particleProps[index].angle.toMatrix()
-			* linear_math::translate(d->emitterProps.position + linear_math::Vector3(d->emitterProps.speed * diff))
-			* linear_math::scale(linear_math::Vector3(size));
+		if (d->emitterProps.positionType == GMParticlePositionType::Free)
+		{
+			transform = linear_math::translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
+				* linear_math::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
+				* linear_math::scale(linear_math::Vector3(size));
+		}
+		else
+		{
+			transform = linear_math::translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
+				* linear_math::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
+				* linear_math::scale(linear_math::Vector3(size));
+		}
 	}
 	else
 	{
@@ -339,19 +348,25 @@ void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* 
 //////////////////////////////////////////////////////////////////////////
 void GMEjectionParticleEmitter::create(
 	GMint count,
+	GMParticlePositionType positionType,
+	GMfloat life,
 	GMfloat startSize,
 	GMfloat endSize,
+	const linear_math::Vector3& emitterPosition,
+	const linear_math::Vector3& startDirectionRange,
+	const linear_math::Vector3& endDirectionRange,
 	const linear_math::Vector4& startColor,
 	const linear_math::Vector4& endColor,
-	const linear_math::Quaternion& startAngleRange,
-	const linear_math::Quaternion& endAngleRange,
+	const linear_math::Quaternion& startAngle,
+	const linear_math::Quaternion& endAngle,
 	GMfloat emissionRate,
 	GMfloat speed,
-	OUT GMParticles** emitter)
+	OUT GMParticlesEmitter** emitter)
 {
 	GMDefaultParticleEmitter* e = new GMDefaultParticleEmitter();
-
 	GMParticleEmitterProperties emitterProps;
+	emitterProps.positionType = positionType;
+	emitterProps.position = emitterPosition;
 	emitterProps.particleCount = count;
 	emitterProps.emissionRate = emissionRate;
 	emitterProps.speed = speed;
@@ -359,7 +374,22 @@ void GMEjectionParticleEmitter::create(
 	GMParticleProperties* particleProps = new GMParticleProperties[count];
 	for (GMint i = 0; i < count; i++)
 	{
-		particleProps[i].angle = linear_math::lerp(startAngleRange, endAngleRange, (GMfloat)i / (count - 1));
+		// 在这里使用lerp，而不是slerp来变换
+		if (count == 1)
+		{
+			particleProps[i].direction = linear_math::normalize(
+				linear_math::normalize(startDirectionRange) + linear_math::normalize(endDirectionRange) / 2
+			);
+		}
+		else
+		{
+			particleProps[i].direction = linear_math::normalize(
+				linear_math::lerp(linear_math::normalize(startDirectionRange), linear_math::normalize(endDirectionRange), (GMfloat)i / (count - 1))
+			);
+		}
+		particleProps[i].life = life;
+		particleProps[i].startAngle = startAngle;
+		particleProps[i].endAngle = endAngle;
 		particleProps[i].startSize = startSize;
 		particleProps[i].endSize = endSize;
 		particleProps[i].startColor = startColor;

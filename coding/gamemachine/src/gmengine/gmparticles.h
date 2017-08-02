@@ -91,7 +91,11 @@ private:
 
 enum class GMParticlePositionType
 {
+	// 固定粒子位置
 	Free,
+
+	// 粒子位置随发射器移动
+	FollowEmitter,
 };
 
 GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
@@ -106,7 +110,10 @@ GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 GM_ALIGNED_STRUCT(GMParticleProperties)
 {
 	GMfloat life = 1;
-	linear_math::Quaternion angle;
+	linear_math::Vector3 startupPosition = 0; // 在Free模式下表示粒子的起始位置
+	linear_math::Vector3 direction = { 1, 0, 0 };
+	linear_math::Quaternion startAngle;
+	linear_math::Quaternion endAngle;
 	linear_math::Vector4 startColor = 1.f;
 	linear_math::Vector4 endColor = 1.f;
 	GMfloat startSize = .1f;
@@ -131,8 +138,9 @@ public:
 	~GMParticlesEmitter();
 
 public:
-	void setEmitterProperties(const GMParticleEmitterProperties& props);
-	void setParticlesProperties(AUTORELEASE GMParticleProperties* props);
+	inline void setEmitterProperties(const GMParticleEmitterProperties& props) { D(d); d->emitterProps = props; }
+	inline void setParticlesProperties(AUTORELEASE GMParticleProperties* props) { D(d); d->particleProps = props; }
+	GMParticleEmitterProperties& getEmitterPropertiesReference() { D(d); return d->emitterProps; }
 
 private:
 	using GMParticles::setParticlesCount;
@@ -147,7 +155,7 @@ GM_PRIVATE_OBJECT(GMDefaultParticleEmitter)
 	GMModel* prototype = nullptr;
 };
 
-// 具体化的粒子发射器，提供基本的粒子变换
+// 具体化的粒子发射器，提供粒子的线性变换
 class GMDefaultParticleEmitter : public GMParticlesEmitter
 {
 	DECLARE_PRIVATE(GMDefaultParticleEmitter)
@@ -163,6 +171,9 @@ public:
 	virtual GMParticleGameObject* createParticle(const GMint index) override;
 	virtual void update(const GMint index, GMParticleGameObject* particle) override;
 	virtual void respawn(const GMint index, GMParticleGameObject* particle) override;
+
+private:
+	void checkEmit(const GMint index);
 };
 
 // 内置一些现成的粒子发射器
@@ -171,15 +182,20 @@ class GMEjectionParticleEmitter : public GMParticlesEmitter
 public:
 	static void create(
 		GMint count,
+		GMParticlePositionType positionType,
+		GMfloat life,
 		GMfloat startSize,
 		GMfloat endSize,
+		const linear_math::Vector3& emitterPosition,
+		const linear_math::Vector3& startDirectionRange,
+		const linear_math::Vector3& endDirectionRange,
 		const linear_math::Vector4& startColor,
 		const linear_math::Vector4& endColor,
-		const linear_math::Quaternion& startAngleRange,
-		const linear_math::Quaternion& endAngleRange,
+		const linear_math::Quaternion& startAngle,
+		const linear_math::Quaternion& endAngle,
 		GMfloat emissionRate,
 		GMfloat speed,
-		OUT GMParticles** emitter
+		OUT GMParticlesEmitter** emitter
 	);
 };
 

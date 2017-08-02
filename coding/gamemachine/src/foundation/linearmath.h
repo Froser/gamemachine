@@ -749,10 +749,10 @@ namespace linear_math
 	static inline Matrix4x4 ortho(float left, float right, float bottom, float top, float n, float f)
 	{
 		return Matrix4x4(
-			Vector4(2.0f / (right - left),	0.0f,					0.0f,			(left + right) / (left - right)),
-			Vector4(0.0f,					2.0f / (top - bottom),	0.0f,			(bottom + top) / (bottom - top)),
-			Vector4(0.0f,					0.0f,					2.0f / (n - f),	(n + f) / (n - f)),
-			Vector4(0.0f,					0.0f,					0.0f,			1.0f)
+			Vector4(2.0f / (right - left),			0.0f,							0.0f,				0),
+			Vector4(0.0f,							2.0f / (top - bottom),			0.0f,				0),
+			Vector4(0.0f,							0.0f,							2.0f / (n - f),		0),
+			Vector4((left + right) / (left - right),(bottom + top) / (bottom - top),(n + f) / (n - f),	1.0f)
 		);
 	}
 

@@ -294,7 +294,7 @@ private:
 	virtual void start()
 	{
 		GMCamera& camera = GameMachine::instance().getCamera();
-		camera.initOrtho(-1, 1, -1, 1, 0, 3200);
+		camera.initOrtho(-1, 1, -1, 1, 0, 500);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 		auto container = engine->getResourceContainer();
@@ -322,7 +322,7 @@ private:
 
 		{
 			GMfloat extents[] = { .5f, .5f, .5f };
-			GMfloat pos[] = { 0, 0, -50.f };
+			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* coreObj;
 			GMPrimitiveCreator::createQuad(extents, pos, &coreObj);
 			GMGameObject* obj = new GMGameObject(coreObj);
@@ -362,7 +362,7 @@ private:
 		}
 
 #if 0
-		GMDefaultParticleEmitter* emitter = new GMDefaultParticleEmitter();
+		emitter = new GMDefaultParticleEmitter();
 		GMParticleEmitterProperties emitterProps;
 		emitterProps.particleCount = 3;
 		emitterProps.emissionRate = .3f;
@@ -382,15 +382,19 @@ private:
 		props[2].angle.setRotation(linear_math::Vector3(0, 0, 1), -.6f);
 		emitter->setParticlesProperties(props);
 #else
-		GMParticles* emitter;
 		linear_math::Quaternion start, end;
-		start.setRotation(linear_math::Vector3(0, 0, 1), .2f);
-		end.setRotation(linear_math::Vector3(0, 0, 1), 3.f);
+		start.setRotation(linear_math::Vector3(0, 0, 1), 0.f);
+		end.setRotation(linear_math::Vector3(0, 0, 1), 5.f);
 		GMEjectionParticleEmitter::create(
-			20,
+			50,
+			GMParticlePositionType::Free,
+			1,
+			.01f,
 			.1f,
-			.1f,
-			linear_math::Vector4(0, 1, 0, 1),
+			linear_math::Vector3(0, 0, 0),
+			linear_math::Vector3(1, 0, 0),
+			linear_math::Vector3(0, 1, 0),
+			linear_math::Vector4(1, 0, 0, 1),
 			linear_math::Vector4(0, 1, 0, 0),
 			start,
 			end,
@@ -409,7 +413,7 @@ private:
 
 	virtual void event(GameMachineEvent evt)
 	{
-		static linear_math::Vector3 dir = linear_math::normalize(linear_math::Vector3(.1f, .2f, .5f));
+		static linear_math::Vector3 dir = linear_math::normalize(linear_math::Vector3(0, 0, 1));
 		switch (evt)
 		{
 		case gm::GameMachineEvent::FrameStart:
@@ -422,7 +426,9 @@ private:
 		case gm::GameMachineEvent::Render:
 			{
 				if (rotate)
-					a += .001f;
+					a += .01f;
+
+				//emitter->getEmitterPropertiesReference().position += linear_math::Vector3(.001f, 0, 0);
 
 				GMGameObject* obj = demo->getGameObject("cube");
 				linear_math::Quaternion q;
@@ -469,6 +475,7 @@ private:
 	GMModel* coreParticle;
 	GMfloat pos[5] = { 0 };
 	bool rotate = true;
+	GMParticlesEmitter* emitter;
 };
 
 int WINAPI WinMain(
