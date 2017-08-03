@@ -393,14 +393,14 @@ private:
 			.1f,
 			linear_math::Vector3(0, 0, 0),
 			linear_math::Vector3(1, 0, 0),
-			linear_math::Vector3(0, 1, 0),
+			linear_math::Vector3(-1.414f / 2, -1.414f / 2, 0),
 			linear_math::Vector4(1, 0, 0, 1),
 			linear_math::Vector4(0, 1, 0, 0),
 			start,
 			end,
 			0.1f,
 			1.f,
-			2,
+			GMParticlesEmitter::InfiniteEmitTimes,
 			&emitter
 		);
 #endif

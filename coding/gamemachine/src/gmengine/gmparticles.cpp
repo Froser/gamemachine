@@ -395,28 +395,37 @@ void GMEjectionParticlesEmitter::create(
 	emitterProps.emissionTimes = emissionTimes;
 
 	GMParticleProperties* particleProps = new GMParticleProperties[count];
-	for (GMint i = 0; i < count; i++)
+
+	if (count == 1)
 	{
-		// 在这里使用lerp，而不是slerp来变换
-		if (count == 1)
+		particleProps[0].direction = linear_math::normalize(
+			linear_math::normalize(startDirectionRange) + linear_math::normalize(endDirectionRange) / 2
+		);
+	}
+	else
+	{
+		linear_math::Vector3 normalStart = linear_math::normalize(startDirectionRange),
+			normalEnd = linear_math::normalize(endDirectionRange);
+		linear_math::Vector3 axis = linear_math::normalize(linear_math::cross(normalStart, normalEnd));
+		GMfloat theta = linear_math::dot(normalStart, normalEnd);
+		linear_math::Vector4 homogeneousStart(normalStart[0], normalStart[1], normalStart[2], 1);
+		linear_math::Quaternion qStart, qEnd;
+		qStart.setRotation(axis, 0);
+		qEnd.setRotation(axis, gmAcos(theta));
+
+		for (GMint i = 0; i < count; i++)
 		{
-			particleProps[i].direction = linear_math::normalize(
-				linear_math::normalize(startDirectionRange) + linear_math::normalize(endDirectionRange) / 2
-			);
+			linear_math::Quaternion interpolation = linear_math::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
+			linear_math::Vector4 transformed = homogeneousStart * interpolation.toMatrix();
+			particleProps[i].direction = linear_math::Vector3(transformed[0], transformed[1], transformed[2]);
+			particleProps[i].life = life;
+			particleProps[i].startAngle = startAngle;
+			particleProps[i].endAngle = endAngle;
+			particleProps[i].startSize = startSize;
+			particleProps[i].endSize = endSize;
+			particleProps[i].startColor = startColor;
+			particleProps[i].endColor = endColor;
 		}
-		else
-		{
-			particleProps[i].direction = linear_math::normalize(
-				linear_math::lerp(linear_math::normalize(startDirectionRange), linear_math::normalize(endDirectionRange), (GMfloat)i / (count - 1))
-			);
-		}
-		particleProps[i].life = life;
-		particleProps[i].startAngle = startAngle;
-		particleProps[i].endAngle = endAngle;
-		particleProps[i].startSize = startSize;
-		particleProps[i].endSize = endSize;
-		particleProps[i].startColor = startColor;
-		particleProps[i].endColor = endColor;
 	}
 	
 	e->setEmitterProperties(emitterProps);

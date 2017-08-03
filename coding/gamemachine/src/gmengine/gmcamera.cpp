@@ -6,7 +6,7 @@
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.initPerspective(75.f, 1.333f, .1f, 500);
+	d->frustum.initPerspective(75.f, 1.333f, .1f, 3200);
 	d->state = { 0 };
 }
 

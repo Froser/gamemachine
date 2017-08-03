@@ -29,6 +29,7 @@ BEGIN_NS
 #	define gm_vPPPM (_mm_set_ps(-0.0f, +0.0f, +0.0f, +0.0f))
 #	define gm_vOnes (_mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f))
 #endif
+#define GM_SIMD_EPSILON FLT_EPSILON
 
 #include <math.h>
 
@@ -37,6 +38,7 @@ inline GMfloat gmFabs(GMfloat x) { return fabsf(x); }
 inline GMfloat gmCos(GMfloat x) { return cosf(x); }
 inline GMfloat gmSin(GMfloat x) { return sinf(x); }
 inline GMfloat gmTan(GMfloat x) { return tanf(x); }
+inline GMfloat gmSqrt(GMfloat x) { return sqrtf(x); }
 inline GMfloat gmAcos(GMfloat x)
 {
 	if (x < GMfloat(-1))
@@ -569,6 +571,27 @@ namespace linear_math
 	static inline GMfloat dot(const T& left, const T& right)
 	{
 #if USE_SIMD
+		__m128 vd;
+		vd = _mm_mul_ps(left.get128(), right.get128());
+		__m128 t = _mm_movehl_ps(vd, vd);
+		vd = _mm_add_ps(vd, t);
+		t = _mm_shuffle_ps(vd, vd, 0x55);
+		vd = _mm_add_ss(vd, t);
+		return _mm_cvtss_f32(vd);
+#else
+		GMfloat result = 0;
+		for (GMint n = 0; n < T::dimension; n++)
+		{
+			result += left[n] * right[n];
+		}
+		return result;
+#endif
+	}
+
+	template <>
+	static inline GMfloat dot(const Vector3& left, const Vector3& right)
+	{
+#if USE_SIMD
 		__m128 vd = _mm_mul_ps(left.get128(), right.get128());
 		__m128 z = _mm_movehl_ps(vd, vd);
 		__m128 y = _mm_shuffle_ps(vd, vd, 0x55);
@@ -583,6 +606,12 @@ namespace linear_math
 		}
 		return result;
 #endif
+	}
+
+	template <>
+	static inline GMfloat dot(const Vector2& left, const Vector2& right)
+	{
+		return left[0] * right[0] + left[1] * right[1];
 	}
 
 	static inline Vector3 cross(const Vector3& left, const Vector3& right)
@@ -606,27 +635,32 @@ namespace linear_math
 #endif
 	}
 
-	static inline GMfloat length(const Vector3& left)
+	template <typename T>
+	static inline GMfloat length(const T& left)
 	{
-		return sqrtf(dot(left, left));
+		return gmSqrt(dot(left, left));
 	}
 
-	static inline GMfloat lengthSquare(const Vector3& left)
+	template <typename T>
+	static inline GMfloat lengthSquare(const T& left)
 	{
 		return dot(left, left);
 	}
 
-	static inline GMfloat fast_length(const Vector3& left)
+	template <typename T>
+	static inline GMfloat fast_length(const T& left)
 	{
 		return 1.f / (GMfloat)fastInvSqrt(lengthSquare(left));
 	}
 
-	static inline Vector3 normalize(const Vector3& left)
+	template <typename T>
+	static inline T normalize(const T& left)
 	{
 		return left * fastInvSqrt(lengthSquare(left));
 	}
 
-	static inline Vector3 precise_normalize(const Vector3& left)
+	template <typename T>
+	static inline T precise_normalize(const T& left)
 	{
 		return left / length(left);
 	}
@@ -821,6 +855,16 @@ namespace linear_math
 				cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw);
 		}
 
+		Vector3 getAxis() const
+		{
+			GMfloat s_squared = 1.f - m_data[3] * m_data[3];
+
+			if (s_squared < GMfloat(10.) * GM_SIMD_EPSILON)
+				return Vector3(1.0, 0.0, 0.0);
+			GMfloat s = 1.f / gmSqrt(s_squared);
+			return Vector3(m_data[0] * s, m_data[1] * s, m_data[2] * s);
+		}
+
 		Quaternion inverse() const
 		{
 #if USE_SIMD
@@ -937,6 +981,36 @@ namespace linear_math
 	inline Quaternion lerp(const Quaternion& start, const Quaternion& end, GMfloat percentage)
 	{
 		return ((1 - percentage) * start + percentage * end).normalize();
+	}
+
+	inline Quaternion slerp(const Quaternion& start, const Quaternion& end, GMfloat percentage)
+	{
+		const GMfloat magnitude = 1 / fastInvSqrt (lengthSquare(start) * lengthSquare(end));
+		ASSERT(magnitude > GMfloat(0));
+
+		const GMfloat product = dot(start, end) / magnitude;
+		const GMfloat absproduct = gmFabs(product);
+
+		if (absproduct < GMfloat(1.0 - GM_SIMD_EPSILON))
+		{
+			const GMfloat theta = gmAcos(absproduct);
+			const GMfloat d = gmSin(theta);
+			ASSERT(d > GMfloat(0));
+
+			const GMfloat sign = (product < 0) ? GMfloat(-1) : GMfloat(1);
+			const GMfloat s0 = gmSin((GMfloat(1.0) - percentage) * theta) / d;
+			const GMfloat s1 = gmSin(sign * percentage * theta) / d;
+
+			return Quaternion(
+				(start.x() * s0 + end.x() * s1),
+				(start.y() * s0 + end.y() * s1),
+				(start.z() * s0 + end.z() * s1),
+				(start.w() * s0 + end.w() * s1));
+		}
+		else
+		{
+			return start;
+		}
 	}
 }
 END_NS
