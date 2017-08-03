@@ -230,7 +230,7 @@ GMParticlesEmitter::~GMParticlesEmitter()
 bool GMParticlesEmitter::isEmissionFinished()
 {
 	D(d);
-	if (d->emitterProps.emissionTimes == InfiniteEmitTimes)
+	if (d->emitterProps.emissionTimes == InfiniteEmissionTimes)
 		return false;
 	return d->emitterProps.particleCount == d->emitterProps.emissionFinishedParticleCount;
 }
@@ -301,7 +301,6 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
 	GMfloat size = linear_math::lerp(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
 	
-	// TODO 区分positionType
 	linear_math::Matrix4x4 transform;
 	if (d->particleProps[index].visible)
 	{
@@ -367,7 +366,7 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMEjectionParticlesEmitter::create(
+void GMLerpParticleEmitter::create(
 	GMint count,
 	GMParticlePositionType positionType,
 	GMfloat life,
@@ -395,40 +394,132 @@ void GMEjectionParticlesEmitter::create(
 	emitterProps.emissionTimes = emissionTimes;
 
 	GMParticleProperties* particleProps = new GMParticleProperties[count];
-
-	if (count == 1)
+	for (GMint i = 0; i < count; i++)
 	{
-		particleProps[0].direction = linear_math::normalize(
-			linear_math::normalize(startDirectionRange) + linear_math::normalize(endDirectionRange) / 2
-		);
-	}
-	else
-	{
-		linear_math::Vector3 normalStart = linear_math::normalize(startDirectionRange),
-			normalEnd = linear_math::normalize(endDirectionRange);
-		linear_math::Vector3 axis = linear_math::normalize(linear_math::cross(normalStart, normalEnd));
-		GMfloat theta = linear_math::dot(normalStart, normalEnd);
-		linear_math::Vector4 homogeneousStart(normalStart[0], normalStart[1], normalStart[2], 1);
-		linear_math::Quaternion qStart, qEnd;
-		qStart.setRotation(axis, 0);
-		qEnd.setRotation(axis, gmAcos(theta));
-
-		for (GMint i = 0; i < count; i++)
+		if (count == 1)
 		{
-			linear_math::Quaternion interpolation = linear_math::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
-			linear_math::Vector4 transformed = homogeneousStart * interpolation.toMatrix();
-			particleProps[i].direction = linear_math::Vector3(transformed[0], transformed[1], transformed[2]);
-			particleProps[i].life = life;
-			particleProps[i].startAngle = startAngle;
-			particleProps[i].endAngle = endAngle;
-			particleProps[i].startSize = startSize;
-			particleProps[i].endSize = endSize;
-			particleProps[i].startColor = startColor;
-			particleProps[i].endColor = endColor;
+			particleProps[i].direction = linear_math::normalize(
+				linear_math::normalize(startDirectionRange) + linear_math::normalize(endDirectionRange) / 2
+			);
 		}
+		else
+		{
+			linear_math::Vector3 normalStart = linear_math::normalize(startDirectionRange),
+				normalEnd = linear_math::normalize(endDirectionRange);
+			linear_math::Vector3 axis = linear_math::normalize(linear_math::cross(normalStart, normalEnd));
+			GMfloat theta = linear_math::dot(normalStart, normalEnd);
+			linear_math::Quaternion qStart, qEnd;
+			qStart.setRotation(axis, 0);
+			qEnd.setRotation(axis, gmAcos(theta));
+
+			linear_math::Quaternion interpolation = linear_math::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
+			linear_math::Vector4 transformed = linear_math::toHomogeneous(normalStart) * interpolation.toMatrix();
+			particleProps[i].direction = linear_math::toInhomogeneous(transformed);
+		}
+
+		particleProps[i].life = life;
+		particleProps[i].startAngle = startAngle;
+		particleProps[i].endAngle = endAngle;
+		particleProps[i].startSize = startSize;
+		particleProps[i].endSize = endSize;
+		particleProps[i].startColor = startColor;
+		particleProps[i].endColor = endColor;
 	}
 	
 	e->setEmitterProperties(emitterProps);
 	e->setParticlesProperties(particleProps);
 	*emitter = e;
+}
+
+void GMRadiusParticlesEmitter::create(
+	GMint count,
+	GMParticlePositionType positionType,
+	GMfloat life,
+	GMfloat startSize,
+	GMfloat endSize,
+	const linear_math::Vector3& rotateAxis,
+	GMfloat angularVelocity,
+	const linear_math::Vector3& emitterPosition,
+	const linear_math::Vector3& direction,
+	const linear_math::Vector4& startColor,
+	const linear_math::Vector4& endColor,
+	const linear_math::Quaternion& startAngle,
+	const linear_math::Quaternion& endAngle,
+	GMfloat emissionRate,
+	GMfloat speed,
+	GMint emissionTimes,
+	OUT GMParticlesEmitter** emitter
+)
+{
+	GMRadiusParticlesEmitter* e = new GMRadiusParticlesEmitter();
+	GMParticleEmitterProperties emitterProps;
+	emitterProps.positionType = positionType;
+	emitterProps.position = emitterPosition;
+	emitterProps.particleCount = count;
+	emitterProps.emissionRate = emissionRate;
+	emitterProps.speed = speed;
+	emitterProps.emissionTimes = emissionTimes;
+
+	GMParticleProperties* particleProps = new GMParticleProperties[count];
+	for (GMint i = 0; i < count; i++)
+	{
+		particleProps[i].direction = linear_math::normalize(direction);
+		particleProps[i].life = life;
+		particleProps[i].startAngle = startAngle;
+		particleProps[i].endAngle = endAngle;
+		particleProps[i].startSize = startSize;
+		particleProps[i].endSize = endSize;
+		particleProps[i].startColor = startColor;
+		particleProps[i].endColor = endColor;
+	}
+
+	e->setAngularVelocity(angularVelocity);
+	e->setRotateAxis(linear_math::normalize(rotateAxis));
+	e->setEmitterProperties(emitterProps);
+	e->setParticlesProperties(particleProps);
+	*emitter = e;
+}
+
+void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* particle)
+{
+	D(d);
+	D_BASE(db, GMParticlesEmitter);
+	checkEmit(index);
+
+	// 更新角速度
+	if (index == 0)
+		d->currentAngle += d->angularVelocity * GameMachine::instance().getLastFrameElapsed();
+
+	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
+	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
+	GMfloat size = linear_math::lerp(db->particleProps[index].startSize, db->particleProps[index].endSize, percentage);
+	linear_math::Quaternion rotation;
+	rotation.setRotation(d->rotateAxis, d->currentAngle);
+
+	linear_math::Matrix4x4 transform;
+	if (db->particleProps[index].visible)
+	{
+		linear_math::Vector4 rotatedDirection = linear_math::toHomogeneous(db->particleProps[index].direction) * rotation.toMatrix();
+		
+		if (db->emitterProps.positionType == GMParticlePositionType::Free)
+		{
+			transform = linear_math::translate(db->particleProps[index].startupPosition + linear_math::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				* linear_math::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
+				* linear_math::scale(linear_math::Vector3(size));
+		}
+		else
+		{
+			transform = linear_math::translate(db->emitterProps.position + linear_math::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				* linear_math::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
+				* linear_math::scale(linear_math::Vector3(size));
+		}
+	}
+	else
+	{
+		transform = linear_math::Matrix4x4(0, 0, 0, 0);
+	}
+	particle->setTransform(transform);
+
+	linear_math::Vector4 currentColor = linear_math::lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
+	particle->setColor(currentColor);
 }

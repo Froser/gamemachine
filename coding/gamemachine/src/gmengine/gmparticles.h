@@ -140,7 +140,7 @@ class GMParticlesEmitter : public GMParticles, public IParticleHandler
 public:
 	enum
 	{
-		InfiniteEmitTimes = 0,
+		InfiniteEmissionTimes = 0,
 	};
 
 public:
@@ -178,19 +178,15 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() override;
 
-public:
+protected:
 	// IParticleHandler
 	virtual GMParticleGameObject* createParticle(const GMint index) override;
 	virtual void update(const GMint index, GMParticleGameObject* particle) override;
 	virtual void respawn(const GMint index, GMParticleGameObject* particle) override;
 
-private:
+protected:
 	void checkEmit(const GMint index);
-};
 
-// 内置一些现成的粒子发射器
-class GMEjectionParticlesEmitter : public GMParticlesEmitter
-{
 public:
 	static void create(
 		GMint count,
@@ -201,6 +197,47 @@ public:
 		const linear_math::Vector3& emitterPosition,
 		const linear_math::Vector3& startDirectionRange,
 		const linear_math::Vector3& endDirectionRange,
+		const linear_math::Vector4& startColor,
+		const linear_math::Vector4& endColor,
+		const linear_math::Quaternion& startAngle,
+		const linear_math::Quaternion& endAngle,
+		GMfloat emissionRate,
+		GMfloat speed,
+		GMint emissionTimes,
+		OUT GMParticlesEmitter** emitter
+	);
+};
+
+// 有恒定角速度的半径发射器
+GM_PRIVATE_OBJECT(GMRadiusParticlesEmitter)
+{
+	linear_math::Vector3 rotateAxis;
+	GMfloat angularVelocity = 0;
+	GMfloat currentAngle = 0;
+};
+
+class GMRadiusParticlesEmitter : public GMLerpParticleEmitter
+{
+	DECLARE_PRIVATE(GMRadiusParticlesEmitter)
+
+public:
+	virtual void update(const GMint index, GMParticleGameObject* particle) override;
+
+private:
+	inline void setAngularVelocity(GMfloat angularVelocity) { D(d); d->angularVelocity = angularVelocity; }
+	inline void setRotateAxis(const linear_math::Vector3& axis) { D(d); d->rotateAxis = axis; }
+
+public:
+	static void create(
+		GMint count,
+		GMParticlePositionType positionType,
+		GMfloat life,
+		GMfloat startSize,
+		GMfloat endSize,
+		const linear_math::Vector3& rotateAxis,
+		GMfloat angularVelocity,
+		const linear_math::Vector3& emitterPosition,
+		const linear_math::Vector3& direction,
 		const linear_math::Vector4& startColor,
 		const linear_math::Vector4& endColor,
 		const linear_math::Quaternion& startAngle,

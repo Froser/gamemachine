@@ -635,6 +635,16 @@ namespace linear_math
 #endif
 	}
 
+	inline Vector3 toInhomogeneous(const Vector4& vec4)
+	{
+		return Vector3(vec4.x() / vec4.w(), vec4.y() / vec4.w(), vec4.z() / vec4.w());
+	}
+
+	inline Vector4 toHomogeneous(const Vector3& vec3)
+	{
+		return Vector4(vec3.x(), vec3.y(), vec3.z(), 1);
+	}
+
 	template <typename T>
 	static inline GMfloat length(const T& left)
 	{

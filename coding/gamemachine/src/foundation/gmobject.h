@@ -128,6 +128,11 @@ GM_ALIGNED_STRUCT(GMUnassignableObject)
 	GMUnassignableObject& operator=(const GMUnassignableObject&) = delete;
 };
 
+GM_ALIGNED_STRUCT(GMUnconstructableObject)
+{
+	GMUnconstructableObject() = delete;
+};
+
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 class GMObject : public GMAlignmentObject, public IDispose
 {
