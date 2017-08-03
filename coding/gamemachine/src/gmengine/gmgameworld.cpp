@@ -40,6 +40,20 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 	GameMachine::instance().initObjectPainter(obj->getModel());
 }
 
+bool GMGameWorld::removeObject(GMGameObject* obj)
+{
+	D(d);
+	auto& objs = d->gameObjects[obj->getType()];
+	auto objIter = objs.find(obj);
+	if (objIter == objs.end())
+		return false;
+	GMGameObject* eraseTarget = *objIter;
+	obj->onRemovingObjectFromWorld();
+	objs.erase(objIter);
+	delete eraseTarget;
+	return true;
+}
+
 void GMGameWorld::simulateGameWorld()
 {
 	D(d);

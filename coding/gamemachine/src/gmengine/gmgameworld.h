@@ -31,6 +31,7 @@ public:
 
 public:
 	virtual void renderGameWorld();
+	virtual bool removeObject(GMGameObject* obj);
 
 public:
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);

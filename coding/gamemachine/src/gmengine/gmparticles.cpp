@@ -3,6 +3,7 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmthreads.h"
 #include "foundation/utilities/gmprimitivecreator.h"
+#include "gmengine/gmgameworld.h"
 
 static void destructor(GMGameObject*) {}
 
@@ -226,6 +227,14 @@ GMParticlesEmitter::~GMParticlesEmitter()
 		delete[] d->particleProps;
 }
 
+bool GMParticlesEmitter::isEmissionFinished()
+{
+	D(d);
+	if (d->emitterProps.emissionTimes == InfiniteEmitTimes)
+		return false;
+	return d->emitterProps.particleCount == d->emitterProps.emissionFinishedParticleCount;
+}
+
 void GMParticlesEmitter::onAppendingObjectToWorld()
 {
 	D(d);
@@ -241,14 +250,14 @@ void GMParticlesEmitter::onAppendingObjectToWorld()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMDefaultParticleEmitter::~GMDefaultParticleEmitter()
+GMLerpParticleEmitter::~GMLerpParticleEmitter()
 {
 	D(d);
 	if (d->prototype)
 		delete d->prototype;
 }
 
-void GMDefaultParticleEmitter::onAppendingObjectToWorld()
+void GMLerpParticleEmitter::onAppendingObjectToWorld()
 {
 	D(d);
 	D_BASE(db, GMParticlesEmitter);
@@ -259,7 +268,7 @@ void GMDefaultParticleEmitter::onAppendingObjectToWorld()
 	GMParticlesEmitter::onAppendingObjectToWorld();
 }
 
-GMParticleGameObject* GMDefaultParticleEmitter::createParticle(const GMint index)
+GMParticleGameObject* GMLerpParticleEmitter::createParticle(const GMint index)
 {
 	D(d);
 	D_BASE(db, GMParticlesEmitter);
@@ -270,7 +279,7 @@ GMParticleGameObject* GMDefaultParticleEmitter::createParticle(const GMint index
 	return particle;
 }
 
-void GMDefaultParticleEmitter::checkEmit(const GMint index)
+void GMLerpParticleEmitter::checkEmit(const GMint index)
 {
 	D_BASE(d, GMParticlesEmitter);
 	if (!d->particleProps[index].emitted)
@@ -283,7 +292,7 @@ void GMDefaultParticleEmitter::checkEmit(const GMint index)
 	}
 }
 
-void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* particle)
+void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* particle)
 {
 	D_BASE(d, GMParticlesEmitter);
 	checkEmit(index);
@@ -319,7 +328,7 @@ void GMDefaultParticleEmitter::update(const GMint index, GMParticleGameObject* p
 	particle->setColor(currentColor);
 }
 
-void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* particle)
+void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* particle)
 {
 	D_BASE(d, GMParticlesEmitter);
 	if (!d->particleProps[index].emitted)
@@ -333,6 +342,18 @@ void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* 
 	}
 	else
 	{
+		if (d->emitterProps.emissionTimes > 0)
+		{
+			if (d->particleProps[index].currentEmissionTimes <= d->emitterProps.emissionTimes)
+				d->particleProps[index].currentEmissionTimes++;
+
+			if (d->particleProps[index].currentEmissionTimes == d->emitterProps.emissionTimes)
+			{
+				d->particleProps[index].visible = false;
+				d->emitterProps.emissionFinishedParticleCount++;
+			}
+		}
+
 		return particle->setCurrentLife(particle->getMaxLife());
 	}
 
@@ -346,7 +367,7 @@ void GMDefaultParticleEmitter::respawn(const GMint index, GMParticleGameObject* 
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMEjectionParticleEmitter::create(
+void GMEjectionParticlesEmitter::create(
 	GMint count,
 	GMParticlePositionType positionType,
 	GMfloat life,
@@ -361,15 +382,17 @@ void GMEjectionParticleEmitter::create(
 	const linear_math::Quaternion& endAngle,
 	GMfloat emissionRate,
 	GMfloat speed,
+	GMint emissionTimes,
 	OUT GMParticlesEmitter** emitter)
 {
-	GMDefaultParticleEmitter* e = new GMDefaultParticleEmitter();
+	GMLerpParticleEmitter* e = new GMLerpParticleEmitter();
 	GMParticleEmitterProperties emitterProps;
 	emitterProps.positionType = positionType;
 	emitterProps.position = emitterPosition;
 	emitterProps.particleCount = count;
 	emitterProps.emissionRate = emissionRate;
 	emitterProps.speed = speed;
+	emitterProps.emissionTimes = emissionTimes;
 
 	GMParticleProperties* particleProps = new GMParticleProperties[count];
 	for (GMint i = 0; i < count; i++)

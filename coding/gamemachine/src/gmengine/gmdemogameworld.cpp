@@ -30,15 +30,50 @@ bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
 	if (r != d->renderList.end())
 		return false;
 	d->renderList[name] = obj;
+	d->renderListInv[obj] = name;
 	appendObjectAndInit(obj);
 	return true;
 }
 
-GMGameObject* GMDemoGameWorld::getGameObject(const GMString& name)
+bool GMDemoGameWorld::removeObject(const GMString& name)
+{
+	D(d);
+	GMGameObject* object = findGameObject(name);
+	if (object)
+	{
+		d->renderList.erase(name);
+		d->renderListInv.erase(object);
+		return GMGameWorld::removeObject(object);
+	}
+	return false;
+}
+
+GMGameObject* GMDemoGameWorld::findGameObject(const GMString& name)
 {
 	D(d);
 	auto target = d->renderList.find(name);
 	if (target == d->renderList.end())
 		return nullptr;
 	return target->second;
+}
+
+bool GMDemoGameWorld::findGameObject(const GMGameObject* obj, REF GMString& name)
+{
+	D(d);
+	auto target = d->renderListInv.find(obj);
+	if (target == d->renderListInv.end())
+		return false;
+	name = target->second;
+	return true;
+}
+
+bool GMDemoGameWorld::removeObject(GMGameObject* obj)
+{
+	GMString name;
+	bool found = findGameObject(obj, name);
+	if (found)
+	{
+		return removeObject(name);
+	}
+	return false;
 }

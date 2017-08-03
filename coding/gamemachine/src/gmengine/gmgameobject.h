@@ -44,7 +44,8 @@ public:
 
 	virtual void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
-	virtual void onAppendingObjectToWorld();
+	virtual void onAppendingObjectToWorld() {}
+	virtual void onRemovingObjectFromWorld() {}
 	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }
 	virtual void draw();
 	virtual void simulate() {}

@@ -52,11 +52,6 @@ GMGameWorld* GMGameObject::getWorld()
 	return d->world;
 }
 
-void GMGameObject::onAppendingObjectToWorld()
-{
-
-}
-
 void GMGameObject::draw()
 {
 	GMfloat transform[16];

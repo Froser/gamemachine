@@ -294,7 +294,7 @@ private:
 	virtual void start()
 	{
 		GMCamera& camera = GameMachine::instance().getCamera();
-		camera.initOrtho(-1, 1, -1, 1, 0, 500);
+		//camera.initOrtho(-1, 1, -1, 1, 0, 500);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 		auto container = engine->getResourceContainer();
@@ -385,7 +385,7 @@ private:
 		linear_math::Quaternion start, end;
 		start.setRotation(linear_math::Vector3(0, 0, 1), 0.f);
 		end.setRotation(linear_math::Vector3(0, 0, 1), 5.f);
-		GMEjectionParticleEmitter::create(
+		GMEjectionParticlesEmitter::create(
 			50,
 			GMParticlePositionType::Free,
 			1,
@@ -400,6 +400,7 @@ private:
 			end,
 			0.1f,
 			1.f,
+			2,
 			&emitter
 		);
 #endif
@@ -422,6 +423,11 @@ private:
 			break;
 		case gm::GameMachineEvent::Simulate:
 			demo->simulateGameWorld();
+			if (emitter && emitter->isEmissionFinished())
+			{
+				demo->removeObject(emitter);
+				emitter = nullptr;
+			}
 			break;
 		case gm::GameMachineEvent::Render:
 			{
@@ -430,7 +436,7 @@ private:
 
 				//emitter->getEmitterPropertiesReference().position += linear_math::Vector3(.001f, 0, 0);
 
-				GMGameObject* obj = demo->getGameObject("cube");
+				GMGameObject* obj = demo->findGameObject("cube");
 				linear_math::Quaternion q;
 				q.setRotation(dir, a);
 				obj->setRotation(q);

@@ -105,6 +105,8 @@ GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 	linear_math::Vector3 position = 0;
 	GMfloat emissionRate = .5f;
 	GMfloat speed = .5f;
+	GMint emissionTimes = 0; // 0(GMParticlesEmitter::InfiniteEmitTimes)表示无限次发射
+	GMint emissionFinishedParticleCount = 0;
 };
 
 GM_ALIGNED_STRUCT(GMParticleProperties)
@@ -118,6 +120,7 @@ GM_ALIGNED_STRUCT(GMParticleProperties)
 	linear_math::Vector4 endColor = 1.f;
 	GMfloat startSize = .1f;
 	GMfloat endSize = .1f;
+	GMint currentEmissionTimes = 0;
 	bool visible = true;
 	bool emitted = false;
 	bool emitCountdown = false;
@@ -135,12 +138,21 @@ class GMParticlesEmitter : public GMParticles, public IParticleHandler
 	DECLARE_PRIVATE(GMParticlesEmitter)
 
 public:
+	enum
+	{
+		InfiniteEmitTimes = 0,
+	};
+
+public:
 	~GMParticlesEmitter();
 
 public:
 	inline void setEmitterProperties(const GMParticleEmitterProperties& props) { D(d); d->emitterProps = props; }
 	inline void setParticlesProperties(AUTORELEASE GMParticleProperties* props) { D(d); d->particleProps = props; }
 	GMParticleEmitterProperties& getEmitterPropertiesReference() { D(d); return d->emitterProps; }
+
+public:
+	bool isEmissionFinished();
 
 private:
 	using GMParticles::setParticlesCount;
@@ -150,18 +162,18 @@ public:
 	virtual void onAppendingObjectToWorld() override;
 };
 
-GM_PRIVATE_OBJECT(GMDefaultParticleEmitter)
+GM_PRIVATE_OBJECT(GMLerpParticleEmitter)
 {
 	GMModel* prototype = nullptr;
 };
 
 // 具体化的粒子发射器，提供粒子的线性变换
-class GMDefaultParticleEmitter : public GMParticlesEmitter
+class GMLerpParticleEmitter : public GMParticlesEmitter
 {
-	DECLARE_PRIVATE(GMDefaultParticleEmitter)
+	DECLARE_PRIVATE(GMLerpParticleEmitter)
 
 public:
-	~GMDefaultParticleEmitter();
+	~GMLerpParticleEmitter();
 
 public:
 	virtual void onAppendingObjectToWorld() override;
@@ -177,7 +189,7 @@ private:
 };
 
 // 内置一些现成的粒子发射器
-class GMEjectionParticleEmitter : public GMParticlesEmitter
+class GMEjectionParticlesEmitter : public GMParticlesEmitter
 {
 public:
 	static void create(
@@ -195,6 +207,7 @@ public:
 		const linear_math::Quaternion& endAngle,
 		GMfloat emissionRate,
 		GMfloat speed,
+		GMint emissionTimes,
 		OUT GMParticlesEmitter** emitter
 	);
 };

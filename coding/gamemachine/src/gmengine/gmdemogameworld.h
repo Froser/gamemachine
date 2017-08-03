@@ -11,6 +11,7 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMDemoGameWorld)
 {
 	Map<GMString, GMGameObject*> renderList;
+	Map<const GMGameObject*, GMString> renderListInv;
 };
 
 class GMDemoGameWorld : public GMGameWorld
@@ -28,7 +29,12 @@ public:
 
 public:
 	bool appendObject(const GMString& name, GMGameObject* obj);
-	GMGameObject* getGameObject(const GMString& name);
+	bool removeObject(const GMString& name);
+	GMGameObject* findGameObject(const GMString& name);
+	bool findGameObject(const GMGameObject* obj, REF GMString& name);
+
+public:
+	bool removeObject(GMGameObject* obj) override;
 };
 
 END_NS
