@@ -366,6 +366,13 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 }
 
 //////////////////////////////////////////////////////////////////////////
+GMRadiusParticlesEmitter::~GMRadiusParticlesEmitter()
+{
+	D(d);
+	if (d->currentAngles)
+		delete[] d->currentAngles;
+}
+
 void GMLerpParticleEmitter::create(
 	GMint count,
 	GMParticlePositionType positionType,
@@ -461,6 +468,7 @@ void GMRadiusParticlesEmitter::create(
 	emitterProps.emissionTimes = emissionTimes;
 
 	GMParticleProperties* particleProps = new GMParticleProperties[count];
+	e->data()->currentAngles = new GMfloat[count];
 	for (GMint i = 0; i < count; i++)
 	{
 		particleProps[i].direction = linear_math::normalize(direction);
@@ -484,17 +492,17 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 {
 	D(d);
 	D_BASE(db, GMParticlesEmitter);
-	checkEmit(index);
 
-	// 更新角速度
 	if (index == 0)
 		d->currentAngle += d->angularVelocity * GameMachine::instance().getLastFrameElapsed();
+
+	checkEmit(index);
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
 	GMfloat size = linear_math::lerp(db->particleProps[index].startSize, db->particleProps[index].endSize, percentage);
 	linear_math::Quaternion rotation;
-	rotation.setRotation(d->rotateAxis, d->currentAngle);
+	rotation.setRotation(d->rotateAxis, d->currentAngles[index]);
 
 	linear_math::Matrix4x4 transform;
 	if (db->particleProps[index].visible)
@@ -522,4 +530,17 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 
 	linear_math::Vector4 currentColor = linear_math::lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
+}
+
+void GMRadiusParticlesEmitter::respawn(const GMint index, GMParticleGameObject* particle)
+{
+	D(d);
+	D_BASE(db, GMParticlesEmitter);
+	GMLerpParticleEmitter::respawn(index, particle);
+
+	if (db->particleProps[index].emitted)
+	{
+		// 更新角速度
+		d->currentAngles[index] = d->currentAngle;
+	}
 }

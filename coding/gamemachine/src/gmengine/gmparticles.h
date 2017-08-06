@@ -172,6 +172,9 @@ class GMLerpParticleEmitter : public GMParticlesEmitter
 {
 	DECLARE_PRIVATE(GMLerpParticleEmitter)
 
+protected:
+	GMLerpParticleEmitter() = default;
+
 public:
 	~GMLerpParticleEmitter();
 
@@ -214,6 +217,7 @@ GM_PRIVATE_OBJECT(GMRadiusParticlesEmitter)
 	linear_math::Vector3 rotateAxis;
 	GMfloat angularVelocity = 0;
 	GMfloat currentAngle = 0;
+	GMfloat* currentAngles = nullptr;
 };
 
 class GMRadiusParticlesEmitter : public GMLerpParticleEmitter
@@ -221,11 +225,18 @@ class GMRadiusParticlesEmitter : public GMLerpParticleEmitter
 	DECLARE_PRIVATE(GMRadiusParticlesEmitter)
 
 public:
+	~GMRadiusParticlesEmitter();
+
+public:
 	virtual void update(const GMint index, GMParticleGameObject* particle) override;
+	virtual void respawn(const GMint index, GMParticleGameObject* particle) override;
 
 private:
 	inline void setAngularVelocity(GMfloat angularVelocity) { D(d); d->angularVelocity = angularVelocity; }
 	inline void setRotateAxis(const linear_math::Vector3& axis) { D(d); d->rotateAxis = axis; }
+
+protected:
+	GMRadiusParticlesEmitter() = default;
 
 public:
 	static void create(
