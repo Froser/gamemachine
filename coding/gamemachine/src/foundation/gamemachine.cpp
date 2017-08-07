@@ -151,7 +151,7 @@ void GameMachine::startGameMachine()
 		// 控制帧率
 		if (bNeedControlFrameRate)
 		{
-			GMLargeInteger elapsedFromStart = frameCounter.elapsedFromStart();
+			GMfloat elapsedFromStart = frameCounter.elapsedFromStart();
 			diff = (1 / 60.f - elapsedFromStart) * 1000;
 			if (diff > 0)
 				GMThread::sleep(diff);
