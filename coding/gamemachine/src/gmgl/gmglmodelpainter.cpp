@@ -34,19 +34,21 @@ GMGLModelPainter::GMGLModelPainter(IGraphicEngine* engine, GMModel* objs)
 void GMGLModelPainter::transfer()
 {
 	D(d);
-	if (d->inited)
-		return;
 
-	GMModel* obj = getModel();
-	GLenum usage = obj->getHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
-	BEGIN_FOREACH_MESH(obj, mesh)
+	GMModel* model = getModel();
+	GLenum usage = model->getUsageHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
+	BEGIN_FOREACH_MESH(model, mesh)
 	{
 		mesh->calculateTangentSpace();
 
-		GLuint vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		mesh->setArrayId(vao);
+		if (!d->inited)
+		{
+			GLuint vao;
+			glGenVertexArrays(1, &vao);
+			mesh->setArrayId(vao);
+		}
+
+		glBindVertexArray(mesh->getArrayId());
 
 		GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(GMModel::DataType) * mesh->positions().size();
 		GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(GMModel::DataType) * mesh->normals().size();
@@ -56,9 +58,14 @@ void GMGLModelPainter::transfer()
 		GLuint lightmapSize		= mesh->isDataDisabled(GMVertexDataType::Lightmap)		? 0 : sizeof(GMModel::DataType) * mesh->lightmaps().size();
 		GLuint colorSize		= mesh->isDataDisabled(GMVertexDataType::Color)			? 0 : sizeof(GMModel::DataType) * mesh->colors().size();
 
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		if (!d->inited)
+		{
+			GLuint vbo;
+			glGenBuffers(1, &vbo);
+			mesh->setBufferId(vbo);
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->getBufferId());
 		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
 		IF_ENABLED(mesh, GMVertexDataType::Position)	glBufferSubData(GL_ARRAY_BUFFER, 0																				, positionSize	, mesh->positions().data());
 		IF_ENABLED(mesh, GMVertexDataType::Normal)		glBufferSubData(GL_ARRAY_BUFFER, positionSize																	, normalSize	, mesh->normals().data());
@@ -67,7 +74,6 @@ void GMGLModelPainter::transfer()
 		IF_ENABLED(mesh, GMVertexDataType::Bitangent)	glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize								, bitangentSize	, mesh->bitangents().data());
 		IF_ENABLED(mesh, GMVertexDataType::Lightmap)	glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize				, lightmapSize	, mesh->lightmaps().data());
 		IF_ENABLED(mesh, GMVertexDataType::Color)		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, colorSize		, mesh->colors().data());
-		mesh->setBufferId(vbo);
 
 		IF_ENABLED(mesh, GMVertexDataType::Position)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	4,  GL_FLOAT, GL_FALSE, 0, 0);
 		IF_ENABLED(mesh, GMVertexDataType::Normal)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		4,  GL_FLOAT, GL_TRUE,  0, (void*)positionSize);

@@ -39,7 +39,7 @@ public:
 	virtual ~GMGameObject();
 
 public:
-	void setObject(AUTORELEASE GMModel* obj);
+	void setModel(AUTORELEASE GMModel* obj);
 	GMModel* getModel();
 
 	virtual void setWorld(GMGameWorld* world);
@@ -89,7 +89,7 @@ public:
 public:
 	void setText(const GMWchar* text);
 	void setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height);
-	void updateObject();
+	void update();
 
 private:
 	virtual void draw() override;
@@ -97,6 +97,8 @@ private:
 
 private:
 	void constructModel();
+	void updateModel();
+	void createVertices(GMComponent* component);
 };
 
 //GMEntityObject

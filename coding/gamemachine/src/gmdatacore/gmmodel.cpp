@@ -8,12 +8,6 @@
 #define VERTEX_OFFSET(offset, idx) ((offset * VERTEX_DEMENSION) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
-GMModel* GMModelPainter::getModel()
-{
-	D(d);
-	return d->object;
-}
-
 GMModel::~GMModel()
 {
 	D(d);
@@ -35,8 +29,14 @@ GMComponent::GMComponent(GMMesh* parent)
 	setVertexOffset(d->parentMesh->positions().size() / VERTEX_DEMENSION);
 }
 
-// 设置此component的第一个顶点位于ChildObject.vertices()中的偏移位置
-// 一般不需要手动调用
+void GMComponent::clear()
+{
+	D(d);
+	d->primitiveCount = 0;
+	d->primitiveVertices.clear();
+	d->vertexOffsets.clear();
+}
+
 void GMComponent::setVertexOffset(GMuint offset)
 {
 	D(d);

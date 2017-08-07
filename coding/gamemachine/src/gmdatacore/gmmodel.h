@@ -17,7 +17,7 @@ class GMGLShaderProgram;
 
 GM_PRIVATE_OBJECT(GMModelPainter)
 {
-	GMModel* object = nullptr;
+	GMModel* model = nullptr;
 };
 
 class GMMesh;
@@ -29,7 +29,7 @@ public:
 	GMModelPainter(GMModel* obj)
 	{
 		D(d);
-		d->object = obj;
+		d->model = obj;
 	}
 
 	virtual ~GMModelPainter() {}
@@ -45,7 +45,7 @@ public:
 	virtual void* getBuffer() = 0;
 
 protected:
-	GMModel* getModel();
+	inline GMModel* getModel() { D(d); return d->model; }
 };
 
 GM_PRIVATE_OBJECT(GMComponent)
@@ -79,6 +79,7 @@ public:
 	inline GMint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
 	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }
 
+	void clear();
 	void setVertexOffset(GMuint offset);
 	void beginFace();
 	void vertex(GMfloat x, GMfloat y, GMfloat z);
@@ -99,7 +100,7 @@ enum class GMUsageHint
 GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
-	Vector<GMMesh*> objects;
+	Vector<GMMesh*> meshes;
 	AutoPtr<GMModelPainter> painter;
 };
 
@@ -138,12 +139,12 @@ public:
 public:
 	inline void setPainter(AUTORELEASE GMModelPainter* painter) { D(d); d->painter.reset(painter); }
 	inline GMModelPainter* getPainter() { D(d); return d->painter; }
-	inline Vector<GMMesh*>& getAllMeshes() { D(d); return d->objects; }
-	inline void append(AUTORELEASE GMMesh* obj) { D(d); d->objects.push_back(obj); }
+	inline Vector<GMMesh*>& getAllMeshes() { D(d); return d->meshes; }
+	inline void append(AUTORELEASE GMMesh* obj) { D(d); d->meshes.push_back(obj); }
 
 	// 绘制方式
-	void setHint(GMUsageHint hint) { D(d); d->hint = hint; }
-	GMUsageHint getHint() { D(d); return d->hint; }
+	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
+	GMUsageHint getUsageHint() { D(d); return d->hint; }
 };
 
 // 绘制时候的排列方式

@@ -8,7 +8,7 @@
 GMGameObject::GMGameObject(AUTORELEASE GMModel* obj)
 {
 	D(d);
-	setObject(obj);
+	setModel(obj);
 	d->scaling = linear_math::Matrix4x4::identity();
 	d->translation = linear_math::Matrix4x4::identity();
 	updateMatrix();
@@ -23,7 +23,7 @@ GMGameObject::~GMGameObject()
 		d->destructor(this);
 }
 
-void GMGameObject::setObject(AUTORELEASE GMModel* obj)
+void GMGameObject::setModel(AUTORELEASE GMModel* obj)
 {
 	D(d);
 	if (d->model)
@@ -75,7 +75,6 @@ void GMGameObject::updateMatrix()
 GMGlyphObject::GMGlyphObject()
 	: GMGameObject(nullptr)
 {
-	D(d);
 }
 
 void GMGlyphObject::setText(const GMWchar* text)
@@ -100,13 +99,9 @@ void GMGlyphObject::constructModel()
 	D_BASE(db, GMGameObject);
 
 	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
-	GMUIWindow* window = GameMachine::instance().getMainWindow();
-	GMRect rect = window->getWindowRect();
-	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
-
-	GMModel* obj = new GMModel();
+	GMModel* model = new GMModel();
 	GMMesh* child = new GMMesh();
-	obj->append(child);
+	model->append(child);
 	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
 	child->setType(GMMeshType::Glyph);
 
@@ -119,6 +114,32 @@ void GMGlyphObject::constructModel()
 	shader.setBlend(true);
 	shader.setBlendFactorSource(GMS_BlendFunc::ONE);
 	shader.setBlendFactorDest(GMS_BlendFunc::ONE);
+
+	createVertices(component);
+	child->appendComponent(component);
+
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+	setModel(model);
+}
+
+void GMGlyphObject::updateModel()
+{
+	D(d);
+	GMComponent* component = getModel()->getAllMeshes()[0]->getComponents()[0];
+	component->clear();
+	createVertices(component);
+	GMModelPainter* painter = getModel()->getPainter();
+	painter->dispose();
+	painter->transfer();
+}
+
+void GMGlyphObject::createVertices(GMComponent* component)
+{
+	D(d);
+	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
+	GMUIWindow* window = GameMachine::instance().getMainWindow();
+	GMRect rect = window->getWindowRect();
+	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
 	auto& str = d->text.toStdWString();
 	const GMWchar* p = str.c_str();
@@ -153,11 +174,7 @@ void GMGlyphObject::constructModel()
 		component->endFace();
 		p++;
 	}
-
-	child->appendComponent(component);
-	setObject(obj);
 }
-
 
 void GMGlyphObject::onAppendingObjectToWorld()
 {
@@ -171,17 +188,16 @@ void GMGlyphObject::draw()
 	D(d);
 	if (d->lastRenderText != d->text)
 	{
-		updateObject();
+		update();
 		d->lastRenderText = d->text;
 	}
 	GMGameObject::draw();
 }
 
-void GMGlyphObject::updateObject()
+void GMGlyphObject::update()
 {
 	D_BASE(d, GMGameObject);
-	constructModel();
-	GameMachine::instance().initObjectPainter(getModel());
+	updateModel();
 }
 
 //GMEntityObject
@@ -293,7 +309,7 @@ GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector
 
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
-	setObject(obj);
+	setModel(obj);
 }
 
 void GMSkyGameObject::createSkyBox(OUT GMModel** obj)

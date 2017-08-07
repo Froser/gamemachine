@@ -170,7 +170,7 @@ GMint GMParticles::getParticleCount(GMModel* prototype)
 void GMParticles::initPrototype(GMModel* prototype, const Vector<GMParticleGameObject*>& particles)
 {
 	D(d);
-	prototype->setHint(GMUsageHint::DynamicDraw);
+	prototype->setUsageHint(GMUsageHint::DynamicDraw);
 
 	auto mesh = prototype->getAllMeshes()[0];
 	mesh->disableData(GMVertexDataType::Normal);
