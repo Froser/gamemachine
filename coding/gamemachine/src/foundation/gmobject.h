@@ -133,15 +133,20 @@ GM_ALIGNED_STRUCT(GMUnconstructableObject)
 	GMUnconstructableObject() = delete;
 };
 
+#define GM_DISABLE_COPY(clsName) public: clsName(clsName&) = delete;
+#define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete;
+
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
 class GMObject : public GMAlignmentObject, public IDispose
 {
+	GM_DISABLE_COPY(GMObject)
+	GM_DISABLE_ASSIGN(GMObject)
+
 public:
 	static void swapData(GMObject* a, GMObject* b);
 
 public:
 	GMObject() = default;
-	GMObject(GMObject&) = delete;
 
 private:
 	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();

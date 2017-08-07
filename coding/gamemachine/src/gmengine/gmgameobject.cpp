@@ -191,7 +191,7 @@ GMEntityObject::GMEntityObject(AUTORELEASE GMModel* obj)
 	calc();
 }
 
-Plane* GMEntityObject::getPlanes()
+GMPlane* GMEntityObject::getPlanes()
 {
 	D(d);
 	return d->planes;
@@ -234,17 +234,17 @@ void GMEntityObject::makePlanes()
 {
 	D(d);
 	// 前
-	d->planes[0] = Plane(linear_math::Vector3(0, 0, 1), -d->maxs[2]);
+	d->planes[0] = GMPlane(linear_math::Vector3(0, 0, 1), -d->maxs[2]);
 	// 后
-	d->planes[1] = Plane(linear_math::Vector3(0, 0, -1), d->mins[2]);
+	d->planes[1] = GMPlane(linear_math::Vector3(0, 0, -1), d->mins[2]);
 	// 左
-	d->planes[2] = Plane(linear_math::Vector3(-1, 0, 0), d->mins[0]);
+	d->planes[2] = GMPlane(linear_math::Vector3(-1, 0, 0), d->mins[0]);
 	// 右
-	d->planes[3] = Plane(linear_math::Vector3(1, 0, 0), -d->maxs[0]);
+	d->planes[3] = GMPlane(linear_math::Vector3(1, 0, 0), -d->maxs[0]);
 	// 上
-	d->planes[4] = Plane(linear_math::Vector3(0, 1, 0), -d->maxs[0]);
+	d->planes[4] = GMPlane(linear_math::Vector3(0, 1, 0), -d->maxs[0]);
 	// 下
-	d->planes[5] = Plane(linear_math::Vector3(0, -1, 0), d->mins[0]);
+	d->planes[5] = GMPlane(linear_math::Vector3(0, -1, 0), d->mins[0]);
 }
 
 // 天空

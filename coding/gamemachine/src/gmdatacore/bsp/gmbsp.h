@@ -50,7 +50,7 @@ enum GMBSPSurfaceType
 	MST_FLARE
 };
 
-typedef Plane BSPPlane;
+typedef GMPlane BSPPlane;
 typedef linear_math::Vector3 BSPVector3;
 
 // BSP file struct

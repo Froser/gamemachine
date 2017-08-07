@@ -344,6 +344,7 @@ public:
 	void setPaused(bool);
 	void begin();
 	void update();
+	GMfloat elapsedFromStart();
 	GMfloat getFps();
 	GMfloat getTime();
 	GMfloat evaluateDeltaTime();
@@ -388,19 +389,28 @@ enum PointPosition
 	POINT_BEHIND_PLANE,
 };
 
-struct Plane : public GMObject
+struct GMPlane : public GMObject
 {
-	Plane() : normal(linear_math::Vector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
-	{}
-	Plane(const linear_math::Vector3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
-	{}
-	Plane(const Plane & rhs)
+	GMPlane() : normal(linear_math::Vector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
+	{
+	}
+
+	GMPlane(const linear_math::Vector3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
+	{
+	}
+
+	GMPlane(const GMPlane & rhs)
 	{
 		normal = rhs.normal;
 		intercept = rhs.intercept;
 	}
 
-	~Plane() {}
+	GMPlane& operator=(const GMPlane& plane)
+	{
+		normal = plane.normal;
+		intercept = plane.intercept;
+		return *this;
+	}
 
 	void setNormal(const linear_math::Vector3 & rhs) { normal = rhs; }
 	void setIntercept(GMfloat newIntercept) { intercept = newIntercept; }
@@ -414,23 +424,23 @@ struct Plane : public GMObject
 	GMfloat getIntercept() { return intercept; }
 
 	//find point of intersection of 3 planes
-	bool intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 & result);
+	bool intersect3(const GMPlane & p2, const GMPlane & p3, linear_math::Vector3 & result);
 
 	GMfloat getDistance(const linear_math::Vector3 & point) const;
 	PointPosition classifyPoint(const linear_math::Vector3 & point) const;
 
-	Plane lerp(const Plane & p2, GMfloat factor);
+	GMPlane lerp(const GMPlane & p2, GMfloat factor);
 
 	//operators
-	bool operator==(const Plane & rhs) const;
-	bool operator!=(const Plane & rhs) const
+	bool operator==(const GMPlane & rhs) const;
+	bool operator!=(const GMPlane & rhs) const
 	{
 		return!((*this) == rhs);
 	}
 
 	//unary operators
-	Plane operator-(void) const { return Plane(-normal, -intercept); }
-	Plane operator+(void) const { return (*this); }
+	GMPlane operator-(void) const { return GMPlane(-normal, -intercept); }
+	GMPlane operator+(void) const { return (*this); }
 
 	//member variables
 	linear_math::Vector3 normal;	//X.N+intercept=0
@@ -447,7 +457,7 @@ enum class GMFrustumType
 GM_PRIVATE_OBJECT(GMFrustum)
 {
 	GMFrustumType type = GMFrustumType::Perspective;
-	Plane planes[6];
+	GMPlane planes[6];
 	union
 	{
 		struct

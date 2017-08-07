@@ -152,11 +152,12 @@ void GameMachine::startGameMachine()
 		// 控制帧率
 		if (bNeedControlFrameRate)
 		{
-			frameCounter.update();
-			diff = (1 / 60.f - frameCounter.evaluateDeltaTime()) * 1000;
+			GMLargeInteger elapsedFromStart = frameCounter.elapsedFromStart();
+			diff = (1 / 60.f - elapsedFromStart) * 1000;
 			if (diff > 0)
 				GMThread::sleep(diff);
 		}
+		d->lastFrameElpased = frameCounter.elapsedFromStart();
 	}
 
 	terminate();

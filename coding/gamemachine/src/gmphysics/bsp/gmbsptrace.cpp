@@ -54,7 +54,8 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 	tw.trace.fraction = 1;
 	tw.modelOrigin = origin;
 
-	if (!bsp.numnodes) {
+	if (!bsp.numnodes)
+	{
 		trace = tw.trace;
 		return;	// map not loaded, shouldn't happen
 	}

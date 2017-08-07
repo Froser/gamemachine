@@ -69,6 +69,13 @@ void GMClock::update()
 	d->begin = d->end;
 }
 
+GMfloat GMClock::elapsedFromStart()
+{
+	D(d);
+	GMLargeInteger now = highResolutionTimer();
+	return cycleToSecond(now - d->begin);
+}
+
 GMfloat GMClock::getFps()
 {
 	D(d);
@@ -168,21 +175,21 @@ GMLargeInteger GMStopwatch::nowInCycle()
 //Plane
 #define EPSILON 0.01f
 
-void Plane::setFromPoints(const linear_math::Vector3 & p0, const linear_math::Vector3 & p1, const linear_math::Vector3 & p2)
+void GMPlane::setFromPoints(const linear_math::Vector3 & p0, const linear_math::Vector3 & p1, const linear_math::Vector3 & p2)
 {
 	normal = linear_math::cross((p1 - p0), (p2 - p0));
 	normal = linear_math::normalize(normal);
 	calculateIntercept(p0);
 }
 
-void Plane::normalize()
+void GMPlane::normalize()
 {
 	GMfloat normalLength = linear_math::length(normal);
 	normal /= normalLength;
 	intercept /= normalLength;
 }
 
-bool Plane::intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 & result)//find point of intersection of 3 planes
+bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, linear_math::Vector3 & result)//find point of intersection of 3 planes
 {
 	GMfloat denominator = linear_math::dot(normal, (linear_math::cross(p2.normal, p3.normal)));
 	//scalar triple product of normals
@@ -199,12 +206,12 @@ bool Plane::intersect3(const Plane & p2, const Plane & p3, linear_math::Vector3 
 	return true;
 }
 
-GMfloat Plane::getDistance(const linear_math::Vector3 & point) const
+GMfloat GMPlane::getDistance(const linear_math::Vector3 & point) const
 {
 	return linear_math::dot(point, normal) + intercept;
 }
 
-PointPosition Plane::classifyPoint(const linear_math::Vector3 & point) const
+PointPosition GMPlane::classifyPoint(const linear_math::Vector3 & point) const
 {
 	GMfloat distance = getDistance(point);
 
@@ -217,9 +224,9 @@ PointPosition Plane::classifyPoint(const linear_math::Vector3 & point) const
 	return POINT_ON_PLANE;	//otherwise
 }
 
-Plane Plane::lerp(const Plane & p2, GMfloat factor)
+GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)
 {
-	Plane result;
+	GMPlane result;
 	result.normal = normal*(1.0f - factor) + p2.normal*factor;
 	result.normal = linear_math::normalize(result.normal);
 
@@ -228,7 +235,7 @@ Plane Plane::lerp(const Plane & p2, GMfloat factor)
 	return result;
 }
 
-bool Plane::operator ==(const Plane & rhs) const
+bool GMPlane::operator ==(const GMPlane & rhs) const
 {
 	if (equals(normal, rhs.normal) && intercept == rhs.intercept)
 		return true;

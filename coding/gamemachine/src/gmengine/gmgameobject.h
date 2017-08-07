@@ -105,7 +105,7 @@ enum { EntityPlaneNum = 6 };
 GM_PRIVATE_OBJECT(GMEntityObject)
 {
 	linear_math::Vector3 mins, maxs;
-	Plane planes[EntityPlaneNum];
+	GMPlane planes[EntityPlaneNum];
 };
 
 class GMEntityObject : public GMGameObject
@@ -118,7 +118,7 @@ public:
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
 
-	Plane* getPlanes();
+	GMPlane* getPlanes();
 	void getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs);
 
 private:

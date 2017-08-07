@@ -63,6 +63,8 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Queue<GameMachineMessage> messageQueue;
 	Vector<IDispose*> manangerQueue;
 	GameMachineWindows windows; // 除主窗口以外的窗口列表
+
+	GMfloat lastFrameElpased = 0;
 };
 
 class GameMachine : public GMSingleton<GameMachine>
@@ -126,7 +128,7 @@ public:
 	// 时间管理
 	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }
 	inline GMfloat getGameTimeSeconds() { D(d); return d->clock.getTime(); }
-	inline GMfloat getLastFrameElapsed() { D(d); return d->clock.evaluateDeltaTime(); }
+	inline GMfloat getLastFrameElapsed() { D(d); return d->lastFrameElpased; }
 
 	// 绘制管理
 	void initObjectPainter(GMModel* obj);
