@@ -15,6 +15,8 @@ struct IDispose
 template <typename T>
 GM_ALIGNED_16(class) GMObjectPrivateWrapper
 {
+	friend class GMObject;
+
 public:
 	GMObjectPrivateWrapper()
 		: m_data(nullptr)
@@ -143,7 +145,11 @@ class GMObject : public GMAlignmentObject, public IDispose
 	GM_DISABLE_ASSIGN(GMObject)
 
 public:
-	static void swapData(GMObject* a, GMObject* b);
+	GMObject(GMObject&& obj) noexcept;
+	GMObject& operator=(GMObject&& obj) noexcept;
+
+public:
+	static void swap(GMObject& a, GMObject& b);
 
 public:
 	GMObject() = default;

@@ -24,13 +24,6 @@ GMGameWorld::~GMGameWorld()
 	}
 }
 
-void GMGameWorld::renderGameWorld()
-{
-	D(d);
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-	engine->newFrame();
-}
-
 void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
@@ -38,6 +31,30 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->onAppendingObjectToWorld();
 	d->gameObjects[obj->getType()].insert(obj);
 	GameMachine::instance().initObjectPainter(obj->getModel());
+}
+
+void GMGameWorld::beginCreateStencil()
+{
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	engine->beginCreateStencil();
+}
+
+void GMGameWorld::endCreateStencil()
+{
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	engine->endCreateStencil();
+}
+
+void GMGameWorld::beginUseStencil(bool inverse)
+{
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	engine->beginUseStencil(inverse);
+}
+
+void GMGameWorld::endUseStencil()
+{
+	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	engine->endUseStencil();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)

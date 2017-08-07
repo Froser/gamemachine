@@ -30,7 +30,11 @@ public:
 	virtual GMPhysicsWorld* physicsWorld() = 0;
 
 public:
-	virtual void renderGameWorld();
+	virtual void renderGameWorld() {}
+	virtual void beginCreateStencil();
+	virtual void endCreateStencil();
+	virtual void beginUseStencil(bool inverse = false);
+	virtual void endUseStencil();
 	virtual bool removeObject(GMGameObject* obj);
 
 public:

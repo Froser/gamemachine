@@ -61,7 +61,6 @@ void GameMachine::postMessage(GameMachineMessage msg)
 
 void GameMachine::initObjectPainter(GMModel* obj)
 {
-	D(d);
 	GMModelPainter* painter = obj->getPainter();
 	if (!painter)
 	{

@@ -112,6 +112,9 @@ public:
 			}
 		case GameMachineEvent::Render:
 			{
+				IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+				engine->newFrame();
+
 				GMCamera& camera = GameMachine::instance().getCamera();
 				camera.apply();
 				m_world->renderGameWorld();
@@ -289,6 +292,7 @@ class DemoGameHandler : public GameHandler
 {
 public:
 	DemoGameHandler() {}
+	~DemoGameHandler() { if (mask) delete mask; }
 
 private:
 	virtual void start()
@@ -320,6 +324,14 @@ private:
 
 		demo = new GMDemoGameWorld();
 
+		{
+			GMfloat extents[] = { .15f, .15f, .15f };
+			GMfloat pos[] = { 0, 0, -1.f };
+			GMModel* maskModel;
+			GMPrimitiveCreator::createQuad(extents, pos, &maskModel);
+			mask = new GMGameObject(maskModel);
+			GameMachine::instance().initObjectPainter(mask->getModel());
+		}
 		{
 			GMfloat extents[] = { .5f, .5f, .5f };
 			GMfloat pos[] = { 0, 0, -1.f };
@@ -434,6 +446,15 @@ private:
 			break;
 		case gm::GameMachineEvent::Render:
 			{
+				IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+				engine->newFrame();
+
+				demo->beginCreateStencil();
+				//mask->draw();
+				demo->endCreateStencil();
+
+				demo->beginUseStencil(true);
+
 				if (rotate)
 					a += .01f;
 
@@ -445,6 +466,7 @@ private:
 				obj->setRotation(q);
 				demo->renderGameWorld();
 
+				demo->endUseStencil();
 				break;
 			}
 		case gm::GameMachineEvent::Activate:
@@ -481,7 +503,7 @@ private:
 
 	GMfloat a = 0;
 	GMDemoGameWorld* demo;
-	GMModel* coreParticle;
+	GMGameObject* mask = nullptr;
 	GMfloat pos[5] = { 0 };
 	bool rotate = true;
 	GMParticlesEmitter* emitter;

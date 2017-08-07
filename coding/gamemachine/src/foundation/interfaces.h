@@ -64,6 +64,10 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
 	virtual void addLight(const GMLight& light) = 0;
+	virtual void beginCreateStencil() = 0;
+	virtual void endCreateStencil() = 0;
+	virtual void beginUseStencil(bool inverse) = 0;
+	virtual void endUseStencil() = 0;
 };
 
 enum class GMDrawMode

@@ -46,6 +46,10 @@ public:
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
 	virtual void addLight(const GMLight& light) override;
+	virtual void beginCreateStencil() override;
+	virtual void endCreateStencil() override;
+	virtual void beginUseStencil(bool inverse) override;
+	virtual void endUseStencil() override;
 
 public:
 	GMGLShaderProgram* getShaders(GMMeshType objectType);

@@ -32,12 +32,12 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 void GMGLGraphicEngine::start()
 {
 	installShaders();
+	glDepthFunc(GL_LEQUAL);
 }
 
 void GMGLGraphicEngine::newFrame()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDepthFunc(GL_LEQUAL);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
 void GMGLGraphicEngine::setViewport(const GMRect& rect)
@@ -213,4 +213,34 @@ void GMGLGraphicEngine::addLight(const GMLight& light)
 	D(d);
 	d->lights.push_back(light);
 	d->needRefreshLights = true;
+}
+
+void GMGLGraphicEngine::beginCreateStencil()
+{
+	D(d);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_STENCIL_TEST);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glStencilMask(0xFF);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+}
+
+void GMGLGraphicEngine::endCreateStencil()
+{
+	D(d);
+	glStencilMask(0x00);
+}
+
+void GMGLGraphicEngine::beginUseStencil(bool inverse)
+{
+	if (!inverse)
+		glStencilFunc(GL_EQUAL, 1, 0xFF);
+	else
+		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+}
+
+void GMGLGraphicEngine::endUseStencil()
+{
+	glDisable(GL_STENCIL_TEST);
 }
