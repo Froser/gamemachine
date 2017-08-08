@@ -400,7 +400,7 @@ private:
 		start.setRotation(linear_math::Vector3(0, 0, 1), 0.f);
 		end.setRotation(linear_math::Vector3(0, 0, 1), 5.f);
 		GMRadiusParticlesEmitter::create(
-			4,
+			50,
 			GMParticlePositionType::RespawnAtEmitterPosition,
 			1,
 			.01f,
