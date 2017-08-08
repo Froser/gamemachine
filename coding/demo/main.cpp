@@ -400,8 +400,8 @@ private:
 		start.setRotation(linear_math::Vector3(0, 0, 1), 0.f);
 		end.setRotation(linear_math::Vector3(0, 0, 1), 5.f);
 		GMRadiusParticlesEmitter::create(
-			50,
-			GMParticlePositionType::Free,
+			4,
+			GMParticlePositionType::RespawnAtEmitterPosition,
 			1,
 			.01f,
 			.1f,
@@ -458,7 +458,7 @@ private:
 				if (rotate)
 					a += .01f;
 
-				//emitter->getEmitterPropertiesReference().position += linear_math::Vector3(.001f, 0, 0);
+				emitter->getEmitterPropertiesReference().position += linear_math::Vector3(.001f, 0, 0);
 
 				GMGameObject* obj = demo->findGameObject("cube");
 				linear_math::Quaternion q;

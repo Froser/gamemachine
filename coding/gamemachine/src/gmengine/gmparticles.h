@@ -94,16 +94,19 @@ private:
 enum class GMParticlePositionType
 {
 	// 固定粒子位置
-	Free,
+	Static,
 
 	// 粒子位置随发射器移动
 	FollowEmitter,
+
+	// 粒子在更新时，在发射器位置重生
+	RespawnAtEmitterPosition,
 };
 
 GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 {
 	GMint particleCount = 2;
-	GMParticlePositionType positionType = GMParticlePositionType::Free;
+	GMParticlePositionType positionType = GMParticlePositionType::Static;
 	linear_math::Vector3 position = 0;
 	GMfloat emissionRate = .5f;
 	GMfloat speed = .5f;
@@ -192,7 +195,7 @@ protected:
 protected:
 	void checkEmit(const GMint index);
 	void reduceLife(GMParticleGameObject* particle);
-	void respawnLife(GMParticleGameObject* particle);
+	void respawnLife(const GMint index, GMParticleGameObject* particle);
 
 public:
 	static void create(

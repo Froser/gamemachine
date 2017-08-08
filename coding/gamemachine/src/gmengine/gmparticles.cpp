@@ -312,7 +312,7 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 	linear_math::Matrix4x4 transform;
 	if (d->particleProps[index].visible)
 	{
-		if (d->emitterProps.positionType == GMParticlePositionType::Free)
+		if (d->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
 			transform = linear_math::translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
 				* linear_math::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
@@ -363,7 +363,7 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 			}
 		}
 
-		return respawnLife(particle);
+		return respawnLife(index, particle);
 	}
 
 	if (d->particleProps[index].emitCountdown)
@@ -371,7 +371,7 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 		// 进入了准备发射倒计时，在此时准备发射
 		d->particleProps[index].visible = true;
 		d->particleProps[index].emitted = true;
-		respawnLife(particle);
+		respawnLife(index, particle);
 	}
 }
 
@@ -380,8 +380,9 @@ void GMLerpParticleEmitter::reduceLife(GMParticleGameObject* particle)
 	particle->setCurrentLife(particle->getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
 }
 
-void GMLerpParticleEmitter::respawnLife(GMParticleGameObject* particle)
+void GMLerpParticleEmitter::respawnLife(const GMint index, GMParticleGameObject* particle)
 {
+	D_BASE(d, GMParticlesEmitter);
 	GMfloat currentLife = particle->getCurrentLife();
 	if (currentLife < 0)
 	{
@@ -393,6 +394,9 @@ void GMLerpParticleEmitter::respawnLife(GMParticleGameObject* particle)
 	{
 		particle->setCurrentLife(particle->getMaxLife());
 	}
+
+	if (d->emitterProps.positionType == GMParticlePositionType::RespawnAtEmitterPosition)
+		d->particleProps[index].startupPosition = d->emitterProps.position;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -539,7 +543,7 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 	{
 		linear_math::Vector4 rotatedDirection = linear_math::toHomogeneous(db->particleProps[index].direction) * rotation.toMatrix();
 		
-		if (db->emitterProps.positionType == GMParticlePositionType::Free)
+		if (db->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
 			transform = linear_math::translate(db->particleProps[index].startupPosition + linear_math::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
 				* linear_math::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
