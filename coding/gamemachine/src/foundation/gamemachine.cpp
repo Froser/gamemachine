@@ -151,12 +151,23 @@ void GameMachine::startGameMachine()
 		// 控制帧率
 		if (bNeedControlFrameRate)
 		{
+			static const GMfloat ms = 1 / 60.f;
 			GMfloat elapsedFromStart = frameCounter.elapsedFromStart();
-			diff = (1 / 60.f - elapsedFromStart) * 1000;
+			diff = (ms - elapsedFromStart) * 1000;
 			if (diff > 0)
+			{
 				GMThread::sleep(diff);
+				d->lastFrameElpased = ms;
+			}
+			else
+			{
+				d->lastFrameElpased = frameCounter.elapsedFromStart();
+			}
 		}
-		d->lastFrameElpased = frameCounter.elapsedFromStart();
+		else
+		{
+			d->lastFrameElpased = frameCounter.elapsedFromStart();
+		}
 	}
 
 	terminate();

@@ -60,8 +60,6 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 		ASSERT((GMLargeInteger)(vertexData + color_offset + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
 		linear_math::copyVector(d->color, (GMfloat*)(vertexData + color_offset) + offset * 4);
 	}
-
-	setCurrentLife(getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -100,7 +98,6 @@ inline GMParticleGameObject* GMParticles::getParticle(GMint index)
 void GMParticles::draw()
 {
 	D(d);
-
 	for (const auto& kv : d->particles)
 	{
 		GMModel* prototype = kv.first;
@@ -141,6 +138,17 @@ void GMParticles::onAppendingObjectToWorld()
 void GMParticles::simulate()
 {
 	D(d);
+	if (d->firstSimulate)
+	{
+		d->startTick = GameMachine::instance().getGameTimeSeconds();
+		d->currentTick = d->startTick;
+		d->firstSimulate = false;
+	}
+	else
+	{
+		d->currentTick = GameMachine::instance().getGameTimeSeconds();
+	}
+
 	GMint i = 0;
 	for (auto& particle : d->allParticles)
 	{
@@ -325,6 +333,8 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 
 	linear_math::Vector4 currentColor = linear_math::lerp(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
+
+	reduceLife(particle);
 }
 
 void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* particle)
@@ -353,7 +363,7 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 			}
 		}
 
-		return particle->setCurrentLife(particle->getMaxLife());
+		return respawnLife(particle);
 	}
 
 	if (d->particleProps[index].emitCountdown)
@@ -361,6 +371,26 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 		// 进入了准备发射倒计时，在此时准备发射
 		d->particleProps[index].visible = true;
 		d->particleProps[index].emitted = true;
+		respawnLife(particle);
+	}
+}
+
+void GMLerpParticleEmitter::reduceLife(GMParticleGameObject* particle)
+{
+	particle->setCurrentLife(particle->getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
+}
+
+void GMLerpParticleEmitter::respawnLife(GMParticleGameObject* particle)
+{
+	GMfloat currentLife = particle->getCurrentLife();
+	if (currentLife < 0)
+	{
+		currentLife = gmFabs(currentLife);
+		GMfloat factor = gmFloor((currentLife - .001f) / particle->getMaxLife()) + 1;
+		particle->setCurrentLife(particle->getMaxLife() * factor - currentLife);
+	}
+	else
+	{
 		particle->setCurrentLife(particle->getMaxLife());
 	}
 }
@@ -494,7 +524,7 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 	D_BASE(db, GMParticlesEmitter);
 
 	if (index == 0)
-		d->currentAngle += d->angularVelocity * GameMachine::instance().getLastFrameElapsed();
+		d->currentAngle = d->angularVelocity * getElapsedTime();
 
 	checkEmit(index);
 
@@ -530,6 +560,8 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 
 	linear_math::Vector4 currentColor = linear_math::lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
+
+	reduceLife(particle);
 }
 
 void GMRadiusParticlesEmitter::respawn(const GMint index, GMParticleGameObject* particle)
