@@ -7,6 +7,7 @@ include_directories(
 		../../3rdparty/freetype-2.3.5/include
 		../../3rdparty/libmad
 		../../3rdparty/duilib
+		../../3rdparty/lua/src
 	)
 
 set(SOURCES
@@ -158,6 +159,8 @@ set(SOURCES
 		gmui/gmui_console.h
 		gmui/gmui_console_ui.h
 		gmui/gmui_console.cpp
+		gmlua/gmlua.h
+		gmlua/gmlua.cpp
 	)
 
 source_group_by_dir(SOURCES)

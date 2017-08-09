@@ -56,7 +56,7 @@ void GMGamePackage::createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld**
 	world->loadBSP(map);
 }
 
-bool GMGamePackage::readFile(PackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename)
+bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename)
 {
 	D(d);
 	GMString p = pathOf(index, filename);
@@ -72,7 +72,7 @@ Vector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
 	return d->handler->getAllFiles(directory);
 }
 
-GMString GMGamePackage::pathOf(PackageIndex index, const GMString& filename)
+GMString GMGamePackage::pathOf(GMPackageIndex index, const GMString& filename)
 {
 	D(d);
 	ASSERT(d->handler);

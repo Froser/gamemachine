@@ -231,7 +231,7 @@ void GMBSPGameWorld::loadBSP(const GMString& mapName)
 {
 	D(d);
 	GMBuffer buffer;
-	GameMachine::instance().getGamePackageManager()->readFile(PI_MAPS, mapName, &buffer);
+	GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Maps, mapName, &buffer);
 	d->bsp.loadBsp(buffer);
 	importBSP();
 }
@@ -692,7 +692,7 @@ void GMBSPGameWorld::importBSP()
 void GMBSPGameWorld::initModels()
 {
 	D(d);
-	GMString modelPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_MODELS, "");
+	GMString modelPath = GameMachine::instance().getGamePackageManager()->pathOf(GMPackageIndex::Models, "");
 	d->modelLoader.init(modelPath, this);
 	d->modelLoader.load();
 }
@@ -700,7 +700,7 @@ void GMBSPGameWorld::initModels()
 void GMBSPGameWorld::initShaders()
 {
 	D(d);
-	GMString texShadersPath = GameMachine::instance().getGamePackageManager()->pathOf(PI_TEXSHADERS, "");
+	GMString texShadersPath = GameMachine::instance().getGamePackageManager()->pathOf(GMPackageIndex::TexShaders, "");
 	d->shaderLoader.init(texShadersPath, this, &d->render.renderData());
 	d->shaderLoader.load();
 }
@@ -754,7 +754,7 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 	{
 		GMString& fn = textureFilename + priorities[i];
 		GMBuffer buf;
-		if (!pk->readFile(PI_TEXTURES, fn, &buf))
+		if (!pk->readFile(GMPackageIndex::Textures, fn, &buf))
 			continue;
 
 		if (GMImageReader::load(buf.buffer, buf.size, img))
@@ -888,7 +888,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		fn.append(".obj");
 
 		GMGamePackage& pk = *GameMachine::instance().getGamePackageManager();
-		GMString& path = pk.pathOf(PI_MODELS, fn);
+		GMString& path = pk.pathOf(GMPackageIndex::Models, fn);
 		GMModelLoadSettings settings = {
 			pk,
 			m->extents,

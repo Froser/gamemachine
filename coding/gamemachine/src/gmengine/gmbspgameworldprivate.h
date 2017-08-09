@@ -26,7 +26,7 @@ constexpr GMint DRAW_PIECE_COUNT = 2;
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
 	AutoPtr<GMBSPPhysicsWorld> physics;
-	BSP bsp;
+	GMBSP bsp;
 	GMGameObject* sky = nullptr;
 
 	GMBSPRender render;

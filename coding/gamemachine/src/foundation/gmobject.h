@@ -67,7 +67,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 		typedef className##Private Data;													\
 	private:																				\
 		GMObjectPrivateWrapper<className##Private> m_data;									\
-		GMObjectPrivateWrapper<GMObject>* dataWrapper() const {								\
+		GMObjectPrivateWrapper<GMObject>* dataWrapper() {									\
 			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(						\
 				const_cast<GMObjectPrivateWrapper<className##Private>*>(&m_data)); }		\
 	protected:																				\

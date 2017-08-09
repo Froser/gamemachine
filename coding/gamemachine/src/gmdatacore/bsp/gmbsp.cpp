@@ -112,11 +112,11 @@ static inline GMint loadFile(const char *filename, void **bufferptr)
 #define CopyMember(dest, src, prop) dest.prop = src.prop
 
 //////////////////////////////////////////////////////////////////////////
-BSP::BSP()
+GMBSP::GMBSP()
 {
 }
 
-BSP::~BSP()
+GMBSP::~GMBSP()
 {
 	D(d);
 	delete[] d->buffer;
@@ -127,7 +127,7 @@ BSP::~BSP()
 	}
 }
 
-void BSP::loadBsp(const GMBuffer& buf)
+void GMBSP::loadBsp(const GMBuffer& buf)
 {
 	D(d);
 	d->buffer = new GMbyte[buf.size];
@@ -138,13 +138,13 @@ void BSP::loadBsp(const GMBuffer& buf)
 	generateLightVolumes();
 }
 
-BSPData& BSP::bspData()
+BSPData& GMBSP::bspData()
 {
 	D(d);
 	return *d;
 }
 
-void BSP::swapBsp()
+void GMBSP::swapBsp()
 {
 	D(d);
 	d->header = (GMBSPHeader*)d->buffer;
@@ -165,7 +165,7 @@ void BSP::swapBsp()
 	loadDrawSurfaces();
 }
 
-void BSP::loadPlanes()
+void GMBSP::loadPlanes()
 {
 	D(d);
 	struct __Tag
@@ -193,7 +193,7 @@ void BSP::loadPlanes()
 	}
 }
 
-void BSP::loadVertices()
+void GMBSP::loadVertices()
 {
 	D(d);
 	struct __Tag
@@ -228,7 +228,7 @@ void BSP::loadVertices()
 	}
 }
 
-void BSP::loadDrawSurfaces()
+void GMBSP::loadDrawSurfaces()
 {
 	D(d);
 	struct __Tag
@@ -295,7 +295,7 @@ void BSP::loadDrawSurfaces()
 	}
 }
 
-void BSP::loadNoAlignData()
+void GMBSP::loadNoAlignData()
 {
 	D(d);
 	const int extrasize = 1;
@@ -359,7 +359,7 @@ void BSP::loadNoAlignData()
 
 // 将坐标系转化为xyz(OpenGL)坐标系
 // Quake的坐标系为：z正向朝上，y正向朝内，x正向朝右
-void BSP::toGLCoord()
+void GMBSP::toGLCoord()
 {
 	D(d);
 	for (GMint i = 0; i < d->numDrawVertices; i++)
@@ -384,7 +384,7 @@ void BSP::toGLCoord()
 	}
 }
 
-void BSP::parseEntities()
+void GMBSP::parseEntities()
 {
 	D(d);
 	d->lightVols.lightVolSize[0] = 64;
@@ -409,7 +409,7 @@ void BSP::parseEntities()
 	}
 }
 
-void BSP::generateLightVolumes()
+void GMBSP::generateLightVolumes()
 {
 	D(d);
 	d->lightVols.lightVolInverseSize = 1.f / d->lightVols.lightVolSize;
@@ -434,7 +434,7 @@ void BSP::generateLightVolumes()
 	}
 }
 
-void BSP::parseFromMemory(char *buffer, int size)
+void GMBSP::parseFromMemory(char *buffer, int size)
 {
 	D(d);
 	d->script = d->scriptstack;
@@ -452,7 +452,7 @@ void BSP::parseFromMemory(char *buffer, int size)
 	d->tokenready = false;
 }
 
-bool BSP::parseEntity(OUT GMBSPEntity** entity)
+bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 {
 	D(d);
 
@@ -493,7 +493,7 @@ bool BSP::parseEntity(OUT GMBSPEntity** entity)
 	return true;
 }
 
-bool BSP::getToken(bool crossline)
+bool GMBSP::getToken(bool crossline)
 {
 	D(d);
 	char *token_p;
@@ -604,7 +604,7 @@ skipspace:
 	return true;
 }
 
-GMBSPEPair* BSP::parseEpair()
+GMBSPEPair* GMBSP::parseEpair()
 {
 	D(d);
 	GMBSPEPair *e = new GMBSPEPair();
@@ -626,7 +626,7 @@ GMBSPEPair* BSP::parseEpair()
 	return e;
 }
 
-void BSP::addScriptToStack(const char *filename)
+void GMBSP::addScriptToStack(const char *filename)
 {
 	D(d);
 	GMint size;
@@ -647,7 +647,7 @@ void BSP::addScriptToStack(const char *filename)
 }
 
 
-bool BSP::endOfScript(bool crossline)
+bool GMBSP::endOfScript(bool crossline)
 {
 	D(d);
 	if (!crossline)

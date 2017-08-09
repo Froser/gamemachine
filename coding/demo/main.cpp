@@ -21,6 +21,7 @@
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "gmengine/gmparticles.h"
 #include "foundation/utilities/gmprimitivecreator.h"
+#include "gmlua/gmlua.h"
 
 using namespace gm;
 
@@ -250,18 +251,18 @@ public:
 		switch (type)
 		{
 		case GMMeshType::Model:
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "object.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.frag", &fragBuf);
 			flag = true;
 			break;
 		case GMMeshType::Glyph:
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "glyph.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.frag", &fragBuf);
 			flag = true;
 			break;
 		case GMMeshType::Particles:
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "particles.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(PI_SHADERS, "particles.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.frag", &fragBuf);
 			flag = true;
 			break;
 		default:
@@ -313,7 +314,7 @@ private:
 
 		GMImage* img;
 		GMBuffer buf;
-		pk->readFile(PI_TEXTURES, "bnp.png", &buf);
+		pk->readFile(GMPackageIndex::Textures, "bnp.png", &buf);
 		GMImageReader::load(buf.buffer, buf.size, &img);
 
 		ITexture* tex;
@@ -529,9 +530,19 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
-	GameMachine::instance().startGameMachine();
+	//GameMachine::instance().startGameMachine();
+	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
+	GMBuffer buffer;
+	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
+	GMLua lua;
+	GMLuaStates result = lua.loadBuffer(buffer);
+	GMLuaVariable v[1];
+	lua.call("add", { 3, 4 }, v);
+
+	lua.setGlobal("r", 10);
+	lua.call("foo", {}, v);
 	return 0;
 }

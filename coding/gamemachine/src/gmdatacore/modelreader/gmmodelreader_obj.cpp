@@ -222,7 +222,7 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 	mtlPath.append("/");
 	mtlPath.append(mtlFilename);
 	GMBuffer buffer;
-	settings.gamePackage.readFile(PI_MODELS, mtlPath, &buffer);
+	settings.gamePackage.readFile(GMPackageIndex::Models, mtlPath, &buffer);
 	buffer.convertToStringBuffer();
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);

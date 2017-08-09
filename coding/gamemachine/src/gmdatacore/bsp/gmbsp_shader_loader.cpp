@@ -137,7 +137,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 	{
 		GMString fn;
 		GMBuffer buf;
-		if (!GameMachine::instance().getGamePackageManager()->readFile(PI_TEXTURES, name, &buf, &fn))
+		if (!GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Textures, name, &buf, &fn))
 		{
 			gm_warning(_L("file %Ls not found."), fn.toStdWString().c_str());
 			return nullptr;

@@ -45,24 +45,26 @@ void GMDefaultGLGamePackageHandler::init()
 {
 }
 
-GMString GMDefaultGLGamePackageHandler::pathRoot(PackageIndex index)
+GMString GMDefaultGLGamePackageHandler::pathRoot(GMPackageIndex index)
 {
 	PKD(d);
 
 	switch (index)
 	{
-	case PI_MAPS:
+	case GMPackageIndex::Maps:
 		return d->packagePath + "maps/";
-	case PI_SHADERS:
+	case GMPackageIndex::Shaders:
 		return d->packagePath + "shaders/";
-	case PI_TEXSHADERS:
+	case GMPackageIndex::TexShaders:
 		return d->packagePath + "texshaders/";
-	case PI_TEXTURES:
+	case GMPackageIndex::Textures:
 		return d->packagePath + "textures/";
-	case PI_MODELS:
+	case GMPackageIndex::Models:
 		return d->packagePath + "models/";
-	case PI_SOUNDS:
+	case GMPackageIndex::Sounds:
 		return d->packagePath + "sounds/";
+	case GMPackageIndex::Scripts:
+		return d->packagePath + "scripts/";
 	default:
 		ASSERT(false);
 		break;
@@ -210,24 +212,26 @@ Vector<GMString> ZipGMGLGamePackageHandler::getAllFiles(const GMString& director
 	return result;
 }
 
-GMString ZipGMGLGamePackageHandler::pathRoot(PackageIndex index)
+GMString ZipGMGLGamePackageHandler::pathRoot(GMPackageIndex index)
 {
 	PKD(d);
 
 	switch (index)
 	{
-	case PI_MAPS:
+	case GMPackageIndex::Maps:
 		return "maps/";
-	case PI_SHADERS:
+	case GMPackageIndex::Shaders:
 		return "shaders/";
-	case PI_TEXSHADERS:
+	case GMPackageIndex::TexShaders:
 		return "texshaders/";
-	case PI_TEXTURES:
+	case GMPackageIndex::Textures:
 		return "textures/";
-	case PI_MODELS:
+	case GMPackageIndex::Models:
 		return "models/";
-	case PI_SOUNDS:
+	case GMPackageIndex::Sounds:
 		return "sounds/";
+	case GMPackageIndex::Scripts:
+		return "scripts/";
 	default:
 		ASSERT(false);
 		break;

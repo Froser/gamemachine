@@ -14,7 +14,7 @@ public:
 public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
-	virtual GMString pathRoot(PackageIndex index) override;
+	virtual GMString pathRoot(GMPackageIndex index) override;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 protected:
@@ -53,7 +53,7 @@ public:
 public:
 	virtual void init() override;
 	virtual bool readFileFromPath(const GMString& path, REF GMBuffer* buffer) override;
-	virtual GMString pathRoot(PackageIndex index) override;
+	virtual GMString pathRoot(GMPackageIndex index) override;
 	virtual Vector<GMString> getAllFiles(const GMString& directory) override;
 
 private:
