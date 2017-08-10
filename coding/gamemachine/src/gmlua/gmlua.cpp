@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmlua.h"
+#include "foundation/linearmath.h"
 
 #define L (d->luaState)
 
@@ -10,6 +11,30 @@ struct __PopGuard							\
 	~__PopGuard() { lua_pop(m_L, 1); }		\
 	lua_State* m_L;							\
 } __guard(L);
+
+GM_PRIVATE_OBJECT(GMLua_Vector2)
+{
+	GMfloat x;
+	GMfloat y;
+};
+
+class GMLua_Vector2 : public GMObject
+{
+	DECLARE_PRIVATE(GMLua_Vector2)
+
+	GM_BEGIN_META_MAP
+		GM_META(x, GMMetaMemberType::Float)
+		GM_META(y, GMMetaMemberType::Float)
+	GM_END_META_MAP
+
+public:
+	GMLua_Vector2(GMfloat x, GMfloat y)
+	{
+		D(d);
+		d->x = x;
+		d->y = y;
+	}
+};
 
 GMLua::GMLua()
 {
@@ -91,13 +116,8 @@ bool GMLua::setGlobal(const char* name, GMObject& obj)
 	const GMMeta* meta = obj.meta();
 	if (!meta)
 		return false;
-	lua_newtable(L);
-
-	for (const auto& member : *meta)
-	{
-		push(member.first, member.second);
-	}
-
+	
+	setTable(obj);
 	lua_setglobal(L, name);
 	return true;
 }
@@ -144,8 +164,13 @@ bool GMLua::getGlobal(const char* name, GMObject& obj)
 					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -2);
 					break;
 				case GMMetaMemberType::Int:
-					*(static_cast<GMint*>(member.second.ptr)) = !!lua_tointeger(L, -2);
+					*(static_cast<GMint*>(member.second.ptr)) = lua_tointeger(L, -2);
 					break;
+				case GMMetaMemberType::Vector2:
+				{
+					ASSERT(false);
+					break;
+				}
 				default:
 					ASSERT(false);
 					break;
@@ -196,6 +221,18 @@ void GMLua::callExceptionHandler(GMLuaStatus state, const char* msg)
 		gm_error("LUA error: %d, %s", (GMint)state, msg);
 }
 
+void GMLua::setTable(GMObject& obj)
+{
+	D(d);
+	lua_newtable(L);
+	auto meta = obj.meta();
+	ASSERT(meta);
+	for (const auto& member : *meta)
+	{
+		push(member.first, member.second);
+	}
+}
+
 void GMLua::push(const GMLuaVariable& var)
 {
 	D(d);
@@ -239,6 +276,14 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 		{
 			std::string value = (static_cast<GMString*>(member.ptr))->toStdString();
 			lua_pushstring(L, value.c_str());
+		}
+		break;
+	case GMMetaMemberType::Vector2:
+		{
+			linear_math::Vector2& vec2 = *static_cast<linear_math::Vector2*>(member.ptr);
+			GMLua_Vector2 lua_vec2(vec2[0], vec2[1]);
+			setTable(lua_vec2);
+			ASSERT(lua_type(L, -1) == LUA_TTABLE);
 		}
 		break;
 	default:

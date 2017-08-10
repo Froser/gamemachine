@@ -121,6 +121,7 @@ public:
 
 private:
 	void callExceptionHandler(GMLuaStatus state, const char* msg);
+	void setTable(GMObject& obj);
 	void push(const GMLuaVariable& var);
 	void push(const char* name, const GMObjectMember& member);
 	GMLuaVariable pop();

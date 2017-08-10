@@ -512,16 +512,14 @@ private:
 
 GM_PRIVATE_OBJECT(MetaTest)
 {
-	GMint i = 3;
 	GMfloat y = 5.2f;
-	GMString hello = "hello world";
+	linear_math::Vector2 xy = { 1,2 };
 };
 
 GM_PRIVATE_OBJECT(MetaTest2)
 {
-	GMint i;
 	GMfloat y;
-	GMString hello;
+	linear_math::Vector2 xy;
 };
 
 class MetaTest : public GMObject
@@ -529,9 +527,8 @@ class MetaTest : public GMObject
 	DECLARE_PRIVATE(MetaTest)
 
 	GM_BEGIN_META_MAP
-		GM_META(i, GMMetaMemberType::Int)
-		GM_META(y, GMMetaMemberType::Float)
-		GM_META(hello, GMMetaMemberType::GMString)
+		GM_META(y, GMMetaMemberType::Int)
+		GM_META(xy, GMMetaMemberType::Vector2)
 	GM_END_META_MAP
 };
 
@@ -540,9 +537,8 @@ class MetaTest2 : public GMObject
 	DECLARE_PRIVATE(MetaTest2)
 
 	GM_BEGIN_META_MAP
-		GM_META(i, GMMetaMemberType::Int)
 		GM_META(y, GMMetaMemberType::Float)
-		GM_META(hello, GMMetaMemberType::GMString)
+		GM_META(xy, GMMetaMemberType::Vector2)
 	GM_END_META_MAP
 };
 
