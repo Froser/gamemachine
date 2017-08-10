@@ -67,7 +67,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 		typedef className##Private Data;													\
 	private:																				\
 		GMObjectPrivateWrapper<className##Private> m_data;									\
-		GMObjectPrivateWrapper<GMObject>* dataWrapper() {									\
+		virtual GMObjectPrivateWrapper<GMObject>* dataWrapper() {							\
 			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(						\
 				const_cast<GMObjectPrivateWrapper<className##Private>*>(&m_data)); }		\
 	protected:																				\
@@ -138,24 +138,62 @@ GM_ALIGNED_STRUCT(GMUnconstructableObject)
 #define GM_DISABLE_COPY(clsName) public: clsName(clsName&) = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete;
 
+enum class GMMetaMemberType
+{
+	Int,
+	Float,
+	Vector2,
+	Vector3,
+	Vector4,
+	GMString,
+	Boolean,
+};
+
+struct GMObjectMember
+{
+	GMMetaMemberType type;
+	size_t size;
+	void* ptr;
+};
+
+using GMMeta = Map<char*, GMObjectMember>;
+
+#define GM_BEGIN_META_MAP \
+	virtual bool registerMeta() override { D_BASE(db, GMObject); D(d); \
+	if (db->meta.size() > 0) return true;
+
+#define GM_META(memberName, type) \
+	db->meta[#memberName] = { type, sizeof(d-> memberName), &d->memberName };
+
+#define GM_END_META_MAP \
+	return true; }
+
 // 所有GM对象的基类，如果可以用SSE指令，那么它是16字节对齐的
+GM_PRIVATE_OBJECT(GMObject)
+{
+	GMMeta meta;
+};
+
 class GMObject : public GMAlignmentObject, public IDispose
 {
+	DECLARE_PRIVATE(GMObject)
 	GM_DISABLE_COPY(GMObject)
 	GM_DISABLE_ASSIGN(GMObject)
 
 public:
+	GMObject() = default;
 	GMObject(GMObject&& obj) noexcept;
 	GMObject& operator=(GMObject&& obj) noexcept;
 
 public:
-	static void swap(GMObject& a, GMObject& b);
+	const GMMeta* meta() { D(d); if (!registerMeta()) return nullptr; return &d->meta; }
+	void swap(GMObject& another);
 
 public:
-	GMObject() = default;
+	static void swap(GMObject& a, GMObject& b);
 
-private:
-	virtual GMObjectPrivateWrapper<GMObject>* dataWrapper();
+protected:
+	virtual bool registerMeta() { return false; }
 };
 
 // 接口统一定义

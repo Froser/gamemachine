@@ -510,6 +510,42 @@ private:
 	GMParticlesEmitter* emitter;
 };
 
+GM_PRIVATE_OBJECT(MetaTest)
+{
+	GMint i = 3;
+	GMfloat y = 5.2f;
+	GMString hello = "hello world";
+};
+
+GM_PRIVATE_OBJECT(MetaTest2)
+{
+	GMint i;
+	GMfloat y;
+	GMString hello;
+};
+
+class MetaTest : public GMObject
+{
+	DECLARE_PRIVATE(MetaTest)
+
+	GM_BEGIN_META_MAP
+		GM_META(i, GMMetaMemberType::Int)
+		GM_META(y, GMMetaMemberType::Float)
+		GM_META(hello, GMMetaMemberType::GMString)
+	GM_END_META_MAP
+};
+
+class MetaTest2 : public GMObject
+{
+	DECLARE_PRIVATE(MetaTest2)
+
+	GM_BEGIN_META_MAP
+		GM_META(i, GMMetaMemberType::Int)
+		GM_META(y, GMMetaMemberType::Float)
+		GM_META(hello, GMMetaMemberType::GMString)
+	GM_END_META_MAP
+};
+
 int WINAPI WinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -538,11 +574,16 @@ int WINAPI WinMain(
 	GMBuffer buffer;
 	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
 	GMLua lua;
-	GMLuaStates result = lua.loadBuffer(buffer);
+	GMLuaStatus result = lua.loadBuffer(buffer);
 	GMLuaVariable v[1];
 	lua.call("add", { 3, 4 }, v);
 
 	lua.setGlobal("r", 10);
 	lua.call("foo", {}, v);
+
+	MetaTest meta;
+	lua.setGlobal("obj", meta);
+	MetaTest2 test;
+	lua.getGlobal("obj", test);
 	return 0;
 }

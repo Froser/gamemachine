@@ -1,18 +1,20 @@
 ﻿#include "stdafx.h"
 #include "gmlua.h"
 
+#define L (d->luaState)
+
 #define POP_GUARD(d) \
 struct __PopGuard							\
 {											\
-	__PopGuard(lua_State* __L) : L(__L) {}	\
-	~__PopGuard() { lua_pop(L, 1); }		\
-	lua_State* L;							\
-} __guard(d->luaState);
+	__PopGuard(lua_State* __L) : m_L(__L) {}\
+	~__PopGuard() { lua_pop(m_L, 1); }		\
+	lua_State* m_L;							\
+} __guard(L);
 
 GMLua::GMLua()
 {
 	D(d);
-	d->luaState = luaL_newstate();
+	L = luaL_newstate();
 	d->ref = new GMuint(1);
 }
 
@@ -24,11 +26,11 @@ GMLua::~GMLua()
 		(*d->ref)--;
 		if (*d->ref == 0)
 		{
-			if (d->luaState)
-				lua_close(d->luaState);
+			if (L)
+				lua_close(L);
 			delete d->ref;
 			d->ref = nullptr;
-			d->luaState = nullptr;
+			L = nullptr;
 		}
 	}
 }
@@ -62,31 +64,104 @@ GMLua& GMLua::operator= (GMLua&& state) noexcept
 	return *this;
 }
 
-GMLuaStates GMLua::loadFile(const char* file)
+GMLuaStatus GMLua::loadFile(const char* file)
 {
 	D(d);
-	ASSERT(d->luaState);
-	return (GMLuaStates)(luaL_loadfile(d->luaState, file) || lua_pcall(d->luaState, 0, LUA_MULTRET, 0));
+	ASSERT(L);
+	return (GMLuaStatus)(luaL_loadfile(L, file) || lua_pcall(L, 0, LUA_MULTRET, 0));
 }
 
-GMLuaStates GMLua::loadBuffer(const GMBuffer& buffer)
+GMLuaStatus GMLua::loadBuffer(const GMBuffer& buffer)
 {
 	D(d);
-	ASSERT(d->luaState);
-	return (GMLuaStates)(luaL_loadbuffer(d->luaState, (const char*) buffer.buffer, buffer.size, 0) || lua_pcall(d->luaState, 0, LUA_MULTRET, 0));
+	ASSERT(L);
+	return (GMLuaStatus)(luaL_loadbuffer(L, (const char*) buffer.buffer, buffer.size, 0) || lua_pcall(L, 0, LUA_MULTRET, 0));
 }
 
 void GMLua::setGlobal(const char* name, const GMLuaVariable& var)
 {
 	D(d);
 	push(var);
-	lua_setglobal(d->luaState, name);
+	lua_setglobal(L, name);
+}
+
+bool GMLua::setGlobal(const char* name, GMObject& obj)
+{
+	D(d);
+	const GMMeta* meta = obj.meta();
+	if (!meta)
+		return false;
+	lua_newtable(L);
+
+	for (const auto& member : *meta)
+	{
+		push(member.first, member.second);
+	}
+
+	lua_setglobal(L, name);
+	return true;
+}
+
+GMLuaVariable GMLua::getGlobal(const char* name)
+{
+	D(d);
+	lua_getglobal(L, name);
+	return pop();
+}
+
+bool GMLua::getGlobal(const char* name, GMObject& obj)
+{
+	D(d);
+	const GMMeta* meta = obj.meta();
+	if (!meta)
+		return false;
+
+	lua_getglobal(L, name);
+	GMint type = lua_type(L, 1);
+	if (type != LUA_TTABLE)
+		return false;
+
+	GMint index = lua_gettop(L);
+	lua_pushnil(L);
+	while (lua_next(L, index))
+	{
+		lua_pushvalue(L, -2);
+		ASSERT(lua_type(L, -1) == LUA_TSTRING);
+		const char* key = lua_tostring(L, -1);
+		for (const auto member : *meta)
+		{
+			if (strEqual(member.first, key))
+			{
+				switch ( member.second.type )
+				{
+				case GMMetaMemberType::GMString:
+					*(static_cast<GMString*>(member.second.ptr)) = lua_tostring(L, -2);
+					break;
+				case GMMetaMemberType::Float:
+					*(static_cast<GMfloat*>(member.second.ptr)) = lua_tonumber(L, -2);
+					break;
+				case GMMetaMemberType::Boolean:
+					*(static_cast<bool*>(member.second.ptr)) = !!lua_toboolean(L, -2);
+					break;
+				case GMMetaMemberType::Int:
+					*(static_cast<GMint*>(member.second.ptr)) = !!lua_tointeger(L, -2);
+					break;
+				default:
+					ASSERT(false);
+					break;
+				}
+			}
+		}
+
+		lua_pop(L, 2);
+	}
+	return true;
 }
 
 void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
 {
 	D(d);
-	lua_getglobal(d->luaState, functionName);
+	lua_getglobal(L, functionName);
 	GMint count = 0;
 	for (const auto& var : args)
 	{
@@ -94,12 +169,12 @@ void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVari
 		count++;
 	}
 
-	GMLuaStates result = (GMLuaStates)lua_pcall(d->luaState, count, 1, 0);
-	if (result != GMLuaStates::OK)
+	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, count, 1, 0);
+	if (result != GMLuaStatus::OK)
 	{
-		const char* msg = lua_tostring(d->luaState, -1);
+		const char* msg = lua_tostring(L, -1);
 		callExceptionHandler(result, msg);
-		lua_pop(d->luaState, 1);
+		lua_pop(L, 1);
 	}
 }
 
@@ -112,7 +187,7 @@ void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVari
 	}
 }
 
-void GMLua::callExceptionHandler(GMLuaStates state, const char* msg)
+void GMLua::callExceptionHandler(GMLuaStatus state, const char* msg)
 {
 	D(d);
 	if (d->exceptionHandler)
@@ -127,15 +202,15 @@ void GMLua::push(const GMLuaVariable& var)
 	switch (var.type)
 	{
 	case GMLuaVariableType::Number:
-		lua_pushnumber(d->luaState, var.valDouble);
+		lua_pushnumber(L, var.valDouble);
 		break;
 	case GMLuaVariableType::Boolean:
-		lua_pushboolean(d->luaState, var.valBoolean);
+		lua_pushboolean(L, var.valBoolean);
 		break;
 	case GMLuaVariableType::String:
 		{
 			std::string str = var.valString.toStdString();
-			lua_pushstring(d->luaState, str.c_str());
+			lua_pushstring(L, str.c_str());
 		}
 		break;
 	default:
@@ -144,17 +219,47 @@ void GMLua::push(const GMLuaVariable& var)
 	}
 }
 
+void GMLua::push(const char* name, const GMObjectMember& member)
+{
+	D(d);
+	lua_pushstring(L, name);
+
+	switch (member.type)
+	{
+	case GMMetaMemberType::Int:
+		lua_pushinteger(L, *static_cast<GMint*>(member.ptr));
+		break;
+	case GMMetaMemberType::Float:
+		lua_pushnumber(L, *static_cast<GMfloat*>(member.ptr));
+		break;
+	case GMMetaMemberType::Boolean:
+		lua_pushboolean(L, *static_cast<bool*>(member.ptr));
+		break;
+	case GMMetaMemberType::GMString:
+		{
+			std::string value = (static_cast<GMString*>(member.ptr))->toStdString();
+			lua_pushstring(L, value.c_str());
+		}
+		break;
+	default:
+		ASSERT(false);
+		break;
+	}
+
+	lua_settable(L, -3);
+}
+
 GMLuaVariable GMLua::pop()
 {
 	D(d);
 	POP_GUARD(d);
 
-	if (lua_isnumber(d->luaState, -1))
-		return lua_tonumber(d->luaState, -1);
-	if (lua_isstring(d->luaState, -1))
-		return GMString(lua_tostring(d->luaState, -1));
-	if (lua_isboolean(d->luaState, -1))
-		return lua_toboolean(d->luaState, -1);
+	if (lua_isnumber(L, -1))
+		return lua_tonumber(L, -1);
+	if (lua_isstring(L, -1))
+		return GMString(lua_tostring(L, -1));
+	if (lua_isboolean(L, -1))
+		return lua_toboolean(L, -1);
 	ASSERT(false);
 	return 0;
 }

@@ -26,7 +26,7 @@ GM_ALIGNED_STRUCT(GMBSPTraceWork)
 };
 END_NS
 
-void GMBSPTrace::initTrace(BSPData* bsp, std::map<GMint, std::set<GMBSPEntity*> >* entities, std::map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
+void GMBSPTrace::initTrace(BSPData* bsp, Map<GMint, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world)
 {
 	D(d);
 	d->bsp = bsp;

@@ -1,6 +1,29 @@
 ﻿#ifndef __DEFINES_H__
 #define __DEFINES_H__
 
+// 容器别名
+#include <utility>
+#include <map>
+#include <set>
+#include <vector>
+#include <queue>
+
+template <typename T1, typename T2>
+using Pair = std::pair<T1, T2>;
+#define makePair std::make_pair
+
+template <typename T1, typename T2>
+using Map = std::map<T1, T2>;
+
+template <typename T>
+using Set = std::set<T>;
+
+template <typename T>
+using Vector = std::vector<T>;
+
+template <typename T>
+using Queue = std::queue<T>;
+
 // 使用UNICODE
 #ifndef UNICODE
 #	define UNICODE 1

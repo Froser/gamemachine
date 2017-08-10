@@ -10,7 +10,7 @@ extern "C"
 #include "lualib.h"
 }
 
-enum class GMLuaStates
+enum class GMLuaStatus
 {
 	OK = LUA_OK,
 	ERRRUN = LUA_ERRRUN,
@@ -21,7 +21,7 @@ enum class GMLuaStates
 
 GM_INTERFACE(GMLuaExceptionHandler)
 {
-	virtual void onException(GMLuaStates state, const char* msg) = 0;
+	virtual void onException(GMLuaStatus state, const char* msg) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMLua)
@@ -99,10 +99,13 @@ public:
 	GMLua& operator= (GMLua&& state) noexcept;
 
 public:
-	GMLuaStates loadFile(const char* file);
-	GMLuaStates loadBuffer(const GMBuffer& buffer);
+	GMLuaStatus loadFile(const char* file);
+	GMLuaStatus loadBuffer(const GMBuffer& buffer);
 
 	void setGlobal(const char* name, const GMLuaVariable& var);
+	bool setGlobal(const char* name, GMObject& obj);
+	GMLuaVariable getGlobal(const char* name);
+	bool getGlobal(const char* name, GMObject& obj);
 	void call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
 	void call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
 
@@ -117,8 +120,9 @@ public:
 	}
 
 private:
-	void callExceptionHandler(GMLuaStates state, const char* msg);
+	void callExceptionHandler(GMLuaStatus state, const char* msg);
 	void push(const GMLuaVariable& var);
+	void push(const char* name, const GMObjectMember& member);
 	GMLuaVariable pop();
 };
 

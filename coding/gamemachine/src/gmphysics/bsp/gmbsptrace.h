@@ -62,7 +62,7 @@ class GMBSPTrace
 	DECLARE_PRIVATE(GMBSPTrace)
 
 public:
-	void initTrace(BSPData* bsp, std::map<GMint, std::set<GMBSPEntity*> >* entities, std::map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world);
+	void initTrace(BSPData* bsp, Map<GMint, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world);
 	void trace(const linear_math::Vector3& start, const linear_math::Vector3& end, const linear_math::Vector3& origin, const linear_math::Vector3& min, const linear_math::Vector3& max, REF BSPTraceResult& trace);
 	void traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const linear_math::Vector3& p1, const linear_math::Vector3& p2);
 	void traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf);

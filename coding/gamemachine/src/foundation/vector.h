@@ -1,13 +1,8 @@
 ﻿#ifndef __VECTOR_H__
 #define __VECTOR_H__
 #include "common.h"
-#include <type_traits>
 #include "assert.h"
 #include "memory.h"
-#include <vector>
-#include <map>
-#include <set>
-#include <queue>
 #include "debug.h"
 
 #if !USE_SIMD
@@ -16,30 +11,9 @@
 
 BEGIN_NS
 
-template <typename T1, typename T2>
-using Pair = std::pair<T1, T2>;
-#define makePair std::make_pair
-
-template <typename T1, typename T2>
-using Map = std::map<T1, T2>;
-
-template <typename T>
-using Hash = std::hash<T>;
-
-template <typename T>
-using Set = std::set<T>;
-
-template <typename T>
-using Vector = std::vector<T>;
-
-template <typename T>
-class Queue : public std::queue<T>
-{
-};
-
 #if !USE_SIMD
 template <typename T>
-class AlignedVector : public std::vector<T>
+class AlignedVector : public Vector<T>
 {
 	typedef std::vector<T> Base;
 	
@@ -126,11 +100,6 @@ public:
 template <typename T>
 class AlignedVector
 {
-	/* forget about it
-	static_assert(std::is_base_of<GMAlignmentObject, T>::value,
-		"type T must be the derived class of GMAlignmentObject, otherwise it may cause memory leaking.");
-		*/
-
 public:
 	typedef AlignVectorIterator<AlignedVector> iterator;
 	typedef AlignVectorConstIterator<AlignedVector> const_iterator;
