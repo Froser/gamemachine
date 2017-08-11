@@ -209,21 +209,22 @@ GM_PRIVATE_OBJECT(GMBSP)
 	AlignedVector<BSPPlane> planes;
 	AlignedVector<GMBSPDrawVertices> vertices;
 	AlignedVector<GMBSPSurface> drawSurfaces;
-	AlignedVector<GMBSPModel> models;
-	AlignedVector<GMBSPShader> shaders;
-	AlignedVector<char> entdata;
-	AlignedVector<GMBSPLeaf> leafs;
-	AlignedVector<GMBSPNode> nodes;
-	AlignedVector<GMint> leafsurfaces;
-	AlignedVector<GMint> leafbrushes;
-	AlignedVector<GMBSPBrush> brushes;
-	AlignedVector<GMBSPBrushSide> brushsides;
-	AlignedVector<GMbyte> lightBytes;
-	AlignedVector<GMbyte> gridData;
-	AlignedVector<GMbyte> visBytes;
-	AlignedVector<GMint> drawIndexes;
-	AlignedVector<GMBSPFog> fogs;
-	AlignedVector<GMBSPEntity*> entities;
+
+	Vector<GMBSPModel> models;
+	Vector<GMBSPShader> shaders;
+	Vector<char> entdata;
+	Vector<GMBSPLeaf> leafs;
+	Vector<GMBSPNode> nodes;
+	Vector<GMint> leafsurfaces;
+	Vector<GMint> leafbrushes;
+	Vector<GMBSPBrush> brushes;
+	Vector<GMBSPBrushSide> brushsides;
+	Vector<GMbyte> lightBytes;
+	Vector<GMbyte> gridData;
+	Vector<GMbyte> visBytes;
+	Vector<GMint> drawIndexes;
+	Vector<GMBSPFog> fogs;
+	Vector<GMBSPEntity*> entities;
 
 	GMint nummodels = 0;
 	GMint numShaders = 0;

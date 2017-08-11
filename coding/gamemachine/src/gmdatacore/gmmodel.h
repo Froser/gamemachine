@@ -121,7 +121,7 @@ enum class GMVertexDataType
 
 #define gmVertexIndex(i) ((GMuint)i)
 
-GM_ALIGNED_16(class) GMModel : public GMObject
+class GMModel : public GMObject
 {
 	DECLARE_PRIVATE(GMModel)
 

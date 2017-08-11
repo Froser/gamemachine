@@ -321,7 +321,7 @@ GM_PRIVATE_OBJECT(Shader)
 	GMMaterial material;
 };
 
-class Shader : public GMObject
+class Shader : public GMObject, public GMAlignmentObject
 {
 	DECLARE_PRIVATE(Shader)
 

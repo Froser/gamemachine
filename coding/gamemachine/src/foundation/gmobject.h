@@ -13,7 +13,7 @@ struct IDispose
 
 // GameMachine采用数据和方法分离的方式，可以为一个类定义一个私有结构存储数据
 template <typename T>
-GM_ALIGNED_16(class) GMObjectPrivateWrapper
+class GMObjectPrivateWrapper
 {
 	friend class GMObject;
 
@@ -113,13 +113,9 @@ class MyObject : public GMObject
 的错误。
 
   条款二：
-  如果一个结构只有方法，没有成员，可以不用继承GMObject，也不用声明为对齐。
+  GMObject本身不是对齐的。一般情况下不推荐GMObject包含成员。如果有需要对齐的成员，需要继承GMAlignmentObject
 
   条款三：
-  当定义对齐结构体时，结构体里面不能包含方法（构造、析构函数，以及一些operator重载除外），所有结构体用GM_ALIGNED_STRUCT
-来定义，它将定义一个对齐结构体。结构体只用于存储数据，没有方法和逻辑。
-
-  条款四：
   任何参与内核的类必须继承GMObject
 */
 
@@ -180,7 +176,7 @@ GM_PRIVATE_OBJECT(GMObject)
 	GMMeta meta;
 };
 
-class GMObject : public GMAlignmentObject, public IDispose
+class GMObject : public IDispose
 {
 	DECLARE_PRIVATE(GMObject)
 	GM_DISABLE_COPY(GMObject)

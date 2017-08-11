@@ -214,13 +214,6 @@ GMBSPGameWorld::GMBSPGameWorld()
 GMBSPGameWorld::~GMBSPGameWorld()
 {
 	D(d);
-#if 0
-	for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
-	{
-		delete d->drawPolygonFacePieces[i];
-	}
-#endif
-
 	delete d->drawPolygonFaceJob;
 	delete d->drawMeshFaceJob;
 	delete d->drawPatchJob;

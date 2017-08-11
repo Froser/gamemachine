@@ -389,7 +389,7 @@ enum PointPosition
 	POINT_BEHIND_PLANE,
 };
 
-struct GMPlane : public GMObject
+struct GMPlane : public GMObject, public GMAlignmentObject
 {
 	GMPlane() : normal(linear_math::Vector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{

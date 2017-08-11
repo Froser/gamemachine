@@ -535,6 +535,7 @@ GM_PRIVATE_OBJECT(Dummy)
 	TT r;
 };
 
+#if 0
 class Dummy : public GMObject
 {
 	DECLARE_PRIVATE(Dummy);
@@ -584,6 +585,7 @@ class MetaTest2 : public GMObject
 		GM_META(dummy, GMMetaMemberType::Object)
 	GM_END_META_MAP
 };
+#endif
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -608,7 +610,9 @@ int WINAPI WinMain(
 		new GameHandler()
 	);
 
-	//GameMachine::instance().startGameMachine();
+	GameMachine::instance().startGameMachine();
+
+#if 0
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buffer;
 	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
@@ -624,5 +628,6 @@ int WINAPI WinMain(
 	lua.setGlobal("obj", meta);
 	MetaTest2 test;
 	lua.getGlobal("obj", test);
+#endif
 	return 0;
 }
