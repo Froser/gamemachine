@@ -510,16 +510,57 @@ private:
 	GMParticlesEmitter* emitter;
 };
 
+GM_PRIVATE_OBJECT(TT)
+{
+	int x;
+};
+
+class TT : public GMObject
+{
+	DECLARE_PRIVATE(TT);
+
+public:
+	TT() = default;
+	TT(int i) { D(d); d->x = i; }
+	TT& operator =(const TT& t) { D(d); d->x = t.data()->x; return *this; }
+
+	GM_BEGIN_META_MAP
+		GM_META(x, GMMetaMemberType::Int)
+	GM_END_META_MAP
+};
+
+GM_PRIVATE_OBJECT(Dummy)
+{
+	int x;
+	TT r;
+};
+
+class Dummy : public GMObject
+{
+	DECLARE_PRIVATE(Dummy);
+
+public:
+	Dummy() = default;
+	Dummy(int i) { D(d); d->x = i; d->r = 100; }
+
+	GM_BEGIN_META_MAP
+		GM_META(x, GMMetaMemberType::Int)
+		GM_META(r, GMMetaMemberType::Object)
+	GM_END_META_MAP
+};
+
 GM_PRIVATE_OBJECT(MetaTest)
 {
 	GMfloat y = 5.2f;
-	linear_math::Vector2 xy = { 1,2 };
+	linear_math::Vector4 xyz = { 1, 2, 3, 8 };
+	Dummy dummy = 5;
 };
 
 GM_PRIVATE_OBJECT(MetaTest2)
 {
 	GMfloat y;
-	linear_math::Vector2 xy;
+	linear_math::Vector4 xyz;
+	Dummy dummy;
 };
 
 class MetaTest : public GMObject
@@ -527,8 +568,9 @@ class MetaTest : public GMObject
 	DECLARE_PRIVATE(MetaTest)
 
 	GM_BEGIN_META_MAP
-		GM_META(y, GMMetaMemberType::Int)
-		GM_META(xy, GMMetaMemberType::Vector2)
+		GM_META(y, GMMetaMemberType::Float)
+		GM_META(xyz, GMMetaMemberType::Vector4)
+		GM_META(dummy, GMMetaMemberType::Object)
 	GM_END_META_MAP
 };
 
@@ -538,7 +580,8 @@ class MetaTest2 : public GMObject
 
 	GM_BEGIN_META_MAP
 		GM_META(y, GMMetaMemberType::Float)
-		GM_META(xy, GMMetaMemberType::Vector2)
+		GM_META(xyz, GMMetaMemberType::Vector4)
+		GM_META(dummy, GMMetaMemberType::Object)
 	GM_END_META_MAP
 };
 

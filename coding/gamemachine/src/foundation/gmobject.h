@@ -147,6 +147,7 @@ enum class GMMetaMemberType
 	Vector4,
 	GMString,
 	Boolean,
+	Object,
 };
 
 struct GMObjectMember
@@ -161,6 +162,11 @@ using GMMeta = Map<char*, GMObjectMember>;
 #define GM_BEGIN_META_MAP \
 	virtual bool registerMeta() override { D_BASE(db, GMObject); D(d); \
 	if (db->meta.size() > 0) return true;
+
+#define GM_BEGIN_META_MAP_FROM(base) \
+	virtual bool registerMeta() override { D_BASE(db, GMObject); D(d); \
+	if (db->meta.size() > 0) return true; \
+	base::registerMeta();
 
 #define GM_META(memberName, type) \
 	db->meta[#memberName] = { type, sizeof(d-> memberName), &d->memberName };
