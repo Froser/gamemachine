@@ -7,8 +7,7 @@ BEGIN_NS
 extern "C"
 {
 	extern int register_core(lua_State *L);
-	extern int gmlua_core_debugPrint(lua_State *L);
-	extern int gmlua_core_outputDebug(lua_State *L);
+	extern int gmlua_core_output(lua_State *L);
 	extern int gmlua_core_debug(lua_State *L);
 	extern int gmlua_core_warning(lua_State *L);
 	extern int gmlua_core_info(lua_State *L);

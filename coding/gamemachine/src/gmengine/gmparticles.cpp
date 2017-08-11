@@ -649,8 +649,8 @@ GMParticleGameObject* GMCustomParticlesEmitter::createParticle(const GMint index
 void GMCustomParticlesEmitter::update(const GMint index, GMParticleGameObject* particle)
 {
 	D(d);
-	// 调用接口 function particlesUpdate(index), 返回粒子table
-	GMLuaStatus result = d->lua.call("particlesUpdate", { index }, particle, 1);
+	// 调用接口 function particlesUpdate(index, particle), 返回粒子table
+	GMLuaStatus result = d->lua.call("particlesUpdate", { index, *particle }, particle, 1);
 	if (result != GMLuaStatus::OK)
 		gm_error("LUA calling 'particlesUpdate(index)' failed.");
 }
@@ -658,8 +658,8 @@ void GMCustomParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 void GMCustomParticlesEmitter::respawn(const GMint index, GMParticleGameObject* particle)
 {
 	D(d);
-	// 调用接口 function particlesRespawn(index), 返回粒子table
-	GMLuaStatus result = d->lua.call("particlesRespawn", { index }, particle, 1);
+	// 调用接口 function particlesRespawn(index, particle), 返回粒子table
+	GMLuaStatus result = d->lua.call("particlesRespawn", { index, *particle }, particle, 1);
 	if (result != GMLuaStatus::OK)
 		gm_error("LUA calling 'particlesUpdate(index)' failed.");
 }

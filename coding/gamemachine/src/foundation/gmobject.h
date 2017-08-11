@@ -87,10 +87,12 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
 #define GM_DECLARE_GETTER(name, memberName, paramType) \
+	public: \
 	inline paramType& get##name() { D(d); return d-> memberName; } \
 	inline const paramType& get##name() const { D(d); return d-> memberName; }
 
 #define GM_DECLARE_SETTER(name, memberName, paramType) \
+	public: \
 	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
 
 #define GM_DECLARE_PROPERTY(name, memberName, paramType) \
@@ -141,6 +143,7 @@ enum class GMMetaMemberType
 	Vector2,
 	Vector3,
 	Vector4,
+	Matrix4x4,
 	GMString,
 	Boolean,
 	Object,
@@ -156,6 +159,7 @@ struct GMObjectMember
 using GMMeta = Map<char*, GMObjectMember>;
 
 #define GM_BEGIN_META_MAP \
+	protected: \
 	virtual bool registerMeta() override { D_BASE(db, GMObject); D(d); \
 	if (db->meta.size() > 0) return true;
 

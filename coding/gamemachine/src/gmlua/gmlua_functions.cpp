@@ -6,7 +6,7 @@
 extern "C"
 {
 	static luaL_Reg g_gmlua_core_functions[] = {
-		{ "outputDebug", gmlua_core_outputDebug },
+		{ "output", gmlua_core_output },
 		{ "debug", gmlua_core_debug },
 		{ "warning", gmlua_core_warning },
 		{ "info", gmlua_core_info },
@@ -27,7 +27,7 @@ extern "C"
 		return luaL_optstring(L, -1, "");
 	}
 
-	int gmlua_core_outputDebug(lua_State* L)
+	int gmlua_core_output(lua_State* L)
 	{
 		const char* arg = getString(L, "outputDebug");
 #if _WINDOWS

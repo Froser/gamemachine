@@ -38,8 +38,8 @@ public:
 		d->y = y;
 	}
 
-	GMfloat x() { D(d); return d->x; }
-	GMfloat y() { D(d); return d->y; }
+	GMfloat x() const { D(d); return d->x; }
+	GMfloat y() const { D(d); return d->y; }
 };
 
 GM_PRIVATE_OBJECT_FROM(GMLua_Vector3, GMLua_Vector2)
@@ -65,7 +65,16 @@ public:
 		d->z = z;
 	}
 
-	GMfloat z() { D(d); return d->z; }
+	GMLua_Vector3(const linear_math::Vector3& v)
+	{
+		D(d);
+		D_BASE(db, GMLua_Vector2);
+		db->x = v[0];
+		db->y = v[1];
+		d->z = v[2];
+	}
+
+	GMfloat z() const { D(d); return d->z; }
 };
 
 GM_PRIVATE_OBJECT_FROM(GMLua_Vector4, GMLua_Vector3)
@@ -90,8 +99,51 @@ public:
 		D(d);
 		d->w = w;
 	}
+	
+	GMLua_Vector4& operator=(const GMLua_Vector4& rhs)
+	{
+		D(d);
+		d->x = rhs.x();
+		d->y = rhs.y();
+		d->z = rhs.z();
+		d->w = rhs.w();
+		return *this;
+	}
 
-	GMfloat w() { D(d); return d->w; }
+	GMfloat w() const { D(d); return d->w; }
+};
+
+GM_PRIVATE_OBJECT(GMLua_Matrix4x4)
+{
+	linear_math::Vector4 r1, r2, r3, r4;
+};
+
+class GMLua_Matrix4x4 : public GMObject
+{
+	DECLARE_PRIVATE(GMLua_Matrix4x4)
+
+	GM_BEGIN_META_MAP
+		GM_META(r1, GMMetaMemberType::Vector4)
+		GM_META(r2, GMMetaMemberType::Vector4)
+		GM_META(r3, GMMetaMemberType::Vector4)
+		GM_META(r4, GMMetaMemberType::Vector4)
+	GM_END_META_MAP
+
+public:
+	GMLua_Matrix4x4() = default;
+	GMLua_Matrix4x4(const linear_math::Vector4& r1, const linear_math::Vector4& r2, const linear_math::Vector4& r3, const linear_math::Vector4& r4)
+	{
+		D(d);
+		d->r1 = r1;
+		d->r2 = r2;
+		d->r3 = r3;
+		d->r4 = r4;
+	}
+
+	linear_math::Vector4& r1() { D(d); return d->r1; }
+	linear_math::Vector4& r2() { D(d); return d->r2; }
+	linear_math::Vector4& r3() { D(d); return d->r3; }
+	linear_math::Vector4& r4() { D(d); return d->r4; }
 };
 
 GMLua::GMLua()
@@ -350,6 +402,18 @@ bool GMLua::getTable(GMObject& obj)
 						(*vec4)[3] = v.w();
 					}
 					break;
+				case GMMetaMemberType::Matrix4x4:
+					{
+						GMLua_Matrix4x4 mat;
+						if (!getTable(mat))
+							return false;
+						linear_math::Matrix4x4& mat4 = *static_cast<linear_math::Matrix4x4*>(member.second.ptr);
+						mat4[0] = mat.r1();
+						mat4[1] = mat.r2();
+						mat4[2] = mat.r3();
+						mat4[3] = mat.r4();
+					}
+					break;
 				case GMMetaMemberType::Object:
 					{
 						GMObject* obj = static_cast<GMObject*>(member.second.ptr);
@@ -437,6 +501,14 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 		{
 			linear_math::Vector4& vec4 = *static_cast<linear_math::Vector4*>(member.ptr);
 			GMLua_Vector4 lua_vec4(vec4[0], vec4[1], vec4[2], vec4[3]);
+			setTable(lua_vec4);
+			ASSERT(lua_istable(L, -1));
+		}
+		break;
+	case GMMetaMemberType::Matrix4x4:
+		{
+			linear_math::Matrix4x4& mat= *static_cast<linear_math::Matrix4x4*>(member.ptr);
+			GMLua_Matrix4x4 lua_vec4(mat[0], mat[1], mat[2], mat[3]);
 			setTable(lua_vec4);
 			ASSERT(lua_istable(L, -1));
 		}

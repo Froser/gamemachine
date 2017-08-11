@@ -28,9 +28,10 @@ public:
 
 public:
 	GM_BEGIN_META_MAP
-		GM_META(color, GMMetaMemberType::Vector4)
 		GM_META(currentLife, GMMetaMemberType::Float)
 		GM_META(maxLife, GMMetaMemberType::Float)
+		GM_META(color, GMMetaMemberType::Vector4)
+		GM_META(transform, GMMetaMemberType::Matrix4x4)
 	GM_END_META_MAP
 
 	GM_DECLARE_PROPERTY(CurrentLife, currentLife, GMfloat);

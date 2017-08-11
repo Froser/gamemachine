@@ -532,58 +532,9 @@ private:
 #endif
 };
 
-GM_PRIVATE_OBJECT(TT)
-{
-	int x;
-};
-
-class TT : public GMObject
-{
-	DECLARE_PRIVATE(TT);
-
-public:
-	TT() = default;
-	TT(int i) { D(d); d->x = i; }
-	TT& operator =(const TT& t) { D(d); d->x = t.data()->x; return *this; }
-
-	GM_BEGIN_META_MAP
-		GM_META(x, GMMetaMemberType::Int)
-	GM_END_META_MAP
-};
-
-GM_PRIVATE_OBJECT(Dummy)
-{
-	int x;
-	TT r;
-};
-
-#if 1
-class Dummy : public GMObject
-{
-	DECLARE_PRIVATE(Dummy);
-
-public:
-	Dummy() = default;
-	Dummy(int i) { D(d); d->x = i; d->r = 100; }
-
-	GM_BEGIN_META_MAP
-		GM_META(x, GMMetaMemberType::Int)
-		GM_META(r, GMMetaMemberType::Object)
-	GM_END_META_MAP
-};
-
 GM_PRIVATE_OBJECT(MetaTest)
 {
-	GMfloat y = 5.2f;
-	linear_math::Vector4 xyz = { 1, 2, 3, 8 };
-	Dummy dummy = 5;
-};
-
-GM_PRIVATE_OBJECT(MetaTest2)
-{
-	GMfloat y;
-	linear_math::Vector4 xyz;
-	Dummy dummy;
+	linear_math::Matrix4x4 mat = linear_math::Matrix4x4::identity();
 };
 
 class MetaTest : public GMObject
@@ -591,23 +542,9 @@ class MetaTest : public GMObject
 	DECLARE_PRIVATE(MetaTest)
 
 	GM_BEGIN_META_MAP
-		GM_META(y, GMMetaMemberType::Float)
-		GM_META(xyz, GMMetaMemberType::Vector4)
-		GM_META(dummy, GMMetaMemberType::Object)
+		GM_META(mat, GMMetaMemberType::Matrix4x4)
 	GM_END_META_MAP
 };
-
-class MetaTest2 : public GMObject
-{
-	DECLARE_PRIVATE(MetaTest2)
-
-	GM_BEGIN_META_MAP
-		GM_META(y, GMMetaMemberType::Float)
-		GM_META(xyz, GMMetaMemberType::Vector4)
-		GM_META(dummy, GMMetaMemberType::Object)
-	GM_END_META_MAP
-};
-#endif
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -632,19 +569,17 @@ int WINAPI WinMain(
 		new DemoGameHandler()
 	);
 
-	//GameMachine::instance().startGameMachine();
+	GameMachine::instance().startGameMachine();
 
-#if 1
+#if 0
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buffer;
 	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
 	GMLua lua;
 	GMLuaStatus result = lua.loadBuffer(buffer);
-	GMLuaVariable v[1];
 
 	MetaTest meta;
-	lua.call("ret", {meta}, &meta, 1);
-	lua.call("ret", { meta }, &meta, 1);
+	lua.call("printMat", {meta}, &meta, 1);
 #endif
 	return 0;
 }
