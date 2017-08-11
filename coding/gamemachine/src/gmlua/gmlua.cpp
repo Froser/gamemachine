@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmlua.h"
 #include "foundation/linearmath.h"
+#include "gmlua_functions.h"
 
 #define L (d->luaState)
 
@@ -150,6 +151,7 @@ GMLuaStatus GMLua::loadFile(const char* file)
 {
 	D(d);
 	ASSERT(L);
+	loadLibrary();
 	return (GMLuaStatus)(luaL_loadfile(L, file) || lua_pcall(L, 0, LUA_MULTRET, 0));
 }
 
@@ -157,6 +159,7 @@ GMLuaStatus GMLua::loadBuffer(const GMBuffer& buffer)
 {
 	D(d);
 	ASSERT(L);
+	loadLibrary();
 	return (GMLuaStatus)(luaL_loadbuffer(L, (const char*) buffer.buffer, buffer.size, 0) || lua_pcall(L, 0, LUA_MULTRET, 0));
 }
 
@@ -226,6 +229,21 @@ void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVari
 	for (GMint i = 0; i < nRet; i++)
 	{
 		returns[i] = pop();
+	}
+}
+
+bool GMLua::invoke(const char* expr)
+{
+	D(d);
+	return luaL_dostring(L, expr);
+}
+
+void GMLua::loadLibrary()
+{
+	D(d);
+	for (auto& function : g_gmlua_functions)
+	{
+		lua_register(L, function.first, function.second);
 	}
 }
 

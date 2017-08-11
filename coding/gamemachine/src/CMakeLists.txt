@@ -161,6 +161,8 @@ set(SOURCES
 		gmui/gmui_console.cpp
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
+		gmlua/gmlua_functions.h
+		gmlua/gmlua_functions.cpp
 	)
 
 source_group_by_dir(SOURCES)
