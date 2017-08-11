@@ -38,18 +38,72 @@ enum class GMLuaVariableType
 	Number,
 	String,
 	Boolean,
+	Object
 };
 
 struct GMLuaVariable
 {
 	GMLuaVariableType type;
-	GMString valString;
 	union
 	{
+		GMString* valPtrString;
+		GMObject* valPtrObject;
 		GMLargeInteger valInt;
 		bool valBoolean;
 		double valFloat;
 	};
+
+	GMLuaVariable(const GMLuaVariable& v)
+	{
+		*this = v;
+	}
+
+	GMLuaVariable& operator=(const GMLuaVariable& v)
+	{
+		if (&v == this)
+			return *this;
+
+		if (v.type == GMLuaVariableType::String)
+		{
+			type = v.type;
+			valPtrString = new GMString(*v.valPtrString);
+		}
+		else
+		{
+			memcpy_s(this, sizeof(*this), &v, sizeof(v));
+		}
+		return *this;
+	}
+
+	GMLuaVariable(GMLuaVariable&& v) noexcept
+	{
+		*this = std::move(v);
+	}
+	GMLuaVariable& operator=(GMLuaVariable&& v) noexcept
+	{
+		if (&v == this)
+			return *this;
+
+		if (v.type == GMLuaVariableType::String)
+		{
+			delete valPtrString;
+			type = v.type;
+			valPtrString = v.valPtrString;
+			v.valPtrString = nullptr;
+		}
+		else if (v.type == GMLuaVariableType::Object)
+		{
+			type = v.type;
+			valPtrObject = v.valPtrObject;
+			v.valPtrObject = nullptr;
+		}
+		else
+		{
+			memcpy_s(this, sizeof(*this), &v, sizeof(v));
+		}
+
+		return *this;
+	}
 
 	GMLuaVariable()
 		: type(GMLuaVariableType::Int)
@@ -81,16 +135,46 @@ struct GMLuaVariable
 	{
 	}
 
-	GMLuaVariable(bool d)
+	explicit GMLuaVariable(bool d)
 		: type(GMLuaVariableType::Boolean)
 		, valBoolean(d)
 	{
 	}
 
-	GMLuaVariable(GMString& str)
+	GMLuaVariable(const char* str)
 		: type(GMLuaVariableType::String)
-		, valString(str)
+		, valPtrString(new GMString(str))
 	{
+	}
+
+	GMLuaVariable(const GMWchar* str)
+		: type(GMLuaVariableType::String)
+		, valPtrString(new GMString(str))
+	{
+	}
+
+	GMLuaVariable(AUTORELEASE const GMString& str)
+		: type(GMLuaVariableType::String)
+		, valPtrString(new GMString(str))
+	{
+	}
+
+	GMLuaVariable(GMObject& obj)
+		: type(GMLuaVariableType::Object)
+		, valPtrObject(&obj)
+	{
+	}
+
+	operator GMObject*()
+	{
+		ASSERT(type == GMLuaVariableType::Object);
+		return valPtrObject;
+	}
+
+	~GMLuaVariable()
+	{
+		if (type == GMLuaVariableType::String)
+			delete valPtrString;
 	}
 };
 

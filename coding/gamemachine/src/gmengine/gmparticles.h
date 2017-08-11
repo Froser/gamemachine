@@ -27,6 +27,12 @@ public:
 	GMParticleGameObject(GMModel* prototype);
 
 public:
+	GM_BEGIN_META_MAP
+		GM_META(color, GMMetaMemberType::Vector4)
+		GM_META(currentLife, GMMetaMemberType::Float)
+		GM_META(maxLife, GMMetaMemberType::Float)
+	GM_END_META_MAP
+
 	GM_DECLARE_PROPERTY(CurrentLife, currentLife, GMfloat);
 	GM_DECLARE_PROPERTY(MaxLife, maxLife, GMfloat);
 	GM_DECLARE_PROPERTY(Color, color, linear_math::Vector4);

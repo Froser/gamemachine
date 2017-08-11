@@ -382,9 +382,12 @@ void GMLua::push(const GMLuaVariable& var)
 		break;
 	case GMLuaVariableType::String:
 		{
-			std::string str = var.valString.toStdString();
+			std::string str = var.valPtrString->toStdString();
 			lua_pushstring(L, str.c_str());
 		}
+		break;
+	case GMLuaVariableType::Object:
+		setTable(*var.valPtrObject);
 		break;
 	default:
 		ASSERT(false);

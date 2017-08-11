@@ -632,9 +632,9 @@ int WINAPI WinMain(
 		new DemoGameHandler()
 	);
 
-	GameMachine::instance().startGameMachine();
+	//GameMachine::instance().startGameMachine();
 
-#if 0
+#if 1
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buffer;
 	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
@@ -643,8 +643,8 @@ int WINAPI WinMain(
 	GMLuaVariable v[1];
 
 	MetaTest meta;
-	lua.call("ret", {}, &meta, 1);
-
+	lua.call("ret", {meta}, &meta, 1);
+	lua.call("ret", { meta }, &meta, 1);
 #endif
 	return 0;
 }
