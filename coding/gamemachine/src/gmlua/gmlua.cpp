@@ -203,7 +203,7 @@ bool GMLua::getGlobal(const char* name, GMObject& obj)
 	return getTable(obj);
 }
 
-void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
+GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
 {
 	D(d);
 	lua_getglobal(L, functionName);
@@ -221,16 +221,36 @@ void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVari
 		callExceptionHandler(result, msg);
 		lua_pop(L, 1);
 	}
+	return result;
 }
 
-void GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
+GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
 {
-	call(functionName, args);
-	for (GMint i = 0; i < nRet; i++)
+	GMLuaStatus result = call(functionName, args);
+	if (result == GMLuaStatus::OK)
 	{
-		returns[i] = pop();
+		for (GMint i = 0; i < nRet; i++)
+		{
+			returns[i] = pop();
+		}
 	}
+	return result;
 }
+
+GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet)
+{
+	GMLuaStatus result = call(functionName, args);
+	if (result == GMLuaStatus::OK)
+	{
+		for (GMint i = 0; i < nRet; i++)
+		{
+			if (getTable(returns[i]))
+				return GMLuaStatus::WRONG_TYPE;
+		}
+	}
+	return result;
+}
+
 
 bool GMLua::invoke(const char* expr)
 {
@@ -241,10 +261,7 @@ bool GMLua::invoke(const char* expr)
 void GMLua::loadLibrary()
 {
 	D(d);
-	for (auto& function : g_gmlua_functions)
-	{
-		lua_register(L, function.first, function.second);
-	}
+	luaL_requiref(L, "gmcore", register_core, 1);
 }
 
 void GMLua::callExceptionHandler(GMLuaStatus state, const char* msg)
@@ -358,7 +375,7 @@ void GMLua::push(const GMLuaVariable& var)
 	switch (var.type)
 	{
 	case GMLuaVariableType::Number:
-		lua_pushnumber(L, var.valDouble);
+		lua_pushnumber(L, var.valFloat);
 		break;
 	case GMLuaVariableType::Boolean:
 		lua_pushboolean(L, var.valBoolean);
@@ -437,7 +454,8 @@ GMLuaVariable GMLua::pop()
 {
 	D(d);
 	POP_GUARD(d);
-
+	if (lua_isinteger(L, -1))
+		return lua_tointeger(L, -1);
 	if (lua_isnumber(L, -1))
 		return lua_tonumber(L, -1);
 	if (lua_isstring(L, -1))

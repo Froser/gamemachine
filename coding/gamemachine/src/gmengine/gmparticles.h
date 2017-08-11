@@ -3,6 +3,7 @@
 #include "common.h"
 #include "foundation/linearmath.h"
 #include "gmgameobject.h"
+#include "gmlua/gmlua.h"
 BEGIN_NS
 
 class GMParticles;
@@ -70,9 +71,9 @@ public:
 	~GMParticles();
 
 public:
-	inline GMfloat* getPositionArray(GMModel* prototype) { D(d); return d->basePositions[prototype]; }
 	inline void setParticlesCount(GMint particlesCount) { D(d); d->particlesCount = particlesCount; }
 	inline void setParticlesHandler(IParticleHandler* handler) { D(d); d->particleHandler = handler; }
+	inline GMfloat* getPositionArray(GMModel* prototype) { D(d); return d->basePositions[prototype]; }
 	GMfloat getElapsedTime() { D(d); return d->currentTick - d->startTick; }
 
 public:
@@ -265,6 +266,35 @@ public:
 		GMint emissionTimes,
 		OUT GMParticlesEmitter** emitter
 	);
+};
+
+GM_PRIVATE_OBJECT(GMCustomParticlesEmitter)
+{
+	bool loaded = false;
+	GMModel* prototype = nullptr;
+	GMLua lua;
+};
+
+// 一个读取LUA脚本的粒子发射器
+class GMCustomParticlesEmitter : public GMParticles, public IParticleHandler
+{
+	DECLARE_PRIVATE(GMCustomParticlesEmitter)
+
+public:
+	GMCustomParticlesEmitter(AUTORELEASE GMModel* model);
+	~GMCustomParticlesEmitter();
+
+public:
+	inline GMLua& getScript() { D(d); return d->lua; }
+
+public:
+	void load(const GMBuffer& script);
+	void onAppendingObjectToWorld() override;
+
+private:
+	virtual GMParticleGameObject* createParticle(const GMint index) override;
+	virtual void update(const GMint index, GMParticleGameObject* particle) override;
+	virtual void respawn(const GMint index, GMParticleGameObject* particle) override;
 };
 
 END_NS

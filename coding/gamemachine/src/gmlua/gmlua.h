@@ -12,6 +12,7 @@ extern "C"
 
 enum class GMLuaStatus
 {
+	WRONG_TYPE = -1,
 	OK = LUA_OK,
 	ERRRUN = LUA_ERRRUN,
 	ERRMEM = LUA_ERRMEM,
@@ -33,6 +34,7 @@ GM_PRIVATE_OBJECT(GMLua)
 
 enum class GMLuaVariableType
 {
+	Int,
 	Number,
 	String,
 	Boolean,
@@ -44,37 +46,44 @@ struct GMLuaVariable
 	GMString valString;
 	union
 	{
-		double valDouble;
+		GMLargeInteger valInt;
 		bool valBoolean;
+		double valFloat;
 	};
 
 	GMLuaVariable()
-		: type(GMLuaVariableType::Number)
-		, valDouble(0)
+		: type(GMLuaVariableType::Int)
+		, valInt(0)
 	{
 	}
 
-	GMLuaVariable(double d)
-		: type(GMLuaVariableType::Number)
-		, valDouble(d)
+	GMLuaVariable(GMLargeInteger d)
+		: type(GMLuaVariableType::Int)
+		, valInt(d)
 	{
 	}
 
 	GMLuaVariable(GMint d)
 		: type(GMLuaVariableType::Number)
-		, valDouble(d)
+		, valInt(d)
 	{
 	}
 
 	GMLuaVariable(GMfloat d)
 		: type(GMLuaVariableType::Number)
-		, valDouble(d)
+		, valFloat(d)
 	{
 	}
 
-	GMLuaVariable(bool b)
+	GMLuaVariable(double d)
+		: type(GMLuaVariableType::Number)
+		, valFloat(d)
+	{
+	}
+
+	GMLuaVariable(bool d)
 		: type(GMLuaVariableType::Boolean)
-		, valBoolean(b)
+		, valBoolean(d)
 	{
 	}
 
@@ -106,18 +115,23 @@ public:
 	bool setGlobal(const char* name, GMObject& obj);
 	GMLuaVariable getGlobal(const char* name);
 	bool getGlobal(const char* name, GMObject& obj);
-	void call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
-	void call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
+	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
+	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
+	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
 	bool invoke(const char* expr);
 
 public:
-	template <size_t _size> void call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
+	template <size_t _size> GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
 	{
-		call(functionName, args);
-		for (GMint i = 0; i < _size; i++)
+		GMLuaStatus result = call(functionName, args);
+		if (result == GMLuaStatus::OK)
 		{
-			returns[i] = pop();
+			for (GMint i = 0; i < _size; i++)
+			{
+				returns[i] = pop();
+			}
 		}
+		return result;
 	}
 
 private:

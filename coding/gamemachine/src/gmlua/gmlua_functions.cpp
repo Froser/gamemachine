@@ -5,13 +5,20 @@
 
 extern "C"
 {
-	Map<const char*, lua_CFunction> g_gmlua_functions = {
-		{ "gmOutputDebug", gmlua_outputDebug },
-		{ "gmDebug", gmlua_debug },
-		{ "gmWarning", gmlua_warning },
-		{ "gmInfo", gmlua_info },
-		{ "gmError", gmlua_error },
+	static luaL_Reg g_gmlua_core_functions[] = {
+		{ "outputDebug", gmlua_core_outputDebug },
+		{ "debug", gmlua_core_debug },
+		{ "warning", gmlua_core_warning },
+		{ "info", gmlua_core_info },
+		{ "error", gmlua_core_error },
+		{ 0, 0 }
 	};
+
+	int register_core(lua_State *L)
+	{
+		luaL_newlib(L, g_gmlua_core_functions);
+		return 1;
+	}
 
 	static const char* getString(lua_State* L, const char* caller)
 	{
@@ -20,9 +27,9 @@ extern "C"
 		return luaL_optstring(L, -1, "");
 	}
 
-	int gmlua_outputDebug(lua_State* L)
+	int gmlua_core_outputDebug(lua_State* L)
 	{
-		const char* arg = getString(L, "gmlua_outputDebug");
+		const char* arg = getString(L, "outputDebug");
 #if _WINDOWS
 		OutputDebugStringA(arg);
 #else
@@ -32,30 +39,30 @@ extern "C"
 		return 0;
 	}
 
-	int gmlua_debug(lua_State* L)
+	int gmlua_core_debug(lua_State* L)
 	{
-		const char* arg = getString(L, "gmOutputDebug");
+		const char* arg = getString(L, "debug");
 		gm_debug(arg);
 		return 0;
 	}
 
-	int gmlua_warning(lua_State* L)
+	int gmlua_core_warning(lua_State* L)
 	{
-		const char* arg = getString(L, "gmlua_warning");
+		const char* arg = getString(L, "warning");
 		gm_warning(arg);
 		return 0;
 	}
 
-	int gmlua_info(lua_State* L)
+	int gmlua_core_info(lua_State* L)
 	{
-		const char* arg = getString(L, "gmlua_info");
+		const char* arg = getString(L, "info");
 		gm_info(arg);
 		return 0;
 	}
 
-	int gmlua_error(lua_State* L)
+	int gmlua_core_error(lua_State* L)
 	{
-		const char* arg = getString(L, "gmlua_error");
+		const char* arg = getString(L, "error");
 		gm_error(arg);
 		return 0;
 	}

@@ -580,3 +580,78 @@ void GMRadiusParticlesEmitter::respawn(const GMint index, GMParticleGameObject* 
 		d->currentAngles[index] = d->currentAngle;
 	}
 }
+
+//////////////////////////////////////////////////////////////////////////
+GMCustomParticlesEmitter::GMCustomParticlesEmitter(AUTORELEASE GMModel* model)
+{
+	D(d);
+	d->prototype = model;
+}
+
+GMCustomParticlesEmitter::~GMCustomParticlesEmitter()
+{
+	D(d);
+	if (d->prototype)
+		delete d->prototype;
+}
+
+void GMCustomParticlesEmitter::load(const GMBuffer& script)
+{
+	D(d);
+	if (d->lua.loadBuffer(script) == GMLuaStatus::OK)
+		d->loaded = true;
+}
+
+void GMCustomParticlesEmitter::onAppendingObjectToWorld()
+{
+	D(d);
+	setParticlesHandler(this);
+	if (!d->loaded)
+	{
+		gm_error("Particle script is not loaded.");
+		return;
+	}
+
+	// 调用接口 function particlesCount(), 返回粒子数目
+	GMLuaVariable ret[1];
+	GMLuaStatus result = d->lua.call("particlesCount", {}, ret);
+	if (result != GMLuaStatus::OK)
+		gm_error("LUA calling 'particlesCount' failed.");
+	else if (ret->type != GMLuaVariableType::Number && ret->type != GMLuaVariableType::Int)
+		gm_error("LUA calling 'particlesCount' return type error.");
+	else if (ret->type == GMLuaVariableType::Int)
+		setParticlesCount(ret->valInt);
+	else
+		setParticlesCount(ret->valFloat);
+
+	GMParticles::onAppendingObjectToWorld();
+}
+
+GMParticleGameObject* GMCustomParticlesEmitter::createParticle(const GMint index)
+{
+	D(d);
+	auto particle = new GMParticleGameObject(d->prototype);
+
+	// 调用接口 function particlesMaxLife(), 返回粒子生命
+	GMLuaVariable ret[1];
+	GMLuaStatus result = d->lua.call("particlesMaxLife", {}, ret);
+	if (result != GMLuaStatus::OK)
+		gm_error("LUA calling 'particlesMaxLife' failed.");
+	else if (ret->type != GMLuaVariableType::Number && ret->type != GMLuaVariableType::Int)
+		gm_error("LUA calling 'particlesMaxLife' return type error.");
+	else if (ret->type == GMLuaVariableType::Int)
+		particle->setMaxLife(ret->valInt);
+	else
+		particle->setMaxLife(ret->valFloat);
+	return particle;
+}
+
+void GMCustomParticlesEmitter::update(const GMint index, GMParticleGameObject* particle)
+{
+	D(d);
+}
+
+void GMCustomParticlesEmitter::respawn(const GMint index, GMParticleGameObject* particle)
+{
+	D_BASE(db, GMParticles);
+}

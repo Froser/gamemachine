@@ -6,14 +6,13 @@ BEGIN_NS
 
 extern "C"
 {
-	extern int gmlua_debugPrint(lua_State *L);
-	extern int gmlua_outputDebug(lua_State *L);
-	extern int gmlua_debug(lua_State *L);
-	extern int gmlua_warning(lua_State *L);
-	extern int gmlua_info(lua_State *L);
-	extern int gmlua_error(lua_State *L);
-
-	extern Map<const char*, lua_CFunction> g_gmlua_functions;
+	extern int register_core(lua_State *L);
+	extern int gmlua_core_debugPrint(lua_State *L);
+	extern int gmlua_core_outputDebug(lua_State *L);
+	extern int gmlua_core_debug(lua_State *L);
+	extern int gmlua_core_warning(lua_State *L);
+	extern int gmlua_core_info(lua_State *L);
+	extern int gmlua_core_error(lua_State *L);
 }
 
 END_NS

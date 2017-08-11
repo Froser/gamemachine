@@ -23,6 +23,8 @@
 #include "foundation/utilities/gmprimitivecreator.h"
 #include "gmlua/gmlua.h"
 
+#define EMITTER_DEMO 0
+
 using namespace gm;
 
 GMGLFactory factory;
@@ -374,6 +376,7 @@ private:
 
 		}
 
+#if EMITTER_DEMO
 #if 0
 		linear_math::Quaternion start, end;
 		start.setRotation(linear_math::Vector3(0, 0, 1), 0.f);
@@ -421,6 +424,19 @@ private:
 		);
 #endif
 		demo->appendObject("particles", emitter);
+#endif
+		GMBuffer buffer;
+		pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
+
+		{
+			GMfloat extents[] = { .15f, .15f, .15f };
+			GMfloat pos[] = { 0, 0, -1.f };
+			GMModel* m;
+			GMPrimitiveCreator::createQuad(extents, pos, &m, GMMeshType::Particles);
+			GMCustomParticlesEmitter* emitter = new GMCustomParticlesEmitter(m);
+			emitter->load(buffer);
+			demo->appendObject("particles", emitter);
+		}
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
@@ -439,11 +455,13 @@ private:
 			break;
 		case gm::GameMachineEvent::Simulate:
 			demo->simulateGameWorld();
+#if EMITTER_DEMO
 			if (emitter && emitter->isEmissionFinished())
 			{
 				demo->removeObject(emitter);
 				emitter = nullptr;
 			}
+#endif
 			break;
 		case gm::GameMachineEvent::Render:
 			{
@@ -459,7 +477,9 @@ private:
 				if (rotate)
 					a += .01f;
 
+#if EMITTER_DEMO
 				emitter->getEmitterPropertiesReference().position += linear_math::Vector3(.001f, 0, 0);
+#endif
 
 				GMGameObject* obj = demo->findGameObject("cube");
 				linear_math::Quaternion q;
@@ -507,7 +527,9 @@ private:
 	GMGameObject* mask = nullptr;
 	GMfloat pos[5] = { 0 };
 	bool rotate = true;
+#if EMITTER_DEMO
 	GMParticlesEmitter* emitter;
+#endif
 };
 
 GM_PRIVATE_OBJECT(TT)
@@ -610,27 +632,18 @@ int WINAPI WinMain(
 		new DemoGameHandler()
 	);
 
-	//GameMachine::instance().startGameMachine();
+	GameMachine::instance().startGameMachine();
 
-#if 1
+#if 0
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buffer;
 	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
 	GMLua lua;
 	GMLuaStatus result = lua.loadBuffer(buffer);
 	GMLuaVariable v[1];
-	lua.call("add", { 3, 4 }, v);
-
-	lua.setGlobal("r", 10);
-	lua.call("foo", {}, v);
 
 	MetaTest meta;
-	lua.setGlobal("obj", meta);
-	MetaTest2 test;
-	lua.getGlobal("obj", test);
-
-	const char* testfunc = "gmDebugPrint()";
-	auto i = lua.invoke(testfunc);
+	lua.call("ret", {}, &meta, 1);
 
 #endif
 	return 0;
