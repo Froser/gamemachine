@@ -5,13 +5,13 @@
 
 #define L (d->luaState)
 
-#define POP_GUARD(d) \
+#define POP_GUARD() \
 struct __PopGuard							\
 {											\
 	__PopGuard(lua_State* __L) : m_L(__L) {}\
 	~__PopGuard() { lua_pop(m_L, 1); }		\
 	lua_State* m_L;							\
-} __guard(L);
+} __guard(*this);
 
 GM_PRIVATE_OBJECT(GMLua_Vector2)
 {
@@ -244,6 +244,7 @@ GMLuaVariable GMLua::getGlobal(const char* name)
 bool GMLua::getGlobal(const char* name, GMObject& obj)
 {
 	D(d);
+	POP_GUARD();
 	const GMMeta* meta = obj.meta();
 	if (!meta)
 		return false;
@@ -257,28 +258,12 @@ bool GMLua::getGlobal(const char* name, GMObject& obj)
 
 GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
 {
-	D(d);
-	lua_getglobal(L, functionName);
-	GMint count = 0;
-	for (const auto& var : args)
-	{
-		push(var);
-		count++;
-	}
-
-	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, count, 1, 0);
-	if (result != GMLuaStatus::OK)
-	{
-		const char* msg = lua_tostring(L, -1);
-		callExceptionHandler(result, msg);
-		lua_pop(L, 1);
-	}
-	return result;
+	return callp(functionName, args, 0);
 }
 
 GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
 {
-	GMLuaStatus result = call(functionName, args);
+	GMLuaStatus result = callp(functionName, args, nRet);
 	if (result == GMLuaStatus::OK)
 	{
 		for (GMint i = 0; i < nRet; i++)
@@ -291,18 +276,35 @@ GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GM
 
 GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet)
 {
-	GMLuaStatus result = call(functionName, args);
+	GMLuaStatus result = callp(functionName, args, nRet);
 	if (result == GMLuaStatus::OK)
 	{
 		for (GMint i = 0; i < nRet; i++)
 		{
-			if (getTable(returns[i]))
+			POP_GUARD();
+			if (!getTable(returns[i]))
 				return GMLuaStatus::WRONG_TYPE;
 		}
 	}
 	return result;
 }
 
+GMLuaStack GMLua::getTopStack()
+{
+	D(d);
+	GMLuaStack stack;
+	stack.index = lua_gettop(L);
+	stack.type = lua_type(L, stack.index);
+	if (stack.type == LUA_TNIL)
+		stack.other = 0;
+	else if (stack.type == LUA_TBOOLEAN)
+		stack.valBool = !!lua_toboolean(L, stack.index);
+	else if (stack.type == LUA_TNUMBER)
+		stack.valDouble = lua_tonumber(L, stack.index);
+	else if (stack.type == LUA_TSTRING)
+		stack.valStr = lua_tostring(L, stack.index);
+	return stack;
+}
 
 bool GMLua::invoke(const char* expr)
 {
@@ -323,6 +325,25 @@ void GMLua::callExceptionHandler(GMLuaStatus state, const char* msg)
 		d->exceptionHandler->onException(state, msg);
 	else
 		gm_error("LUA error: %d, %s", (GMint)state, msg);
+}
+
+GMLuaStatus GMLua::callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet)
+{
+	D(d);
+	lua_getglobal(L, functionName);
+	for (const auto& var : args)
+	{
+		push(var);
+	}
+
+	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, args.size(), nRet, 0);
+	if (result != GMLuaStatus::OK)
+	{
+		const char* msg = lua_tostring(L, -1);
+		callExceptionHandler(result, msg);
+		lua_pop(L, 1);
+	}
+	return result;
 }
 
 void GMLua::setTable(GMObject& obj)
@@ -350,6 +371,7 @@ bool GMLua::getTable(GMObject& obj)
 	while (lua_next(L, index))
 	{
 		ASSERT(lua_isstring(L, -2));
+		POP_GUARD();
 		const char* key = lua_tostring(L, -2);
 		for (const auto member : *meta)
 		{
@@ -427,9 +449,8 @@ bool GMLua::getTable(GMObject& obj)
 				}
 			}
 		}
-
-		lua_pop(L, 1);
 	}
+
 	return true;
 }
 
@@ -438,6 +459,9 @@ void GMLua::push(const GMLuaVariable& var)
 	D(d);
 	switch (var.type)
 	{
+	case GMLuaVariableType::Int:
+		lua_pushinteger(L, var.valInt);
+		break;
 	case GMLuaVariableType::Number:
 		lua_pushnumber(L, var.valFloat);
 		break;
@@ -522,13 +546,14 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	}
 
 	ASSERT(lua_istable(L, -3));
+	GMint top = lua_gettop(L);
 	lua_settable(L, -3);
 }
 
 GMLuaVariable GMLua::pop()
 {
 	D(d);
-	POP_GUARD(d);
+	POP_GUARD();
 	if (lua_isinteger(L, -1))
 		return lua_tointeger(L, -1);
 	if (lua_isnumber(L, -1))

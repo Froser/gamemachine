@@ -24,7 +24,7 @@ class GMParticleGameObject : public GMGameObject
 	DECLARE_PRIVATE(GMParticleGameObject)
 
 public:
-	GMParticleGameObject(GMModel* prototype);
+	GMParticleGameObject(AUTORELEASE GMModel* prototype);
 
 public:
 	GM_BEGIN_META_MAP
@@ -60,6 +60,7 @@ GM_PRIVATE_OBJECT(GMParticles)
 {
 	Map<GMModel*, GMfloat*> basePositions;
 	Map<GMModel*, Vector<GMParticleGameObject*> > particles;
+	Set<GMModel*> prototypes;
 	Vector<GMParticleGameObject*> allParticles;
 	GMuint lastUsedParticle = 0;
 	GMint particlesCount = 0;
@@ -189,9 +190,6 @@ protected:
 	GMLerpParticleEmitter() = default;
 
 public:
-	~GMLerpParticleEmitter();
-
-public:
 	virtual void onAppendingObjectToWorld() override;
 
 protected:
@@ -289,7 +287,6 @@ class GMCustomParticlesEmitter : public GMParticles, public IParticleHandler
 
 public:
 	GMCustomParticlesEmitter(AUTORELEASE GMModel* model);
-	~GMCustomParticlesEmitter();
 
 public:
 	inline GMLua& getScript() { D(d); return d->lua; }

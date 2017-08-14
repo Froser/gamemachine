@@ -79,6 +79,7 @@ struct GMLuaVariable
 	{
 		*this = std::move(v);
 	}
+
 	GMLuaVariable& operator=(GMLuaVariable&& v) noexcept
 	{
 		if (&v == this)
@@ -118,7 +119,7 @@ struct GMLuaVariable
 	}
 
 	GMLuaVariable(GMint d)
-		: type(GMLuaVariableType::Number)
+		: type(GMLuaVariableType::Int)
 		, valInt(d)
 	{
 	}
@@ -178,6 +179,19 @@ struct GMLuaVariable
 	}
 };
 
+struct GMLuaStack
+{
+	GMint type;
+	GMint index;
+	union
+	{
+		bool valBool;
+		const char* valStr;
+		void* other;
+		double valDouble;
+	};
+};
+
 class GMLua : public GMObject
 {
 	DECLARE_PRIVATE(GMLua)
@@ -202,12 +216,13 @@ public:
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
+	GMLuaStack getTopStack();
 	bool invoke(const char* expr);
 
 public:
 	template <size_t _size> GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
 	{
-		GMLuaStatus result = call(functionName, args);
+		GMLuaStatus result = callp(functionName, args, _size);
 		if (result == GMLuaStatus::OK)
 		{
 			for (GMint i = 0; i < _size; i++)
@@ -218,9 +233,16 @@ public:
 		return result;
 	}
 
+	operator lua_State*()
+	{
+		D(d);
+		return d->luaState;
+	}
+
 private:
 	void loadLibrary();
 	void callExceptionHandler(GMLuaStatus state, const char* msg);
+	GMLuaStatus callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet);
 	void setTable(GMObject& obj);
 	bool getTable(GMObject& obj);
 	void push(const GMLuaVariable& var);

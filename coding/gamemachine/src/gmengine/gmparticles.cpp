@@ -7,7 +7,7 @@
 
 static void destructor(GMGameObject*) {}
 
-GMParticleGameObject::GMParticleGameObject(GMModel* prototype)
+GMParticleGameObject::GMParticleGameObject(AUTORELEASE GMModel* prototype)
 	: GMGameObject(prototype)
 {
 	D(d);
@@ -71,21 +71,20 @@ GMParticles::GMParticles()
 GMParticles::~GMParticles()
 {
 	D(d);
-	return;
 	for (auto& positions : d->basePositions)
 	{
 		if (positions.second)
 			delete[] positions.second;
 	}
 
-	for (const auto& kv : d->particles)
+	for (const auto& prototype : d->prototypes)
 	{
-		delete kv.first;
-		
-		for (const auto& p : kv.second)
-		{
-			delete p;
-		}
+		delete prototype;
+	}
+
+	for (const auto& particle : d->allParticles)
+	{
+		delete particle;
 	}
 }
 
@@ -220,6 +219,7 @@ void GMParticles::addParticle(AUTORELEASE GMModel* prototype, AUTORELEASE GMPart
 	particle->setParent(this);
 	particle->setIndex(vec.size() - 1);
 	d->allParticles.push_back(particle);
+	d->prototypes.insert(prototype);
 }
 
 bool GMParticles::containsPrototype(GMModel* prototype)
@@ -258,13 +258,6 @@ void GMParticlesEmitter::onAppendingObjectToWorld()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMLerpParticleEmitter::~GMLerpParticleEmitter()
-{
-	D(d);
-	if (d->prototype)
-		delete d->prototype;
-}
-
 void GMLerpParticleEmitter::onAppendingObjectToWorld()
 {
 	D(d);
@@ -588,13 +581,6 @@ GMCustomParticlesEmitter::GMCustomParticlesEmitter(AUTORELEASE GMModel* model)
 	d->prototype = model;
 }
 
-GMCustomParticlesEmitter::~GMCustomParticlesEmitter()
-{
-	D(d);
-	if (d->prototype)
-		delete d->prototype;
-}
-
 void GMCustomParticlesEmitter::load(const GMBuffer& script)
 {
 	D(d);
@@ -659,6 +645,7 @@ void GMCustomParticlesEmitter::respawn(const GMint index, GMParticleGameObject* 
 {
 	D(d);
 	// 调用接口 function particlesRespawn(index, particle), 返回粒子table
+	auto stack = d->lua.getTopStack();
 	GMLuaStatus result = d->lua.call("particlesRespawn", { index, *particle }, particle, 1);
 	if (result != GMLuaStatus::OK)
 		gm_error("LUA calling 'particlesUpdate(index)' failed.");

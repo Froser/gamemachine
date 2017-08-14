@@ -527,9 +527,7 @@ private:
 	GMGameObject* mask = nullptr;
 	GMfloat pos[5] = { 0 };
 	bool rotate = true;
-#if EMITTER_DEMO
 	GMParticlesEmitter* emitter;
-#endif
 };
 
 GM_PRIVATE_OBJECT(MetaTest)
@@ -569,7 +567,6 @@ int WINAPI WinMain(
 		new DemoGameHandler()
 	);
 
-	GameMachine::instance().startGameMachine();
 
 #if 0
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
@@ -577,9 +574,12 @@ int WINAPI WinMain(
 	pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
 	GMLua lua;
 	GMLuaStatus result = lua.loadBuffer(buffer);
-
+	int xx = lua_gettop(lua);
 	MetaTest meta;
-	lua.call("printMat", {meta}, &meta, 1);
+	while (1)
+	lua.call("v", {meta}, &meta, 1);
+#else
+	GameMachine::instance().startGameMachine();
 #endif
 	return 0;
 }
