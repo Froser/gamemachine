@@ -67,7 +67,6 @@
 #include <richedit.h>
 #include <tchar.h>
 #include <assert.h>
-#include <crtdbg.h>
 #include <malloc.h>
 #include <stdio.h>
 
