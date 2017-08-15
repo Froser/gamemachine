@@ -645,7 +645,6 @@ void GMCustomParticlesEmitter::respawn(const GMint index, GMParticleGameObject* 
 {
 	D(d);
 	// 调用接口 function particlesRespawn(index, particle), 返回粒子table
-	auto stack = d->lua.getTopStack();
 	GMLuaStatus result = d->lua.call("particlesRespawn", { index, *particle }, particle, 1);
 	if (result != GMLuaStatus::OK)
 		gm_error("LUA calling 'particlesUpdate(index)' failed.");

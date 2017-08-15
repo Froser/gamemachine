@@ -315,6 +315,8 @@ bool GMLua::invoke(const char* expr)
 void GMLua::loadLibrary()
 {
 	D(d);
+	POP_GUARD();
+	luaL_openlibs(L);
 	luaL_requiref(L, "gmcore", register_core, 1);
 }
 

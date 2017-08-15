@@ -41,6 +41,19 @@ using Queue = std::queue<T>;
 
 
 // 编译设置：
+#ifndef GM_LIB
+#	define GM_LIB 1
+#endif
+
+#if GM_LIB
+#	define GM_API
+#	define GM_LUA_API extern
+#else
+#	define GM_API
+#	define GM_LUA_API extern
+#	error consider dll
+#endif
+
 // 游戏逻辑的线程模式
 #ifndef GM_MULTI_THREAD
 #define GM_MULTI_THREAD 1

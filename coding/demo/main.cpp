@@ -577,7 +577,7 @@ int WINAPI WinMain(
 	int xx = lua_gettop(lua);
 	MetaTest meta;
 	while (1)
-	lua.call("v", {meta}, &meta, 1);
+		lua.call("v", {1});
 #else
 	GameMachine::instance().startGameMachine();
 #endif

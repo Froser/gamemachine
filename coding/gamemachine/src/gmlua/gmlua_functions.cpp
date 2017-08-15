@@ -14,7 +14,7 @@ extern "C"
 		{ 0, 0 }
 	};
 
-	int register_core(lua_State *L)
+	GM_LUA_API int register_core(lua_State *L)
 	{
 		luaL_newlib(L, g_gmlua_core_functions);
 		return 1;
@@ -27,7 +27,7 @@ extern "C"
 		return luaL_optstring(L, -1, "");
 	}
 
-	int gmlua_core_output(lua_State* L)
+	GM_LUA_API int gmlua_core_output(lua_State* L)
 	{
 		const char* arg = getString(L, "outputDebug");
 #if _WINDOWS
@@ -35,32 +35,31 @@ extern "C"
 #else
 		printf("%s", arg.c_str());
 #endif
-		lua_pop(L, 1);
 		return 0;
 	}
 
-	int gmlua_core_debug(lua_State* L)
+	GM_LUA_API int gmlua_core_debug(lua_State* L)
 	{
 		const char* arg = getString(L, "debug");
 		gm_debug(arg);
 		return 0;
 	}
 
-	int gmlua_core_warning(lua_State* L)
+	GM_LUA_API int gmlua_core_warning(lua_State* L)
 	{
 		const char* arg = getString(L, "warning");
 		gm_warning(arg);
 		return 0;
 	}
 
-	int gmlua_core_info(lua_State* L)
+	GM_LUA_API int gmlua_core_info(lua_State* L)
 	{
 		const char* arg = getString(L, "info");
 		gm_info(arg);
 		return 0;
 	}
 
-	int gmlua_core_error(lua_State* L)
+	GM_LUA_API int gmlua_core_error(lua_State* L)
 	{
 		const char* arg = getString(L, "error");
 		gm_error(arg);
