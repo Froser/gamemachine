@@ -332,7 +332,16 @@ namespace linear_math
 	enum { dimension = l };						\
 	__m128 get128() const { return m_128; }		\
 	void set128(__m128 _128) { m_128 = _128; }	\
-												\
+	GMfloat& operator [](GMint i)				\
+	{											\
+		ASSERT(i < l);							\
+		return m_data[i];						\
+	}											\
+	const GMfloat& operator [](GMint i) const	\
+	{											\
+		ASSERT(i < l);							\
+		return m_data[i];						\
+	}											\
 	protected:									\
 		union									\
 		{										\
@@ -343,6 +352,16 @@ namespace linear_math
 #define DEFINE_VECTOR_DATA(l)					\
 	public:										\
 	enum { dimension = l };						\
+	GMfloat& operator [](GMint i)				\
+	{											\
+		ASSERT(i < l);							\
+		return m_data[i];						\
+	}											\
+	const GMfloat& operator [](GMint i) const	\
+	{											\
+		ASSERT(i < l);							\
+		return m_data[i];						\
+	}											\
 	protected:									\
 		GMfloat m_data[l];
 #endif
@@ -371,10 +390,6 @@ namespace linear_math
 			m_data[1] = right[1];
 #endif
 		}
-
-	public:
-		GMfloat& operator [](GMint i);
-		const GMfloat& operator [](GMint i) const;
 	};
 
 	GM_ALIGNED_16(class) Vector3
@@ -429,10 +444,6 @@ namespace linear_math
 		inline const GMfloat& x() const { return m_data[0]; }
 		inline const GMfloat& y() const { return m_data[1]; }
 		inline const GMfloat& z() const { return m_data[2]; }
-
-	public:
-		GMfloat& operator [](GMint i);
-		const GMfloat& operator [](GMint i) const;
 
 	public:
 		inline static Vector3 fromArray(const GMfloat array[3])
@@ -496,10 +507,6 @@ namespace linear_math
 		inline const GMfloat& y() const { return m_data[1]; }
 		inline const GMfloat& z() const { return m_data[2]; }
 		inline const GMfloat& w() const { return m_data[3]; }
-
-	public:
-		GMfloat& operator [](GMint i);
-		const GMfloat& operator [](GMint i) const;
 	};
 
 	GM_ALIGNED_16(class) Matrix4x4
@@ -515,16 +522,104 @@ namespace linear_math
 		}
 
 	public:
-		static Matrix4x4 identity();
+		static Matrix4x4 identity()
+		{
+#if USE_SIMD
+			static const Matrix4x4
+				identityMatrix(
+					_mm_set_ps(0.0f, 0.0f, 0.0f, 1.0f),
+					_mm_set_ps(0.0f, 0.0f, 1.0f, 0.0f),
+					_mm_set_ps(0.0f, 1.0f, 0.0f, 0.0f),
+					_mm_set_ps(1.0f, 0.0f, 0.0f, 0.0f));
+#else
+			static const Matrix4x4
+				identityMatrix(
+					Vector4(1.0f, 0.0f, 0.0f, 0.0f),
+					Vector4(0.0f, 1.0f, 0.0f, 0.0f),
+					Vector4(0.0f, 0.0f, 1.0f, 0.0f),
+					Vector4(0.0f, 0.0f, 0.0f, 1.0f)
+				);
+#endif
+			return identityMatrix;
+		}
+
 
 	public:
 		inline operator Vector4*() { return &m_data[0]; }
 		inline operator const Vector4*() const { return &m_data[0]; }
 
-		Matrix4x4 operator *(const Matrix4x4& right) const;
-		Matrix4x4 transpose() const;
-		const GMfloat* data() const;
-		void toArray(GMfloat* array) const;
+		Matrix4x4 operator *(const Matrix4x4& left) const
+		{
+#if USE_SIMD
+			Matrix4x4 ret;
+			__m128 __result;
+			for (int i = 0; i < 4; i++)
+			{
+				__m128	__v = left.m_data[i].get128();
+				__m128	__row0 = m_data[0].get128(),
+					__row1 = m_data[1].get128(),
+					__row2 = m_data[2].get128(),
+					__row3 = m_data[3].get128();
+				__m128	__x_mul_row0 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(0, 0, 0, 0)), __row0),
+					__x_mul_row1 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(1, 1, 1, 1)), __row1),
+					__x_mul_row2 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(2, 2, 2, 2)), __row2),
+					__x_mul_row3 = _mm_mul_ps(_mm_shuffle_ps(__v, __v, gm_shuffle_param(3, 3, 3, 3)), __row3);
+				__result = _mm_add_ps(__x_mul_row0, __x_mul_row1);
+				__result = _mm_add_ps(__result, __x_mul_row2);
+				__result = _mm_add_ps(__result, __x_mul_row3);
+				ret[i].set128(__result);
+			}
+			return ret;
+#else
+			Matrix4x4 result;
+			for (GMint j = 0; j < 4; j++)
+			{
+				for (GMint i = 0; i < 4; i++)
+				{
+					GMfloat sum = 0;
+					for (GMint n = 0; n < 4; n++)
+					{
+						sum += m_data[n][i] * left[j][n];
+					}
+					result[j][i] = sum;
+				}
+			}
+			return result;
+#endif
+		}
+
+		Matrix4x4 transpose() const
+		{
+			Matrix4x4 result;
+			GMint x, y;
+
+			for (y = 0; y < 4; y++)
+			{
+				for (x = 0; x < 4; x++)
+				{
+					result[x][y] = m_data[y][x];
+				}
+			}
+
+			return result;
+		}
+
+		void toArray(GMfloat* array) const
+		{
+			GMint k = 0;
+			for (GMint i = 0; i < 4; i++)
+			{
+				for (GMint j = 0; j < 4; j++, k++)
+				{
+					array[k] = m_data[i][j];
+				}
+			}
+		}
+
+		const GMfloat* data() const
+		{
+			return &m_data[0][0];
+		}
 
 	private:
 		Vector4 m_data[4];
@@ -601,7 +696,7 @@ namespace linear_math
 		return _mm_cvtss_f32(vd);
 #else
 		GMfloat result = 0;
-		for (GMint n = 0; n < T::dimension; n++)
+		for (GMint n = 0; n < Vector3::dimension; n++)
 		{
 			result += left[n] * right[n];
 		}
@@ -901,7 +996,7 @@ namespace linear_math
 			m_128 = _mm_mul_ps(m_128, vd);
 			return *this;
 #else
-			return *this /= length();
+			return *this /= length(*this);
 #endif
 		}
 

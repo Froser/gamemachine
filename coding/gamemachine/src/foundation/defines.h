@@ -24,45 +24,36 @@ using Vector = std::vector<T>;
 template <typename T>
 using Queue = std::queue<T>;
 
+/* 工程编译选项 */
 // 使用UNICODE
 #ifndef UNICODE
 #	define UNICODE 1
 #endif
-#define _L(x) L ## x
 
 // 使用OpenGL
 #define USE_OPENGL 1
-
-// 如果是OpenGL，加载glew
-#if USE_OPENGL
-#	define GLEW_STATIC
-#	include "GL/glew.h"
-#endif
-
 
 // 编译设置：
 #ifndef GM_LIB
 #	define GM_LIB 1
 #endif
 
-#if GM_LIB
-#	define GM_API
-#	define GM_LUA_API extern
-#else
-#	define GM_API
-#	define GM_LUA_API extern
-#	error consider dll
-#endif
-
 // 游戏逻辑的线程模式
 #ifndef GM_MULTI_THREAD
-#define GM_MULTI_THREAD 1
+#	define GM_MULTI_THREAD 1
 #endif
 
 // Debug模式下监控内存泄漏
 #ifndef GM_DETECT_MEMORY_LEAK
-#define GM_DETECT_MEMORY_LEAK 0
+#	define GM_DETECT_MEMORY_LEAK 0
 #endif
+
+// SSE指令优化
+#ifndef GM_SIMD
+#	define GM_SIMD 1
+#endif
+
+/* 工程编译选项到此结束 */
 
 #if GM_DETECT_MEMORY_LEAK
 #	if _WINDOWS
@@ -76,7 +67,35 @@ using Queue = std::queue<T>;
 #	define GM_NOVTABLE
 #endif
 
+#if _MSC_VER && GM_SIMD
+#	define USE_SIMD 1
+#else
+#	define USE_SIMD 0
+#endif
+
+#if USE_SIMD
+#	define GM_ALIGNED_16(t) t __declspec(align(16))
+#else
+#	define GM_ALIGNED_16(t) t
+#endif
+
+#if GM_LIB
+#	define GM_API
+#	define GM_LUA_API extern
+#else
+#	define GM_API
+#	define GM_LUA_API extern
+#	error consider dll
+#endif
+
+#if USE_OPENGL
+#	define GLEW_STATIC
+#	include "GL/glew.h"
+#endif
+
 // 整个GameMachine用到的宏定义
+#define _L(x) L ## x
+
 #define BEGIN_NS namespace gm {
 #define END_NS }
 
@@ -169,19 +188,6 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
 
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(*(dest)));
-
-// SSE指令优化
-#ifdef _MSC_VER
-#	define USE_SIMD 1
-#else
-#	define USE_SIMD 0
-#endif
-
-#if USE_SIMD
-#	define GM_ALIGNED_16(t) t __declspec(align(16))
-#else
-#	define GM_ALIGNED_16(t) t
-#endif
 
 // 平台差异
 #ifdef __GNUC__
