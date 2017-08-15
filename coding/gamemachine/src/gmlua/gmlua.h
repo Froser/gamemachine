@@ -1,6 +1,8 @@
 ﻿#ifndef __GMLUA_H__
 #define __GMLUA_H__
 #include "common.h"
+#include "foundation/linearmath.h"
+
 BEGIN_NS
 
 extern "C"
@@ -9,6 +11,155 @@ extern "C"
 #include "lauxlib.h"
 #include "lualib.h"
 }
+
+GM_PRIVATE_OBJECT(GMLua_Vector2)
+{
+	GMfloat x;
+	GMfloat y;
+};
+
+class GMLua_Vector2 : public GMObject
+{
+	DECLARE_PRIVATE(GMLua_Vector2)
+
+	GM_BEGIN_META_MAP
+		GM_META(x, GMMetaMemberType::Float)
+		GM_META(y, GMMetaMemberType::Float)
+	GM_END_META_MAP
+
+public:
+	GMLua_Vector2() = default;
+
+	GMLua_Vector2(GMfloat x, GMfloat y)
+	{
+		D(d);
+		d->x = x;
+		d->y = y;
+	}
+
+	GMfloat x() const { D(d); return d->x; }
+	GMfloat y() const { D(d); return d->y; }
+};
+
+GM_PRIVATE_OBJECT_FROM(GMLua_Vector3, GMLua_Vector2)
+{
+	GMfloat z;
+};
+
+class GMLua_Vector3 : public GMLua_Vector2
+{
+	DECLARE_PRIVATE(GMLua_Vector3)
+
+	GM_BEGIN_META_MAP_FROM(GMLua_Vector2)
+		GM_META(z, GMMetaMemberType::Float)
+	GM_END_META_MAP
+
+public:
+	GMLua_Vector3() = default;
+
+	GMLua_Vector3(GMfloat x, GMfloat y, GMfloat z)
+		: GMLua_Vector2(x, y)
+	{
+		D(d);
+		d->z = z;
+	}
+
+	GMLua_Vector3(const linear_math::Vector3& v)
+	{
+		D(d);
+		D_BASE(db, GMLua_Vector2);
+		db->x = v[0];
+		db->y = v[1];
+		d->z = v[2];
+	}
+
+	GMfloat z() const { D(d); return d->z; }
+};
+
+GM_PRIVATE_OBJECT_FROM(GMLua_Vector4, GMLua_Vector3)
+{
+	GMfloat w;
+};
+
+class GMLua_Vector4 : public GMLua_Vector3
+{
+	DECLARE_PRIVATE(GMLua_Vector4)
+
+	GM_BEGIN_META_MAP_FROM(GMLua_Vector3)
+		GM_META(w, GMMetaMemberType::Float)
+	GM_END_META_MAP
+
+public:
+	GMLua_Vector4() = default;
+
+	GMLua_Vector4(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
+		: GMLua_Vector3(x, y, z)
+	{
+		D(d);
+		d->w = w;
+	}
+
+	GMLua_Vector4& operator=(const GMLua_Vector4& rhs)
+	{
+		D(d);
+		d->x = rhs.x();
+		d->y = rhs.y();
+		d->z = rhs.z();
+		d->w = rhs.w();
+		return *this;
+	}
+
+	operator linear_math::Vector4()
+	{
+		return linear_math::Vector4(x(), y(), z(), w());
+	}
+
+	GMfloat w() const { D(d); return d->w; }
+};
+
+GM_PRIVATE_OBJECT(GMLua_Matrix4x4)
+{
+	linear_math::Vector4 r1, r2, r3, r4;
+};
+
+class GMLua_Matrix4x4 : public GMObject
+{
+	DECLARE_PRIVATE(GMLua_Matrix4x4)
+
+	GM_BEGIN_META_MAP
+		GM_META(r1, GMMetaMemberType::Vector4)
+		GM_META(r2, GMMetaMemberType::Vector4)
+		GM_META(r3, GMMetaMemberType::Vector4)
+		GM_META(r4, GMMetaMemberType::Vector4)
+	GM_END_META_MAP
+
+public:
+	GMLua_Matrix4x4() = default;
+
+	GMLua_Matrix4x4(const linear_math::Matrix4x4& mat)
+		: GMLua_Matrix4x4(mat[0], mat[1], mat[2], mat[3])
+	{
+	}
+
+	GMLua_Matrix4x4(const linear_math::Vector4& r1, const linear_math::Vector4& r2, const linear_math::Vector4& r3, const linear_math::Vector4& r4)
+	{
+		D(d);
+		d->r1 = r1;
+		d->r2 = r2;
+		d->r3 = r3;
+		d->r4 = r4;
+	}
+
+	operator linear_math::Matrix4x4()
+	{
+		return linear_math::Matrix4x4(r1(), r2(), r3(), r4());
+	}
+
+	linear_math::Vector4& r1() { D(d); return d->r1; }
+	linear_math::Vector4& r2() { D(d); return d->r2; }
+	linear_math::Vector4& r3() { D(d); return d->r3; }
+	linear_math::Vector4& r4() { D(d); return d->r4; }
+};
 
 enum class GMLuaStatus
 {
@@ -23,13 +174,6 @@ enum class GMLuaStatus
 GM_INTERFACE(GMLuaExceptionHandler)
 {
 	virtual void onException(GMLuaStatus state, const char* msg) = 0;
-};
-
-GM_PRIVATE_OBJECT(GMLua)
-{
-	lua_State* luaState = nullptr;
-	GMLuaExceptionHandler* exceptionHandler = nullptr;
-	GMuint* ref = nullptr;
 };
 
 enum class GMLuaVariableType
@@ -192,6 +336,14 @@ struct GMLuaStack
 	};
 };
 
+GM_PRIVATE_OBJECT(GMLua)
+{
+	bool weakRef = false;
+	lua_State* luaState = nullptr;
+	GMLuaExceptionHandler* exceptionHandler = nullptr;
+	GMuint* ref = nullptr;
+};
+
 class GMLua : public GMObject
 {
 	DECLARE_PRIVATE(GMLua)
@@ -199,7 +351,7 @@ class GMLua : public GMObject
 public:
 	GMLua();
 	~GMLua();
-
+	GMLua(lua_State* l);
 	GMLua(const GMLua& lua);
 	GMLua(GMLua&& lua) noexcept;
 	GMLua& operator= (const GMLua& state);
@@ -218,6 +370,9 @@ public:
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
 	GMLuaStack getTopStack();
 	bool invoke(const char* expr);
+	void setTable(GMObject& obj);
+	bool getTable(GMObject& obj);
+	bool getTable(GMObject& obj, GMint index);
 
 public:
 	template <size_t _size> GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
@@ -243,8 +398,6 @@ private:
 	void loadLibrary();
 	void callExceptionHandler(GMLuaStatus state, const char* msg);
 	GMLuaStatus callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet);
-	void setTable(GMObject& obj);
-	bool getTable(GMObject& obj);
 	void push(const GMLuaVariable& var);
 	void push(const char* name, const GMObjectMember& member);
 	GMLuaVariable pop();

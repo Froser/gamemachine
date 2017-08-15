@@ -505,6 +505,9 @@ private:
 
 				if (kbState.keyTriggered('P'))
 					rotate = !rotate;
+
+				if (kbState.keydown('B'))
+					GameMachine::instance().postMessage({ GM_MESSAGE_CONSOLE });
 			}
 			break;
 		case gm::GameMachineEvent::Deactivate:
