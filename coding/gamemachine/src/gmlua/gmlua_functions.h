@@ -23,6 +23,7 @@ namespace luaapi
 		GM_LUA_API int math_rotate(lua_State* L);
 		GM_LUA_API int math_mxm(lua_State* L);
 		GM_LUA_API int math_vxm(lua_State* L);
+		GM_LUA_API int math_vlerp(lua_State* L);
 	}
 }
 

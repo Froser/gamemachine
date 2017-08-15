@@ -91,6 +91,7 @@ extern "C"
 		{ "rotate", math_rotate },
 		{ "mxm", math_mxm },
 		{ "vxm", math_vxm },
+		{ "vlerp", math_vlerp },
 		{ 0, 0 }
 	};
 
@@ -154,6 +155,21 @@ extern "C"
 		linear_math::Vector4 result = (linear_math::Vector4)v * m;
 		GMLua_Vector4 luaVec(result[0], result[1], result[2], result[3]);
 		lua.setTable(luaVec);
+		return 1;
+	}
+
+	GM_LUA_API int math_vlerp(lua_State* L)
+	{
+		GMLua lua(L);
+		GMLua_Vector4 v1, v2;
+		lua.getTable(v1, 1);
+		lua.getTable(v2, 2);
+		GMfloat p = lua_tonumber(L, 3);
+		linear_math::Vector4 vec1 = (linear_math::Vector4)v1,
+			vec2 = linear_math::Vector4(v2);
+		linear_math::Vector4 result = linear_math::lerp(vec1, vec2, p);
+		GMLua_Vector4 vecResult(result[0], result[1], result[2], result[3]);
+		lua.setTable(vecResult);
 		return 1;
 	}
 }
