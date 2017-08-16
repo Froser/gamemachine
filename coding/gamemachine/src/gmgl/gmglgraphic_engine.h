@@ -5,12 +5,19 @@
 #include "gmengine/resource_container.h"
 #include "foundation/utilities/utilities.h"
 #include <map>
+#include "gmglgbuffer.h"
 BEGIN_NS
 
 class Camera;
 class GMGameWorld;
 class GameLight;
 struct IRender;
+
+enum class GMGLRenderMode
+{
+	ForwardRendering,
+	DeferredRendering,
+};
 
 GM_INTERFACE(IShaderLoadCallback)
 {
@@ -20,6 +27,7 @@ GM_INTERFACE(IShaderLoadCallback)
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	bool needRefreshLights = true;
+	GMGLRenderMode renderMode = GMGLRenderMode::ForwardRendering;
 	Vector<GMLight> lights;
 	Map<GMMeshType, GMGLShaderProgram*> allShaders;
 	Map<GMMeshType, IRender*> allRenders;
@@ -28,6 +36,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GraphicSettings* settings = nullptr;
 	linear_math::Matrix4x4 viewMatrix;
 	linear_math::Matrix4x4 projectionMatrix;
+	GMGLGBuffer gbuffer;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -41,7 +50,7 @@ public:
 public:
 	virtual void start() override;
 	virtual void newFrame() override;
-	virtual void setViewport(const GMRect& rect) override;
+	virtual void event(const GameMachineMessage& e) override;
 	virtual void drawObject(GMGameObject* obj) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
@@ -56,8 +65,10 @@ public:
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(GMMeshType objectType);
+	void setRenderMode(GMGLRenderMode mode);
 
 private:
+	void setViewport(const GMRect& rect);
 	void registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders);
 	void updateMatrices(const CameraLookAt& lookAt);
 	void installShaders();

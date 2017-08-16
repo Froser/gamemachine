@@ -183,20 +183,18 @@ bool GameMachine::handleMessages()
 
 		switch (msg.msgType)
 		{
-		case gm::GM_MESSAGE_EXIT:
+		case GameMachineMessageType::OnExit:
 			return false;
-		case gm::GM_MESSAGE_CONSOLE:
+		case GameMachineMessageType::OnConsole:
 			{
 				d->consoleWindow->centerWindow();
 				d->consoleWindow->showWindow(true, true);
 			}
-		case gm::GM_MESSAGE_WINDOW_SIZE:
-			d->engine->setViewport(d->mainWindow->getClientRect());
-			break;
 		default:
 			break;
 		}
 
+		d->engine->event(msg);
 		d->messageQueue.pop();
 	}
 	return true;

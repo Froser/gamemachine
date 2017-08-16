@@ -41,6 +41,34 @@ enum class GameMachineEvent
 	Terminate,
 };
 
+enum class GameMachineMessageType
+{
+	OnExit,
+	OnConsole,
+	OnWindowSizeChanged,
+};
+
+struct GameMachineMessage
+{
+	enum ParamType
+	{
+		Type_GMObject,
+		Type_Bool,
+		Type_Int,
+	};
+
+	union Param
+	{
+		GMObject* obj;
+		bool b;
+		GMint i;
+	};
+
+	GameMachineMessageType msgType;
+	ParamType paramType;
+	Param param;
+};
+
 GM_INTERFACE(IGameHandler)
 {
 	virtual void init() = 0;
@@ -59,7 +87,7 @@ GM_INTERFACE(IGraphicEngine)
 {
 	virtual void start() = 0;
 	virtual void newFrame() = 0;
-	virtual void setViewport(const GMRect& rect) = 0;
+	virtual void event(const GameMachineMessage& e) = 0;
 	virtual void drawObject(GMGameObject* obj) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;

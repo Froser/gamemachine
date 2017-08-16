@@ -40,9 +40,26 @@ void GMGLGraphicEngine::newFrame()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }
 
-void GMGLGraphicEngine::setViewport(const GMRect& rect)
+void GMGLGraphicEngine::event(const GameMachineMessage& e)
 {
-	glViewport(rect.x, rect.y, rect.width, rect.height);
+	D(d);
+	switch (e.msgType)
+	{
+	case GameMachineMessageType::OnWindowSizeChanged:
+	{
+		GMRect rect = GM.getMainWindow()->getClientRect();
+		setViewport(rect);
+		d->gbuffer.dispose();
+		if (!d->gbuffer.init(rect.width, rect.height))
+		{
+			gm_error("init gbuffer error");
+			setRenderMode(GMGLRenderMode::ForwardRendering); // if error occurs, back into foward rendering
+		}
+		break;
+	}
+	default:
+		break;
+	}
 }
 
 void GMGLGraphicEngine::drawObject(GMGameObject* object)
@@ -53,7 +70,7 @@ void GMGLGraphicEngine::drawObject(GMGameObject* object)
 	if (d->needRefreshLights)
 	{
 		d->needRefreshLights = false;
-		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+		IGraphicEngine* engine = GM.getGraphicEngine();
 		activateLight(d->lights);
 	}
 
@@ -63,13 +80,6 @@ void GMGLGraphicEngine::drawObject(GMGameObject* object)
 void GMGLGraphicEngine::installShaders()
 {
 	D(d);
-	// 装载所有OpenGL着色器
-	const GMString shaderMap[] =
-	{
-		_L("object"),
-		_L("glyph"),
-	};
-
 	// 按照Object顺序创建renders
 	IRender* renders[] = {
 		new GMGLRenders_Object(),
@@ -77,7 +87,7 @@ void GMGLGraphicEngine::installShaders()
 		new GMGLRenders_Particle(),
 	};
 
-	GMGamePackage* package = GameMachine::instance().getGamePackageManager();
+	GMGamePackage* package = GM.getGamePackageManager();
 
 	GM_FOREACH_ENUM_CLASS(type, GMMeshType, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
@@ -163,13 +173,18 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 {
 	D(d);
-	GMCamera& camera = GameMachine::instance().getCamera();
+	GMCamera& camera = GM.getCamera();
 
 	d->projectionMatrix = camera.getFrustum().getPerspective();
 	d->viewMatrix = getViewMatrix(lookAt);
 
 	camera.getFrustum().updateViewMatrix(d->viewMatrix, d->projectionMatrix);
 	camera.getFrustum().update();
+}
+
+void GMGLGraphicEngine::setViewport(const GMRect& rect)
+{
+	glViewport(rect.x, rect.y, rect.width, rect.height);
 }
 
 void GMGLGraphicEngine::registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders)
@@ -200,6 +215,12 @@ IRender* GMGLGraphicEngine::getRender(GMMeshType objectType)
 		return nullptr;
 
 	return d->allRenders[objectType];
+}
+
+void GMGLGraphicEngine::setRenderMode(GMGLRenderMode mode)
+{
+	D(d);
+	d->renderMode = mode;
 }
 
 ResourceContainer* GMGLGraphicEngine::getResourceContainer()

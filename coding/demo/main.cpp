@@ -149,9 +149,9 @@ public:
 			IMouseState& mouseState = inputManager->getMouseState();
 
 			if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-				GameMachine::instance().postMessage({ GM_MESSAGE_EXIT });
+				GameMachine::instance().postMessage({ GameMachineMessageType::OnExit });
 			if (kbState.keydown('B'))
-				GameMachine::instance().postMessage({ GM_MESSAGE_CONSOLE });
+				GameMachine::instance().postMessage({ GameMachineMessageType::OnConsole });
 
 			GMMovement moveTag = MC_NONE;
 			GMMoveRate rate;
@@ -501,13 +501,13 @@ private:
 					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
 
 				if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-					GameMachine::instance().postMessage({ GM_MESSAGE_EXIT });
+					GameMachine::instance().postMessage({ GameMachineMessageType::OnExit });
 
 				if (kbState.keyTriggered('P'))
 					rotate = !rotate;
 
 				if (kbState.keydown('B'))
-					GameMachine::instance().postMessage({ GM_MESSAGE_CONSOLE });
+					GameMachine::instance().postMessage({ GameMachineMessageType::OnConsole });
 			}
 			break;
 		case gm::GameMachineEvent::Deactivate:

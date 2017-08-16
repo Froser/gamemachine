@@ -16,14 +16,14 @@ uniform GM_texture_t GM_ambient_texture;
 
 out vec4 frag_color;
 
-vec4 calcTexture(GM_texture_t tex, vec2 uv)
+vec4 calcTexture(GM_texture_t texture, vec2 uv)
 {
 	bool hasTexture = false;
 	vec4 result = vec4(0);
-	result += tex.enabled == 1
-		? texture(tex.texture, uv * vec2(tex.scale_s, tex.scale_t) + vec2(tex.scroll_s, tex.scroll_t))
+	result += texture.enabled == 1
+		? texture(texture.texture, uv * vec2(texture.scale_s, texture.scale_t) + vec2(texture.scroll_s, texture.scroll_t))
 		: vec4(0);
-	if (tex.enabled == 1)
+	if (texture.enabled == 1)
 		hasTexture = true;
 
 	if (!hasTexture)

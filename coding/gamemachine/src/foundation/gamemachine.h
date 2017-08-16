@@ -13,33 +13,7 @@
 
 BEGIN_NS
 
-enum GameMachineMessageType
-{
-	GM_MESSAGE_EXIT,
-	GM_MESSAGE_CONSOLE,
-	GM_MESSAGE_WINDOW_SIZE,
-};
-
-struct GameMachineMessage
-{
-	enum ParamType
-	{
-		Type_GMObject,
-		Type_Bool,
-		Type_Int,
-	};
-
-	union Param
-	{
-		GMObject* obj;
-		bool b;
-		GMint i;
-	};
-
-	GameMachineMessageType msgType;
-	ParamType paramType;
-	Param param;
-};
+#define GM GameMachine::instance()
 
 typedef Vector<Pair<GMUIWindow*, GMUIWindowAttributes> > GameMachineWindows;
 

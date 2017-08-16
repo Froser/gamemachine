@@ -87,6 +87,8 @@ set(SOURCES
 		gmgl/gmglfactory.cpp
 		gmgl/gmglgamepackagehandler.h
 		gmgl/gmglgamepackagehandler.cpp
+		gmgl/gmglgbuffer.h
+		gmgl/gmglgbuffer.cpp
 		gmgl/gmglglyphmanager.h
 		gmgl/gmglglyphmanager.cpp
 		gmgl/gmglgraphic_engine.h

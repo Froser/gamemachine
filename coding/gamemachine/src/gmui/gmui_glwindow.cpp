@@ -120,8 +120,11 @@ LongResult GMUIGLWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPar
 		::PostQuitMessage(0L);
 		break;
 	case WM_SIZE:
-		GameMachine::instance().postMessage({ GM_MESSAGE_WINDOW_SIZE });
-		break;
+		{
+			auto res = DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
+			GameMachine::instance().postMessage({ GameMachineMessageType::OnWindowSizeChanged });
+			return res;
+		}
 	default:
 		break;
 	}

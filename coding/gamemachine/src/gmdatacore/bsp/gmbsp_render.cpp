@@ -108,7 +108,6 @@ void GMBSPRender::generateVertices()
 		d->vertices[i].position[0] = d->bsp->vertices[i].xyz[0];
 		d->vertices[i].position[1] = d->bsp->vertices[i].xyz[1];
 		d->vertices[i].position[2] = d->bsp->vertices[i].xyz[2];
-		d->vertices[i].position[3] = 1.0f;
 
 		//scale down
 		// d->vertices[i].position /= SCALING_DOWN;

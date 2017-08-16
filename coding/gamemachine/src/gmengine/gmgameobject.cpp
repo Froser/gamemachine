@@ -98,7 +98,7 @@ void GMGlyphObject::constructModel()
 	D(d);
 	D_BASE(db, GMGameObject);
 
-	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
+	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	GMModel* model = new GMModel();
 	GMMesh* child = new GMMesh();
 	model->append(child);
@@ -136,8 +136,8 @@ void GMGlyphObject::updateModel()
 void GMGlyphObject::createVertices(GMComponent* component)
 {
 	D(d);
-	GMGlyphManager* glyphManager = GameMachine::instance().getGlyphManager();
-	GMUIWindow* window = GameMachine::instance().getMainWindow();
+	GMGlyphManager* glyphManager = GM.getGlyphManager();
+	GMUIWindow* window = GM.getMainWindow();
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
