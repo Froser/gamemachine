@@ -512,6 +512,11 @@ namespace linear_math
 	GM_ALIGNED_16(class) Matrix4x4
 	{
 	public:
+		enum
+		{
+			dimension = 4,
+		};
+
 		Matrix4x4() = default;
 		Matrix4x4(const Vector4& r1, const Vector4& r2, const Vector4& r3, const Vector4& r4)
 		{

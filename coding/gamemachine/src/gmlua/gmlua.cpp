@@ -162,23 +162,6 @@ GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GM
 	return result;
 }
 
-GMLuaStack GMLua::getTopStack()
-{
-	D(d);
-	GMLuaStack stack;
-	stack.index = lua_gettop(L);
-	stack.type = lua_type(L, stack.index);
-	if (stack.type == LUA_TNIL)
-		stack.other = 0;
-	else if (stack.type == LUA_TBOOLEAN)
-		stack.valBool = !!lua_toboolean(L, stack.index);
-	else if (stack.type == LUA_TNUMBER)
-		stack.valDouble = lua_tonumber(L, stack.index);
-	else if (stack.type == LUA_TSTRING)
-		stack.valStr = lua_tostring(L, stack.index);
-	return stack;
-}
-
 bool GMLua::invoke(const char* expr)
 {
 	D(d);
@@ -250,8 +233,8 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 	lua_pushnil(L);
 	while (lua_next(L, index))
 	{
+		POP_GUARD(); // Make sure pop every value
 		ASSERT(lua_isstring(L, -2));
-		POP_GUARD();
 		const char* key = lua_tostring(L, -2);
 		for (const auto member : *meta)
 		{
@@ -273,47 +256,30 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 					break;
 				case GMMetaMemberType::Vector2:
 					{
-						GMLua_Vector2 v;
-						if (!getTable(v))
+						linear_math::Vector2& v = *static_cast<linear_math::Vector2*>(member.second.ptr);
+						if (!getVector(v))
 							return false;
-						linear_math::Vector2* vec2 = static_cast<linear_math::Vector2*>(member.second.ptr);
-						(*vec2)[0] = v.x();
-						(*vec2)[1] = v.y();
 					}
 					break;
 				case GMMetaMemberType::Vector3:
 					{
-						GMLua_Vector3 v;
-						if (!getTable(v))
+						linear_math::Vector3& v = *static_cast<linear_math::Vector3*>(member.second.ptr);
+						if (!getVector(v))
 							return false;
-						linear_math::Vector3* vec3 = static_cast<linear_math::Vector3*>(member.second.ptr);
-						(*vec3)[0] = v.x();
-						(*vec3)[1] = v.y();
-						(*vec3)[2] = v.z();
 					}
 					break;
 				case GMMetaMemberType::Vector4:
 					{
-						GMLua_Vector4 v;
-						if (!getTable(v))
+						linear_math::Vector4& v = *static_cast<linear_math::Vector4*>(member.second.ptr);
+						if (!getVector(v))
 							return false;
-						linear_math::Vector4* vec4 = static_cast<linear_math::Vector4*>(member.second.ptr);
-						(*vec4)[0] = v.x();
-						(*vec4)[1] = v.y();
-						(*vec4)[2] = v.z();
-						(*vec4)[3] = v.w();
 					}
 					break;
 				case GMMetaMemberType::Matrix4x4:
 					{
-						GMLua_Matrix4x4 mat;
-						if (!getTable(mat))
+						linear_math::Matrix4x4& mat = *static_cast<linear_math::Matrix4x4*>(member.second.ptr);
+						if (!getMatrix(mat))
 							return false;
-						linear_math::Matrix4x4& mat4 = *static_cast<linear_math::Matrix4x4*>(member.second.ptr);
-						mat4[0] = mat.r1();
-						mat4[1] = mat.r2();
-						mat4[2] = mat.r3();
-						mat4[3] = mat.r4();
 					}
 					break;
 				case GMMetaMemberType::Object:
@@ -388,32 +354,28 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	case GMMetaMemberType::Vector2:
 		{
 			linear_math::Vector2& vec2 = *static_cast<linear_math::Vector2*>(member.ptr);
-			GMLua_Vector2 lua_vec2(vec2[0], vec2[1]);
-			setTable(lua_vec2);
+			setVector(vec2);
 			ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector3:
 		{
 			linear_math::Vector3& vec3 = *static_cast<linear_math::Vector3*>(member.ptr);
-			GMLua_Vector3 lua_vec3(vec3[0], vec3[1], vec3[2]);
-			setTable(lua_vec3);
+			setVector(vec3);
 			ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector4:
 		{
 			linear_math::Vector4& vec4 = *static_cast<linear_math::Vector4*>(member.ptr);
-			GMLua_Vector4 lua_vec4(vec4[0], vec4[1], vec4[2], vec4[3]);
-			setTable(lua_vec4);
+			setVector(vec4);
 			ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Matrix4x4:
 		{
 			linear_math::Matrix4x4& mat= *static_cast<linear_math::Matrix4x4*>(member.ptr);
-			GMLua_Matrix4x4 lua_vec4(mat[0], mat[1], mat[2], mat[3]);
-			setTable(lua_vec4);
+			setMatrix(mat);
 			ASSERT(lua_istable(L, -1));
 		}
 		break;
@@ -426,7 +388,6 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	}
 
 	ASSERT(lua_istable(L, -3));
-	GMint top = lua_gettop(L);
 	lua_settable(L, -3);
 }
 

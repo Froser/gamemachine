@@ -144,7 +144,7 @@
 #endif
 
 #if !defined(LUA_FLOAT_TYPE)
-#define LUA_FLOAT_TYPE	LUA_FLOAT_DOUBLE
+#define LUA_FLOAT_TYPE	LUA_FLOAT_FLOAT
 #endif
 
 /* }================================================================== */

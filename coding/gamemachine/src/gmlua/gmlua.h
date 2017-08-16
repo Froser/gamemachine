@@ -12,154 +12,14 @@ extern "C"
 #include "lualib.h"
 }
 
-GM_PRIVATE_OBJECT(GMLua_Vector2)
-{
-	GMfloat x;
-	GMfloat y;
-};
-
-class GMLua_Vector2 : public GMObject
-{
-	DECLARE_PRIVATE(GMLua_Vector2)
-
-	GM_BEGIN_META_MAP
-		GM_META(x, GMMetaMemberType::Float)
-		GM_META(y, GMMetaMemberType::Float)
-	GM_END_META_MAP
-
-public:
-	GMLua_Vector2() = default;
-
-	GMLua_Vector2(GMfloat x, GMfloat y)
-	{
-		D(d);
-		d->x = x;
-		d->y = y;
-	}
-
-	GMfloat x() const { D(d); return d->x; }
-	GMfloat y() const { D(d); return d->y; }
-};
-
-GM_PRIVATE_OBJECT_FROM(GMLua_Vector3, GMLua_Vector2)
-{
-	GMfloat z;
-};
-
-class GMLua_Vector3 : public GMLua_Vector2
-{
-	DECLARE_PRIVATE(GMLua_Vector3)
-
-	GM_BEGIN_META_MAP_FROM(GMLua_Vector2)
-		GM_META(z, GMMetaMemberType::Float)
-	GM_END_META_MAP
-
-public:
-	GMLua_Vector3() = default;
-
-	GMLua_Vector3(GMfloat x, GMfloat y, GMfloat z)
-		: GMLua_Vector2(x, y)
-	{
-		D(d);
-		d->z = z;
-	}
-
-	GMLua_Vector3(const linear_math::Vector3& v)
-	{
-		D(d);
-		D_BASE(db, GMLua_Vector2);
-		db->x = v[0];
-		db->y = v[1];
-		d->z = v[2];
-	}
-
-	GMfloat z() const { D(d); return d->z; }
-};
-
-GM_PRIVATE_OBJECT_FROM(GMLua_Vector4, GMLua_Vector3)
-{
-	GMfloat w;
-};
-
-class GMLua_Vector4 : public GMLua_Vector3
-{
-	DECLARE_PRIVATE(GMLua_Vector4)
-
-	GM_BEGIN_META_MAP_FROM(GMLua_Vector3)
-		GM_META(w, GMMetaMemberType::Float)
-	GM_END_META_MAP
-
-public:
-	GMLua_Vector4() = default;
-
-	GMLua_Vector4(GMfloat x, GMfloat y, GMfloat z, GMfloat w)
-		: GMLua_Vector3(x, y, z)
-	{
-		D(d);
-		d->w = w;
-	}
-
-	GMLua_Vector4& operator=(const GMLua_Vector4& rhs)
-	{
-		D(d);
-		d->x = rhs.x();
-		d->y = rhs.y();
-		d->z = rhs.z();
-		d->w = rhs.w();
-		return *this;
-	}
-
-	operator linear_math::Vector4()
-	{
-		return linear_math::Vector4(x(), y(), z(), w());
-	}
-
-	GMfloat w() const { D(d); return d->w; }
-};
-
-GM_PRIVATE_OBJECT(GMLua_Matrix4x4)
-{
-	linear_math::Vector4 r1, r2, r3, r4;
-};
-
-class GMLua_Matrix4x4 : public GMObject
-{
-	DECLARE_PRIVATE(GMLua_Matrix4x4)
-
-	GM_BEGIN_META_MAP
-		GM_META(r1, GMMetaMemberType::Vector4)
-		GM_META(r2, GMMetaMemberType::Vector4)
-		GM_META(r3, GMMetaMemberType::Vector4)
-		GM_META(r4, GMMetaMemberType::Vector4)
-	GM_END_META_MAP
-
-public:
-	GMLua_Matrix4x4() = default;
-
-	GMLua_Matrix4x4(const linear_math::Matrix4x4& mat)
-		: GMLua_Matrix4x4(mat[0], mat[1], mat[2], mat[3])
-	{
-	}
-
-	GMLua_Matrix4x4(const linear_math::Vector4& r1, const linear_math::Vector4& r2, const linear_math::Vector4& r3, const linear_math::Vector4& r4)
-	{
-		D(d);
-		d->r1 = r1;
-		d->r2 = r2;
-		d->r3 = r3;
-		d->r4 = r4;
-	}
-
-	operator linear_math::Matrix4x4()
-	{
-		return linear_math::Matrix4x4(r1(), r2(), r3(), r4());
-	}
-
-	linear_math::Vector4& r1() { D(d); return d->r1; }
-	linear_math::Vector4& r2() { D(d); return d->r2; }
-	linear_math::Vector4& r3() { D(d); return d->r3; }
-	linear_math::Vector4& r4() { D(d); return d->r4; }
-};
+#define L (d->luaState)
+#define POP_GUARD() \
+struct __PopGuard							\
+{											\
+	__PopGuard(lua_State* __L) : m_L(__L) {}\
+	~__PopGuard() { lua_pop(m_L, 1); }		\
+	lua_State* m_L;							\
+} __guard(*this);
 
 enum class GMLuaStatus
 {
@@ -194,7 +54,7 @@ struct GMLuaVariable
 		GMObject* valPtrObject;
 		GMLargeInteger valInt;
 		bool valBoolean;
-		double valFloat;
+		GMfloat valFloat;
 	};
 
 	GMLuaVariable(const GMLuaVariable& v)
@@ -274,12 +134,6 @@ struct GMLuaVariable
 	{
 	}
 
-	GMLuaVariable(double d)
-		: type(GMLuaVariableType::Number)
-		, valFloat(d)
-	{
-	}
-
 	explicit GMLuaVariable(bool d)
 		: type(GMLuaVariableType::Boolean)
 		, valBoolean(d)
@@ -323,19 +177,6 @@ struct GMLuaVariable
 	}
 };
 
-struct GMLuaStack
-{
-	GMint type;
-	GMint index;
-	union
-	{
-		bool valBool;
-		const char* valStr;
-		void* other;
-		double valDouble;
-	};
-};
-
 GM_PRIVATE_OBJECT(GMLua)
 {
 	bool weakRef = false;
@@ -368,7 +209,6 @@ public:
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
 	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
-	GMLuaStack getTopStack();
 	bool invoke(const char* expr);
 	void setTable(GMObject& obj);
 	bool getTable(GMObject& obj);
@@ -394,6 +234,92 @@ public:
 		return d->luaState;
 	}
 
+
+	template <typename T>
+	void setVector(const T& v)
+	{
+		D(d);
+		lua_newtable(L);
+		for (GMint i = 0; i < T::dimension; i++)
+		{
+			lua_pushnumber(L, i);
+			lua_pushnumber(L, v[i]);
+			ASSERT(lua_istable(L, -3));
+			lua_settable(L, -3);
+		}
+	}
+
+	template <typename T>
+	bool getVector(T& v)
+	{
+		D(d);
+		GMint index = lua_gettop(L);
+		return getVector(v, index);
+	}
+
+	template <typename T>
+	bool getVector(T& v, GMint index)
+	{
+		D(d);
+		ASSERT(lua_istable(L, index));
+		lua_pushnil(L);
+		while (lua_next(L, index))
+		{
+			POP_GUARD();
+			if (!lua_isinteger(L, -2))
+				return false;
+
+			GMint key = lua_tointeger(L, -2);
+			if (!lua_isnumber(L, -1))
+				return false;
+
+			v[key] = lua_tonumber(L, -1);
+		}
+		return true;
+	}
+
+	template <typename T>
+	void setMatrix(const T& v)
+	{
+		D(d);
+		lua_newtable(L);
+		for (GMint i = 0; i < T::dimension; i++)
+		{
+			lua_pushnumber(L, i);
+			setVector(v[i]);
+			ASSERT(lua_istable(L, -3));
+			lua_settable(L, -3);
+		}
+	}
+
+	template <typename T>
+	bool getMatrix(T& v)
+	{
+		D(d);
+		GMint index = lua_gettop(L);
+		return getMatrix(v, index);
+	}
+
+	template <typename T>
+	bool getMatrix(T& v, GMint index)
+	{
+		D(d);
+		ASSERT(lua_istable(L, index));
+		lua_pushnil(L);
+		while (lua_next(L, index))
+		{
+			POP_GUARD();
+			if (!lua_isinteger(L, -2))
+				return false;
+
+			GMint key = lua_tointeger(L, -2);
+			bool isVector = getVector(v[key]);
+			if (!isVector)
+				return false;
+		}
+		return true;
+	}
+
 private:
 	void loadLibrary();
 	void callExceptionHandler(GMLuaStatus state, const char* msg);
@@ -403,5 +329,7 @@ private:
 	GMLuaVariable pop();
 };
 
+#undef L
+#undef POP_GUARD
 END_NS
 #endif
