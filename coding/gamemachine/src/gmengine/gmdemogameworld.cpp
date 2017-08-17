@@ -12,10 +12,7 @@ void GMDemoGameWorld::renderGameWorld()
 	Base::renderGameWorld();
 
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-	for (auto& object : d->renderList)
-	{
-		engine->drawObject(object.second);
-	}
+	engine->drawObjects(d->gameObjects.data(), d->gameObjects.size());
 }
 
 GMPhysicsWorld* GMDemoGameWorld::physicsWorld()
@@ -31,6 +28,7 @@ bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
 		return false;
 	d->renderList[name] = obj;
 	d->renderListInv[obj] = name;
+	d->gameObjects.push_back(obj);
 	appendObjectAndInit(obj);
 	return true;
 }
@@ -43,6 +41,7 @@ bool GMDemoGameWorld::removeObject(const GMString& name)
 	{
 		d->renderList.erase(name);
 		d->renderListInv.erase(object);
+		std::remove(d->gameObjects.begin(), d->gameObjects.end(), object);
 		return GMGameWorld::removeObject(object);
 	}
 	return false;

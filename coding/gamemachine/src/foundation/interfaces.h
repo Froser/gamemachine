@@ -88,7 +88,7 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void start() = 0;
 	virtual void newFrame() = 0;
 	virtual void event(const GameMachineMessage& e) = 0;
-	virtual void drawObject(GMGameObject* obj) = 0;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual ResourceContainer* getResourceContainer() = 0;
 	virtual void addLight(const GMLight& light) = 0;

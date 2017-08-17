@@ -12,6 +12,7 @@ GM_PRIVATE_OBJECT(GMDemoGameWorld)
 {
 	Map<GMString, GMGameObject*> renderList;
 	Map<const GMGameObject*, GMString> renderListInv;
+	Vector<GMGameObject*> gameObjects;
 };
 
 class GMDemoGameWorld : public GMGameWorld

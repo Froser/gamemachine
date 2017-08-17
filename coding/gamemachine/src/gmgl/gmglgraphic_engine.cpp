@@ -53,7 +53,7 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 		if (!d->gbuffer.init(rect.width, rect.height))
 		{
 			gm_error("init gbuffer error");
-			setRenderMode(GMGLRenderMode::ForwardRendering); // if error occurs, back into foward rendering
+			setRenderMode(GMGLRenderMode::ForwardRendering); // if error occurs, back into forward rendering
 		}
 		break;
 	}
@@ -62,7 +62,7 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 	}
 }
 
-void GMGLGraphicEngine::drawObject(GMGameObject* object)
+void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
 
@@ -74,7 +74,10 @@ void GMGLGraphicEngine::drawObject(GMGameObject* object)
 		activateLight(d->lights);
 	}
 
-	object->draw();
+	for (GMuint i = 0; i < count; i++)
+	{
+		objects[i]->draw();
+	}
 }
 
 void GMGLGraphicEngine::installShaders()

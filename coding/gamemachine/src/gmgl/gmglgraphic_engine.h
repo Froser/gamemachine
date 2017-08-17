@@ -51,7 +51,7 @@ public:
 	virtual void start() override;
 	virtual void newFrame() override;
 	virtual void event(const GameMachineMessage& e) override;
-	virtual void drawObject(GMGameObject* obj) override;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual ResourceContainer* getResourceContainer() override;
 	virtual void addLight(const GMLight& light) override;

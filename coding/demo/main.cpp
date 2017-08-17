@@ -567,7 +567,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
 

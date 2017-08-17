@@ -32,14 +32,9 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	GMBSPRender render;
 	GMBSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;
-	std::map<GMint, std::set<GMBSPEntity*> > entities;
+	Map<GMint, Set<GMBSPEntity*> > entities;
+	Vector<GMGameObject*> renderBuffer;
 
-	Vector<GMGameObject*> polygonFaceBuffer;
-	Vector<GMGameObject*> meshFaceBuffer;
-	Vector<GMGameObject*> patchBuffer;
-	Vector<GMGameObject*> entityBuffer;
-
-	//DrawPiece *drawPolygonFacePieces[DRAW_PIECE_COUNT];
 	DrawPolygonFaceJob* drawPolygonFaceJob;
 	DrawMeshFaceJob* drawMeshFaceJob;
 	DrawPatchJob* drawPatchJob;

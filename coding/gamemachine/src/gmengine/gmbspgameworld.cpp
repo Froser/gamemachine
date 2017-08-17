@@ -339,7 +339,7 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 void GMBSPGameWorld::drawAll()
 {
 	GM_PROFILE(drawAll);
-
+	clearBuffer();
 	drawSky();
 	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
 	{
@@ -347,66 +347,31 @@ void GMBSPGameWorld::drawAll()
 			calculateVisibleFaces();
 		drawFaces();
 	}
-	
 	drawAlwaysVisibleObjects();
+	flushBuffer();
 }
 
 void GMBSPGameWorld::drawSky()
 {
 	D(d);
 	if (d->sky)
-		GameMachine::instance().getGraphicEngine()->drawObject(d->sky);
+		d->renderBuffer.push_back(d->sky);
 }
 
 void GMBSPGameWorld::drawFaces()
 {
 	GM_PROFILE(drawFaces);
 	D(d);
-	clearBuffer();
-
-	{
-#if 0
-		SustainedThreadRunGuard guard;
-
-		{
-			GMuint start = 0;
-			GMBSPRenderData& rd = renderData();
-			GMuint eachGroupCount = rd.polygonIndices.size() / DRAW_PIECE_COUNT;
-			for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
-			{
-				GMuint end = start + eachGroupCount;
-				if (i == DRAW_PIECE_COUNT - 1)
-					end = rd.polygonIndices.size();
-
-				d->drawPolygonFacePieces[i]->setStart(start);
-				d->drawPolygonFacePieces[i]->setEnd(end);
-				guard.add(d->drawPolygonFacePieces[i]);
-				start = end;
-			}
-
-			for (auto& piece : d->drawPolygonFacePieces)
-			{
-				guard.trigger(piece);
-			}
-		}
-#endif
-
-		gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
-		gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
-		gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
-		gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
-	}
-
-	flushBuffer();
+	gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
+	gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
+	gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
+	gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
 }
 
 void GMBSPGameWorld::clearBuffer()
 {
 	D(d);
-	d->polygonFaceBuffer.clear();
-	d->meshFaceBuffer.clear();
-	d->patchBuffer.clear();
-	d->entityBuffer.clear();
+	d->renderBuffer.clear();
 }
 
 void GMBSPGameWorld::flushBuffer()
@@ -415,26 +380,7 @@ void GMBSPGameWorld::flushBuffer()
 
 	D(d);
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-
-	for (auto& obj : d->polygonFaceBuffer)
-	{
-		engine->drawObject(obj);
-	}
-
-	for (auto& obj : d->meshFaceBuffer)
-	{
-		engine->drawObject(obj);
-	}
-
-	for (auto& obj : d->patchBuffer)
-	{
-		engine->drawObject(obj);
-	}
-
-	for (auto& obj : d->entityBuffer)
-	{
-		engine->drawObject(obj);
-	}
+	engine->drawObjects(d->renderBuffer.data(), d->renderBuffer.size());
 }
 
 void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex)
@@ -537,7 +483,7 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	ASSERT(obj);
-	d->polygonFaceBuffer.push_back(obj);
+	d->renderBuffer.push_back(obj);
 }
 
 void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
@@ -555,7 +501,7 @@ void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 		return;
 
 	ASSERT(obj);
-	d->meshFaceBuffer.push_back(obj);
+	d->renderBuffer.push_back(obj);
 }
 
 void GMBSPGameWorld::drawPatch(GMint patchNumber)
@@ -581,7 +527,7 @@ void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 		return;
 
 	ASSERT(obj);
-	d->patchBuffer.push_back(obj);
+	d->renderBuffer.push_back(obj);
 }
 
 #ifdef NO_LAMBDA
@@ -614,7 +560,7 @@ void GMBSPGameWorld::drawEntity(GMint leafId)
 	{
 		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
-			d->entityBuffer.push_back(obj);
+			d->renderBuffer.push_back(obj);
 	});
 #endif
 }
@@ -623,10 +569,9 @@ void GMBSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
 	AlignedVector<GMGameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 	for (auto& obj : objs)
 	{
-		engine->drawObject(obj);
+		d->renderBuffer.push_back(obj);
 	}
 }
 
