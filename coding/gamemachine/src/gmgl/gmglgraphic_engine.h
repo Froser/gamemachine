@@ -79,6 +79,9 @@ private:
 	bool refreshGBuffer();
 	void geometryPass(GMGameObject *objects[], GMuint count);
 	void lightPass(GMGameObject *objects[], GMuint count);
+
+public:
+	static void newFrameOnCurrentContext();
 };
 
 END_NS

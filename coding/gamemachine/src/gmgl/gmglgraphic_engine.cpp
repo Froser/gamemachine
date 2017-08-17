@@ -39,7 +39,16 @@ void GMGLGraphicEngine::start()
 
 void GMGLGraphicEngine::newFrame()
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	D(d);
+	if (d->renderMode == GMGLRenderMode::DeferredRendering)
+	{
+		d->gbuffer.releaseBind();
+		newFrameOnCurrentContext();
+	}
+	else
+	{
+		newFrameOnCurrentContext();
+	}
 }
 
 void GMGLGraphicEngine::event(const GameMachineMessage& e)
@@ -208,8 +217,8 @@ bool GMGLGraphicEngine::refreshGBuffer()
 void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
+	d->gbuffer.newFrame();
 	d->gbuffer.bindForWriting();
-	newFrame();
 
 	for (GMuint i = 0; i < count; i++)
 	{
@@ -372,4 +381,9 @@ void GMGLGraphicEngine::beginUseStencil(bool inverse)
 void GMGLGraphicEngine::endUseStencil()
 {
 	glDisable(GL_STENCIL_TEST);
+}
+
+void GMGLGraphicEngine::newFrameOnCurrentContext()
+{
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 }

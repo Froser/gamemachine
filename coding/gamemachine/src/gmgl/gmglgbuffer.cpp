@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmglgbuffer.h"
+#include "gmglgraphic_engine.h"
 
 #define TEXTURE_NUM (GMuint) GBufferTextureType::EndOfTextureType
 
@@ -107,5 +108,12 @@ void GMGLGBuffer::releaseBind()
 void GMGLGBuffer::setReadBuffer(GBufferTextureType TextureType)
 {
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + (GMuint) TextureType);
+}
+
+void GMGLGBuffer::newFrame()
+{
+	bindForWriting();
+	GMGLGraphicEngine::newFrameOnCurrentContext();
+	releaseBind();
 }
 

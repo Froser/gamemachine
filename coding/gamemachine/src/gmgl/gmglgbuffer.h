@@ -40,6 +40,7 @@ public:
 	void bindForReading();
 	void releaseBind();
 	void setReadBuffer(GBufferTextureType TextureType);
+	void newFrame();
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }
