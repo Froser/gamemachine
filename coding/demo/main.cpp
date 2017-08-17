@@ -67,6 +67,7 @@ public:
 	{
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
+		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -246,7 +247,7 @@ public:
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
-	bool onLoadShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) override
+	bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram* shader)
 	{
 		bool flag = false;
 		GMBuffer vertBuf, fragBuf;
@@ -268,7 +269,6 @@ public:
 			flag = true;
 			break;
 		default:
-			flag = false;
 			break;
 		}
 
@@ -280,8 +280,36 @@ public:
 			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
 		};
 
-		shaderProgram->attachShader(shadersInfo[0]);
-		shaderProgram->attachShader(shadersInfo[1]);
+		shader->attachShader(shadersInfo[0]);
+		shader->attachShader(shadersInfo[1]);
+		return flag;
+	}
+
+	bool onLoadDeferredShader(const GMMeshType type, GMGLShaderProgram* shader)
+	{
+		bool flag = false;
+		GMBuffer vertBuf, fragBuf;
+		switch (type)
+		{
+		case GMMeshType::Model:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_pass.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_pass.frag", &fragBuf);
+			flag = true;
+			break;
+		default:
+			break;
+		}
+
+		vertBuf.convertToStringBuffer();
+		fragBuf.convertToStringBuffer();
+
+		GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+		};
+
+		shader->attachShader(shadersInfo[0]);
+		shader->attachShader(shadersInfo[1]);
 		return flag;
 	}
 
@@ -435,7 +463,7 @@ private:
 			GMPrimitiveCreator::createQuad(extents, pos, &m, GMMeshType::Particles);
 			GMCustomParticlesEmitter* emitter = new GMCustomParticlesEmitter(m);
 			emitter->load(buffer);
-			demo->appendObject("particles", emitter);
+			//demo->appendObject("particles", emitter);
 		}
 
 		CameraLookAt lookAt;
@@ -472,7 +500,7 @@ private:
 				//mask->draw();
 				demo->endCreateStencil();
 
-				demo->beginUseStencil(true);
+				//demo->beginUseStencil(true);
 
 				if (rotate)
 					a += .01f;
@@ -487,7 +515,7 @@ private:
 				obj->setRotation(q);
 				demo->renderGameWorld();
 
-				demo->endUseStencil();
+				//demo->endUseStencil();
 				break;
 			}
 		case gm::GameMachineEvent::Activate:
@@ -567,9 +595,8 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
-
 
 #if 0
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();

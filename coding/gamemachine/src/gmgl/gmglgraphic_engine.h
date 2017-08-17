@@ -21,7 +21,8 @@ enum class GMGLRenderMode
 
 GM_INTERFACE(IShaderLoadCallback)
 {
-	virtual bool onLoadShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) = 0;
+	virtual bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) = 0;
+	virtual bool onLoadDeferredShader(const GMMeshType type, GMGLShaderProgram* shaderProgram) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
@@ -29,7 +30,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	bool needRefreshLights = true;
 	GMGLRenderMode renderMode = GMGLRenderMode::ForwardRendering;
 	Vector<GMLight> lights;
-	Map<GMMeshType, GMGLShaderProgram*> allShaders;
+	Map<GMMeshType, Pair<GMGLShaderProgram*, GMGLShaderProgram*> > allShaders;
 	Map<GMMeshType, IRender*> allRenders;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
@@ -69,11 +70,15 @@ public:
 
 private:
 	void setViewport(const GMRect& rect);
-	void registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders);
+	void registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram, AUTORELEASE GMGLShaderProgram* deferredShaderProgram);
 	void updateMatrices(const CameraLookAt& lookAt);
 	void installShaders();
-	bool loadDefaultShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram);
+	bool loadDefaultForwardShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram);
+	bool loadDefaultDeferredShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram);
 	void activateLight(const Vector<GMLight>& lights);
+	bool refreshGBuffer();
+	void geometryPass(GMGameObject *objects[], GMuint count);
+	void lightPass(GMGameObject *objects[], GMuint count);
 };
 
 END_NS

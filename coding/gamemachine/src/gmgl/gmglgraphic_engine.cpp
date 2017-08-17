@@ -18,8 +18,10 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	D(d);
 	for (auto iter = d->allShaders.begin(); iter != d->allShaders.end(); iter++)
 	{
-		if ((*iter).second)
-			delete (*iter).second;
+		if ((*iter).second.first)
+			delete (*iter).second.first;
+		if ((*iter).second.second)
+			delete (*iter).second.second;
 	}
 
 	for (auto iter = d->allRenders.begin(); iter != d->allRenders.end(); iter++)
@@ -49,11 +51,14 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 	{
 		GMRect rect = GM.getMainWindow()->getClientRect();
 		setViewport(rect);
-		d->gbuffer.dispose();
-		if (!d->gbuffer.init(rect.width, rect.height))
+
+		if (d->renderMode == GMGLRenderMode::DeferredRendering)
 		{
-			gm_error("init gbuffer error");
-			setRenderMode(GMGLRenderMode::ForwardRendering); // if error occurs, back into forward rendering
+			if (!refreshGBuffer())
+			{
+				gm_error("init gbuffer error");
+				setRenderMode(GMGLRenderMode::ForwardRendering); // if error occurs, back into forward rendering
+			}
 		}
 		break;
 	}
@@ -74,9 +79,18 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		activateLight(d->lights);
 	}
 
-	for (GMuint i = 0; i < count; i++)
+	if (d->renderMode == GMGLRenderMode::ForwardRendering)
 	{
-		objects[i]->draw();
+		for (GMuint i = 0; i < count; i++)
+		{
+			objects[i]->draw();
+		}
+	}
+	else
+	{
+		ASSERT(d->renderMode == GMGLRenderMode::DeferredRendering);
+		geometryPass(objects, count);
+		lightPass(objects, count);
 	}
 }
 
@@ -94,27 +108,38 @@ void GMGLGraphicEngine::installShaders()
 
 	GM_FOREACH_ENUM_CLASS(type, GMMeshType, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
-		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadShader(type, shaderProgram)) )
+		GMGLShaderProgram* forwardShaderProgram = new GMGLShaderProgram();
+		GMGLShaderProgram* deferredShaderProgram = new GMGLShaderProgram();
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadForwardShader(type, forwardShaderProgram)) )
 		{
-			if (!loadDefaultShaders(type, shaderProgram))
+			if (!loadDefaultForwardShaders(type, forwardShaderProgram))
 			{
-				delete shaderProgram;
-				shaderProgram = nullptr;
+				delete forwardShaderProgram;
+				forwardShaderProgram = nullptr;
 			}
 		}
 
-		if (shaderProgram)
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredShader(type, deferredShaderProgram)))
 		{
-			shaderProgram->load();
-			registerShader(type, shaderProgram);
+			if (!loadDefaultDeferredShaders(type, deferredShaderProgram))
+			{
+				delete deferredShaderProgram;
+				deferredShaderProgram = nullptr;
+			}
 		}
 
+		if (forwardShaderProgram)
+			forwardShaderProgram->load();
+
+		if (deferredShaderProgram)
+			deferredShaderProgram->load();
+		
+		registerShader(type, forwardShaderProgram, deferredShaderProgram);
 		registerRender(type, renders[(GMint) type]);
 	}
 }
 
-bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram)
+bool GMGLGraphicEngine::loadDefaultForwardShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram)
 {
 	bool flag = false;
 	switch (type)
@@ -140,6 +165,22 @@ bool GMGLGraphicEngine::loadDefaultShaders(const GMMeshType type, GMGLShaderProg
 	return flag;
 }
 
+bool GMGLGraphicEngine::loadDefaultDeferredShaders(const GMMeshType type, GMGLShaderProgram* shaderProgram)
+{
+	bool flag = false;
+	switch (type)
+	{
+	case GMMeshType::Model:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object_pass.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object_pass.frag });
+		flag = true;
+		break;
+	default:
+		break;
+	}
+	return flag;
+}
+
 void GMGLGraphicEngine::activateLight(const Vector<GMLight>& lights)
 {
 	D(d);
@@ -154,6 +195,58 @@ void GMGLGraphicEngine::activateLight(const Vector<GMLight>& lights)
 			render->activateLight(light, id);
 		}
 	}
+}
+
+bool GMGLGraphicEngine::refreshGBuffer()
+{
+	D(d);
+	GMRect rect = GM.getMainWindow()->getClientRect();
+	d->gbuffer.dispose();
+	return d->gbuffer.init(rect.width, rect.height);
+}
+
+void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	d->gbuffer.bindForWriting();
+	newFrame();
+
+	for (GMuint i = 0; i < count; i++)
+	{
+		objects[i]->draw();
+	}
+
+	ASSERT(glGetError() == GL_NO_ERROR);
+	d->gbuffer.releaseBind();
+}
+
+void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	newFrame();
+
+	// 开始写4个缓存
+	const GMuint& w = d->gbuffer.getWidth(),
+		&h = d->gbuffer.getHeight();
+	GMuint hw = w / 2, hh = h / 2;
+	GLenum errCode;
+
+	d->gbuffer.bindForReading();
+	d->gbuffer.setReadBuffer(GBufferTextureType::Tangent);
+	glBlitFramebuffer(0, 0, w, h, 0, 0, hw, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	d->gbuffer.setReadBuffer(GBufferTextureType::Bitangent);
+	glBlitFramebuffer(0, 0, w, h, 0, hh, hw, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	d->gbuffer.setReadBuffer(GBufferTextureType::DiffuseTexture);
+	glBlitFramebuffer(0, 0, w, h, hw, hh, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	d->gbuffer.setReadBuffer(GBufferTextureType::NormalMap);
+	glBlitFramebuffer(0, 0, w, h, hw, 0, w, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 }
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
@@ -190,10 +283,10 @@ void GMGLGraphicEngine::setViewport(const GMRect& rect)
 	glViewport(rect.x, rect.y, rect.width, rect.height);
 }
 
-void GMGLGraphicEngine::registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* shaders)
+void GMGLGraphicEngine::registerShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram, AUTORELEASE GMGLShaderProgram* deferredShaderProgram)
 {
 	D(d);
-	d->allShaders[objectType] = shaders;
+	d->allShaders[objectType] = makePair(forwardShaderProgram, deferredShaderProgram);
 }
 
 GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
@@ -202,7 +295,19 @@ GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 	if (d->allShaders.find(objectType) == d->allShaders.end())
 		return nullptr;
 	
-	return d->allShaders[objectType];
+	GMGLShaderProgram* prog;
+	if (d->renderMode == GMGLRenderMode::ForwardRendering)
+		prog = d->allShaders[objectType].first;
+	else
+		prog = d->allShaders[objectType].second;
+
+	if (!prog)
+	{
+		gm_warning("cannot find deferred shader of type %i, use forward shader instead.", objectType);
+		return d->allShaders[objectType].first;
+	}
+
+	return prog;
 }
 
 void GMGLGraphicEngine::registerRender(GMMeshType objectType, AUTORELEASE IRender* render)

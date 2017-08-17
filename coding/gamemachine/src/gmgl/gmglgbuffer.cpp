@@ -37,6 +37,11 @@ void GMGLGBuffer::dispose()
 bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 {
 	D(d);
+	GLenum errCode;
+
+	d->windowWidth = windowWidth;
+	d->windowHeight = windowHeight;
+
 	// Create the FBO
 	glGenFramebuffers(1, &d->fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
@@ -50,19 +55,28 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glBindTexture(GL_TEXTURE_2D, d->textures[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
+		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
 
 	// depth
 	glBindTexture(GL_TEXTURE_2D, d->depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d->depthTexture, 0);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 
-	GLenum drawBuffers[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3 };
-	glDrawBuffers(TEXTURE_NUM, drawBuffers);
+	Vector<GLenum> drawBuffers;
+	for (GMuint i = 0; i < TEXTURE_NUM; i++)
+	{
+		drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+	}
+
+	glDrawBuffers(TEXTURE_NUM, drawBuffers.data());
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	if (status != GL_FRAMEBUFFER_COMPLETE) {
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
 		gm_error("FB error, status: 0x%x\n", status);
 		return false;
 	}
@@ -73,18 +87,21 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	return true;
 }
 
-
 void GMGLGBuffer::bindForWriting()
 {
 	D(d);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
 }
 
-
 void GMGLGBuffer::bindForReading()
 {
 	D(d);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo);
+}
+
+void GMGLGBuffer::releaseBind()
+{
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 void GMGLGBuffer::setReadBuffer(GBufferTextureType TextureType)

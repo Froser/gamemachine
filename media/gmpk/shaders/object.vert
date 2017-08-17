@@ -12,20 +12,20 @@ layout (location = 3) in vec4 tangent;
 layout (location = 4) in vec4 bitangent;
 layout (location = 5) in vec2 lightmapuv;
 
-out vec4 shadowCoord;
+out vec4 _shadowCoord;
 out vec4 _normal;
 out vec2 _uv;
 out vec4 _tangent;
 out vec4 _bitangent;
 out vec2 _lightmapuv;
-out vec4 position_world;
+out vec4 _position_world;
 
 void calcCoords()
 {
-    position_world = GM_model_matrix * position;
-    vec4 position_eye = GM_view_matrix * position_world;
+    _position_world = GM_model_matrix * position;
+    vec4 position_eye = GM_view_matrix * _position_world;
     gl_Position = GM_projection_matrix * position_eye;
-    shadowCoord = GM_shadow_matrix * position_world;
+    _shadowCoord = GM_shadow_matrix * _position_world;
     _normal = normal;
     _tangent = tangent;
     _bitangent = bitangent;

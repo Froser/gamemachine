@@ -1,12 +1,12 @@
 #version 330 core
 
-in vec4 position_world;
+in vec4 _position_world;
 in vec4 _normal;
 in vec2 _uv;
 in vec4 _tangent;
 in vec4 _bitangent;
 in vec2 _lightmapuv;
-in vec4 shadowCoord;
+in vec4 _shadowCoord;
 
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
@@ -113,13 +113,13 @@ void calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirec
 
 void calcLights()
 {
-	g_shadeFactor = shadeFactorFactor(calcuateShadeFactor(shadowCoord));
+	g_shadeFactor = shadeFactorFactor(calcuateShadeFactor(_shadowCoord));
 
 	// 由顶点变换矩阵计算法向量变换矩阵
 	mat4 normalModelTransform = transpose(inverse(GM_model_matrix));
 	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
 
-	vec4 vertex_eye = GM_view_matrix * position_world;
+	vec4 vertex_eye = GM_view_matrix * _position_world;
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	g_normal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
