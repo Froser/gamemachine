@@ -247,7 +247,7 @@ public:
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
-	bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram* shader)
+	bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shader) override
 	{
 		bool flag = false;
 		GMBuffer vertBuf, fragBuf;
@@ -280,26 +280,47 @@ public:
 			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
 		};
 
-		shader->attachShader(shadersInfo[0]);
-		shader->attachShader(shadersInfo[1]);
+		shader.attachShader(shadersInfo[0]);
+		shader.attachShader(shadersInfo[1]);
 		return flag;
 	}
 
-	bool onLoadDeferredShader(const GMMeshType type, GMGLShaderProgram* shader)
+	bool onLoadDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram& geometryPassProgram) override
 	{
-		bool flag = false;
-		GMBuffer vertBuf, fragBuf;
-		switch (type)
+		bool flag = true;
 		{
-		case GMMeshType::Model:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_pass.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_pass.frag", &fragBuf);
-			flag = true;
-			break;
-		default:
-			break;
+			GMBuffer vertBuf, fragBuf;
+			switch (type)
+			{
+			case GMMeshType::Model:
+				GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_geometry_pass.vert", &vertBuf);
+				GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_geometry_pass.frag", &fragBuf);
+				break;
+			default:
+				flag = false;
+				break;
+			}
+
+			vertBuf.convertToStringBuffer();
+			fragBuf.convertToStringBuffer();
+
+			GMGLShaderInfo shadersInfo[] = {
+				{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
+				{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+			};
+
+			geometryPassProgram.attachShader(shadersInfo[0]);
+			geometryPassProgram.attachShader(shadersInfo[1]);
 		}
 
+		return flag;
+	}
+
+	bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) override
+	{
+		GMBuffer vertBuf, fragBuf;
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "light_pass.vert", &vertBuf);
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "light_pass.frag", &fragBuf);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -308,9 +329,9 @@ public:
 			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
 		};
 
-		shader->attachShader(shadersInfo[0]);
-		shader->attachShader(shadersInfo[1]);
-		return flag;
+		lightPassProgram.attachShader(shadersInfo[0]);
+		lightPassProgram.attachShader(shadersInfo[1]);
+		return true;
 	}
 
 	bool m_bMouseEnable;

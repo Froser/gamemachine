@@ -117,3 +117,12 @@ void GMGLGBuffer::newFrame()
 	releaseBind();
 }
 
+void GMGLGBuffer::activateTextures()
+{
+	D(d);
+	for (GMuint i = 0; i < TEXTURE_NUM; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, d->textures[i]);
+	}
+}

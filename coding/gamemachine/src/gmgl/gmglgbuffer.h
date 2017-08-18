@@ -41,6 +41,7 @@ public:
 	void releaseBind();
 	void setReadBuffer(GBufferTextureType TextureType);
 	void newFrame();
+	void activateTextures();
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }
