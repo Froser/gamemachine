@@ -38,12 +38,14 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 		if ((*iter).second)
 			delete (*iter).second;
 	}
+
+	if (d->lightPassRender)
+		delete d->lightPassRender;
 }
 
 void GMGLGraphicEngine::start()
 {
 	installShaders();
-	initDeferredRenderQuad();
 	glDepthFunc(GL_LEQUAL);
 }
 
@@ -89,17 +91,10 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-
-	// 光照一般只需要设置一次，除非光照被改变
-	if (d->needRefreshLights)
-	{
-		d->needRefreshLights = false;
-		IGraphicEngine* engine = GM.getGraphicEngine();
-		activateLight(d->lights);
-	}
-
+	
 	if (d->renderMode == GMGLRenderMode::ForwardRendering)
 	{
+		refreshForwardRenderLights();
 		forwardRender(objects, count);
 	}
 	else
@@ -171,6 +166,8 @@ void GMGLGraphicEngine::installShaders()
 
 		registerLightPassShader(deferredShaderLightPassProgram);
 	}
+
+	d->lightPassRender = new GMGLRenders_LightPass();
 }
 
 bool GMGLGraphicEngine::loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram)
@@ -220,7 +217,7 @@ bool GMGLGraphicEngine::loadDefaultDeferredLightPassShader(GMGLShaderProgram* sh
 	return false;
 }
 
-void GMGLGraphicEngine::activateLight(const Vector<GMLight>& lights)
+void GMGLGraphicEngine::activateForwardRenderLight(const Vector<GMLight>& lights)
 {
 	D(d);
 	GM_FOREACH_ENUM(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
@@ -233,6 +230,19 @@ void GMGLGraphicEngine::activateLight(const Vector<GMLight>& lights)
 			GMint id = lightId[(GMuint)light.getType()]++;
 			render->activateLight(light, id);
 		}
+	}
+}
+
+void GMGLGraphicEngine::activateLightPassLight(const Vector<GMLight>& lights)
+{
+	D(d);
+	IRender* render = d->lightPassRender;
+	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+
+	for (auto& light : lights)
+	{
+		GMint id = lightId[(GMuint)light.getType()]++;
+		render->activateLight(light, id);
 	}
 }
 
@@ -273,10 +283,12 @@ void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
 	D(d);
 	newFrame();
 
+#if 1
 	d->deferredLightPassShader->useProgram();
-	d->gbuffer.activateTextures();
-
-	/*
+	refreshDeferredRenderLights();
+	d->gbuffer.activateTextures(d->deferredLightPassShader);
+	renderDeferredRenderQuad();
+#else
 	// 开始写4个缓存
 	const GMuint& w = d->gbuffer.getWidth(),
 		&h = d->gbuffer.getHeight();
@@ -299,7 +311,7 @@ void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
 	d->gbuffer.setReadBuffer(GBufferTextureType::NormalMap);
 	glBlitFramebuffer(0, 0, w, h, hw, 0, w, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-	*/
+#endif
 }
 
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
@@ -331,7 +343,29 @@ void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 	camera.getFrustum().update();
 }
 
-void GMGLGraphicEngine::initDeferredRenderQuad()
+void GMGLGraphicEngine::refreshForwardRenderLights()
+{
+	D(d);
+	if (d->needRefreshLights)
+	{
+		d->needRefreshLights = false;
+		IGraphicEngine* engine = GM.getGraphicEngine();
+		activateForwardRenderLight(d->lights);
+	}
+}
+
+void GMGLGraphicEngine::refreshDeferredRenderLights()
+{
+	D(d);
+	if (d->needRefreshLights)
+	{
+		d->needRefreshLights = false;
+		IGraphicEngine* engine = GM.getGraphicEngine();
+		activateLightPassLight(d->lights);
+	}
+}
+
+void GMGLGraphicEngine::renderDeferredRenderQuad()
 {
 	D(d);
 	if (d->quadVAO == 0)
@@ -433,6 +467,8 @@ IRender* GMGLGraphicEngine::getRender(GMMeshType objectType)
 void GMGLGraphicEngine::setRenderMode(GMGLRenderMode mode)
 {
 	D(d);
+	if (d->renderMode != mode)
+		d->needRefreshLights = true;
 	d->renderMode = mode;
 }
 

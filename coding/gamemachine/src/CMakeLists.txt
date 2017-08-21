@@ -83,6 +83,8 @@ set(SOURCES
 		gmgl/renders/gmgl_renders_object.cpp
 		gmgl/renders/gmgl_renders_particle.h
 		gmgl/renders/gmgl_renders_particle.cpp
+		gmgl/renders/gmgl_renders_lightpass.h
+		gmgl/renders/gmgl_renders_lightpass.cpp
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
 		gmgl/gmglgamepackagehandler.h

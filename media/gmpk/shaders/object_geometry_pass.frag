@@ -26,7 +26,7 @@ uniform GM_texture_t GM_normalmap_textures[1];
 
 out vec4 frag_color;
 
-layout (location = 0) out vec3 gWorld;
+layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gTexAmbient;
 layout (location = 3) out vec3 gTexDiffuse;
@@ -55,7 +55,7 @@ vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 
 void main()
 {
-	gWorld = _position_world.xyz;
+	gPosition = _position_world.xyz;
 	gNormal = _normal.xyz;
 	gTexAmbient = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	gTexDiffuse = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);

@@ -1,10 +1,5 @@
 #version 330 core
 
-// 阴影纹理
-uniform sampler2DShadow GM_shadow_texture;
-uniform int GM_shadow_texture_switch = 0;
-
-#define MAX_TEXTURE_COUNT 3
 #define MAX_LIGHT_COUNT 10
 
 in vec4 _position_world;
@@ -41,7 +36,7 @@ struct GM_Material_t
 	vec3 ks;
 	float shininess;
 };
-uniform GM_Material_t GM_material;
+GM_Material_t GM_material;
 
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_model_matrix;
@@ -147,24 +142,12 @@ void calcLights()
 
 void calcColor()
 {
+	GM_material.kd = vec3(1,1,1);
 	calcLights();
-
-	if (GM_debug_draw_normal == 1)
-	{
-		// 画眼睛视角的法向量
-		frag_color = vec4((g_normal_eye.xyz + 1.f) / 2.f, 1.f);
-		return;
-	}
-	else if (GM_debug_draw_normal == 2)
-	{
-		// 画世界视角的法向量
-		frag_color = vec4((tNormal + 1.f) / 2.f, 1.f);
-		return;
-	}
 
 	// 最终结果
 	vec3 color = g_ambientLight * tTexAmbient + g_diffuseLight * tTexDiffuse + g_specularLight;
-	frag_color = vec4(color, 1.0f);
+	frag_color = vec4(g_specularLight.rgb, 1.0f);
 }
 
 void main()

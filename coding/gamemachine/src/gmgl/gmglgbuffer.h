@@ -25,6 +25,7 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 	GMuint windowHeight = 0;
 };
 
+class GMGLShaderProgram;
 class GMGLGBuffer : public GMObject
 {
 	DECLARE_PRIVATE(GMGLGBuffer)
@@ -41,7 +42,7 @@ public:
 	void releaseBind();
 	void setReadBuffer(GBufferTextureType TextureType);
 	void newFrame();
-	void activateTextures();
+	void activateTextures(GMGLShaderProgram* shaderProgram);
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }

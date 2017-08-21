@@ -6,6 +6,7 @@
 #include "foundation/utilities/utilities.h"
 #include <map>
 #include "gmglgbuffer.h"
+#include "renders/gmgl_renders_lightpass.h"
 BEGIN_NS
 
 class Camera;
@@ -33,8 +34,9 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMLight> lights;
 	Map<GMMeshType, GMGLShaderProgram* > forwardRenderingShaders;
 	Map<GMMeshType, GMGLShaderProgram* > deferredGeometryPassShader;
-	GMGLShaderProgram* deferredLightPassShader;
 	Map<GMMeshType, IRender*> allRenders;
+	GMGLShaderProgram* deferredLightPassShader = nullptr;
+	GMGLRenders_LightPass* lightPassRender = nullptr;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
 	GraphicSettings* settings = nullptr;
@@ -73,9 +75,13 @@ public:
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(GMMeshType objectType);
 	void setRenderMode(GMGLRenderMode mode);
+	GMGLRenderMode getRenderMode() { D(d); return d->renderMode; }
+	GMGLShaderProgram* getLightPassShader() { D(d); return d->deferredLightPassShader; }
 
 private:
-	void initDeferredRenderQuad();
+	void refreshForwardRenderLights();
+	void refreshDeferredRenderLights();
+	void renderDeferredRenderQuad();
 	void disposeDeferredRenderQuad();
 	void setViewport(const GMRect& rect);
 	void registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram);
@@ -86,7 +92,8 @@ private:
 	bool loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram);
 	bool loadDefaultDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram* shaderProgram);
 	bool loadDefaultDeferredLightPassShader(GMGLShaderProgram* shaderProgram);
-	void activateLight(const Vector<GMLight>& lights);
+	void activateForwardRenderLight(const Vector<GMLight>& lights);
+	void activateLightPassLight(const Vector<GMLight>& lights);
 	bool refreshGBuffer();
 	void forwardRender(GMGameObject* objects[], GMuint count);
 	void geometryPass(GMGameObject *objects[], GMuint count);

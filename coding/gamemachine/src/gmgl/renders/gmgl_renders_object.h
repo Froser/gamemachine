@@ -3,9 +3,9 @@
 #include "common.h"
 #include "gmdatacore/shader.h"
 #include "gmdatacore/gmmodel.h"
+#include "gmgl/gmglgraphic_engine.h"
 BEGIN_NS
 
-class GMGLGraphicEngine;
 GM_PRIVATE_OBJECT(GMGLRenders_Object)
 {
 	GMGLGraphicEngine* engine = nullptr;
@@ -14,6 +14,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	GMGLShaderProgram* gmglShaderProgram = nullptr;
 	GMMeshType type;
 	GMDrawMode mode;
+	GMGLRenderMode renderMode = GMGLRenderMode::ForwardRendering;
 };
 
 class GMGLRenders_Object : public GMObject, public IRender
@@ -32,7 +33,7 @@ public:
 	virtual void activateLight(const GMLight& light, GMint lightIndex);
 
 protected:
-	void initShaderProgram();
+	GMGLShaderProgram* getShaderProgram();
 	void activateMaterial(const Shader& shader);
 	void drawDebug();
 	void drawTexture(GMTextureType type, GMint index = 0);

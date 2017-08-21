@@ -4,6 +4,17 @@
 
 #define TEXTURE_NUM (GMuint) GBufferTextureType::EndOfTextureType
 
+const char* g_GBufferTextureUniformName[] =
+{
+	"gPosition",
+	"gNormal",
+	"gTexAmbient",
+	"gTexDiffuse",
+	"gTangent",
+	"gBitangent",
+	"gNormalMap",
+};
+
 GMGLGBuffer::GMGLGBuffer()
 {
 }
@@ -49,33 +60,37 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 
 	// Create the gbuffer textures
 	glGenTextures(TEXTURE_NUM, d->textures);
-	glGenTextures(1, &d->depthTexture);
-
 	for (GMuint i = 0; i < TEXTURE_NUM; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, d->textures[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
 
 	// depth
+	/*
+	glGenTextures(1, &d->depthTexture);
 	glBindTexture(GL_TEXTURE_2D, d->depthTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d->depthTexture, 0);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+	*/
 
-	Vector<GLenum> drawBuffers;
+	Vector<GLenum> attachments;
 	for (GMuint i = 0; i < TEXTURE_NUM; i++)
 	{
-		drawBuffers.push_back(GL_COLOR_ATTACHMENT0 + i);
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 	}
 
-	glDrawBuffers(TEXTURE_NUM, drawBuffers.data());
+	glDrawBuffers(TEXTURE_NUM, attachments.data());
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-
 	if (status != GL_FRAMEBUFFER_COMPLETE)
 	{
 		gm_error("FB error, status: 0x%x\n", status);
@@ -83,7 +98,7 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	}
 
 	// restore default FBO
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	releaseBind();
 
 	return true;
 }
@@ -102,7 +117,7 @@ void GMGLGBuffer::bindForReading()
 
 void GMGLGBuffer::releaseBind()
 {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GMGLGBuffer::setReadBuffer(GBufferTextureType TextureType)
@@ -117,12 +132,16 @@ void GMGLGBuffer::newFrame()
 	releaseBind();
 }
 
-void GMGLGBuffer::activateTextures()
+void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 {
 	D(d);
+	GLenum errCode;
 	for (GMuint i = 0; i < TEXTURE_NUM; i++)
 	{
+		shaderProgram->setInt(g_GBufferTextureUniformName[i], i);
+		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 		glActiveTexture(GL_TEXTURE0 + i);
 		glBindTexture(GL_TEXTURE_2D, d->textures[i]);
+		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
 }
