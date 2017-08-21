@@ -30,6 +30,9 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 			delete (*iter).second;
 	}
 
+	if (d->deferredMaterialPassShader)
+		delete d->deferredMaterialPassShader;
+
 	if (d->deferredLightPassShader)
 		delete d->deferredLightPassShader;
 
@@ -167,6 +170,23 @@ void GMGLGraphicEngine::installShaders()
 		registerLightPassShader(deferredShaderLightPassProgram);
 	}
 
+	{
+		GMGLShaderProgram* deferredShaderMaterialPassProgram = new GMGLShaderProgram();
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredMaterialPassShader(*deferredShaderMaterialPassProgram)))
+		{
+			if (!loadDefaultDeferredMaterialPassShader(deferredShaderMaterialPassProgram))
+			{
+				delete deferredShaderMaterialPassProgram;
+				deferredShaderMaterialPassProgram = nullptr;
+			}
+		}
+
+		if (deferredShaderMaterialPassProgram)
+			deferredShaderMaterialPassProgram->load();
+
+		registerMaterialPassShader(deferredShaderMaterialPassProgram);
+	}
+
 	d->lightPassRender = new GMGLRenders_LightPass();
 }
 
@@ -210,6 +230,11 @@ bool GMGLGraphicEngine::loadDefaultDeferredGeometryPassShader(const GMMeshType t
 		break;
 	}
 	return flag;
+}
+
+bool GMGLGraphicEngine::loadDefaultDeferredMaterialPassShader(GMGLShaderProgram* shaderProgram)
+{
+	return false;
 }
 
 bool GMGLGraphicEngine::loadDefaultDeferredLightPassShader(GMGLShaderProgram* shaderProgram)
@@ -266,17 +291,20 @@ void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-
-	d->gbuffer.newFrame();
-	d->gbuffer.bindForWriting();
-
-	for (GMuint i = 0; i < count; i++)
+	d->gbuffer.beginPass();
+	do
 	{
-		objects[i]->draw();
-	}
+		d->gbuffer.newFrame();
+		d->gbuffer.bindForWriting();
 
-	ASSERT(glGetError() == GL_NO_ERROR);
-	d->gbuffer.releaseBind();
+		for (GMuint i = 0; i < count; i++)
+		{
+			objects[i]->draw();
+		}
+
+		ASSERT(glGetError() == GL_NO_ERROR);
+		d->gbuffer.releaseBind();
+	} while (d->gbuffer.nextPass());
 }
 
 void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
@@ -288,6 +316,7 @@ void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
 	d->deferredLightPassShader->useProgram();
 	refreshDeferredRenderLights();
 	d->gbuffer.activateTextures(d->deferredLightPassShader);
+	d->gbuffer.activateMaterials(d->deferredLightPassShader);
 	renderDeferredRenderQuad();
 #else
 	// 开始写4个缓存
@@ -296,30 +325,34 @@ void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
 	GMuint hw = w / 2, hh = h / 2;
 
 	GLenum errCode;
+
+	d->gbuffer.beginPass();
+	d->gbuffer.nextPass();
+
 	d->gbuffer.bindForReading();
-	d->gbuffer.setReadBuffer(GBufferTextureType::Position);
+	d->gbuffer.setReadBuffer(GBufferMaterialType::Ka);
 	glBlitFramebuffer(0, 0, w, h, 0, 0, hw, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 
-	d->gbuffer.setReadBuffer(GBufferTextureType::Bitangent);
+	d->gbuffer.setReadBuffer(GBufferMaterialType::Kd);
 	glBlitFramebuffer(0, 0, w, h, 0, hh, hw, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 
-	d->gbuffer.setReadBuffer(GBufferTextureType::DiffuseTexture);
+	d->gbuffer.setReadBuffer(GBufferMaterialType::Ks);
 	glBlitFramebuffer(0, 0, w, h, hw, hh, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 
+	/*
 	d->gbuffer.setReadBuffer(GBufferTextureType::NormalMap);
 	glBlitFramebuffer(0, 0, w, h, hw, 0, w, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+	*/
 #endif
 }
 
-void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
+void GMGLGraphicEngine::updateVPMatrices(const CameraLookAt& lookAt)
 {
 	D(d);
-	updateMatrices(lookAt);
-
 	GMMesh dummy;
 	GM_FOREACH_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
@@ -330,15 +363,28 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
 		render->end();
 	}
+}
 
+void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
+{
+	D(d);
+	updateMatrices(lookAt);
+	updateVPMatrices(lookAt);
+
+	if (d->renderMode == GMGLRenderMode::DeferredRendering)
 	{
-		if (d->renderMode == GMGLRenderMode::DeferredRendering)
-		{
-			IRender* render = d->lightPassRender;
-			render->begin(this, &dummy, nullptr);
-			render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
-			render->end();
-		}
+		// 更新material pass著色器
+		auto cache = getRenderState();
+		setRenderState(GMGLRenderState::PassingMaterial);
+		updateVPMatrices(lookAt);
+		setRenderState(cache);
+
+		// 更新light pass著色器
+		GMMesh dummy;
+		IRender* render = d->lightPassRender;
+		render->begin(this, &dummy, nullptr);
+		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
+		render->end();
 	}
 }
 
@@ -382,7 +428,7 @@ void GMGLGraphicEngine::renderDeferredRenderQuad()
 	if (d->quadVAO == 0)
 	{
 		GLfloat quadVertices[] = {
-			// Positions        // Texture Coords
+			// Positions		// Texture Coords
 			-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
 			1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
@@ -435,6 +481,12 @@ void GMGLGraphicEngine::registerGeometryPassShader(GMMeshType objectType, AUTORE
 	d->deferredGeometryPassShader[objectType] = deferredGeometryPassProgram;
 }
 
+void GMGLGraphicEngine::registerMaterialPassShader(AUTORELEASE GMGLShaderProgram* deferredMaterialPassProgram)
+{
+	D(d);
+	d->deferredMaterialPassShader = deferredMaterialPassProgram;
+}
+
 void GMGLGraphicEngine::registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram)
 {
 	D(d);
@@ -445,7 +497,11 @@ GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 {
 	D(d);
 	GMGLShaderProgram* prog;
-	if (d->renderMode == GMGLRenderMode::ForwardRendering)
+	if (d->renderState == GMGLRenderState::PassingMaterial)
+	{
+		prog = d->deferredMaterialPassShader;
+	}
+	else if (d->renderMode == GMGLRenderMode::ForwardRendering)
 	{
 		prog = d->forwardRenderingShaders[objectType];
 	}

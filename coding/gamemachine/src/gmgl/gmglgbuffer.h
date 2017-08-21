@@ -17,13 +17,32 @@ enum class GBufferTextureType
 	EndOfTextureType,
 };
 
+enum class GBufferMaterialType
+{
+	// 材质属性
+	Ka,
+	Kd,
+	Ks,
+	EndOfMaterialType,
+};
+
+enum
+{
+	GMGLGBuffer_Rendering,
+	GMGLGBuffer_MaterialPass,
+
+	GMGLGBuffer_TotalTurn,
+};
+
 GM_PRIVATE_OBJECT(GMGLGBuffer)
 {
-	GLuint fbo = 0;
+	GLuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
 	GLuint textures[(GMint)GBufferTextureType::EndOfTextureType] = { 0 };
+	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
 	GLuint depthTexture = 0;
 	GMuint windowWidth = 0;
 	GMuint windowHeight = 0;
+	GMint currentTurn = 0;
 };
 
 class GMGLShaderProgram;
@@ -36,17 +55,18 @@ public:
 	~GMGLGBuffer();
 
 public:
-	void beginGeometryPass();
-	bool nextGeometryPass();
-
+	void beginPass();
+	bool nextPass();
 	void dispose();
 	bool init(GMuint windowWidth, GMuint windowHeight);
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
-	void setReadBuffer(GBufferTextureType TextureType);
+	void setReadBuffer(GBufferTextureType textureType);
+	void setReadBuffer(GBufferMaterialType materialType);
 	void newFrame();
 	void activateTextures(GMGLShaderProgram* shaderProgram);
+	void activateMaterials(GMGLShaderProgram* shaderProgram);
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }

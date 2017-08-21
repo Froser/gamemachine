@@ -24,8 +24,6 @@ uniform GM_texture_t GM_diffuse_textures[MAX_TEXTURE_COUNT];
 uniform GM_texture_t GM_lightmap_textures[MAX_TEXTURE_COUNT];  // 用到的只有1个
 uniform GM_texture_t GM_normalmap_textures[1];
 
-out vec4 frag_color;
-
 layout (location = 0) out vec3 gPosition;
 layout (location = 1) out vec3 gNormal;
 layout (location = 2) out vec3 gTexAmbient;

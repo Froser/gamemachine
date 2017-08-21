@@ -231,7 +231,7 @@ void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projecti
 GMGLShaderProgram* GMGLRenders_Object::getShaderProgram()
 {
 	D(d);
-	if (!d->gmglShaderProgram || d->renderMode != d->engine->getRenderMode())
+	if (!d->gmglShaderProgram || d->renderMode != d->engine->getRenderMode() || d->engine->getRenderState() != GMGLRenderState::Rendering)
 		d->gmglShaderProgram = d->engine->getShaders(d->type);
 	d->gmglShaderProgram->useProgram();
 	d->renderMode = d->engine->getRenderMode();

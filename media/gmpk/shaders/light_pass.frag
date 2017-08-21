@@ -12,6 +12,9 @@ uniform sampler2D gTexDiffuse;
 uniform sampler2D gTangent;
 uniform sampler2D gBitangent;
 uniform sampler2D gNormalMap;
+uniform sampler2D gKa;
+uniform sampler2D gKd;
+uniform sampler2D gKs;
 
 vec3 tPosition;
 vec3 tNormal;
@@ -21,6 +24,11 @@ vec3 tTangent;
 vec3 tBitangent;
 vec3 tNormalMap;
 
+vec3 tKa;
+vec3 tKd;
+vec3 tKs;
+float tShininess = 1.0f;
+
 struct GM_light_t
 {
 	vec3 lightColor;
@@ -28,15 +36,6 @@ struct GM_light_t
 };
 uniform GM_light_t GM_ambients[MAX_LIGHT_COUNT];
 uniform GM_light_t GM_speculars[MAX_LIGHT_COUNT];
-
-struct GM_Material_t
-{
-	vec3 ka;
-	vec3 kd;
-	vec3 ks;
-	float shininess;
-};
-GM_Material_t GM_material;
 
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_model_matrix;
@@ -55,6 +54,7 @@ out vec4 frag_color;
 
 void init()
 {
+	g_ambientLight = g_diffuseLight = g_specularLight = vec3(0);
 	tPosition = texture(gPosition, _texCoords).rgb;
 	tNormal = texture(gNormal, _texCoords).rgb;
 	tTexAmbient = texture(gTexAmbient, _texCoords).rgb;
@@ -62,8 +62,9 @@ void init()
 	tTangent = texture(gTangent, _texCoords).rgb;
 	tBitangent = texture(gBitangent, _texCoords).rgb;
 	tNormalMap = texture(gNormalMap, _texCoords).rgb;
-	g_ambientLight = g_diffuseLight = g_specularLight = vec3(0);
-
+	tKa = texture(gKa, _texCoords).rgb;
+	tKd = texture(gKd, _texCoords).rgb;
+	tKs = texture(gKs, _texCoords).rgb;
 }
 
 void calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)
@@ -76,7 +77,7 @@ void calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirec
 		float diffuseFactor = dot(L, N);
 		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
 
-		g_diffuseLight += diffuseFactor * GM_material.kd * light.lightColor;
+		g_diffuseLight += diffuseFactor * tKd * light.lightColor;
 	}
 
 	// specular:
@@ -84,10 +85,10 @@ void calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirec
 		vec3 V = normalize(eyeDirection);
 		vec3 R = reflect(-L, N);
 		float theta = dot(V, R);
-		float specularFactor = pow(theta, GM_material.shininess);
+		float specularFactor = pow(theta, tShininess);
 		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
 
-		g_specularLight += specularFactor * GM_material.ks * light.lightColor;
+		g_specularLight += specularFactor * tKs * light.lightColor;
 	}
 }
 
@@ -136,18 +137,17 @@ void calcLights()
 	// 计算环境光
 	for (int i = 0; i < MAX_LIGHT_COUNT; i++)
 	{
-		g_ambientLight += GM_material.ka * GM_ambients[i].lightColor;
+		g_ambientLight += tKa * GM_ambients[i].lightColor;
 	}
 }
 
 void calcColor()
 {
-	GM_material.kd = vec3(1,1,1);
 	calcLights();
 
 	// 最终结果
 	vec3 color = g_ambientLight * tTexAmbient + g_diffuseLight * tTexDiffuse + g_specularLight;
-	frag_color = vec4(g_specularLight.rgb, 1.0f);
+	frag_color = vec4(tPosition, 1.0f);
 }
 
 void main()

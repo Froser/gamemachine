@@ -316,6 +316,24 @@ public:
 		return flag;
 	}
 
+	bool onLoadDeferredMaterialPassShader(GMGLShaderProgram& lightPassProgram) override
+	{
+		GMBuffer vertBuf, fragBuf;
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.vert", &vertBuf);
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.frag", &fragBuf);
+		vertBuf.convertToStringBuffer();
+		fragBuf.convertToStringBuffer();
+
+		GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+		};
+
+		lightPassProgram.attachShader(shadersInfo[0]);
+		lightPassProgram.attachShader(shadersInfo[1]);
+		return true;
+	}
+
 	bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;

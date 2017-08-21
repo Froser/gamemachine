@@ -191,7 +191,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 }
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
 
-#define GM_ZeroMemory(dest) memset((dest), 0, sizeof(*(dest)));
+#define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
 
 // 平台差异
 #ifdef __GNUC__
