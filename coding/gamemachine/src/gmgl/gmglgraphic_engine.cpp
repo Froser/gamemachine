@@ -266,6 +266,7 @@ void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
+
 	d->gbuffer.newFrame();
 	d->gbuffer.bindForWriting();
 
@@ -319,15 +320,25 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	D(d);
 	updateMatrices(lookAt);
 
+	GMMesh dummy;
 	GM_FOREACH_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		IRender* render = getRender(i);
-		GMMesh dummy;
 		dummy.setType(i);
 
 		render->begin(this, &dummy, nullptr);
 		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
 		render->end();
+	}
+
+	{
+		if (d->renderMode == GMGLRenderMode::DeferredRendering)
+		{
+			IRender* render = d->lightPassRender;
+			render->begin(this, &dummy, nullptr);
+			render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
+			render->end();
+		}
 	}
 }
 
@@ -435,9 +446,14 @@ GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 	D(d);
 	GMGLShaderProgram* prog;
 	if (d->renderMode == GMGLRenderMode::ForwardRendering)
+	{
 		prog = d->forwardRenderingShaders[objectType];
+	}
 	else
+	{
+		ASSERT(d->renderMode == GMGLRenderMode::DeferredRendering);
 		prog = d->deferredGeometryPassShader[objectType];
+	}
 
 	if (!prog)
 	{

@@ -6,6 +6,7 @@ BEGIN_NS
 // GBuffer 类型，对应pass着色器layout的顺序
 enum class GBufferTextureType
 {
+	// 顶点属性
 	Position,
 	Normal,
 	AmbientTexture,
@@ -35,6 +36,9 @@ public:
 	~GMGLGBuffer();
 
 public:
+	void beginGeometryPass();
+	bool nextGeometryPass();
+
 	void dispose();
 	bool init(GMuint windowWidth, GMuint windowHeight);
 	void bindForWriting();

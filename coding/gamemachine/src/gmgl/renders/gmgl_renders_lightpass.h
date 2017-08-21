@@ -20,14 +20,12 @@ public:
 	GMGLRenders_LightPass();
 
 public:
-	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override { ASSERT(false); }
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override {}
 	virtual void beginShader(Shader& shader, GMDrawMode mode) override { ASSERT(false); }
-	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) { ASSERT(false); }
+	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt);
 	virtual void endShader() { ASSERT(false); }
-	virtual void end() { ASSERT(false); }
-
+	virtual void end() {}
 	virtual void activateLight(const GMLight& light, GMint lightIndex);
-
 };
 
 END_NS

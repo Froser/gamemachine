@@ -3,8 +3,7 @@
 #include "gmglgraphic_engine.h"
 
 #define TEXTURE_NUM (GMuint) GBufferTextureType::EndOfTextureType
-
-const char* g_GBufferTextureUniformName[] =
+Array<const char*, TEXTURE_NUM> g_GBufferTextureUniformName =
 {
 	"gPosition",
 	"gNormal",
@@ -69,7 +68,6 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
-
 	// depth
 	/*
 	glGenTextures(1, &d->depthTexture);

@@ -7,6 +7,7 @@
 #include <set>
 #include <vector>
 #include <queue>
+#include <array>
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -23,6 +24,9 @@ using Vector = std::vector<T>;
 
 template <typename T>
 using Queue = std::queue<T>;
+
+template <typename T, size_t size>
+using Array = std::array<T, size>;
 
 /* 工程编译选项 */
 // 使用UNICODE

@@ -220,11 +220,11 @@ void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projecti
 	// P
 	shaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, projection.data());
 
-	// V
+	// 视觉位置，用于计算光照
 	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
 	shaderProgram->setMatrix4(GMSHADER_VIEW_POSITION, vec);
 
-	// 视觉位置，用于计算光照
+	// V
 	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
 }
 
