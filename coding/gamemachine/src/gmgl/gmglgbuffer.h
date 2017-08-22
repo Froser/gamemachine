@@ -4,7 +4,7 @@
 BEGIN_NS
 
 // GBuffer 类型，对应pass着色器layout的顺序
-enum class GBufferTextureType
+enum class GBufferGeometryType
 {
 	// 顶点属性
 	Position,
@@ -14,7 +14,7 @@ enum class GBufferTextureType
 	Tangent,
 	Bitangent,
 	NormalMap,
-	EndOfTextureType,
+	EndOfGeometryType,
 };
 
 enum class GBufferMaterialType
@@ -26,19 +26,30 @@ enum class GBufferMaterialType
 	EndOfMaterialType,
 };
 
-enum
+enum class GBufferFlags
 {
-	GMGLGBuffer_Rendering,
-	GMGLGBuffer_MaterialPass,
-
-	GMGLGBuffer_TotalTurn,
+	// 标记
+	HasNormalMap,
+	EndOfFlags,
 };
+
+// 当前渲染的状态，渲染到哪一步了
+enum class GMGLDeferredRenderState
+{
+	GeometryPass, //正在进行普通渲染或geometry pass
+	PassingMaterial, //正在传递材质
+	PassingFlags, //正在传递Flags
+	EndOfRenderState,
+};
+
+constexpr GMuint GMGLGBuffer_TotalTurn = (GMuint) GMGLDeferredRenderState::EndOfRenderState;
 
 GM_PRIVATE_OBJECT(GMGLGBuffer)
 {
 	GLuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
-	GLuint textures[(GMint)GBufferTextureType::EndOfTextureType] = { 0 };
+	GLuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
 	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
+	GLuint flags[(GMint)GBufferFlags::EndOfFlags] = { 0 };
 	GLuint depthTexture = 0;
 	GMuint windowWidth = 0;
 	GMuint windowHeight = 0;
@@ -62,11 +73,10 @@ public:
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
-	void setReadBuffer(GBufferTextureType textureType);
+	void setReadBuffer(GBufferGeometryType textureType);
 	void setReadBuffer(GBufferMaterialType materialType);
 	void newFrame();
 	void activateTextures(GMGLShaderProgram* shaderProgram);
-	void activateMaterials(GMGLShaderProgram* shaderProgram);
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }

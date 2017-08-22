@@ -316,11 +316,22 @@ public:
 		return flag;
 	}
 
-	bool onLoadDeferredMaterialPassShader(GMGLShaderProgram& lightPassProgram) override
+	bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
-		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.vert", &vertBuf);
-		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.frag", &fragBuf);
+		switch (state)
+		{
+		case gm::GMGLDeferredRenderState::PassingMaterial:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.frag", &fragBuf);
+			break;
+		case gm::GMGLDeferredRenderState::PassingFlags:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "flag_pass.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "flag_pass.frag", &fragBuf);
+			break;
+		default:
+			return false;
+		}
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -329,8 +340,8 @@ public:
 			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
 		};
 
-		lightPassProgram.attachShader(shadersInfo[0]);
-		lightPassProgram.attachShader(shadersInfo[1]);
+		shaderProgram.attachShader(shadersInfo[0]);
+		shaderProgram.attachShader(shadersInfo[1]);
 		return true;
 	}
 

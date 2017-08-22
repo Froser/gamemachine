@@ -20,17 +20,11 @@ enum class GMGLRenderMode
 	DeferredRendering,
 };
 
-enum class GMGLRenderState
-{
-	Rendering, //正在进行普通渲染
-	PassingMaterial, //正在传递材质
-};
-
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
 	virtual bool onLoadDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram& geometryPassProgram) = 0;
-	virtual bool onLoadDeferredMaterialPassShader(GMGLShaderProgram& lightPassProgram) = 0;
+	virtual bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) = 0;
 	virtual bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) = 0;
 };
 
@@ -47,8 +41,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	// 著色器程序
 	Map<GMMeshType, GMGLShaderProgram* > forwardRenderingShaders;
 	Map<GMMeshType, GMGLShaderProgram* > deferredGeometryPassShader;
+	Map<GMGLDeferredRenderState, GMGLShaderProgram* > deferredCommonPassShaders;
 	GMGLShaderProgram* deferredLightPassShader = nullptr;
-	GMGLShaderProgram* deferredMaterialPassShader = nullptr;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	ResourceContainer resourceContainer;
@@ -60,7 +54,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMuint quadVAO = 0;
 	GMuint quadVBO = 0;
 	// 渲染状态
-	GMGLRenderState renderState = GMGLRenderState::Rendering;
+	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::GeometryPass;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -94,8 +88,8 @@ public:
 public:
 	inline GMGLRenderMode getRenderMode() { D(d); return d->renderMode; }
 	inline GMGLShaderProgram* getLightPassShader() { D(d); return d->deferredLightPassShader; }
-	inline void setRenderState(GMGLRenderState state) { D(d); d->renderState = state; }
-	inline GMGLRenderState getRenderState() { D(d); return d->renderState; }
+	inline void setRenderState(GMGLDeferredRenderState state) { D(d); d->renderState = state; }
+	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
 
 private:
 	void refreshForwardRenderLights();
@@ -105,8 +99,8 @@ private:
 	void setViewport(const GMRect& rect);
 	void registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram);
 	void registerGeometryPassShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* deferredGeometryPassProgram);
-	void registerMaterialPassShader(AUTORELEASE GMGLShaderProgram* deferredMaterialPassProgram);
 	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
+	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
 	void updateMatrices(const CameraLookAt& lookAt);
 	void installShaders();
 	bool loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram);
