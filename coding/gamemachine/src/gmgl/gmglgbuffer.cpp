@@ -3,8 +3,8 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
-#define TEXTURE_NUM (GMuint) GBufferTextureType::EndOfTextureType
-#define MATERIAL_NUM (GMuint) GBufferMaterialType::EndOfMaterialType
+constexpr GMuint TEXTURE_NUM = (GMuint)GBufferTextureType::EndOfTextureType;
+constexpr GMuint MATERIAL_NUM = (GMuint)GBufferMaterialType::EndOfMaterialType;
 
 Array<const char*, TEXTURE_NUM> g_GBufferTextureUniformName =
 {
@@ -96,6 +96,8 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
+	if (!drawBuffers(TEXTURE_NUM))
+		return false;
 
 	// Material data
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[GMGLGBuffer_MaterialPass]);
@@ -109,6 +111,8 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->materials[i], 0);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
+	if (!drawBuffers(MATERIAL_NUM))
+		return false;
 
 	// depth
 	/*
@@ -120,23 +124,6 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d->depthTexture, 0);
 	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	*/
-
-	Vector<GLenum> attachments;
-	auto maxNum = max(TEXTURE_NUM, MATERIAL_NUM);
-	for (GMuint i = 0; i < maxNum; i++)
-	{
-		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
-	}
-
-	glDrawBuffers(maxNum, attachments.data());
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
-	{
-		gm_error("FB error, status: 0x%x\n", status);
-		return false;
-	}
 
 	// restore default FBO
 	releaseBind();
@@ -209,4 +196,25 @@ void GMGLGBuffer::activateMaterials(GMGLShaderProgram* shaderProgram)
 		glBindTexture(GL_TEXTURE_2D, d->materials[i]);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
+}
+
+bool GMGLGBuffer::drawBuffers(GMuint count)
+{
+	GLenum errCode;
+	Vector<GLuint> attachments;
+	for (GMuint i = 0; i < count; i++)
+	{
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+	}
+
+	glDrawBuffers(count, attachments.data());
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		gm_error("FB error, status: 0x%x\n", status);
+		return false;
+	}
+	return true;
 }

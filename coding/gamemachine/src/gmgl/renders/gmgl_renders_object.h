@@ -15,6 +15,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	GMMeshType type;
 	GMDrawMode mode;
 	GMGLRenderMode renderMode = GMGLRenderMode::ForwardRendering;
+	GMGLRenderState renderState = GMGLRenderState::Rendering;
 };
 
 class GMGLRenders_Object : public GMObject, public IRender

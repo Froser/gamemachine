@@ -71,6 +71,9 @@ public:
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }
 	inline const GMuint& getHeight() { D(d); return d->windowHeight; }
+
+private:
+	bool drawBuffers(GMuint count);
 };
 
 END_NS
