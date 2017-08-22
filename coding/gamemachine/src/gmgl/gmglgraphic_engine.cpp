@@ -24,12 +24,6 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 			delete iter.second;
 	}
 
-	for (auto iter : d->deferredGeometryPassShader)
-	{
-		if (iter.second)
-			delete iter.second;
-	}
-
 	for (auto iter : d->deferredCommonPassShaders)
 	{
 		if (iter.second)
@@ -97,7 +91,7 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	
+	GM_PROFILE(drawObjects);
 	if (d->renderMode == GMGLRenderMode::ForwardRendering)
 	{
 		refreshForwardRenderLights();
@@ -105,9 +99,16 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	}
 	else
 	{
-		ASSERT(d->renderMode == GMGLRenderMode::DeferredRendering);
-		geometryPass(objects, count);
-		lightPass(objects, count);
+		ASSERT(getRenderMode() == GMGLRenderMode::DeferredRendering);
+		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
+		groupGameObjects(objects, count);
+
+		geometryPass(d->deferredRenderingGameObjects);
+		lightPass();
+
+		setRenderMode(GMGLRenderMode::ForwardRendering);
+		drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
+		setRenderMode(GMGLRenderMode::DeferredRendering);
 	}
 }
 
@@ -123,7 +124,7 @@ void GMGLGraphicEngine::installShaders()
 
 	GMGamePackage* package = GM.getGamePackageManager();
 
-	GM_FOREACH_ENUM_CLASS(type, GMMeshType, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
+	GM_FOREACH_ENUM_CLASS(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		GMGLShaderProgram* forwardShaderProgram = new GMGLShaderProgram();
 		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadForwardShader(type, *forwardShaderProgram)) )
@@ -135,24 +136,10 @@ void GMGLGraphicEngine::installShaders()
 			}
 		}
 
-		GMGLShaderProgram* deferredShaderGeometryPassProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredGeometryPassShader(type, *deferredShaderGeometryPassProgram)))
-		{
-			if (!loadDefaultDeferredGeometryPassShader(type, deferredShaderGeometryPassProgram))
-			{
-				delete deferredShaderGeometryPassProgram;
-				deferredShaderGeometryPassProgram = nullptr;
-			}
-		}
-
 		if (forwardShaderProgram)
 			forwardShaderProgram->load();
 
-		if (deferredShaderGeometryPassProgram)
-			deferredShaderGeometryPassProgram->load();
-
 		registerForwardRenderingShader(type, forwardShaderProgram);
-		registerGeometryPassShader(type, deferredShaderGeometryPassProgram);
 		registerRender(type, renders[(GMint) type]);
 	}
 
@@ -173,7 +160,7 @@ void GMGLGraphicEngine::installShaders()
 		registerLightPassShader(deferredShaderLightPassProgram);
 	}
 
-	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState, GMGLDeferredRenderState::PassingMaterial, GMGLDeferredRenderState::EndOfRenderState)
+	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::GeometryPass, GMGLDeferredRenderState::EndOfRenderState)
 	{
 		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
 		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredPassShader(state, *shaderProgram)))
@@ -292,7 +279,7 @@ void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 	}
 }
 
-void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
+void GMGLGraphicEngine::geometryPass(Vector<GMGameObject*>& objects)
 {
 	D(d);
 	d->gbuffer.beginPass();
@@ -301,9 +288,9 @@ void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
 		d->gbuffer.newFrame();
 		d->gbuffer.bindForWriting();
 
-		for (GMuint i = 0; i < count; i++)
+		for (auto object : objects)
 		{
-			objects[i]->draw();
+			object->draw();
 		}
 
 		ASSERT(glGetError() == GL_NO_ERROR);
@@ -311,10 +298,11 @@ void GMGLGraphicEngine::geometryPass(GMGameObject *objects[], GMuint count)
 	} while (d->gbuffer.nextPass());
 }
 
-void GMGLGraphicEngine::lightPass(GMGameObject *objects[], GMuint count)
+void GMGLGraphicEngine::lightPass()
 {
 	D(d);
 	newFrame();
+	d->gbuffer.copyDepthBuffer();
 	d->deferredLightPassShader->useProgram();
 	refreshDeferredRenderLights();
 	d->gbuffer.activateTextures(d->deferredLightPassShader);
@@ -336,17 +324,42 @@ void GMGLGraphicEngine::updateVPMatrices(const CameraLookAt& lookAt)
 	}
 }
 
+void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	d->deferredRenderingGameObjects.clear();
+	d->deferredRenderingGameObjects.reserve(count);
+	d->forwardRenderingGameObjects.clear();
+	d->forwardRenderingGameObjects.reserve(count);
+
+	for (GMuint i = 0; i < count; i++)
+	{
+		if (objects[i]->canDeferredRendering())
+			d->deferredRenderingGameObjects.push_back(objects[i]);
+		else
+			d->forwardRenderingGameObjects.push_back(objects[i]);
+	}
+}
+
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
 	D(d);
 	updateMatrices(lookAt);
-	updateVPMatrices(lookAt);
+
+	// 遍历每一种着色器
+	auto cache = getRenderMode();
+	GM_FOREACH_ENUM_CLASS(mode, GMGLRenderMode::ForwardRendering, GM_ENUM_END(GMGLRenderMode::DeferredRendering))
+	{
+		setRenderMode(mode);
+		updateVPMatrices(lookAt);
+	}
+	setRenderMode(cache);
 
 	if (d->renderMode == GMGLRenderMode::DeferredRendering)
 	{
 		// 更新material pass著色器
 		auto cache = getRenderState();
-		GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState, GMGLDeferredRenderState::PassingMaterial, GMGLDeferredRenderState::EndOfRenderState)
+		GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingMaterial, GMGLDeferredRenderState::EndOfRenderState)
 		{
 			setRenderState(state);
 			updateVPMatrices(lookAt);
@@ -401,7 +414,7 @@ void GMGLGraphicEngine::renderDeferredRenderQuad()
 	D(d);
 	if (d->quadVAO == 0)
 	{
-		GLfloat quadVertices[] = {
+		static GLfloat quadVertices[] = {
 			// Positions		// Texture Coords
 			-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
 			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
@@ -449,12 +462,6 @@ void GMGLGraphicEngine::registerForwardRenderingShader(GMMeshType objectType, AU
 	d->forwardRenderingShaders[objectType] = forwardShaderProgram;
 }
 
-void GMGLGraphicEngine::registerGeometryPassShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* deferredGeometryPassProgram)
-{
-	D(d);
-	d->deferredGeometryPassShader[objectType] = deferredGeometryPassProgram;
-}
-
 void GMGLGraphicEngine::registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram)
 {
 	D(d);
@@ -471,28 +478,17 @@ GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 {
 	D(d);
 	GMGLShaderProgram* prog;
-	if (d->renderState != GMGLDeferredRenderState::GeometryPass)
-	{
-		ASSERT(d->renderMode != GMGLRenderMode::ForwardRendering);
-		prog = d->deferredCommonPassShaders[d->renderState];
-	}
-	else if (d->renderMode == GMGLRenderMode::ForwardRendering)
+	if (d->renderMode == GMGLRenderMode::ForwardRendering)
 	{
 		prog = d->forwardRenderingShaders[objectType];
 	}
 	else
 	{
 		ASSERT(d->renderMode == GMGLRenderMode::DeferredRendering);
-		prog = d->deferredGeometryPassShader[objectType];
+		prog = d->deferredCommonPassShaders[d->renderState];
 	}
 
-	if (!prog)
-	{
-		// TODO
-		gm_warning("cannot find deferred shader of type %i, use forward shader instead.", objectType);
-		return d->forwardRenderingShaders[objectType];
-	}
-
+	ASSERT(prog);
 	return prog;
 }
 

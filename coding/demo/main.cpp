@@ -23,7 +23,7 @@
 #include "foundation/utilities/gmprimitivecreator.h"
 #include "gmlua/gmlua.h"
 
-#define EMITTER_DEMO 0
+#define EMITTER_DEMO 1
 
 using namespace gm;
 
@@ -285,42 +285,15 @@ public:
 		return flag;
 	}
 
-	bool onLoadDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram& geometryPassProgram) override
-	{
-		bool flag = true;
-		{
-			GMBuffer vertBuf, fragBuf;
-			switch (type)
-			{
-			case GMMeshType::Model:
-				GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_geometry_pass.vert", &vertBuf);
-				GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object_geometry_pass.frag", &fragBuf);
-				break;
-			default:
-				flag = false;
-				break;
-			}
-
-			vertBuf.convertToStringBuffer();
-			fragBuf.convertToStringBuffer();
-
-			GMGLShaderInfo shadersInfo[] = {
-				{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
-				{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
-			};
-
-			geometryPassProgram.attachShader(shadersInfo[0]);
-			geometryPassProgram.attachShader(shadersInfo[1]);
-		}
-
-		return flag;
-	}
-
 	bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
 		switch (state)
 		{
+		case GMGLDeferredRenderState::GeometryPass:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "geometry_pass.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "geometry_pass.frag", &fragBuf);
+			break;
 		case gm::GMGLDeferredRenderState::PassingMaterial:
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.vert", &vertBuf);
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.frag", &fragBuf);
@@ -404,6 +377,12 @@ private:
 		textureContainer.insert(item);
 
 		demo = new GMDemoGameWorld();
+
+		{
+			m_glyph = new GMGlyphObject();
+			m_glyph->setGeometry(-1, .8f, 1, 1);
+			demo->appendObjectAndInit(m_glyph);
+		}
 
 		{
 			GMfloat extents[] = { .15f, .15f, .15f };
@@ -506,6 +485,7 @@ private:
 		GMBuffer buffer;
 		pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
 
+#if !EMITTER_DEMO
 		{
 			GMfloat extents[] = { .15f, .15f, .15f };
 			GMfloat pos[] = { 0, 0, -1.f };
@@ -513,8 +493,9 @@ private:
 			GMPrimitiveCreator::createQuad(extents, pos, &m, GMMeshType::Particles);
 			GMCustomParticlesEmitter* emitter = new GMCustomParticlesEmitter(m);
 			emitter->load(buffer);
-			//demo->appendObject("particles", emitter);
+			demo->appendObject("particles", emitter);
 		}
+#endif
 
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
@@ -543,6 +524,13 @@ private:
 			break;
 		case gm::GameMachineEvent::Render:
 			{
+				GMWchar fps[32];
+				swprintf_s(fps, L"%f", GameMachine::instance().getFPS());
+				std::wstring str;
+				str.append(L" fps: ");
+				str.append(fps);
+				m_glyph->setText(str.c_str());
+
 				IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 				engine->newFrame();
 
@@ -586,6 +574,9 @@ private:
 
 				if (kbState.keydown('B'))
 					GameMachine::instance().postMessage({ GameMachineMessageType::OnConsole });
+
+				if (kbState.keyTriggered('I'))
+					GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
 			}
 			break;
 		case gm::GameMachineEvent::Deactivate:

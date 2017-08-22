@@ -282,7 +282,7 @@ public:
 		D(d);
 		D_OF(rhs_d, &rhs);
 
-		GM_FOREACH_ENUM_CLASS(type, GMTextureType, GMTextureType::AMBIENT, GMTextureType::END)
+		GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 		{
 			GMint count = GMMaxTextureCount(type);
 			for (GMint i = 0; i < count; i++)

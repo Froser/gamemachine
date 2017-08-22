@@ -83,7 +83,7 @@ void GMGLModelPainter::transfer()
 		IF_ENABLED(mesh, GMVertexDataType::Lightmap)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	2,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
 		IF_ENABLED(mesh, GMVertexDataType::Color)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		4,  GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize));
 
-		GM_FOREACH_ENUM_CLASS(type, GMVertexDataType, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
+		GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 		{
 			if (!mesh->isDataDisabled(type))
 				glEnableVertexAttribArray(gmVertexIndex(type));

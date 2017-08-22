@@ -60,6 +60,11 @@ void GMGameObject::draw()
 	coreObj->getPainter()->draw(transform);
 }
 
+bool GMGameObject::canDeferredRendering()
+{
+	return true;
+}
+
 void GMGameObject::updateMatrix()
 {
 	D(d);

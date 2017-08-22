@@ -78,6 +78,7 @@ public:
 	void setReadBuffer(GBufferMaterialType materialType);
 	void newFrame();
 	void activateTextures(GMGLShaderProgram* shaderProgram);
+	void copyDepthBuffer();
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }

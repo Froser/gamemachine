@@ -85,7 +85,8 @@ public:
 	GMfloat getElapsedTime() { D(d); return d->currentTick - d->startTick; }
 
 public:
-	virtual GMGameObjectType getType() { return GMGameObjectType::Particles; }
+	virtual GMGameObjectType getType() override { return GMGameObjectType::Particles; }
+	virtual bool canDeferredRendering() override { return false; }
 	virtual void simulate() override;
 	virtual void draw() override;
 	virtual void onAppendingObjectToWorld() override;

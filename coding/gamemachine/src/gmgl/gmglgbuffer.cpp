@@ -116,6 +116,10 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
+	// depth
+	glGenRenderbuffers(1, &d->depthTexture);
+	glBindRenderbuffer(GL_RENDERBUFFER, d->depthTexture);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, windowWidth, windowHeight);
 	if (!drawBuffers(GEOMETRY_NUM))
 		return false;
 
@@ -149,17 +153,6 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	}
 	if (!drawBuffers(FLAG_NUM))
 		return false;
-
-	// depth
-	/*
-	glGenTextures(1, &d->depthTexture);
-	glBindTexture(GL_TEXTURE_2D, d->depthTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, windowWidth, windowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d->depthTexture, 0);
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-	*/
 
 	// restore default FBO
 	releaseBind();
@@ -246,6 +239,15 @@ void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 	}
 }
 
+void GMGLGBuffer::copyDepthBuffer()
+{
+	D(d);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::GeometryPass]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	glBlitFramebuffer(0, 0, d->windowWidth, d->windowHeight, 0, 0, d->windowWidth, d->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
 bool GMGLGBuffer::drawBuffers(GMuint count)
 {
 	GLenum errCode;
@@ -261,7 +263,7 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
 	{
-		gm_error("FB error, status: 0x%x\n", status);
+		gm_error("FB incomplete error, status: 0x%x\n", status);
 		return false;
 	}
 	return true;

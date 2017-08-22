@@ -16,6 +16,9 @@ using Pair = std::pair<T1, T2>;
 template <typename T1, typename T2>
 using Map = std::map<T1, T2>;
 
+template <typename T1, typename T2>
+using Multimap = std::multimap<T1, T2>;
+
 template <typename T>
 using Set = std::set<T>;
 
@@ -115,7 +118,9 @@ using Array = std::array<T, size>;
 // 用于枚举的宏
 #define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMint)var)+1) )
 
-#define GM_FOREACH_ENUM_CLASS(var, type, start, end) for (type var = start; (GMint) var < (GMint) end; var = (decltype(var))(((GMint)var)+1) )
+#define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (GMint) var < (GMint) end; var = (decltype(var))(((GMint)var)+1) )
+
+#define GM_ENUM_END(e) (decltype(e)) ((GMint)(e) + 1)
 
 BEGIN_NS
 

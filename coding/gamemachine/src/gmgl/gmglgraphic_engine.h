@@ -23,7 +23,6 @@ enum class GMGLRenderMode
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
-	virtual bool onLoadDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram& geometryPassProgram) = 0;
 	virtual bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) = 0;
 	virtual bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) = 0;
 };
@@ -40,7 +39,6 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	// 著色器程序
 	Map<GMMeshType, GMGLShaderProgram* > forwardRenderingShaders;
-	Map<GMMeshType, GMGLShaderProgram* > deferredGeometryPassShader;
 	Map<GMGLDeferredRenderState, GMGLShaderProgram* > deferredCommonPassShaders;
 	GMGLShaderProgram* deferredLightPassShader = nullptr;
 
@@ -55,6 +53,10 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMuint quadVBO = 0;
 	// 渲染状态
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::GeometryPass;
+
+	// 延迟渲染分组
+	Vector<GMGameObject*> deferredRenderingGameObjects;
+	Vector<GMGameObject*> forwardRenderingGameObjects;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -98,7 +100,6 @@ private:
 	void disposeDeferredRenderQuad();
 	void setViewport(const GMRect& rect);
 	void registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram);
-	void registerGeometryPassShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* deferredGeometryPassProgram);
 	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
 	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
 	void updateMatrices(const CameraLookAt& lookAt);
@@ -111,9 +112,10 @@ private:
 	void activateLightPassLight(const Vector<GMLight>& lights);
 	bool refreshGBuffer();
 	void forwardRender(GMGameObject* objects[], GMuint count);
-	void geometryPass(GMGameObject *objects[], GMuint count);
-	void lightPass(GMGameObject *objects[], GMuint count);
+	void geometryPass(Vector<GMGameObject*>& objects);
+	void lightPass();
 	void updateVPMatrices(const CameraLookAt& lookAt);
+	void groupGameObjects(GMGameObject *objects[], GMuint count);
 
 public:
 	static void newFrameOnCurrentContext();

@@ -50,6 +50,7 @@ public:
 	virtual void draw();
 	virtual void simulate() {}
 	virtual void updateAfterSimulate() {}
+	virtual bool canDeferredRendering();
 
 public:
 	inline void setScaling(const linear_math::Matrix4x4& scaling) { D(d); updateMatrix(); d->scaling = scaling; }
