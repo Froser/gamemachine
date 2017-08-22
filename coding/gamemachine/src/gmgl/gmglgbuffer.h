@@ -8,11 +8,11 @@ enum class GBufferGeometryType
 {
 	// 顶点属性
 	Position,
-	Normal,
+	Normal_Eye,
 	AmbientTexture,
 	DiffuseTexture,
-	Tangent,
-	Bitangent,
+	Tangent_Eye,
+	Bitangent_Eye,
 	NormalMap,
 	EndOfGeometryType,
 };
@@ -23,6 +23,7 @@ enum class GBufferMaterialType
 	Ka,
 	Kd,
 	Ks,
+	Shininess,
 	EndOfMaterialType,
 };
 
@@ -42,7 +43,7 @@ enum class GMGLDeferredRenderState
 	EndOfRenderState,
 };
 
-constexpr GMuint GMGLGBuffer_TotalTurn = (GMuint) GMGLDeferredRenderState::EndOfRenderState;
+constexpr GMint GMGLGBuffer_TotalTurn = (GMint) GMGLDeferredRenderState::EndOfRenderState;
 
 GM_PRIVATE_OBJECT(GMGLGBuffer)
 {

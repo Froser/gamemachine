@@ -3,18 +3,18 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
-constexpr GMuint GEOMETRY_NUM = (GMuint)GBufferGeometryType::EndOfGeometryType;
-constexpr GMuint MATERIAL_NUM = (GMuint)GBufferMaterialType::EndOfMaterialType;
-constexpr GMuint FLAG_NUM = (GMuint)GBufferFlags::EndOfFlags;
+constexpr GMint GEOMETRY_NUM = (GMint)GBufferGeometryType::EndOfGeometryType;
+constexpr GMint MATERIAL_NUM = (GMint)GBufferMaterialType::EndOfMaterialType;
+constexpr GMint FLAG_NUM = (GMint)GBufferFlags::EndOfFlags;
 
 Array<const char*, GEOMETRY_NUM> g_GBufferGeometryUniformNames =
 {
 	"gPosition",
-	"gNormal",
+	"gNormal_eye",
 	"gTexAmbient",
 	"gTexDiffuse",
-	"gTangent",
-	"gBitangent",
+	"gTangent_eye",
+	"gBitangent_eye",
 	"gNormalMap",
 };
 
@@ -23,6 +23,7 @@ Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
 	"gKa",
 	"gKd",
 	"gKs",
+	"gShininess",
 };
 
 Array<const char*, FLAG_NUM> g_GBufferFlagUniformNames =
@@ -92,9 +93,9 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	glGenFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
 
 	// Vertex data
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMuint)GMGLDeferredRenderState::GeometryPass]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::GeometryPass]);
 	glGenTextures(GEOMETRY_NUM, d->textures);
-	for (GMuint i = 0; i < GEOMETRY_NUM; i++)
+	for (GMint i = 0; i < GEOMETRY_NUM; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, d->textures[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
@@ -107,9 +108,9 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		return false;
 
 	// Material data
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMuint)GMGLDeferredRenderState::PassingMaterial]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingMaterial]);
 	glGenTextures(MATERIAL_NUM, d->materials);
-	for (GMuint i = 0; i < MATERIAL_NUM; i++)
+	for (GMint i = 0; i < MATERIAL_NUM; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, d->materials[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, windowWidth, windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
@@ -118,13 +119,14 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->materials[i], 0);
 		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 	}
+
 	if (!drawBuffers(MATERIAL_NUM))
 		return false;
 
 	// Flags
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMuint)GMGLDeferredRenderState::PassingFlags]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingFlags]);
 	glGenTextures(FLAG_NUM, d->flags);
-	for (GMuint i = 0; i < FLAG_NUM; i++)
+	for (GMint i = 0; i < FLAG_NUM; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, d->flags[i]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, windowWidth, windowHeight, 0, GL_RED, GL_FLOAT, NULL);

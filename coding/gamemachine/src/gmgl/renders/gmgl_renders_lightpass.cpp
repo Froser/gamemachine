@@ -47,9 +47,9 @@ void GMGLRenders_LightPass::activateLight(const GMLight& light, GMint lightIndex
 void GMGLRenders_LightPass::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
-	static auto identity = linear_math::Matrix4x4::identity();
 	auto shaderProgram = d->engine->getLightPassShader();
 	shaderProgram->useProgram();
-	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, identity.data());
 	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
+	GLenum errCode;
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
 }

@@ -23,13 +23,15 @@ uniform GM_texture_t GM_ambient_textures[MAX_TEXTURE_COUNT];
 uniform GM_texture_t GM_diffuse_textures[MAX_TEXTURE_COUNT];
 uniform GM_texture_t GM_lightmap_textures[MAX_TEXTURE_COUNT];  // 用到的只有1个
 uniform GM_texture_t GM_normalmap_textures[1];
+uniform mat4 GM_view_matrix;
+uniform mat4 GM_model_matrix;
 
 layout (location = 0) out vec3 gPosition;
-layout (location = 1) out vec3 gNormal;
+layout (location = 1) out vec3 gNormal_eye;
 layout (location = 2) out vec3 gTexAmbient;
 layout (location = 3) out vec3 gTexDiffuse;
-layout (location = 4) out vec3 gTangent;
-layout (location = 5) out vec3 gBitangent;
+layout (location = 4) out vec3 gTangent_eye;
+layout (location = 5) out vec3 gBitangent_eye;
 layout (location = 6) out vec3 gNormalMap;
 
 vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
@@ -51,13 +53,32 @@ vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 	return result;
 }
 
+void calcEyeSpace()
+{
+	// 由顶点变换矩阵计算法向量变换矩阵
+	mat4 normalModelTransform = transpose(inverse(GM_model_matrix));
+	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
+	vec4 vertex_eye = GM_view_matrix * _position_world;
+	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
+	gNormal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
+
+	if (GM_normalmap_textures[0].enabled == 1)
+	{
+		gTangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
+		gBitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
+	}
+	else
+	{
+		gTangent_eye = vec3(0,0,0);
+		gBitangent_eye = vec3(0,0,0);
+	}
+}
+
 void main()
 {
 	gPosition = _position_world.xyz;
-	gNormal = _normal.xyz;
 	gTexAmbient = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	gTexDiffuse = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
-	gTangent = _tangent.xyz;
-	gBitangent = _bitangent.xyz;
 	gNormalMap = texture(GM_normalmap_textures[0].texture, _uv).rgb;
+	calcEyeSpace();
 }

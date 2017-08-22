@@ -2,32 +2,38 @@
 
 #define MAX_LIGHT_COUNT 10
 
-in vec4 _position_world;
 in vec2 _texCoords;
 
 uniform sampler2D gPosition;
-uniform sampler2D gNormal;
+uniform sampler2D gNormal_eye;
 uniform sampler2D gTexAmbient;
 uniform sampler2D gTexDiffuse;
-uniform sampler2D gTangent;
-uniform sampler2D gBitangent;
+uniform sampler2D gTangent_eye;
+uniform sampler2D gBitangent_eye;
 uniform sampler2D gNormalMap;
 uniform sampler2D gKa;
 uniform sampler2D gKd;
 uniform sampler2D gKs;
+uniform sampler2D gShininess;
+uniform sampler2D gHasNormalMap;
 
+// geometries
 vec3 tPosition;
-vec3 tNormal;
+vec3 tNormal_eye;
 vec3 tTexAmbient;
 vec3 tTexDiffuse;
-vec3 tTangent;
-vec3 tBitangent;
+vec3 tTangent_eye;
+vec3 tBitangent_eye;
 vec3 tNormalMap;
 
+// materials
 vec3 tKa;
 vec3 tKd;
 vec3 tKs;
-float tShininess = 1.0f;
+float tShininess;
+
+// flags, -1 or 1
+float tHasNormalMap;
 
 struct GM_light_t
 {
@@ -38,7 +44,6 @@ uniform GM_light_t GM_ambients[MAX_LIGHT_COUNT];
 uniform GM_light_t GM_speculars[MAX_LIGHT_COUNT];
 
 uniform mat4 GM_view_matrix;
-uniform mat4 GM_model_matrix;
 
 // 调试变量
 uniform int GM_debug_draw_normal;
@@ -52,19 +57,26 @@ vec3 g_specularLight;
 
 out vec4 frag_color;
 
+bool hasFlag(float flag)
+{
+	return flag > 0;
+}
+
 void init()
 {
 	g_ambientLight = g_diffuseLight = g_specularLight = vec3(0);
 	tPosition = texture(gPosition, _texCoords).rgb;
-	tNormal = texture(gNormal, _texCoords).rgb;
+	tNormal_eye = texture(gNormal_eye, _texCoords).rgb;
 	tTexAmbient = texture(gTexAmbient, _texCoords).rgb;
 	tTexDiffuse = texture(gTexDiffuse, _texCoords).rgb;
-	tTangent = texture(gTangent, _texCoords).rgb;
-	tBitangent = texture(gBitangent, _texCoords).rgb;
+	tTangent_eye = texture(gTangent_eye, _texCoords).rgb;
+	tBitangent_eye = texture(gBitangent_eye, _texCoords).rgb;
 	tNormalMap = texture(gNormalMap, _texCoords).rgb;
 	tKa = texture(gKa, _texCoords).rgb;
 	tKd = texture(gKd, _texCoords).rgb;
 	tKs = texture(gKs, _texCoords).rgb;
+	tShininess = texture(gShininess, _texCoords).r;
+	tHasNormalMap = texture(gHasNormalMap, _texCoords).r;
 }
 
 void calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)
@@ -95,37 +107,30 @@ void calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirec
 void calcLights()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 normalModelTransform = transpose(inverse(GM_model_matrix));
-	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
-
-	vec4 vertex_eye = GM_view_matrix * _position_world;
+	vec4 vertex_eye = GM_view_matrix * vec4(tPosition, 1);
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
-	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
-	g_normal_eye = normalize( (normalEyeTransform * vec4(tNormal, 0)).xyz );
 
 	// 计算漫反射和高光部分
-	if (true) //TODO
+	if (!hasFlag(tHasNormalMap))
 	{
 		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
-			calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, g_normal_eye);
+			calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, tNormal_eye);
 		}
 	}
 	else
 	{
 		vec3 normal_tangent = tNormalMap.rgb * 2.0 - 1.0;
-		vec3 tangent_eye = normalize((normalEyeTransform * vec4(tTangent.xyz, 0)).xyz);
-		vec3 bitangent_eye = normalize((normalEyeTransform * vec4(tBitangent.xyz, 0)).xyz);
 		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
 			mat3 TBN = transpose(mat3(
-				tangent_eye,
-				bitangent_eye,
-				g_normal_eye.xyz
+				tTangent_eye,
+				tBitangent_eye,
+				tNormal_eye
 			));
 			vec3 lightDirection_tangent = TBN * lightDirection_eye;
 			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
@@ -147,7 +152,7 @@ void calcColor()
 
 	// 最终结果
 	vec3 color = g_ambientLight * tTexAmbient + g_diffuseLight * tTexDiffuse + g_specularLight;
-	frag_color = vec4(tPosition, 1.0f);
+	frag_color = vec4(color, 1.0f);
 }
 
 void main()
