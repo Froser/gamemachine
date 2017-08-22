@@ -71,7 +71,19 @@ void GMGLGBuffer::dispose()
 	if (d->textures[0] != 0)
 	{
 		glDeleteTextures(GEOMETRY_NUM, d->textures);
-		d->textures[0] = 0;
+		GM_ZeroMemory(d->textures);
+	}
+
+	if (d->materials[0] != 0)
+	{
+		glDeleteTextures(MATERIAL_NUM, d->materials);
+		GM_ZeroMemory(d->materials);
+	}
+
+	if (d->flags[0] != 0)
+	{
+		glDeleteTextures(FLAG_NUM, d->flags);
+		GM_ZeroMemory(d->flags);
 	}
 
 	if (d->depthTexture != 0)
