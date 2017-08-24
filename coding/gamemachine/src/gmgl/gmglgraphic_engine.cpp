@@ -13,6 +13,11 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfig.h"
 
+extern "C"
+{
+	GLenum s_glErrCode;
+}
+
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
@@ -47,6 +52,7 @@ void GMGLGraphicEngine::start()
 {
 	installShaders();
 	glDepthFunc(GL_LEQUAL);
+	createDeferredRenderQuad();
 }
 
 void GMGLGraphicEngine::newFrame()
@@ -106,6 +112,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		geometryPass(d->deferredRenderingGameObjects);
 		lightPass();
 
+		d->gbuffer.copyDepthBuffer();
 		setRenderMode(GMGLRenderMode::ForwardRendering);
 		drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 		setRenderMode(GMGLRenderMode::DeferredRendering);
@@ -302,7 +309,6 @@ void GMGLGraphicEngine::lightPass()
 {
 	D(d);
 	newFrame();
-	d->gbuffer.copyDepthBuffer();
 	d->deferredLightPassShader->useProgram();
 	refreshDeferredRenderLights();
 	d->gbuffer.activateTextures(d->deferredLightPassShader);
@@ -409,7 +415,7 @@ void GMGLGraphicEngine::refreshDeferredRenderLights()
 	}
 }
 
-void GMGLGraphicEngine::renderDeferredRenderQuad()
+void GMGLGraphicEngine::createDeferredRenderQuad()
 {
 	D(d);
 	if (d->quadVAO == 0)
@@ -423,8 +429,8 @@ void GMGLGraphicEngine::renderDeferredRenderQuad()
 		};
 
 		glGenVertexArrays(1, &d->quadVAO);
-		glGenBuffers(1, &d->quadVBO);
 		glBindVertexArray(d->quadVAO);
+		glGenBuffers(1, &d->quadVBO);
 		glBindBuffer(GL_ARRAY_BUFFER, d->quadVBO);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
@@ -432,12 +438,16 @@ void GMGLGraphicEngine::renderDeferredRenderQuad()
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	}
+}
+
+void GMGLGraphicEngine::renderDeferredRenderQuad()
+{
+	D(d);
 	glBindVertexArray(d->quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
 
-	GLenum errCode;
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+	GM_CHECK_GL_ERROR();
 }
 
 void GMGLGraphicEngine::disposeDeferredRenderQuad()

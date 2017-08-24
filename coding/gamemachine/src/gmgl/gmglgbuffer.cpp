@@ -62,6 +62,7 @@ bool GMGLGBuffer::nextPass()
 void GMGLGBuffer::dispose()
 {
 	D(d);
+
 	if (d->fbo)
 	{
 		glDeleteFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
@@ -86,17 +87,16 @@ void GMGLGBuffer::dispose()
 		GM_ZeroMemory(d->flags);
 	}
 
-	if (d->depthTexture != 0)
+	if (d->depthBuffer != 0)
 	{
-		glDeleteTextures(1, &d->depthTexture);
-		d->depthTexture = 0;
+		glDeleteRenderbuffers(1, &d->depthBuffer);
+		d->depthBuffer = 0;
 	}
 }
 
 bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 {
 	D(d);
-	GLenum errCode;
 
 	d->windowWidth = windowWidth;
 	d->windowHeight = windowHeight;
@@ -114,12 +114,13 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
-		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+		GM_CHECK_GL_ERROR();
 	}
 	// depth
-	glGenRenderbuffers(1, &d->depthTexture);
-	glBindRenderbuffer(GL_RENDERBUFFER, d->depthTexture);
+	glGenRenderbuffers(1, &d->depthBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, windowWidth, windowHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
 	if (!drawBuffers(GEOMETRY_NUM))
 		return false;
 
@@ -133,7 +134,7 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->materials[i], 0);
-		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+		GM_CHECK_GL_ERROR();
 	}
 
 	if (!drawBuffers(MATERIAL_NUM))
@@ -149,7 +150,7 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->flags[i], 0);
-		ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+		GM_CHECK_GL_ERROR();
 	}
 	if (!drawBuffers(FLAG_NUM))
 		return false;
@@ -201,16 +202,15 @@ void GMGLGBuffer::newFrame()
 void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 {
 	D(d);
-	GLenum errCode;
 
 	{
 		for (GMuint i = 0; i < GEOMETRY_NUM; i++)
 		{
 			shaderProgram->setInt(g_GBufferGeometryUniformNames[i], i);
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 			glActiveTexture(GL_TEXTURE0 + i);
 			glBindTexture(GL_TEXTURE_2D, d->textures[i]);
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 		}
 	}
 
@@ -219,10 +219,10 @@ void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 		for (GMuint i = 0; i < MATERIAL_NUM; i++)
 		{
 			shaderProgram->setInt(g_GBufferMaterialUniformNames[i], GEOMETRY_OFFSET + i);
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 			glActiveTexture(GL_TEXTURE0 + GEOMETRY_OFFSET + i);
 			glBindTexture(GL_TEXTURE_2D, d->materials[i]);
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 		}
 	}
 
@@ -231,10 +231,10 @@ void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 		for (GMuint i = 0; i < FLAG_NUM; i++)
 		{
 			shaderProgram->setInt(g_GBufferFlagUniformNames[i], FLAG_OFFSET + i);
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 			glActiveTexture(GL_TEXTURE0 + FLAG_OFFSET + i);
 			glBindTexture(GL_TEXTURE_2D, d->flags[i]);
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 		}
 	}
 }
@@ -246,11 +246,11 @@ void GMGLGBuffer::copyDepthBuffer()
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, d->windowWidth, d->windowHeight, 0, 0, d->windowWidth, d->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	GM_CHECK_GL_ERROR();
 }
 
 bool GMGLGBuffer::drawBuffers(GMuint count)
 {
-	GLenum errCode;
 	Vector<GLuint> attachments;
 	for (GMuint i = 0; i < count; i++)
 	{
@@ -258,7 +258,7 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 	}
 
 	glDrawBuffers(count, attachments.data());
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+	GM_CHECK_GL_ERROR();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)

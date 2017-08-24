@@ -67,7 +67,7 @@ public:
 #if _DEBUG
 #	define gm_debug GMDebugger::instance().debug
 #else
-#	define gm_debug()
+#	define gm_debug(i)
 #endif
 
 // hooks

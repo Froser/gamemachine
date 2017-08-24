@@ -51,7 +51,7 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 	GLuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
 	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
 	GLuint flags[(GMint)GBufferFlags::EndOfFlags] = { 0 };
-	GLuint depthTexture = 0;
+	GLuint depthBuffer = 0;
 	GMuint windowWidth = 0;
 	GMuint windowHeight = 0;
 	GMint currentTurn = 0;

@@ -35,8 +35,7 @@ void GMGLRenders_LightPass::activateLight(const GMLight& light, GMint lightIndex
 			combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
 			shaderProgram->setVec3(u_color, light.getLightColor());
 			shaderProgram->setVec3(u_position, light.getLightPosition());
-			GLenum errCode;
-			ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+			GM_CHECK_GL_ERROR();
 		}
 		break;
 	default:
@@ -50,6 +49,5 @@ void GMGLRenders_LightPass::updateVPMatrices(const linear_math::Matrix4x4& proje
 	auto shaderProgram = d->engine->getLightPassShader();
 	shaderProgram->useProgram();
 	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
-	GLenum errCode;
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+	GM_CHECK_GL_ERROR();
 }

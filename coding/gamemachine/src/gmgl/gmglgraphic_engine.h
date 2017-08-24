@@ -14,6 +14,13 @@ class GMGameWorld;
 class GameLight;
 struct IRender;
 
+extern "C"
+{
+	extern GLenum s_glErrCode;
+}
+
+#define GM_CHECK_GL_ERROR() ASSERT((s_glErrCode = glGetError()) == GL_NO_ERROR);
+
 enum class GMGLRenderMode
 {
 	ForwardRendering,
@@ -96,6 +103,7 @@ public:
 private:
 	void refreshForwardRenderLights();
 	void refreshDeferredRenderLights();
+	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();
 	void disposeDeferredRenderQuad();
 	void setViewport(const GMRect& rect);
