@@ -62,6 +62,20 @@ void GMGameObject::draw()
 
 bool GMGameObject::canDeferredRendering()
 {
+	D(d);
+	if (d->modelPropertyChanged)
+	{
+		GMModel* model = getModel();
+		auto& meshes = model->getAllMeshes();
+		for (auto mesh : meshes)
+		{
+			auto& components = mesh->getComponents();
+			for (auto& component : components)
+			{
+			}
+		}
+	}
+
 	return true;
 }
 

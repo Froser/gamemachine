@@ -8,6 +8,7 @@
 #include <vector>
 #include <queue>
 #include <array>
+#include <unordered_map>
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -30,6 +31,12 @@ using Queue = std::queue<T>;
 
 template <typename T, size_t size>
 using Array = std::array<T, size>;
+
+template <typename T>
+using Hash = std::hash<T>;
+
+template <typename T1, typename T2>
+using UnorderedMap = std::unordered_map<T1, T2>;
 
 /* 工程编译选项 */
 // 使用UNICODE

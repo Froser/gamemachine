@@ -2,6 +2,7 @@
 #define __GMOBJECT_H__
 #include "defines.h"
 #include "memory.h"
+#include <functional>
 
 BEGIN_NS
 
@@ -93,7 +94,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 
 #define GM_DECLARE_SETTER(name, memberName, paramType) \
 	public: \
-	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
+	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; emitEvent("onSet" #name); }
 
 #define GM_DECLARE_PROPERTY(name, memberName, paramType) \
 	GM_DECLARE_GETTER(name, memberName, paramType) \
@@ -156,7 +157,24 @@ struct GMObjectMember
 	void* ptr;
 };
 
-using GMMeta = Map<char*, GMObjectMember>;
+using GMMeta = Map<std::string, GMObjectMember>;
+
+// 事件目标，表示一个GMObject被多少事件连接
+using GMEventCallback = std::function<void(GMObject&)>;
+struct GMCallbackTarget
+{
+	GMObject* receiver;
+	GMEventCallback callback;
+};
+
+// 连接目标，表示一个GMObject连接了多少个事件
+struct GMConnectionTarget
+{
+	GMObject* host;
+	char name[128];
+};
+using GMConnectionTargets = Vector<GMConnectionTarget>;
+using GMEvents = UnorderedMap<std::string, Vector<GMCallbackTarget>>;
 
 #define GM_BEGIN_META_MAP \
 	protected: \
@@ -178,6 +196,8 @@ using GMMeta = Map<char*, GMObjectMember>;
 GM_PRIVATE_OBJECT(GMObject)
 {
 	GMMeta meta;
+	GMEvents events;
+	GMConnectionTargets connectionTargets;
 };
 
 class GMObject : public IDispose
@@ -188,15 +208,27 @@ class GMObject : public IDispose
 
 public:
 	GMObject() = default;
+	~GMObject();
 	GMObject(GMObject&& obj) noexcept;
 	GMObject& operator=(GMObject&& obj) noexcept;
 
 public:
 	const GMMeta* meta() { D(d); if (!registerMeta()) return nullptr; return &d->meta; }
 	void swap(GMObject& another);
+	void attachEvent(GMObject& sender, const char* eventName, const GMEventCallback& callback);
+	void detachEvent(GMObject& sender, const char* eventName);
+	void emitEvent(const char* eventName);
 
 public:
 	static void swap(GMObject& a, GMObject& b);
+
+private:
+	void addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback);
+	void removeEventAndConnection(const char* eventName, GMObject& receiver);
+	void removeEvent(const char* eventName, GMObject& receiver);
+	void releaseEvents();
+	void addConnection(GMObject* host, const char* eventName);
+	void removeConnection(GMObject* host, const char* eventName);
 
 protected:
 	virtual bool registerMeta() { return false; }

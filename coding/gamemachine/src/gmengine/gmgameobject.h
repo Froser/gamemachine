@@ -19,6 +19,9 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	linear_math::Matrix4x4 translation;
 	linear_math::Quaternion rotation;
 	linear_math::Matrix4x4 transformMatrix;
+
+	bool modelPropertyChanged = false;
+	bool canDeferredRendering = true;
 };
 
 enum class GMGameObjectType

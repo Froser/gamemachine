@@ -623,6 +623,19 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
+	GMObject obj;
+	GMObject b;
+	b.attachEvent(obj, "A", [](GMObject& receiver) {
+		OutputDebugStringA("test");
+	});
+
+	b.attachEvent(obj, "B", [](GMObject& receiver) {
+		OutputDebugStringA("test");
+	});
+	b.detachEvent(obj, "B");
+	obj.emitEvent("A");
+	obj.emitEvent("B");
+
 	GMUIWindowAttributes attrs =
 	{
 		NULL,

@@ -211,7 +211,7 @@ void GMLua::setTable(GMObject& obj)
 	ASSERT(meta);
 	for (const auto& member : *meta)
 	{
-		push(member.first, member.second);
+		push(member.first.c_str(), member.second);
 	}
 }
 
@@ -238,7 +238,7 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 		const char* key = lua_tostring(L, -2);
 		for (const auto member : *meta)
 		{
-			if (strEqual(member.first, key))
+			if (member.first == key)
 			{
 				switch (member.second.type)
 				{
