@@ -541,6 +541,8 @@ void GMGLGraphicEngine::addLight(const GMLight& light)
 void GMGLGraphicEngine::beginCreateStencil()
 {
 	D(d);
+	d->stencilRenderModeCache = getRenderMode();
+	setRenderMode(GMGLRenderMode::ForwardRendering);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
@@ -553,6 +555,7 @@ void GMGLGraphicEngine::endCreateStencil()
 {
 	D(d);
 	glStencilMask(0x00);
+	setRenderMode(d->stencilRenderModeCache);
 }
 
 void GMGLGraphicEngine::beginUseStencil(bool inverse)

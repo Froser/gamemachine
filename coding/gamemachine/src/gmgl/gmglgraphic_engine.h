@@ -54,6 +54,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GraphicSettings* settings = nullptr;
 	linear_math::Matrix4x4 viewMatrix;
 	linear_math::Matrix4x4 projectionMatrix;
+
 	GMGLGBuffer gbuffer;
 	// 延迟渲染的四边形
 	GMuint quadVAO = 0;
@@ -64,6 +65,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	// 延迟渲染分组
 	Vector<GMGameObject*> deferredRenderingGameObjects;
 	Vector<GMGameObject*> forwardRenderingGameObjects;
+
+	GMGLRenderMode stencilRenderModeCache = GMGLRenderMode::ForwardRendering;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine

@@ -116,11 +116,19 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->textures[i], 0);
 		GM_CHECK_GL_ERROR();
 	}
-	// depth
+
+	// If using STENCIL buffer:
+	// EVER EVER MAKE A STENCIL buffer. All GPUs and all drivers do not support an independent stencil buffer.
+	// If you need a stencil buffer, then you need to make a Depth=24, Stencil=8 buffer, also called D24S8.
+	// See https://www.khronos.org/opengl/wiki/Framebuffer_Object_Extension_Examples
+
 	glGenRenderbuffers(1, &d->depthBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, windowWidth, windowHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, windowWidth, windowHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
+	GM_CHECK_GL_ERROR();
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
 	if (!drawBuffers(GEOMETRY_NUM))
 		return false;
 
@@ -245,6 +253,7 @@ void GMGLGBuffer::copyDepthBuffer()
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::GeometryPass]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, d->windowWidth, d->windowHeight, 0, 0, d->windowWidth, d->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	GM_CHECK_GL_ERROR();
 }

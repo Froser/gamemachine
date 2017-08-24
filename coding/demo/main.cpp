@@ -535,10 +535,10 @@ private:
 				engine->newFrame();
 
 				demo->beginCreateStencil();
-				//mask->draw();
+				mask->draw();
 				demo->endCreateStencil();
 
-				//demo->beginUseStencil(true);
+				demo->beginUseStencil(false);
 
 				if (rotate)
 					a += .01f;
@@ -553,7 +553,7 @@ private:
 				obj->setRotation(q);
 				demo->renderGameWorld();
 
-				//demo->endUseStencil();
+				demo->endUseStencil();
 				break;
 			}
 		case gm::GameMachineEvent::Activate:
