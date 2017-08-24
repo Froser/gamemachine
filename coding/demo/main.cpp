@@ -535,10 +535,10 @@ private:
 				engine->newFrame();
 
 				demo->beginCreateStencil();
-				mask->draw();
+				//mask->draw();
 				demo->endCreateStencil();
 
-				demo->beginUseStencil(false);
+				demo->beginUseStencil(true);
 
 				if (rotate)
 					a += .01f;
@@ -623,19 +623,6 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	GMObject obj;
-	GMObject b;
-	b.attachEvent(obj, "A", [](GMObject& receiver) {
-		OutputDebugStringA("test");
-	});
-
-	b.attachEvent(obj, "B", [](GMObject& receiver) {
-		OutputDebugStringA("test");
-	});
-	b.detachEvent(obj, "B");
-	obj.emitEvent("A");
-	obj.emitEvent("B");
-
 	GMUIWindowAttributes attrs =
 	{
 		NULL,

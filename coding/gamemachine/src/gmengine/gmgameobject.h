@@ -20,7 +20,6 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	linear_math::Quaternion rotation;
 	linear_math::Matrix4x4 transformMatrix;
 
-	bool modelPropertyChanged = false;
 	bool canDeferredRendering = true;
 };
 
@@ -66,6 +65,10 @@ protected:
 
 private:
 	inline void updateMatrix();
+
+	// events
+private:
+	static void onShaderSetBlend(GMObject* sender, GMObject* receiver);
 };
 
 //GMGlyphObject

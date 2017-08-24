@@ -160,7 +160,7 @@ struct GMObjectMember
 using GMMeta = Map<std::string, GMObjectMember>;
 
 // 事件目标，表示一个GMObject被多少事件连接
-using GMEventCallback = std::function<void(GMObject&)>;
+using GMEventCallback = std::function<void(GMObject*, GMObject*)>;
 struct GMCallbackTarget
 {
 	GMObject* receiver;
@@ -218,9 +218,22 @@ public:
 	void attachEvent(GMObject& sender, const char* eventName, const GMEventCallback& callback);
 	void detachEvent(GMObject& sender, const char* eventName);
 	void emitEvent(const char* eventName);
-
+	
 public:
 	static void swap(GMObject& a, GMObject& b);
+
+	template <typename TargetType>
+	static TargetType gmobject_cast(GMObject* obj)
+	{
+#if _DEBUG
+		TargetType target = dynamic_cast<TargetType>(obj);
+		ASSERT(target);
+		return target;
+#else
+		return static_cast<TargetType>(obj);
+#endif
+	}
+
 
 private:
 	void addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback);

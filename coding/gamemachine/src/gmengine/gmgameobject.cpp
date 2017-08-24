@@ -29,6 +29,19 @@ void GMGameObject::setModel(AUTORELEASE GMModel* obj)
 	if (d->model)
 		delete d->model;
 	d->model = obj;
+
+	if (d->model)
+	{
+		for (auto& mesh : d->model->getAllMeshes())
+		{
+			for (auto& component : mesh->getComponents())
+			{
+				Shader& shader = component->getShader();
+				attachEvent(shader, "onSetBlend", onShaderSetBlend);
+				shader.emitEvent("onSetBlend");
+			}
+		}
+	}
 }
 
 GMModel* GMGameObject::getModel()
@@ -63,26 +76,20 @@ void GMGameObject::draw()
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
-	if (d->modelPropertyChanged)
-	{
-		GMModel* model = getModel();
-		auto& meshes = model->getAllMeshes();
-		for (auto mesh : meshes)
-		{
-			auto& components = mesh->getComponents();
-			for (auto& component : components)
-			{
-			}
-		}
-	}
-
-	return true;
+	return d->canDeferredRendering;
 }
 
 void GMGameObject::updateMatrix()
 {
 	D(d);
 	d->transformMatrix = d->scaling * d->rotation.toMatrix() * d->translation;
+}
+
+void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
+{
+	GMGameObject* gameObject = gmobject_cast<GMGameObject*>(receiver);
+	Shader* shader = gmobject_cast<Shader*>(sender);
+	gameObject->data()->canDeferredRendering = !shader->getBlend();
 }
 
 //GlyphObject

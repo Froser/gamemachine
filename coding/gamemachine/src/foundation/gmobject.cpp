@@ -85,7 +85,7 @@ void GMObject::emitEvent(const char* eventName)
 	auto& targets = d->events[eventName];
 	for (auto& target : targets)
 	{
-		target.callback(*target.receiver);
+		target.callback(this, target.receiver);
 	}
 }
 
