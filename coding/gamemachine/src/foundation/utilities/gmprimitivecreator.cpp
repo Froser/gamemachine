@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmprimitivecreator.h"
 
-void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, GMMeshType type)
+void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type)
 {
 	static constexpr GMfloat v[24] = {
 		1, -1, 1,
@@ -65,6 +65,8 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, GMMes
 			}
 			component->endFace();
 		}
+		if (shaderCallback)
+			shaderCallback->onCreateShader(component->getShader());
 		body->appendComponent(component);
 		coreObj->append(body);
 	}
@@ -72,7 +74,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, GMMes
 	*obj = coreObj;
 }
 
-void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, GMMeshType type)
+void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type)
 {
 	static constexpr GMfloat v[] = {
 		-1, 1, 0,
@@ -126,6 +128,8 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 			}
 			component->endFace();
 		}
+		if (shaderCallback)
+			shaderCallback->onCreateShader(component->getShader());
 		body->appendComponent(component);
 		coreObj->append(body);
 	}

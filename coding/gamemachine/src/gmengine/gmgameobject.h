@@ -32,12 +32,14 @@ enum class GMGameObjectType
 	Custom,
 };
 
+struct GMModelContainerItemIndex;
 class GMGameObject : public GMObject
 {
 	DECLARE_PRIVATE(GMGameObject)
 
 public:
 	GMGameObject(AUTORELEASE GMModel* obj);
+	GMGameObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex);
 	virtual ~GMGameObject();
 
 public:
@@ -124,6 +126,7 @@ class GMEntityObject : public GMGameObject
 
 public:
 	GMEntityObject(AUTORELEASE GMModel* obj);
+	GMEntityObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex);
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }

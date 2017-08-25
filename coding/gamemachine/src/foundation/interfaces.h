@@ -6,7 +6,6 @@ BEGIN_NS
 class GameMachine;
 class GMGameWorld;
 class GMCamera;
-class ResourceContainer;
 class GMGameObject;
 class DrawingList;
 class GMGamePackage;
@@ -20,6 +19,7 @@ class GMModelPainter;
 class GMMesh;
 class GMTextureFrames;
 class GMTexture;
+class GMResourceContainer;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
@@ -90,7 +90,6 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void event(const GameMachineMessage& e) = 0;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
-	virtual ResourceContainer* getResourceContainer() = 0;
 	virtual void addLight(const GMLight& light) = 0;
 	virtual void beginCreateStencil() = 0;
 	virtual void endCreateStencil() = 0;

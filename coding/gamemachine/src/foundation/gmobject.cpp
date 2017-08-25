@@ -82,6 +82,9 @@ void GMObject::removeEventAndConnection(const char* eventName, GMObject& receive
 void GMObject::emitEvent(const char* eventName)
 {
 	D(d);
+	if (d->events.empty())
+		return;
+
 	auto& targets = d->events[eventName];
 	for (auto& target : targets)
 	{
@@ -102,19 +105,25 @@ void GMObject::releaseEvents()
 {
 	D(d);
 	// 释放连接到此对象的事件
-	for (auto& event : d->events)
+	if (!d->events.empty())
 	{
-		const char* name = event.first.c_str();
-		for (auto& target : event.second)
+		for (auto& event : d->events)
 		{
-			target.receiver->removeConnection(this, name);
+			const char* name = event.first.c_str();
+			for (auto& target : event.second)
+			{
+				target.receiver->removeConnection(this, name);
+			}
 		}
 	}
 
 	// 释放此对象连接的所有事件
-	for (auto& conns : d->connectionTargets)
+	if (!d->connectionTargets.empty())
 	{
-		conns.host->removeEvent(conns.name, *this);
+		for (auto& conns : d->connectionTargets)
+		{
+			conns.host->removeEvent(conns.name, *this);
+		}
 	}
 }
 

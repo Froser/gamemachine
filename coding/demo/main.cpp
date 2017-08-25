@@ -290,17 +290,13 @@ public:
 		GMBuffer vertBuf, fragBuf;
 		switch (state)
 		{
-		case GMGLDeferredRenderState::GeometryPass:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "geometry_pass.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "geometry_pass.frag", &fragBuf);
+		case GMGLDeferredRenderState::PassingGeometry:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/geometry_pass.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/geometry_pass.frag", &fragBuf);
 			break;
 		case gm::GMGLDeferredRenderState::PassingMaterial:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "material_pass.frag", &fragBuf);
-			break;
-		case gm::GMGLDeferredRenderState::PassingFlags:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "flag_pass.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "flag_pass.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.vert", &vertBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.frag", &fragBuf);
 			break;
 		default:
 			return false;
@@ -321,8 +317,8 @@ public:
 	bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
-		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "light_pass.vert", &vertBuf);
-		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "light_pass.frag", &fragBuf);
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.vert", &vertBuf);
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.frag", &fragBuf);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -355,8 +351,6 @@ private:
 		//camera.initOrtho(-1, 1, -1, 1, 0, 500);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-		auto container = engine->getResourceContainer();
-		auto& textureContainer = container->getTextureContainer();
 
 		auto pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -364,17 +358,6 @@ private:
 #else
 		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
 #endif
-
-		GMImage* img;
-		GMBuffer buf;
-		pk->readFile(GMPackageIndex::Textures, "bnp.png", &buf);
-		GMImageReader::load(buf.buffer, buf.size, &img);
-
-		ITexture* tex;
-		factory.createTexture(img, &tex);
-
-		TextureContainer::TextureItemType item = { "", tex };
-		textureContainer.insert(item);
 
 		demo = new GMDemoGameWorld();
 
@@ -392,35 +375,59 @@ private:
 			mask = new GMGameObject(maskModel);
 			GameMachine::instance().initObjectPainter(mask->getModel());
 		}
+
 		{
+			struct _ShaderCb : public IPrimitiveCreatorShaderCallback
+			{
+				GMDemoGameWorld* demo;
+
+				_ShaderCb(GMDemoGameWorld* d) : demo(d) {}
+
+				virtual void onCreateShader(Shader& shader) override
+				{
+					shader.setCull(GMS_Cull::CULL);
+					shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
+					shader.getMaterial().ks = linear_math::Vector3(.1f, .2f, .3f);
+					shader.getMaterial().ka = linear_math::Vector3(1, 1, 1);
+					shader.getMaterial().shininess = 20;
+
+					auto pk = GameMachine::instance().getGamePackageManager();
+					auto& container = demo->getResourceContainer();
+					auto& textureContainer = container.getTextureContainer();
+
+					GMImage* img;
+					GMBuffer buf;
+					pk->readFile(GMPackageIndex::Textures, "bnp.png", &buf);
+					GMImageReader::load(buf.buffer, buf.size, &img);
+
+					ITexture* tex;
+					factory.createTexture(img, &tex);
+
+					GMTextureContainer::TextureItemType item = { "", tex };
+					textureContainer.insert(item);
+
+					{
+						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
+						frames.setOneFrame(0, tex);
+						frames.setFrameCount(1);
+					}
+
+					{
+						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::DIFFUSE, 0);
+						frames.setOneFrame(0, tex);
+						frames.setFrameCount(1);
+					}
+
+				}
+			} cb(demo);
+
 			GMfloat extents[] = { .5f, .5f, .5f };
 			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* coreObj;
-			GMPrimitiveCreator::createQuad(extents, pos, &coreObj);
+			GMPrimitiveCreator::createQuad(extents, pos, &coreObj, &cb);
 			GMGameObject* obj = new GMGameObject(coreObj);
 
-			GMModel* model = obj->getModel();
-			Shader& shader = model->getAllMeshes()[0]->getComponents()[0]->getShader();
-			shader.setCull(GMS_Cull::CULL);
-
-			shader.getMaterial().kd = linear_math::Vector3(.6f, .2f, .3f);
-			shader.getMaterial().ks = linear_math::Vector3(.1f, .2f, .3f);
-			shader.getMaterial().ka = linear_math::Vector3(1, 1, 1);
-			shader.getMaterial().shininess = 20;
-
 			demo->appendObject("cube", obj);
-
-			{
-				auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
-				frames.setOneFrame(0, tex);
-				frames.setFrameCount(1);
-			}
-
-			{
-				auto& frames = shader.getTexture().getTextureFrames(GMTextureType::DIFFUSE, 0);
-				frames.setOneFrame(0, tex);
-				frames.setFrameCount(1);
-			}
 
 			{
 				GMLight light(GMLightType::SPECULAR);
@@ -480,7 +487,7 @@ private:
 			&emitter
 		);
 #endif
-		//demo->appendObject("particles", emitter);
+		demo->appendObject("particles", emitter);
 #endif
 		GMBuffer buffer;
 		pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);

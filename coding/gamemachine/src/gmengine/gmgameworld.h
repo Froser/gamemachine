@@ -6,6 +6,7 @@
 #include "gmdatacore/shader.h"
 #include "gmgameobject.h"
 #include "foundation/gamemachine.h"
+#include "gmresourcecontainer.h"
 
 BEGIN_NS
 
@@ -15,6 +16,7 @@ class GMModelPainter;
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
+	GMResourceContainer resourceContainer;
 	bool start;
 };
 
@@ -42,6 +44,7 @@ public:
 	void simulateGameWorld();
 	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 	void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
+	GMResourceContainer& getResourceContainer() { D(d); return d->resourceContainer; }
 
 private:
 	GMModelPainter* createPainterForObject(GMGameObject* obj);

@@ -59,8 +59,8 @@ set(SOURCES
 		gmdatacore/shader.h
 		gmdatacore/model.h
 		gmdatacore/model.cpp
-		gmengine/resource_container.h
-		gmengine/resource_container.cpp
+		gmengine/gmresourcecontainer.h
+		gmengine/gmresourcecontainer.cpp
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
 		gmengine/gmgameobject.h

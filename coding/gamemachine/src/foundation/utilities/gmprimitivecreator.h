@@ -5,10 +5,17 @@
 BEGIN_NS
 
 class GMModel;
+class Shader;
+
+GM_INTERFACE(IPrimitiveCreatorShaderCallback)
+{
+	virtual void onCreateShader(Shader& shader) = 0;
+};
+
 struct GMPrimitiveCreator
 {
-	static void createCube(GMfloat extents[3], OUT GMModel** obj, GMMeshType type = GMMeshType::Model);
-	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, GMMeshType type = GMMeshType::Model);
+	static void createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMMeshType type = GMMeshType::Model);
+	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMMeshType type = GMMeshType::Model);
 };
 
 END_NS

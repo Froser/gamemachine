@@ -265,7 +265,7 @@ void GMLerpParticleEmitter::onAppendingObjectToWorld()
 	// 位置、大小初始值无关紧要
 	static GMfloat size[] = { 1, 1, 1 };
 	static GMfloat position[] = { 0, 0, 0 };
-	GMPrimitiveCreator::createQuad(size, position, &d->prototype, GMMeshType::Particles);
+	GMPrimitiveCreator::createQuad(size, position, &d->prototype, nullptr, GMMeshType::Particles);
 	GMParticlesEmitter::onAppendingObjectToWorld();
 }
 

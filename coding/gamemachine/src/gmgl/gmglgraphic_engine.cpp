@@ -166,12 +166,12 @@ void GMGLGraphicEngine::installShaders()
 		registerLightPassShader(deferredShaderLightPassProgram);
 	}
 
-	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::GeometryPass, GMGLDeferredRenderState::EndOfRenderState)
+	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingGeometry, GMGLDeferredRenderState::EndOfRenderState)
 	{
 		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
 		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredPassShader(state, *shaderProgram)))
 		{
-			if (!loadDefaultDeferredMaterialPassShader(shaderProgram))
+			if (!loadDefaultDeferredRenderShader(state, shaderProgram))
 			{
 				delete shaderProgram;
 				shaderProgram = nullptr;
@@ -189,54 +189,49 @@ void GMGLGraphicEngine::installShaders()
 
 bool GMGLGraphicEngine::loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram)
 {
-	bool flag = false;
 	switch (type)
 	{
 	case GMMeshType::Model:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object.frag });
-		flag = true;
 		break;
 	case GMMeshType::Glyph:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::glyph.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::glyph.frag });
-		flag = true;
 		break;
 	case GMMeshType::Particles:
 		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::particles.vert });
 		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::particles.frag });
-		flag = true;
 		break;
 	default:
-		break;
+		return false;
 	}
-	return flag;
-}
-
-bool GMGLGraphicEngine::loadDefaultDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram* shaderProgram)
-{
-	bool flag = false;
-	switch (type)
-	{
-	case GMMeshType::Model:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object_pass.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object_pass.frag });
-		flag = true;
-		break;
-	default:
-		break;
-	}
-	return flag;
-}
-
-bool GMGLGraphicEngine::loadDefaultDeferredMaterialPassShader(GMGLShaderProgram* shaderProgram)
-{
-	return false;
+	return true;
 }
 
 bool GMGLGraphicEngine::loadDefaultDeferredLightPassShader(GMGLShaderProgram* shaderProgram)
 {
-	return false;
+	shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::deferred_light_pass.vert });
+	shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::deferred_light_pass.frag });
+	return true;
+}
+
+bool GMGLGraphicEngine::loadDefaultDeferredRenderShader(GMGLDeferredRenderState state, GMGLShaderProgram* shaderProgram)
+{
+	switch (state)
+	{
+	case GMGLDeferredRenderState::PassingGeometry:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::deferred_geometry_pass.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::deferred_geometry_pass.frag });
+		break;
+	case GMGLDeferredRenderState::PassingMaterial:
+		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::deferred_material_pass.vert });
+		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::deferred_material_pass.frag });
+		break;
+	default:
+		return false;
+	}
+	return true;
 }
 
 void GMGLGraphicEngine::activateForwardRenderLight(const Vector<GMLight>& lights)
@@ -272,6 +267,9 @@ bool GMGLGraphicEngine::refreshGBuffer()
 {
 	D(d);
 	GMRect rect = GM.getMainWindow()->getClientRect();
+	if (rect.width <= 0 || rect.height <= 0)
+		return true;
+
 	d->gbuffer.dispose();
 	return d->gbuffer.init(rect.width, rect.height);
 }
@@ -390,7 +388,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 
 	// 更新material pass著色器
 	setRenderMode(GMGLRenderMode::DeferredRendering);
-	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::GeometryPass, GMGLDeferredRenderState::EndOfRenderState)
+	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingGeometry, GMGLDeferredRenderState::EndOfRenderState)
 	{
 		setRenderState(state);
 		updateVPMatrices(lookAt);
@@ -552,12 +550,6 @@ void GMGLGraphicEngine::setRenderMode(GMGLRenderMode mode)
 	if (d->renderMode != mode)
 		d->needRefreshLights = true;
 	d->renderMode = mode;
-}
-
-ResourceContainer* GMGLGraphicEngine::getResourceContainer()
-{
-	D(d);
-	return &d->resourceContainer;
 }
 
 void GMGLGraphicEngine::addLight(const GMLight& light)

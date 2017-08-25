@@ -18,16 +18,12 @@ GM_ALIGNED_STRUCT_FROM(BSPTracePlane, BSPPlane)
 
 		this->planeType = p.planeType;
 		this->signbits = p.signbits;
-		this->normal = p.normal;
-		this->intercept = p.intercept;
 		return *this;
 	}
 
 	BSPTracePlane& operator =(const BSPPlane& p)
 	{
 		BSPPlane::operator=(p);
-		this->normal = p.normal;
-		this->intercept = p.intercept;
 		return *this;
 	}
 };

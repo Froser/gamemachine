@@ -2,7 +2,7 @@
 #define __GMGLGRAPHIC_ENGINE_H__
 #include "common.h"
 #include "gmglshaderprogram.h"
-#include "gmengine/resource_container.h"
+#include "gmengine/gmresourcecontainer.h"
 #include "foundation/utilities/utilities.h"
 #include <map>
 #include "gmglgbuffer.h"
@@ -50,7 +50,6 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMGLShaderProgram* deferredLightPassShader = nullptr;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
-	ResourceContainer resourceContainer;
 	GraphicSettings* settings = nullptr;
 	linear_math::Matrix4x4 viewMatrix;
 	linear_math::Matrix4x4 projectionMatrix;
@@ -60,7 +59,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMuint quadVAO = 0;
 	GMuint quadVBO = 0;
 	// 渲染状态
-	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::GeometryPass;
+	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 
 	// 延迟渲染分组
 	Vector<GMGameObject*> deferredRenderingGameObjects;
@@ -83,7 +82,6 @@ public:
 	virtual void event(const GameMachineMessage& e) override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
-	virtual ResourceContainer* getResourceContainer() override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void beginCreateStencil() override;
 	virtual void endCreateStencil() override;
@@ -116,9 +114,8 @@ private:
 	void updateMatrices(const CameraLookAt& lookAt);
 	void installShaders();
 	bool loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram);
-	bool loadDefaultDeferredGeometryPassShader(const GMMeshType type, GMGLShaderProgram* shaderProgram);
-	bool loadDefaultDeferredMaterialPassShader(GMGLShaderProgram* shaderProgram);
 	bool loadDefaultDeferredLightPassShader(GMGLShaderProgram* shaderProgram);
+	bool loadDefaultDeferredRenderShader(GMGLDeferredRenderState state, GMGLShaderProgram* shaderProgram);
 	void activateForwardRenderLight(const Vector<GMLight>& lights);
 	void activateLightPassLight(const Vector<GMLight>& lights);
 	bool refreshGBuffer();

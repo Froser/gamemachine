@@ -32,7 +32,6 @@ void GMGLRenders_Object::activateShader()
 
 		glEnable(GL_CULL_FACE);
 	}
-	GM_CHECK_GL_ERROR();
 
 	if (shader->getBlend())
 	{
@@ -81,7 +80,6 @@ void GMGLRenders_Object::activateShader()
 
 	if (shader->getBlend())
 		glDepthMask(GL_FALSE);
-	GM_CHECK_GL_ERROR();
 
 	if (shader->getNoDepthTest())
 		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);

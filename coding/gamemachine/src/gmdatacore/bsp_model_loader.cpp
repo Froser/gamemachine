@@ -108,7 +108,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 	strcpy_s(m->classname, classname);
 
 	const char* b;
-	if ( (b = ti->Attribute("create")) != nullptr )
+	if ( (b = ti->Attribute("create")))
 	{
 		Scanner s(b);
 		GMint value;
@@ -116,7 +116,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		m->create = value != 0;
 	}
 
-	if ((b = ti->Attribute("extents")) != nullptr)
+	if ((b = ti->Attribute("extents")))
 	{
 		Scanner s(b);
 		for (GMint i = 0; i < 3; i++)
@@ -125,7 +125,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 		}
 	}
 
-	if ((b = ti->Attribute("model")) != nullptr)
+	if ((b = ti->Attribute("model")))
 	{
 		strcpy_s(m->model, b);
 	}

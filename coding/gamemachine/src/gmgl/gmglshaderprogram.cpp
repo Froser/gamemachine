@@ -19,7 +19,6 @@ void GMGLShaderProgram::useProgram()
 
 	glUseProgram(d->shaderProgram);
 	d->lastUsedProgram = d->shaderProgram;
-	GM_CHECK_GL_ERROR();
 }
 
 void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)

@@ -4,6 +4,9 @@
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
 #include "foundation/gamemachine.h"
+#include "gmresourcecontainer.h"
+
+static void noDestructor(GMGameObject*) {}
 
 GMGameObject::GMGameObject(AUTORELEASE GMModel* obj)
 {
@@ -12,6 +15,16 @@ GMGameObject::GMGameObject(AUTORELEASE GMModel* obj)
 	d->scaling = linear_math::Matrix4x4::identity();
 	d->translation = linear_math::Matrix4x4::identity();
 	updateMatrix();
+}
+
+GMGameObject::GMGameObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex)
+{
+	D(d);
+	GMResourceContainer& rc = world.getResourceContainer();
+	GMModel* model = rc.getModelContainer().find(objIndex);
+	if (model)
+		d->destructor = noDestructor;
+	setModel(model);
 }
 
 GMGameObject::~GMGameObject()
@@ -229,6 +242,12 @@ void GMGlyphObject::update()
 //GMEntityObject
 GMEntityObject::GMEntityObject(AUTORELEASE GMModel* obj)
 	: GMGameObject(obj)
+{
+	calc();
+}
+
+GMEntityObject::GMEntityObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex)
+	: GMGameObject(world, objIndex)
 {
 	calc();
 }

@@ -24,22 +24,15 @@ enum class GBufferMaterialType
 	Kd,
 	Ks,
 	Shininess,
-	EndOfMaterialType,
-};
-
-enum class GBufferFlags
-{
-	// 标记
 	HasNormalMap,
-	EndOfFlags,
+	EndOfMaterialType,
 };
 
 // 当前渲染的状态，渲染到哪一步了
 enum class GMGLDeferredRenderState
 {
-	GeometryPass, //正在进行普通渲染或geometry pass
+	PassingGeometry, //正在进行普通渲染或geometry pass
 	PassingMaterial, //正在传递材质
-	PassingFlags, //正在传递Flags
 	EndOfRenderState,
 };
 
@@ -50,7 +43,6 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 	GLuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
 	GLuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
 	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
-	GLuint flags[(GMint)GBufferFlags::EndOfFlags] = { 0 };
 	GLuint depthBuffer = 0;
 	GMuint windowWidth = 0;
 	GMuint windowHeight = 0;

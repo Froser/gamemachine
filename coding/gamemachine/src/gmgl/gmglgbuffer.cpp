@@ -5,7 +5,6 @@
 
 constexpr GMint GEOMETRY_NUM = (GMint)GBufferGeometryType::EndOfGeometryType;
 constexpr GMint MATERIAL_NUM = (GMint)GBufferMaterialType::EndOfMaterialType;
-constexpr GMint FLAG_NUM = (GMint)GBufferFlags::EndOfFlags;
 
 Array<const char*, GEOMETRY_NUM> g_GBufferGeometryUniformNames =
 {
@@ -24,10 +23,6 @@ Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
 	"gKd",
 	"gKs",
 	"gShininess",
-};
-
-Array<const char*, FLAG_NUM> g_GBufferFlagUniformNames =
-{
 	"gHasNormalMap",
 };
 
@@ -43,7 +38,7 @@ GMGLGBuffer::~GMGLGBuffer()
 void GMGLGBuffer::beginPass()
 {
 	D(d);
-	d->currentTurn = (GMint)GMGLDeferredRenderState::GeometryPass;
+	d->currentTurn = (GMint)GMGLDeferredRenderState::PassingGeometry;
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
 	engine->setRenderState((GMGLDeferredRenderState)d->currentTurn);
 }
@@ -81,12 +76,6 @@ void GMGLGBuffer::dispose()
 		GM_ZeroMemory(d->materials);
 	}
 
-	if (d->flags[0] != 0)
-	{
-		glDeleteTextures(FLAG_NUM, d->flags);
-		GM_ZeroMemory(d->flags);
-	}
-
 	if (d->depthBuffer != 0)
 	{
 		glDeleteRenderbuffers(1, &d->depthBuffer);
@@ -105,7 +94,7 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	glGenFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
 
 	// Vertex data
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::GeometryPass]);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
 	glGenTextures(GEOMETRY_NUM, d->textures);
 	for (GMint i = 0; i < GEOMETRY_NUM; i++)
 	{
@@ -146,21 +135,6 @@ bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
 	}
 
 	if (!drawBuffers(MATERIAL_NUM))
-		return false;
-
-	// Flags
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingFlags]);
-	glGenTextures(FLAG_NUM, d->flags);
-	for (GMint i = 0; i < FLAG_NUM; i++)
-	{
-		glBindTexture(GL_TEXTURE_2D, d->flags[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_R8, windowWidth, windowHeight, 0, GL_RED, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->flags[i], 0);
-		GM_CHECK_GL_ERROR();
-	}
-	if (!drawBuffers(FLAG_NUM))
 		return false;
 
 	// restore default FBO
@@ -233,24 +207,12 @@ void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 			GM_CHECK_GL_ERROR();
 		}
 	}
-
-	constexpr GMuint FLAG_OFFSET = GEOMETRY_OFFSET + MATERIAL_NUM;
-	{
-		for (GMuint i = 0; i < FLAG_NUM; i++)
-		{
-			shaderProgram->setInt(g_GBufferFlagUniformNames[i], FLAG_OFFSET + i);
-			GM_CHECK_GL_ERROR();
-			glActiveTexture(GL_TEXTURE0 + FLAG_OFFSET + i);
-			glBindTexture(GL_TEXTURE_2D, d->flags[i]);
-			GM_CHECK_GL_ERROR();
-		}
-	}
 }
 
 void GMGLGBuffer::copyDepthBuffer()
 {
 	D(d);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::GeometryPass]);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer(0, 0, d->windowWidth, d->windowHeight, 0, 0, d->windowWidth, d->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 

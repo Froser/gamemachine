@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
-#include "gmengine/resource_container.h"
+#include "gmengine/gmresourcecontainer.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
@@ -530,39 +530,18 @@ void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 	d->renderBuffer.push_back(obj);
 }
 
-#ifdef NO_LAMBDA
-struct __renderIter
-{
-	__renderIter(GMBSPRenderData& _rd, GMBSPGameWorld::Data& _d) : rd(_rd), d(_d) {}
-	void operator()(GMBSPEntity* e)
-	{
-		GMGameObject* obj = rd.entitiyObjects[e];
-		if (obj)
-			d->entityBuffer.push_back(obj);
-	}
-	
-	GMBSPRenderData& rd;
-	GMBSPGameWorld::Data d;
-};
-#endif
-
 void GMBSPGameWorld::drawEntity(GMint leafId)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
 	Set<GMBSPEntity*>& entities = d->entities[leafId];
-#ifdef NO_LAMBDA
-	__renderIter func(rd, d);
-	std::for_each(entities.begin(), entities.end(), func);
-#else
 	std::for_each(entities.begin(), entities.end(), [&rd, &d](GMBSPEntity* e)
 	{
 		GMGameObject* obj = rd.entitiyObjects[e];
 		if (obj)
 			d->renderBuffer.push_back(obj);
 	});
-#endif
 }
 
 void GMBSPGameWorld::drawAlwaysVisibleObjects()
@@ -587,9 +566,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
 	{
-		ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
-		TextureContainer& tc = rc->getTextureContainer();
-		const TextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
+		GMTextureContainer& tc = getResourceContainer().getTextureContainer();
+		const GMTextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
 		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).setOneFrame(0, item->texture);
@@ -602,9 +580,8 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
-	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
-	TextureContainer_ID& tc = rc->getLightmapContainer();
-	const TextureContainer_ID::TextureItemType* item = nullptr;
+	GMTextureContainer_ID& tc = getResourceContainer().getLightmapContainer();
+	const GMTextureContainer_ID::TextureItemType* item = nullptr;
 	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
 		item = tc.find(WHITE_LIGHTMAP);
 	else
@@ -650,7 +627,6 @@ void GMBSPGameWorld::initTextures()
 	BSPData& bsp = d->bsp.bspData();
 
 	IFactory* factory = GameMachine::instance().getFactory();
-	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 
 	for (GMint i = 0; i < bsp.numShaders; i++)
 	{
@@ -665,8 +641,8 @@ void GMBSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
 
-			TextureContainer::TextureItemType item = { shader.shader, texture };
-			rc->getTextureContainer().insert(item);
+			GMTextureContainer::TextureItemType item = { shader.shader, texture };
+			getResourceContainer().getTextureContainer().insert(item);
 		}
 		else
 		{
@@ -709,7 +685,6 @@ void GMBSPGameWorld::initLightmaps()
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	IFactory* factory = GameMachine::instance().getFactory();
-	ResourceContainer* rc = GameMachine::instance().getGraphicEngine()->getResourceContainer();
 
 	const GMint BSP_LIGHTMAP_EXT = 128;
 	const GMint BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
@@ -722,8 +697,8 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 
-		TextureContainer_ID::TextureItemType item = { i, texture };
-		rc->getLightmapContainer().insert(item);
+		GMTextureContainer_ID::TextureItemType item = { i, texture };
+		getResourceContainer().getLightmapContainer().insert(item);
 	}
 
 	{
@@ -733,8 +708,8 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 
-		TextureContainer_ID::TextureItemType item = { -1, texture };
-		rc->getLightmapContainer().insert(item);
+		GMTextureContainer_ID::TextureItemType item = { -1, texture };
+		getResourceContainer().getLightmapContainer().insert(item);
 	}
 }
 
@@ -803,8 +778,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	GMBSPRenderData& rd = d->render.renderData();
 
 	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
-	GMModel* coreObj = nullptr;
-
+	GMEntityObject* entityObject = nullptr;
+	GMModel* model = nullptr;
 	if (!strlen(m->model))
 	{
 		// 如果没有指定model，先创建一个默认的立方体model吧
@@ -815,7 +790,9 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//	return;
 		//}
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
-		d->render.createBox(m->extents, entity->origin, shader, &coreObj);
+		gm_warning("No model selected. Create a default cube instead.");
+		d->render.createBox(m->extents, entity->origin, shader, &model);
+		entityObject = new GMEntityObject(model);
 	}
 	else
 	{
@@ -825,26 +802,39 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		fn.append(m->model);
 		fn.append(".obj");
 
-		GMGamePackage& pk = *GameMachine::instance().getGamePackageManager();
-		GMString& path = pk.pathOf(GMPackageIndex::Models, fn);
-		GMModelLoadSettings settings = {
-			pk,
-			m->extents,
-			entity->origin,
-			path,
-			m->model
-		};
-		
-		if (!GMModelReader::load(settings, &coreObj))
+		GMResourceContainer& rc = getResourceContainer();
+		GMModelContainerItemIndex index;
+		auto iter = d->entitiesCache.find(fn);
+		if (iter != d->entitiesCache.end())
 		{
-			gm_warning(_L("parse model file failed."));
-			return;
+			index = iter->second;
 		}
+		else
+		{
+			GMGamePackage& pk = *GameMachine::instance().getGamePackageManager();
+			GMString& path = pk.pathOf(GMPackageIndex::Models, fn);
+			GMModelLoadSettings settings = {
+				pk,
+				m->extents,
+				entity->origin,
+				path,
+				m->model
+			};
+
+			if (!GMModelReader::load(settings, &model))
+			{
+				gm_warning(_L("parse model file failed."));
+				return;
+			}
+			index = rc.getModelContainer().insert(model);
+			d->entitiesCache[fn] = index;
+		}
+		entityObject = new GMEntityObject(*this, index);
 	}
 
-	GMEntityObject* obj = new GMEntityObject(coreObj);
-	rd.entitiyObjects[entity] = obj;
-	appendObjectAndInit(obj);
+	ASSERT(entityObject);
+	rd.entitiyObjects[entity] = entityObject;
+	appendObjectAndInit(entityObject);
 }
 
 BSPData& GMBSPGameWorld::bspData()
