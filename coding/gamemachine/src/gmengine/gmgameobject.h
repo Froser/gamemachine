@@ -101,6 +101,7 @@ public:
 private:
 	virtual void draw() override;
 	virtual void onAppendingObjectToWorld() override;
+	virtual bool canDeferredRendering() override { return false; }
 
 private:
 	void constructModel();

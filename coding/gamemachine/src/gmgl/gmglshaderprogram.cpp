@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include <stdio.h>
 #include "gmglshaderprogram.h"
+#include "gmglgraphic_engine.h"
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
@@ -18,8 +19,7 @@ void GMGLShaderProgram::useProgram()
 
 	glUseProgram(d->shaderProgram);
 	d->lastUsedProgram = d->shaderProgram;
-	GLint i = glGetError();
-	ASSERT_GL();
+	GM_CHECK_GL_ERROR();
 }
 
 void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)

@@ -28,9 +28,11 @@ void GMGLRenders_Object::activateShader()
 			glFrontFace(GL_CW);
 		else
 			glFrontFace(GL_CCW);
+		GM_CHECK_GL_ERROR();
 
 		glEnable(GL_CULL_FACE);
 	}
+	GM_CHECK_GL_ERROR();
 
 	if (shader->getBlend())
 	{
@@ -69,20 +71,24 @@ void GMGLRenders_Object::activateShader()
 			}
 		}
 		glBlendFunc(factors[0], factors[1]);
+		GM_CHECK_GL_ERROR();
 	}
 	else
 	{
 		glDisable(GL_BLEND);
+		GM_CHECK_GL_ERROR();
 	}
 
 	if (shader->getBlend())
 		glDepthMask(GL_FALSE);
+	GM_CHECK_GL_ERROR();
 
 	if (shader->getNoDepthTest())
 		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 
+	GM_CHECK_GL_ERROR();
 	glLineWidth(shader->getLineWidth());
 }
 

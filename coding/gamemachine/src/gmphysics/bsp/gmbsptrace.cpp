@@ -11,16 +11,16 @@
 BEGIN_NS
 GM_ALIGNED_STRUCT(GMBSPTraceWork)
 {
-	linear_math::Vector3 start;
-	linear_math::Vector3 end;
-	linear_math::Vector3 size[2];	// size of the box being swept through the model
-	linear_math::Vector3 offsets[8];	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
-	GMfloat maxOffset;	// longest corner length from origin
-	linear_math::Vector3 extents;	// greatest of abs(size[0]) and abs(size[1])
-	linear_math::Vector3 bounds[2];	// enclosing box of start and end surrounding by size
-	linear_math::Vector3 modelOrigin;// origin of the model tracing through
-	GMint contents; // ored contents of the model tracing through
-	bool isPoint; // optimized case
+	linear_math::Vector3 start{ 0 };
+	linear_math::Vector3 end{ 0 };
+	linear_math::Vector3 size[2]{ 0 };	// size of the box being swept through the model
+	linear_math::Vector3 offsets[8]{ 0 };	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
+	GMfloat maxOffset = 0;	// longest corner length from origin
+	linear_math::Vector3 extents{ 0 };	// greatest of abs(size[0]) and abs(size[1])
+	linear_math::Vector3 bounds[2]{ 0 };	// enclosing box of start and end surrounding by size
+	linear_math::Vector3 modelOrigin{ 0 };// origin of the model tracing through
+	GMint contents = 0; // ored contents of the model tracing through
+	bool isPoint = false; // optimized case
 	BSPTraceResult trace; // returned from trace call
 	BSPSphere sphere; // sphere for oriendted capsule collision
 };
@@ -50,7 +50,6 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 	d->checkcount++;
 
 	GMBSPTraceWork tw;
-	memset(&tw, 0, sizeof(tw));
 	tw.trace.fraction = 1;
 	tw.modelOrigin = origin;
 

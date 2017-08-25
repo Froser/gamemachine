@@ -132,7 +132,6 @@ void GMBSPMove::generateMovement()
 	D(d);
 	if (!d->inited)
 	{
-		memset(&d->movement, 0, sizeof(d->movement));
 		d->movement.velocity = decomposeVelocity(d->object->motions.velocity);
 		d->inited = true;
 	}

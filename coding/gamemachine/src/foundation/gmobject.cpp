@@ -100,8 +100,18 @@ void GMObject::removeEvent(const char* eventName, GMObject& receiver)
 
 void GMObject::releaseEvents()
 {
-	// 释放此对象连接的所有事件
 	D(d);
+	// 释放连接到此对象的事件
+	for (auto& event : d->events)
+	{
+		const char* name = event.first.c_str();
+		for (auto& target : event.second)
+		{
+			target.receiver->removeConnection(this, name);
+		}
+	}
+
+	// 释放此对象连接的所有事件
 	for (auto& conns : d->connectionTargets)
 	{
 		conns.host->removeEvent(conns.name, *this);

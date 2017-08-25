@@ -480,7 +480,7 @@ private:
 			&emitter
 		);
 #endif
-		demo->appendObject("particles", emitter);
+		//demo->appendObject("particles", emitter);
 #endif
 		GMBuffer buffer;
 		pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
@@ -636,7 +636,7 @@ int WINAPI WinMain(
 	GameMachine::instance().init(
 		hInstance,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
 #if 0

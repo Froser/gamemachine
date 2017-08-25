@@ -12,13 +12,13 @@ class GMBSPTrace;
 
 struct GMBSPMovement
 {
-	GMfloat startTime;
+	GMfloat startTime = 0;
 	BSPTraceResult groundTrace;
-	bool freefall;
-	bool walking;
-	linear_math::Vector3 velocity;
-	linear_math::Vector3 origin;
-	linear_math::Vector3 targetPosition;
+	bool freefall = false;
+	bool walking = false;
+	linear_math::Vector3 velocity{ 0 };
+	linear_math::Vector3 origin{ 0 };
+	linear_math::Vector3 targetPosition{ 0 };
 };
 
 struct GMBSPMoveCommand
@@ -30,9 +30,9 @@ struct GMBSPMoveCommand
 GM_PRIVATE_OBJECT(GMBSPMove)
 {
 	bool inited;
-	GMBSPPhysicsWorld* world;
-	GMCollisionObject* object;
-	GMBSPTrace* trace;
+	GMBSPPhysicsWorld* world = nullptr;
+	GMCollisionObject* object = nullptr;
+	GMBSPTrace* trace = nullptr;
 	GMBSPMovement movement;
 	GMBSPMoveCommand moveCommand;
 };

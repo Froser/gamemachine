@@ -108,7 +108,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		ASSERT(getRenderMode() == GMGLRenderMode::DeferredRendering);
 		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
 		groupGameObjects(objects, count);
-
 		geometryPass(d->deferredRenderingGameObjects);
 		lightPass();
 
@@ -294,14 +293,15 @@ void GMGLGraphicEngine::geometryPass(Vector<GMGameObject*>& objects)
 	{
 		d->gbuffer.newFrame();
 		d->gbuffer.bindForWriting();
+		GM_CHECK_GL_ERROR();
 
 		for (auto object : objects)
 		{
 			object->draw();
+			GM_CHECK_GL_ERROR();
 		}
-
-		ASSERT(glGetError() == GL_NO_ERROR);
 		d->gbuffer.releaseBind();
+		GM_CHECK_GL_ERROR();
 	} while (d->gbuffer.nextPass());
 }
 
@@ -309,10 +309,39 @@ void GMGLGraphicEngine::lightPass()
 {
 	D(d);
 	newFrame();
+#if 1
 	d->deferredLightPassShader->useProgram();
 	refreshDeferredRenderLights();
 	d->gbuffer.activateTextures(d->deferredLightPassShader);
 	renderDeferredRenderQuad();
+#else
+
+	// 开始写4个缓存
+	d->gbuffer.beginPass();
+	const GMuint& w = d->gbuffer.getWidth(),
+		&h = d->gbuffer.getHeight();
+	GMuint hw = w / 2, hh = h / 2;
+
+	GLenum errCode;
+	d->gbuffer.releaseBind();
+	d->gbuffer.bindForReading();
+	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
+	glBlitFramebuffer(0, 0, w, h, 0, 0, hw, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
+	glBlitFramebuffer(0, 0, w, h, 0, hh, hw, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
+	glBlitFramebuffer(0, 0, w, h, hw, hh, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
+	glBlitFramebuffer(0, 0, w, h, hw, 0, w, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
+
+#endif
 }
 
 void GMGLGraphicEngine::updateVPMatrices(const CameraLookAt& lookAt)
@@ -353,25 +382,24 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	updateMatrices(lookAt);
 
 	// 遍历每一种着色器
-	auto cache = getRenderMode();
-	GM_FOREACH_ENUM_CLASS(mode, GMGLRenderMode::ForwardRendering, GM_ENUM_END(GMGLRenderMode::DeferredRendering))
+	auto renderStateCache = getRenderState();
+	auto renderModeCache = getRenderMode();
+
+	setRenderMode(GMGLRenderMode::ForwardRendering);
+	updateVPMatrices(lookAt);
+
+	// 更新material pass著色器
+	setRenderMode(GMGLRenderMode::DeferredRendering);
+	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::GeometryPass, GMGLDeferredRenderState::EndOfRenderState)
 	{
-		setRenderMode(mode);
+		setRenderState(state);
 		updateVPMatrices(lookAt);
 	}
-	setRenderMode(cache);
+	setRenderState(renderStateCache);
+	setRenderMode(renderModeCache);
 
-	if (d->renderMode == GMGLRenderMode::DeferredRendering)
+	if (getRenderMode() == GMGLRenderMode::DeferredRendering)
 	{
-		// 更新material pass著色器
-		auto cache = getRenderState();
-		GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingMaterial, GMGLDeferredRenderState::EndOfRenderState)
-		{
-			setRenderState(state);
-			updateVPMatrices(lookAt);
-		}
-		setRenderState(cache);
-
 		// 更新light pass著色器
 		GMMesh dummy;
 		IRender* render = d->lightPassRender;
@@ -443,6 +471,7 @@ void GMGLGraphicEngine::createDeferredRenderQuad()
 void GMGLGraphicEngine::renderDeferredRenderQuad()
 {
 	D(d);
+	glDisable(GL_CULL_FACE);
 	glBindVertexArray(d->quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
