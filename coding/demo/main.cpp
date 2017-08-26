@@ -237,6 +237,15 @@ public:
 				GMSetBuiltIn(DRAW_ONLY_SKY, !GMGetBuiltIn(DRAW_ONLY_SKY));
 			if (kbState.keyTriggered('R'))
 				mouseState.setMouseEnable(m_bMouseEnable = !m_bMouseEnable);
+
+
+			if (kbState.keyTriggered('0'))
+				GMSetBuiltIn(FRAMEBUFFER_VIEWER_INDEX, 0);
+			GM_FOREACH_ENUM_CLASS(i, GBufferGeometryType::Position, GBufferGeometryType::EndOfGeometryType)
+			{
+				if (kbState.keyTriggered('1' + (GMint)i))
+					GMSetBuiltIn(FRAMEBUFFER_VIEWER_INDEX, (GMint)i + 1);
+			}
 			break;
 		}
 	}

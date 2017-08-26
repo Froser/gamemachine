@@ -55,19 +55,6 @@ static void pushBackData(Scanner& scanner, AlignedVector<T>& container)
 	container.push_back(data);
 }
 
-static void pushBackData(const linear_math::Vector3& extents, const linear_math::Vector3& position, Scanner& scanner, AlignedVector<linear_math::Vector3>& container)
-{
-	linear_math::Vector3 data;
-	for (GMint i = 0; i < 3; i++)
-	{
-		GMfloat d;
-		scanner.nextFloat(&d);
-		d = d * extents[i] + position[i];
-		data[i] = d;
-	}
-	container.push_back(data);
-}
-
 GMModelReader_Obj::GMModelReader_Obj()
 {
 	init();
@@ -120,7 +107,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		else if (strEqual(token, "v"))
 		{
 			// vertex
-			pushBackData(settings.extents, settings.position, s, d->positions);
+			pushBackData<3>(s, d->positions);
 		}
 		else if (strEqual(token, "vn"))
 		{

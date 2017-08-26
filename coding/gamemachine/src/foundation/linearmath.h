@@ -1042,6 +1042,11 @@ namespace linear_math
 			matrix[3][3] = 1.0f;
 			return matrix;
 		}
+
+		static Quaternion identity()
+		{
+			return Quaternion(0, 0, 0, 1);
+		}
 	};
 
 	inline Quaternion operator*(const Quaternion& q1, const Quaternion& q2)

@@ -198,4 +198,9 @@ void GMConfig::initInternal()
 	setInt32(GMConfig_BuiltInOptions::DRAW_LIGHTMAP_ONLY, 0);
 	setInt32(GMConfig_BuiltInOptions::RUN_PROFILE, 0);
 	setInt32(GMConfig_BuiltInOptions::FRAMERATE_CONTROL, 1);
+	setInt32(GMConfig_BuiltInOptions::FRAMEBUFFER_VIEWER_X, 10);
+	setInt32(GMConfig_BuiltInOptions::FRAMEBUFFER_VIEWER_Y, 10);
+	setInt32(GMConfig_BuiltInOptions::FRAMEBUFFER_VIEWER_WIDTH, 250);
+	setInt32(GMConfig_BuiltInOptions::FRAMEBUFFER_VIEWER_HEIGHT, 250);
+	setInt32(GMConfig_BuiltInOptions::FRAMEBUFFER_VIEWER_INDEX, 0);
 }

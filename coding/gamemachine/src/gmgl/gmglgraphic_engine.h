@@ -124,6 +124,7 @@ private:
 	void lightPass();
 	void updateVPMatrices(const CameraLookAt& lookAt);
 	void groupGameObjects(GMGameObject *objects[], GMuint count);
+	void viewFrameBuffer();
 
 public:
 	static void newFrameOnCurrentContext();

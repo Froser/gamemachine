@@ -240,12 +240,6 @@ void GMGlyphObject::update()
 }
 
 //GMEntityObject
-GMEntityObject::GMEntityObject(AUTORELEASE GMModel* obj)
-	: GMGameObject(obj)
-{
-	calc();
-}
-
 GMEntityObject::GMEntityObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex)
 	: GMGameObject(world, objIndex)
 {

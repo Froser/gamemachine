@@ -34,6 +34,8 @@ GMGLModelPainter::GMGLModelPainter(IGraphicEngine* engine, GMModel* objs)
 void GMGLModelPainter::transfer()
 {
 	D(d);
+	if (d->inited)
+		return;
 
 	GMModel* model = getModel();
 	GLenum usage = model->getUsageHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
@@ -41,12 +43,9 @@ void GMGLModelPainter::transfer()
 	{
 		mesh->calculateTangentSpace();
 
-		if (!d->inited)
-		{
-			GLuint vao;
-			glGenVertexArrays(1, &vao);
-			mesh->setArrayId(vao);
-		}
+		GLuint vao;
+		glGenVertexArrays(1, &vao);
+		mesh->setArrayId(vao);
 
 		glBindVertexArray(mesh->getArrayId());
 
@@ -58,12 +57,9 @@ void GMGLModelPainter::transfer()
 		GLuint lightmapSize		= mesh->isDataDisabled(GMVertexDataType::Lightmap)		? 0 : sizeof(GMModel::DataType) * mesh->lightmaps().size();
 		GLuint colorSize		= mesh->isDataDisabled(GMVertexDataType::Color)			? 0 : sizeof(GMModel::DataType) * mesh->colors().size();
 
-		if (!d->inited)
-		{
-			GLuint vbo;
-			glGenBuffers(1, &vbo);
-			mesh->setBufferId(vbo);
-		}
+		GLuint vbo;
+		glGenBuffers(1, &vbo);
+		mesh->setBufferId(vbo);
 
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->getBufferId());
 		glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
@@ -175,5 +171,6 @@ void GMGLModelPainter::draw(IRender* render, Shader& shader, GMComponent* compon
 		render->beginShader(shader, GMDrawMode::Line);
 
 	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+	GM_CHECK_GL_ERROR();
 	render->endShader();
 }

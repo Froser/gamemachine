@@ -15,10 +15,10 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMGameWorld* world = nullptr;
 	GMModel* model = false;
 	GMGameObjectDestructor destructor = nullptr;
-	linear_math::Matrix4x4 scaling;
-	linear_math::Matrix4x4 translation;
-	linear_math::Quaternion rotation;
-	linear_math::Matrix4x4 transformMatrix;
+	linear_math::Matrix4x4 scaling = linear_math::Matrix4x4::identity();
+	linear_math::Matrix4x4 translation = linear_math::Matrix4x4::identity();
+	linear_math::Quaternion rotation = linear_math::Quaternion::identity();
+	linear_math::Matrix4x4 transformMatrix = linear_math::Matrix4x4::identity();
 
 	bool canDeferredRendering = true;
 };
@@ -125,7 +125,6 @@ class GMEntityObject : public GMGameObject
 	DECLARE_PRIVATE(GMEntityObject)
 
 public:
-	GMEntityObject(AUTORELEASE GMModel* obj);
 	GMEntityObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex);
 
 public:

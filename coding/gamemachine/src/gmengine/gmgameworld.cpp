@@ -30,30 +30,30 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 	d->gameObjects[obj->getType()].insert(obj);
-	GameMachine::instance().initObjectPainter(obj->getModel());
+	GM.initObjectPainter(obj->getModel());
 }
 
 void GMGameWorld::beginCreateStencil()
 {
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	IGraphicEngine* engine = GM. getGraphicEngine();
 	engine->beginCreateStencil();
 }
 
 void GMGameWorld::endCreateStencil()
 {
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->endCreateStencil();
 }
 
 void GMGameWorld::beginUseStencil(bool inverse)
 {
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->beginUseStencil(inverse);
 }
 
 void GMGameWorld::endUseStencil()
 {
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->endUseStencil();
 }
 
@@ -86,9 +86,8 @@ void GMGameWorld::simulateGameWorld()
 GMModelPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 {
 	D(d);
-	GameMachine& gm = GameMachine::instance();
-	IFactory* factory = gm.getFactory();
-	IGraphicEngine* engine = gm.getGraphicEngine();
+	IFactory* factory = GM.getFactory();
+	IGraphicEngine* engine = GM.getGraphicEngine();
 	GMModelPainter* painter;
 	factory->createPainter(engine, obj->getModel(), &painter);
 	ASSERT(!obj->getModel()->getPainter());

@@ -224,7 +224,7 @@ void GMBSPGameWorld::loadBSP(const GMString& mapName)
 {
 	D(d);
 	GMBuffer buffer;
-	GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Maps, mapName, &buffer);
+	GM.getGamePackageManager()->readFile(GMPackageIndex::Maps, mapName, &buffer);
 	d->bsp.loadBsp(buffer);
 	importBSP();
 }
@@ -275,7 +275,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	GMCamera& camera = GameMachine::instance().getCamera();
+	GMCamera& camera = GM.getCamera();
 	PositionState pos = camera.getPositionState();
 	BSPData& bsp = d->bsp.bspData();
 
@@ -379,7 +379,7 @@ void GMBSPGameWorld::flushBuffer()
 	GM_PROFILE(flushBuffer);
 
 	D(d);
-	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->drawObjects(d->renderBuffer.data(), d->renderBuffer.size());
 }
 
@@ -607,7 +607,7 @@ void GMBSPGameWorld::importBSP()
 void GMBSPGameWorld::initModels()
 {
 	D(d);
-	GMString modelPath = GameMachine::instance().getGamePackageManager()->pathOf(GMPackageIndex::Models, "");
+	GMString modelPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, "");
 	d->modelLoader.init(modelPath, this);
 	d->modelLoader.load();
 }
@@ -615,7 +615,7 @@ void GMBSPGameWorld::initModels()
 void GMBSPGameWorld::initShaders()
 {
 	D(d);
-	GMString texShadersPath = GameMachine::instance().getGamePackageManager()->pathOf(GMPackageIndex::TexShaders, "");
+	GMString texShadersPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::TexShaders, "");
 	d->shaderLoader.init(texShadersPath, this, &d->render.renderData());
 	d->shaderLoader.load();
 }
@@ -626,7 +626,7 @@ void GMBSPGameWorld::initTextures()
 	D_BASE(db, GMGameWorld);
 	BSPData& bsp = d->bsp.bspData();
 
-	IFactory* factory = GameMachine::instance().getFactory();
+	IFactory* factory = GM.getFactory();
 
 	for (GMint i = 0; i < bsp.numShaders; i++)
 	{
@@ -662,7 +662,7 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 		".bmp"
 	};
 	static GMint dem = 4;
-	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
+	GMGamePackage* pk = GM.getGamePackageManager();
 
 	for (GMint i = 0; i < dem; i++)
 	{
@@ -684,7 +684,7 @@ void GMBSPGameWorld::initLightmaps()
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
-	IFactory* factory = GameMachine::instance().getFactory();
+	IFactory* factory = GM.getFactory();
 
 	const GMint BSP_LIGHTMAP_EXT = 128;
 	const GMint BSP_LIGHTMAP_SIZE = BSP_LIGHTMAP_EXT * BSP_LIGHTMAP_EXT * 3 * sizeof(GMbyte);
@@ -778,6 +778,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	GMBSPRenderData& rd = d->render.renderData();
 
 	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
+	GMResourceContainer& rc = getResourceContainer();
 	GMEntityObject* entityObject = nullptr;
 	GMModel* model = nullptr;
 	if (!strlen(m->model))
@@ -792,7 +793,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
 		gm_warning("No model selected. Create a default cube instead.");
 		d->render.createBox(m->extents, entity->origin, shader, &model);
-		entityObject = new GMEntityObject(model);
+		GMModelContainerItemIndex index = rc.getModelContainer().insert(model);
+		entityObject = new GMEntityObject(*this, index);
 	}
 	else
 	{
@@ -802,7 +804,6 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		fn.append(m->model);
 		fn.append(".obj");
 
-		GMResourceContainer& rc = getResourceContainer();
 		GMModelContainerItemIndex index;
 		auto iter = d->entitiesCache.find(fn);
 		if (iter != d->entitiesCache.end())
@@ -811,12 +812,10 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		}
 		else
 		{
-			GMGamePackage& pk = *GameMachine::instance().getGamePackageManager();
+			GMGamePackage& pk = *GM.getGamePackageManager();
 			GMString& path = pk.pathOf(GMPackageIndex::Models, fn);
 			GMModelLoadSettings settings = {
 				pk,
-				m->extents,
-				entity->origin,
 				path,
 				m->model
 			};
@@ -830,6 +829,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 			d->entitiesCache[fn] = index;
 		}
 		entityObject = new GMEntityObject(*this, index);
+		entityObject->setTranslate(linear_math::translate(entity->origin));
+		entityObject->setScaling(linear_math::scale(m->extents[0], m->extents[1], m->extents[2]));
 	}
 
 	ASSERT(entityObject);

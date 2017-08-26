@@ -115,6 +115,8 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		setRenderMode(GMGLRenderMode::ForwardRendering);
 		drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 		setRenderMode(GMGLRenderMode::DeferredRendering);
+
+		viewFrameBuffer();
 	}
 }
 
@@ -307,39 +309,11 @@ void GMGLGraphicEngine::lightPass()
 {
 	D(d);
 	newFrame();
-#if 1
+
 	d->deferredLightPassShader->useProgram();
 	refreshDeferredRenderLights();
 	d->gbuffer.activateTextures(d->deferredLightPassShader);
 	renderDeferredRenderQuad();
-#else
-
-	// 开始写4个缓存
-	d->gbuffer.beginPass();
-	const GMuint& w = d->gbuffer.getWidth(),
-		&h = d->gbuffer.getHeight();
-	GMuint hw = w / 2, hh = h / 2;
-
-	GLenum errCode;
-	d->gbuffer.releaseBind();
-	d->gbuffer.bindForReading();
-	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
-	glBlitFramebuffer(0, 0, w, h, 0, 0, hw, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-
-	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
-	glBlitFramebuffer(0, 0, w, h, 0, hh, hw, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-
-	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
-	glBlitFramebuffer(0, 0, w, h, hw, hh, w, h, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-
-	d->gbuffer.setReadBuffer(GBufferGeometryType::AmbientTexture);
-	glBlitFramebuffer(0, 0, w, h, hw, 0, w, hh, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-	ASSERT((errCode = glGetError()) == GL_NO_ERROR);
-
-#endif
 }
 
 void GMGLGraphicEngine::updateVPMatrices(const CameraLookAt& lookAt)
@@ -371,6 +345,26 @@ void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 			d->deferredRenderingGameObjects.push_back(objects[i]);
 		else
 			d->forwardRenderingGameObjects.push_back(objects[i]);
+	}
+}
+
+void GMGLGraphicEngine::viewFrameBuffer()
+{
+	D(d);
+	GMint fbIdx = GMGetBuiltIn(FRAMEBUFFER_VIEWER_INDEX);
+	if (fbIdx > 0)
+	{
+		glDisable(GL_DEPTH_TEST);
+		GMint x = GMGetBuiltIn(FRAMEBUFFER_VIEWER_X),
+			y = GMGetBuiltIn(FRAMEBUFFER_VIEWER_Y),
+			width = GMGetBuiltIn(FRAMEBUFFER_VIEWER_WIDTH),
+			height = GMGetBuiltIn(FRAMEBUFFER_VIEWER_HEIGHT);
+		d->gbuffer.beginPass();
+		d->gbuffer.bindForReading();
+		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
+		glBlitFramebuffer(0, 0, d->gbuffer.getWidth(), d->gbuffer.getHeight(), x, y, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+		GM_CHECK_GL_ERROR();
+		d->gbuffer.releaseBind();
 	}
 }
 

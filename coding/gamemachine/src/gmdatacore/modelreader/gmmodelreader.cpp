@@ -26,7 +26,7 @@ public:
 	}
 
 private:
-	std::map<GMModelReader::ModelType, IModelReader*> m_readers;
+	Map<GMModelReader::ModelType, IModelReader*> m_readers;
 };
 
 IModelReader* GMModelReader::getReader(ModelType type)
