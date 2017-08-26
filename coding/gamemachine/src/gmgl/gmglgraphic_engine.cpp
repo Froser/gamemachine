@@ -374,8 +374,8 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 	updateMatrices(lookAt);
 
 	// 遍历每一种着色器
-	auto renderStateCache = getRenderState();
 	auto renderModeCache = getRenderMode();
+	auto renderStateCache = getRenderState();
 
 	setRenderMode(GMGLRenderMode::ForwardRendering);
 	updateVPMatrices(lookAt);

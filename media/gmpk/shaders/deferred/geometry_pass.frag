@@ -53,10 +53,22 @@ vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 	return result;
 }
 
+mat4 removeTranslation(mat4 mat)
+{
+	mat4 r = mat4(
+		vec4(mat[0].xyz, 0),
+		vec4(mat[1].xyz, 0),
+		vec4(mat[2].xyz, 0),
+		vec4(0, 0, 0, 1)
+	);
+	return r;
+}
+
 void calcEyeSpace()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 normalModelTransform = transpose(inverse(GM_model_matrix));
+	mat4 noTranslationMat = removeTranslation(GM_model_matrix);
+	mat4 normalModelTransform = transpose(inverse(noTranslationMat));
 	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
 	vec4 vertex_eye = GM_view_matrix * _position_world;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
