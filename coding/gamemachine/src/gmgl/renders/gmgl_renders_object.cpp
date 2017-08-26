@@ -18,21 +18,6 @@ void GMGLRenders_Object::activateShader()
 	D(d);
 	ASSERT(d->shader);
 	Shader* shader = d->shader;
-	if (shader->getCull() == GMS_Cull::NONE)
-	{
-		glDisable(GL_CULL_FACE);
-	}
-	else
-	{
-		if (shader->getFrontFace() == GMS_FrontFace::CLOCKWISE)
-			glFrontFace(GL_CW);
-		else
-			glFrontFace(GL_CCW);
-		GM_CHECK_GL_ERROR();
-
-		glEnable(GL_CULL_FACE);
-	}
-
 	if (shader->getBlend())
 	{
 		glEnable(GL_BLEND);
@@ -71,11 +56,29 @@ void GMGLRenders_Object::activateShader()
 		}
 		glBlendFunc(factors[0], factors[1]);
 		GM_CHECK_GL_ERROR();
+
+		glDisable(GL_CULL_FACE);
+		GM_CHECK_GL_ERROR();
 	}
 	else
 	{
 		glDisable(GL_BLEND);
 		GM_CHECK_GL_ERROR();
+
+		if (shader->getCull() == GMS_Cull::NONE)
+		{
+			glDisable(GL_CULL_FACE);
+		}
+		else
+		{
+			if (shader->getFrontFace() == GMS_FrontFace::CLOCKWISE)
+				glFrontFace(GL_CW);
+			else
+				glFrontFace(GL_CCW);
+			GM_CHECK_GL_ERROR();
+
+			glEnable(GL_CULL_FACE);
+		}
 	}
 
 	if (shader->getBlend())

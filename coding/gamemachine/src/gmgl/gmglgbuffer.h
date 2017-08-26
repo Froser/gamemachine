@@ -43,7 +43,7 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 	GLuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
 	GLuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
 	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
-	GLuint depthBuffer = 0;
+	GLuint depthBuffers[(GMint)GMGLDeferredRenderState::EndOfRenderState] = { 0 };
 	GMuint windowWidth = 0;
 	GMuint windowHeight = 0;
 	GMint currentTurn = 0;
@@ -77,6 +77,7 @@ public:
 	inline const GMuint& getHeight() { D(d); return d->windowHeight; }
 
 private:
+	bool createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray);
 	bool drawBuffers(GMuint count);
 };
 
