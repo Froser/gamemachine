@@ -3,6 +3,7 @@
 #include "foundation/defines.h"
 #include "foundation/gmobject.h"
 #include <string>
+#include "assert.h"
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMString)
@@ -36,6 +37,7 @@ public:
 public:
 	GMString();
 	GMString(const GMString&);
+	GMString(GMString&&) noexcept;
 	GMString(const char c);
 	GMString(const GMWchar c);
 	GMString(const char* c);
@@ -50,8 +52,17 @@ public:
 	bool operator != (const GMString& str) const;
 	bool operator < (const GMString& str) const;
 	GMString& operator = (const GMString& str);
+	GMString& operator = (GMString&& str) noexcept;
 	GMString& operator = (const char* str);
 	GMString& operator = (const GMWchar* str);
+
+public:
+	char operator[](GMuint i) const
+	{
+		D(d);
+		ASSERT(d->type == GMString::Data::MuiltBytes);
+		return d->str[i];
+	}
 
 public:
 	GMString& append(const GMWchar* c);
@@ -77,6 +88,61 @@ static inline GMString operator +(const GMString& left, const GMString& right)
 		return left.data()->str + right.toStdString();
 	}
 }
+
+class GMStringReader
+{
+	class Iterator
+	{
+	public:
+		Iterator(const Iterator& iter) : m_src(iter.m_src), m_start(iter.m_start), m_end(iter.m_end) {}
+
+		Iterator(const GMString& string) : m_src(string)
+		{
+			findNextLine();
+		}
+
+		Iterator(const GMString& string, size_t pos) : m_src(string)
+		{
+			m_start = m_end = pos;
+		}
+
+	public:
+		GMString operator *();
+
+		Iterator& operator++(int)
+		{
+			return ++*this;
+		}
+
+		Iterator& operator++()
+		{
+			findNextLine();
+			return *this;
+		}
+
+		bool operator !=(const Iterator& rhs)
+		{
+			return m_end != rhs.m_end;
+		}
+
+	private:
+		void findNextLine();
+
+	private:
+		const GMString& m_src;
+		size_t m_start = 0, m_end = 0;
+	};
+
+public:
+	GMStringReader(const GMString& str) : m_string(str) {}
+
+public:
+	Iterator lineBegin();
+	Iterator lineEnd();
+
+private:
+	const GMString& m_string;
+};
 
 END_NS
 #endif

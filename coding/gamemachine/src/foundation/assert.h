@@ -1,7 +1,6 @@
 ﻿#ifndef __ASSERT_H__
 #define __ASSERT_H__
-#include "common.h"
-#include <string>
+#include "defines.h"
 
 BEGIN_NS
 #if _DEBUG

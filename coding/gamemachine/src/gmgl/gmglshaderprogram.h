@@ -52,6 +52,7 @@ public:
 private:
 	void setProgram(GLuint program) { D(d); d->shaderProgram = program; }
 	void removeShaders();
+	void expandSource(GMString& source);
 };
 
 END_NS

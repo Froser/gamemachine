@@ -106,6 +106,7 @@ void GMGLShaderProgram::load()
 		GLuint shader = glCreateShader(entry.type);
 		d->shaders.push_back(shader);
 
+		expandSource(entry.source); // 展开glsl
 		std::string src = entry.source.toStdString();
 		const GLchar* source = src.c_str();
 		if (!source)
@@ -163,5 +164,19 @@ void GMGLShaderProgram::removeShaders()
 	for (auto& shader : shadersInfo)
 	{
 		glDeleteShader(shader);
+	}
+}
+
+void GMGLShaderProgram::expandSource(GMString& source)
+{
+	// 解析源码，展开glsl不支持的一些特有的宏
+	GMStringReader reader(source);
+	auto iter = reader.lineBegin();
+	auto end = reader.lineEnd();
+
+	for (auto iter = reader.lineBegin(); iter != reader.lineEnd(); iter++)
+	{
+		std::string str = (*iter).toStdString();
+		OutputDebugStringA(str.c_str());
 	}
 }

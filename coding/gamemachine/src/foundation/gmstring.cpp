@@ -14,6 +14,11 @@ GMString::GMString(const GMString& s)
 	*this = s;
 }
 
+GMString::GMString(GMString&& s) noexcept
+{
+	*this = std::move(s);
+}
+
 GMString::GMString(const char c)
 {
 	D(d);
@@ -112,6 +117,17 @@ GMString& GMString::operator = (const GMString& str)
 		d->wstr = str.data()->wstr;
 	else
 		d->str = str.data()->str;
+	return *this;
+}
+
+GMString& GMString::operator = (GMString&& str) noexcept
+{
+	D(d);
+	d->type = str.data()->type;
+	if (d->type == Data::WideChars)
+		d->wstr.swap(str.data()->wstr);
+	else
+		d->str.swap(str.data()->str);
 	return *this;
 }
 
@@ -251,4 +267,28 @@ void GMString::copyString(GMWchar *dest) const
 		GMString temp = toStdString();
 		wcscpy_s(dest, temp.length() + 1, temp.data()->wstr.c_str());
 	}
+}
+
+GMStringReader::Iterator GMStringReader::lineBegin()
+{
+	return GMStringReader::Iterator(m_string);
+}
+
+GMStringReader::Iterator GMStringReader::lineEnd()
+{
+	return GMStringReader::Iterator(m_string, m_string.length());
+}
+
+GMString GMStringReader::Iterator::operator *()
+{
+	return m_src.substr(m_start, m_end - m_start);
+}
+
+void GMStringReader::Iterator::findNextLine()
+{
+	m_start = m_end;
+	do
+	{
+		++m_end;
+	} while (m_src[m_end] != '\n' && m_src[m_end] != '\r' && m_src[m_end]);
 }
