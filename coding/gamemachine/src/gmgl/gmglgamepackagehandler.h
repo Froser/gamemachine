@@ -6,10 +6,10 @@
 #include <map>
 BEGIN_NS
 
-class GMDefaultGLGamePackageHandler : public IGamePackageHandler
+class GMGLDefaultGamePackageHandler : public IGamePackageHandler
 {
 public:
-	GMDefaultGLGamePackageHandler(GMGamePackage* pk);
+	GMGLDefaultGamePackageHandler(GMGamePackage* pk);
 
 public:
 	virtual void init() override;
@@ -24,9 +24,9 @@ private:
 	GMGamePackage* m_pk;
 };
 
-class ZipGMGLGamePackageHandler : public GMDefaultGLGamePackageHandler
+class GMGLZipGamePackageHandler : public GMGLDefaultGamePackageHandler
 {
-	typedef GMDefaultGLGamePackageHandler Base;
+	typedef GMGLDefaultGamePackageHandler Base;
 
 	struct ZipBuffer
 	{
@@ -47,8 +47,8 @@ class ZipGMGLGamePackageHandler : public GMDefaultGLGamePackageHandler
 	};
 
 public:
-	ZipGMGLGamePackageHandler(GMGamePackage* pk);
-	~ZipGMGLGamePackageHandler();
+	GMGLZipGamePackageHandler(GMGamePackage* pk);
+	~GMGLZipGamePackageHandler();
 
 public:
 	virtual void init() override;
@@ -60,6 +60,7 @@ private:
 	bool loadZip();
 	void releaseUnzFile();
 	void releaseBuffers();
+	GMString toRelativePath(const GMString& in);
 
 private:
 	unzFile m_uf;

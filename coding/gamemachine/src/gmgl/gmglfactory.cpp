@@ -44,13 +44,13 @@ void GMGLFactory::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IG
 	{
 	case gm::GPT_DIRECTORY:
 		{
-			GMDefaultGLGamePackageHandler* h = new GMDefaultGLGamePackageHandler(pk);
+			GMGLDefaultGamePackageHandler* h = new GMGLDefaultGamePackageHandler(pk);
 			*handler = h;
 		}
 		break;
 	case gm::GPT_ZIP:
 		{
-			ZipGMGLGamePackageHandler* h = new ZipGMGLGamePackageHandler(pk);
+			GMGLZipGamePackageHandler* h = new GMGLZipGamePackageHandler(pk);
 			*handler = h;
 		}
 		break;

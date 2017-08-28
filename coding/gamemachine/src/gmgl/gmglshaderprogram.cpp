@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include "gmglshaderprogram.h"
 #include "gmglgraphic_engine.h"
+#include <regex>
+#include "foundation/gamemachine.h"
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
@@ -106,7 +108,7 @@ void GMGLShaderProgram::load()
 		GLuint shader = glCreateShader(entry.type);
 		d->shaders.push_back(shader);
 
-		expandSource(entry.source); // 展开glsl
+		expandSource(entry); // 展开glsl
 		std::string src = entry.source.toStdString();
 		const GLchar* source = src.c_str();
 		if (!source)
@@ -167,16 +169,58 @@ void GMGLShaderProgram::removeShaders()
 	}
 }
 
-void GMGLShaderProgram::expandSource(GMString& source)
+void GMGLShaderProgram::expandSource(REF GMGLShaderInfo& shaderInfo)
 {
-	// 解析源码，展开glsl不支持的一些特有的宏
-	GMStringReader reader(source);
-	auto iter = reader.lineBegin();
-	auto end = reader.lineEnd();
+	// 解析源码，展开gm特有的宏
+	shaderInfo.source = expandSource(shaderInfo.filename, shaderInfo.source);
+}
 
-	for (auto iter = reader.lineBegin(); iter != reader.lineEnd(); iter++)
+GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMString& source)
+{
+	GMStringReader reader(source);
+	GMString n(""), line("");
+	GMString expanded("");
+	auto iter = reader.lineBegin();
+	while (true)
 	{
-		std::string str = (*iter).toStdString();
-		OutputDebugStringA(str.c_str());
+		line = *iter;
+		if (matchMarco(line, "include", n))
+			expandInclude(filename, n, line);
+		expanded += line;
+		if (!iter.hasNextLine())
+			break;
+
+		iter++;
+	}
+	return expanded;
+}
+
+bool GMGLShaderProgram::matchMarco(const GMString& source, const GMString& marco, REF GMString& result)
+{
+	std::string s = source.toStdString();
+	std::string expr = "#(\\s*)" + marco.toStdString() + " \"(.*)\"";
+	std::smatch match;
+	if (std::regex_search(s, match, std::regex(expr.c_str())))
+	{
+		ASSERT(match.size() >= 3);
+		result = match[2].str();
+		return true;
+	}
+	return false;
+}
+
+void GMGLShaderProgram::expandInclude(const GMString& filename, const GMString& fn, IN OUT GMString& source)
+{
+	GMString workingDir = GMPath::directoryName(filename);
+	GMString include = workingDir + fn;
+	GMBuffer buf;
+	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
+	{
+		buf.convertToStringBuffer();
+		source = expandSource(include, GMString((char*)buf.buffer));
+	}
+	else
+	{
+		gm_warning("GL shader '%s' not found, use empty file instead!", include);
 	}
 }

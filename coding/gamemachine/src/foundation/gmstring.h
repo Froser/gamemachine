@@ -57,11 +57,20 @@ public:
 	GMString& operator = (const GMWchar* str);
 
 public:
+	GMString& operator += (const GMString& str)
+	{
+		*this = *this + str;
+		return *this;
+	}
+
 	char operator[](GMuint i) const
 	{
 		D(d);
-		ASSERT(d->type == GMString::Data::MuiltBytes);
-		return d->str[i];
+		if (d->type == GMString::Data::MuiltBytes)
+			return d->str[i];
+
+		std::string t = toStdString();
+		return t[i];
 	}
 
 public:
@@ -101,11 +110,6 @@ class GMStringReader
 			findNextLine();
 		}
 
-		Iterator(const GMString& string, size_t pos) : m_src(string)
-		{
-			m_start = m_end = pos;
-		}
-
 	public:
 		GMString operator *();
 
@@ -120,9 +124,9 @@ class GMStringReader
 			return *this;
 		}
 
-		bool operator !=(const Iterator& rhs)
+		bool hasNextLine()
 		{
-			return m_end != rhs.m_end;
+			return !!m_src[m_end];
 		}
 
 	private:
@@ -138,11 +142,9 @@ public:
 
 public:
 	Iterator lineBegin();
-	Iterator lineEnd();
 
 private:
 	const GMString& m_string;
 };
-
 END_NS
 #endif

@@ -274,11 +274,6 @@ GMStringReader::Iterator GMStringReader::lineBegin()
 	return GMStringReader::Iterator(m_string);
 }
 
-GMStringReader::Iterator GMStringReader::lineEnd()
-{
-	return GMStringReader::Iterator(m_string, m_string.length());
-}
-
 GMString GMStringReader::Iterator::operator *()
 {
 	return m_src.substr(m_start, m_end - m_start);

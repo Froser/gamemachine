@@ -9,6 +9,8 @@
 #include <queue>
 #include <array>
 #include <unordered_map>
+#include <stack>
+#include <list>
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -37,6 +39,15 @@ using Hash = std::hash<T>;
 
 template <typename T1, typename T2>
 using UnorderedMap = std::unordered_map<T1, T2>;
+
+template <typename T>
+using Stack = std::stack<T>;
+
+template <typename T>
+using List = std::list<T>;
+
+template <typename T>
+using Deque = std::deque<T>;
 
 /* 工程编译选项 */
 // 使用UNICODE
@@ -121,6 +132,9 @@ using UnorderedMap = std::unordered_map<T1, T2>;
 
 // 表示是个引用，函数会改变此变量的值
 #define REF
+
+// 表示作为数据输入
+#define IN
 
 // 用于枚举的宏
 #define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMint)var)+1) )

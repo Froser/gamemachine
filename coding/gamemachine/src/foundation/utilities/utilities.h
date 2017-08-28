@@ -645,8 +645,8 @@ inline linear_math::Matrix4x4 getViewMatrix(const CameraLookAt& lookAt)
 	return linear_math::lookat(lookAt.position, lookAt.lookAt + lookAt.position, linear_math::Vector3(0, 1, 0));
 }
 
-//Path
-struct Path
+//GMPath
+struct GMPath
 {
 	static GMString directoryName(const GMString& fileName);
 	static GMString filename(const GMString& fullPath);

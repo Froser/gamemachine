@@ -1,4 +1,5 @@
 #version 330 core
+#include "../foundation/properties.h"
 
 in vec4 _position_world;
 in vec4 _normal;
@@ -8,21 +9,6 @@ in vec4 _bitangent;
 in vec2 _lightmapuv;
 in vec4 _shadowCoord;
 
-#define MAX_TEXTURE_COUNT 3
-
-struct GM_texture_t
-{
-	sampler2D texture;
-	float scroll_s;
-	float scroll_t;
-	float scale_s;
-	float scale_t;
-	int enabled;
-};
-uniform GM_texture_t GM_ambient_textures[MAX_TEXTURE_COUNT];
-uniform GM_texture_t GM_diffuse_textures[MAX_TEXTURE_COUNT];
-uniform GM_texture_t GM_lightmap_textures[MAX_TEXTURE_COUNT];  // 用到的只有1个
-uniform GM_texture_t GM_normalmap_textures[1];
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_model_matrix;
 

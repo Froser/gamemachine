@@ -41,9 +41,9 @@ static void resOutputHook(void* path, void* buffer)
 
 	std::fstream out;
 	GMString p = std::string("D:/output/") + resPath;
-	GMString dir = Path::directoryName(p);
+	GMString dir = GMPath::directoryName(p);
 	dir = dir.substr(0, dir.length() - 1);
-	Path::createDirectory(dir);
+	GMPath::createDirectory(dir);
 
 	out.open(p.toStdWString().c_str(), std::ios::out | std::ios::trunc | std::ios::binary);
 	if (out.good())
@@ -73,7 +73,7 @@ public:
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
 #else
-		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
+		pk->loadPackage((GMPath::getCurrentPath() + _L("gm.pk0")));
 #endif
 
 	}
@@ -260,21 +260,22 @@ public:
 	{
 		bool flag = false;
 		GMBuffer vertBuf, fragBuf;
+		GMString vertPath, fragPath;
 		switch (type)
 		{
 		case GMMeshType::Model:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.frag", &fragBuf, &fragPath);
 			flag = true;
 			break;
 		case GMMeshType::Glyph:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.frag", &fragBuf, &fragPath);
 			flag = true;
 			break;
 		case GMMeshType::Particles:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.frag", &fragBuf, &fragPath);
 			flag = true;
 			break;
 		default:
@@ -285,8 +286,8 @@ public:
 		fragBuf.convertToStringBuffer();
 
 		GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
 		shader.attachShader(shadersInfo[0]);
@@ -297,15 +298,16 @@ public:
 	bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
+		GMString vertPath, fragPath;
 		switch (state)
 		{
 		case GMGLDeferredRenderState::PassingGeometry:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/geometry_pass.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/geometry_pass.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/geometry_pass.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/geometry_pass.frag", &fragBuf, &fragPath);
 			break;
 		case gm::GMGLDeferredRenderState::PassingMaterial:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.vert", &vertBuf);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.frag", &fragBuf);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.frag", &fragBuf, &fragPath);
 			break;
 		default:
 			return false;
@@ -314,8 +316,8 @@ public:
 		fragBuf.convertToStringBuffer();
 
 		GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
 		shaderProgram.attachShader(shadersInfo[0]);
@@ -326,14 +328,15 @@ public:
 	bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
-		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.vert", &vertBuf);
-		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.frag", &fragBuf);
+		GMString vertPath, fragPath;
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.vert", &vertBuf, &vertPath);
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.frag", &fragBuf, &fragPath);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
 		GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer },
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
 		lightPassProgram.attachShader(shadersInfo[0]);
@@ -365,7 +368,7 @@ private:
 #ifdef _DEBUG
 		pk->loadPackage("D:/gmpk");
 #else
-		pk->loadPackage((Path::getCurrentPath() + _L("gm.pk0")));
+		pk->loadPackage((GMPath::getCurrentPath() + _L("gm.pk0")));
 #endif
 
 		demo = new GMDemoGameWorld();

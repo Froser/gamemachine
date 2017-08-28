@@ -1,6 +1,5 @@
 #version 330 core
-
-#define MAX_LIGHT_COUNT 10
+#include "../foundation/properties.h"
 
 in vec2 _texCoords;
 
@@ -34,14 +33,6 @@ float tShininess;
 
 // flags, -1 or 1
 float tHasNormalMap;
-
-struct GM_light_t
-{
-	vec3 lightColor;
-	vec3 lightPosition;
-};
-uniform GM_light_t GM_ambients[MAX_LIGHT_COUNT];
-uniform GM_light_t GM_speculars[MAX_LIGHT_COUNT];
 
 uniform mat4 GM_view_matrix;
 

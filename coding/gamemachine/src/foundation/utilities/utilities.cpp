@@ -620,7 +620,7 @@ bool Bitset::init(GMint numberOfBits)
 }
 
 //Path
-GMString Path::directoryName(const GMString& fileName)
+GMString GMPath::directoryName(const GMString& fileName)
 {
 	GMint pos1 = fileName.findLastOf('\\'),
 		pos2 = fileName.findLastOf('/');
@@ -630,7 +630,7 @@ GMString Path::directoryName(const GMString& fileName)
 	return fileName.substr(0, pos + 1);
 }
 
-GMString Path::filename(const GMString& fullPath)
+GMString GMPath::filename(const GMString& fullPath)
 {
 	GMint pos1 = fullPath.findLastOf('\\'),
 		pos2 = fullPath.findLastOf('/');
@@ -640,7 +640,7 @@ GMString Path::filename(const GMString& fullPath)
 	return fullPath.substr(pos + 1, fullPath.length());
 }
 
-GMString Path::getCurrentPath()
+GMString GMPath::getCurrentPath()
 {
 #if _WINDOWS
 	const int MAX = 255;
@@ -651,7 +651,7 @@ GMString Path::getCurrentPath()
 	return "";
 }
 
-Vector<GMString> Path::getAllFiles(const GMString& directory)
+Vector<GMString> GMPath::getAllFiles(const GMString& directory)
 {
 	Vector<GMString> res;
 #if _WINDOWS
@@ -680,7 +680,7 @@ Vector<GMString> Path::getAllFiles(const GMString& directory)
 	return res;
 }
 
-bool Path::directoryExists(const GMString& dir)
+bool GMPath::directoryExists(const GMString& dir)
 {
 #if _WINDOWS
 	WIN32_FIND_DATA findFileData;
@@ -698,7 +698,7 @@ bool Path::directoryExists(const GMString& dir)
 #endif
 }
 
-void Path::createDirectory(const GMString& dir)
+void GMPath::createDirectory(const GMString& dir)
 {
 #if _WINDOWS
 	if (directoryExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == _L(':')))

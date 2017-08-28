@@ -8,6 +8,7 @@ struct GMGLShaderInfo
 {
 	GLenum type;
 	GMString source;
+	GMString filename;
 };
 
 typedef AlignedVector<GLuint> GMGLShaderIDList;
@@ -52,7 +53,10 @@ public:
 private:
 	void setProgram(GLuint program) { D(d); d->shaderProgram = program; }
 	void removeShaders();
-	void expandSource(GMString& source);
+	void expandSource(REF GMGLShaderInfo& shaderInfo);
+	GMString expandSource(const GMString& workingDir, const GMString& source);
+	bool matchMarco(const GMString& source, const GMString& marco, REF GMString& result);
+	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
 };
 
 END_NS

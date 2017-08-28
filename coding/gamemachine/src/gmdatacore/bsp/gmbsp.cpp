@@ -55,7 +55,7 @@ static inline void stripTrailing(GMString& e)
 
 static inline GMString expandPath(const char *path)
 {
-	GMString strPath = Path::getCurrentPath();
+	GMString strPath = GMPath::getCurrentPath();
 	strPath.append(path);
 	return strPath;
 }
