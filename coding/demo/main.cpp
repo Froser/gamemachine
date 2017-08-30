@@ -68,7 +68,7 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
-		engine->setEffects(GMEffects::Inversion);
+		engine->setEffects( (GMEffects)(GMEffects::Blur | GMEffects::Sharpen));
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG

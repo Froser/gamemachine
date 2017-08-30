@@ -82,11 +82,17 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
-enum class GMEffects
+namespace GMEffects_ns
 {
-	None = 0x00000000,
-	Inversion = 0x00000001,
-};
+	enum GMEffects
+	{
+		None = 0x00000000,
+		Inversion = 0x00000001,
+		Sharpen = 0x00000002,
+		Blur = 0x00000004,
+	};
+}
+using GMEffects = GMEffects_ns::GMEffects;
 
 class GMLight;
 GM_INTERFACE(IGraphicEngine)

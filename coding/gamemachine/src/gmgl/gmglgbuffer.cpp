@@ -270,6 +270,8 @@ bool GMGLFramebuffer::init(GMuint windowWidth, GMuint windowHeight)
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->windowWidth, d->windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, d->texture, 0);
 
 	GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
@@ -401,9 +403,9 @@ void GMGLFramebuffer::disposeQuad()
 		glDeleteBuffers(1, &d->quadVBO);
 }
 
-inline constexpr GMuint eff(GMEffects effects)
+inline constexpr bool hasEffects(GMuint effects, GMEffects target)
 {
-	return (GMuint)effects;
+	return !! (effects & target);
 }
 
 void GMGLFramebuffer::useShaderProgramAndApplyEffects(GMGLShaderProgram* program)
@@ -416,6 +418,7 @@ void GMGLFramebuffer::useShaderProgramAndApplyEffects(GMGLShaderProgram* program
 	glBindTexture(GL_TEXTURE_2D, d->texture);
 	GM_CHECK_GL_ERROR();
 
-	program->setInt(GMSHADER_EFFECTS_INVERSION, d->effects & eff(GMEffects::Inversion));
-	GM_CHECK_GL_ERROR();
+	program->setInt(GMSHADER_EFFECTS_INVERSION, hasEffects(d->effects, GMEffects::Inversion));
+	program->setInt(GMSHADER_EFFECTS_SHARPEN, hasEffects(d->effects, GMEffects::Sharpen));
+	program->setInt(GMSHADER_EFFECTS_BLUR, hasEffects(d->effects, GMEffects::Blur));
 }
