@@ -1,3 +1,4 @@
+#version 330
 #include "foundation/vert_header.h"
 
 out vec2 _uv;

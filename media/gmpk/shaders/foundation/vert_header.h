@@ -1,5 +1,3 @@
-#version 330
-
 uniform mat4 GM_shadow_matrix;
 uniform mat4 GM_view_matrix;
 uniform mat4 GM_model_matrix;

@@ -82,6 +82,12 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
+enum class GMEffects
+{
+	None = 0x00000000,
+	Inversion = 0x00000001,
+};
+
 class GMLight;
 GM_INTERFACE(IGraphicEngine)
 {
@@ -95,6 +101,7 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void endCreateStencil() = 0;
 	virtual void beginUseStencil(bool inverse) = 0;
 	virtual void endUseStencil() = 0;
+	virtual void setEffects(GMEffects) = 0;
 };
 
 enum class GMDrawMode

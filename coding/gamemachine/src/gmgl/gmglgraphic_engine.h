@@ -32,6 +32,7 @@ GM_INTERFACE(IShaderLoadCallback)
 	virtual bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
 	virtual bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) = 0;
 	virtual bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) = 0;
+	virtual bool onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
@@ -48,6 +49,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Map<GMMeshType, GMGLShaderProgram* > forwardRenderingShaders;
 	Map<GMGLDeferredRenderState, GMGLShaderProgram* > deferredCommonPassShaders;
 	GMGLShaderProgram* deferredLightPassShader = nullptr;
+	GMGLShaderProgram* effectsShader = nullptr;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
@@ -55,6 +57,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	linear_math::Matrix4x4 projectionMatrix;
 
 	GMGLGBuffer gbuffer;
+	GMGLFramebuffer effectBuffer;
+
 	// 延迟渲染的四边形
 	GMuint quadVAO = 0;
 	GMuint quadVBO = 0;
@@ -66,6 +70,9 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMGameObject*> forwardRenderingGameObjects;
 
 	GMGLRenderMode stencilRenderModeCache = GMGLRenderMode::ForwardRendering;
+
+	// 效果
+	GMEffects effects = GMEffects::None;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -87,6 +94,7 @@ public:
 	virtual void endCreateStencil() override;
 	virtual void beginUseStencil(bool inverse) override;
 	virtual void endUseStencil() override;
+	virtual void setEffects(GMEffects effects);
 
 public:
 	GMGLShaderProgram* getShaders(GMMeshType objectType);
@@ -110,6 +118,7 @@ private:
 	void setViewport(const GMRect& rect);
 	void registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram);
 	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
+	void registerEffectsShader(AUTORELEASE GMGLShaderProgram* effectsShader);
 	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
 	void updateMatrices(const CameraLookAt& lookAt);
 	void installShaders();
@@ -119,6 +128,7 @@ private:
 	void activateForwardRenderLight(const Vector<GMLight>& lights);
 	void activateLightPassLight(const Vector<GMLight>& lights);
 	bool refreshGBuffer();
+	bool refreshFramebuffer();
 	void forwardRender(GMGameObject* objects[], GMuint count);
 	void geometryPass(Vector<GMGameObject*>& objects);
 	void lightPass();

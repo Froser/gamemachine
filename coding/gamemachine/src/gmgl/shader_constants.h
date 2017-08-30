@@ -42,6 +42,9 @@ BEGIN_NS
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
 
+//特效
+#define		GMSHADER_EFFECTS_INVERSION			GMSHADER("effects_inversion")
+
 // 获取名称辅助函数
 // 字符串拼接太慢，因此采用一些预设的字符串
 

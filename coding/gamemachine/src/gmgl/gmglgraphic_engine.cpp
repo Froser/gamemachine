@@ -18,6 +18,40 @@ extern "C"
 	GLenum s_glErrCode;
 }
 
+class GMEffectRenderer
+{
+public:
+	GMEffectRenderer(GMGLFramebuffer& effectBuffer, GMEffects effects, GMGLShaderProgram* program)
+		: m_effectBuffer(effectBuffer)
+		, m_program(program)
+	{
+		if (!m_effectBuffer.hasBegun()) // 防止绘制嵌套
+		{
+			m_isHost = true;
+			m_effectBuffer.beginDrawEffects(effects);
+		}
+	}
+
+	~GMEffectRenderer()
+	{
+		if (m_isHost || !m_effectBuffer.hasBegun())
+		{
+			m_effectBuffer.endDrawEffects();
+			m_effectBuffer.draw(m_program);
+		}
+	}
+
+	GLuint framebuffer()
+	{
+		return m_effectBuffer.framebuffer();
+	}
+
+private:
+	GMGLFramebuffer& m_effectBuffer;
+	GMGLShaderProgram* m_program;
+	bool m_isHost = false;
+};
+
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
@@ -46,6 +80,9 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 
 	if (d->lightPassRender)
 		delete d->lightPassRender;
+
+	if (d->effectsShader)
+		delete d->effectsShader;
 }
 
 void GMGLGraphicEngine::start()
@@ -87,6 +124,9 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 				setRenderMode(GMGLRenderMode::ForwardRendering); // if error occurs, back into forward rendering
 			}
 		}
+
+		if (!refreshFramebuffer())
+			gm_error("init framebuffer error");
 		break;
 	}
 	default:
@@ -101,7 +141,11 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	if (d->renderMode == GMGLRenderMode::ForwardRendering)
 	{
 		refreshForwardRenderLights();
-		forwardRender(objects, count);
+
+		{
+			GMEffectRenderer effectRender(d->effectBuffer, d->effects, d->effectsShader);
+			forwardRender(objects, count);
+		}
 	}
 	else
 	{
@@ -109,12 +153,17 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
 		groupGameObjects(objects, count);
 		geometryPass(d->deferredRenderingGameObjects);
-		lightPass();
+		newFrame();
 
-		d->gbuffer.copyDepthBuffer();
-		setRenderMode(GMGLRenderMode::ForwardRendering);
-		drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-		setRenderMode(GMGLRenderMode::DeferredRendering);
+		{
+			GMEffectRenderer effectRender(d->effectBuffer, d->effects, d->effectsShader);
+
+			lightPass();
+			d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
+			setRenderMode(GMGLRenderMode::ForwardRendering);
+			drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
+			setRenderMode(GMGLRenderMode::DeferredRendering);
+		}
 
 		viewFrameBuffer();
 	}
@@ -166,6 +215,23 @@ void GMGLGraphicEngine::installShaders()
 			deferredShaderLightPassProgram->load();
 
 		registerLightPassShader(deferredShaderLightPassProgram);
+	}
+
+	{
+		GMGLShaderProgram* effectsProgram = new GMGLShaderProgram();
+		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadEffectsShader(*effectsProgram)))
+		{
+			//if (!loadDefaultDeferredLightPassShader(effectsProgram))
+			//{
+			//	delete effectsProgram;
+			//	effectsProgram = nullptr;
+			//}
+		}
+
+		if (effectsProgram)
+			effectsProgram->load();
+
+		registerEffectsShader(effectsProgram);
 	}
 
 	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingGeometry, GMGLDeferredRenderState::EndOfRenderState)
@@ -276,6 +342,17 @@ bool GMGLGraphicEngine::refreshGBuffer()
 	return d->gbuffer.init(rect.width, rect.height);
 }
 
+bool GMGLGraphicEngine::refreshFramebuffer()
+{
+	D(d);
+	GMRect rect = GM.getMainWindow()->getClientRect();
+	if (rect.width <= 0 || rect.height <= 0)
+		return true;
+
+	d->effectBuffer.dispose();
+	return d->effectBuffer.init(rect.width, rect.height);
+}
+
 void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 {
 	D(d);
@@ -308,8 +385,6 @@ void GMGLGraphicEngine::geometryPass(Vector<GMGameObject*>& objects)
 void GMGLGraphicEngine::lightPass()
 {
 	D(d);
-	newFrame();
-
 	d->deferredLightPassShader->useProgram();
 	refreshDeferredRenderLights();
 	d->gbuffer.activateTextures(d->deferredLightPassShader);
@@ -505,6 +580,12 @@ void GMGLGraphicEngine::registerLightPassShader(AUTORELEASE GMGLShaderProgram* d
 	d->deferredLightPassShader = deferredLightPassProgram;
 }
 
+void GMGLGraphicEngine::registerEffectsShader(AUTORELEASE GMGLShaderProgram* effectsShader)
+{
+	D(d);
+	d->effectsShader = effectsShader;
+}
+
 GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 {
 	D(d);
@@ -584,6 +665,12 @@ void GMGLGraphicEngine::beginUseStencil(bool inverse)
 void GMGLGraphicEngine::endUseStencil()
 {
 	glDisable(GL_STENCIL_TEST);
+}
+
+void GMGLGraphicEngine::setEffects(GMEffects effects)
+{
+	D(d);
+	d->effects = effects;
 }
 
 void GMGLGraphicEngine::newFrameOnCurrentContext()

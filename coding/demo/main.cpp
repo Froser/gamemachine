@@ -68,6 +68,7 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
+		engine->setEffects(GMEffects::Inversion);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -331,6 +332,25 @@ public:
 		GMString vertPath, fragPath;
 		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.vert", &vertBuf, &vertPath);
 		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/light_pass.frag", &fragBuf, &fragPath);
+		vertBuf.convertToStringBuffer();
+		fragBuf.convertToStringBuffer();
+
+		GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+		};
+
+		lightPassProgram.attachShader(shadersInfo[0]);
+		lightPassProgram.attachShader(shadersInfo[1]);
+		return true;
+	}
+
+	bool onLoadEffectsShader(GMGLShaderProgram& lightPassProgram) override
+	{
+		GMBuffer vertBuf, fragBuf;
+		GMString vertPath, fragPath;
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "effects/effects.vert", &vertBuf, &vertPath);
+		GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "effects/effects.frag", &fragBuf, &fragPath);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 

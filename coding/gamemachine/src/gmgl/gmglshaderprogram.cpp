@@ -189,8 +189,7 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 		expanded += line;
 		if (!iter.hasNextLine())
 			break;
-
-		iter++;
+		++iter;
 	}
 	return expanded;
 }

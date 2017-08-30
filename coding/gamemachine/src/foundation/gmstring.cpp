@@ -284,6 +284,10 @@ void GMStringReader::Iterator::findNextLine()
 	m_start = m_end;
 	do
 	{
-		++m_end;
-	} while (m_src[m_end] != '\n' && m_src[m_end] != '\r' && m_src[m_end]);
+		if (!m_src[m_end])
+		{
+			m_eof = true;
+			break;
+		}
+	} while (m_src[m_end++] != '\n');
 }

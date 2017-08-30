@@ -126,7 +126,7 @@ class GMStringReader
 
 		bool hasNextLine()
 		{
-			return !!m_src[m_end];
+			return !m_eof;
 		}
 
 	private:
@@ -135,6 +135,7 @@ class GMStringReader
 	private:
 		const GMString& m_src;
 		size_t m_start = 0, m_end = 0;
+		bool m_eof = false;
 	};
 
 public:

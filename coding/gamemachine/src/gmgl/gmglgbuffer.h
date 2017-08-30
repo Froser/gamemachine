@@ -55,7 +55,7 @@ class GMGLGBuffer : public GMObject
 	DECLARE_PRIVATE(GMGLGBuffer)
 
 public:
-	GMGLGBuffer();
+	GMGLGBuffer() = default;
 	~GMGLGBuffer();
 
 public:
@@ -70,7 +70,7 @@ public:
 	void setReadBuffer(GBufferMaterialType materialType);
 	void newFrame();
 	void activateTextures(GMGLShaderProgram* shaderProgram);
-	void copyDepthBuffer();
+	void copyDepthBuffer(GLuint target);
 
 public:
 	inline const GMuint& getWidth() { D(d); return d->windowWidth; }
@@ -79,6 +79,49 @@ public:
 private:
 	bool createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray);
 	bool drawBuffers(GMuint count);
+};
+
+GM_PRIVATE_OBJECT(GMGLFramebuffer)
+{
+	GLuint fbo = 0;
+	GLuint quadVAO = 0;
+	GLuint quadVBO = 0;
+	GLuint texture = 0;
+	GLuint depthBuffer = 0;
+	GMuint windowWidth = 0;
+	GMuint windowHeight = 0;
+	GMuint effects = (GMuint) GMEffects::None;
+	bool hasBegun = false;
+};
+
+class GMGLFramebuffer : public GMObject
+{
+	DECLARE_PRIVATE(GMGLFramebuffer)
+
+public:
+	GMGLFramebuffer() = default;
+	~GMGLFramebuffer();
+
+public:
+	void dispose();
+	bool init(GMuint windowWidth, GMuint windowHeight);
+	void beginDrawEffects(GMEffects effects);
+	void endDrawEffects();
+	void draw(GMGLShaderProgram* program);
+
+public:
+	inline GLuint framebuffer() { D(d); if (d->effects) return d->fbo; return 0; }
+	inline bool hasBegun() { D(d); return d->hasBegun; }
+
+private:
+	void bindForWriting();
+	void bindForReading();
+	void releaseBind();
+	void newFrame();
+	void createQuad();
+	void renderQuad();
+	void disposeQuad();
+	void useShaderProgramAndApplyEffects(GMGLShaderProgram* program);
 };
 
 END_NS
