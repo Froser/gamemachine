@@ -421,4 +421,6 @@ void GMGLFramebuffer::useShaderProgramAndApplyEffects(GMGLShaderProgram* program
 	program->setInt(GMSHADER_EFFECTS_INVERSION, hasEffects(d->effects, GMEffects::Inversion));
 	program->setInt(GMSHADER_EFFECTS_SHARPEN, hasEffects(d->effects, GMEffects::Sharpen));
 	program->setInt(GMSHADER_EFFECTS_BLUR, hasEffects(d->effects, GMEffects::Blur));
+	program->setInt(GMSHADER_EFFECTS_GRAYSCALE, hasEffects(d->effects, GMEffects::Grayscale));
+	program->setInt(GMSHADER_EFFECTS_EDGEDETECT, hasEffects(d->effects, GMEffects::EdgeDetect));
 }

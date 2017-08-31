@@ -68,7 +68,7 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
-		engine->setEffects( (GMEffects)(GMEffects::Blur | GMEffects::Sharpen));
+		engine->setEffects(GMEffects::EdgeDetect);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG

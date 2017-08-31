@@ -90,6 +90,11 @@ namespace GMEffects_ns
 		Inversion = 0x00000001,
 		Sharpen = 0x00000002,
 		Blur = 0x00000004,
+		Grayscale = 0x00000008,
+		EdgeDetect = 0x00000010,
+
+		LastEffectsTag,
+		EndOfEffects = (LastEffectsTag - 1) << 2
 	};
 }
 using GMEffects = GMEffects_ns::GMEffects;
