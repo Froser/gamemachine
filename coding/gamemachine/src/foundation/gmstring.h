@@ -145,7 +145,7 @@ public:
 	Iterator lineBegin();
 
 private:
-	const GMString& m_string;
+	const GMString m_string;
 };
 END_NS
 #endif

@@ -129,8 +129,20 @@ void GMGLShaderProgram::load()
 
 			GLchar* log = new GLchar[len + 1];
 			glGetShaderInfoLog(shader, len, &len, log);
+
+			GMStringReader reader(source);
+			std::string report;
+			GMint ln = 0;
+			auto iter = reader.lineBegin();
+			do
+			{
+				report = std::to_string(++ln) + ":" + (*iter).toStdString();
+				gm_error("%s", report.c_str());
+				iter++;
+			} while (iter.hasNextLine());
+
 			gm_error("Shader compilation failed: %s", log);
-			ASSERT("Shader compilation failed: " && FALSE);
+			GM.postMessage({ GameMachineMessageType::OnConsole });
 			delete[] log;
 			return;
 		}

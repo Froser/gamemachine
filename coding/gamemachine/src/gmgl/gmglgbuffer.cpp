@@ -227,6 +227,15 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 	return true;
 }
 
+static const Pair<GMEffects, const char*> s_effects_uniformNames[] =
+{
+	{ GMEffects::Inversion, GMSHADER_EFFECTS_INVERSION },
+	{ GMEffects::Sharpen, GMSHADER_EFFECTS_SHARPEN },
+	{ GMEffects::Blur, GMSHADER_EFFECTS_BLUR },
+	{ GMEffects::Grayscale, GMSHADER_EFFECTS_GRAYSCALE },
+	{ GMEffects::EdgeDetect, GMSHADER_EFFECTS_EDGEDETECT },
+};
+
 GMGLFramebuffer::~GMGLFramebuffer()
 {
 	disposeQuad();
@@ -262,6 +271,8 @@ bool GMGLFramebuffer::init(GMuint windowWidth, GMuint windowHeight)
 
 	d->windowWidth = windowWidth;
 	d->windowHeight = windowHeight;
+	d->textureOffset[0] = 1.f / windowWidth;
+	d->textureOffset[1] = 1.f / windowHeight;
 
 	glGenFramebuffers(1, &d->fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
@@ -291,7 +302,6 @@ bool GMGLFramebuffer::init(GMuint windowWidth, GMuint windowHeight)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
 	GM_CHECK_GL_ERROR();
 
-	GM_CHECK_GL_ERROR();
 	releaseBind();
 	return true;
 }
@@ -315,7 +325,6 @@ void GMGLFramebuffer::endDrawEffects()
 		return;
 
 	d->hasBegun = false;
-	renderQuad();
 	releaseBind();
 }
 
@@ -326,7 +335,24 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	if (!e)
 		return;
 
-	useShaderProgramAndApplyEffects(program);
+	program->useProgram();
+	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->textureOffset[0]);
+	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->textureOffset[1]);
+
+	bindForWriting();
+	GMuint eff = 1;
+	while (eff != GMEffects::EndOfEffects)
+	{
+		if (d->effects & eff)
+		{
+			const char* name = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
+			renderQuad();
+			turnOffEffects(program, name);
+		}
+		eff <<= 1;
+	}
+	releaseBind();
+
 	renderQuad();
 }
 
@@ -382,6 +408,7 @@ void GMGLFramebuffer::createQuad()
 void GMGLFramebuffer::renderQuad()
 {
 	D(d);
+	glDisable(GL_BLEND);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 
@@ -403,24 +430,33 @@ void GMGLFramebuffer::disposeQuad()
 		glDeleteBuffers(1, &d->quadVBO);
 }
 
-inline constexpr bool hasEffects(GMuint effects, GMEffects target)
-{
-	return !! (effects & target);
-}
-
-void GMGLFramebuffer::useShaderProgramAndApplyEffects(GMGLShaderProgram* program)
+const char* GMGLFramebuffer::useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMEffects effect)
 {
 	D(d);
-	program->useProgram();
+	const char* uniformName = nullptr;
 	program->setInt("gFramebuffer", 0);
 	GM_CHECK_GL_ERROR();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, d->texture);
 	GM_CHECK_GL_ERROR();
 
-	program->setInt(GMSHADER_EFFECTS_INVERSION, hasEffects(d->effects, GMEffects::Inversion));
-	program->setInt(GMSHADER_EFFECTS_SHARPEN, hasEffects(d->effects, GMEffects::Sharpen));
-	program->setInt(GMSHADER_EFFECTS_BLUR, hasEffects(d->effects, GMEffects::Blur));
-	program->setInt(GMSHADER_EFFECTS_GRAYSCALE, hasEffects(d->effects, GMEffects::Grayscale));
-	program->setInt(GMSHADER_EFFECTS_EDGEDETECT, hasEffects(d->effects, GMEffects::EdgeDetect));
+	for (auto iter = std::begin(s_effects_uniformNames); iter != std::end(s_effects_uniformNames); ++iter)
+	{
+		if (iter->first == effect)
+		{
+			program->setBool(iter->second, true);
+			uniformName = iter->second;
+		}
+		else
+		{
+			program->setBool(iter->second, false);
+		}
+	}
+	return uniformName;
+}
+
+void GMGLFramebuffer::turnOffEffects(GMGLShaderProgram* program, const char* uniformName)
+{
+	if (uniformName)
+		program->setBool(uniformName, false);
 }

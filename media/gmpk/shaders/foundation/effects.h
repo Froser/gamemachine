@@ -1,7 +1,9 @@
 uniform sampler2D gFramebuffer;
 
 bool g_hasEffect = false;
-float g_offset = 1 / 300.f;
+
+uniform float GM_effects_texture_offset_x;
+uniform float GM_effects_texture_offset_y;
 
 // Effect switches
 uniform int GM_effects_inversion;
@@ -13,15 +15,15 @@ uniform int GM_effects_edgedetect;
 vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 {
     vec2 offsets[9] = vec2[](
-        vec2(-g_offset,  g_offset),
-        vec2( 0.0f,    g_offset),
-        vec2( g_offset,  g_offset),
-        vec2(-g_offset,  0.0f),  
-        vec2( 0.0f,    0.0f),  
-        vec2( g_offset,  0.0f),  
-        vec2(-g_offset, -g_offset),
-        vec2( 0.0f,   -g_offset),
-        vec2( g_offset, -g_offset) 
+        vec2(-GM_effects_texture_offset_x, GM_effects_texture_offset_y),
+        vec2( 0.0f, GM_effects_texture_offset_y),
+        vec2( GM_effects_texture_offset_x, GM_effects_texture_offset_y),
+        vec2(-GM_effects_texture_offset_x, 0.0f),  
+        vec2( 0.0f, 0.0f),  
+        vec2( GM_effects_texture_offset_x, 0.0f),  
+        vec2(-GM_effects_texture_offset_x, -GM_effects_texture_offset_y),
+        vec2( 0.0f, -GM_effects_texture_offset_y),
+        vec2( GM_effects_texture_offset_x, -GM_effects_texture_offset_y) 
     );
     vec3 sampler[9];
     for(int i = 0; i < 9; i++)
@@ -92,15 +94,15 @@ vec3 effects(sampler2D t, vec2 uv)
     bool hasEffect = false;
     vec3 result = vec3(0, 0, 0);
     if (hasEffect(GM_effects_inversion))
-        result += inv(t, uv);
+        result = inv(t, uv);
     else if (hasEffect(GM_effects_sharpen))
-        result += sharpen(t, uv);
+        result = sharpen(t, uv);
     else if (hasEffect(GM_effects_blur))
-        result += blur(t, uv);
+        result = blur(t, uv);
     else if (hasEffect(GM_effects_grayscale))
-        result += gray(t, uv);
+        result = gray(t, uv);
     else if (hasEffect(GM_effects_edgedetect))
-        result += edgeDetect(t, uv);
+        result = edgeDetect(t, uv);
     else if (!g_hasEffect)
         result = texture(t, uv).rgb;
     return result;

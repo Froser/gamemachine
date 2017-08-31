@@ -92,6 +92,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	GMuint windowHeight = 0;
 	GMuint effects = (GMuint) GMEffects::None;
 	bool hasBegun = false;
+	float textureOffset[2] = { 0 };
 };
 
 class GMGLFramebuffer : public GMObject
@@ -121,7 +122,8 @@ private:
 	void createQuad();
 	void renderQuad();
 	void disposeQuad();
-	void useShaderProgramAndApplyEffects(GMGLShaderProgram* program);
+	const char* useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMEffects effect);
+	void turnOffEffects(GMGLShaderProgram* program, const char* uniformName);
 };
 
 END_NS
