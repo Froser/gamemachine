@@ -194,7 +194,7 @@ void GM_new_arr(OUT T** out, GMint cnt)
 	memset(*out, 0, cnt * sizeof(T));
 }
 
-#define LINE_MAX 2048
+#define LINE_MAX 10240
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
 #define RAD(deg) deg * (PI / 180)

@@ -1,5 +1,5 @@
 #define GLEW_STATIC
-#define FREEGLUT_STATIC
+#include <iostream>
 #include <windows.h>
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
@@ -68,7 +68,7 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
-		engine->setEffects((GMEffects)(GMEffects::Blur | GMEffects::Sharpen));
+		engine->setEffects((GMEffects)(GMEffects::Blur));
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -151,9 +151,9 @@ public:
 			IMouseState& mouseState = inputManager->getMouseState();
 
 			if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-				GameMachine::instance().postMessage({ GameMachineMessageType::OnExit });
+				GameMachine::instance().postMessage({ GameMachineMessageType::Exit });
 			if (kbState.keydown('B'))
-				GameMachine::instance().postMessage({ GameMachineMessageType::OnConsole });
+				GameMachine::instance().postMessage({ GameMachineMessageType::Console });
 
 			GMMovement moveTag = MC_NONE;
 			GMMoveRate rate;
@@ -257,9 +257,8 @@ public:
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
-	bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shader) override
+	void onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shader) override
 	{
-		bool flag = false;
 		GMBuffer vertBuf, fragBuf;
 		GMString vertPath, fragPath;
 		switch (type)
@@ -267,17 +266,14 @@ public:
 		case GMMeshType::Model:
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.vert", &vertBuf, &vertPath);
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.frag", &fragBuf, &fragPath);
-			flag = true;
 			break;
 		case GMMeshType::Glyph:
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.vert", &vertBuf, &vertPath);
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.frag", &fragBuf, &fragPath);
-			flag = true;
 			break;
 		case GMMeshType::Particles:
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.vert", &vertBuf, &vertPath);
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.frag", &fragBuf, &fragPath);
-			flag = true;
 			break;
 		default:
 			break;
@@ -293,10 +289,9 @@ public:
 
 		shader.attachShader(shadersInfo[0]);
 		shader.attachShader(shadersInfo[1]);
-		return flag;
 	}
 
-	bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) override
+	void onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
 		GMString vertPath, fragPath;
@@ -311,7 +306,7 @@ public:
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "deferred/material_pass.frag", &fragBuf, &fragPath);
 			break;
 		default:
-			return false;
+			break;
 		}
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
@@ -323,10 +318,9 @@ public:
 
 		shaderProgram.attachShader(shadersInfo[0]);
 		shaderProgram.attachShader(shadersInfo[1]);
-		return true;
 	}
 
-	bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) override
+	void onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
 		GMString vertPath, fragPath;
@@ -342,10 +336,9 @@ public:
 
 		lightPassProgram.attachShader(shadersInfo[0]);
 		lightPassProgram.attachShader(shadersInfo[1]);
-		return true;
 	}
 
-	bool onLoadEffectsShader(GMGLShaderProgram& lightPassProgram) override
+	void onLoadEffectsShader(GMGLShaderProgram& lightPassProgram) override
 	{
 		GMBuffer vertBuf, fragBuf;
 		GMString vertPath, fragPath;
@@ -361,7 +354,6 @@ public:
 
 		lightPassProgram.attachShader(shadersInfo[0]);
 		lightPassProgram.attachShader(shadersInfo[1]);
-		return true;
 	}
 
 	bool m_bMouseEnable;
@@ -606,13 +598,13 @@ private:
 					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
 
 				if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-					GameMachine::instance().postMessage({ GameMachineMessageType::OnExit });
+					GameMachine::instance().postMessage({ GameMachineMessageType::Exit });
 
 				if (kbState.keyTriggered('P'))
 					rotate = !rotate;
 
 				if (kbState.keydown('B'))
-					GameMachine::instance().postMessage({ GameMachineMessageType::OnConsole });
+					GameMachine::instance().postMessage({ GameMachineMessageType::Console });
 
 				if (kbState.keyTriggered('I'))
 					GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));

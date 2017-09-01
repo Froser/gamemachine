@@ -230,6 +230,21 @@ void GMUIConsole::debug(const GMString& msg)
 	insertText(Data::OutputType::Debug, msg);
 }
 
+bool GMUIConsole::event(const GameMachineMessage& msg)
+{
+	D(d);
+	centerWindow();
+	showWindow(true, true);
+
+	if (msg.type == GMUIConsoleParam1::SELECT_FILTER)
+	{
+		d->filter.clearAll();
+		d->filter.set(msg.value);
+		onFilterChanged();
+	}
+	return true;
+}
+
 void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
 {
 	D(d);

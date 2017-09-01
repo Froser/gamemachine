@@ -200,6 +200,7 @@ GM_PRIVATE_OBJECT(GMObject)
 	GMConnectionTargets connectionTargets;
 };
 
+struct GameMachineMessage;
 class GMObject : public IDispose
 {
 	DECLARE_PRIVATE(GMObject)
@@ -234,6 +235,8 @@ public:
 #endif
 	}
 
+public:
+	virtual bool event(const GameMachineMessage& msg);
 
 private:
 	void addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback);

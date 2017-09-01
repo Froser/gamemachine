@@ -183,12 +183,11 @@ bool GameMachine::handleMessages()
 
 		switch (msg.msgType)
 		{
-		case GameMachineMessageType::OnExit:
+		case GameMachineMessageType::Exit:
 			return false;
-		case GameMachineMessageType::OnConsole:
+		case GameMachineMessageType::Console:
 			{
-				d->consoleWindow->centerWindow();
-				d->consoleWindow->showWindow(true, true);
+				d->consoleWindow->event(msg);
 			}
 		default:
 			break;

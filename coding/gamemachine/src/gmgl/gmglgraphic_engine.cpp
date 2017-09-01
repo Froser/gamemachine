@@ -9,7 +9,6 @@
 #include "renders/gmgl_renders_object.h"
 #include "renders/gmgl_renders_glyph.h"
 #include "renders/gmgl_renders_particle.h"
-#include "gmglgraphic_engine_default_shaders.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfig.h"
 
@@ -106,12 +105,12 @@ void GMGLGraphicEngine::newFrame()
 	}
 }
 
-void GMGLGraphicEngine::event(const GameMachineMessage& e)
+bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 {
 	D(d);
 	switch (e.msgType)
 	{
-	case GameMachineMessageType::OnWindowSizeChanged:
+	case GameMachineMessageType::WindowSizeChanged:
 	{
 		GMRect rect = GM.getMainWindow()->getClientRect();
 		setViewport(rect);
@@ -130,8 +129,9 @@ void GMGLGraphicEngine::event(const GameMachineMessage& e)
 		break;
 	}
 	default:
-		break;
+		return false;
 	}
+	return true;
 }
 
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
@@ -180,19 +180,17 @@ void GMGLGraphicEngine::installShaders()
 	};
 
 	GMGamePackage* package = GM.getGamePackageManager();
+	if (!d->shaderLoadCallback)
+	{
+		gm_error("You must specify a IShaderLoadCallback");
+		ASSERT(false);
+		return;
+	}
 
 	GM_FOREACH_ENUM_CLASS(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		GMGLShaderProgram* forwardShaderProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadForwardShader(type, *forwardShaderProgram)) )
-		{
-			if (!loadDefaultForwardShader(type, forwardShaderProgram))
-			{
-				delete forwardShaderProgram;
-				forwardShaderProgram = nullptr;
-			}
-		}
-
+		d->shaderLoadCallback->onLoadForwardShader(type, *forwardShaderProgram);
 		if (forwardShaderProgram)
 			forwardShaderProgram->load();
 
@@ -202,104 +200,27 @@ void GMGLGraphicEngine::installShaders()
 
 	{
 		GMGLShaderProgram* deferredShaderLightPassProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredLightPassShader(*deferredShaderLightPassProgram)))
-		{
-			if (!loadDefaultDeferredLightPassShader(deferredShaderLightPassProgram))
-			{
-				delete deferredShaderLightPassProgram;
-				deferredShaderLightPassProgram = nullptr;
-			}
-		}
-
-		if (deferredShaderLightPassProgram)
-			deferredShaderLightPassProgram->load();
-
+		d->shaderLoadCallback->onLoadDeferredLightPassShader(*deferredShaderLightPassProgram);
+		deferredShaderLightPassProgram->load();
 		registerLightPassShader(deferredShaderLightPassProgram);
 	}
 
 	{
 		GMGLShaderProgram* effectsProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadEffectsShader(*effectsProgram)))
-		{
-			//if (!loadDefaultDeferredLightPassShader(effectsProgram))
-			//{
-			//	delete effectsProgram;
-			//	effectsProgram = nullptr;
-			//}
-		}
-
-		if (effectsProgram)
-			effectsProgram->load();
-
+		d->shaderLoadCallback->onLoadEffectsShader(*effectsProgram);
+		effectsProgram->load();
 		registerEffectsShader(effectsProgram);
 	}
 
 	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingGeometry, GMGLDeferredRenderState::EndOfRenderState)
 	{
 		GMGLShaderProgram* shaderProgram = new GMGLShaderProgram();
-		if (!d->shaderLoadCallback || (d->shaderLoadCallback && !d->shaderLoadCallback->onLoadDeferredPassShader(state, *shaderProgram)))
-		{
-			if (!loadDefaultDeferredRenderShader(state, shaderProgram))
-			{
-				delete shaderProgram;
-				shaderProgram = nullptr;
-			}
-		}
-
-		if (shaderProgram)
-			shaderProgram->load();
-
+		d->shaderLoadCallback->onLoadDeferredPassShader(state, *shaderProgram);
+		shaderProgram->load();
 		registerCommonPassShader(state, shaderProgram);
 	}
 
 	d->lightPassRender = new GMGLRenders_LightPass();
-}
-
-bool GMGLGraphicEngine::loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram)
-{
-	switch (type)
-	{
-	case GMMeshType::Model:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::object.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::object.frag });
-		break;
-	case GMMeshType::Glyph:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::glyph.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::glyph.frag });
-		break;
-	case GMMeshType::Particles:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::particles.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::particles.frag });
-		break;
-	default:
-		return false;
-	}
-	return true;
-}
-
-bool GMGLGraphicEngine::loadDefaultDeferredLightPassShader(GMGLShaderProgram* shaderProgram)
-{
-	shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::deferred_light_pass.vert });
-	shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::deferred_light_pass.frag });
-	return true;
-}
-
-bool GMGLGraphicEngine::loadDefaultDeferredRenderShader(GMGLDeferredRenderState state, GMGLShaderProgram* shaderProgram)
-{
-	switch (state)
-	{
-	case GMGLDeferredRenderState::PassingGeometry:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::deferred_geometry_pass.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::deferred_geometry_pass.frag });
-		break;
-	case GMGLDeferredRenderState::PassingMaterial:
-		shaderProgram->attachShader({ GL_VERTEX_SHADER, gmgl_shaders::deferred_material_pass.vert });
-		shaderProgram->attachShader({ GL_FRAGMENT_SHADER, gmgl_shaders::deferred_material_pass.frag });
-		break;
-	default:
-		return false;
-	}
-	return true;
 }
 
 void GMGLGraphicEngine::activateForwardRenderLight(const Vector<GMLight>& lights)

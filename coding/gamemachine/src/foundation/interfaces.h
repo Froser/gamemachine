@@ -43,30 +43,16 @@ enum class GameMachineEvent
 
 enum class GameMachineMessageType
 {
-	OnExit,
-	OnConsole,
-	OnWindowSizeChanged,
+	Exit,
+	Console,
+	WindowSizeChanged,
 };
 
 struct GameMachineMessage
 {
-	enum ParamType
-	{
-		Type_GMObject,
-		Type_Bool,
-		Type_Int,
-	};
-
-	union Param
-	{
-		GMObject* obj;
-		bool b;
-		GMint i;
-	};
-
 	GameMachineMessageType msgType;
-	ParamType paramType;
-	Param param;
+	GMint type;
+	GMint value;
 };
 
 GM_INTERFACE(IGameHandler)
@@ -104,7 +90,7 @@ GM_INTERFACE(IGraphicEngine)
 {
 	virtual void start() = 0;
 	virtual void newFrame() = 0;
-	virtual void event(const GameMachineMessage& e) = 0;
+	virtual bool event(const GameMachineMessage& e) = 0;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual void addLight(const GMLight& light) = 0;

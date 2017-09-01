@@ -29,10 +29,10 @@ enum class GMGLRenderMode
 
 GM_INTERFACE(IShaderLoadCallback)
 {
-	virtual bool onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
-	virtual bool onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) = 0;
-	virtual bool onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) = 0;
-	virtual bool onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
+	virtual void onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
+	virtual void onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) = 0;
+	virtual void onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) = 0;
+	virtual void onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
@@ -86,7 +86,7 @@ public:
 public:
 	virtual void start() override;
 	virtual void newFrame() override;
-	virtual void event(const GameMachineMessage& e) override;
+	virtual bool event(const GameMachineMessage& e) override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual void addLight(const GMLight& light) override;
@@ -122,9 +122,6 @@ private:
 	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
 	void updateMatrices(const CameraLookAt& lookAt);
 	void installShaders();
-	bool loadDefaultForwardShader(const GMMeshType type, GMGLShaderProgram* shaderProgram);
-	bool loadDefaultDeferredLightPassShader(GMGLShaderProgram* shaderProgram);
-	bool loadDefaultDeferredRenderShader(GMGLDeferredRenderState state, GMGLShaderProgram* shaderProgram);
 	void activateForwardRenderLight(const Vector<GMLight>& lights);
 	void activateLightPassLight(const Vector<GMLight>& lights);
 	bool refreshGBuffer();

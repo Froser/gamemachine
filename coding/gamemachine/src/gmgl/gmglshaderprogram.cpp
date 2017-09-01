@@ -136,13 +136,13 @@ void GMGLShaderProgram::load()
 			auto iter = reader.lineBegin();
 			do
 			{
-				report = std::to_string(++ln) + ":" + (*iter).toStdString();
-				gm_error("%s", report.c_str());
+				report += std::to_string(++ln) + ":\t" + (*iter).toStdString();
 				iter++;
 			} while (iter.hasNextLine());
 
+			gm_error("Shader source: \n%s", report.c_str());
 			gm_error("Shader compilation failed: %s", log);
-			GM.postMessage({ GameMachineMessageType::OnConsole });
+			GM.postMessage({ GameMachineMessageType::Console, GMUIConsoleParam1::SELECT_FILTER, GMUIConsoleParam2::PARAM_ERROR });
 			delete[] log;
 			return;
 		}
