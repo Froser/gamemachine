@@ -142,7 +142,7 @@ GM_ALIGNED_STRUCT(GMS_TextureMod)
 
 GM_PRIVATE_OBJECT(GMTextureFrames)
 {
-	ITexture* frames[MAX_ANIMATION_FRAME]; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
+	ITexture* frames[MAX_ANIMATION_FRAME] = { 0 }; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
 	GMS_TextureMod texMod[MAX_TEX_MOD];
 	GMint frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
@@ -165,12 +165,7 @@ public:
 	GM_DECLARE_PROPERTY(WrapT, wrapT, GMS_Wrap);
 
 public:
-	GMTextureFrames()
-	{
-		D(d);
-		memset(d->frames, 0, sizeof(*d->frames) * MAX_ANIMATION_FRAME);
-	}
-
+	GMTextureFrames() = default;
 	GMTextureFrames(const GMTextureFrames&) = delete;
 
 public:
@@ -186,16 +181,18 @@ public:
 		d->texMod[index] = mod;
 	}
 
-	inline ITexture* getOneFrame(GMint frameIndex)
+	inline ITexture* getFrameByIndex(GMint frameIndex)
 	{
 		D(d);
 		return d->frames[frameIndex];
 	}
 
-	inline void setOneFrame(GMint frameIndex, ITexture* oneFrame)
+	inline GMint addFrame(ITexture* oneFrame)
 	{
 		D(d);
-		d->frames[frameIndex] = oneFrame;
+		d->frames[d->frameCount] = oneFrame;
+		++d->frameCount;
+		return d->frameCount;
 	}
 
 	inline GMTextureFrames& operator=(const GMTextureFrames& rhs)

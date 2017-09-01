@@ -52,7 +52,7 @@ private:
 	void parse_cull(Shader& shader, TiXmlElement* elem);
 	void parse_blendFunc(Shader& shader, TiXmlElement* elem);
 	void parse_animMap(Shader& shader, TiXmlElement* elem);
-	void parse_src(Shader& shader, TiXmlElement* elem, GMuint i);
+	void parse_src(Shader& shader, TiXmlElement* elem);
 	void parse_clampmap(Shader& shader, TiXmlElement* elem);
 	void parse_map(Shader& shader, TiXmlElement* elem);
 	void parse_map_tcMod(Shader& shader, TiXmlElement* elem);

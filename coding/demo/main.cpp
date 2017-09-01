@@ -68,7 +68,6 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
-		engine->setEffects((GMEffects)(GMEffects::Blur));
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -432,14 +431,12 @@ private:
 
 					{
 						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
-						frames.setOneFrame(0, tex);
-						frames.setFrameCount(1);
+						frames.addFrame(tex);
 					}
 
 					{
 						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::DIFFUSE, 0);
-						frames.setOneFrame(0, tex);
-						frames.setFrameCount(1);
+						frames.addFrame(tex);
 					}
 
 				}

@@ -257,13 +257,13 @@ ITexture* GMGLRenders_Object::getTexture(GMTextureFrames& frames)
 		return nullptr;
 
 	if (frames.getFrameCount() == 1)
-		return frames.getOneFrame(0);
+		return frames.getFrameByIndex(0);
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
 	GMint elapsed = GameMachine::instance().getGameTimeSeconds() * 1000;
 
-	return frames.getOneFrame((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
+	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
 void GMGLRenders_Object::activateMaterial(const Shader& shader)
