@@ -361,6 +361,7 @@ void GMGLGraphicEngine::viewFrameBuffer()
 void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 {
 	D(d);
+	GM_BEGIN_CHECK_GL_ERROR
 	updateMatrices(lookAt);
 
 	// 遍历每一种着色器
@@ -389,6 +390,7 @@ void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
 		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
 		render->end();
 	}
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
@@ -474,7 +476,9 @@ void GMGLGraphicEngine::disposeDeferredRenderQuad()
 
 void GMGLGraphicEngine::setViewport(const GMRect& rect)
 {
+	GM_BEGIN_CHECK_GL_ERROR
 	glViewport(rect.x, rect.y, rect.width, rect.height);
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLGraphicEngine::registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram)

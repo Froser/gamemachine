@@ -85,11 +85,6 @@ void GMGLModelPainter::transfer()
 				glEnableVertexAttribArray(gmVertexIndex(type));
 		}
 
-#if _DEBUG
-		void* buf = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-		glUnmapBuffer(GL_ARRAY_BUFFER);
-#endif
-
 		glBindVertexArray(0);
 
 		IF_ENABLED(mesh, GMVertexDataType::Position)	mesh->clear_positions_and_save_byte_size();

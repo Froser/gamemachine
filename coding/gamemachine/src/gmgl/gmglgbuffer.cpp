@@ -54,25 +54,25 @@ bool GMGLGBuffer::nextPass()
 void GMGLGBuffer::dispose()
 {
 	D(d);
-	if (d->fbo)
+	if (d->fbo[0])
 	{
 		glDeleteFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
 		GM_ZeroMemory(d->fbo);
 	}
 
-	if (d->textures[0] != 0)
+	if (d->textures[0])
 	{
 		glDeleteTextures(GEOMETRY_NUM, d->textures);
 		GM_ZeroMemory(d->textures);
 	}
 
-	if (d->materials[0] != 0)
+	if (d->materials[0])
 	{
 		glDeleteTextures(MATERIAL_NUM, d->materials);
 		GM_ZeroMemory(d->materials);
 	}
 
-	if (d->depthBuffers != 0)
+	if (d->depthBuffers[0])
 	{
 		glDeleteRenderbuffers(GMGLGBuffer_TotalTurn, d->depthBuffers);
 		GM_ZeroMemory(d->depthBuffers);

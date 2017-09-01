@@ -68,6 +68,7 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
+		engine->setEffects(GMEffects::Grayscale);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -524,11 +525,12 @@ private:
 			demo->appendObject("particles", emitter);
 		}
 #endif
-
+		GM_BEGIN_CHECK_GL_ERROR
 		CameraLookAt lookAt;
 		lookAt.lookAt = { 0, 0, -1 };
 		lookAt.position = { 0, 0, 1 };
 		engine->updateCameraView(lookAt);
+		GM_END_CHECK_GL_ERROR
 	}
 
 	virtual void event(GameMachineEvent evt)
