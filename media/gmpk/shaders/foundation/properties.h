@@ -25,6 +25,8 @@ struct GM_light_t
 };
 uniform GM_light_t GM_ambients[MAX_LIGHT_COUNT];
 uniform GM_light_t GM_speculars[MAX_LIGHT_COUNT];
+uniform int GM_ambients_count;
+uniform int GM_speculars_count;
 
 struct GM_Material_t
 {

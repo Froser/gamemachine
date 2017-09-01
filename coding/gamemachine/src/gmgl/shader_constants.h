@@ -29,7 +29,9 @@ BEGIN_NS
 
 //光照
 #define		GMSHADER_AMBIENT_LIGHTS(i)			GMSHADER("ambients") "[" #i "]"
+#define		GMSHADER_AMBIENTS_COUNT				GMSHADER("ambients_count")
 #define		GMSHADER_SPECULAR_LIGHTS(i)			GMSHADER("speculars") "[" #i "]"
+#define		GMSHADER_SPECULARS_COUNT			GMSHADER("speculars_count")
 #define		GMSHADER_LIGHTS_LIGHTCOLOR			".lightColor"
 #define		GMSHADER_LIGHTS_LIGHTPOSITION		".lightPosition"
 

@@ -31,7 +31,7 @@ public:
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;
 	virtual void end() override;
-	virtual void activateLight(const GMLight& light, GMint lightIndex);
+	virtual void activateLights(const GMLight* lights, GMint count);
 
 protected:
 	GMGLShaderProgram* getShaderProgram();

@@ -81,13 +81,13 @@ void GMGLRenders_Object::activateShader()
 		}
 	}
 
-	if (shader->getBlend())
-		glDepthMask(GL_FALSE);
-
 	if (shader->getNoDepthTest())
 		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
+
+	if (shader->getBlend())
+		glDepthMask(GL_FALSE);
 
 	GM_CHECK_GL_ERROR();
 	glLineWidth(shader->getLineWidth());
@@ -189,34 +189,44 @@ void GMGLRenders_Object::end()
 {
 }
 
-void GMGLRenders_Object::activateLight(const GMLight& light, GMint lightIndex)
+void GMGLRenders_Object::activateLights(const GMLight* lights, GMint count)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
 
-	switch (light.getType())
+	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+	for (GMint i = 0; i < count; i++)
 	{
-	case GMLightType::AMBIENT:
+		const GMLight& light = lights[i];
+		GMint id = lightId[(GMuint)light.getType()]++;
+
+		switch (light.getType())
 		{
-			const char* uniform = getLightUniformName(GMLightType::AMBIENT, lightIndex);
-			char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-			shaderProgram->setVec3(u_color, light.getLightColor());
+		case GMLightType::AMBIENT:
+			{
+				const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
+				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
+				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+				shaderProgram->setVec3(u_color, light.getLightColor());
+			}
+			break;
+		case GMLightType::SPECULAR:
+			{
+				const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
+				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
+				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+				combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
+				shaderProgram->setVec3(u_color, light.getLightColor());
+				shaderProgram->setVec3(u_position, light.getLightPosition());
+			}
+			break;
+		default:
+			break;
 		}
-		break;
-	case GMLightType::SPECULAR:
-		{
-			const char* uniform = getLightUniformName(GMLightType::SPECULAR, lightIndex);
-			char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-			combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
-			shaderProgram->setVec3(u_color, light.getLightColor());
-			shaderProgram->setVec3(u_position, light.getLightPosition());
-		}
-		break;
-	default:
-		break;
 	}
+
+	shaderProgram->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
+	shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
 void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)

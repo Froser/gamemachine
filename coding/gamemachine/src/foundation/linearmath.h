@@ -62,6 +62,8 @@ inline GMfloat gmLog(GMfloat x) { return logf(x); }
 inline GMfloat gmPow(GMfloat x, GMfloat y) { return powf(x, y); }
 inline GMfloat gmFmod(GMfloat x, GMfloat y) { return fmodf(x, y); }
 inline GMfloat gmFloor(GMfloat x) { return floor(x); }
+inline GMfloat gmMin(GMfloat x, GMfloat y) { return x < y ? x : y; }
+inline GMfloat gmMax(GMfloat x, GMfloat y) { return x > y ? x : y; }
 
 #define VEC3(v4) linear_math::Vector3(v4[0], v4[1], v4[2])
 #define VEC4(v3, v4) linear_math::Vector4(v3, v4[3])

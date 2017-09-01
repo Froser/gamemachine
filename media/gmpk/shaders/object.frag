@@ -103,7 +103,7 @@ void calcLights()
 	// 计算漫反射和高光部分
 	if (GM_normalmap_textures[0].enabled == 0)
 	{
-		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+		for (int i = 0; i < GM_speculars_count; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
@@ -115,7 +115,7 @@ void calcLights()
 		vec3 normal_tangent = texture(GM_normalmap_textures[0].texture, _uv).rgb * 2.0 - 1.0;
 		vec3 tangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
 		vec3 bitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
-		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+		for (int i = 0; i < GM_speculars_count; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
@@ -132,7 +132,7 @@ void calcLights()
 	}
 
 	// 计算环境光
-	for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+	for (int i = 0; i < GM_ambients_count; i++)
 	{
 		g_ambientLight += GM_material.ka * GM_ambients[i].lightColor * g_shadeFactor;
 	}
@@ -144,6 +144,9 @@ vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 	vec3 result = vec3(0);
 	for (int i = 0; i < size; i++)
 	{
+		if (textures[i].enabled == 0)
+			break;
+		
 		result += textures[i].enabled == 1
 			? vec3(texture(textures[i].texture, uv * vec2(textures[i].scale_s, textures[i].scale_t) + vec2(textures[i].scroll_s, textures[i].scroll_t)))
 			: vec3(0);

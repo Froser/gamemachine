@@ -26,6 +26,9 @@ vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 	vec3 result = vec3(0);
 	for (int i = 0; i < size; i++)
 	{
+		if (textures[i].enabled == 0)
+			break;
+		
 		result += textures[i].enabled == 1
 			? vec3(texture(textures[i].texture, uv * vec2(textures[i].scale_s, textures[i].scale_t) + vec2(textures[i].scroll_s, textures[i].scroll_t)))
 			: vec3(0);

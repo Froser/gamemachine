@@ -229,13 +229,7 @@ void GMGLGraphicEngine::activateForwardRenderLight(const Vector<GMLight>& lights
 	GM_FOREACH_ENUM(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		IRender* render = getRender(type);
-		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-
-		for (auto& light : lights)
-		{
-			GMint id = lightId[(GMuint)light.getType()]++;
-			render->activateLight(light, id);
-		}
+		render->activateLights(lights.data(), lights.size());
 	}
 }
 
@@ -248,7 +242,7 @@ void GMGLGraphicEngine::activateLightPassLight(const Vector<GMLight>& lights)
 	for (auto& light : lights)
 	{
 		GMint id = lightId[(GMuint)light.getType()]++;
-		render->activateLight(light, id);
+		render->activateLights(lights.data(), lights.size());
 	}
 }
 

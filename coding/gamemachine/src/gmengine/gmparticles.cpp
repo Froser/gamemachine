@@ -101,13 +101,14 @@ void GMParticles::draw()
 	{
 		GMModel* prototype = kv.first;
 		GMModelPainter* painter = prototype->getPainter();
+		painter->beginUpdateBuffer(prototype->getAllMeshes()[0]);
 		void* buffer = painter->getBuffer();
 		for (const auto& particle : kv.second)
 		{
 			particle->updatePrototype(buffer);
 		}
 		painter->endUpdateBuffer();
-		kv.first->getPainter()->draw(nullptr);
+		painter->draw(nullptr);
 	}
 }
 
@@ -380,7 +381,10 @@ void GMLerpParticleEmitter::respawnLife(const GMint index, GMParticleGameObject*
 	if (currentLife < 0)
 	{
 		currentLife = gmFabs(currentLife);
-		GMfloat factor = gmFloor((currentLife - .001f) / particle->getMaxLife()) + 1;
+		GMfloat factor = gmFloor((currentLife - .001f) / particle->getMaxLife());
+		if (factor < 0)
+			factor = 0;
+		++factor;
 		particle->setCurrentLife(particle->getMaxLife() * factor - currentLife);
 	}
 	else

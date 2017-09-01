@@ -104,7 +104,7 @@ void calcLights()
 	// 计算漫反射和高光部分
 	if (!hasFlag(tHasNormalMap))
 	{
-		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+		for (int i = 0; i < GM_speculars_count; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
@@ -114,7 +114,7 @@ void calcLights()
 	else
 	{
 		vec3 normal_tangent = tNormalMap.rgb * 2.0 - 1.0;
-		for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+		for (int i = 0; i < GM_speculars_count; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
@@ -131,7 +131,7 @@ void calcLights()
 	}
 
 	// 计算环境光
-	for (int i = 0; i < MAX_LIGHT_COUNT; i++)
+	for (int i = 0; i < GM_ambients_count; i++)
 	{
 		g_ambientLight += tKa * GM_ambients[i].lightColor;
 	}

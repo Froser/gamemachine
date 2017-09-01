@@ -25,7 +25,7 @@ public:
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt);
 	virtual void endShader() { ASSERT(false); }
 	virtual void end() {}
-	virtual void activateLight(const GMLight& light, GMint lightIndex);
+	virtual void activateLights(const GMLight* lights, GMint count);
 };
 
 END_NS
