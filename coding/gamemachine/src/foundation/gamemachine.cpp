@@ -183,7 +183,7 @@ bool GameMachine::handleMessages()
 
 		switch (msg.msgType)
 		{
-		case GameMachineMessageType::Exit:
+		case GameMachineMessageType::Quit:
 			return false;
 		case GameMachineMessageType::Console:
 			{

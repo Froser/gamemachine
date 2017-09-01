@@ -151,7 +151,7 @@ public:
 			IMouseState& mouseState = inputManager->getMouseState();
 
 			if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-				GameMachine::instance().postMessage({ GameMachineMessageType::Exit });
+				GameMachine::instance().postMessage({ GameMachineMessageType::Quit });
 			if (kbState.keydown('B'))
 				GameMachine::instance().postMessage({ GameMachineMessageType::Console });
 
@@ -597,7 +597,7 @@ private:
 					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
 
 				if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-					GameMachine::instance().postMessage({ GameMachineMessageType::Exit });
+					GameMachine::instance().postMessage({ GameMachineMessageType::Quit });
 
 				if (kbState.keyTriggered('P'))
 					rotate = !rotate;

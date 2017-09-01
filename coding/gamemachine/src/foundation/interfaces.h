@@ -43,7 +43,7 @@ enum class GameMachineEvent
 
 enum class GameMachineMessageType
 {
-	Exit,
+	Quit,
 	Console,
 	WindowSizeChanged,
 };
