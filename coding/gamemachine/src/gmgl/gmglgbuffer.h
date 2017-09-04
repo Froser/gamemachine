@@ -44,9 +44,11 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 	GLuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
 	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
 	GLuint depthBuffers[(GMint)GMGLDeferredRenderState::EndOfRenderState] = { 0 };
-	GMuint windowWidth = 0;
-	GMuint windowHeight = 0;
+	GMint renderWidth = 0;
+	GMint renderHeight = 0;
 	GMint currentTurn = 0;
+	GMRect clientRect = { 0 };
+	GMRect viewport = { 0 };
 };
 
 class GMGLShaderProgram;
@@ -59,10 +61,12 @@ public:
 	~GMGLGBuffer();
 
 public:
+	void adjustViewport();
+	void restoreViewport();
 	void beginPass();
 	bool nextPass();
 	void dispose();
-	bool init(GMuint windowWidth, GMuint windowHeight);
+	bool init(const GMRect& clientRect);
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
@@ -73,8 +77,8 @@ public:
 	void copyDepthBuffer(GLuint target);
 
 public:
-	inline const GMuint& getWidth() { D(d); return d->windowWidth; }
-	inline const GMuint& getHeight() { D(d); return d->windowHeight; }
+	inline const GMint& getWidth() { D(d); return d->renderWidth; }
+	inline const GMint& getHeight() { D(d); return d->renderHeight; }
 
 private:
 	bool createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray);
@@ -88,11 +92,12 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	GLuint quadVBO = 0;
 	GLuint texture = 0;
 	GLuint depthBuffer = 0;
-	GMuint windowWidth = 0;
-	GMuint windowHeight = 0;
-	GMuint effects = (GMuint) GMEffects::None;
+	GMint renderWidth = 0;
+	GMint renderHeight = 0;
+	GMuint effects = GMEffects::None;
 	bool hasBegun = false;
-	float textureOffset[2] = { 0 };
+	GMRect clientRect = { 0 };
+	GMRect viewport = { 0 };
 };
 
 class GMGLFramebuffer : public GMObject
@@ -105,8 +110,8 @@ public:
 
 public:
 	void dispose();
-	bool init(GMuint windowWidth, GMuint windowHeight);
-	void beginDrawEffects(GMEffects effects);
+	bool init(const GMRect& clientRect);
+	void beginDrawEffects();
 	void endDrawEffects();
 	void draw(GMGLShaderProgram* program);
 
@@ -115,6 +120,7 @@ public:
 	inline bool hasBegun() { D(d); return d->hasBegun; }
 
 private:
+	bool needRenderFramebuffer();
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
@@ -123,7 +129,6 @@ private:
 	void renderQuad();
 	void disposeQuad();
 	const char* useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMEffects effect);
-	void turnOffEffects(GMGLShaderProgram* program, const char* uniformName);
 };
 
 END_NS

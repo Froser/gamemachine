@@ -339,7 +339,7 @@ void GMUIConsole::update()
 	GMUIGraphGuard guard(d->profileGraph);
 	d->profileGraph->clearGraph();
 
-	if (!GMGetBuiltIn(RUN_PROFILE))
+	if (!GMGetDebugState(RUN_PROFILE))
 	{
 		d->profileGraph->drawText(_L("Profile function disabled. "));
 		return;

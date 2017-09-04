@@ -68,23 +68,6 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
-namespace GMEffects_ns
-{
-	enum GMEffects
-	{
-		None = 0x00000000,
-		Inversion = 0x00000001,
-		Sharpen = 0x00000002,
-		Blur = 0x00000004,
-		Grayscale = 0x00000008,
-		EdgeDetect = 0x00000010,
-
-		LastEffectsTag,
-		EndOfEffects = (LastEffectsTag - 1) << 2
-	};
-}
-using GMEffects = GMEffects_ns::GMEffects;
-
 class GMLight;
 GM_INTERFACE(IGraphicEngine)
 {
@@ -98,7 +81,6 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void endCreateStencil() = 0;
 	virtual void beginUseStencil(bool inverse) = 0;
 	virtual void endUseStencil() = 0;
-	virtual void setEffects(GMEffects) = 0;
 };
 
 enum class GMDrawMode

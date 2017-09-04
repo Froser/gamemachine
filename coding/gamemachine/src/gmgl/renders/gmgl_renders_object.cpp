@@ -169,7 +169,7 @@ void GMGLRenders_Object::endShader()
 void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
 {
 	D(d);
-	if (GMGetBuiltIn(DRAW_LIGHTMAP_ONLY) && type != GMTextureType::LIGHTMAP)
+	if (GMGetDebugState(DRAW_LIGHTMAP_ONLY) && type != GMTextureType::LIGHTMAP)
 		return;
 
 	// 按照贴图类型选择纹理动画序列
@@ -291,7 +291,7 @@ void GMGLRenders_Object::drawDebug()
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
-	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetBuiltIn(DRAW_NORMAL));
+	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
 }
 
 void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint index)

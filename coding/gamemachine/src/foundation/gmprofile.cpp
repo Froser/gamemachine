@@ -45,7 +45,7 @@ void GMProfile::startRecord(const GMWchar* name)
 	D(d);
 	GMMutex m;
 	static GMLargeInteger frequency = GMClock::highResolutionTimerFrequency();
-	if (!GMGetBuiltIn(RUN_PROFILE))
+	if (!GMGetDebugState(RUN_PROFILE))
 		return;
 
 	GMProfileSessions::GMProfileSession& ps = profileSession();

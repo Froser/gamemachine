@@ -1,16 +1,15 @@
 uniform sampler2D gFramebuffer;
 
-bool g_hasEffect = false;
-
 uniform float GM_effects_texture_offset_x;
 uniform float GM_effects_texture_offset_y;
 
 // Effect switches
-uniform int GM_effects_inversion;
-uniform int GM_effects_sharpen;
-uniform int GM_effects_blur;
-uniform int GM_effects_grayscale;
-uniform int GM_effects_edgedetect;
+uniform int GM_effects_none = 0;
+uniform int GM_effects_inversion = 0;
+uniform int GM_effects_sharpen = 0;
+uniform int GM_effects_blur = 0;
+uniform int GM_effects_grayscale = 0;
+uniform int GM_effects_edgedetect = 0;
 
 vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 {
@@ -39,10 +38,7 @@ vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 bool hasEffect(int effect)
 {
     if (effect == 1)
-    {
-        g_hasEffect = true;
         return true;
-    }
     return false;
 }
 
@@ -91,7 +87,6 @@ vec3 edgeDetect(sampler2D t, vec2 uv)
 
 vec3 effects(sampler2D t, vec2 uv)
 {
-    bool hasEffect = false;
     vec3 result = vec3(0, 0, 0);
     if (hasEffect(GM_effects_inversion))
         result = inv(t, uv);
@@ -103,7 +98,7 @@ vec3 effects(sampler2D t, vec2 uv)
         result = gray(t, uv);
     else if (hasEffect(GM_effects_edgedetect))
         result = edgeDetect(t, uv);
-    else if (!g_hasEffect)
+    else
         result = texture(t, uv).rgb;
     return result;
 }

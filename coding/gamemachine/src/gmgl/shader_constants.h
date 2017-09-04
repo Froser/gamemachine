@@ -47,6 +47,7 @@ BEGIN_NS
 //特效
 #define		GMSHADER_EFFECTS_TEXTURE_OFFSET_X	GMSHADER("effects_texture_offset_x")
 #define		GMSHADER_EFFECTS_TEXTURE_OFFSET_Y	GMSHADER("effects_texture_offset_y")
+#define		GMSHADER_EFFECTS_NONE				GMSHADER("effects_none")
 #define		GMSHADER_EFFECTS_INVERSION			GMSHADER("effects_inversion")
 #define		GMSHADER_EFFECTS_SHARPEN			GMSHADER("effects_sharpen")
 #define		GMSHADER_EFFECTS_BLUR				GMSHADER("effects_blur")

@@ -10,7 +10,7 @@
 #include "renders/gmgl_renders_glyph.h"
 #include "renders/gmgl_renders_particle.h"
 #include "foundation/gamemachine.h"
-#include "foundation/gmconfig.h"
+#include "foundation/gmstates.h"
 
 extern "C"
 {
@@ -20,14 +20,14 @@ extern "C"
 class GMEffectRenderer
 {
 public:
-	GMEffectRenderer(GMGLFramebuffer& effectBuffer, GMEffects effects, GMGLShaderProgram* program)
+	GMEffectRenderer(GMGLFramebuffer& effectBuffer, GMGLShaderProgram* program)
 		: m_effectBuffer(effectBuffer)
 		, m_program(program)
 	{
 		if (!m_effectBuffer.hasBegun()) // 防止绘制嵌套
 		{
 			m_isHost = true;
-			m_effectBuffer.beginDrawEffects(effects);
+			m_effectBuffer.beginDrawEffects();
 		}
 	}
 
@@ -143,7 +143,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		refreshForwardRenderLights();
 
 		{
-			GMEffectRenderer effectRender(d->effectBuffer, d->effects, d->effectsShader);
+			GMEffectRenderer effectRender(d->effectBuffer, d->effectsShader);
 			forwardRender(objects, count);
 		}
 	}
@@ -152,17 +152,20 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		ASSERT(getRenderMode() == GMGLRenderMode::DeferredRendering);
 		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
 		groupGameObjects(objects, count);
+
+		d->gbuffer.adjustViewport();
 		geometryPass(d->deferredRenderingGameObjects);
 		newFrame();
 
 		{
-			GMEffectRenderer effectRender(d->effectBuffer, d->effects, d->effectsShader);
+			GMEffectRenderer effectRender(d->effectBuffer, d->effectsShader);
 
 			lightPass();
 			d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
 			setRenderMode(GMGLRenderMode::ForwardRendering);
 			drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 			setRenderMode(GMGLRenderMode::DeferredRendering);
+			d->gbuffer.restoreViewport();
 		}
 
 		viewFrameBuffer();
@@ -254,7 +257,7 @@ bool GMGLGraphicEngine::refreshGBuffer()
 		return true;
 
 	d->gbuffer.dispose();
-	return d->gbuffer.init(rect.width, rect.height);
+	return d->gbuffer.init(rect);
 }
 
 bool GMGLGraphicEngine::refreshFramebuffer()
@@ -265,7 +268,7 @@ bool GMGLGraphicEngine::refreshFramebuffer()
 		return true;
 
 	d->effectBuffer.dispose();
-	return d->effectBuffer.init(rect.width, rect.height);
+	return d->effectBuffer.init(rect);
 }
 
 void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
@@ -341,14 +344,14 @@ void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 void GMGLGraphicEngine::viewFrameBuffer()
 {
 	D(d);
-	GMint fbIdx = GMGetBuiltIn(FRAMEBUFFER_VIEWER_INDEX);
+	GMint fbIdx = GMGetDebugState(FRAMEBUFFER_VIEWER_INDEX);
 	if (fbIdx > 0)
 	{
 		glDisable(GL_DEPTH_TEST);
-		GMint x = GMGetBuiltIn(FRAMEBUFFER_VIEWER_X),
-			y = GMGetBuiltIn(FRAMEBUFFER_VIEWER_Y),
-			width = GMGetBuiltIn(FRAMEBUFFER_VIEWER_WIDTH),
-			height = GMGetBuiltIn(FRAMEBUFFER_VIEWER_HEIGHT);
+		GMint x = GMGetDebugState(FRAMEBUFFER_VIEWER_X),
+			y = GMGetDebugState(FRAMEBUFFER_VIEWER_Y),
+			width = GMGetDebugState(FRAMEBUFFER_VIEWER_WIDTH),
+			height = GMGetDebugState(FRAMEBUFFER_VIEWER_HEIGHT);
 		d->gbuffer.beginPass();
 		d->gbuffer.bindForReading();
 		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
@@ -584,12 +587,6 @@ void GMGLGraphicEngine::beginUseStencil(bool inverse)
 void GMGLGraphicEngine::endUseStencil()
 {
 	glDisable(GL_STENCIL_TEST);
-}
-
-void GMGLGraphicEngine::setEffects(GMEffects effects)
-{
-	D(d);
-	d->effects = effects;
 }
 
 void GMGLGraphicEngine::newFrameOnCurrentContext()

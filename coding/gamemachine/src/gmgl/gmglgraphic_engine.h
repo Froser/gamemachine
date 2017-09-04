@@ -72,9 +72,6 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMGameObject*> forwardRenderingGameObjects;
 
 	GMGLRenderMode stencilRenderModeCache = GMGLRenderMode::ForwardRendering;
-
-	// 效果
-	GMEffects effects = GMEffects::None;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -96,7 +93,6 @@ public:
 	virtual void endCreateStencil() override;
 	virtual void beginUseStencil(bool inverse) override;
 	virtual void endUseStencil() override;
-	virtual void setEffects(GMEffects effects);
 
 public:
 	GMGLShaderProgram* getShaders(GMMeshType objectType);
@@ -104,6 +100,7 @@ public:
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(GMMeshType objectType);
 	void setRenderMode(GMGLRenderMode mode);
+	void setViewport(const GMRect& rect);
 
 public:
 	inline GMGLRenderMode getRenderMode() { D(d); return d->renderMode; }
@@ -117,7 +114,6 @@ private:
 	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();
 	void disposeDeferredRenderQuad();
-	void setViewport(const GMRect& rect);
 	void registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram);
 	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
 	void registerEffectsShader(AUTORELEASE GMGLShaderProgram* effectsShader);

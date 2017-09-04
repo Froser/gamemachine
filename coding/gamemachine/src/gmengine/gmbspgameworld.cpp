@@ -341,9 +341,9 @@ void GMBSPGameWorld::drawAll()
 	GM_PROFILE(drawAll);
 	clearBuffer();
 	drawSky();
-	if (!GMGetBuiltIn(DRAW_ONLY_SKY))
+	if (!GMGetDebugState(DRAW_ONLY_SKY))
 	{
-		if (GMGetBuiltIn(CALCULATE_BSP_FACE))
+		if (GMGetDebugState(CALCULATE_BSP_FACE))
 			calculateVisibleFaces();
 		drawFaces();
 	}

@@ -177,7 +177,7 @@ STATIC_ASSERT_SIZE(GMLargeInteger, 8);
 // 常用函数和工具、常量
 struct GMRect
 {
-	GMfloat x, y, width, height;
+	GMint x, y, width, height;
 };
 
 template <typename T>

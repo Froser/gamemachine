@@ -4,6 +4,8 @@
 #include "foundation/gamemachine.h"
 #include "shader_constants.h"
 
+#define GMEngine static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine())
+
 constexpr GMint GEOMETRY_NUM = (GMint)GBufferGeometryType::EndOfGeometryType;
 constexpr GMint MATERIAL_NUM = (GMint)GBufferMaterialType::EndOfMaterialType;
 
@@ -30,6 +32,18 @@ Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
 GMGLGBuffer::~GMGLGBuffer()
 {
 	dispose();
+}
+
+void GMGLGBuffer::adjustViewport()
+{
+	D(d);
+	GMEngine->setViewport(d->viewport);
+}
+
+void GMGLGBuffer::restoreViewport()
+{
+	D(d);
+	GMEngine->setViewport(d->clientRect);
 }
 
 void GMGLGBuffer::beginPass()
@@ -79,11 +93,13 @@ void GMGLGBuffer::dispose()
 	}
 }
 
-bool GMGLGBuffer::init(GMuint windowWidth, GMuint windowHeight)
+bool GMGLGBuffer::init(const GMRect& clientRect)
 {
 	D(d);
-	d->windowWidth = windowWidth;
-	d->windowHeight = windowHeight;
+	d->clientRect = clientRect;
+	d->renderWidth = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.width : GMGetRenderState(RESOLUTION_X);
+	d->renderHeight = GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.height : GMGetRenderState(RESOLUTION_Y);
+	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
 
 	glGenFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
 	if (!createFrameBuffers(GMGLDeferredRenderState::PassingGeometry, GEOMETRY_NUM, d->textures))
@@ -167,7 +183,7 @@ void GMGLGBuffer::copyDepthBuffer(GLuint target)
 	D(d);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
-	glBlitFramebuffer(0, 0, d->windowWidth, d->windowHeight, 0, 0, d->windowWidth, d->windowHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	glBlitFramebuffer(0, 0, d->renderWidth, d->renderHeight, 0, 0, d->renderWidth, d->renderHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	GM_CHECK_GL_ERROR();
 
 	glBindFramebuffer(GL_FRAMEBUFFER, target);
@@ -183,7 +199,7 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 	for (GMint i = 0; i < textureCount; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, textureArray[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->windowWidth, d->windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureArray[i], 0);
@@ -197,7 +213,7 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 
 	glGenRenderbuffers(1, &d->depthBuffers[s]);
 	glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffers[s]);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->windowWidth, d->windowHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->renderWidth, d->renderHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffers[s]);
 	GM_CHECK_GL_ERROR();
 
@@ -229,6 +245,7 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 
 static const Pair<GMEffects, const char*> s_effects_uniformNames[] =
 {
+	{ GMEffects::None, GMSHADER_EFFECTS_NONE },
 	{ GMEffects::Inversion, GMSHADER_EFFECTS_INVERSION },
 	{ GMEffects::Sharpen, GMSHADER_EFFECTS_SHARPEN },
 	{ GMEffects::Blur, GMSHADER_EFFECTS_BLUR },
@@ -264,21 +281,22 @@ void GMGLFramebuffer::dispose()
 	}
 }
 
-bool GMGLFramebuffer::init(GMuint windowWidth, GMuint windowHeight)
+bool GMGLFramebuffer::init(const GMRect& clientRect)
 {
 	D(d);
 	createQuad();
 
-	d->windowWidth = windowWidth;
-	d->windowHeight = windowHeight;
-	d->textureOffset[0] = 1.f / windowWidth;
-	d->textureOffset[1] = 1.f / windowHeight;
+	GM_BEGIN_CHECK_GL_ERROR
+	d->clientRect = clientRect;
+	d->renderWidth = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.width : GMGetRenderState(RESOLUTION_X);
+	d->renderHeight = GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.height : GMGetRenderState(RESOLUTION_Y);
+	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
 
 	glGenFramebuffers(1, &d->fbo);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
 	glGenTextures(1, &d->texture);
 	glBindTexture(GL_TEXTURE_2D, d->texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->windowWidth, d->windowHeight, 0, GL_RGB, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -287,7 +305,6 @@ bool GMGLFramebuffer::init(GMuint windowWidth, GMuint windowHeight)
 
 	GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
 	glDrawBuffers(1, attachments);
-	GM_CHECK_GL_ERROR();
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -298,62 +315,79 @@ bool GMGLFramebuffer::init(GMuint windowWidth, GMuint windowHeight)
 
 	glGenRenderbuffers(1, &d->depthBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->windowWidth, d->windowHeight);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->renderWidth, d->renderHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
-	GM_CHECK_GL_ERROR();
 
 	releaseBind();
+	GM_END_CHECK_GL_ERROR
 	return true;
 }
 
-void GMGLFramebuffer::beginDrawEffects(GMEffects effects)
+void GMGLFramebuffer::beginDrawEffects()
 {
 	D(d);
-	d->effects = (GMuint)effects;
-	if (!d->effects)
-		return;
-
-	d->hasBegun = true;
-	newFrame();
-	bindForWriting();
+	d->effects = GMGetRenderState(EFFECTS);
+	if (needRenderFramebuffer())
+	{
+		GMEngine->setViewport(d->viewport);
+		d->hasBegun = true;
+		newFrame();
+		bindForWriting();
+	}
 }
 
 void GMGLFramebuffer::endDrawEffects()
 {
 	D(d);
-	if (!d->effects)
-		return;
-
-	d->hasBegun = false;
-	releaseBind();
+	if (needRenderFramebuffer())
+	{
+		d->hasBegun = false;
+		releaseBind();
+	}
 }
 
 void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 {
 	D(d);
-	GMuint e = (GMuint)d->effects;
-	if (!e)
-		return;
-
-	program->useProgram();
-	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->textureOffset[0]);
-	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->textureOffset[1]);
-
-	bindForWriting();
-	GMuint eff = 1;
-	while (eff != GMEffects::EndOfEffects)
+	if (needRenderFramebuffer())
 	{
-		if (d->effects & eff)
-		{
-			const char* name = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
-			renderQuad();
-			turnOffEffects(program, name);
-		}
-		eff <<= 1;
-	}
-	releaseBind();
+		program->useProgram();
+		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET ? 1.f / d->renderWidth : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X));
+		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET ? 1.f / d->renderHeight : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y));
 
-	renderQuad();
+		bindForWriting();
+
+		if (d->effects != GMEffects::None)
+		{
+			GMuint eff = GMEffects::None + 1;
+			while (eff != GMEffects::EndOfEffects)
+			{
+				if (d->effects & eff)
+				{
+					const char* name = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
+					renderQuad();
+				}
+				eff <<= 1;
+			}
+		}
+		else
+		{
+			const char* name = useShaderProgramAndApplyEffect(program, GMEffects::None);
+			renderQuad();
+		}
+
+		releaseBind();
+		GMEngine->setViewport(d->clientRect);
+		renderQuad();
+	}
+}
+
+bool GMGLFramebuffer::needRenderFramebuffer()
+{
+	D(d);
+	bool autoResolution = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION &&
+		GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION;
+	return !autoResolution || d->effects;
 }
 
 void GMGLFramebuffer::bindForWriting()
@@ -453,10 +487,4 @@ const char* GMGLFramebuffer::useShaderProgramAndApplyEffect(GMGLShaderProgram* p
 		}
 	}
 	return uniformName;
-}
-
-void GMGLFramebuffer::turnOffEffects(GMGLShaderProgram* program, const char* uniformName)
-{
-	if (uniformName)
-		program->setBool(uniformName, false);
 }

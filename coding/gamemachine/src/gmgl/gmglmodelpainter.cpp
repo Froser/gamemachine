@@ -167,7 +167,7 @@ void* GMGLModelPainter::getBuffer()
 
 void GMGLModelPainter::draw(IRender* render, Shader& shader, GMComponent* component, GMMesh* mesh, bool fill)
 {
-	GLenum mode = GMGetBuiltIn(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
+	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 	if (fill)
 		render->beginShader(shader, GMDrawMode::Fill);
 	else

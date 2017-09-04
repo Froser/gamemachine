@@ -29,7 +29,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMGlyphManager* glyphManager = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
 	IInput* inputManager = nullptr;
-	GMConfig* configManager = nullptr;
+	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
 	GMUIConsole* consoleWindow = nullptr; // 内置调试窗口
 
@@ -63,6 +63,9 @@ public:
 	};
 
 public:
+	GameMachine();
+
+public:
 	void init(
 		GMUIInstance instance,
 		AUTORELEASE IFactory* factory,
@@ -85,7 +88,7 @@ public:
 	inline const GameMachineWindows& getWindows() { D(d); return d->windows; }
 
 	// 配置管理
-	GMConfig* getConfigManager() { D(d); return d->configManager; }
+	GMStates* getStatesManager() { D(d); return d->statesManager; }
 
 	// 字体管理
 	GMGlyphManager* getGlyphManager() { D(d); return d->glyphManager; }

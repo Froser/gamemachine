@@ -2,12 +2,17 @@
 #include "gamemachine.h"
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmengine/gmgameobject.h"
-#include "gmconfig.h"
+#include "gmstates.h"
 #include "gmui/gmui.h"
 
 #if _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
 #endif
+
+GameMachine::GameMachine()
+{
+	defaultMainWindowAttributes();
+}
 
 void GameMachine::init(
 	GMUIInstance instance,
@@ -18,8 +23,6 @@ void GameMachine::init(
 	D(d);
 	d->instance = instance;
 	GMUIPainter::SetInstance(d->instance);
-
-	defaultMainWindowAttributes();
 
 	registerManager(factory, &d->factory);
 	registerManager(gameHandler, &d->gameHandler);
@@ -34,7 +37,7 @@ void GameMachine::init(
 
 	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
 	registerManager(new GMInput(), &d->inputManager);
-	registerManager(new GMConfig(), &d->configManager);
+	registerManager(new GMStates(), &d->statesManager);
 
 	initInner();
 	d->gameHandler->init();
@@ -120,7 +123,7 @@ void GameMachine::startGameMachine()
 	GMClock frameCounter;
 	while (true)
 	{
-		GMint bNeedControlFrameRate = GMGetBuiltIn(FRAMERATE_CONTROL);
+		GMint bNeedControlFrameRate = GMGetDebugState(FRAMERATE_CONTROL);
 		if (bNeedControlFrameRate)
 			frameCounter.begin();
 

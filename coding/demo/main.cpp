@@ -67,8 +67,10 @@ public:
 	{
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
-		engine->setRenderMode(GMGLRenderMode::DeferredRendering);
-		engine->setEffects(GMEffects::Grayscale);
+		//engine->setRenderMode(GMGLRenderMode::DeferredRendering);
+		//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
+		GMSetRenderState(RESOLUTION_X, 800);
+		GMSetRenderState(RESOLUTION_Y, 600);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -200,11 +202,11 @@ public:
 				joyState.joystickVibrate(0, 0);
 
 			if (kbState.keyTriggered('N'))
-				GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
+				GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % GMStates_DebugOptions::DRAW_NORMAL_END);
 			if (kbState.keyTriggered('M'))
-				GMSetBuiltIn(DRAW_LIGHTMAP_ONLY, !GMGetBuiltIn(DRAW_LIGHTMAP_ONLY));
+				GMSetDebugState(DRAW_LIGHTMAP_ONLY, !GMGetDebugState(DRAW_LIGHTMAP_ONLY));
 			if (kbState.keyTriggered('I'))
-				GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
+				GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
 
 			if (state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 			{
@@ -231,21 +233,21 @@ public:
 			m_sprite->action(moveTag, rate);
 
 			if (kbState.keyTriggered('P'))
-				GMSetBuiltIn(CALCULATE_BSP_FACE, !GMGetBuiltIn(CALCULATE_BSP_FACE));
+				GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));
 			if (kbState.keyTriggered('L'))
-				GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
+				GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
 			if (kbState.keyTriggered('O'))
-				GMSetBuiltIn(DRAW_ONLY_SKY, !GMGetBuiltIn(DRAW_ONLY_SKY));
+				GMSetDebugState(DRAW_ONLY_SKY, !GMGetDebugState(DRAW_ONLY_SKY));
 			if (kbState.keyTriggered('R'))
 				mouseState.setMouseEnable(m_bMouseEnable = !m_bMouseEnable);
 
 
 			if (kbState.keyTriggered('0'))
-				GMSetBuiltIn(FRAMEBUFFER_VIEWER_INDEX, 0);
+				GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
 			GM_FOREACH_ENUM_CLASS(i, GBufferGeometryType::Position, GBufferGeometryType::EndOfGeometryType)
 			{
 				if (kbState.keyTriggered('1' + (GMint)i))
-					GMSetBuiltIn(FRAMEBUFFER_VIEWER_INDEX, (GMint)i + 1);
+					GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, (GMint)i + 1);
 			}
 			break;
 		}
@@ -591,10 +593,10 @@ private:
 				IInput* inputManager = GameMachine::instance().getInputManager();
 				IKeyboardState& kbState = inputManager->getKeyboardState();
 				if (kbState.keyTriggered('N'))
-					GMSetBuiltIn(DRAW_NORMAL, (GMGetBuiltIn(DRAW_NORMAL) + 1) % GMConfig_BuiltInOptions::DRAW_NORMAL_END);
+					GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % GMStates_DebugOptions::DRAW_NORMAL_END);
 
 				if (kbState.keyTriggered('L'))
-					GMSetBuiltIn(POLYGON_LINE_MODE, !GMGetBuiltIn(POLYGON_LINE_MODE));
+					GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
 
 				if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
 					GameMachine::instance().postMessage({ GameMachineMessageType::Quit });
@@ -606,7 +608,7 @@ private:
 					GameMachine::instance().postMessage({ GameMachineMessageType::Console });
 
 				if (kbState.keyTriggered('I'))
-					GMSetBuiltIn(RUN_PROFILE, !GMGetBuiltIn(RUN_PROFILE));
+					GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
 			}
 			break;
 		case gm::GameMachineEvent::Deactivate:
@@ -656,14 +658,15 @@ int WINAPI WinMain(
 	GMUIWindowAttributes attrs =
 	{
 		NULL,
-		L"HELLO",
+		L"Default",
+		WS_OVERLAPPEDWINDOW,
 		0,
-		0,
-		{ 0, 0, 1024 / 2, 1024 / 2 },
+		{ 0, 0, 800, 600 },
 		NULL,
 	};
 
-	GameMachine::instance().init(
+	GM.setMainWindowAttributes(attrs);
+	GM.init(
 		hInstance,
 		new GMGLFactory(),
 		new GameHandler()

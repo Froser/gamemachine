@@ -95,7 +95,6 @@ set(SOURCES
 		gmgl/gmglglyphmanager.cpp
 		gmgl/gmglgraphic_engine.h
 		gmgl/gmglgraphic_engine.cpp
-		gmgl/gmglgraphic_engine_default_shaders.h
 		gmgl/gmglmodelpainter.h
 		gmgl/gmglmodelpainter.cpp
 		gmgl/gmglshaderprogram.h
@@ -145,8 +144,8 @@ set(SOURCES
 		foundation/gamemachine.h
 		foundation/gamemachine.cpp
 		foundation/interfaces.h
-		foundation/gmconfig.h
-		foundation/gmconfig.cpp
+		foundation/gmstates.h
+		foundation/gmstates.cpp
 		foundation/gmthreads.h
 		foundation/gmthreads.cpp
 		foundation/gmprofile.h

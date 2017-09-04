@@ -19,7 +19,7 @@ GMRect GMUIWindow::getWindowRect()
 {
 	RECT rect;
 	GetWindowRect(getWindowHandle(), &rect);
-	GMRect r = { (GMfloat)rect.left, (GMfloat)rect.top, (GMfloat)rect.right - rect.left, (GMfloat)rect.bottom - rect.top };
+	GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
 	return r;
 }
 
@@ -27,7 +27,7 @@ GMRect GMUIWindow::getClientRect()
 {
 	RECT rect;
 	GetClientRect(getWindowHandle(), &rect);
-	GMRect r = { (GMfloat)rect.left, (GMfloat)rect.top, (GMfloat)rect.right - rect.left, (GMfloat)rect.bottom - rect.top };
+	GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
 	return r;
 }
 
