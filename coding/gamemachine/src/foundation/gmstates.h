@@ -52,6 +52,7 @@ struct GMStates_RenderOptions
 {
 	enum
 	{
+		RENDER_MODE,
 		EFFECTS,
 		BLUR_SAMPLE_OFFSET_X,
 		BLUR_SAMPLE_OFFSET_Y,
@@ -59,6 +60,12 @@ struct GMStates_RenderOptions
 		RESOLUTION_Y,
 
 		OPTIONS_END
+	};
+
+	enum //RENDER_MODE
+	{
+		FORWARD,
+		DEFERRED,
 	};
 
 	enum
@@ -84,6 +91,7 @@ struct GMStates_RenderOptions
 	};
 };
 using GMEffects = GMStates_RenderOptions::GMEffects_ns::GMEffects;
+using GMRenderMode = GMint;
 
 union GMStateItemValueStruct
 {

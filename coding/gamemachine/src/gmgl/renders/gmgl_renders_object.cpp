@@ -249,13 +249,13 @@ GMGLShaderProgram* GMGLRenders_Object::getShaderProgram()
 {
 	D(d);
 	if (!d->gmglShaderProgram ||
-		d->renderMode != d->engine->getRenderMode() ||
+		d->renderMode != GMGetRenderState(RENDER_MODE) ||
 		d->renderState != d->engine->getRenderState())
 	{
 		d->gmglShaderProgram = d->engine->getShaders(d->type);
 	}
 	d->gmglShaderProgram->useProgram();
-	d->renderMode = d->engine->getRenderMode();
+	d->renderMode = GMGetRenderState(RENDER_MODE);
 	d->renderState = d->engine->getRenderState();
 	return d->gmglShaderProgram;
 }

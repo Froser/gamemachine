@@ -339,6 +339,8 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 void GMBSPGameWorld::drawAll()
 {
 	GM_PROFILE(drawAll);
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->newFrame();
 	clearBuffer();
 	drawSky();
 	if (!GMGetDebugState(DRAW_ONLY_SKY))
@@ -347,8 +349,13 @@ void GMBSPGameWorld::drawAll()
 			calculateVisibleFaces();
 		drawFaces();
 	}
+	flushBuffer();
+
+	engine->beginBlend();
+	clearBuffer();
 	drawAlwaysVisibleObjects();
 	flushBuffer();
+	engine->endBlend();
 }
 
 void GMBSPGameWorld::drawSky()

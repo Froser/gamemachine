@@ -40,12 +40,6 @@ void GMGLGBuffer::adjustViewport()
 	GMEngine->setViewport(d->viewport);
 }
 
-void GMGLGBuffer::restoreViewport()
-{
-	D(d);
-	GMEngine->setViewport(d->clientRect);
-}
-
 void GMGLGBuffer::beginPass()
 {
 	D(d);
@@ -382,6 +376,14 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	}
 }
 
+GLuint GMGLFramebuffer::framebuffer()
+{
+	D(d);
+	if (needRenderFramebuffer()) 
+		return d->fbo;
+	return 0;
+}
+
 bool GMGLFramebuffer::needRenderFramebuffer()
 {
 	D(d);
@@ -442,7 +444,16 @@ void GMGLFramebuffer::createQuad()
 void GMGLFramebuffer::renderQuad()
 {
 	D(d);
-	glDisable(GL_BLEND);
+	if (!GMEngine->isBlending())
+	{
+		glDisable(GL_BLEND);
+	}
+	else
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_ONE, GL_ONE);
+	}
+
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 

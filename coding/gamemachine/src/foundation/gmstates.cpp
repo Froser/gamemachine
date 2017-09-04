@@ -121,6 +121,7 @@ void GMStates::initInternal()
 	d->debugStates.setInt32(GMStates_DebugOptions::FRAMEBUFFER_VIEWER_HEIGHT, 250);
 	d->debugStates.setInt32(GMStates_DebugOptions::FRAMEBUFFER_VIEWER_INDEX, 0);
 
+	d->renderStates.setInt32(GMStates_RenderOptions::RENDER_MODE, GMStates_RenderOptions::FORWARD);
 	d->renderStates.setInt32(GMStates_RenderOptions::EFFECTS, GMEffects::None);
 	d->renderStates.setFloat32(GMStates_RenderOptions::BLUR_SAMPLE_OFFSET_X, GMStates_RenderOptions::AUTO_SAMPLE_OFFSET);
 	d->renderStates.setFloat32(GMStates_RenderOptions::BLUR_SAMPLE_OFFSET_Y, GMStates_RenderOptions::AUTO_SAMPLE_OFFSET);

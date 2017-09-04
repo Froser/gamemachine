@@ -81,6 +81,8 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void endCreateStencil() = 0;
 	virtual void beginUseStencil(bool inverse) = 0;
 	virtual void endUseStencil() = 0;
+	virtual void beginBlend() = 0;
+	virtual void endBlend() = 0;
 };
 
 enum class GMDrawMode

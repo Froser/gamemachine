@@ -62,7 +62,6 @@ public:
 
 public:
 	void adjustViewport();
-	void restoreViewport();
 	void beginPass();
 	bool nextPass();
 	void dispose();
@@ -114,9 +113,9 @@ public:
 	void beginDrawEffects();
 	void endDrawEffects();
 	void draw(GMGLShaderProgram* program);
+	GLuint framebuffer();
 
 public:
-	inline GLuint framebuffer() { D(d); if (d->effects) return d->fbo; return 0; }
 	inline bool hasBegun() { D(d); return d->hasBegun; }
 
 private:

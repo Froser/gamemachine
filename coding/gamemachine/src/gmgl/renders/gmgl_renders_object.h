@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	GMGLShaderProgram* gmglShaderProgram = nullptr;
 	GMMeshType type;
 	GMDrawMode mode;
-	GMGLRenderMode renderMode = GMGLRenderMode::ForwardRendering;
+	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
 

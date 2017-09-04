@@ -12,6 +12,7 @@ void GMDemoGameWorld::renderGameWorld()
 	Base::renderGameWorld();
 
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+	engine->newFrame();
 	engine->drawObjects(d->gameObjects.data(), d->gameObjects.size());
 }
 

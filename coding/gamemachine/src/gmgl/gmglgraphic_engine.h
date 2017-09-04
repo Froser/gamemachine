@@ -23,12 +23,6 @@ extern "C"
 #define GM_BEGIN_CHECK_GL_ERROR { GM_CHECK_GL_ERROR()
 #define GM_END_CHECK_GL_ERROR GM_CHECK_GL_ERROR() }
 
-enum class GMGLRenderMode
-{
-	ForwardRendering,
-	DeferredRendering,
-};
-
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual void onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
@@ -40,7 +34,6 @@ GM_INTERFACE(IShaderLoadCallback)
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	bool needRefreshLights = true;
-	GMGLRenderMode renderMode = GMGLRenderMode::ForwardRendering;
 	Vector<GMLight> lights;
 
 	// 渲染器
@@ -71,7 +64,12 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMGameObject*> deferredRenderingGameObjects;
 	Vector<GMGameObject*> forwardRenderingGameObjects;
 
-	GMGLRenderMode stencilRenderModeCache = GMGLRenderMode::ForwardRendering;
+	GMint stencilRenderModeCache = GMStates_RenderOptions::FORWARD;
+	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
+
+	// 混合绘制
+	GMRenderMode renderModeForBlend = GMStates_RenderOptions::FORWARD;
+	bool isBlending = false;
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -93,20 +91,21 @@ public:
 	virtual void endCreateStencil() override;
 	virtual void beginUseStencil(bool inverse) override;
 	virtual void endUseStencil() override;
+	virtual void beginBlend() override;
+	virtual void endBlend() override;
 
 public:
 	GMGLShaderProgram* getShaders(GMMeshType objectType);
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(GMMeshType objectType);
-	void setRenderMode(GMGLRenderMode mode);
 	void setViewport(const GMRect& rect);
 
 public:
-	inline GMGLRenderMode getRenderMode() { D(d); return d->renderMode; }
 	inline GMGLShaderProgram* getLightPassShader() { D(d); return d->deferredLightPassShader; }
 	inline void setRenderState(GMGLDeferredRenderState state) { D(d); d->renderState = state; }
 	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
+	inline bool isBlending() { D(d); return d->isBlending; }
 
 private:
 	void refreshForwardRenderLights();
