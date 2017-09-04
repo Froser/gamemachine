@@ -6,8 +6,10 @@
 BEGIN_NS
 
 #define GMCfg (GameMachine::instance().getConfigManager())
-#define GMGetBuiltIn(i) (GMCfg->getInt32(GMConfig_BuiltInOptions::i, GMConfig_BuiltInOptions::BUILTIN_OPTIONS_INVALID))
+#define GMGetBuiltIn(i) (GMCfg->getInt32(GMConfig_BuiltInOptions::i))
 #define GMSetBuiltIn(i, value) (GMCfg->setInt32(GMConfig_BuiltInOptions::i, value))
+
+constexpr GMint MAX_SUPPORTED_KEY_NUM = 64;
 
 // 关于内部（如调试）的一些配置
 struct GMConfig_BuiltInOptions
@@ -114,7 +116,7 @@ inline bool operator < (const GMConfigValue& lhs, const GMConfigValue& rhs)
 
 GM_PRIVATE_OBJECT(GMConfig)
 {
-	std::map<GMConfigValue, GMConfigValue> values;
+	Array<GMConfigValue, MAX_SUPPORTED_KEY_NUM> values;
 };
 
 class GMConfig : public GMObject
@@ -130,18 +132,17 @@ private:
 	GMConfig();
 
 public:
-	void setInt32(const GMConfigValue& key, GMint i);
-	GMint getInt32(const GMConfigValue& key, GMint defaultValue, bool* hasValue = nullptr, bool* correctType = nullptr);
-	void setInt64(const GMConfigValue& key, GMLargeInteger i);
-	GMLargeInteger getInt64(const GMConfigValue& key, GMLargeInteger defaultValue, bool* hasValue = nullptr, bool* correctType = nullptr);
-	void setFloat32(const GMConfigValue& key, GMfloat i);
-	GMfloat getFloat32(const GMConfigValue& key, GMfloat defaultValue, bool* hasValue = nullptr, bool* correctType = nullptr);
-	void setString(const GMConfigValue& key, const char* str);
-	const char* getString(const GMConfigValue& key, const char* defaultValue, bool* hasValue = nullptr, bool* correctType = nullptr);
+	void setInt32(GMint key, GMint i);
+	GMint getInt32(GMint key, bool* correctType = nullptr);
+	void setInt64(GMint key, GMLargeInteger i);
+	GMLargeInteger getInt64(GMint key, bool* correctType = nullptr);
+	void setFloat32(GMint key, GMfloat i);
+	GMfloat getFloat32(GMint key, bool* correctType = nullptr);
+	void setString(GMint key, const char* str);
+	const char* getString(GMint key, bool* correctType = nullptr);
 
 private:
-	GMConfigValue* find(const GMConfigValue& key);
-	void releaseString(const GMConfigValue* value);
+	void releaseString(const GMConfigValue& value);
 	void initInternal();
 };
 
