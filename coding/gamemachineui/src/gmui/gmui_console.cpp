@@ -4,7 +4,7 @@
 #if _WINDOWS
 #	include "gmui_console_ui.h"
 #endif
-#include <sstream>
+#include <gmmessages.h>
 
 enum
 {
@@ -232,7 +232,7 @@ bool GMUIConsole::event(const gm::GameMachineMessage& msg)
 	centerWindow();
 	showWindowEx(true, true);
 
-	if (msg.type == GMUIConsoleParam1::SELECT_FILTER)
+	if (msg.type == GMM_CONSOLE_SELECT_FILTER)
 	{
 		d->filter.clearAll();
 		d->filter.set(msg.value);

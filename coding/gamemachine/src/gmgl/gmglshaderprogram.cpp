@@ -4,6 +4,7 @@
 #include "gmglgraphic_engine.h"
 #include <regex>
 #include "foundation/gamemachine.h"
+#include <gmmessages.h>
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
@@ -142,7 +143,7 @@ void GMGLShaderProgram::load()
 
 			gm_error("Shader source: \n%s", report.c_str());
 			gm_error("Shader compilation failed: %s", log);
-			GM.postMessage({ GameMachineMessageType::Console });
+			GM.postMessage({ GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR });
 			delete[] log;
 			return;
 		}

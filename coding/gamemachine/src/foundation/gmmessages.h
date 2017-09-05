@@ -1,0 +1,10 @@
+﻿#ifndef __GMMESSAGES_H__
+#define __GMMESSAGES_H__
+
+#define GMM_CONSOLE_SELECT_FILTER	0
+#define GMM_CONSOLE_INFO			0x0000
+#define GMM_CONSOLE_WARNING			0x0001
+#define GMM_CONSOLE_ERROR			0x0002
+#define GMM_CONSOLE_DEBUG			0x0003
+
+#endif

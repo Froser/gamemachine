@@ -6,29 +6,6 @@
 #include "gmuicontrols.h"
 BEGIN_UI_NS
 
-//gm::GameMachineMessage params:
-namespace GMUIConsoleParam1_ns
-{
-	enum GMUIConsoleParam
-	{
-		SELECT_FILTER = 0x0001
-	};
-}
-
-namespace GMUIConsoleParam2_ns
-{
-	enum GMUIConsoleParam
-	{
-		PARAM_INFO = 0x0000,
-		PARAM_WARNING = 0x0001,
-		PARAM_ERROR = 0x0002,
-		PARAM_DEBUG = 0x0003,
-	};
-}
-
-using GMUIConsoleParam1 = GMUIConsoleParam1_ns::GMUIConsoleParam;
-using GMUIConsoleParam2 = GMUIConsoleParam2_ns::GMUIConsoleParam;
-
 #if _WINDOWS
 GM_PRIVATE_OBJECT(GMUIConsole)
 {

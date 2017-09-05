@@ -131,6 +131,7 @@ set(SOURCES
 		foundation/utilities/gmprimitivecreator.h
 		foundation/utilities/gmprimitivecreator.cpp
 		foundation/defines.h
+		foundation/gmmessages.h
 		foundation/debug.h
 		foundation/debug.cpp
 		foundation/assert.h
