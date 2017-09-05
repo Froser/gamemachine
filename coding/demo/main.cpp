@@ -68,7 +68,7 @@ public:
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*> (GameMachine::instance().getGraphicEngine());
 		engine->setShaderLoadCallback(this);
 		GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::DEFERRED);
-		//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
+		GMSetRenderState(EFFECTS, GMEffects::Grayscale);
 		GMSetRenderState(RESOLUTION_X, 800);
 		GMSetRenderState(RESOLUTION_Y, 600);
 

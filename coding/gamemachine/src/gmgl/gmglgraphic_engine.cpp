@@ -602,6 +602,18 @@ void GMGLGraphicEngine::endBlend()
 	d->isBlending = false;
 }
 
+void GMGLGraphicEngine::beginFullRendering()
+{
+	D(d);
+	d->effectBuffer.setUseFullscreenFramebuffer(true);
+}
+
+void GMGLGraphicEngine::endFullRendering()
+{
+	D(d);
+	d->effectBuffer.setUseFullscreenFramebuffer(false);
+}
+
 void GMGLGraphicEngine::newFrameOnCurrentContext()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);

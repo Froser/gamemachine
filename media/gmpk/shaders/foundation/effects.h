@@ -50,22 +50,22 @@ vec3 inv(sampler2D t, vec2 uv)
 
 vec3 sharpen(sampler2D t, vec2 uv)
 {
-    float kernel[9] = float[](
+    float kernels[9] = float[](
         -1, -1, -1,
         -1,  9, -1,
         -1, -1, -1
     );
-    return kernel(kernel, t, uv);
+    return kernel(kernels, t, uv);
 }
 
 vec3 blur(sampler2D t, vec2 uv)
 {
-    float kernel[9] = float[](
+    float kernels[9] = float[](
         1.0 / 16, 2.0 / 16, 1.0 / 16,
         2.0 / 16, 4.0 / 16, 2.0 / 16,
         1.0 / 16, 2.0 / 16, 1.0 / 16  
     );
-    return kernel(kernel, t, uv);
+    return kernel(kernels, t, uv);
 }
 
 vec3 gray(sampler2D t, vec2 uv)
@@ -77,12 +77,12 @@ vec3 gray(sampler2D t, vec2 uv)
 
 vec3 edgeDetect(sampler2D t, vec2 uv)
 {
-        float kernel[9] = float[](
+        float kernels[9] = float[](
         1, 1, 1,
         1, -8, 1,
         1, 1, 1
     );
-    return kernel(kernel, t, uv);
+    return kernel(kernels, t, uv);
 }
 
 vec3 effects(sampler2D t, vec2 uv)

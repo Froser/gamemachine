@@ -352,9 +352,11 @@ void GMBSPGameWorld::drawAll()
 	flushBuffer();
 
 	engine->beginBlend();
+	engine->beginFullRendering();
 	clearBuffer();
 	drawAlwaysVisibleObjects();
 	flushBuffer();
+	engine->endFullRendering();
 	engine->endBlend();
 }
 

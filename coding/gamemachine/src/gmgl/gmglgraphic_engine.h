@@ -93,6 +93,8 @@ public:
 	virtual void endUseStencil() override;
 	virtual void beginBlend() override;
 	virtual void endBlend() override;
+	virtual void beginFullRendering() override;
+	virtual void endFullRendering() override;
 
 public:
 	GMGLShaderProgram* getShaders(GMMeshType objectType);

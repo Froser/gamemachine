@@ -273,6 +273,25 @@ void GMGLFramebuffer::dispose()
 		glDeleteRenderbuffers(1, &d->depthBuffer);
 		d->depthBuffer = 0;
 	}
+
+	if (d->fullscreenFbo)
+	{
+		glDeleteFramebuffers(1, &d->fullscreenFbo);
+		d->fullscreenFbo = 0;
+	}
+
+	if (d->fullscreenTexture)
+	{
+		glDeleteTextures(1, &d->fullscreenTexture);
+		d->fullscreenTexture = 0;
+	}
+
+	if (d->fullscreenDepthBuffer)
+	{
+		glDeleteRenderbuffers(1, &d->fullscreenDepthBuffer);
+		d->fullscreenDepthBuffer = 0;
+	}
+
 }
 
 bool GMGLFramebuffer::init(const GMRect& clientRect)
@@ -285,34 +304,70 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 	d->renderWidth = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.width : GMGetRenderState(RESOLUTION_X);
 	d->renderHeight = GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.height : GMGetRenderState(RESOLUTION_Y);
 	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
+	d->sampleOffsets[0] = (GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET) ? 1.f / d->renderWidth : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X);
+	d->sampleOffsets[1] = (GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET) ? 1.f / d->renderHeight : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y);
 
-	glGenFramebuffers(1, &d->fbo);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
-	glGenTextures(1, &d->texture);
-	glBindTexture(GL_TEXTURE_2D, d->texture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, d->texture, 0);
-
-	GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, attachments);
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
+	// 指定分辨率的framebuffer
 	{
-		gm_error("FB incomplete error, status: 0x%x\n", status);
-		return false;
+		glGenFramebuffers(1, &d->fbo);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
+		glGenTextures(1, &d->texture);
+		glBindTexture(GL_TEXTURE_2D, d->texture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, d->texture, 0);
+	
+		GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, attachments);
+	
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			gm_error("FB incomplete error, status: 0x%x\n", status);
+			return false;
+		}
+	
+		glGenRenderbuffers(1, &d->depthBuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->renderWidth, d->renderHeight);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
+		releaseBind();
 	}
 
-	glGenRenderbuffers(1, &d->depthBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->renderWidth, d->renderHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
+	{
+		// 全屏framebuffer
+		glGenFramebuffers(1, &d->fullscreenFbo);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fullscreenFbo);
+		glGenTextures(1, &d->fullscreenTexture);
+		glBindTexture(GL_TEXTURE_2D, d->fullscreenTexture);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->clientRect.width, d->clientRect.height, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, d->fullscreenTexture, 0);
 
-	releaseBind();
+		GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, attachments);
+
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			gm_error("FB incomplete error, status: 0x%x\n", status);
+			return false;
+		}
+
+		glGenRenderbuffers(1, &d->fullscreenDepthBuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, d->fullscreenDepthBuffer);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->clientRect.width, d->clientRect.height);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
+		releaseBind();
+	}
+
 	GM_END_CHECK_GL_ERROR
 	return true;
 }
@@ -323,7 +378,10 @@ void GMGLFramebuffer::beginDrawEffects()
 	d->effects = GMGetRenderState(EFFECTS);
 	if (needRenderFramebuffer())
 	{
-		GMEngine->setViewport(d->viewport);
+		if (d->useFullscreenFramebuffer)
+			GMEngine->setViewport(d->clientRect);
+		else
+			GMEngine->setViewport(d->viewport);
 		d->hasBegun = true;
 		newFrame();
 		bindForWriting();
@@ -345,12 +403,12 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	D(d);
 	if (needRenderFramebuffer())
 	{
+		const char* effectUniformName = nullptr;
 		program->useProgram();
-		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET ? 1.f / d->renderWidth : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X));
-		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET ? 1.f / d->renderHeight : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y));
+		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->sampleOffsets[0]);
+		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);
 
 		bindForWriting();
-
 		if (d->effects != GMEffects::None)
 		{
 			GMuint eff = GMEffects::None + 1;
@@ -358,7 +416,7 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 			{
 				if (d->effects & eff)
 				{
-					const char* name = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
+					effectUniformName = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
 					renderQuad();
 				}
 				eff <<= 1;
@@ -370,6 +428,10 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 			renderQuad();
 		}
 
+		//Reset effects
+		ASSERT(effectUniformName);
+		program->setBool(effectUniformName, false);
+
 		releaseBind();
 		GMEngine->setViewport(d->clientRect);
 		renderQuad();
@@ -380,8 +442,16 @@ GLuint GMGLFramebuffer::framebuffer()
 {
 	D(d);
 	if (needRenderFramebuffer()) 
-		return d->fbo;
+		return fbo();
 	return 0;
+}
+
+GLuint GMGLFramebuffer::fbo()
+{
+	D(d);
+	if (d->useFullscreenFramebuffer)
+		return d->fullscreenFbo;
+	return d->fbo;
 }
 
 bool GMGLFramebuffer::needRenderFramebuffer()
@@ -395,13 +465,13 @@ bool GMGLFramebuffer::needRenderFramebuffer()
 void GMGLFramebuffer::bindForWriting()
 {
 	D(d);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo());
 }
 
 void GMGLFramebuffer::bindForReading()
 {
 	D(d);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo());
 }
 
 void GMGLFramebuffer::releaseBind()
@@ -482,7 +552,10 @@ const char* GMGLFramebuffer::useShaderProgramAndApplyEffect(GMGLShaderProgram* p
 	program->setInt("gFramebuffer", 0);
 	GM_CHECK_GL_ERROR();
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, d->texture);
+	if (d->useFullscreenFramebuffer)
+		glBindTexture(GL_TEXTURE_2D, d->fullscreenTexture);
+	else
+		glBindTexture(GL_TEXTURE_2D, d->texture);
 	GM_CHECK_GL_ERROR();
 
 	for (auto iter = std::begin(s_effects_uniformNames); iter != std::end(s_effects_uniformNames); ++iter)
