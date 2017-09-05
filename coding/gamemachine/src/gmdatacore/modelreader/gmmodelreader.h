@@ -1,7 +1,7 @@
 ﻿#ifndef __MODELREADER_H__
 #define __MODELREADER_H__
-#include "common.h"
-#include "foundation/linearmath.h"
+#include <gmcommon.h>
+#include <linearmath.h>
 BEGIN_NS
 
 class GMModel;

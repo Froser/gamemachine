@@ -1,6 +1,6 @@
 ﻿#ifndef __GMGL_TEXTURE_H__
 #define __GMGL_TEXTURE_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmdatacore/image.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/gmmodel.h"

@@ -1,6 +1,6 @@
 ﻿#ifndef __GMGL_RENDERS_GLYPH_H__
 #define __GMGL_RENDERS_GLYPH_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmgl_renders_object.h"
 BEGIN_NS
 

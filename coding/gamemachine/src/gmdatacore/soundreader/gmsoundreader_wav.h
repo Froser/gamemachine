@@ -1,6 +1,6 @@
 ﻿#ifndef __SOUNDREADER_WAV_H__
 #define __SOUNDREADER_WAV_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmsoundreader.h"
 BEGIN_NS
 

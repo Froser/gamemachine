@@ -1,6 +1,6 @@
 ﻿#ifndef __GLYPHMANAGER_H__
 #define __GLYPHMANAGER_H__
-#include "common.h"
+#include <gmcommon.h>
 #include <map>
 BEGIN_NS
 

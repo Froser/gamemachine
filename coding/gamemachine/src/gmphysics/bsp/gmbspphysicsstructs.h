@@ -1,8 +1,8 @@
 ﻿#ifndef __BSPPHYSICSSTRUCTS_H__
 #define __BSPPHYSICSSTRUCTS_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmdatacore/bsp/gmbsp.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 #include "foundation/vector.h"
 BEGIN_NS
 

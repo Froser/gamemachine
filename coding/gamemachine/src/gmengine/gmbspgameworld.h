@@ -1,6 +1,6 @@
 ﻿#ifndef __BSPGAMEWORLD_H__
 #define __BSPGAMEWORLD_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmgameworld.h"
 #include "gmbspgameworldprivate.h"
 #include "gmengine/gmresourcecontainer.h"

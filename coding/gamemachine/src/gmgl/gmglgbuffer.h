@@ -1,6 +1,6 @@
 ﻿#ifndef __GMGLGBUFFER_H__
 #define __GMGLGBUFFER_H__
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 // GBuffer 类型，对应pass着色器layout的顺序

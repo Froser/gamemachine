@@ -1,9 +1,9 @@
 ﻿#ifndef __GMPARTICLEGAMEOBJECT_H__
 #define __GMPARTICLEGAMEOBJECT_H__
-#include "common.h"
-#include "foundation/linearmath.h"
+#include <gmcommon.h>
+#include <linearmath.h>
+#include <gmlua.h>
 #include "gmgameobject.h"
-#include "gmlua/gmlua.h"
 BEGIN_NS
 
 class GMParticles;

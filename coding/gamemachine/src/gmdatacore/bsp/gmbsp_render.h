@@ -1,7 +1,7 @@
 ﻿#ifndef __BSP_RENDER_H__
 #define __BSP_RENDER_H__
-#include "common.h"
-#include "foundation/linearmath.h"
+#include <gmcommon.h>
+#include <linearmath.h>
 #include "foundation/utilities/utilities.h"
 #include "foundation/vector.h"
 #include <map>

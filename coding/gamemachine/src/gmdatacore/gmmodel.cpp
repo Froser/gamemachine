@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmmodel.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 #include <algorithm>
 #include <iterator>
 

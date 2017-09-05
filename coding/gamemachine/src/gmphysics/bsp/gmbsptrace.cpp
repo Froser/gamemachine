@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbsptrace.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 #include "gmbspphysicsworld.h"
 #include "gmengine/gmgameobject.h"
 

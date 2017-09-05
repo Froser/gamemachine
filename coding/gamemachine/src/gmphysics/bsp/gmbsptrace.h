@@ -1,6 +1,6 @@
 ﻿#ifndef __BSPTRACE_H__
 #define __BSPTRACE_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmdatacore/bsp/gmbsp.h"
 #include "gmbspphysicsstructs.h"
 BEGIN_NS

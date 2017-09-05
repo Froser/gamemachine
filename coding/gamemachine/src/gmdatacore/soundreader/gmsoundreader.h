@@ -1,6 +1,6 @@
 ﻿#ifndef __SOUNDREADER_H__
 #define __SOUNDREADER_H__
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 #ifndef _WINDOWS

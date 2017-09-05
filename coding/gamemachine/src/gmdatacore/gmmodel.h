@@ -1,10 +1,10 @@
 ﻿#ifndef __GMMODEL_H__
 #define __GMMODEL_H__
-#include "common.h"
-#include "foundation/vector.h"
+#include <gmcommon.h>
+#include "../foundation/vector.h"
+#include <utilities.h>
+#include <linearmath.h>
 #include "image.h"
-#include "foundation/utilities/utilities.h"
-#include "foundation/linearmath.h"
 #include "shader.h"
 
 #define BEGIN_FOREACH_MESH(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;

@@ -1,6 +1,6 @@
 ﻿#ifndef __IMAGEREADER_BMP_H__
 #define __IMAGEREADER_BMP_H__
-#include "common.h"
+#include <gmcommon.h>
 #include <string>
 #include "gmimagereader.h"
 BEGIN_NS

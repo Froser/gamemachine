@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 
 static inline const char* getValue(const GMBSPEntity* entity, const char* key)
 {

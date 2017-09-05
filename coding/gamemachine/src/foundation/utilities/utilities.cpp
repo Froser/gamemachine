@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "utilities.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 #include "assert.h"
 #if _WINDOWS
 #	include <io.h>

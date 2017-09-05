@@ -1,6 +1,6 @@
 ﻿#ifndef __BSP_SURFACE_FLAGS_H__
 #define __BSP_SURFACE_FLAGS_H__
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 #define	CONTENTS_SOLID			1		// an eye is never valid in a solid

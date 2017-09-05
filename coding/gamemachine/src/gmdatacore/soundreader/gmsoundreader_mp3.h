@@ -1,6 +1,6 @@
 ﻿#ifndef __SOUNDREADER_MP3_H__
 #define __SOUNDREADER_MP3_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmsoundreader.h"
 #include "foundation/vector.h"
 BEGIN_NS

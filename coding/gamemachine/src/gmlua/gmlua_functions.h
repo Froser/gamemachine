@@ -1,6 +1,6 @@
 ﻿#ifndef __GMLUA_FUNCTIONS_H__
 #define __GMLUA_FUNCTIONS_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmlua.h"
 BEGIN_NS
 

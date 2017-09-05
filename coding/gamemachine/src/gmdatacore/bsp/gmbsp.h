@@ -1,10 +1,10 @@
 ﻿#ifndef __BSP_H__
 #define __BSP_H__
-#include "common.h"
+#include <gmcommon.h>
 #include <string>
 #include "foundation/utilities/utilities.h"
 #include "foundation/vector.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 #include "gmbsp_surface_flags.h"
 BEGIN_NS
 

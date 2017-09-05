@@ -1,6 +1,6 @@
 ﻿#ifndef __BSPPHYSICSWORLD_H__
 #define __BSPPHYSICSWORLD_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmphysics/gmphysicsworld.h"
 #include "gmbsptrace.h"
 #include "gmbsppatch.h"

@@ -1,9 +1,9 @@
 ﻿#ifndef __GMGLGRAPHIC_ENGINE_H__
 #define __GMGLGRAPHIC_ENGINE_H__
-#include "common.h"
+#include <gmcommon.h>
+#include <gmresourcecontainer.h>
 #include "gmglshaderprogram.h"
-#include "gmengine/gmresourcecontainer.h"
-#include "foundation/utilities/utilities.h"
+#include <gamemachine.h>
 #include <map>
 #include "gmglgbuffer.h"
 #include "renders/gmgl_renders_lightpass.h"

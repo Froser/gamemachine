@@ -1,6 +1,6 @@
 ﻿#ifndef __PHYSICSWORLD_H__
 #define __PHYSICSWORLD_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmphysicsstructs.h"
 BEGIN_NS
 

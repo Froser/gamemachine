@@ -1,6 +1,6 @@
 ﻿#ifndef __GMDEMOGAMEWORLD_H__
 #define __GMDEMOGAMEWORLD_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmgameworld.h"
 #include "foundation/vector.h"
 #include "gmgameobject.h"

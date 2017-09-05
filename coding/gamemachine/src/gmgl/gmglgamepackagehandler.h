@@ -1,6 +1,6 @@
 ﻿#ifndef __GMGLGAMEPACKAGEHANDLER_H__
 #define __GMGLGAMEPACKAGEHANDLER_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "contrib/minizip/unzip.h"
 #include <map>

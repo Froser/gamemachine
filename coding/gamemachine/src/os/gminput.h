@@ -1,6 +1,6 @@
 ﻿#ifndef __INPUT_H__
 #define __INPUT_H__
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 #if _WINDOWS

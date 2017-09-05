@@ -1,6 +1,6 @@
 ﻿#ifndef __IMAGEREADER_DDS_H__
 #define __IMAGEREADER_DDS_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmimagereader.h"
 
 BEGIN_NS

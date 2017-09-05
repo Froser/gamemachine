@@ -1,6 +1,6 @@
 ﻿#ifndef __VECTOR_H__
 #define __VECTOR_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "assert.h"
 #include "memory.h"
 #include "debug.h"

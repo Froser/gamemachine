@@ -1,6 +1,6 @@
 #ifndef __IMAGEREADER_TGA_H__
 #define __IMAGEREADER_TGA_H__
-#include "common.h"
+#include <gmcommon.h>
 #include <sstream>
 #include "gmimagereader.h"
 BEGIN_NS

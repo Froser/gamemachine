@@ -1,7 +1,7 @@
 ﻿#ifndef __GMPRIMITIVECREATOR_H__
 #define __GMPRIMITIVECREATOR_H__
-#include "common.h"
-#include "gmdatacore/gmmodel.h"
+#include <gmcommon.h>
+#include <gmmodel.h>
 BEGIN_NS
 
 class GMModel;

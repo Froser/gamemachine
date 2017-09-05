@@ -1,7 +1,7 @@
 ﻿#ifndef __GMLUA_H__
 #define __GMLUA_H__
-#include "common.h"
-#include "foundation/linearmath.h"
+#include <gmcommon.h>
+#include <linearmath.h>
 
 BEGIN_NS
 

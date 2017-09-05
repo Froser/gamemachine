@@ -1,6 +1,6 @@
 ﻿#ifndef __GMTHREADS_H__
 #define __GMTHREADS_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "utilities/utilities.h"
 #include <mutex>
 #include <thread>

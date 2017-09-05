@@ -1,6 +1,6 @@
 ﻿#ifndef __IMAGE_BUFFER_H__
 #define __IMAGE_BUFFER_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "image.h"
 BEGIN_NS
 

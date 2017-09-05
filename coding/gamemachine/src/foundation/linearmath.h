@@ -1,6 +1,6 @@
 ﻿#ifndef __LINEARMATH_H__
 #define __LINEARMATH_H__
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 #if USE_SIMD

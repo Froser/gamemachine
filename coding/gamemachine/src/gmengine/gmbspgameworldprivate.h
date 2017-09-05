@@ -1,6 +1,6 @@
 ﻿#ifndef __BSPGAMEWORLDPRIVATE_H__
 #define __BSPGAMEWORLDPRIVATE_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmdatacore/shader.h"
 #include <string>
 #include <map>

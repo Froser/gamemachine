@@ -1,6 +1,6 @@
 ﻿#ifndef __GMPROFILE_H__
 #define __GMPROFILE_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmthreads.h"
 #include <stack>
 BEGIN_NS

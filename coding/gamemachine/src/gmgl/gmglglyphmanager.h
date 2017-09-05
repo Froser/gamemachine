@@ -1,6 +1,6 @@
 ﻿#ifndef __GMGLGLYPHMANAGER_H__
 #define __GMGLGLYPHMANAGER_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmdatacore/glyph/gmglyphmanager.h"
 BEGIN_NS
 

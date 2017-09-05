@@ -1,6 +1,6 @@
 ﻿#ifndef __IMAGE_H__
 #define __IMAGE_H__
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 #define MAX_MIP_CNT 14

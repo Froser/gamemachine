@@ -1,8 +1,8 @@
 ﻿#ifndef __MODELREADER_OBJ_H__
 #define __MODELREADER_OBJ_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "gmmodelreader.h"
-#include "foundation/linearmath.h"
+#include <linearmath.h>
 #include <map>
 #include "foundation/vector.h"
 

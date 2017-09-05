@@ -1,6 +1,6 @@
 ﻿#ifndef __BSPMODEL_LOADER_H__
 #define __BSPMODEL_LOADER_H__
-#include "common.h"
+#include <gmcommon.h>
 #include "model.h"
 #include <string>
 #include "foundation/vector.h"

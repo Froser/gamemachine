@@ -1,26 +1,15 @@
 #define GLEW_STATIC
 #include <iostream>
 #include <windows.h>
-#include "foundation/gamemachine.h"
-#include "gmengine/gmgameworld.h"
-#include "gmgl/gmglfactory.h"
-#include "gmgl/gmglgraphic_engine.h"
-#include "gmgl/shader_constants.h"
-#include "foundation/utilities/utilities.h"
-#include "gmengine/gmbspgameworld.h"
-#include "foundation/debug.h"
-#include "os/gminput.h"
-#include "gmdatacore/gamepackage/gmgamepackage.h"
 
 #include <fstream>
-#include "gmdatacore/soundreader/gmsoundreader.h"
-#include "gmengine/gmdemogameworld.h"
-#include "gmengine/gmspritegameobject.h"
-#include "gmdatacore/imagereader/gmimagereader.h"
-#include "gmengine/gmparticles.h"
-#include "foundation/utilities/gmprimitivecreator.h"
-#include "gmlua/gmlua.h"
-#include "foundation/interfaces.h"
+#include <gamemachine.h>
+#include <gmprimitivecreator.h>
+#include <gmparticles.h>
+#include <gmgl.h>
+#include <gmdemogameworld.h>
+#include <gmbspgameworld.h>
+#include <gmimagereader.h>
 #include <gmui.h>
 
 #define EMITTER_DEMO 1

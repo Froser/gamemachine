@@ -1,6 +1,6 @@
 ﻿#ifndef __GAMEMACHINE_H__
 #define __GAMEMACHINE_H__
-#include "common.h"
+#include <gmcommon.h>
 #include <utilities.h>
 #include "../gmdatacore/glyph/gmglyphmanager.h"
 #include "../gmdatacore/gamepackage/gmgamepackage.h"

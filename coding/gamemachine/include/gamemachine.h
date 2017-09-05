@@ -11,3 +11,7 @@
 #include "../src/foundation/gmstates.h"
 #include "../src/foundation/gamemachine.h"
 #include "../src/foundation/vector.h"
+#include "../src/gmdatacore/gmmodel.h"
+#include "../src/gmengine/gmgameworld.h"
+#include "../src/gmengine/gmgameobject.h"
+#include "../src/gmengine/gmspritegameobject.h"

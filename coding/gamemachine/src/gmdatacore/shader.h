@@ -1,8 +1,8 @@
 ﻿#ifndef __SHADER_H__
 #define __SHADER_H__
-#include "common.h"
-#include "foundation/linearmath.h"
-#include "foundation/utilities/utilities.h"
+#include <gmcommon.h>
+#include <linearmath.h>
+#include <utilities.h>
 BEGIN_NS
 
 enum class GMLightType

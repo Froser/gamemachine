@@ -1,7 +1,7 @@
 ﻿#ifndef __UTILITIES_H__
 #define __UTILITIES_H__
-#include "common.h"
-#include "../linearmath.h"
+#include <gmcommon.h>
+#include <linearmath.h>
 #include "../vector.h"
 #include <time.h>
 BEGIN_NS

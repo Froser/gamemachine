@@ -1,6 +1,6 @@
 ﻿#ifndef __GAMEPACKAGE_H__
 #define __GAMEPACKAGE_H__
-#include "common.h"
+#include <gmcommon.h>
 #include <string>
 #include "utilities.h"
 #include "gamemachine.h"

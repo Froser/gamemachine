@@ -1,7 +1,7 @@
 ﻿#ifndef __MODEL_H__
 #define __MODEL_H__
-#include "common.h"
-#include "foundation/linearmath.h"
+#include <gmcommon.h>
+#include <linearmath.h>
 BEGIN_NS
 
 GM_ALIGNED_STRUCT(Model)

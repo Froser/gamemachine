@@ -8,7 +8,6 @@ include_directories(
 		../3rdparty/zlib
 		../3rdparty/duilib
 		../3rdparty/lua/src
-		../gamemachine/src
 		../gamemachine/include
 		../gamemachineui/include
 	)
