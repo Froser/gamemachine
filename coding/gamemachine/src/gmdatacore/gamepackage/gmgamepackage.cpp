@@ -49,7 +49,7 @@ void GMGamePackage::loadPackage(const GMString& path)
 void GMGamePackage::createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld** gameWorld)
 {
 	D(d);
-	ASSERT(gameWorld);
+	GM_ASSERT(gameWorld);
 
 	GMBSPGameWorld* world = new GMBSPGameWorld();
 	*gameWorld = world;
@@ -68,21 +68,21 @@ bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF
 Vector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
 {
 	D(d);
-	ASSERT(d->handler);
+	GM_ASSERT(d->handler);
 	return d->handler->getAllFiles(directory);
 }
 
 GMString GMGamePackage::pathOf(GMPackageIndex index, const GMString& filename)
 {
 	D(d);
-	ASSERT(d->handler);
+	GM_ASSERT(d->handler);
 	return d->handler->pathRoot(index) + filename;
 }
 
 bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	D(d);
-	ASSERT(d->handler);
+	GM_ASSERT(d->handler);
 	bool b = d->handler->readFileFromPath(path, buffer);
 	gm_hook2(GMGamePackage, readFileFromPath, &path, buffer);
 	return b;

@@ -201,15 +201,15 @@ public:
 
 	const T& at(GMuint n) const
 	{
-		ASSERT(n >= 0);
-		ASSERT(n < size());
+		GM_ASSERT(n >= 0);
+		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
 	T& at(GMuint n)
 	{
-		ASSERT(n >= 0);
-		ASSERT(n < size());
+		GM_ASSERT(n >= 0);
+		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
@@ -220,15 +220,15 @@ public:
 
 	const T& operator[](GMuint n) const
 	{
-		ASSERT(n >= 0);
-		ASSERT(n < size());
+		GM_ASSERT(n >= 0);
+		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
 	T& operator[](GMuint n)
 	{
-		ASSERT(n >= 0);
-		ASSERT(n < size());
+		GM_ASSERT(n >= 0);
+		GM_ASSERT(n < size());
 		return m_data[n];
 	}
 
@@ -241,20 +241,20 @@ public:
 
 	void pop_back()
 	{
-		ASSERT(m_size > 0);
+		GM_ASSERT(m_size > 0);
 		m_size--;
 		m_data[m_size].~T();
 	}
 
 	T& back()
 	{
-		ASSERT(m_size > 0);
+		GM_ASSERT(m_size > 0);
 		return m_data[m_size - 1];
 	}
 
 	T& front()
 	{
-		ASSERT(m_size > 0);
+		GM_ASSERT(m_size > 0);
 		return *m_data;
 	}
 
@@ -401,7 +401,7 @@ public:
 		if (capacity() < _Count)
 		{	// not enough room, reallocate
 			T*	s = (T*)allocate(_Count);
-			ASSERT(s);
+			GM_ASSERT(s);
 			if (s == 0)
 			{
 				gm_error(_L("AlignedVector reserve out-of-memory\n"));

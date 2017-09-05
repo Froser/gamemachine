@@ -14,7 +14,6 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GameMachine)
 {
-	GMWindowAttributes mainWindowAttributes;
 	GMClock clock;
 
 	IWindow* mainWindow = nullptr;
@@ -25,7 +24,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IInput* inputManager = nullptr;
 	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
-	IDebugOutput* consoleWindow = nullptr; // 内置调试窗口
+	IWindow* consoleWindow = nullptr; // 内置调试窗口
 
 	GMCamera camera;
 	Queue<GameMachineMessage> messageQueue;
@@ -65,8 +64,6 @@ public:
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
-
-	void setMainWindowAttributes(const GMWindowAttributes& attrs);
 
 	// 绘制引擎
 	inline IGraphicEngine* getGraphicEngine() { D(d); return d->engine; }

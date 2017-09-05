@@ -157,7 +157,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	}
 	else
 	{
-		ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
+		GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
 		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
 		groupGameObjects(objects, count);
 
@@ -192,7 +192,7 @@ void GMGLGraphicEngine::installShaders()
 	if (!d->shaderLoadCallback)
 	{
 		gm_error("You must specify a IShaderLoadCallback");
-		ASSERT(false);
+		GM_ASSERT(false);
 		return;
 	}
 
@@ -525,11 +525,11 @@ GMGLShaderProgram* GMGLGraphicEngine::getShaders(GMMeshType objectType)
 	}
 	else
 	{
-		ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
+		GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
 		prog = d->deferredCommonPassShaders[d->renderState];
 	}
 
-	ASSERT(prog);
+	GM_ASSERT(prog);
 	return prog;
 }
 

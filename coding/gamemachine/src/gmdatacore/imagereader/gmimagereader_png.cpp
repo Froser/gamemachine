@@ -35,7 +35,7 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuin
 
 	GMint temp = png_sig_cmp((png_const_bytep)data, (png_size_t)0, PNG_BYTES_TO_CHECK);
 	// 检测是否为png文件
-	ASSERT(temp == 0);
+	GM_ASSERT(temp == 0);
 	PngImage imgsource = { data, dataSize, 0 };
 	png_set_read_fn(png_ptr, &imgsource, pngReadCallback);
 	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
@@ -115,7 +115,7 @@ struct PNGTestHeader
 
 bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 {
-	ASSERT(img);
+	GM_ASSERT(img);
 	*img = new GMImage();
 
 	PngData png;
@@ -133,7 +133,7 @@ bool GMImageReader_PNG::test(const GMbyte* data)
 
 void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size)
 {
-	ASSERT(img);
+	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
@@ -155,6 +155,6 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size
 	data.mip[0].data = png.rgba;
 	data.size = size;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 #endif
 }

@@ -645,10 +645,7 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	gm::IWindow* mainWindow = nullptr;
-	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow);
-
-	GMWindowAttributes attrs =
+	GMWindowAttributes mainAttrs =
 	{
 		NULL,
 		L"Default",
@@ -658,7 +655,11 @@ int WINAPI WinMain(
 		NULL,
 	};
 
-	GMWindowAttributes attrs2 =
+	gm::IWindow* mainWindow = nullptr;
+	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow);
+	mainWindow->create(mainAttrs);
+
+	GMWindowAttributes consoleAttrs =
 	{
 		NULL,
 		L"GameMachineConsoleWindow",
@@ -668,10 +669,13 @@ int WINAPI WinMain(
 		NULL,
 	};
 
-	GM.setMainWindowAttributes(attrs);
+	gm::IWindow* consoleWindow = nullptr;
+	gmui::GMUIFactory::createConsoleWindow(hInstance, &consoleWindow);
+	consoleWindow->create(consoleAttrs);
+	
 	GM.init(
 		mainWindow,
-		0,
+		consoleWindow,
 		new GMGLFactory(),
 		new GameHandler()
 	);

@@ -54,7 +54,7 @@ GM_ALIGNED_STRUCT(BSPWinding)
 
 	void alloc(GMint pointNum)
 	{
-		ASSERT(pointNum != 0);
+		GM_ASSERT(pointNum != 0);
 		p.resize(pointNum);
 	}
 };
@@ -329,7 +329,7 @@ static bool planeFromPoints(linear_math::Vector4& plane, const linear_math::Vect
 	plane = VEC4(t, plane);
 	plane[3] = -linear_math::dot(a, VEC3(plane));
 
-	ASSERT(a[0] * plane[0] + a[1] * plane[1] + a[2] * plane[2] + plane[3] < NORMAL_EPSILON);
+	GM_ASSERT(a[0] * plane[0] + a[1] * plane[1] + a[2] * plane[2] + plane[3] < NORMAL_EPSILON);
 	return true;
 }
 

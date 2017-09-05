@@ -60,7 +60,7 @@ static GMuint parseSurfaceParm(const char* p)
 			return _surface_flags[i].flag;
 	}
 
-	ASSERT(false);
+	GM_ASSERT(false);
 	gm_error("wrong surfaceparm %s", p);
 	return 0;
 }

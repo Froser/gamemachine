@@ -16,7 +16,7 @@ GMGLRenders_Object::GMGLRenders_Object()
 void GMGLRenders_Object::activateShader()
 {
 	D(d);
-	ASSERT(d->shader);
+	GM_ASSERT(d->shader);
 	Shader* shader = d->shader;
 	if (shader->getBlend())
 	{
@@ -50,7 +50,7 @@ void GMGLRenders_Object::activateShader()
 				factors[i] = GL_ONE_MINUS_SRC_ALPHA;
 				break;
 			default:
-				ASSERT(false);
+				GM_ASSERT(false);
 				break;
 			}
 		}
@@ -394,7 +394,7 @@ void GMGLRenders_Object::getTextureID(GMTextureType type, GMint index, REF GLenu
 		tex = GL_TEXTURE8;
 		break;
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		return;
 	}
 }

@@ -56,7 +56,7 @@ void GMProfile::startRecord(const GMWchar* name)
 	GMLargeInteger now = GMClock::highResolutionTimer();
 	if (ps.firstProfileTimeInCycle < 0)
 		ps.firstProfileTimeInCycle = now;
-	ASSERT(now - ps.firstProfileTimeInCycle >= 0);
+	GM_ASSERT(now - ps.firstProfileTimeInCycle >= 0);
 	d->durationSinceLastProfile = (now - ps.firstProfileTimeInCycle) / (GMfloat) frequency;
 	g_handler->beginProfile(name, d->durationSinceLastProfile, GMThread::getCurrentThreadId(), ps.level);
 

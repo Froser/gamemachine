@@ -100,7 +100,7 @@ bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT GMImage** img)
 	long paletteLen = bitmapFile.bitmapHeader.bfOffBits - sizeof(BitmapHeader)-sizeof(BitmapInfoHeader);
 	ms.read(reinterpret_cast<GMbyte*>(&bitmapFile.palette), paletteLen);
 
-	ASSERT(bitmapFile.bitmapInfoHeader.biHeight > 0
+	GM_ASSERT(bitmapFile.bitmapInfoHeader.biHeight > 0
 		&& bitmapFile.bitmapInfoHeader.biBitCount == 24
 		&& bitmapFile.bitmapInfoHeader.biCompression == 0);
 
@@ -121,7 +121,7 @@ bool GMImageReader_BMP::test(const GMbyte* byte)
 
 void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint size)
 {
-	ASSERT(img);
+	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
@@ -139,6 +139,6 @@ void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuin
 	data.mip[0].data = bitmap.buffer;
 	data.size = size;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 #endif
 }

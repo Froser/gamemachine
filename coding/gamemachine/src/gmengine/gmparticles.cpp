@@ -15,7 +15,7 @@ GMParticleGameObject::GMParticleGameObject(AUTORELEASE GMModel* prototype)
 
 	if (prototype->getAllMeshes().size() > 1)
 	{
-		ASSERT(false);
+		GM_ASSERT(false);
 		gm_warning("Only one mesh in particle's prototype is allowed.");
 	}
 }
@@ -53,11 +53,11 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 			*(basePositions + offset * 4 + 3)
 		);
 		linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
-		ASSERT((GMLargeInteger)(vertexData + offset_position + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
+		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
 		linear_math::copyVector(transformedPosition, (GMfloat*)(vertexData + offset_position) + offset * 4);
 
 		//更新颜色
-		ASSERT((GMLargeInteger)(vertexData + color_offset + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
+		GM_ASSERT((GMLargeInteger)(vertexData + color_offset + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
 		linear_math::copyVector(d->color, (GMfloat*)(vertexData + color_offset) + offset * 4);
 	}
 }
@@ -122,7 +122,7 @@ void GMParticles::onAppendingObjectToWorld()
 	for (GMint i = 0; i < d->particlesCount; i++)
 	{
 		GMParticleGameObject* particle = d->particleHandler->createParticle(i);
-		ASSERT(particle);
+		GM_ASSERT(particle);
 		particle->setWorld(db->world);
 		addParticle(particle->getPrototype(), particle);
 	}
@@ -274,7 +274,7 @@ GMParticleGameObject* GMLerpParticleEmitter::createParticle(const GMint index)
 {
 	D(d);
 	D_BASE(db, GMParticlesEmitter);
-	ASSERT(db->particleProps);
+	GM_ASSERT(db->particleProps);
 	auto particle = new GMParticleGameObject(d->prototype);
 	auto& props = db->particleProps[index];
 	particle->setMaxLife(props.life);

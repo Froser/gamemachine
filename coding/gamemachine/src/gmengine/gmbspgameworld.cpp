@@ -246,7 +246,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 
 	GMBSP_Render_Face& polygonFace = rd.polygonFaces[polygonFaceNumber];
 	GMGameObject* obj = nullptr;
-	ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
+	GM_ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
 
 	Shader shader;
 	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
@@ -275,7 +275,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	GMBSP_Render_Face& meshFace = rd.meshFaces[meshFaceNumber];
 	GMGameObject* obj = nullptr;
 
-	ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
+	GM_ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
 	Shader shader;
 	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
 
@@ -313,7 +313,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
 	{
 		GMBSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
-		ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
+		GM_ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
 
 		GMModel* coreObj;
 		d->render.createObject(biqp, shader, &coreObj);
@@ -337,7 +337,7 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 	else
 		return;
 
-	ASSERT(obj);
+	GM_ASSERT(obj);
 	d->renderBuffer.push_back(obj);
 }
 
@@ -355,7 +355,7 @@ void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 	else
 		return;
 
-	ASSERT(obj);
+	GM_ASSERT(obj);
 	d->renderBuffer.push_back(obj);
 }
 
@@ -381,7 +381,7 @@ void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 	else
 		return;
 
-	ASSERT(obj);
+	GM_ASSERT(obj);
 	d->renderBuffer.push_back(obj);
 }
 
@@ -630,7 +630,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 
 	GMBSPRenderData& rd = d->render.renderData();
 
-	ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
+	GM_ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
 	GMResourceContainer& rc = getResourceContainer();
 	GMEntityObject* entityObject = nullptr;
 	GMModel* model = nullptr;
@@ -686,7 +686,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		entityObject->setScaling(linear_math::scale(m->extents[0], m->extents[1], m->extents[2]));
 	}
 
-	ASSERT(entityObject);
+	GM_ASSERT(entityObject);
 	rd.entitiyObjects[entity] = entityObject;
 	appendObjectAndInit(entityObject);
 }

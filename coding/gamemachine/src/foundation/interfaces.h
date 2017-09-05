@@ -148,6 +148,7 @@ GM_INTERFACE(IWindow)
 	virtual GMRect getWindowRect() = 0;
 	virtual GMRect getClientRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
+	virtual bool event(const GameMachineMessage& msg) = 0;
 };
 
 END_NS

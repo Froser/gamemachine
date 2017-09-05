@@ -117,7 +117,7 @@ void GMBSPMove::sendCommand(GMCommand cmd, const CommandParams& dataParam)
 	D(d);
 	d->moveCommand.command |= cmd;
 	auto iter = dataParam.find(cmd);
-	ASSERT(iter != dataParam.end());
+	GM_ASSERT(iter != dataParam.end());
 	d->moveCommand.params[cmd] = (*iter).second;
 }
 

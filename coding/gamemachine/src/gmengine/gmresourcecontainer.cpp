@@ -13,7 +13,7 @@ GMTextureContainer::~GMTextureContainer()
 void GMTextureContainer::insert(GMTextureContainer::TextureItemType& item)
 {
 	D(d);
-	ASSERT(d->textures.find(item) == d->textures.end());
+	GM_ASSERT(d->textures.find(item) == d->textures.end());
 	d->textures.insert(item);
 }
 
@@ -41,7 +41,7 @@ GMTextureContainer_ID::~GMTextureContainer_ID()
 void GMTextureContainer_ID::insert(GMTextureContainer_ID::TextureItemType& item)
 {
 	D(d);
-	ASSERT(d->textures.find(item) == d->textures.end());
+	GM_ASSERT(d->textures.find(item) == d->textures.end());
 	d->textures.insert(item);
 }
 

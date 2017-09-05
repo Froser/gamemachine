@@ -32,6 +32,6 @@ void ImageBuffer::generateData()
 	// Buffer 移交给 Image 管理
 	data.mip[0].data = d->buffer;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 #endif
 }

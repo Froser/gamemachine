@@ -8,19 +8,19 @@
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
-	ASSERT(engine);
+	GM_ASSERT(engine);
 	*engine = new GMGLGraphicEngine();
 }
 
 void GMGLFactory::createTexture(AUTORELEASE GMImage* image, OUT ITexture** texture)
 {
-	ASSERT(texture);
+	GM_ASSERT(texture);
 	(*texture) = new GMGLTexture(image);
 }
 
 void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* obj, OUT GMModelPainter** painter)
 {
-	ASSERT(painter);
+	GM_ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
 	(*painter) = new GMGLModelPainter(gmglEngine, obj);
 }
@@ -42,7 +42,7 @@ void GMGLFactory::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IG
 		}
 		break;
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 }

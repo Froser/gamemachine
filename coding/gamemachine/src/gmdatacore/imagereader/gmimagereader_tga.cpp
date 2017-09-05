@@ -80,7 +80,7 @@ bool TGAImage::read_tga_file(const GMbyte* data, GMuint size)
 	}
 	else 
 	{
-		ASSERT(false);
+		GM_ASSERT(false);
 		gm_error(_L("unknown file format %d"), (int)header.datatypecode);
 		return false;
 	}
@@ -352,7 +352,7 @@ bool TGAImage::scale(int w, int h) {
 
 bool GMImageReader_TGA::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 {
-	ASSERT(img);
+	GM_ASSERT(img);
 	*img = new GMImage();
 	TGAImage tga;
 	bool b = tga.read_tga_file(data, size);
@@ -371,7 +371,7 @@ bool GMImageReader_TGA::test(const GMbyte* data)
 
 void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 {
-	ASSERT(img);
+	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
@@ -396,6 +396,6 @@ void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 	data.mip[0].data = new GMbyte[tga.get_nbytes()];
 	memcpy(data.mip[0].data, tga.buffer(), tga.get_nbytes());
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 #endif
 }

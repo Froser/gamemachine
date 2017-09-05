@@ -99,10 +99,10 @@ GMLargeInteger GMClock::highResolutionTimerFrequency()
 #if _WINDOWS
 	LARGE_INTEGER i;
 	BOOL b = QueryPerformanceFrequency(&i);
-	ASSERT(b);
+	GM_ASSERT(b);
 	return i.QuadPart;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 	return 0;
 #endif
 }
@@ -112,10 +112,10 @@ GMLargeInteger GMClock::highResolutionTimer()
 #if _WINDOWS
 	LARGE_INTEGER i;
 	BOOL b = QueryPerformanceCounter(&i);
-	ASSERT(b);
+	GM_ASSERT(b);
 	return i.QuadPart;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 	return 0;
 #endif
 }
@@ -319,7 +319,7 @@ void GMFrustum::update()
 	}
 	else
 	{
-		ASSERT(d->type == GMFrustumType::Orthographic);
+		GM_ASSERT(d->type == GMFrustumType::Orthographic);
 		d->planes[RIGHT_PLANE].normal = linear_math::Vector3(1, 0, 0);
 		d->planes[RIGHT_PLANE].intercept = d->right;
 
@@ -591,7 +591,7 @@ void MemoryStream::seek(GMuint cnt, SeekMode mode)
 	else if (mode == MemoryStream::FromNow)
 		d->ptr += cnt;
 	else
-		ASSERT(false);
+		GM_ASSERT(false);
 }
 
 //Bitset
@@ -672,7 +672,7 @@ Vector<GMString> GMPath::getAllFiles(const GMString& directory)
 		_findclose(hFile);
 	}
 #elif defined __APPLE__
-	ASSERT(false);
+	GM_ASSERT(false);
 	return AlignedVector<GMString>();
 #else
 #error need implement
@@ -691,7 +691,7 @@ bool GMPath::directoryExists(const GMString& dir)
 	FindClose(hFind);
 	return b;
 #elif defined __APPLE__
-	ASSERT(false);
+	GM_ASSERT(false);
 	return false;
 #else
 #error need implement
@@ -720,7 +720,7 @@ void GMPath::createDirectory(const GMString& dir)
 	std::string strDir = GMString(dir).toStdString();
 	_mkdir(strDir.c_str());
 #elif defined __APPLE__
-	ASSERT(false);
+	GM_ASSERT(false);
 #else
 #error need implement
 #endif
@@ -764,7 +764,7 @@ void GMEvent::signalObjectAndWait(const GMEvent& eventToSignal, const GMEvent& e
 #if _WINDOWS
 	::SignalObjectAndWait(eventToSignal.data()->handle, eventToWait.data()->handle, INFINITE, FALSE);
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 #endif
 }
 #endif

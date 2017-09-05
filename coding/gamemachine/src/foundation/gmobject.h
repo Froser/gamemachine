@@ -228,10 +228,23 @@ public:
 	{
 #if _DEBUG
 		TargetType target = dynamic_cast<TargetType>(obj);
-		ASSERT(target);
+		GM_ASSERT(target);
 		return target;
 #else
 		return static_cast<TargetType>(obj);
+#endif
+	}
+
+	template <typename TargetType>
+	static TargetType gminterface_cast(IDispose* obj)
+	{
+		IDispose* d = obj;
+#if _DEBUG
+		TargetType target = dynamic_cast<TargetType>(d);
+		GM_ASSERT(target);
+		return target;
+#else
+		return static_cast<TargetType>(d);
 #endif
 	}
 

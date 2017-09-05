@@ -27,15 +27,10 @@ void GameMachine::init(
 	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
 	registerManager(new GMInput(), &d->inputManager);
 	registerManager(new GMStates(), &d->statesManager);
+	registerManager(consoleWindow, &d->consoleWindow);
 
 	initInner();
 	d->gameHandler->init();
-}
-
-void GameMachine::setMainWindowAttributes(const GMWindowAttributes& attrs)
-{
-	D(d);
-	d->mainWindowAttributes = attrs;
 }
 
 void GameMachine::postMessage(GameMachineMessage msg)
@@ -73,8 +68,7 @@ GameMachine::EndiannessMode GameMachine::getMachineEndianness()
 void GameMachine::startGameMachine()
 {
 	D(d);
-	// 创建主窗口
-	d->mainWindow->create(d->mainWindowAttributes);
+	// 显示主窗口
 	d->mainWindow->centerWindow();
 	d->mainWindow->showWindow();
 
@@ -126,6 +120,7 @@ void GameMachine::startGameMachine()
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
 
 		// 更新所有管理器
+		d->consoleWindow->update();
 		d->inputManager->update();
 		d->clock.update();
 
@@ -184,7 +179,7 @@ bool GameMachine::handleMessages()
 void GameMachine::initInner()
 {
 	D(d);
-	GMDebugger::setDebugOutput(d->consoleWindow);
+	GMDebugger::setDebugOutput(gminterface_cast<IDebugOutput*>(d->consoleWindow));
 }
 
 template <typename T, typename U>
@@ -203,8 +198,5 @@ void GameMachine::terminate()
 	{
 		delete manager;
 	}
-
-	if (d->consoleWindow)
-		delete d->consoleWindow;
 	GMSoundPlayerDevice::terminate();
 }

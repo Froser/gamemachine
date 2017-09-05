@@ -14,7 +14,6 @@ GM_INTERFACE(IDebugOutput)
 	virtual void warning(const GMString& msg) = 0;
 	virtual void error(const GMString& msg) = 0;
 	virtual void debug(const GMString& msg) = 0;
-	virtual bool event(const GameMachineMessage& msg) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMDebugger)

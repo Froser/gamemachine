@@ -296,7 +296,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shad
 	GMComponent* component = new GMComponent(child);
 	component->setShader(shader);
 
-	ASSERT(face.numIndices % 3 == 0);
+	GM_ASSERT(face.numIndices % 3 == 0);
 	for (GMint i = 0; i < face.numIndices / 3; i++)
 	{
 		component->beginFace();

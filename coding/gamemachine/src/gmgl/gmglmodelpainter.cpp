@@ -19,7 +19,7 @@ static GLenum getMode(GMMesh* obj)
 	case GMArrangementMode::Lines:
 		return GL_LINE_LOOP;
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		return GL_TRIANGLE_FAN;
 	}
 }

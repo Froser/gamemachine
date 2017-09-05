@@ -178,7 +178,7 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 	// If allsolid is set (was entirely inside something solid), the plane is not valid.
 	// If fraction == 1.0, we never hit anything, and thus the plane is not valid.
 	// Otherwise, the normal on the plane should have unit length
-	ASSERT(tw.trace.allsolid ||
+	GM_ASSERT(tw.trace.allsolid ||
 		tw.trace.fraction == 1.0 ||
 		linear_math::lengthSquare(tw.trace.plane.normal) > 0.9999f);
 	trace = tw.trace;

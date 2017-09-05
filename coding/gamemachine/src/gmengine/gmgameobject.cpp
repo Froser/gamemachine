@@ -68,7 +68,7 @@ GMModel* GMGameObject::getModel()
 void GMGameObject::setWorld(GMGameWorld* world)
 {
 	D(d);
-	ASSERT(!d->world);
+	GM_ASSERT(!d->world);
 	d->world = world;
 }
 

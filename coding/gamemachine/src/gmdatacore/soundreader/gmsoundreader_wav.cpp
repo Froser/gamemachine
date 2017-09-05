@@ -58,7 +58,7 @@ public:
 		loadSound();
 		d->playing = true;
 		HRESULT hr = d->cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
-		ASSERT(SUCCEEDED(hr));
+		GM_ASSERT(SUCCEEDED(hr));
 	}
 
 	virtual void stop() override
@@ -138,7 +138,7 @@ bool GMSoundReader_Wav::load(GMBuffer& buffer, OUT ISoundFile** sf)
 	*sf = _sf;
 	return true;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 	return false;
 #endif
 }

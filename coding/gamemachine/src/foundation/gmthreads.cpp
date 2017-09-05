@@ -74,6 +74,6 @@ void GMThread::sleep(GMint miliseconds)
 #if _WINDOWS
 	::Sleep(miliseconds);
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 #endif
 }

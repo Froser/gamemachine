@@ -75,7 +75,7 @@ GMLua& GMLua::operator= (GMLua&& state) noexcept
 GMLuaStatus GMLua::loadFile(const char* file)
 {
 	D(d);
-	ASSERT(L);
+	GM_ASSERT(L);
 	loadLibrary();
 	return (GMLuaStatus)(luaL_loadfile(L, file) || lua_pcall(L, 0, LUA_MULTRET, 0));
 }
@@ -83,7 +83,7 @@ GMLuaStatus GMLua::loadFile(const char* file)
 GMLuaStatus GMLua::loadBuffer(const GMBuffer& buffer)
 {
 	D(d);
-	ASSERT(L);
+	GM_ASSERT(L);
 	loadLibrary();
 	return (GMLuaStatus)(luaL_loadbuffer(L, (const char*) buffer.buffer, buffer.size, 0) || lua_pcall(L, 0, LUA_MULTRET, 0));
 }
@@ -208,7 +208,7 @@ void GMLua::setTable(GMObject& obj)
 	D(d);
 	lua_newtable(L);
 	auto meta = obj.meta();
-	ASSERT(meta);
+	GM_ASSERT(meta);
 	for (const auto& member : *meta)
 	{
 		push(member.first.c_str(), member.second);
@@ -229,12 +229,12 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 	if (!meta)
 		return false;
 
-	ASSERT(lua_istable(L, index));
+	GM_ASSERT(lua_istable(L, index));
 	lua_pushnil(L);
 	while (lua_next(L, index))
 	{
 		POP_GUARD(); // Make sure pop every value
-		ASSERT(lua_isstring(L, -2));
+		GM_ASSERT(lua_isstring(L, -2));
 		const char* key = lua_tostring(L, -2);
 		for (const auto member : *meta)
 		{
@@ -290,7 +290,7 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 					}
 					break;
 				default:
-					ASSERT(false);
+					GM_ASSERT(false);
 					break;
 				}
 			}
@@ -324,7 +324,7 @@ void GMLua::push(const GMLuaVariable& var)
 		setTable(*var.valPtrObject);
 		break;
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 }
@@ -355,39 +355,39 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 		{
 			linear_math::Vector2& vec2 = *static_cast<linear_math::Vector2*>(member.ptr);
 			setVector(vec2);
-			ASSERT(lua_istable(L, -1));
+			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector3:
 		{
 			linear_math::Vector3& vec3 = *static_cast<linear_math::Vector3*>(member.ptr);
 			setVector(vec3);
-			ASSERT(lua_istable(L, -1));
+			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector4:
 		{
 			linear_math::Vector4& vec4 = *static_cast<linear_math::Vector4*>(member.ptr);
 			setVector(vec4);
-			ASSERT(lua_istable(L, -1));
+			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Matrix4x4:
 		{
 			linear_math::Matrix4x4& mat= *static_cast<linear_math::Matrix4x4*>(member.ptr);
 			setMatrix(mat);
-			ASSERT(lua_istable(L, -1));
+			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Object:
 		setTable(*static_cast<GMObject*>(member.ptr));
 		break;
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 
-	ASSERT(lua_istable(L, -3));
+	GM_ASSERT(lua_istable(L, -3));
 	lua_settable(L, -3);
 }
 
@@ -403,6 +403,6 @@ GMLuaVariable GMLua::pop()
 		return GMString(lua_tostring(L, -1));
 	if (lua_isboolean(L, -1))
 		return lua_toboolean(L, -1);
-	ASSERT(false);
+	GM_ASSERT(false);
 	return 0;
 }

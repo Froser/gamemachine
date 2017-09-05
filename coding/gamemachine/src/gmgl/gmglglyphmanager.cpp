@@ -184,6 +184,6 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 
 	// 存入缓存
 	auto result = getCharList().insert(std::make_pair(c, glyphInfo));
-	ASSERT(result.second);
+	GM_ASSERT(result.second);
 	return (*(result.first)).second;
 }

@@ -186,8 +186,8 @@ public:
 	}
 	void detach(E** ppv)
 	{
-		ASSERT(0); // 过时的用法!
-		ASSERT(ppv != &m_ptr);
+		GM_ASSERT(0); // 过时的用法!
+		GM_ASSERT(ppv != &m_ptr);
 		*ppv = m_ptr;
 		m_ptr = NULL;
 	}
@@ -223,7 +223,7 @@ public:
 	}
 	E* operator=(int __nil)
 	{
-		ASSERT(__nil == 0);
+		GM_ASSERT(__nil == 0);
 		if (m_ptr)
 		{
 			m_ptr->Release();
@@ -233,7 +233,7 @@ public:
 	}
 	E* operator=(long __nil)
 	{
-		ASSERT(__nil == 0);
+		GM_ASSERT(__nil == 0);
 		if (m_ptr)
 		{
 			m_ptr->Release();
@@ -291,7 +291,7 @@ public:
 	}
 	E** operator&() // The assert on operator& usually indicates a bug.
 	{
-		ASSERT(m_ptr == NULL); return &m_ptr;
+		GM_ASSERT(m_ptr == NULL); return &m_ptr;
 	}
 	E* operator->() const
 	{

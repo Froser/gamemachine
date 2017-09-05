@@ -126,14 +126,14 @@ void GMGLGBuffer::releaseBind()
 void GMGLGBuffer::setReadBuffer(GBufferGeometryType textureType)
 {
 	D(d);
-	ASSERT(d->currentTurn == 0);
+	GM_ASSERT(d->currentTurn == 0);
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + (GMuint)textureType);
 }
 
 void GMGLGBuffer::setReadBuffer(GBufferMaterialType materialType)
 {
 	D(d);
-	ASSERT(d->currentTurn == 1);
+	GM_ASSERT(d->currentTurn == 1);
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + (GMuint)materialType);
 }
 
@@ -429,7 +429,7 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 		}
 
 		//Reset effects
-		ASSERT(effectUniformName);
+		GM_ASSERT(effectUniformName);
 		program->setBool(effectUniformName, false);
 
 		releaseBind();

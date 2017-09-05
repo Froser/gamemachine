@@ -336,12 +336,12 @@ namespace linear_math
 	void set128(__m128 _128) { m_128 = _128; }	\
 	GMfloat& operator [](GMint i)				\
 	{											\
-		ASSERT(i < l);							\
+		GM_ASSERT(i < l);						\
 		return m_data[i];						\
 	}											\
 	const GMfloat& operator [](GMint i) const	\
 	{											\
-		ASSERT(i < l);							\
+		GM_ASSERT(i < l);						\
 		return m_data[i];						\
 	}											\
 	protected:									\
@@ -356,12 +356,12 @@ namespace linear_math
 	enum { dimension = l };						\
 	GMfloat& operator [](GMint i)				\
 	{											\
-		ASSERT(i < l);							\
+		GM_ASSERT(i < l);						\
 		return m_data[i];						\
 	}											\
 	const GMfloat& operator [](GMint i) const	\
 	{											\
-		ASSERT(i < l);							\
+		GM_ASSERT(i < l);						\
 		return m_data[i];						\
 	}											\
 	protected:									\
@@ -945,7 +945,7 @@ namespace linear_math
 		void setRotation(const Vector3& axis, GMfloat angle)
 		{
 			GMfloat d = length(axis);
-			ASSERT(d != GMfloat(0.0));
+			GM_ASSERT(d != GMfloat(0.0));
 			GMfloat s = gmSin(angle * 0.5f) / d;
 			setValue(axis.x() * s, axis.y() * s, axis.z() * s,
 				gmCos(angle * 0.5f));
@@ -1104,7 +1104,7 @@ namespace linear_math
 	inline Quaternion slerp(const Quaternion& start, const Quaternion& end, GMfloat percentage)
 	{
 		const GMfloat magnitude = 1 / fastInvSqrt (lengthSquare(start) * lengthSquare(end));
-		ASSERT(magnitude > GMfloat(0));
+		GM_ASSERT(magnitude > GMfloat(0));
 
 		const GMfloat product = dot(start, end) / magnitude;
 		const GMfloat absproduct = gmFabs(product);
@@ -1113,7 +1113,7 @@ namespace linear_math
 		{
 			const GMfloat theta = gmAcos(absproduct);
 			const GMfloat d = gmSin(theta);
-			ASSERT(d > GMfloat(0));
+			GM_ASSERT(d > GMfloat(0));
 
 			const GMfloat sign = (product < 0) ? GMfloat(-1) : GMfloat(1);
 			const GMfloat s0 = gmSin((GMfloat(1.0) - percentage) * theta) / d;

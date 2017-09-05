@@ -69,7 +69,7 @@ GMCollisionObject* GMBSPPhysicsWorld::find(GMGameObject* obj)
 void GMBSPPhysicsWorld::sendCommand(GMCollisionObject* obj, const CommandParams& dataParam)
 {
 	D(d);
-	ASSERT(dataParam.size() == 1);
+	GM_ASSERT(dataParam.size() == 1);
 	GMCommand cmd = (*dataParam.begin()).first;
 	GMBSPMove* move = getMove(obj);
 	move->sendCommand(cmd, dataParam);
@@ -97,7 +97,7 @@ GMBSPMove* GMBSPPhysicsWorld::getMove(GMCollisionObject* o)
 		m = d->objectMoves[o];
 	}
 
-	ASSERT(m);
+	GM_ASSERT(m);
 	return m;
 }
 

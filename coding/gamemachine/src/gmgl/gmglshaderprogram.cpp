@@ -164,7 +164,7 @@ void GMGLShaderProgram::load()
 		GLchar* log = new GLchar[len + 1];
 		glGetProgramInfoLog(program, len, &len, log);
 		printf("%s", log);
-		ASSERT("Shader linking failed: " && FALSE);
+		GM_ASSERT("Shader linking failed: " && FALSE);
 		delete[] log;
 #endif /* DEBUG */
 
@@ -214,7 +214,7 @@ bool GMGLShaderProgram::matchMarco(const GMString& source, const GMString& marco
 	std::smatch match;
 	if (std::regex_search(s, match, std::regex(expr.c_str())))
 	{
-		ASSERT(match.size() >= 3);
+		GM_ASSERT(match.size() >= 3);
 		result = match[2].str();
 		return true;
 	}

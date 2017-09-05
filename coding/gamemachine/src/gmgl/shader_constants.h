@@ -62,7 +62,7 @@ constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
 
 inline const char* getTextureUniformName(GMTextureType t, GMint index)
 {
-	ASSERT(index < GMMaxTextureCount(t));
+	GM_ASSERT(index < GMMaxTextureCount(t));
 	switch (t)
 	{
 	case GMTextureType::AMBIENT:
@@ -83,7 +83,7 @@ inline const char* getTextureUniformName(GMTextureType t, GMint index)
 			index == 2 ? GMSHADER_LIGHTMAP_TEXTURES(2) : "";
 	case GMTextureType::END:
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 	return "";
@@ -91,7 +91,7 @@ inline const char* getTextureUniformName(GMTextureType t, GMint index)
 
 inline const char* getLightUniformName(GMLightType t, GMint index)
 {
-	ASSERT(index < GMGL_MAX_LIGHT_COUNT);
+	GM_ASSERT(index < GMGL_MAX_LIGHT_COUNT);
 	switch (t)
 	{
 	case GMLightType::AMBIENT:
@@ -119,7 +119,7 @@ inline const char* getLightUniformName(GMLightType t, GMint index)
 			index == 9 ? GMSHADER_SPECULAR_LIGHTS(9) :
 			index == 10 ? GMSHADER_SPECULAR_LIGHTS(10) : "";
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 	return "";

@@ -27,7 +27,7 @@ GMint GMStateItem::getInt32(GMint key)
 	D(d);
 	GMStateItemValue& v = d->values[key];
 
-	ASSERT(v.type == VT_Int32);
+	GM_ASSERT(v.type == VT_Int32);
 
 	return v.value.i32;
 }
@@ -47,7 +47,7 @@ GMLargeInteger GMStateItem::getInt64(GMint key)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];
-	ASSERT(v.type == VT_Int64);
+	GM_ASSERT(v.type == VT_Int64);
 	return v.value.i64;
 }
 
@@ -66,7 +66,7 @@ GMfloat GMStateItem::getFloat32(GMint key)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];
-	ASSERT(v.type == VT_Float32);
+	GM_ASSERT(v.type == VT_Float32);
 	return v.value.f32;
 }
 
@@ -87,7 +87,7 @@ const char* GMStateItem::getString(GMint key)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];
-	ASSERT(v.type == VT_String);
+	GM_ASSERT(v.type == VT_String);
 	return v.value.str;
 }
 

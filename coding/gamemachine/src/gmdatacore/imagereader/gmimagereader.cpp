@@ -30,7 +30,7 @@ public:
 
 	IImageReader* getReader(GMImageReader::ImageType type)
 	{
-		ASSERT(m_readers.find(type) != m_readers.end());
+		GM_ASSERT(m_readers.find(type) != m_readers.end());
 		return m_readers[type];
 	}
 

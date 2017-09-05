@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmuicontrols.h"
 
-#if _WINDOWS
-#	define RGBA(r,g,b,a) RGB(r, g, b) | (a << 24)
+#define RGBA(r,g,b,a) RGB(r, g, b) | (a << 24)
 const gm::GMint MARGIN = 10;
 
 void GMUIGraph::drawGraph(HDC hDC, const RECT& rcPaint)
@@ -152,11 +151,10 @@ void GMUIGraph::penForward(gm::GMint xOffset, gm::GMint yOffset)
 DuiLib::CControlUI* GMUIDialogBuilder::CreateControl(LPCTSTR pstrClass)
 {
 	D(d);
-	if (wstrEqual(pstrClass, _L("GMGraph")))
+	if (wstrEqual(pstrClass, _L("GMUIGraph")))
 	{
 		return new GMUIGraph(d->parentWindow);
 	}
-	ASSERT(false);
+	GM_ASSERT(false);
 	return nullptr;
 }
-#endif

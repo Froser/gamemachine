@@ -182,7 +182,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 		faceScanner.nextInt(&t);
 		faceScanner.nextInt(&n);
 
-		ASSERT(v != INVALID);
+		GM_ASSERT(v != INVALID);
 		{
 			auto& vec = d->positions[v - 1];
 			d->currentComponent->vertex(vec[0], vec[1], vec[2]);
@@ -193,7 +193,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 			d->currentComponent->uv(vec[0], vec[1]);
 		}
 
-		ASSERT(n != INVALID);
+		GM_ASSERT(n != INVALID);
 		{
 			auto& vec = d->normals[n - 1];
 			d->currentComponent->normal(vec[0], vec[1], vec[2]);
@@ -229,26 +229,26 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 		}
 		else if (strEqual(token, "Ns"))
 		{
-			ASSERT(material);
+			GM_ASSERT(material);
 			s.nextFloat(&material->ns);
 		}
 		else if (strEqual(token, "Kd"))
 		{
-			ASSERT(material);
+			GM_ASSERT(material);
 			s.nextFloat(&material->kd[0]);
 			s.nextFloat(&material->kd[1]);
 			s.nextFloat(&material->kd[2]);
 		}
 		else if (strEqual(token, "Ka"))
 		{
-			ASSERT(material);
+			GM_ASSERT(material);
 			s.nextFloat(&material->ka[0]);
 			s.nextFloat(&material->ka[1]);
 			s.nextFloat(&material->ka[2]);
 		}
 		else if (strEqual(token, "Ks"))
 		{
-			ASSERT(material);
+			GM_ASSERT(material);
 			s.nextFloat(&material->ks[0]);
 			s.nextFloat(&material->ks[1]);
 			s.nextFloat(&material->ks[2]);

@@ -545,7 +545,7 @@ skipspace:
 		if (!crossline)
 		{
 			gm_error(_L("Line %i is incomplete\n"), d->scriptline);
-			ASSERT(false);
+			GM_ASSERT(false);
 		}
 		d->script->script_p += 2;
 		while (d->script->script_p[0] != '*' && d->script->script_p[1] != '/')

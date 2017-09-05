@@ -136,20 +136,20 @@ private:
 			d->events[i] = d->notifyPos[i].hEventNotify;
 		}
 		hr = cpDirectSoundNotify->SetNotificationPositions(2, d->notifyPos);
-		ASSERT(SUCCEEDED(hr));
+		GM_ASSERT(SUCCEEDED(hr));
 
 		LPVOID lpLockBuf;
 		DWORD len;
 		hr = d->cpDirectSoundBuffer->Lock(0, 0, &lpLockBuf, &len, 0, 0, DSBLOCK_ENTIREBUFFER);
-		ASSERT(SUCCEEDED(hr));
+		GM_ASSERT(SUCCEEDED(hr));
 		memcpy(lpLockBuf, b, size);
 		memset((GMbyte*)lpLockBuf + size, 0, len - size);
 		hr = d->cpDirectSoundBuffer->Unlock(lpLockBuf, len, NULL, NULL);
-		ASSERT(SUCCEEDED(hr));
+		GM_ASSERT(SUCCEEDED(hr));
 		hr = d->cpDirectSoundBuffer->SetCurrentPosition(0);
-		ASSERT(SUCCEEDED(hr));
+		GM_ASSERT(SUCCEEDED(hr));
 		hr = d->cpDirectSoundBuffer->Play(0, 0, DSBPLAY_LOOPING);
-		ASSERT(SUCCEEDED(hr));
+		GM_ASSERT(SUCCEEDED(hr));
 	}
 };
 #endif
@@ -295,7 +295,7 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 
 			// Release the data back to DirectSound. 
 			hr = d->cpDirectSoundBuffer->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
-			ASSERT(SUCCEEDED(hr));
+			GM_ASSERT(SUCCEEDED(hr));
 		}
 
 		DWORD step = dwBytes1 + dwBytes2;
@@ -326,7 +326,7 @@ bool GMSoundReader_MP3::load(GMBuffer& buffer, OUT ISoundFile** sf)
 	*sf = file;
 	return 0;
 #else
-	ASSERT(false);
+	GM_ASSERT(false);
 	return 0;
 #endif
 }

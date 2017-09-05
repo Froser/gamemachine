@@ -66,7 +66,7 @@ GMString GMGLDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 	case GMPackageIndex::Scripts:
 		return d->packagePath + "scripts/";
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 	return "";
@@ -172,7 +172,7 @@ bool GMGLZipGamePackageHandler::loadZip()
 				if (err > 0)
 					ptr += err;
 			} while (err > 0);
-			ASSERT(m_buffers.find(filename) == m_buffers.end());
+			GM_ASSERT(m_buffers.find(filename) == m_buffers.end());
 
 			ZipBuffer* buf = new ZipBuffer();
 			buf->buffer = buffer;
@@ -281,7 +281,7 @@ GMString GMGLZipGamePackageHandler::pathRoot(GMPackageIndex index)
 	case GMPackageIndex::Scripts:
 		return "scripts/";
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 	return "";

@@ -1,9 +1,7 @@
 ﻿#include "stdafx.h"
-#include "gmui_console.h"
+#include "gmuiconsole.h"
 #include <gamemachine.h>
-#if _WINDOWS
-#	include "gmui_console_ui.h"
-#endif
+#include "gmuiconsole_ui.h"
 #include <gmmessages.h>
 
 enum
@@ -24,12 +22,11 @@ GMUIStringPtr GMUIConsole::getWindowClassName() const
 	return _L("gamemachine_Console_class");
 }
 
-#if _WINDOWS
 template <typename T>
 inline static T* findControl(GMUIPainter* painter, gm::GMWchar* name)
 {
 	T* control = static_cast<T*>(painter->FindControl(name));
-	ASSERT(control);
+	GM_ASSERT(control);
 	return control;
 }
 
@@ -39,8 +36,8 @@ LongResult GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	d->painter->Init(getWindowHandle());
 	DuiLib::CDialogBuilder builder;
 	GMUIDialogBuilder db(this);
-	DuiLib::CControlUI* pRoot = builder.Create(gmui::GMUIConsole::UI, (UINT)0, &db, d->painter);
-	ASSERT(pRoot && "Failed to parse XML");
+	DuiLib::CControlUI* pRoot = builder.Create(GMUIConsole_UI::UI, (UINT)0, &db, d->painter);
+	GM_ASSERT(pRoot && "Failed to parse XML");
 	d->painter->AttachDialog(pRoot);
 	d->painter->AddNotifier(this);
 	LongResult result = Base::onCreate(uMsg, wParam, lParam, bHandled);
@@ -110,7 +107,7 @@ void GMUIConsole::afterCreated()
 {
 	D(d);
 	DuiLib::CRichEditUI* re = static_cast<DuiLib::CRichEditUI*> (d->painter->FindControl(ID_EDIT_CONSOLE));
-	ASSERT(re);	
+	GM_ASSERT(re);	
 	d->consoleEdit = re;
 	d->consoleEdit->SetBkColor(0);
 
@@ -311,7 +308,7 @@ void GMUIConsole::endProfile(const gm::GMString& name, gm::GMfloat elapsedInSeco
 	auto& targetInfo = std::find_if(infos.begin(), infos.end(), [id, level, &name](Data::ProfileInfo& info) {
 		return info.name == name && info.id == id && info.level == level;
 	});
-	ASSERT(targetInfo != infos.end());
+	GM_ASSERT(targetInfo != infos.end());
 	targetInfo->durationInSecond = elapsedInSecond;
 }
 
@@ -348,8 +345,8 @@ void GMUIConsole::update()
 
 		for (auto& info : profile.second)
 		{
-			gm::GMint w = (gm::GMint) info.durationInSecond * magnification, h = 12;
-			gm::GMint start = (gm::GMint) info.durationSinceStartInSecond * magnification;
+			gm::GMint w = (gm::GMint) (info.durationInSecond * magnification), h = 12;
+			gm::GMint start = (gm::GMint) (info.durationSinceStartInSecond * magnification);
 
 			d->profileGraph->penForward(start, 0);
 			d->profileGraph->drawText(info.name);
@@ -368,5 +365,3 @@ void GMUIConsole::update()
 	}
 	d->profileGraph->endDraw();
 }
-
-#endif

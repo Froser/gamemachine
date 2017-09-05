@@ -90,7 +90,7 @@ GMModelPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	GMModelPainter* painter;
 	factory->createPainter(engine, obj->getModel(), &painter);
-	ASSERT(!obj->getModel()->getPainter());
+	GM_ASSERT(!obj->getModel()->getPainter());
 	obj->getModel()->setPainter(painter);
 	return painter;
 }

@@ -250,7 +250,7 @@ public:
 public:
 	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMint index)
 	{
-		ASSERT(index < GMMaxTextureCount(type));
+		GM_ASSERT(index < GMMaxTextureCount(type));
 
 		D(d);
 		switch (type)
@@ -264,7 +264,7 @@ public:
 		case GMTextureType::LIGHTMAP:
 			return d->lightMap[index];
 		default:
-			ASSERT(false);
+			GM_ASSERT(false);
 			return d->ambients[0];
 		}
 	}

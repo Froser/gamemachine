@@ -21,7 +21,7 @@ public:
 
 	IModelReader* getReader(GMModelReader::ModelType type)
 	{
-		ASSERT(m_readers.find(type) != m_readers.end());
+		GM_ASSERT(m_readers.find(type) != m_readers.end());
 		return m_readers[type];
 	}
 

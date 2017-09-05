@@ -166,7 +166,7 @@ struct GMLuaVariable
 
 	operator GMObject*()
 	{
-		ASSERT(type == GMLuaVariableType::Object);
+		GM_ASSERT(type == GMLuaVariableType::Object);
 		return valPtrObject;
 	}
 
@@ -244,7 +244,7 @@ public:
 		{
 			lua_pushnumber(L, i);
 			lua_pushnumber(L, v[i]);
-			ASSERT(lua_istable(L, -3));
+			GM_ASSERT(lua_istable(L, -3));
 			lua_settable(L, -3);
 		}
 	}
@@ -261,7 +261,7 @@ public:
 	bool getVector(T& v, GMint index)
 	{
 		D(d);
-		ASSERT(lua_istable(L, index));
+		GM_ASSERT(lua_istable(L, index));
 		lua_pushnil(L);
 		while (lua_next(L, index))
 		{
@@ -287,7 +287,7 @@ public:
 		{
 			lua_pushnumber(L, i);
 			setVector(v[i]);
-			ASSERT(lua_istable(L, -3));
+			GM_ASSERT(lua_istable(L, -3));
 			lua_settable(L, -3);
 		}
 	}
@@ -304,7 +304,7 @@ public:
 	bool getMatrix(T& v, GMint index)
 	{
 		D(d);
-		ASSERT(lua_istable(L, index));
+		GM_ASSERT(lua_istable(L, index));
 		lua_pushnil(L);
 		while (lua_next(L, index))
 		{

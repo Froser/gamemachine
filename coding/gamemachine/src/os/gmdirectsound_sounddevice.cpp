@@ -13,10 +13,10 @@ static GMSoundPlayerDevice* g_device;
 GMSoundPlayerDevice::GMSoundPlayerDevice(IWindow* window)
 {
 	HRESULT hr = DirectSoundCreate8(NULL, &m_cpDirectSound, NULL);
-	ASSERT(SUCCEEDED(hr));
+	GM_ASSERT(SUCCEEDED(hr));
 
 	hr = m_cpDirectSound->SetCooperativeLevel(window->getWindowHandle(), DSSCL_PRIORITY);
-	ASSERT(SUCCEEDED(hr));
+	GM_ASSERT(SUCCEEDED(hr));
 }
 
 IDirectSound8* GMSoundPlayerDevice::getInstance()
