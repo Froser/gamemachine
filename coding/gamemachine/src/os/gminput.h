@@ -43,14 +43,13 @@ GM_INTERFACE(IKeyboardState)
 GM_INTERFACE(IMouseState)
 {
 	virtual GMMouseState mouseState() = 0;
-	virtual void initMouse(GMUIWindow* window) = 0;
+	virtual void initMouse(IWindow* window) = 0;
 	virtual void setMouseEnable(bool enable) = 0;
 };
 
 #if _WINDOWS
 #include <Xinput.h>
 
-class GMUIWindow;
 class XInputWrapper
 {
 	typedef DWORD( WINAPI *XInputGetState_Delegate)(DWORD dwUserIndex, XINPUT_STATE* pState);
@@ -75,7 +74,7 @@ GM_PRIVATE_OBJECT(Input_Windows)
 	enum { MAX_KEYS = 256 };
 	bool mouseReady;
 	bool mouseEnabled;
-	GMUIWindow* window;
+	IWindow* window;
 
 	// joystick (xinput)
 	XInputWrapper xinput;
@@ -142,7 +141,7 @@ public:
 
 	// IMouseState
 public:
-	virtual void initMouse(GMUIWindow* window) override;
+	virtual void initMouse(IWindow* window) override;
 	virtual GMMouseState mouseState() override;
 	virtual void setMouseEnable(bool center) override;
 };

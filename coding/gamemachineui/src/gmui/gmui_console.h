@@ -2,14 +2,11 @@
 #define __GMUI_CONSOLE_H__
 #include "common.h"
 #include "gmui.h"
-#include <queue>
-#include <list>
-#include "foundation/utilities/utilities.h"
-#include "foundation/gmprofile.h"
+#include <gamemachine.h>
 #include "gmuicontrols.h"
-BEGIN_NS
+BEGIN_UI_NS
 
-//GameMachineMessage params:
+//gm::GameMachineMessage params:
 namespace GMUIConsoleParam1_ns
 {
 	enum GMUIConsoleParam
@@ -46,17 +43,17 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 
 	struct ProfileInfo
 	{
-		GMString name;
-		GMfloat durationInSecond;
-		GMfloat durationSinceStartInSecond;
-		GMThreadHandle::id id;
-		GMint level;
+		gm::GMString name;
+		gm::GMfloat durationInSecond;
+		gm::GMfloat durationSinceStartInSecond;
+		gm::GMThreadHandle::id id;
+		gm::GMint level;
 	};
 
 	struct Message
 	{
 		OutputType type;
-		GMString message;
+		gm::GMString message;
 	};
 
 	DuiLib::CRichEditUI* consoleEdit;
@@ -69,35 +66,32 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	DuiLib::COptionUI* optFltDebug;
 	IUIGraph* profileGraph;
 	GMUIPainter* painter;
-	std::queue<Message> msgQueue;
-	std::list<Message> msgBuffer;
-	Bitset filter;
-	GMint tabIndex = 0;
+	Queue<Message> msgQueue;
+	List<Message> msgBuffer;
+	gm::Bitset filter;
+	gm::GMint tabIndex = 0;
 
-	Map<GMThreadHandle::id, Vector<ProfileInfo> > profiles;
+	Map<gm::GMThreadHandle::id, Vector<ProfileInfo> > profiles;
 };
 
 class GMUIConsole :
 	public GMUIGUIWindow,
 	public DuiLib::INotifyUI,
-	public IDebugOutput,
-	public IProfileHandler
+	public gm::IDebugOutput,
+	public gm::IProfileHandler
 {
 	DECLARE_PRIVATE(GMUIConsole)
 
 	typedef GMUIGUIWindow Base;
 
 public:
-	static void newConsoleWindow(AUTORELEASE OUT GMUIConsole** out);
-
-private:
 	GMUIConsole()
 	{
 		D(d);
 		D_BASE(db, Base);
 		GM_PROFILE_HANDLER(this);
 		d->painter = &db->painter;
-		d->filter.init( (GMint) Data::OutputType::EndOfOutputType);
+		d->filter.init( (gm::GMint) Data::OutputType::EndOfOutputType);
 		d->filter.setAll();
 	}
 
@@ -105,11 +99,11 @@ private:
 
 public:
 	virtual GMUIStringPtr getWindowClassName() const override;
-	virtual GMuint getClassStyle() const override { return CS_DBLCLKS; }
+	virtual gm::GMuint getClassStyle() const override { return CS_DBLCLKS; }
 	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual LongResult onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-	virtual void onFinalMessage(GMUIWindowHandle wndHandle) override;
+	virtual void onFinalMessage(gm::GMWindowHandle wndHandle) override;
 	virtual void update();
 
 public:
@@ -117,26 +111,26 @@ public:
 
 	// IDebugOutput
 public:
-	virtual void info(const GMString& msg) override;
-	virtual void warning(const GMString& msg) override;
-	virtual void error(const GMString& msg) override;
-	virtual void debug(const GMString& msg) override;
+	virtual void info(const gm::GMString& msg) override;
+	virtual void warning(const gm::GMString& msg) override;
+	virtual void error(const gm::GMString& msg) override;
+	virtual void debug(const gm::GMString& msg) override;
 
 	// IProfileHandler
 public:
-	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadHandle::id id, GMint level) override;
-	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadHandle::id id, GMint level) override;
+	virtual void beginProfile(const gm::GMString& name, gm::GMfloat durationSinceStartInSecond, gm::GMThreadHandle::id id, gm::GMint level) override;
+	virtual void endProfile(const gm::GMString& name, gm::GMfloat elapsedInSecond, gm::GMThreadHandle::id id, gm::GMint level) override;
 
 	// GMObject
 public:
-	virtual bool event(const GameMachineMessage& msg) override;
+	virtual bool event(const gm::GameMachineMessage& msg) override;
 
 private:
-	void insertText(Data::OutputType type, const GMString& msg);
-	void insertTextToRichEdit(Data::OutputType type, const GMString& msg);
+	void insertText(Data::OutputType type, const gm::GMString& msg);
+	void insertTextToRichEdit(Data::OutputType type, const gm::GMString& msg);
 	void afterCreated();
-	void selectTab(GMint i);
-	void addBuffer(Data::OutputType type, const GMString& msg);
+	void selectTab(gm::GMint i);
+	void addBuffer(Data::OutputType type, const gm::GMString& msg);
 	void onFilterChanged();
 	void refreshOptFilter();
 	void refreshTabs();
@@ -144,5 +138,5 @@ private:
 
 #endif
 
-END_NS
+END_UI_NS
 #endif

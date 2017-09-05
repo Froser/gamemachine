@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmdirectsound_sounddevice.h"
 #include "gmdatacore/soundreader/gmsoundreader.h"
-#include "gmui/gmui.h"
 
 #if _WINDOWS
 
@@ -11,7 +10,7 @@
 
 static GMSoundPlayerDevice* g_device;
 
-GMSoundPlayerDevice::GMSoundPlayerDevice(GMUIWindow* window)
+GMSoundPlayerDevice::GMSoundPlayerDevice(IWindow* window)
 {
 	HRESULT hr = DirectSoundCreate8(NULL, &m_cpDirectSound, NULL);
 	ASSERT(SUCCEEDED(hr));
@@ -25,7 +24,7 @@ IDirectSound8* GMSoundPlayerDevice::getInstance()
 	return g_device->m_cpDirectSound;
 }
 
-void GMSoundPlayerDevice::createInstance(GMUIWindow* window)
+void GMSoundPlayerDevice::createInstance(IWindow* window)
 {
 	if (!g_device)
 		g_device = new GMSoundPlayerDevice(window);

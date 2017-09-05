@@ -1,29 +1,23 @@
 ﻿#ifndef __GAMEMACHINE_H__
 #define __GAMEMACHINE_H__
 #include "common.h"
-#include "foundation/utilities/utilities.h"
-#include <queue>
-#include "gmdatacore/glyph/gmglyphmanager.h"
-#include "gmdatacore/gamepackage/gmgamepackage.h"
-#include "os/gminput.h"
+#include <utilities.h>
+#include "../gmdatacore/glyph/gmglyphmanager.h"
+#include "../gmdatacore/gamepackage/gmgamepackage.h"
+#include "../os/gminput.h"
+#include "../gmengine/gmcamera.h"
 #include "gmthreads.h"
-#include "gmui/gmui.h"
-#include "gmui/gmui_console.h"
-#include "gmengine/gmcamera.h"
 
 BEGIN_NS
 
 #define GM GameMachine::instance()
 
-typedef Vector<Pair<GMUIWindow*, GMUIWindowAttributes> > GameMachineWindows;
-
 GM_PRIVATE_OBJECT(GameMachine)
 {
-	GMUIInstance instance;
-	GMUIWindowAttributes mainWindowAttributes;
+	GMWindowAttributes mainWindowAttributes;
 	GMClock clock;
 
-	GMUIWindow* mainWindow = nullptr;
+	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	IGraphicEngine* engine = nullptr;
 	GMGlyphManager* glyphManager = nullptr;
@@ -31,12 +25,11 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IInput* inputManager = nullptr;
 	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
-	GMUIConsole* consoleWindow = nullptr; // 内置调试窗口
+	IDebugOutput* consoleWindow = nullptr; // 内置调试窗口
 
 	GMCamera camera;
 	Queue<GameMachineMessage> messageQueue;
 	Vector<IDispose*> manangerQueue;
-	GameMachineWindows windows; // 除主窗口以外的窗口列表
 
 	GMfloat lastFrameElpased = 0;
 };
@@ -63,29 +56,26 @@ public:
 	};
 
 public:
-	GameMachine();
+	GameMachine() = default;
 
 public:
 	void init(
-		GMUIInstance instance,
+		AUTORELEASE IWindow* mainWindow,
+		AUTORELEASE IWindow* consoleWindow,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
 
-	void setMainWindowAttributes(const GMUIWindowAttributes& attrs);
+	void setMainWindowAttributes(const GMWindowAttributes& attrs);
 
 	// 绘制引擎
 	inline IGraphicEngine* getGraphicEngine() { D(d); return d->engine; }
 
 	// 主窗口
-	inline GMUIWindow* getMainWindow() { D(d); return d->mainWindow; }
+	inline IWindow* getMainWindow() { D(d); return d->mainWindow; }
 
 	// 工厂管理
 	inline IFactory* getFactory() { D(d); return d->factory; }
-
-	// 窗口管理
-	GMUIWindow* appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs);
-	inline const GameMachineWindows& getWindows() { D(d); return d->windows; }
 
 	// 配置管理
 	GMStates* getStatesManager() { D(d); return d->statesManager; }
@@ -122,9 +112,6 @@ private:
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
 	void terminate();
 	bool handleMessages();
-	void defaultMainWindowAttributes();
-	void createWindows();
-	void updateWindows();
 	void initInner();
 };
 

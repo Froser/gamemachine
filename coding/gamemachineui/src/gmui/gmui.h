@@ -1,6 +1,7 @@
 ﻿#ifndef __GMUI_H__
 #define __GMUI_H__
-#include "common.h"
+#include "../../common.h"
+#include <gamemachine.h>
 
 #if _WINDOWS
 #	include <windef.h>
@@ -8,7 +9,6 @@
 
 typedef DuiLib::CWindowWnd GMUIWindowBase;
 typedef DuiLib::CPaintManagerUI GMUIPainter;
-typedef HWND GMUIWindowHandle;
 typedef WNDPROC GMUIWindowProc;
 typedef HINSTANCE GMUIInstance;
 typedef LPCTSTR GMUIStringPtr;
@@ -16,55 +16,47 @@ typedef LRESULT LongResult;
 typedef WPARAM UintPtr;
 typedef LPARAM LongPtr;
 
-struct GMUIWindowAttributes
-{
-	HWND hwndParent;
-	LPCTSTR pstrName;
-	DWORD dwStyle;
-	DWORD dwExStyle;
-	RECT rc;
-	HMENU hMenu;
-	GMUIInstance instance;
-};
 #else
-typedef void* GMUIWindowHandle;
+typedef void* gm::GMWindowHandle;
 typedef void* GMUIWindowProc;
 typedef void* GMUIInstance;
-typedef GMWchar* GMUIStringPtr;
-typedef GMlong LongPtr;
-typedef GMuint UintPtr;
-typedef GMlong LongPtr;
+typedef gm::GMWchar* GMUIStringPtr;
+typedef gm::GMlong LongPtr;
+typedef gm::GMuint UintPtr;
+typedef gm::GMlong LongPtr;
 #endif
 
-BEGIN_NS
-class GMUIWindow : public GMObject, private GMUIWindowBase
+BEGIN_UI_NS
+class GMUIWindow : public gm::GMObject, public gm::IWindow, private GMUIWindowBase
 {
 	typedef GMUIWindowBase Base;
 
 public:
-	static bool handleMessage();
+	operator gm::GMWindowHandle() const { return getWindowHandle(); }
+
+	// IWindow
+public:
+	virtual void update() override {} ;
+	virtual void swapBuffers() const override {};
+	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& attrs) override;
+	virtual gm::GMRect getWindowRect() override;
+	virtual gm::GMRect getClientRect() override;
+	virtual void showWindow() override { showWindowEx(); }
+	virtual void centerWindow() override { return Base::CenterWindow(); }
+	gm::GMWindowHandle getWindowHandle() const override { return Base::GetHWND(); }
+	virtual bool handleMessage() override { return DuiLib::CPaintManagerUI::HandleMessage(); }
 
 public:
-	GMUIWindowHandle getWindowHandle() const { return Base::GetHWND(); }
-	operator GMUIWindowHandle() const { return getWindowHandle(); }
-
-public:
-	virtual GMUIWindowHandle create(const GMUIWindowAttributes& attrs);
-	virtual GMRect getWindowRect();
-	virtual GMRect getClientRect();
-	virtual void swapBuffers() const {}
-	virtual void centerWindow() { return Base::CenterWindow(); }
-	virtual GMuint showModal() { return Base::ShowModal(); }
-	virtual void showWindow(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
-	virtual void onFinalMessage(GMUIWindowHandle wndHandle) {}
-	virtual void update() {};
+	virtual gm::GMuint showModal() { return Base::ShowModal(); }
+	virtual void showWindowEx(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
+	virtual void onFinalMessage(gm::GMWindowHandle wndHandle) {}
 
 private:
 	virtual GMUIStringPtr getWindowClassName() const = 0;
-	virtual GMuint getClassStyle() const { return 0; }
+	virtual gm::GMuint getClassStyle() const { return 0; }
 
 protected:
-	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) { return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam); }
+	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) { return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam); }
 
 #if _WINDOWS
 	// From base:
@@ -95,7 +87,7 @@ public:
 	void refreshWindow();
 
 public:
-	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
+	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 
 protected:
 	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
@@ -112,6 +104,18 @@ protected:
 };
 
 #endif
-END_NS
+
+//Factory
+class GMUIFactory
+{
+public:
+	static void createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window);
+	static void createConsoleWindow(gm::GMInstance instance, OUT gm::IDebugOutput** window);
+
+private:
+	static void initEnvironment(gm::GMInstance instance);
+};
+
+END_UI_NS
 
 #endif

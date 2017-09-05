@@ -2,8 +2,8 @@
 #define __GAMEPACKAGE_H__
 #include "common.h"
 #include <string>
-#include "foundation/utilities/utilities.h"
-#include "foundation/vector.h"
+#include "utilities.h"
+#include "gamemachine.h"
 BEGIN_NS
 
 enum class GMPackageIndex

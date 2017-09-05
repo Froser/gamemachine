@@ -65,11 +65,6 @@ void GMObject::detachEvent(GMObject& sender, const char* eventName)
 	sender.removeEventAndConnection(eventName, *this);
 }
 
-bool GMObject::event(const GameMachineMessage& msg)
-{
-	return false;
-}
-
 void GMObject::addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback)
 {
 	D(d);

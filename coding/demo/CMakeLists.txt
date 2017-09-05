@@ -9,6 +9,8 @@ include_directories(
 		../3rdparty/duilib
 		../3rdparty/lua/src
 		../gamemachine/src
+		../gamemachine/include
+		../gamemachineui/include
 	)
 
 link_directories(
@@ -41,6 +43,7 @@ if(MSVC)
 endif(MSVC)
 
 target_link_libraries(${PROJECT_NAME} gamemachine)
+target_link_libraries(${PROJECT_NAME} gamemachineui)
 target_link_libraries(${PROJECT_NAME} png_static)
 target_link_libraries(${PROJECT_NAME} zlibstatic)
 target_link_libraries(${PROJECT_NAME} libmad)

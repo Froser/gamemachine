@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
-#include "gmui/gmui_glwindow.h"
-#include "foundation/gamemachine.h"
+#include "gmui_glwindow.h"
+#include <gamemachine.h>
 
 #if _WINDOWS
 
@@ -16,11 +16,11 @@ GMUIGLWindow::~GMUIGLWindow()
 	dispose();
 }
 
-GMUIWindowHandle GMUIGLWindow::create(const GMUIWindowAttributes& wndAttrs)
+gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 {
 	D(d);
 
-	GMUIWindowAttributes attrs = wndAttrs;
+	gm::GMWindowAttributes attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION | WS_VISIBLE;
 
@@ -35,8 +35,8 @@ GMUIWindowHandle GMUIGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 		return false;
 	}
 
-	const GMbyte colorDepth = 32, alphaBits = 8;
-	GMuint pixelFormat;
+	const gm::GMbyte colorDepth = 32, alphaBits = 8;
+	gm::GMuint pixelFormat;
 	static PIXELFORMATDESCRIPTOR pfd =						//pfd tells windows how we want things to be
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),						//size of Pixel format descriptor
@@ -59,7 +59,7 @@ GMUIWindowHandle GMUIGLWindow::create(const GMUIWindowAttributes& wndAttrs)
 		0, 0, 0												//layer masks ignored
 	};
 
-	GMUIWindowHandle wnd = getWindowHandle();
+	gm::GMWindowHandle wnd = getWindowHandle();
 	if (!(d->hDC = GetDC(wnd)))
 	{
 		dispose();
@@ -111,7 +111,7 @@ void GMUIGLWindow::swapBuffers() const
 	::SwapBuffers(d->hDC);
 }
 
-LongResult GMUIGLWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam)
+LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
 {
 	D(d);
 	switch (uMsg)
@@ -122,7 +122,7 @@ LongResult GMUIGLWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPar
 	case WM_SIZE:
 		{
 			auto res = DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
-			GameMachine::instance().postMessage({ GameMachineMessageType::WindowSizeChanged });
+			gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
 			return res;
 		}
 	default:
@@ -134,7 +134,7 @@ LongResult GMUIGLWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPar
 void GMUIGLWindow::dispose()
 {
 	D(d);
-	GMUIWindowHandle wnd = getWindowHandle();
+	gm::GMWindowHandle wnd = getWindowHandle();
 	if (d->hRC)
 	{
 		if (!wglMakeCurrent(0, 0))

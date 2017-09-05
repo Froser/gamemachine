@@ -67,10 +67,10 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 	public:																					\
 		typedef className##Private Data;													\
 	private:																				\
-		GMObjectPrivateWrapper<className##Private> m_data;									\
-		virtual GMObjectPrivateWrapper<GMObject>* dataWrapper() {							\
-			return reinterpret_cast<GMObjectPrivateWrapper<GMObject>*>(						\
-				const_cast<GMObjectPrivateWrapper<className##Private>*>(&m_data)); }		\
+		gm::GMObjectPrivateWrapper<className##Private> m_data;								\
+		virtual gm::GMObjectPrivateWrapper<gm::GMObject>* dataWrapper() {					\
+			return reinterpret_cast<gm::GMObjectPrivateWrapper<gm::GMObject>*>(				\
+				const_cast<gm::GMObjectPrivateWrapper<className##Private>*>(&m_data)); }	\
 	protected:																				\
 		className##Private* data() const { if (!m_data.data()) return nullptr;				\
 			m_data.data()->parent = const_cast<className*>(this); return m_data.data();}
@@ -81,7 +81,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 #define D_OF(d, ptr) auto d = (ptr)->data()
 
 // 为一个对象定义private部分
-#define GM_PRIVATE_OBJECT(name) class name; GM_ALIGNED_16(struct) name##Private : public GMObjectPrivateBase<name>
+#define GM_PRIVATE_OBJECT(name) class name; GM_ALIGNED_16(struct) name##Private : public gm::GMObjectPrivateBase<name>
 #define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_CONSTRUCT(name) name##Private()
@@ -235,9 +235,6 @@ public:
 #endif
 	}
 
-public:
-	virtual bool event(const GameMachineMessage& msg);
-
 private:
 	void addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback);
 	void removeEventAndConnection(const char* eventName, GMObject& receiver);
@@ -251,7 +248,7 @@ protected:
 };
 
 // 接口统一定义
-#define GM_INTERFACE(name) struct name : public IDispose
+#define GM_INTERFACE(name) struct name : public gm::IDispose
 
 template <typename T>
 class GMSingleton : public GMObject

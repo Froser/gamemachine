@@ -17,12 +17,12 @@ class GMUIWindow;
 class GMSoundPlayerDevice
 {
 public:
-	static void createInstance(GMUIWindow* window);
+	static void createInstance(IWindow* window);
 	static IDirectSound8* getInstance();
 	static void terminate();
 
 private:
-	GMSoundPlayerDevice(GMUIWindow* window);
+	GMSoundPlayerDevice(IWindow* window);
 
 private:
 	ComPtr<IDirectSound8> m_cpDirectSound;

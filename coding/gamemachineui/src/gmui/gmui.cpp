@@ -1,33 +1,29 @@
 ﻿#include "stdafx.h"
 #include "gmui.h"
-#include "foundation/gmprofile.h"
-#include "foundation/gamemachine.h"
+#include <gamemachine.h>
+#include "gmui_glwindow.h"
+#include "gmui_console.h"
 
 #if _WINDOWS
 
-bool GMUIWindow::handleMessage()
-{
-	return DuiLib::CPaintManagerUI::HandleMessage();
-}
-
-GMUIWindowHandle GMUIWindow::create(const GMUIWindowAttributes& wndAttrs)
+gm::GMWindowHandle GMUIWindow::create(const gm::GMWindowAttributes& wndAttrs)
 {
 	return Base::Create(wndAttrs.hwndParent, wndAttrs.pstrName, wndAttrs.dwStyle, wndAttrs.dwExStyle, wndAttrs.rc, wndAttrs.hMenu);
 }
 
-GMRect GMUIWindow::getWindowRect()
+gm::GMRect GMUIWindow::getWindowRect()
 {
 	RECT rect;
 	GetWindowRect(getWindowHandle(), &rect);
-	GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
+	gm::GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
 	return r;
 }
 
-GMRect GMUIWindow::getClientRect()
+gm::GMRect GMUIWindow::getClientRect()
 {
 	RECT rect;
 	GetClientRect(getWindowHandle(), &rect);
-	GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
+	gm::GMRect r = { rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top };
 	return r;
 }
 
@@ -50,7 +46,7 @@ void GMUIGUIWindow::refreshWindow()
 	::InvalidateRect(getWindowHandle(), &rc, TRUE);
 }
 
-LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam)
+LongResult GMUIGUIWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
 {
 	D(d);
 	LRESULT lRes = 0;
@@ -77,4 +73,23 @@ LongResult GMUIGUIWindow::handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lPa
 		return lRes;
 	return Base::handleMessage(uMsg, wParam, lParam);
 }
+
+// factory
+void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window)
+{
+	initEnvironment(instance);
+	(*window) = new GMUIGLWindow();
+}
+
+void GMUIFactory::createConsoleWindow(gm::GMInstance instance, OUT gm::IDebugOutput** window)
+{
+	initEnvironment(instance);
+	(*window) = new GMUIConsole();
+}
+
+void GMUIFactory::initEnvironment(gm::GMInstance instance)
+{
+	GMUIPainter::SetInstance(instance);
+}
+
 #endif

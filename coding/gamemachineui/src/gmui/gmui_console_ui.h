@@ -1,10 +1,10 @@
-﻿BEGIN_NS
+﻿BEGIN_UI_NS
 
 namespace gmui
 {
 	struct GMUIConsole
 	{
-		static const GMWchar* UI;
+		static const gm::GMWchar* UI;
 	};
 }
 
@@ -18,7 +18,7 @@ namespace gmui
 #define	ID_OPTION_FILTER_DEBUG		_L("Option_Debug")
 #define	ID_PROFILE_GRAPH			_L("Option_Profile_Graph")
 
-const GMWchar* gmui::GMUIConsole::UI = L""
+const gm::GMWchar* gmui::GMUIConsole::UI = L""
 	L"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?> "
 	L"<Window size=\"700,700\"> "
 	L"    <VerticalLayout enabled=\"true\" bkcolor=\"#FFA6CAF0\"> "
@@ -43,4 +43,4 @@ const GMWchar* gmui::GMUIConsole::UI = L""
 	L"    </VerticalLayout> "
 	L"</Window> "
 ;
-END_NS
+END_UI_NS

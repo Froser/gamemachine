@@ -11,6 +11,7 @@
 #include "renders/gmgl_renders_particle.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmstates.h"
+#include "foundation/gmprofile.h"
 
 extern "C"
 {

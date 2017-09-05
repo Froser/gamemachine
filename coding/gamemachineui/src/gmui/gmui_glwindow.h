@@ -1,8 +1,9 @@
 ﻿#ifndef __WINGL_WINDOW_H__
 #define __WINGL_WINDOW_H__
 #include "common.h"
-#include "gmui/gmui.h"
-BEGIN_NS
+#include "gmui.h"
+
+BEGIN_UI_NS
 
 #if _WINDOWS
 
@@ -24,13 +25,13 @@ public:
 	~GMUIGLWindow();
 
 public:
-	virtual GMUIWindowHandle create(const GMUIWindowAttributes& wndAttrs) override;
+	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs) override;
 	virtual void swapBuffers() const override;
-	virtual LongResult handleMessage(GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
+	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 
 private:
 	inline virtual GMUIStringPtr getWindowClassName() const override { return _L("gamemachine_mainWindow_class"); }
-	inline virtual GMuint getClassStyle() const override { return 0; }
+	inline virtual gm::GMuint getClassStyle() const override { return 0; }
 
 private:
 	void dispose();
@@ -38,5 +39,5 @@ private:
 
 #endif
 
-END_NS
+END_UI_NS
 #endif

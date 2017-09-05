@@ -3,33 +3,22 @@
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmengine/gmgameobject.h"
 #include "gmstates.h"
-#include "gmui/gmui.h"
 
 #if _WINDOWS
 #	include "os/gmdirectsound_sounddevice.h"
 #endif
 
-GameMachine::GameMachine()
-{
-	defaultMainWindowAttributes();
-}
-
 void GameMachine::init(
-	GMUIInstance instance,
+	AUTORELEASE IWindow* mainWindow,
+	AUTORELEASE IWindow* consoleWindow,
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
 )
 {
 	D(d);
-	d->instance = instance;
-	GMUIPainter::SetInstance(d->instance);
-
 	registerManager(factory, &d->factory);
 	registerManager(gameHandler, &d->gameHandler);
-
-	GMUIWindow* window;
-	d->factory->createWindow(&window);
-	registerManager(window, &d->mainWindow);
+	registerManager(mainWindow, &d->mainWindow);
 
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
@@ -43,17 +32,10 @@ void GameMachine::init(
 	d->gameHandler->init();
 }
 
-void GameMachine::setMainWindowAttributes(const GMUIWindowAttributes& attrs)
+void GameMachine::setMainWindowAttributes(const GMWindowAttributes& attrs)
 {
 	D(d);
 	d->mainWindowAttributes = attrs;
-}
-
-GMUIWindow* GameMachine::appendWindow(AUTORELEASE GMUIWindow* window, const GMUIWindowAttributes& attrs)
-{
-	D(d);
-	d->windows.push_back(makePair(window, attrs) );
-	return window;
 }
 
 void GameMachine::postMessage(GameMachineMessage msg)
@@ -96,9 +78,6 @@ void GameMachine::startGameMachine()
 	d->mainWindow->centerWindow();
 	d->mainWindow->showWindow();
 
-	// 创建其他窗口
-	createWindows();
-
 #if _WINDOWS
 	// 创建声音设备
 	GMSoundPlayerDevice::createInstance(d->mainWindow);
@@ -127,7 +106,7 @@ void GameMachine::startGameMachine()
 		if (bNeedControlFrameRate)
 			frameCounter.begin();
 
-		if (!GMUIWindow::handleMessage())
+		if (!d->mainWindow->handleMessage())
 			break;
 
 		if (!handleMessages())
@@ -147,7 +126,6 @@ void GameMachine::startGameMachine()
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
 
 		// 更新所有管理器
-		updateWindows();
 		d->inputManager->update();
 		d->clock.update();
 
@@ -190,7 +168,8 @@ bool GameMachine::handleMessages()
 			return false;
 		case GameMachineMessageType::Console:
 			{
-				d->consoleWindow->event(msg);
+				if (d->consoleWindow)
+					d->consoleWindow->event(msg);
 			}
 		default:
 			break;
@@ -202,59 +181,9 @@ bool GameMachine::handleMessages()
 	return true;
 }
 
-void GameMachine::defaultMainWindowAttributes()
-{
-	D(d);
-	GMUIWindowAttributes attrs =
-	{
-		NULL,
-		L"DefaultGameMachineWindow",
-		WS_OVERLAPPEDWINDOW,
-		0,
-		{ 0, 0, 700, 400 },
-		NULL,
-		d->instance,
-	};
-	setMainWindowAttributes(attrs);
-}
-
-void GameMachine::createWindows()
-{
-	D(d);
-	for (auto& window : d->windows)
-	{
-		ASSERT(window.first);
-		GMUIWindowAttributes attrs = window.second;
-		attrs.hwndParent = d->mainWindow->getWindowHandle();
-		window.first->create(attrs);
-	}
-}
-
-void GameMachine::updateWindows()
-{
-	D(d);
-	for (auto& window : d->windows)
-	{
-		window.first->update();
-	}
-}
-
 void GameMachine::initInner()
 {
 	D(d);
-	GMUIWindowAttributes attrs =
-	{
-		NULL,
-		L"GameMachineConsoleWindow",
-		WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU,
-		WS_EX_CLIENTEDGE,
-		{ 0, 0, 700, 400 },
-		NULL,
-		d->instance,
-	};
-
-	GMUIConsole::newConsoleWindow(&d->consoleWindow);
-	appendWindow(d->consoleWindow, attrs);
 	GMDebugger::setDebugOutput(d->consoleWindow);
 }
 
@@ -274,5 +203,8 @@ void GameMachine::terminate()
 	{
 		delete manager;
 	}
+
+	if (d->consoleWindow)
+		delete d->consoleWindow;
 	GMSoundPlayerDevice::terminate();
 }

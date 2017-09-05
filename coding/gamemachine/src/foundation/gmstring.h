@@ -1,7 +1,7 @@
 ﻿#ifndef __GMSTRING_H__
 #define __GMSTRING_H__
-#include "foundation/defines.h"
-#include "foundation/gmobject.h"
+#include "../foundation/defines.h"
+#include "../foundation/gmobject.h"
 #include <string>
 #include "assert.h"
 BEGIN_NS

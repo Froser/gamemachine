@@ -2,9 +2,8 @@
 #define __ASSERT_H__
 #include "defines.h"
 
-BEGIN_NS
 #if _DEBUG
-#define ASSERT(cond) ((!(cond)) ? Assert::gm_assert(#cond, __FILE__, __LINE__) : Assert::noop())
+#define ASSERT(cond) ((!(cond)) ? gm::Assert::gm_assert(#cond, __FILE__, __LINE__) : gm::Assert::noop())
 #else
 #define ASSERT(cond)
 #endif
@@ -12,6 +11,8 @@ BEGIN_NS
 #ifdef assert
 #undef assert
 #endif
+
+BEGIN_NS
 class Assert
 {
 public:

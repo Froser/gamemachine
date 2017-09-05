@@ -1,7 +1,7 @@
 ﻿#ifndef __GMCAMERA_H__
 #define __GMCAMERA_H__
 #include "common.h"
-#include "foundation/utilities/utilities.h"
+#include <utilities.h>
 BEGIN_NS
 
 class GMSpriteGameObject;

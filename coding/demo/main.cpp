@@ -14,14 +14,14 @@
 
 #include <fstream>
 #include "gmdatacore/soundreader/gmsoundreader.h"
-#include "gmui/gmui.h"
-#include "gmui/gmui_glwindow.h"
 #include "gmengine/gmdemogameworld.h"
 #include "gmengine/gmspritegameobject.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "gmengine/gmparticles.h"
 #include "foundation/utilities/gmprimitivecreator.h"
 #include "gmlua/gmlua.h"
+#include "foundation/interfaces.h"
+#include <gmui.h>
 
 #define EMITTER_DEMO 1
 
@@ -255,7 +255,7 @@ public:
 
 	bool isWindowActivate()
 	{
-		GMUIWindow* window = GameMachine::instance().getMainWindow();
+		IWindow* window = GameMachine::instance().getMainWindow();
 		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
@@ -655,7 +655,10 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	GMUIWindowAttributes attrs =
+	gm::IWindow* mainWindow = nullptr;
+	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow);
+
+	GMWindowAttributes attrs =
 	{
 		NULL,
 		L"Default",
@@ -665,9 +668,20 @@ int WINAPI WinMain(
 		NULL,
 	};
 
+	GMWindowAttributes attrs2 =
+	{
+		NULL,
+		L"GameMachineConsoleWindow",
+		WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU,
+		WS_EX_CLIENTEDGE,
+		{ 0, 0, 700, 400 },
+		NULL,
+	};
+
 	GM.setMainWindowAttributes(attrs);
 	GM.init(
-		hInstance,
+		mainWindow,
+		0,
 		new GMGLFactory(),
 		new GameHandler()
 	);

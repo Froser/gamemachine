@@ -3,7 +3,7 @@
 
 #if _WINDOWS
 #	define RGBA(r,g,b,a) RGB(r, g, b) | (a << 24)
-const GMint MARGIN = 10;
+const gm::GMint MARGIN = 10;
 
 void GMUIGraph::drawGraph(HDC hDC, const RECT& rcPaint)
 {
@@ -91,14 +91,14 @@ void GMUIGraph::drawCommand(const GMGraphCommand& cmd, HDC hDC, const RECT& rcPa
 	}
 }
 
-void GMUIGraph::setPenPosition(GMint x, GMint y)
+void GMUIGraph::setPenPosition(gm::GMint x, gm::GMint y)
 {
 	D(d);
 	d->currentPos[0] = x;
 	d->currentPos[1] = y;
 }
 
-void GMUIGraph::movePenPosition(GMint x, GMint y)
+void GMUIGraph::movePenPosition(gm::GMint x, gm::GMint y)
 {
 	D(d);
 	d->currentPos[0] += x;
@@ -118,15 +118,15 @@ void GMUIGraph::clearGraph()
 	addCommand(cmd);
 }
 
-void GMUIGraph::drawText(const GMString& msg)
+void GMUIGraph::drawText(const gm::GMString& msg)
 {
 	GMGraphCommand cmd = { GMGraphCommandType::Draw_Text,{ 0, 0, 0, 0, 0, 0, msg } };
 	addCommand(cmd);
 }
 
-void GMUIGraph::drawRect(GMlong rgb, GMint width, GMint height)
+void GMUIGraph::drawRect(gm::GMlong rgb, gm::GMint width, gm::GMint height)
 {
-	GMbyte r = GetRValue(rgb), g = GetGValue(rgb), b = GetBValue(rgb);
+	gm::GMbyte r = GetRValue(rgb), g = GetGValue(rgb), b = GetBValue(rgb);
 	GMGraphCommand cmd = { GMGraphCommandType::Draw_Rect,{ r, g, b, width, height } };
 	addCommand(cmd);
 }
@@ -137,13 +137,13 @@ void GMUIGraph::penEnter()
 	addCommand(cmd);
 }
 
-void GMUIGraph::penReturn(GMint yOffset)
+void GMUIGraph::penReturn(gm::GMint yOffset)
 {
 	GMGraphCommand cmd = { GMGraphCommandType::Control_Return,{ yOffset } };
 	addCommand(cmd);
 }
 
-void GMUIGraph::penForward(GMint xOffset, GMint yOffset)
+void GMUIGraph::penForward(gm::GMint xOffset, gm::GMint yOffset)
 {
 	GMGraphCommand cmd = { GMGraphCommandType::Control_Forward,{ xOffset, yOffset } };
 	addCommand(cmd);

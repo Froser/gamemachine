@@ -7,12 +7,14 @@
 
 BEGIN_NS
 
+struct GameMachineMessage;
 GM_INTERFACE(IDebugOutput)
 {
 	virtual void info(const GMString& msg) = 0;
 	virtual void warning(const GMString& msg) = 0;
 	virtual void error(const GMString& msg) = 0;
 	virtual void debug(const GMString& msg) = 0;
+	virtual bool event(const GameMachineMessage& msg) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMDebugger)
@@ -61,20 +63,20 @@ public:
 };
 
 // debug macros:
-#define gm_info GMDebugger::instance().info
-#define gm_error GMDebugger::instance().error
-#define gm_warning GMDebugger::instance().warning
+#define gm_info gm::GMDebugger::instance().info
+#define gm_error gm::GMDebugger::instance().error
+#define gm_warning gm::GMDebugger::instance().warning
 #if _DEBUG
-#	define gm_debug GMDebugger::instance().debug
+#	define gm_debug gm::GMDebugger::instance().debug
 #else
 #	define gm_debug(i)
 #endif
 
 // hooks
-#define gm_install_hook(cls, name, funcPtr) { Hooks::install(#cls"_"#name, funcPtr); }
-#define gm_hook(cls, name) { Hooks::invoke0(#cls"_"#name)}
-#define gm_hook1(cls, name, arg1) { Hooks::invoke1(#cls"_"#name, gm_hook_arg(arg1));}
-#define gm_hook2(cls, name, arg1, arg2) { Hooks::invoke2(#cls"_"#name, gm_hook_arg(arg1), gm_hook_arg(arg2));}
+#define gm_install_hook(cls, name, funcPtr) { gm::Hooks::install(#cls"_"#name, funcPtr); }
+#define gm_hook(cls, name) { gm::Hooks::invoke0(#cls"_"#name)}
+#define gm_hook1(cls, name, arg1) { gm::Hooks::invoke1(#cls"_"#name, gm_hook_arg(arg1));}
+#define gm_hook2(cls, name, arg1, arg2) { gm::Hooks::invoke2(#cls"_"#name, gm_hook_arg(arg1), gm_hook_arg(arg2));}
 #define gm_hook_arg(arg) ((void*)arg)
 
 typedef void(*Hook0)();
@@ -83,9 +85,9 @@ typedef void(*Hook2)(void*, void*);
 
 class Hooks
 {
-	typedef std::set<Hook0> Hook0_t;
-	typedef std::set<Hook1> Hook1_t;
-	typedef std::set<Hook2> Hook2_t;
+	typedef Set<Hook0> Hook0_t;
+	typedef Set<Hook1> Hook1_t;
+	typedef Set<Hook2> Hook2_t;
 
 public:
 	static void invoke0(const GMString& identifier);

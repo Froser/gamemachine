@@ -175,7 +175,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 {
 	D(d);
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
-	GMUIWindow* window = GM.getMainWindow();
+	IWindow* window = GM.getMainWindow();
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 

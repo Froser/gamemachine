@@ -5,19 +5,6 @@
 #include "gmglmodelpainter.h"
 #include "gmglgamepackagehandler.h"
 #include "gmglglyphmanager.h"
-#include "gmui/gmui_glwindow.h"
-
-void GMGLFactory::createWindow(OUT GMUIWindow** window)
-{
-	ASSERT(window);
-#if _WINDOWS
-	*window = new GMUIGLWindow();
-#elif defined __APPLE__
-	;
-#else
-#error need implement
-#endif
-}
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {

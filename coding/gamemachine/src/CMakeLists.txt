@@ -1,12 +1,12 @@
 include_directories(
 		./
+		../include
 		../../3rdparty/glew/include
 		../../3rdparty/libpng
 		../../3rdparty/jpeg-6b
 		../../3rdparty/zlib
 		../../3rdparty/freetype-2.3.5/include
 		../../3rdparty/libmad
-		../../3rdparty/duilib
 		../../3rdparty/lua/src
 	)
 
@@ -152,15 +152,6 @@ set(SOURCES
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
 		foundation/gmstring.cpp
-		gmui/gmui.h
-		gmui/gmui.cpp
-		gmui/gmuicontrols.h
-		gmui/gmuicontrols.cpp
-		gmui/gmui_glwindow.h
-		gmui/gmui_glwindow.cpp
-		gmui/gmui_console.h
-		gmui/gmui_console_ui.h
-		gmui/gmui_console.cpp
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h

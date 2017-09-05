@@ -1,8 +1,8 @@
 ﻿#ifndef __UTILITIES_H__
 #define __UTILITIES_H__
 #include "common.h"
-#include "foundation/linearmath.h"
-#include "foundation/vector.h"
+#include "../linearmath.h"
+#include "../vector.h"
 #include <time.h>
 BEGIN_NS
 

@@ -1,17 +1,17 @@
 ﻿#ifndef __GMCONFIG_H__
 #define __GMCONFIG_H__
-#include "foundation/gmobject.h"
+#include "gmobject.h"
 BEGIN_NS
 
-#define GMDebugStates (GameMachine::instance().getStatesManager()->getDebugStates())
-#define GMGetDebugState(i) (GMDebugStates.getInt32(GMStates_DebugOptions::i))
-#define GMSetDebugState(i, value) (GMDebugStates.setInt32(GMStates_DebugOptions::i, value))
+#define GMDebugStates (gm::GameMachine::instance().getStatesManager()->getDebugStates())
+#define GMGetDebugState(i) (GMDebugStates.getInt32(gm::GMStates_DebugOptions::i))
+#define GMSetDebugState(i, value) (GMDebugStates.setInt32(gm::GMStates_DebugOptions::i, value))
 
-#define GMRenderStates (GameMachine::instance().getStatesManager()->getRenderStates())
-#define GMGetRenderState(i) (GMRenderStates.getInt32(GMStates_RenderOptions::i))
-#define GMSetRenderState(i, value) (GMRenderStates.setInt32(GMStates_RenderOptions::i, value))
-#define GMGetRenderStateF(i) (GMRenderStates.getFloat32(GMStates_RenderOptions::i))
-#define GMSetRenderStateF(i, value) (GMRenderStates.setFloat32(GMStates_RenderOptions::i, value))
+#define GMRenderStates (gm::GameMachine::instance().getStatesManager()->getRenderStates())
+#define GMGetRenderState(i) (GMRenderStates.getInt32(gm::GMStates_RenderOptions::i))
+#define GMSetRenderState(i, value) (GMRenderStates.setInt32(gm::GMStates_RenderOptions::i, value))
+#define GMGetRenderStateF(i) (GMRenderStates.getFloat32(gm::GMStates_RenderOptions::i))
+#define GMSetRenderStateF(i, value) (GMRenderStates.setFloat32(gm::GMStates_RenderOptions::i, value))
 
 constexpr GMint MAX_SUPPORTED_KEY_NUM = 64;
 

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gminput.h"
-#include "gmui/gmui.h"
 #include "foundation/gmprofile.h"
 
 #if _WINDOWS
@@ -72,7 +71,7 @@ void Input_Windows::update()
 	::GetKeyboardState(d->lastKeyState);
 }
 
-void Input_Windows::initMouse(GMUIWindow* window)
+void Input_Windows::initMouse(IWindow* window)
 {
 	D(d);
 	d->window = window;

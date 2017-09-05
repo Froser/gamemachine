@@ -53,5 +53,6 @@ if(WIN32)
 	add_subdirectory(./3rdparty/duilib duilib)
 endif(WIN32)
 
+add_subdirectory(gamemachineui gamemachineui)
 add_subdirectory(gamemachine gamemachine)
 add_subdirectory(demo demo)

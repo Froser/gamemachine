@@ -93,9 +93,8 @@ enum class GMDrawMode
 	Line,
 };
 
-struct IRender
+GM_INTERFACE(IRender)
 {
-	virtual ~IRender() {}
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) = 0;
 	virtual void beginShader(Shader& shader, GMDrawMode mode) = 0;
 	virtual void endShader() = 0;
@@ -112,12 +111,44 @@ enum GamePackageType
 
 GM_INTERFACE(IFactory)
 {
-	virtual void createWindow(OUT GMUIWindow**) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(AUTORELEASE GMImage*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, GMModel*, OUT GMModelPainter**) = 0;
 	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };
+
+#if _WINDOWS
+typedef HINSTANCE GMInstance;
+typedef HWND GMWindowHandle;
+struct GMWindowAttributes
+{
+	HWND hwndParent;
+	LPCTSTR pstrName;
+	DWORD dwStyle;
+	DWORD dwExStyle;
+	RECT rc;
+	HMENU hMenu;
+	GMInstance instance;
+};
+#else
+typedef GMuint GMUIInstance;
+typedef GMuint GMWindowHandle;
+struct GMUIWindowAttributes {};
+#endif
+
+GM_INTERFACE(IWindow)
+{
+	virtual void update() = 0;
+	virtual void swapBuffers() const = 0;
+	virtual gm::GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
+	virtual void centerWindow() = 0;
+	virtual void showWindow() = 0;
+	virtual bool handleMessage() = 0;
+	virtual GMRect getWindowRect() = 0;
+	virtual GMRect getClientRect() = 0;
+	virtual GMWindowHandle getWindowHandle() const = 0;
+};
+
 END_NS
 #endif

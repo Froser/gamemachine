@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmui_console.h"
-#include "foundation/gamemachine.h"
+#include <gamemachine.h>
 #if _WINDOWS
 #	include "gmui_console_ui.h"
 #endif
@@ -14,14 +14,9 @@ enum
 
 GMUIConsole::~GMUIConsole()
 {
-	if (GMDebugger::getDebugOutput() == this)
-		GMDebugger::setDebugOutput(nullptr);
+	if (gm::GMDebugger::getDebugOutput() == this)
+		gm::GMDebugger::setDebugOutput(nullptr);
 	GM_PROFILE_CLEAR_HANDLER();
-}
-
-void GMUIConsole::newConsoleWindow(OUT GMUIConsole** out)
-{
-	*out = new GMUIConsole();
 }
 
 GMUIStringPtr GMUIConsole::getWindowClassName() const
@@ -31,7 +26,7 @@ GMUIStringPtr GMUIConsole::getWindowClassName() const
 
 #if _WINDOWS
 template <typename T>
-inline static T* findControl(GMUIPainter* painter, GMWchar* name)
+inline static T* findControl(GMUIPainter* painter, gm::GMWchar* name)
 {
 	T* control = static_cast<T*>(painter->FindControl(name));
 	ASSERT(control);
@@ -74,7 +69,7 @@ LongResult GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 	return 0;
 }
 
-void GMUIConsole::onFinalMessage(GMUIWindowHandle wndHandle)
+void GMUIConsole::onFinalMessage(gm::GMWindowHandle wndHandle)
 {
 	delete this;
 }
@@ -100,7 +95,7 @@ void GMUIConsole::Notify(DuiLib::TNotifyUI& msg)
 			else if (msg.pSender == d->optFltDebug)
 				type = Data::OutputType::Debug;
 
-			d->filter.toggle((GMint) type);
+			d->filter.toggle((gm::GMint) type);
 			onFilterChanged();
 		}
 	}
@@ -129,7 +124,7 @@ void GMUIConsole::afterCreated()
 	d->profileGraph = findControl<GMUIGraph>(d->painter, ID_PROFILE_GRAPH);
 }
 
-void GMUIConsole::selectTab(GMint i)
+void GMUIConsole::selectTab(gm::GMint i)
 {
 	D(d);
 	d->tabIndex = i;
@@ -137,10 +132,10 @@ void GMUIConsole::selectTab(GMint i)
 	refreshTabs();
 }
 
-void GMUIConsole::addBuffer(Data::OutputType type, const GMString& msg)
+void GMUIConsole::addBuffer(Data::OutputType type, const gm::GMString& msg)
 {
 	D(d);
-	const static GMuint MAX_BUFFER = 1000;
+	const static gm::GMuint MAX_BUFFER = 1000;
 	d->msgBuffer.push_back ({ type, msg });
 	if (d->msgBuffer.size() > MAX_BUFFER)
 		d->msgBuffer.pop_front();
@@ -161,7 +156,7 @@ void GMUIConsole::onFilterChanged()
 void GMUIConsole::refreshTabs()
 {
 	D(d);
-	GMint i = 0;
+	gm::GMint i = 0;
 	auto tabOptions = { d->optLog, d->optPerformance };
 	for (auto opt : tabOptions)
 	{
@@ -189,7 +184,7 @@ void GMUIConsole::refreshOptFilter()
 	for (auto type : typeList)
 	{
 		DuiLib::COptionUI* opt = const_cast<DuiLib::COptionUI*>(*iter);
-		if (d->filter.isSet((GMint) type))
+		if (d->filter.isSet((gm::GMint) type))
 		{
 			opt->SetBorderSize(1);
 			opt->SetBorderColor(0xFFFFFF);
@@ -203,39 +198,39 @@ void GMUIConsole::refreshOptFilter()
 	}
 }
 
-void GMUIConsole::info(const GMString& msg)
+void GMUIConsole::info(const gm::GMString& msg)
 {
 	D(d);
 	addBuffer(Data::OutputType::Info, msg);
 	insertText(Data::OutputType::Info, msg);
 }
 
-void GMUIConsole::warning(const GMString& msg)
+void GMUIConsole::warning(const gm::GMString& msg)
 {
 	D(d);
 	addBuffer(Data::OutputType::Warning, msg);
 	insertText(Data::OutputType::Warning, msg);
 }
 
-void GMUIConsole::error(const GMString& msg)
+void GMUIConsole::error(const gm::GMString& msg)
 {
 	D(d);
 	addBuffer(Data::OutputType::Error, msg);
 	insertText(Data::OutputType::Error, msg);
 }
 
-void GMUIConsole::debug(const GMString& msg)
+void GMUIConsole::debug(const gm::GMString& msg)
 {
 	D(d);
 	addBuffer(Data::OutputType::Debug, msg);
 	insertText(Data::OutputType::Debug, msg);
 }
 
-bool GMUIConsole::event(const GameMachineMessage& msg)
+bool GMUIConsole::event(const gm::GameMachineMessage& msg)
 {
 	D(d);
 	centerWindow();
-	showWindow(true, true);
+	showWindowEx(true, true);
 
 	if (msg.type == GMUIConsoleParam1::SELECT_FILTER)
 	{
@@ -246,12 +241,12 @@ bool GMUIConsole::event(const GameMachineMessage& msg)
 	return true;
 }
 
-void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
+void GMUIConsole::insertText(Data::OutputType type, const gm::GMString& msg)
 {
 	D(d);
 	if (isWindowVisible())
 	{
-		if (d->filter.isSet((GMint)type))
+		if (d->filter.isSet((gm::GMint)type))
 			insertTextToRichEdit(type, msg);
 	}
 	else
@@ -260,7 +255,7 @@ void GMUIConsole::insertText(Data::OutputType type, const GMString& msg)
 	}
 }
 
-void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& msg)
+void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const gm::GMString& msg)
 {
 	D(d);
 	DWORD color;
@@ -294,10 +289,10 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& ms
 	d->consoleEdit->SetSelectionCharFormat(cf);
 }
 
-void GMUIConsole::beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadHandle::id id, GMint level)
+void GMUIConsole::beginProfile(const gm::GMString& name, gm::GMfloat durationSinceStartInSecond, gm::GMThreadHandle::id id, gm::GMint level)
 {
 	D(d);
-	GMMutex m;
+	gm::GMMutex m;
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
@@ -305,10 +300,10 @@ void GMUIConsole::beginProfile(const GMString& name, GMfloat durationSinceStartI
 	d->profiles[id].push_back(info);
 }
 
-void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadHandle::id id, GMint level)
+void GMUIConsole::endProfile(const gm::GMString& name, gm::GMfloat elapsedInSecond, gm::GMThreadHandle::id id, gm::GMint level)
 {
 	D(d);
-	GMMutex m;
+	gm::GMMutex m;
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
@@ -323,14 +318,14 @@ void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMTh
 void GMUIConsole::update()
 {
 	// 在这里更新绘制数据
-	static constexpr GMlong colors[] = {
+	static constexpr gm::GMlong colors[] = {
 		0x0033FF,
 		0x00CC00,
 		0x00CCFF,
 		0x6600CC,
 	};
 	static constexpr decltype(sizeof(colors)) colorLen = sizeof(colors) / sizeof(colors[0]);
-	static constexpr GMint magnification = 5000;
+	static constexpr gm::GMint magnification = 5000;
 	GM_PROFILE_RESET_TIMELINE();
 
 	D(d);
@@ -353,8 +348,8 @@ void GMUIConsole::update()
 
 		for (auto& info : profile.second)
 		{
-			GMint w = info.durationInSecond * magnification, h = 12;
-			GMint start = info.durationSinceStartInSecond * magnification;
+			gm::GMint w = (gm::GMint) info.durationInSecond * magnification, h = 12;
+			gm::GMint start = (gm::GMint) info.durationSinceStartInSecond * magnification;
 
 			d->profileGraph->penForward(start, 0);
 			d->profileGraph->drawText(info.name);
@@ -362,10 +357,10 @@ void GMUIConsole::update()
 			d->profileGraph->penEnter();
 			d->profileGraph->penForward(start, 0);
 
-			const GMlong& color = colors[info.level % colorLen];
+			const gm::GMlong& color = colors[info.level % colorLen];
 			d->profileGraph->drawRect(color, w, h);
 			d->profileGraph->penForward(12, 0);
-			d->profileGraph->drawText(GMString(info.durationInSecond * 1000) + _L("ms"));
+			d->profileGraph->drawText(gm::GMString(info.durationInSecond * 1000) + _L("ms"));
 			d->profileGraph->penReturn(24);
 			d->profileGraph->penEnter();
 		}
