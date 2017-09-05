@@ -3,11 +3,12 @@
 #include "common.h"
 #include "utilities/utilities.h"
 #include <mutex>
+#include <thread>
 BEGIN_NS
 
+typedef std::thread GMThreadHandle;
+
 #if _WINDOWS
-typedef HANDLE GMThreadHandle;
-typedef DWORD GMThreadId;
 typedef CRITICAL_SECTION GMCS;
 #else
 #error need implement
@@ -60,13 +61,18 @@ public:
 	void wait(GMuint milliseconds = 0);
 	void setCallback(IThreadCallback* callback);
 	void terminate();
-	Data* d();
+
+public:
+	GMThreadHandle& handle() { D(d); return d->handle; }
 
 public:
 	virtual void run() = 0;
 
+private:
+	void threadCallback();
+
 public:
-	static GMThreadId getCurrentThreadId();
+	static GMThreadHandle::id getCurrentThreadId();
 	static void sleep(GMint miliseconds);
 };
 
@@ -75,48 +81,8 @@ GM_PRIVATE_OBJECT(GMSustainedThread)
 {
 	GMEvent jobFinishedEvent;
 	GMEvent jobStartEvent;
+	GMEvent terminateEvent;
 	bool terminate;
-};
-
-class GMSustainedThread : public GMThread
-{
-	DECLARE_PRIVATE(GMSustainedThread)
-
-public:
-	GMSustainedThread();
-	~GMSustainedThread();
-
-public:
-	void wait(GMint milliseconds = 0);
-	void trigger();
-	void stop();
-
-public:
-	virtual void run() override;
-
-#if MULTI_THREAD
-private:
-#else
-public:
-#endif
-	virtual void sustainedRun() = 0;
-};
-
-class GMSustainedThreadRunner
-{
-public:
-	GMSustainedThreadRunner(GMSustainedThread* t) : th(t)
-	{
-		th->trigger();
-	}
-
-	~GMSustainedThreadRunner()
-	{
-		th->wait();
-	}
-
-private:
-	GMSustainedThread* th;
 };
 
 GM_PRIVATE_OBJECT(GMMutex)
@@ -131,58 +97,6 @@ class GMMutex : public GMObject
 public:
 	GMMutex() { D(d); d->mutex.lock(); }
 	~GMMutex() { D(d); d->mutex.unlock(); }
-};
-
-#if MULTI_THREAD
-#	define gmRunSustainedThread(name, thread) GMSustainedThreadRunner name(thread);
-#else
-#	define gmRunSustainedThread(name, thread) (thread)->sustainedRun();
-#endif
-
-GM_PRIVATE_OBJECT(SustainedThreadRunGuard)
-{
-	Vector<GMSustainedThread*> threads;
-};
-
-class SustainedThreadRunGuard : public GMObject
-{
-	DECLARE_PRIVATE(SustainedThreadRunGuard)
-
-public:
-	SustainedThreadRunGuard() = default;
-	void add(GMSustainedThread* t) { GMMutex m; D(d); d->threads.push_back(t); }
-
-#if GM_MULTI_THREAD
-	~SustainedThreadRunGuard() { GMMutex m; D(d); for (auto& thread : d->threads) { thread->wait(); } }
-	void trigger(GMSustainedThread* t) { GMMutex m; D(d); for (auto& thread : d->threads) { thread->trigger(); } }
-#else
-	void trigger(GMSustainedThread* t) { for (auto& thread : d->threads) { thread->sustainedRun(); } }
-#endif
-};
-
-// GMJobPool
-GM_PRIVATE_OBJECT(GMJobPool)
-{
-	Vector<GMThreadHandle> handles;
-	Vector<GMThread*> threads;
-};
-
-class GMJobPool : public GMObject, public IThreadCallback
-{
-	DECLARE_PRIVATE(GMJobPool)
-
-public:
-	GMJobPool() {}
-	~GMJobPool();
-
-public:
-	void addJob(AUTORELEASE GMThread* thread);
-	void waitJobs(GMuint milliseconds = 0);
-
-public:
-	virtual void onCreateThread(GMThread* thread) override;
-	virtual void beforeRun(GMThread* thread) override;
-	virtual void afterRun(GMThread* thread) override;
 };
 
 class GMInterlock : public GMObject

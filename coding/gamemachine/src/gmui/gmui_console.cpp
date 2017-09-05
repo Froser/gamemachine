@@ -4,6 +4,7 @@
 #if _WINDOWS
 #	include "gmui_console_ui.h"
 #endif
+#include <sstream>
 
 enum
 {
@@ -293,7 +294,7 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const GMString& ms
 	d->consoleEdit->SetSelectionCharFormat(cf);
 }
 
-void GMUIConsole::beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMint id, GMint level)
+void GMUIConsole::beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadHandle::id id, GMint level)
 {
 	D(d);
 	GMMutex m;
@@ -304,7 +305,7 @@ void GMUIConsole::beginProfile(const GMString& name, GMfloat durationSinceStartI
 	d->profiles[id].push_back(info);
 }
 
-void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMint id, GMint level)
+void GMUIConsole::endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadHandle::id id, GMint level)
 {
 	D(d);
 	GMMutex m;
@@ -347,7 +348,6 @@ void GMUIConsole::update()
 
 	for (auto& profile : d->profiles)
 	{
-		d->profileGraph->drawText(_L("Thread ") + GMString(profile.first) + _L(": "));
 		d->profileGraph->penReturn(12);
 		d->profileGraph->penEnter();
 

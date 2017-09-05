@@ -49,7 +49,7 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 		GMString name;
 		GMfloat durationInSecond;
 		GMfloat durationSinceStartInSecond;
-		GMint id;
+		GMThreadHandle::id id;
 		GMint level;
 	};
 
@@ -74,7 +74,7 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	Bitset filter;
 	GMint tabIndex = 0;
 
-	std::map<GMint, Vector<ProfileInfo> > profiles;
+	Map<GMThreadHandle::id, Vector<ProfileInfo> > profiles;
 };
 
 class GMUIConsole :
@@ -124,8 +124,8 @@ public:
 
 	// IProfileHandler
 public:
-	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMint id, GMint level) override;
-	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMint id, GMint level) override;
+	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadHandle::id id, GMint level) override;
+	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadHandle::id id, GMint level) override;
 
 	// GMObject
 public:

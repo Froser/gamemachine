@@ -14,175 +14,43 @@
 #include "gmgameobject.h"
 #include "foundation/vector.h"
 
-// Multi-threads
 BEGIN_NS
 
-#if 0
-template <typename T>
-static void vectorPushBack(Vector<T>& vector, T obj)
+typedef void (GMBSPGameWorld::*drawFaceHandler)(GMint);
+
+inline void drawFaces(
+	GMBSPGameWorld* world,
+	const Vector<GMint>& indices,
+	drawFaceHandler handler,
+	GMBSPSurfaceType targetType
+)
 {
-	GMMutex m;
-	vector.push_back(obj);
+	GMBSPRenderData& renderData = world->renderData();
+	for (auto i : indices)
+	{
+		if (renderData.facesToDraw.isSet(i))
+		{
+			if (renderData.faceDirectory[i].faceType == 0)
+				continue;
+
+			if (renderData.faceDirectory[i].faceType == targetType)
+				(world->*handler)(renderData.faceDirectory[i].typeFaceNumber);
+		}
+	}
 }
 
-// 分为若干个小工作
-struct DrawPiece : public GMSustainedThread
+inline void drawEntities(GMBSPGameWorld* world)
 {
-	DrawPiece(GMBSPGameWorld* w)
-		: world(w)
+	BSPData& bsp = world->bspData();
+	GMBSPRenderData& renderData = world->renderData();
+
+	for (GMint i = 0; i < bsp.numleafs; i++)
 	{
+		if (renderData.entitiesToDraw.isSet(i))
+			world->drawEntity(i);
 	}
+}
 
-	void setStart(GMuint start)
-	{
-		s = start;
-	}
-
-	void setEnd(GMuint end)
-	{
-		e = end;
-	}
-
-protected:
-	GMBSPGameWorld* world;
-	GMuint s = 0, e = 0;
-};
-
-struct DrawPolygonFacePiece : public DrawPiece
-{
-	DrawPolygonFacePiece(GMBSPGameWorld* w)
-		: DrawPiece(w)
-	{
-	}
-
-	virtual void sustainedRun() override
-	{
-		GMMutex m;
-		BSPData& bsp = world->bspData();
-		GMBSPRenderData& renderData = world->renderData();
-		for (GMuint x = s; x < e; GMInterlock::increment(&x))
-		{
-			auto i = renderData.polygonIndices[x];
-			if (renderData.facesToDraw.isSet(i))
-			{
-				if (renderData.faceDirectory[i].faceType == 0)
-					continue;
-
-				if (renderData.faceDirectory[i].faceType == MST_PLANAR)
-					world->drawPolygonFace(renderData.faceDirectory[i].typeFaceNumber);
-			}
-		}
-	}
-};
-#endif
-
-struct DrawPolygonFaceJob : public GMSustainedThread
-{
-	DrawPolygonFaceJob(GMBSPGameWorld* w)
-		: world(w)
-	{
-	}
-
-	virtual void sustainedRun() override
-	{
-		BSPData& bsp = world->bspData();
-		GMBSPRenderData& renderData = world->renderData();
-		for (auto i : renderData.polygonIndices)
-		{
-			if (renderData.facesToDraw.isSet(i))
-			{
-				if (renderData.faceDirectory[i].faceType == 0)
-					continue;
-
-				if (renderData.faceDirectory[i].faceType == MST_PLANAR)
-					world->drawPolygonFace(renderData.faceDirectory[i].typeFaceNumber);
-			}
-		}
-	}
-
-private:
-	GMBSPGameWorld* world;
-};
-
-struct DrawMeshFaceJob : public GMSustainedThread
-{
-	DrawMeshFaceJob(GMBSPGameWorld* w)
-		: world(w)
-	{
-	}
-
-	virtual void sustainedRun() override
-	{
-		BSPData& bsp = world->bspData();
-		GMBSPRenderData& renderData = world->renderData();
-		for (auto iter = renderData.meshFaceIndices.begin(); iter != renderData.meshFaceIndices.end(); ++iter)
-		{
-			const GMint& i = *iter;
-			if (renderData.facesToDraw.isSet(i))
-			{
-				if (renderData.faceDirectory[i].faceType == 0)
-					continue;
-
-				if (renderData.faceDirectory[i].faceType == MST_TRIANGLE_SOUP)
-					world->drawMeshFace(renderData.faceDirectory[i].typeFaceNumber);
-			}
-		}
-	}
-
-private:
-	GMBSPGameWorld* world;
-};
-
-struct DrawPatchJob : public GMSustainedThread
-{
-	DrawPatchJob(GMBSPGameWorld* w)
-		: world(w)
-	{
-	}
-
-	virtual void sustainedRun() override
-	{
-		BSPData& bsp = world->bspData();
-		GMBSPRenderData& renderData = world->renderData();
-		for (auto i : renderData.patchIndices)
-		{
-			if (renderData.facesToDraw.isSet(i))
-			{
-				if (renderData.faceDirectory[i].faceType == 0)
-					continue;
-
-				if (renderData.faceDirectory[i].faceType == MST_PATCH)
-					world->drawPatch(renderData.faceDirectory[i].typeFaceNumber);
-			}
-		}
-	}
-
-private:
-	GMBSPGameWorld* world;
-};
-
-struct DrawEntityJob : public GMSustainedThread
-{
-	DrawEntityJob(GMBSPGameWorld* w)
-		: world(w)
-	{
-	}
-
-	virtual void sustainedRun() override
-	{
-		BSPData& bsp = world->bspData();
-		GMBSPRenderData& renderData = world->renderData();
-
-		for (GMint i = 0; i < bsp.numleafs; i++)
-		{
-			if (renderData.entitiesToDraw.isSet(i))
-				world->drawEntity(i);
-		}
-	}
-
-private:
-	GMBSPGameWorld* world;
-};
 END_NS
 
 GMBSPGameWorld::GMBSPGameWorld()
@@ -190,34 +58,6 @@ GMBSPGameWorld::GMBSPGameWorld()
 {
 	D(d);
 	d->physics.reset(new GMBSPPhysicsWorld(this));
-
-	// 初始化工作线程
-	d->drawPolygonFaceJob = new DrawPolygonFaceJob(this);
-	d->drawMeshFaceJob = new DrawMeshFaceJob(this);
-	d->drawPatchJob = new DrawPatchJob(this);
-	d->drawEntityJob = new DrawEntityJob(this);
-
-	d->drawPolygonFaceJob->start();
-	d->drawMeshFaceJob->start();
-	d->drawPatchJob->start();
-	d->drawEntityJob->start();
-
-#if 0
-	for (GMint i = 0; i < DRAW_PIECE_COUNT; i++)
-	{
-		d->drawPolygonFacePieces[i] = new DrawPolygonFacePiece(this);
-		d->drawPolygonFacePieces[i]->start();
-	}
-#endif
-}
-
-GMBSPGameWorld::~GMBSPGameWorld()
-{
-	D(d);
-	delete d->drawPolygonFaceJob;
-	delete d->drawMeshFaceJob;
-	delete d->drawPatchJob;
-	delete d->drawEntityJob;
 }
 
 void GMBSPGameWorld::loadBSP(const GMString& mapName)
@@ -370,11 +210,10 @@ void GMBSPGameWorld::drawSky()
 void GMBSPGameWorld::drawFaces()
 {
 	GM_PROFILE(drawFaces);
-	D(d);
-	gmRunSustainedThread(drawPolygonFaceJob, d->drawPolygonFaceJob);
-	gmRunSustainedThread(drawMeshFaceJob, d->drawMeshFaceJob);
-	gmRunSustainedThread(drawPatchJob, d->drawPatchJob);
-	gmRunSustainedThread(drawEntityJob, d->drawEntityJob);
+	::drawFaces(this, renderData().polygonIndices, &GMBSPGameWorld::drawPolygonFace, MST_PLANAR);
+	::drawFaces(this, renderData().meshFaceIndices, &GMBSPGameWorld::drawMeshFace, MST_TRIANGLE_SOUP);
+	::drawFaces(this, renderData().patchIndices, &GMBSPGameWorld::drawPatch, MST_PATCH);
+	::drawEntities(this);
 }
 
 void GMBSPGameWorld::clearBuffer()

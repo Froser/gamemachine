@@ -35,12 +35,6 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	Map<GMint, Set<GMBSPEntity*> > entities;
 	Map<GMString, GMModelContainerItemIndex> entitiesCache;
 	Vector<GMGameObject*> renderBuffer;
-
-	DrawPolygonFaceJob* drawPolygonFaceJob;
-	DrawMeshFaceJob* drawMeshFaceJob;
-	DrawPatchJob* drawPatchJob;
-	DrawEntityJob* drawEntityJob;
-
 };
 
 class GMBSPGameWorld;

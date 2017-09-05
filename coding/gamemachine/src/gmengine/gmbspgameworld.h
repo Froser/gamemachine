@@ -15,7 +15,6 @@ class GMBSPGameWorld : public GMGameWorld
 
 public:
 	GMBSPGameWorld();
-	~GMBSPGameWorld();
 
 public:
 	void loadBSP(const GMString& mapName);
