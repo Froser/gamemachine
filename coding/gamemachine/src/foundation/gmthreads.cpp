@@ -6,29 +6,6 @@
 #include <mutex>
 #include <thread>
 
-static GMCS cs;
-
-GMLocker::GMLocker(GMCS& _cs)
-	: cs(_cs)
-{
-#if _WINDOWS
-	::InitializeCriticalSection(&cs);
-	::EnterCriticalSection(&cs);
-#else
-#	error
-#endif
-}
-
-GMLocker::~GMLocker()
-{
-#if _WINDOWS
-	::LeaveCriticalSection(&cs);
-	::DeleteCriticalSection(&cs);
-#else
-#	error
-#endif
-}
-
 GMThread::GMThread()
 {
 	D(d);

@@ -8,23 +8,6 @@ BEGIN_NS
 
 typedef std::thread GMThreadHandle;
 
-#if _WINDOWS
-typedef CRITICAL_SECTION GMCS;
-#else
-#error need implement
-#endif
-
-class GMLocker
-{
-public:
-	GMLocker(GMCS&);
-	~GMLocker();
-	GMCS cs;
-};
-
-#define GMBeginLock(cs) { GMLocker __gmlocker(cs);
-#define GMEndLock() }
-
 enum ThreadState
 {
 	NotRunning,
