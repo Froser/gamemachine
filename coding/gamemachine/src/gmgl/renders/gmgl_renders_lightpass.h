@@ -1,8 +1,8 @@
 ﻿#ifndef __GMGL_RENDERS_LIGHTPASS_H__
 #define __GMGL_RENDERS_LIGHTPASS_H__
 #include <gmcommon.h>
-#include "gmdatacore/shader.h"
-#include "gmdatacore/gmmodel.h"
+#include <shader.h>
+#include <gmmodel.h>
 BEGIN_NS
 
 class GMGLGraphicEngine;

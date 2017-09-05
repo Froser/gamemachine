@@ -1,5 +1,5 @@
-﻿#ifndef __IMAGE_H__
-#define __IMAGE_H__
+﻿#ifndef __GMIMAGE_H__
+#define __GMIMAGE_H__
 #include <gmcommon.h>
 BEGIN_NS
 

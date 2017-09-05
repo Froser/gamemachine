@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader_bmp.h"
 #include <sstream>
-#include "gmdatacore/image.h"
+#include <gmimage.h>
 #include "foundation/utilities/utilities.h"
 
 #if _WINDOWS

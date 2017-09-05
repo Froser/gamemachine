@@ -1,7 +1,7 @@
 ﻿#ifndef __SHADER_CONSTAINS_H__
 #define __SHADER_CONSTAINS_H__
 #include <gmcommon.h>
-#include "gmdatacore/shader.h"
+#include <shader.h>
 #include "foundation/assert.h"
 
 BEGIN_NS

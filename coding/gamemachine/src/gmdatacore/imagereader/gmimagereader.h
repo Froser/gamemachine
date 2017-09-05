@@ -1,7 +1,7 @@
 ﻿#ifndef __IMAGEREADER_H__
 #define __IMAGEREADER_H__
 #include <gmcommon.h>
-#include "gmdatacore/image.h"
+#include <gmimage.h>
 BEGIN_NS
 
 class GMImage;

@@ -1,7 +1,7 @@
 ﻿#ifndef __IMAGE_BUFFER_H__
 #define __IMAGE_BUFFER_H__
 #include <gmcommon.h>
-#include "image.h"
+#include <gmimage.h>
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(ImageBuffer)

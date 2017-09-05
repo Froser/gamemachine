@@ -2,9 +2,7 @@
 #define __BSP_RENDER_H__
 #include <gmcommon.h>
 #include <linearmath.h>
-#include "foundation/utilities/utilities.h"
-#include "foundation/vector.h"
-#include <map>
+#include <utilities.h>
 #include "gmbsp.h"
 BEGIN_NS
 

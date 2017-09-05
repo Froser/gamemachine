@@ -2,7 +2,6 @@
 #define __GMDEMOGAMEWORLD_H__
 #include <gmcommon.h>
 #include "gmgameworld.h"
-#include "foundation/vector.h"
 #include "gmgameobject.h"
 BEGIN_NS
 

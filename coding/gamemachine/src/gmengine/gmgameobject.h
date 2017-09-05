@@ -1,9 +1,8 @@
 ﻿#ifndef __GAMEOBJECT_H__
 #define __GAMEOBJECT_H__
 #include <gmcommon.h>
-#include "../foundation/vector.h"
 #include <utilities.h>
-#include "../gmdatacore/gmmodel.h"
+#include <gmmodel.h>
 
 BEGIN_NS
 

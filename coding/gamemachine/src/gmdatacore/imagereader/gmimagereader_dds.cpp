@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader_dds.h"
-#include "gmdatacore/image.h"
+#include <gmimage.h>
 
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS

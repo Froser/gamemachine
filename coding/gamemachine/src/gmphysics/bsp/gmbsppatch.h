@@ -2,7 +2,6 @@
 #define __BSPPATCH_H__
 #include <gmcommon.h>
 #include <linearmath.h>
-#include "foundation/vector.h"
 
 BEGIN_NS
 

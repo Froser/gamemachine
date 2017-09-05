@@ -3,8 +3,7 @@
 #include <gmcommon.h>
 #include "gmgameworld.h"
 #include "gmbspgameworldprivate.h"
-#include "gmengine/gmresourcecontainer.h"
-#include "gmdatacore/bsp/gmbsp.h"
+#include <gmresourcecontainer.h>
 BEGIN_NS
 
 class GMBSPGameWorld : public GMGameWorld
@@ -15,6 +14,7 @@ class GMBSPGameWorld : public GMGameWorld
 
 public:
 	GMBSPGameWorld();
+	~GMBSPGameWorld();
 
 public:
 	void loadBSP(const GMString& mapName);

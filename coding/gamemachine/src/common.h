@@ -13,5 +13,6 @@
 #include "foundation/gmstring.h"
 #include "foundation/interfaces.h"
 #include "foundation/gmstates.h"
+#include "foundation/vector.h"
 
 #endif

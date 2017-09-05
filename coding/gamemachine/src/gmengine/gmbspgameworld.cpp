@@ -12,7 +12,7 @@
 #include "foundation/gmprofile.h"
 #include "foundation/gmthreads.h"
 #include "gmgameobject.h"
-#include "foundation/vector.h"
+#include "gmphysics/bsp/gmbspphysicsworld.h"
 
 BEGIN_NS
 
@@ -57,7 +57,14 @@ GMBSPGameWorld::GMBSPGameWorld()
 	: GMGameWorld()
 {
 	D(d);
-	d->physics.reset(new GMBSPPhysicsWorld(this));
+	d->physics = new GMBSPPhysicsWorld(this);
+}
+
+GMBSPGameWorld::~GMBSPGameWorld()
+{
+	D(d);
+	if (d->physics)
+		delete d->physics;
 }
 
 void GMBSPGameWorld::loadBSP(const GMString& mapName)

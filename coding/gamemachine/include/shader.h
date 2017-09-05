@@ -1,0 +1,1 @@
+﻿#include "../src/gmdatacore/shader.h"

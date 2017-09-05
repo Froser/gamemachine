@@ -1,10 +1,10 @@
 ﻿#ifndef __BSPPHYSICSWORLD_H__
 #define __BSPPHYSICSWORLD_H__
 #include <gmcommon.h>
-#include "gmphysics/gmphysicsworld.h"
+#include "../gmphysicsworld.h"
+#include "gmbspphysicsstructs.h"
 #include "gmbsptrace.h"
 #include "gmbsppatch.h"
-#include "gmbspphysicsstructs.h"
 BEGIN_NS
 
 class GMBSPGameWorld;

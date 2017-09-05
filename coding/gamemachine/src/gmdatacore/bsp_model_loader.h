@@ -2,16 +2,13 @@
 #define __BSPMODEL_LOADER_H__
 #include <gmcommon.h>
 #include "model.h"
-#include <string>
-#include "foundation/vector.h"
-#include <map>
 
 class TiXmlDocument;
 class TiXmlElement;
 
 BEGIN_NS
 // BSP中读取出来的Entity会在这里找到对应的model，来进行绘制
-typedef std::map<GMString, Model*> ModelMap;
+typedef Map<GMString, Model*> ModelMap;
 
 class GMBSPGameWorld;
 GM_PRIVATE_OBJECT(BSPModelLoader)

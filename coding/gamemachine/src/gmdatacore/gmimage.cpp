@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "image.h"
+#include <gmimage.h>
 
 GMImage::GMImage()
 {

@@ -9,7 +9,8 @@
 #include <gmgl.h>
 #include <gmdemogameworld.h>
 #include <gmbspgameworld.h>
-#include <gmimagereader.h>
+#include <gmbsp.h>
+#include <gmimage.h>
 #include <gmui.h>
 
 #define EMITTER_DEMO 1

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader_png.h"
 #include <fstream>
-#include "gmdatacore/image.h"
+#include <gmimage.h>
 #include "png.h"
 
 #define PNG_BYTES_TO_CHECK 4

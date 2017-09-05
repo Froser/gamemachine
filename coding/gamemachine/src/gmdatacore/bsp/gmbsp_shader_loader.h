@@ -1,8 +1,6 @@
 ﻿#ifndef __BSP_SHADER_LOADER_H__
 #define __BSP_SHADER_LOADER_H__
 #include <gmcommon.h>
-#include <string>
-#include <map>
 #include "gmbsp_render.h"
 
 class TiXmlElement;

@@ -1,12 +1,11 @@
 ﻿#ifndef __GAMEWORLD_H__
 #define __GAMEWORLD_H__
 #include <gmcommon.h>
-#include "../foundation/vector.h"
 #include "../foundation/gamemachine.h"
 #include "../gmphysics/gmphysicsworld.h"
-#include "../gmdatacore/shader.h"
+#include <shader.h>
 #include "gmgameobject.h"
-#include "gmresourcecontainer.h"
+#include <gmresourcecontainer.h>
 
 BEGIN_NS
 

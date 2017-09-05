@@ -1,31 +1,18 @@
 ﻿#ifndef __BSPGAMEWORLDPRIVATE_H__
 #define __BSPGAMEWORLDPRIVATE_H__
 #include <gmcommon.h>
-#include "gmdatacore/shader.h"
-#include <string>
-#include <map>
-#include <set>
-#include "gmdatacore/bsp/gmbsp.h"
-#include "gmdatacore/bsp/gmbsp_shader_loader.h"
-#include "gmdatacore/bsp/gmbsp_render.h"
-#include "gmphysics/bsp/gmbspphysicsworld.h"
-#include "gmdatacore/bsp_model_loader.h"
+#include <shader.h>
+#include <gmbsp.h>
+#include <gmbspphysicsworld.h>
 BEGIN_NS
-
-#if 0
-struct DrawPiece;
-#endif;
-struct DrawPolygonFaceJob;
-struct DrawMeshFaceJob;
-struct DrawPatchJob;
-struct DrawEntityJob;
 
 // 每个作业的分片数
 constexpr GMint DRAW_PIECE_COUNT = 2;
 
+class GMBSPPhysicsWorld;
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
-	AutoPtr<GMBSPPhysicsWorld> physics;
+	GMBSPPhysicsWorld* physics = nullptr;
 	GMBSP bsp;
 	GMGameObject* sky = nullptr;
 

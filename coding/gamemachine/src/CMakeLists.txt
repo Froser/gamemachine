@@ -50,8 +50,8 @@ set(SOURCES
 		gmdatacore/gamepackage/gmgamepackage.cpp
 		gmdatacore/bsp_model_loader.h
 		gmdatacore/bsp_model_loader.cpp
-		gmdatacore/image.h
-		gmdatacore/image.cpp
+		gmdatacore/gmimage.h
+		gmdatacore/gmimage.cpp
 		gmdatacore/imagebuffer.h
 		gmdatacore/imagebuffer.cpp
 		gmdatacore/gmmodel.h

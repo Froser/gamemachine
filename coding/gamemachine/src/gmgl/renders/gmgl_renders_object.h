@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGL_RENDERS_OBJECT_H__
 #define __GMGL_RENDERS_OBJECT_H__
 #include <gmcommon.h>
-#include "gmdatacore/shader.h"
+#include <shader.h>
 #include "gmdatacore/gmmodel.h"
 #include "gmgl/gmglgraphic_engine.h"
 BEGIN_NS

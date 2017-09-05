@@ -4,7 +4,7 @@
 #include "../foundation/vector.h"
 #include <utilities.h>
 #include <linearmath.h>
-#include "image.h"
+#include <gmimage.h>
 #include "shader.h"
 
 #define BEGIN_FOREACH_MESH(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;
