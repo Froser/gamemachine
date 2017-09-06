@@ -25,11 +25,11 @@ static inline GMString operator +(const GMString& left, const GMString& right);
 
 // 字符串类，提供Local8Bits和宽字节的支持
 // 在渲染过程中不允许使用GMString，因为它会严重拖慢渲染的效率
-class GMString 
+class GMString
 {
 	DECLARE_PRIVATE(GMString)
 
-	friend static inline GMString operator +(const GMString& left, const GMString& right);
+	friend inline GMString operator +(const GMString& left, const GMString& right);
 
 public:
 	static size_t npos;

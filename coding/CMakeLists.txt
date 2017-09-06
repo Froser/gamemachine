@@ -14,20 +14,22 @@ macro(source_group_by_dir source_files)
 endmacro(source_group_by_dir)
 
 macro(add_msvc_precompiled_header PrecompiledHeader PrecompiledSource SourcesVar)
-	get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
-	set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
-	set(Sources ${${SourcesVar}})
+	if(MSVC)
+		get_filename_component(PrecompiledBasename ${PrecompiledHeader} NAME_WE)
+		set(PrecompiledBinary "${CMAKE_CURRENT_BINARY_DIR}/${PrecompiledBasename}.pch")
+		set(Sources ${${SourcesVar}})
 
-	set_source_files_properties(${PrecompiledSource}
-			PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
-			OBJECT_OUTPUTS "${PrecompiledBinary}"
-		)
-	set_source_files_properties(${Sources}
-			PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
-			OBJECT_DEPENDS "${PrecompiledBinary}"
-		)
-	# Add precompiled header to SourcesVar
-	list(APPEND ${SourcesVar} ${PrecompiledSource})
+		set_source_files_properties(${PrecompiledSource}
+				PROPERTIES COMPILE_FLAGS "/Yc\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+				OBJECT_OUTPUTS "${PrecompiledBinary}"
+			)
+		set_source_files_properties(${Sources}
+				PROPERTIES COMPILE_FLAGS "/Yu\"${PrecompiledHeader}\" /FI\"${PrecompiledHeader}\" /Fp\"${PrecompiledBinary}\""
+				OBJECT_DEPENDS "${PrecompiledBinary}"
+			)
+		# Add precompiled header to SourcesVar
+		list(APPEND ${SourcesVar} ${PrecompiledSource})
+	endif(MSVC)
 endmacro(add_msvc_precompiled_header)
 
 #Runtime library
@@ -43,6 +45,20 @@ macro(apply_runtime_library)
 	endif(${RUNTIME_LIBRARY} STREQUAL MD)
 endmacro(apply_runtime_library)
 apply_runtime_library()
+
+macro(init_solution)
+	add_compile_options(-std=c++14)
+	if(MINGW)
+		add_definitions(-D_WINDOWS)
+	endif(MINGW)
+endmacro(init_solution)
+
+macro(link_dependencies projectName)
+	if(MINGW)
+		find_package (Threads REQUIRED)
+		target_link_libraries (${projectName} ${CMAKE_THREAD_LIBS_INIT})
+	endif(MINGW)
+endmacro(link_dependencies)
 
 add_subdirectory(./3rdparty/zlib zlib)
 add_subdirectory(./3rdparty/libpng libpng)

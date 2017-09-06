@@ -220,38 +220,34 @@ void GM_new_arr(OUT T** out, GMint cnt)
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
 
 // 平台差异
-#ifdef __GNUC__
-#define strcat_s strcat
+#if !_MSC_VER
+#	define strcat_s strcat
+#	ifdef SAFE_SSCANF
+#		undef SAFE_SSCANF
+#		define SAFE_SSCANF(in, format, out)	\
+	{											\
+		const char* _str = in;				\
+		if (_str)							\
+			sscanf(_str, format, out);		\
+	}
+#	endif
 
-inline static void strcpy_s(GMchar* dest, size_t len, const GMchar* source)
+inline static void strcpy_s(char* dest, size_t len, const char* source)
 {
 	strcpy(dest, source);
 }
 
-inline static void strcpy_s(GMchar* dest, const GMchar* source)
+inline static void strcpy_s(char* dest, const char* source)
 {
 	strcpy(dest, source);
 }
 
-inline static void fopen_s(FILE** f, const GMchar* filename, const GMchar* mode)
+inline static void fopen_s(FILE** f, const char* filename, const char* mode)
 {
 	*f = fopen(filename, mode);
 }
 
-#ifdef SAFE_SSCANF
-#	undef SAFE_SSCANF
-#	define SAFE_SSCANF(in, format, out)	\
-{										\
-	const GMchar* _str = in;				\
-	if (_str)							\
-		sscanf(_str, format, out);		\
-}
 #endif
-
-#define MAX_PATH 256 // 最长路径
-#define NO_LAMBDA //禁止使用Lambda表达式
-
-#endif // __GNUC__
 
 END_NS
 

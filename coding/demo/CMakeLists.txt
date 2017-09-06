@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-PROJECT (demo)
+project (demo)
+init_solution()
 
 include_directories(
 		../3rdparty/glew/include
@@ -41,6 +42,7 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS" ) 
 endif(MSVC)
 
+link_dependencies(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} gamemachine)
 target_link_libraries(${PROJECT_NAME} gamemachineui)
 target_link_libraries(${PROJECT_NAME} png_static)

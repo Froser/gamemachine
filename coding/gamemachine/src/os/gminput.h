@@ -48,7 +48,11 @@ GM_INTERFACE(IMouseState)
 };
 
 #if _WINDOWS
-#include <Xinput.h>
+#if _MSC_VER
+#	include <Xinput.h>
+#else
+#	include <xinput_gm.h>
+#endif
 
 class XInputWrapper
 {

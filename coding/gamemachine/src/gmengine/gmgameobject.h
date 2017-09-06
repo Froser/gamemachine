@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
-	GMModel* model = false;
+	GMModel* model = nullptr;
 	GMGameObjectDestructor destructor = nullptr;
 	linear_math::Matrix4x4 scaling = linear_math::Matrix4x4::identity();
 	linear_math::Matrix4x4 translation = linear_math::Matrix4x4::identity();
@@ -55,6 +55,9 @@ public:
 	virtual void updateAfterSimulate() {}
 	virtual bool canDeferredRendering();
 
+private:
+	inline void updateMatrix();
+
 public:
 	inline void setScaling(const linear_math::Matrix4x4& scaling) { D(d); updateMatrix(); d->scaling = scaling; }
 	inline void setTranslate(const linear_math::Matrix4x4& translation) { D(d); updateMatrix(); d->translation = translation; }
@@ -63,9 +66,6 @@ public:
 
 protected:
 	inline void setDestructor(GMGameObjectDestructor destructor) { D(d); d->destructor = destructor; }
-
-private:
-	inline void updateMatrix();
 
 	// events
 private:

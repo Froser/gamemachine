@@ -6,7 +6,7 @@ inline void format_timeW(GMWchar* in)
 #if _WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
-	swprintf_s(in, LINE_MAX, _L("%d-%02d-%02d %02d:%02d:%02d"),
+	swprintf_s(in, LINE_MAX, L"%d-%02d-%02d %02d:%02d:%02d",
 		time.wYear,
 		time.wMonth,
 		time.wDay,

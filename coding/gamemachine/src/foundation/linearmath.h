@@ -29,6 +29,9 @@ BEGIN_NS
 #	define gm_vPPPM (_mm_set_ps(-0.0f, +0.0f, +0.0f, +0.0f))
 #	define gm_vOnes (_mm_set_ps(1.0f, 1.0f, 1.0f, 1.0f))
 #endif
+#if !_MSC_VER
+#	define FLT_EPSILON 1.192092896e-07F
+#endif
 #define GM_SIMD_EPSILON FLT_EPSILON
 
 #include <math.h>
@@ -373,7 +376,7 @@ namespace linear_math
 		DEFINE_VECTOR_DATA(2)
 
 	public:
-#if USE_SIMD 
+#if USE_SIMD
 		Vector2(__m128 _128) : m_128(_128) {};
 #endif
 		Vector2() = default;
@@ -671,7 +674,7 @@ namespace linear_math
 	}
 
 	template <typename T>
-	static inline GMfloat dot(const T& left, const T& right)
+	inline GMfloat dot(const T& left, const T& right)
 	{
 #if USE_SIMD
 		__m128 vd;
@@ -692,7 +695,7 @@ namespace linear_math
 	}
 
 	template <>
-	static inline GMfloat dot(const Vector3& left, const Vector3& right)
+	inline GMfloat dot(const Vector3& left, const Vector3& right)
 	{
 #if USE_SIMD
 		__m128 vd = _mm_mul_ps(left.get128(), right.get128());
@@ -712,7 +715,7 @@ namespace linear_math
 	}
 
 	template <>
-	static inline GMfloat dot(const Vector2& left, const Vector2& right)
+	inline GMfloat dot(const Vector2& left, const Vector2& right)
 	{
 		return left[0] * right[0] + left[1] * right[1];
 	}
@@ -982,7 +985,7 @@ namespace linear_math
 		{
 #if USE_SIMD
 			return Quaternion(_mm_xor_ps(get128(), gm_vQInv));
-#else	
+#else
 			return Quaternion(-m_data[0], -m_data[1], -m_data[2], m_data[3]);
 #endif
 		}
@@ -1075,7 +1078,7 @@ namespace linear_math
 		q *= rotation.inverse();
 #if USE_SIMD
 		return Vector3(_mm_and_ps(q.get128(), gm_vFFF0fMask));
-#else	
+#else
 		return Vector3(q.x(), q.y(), q.z());
 #endif
 	}

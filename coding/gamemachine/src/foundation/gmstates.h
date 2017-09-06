@@ -1,5 +1,6 @@
 ﻿#ifndef __GMCONFIG_H__
 #define __GMCONFIG_H__
+#include "defines.h"
 #include "gmobject.h"
 BEGIN_NS
 
@@ -21,7 +22,7 @@ struct GMStates_DebugOptions
 	enum
 	{
 		BUILTIN_OPTIONS_INVALID = -1,
-		
+
 		CALCULATE_BSP_FACE = 0,
 		POLYGON_LINE_MODE,
 		DRAW_ONLY_SKY,

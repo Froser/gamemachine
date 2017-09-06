@@ -134,7 +134,7 @@ private:
 };
 
 //Shared pointer
-#if _WINDOWS
+#if _MSC_VER
 #define __uuid(c) __uuidof(c)
 
 template <class E>

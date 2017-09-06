@@ -6,6 +6,24 @@
 #include <mutex>
 #include <thread>
 
+#if GM_USE_PTHREAD
+void* threadCallback(void* thread)
+{
+	GMThread* t = gmobject_cast<GMThread*>(thread);
+	GMThread::Data* d = t->data();
+
+	d->state = Running;
+	if (d->callback)
+		d->callback->beforeRun(this);
+	run();
+	if (d->callback)
+		d->callback->afterRun(this);
+	d->state = Finished;
+	d->event.set();
+	d->done = true;
+}
+#endif // GM_USE_PTHREAD
+
 GMThread::GMThread()
 {
 	D(d);
@@ -30,9 +48,14 @@ void GMThread::threadCallback()
 void GMThread::start()
 {
 	D(d);
+#if GM_USE_PTHREAD
+	pthread_create(&d->handle->thread, nullptr, threadCallback, this);
+#else
+	d->handle = GMThreadHandle(&GMThread::threadCallback, this);
+#endif // GM_USE_PTHREAD
+
 	d->event.reset();
 	d->done = false;
-	d->handle = GMThreadHandle(&GMThread::threadCallback, this);
 	if (d->callback)
 		d->callback->onCreateThread(this);
 }
@@ -60,7 +83,11 @@ void GMThread::terminate()
 
 GMThreadHandle::id GMThread::getCurrentThreadId()
 {
+#if GM_USE_PTHREAD
+	return pthread_self();
+#else
 	return std::this_thread::get_id();
+#endif
 }
 
 GMThread::GMThread(GMThread&& t) noexcept

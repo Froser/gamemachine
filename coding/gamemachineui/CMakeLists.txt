@@ -1,4 +1,5 @@
 project (gamemachineui)
+init_solution()
 
 include_directories(
 		./
@@ -42,7 +43,6 @@ if(WIN32)
 		)
 	source_group_by_dir(WIN32_SOURCES)
 endif(WIN32)
-
 
 add_definitions(-DFPM_DEFAULT)
 add_definitions(-DUNICODE -D_UNICODE)

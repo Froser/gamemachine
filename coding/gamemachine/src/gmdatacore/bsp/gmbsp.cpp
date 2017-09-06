@@ -2,6 +2,7 @@
 #ifdef __APPLE__
 #include <stdlib.h>
 #endif
+#include "foundation/defines.h"
 #include "gmbsp.h"
 #include <stdio.h>
 #include "foundation/utilities/utilities.h"
@@ -120,7 +121,7 @@ GMBSP::~GMBSP()
 {
 	D(d);
 	delete[] d->buffer;
-	
+
 	for (auto& entity : d->entities)
 	{
 		delete entity;

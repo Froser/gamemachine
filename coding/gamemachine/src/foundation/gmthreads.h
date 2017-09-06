@@ -3,10 +3,25 @@
 #include <gmcommon.h>
 #include "utilities/utilities.h"
 #include <mutex>
-#include <thread>
+
+#if !_MSC_VER
+#	include <pthread.h>
+#	define GM_USE_PTHREAD 1
+#else
+#   include <thread>
+#endif
+
 BEGIN_NS
 
+#if GM_USE_PTHREAD
+struct GMThreadHandle
+{
+	typedef pthread_t id;
+	pthread_t thread;
+};
+#else
 typedef std::thread GMThreadHandle;
+#endif
 
 enum ThreadState
 {
@@ -36,6 +51,8 @@ GM_PRIVATE_OBJECT(GMThread)
 class GMThread : public GMObject
 {
 	DECLARE_PRIVATE(GMThread)
+
+ friend void* threadCallback(void* thread);
 
 public:
 	GMThread();
@@ -74,7 +91,31 @@ GM_PRIVATE_OBJECT(GMSustainedThread)
 
 GM_PRIVATE_OBJECT(GMMutex)
 {
+#if GM_USE_PTHREAD
+	class __MutexLocker
+	{
+	public:
+		__MutexLocker()
+		{
+			pthread_mutex_init(&m_mutex, nullptr);
+		}
+
+		void lock()
+		{
+			pthread_mutex_lock(&m_mutex);
+		}
+
+		void unlock()
+		{
+			pthread_mutex_unlock(&m_mutex);
+		}
+
+	private:
+		pthread_mutex_t m_mutex;
+	} mutex;
+#else
 	std::mutex mutex;
+#endif
 };
 
 class GMMutex : public GMObject
@@ -84,12 +125,6 @@ class GMMutex : public GMObject
 public:
 	GMMutex() { D(d); d->mutex.lock(); }
 	~GMMutex() { D(d); d->mutex.unlock(); }
-};
-
-class GMInterlock : public GMObject
-{
-public:
-	static GMuint increment(GMuint* i) { return ::InterlockedIncrement(i); }
 };
 
 // 同步
