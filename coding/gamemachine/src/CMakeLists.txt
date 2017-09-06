@@ -130,6 +130,7 @@ set(SOURCES
 		foundation/utilities/utilities.cpp
 		foundation/utilities/gmprimitivecreator.h
 		foundation/utilities/gmprimitivecreator.cpp
+		foundation/utilities/gmcom.h
 		foundation/defines.h
 		foundation/gmmessages.h
 		foundation/debug.h

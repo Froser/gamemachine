@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include <iostream>
 #include <string.h>
 #include <time.h>
@@ -383,7 +383,7 @@ void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 	else if (tga.get_bytespp() == 4)
 		data.format = GL_BGRA;
 	else
-		gm_error(_L("²»Ö§³Ö16Î»µÄtga"));
+		gm_error(_L("ä¸æ”¯æŒ16ä½çš„tga"));
 
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;

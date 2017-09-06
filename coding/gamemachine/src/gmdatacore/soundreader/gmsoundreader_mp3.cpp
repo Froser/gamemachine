@@ -1,12 +1,17 @@
 ﻿#include "stdafx.h"
+#include <gmcom.h>
 #include "gmsoundreader_mp3.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "mad.h"
-#if _WINDOWS
-#include <dsound.h>
-#endif
 #include "foundation/utilities/utilities.h"
 #include "os/gmdirectsound_sounddevice.h"
+#if _WINDOWS
+#	if _MSC_VER
+#		include <dsound.h>
+#	else
+#		include <dsound_gm.h>
+#	endif
+#endif
 
 #define FRAME_BUFFER 50 // 每一份缓存包含的帧数
 #define BUFFER_COUNT 2 // 将缓存分为多少部分
@@ -280,7 +285,7 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 		DWORD dwBytes2;
 		HRESULT hr;
 		hr = d->cpDirectSoundBuffer->Lock(bufferOffset, d->unitBufferSize, &lpvPtr1, &dwBytes1, &lpvPtr2, &dwBytes2, 0);
-		// If the buffer was lost, restore and retry lock. 
+		// If the buffer was lost, restore and retry lock.
 		if (DSERR_BUFFERLOST == hr)
 		{
 			d->cpDirectSoundBuffer->Restore();
@@ -293,7 +298,7 @@ static DWORD WINAPI processBuffer(LPVOID lpThreadParameter)
 			if (lpvPtr2)
 				memcpy(lpvPtr2, d->bufferOut.data() + d->bufferOffset + dwBytes1, dwBytes2);
 
-			// Release the data back to DirectSound. 
+			// Release the data back to DirectSound.
 			hr = d->cpDirectSoundBuffer->Unlock(lpvPtr1, dwBytes1, lpvPtr2, dwBytes2);
 			GM_ASSERT(SUCCEEDED(hr));
 		}

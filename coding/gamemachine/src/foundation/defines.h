@@ -221,7 +221,6 @@ void GM_new_arr(OUT T** out, GMint cnt)
 
 // 平台差异
 #if !_MSC_VER
-#	define strcat_s strcat
 #	ifdef SAFE_SSCANF
 #		undef SAFE_SSCANF
 #		define SAFE_SSCANF(in, format, out)	\
@@ -232,19 +231,29 @@ void GM_new_arr(OUT T** out, GMint cnt)
 	}
 #	endif
 
-inline static void strcpy_s(char* dest, size_t len, const char* source)
+inline void strcpy_s(char* dest, size_t len, const char* source)
 {
 	strcpy(dest, source);
 }
 
-inline static void strcpy_s(char* dest, const char* source)
+inline void strcpy_s(char* dest, const char* source)
 {
 	strcpy(dest, source);
 }
 
-inline static void fopen_s(FILE** f, const char* filename, const char* mode)
+inline void fopen_s(FILE** f, const char* filename, const char* mode)
 {
 	*f = fopen(filename, mode);
+}
+
+inline void memcpy_s(void* dest, size_t, const void* src, size_t size)
+{
+	memcpy(dest, src, size);
+}
+
+inline char* strcat_s(char* dest, size_t, const char* src)
+{
+	return strcat(dest, src);
 }
 
 #endif

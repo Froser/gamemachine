@@ -519,7 +519,7 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 
 	for (GMint i = 0; i < dem; i++)
 	{
-		GMString& fn = textureFilename + priorities[i];
+		GMString fn = textureFilename + priorities[i];
 		GMBuffer buf;
 		if (!pk->readFile(GMPackageIndex::Textures, fn, &buf))
 			continue;
@@ -666,7 +666,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		else
 		{
 			GMGamePackage& pk = *GM.getGamePackageManager();
-			GMString& path = pk.pathOf(GMPackageIndex::Models, fn);
+			GMString path = pk.pathOf(GMPackageIndex::Models, fn);
 			GMModelLoadSettings settings = {
 				pk,
 				path,

@@ -24,7 +24,7 @@ GMPhysicsWorld* GMDemoGameWorld::physicsWorld()
 bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
 {
 	D(d);
-	auto& r = d->renderList.find(name);
+	auto r = d->renderList.find(name);
 	if (r != d->renderList.end())
 		return false;
 	d->renderList[name] = obj;

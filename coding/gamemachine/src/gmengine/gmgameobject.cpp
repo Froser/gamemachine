@@ -92,12 +92,6 @@ bool GMGameObject::canDeferredRendering()
 	return d->canDeferredRendering;
 }
 
-void GMGameObject::updateMatrix()
-{
-	D(d);
-	d->transformMatrix = d->scaling * d->rotation.toMatrix() * d->translation;
-}
-
 void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
 {
 	GMGameObject* gameObject = gmobject_cast<GMGameObject*>(receiver);
@@ -179,7 +173,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	GMRect rect = window->getWindowRect();
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 
-	auto& str = d->text.toStdWString();
+	std::wstring str = d->text.toStdWString();
 	const GMWchar* p = str.c_str();
 	const GMfloat Z = 0;
 	GMfloat x = d->left, y = d->bottom;

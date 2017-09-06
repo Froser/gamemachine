@@ -5,8 +5,18 @@
 #include "freetype/ftglyph.h"
 #include "gmgltexture.h"
 
-#if _WINDOWS
-#include <shlobj.h>
+#if _MSC_VER
+#	include <shlobj.h>
+#else
+//TODO 这里在其他系统下存在问题
+BOOL SHGetSpecialFolderPathA(HWND hwnd, LPSTR pszPath, int csidl, BOOL fCreate);
+BOOL SHGetSpecialFolderPathW(HWND hwnd, LPWSTR pszPath, int csidl, BOOL fCreate);
+#	ifdef UNICODE
+#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathW
+#	else
+#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathA
+#	endif // !UNICODE
+#	define CSIDL_FONTS 0x0014
 #endif
 
 struct TypoLibrary
@@ -44,12 +54,14 @@ static FT_Error loadFace(FT_Face* face)
 	GMWchar path[MAX_PATH];
 	SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
 
+	std::string strPath;
 	for (GMuint i = 0; i < fontNameNum; i++)
 	{
 		GMString p(path);
 		p.append(_L("/"));
 		p.append(fontNameList[i].fontName);
-		err = FT_New_Face(g_lib.library, p.toStdString().c_str(), 0, face);
+		strPath = p.toStdString();
+		err = FT_New_Face(g_lib.library, strPath.c_str(), 0, face);
 		if (err == FT_Err_Ok)
 			break;
 	}

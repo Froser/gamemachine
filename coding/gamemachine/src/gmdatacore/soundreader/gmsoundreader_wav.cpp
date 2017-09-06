@@ -5,8 +5,12 @@
 #include "gmsoundreader.h"
 
 #if _WINDOWS
-#include <dsound.h>
-#include "os/gmdirectsound_sounddevice.h"
+#	if _MSC_VER
+#		include <dsound.h>
+#	else
+#		include <dsound_gm.h>
+#	endif
+#	include "os/gmdirectsound_sounddevice.h"
 #endif
 
 struct GM_WAVERIFF

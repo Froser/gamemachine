@@ -55,7 +55,8 @@ GMGLDefaultGamePackageHandler::GMGLDefaultGamePackageHandler(GMGamePackage* pk)
 bool GMGLDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	std::ifstream file;
-	file.open(path.toStdWString(), std::ios::in | std::ios::binary | std::ios::ate);
+	std::string p = path.toStdString();
+	file.open(p, std::ios::in | std::ios::binary | std::ios::ate);
 	if (file.good())
 	{
 		GMint size = file.tellg();
@@ -160,7 +161,7 @@ bool GMGLZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuf
 		buffer->size = buf->size;
 		return true;
 	}
-		
+
 	GMString r = toRelativePath(path);
 	if (m_buffers.find(toRelativePath(r)) != m_buffers.end())
 	{
@@ -256,7 +257,7 @@ GMString GMGLZipGamePackageHandler::toRelativePath(const GMString& in)
 {
 	Deque<GMString> deque;
 
-	auto pushToStack = [&deque](GMString& str) {
+	auto pushToStack = [&deque](GMString&& str) {
 		if (str == ".")
 			return;
 		if (str == "..")
