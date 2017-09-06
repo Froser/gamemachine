@@ -7,6 +7,45 @@
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
 
+class GMGLDefaultGamePackageHandler::GMReadFileThread : public GMThread, public IThreadCallback
+{
+public:
+	GMReadFileThread(GMGLDefaultGamePackageHandler* handler, const GMString& path, GMGamePackageAsyncResult* result, GMAsyncCallback callback)
+		: m_handler(handler)
+		, m_path(path)
+		, m_result(result)
+		, m_callback(callback)
+	{
+		setCallback(this);
+	}
+
+	virtual void run() override
+	{
+		GMMutex m;
+		GMBuffer* buf = gmobject_cast<GMBuffer*>(m_result->state());
+		m_handler->readFileFromPath(m_path, buf);
+	}
+
+	virtual void onCreateThread(GMThread*) override
+	{
+	}
+
+	virtual void beforeRun(GMThread*) override
+	{
+	}
+
+	virtual void afterRun(GMThread* t) override
+	{
+		m_callback(m_result);
+	}
+
+private:
+	GMGLDefaultGamePackageHandler* m_handler;
+	GMGamePackageAsyncResult* m_result;
+	GMAsyncCallback m_callback;
+	GMString m_path;
+};
+
 GMGLDefaultGamePackageHandler::GMGLDefaultGamePackageHandler(GMGamePackage* pk)
 	: m_pk(pk)
 {
@@ -34,6 +73,15 @@ bool GMGLDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF G
 		gm_warning(_L("cannot read file from path: %Ls"), path.toStdWString().c_str());
 	}
 	return false;
+}
+
+void GMGLDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar)
+{
+	GMGamePackageAsyncResult* result = new GMGamePackageAsyncResult();
+	GMReadFileThread* thread = new GMReadFileThread(this, path, result, callback);
+	result->setThread(thread);
+	(*ar) = result;
+	thread->start();
 }
 
 void GMGLDefaultGamePackageHandler::init()

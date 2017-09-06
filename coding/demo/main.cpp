@@ -680,6 +680,18 @@ int WINAPI WinMain(
 		new GameHandler()
 	);
 
+	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
+
+#if 0
+	// Òì²½Ä£ÐÍ
+	GMBuffer buffer;
+	IAsyncResult* ar;
+	auto i = [](IAsyncResult* a) {
+	};
+	pk->beginReadFile(GMPackageIndex::Scripts, "helloworld.lua", i, &ar);
+	ar->waitHandle().wait();
+#endif
+
 #if 0
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	GMBuffer buffer;

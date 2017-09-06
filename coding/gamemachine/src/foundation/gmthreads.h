@@ -26,10 +26,11 @@ struct IThreadCallback
 
 GM_PRIVATE_OBJECT(GMThread)
 {
-	IThreadCallback* callback;
+	IThreadCallback* callback = nullptr;
 	GMThreadHandle handle;
 	GMEvent event;
 	ThreadState state;
+	bool done = false;
 };
 
 class GMThread : public GMObject
@@ -38,6 +39,7 @@ class GMThread : public GMObject
 
 public:
 	GMThread();
+	GMThread(GMThread&&) noexcept;
 
 public:
 	void start();
@@ -47,6 +49,8 @@ public:
 
 public:
 	GMThreadHandle& handle() { D(d); return d->handle; }
+	GMEvent& waitEvent() { D(d); return d->event; }
+	bool isDone() { D(d); return d->done; }
 
 public:
 	virtual void run() = 0;
@@ -87,6 +91,16 @@ class GMInterlock : public GMObject
 public:
 	static GMuint increment(GMuint* i) { return ::InterlockedIncrement(i); }
 };
+
+// 同步
+GM_INTERFACE(IAsyncResult)
+{
+	virtual GMObject* state() = 0;
+	virtual bool isComplete() = 0;
+	virtual GMEvent& waitHandle() = 0;
+};
+
+using GMAsyncCallback = std::function<void(IAsyncResult*)>;
 
 END_NS
 #endif

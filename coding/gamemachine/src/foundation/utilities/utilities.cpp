@@ -734,6 +734,11 @@ GMEvent::GMEvent(bool manualReset)
 	d->handle = ::CreateEvent(NULL, manualReset, FALSE, _L(""));
 }
 
+GMEvent::GMEvent(GMEvent&& e) noexcept
+{
+	swap(e);
+}
+
 GMEvent::~GMEvent()
 {
 	D(d);

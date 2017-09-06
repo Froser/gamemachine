@@ -674,6 +674,7 @@ class GMEvent : public GMObject
 
 public:
 	GMEvent(bool manualReset = false);
+	GMEvent(GMEvent&&) noexcept;
 	~GMEvent();
 
 public:

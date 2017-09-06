@@ -65,6 +65,14 @@ bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF
 	return readFileFromPath(p, buffer);
 }
 
+void GMGamePackage::beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT IAsyncResult** ar, REF GMString* fullFilename)
+{
+	GMString p = pathOf(index, filename);
+	if (fullFilename)
+		*fullFilename = p;
+	return beginReadFileFromPath(p, callback, ar);
+}
+
 Vector<GMString> GMGamePackage::getAllFiles(const GMString& directory)
 {
 	D(d);
@@ -86,4 +94,34 @@ bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 	bool b = d->handler->readFileFromPath(path, buffer);
 	gm_hook2(GMGamePackage, readFileFromPath, &path, buffer);
 	return b;
+}
+
+void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar)
+{
+	D(d);
+	d->handler->beginReadFileFromPath(path, callback, ar);
+}
+
+GMGamePackageAsyncResult::~GMGamePackageAsyncResult()
+{
+	D(d);
+	delete d->thread;
+}
+
+GMObject* GMGamePackageAsyncResult::state()
+{
+	D(d);
+	return &d->buffer;
+}
+
+bool GMGamePackageAsyncResult::isComplete()
+{
+	D(d);
+	return d->thread->isDone();
+}
+
+GMEvent& GMGamePackageAsyncResult::waitHandle()
+{
+	D(d);
+	return d->thread->waitEvent();
 }

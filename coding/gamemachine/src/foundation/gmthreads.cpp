@@ -24,15 +24,14 @@ void GMThread::threadCallback()
 		d->callback->afterRun(this);
 	d->state = Finished;
 	d->event.set();
+	d->done = true;
 }
 
 void GMThread::start()
 {
 	D(d);
-
-#if _WINDOWS
 	d->event.reset();
-#endif
+	d->done = false;
 	d->handle = GMThreadHandle(&GMThread::threadCallback, this);
 	if (d->callback)
 		d->callback->onCreateThread(this);
@@ -41,10 +40,7 @@ void GMThread::start()
 void GMThread::wait(GMuint milliseconds)
 {
 	D(d);
-#if _WINDOWS
-	HANDLE* handle = (HANDLE*)d->handle.native_handle();
-	::WaitForSingleObject(handle, milliseconds == 0 ? INFINITE : milliseconds);
-#endif
+	d->event.wait();
 }
 
 void GMThread::setCallback(IThreadCallback* callback)
@@ -64,9 +60,12 @@ void GMThread::terminate()
 
 GMThreadHandle::id GMThread::getCurrentThreadId()
 {
-#if _WINDOWS
 	return std::this_thread::get_id();
-#endif
+}
+
+GMThread::GMThread(GMThread&& t) noexcept
+{
+	swap(t);
 }
 
 void GMThread::sleep(GMint miliseconds)
