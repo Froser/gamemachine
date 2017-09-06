@@ -669,13 +669,13 @@ int WINAPI WinMain(
 		NULL,
 	};
 
-	gm::IWindow* consoleWindow = nullptr;
-	gmui::GMUIFactory::createConsoleWindow(hInstance, &consoleWindow);
-	consoleWindow->create(consoleAttrs);
+	gm::GMConsoleHandle consoleHandle;
+	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);
+	consoleHandle.window->create(consoleAttrs);
 	
 	GM.init(
 		mainWindow,
-		consoleWindow,
+		consoleHandle,
 		new GMGLFactory(),
 		new GameHandler()
 	);

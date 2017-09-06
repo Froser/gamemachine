@@ -9,10 +9,12 @@ void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** wi
 	(*window) = new GMUIGLWindow();
 }
 
-void GMUIFactory::createConsoleWindow(gm::GMInstance instance, OUT gm::IWindow** window)
+void GMUIFactory::createConsoleWindow(gm::GMInstance instance, REF gm::GMConsoleHandle& OUT handle)
 {
 	initEnvironment(instance);
-	(*window) = new GMUIConsole();
+	GMUIConsole* console = new GMUIConsole();
+	handle.window = console;
+	handle.dbgoutput = console;
 }
 
 void GMUIFactory::initEnvironment(gm::GMInstance instance)

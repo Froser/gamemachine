@@ -10,7 +10,7 @@
 
 void GameMachine::init(
 	AUTORELEASE IWindow* mainWindow,
-	AUTORELEASE IWindow* consoleWindow,
+	const GMConsoleHandle& consoleHandle,
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
 )
@@ -27,7 +27,8 @@ void GameMachine::init(
 	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
 	registerManager(new GMInput(), &d->inputManager);
 	registerManager(new GMStates(), &d->statesManager);
-	registerManager(consoleWindow, &d->consoleWindow);
+	registerManager(consoleHandle.window, &d->consoleWindow);
+	d->consoleOutput = consoleHandle.dbgoutput;
 
 	initInner();
 	d->gameHandler->init();
@@ -179,7 +180,7 @@ bool GameMachine::handleMessages()
 void GameMachine::initInner()
 {
 	D(d);
-	GMDebugger::setDebugOutput(gminterface_cast<IDebugOutput*>(d->consoleWindow));
+	GMDebugger::setDebugOutput(d->consoleOutput);
 }
 
 template <typename T, typename U>

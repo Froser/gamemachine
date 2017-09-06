@@ -24,7 +24,10 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IInput* inputManager = nullptr;
 	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
-	IWindow* consoleWindow = nullptr; // 内置调试窗口
+
+	// 内置调试窗口，他们本质是同一个对象，所以不能重复释放
+	IWindow* consoleWindow = nullptr; 
+	IDebugOutput* consoleOutput = nullptr;
 
 	GMCamera camera;
 	Queue<GameMachineMessage> messageQueue;
@@ -60,7 +63,7 @@ public:
 public:
 	void init(
 		AUTORELEASE IWindow* mainWindow,
-		AUTORELEASE IWindow* consoleWindow,
+		const GMConsoleHandle& consoleHandle,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);

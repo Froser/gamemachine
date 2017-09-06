@@ -24,6 +24,7 @@ struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
 struct CameraLookAt;
+struct IDebugOutput;
 
 namespace linear_math
 {
@@ -149,6 +150,12 @@ GM_INTERFACE(IWindow)
 	virtual GMRect getClientRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
 	virtual bool event(const GameMachineMessage& msg) = 0;
+};
+
+GM_ALIGNED_STRUCT(GMConsoleHandle)
+{
+	IWindow* window;
+	IDebugOutput* dbgoutput;
 };
 
 END_NS

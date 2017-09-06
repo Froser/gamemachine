@@ -235,19 +235,6 @@ public:
 #endif
 	}
 
-	template <typename TargetType>
-	static TargetType gminterface_cast(IDispose* obj)
-	{
-		IDispose* d = obj;
-#if _DEBUG
-		TargetType target = dynamic_cast<TargetType>(d);
-		GM_ASSERT(target);
-		return target;
-#else
-		return static_cast<TargetType>(d);
-#endif
-	}
-
 private:
 	void addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback);
 	void removeEventAndConnection(const char* eventName, GMObject& receiver);
