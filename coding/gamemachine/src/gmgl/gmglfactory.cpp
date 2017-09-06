@@ -3,8 +3,8 @@
 #include "gmgltexture.h"
 #include "gmglgraphic_engine.h"
 #include "gmglmodelpainter.h"
-#include "gmglgamepackagehandler.h"
 #include "gmglglyphmanager.h"
+#include "gmdatacore/gamepackage/gmgamepackagehandler.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {

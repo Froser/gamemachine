@@ -1,13 +1,8 @@
 ﻿#include "stdafx.h"
-#include "gmglgamepackagehandler.h"
-#include "gmglshaderprogram.h"
-#include "gmglgraphic_engine.h"
-#include <string>
-#include "foundation/utilities/utilities.h"
 #include <fstream>
+#include "gmgamepackagehandler.h"
+#include "foundation/utilities/utilities.h"
 #include "gmengine/gmbspgameworld.h"
-#include "renders/gmgl_renders_object.h"
-#include "renders/gmgl_renders_glyph.h"
 #include "foundation/gamemachine.h"
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();

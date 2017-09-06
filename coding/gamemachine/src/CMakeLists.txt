@@ -48,6 +48,8 @@ set(SOURCES
 		gmdatacore/soundreader/gmsoundreader_mp3.cpp
 		gmdatacore/gamepackage/gmgamepackage.h
 		gmdatacore/gamepackage/gmgamepackage.cpp
+		gmdatacore/gamepackage/gmgamepackagehandler.h
+		gmdatacore/gamepackage/gmgamepackagehandler.cpp
 		gmdatacore/bsp_model_loader.h
 		gmdatacore/bsp_model_loader.cpp
 		gmdatacore/gmimage.h
@@ -87,8 +89,6 @@ set(SOURCES
 		gmgl/renders/gmgl_renders_lightpass.cpp
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
-		gmgl/gmglgamepackagehandler.h
-		gmgl/gmglgamepackagehandler.cpp
 		gmgl/gmglgbuffer.h
 		gmgl/gmglgbuffer.cpp
 		gmgl/gmglglyphmanager.h

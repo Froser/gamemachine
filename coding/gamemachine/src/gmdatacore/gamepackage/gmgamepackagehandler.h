@@ -1,9 +1,8 @@
-﻿#ifndef __GMGLGAMEPACKAGEHANDLER_H__
-#define __GMGLGAMEPACKAGEHANDLER_H__
+﻿#ifndef __GMGAMEPACKAGEHANDLER_H__
+#define __GMGAMEPACKAGEHANDLER_H__
 #include <gmcommon.h>
-#include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "gmgamepackage.h"
 #include "contrib/minizip/unzip.h"
-#include <map>
 BEGIN_NS
 
 class GMGLDefaultGamePackageHandler : public IGamePackageHandler
