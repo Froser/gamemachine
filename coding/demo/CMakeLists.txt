@@ -11,12 +11,14 @@ include_directories(
 		../3rdparty/lua/src
 		../gamemachine/include
 		../gamemachineui/include
+		../gamemachinemedia/include
 	)
 
 link_directories(
 		${demo_SOURCE_DIR}/../3rdparty/glew/lib/release/win32
 		${demo_SOURCE_DIR}/../3rdparty/freetype-2.3.5/lib
 		${demo_SOURCE_DIR}/../3rdparty/dx #windows only
+		${demo_SOURCE_DIR}/../3rdparty/openal1.1/libs/Win32
 	)
 
 link_libraries(
@@ -25,6 +27,7 @@ link_libraries(
 		glew32s.lib
 		freetype.lib
 		dxguid.lib #windows only
+		OpenAL32.lib #windows only
 	)
 
 set(SOURCES
@@ -45,6 +48,7 @@ endif(MSVC)
 link_dependencies(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} gamemachine)
 target_link_libraries(${PROJECT_NAME} gamemachineui)
+target_link_libraries(${PROJECT_NAME} gamemachinemedia)
 target_link_libraries(${PROJECT_NAME} png_static)
 target_link_libraries(${PROJECT_NAME} zlibstatic)
 target_link_libraries(${PROJECT_NAME} libmad)

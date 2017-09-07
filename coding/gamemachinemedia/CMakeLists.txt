@@ -5,6 +5,7 @@ include_directories(
 		./
 		./include
 		../3rdparty/glew/include
+		../3rdparty/openal1.1/include
 		../gamemachine/include
 	)
 
@@ -14,6 +15,8 @@ set(SOURCES
 		common.h
 
 		src/gmm/gmm.h
+		src/common/audio/gmmaudioplayer.h
+		src/common/audio/gmmaudioplayer.cpp
 	)
 
 set(WIN32_SOURCES
