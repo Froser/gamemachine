@@ -48,8 +48,14 @@ apply_runtime_library()
 
 macro(init_solution)
 	add_compile_options(-std=c++14)
+	add_definitions(-DFPM_DEFAULT)
+	add_definitions(-DUNICODE -D_UNICODE)
+
 	if(MINGW)
-		add_definitions(-D_WINDOWS)
+		add_definitions(-D_GLIBCXX_USE_WCHAR_T)
+		if (WIN32)
+			add_definitions(-D_WINDOWS)
+		endif(WIN32)
 	endif(MINGW)
 endmacro(init_solution)
 

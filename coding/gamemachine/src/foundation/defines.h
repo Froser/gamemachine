@@ -231,6 +231,16 @@ void GM_new_arr(OUT T** out, GMint cnt)
 	}
 #	endif
 
+inline GMWchar* wcscpy_s(GMWchar* dest,  const GMWchar* source)
+{
+	return wcscpy(dest, source);
+}
+
+inline GMWchar* wcscpy_s(GMWchar* dest, size_t, const GMWchar* source)
+{
+	return wcscpy(dest, source);
+}
+
 inline void strcpy_s(char* dest, size_t len, const char* source)
 {
 	strcpy(dest, source);

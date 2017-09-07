@@ -16,9 +16,10 @@ BEGIN_NS
 #if GM_USE_PTHREAD
 struct GMThreadHandle
 {
-	typedef pthread_t id;
+	typedef void* id;
 	pthread_t thread;
 };
+
 #else
 typedef std::thread GMThreadHandle;
 #endif
@@ -52,8 +53,6 @@ class GMThread : public GMObject
 {
 	DECLARE_PRIVATE(GMThread)
 
- friend void* threadCallback(void* thread);
-
 public:
 	GMThread();
 	GMThread(GMThread&&) noexcept;
@@ -65,6 +64,7 @@ public:
 	void terminate();
 
 public:
+	GMThread::Data* threadData() { D(d); return data(); }
 	GMThreadHandle& handle() { D(d); return d->handle; }
 	GMEvent& waitEvent() { D(d); return d->event; }
 	bool isDone() { D(d); return d->done; }

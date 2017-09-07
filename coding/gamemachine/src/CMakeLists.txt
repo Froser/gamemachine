@@ -167,9 +167,6 @@ add_library(gamemachine
 		${SOURCES}
 	)
 
-add_definitions(-DFPM_DEFAULT)
-add_definitions(-DUNICODE -D_UNICODE)
-
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 

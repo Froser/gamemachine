@@ -1,4 +1,8 @@
-﻿#include "stdafx.h"
+﻿#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NON_CONFORMING_SWPRINTFS
+#undef __STRICT_ANSI__
+#include "stdafx.h"
+#include "stdio.h"
 #include "gmstring.h"
 
 size_t GMString::npos = std::string::npos;
@@ -72,7 +76,7 @@ GMString::GMString(const GMfloat f)
 	D(d);
 	d->type = Data::WideChars;
 	GMWchar buffer[128] = { 0 };
-	swprintf_s(buffer, _L("%f"), f);
+	swprintf(buffer, _L("%f"), f);
 	d->wstr = buffer;
 }
 
@@ -81,7 +85,7 @@ GMString::GMString(const GMint i)
 	D(d);
 	d->type = Data::WideChars;
 	GMWchar buffer[128] = { 0 };
-	swprintf_s(buffer, _L("%i"), i);
+	swprintf(buffer, _L("%i"), i);
 	d->wstr = buffer;
 }
 

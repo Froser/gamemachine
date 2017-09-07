@@ -1,12 +1,16 @@
-﻿#include "stdafx.h"
+﻿#undef __STRICT_ANSI__
+#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_NON_CONFORMING_SWPRINTFS
+#include "stdafx.h"
 #include "debug.h"
+#include <cwchar>
 
 inline void format_timeW(GMWchar* in)
 {
 #if _WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
-	swprintf_s(in, LINE_MAX, L"%d-%02d-%02d %02d:%02d:%02d",
+	swprintf(in, L"%d-%02d-%02d %02d:%02d:%02d",
 		time.wYear,
 		time.wMonth,
 		time.wDay,
@@ -22,7 +26,7 @@ inline void format_timeA(char* in)
 #if _WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
-	sprintf_s(in, LINE_MAX, "%d-%02d-%02d %02d:%02d:%02d",
+	sprintf(in, "%d-%02d-%02d %02d:%02d:%02d",
 		time.wYear,
 		time.wMonth,
 		time.wDay,
@@ -44,7 +48,7 @@ inline void format_timeA(char* in)
 	if (d && d->debugger)											\
 	{																\
 		GMWchar buf[LINE_MAX];										\
-		vswprintf(buf, LINE_MAX, format, ap);						\
+		vswprintf(buf, format, ap);									\
 		f_timeW(t);													\
 		wsprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
 		d->debugger->tag(out);										\
@@ -52,7 +56,7 @@ inline void format_timeA(char* in)
 	else															\
 	{																\
 		GMWchar buf[LINE_MAX];										\
-		vswprintf(buf, LINE_MAX, format, ap);						\
+		vswprintf(buf, format, ap);									\
 		f_timeW(t);													\
 		wprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
 	}																\
@@ -66,15 +70,15 @@ inline void format_timeA(char* in)
 	if (d && d->debugger)											\
 	{																\
 		char buf[LINE_MAX];											\
-		vsprintf_s(buf, format, ap);								\
+		vsprintf(buf, format, ap);									\
 		f_timeA(t);													\
-		sprintf_s(out, "[" #tag "]%s: %s", t, buf);					\
+		sprintf(out, "[" #tag "]%s: %s", t, buf);					\
 		d->debugger->tag(out);										\
 	}																\
 	else															\
 	{																\
 		char buf[LINE_MAX];											\
-		vsprintf_s(buf, format, ap);								\
+		vsprintf(buf, format, ap);									\
 		f_timeA(t);													\
 		printf(out, "[" #tag "]%s: %s", t, buf);					\
 	}																\

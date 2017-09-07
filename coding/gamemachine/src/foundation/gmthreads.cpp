@@ -7,17 +7,17 @@
 #include <thread>
 
 #if GM_USE_PTHREAD
-void* threadCallback(void* thread)
+void* pthreadCallback(void* thread)
 {
-	GMThread* t = gmobject_cast<GMThread*>(thread);
-	GMThread::Data* d = t->data();
+	GMThread* t = (GMThread*)(thread);
+	GMThread::Data* d = t->threadData();
 
 	d->state = Running;
 	if (d->callback)
-		d->callback->beforeRun(this);
-	run();
+		d->callback->beforeRun(t);
+	t->run();
 	if (d->callback)
-		d->callback->afterRun(this);
+		d->callback->afterRun(t);
 	d->state = Finished;
 	d->event.set();
 	d->done = true;
@@ -49,7 +49,7 @@ void GMThread::start()
 {
 	D(d);
 #if GM_USE_PTHREAD
-	pthread_create(&d->handle->thread, nullptr, threadCallback, this);
+	pthread_create(&d->handle.thread, nullptr, ::pthreadCallback, this);
 #else
 	d->handle = GMThreadHandle(&GMThread::threadCallback, this);
 #endif // GM_USE_PTHREAD
@@ -75,7 +75,9 @@ void GMThread::setCallback(IThreadCallback* callback)
 void GMThread::terminate()
 {
 	D(d);
-#if _WINDOWS
+#if GM_USE_PTHREAD
+	pthread_exit(nullptr);
+#else
 	HANDLE* handle = (HANDLE*)d->handle.native_handle();
 	::TerminateThread(handle, 0);
 #endif
@@ -84,7 +86,7 @@ void GMThread::terminate()
 GMThreadHandle::id GMThread::getCurrentThreadId()
 {
 #if GM_USE_PTHREAD
-	return pthread_self();
+	return pthread_self().p;
 #else
 	return std::this_thread::get_id();
 #endif
