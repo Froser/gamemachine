@@ -10,7 +10,7 @@
 
 BEGIN_NS
 
-#define GM GameMachine::instance()
+#define GM gm::GameMachine::instance()
 
 GM_PRIVATE_OBJECT(GameMachine)
 {

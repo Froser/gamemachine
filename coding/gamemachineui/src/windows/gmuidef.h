@@ -1,7 +1,7 @@
 ﻿#ifndef __GMUI_DEF_H__
 #define __GMUI_DEF_H__
 
-#ifndef _WINDOWS
+#if !_WINDOWS
 #error Windows system is required.
 #endif
 

@@ -25,6 +25,7 @@ struct IGamePackageHandler;
 struct GraphicSettings;
 struct CameraLookAt;
 struct IDebugOutput;
+struct IAudioPlayer;
 
 namespace linear_math
 {
@@ -156,6 +157,17 @@ GM_ALIGNED_STRUCT(GMConsoleHandle)
 {
 	IWindow* window;
 	IDebugOutput* dbgoutput;
+};
+
+GM_INTERFACE(IAudioPlayer)
+{
+	virtual void play() = 0;
+	virtual void stop() = 0;
+};
+
+GM_INTERFACE(IAudioReader)
+{
+	virtual bool load(GMBuffer& buffer, OUT IAudioPlayer** player) = 0;
 };
 
 END_NS

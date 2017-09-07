@@ -1,9 +1,9 @@
 ﻿#ifndef __GMCOM_H__
 #define __GMCOM_H__
-#include "common.h"
-BEGIN_NS
+#include <gamemachine.h>
 
 #if _WINDOWS
+#include <Unknwnbase.h>
 
 #if _MSC_VER
 #	define __uuid(c) __uuidof(c)
@@ -18,6 +18,7 @@ BEGIN_NS
 	}
 #endif
 
+BEGIN_NS
 template <class E>
 class ComPtr
 {

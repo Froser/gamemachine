@@ -3,13 +3,6 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-#ifndef _WINDOWS
-struct WAVEFORMATEX
-{
-	
-};
-#endif
-
 struct GMWaveData
 {
 	GMbyte chID[4];

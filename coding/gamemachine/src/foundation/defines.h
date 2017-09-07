@@ -137,7 +137,7 @@ using Deque = std::deque<T>;
 #define IN
 
 // 用于枚举的宏
-#define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((GMint)var)+1) )
+#define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((gm::GMint)var)+1) )
 
 #define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (GMint) var < (GMint) end; var = (decltype(var))(((GMint)var)+1) )
 

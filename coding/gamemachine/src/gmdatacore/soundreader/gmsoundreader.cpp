@@ -27,7 +27,7 @@ public:
 	}
 
 private:
-	std::map<GMSoundReader::SoundType, ISoundReader*> m_readers;
+	Map<GMSoundReader::SoundType, ISoundReader*> m_readers;
 };
 
 GMSoundFile::GMSoundFile(const WAVEFORMATEX& fmt, AUTORELEASE GMWaveData* waveData)
