@@ -24,8 +24,7 @@ public:
 	ALDeviceList& getDevices() { D(d); return d->devices; }
 
 public:
-	virtual void play() override {}
-	virtual void stop() override {}
+	virtual void createPlayerHandle(gm::IAudioFile*);
 
 private:
 	bool openDevice(gm::GMint idx);

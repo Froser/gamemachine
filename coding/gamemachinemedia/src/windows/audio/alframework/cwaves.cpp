@@ -115,7 +115,7 @@ WAVERESULT CWaves::LoadWaveFile(const char *szFilename, WAVEID *pWaveID)
 	pWaveInfo = new WAVEFILEINFO;
 	if (pWaveInfo)
 	{
-		if (SUCCEEDED(wr = ParseFile(szFilename, pWaveInfo)))
+		if (WAVE_SUCCEEDED(wr = ParseFile(szFilename, pWaveInfo)))
 		{
 			// Allocate memory for sample data
 			pWaveInfo->pData = new char[pWaveInfo->ulDataSize];
@@ -176,7 +176,7 @@ WAVERESULT CWaves::OpenWaveFile(const char *szFilename, WAVEID *pWaveID)
 	pWaveInfo = new WAVEFILEINFO;
 	if (pWaveInfo)
 	{
-		if (SUCCEEDED(wr = ParseFile(szFilename, pWaveInfo)))
+		if (WAVE_SUCCEEDED(wr = ParseFile(szFilename, pWaveInfo)))
 		{
 			long lLoop = 0;
 			for (lLoop = 0; lLoop < MAX_NUM_WAVEID; lLoop++)

@@ -170,12 +170,12 @@ struct GMAudioFileInfo
 GM_INTERFACE(IAudioFile)
 {
 	virtual const GMAudioFileInfo& getFileInfo() = 0;
+	virtual void disposeAudioFile() = 0;
 };
 
 GM_INTERFACE(IAudioPlayer)
 {
-	virtual void play() = 0;
-	virtual void stop() = 0;
+	virtual void createPlayerHandle(IAudioFile*) = 0;
 };
 
 GM_INTERFACE(IAudioReader)

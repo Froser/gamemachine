@@ -12,7 +12,7 @@ enum class GMPackageIndex
 	TexShaders,
 	Textures,
 	Models,
-	Sounds,
+	Audio,
 	Scripts,
 };
 

@@ -105,8 +105,8 @@ GMString GMGLDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 		return d->packagePath + "textures/";
 	case GMPackageIndex::Models:
 		return d->packagePath + "models/";
-	case GMPackageIndex::Sounds:
-		return d->packagePath + "sounds/";
+	case GMPackageIndex::Audio:
+		return d->packagePath + "audio/";
 	case GMPackageIndex::Scripts:
 		return d->packagePath + "scripts/";
 	default:
@@ -320,8 +320,8 @@ GMString GMGLZipGamePackageHandler::pathRoot(GMPackageIndex index)
 		return "textures/";
 	case GMPackageIndex::Models:
 		return "models/";
-	case GMPackageIndex::Sounds:
-		return "sounds/";
+	case GMPackageIndex::Audio:
+		return "audio/";
 	case GMPackageIndex::Scripts:
 		return "scripts/";
 	default:

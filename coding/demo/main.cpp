@@ -682,8 +682,17 @@ int WINAPI WinMain(
 	);
 
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
+	gm::IAudioReader* reader;
+	gmm::GMMFactory::createAudioReader(&reader);
+	
+	GMBuffer buffer;
+	pk->readFile(GMPackageIndex::Audio, "footsteps.wav", &buffer);
+	IAudioFile* file;
+	reader->load(buffer, &file);
+
 	gm::IAudioPlayer* player = nullptr;
 	gmm::GMMFactory::createAudioPlayer(&player);
+	player->createPlayerHandle(file);
 
 #if 0
 	// Òì²½Ä£ĞÍ

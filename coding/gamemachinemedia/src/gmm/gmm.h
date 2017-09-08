@@ -13,6 +13,7 @@ BEGIN_MEDIA_NS
 class GMMFactory
 {
 public:
+	static void createAudioReader(OUT gm::IAudioReader** reader);
 	static void createAudioPlayer(OUT gm::IAudioPlayer** player);
 };
 

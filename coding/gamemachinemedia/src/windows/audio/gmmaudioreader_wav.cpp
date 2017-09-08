@@ -4,6 +4,26 @@
 #include "alframework/cwaves.h"
 #include <al.h>
 
+#pragma pack(push, 4)
+struct WAVEFILEHEADER
+{
+	char			szRIFF[4];
+	unsigned long	ulRIFFSize;
+	char			szWAVE[4];
+};
+
+static bool strnEqual(char* a, char* b, gm::GMint n)
+{
+	gm::GMint i = 0;
+	do
+	{
+		if (a[i] != b[i])
+			return false;
+	}
+	while (++i < n);
+	return true;
+}
+
 static CWaves& getWaveLoader()
 {
 	static CWaves g_cwaves;
@@ -12,7 +32,7 @@ static CWaves& getWaveLoader()
 
 GM_PRIVATE_OBJECT(GMMAudioPlayer_Wav)
 {
-	WAVEID waveId = 0;
+	WAVEID waveId = -1;
 	gm::GMAudioFileInfo fileInfo;
 };
 
@@ -27,6 +47,7 @@ public:
 
 	~GMMAudioPlayer_Wav()
 	{
+		disposeAudioFile();
 	}
 
 public:
@@ -34,7 +55,7 @@ public:
 	{
 		D(d);
 		CWaves& waveLoader = getWaveLoader();
-		if (WAVE_SUCCEEDED(waveLoader.LoadWaveFile("", &d->waveId)))
+		if (WAVE_SUCCEEDED(waveLoader.LoadWaveFile("D:\\gmpk\\audio\\footsteps.wav", &d->waveId)))
 		{
 			if ((WAVE_SUCCEEDED(waveLoader.GetWaveSize(d->waveId, (unsigned long*)&d->fileInfo.size))) &&
 				(WAVE_SUCCEEDED(waveLoader.GetWaveData(d->waveId, (void**)&d->fileInfo.data))) &&
@@ -46,6 +67,17 @@ public:
 	}
 
 public:
+	virtual void disposeAudioFile() override
+	{
+		D(d);
+		if (d->waveId > 0)
+		{
+			CWaves& waveLoader = getWaveLoader();
+			waveLoader.DeleteWaveFile(d->waveId);
+			d->waveId = -1;
+		}
+	}
+
 	virtual gm::GMAudioFileInfo& getFileInfo() override
 	{
 		D(d);
@@ -62,14 +94,9 @@ bool GMMAudioReader_Wav::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
 
 bool GMMAudioReader_Wav::test(const gm::GMBuffer& buffer)
 {
-	struct GMMWAVERIFF
-	{
-		gm::GMbyte chID[4];
-		DWORD dwSize;
-		gm::GMbyte chData[4];
-	} riff;
+	WAVEFILEHEADER header;
 	gm::MemoryStream ms(buffer.buffer, buffer.size);
-	ms.read((gm::GMbyte*)&riff, sizeof(GMMWAVERIFF));
+	ms.read((gm::GMbyte*)&header, sizeof(header));
 	GM_ASSERT(GM.getMachineEndianness() == gm::GameMachine::LITTLE_ENDIAN);
-	return riff.chData[0] == 'W' && riff.chData[1] == 'A' && riff.chData[2] == 'V' && riff.chData[3] == 'E';
+	return strnEqual(header.szRIFF, "RIFF", 4) && strnEqual(header.szWAVE, "WAVE", 4);
 }
