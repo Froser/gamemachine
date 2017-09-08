@@ -44,11 +44,11 @@ GMMAudioReader::AudioType GMMAudioReader::test(const gm::GMBuffer& buffer)
 	return AudioType::End;
 }
 
-bool GMMAudioReader::load(gm::GMBuffer& buffer, OUT gm::IAudioPlayer** player)
+bool GMMAudioReader::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
 {
 	auto type = test(buffer);
 	if (type == AudioType::End)
 		return false;
 
-	return getReader(type)->load(buffer, player);
+	return getReader(type)->load(buffer, f);
 }

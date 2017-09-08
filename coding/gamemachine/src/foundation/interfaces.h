@@ -159,6 +159,19 @@ GM_ALIGNED_STRUCT(GMConsoleHandle)
 	IDebugOutput* dbgoutput;
 };
 
+struct GMAudioFileInfo
+{
+	GMint format;
+	const void* data;
+	GMint size;
+	GMint frequency;
+};
+
+GM_INTERFACE(IAudioFile)
+{
+	virtual const GMAudioFileInfo& getFileInfo() = 0;
+};
+
 GM_INTERFACE(IAudioPlayer)
 {
 	virtual void play() = 0;
@@ -167,7 +180,7 @@ GM_INTERFACE(IAudioPlayer)
 
 GM_INTERFACE(IAudioReader)
 {
-	virtual bool load(GMBuffer& buffer, OUT IAudioPlayer** player) = 0;
+	virtual bool load(GMBuffer& buffer, OUT gm::IAudioFile** f) = 0;
 };
 
 END_NS

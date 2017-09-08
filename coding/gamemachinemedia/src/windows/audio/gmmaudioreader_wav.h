@@ -9,7 +9,7 @@ BEGIN_MEDIA_NS
 class GMMAudioReader_Wav : public gm::GMObject, public IAudioFormatReader
 {
 public:
-	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioPlayer** player) override;
+	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f) override;
 	virtual bool test(const gm::GMBuffer& buffer) override;
 };
 

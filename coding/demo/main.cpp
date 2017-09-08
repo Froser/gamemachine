@@ -12,7 +12,7 @@
 #include <gmbsp.h>
 #include <gmimage.h>
 #include <gmui.h>
-#include "..\gamemachinemedia\src\common\audio\gmmaudioplayer.h"
+#include <gmm.h>
 
 #define EMITTER_DEMO 1
 
@@ -682,8 +682,9 @@ int WINAPI WinMain(
 	);
 
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
-	GMMAudioPlayer player;//test
-	(void*)&player;
+	gm::IAudioPlayer* player = nullptr;
+	gmm::GMMFactory::createAudioPlayer(&player);
+
 #if 0
 	// Òì²½Ä£ÐÍ
 	GMBuffer buffer;

@@ -8,7 +8,7 @@ BEGIN_MEDIA_NS
 
 GM_INTERFACE(IAudioFormatReader)
 {
-	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioPlayer** player) = 0;
+	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f) = 0;
 	virtual bool test(const gm::GMBuffer& buffer) = 0;
 };
 
@@ -23,7 +23,7 @@ public:
 	};
 
 public:
-	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioPlayer** player) override;
+	virtual bool load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f) override;
 
 private:
 	IAudioFormatReader* getReader(AudioType type);

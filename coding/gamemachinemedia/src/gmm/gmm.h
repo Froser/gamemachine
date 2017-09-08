@@ -6,6 +6,16 @@
 #include "../windows/audio/gmmaudioreader.h"
 #endif
 
-END_UI_NS
+#include <gmmaudioplayer.h>
+
+BEGIN_MEDIA_NS
+
+class GMMFactory
+{
+public:
+	static void createAudioPlayer(OUT gm::IAudioPlayer** player);
+};
+
+END_MEDIA_NS
 
 #endif
