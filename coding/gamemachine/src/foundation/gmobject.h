@@ -4,6 +4,12 @@
 #include "memory.h"
 #include <functional>
 
+#if __APPLE__
+#	include <string>
+#	include <sstream>
+#	include <iostream>
+#endif
+
 BEGIN_NS
 
 // IDipose接口无其它含义，表示此类有一个虚析构函数
@@ -175,7 +181,12 @@ struct GMConnectionTarget
 	char name[128];
 };
 using GMConnectionTargets = Vector<GMConnectionTarget>;
+
+#if __APPLE__
+using GMEvents = Map<std::string, Vector<GMCallbackTarget>>;
+#else
 using GMEvents = UnorderedMap<std::string, Vector<GMCallbackTarget>>;
+#endif
 
 #define GM_BEGIN_META_MAP \
 	protected: \

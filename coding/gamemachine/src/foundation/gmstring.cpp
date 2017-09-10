@@ -7,6 +7,16 @@
 
 size_t GMString::npos = std::string::npos;
 
+#if _WINDOWS
+#	define gm_swprintf swprintf
+#else
+template <typename... T>
+void gm_swprintf(GMWchar* buffer, const GMWchar* format, T... args)
+{
+	swprintf(buffer, wcslen(buffer), format, args...);
+}
+#endif
+
 GMString::GMString()
 {
 	D(d);
@@ -76,7 +86,7 @@ GMString::GMString(const GMfloat f)
 	D(d);
 	d->type = Data::WideChars;
 	GMWchar buffer[128] = { 0 };
-	swprintf(buffer, _L("%f"), f);
+	gm_swprintf(buffer, _L("%f"), f);
 	d->wstr = buffer;
 }
 
@@ -85,7 +95,7 @@ GMString::GMString(const GMint i)
 	D(d);
 	d->type = Data::WideChars;
 	GMWchar buffer[128] = { 0 };
-	swprintf(buffer, _L("%i"), i);
+	gm_swprintf(buffer, _L("%i"), i);
 	d->wstr = buffer;
 }
 
@@ -185,7 +195,7 @@ std::string GMString::toStdString() const
 #if _WINDOWS
 	WideCharToMultiByte(CP_ACP, 0, d->wstr.data(), -1, (char*)d->bufString.data(), d->wstr.size(), 0, FALSE);
 #else
-#	error
+	GM_ASSERT(false); //TODO
 #endif
 	return d->bufString;
 }
@@ -232,7 +242,7 @@ std::wstring GMString::toStdWString() const
 #if _WINDOWS
 	MultiByteToWideChar(CP_ACP, 0, d->str.data(), -1, (GMWchar*)d->bufWString.data(), d->str.size());
 #else
-#	error
+	GM_ASSERT(false); //TODO
 #endif
 	return d->bufWString;
 }

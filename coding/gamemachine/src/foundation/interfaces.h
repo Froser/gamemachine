@@ -134,9 +134,11 @@ struct GMWindowAttributes
 	GMInstance instance;
 };
 #else
+struct GMWindowAttributes
+{
+};
 typedef GMuint GMUIInstance;
 typedef GMuint GMWindowHandle;
-struct GMUIWindowAttributes {};
 #endif
 
 GM_INTERFACE(IWindow)

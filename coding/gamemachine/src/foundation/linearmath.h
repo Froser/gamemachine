@@ -259,73 +259,73 @@ namespace linear_math
 
 	// Operators
 	template <typename T>
-	static inline T operator - (const T& left)
+	inline T operator - (const T& left)
 	{
 		return _op_selector<T>::Op::negate(left);
 	}
 
 	template <typename T>
-	static inline T operator + (const T& left, const T& right)
+	inline T operator + (const T& left, const T& right)
 	{
 		return _op_selector<T>::Op::add(left, right);
 	}
 
 	template <typename T>
-	static inline T operator - (const T& left, const T& right)
+	inline T operator - (const T& left, const T& right)
 	{
 		return _op_selector<T>::Op::sub(left, right);
 	}
 
 	template <typename T>
-	static inline T operator * (const T& left, GMfloat right)
+	inline T operator * (const T& left, GMfloat right)
 	{
 		return _op_selector<T>::Op::mul(left, right);
 	}
 
 	template <typename T>
-	static inline T operator * (GMfloat a, const T& b)
+	inline T operator * (GMfloat a, const T& b)
 	{
 		return _op_selector<T>::Op::mul(b, a);
 	}
 
 	template <typename T>
-	static inline T operator / (const T& left, GMfloat right)
+	inline T operator / (const T& left, GMfloat right)
 	{
 		return _op_selector<T>::Op::div(left, right);
 	}
 
 	template <typename T>
-	static inline T operator / (GMfloat left, const T& right)
+	inline T operator / (GMfloat left, const T& right)
 	{
 		return _op_selector<T>::Op::div(left, right);
 	}
 
 	template <typename T>
-	static inline T& operator += (T& left, const T& right)
+	inline T& operator += (T& left, const T& right)
 	{
 		return _op_selector<T>::Op::self_add(left, right);
 	}
 
 	template <typename T>
-	static inline T& operator += (T& left, GMfloat right)
+	inline T& operator += (T& left, GMfloat right)
 	{
 		return _op_selector<T>::Op::self_add(left, right);
 	}
 
 	template <typename T>
-	static inline T& operator -= (T& left, GMfloat right)
+	inline T& operator -= (T& left, GMfloat right)
 	{
 		return _op_selector<T>::Op::self_sub(left, right);
 	}
 
 	template <typename T>
-	static inline T& operator *= (T& left, GMfloat right)
+	inline T& operator *= (T& left, GMfloat right)
 	{
 		return _op_selector<T>::Op::self_mul(left, right);
 	}
 
 	template <typename T>
-	static inline T& operator /= (T& left, GMfloat right)
+	inline T& operator /= (T& left, GMfloat right)
 	{
 		return _op_selector<T>::Op::self_div(left, right);
 	}
@@ -635,7 +635,7 @@ namespace linear_math
 		Vector4 m_data[4];
 	};
 
-	static inline Vector4 operator* (const Vector4& left, const Matrix4x4& right)
+	inline Vector4 operator* (const Vector4& left, const Matrix4x4& right)
 	{
 #if USE_SIMD
 		__m128 __result;
@@ -663,7 +663,7 @@ namespace linear_math
 	}
 
 // AlignedVector functions
-	static inline GMfloat fastInvSqrt(GMfloat x)
+	inline GMfloat fastInvSqrt(GMfloat x)
 	{
 		GMfloat xhalf = 0.5f*x;
 		GMint i = *(GMint*)&x;
@@ -720,7 +720,7 @@ namespace linear_math
 		return left[0] * right[0] + left[1] * right[1];
 	}
 
-	static inline Vector3 cross(const Vector3& left, const Vector3& right)
+	inline Vector3 cross(const Vector3& left, const Vector3& right)
 	{
 #if USE_SIMD
 		__m128 T, V;
@@ -752,36 +752,36 @@ namespace linear_math
 	}
 
 	template <typename T>
-	static inline GMfloat length(const T& left)
+	inline GMfloat length(const T& left)
 	{
 		return gmSqrt(dot(left, left));
 	}
 
 	template <typename T>
-	static inline GMfloat lengthSquare(const T& left)
+	inline GMfloat lengthSquare(const T& left)
 	{
 		return dot(left, left);
 	}
 
 	template <typename T>
-	static inline GMfloat fast_length(const T& left)
+	inline GMfloat fast_length(const T& left)
 	{
 		return 1.f / (GMfloat)fastInvSqrt(lengthSquare(left));
 	}
 
 	template <typename T>
-	static inline T normalize(const T& left)
+	inline T normalize(const T& left)
 	{
 		return left * fastInvSqrt(lengthSquare(left));
 	}
 
 	template <typename T>
-	static inline T precise_normalize(const T& left)
+	inline T precise_normalize(const T& left)
 	{
 		return left / length(left);
 	}
 
-	static inline Matrix4x4 translate(const Vector3& t)
+	inline Matrix4x4 translate(const Vector3& t)
 	{
 		return Matrix4x4(Vector4(1.0f, 0.0f, 0.0f, 0.0f),
 			Vector4(0.0f, 1.0f, 0.0f, 0.0f),
@@ -789,7 +789,7 @@ namespace linear_math
 			Vector4(t[0], t[1], t[2], 1.0f));
 	}
 
-	static inline Matrix4x4 lookat(const Vector3& eye, const Vector3& center, const Vector3& up)
+	inline Matrix4x4 lookat(const Vector3& eye, const Vector3& center, const Vector3& up)
 	{
 		const Vector3 f = normalize(center - eye);
 		const Vector3 upN = normalize(up);
@@ -803,7 +803,7 @@ namespace linear_math
 		return M * translate(-eye);
 	}
 
-	static inline Matrix4x4 scale(GMfloat x)
+	inline Matrix4x4 scale(GMfloat x)
 	{
 		return Matrix4x4(Vector4(x, 0.0f, 0.0f, 0.0f),
 			Vector4(0.0f, x, 0.0f, 0.0f),
@@ -811,7 +811,7 @@ namespace linear_math
 			Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
-	static inline Matrix4x4 scale(GMfloat x, GMfloat y, GMfloat z)
+	inline Matrix4x4 scale(GMfloat x, GMfloat y, GMfloat z)
 	{
 		return Matrix4x4(Vector4(x, 0.0f, 0.0f, 0.0f),
 			Vector4(0.0f, y, 0.0f, 0.0f),
@@ -819,12 +819,12 @@ namespace linear_math
 			Vector4(0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
-	static inline Matrix4x4 scale(const Vector3& v)
+	inline Matrix4x4 scale(const Vector3& v)
 	{
 		return scale(v[0], v[1], v[2]);
 	}
 
-	static inline Matrix4x4 frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
+	inline Matrix4x4 frustum(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 	{
 		Matrix4x4 result(Matrix4x4::identity());
 
@@ -849,12 +849,12 @@ namespace linear_math
 		return result;
 	}
 
-	static inline bool fuzzyCompare(GMfloat p1, GMfloat p2)
+	inline bool fuzzyCompare(GMfloat p1, GMfloat p2)
 	{
 		return (fabs(p1 - p2) <= 0.01f);
 	}
 
-	static inline bool equals(const Vector3& left, const Vector3& right)
+	inline bool equals(const Vector3& left, const Vector3& right)
 	{
 		//TODO 可以优化(SIMD)
 		for (GMint i = 0; i < 3; i++)
@@ -865,7 +865,7 @@ namespace linear_math
 		return true;
 	}
 
-	static inline bool equals(const Vector4& left, const Vector4& right)
+	inline bool equals(const Vector4& left, const Vector4& right)
 	{
 #if USE_SIMD
 		return left.get128().m128_f32 == right.get128().m128_f32;
@@ -879,7 +879,7 @@ namespace linear_math
 #endif
 	}
 
-	static inline Matrix4x4 perspective(float fovy, float aspect, float n, float f)
+	inline Matrix4x4 perspective(float fovy, float aspect, float n, float f)
 	{
 		float q = 1.0f / tan(RAD(0.5f * fovy));
 		float A = q / aspect;
@@ -896,7 +896,7 @@ namespace linear_math
 		return result;
 	}
 
-	static inline Matrix4x4 ortho(float left, float right, float bottom, float top, float n, float f)
+	inline Matrix4x4 ortho(float left, float right, float bottom, float top, float n, float f)
 	{
 		return Matrix4x4(
 			Vector4(2.0f / (right - left),			0.0f,							0.0f,				0),

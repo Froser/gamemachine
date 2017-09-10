@@ -478,7 +478,7 @@ struct GMPath
 #if _WINDOWS
 typedef HANDLE GMEventHandle;
 #else
-#	error need implement
+typedef void* GMEventHandle; //TODO
 #endif
 
 GM_PRIVATE_OBJECT(GMEvent)
