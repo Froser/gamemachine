@@ -11,6 +11,7 @@
 void GameMachine::init(
 	AUTORELEASE IWindow* mainWindow,
 	const GMConsoleHandle& consoleHandle,
+	AUTORELEASE IAudioPlayer* audioPlayer,
 	AUTORELEASE IFactory* factory,
 	AUTORELEASE IGameHandler* gameHandler
 )
@@ -29,6 +30,7 @@ void GameMachine::init(
 	registerManager(new GMStates(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
 	d->consoleOutput = consoleHandle.dbgoutput;
+	registerManager(audioPlayer, &d->audioPlayer);
 
 	initInner();
 	d->gameHandler->init();

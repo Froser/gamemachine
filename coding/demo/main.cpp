@@ -673,10 +673,14 @@ int WINAPI WinMain(
 	gm::GMConsoleHandle consoleHandle;
 	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);
 	consoleHandle.window->create(consoleAttrs);
-	
+
+	gm::IAudioPlayer* player = nullptr;
+	gmm::GMMFactory::createAudioPlayer(&player);
+
 	GM.init(
 		mainWindow,
 		consoleHandle,
+		player,
 		new GMGLFactory(),
 		new GameHandler()
 	);
@@ -690,9 +694,16 @@ int WINAPI WinMain(
 	IAudioFile* file;
 	reader->load(buffer, &file);
 
-	gm::IAudioPlayer* player = nullptr;
-	gmm::GMMFactory::createAudioPlayer(&player);
-	player->createPlayerHandle(file);
+	IAudioSource* s;
+	GM.getAudioPlayer()->createPlayerSource(file, &s);
+
+	s->play(true);
+	Sleep(1500);
+	s->pause();
+	Sleep(1500);
+	s->play(true);
+	Sleep(1500);
+	s->rewind();
 
 #if 0
 	// Òì²½Ä£ĞÍ

@@ -175,9 +175,17 @@ GM_INTERFACE(IAudioFile)
 	virtual void disposeAudioFile() = 0;
 };
 
+GM_INTERFACE(IAudioSource)
+{
+	virtual void play(bool loop) = 0;
+	virtual void stop() = 0;
+	virtual void pause() = 0;
+	virtual void rewind() = 0;
+};
+
 GM_INTERFACE(IAudioPlayer)
 {
-	virtual void createPlayerHandle(IAudioFile*) = 0;
+	virtual void createPlayerSource(IAudioFile*, OUT gm::IAudioSource** handle) = 0;
 };
 
 GM_INTERFACE(IAudioReader)

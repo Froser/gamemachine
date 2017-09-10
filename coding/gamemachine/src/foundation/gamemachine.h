@@ -24,6 +24,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IInput* inputManager = nullptr;
 	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
+	IAudioPlayer* audioPlayer = nullptr;
 
 	// 内置调试窗口，他们本质是同一个对象，所以不能重复释放
 	IWindow* consoleWindow = nullptr; 
@@ -64,6 +65,7 @@ public:
 	void init(
 		AUTORELEASE IWindow* mainWindow,
 		const GMConsoleHandle& consoleHandle,
+		AUTORELEASE IAudioPlayer* audioPlayer,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
@@ -91,6 +93,9 @@ public:
 
 	// 相机管理
 	GMCamera& getCamera() { D(d); return d->camera; }
+
+	// 音频管理
+	IAudioPlayer* getAudioPlayer() { D(d); return d->audioPlayer; }
 
 	// 时间管理
 	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }

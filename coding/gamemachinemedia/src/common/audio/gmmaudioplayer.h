@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMMAudioPlayer)
 	ALDeviceList devices;
 };
 
-class GMMAudioPlayer : public gm::IAudioPlayer
+class GMMAudioPlayer : public gm::GMObject, public gm::IAudioPlayer
 {
 	DECLARE_PRIVATE(GMMAudioPlayer)
 
@@ -24,7 +24,7 @@ public:
 	ALDeviceList& getDevices() { D(d); return d->devices; }
 
 public:
-	virtual void createPlayerHandle(gm::IAudioFile*);
+	virtual void createPlayerSource(gm::IAudioFile* f, OUT gm::IAudioSource** handle) override;
 
 private:
 	bool openDevice(gm::GMint idx);
