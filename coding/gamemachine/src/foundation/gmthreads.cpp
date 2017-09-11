@@ -83,6 +83,32 @@ void GMThread::terminate()
 #endif
 }
 
+void GMThread::detach()
+{
+	D(d);
+#if GM_USE_PTHREAD
+	pthread_detach()
+#else
+	d->handle.detach();
+#endif
+}
+
+bool GMThread::join()
+{
+	D(d);
+#if GM_USE_PTHREAD
+	pthread_join();
+	return true;
+#else
+	if (d->handle.joinable())
+	{
+		d->handle.join();
+		return true;
+	}
+	return false;
+#endif
+}
+
 GMThreadHandle::id GMThread::getCurrentThreadId()
 {
 #if GM_USE_PTHREAD
@@ -90,11 +116,6 @@ GMThreadHandle::id GMThread::getCurrentThreadId()
 #else
 	return std::this_thread::get_id();
 #endif
-}
-
-GMThread::GMThread(GMThread&& t) noexcept
-{
-	swap(t);
 }
 
 void GMThread::sleep(GMint miliseconds)

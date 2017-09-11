@@ -55,13 +55,14 @@ class GMThread : public GMObject
 
 public:
 	GMThread();
-	GMThread(GMThread&&) noexcept;
 
 public:
 	void start();
 	void wait(GMuint milliseconds = 0);
 	void setCallback(IThreadCallback* callback);
 	void terminate();
+	void detach();
+	bool join();
 
 public:
 	GMThread::Data* threadData() { D(d); return data(); }

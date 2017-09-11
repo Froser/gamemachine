@@ -16,7 +16,6 @@ enum class GMAudioSourcePlaySignal
 	Stop,
 	Play,
 	Rewind,
-	Terminate,
 };
 
 GM_PRIVATE_OBJECT(GMAudioHandlePlayThread)
@@ -24,6 +23,7 @@ GM_PRIVATE_OBJECT(GMAudioHandlePlayThread)
 	ALint sourceId = 0;
 	GMAudioSourcePlaySignal signal = GMAudioSourcePlaySignal::None;
 	bool loop = false;
+	bool threadRunning = false;
 };
 
 class GMAudioHandlePlayThread : public gm::GMThread
@@ -46,9 +46,12 @@ public:
 	void emitSignal(GMAudioSourcePlaySignal signal)
 	{
 		D(d);
-		d->signal = signal;
-		if (d->signal == GMAudioSourcePlaySignal::Play)
-			this->start();
+		setSignal(signal);
+		if (!d->threadRunning)
+		{
+			if (d->signal == GMAudioSourcePlaySignal::Play)
+				this->start();
+		}
 	}
 
 	ALint getSourceState()
@@ -59,73 +62,75 @@ public:
 		return state;
 	}
 
-	void playSource()
-	{
-		D(d);
-		alSourcePlay(d->sourceId);
-	}
-
-public:
+private:
 	virtual void run() override
 	{
 		D(d);
+		d->threadRunning = true;
 		ALint state = AL_INVALID_VALUE;
-		bool breakLoop = false;
-		while (d->loop && !breakLoop)
+		do
 		{
-			do
-			{
-				Sleep(1000 / 60);
+			Sleep(1000 / 60); // 1 frame
 
-				switch (d->signal)
+			switch (d->signal)
+			{
+			case GMAudioSourcePlaySignal::Stop:
+				alSourceStop(d->sourceId);
+				break;
+			case GMAudioSourcePlaySignal::Pause:
+				alSourcePause(d->sourceId);
+				break;
+			case GMAudioSourcePlaySignal::Rewind:
+				alSourceRewind(d->sourceId);
+				break;
+			case GMAudioSourcePlaySignal::Play:
+				alSourcePlay(d->sourceId);
+				break;
+			case GMAudioSourcePlaySignal::None:
+			default:
+				break;
+			}
+
+			alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
+			if (d->signal == GMAudioSourcePlaySignal::Stop ||
+				d->signal == GMAudioSourcePlaySignal::Pause ||
+				d->signal == GMAudioSourcePlaySignal::Rewind )
+			{
+				break;
+			}
+
+			if (state != AL_PLAYING)
+			{
+				if (d->loop && d->signal == GMAudioSourcePlaySignal::None)
 				{
-				case GMAudioSourcePlaySignal::Stop:
-					alSourceStop(d->sourceId);
-					resetSignal();
-					breakLoop = true;
-					break;
-				case GMAudioSourcePlaySignal::Pause:
-					alSourcePause(d->sourceId);
-					resetSignal();
-					breakLoop = true;
-					break;
-				case GMAudioSourcePlaySignal::Rewind:
 					alSourceRewind(d->sourceId);
-					resetSignal();
-					break;
-				case GMAudioSourcePlaySignal::Play:
-					playSource();
-					resetSignal();
-					break;
-				case GMAudioSourcePlaySignal::None:
-				default:
+					alSourcePlay(d->sourceId);
+				}
+				else
+				{
 					break;
 				}
+			}
 
-				if (breakLoop)
-					break;
+			setSignal(GMAudioSourcePlaySignal::None);
 
-				alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
-			} while (state == AL_PLAYING);
-
-			if (d->loop && !breakLoop)
-				playSource();
-		}
-		resetSignal();
+		} while (1);
+		d->threadRunning = false;
 	}
 
 private:
-	void resetSignal()
+	void setSignal(GMAudioSourcePlaySignal signal)
 	{
 		D(d);
-		d->signal = GMAudioSourcePlaySignal::None;
+		gm::GMMutex m;
+		d->signal = signal;
 	}
 };
 
 GM_PRIVATE_OBJECT(GMMAudioSource)
 {
-	ALint bufferId;
-	ALint sourceId;
+	ALuint bufferId = 0;
+	ALuint sourceId = 0;
 	GMAudioHandlePlayThread playThread;
 };
 
@@ -135,6 +140,7 @@ class GMMAudioSource : public gm::GMObject, public gm::IAudioSource
 
 public:
 	GMMAudioSource(ALuint bufferId, ALuint sourceId);
+	~GMMAudioSource();
 
 public:
 	virtual void play(bool loop) override;
@@ -150,6 +156,14 @@ GMMAudioSource::GMMAudioSource(ALuint bufferId, ALuint sourceId)
 	d->sourceId = sourceId;
 }
 
+GMMAudioSource::~GMMAudioSource()
+{
+	D(d);
+	d->playThread.emitSignal(GMAudioSourcePlaySignal::Stop);
+	d->playThread.join();
+	alDeleteSources(1, &d->sourceId);
+}
+
 void GMMAudioSource::play(bool loop)
 {
 	D(d);
@@ -162,18 +176,21 @@ void GMMAudioSource::stop()
 {
 	D(d);
 	d->playThread.emitSignal(GMAudioSourcePlaySignal::Stop);
+	d->playThread.join();
 }
 
 void GMMAudioSource::pause()
 {
 	D(d);
 	d->playThread.emitSignal(GMAudioSourcePlaySignal::Pause);
+	d->playThread.join();
 }
 
 void GMMAudioSource::rewind()
 {
 	D(d);
 	d->playThread.emitSignal(GMAudioSourcePlaySignal::Rewind);
+	d->playThread.join();
 }
 
 //////////////////////////////////////////////////////////////////////////
