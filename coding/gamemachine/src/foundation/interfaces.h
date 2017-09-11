@@ -161,16 +161,33 @@ GM_ALIGNED_STRUCT(GMConsoleHandle)
 	IDebugOutput* dbgoutput;
 };
 
+// Audio
+#ifndef _WAVEFORMATEX_
+#define _WAVEFORMATEX_
+typedef struct tWAVEFORMATEX
+{
+	WORD    wFormatTag;
+	WORD    nChannels;
+	DWORD   nSamplesPerSec;
+	DWORD   nAvgBytesPerSec;
+	WORD    nBlockAlign;
+	WORD    wBitsPerSample;
+	WORD    cbSize;
+} WAVEFORMATEX;
+#endif /* _WAVEFORMATEX_ */
+
 struct GMAudioFileInfo
 {
 	GMint format;
 	const void* data;
 	GMint size;
 	GMint frequency;
+	WAVEFORMATEX waveFormatExHeader;
 };
 
 GM_INTERFACE(IAudioFile)
 {
+	virtual bool isStream() = 0;
 	virtual const GMAudioFileInfo& getFileInfo() = 0;
 	virtual void disposeAudioFile() = 0;
 };

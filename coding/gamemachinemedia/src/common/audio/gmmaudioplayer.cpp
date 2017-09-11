@@ -2,6 +2,7 @@
 #include "gmmaudioplayer.h"
 #include "al.h"
 #include "alc.h"
+#include "decoder.h"
 
 // 大小保持一致
 static_assert(sizeof(gm::GMint) == sizeof(ALenum), "Size error");
@@ -9,7 +10,7 @@ static_assert(sizeof(gm::GMint) == sizeof(ALsizei), "Size error");
 static ALenum s_alErrCode;
 #define GMM_CHECK_AL_ERROR() GM_ASSERT((s_alErrCode = alGetError()) == AL_NO_ERROR);
 //////////////////////////////////////////////////////////////////////////
-enum class GMAudioSourcePlaySignal
+enum class GMMAudioSourcePlayOperation
 {
 	None,
 	Pause,
@@ -18,129 +19,109 @@ enum class GMAudioSourcePlaySignal
 	Rewind,
 };
 
-GM_PRIVATE_OBJECT(GMAudioHandlePlayThread)
-{
-	ALint sourceId = 0;
-	GMAudioSourcePlaySignal signal = GMAudioSourcePlaySignal::None;
-	bool loop = false;
-	bool threadRunning = false;
-};
-
-class GMAudioHandlePlayThread : public gm::GMThread
-{
-	DECLARE_PRIVATE(GMAudioHandlePlayThread)
-
-public:
-	void setSource(ALint sourceId)
-	{
-		D(d);
-		d->sourceId = sourceId;
-	}
-
-	void setLoop(bool loop)
-	{
-		D(d);
-		d->loop = loop;
-	}
-
-	void emitSignal(GMAudioSourcePlaySignal signal)
-	{
-		D(d);
-		setSignal(signal);
-		if (!d->threadRunning)
-		{
-			if (d->signal == GMAudioSourcePlaySignal::Play)
-				this->start();
-		}
-	}
-
-	ALint getSourceState()
-	{
-		D(d);
-		ALint state;
-		alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
-		return state;
-	}
-
-private:
-	virtual void run() override
-	{
-		D(d);
-		d->threadRunning = true;
-		ALint state = AL_INVALID_VALUE;
-		do
-		{
-			Sleep(1000 / 60); // 1 frame
-
-			switch (d->signal)
-			{
-			case GMAudioSourcePlaySignal::Stop:
-				alSourceStop(d->sourceId);
-				break;
-			case GMAudioSourcePlaySignal::Pause:
-				alSourcePause(d->sourceId);
-				break;
-			case GMAudioSourcePlaySignal::Rewind:
-				alSourceRewind(d->sourceId);
-				break;
-			case GMAudioSourcePlaySignal::Play:
-				alSourcePlay(d->sourceId);
-				break;
-			case GMAudioSourcePlaySignal::None:
-			default:
-				break;
-			}
-
-			alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
-			if (d->signal == GMAudioSourcePlaySignal::Stop ||
-				d->signal == GMAudioSourcePlaySignal::Pause ||
-				d->signal == GMAudioSourcePlaySignal::Rewind )
-			{
-				break;
-			}
-
-			if (state != AL_PLAYING)
-			{
-				if (d->loop && d->signal == GMAudioSourcePlaySignal::None)
-				{
-					alSourceRewind(d->sourceId);
-					alSourcePlay(d->sourceId);
-				}
-				else
-				{
-					break;
-				}
-			}
-
-			setSignal(GMAudioSourcePlaySignal::None);
-
-		} while (1);
-		d->threadRunning = false;
-	}
-
-private:
-	void setSignal(GMAudioSourcePlaySignal signal)
-	{
-		D(d);
-		gm::GMMutex m;
-		d->signal = signal;
-	}
-};
-
-GM_PRIVATE_OBJECT(GMMAudioSource)
+//////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT(GMMAudioStaticSource)
 {
 	ALuint bufferId = 0;
 	ALuint sourceId = 0;
-	GMAudioHandlePlayThread playThread;
 };
 
-class GMMAudioSource : public gm::GMObject, public gm::IAudioSource
+class GMMAudioStaticSource : public gm::GMObject, public gm::IAudioSource
 {
-	DECLARE_PRIVATE(GMMAudioSource)
+	DECLARE_PRIVATE(GMMAudioStaticSource)
 
 public:
-	GMMAudioSource(ALuint bufferId, ALuint sourceId);
-	~GMMAudioSource();
+	GMMAudioStaticSource(ALuint bufferId, ALuint sourceId);
+	~GMMAudioStaticSource();
+
+public:
+	virtual void play(bool loop) override;
+	virtual void stop() override;
+	virtual void pause() override;
+	virtual void rewind() override;
+
+private:
+	void operate(GMMAudioSourcePlayOperation op);
+};
+
+GMMAudioStaticSource::GMMAudioStaticSource(ALuint bufferId, ALuint sourceId)
+{
+	D(d);
+	d->bufferId = bufferId;
+	d->sourceId = sourceId;
+}
+
+GMMAudioStaticSource::~GMMAudioStaticSource()
+{
+	D(d);
+	operate(GMMAudioSourcePlayOperation::Stop);
+	alDeleteSources(1, &d->sourceId);
+}
+
+void GMMAudioStaticSource::play(bool loop)
+{
+	D(d);
+	alSourcei(d->sourceId, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+	operate(GMMAudioSourcePlayOperation::Play);
+}
+
+void GMMAudioStaticSource::stop()
+{
+	D(d);
+	operate(GMMAudioSourcePlayOperation::Stop);
+}
+
+void GMMAudioStaticSource::pause()
+{
+	D(d);
+	operate(GMMAudioSourcePlayOperation::Pause);
+}
+
+void GMMAudioStaticSource::rewind()
+{
+	D(d);
+	operate(GMMAudioSourcePlayOperation::Rewind);
+}
+
+void GMMAudioStaticSource::operate(GMMAudioSourcePlayOperation op)
+{
+	D(d);
+	switch (op)
+	{
+	case GMMAudioSourcePlayOperation::Stop:
+		alSourceStop(d->sourceId);
+		break;
+	case GMMAudioSourcePlayOperation::Pause:
+		alSourcePause(d->sourceId);
+		break;
+	case GMMAudioSourcePlayOperation::Rewind:
+		alSourceRewind(d->sourceId);
+		break;
+	case GMMAudioSourcePlayOperation::Play:
+		alSourcePlay(d->sourceId);
+		break;
+	case GMMAudioSourcePlayOperation::None:
+	default:
+		break;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT(GMMAudioStreamSource)
+{
+	ALuint bufferNum = 0;
+	ALuint* bufferIds = nullptr;
+	ALuint sourceId = 0;
+	gm::IAudioFile* file;
+};
+
+class GMMAudioStreamSource : public gm::GMObject, public gm::IAudioSource
+{
+	DECLARE_PRIVATE(GMMAudioStreamSource)
+
+public:
+	GMMAudioStreamSource(ALuint bufferNum, ALuint* buffers, ALuint sourceId, gm::IAudioFile* file);
+	~GMMAudioStreamSource();
 
 public:
 	virtual void play(bool loop) override;
@@ -149,48 +130,41 @@ public:
 	virtual void rewind() override;
 };
 
-GMMAudioSource::GMMAudioSource(ALuint bufferId, ALuint sourceId)
+GMMAudioStreamSource::GMMAudioStreamSource(ALuint bufferNum, ALuint* buffers, ALuint sourceId, gm::IAudioFile* file)
 {
 	D(d);
-	d->bufferId = bufferId;
+	d->bufferNum = bufferNum;
+	d->bufferIds = new ALuint[d->bufferNum]{ 0 };
 	d->sourceId = sourceId;
+	d->file = file;
 }
 
-GMMAudioSource::~GMMAudioSource()
+GMMAudioStreamSource::~GMMAudioStreamSource()
 {
 	D(d);
-	d->playThread.emitSignal(GMAudioSourcePlaySignal::Stop);
-	d->playThread.join();
+	GM_ASSERT(d->bufferIds);
+	delete[] d->bufferIds;
 	alDeleteSources(1, &d->sourceId);
 }
 
-void GMMAudioSource::play(bool loop)
+void GMMAudioStreamSource::play(bool loop)
 {
 	D(d);
-	d->playThread.setSource(d->sourceId);
-	d->playThread.setLoop(loop);
-	d->playThread.emitSignal(GMAudioSourcePlaySignal::Play);
 }
 
-void GMMAudioSource::stop()
+void GMMAudioStreamSource::stop()
 {
-	D(d);
-	d->playThread.emitSignal(GMAudioSourcePlaySignal::Stop);
-	d->playThread.join();
+
 }
 
-void GMMAudioSource::pause()
+void GMMAudioStreamSource::pause()
 {
-	D(d);
-	d->playThread.emitSignal(GMAudioSourcePlaySignal::Pause);
-	d->playThread.join();
+
 }
 
-void GMMAudioSource::rewind()
+void GMMAudioStreamSource::rewind()
 {
-	D(d);
-	d->playThread.emitSignal(GMAudioSourcePlaySignal::Rewind);
-	d->playThread.join();
+
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -238,21 +212,40 @@ void GMMAudioPlayer::shutdownDevice()
 
 void GMMAudioPlayer::createPlayerSource(gm::IAudioFile* f, OUT gm::IAudioSource** handle)
 {
-	ALuint uiBufferID = -1;
-	GMM_CHECK_AL_ERROR();
-	alGenBuffers(1, &uiBufferID);
-	GMM_CHECK_AL_ERROR();
+	if (!f->isStream())
+	{
+		ALuint uiBufferID = 0;
+		GMM_CHECK_AL_ERROR();
+		alGenBuffers(1, &uiBufferID);
+		GMM_CHECK_AL_ERROR();
 
-	const gm::GMAudioFileInfo& fileInfo = f->getFileInfo();
-	GMM_CHECK_AL_ERROR();
-	alBufferData(uiBufferID, fileInfo.format, fileInfo.data, fileInfo.size, fileInfo.frequency);
-	GMM_CHECK_AL_ERROR();
-	f->disposeAudioFile();
+		const gm::GMAudioFileInfo& fileInfo = f->getFileInfo();
+		GMM_CHECK_AL_ERROR();
+		alBufferData(uiBufferID, fileInfo.format, fileInfo.data, fileInfo.size, fileInfo.frequency);
+		GMM_CHECK_AL_ERROR();
+		f->disposeAudioFile();
 
-	ALuint uiSource = -1;
-	alGenSources(1, &uiSource);
-	alSourcei(uiSource, AL_BUFFER, uiBufferID);
+		ALuint uiSource = 0;
+		alGenSources(1, &uiSource);
+		alSourcei(uiSource, AL_BUFFER, uiBufferID);
 
-	GMMAudioSource* h = new GMMAudioSource(uiBufferID, uiSource);
-	(*handle) = h;
+		GMMAudioStaticSource* h = new GMMAudioStaticSource(uiBufferID, uiSource);
+		(*handle) = h;
+	}
+	else
+	{
+		ALuint uiBuffers[STREAM_BUFFER_NUM] = { 0 };
+		alGenBuffers(STREAM_BUFFER_NUM, uiBuffers);
+		ALuint uiSource = 0;
+		alGenSources(1, &uiSource);
+
+		const gm::GMAudioFileInfo& fileInfo = f->getFileInfo();
+		gm::GMulong ulBufferSize = fileInfo.waveFormatExHeader.nAvgBytesPerSec >> 2;
+
+		// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment
+		ulBufferSize -= (ulBufferSize % fileInfo.waveFormatExHeader.nBlockAlign);
+
+		GMMAudioStreamSource* h = new GMMAudioStreamSource(STREAM_BUFFER_NUM, uiBuffers, uiSource, f);
+		(*handle) = h;
+	}
 }

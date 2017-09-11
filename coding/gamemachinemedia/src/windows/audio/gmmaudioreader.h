@@ -4,6 +4,17 @@
 #include <gamemachine.h>
 #include "../gmmdef.h"
 
+static bool strnEqual(char* a, char* b, gm::GMint n)
+{
+	gm::GMint i = 0;
+	do
+	{
+		if (a[i] != b[i])
+			return false;
+	} while (++i < n);
+	return true;
+}
+
 BEGIN_MEDIA_NS
 
 GM_INTERFACE(IAudioFormatReader)

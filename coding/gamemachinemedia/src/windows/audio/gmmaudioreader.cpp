@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioreader.h"
 #include "gmmaudioreader_wav.h"
+#include "gmmaudioreader_mp3.h"
 
 class GMAudioFormatReaders
 {
@@ -8,7 +9,7 @@ public:
 	GMAudioFormatReaders()
 	{
 		m_readers[GMMAudioReader::AudioType::Wav] = new GMMAudioReader_Wav();
-		//m_readers[GMMAudioReader::AudioType::MP3] = new GMSoundReader_MP3();
+		m_readers[GMMAudioReader::AudioType::MP3] = new GMMAudioReader_MP3();
 	}
 
 	~GMAudioFormatReaders()

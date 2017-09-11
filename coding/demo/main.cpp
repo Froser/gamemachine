@@ -690,17 +690,14 @@ int WINAPI WinMain(
 	gmm::GMMFactory::createAudioReader(&reader);
 	
 	GMBuffer buffer;
-	pk->readFile(GMPackageIndex::Audio, "footsteps.wav", &buffer);
+	pk->readFile(GMPackageIndex::Audio, "bgm.mp3", &buffer);
 	IAudioFile* file;
 	reader->load(buffer, &file);
 
 	IAudioSource* s;
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
 
-	s->play(true);
-	s->play(true);
-	Sleep(1500);
-	delete s;
+	s->play(1);
 
 #if 0
 	// Òì²½Ä£ÐÍ

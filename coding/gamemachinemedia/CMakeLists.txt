@@ -6,6 +6,7 @@ include_directories(
 		./include
 		../3rdparty/glew/include
 		../3rdparty/openal1.1/include
+		../3rdparty/libmad
 		../gamemachine/include
 	)
 
@@ -30,6 +31,8 @@ set(WIN32_SOURCES
 		src/windows/audio/gmmaudioreader.cpp
 		src/windows/audio/gmmaudioreader_wav.h
 		src/windows/audio/gmmaudioreader_wav.cpp
+		src/windows/audio/gmmaudioreader_mp3.h
+		src/windows/audio/gmmaudioreader_mp3.cpp
 	)
 
 source_group_by_dir(SOURCES)

@@ -12,40 +12,28 @@ struct WAVEFILEHEADER
 	char			szWAVE[4];
 };
 
-static bool strnEqual(char* a, char* b, gm::GMint n)
-{
-	gm::GMint i = 0;
-	do
-	{
-		if (a[i] != b[i])
-			return false;
-	}
-	while (++i < n);
-	return true;
-}
-
 static CWaves& getWaveLoader()
 {
 	static CWaves g_cwaves;
 	return g_cwaves;
 }
 
-GM_PRIVATE_OBJECT(GMMAudioPlayer_Wav)
+GM_PRIVATE_OBJECT(GMMAudioFile_Wav)
 {
 	WAVEID waveId = -1;
 	gm::GMAudioFileInfo fileInfo;
 };
 
-class GMMAudioPlayer_Wav : public gm::IAudioFile
+class GMMAudioFile_Wav : public gm::IAudioFile
 {
-	DECLARE_PRIVATE(GMMAudioPlayer_Wav)
+	DECLARE_PRIVATE(GMMAudioFile_Wav)
 
 public:
-	GMMAudioPlayer_Wav()
+	GMMAudioFile_Wav()
 	{
 	}
 
-	~GMMAudioPlayer_Wav()
+	~GMMAudioFile_Wav()
 	{
 		disposeAudioFile();
 	}
@@ -60,13 +48,19 @@ public:
 			if ((WAVE_SUCCEEDED(waveLoader.GetWaveSize(d->waveId, (unsigned long*)&d->fileInfo.size))) &&
 				(WAVE_SUCCEEDED(waveLoader.GetWaveData(d->waveId, (void**)&d->fileInfo.data))) &&
 				(WAVE_SUCCEEDED(waveLoader.GetWaveFrequency(d->waveId, (unsigned long*)&d->fileInfo.frequency))) &&
-				(WAVE_SUCCEEDED(waveLoader.GetWaveALBufferFormat(d->waveId, &alGetEnumValue, (unsigned long*)&d->fileInfo.format))))
+				(WAVE_SUCCEEDED(waveLoader.GetWaveALBufferFormat(d->waveId, &alGetEnumValue, (unsigned long*)&d->fileInfo.format))) &&
+				(WAVE_SUCCEEDED(waveLoader.GetWaveFormatExHeader(d->waveId, &d->fileInfo.waveFormatExHeader))))
 			return true;
 		}
 		return false;
 	}
 
 public:
+	virtual bool isStream() override
+	{
+		return false;
+	}
+
 	virtual void disposeAudioFile() override
 	{
 		D(d);
@@ -87,7 +81,7 @@ public:
 
 bool GMMAudioReader_Wav::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
 {
-	GMMAudioPlayer_Wav* file = new GMMAudioPlayer_Wav();
+	GMMAudioFile_Wav* file = new GMMAudioFile_Wav();
 	(*f) = file;
 	return file->load(buffer);
 }
@@ -97,6 +91,5 @@ bool GMMAudioReader_Wav::test(const gm::GMBuffer& buffer)
 	WAVEFILEHEADER header;
 	gm::MemoryStream ms(buffer.buffer, buffer.size);
 	ms.read((gm::GMbyte*)&header, sizeof(header));
-	GM_ASSERT(GM.getMachineEndianness() == gm::GameMachine::LITTLE_ENDIAN);
 	return strnEqual(header.szRIFF, "RIFF", 4) && strnEqual(header.szWAVE, "WAVE", 4);
 }
