@@ -176,10 +176,12 @@ public:
 			alSourceQueueBuffers(d->sourceId, 1, &d->buffers[i]);
 		}
 		alSourcePlay(d->sourceId);
-#if 0
+
 		ALint buffersProcessed = 0;
 		ALint totalBuffersProcessed = 0;
 		ALuint buffer = 0;
+		ALenum state;
+		ALint queuedBuffers;
 		while (true)
 		{
 			alGetSourcei(d->sourceId, AL_BUFFERS_PROCESSED, &buffersProcessed);
@@ -189,13 +191,32 @@ public:
 			{
 				buffer = 0;
 				alSourceUnqueueBuffers(d->sourceId, 1, &buffer);
-
-				//stream->readBuffer(audioData);
+				stream->nextBuffer();
+				stream->readBuffer(audioData);
+				if (audioData)
+				{
+					alBufferData(buffer, fileInfo.format, audioData, bufferSize, fileInfo.frequency);
+					alSourceQueueBuffers(d->sourceId, 1, &buffer);
+				}
 
 				buffersProcessed--;
 			}
+
+			alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
+			if (state != AL_PLAYING)
+			{
+				alGetSourcei(d->sourceId, AL_BUFFERS_QUEUED, &queuedBuffers);
+				if (queuedBuffers)
+				{
+					alSourcePlay(d->sourceId);
+				}
+				else
+				{
+					break;
+				}
+			}
 		}
-#endif
+		delete[] audioData;
 	}
 };
 

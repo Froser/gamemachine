@@ -189,7 +189,8 @@ GM_INTERFACE(IAudioStream)
 {
 	virtual GMuint getBufferSize() = 0; // 每个部分的buffer大小
 	virtual GMuint getBufferNum() = 0; // buffer一共分为多少部分
-	virtual void readBuffer(GMbyte* data) = 0;
+	virtual bool readBuffer(GMbyte* data) = 0;
+	virtual void nextBuffer() = 0;
 };
 
 GM_INTERFACE(IAudioFile)
