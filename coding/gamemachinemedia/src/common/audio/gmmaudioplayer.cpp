@@ -108,6 +108,8 @@ void GMMAudioStaticSource::operate(GMMAudioSourcePlayOperation op)
 }
 
 //////////////////////////////////////////////////////////////////////////
+
+class GMMAudioStreamPlayThread;
 GM_PRIVATE_OBJECT(GMMAudioStreamSource)
 {
 	ALuint* buffers = nullptr;
@@ -115,11 +117,19 @@ GM_PRIVATE_OBJECT(GMMAudioStreamSource)
 	ALuint bufferSize = 0;
 	ALuint sourceId = 0;
 	gm::IAudioFile* file;
+	GMMAudioStreamPlayThread* thread = nullptr;
+};
+
+GM_PRIVATE_OBJECT(GMMAudioStreamPlayThread)
+{
+	GMMAudioStreamSource* source = nullptr;
 };
 
 class GMMAudioStreamSource : public gm::GMObject, public gm::IAudioSource
 {
 	DECLARE_PRIVATE(GMMAudioStreamSource)
+
+	friend class GMMAudioStreamPlayThread;
 
 public:
 	GMMAudioStreamSource(gm::IAudioFile* file);
@@ -132,6 +142,63 @@ public:
 	virtual void rewind() override;
 };
 
+class GMMAudioStreamPlayThread : public gm::GMThread
+{
+	DECLARE_PRIVATE(GMMAudioStreamPlayThread)
+
+public:
+	GMMAudioStreamPlayThread(GMMAudioStreamSource* src)
+	{
+		D(d);
+		d->source = src;
+	}
+
+public:
+	virtual void run() override
+	{
+		D(d_self);
+		D_OF(d, d_self->source);
+
+		gm::IAudioStream* stream = d->file->getStream();
+		gm::GMuint bufferNum = stream->getBufferNum();
+
+		// 初始化
+		stream->readBuffer(nullptr);
+		gm::GMuint bufferSize = stream->getBufferSize();
+		gm::GMbyte* audioData = new gm::GMbyte[bufferSize];
+
+		// 先填充Buffer
+		auto& fileInfo = d->file->getFileInfo();
+		for (gm::GMuint i = 0; i < bufferNum; ++i)
+		{
+			stream->readBuffer(audioData);
+			alBufferData(d->buffers[i], fileInfo.format, audioData, bufferSize, fileInfo.frequency);
+			alSourceQueueBuffers(d->sourceId, 1, &d->buffers[i]);
+		}
+		alSourcePlay(d->sourceId);
+#if 0
+		ALint buffersProcessed = 0;
+		ALint totalBuffersProcessed = 0;
+		ALuint buffer = 0;
+		while (true)
+		{
+			alGetSourcei(d->sourceId, AL_BUFFERS_PROCESSED, &buffersProcessed);
+			totalBuffersProcessed += buffersProcessed;
+			// Check next chunk
+			while (buffersProcessed)
+			{
+				buffer = 0;
+				alSourceUnqueueBuffers(d->sourceId, 1, &buffer);
+
+				//stream->readBuffer(audioData);
+
+				buffersProcessed--;
+			}
+		}
+#endif
+	}
+};
+
 GMMAudioStreamSource::GMMAudioStreamSource(gm::IAudioFile* file)
 {
 	D(d);
@@ -140,6 +207,7 @@ GMMAudioStreamSource::GMMAudioStreamSource(gm::IAudioFile* file)
 	d->buffers = new ALuint[stream->getBufferNum()];
 	alGenBuffers(stream->getBufferNum(), d->buffers);
 	alGenSources(1, &d->sourceId);
+	d->thread = new GMMAudioStreamPlayThread(this);
 }
 
 GMMAudioStreamSource::~GMMAudioStreamSource()
@@ -153,29 +221,16 @@ GMMAudioStreamSource::~GMMAudioStreamSource()
 		alDeleteBuffers(stream->getBufferNum(), d->buffers);
 		delete[] d->buffers;
 	}
+
+	if (d->thread)
+		delete d->thread;
 }
 
 void GMMAudioStreamSource::play(bool loop)
 {
 	D(d);
 	GM_ASSERT(d->file->isStream());
-	gm::IAudioStream* stream = d->file->getStream();
-	gm::GMuint bufferNum = stream->getBufferNum();
-
-	// 初始化
-	stream->readBuffer(0, nullptr);
-	gm::GMuint bufferSize = stream->getBufferSize();
-	gm::GMbyte* audioData = new gm::GMbyte[bufferSize];
-
-	// 先填充Buffer
-	auto& fileInfo = d->file->getFileInfo();
-	for (gm::GMuint i = 0; i < bufferNum; ++i)
-	{
-		stream->readBuffer(i, audioData);
-		alBufferData(d->buffers[i], fileInfo.format, audioData, bufferSize, fileInfo.frequency);
-		alSourceQueueBuffers(d->sourceId, 1, &d->buffers[i]);
-	}
-	alSourcePlay(d->sourceId);
+	d->thread->start();
 }
 
 void GMMAudioStreamSource::stop()

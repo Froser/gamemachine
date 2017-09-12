@@ -117,7 +117,7 @@ public:
 		return d->bufferSize;
 	}
 
-	virtual void readBuffer(gm::GMuint n, gm::GMbyte* bytes)
+	virtual void readBuffer(gm::GMbyte* bytes) override
 	{
 		D(d);
 		d->bufferReadEvent.wait();
@@ -125,12 +125,12 @@ public:
 		if (!bytes)
 			return;
 
-		auto& buffer = d->output[n];
+		auto& buffer = d->output[d->readPtr];
 		gm::GMuint sz = buffer.size();
-		for (gm::GMuint i = 0; i < sz; ++i)
-		{
-			bytes[i] = buffer[i];
-		}
+		memcpy_s(bytes, sz, buffer.data(), sz);
+
+		++d->readPtr;
+		d->readPtr = d->readPtr % d->bufferNum;
 	}
 	
 private: // MP3解码器
@@ -227,9 +227,8 @@ private: // MP3解码器
 			d->output = new Vector<gm::GMbyte>[d->bufferSize];
 			for (gm::GMuint i = 0; i < d->bufferNum; i++)
 			{
-				d->output[i].resize(d->bufferSize);
+				d->output[i].reserve(d->bufferSize);
 			}
-			d->bufferReadEvent.set();
 		}
 	}
 
@@ -269,11 +268,16 @@ private: // MP3解码器
 
 	static void saveBuffer(Data* d, gm::GMbyte data)
 	{
+		// 当读取指针和写入指针在同一段，锁定它，直到这一段读取完毕
+		if (d->writePtr == d->readPtr)
+			d->bufferReadEvent.reset();
+
 		d->output[d->writePtr].push_back(data);
 		if (d->output[d->writePtr].size() == d->bufferSize)
 		{
 			++d->writePtr;
 			d->writePtr = d->writePtr % d->bufferNum;
+			d->bufferReadEvent.set();
 
 			if (d->writePtr == d->readPtr)
 			{
@@ -282,6 +286,7 @@ private: // MP3解码器
 				d->bufferWriteEvent.wait();
 			}
 		}
+
 	}
 };
 
