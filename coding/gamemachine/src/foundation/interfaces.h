@@ -185,11 +185,19 @@ struct GMAudioFileInfo
 	WAVEFORMATEX waveFormatExHeader;
 };
 
+GM_INTERFACE(IAudioStream)
+{
+	virtual GMuint getBufferSize() = 0; // 每个部分的buffer大小
+	virtual GMuint getBufferNum() = 0; // buffer一共分为多少部分
+	virtual void readBuffer(GMuint n, GMbyte* data) = 0;
+};
+
 GM_INTERFACE(IAudioFile)
 {
 	virtual bool isStream() = 0;
+	virtual IAudioStream* getStream() = 0;
 	virtual const GMAudioFileInfo& getFileInfo() = 0;
-	virtual void disposeAudioFile() = 0;
+	virtual GMuint getBufferId() = 0;
 };
 
 GM_INTERFACE(IAudioSource)

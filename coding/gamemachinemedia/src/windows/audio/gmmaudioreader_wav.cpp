@@ -20,6 +20,7 @@ static CWaves& getWaveLoader()
 
 GM_PRIVATE_OBJECT(GMMAudioFile_Wav)
 {
+	ALuint bufferId = 0;
 	WAVEID waveId = -1;
 	gm::GMAudioFileInfo fileInfo;
 };
@@ -50,7 +51,12 @@ public:
 				(WAVE_SUCCEEDED(waveLoader.GetWaveFrequency(d->waveId, (unsigned long*)&d->fileInfo.frequency))) &&
 				(WAVE_SUCCEEDED(waveLoader.GetWaveALBufferFormat(d->waveId, &alGetEnumValue, (unsigned long*)&d->fileInfo.format))) &&
 				(WAVE_SUCCEEDED(waveLoader.GetWaveFormatExHeader(d->waveId, &d->fileInfo.waveFormatExHeader))))
-			return true;
+			{
+				alGenBuffers(1, &d->bufferId);
+				alBufferData(d->bufferId, d->fileInfo.format, d->fileInfo.data, d->fileInfo.size, d->fileInfo.frequency);
+				disposeAudioFile();
+				return true;
+			}
 		}
 		return false;
 	}
@@ -61,7 +67,25 @@ public:
 		return false;
 	}
 
-	virtual void disposeAudioFile() override
+	virtual gm::IAudioStream* getStream() override
+	{
+		return nullptr;
+	}
+
+	virtual gm::GMAudioFileInfo& getFileInfo() override
+	{
+		D(d);
+		return d->fileInfo;
+	}
+
+	virtual gm::GMuint getBufferId()
+	{
+		D(d);
+		return d->bufferId;
+	}
+
+private:
+	virtual void disposeAudioFile()
 	{
 		D(d);
 		if (d->waveId > 0)
@@ -72,11 +96,6 @@ public:
 		}
 	}
 
-	virtual gm::GMAudioFileInfo& getFileInfo() override
-	{
-		D(d);
-		return d->fileInfo;
-	}
 };
 
 bool GMMAudioReader_Wav::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)

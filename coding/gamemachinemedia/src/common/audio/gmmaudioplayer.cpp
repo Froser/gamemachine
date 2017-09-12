@@ -22,7 +22,7 @@ enum class GMMAudioSourcePlayOperation
 //////////////////////////////////////////////////////////////////////////
 GM_PRIVATE_OBJECT(GMMAudioStaticSource)
 {
-	ALuint bufferId = 0;
+	gm::IAudioFile* file = nullptr;
 	ALuint sourceId = 0;
 };
 
@@ -31,7 +31,7 @@ class GMMAudioStaticSource : public gm::GMObject, public gm::IAudioSource
 	DECLARE_PRIVATE(GMMAudioStaticSource)
 
 public:
-	GMMAudioStaticSource(ALuint bufferId, ALuint sourceId);
+	GMMAudioStaticSource(gm::IAudioFile* f);
 	~GMMAudioStaticSource();
 
 public:
@@ -44,11 +44,12 @@ private:
 	void operate(GMMAudioSourcePlayOperation op);
 };
 
-GMMAudioStaticSource::GMMAudioStaticSource(ALuint bufferId, ALuint sourceId)
+GMMAudioStaticSource::GMMAudioStaticSource(gm::IAudioFile* f)
 {
 	D(d);
-	d->bufferId = bufferId;
-	d->sourceId = sourceId;
+	d->file = f;
+	alGenSources(1, &d->sourceId);
+	alSourcei(d->sourceId, AL_BUFFER, d->file->getBufferId());
 }
 
 GMMAudioStaticSource::~GMMAudioStaticSource()
@@ -109,8 +110,9 @@ void GMMAudioStaticSource::operate(GMMAudioSourcePlayOperation op)
 //////////////////////////////////////////////////////////////////////////
 GM_PRIVATE_OBJECT(GMMAudioStreamSource)
 {
+	ALuint* buffers = nullptr;
 	ALuint bufferNum = 0;
-	ALuint* bufferIds = nullptr;
+	ALuint bufferSize = 0;
 	ALuint sourceId = 0;
 	gm::IAudioFile* file;
 };
@@ -120,7 +122,7 @@ class GMMAudioStreamSource : public gm::GMObject, public gm::IAudioSource
 	DECLARE_PRIVATE(GMMAudioStreamSource)
 
 public:
-	GMMAudioStreamSource(ALuint bufferNum, ALuint* buffers, ALuint sourceId, gm::IAudioFile* file);
+	GMMAudioStreamSource(gm::IAudioFile* file);
 	~GMMAudioStreamSource();
 
 public:
@@ -130,26 +132,50 @@ public:
 	virtual void rewind() override;
 };
 
-GMMAudioStreamSource::GMMAudioStreamSource(ALuint bufferNum, ALuint* buffers, ALuint sourceId, gm::IAudioFile* file)
+GMMAudioStreamSource::GMMAudioStreamSource(gm::IAudioFile* file)
 {
 	D(d);
-	d->bufferNum = bufferNum;
-	d->bufferIds = new ALuint[d->bufferNum]{ 0 };
-	d->sourceId = sourceId;
 	d->file = file;
+	gm::IAudioStream* stream = d->file->getStream();
+	d->buffers = new ALuint[stream->getBufferNum()];
+	alGenBuffers(stream->getBufferNum(), d->buffers);
+	alGenSources(1, &d->sourceId);
 }
 
 GMMAudioStreamSource::~GMMAudioStreamSource()
 {
 	D(d);
-	GM_ASSERT(d->bufferIds);
-	delete[] d->bufferIds;
 	alDeleteSources(1, &d->sourceId);
+
+	if (d->buffers)
+	{
+		gm::IAudioStream* stream = d->file->getStream();
+		alDeleteBuffers(stream->getBufferNum(), d->buffers);
+		delete[] d->buffers;
+	}
 }
 
 void GMMAudioStreamSource::play(bool loop)
 {
 	D(d);
+	GM_ASSERT(d->file->isStream());
+	gm::IAudioStream* stream = d->file->getStream();
+	gm::GMuint bufferNum = stream->getBufferNum();
+
+	// 初始化
+	stream->readBuffer(0, nullptr);
+	gm::GMuint bufferSize = stream->getBufferSize();
+	gm::GMbyte* audioData = new gm::GMbyte[bufferSize];
+
+	// 先填充Buffer
+	auto& fileInfo = d->file->getFileInfo();
+	for (gm::GMuint i = 0; i < bufferNum; ++i)
+	{
+		stream->readBuffer(i, audioData);
+		alBufferData(d->buffers[i], fileInfo.format, audioData, bufferSize, fileInfo.frequency);
+		alSourceQueueBuffers(d->sourceId, 1, &d->buffers[i]);
+	}
+	alSourcePlay(d->sourceId);
 }
 
 void GMMAudioStreamSource::stop()
@@ -214,38 +240,12 @@ void GMMAudioPlayer::createPlayerSource(gm::IAudioFile* f, OUT gm::IAudioSource*
 {
 	if (!f->isStream())
 	{
-		ALuint uiBufferID = 0;
-		GMM_CHECK_AL_ERROR();
-		alGenBuffers(1, &uiBufferID);
-		GMM_CHECK_AL_ERROR();
-
-		const gm::GMAudioFileInfo& fileInfo = f->getFileInfo();
-		GMM_CHECK_AL_ERROR();
-		alBufferData(uiBufferID, fileInfo.format, fileInfo.data, fileInfo.size, fileInfo.frequency);
-		GMM_CHECK_AL_ERROR();
-		f->disposeAudioFile();
-
-		ALuint uiSource = 0;
-		alGenSources(1, &uiSource);
-		alSourcei(uiSource, AL_BUFFER, uiBufferID);
-
-		GMMAudioStaticSource* h = new GMMAudioStaticSource(uiBufferID, uiSource);
+		GMMAudioStaticSource* h = new GMMAudioStaticSource(f);
 		(*handle) = h;
 	}
 	else
 	{
-		ALuint uiBuffers[STREAM_BUFFER_NUM] = { 0 };
-		alGenBuffers(STREAM_BUFFER_NUM, uiBuffers);
-		ALuint uiSource = 0;
-		alGenSources(1, &uiSource);
-
-		const gm::GMAudioFileInfo& fileInfo = f->getFileInfo();
-		gm::GMulong ulBufferSize = fileInfo.waveFormatExHeader.nAvgBytesPerSec >> 2;
-
-		// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment
-		ulBufferSize -= (ulBufferSize % fileInfo.waveFormatExHeader.nBlockAlign);
-
-		GMMAudioStreamSource* h = new GMMAudioStreamSource(STREAM_BUFFER_NUM, uiBuffers, uiSource, f);
+		GMMAudioStreamSource* h = new GMMAudioStreamSource(f);
 		(*handle) = h;
 	}
 }
