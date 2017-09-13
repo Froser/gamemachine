@@ -168,6 +168,7 @@ public:
 
 		// 先填充Buffer
 		auto& fileInfo = d->file->getFileInfo();
+		stream->nextChunk(bufferNum);
 		for (gm::GMuint i = 0; i < bufferNum; ++i)
 		{
 			stream->readBuffer(audioData);

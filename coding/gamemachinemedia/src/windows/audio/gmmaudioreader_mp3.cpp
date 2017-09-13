@@ -33,12 +33,6 @@ private:
 	}
 };
 
-enum class GMMAudioFileStreamStatus
-{
-	StreamInit,
-	StreamBuffering,
-};
-
 GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 {
 	gm::GMuint bufferNum = 0;
@@ -56,7 +50,6 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 	gm::GMEvent streamReadyEvent;
 	gm::GMEvent blockWriteEvent;
 	gm::GMlong chunkNum = 0; //表示当前应该写入多少个chunk
-	GMMAudioFileStreamStatus state = GMMAudioFileStreamStatus::StreamInit;
 };
 
 class GMMAudioFile_MP3 : public gm::IAudioFile, public gm::IAudioStream
@@ -151,8 +144,6 @@ public:
 #else
 		d->chunkNum += chunkNum;
 #endif
-		if (d->state != GMMAudioFileStreamStatus::StreamBuffering)
-			d->state = GMMAudioFileStreamStatus::StreamBuffering;
 		if (chunkNum > 0)
 			d->blockWriteEvent.set();
 	}
@@ -308,27 +299,20 @@ private: // MP3解码器
 		if (d->output[d->writePtr].isFull())
 		{
 			d->output[d->writePtr].endWrite();
-
-			if (d->state == GMMAudioFileStreamStatus::StreamBuffering)
-			{
-				gm::interlock_dec(&d->chunkNum);
-				GM_ASSERT(d->chunkNum >= 0);
-			}
+			gm::interlock_dec(&d->chunkNum);
+			GM_ASSERT(d->chunkNum >= 0);
 
 			// 跳到下一段缓存
 			move(d->writePtr, d->bufferNum);
 			d->output[d->writePtr].beginWrite();
 			d->output[d->writePtr].rewind();
 
-			if (d->state == GMMAudioFileStreamStatus::StreamBuffering)
+			if (!d->chunkNum)
 			{
-				if (!d->chunkNum)
-				{
-					// 如果所以缓存写满，等待
-					d->blockWriteEvent.reset();
-					d->blockWriteEvent.wait();
-					d->blockWriteEvent.set();
-				}
+				// 如果所以缓存写满，等待
+				d->blockWriteEvent.reset();
+				d->blockWriteEvent.wait();
+				d->blockWriteEvent.set();
 			}
 		}
 	}
