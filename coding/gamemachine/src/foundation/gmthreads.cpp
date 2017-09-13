@@ -118,11 +118,12 @@ GMThreadHandle::id GMThread::getCurrentThreadId()
 #endif
 }
 
-void GMThread::sleep(GMint miliseconds)
+void GMThread::sleep(GMint milliseconds)
 {
-#if _WINDOWS
-	::Sleep(miliseconds);
+#if GM_USE_PTHREAD
+	::sleep(milliseconds / 1000.f);
 #else
-	GM_ASSERT(false);
+	std::chrono::duration<GMint, std::milli> milli(milliseconds);
+	std::this_thread::sleep_for(milli);
 #endif
 }

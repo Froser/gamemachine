@@ -163,7 +163,6 @@ public:
 		gm::GMuint bufferNum = stream->getBufferNum();
 
 		// 初始化
-		stream->readBuffer(nullptr);
 		gm::GMuint bufferSize = stream->getBufferSize();
 		gm::GMbyte* audioData = new gm::GMbyte[bufferSize];
 
@@ -184,16 +183,18 @@ public:
 		ALint queuedBuffers;
 		while (true)
 		{
+			gm::GMThread::sleep(1000 / 60);
+
 			alGetSourcei(d->sourceId, AL_BUFFERS_PROCESSED, &buffersProcessed);
 			totalBuffersProcessed += buffersProcessed;
 			// Check next chunk
+			if (buffersProcessed > 0)
+				stream->nextChunk(buffersProcessed);
 			while (buffersProcessed)
 			{
 				buffer = 0;
 				alSourceUnqueueBuffers(d->sourceId, 1, &buffer);
-				stream->nextBuffer();
-				stream->readBuffer(audioData);
-				if (audioData)
+				if (stream->readBuffer(audioData))
 				{
 					alBufferData(buffer, fileInfo.format, audioData, bufferSize, fileInfo.frequency);
 					alSourceQueueBuffers(d->sourceId, 1, &buffer);

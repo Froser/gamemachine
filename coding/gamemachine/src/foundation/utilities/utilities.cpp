@@ -766,10 +766,6 @@ void GMEvent::reset()
 
 void GMEvent::signalObjectAndWait(const GMEvent& eventToSignal, const GMEvent& eventToWait)
 {
-#if _WINDOWS
 	::SignalObjectAndWait(eventToSignal.data()->handle, eventToWait.data()->handle, INFINITE, FALSE);
-#else
-	GM_ASSERT(false);
-#endif
 }
 #endif

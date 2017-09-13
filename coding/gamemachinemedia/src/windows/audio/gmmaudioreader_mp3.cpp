@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
-#include <gmcom.h>
 #include "gmmaudioreader_mp3.h"
-#include "alframework/cwaves.h"
 #include <al.h>
 #include "mad.h"
+#include "common/utilities/gmmstream.h"
 
 typedef void(*DecodeCallback)(void* data);
 
@@ -34,12 +33,18 @@ private:
 	}
 };
 
+enum class GMMAudioFileStreamStatus
+{
+	StreamInit,
+	StreamBuffering,
+};
+
 GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 {
 	gm::GMuint bufferNum = 0;
 	gm::GMAudioFileInfo fileInfo;
 	bool fmtCreated = false;
-	Vector<gm::GMbyte>* output = nullptr;
+	GMMStream* output = nullptr;
 	GMMDecodeThread decodeThread;
 	bool terminateDecode = false;
 	gm::GMEvent terminateEvent;
@@ -48,8 +53,10 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 	gm::GMulong bufferSize = 0;
 	gm::GMuint writePtr = 0;
 	gm::GMuint readPtr = 0;
-	gm::GMEvent bufferWriteEvent;
-	gm::GMEvent bufferReadEvent;
+	gm::GMEvent streamReadyEvent;
+	gm::GMEvent blockWriteEvent;
+	gm::GMlong chunkNum = 0; //表示当前应该写入多少个chunk
+	GMMAudioFileStreamStatus state = GMMAudioFileStreamStatus::StreamInit;
 };
 
 class GMMAudioFile_MP3 : public gm::IAudioFile, public gm::IAudioStream
@@ -78,6 +85,7 @@ public:
 		d->bufferNum = getBufferNum();
 		d->decodeThread.setData(d, decode);
 		d->decodeThread.start();
+		d->streamReadyEvent.reset();
 		return true;
 	}
 
@@ -96,6 +104,7 @@ public:
 	virtual gm::GMAudioFileInfo& getFileInfo() override
 	{
 		D(d);
+		waitForStreamReady();
 		return d->fileInfo;
 	}
 
@@ -114,35 +123,48 @@ public:
 	virtual gm::GMuint getBufferSize() override
 	{
 		D(d);
+		waitForStreamReady();
 		return d->bufferSize;
 	}
 
 	virtual bool readBuffer(gm::GMbyte* bytes) override
 	{
 		D(d);
-		d->bufferReadEvent.wait();
-		d->bufferReadEvent.set();
+		waitForStreamReady();
 		if (!bytes)
 			return false;
 
 		auto& buffer = d->output[d->readPtr];
-		gm::GMuint sz = buffer.size();
-		if (!sz)
-			return false;
+		bool res = buffer.read(bytes);
 
-		memcpy_s(bytes, sz, buffer.data(), sz);
-
-		++d->readPtr;
-		d->readPtr = d->readPtr % d->bufferNum;
-		return true;
+		// 跳到下一段
+		move(d->readPtr, d->bufferNum); 
+		return res;
 	}
 
-	virtual void nextBuffer() override
+	virtual void nextChunk(gm::GMlong chunkNum) override
 	{
 		D(d);
-		d->bufferWriteEvent.set();
+
+#if _WINDOWS
+		::InterlockedAdd(&d->chunkNum, chunkNum);
+#else
+		d->chunkNum += chunkNum;
+#endif
+		if (d->state != GMMAudioFileStreamStatus::StreamBuffering)
+			d->state = GMMAudioFileStreamStatus::StreamBuffering;
+		if (chunkNum > 0)
+			d->blockWriteEvent.set();
 	}
 	
+private:
+	void waitForStreamReady()
+	{
+		D(d);
+		d->streamReadyEvent.wait();
+		d->streamReadyEvent.set();
+	}
+
 private: // MP3解码器
 	static void decode(void* data)
 	{
@@ -234,11 +256,14 @@ private: // MP3解码器
 			d->bufferSize -= (d->bufferSize % d->fileInfo.waveFormatExHeader.nBlockAlign);
 
 			GM_ASSERT(!d->output);
-			d->output = new Vector<gm::GMbyte>[d->bufferSize];
+			d->output = new GMMStream[d->bufferNum];
 			for (gm::GMuint i = 0; i < d->bufferNum; i++)
 			{
-				d->output[i].reserve(d->bufferSize);
+				d->output[i].resize(d->bufferSize);
 			}
+
+			// Stream is ready
+			d->streamReadyEvent.set();
 		}
 	}
 
@@ -278,26 +303,42 @@ private: // MP3解码器
 
 	static void saveBuffer(Data* d, gm::GMbyte data)
 	{
-		// 当读取指针和写入指针在同一段，锁定它，直到这一段读取完毕
-		if (d->writePtr == d->readPtr)
-			d->bufferReadEvent.reset();
-		else
-			d->bufferReadEvent.set();
-
-		d->output[d->writePtr].push_back(data);
-		if (d->output[d->writePtr].size() == d->bufferSize)
+		d->output[d->writePtr].beginWrite();
+		d->output[d->writePtr] << data;
+		if (d->output[d->writePtr].isFull())
 		{
-			++d->writePtr;
-			d->writePtr = d->writePtr % d->bufferNum;
-			d->output[d->writePtr].clear();
-			if (d->writePtr == d->readPtr)
+			d->output[d->writePtr].endWrite();
+
+			if (d->state == GMMAudioFileStreamStatus::StreamBuffering)
 			{
-				// 缓存写满了，等待时机写入
-				d->bufferWriteEvent.reset();
-				d->bufferWriteEvent.wait();
+				gm::interlock_dec(&d->chunkNum);
+				GM_ASSERT(d->chunkNum >= 0);
+			}
+
+			// 跳到下一段缓存
+			move(d->writePtr, d->bufferNum);
+			d->output[d->writePtr].beginWrite();
+			d->output[d->writePtr].rewind();
+
+			if (d->state == GMMAudioFileStreamStatus::StreamBuffering)
+			{
+				if (!d->chunkNum)
+				{
+					// 如果所以缓存写满，等待
+					d->blockWriteEvent.reset();
+					d->blockWriteEvent.wait();
+					d->blockWriteEvent.set();
+				}
 			}
 		}
 	}
+
+	static void move(gm::GMuint& ptr, gm::GMuint loop)
+	{
+		gm::interlock_inc(&ptr);
+		ptr = ptr % loop;
+	}
+
 };
 
 bool GMMAudioReader_MP3::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)

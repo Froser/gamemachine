@@ -4,6 +4,7 @@ init_solution()
 include_directories(
 		./
 		./include
+		./src
 		../3rdparty/glew/include
 		../3rdparty/openal1.1/include
 		../3rdparty/libmad
@@ -16,6 +17,8 @@ set(SOURCES
 		common.h
 
 		src/gmm/gmm.h
+		src/common/utilities/gmmstream.cpp
+		src/common/utilities/gmmstream.h
 		src/common/audio/aldlist.cpp
 		src/common/audio/aldlist.h
 		src/common/audio/gmmaudioplayer.h
