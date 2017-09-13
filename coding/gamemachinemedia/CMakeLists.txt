@@ -23,6 +23,9 @@ set(SOURCES
 		src/common/audio/aldlist.h
 		src/common/audio/gmmaudioplayer.h
 		src/common/audio/gmmaudioplayer.cpp
+		src/common/audio/gmmaudioreader.h
+		src/common/audio/gmmaudioreader_mp3.h
+		src/common/audio/gmmaudioreader_mp3.cpp
 	)
 
 set(WIN32_SOURCES
@@ -30,12 +33,9 @@ set(WIN32_SOURCES
 		src/windows/gmmdef.h
 		src/windows/audio/alframework/cwaves.cpp
 		src/windows/audio/alframework/cwaves.h
-		src/windows/audio/gmmaudioreader.h
 		src/windows/audio/gmmaudioreader.cpp
 		src/windows/audio/gmmaudioreader_wav.h
 		src/windows/audio/gmmaudioreader_wav.cpp
-		src/windows/audio/gmmaudioreader_mp3.h
-		src/windows/audio/gmmaudioreader_mp3.cpp
 	)
 
 source_group_by_dir(SOURCES)

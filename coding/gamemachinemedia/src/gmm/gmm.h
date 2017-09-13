@@ -2,11 +2,8 @@
 #define __GMM_H__
 #include <gmmcommon.h>
 
-#if _WINDOWS
-#include "../windows/audio/gmmaudioreader.h"
-#endif
-
 #include <gmmaudioplayer.h>
+#include <gmmaudioreader.h>
 
 BEGIN_MEDIA_NS
 

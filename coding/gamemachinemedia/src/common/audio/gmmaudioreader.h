@@ -2,7 +2,6 @@
 #define __GMMAUDIOREADER_H__
 #include <gmmcommon.h>
 #include <gamemachine.h>
-#include "../gmmdef.h"
 
 static bool strnEqual(char* a, char* b, gm::GMint n)
 {
