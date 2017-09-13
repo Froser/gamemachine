@@ -429,8 +429,8 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 		}
 
 		//Reset effects
-		GM_ASSERT(effectUniformName);
-		program->setBool(effectUniformName, false);
+		if (effectUniformName)
+			program->setBool(effectUniformName, false);
 
 		releaseBind();
 		GMEngine->setViewport(d->clientRect);
