@@ -165,6 +165,7 @@ public:
 	{
 		D(d_self);
 		detach();
+		d_self->terminate = false;
 		d_self->started = true;
 
 		D_OF(d, d_self->source);
@@ -191,7 +192,7 @@ public:
 		ALuint buffer = 0;
 		while (!d_self->terminate)
 		{
-			gm::GMThread::sleep(1000 / 60);
+			GMM_SLEEP_FOR_ONE_FRAME();
 
 			alGetSourcei(d->sourceId, AL_BUFFERS_PROCESSED, &buffersProcessed);
 			totalBuffersProcessed += buffersProcessed;
@@ -224,8 +225,11 @@ public:
 
 	void terminateThread()
 	{
-		D(d);
-		d->terminate = true;
+		D(d_self);
+		D_OF(d, d_self->source);
+		gm::IAudioStream* stream = d->file->getStream();
+		stream->nextChunk(1); //防止阻塞线程
+		d_self->terminate = true;
 	}
 };
 
@@ -286,16 +290,24 @@ void GMMAudioStreamSource::pause()
 void GMMAudioStreamSource::rewind()
 {
 	D(d);
+	// 停止播放线程
+	d->thread->detach();
+	d->thread->terminateThread();
+	d->thread->wait();
+
 	gm::IAudioStream* stream = d->file->getStream();
 	// 停止播放
 	alSourceStop(d->sourceId);
 
+	ALint state;
+	do
+	{
+		GMM_SLEEP_FOR_ONE_FRAME();
+		alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
+	} while (state == AL_PLAYING);
+
 	// 停止流解码，回退到流最初状态
 	stream->rewind();
-
-	// 停止播放线程
-	d->thread->terminateThread();
-	d->thread->wait();
 }
 
 //////////////////////////////////////////////////////////////////////////

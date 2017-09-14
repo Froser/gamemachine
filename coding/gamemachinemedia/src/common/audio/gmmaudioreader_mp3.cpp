@@ -5,6 +5,8 @@
 #include "common/utilities/gmmstream.h"
 #include "gmmaudioreader_stream.h"
 
+#define _MAD_CHECK_FLOW(i) if ((i) == MAD_FLOW_STOP) return MAD_FLOW_STOP;
+
 typedef void(*DecodeCallback)(void* data);
 
 GM_PRIVATE_OBJECT(GMMDecodeThread)
@@ -127,17 +129,28 @@ private: // MP3解码器
 
 			sample = scale(*left_ch++);
 
-			saveBuffer(d->baseData, (sample >> 0) & 0xff);
-			saveBuffer(d->baseData, (sample >> 8) & 0xff);
+			_MAD_CHECK_FLOW(saveBufferIfNotTerminated(d, (sample >> 0) & 0xff));
+			_MAD_CHECK_FLOW(saveBufferIfNotTerminated(d, (sample >> 8) & 0xff));
 
-			if (nchannels == 2) {
+			if (nchannels == 2)
+			{
 				sample = scale(*right_ch++);
-				saveBuffer(d->baseData, (sample >> 0) & 0xff);
-				saveBuffer(d->baseData, (sample >> 8) & 0xff);
+				_MAD_CHECK_FLOW(saveBufferIfNotTerminated(d, (sample >> 0) & 0xff));
+				_MAD_CHECK_FLOW(saveBufferIfNotTerminated(d, (sample >> 8) & 0xff));
 			}
 		}
 
 		return MAD_FLOW_CONTINUE;
+	}
+
+	static mad_flow saveBufferIfNotTerminated(Data* d, gm::GMbyte byte)
+	{
+		if (!d->terminateDecode)
+		{
+			saveBuffer(d->baseData, byte);
+			return MAD_FLOW_CONTINUE;
+		}
+		return MAD_FLOW_STOP;
 	}
 
 	static inline gm::GMint scale(mad_fixed_t sample)

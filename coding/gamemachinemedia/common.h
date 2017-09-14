@@ -11,6 +11,8 @@
 // 流采样数目
 #define STREAM_BUFFER_NUM 4
 
+#define GMM_SLEEP_FOR_ONE_FRAME() gm::GMThread::sleep(1000 / 60);
+
 // 常用函数
 inline bool strnEqual(char* a, char* b, int n)
 {

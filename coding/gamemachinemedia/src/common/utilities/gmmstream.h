@@ -13,6 +13,7 @@ GM_PRIVATE_OBJECT(GMMStream)
 	gm::GMManualResetEvent preventRead;
 	std::atomic_uint ptr;
 	gm::GMuint capacity = 0;
+	bool writing = false;
 };
 
 class GMMStream : public gm::GMObject
@@ -29,6 +30,7 @@ public:
 	void endWrite();
 	void rewind();
 	bool isFull();
+	bool isWriting();
 
 public:
 	GMMStream& operator <<(gm::GMbyte byte);

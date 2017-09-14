@@ -25,12 +25,14 @@ void GMMStream::resize(size_t sz)
 void GMMStream::beginWrite()
 {
 	D(d);
+	d->writing = true;
 	d->preventRead.reset();
 }
 
 void GMMStream::endWrite()
 {
 	D(d);
+	d->writing = false;
 	d->preventRead.set();
 }
 
@@ -46,9 +48,16 @@ bool GMMStream::isFull()
 	return d->capacity == d->ptr;
 }
 
+bool GMMStream::isWriting()
+{
+	D(d);
+	return d->writing;
+}
+
 GMMStream& GMMStream::operator <<(gm::GMbyte byte)
 {
 	D(d);
+	GM_ASSERT(d->ptr < d->capacity);
 	d->data[d->ptr] = byte;
 	d->ptr++;
 	return *this;
@@ -59,10 +68,8 @@ bool GMMStream::read(gm::GMbyte* buffer)
 	D(d);
 	d->preventRead.wait();
 	if (!isFull())
-	{
-		GM_ASSERT(false);
 		return false;
-	}
+
 	memcpy_s(buffer, d->capacity, d->data, d->capacity);
 	return true;
 }

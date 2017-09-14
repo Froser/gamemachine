@@ -5,6 +5,8 @@
 GMMAudioFile_Stream::GMMAudioFile_Stream()
 {
 	D(d);
+	d->writePtr = 0;
+	d->readPtr = 0;
 	d->chunkNum = 0;
 }
 
@@ -93,19 +95,32 @@ void GMMAudioFile_Stream::waitForStreamReady()
 void GMMAudioFile_Stream::rewindDecode()
 {
 	D(d);
-	d->streamReadyEvent.reset();
-	d->chunkNum = 0;
+	// 重启解码线程
 	d->writePtr = 0;
 	d->readPtr = 0;
-
-	// 重启解码线程
 	nextChunk(d->bufferNum);
 	startDecodeThread();
 }
 
 void GMMAudioFile_Stream::rewind()
 {
+	cleanUp();
 	rewindDecode();
+}
+
+void GMMAudioFile_Stream::cleanUp()
+{
+	D(d);
+	d->blockWriteEvent.set();
+
+	for (gm::GMuint i = 0; i < d->bufferNum; ++i)
+	{
+		if (d->output[i].isWriting())
+		{
+			d->output[i].endWrite(); //让数据读完，防止死锁
+			break; //不可能同时写多个buffer
+		}
+	}
 }
 
 void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)
@@ -123,7 +138,7 @@ void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)
 		d->output[d->writePtr].beginWrite();
 		d->output[d->writePtr].rewind();
 
-		if (!d->chunkNum)
+		if (d->chunkNum == 0)
 		{
 			// 如果所以缓存写满，等待
 			d->blockWriteEvent.reset();
@@ -132,7 +147,7 @@ void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)
 	}
 }
 
-void GMMAudioFile_Stream::move(gm::GMuint& ptr, gm::GMuint loop)
+void GMMAudioFile_Stream::move(std::atomic_long& ptr, gm::GMuint loop)
 {
 	++ptr;
 	ptr = ptr % loop;
