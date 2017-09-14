@@ -191,6 +191,7 @@ GM_INTERFACE(IAudioStream)
 	virtual GMuint getBufferNum() = 0; // buffer一共分为多少部分
 	virtual bool readBuffer(GMbyte* data) = 0;
 	virtual void nextChunk(gm::GMlong chunkNum) = 0;
+	virtual void rewind() = 0;
 };
 
 GM_INTERFACE(IAudioFile)

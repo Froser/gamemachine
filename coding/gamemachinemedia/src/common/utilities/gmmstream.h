@@ -11,7 +11,7 @@ GM_PRIVATE_OBJECT(GMMStream)
 {
 	gm::GMbyte* data = nullptr;
 	gm::GMEvent preventRead;
-	std::atomic_uint ptr = 0;
+	std::atomic_uint ptr;
 	gm::GMuint capacity = 0;
 };
 
@@ -20,7 +20,7 @@ class GMMStream : public gm::GMObject
 	DECLARE_PRIVATE(GMMStream)
 
 public:
-	GMMStream() = default;
+	GMMStream();
 	~GMMStream();
 
 public:

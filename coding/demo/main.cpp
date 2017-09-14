@@ -697,6 +697,7 @@ int WINAPI WinMain(
 	IAudioSource* s;
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
 
+	s->rewind();
 	s->play(1);
 
 #if 0

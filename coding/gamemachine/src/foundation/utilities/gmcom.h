@@ -3,9 +3,9 @@
 #include <gamemachine.h>
 
 #if _WINDOWS
-#include <Unknwnbase.h>
 
 #if _MSC_VER
+#   include <Unknwnbase.h>
 #	define __uuid(c) __uuidof(c)
 #	define GM_REGISTER_IUNKNOWN(c)
 #else

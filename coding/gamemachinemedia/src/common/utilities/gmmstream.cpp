@@ -1,5 +1,12 @@
 ﻿#include "stdafx.h"
+#include <gamemachine.h>
 #include "gmmstream.h"
+
+GMMStream::GMMStream()
+{
+	D(d);
+	d->ptr = 0;
+}
 
 GMMStream::~GMMStream()
 {

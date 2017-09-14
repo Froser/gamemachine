@@ -1,17 +1,17 @@
 /*
  * Copyright (c) 2006, Creative Labs Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided
  * that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright notice, this list of conditions and
  * 	     the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
  * 	     and the following disclaimer in the documentation and/or other materials provided with the distribution.
  *     * Neither the name of Creative Labs Inc. nor the names of its contributors may be used to endorse or
  * 	     promote products derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
@@ -22,9 +22,9 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <gmmcommon.h>
+#include <gamemachine.h>
 #include "CWaves.h"
-#include <ks.h>
-#include <ksmedia.h>
 #include <errno.h>
 
 #pragma pack(push, 4)
@@ -56,26 +56,80 @@ typedef struct
     GUID            guidSubFormat;
 } WAVEFMT;
 
-#pragma pack(pop)
+#ifndef _KSMEDIA_
+#define _KSMEDIA_
+// Speaker Positions:
+#define SPEAKER_FRONT_LEFT              0x1
+#define SPEAKER_FRONT_RIGHT             0x2
+#define SPEAKER_FRONT_CENTER            0x4
+#define SPEAKER_LOW_FREQUENCY           0x8
+#define SPEAKER_BACK_LEFT               0x10
+#define SPEAKER_BACK_RIGHT              0x20
+#define SPEAKER_FRONT_LEFT_OF_CENTER    0x40
+#define SPEAKER_FRONT_RIGHT_OF_CENTER   0x80
+#define SPEAKER_BACK_CENTER             0x100
+#define SPEAKER_SIDE_LEFT               0x200
+#define SPEAKER_SIDE_RIGHT              0x400
+#define SPEAKER_TOP_CENTER              0x800
+#define SPEAKER_TOP_FRONT_LEFT          0x1000
+#define SPEAKER_TOP_FRONT_CENTER        0x2000
+#define SPEAKER_TOP_FRONT_RIGHT         0x4000
+#define SPEAKER_TOP_BACK_LEFT           0x8000
+#define SPEAKER_TOP_BACK_CENTER         0x10000
+#define SPEAKER_TOP_BACK_RIGHT          0x20000
 
-#if _MSC_VER <= 1310 
+// Bit mask locations reserved for future use
+#define SPEAKER_RESERVED                0x7FFC0000
 
-// Wrap around the deprecated functions for VS2003 support
-int fopen_s( FILE** pFile, const char *filename, const char *mode )
-{
-    *pFile = fopen( filename, mode );
-    
-    return *pFile ? 0 : EBADF;
-}
+// Used to specify that any possible permutation of speaker configurations
+#define SPEAKER_ALL                     0x80000000
 
-int strncpy_s( char *strDest, size_t numberOfElements, const char *strSource, size_t count )
-{
-    strncpy( strDest, strSource, count );
-
-    return 0;
-}
-
+// DirectSound Speaker Config
+#if (NTDDI_VERSION >= NTDDI_WINXP)
+#define KSAUDIO_SPEAKER_DIRECTOUT       0
 #endif
+#define KSAUDIO_SPEAKER_MONO            (SPEAKER_FRONT_CENTER)
+#define KSAUDIO_SPEAKER_STEREO          (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT)
+#define KSAUDIO_SPEAKER_QUAD            (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | \
+                                         SPEAKER_BACK_LEFT  | SPEAKER_BACK_RIGHT)
+#define KSAUDIO_SPEAKER_SURROUND        (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | \
+                                         SPEAKER_FRONT_CENTER | SPEAKER_BACK_CENTER)
+#define KSAUDIO_SPEAKER_5POINT1         (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | \
+                                         SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | \
+                                         SPEAKER_BACK_LEFT  | SPEAKER_BACK_RIGHT)
+#define KSAUDIO_SPEAKER_7POINT1         (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | \
+                                         SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | \
+                                         SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT | \
+                                         SPEAKER_FRONT_LEFT_OF_CENTER | SPEAKER_FRONT_RIGHT_OF_CENTER)
+
+#if ( (NTDDI_VERSION >= NTDDI_WINXPSP2) && (NTDDI_VERSION < NTDDI_WS03) ) || (NTDDI_VERSION >= NTDDI_WS03SP1)
+
+#define KSAUDIO_SPEAKER_5POINT1_SURROUND (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | \
+                                         SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | \
+                                         SPEAKER_SIDE_LEFT  | SPEAKER_SIDE_RIGHT)
+#define KSAUDIO_SPEAKER_7POINT1_SURROUND (SPEAKER_FRONT_LEFT | SPEAKER_FRONT_RIGHT | \
+                                         SPEAKER_FRONT_CENTER | SPEAKER_LOW_FREQUENCY | \
+                                         SPEAKER_BACK_LEFT | SPEAKER_BACK_RIGHT | \
+                                         SPEAKER_SIDE_LEFT | SPEAKER_SIDE_RIGHT)
+// The following are obsolete 5.1 and 7.1 settings (they lack side speakers).  Note this means
+// that the default 5.1 and 7.1 settings (KSAUDIO_SPEAKER_5POINT1 and KSAUDIO_SPEAKER_7POINT1 are
+// similarly obsolete but are unchanged for compatibility reasons).
+#define KSAUDIO_SPEAKER_5POINT1_BACK     KSAUDIO_SPEAKER_5POINT1
+#define KSAUDIO_SPEAKER_7POINT1_WIDE     KSAUDIO_SPEAKER_7POINT1
+
+#endif // XP SP2 and later (chronologically)
+
+// DVD Speaker Positions
+#define KSAUDIO_SPEAKER_GROUND_FRONT_LEFT   SPEAKER_FRONT_LEFT
+#define KSAUDIO_SPEAKER_GROUND_FRONT_CENTER SPEAKER_FRONT_CENTER
+#define KSAUDIO_SPEAKER_GROUND_FRONT_RIGHT  SPEAKER_FRONT_RIGHT
+#define KSAUDIO_SPEAKER_GROUND_REAR_LEFT    SPEAKER_BACK_LEFT
+#define KSAUDIO_SPEAKER_GROUND_REAR_RIGHT   SPEAKER_BACK_RIGHT
+#define KSAUDIO_SPEAKER_TOP_MIDDLE          SPEAKER_TOP_CENTER
+#define KSAUDIO_SPEAKER_SUPER_WOOFER        SPEAKER_LOW_FREQUENCY
+#endif //__KSMEDIA__
+
+#pragma pack(pop)
 
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
@@ -297,16 +351,16 @@ WAVERESULT CWaves::ParseFile(const char *szFilename, LPWAVEFILEINFO pWaveInfo)
 	{
 		// Read Wave file header
 		fread(&waveFileHeader, 1, sizeof(WAVEFILEHEADER), pWaveInfo->pFile);
-		if (!_strnicmp(waveFileHeader.szRIFF, "RIFF", 4) && !_strnicmp(waveFileHeader.szWAVE, "WAVE", 4))
+		if (strnEqual(waveFileHeader.szRIFF, "RIFF", 4) && strnEqual(waveFileHeader.szWAVE, "WAVE", 4))
 		{
 			while (fread(&riffChunk, 1, sizeof(RIFFCHUNK), pWaveInfo->pFile) == sizeof(RIFFCHUNK))
 			{
-				if (!_strnicmp(riffChunk.szChunkName, "fmt ", 4))
+				if (strnEqual(riffChunk.szChunkName, "fmt ", 4))
 				{
 					if (riffChunk.ulChunkSize <= sizeof(WAVEFMT))
 					{
 						fread(&waveFmt, 1, riffChunk.ulChunkSize, pWaveInfo->pFile);
-					
+
 						// Determine if this is a WAVEFORMATEX or WAVEFORMATEXTENSIBLE wave file
 						if (waveFmt.usFormatTag == WAVE_FORMAT_PCM)
 						{
@@ -324,7 +378,7 @@ WAVERESULT CWaves::ParseFile(const char *szFilename, LPWAVEFILEINFO pWaveInfo)
 						fseek(pWaveInfo->pFile, riffChunk.ulChunkSize, SEEK_CUR);
 					}
 				}
-				else if (!_strnicmp(riffChunk.szChunkName, "data", 4))
+				else if (strnEqual(riffChunk.szChunkName, "data", 4))
 				{
 					pWaveInfo->ulDataSize = riffChunk.ulChunkSize;
 					pWaveInfo->ulDataOffset = ftell(pWaveInfo->pFile);
@@ -594,7 +648,7 @@ bool CWaves::IsWaveID(WAVEID WaveID)
 
 
 char *CWaves::GetErrorString(WAVERESULT wr, char *szErrorString, unsigned long nSizeOfErrorString)
-{	
+{
 	switch (wr)
 	{
 		case WR_OK:
@@ -632,7 +686,7 @@ char *CWaves::GetErrorString(WAVERESULT wr, char *szErrorString, unsigned long n
 		case WR_WAVEMUSTBEWAVEFORMATPCM:
 			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must be in Wave Format PCM\n", nSizeOfErrorString-1);
 			break;
-		
+
 		case WR_WAVESMUSTHAVESAMEBITRESOLUTION:
 			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must have the same Bit Resolution\n", nSizeOfErrorString-1);
 			break;

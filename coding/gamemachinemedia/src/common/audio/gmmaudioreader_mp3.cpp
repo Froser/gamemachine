@@ -66,11 +66,22 @@ public:
 	}
 
 public:
-	virtual void startDecodeThread(Base::Data* d) override
+	virtual void startDecodeThread() override
 	{
-		D(d_self);
-		d_self->decodeThread.setData(d_self, decode);
-		d_self->decodeThread.start();
+		D(d);
+		d->decodeThread.setData(d, decode);
+		d->decodeThread.start();
+	}
+
+	virtual void rewindDecode() override
+	{
+		D(d);
+		// 清理解码线程
+		d->decodeThread.detach();
+		d->terminateDecode = true;
+		d->decodeThread.wait();
+		d->terminateDecode = false;
+		resetData();
 	}
 
 private: // MP3解码器

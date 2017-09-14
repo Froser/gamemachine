@@ -29,6 +29,7 @@ GMThread::GMThread()
 	D(d);
 	d->state = NotRunning;
 	d->callback = nullptr;
+	d->event.set();
 }
 
 void GMThread::threadCallback()
@@ -87,7 +88,7 @@ void GMThread::detach()
 {
 	D(d);
 #if GM_USE_PTHREAD
-	pthread_detach()
+	pthread_detach(pthread_self());
 #else
 	d->handle.detach();
 #endif
@@ -97,7 +98,7 @@ bool GMThread::join()
 {
 	D(d);
 #if GM_USE_PTHREAD
-	pthread_join();
+	pthread_join(pthread_self(), nullptr);
 	return true;
 #else
 	if (d->handle.joinable())
@@ -121,7 +122,7 @@ GMThreadHandle::id GMThread::getCurrentThreadId()
 void GMThread::sleep(GMint milliseconds)
 {
 #if GM_USE_PTHREAD
-	::sleep(milliseconds / 1000.f);
+	//::sleep(milliseconds / 1000.f);
 #else
 	std::chrono::duration<GMint, std::milli> milli(milliseconds);
 	std::this_thread::sleep_for(milli);

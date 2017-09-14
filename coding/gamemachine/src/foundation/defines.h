@@ -4,6 +4,8 @@
 // 容器别名
 #if _MSC_VER
 #	include <wtypes.h>
+#else
+#	include <strings.h>
 #endif
 #include <utility>
 #include <map>
@@ -155,12 +157,7 @@ typedef unsigned long GMulong;
 typedef short GMshort;
 typedef unsigned short GMushort;
 typedef wchar_t GMWchar;
-
-#if __APPLE__
 typedef int64_t GMLargeInteger;
-#else
-typedef __int64 GMLargeInteger;
-#endif
 
 #if USE_OPENGL
 typedef GLfloat GMfloat;
@@ -232,6 +229,9 @@ void GM_new_arr(OUT T** out, GMint cnt)
 
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
 
+END_NS
+
+// 全局空间
 // 平台差异
 #if !_MSC_VER
 #	ifdef SAFE_SSCANF
@@ -244,12 +244,14 @@ void GM_new_arr(OUT T** out, GMint cnt)
 	}
 #	endif
 
-inline GMWchar* wcscpy_s(GMWchar* dest,  const GMWchar* source)
+#define _stricmp strcasecmp
+
+inline gm::GMWchar* wcscpy_s(gm::GMWchar* dest,  const gm::GMWchar* source)
 {
 	return wcscpy(dest, source);
 }
 
-inline GMWchar* wcscpy_s(GMWchar* dest, size_t, const GMWchar* source)
+inline gm::GMWchar* wcscpy_s(gm::GMWchar* dest, size_t, const gm::GMWchar* source)
 {
 	return wcscpy(dest, source);
 }
@@ -279,8 +281,11 @@ inline char* strcat_s(char* dest, size_t, const char* src)
 	return strcat(dest, src);
 }
 
-#endif
+inline char* strncpy_s(char* dest, size_t, const char* src, size_t count)
+{
+	return strncpy(dest, src, count);
+}
 
-END_NS
+#endif
 
 #endif

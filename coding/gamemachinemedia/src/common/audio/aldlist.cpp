@@ -1,17 +1,17 @@
 /*
  * Copyright (c) 2006, Creative Labs Inc.
  * All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided
  * that the following conditions are met:
- * 
+ *
  *     * Redistributions of source code must retain the above copyright notice, this list of conditions and
  * 	     the following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions
  * 	     and the following disclaimer in the documentation and/or other materials provided with the distribution.
  *     * Neither the name of Creative Labs Inc. nor the names of its contributors may be used to endorse or
  * 	     promote products derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
@@ -23,11 +23,12 @@
  */
 
 #include "stdafx.h"
+#include <gamemachine.h>
 #include "aldlist.h"
 #include "alc.h"
 #include "al.h"
 
-/* 
+/*
  * Init call
  */
 ALDeviceList::ALDeviceList()
@@ -90,7 +91,7 @@ ALDeviceList::ALDeviceList()
 							ALDeviceInfo.pvstrExtensions->push_back("AL_EXT_LINEAR_DISTANCE");
 						if (alIsExtensionPresent("AL_EXT_EXPONENT_DISTANCE") == AL_TRUE)
 							ALDeviceInfo.pvstrExtensions->push_back("AL_EXT_EXPONENT_DISTANCE");
-							
+
 						if (alIsExtensionPresent("EAX2.0") == AL_TRUE)
 							ALDeviceInfo.pvstrExtensions->push_back("EAX2.0");
 						if (alIsExtensionPresent("EAX3.0") == AL_TRUE)
@@ -121,7 +122,7 @@ ALDeviceList::ALDeviceList()
 	ResetFilters();
 }
 
-/* 
+/*
  * Exit call
  */
 ALDeviceList::~ALDeviceList()
@@ -141,10 +142,10 @@ ALDeviceList::~ALDeviceList()
  */
 int ALDeviceList::GetNumDevices()
 {
-	return (int)vDeviceInfo.size();	
+	return (int)vDeviceInfo.size();
 }
 
-/* 
+/*
  * Returns the device name at an index in the complete device list
  */
 char * ALDeviceList::GetDeviceName(int index)
@@ -192,7 +193,7 @@ bool ALDeviceList::IsExtensionSupported(int index, char *szExtName)
 			if (!_stricmp(vDeviceInfo[index].pvstrExtensions->at(i).c_str(), szExtName)) {
 				bReturn = true;
 				break;
-			}				
+			}
 		}
 	}
 
@@ -207,7 +208,7 @@ int ALDeviceList::GetDefaultDevice()
 	return defaultDeviceIndex;
 }
 
-/* 
+/*
  * Deselects devices which don't have the specified minimum version
  */
 void ALDeviceList::FilterDevicesMinVer(int major, int minor)
@@ -221,7 +222,7 @@ void ALDeviceList::FilterDevicesMinVer(int major, int minor)
 	}
 }
 
-/* 
+/*
  * Deselects devices which don't have the specified maximum version
  */
 void ALDeviceList::FilterDevicesMaxVer(int major, int minor)

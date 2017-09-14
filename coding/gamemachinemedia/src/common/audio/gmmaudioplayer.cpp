@@ -286,7 +286,17 @@ void GMMAudioStreamSource::pause()
 
 void GMMAudioStreamSource::rewind()
 {
+	D(d);
+	gm::IAudioStream* stream = d->file->getStream();
+	// 停止播放
+	alSourceStop(d->sourceId);
 
+	// 停止流解码，回退到流最初状态
+	stream->rewind();
+
+	// 停止播放线程
+	d->thread->terminateThread();
+	d->thread->wait();
 }
 
 //////////////////////////////////////////////////////////////////////////

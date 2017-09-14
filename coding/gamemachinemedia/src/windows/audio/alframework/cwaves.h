@@ -6,6 +6,8 @@
 #define _CWAVES_H_
 
 #include <windows.h>
+#include <ks.h>
+#include <ksmedia.h>
 #include <stdio.h>
 
 #define MAX_NUM_WAVEID			1024

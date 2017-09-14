@@ -1,5 +1,8 @@
-﻿#if _WINDOWS
-#include <windows.h>
+﻿#ifndef __GMM_COMMON_H__
+#define __GMM_COMMON_H__
+
+#if _WINDOWS
+#	include <windows.h>
 #endif
 
 #define BEGIN_MEDIA_NS namespace gmm {
@@ -7,3 +10,17 @@
 
 // 流采样数目
 #define STREAM_BUFFER_NUM 4
+
+// 常用函数
+inline bool strnEqual(char* a, char* b, int n)
+{
+	int i = 0;
+	do
+	{
+		if (a[i] != b[i])
+			return false;
+	} while (++i < n);
+	return true;
+}
+
+#endif

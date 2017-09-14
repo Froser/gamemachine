@@ -4,6 +4,8 @@
 
 GMMAudioFile_Stream::GMMAudioFile_Stream()
 {
+    D(d);
+    d->chunkNum = 0;
 }
 
 GMMAudioFile_Stream::~GMMAudioFile_Stream()
@@ -19,8 +21,8 @@ bool GMMAudioFile_Stream::load(gm::GMBuffer& buffer)
 	d->fileInfo.data = buffer.buffer;
 	d->fileInfo.size = buffer.size;
 	d->bufferNum = getBufferNum();
-	startDecodeThread(d);
 	d->streamReadyEvent.reset();
+	startDecodeThread();
 	return true;
 }
 
@@ -86,6 +88,20 @@ void GMMAudioFile_Stream::waitForStreamReady()
 	D(d);
 	d->streamReadyEvent.wait();
 	d->streamReadyEvent.set();
+}
+
+void GMMAudioFile_Stream::resetData()
+{
+	D(d);
+	d->streamReadyEvent.reset();
+	d->chunkNum = 0;
+	d->writePtr = 0;
+	d->readPtr = 0;
+}
+
+void GMMAudioFile_Stream::rewind()
+{
+	rewindDecode();
 }
 
 void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)

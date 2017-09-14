@@ -9,6 +9,7 @@ BEGIN_MEDIA_NS
 class GMMStream;
 GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 {
+	// 缓存相关
 	gm::GMuint bufferNum = 0;
 	gm::GMAudioFileInfo fileInfo;
 	GMMStream* output = nullptr;
@@ -19,7 +20,7 @@ GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 	gm::GMuint readPtr = 0;
 	gm::GMEvent streamReadyEvent;
 	gm::GMEvent blockWriteEvent;
-	std::atomic_long chunkNum = 0; //表示当前应该写入多少个chunk
+	std::atomic_long chunkNum; //表示当前应该写入多少个chunk
 };
 
 class GMMAudioFile_Stream : public gm::IAudioFile, public gm::IAudioStream
@@ -45,12 +46,15 @@ public:
 	virtual gm::GMuint getBufferSize() override;
 	virtual bool readBuffer(gm::GMbyte* bytes) override;
 	virtual void nextChunk(gm::GMlong chunkNum) override;
+	virtual void rewind() override;
 
 protected:
 	void waitForStreamReady();
+	void resetData();
 
 public:
-	virtual void startDecodeThread(Data* d) = 0;
+	virtual void startDecodeThread() = 0;
+	virtual void rewindDecode() = 0;
 
 protected:
 	static void saveBuffer(Data* d, gm::GMbyte data);
