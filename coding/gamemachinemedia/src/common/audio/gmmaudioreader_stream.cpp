@@ -88,16 +88,19 @@ void GMMAudioFile_Stream::waitForStreamReady()
 {
 	D(d);
 	d->streamReadyEvent.wait();
-	d->streamReadyEvent.set();
 }
 
-void GMMAudioFile_Stream::resetData()
+void GMMAudioFile_Stream::rewindDecode()
 {
 	D(d);
 	d->streamReadyEvent.reset();
 	d->chunkNum = 0;
 	d->writePtr = 0;
 	d->readPtr = 0;
+
+	// 重启解码线程
+	nextChunk(d->bufferNum);
+	startDecodeThread();
 }
 
 void GMMAudioFile_Stream::rewind()
@@ -125,7 +128,6 @@ void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)
 			// 如果所以缓存写满，等待
 			d->blockWriteEvent.reset();
 			d->blockWriteEvent.wait();
-			d->blockWriteEvent.set();
 		}
 	}
 }

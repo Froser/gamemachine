@@ -66,7 +66,6 @@ void GMThread::wait(GMuint milliseconds)
 	D(d);
 	// 等待线程结束，并重置事件
 	d->event.wait();
-	d->event.set();
 }
 
 void GMThread::setCallback(IThreadCallback* callback)

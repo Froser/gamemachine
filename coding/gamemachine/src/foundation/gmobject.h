@@ -72,7 +72,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 #define DECLARE_PRIVATE(className)															\
 	public:																					\
 		typedef className##Private Data;													\
-	private:																				\
+	protected:																				\
 		gm::GMObjectPrivateWrapper<className##Private> m_data;								\
 		virtual gm::GMObjectPrivateWrapper<gm::GMObject>* dataWrapper() {					\
 			return reinterpret_cast<gm::GMObjectPrivateWrapper<gm::GMObject>*>(				\

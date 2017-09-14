@@ -44,7 +44,7 @@ GM_PRIVATE_OBJECT(GMThread)
 {
 	IThreadCallback* callback = nullptr;
 	GMThreadHandle handle;
-	GMEvent event;
+	GMManualResetEvent event;
 	ThreadState state;
 	bool done = false;
 };

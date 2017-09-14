@@ -82,7 +82,8 @@ public:
 		d->terminateDecode = true;
 		d->decodeThread.wait();
 		d->terminateDecode = false;
-		resetData();
+
+		Base::rewindDecode();
 	}
 
 private: // MP3解码器

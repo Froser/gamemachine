@@ -18,8 +18,8 @@ GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 	gm::GMulong bufferSize = 0;
 	gm::GMuint writePtr = 0;
 	gm::GMuint readPtr = 0;
-	gm::GMEvent streamReadyEvent;
-	gm::GMEvent blockWriteEvent;
+	gm::GMManualResetEvent streamReadyEvent;
+	gm::GMManualResetEvent blockWriteEvent;
 	std::atomic_long chunkNum; //表示当前应该写入多少个chunk
 };
 
@@ -50,11 +50,12 @@ public:
 
 protected:
 	void waitForStreamReady();
-	void resetData();
 
-public:
+protected:
+	virtual void rewindDecode();
+
+protected:
 	virtual void startDecodeThread() = 0;
-	virtual void rewindDecode() = 0;
 
 protected:
 	static void saveBuffer(Data* d, gm::GMbyte data);

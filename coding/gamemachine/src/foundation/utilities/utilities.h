@@ -486,22 +486,47 @@ GM_PRIVATE_OBJECT(GMEvent)
 	GMEventHandle handle;
 };
 
+// 表示一个Wait之后能够自动Set的事件
 class GMEvent : public GMObject
 {
 	DECLARE_PRIVATE(GMEvent)
+	GM_DISABLE_ASSIGN(GMEvent)
+	GM_DISABLE_COPY(GMEvent)
 
 public:
-	GMEvent(bool manualReset = false);
-	GMEvent(GMEvent&&) noexcept;
+	GMEvent(GMEvent&& e) noexcept
+	{
+		swap(e);
+	}
+
+	GMEvent& operator=(GMEvent&& e) noexcept
+	{
+		swap(e);
+		return *this;
+	}
+
+protected:
+	GMEvent(bool manualReset, bool initialState);
+
+public:
 	~GMEvent();
 
 public:
 	void wait(GMuint milliseconds = 0);
 	void set();
 	void reset();
+};
 
+class GMAutoResetEvent : public GMEvent
+{
 public:
-	static void signalObjectAndWait(const GMEvent& eventToSignal, const GMEvent& eventToWait);
+	GMAutoResetEvent(bool initialState = false);
+};
+
+class GMManualResetEvent : public GMEvent
+{
+public:
+	GMManualResetEvent(bool initialState = false);
 };
 
 END_NS

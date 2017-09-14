@@ -728,15 +728,10 @@ void GMPath::createDirectory(const GMString& dir)
 
 //GMEvent
 #if _WINDOWS
-GMEvent::GMEvent(bool manualReset)
+GMEvent::GMEvent(bool manualReset, bool initialState)
 {
 	D(d);
-	d->handle = ::CreateEvent(NULL, manualReset, FALSE, _L(""));
-}
-
-GMEvent::GMEvent(GMEvent&& e) noexcept
-{
-	swap(e);
+	d->handle = ::CreateEvent(NULL, manualReset, initialState ? TRUE : FALSE, _L(""));
 }
 
 GMEvent::~GMEvent()
@@ -764,8 +759,13 @@ void GMEvent::reset()
 	::ResetEvent(d->handle);
 }
 
-void GMEvent::signalObjectAndWait(const GMEvent& eventToSignal, const GMEvent& eventToWait)
+GMAutoResetEvent::GMAutoResetEvent(bool initialState)
+	: GMEvent(false, initialState)
 {
-	::SignalObjectAndWait(eventToSignal.data()->handle, eventToWait.data()->handle, INFINITE, FALSE);
+}
+
+GMManualResetEvent::GMManualResetEvent(bool initialState)
+	: GMEvent(true, initialState)
+{
 }
 #endif

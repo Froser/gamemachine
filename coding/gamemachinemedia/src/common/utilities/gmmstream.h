@@ -10,7 +10,7 @@ BEGIN_MEDIA_NS
 GM_PRIVATE_OBJECT(GMMStream)
 {
 	gm::GMbyte* data = nullptr;
-	gm::GMEvent preventRead;
+	gm::GMManualResetEvent preventRead;
 	std::atomic_uint ptr;
 	gm::GMuint capacity = 0;
 };
