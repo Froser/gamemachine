@@ -23,8 +23,8 @@ bool GMMAudioFile_Stream::load(gm::GMBuffer& buffer)
 	d->fileInfo.data = buffer.buffer;
 	d->fileInfo.size = buffer.size;
 	d->bufferNum = getBufferNum();
-	nextChunk(d->bufferNum);
 	d->streamReadyEvent.reset();
+	nextChunk(d->bufferNum - 1);
 	startDecodeThread();
 	return true;
 }
@@ -98,7 +98,8 @@ void GMMAudioFile_Stream::rewindDecode()
 	// 重启解码线程
 	d->writePtr = 0;
 	d->readPtr = 0;
-	nextChunk(d->bufferNum);
+	d->chunkNum = 0;
+	nextChunk(d->bufferNum - 1);
 	startDecodeThread();
 }
 
@@ -116,10 +117,8 @@ void GMMAudioFile_Stream::cleanUp()
 	for (gm::GMuint i = 0; i < d->bufferNum; ++i)
 	{
 		if (d->output[i].isWriting())
-		{
 			d->output[i].endWrite(); //让数据读完，防止死锁
-			break; //不可能同时写多个buffer
-		}
+		d->output[i].rewind();
 	}
 }
 
@@ -135,8 +134,8 @@ void GMMAudioFile_Stream::saveBuffer(Data* d, gm::GMbyte data)
 
 		// 跳到下一段缓存
 		move(d->writePtr, d->bufferNum);
-		d->output[d->writePtr].beginWrite();
 		d->output[d->writePtr].rewind();
+		d->output[d->writePtr].beginWrite();
 
 		if (d->chunkNum == 0)
 		{

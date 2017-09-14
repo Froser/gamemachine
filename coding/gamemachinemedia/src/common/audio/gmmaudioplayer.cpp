@@ -113,11 +113,9 @@ class GMMAudioStreamPlayThread;
 GM_PRIVATE_OBJECT(GMMAudioStreamSource)
 {
 	ALuint* buffers = nullptr;
-	ALuint bufferNum = 0;
-	ALuint bufferSize = 0;
-	ALuint sourceId = 0;
-	gm::IAudioFile* file;
+	gm::IAudioFile* file = nullptr;
 	GMMAudioStreamPlayThread* thread = nullptr;
+	ALuint sourceId = 0;
 };
 
 GM_PRIVATE_OBJECT(GMMAudioStreamPlayThread)
@@ -169,17 +167,27 @@ public:
 		d_self->started = true;
 
 		D_OF(d, d_self->source);
-
-		gm::IAudioStream* stream = d->file->getStream();
-		gm::GMuint bufferNum = stream->getBufferNum();
-
 		// 初始化
+		gm::IAudioStream* stream = d->file->getStream();
 		gm::GMuint bufferSize = stream->getBufferSize();
+		gm::GMuint bufferNum = stream->getBufferNum();
 		gm::GMbyte* audioData = new gm::GMbyte[bufferSize];
+		if (!d->buffers)
+		{
+			d->buffers = new ALuint[bufferNum]{ 0 };
+			alGenBuffers(bufferNum, d->buffers);
+		}
+		else
+		{
+			alDeleteBuffers(bufferNum, d->buffers);
+			alGenBuffers(bufferNum, d->buffers);
+			alDeleteSources(1, &d->sourceId);
+			alGenSources(1, &d->sourceId);
+		}
 
 		// 先填充Buffer
 		auto& fileInfo = d->file->getFileInfo();
-		for (gm::GMuint i = 0; i < bufferNum; ++i)
+		for (gm::GMuint i = 0; i < bufferNum - 1; ++i)
 		{
 			stream->readBuffer(audioData);
 			alBufferData(d->buffers[i], fileInfo.format, audioData, bufferSize, fileInfo.frequency);
@@ -228,7 +236,6 @@ public:
 		D(d_self);
 		D_OF(d, d_self->source);
 		gm::IAudioStream* stream = d->file->getStream();
-		stream->nextChunk(1); //防止阻塞线程
 		d_self->terminate = true;
 	}
 };
@@ -238,8 +245,6 @@ GMMAudioStreamSource::GMMAudioStreamSource(gm::IAudioFile* file)
 	D(d);
 	d->file = file;
 	gm::IAudioStream* stream = d->file->getStream();
-	d->buffers = new ALuint[stream->getBufferNum()];
-	alGenBuffers(stream->getBufferNum(), d->buffers);
 	alGenSources(1, &d->sourceId);
 	d->thread = new GMMAudioStreamPlayThread(this);
 }
@@ -290,21 +295,20 @@ void GMMAudioStreamSource::pause()
 void GMMAudioStreamSource::rewind()
 {
 	D(d);
-	// 停止播放线程
-	d->thread->detach();
-	d->thread->terminateThread();
-	d->thread->wait();
-
-	gm::IAudioStream* stream = d->file->getStream();
 	// 停止播放
+	gm::IAudioStream* stream = d->file->getStream();
 	alSourceStop(d->sourceId);
-
 	ALint state;
 	do
 	{
 		GMM_SLEEP_FOR_ONE_FRAME();
 		alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
 	} while (state == AL_PLAYING);
+
+	// 停止播放线程
+	d->thread->detach();
+	d->thread->terminateThread();
+	d->thread->wait();
 
 	// 停止流解码，回退到流最初状态
 	stream->rewind();
