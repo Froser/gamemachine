@@ -4,10 +4,6 @@
 #include "gmengine/gmgameobject.h"
 #include "gmstates.h"
 
-#if _WINDOWS
-#	include "os/gmdirectsound_sounddevice.h"
-#endif
-
 void GameMachine::init(
 	AUTORELEASE IWindow* mainWindow,
 	const GMConsoleHandle& consoleHandle,
@@ -74,11 +70,6 @@ void GameMachine::startGameMachine()
 	// 显示主窗口
 	d->mainWindow->centerWindow();
 	d->mainWindow->showWindow();
-
-#if _WINDOWS
-	// 创建声音设备
-	GMSoundPlayerDevice::createInstance(d->mainWindow);
-#endif
 
 	// 创建Glyph管理器，它必须在OpenGL窗口创建以后才可以初始化
 	GMGlyphManager* glyphManager;
@@ -201,5 +192,4 @@ void GameMachine::terminate()
 	{
 		delete manager;
 	}
-	GMSoundPlayerDevice::terminate();
 }

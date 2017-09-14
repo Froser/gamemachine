@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioreader.h"
 #include "gmmaudioreader_wav.h"
-#include "gmmaudioreader_mp3.h"
+#include "common/audio/gmmaudioreader_mp3.h"
 
 class GMAudioFormatReaders
 {

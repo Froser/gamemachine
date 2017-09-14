@@ -40,12 +40,6 @@ set(SOURCES
 		gmdatacore/modelreader/gmmodelreader.cpp
 		gmdatacore/modelreader/gmmodelreader_obj.h
 		gmdatacore/modelreader/gmmodelreader_obj.cpp
-		gmdatacore/soundreader/gmsoundreader.h
-		gmdatacore/soundreader/gmsoundreader.cpp
-		gmdatacore/soundreader/gmsoundreader_wav.h
-		gmdatacore/soundreader/gmsoundreader_wav.cpp
-		gmdatacore/soundreader/gmsoundreader_mp3.h
-		gmdatacore/soundreader/gmsoundreader_mp3.cpp
 		gmdatacore/gamepackage/gmgamepackage.h
 		gmdatacore/gamepackage/gmgamepackage.cpp
 		gmdatacore/gamepackage/gmgamepackagehandler.h
@@ -116,8 +110,6 @@ set(SOURCES
 		gmphysics/gmphysicsstructs.h
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
-		os/gmdirectsound_sounddevice.h
-		os/gmdirectsound_sounddevice.cpp
 		os/gminput.h
 		os/gminput.cpp
 		foundation/utilities/tinyxml/tinystr.cpp

@@ -49,7 +49,7 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 	gm::GMuint readPtr = 0;
 	gm::GMEvent streamReadyEvent;
 	gm::GMEvent blockWriteEvent;
-	gm::GMlong chunkNum = 0; //表示当前应该写入多少个chunk
+	std::atomic_long chunkNum = 0; //表示当前应该写入多少个chunk
 };
 
 class GMMAudioFile_MP3 : public gm::IAudioFile, public gm::IAudioStream
@@ -138,12 +138,7 @@ public:
 	virtual void nextChunk(gm::GMlong chunkNum) override
 	{
 		D(d);
-
-#if _WINDOWS
-		::InterlockedAdd(&d->chunkNum, chunkNum);
-#else
 		d->chunkNum += chunkNum;
-#endif
 		if (chunkNum > 0)
 			d->blockWriteEvent.set();
 	}
@@ -299,7 +294,7 @@ private: // MP3解码器
 		if (d->output[d->writePtr].isFull())
 		{
 			d->output[d->writePtr].endWrite();
-			gm::interlock_dec(&d->chunkNum);
+			--d->chunkNum;
 			GM_ASSERT(d->chunkNum >= 0);
 
 			// 跳到下一段缓存
@@ -319,7 +314,7 @@ private: // MP3解码器
 
 	static void move(gm::GMuint& ptr, gm::GMuint loop)
 	{
-		gm::interlock_inc(&ptr);
+		++ptr;
 		ptr = ptr % loop;
 	}
 

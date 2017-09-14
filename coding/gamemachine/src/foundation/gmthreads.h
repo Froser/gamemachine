@@ -137,37 +137,5 @@ GM_INTERFACE(IAsyncResult)
 };
 
 using GMAsyncCallback = std::function<void(IAsyncResult*)>;
-
-// 原子操作
-template <typename T>
-void interlock_add(T* a, T v)
-{
-#if _WINDOWS
-	::InterlockedAdd(a, v);
-#else
-	*s = *s + v;
-#endif
-}
-
-template <typename T>
-void interlock_inc(T* a)
-{
-#if _WINDOWS
-	::InterlockedIncrement(a);
-#else
-	++(*a);
-#endif
-}
-
-template <typename T>
-void interlock_dec(T* a)
-{
-#if _WINDOWS
-	::InterlockedDecrement(a);
-#else
-	--(*a);
-#endif
-}
-
 END_NS
 #endif

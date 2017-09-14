@@ -3,6 +3,7 @@
 
 #include <gmmcommon.h>
 #include <gamemachine.h>
+#include <atomic>
 
 BEGIN_MEDIA_NS
 
@@ -10,7 +11,7 @@ GM_PRIVATE_OBJECT(GMMStream)
 {
 	gm::GMbyte* data = nullptr;
 	gm::GMEvent preventRead;
-	gm::GMuint ptr = 0;
+	std::atomic_uint ptr = 0;
 	gm::GMuint capacity = 0;
 };
 

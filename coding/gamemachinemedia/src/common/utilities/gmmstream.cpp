@@ -43,7 +43,7 @@ GMMStream& GMMStream::operator <<(gm::GMbyte byte)
 {
 	D(d);
 	d->data[d->ptr] = byte;
-	gm::interlock_inc(&d->ptr);
+	d->ptr++;
 	return *this;
 }
 
