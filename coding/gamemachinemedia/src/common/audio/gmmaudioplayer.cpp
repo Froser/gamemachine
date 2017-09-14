@@ -157,7 +157,6 @@ public:
 
 	~GMMAudioStreamPlayThread()
 	{
-		D(d);
 		wait();
 	}
 

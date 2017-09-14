@@ -3,6 +3,7 @@
 #include <al.h>
 #include "mad.h"
 #include "common/utilities/gmmstream.h"
+#include "gmmaudioreader_stream.h"
 
 typedef void(*DecodeCallback)(void* data);
 
@@ -35,29 +36,25 @@ private:
 
 GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 {
-	gm::GMuint bufferNum = 0;
-	gm::GMAudioFileInfo fileInfo;
+	typedef GMMAudioFile_Stream Base;
+
 	bool fmtCreated = false;
-	GMMStream* output = nullptr;
 	GMMDecodeThread decodeThread;
 	bool terminateDecode = false;
-
-	// stream相关
-	gm::GMulong bufferSize = 0;
-	gm::GMuint writePtr = 0;
-	gm::GMuint readPtr = 0;
-	gm::GMEvent streamReadyEvent;
-	gm::GMEvent blockWriteEvent;
-	std::atomic_long chunkNum = 0; //表示当前应该写入多少个chunk
+	Base::Data* baseData = nullptr;
 };
 
-class GMMAudioFile_MP3 : public gm::IAudioFile, public gm::IAudioStream
+class GMMAudioFile_MP3 : public GMMAudioFile_Stream
 {
 	DECLARE_PRIVATE(GMMAudioFile_MP3)
+
+	typedef GMMAudioFile_Stream Base;
 
 public:
 	GMMAudioFile_MP3()
 	{
+		D(d);
+		d->baseData = Base::data();
 	}
 
 	~GMMAudioFile_MP3()
@@ -69,85 +66,11 @@ public:
 	}
 
 public:
-	bool load(gm::GMBuffer& buffer)
+	virtual void startDecodeThread(Base::Data* d) override
 	{
-		D(d);
-		d->fileInfo.data = buffer.buffer;
-		d->fileInfo.size = buffer.size;
-		d->bufferNum = getBufferNum();
-		d->decodeThread.setData(d, decode);
-		d->decodeThread.start();
-		d->streamReadyEvent.reset();
-		return true;
-	}
-
-	// gm::IAudioFile
-public:
-	virtual bool isStream() override
-	{
-		return true;
-	}
-
-	virtual gm::IAudioStream* getStream() override
-	{
-		return this;
-	}
-
-	virtual gm::GMAudioFileInfo& getFileInfo() override
-	{
-		D(d);
-		waitForStreamReady();
-		return d->fileInfo;
-	}
-
-	virtual gm::GMuint getBufferId() override
-	{
-		return 0;
-	}
-
-	// gm::IAudioStream
-public:
-	virtual gm::GMuint getBufferNum() override
-	{
-		return STREAM_BUFFER_NUM;
-	}
-
-	virtual gm::GMuint getBufferSize() override
-	{
-		D(d);
-		waitForStreamReady();
-		return d->bufferSize;
-	}
-
-	virtual bool readBuffer(gm::GMbyte* bytes) override
-	{
-		D(d);
-		waitForStreamReady();
-		if (!bytes)
-			return false;
-
-		auto& buffer = d->output[d->readPtr];
-		bool res = buffer.read(bytes);
-
-		// 跳到下一段
-		move(d->readPtr, d->bufferNum); 
-		return res;
-	}
-
-	virtual void nextChunk(gm::GMlong chunkNum) override
-	{
-		D(d);
-		d->chunkNum += chunkNum;
-		if (chunkNum > 0)
-			d->blockWriteEvent.set();
-	}
-	
-private:
-	void waitForStreamReady()
-	{
-		D(d);
-		d->streamReadyEvent.wait();
-		d->streamReadyEvent.set();
+		D(d_self);
+		d_self->decodeThread.setData(d_self, decode);
+		d_self->decodeThread.start();
 	}
 
 private: // MP3解码器
@@ -163,7 +86,7 @@ private: // MP3解码器
 	static mad_flow input(void *data, mad_stream *stream)
 	{
 		Data* d = (Data*)data;
-		mad_stream_buffer(stream, (unsigned char*)d->fileInfo.data, d->fileInfo.size);
+		mad_stream_buffer(stream, (unsigned char*)d->baseData->fileInfo.data, d->baseData->fileInfo.size);
 		return MAD_FLOW_CONTINUE;
 	}
 
@@ -191,13 +114,13 @@ private: // MP3解码器
 
 			sample = scale(*left_ch++);
 
-			saveBuffer(d, (sample >> 0) & 0xff);
-			saveBuffer(d, (sample >> 8) & 0xff);
+			saveBuffer(d->baseData, (sample >> 0) & 0xff);
+			saveBuffer(d->baseData, (sample >> 8) & 0xff);
 
 			if (nchannels == 2) {
 				sample = scale(*right_ch++);
-				saveBuffer(d, (sample >> 0) & 0xff);
-				saveBuffer(d, (sample >> 8) & 0xff);
+				saveBuffer(d->baseData, (sample >> 0) & 0xff);
+				saveBuffer(d->baseData, (sample >> 8) & 0xff);
 			}
 		}
 
@@ -223,30 +146,30 @@ private: // MP3解码器
 	{
 		if (!d->fmtCreated)
 		{
-			d->fileInfo.waveFormatExHeader.cbSize = sizeof(WAVEFORMATEX);
-			d->fileInfo.waveFormatExHeader.nChannels = pcm->channels;
-			d->fileInfo.waveFormatExHeader.nBlockAlign = 4;
-			d->fileInfo.waveFormatExHeader.wFormatTag = 1;
-			d->fileInfo.waveFormatExHeader.nSamplesPerSec = pcm->samplerate;
-			d->fileInfo.waveFormatExHeader.nAvgBytesPerSec = d->fileInfo.waveFormatExHeader.nSamplesPerSec * sizeof(unsigned short)* pcm->channels;
-			d->fileInfo.waveFormatExHeader.wBitsPerSample = 16;
-			d->fileInfo.frequency = pcm->samplerate;
-			d->fileInfo.format = getFileFormat(d, alGetEnumValue);
+			d->baseData->fileInfo.waveFormatExHeader.cbSize = sizeof(WAVEFORMATEX);
+			d->baseData->fileInfo.waveFormatExHeader.nChannels = pcm->channels;
+			d->baseData->fileInfo.waveFormatExHeader.nBlockAlign = 4;
+			d->baseData->fileInfo.waveFormatExHeader.wFormatTag = 1;
+			d->baseData->fileInfo.waveFormatExHeader.nSamplesPerSec = pcm->samplerate;
+			d->baseData->fileInfo.waveFormatExHeader.nAvgBytesPerSec = d->baseData->fileInfo.waveFormatExHeader.nSamplesPerSec * sizeof(unsigned short)* pcm->channels;
+			d->baseData->fileInfo.waveFormatExHeader.wBitsPerSample = 16;
+			d->baseData->fileInfo.frequency = pcm->samplerate;
+			d->baseData->fileInfo.format = getFileFormat(d, alGetEnumValue);
 			d->fmtCreated = true;
 
-			d->bufferSize = d->fileInfo.waveFormatExHeader.nAvgBytesPerSec >> 2;
+			d->baseData->bufferSize = d->baseData->fileInfo.waveFormatExHeader.nAvgBytesPerSec >> 2;
 			// IMPORTANT : The Buffer Size must be an exact multiple of the BlockAlignment
-			d->bufferSize -= (d->bufferSize % d->fileInfo.waveFormatExHeader.nBlockAlign);
+			d->baseData->bufferSize -= (d->baseData->bufferSize % d->baseData->fileInfo.waveFormatExHeader.nBlockAlign);
 
-			GM_ASSERT(!d->output);
-			d->output = new GMMStream[d->bufferNum];
-			for (gm::GMuint i = 0; i < d->bufferNum; i++)
+			GM_ASSERT(!d->baseData->output);
+			d->baseData->output = new GMMStream[d->baseData->bufferNum];
+			for (gm::GMuint i = 0; i < d->baseData->bufferNum; i++)
 			{
-				d->output[i].resize(d->bufferSize);
+				d->baseData->output[i].resize(d->baseData->bufferSize);
 			}
 
 			// Stream is ready
-			d->streamReadyEvent.set();
+			GMMAudioFile_Stream::setStreamReady(d->baseData);
 		}
 	}
 
@@ -254,9 +177,9 @@ private: // MP3解码器
 
 	static ALenum getFileFormat(Data* d, PFNALGETENUMVALUE pfnGetEnumValue)
 	{
-		if (d->fileInfo.waveFormatExHeader.nChannels == 1)
+		if (d->baseData->fileInfo.waveFormatExHeader.nChannels == 1)
 		{
-			switch (d->fileInfo.waveFormatExHeader.wBitsPerSample)
+			switch (d->baseData->fileInfo.waveFormatExHeader.wBitsPerSample)
 			{
 			case 4:
 				return pfnGetEnumValue("AL_FORMAT_MONO_IMA4");
@@ -266,9 +189,9 @@ private: // MP3解码器
 				return pfnGetEnumValue("AL_FORMAT_MONO16");
 			}
 		}
-		else if (d->fileInfo.waveFormatExHeader.nChannels == 2)
+		else if (d->baseData->fileInfo.waveFormatExHeader.nChannels == 2)
 		{
-			switch (d->fileInfo.waveFormatExHeader.wBitsPerSample)
+			switch (d->baseData->fileInfo.waveFormatExHeader.wBitsPerSample)
 			{
 			case 4:
 				return pfnGetEnumValue("AL_FORMAT_STEREO_IMA4");
@@ -278,43 +201,11 @@ private: // MP3解码器
 				return pfnGetEnumValue("AL_FORMAT_STEREO16");
 			}
 		}
-		else if (d->fileInfo.waveFormatExHeader.nChannels == 4 && (d->fileInfo.waveFormatExHeader.wBitsPerSample == 16))
+		else if (d->baseData->fileInfo.waveFormatExHeader.nChannels == 4 && (d->baseData->fileInfo.waveFormatExHeader.wBitsPerSample == 16))
 			return pfnGetEnumValue("AL_FORMAT_QUAD16");
 		GM_ASSERT(false);
 		return AL_INVALID_ENUM;
 	}
-
-	static void saveBuffer(Data* d, gm::GMbyte data)
-	{
-		d->output[d->writePtr].beginWrite();
-		d->output[d->writePtr] << data;
-		if (d->output[d->writePtr].isFull())
-		{
-			d->output[d->writePtr].endWrite();
-			--d->chunkNum;
-			GM_ASSERT(d->chunkNum >= 0);
-
-			// 跳到下一段缓存
-			move(d->writePtr, d->bufferNum);
-			d->output[d->writePtr].beginWrite();
-			d->output[d->writePtr].rewind();
-
-			if (!d->chunkNum)
-			{
-				// 如果所以缓存写满，等待
-				d->blockWriteEvent.reset();
-				d->blockWriteEvent.wait();
-				d->blockWriteEvent.set();
-			}
-		}
-	}
-
-	static void move(gm::GMuint& ptr, gm::GMuint loop)
-	{
-		++ptr;
-		ptr = ptr % loop;
-	}
-
 };
 
 bool GMMAudioReader_MP3::load(gm::GMBuffer& buffer, OUT gm::IAudioFile** f)
