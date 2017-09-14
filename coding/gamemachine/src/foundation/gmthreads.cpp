@@ -64,7 +64,9 @@ void GMThread::start()
 void GMThread::wait(GMuint milliseconds)
 {
 	D(d);
+	// 等待线程结束，并重置事件
 	d->event.wait();
+	d->event.set();
 }
 
 void GMThread::setCallback(IThreadCallback* callback)
@@ -90,7 +92,8 @@ void GMThread::detach()
 #if GM_USE_PTHREAD
 	pthread_detach(pthread_self());
 #else
-	d->handle.detach();
+	if (d->handle.joinable())
+		d->handle.detach();
 #endif
 }
 

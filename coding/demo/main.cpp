@@ -698,7 +698,7 @@ int WINAPI WinMain(
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
 
 	s->rewind();
-	s->play(1);
+	//s->play(1);
 
 #if 0
 	// Òì²½Ä£ÐÍ
@@ -722,7 +722,7 @@ int WINAPI WinMain(
 		lua.call("v", {1});
 #else
 	GameMachine::instance().startGameMachine();
-	delete s;
+	delete file;
 #endif
 	return 0;
 }

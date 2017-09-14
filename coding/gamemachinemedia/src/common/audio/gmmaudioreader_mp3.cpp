@@ -61,6 +61,7 @@ public:
 	{
 		D(d);
 		d->decodeThread.detach();
+		d->baseData->blockWriteEvent.set();
 		d->terminateDecode = true;
 		d->decodeThread.wait();
 	}

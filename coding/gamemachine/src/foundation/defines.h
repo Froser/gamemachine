@@ -237,7 +237,7 @@ END_NS
 #	ifdef SAFE_SSCANF
 #		undef SAFE_SSCANF
 #		define SAFE_SSCANF(in, format, out)	\
-	{											\
+	{										\
 		const char* _str = in;				\
 		if (_str)							\
 			sscanf(_str, format, out);		\
