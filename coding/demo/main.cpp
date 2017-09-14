@@ -721,6 +721,7 @@ int WINAPI WinMain(
 		lua.call("v", {1});
 #else
 	GameMachine::instance().startGameMachine();
+	delete s;
 #endif
 	return 0;
 }

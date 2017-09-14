@@ -123,6 +123,8 @@ GM_PRIVATE_OBJECT(GMMAudioStreamSource)
 GM_PRIVATE_OBJECT(GMMAudioStreamPlayThread)
 {
 	GMMAudioStreamSource* source = nullptr;
+	bool started = false;
+	bool terminate = false;
 };
 
 class GMMAudioStreamSource : public gm::GMObject, public gm::IAudioSource
@@ -153,10 +155,19 @@ public:
 		d->source = src;
 	}
 
+	~GMMAudioStreamPlayThread()
+	{
+		D(d);
+		wait();
+	}
+
 public:
 	virtual void run() override
 	{
 		D(d_self);
+		detach();
+		d_self->started = true;
+
 		D_OF(d, d_self->source);
 
 		gm::IAudioStream* stream = d->file->getStream();
@@ -180,9 +191,7 @@ public:
 		ALint buffersProcessed = 0;
 		ALint totalBuffersProcessed = 0;
 		ALuint buffer = 0;
-		ALenum state;
-		ALint queuedBuffers;
-		while (true)
+		while (!d_self->terminate)
 		{
 			gm::GMThread::sleep(1000 / 60);
 
@@ -203,22 +212,22 @@ public:
 
 				buffersProcessed--;
 			}
-
-			alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
-			if (state != AL_PLAYING)
-			{
-				alGetSourcei(d->sourceId, AL_BUFFERS_QUEUED, &queuedBuffers);
-				if (queuedBuffers)
-				{
-					alSourcePlay(d->sourceId);
-				}
-				else
-				{
-					break;
-				}
-			}
 		}
 		delete[] audioData;
+		d_self->started = false;
+	}
+
+public:
+	bool hasStarted()
+	{
+		D(d);
+		return d->started;
+	}
+
+	void terminateThread()
+	{
+		D(d);
+		d->terminate = true;
 	}
 };
 
@@ -238,6 +247,8 @@ GMMAudioStreamSource::~GMMAudioStreamSource()
 	D(d);
 	alDeleteSources(1, &d->sourceId);
 
+	gm::IAudioStream* stream = d->file->getStream();
+
 	if (d->buffers)
 	{
 		gm::IAudioStream* stream = d->file->getStream();
@@ -246,24 +257,32 @@ GMMAudioStreamSource::~GMMAudioStreamSource()
 	}
 
 	if (d->thread)
+	{
+		d->thread->terminateThread();
 		delete d->thread;
+	}
 }
 
 void GMMAudioStreamSource::play(bool loop)
 {
 	D(d);
 	GM_ASSERT(d->file->isStream());
-	d->thread->start();
+	if (!d->thread->hasStarted())
+		d->thread->start();
+	else
+		alSourcePlay(d->sourceId);
 }
 
 void GMMAudioStreamSource::stop()
 {
-
+	D(d);
+	alSourceStop(d->sourceId);
 }
 
 void GMMAudioStreamSource::pause()
 {
-
+	D(d);
+	alSourcePause(d->sourceId);
 }
 
 void GMMAudioStreamSource::rewind()

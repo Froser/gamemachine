@@ -41,7 +41,6 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 	GMMStream* output = nullptr;
 	GMMDecodeThread decodeThread;
 	bool terminateDecode = false;
-	gm::GMEvent terminateEvent;
 
 	// stream相关
 	gm::GMulong bufferSize = 0;
@@ -66,7 +65,7 @@ public:
 		D(d);
 		d->decodeThread.detach();
 		d->terminateDecode = true;
-		d->terminateEvent.wait();
+		d->decodeThread.wait();
 	}
 
 public:
@@ -155,12 +154,10 @@ private: // MP3解码器
 	static void decode(void* data)
 	{
 		Data* d = (Data*)data;
-		d->terminateEvent.reset();
 		mad_decoder decoder;
 		mad_decoder_init(&decoder, d, input, nullptr, nullptr, output, nullptr, nullptr);
 		mad_decoder_run(&decoder, MAD_DECODER_MODE_SYNC);
 		mad_decoder_finish(&decoder);
-		d->terminateEvent.set();
 	}
 
 	static mad_flow input(void *data, mad_stream *stream)
