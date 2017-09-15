@@ -44,7 +44,7 @@ public:
 	{
 		D(d);
 		CWaves& waveLoader = getWaveLoader();
-		if (WAVE_SUCCEEDED(waveLoader.LoadWaveFile("D:\\gmpk\\audio\\footsteps.wav", &d->waveId)))
+		if (WAVE_SUCCEEDED(waveLoader.LoadWaveBuffer(buffer, &d->waveId)))
 		{
 			if ((WAVE_SUCCEEDED(waveLoader.GetWaveSize(d->waveId, (unsigned long*)&d->fileInfo.size))) &&
 				(WAVE_SUCCEEDED(waveLoader.GetWaveData(d->waveId, (void**)&d->fileInfo.data))) &&

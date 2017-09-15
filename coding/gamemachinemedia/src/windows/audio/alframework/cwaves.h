@@ -109,8 +109,12 @@ public:
 
 private:
 	WAVERESULT ParseFile(const char *szFilename, LPWAVEFILEINFO pWaveInfo);
-	WAVEID InsertWaveID(LPWAVEFILEINFO pWaveFileInfo);
-	
+	WAVERESULT ParseBuffer(gm::MemoryStream& ms, LPWAVEFILEINFO pWaveInfo);
+
+public:
+	WAVERESULT LoadWaveBuffer(const gm::GMBuffer& buffer, WAVEID *pWaveID);
+
+private:
 	LPWAVEFILEINFO	m_WaveIDs[MAX_NUM_WAVEID];
 };
 

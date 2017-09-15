@@ -221,7 +221,6 @@ WAVERESULT CWaves::LoadWaveFile(const char *szFilename, WAVEID *pWaveID)
 	return wr;
 }
 
-
 WAVERESULT CWaves::OpenWaveFile(const char *szFilename, WAVEID *pWaveID)
 {
 	WAVERESULT wr = WR_OUTOFMEMORY;
@@ -408,6 +407,128 @@ WAVERESULT CWaves::ParseFile(const char *szFilename, LPWAVEFILEINFO pWaveInfo)
 	return wr;
 }
 
+WAVERESULT CWaves::ParseBuffer(gm::MemoryStream& ms, LPWAVEFILEINFO pWaveInfo)
+{
+	WAVEFILEHEADER	waveFileHeader;
+	RIFFCHUNK		riffChunk;
+	WAVEFMT			waveFmt;
+	WAVERESULT		wr = WR_BADWAVEFILE;
+
+	if (!pWaveInfo)
+		return WR_INVALIDPARAM;
+
+	ms.read(reinterpret_cast<gm::GMbyte*>(&waveFileHeader), sizeof(WAVEFILEHEADER));
+
+	if (strnEqual(waveFileHeader.szRIFF, "RIFF", 4) && strnEqual(waveFileHeader.szWAVE, "WAVE", 4))
+	{
+		while (ms.read(reinterpret_cast<gm::GMbyte*>(&riffChunk), sizeof(RIFFCHUNK)) == sizeof(RIFFCHUNK))
+		{
+			if (strnEqual(riffChunk.szChunkName, "fmt ", 4))
+			{
+				if (riffChunk.ulChunkSize <= sizeof(WAVEFMT))
+				{
+					ms.read(reinterpret_cast<gm::GMbyte*>(&waveFmt), riffChunk.ulChunkSize);
+
+					// Determine if this is a WAVEFORMATEX or WAVEFORMATEXTENSIBLE wave file
+					if (waveFmt.usFormatTag == WAVE_FORMAT_PCM)
+					{
+						pWaveInfo->wfType = WF_EX;
+						memcpy(&pWaveInfo->wfEXT.Format, &waveFmt, sizeof(PCMWAVEFORMAT));
+					}
+					else if (waveFmt.usFormatTag == WAVE_FORMAT_EXTENSIBLE)
+					{
+						pWaveInfo->wfType = WF_EXT;
+						memcpy(&pWaveInfo->wfEXT, &waveFmt, sizeof(WAVEFORMATEXTENSIBLE));
+					}
+				}
+				else
+				{
+					ms.seek(riffChunk.ulChunkSize, gm::MemoryStream::FromNow);
+				}
+			}
+			else if (strnEqual(riffChunk.szChunkName, "data", 4))
+			{
+				pWaveInfo->ulDataSize = riffChunk.ulChunkSize;
+				pWaveInfo->ulDataOffset = ms.tell();
+				ms.seek(riffChunk.ulChunkSize, gm::MemoryStream::FromNow);
+			}
+			else
+			{
+				ms.seek(riffChunk.ulChunkSize, gm::MemoryStream::FromNow);
+			}
+
+			// Ensure that we are correctly aligned for next chunk
+			if (riffChunk.ulChunkSize & 1)
+				ms.seek(1, gm::MemoryStream::FromNow);
+		}
+
+		if (pWaveInfo->ulDataSize && pWaveInfo->ulDataOffset && ((pWaveInfo->wfType == WF_EX) || (pWaveInfo->wfType == WF_EXT)))
+			wr = WR_OK;
+	}
+	else
+	{
+		wr = WR_BADWAVEFILE;
+	}
+	return wr;
+}
+
+WAVERESULT CWaves::LoadWaveBuffer(const gm::GMBuffer& buffer, WAVEID *pWaveID)
+{
+	WAVERESULT wr = WR_OUTOFMEMORY;
+	LPWAVEFILEINFO pWaveInfo;
+
+	pWaveInfo = new WAVEFILEINFO;
+	pWaveInfo->pFile = nullptr; //NOT A FILE
+	if (pWaveInfo)
+	{
+		gm::MemoryStream ms(buffer.buffer, buffer.size);
+		if (WAVE_SUCCEEDED(wr = ParseBuffer(ms, pWaveInfo)))
+		{
+			pWaveInfo->pData = new char[pWaveInfo->ulDataSize];
+			if (pWaveInfo->pData)
+			{
+				// Seek to start of audio data
+				ms.seek(pWaveInfo->ulDataOffset, gm::MemoryStream::FromStart);
+				
+				// Read Sample Data
+				if (ms.read(reinterpret_cast<gm::GMbyte*>(pWaveInfo->pData), pWaveInfo->ulDataSize) == pWaveInfo->ulDataSize)
+				{
+					long lLoop = 0;
+					for (lLoop = 0; lLoop < MAX_NUM_WAVEID; lLoop++)
+					{
+						if (!m_WaveIDs[lLoop])
+						{
+							m_WaveIDs[lLoop] = pWaveInfo;
+							*pWaveID = lLoop;
+							wr = WR_OK;
+							break;
+						}
+					}
+
+					if (lLoop == MAX_NUM_WAVEID)
+					{
+						delete pWaveInfo->pData;
+						wr = WR_OUTOFMEMORY;
+					}
+				}
+				else
+				{
+					delete pWaveInfo->pData;
+					wr = WR_BADWAVEFILE;
+				}
+			}
+			else
+			{
+				wr = WR_OUTOFMEMORY;
+			}
+		}
+
+		if (wr != WR_OK)
+			delete pWaveInfo;
+	}
+
+	return wr;
+}
 
 WAVERESULT CWaves::DeleteWaveFile(WAVEID WaveID)
 {
@@ -432,7 +553,6 @@ WAVERESULT CWaves::DeleteWaveFile(WAVEID WaveID)
 	return wr;
 }
 
-
 WAVERESULT CWaves::GetWaveType(WAVEID WaveID, WAVEFILETYPE *wfType)
 {
 	if (!IsWaveID(WaveID))
@@ -446,7 +566,6 @@ WAVERESULT CWaves::GetWaveType(WAVEID WaveID, WAVEFILETYPE *wfType)
 	return WR_OK;
 }
 
-
 WAVERESULT CWaves::GetWaveFormatExHeader(WAVEID WaveID, WAVEFORMATEX *wfex)
 {
 	if (!IsWaveID(WaveID))
@@ -459,7 +578,6 @@ WAVERESULT CWaves::GetWaveFormatExHeader(WAVEID WaveID, WAVEFORMATEX *wfex)
 
 	return WR_OK;
 }
-
 
 WAVERESULT CWaves::GetWaveFormatExtensibleHeader(WAVEID WaveID, WAVEFORMATEXTENSIBLE *wfext)
 {
@@ -503,7 +621,6 @@ WAVERESULT CWaves::GetWaveSize(WAVEID WaveID, unsigned long *size)
 	return WR_OK;
 }
 
-
 WAVERESULT CWaves::GetWaveFrequency(WAVEID WaveID, unsigned long *pulFrequency)
 {
 	WAVERESULT wr = WR_OK;
@@ -522,7 +639,6 @@ WAVERESULT CWaves::GetWaveFrequency(WAVEID WaveID, unsigned long *pulFrequency)
 
 	return wr;
 }
-
 
 WAVERESULT CWaves::GetWaveALBufferFormat(WAVEID WaveID, PFNALGETENUMVALUE pfnGetEnumValue, unsigned long *pulFormat)
 {
@@ -632,7 +748,6 @@ WAVERESULT CWaves::GetWaveALBufferFormat(WAVEID WaveID, PFNALGETENUMVALUE pfnGet
 	return wr;
 }
 
-
 bool CWaves::IsWaveID(WAVEID WaveID)
 {
 	bool bReturn = false;
@@ -645,7 +760,6 @@ bool CWaves::IsWaveID(WAVEID WaveID)
 
 	return bReturn;
 }
-
 
 char *CWaves::GetErrorString(WAVERESULT wr, char *szErrorString, unsigned long nSizeOfErrorString)
 {
