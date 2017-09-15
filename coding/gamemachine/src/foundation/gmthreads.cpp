@@ -112,6 +112,16 @@ bool GMThread::join()
 #endif
 }
 
+GMThreadHandle::id GMThread::getThreadId()
+{
+	D(d);
+#if GM_USE_PTHREAD
+	return d->handle.p;
+#else
+	return d->handle.get_id();
+#endif
+}
+
 GMThreadHandle::id GMThread::getCurrentThreadId()
 {
 #if GM_USE_PTHREAD

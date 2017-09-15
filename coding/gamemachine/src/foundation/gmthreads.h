@@ -63,6 +63,7 @@ public:
 	void terminate();
 	void detach();
 	bool join();
+	GMThreadHandle::id getThreadId();
 
 public:
 	GMThread::Data* threadData() { D(d); return data(); }

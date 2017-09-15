@@ -54,6 +54,14 @@ bool GMMStream::isWriting()
 	return d->writing;
 }
 
+void GMMStream::fill(gm::GMbyte byte)
+{
+	D(d);
+	size_t sz = d->capacity - d->ptr;
+	if (sz)
+		memset(d->data, 0u, sz);
+}
+
 GMMStream& GMMStream::operator <<(gm::GMbyte byte)
 {
 	D(d);

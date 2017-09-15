@@ -9,6 +9,18 @@ static_assert(sizeof(gm::GMint) == sizeof(ALenum), "Size error");
 static_assert(sizeof(gm::GMint) == sizeof(ALsizei), "Size error");
 static ALenum s_alErrCode;
 #define GMM_CHECK_AL_ERROR() GM_ASSERT((s_alErrCode = alGetError()) == AL_NO_ERROR);
+
+inline void waitForSourceStop(ALuint source)
+{
+	alSourceStop(source);
+	ALint state;
+	do
+	{
+		GMM_SLEEP_FOR_ONE_FRAME();
+		alGetSourcei(source, AL_SOURCE_STATE, &state);
+	} while (state == AL_PLAYING);
+}
+
 //////////////////////////////////////////////////////////////////////////
 enum class GMMAudioSourcePlayOperation
 {
@@ -123,6 +135,7 @@ GM_PRIVATE_OBJECT(GMMAudioStreamPlayThread)
 	GMMAudioStreamSource* source = nullptr;
 	bool started = false;
 	bool terminate = false;
+	bool loop = false;
 };
 
 class GMMAudioStreamSource : public gm::GMObject, public gm::IAudioSource
@@ -159,15 +172,22 @@ public:
 	}
 
 public:
+	void setLoop(bool loop)
+	{
+		D(d);
+		d->loop = loop;
+	}
+
+public:
 	virtual void run() override
 	{
 		D(d_self);
-		detach();
 		d_self->terminate = false;
 		d_self->started = true;
 
 		D_OF(d, d_self->source);
 		// 初始化
+		alSourcei(d->sourceId, AL_LOOPING, AL_FALSE);
 		gm::IAudioStream* stream = d->file->getStream();
 		gm::GMuint bufferSize = stream->getBufferSize();
 		gm::GMuint bufferNum = stream->getBufferNum();
@@ -211,17 +231,23 @@ public:
 			{
 				buffer = 0;
 				alSourceUnqueueBuffers(d->sourceId, 1, &buffer);
-				if (stream->readBuffer(audioData))
+				if (stream->readBuffer(audioData) && !d_self->loop)
+				{
+					waitForSourceStop(d->sourceId);
+					d_self->source->rewind();
+					terminateThread();
+				}
+				else
 				{
 					alBufferData(buffer, fileInfo.format, audioData, bufferSize, fileInfo.frequency);
 					alSourceQueueBuffers(d->sourceId, 1, &buffer);
 				}
-
 				buffersProcessed--;
 			}
 		}
 		delete[] audioData;
 		d_self->started = false;
+		detach();
 	}
 
 public:
@@ -235,7 +261,6 @@ public:
 	{
 		D(d_self);
 		D_OF(d, d_self->source);
-		gm::IAudioStream* stream = d->file->getStream();
 		d_self->terminate = true;
 	}
 };
@@ -265,7 +290,9 @@ GMMAudioStreamSource::~GMMAudioStreamSource()
 
 	if (d->thread)
 	{
+		d->thread->detach();
 		d->thread->terminateThread();
+		d->thread->wait();
 		delete d->thread;
 	}
 }
@@ -274,6 +301,7 @@ void GMMAudioStreamSource::play(bool loop)
 {
 	D(d);
 	GM_ASSERT(d->file->isStream());
+	d->thread->setLoop(loop);
 	if (!d->thread->hasStarted())
 		d->thread->start();
 	else
@@ -306,9 +334,12 @@ void GMMAudioStreamSource::rewind()
 	} while (state == AL_PLAYING);
 
 	// 停止播放线程
-	d->thread->detach();
-	d->thread->terminateThread();
-	d->thread->wait();
+	if (d->thread->getThreadId() != gm::GMThread::getCurrentThreadId())
+	{
+		d->thread->detach();
+		d->thread->terminateThread();
+		d->thread->wait();
+	}
 
 	// 停止流解码，回退到流最初状态
 	stream->rewind();

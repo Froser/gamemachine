@@ -690,19 +690,17 @@ int WINAPI WinMain(
 	gmm::GMMFactory::createAudioReader(&reader);
 	
 	GMBuffer buffer;
-	pk->readFile(GMPackageIndex::Audio, "bgm.mp3", &buffer);
+	pk->readFile(GMPackageIndex::Audio, "short.mp3", &buffer);
 	IAudioFile* file;
 	reader->load(buffer, &file);
 
 	IAudioSource* s;
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
 
-	s->play(1);
-	Sleep(5000);
-	s->rewind();
-	Sleep(5000);
-	s->play(1);
+	s->play(0);
 
+	Sleep(5000);
+	s->play(1);
 #if 0
 	// Òì²½Ä£ÐÍ
 	GMBuffer buffer;

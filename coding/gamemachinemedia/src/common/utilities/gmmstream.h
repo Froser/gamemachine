@@ -31,6 +31,7 @@ public:
 	void rewind();
 	bool isFull();
 	bool isWriting();
+	void fill(gm::GMbyte byte);
 
 public:
 	GMMStream& operator <<(gm::GMbyte byte);

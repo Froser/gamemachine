@@ -4,10 +4,7 @@
 
 GMMAudioFile_Stream::GMMAudioFile_Stream()
 {
-	D(d);
-	d->writePtr = 0;
-	d->readPtr = 0;
-	d->chunkNum = 0;
+	init();
 }
 
 GMMAudioFile_Stream::~GMMAudioFile_Stream()
@@ -67,15 +64,14 @@ bool GMMAudioFile_Stream::readBuffer(gm::GMbyte* bytes)
 {
 	D(d);
 	waitForStreamReady();
-	if (!bytes)
-		return false;
 
+	GM_ASSERT(bytes);
 	auto& buffer = d->output[d->readPtr];
-	bool res = buffer.read(bytes);
+	buffer.read(bytes);
 
 	// 跳到下一段
 	move(d->readPtr, d->bufferNum);
-	return res;
+	return d->eof && peek(d->readPtr, d->bufferNum) == d->eofPtr;
 }
 
 void GMMAudioFile_Stream::nextChunk(gm::GMlong chunkNum)
@@ -96,9 +92,7 @@ void GMMAudioFile_Stream::rewindDecode()
 {
 	D(d);
 	// 重启解码线程
-	d->writePtr = 0;
-	d->readPtr = 0;
-	d->chunkNum = 0;
+	init();
 	nextChunk(d->bufferNum - 1);
 	startDecodeThread();
 }
@@ -107,6 +101,15 @@ void GMMAudioFile_Stream::rewind()
 {
 	cleanUp();
 	rewindDecode();
+}
+
+void GMMAudioFile_Stream::init()
+{
+	D(d);
+	d->writePtr = 0;
+	d->readPtr = 0;
+	d->chunkNum = 0;
+	d->eof = false;
 }
 
 void GMMAudioFile_Stream::cleanUp()
@@ -150,6 +153,20 @@ void GMMAudioFile_Stream::move(std::atomic_long& ptr, gm::GMuint loop)
 {
 	++ptr;
 	ptr = ptr % loop;
+}
+
+gm::GMlong GMMAudioFile_Stream::peek(std::atomic_long& ptr, gm::GMuint loop)
+{
+	return (ptr + 1) % loop;
+}
+
+void GMMAudioFile_Stream::setEof(Data* d)
+{
+	// 做个EOF标记
+	// 流可能是循环的，这个标记表示在这个buffer中，到达了解码的末尾
+	d->output[d->writePtr].fill(0x00);
+	d->eof = true;
+	d->eofPtr = d->writePtr;
 }
 
 void GMMAudioFile_Stream::setStreamReady(Data* d)

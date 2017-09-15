@@ -16,6 +16,8 @@ GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 
 	// stream相关
 	gm::GMulong bufferSize = 0;
+	bool eof = false;
+	gm::GMlong eofPtr = 0;
 	std::atomic_long writePtr;
 	std::atomic_long readPtr;
 	gm::GMManualResetEvent streamReadyEvent;
@@ -58,11 +60,14 @@ protected:
 protected:
 	static void saveBuffer(Data* d, gm::GMbyte data);
 	static void move(std::atomic_long& ptr, gm::GMuint loop);
+	static gm::GMlong GMMAudioFile_Stream::peek(std::atomic_long& ptr, gm::GMuint loop);
 
 public:
 	static void setStreamReady(Data* d);
+	static void setEof(Data* d);
 
 private:
+	void init();
 	void cleanUp();
 };
 
