@@ -5,9 +5,6 @@
 #ifndef _CWAVES_H_
 #define _CWAVES_H_
 
-#include <windows.h>
-#include <ks.h>
-#include <ksmedia.h>
 #include <stdio.h>
 
 #define MAX_NUM_WAVEID			1024
@@ -41,6 +38,10 @@ enum WAVERESULT
 	WR_INVALIDWAVEFILETYPE				= -16,
 	WR_NOTWAVEFORMATEXTENSIBLEFORMAT	= -17
 };
+
+#if !defined(WAVE_FORMAT_EXTENSIBLE)
+#define  WAVE_FORMAT_EXTENSIBLE                 0xFFFE
+#endif // !defined(WAVE_FORMAT_EXTENSIBLE)
 
 #ifndef _WAVEFORMATEX_
 #define _WAVEFORMATEX_

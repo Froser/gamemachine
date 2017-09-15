@@ -343,7 +343,7 @@ public:
 	bool nextInt(GMint* out);
 };
 
-//MemoryStream
+//GMMemoryStream
 GM_PRIVATE_OBJECT(GMMemoryStream)
 {
 	const GMbyte* ptr;
