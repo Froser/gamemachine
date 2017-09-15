@@ -563,7 +563,7 @@ static GLenum getTargetFromDDSHeader(const DDS_FILE_HEADER& header)
 
 static bool loadDDS(const GMbyte* data, GMuint size, GMImage::Data* image)
 {
-	MemoryStream ms(data, size);
+	GMMemoryStream ms(data, size);
 	DDS_FILE_HEADER file_header = { 0 };
 
 	ms.read(reinterpret_cast<GMbyte*>(&file_header), sizeof(file_header.magic) + sizeof(file_header.std_header));

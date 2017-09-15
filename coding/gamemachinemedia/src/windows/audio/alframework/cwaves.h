@@ -109,7 +109,7 @@ public:
 
 private:
 	WAVERESULT ParseFile(const char *szFilename, LPWAVEFILEINFO pWaveInfo);
-	WAVERESULT ParseBuffer(gm::MemoryStream& ms, LPWAVEFILEINFO pWaveInfo);
+	WAVERESULT ParseBuffer(gm::GMMemoryStream& ms, LPWAVEFILEINFO pWaveInfo);
 
 public:
 	WAVERESULT LoadWaveBuffer(const gm::GMBuffer& buffer, WAVEID *pWaveID);

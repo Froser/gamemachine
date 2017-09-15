@@ -53,7 +53,7 @@ bool TGAImage::read_tga_file(const GMbyte* data, GMuint size)
 		delete [] d;
 	d = nullptr;
 
-	MemoryStream in(data, size);
+	GMMemoryStream in(data, size);
 	TGA_Header header;
 	in.read(reinterpret_cast<GMbyte*>(&header), sizeof(header));
 
@@ -91,7 +91,7 @@ bool TGAImage::read_tga_file(const GMbyte* data, GMuint size)
 	return true;
 }
 
-bool TGAImage::load_rle_data(MemoryStream& in) {
+bool TGAImage::load_rle_data(GMMemoryStream& in) {
 	unsigned long pixelcount = width*height;
 	unsigned long currentpixel = 0;
 	unsigned long currentbyte  = 0;

@@ -407,7 +407,7 @@ WAVERESULT CWaves::ParseFile(const char *szFilename, LPWAVEFILEINFO pWaveInfo)
 	return wr;
 }
 
-WAVERESULT CWaves::ParseBuffer(gm::MemoryStream& ms, LPWAVEFILEINFO pWaveInfo)
+WAVERESULT CWaves::ParseBuffer(gm::GMMemoryStream& ms, LPWAVEFILEINFO pWaveInfo)
 {
 	WAVEFILEHEADER	waveFileHeader;
 	RIFFCHUNK		riffChunk;
@@ -443,23 +443,23 @@ WAVERESULT CWaves::ParseBuffer(gm::MemoryStream& ms, LPWAVEFILEINFO pWaveInfo)
 				}
 				else
 				{
-					ms.seek(riffChunk.ulChunkSize, gm::MemoryStream::FromNow);
+					ms.seek(riffChunk.ulChunkSize, gm::GMMemoryStream::FromNow);
 				}
 			}
 			else if (strnEqual(riffChunk.szChunkName, "data", 4))
 			{
 				pWaveInfo->ulDataSize = riffChunk.ulChunkSize;
 				pWaveInfo->ulDataOffset = ms.tell();
-				ms.seek(riffChunk.ulChunkSize, gm::MemoryStream::FromNow);
+				ms.seek(riffChunk.ulChunkSize, gm::GMMemoryStream::FromNow);
 			}
 			else
 			{
-				ms.seek(riffChunk.ulChunkSize, gm::MemoryStream::FromNow);
+				ms.seek(riffChunk.ulChunkSize, gm::GMMemoryStream::FromNow);
 			}
 
 			// Ensure that we are correctly aligned for next chunk
 			if (riffChunk.ulChunkSize & 1)
-				ms.seek(1, gm::MemoryStream::FromNow);
+				ms.seek(1, gm::GMMemoryStream::FromNow);
 		}
 
 		if (pWaveInfo->ulDataSize && pWaveInfo->ulDataOffset && ((pWaveInfo->wfType == WF_EX) || (pWaveInfo->wfType == WF_EXT)))
@@ -481,14 +481,14 @@ WAVERESULT CWaves::LoadWaveBuffer(const gm::GMBuffer& buffer, WAVEID *pWaveID)
 	pWaveInfo->pFile = nullptr; //NOT A FILE
 	if (pWaveInfo)
 	{
-		gm::MemoryStream ms(buffer.buffer, buffer.size);
+		gm::GMMemoryStream ms(buffer.buffer, buffer.size);
 		if (WAVE_SUCCEEDED(wr = ParseBuffer(ms, pWaveInfo)))
 		{
 			pWaveInfo->pData = new char[pWaveInfo->ulDataSize];
 			if (pWaveInfo->pData)
 			{
 				// Seek to start of audio data
-				ms.seek(pWaveInfo->ulDataOffset, gm::MemoryStream::FromStart);
+				ms.seek(pWaveInfo->ulDataOffset, gm::GMMemoryStream::FromStart);
 				
 				// Read Sample Data
 				if (ms.read(reinterpret_cast<gm::GMbyte*>(pWaveInfo->pData), pWaveInfo->ulDataSize) == pWaveInfo->ulDataSize)

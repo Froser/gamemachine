@@ -344,7 +344,7 @@ public:
 };
 
 //MemoryStream
-GM_PRIVATE_OBJECT(MemoryStream)
+GM_PRIVATE_OBJECT(GMMemoryStream)
 {
 	const GMbyte* ptr;
 	const GMbyte* start;
@@ -352,9 +352,9 @@ GM_PRIVATE_OBJECT(MemoryStream)
 	GMuint size;
 };
 
-class MemoryStream : public GMObject
+class GMMemoryStream : public GMObject
 {
-	DECLARE_PRIVATE(MemoryStream)
+	DECLARE_PRIVATE(GMMemoryStream)
 
 public:
 	enum SeekMode
@@ -364,7 +364,7 @@ public:
 	};
 
 public:
-	MemoryStream(const GMbyte* buffer, GMuint size);
+	GMMemoryStream(const GMbyte* buffer, GMuint size);
 
 public:
 	GMuint read(GMbyte* buf, GMuint size);

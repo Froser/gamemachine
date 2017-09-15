@@ -526,7 +526,7 @@ bool Scanner::nextInt(GMint* out)
 
 //MemoryStream
 
-MemoryStream::MemoryStream(const GMbyte* buffer, GMuint size)
+GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMuint size)
 {
 	D(d);
 	d->start = buffer;
@@ -535,7 +535,7 @@ MemoryStream::MemoryStream(const GMbyte* buffer, GMuint size)
 	d->end = d->start + d->size;
 }
 
-GMuint MemoryStream::read(GMbyte* buf, GMuint size)
+GMuint GMMemoryStream::read(GMbyte* buf, GMuint size)
 {
 	D(d);
 	if (d->ptr >= d->end)
@@ -547,7 +547,7 @@ GMuint MemoryStream::read(GMbyte* buf, GMuint size)
 	return realSize;
 }
 
-GMuint MemoryStream::peek(GMbyte* buf, GMuint size)
+GMuint GMMemoryStream::peek(GMbyte* buf, GMuint size)
 {
 	D(d);
 	if (d->ptr >= d->end)
@@ -558,37 +558,37 @@ GMuint MemoryStream::peek(GMbyte* buf, GMuint size)
 	return realSize;
 }
 
-void MemoryStream::rewind()
+void GMMemoryStream::rewind()
 {
 	D(d);
 	d->ptr = d->start;
 }
 
-GMuint MemoryStream::size()
+GMuint GMMemoryStream::size()
 {
 	D(d);
 	return d->size;
 }
 
-GMuint MemoryStream::tell()
+GMuint GMMemoryStream::tell()
 {
 	D(d);
 	return d->ptr - d->start;
 }
 
-GMbyte MemoryStream::get()
+GMbyte GMMemoryStream::get()
 {
 	GMbyte c;
 	read(&c, 1);
 	return c;
 }
 
-void MemoryStream::seek(GMuint cnt, SeekMode mode)
+void GMMemoryStream::seek(GMuint cnt, SeekMode mode)
 {
 	D(d);
-	if (mode == MemoryStream::FromStart)
+	if (mode == GMMemoryStream::FromStart)
 		d->ptr = d->start + cnt;
-	else if (mode == MemoryStream::FromNow)
+	else if (mode == GMMemoryStream::FromNow)
 		d->ptr += cnt;
 	else
 		GM_ASSERT(false);

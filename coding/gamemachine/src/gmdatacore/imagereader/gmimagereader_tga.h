@@ -64,7 +64,7 @@ struct TGAColor {
 	}
 };
 
-class MemoryStream;
+class GMMemoryStream;
 class TGAImage
 {
 protected:
@@ -74,7 +74,7 @@ protected:
 	int bytespp;
 	size_t nbytes;
 
-	bool load_rle_data(MemoryStream& in);
+	bool load_rle_data(GMMemoryStream& in);
 	bool unload_rle_data(std::ofstream &out) const;
 public:
 	enum Format {

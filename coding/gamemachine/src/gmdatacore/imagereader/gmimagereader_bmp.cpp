@@ -91,7 +91,7 @@ bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT GMImage** img)
 		return false;
 	}
 
-	MemoryStream ms(byte, size);
+	GMMemoryStream ms(byte, size);
 	BitmapFile& bitmapFile = image->getRawFile();
 
 	ms.read(reinterpret_cast<GMbyte*>(&bitmapFile.bitmapHeader), sizeof(BitmapHeader));
