@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 #include "gmgameworld.h"
 #include "gmbspgameworldprivate.h"
-#include <gmresourcecontainer.h>
+#include <gmassets.h>
 BEGIN_NS
 
 class GMBSPGameWorld : public GMGameWorld

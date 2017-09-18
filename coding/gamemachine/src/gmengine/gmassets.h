@@ -1,5 +1,5 @@
-﻿#ifndef __RESOURCE_CONTAINER_H__
-#define __RESOURCE_CONTAINER_H__
+﻿#ifndef __GMASSETS_H__
+#define __GMASSETS_H__
 #include <gmcommon.h>
 #include <set>
 #include "../gmdatacore/gmmodel.h"
@@ -30,46 +30,46 @@ struct TextureItem
 	ITexture* texture;
 };
 
-GM_PRIVATE_OBJECT(GMTextureContainer)
+GM_PRIVATE_OBJECT(GMTextureAssets)
 {
 	std::set<TextureItem<std::string>, Name_Less<TextureItem<std::string> > > textures;
 };
 
-class GMTextureContainer : public GMObject
+class GMTextureAssets : public GMObject
 {
-	DECLARE_PRIVATE(GMTextureContainer);
+	DECLARE_PRIVATE(GMTextureAssets);
 
 public:
 	typedef TextureItem<std::string> TextureItemType;
 
 public:
-	~GMTextureContainer();
+	~GMTextureAssets();
 
 	void insert(TextureItemType& item);
 	const TextureItemType* find(const char* name);
 };
 
-GM_PRIVATE_OBJECT(GMTextureContainer_ID)
+GM_PRIVATE_OBJECT(GMTextureAssets_ID)
 {
 	std::set<TextureItem<GMint>, ID_Less<TextureItem<GMint> > > textures;
 };
 
-class GMTextureContainer_ID : public GMObject
+class GMTextureAssets_ID : public GMObject
 {
-	DECLARE_PRIVATE(GMTextureContainer_ID)
+	DECLARE_PRIVATE(GMTextureAssets_ID)
 
 public:
 	typedef TextureItem<GMint> TextureItemType;
 
 public:
-	~GMTextureContainer_ID();
+	~GMTextureAssets_ID();
 
 public:
 	void insert(TextureItemType& item);
 	const TextureItemType* find(GMint id);
 };
 
-GM_PRIVATE_OBJECT(GMModelContainer)
+GM_PRIVATE_OBJECT(GMModelAssets)
 {
 	Map<GMuint, GMModel*> items;
 	GMint id = 0;
@@ -80,43 +80,43 @@ struct GMModelContainerItemIndex
 	GMint id = -1;
 };
 
-class GMModelContainer : public GMObject
+class GMModelAssets : public GMObject
 {
-	DECLARE_PRIVATE(GMModelContainer)
+	DECLARE_PRIVATE(GMModelAssets)
 
 public:
-	~GMModelContainer();
+	~GMModelAssets();
 
 public:
 	GMModelContainerItemIndex insert(AUTORELEASE GMModel* model);
 	GMModel* find(GMModelContainerItemIndex index);
 };
 
-GM_PRIVATE_OBJECT(GMResourceContainer)
+GM_PRIVATE_OBJECT(GMAssets)
 {
-	GMTextureContainer textureContainer;
-	GMTextureContainer_ID lightmapContainer;
-	GMModelContainer modelContainer;
+	GMTextureAssets textureContainer;
+	GMTextureAssets_ID lightmapContainer;
+	GMModelAssets modelContainer;
 };
 
-class GMResourceContainer : public GMObject
+class GMAssets : public GMObject
 {
-	DECLARE_PRIVATE(GMResourceContainer)
+	DECLARE_PRIVATE(GMAssets)
 
 public:
-	GMTextureContainer& getTextureContainer()
+	GMTextureAssets& getTextureContainer()
 	{
 		D(d);
 		return d->textureContainer;
 	}
 
-	GMTextureContainer_ID& getLightmapContainer()
+	GMTextureAssets_ID& getLightmapContainer()
 	{
 		D(d);
 		return d->lightmapContainer;
 	}
 
-	GMModelContainer& getModelContainer()
+	GMModelAssets& getModelContainer()
 	{
 		D(d);
 		return d->modelContainer;

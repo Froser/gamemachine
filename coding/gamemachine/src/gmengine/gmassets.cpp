@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
-#include "gmresourcecontainer.h"
+#include "gmassets.h"
 
-GMTextureContainer::~GMTextureContainer()
+GMTextureAssets::~GMTextureAssets()
 {
 	D(d);
 	for (auto& texture : d->textures)
@@ -10,17 +10,17 @@ GMTextureContainer::~GMTextureContainer()
 	}
 }
 
-void GMTextureContainer::insert(GMTextureContainer::TextureItemType& item)
+void GMTextureAssets::insert(GMTextureAssets::TextureItemType& item)
 {
 	D(d);
 	GM_ASSERT(d->textures.find(item) == d->textures.end());
 	d->textures.insert(item);
 }
 
-const GMTextureContainer::TextureItemType* GMTextureContainer::find(const char* name)
+const GMTextureAssets::TextureItemType* GMTextureAssets::find(const char* name)
 {
 	D(d);
-	GMTextureContainer::TextureItemType _key;
+	GMTextureAssets::TextureItemType _key;
 	_key.id = name;
 	auto it = d->textures.find(_key);
 	if (it == d->textures.end())
@@ -29,7 +29,7 @@ const GMTextureContainer::TextureItemType* GMTextureContainer::find(const char* 
 	return &(*it);
 }
 
-GMTextureContainer_ID::~GMTextureContainer_ID()
+GMTextureAssets_ID::~GMTextureAssets_ID()
 {
 	D(d);
 	for (auto& texture : d->textures)
@@ -38,17 +38,17 @@ GMTextureContainer_ID::~GMTextureContainer_ID()
 	}
 }
 
-void GMTextureContainer_ID::insert(GMTextureContainer_ID::TextureItemType& item)
+void GMTextureAssets_ID::insert(GMTextureAssets_ID::TextureItemType& item)
 {
 	D(d);
 	GM_ASSERT(d->textures.find(item) == d->textures.end());
 	d->textures.insert(item);
 }
 
-const GMTextureContainer_ID::TextureItemType* GMTextureContainer_ID::find(GMint id)
+const GMTextureAssets_ID::TextureItemType* GMTextureAssets_ID::find(GMint id)
 {
 	D(d);
-	GMTextureContainer_ID::TextureItemType _key = { id };
+	GMTextureAssets_ID::TextureItemType _key = { id };
 	auto it = d->textures.find(_key);
 	if (it == d->textures.end())
 		return nullptr;
@@ -56,7 +56,7 @@ const GMTextureContainer_ID::TextureItemType* GMTextureContainer_ID::find(GMint 
 	return &(*it);
 }
 
-GMModelContainer::~GMModelContainer()
+GMModelAssets::~GMModelAssets()
 {
 	D(d);
 	for (auto& item : d->items)
@@ -66,7 +66,7 @@ GMModelContainer::~GMModelContainer()
 	}
 }
 
-GMModelContainerItemIndex GMModelContainer::insert(AUTORELEASE GMModel* model)
+GMModelContainerItemIndex GMModelAssets::insert(AUTORELEASE GMModel* model)
 {
 	D(d);
 	d->items[d->id] = model;
@@ -75,7 +75,7 @@ GMModelContainerItemIndex GMModelContainer::insert(AUTORELEASE GMModel* model)
 	return r;
 }
 
-GMModel* GMModelContainer::find(GMModelContainerItemIndex index)
+GMModel* GMModelAssets::find(GMModelContainerItemIndex index)
 {
 	D(d);
 	GMuint _key = index.id;

@@ -129,9 +129,9 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 	if (!name)
 		return nullptr;
 
-	GMResourceContainer& rc = d->world->getResourceContainer();
-	GMTextureContainer& tc = rc.getTextureContainer();
-	const GMTextureContainer::TextureItemType* item = tc.find(name);
+	GMAssets& rc = d->world->getAssets();
+	GMTextureAssets& tc = rc.getTextureContainer();
+	const GMTextureAssets::TextureItemType* item = tc.find(name);
 	if (!item)
 	{
 		GMString fn;
@@ -151,7 +151,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 			IFactory* factory = GameMachine::instance().getFactory();
 			factory->createTexture(img, &texture);
 
-			GMTextureContainer::TextureItemType ti = { name, texture };
+			GMTextureAssets::TextureItemType ti = { name, texture };
 			tc.insert(ti);
 			return texture;
 		}
@@ -381,11 +381,11 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 	{
 		if (strEqual(from, "lightmap"))
 		{
-			GMResourceContainer& rc = d->world->getResourceContainer();
-			GMTextureContainer_ID& tc = rc.getLightmapContainer();
+			GMAssets& rc = d->world->getAssets();
+			GMTextureAssets_ID& tc = rc.getLightmapContainer();
 
 			GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
-			const GMTextureContainer_ID::TextureItemType* tex = tc.find(d->lightmapId);
+			const GMTextureAssets_ID::TextureItemType* tex = tc.find(d->lightmapId);
 			if (tex)
 			{
 				frame->addFrame(tc.find(d->lightmapId)->texture);

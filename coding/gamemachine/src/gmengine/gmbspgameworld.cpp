@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
-#include "gmengine/gmresourcecontainer.h"
+#include "gmengine/gmassets.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
@@ -421,8 +421,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
 	{
-		GMTextureContainer& tc = getResourceContainer().getTextureContainer();
-		const GMTextureContainer::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
+		GMTextureAssets& tc = getAssets().getTextureContainer();
+		const GMTextureAssets::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
 		if (!item)
 			return false;
 		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(item->texture);
@@ -434,8 +434,8 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
-	GMTextureContainer_ID& tc = getResourceContainer().getLightmapContainer();
-	const GMTextureContainer_ID::TextureItemType* item = nullptr;
+	GMTextureAssets_ID& tc = getAssets().getLightmapContainer();
+	const GMTextureAssets_ID::TextureItemType* item = nullptr;
 	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
 		item = tc.find(WHITE_LIGHTMAP);
 	else
@@ -494,8 +494,8 @@ void GMBSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
 
-			GMTextureContainer::TextureItemType item = { shader.shader, texture };
-			getResourceContainer().getTextureContainer().insert(item);
+			GMTextureAssets::TextureItemType item = { shader.shader, texture };
+			getAssets().getTextureContainer().insert(item);
 		}
 		else
 		{
@@ -550,8 +550,8 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 
-		GMTextureContainer_ID::TextureItemType item = { i, texture };
-		getResourceContainer().getLightmapContainer().insert(item);
+		GMTextureAssets_ID::TextureItemType item = { i, texture };
+		getAssets().getLightmapContainer().insert(item);
 	}
 
 	{
@@ -561,8 +561,8 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 
-		GMTextureContainer_ID::TextureItemType item = { -1, texture };
-		getResourceContainer().getLightmapContainer().insert(item);
+		GMTextureAssets_ID::TextureItemType item = { -1, texture };
+		getAssets().getLightmapContainer().insert(item);
 	}
 }
 
@@ -631,7 +631,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GM_ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
-	GMResourceContainer& rc = getResourceContainer();
+	GMAssets& rc = getAssets();
 	GMEntityObject* entityObject = nullptr;
 	GMModel* model = nullptr;
 	if (!strlen(m->model))

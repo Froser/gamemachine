@@ -5,7 +5,7 @@
 #include "../gmphysics/gmphysicsworld.h"
 #include <shader.h>
 #include "gmgameobject.h"
-#include <gmresourcecontainer.h>
+#include <gmassets.h>
 
 BEGIN_NS
 
@@ -15,7 +15,7 @@ class GMModelPainter;
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
-	GMResourceContainer resourceContainer;
+	GMAssets assets;
 	bool start;
 };
 
@@ -43,7 +43,7 @@ public:
 	void simulateGameWorld();
 	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 	void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
-	GMResourceContainer& getResourceContainer() { D(d); return d->resourceContainer; }
+	GMAssets& getAssets() { D(d); return d->assets; }
 
 private:
 	GMModelPainter* createPainterForObject(GMGameObject* obj);

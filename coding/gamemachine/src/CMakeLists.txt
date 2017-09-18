@@ -55,8 +55,8 @@ set(SOURCES
 		gmdatacore/shader.h
 		gmdatacore/model.h
 		gmdatacore/model.cpp
-		gmengine/gmresourcecontainer.h
-		gmengine/gmresourcecontainer.cpp
+		gmengine/gmassets.h
+		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
 		gmengine/gmgameobject.h
@@ -65,6 +65,8 @@ set(SOURCES
 		gmengine/gmparticles.cpp
 		gmengine/gmspritegameobject.h
 		gmengine/gmspritegameobject.cpp
+		gmengine/gm2dgameobject.h
+		gmengine/gm2dgameobject.cpp
 		gmengine/gmcamera.h
 		gmengine/gmcamera.cpp
 		gmengine/gmbspgameworldprivate.h

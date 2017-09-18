@@ -1,7 +1,7 @@
 ﻿#ifndef __GMGLGRAPHIC_ENGINE_H__
 #define __GMGLGRAPHIC_ENGINE_H__
 #include <gmcommon.h>
-#include <gmresourcecontainer.h>
+#include <gmassets.h>
 #include "gmglshaderprogram.h"
 #include <gamemachine.h>
 #include <map>

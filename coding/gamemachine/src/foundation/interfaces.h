@@ -19,7 +19,7 @@ class GMModelPainter;
 class GMMesh;
 class GMTextureFrames;
 class GMTexture;
-class GMResourceContainer;
+class GMAssets;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;

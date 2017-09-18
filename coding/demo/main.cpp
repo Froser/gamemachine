@@ -409,7 +409,7 @@ private:
 					shader.getMaterial().shininess = 20;
 
 					auto pk = GameMachine::instance().getGamePackageManager();
-					auto& container = demo->getResourceContainer();
+					auto& container = demo->getAssets();
 					auto& textureContainer = container.getTextureContainer();
 
 					GMImage* img;
@@ -420,7 +420,7 @@ private:
 					ITexture* tex;
 					factory.createTexture(img, &tex);
 
-					GMTextureContainer::TextureItemType item = { "", tex };
+					GMTextureAssets::TextureItemType item = { "", tex };
 					textureContainer.insert(item);
 
 					{

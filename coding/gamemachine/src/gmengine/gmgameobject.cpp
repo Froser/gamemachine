@@ -4,7 +4,7 @@
 #include "gmdatacore/glyph/gmglyphmanager.h"
 #include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
 #include "foundation/gamemachine.h"
-#include "gmresourcecontainer.h"
+#include "gmassets.h"
 
 static void noDestructor(GMGameObject*) {}
 
@@ -20,7 +20,7 @@ GMGameObject::GMGameObject(AUTORELEASE GMModel* obj)
 GMGameObject::GMGameObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex)
 {
 	D(d);
-	GMResourceContainer& rc = world.getResourceContainer();
+	GMAssets& rc = world.getAssets();
 	GMModel* model = rc.getModelContainer().find(objIndex);
 	if (model)
 		d->destructor = noDestructor;
