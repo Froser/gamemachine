@@ -83,6 +83,7 @@ class GMAssets : public GMObject
 
 public:
 	GMAssets();
+	~GMAssets();
 
 public:
 	ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
@@ -97,12 +98,12 @@ public:
 public:
 	static GMAsset createIsolatedAsset(GMAssetType type, void* data);
 	static GMAssetsNode* findChild(GMAssetsNode* parentNode, const GMAssetName& name, bool createIfNotExists = false);
+	static GMAssetsNode* findLastChild(GMAssetsNode* parentNode, bool createIfNotExists = false);
 	static GMString combinePath(std::initializer_list<GMString> args, REF char* path = nullptr, REF char* lastPart = nullptr);
 
 private:
 	static GMAssetsNode* getNodeFromPath(GMAssetsNode* node, const char* path, bool createIfNotExists = false);
-	static void defaultName(GMAssetsNode* node, REF char* name);
-	static void clearChildNode(GMAssetsNode* node);
+	static void clearChildNode(GMAssetsNode* parentNode);
 };
 
 END_NS

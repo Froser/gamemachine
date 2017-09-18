@@ -75,7 +75,7 @@ using Deque = std::deque<T>;
 
 // Debug模式下监控内存泄漏
 #ifndef GM_DETECT_MEMORY_LEAK
-#	define GM_DETECT_MEMORY_LEAK 0
+#	define GM_DETECT_MEMORY_LEAK 1
 #endif
 
 // SSE指令优化

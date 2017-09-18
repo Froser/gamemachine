@@ -9,6 +9,12 @@ GMAssets::GMAssets()
 	createNodeFromPath(GM_ASSET_LIGHTMAPS);
 }
 
+GMAssets::~GMAssets()
+{
+	D(d);
+	clearChildNode(&d->root);
+}
+
 GMAsset* GMAssets::insertAsset(const char* path, GMAssetType type, void* asset)
 {
 	GMAssetsNode* node = nullptr;
@@ -16,8 +22,7 @@ GMAsset* GMAssets::insertAsset(const char* path, GMAssetType type, void* asset)
 
 	// 使用匿名的asset
 	node = getNodeFromPath(path, true);
-	defaultName(node, name);
-	node = findChild(node, name, true);
+	node = findLastChild(node);
 	GM_ASSERT(node);
 	node->name = name;
 	node->asset.type = type;
@@ -102,6 +107,28 @@ GMAssetsNode* GMAssets::findChild(GMAssetsNode* parentNode, const GMAssetName& n
 	return node; // node == nullptr
 }
 
+GMAssetsNode* GMAssets::findLastChild(GMAssetsNode* parentNode, bool createIfNotExists)
+{
+	GMAssetsNode* node = parentNode->child;
+	if (!node)
+	{
+		if (createIfNotExists)
+		{
+			parentNode->child = new GMAssetsNode();
+			return parentNode;
+		}
+		return nullptr;
+	}
+	else
+	{
+		while (node)
+		{
+			node = node->next;
+		}
+		return node;
+	}
+}
+
 GMString GMAssets::combinePath(std::initializer_list<GMString> args, REF char* path, REF char* lastPart)
 {
 	GMString result;
@@ -145,30 +172,25 @@ GMAssetsNode* GMAssets::getNodeFromPath(GMAssetsNode* beginNode, const char* pat
 	return node;
 }
 
-void GMAssets::defaultName(GMAssetsNode* node, REF char* name)
+void GMAssets::clearChildNode(GMAssetsNode* parentNode)
 {
-	strcpy_s(name, GMAssetName::NAME_MAX, "__unnamed");
-}
-
-void GMAssets::clearChildNode(GMAssetsNode* node)
-{
-	if (node->child)
+	GMAssetsNode* node = parentNode->child;
+	while (node)
 	{
-		clearChildNode(node->child);
-	}
-	else
-	{
+		if (node->child)
+			clearChildNode(node);
 		switch (node->asset.type)
 		{
 		case GMAssetType::Texture:
-			delete getTexture(node->asset);
+			delete getTexture(parentNode->asset);
 			break;
 		case GMAssetType::Model:
-			delete getModel(node->asset);
+			delete getModel(parentNode->asset);
 			break;
 		default:
 			GM_ASSERT(false);
 			break;
 		}
+		node = node->next;
 	}
 }
