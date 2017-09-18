@@ -20,7 +20,6 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	GMBSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;
 	Map<GMint, Set<GMBSPEntity*> > entities;
-	Map<GMString, GMModelContainerItemIndex> entitiesCache;
 	Vector<GMGameObject*> renderBuffer;
 };
 

@@ -5,13 +5,12 @@
 #include "foundation/utilities/gmprimitivecreator.h"
 #include "gmengine/gmgameworld.h"
 
-static void destructor(GMGameObject*) {}
-
 GMParticleGameObject::GMParticleGameObject(AUTORELEASE GMModel* prototype)
-	: GMGameObject(prototype)
 {
 	D(d);
-	setDestructor(destructor);
+
+	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, prototype);
+	setModel(&asset);
 
 	if (prototype->getAllMeshes().size() > 1)
 	{
@@ -64,7 +63,6 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 
 //////////////////////////////////////////////////////////////////////////
 GMParticles::GMParticles()
-	: GMGameObject(nullptr)
 {
 }
 

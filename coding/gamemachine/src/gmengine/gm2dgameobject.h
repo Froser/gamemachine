@@ -33,8 +33,7 @@ class GMImage2DGameObject : public GMGameObject
 	DECLARE_PRIVATE(GMImage2DGameObject)
 
 public:
-	void setImage(const GMTextureAssets::TextureItemType& image);
-	void setImage(GMImage& image);
+	void setImage(GMAsset& asset);
 
 private:
 	virtual void onAppendingObjectToWorld();

@@ -258,9 +258,11 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	}
 	setMaterialLightmap(polygonFace.lightmapIndex, shader);
 
-	GMModel* coreObj;
-	d->render.createObject(polygonFace, shader, &coreObj);
-	obj = new GMGameObject(coreObj);
+	GMModel* model = nullptr;
+	d->render.createObject(polygonFace, shader, &model);
+	GM_ASSERT(model);
+	GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+	obj = new GMGameObject(asset);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
 	appendObjectAndInit(obj);
@@ -286,9 +288,12 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	}
 	setMaterialLightmap(meshFace.lightmapIndex, shader);
 
-	GMModel* coreObj;
-	d->render.createObject(meshFace, shader, &coreObj);
-	obj = new GMGameObject(coreObj);
+	GMModel* model = nullptr;
+	d->render.createObject(meshFace, shader, &model);
+	GM_ASSERT(model);
+
+	GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+	obj = new GMGameObject(asset);
 	rd.meshFaceObjects[&meshFace] = obj;
 	appendObjectAndInit(obj);
 }
@@ -315,9 +320,10 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 		GMBSP_Render_BiquadraticPatch& biqp = rd.patches[patchNumber].quadraticPatches[i];
 		GM_ASSERT(rd.biquadraticPatchObjects.find(&biqp) == rd.biquadraticPatchObjects.end());
 
-		GMModel* coreObj;
-		d->render.createObject(biqp, shader, &coreObj);
-		GMGameObject* obj = new GMGameObject(coreObj);
+		GMModel* model = nullptr;
+		d->render.createObject(biqp, shader, &model);
+		GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
 	}
@@ -421,11 +427,13 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
 	{
-		GMTextureAssets& tc = getAssets().getTextureContainer();
-		const GMTextureAssets::TextureItemType* item = tc.find(bsp.shaders[textureid].shader);
-		if (!item)
+		GMAssetsNode* node = getAssets().getNodeFromPath(GMAssets::combinePath({ GM_ASSET_TEXTURES, bsp.shaders[textureid].shader }).toStdString().c_str());
+		if (!node)
 			return false;
-		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(item->texture);
+
+		ITexture* texture = GMAssets::getTexture(node->asset);
+		GM_ASSERT(texture);
+		shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(texture);
 	}
 	return true;
 }
@@ -434,14 +442,18 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
-	GMTextureAssets_ID& tc = getAssets().getLightmapContainer();
-	const GMTextureAssets_ID::TextureItemType* item = nullptr;
-	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
-		item = tc.find(WHITE_LIGHTMAP);
-	else
-		item = lightmapid >= 0 ? tc.find(lightmapid) : tc.find(WHITE_LIGHTMAP);
+	GMint id = 0;
 
-	shader.getTexture().getTextureFrames(GMTextureType::LIGHTMAP, 0).addFrame(item->texture);
+	if (shader.getSurfaceFlag() & SURF_NOLIGHTMAP)
+		id = WHITE_LIGHTMAP;
+	else
+		id = lightmapid >= 0 ? lightmapid : WHITE_LIGHTMAP;
+
+	std::string lightmapPath = GMAssets::combinePath({ GM_ASSET_LIGHTMAPS, std::to_string(id) }).toStdString();
+	GMAssetsNode* node = getAssets().getNodeFromPath(lightmapPath.c_str());
+	GM_ASSERT(node);
+	ITexture* texture = GMAssets::getTexture(node->asset);
+	shader.getTexture().getTextureFrames(GMTextureType::LIGHTMAP, 0).addFrame(texture);
 }
 
 void GMBSPGameWorld::importBSP()
@@ -494,8 +506,7 @@ void GMBSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
 
-			GMTextureAssets::TextureItemType item = { shader.shader, texture };
-			getAssets().getTextureContainer().insert(item);
+			getAssets().insertAssert(GM_ASSET_TEXTURES, shader.shader, GMAssetType::Texture, texture);
 		}
 		else
 		{
@@ -549,9 +560,7 @@ void GMBSPGameWorld::initLightmaps()
 		ImageBuffer* imgBuf = new ImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
-
-		GMTextureAssets_ID::TextureItemType item = { i, texture };
-		getAssets().getLightmapContainer().insert(item);
+		getAssets().insertAssert(GM_ASSET_LIGHTMAPS, std::to_string(i).c_str(), GMAssetType::Texture, texture);
 	}
 
 	{
@@ -560,9 +569,7 @@ void GMBSPGameWorld::initLightmaps()
 		ImageBuffer* whiteBuf = new ImageBuffer(1, 1, 3 * sizeof(GMbyte), white);
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
-
-		GMTextureAssets_ID::TextureItemType item = { -1, texture };
-		getAssets().getLightmapContainer().insert(item);
+		getAssets().insertAssert(GM_ASSET_LIGHTMAPS, std::to_string(-1).c_str(), GMAssetType::Texture, texture);
 	}
 }
 
@@ -646,8 +653,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
 		gm_warning("No model selected. Create a default cube instead.");
 		d->render.createBox(m->extents, entity->origin, shader, &model);
-		GMModelContainerItemIndex index = rc.getModelContainer().insert(model);
-		entityObject = new GMEntityObject(*this, index);
+		GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+		entityObject = new GMEntityObject(asset);
 	}
 	else
 	{
@@ -657,11 +664,12 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		fn.append(m->model);
 		fn.append(".obj");
 
-		GMModelContainerItemIndex index;
-		auto iter = d->entitiesCache.find(fn);
-		if (iter != d->entitiesCache.end())
+		GMAssets& assets = getAssets();
+		GMAssetsNode* node = assets.getNodeFromPath(GMAssets::combinePath({ GM_ASSET_MODELS, fn }).toStdString().c_str());
+		GMAsset* asset = nullptr;
+		if (node)
 		{
-			index = iter->second;
+			asset = &node->asset;
 		}
 		else
 		{
@@ -678,10 +686,11 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 				gm_warning(_L("parse model file failed."));
 				return;
 			}
-			index = rc.getModelContainer().insert(model);
-			d->entitiesCache[fn] = index;
+
+			asset = assets.insertAssert(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
 		}
-		entityObject = new GMEntityObject(*this, index);
+		GM_ASSERT(asset);
+		entityObject = new GMEntityObject(asset);
 		entityObject->setTranslate(linear_math::translate(entity->origin));
 		entityObject->setScaling(linear_math::scale(m->extents[0], m->extents[1], m->extents[2]));
 	}

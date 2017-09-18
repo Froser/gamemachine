@@ -3,7 +3,6 @@
 #include "gmgameworld.h"
 
 GM2DGameObject::GM2DGameObject(GMGameWorld* world)
-	: GMGameObject(nullptr)
 {
 	D(d);
 	d->world = world;
@@ -16,8 +15,8 @@ void GM2DGameObject::setRect(const GMRect& rect)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMImage2DGameObject::setImage(const GMTextureAssets::TextureItemType& image)
+void GMImage2DGameObject::setImage(GMAsset& image)
 {
-	D_BASE(db, GMGameObject);
-	db->world->getAssets();
+	D(d);
+	d->image = GMAssets::getTexture(image);
 }

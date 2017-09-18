@@ -5,28 +5,28 @@
 #include "gmdatacore/gmmodel.h"
 
 GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)
-	: m_inited(false)
 {
-	m_image.reset(image);
 	init();
 }
 
 GMGLTexture::~GMGLTexture()
 {
-	glDeleteTextures(1, &m_id);
-	m_inited = false;
+	D(d);
+	glDeleteTextures(1, &d->id);
+	d->inited = false;
 }
 
 void GMGLTexture::init()
 {
-	if (m_inited)
+	D(d);
+	if (d->inited)
 		return;
 
 	GMint level;
-	const GMImage::Data& image = m_image->getData();
+	const GMImage::Data& image = d->image->getData();
 
-	glGenTextures(1, &m_id);
-	glBindTexture(image.target, m_id);
+	glGenTextures(1, &d->id);
+	glBindTexture(image.target, d->id);
 
 	switch (image.target)
 	{
@@ -141,14 +141,15 @@ void GMGLTexture::init()
 
 	glTexParameteriv(image.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(image.swizzle));
 	glBindTexture(image.target, 0);
-	m_image->dispose();
-	m_inited = true;
+	d->image->dispose();
+	d->inited = true;
 }
 
 void GMGLTexture::drawTexture(GMTextureFrames* frames)
 {
-	const GMImage::Data& image = m_image->getData();
-	glBindTexture(image.target, m_id);
+	D(d);
+	const GMImage::Data& image = d->image->getData();
+	glBindTexture(image.target, d->id);
 
 	// Apply params
 	glTexParameteri(image.target, GL_TEXTURE_MIN_FILTER,

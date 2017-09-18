@@ -359,7 +359,7 @@ class DemoGameHandler : public GameHandler
 {
 public:
 	DemoGameHandler() {}
-	~DemoGameHandler() { if (mask) delete mask; }
+	~DemoGameHandler() {}
 
 private:
 	virtual void start()
@@ -389,7 +389,9 @@ private:
 			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* maskModel;
 			GMPrimitiveCreator::createQuad(extents, pos, &maskModel);
-			mask = new GMGameObject(maskModel);
+			GMAsset* asset = demo->getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, maskModel);
+
+			mask = new GMGameObject(asset);
 			GameMachine::instance().initObjectPainter(mask->getModel());
 		}
 
@@ -410,7 +412,6 @@ private:
 
 					auto pk = GameMachine::instance().getGamePackageManager();
 					auto& container = demo->getAssets();
-					auto& textureContainer = container.getTextureContainer();
 
 					GMImage* img;
 					GMBuffer buf;
@@ -420,9 +421,7 @@ private:
 					ITexture* tex;
 					factory.createTexture(img, &tex);
 
-					GMTextureAssets::TextureItemType item = { "", tex };
-					textureContainer.insert(item);
-
+					demo->getAssets().insertAssert(GM_ASSET_TEXTURES, GMAssetType::Texture, tex);
 					{
 						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
 						frames.addFrame(tex);
@@ -440,7 +439,8 @@ private:
 			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* coreObj;
 			GMPrimitiveCreator::createQuad(extents, pos, &coreObj, &cb);
-			GMGameObject* obj = new GMGameObject(coreObj);
+			GMAsset* quadAsset = demo->getAssets().insertAssert(GM_ASSET_MODELS, "quad", GMAssetType::Model, coreObj);
+			GMGameObject* obj = new GMGameObject(quadAsset);
 
 			demo->appendObject("cube", obj);
 

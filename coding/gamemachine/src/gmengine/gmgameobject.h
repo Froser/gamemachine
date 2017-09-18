@@ -6,14 +6,11 @@
 
 BEGIN_NS
 
-typedef void(*GMGameObjectDestructor)(GMGameObject*);
-
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
-	GMGameObjectDestructor destructor = nullptr;
 	linear_math::Matrix4x4 scaling = linear_math::Matrix4x4::identity();
 	linear_math::Matrix4x4 translation = linear_math::Matrix4x4::identity();
 	linear_math::Quaternion rotation = linear_math::Quaternion::identity();
@@ -31,18 +28,17 @@ enum class GMGameObjectType
 	Custom,
 };
 
-struct GMModelContainerItemIndex;
+struct GMAsset;
 class GMGameObject : public GMObject
 {
 	DECLARE_PRIVATE(GMGameObject)
 
 public:
-	GMGameObject(AUTORELEASE GMModel* obj);
-	GMGameObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex);
-	virtual ~GMGameObject();
+	GMGameObject();
+	GMGameObject(GMAsset* asset);
 
 public:
-	void setModel(AUTORELEASE GMModel* obj);
+	void setModel(GMAsset* asset);
 	GMModel* getModel();
 
 	virtual void setWorld(GMGameWorld* world);
@@ -63,9 +59,6 @@ public:
 	inline void setTranslate(const linear_math::Matrix4x4& translation) { D(d); updateMatrix(); d->translation = translation; }
 	inline void setRotation(const linear_math::Quaternion& rotation) { D(d); updateMatrix(); d->rotation = rotation; }
 	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
-
-protected:
-	inline void setDestructor(GMGameObjectDestructor destructor) { D(d); d->destructor = destructor; }
 
 	// events
 private:
@@ -92,7 +85,8 @@ class GMGlyphObject : public GMGameObject
 	DECLARE_PRIVATE(GMGlyphObject)
 
 public:
-	GMGlyphObject();
+	GMGlyphObject() = default;
+	~GMGlyphObject();
 
 public:
 	void setText(const GMWchar* text);
@@ -124,7 +118,7 @@ class GMEntityObject : public GMGameObject
 	DECLARE_PRIVATE(GMEntityObject)
 
 public:
-	GMEntityObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex);
+	GMEntityObject(GMAsset* asset);
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
@@ -151,6 +145,7 @@ class GMSkyGameObject : public GMGameObject
 
 public:
 	GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
+	~GMSkyGameObject();
 
 private:
 	void createSkyBox(OUT GMModel** obj);

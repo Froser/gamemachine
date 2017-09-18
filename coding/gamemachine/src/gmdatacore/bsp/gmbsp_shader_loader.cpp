@@ -129,10 +129,11 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 	if (!name)
 		return nullptr;
 
-	GMAssets& rc = d->world->getAssets();
-	GMTextureAssets& tc = rc.getTextureContainer();
-	const GMTextureAssets::TextureItemType* item = tc.find(name);
-	if (!item)
+	GMAssets& assets = d->world->getAssets();
+	GMAssetsNode* texNode = assets.getNodeFromPath(GM_ASSET_TEXTURES);
+	GM_ASSERT(texNode);
+	GMAssetsNode* node = GMAssets::findChild(texNode, name);
+	if (!node)
 	{
 		GMString fn;
 		GMBuffer buf;
@@ -147,19 +148,19 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 
 		if (img)
 		{
-			ITexture* texture;
+			ITexture* texture = nullptr;
 			IFactory* factory = GameMachine::instance().getFactory();
 			factory->createTexture(img, &texture);
 
-			GMTextureAssets::TextureItemType ti = { name, texture };
-			tc.insert(ti);
+			GM_ASSERT(texture);
+			assets.insertAssert(GM_ASSET_TEXTURES, name, GMAssetType::Texture, texture);
 			return texture;
 		}
 		return nullptr;
 	}
 	else
 	{
-		return item->texture;
+		return GMAssets::getTexture(node->asset);
 	}
 }
 
@@ -381,14 +382,17 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 	{
 		if (strEqual(from, "lightmap"))
 		{
-			GMAssets& rc = d->world->getAssets();
-			GMTextureAssets_ID& tc = rc.getLightmapContainer();
+			GMAssets& assets = d->world->getAssets();
+			GMAssetsNode* lightmapNode = assets.getNodeFromPath(GM_ASSET_LIGHTMAPS);
 
 			GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
-			const GMTextureAssets_ID::TextureItemType* tex = tc.find(d->lightmapId);
+			GMAssetsNode* node = GMAssets::findChild(lightmapNode, std::to_string(d->lightmapId).c_str());
+			GM_ASSERT(node);
+
+			ITexture* tex = GMAssets::getTexture(node->asset);
 			if (tex)
 			{
-				frame->addFrame(tc.find(d->lightmapId)->texture);
+				frame->addFrame(tex);
 				gm_info(_L("found map from lightmap %d"), d->lightmapId);
 			}
 			else

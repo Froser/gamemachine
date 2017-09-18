@@ -9,8 +9,17 @@
 #include "shader_constants.h"
 BEGIN_NS
 
+GM_PRIVATE_OBJECT(GMGLTexture)
+{
+	bool inited = false;
+	GMImage* image = nullptr;
+	GLuint id = 0;
+};
+
 class GMGLTexture : public ITexture
 {
+	DECLARE_PRIVATE(GMGLTexture)
+
 public:
 	GMGLTexture(AUTORELEASE GMImage* image);
 	~GMGLTexture();
@@ -20,11 +29,6 @@ public:
 
 public:
 	virtual void drawTexture(GMTextureFrames* frames) override;
-
-private:
-	bool m_inited;
-	AutoPtr<GMImage> m_image;
-	GLuint m_id;
 };
 
 END_NS

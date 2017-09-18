@@ -8,40 +8,26 @@
 
 static void noDestructor(GMGameObject*) {}
 
-GMGameObject::GMGameObject(AUTORELEASE GMModel* obj)
+GMGameObject::GMGameObject()
 {
 	D(d);
-	setModel(obj);
 	d->scaling = linear_math::Matrix4x4::identity();
 	d->translation = linear_math::Matrix4x4::identity();
+}
+
+GMGameObject::GMGameObject(GMAsset* asset)
+	: GMGameObject()
+{
+	setModel(asset);
 	updateMatrix();
 }
 
-GMGameObject::GMGameObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex)
+void GMGameObject::setModel(GMAsset* asset)
 {
 	D(d);
-	GMAssets& rc = world.getAssets();
-	GMModel* model = rc.getModelContainer().find(objIndex);
-	if (model)
-		d->destructor = noDestructor;
-	setModel(model);
-}
-
-GMGameObject::~GMGameObject()
-{
-	D(d);
-	if (!d->destructor)
-		delete d->model;
-	else
-		d->destructor(this);
-}
-
-void GMGameObject::setModel(AUTORELEASE GMModel* obj)
-{
-	D(d);
-	if (d->model)
-		delete d->model;
-	d->model = obj;
+	GMModel* model = GMAssets::getModel(*asset);
+	GM_ASSERT(model);
+	d->model = model;
 
 	if (d->model)
 	{
@@ -105,9 +91,12 @@ void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
 #define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
 #define UV_Y(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
 
-GMGlyphObject::GMGlyphObject()
-	: GMGameObject(nullptr)
+GMGlyphObject::~GMGlyphObject()
 {
+	D(d);
+	GMModel* m = getModel();
+	if (m)
+		delete m;
 }
 
 void GMGlyphObject::setText(const GMWchar* text)
@@ -151,7 +140,12 @@ void GMGlyphObject::constructModel()
 	child->appendComponent(component);
 
 	model->setUsageHint(GMUsageHint::DynamicDraw);
-	setModel(model);
+
+	GMModel* m = getModel();
+	if (m)
+		delete m;
+	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
+	setModel(&asset);
 }
 
 void GMGlyphObject::updateModel()
@@ -233,8 +227,8 @@ void GMGlyphObject::update()
 }
 
 //GMEntityObject
-GMEntityObject::GMEntityObject(GMGameWorld& world, const GMModelContainerItemIndex& objIndex)
-	: GMGameObject(world, objIndex)
+GMEntityObject::GMEntityObject(GMAsset* asset)
+	: GMGameObject(asset)
 {
 	calc();
 }
@@ -332,7 +326,6 @@ static linear_math::Vector2 uvs[24] = {
 };
 
 GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
-	: GMGameObject(nullptr)
 {
 	D(d);
 	d->shader = shader;
@@ -341,7 +334,16 @@ GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector
 
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
-	setModel(obj);
+	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, obj);
+	setModel(&asset);
+}
+
+GMSkyGameObject::~GMSkyGameObject()
+{
+	D(d);
+	GMModel* m = getModel();
+	if (m)
+		delete m;
 }
 
 void GMSkyGameObject::createSkyBox(OUT GMModel** obj)

@@ -4,7 +4,6 @@
 #include "gmphysics/gmphysicsworld.h"
 
 GMSpriteGameObject::GMSpriteGameObject(GMfloat radius)
-	: GMGameObject(nullptr)
 {
 	D(d);
 	d->radius = radius;
