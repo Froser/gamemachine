@@ -36,6 +36,11 @@ struct GMAssetName
 		return name.data();
 	}
 
+	bool operator ==(const char* n)
+	{
+		return strEqual(name.data(), n);
+	}
+
 	GMAssetName(const char* n)
 	{
 		strcpy_s(name.data(), NAME_MAX, n);
@@ -77,25 +82,26 @@ class GMAssets : public GMObject
 	DECLARE_PRIVATE(GMAssets)
 
 public:
-	GMAssets() = default;
+	GMAssets();
 
 public:
 	ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
 	ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
 
 public:
-	GMAsset* insertAssert(const char* path, GMAssetType type, void* asset);
-	GMAsset* insertAssert(const char* path, const GMAssetName& name, GMAssetType type, void* asset);
+	GMAsset* insertAsset(const char* path, GMAssetType type, void* asset);
+	GMAsset* insertAsset(const char* path, const GMAssetName& name, GMAssetType type, void* asset);
 	GMAssetsNode* getNodeFromPath(const char* path, bool createIfNotExists = false);
+	void createNodeFromPath(const char* path);
 
 public:
 	static GMAsset createIsolatedAsset(GMAssetType type, void* data);
-	static GMAssetsNode* findChild(GMAssetsNode* node, const GMAssetName& name, bool createIfNotExists = false);
-	static GMString combinePath(std::initializer_list<GMString> args);
+	static GMAssetsNode* findChild(GMAssetsNode* parentNode, const GMAssetName& name, bool createIfNotExists = false);
+	static GMString combinePath(std::initializer_list<GMString> args, REF char* path = nullptr, REF char* lastPart = nullptr);
 
 private:
 	static GMAssetsNode* getNodeFromPath(GMAssetsNode* node, const char* path, bool createIfNotExists = false);
-	static void nextAvailableName(GMAssetsNode* node, REF char* name);
+	static void defaultName(GMAssetsNode* node, REF char* name);
 	static void clearChildNode(GMAssetsNode* node);
 };
 

@@ -6,6 +6,8 @@
 
 GMGLTexture::GMGLTexture(AUTORELEASE GMImage* image)
 {
+	D(d);
+	d->image = image;
 	init();
 }
 

@@ -389,7 +389,7 @@ private:
 			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* maskModel;
 			GMPrimitiveCreator::createQuad(extents, pos, &maskModel);
-			GMAsset* asset = demo->getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, maskModel);
+			GMAsset* asset = demo->getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, maskModel);
 
 			mask = new GMGameObject(asset);
 			GameMachine::instance().initObjectPainter(mask->getModel());
@@ -421,7 +421,7 @@ private:
 					ITexture* tex;
 					factory.createTexture(img, &tex);
 
-					demo->getAssets().insertAssert(GM_ASSET_TEXTURES, GMAssetType::Texture, tex);
+					demo->getAssets().insertAsset(GM_ASSET_TEXTURES, GMAssetType::Texture, tex);
 					{
 						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
 						frames.addFrame(tex);
@@ -439,7 +439,7 @@ private:
 			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* coreObj;
 			GMPrimitiveCreator::createQuad(extents, pos, &coreObj, &cb);
-			GMAsset* quadAsset = demo->getAssets().insertAssert(GM_ASSET_MODELS, "quad", GMAssetType::Model, coreObj);
+			GMAsset* quadAsset = demo->getAssets().insertAsset(GM_ASSET_MODELS, "quad", GMAssetType::Model, coreObj);
 			GMGameObject* obj = new GMGameObject(quadAsset);
 
 			demo->appendObject("cube", obj);
@@ -697,7 +697,7 @@ int WINAPI WinMain(
 	IAudioSource* s;
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
 
-	s->play(1);
+	//s->play(1);
 #if 0
 	// Òì²½Ä£ÐÍ
 	GMBuffer buffer;

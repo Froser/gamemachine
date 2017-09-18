@@ -153,7 +153,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 			factory->createTexture(img, &texture);
 
 			GM_ASSERT(texture);
-			assets.insertAssert(GM_ASSET_TEXTURES, name, GMAssetType::Texture, texture);
+			assets.insertAsset(GM_ASSET_TEXTURES, name, GMAssetType::Texture, texture);
 			return texture;
 		}
 		return nullptr;

@@ -261,7 +261,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	GMModel* model = nullptr;
 	d->render.createObject(polygonFace, shader, &model);
 	GM_ASSERT(model);
-	GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+	GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
@@ -292,7 +292,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	d->render.createObject(meshFace, shader, &model);
 	GM_ASSERT(model);
 
-	GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+	GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 	rd.meshFaceObjects[&meshFace] = obj;
 	appendObjectAndInit(obj);
@@ -322,7 +322,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 
 		GMModel* model = nullptr;
 		d->render.createObject(biqp, shader, &model);
-		GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+		GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
 		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
@@ -427,7 +427,8 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 	// 先从地图Shaders中找，如果找不到，就直接读取材质
 	if (!d->shaderLoader.findItem(name, lightmapid, &shader))
 	{
-		GMAssetsNode* node = getAssets().getNodeFromPath(GMAssets::combinePath({ GM_ASSET_TEXTURES, bsp.shaders[textureid].shader }).toStdString().c_str());
+		std::string texturePath = GMAssets::combinePath({ GM_ASSET_TEXTURES, bsp.shaders[textureid].shader }).toStdString();
+		GMAssetsNode* node = getAssets().getNodeFromPath(texturePath.c_str());
 		if (!node)
 			return false;
 
@@ -505,8 +506,7 @@ void GMBSPGameWorld::initTextures()
 		{
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
-
-			getAssets().insertAssert(GM_ASSET_TEXTURES, shader.shader, GMAssetType::Texture, texture);
+			getAssets().insertAsset(GM_ASSET_TEXTURES, shader.shader, GMAssetType::Texture, texture);
 		}
 		else
 		{
@@ -560,7 +560,7 @@ void GMBSPGameWorld::initLightmaps()
 		ImageBuffer* imgBuf = new ImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
-		getAssets().insertAssert(GM_ASSET_LIGHTMAPS, std::to_string(i).c_str(), GMAssetType::Texture, texture);
+		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, std::to_string(i).c_str(), GMAssetType::Texture, texture);
 	}
 
 	{
@@ -569,7 +569,7 @@ void GMBSPGameWorld::initLightmaps()
 		ImageBuffer* whiteBuf = new ImageBuffer(1, 1, 3 * sizeof(GMbyte), white);
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
-		getAssets().insertAssert(GM_ASSET_LIGHTMAPS, std::to_string(-1).c_str(), GMAssetType::Texture, texture);
+		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, std::to_string(-1).c_str(), GMAssetType::Texture, texture);
 	}
 }
 
@@ -653,7 +653,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
 		gm_warning("No model selected. Create a default cube instead.");
 		d->render.createBox(m->extents, entity->origin, shader, &model);
-		GMAsset* asset = getAssets().insertAssert(GM_ASSET_MODELS, GMAssetType::Model, model);
+		GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
 		entityObject = new GMEntityObject(asset);
 	}
 	else
@@ -687,7 +687,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 				return;
 			}
 
-			asset = assets.insertAssert(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
+			asset = assets.insertAsset(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
 		}
 		GM_ASSERT(asset);
 		entityObject = new GMEntityObject(asset);
