@@ -103,7 +103,7 @@ public:
 	inline GMfloat getLastFrameElapsed() { D(d); return d->lastFrameElpased; }
 
 	// 绘制管理
-	void initObjectPainter(GMModel* obj);
+	void initObjectPainter(GMModel* model);
 
 	// 大小端模式
 	EndiannessMode getMachineEndianness();

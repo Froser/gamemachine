@@ -38,15 +38,18 @@ void GameMachine::postMessage(GameMachineMessage msg)
 	d->messageQueue.push(msg);
 }
 
-void GameMachine::initObjectPainter(GMModel* obj)
+void GameMachine::initObjectPainter(GMModel* model)
 {
-	GMModelPainter* painter = obj->getPainter();
-	if (!painter)
+	if (model)
 	{
-		getFactory()->createPainter(getGraphicEngine(), obj, &painter);
-		obj->setPainter(painter);
+		GMModelPainter* painter = model->getPainter();
+		if (!painter)
+		{
+			getFactory()->createPainter(getGraphicEngine(), model, &painter);
+			model->setPainter(painter);
+		}
+		painter->transfer();
 	}
-	painter->transfer();
 }
 
 GameMachine::EndiannessMode GameMachine::getMachineEndianness()

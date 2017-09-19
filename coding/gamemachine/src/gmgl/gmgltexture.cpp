@@ -16,6 +16,8 @@ GMGLTexture::~GMGLTexture()
 	D(d);
 	glDeleteTextures(1, &d->id);
 	d->inited = false;
+	if (d->image)
+		delete d->image;
 }
 
 void GMGLTexture::init()

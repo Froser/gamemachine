@@ -46,8 +46,6 @@ void GMGameObject::setModel(GMAsset* asset)
 GMModel* GMGameObject::getModel()
 {
 	D(d);
-	if (!d->model)
-		d->model = new GMModel();
 	return d->model;
 }
 

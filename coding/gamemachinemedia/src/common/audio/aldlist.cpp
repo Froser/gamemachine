@@ -33,7 +33,7 @@
  */
 ALDeviceList::ALDeviceList()
 {
-	ALDEVICEINFO	ALDeviceInfo;
+	ALDEVICEINFO ALDeviceInfo;
 	char *devices;
 	int index;
 	const char *defaultDeviceName;
@@ -68,41 +68,39 @@ ALDeviceList::ALDeviceList()
 							bNewName = false;
 						}
 					}
-					if ((bNewName) && (actualDeviceName != NULL) && (strlen(actualDeviceName) > 0)) {
-						memset(&ALDeviceInfo, 0, sizeof(ALDEVICEINFO));
+					if ((bNewName) && (actualDeviceName != NULL) && (strlen(actualDeviceName) > 0))
+					{
 						ALDeviceInfo.bSelected = true;
 						ALDeviceInfo.strDeviceName = actualDeviceName;
 						alcGetIntegerv(device, ALC_MAJOR_VERSION, sizeof(int), &ALDeviceInfo.iMajorVersion);
 						alcGetIntegerv(device, ALC_MINOR_VERSION, sizeof(int), &ALDeviceInfo.iMinorVersion);
 
-						ALDeviceInfo.pvstrExtensions = new vector<string>;
-
 						// Check for ALC Extensions
 						if (alcIsExtensionPresent(device, "ALC_EXT_CAPTURE") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("ALC_EXT_CAPTURE");
+							ALDeviceInfo.pvstrExtensions.push_back("ALC_EXT_CAPTURE");
 						if (alcIsExtensionPresent(device, "ALC_EXT_EFX") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("ALC_EXT_EFX");
+							ALDeviceInfo.pvstrExtensions.push_back("ALC_EXT_EFX");
 
 						// Check for AL Extensions
 						if (alIsExtensionPresent("AL_EXT_OFFSET") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("AL_EXT_OFFSET");
+							ALDeviceInfo.pvstrExtensions.push_back("AL_EXT_OFFSET");
 
 						if (alIsExtensionPresent("AL_EXT_LINEAR_DISTANCE") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("AL_EXT_LINEAR_DISTANCE");
+							ALDeviceInfo.pvstrExtensions.push_back("AL_EXT_LINEAR_DISTANCE");
 						if (alIsExtensionPresent("AL_EXT_EXPONENT_DISTANCE") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("AL_EXT_EXPONENT_DISTANCE");
+							ALDeviceInfo.pvstrExtensions.push_back("AL_EXT_EXPONENT_DISTANCE");
 
 						if (alIsExtensionPresent("EAX2.0") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("EAX2.0");
+							ALDeviceInfo.pvstrExtensions.push_back("EAX2.0");
 						if (alIsExtensionPresent("EAX3.0") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("EAX3.0");
+							ALDeviceInfo.pvstrExtensions.push_back("EAX3.0");
 						if (alIsExtensionPresent("EAX4.0") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("EAX4.0");
+							ALDeviceInfo.pvstrExtensions.push_back("EAX4.0");
 						if (alIsExtensionPresent("EAX5.0") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("EAX5.0");
+							ALDeviceInfo.pvstrExtensions.push_back("EAX5.0");
 
 						if (alIsExtensionPresent("EAX-RAM") == AL_TRUE)
-							ALDeviceInfo.pvstrExtensions->push_back("EAX-RAM");
+							ALDeviceInfo.pvstrExtensions.push_back("EAX-RAM");
 
 						// Get Source Count
 						ALDeviceInfo.uiSourceCount = GetMaxNumSources();
@@ -127,14 +125,6 @@ ALDeviceList::ALDeviceList()
  */
 ALDeviceList::~ALDeviceList()
 {
-	for (unsigned int i = 0; i < vDeviceInfo.size(); i++) {
-		if (vDeviceInfo[i].pvstrExtensions) {
-			vDeviceInfo[i].pvstrExtensions->empty();
-			delete vDeviceInfo[i].pvstrExtensions;
-		}
-	}
-
-	vDeviceInfo.empty();
 }
 
 /*
@@ -189,8 +179,8 @@ bool ALDeviceList::IsExtensionSupported(int index, char *szExtName)
 	bool bReturn = false;
 
 	if (index < GetNumDevices()) {
-		for (unsigned int i = 0; i < vDeviceInfo[index].pvstrExtensions->size(); i++) {
-			if (!_stricmp(vDeviceInfo[index].pvstrExtensions->at(i).c_str(), szExtName)) {
+		for (unsigned int i = 0; i < vDeviceInfo[index].pvstrExtensions.size(); i++) {
+			if (!_stricmp(vDeviceInfo[index].pvstrExtensions.at(i).c_str(), szExtName)) {
 				bReturn = true;
 				break;
 			}
@@ -245,8 +235,8 @@ void ALDeviceList::FilterDevicesExtension(char *szExtName)
 
 	for (unsigned int i = 0; i < vDeviceInfo.size(); i++) {
 		bFound = false;
-		for (unsigned int j = 0; j < vDeviceInfo[i].pvstrExtensions->size(); j++) {
-			if (!_stricmp(vDeviceInfo[i].pvstrExtensions->at(j).c_str(), szExtName)) {
+		for (unsigned int j = 0; j < vDeviceInfo[i].pvstrExtensions.size(); j++) {
+			if (!_stricmp(vDeviceInfo[i].pvstrExtensions.at(j).c_str(), szExtName)) {
 				bFound = true;
 				break;
 			}

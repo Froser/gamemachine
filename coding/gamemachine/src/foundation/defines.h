@@ -24,8 +24,8 @@ using Pair = std::pair<T1, T2>;
 template <typename T1, typename T2>
 using Map = std::map<T1, T2>;
 
-template <typename T1, typename T2>
-using Multimap = std::multimap<T1, T2>;
+template <typename T1, typename T2, typename Cmp = std::less<T1> >
+using Multimap = std::multimap<T1, T2, Cmp>;
 
 template <typename T>
 using Set = std::set<T>;
@@ -74,8 +74,10 @@ using Deque = std::deque<T>;
 #endif
 
 // Debug模式下监控内存泄漏
-#ifndef GM_DETECT_MEMORY_LEAK
-#	define GM_DETECT_MEMORY_LEAK 1
+#if _WINDOWS
+#	ifndef GM_DETECT_MEMORY_LEAK
+#		define GM_DETECT_MEMORY_LEAK 1
+#	endif
 #endif
 
 // SSE指令优化

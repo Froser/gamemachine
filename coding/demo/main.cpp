@@ -359,7 +359,11 @@ class DemoGameHandler : public GameHandler
 {
 public:
 	DemoGameHandler() {}
-	~DemoGameHandler() {}
+	~DemoGameHandler()
+	{
+		if (mask)
+			delete mask;
+	}
 
 private:
 	virtual void start()
@@ -693,9 +697,11 @@ int WINAPI WinMain(
 	pk->readFile(GMPackageIndex::Audio, "footsteps.wav", &buffer);
 	IAudioFile* file;
 	reader->load(buffer, &file);
+	delete reader;
 
 	IAudioSource* s;
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
+
 
 	//s->play(1);
 #if 0
@@ -720,7 +726,9 @@ int WINAPI WinMain(
 		lua.call("v", {1});
 #else
 	GameMachine::instance().startGameMachine();
+
 	delete file;
+	delete s;
 #endif
 	return 0;
 }

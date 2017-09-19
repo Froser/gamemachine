@@ -12,13 +12,14 @@ BEGIN_NS
 
 enum class GMAssetType
 {
+	None,
 	Texture,
 	Model,
 };
 
 struct GMAsset
 {
-	GMAssetType type;
+	GMAssetType type = GMAssetType::None;
 	void* asset = nullptr;
 };
 
@@ -54,6 +55,14 @@ struct GMAssetName
 	}
 };
 
+struct GMAssetNameCmp
+{
+	bool operator ()(const GMAssetName& left, const GMAssetName& right)
+	{
+		return strcmp(left.name.data(), right.name.data()) < 0;
+	}
+};
+
 // 使用一种（多叉）树状结构，保存游戏中的资产
 // 资产的根节点叫作root
 #define ASSET_GETTER(retType, funcName, predictType)	\
@@ -67,14 +76,13 @@ struct GMAssetsNode;
 struct GMAssetsNode
 {
 	GMAssetName name;
-	GMAssetsNode* next = nullptr;
-	GMAssetsNode* child = nullptr;
+	Multimap<GMAssetName, GMAssetsNode*, GMAssetNameCmp> childs;
 	GMAsset asset;
 };
 
 GM_PRIVATE_OBJECT(GMAssets)
 {
-	GMAssetsNode root;
+	GMAssetsNode* root = nullptr;
 };
 
 class GMAssets : public GMObject
@@ -98,12 +106,12 @@ public:
 public:
 	static GMAsset createIsolatedAsset(GMAssetType type, void* data);
 	static GMAssetsNode* findChild(GMAssetsNode* parentNode, const GMAssetName& name, bool createIfNotExists = false);
-	static GMAssetsNode* findLastChild(GMAssetsNode* parentNode, bool createIfNotExists = false);
+	static GMAssetsNode* makeChild(GMAssetsNode* parentNode, const GMAssetName& name);
 	static GMString combinePath(std::initializer_list<GMString> args, REF char* path = nullptr, REF char* lastPart = nullptr);
 
 private:
 	static GMAssetsNode* getNodeFromPath(GMAssetsNode* node, const char* path, bool createIfNotExists = false);
-	static void clearChildNode(GMAssetsNode* parentNode);
+	static void clearChildNode(GMAssetsNode* self);
 };
 
 END_NS

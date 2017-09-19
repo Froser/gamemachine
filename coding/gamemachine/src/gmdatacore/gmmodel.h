@@ -32,8 +32,6 @@ public:
 		d->model = obj;
 	}
 
-	virtual ~GMModelPainter() {}
-
 public:
 	virtual void transfer() = 0;
 	virtual void draw(GMfloat* modelTransform) = 0;

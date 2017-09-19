@@ -13,11 +13,11 @@ BEGIN_MEDIA_NS
 typedef struct
 {
 	string			strDeviceName;
-	int				iMajorVersion;
-	int				iMinorVersion;
-	unsigned int	uiSourceCount;
-	vector<string>	*pvstrExtensions;
-	bool			bSelected;
+	int				iMajorVersion = 0;
+	int				iMinorVersion = 0;
+	unsigned int	uiSourceCount = 0;
+	vector<string>	pvstrExtensions;
+	bool			bSelected = false;
 } ALDEVICEINFO, *LPALDEVICEINFO;
 
 class ALDeviceList

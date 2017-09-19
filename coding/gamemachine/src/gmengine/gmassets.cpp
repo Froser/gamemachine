@@ -3,6 +3,10 @@
 
 GMAssets::GMAssets()
 {
+	D(d);
+	d->root = new GMAssetsNode();
+	d->root->name = "root";
+
 	// 创建默认目录
 	createNodeFromPath(GM_ASSET_MODELS);
 	createNodeFromPath(GM_ASSET_TEXTURES);
@@ -12,19 +16,17 @@ GMAssets::GMAssets()
 GMAssets::~GMAssets()
 {
 	D(d);
-	clearChildNode(&d->root);
+	clearChildNode(d->root);
 }
 
 GMAsset* GMAssets::insertAsset(const char* path, GMAssetType type, void* asset)
 {
 	GMAssetsNode* node = nullptr;
-	char name[GMAssetName::NAME_MAX];
-
 	// 使用匿名的asset
 	node = getNodeFromPath(path, true);
-	node = findLastChild(node);
+	node->name = "__unnamed";
+	node = makeChild(node, node->name);
 	GM_ASSERT(node);
-	node->name = name;
 	node->asset.type = type;
 	node->asset.asset = asset;
 	return &node->asset;
@@ -36,9 +38,8 @@ GMAsset* GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAsse
 	// 把(a/b, c/d)字符串类型的参数改写为(a/b/c, d)
 	char newPath[GMAssetName::NAME_MAX], newName[GMAssetName::NAME_MAX];
 	combinePath({ path, name.name.data() }, newPath, newName);
-	gm_info("Adding asset: path=%s, name=%s", newPath, newName);
 	node = getNodeFromPath(newPath, true);
-	node = findChild(node, newName, true);
+	node = makeChild(node, newName);
 	GM_ASSERT(node);
 	node->name = newName;
 	node->asset.type = type;
@@ -54,7 +55,7 @@ static bool splash(char in)
 GMAssetsNode* GMAssets::getNodeFromPath(const char* path, bool createIfNotExists)
 {
 	D(d);
-	GMAssetsNode* node = &d->root;
+	GMAssetsNode* node = d->root;
 	return getNodeFromPath(node, path, createIfNotExists);
 }
 
@@ -73,60 +74,29 @@ GMAsset GMAssets::createIsolatedAsset(GMAssetType type, void* data)
 
 GMAssetsNode* GMAssets::findChild(GMAssetsNode* parentNode, const GMAssetName& name, bool createIfNotExists)
 {
-	Scanner s(name, splash);
 	if (!parentNode)
 		return nullptr;
 
-	GMAssetsNode *node = parentNode->child, *last = nullptr;
-	while (node)
-	{
-		if (node->name == name)
-			return node;
-		last = node;
-		node = node->next;
-	}
+	auto iter = parentNode->childs.find(name);
+	if (iter != parentNode->childs.end())
+		return iter->second;
 
-	GM_ASSERT(!node);
-	if (createIfNotExists)
-	{
-		if (!last)
-		{
-			parentNode->child = new GMAssetsNode();
-			parentNode->child->name = name;
-			return parentNode->child;
-		}
-		else
-		{
-			last->next = new GMAssetsNode();
-			last->next->name = name;
-			return last->next;
-		}
-	}
+	GM_ASSERT(iter == parentNode->childs.end());
+	if (!createIfNotExists)
+		return nullptr;
 
-	GM_ASSERT(!node);
-	return node; // node == nullptr
+	GMAssetsNode* node = new GMAssetsNode();
+	node->name = name;
+	parentNode->childs.insert({ name, node });
+	return node;
 }
 
-GMAssetsNode* GMAssets::findLastChild(GMAssetsNode* parentNode, bool createIfNotExists)
+GMAssetsNode* GMAssets::makeChild(GMAssetsNode* parentNode, const GMAssetName& name)
 {
-	GMAssetsNode* node = parentNode->child;
-	if (!node)
-	{
-		if (createIfNotExists)
-		{
-			parentNode->child = new GMAssetsNode();
-			return parentNode;
-		}
-		return nullptr;
-	}
-	else
-	{
-		while (node)
-		{
-			node = node->next;
-		}
-		return node;
-	}
+	GMAssetsNode* node = new GMAssetsNode();
+	node->name = name;
+	parentNode->childs.insert({ name, node });
+	return node;
 }
 
 GMString GMAssets::combinePath(std::initializer_list<GMString> args, REF char* path, REF char* lastPart)
@@ -172,25 +142,29 @@ GMAssetsNode* GMAssets::getNodeFromPath(GMAssetsNode* beginNode, const char* pat
 	return node;
 }
 
-void GMAssets::clearChildNode(GMAssetsNode* parentNode)
+void GMAssets::clearChildNode(GMAssetsNode* self)
 {
-	GMAssetsNode* node = parentNode->child;
-	while (node)
+	auto& childs = self->childs;
+	for (auto& node : childs)
 	{
-		if (node->child)
-			clearChildNode(node);
-		switch (node->asset.type)
-		{
-		case GMAssetType::Texture:
-			delete getTexture(parentNode->asset);
-			break;
-		case GMAssetType::Model:
-			delete getModel(parentNode->asset);
-			break;
-		default:
-			GM_ASSERT(false);
-			break;
-		}
-		node = node->next;
+		// 递归清理子对象
+		clearChildNode(node.second);
 	}
+
+	// 清理自身
+	switch (self->asset.type)
+	{
+	case GMAssetType::None:
+		break;
+	case GMAssetType::Texture:
+		delete getTexture(self->asset);
+		break;
+	case GMAssetType::Model:
+		delete getModel(self->asset);
+		break;
+	default:
+		GM_ASSERT(false);
+		break;
+	}
+	delete self;
 }
