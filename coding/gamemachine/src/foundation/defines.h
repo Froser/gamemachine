@@ -74,10 +74,8 @@ using Deque = std::deque<T>;
 #endif
 
 // Debug模式下监控内存泄漏
-#if _WINDOWS
-#	ifndef GM_DETECT_MEMORY_LEAK
-#		define GM_DETECT_MEMORY_LEAK 1
-#	endif
+#ifndef GM_DETECT_MEMORY_LEAK
+#	define GM_DETECT_MEMORY_LEAK 0
 #endif
 
 // SSE指令优化
@@ -88,7 +86,7 @@ using Deque = std::deque<T>;
 /* 工程编译选项到此结束 */
 
 #if GM_DETECT_MEMORY_LEAK
-#	if _WINDOWS
+#	if _WINDOWS && _DEBUG
 #		include <vld.h> // Windows环境下，确保安装了VLD，否则请将GM_DETECT_MEMORY_LEAK设置为0
 #	endif
 #endif
