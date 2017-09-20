@@ -1,11 +1,14 @@
 ﻿#include "stdafx.h"
 #include "gmassets.h"
 
+#define RESERVED 1024
+
 GMAssets::GMAssets()
 {
 	D(d);
 	d->root = new GMAssetsNode();
 	d->root->name = "root";
+	d->orphans.reserve(RESERVED);
 
 	// 创建默认目录
 	createNodeFromPath(GM_ASSET_MODELS);
@@ -17,18 +20,27 @@ GMAssets::~GMAssets()
 {
 	D(d);
 	clearChildNode(d->root);
+	clearOrphans();
+}
+
+void GMAssets::clearOrphans()
+{
+	D(d);
+	for (auto& node : d->orphans)
+	{
+		deleteAsset(node);
+		delete node;
+	}
 }
 
 GMAsset* GMAssets::insertAsset(const char* path, GMAssetType type, void* asset)
 {
-	GMAssetsNode* node = nullptr;
-	// 使用匿名的asset
-	node = getNodeFromPath(path, true);
-	node->name = "__unnamed";
-	node = makeChild(node, node->name);
-	GM_ASSERT(node);
+	D(d);
+	// 使用匿名的asset，意味着它不需要被第二次找到，直接放入vector
+	GMAssetsNode* node = new GMAssetsNode();
 	node->asset.type = type;
 	node->asset.asset = asset;
+	d->orphans.push_back(node);
 	return &node->asset;
 }
 
@@ -152,19 +164,24 @@ void GMAssets::clearChildNode(GMAssetsNode* self)
 	}
 
 	// 清理自身
-	switch (self->asset.type)
+	deleteAsset(self);
+	delete self;
+}
+
+void GMAssets::deleteAsset(GMAssetsNode* node)
+{
+	switch (node->asset.type)
 	{
 	case GMAssetType::None:
 		break;
 	case GMAssetType::Texture:
-		delete getTexture(self->asset);
+		delete getTexture(node->asset);
 		break;
 	case GMAssetType::Model:
-		delete getModel(self->asset);
+		delete getModel(node->asset);
 		break;
 	default:
 		GM_ASSERT(false);
 		break;
 	}
-	delete self;
 }

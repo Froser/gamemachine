@@ -57,7 +57,7 @@ struct GMAssetName
 
 struct GMAssetNameCmp
 {
-	bool operator ()(const GMAssetName& left, const GMAssetName& right)
+	bool operator ()(const GMAssetName& left, const GMAssetName& right) const
 	{
 		return strcmp(left.name.data(), right.name.data()) < 0;
 	}
@@ -66,7 +66,7 @@ struct GMAssetNameCmp
 // 使用一种（多叉）树状结构，保存游戏中的资产
 // 资产的根节点叫作root
 #define ASSET_GETTER(retType, funcName, predictType)	\
-	static retType funcName(const GMAsset& asset) {			\
+	static retType funcName(const GMAsset& asset) {		\
 		if (asset.type == predictType)					\
 			return static_cast<retType>(asset.asset);	\
 		return nullptr;									\
@@ -83,6 +83,7 @@ struct GMAssetsNode
 GM_PRIVATE_OBJECT(GMAssets)
 {
 	GMAssetsNode* root = nullptr;
+	Vector<GMAssetsNode*> orphans;
 };
 
 class GMAssets : public GMObject
@@ -112,6 +113,10 @@ public:
 private:
 	static GMAssetsNode* getNodeFromPath(GMAssetsNode* node, const char* path, bool createIfNotExists = false);
 	static void clearChildNode(GMAssetsNode* self);
+	static void deleteAsset(GMAssetsNode* node);
+
+private:
+	void clearOrphans();
 };
 
 END_NS
