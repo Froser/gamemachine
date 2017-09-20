@@ -23,7 +23,7 @@ enum class GMGameObjectType
 {
 	Static,
 	Entity, // 可响应实体
-	Sprite, // 精灵类型
+	Sprite, // 精灵
 	Particles, // 粒子
 	Controls, // UI控件
 	Custom,
