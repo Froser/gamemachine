@@ -99,7 +99,7 @@ public:
 	ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
 
 public:
-	GMAsset* insertAsset(const char* path, GMAssetType type, void* asset);
+	GMAsset* insertAsset(GMAssetType type, void* asset);
 	GMAsset* insertAsset(const char* path, const GMAssetName& name, GMAssetType type, void* asset);
 	GMAssetsNode* getNodeFromPath(const char* path, bool createIfNotExists = false);
 	void createNodeFromPath(const char* path);

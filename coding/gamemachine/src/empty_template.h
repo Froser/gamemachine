@@ -1,6 +1,6 @@
 ﻿#ifndef __
 #define __
-#include "common.h"
+#include <gmcommon.h>
 BEGIN_NS
 
 END_NS

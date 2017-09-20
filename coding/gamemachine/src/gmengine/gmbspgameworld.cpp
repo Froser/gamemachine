@@ -261,7 +261,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	GMModel* model = nullptr;
 	d->render.createObject(polygonFace, shader, &model);
 	GM_ASSERT(model);
-	GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
+	GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
@@ -292,7 +292,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	d->render.createObject(meshFace, shader, &model);
 	GM_ASSERT(model);
 
-	GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
+	GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 	rd.meshFaceObjects[&meshFace] = obj;
 	appendObjectAndInit(obj);
@@ -322,7 +322,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 
 		GMModel* model = nullptr;
 		d->render.createObject(biqp, shader, &model);
-		GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
+		GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
 		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
@@ -653,7 +653,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
 		gm_warning("No model selected. Create a default cube instead.");
 		d->render.createBox(m->extents, entity->origin, shader, &model);
-		GMAsset* asset = getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, model);
+		GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
 		entityObject = new GMEntityObject(asset);
 	}
 	else

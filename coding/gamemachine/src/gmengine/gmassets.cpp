@@ -33,7 +33,7 @@ void GMAssets::clearOrphans()
 	}
 }
 
-GMAsset* GMAssets::insertAsset(const char* path, GMAssetType type, void* asset)
+GMAsset* GMAssets::insertAsset(GMAssetType type, void* asset)
 {
 	D(d);
 	// 使用匿名的asset，意味着它不需要被第二次找到，直接放入vector

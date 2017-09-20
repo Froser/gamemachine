@@ -13,6 +13,7 @@
 #include <gmimage.h>
 #include <gmui.h>
 #include <gmm.h>
+#include <gm2dgameobject.h>
 
 #define EMITTER_DEMO 1
 
@@ -353,6 +354,7 @@ public:
 	GMSpriteGameObject* m_sprite;
 	GMBSPGameWorld* m_world;
 	GMGlyphObject* m_glyph;
+	GMImage2DGameObject* m_img;
 };
 
 class DemoGameHandler : public GameHandler
@@ -385,7 +387,26 @@ private:
 		{
 			m_glyph = new GMGlyphObject();
 			m_glyph->setGeometry(-1, .8f, 1, 1);
-			demo->appendObjectAndInit(m_glyph);
+			demo->appendObject("fps", m_glyph);
+		}
+
+		{
+			GMBuffer buf;
+			pk->readFile(GMPackageIndex::Textures, "demo.png", &buf);
+			GMImage* img = nullptr;
+			GMImageReader::load(buf.buffer, buf.size, &img);
+
+			ITexture* tex = nullptr;
+			GM.getFactory()->createTexture(img, &tex);
+			GM_ASSERT(tex);
+
+			GMAsset* asset = demo->getAssets().insertAsset(GMAssetType::Texture, tex);
+
+			m_img = new GMImage2DGameObject();
+			GMRect rect = { 0,0,141,61 };
+			m_img->setRect(rect);
+			m_img->setImage(*asset);
+			demo->appendObject("demo", m_img);
 		}
 
 		{
@@ -393,7 +414,7 @@ private:
 			GMfloat pos[] = { 0, 0, -1.f };
 			GMModel* maskModel;
 			GMPrimitiveCreator::createQuad(extents, pos, &maskModel);
-			GMAsset* asset = demo->getAssets().insertAsset(GM_ASSET_MODELS, GMAssetType::Model, maskModel);
+			GMAsset* asset = demo->getAssets().insertAsset(GMAssetType::Model, maskModel);
 
 			mask = new GMGameObject(asset);
 			GameMachine::instance().initObjectPainter(mask->getModel());
@@ -425,7 +446,7 @@ private:
 					ITexture* tex;
 					factory.createTexture(img, &tex);
 
-					demo->getAssets().insertAsset(GM_ASSET_TEXTURES, GMAssetType::Texture, tex);
+					demo->getAssets().insertAsset(GMAssetType::Texture, tex);
 					{
 						auto& frames = shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
 						frames.addFrame(tex);
@@ -686,13 +707,14 @@ int WINAPI WinMain(
 		consoleHandle,
 		player,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
 	gm::IAudioReader* reader;
 	gmm::GMMFactory::createAudioReader(&reader);
 	
+	/*
 	GMBuffer buffer;
 	pk->readFile(GMPackageIndex::Audio, "footsteps.wav", &buffer);
 	IAudioFile* file;
@@ -701,6 +723,7 @@ int WINAPI WinMain(
 
 	IAudioSource* s;
 	GM.getAudioPlayer()->createPlayerSource(file, &s);
+	*/
 
 
 	//s->play(1);
@@ -727,8 +750,8 @@ int WINAPI WinMain(
 #else
 	GameMachine::instance().startGameMachine();
 
-	delete file;
-	delete s;
+	//delete file;
+	//delete s;
 #endif
 	return 0;
 }

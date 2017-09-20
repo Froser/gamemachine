@@ -232,7 +232,6 @@ static constexpr GMint GMMaxTextureCount(GMTextureType type)
 
 GM_PRIVATE_OBJECT(GMTexture)
 {
-	//TODO VS2015一下很有可能无法编过
 	GMTextureFrames ambients[GMMaxTextureCount(GMTextureType::AMBIENT)];
 	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::DIFFUSE)];
 	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NORMALMAP)];
