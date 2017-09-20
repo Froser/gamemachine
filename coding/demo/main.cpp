@@ -85,7 +85,9 @@ public:
 		m_sprite = static_cast<GMSpriteGameObject*> (const_cast<GMGameObject*> (*(m_world->getGameObjects(GMGameObjectType::Sprite).begin())));
 
 		m_glyph = new GMGlyphObject();
-		m_glyph->setGeometry(-1, .8f, 1, 1);
+		auto r = GM.getMainWindow()->getClientRect();
+		GMRect rect = { 150, 150, (GMint)r.width, (GMint)r.height };
+		m_glyph->setGeometry(rect);
 		m_world->appendObjectAndInit(m_glyph, true);
 
 		//GMBuffer bg;
@@ -257,13 +259,13 @@ public:
 		GMString vertPath, fragPath;
 		switch (type)
 		{
-		case GMMeshType::Model:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.vert", &vertBuf, &vertPath);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "object.frag", &fragBuf, &fragPath);
+		case GMMeshType::Model3D:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "model3d.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "model3d.frag", &fragBuf, &fragPath);
 			break;
-		case GMMeshType::Glyph:
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.vert", &vertBuf, &vertPath);
-			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "glyph.frag", &fragBuf, &fragPath);
+		case GMMeshType::Model2D:
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "model2d.vert", &vertBuf, &vertPath);
+			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "model2d.frag", &fragBuf, &fragPath);
 			break;
 		case GMMeshType::Particles:
 			GameMachine::instance().getGamePackageManager()->readFile(GMPackageIndex::Shaders, "particles.vert", &vertBuf, &vertPath);
@@ -386,7 +388,9 @@ private:
 
 		{
 			m_glyph = new GMGlyphObject();
-			m_glyph->setGeometry(-1, .8f, 1, 1);
+			auto r = GM.getMainWindow()->getClientRect();
+			GMRect rect = {150, 150, (GMint)r.width, (GMint)r.height };
+			m_glyph->setGeometry(rect);
 			demo->appendObject("fps", m_glyph);
 		}
 
@@ -403,8 +407,8 @@ private:
 			GMAsset* asset = demo->getAssets().insertAsset(GMAssetType::Texture, tex);
 
 			m_img = new GMImage2DGameObject();
-			GMRect rect = { 0,0,141,61 };
-			m_img->setRect(rect);
+			GMRect rect = { 150,750,141,61 };
+			m_img->setGeometry(rect);
 			m_img->setImage(*asset);
 			demo->appendObject("demo", m_img);
 		}

@@ -47,7 +47,7 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuin
 	color_type = png_get_color_type(png_ptr, info_ptr);
 
 	int i, j;
-	int size, pos = 0;
+	int size, pos = -1;
 	
 	png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
 	out->width = png_get_image_width(png_ptr, info_ptr);
@@ -55,7 +55,6 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuin
 	size = out->width * out->height;
 
 	// 根据flip来决定是否翻转Y轴
-
 	if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 	{
 		size *= (4 * sizeof(unsigned char));
@@ -71,10 +70,10 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuin
 
 			for (j = 0; j < temp; j += 4)
 			{
-				out->rgba[pos++] = row_pointers[_i][j]; // red
-				out->rgba[pos++] = row_pointers[_i][j + 1]; // green
-				out->rgba[pos++] = row_pointers[_i][j + 2];  // blue
-				out->rgba[pos++] = row_pointers[_i][j + 3]; // alpha
+				out->rgba[++pos] = row_pointers[_i][j]; // red
+				out->rgba[++pos] = row_pointers[_i][j + 1]; // green
+				out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
+				out->rgba[++pos] = row_pointers[_i][j + 3]; // alpha
 			}
 		}
 	}
@@ -93,9 +92,9 @@ static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuin
 
 			for (j = 0; j < temp; j += 3)
 			{
-				out->rgba[pos++] = row_pointers[i][j]; // red
-				out->rgba[pos++] = row_pointers[i][j + 1]; // green
-				out->rgba[pos++] = row_pointers[i][j + 2];  // blue
+				out->rgba[++pos] = row_pointers[_i][j]; // red
+				out->rgba[++pos] = row_pointers[_i][j + 1]; // green
+				out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
 			}
 		}
 	}

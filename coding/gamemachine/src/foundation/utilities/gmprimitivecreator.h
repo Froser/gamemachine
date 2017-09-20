@@ -14,8 +14,8 @@ GM_INTERFACE(IPrimitiveCreatorShaderCallback)
 
 struct GMPrimitiveCreator
 {
-	static void createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMMeshType type = GMMeshType::Model);
-	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMMeshType type = GMMeshType::Model);
+	static void createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMMeshType type = GMMeshType::Model3D);
+	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMMeshType type = GMMeshType::Model3D);
 };
 
 END_NS

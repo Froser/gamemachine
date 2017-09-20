@@ -190,6 +190,11 @@ struct GMRect
 	GMint x, y, width, height;
 };
 
+struct GMRectF
+{
+	GMfloat x, y, width, height;
+};
+
 template <typename T>
 void GM_new(OUT T** out)
 {

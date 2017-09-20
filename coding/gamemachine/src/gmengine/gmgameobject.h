@@ -22,9 +22,10 @@ GM_PRIVATE_OBJECT(GMGameObject)
 enum class GMGameObjectType
 {
 	Static,
-	Entity,
-	Sprite,
-	Particles,
+	Entity, // 可响应实体
+	Sprite, // 精灵类型
+	Particles, // 粒子
+	Controls, // UI控件
 	Custom,
 };
 
@@ -63,45 +64,6 @@ public:
 	// events
 private:
 	static void onShaderSetBlend(GMObject* sender, GMObject* receiver);
-};
-
-//GMGlyphObject
-struct GlyphProperties
-{
-};
-
-GM_PRIVATE_OBJECT(GMGlyphObject)
-{
-	GMString lastRenderText;
-	GMString text;
-	GlyphProperties properties;
-	GMfloat left, bottom, width, height;
-	ITexture* texture;
-};
-
-class GMComponent;
-class GMGlyphObject : public GMGameObject
-{
-	DECLARE_PRIVATE(GMGlyphObject)
-
-public:
-	GMGlyphObject() = default;
-	~GMGlyphObject();
-
-public:
-	void setText(const GMWchar* text);
-	void setGeometry(GMfloat left, GMfloat bottom, GMfloat width, GMfloat height);
-	void update();
-
-private:
-	virtual void draw() override;
-	virtual void onAppendingObjectToWorld() override;
-	virtual bool canDeferredRendering() override { return false; }
-
-private:
-	void constructModel();
-	void updateModel();
-	void createVertices(GMComponent* component);
 };
 
 //GMEntityObject

@@ -9,7 +9,7 @@ BEGIN_NS
 class GMGameWorld;
 GM_PRIVATE_OBJECT(GM2DGameObject)
 {
-	GMRect rect{ 0,0,0,0 };
+	GMRect geometry{ 0,0,0,0 };
 };
 
 class GM2DGameObject : public GMGameObject
@@ -20,16 +20,67 @@ public:
 	GM2DGameObject() = default;
 
 public:
-	void setRect(const GMRect& rect);
+	void setGeometry(const GMRect& rect);
 
 public:
 	virtual bool canDeferredRendering() override { return false; }
+};
+
+//////////////////////////////////////////////////////////////////////////
+
+
+//GMGlyphObject
+struct GlyphProperties
+{
+};
+
+GM_PRIVATE_OBJECT(GMGlyphObject)
+{
+	GMString lastRenderText;
+	GMString text;
+	GlyphProperties properties;
+	bool autoResize = true; // 是否按照屏幕大小调整字体
+	GMRectF lastGeometry = { -1 };
+	GMRect lastClientRect = { -1 };
+	ITexture* texture;
+};
+
+class GMGlyphObject : public GM2DGameObject
+{
+	DECLARE_PRIVATE(GMGlyphObject)
+
+public:
+	GMGlyphObject() = default;
+	~GMGlyphObject();
+
+public:
+	void setText(const GMWchar* text);
+	void update();
+
+public:
+	inline void setAutoResize(bool b) { D(d); d->autoResize = b; }
+
+private:
+	virtual void draw() override;
+	virtual void onAppendingObjectToWorld() override;
+
+private:
+	void constructModel();
+	void updateModel();
+	void createVertices(GMComponent* component);
+};
+
+//////////////////////////////////////////////////////////////////////////
+enum class GMImage2DAnchor
+{
+	Center,
 };
 
 GM_PRIVATE_OBJECT(GMImage2DGameObject)
 {
 	GMModel* model = nullptr;
 	ITexture* image = nullptr;
+	GMImage2DAnchor anchor = GMImage2DAnchor::Center;
 };
 
 class GMImage2DGameObject : public GM2DGameObject, public IPrimitiveCreatorShaderCallback

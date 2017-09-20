@@ -158,8 +158,8 @@ enum class GMArrangementMode
 enum class GMMeshType
 {
 	MeshTypeBegin,
-	Model = MeshTypeBegin,
-	Glyph,
+	Model3D = MeshTypeBegin,
+	Model2D,
 	Particles,
 	MeshTypeEnd,
 };
@@ -188,7 +188,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
 	Vector<GMComponent*> components;
-	GMMeshType type = GMMeshType::Model;
+	GMMeshType type = GMMeshType::Model3D;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
 	GMString name = _L("default");
 };
