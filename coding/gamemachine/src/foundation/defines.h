@@ -148,8 +148,16 @@ using Deque = std::deque<T>;
 
 #define GM_ENUM_END(e) (decltype(e)) ((GMint)(e) + 1)
 
-BEGIN_NS
 
+// 全局数据类型
+#if !_MSC_VER
+typedef unsigned short WORD;
+typedef unsigned long DWORD;
+STATIC_ASSERT_SIZE(WORD, 2);
+STATIC_ASSERT_SIZE(DWORD, 4);
+#endif
+
+BEGIN_NS
 // 基本数据类型
 typedef unsigned char GMbyte;
 typedef long GMlong;
@@ -169,11 +177,6 @@ typedef GLsizeiptr GMsizeiptr;
 typedef float GMfloat;
 typedef int GMint
 typedef short GMshort;
-#endif
-
-#if !_MSC_VER
-typedef unsigned short WORD;
-typedef unsigned long DWORD;
 #endif
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过

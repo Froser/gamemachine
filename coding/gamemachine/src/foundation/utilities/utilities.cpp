@@ -2,10 +2,6 @@
 #include "utilities.h"
 #include <linearmath.h>
 #include "assert.h"
-#if _WINDOWS
-#	include <io.h>
-#	include <direct.h>
-#endif
 #include "foundation/vector.h"
 
 //GMClock
@@ -94,30 +90,18 @@ GMfloat GMClock::evaluateDeltaTime()
 	return cycleToSecond(d->deltaCycles);
 }
 
+// platforms/[os]/timer.cpp
+extern "C" GMLargeInteger highResolutionTimerFrequency();
+extern "C" GMLargeInteger highResolutionTimer();
+
 GMLargeInteger GMClock::highResolutionTimerFrequency()
 {
-#if _WINDOWS
-	LARGE_INTEGER i;
-	BOOL b = QueryPerformanceFrequency(&i);
-	GM_ASSERT(b);
-	return i.QuadPart;
-#else
-	GM_ASSERT(false);
-	return 0;
-#endif
+	return ::highResolutionTimerFrequency();
 }
 
 GMLargeInteger GMClock::highResolutionTimer()
 {
-#if _WINDOWS
-	LARGE_INTEGER i;
-	BOOL b = QueryPerformanceCounter(&i);
-	GM_ASSERT(b);
-	return i.QuadPart;
-#else
-	GM_ASSERT(false);
-	return 0;
-#endif
+	return ::highResolutionTimer();
 }
 
 GMfloat GMClock::cycleToSecond(GMLargeInteger cycle)
@@ -618,154 +602,3 @@ bool Bitset::init(GMint numberOfBits)
 
 	return true;
 }
-
-//Path
-GMString GMPath::directoryName(const GMString& fileName)
-{
-	GMint pos1 = fileName.findLastOf('\\'),
-		pos2 = fileName.findLastOf('/');
-	GMint pos = pos1 > pos2 ? pos1 : pos2;
-	if (pos == GMString::npos)
-		return fileName;
-	return fileName.substr(0, pos + 1);
-}
-
-GMString GMPath::filename(const GMString& fullPath)
-{
-	GMint pos1 = fullPath.findLastOf('\\'),
-		pos2 = fullPath.findLastOf('/');
-	GMint pos = pos1 > pos2 ? pos1 : pos2;
-	if (pos == GMString::npos)
-		return fullPath;
-	return fullPath.substr(pos + 1, fullPath.length());
-}
-
-GMString GMPath::getCurrentPath()
-{
-#if _WINDOWS
-	const int MAX = 255;
-	GMWchar fn[MAX];
-	::GetModuleFileName(NULL, fn, MAX);
-	return directoryName(fn);
-#endif
-	return "";
-}
-
-Vector<GMString> GMPath::getAllFiles(const GMString& directory)
-{
-	Vector<GMString> res;
-#if _WINDOWS
-	GMString p = directory;
-	p.append("*");
-	_finddata_t fd;
-	long hFile = 0;
-	if ((hFile = _findfirst(p.toStdString().c_str(), &fd)) != -1)
-	{
-		do
-		{
-			if ((fd.attrib &  _A_ARCH))
-			{
-				if (!strEqual(fd.name, ".") && !strEqual(fd.name, ".."))
-					res.push_back(GMString(directory).append(fd.name));
-			}
-		} while (_findnext(hFile, &fd) == 0);
-		_findclose(hFile);
-	}
-#elif defined __APPLE__
-	GM_ASSERT(false);
-	return AlignedVector<GMString>();
-#else
-#error need implement
-#endif
-	return res;
-}
-
-bool GMPath::directoryExists(const GMString& dir)
-{
-#if _WINDOWS
-	WIN32_FIND_DATA findFileData;
-	HANDLE hFind;
-	hFind = FindFirstFile(dir.toStdWString().c_str(), &findFileData);
-
-	bool b = hFind != INVALID_HANDLE_VALUE;
-	FindClose(hFind);
-	return b;
-#elif defined __APPLE__
-	GM_ASSERT(false);
-	return false;
-#else
-#error need implement
-#endif
-}
-
-void GMPath::createDirectory(const GMString& dir)
-{
-#if _WINDOWS
-	if (directoryExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == _L(':')))
-		return;
-
-	std::wstring stdUp = dir.toStdWString();
-	if (stdUp.back() == '/' || stdUp.back() == '\\')
-		stdUp = stdUp.substr(0, stdUp.length() - 1); //去掉斜杠和反斜杠
-	stdUp = directoryName(stdUp).toStdWString();
-	for (GMuint i = 0; i < stdUp.length(); i++)
-	{
-		if (stdUp[i] == '/')
-			stdUp[i] = '\\';
-	}
-	if (stdUp.back() == '/' || stdUp.back() == '\\')
-		stdUp = stdUp.substr(0, stdUp.length() - 1);
-
-	createDirectory(stdUp);
-	std::string strDir = GMString(dir).toStdString();
-	_mkdir(strDir.c_str());
-#elif defined __APPLE__
-	GM_ASSERT(false);
-#else
-#error need implement
-#endif
-}
-
-//GMEvent
-#if _WINDOWS
-GMEvent::GMEvent(bool manualReset, bool initialState)
-{
-	D(d);
-	d->handle = ::CreateEvent(NULL, manualReset, initialState ? TRUE : FALSE, _L(""));
-}
-
-GMEvent::~GMEvent()
-{
-	D(d);
-	::CloseHandle(d->handle);
-}
-
-void GMEvent::wait(GMuint milliseconds)
-{
-	D(d);
-	milliseconds = !milliseconds ? INFINITE : milliseconds;
-	::WaitForSingleObject(d->handle, milliseconds);
-}
-
-void GMEvent::set()
-{
-	D(d);
-	::SetEvent(d->handle);
-}
-
-void GMEvent::reset()
-{
-	D(d);
-	::ResetEvent(d->handle);
-}
-
-GMAutoResetEvent::GMAutoResetEvent(bool initialState)
-	: GMEvent(false, initialState)
-{
-}
-
-GMManualResetEvent::GMManualResetEvent(bool initialState)
-	: GMEvent(true, initialState)
-{
-}
-#endif

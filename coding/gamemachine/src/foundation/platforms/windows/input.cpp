@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "gminput.h"
+#include "check.h"
+#include "gamemachine.h"
+#include "input.h"
 #include "foundation/gmprofile.h"
-
-#if _WINDOWS
 
 static GMString xinputDlls[] = {
 	"xinput9_1_0.dll",
@@ -15,7 +15,6 @@ XInputWrapper::XInputWrapper()
 	, m_xinputSetState(nullptr)
 	, m_module(0)
 {
-#if _WINDOWS
 	for (GMint i = 0; i < 3; i++)
 	{
 		m_module = LoadLibrary(xinputDlls[i].toStdWString().c_str());
@@ -32,7 +31,6 @@ XInputWrapper::XInputWrapper()
 
 	m_xinputGetState = (XInputGetState_Delegate)GetProcAddress(m_module, "XInputGetState");
 	m_xinputSetState = (XInputSetState_Delegate)GetProcAddress(m_module, "XInputSetState");
-#endif
 }
 
 DWORD XInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
@@ -58,20 +56,13 @@ XInputWrapper::~XInputWrapper()
 	::FreeLibrary(m_module);
 }
 
-Input_Windows::Input_Windows()
-{
-	D(d);
-	d->mouseReady = false;
-	d->mouseEnabled = true;
-}
-
-void Input_Windows::update()
+void GMInput_Windows::update()
 {
 	D(d);
 	::GetKeyboardState(d->lastKeyState);
 }
 
-void Input_Windows::initMouse(IWindow* window)
+void GMInput_Windows::initMouse(IWindow* window)
 {
 	D(d);
 	d->window = window;
@@ -81,13 +72,13 @@ void Input_Windows::initMouse(IWindow* window)
 	setMouseEnable(true);
 }
 
-void Input_Windows::setMouseEnable(bool enable)
+void GMInput_Windows::setMouseEnable(bool enable)
 {
 	D(d);
 	d->mouseEnabled = enable;
 }
 
-GMJoystickState Input_Windows::joystickState()
+GMJoystickState GMInput_Windows::joystickState()
 {
 	D(d);
 	XINPUT_STATE state;
@@ -108,21 +99,21 @@ GMJoystickState Input_Windows::joystickState()
 	return std::move(result);
 }
 
-void Input_Windows::setIMEState(bool enabled)
+void GMInput_Windows::setIMEState(bool enabled)
 {
 	D(d);
 	HIMC hImc = ImmGetContext(d->window->getWindowHandle());
 	::ImmSetOpenStatus(hImc, enabled);
 }
 
-void Input_Windows::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
+void GMInput_Windows::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
 {
 	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
 	d->xinput.XInputSetState(0, &v);
 }
 
-IKeyboardState& Input_Windows::getKeyboardState()
+IKeyboardState& GMInput_Windows::getKeyboardState()
 {
 	GM_PROFILE(getKeyboardState);
 	D(d);
@@ -131,7 +122,7 @@ IKeyboardState& Input_Windows::getKeyboardState()
 	return *this;
 }
 
-GMMouseState Input_Windows::mouseState()
+GMMouseState GMInput_Windows::mouseState()
 {
 	D(d);
 	if (!d->mouseReady)
@@ -159,5 +150,3 @@ GMMouseState Input_Windows::mouseState()
 	}
 	return state;
 }
-
-#endif

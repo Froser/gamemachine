@@ -112,8 +112,8 @@ set(SOURCES
 		gmphysics/gmphysicsstructs.h
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
-		os/gminput.h
-		os/gminput.cpp
+		io/gminput.h
+		io/gminput.cpp
 		foundation/utilities/tinyxml/tinystr.cpp
 		foundation/utilities/tinyxml/tinystr.h
 		foundation/utilities/tinyxml/tinyxml.cpp
@@ -153,6 +153,18 @@ set(SOURCES
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
 	)
+
+set(WIN32_SOURCES
+		foundation/platforms/windows/event.cpp
+		foundation/platforms/windows/path.cpp
+		foundation/platforms/windows/timer.cpp
+		foundation/platforms/windows/input.h
+		foundation/platforms/windows/input.cpp
+	)
+
+if(WIN32)
+	list(APPEND SOURCES ${WIN32_SOURCES})
+endif(WIN32)
 
 source_group_by_dir(SOURCES)
 add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})

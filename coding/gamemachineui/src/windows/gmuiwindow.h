@@ -21,7 +21,7 @@ public:
 	virtual gm::GMRect getClientRect() override;
 	virtual void showWindow() override { showWindowEx(); }
 	virtual void centerWindow() override { return Base::CenterWindow(); }
-	gm::GMWindowHandle getWindowHandle() const override { return Base::GetHWND(); }
+	virtual gm::GMWindowHandle getWindowHandle() const override { return Base::GetHWND(); }
 	virtual bool handleMessage() override { return DuiLib::CPaintManagerUI::HandleMessage(); }
 	virtual bool event(const gm::GameMachineMessage& msg) { return false; }
 

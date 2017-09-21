@@ -21,8 +21,12 @@ void GameMachine::init(
 	d->factory->createGraphicEngine(&engine);
 	registerManager(engine, &d->engine);
 
+	IInput* input = nullptr;
+	GMInputFactory::createInput(&input);
+	GM_ASSERT(input);
+
+	registerManager(input, &d->inputManager);
 	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
-	registerManager(new GMInput(), &d->inputManager);
 	registerManager(new GMStates(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
 	d->consoleOutput = consoleHandle.dbgoutput;

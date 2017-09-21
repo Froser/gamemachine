@@ -126,7 +126,9 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 	default:
 		break;
 	}
-	return ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
+
+	gm::GMWindowHandle hwnd = getWindowHandle();
+	return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
 void GMUIGLWindow::dispose()

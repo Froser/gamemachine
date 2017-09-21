@@ -463,7 +463,7 @@ inline linear_math::Matrix4x4 getViewMatrix(const CameraLookAt& lookAt)
 	return linear_math::lookat(lookAt.position, lookAt.lookAt + lookAt.position, linear_math::Vector3(0, 1, 0));
 }
 
-//GMPath
+//GMPath: platforms/[os]/path.cpp
 struct GMPath
 {
 	static GMString directoryName(const GMString& fileName);
@@ -474,7 +474,7 @@ struct GMPath
 	static void createDirectory(const GMString& dir);
 };
 
-//GMEvent
+//GMEvent: platforms/[os]/event.cpp
 #if _WINDOWS
 typedef HANDLE GMEventHandle;
 #else
