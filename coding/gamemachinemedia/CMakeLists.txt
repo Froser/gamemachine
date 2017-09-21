@@ -40,16 +40,19 @@ set(WIN32_SOURCES
 		src/windows/audio/gmmaudioreader_wav.cpp
 	)
 
+if(WIN32)
+	list(APPEND SOURCES ${WIN32_SOURCES})
+endif(WIN32)
+
 source_group_by_dir(SOURCES)
 
 if(WIN32)
-	add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES} ${WIN32_SOURCES})
-	add_library(gamemachinemedia
-			${SOURCES}
-			${WIN32_SOURCES}
-		)
-	source_group_by_dir(WIN32_SOURCES)
+	add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 endif(WIN32)
+
+add_library(gamemachinemedia
+		${SOURCES}
+	)
 
 add_definitions(-DFPM_DEFAULT)
 add_definitions(-DUNICODE -D_UNICODE)
