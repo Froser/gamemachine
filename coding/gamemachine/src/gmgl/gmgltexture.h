@@ -12,8 +12,8 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMGLTexture)
 {
 	bool inited = false;
-	GMImage* image = nullptr;
 	GLuint id = 0;
+	GLenum target = 0;
 };
 
 class GMGLTexture : public ITexture
@@ -21,11 +21,11 @@ class GMGLTexture : public ITexture
 	DECLARE_PRIVATE(GMGLTexture)
 
 public:
-	GMGLTexture(AUTORELEASE GMImage* image);
+	GMGLTexture(const GMImage* image);
 	~GMGLTexture();
 
 public:
-	void init();
+	void init(const GMImage* image);
 
 public:
 	virtual void drawTexture(GMTextureFrames* frames) override;

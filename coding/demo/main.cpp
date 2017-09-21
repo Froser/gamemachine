@@ -403,6 +403,7 @@ private:
 			ITexture* tex = nullptr;
 			GM.getFactory()->createTexture(img, &tex);
 			GM_ASSERT(tex);
+			delete img;
 
 			GMAsset* asset = demo->getAssets().insertAsset(GMAssetType::Texture, tex);
 
@@ -449,6 +450,7 @@ private:
 
 					ITexture* tex;
 					factory.createTexture(img, &tex);
+					delete img;
 
 					demo->getAssets().insertAsset(GMAssetType::Texture, tex);
 					{
@@ -711,7 +713,7 @@ int WINAPI WinMain(
 		consoleHandle,
 		player,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();

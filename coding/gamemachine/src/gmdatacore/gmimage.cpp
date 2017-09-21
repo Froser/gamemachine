@@ -1,16 +1,18 @@
 ﻿#include "stdafx.h"
 #include <gmimage.h>
 
-GMImage::GMImage()
-{
-}
-
 GMImage::~GMImage()
 {
 	dispose();
 }
 
 GMImage::Data& GMImage::getData()
+{
+	D(d);
+	return *d;
+}
+
+const GMImage::Data& GMImage::getData() const
 {
 	D(d);
 	return *d;

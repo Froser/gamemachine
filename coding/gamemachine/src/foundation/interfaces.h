@@ -114,7 +114,7 @@ enum GamePackageType
 GM_INTERFACE(IFactory)
 {
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
-	virtual void createTexture(AUTORELEASE GMImage*, OUT ITexture**) = 0;
+	virtual void createTexture(GMImage*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, GMModel*, OUT GMModelPainter**) = 0;
 	virtual void createGamePackage(GMGamePackage*, GamePackageType, OUT IGamePackageHandler**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;

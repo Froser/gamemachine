@@ -151,6 +151,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 			ITexture* texture = nullptr;
 			IFactory* factory = GameMachine::instance().getFactory();
 			factory->createTexture(img, &texture);
+			delete img;
 
 			GM_ASSERT(texture);
 			assets.insertAsset(GM_ASSET_TEXTURES, name, GMAssetType::Texture, texture);

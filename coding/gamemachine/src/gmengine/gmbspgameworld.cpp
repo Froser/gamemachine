@@ -506,6 +506,7 @@ void GMBSPGameWorld::initTextures()
 		{
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
+			delete tex;
 			getAssets().insertAsset(GM_ASSET_TEXTURES, shader.shader, GMAssetType::Texture, texture);
 		}
 		else
@@ -560,6 +561,7 @@ void GMBSPGameWorld::initLightmaps()
 		ImageBuffer* imgBuf = new ImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
+		delete imgBuf;
 		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, std::to_string(i).c_str(), GMAssetType::Texture, texture);
 	}
 
@@ -569,6 +571,7 @@ void GMBSPGameWorld::initLightmaps()
 		ImageBuffer* whiteBuf = new ImageBuffer(1, 1, 3 * sizeof(GMbyte), white);
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
+		delete whiteBuf;
 		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, std::to_string(-1).c_str(), GMAssetType::Texture, texture);
 	}
 }

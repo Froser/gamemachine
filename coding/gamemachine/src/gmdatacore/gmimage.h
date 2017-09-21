@@ -36,11 +36,12 @@ class GMImage : public GMObject
 	DECLARE_PRIVATE(GMImage)
 
 public:
-	GMImage();
+	GMImage() = default;
 	virtual ~GMImage();
 
 public:
 	Data& getData();
+	const Data& getData() const;
 	virtual void dispose();
 	void flipVertically(GMuint mipId);
 };

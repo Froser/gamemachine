@@ -12,7 +12,7 @@ void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 	*engine = new GMGLGraphicEngine();
 }
 
-void GMGLFactory::createTexture(AUTORELEASE GMImage* image, OUT ITexture** texture)
+void GMGLFactory::createTexture(GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
 	(*texture) = new GMGLTexture(image);
