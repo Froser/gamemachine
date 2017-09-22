@@ -4,12 +4,13 @@
 #include "gmgameobject.h"
 #include "gmassets.h"
 #include <gmprimitivecreator.h>
-#include <gminput.h>
+#include <input.h>
 BEGIN_NS
 
 enum class GM2DEventType
 {
 	MouseMove,
+	MouseDown,
 };
 
 // 2D对象的事件
@@ -32,6 +33,32 @@ public:
 	{
 	}
 	GMMouseState state() { return m_state; }
+
+private:
+	GMMouseState m_state;
+};
+
+class GM2DMouseDownEvent : public GM2DEvent
+{
+public:
+	enum Button
+	{
+		Left,
+		Right,
+		Middle,
+	};
+
+public:
+	GM2DMouseDownEvent(const GMMouseState& ms)
+		: GM2DEvent(GM2DEventType::MouseDown)
+		, m_state(ms)
+	{
+	}
+
+	GMMouseState state() { return m_state; }
+
+public:
+	bool buttonDown(Button button);
 
 private:
 	GMMouseState m_state;
@@ -65,7 +92,7 @@ public:
 	virtual void notifyControl() override;
 
 protected:
-	virtual void event(GM2DEvent* e);
+	virtual void event(GM2DEvent* e) {}
 	virtual bool insideGeometry(GMint x, GMint y);
 	virtual void updateUI();
 };

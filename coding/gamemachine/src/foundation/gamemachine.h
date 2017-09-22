@@ -2,7 +2,7 @@
 #define __GAMEMACHINE_H__
 #include <gmcommon.h>
 #include <utilities.h>
-#include <gminput.h>
+#include <input.h>
 #include "../gmdatacore/glyph/gmglyphmanager.h"
 #include "../gmdatacore/gamepackage/gmgamepackage.h"
 #include "../gmengine/gmcamera.h"

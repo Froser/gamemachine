@@ -22,12 +22,22 @@ struct GMJoystickState
 	GMshort thumbRY;
 };
 
+
+// GMMouseButton defines:
+#define GMMouseButton_None		0
+#define GMMouseButton_Left		1
+#define GMMouseButton_Right		2
+#define GMMouseButton_Middle	4
+
 struct GMMouseState
 {
+	typedef GMint GMMouseButton;
+
 	GMint deltaX;
 	GMint deltaY;
 	GMint posX;
 	GMint posY;
+	GMMouseButton button;
 };
 
 GM_INTERFACE(IJoystickState)

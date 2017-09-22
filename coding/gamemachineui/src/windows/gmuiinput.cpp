@@ -138,6 +138,15 @@ gm::GMMouseState GMInput::mouseState()
 		::ScreenToClient(d->window->getWindowHandle(), &p);
 		state.posX = p.x;
 		state.posY = p.y;
+
+		IKeyboardState& ks = getKeyboardState();
+		state.button = GMMouseButton_None;
+		if (ks.keydown(VK_LBUTTON))
+			state.button |= GMMouseButton_Left;
+		if (ks.keydown(VK_RBUTTON))
+			state.button |= GMMouseButton_Right;
+		if (ks.keydown(VK_MBUTTON))
+			state.button |= GMMouseButton_Middle;
 	}
 
 	if (!d->mouseReady)

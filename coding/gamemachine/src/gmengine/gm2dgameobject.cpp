@@ -16,24 +16,22 @@ static GMRectF toNormalCoord(const GMRect& in)
 	return out;
 }
 
-static GMRectF toNormalCoord(const GMRect& in, const GMRect& clientSize)
-{
-	GMRectF out = {
-		in.x * 2.f / clientSize.width - 1.f,
-		1.f - in.y * 2.f / clientSize.height,
-		(GMfloat)in.width / clientSize.width,
-		(GMfloat)in.height / clientSize.height
-	};
-	return out;
-}
-
-
 //////////////////////////////////////////////////////////////////////////
 GM2DEvent::GM2DEvent(GM2DEventType type)
 	: m_type(type)
 {
 }
 
+bool GM2DMouseDownEvent::buttonDown(Button button)
+{
+	if (button == GM2DMouseDownEvent::Left)
+		return !!(m_state.button & GMMouseButton_Left);
+	if (button == GM2DMouseDownEvent::Right)
+		return !!(m_state.button & GMMouseButton_Right);
+	if (button == GM2DMouseDownEvent::Middle)
+		return !!(m_state.button & GMMouseButton_Middle);
+	return false;
+}
 //////////////////////////////////////////////////////////////////////////
 GM2DGameObject::GM2DGameObject()
 {
@@ -61,11 +59,13 @@ void GM2DGameObject::notifyControl()
 	{
 		GM2DMouseMoveEvent e(ms);
 		event(&e);
-	}
-}
 
-void GM2DGameObject::event(GM2DEvent* e)
-{
+		if (ms.button != GMMouseButton_None)
+		{
+			GM2DMouseDownEvent e(ms);
+			event(&e);
+		}
+	}
 }
 
 bool GM2DGameObject::insideGeometry(GMint x, GMint y)
@@ -77,8 +77,9 @@ bool GM2DGameObject::insideGeometry(GMint x, GMint y)
 void GM2DGameObject::updateUI()
 {
 	D(d);
-	if (GM.peekMessage().msgType == GameMachineMessageType::WindowSizeChanged)
+	switch(GM.peekMessage().msgType)
 	{
+	case GameMachineMessageType::WindowSizeChanged:
 		GMRect nowClient = GM.getMainWindow()->getClientRect();
 		GMfloat scaleX = (GMfloat)nowClient.width / d->clientSize.width,
 			scaleY = (GMfloat)nowClient.height / d->clientSize.height;
@@ -97,15 +98,13 @@ void GM2DGameObject::updateUI()
 			GMPrimitiveUtil::scaleModel(*getModel(), scaling);
 
 			// 相对于左上角位置也不能变
-			// TODO
-			/*
-			GMRectF rect = toNormalCoord(d->geometry, d->clientSize);
-			GMfloat trans[] = { rect.x / scaleX, rect.y / scaleY, 0 };
+			GMRectF rect = toNormalCoord(d->geometry);
+			GMfloat trans[] = { rect.x, rect.y, 0 };
 			GMPrimitiveUtil::translateModelTo(*getModel(), trans);
-			*/
 		}
 
 		d->clientSize = nowClient;
+		break;
 	}
 }
 

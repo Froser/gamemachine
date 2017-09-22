@@ -1,6 +1,6 @@
 ﻿#ifndef __INTERFACES_H__
 #define __INTERFACES_H__
-#include <gminput.h>
+#include <input.h>
 
 BEGIN_NS
 
