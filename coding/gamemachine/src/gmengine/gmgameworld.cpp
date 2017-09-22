@@ -1,10 +1,17 @@
 ﻿#include "stdafx.h"
 #include "gmgameworld.h"
-#include "gmgameobject.h"
+#include "gameobjects/gmgameobject.h"
 #include "gmdatacore/gmmodel.h"
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"
+#include "gameobjects/gmcontrolgameobject.h"
+
+bool GMControlGameObjectPredicator::operator()(const GMControlGameObject& lhs, const GMControlGameObject& rhs)
+{
+	//return lhs.zOrder() < rhs.zOrder();
+	return &lhs < &rhs;
+}
 
 GMGameWorld::GMGameWorld()
 {
@@ -21,6 +28,11 @@ GMGameWorld::~GMGameWorld()
 		{
 			delete gameObject;
 		}
+	}
+
+	for (auto control : d->controls)
+	{
+		delete control;
 	}
 }
 
@@ -83,11 +95,19 @@ void GMGameWorld::simulateGameWorld()
 		d->start = true;
 }
 
+void GMGameWorld::addControl(GMControlGameObject* control)
+{
+	D(d);
+	control->setWorld(this);
+	control->onAppendingObjectToWorld();
+	d->controls.insert(control);
+	GM.initObjectPainter(control->getModel());
+}
+
 void GMGameWorld::notifyControls()
 {
 	D(d);
-	auto& objs = d->gameObjects[GMGameObjectType::Controls];
-	for (auto& obj : objs)
+	for (auto& obj : d->controls)
 	{
 		obj->notifyControl();
 	}

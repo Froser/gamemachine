@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmcamera.h"
-#include "gmspritegameobject.h"
+#include "gameobjects/gmspritegameobject.h"
 #include "foundation/gamemachine.h"
 
 GMCamera::GMCamera()

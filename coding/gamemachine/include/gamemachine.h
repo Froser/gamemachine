@@ -13,5 +13,4 @@
 #include "../src/foundation/vector.h"
 #include "../src/gmdatacore/gmmodel.h"
 #include "../src/gmengine/gmgameworld.h"
-#include "../src/gmengine/gmgameobject.h"
-#include "../src/gmengine/gmspritegameobject.h"
+#include "gmgameobject.h"

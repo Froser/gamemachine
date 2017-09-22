@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmgameworld.h"
+#include <gmgameworld.h>
 #include "gmspritegameobject.h"
 #include "gmphysics/gmphysicsworld.h"
 

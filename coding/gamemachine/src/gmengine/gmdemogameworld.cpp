@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmdemogameworld.h"
 #include "foundation/gamemachine.h"
+#include "gameobjects/gmcontrolgameobject.h"
 
 GMDemoGameWorld::GMDemoGameWorld()
 {
@@ -14,6 +15,16 @@ void GMDemoGameWorld::renderGameWorld()
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 	engine->newFrame();
 	engine->drawObjects(d->gameObjects.data(), d->gameObjects.size());
+
+	engine->beginBlend();
+	auto& controls = getControls();
+	Vector<GMGameObject*> cs;
+	for (auto& control : controls)
+	{ 
+		cs.push_back(control);
+	}
+	engine->drawObjects(cs.data(), cs.size());
+	engine->endBlend();
 }
 
 GMPhysicsWorld* GMDemoGameWorld::physicsWorld()

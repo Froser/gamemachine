@@ -59,14 +59,6 @@ set(SOURCES
 		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h
 		gmengine/gmgameworld.cpp
-		gmengine/gmgameobject.h
-		gmengine/gmgameobject.cpp
-		gmengine/gmparticles.h
-		gmengine/gmparticles.cpp
-		gmengine/gmspritegameobject.h
-		gmengine/gmspritegameobject.cpp
-		gmengine/gm2dgameobject.h
-		gmengine/gm2dgameobject.cpp
 		gmengine/gmcamera.h
 		gmengine/gmcamera.cpp
 		gmengine/gmbspgameworldprivate.h
@@ -75,6 +67,16 @@ set(SOURCES
 		gmengine/gmbspgameworld.cpp
 		gmengine/gmdemogameworld.h
 		gmengine/gmdemogameworld.cpp
+		gmengine/gameobjects/gmgameobject.h
+		gmengine/gameobjects/gmgameobject.cpp
+		gmengine/gameobjects/gmparticles.h
+		gmengine/gameobjects/gmparticles.cpp
+		gmengine/gameobjects/gmspritegameobject.h
+		gmengine/gameobjects/gmspritegameobject.cpp
+		gmengine/gameobjects/gm2dgameobject.h
+		gmengine/gameobjects/gm2dgameobject.cpp
+		gmengine/gameobjects/gmcontrolgameobject.h
+		gmengine/gameobjects/gmcontrolgameobject.cpp
 		gmgl/renders/gmgl_renders_glyph.h
 		gmgl/renders/gmgl_renders_glyph.cpp
 		gmgl/renders/gmgl_renders_object.h

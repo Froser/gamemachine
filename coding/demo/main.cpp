@@ -5,7 +5,7 @@
 #include <fstream>
 #include <gamemachine.h>
 #include <gmprimitivecreator.h>
-#include <gmparticles.h>
+#include <gm2dgameobject.h>
 #include <gmgl.h>
 #include <gmdemogameworld.h>
 #include <gmbspgameworld.h>
@@ -13,7 +13,6 @@
 #include <gmimage.h>
 #include <gmui.h>
 #include <gmm.h>
-#include <gm2dgameobject.h>
 
 #define EMITTER_DEMO 1
 
@@ -406,7 +405,7 @@ private:
 			m_img->setStretch(false);
 			m_img->setGeometry(rect);
 			m_img->setImage(*asset);
-			demo->appendObject("demo", m_img);
+			demo->addControl(m_img);
 		}
 
 		{

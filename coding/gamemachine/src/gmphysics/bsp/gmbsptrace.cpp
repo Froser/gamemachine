@@ -2,7 +2,7 @@
 #include "gmbsptrace.h"
 #include <linearmath.h>
 #include "gmbspphysicsworld.h"
-#include "gmengine/gmgameobject.h"
+#include "gmengine/gameobjects/gmgameobject.h"
 
 // keep 1/8 unit away to keep the position valid before network snapping
 // and to avoid various numeric issues

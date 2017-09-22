@@ -8,7 +8,7 @@
 #include "gmengine/gmbspgameworld.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
-#include "gmengine/gmgameobject.h"
+#include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
 
 #define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)

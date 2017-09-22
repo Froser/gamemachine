@@ -11,7 +11,7 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
 #include "foundation/gmthreads.h"
-#include "gmgameobject.h"
+#include "gameobjects/gmgameobject.h"
 #include "gmphysics/bsp/gmbspphysicsworld.h"
 
 BEGIN_NS

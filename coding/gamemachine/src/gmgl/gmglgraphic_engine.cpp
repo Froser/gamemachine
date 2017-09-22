@@ -4,7 +4,6 @@
 #include "gmglgraphic_engine.h"
 #include "gmdatacore/gmmodel.h"
 #include "gmgltexture.h"
-#include "gmengine/gmgameobject.h"
 #include "gmglmodelpainter.h"
 #include "renders/gmgl_renders_object.h"
 #include "renders/gmgl_renders_glyph.h"

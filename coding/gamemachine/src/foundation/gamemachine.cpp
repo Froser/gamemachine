@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gamemachine.h"
 #include "gmdatacore/glyph/gmglyphmanager.h"
-#include "gmengine/gmgameobject.h"
+#include "gmengine/gameobjects/gmgameobject.h"
 #include "gmstates.h"
 
 void GameMachine::init(

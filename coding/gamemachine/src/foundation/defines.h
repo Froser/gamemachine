@@ -21,14 +21,14 @@ template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
 #define makePair std::make_pair
 
-template <typename T1, typename T2>
-using Map = std::map<T1, T2>;
+template <typename T1, typename T2, typename Cmp = std::less<T1> >
+using Map = std::map<T1, T2, Cmp>;
 
 template <typename T1, typename T2, typename Cmp = std::less<T1> >
 using Multimap = std::multimap<T1, T2, Cmp>;
 
-template <typename T>
-using Set = std::set<T>;
+template <typename T, typename Cmp = std::less<T> >
+using Set = std::set<T, Cmp>;
 
 template <typename T>
 using Vector = std::vector<T>;

@@ -6,6 +6,7 @@ include_directories(
 		./include
 		../3rdparty/glew/include
 		../3rdparty/duilib
+		../3rdparty/lua/src
 		../gamemachine/include
 	)
 

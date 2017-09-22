@@ -4,17 +4,23 @@
 #include "../foundation/gamemachine.h"
 #include "../gmphysics/gmphysicsworld.h"
 #include <shader.h>
-#include "gmgameobject.h"
+#include "gameobjects/gmgameobject.h"
 #include <gmassets.h>
 
 BEGIN_NS
 
+class GMControlGameObject;
+struct GMControlGameObjectPredicator
+{
+	bool operator()(const GMControlGameObject& lhs, const GMControlGameObject& rhs);
+};
+
 class GMCharacter;
 class GMModelPainter;
-
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
+	Set<GMControlGameObject*> controls;
 	GMAssets assets;
 	bool start;
 };
@@ -41,10 +47,13 @@ public:
 public:
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
+	void addControl(AUTORELEASE GMControlGameObject* control);
 	void notifyControls();
-	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
-	void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
-	GMAssets& getAssets() { D(d); return d->assets; }
+
+	inline const Set<GMControlGameObject*>& getControls() { D(d); return d->controls; }
+	inline const Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
+	inline void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
+	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 private:
 	GMModelPainter* createPainterForObject(GMGameObject* obj);

@@ -8,6 +8,7 @@ include_directories(
 		../3rdparty/glew/include
 		../3rdparty/openal1.1/include
 		../3rdparty/libmad
+		../3rdparty/lua/src
 		../gamemachine/include
 	)
 

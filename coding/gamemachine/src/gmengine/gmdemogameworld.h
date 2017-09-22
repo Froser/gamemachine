@@ -2,7 +2,7 @@
 #define __GMDEMOGAMEWORLD_H__
 #include <gmcommon.h>
 #include "gmgameworld.h"
-#include "gmgameobject.h"
+#include "gameobjects/gmgameobject.h"
 BEGIN_NS
 
 // 提供一些示例的世界
