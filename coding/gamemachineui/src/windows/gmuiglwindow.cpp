@@ -131,6 +131,12 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 	return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 
+void GMUIGLWindow::update()
+{
+	swapBuffers();
+	Base::update();
+}
+
 void GMUIGLWindow::dispose()
 {
 	D(d);

@@ -114,12 +114,14 @@ void GameMachine::startGameMachine()
 			d->gameHandler->event(GameMachineEvent::Deactivate);
 		d->gameHandler->event(GameMachineEvent::Simulate);
 		d->gameHandler->event(GameMachineEvent::Render);
-		d->mainWindow->swapBuffers();
-		d->gameHandler->event(GameMachineEvent::FrameEnd);
 
 		// 更新所有管理器
+		d->mainWindow->update();
 		d->consoleWindow->update();
 		d->clock.update();
+
+		// 本帧结束
+		d->gameHandler->event(GameMachineEvent::FrameEnd);
 
 		// 控制帧率
 		if (bNeedControlFrameRate)

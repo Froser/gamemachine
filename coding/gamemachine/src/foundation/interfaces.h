@@ -153,7 +153,6 @@ GM_INTERFACE(IWindow)
 {
 	virtual IInput* getInputMananger() = 0;
 	virtual void update() = 0;
-	virtual void swapBuffers() const = 0;
 	virtual gm::GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
 	virtual void centerWindow() = 0;
 	virtual void showWindow() = 0;

@@ -24,14 +24,15 @@ public:
 
 public:
 	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs) override;
-	virtual void swapBuffers() const override;
 	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
+	virtual void update() override;
 
 private:
 	inline virtual GMUIStringPtr getWindowClassName() const override { return _L("gamemachine_mainWindow_class"); }
 	inline virtual gm::GMuint getClassStyle() const override { return 0; }
 
 private:
+	void swapBuffers() const;
 	void dispose();
 };
 

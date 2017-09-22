@@ -27,7 +27,6 @@ public:
 public:
 	virtual gm::IInput* getInputMananger() override;
 	virtual void update() override;
-	virtual void swapBuffers() const override {};
 	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& attrs) override;
 	virtual gm::GMRect getWindowRect() override;
 	virtual gm::GMRect getClientRect() override;
