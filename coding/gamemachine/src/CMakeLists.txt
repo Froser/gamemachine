@@ -136,6 +136,7 @@ set(SOURCES
 		foundation/memory.h
 		foundation/memory.cpp
 		foundation/linearmath.h
+		foundation/event_enum.h
 		foundation/gmobject.h
 		foundation/gmobject.cpp
 		foundation/gamemachine.h

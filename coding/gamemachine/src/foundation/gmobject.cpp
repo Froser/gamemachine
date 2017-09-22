@@ -55,17 +55,17 @@ void GMObject::swap(GMObject& a, GMObject& b)
 	wrapperA->swap(wrapperB);
 }
 
-void GMObject::attachEvent(GMObject& sender, const char* eventName, const GMEventCallback& callback)
+void GMObject::attachEvent(GMObject& sender, GMEventName eventName, const GMEventCallback& callback)
 {
 	sender.addEvent(eventName, *this, callback);
 }
 
-void GMObject::detachEvent(GMObject& sender, const char* eventName)
+void GMObject::detachEvent(GMObject& sender, GMEventName eventName)
 {
 	sender.removeEventAndConnection(eventName, *this);
 }
 
-void GMObject::addEvent(const char* eventName, GMObject& receiver, const GMEventCallback& callback)
+void GMObject::addEvent(GMEventName eventName, GMObject& receiver, const GMEventCallback& callback)
 {
 	D(d);
 	GMCallbackTarget target = { &receiver, callback };
@@ -73,14 +73,14 @@ void GMObject::addEvent(const char* eventName, GMObject& receiver, const GMEvent
 	receiver.addConnection(this, eventName);
 }
 
-void GMObject::removeEventAndConnection(const char* eventName, GMObject& receiver)
+void GMObject::removeEventAndConnection(GMEventName eventName, GMObject& receiver)
 {
 	D(d);
 	removeEvent(eventName, receiver);
 	receiver.removeConnection(this, eventName);
 }
 
-void GMObject::emitEvent(const char* eventName)
+void GMObject::emitEvent(GMEventName eventName)
 {
 	D(d);
 	if (d->events.empty())
@@ -93,7 +93,7 @@ void GMObject::emitEvent(const char* eventName)
 	}
 }
 
-void GMObject::removeEvent(const char* eventName, GMObject& receiver)
+void GMObject::removeEvent(GMEventName eventName, GMObject& receiver)
 {
 	D(d);
 	auto& targets = d->events[eventName];
@@ -110,7 +110,7 @@ void GMObject::releaseEvents()
 	{
 		for (auto& event : d->events)
 		{
-			const char* name = event.first.c_str();
+			GMEventName name = event.first;
 			for (auto& target : event.second)
 			{
 				target.receiver->removeConnection(this, name);
@@ -128,19 +128,19 @@ void GMObject::releaseEvents()
 	}
 }
 
-void GMObject::addConnection(GMObject* host, const char* eventName)
+void GMObject::addConnection(GMObject* host, GMEventName eventName)
 {
 	D(d);
 	GMConnectionTarget c;
 	c.host = host;
-	strcpy_s(c.name, eventName);
+	c.name = eventName;
 	d->connectionTargets.push_back(c);
 }
 
-void GMObject::removeConnection(GMObject* host, const char* eventName)
+void GMObject::removeConnection(GMObject* host, GMEventName eventName)
 {
 	D(d);
 	removeIf(d->connectionTargets, [&](auto iter) {
-		return strEqual(iter->name, eventName) && iter->host == host;
+		return iter->name == eventName && iter->host == host;
 	});
 }

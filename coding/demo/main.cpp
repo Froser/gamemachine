@@ -703,7 +703,7 @@ int WINAPI WinMain(
 		consoleHandle,
 		player,
 		new GMGLFactory(),
-		new DemoGameHandler()
+		new GameHandler()
 	);
 
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();

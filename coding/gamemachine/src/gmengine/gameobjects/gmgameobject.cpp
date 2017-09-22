@@ -36,8 +36,8 @@ void GMGameObject::setModel(GMAsset* asset)
 			for (auto& component : mesh->getComponents())
 			{
 				Shader& shader = component->getShader();
-				attachEvent(shader, "onSetBlend", onShaderSetBlend);
-				shader.emitEvent("onSetBlend");
+				attachEvent(shader, GM_SET_PROPERTY_ENUM(Blend), onShaderSetBlend);
+				shader.emitEvent(GM_SET_PROPERTY_ENUM(Blend));
 			}
 		}
 	}
