@@ -1,5 +1,5 @@
-﻿#ifndef __INPUT_H__
-#define __INPUT_H__
+﻿#ifndef __GMINPUT_H__
+#define __GMINPUT_H__
 #include <gmcommon.h>
 
 #if _MSC_VER
@@ -9,7 +9,7 @@
 #endif
 
 BEGIN_NS
-
+struct IWindow;
 struct GMJoystickState
 {
 	bool valid;
@@ -26,6 +26,8 @@ struct GMMouseState
 {
 	GMint deltaX;
 	GMint deltaY;
+	GMint posX;
+	GMint posY;
 };
 
 GM_INTERFACE(IJoystickState)
@@ -44,7 +46,6 @@ GM_INTERFACE(IKeyboardState)
 GM_INTERFACE(IMouseState)
 {
 	virtual GMMouseState mouseState() = 0;
-	virtual void initMouse(IWindow* window) = 0;
 	virtual void setMouseEnable(bool enable) = 0;
 };
 
@@ -55,12 +56,5 @@ GM_INTERFACE(IInput)
 	virtual IJoystickState& getJoystickState() = 0;
 	virtual IMouseState& getMouseState() = 0;
 };
-
-class GMInputFactory
-{
-public:
-	static void createInput(IInput** out);
-};
-
 END_NS
 #endif

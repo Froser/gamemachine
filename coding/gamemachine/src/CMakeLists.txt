@@ -113,7 +113,6 @@ set(SOURCES
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
 		io/gminput.h
-		io/gminput.cpp
 		foundation/utilities/tinyxml/tinystr.cpp
 		foundation/utilities/tinyxml/tinystr.h
 		foundation/utilities/tinyxml/tinyxml.cpp
@@ -158,8 +157,6 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/event.cpp
 		foundation/platforms/windows/path.cpp
 		foundation/platforms/windows/timer.cpp
-		foundation/platforms/windows/input.h
-		foundation/platforms/windows/input.cpp
 	)
 
 if(WIN32)

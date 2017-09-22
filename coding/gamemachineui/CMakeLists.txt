@@ -31,6 +31,8 @@ set(WIN32_SOURCES
 		src/windows/gmuiguiwindow.h
 		src/windows/gmuiwindow.cpp
 		src/windows/gmuiwindow.h
+		src/windows/gmuiinput.cpp
+		src/windows/gmuiinput.h
 	)
 	
 if(WIN32)

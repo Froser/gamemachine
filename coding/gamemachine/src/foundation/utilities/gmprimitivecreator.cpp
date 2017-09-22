@@ -74,15 +74,23 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	*obj = coreObj;
 }
 
-void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type)
+void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMCreateAnchor anchor)
 {
-	static constexpr GMfloat v[] = {
+	static constexpr GMfloat v_anchor_center[] = {
 		-1, 1, 0,
 		-1, -1, 0,
 		1, -1, 0,
 		1, 1, 0,
 	};
 
+	static constexpr GMfloat v_anchor_top_left[] = {
+		0, 0, 0,
+		0, -2, 0,
+		2, -2, 0,
+		2, 0, 0,
+	};
+
+	const GMfloat(&v)[12] = anchor == TopLeft ? v_anchor_top_left : v_anchor_center;
 	static constexpr GMint indices[] = {
 		0, 1, 3,
 		2, 3, 1,
@@ -114,7 +122,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				GMint idx = i * 3 + j; //顶点的开始
 				GMint idx_next = i * 3 + (j + 1) % 3;
 				GMint idx_prev = i * 3 + (j + 2) % 3;
-				linear_math::Vector2 uv(v[indices[idx] * 3], v[indices[idx] * 3 + 1]);
+				linear_math::Vector2 uv(v_anchor_center[indices[idx] * 3], v_anchor_center[indices[idx] * 3 + 1]);
 				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 				linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
@@ -135,4 +143,54 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	}
 
 	*obj = coreObj;
+}
+
+//////////////////////////////////////////////////////////////////////////
+void GMPrimitiveUtil::translateModelTo(REF GMModel& model, const GMfloat(&trans)[3])
+{
+	auto& meshes = model.getAllMeshes();
+	GMModelPainter* painter = model.getPainter();
+	for (auto& mesh : meshes)
+	{
+		painter->beginUpdateBuffer(mesh);
+		GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
+		GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
+
+		// 计算首个偏移
+		GMfloat* first = buffer;
+		GMfloat delta[] = {
+			trans[0] - first[0],
+			trans[1] - first[1],
+			trans[2] - first[2]
+		};
+
+		for (GMint v = 0; v < vertexCount; ++v)
+		{
+			GMfloat* ptr = buffer + v * GMModel::PositionDimension;
+			ptr[0] += delta[0];
+			ptr[1] += delta[1];
+			ptr[2] += delta[2];
+		}
+		painter->endUpdateBuffer();
+	}
+}
+
+void GMPrimitiveUtil::scaleModel(REF GMModel& model, const GMfloat (&scaling)[3])
+{
+	auto& meshes = model.getAllMeshes();
+	GMModelPainter* painter = model.getPainter();
+	for (auto& mesh : meshes)
+	{
+		painter->beginUpdateBuffer(mesh);
+		GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
+		GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
+		for (GMint v = 0; v < vertexCount; ++v)
+		{
+			GMfloat* ptr = buffer + v * GMModel::PositionDimension;
+			ptr[0] *= scaling[0];
+			ptr[1] *= scaling[1];
+			ptr[2] *= scaling[2];
+		}
+		painter->endUpdateBuffer();
+	}
 }

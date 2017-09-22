@@ -76,8 +76,7 @@ public:
 	void start()
 	{
 		//gm_install_hook(GMGamePackage, readFileFromPath, resOutputHook);
-		IInput* inputManager = GameMachine::instance().getInputManager();
-		inputManager->getMouseState().initMouse(GameMachine::instance().getMainWindow());
+		IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		inputManager->getKeyboardState().setIMEState(false);
 
 		GMGamePackage* pk = GameMachine::instance().getGamePackageManager();
@@ -138,7 +137,7 @@ public:
 			}
 			break;
 		case GameMachineEvent::Activate:
-			IInput* inputManager = GameMachine::instance().getInputManager();
+			IInput* inputManager = GM.getMainWindow()->getInputMananger();
 			static GMfloat mouseSensitivity = 0.25f;
 			static GMfloat joystickSensitivity = 0.0003f;
 
@@ -147,9 +146,9 @@ public:
 			IMouseState& mouseState = inputManager->getMouseState();
 
 			if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-				GameMachine::instance().postMessage({ GameMachineMessageType::Quit });
+				GameMachine::instance().postMessage(GameMachineMessageType::Quit);
 			if (kbState.keydown('B'))
-				GameMachine::instance().postMessage({ GameMachineMessageType::Console });
+				GameMachine::instance().postMessage(GameMachineMessageType::Console);
 
 			GMMovement moveTag = MC_NONE;
 			GMMoveRate rate;
@@ -245,12 +244,6 @@ public:
 			}
 			break;
 		}
-	}
-
-	bool isWindowActivate()
-	{
-		IWindow* window = GameMachine::instance().getMainWindow();
-		return ::GetForegroundWindow() == window->getWindowHandle();
 	}
 
 	void onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shader) override
@@ -376,6 +369,7 @@ private:
 		//camera.initOrtho(-1, 1, -1, 1, 0, 500);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
+		GM.getMainWindow()->getInputMananger()->getMouseState().setMouseEnable(false);
 
 		auto pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -391,7 +385,7 @@ private:
 			auto r = GM.getMainWindow()->getClientRect();
 			GMRect rect = {150, 150, (GMint)r.width, (GMint)r.height };
 			m_glyph->setGeometry(rect);
-			demo->appendObject("fps", m_glyph);
+			//demo->appendObject("fps", m_glyph);
 		}
 
 		{
@@ -408,7 +402,8 @@ private:
 			GMAsset* asset = demo->getAssets().insertAsset(GMAssetType::Texture, tex);
 
 			m_img = new GMImage2DGameObject();
-			GMRect rect = { 150,750,141,61 };
+			GMRect rect = { 100,100,141,61 };
+			m_img->setStretch(false);
 			m_img->setGeometry(rect);
 			m_img->setImage(*asset);
 			demo->appendObject("demo", m_img);
@@ -568,6 +563,7 @@ private:
 			break;
 		case gm::GameMachineEvent::Simulate:
 			demo->simulateGameWorld();
+			demo->notifyControls();
 #if EMITTER_DEMO
 			if (emitter && emitter->isEmissionFinished())
 			{
@@ -612,7 +608,7 @@ private:
 			}
 		case gm::GameMachineEvent::Activate:
 			{
-				IInput* inputManager = GameMachine::instance().getInputManager();
+				IInput* inputManager = GM.getMainWindow()->getInputMananger();
 				IKeyboardState& kbState = inputManager->getKeyboardState();
 				if (kbState.keyTriggered('N'))
 					GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % GMStates_DebugOptions::DRAW_NORMAL_END);
@@ -641,11 +637,6 @@ private:
 		default:
 			break;
 		}
-	}
-
-	virtual bool isWindowActivate()
-	{
-		return true;
 	}
 
 	GMfloat a = 0;

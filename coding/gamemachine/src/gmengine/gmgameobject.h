@@ -48,9 +48,10 @@ public:
 	virtual void onRemovingObjectFromWorld() {}
 	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }
 	virtual void draw();
-	virtual void simulate() {}
 	virtual void updateAfterSimulate() {}
+	virtual void simulate() {}
 	virtual bool canDeferredRendering();
+	virtual void notifyControl() {}
 
 private:
 	inline void updateMatrix() { D(d); d->transformMatrix = d->scaling * d->rotation.toMatrix() * d->translation; }

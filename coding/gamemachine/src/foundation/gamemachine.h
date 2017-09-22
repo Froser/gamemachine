@@ -21,10 +21,11 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IGraphicEngine* engine = nullptr;
 	GMGlyphManager* glyphManager = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
-	IInput* inputManager = nullptr;
 	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
 	IAudioPlayer* audioPlayer = nullptr;
+
+	GameMachineMessage lastMessage;
 
 	// 内置调试窗口，他们本质是同一个对象，所以不能重复释放
 	IWindow* consoleWindow = nullptr; 
@@ -73,7 +74,7 @@ public:
 	// 绘制引擎
 	inline IGraphicEngine* getGraphicEngine() { D(d); return d->engine; }
 
-	// 主窗口
+	// 窗口
 	inline IWindow* getMainWindow() { D(d); return d->mainWindow; }
 
 	// 工厂管理
@@ -87,9 +88,6 @@ public:
 
 	// 资源管理
 	GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
-
-	// HID
-	IInput* getInputManager() { D(d); return d->inputManager; }
 
 	// 相机管理
 	GMCamera& getCamera() { D(d); return d->camera; }
@@ -110,6 +108,7 @@ public:
 
 	// 发送事件
 	void postMessage(GameMachineMessage msg);
+	GameMachineMessage peekMessage();
 
 	void startGameMachine();
 

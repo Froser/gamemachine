@@ -20,12 +20,6 @@ void GameMachine::init(
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
 	registerManager(engine, &d->engine);
-
-	IInput* input = nullptr;
-	GMInputFactory::createInput(&input);
-	GM_ASSERT(input);
-
-	registerManager(input, &d->inputManager);
 	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
 	registerManager(new GMStates(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
@@ -40,6 +34,12 @@ void GameMachine::postMessage(GameMachineMessage msg)
 {
 	D(d);
 	d->messageQueue.push(msg);
+}
+
+GameMachineMessage GameMachine::peekMessage()
+{
+	D(d);
+	return d->lastMessage;
 }
 
 void GameMachine::initObjectPainter(GMModel* model)
@@ -91,8 +91,8 @@ void GameMachine::startGameMachine()
 
 	// 开始计时器
 	d->clock.begin();
-	// 消息循环
 
+	// 消息循环
 	GMfloat diff = 0;
 	GMClock frameCounter;
 	while (true)
@@ -108,21 +108,17 @@ void GameMachine::startGameMachine()
 			break;
 		
 		d->gameHandler->event(GameMachineEvent::FrameStart);
-
-		if (d->gameHandler->isWindowActivate())
+		if (d->mainWindow->isWindowActivate())
 			d->gameHandler->event(GameMachineEvent::Activate);
 		else
 			d->gameHandler->event(GameMachineEvent::Deactivate);
-
 		d->gameHandler->event(GameMachineEvent::Simulate);
 		d->gameHandler->event(GameMachineEvent::Render);
 		d->mainWindow->swapBuffers();
-		
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
 
 		// 更新所有管理器
 		d->consoleWindow->update();
-		d->inputManager->update();
 		d->clock.update();
 
 		// 控制帧率
@@ -174,6 +170,7 @@ bool GameMachine::handleMessages()
 		d->engine->event(msg);
 		d->messageQueue.pop();
 	}
+	d->lastMessage = msg;
 	return true;
 }
 

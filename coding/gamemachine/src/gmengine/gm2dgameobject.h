@@ -4,26 +4,70 @@
 #include "gmgameobject.h"
 #include "gmassets.h"
 #include <gmprimitivecreator.h>
+#include <gminput.h>
 BEGIN_NS
 
+enum class GM2DEventType
+{
+	MouseMove,
+};
+
+// 2D对象的事件
+class GM2DEvent
+{
+public:
+	GM2DEvent(GM2DEventType type);
+	GM2DEventType type() { return m_type; }
+
+private:
+	GM2DEventType m_type;
+};
+
+class GM2DMouseMoveEvent : public GM2DEvent
+{
+public:
+	GM2DMouseMoveEvent(const GMMouseState& ms)
+		: GM2DEvent(GM2DEventType::MouseMove)
+		, m_state(ms)
+	{
+	}
+	GMMouseState state() { return m_state; }
+
+private:
+	GMMouseState m_state;
+};
+
+//////////////////////////////////////////////////////////////////////////
 class GMGameWorld;
 GM_PRIVATE_OBJECT(GM2DGameObject)
 {
-	GMRect geometry{ 0,0,0,0 };
+	GMRect geometry{ 0 };
+	GMRect clientSize{ 0 };
+
+	bool stretch = true;
 };
 
 class GM2DGameObject : public GMGameObject
 {
 	DECLARE_PRIVATE(GM2DGameObject)
 
+	GM_DECLARE_PROPERTY(Stretch, stretch, bool);
+
 public:
-	GM2DGameObject() = default;
+	GM2DGameObject();
 
 public:
 	void setGeometry(const GMRect& rect);
 
 public:
+	virtual GMGameObjectType getType() { return GMGameObjectType::Controls; }
 	virtual bool canDeferredRendering() override { return false; }
+	virtual void notifyControl() override;
+
+protected:
+	virtual void event(GM2DEvent* e);
+	virtual bool insideGeometry(GMint x, GMint y);
+	virtual void updateUI();
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -68,6 +112,9 @@ private:
 	void constructModel();
 	void updateModel();
 	void createVertices(GMComponent* component);
+
+protected:
+	virtual void updateUI() {} //Ignore base
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,7 +127,6 @@ GM_PRIVATE_OBJECT(GMImage2DGameObject)
 {
 	GMModel* model = nullptr;
 	ITexture* image = nullptr;
-	GMImage2DAnchor anchor = GMImage2DAnchor::Center;
 };
 
 class GMImage2DGameObject : public GM2DGameObject, public IPrimitiveCreatorShaderCallback

@@ -1,8 +1,29 @@
 ﻿#include "stdafx.h"
 #include "gmui.h"
 #include <gamemachine.h>
+#include "gmuiinput.h"
 
-#if _WINDOWS
+GMUIWindow::~GMUIWindow()
+{
+	D(d);
+	if (d->input)
+		delete d->input;
+}
+
+gm::IInput* GMUIWindow::getInputMananger()
+{
+	D(d);
+	if (!d->input)
+		d->input = new GMInput(this);
+	return d->input;
+}
+
+void GMUIWindow::update()
+{
+	D(d);
+	if (d->input)
+		d->input->update();
+}
 
 gm::GMWindowHandle GMUIWindow::create(const gm::GMWindowAttributes& wndAttrs)
 {
@@ -25,4 +46,7 @@ gm::GMRect GMUIWindow::getClientRect()
 	return r;
 }
 
-#endif
+bool GMUIWindow::isWindowActivate()
+{
+	return ::GetForegroundWindow() == getWindowHandle();
+}

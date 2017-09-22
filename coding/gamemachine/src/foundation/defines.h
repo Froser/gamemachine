@@ -199,6 +199,13 @@ struct GMRectF
 };
 
 template <typename T>
+inline bool GM_in_rect(const T& rect, const decltype(T().x) x, const decltype(T().y) y)
+{
+	return (x > rect.x) && (x < rect.x + rect.width) &&
+		(y > rect.y) && (y < rect.y + rect.height);
+}
+
+template <typename T>
 void GM_new(OUT T** out)
 {
 	*out = new T;

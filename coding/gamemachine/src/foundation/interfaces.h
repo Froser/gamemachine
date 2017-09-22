@@ -1,5 +1,7 @@
 ﻿#ifndef __INTERFACES_H__
 #define __INTERFACES_H__
+#include <gminput.h>
+
 BEGIN_NS
 
 // 前置声明
@@ -45,6 +47,7 @@ enum class GameMachineEvent
 
 enum class GameMachineMessageType
 {
+	None,
 	Quit,
 	Console,
 	WindowSizeChanged,
@@ -52,9 +55,15 @@ enum class GameMachineMessageType
 
 struct GameMachineMessage
 {
-	GameMachineMessageType msgType;
-	GMint type;
-	GMint value;
+	GameMachineMessage(GameMachineMessageType t = GameMachineMessageType::None, GMint tp = 0, GMint v = 0)
+		: msgType(t)
+		, type(tp)
+		, value(v)
+	{}
+
+	GameMachineMessageType msgType = GameMachineMessageType::None;
+	GMint type = 0;
+	GMint value = 0;
 };
 
 GM_INTERFACE(IGameHandler)
@@ -62,7 +71,6 @@ GM_INTERFACE(IGameHandler)
 	virtual void init() = 0;
 	virtual void start() = 0;
 	virtual void event(GameMachineEvent evt) = 0;
-	virtual bool isWindowActivate() = 0;
 };
 
 GM_INTERFACE(ITexture)
@@ -143,6 +151,7 @@ typedef GMuint GMWindowHandle;
 
 GM_INTERFACE(IWindow)
 {
+	virtual IInput* getInputMananger() = 0;
 	virtual void update() = 0;
 	virtual void swapBuffers() const = 0;
 	virtual gm::GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
@@ -153,11 +162,12 @@ GM_INTERFACE(IWindow)
 	virtual GMRect getClientRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
 	virtual bool event(const GameMachineMessage& msg) = 0;
+	virtual bool isWindowActivate() = 0;
 };
 
 GM_ALIGNED_STRUCT(GMConsoleHandle)
 {
-	IWindow* window;
+	IWindow* window = nullptr;
 	IDebugOutput* dbgoutput;
 };
 

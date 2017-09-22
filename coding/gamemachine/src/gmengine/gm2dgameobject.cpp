@@ -8,20 +8,107 @@ static GMRectF toNormalCoord(const GMRect& in)
 {
 	GMRect client = GM.getMainWindow()->getClientRect();
 	GMRectF out = {
-		(GMfloat)in.x / client.width - 1.f,
-		1.f - (GMfloat)in.y / client.height,
+		in.x * 2.f / client.width - 1.f,
+		1.f - in.y * 2.f / client.height,
 		(GMfloat)in.width / client.width,
 		(GMfloat)in.height / client.height
 	};
 	return out;
 }
 
+static GMRectF toNormalCoord(const GMRect& in, const GMRect& clientSize)
+{
+	GMRectF out = {
+		in.x * 2.f / clientSize.width - 1.f,
+		1.f - in.y * 2.f / clientSize.height,
+		(GMfloat)in.width / clientSize.width,
+		(GMfloat)in.height / clientSize.height
+	};
+	return out;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
+GM2DEvent::GM2DEvent(GM2DEventType type)
+	: m_type(type)
+{
+}
+
+//////////////////////////////////////////////////////////////////////////
+GM2DGameObject::GM2DGameObject()
+{
+	D(d);
+	GMRect client = GM.getMainWindow()->getClientRect();
+	d->clientSize = client;
+}
+
 void GM2DGameObject::setGeometry(const GMRect& rect)
 {
 	D(d);
 	d->geometry = rect;
 }
+
+void GM2DGameObject::notifyControl()
+{
+	D(d);
+	updateUI();
+
+	IInput* input = GM.getMainWindow()->getInputMananger();
+	IMouseState& mouseState = input->getMouseState();
+	GMMouseState ms = mouseState.mouseState();
+	
+	if (insideGeometry(ms.posX, ms.posY))
+	{
+		GM2DMouseMoveEvent e(ms);
+		event(&e);
+	}
+}
+
+void GM2DGameObject::event(GM2DEvent* e)
+{
+}
+
+bool GM2DGameObject::insideGeometry(GMint x, GMint y)
+{
+	D(d);
+	return GM_in_rect(d->geometry, x, y);
+}
+
+void GM2DGameObject::updateUI()
+{
+	D(d);
+	if (GM.peekMessage().msgType == GameMachineMessageType::WindowSizeChanged)
+	{
+		GMRect nowClient = GM.getMainWindow()->getClientRect();
+		GMfloat scaleX = (GMfloat)nowClient.width / d->clientSize.width,
+			scaleY = (GMfloat)nowClient.height / d->clientSize.height;
+
+		if (getStretch())
+		{
+			d->geometry.x *= scaleX;
+			d->geometry.y *= scaleY;
+			d->geometry.width *= scaleX;
+			d->geometry.height *= scaleY;
+		}
+		else
+		{
+			// 调整大小，防止拉伸
+			GMfloat scaling[] = { 1.f / scaleX, 1.f / scaleY, 1 };
+			GMPrimitiveUtil::scaleModel(*getModel(), scaling);
+
+			// 相对于左上角位置也不能变
+			// TODO
+			/*
+			GMRectF rect = toNormalCoord(d->geometry, d->clientSize);
+			GMfloat trans[] = { rect.x / scaleX, rect.y / scaleY, 0 };
+			GMPrimitiveUtil::translateModelTo(*getModel(), trans);
+			*/
+		}
+
+		d->clientSize = nowClient;
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 //GlyphObject
@@ -194,26 +281,9 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 		coord.height,
 		1.f,
 	};
-	GMfloat pos[3];
-	
-	switch (d->anchor)
-	{
-	case GMImage2DAnchor::Center:
-		pos[0] = coord.x;
-		pos[1] = coord.y;
-		pos[2] = 0.f;
-		break;
-	default:
-		GM_ASSERT(false); //应该支持其他锚点类型
-		break;
-	}
-
-	GMPrimitiveCreator::createQuad(extents, pos, &d->model, this);
-	auto& meshes = d->model->getAllMeshes();
-	for (auto& m : meshes)
-	{
-		m->setType(GMMeshType::Model2D);
-	}
+	GMfloat pos[3] = { coord.x, coord.y, 0 };
+	GMPrimitiveCreator::createQuad(extents, pos, &d->model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+	d->model->setUsageHint(GMUsageHint::DynamicDraw);
 
 	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, d->model);
 	setModel(&asset);
@@ -222,6 +292,7 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 void GMImage2DGameObject::onCreateShader(Shader& shader)
 {
 	D(d);
+	shader.setNoDepthTest(true);
 	auto& tex = shader.getTexture();
 	auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
 	frames.addFrame(d->image);

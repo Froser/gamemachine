@@ -143,7 +143,8 @@ void GMGLShaderProgram::load()
 
 			gm_error("Shader source: \n%s", report.c_str());
 			gm_error("Shader compilation failed: %s", log);
-			GM.postMessage({ GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR });
+			GameMachineMessage msg(GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR);
+			GM.postMessage(msg);
 			delete[] log;
 			return;
 		}

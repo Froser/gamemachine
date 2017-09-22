@@ -1,10 +1,8 @@
 ﻿#ifndef __GMINPUT_WIN_H__
 #define __GMINPUT_WIN_H__
-#include <gmcommon.h>
-#include "check.h"
-#include "io/gminput.h"
-
-BEGIN_NS
+#include <gmuicommon.h>
+#include "gmuidef.h"
+#include <gamemachine.h>
 
 class XInputWrapper
 {
@@ -25,36 +23,36 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
-GM_PRIVATE_OBJECT(GMInput_Windows)
+GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
 	bool mouseReady = false;
 	bool mouseEnabled = true;
-	IWindow* window;
+	gm::IWindow* window;
 
 	// joystick (xinput)
 	XInputWrapper xinput;
-	GMJoystickState joystickState;
+	gm::GMJoystickState joystickState;
 
 	// keyboard
-	GMbyte keyState[256];
-	GMbyte lastKeyState[MAX_KEYS];
+	gm::GMbyte keyState[256];
+	gm::GMbyte lastKeyState[MAX_KEYS];
 
 	// mouse
-	GMMouseState mouseState;
+	gm::GMMouseState mouseState;
 };
 
-class GMInput_Windows :
-	public GMObject,
-	public IInput,
-	public IKeyboardState,
-	public IJoystickState,
-	public IMouseState
+class GMInput :
+	public gm::GMObject,
+	public gm::IInput,
+	public gm::IKeyboardState,
+	public gm::IJoystickState,
+	public gm::IMouseState
 {
-	DECLARE_PRIVATE(GMInput_Windows)
+	DECLARE_PRIVATE(GMInput)
 
 public:
-	GMInput_Windows() = default;
+	GMInput(gm::IWindow* window);
 
 public:
 
@@ -68,14 +66,14 @@ public:
 
 	// IKeyboardState
 public:
-	virtual bool keydown(GMuint key) override
+	virtual bool keydown(gm::GMuint key) override
 	{
 		D(d);
 		return !!(d->keyState[key] & 0x80);
 	}
 
 	// 表示一个键是否按下一次，长按只算是一次
-	virtual bool keyTriggered(GMuint key) override
+	virtual bool keyTriggered(gm::GMuint key) override
 	{
 		D(d);
 		return !(d->lastKeyState[key] & 0x80) && (keydown(key));
@@ -83,16 +81,16 @@ public:
 
 	// IJoystickState
 public:
-	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
-	virtual GMJoystickState joystickState() override;
+	virtual void joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMotorSpeed) override;
+	virtual gm::GMJoystickState joystickState() override;
 	virtual void setIMEState(bool enabled) override;
 
 	// IMouseState
 public:
-	virtual void initMouse(IWindow* window) override;
-	virtual GMMouseState mouseState() override;
+	void initMouse();
+
+public:
+	virtual gm::GMMouseState mouseState() override;
 	virtual void setMouseEnable(bool center) override;
 };
-
-END_NS
 #endif

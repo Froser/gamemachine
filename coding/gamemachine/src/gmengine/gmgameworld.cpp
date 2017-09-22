@@ -83,6 +83,16 @@ void GMGameWorld::simulateGameWorld()
 		d->start = true;
 }
 
+void GMGameWorld::notifyControls()
+{
+	D(d);
+	auto& objs = d->gameObjects[GMGameObjectType::Controls];
+	for (auto& obj : objs)
+	{
+		obj->notifyControl();
+	}
+}
+
 GMModelPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 {
 	D(d);
@@ -97,10 +107,11 @@ GMModelPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
 
 void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects)
 {
-	std::for_each(gameObjects.cbegin(), gameObjects.cend(), [phyw](GMGameObject* gameObject) {
+	for (auto& gameObject : gameObjects)
+	{
 		gameObject->simulate();
 		if (phyw)
 			phyw->simulate(gameObject);
 		gameObject->updateAfterSimulate();
-	});
+	}
 }

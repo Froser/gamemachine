@@ -41,6 +41,7 @@ public:
 public:
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
+	void notifyControls();
 	Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 	void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
 	GMAssets& getAssets() { D(d); return d->assets; }

@@ -1,10 +1,7 @@
 ﻿#include "stdafx.h"
-#include "check.h"
-#include "gamemachine.h"
-#include "input.h"
-#include "foundation/gmprofile.h"
+#include "gmuiinput.h"
 
-static GMString xinputDlls[] = {
+static gm::GMString xinputDlls[] = {
 	"xinput9_1_0.dll",
 	"xinput1_4.dll",
 	"xinput1_3.dll",
@@ -15,7 +12,7 @@ XInputWrapper::XInputWrapper()
 	, m_xinputSetState(nullptr)
 	, m_module(0)
 {
-	for (GMint i = 0; i < 3; i++)
+	for (gm::GMint i = 0; i < 3; i++)
 	{
 		m_module = LoadLibrary(xinputDlls[i].toStdWString().c_str());
 		if (m_module)
@@ -56,33 +53,39 @@ XInputWrapper::~XInputWrapper()
 	::FreeLibrary(m_module);
 }
 
-void GMInput_Windows::update()
+GMInput::GMInput(gm::IWindow* window)
+{
+	D(d);
+	d->window = window;
+	initMouse();
+}
+
+void GMInput::update()
 {
 	D(d);
 	::GetKeyboardState(d->lastKeyState);
 }
 
-void GMInput_Windows::initMouse(IWindow* window)
+void GMInput::initMouse()
 {
 	D(d);
-	d->window = window;
-	GMRect rect = d->window->getWindowRect();
+	gm::GMRect rect = d->window->getWindowRect();
 	::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
 	d->mouseReady = true;
 	setMouseEnable(true);
 }
 
-void GMInput_Windows::setMouseEnable(bool enable)
+void GMInput::setMouseEnable(bool enable)
 {
 	D(d);
 	d->mouseEnabled = enable;
 }
 
-GMJoystickState GMInput_Windows::joystickState()
+gm::GMJoystickState GMInput::joystickState()
 {
 	D(d);
 	XINPUT_STATE state;
-	GMJoystickState result = { false };
+	gm::GMJoystickState result = { false };
 
 	if (d->xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
 	{
@@ -99,21 +102,21 @@ GMJoystickState GMInput_Windows::joystickState()
 	return std::move(result);
 }
 
-void GMInput_Windows::setIMEState(bool enabled)
+void GMInput::setIMEState(bool enabled)
 {
 	D(d);
 	HIMC hImc = ImmGetContext(d->window->getWindowHandle());
 	::ImmSetOpenStatus(hImc, enabled);
 }
 
-void GMInput_Windows::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
+void GMInput::joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMotorSpeed)
 {
 	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
 	d->xinput.XInputSetState(0, &v);
 }
 
-IKeyboardState& GMInput_Windows::getKeyboardState()
+gm::IKeyboardState& GMInput::getKeyboardState()
 {
 	GM_PROFILE(getKeyboardState);
 	D(d);
@@ -122,31 +125,41 @@ IKeyboardState& GMInput_Windows::getKeyboardState()
 	return *this;
 }
 
-GMMouseState GMInput_Windows::mouseState()
+gm::GMMouseState GMInput::mouseState()
 {
 	D(d);
-	if (!d->mouseReady)
+	gm::GMMouseState state = { 0 };
+
+	POINT pos;
+	::GetCursorPos(&pos);
+
 	{
-		gm_error(_L("Mouse is not ready. Please call initMouse() first."));
-		return GMMouseState();
+		POINT p = pos;
+		::ScreenToClient(d->window->getWindowHandle(), &p);
+		state.posX = p.x;
+		state.posY = p.y;
 	}
 
-	GMMouseState state;
-
-	if (d->mouseEnabled)
+	if (!d->mouseReady)
 	{
-		GMRect rect = d->window->getWindowRect();
-		const GMint centerX = rect.x + rect.width / 2;
-		const GMint centerY = rect.y + rect.height / 2;
-		POINT pos;
-		::GetCursorPos(&pos);
-		::SetCursorPos(centerX, centerY);
-		state.deltaX = pos.x - centerX;
-		state.deltaY = pos.y - centerY;
+		gm_error(_L("Mouse is not ready. Please call initMouse() first, "
+			"otherwise deltaX and deltaY won't be valid."));
 	}
 	else
 	{
-		state.deltaX = state.deltaY = 0;
+		if (d->mouseEnabled)
+		{
+			gm::GMRect rect = d->window->getWindowRect();
+			const gm::GMint centerX = rect.x + rect.width / 2;
+			const gm::GMint centerY = rect.y + rect.height / 2;
+			::SetCursorPos(centerX, centerY);
+			state.deltaX = pos.x - centerX;
+			state.deltaY = pos.y - centerY;
+		}
+		else
+		{
+			state.deltaX = state.deltaY = 0;
+		}
 	}
 	return state;
 }
