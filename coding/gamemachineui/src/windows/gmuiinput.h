@@ -85,12 +85,12 @@ public:
 	virtual gm::GMJoystickState joystickState() override;
 	virtual void setIMEState(bool enabled) override;
 
-	// IMouseState
-public:
+private:
 	void initMouse();
 
 public:
 	virtual gm::GMMouseState mouseState() override;
 	virtual void setMouseEnable(bool center) override;
+	virtual void setCursor(gm::GMCursorType type) override;
 };
 #endif

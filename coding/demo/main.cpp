@@ -368,7 +368,8 @@ private:
 		//camera.initOrtho(-1, 1, -1, 1, 0, 500);
 
 		IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-		GM.getMainWindow()->getInputMananger()->getMouseState().setMouseEnable(false);
+		auto& ms = GM.getMainWindow()->getInputMananger()->getMouseState();
+		ms.setMouseEnable(false);
 
 		auto pk = GameMachine::instance().getGamePackageManager();
 #ifdef _DEBUG
@@ -402,9 +403,21 @@ private:
 
 			m_img = new GMImage2DGameObject();
 			GMRect rect = { 100,100,141,61 };
-			m_img->setStretch(false);
+			//m_img->setStretch(false);
 			m_img->setGeometry(rect);
 			m_img->setImage(*asset);
+			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseHover), [&](auto sender, auto receiver) {
+				//GM.postMessage(gm::GameMachineMessageType::Quit);
+				ms.setCursor(GMCursorType::Hand);
+				OutputDebugStringA("Mouse hover\n");
+			});
+			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseLeave), [&](auto sender, auto receiver) {
+				ms.setCursor(GMCursorType::Arrow);
+				OutputDebugStringA("Mouse Leave\n");
+			});
+			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseDown), [&](auto sender, auto receiver) {
+				GM.postMessage(gm::GameMachineMessageType::Quit);
+			});
 			demo->addControl(m_img);
 		}
 
@@ -703,7 +716,7 @@ int WINAPI WinMain(
 		consoleHandle,
 		player,
 		new GMGLFactory(),
-		new GameHandler()
+		new DemoGameHandler()
 	);
 
 	GMGamePackage* pk = GameMachine::instance().getGamePackageManager();

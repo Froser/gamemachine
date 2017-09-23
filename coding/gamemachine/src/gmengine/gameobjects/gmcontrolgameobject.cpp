@@ -3,19 +3,20 @@
 #include "foundation/utilities/gmprimitivecreator.h"
 
 //////////////////////////////////////////////////////////////////////////
-GMControlEvent::GMControlEvent(GMControlEventType type)
+GMControlEvent::GMControlEvent(GMControlEventType type, GMEventName eventName)
 	: m_type(type)
+	, m_eventName(eventName)
 {
 }
 
 bool GM2DMouseDownEvent::buttonDown(Button button)
 {
 	if (button == GM2DMouseDownEvent::Left)
-		return !!(m_state.button & GMMouseButton_Left);
+		return !!(m_state.trigger_button & GMMouseButton_Left);
 	if (button == GM2DMouseDownEvent::Right)
-		return !!(m_state.button & GMMouseButton_Right);
+		return !!(m_state.trigger_button & GMMouseButton_Right);
 	if (button == GM2DMouseDownEvent::Middle)
-		return !!(m_state.button & GMMouseButton_Middle);
+		return !!(m_state.trigger_button & GMMouseButton_Middle);
 	return false;
 }
 //////////////////////////////////////////////////////////////////////////
@@ -43,15 +44,36 @@ void GMControlGameObject::notifyControl()
 
 	if (insideGeometry(ms.posX, ms.posY))
 	{
-		GM2DMouseHoverEvent e(ms);
-		event(&e);
-
-		if (ms.button != GMMouseButton_None)
+		if (ms.trigger_button != GMMouseButton_None)
 		{
 			GM2DMouseDownEvent e(ms);
 			event(&e);
 		}
+		else
+		{
+			if (!d->mouseHovered)
+			{
+				d->mouseHovered = true;
+				GM2DMouseHoverEvent e(ms);
+				event(&e);
+			}
+		}
 	}
+	else
+	{
+		if (d->mouseHovered)
+		{
+			d->mouseHovered = false;
+			GM2DMouseLeaveEvent e(ms);
+			event(&e);
+		}
+	}
+}
+
+void GMControlGameObject::event(GMControlEvent* e)
+{
+	D(d);
+	emitEvent(e->getEventName());
 }
 
 bool GMControlGameObject::insideGeometry(GMint x, GMint y)

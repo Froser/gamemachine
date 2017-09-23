@@ -7,6 +7,7 @@ BEGIN_NS
 enum class GMControlEventType
 {
 	MouseHover,
+	MouseLeave,
 	MouseDown,
 };
 
@@ -14,28 +15,50 @@ enum class GMControlEventType
 class GMControlEvent
 {
 public:
-	GMControlEvent(GMControlEventType type);
+	GMControlEvent(GMControlEventType type, GMEventName eventName);
 	GMControlEventType type() { return m_type; }
 
+public:
+	GMEventName getEventName() { return m_eventName; }
+
 private:
+	GMEventName m_eventName;
 	GMControlEventType m_type;
 };
 
-class GM2DMouseHoverEvent : public GMControlEvent
+class GM2DMouseEvent : public GMControlEvent
 {
 public:
-	GM2DMouseHoverEvent(const GMMouseState& ms)
-		: GMControlEvent(GMControlEventType::MouseHover)
+	GM2DMouseEvent(GMEventName eventName, GMControlEventType eventType, const GMMouseState& ms)
+		: GMControlEvent(eventType, eventName)
 		, m_state(ms)
 	{
 	}
 	GMMouseState state() { return m_state; }
 
-private:
+protected:
 	GMMouseState m_state;
 };
 
-class GM2DMouseDownEvent : public GMControlEvent
+class GM2DMouseHoverEvent : public GM2DMouseEvent
+{
+public:
+	GM2DMouseHoverEvent(const GMMouseState& ms)
+		: GM2DMouseEvent(GM_CONTROL_EVENT_ENUM(MouseHover), GMControlEventType::MouseHover, ms)
+	{
+	}
+};
+
+class GM2DMouseLeaveEvent : public GM2DMouseEvent
+{
+public:
+	GM2DMouseLeaveEvent(const GMMouseState& ms)
+		: GM2DMouseEvent(GM_CONTROL_EVENT_ENUM(MouseLeave), GMControlEventType::MouseLeave, ms)
+	{
+	}
+};
+
+class GM2DMouseDownEvent : public GM2DMouseEvent
 {
 public:
 	enum Button
@@ -45,20 +68,13 @@ public:
 		Middle,
 	};
 
-public:
 	GM2DMouseDownEvent(const GMMouseState& ms)
-		: GMControlEvent(GMControlEventType::MouseDown)
-		, m_state(ms)
+		: GM2DMouseEvent(GM_CONTROL_EVENT_ENUM(MouseDown), GMControlEventType::MouseDown, ms)
 	{
 	}
 
-	GMMouseState state() { return m_state; }
-
 public:
 	bool buttonDown(Button button);
-
-private:
-	GMMouseState m_state;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -66,6 +82,7 @@ GM_PRIVATE_OBJECT(GMControlGameObject)
 {
 	GMRect geometry{ 0 };
 	GMRect clientSize{ 0 };
+	bool mouseHovered = false;
 	bool stretch = true;
 };
 
@@ -88,7 +105,7 @@ public:
 	virtual bool canDeferredRendering() override { return false; }
 
 protected:
-	virtual void event(GMControlEvent* e) {}
+	virtual void event(GMControlEvent* e);
 	virtual bool insideGeometry(GMint x, GMint y);
 	virtual void updateUI();
 

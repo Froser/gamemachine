@@ -37,7 +37,19 @@ struct GMMouseState
 	GMint deltaY;
 	GMint posX;
 	GMint posY;
-	GMMouseButton button;
+	GMMouseButton down_button;
+	GMMouseButton trigger_button;
+};
+
+enum class GMCursorType
+{
+	Arrow,
+	IBeam,
+	Wait,
+	Cross,
+	UpArrow,
+	Hand,
+	Custom,
 };
 
 GM_INTERFACE(IJoystickState)
@@ -57,6 +69,7 @@ GM_INTERFACE(IMouseState)
 {
 	virtual GMMouseState mouseState() = 0;
 	virtual void setMouseEnable(bool enable) = 0;
+	virtual void setCursor(GMCursorType type) = 0;
 };
 
 GM_INTERFACE(IInput)

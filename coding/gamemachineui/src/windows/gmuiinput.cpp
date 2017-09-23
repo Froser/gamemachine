@@ -81,6 +81,40 @@ void GMInput::setMouseEnable(bool enable)
 	d->mouseEnabled = enable;
 }
 
+void GMInput::setCursor(gm::GMCursorType type)
+{
+	D(d);
+	LPCWSTR cursor = nullptr;
+	switch (type)
+	{
+	case gm::GMCursorType::Arrow:
+		cursor = IDC_ARROW;
+		break;
+	case gm::GMCursorType::IBeam:
+		cursor = IDC_IBEAM;
+		break;
+	case gm::GMCursorType::Wait:
+		cursor = IDC_WAIT;
+		break;
+	case gm::GMCursorType::Cross:
+		cursor = IDC_CROSS;
+		break;
+	case gm::GMCursorType::UpArrow:
+		cursor = IDC_UPARROW;
+		break;
+	case gm::GMCursorType::Hand:
+		cursor = IDC_HAND;
+		break;
+	case gm::GMCursorType::Custom:
+		ASSERT(!"need implement");
+		break;
+	default:
+		ASSERT(false);
+		break;
+	}
+	::SetClassLong(d->window->getWindowHandle(), GCL_HCURSOR, (LONG)::LoadCursor(NULL, cursor));
+}
+
 gm::GMJoystickState GMInput::joystickState()
 {
 	D(d);
@@ -140,13 +174,21 @@ gm::GMMouseState GMInput::mouseState()
 		state.posY = p.y;
 
 		IKeyboardState& ks = getKeyboardState();
-		state.button = GMMouseButton_None;
+		state.down_button = GMMouseButton_None;
 		if (ks.keydown(VK_LBUTTON))
-			state.button |= GMMouseButton_Left;
+			state.down_button |= GMMouseButton_Left;
 		if (ks.keydown(VK_RBUTTON))
-			state.button |= GMMouseButton_Right;
+			state.down_button |= GMMouseButton_Right;
 		if (ks.keydown(VK_MBUTTON))
-			state.button |= GMMouseButton_Middle;
+			state.down_button |= GMMouseButton_Middle;
+
+		state.trigger_button = GMMouseButton_None;
+		if (ks.keyTriggered(VK_LBUTTON))
+			state.trigger_button |= GMMouseButton_Left;
+		if (ks.keyTriggered(VK_RBUTTON))
+			state.trigger_button |= GMMouseButton_Right;
+		if (ks.keyTriggered(VK_MBUTTON))
+			state.trigger_button |= GMMouseButton_Middle;
 	}
 
 	if (!d->mouseReady)
