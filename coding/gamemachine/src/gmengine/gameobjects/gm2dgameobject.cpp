@@ -53,7 +53,6 @@ void GMGlyphObject::constructModel()
 	createVertices(component);
 	child->appendComponent(component);
 
-	model->setUsageHint(GMUsageHint::DynamicDraw);
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(&asset);
 }
@@ -151,9 +150,9 @@ void GMGlyphObject::update()
 //////////////////////////////////////////////////////////////////////////
 GMImage2DGameObject::~GMImage2DGameObject()
 {
-	D(d);
-	if (d->model)
-		delete d->model;
+	GMModel* model = getModel();
+	if (model)
+		delete model;
 }
 
 void GMImage2DGameObject::setImage(GMAsset& image)
@@ -173,11 +172,12 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 		coord.height,
 		1.f,
 	};
+	GMModel* model = nullptr;
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
-	GMPrimitiveCreator::createQuad(extents, pos, &d->model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
-	d->model->setUsageHint(GMUsageHint::DynamicDraw);
+	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+	model->setUsageHint(GMUsageHint::DynamicDraw);
 
-	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, d->model);
+	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(&asset);
 }
 
@@ -188,4 +188,30 @@ void GMImage2DGameObject::onCreateShader(Shader& shader)
 	auto& tex = shader.getTexture();
 	auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
 	frames.addFrame(d->image);
+}
+
+//////////////////////////////////////////////////////////////////////////
+void GMListbox2DGameObject::onCreateShader(Shader& shader)
+{
+	D(d);
+	shader.setNoDepthTest(true);
+}
+
+void GMListbox2DGameObject::onAppendingObjectToWorld()
+{
+	D(d);
+	D_BASE(db, GMControlGameObject);
+	GMRectF coord = toViewportCoord(db->geometry);
+	GMfloat extents[3] = {
+		coord.width,
+		coord.height,
+		1.f,
+	};
+	GMModel* model = nullptr;
+	GMfloat pos[3] = { coord.x, coord.y, 0 };
+	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+
+	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
+	setModel(&asset);
 }

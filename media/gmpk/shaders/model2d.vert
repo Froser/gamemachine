@@ -5,6 +5,6 @@ out vec2 _uv;
 
 void main(void)
 {
-    gl_Position = position;
+    gl_Position = GM_model_matrix * position;
     _uv = uv;
 }

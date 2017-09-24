@@ -52,14 +52,8 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////
-enum class GMImage2DAnchor
-{
-	Center,
-};
-
 GM_PRIVATE_OBJECT(GMImage2DGameObject)
 {
-	GMModel* model = nullptr;
 	ITexture* image = nullptr;
 };
 
@@ -79,6 +73,25 @@ private:
 	virtual void onCreateShader(Shader& shader) override;
 
 private:
+	virtual void onAppendingObjectToWorld();
+};
+
+//////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT(GMListbox2DGameObject)
+{
+	Vector<GMString> items;
+	Vector<GMModel*> itemModels;
+};
+
+class GMListbox2DGameObject : public GMControlGameObject, public IPrimitiveCreatorShaderCallback
+{
+	DECLARE_PRIVATE(GMListbox2DGameObject);
+
+public:
+	GMListbox2DGameObject() = default;
+
+private:
+	virtual void onCreateShader(Shader& shader) override;
 	virtual void onAppendingObjectToWorld();
 };
 

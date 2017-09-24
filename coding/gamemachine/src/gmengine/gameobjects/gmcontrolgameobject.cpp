@@ -103,12 +103,11 @@ void GMControlGameObject::updateUI()
 		{
 			// 调整大小，防止拉伸
 			GMfloat scaling[] = { 1.f / scaleX, 1.f / scaleY, 1 };
-			GMPrimitiveUtil::scaleModel(*getModel(), scaling);
+			setScaling(linear_math::scale({ 1.f / scaleX, 1.f / scaleY, 1 }));
 
 			// 相对于左上角位置也不能变
 			GMRectF rect = toViewportCoord(d->geometry);
-			GMfloat trans[] = { rect.x, rect.y, 0 };
-			GMPrimitiveUtil::translateModelTo(*getModel(), trans);
+			setTranslate(linear_math::translate({ rect.x, rect.y, 0 }));
 		}
 
 		d->clientSize = nowClient;
