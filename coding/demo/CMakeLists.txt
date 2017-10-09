@@ -29,6 +29,8 @@ link_libraries(
 	)
 
 set(SOURCES
+		demostration_world.h
+		demostration_world.cpp
 		main.cpp
 	)
 
