@@ -150,9 +150,12 @@ void GMGlyphObject::update()
 //////////////////////////////////////////////////////////////////////////
 GMImage2DGameObject::~GMImage2DGameObject()
 {
+	D(d);
 	GMModel* model = getModel();
 	if (model)
 		delete model;
+	if (d->textModel)
+		delete d->textModel;
 }
 
 void GMImage2DGameObject::setImage(GMAsset& image)
@@ -160,6 +163,14 @@ void GMImage2DGameObject::setImage(GMAsset& image)
 	D(d);
 	d->image = GMAssets::getTexture(image);
 	GM_ASSERT(d->image);
+}
+
+void GMImage2DGameObject::setText(const GMString& text)
+{
+	D(d);
+	d->text = text.toStdWString();
+	if (!d->text.empty())
+		d->textModel = new GMGlyphObject();
 }
 
 void GMImage2DGameObject::onAppendingObjectToWorld()
@@ -179,6 +190,24 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 
 	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(&asset);
+
+	if (d->textModel)
+	{
+		d->textModel->setWorld(getWorld());
+		d->textModel->setGeometry(db->geometry);
+		d->textModel->setText(d->text.c_str());
+		d->textModel->onAppendingObjectToWorld();
+		GM.initObjectPainter(d->textModel->getModel());
+		GMAssets::createIsolatedAsset(GMAssetType::Model, d->textModel);
+	}
+}
+
+void GMImage2DGameObject::draw()
+{
+	D(d);
+	Base::draw();
+	if (d->textModel)
+		d->textModel->draw();
 }
 
 void GMImage2DGameObject::onCreateShader(Shader& shader)

@@ -38,9 +38,9 @@ public:
 public:
 	inline void setAutoResize(bool b) { D(d); d->autoResize = b; }
 
-private:
-	virtual void draw() override;
+public:
 	virtual void onAppendingObjectToWorld() override;
+	virtual void draw() override;
 
 private:
 	void constructModel();
@@ -55,11 +55,15 @@ protected:
 GM_PRIVATE_OBJECT(GMImage2DGameObject)
 {
 	ITexture* image = nullptr;
+	AUTORELEASE GMGlyphObject* textModel = nullptr;
+	std::wstring text;
 };
 
 class GMImage2DGameObject : public GMControlGameObject, public IPrimitiveCreatorShaderCallback
 {
 	DECLARE_PRIVATE(GMImage2DGameObject)
+
+	typedef GMControlGameObject Base;
 
 public:
 	GMImage2DGameObject() = default;
@@ -67,6 +71,7 @@ public:
 
 public:
 	void setImage(GMAsset& asset);
+	void setText(const GMString& text);
 
 	//IPrimitiveCreatorShaderCallback
 private:
@@ -74,6 +79,7 @@ private:
 
 private:
 	virtual void onAppendingObjectToWorld();
+	virtual void draw() override;
 };
 
 //////////////////////////////////////////////////////////////////////////

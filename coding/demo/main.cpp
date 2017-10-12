@@ -406,6 +406,7 @@ private:
 			//m_img->setStretch(false);
 			m_img->setGeometry(rect);
 			m_img->setImage(*asset);
+			m_img->setText(L"hello");
 			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseHover), [&](auto sender, auto receiver) {
 				//GM.postMessage(gm::GameMachineMessageType::Quit);
 				ms.setCursor(GMCursorType::Hand);
