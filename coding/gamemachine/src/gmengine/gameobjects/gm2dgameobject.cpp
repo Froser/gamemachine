@@ -92,6 +92,17 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
 	GMfloat &x = coord.x, &y = coord.y;
 
+	// 获取字符串高度
+	GMfloat maxHeight = 0;
+	while (*p)
+	{
+		const GlyphInfo& glyph = glyphManager->getChar(*p);
+		if (maxHeight < glyph.height)
+			maxHeight = glyph.height;
+		++p;
+	}
+	p = str.c_str();
+
 	while (*p)
 	{
 		component->beginFace();
@@ -105,10 +116,10 @@ void GMGlyphObject::createVertices(GMComponent* component)
 			// 1 3
 			// 让所有字体origin开始的x轴平齐
 
-			component->vertex(x + X(glyph.bearingX), y + Y(glyph.bearingY), Z);
-			component->vertex(x + X(glyph.bearingX), y + Y(glyph.bearingY - glyph.height), Z);
-			component->vertex(x + X(glyph.bearingX + glyph.width), y + Y(glyph.bearingY), Z);
-			component->vertex(x + X(glyph.bearingX + glyph.width), y + Y(glyph.bearingY - glyph.height), Z);
+			component->vertex(x + X(glyph.bearingX), y - Y(maxHeight - glyph.bearingY), Z);
+			component->vertex(x + X(glyph.bearingX), y - Y(maxHeight - (glyph.bearingY - glyph.height)), Z);
+			component->vertex(x + X(glyph.bearingX + glyph.width), y - Y(maxHeight - glyph.bearingY), Z);
+			component->vertex(x + X(glyph.bearingX + glyph.width), y - Y(maxHeight - (glyph.bearingY - glyph.height)), Z);
 
 			component->uv(UV_X(glyph.x), UV_Y(glyph.y));
 			component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
@@ -118,7 +129,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 		x += X(glyph.advance);
 
 		component->endFace();
-		p++;
+		++p;
 	}
 }
 
@@ -186,7 +197,6 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 	GMModel* model = nullptr;
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
 	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
-	model->setUsageHint(GMUsageHint::DynamicDraw);
 
 	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(&asset);
@@ -214,9 +224,13 @@ void GMImage2DGameObject::onCreateShader(Shader& shader)
 {
 	D(d);
 	shader.setNoDepthTest(true);
-	auto& tex = shader.getTexture();
-	auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
-	frames.addFrame(d->image);
+
+	if (d->image)
+	{
+		auto& tex = shader.getTexture();
+		auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
+		frames.addFrame(d->image);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

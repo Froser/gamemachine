@@ -541,7 +541,7 @@ private:
 			&emitter
 		);
 #endif
-		demo->appendObject("particles", emitter);
+		//demo->appendObject("particles", emitter);
 #endif
 		GMBuffer buffer;
 		pk->readFile(GMPackageIndex::Scripts, "helloworld.lua", &buffer);
@@ -609,11 +609,12 @@ private:
 #if EMITTER_DEMO
 				emitter->getEmitterPropertiesReference().position += linear_math::Vector3(.001f, 0, 0);
 #endif
-
+				
 				GMGameObject* obj = demo->findGameObject("cube");
 				linear_math::Quaternion q;
 				q.setRotation(dir, a);
 				obj->setRotation(q);
+				
 				demo->renderGameWorld();
 
 				demo->endUseStencil();

@@ -16,7 +16,7 @@ struct GlyphInfo
 	GMfloat advance;
 };
 
-typedef std::map<GMWchar, GlyphInfo> CharList;
+typedef Map<GMWchar, GlyphInfo> CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
