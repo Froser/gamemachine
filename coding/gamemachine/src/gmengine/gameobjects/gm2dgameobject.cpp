@@ -47,8 +47,8 @@ void GMGlyphObject::constructModel()
 	shader.setNoDepthTest(true);
 	shader.setCull(GMS_Cull::NONE);
 	shader.setBlend(true);
-	shader.setBlendFactorSource(GMS_BlendFunc::ONE);
-	shader.setBlendFactorDest(GMS_BlendFunc::ONE);
+	shader.setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
+	shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_DST_COLOR);
 
 	createVertices(component);
 	child->appendComponent(component);
@@ -223,6 +223,7 @@ void GMImage2DGameObject::draw()
 void GMImage2DGameObject::onCreateShader(Shader& shader)
 {
 	D(d);
+	shader.setBlend(false);
 	shader.setNoDepthTest(true);
 
 	if (d->image)

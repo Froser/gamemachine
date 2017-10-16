@@ -37,6 +37,9 @@ void GMGLRenders_Object::activateShader()
 			case GMS_BlendFunc::ONE:
 				factors[i] = GL_ONE;
 				break;
+			case GMS_BlendFunc::SRC_COLOR:
+				factors[i] = GL_SRC_COLOR;
+				break;
 			case GMS_BlendFunc::DST_COLOR:
 				factors[i] = GL_DST_COLOR;
 				break;
@@ -48,6 +51,9 @@ void GMGLRenders_Object::activateShader()
 				break;
 			case GMS_BlendFunc::ONE_MINUS_SRC_ALPHA:
 				factors[i] = GL_ONE_MINUS_SRC_ALPHA;
+				break;
+			case GMS_BlendFunc::ONE_MINUS_DST_COLOR:
+				factors[i] = GL_ONE_MINUS_DST_COLOR;
 				break;
 			default:
 				GM_ASSERT(false);

@@ -90,10 +90,12 @@ enum class GMS_BlendFunc
 {
 	ZERO = 0,
 	ONE,
+	SRC_COLOR,
 	DST_COLOR,
 	SRC_ALPHA,
 	DST_ALPHA,
 	ONE_MINUS_SRC_ALPHA,
+	ONE_MINUS_DST_COLOR,
 };
 
 enum class GMS_Cull
