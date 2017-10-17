@@ -77,10 +77,10 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/gameobjects/gmcontrolgameobject.h
 		gmengine/gameobjects/gmcontrolgameobject.cpp
-		gmgl/renders/gmgl_renders_glyph.h
-		gmgl/renders/gmgl_renders_glyph.cpp
-		gmgl/renders/gmgl_renders_object.h
-		gmgl/renders/gmgl_renders_object.cpp
+		gmgl/renders/gmgl_renders_2d.h
+		gmgl/renders/gmgl_renders_2d.cpp
+		gmgl/renders/gmgl_renders_3d.h
+		gmgl/renders/gmgl_renders_3d.cpp
 		gmgl/renders/gmgl_renders_particle.h
 		gmgl/renders/gmgl_renders_particle.cpp
 		gmgl/renders/gmgl_renders_lightpass.h

@@ -5,8 +5,8 @@
 #include "gmdatacore/gmmodel.h"
 #include "gmgltexture.h"
 #include "gmglmodelpainter.h"
-#include "renders/gmgl_renders_object.h"
-#include "renders/gmgl_renders_glyph.h"
+#include "renders/gmgl_renders_3d.h"
+#include "renders/gmgl_renders_2d.h"
 #include "renders/gmgl_renders_particle.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmstates.h"
@@ -182,8 +182,8 @@ void GMGLGraphicEngine::installShaders()
 	D(d);
 	// 按照Object顺序创建renders
 	IRender* renders[] = {
-		new GMGLRenders_Object(),
-		new GMGLRenders_Glyph(),
+		new GMGLRenders_3D(),
+		new GMGLRenders_2D(),
 		new GMGLRenders_Particle(),
 	};
 

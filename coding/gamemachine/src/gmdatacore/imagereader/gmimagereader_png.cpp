@@ -137,11 +137,16 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
-	data.internalFormat = GL_RGB16;
 	if (png.hasAlpha)
+	{
+		data.internalFormat = GL_RGBA8;
 		data.format = GL_RGBA;
+	}
 	else
+	{
+		data.internalFormat = GL_RGB8;
 		data.format = GL_RGB;
+	}
 
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;

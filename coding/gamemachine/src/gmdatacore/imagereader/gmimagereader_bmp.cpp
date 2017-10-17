@@ -126,7 +126,7 @@ void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuin
 #if USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
-	data.internalFormat = GL_RGB16;
+	data.internalFormat = GL_RGB8;
 	data.format = GL_BGR;
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;

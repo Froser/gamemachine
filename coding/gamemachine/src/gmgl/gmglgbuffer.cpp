@@ -434,6 +434,9 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 
 		releaseBind();
 		GMEngine->setViewport(d->clientRect);
+
+		// 处理融混
+		blending();
 		renderQuad();
 	}
 }
@@ -511,9 +514,8 @@ void GMGLFramebuffer::createQuad()
 	}
 }
 
-void GMGLFramebuffer::renderQuad()
+void GMGLFramebuffer::blending()
 {
-	D(d);
 	if (!GMEngine->isBlending())
 	{
 		glDisable(GL_BLEND);
@@ -523,7 +525,11 @@ void GMGLFramebuffer::renderQuad()
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_ONE, GL_ONE);
 	}
+}
 
+void GMGLFramebuffer::renderQuad()
+{
+	D(d);
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_CULL_FACE);
 

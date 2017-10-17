@@ -6,7 +6,7 @@
 #include "gmgl/gmglgraphic_engine.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMGLRenders_Object)
+GM_PRIVATE_OBJECT(GMGLRenders_3D)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	GMMesh* mesh = nullptr;
@@ -18,12 +18,12 @@ GM_PRIVATE_OBJECT(GMGLRenders_Object)
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
 
-class GMGLRenders_Object : public GMObject, public IRender
+class GMGLRenders_3D : public GMObject, public IRender
 {
-	DECLARE_PRIVATE(GMGLRenders_Object)
+	DECLARE_PRIVATE(GMGLRenders_3D)
 
 public:
-	GMGLRenders_Object();
+	GMGLRenders_3D();
 
 public:
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override;

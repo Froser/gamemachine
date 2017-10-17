@@ -132,6 +132,7 @@ private:
 	void releaseBind();
 	void newFrame();
 	void createQuad();
+	void blending();
 	void renderQuad();
 	void disposeQuad();
 	const char* useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMEffects effect);

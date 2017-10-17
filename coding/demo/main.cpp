@@ -615,6 +615,7 @@ private:
 				q.setRotation(dir, a);
 				obj->setRotation(q);
 				
+				
 				demo->renderGameWorld();
 
 				demo->endUseStencil();

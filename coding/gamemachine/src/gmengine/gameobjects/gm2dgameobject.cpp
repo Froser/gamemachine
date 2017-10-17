@@ -34,7 +34,6 @@ void GMGlyphObject::constructModel()
 	D(d);
 	D_BASE(db, GMGameObject);
 
-	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	GMModel* model = new GMModel();
 	GMMesh* child = new GMMesh();
 	model->append(child);
@@ -42,19 +41,22 @@ void GMGlyphObject::constructModel()
 	child->setType(GMMeshType::Model2D);
 
 	GMComponent* component = new GMComponent(child);
-	Shader& shader = component->getShader();
-	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(glyphManager->glyphTexture());
-	shader.setNoDepthTest(true);
-	shader.setCull(GMS_Cull::NONE);
-	shader.setBlend(true);
-	shader.setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
-	shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_DST_COLOR);
-
 	createVertices(component);
 	child->appendComponent(component);
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(&asset);
+}
+
+void GMGlyphObject::onCreateShader(Shader& shader)
+{
+	GMGlyphManager* glyphManager = GM.getGlyphManager();
+	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(glyphManager->glyphTexture());
+	shader.setNoDepthTest(true);
+	shader.setCull(GMS_Cull::NONE);
+	//shader.setBlend(false);
+	//shader.setBlendFactorSource(GMS_BlendFunc::ONE);
+	//shader.setBlendFactorDest(GMS_BlendFunc::ONE);
 }
 
 void GMGlyphObject::updateModel()
@@ -129,6 +131,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 		x += X(glyph.advance);
 
 		component->endFace();
+		onCreateShader(component->getShader());
 		++p;
 	}
 }

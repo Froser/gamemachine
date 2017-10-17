@@ -46,6 +46,7 @@ private:
 	void constructModel();
 	void updateModel();
 	void createVertices(GMComponent* component);
+	void onCreateShader(Shader& shader);
 
 protected:
 	virtual void updateUI() {} //Ignore base

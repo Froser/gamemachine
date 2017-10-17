@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmgl_renders_object.h"
+#include "gmgl_renders_3d.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmgltexture.h"
@@ -7,13 +7,13 @@
 #include <linearmath.h>
 #include "foundation/gamemachine.h"
 
-GMGLRenders_Object::GMGLRenders_Object()
+GMGLRenders_3D::GMGLRenders_3D()
 {
 	D(d);
 	d->engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
 }
 
-void GMGLRenders_Object::activateShader()
+void GMGLRenders_3D::activateShader()
 {
 	D(d);
 	GM_ASSERT(d->shader);
@@ -99,7 +99,7 @@ void GMGLRenders_Object::activateShader()
 	glLineWidth(shader->getLineWidth());
 }
 
-void GMGLRenders_Object::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform)
+void GMGLRenders_3D::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform)
 {
 	D(d);
 	d->mesh = mesh;
@@ -111,7 +111,7 @@ void GMGLRenders_Object::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* mo
 		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
 }
 
-void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
+void GMGLRenders_3D::beginShader(Shader& shader, GMDrawMode mode)
 {
 	D(d);
 	d->shader = &shader;
@@ -153,7 +153,7 @@ void GMGLRenders_Object::beginShader(Shader& shader, GMDrawMode mode)
 	drawDebug();
 }
 
-void GMGLRenders_Object::endShader()
+void GMGLRenders_3D::endShader()
 {
 	D(d);
 	if (d->shader->getBlend())
@@ -172,7 +172,7 @@ void GMGLRenders_Object::endShader()
 		d->shader->pop();
 }
 
-void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
+void GMGLRenders_3D::drawTexture(GMTextureType type, GMint index)
 {
 	D(d);
 	if (GMGetDebugState(DRAW_LIGHTMAP_ONLY) && type != GMTextureType::LIGHTMAP)
@@ -191,11 +191,11 @@ void GMGLRenders_Object::drawTexture(GMTextureType type, GMint index)
 	}
 }
 
-void GMGLRenders_Object::end()
+void GMGLRenders_3D::end()
 {
 }
 
-void GMGLRenders_Object::activateLights(const GMLight* lights, GMint count)
+void GMGLRenders_3D::activateLights(const GMLight* lights, GMint count)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
@@ -235,7 +235,7 @@ void GMGLRenders_Object::activateLights(const GMLight* lights, GMint count)
 	shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
-void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
+void GMGLRenders_3D::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
@@ -251,7 +251,7 @@ void GMGLRenders_Object::updateVPMatrices(const linear_math::Matrix4x4& projecti
 	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
 }
 
-GMGLShaderProgram* GMGLRenders_Object::getShaderProgram()
+GMGLShaderProgram* GMGLRenders_3D::getShaderProgram()
 {
 	D(d);
 	if (!d->gmglShaderProgram ||
@@ -266,7 +266,7 @@ GMGLShaderProgram* GMGLRenders_Object::getShaderProgram()
 	return d->gmglShaderProgram;
 }
 
-ITexture* GMGLRenders_Object::getTexture(GMTextureFrames& frames)
+ITexture* GMGLRenders_3D::getTexture(GMTextureFrames& frames)
 {
 	D(d);
 	if (frames.getFrameCount() == 0)
@@ -282,7 +282,7 @@ ITexture* GMGLRenders_Object::getTexture(GMTextureFrames& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
-void GMGLRenders_Object::activateMaterial(const Shader& shader)
+void GMGLRenders_3D::activateMaterial(const Shader& shader)
 {
 	D(d);
 	const GMMaterial& material = shader.getMaterial();
@@ -293,14 +293,14 @@ void GMGLRenders_Object::activateMaterial(const Shader& shader)
 	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.shininess);
 }
 
-void GMGLRenders_Object::drawDebug()
+void GMGLRenders_3D::drawDebug()
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
 }
 
-void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint index)
+void GMGLRenders_3D::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
@@ -346,7 +346,7 @@ void GMGLRenders_Object::activateTextureTransform(GMTextureType type, GMint inde
 	}
 }
 
-void GMGLRenders_Object::activateTexture(GMTextureType type, GMint index)
+void GMGLRenders_3D::activateTexture(GMTextureType type, GMint index)
 {
 	D(d);
 	GMint idx = (GMint)type;
@@ -367,7 +367,7 @@ void GMGLRenders_Object::activateTexture(GMTextureType type, GMint index)
 	glActiveTexture(tex);
 }
 
-void GMGLRenders_Object::deactivateTexture(GMTextureType type, GMint index)
+void GMGLRenders_3D::deactivateTexture(GMTextureType type, GMint index)
 {
 	D(d);
 	GLenum tex;
@@ -382,7 +382,7 @@ void GMGLRenders_Object::deactivateTexture(GMTextureType type, GMint index)
 	shaderProgram->setInt(u, 0);
 }
 
-void GMGLRenders_Object::getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId)
+void GMGLRenders_3D::getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId)
 {
 	switch (type)
 	{
