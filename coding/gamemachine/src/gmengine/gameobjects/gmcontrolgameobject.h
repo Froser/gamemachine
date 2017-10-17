@@ -100,8 +100,6 @@ public:
 
 public:
 	virtual void notifyControl();
-
-public:
 	virtual bool canDeferredRendering() override { return false; }
 
 protected:

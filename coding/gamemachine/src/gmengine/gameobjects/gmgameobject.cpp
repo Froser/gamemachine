@@ -64,10 +64,13 @@ GMGameWorld* GMGameObject::getWorld()
 
 void GMGameObject::draw()
 {
-	GMfloat transform[16];
-	getTransform().toArray(transform);
 	GMModel* coreObj = getModel();
-	coreObj->getPainter()->draw(transform);
+	if (coreObj)
+	{
+		GMfloat transform[16];
+		getTransform().toArray(transform);
+		coreObj->getPainter()->draw(transform);
+	}
 }
 
 bool GMGameObject::canDeferredRendering()

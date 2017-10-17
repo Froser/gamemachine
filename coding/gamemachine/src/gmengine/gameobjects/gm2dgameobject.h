@@ -74,32 +74,51 @@ public:
 	void setImage(GMAsset& asset);
 	void setText(const GMString& text);
 
+public:
+	virtual void onAppendingObjectToWorld();
+	virtual void draw() override;
+
 	//IPrimitiveCreatorShaderCallback
 private:
 	virtual void onCreateShader(Shader& shader) override;
-
-private:
-	virtual void onAppendingObjectToWorld();
-	virtual void draw() override;
 };
 
 //////////////////////////////////////////////////////////////////////////
 GM_PRIVATE_OBJECT(GMListbox2DGameObject)
 {
-	Vector<GMString> items;
-	Vector<GMModel*> itemModels;
+	Vector<GMImage2DGameObject*> items;
+	GMfloat margins[4] = { 0 };
 };
 
-class GMListbox2DGameObject : public GMControlGameObject, public IPrimitiveCreatorShaderCallback
+class GMListbox2DGameObject : public GMImage2DGameObject
 {
 	DECLARE_PRIVATE(GMListbox2DGameObject);
 
+	typedef GMImage2DGameObject Base;
+
+	enum Margins
+	{
+		Left = 0,
+		Top,
+		Right,
+		Bottom,
+	};
+
 public:
 	GMListbox2DGameObject() = default;
+	~GMListbox2DGameObject();
+
+public:
+	GMImage2DGameObject* addItem(const GMString& text);
+	void setItemMargins(GMfloat left, GMfloat top, GMfloat right, GMfloat bottom);
+
+public:
+	virtual void onAppendingObjectToWorld();
 
 private:
 	virtual void onCreateShader(Shader& shader) override;
-	virtual void onAppendingObjectToWorld();
+	virtual void draw() override;
+	virtual void notifyControl() override;
 };
 
 END_NS

@@ -191,6 +191,7 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
+	Base::onAppendingObjectToWorld();
 	GMRectF coord = toViewportCoord(db->geometry);
 	GMfloat extents[3] = {
 		coord.width,
@@ -238,6 +239,33 @@ void GMImage2DGameObject::onCreateShader(Shader& shader)
 }
 
 //////////////////////////////////////////////////////////////////////////
+GMListbox2DGameObject::~GMListbox2DGameObject()
+{
+	D(d);
+	for (auto& item : d->items)
+	{
+		delete item;
+	}
+}
+
+GMImage2DGameObject* GMListbox2DGameObject::addItem(const GMString& text)
+{
+	D(d);
+	GMImage2DGameObject* item = new GMImage2DGameObject();
+	item->setText(text);
+	d->items.push_back(item);
+	return item;
+}
+
+void GMListbox2DGameObject::setItemMargins(GMfloat left, GMfloat top, GMfloat right, GMfloat bottom)
+{
+	D(d);
+	d->margins[Left] = left;
+	d->margins[Top] = top;
+	d->margins[Right] = right;
+	d->margins[Bottom] = bottom;
+}
+
 void GMListbox2DGameObject::onCreateShader(Shader& shader)
 {
 	D(d);
@@ -248,17 +276,49 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
-	GMRectF coord = toViewportCoord(db->geometry);
-	GMfloat extents[3] = {
-		coord.width,
-		coord.height,
-		1.f,
-	};
-	GMModel* model = nullptr;
-	GMfloat pos[3] = { coord.x, coord.y, 0 };
-	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
-	model->setUsageHint(GMUsageHint::DynamicDraw);
 
-	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
-	setModel(&asset);
+	Base::onAppendingObjectToWorld();
+	auto x = db->geometry.x + d->margins[Left],
+		y = db->geometry.y + d->margins[Top];
+
+	for (auto item : d->items)
+	{
+		static GMRect rect;
+		rect.x = x;
+		rect.y = y;
+		rect.width = db->geometry.width - d->margins[Left] - d->margins[Right];
+		rect.height = db->geometry.height;
+		item->setGeometry(rect);
+		item->setWorld(getWorld());
+		item->onAppendingObjectToWorld();
+		GM.initObjectPainter(item->getModel());
+
+		y += rect.height + d->margins[Top] + d->margins[Bottom];
+	}
+}
+
+void GMListbox2DGameObject::draw()
+{
+	D(d);
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->beginCreateStencil();
+	Base::draw();
+	engine->endCreateStencil();
+
+	engine->beginUseStencil(true);
+	for (auto item : d->items)
+	{
+		item->draw();
+	}
+	engine->endUseStencil();
+}
+
+void GMListbox2DGameObject::notifyControl()
+{
+	D(d);
+	Base::notifyControl();
+	for (auto item : d->items)
+	{
+		item->notifyControl();
+	}
 }
