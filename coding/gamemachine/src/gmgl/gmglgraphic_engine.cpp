@@ -559,7 +559,6 @@ void GMGLGraphicEngine::beginCreateStencil()
 	D(d);
 	d->stencilRenderModeCache = GMGetRenderState(RENDER_MODE);
 	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
-	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_STENCIL_TEST);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glStencilMask(0xFF);
@@ -585,6 +584,7 @@ void GMGLGraphicEngine::beginUseStencil(bool inverse)
 void GMGLGraphicEngine::endUseStencil()
 {
 	glDisable(GL_STENCIL_TEST);
+	glClear(GL_STENCIL_BUFFER_BIT);
 }
 
 void GMGLGraphicEngine::beginBlend()

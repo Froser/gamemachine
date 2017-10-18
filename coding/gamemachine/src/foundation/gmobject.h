@@ -66,8 +66,7 @@ private:
 template <typename T>
 GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 {
-	GMObjectPrivateBase() : parent(nullptr) {}
-	mutable T* parent;
+	mutable T* __parent = nullptr;
 };
 
 #define DECLARE_PRIVATE(className)															\
@@ -80,7 +79,7 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 				const_cast<gm::GMObjectPrivateWrapper<className##Private>*>(&m_data)); }	\
 	protected:																				\
 		className##Private* data() const { if (!m_data.data()) return nullptr;				\
-			m_data.data()->parent = const_cast<className*>(this); return m_data.data();}
+			m_data.data()->__parent = const_cast<className*>(this); return m_data.data();}
 
 // 获取私有成员
 #define D(d) auto d = data()

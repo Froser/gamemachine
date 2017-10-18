@@ -67,7 +67,7 @@ class GMImage2DGameObject : public GMControlGameObject, public IPrimitiveCreator
 	typedef GMControlGameObject Base;
 
 public:
-	GMImage2DGameObject() = default;
+	using GMControlGameObject::GMControlGameObject;
 	~GMImage2DGameObject();
 
 public:
@@ -86,7 +86,6 @@ private:
 //////////////////////////////////////////////////////////////////////////
 GM_PRIVATE_OBJECT(GMListbox2DGameObject)
 {
-	Vector<GMImage2DGameObject*> items;
 	GMfloat margins[4] = { 0 };
 };
 
@@ -106,7 +105,6 @@ class GMListbox2DGameObject : public GMImage2DGameObject
 
 public:
 	GMListbox2DGameObject() = default;
-	~GMListbox2DGameObject();
 
 public:
 	GMImage2DGameObject* addItem(const GMString& text);
@@ -119,6 +117,9 @@ private:
 	virtual void onCreateShader(Shader& shader) override;
 	virtual void draw() override;
 	virtual void notifyControl() override;
+
+private:
+	inline Vector<GMControlGameObject*> getItems() { D_BASE(db, GMControlGameObject); return db->children; }
 };
 
 END_NS

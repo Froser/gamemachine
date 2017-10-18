@@ -20,17 +20,23 @@ bool GM2DMouseDownEvent::buttonDown(Button button)
 	return false;
 }
 //////////////////////////////////////////////////////////////////////////
-GMControlGameObject::GMControlGameObject()
+GMControlGameObject::GMControlGameObject(GMControlGameObject* parent)
 {
 	D(d);
+	if (parent)
+		parent->addChild(this);
+
 	GMRect client = GM.getMainWindow()->getClientRect();
 	d->clientSize = client;
 }
 
-void GMControlGameObject::setGeometry(const GMRect& rect)
+GMControlGameObject::~GMControlGameObject()
 {
 	D(d);
-	d->geometry = rect;
+	for (auto& child : d->children)
+	{
+		delete child;
+	}
 }
 
 void GMControlGameObject::notifyControl()
@@ -79,7 +85,9 @@ void GMControlGameObject::event(GMControlEvent* e)
 bool GMControlGameObject::insideGeometry(GMint x, GMint y)
 {
 	D(d);
-	return GM_in_rect(d->geometry, x, y);
+	return d->parent ?
+		d->parent->insideGeometry(x, y) && GM_in_rect(d->geometry, x, y) :
+		GM_in_rect(d->geometry, x, y);
 }
 
 void GMControlGameObject::updateUI()
@@ -125,4 +133,11 @@ GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 		(GMfloat)in.height / client.height
 	};
 	return out;
+}
+
+void GMControlGameObject::addChild(GMControlGameObject* child)
+{
+	D(d);
+	child->setParent(this);
+	d->children.push_back(child);
 }

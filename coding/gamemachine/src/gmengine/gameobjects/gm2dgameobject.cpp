@@ -239,21 +239,17 @@ void GMImage2DGameObject::onCreateShader(Shader& shader)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMListbox2DGameObject::~GMListbox2DGameObject()
-{
-	D(d);
-	for (auto& item : d->items)
-	{
-		delete item;
-	}
-}
-
 GMImage2DGameObject* GMListbox2DGameObject::addItem(const GMString& text)
 {
 	D(d);
-	GMImage2DGameObject* item = new GMImage2DGameObject();
+	GMImage2DGameObject* item = new GMImage2DGameObject(this);
 	item->setText(text);
-	d->items.push_back(item);
+
+	GMRect geo = getGeometry();
+	geo.x = geo.y = 0;
+	item->setGeometry(geo);
+
+	getItems().push_back(item);
 	return item;
 }
 
@@ -281,13 +277,13 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 	auto x = db->geometry.x + d->margins[Left],
 		y = db->geometry.y + d->margins[Top];
 
-	for (auto item : d->items)
+	for (auto item : getItems())
 	{
 		static GMRect rect;
 		rect.x = x;
 		rect.y = y;
-		rect.width = db->geometry.width - d->margins[Left] - d->margins[Right];
-		rect.height = db->geometry.height;
+		rect.width = item->getGeometry().width - d->margins[Left] - d->margins[Right];
+		rect.height = item->getGeometry().height;
 		item->setGeometry(rect);
 		item->setWorld(getWorld());
 		item->onAppendingObjectToWorld();
@@ -305,8 +301,8 @@ void GMListbox2DGameObject::draw()
 	Base::draw();
 	engine->endCreateStencil();
 
-	engine->beginUseStencil(true);
-	for (auto item : d->items)
+	engine->beginUseStencil(false);
+	for (auto item : getItems())
 	{
 		item->draw();
 	}
@@ -317,7 +313,7 @@ void GMListbox2DGameObject::notifyControl()
 {
 	D(d);
 	Base::notifyControl();
-	for (auto item : d->items)
+	for (auto item : getItems())
 	{
 		item->notifyControl();
 	}

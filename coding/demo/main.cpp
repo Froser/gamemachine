@@ -348,7 +348,7 @@ public:
 	GMSpriteGameObject* m_sprite;
 	GMBSPGameWorld* m_world;
 	GMGlyphObject* m_glyph;
-	GMImage2DGameObject* m_img;
+	GMListbox2DGameObject* m_list;
 };
 
 class DemoGameHandler : public GameHandler
@@ -401,25 +401,38 @@ private:
 
 			GMAsset* asset = demo->getAssets().insertAsset(GMAssetType::Texture, tex);
 
-			m_img = new GMImage2DGameObject();
-			GMRect rect = { 100,100,141,61 };
-			//m_img->setStretch(false);
-			m_img->setGeometry(rect);
-			m_img->setImage(*asset);
-			m_img->setText(L"hello");
-			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseHover), [&](auto sender, auto receiver) {
-				//GM.postMessage(gm::GameMachineMessageType::Quit);
+			m_list = new GMListbox2DGameObject();
+			m_list->setItemMargins(5, 5, 5, 5);
+			GMRect rect = { 100,100,140,50 };
+			m_list->setGeometry(rect);
+
+			GMImage2DGameObject* imgobj = m_list->addItem("hello");
+			imgobj->setImage(*asset);
+			imgobj->setHeight(30);
+			imgobj->attachEvent(*imgobj, GM_CONTROL_EVENT_ENUM(MouseHover), [&](auto sender, auto receiver) {
 				ms.setCursor(GMCursorType::Hand);
 				OutputDebugStringA("Mouse hover\n");
 			});
-			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseLeave), [&](auto sender, auto receiver) {
+			imgobj->attachEvent(*imgobj, GM_CONTROL_EVENT_ENUM(MouseLeave), [&](auto sender, auto receiver) {
 				ms.setCursor(GMCursorType::Arrow);
 				OutputDebugStringA("Mouse Leave\n");
 			});
-			m_img->attachEvent(*m_img, GM_CONTROL_EVENT_ENUM(MouseDown), [&](auto sender, auto receiver) {
+			imgobj->attachEvent(*imgobj, GM_CONTROL_EVENT_ENUM(MouseDown), [&](auto sender, auto receiver) {
 				GM.postMessage(gm::GameMachineMessageType::Quit);
 			});
-			demo->addControl(m_img);
+
+			auto imgobj2 = m_list->addItem("world");
+			imgobj2->setHeight(30);
+			imgobj2->setImage(*asset);
+			imgobj2->attachEvent(*imgobj2, GM_CONTROL_EVENT_ENUM(MouseLeave), [&](auto sender, auto receiver) {
+				ms.setCursor(GMCursorType::Arrow);
+			});
+			imgobj2->attachEvent(*imgobj2, GM_CONTROL_EVENT_ENUM(MouseHover), [&](auto sender, auto receiver) {
+				ms.setCursor(GMCursorType::Hand);
+			});
+			m_list->addItem("how are you")->setImage(*asset);
+
+			demo->addControl(m_list);
 		}
 
 		{
@@ -601,8 +614,6 @@ private:
 				//mask->draw();
 				demo->endCreateStencil();
 
-				demo->beginUseStencil(true);
-
 				if (rotate)
 					a += .01f;
 
@@ -618,7 +629,6 @@ private:
 				
 				demo->renderGameWorld();
 
-				demo->endUseStencil();
 				break;
 			}
 		case gm::GameMachineEvent::Activate:

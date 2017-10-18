@@ -80,10 +80,12 @@ public:
 //////////////////////////////////////////////////////////////////////////
 GM_PRIVATE_OBJECT(GMControlGameObject)
 {
+	GMControlGameObject* parent = nullptr;
 	GMRect geometry{ 0 };
 	GMRect clientSize{ 0 };
 	bool mouseHovered = false;
 	bool stretch = true;
+	Vector<GMControlGameObject*> children;
 };
 
 class GMControlGameObject : public GMGameObject
@@ -93,10 +95,15 @@ class GMControlGameObject : public GMGameObject
 	GM_DECLARE_PROPERTY(Stretch, stretch, bool);
 
 public:
-	GMControlGameObject();
+	GMControlGameObject(GMControlGameObject* parent = nullptr);
+	~GMControlGameObject();
 
 public:
-	void setGeometry(const GMRect& rect);
+	inline void setParent(GMControlGameObject* parent) { D(d); d->parent = parent; }
+	inline const GMRect& getGeometry() { D(d); return d->geometry; }
+	inline void setGeometry(const GMRect& rect) { D(d); d->geometry = rect; }
+	inline void setWidth(GMint width) { D(d); d->geometry.width = width; }
+	inline void setHeight(GMint height) { D(d); d->geometry.height = height; }
 
 public:
 	virtual void notifyControl();
@@ -109,6 +116,9 @@ protected:
 
 protected:
 	static GMRectF toViewportCoord(const GMRect& in);
+
+private:
+	void addChild(GMControlGameObject* child);
 };
 
 

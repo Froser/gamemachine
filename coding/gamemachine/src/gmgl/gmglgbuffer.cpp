@@ -332,9 +332,15 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 	
 		glGenRenderbuffers(1, &d->depthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->renderWidth, d->renderHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_EXT, d->renderWidth, d->renderHeight);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			gm_error("FB incomplete error, status: 0x%x\n", status);
+			return false;
+		}
 		releaseBind();
 	}
 
@@ -363,8 +369,16 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 
 		glGenRenderbuffers(1, &d->fullscreenDepthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, d->fullscreenDepthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->clientRect.width, d->clientRect.height);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_EXT, d->clientRect.width, d->clientRect.height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
+		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			gm_error("FB incomplete error, status: 0x%x\n", status);
+			return false;
+		}
+
 		releaseBind();
 	}
 
