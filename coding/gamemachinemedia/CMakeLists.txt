@@ -51,7 +51,7 @@ if(WIN32)
 	add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 endif(WIN32)
 
-add_library(gamemachinemedia
+add_library(${PROJECT_NAME}
 		${SOURCES}
 	)
 

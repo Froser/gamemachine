@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
-project (demo)
+project (gamemachinedemo)
 init_solution()
 
 include_directories(
@@ -29,21 +29,28 @@ link_libraries(
 	)
 
 set(SOURCES
+		stdafx.cpp
+		stdafx.h
+		main.cpp
+
 		demostration_world.h
 		demostration_world.cpp
-		main.cpp
+		demo/simple.h
+		demo/simple.cpp
 	)
 
 source_group_by_dir(SOURCES)
 add_definitions(-DUNICODE -D_UNICODE)
 
-add_executable(demo
+add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS" ) 
 endif(MSVC)
+
+add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 link_dependencies(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} gamemachine)
