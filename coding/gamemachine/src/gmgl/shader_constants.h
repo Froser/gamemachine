@@ -45,6 +45,7 @@ BEGIN_NS
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
 
 //特效
+#define		GMSHADER_FRAMEBUFFER				GMSHADER("framebuffer")
 #define		GMSHADER_EFFECTS_TEXTURE_OFFSET_X	GMSHADER("effects_texture_offset_x")
 #define		GMSHADER_EFFECTS_TEXTURE_OFFSET_Y	GMSHADER("effects_texture_offset_y")
 #define		GMSHADER_EFFECTS_NONE				GMSHADER("effects_none")

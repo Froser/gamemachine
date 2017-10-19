@@ -423,6 +423,7 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);
 
 		bindForWriting();
+		turnOffBlending();
 		if (d->effects != GMEffects::None)
 		{
 			GMuint eff = GMEffects::None + 1;
@@ -528,6 +529,11 @@ void GMGLFramebuffer::createQuad()
 	}
 }
 
+void GMGLFramebuffer::turnOffBlending()
+{
+	glDisable(GL_BLEND);
+}
+
 void GMGLFramebuffer::blending()
 {
 	if (!GMEngine->isBlending())
@@ -569,7 +575,7 @@ const char* GMGLFramebuffer::useShaderProgramAndApplyEffect(GMGLShaderProgram* p
 {
 	D(d);
 	const char* uniformName = nullptr;
-	program->setInt("gFramebuffer", 0);
+	program->setInt(GMSHADER_FRAMEBUFFER, 0);
 	GM_CHECK_GL_ERROR();
 	glActiveTexture(GL_TEXTURE0);
 	if (d->useFullscreenFramebuffer)

@@ -41,6 +41,7 @@ void GMGlyphObject::constructModel()
 	child->setType(GMMeshType::Model2D);
 
 	GMComponent* component = new GMComponent(child);
+	onCreateShader(component->getShader());
 	createVertices(component);
 	child->appendComponent(component);
 
@@ -131,7 +132,6 @@ void GMGlyphObject::createVertices(GMComponent* component)
 		x += X(glyph.advance);
 
 		component->endFace();
-		onCreateShader(component->getShader());
 		++p;
 	}
 }

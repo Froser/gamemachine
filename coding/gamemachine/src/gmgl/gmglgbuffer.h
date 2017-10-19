@@ -132,6 +132,7 @@ private:
 	void releaseBind();
 	void newFrame();
 	void createQuad();
+	void turnOffBlending();
 	void blending();
 	void renderQuad();
 	void disposeQuad();

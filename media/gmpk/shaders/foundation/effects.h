@@ -1,4 +1,4 @@
-uniform sampler2D gFramebuffer;
+uniform sampler2D GM_framebuffer;
 
 uniform float GM_effects_texture_offset_x;
 uniform float GM_effects_texture_offset_y;

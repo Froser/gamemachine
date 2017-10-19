@@ -10,7 +10,6 @@ typedef Vector<GameHandlerItem> GameHandlers;
 GM_PRIVATE_OBJECT(DemostrationWorld)
 {
 	GameHandlers handlers;
-	Vector<gm::GMImage2DGameObject*> entrances;
 };
 
 class DemostrationWorld : public gm::GMGameWorld
@@ -19,7 +18,6 @@ class DemostrationWorld : public gm::GMGameWorld
 
 public:
 	DemostrationWorld() = default;
-	~DemostrationWorld();
 
 public:
 	void init(GameHandlers& handlers);
