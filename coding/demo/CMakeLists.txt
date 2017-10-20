@@ -12,6 +12,7 @@ include_directories(
 		../gamemachine/include
 		../gamemachineui/include
 		../gamemachinemedia/include
+		./
 	)
 
 link_directories(

@@ -87,6 +87,7 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual void addLight(const GMLight& light) = 0;
+	virtual void removeLights() = 0;
 	virtual void beginCreateStencil() = 0;
 	virtual void endCreateStencil() = 0;
 	virtual void beginUseStencil(bool inverse) = 0;

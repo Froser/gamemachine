@@ -87,6 +87,7 @@ public:
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual void addLight(const GMLight& light) override;
+	virtual void removeLights();
 	virtual void beginCreateStencil() override;
 	virtual void endCreateStencil() override;
 	virtual void beginUseStencil(bool inverse) override;

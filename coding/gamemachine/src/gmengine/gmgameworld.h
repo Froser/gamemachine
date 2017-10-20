@@ -50,7 +50,8 @@ public:
 	inline Vector<GMControlGameObject*>& getControls() { D(d); return d->controls; }
 	inline Vector<GMGameObject*>& getControlsGameObject() { D(d); return d->controls_objectType; }
 	inline const Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
-	inline void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
+	inline void addLight(const GMLight& light) { GM.getGraphicEngine()->addLight(light); }
+	inline void removeLights() { GM.getGraphicEngine()->removeLights(); }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 private:

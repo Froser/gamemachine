@@ -10,6 +10,18 @@ void loadDemostrations(DemostrationWorld* world)
 	world->init();
 }
 
+void DemoHandler::init()
+{
+	D(d);
+	d->inited = true;
+}
+
+bool DemoHandler::isInited()
+{
+	D(d);
+	return d->inited;
+}
+
 DemostrationWorld::~DemostrationWorld()
 {
 	D(d);
@@ -20,7 +32,7 @@ DemostrationWorld::~DemostrationWorld()
 	}
 }
 
-void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE gm::IGameHandler* demo)
+void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
 {
 	D(d);
 	GM_ASSERT(demo);
@@ -37,12 +49,17 @@ void DemostrationWorld::init()
 	{
 		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
 		item->setHeight(20);
+		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [&](gm::GMObject* sender, gm::GMObject* receiver) {
+			removeLights();
+			setCurrentDemo(demo.second);
+		});
 	}
 	addControl(listbox);
 }
 
 void DemostrationWorld::renderScene()
 {
+	D(d);
 	Base::renderScene();
 
 	gm::IGraphicEngine* engine = GM.getGraphicEngine();
@@ -74,11 +91,15 @@ void DemostrationEntrance::init()
 void DemostrationEntrance::start()
 {
 	D(d);
+	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+	inputManager->getMouseState().setMouseEnable(false);
+
 	loadDemostrations(d->world);
 }
 
 void DemostrationEntrance::event(gm::GameMachineEvent evt)
 {
+	D(d);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:
@@ -86,6 +107,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
+		getWorld()->notifyControls();
 		break;
 	case gm::GameMachineEvent::Render:
 		getWorld()->renderScene();
@@ -98,6 +120,14 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 		break;
 	default:
 		break;
+	}
+
+	DemoHandler* currentDemo = getWorld()->getCurrentDemo();
+	if (currentDemo)
+	{
+		if (!currentDemo->isInited())
+			currentDemo->init();
+		currentDemo->event(evt);
 	}
 }
 

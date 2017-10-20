@@ -557,6 +557,13 @@ void GMGLGraphicEngine::addLight(const GMLight& light)
 	d->needRefreshLights = true;
 }
 
+void GMGLGraphicEngine::removeLights()
+{
+	D(d);
+	d->lights.clear();
+	d->needRefreshLights = true;
+}
+
 void GMGLGraphicEngine::beginCreateStencil()
 {
 	D(d);

@@ -5,13 +5,28 @@
 #include <gm2dgameobject.h>
 #include <gmgl.h>
 
-typedef Pair<gm::GMString, gm::IGameHandler*> GameHandlerItem;
-typedef Vector<GameHandlerItem> GameHandlers;
+GM_PRIVATE_OBJECT(DemoHandler)
+{
+	bool inited = false;
+};
+
+class DemoHandler : public gm::GMObject
+{
+	DECLARE_PRIVATE(DemoHandler)
+
+public:
+	virtual void init();
+	virtual bool isInited();
+	virtual void event(gm::GameMachineEvent evt) = 0;
+};
+
+typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
+typedef Vector<GameHandlerItem> DemoHandlers;
 
 GM_PRIVATE_OBJECT(DemostrationWorld)
 {
-	GameHandlers demos;
-	gm::IGameHandler* currentDemo = nullptr;
+	DemoHandlers demos;
+	DemoHandler* currentDemo = nullptr;
 };
 
 namespace gm
@@ -30,12 +45,15 @@ public:
 	~DemostrationWorld();
 
 public:
-	void addDemo(const gm::GMString& name, AUTORELEASE gm::IGameHandler* demo);
+	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
+
+public:
+	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
 	void init();
 	void renderScene();
 
 private:
-	void setCurrentDemo(gm::IGameHandler* demo) { D(d); d->currentDemo = demo; }
+	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
 	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
 };
 

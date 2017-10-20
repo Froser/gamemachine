@@ -219,6 +219,16 @@ void GM_new_arr(OUT T** out, GMint cnt)
 	memset(*out, 0, cnt * sizeof(T));
 }
 
+template <typename T>
+inline void GM_delete(T*& o)
+{
+	if (o)
+	{
+		delete o;
+		o = nullptr;
+	}
+}
+
 #define LINE_MAX 10240
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
