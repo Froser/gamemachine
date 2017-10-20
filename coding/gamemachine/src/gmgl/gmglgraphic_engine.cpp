@@ -138,6 +138,9 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
 	GM_PROFILE(drawObjects);
+	if (!count)
+		return;
+
 	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
 	if (renderMode != d->renderMode)
 	{

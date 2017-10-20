@@ -89,10 +89,10 @@ GMGameObject* GMBSPGameWorld::getSky()
 	return d->sky;
 }
 
-void GMBSPGameWorld::renderGameWorld()
+void GMBSPGameWorld::renderScene()
 {
-	GM_PROFILE(renderGameWorld);
-	Base::renderGameWorld();
+	GM_PROFILE(renderScene);
+	Base::renderScene();
 	drawAll();
 }
 

@@ -10,7 +10,8 @@ typedef Vector<GameHandlerItem> GameHandlers;
 
 GM_PRIVATE_OBJECT(DemostrationWorld)
 {
-	GameHandlers handlers;
+	GameHandlers demos;
+	gm::IGameHandler* currentDemo = nullptr;
 };
 
 namespace gm
@@ -22,25 +23,25 @@ class DemostrationWorld : public gm::GMGameWorld
 {
 	DECLARE_PRIVATE(DemostrationWorld)
 
+	typedef gm::GMGameWorld Base;
+
 public:
 	DemostrationWorld() = default;
+	~DemostrationWorld();
 
 public:
-	void init(GameHandlers& handlers);
+	void addDemo(const gm::GMString& name, AUTORELEASE gm::IGameHandler* demo);
+	void init();
+	void renderScene();
 
 private:
-	void addMenu(GameHandlerItem& item);
-
-public:
-	virtual gm::GMPhysicsWorld* physicsWorld() override { return nullptr; }
-
-private:
-	static void mouseDownCallback(GMObject*, GMObject*);
+	void setCurrentDemo(gm::IGameHandler* demo) { D(d); d->currentDemo = demo; }
+	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
 };
 
 GM_PRIVATE_OBJECT(DemostrationEntrance)
 {
-	DemostrationWorld world;
+	DemostrationWorld* world = nullptr;
 };
 
 class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCallback
@@ -49,9 +50,10 @@ class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCall
 
 public:
 	DemostrationEntrance() = default;
+	~DemostrationEntrance();
 
 public:
-	inline DemostrationWorld& getWorld() { D(d); return d->world; }
+	inline DemostrationWorld* getWorld() { D(d); return d->world; }
 
 	// IShaderLoadCallback
 private:

@@ -45,30 +45,6 @@ void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
 	GM.initObjectPainter(obj->getModel());
 }
 
-void GMGameWorld::beginCreateStencil()
-{
-	IGraphicEngine* engine = GM. getGraphicEngine();
-	engine->beginCreateStencil();
-}
-
-void GMGameWorld::endCreateStencil()
-{
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->endCreateStencil();
-}
-
-void GMGameWorld::beginUseStencil(bool inverse)
-{
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginUseStencil(inverse);
-}
-
-void GMGameWorld::endUseStencil()
-{
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->endUseStencil();
-}
-
 bool GMGameWorld::removeObject(GMGameObject* obj)
 {
 	D(d);
@@ -100,7 +76,8 @@ void GMGameWorld::addControl(GMControlGameObject* control)
 	D(d);
 	control->setWorld(this);
 	control->onAppendingObjectToWorld();
-	d->controls.insert(control);
+	d->controls.push_back(control);
+	d->controls_objectType.push_back(control);
 	GM.initObjectPainter(control->getModel());
 }
 

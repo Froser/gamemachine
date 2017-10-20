@@ -24,8 +24,7 @@ public:
 	GMDemoGameWorld();
 
 public:
-	virtual void renderGameWorld() override;
-	virtual GMPhysicsWorld* physicsWorld() override;
+	virtual void renderScene() override;
 
 public:
 	bool appendObject(const GMString& name, GMGameObject* obj);

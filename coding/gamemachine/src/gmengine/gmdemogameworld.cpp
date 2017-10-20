@@ -7,28 +7,18 @@ GMDemoGameWorld::GMDemoGameWorld()
 {
 }
 
-void GMDemoGameWorld::renderGameWorld()
+void GMDemoGameWorld::renderScene()
 {
 	D(d);
-	Base::renderGameWorld();
+	Base::renderScene();
 
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
 	engine->drawObjects(d->gameObjects.data(), d->gameObjects.size());
 
 	engine->beginBlend();
-	auto& controls = getControls();
-	Vector<GMGameObject*> cs;
-	for (auto& control : controls)
-	{ 
-		cs.push_back(control);
-	}
-	engine->drawObjects(cs.data(), cs.size());
+	auto& controls = getControlsGameObject();
+	engine->drawObjects(controls.data(), controls.size());
 	engine->endBlend();
-}
-
-GMPhysicsWorld* GMDemoGameWorld::physicsWorld()
-{
-	return nullptr;
 }
 
 bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)

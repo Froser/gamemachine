@@ -9,11 +9,8 @@
 #include <gmm.h>
 #include "demostration_world.h"
 
-#define EMITTER_DEMO 1
 
-using namespace gm;
-
-GMGLFactory factory;
+gm::GMGLFactory factory;
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -22,7 +19,7 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	GMWindowAttributes mainAttrs =
+	gm::GMWindowAttributes mainAttrs =
 	{
 		NULL,
 		L"Default",
@@ -36,7 +33,7 @@ int WINAPI WinMain(
 	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow);
 	mainWindow->create(mainAttrs);
 
-	GMWindowAttributes consoleAttrs =
+	gm::GMWindowAttributes consoleAttrs =
 	{
 		NULL,
 		L"GameMachineConsoleWindow",
@@ -50,9 +47,6 @@ int WINAPI WinMain(
 	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);
 	consoleHandle.window->create(consoleAttrs);
 
-	DemostrationEntrance* entrance = new DemostrationEntrance();
-	DemostrationWorld& world = entrance->getWorld();
-
 	gm::IAudioPlayer* player = nullptr;
 	gmm::GMMFactory::createAudioPlayer(&player);
 
@@ -60,10 +54,10 @@ int WINAPI WinMain(
 		mainWindow,
 		consoleHandle,
 		player,
-		new GMGLFactory(),
-		entrance
+		new gm::GMGLFactory(),
+		new DemostrationEntrance()
 	);
 
-	GameMachine::instance().startGameMachine();
+	GM.startGameMachine();
 	return 0;
 }

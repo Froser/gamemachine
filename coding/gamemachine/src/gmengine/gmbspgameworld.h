@@ -25,7 +25,7 @@ public:
 	using GMGameWorld::appendObjectAndInit;
 
 public:
-	virtual void renderGameWorld() override;
+	virtual void renderScene() override;
 	virtual GMPhysicsWorld* physicsWorld() override;
 
 	//renders:

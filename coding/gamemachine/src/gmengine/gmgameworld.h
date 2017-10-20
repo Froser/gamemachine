@@ -20,7 +20,8 @@ class GMModelPainter;
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
-	Set<GMControlGameObject*> controls;
+	Vector<GMControlGameObject*> controls;
+	Vector<GMGameObject*> controls_objectType;
 	GMAssets assets;
 	bool start;
 };
@@ -34,14 +35,10 @@ public:
 	virtual ~GMGameWorld();
 
 public:
-	virtual GMPhysicsWorld* physicsWorld() = 0;
+	virtual GMPhysicsWorld* physicsWorld() { return nullptr; }
 
 public:
-	virtual void renderGameWorld() {}
-	virtual void beginCreateStencil();
-	virtual void endCreateStencil();
-	virtual void beginUseStencil(bool inverse = false);
-	virtual void endUseStencil();
+	virtual void renderScene() {}
 	virtual bool removeObject(GMGameObject* obj);
 
 public:
@@ -50,7 +47,8 @@ public:
 	void addControl(AUTORELEASE GMControlGameObject* control);
 	void notifyControls();
 
-	inline const Set<GMControlGameObject*>& getControls() { D(d); return d->controls; }
+	inline Vector<GMControlGameObject*>& getControls() { D(d); return d->controls; }
+	inline Vector<GMGameObject*>& getControlsGameObject() { D(d); return d->controls_objectType; }
 	inline const Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
 	inline void addLight(const GMLight& light) { GameMachine::instance().getGraphicEngine()->addLight(light); }
 	inline GMAssets& getAssets() { D(d); return d->assets; }

@@ -198,6 +198,9 @@ void GMGLRenders_3D::end()
 void GMGLRenders_3D::activateLights(const GMLight* lights, GMint count)
 {
 	D(d);
+	if (!count)
+		return;
+
 	auto shaderProgram = getShaderProgram();
 
 	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
