@@ -33,8 +33,14 @@ void GMCamera::synchronize(GMSpriteGameObject* gameObject)
 	d->lookAt.position = d->state.position;
 }
 
-void GMCamera::apply()
+void GMCamera::lookAtSynchronized()
 {
 	D(d);
-	GameMachine::instance().getGraphicEngine()->updateCameraView(d->lookAt);
+	GM.getGraphicEngine()->updateCameraView(d->lookAt);
+}
+
+void GMCamera::lookAt(const CameraLookAt& lookAt)
+{
+	D(d);
+	GM.getGraphicEngine()->updateCameraView(lookAt);
 }

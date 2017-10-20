@@ -237,10 +237,15 @@ void GMGLGraphicEngine::installShaders()
 void GMGLGraphicEngine::activateForwardRenderLight(const Vector<GMLight>& lights)
 {
 	D(d);
+	static GMMesh dummy;
 	GM_FOREACH_ENUM(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
+		dummy.setType(type);
+
 		IRender* render = getRender(type);
+		render->begin(this, &dummy, nullptr);
 		render->activateLights(lights.data(), lights.size());
+		render->end();
 	}
 }
 
@@ -320,7 +325,7 @@ void GMGLGraphicEngine::lightPass()
 void GMGLGraphicEngine::updateVPMatrices(const CameraLookAt& lookAt)
 {
 	D(d);
-	GMMesh dummy;
+	static GMMesh dummy;
 	GM_FOREACH_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
 	{
 		IRender* render = getRender(i);

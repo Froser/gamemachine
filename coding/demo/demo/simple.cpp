@@ -12,6 +12,7 @@ void Demo_Simple::init()
 {
 	D(d);
 	Base::init();
+
 	// 创建对象
 	d->demoWorld = new gm::GMDemoGameWorld();
 
@@ -64,9 +65,9 @@ void Demo_Simple::init()
 	// 创建一个带纹理的对象
 	gm::GMfloat extents[] = { .5f, .5f, .5f };
 	gm::GMfloat pos[] = { 0, 0, -1.f };
-	gm::GMModel* coreObj;
-	gm::GMPrimitiveCreator::createQuad(extents, pos, &coreObj, &cb);
-	gm::GMAsset* quadAsset = d->demoWorld->getAssets().insertAsset(GM_ASSET_MODELS, "quad", gm::GMAssetType::Model, coreObj);
+	gm::GMModel* model;
+	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
+	gm::GMAsset* quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
 	d->demoWorld->appendObject("texture", obj);
 
@@ -94,27 +95,11 @@ void Demo_Simple::event(gm::GameMachineEvent evt)
 		break;
 	case gm::GameMachineEvent::Render:
 	{
-		gm::IGraphicEngine* engine = GM.getGraphicEngine();
-		engine->beginBlend();
 		d->demoWorld->renderScene();
-		engine->endBlend();
 		break;
 	}
 	case gm::GameMachineEvent::Activate:
-	{
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-
-		if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-			GM.postMessage({ gm::GameMachineMessageType::Quit });
-
-		if (kbState.keydown('B'))
-			GM.postMessage({ gm::GameMachineMessageType::Console });
-
-		if (kbState.keyTriggered('I'))
-			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
 		break;
-	}
 	case gm::GameMachineEvent::Deactivate:
 		break;
 	case gm::GameMachineEvent::Terminate:

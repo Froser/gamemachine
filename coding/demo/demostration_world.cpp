@@ -60,11 +60,13 @@ void DemostrationWorld::init()
 void DemostrationWorld::renderScene()
 {
 	D(d);
-	Base::renderScene();
-
 	gm::IGraphicEngine* engine = GM.getGraphicEngine();
+
+	engine->beginBlend();
+	Base::renderScene();
 	auto& controls = getControlsGameObject();
 	engine->drawObjects(controls.data(), controls.size());
+	engine->endBlend();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -94,12 +96,30 @@ void DemostrationEntrance::start()
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	inputManager->getMouseState().setMouseEnable(false);
 
+	// 设置一个默认视角
+	gm::GMCamera& camera = GM.getCamera();
+	gm::CameraLookAt lookAt;
+	lookAt.lookAt = { 0, 0, -1 };
+	lookAt.position = { 0, 0, 1 };
+	camera.lookAt(lookAt);
+
 	loadDemostrations(d->world);
 }
 
 void DemostrationEntrance::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	gm::IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->newFrame();
+
+	DemoHandler* currentDemo = getWorld()->getCurrentDemo();
+	if (currentDemo)
+	{
+		if (!currentDemo->isInited())
+			currentDemo->init();
+		currentDemo->event(evt);
+	}
+
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:
@@ -113,21 +133,26 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 		getWorld()->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
+	{
+		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+
+		if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
+			GM.postMessage({ gm::GameMachineMessageType::Quit });
+
+		if (kbState.keydown('B'))
+			GM.postMessage({ gm::GameMachineMessageType::Console });
+
+		if (kbState.keyTriggered('I'))
+			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
 		break;
+	}
 	case gm::GameMachineEvent::Deactivate:
 		break;
 	case gm::GameMachineEvent::Terminate:
 		break;
 	default:
 		break;
-	}
-
-	DemoHandler* currentDemo = getWorld()->getCurrentDemo();
-	if (currentDemo)
-	{
-		if (!currentDemo->isInited())
-			currentDemo->init();
-		currentDemo->event(evt);
 	}
 }
 

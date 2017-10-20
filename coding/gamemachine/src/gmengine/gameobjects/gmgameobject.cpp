@@ -6,8 +6,6 @@
 #include "foundation/gamemachine.h"
 #include "gmassets.h"
 
-static void noDestructor(GMGameObject*) {}
-
 GMGameObject::GMGameObject()
 {
 	D(d);

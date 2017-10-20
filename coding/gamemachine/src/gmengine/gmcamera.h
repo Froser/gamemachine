@@ -25,7 +25,9 @@ public:
 	void initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
 
 	void synchronize(GMSpriteGameObject* gameObject);
-	void apply();
+	void lookAtSynchronized();
+
+	void lookAt(const CameraLookAt& lookAt);
 
 	GMFrustum& getFrustum() { D(d); return d->frustum; }
 	const PositionState& getPositionState() { D(d); return d->state; }
