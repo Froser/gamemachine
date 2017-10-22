@@ -125,7 +125,7 @@ void DemostrationEntrance::init()
 #ifdef _DEBUG
 	pk->loadPackage("D:/gmpk");
 #else
-	pk->loadPackage((GMPath::getCurrentPath() + _L("gm.pk0")));
+	pk->loadPackage((gm::GMPath::getCurrentPath() + _L("gm.pk0")));
 #endif
 	d->world = new DemostrationWorld();
 }
