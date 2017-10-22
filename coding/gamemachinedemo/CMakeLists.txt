@@ -1,4 +1,4 @@
-CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
+﻿CMAKE_MINIMUM_REQUIRED (VERSION 2.6)
 
 project (gamemachinedemo)
 init_solution()
@@ -36,8 +36,18 @@ set(SOURCES
 
 		demostration_world.h
 		demostration_world.cpp
-		demo/simple.h
-		demo/simple.cpp
+		demo/texture.h
+		demo/texture.cpp
+		demo/normalmap.h
+		demo/normalmap.cpp
+		demo/animation.h
+		demo/animation.cpp
+		demo/particles1.h
+		demo/particles1.cpp
+		demo/particles2.h
+		demo/particles2.cpp
+		demo/effects.h
+		demo/effects.cpp
 	)
 
 source_group_by_dir(SOURCES)

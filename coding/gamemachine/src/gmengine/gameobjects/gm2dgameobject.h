@@ -104,9 +104,6 @@ class GMListbox2DGameObject : public GMImage2DGameObject
 	};
 
 public:
-	GMListbox2DGameObject() = default;
-
-public:
 	GMImage2DGameObject* addItem(const GMString& text);
 	void setItemMargins(GMfloat left, GMfloat top, GMfloat right, GMfloat bottom);
 
@@ -119,7 +116,7 @@ private:
 	virtual void notifyControl() override;
 
 private:
-	inline Vector<GMControlGameObject*> getItems() { D_BASE(db, GMControlGameObject); return db->children; }
+	inline const Vector<GMControlGameObject*>& getItems() { D_BASE(db, GMControlGameObject); return db->children; }
 };
 
 END_NS

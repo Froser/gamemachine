@@ -1,22 +1,22 @@
-#include "stdafx.h"
-#include "simple.h"
+ï»¿#include "stdafx.h"
+#include "normalmap.h"
 #include <linearmath.h>
 
-Demo_Simple::~Demo_Simple()
+Demo_NormalMap::~Demo_NormalMap()
 {
 	D(d);
 	gm::GM_delete(d->demoWorld);
 }
 
-void Demo_Simple::init()
+void Demo_NormalMap::init()
 {
 	D(d);
 	Base::init();
 
-	// ´´½¨¶ÔÏó
+	// åˆ›å»ºå¯¹è±¡
 	d->demoWorld = new gm::GMDemoGameWorld();
 
-	// ´´½¨Ò»¸öÎÆÀí
+	// åˆ›å»ºä¸€ä¸ªçº¹ç†
 	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
 	{
 		gm::GMDemoGameWorld* world = nullptr;
@@ -45,7 +45,7 @@ void Demo_Simple::init()
 			gm::ITexture* tex = nullptr;
 			GM.getFactory()->createTexture(img, &tex);
 			GM_ASSERT(tex);
-			// ²»ÒªÍü¼ÇÊÍ·Åimg
+			// ä¸è¦å¿˜è®°é‡Šæ”¾img
 			delete img;
 
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
@@ -62,7 +62,7 @@ void Demo_Simple::init()
 		}
 	} cb(d->demoWorld);
 
-	// ´´½¨Ò»¸ö´øÎÆÀíµÄ¶ÔÏó
+	// åˆ›å»ºä¸€ä¸ªå¸¦çº¹ç†çš„å¯¹è±¡
 	gm::GMfloat extents[] = { .5f, .5f, .5f };
 	gm::GMfloat pos[] = { 0, 0, -1.f };
 	gm::GMModel* model;
@@ -71,7 +71,7 @@ void Demo_Simple::init()
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
 	d->demoWorld->appendObject("texture", obj);
 
-	// ÉèÖÃµÆ¹â
+	// è®¾ç½®ç¯å…‰
 	gm::GMLight light(gm::GMLightType::SPECULAR);
 	gm::GMfloat lightPos[] = { 0, 0, .2f };
 	light.setLightPosition(lightPos);
@@ -80,7 +80,7 @@ void Demo_Simple::init()
 	d->demoWorld->addLight(light);
 }
 
-void Demo_Simple::event(gm::GameMachineEvent evt)
+void Demo_NormalMap::event(gm::GameMachineEvent evt)
 {
 	D(d);
 	switch (evt)

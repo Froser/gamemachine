@@ -7,12 +7,6 @@
 #include "foundation/gamemachine.h"
 #include "gameobjects/gmcontrolgameobject.h"
 
-bool GMControlGameObjectPredicator::operator()(const GMControlGameObject& lhs, const GMControlGameObject& rhs)
-{
-	//return lhs.zOrder() < rhs.zOrder();
-	return &lhs < &rhs;
-}
-
 GMGameWorld::GMGameWorld()
 {
 	D(d);

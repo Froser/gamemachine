@@ -1,13 +1,16 @@
-#ifndef __DEMOSTRATION_H__
+﻿#ifndef __DEMOSTRATION_H__
 #define __DEMOSTRATION_H__
 
 #include <gamemachine.h>
 #include <gm2dgameobject.h>
 #include <gmgl.h>
 
+void defaultLookAtFunc();
+
 GM_PRIVATE_OBJECT(DemoHandler)
 {
 	bool inited = false;
+	void(*lookAtFunc)() = nullptr;
 };
 
 class DemoHandler : public gm::GMObject
@@ -15,8 +18,13 @@ class DemoHandler : public gm::GMObject
 	DECLARE_PRIVATE(DemoHandler)
 
 public:
+	DemoHandler(void(*lookAtFunc)() = defaultLookAtFunc);
+
+public:
 	virtual void init();
 	virtual bool isInited();
+	virtual void onActivate();
+	virtual void onDeactivated();
 	virtual void event(gm::GameMachineEvent evt) = 0;
 };
 

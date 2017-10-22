@@ -10,11 +10,6 @@
 BEGIN_NS
 
 class GMControlGameObject;
-struct GMControlGameObjectPredicator
-{
-	bool operator()(const GMControlGameObject& lhs, const GMControlGameObject& rhs);
-};
-
 class GMCharacter;
 class GMModelPainter;
 GM_PRIVATE_OBJECT(GMGameWorld)

@@ -75,7 +75,7 @@ class GMParticles : public GMGameObject
 {
 	DECLARE_PRIVATE(GMParticles)
 public:
-	GMParticles();
+	GMParticles() = default;
 	~GMParticles();
 
 public:

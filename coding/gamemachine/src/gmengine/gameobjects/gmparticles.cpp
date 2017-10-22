@@ -62,10 +62,6 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMParticles::GMParticles()
-{
-}
-
 GMParticles::~GMParticles()
 {
 	D(d);

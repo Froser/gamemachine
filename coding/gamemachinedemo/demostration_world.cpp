@@ -1,25 +1,62 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "demostration_world.h"
 #include <gmcontrolgameobject.h>
 #include <gmgl.h>
 
-#include "demo/simple.h"
+#include "demo/texture.h"
+#include "demo/normalmap.h"
+#include "demo/animation.h"
+#include "demo/particles1.h"
+#include "demo/particles2.h"
+#include "demo/effects.h"
+
 void loadDemostrations(DemostrationWorld* world)
 {
-	world->addDemo("Load texture", new Demo_Simple());
+	world->addDemo("Hello World: Load a texture", new Demo_Texture());
+	world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap());
+	world->addDemo("Animation: How to rotate an object", new Demo_Animation());
+	world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1());
+	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2());
+	world->addDemo("Effects: Use a blur effect.", new Demo_Effects());
 	world->init();
+}
+
+void defaultLookAtFunc()
+{
+	gm::GMCamera& camera = GM.getCamera();
+	gm::CameraLookAt lookAt;
+	lookAt.lookAt = { 0, 0, -1 };
+	lookAt.position = { 0, 0, 1 };
+	camera.lookAt(lookAt);
+}
+
+DemoHandler::DemoHandler(void(*lookAtFunc)())
+{
+	D(d);
+	d->lookAtFunc = lookAtFunc;
 }
 
 void DemoHandler::init()
 {
 	D(d);
 	d->inited = true;
+	d->lookAtFunc();
 }
 
 bool DemoHandler::isInited()
 {
 	D(d);
 	return d->inited;
+}
+
+void DemoHandler::onActivate()
+{
+}
+
+void DemoHandler::onDeactivated()
+{
+	GM.getGraphicEngine()->removeLights();
+	GMSetRenderState(EFFECTS, gm::GMEffects::None);
 }
 
 DemostrationWorld::~DemostrationWorld()
@@ -43,14 +80,17 @@ void DemostrationWorld::init()
 {
 	D(d);
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
-	gm::GMRect rect = { 10, 10, 200, 600 };
+	gm::GMRect rect = { 10, 10, 600, 600 };
 	listbox->setGeometry(rect);
+	listbox->setItemMargins(0, 5, 0, 0);
 	for (auto& demo : d->demos)
 	{
 		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
 		item->setHeight(20);
-		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [&](gm::GMObject* sender, gm::GMObject* receiver) {
-			removeLights();
+		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+			if (d->currentDemo)
+				d->currentDemo->onDeactivated();
+			demo.second->onActivate();
 			setCurrentDemo(demo.second);
 		});
 	}
@@ -96,7 +136,7 @@ void DemostrationEntrance::start()
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	inputManager->getMouseState().setMouseEnable(false);
 
-	// ÉèÖÃÒ»¸öÄ¬ÈÏÊÓ½Ç
+	// è®¾ç½®ä¸€ä¸ªé»˜è®¤è§†è§’
 	gm::GMCamera& camera = GM.getCamera();
 	gm::CameraLookAt lookAt;
 	lookAt.lookAt = { 0, 0, -1 };

@@ -32,8 +32,6 @@ void GMGlyphObject::setText(const GMWchar* text)
 void GMGlyphObject::constructModel()
 {
 	D(d);
-	D_BASE(db, GMGameObject);
-
 	GMModel* model = new GMModel();
 	GMMesh* child = new GMMesh();
 	model->append(child);
@@ -248,8 +246,6 @@ GMImage2DGameObject* GMListbox2DGameObject::addItem(const GMString& text)
 	GMRect geo = getGeometry();
 	geo.x = geo.y = 0;
 	item->setGeometry(geo);
-
-	getItems().push_back(item);
 	return item;
 }
 
