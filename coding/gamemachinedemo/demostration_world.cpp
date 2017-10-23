@@ -51,6 +51,9 @@ bool DemoHandler::isInited()
 
 void DemoHandler::onActivate()
 {
+	D(d);
+	GM_ASSERT(d->lookAtFunc);
+	d->lookAtFunc();
 }
 
 void DemoHandler::onDeactivated()

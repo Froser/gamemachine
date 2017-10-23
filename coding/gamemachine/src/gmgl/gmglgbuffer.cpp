@@ -390,78 +390,66 @@ void GMGLFramebuffer::beginDrawEffects()
 {
 	D(d);
 	d->effects = GMGetRenderState(EFFECTS);
-	if (needRenderFramebuffer())
-	{
-		if (d->useFullscreenFramebuffer)
-			GMEngine->setViewport(d->clientRect);
-		else
-			GMEngine->setViewport(d->viewport);
-		d->hasBegun = true;
-		newFrame();
-		bindForWriting();
-	}
+	if (d->useFullscreenFramebuffer)
+		GMEngine->setViewport(d->clientRect);
+	else
+		GMEngine->setViewport(d->viewport);
+	d->hasBegun = true;
+	newFrame();
+	bindForWriting();
 }
 
 void GMGLFramebuffer::endDrawEffects()
 {
 	D(d);
-	if (needRenderFramebuffer())
-	{
-		d->hasBegun = false;
-		releaseBind();
-	}
+	d->hasBegun = false;
+	releaseBind();
 }
 
 void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 {
 	D(d);
-	if (needRenderFramebuffer())
+	const char* effectUniformName = nullptr;
+	program->useProgram();
+	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->sampleOffsets[0]);
+	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);
+
+	bindForWriting();
+	turnOffBlending();
+	if (d->effects != GMEffects::None)
 	{
-		const char* effectUniformName = nullptr;
-		program->useProgram();
-		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->sampleOffsets[0]);
-		program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);
-
-		bindForWriting();
-		turnOffBlending();
-		if (d->effects != GMEffects::None)
+		GMuint eff = GMEffects::None + 1;
+		while (eff != GMEffects::EndOfEffects)
 		{
-			GMuint eff = GMEffects::None + 1;
-			while (eff != GMEffects::EndOfEffects)
+			if (d->effects & eff)
 			{
-				if (d->effects & eff)
-				{
-					effectUniformName = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
-					renderQuad();
-				}
-				eff <<= 1;
+				effectUniformName = useShaderProgramAndApplyEffect(program, (GMEffects)eff);
+				renderQuad();
 			}
+			eff <<= 1;
 		}
-		else
-		{
-			const char* name = useShaderProgramAndApplyEffect(program, GMEffects::None);
-			renderQuad();
-		}
-
-		//Reset effects
-		if (effectUniformName)
-			program->setBool(effectUniformName, false);
-
-		releaseBind();
-		GMEngine->setViewport(d->clientRect);
-
-		// 处理融混
-		blending();
+	}
+	else
+	{
+		const char* name = useShaderProgramAndApplyEffect(program, GMEffects::None);
 		renderQuad();
 	}
+
+	//Reset effects
+	if (effectUniformName)
+		program->setBool(effectUniformName, false);
+
+	releaseBind();
+	GMEngine->setViewport(d->clientRect);
+
+	// 处理融混
+	blending();
+	renderQuad();
 }
 
 GLuint GMGLFramebuffer::framebuffer()
 {
-	D(d);
-	if (needRenderFramebuffer()) 
-		return fbo();
-	return 0;
+	return fbo();
 }
 
 GLuint GMGLFramebuffer::fbo()
@@ -470,14 +458,6 @@ GLuint GMGLFramebuffer::fbo()
 	if (d->useFullscreenFramebuffer)
 		return d->fullscreenFbo;
 	return d->fbo;
-}
-
-bool GMGLFramebuffer::needRenderFramebuffer()
-{
-	D(d);
-	bool autoResolution = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION &&
-		GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION;
-	return !autoResolution || d->effects;
 }
 
 void GMGLFramebuffer::bindForWriting()

@@ -126,7 +126,6 @@ public:
 
 private:
 	GLuint fbo();
-	bool needRenderFramebuffer();
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
