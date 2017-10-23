@@ -1,1 +1,1 @@
-﻿#include "../src/gmphysics/bsp/gmbspphysicsworld.h"
+﻿#include "../src/extensions/bsp/physics/gmbspphysicsworld.h"

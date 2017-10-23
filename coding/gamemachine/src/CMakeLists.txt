@@ -15,13 +15,6 @@ set(SOURCES
 		stdafx.h
 		common.h
 
-		gmdatacore/bsp/gmbsp.h
-		gmdatacore/bsp/gmbsp.cpp
-		gmdatacore/bsp/gmbsp_render.h
-		gmdatacore/bsp/gmbsp_render.cpp
-		gmdatacore/bsp/gmbsp_shader_loader.h
-		gmdatacore/bsp/gmbsp_shader_loader.cpp
-		gmdatacore/bsp/gmbsp_surface_flags.h
 		gmdatacore/glyph/gmglyphmanager.h
 		gmdatacore/glyph/gmglyphmanager.cpp
 		gmdatacore/imagereader/gmimagereader.h
@@ -44,8 +37,6 @@ set(SOURCES
 		gmdatacore/gamepackage/gmgamepackage.cpp
 		gmdatacore/gamepackage/gmgamepackagehandler.h
 		gmdatacore/gamepackage/gmgamepackagehandler.cpp
-		gmdatacore/bsp_model_loader.h
-		gmdatacore/bsp_model_loader.cpp
 		gmdatacore/gmimage.h
 		gmdatacore/gmimage.cpp
 		gmdatacore/imagebuffer.h
@@ -61,10 +52,6 @@ set(SOURCES
 		gmengine/gmgameworld.cpp
 		gmengine/gmcamera.h
 		gmengine/gmcamera.cpp
-		gmengine/gmbspgameworldprivate.h
-		gmengine/gmbspgameworldprivate.cpp
-		gmengine/gmbspgameworld.h
-		gmengine/gmbspgameworld.cpp
 		gmengine/gmdemogameworld.h
 		gmengine/gmdemogameworld.cpp
 		gmengine/gameobjects/gmgameobject.h
@@ -100,21 +87,11 @@ set(SOURCES
 		gmgl/gmgltexture.h
 		gmgl/gmgltexture.cpp
 		gmgl/shader_constants.h
-		gmphysics/bsp/gmbsptrace.h
-		gmphysics/bsp/gmbsptrace.cpp
-		gmphysics/bsp/gmbspphysicsworld.h
-		gmphysics/bsp/gmbspphysicsworld.cpp
-		gmphysics/bsp/gmbspphysicsstructs.h
-		gmphysics/bsp/gmbsppatch.h
-		gmphysics/bsp/gmbsppatch.cpp
-		gmphysics/bsp/gmbspmove.h
-		gmphysics/bsp/gmbspmove.cpp
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp
 		gmphysics/gmphysicsstructs.h
 		gmphysics/collisionobjectfactory.h
 		gmphysics/collisionobjectfactory.cpp
-		io/input.h
 		foundation/utilities/tinyxml/tinystr.cpp
 		foundation/utilities/tinyxml/tinystr.h
 		foundation/utilities/tinyxml/tinyxml.cpp
@@ -126,6 +103,7 @@ set(SOURCES
 		foundation/utilities/gmprimitivecreator.h
 		foundation/utilities/gmprimitivecreator.cpp
 		foundation/utilities/gmcom.h
+		foundation/input.h
 		foundation/defines.h
 		foundation/gmmessages.h
 		foundation/debug.h
@@ -154,6 +132,28 @@ set(SOURCES
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
+		extensions/bsp/data/gmbsp.h
+		extensions/bsp/data/gmbsp.cpp
+		extensions/bsp/data/gmbsp_render.h
+		extensions/bsp/data/gmbsp_render.cpp
+		extensions/bsp/data/gmbsp_shader_loader.h
+		extensions/bsp/data/gmbsp_shader_loader.cpp
+		extensions/bsp/data/gmbsp_surface_flags.h
+		extensions/bsp/data/bsp_model_loader.h
+		extensions/bsp/data/bsp_model_loader.cpp
+		extensions/bsp/physics/gmbsptrace.h
+		extensions/bsp/physics/gmbsptrace.cpp
+		extensions/bsp/physics/gmbspphysicsworld.h
+		extensions/bsp/physics/gmbspphysicsworld.cpp
+		extensions/bsp/physics/gmbspphysicsstructs.h
+		extensions/bsp/physics/gmbsppatch.h
+		extensions/bsp/physics/gmbsppatch.cpp
+		extensions/bsp/physics/gmbspmove.h
+		extensions/bsp/physics/gmbspmove.cpp
+		extensions/bsp/render/gmbspgameworldprivate.h
+		extensions/bsp/render/gmbspgameworldprivate.cpp
+		extensions/bsp/render/gmbspgameworld.h
+		extensions/bsp/render/gmbspgameworld.cpp
 	)
 
 set(WIN32_SOURCES

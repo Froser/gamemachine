@@ -1,7 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmbspphysicsworld.h"
 #include "gmbspmove.h"
-#include "gmengine/gmbspgameworld.h"
+#include <gmphysics.h>
+#include "extensions/bsp/render/gmbspgameworld.h"
 #include "gmphysics/collisionobjectfactory.h"
 
 //class

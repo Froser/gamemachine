@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmbspgameworld.h"
 #include "foundation/utilities/utilities.h"
-#include "gameobjects/gmspritegameobject.h"
+#include "gmengine/gameobjects/gmspritegameobject.h"
 
 #define EACH_PAIR_OF_ENTITY(entity, pair) GMBSPEPair* pair = entity.epairs; for (; pair; pair = pair->next)
 

@@ -1,11 +1,10 @@
 ﻿#include "stdafx.h"
 #include "bsp_model_loader.h"
 #include "foundation/vector.h"
-#include "gamepackage/gmgamepackage.h"
-#include "gmengine/gmbspgameworld.h"
+#include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "extensions/bsp/render/gmbspgameworld.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "shader.h"
-#include "model.h"
 #include "foundation/utilities/utilities.h"
 #include "foundation/gamemachine.h"
 

@@ -1,8 +1,8 @@
 ﻿#ifndef __BSPPHYSICSWORLD_H__
 #define __BSPPHYSICSWORLD_H__
 #include <gmcommon.h>
-#include "../gmphysicsworld.h"
-#include "gmbspphysicsstructs.h"
+#include <gmphysics.h>
+#include <gmbspphysicsworld.h>
 #include "gmbsptrace.h"
 #include "gmbsppatch.h"
 BEGIN_NS

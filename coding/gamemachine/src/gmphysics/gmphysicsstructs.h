@@ -3,7 +3,6 @@
 #include <gmcommon.h>
 #include <map>
 #include <linearmath.h>
-#include "../foundation/vector.h"
 BEGIN_NS
 
 typedef GMint GMCommand;

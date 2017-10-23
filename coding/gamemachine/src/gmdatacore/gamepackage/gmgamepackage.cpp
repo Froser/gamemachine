@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmgamepackage.h"
-#include "gmengine/gmbspgameworld.h"
+#include "extensions/bsp/render/gmbspgameworld.h"
 #include <sys/stat.h>
 
 GMGamePackage::GMGamePackage(IFactory* factory)

@@ -1,12 +1,21 @@
 ﻿#ifndef __BSPMODEL_LOADER_H__
 #define __BSPMODEL_LOADER_H__
 #include <gmcommon.h>
-#include "model.h"
+#include <linearmath.h>
 
 class TiXmlDocument;
 class TiXmlElement;
 
 BEGIN_NS
+
+GM_ALIGNED_STRUCT(Model)
+{
+	linear_math::Vector3 extents;
+	char classname[64];
+	char model[64];
+	bool create;
+};
+
 // BSP中读取出来的Entity会在这里找到对应的model，来进行绘制
 typedef Map<GMString, Model*> ModelMap;
 

@@ -4,15 +4,15 @@
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
 #include "gmdatacore/imagebuffer.h"
-#include "gmdatacore/bsp/gmbsp_shader_loader.h"
+#include "extensions/bsp/data/gmbsp_shader_loader.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include <algorithm>
 #include "gmdatacore/modelreader/gmmodelreader.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
 #include "foundation/gmthreads.h"
-#include "gameobjects/gmgameobject.h"
-#include "gmphysics/bsp/gmbspphysicsworld.h"
+#include "gmengine/gameobjects/gmgameobject.h"
+#include "extensions/bsp/physics/gmbspphysicsworld.h"
 
 BEGIN_NS
 
