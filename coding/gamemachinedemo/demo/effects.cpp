@@ -1,10 +1,10 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "effects.h"
 
 void Demo_Effects::onActivate()
 {
 	Base::onActivate();
-	// Ê¹ÓÃÔ¤ÉèÌØĞ§·Ç³£¼òµ¥£¬Ö»ĞèÒªÉèÖÃ´Ë×´Ì¬¼´¿É
-	// Èç¹ûÊÇ×Ô¶¨ÒåÌØĞ§£¬ĞèÒª×ÔĞĞĞŞ¸Ä×ÅÉ«Æ÷
+	// ä½¿ç”¨é¢„è®¾ç‰¹æ•ˆéå¸¸ç®€å•ï¼Œåªéœ€è¦è®¾ç½®æ­¤çŠ¶æ€å³å¯
+	// å¦‚æœæ˜¯è‡ªå®šä¹‰ç‰¹æ•ˆï¼Œéœ€è¦è‡ªè¡Œä¿®æ”¹ç€è‰²å™¨
 	GMSetRenderState(EFFECTS, gm::GMEffects::Blur);
 }

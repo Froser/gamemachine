@@ -1,4 +1,4 @@
-uniform sampler2D GM_framebuffer;
+uniform sampler2D gFramebuffer;
 
 uniform float GM_effects_texture_offset_x;
 uniform float GM_effects_texture_offset_y;
@@ -29,7 +29,7 @@ vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
     {
         sampler[i] = vec3(texture(t, uv + offsets[i]));
     }
-    vec3 color;
+    vec3 color = vec3(0);
     for(int i = 0; i < 9; i++)
         color += sampler[i] * kernels[i];
     return color;
