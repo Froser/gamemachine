@@ -19,40 +19,7 @@ static GMString getClassname(const GMBSPEntity& entity)
 
 void import_worldspawn(const GMBSPEntity& entity, GMBSPGameWorld* world)
 {
-	/*
-	EACH_PAIR_OF_ENTITY(entity, e)
-	{
-		if (SAME_KEY(e, "ambient")); //nothing
-		else if (SAME_KEY(e, "_color"))
-		{
-			GameLight* ambientLight;
-			IFactory* factory = world->getGameMachine()->getFactory();
-			factory->createLight(Ambient, &ambientLight);
-			if (ambientLight)
-			{
-				ambientLight->setId(0);
-				ambientLight->setColor(linear_math::Vector3(1, 1, 1));
-				ambientLight->setPosition(linear_math::Vector3(0, 0, 0));
-				ambientLight->setWorld(world);
-				ambientLight->setShadowSource(false);
-				world->appendLight(ambientLight);
-			}
-		}
-	}
-	*/
-	{
-		GMLight ambientLight(GMLightType::AMBIENT);
-		GMfloat lightColor[] = { .9f, .9f, .9f };
-		ambientLight.setLightColor(lightColor);
-		world->addLight(ambientLight);
-	}
-
-	{
-		GMLight specularLight(GMLightType::SPECULAR);
-		GMfloat lightColor[] = { 1, 1, 1 };
-		specularLight.setLightColor(lightColor);
-		world->addLight(specularLight);
-	}
+	world->setDefaultLights();
 }
 
 void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* world)

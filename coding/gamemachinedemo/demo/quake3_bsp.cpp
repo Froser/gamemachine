@@ -13,12 +13,30 @@ Demo_Quake3_BSP::~Demo_Quake3_BSP()
 void Demo_Quake3_BSP::onActivate()
 {
 	D(d);
-	GM.getCamera().synchronizeLookAt();
+	Base::onActivate();
 
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	gm::IMouseState& mouseState = inputManager->getMouseState();
 	d->mouseEnabled = true;
 	mouseState.setMouseEnable(d->mouseEnabled);
+}
+
+void Demo_Quake3_BSP::onDeactivated()
+{
+	Base::onDeactivated();
+	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+}
+
+void Demo_Quake3_BSP::setLookAt()
+{
+	GM.getCamera().synchronizeLookAt();
+}
+
+void Demo_Quake3_BSP::setDefaultLights()
+{
+	D(d);
+	if (isInited())
+		d->world->setDefaultLights();
 }
 
 void Demo_Quake3_BSP::init()
@@ -141,8 +159,6 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 
 		if (kbState.keyTriggered('P'))
 			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));
-		if (kbState.keyTriggered('L'))
-			GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
 		if (kbState.keyTriggered('O'))
 			GMSetDebugState(DRAW_ONLY_SKY, !GMGetDebugState(DRAW_ONLY_SKY));
 		if (kbState.keyTriggered('R'))

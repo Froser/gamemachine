@@ -22,6 +22,7 @@ public:
 	GMGameObject* getSky();
 	Map<GMint, Set<GMBSPEntity*> >& getEntities();
 	void appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
+	void setDefaultLights();
 	using GMGameWorld::appendObjectAndInit;
 
 public:

@@ -23,26 +23,11 @@ void loadDemostrations(DemostrationWorld* world)
 	world->init();
 }
 
-void defaultLookAtFunc()
-{
-	gm::GMCamera& camera = GM.getCamera();
-	gm::CameraLookAt lookAt;
-	lookAt.lookAt = { 0, 0, -1 };
-	lookAt.position = { 0, 0, 1 };
-	camera.lookAt(lookAt);
-}
-
-DemoHandler::DemoHandler(void(*lookAtFunc)())
-{
-	D(d);
-	d->lookAtFunc = lookAtFunc;
-}
-
 void DemoHandler::init()
 {
 	D(d);
 	d->inited = true;
-	d->lookAtFunc();
+	setLookAt();
 }
 
 bool DemoHandler::isInited()
@@ -54,14 +39,38 @@ bool DemoHandler::isInited()
 void DemoHandler::onActivate()
 {
 	D(d);
-	GM_ASSERT(d->lookAtFunc);
-	d->lookAtFunc();
+	setLookAt();
+	setDefaultLights();
 }
 
 void DemoHandler::onDeactivated()
 {
 	GM.getGraphicEngine()->removeLights();
 	GMSetRenderState(EFFECTS, gm::GMEffects::None);
+}
+
+void DemoHandler::setLookAt()
+{
+	gm::GMCamera& camera = GM.getCamera();
+	gm::CameraLookAt lookAt;
+	lookAt.lookAt = { 0, 0, -1 };
+	lookAt.position = { 0, 0, 1 };
+	camera.lookAt(lookAt);
+}
+
+void DemoHandler::setDefaultLights()
+{
+	// 所有Demo的默认灯光属性
+	D(d);
+	if (isInited())
+	{
+		gm::GMLight light(gm::GMLightType::SPECULAR);
+		gm::GMfloat lightPos[] = { 0, 0, .2f };
+		light.setLightPosition(lightPos);
+		gm::GMfloat color[] = { .7f, .7f, .7f };
+		light.setLightColor(color);
+		GM.getGraphicEngine()->addLight(light);
+	}
 }
 
 DemostrationWorld::~DemostrationWorld()
@@ -93,10 +102,7 @@ void DemostrationWorld::init()
 		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
 		item->setHeight(20);
 		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-			if (d->currentDemo)
-				d->currentDemo->onDeactivated();
-			demo.second->onActivate();
-			setCurrentDemo(demo.second);
+			d->nextDemo = demo.second;
 		});
 	}
 	addControl(listbox);
@@ -112,6 +118,19 @@ void DemostrationWorld::renderScene()
 	auto& controls = getControlsGameObject();
 	engine->drawObjects(controls.data(), controls.size());
 	engine->endBlend();
+}
+
+void DemostrationWorld::switchDemo()
+{
+	D(d);
+	if (d->nextDemo)
+	{
+		if (d->currentDemo)
+			d->currentDemo->onDeactivated();
+		d->nextDemo->onActivate();
+		setCurrentDemo(d->nextDemo);
+		d->nextDemo = nullptr;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -170,6 +189,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameStart:
 		break;
 	case gm::GameMachineEvent::FrameEnd:
+		getWorld()->switchDemo();
 		break;
 	case gm::GameMachineEvent::Simulate:
 		getWorld()->notifyControls();
@@ -187,6 +207,9 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 
 		if (kbState.keydown('B'))
 			GM.postMessage({ gm::GameMachineMessageType::Console });
+
+		if (kbState.keyTriggered('L'))
+			GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
 
 		if (kbState.keyTriggered('I'))
 			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));

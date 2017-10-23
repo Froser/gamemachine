@@ -110,6 +110,23 @@ void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alw
 		d->render.renderData().alwaysVisibleObjects.push_back(obj);
 }
 
+void GMBSPGameWorld::setDefaultLights()
+{
+	{
+		GMLight ambientLight(GMLightType::AMBIENT);
+		GMfloat lightColor[] = { .9f, .9f, .9f };
+		ambientLight.setLightColor(lightColor);
+		addLight(ambientLight);
+	}
+
+	{
+		GMLight specularLight(GMLightType::SPECULAR);
+		GMfloat lightColor[] = { 1, 1, 1 };
+		specularLight.setLightColor(lightColor);
+		addLight(specularLight);
+	}
+}
+
 Map<GMint, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 {
 	D(d);

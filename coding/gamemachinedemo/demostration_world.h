@@ -5,12 +5,9 @@
 #include <gm2dgameobject.h>
 #include <gmgl.h>
 
-void defaultLookAtFunc();
-
 GM_PRIVATE_OBJECT(DemoHandler)
 {
 	bool inited = false;
-	void(*lookAtFunc)() = nullptr;
 };
 
 class DemoHandler : public gm::GMObject
@@ -18,7 +15,7 @@ class DemoHandler : public gm::GMObject
 	DECLARE_PRIVATE(DemoHandler)
 
 public:
-	DemoHandler(void(*lookAtFunc)() = defaultLookAtFunc);
+	DemoHandler() = default;
 
 public:
 	virtual void init();
@@ -26,6 +23,10 @@ public:
 	virtual void onActivate();
 	virtual void onDeactivated();
 	virtual void event(gm::GameMachineEvent evt) = 0;
+
+protected:
+	virtual void setLookAt();
+	virtual void setDefaultLights();
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
@@ -35,6 +36,7 @@ GM_PRIVATE_OBJECT(DemostrationWorld)
 {
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
+	DemoHandler* nextDemo = nullptr;
 };
 
 namespace gm
@@ -59,6 +61,7 @@ public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
 	void init();
 	void renderScene();
+	void switchDemo();
 
 private:
 	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }

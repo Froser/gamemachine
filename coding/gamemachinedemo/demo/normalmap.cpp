@@ -70,14 +70,6 @@ void Demo_NormalMap::init()
 	gm::GMAsset* quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
 	d->demoWorld->appendObject("texture", obj);
-
-	// 设置灯光
-	gm::GMLight light(gm::GMLightType::SPECULAR);
-	gm::GMfloat lightPos[] = { 0, 0, .2f };
-	light.setLightPosition(lightPos);
-	gm::GMfloat color[] = { .7f, .7f, .7f };
-	light.setLightColor(color);
-	d->demoWorld->addLight(light);
 }
 
 void Demo_NormalMap::event(gm::GameMachineEvent evt)
