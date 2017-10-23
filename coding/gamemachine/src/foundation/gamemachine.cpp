@@ -196,6 +196,6 @@ void GameMachine::terminate()
 	d->gameHandler->event(GameMachineEvent::Terminate);
 	for (auto manager : d->manangerQueue)
 	{
-		delete manager;
+		GM_delete(manager);
 	}
 }

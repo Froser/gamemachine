@@ -63,13 +63,8 @@ GM_ALIGNED_STRUCT(GMBSP_Render_BiquadraticPatch)
 
 	~GMBSP_Render_BiquadraticPatch()
 	{
-		if (trianglesPerRow)
-			delete[] trianglesPerRow;
-		trianglesPerRow = nullptr;
-
-		if (rowIndexPointers)
-			delete[] rowIndexPointers;
-		rowIndexPointers = nullptr;
+		GM_delete_array(trianglesPerRow);
+		GM_delete_array(rowIndexPointers);
 	}
 
 	bool tesselate(int newTesselation);
@@ -114,9 +109,7 @@ struct GMBSP_Render_VisibilityData
 	}
 	~GMBSP_Render_VisibilityData()
 	{
-		if (bitset)
-			delete[] bitset;
-		bitset = nullptr;
+		GM_delete_array(bitset);
 	}
 	GMint numClusters;
 	GMint bytesPerCluster;

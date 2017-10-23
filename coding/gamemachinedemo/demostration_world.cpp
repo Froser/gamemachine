@@ -70,7 +70,7 @@ DemostrationWorld::~DemostrationWorld()
 	for (auto& demo : d->demos)
 	{
 		GM_ASSERT(demo.second);
-		delete demo.second;
+		gm::GM_delete(demo.second);
 	}
 }
 
@@ -204,8 +204,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 DemostrationEntrance::~DemostrationEntrance()
 {
 	D(d);
-	if (d->world)
-		delete d->world;
+	gm::GM_delete(d->world);
 }
 
 void DemostrationEntrance::onLoadForwardShader(const gm::GMMeshType type, gm::GMGLShaderProgram& shader)

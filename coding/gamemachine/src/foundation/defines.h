@@ -222,7 +222,21 @@ inline void GM_delete(T*& o)
 	if (o)
 	{
 		delete o;
+#if _DEBUG
 		o = nullptr;
+#endif
+	}
+}
+
+template <typename T>
+inline void GM_delete_array(T*& o)
+{
+	if (o)
+	{
+		delete[] o;
+#if _DEBUG
+		o = nullptr;
+#endif
 	}
 }
 

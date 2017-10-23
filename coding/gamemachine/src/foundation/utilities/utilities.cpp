@@ -583,9 +583,7 @@ bool Bitset::init(GMint numberOfBits)
 {
 	D(d);
 	//Delete any memory allocated to bits
-	if (d->bits)
-		delete[] d->bits;
-	d->bits = NULL;
+	GM_delete_array(d->bits);
 
 	//Calculate size
 	d->numBytes = (numberOfBits >> 3) + 1;

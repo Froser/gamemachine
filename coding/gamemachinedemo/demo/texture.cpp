@@ -43,7 +43,7 @@ void Demo_Texture::init()
 			GM.getFactory()->createTexture(img, &tex);
 			GM_ASSERT(tex);
 			// 不要忘记释放img
-			delete img;
+			gm::GM_delete(img);
 
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 			{

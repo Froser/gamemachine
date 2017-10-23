@@ -397,9 +397,7 @@ public:
 	~Bitset()
 	{
 		D(d);
-		if (d->bits)
-			delete[] d->bits;
-		d->bits = nullptr;
+		GM_delete_array(d->bits);
 	}
 
 	bool init(GMint numberOfBits);

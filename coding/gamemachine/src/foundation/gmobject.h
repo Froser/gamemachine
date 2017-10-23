@@ -292,8 +292,7 @@ struct GMBuffer : public GMObject
 	{
 		if (needRelease)
 		{
-			if (buffer)
-				delete[] buffer;
+			GM_delete_array(buffer);
 		}
 	}
 
@@ -313,7 +312,7 @@ struct GMBuffer : public GMObject
 		newBuffer[size] = 0;
 		size++;
 		if (needRelease && buffer)
-			delete[] buffer;
+			GM_delete_array(buffer);
 		needRelease = true;
 		buffer = newBuffer;
 	}

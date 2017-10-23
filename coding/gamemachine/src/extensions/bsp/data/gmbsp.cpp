@@ -120,11 +120,11 @@ GMBSP::GMBSP()
 GMBSP::~GMBSP()
 {
 	D(d);
-	delete[] d->buffer;
+	GM_delete_array(d->buffer);
 
 	for (auto& entity : d->entities)
 	{
-		delete entity;
+		GM_delete(entity);
 	}
 }
 

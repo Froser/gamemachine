@@ -95,8 +95,7 @@ void GMStateItem::releaseString(const GMStateItemValue& value)
 {
 	if (value.type == VT_String && value.value.str)
 	{
-		delete[] value.value.str;
-		value.value.str = nullptr;
+		GM_delete_array(value.value.str);
 	}
 }
 
