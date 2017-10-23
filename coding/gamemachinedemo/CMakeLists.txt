@@ -48,6 +48,8 @@ set(SOURCES
 		demo/particles2.cpp
 		demo/effects.h
 		demo/effects.cpp
+		demo/quake3_bsp.h
+		demo/quake3_bsp.cpp
 	)
 
 source_group_by_dir(SOURCES)

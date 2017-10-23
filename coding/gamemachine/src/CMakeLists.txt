@@ -44,8 +44,6 @@ set(SOURCES
 		gmdatacore/gmmodel.h
 		gmdatacore/gmmodel.cpp
 		gmdatacore/shader.h
-		gmdatacore/model.h
-		gmdatacore/model.cpp
 		gmengine/gmassets.h
 		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h
@@ -132,6 +130,9 @@ set(SOURCES
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
+
+		extensions/bsp/bsp_factory.h
+		extensions/bsp/bsp_factory.cpp
 		extensions/bsp/data/gmbsp.h
 		extensions/bsp/data/gmbsp.cpp
 		extensions/bsp/data/gmbsp_render.h

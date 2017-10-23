@@ -144,10 +144,7 @@ using Deque = std::deque<T>;
 // 用于枚举的宏
 #define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((gm::GMint)var)+1) )
 
-#define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (GMint) var < (GMint) end; var = (decltype(var))(((GMint)var)+1) )
-
-#define GM_ENUM_END(e) (decltype(e)) ((GMint)(e) + 1)
-
+#define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint) var < (gm::GMint) end; var = (decltype(var))(((gm::GMint)var)+1) )
 
 // 全局数据类型
 #if !_MSC_VER

@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmgamepackage.h"
-#include "extensions/bsp/render/gmbspgameworld.h"
 #include <sys/stat.h>
 
 GMGamePackage::GMGamePackage(IFactory* factory)
@@ -44,16 +43,6 @@ void GMGamePackage::loadPackage(const GMString& path)
 
 	d->handler.reset(handler);
 	d->handler->init();
-}
-
-void GMGamePackage::createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld** gameWorld)
-{
-	D(d);
-	GM_ASSERT(gameWorld);
-
-	GMBSPGameWorld* world = new GMBSPGameWorld();
-	*gameWorld = world;
-	world->loadBSP(map);
 }
 
 bool GMGamePackage::readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename)

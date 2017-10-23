@@ -9,6 +9,7 @@
 #include "demo/particles1.h"
 #include "demo/particles2.h"
 #include "demo/effects.h"
+#include "demo/quake3_bsp.h"
 
 void loadDemostrations(DemostrationWorld* world)
 {
@@ -18,6 +19,7 @@ void loadDemostrations(DemostrationWorld* world)
 	world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1());
 	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2());
 	world->addDemo("Effects: Use a blur effect.", new Demo_Effects());
+	world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP());
 	world->init();
 }
 

@@ -2,7 +2,6 @@
 #include <fstream>
 #include "gmgamepackagehandler.h"
 #include "foundation/utilities/utilities.h"
-#include "extensions/bsp/render/gmbspgameworld.h"
 #include "foundation/gamemachine.h"
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();

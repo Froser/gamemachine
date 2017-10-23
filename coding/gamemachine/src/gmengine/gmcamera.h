@@ -25,7 +25,7 @@ public:
 	void initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
 
 	void synchronize(GMSpriteGameObject* gameObject);
-	void lookAtSynchronized();
+	void synchronizeLookAt();
 
 	void lookAt(const CameraLookAt& lookAt);
 

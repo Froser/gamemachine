@@ -46,7 +46,6 @@ class GMGamePackage : public GMObject
 public:
 	Data* gamePackageData();
 	void loadPackage(const GMString& path);
-	void createBSPGameWorld(const GMString& map, OUT GMBSPGameWorld** gameWorld);
 	bool readFile(GMPackageIndex index, const GMString& filename, REF GMBuffer* buffer, REF GMString* fullFilename = nullptr);
 	void beginReadFile(GMPackageIndex index, const GMString& filename, GMAsyncCallback callback, OUT IAsyncResult** ar, REF GMString* fullFilename = nullptr);
 	Vector<GMString> getAllFiles(const GMString& directory);
