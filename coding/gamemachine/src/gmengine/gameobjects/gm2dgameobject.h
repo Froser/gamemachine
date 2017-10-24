@@ -67,7 +67,7 @@ GM_PRIVATE_OBJECT(GMImage2DBorder)
 	GMRect center;
 	bool autoDevide;
 	GMRect borderTextureGeometry;
-	GMModel *models[9];
+	GMModel *models[9] = { nullptr };
 };
 
 // 表示一个2D边框。
