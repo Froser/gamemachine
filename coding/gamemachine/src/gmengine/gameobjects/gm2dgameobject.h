@@ -53,11 +53,72 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////
+GM_PRIVATE_OBJECT(GMImage2DBorder)
+{
+	GMAsset texture;
+	GMRect topLeft;
+	GMRect topRight;
+	GMRect middleLeft;
+	GMRect middleRight;
+	GMRect bottomLeft;
+	GMRect bottomRight;
+	GMRect topCenter;
+	GMRect bottomCenter;
+	GMRect center;
+	bool autoDevide;
+	GMRect borderTextureGeometry;
+	GMModel *models[9];
+};
+
+// 表示一个2D边框。
+// 边框由9部分组成，可以在同一个素材中选择9个坐标来组成这个边框
+class GMImage2DBorder : public GMObject
+{
+	DECLARE_PRIVATE(GMImage2DBorder)
+
+	friend class GMImage2DGameObject;
+	friend struct GMImage2DGameObjectPrivate;
+
+private:
+	GMImage2DBorder() = default;
+
+public:
+	GMImage2DBorder(GMAsset& texture, GMRect& borderTextureGeometry);
+	GMImage2DBorder(
+		GMAsset& texture,
+		GMRect& borderTextureGeometry,
+		GMRect& topLeft,
+		GMRect& topRight,
+		GMRect& middleLeft,
+		GMRect& middleRight,
+		GMRect& bottomLeft,
+		GMRect& bottomRight,
+		GMRect& topCenter,
+		GMRect& bottomCenter,
+		GMRect& center
+	);
+
+	~GMImage2DBorder();
+
+private:
+	bool isAutoDevide() { D(d); return d->autoDevide; }
+	bool hasBorder() { D(d); return !!d->texture.asset; }
+	const GMRect& textureGeometry() { D(d); return d->borderTextureGeometry; }
+	template <GMint Size> void releaseBorderModels(GMModel* (&)[Size]);
+
+private:
+	void clone(GMImage2DBorder&);
+	void createBorder();
+};
+
+//////////////////////////////////////////////////////////////////////////
+
 GM_PRIVATE_OBJECT(GMImage2DGameObject)
 {
 	ITexture* image = nullptr;
 	AUTORELEASE GMGlyphObject* textModel = nullptr;
 	std::wstring text;
+	GMImage2DBorder border;
 };
 
 class GMImage2DGameObject : public GMControlGameObject, public IPrimitiveCreatorShaderCallback
@@ -73,6 +134,7 @@ public:
 public:
 	void setImage(GMAsset& asset);
 	void setText(const GMString& text);
+	void setBorder(GMImage2DBorder& border);
 
 public:
 	virtual void onAppendingObjectToWorld();
@@ -81,6 +143,11 @@ public:
 	//IPrimitiveCreatorShaderCallback
 private:
 	virtual void onCreateShader(Shader& shader) override;
+
+private:
+	void createBackgroundImage();
+	void createBorder();
+	void createGlyphs();
 };
 
 //////////////////////////////////////////////////////////////////////////

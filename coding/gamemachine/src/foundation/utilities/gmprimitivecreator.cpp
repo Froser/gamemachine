@@ -74,7 +74,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	*obj = coreObj;
 }
 
-void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMCreateAnchor anchor)
+void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
 {
 	static constexpr GMfloat v_anchor_center[] = {
 		-1, 1, 0,
@@ -90,7 +90,9 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		2, 0, 0,
 	};
 
-	const GMfloat(&v)[12] = anchor == TopLeft ? v_anchor_top_left : v_anchor_center;
+	const GMfloat(*_v)[12] = customUV ? customUV : ((anchor == TopLeft) ? &v_anchor_top_left : &v_anchor_center);
+	const GMfloat(&v)[12] = *_v;
+
 	static constexpr GMint indices[] = {
 		0, 1, 3,
 		2, 3, 1,
