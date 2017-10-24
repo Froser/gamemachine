@@ -83,6 +83,9 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		1, 1, 0,
 	};
 
+	const GMfloat(*_customUV)[12] = customUV ? customUV : &v_anchor_center;
+	const GMfloat(&uvArr)[12] = *_customUV;
+
 	static constexpr GMfloat v_anchor_top_left[] = {
 		0, 0, 0,
 		0, -2, 0,
@@ -90,8 +93,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		2, 0, 0,
 	};
 
-	const GMfloat(*_v)[12] = customUV ? customUV : ((anchor == TopLeft) ? &v_anchor_top_left : &v_anchor_center);
-	const GMfloat(&v)[12] = *_v;
+	const GMfloat(&v)[12] = (anchor == TopLeft) ? v_anchor_top_left : v_anchor_center;
 
 	static constexpr GMint indices[] = {
 		0, 1, 3,
@@ -124,7 +126,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				GMint idx = i * 3 + j; //顶点的开始
 				GMint idx_next = i * 3 + (j + 1) % 3;
 				GMint idx_prev = i * 3 + (j + 2) % 3;
-				linear_math::Vector2 uv(v_anchor_center[indices[idx] * 3], v_anchor_center[indices[idx] * 3 + 1]);
+				linear_math::Vector2 uv(uvArr[indices[idx] * 3], uvArr[indices[idx] * 3 + 1]);
 				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 				linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);

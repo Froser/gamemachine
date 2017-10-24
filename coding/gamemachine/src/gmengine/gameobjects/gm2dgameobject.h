@@ -56,22 +56,14 @@ protected:
 GM_PRIVATE_OBJECT(GMImage2DBorder)
 {
 	GMAsset texture;
-	GMRect topLeft;
-	GMRect topRight;
-	GMRect middleLeft;
-	GMRect middleRight;
-	GMRect bottomLeft;
-	GMRect bottomRight;
-	GMRect topCenter;
-	GMRect bottomCenter;
-	GMRect center;
-	bool autoDevide;
 	GMRect borderTextureGeometry;
 	GMModel *models[9] = { nullptr };
+	GMGameObject *objects[9] = { nullptr };
+	GMfloat width;
+	GMfloat height;
 };
 
 // 表示一个2D边框。
-// 边框由9部分组成，可以在同一个素材中选择9个坐标来组成这个边框
 class GMImage2DBorder : public GMObject
 {
 	DECLARE_PRIVATE(GMImage2DBorder)
@@ -83,32 +75,19 @@ private:
 	GMImage2DBorder() = default;
 
 public:
-	GMImage2DBorder(GMAsset& texture, GMRect& borderTextureGeometry);
-	GMImage2DBorder(
-		GMAsset& texture,
-		GMRect& borderTextureGeometry,
-		GMRect& topLeft,
-		GMRect& topRight,
-		GMRect& middleLeft,
-		GMRect& middleRight,
-		GMRect& bottomLeft,
-		GMRect& bottomRight,
-		GMRect& topCenter,
-		GMRect& bottomCenter,
-		GMRect& center
-	);
-
+	GMImage2DBorder(GMAsset& texture, const GMRect& borderTextureGeometry, GMfloat textureWidth, GMfloat textureHeight);
 	~GMImage2DBorder();
 
 private:
-	bool isAutoDevide() { D(d); return d->autoDevide; }
 	bool hasBorder() { D(d); return !!d->texture.asset; }
 	const GMRect& textureGeometry() { D(d); return d->borderTextureGeometry; }
-	template <GMint Size> void releaseBorderModels(GMModel* (&)[Size]);
+	template <typename T, GMint Size> void release(T* (&)[Size]);
+	template <GMint Size> void drawObjects(GMGameObject* (&)[Size]);
 
 private:
 	void clone(GMImage2DBorder&);
-	void createBorder();
+	void createBorder(const GMRect& geometry);
+	void draw();
 };
 
 //////////////////////////////////////////////////////////////////////////

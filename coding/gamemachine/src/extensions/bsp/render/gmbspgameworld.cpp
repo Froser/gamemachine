@@ -278,7 +278,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	GMModel* model = nullptr;
 	d->render.createObject(polygonFace, shader, &model);
 	GM_ASSERT(model);
-	GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
+	GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
@@ -309,7 +309,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	d->render.createObject(meshFace, shader, &model);
 	GM_ASSERT(model);
 
-	GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
+	GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 	rd.meshFaceObjects[&meshFace] = obj;
 	appendObjectAndInit(obj);
@@ -339,7 +339,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 
 		GMModel* model = nullptr;
 		d->render.createObject(biqp, shader, &model);
-		GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
+		GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
 		appendObjectAndInit(obj);
@@ -673,7 +673,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
 		gm_warning("No model selected. Create a default cube instead.");
 		d->render.createBox(m->extents, entity->origin, shader, &model);
-		GMAsset* asset = getAssets().insertAsset(GMAssetType::Model, model);
+		GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 		entityObject = new GMEntityObject(asset);
 	}
 	else
@@ -686,10 +686,10 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 
 		GMAssets& assets = getAssets();
 		GMAssetsNode* node = assets.getNodeFromPath(GMAssets::combinePath({ GM_ASSET_MODELS, fn }).toStdString().c_str());
-		GMAsset* asset = nullptr;
+		GMAsset asset;
 		if (node)
 		{
-			asset = &node->asset;
+			asset = node->asset;
 		}
 		else
 		{
@@ -709,7 +709,6 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 
 			asset = assets.insertAsset(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
 		}
-		GM_ASSERT(asset);
 		entityObject = new GMEntityObject(asset);
 		entityObject->setTranslate(linear_math::translate(entity->origin));
 		entityObject->setScaling(linear_math::scale(m->extents[0], m->extents[1], m->extents[2]));

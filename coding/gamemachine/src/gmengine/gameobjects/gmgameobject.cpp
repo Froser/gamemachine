@@ -13,17 +13,17 @@ GMGameObject::GMGameObject()
 	d->translation = linear_math::Matrix4x4::identity();
 }
 
-GMGameObject::GMGameObject(GMAsset* asset)
+GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
 	setModel(asset);
 	updateMatrix();
 }
 
-void GMGameObject::setModel(GMAsset* asset)
+void GMGameObject::setModel(GMAsset asset)
 {
 	D(d);
-	GMModel* model = GMAssets::getModel(*asset);
+	GMModel* model = GMAssets::getModel(asset);
 	GM_ASSERT(model);
 	d->model = model;
 
@@ -85,7 +85,7 @@ void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
 }
 
 //GMEntityObject
-GMEntityObject::GMEntityObject(GMAsset* asset)
+GMEntityObject::GMEntityObject(GMAsset asset)
 	: GMGameObject(asset)
 {
 	calc();
@@ -193,7 +193,7 @@ GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, obj);
-	setModel(&asset);
+	setModel(asset);
 }
 
 GMSkyGameObject::~GMSkyGameObject()

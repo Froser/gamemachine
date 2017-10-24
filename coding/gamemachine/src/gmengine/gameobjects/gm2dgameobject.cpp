@@ -44,7 +44,7 @@ void GMGlyphObject::constructModel()
 	child->appendComponent(component);
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
-	setModel(&asset);
+	setModel(asset);
 }
 
 void GMGlyphObject::onCreateShader(Shader& shader)
@@ -159,50 +159,23 @@ void GMGlyphObject::update()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMImage2DBorder::GMImage2DBorder(GMAsset& texture, GMRect& borderTextureGeometry)
+GMImage2DBorder::GMImage2DBorder(GMAsset& texture, const GMRect& borderTextureGeometry, GMfloat textureWidth, GMfloat textureHeight)
 {
 	D(d);
-	d->autoDevide = true;
 	d->texture = texture;
 	d->borderTextureGeometry = borderTextureGeometry;
-}
-
-GMImage2DBorder::GMImage2DBorder(
-	GMAsset& texture,
-	GMRect& borderTextureGeometry,
-	GMRect& topLeft,
-	GMRect& topRight,
-	GMRect& middleLeft,
-	GMRect& middleRight,
-	GMRect& bottomLeft,
-	GMRect& bottomRight,
-	GMRect& topCenter,
-	GMRect& bottomCenter,
-	GMRect& center
-)
-{
-	D(d);
-	d->autoDevide = false;
-	d->texture = texture;
-	d->borderTextureGeometry = borderTextureGeometry;
-	d->topLeft = topLeft;
-	d->topRight = topRight;
-	d->middleLeft = middleLeft;
-	d->middleRight = middleRight;
-	d->bottomLeft = bottomLeft;
-	d->bottomRight = bottomRight;
-	d->topCenter = topCenter;
-	d->bottomCenter = bottomCenter;
-	d->center = center;
+	d->width = textureWidth;
+	d->height = textureHeight;
 }
 
 GMImage2DBorder::~GMImage2DBorder()
 {
 	D(d);
-	releaseBorderModels(d->models);
+	release(d->models);
+	release(d->objects);
 }
 
-template <GMint Size> void GMImage2DBorder::releaseBorderModels(GMModel* (&m)[Size])
+template <typename T, GMint Size> void GMImage2DBorder::release(T* (&m)[Size])
 {
 	for (GMint i = 0; i < Size; ++i)
 	{
@@ -214,21 +187,11 @@ void GMImage2DBorder::clone(GMImage2DBorder& b)
 {
 	D(d);
 	D_OF(d_b, &b);
-	d->autoDevide = d_b->autoDevide;
 	d->texture = d_b->texture;
 	d->borderTextureGeometry = d_b->borderTextureGeometry;
-	d->topLeft = d_b->topLeft;
-	d->topRight = d_b->topRight;
-	d->middleLeft = d_b->middleLeft;
-	d->middleRight = d_b->middleRight;
-	d->bottomLeft = d_b->bottomLeft;
-	d->bottomRight = d_b->bottomRight;
-	d->topCenter = d_b->topCenter;
-	d->bottomCenter = d_b->bottomCenter;
-	d->center = d_b->center;
 }
 
-void GMImage2DBorder::createBorder()
+void GMImage2DBorder::createBorder(const GMRect& geometry)
 {
 	D(d);
 	GM_ASSERT(d->models);
@@ -237,88 +200,152 @@ void GMImage2DBorder::createBorder()
 	// 0 3 6
 	// 1 4 7
 	// 2 5 8
-	std::array<std::array<GMfloat, 12>, 9> areas;
+	std::array<std::array<GMfloat, 12>, 9> uv;
 
-	//TODO
-	GMint textureWidth = 1, textureHeight = 1;
-	GM_ASSERT(false);
+	const GMfloat& textureWidth = d->width,
+		&textureHeight = d->height;
 
-	const GMRect& geo = textureGeometry();
+	const GMRect& textureGeo = textureGeometry();
 	GMfloat basedUV[2] = {
-		geo.x / (GMfloat)textureWidth,
-		geo.y / (GMfloat)textureHeight,
+		textureGeo.x / (GMfloat)textureWidth,
+		textureGeo.y / (GMfloat)textureHeight,
 	};
 
-	// 判断是否平分
-	if (isAutoDevide())
-	{
-		// 三等分点
-		GMfloat d1[2] = { geo.width / 3.f / textureWidth, geo.height / 3.f / textureHeight };
-		GMfloat d2[2] = { d1[0] * 2.f, d1[1] * 2.f };
-		GMfloat d3[3] = { d1[0] * 3.f, d1[1] * 3.f };
-		areas[0] = {
-			basedUV[0], basedUV[1], 0,
-			basedUV[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d1[0], basedUV[1], 0,
-		};
-		areas[1] = {
-			basedUV[0], basedUV[1] - d1[1], 0,
-			basedUV[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-		};
-		areas[2] = {
-			basedUV[0], basedUV[1] - d2[1], 0,
-			basedUV[0], basedUV[1] - d3[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d3[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-		};
+	// 三等分点
+	GMfloat w_3 = textureGeo.width / 3.f, h_3 = textureGeo.height / 3.f;
+	GMfloat d1[2] = { w_3 / textureWidth, h_3 / textureHeight };
+	GMfloat d2[2] = { d1[0] * 2.f, d1[1] * 2.f };
+	GMfloat d3[3] = { d1[0] * 3.f, d1[1] * 3.f };
+	uv[0] = {
+		basedUV[0], basedUV[1], 0,
+		basedUV[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d1[0], basedUV[1], 0,
+	};
+	uv[1] = {
+		basedUV[0], basedUV[1] - d1[1], 0,
+		basedUV[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
+	};
+	uv[2] = {
+		basedUV[0], basedUV[1] - d2[1], 0,
+		basedUV[0], basedUV[1] - d3[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d3[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
+	};
 
-		areas[3] = {
-			basedUV[0] + d1[0], basedUV[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d2[0], basedUV[1], 0,
-		};
-		areas[4] = {
-			basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-		};
-		areas[5] = {
-			basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d1[0], basedUV[1] - d3[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d3[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-		};
+	uv[3] = {
+		basedUV[0] + d1[0], basedUV[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d2[0], basedUV[1], 0,
+	};
+	uv[4] = {
+		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
+	};
+	uv[5] = {
+		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d1[0], basedUV[1] - d3[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d3[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
+	};
 
-		areas[6] = {
-			basedUV[0] + d2[0], basedUV[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d3[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d3[0], basedUV[1], 0,
-		};
-		areas[7] = {
-			basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d3[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d3[0], basedUV[1] - d1[1], 0,
-		};
-		areas[8] = {
-			basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-			basedUV[0] + d2[0], basedUV[1] - d3[1], 0,
-			basedUV[0] + d3[0], basedUV[1] - d3[1], 0,
-			basedUV[0] + d3[0], basedUV[1] - d2[1], 0,
-		};
-	}
+	uv[6] = {
+		basedUV[0] + d2[0], basedUV[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d3[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d3[0], basedUV[1], 0,
+	};
+	uv[7] = {
+		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d3[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d3[0], basedUV[1] - d1[1], 0,
+	};
+	uv[8] = {
+		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
+		basedUV[0] + d2[0], basedUV[1] - d3[1], 0,
+		basedUV[0] + d3[0], basedUV[1] - d3[1], 0,
+		basedUV[0] + d3[0], basedUV[1] - d2[1], 0,
+	};
 
+	GMRect w = GM.getMainWindow()->getClientRect();
+	GMRectF window = {
+		(GMfloat)w.x,
+		(GMfloat)w.y,
+		(GMfloat)w.width,
+		(GMfloat)w.height
+	};
+
+	std::array<GMfloat, 3> extents;
+	extents = {
+		geometry.width / 3.f / window.width,
+		geometry.height / 3.f / window.height,
+		1,
+	};
+
+	GMfloat pos[9][3] = {
+		(geometry.x) / window.width, (geometry.y) / window.height, 0,
+		(geometry.x) / window.width, (geometry.y + h_3) / window.height, 0,
+		(geometry.x) / window.width, (geometry.y + h_3 * 2) / window.height, 0,
+		(geometry.x + w_3) / window.width, (geometry.y) / window.height, 0,
+		(geometry.x + w_3) / window.width, (geometry.y + h_3) / window.height, 0,
+		(geometry.x + w_3) / window.width, (geometry.y + h_3 * 2) / window.height, 0,
+		(geometry.x + w_3 * 2) / window.width, (geometry.y) / window.height, 0,
+		(geometry.x + w_3 * 2) / window.width, (geometry.y + h_3) / window.height, 0,
+		(geometry.x + w_3 * 2) / window.width, (geometry.y + h_3 * 2) / window.height, 0,
+	};
+
+	// Shader回调
+	struct _Callback: public IPrimitiveCreatorShaderCallback {
+		_Callback(GMAsset t)
+			: texture(t)
+		{
+		}
+
+		void onCreateShader(Shader& shader)
+		{
+			shader.setNoDepthTest(true);
+			auto& tex = shader.getTexture();
+			auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
+			frames.addFrame(GMAssets::getTexture(texture));
+		}
+
+		GMAsset texture;
+	} _cb(d->texture);
+
+	// 制作9个矩形进行拉伸（可以以后还会有非拉伸的模式）
 	for (GMint i = 0; i < 9; ++i)
 	{
-		// TODO
-		//GMPrimitiveCreator::createQuad(extents, pos, d->models[i], this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+		GMfloat (*ptr)[12] = (GMfloat(*)[12])uv[i].data();
+		GMPrimitiveCreator::createQuad(extents.data(), pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, ptr);
+
+		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
+		d->objects[i] = new GMGameObject(asset);
+		d->objects[i]->onAppendingObjectToWorld();
+		GM.initObjectPainter(d->objects[i]->getModel());
 	}
+}
+
+template <GMint Size> void GMImage2DBorder::drawObjects(GMGameObject* (&objects)[Size])
+{
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->beginBlend();
+	for (GMint i = 0; i < Size; ++i)
+	{
+		objects[i]->draw();
+	}
+	engine->endBlend();
+}
+
+void GMImage2DBorder::draw()
+{
+	D(d);
+	//drawObjects(d->objects);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -366,7 +393,12 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 void GMImage2DGameObject::draw()
 {
 	D(d);
+	// 边框
+	if (d->border.hasBorder())
+		d->border.draw();
+	// 背景
 	Base::draw();
+	// 文字
 	if (d->textModel)
 		d->textModel->draw();
 }
@@ -400,14 +432,15 @@ void GMImage2DGameObject::createBackgroundImage()
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
 	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
 
-	auto asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
-	setModel(&asset);
+	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
+	setModel(asset);
 }
 
 void GMImage2DGameObject::createBorder()
 {
 	D(d);
-	d->border.createBorder();
+	D_BASE(db, GMControlGameObject);
+	d->border.createBorder(db->geometry);
 }
 
 void GMImage2DGameObject::createGlyphs()

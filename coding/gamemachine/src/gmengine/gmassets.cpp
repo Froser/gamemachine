@@ -33,7 +33,7 @@ void GMAssets::clearOrphans()
 	}
 }
 
-GMAsset* GMAssets::insertAsset(GMAssetType type, void* asset)
+GMAsset GMAssets::insertAsset(GMAssetType type, void* asset)
 {
 	D(d);
 	// 使用匿名的asset，意味着它不需要被第二次找到，直接放入vector
@@ -41,10 +41,10 @@ GMAsset* GMAssets::insertAsset(GMAssetType type, void* asset)
 	node->asset.type = type;
 	node->asset.asset = asset;
 	d->orphans.push_back(node);
-	return &node->asset;
+	return node->asset;
 }
 
-GMAsset* GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAssetType type, void* asset)
+GMAsset GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAssetType type, void* asset)
 {
 	GMAssetsNode* node = nullptr;
 	// 把(a/b, c/d)字符串类型的参数改写为(a/b/c, d)
@@ -56,7 +56,7 @@ GMAsset* GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAsse
 	node->name = newName;
 	node->asset.type = type;
 	node->asset.asset = asset;
-	return &node->asset;
+	return node->asset;
 }
 
 static bool splash(char in)

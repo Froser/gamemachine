@@ -58,7 +58,7 @@ void Demo_Texture::init()
 	gm::GMfloat pos[] = { 0, 0, -1.f };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
-	gm::GMAsset* quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
+	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
 	d->demoWorld->appendObject("texture", obj);
 

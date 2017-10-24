@@ -10,7 +10,7 @@ GMParticleGameObject::GMParticleGameObject(AUTORELEASE GMModel* prototype)
 	D(d);
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, prototype);
-	setModel(&asset);
+	setModel(asset);
 
 	if (prototype->getAllMeshes().size() > 1)
 	{

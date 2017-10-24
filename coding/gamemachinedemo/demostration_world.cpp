@@ -94,6 +94,21 @@ void DemostrationWorld::init()
 {
 	D(d);
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
+
+	// 读取边框
+	gm::GMGamePackage* package = GM.getGamePackageManager();
+	gm::GMBuffer buf;
+	package->readFile(gm::GMPackageIndex::Textures, "frame.png", &buf);
+	gm::GMImage* img = nullptr;
+	gm::GMImageReader::load(buf.buffer, buf.size, &img);
+	gm::ITexture* frameTexture = nullptr;
+	GM.getFactory()->createTexture(img, &frameTexture);
+	GM_ASSERT(frameTexture);
+	gm::GMAsset frameAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
+	gm::GMRect textureGeo = { 0,0,96,96 }; //截取的纹理位置
+	listbox->setBorder(gm::GMImage2DBorder(frameAsset, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height));
+	GM_delete(img);
+
 	gm::GMRect rect = { 10, 10, 600, 600 };
 	listbox->setGeometry(rect);
 	listbox->setItemMargins(0, 5, 0, 0);

@@ -35,10 +35,10 @@ class GMGameObject : public GMObject
 
 public:
 	GMGameObject();
-	GMGameObject(GMAsset* asset);
+	GMGameObject(GMAsset asset);
 
 public:
-	void setModel(GMAsset* asset);
+	void setModel(GMAsset asset);
 	GMModel* getModel();
 
 	virtual void setWorld(GMGameWorld* world);
@@ -79,7 +79,7 @@ class GMEntityObject : public GMGameObject
 	DECLARE_PRIVATE(GMEntityObject)
 
 public:
-	GMEntityObject(GMAsset* asset);
+	GMEntityObject(GMAsset asset);
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
