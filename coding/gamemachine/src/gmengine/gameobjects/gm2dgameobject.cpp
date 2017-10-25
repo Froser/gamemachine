@@ -3,6 +3,14 @@
 #include "gmgameworld.h"
 #include "gmgl/gmglglyphmanager.h"
 
+enum Margins
+{
+	Left = 0,
+	Top,
+	Right,
+	Bottom,
+};
+
 //GlyphObject
 template <typename T>
 inline bool isValidRect(const T& r)
@@ -189,6 +197,8 @@ void GMImage2DBorder::clone(GMImage2DBorder& b)
 	D_OF(d_b, &b);
 	d->texture = d_b->texture;
 	d->borderTextureGeometry = d_b->borderTextureGeometry;
+	d->width = d_b->width;
+	d->height = d_b->height;
 }
 
 void GMImage2DBorder::createBorder(const GMRect& geometry)
@@ -281,22 +291,23 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		(GMfloat)w.height
 	};
 
+	GMfloat gw_3 = geometry.width / 3.f, gh_3 = geometry.height / 3.f;
 	GMfloat extents[3] = {
-		w_3 / window.width,
-		h_3 / window.height,
+		gw_3 / window.width,
+		gh_3 / window.height,
 		1,
 	};
 
 	GMfloat pos[9][3] = {
 		(geometry.x * 2) / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
-		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + h_3) * 2 / window.height, 0,
-		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + h_3 * 2) * 2 / window.height, 0,
-		(geometry.x + w_3) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
-		(geometry.x + w_3) * 2 / window.width - 1, 1 - (geometry.y + h_3) * 2 / window.height, 0,
-		(geometry.x + w_3) * 2 / window.width - 1, 1 - (geometry.y + h_3 * 2) * 2 / window.height, 0,
-		(geometry.x + w_3 * 2) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
-		(geometry.x + w_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + h_3) * 2 / window.height, 0,
-		(geometry.x + w_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + h_3 * 2) * 2 / window.height, 0,
+		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + gh_3) * 2 / window.height, 0,
+		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + gh_3 * 2) * 2 / window.height, 0,
+		(geometry.x + gw_3) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
+		(geometry.x + gw_3) * 2 / window.width - 1, 1 - (geometry.y + gh_3) * 2 / window.height, 0,
+		(geometry.x + gw_3) * 2 / window.width - 1, 1 - (geometry.y + gh_3 * 2) * 2 / window.height, 0,
+		(geometry.x + gw_3 * 2) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
+		(geometry.x + gw_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + gh_3) * 2 / window.height, 0,
+		(geometry.x + gw_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + gh_3 * 2) * 2 / window.height, 0,
 	};
 
 	// Shader回调
@@ -312,6 +323,10 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 			auto& tex = shader.getTexture();
 			auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
 			frames.addFrame(GMAssets::getTexture(texture));
+
+			shader.setBlend(true);
+			shader.setBlendFactorSource(GMS_BlendFunc::ONE);
+			shader.setBlendFactorDest(GMS_BlendFunc::DST_ALPHA);
 		}
 
 		GMAsset texture;
@@ -333,12 +348,10 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 template <GMint Size> void GMImage2DBorder::drawObjects(GMGameObject* (&objects)[Size])
 {
 	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginBlend();
 	for (GMint i = 0; i < Size; ++i)
 	{
 		objects[i]->draw();
 	}
-	engine->endBlend();
 }
 
 void GMImage2DBorder::draw()
@@ -356,6 +369,15 @@ GMImage2DGameObject::~GMImage2DGameObject()
 		delete model;
 	if (d->textModel)
 		delete d->textModel;
+}
+
+void GMImage2DGameObject::setPaddings(GMint left, GMint top, GMint right, GMint bottom)
+{
+	D(d);
+	d->paddings[Left] = left;
+	d->paddings[Top] = top;
+	d->paddings[Right] = right;
+	d->paddings[Bottom] = bottom;
 }
 
 void GMImage2DGameObject::setImage(GMAsset& image)
@@ -392,14 +414,25 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 void GMImage2DGameObject::draw()
 {
 	D(d);
-	// 边框
-	if (d->border.hasBorder())
-		d->border.draw();
+
+	// 首先创建出一个裁剪框
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->beginCreateStencil();
+	Base::draw();
+	engine->endCreateStencil();
+
+	engine->beginUseStencil(false);
 	// 背景
 	Base::draw();
 	// 文字
 	if (d->textModel)
 		d->textModel->draw();
+
+	// 边框
+	if (d->border.hasBorder())
+		d->border.draw();
+
+	engine->endUseStencil();
 }
 
 void GMImage2DGameObject::onCreateShader(Shader& shader)
@@ -420,7 +453,7 @@ void GMImage2DGameObject::createBackgroundImage()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
-
+	
 	GMRectF coord = toViewportCoord(db->geometry);
 	GMfloat extents[3] = {
 		coord.width,
@@ -431,8 +464,7 @@ void GMImage2DGameObject::createBackgroundImage()
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
 	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
 
-	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
-	setModel(asset);
+	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 }
 
 void GMImage2DGameObject::createBorder()
@@ -448,8 +480,15 @@ void GMImage2DGameObject::createGlyphs()
 	D_BASE(db, GMControlGameObject);
 	if (d->textModel)
 	{
+		GMRect geometry = {
+			db->geometry.x + d->paddings[Left],
+			db->geometry.y + d->paddings[Top],
+			db->geometry.width - d->paddings[Left] - d->paddings[Right],
+			db->geometry.height - d->paddings[Top] - d->paddings[Bottom],
+		};
+
+		d->textModel->setGeometry(geometry);
 		d->textModel->setWorld(getWorld());
-		d->textModel->setGeometry(db->geometry);
 		d->textModel->setText(d->text.c_str());
 		d->textModel->onAppendingObjectToWorld();
 		GM.initObjectPainter(d->textModel->getModel());
@@ -470,13 +509,13 @@ GMImage2DGameObject* GMListbox2DGameObject::addItem(const GMString& text)
 	return item;
 }
 
-void GMListbox2DGameObject::setItemMargins(GMfloat left, GMfloat top, GMfloat right, GMfloat bottom)
+void GMListbox2DGameObject::setItemMargins(GMint left, GMint top, GMint right, GMint bottom)
 {
 	D(d);
-	d->margins[Left] = left;
-	d->margins[Top] = top;
-	d->margins[Right] = right;
-	d->margins[Bottom] = bottom;
+	d->itemMargins[Left] = left;
+	d->itemMargins[Top] = top;
+	d->itemMargins[Right] = right;
+	d->itemMargins[Bottom] = bottom;
 }
 
 void GMListbox2DGameObject::onCreateShader(Shader& shader)
@@ -491,22 +530,22 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 	D_BASE(db, GMControlGameObject);
 
 	Base::onAppendingObjectToWorld();
-	auto x = db->geometry.x + d->margins[Left],
-		y = db->geometry.y + d->margins[Top];
+	auto x = db->geometry.x + d->itemMargins[Left],
+		y = db->geometry.y + d->itemMargins[Top];
 
 	for (auto item : getItems())
 	{
 		static GMRect rect;
 		rect.x = x;
 		rect.y = y;
-		rect.width = item->getGeometry().width - d->margins[Left] - d->margins[Right];
+		rect.width = item->getGeometry().width - d->itemMargins[Left] - d->itemMargins[Right];
 		rect.height = item->getGeometry().height;
 		item->setGeometry(rect);
 		item->setWorld(getWorld());
 		item->onAppendingObjectToWorld();
 		GM.initObjectPainter(item->getModel());
 
-		y += rect.height + d->margins[Top] + d->margins[Bottom];
+		y += rect.height + d->itemMargins[Top] + d->itemMargins[Bottom];
 	}
 }
 

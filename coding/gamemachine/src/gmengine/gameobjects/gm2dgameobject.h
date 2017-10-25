@@ -98,6 +98,7 @@ GM_PRIVATE_OBJECT(GMImage2DGameObject)
 	AUTORELEASE GMGlyphObject* textModel = nullptr;
 	std::wstring text;
 	GMImage2DBorder border;
+	GMint paddings[4] = { 0 };
 };
 
 class GMImage2DGameObject : public GMControlGameObject, public IPrimitiveCreatorShaderCallback
@@ -111,6 +112,8 @@ public:
 	~GMImage2DGameObject();
 
 public:
+	// GMImage2DGameObject采用的盒模型是，width和height表示边框的宽度和高度，内容部分应该减去相应的padding
+	void setPaddings(GMint left, GMint top, GMint right, GMint bottom);
 	void setImage(GMAsset& asset);
 	void setText(const GMString& text);
 	void setBorder(GMImage2DBorder& border);
@@ -132,7 +135,7 @@ private:
 //////////////////////////////////////////////////////////////////////////
 GM_PRIVATE_OBJECT(GMListbox2DGameObject)
 {
-	GMfloat margins[4] = { 0 };
+	GMint itemMargins[4] = { 0 };
 };
 
 class GMListbox2DGameObject : public GMImage2DGameObject
@@ -141,17 +144,9 @@ class GMListbox2DGameObject : public GMImage2DGameObject
 
 	typedef GMImage2DGameObject Base;
 
-	enum Margins
-	{
-		Left = 0,
-		Top,
-		Right,
-		Bottom,
-	};
-
 public:
 	GMImage2DGameObject* addItem(const GMString& text);
-	void setItemMargins(GMfloat left, GMfloat top, GMfloat right, GMfloat bottom);
+	void setItemMargins(GMint left, GMint top, GMint right, GMint bottom);
 
 public:
 	virtual void onAppendingObjectToWorld();

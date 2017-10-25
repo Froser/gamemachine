@@ -106,21 +106,22 @@ void DemostrationWorld::init()
 	GM_ASSERT(frameTexture);
 	gm::GMAsset frameAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0,0,96,96 }; //截取的纹理位置
-	listbox->setBorder(gm::GMImage2DBorder(frameAsset, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height));
-	GM_delete(img);
 
-	gm::GMRect rect = { 10, 10, 600, 600 };
+	gm::GMRect rect = { 10, 10, 600, 300 };
 	listbox->setGeometry(rect);
 	listbox->setItemMargins(0, 5, 0, 0);
 	for (auto& demo : d->demos)
 	{
 		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
-		item->setHeight(20);
+		item->setBorder(gm::GMImage2DBorder(frameAsset, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height));
+		item->setHeight(30);
+		item->setPaddings(3, 3, 3, 3);
 		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
 		});
 	}
 	addControl(listbox);
+	GM_delete(img);
 }
 
 void DemostrationWorld::renderScene()

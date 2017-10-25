@@ -605,6 +605,7 @@ void GMGLGraphicEngine::endUseStencil()
 void GMGLGraphicEngine::beginBlend()
 {
 	D(d);
+	GM_ASSERT(!d->isBlending); // 不能重复进行多次Blend
 	d->renderModeForBlend = GMGetRenderState(RENDER_MODE);
 	d->isBlending = true;
 	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
