@@ -323,10 +323,6 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 			auto& tex = shader.getTexture();
 			auto& frames = tex.getTextureFrames(GMTextureType::AMBIENT, 0);
 			frames.addFrame(GMAssets::getTexture(texture));
-
-			shader.setBlend(true);
-			shader.setBlendFactorSource(GMS_BlendFunc::ONE);
-			shader.setBlendFactorDest(GMS_BlendFunc::DST_ALPHA);
 		}
 
 		GMAsset texture;
@@ -422,15 +418,17 @@ void GMImage2DGameObject::draw()
 	engine->endCreateStencil();
 
 	engine->beginUseStencil(false);
+
 	// 背景
 	Base::draw();
-	// 文字
-	if (d->textModel)
-		d->textModel->draw();
 
 	// 边框
 	if (d->border.hasBorder())
 		d->border.draw();
+
+	// 文字
+	if (d->textModel)
+		d->textModel->draw();
 
 	engine->endUseStencil();
 }
