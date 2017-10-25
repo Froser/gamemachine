@@ -281,23 +281,22 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		(GMfloat)w.height
 	};
 
-	std::array<GMfloat, 3> extents;
-	extents = {
-		geometry.width / 3.f / window.width,
-		geometry.height / 3.f / window.height,
+	GMfloat extents[3] = {
+		w_3 / window.width,
+		h_3 / window.height,
 		1,
 	};
 
 	GMfloat pos[9][3] = {
-		(geometry.x) / window.width, (geometry.y) / window.height, 0,
-		(geometry.x) / window.width, (geometry.y + h_3) / window.height, 0,
-		(geometry.x) / window.width, (geometry.y + h_3 * 2) / window.height, 0,
-		(geometry.x + w_3) / window.width, (geometry.y) / window.height, 0,
-		(geometry.x + w_3) / window.width, (geometry.y + h_3) / window.height, 0,
-		(geometry.x + w_3) / window.width, (geometry.y + h_3 * 2) / window.height, 0,
-		(geometry.x + w_3 * 2) / window.width, (geometry.y) / window.height, 0,
-		(geometry.x + w_3 * 2) / window.width, (geometry.y + h_3) / window.height, 0,
-		(geometry.x + w_3 * 2) / window.width, (geometry.y + h_3 * 2) / window.height, 0,
+		(geometry.x * 2) / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
+		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + h_3) * 2 / window.height, 0,
+		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + h_3 * 2) * 2 / window.height, 0,
+		(geometry.x + w_3) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
+		(geometry.x + w_3) * 2 / window.width - 1, 1 - (geometry.y + h_3) * 2 / window.height, 0,
+		(geometry.x + w_3) * 2 / window.width - 1, 1 - (geometry.y + h_3 * 2) * 2 / window.height, 0,
+		(geometry.x + w_3 * 2) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
+		(geometry.x + w_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + h_3) * 2 / window.height, 0,
+		(geometry.x + w_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + h_3 * 2) * 2 / window.height, 0,
 	};
 
 	// Shader回调
@@ -322,7 +321,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	for (GMint i = 0; i < 9; ++i)
 	{
 		GMfloat (*ptr)[12] = (GMfloat(*)[12])uv[i].data();
-		GMPrimitiveCreator::createQuad(extents.data(), pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, ptr);
+		GMPrimitiveCreator::createQuad(extents, pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, ptr);
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
 		d->objects[i] = new GMGameObject(asset);
@@ -345,7 +344,7 @@ template <GMint Size> void GMImage2DBorder::drawObjects(GMGameObject* (&objects)
 void GMImage2DBorder::draw()
 {
 	D(d);
-	//drawObjects(d->objects);
+	drawObjects(d->objects);
 }
 
 //////////////////////////////////////////////////////////////////////////
