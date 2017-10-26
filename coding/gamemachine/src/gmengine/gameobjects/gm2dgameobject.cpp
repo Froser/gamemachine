@@ -221,7 +221,6 @@ void GMImage2DBorder::clone(GMImage2DBorder& b)
 void GMImage2DBorder::createBorder(const GMRect& geometry)
 {
 	D(d);
-	GM_ASSERT(d->models);
 	GM_ASSERT(hasBorder());
 
 	// 创建9个区域
