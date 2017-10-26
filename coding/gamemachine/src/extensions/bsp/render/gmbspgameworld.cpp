@@ -112,6 +112,8 @@ void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alw
 
 void GMBSPGameWorld::setDefaultLights()
 {
+	removeLights();
+
 	{
 		GMLight ambientLight(GMLightType::AMBIENT);
 		GMfloat lightColor[] = { .9f, .9f, .9f };
