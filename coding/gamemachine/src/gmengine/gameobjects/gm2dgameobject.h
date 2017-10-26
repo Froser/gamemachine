@@ -61,6 +61,8 @@ GM_PRIVATE_OBJECT(GMImage2DBorder)
 	GMGameObject *objects[9] = { nullptr };
 	GMfloat width;
 	GMfloat height;
+	GMfloat cornerWidth;
+	GMfloat cornerHeight;
 };
 
 // 表示一个2D边框。
@@ -75,7 +77,13 @@ private:
 	GMImage2DBorder() = default;
 
 public:
-	GMImage2DBorder(GMAsset& texture, const GMRect& borderTextureGeometry, GMfloat textureWidth, GMfloat textureHeight);
+	GMImage2DBorder(GMAsset& texture,
+		const GMRect& borderTextureGeometry,
+		GMfloat textureWidth,
+		GMfloat textureHeight,
+		GMfloat cornerWidth,
+		GMfloat cornerHeight
+	);
 	~GMImage2DBorder();
 
 private:
@@ -85,9 +93,9 @@ private:
 	template <GMint Size> void drawObjects(GMGameObject* (&)[Size]);
 
 private:
-	void clone(GMImage2DBorder&);
-	void createBorder(const GMRect& geometry);
-	void draw();
+	virtual void clone(GMImage2DBorder&);
+	virtual void createBorder(const GMRect& geometry);
+	virtual void draw();
 };
 
 //////////////////////////////////////////////////////////////////////////

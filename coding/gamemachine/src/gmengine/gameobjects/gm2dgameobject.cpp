@@ -18,6 +18,11 @@ inline bool isValidRect(const T& r)
 	return r.x >= 0;
 }
 
+#define BEGIN_GEOMETRY_TO_VIEWPORT(clientRect) const auto& cw = clientRect.width, &ch = clientRect.height;
+#define GEOMETRY_TO_VIEWPORT_X(i) ((i) * 2.f / cw - 1.f)
+#define GEOMETRY_TO_VIEWPORT_Y(i) (1 - (i) * 2.f / ch)
+#define END_GEOMETRY_TO_VIEWPORT()
+
 #define X(i) (i) / resolutionWidth
 #define Y(i) (i) / resolutionHeight
 #define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
@@ -167,13 +172,21 @@ void GMGlyphObject::update()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMImage2DBorder::GMImage2DBorder(GMAsset& texture, const GMRect& borderTextureGeometry, GMfloat textureWidth, GMfloat textureHeight)
+GMImage2DBorder::GMImage2DBorder(GMAsset& texture,
+	const GMRect& borderTextureGeometry,
+	GMfloat textureWidth,
+	GMfloat textureHeight,
+	GMfloat cornerWidth,
+	GMfloat cornerHeight
+)
 {
 	D(d);
 	d->texture = texture;
 	d->borderTextureGeometry = borderTextureGeometry;
 	d->width = textureWidth;
 	d->height = textureHeight;
+	d->cornerWidth = cornerWidth;
+	d->cornerHeight = cornerHeight;
 }
 
 GMImage2DBorder::~GMImage2DBorder()
@@ -199,88 +212,54 @@ void GMImage2DBorder::clone(GMImage2DBorder& b)
 	d->borderTextureGeometry = d_b->borderTextureGeometry;
 	d->width = d_b->width;
 	d->height = d_b->height;
+	d->cornerWidth = d_b->cornerWidth;
+	d->cornerHeight = d_b->cornerHeight;
 }
 
 void GMImage2DBorder::createBorder(const GMRect& geometry)
 {
 	D(d);
 	GM_ASSERT(d->models);
+	GM_ASSERT(hasBorder());
 
 	// 创建9个区域
-	// 0 3 6
-	// 1 4 7
-	// 2 5 8
-	std::array<std::array<GMfloat, 12>, 9> uv;
+	// 0(corner) 3(center) 6(corner)
+	// 1(middle)     4     7(middle)
+	// 2(corner) 5(center) 8(corner)
 
 	const GMfloat& textureWidth = d->width,
 		&textureHeight = d->height;
 
 	const GMRect& textureGeo = textureGeometry();
-	GMfloat basedUV[2] = {
+	GMfloat base[2] = {
 		textureGeo.x / (GMfloat)textureWidth,
 		textureGeo.y / (GMfloat)textureHeight,
 	};
 
-	// 三等分点
-	GMfloat w_3 = textureGeo.width / 3.f, h_3 = textureGeo.height / 3.f;
-	GMfloat d1[2] = { w_3 / textureWidth, h_3 / textureHeight };
-	GMfloat d2[2] = { d1[0] * 2.f, d1[1] * 2.f };
-	GMfloat d3[3] = { d1[0] * 3.f, d1[1] * 3.f };
-	uv[0] = {
-		basedUV[0], basedUV[1], 0,
-		basedUV[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d1[0], basedUV[1], 0,
-	};
-	uv[1] = {
-		basedUV[0], basedUV[1] - d1[1], 0,
-		basedUV[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-	};
-	uv[2] = {
-		basedUV[0], basedUV[1] - d2[1], 0,
-		basedUV[0], basedUV[1] - d3[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d3[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-	};
+	const GMfloat& center_w_pixel = (d->width - 2 * d->cornerWidth), &center_h_pixel = d->cornerHeight;
+	const GMfloat& middle_w_pixel = d->cornerWidth, &middle_h_pixel = (d->height - 2 * d->cornerHeight);
+	const GMfloat& corner_w = d->cornerWidth / d->width, &corner_h = d->cornerHeight / d->height;
+	const GMfloat& corner_w2 = corner_w * 2, &corner_h2 = corner_h * 2;
+	const GMfloat& center_w = center_w_pixel / d->width, &center_h = corner_h;
+	const GMfloat& middle_w = corner_w, &middle_h = middle_h_pixel / d->height;
+	GMfloat uv[9][12] = {
+		// 0
+		base[0]               , base[1] + corner_h2 + middle_h   , 0,
+		base[0]               , base[1] + corner_h + middle_h    , 0,
+		base[0] + corner_w    , base[1] + corner_h + middle_h    , 0,
+		base[0] + corner_w    , base[1] + corner_h2 + middle_h   , 0,
 
-	uv[3] = {
-		basedUV[0] + d1[0], basedUV[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d2[0], basedUV[1], 0,
-	};
-	uv[4] = {
-		basedUV[0] + d1[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-	};
-	uv[5] = {
-		basedUV[0] + d1[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d1[0], basedUV[1] - d3[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d3[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-	};
+		// 1
+		base[0]               , base[1] + corner_h + middle_h    , 0,
+		base[0]               , base[1] + middle_h               , 0,
+		base[0] + corner_w    , base[1] + middle_h               , 0,
+		base[0] + corner_w    , base[1] + corner_h + middle_h    , 0,
 
-	uv[6] = {
-		basedUV[0] + d2[0], basedUV[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d3[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d3[0], basedUV[1], 0,
-	};
-	uv[7] = {
-		basedUV[0] + d2[0], basedUV[1] - d1[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d3[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d3[0], basedUV[1] - d1[1], 0,
-	};
-	uv[8] = {
-		basedUV[0] + d2[0], basedUV[1] - d2[1], 0,
-		basedUV[0] + d2[0], basedUV[1] - d3[1], 0,
-		basedUV[0] + d3[0], basedUV[1] - d3[1], 0,
-		basedUV[0] + d3[0], basedUV[1] - d2[1], 0,
+		// 2
+		base[0]               , base[1] + corner_h               , 0,
+		base[0]               , base[1]                          , 0,
+		base[0] + corner_w    , base[1]                          , 0,
+		base[0] + corner_w    , base[1] + corner_h               , 0,
 	};
 
 	GMRect w = GM.getMainWindow()->getClientRect();
@@ -291,24 +270,38 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		(GMfloat)w.height
 	};
 
-	GMfloat gw_3 = geometry.width / 3.f, gh_3 = geometry.height / 3.f;
-	GMfloat extents[3] = {
-		gw_3 / window.width,
-		gh_3 / window.height,
-		1,
+	const GMfloat &pos_center_w = geometry.width - 2 * d->cornerWidth,
+		&pos_center_h = d->cornerHeight,
+		&pos_middle_w = d->cornerWidth,
+		&pos_middle_h = geometry.height - 2 * d->cornerHeight;
+
+	GMfloat extents[9][3] = {
+		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
+		{ pos_middle_w / window.width, pos_middle_h / window.height , 1 },
+		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
+
+		{ center_w_pixel / window.width, center_h_pixel / window.height, 1 },
+		{ pos_center_w / window.width, pos_middle_h / window.height, 1 },
+		{ center_w_pixel / window.width, center_h_pixel / window.height, 1 },
+
+		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
+		{ pos_middle_w / window.width, pos_middle_h / window.height , 1 },
+		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
 	};
 
-	GMfloat pos[9][3] = {
-		(geometry.x * 2) / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
-		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + gh_3) * 2 / window.height, 0,
-		(geometry.x * 2) / window.width - 1, 1 - (geometry.y + gh_3 * 2) * 2 / window.height, 0,
-		(geometry.x + gw_3) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
-		(geometry.x + gw_3) * 2 / window.width - 1, 1 - (geometry.y + gh_3) * 2 / window.height, 0,
-		(geometry.x + gw_3) * 2 / window.width - 1, 1 - (geometry.y + gh_3 * 2) * 2 / window.height, 0,
-		(geometry.x + gw_3 * 2) * 2 / window.width - 1, 1 - (geometry.y) * 2 / window.height, 0,
-		(geometry.x + gw_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + gh_3) * 2 / window.height, 0,
-		(geometry.x + gw_3 * 2) * 2 / window.width - 1, 1 - (geometry.y + gh_3 * 2) * 2 / window.height, 0,
-	};
+	BEGIN_GEOMETRY_TO_VIEWPORT(window)
+		GMfloat pos[9][3] = {
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x), GEOMETRY_TO_VIEWPORT_Y(geometry.y), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight + pos_middle_h), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth), GEOMETRY_TO_VIEWPORT_Y(geometry.y), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight + pos_middle_h), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth + pos_center_w), GEOMETRY_TO_VIEWPORT_Y(geometry.y), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth + pos_center_w), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight), 0 },
+			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth + pos_center_w), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight + pos_middle_h), 0 },
+		};
+	END_GEOMETRY_TO_VIEWPORT()
 
 	// Shader回调
 	struct _Callback: public IPrimitiveCreatorShaderCallback {
@@ -331,8 +324,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	// 制作9个矩形进行拉伸（可以以后还会有非拉伸的模式）
 	for (GMint i = 0; i < 9; ++i)
 	{
-		GMfloat (*ptr)[12] = (GMfloat(*)[12])uv[i].data();
-		GMPrimitiveCreator::createQuad(extents, pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, ptr);
+		GMPrimitiveCreator::createQuad(extents[i], pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, uv);
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
 		d->objects[i] = new GMGameObject(asset);
@@ -353,6 +345,7 @@ template <GMint Size> void GMImage2DBorder::drawObjects(GMGameObject* (&objects)
 void GMImage2DBorder::draw()
 {
 	D(d);
+	GM_ASSERT(hasBorder());
 	drawObjects(d->objects);
 }
 
@@ -469,7 +462,8 @@ void GMImage2DGameObject::createBorder()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
-	d->border.createBorder(db->geometry);
+	if (d->border.hasBorder())
+		d->border.createBorder(db->geometry);
 }
 
 void GMImage2DGameObject::createGlyphs()

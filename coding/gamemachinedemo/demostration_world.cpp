@@ -113,7 +113,14 @@ void DemostrationWorld::init()
 	for (auto& demo : d->demos)
 	{
 		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
-		item->setBorder(gm::GMImage2DBorder(frameAsset, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height));
+		item->setBorder(gm::GMImage2DBorder(
+			frameAsset,
+			textureGeo,
+			img->getData().mip[0].width,
+			img->getData().mip[0].height,
+			img->getData().mip[0].width / 3.f,
+			img->getData().mip[0].height / 3.f
+		));
 		item->setHeight(30);
 		item->setPaddings(3, 3, 3, 3);
 		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
