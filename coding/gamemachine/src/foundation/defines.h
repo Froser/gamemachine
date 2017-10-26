@@ -203,20 +203,6 @@ inline bool GM_in_rect(const T& rect, const decltype(T().x) x, const decltype(T(
 }
 
 template <typename T>
-void GM_new(OUT T** out)
-{
-	*out = new T;
-	memset(*out, 0, sizeof(T));
-}
-
-template <typename T>
-void GM_new_arr(OUT T** out, GMint cnt)
-{
-	*out = new T[cnt];
-	memset(*out, 0, cnt * sizeof(T));
-}
-
-template <typename T>
 inline void GM_delete(T*& o)
 {
 	if (o)

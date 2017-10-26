@@ -118,8 +118,8 @@ void DemostrationWorld::init()
 			textureGeo,
 			img->getData().mip[0].width,
 			img->getData().mip[0].height,
-			img->getData().mip[0].width / 3.f,
-			img->getData().mip[0].height / 3.f
+			14,
+			14
 		));
 		item->setHeight(30);
 		item->setPaddings(3, 3, 3, 3);
@@ -150,6 +150,9 @@ void DemostrationWorld::switchDemo()
 	{
 		if (d->currentDemo)
 			d->currentDemo->onDeactivated();
+
+		if (!d->nextDemo->isInited())
+			d->nextDemo->init();
 		d->nextDemo->onActivate();
 		setCurrentDemo(d->nextDemo);
 		d->nextDemo = nullptr;
@@ -201,11 +204,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 
 	DemoHandler* currentDemo = getWorld()->getCurrentDemo();
 	if (currentDemo)
-	{
-		if (!currentDemo->isInited())
-			currentDemo->init();
 		currentDemo->event(evt);
-	}
 
 	switch (evt)
 	{

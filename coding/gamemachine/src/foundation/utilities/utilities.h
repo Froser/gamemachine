@@ -527,5 +527,12 @@ public:
 	GMManualResetEvent(bool initialState = false);
 };
 
+// traits
+template <typename T, GMint size>
+constexpr GMint GM_dimensions_of_array(T(&)[size])
+{
+	return size;
+}
+
 END_NS
 #endif

@@ -22,6 +22,8 @@ inline bool isValidRect(const T& r)
 #define GEOMETRY_TO_VIEWPORT_X(i) ((i) * 2.f / cw - 1.f)
 #define GEOMETRY_TO_VIEWPORT_Y(i) (1 - (i) * 2.f / ch)
 #define END_GEOMETRY_TO_VIEWPORT()
+#define UV_INDEX(points) points[0], points[1], 0
+#define EXTENTS_INDEX(points) points[0], points[1], 1
 
 #define X(i) (i) / resolutionWidth
 #define Y(i) (i) / resolutionHeight
@@ -242,24 +244,39 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	const GMfloat& corner_w2 = corner_w * 2, &corner_h2 = corner_h * 2;
 	const GMfloat& center_w = center_w_pixel / d->width, &center_h = corner_h;
 	const GMfloat& middle_w = corner_w, &middle_h = middle_h_pixel / d->height;
+
+	const GMfloat uv_points[16][2] = {
+		{ base[0], base[1] + corner_h2 + middle_h },
+		{ base[0], base[1] + corner_h + middle_h },
+		{ base[0], base[1] + corner_h },
+		{ base[0], base[1] },
+
+		{ base[0] + corner_w, base[1] + corner_h2 + middle_h },
+		{ base[0] + corner_w, base[1] + corner_h + middle_h },
+		{ base[0] + corner_w, base[1] + corner_h },
+		{ base[0] + corner_w, base[1] },
+
+		{ base[0] + corner_w + center_w, base[1] + corner_h2 + middle_h },
+		{ base[0] + corner_w + center_w, base[1] + corner_h + middle_h },
+		{ base[0] + corner_w + center_w, base[1] + corner_h },
+		{ base[0] + corner_w + center_w, base[1] },
+
+		{ base[0] + corner_w2 + center_w, base[1] + corner_h2 + middle_h },
+		{ base[0] + corner_w2 + center_w, base[1] + corner_h + middle_h },
+		{ base[0] + corner_w2 + center_w, base[1] + corner_h },
+		{ base[0] + corner_w2 + center_w, base[1] },
+	};
+
 	GMfloat uv[9][12] = {
-		// 0
-		base[0]               , base[1] + corner_h2 + middle_h   , 0,
-		base[0]               , base[1] + corner_h + middle_h    , 0,
-		base[0] + corner_w    , base[1] + corner_h + middle_h    , 0,
-		base[0] + corner_w    , base[1] + corner_h2 + middle_h   , 0,
-
-		// 1
-		base[0]               , base[1] + corner_h + middle_h    , 0,
-		base[0]               , base[1] + middle_h               , 0,
-		base[0] + corner_w    , base[1] + middle_h               , 0,
-		base[0] + corner_w    , base[1] + corner_h + middle_h    , 0,
-
-		// 2
-		base[0]               , base[1] + corner_h               , 0,
-		base[0]               , base[1]                          , 0,
-		base[0] + corner_w    , base[1]                          , 0,
-		base[0] + corner_w    , base[1] + corner_h               , 0,
+		UV_INDEX(uv_points[0]), UV_INDEX(uv_points[1]), UV_INDEX(uv_points[5]), UV_INDEX(uv_points[4]),
+		UV_INDEX(uv_points[1]), UV_INDEX(uv_points[2]), UV_INDEX(uv_points[6]), UV_INDEX(uv_points[5]),
+		UV_INDEX(uv_points[2]), UV_INDEX(uv_points[3]), UV_INDEX(uv_points[7]), UV_INDEX(uv_points[6]),
+		UV_INDEX(uv_points[4]), UV_INDEX(uv_points[5]), UV_INDEX(uv_points[9]), UV_INDEX(uv_points[8]),
+		UV_INDEX(uv_points[5]), UV_INDEX(uv_points[6]), UV_INDEX(uv_points[10]), UV_INDEX(uv_points[9]),
+		UV_INDEX(uv_points[6]), UV_INDEX(uv_points[7]), UV_INDEX(uv_points[11]), UV_INDEX(uv_points[10]),
+		UV_INDEX(uv_points[8]), UV_INDEX(uv_points[9]), UV_INDEX(uv_points[13]), UV_INDEX(uv_points[12]),
+		UV_INDEX(uv_points[9]), UV_INDEX(uv_points[10]), UV_INDEX(uv_points[14]), UV_INDEX(uv_points[13]),
+		UV_INDEX(uv_points[10]), UV_INDEX(uv_points[11]), UV_INDEX(uv_points[15]), UV_INDEX(uv_points[14]),
 	};
 
 	GMRect w = GM.getMainWindow()->getClientRect();
@@ -275,18 +292,26 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		&pos_middle_w = d->cornerWidth,
 		&pos_middle_h = geometry.height - 2 * d->cornerHeight;
 
-	GMfloat extents[9][3] = {
+
+	GMfloat extentsArray[4][3] = {
 		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
 		{ pos_middle_w / window.width, pos_middle_h / window.height , 1 },
-		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
-
-		{ center_w_pixel / window.width, center_h_pixel / window.height, 1 },
+		{ pos_center_w / window.width, center_h_pixel / window.height, 1 },
 		{ pos_center_w / window.width, pos_middle_h / window.height, 1 },
-		{ center_w_pixel / window.width, center_h_pixel / window.height, 1 },
+	};
 
-		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
-		{ pos_middle_w / window.width, pos_middle_h / window.height , 1 },
-		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
+	GMfloat extents[9][3] = {
+		EXTENTS_INDEX(extentsArray[0]),
+		EXTENTS_INDEX(extentsArray[1]),
+		EXTENTS_INDEX(extentsArray[0]),
+
+		EXTENTS_INDEX(extentsArray[2]),
+		EXTENTS_INDEX(extentsArray[3]),
+		EXTENTS_INDEX(extentsArray[2]),
+
+		EXTENTS_INDEX(extentsArray[0]),
+		EXTENTS_INDEX(extentsArray[1]),
+		EXTENTS_INDEX(extentsArray[0]),
 	};
 
 	BEGIN_GEOMETRY_TO_VIEWPORT(window)
@@ -322,9 +347,9 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	} _cb(d->texture);
 
 	// 制作9个矩形进行拉伸（可以以后还会有非拉伸的模式）
-	for (GMint i = 0; i < 9; ++i)
+	for (GMint i = 0; i < GM_dimensions_of_array(d->models); ++i)
 	{
-		GMPrimitiveCreator::createQuad(extents[i], pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, uv);
+		GMPrimitiveCreator::createQuad(extents[i], pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, &uv[i]);
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
 		d->objects[i] = new GMGameObject(asset);

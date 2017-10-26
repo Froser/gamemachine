@@ -53,12 +53,16 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////
+enum {
+	BorderAreaCount = 9,
+};
+
 GM_PRIVATE_OBJECT(GMImage2DBorder)
 {
 	GMAsset texture;
 	GMRect borderTextureGeometry;
-	GMModel *models[9] = { nullptr };
-	GMGameObject *objects[9] = { nullptr };
+	GMModel *models[BorderAreaCount] = { nullptr };
+	GMGameObject *objects[BorderAreaCount] = { nullptr };
 	GMfloat width;
 	GMfloat height;
 	GMfloat cornerWidth;
