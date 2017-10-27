@@ -92,6 +92,7 @@ public:
 
 private:
 	bool hasBorder() { D(d); return !!d->texture.asset; }
+	// 截取的纹理
 	const GMRect& textureGeometry() { D(d); return d->borderTextureGeometry; }
 	template <typename T, GMint Size> void release(T* (&)[Size]);
 	template <GMint Size> void drawObjects(GMGameObject* (&)[Size]);

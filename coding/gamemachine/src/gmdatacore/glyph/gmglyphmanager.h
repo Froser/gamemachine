@@ -16,7 +16,7 @@ struct GlyphInfo
 	GMfloat advance;
 };
 
-typedef Map<GMWchar, GlyphInfo> CharList;
+typedef Map<GMint, Map<GMWchar, GlyphInfo>> CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
@@ -32,16 +32,17 @@ public:
 	virtual ~GMGlyphManager() {}
 
 public:
-	const GlyphInfo getChar(GMWchar c);
+	const GlyphInfo getChar(GMWchar c, GMint fontSize);
 
 public:
 	virtual ITexture* glyphTexture() = 0;
 
 protected:
-	virtual const GlyphInfo& createChar(GMWchar c) = 0;
+	virtual const GlyphInfo& createChar(GMWchar c, GMint fontSize) = 0;
 
 protected:
-	CharList& getCharList();
+	GlyphInfo& insertChar(GMint fontSize, GMWchar ch, const GlyphInfo& glyph);
+	const GlyphInfo& getChar(GMint fontSize, GMWchar ch);
 };
 
 END_NS

@@ -87,6 +87,10 @@ void GMGlyphObject::updateModel()
 void GMGlyphObject::createVertices(GMComponent* component)
 {
 	D(d);
+
+	//TODO
+	constexpr GMint fontSize = 66;
+
 	D_BASE(db, GMControlGameObject);
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	IWindow* window = GM.getMainWindow();
@@ -112,7 +116,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	GMfloat maxHeight = 0;
 	while (*p)
 	{
-		const GlyphInfo& glyph = glyphManager->getChar(*p);
+		const GlyphInfo& glyph = glyphManager->getChar(*p, fontSize);
 		if (maxHeight < glyph.height)
 			maxHeight = glyph.height;
 		++p;
@@ -122,7 +126,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	while (*p)
 	{
 		component->beginFace();
-		const GlyphInfo& glyph = glyphManager->getChar(*p);
+		const GlyphInfo& glyph = glyphManager->getChar(*p, fontSize);
 
 		if (glyph.width > 0 && glyph.height > 0)
 		{
@@ -237,8 +241,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		textureGeo.y / (GMfloat)textureHeight,
 	};
 
-	const GMfloat& center_w_pixel = (d->width - 2 * d->cornerWidth), &center_h_pixel = d->cornerHeight;
-	const GMfloat& middle_w_pixel = d->cornerWidth, &middle_h_pixel = (d->height - 2 * d->cornerHeight);
+	const GMfloat& center_w_pixel = (textureGeo.width - 2 * d->cornerWidth), &center_h_pixel = d->cornerHeight;
+	const GMfloat& middle_w_pixel = d->cornerWidth, &middle_h_pixel = (textureGeo.height - 2 * d->cornerHeight);
 	const GMfloat& corner_w = d->cornerWidth / d->width, &corner_h = d->cornerHeight / d->height;
 	const GMfloat& corner_w2 = corner_w * 2, &corner_h2 = corner_h * 2;
 	const GMfloat& center_w = center_w_pixel / d->width, &center_h = corner_h;

@@ -98,14 +98,14 @@ void DemostrationWorld::init()
 	// 读取边框
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::GMBuffer buf;
-	package->readFile(gm::GMPackageIndex::Textures, "frame.png", &buf);
+	package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
 	gm::GMImage* img = nullptr;
 	gm::GMImageReader::load(buf.buffer, buf.size, &img);
 	gm::ITexture* frameTexture = nullptr;
 	GM.getFactory()->createTexture(img, &frameTexture);
 	GM_ASSERT(frameTexture);
 	gm::GMAsset frameAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
-	gm::GMRect textureGeo = { 0,0,96,96 }; //截取的纹理位置
+	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 	gm::GMRect rect = { 10, 10, 600, 300 };
 	listbox->setGeometry(rect);
@@ -122,7 +122,7 @@ void DemostrationWorld::init()
 			14
 		));
 		item->setHeight(30);
-		item->setPaddings(3, 3, 3, 3);
+		item->setPaddings(5, 5, 5, 5);
 		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
 		});

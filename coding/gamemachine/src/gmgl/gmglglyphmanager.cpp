@@ -129,7 +129,7 @@ ITexture* GMGLGlyphManager::glyphTexture()
 	return d->texture;
 }
 
-const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
+const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
 {
 	D(d);
 	static GlyphInfo errGlyph = { false };
@@ -144,7 +144,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 	}
 
 	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-	error = FT_Set_Char_Size(face, 0, FONT_SIZE << 6, RESOLUTION, RESOLUTION);
+	error = FT_Set_Char_Size(face, 0, fontSize << 6, RESOLUTION, RESOLUTION);
 	error = FT_Load_Glyph(face, FT_Get_Char_Index(face, c), FT_LOAD_DEFAULT);
 	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 	error = FT_Get_Glyph(face->glyph, &glyph);
@@ -160,6 +160,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 		if (d->cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
 		{
 			gm_error(_L("no texture space for glyph!"));
+			GM_ASSERT(false);
 		}
 	}
 
@@ -195,7 +196,5 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c)
 	FT_Done_Glyph(glyph);
 
 	// 存入缓存
-	auto result = getCharList().insert(std::make_pair(c, glyphInfo));
-	GM_ASSERT(result.second);
-	return (*(result.first)).second;
+	return insertChar(fontSize, c, glyphInfo);
 }

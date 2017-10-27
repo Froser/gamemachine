@@ -19,7 +19,6 @@ class GMGLGlyphManager : public GMGlyphManager
 public:
 	enum
 	{
-		FONT_SIZE = 24,
 		RESOLUTION = 150,
 		CANVAS_WIDTH = 1024,
 		CANVAS_HEIGHT = 1024,
@@ -33,7 +32,7 @@ public:
 	virtual ITexture* glyphTexture() override;
 
 protected:
-	virtual const GlyphInfo& createChar(GMWchar c) override;
+	virtual const GlyphInfo& createChar(GMWchar c, GMint fontSize) override;
 };
 
 END_NS
