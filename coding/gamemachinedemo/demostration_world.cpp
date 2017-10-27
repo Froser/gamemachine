@@ -217,13 +217,14 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 		getWorld()->switchDemo();
 		break;
 	case gm::GameMachineEvent::Simulate:
-		getWorld()->notifyControls();
 		break;
 	case gm::GameMachineEvent::Render:
 		getWorld()->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
 	{
+		getWorld()->notifyControls();
+
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 

@@ -100,6 +100,8 @@ void GMControlGameObject::updateUI()
 		GMfloat scaleX = (GMfloat)nowClient.width / d->clientSize.width,
 			scaleY = (GMfloat)nowClient.height / d->clientSize.height;
 
+		GM_ASSERT(scaleX != 0 && scaleY != 0);
+
 		if (getStretch())
 		{
 			d->geometry.x *= scaleX;

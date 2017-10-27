@@ -74,14 +74,12 @@ void Demo_Texture::event(gm::GameMachineEvent evt)
 		break;
 	case gm::GameMachineEvent::Simulate:
 		d->demoWorld->simulateGameWorld();
-		d->demoWorld->notifyControls();
 		break;
 	case gm::GameMachineEvent::Render:
-	{
 		d->demoWorld->renderScene();
 		break;
-	}
 	case gm::GameMachineEvent::Activate:
+		d->demoWorld->notifyControls();
 		break;
 	case gm::GameMachineEvent::Deactivate:
 		break;

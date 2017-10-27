@@ -6,8 +6,11 @@
 Demo_Sound::~Demo_Sound()
 {
 	D(d);
-	gm::GM_delete(d->demoWorld);
+	gm::GM_delete(d->wavSource);
 	gm::GM_delete(d->mp3Source);
+	gm::GM_delete(d->wavFile);
+	gm::GM_delete(d->mp3File);
+	gm::GM_delete(d->demoWorld);
 }
 
 void Demo_Sound::init()
@@ -131,14 +134,12 @@ void Demo_Sound::event(gm::GameMachineEvent evt)
 		break;
 	case gm::GameMachineEvent::Simulate:
 		d->demoWorld->simulateGameWorld();
-		d->demoWorld->notifyControls();
 		break;
 	case gm::GameMachineEvent::Render:
-	{
 		d->demoWorld->renderScene();
 		break;
-	}
 	case gm::GameMachineEvent::Activate:
+		d->demoWorld->notifyControls();
 		break;
 	case gm::GameMachineEvent::Deactivate:
 		break;
