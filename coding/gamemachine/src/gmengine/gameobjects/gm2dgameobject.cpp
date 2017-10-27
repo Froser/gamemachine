@@ -89,7 +89,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	D(d);
 
 	//TODO
-	constexpr GMint fontSize = 66;
+	constexpr GMint fontSize = 16;
 
 	D_BASE(db, GMControlGameObject);
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
@@ -178,7 +178,7 @@ void GMGlyphObject::update()
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMImage2DBorder::GMImage2DBorder(GMAsset& texture,
+GMImage2DBorder::GMImage2DBorder(GMAsset texture,
 	const GMRect& borderTextureGeometry,
 	GMfloat textureWidth,
 	GMfloat textureHeight,

@@ -50,6 +50,8 @@ set(SOURCES
 		demo/effects.cpp
 		demo/quake3_bsp.h
 		demo/quake3_bsp.cpp
+		demo/sound.h
+		demo/sound.cpp
 	)
 
 source_group_by_dir(SOURCES)

@@ -81,7 +81,7 @@ private:
 	GMImage2DBorder() = default;
 
 public:
-	GMImage2DBorder(GMAsset& texture,
+	GMImage2DBorder(GMAsset texture,
 		const GMRect& borderTextureGeometry,
 		GMfloat textureWidth,
 		GMfloat textureHeight,

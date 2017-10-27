@@ -10,6 +10,7 @@
 #include "demo/particles2.h"
 #include "demo/effects.h"
 #include "demo/quake3_bsp.h"
+#include "demo/sound.h"
 
 void loadDemostrations(DemostrationWorld* world)
 {
@@ -20,6 +21,7 @@ void loadDemostrations(DemostrationWorld* world)
 	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2());
 	world->addDemo("Effects: Use a blur effect.", new Demo_Effects());
 	world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP());
+	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound());
 	world->init();
 }
 
@@ -104,7 +106,7 @@ void DemostrationWorld::init()
 	gm::ITexture* frameTexture = nullptr;
 	GM.getFactory()->createTexture(img, &frameTexture);
 	GM_ASSERT(frameTexture);
-	gm::GMAsset frameAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
+	gm::GMAsset borderAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 	gm::GMRect rect = { 10, 10, 600, 300 };
@@ -114,7 +116,7 @@ void DemostrationWorld::init()
 	{
 		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
 		item->setBorder(gm::GMImage2DBorder(
-			frameAsset,
+			borderAsset,
 			textureGeo,
 			img->getData().mip[0].width,
 			img->getData().mip[0].height,
@@ -122,7 +124,7 @@ void DemostrationWorld::init()
 			14
 		));
 		item->setHeight(30);
-		item->setPaddings(5, 5, 5, 5);
+		item->setPaddings(10, 5, 10, 5);
 		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
 		});
