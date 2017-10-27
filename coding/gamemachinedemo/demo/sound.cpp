@@ -22,7 +22,9 @@ void Demo_Sound::init()
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::GMBuffer buf;
-	package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	GM_ASSERT(b);
+
 	gm::GMImage* img = nullptr;
 	gm::GMImageReader::load(buf.buffer, buf.size, &img);
 	gm::ITexture* frameTexture = nullptr;
@@ -38,7 +40,8 @@ void Demo_Sound::init()
 	{
 		// 获取WAV播放器，播放源
 		gm::GMBuffer mp3Buffer;
-		package->readFile(gm::GMPackageIndex::Audio, "iidesuka.wav", &mp3Buffer);
+		b = package->readFile(gm::GMPackageIndex::Audio, "iidesuka.wav", &mp3Buffer);
+		GM_ASSERT(b);
 
 		gm::IAudioReader* audioReader = gmm::GMMFactory::getAudioReader();
 		GM_ASSERT(!d->wavFile);
@@ -77,7 +80,8 @@ void Demo_Sound::init()
 	{
 		// 获取MP3播放器，播放源
 		gm::GMBuffer mp3Buffer;
-		package->readFile(gm::GMPackageIndex::Audio, "gyakuten.mp3", &mp3Buffer);
+		b = package->readFile(gm::GMPackageIndex::Audio, "gyakuten.mp3", &mp3Buffer);
+		GM_ASSERT(b);
 
 		gm::IAudioReader* audioReader = gmm::GMMFactory::getAudioReader();
 		GM_ASSERT(!d->mp3File);

@@ -100,7 +100,8 @@ void DemostrationWorld::init()
 	// 读取边框
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::GMBuffer buf;
-	package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	GM_ASSERT(b);
 	gm::GMImage* img = nullptr;
 	gm::GMImageReader::load(buf.buffer, buf.size, &img);
 	gm::ITexture* frameTexture = nullptr;
