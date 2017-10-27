@@ -160,6 +160,7 @@ enum class GMMeshType
 	MeshTypeBegin,
 	Model3D = MeshTypeBegin,
 	Model2D,
+	Glyph,
 	Particles,
 	MeshTypeEnd,
 };

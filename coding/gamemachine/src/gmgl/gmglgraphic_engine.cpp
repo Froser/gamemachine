@@ -187,6 +187,7 @@ void GMGLGraphicEngine::installShaders()
 	IRender* renders[] = {
 		new GMGLRenders_3D(),
 		new GMGLRenders_2D(),
+		new GMGLRenders_2D(),
 		new GMGLRenders_Particle(),
 	};
 

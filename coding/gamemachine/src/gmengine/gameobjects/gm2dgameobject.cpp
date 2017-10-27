@@ -51,7 +51,7 @@ void GMGlyphObject::constructModel()
 	GMMesh* child = new GMMesh();
 	model->append(child);
 	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
-	child->setType(GMMeshType::Model2D);
+	child->setType(GMMeshType::Glyph);
 
 	GMComponent* component = new GMComponent(child);
 	onCreateShader(component->getShader());
@@ -68,9 +68,9 @@ void GMGlyphObject::onCreateShader(Shader& shader)
 	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(glyphManager->glyphTexture());
 	shader.setNoDepthTest(true);
 	shader.setCull(GMS_Cull::NONE);
-	//shader.setBlend(false);
-	//shader.setBlendFactorSource(GMS_BlendFunc::ONE);
-	//shader.setBlendFactorDest(GMS_BlendFunc::ONE);
+	shader.setBlend(true);
+	shader.setBlendFactorSource(GMS_BlendFunc::ONE);
+	shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_SRC_ALPHA);
 }
 
 void GMGlyphObject::updateModel()

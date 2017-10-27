@@ -266,6 +266,10 @@ void DemostrationEntrance::onLoadForwardShader(const gm::GMMeshType type, gm::GM
 		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "model2d.vert", &vertBuf, &vertPath);
 		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "model2d.frag", &fragBuf, &fragPath);
 		break;
+	case gm::GMMeshType::Glyph:
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "glyph.vert", &vertBuf, &vertPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "glyph.frag", &fragBuf, &fragPath);
+		break;
 	case gm::GMMeshType::Particles:
 		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "particles.vert", &vertBuf, &vertPath);
 		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "particles.frag", &fragBuf, &fragPath);
