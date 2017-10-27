@@ -23,7 +23,6 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMGamePackage* gamePackageManager = nullptr;
 	GMStates* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
-	IAudioPlayer* audioPlayer = nullptr;
 
 	GameMachineMessage lastMessage;
 
@@ -66,7 +65,6 @@ public:
 	void init(
 		AUTORELEASE IWindow* mainWindow,
 		const GMConsoleHandle& consoleHandle,
-		AUTORELEASE IAudioPlayer* audioPlayer,
 		AUTORELEASE IFactory* factory,
 		AUTORELEASE IGameHandler* gameHandler
 	);
@@ -91,9 +89,6 @@ public:
 
 	// 相机管理
 	GMCamera& getCamera() { D(d); return d->camera; }
-
-	// 音频管理
-	IAudioPlayer* getAudioPlayer() { D(d); return d->audioPlayer; }
 
 	// 时间管理
 	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }

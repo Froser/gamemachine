@@ -2,12 +2,17 @@
 #include <gmm.h>
 #include "gmmdef.h"
 
-void GMMFactory::createAudioReader(OUT gm::IAudioReader** reader)
+gm::IAudioReader* GMMFactory::getAudioReader()
 {
-	(*reader) = new GMMAudioReader();
+	// 必须要先初始化播放器
+	getAudioPlayer();
+
+	static GMMAudioReader s;
+	return &s;
 }
 
-void GMMFactory::createAudioPlayer(OUT gm::IAudioPlayer** player)
+gm::IAudioPlayer* GMMFactory::getAudioPlayer()
 {
-	(*player) = new GMMAudioPlayer();
+	static GMMAudioPlayer s;
+	return &s;
 }

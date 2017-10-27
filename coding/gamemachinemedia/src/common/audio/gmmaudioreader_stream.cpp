@@ -17,8 +17,9 @@ GMMAudioFile_Stream::~GMMAudioFile_Stream()
 bool GMMAudioFile_Stream::load(gm::GMBuffer& buffer)
 {
 	D(d);
-	d->fileInfo.data = buffer.buffer;
-	d->fileInfo.size = buffer.size;
+	d->fileBuffer.swap(buffer);
+	d->fileInfo.data = d->fileBuffer.buffer;
+	d->fileInfo.size = d->fileBuffer.size;
 	d->bufferNum = getBufferNum();
 	d->streamReadyEvent.reset();
 	nextChunk(d->bufferNum - 1);

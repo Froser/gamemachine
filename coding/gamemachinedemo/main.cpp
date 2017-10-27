@@ -47,13 +47,9 @@ int WINAPI WinMain(
 	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);
 	consoleHandle.window->create(consoleAttrs);
 
-	gm::IAudioPlayer* player = nullptr;
-	gmm::GMMFactory::createAudioPlayer(&player);
-
 	GM.init(
 		mainWindow,
 		consoleHandle,
-		player,
 		new gm::GMGLFactory(),
 		new DemostrationEntrance()
 	);

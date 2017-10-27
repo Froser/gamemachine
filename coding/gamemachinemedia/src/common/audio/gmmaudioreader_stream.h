@@ -10,6 +10,7 @@ class GMMStream;
 GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 {
 	// 缓存相关
+	gm::GMBuffer fileBuffer;
 	gm::GMuint bufferNum = 0;
 	gm::GMAudioFileInfo fileInfo;
 	GMMStream* output = nullptr;

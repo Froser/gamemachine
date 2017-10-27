@@ -317,6 +317,13 @@ struct GMBuffer : public GMObject
 		buffer = newBuffer;
 	}
 
+	void swap(GMBuffer& rhs)
+	{
+		SWAP(buffer, rhs.buffer);
+		SWAP(size, rhs.size);
+		SWAP(needRelease, rhs.needRelease);
+	}
+
 	GMbyte* buffer;
 	GMuint size;
 	bool needRelease; // 表示是否需要手动释放

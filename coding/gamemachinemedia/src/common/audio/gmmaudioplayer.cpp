@@ -74,8 +74,13 @@ GMMAudioStaticSource::~GMMAudioStaticSource()
 void GMMAudioStaticSource::play(bool loop)
 {
 	D(d);
-	alSourcei(d->sourceId, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
-	operate(GMMAudioSourcePlayOperation::Play);
+	ALint state;
+	alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
+	if (state != AL_PLAYING)
+	{
+		alSourcei(d->sourceId, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+		operate(GMMAudioSourcePlayOperation::Play);
+	}
 }
 
 void GMMAudioStaticSource::stop()
@@ -300,12 +305,17 @@ GMMAudioStreamSource::~GMMAudioStreamSource()
 void GMMAudioStreamSource::play(bool loop)
 {
 	D(d);
-	GM_ASSERT(d->file->isStream());
-	d->thread->setLoop(loop);
-	if (!d->thread->hasStarted())
-		d->thread->start();
-	else
-		alSourcePlay(d->sourceId);
+	ALint state;
+	alGetSourcei(d->sourceId, AL_SOURCE_STATE, &state);
+	if (state != AL_PLAYING)
+	{
+		GM_ASSERT(d->file->isStream());
+		d->thread->setLoop(loop);
+		if (!d->thread->hasStarted())
+			d->thread->start();
+		else
+			alSourcePlay(d->sourceId);
+	}
 }
 
 void GMMAudioStreamSource::stop()

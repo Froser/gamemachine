@@ -8,8 +8,10 @@
 GM_PRIVATE_OBJECT(Demo_Sound)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
-	gm::IAudioFile* file = nullptr;
-	gm::IAudioSource* audioSource = nullptr;
+	gm::IAudioFile* wavFile = nullptr;
+	gm::IAudioFile* mp3File = nullptr;
+	gm::IAudioSource* wavSource = nullptr;
+	gm::IAudioSource* mp3Source = nullptr;
 };
 
 class Demo_Sound : public DemoHandler
