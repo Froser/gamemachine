@@ -8,19 +8,24 @@
 BEGIN_NS
 
 //GMGlyphObject
-struct GlyphProperties
+typedef std::function<void(GMint, GMint&)> FontSizeCallback;
+typedef std::function<void(GMint, GMfloat(&rgb)[3])> ColorCallback;
+extern "C"
 {
-};
+	void __defaultFontSizeCallback(GMint pos, GMint& sz);
+	void __defaultColorCallback(GMint pos, GMfloat(&rgb)[3]);
+}
 
 GM_PRIVATE_OBJECT(GMGlyphObject)
 {
 	GMString lastRenderText;
 	GMString text;
-	GlyphProperties properties;
 	bool autoResize = true; // 是否按照屏幕大小调整字体
 	GMRectF lastGeometry = { -1 };
 	GMRect lastClientRect = { -1 };
 	ITexture* texture;
+	FontSizeCallback fontSizeCallback = __defaultFontSizeCallback;
+	ColorCallback colorCallback = __defaultColorCallback;
 };
 
 class GMGlyphObject : public GMControlGameObject
@@ -37,6 +42,8 @@ public:
 
 public:
 	inline void setAutoResize(bool b) { D(d); d->autoResize = b; }
+	inline void setFontSizeCallback(FontSizeCallback& cb) { D(d); d->fontSizeCallback = cb; }
+	inline void setColorCallback(ColorCallback& cb) { D(d); d->colorCallback = cb; }
 
 public:
 	virtual void onAppendingObjectToWorld() override;

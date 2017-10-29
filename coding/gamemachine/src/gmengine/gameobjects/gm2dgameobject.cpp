@@ -30,6 +30,21 @@ inline bool isValidRect(const T& r)
 #define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
 #define UV_Y(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
 
+extern "C"
+{
+	void __defaultFontSizeCallback(GMint pos, GMint& sz)
+	{
+		sz = 16;
+	}
+
+	void __defaultColorCallback(GMint pos, GMfloat(&rgb)[3])
+	{
+		rgb[0] = 0;
+		rgb[1] = 1;
+		rgb[2] = 0;
+	}
+}
+
 GMGlyphObject::~GMGlyphObject()
 {
 	D(d);
@@ -88,9 +103,6 @@ void GMGlyphObject::createVertices(GMComponent* component)
 {
 	D(d);
 
-	//TODO
-	constexpr GMint fontSize = 16;
-
 	D_BASE(db, GMControlGameObject);
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	IWindow* window = GM.getMainWindow();
@@ -114,8 +126,12 @@ void GMGlyphObject::createVertices(GMComponent* component)
 
 	// 获取字符串高度
 	GMfloat maxHeight = 0;
+	GMint pos = 0;
+	GMint fontSize;
+	GMfloat rgb[3];
 	while (*p)
 	{
+		d->fontSizeCallback(pos++, fontSize);
 		const GlyphInfo& glyph = glyphManager->getChar(*p, fontSize);
 		if (maxHeight < glyph.height)
 			maxHeight = glyph.height;
@@ -123,9 +139,11 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	}
 	p = str.c_str();
 
+	pos = 0;
 	while (*p)
 	{
 		component->beginFace();
+		d->fontSizeCallback(pos, fontSize);
 		const GlyphInfo& glyph = glyphManager->getChar(*p, fontSize);
 
 		if (glyph.width > 0 && glyph.height > 0)
@@ -145,6 +163,13 @@ void GMGlyphObject::createVertices(GMComponent* component)
 			component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
 			component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
 			component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
+
+			d->colorCallback(pos, rgb);
+			component->color(rgb[0], rgb[1], rgb[2]);
+			component->color(rgb[0], rgb[1], rgb[2]);
+			component->color(rgb[0], rgb[1], rgb[2]);
+			component->color(rgb[0], rgb[1], rgb[2]);
+			++pos;
 		}
 		x += X(glyph.advance);
 
