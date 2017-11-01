@@ -36,7 +36,7 @@ void Demo_Sound::init()
 	gm::GMAsset border = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
-	gm::GMRect rect = { 350, 320, 100, 300 };
+	gm::GMRect rect = { 350, 220, 100, 300 };
 	listbox->setGeometry(rect);
 	listbox->setItemMargins(0, 5, 0, 0);
 

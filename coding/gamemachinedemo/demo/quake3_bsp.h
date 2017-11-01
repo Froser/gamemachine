@@ -27,11 +27,14 @@ public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
 	virtual void onActivate() override;
-	virtual void onDeactivated() override;
+	virtual void onDeactivate() override;
 
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+
+private:
+	void setMouseEnabled(bool enabled);
 };
 
 #endif

@@ -14,17 +14,15 @@ void Demo_Quake3_BSP::onActivate()
 {
 	D(d);
 	Base::onActivate();
-
-	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-	gm::IMouseState& mouseState = inputManager->getMouseState();
-	d->mouseEnabled = true;
-	mouseState.setMouseEnable(d->mouseEnabled);
+	setMouseEnabled(true);
 }
 
-void Demo_Quake3_BSP::onDeactivated()
+void Demo_Quake3_BSP::onDeactivate()
 {
-	Base::onDeactivated();
+	D(d);
+	Base::onDeactivate();
 	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+	setMouseEnabled(false);
 }
 
 void Demo_Quake3_BSP::setLookAt()
@@ -37,6 +35,15 @@ void Demo_Quake3_BSP::setDefaultLights()
 	D(d);
 	if (isInited())
 		d->world->setDefaultLights();
+}
+
+void Demo_Quake3_BSP::setMouseEnabled(bool enabled)
+{
+	D(d);
+	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+	gm::IMouseState& mouseState = inputManager->getMouseState();
+	d->mouseEnabled = enabled;
+	mouseState.setMouseEnable(d->mouseEnabled);
 }
 
 void Demo_Quake3_BSP::init()

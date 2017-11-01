@@ -23,7 +23,7 @@ public:
 	virtual void init();
 	virtual bool isInited();
 	virtual void onActivate();
-	virtual void onDeactivated();
+	virtual void onDeactivate();
 	virtual void event(gm::GameMachineEvent evt);
 
 protected:

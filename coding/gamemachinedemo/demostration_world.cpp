@@ -51,7 +51,7 @@ void DemoHandler::onActivate()
 	setDefaultLights();
 }
 
-void DemoHandler::onDeactivated()
+void DemoHandler::onDeactivate()
 {
 	GM.getGraphicEngine()->removeLights();
 	GMSetRenderState(EFFECTS, gm::GMEffects::None);
@@ -65,8 +65,17 @@ void DemoHandler::event(gm::GameMachineEvent evt)
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
-		if (kbState.keydown(VK_ESCAPE))
+		if (kbState.keyTriggered(VK_ESCAPE))
 			backToEntrance();
+
+		if (kbState.keyTriggered('B'))
+			GM.postMessage({ gm::GameMachineMessageType::Console });
+
+		if (kbState.keyTriggered('L'))
+			GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
+
+		if (kbState.keyTriggered('I'))
+			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
 		break;
 	}
 }
@@ -99,7 +108,7 @@ void DemoHandler::backToEntrance()
 {
 	D(d);
 	d->demostrationWorld->setCurrentDemo(nullptr);
-	onDeactivated();
+	onDeactivate();
 }
 
 DemostrationWorld::~DemostrationWorld()
