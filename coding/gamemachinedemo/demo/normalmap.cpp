@@ -75,6 +75,7 @@ void Demo_NormalMap::init()
 void Demo_NormalMap::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:

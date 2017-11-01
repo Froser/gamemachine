@@ -126,6 +126,7 @@ void Demo_Sound::init()
 void Demo_Sound::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:

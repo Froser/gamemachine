@@ -14,15 +14,21 @@
 
 void loadDemostrations(DemostrationWorld* world)
 {
-	world->addDemo("Hello World: Load a texture", new Demo_Texture());
-	world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap());
-	world->addDemo("Animation: How to rotate an object", new Demo_Animation());
-	world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1());
-	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2());
-	world->addDemo("Effects: Use a blur effect.", new Demo_Effects());
-	world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP());
-	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound());
+	world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
+	world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
+	world->addDemo("Animation: How to rotate an object", new Demo_Animation(world));
+	world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1(world));
+	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2(world));
+	world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
+	world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));
+	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
 	world->init();
+}
+
+DemoHandler::DemoHandler(DemostrationWorld* demostrationWorld)
+{
+	D(d);
+	d->demostrationWorld = demostrationWorld;
 }
 
 void DemoHandler::init()
@@ -51,6 +57,20 @@ void DemoHandler::onDeactivated()
 	GMSetRenderState(EFFECTS, gm::GMEffects::None);
 }
 
+void DemoHandler::event(gm::GameMachineEvent evt)
+{
+	switch (evt)
+	{
+	case gm::GameMachineEvent::Activate:
+		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+
+		if (kbState.keydown(VK_ESCAPE))
+			backToEntrance();
+		break;
+	}
+}
+
 void DemoHandler::setLookAt()
 {
 	gm::GMCamera& camera = GM.getCamera();
@@ -73,6 +93,13 @@ void DemoHandler::setDefaultLights()
 		light.setLightColor(color);
 		GM.getGraphicEngine()->addLight(light);
 	}
+}
+
+void DemoHandler::backToEntrance()
+{
+	D(d);
+	d->demostrationWorld->setCurrentDemo(nullptr);
+	onDeactivated();
 }
 
 DemostrationWorld::~DemostrationWorld()
@@ -151,9 +178,6 @@ void DemostrationWorld::switchDemo()
 	D(d);
 	if (d->nextDemo)
 	{
-		if (d->currentDemo)
-			d->currentDemo->onDeactivated();
-
 		if (!d->nextDemo->isInited())
 			d->nextDemo->init();
 		d->nextDemo->onActivate();
@@ -207,46 +231,50 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 
 	DemoHandler* currentDemo = getWorld()->getCurrentDemo();
 	if (currentDemo)
+	{
 		currentDemo->event(evt);
-
-	switch (evt)
-	{
-	case gm::GameMachineEvent::FrameStart:
-		break;
-	case gm::GameMachineEvent::FrameEnd:
-		getWorld()->switchDemo();
-		break;
-	case gm::GameMachineEvent::Simulate:
-		break;
-	case gm::GameMachineEvent::Render:
-		getWorld()->renderScene();
-		break;
-	case gm::GameMachineEvent::Activate:
-	{
-		getWorld()->notifyControls();
-
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-
-		if (kbState.keydown('Q') || kbState.keydown(VK_ESCAPE))
-			GM.postMessage({ gm::GameMachineMessageType::Quit });
-
-		if (kbState.keydown('B'))
-			GM.postMessage({ gm::GameMachineMessageType::Console });
-
-		if (kbState.keyTriggered('L'))
-			GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
-
-		if (kbState.keyTriggered('I'))
-			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
-		break;
 	}
-	case gm::GameMachineEvent::Deactivate:
-		break;
-	case gm::GameMachineEvent::Terminate:
-		break;
-	default:
-		break;
+	else
+	{
+		switch (evt)
+		{
+		case gm::GameMachineEvent::FrameStart:
+			break;
+		case gm::GameMachineEvent::FrameEnd:
+			getWorld()->switchDemo();
+			break;
+		case gm::GameMachineEvent::Simulate:
+			break;
+		case gm::GameMachineEvent::Render:
+			getWorld()->renderScene();
+			break;
+		case gm::GameMachineEvent::Activate:
+		{
+			getWorld()->notifyControls();
+
+			gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+
+			if (kbState.keyTriggered('Q') || kbState.keyTriggered(VK_ESCAPE))
+				GM.postMessage({ gm::GameMachineMessageType::Quit });
+
+			if (kbState.keyTriggered('B'))
+				GM.postMessage({ gm::GameMachineMessageType::Console });
+
+			if (kbState.keyTriggered('L'))
+				GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
+
+			if (kbState.keyTriggered('I'))
+				GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
+			break;
+		}
+		case gm::GameMachineEvent::Deactivate:
+			break;
+		case gm::GameMachineEvent::Terminate:
+			break;
+		default:
+			break;
+		}
 	}
 }
 

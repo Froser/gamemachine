@@ -66,6 +66,7 @@ void Demo_Texture::init()
 void Demo_Texture::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:

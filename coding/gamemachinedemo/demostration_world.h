@@ -5,8 +5,10 @@
 #include <gm2dgameobject.h>
 #include <gmgl.h>
 
+class DemostrationWorld;
 GM_PRIVATE_OBJECT(DemoHandler)
 {
+	DemostrationWorld* demostrationWorld;
 	bool inited = false;
 };
 
@@ -15,18 +17,21 @@ class DemoHandler : public gm::GMObject
 	DECLARE_PRIVATE(DemoHandler)
 
 public:
-	DemoHandler() = default;
+	DemoHandler(DemostrationWorld* demostrationWorld);
 
 public:
 	virtual void init();
 	virtual bool isInited();
 	virtual void onActivate();
 	virtual void onDeactivated();
-	virtual void event(gm::GameMachineEvent evt) = 0;
+	virtual void event(gm::GameMachineEvent evt);
 
 protected:
 	virtual void setLookAt();
 	virtual void setDefaultLights();
+
+protected:
+	void backToEntrance();
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
@@ -56,16 +61,14 @@ public:
 
 public:
 	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
+	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
+	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
 
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
 	void init();
 	void renderScene();
 	void switchDemo();
-
-private:
-	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
-	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
 };
 
 GM_PRIVATE_OBJECT(DemostrationEntrance)

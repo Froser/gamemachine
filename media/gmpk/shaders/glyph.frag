@@ -2,6 +2,7 @@
 #include "foundation/properties.h"
 
 in vec2 _uv;
+in vec4 _color;
 out vec4 frag_color;
 
 void main()
@@ -15,5 +16,5 @@ void main()
 		frag_color = vec4(0, 0, 0, 0);
 	}
 
-	frag_color = vec4(frag_color.r, 0, 0, frag_color.r);
+	frag_color = vec4(_color.rgb, frag_color.r);
 }

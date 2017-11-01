@@ -57,6 +57,7 @@ void Demo_Quake3_BSP::init()
 void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::Simulate:

@@ -44,6 +44,7 @@ void Demo_Particles1::init()
 void Demo_Particles1::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	Base::event(evt);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:
