@@ -5,7 +5,7 @@ GMGlyphManager::GMGlyphManager()
 {
 }
 
-const GlyphInfo GMGlyphManager::getChar(GMWchar c, GMint fontSize)
+const GlyphInfo& GMGlyphManager::getChar(GMWchar c, GMint fontSize)
 {
 	D(d);
 	CharList::mapped_type::iterator iter;

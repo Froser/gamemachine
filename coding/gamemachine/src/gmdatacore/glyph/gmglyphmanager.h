@@ -32,7 +32,7 @@ public:
 	virtual ~GMGlyphManager() {}
 
 public:
-	const GlyphInfo getChar(GMWchar c, GMint fontSize);
+	const GlyphInfo& getChar(GMWchar c, GMint fontSize);
 
 public:
 	virtual ITexture* glyphTexture() = 0;

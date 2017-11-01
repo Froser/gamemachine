@@ -62,6 +62,8 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/gameobjects/gmcontrolgameobject.h
 		gmengine/gameobjects/gmcontrolgameobject.cpp
+		gmengine/gmtypoengine.h
+		gmengine/gmtypoengine.cpp
 		gmgl/renders/gmgl_renders_2d.h
 		gmgl/renders/gmgl_renders_2d.cpp
 		gmgl/renders/gmgl_renders_3d.h

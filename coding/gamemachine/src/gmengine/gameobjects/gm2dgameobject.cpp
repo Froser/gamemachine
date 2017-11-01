@@ -2,6 +2,7 @@
 #include "gm2dgameobject.h"
 #include "gmgameworld.h"
 #include "gmgl/gmglglyphmanager.h"
+#include "gmtypoengine.h"
 
 enum Margins
 {
@@ -30,27 +31,26 @@ inline bool isValidRect(const T& r)
 #define UV_X(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_WIDTH)
 #define UV_Y(i) ((i) / (GMfloat)GMGLGlyphManager::CANVAS_HEIGHT)
 
-extern "C"
+GMGlyphObject::GMGlyphObject()
 {
-	void __defaultFontSizeCallback(GMint pos, GMint& sz)
-	{
-		sz = 16;
-	}
+	D(d);
+	d->typoEngine = new GMTypoEngine();
+}
 
-	void __defaultColorCallback(GMint pos, GMfloat(&rgb)[3])
-	{
-		rgb[0] = 0;
-		rgb[1] = 1;
-		rgb[2] = 0;
-	}
+GMGlyphObject::GMGlyphObject(ITypoEngine* typo)
+{
+	D(d);
+	d->typoEngine = typo;
+	d->insetTypoEngine = false;
 }
 
 GMGlyphObject::~GMGlyphObject()
 {
 	D(d);
 	GMModel* m = getModel();
-	if (m)
-		delete m;
+	GM_delete(m);
+	if (d->insetTypoEngine)
+		GM_delete(d->typoEngine);
 }
 
 void GMGlyphObject::setText(const GMWchar* text)
@@ -107,10 +107,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	IWindow* window = GM.getMainWindow();
 
-	std::wstring str = d->text.toStdWString();
-	const GMWchar* p = str.c_str();
-	const GMfloat Z = 0;
-
+	constexpr GMfloat Z = 0;
 	GMRect rect = d->autoResize && isValidRect(d->lastClientRect) ? d->lastClientRect : GM.getMainWindow()->getClientRect();
 	GMRectF coord = d->autoResize && isValidRect(d->lastGeometry) ? d->lastGeometry : toViewportCoord(db->geometry);
 
@@ -122,30 +119,23 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	}
 
 	GMfloat resolutionWidth = rect.width, resolutionHeight = rect.height;
-	GMfloat &x = coord.x, &y = coord.y;
 
-	// 获取字符串高度
-	GMfloat maxHeight = 0;
-	GMint pos = 0;
-	GMint fontSize;
-	GMfloat rgb[3];
-	while (*p)
-	{
-		d->fontSizeCallback(pos++, fontSize);
-		const GlyphInfo& glyph = glyphManager->getChar(*p, fontSize);
-		if (maxHeight < glyph.height)
-			maxHeight = glyph.height;
-		++p;
-	}
-	p = str.c_str();
+	// 使用排版引擎进行排版
+	ITypoEngine* typoEngine = d->typoEngine;
+	GMTypoOptions options;
+	options.position[0] = coord.x;
+	options.position[1] = coord.y;
 
-	pos = 0;
-	while (*p)
+	//TODO
+	GMfloat x = coord.x;
+	GM_ASSERT(typoEngine);
+	GMTypoIterator iter = typoEngine->begin(d->text, options);
+	for (; iter != typoEngine->end(); ++iter)
 	{
+		GMTypoResult typoResult = *iter;
+		const GlyphInfo& glyph = *typoResult.glyph;
+
 		component->beginFace();
-		d->fontSizeCallback(pos, fontSize);
-		const GlyphInfo& glyph = glyphManager->getChar(*p, fontSize);
-
 		if (glyph.width > 0 && glyph.height > 0)
 		{
 			// 如果width和height为0，视为空格，只占用空间而已
@@ -154,27 +144,24 @@ void GMGlyphObject::createVertices(GMComponent* component)
 			// 1 3
 			// 让所有字体origin开始的x轴平齐
 
-			component->vertex(x + X(glyph.bearingX), y - Y(maxHeight - glyph.bearingY), Z);
-			component->vertex(x + X(glyph.bearingX), y - Y(maxHeight - (glyph.bearingY - glyph.height)), Z);
-			component->vertex(x + X(glyph.bearingX + glyph.width), y - Y(maxHeight - glyph.bearingY), Z);
-			component->vertex(x + X(glyph.bearingX + glyph.width), y - Y(maxHeight - (glyph.bearingY - glyph.height)), Z);
+			component->vertex(x + X(glyph.bearingX), typoResult.y - Y(typoResult.lineHeight - glyph.bearingY), Z);
+			component->vertex(x + X(glyph.bearingX), typoResult.y - Y(typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+			component->vertex(x + X(glyph.bearingX + glyph.width), typoResult.y - Y(typoResult.lineHeight - glyph.bearingY), Z);
+			component->vertex(x + X(glyph.bearingX + glyph.width), typoResult.y - Y(typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
 			component->uv(UV_X(glyph.x), UV_Y(glyph.y));
 			component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
 			component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
 			component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
 
-			d->colorCallback(pos, rgb);
-			component->color(rgb[0], rgb[1], rgb[2]);
-			component->color(rgb[0], rgb[1], rgb[2]);
-			component->color(rgb[0], rgb[1], rgb[2]);
-			component->color(rgb[0], rgb[1], rgb[2]);
-			++pos;
+			component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+			component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+			component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+			component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 		}
 		x += X(glyph.advance);
 
 		component->endFace();
-		++p;
 	}
 }
 

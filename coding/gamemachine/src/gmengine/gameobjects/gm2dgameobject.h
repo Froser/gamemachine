@@ -8,14 +8,7 @@
 BEGIN_NS
 
 //GMGlyphObject
-typedef std::function<void(GMint, GMint&)> FontSizeCallback;
-typedef std::function<void(GMint, GMfloat(&rgb)[3])> ColorCallback;
-extern "C"
-{
-	void __defaultFontSizeCallback(GMint pos, GMint& sz);
-	void __defaultColorCallback(GMint pos, GMfloat(&rgb)[3]);
-}
-
+struct ITypoEngine;
 GM_PRIVATE_OBJECT(GMGlyphObject)
 {
 	GMString lastRenderText;
@@ -24,8 +17,8 @@ GM_PRIVATE_OBJECT(GMGlyphObject)
 	GMRectF lastGeometry = { -1 };
 	GMRect lastClientRect = { -1 };
 	ITexture* texture;
-	FontSizeCallback fontSizeCallback = __defaultFontSizeCallback;
-	ColorCallback colorCallback = __defaultColorCallback;
+	ITypoEngine* typoEngine = nullptr;
+	bool insetTypoEngine = true;
 };
 
 class GMGlyphObject : public GMControlGameObject
@@ -33,7 +26,8 @@ class GMGlyphObject : public GMControlGameObject
 	DECLARE_PRIVATE(GMGlyphObject)
 
 public:
-	GMGlyphObject() = default;
+	GMGlyphObject();
+	GMGlyphObject(ITypoEngine* typo);
 	~GMGlyphObject();
 
 public:
@@ -42,8 +36,6 @@ public:
 
 public:
 	inline void setAutoResize(bool b) { D(d); d->autoResize = b; }
-	inline void setFontSizeCallback(FontSizeCallback& cb) { D(d); d->fontSizeCallback = cb; }
-	inline void setColorCallback(ColorCallback& cb) { D(d); d->colorCallback = cb; }
 
 public:
 	virtual void onAppendingObjectToWorld() override;
