@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmprimitivecreator.h"
+#include "foundation/gamemachine.h"
 
 void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type)
 {

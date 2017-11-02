@@ -168,10 +168,10 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
 	glyphInfo.valid = true;
 	glyphInfo.x = d->cursor_u;
 	glyphInfo.y = d->cursor_v;
-	glyphInfo.width = bitmapGlyph->bitmap.width;
-	glyphInfo.height = bitmapGlyph->bitmap.rows;
-	glyphInfo.bearingX = bitmapGlyph->left;
-	glyphInfo.bearingY = bitmapGlyph->top;
+	glyphInfo.width = face->glyph->metrics.width >> 6;
+	glyphInfo.height = face->glyph->metrics.height >> 6;
+	glyphInfo.bearingX = face->glyph->metrics.horiBearingX >> 6;
+	glyphInfo.bearingY = face->glyph->metrics.horiBearingY >> 6;
 	glyphInfo.advance = face->glyph->metrics.horiAdvance >> 6;
 
 	if (d->maxHeight < glyphInfo.height)

@@ -99,7 +99,6 @@ private:
 	virtual void init() override;
 	virtual void start() override;
 	virtual void event(gm::GameMachineEvent evt) override;
-
 };
 
 #endif

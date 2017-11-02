@@ -23,7 +23,7 @@ int WINAPI WinMain(
 	{
 		NULL,
 		L"Default",
-		WS_OVERLAPPEDWINDOW,
+		WS_OVERLAPPED,
 		0,
 		{ 0, 0, 800, 600 },
 		NULL,

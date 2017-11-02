@@ -242,6 +242,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	if (currentDemo)
 	{
 		currentDemo->event(evt);
+		getWorld()->notifyControls();
 	}
 	else
 	{
