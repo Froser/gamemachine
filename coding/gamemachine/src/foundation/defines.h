@@ -156,14 +156,6 @@ STATIC_ASSERT_SIZE(DWORD, 4);
 
 BEGIN_NS
 // 基本数据类型
-typedef unsigned char GMbyte;
-typedef long GMlong;
-typedef unsigned long GMulong;
-typedef short GMshort;
-typedef unsigned short GMushort;
-typedef wchar_t GMWchar;
-typedef int64_t GMLargeInteger;
-
 #if USE_OPENGL
 typedef GLfloat GMfloat;
 typedef GLint GMint;
@@ -175,6 +167,15 @@ typedef float GMfloat;
 typedef int GMint
 typedef short GMshort;
 #endif
+
+typedef unsigned char GMbyte;
+typedef long GMlong;
+typedef unsigned long GMulong;
+typedef short GMshort;
+typedef unsigned short GMushort;
+typedef wchar_t GMWchar;
+typedef int64_t GMLargeInteger;
+typedef GMint GMFontSizePt;
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
 #define STATIC_ASSERT_SIZE(type, size) static_assert(sizeof(type) == size, "Type '" #type "' size static assert failed. Excepted size is " #size);

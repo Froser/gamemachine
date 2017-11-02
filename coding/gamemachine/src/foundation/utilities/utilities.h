@@ -472,6 +472,12 @@ struct GMPath
 	static void createDirectory(const GMString& dir);
 };
 
+//GMPath: platforms/[os]/screen.cpp
+struct GMScreen
+{
+	static GMfloat dpi();
+};
+
 //GMEvent: platforms/[os]/event.cpp
 #if _WINDOWS
 typedef HANDLE GMEventHandle;
@@ -525,6 +531,13 @@ class GMManualResetEvent : public GMEvent
 {
 public:
 	GMManualResetEvent(bool initialState = false);
+};
+
+// Unit conversion
+struct GMUnitConvertion
+{
+	static GMfloat pointToInch(GMint pt);
+	static GMfloat pointToPixel(GMint pt);
 };
 
 // traits

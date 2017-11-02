@@ -37,7 +37,7 @@ void Demo_Particles2::init()
 		gm::GMParticlesEmitter::InfiniteEmissionTimes,
 		&d->emitter
 		);
-	d->demoWorld->appendObject("particles", d->emitter);
+	d->demoWorld->addObject("particles", d->emitter);
 }
 
 void Demo_Particles2::event(gm::GameMachineEvent evt)

@@ -42,3 +42,13 @@ GMManualResetEvent::GMManualResetEvent(bool initialState)
 	: GMEvent(true, initialState)
 {
 }
+
+GMfloat GMUnitConvertion::pointToInch(GMint pt)
+{
+	return pt / 72.f;
+}
+
+GMfloat GMUnitConvertion::pointToPixel(GMint pt)
+{
+	return pointToInch(pt) * GMScreen::dpi();
+}

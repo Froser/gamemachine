@@ -5,7 +5,7 @@ GMGlyphManager::GMGlyphManager()
 {
 }
 
-const GlyphInfo& GMGlyphManager::getChar(GMWchar c, GMint fontSize)
+const GMGlyphInfo& GMGlyphManager::getChar(GMWchar c, GMint fontSize)
 {
 	D(d);
 	CharList::mapped_type::iterator iter;
@@ -15,7 +15,7 @@ const GlyphInfo& GMGlyphManager::getChar(GMWchar c, GMint fontSize)
 	return createChar(c, fontSize);
 }
 
-GlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMWchar ch, const GlyphInfo& glyph)
+GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMWchar ch, const GMGlyphInfo& glyph)
 {
 	D(d);
 	auto& result = d->chars[fontSize].insert({ ch, glyph });
@@ -23,7 +23,7 @@ GlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMWchar ch, const GlyphInf
 	return (*(result.first)).second;
 }
 
-const GlyphInfo& GMGlyphManager::getChar(GMint fontSize, GMWchar ch)
+const GMGlyphInfo& GMGlyphManager::getChar(GMint fontSize, GMWchar ch)
 {
 	D(d);
 	return d->chars[fontSize][ch];

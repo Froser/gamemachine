@@ -37,7 +37,7 @@ public:
 	virtual bool removeObject(GMGameObject* obj);
 
 public:
-	void appendObjectAndInit(AUTORELEASE GMGameObject* obj);
+	void addObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
 	void addControl(AUTORELEASE GMControlGameObject* control);
 	void notifyControls();

@@ -80,7 +80,7 @@ void GMBSPGameWorld::setSky(AUTORELEASE GMGameObject* sky)
 {
 	D(d);
 	d->sky = sky;
-	appendObjectAndInit(sky);
+	addObjectAndInit(sky);
 }
 
 GMGameObject* GMBSPGameWorld::getSky()
@@ -102,10 +102,10 @@ GMPhysicsWorld* GMBSPGameWorld::physicsWorld()
 	return d->physics;
 }
 
-void GMBSPGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)
+void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)
 {
 	D(d);
-	GMGameWorld::appendObjectAndInit(obj);
+	GMGameWorld::addObjectAndInit(obj);
 	if (alwaysVisible)
 		d->render.renderData().alwaysVisibleObjects.push_back(obj);
 }
@@ -284,7 +284,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	obj = new GMGameObject(asset);
 
 	rd.polygonFaceObjects[&polygonFace] = obj;
-	appendObjectAndInit(obj);
+	addObjectAndInit(obj);
 }
 
 void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceIndex)
@@ -314,7 +314,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 	obj = new GMGameObject(asset);
 	rd.meshFaceObjects[&meshFace] = obj;
-	appendObjectAndInit(obj);
+	addObjectAndInit(obj);
 }
 
 void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
@@ -344,7 +344,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 		GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 		GMGameObject* obj = new GMGameObject(asset);
 		rd.biquadraticPatchObjects[&biqp] = obj;
-		appendObjectAndInit(obj);
+		addObjectAndInit(obj);
 	}
 }
 
@@ -718,7 +718,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 
 	GM_ASSERT(entityObject);
 	rd.entitiyObjects[entity] = entityObject;
-	appendObjectAndInit(entityObject);
+	addObjectAndInit(entityObject);
 }
 
 BSPData& GMBSPGameWorld::bspData()

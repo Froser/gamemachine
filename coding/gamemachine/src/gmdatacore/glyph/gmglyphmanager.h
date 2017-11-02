@@ -7,16 +7,16 @@ BEGIN_NS
 struct ITexture;
 
 // 用于管理字形的类
-struct GlyphInfo
+struct GMGlyphInfo
 {
 	bool valid;
-	GMfloat x, y;
-	GMfloat width, height;
+	GMfloat x, y; // 字形在纹理中的位置
+	GMfloat width, height; // 字形在纹理中的大小
 	GMfloat bearingX, bearingY;
 	GMfloat advance;
 };
 
-typedef Map<GMint, Map<GMWchar, GlyphInfo>> CharList;
+typedef Map<GMint, Map<GMWchar, GMGlyphInfo>> CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
@@ -40,17 +40,17 @@ public:
 	virtual ~GMGlyphManager() {}
 
 public:
-	const GlyphInfo& getChar(GMWchar c, GMint fontSize);
+	const GMGlyphInfo& getChar(GMWchar c, GMFontSizePt fontSize);
 
 public:
 	virtual ITexture* glyphTexture() = 0;
 
 protected:
-	virtual const GlyphInfo& createChar(GMWchar c, GMint fontSize) = 0;
+	virtual const GMGlyphInfo& createChar(GMWchar c, GMFontSizePt fontSize) = 0;
 
 protected:
-	GlyphInfo& insertChar(GMint fontSize, GMWchar ch, const GlyphInfo& glyph);
-	const GlyphInfo& getChar(GMint fontSize, GMWchar ch);
+	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMWchar ch, const GMGlyphInfo& glyph);
+	const GMGlyphInfo& getChar(GMFontSizePt fontSize, GMWchar ch);
 };
 
 END_NS

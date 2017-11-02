@@ -160,9 +160,11 @@ set(SOURCES
 	)
 
 set(WIN32_SOURCES
+		foundation/platforms/windows/check.h
 		foundation/platforms/windows/event.cpp
 		foundation/platforms/windows/path.cpp
 		foundation/platforms/windows/timer.cpp
+		foundation/platforms/windows/screen.cpp
 	)
 
 if(WIN32)

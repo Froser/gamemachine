@@ -14,8 +14,8 @@ GM_PRIVATE_OBJECT(GMGlyphObject)
 	GMString lastRenderText;
 	GMString text;
 	bool autoResize = true; // 是否按照屏幕大小调整字体
-	GMRectF lastGeometry = { -1 };
-	GMRect lastClientRect = { -1 };
+	GMRectF lastGeometry = { 0, 0, -1, -1 };
+	GMRect lastClientRect = { 0, 0, -1, -1 };
 	ITexture* texture;
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;

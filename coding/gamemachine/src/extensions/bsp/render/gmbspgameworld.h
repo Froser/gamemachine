@@ -21,9 +21,9 @@ public:
 	void setSky(AUTORELEASE GMGameObject* sky);
 	GMGameObject* getSky();
 	Map<GMint, Set<GMBSPEntity*> >& getEntities();
-	void appendObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
+	void addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
 	void setDefaultLights();
-	using GMGameWorld::appendObjectAndInit;
+	using GMGameWorld::addObjectAndInit;
 
 public:
 	virtual void renderScene() override;

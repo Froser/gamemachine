@@ -60,7 +60,7 @@ void Demo_Texture::init()
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
 	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
-	d->demoWorld->appendObject("texture", obj);
+	d->demoWorld->addObject("texture", obj);
 }
 
 void Demo_Texture::event(gm::GameMachineEvent evt)

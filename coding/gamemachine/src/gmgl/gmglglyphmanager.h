@@ -17,12 +17,6 @@ class GMGLGlyphManager : public GMGlyphManager
 	DECLARE_PRIVATE(GMGLGlyphManager);
 
 public:
-	enum
-	{
-		RESOLUTION = 150,
-	};
-
-public:
 	GMGLGlyphManager();
 	~GMGLGlyphManager();
 
@@ -30,7 +24,7 @@ public:
 	virtual ITexture* glyphTexture() override;
 
 protected:
-	virtual const GlyphInfo& createChar(GMWchar c, GMint fontSize) override;
+	virtual const GMGlyphInfo& createChar(GMWchar c, GMFontSizePt fontSize) override;
 };
 
 END_NS

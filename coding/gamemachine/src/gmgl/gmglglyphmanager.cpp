@@ -129,10 +129,10 @@ ITexture* GMGLGlyphManager::glyphTexture()
 	return d->texture;
 }
 
-const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
+const GMGlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
 {
 	D(d);
-	static GlyphInfo errGlyph = { false };
+	static GMGlyphInfo errGlyph = { false };
 	FT_Error error;
 	FT_Face face;
 	FT_Glyph glyph;
@@ -144,7 +144,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
 	}
 
 	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
-	error = FT_Set_Char_Size(face, 0, fontSize << 6, RESOLUTION, RESOLUTION);
+	error = FT_Set_Char_Size(face, 0, fontSize << 6, GMScreen::dpi(), GMScreen::dpi());
 	error = FT_Load_Glyph(face, FT_Get_Char_Index(face, c), FT_LOAD_DEFAULT);
 	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 	error = FT_Get_Glyph(face->glyph, &glyph);
@@ -164,7 +164,7 @@ const GlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
 		}
 	}
 
-	GlyphInfo glyphInfo = { 0 };
+	GMGlyphInfo glyphInfo = { 0 };
 	glyphInfo.valid = true;
 	glyphInfo.x = d->cursor_u;
 	glyphInfo.y = d->cursor_v;

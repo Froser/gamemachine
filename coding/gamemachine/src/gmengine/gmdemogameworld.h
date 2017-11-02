@@ -30,14 +30,14 @@ public:
 	virtual bool removeObject(GMGameObject* obj) override;
 
 public:
-	bool appendObject(const GMString& name, GMGameObject* obj);
+	bool addObject(const GMString& name, GMGameObject* obj);
 	bool removeObject(const GMString& name);
 	GMGameObject* findGameObject(const GMString& name);
 	bool findGameObject(const GMGameObject* obj, REF GMString& name);
 
 private:
 	// 这个应该由appendObject来转调，appendObject会传入一个对象的名称
-	using GMGameWorld::appendObjectAndInit;
+	using GMGameWorld::addObjectAndInit;
 };
 
 END_NS

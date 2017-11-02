@@ -11,6 +11,7 @@
 #include "demo/effects.h"
 #include "demo/quake3_bsp.h"
 #include "demo/sound.h"
+#include "demo/literature.h"
 
 void loadDemostrations(DemostrationWorld* world)
 {
@@ -22,6 +23,7 @@ void loadDemostrations(DemostrationWorld* world)
 	world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
 	world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));
 	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
+	world->addDemo("Literature: Demostrate render literatures via GMTypoEngine.", new Demo_Literature(world));
 	world->init();
 }
 

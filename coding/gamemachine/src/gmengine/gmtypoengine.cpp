@@ -22,7 +22,7 @@ const GMTypoResult& GMTypoIterator::operator*()
 	return d->result;
 }
 
-GMTypoIterator& GMTypoIterator::operator ++(int)
+GMTypoIterator& GMTypoIterator::operator ++()
 {
 	D(d);
 	GM_ASSERT(!d->invalid);
@@ -55,7 +55,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	const GMWchar* p = wstr.c_str();
 	while (*p)
 	{
-		const GlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize);
+		const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize);
 		if (d->lineHeight < glyph.height)
 			d->lineHeight = glyph.height;
 		++p;
@@ -79,17 +79,34 @@ GMTypoResult GMTypoEngine::getTypoResult(GMint index)
 	result.color[1] = 1;
 	result.color[2] = 0;
 
-	const GlyphInfo& glyph = d->glyphManager->getChar(d->literature[index], d->fontSize);
+	const GMGlyphInfo& glyph = d->glyphManager->getChar(d->literature[index], d->fontSize);
 	result.glyph = &glyph;
 
 	result.lineHeight = d->lineHeight;
 	result.fontSize = d->fontSize;
 
 	result.x = d->current_x + glyph.bearingX;
-	result.y = 0;
+	result.y = d->current_y;
 	result.width = glyph.width;
 	result.height = glyph.height;
+	if (isValidTypeFrame())
+	{
+		// 如果给定了一个合法的绘制区域，且出现超出绘制区域的情况
+		if (result.x + result.width > d->options.typoArea.width)
+		{
+			d->current_x = 0;
+			d->current_y += d->lineHeight + d->options.lineSpacing;
+			result.x = d->current_x + glyph.bearingX;
+			result.y = d->current_y;
+		}
+	}
 	d->current_x += glyph.advance;
 
 	return result;
+}
+
+bool GMTypoEngine::isValidTypeFrame()
+{
+	D(d);
+	return !(d->options.typoArea.width < 0 || d->options.typoArea.height < 0);
 }

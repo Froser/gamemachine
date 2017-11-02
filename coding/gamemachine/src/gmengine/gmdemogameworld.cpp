@@ -21,7 +21,7 @@ void GMDemoGameWorld::renderScene()
 	engine->endBlend();
 }
 
-bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
+bool GMDemoGameWorld::addObject(const GMString& name, GMGameObject* obj)
 {
 	D(d);
 	auto r = d->renderList.find(name);
@@ -30,7 +30,7 @@ bool GMDemoGameWorld::appendObject(const GMString& name, GMGameObject* obj)
 	d->renderList[name] = obj;
 	d->renderListInv[obj] = name;
 	d->gameObjects.push_back(obj);
-	appendObjectAndInit(obj);
+	addObjectAndInit(obj);
 	return true;
 }
 

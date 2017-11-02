@@ -30,7 +30,7 @@ GMGameWorld::~GMGameWorld()
 	}
 }
 
-void GMGameWorld::appendObjectAndInit(AUTORELEASE GMGameObject* obj)
+void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
 	obj->setWorld(this);
