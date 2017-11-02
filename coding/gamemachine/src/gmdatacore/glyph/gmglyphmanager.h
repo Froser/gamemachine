@@ -28,6 +28,14 @@ class GMGlyphManager : public GMObject
 	DECLARE_PRIVATE(GMGlyphManager);
 
 public:
+	// 文字纹理的大小
+	enum
+	{
+		CANVAS_WIDTH = 1024,
+		CANVAS_HEIGHT = 1024,
+	};
+
+public:
 	GMGlyphManager();
 	virtual ~GMGlyphManager() {}
 

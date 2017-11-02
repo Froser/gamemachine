@@ -20,8 +20,6 @@ public:
 	enum
 	{
 		RESOLUTION = 150,
-		CANVAS_WIDTH = 1024,
-		CANVAS_HEIGHT = 1024,
 	};
 
 public:

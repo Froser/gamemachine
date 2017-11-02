@@ -12,6 +12,8 @@ struct GMTypoResult
 	GMfloat color[4];
 	GMfloat x = 0;
 	GMfloat y = 0;
+	GMfloat width = 0;
+	GMfloat height = 0;
 	GMfloat lineHeight = 0;
 	const GlyphInfo* glyph = nullptr;
 };
@@ -22,6 +24,8 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 {
 	ITypoEngine* typo = nullptr;
 	GMint index = 0;
+	GMTypoResult result;
+	bool invalid = true;
 };
 
 class GMTypoIterator : public GMObject
@@ -32,19 +36,11 @@ public:
 	GMTypoIterator(ITypoEngine* typo, GMint index);
 
 public:
-	bool end();
-
-	GMTypoResult operator*();
+	const GMTypoResult& operator*();
 	bool operator==(const GMTypoIterator& rhs);
 	bool operator!=(const GMTypoIterator& rhs);
 
-	GMTypoIterator& operator ++(int)
-	{
-		D(d);
-		++d->index;
-		return *this;
-	}
-
+	GMTypoIterator& operator ++(int);
 	GMTypoIterator& operator ++()
 	{
 		return (*this)++;
@@ -80,6 +76,7 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 	GMfloat lineHeight = 0;
 
 	// 绘制状态
+	GMint current_x = 0;
 	GMint fontSize = 0;
 };
 

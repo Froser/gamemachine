@@ -7,12 +7,27 @@ GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMint index)
 	D(d);
 	d->typo = typo;
 	d->index = index;
+
+	if (!index)
+	{
+		d->result = d->typo->getTypoResult(index);
+		d->invalid = false;
+	}
 }
 
-GMTypoResult GMTypoIterator::operator*()
+const GMTypoResult& GMTypoIterator::operator*()
 {
 	D(d);
-	return d->typo->getTypoResult(d->index);
+	GM_ASSERT(!d->invalid);
+	return d->result;
+}
+
+GMTypoIterator& GMTypoIterator::operator ++(int)
+{
+	D(d);
+	GM_ASSERT(!d->invalid);
+	d->result = d->typo->getTypoResult(++d->index);
+	return *this;
 }
 
 bool GMTypoIterator::operator==(const GMTypoIterator& rhs)
@@ -70,10 +85,11 @@ GMTypoResult GMTypoEngine::getTypoResult(GMint index)
 	result.lineHeight = d->lineHeight;
 	result.fontSize = d->fontSize;
 
-	//TODO!!!
-	result.x += glyph.advance / 800.f;
+	result.x = d->current_x + glyph.bearingX;
+	result.y = 0;
+	result.width = glyph.width;
+	result.height = glyph.height;
+	d->current_x += glyph.advance;
 
-	//TODO
-	result.y = d->options.position[1];
 	return result;
 }
