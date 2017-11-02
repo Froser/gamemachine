@@ -77,6 +77,5 @@ void Demo_Literature::setupItem(gm::GMImage2DGameObject* item, gm::GMAsset borde
 		14,
 		14
 	));
-	item->setHeight(item->getGeometry().height);
 	item->setPaddings(10, 5, 10, 5);
 }
