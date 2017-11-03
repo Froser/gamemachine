@@ -16,6 +16,7 @@ struct GMTypoResult
 	GMfloat height = 0;
 	GMfloat lineHeight = 0;
 	const GMGlyphInfo* glyph = nullptr;
+	bool valid = true;
 };
 
 struct ITypoEngine;
@@ -65,9 +66,39 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
+class GMTypoEngine;
+GM_PRIVATE_OBJECT(GMTypoStateMachine)
+{
+	GMTypoEngine* typoEngine = nullptr;
+};
+
+class GMTypoStateMachine : public GMObject
+{
+	DECLARE_PRIVATE(GMTypoStateMachine)
+
+public:
+	enum ParseState
+	{
+		Okay,
+		Newline,
+		Ignore,
+	};
+
+	GMTypoStateMachine(GMTypoEngine* engine);
+
+public:
+	virtual ParseState parse(GMWchar ch, REF GMTypoResult& result);
+
+protected:
+	virtual void setColor(REF GMTypoResult& result, GMfloat r, GMfloat g, GMfloat b);
+};
+
 // 一个默认排版类
 GM_PRIVATE_OBJECT(GMTypoEngine)
 {
+	GMTypoStateMachine* stateMachine = nullptr;
+	bool insetStateMachine = false;
+
 	GMGlyphManager* const glyphManager = GM.getGlyphManager();
 	std::wstring literature;
 	GMTypoOptions options;
@@ -82,6 +113,11 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 class GMTypoEngine : public GMObject, public ITypoEngine
 {
 	DECLARE_PRIVATE(GMTypoEngine);
+
+public:
+	GMTypoEngine();
+	GMTypoEngine(AUTORELEASE GMTypoStateMachine* stateMachine);
+	~GMTypoEngine();
 
 public:
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) override;

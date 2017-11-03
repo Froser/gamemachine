@@ -42,6 +42,47 @@ bool GMTypoIterator::operator!=(const GMTypoIterator& rhs)
 	return !(*this == rhs);
 }
 
+//////////////////////////////////////////////////////////////////////////
+GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
+{
+	D(d);
+	GM_ASSERT(engine);
+	d->typoEngine = engine;
+}
+
+GMTypoStateMachine::ParseState GMTypoStateMachine::parse(GMWchar ch, REF GMTypoResult& result)
+{
+	//TODO
+	setColor(result, 0, 1, 0);
+	return Okay;
+}
+
+void GMTypoStateMachine::setColor(REF GMTypoResult& result, GMfloat r, GMfloat g, GMfloat b)
+{
+	result.color[0] = r;
+	result.color[1] = g;
+	result.color[2] = b;
+}
+
+//////////////////////////////////////////////////////////////////////////
+GMTypoEngine::GMTypoEngine()
+{
+	D(d);
+	d->stateMachine = new GMTypoStateMachine(this);
+}
+
+GMTypoEngine::GMTypoEngine(AUTORELEASE GMTypoStateMachine* stateMachine)
+{
+	D(d);
+	d->stateMachine = stateMachine;
+}
+
+GMTypoEngine::~GMTypoEngine()
+{
+	D(d);
+	GM_delete(d->stateMachine);
+}
+
 GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptions& options)
 {
 	D(d);
@@ -74,12 +115,15 @@ GMTypoResult GMTypoEngine::getTypoResult(GMint index)
 {
 	D(d);
 	GMTypoResult result;
-	//TODO COLOR
-	result.color[0] = 0;
-	result.color[1] = 1;
-	result.color[2] = 0;
+	GMWchar ch = d->literature[index];
+	GMTypoStateMachine::ParseState state = d->stateMachine->parse(ch, result);
+	if (state == GMTypoStateMachine::Ignore)
+	{
+		result.valid = false;
+		return result;
+	}
 
-	const GMGlyphInfo& glyph = d->glyphManager->getChar(d->literature[index], d->fontSize);
+	const GMGlyphInfo& glyph = d->glyphManager->getChar(ch, d->fontSize);
 	result.glyph = &glyph;
 
 	result.lineHeight = d->lineHeight;
