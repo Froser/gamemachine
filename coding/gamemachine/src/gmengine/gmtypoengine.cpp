@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmtypoengine.h"
 #include "foundation/gamemachine.h"
+#include <regex>
 
 GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMint index)
 {
@@ -50,18 +51,107 @@ GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
 	d->typoEngine = engine;
 }
 
-GMTypoStateMachine::ParseState GMTypoStateMachine::parse(GMWchar ch, REF GMTypoResult& result)
+GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMWchar& ch)
 {
-	//TODO
-	setColor(result, 0, 1, 0);
+	D(d);
+	switch (d->state)
+	{
+	case GMTypoStateMachineParseState::Literature:
+	{
+		if (ch == '[')
+		{
+			d->state = GMTypoStateMachineParseState::WaitingForCommand;
+			return Ignore;
+		}
+		return Okay;
+	}
+	case GMTypoStateMachineParseState::WaitingForCommand:
+	{
+		if (ch == '[')
+		{
+			d->state = GMTypoStateMachineParseState::Literature;
+			return Okay;
+		}
+		else if (ch == ']')
+		{
+			d->state = GMTypoStateMachineParseState::Literature;
+			return Ignore;
+		}
+		else
+		{
+			d->state = GMTypoStateMachineParseState::ParsingSymbol;
+			d->parsedSymbol = "";
+			return parse(ch);
+		}
+		break;
+	}
+	case GMTypoStateMachineParseState::ParsingSymbol:
+	{
+		if (ch == ']')
+		{
+			d->state = GMTypoStateMachineParseState::Literature;
+			return applyAttribute();
+		}
+		else
+		{
+			d->parsedSymbol += ch;
+			return Ignore;
+		}
+	}
+	default:
+		GM_ASSERT(false);
+		break;
+	}
 	return Okay;
 }
 
-void GMTypoStateMachine::setColor(REF GMTypoResult& result, GMfloat r, GMfloat g, GMfloat b)
+GMTypoStateMachine::ParseResult GMTypoStateMachine::applyAttribute()
 {
-	result.color[0] = r;
-	result.color[1] = g;
-	result.color[2] = b;
+	D(d);
+	GMString value;
+	if (parsePair("color", value))
+	{
+		GMfloat rgb[3];
+		bool b = GMConvertion::hexToRGB(value, rgb);
+		GM_ASSERT(b);
+		setColor(rgb);
+		return Ignore;
+	}
+	else if (preciseParse("n"))
+	{
+		return Newline;
+	}
+
+	GM_ASSERT(false);
+	return Okay;
+}
+
+void GMTypoStateMachine::setColor(GMfloat rgb[3])
+{
+	D(d);
+	d->typoEngine->setColor(rgb);
+}
+
+bool GMTypoStateMachine::parsePair(const GMString& key, REF GMString& value)
+{
+	D(d);
+	GMString expr = ("(") + key + ")\\s*=\\s*(.*)";
+	std::regex regPair(expr.toStdString());
+	std::smatch match;
+	std::string symbol = d->parsedSymbol.toStdString();
+	if (std::regex_search(symbol, match, regPair))
+	{
+		GM_ASSERT(match.size() >= 3);
+		value = match[2].str();
+		return true;
+	}
+	return false;
+}
+
+bool GMTypoStateMachine::preciseParse(const GMString& name)
+{
+	D(d);
+	return d->parsedSymbol == name;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -87,7 +177,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 {
 	D(d);
 	d->options = options;
-	d->fontSize = d->options.defaultFontSize;
+	setFontSize(d->options.defaultFontSize);
 	d->literature = literature.toStdWString();
 
 	// 获取行高
@@ -116,9 +206,16 @@ GMTypoResult GMTypoEngine::getTypoResult(GMint index)
 	D(d);
 	GMTypoResult result;
 	GMWchar ch = d->literature[index];
-	GMTypoStateMachine::ParseState state = d->stateMachine->parse(ch, result);
-	if (state == GMTypoStateMachine::Ignore)
+	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(ch);
+	if (parseResult == GMTypoStateMachine::Ignore)
 	{
+		result.valid = false;
+		return result;
+	}
+
+	if (parseResult == GMTypoStateMachine::Newline)
+	{
+		newLine();
 		result.valid = false;
 		return result;
 	}
@@ -138,19 +235,45 @@ GMTypoResult GMTypoEngine::getTypoResult(GMint index)
 		// 如果给定了一个合法的绘制区域，且出现超出绘制区域的情况
 		if (result.x + result.width > d->options.typoArea.width)
 		{
-			d->current_x = 0;
-			d->current_y += d->lineHeight + d->options.lineSpacing;
+			newLine();
 			result.x = d->current_x + glyph.bearingX;
 			result.y = d->current_y;
 		}
 	}
 	d->current_x += glyph.advance;
 
+	// 拷贝状态
+	result.color[0] = d->color[0];
+	result.color[1] = d->color[1];
+	result.color[2] = d->color[2];
+	result.color[3] = 1.f;
+
 	return result;
+}
+
+void GMTypoEngine::newLine()
+{
+	D(d);
+	d->current_x = 0;
+	d->current_y += d->lineHeight + d->options.lineSpacing;
 }
 
 bool GMTypoEngine::isValidTypeFrame()
 {
 	D(d);
 	return !(d->options.typoArea.width < 0 || d->options.typoArea.height < 0);
+}
+
+void GMTypoEngine::setColor(GMfloat rgb[3])
+{
+	D(d);
+	d->color[0] = rgb[0];
+	d->color[1] = rgb[1];
+	d->color[2] = rgb[2];
+}
+
+void GMTypoEngine::setFontSize(GMint pt)
+{
+	D(d);
+	d->fontSize = pt;
 }

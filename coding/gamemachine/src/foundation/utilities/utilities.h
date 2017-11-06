@@ -534,10 +534,11 @@ public:
 };
 
 // Unit conversion
-struct GMUnitConvertion
+struct GMConvertion
 {
 	static GMfloat pointToInch(GMint pt);
 	static GMfloat pointToPixel(GMint pt);
+	static bool hexToRGB(const GMString& hex, GMfloat rgb[3]);
 };
 
 // traits

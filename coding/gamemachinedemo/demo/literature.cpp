@@ -34,7 +34,13 @@ void Demo_Literature::init()
 	gm::GMImage2DGameObject* literature = new gm::GMImage2DGameObject();
 	gm::GMRect rect = { 200, 220, 400, 200 };
 	literature->setGeometry(rect);
-	literature->setText("This is a text demo. It shows you how to render ABC,xyz,etc");
+	literature->setText(
+		"This is a [color=#ffbbff]text[color=#ffffff] demo. It shows you how to render ABC,xyz,etc.[n]"
+		"[color=#ff0000]red[n]"
+		"[color=#00ff00]green[n]"
+		"[color=#0000ff]blue[n]"
+		"[color=#ff00FF]magenta[n]"
+	);
 	setupItem(literature, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
 	d->demoWorld->addControl(literature);
 	GM_delete(img);

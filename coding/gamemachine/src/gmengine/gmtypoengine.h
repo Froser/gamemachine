@@ -67,9 +67,18 @@ private:
 
 //////////////////////////////////////////////////////////////////////////
 class GMTypoEngine;
+enum class GMTypoStateMachineParseState
+{
+	Literature,
+	WaitingForCommand,
+	ParsingSymbol,
+};
+
 GM_PRIVATE_OBJECT(GMTypoStateMachine)
 {
 	GMTypoEngine* typoEngine = nullptr;
+	GMTypoStateMachineParseState state = GMTypoStateMachineParseState::Literature;
+	GMString parsedSymbol;
 };
 
 class GMTypoStateMachine : public GMObject
@@ -77,7 +86,7 @@ class GMTypoStateMachine : public GMObject
 	DECLARE_PRIVATE(GMTypoStateMachine)
 
 public:
-	enum ParseState
+	enum ParseResult
 	{
 		Okay,
 		Newline,
@@ -87,10 +96,17 @@ public:
 	GMTypoStateMachine(GMTypoEngine* engine);
 
 public:
-	virtual ParseState parse(GMWchar ch, REF GMTypoResult& result);
+	virtual ParseResult parse(REF GMWchar& ch);
 
 protected:
-	virtual void setColor(REF GMTypoResult& result, GMfloat r, GMfloat g, GMfloat b);
+	GMTypoStateMachine::ParseResult applyAttribute();
+
+protected:
+	virtual void setColor(GMfloat rgb[3]);
+
+private:
+	bool parsePair(const GMString& key, REF GMString& value);
+	bool preciseParse(const GMString& name);
 };
 
 // 一个默认排版类
@@ -107,7 +123,8 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 	// 绘制状态
 	GMint current_x = 0;
 	GMint current_y = 0;
-	GMFontSizePt fontSize = 0;
+	GMFontSizePt fontSize = 12;
+	GMfloat color[3] = { 1.f, 1.f, 1.f };
 };
 
 class GMTypoEngine : public GMObject, public ITypoEngine
@@ -128,6 +145,11 @@ private:
 
 private:
 	bool isValidTypeFrame();
+	void newLine();
+
+public:
+	void setColor(GMfloat rgb[3]);
+	void setFontSize(GMint pt);
 };
 
 END_NS

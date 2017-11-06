@@ -46,7 +46,7 @@ GMString::GMString(const GMWchar c)
 	D(d);
 	d->type = Data::WideChars;
 	d->wstr = c;
-	d->wstr.clear();
+	d->str.clear();
 }
 
 GMString::GMString(const char* c)

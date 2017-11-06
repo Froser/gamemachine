@@ -132,6 +132,9 @@ void GMGlyphObject::createVertices(GMComponent* component)
 		for (; iter != typoEngine->end(); ++iter)
 		{
 			const GMTypoResult& typoResult = *iter;
+			if (!typoResult.valid)
+				continue;
+
 			const GMGlyphInfo& glyph = *typoResult.glyph;
 
 			component->beginFace();
