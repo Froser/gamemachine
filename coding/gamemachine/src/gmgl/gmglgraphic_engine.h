@@ -90,6 +90,7 @@ public:
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights();
+	virtual void clearStencil() override;
 	virtual void beginCreateStencil() override;
 	virtual void endCreateStencil() override;
 	virtual void beginUseStencil(bool inverse) override;

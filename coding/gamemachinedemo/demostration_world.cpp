@@ -148,7 +148,7 @@ void DemostrationWorld::init()
 	gm::GMAsset borderAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
-	gm::GMRect rect = { 10, 10, 600, 600 };
+	gm::GMRect rect = { 10, 10, 600, 300 };
 	listbox->setGeometry(rect);
 	listbox->setItemMargins(0, 5, 0, 0);
 	for (auto& demo : d->demos)

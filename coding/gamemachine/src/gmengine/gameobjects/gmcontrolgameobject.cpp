@@ -37,6 +37,37 @@ GMControlGameObject::~GMControlGameObject()
 	{
 		delete child;
 	}
+
+	if (d->stencil)
+	{
+		GMModel* model = d->stencil->getModel();
+		GM_delete(model);
+		GM_delete(d->stencil);
+	}
+}
+
+void GMControlGameObject::onAppendingObjectToWorld()
+{
+	D(d);
+	// 创建一个模板，绘制子对象的时候，子对象不能溢出此模板
+	class __Cb : public IPrimitiveCreatorShaderCallback
+	{
+	public:
+		virtual void onCreateShader(Shader& shader) override
+		{
+			shader.setBlend(true);
+			shader.setBlendFactorDest(GMS_BlendFunc::ONE);
+			shader.setBlendFactorSource(GMS_BlendFunc::ONE);
+		}
+	} _cb;
+
+	GMModel* model = nullptr;
+	createQuadModel(&_cb, &model);
+	d->stencil = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->stencil->setWorld(getWorld());
+	GM.initObjectPainter(d->stencil->getModel());
+
+	Base::onAppendingObjectToWorld();
 }
 
 void GMControlGameObject::notifyControl()

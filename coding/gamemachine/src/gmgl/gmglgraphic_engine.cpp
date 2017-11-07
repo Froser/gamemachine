@@ -88,6 +88,9 @@ void GMGLGraphicEngine::start()
 {
 	installShaders();
 	glDepthFunc(GL_LEQUAL);
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	createDeferredRenderQuad();
 }
 
@@ -570,6 +573,11 @@ void GMGLGraphicEngine::removeLights()
 	d->needRefreshLights = true;
 }
 
+void GMGLGraphicEngine::clearStencil()
+{
+	glClear(GL_STENCIL_BUFFER_BIT);
+}
+
 void GMGLGraphicEngine::beginCreateStencil()
 {
 	D(d);
@@ -577,11 +585,7 @@ void GMGLGraphicEngine::beginCreateStencil()
 	{
 		d->stencilRenderModeCache = GMGetRenderState(RENDER_MODE);
 		GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
-		glEnable(GL_STENCIL_TEST);
-		glClear(GL_STENCIL_BUFFER_BIT);
 		glStencilMask(0xFF);
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	}
 	++d->createStencilRef;
 }
@@ -613,10 +617,7 @@ void GMGLGraphicEngine::endUseStencil()
 {
 	D(d);
 	if (!--d->useStencilRef)
-	{
-		glDisable(GL_STENCIL_TEST);
-		glClear(GL_STENCIL_BUFFER_BIT);
-	}
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 }
 
 void GMGLGraphicEngine::beginBlend()

@@ -81,6 +81,7 @@ public:
 struct IPrimitiveCreatorShaderCallback;
 GM_PRIVATE_OBJECT(GMControlGameObject)
 {
+	AUTORELEASE GMGameObject* stencil = nullptr;
 	GMControlGameObject* parent = nullptr;
 	GMRect geometry{ 0 };
 	GMRect clientSize{ 0 };
@@ -93,6 +94,8 @@ class GMControlGameObject : public GMGameObject
 {
 	DECLARE_PRIVATE(GMControlGameObject)
 
+	typedef GMGameObject Base;
+
 	GM_DECLARE_PROPERTY(Stretch, stretch, bool);
 
 public:
@@ -101,10 +104,14 @@ public:
 
 public:
 	inline void setParent(GMControlGameObject* parent) { D(d); d->parent = parent; }
+	inline GMGameObject* getStencil() { D(d); return d->stencil; }
 	inline const GMRect& getGeometry() { D(d); return d->geometry; }
 	inline void setGeometry(const GMRect& rect) { D(d); d->geometry = rect; }
 	inline void setWidth(GMint width) { D(d); d->geometry.width = width; }
 	inline void setHeight(GMint height) { D(d); d->geometry.height = height; }
+
+public:
+	virtual void onAppendingObjectToWorld() override;
 
 public:
 	virtual void notifyControl();

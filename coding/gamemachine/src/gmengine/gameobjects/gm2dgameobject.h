@@ -139,6 +139,9 @@ public:
 private:
 	virtual void onCreateShader(Shader& shader) override;
 
+protected:
+	void drawBackground();
+
 private:
 	void createBackgroundImage();
 	void createBorder();
