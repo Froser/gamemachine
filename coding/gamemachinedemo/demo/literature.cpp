@@ -32,16 +32,29 @@ void Demo_Literature::init()
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 	gm::GMImage2DGameObject* literature = new gm::GMImage2DGameObject();
-	gm::GMRect rect = { 200, 220, 400, 200 };
+	gm::GMRect rect = { 200, 220, 400, 190 };
 	literature->setGeometry(rect);
 	literature->setText(
 		"This is a [color=#ffbbff]text[color=#ffffff] demo. It shows you how to render ABC,xyz,etc.[n]"
 		"[color=#ff0000]red[n]"
 		"[color=#00ff00]green[n]"
 		"[color=#0000ff]blue[n]"
-		"[color=#ff00FF]magenta[n]"
+		"[color=#ff00FF]magenta[n][color=#ffffff]"
+		"[size=20]20Points Font Size[n]"
+		"[size=10]10Points Font Size[n]"
+		"[n]"
+		"[size=25][n]Let's try some 'overflow'"
 	);
-	setupItem(literature, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
+
+	literature->setBorder(gm::GMImage2DBorder(
+		border,
+		textureGeo,
+		img->getData().mip[0].width,
+		img->getData().mip[0].height,
+		14,
+		14
+	));
+	literature->setPaddings(10, 17, 10, 15);
 	d->demoWorld->addControl(literature);
 	GM_delete(img);
 }
@@ -71,17 +84,4 @@ void Demo_Literature::event(gm::GameMachineEvent evt)
 	default:
 		break;
 	}
-}
-
-void Demo_Literature::setupItem(gm::GMImage2DGameObject* item, gm::GMAsset border, const gm::GMRect& textureGeo, gm::GMint imgWidth, gm::GMint imgHeight)
-{
-	item->setBorder(gm::GMImage2DBorder(
-		border,
-		textureGeo,
-		imgWidth,
-		imgHeight,
-		14,
-		14
-	));
-	item->setPaddings(10, 5, 10, 5);
 }

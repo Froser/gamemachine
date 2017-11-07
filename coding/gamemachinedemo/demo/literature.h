@@ -23,9 +23,6 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
-
-private:
-	void setupItem(gm::GMImage2DGameObject* item, gm::GMAsset border, const gm::GMRect& textureGeo, gm::GMint imgWidth, gm::GMint imgHeight);
 };
 
 #endif
