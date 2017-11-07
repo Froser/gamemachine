@@ -78,6 +78,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////
+struct IPrimitiveCreatorShaderCallback;
 GM_PRIVATE_OBJECT(GMControlGameObject)
 {
 	GMControlGameObject* parent = nullptr;
@@ -108,6 +109,9 @@ public:
 public:
 	virtual void notifyControl();
 	virtual bool canDeferredRendering() override { return false; }
+
+public:
+	void createQuadModel(IPrimitiveCreatorShaderCallback* callback, OUT GMModel** model);
 
 protected:
 	virtual void event(GMControlEvent* e);

@@ -117,6 +117,14 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::applyAttribute()
 		setColor(rgb);
 		return Ignore;
 	}
+	else if (parsePair("size", value))
+	{
+		GMint sz;
+		std::string str = value.toStdString();
+		SAFE_SSCANF(str.c_str(), "%d", &sz);
+		setFontSize(sz);
+		return Ignore;
+	}
 	else if (preciseParse("n"))
 	{
 		return Newline;
@@ -130,6 +138,12 @@ void GMTypoStateMachine::setColor(GMfloat rgb[3])
 {
 	D(d);
 	d->typoEngine->setColor(rgb);
+}
+
+void GMTypoStateMachine::setFontSize(GMint sz)
+{
+	D(d);
+	d->typoEngine->setFontSize(sz);
 }
 
 bool GMTypoStateMachine::parsePair(const GMString& key, REF GMString& value)

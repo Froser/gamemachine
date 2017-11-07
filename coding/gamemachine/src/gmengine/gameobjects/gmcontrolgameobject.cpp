@@ -143,3 +143,18 @@ void GMControlGameObject::addChild(GMControlGameObject* child)
 	child->setParent(this);
 	d->children.push_back(child);
 }
+
+void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callback, OUT GMModel** model)
+{
+	D(d);
+	GM_ASSERT(model);
+
+	GMRectF coord = toViewportCoord(d->geometry);
+	GMfloat extents[3] = {
+		coord.width,
+		coord.height,
+		1.f,
+	};
+	GMfloat pos[3] = { coord.x, coord.y, 0 };
+	GMPrimitiveCreator::createQuad(extents, pos, model, callback, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+}

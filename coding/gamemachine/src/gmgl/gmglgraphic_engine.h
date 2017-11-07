@@ -66,6 +66,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	GMint stencilRenderModeCache = GMStates_RenderOptions::FORWARD;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
+	GMint createStencilRef = 0;
+	GMint useStencilRef = 0;
 
 	// 混合绘制
 	GMRenderMode renderModeForBlend = GMStates_RenderOptions::FORWARD;

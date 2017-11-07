@@ -573,34 +573,50 @@ void GMGLGraphicEngine::removeLights()
 void GMGLGraphicEngine::beginCreateStencil()
 {
 	D(d);
-	d->stencilRenderModeCache = GMGetRenderState(RENDER_MODE);
-	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
-	glEnable(GL_STENCIL_TEST);
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glStencilMask(0xFF);
-	glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	if (!d->createStencilRef)
+	{
+		d->stencilRenderModeCache = GMGetRenderState(RENDER_MODE);
+		GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+		glEnable(GL_STENCIL_TEST);
+		glClear(GL_STENCIL_BUFFER_BIT);
+		glStencilMask(0xFF);
+		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+		glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	}
+	++d->createStencilRef;
 }
 
 void GMGLGraphicEngine::endCreateStencil()
 {
 	D(d);
-	glStencilMask(0x00);
-	GMSetRenderState(RENDER_MODE, d->stencilRenderModeCache);
+	if (!--d->createStencilRef)
+	{
+		glStencilMask(0x00);
+		GMSetRenderState(RENDER_MODE, d->stencilRenderModeCache);
+	}
 }
 
 void GMGLGraphicEngine::beginUseStencil(bool inverse)
 {
-	if (!inverse)
-		glStencilFunc(GL_EQUAL, 1, 0xFF);
-	else
-		glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	D(d);
+	if (!d->useStencilRef)
+	{
+		if (!inverse)
+			glStencilFunc(GL_EQUAL, 1, 0xFF);
+		else
+			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	}
+	++d->useStencilRef;
 }
 
 void GMGLGraphicEngine::endUseStencil()
 {
-	glDisable(GL_STENCIL_TEST);
-	glClear(GL_STENCIL_BUFFER_BIT);
+	D(d);
+	if (!--d->useStencilRef)
+	{
+		glDisable(GL_STENCIL_TEST);
+		glClear(GL_STENCIL_BUFFER_BIT);
+	}
 }
 
 void GMGLGraphicEngine::beginBlend()

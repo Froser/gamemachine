@@ -103,6 +103,7 @@ protected:
 
 protected:
 	virtual void setColor(GMfloat rgb[3]);
+	virtual void setFontSize(GMint sz);
 
 private:
 	bool parsePair(const GMString& key, REF GMString& value);

@@ -395,11 +395,21 @@ void GMImage2DBorder::draw()
 GMImage2DGameObject::~GMImage2DGameObject()
 {
 	D(d);
-	GMModel* model = getModel();
-	if (model)
-		delete model;
-	if (d->textModel)
-		delete d->textModel;
+	{
+		GMModel* model = getModel();
+		if (model)
+			delete model;
+	}
+
+	GM_delete(d->textModel);
+
+	if (d->textMask)
+	{
+		GMModel* maskModel = d->textMask->getModel();
+		GM_delete(maskModel);
+		GM_delete(d->textMask);
+	}
+
 }
 
 void GMImage2DGameObject::setPaddings(GMint left, GMint top, GMint right, GMint bottom)
@@ -453,19 +463,25 @@ void GMImage2DGameObject::draw()
 	engine->endCreateStencil();
 
 	engine->beginUseStencil(false);
-
 	// 背景
 	Base::draw();
-
 	// 边框
 	if (d->border.hasBorder())
 		d->border.draw();
+	engine->endUseStencil();
 
 	// 文字
 	if (d->textModel)
-		d->textModel->draw();
+	{
+		GM_ASSERT(d->textMask);
+		engine->beginCreateStencil();
+		d->textMask->draw();
+		engine->endCreateStencil();
 
-	engine->endUseStencil();
+		engine->beginUseStencil(false);
+		d->textModel->draw();
+		engine->endUseStencil();
+	}
 }
 
 void GMImage2DGameObject::onCreateShader(Shader& shader)
@@ -484,19 +500,9 @@ void GMImage2DGameObject::onCreateShader(Shader& shader)
 
 void GMImage2DGameObject::createBackgroundImage()
 {
-	D(d);
-	D_BASE(db, GMControlGameObject);
-	
-	GMRectF coord = toViewportCoord(db->geometry);
-	GMfloat extents[3] = {
-		coord.width,
-		coord.height,
-		1.f,
-	};
+	D_BASE(d, GMControlGameObject);
 	GMModel* model = nullptr;
-	GMfloat pos[3] = { coord.x, coord.y, 0 };
-	GMPrimitiveCreator::createQuad(extents, pos, &model, this, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
-
+	createQuadModel(this, &model);
 	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 }
 
@@ -512,6 +518,7 @@ void GMImage2DGameObject::createGlyphs()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
+
 	if (d->textModel)
 	{
 		GMRect geometry = {
@@ -520,6 +527,17 @@ void GMImage2DGameObject::createGlyphs()
 			db->geometry.width - d->paddings[Left] - d->paddings[Right],
 			db->geometry.height - d->paddings[Top] - d->paddings[Bottom],
 		};
+
+		// 创建一个内容模板，字体绘制的时候，只能绘制在模板中
+		GM_ASSERT(!d->textMask);
+		d->textMask = new GMControlGameObject();
+		d->textMask->setGeometry(geometry);
+		d->textMask->onAppendingObjectToWorld();
+		GMModel* textMaskModel = nullptr;
+		d->textMask->createQuadModel(nullptr, &textMaskModel);
+		GM_ASSERT(textMaskModel);
+		d->textMask->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, textMaskModel));
+		GM.initObjectPainter(textMaskModel);
 
 		d->textModel->setGeometry(geometry);
 		d->textModel->setWorld(getWorld());
