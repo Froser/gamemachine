@@ -395,13 +395,16 @@ void GMImage2DBorder::draw()
 GMImage2DGameObject::~GMImage2DGameObject()
 {
 	D(d);
-	{
-		GMModel* model = getModel();
-		if (model)
-			delete model;
-	}
+	GM_ASSERT(!getModel());
 
 	GM_delete(d->textModel);
+
+	if (d->background)
+	{
+		GMModel* backgroundModel = d->background->getModel();
+		GM_delete(backgroundModel);
+		GM_delete(d->background);
+	}
 
 	if (d->textMask)
 	{
@@ -458,21 +461,19 @@ void GMImage2DGameObject::draw()
 
 	// 首先创建出一个裁剪框
 	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginCreateStencil();
-	Base::draw();
-	engine->endCreateStencil();
 
-	engine->beginUseStencil(false);
 	// 背景
-	Base::draw();
+	if (d->background)
+		d->background->draw();
+
 	// 边框
 	if (d->border.hasBorder())
 		d->border.draw();
-	engine->endUseStencil();
 
 	// 文字
 	if (d->textModel)
 	{
+		// 绘制边框裁剪框
 		GM_ASSERT(d->textMask);
 		engine->beginCreateStencil();
 		d->textMask->draw();
@@ -500,10 +501,13 @@ void GMImage2DGameObject::onCreateShader(Shader& shader)
 
 void GMImage2DGameObject::createBackgroundImage()
 {
-	D_BASE(d, GMControlGameObject);
+	D(d);
 	GMModel* model = nullptr;
 	createQuadModel(this, &model);
-	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+
+	d->background = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->background->setWorld(getWorld());
+	GM.initObjectPainter(d->background->getModel());
 }
 
 void GMImage2DGameObject::createBorder()
