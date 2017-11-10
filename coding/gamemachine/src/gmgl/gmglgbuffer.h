@@ -119,16 +119,19 @@ public:
 	void endDrawEffects();
 	void draw(GMGLShaderProgram* program);
 	GLuint framebuffer();
+	void clearStencil();
+	void bindForWriting();
+	void bindForReading();
+	void releaseBind();
 
 public:
 	inline bool hasBegun() { D(d); return d->hasBegun; }
 	inline void setUseFullscreenFramebuffer(bool b) { D(d); d->useFullscreenFramebuffer = b; }
+	inline GMuint getWidth() { D(d); return d->renderWidth; }
+	inline GMuint getHeight() { D(d); return d->renderHeight; }
 
 private:
 	GLuint fbo();
-	void bindForWriting();
-	void bindForReading();
-	void releaseBind();
 	void newFrame();
 	void createQuad();
 	void turnOffBlending();

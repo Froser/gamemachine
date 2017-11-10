@@ -20,8 +20,8 @@ extern "C"
 class GMEffectRenderer
 {
 public:
-	GMEffectRenderer(GMGLFramebuffer& effectBuffer, GMGLShaderProgram* program)
-		: m_effectBuffer(effectBuffer)
+	GMEffectRenderer(GMGLFramebuffer& framebuffer, GMGLShaderProgram* program)
+		: m_effectBuffer(framebuffer)
 		, m_program(program)
 	{
 		if (!m_effectBuffer.hasBegun()) // 防止绘制嵌套
@@ -156,7 +156,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		refreshForwardRenderLights();
 
 		{
-			GMEffectRenderer effectRender(d->effectBuffer, d->effectsShader);
+			GMEffectRenderer effectRender(d->framebuffer, d->effectsShader);
 			forwardRender(objects, count);
 		}
 	}
@@ -170,7 +170,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		geometryPass(d->deferredRenderingGameObjects);
 
 		{
-			GMEffectRenderer effectRender(d->effectBuffer, d->effectsShader);
+			GMEffectRenderer effectRender(d->framebuffer, d->effectsShader);
 
 			lightPass();
 			d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
@@ -179,7 +179,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 			GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::DEFERRED);
 		}
 
-		viewFrameBuffer();
+		viewGBufferFrameBuffer();
 	}
 }
 
@@ -284,8 +284,8 @@ bool GMGLGraphicEngine::refreshFramebuffer()
 	if (rect.width <= 0 || rect.height <= 0)
 		return true;
 
-	d->effectBuffer.dispose();
-	return d->effectBuffer.init(rect);
+	d->framebuffer.dispose();
+	return d->framebuffer.init(rect);
 }
 
 void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
@@ -358,7 +358,7 @@ void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 	}
 }
 
-void GMGLGraphicEngine::viewFrameBuffer()
+void GMGLGraphicEngine::viewGBufferFrameBuffer()
 {
 	D(d);
 	GMint fbIdx = GMGetDebugState(FRAMEBUFFER_VIEWER_INDEX);
@@ -575,7 +575,8 @@ void GMGLGraphicEngine::removeLights()
 
 void GMGLGraphicEngine::clearStencil()
 {
-	glClear(GL_STENCIL_BUFFER_BIT);
+	D(d);
+	d->framebuffer.clearStencil();
 }
 
 void GMGLGraphicEngine::beginCreateStencil()
@@ -639,13 +640,13 @@ void GMGLGraphicEngine::endBlend()
 void GMGLGraphicEngine::beginFullRendering()
 {
 	D(d);
-	d->effectBuffer.setUseFullscreenFramebuffer(true);
+	d->framebuffer.setUseFullscreenFramebuffer(true);
 }
 
 void GMGLGraphicEngine::endFullRendering()
 {
 	D(d);
-	d->effectBuffer.setUseFullscreenFramebuffer(false);
+	d->framebuffer.setUseFullscreenFramebuffer(false);
 }
 
 void GMGLGraphicEngine::newFrameOnCurrentContext()

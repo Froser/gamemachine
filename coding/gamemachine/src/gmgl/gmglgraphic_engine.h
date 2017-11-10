@@ -52,7 +52,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	linear_math::Matrix4x4 projectionMatrix;
 
 	GMGLGBuffer gbuffer;
-	GMGLFramebuffer effectBuffer;
+	GMGLFramebuffer framebuffer;
 
 	// 延迟渲染的四边形
 	GMuint quadVAO = 0;
@@ -134,7 +134,7 @@ private:
 	void lightPass();
 	void updateVPMatrices(const CameraLookAt& lookAt);
 	void groupGameObjects(GMGameObject *objects[], GMuint count);
-	void viewFrameBuffer();
+	void viewGBufferFrameBuffer();
 
 public:
 	static void newFrameOnCurrentContext();

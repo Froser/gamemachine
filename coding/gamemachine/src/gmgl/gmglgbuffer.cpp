@@ -201,7 +201,7 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 	}
 
 	// If using STENCIL buffer:
-	// EVER EVER MAKE A STENCIL buffer. All GPUs and all drivers do not support an independent stencil buffer.
+	// NEVER EVER MAKE A STENCIL buffer. All GPUs and all drivers do not support an independent stencil buffer.
 	// If you need a stencil buffer, then you need to make a Depth=24, Stencil=8 buffer, also called D24S8.
 	// See https://www.khronos.org/opengl/wiki/Framebuffer_Object_Extension_Examples
 
@@ -332,7 +332,7 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 	
 		glGenRenderbuffers(1, &d->depthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_EXT, d->renderWidth, d->renderHeight);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, d->renderWidth, d->renderHeight);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -369,7 +369,7 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 
 		glGenRenderbuffers(1, &d->fullscreenDepthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, d->fullscreenDepthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8_EXT, d->clientRect.width, d->clientRect.height);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, d->clientRect.width, d->clientRect.height);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -450,6 +450,10 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 GLuint GMGLFramebuffer::framebuffer()
 {
 	return fbo();
+}
+
+void GMGLFramebuffer::clearStencil()
+{
 }
 
 GLuint GMGLFramebuffer::fbo()

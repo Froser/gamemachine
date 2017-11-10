@@ -277,6 +277,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 
 			if (kbState.keyTriggered('I'))
 				GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
+
 			break;
 		}
 		case gm::GameMachineEvent::Deactivate:
