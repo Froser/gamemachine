@@ -140,7 +140,7 @@ void GMGLGBuffer::setReadBuffer(GBufferMaterialType materialType)
 void GMGLGBuffer::newFrame()
 {
 	bindForWriting();
-	GMGLGraphicEngine::newFrameOnCurrentContext();
+	GMGLGraphicEngine::newFrameOnCurrentFramebuffer();
 	releaseBind();
 }
 
@@ -333,8 +333,8 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 		glGenRenderbuffers(1, &d->depthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, d->renderWidth, d->renderHeight);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
+		GM_CHECK_GL_ERROR();
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
@@ -370,8 +370,8 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 		glGenRenderbuffers(1, &d->fullscreenDepthBuffer);
 		glBindRenderbuffer(GL_RENDERBUFFER, d->fullscreenDepthBuffer);
 		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, d->clientRect.width, d->clientRect.height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
+		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
+		GM_CHECK_GL_ERROR();
 		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
@@ -452,10 +452,6 @@ GLuint GMGLFramebuffer::framebuffer()
 	return fbo();
 }
 
-void GMGLFramebuffer::clearStencil()
-{
-}
-
 GLuint GMGLFramebuffer::fbo()
 {
 	D(d);
@@ -484,7 +480,7 @@ void GMGLFramebuffer::releaseBind()
 void GMGLFramebuffer::newFrame()
 {
 	bindForWriting();
-	GMGLGraphicEngine::newFrameOnCurrentContext();
+	GMGLGraphicEngine::newFrameOnCurrentFramebuffer();
 	releaseBind();
 }
 

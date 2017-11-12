@@ -100,11 +100,11 @@ void GMGLGraphicEngine::newFrame()
 	if (GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::DEFERRED)
 	{
 		d->gbuffer.releaseBind();
-		newFrameOnCurrentContext();
+		newFrameOnCurrentFramebuffer();
 	}
 	else
 	{
-		newFrameOnCurrentContext();
+		newFrameOnCurrentFramebuffer();
 	}
 }
 
@@ -576,7 +576,7 @@ void GMGLGraphicEngine::removeLights()
 void GMGLGraphicEngine::clearStencil()
 {
 	D(d);
-	d->framebuffer.clearStencil();
+	clearStencilOnCurrentFramebuffer();
 }
 
 void GMGLGraphicEngine::beginCreateStencil()
@@ -649,7 +649,16 @@ void GMGLGraphicEngine::endFullRendering()
 	d->framebuffer.setUseFullscreenFramebuffer(false);
 }
 
-void GMGLGraphicEngine::newFrameOnCurrentContext()
+void GMGLGraphicEngine::newFrameOnCurrentFramebuffer()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+}
+
+void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()
+{
+	GLint mask;
+	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
+	glStencilMask(0xFF);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glStencilMask(mask);
 }

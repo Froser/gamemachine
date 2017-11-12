@@ -137,7 +137,8 @@ private:
 	void viewGBufferFrameBuffer();
 
 public:
-	static void newFrameOnCurrentContext();
+	static void newFrameOnCurrentFramebuffer();
+	static void clearStencilOnCurrentFramebuffer();
 };
 
 END_NS

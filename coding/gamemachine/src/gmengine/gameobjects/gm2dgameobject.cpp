@@ -461,10 +461,11 @@ void GMImage2DGameObject::draw()
 	D_BASE(db, GMControlGameObject);
 
 	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->clearStencil();
+
 	if (db->parent)
 	{
 		// 首先创建出一个父亲的裁剪框，绘制不需要裁剪的部分
-		engine->clearStencil();
 		engine->beginCreateStencil();
 		db->parent->getStencil()->draw();
 		engine->endCreateStencil();
@@ -496,7 +497,6 @@ void GMImage2DGameObject::draw()
 		engine->beginUseStencil(false);
 		d->textModel->draw();
 		engine->endUseStencil();
-		engine->clearStencil();
 	}
 }
 

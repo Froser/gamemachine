@@ -119,7 +119,6 @@ public:
 	void endDrawEffects();
 	void draw(GMGLShaderProgram* program);
 	GLuint framebuffer();
-	void clearStencil();
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
