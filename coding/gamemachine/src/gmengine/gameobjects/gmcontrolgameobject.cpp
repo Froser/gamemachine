@@ -70,6 +70,24 @@ void GMControlGameObject::onAppendingObjectToWorld()
 	Base::onAppendingObjectToWorld();
 }
 
+void GMControlGameObject::setScaling(const linear_math::Matrix4x4& scaling)
+{
+	D(d);
+	Base::setScaling(scaling);
+	if (d->stencil)
+		d->stencil->setScaling(scaling);
+	for (auto& child : d->children)
+	{
+		child->setScaling(scaling);
+	}
+}
+
+void GMControlGameObject::draw()
+{
+	updateAnimation();
+	Base::draw();
+}
+
 void GMControlGameObject::notifyControl()
 {
 	D(d);
@@ -105,6 +123,65 @@ void GMControlGameObject::notifyControl()
 			event(&e);
 		}
 	}
+}
+
+void GMControlGameObject::updateAnimation()
+{
+	D(d);
+	GMAnimationStates_t& state = d->animationStates[GMAnimationTypes::Scaling];
+	GMfloat now = GM.getGameTimeSeconds();
+	if (state.state == GMAnimateState::Running ||
+		state.state == GMAnimateState::Reverting )
+	{
+		state.p += state.direction * (now - state.tick) / state.duration;
+		if (state.p >= 1.f)
+		{
+			state.p = 1.f;
+			state.state = GMAnimateState::Stopped;
+		}
+		else if (state.p < 0)
+		{
+			state.p = 0;
+			state.state = GMAnimateState::Stopped;
+		}
+
+		GMfloat scaling[3];
+		state.interpolation(
+			state.start,
+			state.end,
+			state.p,
+			scaling);
+
+		linear_math::Matrix4x4 s = linear_math::scale(scaling[0], scaling[1], scaling[2]);
+		setScaling(s);
+	}
+	state.tick = now;
+}
+
+void GMControlGameObject::animateScaleStart(const GMfloat(&end)[3], GMfloat duration, GMInterpolation interpolation)
+{
+	D(d);
+	GMAnimationStates_t& state = d->animationStates[GMAnimationTypes::Scaling];
+	GMfloat now = GM.getGameTimeSeconds();
+	state.interpolation = interpolation;
+	auto& scalingMatrix = getScaling();
+	state.start[0] = scalingMatrix[0][0];
+	state.start[1] = scalingMatrix[1][1];
+	state.start[2] = scalingMatrix[2][2];
+	state.duration = duration;
+	state.tick = now;
+	state.p = 0;
+	state.direction = 1;
+	memcpy_s(state.end, sizeof(end), end, sizeof(end));
+	state.state = GMAnimateState::Running;
+}
+
+void GMControlGameObject::animateScaleEnd()
+{
+	D(d);
+	GMAnimationStates_t& state = d->animationStates[GMAnimationTypes::Scaling];
+	state.direction = -1;
+	state.state = GMAnimateState::Reverting;
 }
 
 void GMControlGameObject::event(GMControlEvent* e)
@@ -143,12 +220,14 @@ void GMControlGameObject::updateUI()
 		else
 		{
 			// 调整大小，防止拉伸
-			GMfloat scaling[] = { 1.f / scaleX, 1.f / scaleY, 1 };
+			auto& mat = getScaling();
+			GMfloat scaling[] = { 1.f / scaleX * mat[0][0], 1.f / scaleY * mat[1][1], mat[2][2] };
 			setScaling(linear_math::scale({ 1.f / scaleX, 1.f / scaleY, 1 }));
 
 			// 相对于左上角位置也不能变
+			auto& trans = getTranslation();
 			GMRectF rect = toViewportCoord(d->geometry);
-			setTranslate(linear_math::translate({ rect.x, rect.y, 0 }));
+			setTranslate(linear_math::translate({ rect.x + trans[3][0], rect.y + trans[3][1], trans[3][2] }));
 		}
 
 		d->clientSize = nowClient;
@@ -188,4 +267,10 @@ void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callb
 	};
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
 	GMPrimitiveCreator::createQuad(extents, pos, model, callback, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+}
+
+GMAnimateState GMControlGameObject::getAnimationState(GMAnimationTypes::Types type)
+{
+	D(d);
+	return d->animationStates[type].state;
 }

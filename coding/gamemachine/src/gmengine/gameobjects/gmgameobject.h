@@ -6,6 +6,19 @@
 
 BEGIN_NS
 
+typedef std::function<void(GMfloat*, GMfloat*, GMfloat, GMfloat*)> GMInterpolation;
+template <size_t size>
+struct GMInterpolations
+{
+	static void linear(GMfloat* start, GMfloat* end, GMfloat p, GMfloat* out)
+	{
+		for (GMint i = 0; i < size; ++i)
+		{
+			out[i] = (end[i] - start[i]) * p + start[i];
+		}
+	}
+};
+
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
@@ -55,10 +68,13 @@ private:
 	inline void updateMatrix() { D(d); d->transformMatrix = d->scaling * d->rotation.toMatrix() * d->translation; }
 
 public:
-	inline void setScaling(const linear_math::Matrix4x4& scaling) { D(d); updateMatrix(); d->scaling = scaling; }
-	inline void setTranslate(const linear_math::Matrix4x4& translation) { D(d); updateMatrix(); d->translation = translation; }
-	inline void setRotation(const linear_math::Quaternion& rotation) { D(d); updateMatrix(); d->rotation = rotation; }
+	inline virtual void setScaling(const linear_math::Matrix4x4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
+	inline virtual void setTranslate(const linear_math::Matrix4x4& translation) { D(d); d->translation = translation; updateMatrix(); }
+	inline virtual void setRotation(const linear_math::Quaternion& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
 	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
+	inline const linear_math::Matrix4x4& getScaling() { D(d); return d->scaling; }
+	inline const linear_math::Matrix4x4& getTranslation() { D(d); return d->translation; }
+	inline const linear_math::Quaternion& getRotation() { D(d); return d->rotation; }
 
 	// events
 private:

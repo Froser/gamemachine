@@ -100,6 +100,7 @@ private:
 	virtual void clone(GMImage2DBorder&);
 	virtual void createBorder(const GMRect& geometry);
 	virtual void draw();
+	virtual void setScaling(const linear_math::Matrix4x4& scaling);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -134,6 +135,7 @@ public:
 public:
 	virtual void onAppendingObjectToWorld();
 	virtual void draw() override;
+	virtual void setScaling(const linear_math::Matrix4x4& scaling);
 
 	//IPrimitiveCreatorShaderCallback
 private:

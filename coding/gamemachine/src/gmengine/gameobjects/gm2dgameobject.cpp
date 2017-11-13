@@ -391,6 +391,16 @@ void GMImage2DBorder::draw()
 	drawObjects(d->objects);
 }
 
+void GMImage2DBorder::setScaling(const linear_math::Matrix4x4& scaling)
+{
+	D(d);
+	size_t size = GM_dimensions_of_array(d->objects);
+	for (GMuint i = 0; i < size; ++i)
+	{
+		d->objects[i]->setScaling(scaling);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 GMImage2DGameObject::~GMImage2DGameObject()
 {
@@ -459,6 +469,7 @@ void GMImage2DGameObject::draw()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
+	Base::draw();
 
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->clearStencil();
@@ -499,6 +510,21 @@ void GMImage2DGameObject::draw()
 		engine->endUseStencil();
 	}
 }
+
+void GMImage2DGameObject::setScaling(const linear_math::Matrix4x4& scaling)
+{
+	D(d);
+	Base::setScaling(scaling);
+	if (d->textModel)
+		d->textModel->setScaling(scaling);
+	if (d->textMask)
+		d->textMask->setScaling(scaling);
+	if (d->background)
+		d->background->setScaling(scaling);
+	if (d->border.hasBorder())
+		d->border.setScaling(scaling);
+}
+
 
 void GMImage2DGameObject::onCreateShader(Shader& shader)
 {

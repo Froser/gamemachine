@@ -280,7 +280,7 @@ ITexture* GMGLRenders_3D::getTexture(GMTextureFrames& frames)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GameMachine::instance().getGameTimeSeconds() * 1000;
+	GMint elapsed = GM.getGameTimeSeconds() * 1000;
 
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }

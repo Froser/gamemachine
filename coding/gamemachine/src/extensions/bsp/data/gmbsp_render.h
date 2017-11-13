@@ -126,10 +126,10 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	AlignedVector<GMBSP_Render_Patch> patches;
 	AlignedVector<GMBSP_Render_Leaf> leafs;
 
-	std::map<GMBSP_Render_BiquadraticPatch*, GMGameObject*> biquadraticPatchObjects;
-	std::map<GMBSP_Render_Face*, GMGameObject*> polygonFaceObjects;
-	std::map<GMBSP_Render_Face*, GMGameObject*> meshFaceObjects;
-	std::map<GMBSPEntity*, GMEntityObject*> entitiyObjects;
+	Map<GMBSP_Render_BiquadraticPatch*, GMGameObject*> biquadraticPatchObjects;
+	Map<GMBSP_Render_Face*, GMGameObject*> polygonFaceObjects;
+	Map<GMBSP_Render_Face*, GMGameObject*> meshFaceObjects;
+	Map<GMBSPEntity*, GMEntityObject*> entitiyObjects;
 
 	// 用于记录每种类型的面在faceDirectory中的位置
 	Vector<GMint> polygonIndices;
