@@ -12,6 +12,7 @@
 #include "demo/quake3_bsp.h"
 #include "demo/sound.h"
 #include "demo/literature.h"
+#include "demo/button.h"
 
 void loadDemostrations(DemostrationWorld* world)
 {
@@ -24,6 +25,7 @@ void loadDemostrations(DemostrationWorld* world)
 	world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));
 	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
 	world->addDemo("Literature: Demostrate render literatures via GMTypoEngine.", new Demo_Literature(world));
+	world->addDemo("Button: Demostrate how to create a button.", new Demo_Button(world));
 	world->init();
 }
 
@@ -148,7 +150,7 @@ void DemostrationWorld::init()
 	gm::GMAsset borderAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
-	gm::GMRect rect = { 10, 10, 600, 300 };
+	gm::GMRect rect = { 10, 10, 600, 500 };
 	listbox->setGeometry(rect);
 	listbox->setItemMargins(0, 5, 0, 0);
 	for (auto& demo : d->demos)
