@@ -105,10 +105,10 @@ void GMAnimation::startAnimation()
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
-		state.tick = GM.getGameTimeSeconds();
-		state.direction = 1;
+	state.tick = GM.getGameTimeSeconds();
+	state.direction = 1;
 
-		state.canReverse = state.canResume = true;
-		state.canStart = false;
-		state.playingState = GMAnimationPlayingState::Activated;
+	state.canReverse = state.canResume = true;
+	state.canStart = false;
+	state.playingState = GMAnimationPlayingState::Activated;
 }
