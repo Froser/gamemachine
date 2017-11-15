@@ -82,12 +82,6 @@ void GMControlGameObject::setScaling(const linear_math::Matrix4x4& scaling)
 	}
 }
 
-void GMControlGameObject::draw()
-{
-	updateAnimation();
-	Base::draw();
-}
-
 void GMControlGameObject::notifyControl()
 {
 	D(d);
@@ -123,65 +117,6 @@ void GMControlGameObject::notifyControl()
 			event(&e);
 		}
 	}
-}
-
-void GMControlGameObject::updateAnimation()
-{
-	D(d);
-	GMAnimationStates_t& state = d->animationStates[GMAnimationTypes::Scaling];
-	GMfloat now = GM.getGameTimeSeconds();
-	if (state.state == GMAnimateState::Running ||
-		state.state == GMAnimateState::Reverting )
-	{
-		state.p += state.direction * (now - state.tick) / state.duration;
-		if (state.p >= 1.f)
-		{
-			state.p = 1.f;
-			state.state = GMAnimateState::Stopped;
-		}
-		else if (state.p < 0)
-		{
-			state.p = 0;
-			state.state = GMAnimateState::Stopped;
-		}
-
-		GMfloat scaling[3];
-		state.interpolation(
-			state.start,
-			state.end,
-			state.p,
-			scaling);
-
-		linear_math::Matrix4x4 s = linear_math::scale(scaling[0], scaling[1], scaling[2]);
-		setScaling(s);
-	}
-	state.tick = now;
-}
-
-void GMControlGameObject::animateScaleStart(const GMfloat(&end)[3], GMfloat duration, GMInterpolation interpolation)
-{
-	D(d);
-	GMAnimationStates_t& state = d->animationStates[GMAnimationTypes::Scaling];
-	GMfloat now = GM.getGameTimeSeconds();
-	state.interpolation = interpolation;
-	auto& scalingMatrix = getScaling();
-	state.start[0] = scalingMatrix[0][0];
-	state.start[1] = scalingMatrix[1][1];
-	state.start[2] = scalingMatrix[2][2];
-	state.duration = duration;
-	state.tick = now;
-	state.p = 0;
-	state.direction = 1;
-	memcpy_s(state.end, sizeof(end), end, sizeof(end));
-	state.state = GMAnimateState::Running;
-}
-
-void GMControlGameObject::animateScaleEnd()
-{
-	D(d);
-	GMAnimationStates_t& state = d->animationStates[GMAnimationTypes::Scaling];
-	state.direction = -1;
-	state.state = GMAnimateState::Reverting;
 }
 
 void GMControlGameObject::event(GMControlEvent* e)
@@ -267,10 +202,4 @@ void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callb
 	};
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
 	GMPrimitiveCreator::createQuad(extents, pos, model, callback, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
-}
-
-GMAnimateState GMControlGameObject::getAnimationState(GMAnimationTypes::Types type)
-{
-	D(d);
-	return d->animationStates[type].state;
 }

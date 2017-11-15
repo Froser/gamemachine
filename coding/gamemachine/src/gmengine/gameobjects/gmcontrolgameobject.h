@@ -79,34 +79,6 @@ public:
 
 //////////////////////////////////////////////////////////////////////////
 struct IPrimitiveCreatorShaderCallback;
-enum class GMAnimateState
-{
-	Stopped,
-	Running,
-	Reverting,
-};
-
-struct GMAnimationTypes
-{
-	enum Types
-	{
-		Scaling,
-		MaxType,
-	};
-};
-
-struct GMAnimationStates_t
-{
-	GMfloat tick = 0;
-	GMfloat p = 0;
-	GMfloat duration = 0;
-	GMfloat start[3] = { 0 };
-	GMfloat end[3] = { 0 };
-	GMint direction = 1;
-	GMAnimateState state = GMAnimateState::Stopped;
-	GMInterpolation interpolation;
-};
-
 GM_PRIVATE_OBJECT(GMControlGameObject)
 {
 	AUTORELEASE GMGameObject* stencil = nullptr;
@@ -116,8 +88,6 @@ GM_PRIVATE_OBJECT(GMControlGameObject)
 	bool mouseHovered = false;
 	bool stretch = true;
 	Vector<GMControlGameObject*> children;
-
-	GMAnimationStates_t animationStates[GMAnimationTypes::MaxType];
 };
 
 class GMControlGameObject : public GMGameObject
@@ -144,22 +114,17 @@ public:
 	virtual void onAppendingObjectToWorld() override;
 	virtual bool canDeferredRendering() override { return false; }
 	virtual void setScaling(const linear_math::Matrix4x4& scaling) override;
-	virtual void draw() override;
 
 public:
 	virtual void notifyControl();
-	virtual void animateScaleStart(const GMfloat(&end)[3], GMfloat duration, GMInterpolation interpolation = GMInterpolations<3>::linear);
-	virtual void animateScaleEnd();
 
 public:
 	void createQuadModel(IPrimitiveCreatorShaderCallback* callback, OUT GMModel** model);
-	GMAnimateState getAnimationState(GMAnimationTypes::Types type);
 
 protected:
 	virtual void event(GMControlEvent* e);
 	virtual bool insideGeometry(GMint x, GMint y);
 	virtual void updateUI();
-	virtual void updateAnimation();
 
 protected:
 	static GMRectF toViewportCoord(const GMRect& in);

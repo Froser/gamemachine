@@ -6,19 +6,6 @@
 
 BEGIN_NS
 
-typedef std::function<void(GMfloat*, GMfloat*, GMfloat, GMfloat*)> GMInterpolation;
-template <size_t size>
-struct GMInterpolations
-{
-	static void linear(GMfloat* start, GMfloat* end, GMfloat p, GMfloat* out)
-	{
-		for (GMint i = 0; i < size; ++i)
-		{
-			out[i] = (end[i] - start[i]) * p + start[i];
-		}
-	}
-};
-
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
