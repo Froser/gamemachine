@@ -106,9 +106,6 @@ void GMGlyphObject::createVertices(GMComponent* component)
 	D(d);
 
 	D_BASE(db, GMControlGameObject);
-	GMGlyphManager* glyphManager = GM.getGlyphManager();
-	IWindow* window = GM.getMainWindow();
-
 	constexpr GMfloat Z = 0;
 	GMRect rect = d->autoResize && isValidRect(d->lastClientRect) ? d->lastClientRect : GM.getMainWindow()->getClientRect();
 	GMRectF coord = d->autoResize && isValidRect(d->lastGeometry) ? d->lastGeometry : toViewportCoord(db->geometry);
@@ -124,8 +121,8 @@ void GMGlyphObject::createVertices(GMComponent* component)
 		// 使用排版引擎进行排版
 		ITypoEngine* typoEngine = d->typoEngine;
 		GMTypoOptions options;
-		options.typoArea.width = coord.width * rect.width;
-		options.typoArea.height = coord.width * rect.height;
+		options.typoArea.width = coord.width * rect.width * .5f;
+		options.typoArea.height = coord.height * rect.height * .5f;
 
 		GM_ASSERT(typoEngine);
 		GMTypoIterator iter = typoEngine->begin(d->text, options);
@@ -146,10 +143,10 @@ void GMGlyphObject::createVertices(GMComponent* component)
 				// 1 3
 				// 让所有字体origin开始的x轴平齐
 
-				component->vertex(coord.x + X(typoResult.x), coord.y - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				component->vertex(coord.x + X(typoResult.x), coord.y - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
-				component->vertex(coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				component->vertex(coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
 				component->uv(UV_X(glyph.x), UV_Y(glyph.y));
 				component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));

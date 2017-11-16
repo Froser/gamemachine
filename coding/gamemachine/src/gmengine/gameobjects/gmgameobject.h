@@ -52,7 +52,7 @@ public:
 	virtual bool canDeferredRendering();
 
 private:
-	inline void updateMatrix() { D(d); d->transformMatrix = d->scaling * d->rotation.toMatrix() * d->translation; }
+	inline void updateMatrix() { D(d); d->transformMatrix = d->translation * d->rotation.toMatrix() * d->scaling; }
 
 public:
 	inline virtual void setScaling(const linear_math::Matrix4x4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }

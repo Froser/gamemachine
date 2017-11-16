@@ -2,7 +2,6 @@
 #include "gmgameobject.h"
 #include "gmengine/gmgameworld.h"
 #include "gmdatacore/glyph/gmglyphmanager.h"
-#include "gmgl/gmglglyphmanager.h" //TODO 不应该有GMGL
 #include "foundation/gamemachine.h"
 #include "gmassets.h"
 

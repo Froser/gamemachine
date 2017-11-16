@@ -63,7 +63,9 @@ void GMControlGameObject::onAppendingObjectToWorld()
 
 	GMModel* model = nullptr;
 	createQuadModel(&_cb, &model);
-	d->stencil = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->stencil = new GMControlGameObject();
+	d->stencil->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->stencil->setGeometry(getGeometry());
 	d->stencil->setWorld(getWorld());
 	GM.initObjectPainter(d->stencil->getModel());
 
@@ -163,25 +165,28 @@ void GMControlGameObject::updateUI()
 
 GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 {
+	// 得到一个原点在中心，x属于[-1,1],y属于[-1,1]范围的参考系的OpenGL的坐标
 	GMRect client = GM.getMainWindow()->getClientRect();
 	GMRectF out = {
 		in.x * 2.f / client.width - 1.f,
 		1.f - in.y * 2.f / client.height,
-		(GMfloat)in.width / client.width,
-		(GMfloat)in.height / client.height
+		in.width * 2.f / client.width,
+		in.height * 2.f / client.height
 	};
 	return out;
 }
 
-void GMControlGameObject::updateMatrices()
+void GMControlGameObject::updateGeometry()
 {
 	D(d);
+	// 更新所有辅助绘制对象位置
+	if (d->stencil)
+		d->stencil->setGeometry(getGeometry());
+
 	GMRectF coord = toViewportCoord(d->geometry);
 	// coord表示左上角的绘制坐标，平移的时候需要换算到中心处
 	GMfloat x = coord.x + coord.width / 2.f, y = coord.y - coord.height / 2;
-
-	// TODO
-	// setTranslation(linear_math::translate(linear_math::Vector3(x, y, 0)));
+	setTranslation(linear_math::translate(linear_math::Vector3(x, y, 0)));
 }
 
 void GMControlGameObject::addChild(GMControlGameObject* child)
@@ -207,13 +212,10 @@ void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callb
 
 	GMRectF coord = toViewportCoord(d->geometry);
 	GMfloat extents[3] = {
-		coord.width,
-		coord.height,
+		coord.width / 2.f,
+		coord.height / 2.f,
 		1.f,
 	};
 
-	//GMPrimitiveCreator::createQuad(extents, GMPrimitiveCreator::origin(), model, callback, GMMeshType::Model2D, GMPrimitiveCreator::Center);
-	// TODO:
-	GMfloat pos[3] = { coord.x, coord.y, 0 };
-	GMPrimitiveCreator::createQuad(extents, pos, model, callback, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
+	GMPrimitiveCreator::createQuad(extents, GMPrimitiveCreator::origin(), model, callback, GMMeshType::Model2D, GMPrimitiveCreator::Center);
 }

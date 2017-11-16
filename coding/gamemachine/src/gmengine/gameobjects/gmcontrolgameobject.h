@@ -81,7 +81,7 @@ public:
 struct IPrimitiveCreatorShaderCallback;
 GM_PRIVATE_OBJECT(GMControlGameObject)
 {
-	AUTORELEASE GMGameObject* stencil = nullptr;
+	AUTORELEASE GMControlGameObject* stencil = nullptr;
 	GMControlGameObject* parent = nullptr;
 	GMRect geometry{ 0 };
 	GMfloat geometryScaling[2] = { 1, 1 };
@@ -105,9 +105,9 @@ public:
 	inline void setParent(GMControlGameObject* parent) { D(d); d->parent = parent; }
 	inline GMGameObject* getStencil() { D(d); return d->stencil; }
 	inline const GMRect& getGeometry() { D(d); return d->geometry; }
-	inline void setGeometry(const GMRect& rect) { D(d); d->geometry = rect; updateMatrices(); }
-	inline void setWidth(GMint width) { D(d); d->geometry.width = width; updateMatrices(); }
-	inline void setHeight(GMint height) { D(d); d->geometry.height = height; updateMatrices(); }
+	inline void setGeometry(const GMRect& rect) { D(d); d->geometry = rect; updateGeometry(); }
+	inline void setWidth(GMint width) { D(d); d->geometry.width = width; updateGeometry();  }
+	inline void setHeight(GMint height) { D(d); d->geometry.height = height; updateGeometry();  }
 
 public:
 	virtual void onAppendingObjectToWorld() override;
@@ -124,12 +124,12 @@ protected:
 	virtual void event(GMControlEvent* e);
 	virtual bool insideGeometry(GMint x, GMint y);
 	virtual void updateUI();
+	virtual void updateGeometry();
 
 protected:
 	static GMRectF toViewportCoord(const GMRect& in);
 
 private:
-	void updateMatrices();
 	void addChild(GMControlGameObject* child);
 	void scalingGeometry(const linear_math::Matrix4x4& scaling);
 };

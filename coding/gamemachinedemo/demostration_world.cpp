@@ -165,7 +165,7 @@ void DemostrationWorld::init()
 			14
 		));
 		item->setHeight(30);
-		item->setPaddings(10, 5, 10, 5);
+		item->setPaddings(10, 8, 10, 8);
 		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
 		});
