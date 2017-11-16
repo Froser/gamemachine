@@ -32,15 +32,15 @@ void Demo_Button::init()
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 	gm::GMImage2DGameObject* literature = new gm::GMImage2DGameObject();
-	gm::GMRect rect = { 200, 220, 400, 190 };
+	gm::GMRect rect = { 10, 10, 400, 40 };
 	literature->setGeometry(rect);
 	literature->setText("This is a button");
 
 	literature->setBorder(gm::GMImage2DBorder(
 		border,
 		textureGeo,
-		img->getData().mip[0].width,
-		img->getData().mip[0].height,
+		img->getWidth(),
+		img->getHeight(),
 		14,
 		14
 	));
@@ -66,7 +66,7 @@ void Demo_Button::init()
 
 	d->buttonAnimation = new gm::GMAnimation(literature);
 
-	literature->setPaddings(10, 17, 10, 15);
+	literature->setPaddings(10, 5, 10, 5);
 	d->demoWorld->addControl(literature);
 	GM_delete(img);
 }

@@ -109,7 +109,7 @@ GM_PRIVATE_OBJECT(GMImage2DGameObject)
 	ITexture* image = nullptr;
 	AUTORELEASE GMGlyphObject* textModel = nullptr;
 	AUTORELEASE GMControlGameObject* textMask = nullptr;
-	AUTORELEASE GMGameObject* background = nullptr;
+	AUTORELEASE GMControlGameObject* background = nullptr;
 	std::wstring text;
 	GMImage2DBorder border;
 	GMint paddings[4] = { 0 };

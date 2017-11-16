@@ -49,8 +49,8 @@ void Demo_Literature::init()
 	literature->setBorder(gm::GMImage2DBorder(
 		border,
 		textureGeo,
-		img->getData().mip[0].width,
-		img->getData().mip[0].height,
+		img->getWidth(),
+		img->getHeight(),
 		14,
 		14
 	));

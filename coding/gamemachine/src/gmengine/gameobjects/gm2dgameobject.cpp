@@ -363,13 +363,15 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		GMAsset texture;
 	} _cb(d->texture);
 
-	// 制作9个矩形进行拉伸（可以以后还会有非拉伸的模式）
+	// 制作9个矩形进行拉伸（可能以后还会有非拉伸的模式）
 	for (GMint i = 0; i < GM_dimensions_of_array(d->models); ++i)
 	{
+		// TODO: GMPrimitiveCreator::createQuad(extents[i], GMPrimitiveCreator::origin(), d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::Center, &uv[i]);
 		GMPrimitiveCreator::createQuad(extents[i], pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, &uv[i]);
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
 		d->objects[i] = new GMGameObject(asset);
+		// TODO: d->objects[i]->setTranslation(linear_math::translate(linear_math::Vector3(pos[i][0], pos[i][1], pos[i][2])));
 		d->objects[i]->onAppendingObjectToWorld();
 		GM.initObjectPainter(d->objects[i]->getModel());
 	}
@@ -546,7 +548,9 @@ void GMImage2DGameObject::createBackgroundImage()
 	GMModel* model = nullptr;
 	createQuadModel(this, &model);
 
-	d->background = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->background = new GMControlGameObject();
+	d->background->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->background->setGeometry(getGeometry());
 	d->background->setWorld(getWorld());
 	GM.initObjectPainter(d->background->getModel());
 }

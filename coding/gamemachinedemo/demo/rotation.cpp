@@ -1,7 +1,7 @@
 #include "stdafx.h"
-#include "animation.h"
+#include "rotation.h"
 
-void Demo_Animation::init()
+void Demo_Rotation::init()
 {
 	D(d);
 	D_BASE(db, Base);
@@ -11,7 +11,7 @@ void Demo_Animation::init()
 	d->gameObject->setRotation(d->rotation);
 }
 
-void Demo_Animation::event(gm::GameMachineEvent evt)
+void Demo_Rotation::event(gm::GameMachineEvent evt)
 {
 	D(d);
 	Base::event(evt);

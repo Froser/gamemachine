@@ -6,7 +6,7 @@
 #include "demostration_world.h"
 #include "normalmap.h"
 
-GM_PRIVATE_OBJECT(Demo_Animation)
+GM_PRIVATE_OBJECT(Demo_Rotation)
 {
 	gm::linear_math::Quaternion rotation;
 	gm::GMfloat angle = 0.f;
@@ -14,9 +14,9 @@ GM_PRIVATE_OBJECT(Demo_Animation)
 	gm::GMGameObject* gameObject = nullptr;
 };
 
-class Demo_Animation : public Demo_NormalMap
+class Demo_Rotation : public Demo_NormalMap
 {
-	DECLARE_PRIVATE(Demo_Animation)
+	DECLARE_PRIVATE(Demo_Rotation)
 
 	typedef Demo_NormalMap Base;
 

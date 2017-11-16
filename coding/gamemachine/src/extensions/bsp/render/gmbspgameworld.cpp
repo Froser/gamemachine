@@ -712,7 +712,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 			asset = assets.insertAsset(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
 		}
 		entityObject = new GMEntityObject(asset);
-		entityObject->setTranslate(linear_math::translate(entity->origin));
+		entityObject->setTranslation(linear_math::translate(entity->origin));
 		entityObject->setScaling(linear_math::scale(m->extents[0], m->extents[1], m->extents[2]));
 	}
 

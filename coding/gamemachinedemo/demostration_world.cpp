@@ -5,7 +5,7 @@
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
-#include "demo/animation.h"
+#include "demo/rotation.h"
 #include "demo/particles1.h"
 #include "demo/particles2.h"
 #include "demo/effects.h"
@@ -18,7 +18,7 @@ void loadDemostrations(DemostrationWorld* world)
 {
 	world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
 	world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-	world->addDemo("Animation: How to rotate an object", new Demo_Animation(world));
+	world->addDemo("Rotation: How to rotate an object", new Demo_Rotation(world));
 	world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1(world));
 	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2(world));
 	world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
@@ -159,8 +159,8 @@ void DemostrationWorld::init()
 		item->setBorder(gm::GMImage2DBorder(
 			borderAsset,
 			textureGeo,
-			img->getData().mip[0].width,
-			img->getData().mip[0].height,
+			img->getWidth(),
+			img->getHeight(),
 			14,
 			14
 		));

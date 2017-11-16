@@ -74,6 +74,8 @@ void GMControlGameObject::setScaling(const linear_math::Matrix4x4& scaling)
 {
 	D(d);
 	Base::setScaling(scaling);
+	scalingGeometry(scaling);
+
 	if (d->stencil)
 		d->stencil->setScaling(scaling);
 	for (auto& child : d->children)
@@ -128,9 +130,17 @@ void GMControlGameObject::event(GMControlEvent* e)
 bool GMControlGameObject::insideGeometry(GMint x, GMint y)
 {
 	D(d);
+	GMint tx = d->geometry.x + d->geometry.width / 2, ty = d->geometry.y + d->geometry.height / 2;
+	GMRect scaledRect = {
+		(GMint) ((d->geometry.x - tx) * d->geometryScaling[0] + tx),
+		(GMint) ((d->geometry.y - ty) * d->geometryScaling[1] + ty),
+		(GMint) (d->geometry.width * d->geometryScaling[0]),
+		(GMint) (d->geometry.height * d->geometryScaling[1]),
+	};
+
 	return d->parent ?
-		d->parent->insideGeometry(x, y) && GM_in_rect(d->geometry, x, y) :
-		GM_in_rect(d->geometry, x, y);
+		d->parent->insideGeometry(x, y) && GM_in_rect(scaledRect, x, y) :
+		GM_in_rect(scaledRect, x, y);
 }
 
 void GMControlGameObject::updateUI()
@@ -144,27 +154,8 @@ void GMControlGameObject::updateUI()
 			scaleY = (GMfloat)nowClient.height / d->clientSize.height;
 
 		GM_ASSERT(scaleX != 0 && scaleY != 0);
-
-		if (getStretch())
-		{
-			d->geometry.x *= scaleX;
-			d->geometry.y *= scaleY;
-			d->geometry.width *= scaleX;
-			d->geometry.height *= scaleY;
-		}
-		else
-		{
-			// 调整大小，防止拉伸
-			auto& mat = getScaling();
-			GMfloat scaling[] = { 1.f / scaleX * mat[0][0], 1.f / scaleY * mat[1][1], mat[2][2] };
-			setScaling(linear_math::scale({ 1.f / scaleX, 1.f / scaleY, 1 }));
-
-			// 相对于左上角位置也不能变
-			auto& trans = getTranslation();
-			GMRectF rect = toViewportCoord(d->geometry);
-			setTranslate(linear_math::translate({ rect.x + trans[3][0], rect.y + trans[3][1], trans[3][2] }));
-		}
-
+		d->geometryScaling[0] = scaleX;
+		d->geometryScaling[1] = scaleY;
 		d->clientSize = nowClient;
 		break;
 	}
@@ -182,11 +173,31 @@ GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 	return out;
 }
 
+void GMControlGameObject::updateMatrices()
+{
+	D(d);
+	GMRectF coord = toViewportCoord(d->geometry);
+	// coord表示左上角的绘制坐标，平移的时候需要换算到中心处
+	GMfloat x = coord.x + coord.width / 2.f, y = coord.y - coord.height / 2;
+
+	// TODO
+	// setTranslation(linear_math::translate(linear_math::Vector3(x, y, 0)));
+}
+
 void GMControlGameObject::addChild(GMControlGameObject* child)
 {
 	D(d);
 	child->setParent(this);
 	d->children.push_back(child);
+}
+
+void GMControlGameObject::scalingGeometry(const linear_math::Matrix4x4& scaling)
+{
+	D(d);
+	GM_ASSERT(scaling[0][0] > 0);
+	GM_ASSERT(scaling[1][1] > 0);
+	d->geometryScaling[0] = scaling[0][0];
+	d->geometryScaling[1] = scaling[1][1];
 }
 
 void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callback, OUT GMModel** model)
@@ -200,6 +211,9 @@ void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callb
 		coord.height,
 		1.f,
 	};
+
+	//GMPrimitiveCreator::createQuad(extents, GMPrimitiveCreator::origin(), model, callback, GMMeshType::Model2D, GMPrimitiveCreator::Center);
+	// TODO:
 	GMfloat pos[3] = { coord.x, coord.y, 0 };
 	GMPrimitiveCreator::createQuad(extents, pos, model, callback, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft);
 }

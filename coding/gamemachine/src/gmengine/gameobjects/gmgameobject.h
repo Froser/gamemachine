@@ -56,7 +56,7 @@ private:
 
 public:
 	inline virtual void setScaling(const linear_math::Matrix4x4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
-	inline virtual void setTranslate(const linear_math::Matrix4x4& translation) { D(d); d->translation = translation; updateMatrix(); }
+	inline virtual void setTranslation(const linear_math::Matrix4x4& translation) { D(d); d->translation = translation; updateMatrix(); }
 	inline virtual void setRotation(const linear_math::Quaternion& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
 	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
 	inline const linear_math::Matrix4x4& getScaling() { D(d); return d->scaling; }

@@ -2,6 +2,12 @@
 #include "gmprimitivecreator.h"
 #include "foundation/gamemachine.h"
 
+GMfloat* GMPrimitiveCreator::origin()
+{
+	static GMfloat o[3] = { 0 };
+	return o;
+}
+
 void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type)
 {
 	static constexpr GMfloat v[24] = {
