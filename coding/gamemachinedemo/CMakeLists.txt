@@ -17,7 +17,6 @@ include_directories(
 
 link_directories(
 		${demo_SOURCE_DIR}/../3rdparty/glew/lib/release/win32
-		${demo_SOURCE_DIR}/../3rdparty/freetype-2.3.5/lib
 		${demo_SOURCE_DIR}/../3rdparty/openal1.1/libs/Win32
 	)
 
@@ -25,7 +24,6 @@ link_libraries(
 		glu32.lib
 		opengl32.lib
 		glew32s.lib
-		freetype.lib
 		OpenAL32.lib #windows only
 	)
 
@@ -81,3 +79,4 @@ target_link_libraries(${PROJECT_NAME} libmad)
 target_link_libraries(${PROJECT_NAME} duilib)
 target_link_libraries(${PROJECT_NAME} libjpeg)
 target_link_libraries(${PROJECT_NAME} lua)
+target_link_libraries(${PROJECT_NAME} freetype)

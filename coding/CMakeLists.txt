@@ -69,6 +69,7 @@ macro(link_dependencies projectName)
 endmacro(link_dependencies)
 
 add_subdirectory(./3rdparty/zlib zlib)
+add_subdirectory(./3rdparty/freetype-2.8.1 freetype)
 add_subdirectory(./3rdparty/libpng libpng)
 add_subdirectory(./3rdparty/libmad libmad)
 add_subdirectory(./3rdparty/jpeg-6b libjpeg)

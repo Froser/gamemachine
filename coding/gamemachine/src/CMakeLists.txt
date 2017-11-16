@@ -5,7 +5,7 @@ include_directories(
 		../../3rdparty/libpng
 		../../3rdparty/jpeg-6b
 		../../3rdparty/zlib
-		../../3rdparty/freetype-2.3.5/include
+		../../3rdparty/freetype-2.8.1/include
 		../../3rdparty/libmad
 		../../3rdparty/lua/src
 	)
