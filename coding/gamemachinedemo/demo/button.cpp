@@ -31,12 +31,12 @@ void Demo_Button::init()
 	gm::GMAsset border = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
-	gm::GMImage2DGameObject* literature = new gm::GMImage2DGameObject();
+	gm::GMImage2DGameObject* button = new gm::GMImage2DGameObject();
 	gm::GMRect rect = { 10, 10, 400, 40 };
-	literature->setGeometry(rect);
-	literature->setText("This is a button");
+	button->setGeometry(rect);
+	button->setText("This is a button");
 
-	literature->setBorder(gm::GMImage2DBorder(
+	button->setBorder(gm::GMImage2DBorder(
 		border,
 		textureGeo,
 		img->getWidth(),
@@ -45,7 +45,7 @@ void Demo_Button::init()
 		14
 	));
 
-	literature->attachEvent(*literature, gm::GM_CONTROL_EVENT_ENUM(MouseHover), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->attachEvent(*button, gm::GM_CONTROL_EVENT_ENUM(MouseHover), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->buttonAnimation->canStart())
 		{
 			d->buttonAnimation->setScaling(gm::linear_math::Vector3(2.f, 2.f, 2.f), 1.f);
@@ -57,17 +57,17 @@ void Demo_Button::init()
 		}
 	});
 
-	literature->attachEvent(*literature, gm::GM_CONTROL_EVENT_ENUM(MouseLeave), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+	button->attachEvent(*button, gm::GM_CONTROL_EVENT_ENUM(MouseLeave), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->buttonAnimation->canReverse())
 		{
 			d->buttonAnimation->reverse();
 		}
 	});
 
-	d->buttonAnimation = new gm::GMAnimation(literature);
+	d->buttonAnimation = new gm::GMAnimation(button);
 
-	literature->setPaddings(10, 5, 10, 5);
-	d->demoWorld->addControl(literature);
+	button->setPaddings(10, 5, 10, 5);
+	d->demoWorld->addControl(button);
 	GM_delete(img);
 }
 

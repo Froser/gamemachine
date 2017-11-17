@@ -363,12 +363,21 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	// 制作9个矩形进行拉伸（可能以后还会有非拉伸的模式）
 	for (GMint i = 0; i < GM_dimensions_of_array(d->models); ++i)
 	{
-		// TODO: GMPrimitiveCreator::createQuad(extents[i], GMPrimitiveCreator::origin(), d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::Center, &uv[i]);
-		GMPrimitiveCreator::createQuad(extents[i], pos[i], d->models + i, &_cb, GMMeshType::Model2D, GMPrimitiveCreator::TopLeft, &uv[i]);
+		GMPrimitiveCreator::createQuad(extents[i], GMPrimitiveCreator::origin(),
+			d->models + i,
+			&_cb,
+			GMMeshType::Model2D,
+			GMPrimitiveCreator::Center,
+			&uv[i]);
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
 		d->objects[i] = new GMGameObject(asset);
-		// TODO: d->objects[i]->setTranslation(linear_math::translate(linear_math::Vector3(pos[i][0], pos[i][1], pos[i][2])));
+		d->objects[i]->setTranslation(linear_math::translate(
+			linear_math::Vector3(
+				pos[i][0] + extents[i][0],
+				pos[i][1] - extents[i][1],
+				pos[i][2] + extents[i][2]))
+		);
 		d->objects[i]->onAppendingObjectToWorld();
 		GM.initObjectPainter(d->objects[i]->getModel());
 	}
