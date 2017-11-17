@@ -48,6 +48,8 @@ set(SOURCES
 		demo/effects.cpp
 		demo/quake3_bsp.h
 		demo/quake3_bsp.cpp
+		demo/border.h
+		demo/border.cpp
 		demo/sound.h
 		demo/sound.cpp
 		demo/literature.h
