@@ -18,9 +18,9 @@ inline bool isValidRect(const T& r)
 	return r.width >= 0;
 }
 
-#define BEGIN_GEOMETRY_TO_VIEWPORT(clientRect) const auto& cw = clientRect.width, &ch = clientRect.height;
-#define GEOMETRY_TO_VIEWPORT_X(i) ((i) * 2.f / cw - 1.f)
-#define GEOMETRY_TO_VIEWPORT_Y(i) (1 - (i) * 2.f / ch)
+#define BEGIN_TO_VIEWPORT(clientRect) const auto& cw = clientRect.width, &ch = clientRect.height;
+#define TO_VIEWPORT_X(i) ((i) * 2.f / cw)
+#define TO_VIEWPORT_Y(i) ((i) * 2.f / ch)
 #define END_GEOMETRY_TO_VIEWPORT()
 #define UV_INDEX(points) points[0], points[1], 0
 #define EXTENTS_INDEX(points) points[0], points[1], 1
@@ -258,6 +258,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	const GMfloat& corner_w2 = corner_w * 2, &corner_h2 = corner_h * 2;
 	const GMfloat& center_w = center_w_pixel / d->width, &center_h = corner_h;
 	const GMfloat& middle_w = corner_w, &middle_h = middle_h_pixel / d->height;
+	const GMfloat& half_border_width = textureGeo.width / 2,
+		&half_border_height = textureGeo.height / 2;
 
 	const GMfloat uv_points[16][2] = {
 		{ base[0], base[1] + corner_h2 + middle_h },
@@ -309,7 +311,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 
 	GMfloat extentsArray[4][3] = {
 		{ d->cornerWidth / window.width, d->cornerHeight / window.height, 1 },
-		{ pos_middle_w / window.width, pos_middle_h / window.height , 1 },
+		{ pos_middle_w / window.width, pos_middle_h / window.height, 1 },
 		{ pos_center_w / window.width, center_h_pixel / window.height, 1 },
 		{ pos_center_w / window.width, pos_middle_h / window.height, 1 },
 	};
@@ -328,18 +330,36 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		EXTENTS_INDEX(extentsArray[0]),
 	};
 
-	BEGIN_GEOMETRY_TO_VIEWPORT(window)
-		GMfloat pos[9][3] = {
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x), GEOMETRY_TO_VIEWPORT_Y(geometry.y), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight + pos_middle_h), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth), GEOMETRY_TO_VIEWPORT_Y(geometry.y), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight + pos_middle_h), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth + pos_center_w), GEOMETRY_TO_VIEWPORT_Y(geometry.y), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth + pos_center_w), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight), 0 },
-			{ GEOMETRY_TO_VIEWPORT_X(geometry.x + d->cornerWidth + pos_center_w), GEOMETRY_TO_VIEWPORT_Y(geometry.y + d->cornerHeight + pos_middle_h), 0 },
+	BEGIN_TO_VIEWPORT(window)
+		// 9个边框的中心坐标
+		GMfloat col[3] = {
+			TO_VIEWPORT_X(-(d->cornerWidth + pos_center_w) / 2),
+			0,
+			TO_VIEWPORT_X((d->cornerWidth + pos_center_w) / 2)
 		};
+
+		GMfloat row[3] = {
+			TO_VIEWPORT_Y((d->cornerHeight + pos_middle_h) / 2),
+			0,
+			TO_VIEWPORT_Y(-(d->cornerHeight + pos_middle_h) / 2)
+		};
+
+		linear_math::Vector4 center[9] = {
+			{ col[0], row[0], 0, 1 },
+			{ col[0], row[1], 0, 1 },
+			{ col[0], row[2], 0, 1 },
+			{ col[1], row[0], 0, 1 },
+			{ col[1], row[1], 0, 1 },
+			{ col[1], row[2], 0, 1 },
+			{ col[2], row[0], 0, 1 },
+			{ col[2], row[1], 0, 1 },
+			{ col[2], row[2], 0, 1 },
+		};
+
+		// 把所有边框坐标移到中心（4）
+		linear_math::Matrix4x4 translation = linear_math::translate(
+			linear_math::Vector3(TO_VIEWPORT_X(-half_border_width), TO_VIEWPORT_Y(half_border_height), 0)
+		);
 	END_GEOMETRY_TO_VIEWPORT()
 
 	// Shader回调
@@ -360,10 +380,10 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		GMAsset texture;
 	} _cb(d->texture);
 
-	// 制作9个矩形进行拉伸（可能以后还会有非拉伸的模式）
 	for (GMint i = 0; i < GM_dimensions_of_array(d->models); ++i)
 	{
-		GMPrimitiveCreator::createQuad(extents[i], GMPrimitiveCreator::origin(),
+		// 创建在中心的边框
+		GMPrimitiveCreator::createQuad(extents[i], &center[i][0],
 			d->models + i,
 			&_cb,
 			GMMeshType::Model2D,
@@ -372,11 +392,18 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, *(d->models + i));
 		d->objects[i] = new GMGameObject(asset);
+
+		// 移动到期望的位置
+		GMint centerPosition[2] = {
+			geometry.x + geometry.width / 2,
+			geometry.y + geometry.height / 2
+		};
+
 		d->objects[i]->setTranslation(linear_math::translate(
 			linear_math::Vector3(
-				pos[i][0] + extents[i][0],
-				pos[i][1] - extents[i][1],
-				pos[i][2] + extents[i][2]))
+				centerPosition[0] * 2 / window.width - 1,
+				1 - centerPosition[1] * 2 / window.height,
+				0))
 		);
 		d->objects[i]->onAppendingObjectToWorld();
 		GM.initObjectPainter(d->objects[i]->getModel());

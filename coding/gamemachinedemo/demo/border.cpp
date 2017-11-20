@@ -32,7 +32,7 @@ void Demo_Border::init()
 	gm::GMRect textureGeo = { 96, 96, 96, 96}; //截取的纹理位置
 
 	gm::GMImage2DGameObject* borderObject = new gm::GMImage2DGameObject();
-	gm::GMRect rect = { 200, 220, 400, 190 };
+	gm::GMRect rect = { 10, 10, 400, 200 };
 	borderObject->setGeometry(rect);
 	borderObject->setBorder(gm::GMImage2DBorder(
 		border,
