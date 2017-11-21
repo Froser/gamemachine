@@ -115,7 +115,7 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 	{
 	case GameMachineMessageType::WindowSizeChanged:
 	{
-		GMRect rect = GM.getMainWindow()->getClientRect();
+		const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
 		setViewport(rect);
 
 		if (GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::DEFERRED)
@@ -269,7 +269,7 @@ void GMGLGraphicEngine::activateLightPassLight(const Vector<GMLight>& lights)
 bool GMGLGraphicEngine::refreshGBuffer()
 {
 	D(d);
-	GMRect rect = GM.getMainWindow()->getClientRect();
+	const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
 	if (rect.width <= 0 || rect.height <= 0)
 		return true;
 
@@ -280,7 +280,7 @@ bool GMGLGraphicEngine::refreshGBuffer()
 bool GMGLGraphicEngine::refreshFramebuffer()
 {
 	D(d);
-	GMRect rect = GM.getMainWindow()->getClientRect();
+	const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
 	if (rect.width <= 0 || rect.height <= 0)
 		return true;
 

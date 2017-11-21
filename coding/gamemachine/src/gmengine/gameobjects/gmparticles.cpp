@@ -365,7 +365,7 @@ void GMLerpParticleEmitter::respawn(const GMint index, GMParticleGameObject* par
 
 void GMLerpParticleEmitter::reduceLife(GMParticleGameObject* particle)
 {
-	particle->setCurrentLife(particle->getCurrentLife() - GameMachine::instance().getLastFrameElapsed());
+	particle->setCurrentLife(particle->getCurrentLife() - GM.getGameMachineRunningStates().lastFrameElpased);
 }
 
 void GMLerpParticleEmitter::respawnLife(const GMint index, GMParticleGameObject* particle)

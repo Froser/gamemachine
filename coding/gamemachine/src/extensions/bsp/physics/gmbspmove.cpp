@@ -250,7 +250,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 {
 	D(d);
 	GMBSPPhysicsWorld::Data& wd = d->world->physicsData();
-	GMfloat dt = GameMachine::instance().getLastFrameElapsed();
+	GMfloat dt = GM.getGameMachineRunningStates().lastFrameElpased;
 	linear_math::Vector3 velocity = d->movement.velocity;
 
 	GMint numbumps = 4, bumpcount;

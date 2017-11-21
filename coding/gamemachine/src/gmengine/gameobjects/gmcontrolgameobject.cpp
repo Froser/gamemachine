@@ -26,7 +26,7 @@ GMControlGameObject::GMControlGameObject(GMControlGameObject* parent)
 	if (parent)
 		parent->addChild(this);
 
-	GMRect client = GM.getMainWindow()->getClientRect();
+	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
 	d->clientSize = client;
 }
 
@@ -165,7 +165,7 @@ void GMControlGameObject::updateUI()
 	switch (GM.peekMessage().msgType)
 	{
 	case GameMachineMessageType::WindowSizeChanged:
-		GMRect nowClient = GM.getMainWindow()->getClientRect();
+		const GMRect& nowClient = GM.getGameMachineRunningStates().clientRect;
 		GMfloat scaleX = (GMfloat)nowClient.width / d->clientSize.width,
 			scaleY = (GMfloat)nowClient.height / d->clientSize.height;
 
@@ -180,7 +180,7 @@ void GMControlGameObject::updateUI()
 GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 {
 	// 得到一个原点在中心，x属于[-1,1],y属于[-1,1]范围的参考系的OpenGL的坐标
-	GMRect client = GM.getMainWindow()->getClientRect();
+	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
 	GMRectF out = {
 		in.x * 2.f / client.width - 1.f,
 		1.f - in.y * 2.f / client.height,
@@ -192,7 +192,7 @@ GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 
 GMRect GMControlGameObject::toControlCoord(const GMRectF& in)
 {
-	GMRect client = GM.getMainWindow()->getClientRect();
+	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
 	GMRect out = {
 		(GMint)((in.x + 1) * client.width * .5f),
 		(GMint)((1 - in.y) * client.height * .5f),
@@ -236,7 +236,6 @@ void GMControlGameObject::scalingGeometry(const linear_math::Matrix4x4& scaling)
 void GMControlGameObject::translateGeometry(const linear_math::Matrix4x4& translation)
 {
 	D(d);
-	GMRect window = GM.getMainWindow()->getClientRect();
 	GMfloat trans[3];
 	linear_math::getTranslationFromMatrix(translation, trans);
 

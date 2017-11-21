@@ -14,22 +14,25 @@ bool GMAnimation::canStart()
 {
 	D(d);
 	return d->animationStates[GMAnimationTypes::Scaling].canStart
-		|| d->animationStates[GMAnimationTypes::Translation].canStart;
+		&& d->animationStates[GMAnimationTypes::Translation].canStart;
 }
 
 void GMAnimation::start()
 {
 	D(d);
-	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
-	if (state.canStart)
-		startAnimation();
+	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+	{
+		GMAnimationState& state = d->animationStates[type];
+		if (state.canStart)
+			startAnimation(type);
+	}
 }
 
 bool GMAnimation::canReverse()
 {
 	D(d);
 	return d->animationStates[GMAnimationTypes::Scaling].canReverse
-		|| d->animationStates[GMAnimationTypes::Translation].canReverse;
+		&& d->animationStates[GMAnimationTypes::Translation].canReverse;
 }
 
 void GMAnimation::reverse()
@@ -49,16 +52,19 @@ void GMAnimation::reverse()
 void GMAnimation::resume()
 {
 	D(d);
-	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
-	if (state.canResume)
-		startAnimation();
+	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+	{
+		GMAnimationState& state = d->animationStates[type];
+		if (state.canResume)
+			startAnimation(type);
+	}
 }
 
 bool GMAnimation::canResume()
 {
 	D(d);
 	return d->animationStates[GMAnimationTypes::Scaling].canResume
-		|| d->animationStates[GMAnimationTypes::Translation].canResume;
+		&& d->animationStates[GMAnimationTypes::Translation].canResume;
 }
 
 void GMAnimation::update()
@@ -82,7 +88,7 @@ void GMAnimation::update()
 		GMAnimationState& state = d->animationStates[type];
 		if (state.set && state.playingState == GMAnimationPlayingState::Activated)
 		{
-			state.p += state.direction * (now - state.tick) / state.duration;
+			state.p += state.direction * (now - state.tick) / d->duration;
 			if (state.p >= 1.f)
 			{
 				state.p = 1.f;
@@ -105,7 +111,13 @@ void GMAnimation::update()
 	}
 }
 
-void GMAnimation::setScaling(const linear_math::Vector3& scaling, GMfloat duration, GMInterpolation interpolation)
+void GMAnimation::setDuration(GMfloat duration)
+{
+	D(d);
+	d->duration = duration;
+}
+
+void GMAnimation::setScaling(const linear_math::Vector3& scaling, GMInterpolation interpolation)
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
@@ -116,7 +128,6 @@ void GMAnimation::setScaling(const linear_math::Vector3& scaling, GMfloat durati
 	state.start[0] = s[0];
 	state.start[1] = s[1];
 	state.start[2] = s[2];
-	state.duration = duration;
 	state.p = 0;
 	state.end = scaling;
 	state.direction = 1;
@@ -130,7 +141,7 @@ void GMAnimation::disableScaling()
 	state.set = false;
 }
 
-void GMAnimation::setTranslation(const linear_math::Vector3& translation, GMfloat duration, GMInterpolation interpolation)
+void GMAnimation::setTranslation(const linear_math::Vector3& translation, GMInterpolation interpolation)
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Translation];
@@ -141,7 +152,6 @@ void GMAnimation::setTranslation(const linear_math::Vector3& translation, GMfloa
 	state.start[0] = s[0];
 	state.start[1] = s[1];
 	state.start[2] = s[2];
-	state.duration = duration;
 	state.p = 0;
 	state.end = translation;
 	state.direction = 1;
@@ -155,19 +165,16 @@ void GMAnimation::disableTranslation()
 	state.set = false;
 }
 
-void GMAnimation::startAnimation()
+void GMAnimation::startAnimation(GMAnimationTypes::Types type)
 {
 	D(d);
-	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
-	{
-		GMAnimationState& state = d->animationStates[type];
-		state.tick = GM.getGameTimeSeconds();
-		state.direction = 1;
+	GMAnimationState& state = d->animationStates[type];
+	state.tick = GM.getGameTimeSeconds();
+	state.direction = 1;
 
-		state.canReverse = state.canResume = true;
-		state.canStart = false;
-		state.playingState = GMAnimationPlayingState::Activated;
-	}
+	state.canReverse = state.canResume = true;
+	state.canStart = false;
+	state.playingState = GMAnimationPlayingState::Activated;
 }
 
 GMControlGameObjectAnimation::GMControlGameObjectAnimation(GMControlGameObject* object)
@@ -177,7 +184,7 @@ GMControlGameObjectAnimation::GMControlGameObjectAnimation(GMControlGameObject* 
 	d->object = object;
 }
 
-void GMControlGameObjectAnimation::setTranslation(GMint x, GMint y, GMfloat duration, GMInterpolation interpolation)
+void GMControlGameObjectAnimation::setTranslation(GMint x, GMint y, GMInterpolation interpolation)
 {
 	D(d);
 	D_BASE(db, GMAnimation);
@@ -195,7 +202,6 @@ void GMControlGameObjectAnimation::setTranslation(GMint x, GMint y, GMfloat dura
 	state.start[0] = s[0];
 	state.start[1] = s[1];
 	state.start[2] = s[2];
-	state.duration = duration;
 	state.p = 0;
 	state.end = trans;
 	state.direction = 1;

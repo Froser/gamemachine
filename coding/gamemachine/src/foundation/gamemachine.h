@@ -12,6 +12,12 @@ BEGIN_NS
 
 #define GM gm::GameMachine::instance()
 
+struct GMGameMachineRunningStates
+{
+	GMRect clientRect;
+	GMfloat lastFrameElpased = 0;
+};
+
 GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMClock clock;
@@ -34,7 +40,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Queue<GameMachineMessage> messageQueue;
 	Vector<IDispose*> manangerQueue;
 
-	GMfloat lastFrameElpased = 0;
+	GMGameMachineRunningStates states;
 };
 
 class GameMachine : public GMSingleton<GameMachine>
@@ -93,7 +99,9 @@ public:
 	// 时间管理
 	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }
 	inline GMfloat getGameTimeSeconds() { D(d); return d->clock.getTime(); }
-	inline GMfloat getLastFrameElapsed() { D(d); return d->lastFrameElpased; }
+
+	// 状态管理
+	inline const GMGameMachineRunningStates& getGameMachineRunningStates() const { D(d); return d->states; }
 
 	// 绘制管理
 	void initObjectPainter(GMModel* model);
@@ -112,6 +120,7 @@ private:
 	void terminate();
 	bool handleMessages();
 	void initInner();
+	void updateGameMachineRunningStates();
 };
 
 END_NS

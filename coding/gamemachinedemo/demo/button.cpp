@@ -48,8 +48,8 @@ void Demo_Button::init()
 	button->attachEvent(*button, gm::GM_CONTROL_EVENT_ENUM(MouseHover), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->buttonAnimation->canStart())
 		{
-			d->buttonAnimation->setScaling(gm::linear_math::Vector3(1.2f, 1.2f, 1.2f), .25f);
-			d->buttonAnimation->setTranslation(gm::linear_math::Vector3(0, 0, 0), 5.f);
+			d->buttonAnimation->setScaling(gm::linear_math::Vector3(1.2f, 1.2f, 1.2f));
+			d->buttonAnimation->setTranslation(0, 0);
 			d->buttonAnimation->start();
 		}
 		else if (d->buttonAnimation->canResume())
@@ -65,7 +65,8 @@ void Demo_Button::init()
 		}
 	});
 
-	d->buttonAnimation = new gm::GMAnimation(button);
+	d->buttonAnimation = new gm::GMControlGameObjectAnimation(button);
+	d->buttonAnimation->setDuration(.5f);
 
 	button->setPaddings(10, 10, 10, 5);
 	d->demoWorld->addControl(button);

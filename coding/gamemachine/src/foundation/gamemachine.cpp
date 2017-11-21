@@ -81,6 +81,9 @@ void GameMachine::startGameMachine()
 	d->factory->createGlyphManager(&glyphManager);
 	registerManager(glyphManager, &d->glyphManager);
 
+	// 更新一次状态
+	updateGameMachineRunningStates();
+
 	// 开始渲染
 	d->engine->start();
 
@@ -117,6 +120,9 @@ void GameMachine::startGameMachine()
 		d->mainWindow->update();
 		d->consoleWindow->update();
 		d->clock.update();
+		
+		// 更新状态
+		updateGameMachineRunningStates();
 
 		// 本帧结束
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
@@ -130,16 +136,16 @@ void GameMachine::startGameMachine()
 			if (diff > 0)
 			{
 				GMThread::sleep(diff);
-				d->lastFrameElpased = ms;
+				d->states.lastFrameElpased = ms;
 			}
 			else
 			{
-				d->lastFrameElpased = frameCounter.elapsedFromStart();
+				d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 			}
 		}
 		else
 		{
-			d->lastFrameElpased = frameCounter.elapsedFromStart();
+			d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 		}
 	}
 
@@ -196,4 +202,10 @@ void GameMachine::terminate()
 	{
 		GM_delete(manager);
 	}
+}
+
+void GameMachine::updateGameMachineRunningStates()
+{
+	D(d);
+	d->states.clientRect = getMainWindow()->getClientRect();
 }

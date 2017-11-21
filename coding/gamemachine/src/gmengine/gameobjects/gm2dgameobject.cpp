@@ -107,7 +107,7 @@ void GMGlyphObject::createVertices(GMComponent* component)
 
 	D_BASE(db, GMControlGameObject);
 	constexpr GMfloat Z = 0;
-	GMRect rect = d->autoResize && isValidRect(d->lastClientRect) ? d->lastClientRect : GM.getMainWindow()->getClientRect();
+	GMRect rect = d->autoResize && isValidRect(d->lastClientRect) ? d->lastClientRect : GM.getGameMachineRunningStates().clientRect;
 	GMRectF coord = d->autoResize && isValidRect(d->lastGeometry) ? d->lastGeometry : toViewportCoord(db->geometry);
 
 	if (!isValidRect(d->lastClientRect) || d->autoResize)
@@ -295,7 +295,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		UV_INDEX(uv_points[10]), UV_INDEX(uv_points[11]), UV_INDEX(uv_points[15]), UV_INDEX(uv_points[14]),
 	};
 
-	GMRect w = GM.getMainWindow()->getClientRect();
+	const GMRect& w = GM.getGameMachineRunningStates().clientRect;
 	GMRectF window = {
 		(GMfloat)w.x,
 		(GMfloat)w.y,

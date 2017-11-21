@@ -33,7 +33,6 @@ GM_ALIGNED_STRUCT(GMAnimationState)
 {
 	GMfloat tick = 0;
 	GMfloat p = 0;
-	GMfloat duration = 0;
 	linear_math::Vector3 start;
 	linear_math::Vector3 end;
 	GMint direction = 1;
@@ -49,6 +48,7 @@ GM_PRIVATE_OBJECT(GMAnimation)
 {
 	GMAnimationState animationStates[GMAnimationTypes::EndType];
 	GMGameObject* object = nullptr;
+	GMfloat duration = 0;
 };
 
 class GMAnimation : public GMObject
@@ -68,13 +68,14 @@ public:
 	virtual void update();
 
 public:
-	void setScaling(const linear_math::Vector3& scaling, GMfloat duration, GMInterpolation interpolation = GMInterpolations::linear);
+	void setDuration(GMfloat duration);
+	void setScaling(const linear_math::Vector3& scaling, GMInterpolation interpolation = GMInterpolations::linear);
 	void disableScaling();
-	void setTranslation(const linear_math::Vector3& translation, GMfloat duration, GMInterpolation interpolation = GMInterpolations::linear);
+	void setTranslation(const linear_math::Vector3& translation, GMInterpolation interpolation = GMInterpolations::linear);
 	void disableTranslation();
 
 private:
-	void startAnimation();
+	void startAnimation(GMAnimationTypes::Types type);
 };
 
 class GMControlGameObject;
@@ -91,7 +92,7 @@ public:
 	GMControlGameObjectAnimation(GMControlGameObject* object);
 
 public:
-	void setTranslation(GMint x, GMint y, GMfloat duration, GMInterpolation interpolation = GMInterpolations::linear);
+	void setTranslation(GMint x, GMint y, GMInterpolation interpolation = GMInterpolations::linear);
 };
 
 END_NS

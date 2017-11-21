@@ -7,13 +7,13 @@
 
 namespace gm
 {
-	class GMAnimation;
+	class GMControlGameObjectAnimation;
 }
 
 GM_PRIVATE_OBJECT(Demo_Button)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
-	gm::GMAnimation* buttonAnimation = nullptr;
+	gm::GMControlGameObjectAnimation* buttonAnimation = nullptr;
 };
 
 class Demo_Button : public DemoHandler
