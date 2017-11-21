@@ -101,6 +101,7 @@ private:
 	virtual void createBorder(const GMRect& geometry);
 	virtual void draw();
 	virtual void setScaling(const linear_math::Matrix4x4& scaling);
+	virtual void setTranslation(const linear_math::Matrix4x4& translation);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -133,9 +134,10 @@ public:
 	void setBorder(GMImage2DBorder& border);
 
 public:
-	virtual void onAppendingObjectToWorld();
+	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
-	virtual void setScaling(const linear_math::Matrix4x4& scaling);
+	virtual void setScaling(const linear_math::Matrix4x4& scaling) override;
+	virtual void setTranslation(const linear_math::Matrix4x4& translation) override;
 
 	//IPrimitiveCreatorShaderCallback
 private:

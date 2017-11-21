@@ -16,8 +16,10 @@ struct GMAnimationTypes
 {
 	enum Types
 	{
-		Scaling,
-		MaxType,
+		BeginType,
+		Scaling = BeginType,
+		Translation,
+		EndType,
 	};
 };
 
@@ -40,11 +42,12 @@ GM_ALIGNED_STRUCT(GMAnimationState)
 	bool canStart = true;
 	bool canReverse = false;
 	bool canResume = false;
+	bool set = false;
 };
 
 GM_PRIVATE_OBJECT(GMAnimation)
 {
-	GMAnimationState animationStates[GMAnimationTypes::MaxType];
+	GMAnimationState animationStates[GMAnimationTypes::EndType];
 	GMGameObject* object = nullptr;
 };
 
@@ -66,6 +69,9 @@ public:
 
 public:
 	void setScaling(const linear_math::Vector3& scaling, GMfloat duration, GMInterpolation interpolation = GMInterpolations::linear);
+	void disableScaling();
+	void setTranslation(const linear_math::Vector3& translation, GMfloat duration, GMInterpolation interpolation = GMInterpolations::linear);
+	void disableTranslation();
 
 private:
 	void startAnimation();

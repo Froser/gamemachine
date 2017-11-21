@@ -906,6 +906,20 @@ namespace linear_math
 		);
 	}
 
+	inline void getScalingFromMatrix(const Matrix4x4& mat, GMfloat* out)
+	{
+		out[0] = mat[0][0];
+		out[1] = mat[1][1];
+		out[2] = mat[2][2];
+	}
+
+	inline void getTranslationFromMatrix(const Matrix4x4& mat, GMfloat* out)
+	{
+		out[0] = mat[3][0];
+		out[1] = mat[3][1];
+		out[2] = mat[3][2];
+	}
+
 	GM_ALIGNED_16(class) Quaternion
 	{
 		DEFINE_VECTOR_DATA(4)

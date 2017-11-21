@@ -432,7 +432,19 @@ void GMImage2DBorder::setScaling(const linear_math::Matrix4x4& scaling)
 	size_t size = GM_dimensions_of_array(d->objects);
 	for (GMuint i = 0; i < size; ++i)
 	{
-		d->objects[i]->setScaling(scaling);
+		if (d->objects[i])
+			d->objects[i]->setScaling(scaling);
+	}
+}
+
+void GMImage2DBorder::setTranslation(const linear_math::Matrix4x4& translation)
+{
+	D(d);
+	size_t size = GM_dimensions_of_array(d->objects);
+	for (GMuint i = 0; i < size; ++i)
+	{
+		if (d->objects[i])
+			d->objects[i]->setTranslation(translation);
 	}
 }
 
@@ -560,6 +572,19 @@ void GMImage2DGameObject::setScaling(const linear_math::Matrix4x4& scaling)
 		d->border.setScaling(scaling);
 }
 
+void GMImage2DGameObject::setTranslation(const linear_math::Matrix4x4& translation)
+{
+	D(d);
+	Base::setTranslation(translation);
+	if (d->textModel)
+		d->textModel->setTranslation(translation);
+	if (d->textMask)
+		d->textMask->setTranslation(translation);
+	if (d->background)
+		d->background->setTranslation(translation);
+	if (d->border.hasBorder())
+		d->border.setTranslation(translation);
+}
 
 void GMImage2DGameObject::onCreateShader(Shader& shader)
 {

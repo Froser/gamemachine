@@ -32,9 +32,9 @@ void Demo_Button::init()
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 	gm::GMImage2DGameObject* button = new gm::GMImage2DGameObject();
-	gm::GMRect rect = { 10, 10, 400, 40 };
+	gm::GMRect rect = { 50, 30, 400, 40 };
 	button->setGeometry(rect);
-	button->setText("This is a button");
+	button->setText("This is a scaling button");
 
 	button->setBorder(gm::GMImage2DBorder(
 		border,
@@ -48,7 +48,8 @@ void Demo_Button::init()
 	button->attachEvent(*button, gm::GM_CONTROL_EVENT_ENUM(MouseHover), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		if (d->buttonAnimation->canStart())
 		{
-			d->buttonAnimation->setScaling(gm::linear_math::Vector3(2.f, 2.f, 2.f), 1.f);
+			d->buttonAnimation->setScaling(gm::linear_math::Vector3(1.2f, 1.2f, 1.2f), .25f);
+			d->buttonAnimation->setTranslation(gm::linear_math::Vector3(0, 0, 0), 5.f);
 			d->buttonAnimation->start();
 		}
 		else if (d->buttonAnimation->canResume())
@@ -66,7 +67,7 @@ void Demo_Button::init()
 
 	d->buttonAnimation = new gm::GMAnimation(button);
 
-	button->setPaddings(10, 5, 10, 5);
+	button->setPaddings(10, 10, 10, 5);
 	d->demoWorld->addControl(button);
 	GM_delete(img);
 }

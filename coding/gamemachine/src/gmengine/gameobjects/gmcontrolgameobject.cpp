@@ -86,6 +86,20 @@ void GMControlGameObject::setScaling(const linear_math::Matrix4x4& scaling)
 	}
 }
 
+void GMControlGameObject::setTranslation(const linear_math::Matrix4x4& translation)
+{
+	D(d);
+	Base::setTranslation(translation);
+	translateGeometry(translation);
+
+	if (d->stencil)
+		d->stencil->setTranslation(translation);
+	for (auto& child : d->children)
+	{
+		child->setTranslation(translation);
+	}
+}
+
 void GMControlGameObject::notifyControl()
 {
 	D(d);
@@ -201,8 +215,20 @@ void GMControlGameObject::scalingGeometry(const linear_math::Matrix4x4& scaling)
 	D(d);
 	GM_ASSERT(scaling[0][0] > 0);
 	GM_ASSERT(scaling[1][1] > 0);
-	d->geometryScaling[0] = scaling[0][0];
-	d->geometryScaling[1] = scaling[1][1];
+	GMfloat trans[3];
+	linear_math::getScalingFromMatrix(scaling, trans);
+	d->geometryScaling[0] = trans[0];
+	d->geometryScaling[1] = trans[1];
+}
+
+void GMControlGameObject::translateGeometry(const linear_math::Matrix4x4& translation)
+{
+	D(d);
+	GMRect window = GM.getMainWindow()->getClientRect();
+	GMfloat trans[3];
+	linear_math::getTranslationFromMatrix(translation, trans);
+	d->geometry.x = (trans[0] + 1) * window.width * .5f - d->geometry.width * .5f;
+	d->geometry.y = (1 - trans[1]) * window.height * .5f - d->geometry.height * .5f;
 }
 
 void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callback, OUT GMModel** model)
