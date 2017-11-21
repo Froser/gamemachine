@@ -734,3 +734,62 @@ void GMListbox2DGameObject::notifyControl()
 		item->notifyControl();
 	}
 }
+
+//////////////////////////////////////////////////////////////////////////
+GMCursorGameObject::GMCursorGameObject(GMint width, GMint height)
+{
+	D(d);
+	setWidth(width);
+	setHeight(height);
+}
+
+void GMCursorGameObject::setOnShadercCallback(const ShaderCallback& cb)
+{
+	D(d);
+	d->callback = cb;
+}
+
+void GMCursorGameObject::onCreateShader(Shader& shader)
+{
+	D(d);
+	GMImage2DGameObject::onCreateShader(shader);
+	if (d->callback)
+		d->callback(shader);
+}
+
+void GMCursorGameObject::enableCursor()
+{
+	D(d);
+	if (!d->inited)
+	{
+		onAppendingObjectToWorld();
+		d->inited = true;
+	}
+
+	IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
+	mouseState.setCursor(GMCursorType::Custom);
+}
+
+void GMCursorGameObject::disableCursor()
+{
+	IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
+	mouseState.setCursor(GMCursorType::Arrow);
+}
+
+void GMCursorGameObject::update()
+{
+	D(d);
+	D_BASE(db, GMControlGameObject);
+	GM_ASSERT(d->inited);
+	IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
+	GMMouseState ms = mouseState.mouseState();
+	GMRect rect = { ms.posX + db->geometry.width / 2, ms.posY + db->geometry.height / 2 };
+	GMRectF coord = toViewportCoord(rect);
+	setTranslation(linear_math::translate(linear_math::Vector3(coord.x, coord.y, 0)));
+
+	static GMGameObject* cursor[] = { this };
+	gm::IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->beginBlend();
+	engine->drawObjects(cursor, 1);
+	engine->endBlend();
+}

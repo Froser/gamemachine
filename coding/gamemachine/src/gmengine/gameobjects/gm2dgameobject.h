@@ -140,7 +140,7 @@ public:
 	virtual void setTranslation(const linear_math::Matrix4x4& translation) override;
 
 	//IPrimitiveCreatorShaderCallback
-private:
+protected:
 	virtual void onCreateShader(Shader& shader) override;
 
 protected:
@@ -180,5 +180,30 @@ private:
 	inline const Vector<GMControlGameObject*>& getItems() { D_BASE(db, GMControlGameObject); return db->children; }
 };
 
+//////////////////////////////////////////////////////////////////////////
+typedef std::function<void(Shader&)> ShaderCallback;
+
+GM_PRIVATE_OBJECT(GMCursorGameObject)
+{
+	ShaderCallback callback;
+	bool inited = false;
+};
+
+class GMCursorGameObject : public GMImage2DGameObject
+{
+	DECLARE_PRIVATE(GMCursorGameObject)
+
+public:
+	GMCursorGameObject(GMint width, GMint height);
+
+public:
+	virtual void onCreateShader(Shader& shader) override;
+
+public:
+	void enableCursor();
+	void disableCursor();
+	void update();
+	void setOnShadercCallback(const ShaderCallback& cb);
+};
 END_NS
 #endif

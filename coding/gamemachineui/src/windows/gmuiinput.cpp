@@ -106,8 +106,8 @@ void GMInput::setCursor(gm::GMCursorType type)
 		cursor = IDC_HAND;
 		break;
 	case gm::GMCursorType::Custom:
-		ASSERT(!"need implement");
-		break;
+		::ShowCursor(FALSE);
+		return;
 	default:
 		ASSERT(false);
 		break;

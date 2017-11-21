@@ -125,6 +125,8 @@ DemostrationWorld::~DemostrationWorld()
 		GM_ASSERT(demo.second);
 		gm::GM_delete(demo.second);
 	}
+
+	gm::GM_delete(d->cursor);
 }
 
 void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -137,12 +139,28 @@ void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandle
 void DemostrationWorld::init()
 {
 	D(d);
+	gm::GMGamePackage* package = GM.getGamePackageManager();
+	//创建鼠标
+	gm::GMCursorGameObject* cursor = new gm::GMCursorGameObject(16, 16);
+	gm::GMBuffer cursorBuf;
+	bool b = package->readFile(gm::GMPackageIndex::Textures, "cursor.png", &cursorBuf);
+	GM_ASSERT(b);
+	gm::GMImage* cur = nullptr;
+	gm::GMImageReader::load(cursorBuf.buffer, cursorBuf.size, &cur);
+	gm::ITexture* curFrame = nullptr;
+	GM.getFactory()->createTexture(cur, &curFrame);
+	GM_ASSERT(curFrame);
+	gm::GMAsset curAsset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Texture, curFrame);
+	cursor->setImage(curAsset);
+	cursor->enableCursor();
+	setCursor(cursor);
+	gm::GM_delete(cur);
+
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
 
 	// 读取边框
-	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::GMBuffer buf;
-	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
 	GM_ASSERT(b);
 	gm::GMImage* img = nullptr;
 	gm::GMImageReader::load(buf.buffer, buf.size, &img);
@@ -201,10 +219,34 @@ void DemostrationWorld::switchDemo()
 	}
 }
 
+void DemostrationWorld::setCursor(gm::GMCursorGameObject* cursor)
+{
+	D(d);
+	if (d->cursor == cursor)
+		return;
+	gm::GM_delete(d->cursor);
+	d->cursor = cursor;
+}
+
+void DemostrationWorld::renderCursor()
+{
+	D(d);
+	gm::IGraphicEngine* engine = GM.getGraphicEngine();
+	if (d->cursor)
+		d->cursor->update();
+}
+
 //////////////////////////////////////////////////////////////////////////
 void DemostrationEntrance::init()
 {
 	D(d);
+	gm::GMGamePackage* pk = GM.getGamePackageManager();
+
+#ifdef _DEBUG
+	pk->loadPackage("D:/gmpk");
+#else
+	pk->loadPackage((gm::GMPath::getCurrentPath() + _L("gm.pk0")));
+#endif
 
 	gm::GMGLGraphicEngine* engine = static_cast<gm::GMGLGraphicEngine*> (GM.getGraphicEngine());
 	engine->setShaderLoadCallback(this);
@@ -213,12 +255,6 @@ void DemostrationEntrance::init()
 	GMSetRenderState(RESOLUTION_X, 800);
 	GMSetRenderState(RESOLUTION_Y, 600);
 
-	gm::GMGamePackage* pk = GM.getGamePackageManager();
-#ifdef _DEBUG
-	pk->loadPackage("D:/gmpk");
-#else
-	pk->loadPackage((gm::GMPath::getCurrentPath() + _L("gm.pk0")));
-#endif
 	d->world = new DemostrationWorld();
 }
 
@@ -292,6 +328,10 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 			break;
 		}
 	}
+
+	// 不要忘记渲染鼠标
+	if (evt == gm::GameMachineEvent::Render)
+		getWorld()->renderCursor();
 }
 
 DemostrationEntrance::~DemostrationEntrance()
