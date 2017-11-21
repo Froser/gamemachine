@@ -190,6 +190,18 @@ GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 	return out;
 }
 
+GMRect GMControlGameObject::toControlCoord(const GMRectF& in)
+{
+	GMRect client = GM.getMainWindow()->getClientRect();
+	GMRect out = {
+		(GMint)((in.x + 1) * client.width * .5f),
+		(GMint)((1 - in.y) * client.height * .5f),
+		(GMint)(in.width * client.width * .5f),
+		(GMint)(in.height * client.height * .5f),
+	};
+	return out;
+}
+
 void GMControlGameObject::updateGeometry()
 {
 	D(d);
@@ -227,8 +239,13 @@ void GMControlGameObject::translateGeometry(const linear_math::Matrix4x4& transl
 	GMRect window = GM.getMainWindow()->getClientRect();
 	GMfloat trans[3];
 	linear_math::getTranslationFromMatrix(translation, trans);
-	d->geometry.x = (trans[0] + 1) * window.width * .5f - d->geometry.width * .5f;
-	d->geometry.y = (1 - trans[1]) * window.height * .5f - d->geometry.height * .5f;
+
+	GMRectF transRect = { trans[0], trans[1] };
+	// 得到中间位置坐标
+	GMRect rect = toControlCoord(transRect);
+	// 变换到左上角
+	d->geometry.x = rect.x - d->geometry.width * .5f;
+	d->geometry.y = rect.y - d->geometry.height * .5f;
 }
 
 void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callback, OUT GMModel** model)

@@ -2,6 +2,7 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmanimation.h"
 #include "foundation/gamemachine.h"
+#include "gameobjects/gmcontrolgameobject.h"
 
 GMAnimation::GMAnimation(GMGameObject* object)
 {
@@ -12,8 +13,8 @@ GMAnimation::GMAnimation(GMGameObject* object)
 bool GMAnimation::canStart()
 {
 	D(d);
-	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
-	return state.canStart;
+	return d->animationStates[GMAnimationTypes::Scaling].canStart
+		|| d->animationStates[GMAnimationTypes::Translation].canStart;
 }
 
 void GMAnimation::start()
@@ -27,8 +28,8 @@ void GMAnimation::start()
 bool GMAnimation::canReverse()
 {
 	D(d);
-	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
-	return state.canReverse;
+	return d->animationStates[GMAnimationTypes::Scaling].canReverse
+		|| d->animationStates[GMAnimationTypes::Translation].canReverse;
 }
 
 void GMAnimation::reverse()
@@ -56,8 +57,8 @@ void GMAnimation::resume()
 bool GMAnimation::canResume()
 {
 	D(d);
-	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
-	return state.canResume;
+	return d->animationStates[GMAnimationTypes::Scaling].canResume
+		|| d->animationStates[GMAnimationTypes::Translation].canResume;
 }
 
 void GMAnimation::update()
@@ -167,4 +168,36 @@ void GMAnimation::startAnimation()
 		state.canStart = false;
 		state.playingState = GMAnimationPlayingState::Activated;
 	}
+}
+
+GMControlGameObjectAnimation::GMControlGameObjectAnimation(GMControlGameObject* object)
+	: GMAnimation(object)
+{
+	D(d);
+	d->object = object;
+}
+
+void GMControlGameObjectAnimation::setTranslation(GMint x, GMint y, GMfloat duration, GMInterpolation interpolation)
+{
+	D(d);
+	D_BASE(db, GMAnimation);
+	// translation是控件空间，左上角(0,0)，变换到绘制空间
+	const GMRect& geometry = d->object->getGeometry();
+	GMRect viewportCoord = { x + geometry.width / 2, y + geometry.height / 2 };
+	GMRectF coord = GMControlGameObject::toViewportCoord(viewportCoord);
+	linear_math::Vector3 trans(coord.x, coord.y, 0);
+
+	GMAnimationState& state = db->animationStates[GMAnimationTypes::Translation];
+	state.interpolation = interpolation;
+	auto& translationMatrix = d->object->getTranslation();
+	GMfloat s[3];
+	linear_math::getTranslationFromMatrix(translationMatrix, s);
+	state.start[0] = s[0];
+	state.start[1] = s[1];
+	state.start[2] = s[2];
+	state.duration = duration;
+	state.p = 0;
+	state.end = trans;
+	state.direction = 1;
+	state.set = true;
 }

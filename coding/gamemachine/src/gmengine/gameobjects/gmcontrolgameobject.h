@@ -127,8 +127,9 @@ protected:
 	virtual void updateUI();
 	virtual void updateGeometry();
 
-protected:
+public:
 	static GMRectF toViewportCoord(const GMRect& in);
+	static GMRect toControlCoord(const GMRectF& in);
 
 private:
 	void addChild(GMControlGameObject* child);

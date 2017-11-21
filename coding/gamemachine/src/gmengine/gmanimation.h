@@ -77,5 +77,22 @@ private:
 	void startAnimation();
 };
 
+class GMControlGameObject;
+GM_PRIVATE_OBJECT(GMControlGameObjectAnimation)
+{
+	GMControlGameObject* object = nullptr;
+};
+
+class GMControlGameObjectAnimation : public GMAnimation
+{
+	DECLARE_PRIVATE(GMControlGameObjectAnimation)
+
+public:
+	GMControlGameObjectAnimation(GMControlGameObject* object);
+
+public:
+	void setTranslation(GMint x, GMint y, GMfloat duration, GMInterpolation interpolation = GMInterpolations::linear);
+};
+
 END_NS
 #endif
