@@ -113,7 +113,7 @@ void GMGLModelPainter::draw(GMfloat* modelTransform)
 		glBindVertexArray(mesh->getArrayId());
 		for (auto component : mesh->getComponents())
 		{
-			Shader& shader = component->getShader();
+			GMShader& shader = component->getShader();
 			if (shader.getNodraw())
 				continue;
 
@@ -165,7 +165,7 @@ void* GMGLModelPainter::getBuffer()
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
-void GMGLModelPainter::draw(IRender* render, Shader& shader, GMComponent* component, GMMesh* mesh, bool fill)
+void GMGLModelPainter::draw(IRender* render, GMShader& shader, GMComponent* component, GMMesh* mesh, bool fill)
 {
 	D(d);
 	d->engine->checkDrawingState();

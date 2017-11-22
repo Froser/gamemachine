@@ -32,7 +32,7 @@ void GMGameObject::setModel(GMAsset asset)
 		{
 			for (auto& component : mesh->getComponents())
 			{
-				Shader& shader = component->getShader();
+				GMShader& shader = component->getShader();
 				attachEvent(shader, GM_SET_PROPERTY_EVENT_ENUM(Blend), onShaderSetBlend);
 				shader.emitEvent(GM_SET_PROPERTY_EVENT_ENUM(Blend));
 			}
@@ -79,7 +79,7 @@ bool GMGameObject::canDeferredRendering()
 void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
 {
 	GMGameObject* gameObject = gmobject_cast<GMGameObject*>(receiver);
-	Shader* shader = gmobject_cast<Shader*>(sender);
+	GMShader* shader = gmobject_cast<GMShader*>(sender);
 	gameObject->data()->canDeferredRendering = !shader->getBlend();
 }
 
@@ -182,7 +182,7 @@ static linear_math::Vector2 uvs[24] = {
 	*/
 };
 
-GMSkyGameObject::GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
+GMSkyGameObject::GMSkyGameObject(const GMShader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
 {
 	D(d);
 	d->shader = shader;

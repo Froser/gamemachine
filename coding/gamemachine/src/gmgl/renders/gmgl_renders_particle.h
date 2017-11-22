@@ -7,7 +7,7 @@ BEGIN_NS
 class GMGLRenders_Particle : public GMGLRenders_3D
 {
 public:
-	virtual void beginShader(Shader& shader, GMDrawMode mode) override;
+	virtual void beginShader(GMShader& shader, GMDrawMode mode) override;
 };
 
 END_NS

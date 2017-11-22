@@ -45,7 +45,7 @@ private:
 	void constructModel();
 	void updateModel();
 	void createVertices(GMComponent* component);
-	void onCreateShader(Shader& shader);
+	void onCreateShader(GMShader& shader);
 
 protected:
 	virtual void updateUI() {} //Ignore base
@@ -141,7 +141,7 @@ public:
 
 	//IPrimitiveCreatorShaderCallback
 protected:
-	virtual void onCreateShader(Shader& shader) override;
+	virtual void onCreateShader(GMShader& shader) override;
 
 protected:
 	void drawBackground();
@@ -172,7 +172,7 @@ public:
 	virtual void onAppendingObjectToWorld();
 
 private:
-	virtual void onCreateShader(Shader& shader) override;
+	virtual void onCreateShader(GMShader& shader) override;
 	virtual void draw() override;
 	virtual void notifyControl() override;
 
@@ -181,25 +181,30 @@ private:
 };
 
 //////////////////////////////////////////////////////////////////////////
-typedef std::function<void(Shader&)> ShaderCallback;
+typedef std::function<void(GMShader&)> ShaderCallback;
 
 GM_PRIVATE_OBJECT(GMCursorGameObject)
 {
 	ShaderCallback callback;
 	bool inited = false;
+	bool enabled = false;
+	GMGameObject* ptr[1];
 };
 
 class GMCursorGameObject : public GMImage2DGameObject
 {
 	DECLARE_PRIVATE(GMCursorGameObject)
 
+	typedef GMImage2DGameObject Base;
+
 public:
 	GMCursorGameObject(GMint width, GMint height);
 
 public:
-	virtual void onCreateShader(Shader& shader) override;
+	virtual void onCreateShader(GMShader& shader) override;
 
 public:
+	void drawCursor();
 	void enableCursor();
 	void disableCursor();
 	void update();

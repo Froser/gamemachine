@@ -286,7 +286,7 @@ void GMBSPRender::generateVisibilityData()
 	memcpy(d->visibilityData.bitset, d->bsp->visBytes.data() + sz, bitsetSize);
 }
 
-void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shader, OUT GMModel** obj)
+void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& shader, OUT GMModel** obj)
 {
 	D(d);
 
@@ -326,7 +326,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const Shader& shad
 	*obj = coreObj;
 }
 
-void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const Shader& shader, OUT GMModel** obj)
+void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModel** obj)
 {
 	GMModel* coreObj = new GMModel();
 	GMMesh* child = new GMMesh();
@@ -371,7 +371,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	*obj = coreObj;
 }
 
-void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const Shader& shader, OUT GMModel** obj)
+void GMBSPRender::createBox(const linear_math::Vector3& extents, const linear_math::Vector3& position, const GMShader& shader, OUT GMModel** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,

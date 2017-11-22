@@ -100,7 +100,7 @@ GM_PRIVATE_OBJECT(GMSkyGameObject)
 {
 	linear_math::Vector3 min;
 	linear_math::Vector3 max;
-	Shader shader;
+	GMShader shader;
 };
 
 class GMSkyGameObject : public GMGameObject
@@ -108,7 +108,7 @@ class GMSkyGameObject : public GMGameObject
 	DECLARE_PRIVATE(GMSkyGameObject)
 
 public:
-	GMSkyGameObject(const Shader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
+	GMSkyGameObject(const GMShader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
 	~GMSkyGameObject();
 
 private:

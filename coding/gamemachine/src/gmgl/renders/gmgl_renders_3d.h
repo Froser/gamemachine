@@ -10,7 +10,7 @@ GM_PRIVATE_OBJECT(GMGLRenders_3D)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	GMMesh* mesh = nullptr;
-	Shader* shader = nullptr;
+	GMShader* shader = nullptr;
 	GMGLShaderProgram* gmglShaderProgram = nullptr;
 	GMMeshType type;
 	GMDrawMode mode;
@@ -27,7 +27,7 @@ public:
 
 public:
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override;
-	virtual void beginShader(Shader& shader, GMDrawMode mode) override;
+	virtual void beginShader(GMShader& shader, GMDrawMode mode) override;
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;
 	virtual void end() override;
@@ -35,7 +35,7 @@ public:
 
 protected:
 	GMGLShaderProgram* getShaderProgram();
-	void activateMaterial(const Shader& shader);
+	void activateMaterial(const GMShader& shader);
 	void drawDebug();
 	void drawTexture(GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);

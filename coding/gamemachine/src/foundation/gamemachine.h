@@ -17,6 +17,7 @@ class GMCursorGameObject;
 struct GMGameMachineRunningStates
 {
 	GMRect clientRect;
+	GMRect windowRect;
 	GMfloat lastFrameElpased = 0;
 };
 
@@ -116,8 +117,8 @@ public:
 	void postMessage(GameMachineMessage msg);
 	GameMachineMessage peekMessage();
 
-	void setCursor(GMCursorGameObject* cursor) { D(d); d->cursor = cursor; }
-	GMCursorGameObject* getCursor() { D(d); return d->cursor; }
+	inline void setCursor(GMCursorGameObject* cursor) { D(d); d->cursor = cursor; }
+	inline GMCursorGameObject* getCursor() { D(d); return d->cursor; }
 
 	void startGameMachine();
 

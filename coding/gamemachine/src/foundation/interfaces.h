@@ -17,7 +17,7 @@ class GMModel;
 class GMGamePackage;
 class GMGlyphManager;
 class GMUIWindow;
-class Shader;
+class GMShader;
 class GMModelPainter;
 class GMMesh;
 class GMTextureFrames;
@@ -109,7 +109,7 @@ enum class GMDrawMode
 GM_INTERFACE(IRender)
 {
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) = 0;
-	virtual void beginShader(Shader& shader, GMDrawMode mode) = 0;
+	virtual void beginShader(GMShader& shader, GMDrawMode mode) = 0;
 	virtual void endShader() = 0;
 	virtual void end() = 0;
 	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) = 0;

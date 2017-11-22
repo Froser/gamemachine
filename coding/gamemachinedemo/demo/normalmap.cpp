@@ -25,7 +25,7 @@ void Demo_NormalMap::init()
 		{
 		}
 
-		virtual void onCreateShader(gm::Shader& shader) override
+		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.setCull(gm::GMS_Cull::CULL);
 			shader.getMaterial().kd = gm::linear_math::Vector3(.6f, .2f, .3f);

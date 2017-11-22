@@ -48,7 +48,7 @@ private:
 	void init();
 	void appendFace(Scanner& scanner);
 	void loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename);
-	void applyMaterial(const ModelReader_Obj_Material& material, Shader& shader);
+	void applyMaterial(const ModelReader_Obj_Material& material, GMShader& shader);
 	ModelReader_Obj_Material* getMaterial(const GMString& materialName);
 };
 

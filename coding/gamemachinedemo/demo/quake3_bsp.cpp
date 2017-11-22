@@ -14,7 +14,7 @@ void Demo_Quake3_BSP::onActivate()
 {
 	D(d);
 	Base::onActivate();
-	setMouseEnabled(true);
+	setMouseTrace(true);
 }
 
 void Demo_Quake3_BSP::onDeactivate()
@@ -22,7 +22,7 @@ void Demo_Quake3_BSP::onDeactivate()
 	D(d);
 	Base::onDeactivate();
 	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
-	setMouseEnabled(false);
+	setMouseTrace(false);
 }
 
 void Demo_Quake3_BSP::setLookAt()
@@ -37,13 +37,21 @@ void Demo_Quake3_BSP::setDefaultLights()
 		d->world->setDefaultLights();
 }
 
-void Demo_Quake3_BSP::setMouseEnabled(bool enabled)
+void Demo_Quake3_BSP::setMouseTrace(bool enabled)
 {
+	// 如果开启了鼠标跟踪，将会自动隐藏鼠标
 	D(d);
+	if (enabled)
+		GM.getCursor()->disableCursor();
+	else
+		GM.getCursor()->enableCursor();
+	
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	gm::IMouseState& mouseState = inputManager->getMouseState();
-	d->mouseEnabled = enabled;
-	mouseState.setMouseEnable(d->mouseEnabled);
+	d->mouseTrace = enabled;
+
+	// 鼠标跟踪开启时，detecting mode也开启，每一帧将返回窗口中心，以获取鼠标移动偏量
+	mouseState.setDetectingMode(d->mouseTrace);
 }
 
 void Demo_Quake3_BSP::init()
@@ -170,7 +178,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		if (kbState.keyTriggered('O'))
 			GMSetDebugState(DRAW_ONLY_SKY, !GMGetDebugState(DRAW_ONLY_SKY));
 		if (kbState.keyTriggered('R'))
-			mouseState.setMouseEnable(d->mouseEnabled = !d->mouseEnabled);
+			setMouseTrace(!d->mouseTrace);
 
 		if (kbState.keyTriggered('0'))
 			GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);

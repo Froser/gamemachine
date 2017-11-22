@@ -45,8 +45,8 @@ private:
 	void drawFaces();
 	void draw(GMBSP_Render_BiquadraticPatch& biqp);
 	void drawAlwaysVisibleObjects();
-	template <typename T> bool setMaterialTexture(T& face, REF Shader& shader);
-	void setMaterialLightmap(GMint lightmapid, REF Shader& shader);
+	template <typename T> bool setMaterialTexture(T& face, REF GMShader& shader);
+	void setMaterialLightmap(GMint lightmapid, REF GMShader& shader);
 	int isClusterVisible(GMint cameraCluster, GMint testCluster);
 
 	//imports:

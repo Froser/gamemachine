@@ -79,7 +79,7 @@ void GMGlyphObject::constructModel()
 	setModel(asset);
 }
 
-void GMGlyphObject::onCreateShader(Shader& shader)
+void GMGlyphObject::onCreateShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(glyphManager->glyphTexture());
@@ -369,7 +369,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		{
 		}
 
-		void onCreateShader(Shader& shader)
+		void onCreateShader(GMShader& shader)
 		{
 			shader.setNoDepthTest(true);
 			auto& tex = shader.getTexture();
@@ -586,7 +586,7 @@ void GMImage2DGameObject::setTranslation(const linear_math::Matrix4x4& translati
 		d->border.setTranslation(translation);
 }
 
-void GMImage2DGameObject::onCreateShader(Shader& shader)
+void GMImage2DGameObject::onCreateShader(GMShader& shader)
 {
 	D(d);
 	shader.setBlend(false);
@@ -684,7 +684,7 @@ void GMListbox2DGameObject::setItemMargins(GMint left, GMint top, GMint right, G
 	d->itemMargins[Bottom] = bottom;
 }
 
-void GMListbox2DGameObject::onCreateShader(Shader& shader)
+void GMListbox2DGameObject::onCreateShader(GMShader& shader)
 {
 	D(d);
 	shader.setNoDepthTest(true);
@@ -741,6 +741,7 @@ GMCursorGameObject::GMCursorGameObject(GMint width, GMint height)
 	D(d);
 	setWidth(width);
 	setHeight(height);
+	d->ptr[0] = this;
 }
 
 void GMCursorGameObject::setOnShadercCallback(const ShaderCallback& cb)
@@ -749,12 +750,24 @@ void GMCursorGameObject::setOnShadercCallback(const ShaderCallback& cb)
 	d->callback = cb;
 }
 
-void GMCursorGameObject::onCreateShader(Shader& shader)
+void GMCursorGameObject::onCreateShader(GMShader& shader)
 {
 	D(d);
 	GMImage2DGameObject::onCreateShader(shader);
 	if (d->callback)
 		d->callback(shader);
+}
+
+void GMCursorGameObject::drawCursor()
+{
+	D(d);
+	if (d->enabled)
+	{
+		IGraphicEngine* engine = GM.getGraphicEngine();
+		engine->beginBlend(GMS_BlendFunc::ONE, GMS_BlendFunc::ONE);
+		engine->drawObjects(d->ptr, 1);
+		engine->endBlend();
+	}
 }
 
 void GMCursorGameObject::enableCursor()
@@ -768,22 +781,28 @@ void GMCursorGameObject::enableCursor()
 
 	IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
 	mouseState.setCursor(GMCursorType::Custom);
+	d->enabled = true;
 }
 
 void GMCursorGameObject::disableCursor()
 {
+	D(d);
 	IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
 	mouseState.setCursor(GMCursorType::Arrow);
+	d->enabled = false;
 }
 
 void GMCursorGameObject::update()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
-	GM_ASSERT(d->inited);
-	IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
-	GMMouseState ms = mouseState.mouseState();
-	GMRect rect = { ms.posX + db->geometry.width / 2, ms.posY + db->geometry.height / 2 };
-	GMRectF coord = toViewportCoord(rect);
-	setTranslation(linear_math::translate(linear_math::Vector3(coord.x, coord.y, 0)));
+	if (d->enabled)
+	{
+		GM_ASSERT(d->inited);
+		IMouseState& mouseState = GM.getMainWindow()->getInputMananger()->getMouseState();
+		GMMouseState ms = mouseState.mouseState();
+		GMRect rect = { ms.posX + db->geometry.width / 2, ms.posY + db->geometry.height / 2 };
+		GMRectF coord = toViewportCoord(rect);
+		setTranslation(linear_math::translate(linear_math::Vector3(coord.x, coord.y, 0)));
+	}
 }

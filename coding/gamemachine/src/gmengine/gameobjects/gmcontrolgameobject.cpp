@@ -53,7 +53,7 @@ void GMControlGameObject::onAppendingObjectToWorld()
 	class __Cb : public IPrimitiveCreatorShaderCallback
 	{
 	public:
-		virtual void onCreateShader(Shader& shader) override
+		virtual void onCreateShader(GMShader& shader) override
 		{
 			shader.setBlend(true);
 			shader.setBlendFactorDest(GMS_BlendFunc::ONE);

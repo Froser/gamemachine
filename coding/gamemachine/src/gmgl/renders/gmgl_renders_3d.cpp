@@ -17,7 +17,7 @@ void GMGLRenders_3D::activateShader()
 {
 	D(d);
 	GM_ASSERT(d->shader);
-	Shader* shader = d->shader;
+	GMShader* shader = d->shader;
 	if (shader->getBlend())
 	{
 		glEnable(GL_BLEND);
@@ -71,7 +71,7 @@ void GMGLRenders_3D::begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelT
 		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
 }
 
-void GMGLRenders_3D::beginShader(Shader& shader, GMDrawMode mode)
+void GMGLRenders_3D::beginShader(GMShader& shader, GMDrawMode mode)
 {
 	D(d);
 	d->shader = &shader;
@@ -245,7 +245,7 @@ ITexture* GMGLRenders_3D::getTexture(GMTextureFrames& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
-void GMGLRenders_3D::activateMaterial(const Shader& shader)
+void GMGLRenders_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
 	const GMMaterial& material = shader.getMaterial();

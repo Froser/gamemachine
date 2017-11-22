@@ -9,7 +9,8 @@ void main()
 	if (GM_ambient_textures[0].enabled == 1)
 	{
 		frag_color = texture(GM_ambient_textures[0].texture, _uv * vec2(GM_ambient_textures[0].scale_s, GM_ambient_textures[0].scale_t));
-		//frag_color = vec4((frag_color.rgb - vec3(1, 1, 1)) * frag_color.a, 1);
+		if (frag_color.a == 0)
+			discard;
 	}
 	else
 	{

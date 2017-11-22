@@ -180,7 +180,7 @@ void GMBSPShaderLoader::load()
 	}
 }
 
-bool GMBSPShaderLoader::findItem(const GMString& name, GMint lightmapId, REF Shader* shader)
+bool GMBSPShaderLoader::findItem(const GMString& name, GMint lightmapId, REF GMShader* shader)
 {
 	D(d);
 	auto foundResult = d->items.find(name);
@@ -231,7 +231,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	}
 }
 
-void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF Shader* shaderPtr)
+void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF GMShader* shaderPtr)
 {
 	D(d);
 	if (!shaderPtr)
@@ -241,7 +241,7 @@ void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF Shad
 	// 这个是用于追踪from=lightmap的纹理使用的
 	d->lightmapId = lightmapId;
 
-	Shader& shader = *shaderPtr;
+	GMShader& shader = *shaderPtr;
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
@@ -273,12 +273,12 @@ void GMBSPShaderLoader::parseEnd()
 	d->lightmapId = -1;
 }
 
-void GMBSPShaderLoader::parse_surfaceparm(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_surfaceparm(GMShader& shader, TiXmlElement* elem)
 {
 	shader.setSurfaceFlag(shader.getSurfaceFlag() | parseSurfaceParm(elem->GetText()));
 }
 
-void GMBSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_cull(GMShader& shader, TiXmlElement* elem)
 {
 	const char* text = elem->GetText();
 	if (strEqual(text, "none"))
@@ -289,7 +289,7 @@ void GMBSPShaderLoader::parse_cull(Shader& shader, TiXmlElement* elem)
 		gm_error("wrong cull param %s", text);
 }
 
-void GMBSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, TiXmlElement* elem)
 {
 	const char* b = elem->GetText();
 	if (b)
@@ -308,7 +308,7 @@ void GMBSPShaderLoader::parse_blendFunc(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_animMap(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
@@ -325,7 +325,7 @@ void GMBSPShaderLoader::parse_animMap(Shader& shader, TiXmlElement* elem)
 	d->textureNum++;
 }
 
-void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_src(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
@@ -334,7 +334,7 @@ void GMBSPShaderLoader::parse_src(Shader& shader, TiXmlElement* elem)
 		frame->addFrame(texture);
 }
 
-void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_clampmap(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
@@ -354,7 +354,7 @@ void GMBSPShaderLoader::parse_clampmap(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
@@ -373,7 +373,7 @@ void GMBSPShaderLoader::parse_map(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	// from "lightmap"
@@ -403,7 +403,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(Shader& shader, TiXmlElement* ele
 	}
 }
 
-void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_normalmap(GMShader& shader, TiXmlElement* elem)
 {
 	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
@@ -415,7 +415,7 @@ void GMBSPShaderLoader::parse_normalmap(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_lights(GMShader& shader, TiXmlElement* elem)
 {
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
@@ -424,7 +424,7 @@ void GMBSPShaderLoader::parse_lights(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	const char* type = elem->Attribute("type");
@@ -508,7 +508,7 @@ void GMBSPShaderLoader::parse_light(Shader& shader, TiXmlElement* elem)
 	d->world->addLight(light);
 }
 
-void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
+void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	// tcMod <type> <...>
@@ -556,14 +556,14 @@ void GMBSPShaderLoader::parse_map_tcMod(Shader& shader, TiXmlElement* elem)
 	}
 }
 
-void GMBSPShaderLoader::createSky(Shader& shader)
+void GMBSPShaderLoader::createSky(GMShader& shader)
 {
 	D(d);
 	ITexture* texture = shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).getFrameByIndex(0);
 	shader.setNodraw(true);
 	if (!d->world->getSky())
 	{
-		Shader skyShader = shader;
+		GMShader skyShader = shader;
 		skyShader.setNodraw(false);
 		skyShader.setCull(GMS_Cull::NONE);
 

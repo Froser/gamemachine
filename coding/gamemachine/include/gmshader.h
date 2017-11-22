@@ -1,1 +1,1 @@
-﻿#include "../src/gmdatacore/shader.h"
+﻿#include "../src/gmdatacore/gmshader.h"

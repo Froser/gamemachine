@@ -5,11 +5,11 @@
 BEGIN_NS
 
 class GMModel;
-class Shader;
+class GMShader;
 
 GM_INTERFACE(IPrimitiveCreatorShaderCallback)
 {
-	virtual void onCreateShader(Shader& shader) = 0;
+	virtual void onCreateShader(GMShader& shader) = 0;
 };
 
 struct GMPrimitiveCreator

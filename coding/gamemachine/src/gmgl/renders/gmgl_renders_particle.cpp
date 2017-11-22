@@ -3,7 +3,7 @@
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmglshaderprogram.h"
 
-void GMGLRenders_Particle::beginShader(Shader& shader, GMDrawMode mode)
+void GMGLRenders_Particle::beginShader(GMShader& shader, GMDrawMode mode)
 {
 	D(d);
 	d->shader = &shader;

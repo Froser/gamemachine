@@ -68,7 +68,7 @@ GM_INTERFACE(IKeyboardState)
 GM_INTERFACE(IMouseState)
 {
 	virtual GMMouseState mouseState() = 0;
-	virtual void setMouseEnable(bool enable) = 0;
+	virtual void setDetectingMode(bool enable) = 0;
 	virtual void setCursor(GMCursorType type) = 0;
 };
 

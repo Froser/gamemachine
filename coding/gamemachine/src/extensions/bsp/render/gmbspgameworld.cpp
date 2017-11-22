@@ -267,7 +267,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 	GMGameObject* obj = nullptr;
 	GM_ASSERT(rd.polygonFaceObjects.find(&polygonFace) == rd.polygonFaceObjects.end());
 
-	Shader shader;
+	GMShader shader;
 	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
 
 	if (!setMaterialTexture(polygonFace, shader))
@@ -297,7 +297,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 	GMGameObject* obj = nullptr;
 
 	GM_ASSERT(rd.meshFaceObjects.find(&meshFace) == rd.meshFaceObjects.end());
-	Shader shader;
+	GMShader shader;
 	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
 
 	if (!setMaterialTexture(meshFace, shader))
@@ -324,7 +324,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 	GMBSPRenderData& rd = d->render.renderData();
 	rd.patchIndices.push_back(drawSurfaceIndex);
 
-	Shader shader;
+	GMShader shader;
 	shader.setFrontFace(GMS_FrontFace::CLOCKWISE);
 
 	if (!setMaterialTexture(rd.patches[patchNumber], shader))
@@ -435,7 +435,7 @@ void GMBSPGameWorld::drawAlwaysVisibleObjects()
 }
 
 template <typename T>
-bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
+bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -458,7 +458,7 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF Shader& shader)
 	return true;
 }
 
-void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF Shader& shader)
+void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF GMShader& shader)
 {
 	D(d);
 	const GMint WHITE_LIGHTMAP = -1;
@@ -666,7 +666,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 	if (!strlen(m->model))
 	{
 		// 如果没有指定model，先创建一个默认的立方体model吧
-		Shader shader;
+		GMShader shader;
 		//if (!setMaterialTexture(meshFace, shader))
 		//{
 		//	gm_warning("mesh: %d texture missing.", meshFaceNumber);

@@ -10,7 +10,7 @@ void GMGLRenders_2D::updateVPMatrices(const linear_math::Matrix4x4& projection, 
 	d->gmglShaderProgram->setMatrix4(GMSHADER_VIEW_POSITION, vec);
 }
 
-void GMGLRenders_2D::beginShader(Shader& shader, GMDrawMode mode)
+void GMGLRenders_2D::beginShader(GMShader& shader, GMDrawMode mode)
 {
 	D(d);
 	d->shader = &shader;

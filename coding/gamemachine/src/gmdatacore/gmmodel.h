@@ -5,7 +5,7 @@
 #include <utilities.h>
 #include <linearmath.h>
 #include <gmimage.h>
-#include "shader.h"
+#include <gmshader.h>
 
 #define BEGIN_FOREACH_MESH(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;
 #define END_FOREACH_MESH }
@@ -59,7 +59,7 @@ GM_PRIVATE_OBJECT(GMComponent)
 
 	GMMesh* parentMesh;
 	GMuint currentFaceVerticesCount;
-	Shader shader;
+	GMShader shader;
 };
 
 class GMComponent : public GMObject
@@ -71,8 +71,8 @@ class GMComponent : public GMObject
 public:
 	GMComponent(GMMesh* parent);
 
-	inline Shader& getShader() { D(d); return d->shader; }
-	inline void setShader(const Shader& shader) { D(d); d->shader = shader; }
+	inline GMShader& getShader() { D(d); return d->shader; }
+	inline void setShader(const GMShader& shader) { D(d); d->shader = shader; }
 	inline GMint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
 	inline GMint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
 	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }

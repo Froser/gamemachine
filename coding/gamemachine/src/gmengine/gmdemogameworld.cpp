@@ -14,9 +14,7 @@ void GMDemoGameWorld::renderScene()
 	Base::renderScene();
 
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-	auto objs = d->gameObjects;
-	if (GM.getCursor())
-		objs.push_back(GM.getCursor());
+	auto& objs = d->gameObjects;
 	engine->drawObjects(objs.data(), objs.size());
 
 	engine->beginBlend();

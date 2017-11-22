@@ -10,7 +10,7 @@ GM_PRIVATE_OBJECT(Demo_Quake3_BSP)
 {
 	gm::GMBSPGameWorld* world = nullptr;
 	gm::GMSpriteGameObject* sprite = nullptr;
-	bool mouseEnabled = true;
+	bool mouseTrace = false;
 };
 
 class Demo_Quake3_BSP : public DemoHandler
@@ -34,7 +34,7 @@ protected:
 	virtual void setDefaultLights() override;
 
 private:
-	void setMouseEnabled(bool enabled);
+	void setMouseTrace(bool enabled);
 };
 
 #endif

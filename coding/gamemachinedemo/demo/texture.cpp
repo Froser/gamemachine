@@ -25,7 +25,7 @@ void Demo_Texture::init()
 		{
 		}
 
-		virtual void onCreateShader(gm::Shader& shader) override
+		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.setCull(gm::GMS_Cull::CULL);
 			shader.getMaterial().kd = gm::linear_math::Vector3(1, 1, 1);

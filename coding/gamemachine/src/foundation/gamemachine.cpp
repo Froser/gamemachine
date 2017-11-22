@@ -208,4 +208,5 @@ void GameMachine::updateGameMachineRunningStates()
 {
 	D(d);
 	d->states.clientRect = getMainWindow()->getClientRect();
+	d->states.windowRect = getMainWindow()->getWindowRect();
 }

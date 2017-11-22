@@ -256,7 +256,7 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 	}
 }
 
-void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, Shader& shader)
+void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, GMShader& shader)
 {
 	shader.setCull(GMS_Cull::NONE);
 

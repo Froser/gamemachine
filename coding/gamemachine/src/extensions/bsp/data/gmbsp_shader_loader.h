@@ -35,32 +35,32 @@ public:
 public:
 	void init(const GMString& directory, GMBSPGameWorld* world, GMBSPRenderData* bspRenderData);
 	void load();
-	bool findItem(const GMString& name, GMint lightmapId, REF Shader* shader);
+	bool findItem(const GMString& name, GMint lightmapId, REF GMShader* shader);
 
 	// parsers:
 private:
 	ITexture* addTextureToTextureContainer(const char* name);
 	void parse(const char* buffer);
-	void parseItem(TiXmlElement* elem, GMint lightmapId, REF Shader* shaderPtr);
+	void parseItem(TiXmlElement* elem, GMint lightmapId, REF GMShader* shaderPtr);
 	void parseStart();
 	void parseEnd();
 
 private:
-	void parse_surfaceparm(Shader& shader, TiXmlElement* elem);
-	void parse_cull(Shader& shader, TiXmlElement* elem);
-	void parse_blendFunc(Shader& shader, TiXmlElement* elem);
-	void parse_animMap(Shader& shader, TiXmlElement* elem);
-	void parse_src(Shader& shader, TiXmlElement* elem);
-	void parse_clampmap(Shader& shader, TiXmlElement* elem);
-	void parse_map(Shader& shader, TiXmlElement* elem);
-	void parse_map_tcMod(Shader& shader, TiXmlElement* elem);
-	void parse_map_fromLightmap(Shader& shader, TiXmlElement* elem);
-	void parse_normalmap(Shader& shader, TiXmlElement* elem);
-	void parse_lights(Shader& shader, TiXmlElement* elem);
-	void parse_light(Shader& shader, TiXmlElement* elem);
+	void parse_surfaceparm(GMShader& shader, TiXmlElement* elem);
+	void parse_cull(GMShader& shader, TiXmlElement* elem);
+	void parse_blendFunc(GMShader& shader, TiXmlElement* elem);
+	void parse_animMap(GMShader& shader, TiXmlElement* elem);
+	void parse_src(GMShader& shader, TiXmlElement* elem);
+	void parse_clampmap(GMShader& shader, TiXmlElement* elem);
+	void parse_map(GMShader& shader, TiXmlElement* elem);
+	void parse_map_tcMod(GMShader& shader, TiXmlElement* elem);
+	void parse_map_fromLightmap(GMShader& shader, TiXmlElement* elem);
+	void parse_normalmap(GMShader& shader, TiXmlElement* elem);
+	void parse_lights(GMShader& shader, TiXmlElement* elem);
+	void parse_light(GMShader& shader, TiXmlElement* elem);
 
 private:
-	void createSky(Shader& shader);
+	void createSky(GMShader& shader);
 };
 
 END_NS

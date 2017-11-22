@@ -200,8 +200,6 @@ void DemostrationWorld::renderScene()
 	gm::IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->beginBlend();
 	auto controls = getControlsGameObject();
-	if (GM.getCursor())
-		controls.push_back(GM.getCursor());
 	engine->drawObjects(controls.data(), controls.size());
 	engine->endBlend();
 }
@@ -245,7 +243,6 @@ void DemostrationEntrance::start()
 {
 	D(d);
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-	inputManager->getMouseState().setMouseEnable(false);
 
 	// 设置一个默认视角
 	gm::GMCamera& camera = GM.getCamera();
@@ -312,8 +309,13 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 		}
 	}
 
-	if (GM.getCursor() && evt == gm::GameMachineEvent::FrameStart)
-		GM.getCursor()->update();
+	if (GM.getCursor())
+	{
+		if (evt == gm::GameMachineEvent::FrameStart)
+			GM.getCursor()->update();
+		else if (evt == gm::GameMachineEvent::Render)
+			GM.getCursor()->drawCursor();
+	}
 }
 
 DemostrationEntrance::~DemostrationEntrance()

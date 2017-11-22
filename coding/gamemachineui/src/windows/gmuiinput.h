@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
 	bool mouseReady = false;
-	bool mouseEnabled = true;
+	bool detectingMode = false;
 	gm::IWindow* window;
 
 	// joystick (xinput)
@@ -85,12 +85,9 @@ public:
 	virtual gm::GMJoystickState joystickState() override;
 	virtual void setIMEState(bool enabled) override;
 
-private:
-	void initMouse();
-
 public:
 	virtual gm::GMMouseState mouseState() override;
-	virtual void setMouseEnable(bool center) override;
+	virtual void setDetectingMode(bool center) override;
 	virtual void setCursor(gm::GMCursorType type) override;
 };
 #endif

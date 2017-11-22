@@ -57,7 +57,6 @@ GMInput::GMInput(gm::IWindow* window)
 {
 	D(d);
 	d->window = window;
-	initMouse();
 }
 
 void GMInput::update()
@@ -66,19 +65,22 @@ void GMInput::update()
 	::GetKeyboardState(d->lastKeyState);
 }
 
-void GMInput::initMouse()
+void GMInput::setDetectingMode(bool enable)
 {
 	D(d);
-	gm::GMRect rect = d->window->getWindowRect();
-	::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
-	d->mouseReady = true;
-	setMouseEnable(true);
-}
+	if (enable)
+	{
+		const gm::GMRect& rect = GM.getGameMachineRunningStates().windowRect;
+		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
+		d->mouseReady = true;
+		::ShowCursor(FALSE);
+	}
+	else
+	{
+		::ShowCursor(TRUE);
+	}
 
-void GMInput::setMouseEnable(bool enable)
-{
-	D(d);
-	d->mouseEnabled = enable;
+	d->detectingMode = enable;
 }
 
 void GMInput::setCursor(gm::GMCursorType type)
@@ -199,7 +201,7 @@ gm::GMMouseState GMInput::mouseState()
 	}
 	else
 	{
-		if (d->mouseEnabled)
+		if (d->detectingMode)
 		{
 			gm::GMRect rect = d->window->getWindowRect();
 			const gm::GMint centerX = rect.x + rect.width / 2;
