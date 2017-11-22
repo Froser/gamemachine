@@ -71,7 +71,14 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	// 混合绘制
 	GMRenderMode renderModeForBlend = GMStates_RenderOptions::FORWARD;
+	GMS_BlendFunc blendsfactor;
+	GMS_BlendFunc blenddfactor;
 	bool isBlending = false;
+
+	// 是否进入绘制模式
+#if _DEBUG
+	GMint drawingLevel = 0;
+#endif
 };
 
 class GMGLGraphicEngine : public GMObject, public IGraphicEngine
@@ -95,7 +102,7 @@ public:
 	virtual void endCreateStencil() override;
 	virtual void beginUseStencil(bool inverse) override;
 	virtual void endUseStencil() override;
-	virtual void beginBlend() override;
+	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
 	virtual void beginFullRendering() override;
 	virtual void endFullRendering() override;
@@ -112,6 +119,20 @@ public:
 	inline void setRenderState(GMGLDeferredRenderState state) { D(d); d->renderState = state; }
 	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
 	inline bool isBlending() { D(d); return d->isBlending; }
+	GMS_BlendFunc blendsfactor() { D(d); return d->blendsfactor; }
+	GMS_BlendFunc blenddfactor() { D(d); return d->blenddfactor; }
+
+	inline void checkDrawingState()
+	{
+#if _DEBUG
+		D(d);
+		if (!d->drawingLevel)
+		{
+			GM_ASSERT(false);
+			gm_error("GMObject::draw() cannot be called outside IGraphicEngine::drawObjects");
+		}
+#endif
+	}
 
 private:
 	void refreshForwardRenderLights();
@@ -139,6 +160,12 @@ private:
 public:
 	static void newFrameOnCurrentFramebuffer();
 	static void clearStencilOnCurrentFramebuffer();
+};
+
+class GMGLUtility
+{
+public:
+	static void blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor);
 };
 
 END_NS

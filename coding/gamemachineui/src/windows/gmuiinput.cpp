@@ -112,6 +112,7 @@ void GMInput::setCursor(gm::GMCursorType type)
 		ASSERT(false);
 		break;
 	}
+	::ShowCursor(TRUE);
 	::SetClassLong(d->window->getWindowHandle(), GCL_HCURSOR, (LONG)::LoadCursor(NULL, cursor));
 }
 

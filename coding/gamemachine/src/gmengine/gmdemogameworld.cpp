@@ -2,6 +2,7 @@
 #include "gmdemogameworld.h"
 #include "foundation/gamemachine.h"
 #include "gameobjects/gmcontrolgameobject.h"
+#include "gameobjects/gm2dgameobject.h"
 
 GMDemoGameWorld::GMDemoGameWorld()
 {
@@ -13,7 +14,10 @@ void GMDemoGameWorld::renderScene()
 	Base::renderScene();
 
 	IGraphicEngine* engine = GameMachine::instance().getGraphicEngine();
-	engine->drawObjects(d->gameObjects.data(), d->gameObjects.size());
+	auto objs = d->gameObjects;
+	if (GM.getCursor())
+		objs.push_back(GM.getCursor());
+	engine->drawObjects(objs.data(), objs.size());
 
 	engine->beginBlend();
 	auto& controls = getControlsGameObject();

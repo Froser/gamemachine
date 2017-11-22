@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <utilities.h>
 #include <input.h>
+#include <gmassets.h>
 #include "../gmdatacore/glyph/gmglyphmanager.h"
 #include "../gmdatacore/gamepackage/gmgamepackage.h"
 #include "../gmengine/gmcamera.h"
@@ -12,6 +13,7 @@ BEGIN_NS
 
 #define GM gm::GameMachine::instance()
 
+class GMCursorGameObject;
 struct GMGameMachineRunningStates
 {
 	GMRect clientRect;
@@ -41,6 +43,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Vector<IDispose*> manangerQueue;
 
 	GMGameMachineRunningStates states;
+	GMCursorGameObject* cursor;
 };
 
 class GameMachine : public GMSingleton<GameMachine>
@@ -112,6 +115,9 @@ public:
 	// 发送事件
 	void postMessage(GameMachineMessage msg);
 	GameMachineMessage peekMessage();
+
+	void setCursor(GMCursorGameObject* cursor) { D(d); d->cursor = cursor; }
+	GMCursorGameObject* getCursor() { D(d); return d->cursor; }
 
 	void startGameMachine();
 

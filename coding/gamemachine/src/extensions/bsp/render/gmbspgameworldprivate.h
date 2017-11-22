@@ -1,7 +1,6 @@
 ﻿#ifndef __BSPGAMEWORLDPRIVATE_H__
 #define __BSPGAMEWORLDPRIVATE_H__
 #include <gmcommon.h>
-#include <shader.h>
 #include <gmbsp.h>
 #include <gmbspphysicsworld.h>
 BEGIN_NS

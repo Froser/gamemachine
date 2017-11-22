@@ -523,7 +523,7 @@ void GMGLFramebuffer::blending()
 	else
 	{
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_ONE, GL_ONE);
+		GMGLUtility::blendFunc(GMEngine->blendsfactor(), GMEngine->blenddfactor());
 	}
 }
 

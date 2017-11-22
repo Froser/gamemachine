@@ -130,6 +130,7 @@ set(SOURCES
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
 		foundation/gmstring.cpp
+		foundation/gmenums.h
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h

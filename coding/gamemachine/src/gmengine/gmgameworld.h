@@ -1,9 +1,9 @@
 ﻿#ifndef __GAMEWORLD_H__
 #define __GAMEWORLD_H__
 #include <gmcommon.h>
-#include "../foundation/gamemachine.h"
+#include <gamemachine.h>
 #include "../gmphysics/gmphysicsworld.h"
-#include <shader.h>
+#include <gmenums.h>
 #include "gameobjects/gmgameobject.h"
 #include <gmassets.h>
 

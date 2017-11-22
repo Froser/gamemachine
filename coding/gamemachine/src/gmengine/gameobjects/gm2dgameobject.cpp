@@ -786,10 +786,4 @@ void GMCursorGameObject::update()
 	GMRect rect = { ms.posX + db->geometry.width / 2, ms.posY + db->geometry.height / 2 };
 	GMRectF coord = toViewportCoord(rect);
 	setTranslation(linear_math::translate(linear_math::Vector3(coord.x, coord.y, 0)));
-
-	static GMGameObject* cursor[] = { this };
-	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginBlend();
-	engine->drawObjects(cursor, 1);
-	engine->endBlend();
 }

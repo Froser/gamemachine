@@ -125,8 +125,6 @@ DemostrationWorld::~DemostrationWorld()
 		GM_ASSERT(demo.second);
 		gm::GM_delete(demo.second);
 	}
-
-	gm::GM_delete(d->cursor);
 }
 
 void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -153,7 +151,7 @@ void DemostrationWorld::init()
 	gm::GMAsset curAsset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Texture, curFrame);
 	cursor->setImage(curAsset);
 	cursor->enableCursor();
-	setCursor(cursor);
+	GM.setCursor(cursor);
 	gm::GM_delete(cur);
 
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
@@ -197,11 +195,13 @@ void DemostrationWorld::init()
 void DemostrationWorld::renderScene()
 {
 	D(d);
-	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-
-	engine->beginBlend();
 	Base::renderScene();
-	auto& controls = getControlsGameObject();
+
+	gm::IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->beginBlend();
+	auto controls = getControlsGameObject();
+	if (GM.getCursor())
+		controls.push_back(GM.getCursor());
 	engine->drawObjects(controls.data(), controls.size());
 	engine->endBlend();
 }
@@ -217,23 +217,6 @@ void DemostrationWorld::switchDemo()
 		setCurrentDemo(d->nextDemo);
 		d->nextDemo = nullptr;
 	}
-}
-
-void DemostrationWorld::setCursor(gm::GMCursorGameObject* cursor)
-{
-	D(d);
-	if (d->cursor == cursor)
-		return;
-	gm::GM_delete(d->cursor);
-	d->cursor = cursor;
-}
-
-void DemostrationWorld::renderCursor()
-{
-	D(d);
-	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	if (d->cursor)
-		d->cursor->update();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -329,9 +312,8 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 		}
 	}
 
-	// 不要忘记渲染鼠标
-	if (evt == gm::GameMachineEvent::Render)
-		getWorld()->renderCursor();
+	if (GM.getCursor() && evt == gm::GameMachineEvent::FrameStart)
+		GM.getCursor()->update();
 }
 
 DemostrationEntrance::~DemostrationEntrance()

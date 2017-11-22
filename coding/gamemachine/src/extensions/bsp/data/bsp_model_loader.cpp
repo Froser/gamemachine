@@ -4,7 +4,6 @@
 #include "gmdatacore/gamepackage/gmgamepackage.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
-#include "shader.h"
 #include "foundation/utilities/utilities.h"
 #include "foundation/gamemachine.h"
 

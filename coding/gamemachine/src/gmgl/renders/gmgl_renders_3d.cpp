@@ -21,47 +21,7 @@ void GMGLRenders_3D::activateShader()
 	if (shader->getBlend())
 	{
 		glEnable(GL_BLEND);
-		GLenum factors[2];
-		GMS_BlendFunc gms_factors[] = {
-			shader->getBlendFactorSource(),
-			shader->getBlendFactorDest(),
-		};
-
-		for (GMuint i = 0; i < 2; i++)
-		{
-			switch (gms_factors[i])
-			{
-			case GMS_BlendFunc::ZERO:
-				factors[i] = GL_ZERO;
-				break;
-			case GMS_BlendFunc::ONE:
-				factors[i] = GL_ONE;
-				break;
-			case GMS_BlendFunc::SRC_COLOR:
-				factors[i] = GL_SRC_COLOR;
-				break;
-			case GMS_BlendFunc::DST_COLOR:
-				factors[i] = GL_DST_COLOR;
-				break;
-			case GMS_BlendFunc::SRC_ALPHA:
-				factors[i] = GL_SRC_ALPHA;
-				break;
-			case GMS_BlendFunc::DST_ALPHA:
-				factors[i] = GL_DST_ALPHA;
-				break;
-			case GMS_BlendFunc::ONE_MINUS_SRC_ALPHA:
-				factors[i] = GL_ONE_MINUS_SRC_ALPHA;
-				break;
-			case GMS_BlendFunc::ONE_MINUS_DST_COLOR:
-				factors[i] = GL_ONE_MINUS_DST_COLOR;
-				break;
-			default:
-				GM_ASSERT(false);
-				break;
-			}
-		}
-		glBlendFunc(factors[0], factors[1]);
-		GM_CHECK_GL_ERROR();
+		GMGLUtility::blendFunc(shader->getBlendFactorSource(), shader->getBlendFactorDest());
 
 		glDisable(GL_CULL_FACE);
 		GM_CHECK_GL_ERROR();

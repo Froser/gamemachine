@@ -144,6 +144,10 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	if (!count)
 		return;
 
+#if _DEBUG
+	++d->drawingLevel;
+#endif
+
 	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
 	if (renderMode != d->renderMode)
 	{
@@ -181,6 +185,10 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 
 		viewGBufferFrameBuffer();
 	}
+
+#if _DEBUG
+	--d->drawingLevel;
+#endif
 }
 
 void GMGLGraphicEngine::installShaders()
@@ -621,12 +629,14 @@ void GMGLGraphicEngine::endUseStencil()
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
 }
 
-void GMGLGraphicEngine::beginBlend()
+void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 {
 	D(d);
 	GM_ASSERT(!d->isBlending); // 不能重复进行多次Blend
 	d->renderModeForBlend = GMGetRenderState(RENDER_MODE);
 	d->isBlending = true;
+	d->blendsfactor = sfactor;
+	d->blenddfactor = dfactor;
 	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
 }
 
@@ -661,4 +671,51 @@ void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()
 	glStencilMask(0xFF);
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glStencilMask(mask);
+}
+
+//////////////////////////////////////////////////////////////////////////
+void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
+{
+	GM_BEGIN_CHECK_GL_ERROR
+	GMS_BlendFunc gms_factors[] = {
+		sfactor,
+		dfactor
+	};
+	GLenum factors[2];
+
+	for (GMint i = 0; i < gm::GM_dimensions_of_array(gms_factors); i++)
+	{
+		switch (gms_factors[i])
+		{
+		case GMS_BlendFunc::ZERO:
+			factors[i] = GL_ZERO;
+			break;
+		case GMS_BlendFunc::ONE:
+			factors[i] = GL_ONE;
+			break;
+		case GMS_BlendFunc::SRC_COLOR:
+			factors[i] = GL_SRC_COLOR;
+			break;
+		case GMS_BlendFunc::DST_COLOR:
+			factors[i] = GL_DST_COLOR;
+			break;
+		case GMS_BlendFunc::SRC_ALPHA:
+			factors[i] = GL_SRC_ALPHA;
+			break;
+		case GMS_BlendFunc::DST_ALPHA:
+			factors[i] = GL_DST_ALPHA;
+			break;
+		case GMS_BlendFunc::ONE_MINUS_SRC_ALPHA:
+			factors[i] = GL_ONE_MINUS_SRC_ALPHA;
+			break;
+		case GMS_BlendFunc::ONE_MINUS_DST_COLOR:
+			factors[i] = GL_ONE_MINUS_DST_COLOR;
+			break;
+		default:
+			GM_ASSERT(false);
+			break;
+		}
+	}
+	glBlendFunc(factors[0], factors[1]);
+	GM_END_CHECK_GL_ERROR
 }

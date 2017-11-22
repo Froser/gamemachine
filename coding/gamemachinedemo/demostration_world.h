@@ -5,11 +5,6 @@
 #include <gm2dgameobject.h>
 #include <gmgl.h>
 
-namespace gm
-{
-	class GMCursorGameObject;
-}
-
 class DemostrationWorld;
 GM_PRIVATE_OBJECT(DemoHandler)
 {
@@ -47,7 +42,6 @@ GM_PRIVATE_OBJECT(DemostrationWorld)
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
-	gm::GMCursorGameObject* cursor = nullptr;
 };
 
 class DemostrationWorld : public gm::GMGameWorld
@@ -70,8 +64,6 @@ public:
 	void init();
 	void renderScene();
 	void switchDemo();
-	void setCursor(gm::GMCursorGameObject* cursor);
-	void renderCursor();
 };
 
 GM_PRIVATE_OBJECT(DemostrationEntrance)

@@ -4,7 +4,6 @@
 #include <string>
 #include "foundation/utilities/utilities.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
-#include <shader.h>
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include "gmdatacore/imagereader/gmimagereader.h"
 #include "gmdatacore/gamepackage/gmgamepackage.h"
