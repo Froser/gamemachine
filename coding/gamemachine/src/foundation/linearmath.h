@@ -558,6 +558,11 @@ namespace linear_math
 		inline operator Vector4*() { return &m_data[0]; }
 		inline operator const Vector4*() const { return &m_data[0]; }
 
+		// 表示矩阵的左乘
+		// 如程序中有:
+		// Matrix4x4 a, b;
+		// Matrix4x4 c = a * b;
+		// 在数学上表示 c = M(b) * M(a)
 		Matrix4x4 operator *(const Matrix4x4& left) const
 		{
 #if USE_SIMD
