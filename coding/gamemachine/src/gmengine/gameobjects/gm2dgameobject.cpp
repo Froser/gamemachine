@@ -448,6 +448,17 @@ void GMImage2DBorder::setTranslation(const linear_math::Matrix4x4& translation)
 	}
 }
 
+void GMImage2DBorder::setRotation(const linear_math::Quaternion& rotation)
+{
+	D(d);
+	size_t size = GM_array_size(d->objects);
+	for (GMuint i = 0; i < size; ++i)
+	{
+		if (d->objects[i])
+			d->objects[i]->setRotation(rotation);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 GMImage2DGameObject::~GMImage2DGameObject()
 {
@@ -584,6 +595,20 @@ void GMImage2DGameObject::setTranslation(const linear_math::Matrix4x4& translati
 		d->background->setTranslation(translation);
 	if (d->border.hasBorder())
 		d->border.setTranslation(translation);
+}
+
+void GMImage2DGameObject::setRotation(const linear_math::Quaternion& rotation)
+{
+	D(d);
+	Base::setRotation(rotation);
+	if (d->textModel)
+		d->textModel->setRotation(rotation);
+	if (d->textMask)
+		d->textMask->setRotation(rotation);
+	if (d->background)
+		d->background->setRotation(rotation);
+	if (d->border.hasBorder())
+		d->border.setRotation(rotation);
 }
 
 void GMImage2DGameObject::onCreateShader(GMShader& shader)

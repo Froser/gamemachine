@@ -97,11 +97,30 @@ void Demo_Button::initBorder()
 			d->demoWorld->addControl(button);
 		}
 
-		/*
-		newButton(1, border);
-		newButton(2, border);
-		newButton(3, border);
-		*/
+		{
+			gm::GMImage2DGameObject* button = newButton<2>(border, [=](gm::GMControlGameObjectAnimation* animation) {
+				gm::linear_math::Quaternion q;
+				q.setRotation(gm::linear_math::Vector3(1, 1, 1), 3.14f / 6.f);
+				animation->setRotation(q);
+			}).button;
+			gm::GMRect rect = { 50, 170, 400, 40 };
+			button->setGeometry(rect);
+			button->setText("This is a rotation button");
+			d->demoWorld->addControl(button);
+		}
+
+		{
+			gm::GMImage2DGameObject* button = newButton<3>(border, [=](gm::GMControlGameObjectAnimation* animation) {
+				gm::linear_math::Quaternion q;
+				q.setRotation(gm::linear_math::Vector3(1, 1, 1), 3.14f / 6.f);
+				animation->setRotation(q);
+				//animation->setScaling(gm::linear_math::Vector3(1.2f, 1.2f, 1.2f));
+			}).button;
+			gm::GMRect rect = { 50, 240, 400, 40 };
+			button->setGeometry(rect);
+			button->setText("This is a mixed button");
+			d->demoWorld->addControl(button);
+		}
 
 		GM_delete(border);
 	}

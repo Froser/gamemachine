@@ -26,7 +26,6 @@ private:
 GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
-	bool mouseReady = false;
 	bool detectingMode = false;
 	gm::IWindow* window;
 

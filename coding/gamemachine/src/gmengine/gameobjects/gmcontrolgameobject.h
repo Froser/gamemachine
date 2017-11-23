@@ -114,6 +114,7 @@ public:
 	virtual bool canDeferredRendering() override { return false; }
 	virtual void setScaling(const linear_math::Matrix4x4& scaling) override;
 	virtual void setTranslation(const linear_math::Matrix4x4& translation) override;
+	virtual void setRotation(const linear_math::Quaternion& rotation) override;
 
 public:
 	virtual void notifyControl();

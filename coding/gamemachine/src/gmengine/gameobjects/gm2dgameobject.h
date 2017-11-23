@@ -102,6 +102,7 @@ private:
 	virtual void draw();
 	virtual void setScaling(const linear_math::Matrix4x4& scaling);
 	virtual void setTranslation(const linear_math::Matrix4x4& translation);
+	virtual void setRotation(const linear_math::Quaternion& rotation);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -138,6 +139,7 @@ public:
 	virtual void draw() override;
 	virtual void setScaling(const linear_math::Matrix4x4& scaling) override;
 	virtual void setTranslation(const linear_math::Matrix4x4& translation) override;
+	virtual void setRotation(const linear_math::Quaternion& rotation) override;
 
 	//IPrimitiveCreatorShaderCallback
 protected:

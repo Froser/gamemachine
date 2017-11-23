@@ -100,6 +100,20 @@ void GMControlGameObject::setTranslation(const linear_math::Matrix4x4& translati
 	}
 }
 
+void GMControlGameObject::setRotation(const linear_math::Quaternion& rotation)
+{
+	D(d);
+	Base::setRotation(rotation);
+	// TODO translateGeometry(rotation);
+
+	if (d->stencil)
+		d->stencil->setRotation(rotation);
+	for (auto& child : d->children)
+	{
+		child->setRotation(rotation);
+	}
+}
+
 void GMControlGameObject::notifyControl()
 {
 	D(d);

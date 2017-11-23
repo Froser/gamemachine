@@ -72,7 +72,6 @@ void GMInput::setDetectingMode(bool enable)
 	{
 		const gm::GMRect& rect = GM.getGameMachineRunningStates().windowRect;
 		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
-		d->mouseReady = true;
 		::ShowCursor(FALSE);
 	}
 	else
@@ -194,26 +193,18 @@ gm::GMMouseState GMInput::mouseState()
 			state.trigger_button |= GMMouseButton_Middle;
 	}
 
-	if (!d->mouseReady)
+	if (d->detectingMode)
 	{
-		gm_error(_L("Mouse is not ready. Please call initMouse() first, "
-			"otherwise deltaX and deltaY won't be valid."));
+		gm::GMRect rect = d->window->getWindowRect();
+		const gm::GMint centerX = rect.x + rect.width / 2;
+		const gm::GMint centerY = rect.y + rect.height / 2;
+		::SetCursorPos(centerX, centerY);
+		state.deltaX = pos.x - centerX;
+		state.deltaY = pos.y - centerY;
 	}
 	else
 	{
-		if (d->detectingMode)
-		{
-			gm::GMRect rect = d->window->getWindowRect();
-			const gm::GMint centerX = rect.x + rect.width / 2;
-			const gm::GMint centerY = rect.y + rect.height / 2;
-			::SetCursorPos(centerX, centerY);
-			state.deltaX = pos.x - centerX;
-			state.deltaY = pos.y - centerY;
-		}
-		else
-		{
-			state.deltaX = state.deltaY = 0;
-		}
+		state.deltaX = state.deltaY = 0;
 	}
 	return state;
 }

@@ -82,9 +82,18 @@ void GMAnimation::update()
 				state.playingState = GMAnimationPlayingState::Deactivated;
 			}
 
-			auto p = state.interpolation(state.start, state.end, state.p);
-			linear_math::Matrix4x4 s = transformFunc[type](p);
-			transformFunSetList[type](d->object, s);
+			if (type != GMAnimationTypes::Rotation)
+			{
+				linear_math::Vector3 p = state.interpolation(state.start, state.end, state.p);
+				linear_math::Matrix4x4 s = transformFunc[type](p);
+				transformFunSetList[type](d->object, s);
+			}
+			else
+			{
+				linear_math::Quaternion p = state.interpolation_q(state.start_q, state.end_q, state.p);
+				gm_info("%f, %f, %f, %f", p[0], p[1], p[2], p[3]);
+				d->object->setRotation(p);
+			}
 		}
 		state.tick = now;
 	}
@@ -126,7 +135,7 @@ void GMAnimation::setTranslation(const linear_math::Vector3& translation, GMInte
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Translation];
 	state.interpolation = interpolation;
 	auto& translationMatrix = d->object->getTranslation();
-	GMfloat s[3];
+	GMfloat s[4];
 	linear_math::getTranslationFromMatrix(translationMatrix, s);
 	state.start[0] = s[0];
 	state.start[1] = s[1];
@@ -144,6 +153,25 @@ void GMAnimation::disableTranslation()
 	state.set = false;
 }
 
+void GMAnimation::setRotation(const linear_math::Quaternion& rotation, GMQuaternionInterpolation interpolation)
+{
+	D(d);
+	GMAnimationState& state = d->animationStates[GMAnimationTypes::Rotation];
+	state.interpolation_q = interpolation;
+	state.start_q = d->object->getRotation();
+	state.p = 0;
+	state.end_q = rotation;
+	state.direction = 1;
+	state.set = true;
+}
+
+void GMAnimation::disableRotation()
+{
+	D(d);
+	GMAnimationState& state = d->animationStates[GMAnimationTypes::Rotation];
+	state.set = false;
+}
+
 void GMAnimation::startAnimation(GMAnimationTypes::Types type)
 {
 	D(d);
@@ -156,6 +184,7 @@ void GMAnimation::startAnimation(GMAnimationTypes::Types type)
 	state.playingState = GMAnimationPlayingState::Activated;
 }
 
+//////////////////////////////////////////////////////////////////////////
 GMControlGameObjectAnimation::GMControlGameObjectAnimation(GMControlGameObject* object)
 	: GMAnimation(object)
 {
