@@ -445,6 +445,7 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 	D(d);
 	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
 	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+	d->framebuffer.releaseBind();
 	forwardRender(objects, count);
 	GMSetRenderState(RENDER_MODE, renderMode);
 }

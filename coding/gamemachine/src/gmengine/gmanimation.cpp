@@ -13,24 +13,27 @@ GMAnimation::GMAnimation(GMGameObject* object)
 void GMAnimation::start()
 {
 	D(d);
-	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+	if (d->canStart)
 	{
-		GMAnimationState& state = d->animationStates[type];
-		if (state.set && d->canStart)
-			startAnimation(type);
+		GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+		{
+			GMAnimationState& state = d->animationStates[type];
+			if (state.set)
+				startAnimation(type);
+		}
 	}
 }
 
 void GMAnimation::reverse()
 {
 	D(d);
-	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+	if (d->canReverse)
 	{
-		GMAnimationState& state = d->animationStates[type];
-		if (d->canReverse)
+		GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
 		{
-			state.direction = -1;
-			d->canResume = true;
+			GMAnimationState& state = d->animationStates[type];
+				state.direction = -1;
+				d->canResume = true;
 		}
 	}
 }
@@ -38,11 +41,13 @@ void GMAnimation::reverse()
 void GMAnimation::resume()
 {
 	D(d);
-	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+	if (d->canResume)
 	{
-		GMAnimationState& state = d->animationStates[type];
-		if (d->canResume)
+		GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
+		{
+			GMAnimationState& state = d->animationStates[type];
 			startAnimation(type);
+		}
 	}
 }
 

@@ -43,7 +43,7 @@ set(SOURCES
 		gmdatacore/imagebuffer.cpp
 		gmdatacore/gmmodel.h
 		gmdatacore/gmmodel.cpp
-		gmdatacore/shader.h
+		gmdatacore/gmshader.h
 		gmengine/gmassets.h
 		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h
