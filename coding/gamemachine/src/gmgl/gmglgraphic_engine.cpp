@@ -663,18 +663,6 @@ void GMGLGraphicEngine::endBlend()
 	d->isBlending = false;
 }
 
-void GMGLGraphicEngine::beginFullRendering()
-{
-	D(d);
-	d->framebuffer.setUseFullscreenFramebuffer(true);
-}
-
-void GMGLGraphicEngine::endFullRendering()
-{
-	D(d);
-	d->framebuffer.setUseFullscreenFramebuffer(false);
-}
-
 void GMGLGraphicEngine::newFrameOnCurrentFramebuffer()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -699,7 +687,7 @@ void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 	};
 	GLenum factors[2];
 
-	for (GMint i = 0; i < gm::GM_dimensions_of_array(gms_factors); i++)
+	for (GMint i = 0; i < GM_array_size(gms_factors); i++)
 	{
 		switch (gms_factors[i])
 		{

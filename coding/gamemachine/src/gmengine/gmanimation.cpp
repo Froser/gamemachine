@@ -10,29 +10,15 @@ GMAnimation::GMAnimation(GMGameObject* object)
 	d->object = object;
 }
 
-bool GMAnimation::canStart()
-{
-	D(d);
-	return d->animationStates[GMAnimationTypes::Scaling].canStart
-		&& d->animationStates[GMAnimationTypes::Translation].canStart;
-}
-
 void GMAnimation::start()
 {
 	D(d);
 	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
 	{
 		GMAnimationState& state = d->animationStates[type];
-		if (state.canStart)
+		if (state.set && d->canStart)
 			startAnimation(type);
 	}
-}
-
-bool GMAnimation::canReverse()
-{
-	D(d);
-	return d->animationStates[GMAnimationTypes::Scaling].canReverse
-		&& d->animationStates[GMAnimationTypes::Translation].canReverse;
 }
 
 void GMAnimation::reverse()
@@ -41,10 +27,10 @@ void GMAnimation::reverse()
 	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
 	{
 		GMAnimationState& state = d->animationStates[type];
-		if (state.canReverse)
+		if (d->canReverse)
 		{
 			state.direction = -1;
-			state.canResume = true;
+			d->canResume = true;
 		}
 	}
 }
@@ -55,16 +41,9 @@ void GMAnimation::resume()
 	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
 	{
 		GMAnimationState& state = d->animationStates[type];
-		if (state.canResume)
+		if (d->canResume)
 			startAnimation(type);
 	}
-}
-
-bool GMAnimation::canResume()
-{
-	D(d);
-	return d->animationStates[GMAnimationTypes::Scaling].canResume
-		&& d->animationStates[GMAnimationTypes::Translation].canResume;
 }
 
 void GMAnimation::update()
@@ -92,14 +71,14 @@ void GMAnimation::update()
 			if (state.p >= 1.f)
 			{
 				state.p = 1.f;
-				state.canReverse = true;
-				state.canResume = state.canStart = false;
+				d->canReverse = true;
+				d->canResume = d->canStart = false;
 			}
 			else if (state.p < 0)
 			{
 				state.p = 0;
-				state.canResume = state.canReverse = false;
-				state.canStart = true;
+				d->canResume = d->canReverse = false;
+				d->canStart = true;
 				state.playingState = GMAnimationPlayingState::Deactivated;
 			}
 
@@ -172,8 +151,8 @@ void GMAnimation::startAnimation(GMAnimationTypes::Types type)
 	state.tick = GM.getGameTimeSeconds();
 	state.direction = 1;
 
-	state.canReverse = state.canResume = true;
-	state.canStart = false;
+	d->canReverse = d->canResume = true;
+	d->canStart = false;
 	state.playingState = GMAnimationPlayingState::Activated;
 }
 

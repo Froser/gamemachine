@@ -150,8 +150,8 @@ using Deque = std::deque<T>;
 #if !_MSC_VER
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
-STATIC_ASSERT_SIZE(WORD, 2);
-STATIC_ASSERT_SIZE(DWORD, 4);
+GM_STATIC_ASSERT_SIZE(WORD, 2);
+GM_STATIC_ASSERT_SIZE(DWORD, 4);
 #endif
 
 BEGIN_NS
@@ -178,12 +178,13 @@ typedef int64_t GMLargeInteger;
 typedef GMint GMFontSizePt;
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
-#define STATIC_ASSERT_SIZE(type, size) static_assert(sizeof(type) == size, "Type '" #type "' size static assert failed. Excepted size is " #size);
-STATIC_ASSERT_SIZE(GMbyte, 1);
-STATIC_ASSERT_SIZE(GMint, 4);
-STATIC_ASSERT_SIZE(GMuint, 4);
-STATIC_ASSERT_SIZE(GMfloat, 4);
-STATIC_ASSERT_SIZE(GMLargeInteger, 8);
+#define GM_STATIC_ASSERT static_assert
+#define GM_STATIC_ASSERT_SIZE(type, size) GM_STATIC_ASSERT(sizeof(type) == size, "Type '" #type "' size static assert failed. Excepted size is " #size);
+GM_STATIC_ASSERT_SIZE(GMbyte, 1);
+GM_STATIC_ASSERT_SIZE(GMint, 4);
+GM_STATIC_ASSERT_SIZE(GMuint, 4);
+GM_STATIC_ASSERT_SIZE(GMfloat, 4);
+GM_STATIC_ASSERT_SIZE(GMLargeInteger, 8);
 
 // 常用函数和工具、常量
 struct GMRect
@@ -251,6 +252,7 @@ inline void GM_delete_array(T*& o)
 #define SWAP(a, b) { auto t = a; a = b; b = t; }
 
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
+#define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )
 
 END_NS
 

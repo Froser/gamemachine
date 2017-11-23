@@ -380,7 +380,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		GMAsset texture;
 	} _cb(d->texture);
 
-	for (GMint i = 0; i < GM_dimensions_of_array(d->models); ++i)
+	for (GMint i = 0; i < GM_array_size(d->models); ++i)
 	{
 		// 创建在中心的边框
 		GMPrimitiveCreator::createQuad(extents[i], &center[i][0],
@@ -429,7 +429,7 @@ void GMImage2DBorder::draw()
 void GMImage2DBorder::setScaling(const linear_math::Matrix4x4& scaling)
 {
 	D(d);
-	size_t size = GM_dimensions_of_array(d->objects);
+	size_t size = GM_array_size(d->objects);
 	for (GMuint i = 0; i < size; ++i)
 	{
 		if (d->objects[i])
@@ -440,7 +440,7 @@ void GMImage2DBorder::setScaling(const linear_math::Matrix4x4& scaling)
 void GMImage2DBorder::setTranslation(const linear_math::Matrix4x4& translation)
 {
 	D(d);
-	size_t size = GM_dimensions_of_array(d->objects);
+	size_t size = GM_array_size(d->objects);
 	for (GMuint i = 0; i < size; ++i)
 	{
 		if (d->objects[i])

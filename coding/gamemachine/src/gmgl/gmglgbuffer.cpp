@@ -273,25 +273,6 @@ void GMGLFramebuffer::dispose()
 		glDeleteRenderbuffers(1, &d->depthBuffer);
 		d->depthBuffer = 0;
 	}
-
-	if (d->fullscreenFbo)
-	{
-		glDeleteFramebuffers(1, &d->fullscreenFbo);
-		d->fullscreenFbo = 0;
-	}
-
-	if (d->fullscreenTexture)
-	{
-		glDeleteTextures(1, &d->fullscreenTexture);
-		d->fullscreenTexture = 0;
-	}
-
-	if (d->fullscreenDepthBuffer)
-	{
-		glDeleteRenderbuffers(1, &d->fullscreenDepthBuffer);
-		d->fullscreenDepthBuffer = 0;
-	}
-
 }
 
 bool GMGLFramebuffer::init(const GMRect& clientRect)
@@ -344,44 +325,6 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 		releaseBind();
 	}
 
-	{
-		// 全屏framebuffer
-		glGenFramebuffers(1, &d->fullscreenFbo);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fullscreenFbo);
-		glGenTextures(1, &d->fullscreenTexture);
-		glBindTexture(GL_TEXTURE_2D, d->fullscreenTexture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->clientRect.width, d->clientRect.height, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, d->fullscreenTexture, 0);
-
-		GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, attachments);
-
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
-		{
-			gm_error("FB incomplete error, status: 0x%x\n", status);
-			return false;
-		}
-
-		glGenRenderbuffers(1, &d->fullscreenDepthBuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, d->fullscreenDepthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, d->clientRect.width, d->clientRect.height);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->fullscreenDepthBuffer);
-		GM_CHECK_GL_ERROR();
-		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
-		{
-			gm_error("FB incomplete error, status: 0x%x\n", status);
-			return false;
-		}
-
-		releaseBind();
-	}
-
 	GM_END_CHECK_GL_ERROR
 	return true;
 }
@@ -390,10 +333,7 @@ void GMGLFramebuffer::beginDrawEffects()
 {
 	D(d);
 	d->effects = GMGetRenderState(EFFECTS);
-	if (d->useFullscreenFramebuffer)
-		GMEngine->setViewport(d->clientRect);
-	else
-		GMEngine->setViewport(d->viewport);
+	GMEngine->setViewport(d->viewport);
 	d->hasBegun = true;
 	newFrame();
 	bindForWriting();
@@ -449,27 +389,20 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 
 GLuint GMGLFramebuffer::framebuffer()
 {
-	return fbo();
-}
-
-GLuint GMGLFramebuffer::fbo()
-{
 	D(d);
-	if (d->useFullscreenFramebuffer)
-		return d->fullscreenFbo;
 	return d->fbo;
 }
 
 void GMGLFramebuffer::bindForWriting()
 {
 	D(d);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo());
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer());
 }
 
 void GMGLFramebuffer::bindForReading()
 {
 	D(d);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo());
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer());
 }
 
 void GMGLFramebuffer::releaseBind()
@@ -558,10 +491,7 @@ const char* GMGLFramebuffer::useShaderProgramAndApplyEffect(GMGLShaderProgram* p
 	program->setInt(GMSHADER_FRAMEBUFFER, 0);
 	GM_CHECK_GL_ERROR();
 	glActiveTexture(GL_TEXTURE0);
-	if (d->useFullscreenFramebuffer)
-		glBindTexture(GL_TEXTURE_2D, d->fullscreenTexture);
-	else
-		glBindTexture(GL_TEXTURE_2D, d->texture);
+	glBindTexture(GL_TEXTURE_2D, d->texture);
 	GM_CHECK_GL_ERROR();
 
 	for (auto iter = std::begin(s_effects_uniformNames); iter != std::end(s_effects_uniformNames); ++iter)

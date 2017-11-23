@@ -91,9 +91,6 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	GLuint depthBuffer = 0;
 	GLuint quadVAO = 0;
 	GLuint quadVBO = 0;
-	GLuint fullscreenFbo = 0;
-	GLuint fullscreenTexture = 0;
-	GLuint fullscreenDepthBuffer = 0;
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMfloat sampleOffsets[2] = { 0 };
@@ -101,7 +98,6 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	bool hasBegun = false;
 	GMRect clientRect = { 0 };
 	GMRect viewport = { 0 };
-	bool useFullscreenFramebuffer = false;
 };
 
 class GMGLFramebuffer : public GMObject
@@ -125,12 +121,10 @@ public:
 
 public:
 	inline bool hasBegun() { D(d); return d->hasBegun; }
-	inline void setUseFullscreenFramebuffer(bool b) { D(d); d->useFullscreenFramebuffer = b; }
 	inline GMuint getWidth() { D(d); return d->renderWidth; }
 	inline GMuint getHeight() { D(d); return d->renderHeight; }
 
 private:
-	GLuint fbo();
 	void newFrame();
 	void createQuad();
 	void turnOffBlending();

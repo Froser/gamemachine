@@ -10,11 +10,21 @@ namespace gm
 	class GMControlGameObjectAnimation;
 }
 
+struct Button
+{
+	gm::GMImage2DGameObject* button = nullptr;
+	gm::GMControlGameObjectAnimation* animation = nullptr;
+};
+
 GM_PRIVATE_OBJECT(Demo_Button)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
-	gm::GMControlGameObjectAnimation* buttonAnimation = nullptr;
+	gm::GMAsset border;
+	gm::GMRect textureGeo;
+	Button buttons[4];
 };
+
+typedef std::function<void(gm::GMControlGameObjectAnimation*)> AnimationAction;
 
 class Demo_Button : public DemoHandler
 {
@@ -29,6 +39,10 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
+
+private:
+	void initBorder();
+	template <gm::GMint idx> Button& newButton(gm::GMImage* border, const AnimationAction& onHoverAction);
 };
 
 #endif

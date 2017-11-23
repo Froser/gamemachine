@@ -38,9 +38,6 @@ GM_ALIGNED_STRUCT(GMAnimationState)
 	GMint direction = 1;
 	GMInterpolation interpolation;
 	GMAnimationPlayingState playingState = GMAnimationPlayingState::Deactivated;
-	bool canStart = true;
-	bool canReverse = false;
-	bool canResume = false;
 	bool set = false;
 };
 
@@ -49,6 +46,9 @@ GM_PRIVATE_OBJECT(GMAnimation)
 	GMAnimationState animationStates[GMAnimationTypes::EndType];
 	GMGameObject* object = nullptr;
 	GMfloat duration = 0;
+	bool canStart = true;
+	bool canReverse = false;
+	bool canResume = false;
 };
 
 class GMAnimation : public GMObject
@@ -59,11 +59,11 @@ public:
 	GMAnimation(GMGameObject* object);
 
 public:
-	virtual bool canStart();
+	inline virtual bool canStart() { D(d); return d->canStart; }
 	virtual void start();
-	virtual bool canReverse();
+	inline virtual bool canReverse() { D(d); return d->canReverse; }
 	virtual void reverse();
-	virtual bool canResume();
+	inline virtual bool canResume() { D(d); return d->canResume; }
 	virtual void resume();
 	virtual void update();
 

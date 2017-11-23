@@ -541,12 +541,5 @@ struct GMConvertion
 	static bool hexToRGB(const GMString& hex, GMfloat rgb[3]);
 };
 
-// traits
-template <typename T, GMint size>
-constexpr GMint GM_dimensions_of_array(T(&)[size])
-{
-	return size;
-}
-
 END_NS
 #endif

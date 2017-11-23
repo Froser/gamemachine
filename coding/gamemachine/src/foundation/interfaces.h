@@ -102,8 +102,6 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void endUseStencil() = 0;
 	virtual void beginBlend(GMS_BlendFunc sfactor = GMS_BlendFunc::ONE, GMS_BlendFunc dfactor = GMS_BlendFunc::ONE) = 0;
 	virtual void endBlend() = 0;
-	virtual void beginFullRendering() = 0;
-	virtual void endFullRendering() = 0;
 };
 
 enum class GMDrawMode
