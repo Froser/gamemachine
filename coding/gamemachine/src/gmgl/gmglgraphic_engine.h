@@ -93,7 +93,7 @@ public:
 	virtual void start() override;
 	virtual void newFrame() override;
 	virtual bool event(const GameMachineMessage& e) override;
-	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;
 	virtual void updateCameraView(const CameraLookAt& lookAt) override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights();
@@ -135,6 +135,7 @@ public:
 	}
 
 private:
+	void directDraw(GMGameObject *objects[], GMuint count);
 	void refreshForwardRenderLights();
 	void refreshDeferredRenderLights();
 	void createDeferredRenderQuad();

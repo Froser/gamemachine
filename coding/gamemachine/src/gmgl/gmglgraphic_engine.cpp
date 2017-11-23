@@ -137,7 +137,7 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 	return true;
 }
 
-void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
+void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode)
 {
 	D(d);
 	GM_PROFILE(drawObjects);
@@ -148,42 +148,49 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	++d->drawingLevel;
 #endif
 
-	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
-	if (renderMode != d->renderMode)
+	if (bufferMode == GMBufferMode::NoFramebuffer)
 	{
-		d->needRefreshLights = true;
-		d->renderMode = renderMode;
-	}
-
-	if (renderMode == GMStates_RenderOptions::FORWARD)
-	{
-		refreshForwardRenderLights();
-
-		{
-			GMEffectRenderer effectRender(d->framebuffer, d->effectsShader);
-			forwardRender(objects, count);
-		}
+		directDraw(objects, count);
 	}
 	else
 	{
-		GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
-		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
-		groupGameObjects(objects, count);
-
-		d->gbuffer.adjustViewport();
-		geometryPass(d->deferredRenderingGameObjects);
-
+		GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
+		if (renderMode != d->renderMode)
 		{
-			GMEffectRenderer effectRender(d->framebuffer, d->effectsShader);
-
-			lightPass();
-			d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
-			GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
-			drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-			GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::DEFERRED);
+			d->needRefreshLights = true;
+			d->renderMode = renderMode;
 		}
 
-		viewGBufferFrameBuffer();
+		if (renderMode == GMStates_RenderOptions::FORWARD)
+		{
+			refreshForwardRenderLights();
+
+			{
+				GMEffectRenderer effectRender(d->framebuffer, d->effectsShader);
+				forwardRender(objects, count);
+			}
+		}
+		else
+		{
+			GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
+			// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
+			groupGameObjects(objects, count);
+
+			d->gbuffer.adjustViewport();
+			geometryPass(d->deferredRenderingGameObjects);
+
+			{
+				GMEffectRenderer effectRender(d->framebuffer, d->effectsShader);
+
+				lightPass();
+				d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
+				GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+				drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), bufferMode);
+				GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::DEFERRED);
+			}
+
+			viewGBufferFrameBuffer();
+		}
 	}
 
 #if _DEBUG
@@ -431,6 +438,15 @@ void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 
 	camera.getFrustum().updateViewMatrix(d->viewMatrix, d->projectionMatrix);
 	camera.getFrustum().update();
+}
+
+void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
+	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+	forwardRender(objects, count);
+	GMSetRenderState(RENDER_MODE, renderMode);
 }
 
 void GMGLGraphicEngine::refreshForwardRenderLights()

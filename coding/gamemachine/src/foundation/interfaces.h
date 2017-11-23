@@ -79,13 +79,19 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
+enum class GMBufferMode
+{
+	Normal,
+	NoFramebuffer,
+};
+
 class GMLight;
 GM_INTERFACE(IGraphicEngine)
 {
 	virtual void start() = 0;
 	virtual void newFrame() = 0;
 	virtual bool event(const GameMachineMessage& e) = 0;
-	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode = GMBufferMode::Normal) = 0;
 	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
 	virtual void addLight(const GMLight& light) = 0;
 	virtual void removeLights() = 0;

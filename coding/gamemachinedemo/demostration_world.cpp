@@ -138,7 +138,7 @@ void DemostrationWorld::init()
 {
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
-	//创建鼠标
+	//创建光标
 	gm::GMCursorGameObject* cursor = new gm::GMCursorGameObject(32, 32);
 	gm::GMBuffer cursorBuf;
 	bool b = package->readFile(gm::GMPackageIndex::Textures, "cursor.png", &cursorBuf);

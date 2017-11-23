@@ -764,9 +764,7 @@ void GMCursorGameObject::drawCursor()
 	if (d->enabled)
 	{
 		IGraphicEngine* engine = GM.getGraphicEngine();
-		engine->beginBlend(GMS_BlendFunc::ONE, GMS_BlendFunc::ONE);
-		engine->drawObjects(d->ptr, 1);
-		engine->endBlend();
+		engine->drawObjects(d->ptr, 1, GMBufferMode::NoFramebuffer);
 	}
 }
 
