@@ -8,7 +8,9 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius)
 	D(d);
 	d->radius = radius;
 	d->moveDirection = MC_NONE;
-	d->state = { 0 };
+	d->state.position = glm::vec3(0);
+	d->state.pitch = 0;
+	d->state.yaw = 0;
 	d->moveRate.clear();
 	clearMoveArgs();
 	d->pitchLimitRadius = HALF_PI - RAD(3);
@@ -34,7 +36,7 @@ void GMSpriteGameObject::moveLeftOrRight(bool left)
 	d->moveCmdArgLR = GMCommandVector3(left, moveRate, USELESS_PARAM);
 }
 
-void GMSpriteGameObject::setJumpSpeed(const linear_math::Vector3& jumpSpeed)
+void GMSpriteGameObject::setJumpSpeed(const glm::vec3& jumpSpeed)
 {
 	D(d);
 	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);

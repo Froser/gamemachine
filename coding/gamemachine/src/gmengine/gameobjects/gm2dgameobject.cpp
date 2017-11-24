@@ -344,7 +344,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 			TO_VIEWPORT_Y(-(d->cornerHeight + pos_middle_h) / 2)
 		};
 
-		linear_math::Vector4 center[9] = {
+		glm::vec4 center[9] = {
 			{ col[0], row[0], 0, 1 },
 			{ col[0], row[1], 0, 1 },
 			{ col[0], row[2], 0, 1 },
@@ -357,8 +357,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		};
 
 		// 把所有边框坐标移到中心（4）
-		linear_math::Matrix4x4 translation = linear_math::translate(
-			linear_math::Vector3(TO_VIEWPORT_X(-half_border_width), TO_VIEWPORT_Y(half_border_height), 0)
+		glm::mat4 translation = glm::translate(
+			glm::vec3(TO_VIEWPORT_X(-half_border_width), TO_VIEWPORT_Y(half_border_height), 0)
 		);
 	END_GEOMETRY_TO_VIEWPORT()
 
@@ -399,8 +399,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 			geometry.y + geometry.height / 2
 		};
 
-		d->objects[i]->setTranslation(linear_math::translate(
-			linear_math::Vector3(
+		d->objects[i]->setTranslation(glm::translate(
+			glm::vec3(
 				centerPosition[0] * 2 / window.width - 1,
 				1 - centerPosition[1] * 2 / window.height,
 				0))
@@ -426,7 +426,7 @@ void GMImage2DBorder::draw()
 	drawObjects(d->objects);
 }
 
-void GMImage2DBorder::setScaling(const linear_math::Matrix4x4& scaling)
+void GMImage2DBorder::setScaling(const glm::mat4& scaling)
 {
 	D(d);
 	size_t size = GM_array_size(d->objects);
@@ -437,7 +437,7 @@ void GMImage2DBorder::setScaling(const linear_math::Matrix4x4& scaling)
 	}
 }
 
-void GMImage2DBorder::setTranslation(const linear_math::Matrix4x4& translation)
+void GMImage2DBorder::setTranslation(const glm::mat4& translation)
 {
 	D(d);
 	size_t size = GM_array_size(d->objects);
@@ -448,7 +448,7 @@ void GMImage2DBorder::setTranslation(const linear_math::Matrix4x4& translation)
 	}
 }
 
-void GMImage2DBorder::setRotation(const linear_math::Quaternion& rotation)
+void GMImage2DBorder::setRotation(const glm::quat& rotation)
 {
 	D(d);
 	size_t size = GM_array_size(d->objects);
@@ -569,7 +569,7 @@ void GMImage2DGameObject::draw()
 	}
 }
 
-void GMImage2DGameObject::setScaling(const linear_math::Matrix4x4& scaling)
+void GMImage2DGameObject::setScaling(const glm::mat4& scaling)
 {
 	D(d);
 	Base::setScaling(scaling);
@@ -583,7 +583,7 @@ void GMImage2DGameObject::setScaling(const linear_math::Matrix4x4& scaling)
 		d->border.setScaling(scaling);
 }
 
-void GMImage2DGameObject::setTranslation(const linear_math::Matrix4x4& translation)
+void GMImage2DGameObject::setTranslation(const glm::mat4& translation)
 {
 	D(d);
 	Base::setTranslation(translation);
@@ -597,7 +597,7 @@ void GMImage2DGameObject::setTranslation(const linear_math::Matrix4x4& translati
 		d->border.setTranslation(translation);
 }
 
-void GMImage2DGameObject::setRotation(const linear_math::Quaternion& rotation)
+void GMImage2DGameObject::setRotation(const glm::quat& rotation)
 {
 	D(d);
 	Base::setRotation(rotation);
@@ -826,6 +826,6 @@ void GMCursorGameObject::update()
 		GMMouseState ms = mouseState.mouseState();
 		GMRect rect = { ms.posX + db->geometry.width / 2, ms.posY + db->geometry.height / 2 };
 		GMRectF coord = toViewportCoord(rect);
-		setTranslation(linear_math::translate(linear_math::Vector3(coord.x, coord.y, 0)));
+		setTranslation(glm::translate(glm::vec3(coord.x, coord.y, 0)));
 	}
 }

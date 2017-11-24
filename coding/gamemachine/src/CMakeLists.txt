@@ -8,7 +8,10 @@ include_directories(
 		../../3rdparty/freetype-2.8.1/include
 		../../3rdparty/libmad
 		../../3rdparty/lua/src
+		../../3rdparty/glm-0.9.9-a2
 	)
+
+init_solution()
 
 set(SOURCES
 		stdafx.cpp

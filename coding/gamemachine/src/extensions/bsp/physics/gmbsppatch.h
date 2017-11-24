@@ -20,7 +20,7 @@ class GMBSPPatch : public GMObject
 public:
 	void alloc(GMint num);
 	GMBSP_Physics_Patch* patches(GMint at);
-	void generatePatchCollide(GMint index, GMint width, GMint height, const linear_math::Vector3* points, AUTORELEASE GMBSP_Physics_Patch* patch);
+	void generatePatchCollide(GMint index, GMint width, GMint height, const glm::vec3* points, AUTORELEASE GMBSP_Physics_Patch* patch);
 };
 
 END_NS

@@ -48,8 +48,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
-	linear_math::Matrix4x4 viewMatrix;
-	linear_math::Matrix4x4 projectionMatrix;
+	glm::mat4 viewMatrix;
+	glm::mat4 projectionMatrix;
 
 	GMGLGBuffer gbuffer;
 	GMGLFramebuffer framebuffer;

@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <utilities.h>
 #include <gmmodel.h>
+#include <linearmath.h>
 
 BEGIN_NS
 
@@ -11,10 +12,10 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
-	linear_math::Matrix4x4 scaling = linear_math::Matrix4x4::identity();
-	linear_math::Matrix4x4 translation = linear_math::Matrix4x4::identity();
-	linear_math::Quaternion rotation = linear_math::Quaternion::identity();
-	linear_math::Matrix4x4 transformMatrix = linear_math::Matrix4x4::identity();
+	glm::mat4 scaling = glm::identity<glm::mat4>();
+	glm::mat4 translation = glm::identity<glm::mat4>();
+	glm::quat rotation = glm::identity<glm::quat>();
+	glm::mat4 transformMatrix = glm::identity<glm::mat4>();
 
 	bool canDeferredRendering = true;
 };
@@ -52,16 +53,19 @@ public:
 	virtual bool canDeferredRendering();
 
 private:
-	inline void updateMatrix() { D(d); d->transformMatrix = d->translation * d->rotation.toMatrix() * d->scaling; }
+	inline void updateMatrix() { 
+		//D(d); d->transformMatrix = d->translation * d->rotation.toMatrix() * d->scaling; 
+		//#warning todo
+	}
 
 public:
-	inline virtual void setScaling(const linear_math::Matrix4x4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
-	inline virtual void setTranslation(const linear_math::Matrix4x4& translation) { D(d); d->translation = translation; updateMatrix(); }
-	inline virtual void setRotation(const linear_math::Quaternion& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
-	inline const linear_math::Matrix4x4& getTransform() { D(d); return d->transformMatrix; }
-	inline const linear_math::Matrix4x4& getScaling() { D(d); return d->scaling; }
-	inline const linear_math::Matrix4x4& getTranslation() { D(d); return d->translation; }
-	inline const linear_math::Quaternion& getRotation() { D(d); return d->rotation; }
+	inline virtual void setScaling(const glm::mat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
+	inline virtual void setTranslation(const glm::mat4& translation) { D(d); d->translation = translation; updateMatrix(); }
+	inline virtual void setRotation(const glm::quat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
+	inline const glm::mat4& getTransform() { D(d); return d->transformMatrix; }
+	inline const glm::mat4& getScaling() { D(d); return d->scaling; }
+	inline const glm::mat4& getTranslation() { D(d); return d->translation; }
+	inline const glm::quat& getRotation() { D(d); return d->rotation; }
 
 	// events
 private:
@@ -73,7 +77,7 @@ enum { EntityPlaneNum = 6 };
 
 GM_PRIVATE_OBJECT(GMEntityObject)
 {
-	linear_math::Vector3 mins, maxs;
+	glm::vec3 mins, maxs;
 	GMPlane planes[EntityPlaneNum];
 };
 
@@ -88,7 +92,7 @@ public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
 
 	GMPlane* getPlanes();
-	void getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs);
+	void getBounds(REF glm::vec3& mins, REF glm::vec3& maxs);
 
 private:
 	void calc();
@@ -98,8 +102,8 @@ private:
 // GMSkyObject
 GM_PRIVATE_OBJECT(GMSkyGameObject)
 {
-	linear_math::Vector3 min;
-	linear_math::Vector3 max;
+	glm::vec3 min;
+	glm::vec3 max;
 	GMShader shader;
 };
 
@@ -108,7 +112,7 @@ class GMSkyGameObject : public GMGameObject
 	DECLARE_PRIVATE(GMSkyGameObject)
 
 public:
-	GMSkyGameObject(const GMShader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max);
+	GMSkyGameObject(const GMShader& shader, const glm::vec3& min, const glm::vec3& max);
 	~GMSkyGameObject();
 
 private:

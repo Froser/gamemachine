@@ -28,7 +28,7 @@ void Demo_Texture::init()
 		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.setCull(gm::GMS_Cull::CULL);
-			shader.getMaterial().kd = gm::linear_math::Vector3(1, 1, 1);
+			shader.getMaterial().kd = glm::vec3(1, 1, 1);
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
 			auto& container = world->getAssets();

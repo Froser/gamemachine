@@ -8,8 +8,8 @@
 GMGameObject::GMGameObject()
 {
 	D(d);
-	d->scaling = linear_math::Matrix4x4::identity();
-	d->translation = linear_math::Matrix4x4::identity();
+	d->scaling = glm::identity<glm::mat4>();
+	d->translation = glm::identity<glm::mat4>();
 }
 
 GMGameObject::GMGameObject(GMAsset asset)
@@ -65,7 +65,7 @@ void GMGameObject::draw()
 	if (coreObj)
 	{
 		GMfloat transform[16];
-		getTransform().toArray(transform);
+		glm::copyToArray(getTransform(), transform);
 		coreObj->getPainter()->draw(transform);
 	}
 }
@@ -96,7 +96,7 @@ GMPlane* GMEntityObject::getPlanes()
 	return d->planes;
 }
 
-void GMEntityObject::getBounds(REF linear_math::Vector3& mins, REF linear_math::Vector3& maxs)
+void GMEntityObject::getBounds(REF glm::vec3& mins, REF glm::vec3& maxs)
 {
 	D(d);
 	mins = d->mins;
@@ -133,56 +133,56 @@ void GMEntityObject::makePlanes()
 {
 	D(d);
 	// 前
-	d->planes[0] = GMPlane(linear_math::Vector3(0, 0, 1), -d->maxs[2]);
+	d->planes[0] = GMPlane(glm::vec3(0, 0, 1), -d->maxs[2]);
 	// 后
-	d->planes[1] = GMPlane(linear_math::Vector3(0, 0, -1), d->mins[2]);
+	d->planes[1] = GMPlane(glm::vec3(0, 0, -1), d->mins[2]);
 	// 左
-	d->planes[2] = GMPlane(linear_math::Vector3(-1, 0, 0), d->mins[0]);
+	d->planes[2] = GMPlane(glm::vec3(-1, 0, 0), d->mins[0]);
 	// 右
-	d->planes[3] = GMPlane(linear_math::Vector3(1, 0, 0), -d->maxs[0]);
+	d->planes[3] = GMPlane(glm::vec3(1, 0, 0), -d->maxs[0]);
 	// 上
-	d->planes[4] = GMPlane(linear_math::Vector3(0, 1, 0), -d->maxs[0]);
+	d->planes[4] = GMPlane(glm::vec3(0, 1, 0), -d->maxs[0]);
 	// 下
-	d->planes[5] = GMPlane(linear_math::Vector3(0, -1, 0), d->mins[0]);
+	d->planes[5] = GMPlane(glm::vec3(0, -1, 0), d->mins[0]);
 }
 
 // 天空
 
-static linear_math::Vector2 uvs[24] = {
-	linear_math::Vector2(0, 0),
-	linear_math::Vector2(0, 1),
-	linear_math::Vector2(1, 1),
-	linear_math::Vector2(1, 0),
+static glm::vec2 uvs[24] = {
+	glm::vec2(0, 0),
+	glm::vec2(0, 1),
+	glm::vec2(1, 1),
+	glm::vec2(1, 0),
 
-	linear_math::Vector2(0, 0),
-	linear_math::Vector2(0, 1),
-	linear_math::Vector2(1, 1),
-	linear_math::Vector2(1, 0),
+	glm::vec2(0, 0),
+	glm::vec2(0, 1),
+	glm::vec2(1, 1),
+	glm::vec2(1, 0),
 
-	linear_math::Vector2(0, 0),
-	linear_math::Vector2(0, 1),
-	linear_math::Vector2(1, 1),
-	linear_math::Vector2(1, 0),
+	glm::vec2(0, 0),
+	glm::vec2(0, 1),
+	glm::vec2(1, 1),
+	glm::vec2(1, 0),
 
-	linear_math::Vector2(0, 0),
-	linear_math::Vector2(0, 1),
-	linear_math::Vector2(1, 1),
-	linear_math::Vector2(1, 0),
+	glm::vec2(0, 0),
+	glm::vec2(0, 1),
+	glm::vec2(1, 1),
+	glm::vec2(1, 0),
 
-	linear_math::Vector2(0, 0),
-	linear_math::Vector2(0, 1),
-	linear_math::Vector2(1, 1),
-	linear_math::Vector2(1, 0),
+	glm::vec2(0, 0),
+	glm::vec2(0, 1),
+	glm::vec2(1, 1),
+	glm::vec2(1, 0),
 
 	/*
-	linear_math::Vector2(0, 0),
-	linear_math::Vector2(0, 1),
-	linear_math::Vector2(1, 1),
-	linear_math::Vector2(1, 0),
+	glm::vec2(0, 0),
+	glm::vec2(0, 1),
+	glm::vec2(1, 1),
+	glm::vec2(1, 0),
 	*/
 };
 
-GMSkyGameObject::GMSkyGameObject(const GMShader& shader, const linear_math::Vector3& min, const linear_math::Vector3& max)
+GMSkyGameObject::GMSkyGameObject(const GMShader& shader, const glm::vec3& min, const glm::vec3& max)
 {
 	D(d);
 	d->shader = shader;
@@ -206,58 +206,59 @@ GMSkyGameObject::~GMSkyGameObject()
 void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 {
 	D(d);
-	linear_math::Vector3 vertices[20] = {
+	glm::vec3 vertices[20] = {
 		//Front
-		linear_math::Vector3(d->min[0], d->max[1], d->max[2]),
-		linear_math::Vector3(d->min[0], d->min[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->min[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->max[1], d->max[2]),
+		glm::vec3(d->min[0], d->max[1], d->max[2]),
+		glm::vec3(d->min[0], d->min[1], d->max[2]),
+		glm::vec3(d->max[0], d->min[1], d->max[2]),
+		glm::vec3(d->max[0], d->max[1], d->max[2]),
 
 		//Back
-		linear_math::Vector3(d->min[0], d->max[1], d->min[2]),
-		linear_math::Vector3(d->min[0], d->min[1], d->min[2]),
-		linear_math::Vector3(d->max[0], d->min[1], d->min[2]),
-		linear_math::Vector3(d->max[0], d->max[1], d->min[2]),
+		glm::vec3(d->min[0], d->max[1], d->min[2]),
+		glm::vec3(d->min[0], d->min[1], d->min[2]),
+		glm::vec3(d->max[0], d->min[1], d->min[2]),
+		glm::vec3(d->max[0], d->max[1], d->min[2]),
 
 		//Left
-		linear_math::Vector3(d->min[0], d->max[1], d->min[2]),
-		linear_math::Vector3(d->min[0], d->max[1], d->max[2]),
-		linear_math::Vector3(d->min[0], d->min[1], d->max[2]),
-		linear_math::Vector3(d->min[0], d->min[1], d->min[2]),
+		glm::vec3(d->min[0], d->max[1], d->min[2]),
+		glm::vec3(d->min[0], d->max[1], d->max[2]),
+		glm::vec3(d->min[0], d->min[1], d->max[2]),
+		glm::vec3(d->min[0], d->min[1], d->min[2]),
 
 		//Right
-		linear_math::Vector3(d->max[0], d->max[1], d->min[2]),
-		linear_math::Vector3(d->max[0], d->max[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->min[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->min[1], d->min[2]),
+		glm::vec3(d->max[0], d->max[1], d->min[2]),
+		glm::vec3(d->max[0], d->max[1], d->max[2]),
+		glm::vec3(d->max[0], d->min[1], d->max[2]),
+		glm::vec3(d->max[0], d->min[1], d->min[2]),
 
 		//Up
-		linear_math::Vector3(d->min[0], d->max[1], d->min[2]),
-		linear_math::Vector3(d->min[0], d->max[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->max[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->max[1], d->min[2]),
+		glm::vec3(d->min[0], d->max[1], d->min[2]),
+		glm::vec3(d->min[0], d->max[1], d->max[2]),
+		glm::vec3(d->max[0], d->max[1], d->max[2]),
+		glm::vec3(d->max[0], d->max[1], d->min[2]),
 
 		//Down
 		/*
-		linear_math::Vector3(d->min[0], d->min[1], d->min[2]),
-		linear_math::Vector3(d->min[0], d->min[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->min[1], d->max[2]),
-		linear_math::Vector3(d->max[0], d->min[1], d->min[2]),
+		glm::vec3(d->min[0], d->min[1], d->min[2]),
+		glm::vec3(d->min[0], d->min[1], d->max[2]),
+		glm::vec3(d->max[0], d->min[1], d->max[2]),
+		glm::vec3(d->max[0], d->min[1], d->min[2]),
 		*/
 	};
 
 	// Scaling surface
 	const GMint SCALING = 2;
-	linear_math::Vector3 center = (d->min + d->max) / 2;
-	linear_math::Matrix4x4 transScale = linear_math::scale(linear_math::Vector3(SCALING, 1, SCALING));
+	glm::vec3 center = (d->min + d->max) / 2.f;
+	glm::mat4 transScale = glm::scale(glm::vec3(SCALING, 1, SCALING));
 	for (GMuint i = 0; i < 20; i++)
 	{
-		linear_math::Matrix4x4 transRestore = linear_math::translate(center);
-		linear_math::Matrix4x4 transMoveToAxisOrigin = linear_math::translate(-center);
-		linear_math::Matrix4x4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
+		glm::mat4 transRestore = glm::translate(center);
+		glm::mat4 transMoveToAxisOrigin = glm::translate(-center);
+		//#warning todo
+		glm::mat4 transFinal = transRestore;// *transScale * transMoveToAxisOrigin;
 
-		linear_math::Vector4 pt = linear_math::Vector4(vertices[i], 1) * transFinal;
-		vertices[i] = linear_math::Vector3(pt[0], pt[1], pt[2]);
+		glm::vec4 pt = glm::vec4(vertices[i], 1) * transFinal;
+		vertices[i] = glm::vec3(pt[0], pt[1], pt[2]);
 	}
 
 	GMModel* object = new GMModel();

@@ -198,20 +198,20 @@ void GMGLRenders_3D::activateLights(const GMLight* lights, GMint count)
 	shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
-void GMGLRenders_3D::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
+void GMGLRenders_3D::updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
 
 	// P
-	shaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, projection.data());
+	shaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(projection));
 
 	// 视觉位置，用于计算光照
 	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
 	shaderProgram->setMatrix4(GMSHADER_VIEW_POSITION, vec);
 
 	// V
-	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
+	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(view));
 }
 
 GMGLShaderProgram* GMGLRenders_3D::getShaderProgram()

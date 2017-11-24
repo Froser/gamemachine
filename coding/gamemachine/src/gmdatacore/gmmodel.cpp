@@ -183,18 +183,18 @@ void GMMesh::calculateTangentSpace()
 			// 每一个多边形拥有一个切线空间，这意味着多于3个点的多边形需要共面，否则切线空间会有问题
 			GMint o = component->getOffsetPtr()[i];
 
-			linear_math::Vector3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
-			linear_math::Vector3 e1(d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)], d->positions[VERTEX_OFFSET(o, 6)]);
-			linear_math::Vector3 e2(d->positions[VERTEX_OFFSET(o, 8)], d->positions[VERTEX_OFFSET(o, 9)], d->positions[VERTEX_OFFSET(o, 10)]);
+			glm::vec3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
+			glm::vec3 e1(d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)], d->positions[VERTEX_OFFSET(o, 6)]);
+			glm::vec3 e2(d->positions[VERTEX_OFFSET(o, 8)], d->positions[VERTEX_OFFSET(o, 9)], d->positions[VERTEX_OFFSET(o, 10)]);
 
-			linear_math::Vector2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
-			linear_math::Vector2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);
-			linear_math::Vector2 uv2(d->uvs[UV_OFFSET(o, 4)], d->uvs[UV_OFFSET(o, 5)]);
+			glm::vec2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
+			glm::vec2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);
+			glm::vec2 uv2(d->uvs[UV_OFFSET(o, 4)], d->uvs[UV_OFFSET(o, 5)]);
 
-			linear_math::Vector3 E1 = e1 - e0;
-			linear_math::Vector3 E2 = e2 - e0;
-			linear_math::Vector2 deltaUV1 = uv1 - uv0;
-			linear_math::Vector2 deltaUV2 = uv2 - uv0;
+			glm::vec3 E1 = e1 - e0;
+			glm::vec3 E2 = e2 - e0;
+			glm::vec2 deltaUV1 = uv1 - uv0;
+			glm::vec2 deltaUV2 = uv2 - uv0;
 
 			GMfloat s = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);
 
@@ -209,8 +209,8 @@ void GMMesh::calculateTangentSpace()
 				s * (deltaUV1[0] * E2[2] - deltaUV2[0] * E1[2])
 			};
 
-			linear_math::Vector3 tangentVector = linear_math::normalize(linear_math::Vector3(tangents[0], tangents[1], tangents[2]));
-			linear_math::Vector3 bitangentVector = linear_math::normalize(linear_math::Vector3(bitangents[0], bitangents[1], bitangents[2]));
+			glm::vec3 tangentVector = glm::fastNormalize(glm::vec3(tangents[0], tangents[1], tangents[2]));
+			glm::vec3 bitangentVector = glm::fastNormalize(glm::vec3(bitangents[0], bitangents[1], bitangents[2]));
 
 			GMint verticesCount = component->getPrimitiveVerticesCountPtr()[i];
 			for (GMint j = 0; j < verticesCount; j++)

@@ -3,7 +3,7 @@
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmglshaderprogram.h"
 
-void GMGLRenders_2D::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
+void GMGLRenders_2D::updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt)
 {
 	D(d);
 	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };

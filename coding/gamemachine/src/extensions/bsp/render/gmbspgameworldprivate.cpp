@@ -49,12 +49,12 @@ void import_info_player_deathmatch(const GMBSPEntity& entity, GMBSPGameWorld* wo
 		}
 	}
 
-	linear_math::Vector3 playerStart (origin[0], origin[2], -origin[1]);
+	glm::vec3 playerStart (origin[0], origin[2], -origin[1]);
 
 	GMSpriteGameObject* sprite = new GMSpriteGameObject(6);
 	world->addObjectAndInit(sprite);
 	sprite->setMoveSpeed(192);
-	sprite->setJumpSpeed(linear_math::Vector3(0, 150, 0));
+	sprite->setJumpSpeed(glm::vec3(0, 150, 0));
 
 	GMMotionProperties& prop = world->physicsWorld()->find(sprite)->motions;
 	prop.translation = playerStart;

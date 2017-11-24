@@ -45,19 +45,19 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 	GMint vertexCountThisTurn = mesh->get_transferred_positions_byte_size() / sizeof(GMModel::DataType) / particleCount / GMModel::PositionDimension;
 	for (GMint offset = 0; offset < vertexCountThisTurn; ++offset)
 	{
-		linear_math::Vector4 basePositionVector(
+		glm::vec4 basePositionVector(
 			*(basePositions + offset * 4 + 0),
 			*(basePositions + offset * 4 + 1),
 			*(basePositions + offset * 4 + 2),
 			*(basePositions + offset * 4 + 3)
 		);
-		linear_math::Vector4 transformedPosition = basePositionVector * d->transform;
+		glm::vec4 transformedPosition = basePositionVector * d->transform;
 		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
-		linear_math::copyVector(transformedPosition, (GMfloat*)(vertexData + offset_position) + offset * 4);
+		glm::copyToArray(transformedPosition, (GMfloat*)(vertexData + offset_position) + offset * 4);
 
 		//更新颜色
 		GM_ASSERT((GMLargeInteger)(vertexData + color_offset + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
-		linear_math::copyVector(d->color, (GMfloat*)(vertexData + color_offset) + offset * 4);
+		glm::copyToArray(d->color, (GMfloat*)(vertexData + color_offset) + offset * 4);
 	}
 }
 
@@ -245,7 +245,7 @@ void GMParticlesEmitter::onAppendingObjectToWorld()
 	setParticlesHandler(this);
 	for (GMint i = 0; i < d->emitterProps.particleCount; i++)
 	{
-		d->particleProps[i].direction = linear_math::normalize(d->particleProps[i].direction);
+		d->particleProps[i].direction = glm::fastNormalize(d->particleProps[i].direction);
 		d->particleProps[i].startupPosition = d->emitterProps.position;
 	}
 
@@ -295,31 +295,37 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
-	GMfloat size = linear_math::lerp(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
+	GMfloat size = glm::lerp(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
 	
-	linear_math::Matrix4x4 transform;
+	glm::mat4 transform;
 	if (d->particleProps[index].visible)
 	{
 		if (d->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			transform = linear_math::translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
-				* linear_math::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
-				* linear_math::scale(linear_math::Vector3(size));
+			//#warning todo
+				/*
+			transform = glm::translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
+				* glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::scale(glm::vec3(size));
+				*/
 		}
 		else
 		{
-			transform = linear_math::translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
-				* linear_math::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
-				* linear_math::scale(linear_math::Vector3(size));
+			//#warning todo
+				/*
+			transform = glm::translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
+				* glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::scale(glm::vec3(size));
+				*/
 		}
 	}
 	else
 	{
-		transform = linear_math::Matrix4x4(0, 0, 0, 0);
+		transform = glm::mat4(0);
 	}
 	particle->setTransform(transform);
 
-	linear_math::Vector4 currentColor = linear_math::lerp(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
+	glm::vec4 currentColor = glm::lerp(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
 
 	reduceLife(particle);
@@ -404,13 +410,13 @@ void GMLerpParticleEmitter::create(
 	GMfloat life,
 	GMfloat startSize,
 	GMfloat endSize,
-	const linear_math::Vector3& emitterPosition,
-	const linear_math::Vector3& startDirectionRange,
-	const linear_math::Vector3& endDirectionRange,
-	const linear_math::Vector4& startColor,
-	const linear_math::Vector4& endColor,
-	const linear_math::Quaternion& startAngle,
-	const linear_math::Quaternion& endAngle,
+	const glm::vec3& emitterPosition,
+	const glm::vec3& startDirectionRange,
+	const glm::vec3& endDirectionRange,
+	const glm::vec4& startColor,
+	const glm::vec4& endColor,
+	const glm::quat& startAngle,
+	const glm::quat& endAngle,
 	GMfloat emissionRate,
 	GMfloat speed,
 	GMint emissionTimes,
@@ -430,23 +436,22 @@ void GMLerpParticleEmitter::create(
 	{
 		if (count == 1)
 		{
-			particleProps[i].direction = linear_math::normalize(
-				linear_math::normalize(startDirectionRange) + linear_math::normalize(endDirectionRange) / 2
+			particleProps[i].direction = glm::fastNormalize(
+				glm::fastNormalize(startDirectionRange) + glm::fastNormalize(endDirectionRange) / 2.f
 			);
 		}
 		else
 		{
-			linear_math::Vector3 normalStart = linear_math::normalize(startDirectionRange),
-				normalEnd = linear_math::normalize(endDirectionRange);
-			linear_math::Vector3 axis = linear_math::normalize(linear_math::cross(normalStart, normalEnd));
-			GMfloat theta = linear_math::dot(normalStart, normalEnd);
-			linear_math::Quaternion qStart, qEnd;
-			qStart.setRotation(axis, 0);
-			qEnd.setRotation(axis, gmAcos(theta));
+			glm::vec3 normalStart = glm::fastNormalize(startDirectionRange),
+				normalEnd = glm::fastNormalize(endDirectionRange);
+			glm::vec3 axis = glm::fastNormalize(glm::cross(normalStart, normalEnd));
+			GMfloat theta = glm::dot(normalStart, normalEnd);
+			glm::quat qStart = glm::rotate(glm::identity<glm::quat>(), 0.f, axis),
+				qEnd = glm::rotate(glm::identity<glm::quat>(), gmAcos(theta), axis);
 
-			linear_math::Quaternion interpolation = linear_math::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
-			linear_math::Vector4 transformed = linear_math::toHomogeneous(normalStart) * interpolation.toMatrix();
-			particleProps[i].direction = linear_math::toInhomogeneous(transformed);
+			glm::quat interpolation = glm::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
+			glm::vec4 transformed = glm::toHomogeneous(normalStart) * glm::mat4_cast(interpolation);
+			particleProps[i].direction = glm::toInhomogeneous(transformed);
 		}
 
 		particleProps[i].life = life;
@@ -469,14 +474,14 @@ void GMRadiusParticlesEmitter::create(
 	GMfloat life,
 	GMfloat startSize,
 	GMfloat endSize,
-	const linear_math::Vector3& rotateAxis,
+	const glm::vec3& rotateAxis,
 	GMfloat angularVelocity,
-	const linear_math::Vector3& emitterPosition,
-	const linear_math::Vector3& direction,
-	const linear_math::Vector4& startColor,
-	const linear_math::Vector4& endColor,
-	const linear_math::Quaternion& startAngle,
-	const linear_math::Quaternion& endAngle,
+	const glm::vec3& emitterPosition,
+	const glm::vec3& direction,
+	const glm::vec4& startColor,
+	const glm::vec4& endColor,
+	const glm::quat& startAngle,
+	const glm::quat& endAngle,
 	GMfloat emissionRate,
 	GMfloat speed,
 	GMint emissionTimes,
@@ -496,7 +501,7 @@ void GMRadiusParticlesEmitter::create(
 	e->data()->currentAngles = new GMfloat[count];
 	for (GMint i = 0; i < count; i++)
 	{
-		particleProps[i].direction = linear_math::normalize(direction);
+		particleProps[i].direction = glm::fastNormalize(direction);
 		particleProps[i].life = life;
 		particleProps[i].startAngle = startAngle;
 		particleProps[i].endAngle = endAngle;
@@ -507,7 +512,7 @@ void GMRadiusParticlesEmitter::create(
 	}
 
 	e->setAngularVelocity(angularVelocity);
-	e->setRotateAxis(linear_math::normalize(rotateAxis));
+	e->setRotateAxis(glm::fastNormalize(rotateAxis));
 	e->setEmitterProperties(emitterProps);
 	e->setParticlesProperties(particleProps);
 	*emitter = e;
@@ -525,35 +530,40 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
-	GMfloat size = linear_math::lerp(db->particleProps[index].startSize, db->particleProps[index].endSize, percentage);
-	linear_math::Quaternion rotation;
-	rotation.setRotation(d->rotateAxis, d->currentAngles[index]);
+	GMfloat size = glm::lerp(db->particleProps[index].startSize, db->particleProps[index].endSize, percentage);
+	glm::quat rotation = glm::rotate(glm::identity<glm::quat>(), d->currentAngles[index], d->rotateAxis);
 
-	linear_math::Matrix4x4 transform;
+	glm::mat4 transform;
 	if (db->particleProps[index].visible)
 	{
-		linear_math::Vector4 rotatedDirection = linear_math::toHomogeneous(db->particleProps[index].direction) * rotation.toMatrix();
+		glm::vec4 rotatedDirection = glm::toHomogeneous(db->particleProps[index].direction) * glm::mat4_cast(rotation);
 		
 		if (db->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			transform = linear_math::translate(db->particleProps[index].startupPosition + linear_math::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
-				* linear_math::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
-				* linear_math::scale(linear_math::Vector3(size));
+			//#warning todo
+				/*
+			transform = glm::translate(db->particleProps[index].startupPosition + glm::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				* glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::scale(glm::vec3(size));
+				*/
 		}
 		else
 		{
-			transform = linear_math::translate(db->emitterProps.position + linear_math::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
-				* linear_math::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
-				* linear_math::scale(linear_math::Vector3(size));
+			//#warning todo
+				/*
+			transform = glm::translate(db->emitterProps.position + glm::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				* glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::scale(glm::vec3(size));
+				*/
 		}
 	}
 	else
 	{
-		transform = linear_math::Matrix4x4(0, 0, 0, 0);
+		transform = glm::mat4(0);
 	}
 	particle->setTransform(transform);
 
-	linear_math::Vector4 currentColor = linear_math::lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
+	glm::vec4 currentColor = glm::lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
 
 	reduceLife(particle);

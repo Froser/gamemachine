@@ -7,6 +7,7 @@ include_directories(
 		../3rdparty/glew/include
 		../3rdparty/glew
 		../3rdparty/zlib
+		../3rdparty/glm-0.9.9-a2
 		../3rdparty/duilib
 		../3rdparty/lua/src
 		../gamemachine/include

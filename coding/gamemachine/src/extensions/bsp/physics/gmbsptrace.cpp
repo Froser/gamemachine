@@ -11,14 +11,14 @@
 BEGIN_NS
 GM_ALIGNED_STRUCT(GMBSPTraceWork)
 {
-	linear_math::Vector3 start{ 0 };
-	linear_math::Vector3 end{ 0 };
-	linear_math::Vector3 size[2]{ 0 };	// size of the box being swept through the model
-	linear_math::Vector3 offsets[8]{ 0 };	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
+	glm::vec3 start = glm::vec3(0);
+	glm::vec3 end = glm::vec3(0);
+	glm::vec3 size[2] = { glm::vec3(0), glm::vec3(0) };	// size of the box being swept through the model
+	glm::vec3 offsets[8] = { glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0), glm::vec3(0) };	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
 	GMfloat maxOffset = 0;	// longest corner length from origin
-	linear_math::Vector3 extents{ 0 };	// greatest of abs(size[0]) and abs(size[1])
-	linear_math::Vector3 bounds[2]{ 0 };	// enclosing box of start and end surrounding by size
-	linear_math::Vector3 modelOrigin{ 0 };// origin of the model tracing through
+	glm::vec3 extents{ 0 };	// greatest of abs(size[0]) and abs(size[1])
+	glm::vec3 bounds[2] = { glm::vec3(0), glm::vec3(0) };	// enclosing box of start and end surrounding by size
+	glm::vec3 modelOrigin = glm::vec3(0);// origin of the model tracing through
 	GMint contents = 0; // ored contents of the model tracing through
 	bool isPoint = false; // optimized case
 	BSPTraceResult trace; // returned from trace call
@@ -43,7 +43,7 @@ min: 物体包围盒最小向量
 max: 物体包围盒最大向量
 trace: 返回的碰撞跟踪结果
 */
-void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vector3& end, const linear_math::Vector3& origin, const linear_math::Vector3& min, const linear_math::Vector3& max, REF BSPTraceResult& trace)
+void GMBSPTrace::trace(const glm::vec3& start, const glm::vec3& end, const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max, REF BSPTraceResult& trace)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
@@ -61,7 +61,7 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 
 	tw.contents = 1; //TODO brushmask
 
-	linear_math::Vector3 offset = (min + max) * 0.5;
+	glm::vec3 offset = (min + max) * 0.5f;
 	tw.size[0] = min - offset;
 	tw.size[1] = max - offset;
 	tw.start = start + offset;
@@ -130,7 +130,7 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 		}
 	}
 
-	if (linear_math::equals(start, end))
+	if (start == end)
 	{
 		/*
 		if (model) {
@@ -155,7 +155,7 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 		if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0)
 		{
 			tw.isPoint = true;
-			tw.extents = linear_math::Vector3(0);
+			tw.extents = glm::vec3(0);
 		}
 		else {
 			tw.isPoint = false;
@@ -180,11 +180,11 @@ void GMBSPTrace::trace(const linear_math::Vector3& start, const linear_math::Vec
 	// Otherwise, the normal on the plane should have unit length
 	GM_ASSERT(tw.trace.allsolid ||
 		tw.trace.fraction == 1.0 ||
-		linear_math::lengthSquare(tw.trace.plane.normal) > 0.9999f);
+		glm::lengthSquare(tw.trace.plane.normal) > 0.9999f);
 	trace = tw.trace;
 }
 
-void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const linear_math::Vector3& p1, const linear_math::Vector3& p2)
+void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const glm::vec3& p1, const glm::vec3& p2)
 {
 	D(d);
 	BSPData& bsp = *d->bsp;
@@ -224,8 +224,8 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 		offset = tw.extents[plane->planeType];
 	}
 	else {
-		t1 = linear_math::dot(plane->normal, p1) + dist;
-		t2 = linear_math::dot(plane->normal, p2) + dist;
+		t1 = glm::dot(plane->normal, p1) + dist;
+		t2 = glm::dot(plane->normal, p2) + dist;
 		if (tw.isPoint) {
 			offset = 0;
 		}
@@ -276,7 +276,7 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	}
 
 	GMfloat midf;
-	linear_math::Vector3 mid;
+	glm::vec3 mid;
 	midf = p1f + (p2f - p1f)*frac;
 
 	mid = p1 + frac*(p2 - p1);
@@ -367,8 +367,8 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 	GMint j, hit, hitnum;
 	GMfloat offset, enterFrac, leaveFrac, t;
 	GMBSPPatchPlane* planes;
-	linear_math::Vector4 plane, bestplane;
-	linear_math::Vector3 startp, endp;
+	glm::vec4 plane, bestplane;
+	glm::vec3 startp, endp;
 
 	if (!boundsIntersect(tw.bounds[0], tw.bounds[1],
 		pc->bounds[0], pc->bounds[1])) {
@@ -396,7 +396,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			plane[3] += tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			t = linear_math::dot(VEC3(plane), tw.sphere.offset);
+			t = glm::dot(glm::toInhomogeneous(plane), tw.sphere.offset);
 			if (t > 0.0f) {
 				startp = tw.start - tw.sphere.offset;
 				endp = tw.end - tw.sphere.offset;
@@ -408,7 +408,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 		}
 		else
 		{
-			offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(plane));
+			offset = glm::dot(tw.offsets[planes->signbits], glm::toInhomogeneous(plane));
 			plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
@@ -434,7 +434,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 				plane[3] += tw.sphere.radius;
 
 				// find the closest point on the capsule to the plane
-				t = linear_math::dot(VEC3(plane), tw.sphere.offset);
+				t = glm::dot(glm::toInhomogeneous(plane), tw.sphere.offset);
 				if (t > 0.0f) {
 					startp = tw.start - tw.sphere.offset;
 					endp = tw.end - tw.sphere.offset;
@@ -447,7 +447,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			else
 			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
-				offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(plane));
+				offset = glm::dot(tw.offsets[planes->signbits], glm::toInhomogeneous(plane));
 				plane[3] -= fabs(offset);
 				startp = tw.start;
 			}
@@ -478,7 +478,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 				}
 
 				tw.trace.fraction = enterFrac;
-				tw.trace.plane.normal = VEC3(bestplane);
+				tw.trace.plane.normal = glm::toInhomogeneous(bestplane);
 				tw.trace.plane.intercept = bestplane[3];
 			}
 		}
@@ -501,7 +501,7 @@ void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity
 			for (GMint i = 0; i < EntityPlaneNum; i++)
 			{
 				// 首先判断起点和终点是否在AABB中，如果没有，肯定没有接触到entity
-				linear_math::Vector3 mins, maxs;
+				glm::vec3 mins, maxs;
 				obj->getBounds(mins, maxs);
 				if (!boundsIntersect(tw.bounds[0], tw.bounds[1], mins, maxs))
 					continue;
@@ -527,9 +527,9 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 	GMint i = 0;
 	for (const auto& plane : planes)
 	{
-		offset = linear_math::dot(tw.offsets[plane.signbits], VEC3(plane.plane));
-		d1 = linear_math::dot(tw.start, VEC3(plane.plane)) - plane.plane[3] + offset;
-		d2 = linear_math::dot(tw.end, VEC3(plane.plane)) - plane.plane[3] + offset;
+		offset = glm::dot(tw.offsets[plane.signbits], glm::toInhomogeneous(plane.plane));
+		d1 = glm::dot(tw.start, glm::toInhomogeneous(plane.plane)) - plane.plane[3] + offset;
+		d2 = glm::dot(tw.end, glm::toInhomogeneous(plane.plane)) - plane.plane[3] + offset;
 		if (d1 <= 0)
 			frontFacing[i] = 0;
 		else
@@ -581,9 +581,9 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 			const GMBSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
 
 			// calculate intersection with a slight pushoff
-			offset = linear_math::dot(tw.offsets[planes->signbits], VEC3(planes->plane));
-			d1 = linear_math::dot(tw.start, VEC3(planes->plane)) - planes->plane[3] + offset;
-			d2 = linear_math::dot(tw.end, VEC3(planes->plane)) - planes->plane[3] + offset;
+			offset = glm::dot(tw.offsets[planes->signbits], glm::toInhomogeneous(planes->plane));
+			d1 = glm::dot(tw.start, glm::toInhomogeneous(planes->plane)) - planes->plane[3] + offset;
+			d2 = glm::dot(tw.end, glm::toInhomogeneous(planes->plane)) - planes->plane[3] + offset;
 			tw.trace.fraction = (d1 - SURFACE_CLIP_EPSILON) / (d1 - d2);
 
 			if (tw.trace.fraction < 0)
@@ -591,20 +591,20 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 				tw.trace.fraction = 0;
 			}
 
-			tw.trace.plane.normal = VEC3(planes->plane);
+			tw.trace.plane.normal = glm::toInhomogeneous(planes->plane);
 			tw.trace.plane.intercept = planes->plane[3];
 		}
 	}
 }
 
-GMint GMBSPTrace::checkFacetPlane(const linear_math::Vector4& plane, const linear_math::Vector3& start, const linear_math::Vector3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
+GMint GMBSPTrace::checkFacetPlane(const glm::vec4& plane, const glm::vec3& start, const glm::vec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit)
 {
 	float d1, d2, f;
 
 	*hit = false;
 
-	d1 = linear_math::dot(start, linear_math::Vector3(plane[0], plane[1], plane[2])) + plane[3];
-	d2 = linear_math::dot(end, linear_math::Vector3(plane[0], plane[1], plane[2])) + plane[3];
+	d1 = glm::dot(start, glm::vec3(plane[0], plane[1], plane[2])) + plane[3];
+	d2 = glm::dot(end, glm::vec3(plane[0], plane[1], plane[2])) + plane[3];
 
 	// if completely in front of face, no intersection with the entire facet
 	if (d1 > 0 && (d2 >= SURFACE_CLIP_EPSILON || d2 >= d1)) {
@@ -656,7 +656,7 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 	GMfloat f = 0;
 	GMfloat enterFrac = -1.0;
 	GMfloat leaveFrac = 1.0;
-	linear_math::Vector3 startp, endp;
+	glm::vec3 startp, endp;
 
 	if (tw.sphere.use)
 	{
@@ -668,7 +668,7 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 			GMfloat dist = plane->intercept - tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			GMfloat t = linear_math::dot(plane->normal, tw.sphere.offset);
+			GMfloat t = glm::dot(plane->normal, tw.sphere.offset);
 			if (t > 0)
 			{
 				startp = tw.start - tw.sphere.offset;
@@ -680,8 +680,8 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 				endp = tw.end + tw.sphere.offset;
 			}
 
-			GMfloat d1 = linear_math::dot(startp, plane->normal) + dist;
-			GMfloat d2 = linear_math::dot(endp, plane->normal) + dist;
+			GMfloat d1 = glm::dot(startp, plane->normal) + dist;
+			GMfloat d2 = glm::dot(endp, plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -735,11 +735,11 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 			plane = &pw.planes[side->side->planeNum];
 
 			// adjust the plane distance apropriately for mins/maxs
-			GMfloat bound = linear_math::dot(tw.offsets[plane->signbits], plane->normal);
+			GMfloat bound = glm::dot(tw.offsets[plane->signbits], plane->normal);
 			GMfloat dist = plane->intercept + bound;
 
-			GMfloat d1 = linear_math::dot(tw.start, plane->normal) + dist;
-			GMfloat d2 = linear_math::dot(tw.end, plane->normal) + dist;
+			GMfloat d1 = glm::dot(tw.start, plane->normal) + dist;
+			GMfloat d2 = glm::dot(tw.end, plane->normal) + dist;
 
 			if (d2 > 0) {
 				getout = true;	// endpoint is not in solid
@@ -809,7 +809,7 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 	}
 }
 
-bool GMBSPTrace::boundsIntersect(const linear_math::Vector3& mins, const linear_math::Vector3& maxs, const linear_math::Vector3& mins2, const linear_math::Vector3& maxs2)
+bool GMBSPTrace::boundsIntersect(const glm::vec3& mins, const glm::vec3& maxs, const glm::vec3& mins2, const glm::vec3& maxs2)
 {
 	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
 		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||

@@ -1,5 +1,6 @@
 ﻿#ifndef __INTERFACES_H__
 #define __INTERFACES_H__
+#include <glm/fwd.hpp>
 #include <input.h>
 #include <gmenums.h>
 
@@ -29,11 +30,6 @@ struct GraphicSettings;
 struct CameraLookAt;
 struct IDebugOutput;
 struct IAudioPlayer;
-
-namespace linear_math
-{
-	class Matrix4x4;
-}
 
 enum class GameMachineEvent
 {
@@ -116,7 +112,7 @@ GM_INTERFACE(IRender)
 	virtual void beginShader(GMShader& shader, GMDrawMode mode) = 0;
 	virtual void endShader() = 0;
 	virtual void end() = 0;
-	virtual void updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt) = 0;
+	virtual void updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt) = 0;
 	virtual void activateLights(const GMLight* lights, GMint count) = 0;
 };
 

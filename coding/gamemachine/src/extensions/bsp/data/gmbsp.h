@@ -50,7 +50,7 @@ enum GMBSPSurfaceType
 };
 
 typedef GMPlane BSPPlane;
-typedef linear_math::Vector3 BSPVector3;
+typedef glm::vec3 BSPVector3;
 
 // BSP file struct
 struct GMBSPLump
@@ -193,10 +193,10 @@ struct GMBSPDrawVertices
 
 GM_ALIGNED_STRUCT(BSPLightVolumes)
 {
-	linear_math::Vector3 lightVolOrigin;
-	linear_math::Vector3 lightVolSize;
-	linear_math::Vector3 lightVolInverseSize;
-	linear_math::Vector3 lightVolBounds;
+	glm::vec3 lightVolOrigin;
+	glm::vec3 lightVolSize;
+	glm::vec3 lightVolInverseSize;
+	glm::vec3 lightVolBounds;
 	GMbyte* volData;
 };
 

@@ -209,11 +209,11 @@ enum PointPosition
 
 struct GMPlane : public GMObject, public GMAlignmentObject
 {
-	GMPlane() : normal(linear_math::Vector3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
+	GMPlane() : normal(glm::vec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{
 	}
 
-	GMPlane(const linear_math::Vector3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
+	GMPlane(const glm::vec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
 	{
 	}
 
@@ -230,22 +230,22 @@ struct GMPlane : public GMObject, public GMAlignmentObject
 		return *this;
 	}
 
-	void setNormal(const linear_math::Vector3 & rhs) { normal = rhs; }
+	void setNormal(const glm::vec3 & rhs) { normal = rhs; }
 	void setIntercept(GMfloat newIntercept) { intercept = newIntercept; }
-	void setFromPoints(const linear_math::Vector3 & p0, const linear_math::Vector3 & p1, const linear_math::Vector3 & p2);
+	void setFromPoints(const glm::vec3 & p0, const glm::vec3 & p1, const glm::vec3 & p2);
 
-	void calculateIntercept(const linear_math::Vector3 & pointOnPlane) { intercept = -linear_math::dot(normal, pointOnPlane); }
+	void calculateIntercept(const glm::vec3 & pointOnPlane) { intercept = -glm::dot(normal, pointOnPlane); }
 
 	void normalize(void);
 
-	linear_math::Vector3 getNormal() { return normal; }
+	glm::vec3 getNormal() { return normal; }
 	GMfloat getIntercept() { return intercept; }
 
 	//find point of intersection of 3 planes
-	bool intersect3(const GMPlane & p2, const GMPlane & p3, linear_math::Vector3 & result);
+	bool intersect3(const GMPlane & p2, const GMPlane & p3, glm::vec3 & result);
 
-	GMfloat getDistance(const linear_math::Vector3 & point) const;
-	PointPosition classifyPoint(const linear_math::Vector3 & point) const;
+	GMfloat getDistance(const glm::vec3 & point) const;
+	PointPosition classifyPoint(const glm::vec3 & point) const;
 
 	GMPlane lerp(const GMPlane & p2, GMfloat factor);
 
@@ -261,7 +261,7 @@ struct GMPlane : public GMObject, public GMAlignmentObject
 	GMPlane operator+(void) const { return (*this); }
 
 	//member variables
-	linear_math::Vector3 normal;	//X.N+intercept=0
+	glm::vec3 normal;	//X.N+intercept=0
 	GMfloat intercept;
 };
 
@@ -295,8 +295,8 @@ GM_PRIVATE_OBJECT(GMFrustum)
 	GMfloat n;
 	GMfloat f;
 
-	linear_math::Matrix4x4 viewMatrix;
-	linear_math::Matrix4x4 projMatrix;
+	glm::mat4 viewMatrix;
+	glm::mat4 projMatrix;
 };
 
 class GMFrustum : public GMObject
@@ -310,10 +310,10 @@ public:
 
 public:
 	void update();
-	bool isPointInside(const linear_math::Vector3& point);
-	bool isBoundingBoxInside(const linear_math::Vector3* vertices);
-	linear_math::Matrix4x4 getPerspective();
-	void updateViewMatrix(linear_math::Matrix4x4& viewMatrix, linear_math::Matrix4x4& projMatrix);
+	bool isPointInside(const glm::vec3& point);
+	bool isBoundingBoxInside(const glm::vec3* vertices);
+	glm::mat4 getPerspective();
+	void updateViewMatrix(glm::mat4& viewMatrix, glm::mat4& projMatrix);
 };
 
 //Scanner
@@ -445,20 +445,20 @@ public:
 //Camera
 GM_ALIGNED_16(struct) CameraLookAt
 {
-	linear_math::Vector3 lookAt;
-	linear_math::Vector3 position;
+	glm::vec3 lookAt;
+	glm::vec3 position;
 };
 
 GM_ALIGNED_16(struct) PositionState
 {
-	linear_math::Vector3 position;
+	glm::vec3 position;
 	GMfloat yaw;
 	GMfloat pitch;
 };
 
-inline linear_math::Matrix4x4 getViewMatrix(const CameraLookAt& lookAt)
+inline glm::mat4 getViewMatrix(const CameraLookAt& lookAt)
 {
-	return linear_math::lookat(lookAt.position, lookAt.lookAt + lookAt.position, linear_math::Vector3(0, 1, 0));
+	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, glm::vec3(0, 1, 0));
 }
 
 //GMPath: platforms/[os]/path.cpp

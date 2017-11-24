@@ -72,7 +72,7 @@ void GMControlGameObject::onAppendingObjectToWorld()
 	Base::onAppendingObjectToWorld();
 }
 
-void GMControlGameObject::setScaling(const linear_math::Matrix4x4& scaling)
+void GMControlGameObject::setScaling(const glm::mat4& scaling)
 {
 	D(d);
 	Base::setScaling(scaling);
@@ -86,7 +86,7 @@ void GMControlGameObject::setScaling(const linear_math::Matrix4x4& scaling)
 	}
 }
 
-void GMControlGameObject::setTranslation(const linear_math::Matrix4x4& translation)
+void GMControlGameObject::setTranslation(const glm::mat4& translation)
 {
 	D(d);
 	Base::setTranslation(translation);
@@ -100,7 +100,7 @@ void GMControlGameObject::setTranslation(const linear_math::Matrix4x4& translati
 	}
 }
 
-void GMControlGameObject::setRotation(const linear_math::Quaternion& rotation)
+void GMControlGameObject::setRotation(const glm::quat& rotation)
 {
 	D(d);
 	Base::setRotation(rotation);
@@ -226,7 +226,7 @@ void GMControlGameObject::updateGeometry()
 	GMRectF coord = toViewportCoord(d->geometry);
 	// coord表示左上角的绘制坐标，平移的时候需要换算到中心处
 	GMfloat x = coord.x + coord.width / 2.f, y = coord.y - coord.height / 2;
-	setTranslation(linear_math::translate(linear_math::Vector3(x, y, 0)));
+	setTranslation(glm::translate(glm::vec3(x, y, 0)));
 }
 
 void GMControlGameObject::addChild(GMControlGameObject* child)
@@ -236,22 +236,22 @@ void GMControlGameObject::addChild(GMControlGameObject* child)
 	d->children.push_back(child);
 }
 
-void GMControlGameObject::scalingGeometry(const linear_math::Matrix4x4& scaling)
+void GMControlGameObject::scalingGeometry(const glm::mat4& scaling)
 {
 	D(d);
 	GM_ASSERT(scaling[0][0] > 0);
 	GM_ASSERT(scaling[1][1] > 0);
 	GMfloat trans[3];
-	linear_math::getScalingFromMatrix(scaling, trans);
+	glm::getScalingFromMatrix(scaling, trans);
 	d->geometryScaling[0] = trans[0];
 	d->geometryScaling[1] = trans[1];
 }
 
-void GMControlGameObject::translateGeometry(const linear_math::Matrix4x4& translation)
+void GMControlGameObject::translateGeometry(const glm::mat4& translation)
 {
 	D(d);
 	GMfloat trans[3];
-	linear_math::getTranslationFromMatrix(translation, trans);
+	glm::getTranslationFromMatrix(translation, trans);
 
 	GMRectF transRect = { trans[0], trans[1] };
 	// 得到中间位置坐标

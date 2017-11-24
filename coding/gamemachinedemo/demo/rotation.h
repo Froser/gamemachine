@@ -8,7 +8,7 @@
 
 GM_PRIVATE_OBJECT(Demo_Rotation)
 {
-	gm::linear_math::Quaternion rotation;
+	glm::quat rotation;
 	gm::GMfloat angle = 0.f;
 	bool rotate = true;
 	gm::GMGameObject* gameObject = nullptr;

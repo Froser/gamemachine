@@ -35,15 +35,15 @@ typedef Map<GMCommand, Vector<GMCommandVector3> > CommandParams;
 
 GM_ALIGNED_STRUCT(GMShapeProperties)
 {
-	linear_math::Vector3 bounding[2]; //最小边界和最大边界
+	glm::vec3 bounding[2]; //最小边界和最大边界
 	GMfloat stepHeight;
 };
 
 GM_ALIGNED_STRUCT(GMMotionProperties)
 {
-	linear_math::Vector3 translation;
-	linear_math::Vector3 velocity;
-	linear_math::Vector3 jumpSpeed;
+	glm::vec3 translation;
+	glm::vec3 velocity;
+	glm::vec3 jumpSpeed;
 	GMfloat moveSpeed;
 };
 

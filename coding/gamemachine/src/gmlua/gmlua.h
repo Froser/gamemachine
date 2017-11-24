@@ -240,7 +240,7 @@ public:
 	{
 		D(d);
 		lua_newtable(L);
-		for (GMint i = 0; i < T::dimension; i++)
+		for (GMint i = 0; i < T::length(); i++)
 		{
 			lua_pushnumber(L, i);
 			lua_pushnumber(L, v[i]);
@@ -283,7 +283,7 @@ public:
 	{
 		D(d);
 		lua_newtable(L);
-		for (GMint i = 0; i < T::dimension; i++)
+		for (GMint i = 0; i < T::length(); i++)
 		{
 			lua_pushnumber(L, i);
 			setVector(v[i]);

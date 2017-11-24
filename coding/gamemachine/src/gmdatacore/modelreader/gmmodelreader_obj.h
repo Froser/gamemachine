@@ -23,9 +23,9 @@ class GMComponent;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
 	GMModel* object;
-	AlignedVector<linear_math::Vector3> positions;
-	AlignedVector<linear_math::Vector3> normals;
-	AlignedVector<linear_math::Vector2> textures;
+	AlignedVector<glm::vec3> positions;
+	AlignedVector<glm::vec3> normals;
+	AlignedVector<glm::vec2> textures;
 	Map<GMString, ModelReader_Obj_Material> materials;
 	GMString currentMaterialName;
 	GMComponent* currentComponent;

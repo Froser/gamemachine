@@ -7,7 +7,7 @@ void Demo_Rotation::init()
 	D_BASE(db, Base);
 	Base::init();
 	d->gameObject= db->demoWorld->findGameObject("texture");
-	d->rotation.setRotation(gm::linear_math::Vector3(0, 0, 1), d->angle);
+	d->rotation = glm::rotate(glm::identity<glm::quat>(), d->angle, glm::vec3(0, 0, 1));
 	d->gameObject->setRotation(d->rotation);
 }
 
@@ -29,7 +29,7 @@ void Demo_Rotation::event(gm::GameMachineEvent evt)
 	}
 	case gm::GameMachineEvent::Render:
 	{
-		d->rotation.setRotation(gm::linear_math::Vector3(0, 0, 1), d->angle);
+		d->rotation = glm::rotate(glm::identity<glm::quat>(), d->angle, (glm::vec3(0, 0, 1)));
 		d->gameObject->setRotation(d->rotation);
 		break;
 	}

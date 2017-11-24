@@ -16,9 +16,9 @@ struct GMBSPMovement
 	BSPTraceResult groundTrace;
 	bool freefall = false;
 	bool walking = false;
-	linear_math::Vector3 velocity{ 0 };
-	linear_math::Vector3 origin{ 0 };
-	linear_math::Vector3 targetPosition{ 0 };
+	glm::vec3 velocity{ 0 };
+	glm::vec3 origin{ 0 };
+	glm::vec3 targetPosition{ 0 };
 };
 
 struct GMBSPMoveCommand
@@ -54,13 +54,13 @@ private:
 	void processMove();
 	void processJump();
 	void composeVelocityWithGravity();
-	linear_math::Vector3 decomposeVelocity(const linear_math::Vector3& v);
+	glm::vec3 decomposeVelocity(const glm::vec3& v);
 	void walkMove();
 	void airMove();
 	void stepSlideMove(bool hasGravity);
 	bool slideMove(bool hasGravity);
 	void synchronizePosition();
-	void clipVelocity(const linear_math::Vector3& in, const linear_math::Vector3& normal, linear_math::Vector3& out, GMfloat overbounce);
+	void clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::vec3& out, GMfloat overbounce);
 };
 
 END_NS

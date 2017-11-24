@@ -90,7 +90,7 @@ public:
 	virtual void updateAfterSimulate() override;
 
 public:
-	void setJumpSpeed(const linear_math::Vector3& jumpSpeed);
+	void setJumpSpeed(const glm::vec3& jumpSpeed);
 	void setMoveSpeed(GMfloat moveSpeed);
 	void action(GMMovement movement, const GMMoveRate& rate);
 	void lookUp(GMfloat degree);

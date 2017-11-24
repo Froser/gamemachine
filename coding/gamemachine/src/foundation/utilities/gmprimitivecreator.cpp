@@ -51,7 +51,6 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 
 		GMComponent* component = new GMComponent(body);
 
-		linear_math::Vector3 normal;
 		for (GMint i = 0; i < 12; i++)
 		{
 			component->beginFace();
@@ -60,11 +59,11 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 				GMint idx = i * 3 + j; //顶点的开始
 				GMint idx_next = i * 3 + (j + 1) % 3;
 				GMint idx_prev = i * 3 + (j + 2) % 3;
-				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-				linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-				linear_math::Vector3 normal = linear_math::cross(vertex - vertex_prev, vertex_next - vertex);
-				normal = linear_math::normalize(normal);
+				glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = glm::fastNormalize(normal);
 
 				component->vertex(vertex[0], vertex[1], vertex[2]);
 				component->normal(normal[0], normal[1], normal[2]);
@@ -122,9 +121,6 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		body->setType(type);
 
 		GMComponent* component = new GMComponent(body);
-
-		linear_math::Vector3 normal;
-
 		for (GMint i = 0; i < 2; i++)
 		{
 			component->beginFace();
@@ -133,12 +129,12 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				GMint idx = i * 3 + j; //顶点的开始
 				GMint idx_next = i * 3 + (j + 1) % 3;
 				GMint idx_prev = i * 3 + (j + 2) % 3;
-				linear_math::Vector2 uv(uvArr[indices[idx] * 3], uvArr[indices[idx] * 3 + 1]);
-				linear_math::Vector3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-				linear_math::Vector3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+				glm::vec2 uv(uvArr[indices[idx] * 3], uvArr[indices[idx] * 3 + 1]);
+				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-				linear_math::Vector3 normal = linear_math::cross(vertex - vertex_prev, vertex_next - vertex);
-				normal = linear_math::normalize(normal);
+				glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = glm::fastNormalize(normal);
 
 				component->vertex(vertex[0], vertex[1], vertex[2]);
 				component->normal(normal[0], normal[1], normal[2]);

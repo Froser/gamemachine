@@ -44,13 +44,13 @@ GM_ALIGNED_STRUCT(BSPGrid)
 	GMint height;
 	bool wrapWidth;
 	bool wrapHeight;
-	linear_math::Vector3 points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
+	glm::vec3 points[MAX_GRID_SIZE][MAX_GRID_SIZE];	// [width][height]
 };
 
 //a winding gives the bounding points of a convex polygon
 GM_ALIGNED_STRUCT(BSPWinding)
 {
-	AlignedVector<linear_math::Vector3> p;
+	AlignedVector<glm::vec3> p;
 
 	void alloc(GMint pointNum)
 	{
@@ -60,13 +60,13 @@ GM_ALIGNED_STRUCT(BSPWinding)
 };
 
 //tools
-static void clearBounds(linear_math::Vector3& mins, linear_math::Vector3& maxs)
+static void clearBounds(glm::vec3& mins, glm::vec3& maxs)
 {
-	mins = linear_math::Vector3(99999);
-	maxs = linear_math::Vector3(-99999);
+	mins = glm::vec3(99999);
+	maxs = glm::vec3(-99999);
 }
 
-static void addPointToBounds(const linear_math::Vector3& v, linear_math::Vector3& mins, linear_math::Vector3& maxs)
+static void addPointToBounds(const glm::vec3& v, glm::vec3& mins, glm::vec3& maxs)
 {
 	if (v[0] < mins[0]) {
 		mins[0] = v[0];
@@ -112,11 +112,11 @@ static void setGridWrapWidth(BSPGrid* grid)
 		grid->wrapWidth = false;
 }
 
-static bool needsSubdivision(const linear_math::Vector3& a, const linear_math::Vector3& b, const linear_math::Vector3& c)
+static bool needsSubdivision(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
 {
-	linear_math::Vector3 cmid;
-	linear_math::Vector3 lmid;
-	linear_math::Vector3 delta;
+	glm::vec3 cmid;
+	glm::vec3 lmid;
+	glm::vec3 delta;
 	GMfloat dist;
 
 	// calculate the linear midpoint
@@ -127,12 +127,12 @@ static bool needsSubdivision(const linear_math::Vector3& a, const linear_math::V
 
 	// see if the curve is far enough away from the linear mid
 	delta = cmid - lmid;
-	dist = linear_math::length(delta);
+	dist = glm::length(delta);
 
 	return dist >= SUBDIVIDE_DISTANCE;
 }
 
-static void subdivide(linear_math::Vector3& a, linear_math::Vector3& b, linear_math::Vector3& c, linear_math::Vector3& out1, linear_math::Vector3& out2, linear_math::Vector3& out3)
+static void subdivide(glm::vec3& a, glm::vec3& b, glm::vec3& c, glm::vec3& out1, glm::vec3& out2, glm::vec3& out3)
 {
 	out1 = (a + b) * .5f;
 	out3 = (b + c) * .5f;
@@ -178,7 +178,7 @@ static void subdivideGridColumns(BSPGrid* grid)
 		//
 		for (j = 0; j < grid->height; j++)
 		{
-			linear_math::Vector3 prev, mid, next;
+			glm::vec3 prev, mid, next;
 
 			// save the control points now
 			prev = grid->points[i][j];
@@ -204,7 +204,7 @@ static void subdivideGridColumns(BSPGrid* grid)
 	}
 }
 
-static bool comparePoints(const linear_math::Vector3& a, const linear_math::Vector3& b)
+static bool comparePoints(const glm::vec3& a, const glm::vec3& b)
 {
 	GMfloat d;
 
@@ -261,7 +261,7 @@ static void removeDegenerateColumns(BSPGrid* grid)
 static void transposeGrid(BSPGrid* grid)
 {
 	GMint i, j, l;
-	linear_math::Vector3	temp;
+	glm::vec3	temp;
 	bool tempWrap;
 
 	if (grid->width > grid->height)
@@ -316,24 +316,24 @@ static void transposeGrid(BSPGrid* grid)
 	grid->wrapHeight = tempWrap;
 }
 
-static bool planeFromPoints(linear_math::Vector4& plane, const linear_math::Vector3& a, const linear_math::Vector3& b, const linear_math::Vector3& c)
+static bool planeFromPoints(glm::vec4& plane, const glm::vec3& a, const glm::vec3& b, const glm::vec3& c)
 {
-	linear_math::Vector3 d1, d2;
+	glm::vec3 d1, d2;
 	d1 = b - a;
 	d2 = c - a;
-	linear_math::Vector3 t = linear_math::cross(d2, d1);
-	if (linear_math::length(t) == 0)
+	glm::vec3 t = glm::cross(d2, d1);
+	if (glm::length(t) == 0)
 		return false;
 
-	t = linear_math::precise_normalize(t);
+	t = glm::normalize(t);
 	plane = VEC4(t, plane);
-	plane[3] = -linear_math::dot(a, VEC3(plane));
+	plane[3] = -glm::dot(a, glm::toInhomogeneous(plane));
 
 	GM_ASSERT(a[0] * plane[0] + a[1] * plane[1] + a[2] * plane[2] + plane[3] < NORMAL_EPSILON);
 	return true;
 }
 
-static int signbitsForNormal(const linear_math::Vector4& normal)
+static int signbitsForNormal(const glm::vec4& normal)
 {
 	GMint bits, j;
 
@@ -346,9 +346,9 @@ static int signbitsForNormal(const linear_math::Vector4& normal)
 	return bits;
 }
 
-static GMint planeEqual(GMBSPPatchPlane* p, const linear_math::Vector4& plane, GMint *flipped)
+static GMint planeEqual(GMBSPPatchPlane* p, const glm::vec4& plane, GMint *flipped)
 {
-	linear_math::Vector4 invplane;
+	glm::vec4 invplane;
 
 	if (
 		fabs(p->plane[0] - plane[0]) < NORMAL_EPSILON
@@ -375,9 +375,9 @@ static GMint planeEqual(GMBSPPatchPlane* p, const linear_math::Vector4& plane, G
 	return false;
 }
 
-static int findPlane(PatchCollideContext& context, const linear_math::Vector3& p1, const linear_math::Vector3& p2, const linear_math::Vector3& p3)
+static int findPlane(PatchCollideContext& context, const glm::vec3& p1, const glm::vec3& p2, const glm::vec3& p3)
 {
-	linear_math::Vector4 plane;
+	glm::vec4 plane;
 	GMfloat d;
 
 	if (!planeFromPoints(plane, p1, p2, p3))
@@ -386,18 +386,18 @@ static int findPlane(PatchCollideContext& context, const linear_math::Vector3& p
 	// see if the points are close enough to an existing plane
 	for (GMuint i = 0; i < context.planes.size(); i++)
 	{
-		if (linear_math::dot(VEC3(plane), VEC3(context.planes[i].plane)) < 0)
+		if (glm::dot(glm::toInhomogeneous(plane), glm::toInhomogeneous(context.planes[i].plane)) < 0)
 			continue;	// allow backwards planes?
 
-		d = linear_math::dot(p1, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
+		d = glm::dot(p1, glm::toInhomogeneous(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON)
 			continue;
 
-		d = linear_math::dot(p2, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
+		d = glm::dot(p2, glm::toInhomogeneous(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON)
 			continue;
 
-		d = linear_math::dot(p3, VEC3(context.planes[i].plane)) + context.planes[i].plane[3];
+		d = glm::dot(p3, glm::toInhomogeneous(context.planes[i].plane)) + context.planes[i].plane[3];
 		if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
 			continue;
 		}
@@ -413,7 +413,7 @@ static int findPlane(PatchCollideContext& context, const linear_math::Vector3& p
 	return context.planes.size() - 1;
 }
 
-static GMint findPlane(PatchCollideContext& context, const linear_math::Vector4& plane, GMint *flipped)
+static GMint findPlane(PatchCollideContext& context, const glm::vec4& plane, GMint *flipped)
 {
 	// see if the points are close enough to an existing plane
 	for (GMuint i = 0; i < context.planes.size(); i++)
@@ -451,26 +451,26 @@ static GMint gridPlane(int gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i,
 }
 
 static int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2], GMint i, GMint j, GMint k) {
-	linear_math::Vector3 p1, p2;
-	linear_math::Vector3 up;
+	glm::vec3 p1, p2;
+	glm::vec3 up;
 	GMint p;
-	linear_math::Vector4 t;
+	glm::vec4 t;
 
 	switch (k) {
 	case 0:	// top border
 		p1 = grid->points[i][j];
 		p2 = grid->points[i + 1][j];
 		p = gridPlane(gridPlanes, i, j, 0);
-		t = context.planes[p].plane * 4;
-		up = p1 + VEC3(t);
+		t = context.planes[p].plane * 4.f;
+		up = p1 + glm::toInhomogeneous(t);
 		return findPlane(context, p1, p2, up);
 
 	case 2:	// bottom border
 		p1 = grid->points[i][j + 1];
 		p2 = grid->points[i + 1][j + 1];
 		p = gridPlane(gridPlanes, i, j, 1);
-		t = context.planes[p].plane * 4;
-		up = p1 + VEC3(t);
+		t = context.planes[p].plane * 4.f;
+		up = p1 + glm::toInhomogeneous(t);
 
 		return findPlane(context, p2, p1, up);
 
@@ -478,32 +478,32 @@ static int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint gridP
 		p1 = grid->points[i][j];
 		p2 = grid->points[i][j + 1];
 		p = gridPlane(gridPlanes, i, j, 1);
-		t = context.planes[p].plane * 4;
-		up = p1 + VEC3(t);
+		t = context.planes[p].plane * 4.f;
+		up = p1 + glm::toInhomogeneous(t);
 		return findPlane(context, p2, p1, up);
 
 	case 1:	// right border
 		p1 = grid->points[i + 1][j];
 		p2 = grid->points[i + 1][j + 1];
 		p = gridPlane(gridPlanes, i, j, 0);
-		t = context.planes[p].plane * 4;
-		up = p1 + VEC3(t);
+		t = context.planes[p].plane * 4.f;
+		up = p1 + glm::toInhomogeneous(t);
 		return findPlane(context, p1, p2, up);
 
 	case 4:	// diagonal out of triangle 0
 		p1 = grid->points[i + 1][j + 1];
 		p2 = grid->points[i][j];
 		p = gridPlane(gridPlanes, i, j, 0);
-		t = context.planes[p].plane * 4;
-		up = p1 + VEC3(t);
+		t = context.planes[p].plane * 4.f;
+		up = p1 + glm::toInhomogeneous(t);
 		return findPlane(context, p1, p2, up);
 
 	case 5:	// diagonal out of triangle 1
 		p1 = grid->points[i][j];
 		p2 = grid->points[i + 1][j + 1];
 		p = gridPlane(gridPlanes, i, j, 1);
-		t = context.planes[p].plane * 4;
-		up = p1 + VEC3(t);
+		t = context.planes[p].plane * 4.f;
+		up = p1 + glm::toInhomogeneous(t);
 		return findPlane(context, p1, p2, up);
 
 	}
@@ -512,16 +512,16 @@ static int edgePlaneNum(PatchCollideContext& context, BSPGrid* grid, GMint gridP
 	return -1;
 }
 
-static int pointOnPlaneSide(PatchCollideContext& context, const linear_math::Vector3& p, GMint planeNum)
+static int pointOnPlaneSide(PatchCollideContext& context, const glm::vec3& p, GMint planeNum)
 {
 	GMfloat d;
 
 	if (planeNum == -1)
 		return SIDE_ON;
 
-	const linear_math::Vector4& plane = context.planes[planeNum].plane;
+	const glm::vec4& plane = context.planes[planeNum].plane;
 
-	d = linear_math::dot(p, VEC3(plane)) + plane[3];
+	d = glm::dot(p, glm::toInhomogeneous(plane)) + plane[3];
 
 	if (d > PLANE_TRI_EPSILON)
 		return SIDE_FRONT;
@@ -537,7 +537,7 @@ static void setBorderInward(PatchCollideContext& context, GMBSPFacet* facet, BSP
 {
 	static bool debugBlock = false;
 	GMint k, l;
-	linear_math::Vector3 points[4];
+	glm::vec3 points[4];
 	GMint numPoints;
 
 	switch (which) {
@@ -606,13 +606,13 @@ static void setBorderInward(PatchCollideContext& context, GMBSPFacet* facet, BSP
 	}
 }
 
-static void baseWindingForPlane(const linear_math::Vector4& plane, REF BSPWinding& w)
+static void baseWindingForPlane(const glm::vec4& plane, REF BSPWinding& w)
 {
-	linear_math::Vector3 normal = VEC3(plane);
+	glm::vec3 normal = glm::toInhomogeneous(plane);
 	GMfloat dist = plane[3];
 	GMint i, x;
 	GMfloat max, v;
-	linear_math::Vector3 org, vright, vup;
+	glm::vec3 org, vright, vup;
 
 	// find the major axis
 
@@ -631,7 +631,7 @@ static void baseWindingForPlane(const linear_math::Vector4& plane, REF BSPWindin
 		gm_error(_L("baseWindingForPlane: no axis found"));
 
 	// 找到向上轴，openGL中y坐标轴表示向上
-	vup = linear_math::Vector3(0, 0, 0);
+	vup = glm::vec3(0, 0, 0);
 	switch (x)
 	{
 	case 0:
@@ -643,13 +643,13 @@ static void baseWindingForPlane(const linear_math::Vector4& plane, REF BSPWindin
 		break;
 	}
 
-	v = linear_math::dot(vup, normal);
+	v = glm::dot(vup, normal);
 	vup = vup - normal * v;
-	vup = linear_math::precise_normalize(vup);
+	vup = glm::normalize(vup);
 	org = normal * -dist;
-	vright = linear_math::cross(vup, normal);
-	vup = vup * MAX_MAP_BOUNDS;
-	vright = vright * MAX_MAP_BOUNDS;
+	vright = glm::cross(vup, normal);
+	vup = vup * (GMfloat) MAX_MAP_BOUNDS;
+	vright = vright * (GMfloat)MAX_MAP_BOUNDS;
 
 	// project a really big	axis aligned box onto the plane
 	w.alloc(4);
@@ -667,16 +667,16 @@ static void baseWindingForPlane(const linear_math::Vector4& plane, REF BSPWindin
 	w.p[3] = w.p[3] - vup;
 }
 
-static bool chopWindingInPlace(REF BSPWinding& inout, const linear_math::Vector4& plane, GMfloat epsilon)
+static bool chopWindingInPlace(REF BSPWinding& inout, const glm::vec4& plane, GMfloat epsilon)
 {
 	AlignedVector<GMfloat> dists;
 	AlignedVector<GMint> sides;
 	GMint counts[3];
 	GMfloat dot;
 	GMint j;
-	linear_math::Vector3 mid;
+	glm::vec3 mid;
 
-	linear_math::Vector3 normal = VEC3(plane);
+	glm::vec3 normal = glm::toInhomogeneous(plane);
 	GMfloat dist = plane[3];
 
 	BSPWinding& in = inout;
@@ -688,7 +688,7 @@ static bool chopWindingInPlace(REF BSPWinding& inout, const linear_math::Vector4
 	//for (auto iter = in.p.begin(); iter != in.p.end(); iter++)
 	for (auto& p : in.p)
 	{
-		dot = linear_math::dot(p, normal);
+		dot = glm::dot(p, normal);
 		dot += dist;
 		dists.push_back(dot);
 		if (dot > epsilon)
@@ -710,7 +710,7 @@ static bool chopWindingInPlace(REF BSPWinding& inout, const linear_math::Vector4
 
 	for (GMuint i = 0; i < in.p.size(); i++)
 	{
-		linear_math::Vector3 p1 = in.p[i];
+		glm::vec3 p1 = in.p[i];
 
 		if (sides[i] == SIDE_ON)
 		{
@@ -727,7 +727,7 @@ static bool chopWindingInPlace(REF BSPWinding& inout, const linear_math::Vector4
 			continue;
 
 		// generate a split point
-		linear_math::Vector3 p2 = in.p[(i + 1) % in.p.size()];
+		glm::vec3 p2 = in.p[(i + 1) % in.p.size()];
 
 		dot = dists[i] / (dists[i] - dists[i + 1]);
 		for (j = 0; j < 3; j++)
@@ -747,12 +747,12 @@ static bool chopWindingInPlace(REF BSPWinding& inout, const linear_math::Vector4
 	return true;
 }
 
-static void windingBounds(const BSPWinding& w, linear_math::Vector3& mins, linear_math::Vector3& maxs)
+static void windingBounds(const BSPWinding& w, glm::vec3& mins, glm::vec3& maxs)
 {
 	GMfloat v;
 
-	mins = linear_math::Vector3(MAX_MAP_BOUNDS);
-	maxs = linear_math::Vector3(-MAX_MAP_BOUNDS);
+	mins = glm::vec3(MAX_MAP_BOUNDS);
+	maxs = glm::vec3(-MAX_MAP_BOUNDS);
 
 	for (GMuint i = 0; i < w.p.size(); i++)
 	{
@@ -767,20 +767,20 @@ static void windingBounds(const BSPWinding& w, linear_math::Vector3& mins, linea
 	}
 }
 
-void snapVector(linear_math::Vector3& normal) {
+void snapVector(glm::vec3& normal) {
 	GMint i;
 
 	for (i = 0; i < 3; i++)
 	{
 		if (fabs(normal[i] - 1) < NORMAL_EPSILON)
 		{
-			normal = linear_math::Vector3(0);
+			normal = glm::vec3(0);
 			normal[i] = 1;
 			break;
 		}
 		if (fabs(normal[i] - -1) < NORMAL_EPSILON)
 		{
-			normal = linear_math::Vector3(0);
+			normal = glm::vec3(0);
 			normal[i] = -1;
 			break;
 		}
@@ -790,10 +790,10 @@ void snapVector(linear_math::Vector3& normal) {
 static void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 {
 	GMint axis, dir, flipped;
-	linear_math::Vector4 plane;
+	glm::vec4 plane;
 	GMfloat d;
-	linear_math::Vector4 newplane;
-	linear_math::Vector3 mins, maxs, vec, Vector2;
+	glm::vec4 newplane;
+	glm::vec3 mins, maxs, vec, Vector2;
 
 	plane = context.planes[facet->surfacePlane].plane;
 
@@ -824,7 +824,7 @@ static void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 	{
 		for (dir = -1; dir <= 1; dir += 2)
 		{
-			plane = linear_math::Vector4(0);
+			plane = glm::vec4(0);
 			plane[axis] = dir;
 			if (dir == 1) {
 				plane[3] = -maxs[axis];
@@ -863,13 +863,13 @@ static void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 		k = (j + 1) % w.p.size();
 		vec = w.p[j] - w.p[k];
 		//if it's a degenerate edge
-		vec = linear_math::precise_normalize(vec);
-		if (linear_math::length(vec) < 0.5)
+		vec = glm::normalize(vec);
+		if (glm::length(vec) < 0.5)
 			continue;
 		snapVector(vec);
 		for (k = 0; k < 3; k++)
 		{
-			if (linear_math::fuzzyCompare(vec[k], -1) || linear_math::fuzzyCompare(vec[k], 1))
+			if (glm::fuzzyCompare(vec[k], -1) || glm::fuzzyCompare(vec[k], 1))
 				break;	// axial
 		}
 		if (k < 3)
@@ -881,21 +881,21 @@ static void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 			for (dir = -1; dir <= 1; dir += 2)
 			{
 				// construct a plane
-				Vector2 = linear_math::Vector3(0);
+				Vector2 = glm::vec3(0);
 				Vector2[axis] = dir;
-				linear_math::Vector3 t = linear_math::cross(vec, Vector2);
-				t = linear_math::precise_normalize(t);
-				if (linear_math::length(t) < 0.5)
+				glm::vec3 t = glm::cross(vec, Vector2);
+				t = glm::normalize(t);
+				if (glm::length(t) < 0.5)
 					continue;
 				plane = VEC4(t, plane);
-				plane[3] = -linear_math::dot(w.p[j], VEC3(plane));
+				plane[3] = -glm::dot(w.p[j], glm::toInhomogeneous(plane));
 
 				// if all the points of the facet winding are
 				// behind this plane, it is a proper edge bevel
 				GMuint l;
 				for (l = 0; l < w.p.size(); l++)
 				{
-					d = linear_math::dot(w.p[l], VEC3(plane)) + plane[3];
+					d = glm::dot(w.p[l], glm::toInhomogeneous(plane)) + plane[3];
 					if (d > 0.1)
 						break;	// point in front
 				}
@@ -950,9 +950,9 @@ static void addFacetBevels(PatchCollideContext& context, GMBSPFacet *facet)
 
 static bool validateFacet(PatchCollideContext& context, GMBSPFacet* facet)
 {
-	linear_math::Vector4 plane;
-	linear_math::Vector3 bounds[2];
-	linear_math::Vector3 origin(0, 0, 0);
+	glm::vec4 plane;
+	glm::vec3 bounds[2];
+	glm::vec3 origin(0, 0, 0);
 
 	if (facet->surfacePlane == -1)
 		return false;
@@ -1000,7 +1000,7 @@ static bool validateFacet(PatchCollideContext& context, GMBSPFacet* facet)
 static void patchCollideFromGrid(BSPGrid *grid, GMBSPPatchCollide *pf)
 {
 	GMint i, j;
-	linear_math::Vector3 p1, p2, p3;
+	glm::vec3 p1, p2, p3;
 	GMint gridPlanes[MAX_GRID_SIZE][MAX_GRID_SIZE][2];
 	GMint borders[4];
 	bool noAdjust[4];
@@ -1170,7 +1170,7 @@ GMBSP_Physics_Patch* GMBSPPatch::patches(GMint at)
 	return d->patches[at];
 }
 
-void GMBSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, const linear_math::Vector3* points, AUTORELEASE GMBSP_Physics_Patch* patch)
+void GMBSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, const glm::vec3* points, AUTORELEASE GMBSP_Physics_Patch* patch)
 {
 	D(d);
 

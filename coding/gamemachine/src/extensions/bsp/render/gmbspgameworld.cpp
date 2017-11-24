@@ -170,7 +170,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-GMint GMBSPGameWorld::calculateLeafNode(const linear_math::Vector3& position)
+GMint GMBSPGameWorld::calculateLeafNode(const glm::vec3& position)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -710,8 +710,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 			asset = assets.insertAsset(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
 		}
 		entityObject = new GMEntityObject(asset);
-		entityObject->setTranslation(linear_math::translate(entity->origin));
-		entityObject->setScaling(linear_math::scale(m->extents[0], m->extents[1], m->extents[2]));
+		entityObject->setTranslation(glm::translate(entity->origin));
+		entityObject->setScaling(glm::scale(m->extents[0], m->extents[1], m->extents[2]));
 	}
 
 	GM_ASSERT(entityObject);

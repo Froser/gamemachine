@@ -7,7 +7,9 @@ GMCamera::GMCamera()
 {
 	D(d);
 	d->frustum.initPerspective(75.f, 1.333f, .1f, 3200);
-	d->state = { 0 };
+	d->state.position = glm::vec3(0);
+	d->state.pitch = 0;
+	d->state.yaw = 0;
 }
 
 void GMCamera::initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)

@@ -170,7 +170,7 @@ void GMBSPPhysicsWorld::generatePhysicsPatches()
 
 		GMint width = bsp.drawSurfaces[i].patchWidth, height = bsp.drawSurfaces[i].patchHeight;
 		GMint c = width * height;
-		AlignedVector<linear_math::Vector3> points;
+		AlignedVector<glm::vec3> points;
 		points.resize(c);
 		GMBSPDrawVertices* v = &bsp.vertices[bsp.drawSurfaces[i].firstVert];
 		for (GMint j = 0; j < c; j++, v++)

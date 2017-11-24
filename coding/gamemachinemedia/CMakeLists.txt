@@ -10,6 +10,7 @@ include_directories(
 		../3rdparty/libmad
 		../3rdparty/lua/src
 		../gamemachine/include
+		../3rdparty/glm-0.9.9-a2
 	)
 
 set(SOURCES

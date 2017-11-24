@@ -112,9 +112,9 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() override;
 	virtual bool canDeferredRendering() override { return false; }
-	virtual void setScaling(const linear_math::Matrix4x4& scaling) override;
-	virtual void setTranslation(const linear_math::Matrix4x4& translation) override;
-	virtual void setRotation(const linear_math::Quaternion& rotation) override;
+	virtual void setScaling(const glm::mat4& scaling) override;
+	virtual void setTranslation(const glm::mat4& translation) override;
+	virtual void setRotation(const glm::quat& rotation) override;
 
 public:
 	virtual void notifyControl();
@@ -134,8 +134,8 @@ public:
 
 private:
 	void addChild(GMControlGameObject* child);
-	void scalingGeometry(const linear_math::Matrix4x4& scaling);
-	void translateGeometry(const linear_math::Matrix4x4& scaling);
+	void scalingGeometry(const glm::mat4& scaling);
+	void translateGeometry(const glm::mat4& scaling);
 };
 
 

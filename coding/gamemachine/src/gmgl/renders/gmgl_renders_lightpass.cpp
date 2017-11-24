@@ -53,11 +53,11 @@ void GMGLRenders_LightPass::activateLights(const GMLight* lights, GMint count)
 	shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
-void GMGLRenders_LightPass::updateVPMatrices(const linear_math::Matrix4x4& projection, const linear_math::Matrix4x4& view, const CameraLookAt& lookAt)
+void GMGLRenders_LightPass::updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt)
 {
 	D(d);
 	auto shaderProgram = d->engine->getLightPassShader();
 	shaderProgram->useProgram();
-	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, view.data());
+	shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(view));
 	GM_CHECK_GL_ERROR();
 }

@@ -28,9 +28,9 @@ void Demo_NormalMap::init()
 		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.setCull(gm::GMS_Cull::CULL);
-			shader.getMaterial().kd = gm::linear_math::Vector3(.6f, .2f, .3f);
-			shader.getMaterial().ks = gm::linear_math::Vector3(.1f, .2f, .3f);
-			shader.getMaterial().ka = gm::linear_math::Vector3(1, 1, 1);
+			shader.getMaterial().kd = glm::vec3(.6f, .2f, .3f);
+			shader.getMaterial().ks = glm::vec3(.1f, .2f, .3f);
+			shader.getMaterial().ka = glm::vec3(1, 1, 1);
 			shader.getMaterial().shininess = 20;
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();

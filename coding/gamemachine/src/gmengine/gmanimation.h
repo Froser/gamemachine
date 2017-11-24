@@ -3,19 +3,19 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-typedef std::function<linear_math::Vector3(const linear_math::Vector3&, const linear_math::Vector3&, GMfloat)> GMInterpolation;
-typedef std::function<linear_math::Quaternion(const linear_math::Quaternion&, const linear_math::Quaternion&, GMfloat)> GMQuaternionInterpolation;
+typedef std::function<glm::vec3(const glm::vec3&, const glm::vec3&, GMfloat)> GMInterpolation;
+typedef std::function<glm::quat(const glm::quat&, const glm::quat&, GMfloat)> GMQuaternionInterpolation;
 
 struct GMInterpolations
 {
-	static linear_math::Vector3 linear(const linear_math::Vector3& start, const linear_math::Vector3& end, GMfloat p)
+	static glm::vec3 linear(const glm::vec3& start, const glm::vec3& end, GMfloat p)
 	{
-		return linear_math::lerp(start, end, p);
+		return glm::lerp(start, end, p);
 	}
 
-	static linear_math::Quaternion quaternion_linear(const linear_math::Quaternion& start, const linear_math::Quaternion& end, GMfloat p)
+	static glm::quat quaternion_linear(const glm::quat& start, const glm::quat& end, GMfloat p)
 	{
-		return linear_math::slerp(start, end, p);
+		return glm::slerp(start, end, p);
 	}
 };
 
@@ -41,10 +41,10 @@ GM_ALIGNED_STRUCT(GMAnimationState)
 {
 	GMfloat tick = 0;
 	GMfloat p = 0;
-	linear_math::Vector3 start;
-	linear_math::Vector3 end;
-	linear_math::Quaternion start_q; // only used in rotation
-	linear_math::Quaternion end_q; // only used in rotation
+	glm::vec3 start;
+	glm::vec3 end;
+	glm::quat start_q; // only used in rotation
+	glm::quat end_q; // only used in rotation
 	GMQuaternionInterpolation interpolation_q; // only used in rotation
 	GMint direction = 1;
 	GMInterpolation interpolation;
@@ -80,11 +80,11 @@ public:
 
 public:
 	void setDuration(GMfloat duration);
-	void setScaling(const linear_math::Vector3& scaling, GMInterpolation interpolation = GMInterpolations::linear);
+	void setScaling(const glm::vec3& scaling, GMInterpolation interpolation = GMInterpolations::linear);
 	void disableScaling();
-	void setTranslation(const linear_math::Vector3& translation, GMInterpolation interpolation = GMInterpolations::linear);
+	void setTranslation(const glm::vec3& translation, GMInterpolation interpolation = GMInterpolations::linear);
 	void disableTranslation();
-	void setRotation(const linear_math::Quaternion& rotation, GMQuaternionInterpolation interpolation = GMInterpolations::quaternion_linear);
+	void setRotation(const glm::quat& rotation, GMQuaternionInterpolation interpolation = GMInterpolations::quaternion_linear);
 	void disableRotation();
 
 private:

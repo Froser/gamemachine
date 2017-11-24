@@ -189,7 +189,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 		}
 
 		{
-			auto&& vec = t != INVALID ? d->textures[t - 1] : linear_math::Vector2(0, 0);
+			auto&& vec = t != INVALID ? d->textures[t - 1] : glm::vec2(0, 0);
 			d->currentComponent->uv(vec[0], vec[1]);
 		}
 
@@ -261,8 +261,8 @@ void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, 
 	shader.setCull(GMS_Cull::NONE);
 
 	GMMaterial& m = shader.getMaterial();
-	m.ka = linear_math::Vector3::fromArray(material.ka);
-	m.kd = linear_math::Vector3::fromArray(material.kd);
-	m.ks = linear_math::Vector3::fromArray(material.ks);
+	m.ka = glm::fromArray(material.ka);
+	m.kd = glm::fromArray(material.kd);
+	m.ks = glm::fromArray(material.ks);
 	m.shininess = material.ns;
 }

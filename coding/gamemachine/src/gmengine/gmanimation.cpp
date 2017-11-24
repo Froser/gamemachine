@@ -61,10 +61,10 @@ void GMAnimation::update()
 		std::mem_fn(&GMGameObject::setTranslation),
 	};
 
-	typedef linear_math::Matrix4x4(*TransformFunc)(const linear_math::Vector3&);
+	typedef glm::mat4(*TransformFunc)(const glm::vec3&);
 	TransformFunc transformFunc[] {
-		linear_math::scale,
-		linear_math::translate,
+		glm::scale,
+		glm::translate,
 	};
 
 	GM_FOREACH_ENUM(type, GMAnimationTypes::BeginType, GMAnimationTypes::EndType)
@@ -89,13 +89,13 @@ void GMAnimation::update()
 
 			if (type != GMAnimationTypes::Rotation)
 			{
-				linear_math::Vector3 p = state.interpolation(state.start, state.end, state.p);
-				linear_math::Matrix4x4 s = transformFunc[type](p);
+				glm::vec3 p = state.interpolation(state.start, state.end, state.p);
+				glm::mat4 s = transformFunc[type](p);
 				transformFunSetList[type](d->object, s);
 			}
 			else
 			{
-				linear_math::Quaternion p = state.interpolation_q(state.start_q, state.end_q, state.p);
+				glm::quat p = state.interpolation_q(state.start_q, state.end_q, state.p);
 				gm_info("%f, %f, %f, %f", p[0], p[1], p[2], p[3]);
 				d->object->setRotation(p);
 			}
@@ -110,14 +110,14 @@ void GMAnimation::setDuration(GMfloat duration)
 	d->duration = duration;
 }
 
-void GMAnimation::setScaling(const linear_math::Vector3& scaling, GMInterpolation interpolation)
+void GMAnimation::setScaling(const glm::vec3& scaling, GMInterpolation interpolation)
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Scaling];
 	state.interpolation = interpolation;
 	auto& scalingMatrix = d->object->getScaling();
 	GMfloat s[3];
-	linear_math::getScalingFromMatrix(scalingMatrix, s);
+	glm::getScalingFromMatrix(scalingMatrix, s);
 	state.start[0] = s[0];
 	state.start[1] = s[1];
 	state.start[2] = s[2];
@@ -134,14 +134,14 @@ void GMAnimation::disableScaling()
 	state.set = false;
 }
 
-void GMAnimation::setTranslation(const linear_math::Vector3& translation, GMInterpolation interpolation)
+void GMAnimation::setTranslation(const glm::vec3& translation, GMInterpolation interpolation)
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Translation];
 	state.interpolation = interpolation;
 	auto& translationMatrix = d->object->getTranslation();
 	GMfloat s[4];
-	linear_math::getTranslationFromMatrix(translationMatrix, s);
+	glm::getTranslationFromMatrix(translationMatrix, s);
 	state.start[0] = s[0];
 	state.start[1] = s[1];
 	state.start[2] = s[2];
@@ -158,7 +158,7 @@ void GMAnimation::disableTranslation()
 	state.set = false;
 }
 
-void GMAnimation::setRotation(const linear_math::Quaternion& rotation, GMQuaternionInterpolation interpolation)
+void GMAnimation::setRotation(const glm::quat& rotation, GMQuaternionInterpolation interpolation)
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[GMAnimationTypes::Rotation];
@@ -205,13 +205,13 @@ void GMControlGameObjectAnimation::setTranslation(GMint x, GMint y, GMInterpolat
 	const GMRect& geometry = d->object->getGeometry();
 	GMRect viewportCoord = { x + geometry.width / 2, y + geometry.height / 2 };
 	GMRectF coord = GMControlGameObject::toViewportCoord(viewportCoord);
-	linear_math::Vector3 trans(coord.x, coord.y, 0);
+	glm::vec3 trans(coord.x, coord.y, 0);
 
 	GMAnimationState& state = db->animationStates[GMAnimationTypes::Translation];
 	state.interpolation = interpolation;
 	auto& translationMatrix = d->object->getTranslation();
 	GMfloat s[3];
-	linear_math::getTranslationFromMatrix(translationMatrix, s);
+	glm::getTranslationFromMatrix(translationMatrix, s);
 	state.start[0] = s[0];
 	state.start[1] = s[1];
 	state.start[2] = s[2];

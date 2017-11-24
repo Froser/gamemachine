@@ -256,28 +256,28 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 					break;
 				case GMMetaMemberType::Vector2:
 					{
-						linear_math::Vector2& v = *static_cast<linear_math::Vector2*>(member.second.ptr);
+						glm::vec2& v = *static_cast<glm::vec2*>(member.second.ptr);
 						if (!getVector(v))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Vector3:
 					{
-						linear_math::Vector3& v = *static_cast<linear_math::Vector3*>(member.second.ptr);
+						glm::vec3& v = *static_cast<glm::vec3*>(member.second.ptr);
 						if (!getVector(v))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Vector4:
 					{
-						linear_math::Vector4& v = *static_cast<linear_math::Vector4*>(member.second.ptr);
+						glm::vec4& v = *static_cast<glm::vec4*>(member.second.ptr);
 						if (!getVector(v))
 							return false;
 					}
 					break;
 				case GMMetaMemberType::Matrix4x4:
 					{
-						linear_math::Matrix4x4& mat = *static_cast<linear_math::Matrix4x4*>(member.second.ptr);
+						glm::mat4& mat = *static_cast<glm::mat4*>(member.second.ptr);
 						if (!getMatrix(mat))
 							return false;
 					}
@@ -353,28 +353,28 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 		break;
 	case GMMetaMemberType::Vector2:
 		{
-			linear_math::Vector2& vec2 = *static_cast<linear_math::Vector2*>(member.ptr);
+			glm::vec2& vec2 = *static_cast<glm::vec2*>(member.ptr);
 			setVector(vec2);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector3:
 		{
-			linear_math::Vector3& vec3 = *static_cast<linear_math::Vector3*>(member.ptr);
+			glm::vec3& vec3 = *static_cast<glm::vec3*>(member.ptr);
 			setVector(vec3);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Vector4:
 		{
-			linear_math::Vector4& vec4 = *static_cast<linear_math::Vector4*>(member.ptr);
+			glm::vec4& vec4 = *static_cast<glm::vec4*>(member.ptr);
 			setVector(vec4);
 			GM_ASSERT(lua_istable(L, -1));
 		}
 		break;
 	case GMMetaMemberType::Matrix4x4:
 		{
-			linear_math::Matrix4x4& mat= *static_cast<linear_math::Matrix4x4*>(member.ptr);
+			glm::mat4& mat= *static_cast<glm::mat4*>(member.ptr);
 			setMatrix(mat);
 			GM_ASSERT(lua_istable(L, -1));
 		}

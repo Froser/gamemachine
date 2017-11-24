@@ -87,7 +87,7 @@ static void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage
 		gm_error(_L("texture %Ls not found"), filename.toStdWString().c_str());
 }
 
-static void readTernaryFloatsFromString(const char* str, linear_math::Vector3& vec)
+static void readTernaryFloatsFromString(const char* str, glm::vec3& vec)
 {
 	Scanner s(str);
 	for (GMint i = 0; i < 3; i++)
@@ -444,7 +444,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	linear_math::Vector3 vecColor;
+	glm::vec3 vecColor;
 	readTernaryFloatsFromString(color, vecColor);
 	light.setLightColor(&vecColor[0]);
 
@@ -462,11 +462,11 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 			return;
 		}
 		Scanner s(color);
-		linear_math::Vector3 vecPosition;
+		glm::vec3 vecPosition;
 		readTernaryFloatsFromString(position, vecPosition);
 		light.setLightPosition(&vecPosition[0]);
 
-		linear_math::Vector3 arg;
+		glm::vec3 arg;
 
 		const char* k = elem->Attribute("ks");
 		if (!k)
