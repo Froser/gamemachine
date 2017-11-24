@@ -78,6 +78,20 @@ namespace glm
 	}
 
 	template <>
+	inline mat3& identity()
+	{
+		static mat3 m(1.f);
+		return m;
+	}
+
+	template <>
+	inline mat2& identity()
+	{
+		static mat2 m(1.f);
+		return m;
+	}
+
+	template <>
 	inline quat& identity()
 	{
 		static quat q(0, 0, 0, 1);
