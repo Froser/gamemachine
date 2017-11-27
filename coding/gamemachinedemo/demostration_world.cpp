@@ -59,6 +59,8 @@ void DemoHandler::onActivate()
 
 void DemoHandler::onDeactivate()
 {
+	D(d);
+	d->demostrationWorld->resetProjectionAndEye();
 	GM.getGraphicEngine()->removeLights();
 	GMSetRenderState(EFFECTS, gm::GMEffects::None);
 }
@@ -217,6 +219,18 @@ void DemostrationWorld::switchDemo()
 	}
 }
 
+void DemostrationWorld::resetProjectionAndEye()
+{
+	// 设置一个默认视角
+	gm::GMCamera& camera = GM.getCamera();
+	camera.initOrtho(-1, 1, -1, 1, .1f, 3200.f);
+
+	gm::CameraLookAt lookAt;
+	lookAt.lookAt = { 0, 0, -1 };
+	lookAt.position = { 0, 0, 1 };
+	camera.lookAt(lookAt);
+}
+
 //////////////////////////////////////////////////////////////////////////
 void DemostrationEntrance::init()
 {
@@ -243,14 +257,7 @@ void DemostrationEntrance::start()
 {
 	D(d);
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-
-	// 设置一个默认视角
-	gm::GMCamera& camera = GM.getCamera();
-	gm::CameraLookAt lookAt;
-	lookAt.lookAt = { 0, 0, -1 };
-	lookAt.position = { 0, 0, 1 };
-	camera.lookAt(lookAt);
-
+	getWorld()->resetProjectionAndEye();
 	loadDemostrations(d->world);
 }
 

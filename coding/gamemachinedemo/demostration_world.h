@@ -64,6 +64,7 @@ public:
 	void init();
 	void renderScene();
 	void switchDemo();
+	void resetProjectionAndEye();
 };
 
 GM_PRIVATE_OBJECT(DemostrationEntrance)
