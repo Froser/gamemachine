@@ -34,7 +34,7 @@ public:
 
 public:
 	virtual void transfer() = 0;
-	virtual void draw(GMfloat* modelTransform) = 0;
+	virtual void draw(const GMfloat* modelTransform) = 0;
 	virtual void dispose() = 0;
 
 // 提供修改缓存的方法

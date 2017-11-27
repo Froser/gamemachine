@@ -52,7 +52,7 @@ void GMSpriteGameObject::setMoveSpeed(GMfloat moveSpeed)
 		c->motions.moveSpeed = moveSpeed;
 }
 
-const PositionState& GMSpriteGameObject::getPositionState()
+const GMPositionState& GMSpriteGameObject::getPositionState()
 {
 	D(d);
 	return d->state;

@@ -27,7 +27,7 @@ class GMAssets;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
-struct CameraLookAt;
+struct GMCameraLookAt;
 struct IDebugOutput;
 struct IAudioPlayer;
 
@@ -114,11 +114,10 @@ enum class GMDrawMode
 
 GM_INTERFACE(IRender)
 {
-	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) = 0;
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) = 0;
 	virtual void beginShader(GMShader& shader, GMDrawMode mode) = 0;
 	virtual void endShader() = 0;
 	virtual void end() = 0;
-	virtual void updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt) = 0;
 	virtual void activateLights(const GMLight* lights, GMint count) = 0;
 };
 

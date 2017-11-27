@@ -341,21 +341,6 @@ void GMGLGraphicEngine::lightPass()
 	renderDeferredRenderQuad();
 }
 
-void GMGLGraphicEngine::updateVPMatrices(const CameraLookAt& lookAt)
-{
-	D(d);
-	static GMMesh dummy;
-	GM_FOREACH_ENUM(i, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
-	{
-		IRender* render = getRender(i);
-		dummy.setType(i);
-
-		render->begin(this, &dummy, nullptr);
-		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
-		render->end();
-	}
-}
-
 void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
@@ -393,6 +378,20 @@ void GMGLGraphicEngine::viewGBufferFrameBuffer()
 	}
 }
 
+void GMGLGraphicEngine::foreachShaderProgram(const std::function<void(GMGLShaderProgram*)>& action)
+{
+	D(d);
+	for (auto& sp : d->forwardRenderingShaders)
+	{
+		action(sp.second);
+	}
+
+	for (auto& sp : d->deferredCommonPassShaders)
+	{
+		action(sp.second);
+	}
+}
+
 void GMGLGraphicEngine::update(GMUpdateDataType type, const void* _data)
 {
 	D(d);
@@ -401,12 +400,12 @@ void GMGLGraphicEngine::update(GMUpdateDataType type, const void* _data)
 	case GMUpdateDataType::ProjectionMatrix:
 	{
 		GMCamera& camera = GM.getCamera();
-		d->projectionMatrix = camera.getFrustum().getProjection();
+		updateProjection(camera.getFrustum().getProjection());
 		break;
 	}
 	case GMUpdateDataType::ViewMatrix:
 	{
-		updateView(*static_cast<const CameraLookAt*>(_data));
+		updateView(*static_cast<const GMCameraLookAt*>(_data));
 		break;
 	}
 	default:
@@ -415,50 +414,38 @@ void GMGLGraphicEngine::update(GMUpdateDataType type, const void* _data)
 	}
 }
 
-void GMGLGraphicEngine::updateView(const CameraLookAt& lookAt)
+void GMGLGraphicEngine::updateProjection(const glm::mat4& proj)
 {
 	D(d);
-	GM_BEGIN_CHECK_GL_ERROR
-	updateMatrices(lookAt);
-
-	// 遍历每一种着色器
-	GMRenderMode renderModeCache = GMGetRenderState(RENDER_MODE);
-	auto renderStateCache = getRenderState();
-
-	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
-	updateVPMatrices(lookAt);
-
-	// 更新material pass著色器
-	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::DEFERRED);
-	GM_FOREACH_ENUM_CLASS(state, GMGLDeferredRenderState::PassingGeometry, GMGLDeferredRenderState::EndOfRenderState)
-	{
-		setRenderState(state);
-		updateVPMatrices(lookAt);
-	}
-	setRenderState(renderStateCache);
-	GMSetRenderState(RENDER_MODE, renderModeCache);
-
-	if (renderModeCache == GMStates_RenderOptions::DEFERRED)
-	{
-		// 更新light pass著色器
-		GMMesh dummy;
-		IRender* render = d->lightPassRender;
-		render->begin(this, &dummy, nullptr);
-		render->updateVPMatrices(d->projectionMatrix, d->viewMatrix, lookAt);
-		render->end();
-	}
-	GM_END_CHECK_GL_ERROR
+	auto update = [&proj](GMGLShaderProgram* shaderProgram) {
+		GM_BEGIN_CHECK_GL_ERROR
+		shaderProgram->useProgram();
+		shaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
+		GM_END_CHECK_GL_ERROR
+	};
+	foreachShaderProgram(update);
 }
 
-void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
+void GMGLGraphicEngine::updateView(const GMCameraLookAt& lookAt)
 {
 	D(d);
-	GMCamera& camera = GM.getCamera();
+	glm::mat4 viewMatrix = getViewMatrix(lookAt);
+	auto update = [&lookAt, &viewMatrix](GMGLShaderProgram* shaderProgram) {
+		shaderProgram->useProgram();
 
-	d->projectionMatrix = camera.getFrustum().getProjection();
-	d->viewMatrix = getViewMatrix(lookAt);
+		GM_BEGIN_CHECK_GL_ERROR
+		// 视觉位置，用于计算光照
+		GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
+		shaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
+		GM_END_CHECK_GL_ERROR
 
-	camera.getFrustum().updateViewMatrix(d->viewMatrix);
+		GM_BEGIN_CHECK_GL_ERROR
+		// V
+		shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
+		GM_END_CHECK_GL_ERROR
+	};
+	foreachShaderProgram(update);
+	GM.getCamera().getFrustum().updateViewMatrix(viewMatrix);
 }
 
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)

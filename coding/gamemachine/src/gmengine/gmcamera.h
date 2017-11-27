@@ -4,6 +4,25 @@
 #include <utilities.h>
 BEGIN_NS
 
+//Camera
+GM_ALIGNED_16(struct) GMCameraLookAt
+{
+	glm::vec3 lookAt;
+	glm::vec3 position;
+};
+
+GM_ALIGNED_16(struct) GMPositionState
+{
+	glm::vec3 position;
+	GMfloat yaw;
+	GMfloat pitch;
+};
+
+inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)
+{
+	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, glm::vec3(0, 1, 0));
+}
+
 //Frustum
 enum class GMFrustumType
 {
@@ -63,8 +82,8 @@ private:
 GM_PRIVATE_OBJECT(GMCamera)
 {
 	GMFrustum frustum;
-	PositionState state;
-	CameraLookAt lookAt;
+	GMPositionState state;
+	GMCameraLookAt lookAt;
 };
 
 class GMCamera
@@ -81,10 +100,10 @@ public:
 	void synchronize(GMSpriteGameObject* gameObject);
 	void synchronizeLookAt();
 
-	void lookAt(const CameraLookAt& lookAt);
+	void lookAt(const GMCameraLookAt& lookAt);
 
 	GMFrustum& getFrustum() { D(d); return d->frustum; }
-	const PositionState& getPositionState() { D(d); return d->state; }
+	const GMPositionState& getPositionState() { D(d); return d->state; }
 };
 
 END_NS

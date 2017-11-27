@@ -48,8 +48,6 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
-	glm::mat4 viewMatrix;
-	glm::mat4 projectionMatrix;
 
 	GMGLGBuffer gbuffer;
 	GMGLFramebuffer framebuffer;
@@ -143,8 +141,8 @@ private:
 	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
 	void registerEffectsShader(AUTORELEASE GMGLShaderProgram* effectsShader);
 	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
-	void updateView(const CameraLookAt& lookAt);
-	void updateMatrices(const CameraLookAt& lookAt);
+	void updateProjection(const glm::mat4& proj);
+	void updateView(const GMCameraLookAt& lookAt);
 	void installShaders();
 	void activateForwardRenderLight(const Vector<GMLight>& lights);
 	void activateLightPassLight(const Vector<GMLight>& lights);
@@ -153,9 +151,9 @@ private:
 	void forwardRender(GMGameObject* objects[], GMuint count);
 	void geometryPass(Vector<GMGameObject*>& objects);
 	void lightPass();
-	void updateVPMatrices(const CameraLookAt& lookAt);
 	void groupGameObjects(GMGameObject *objects[], GMuint count);
 	void viewGBufferFrameBuffer();
+	void foreachShaderProgram(const std::function<void(GMGLShaderProgram*)>& action);
 
 public:
 	static void newFrameOnCurrentFramebuffer();

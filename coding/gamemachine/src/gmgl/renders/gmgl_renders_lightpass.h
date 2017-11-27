@@ -19,9 +19,8 @@ public:
 	GMGLRenders_LightPass();
 
 public:
-	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override {}
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) override {}
 	virtual void beginShader(GMShader& shader, GMDrawMode mode) override { GM_ASSERT(false); }
-	virtual void updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt);
 	virtual void endShader() { GM_ASSERT(false); }
 	virtual void end() {}
 	virtual void activateLights(const GMLight* lights, GMint count);

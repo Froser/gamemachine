@@ -26,9 +26,8 @@ public:
 	GMGLRenders_3D();
 
 public:
-	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, GMfloat* modelTransform) override;
+	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) override;
 	virtual void beginShader(GMShader& shader, GMDrawMode mode) override;
-	virtual void updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt) override;
 	virtual void endShader() override;
 	virtual void end() override;
 	virtual void activateLights(const GMLight* lights, GMint count);

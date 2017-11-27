@@ -142,7 +142,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMCamera& camera = GM.getCamera();
-	PositionState pos = camera.getPositionState();
+	GMPositionState pos = camera.getPositionState();
 	BSPData& bsp = d->bsp.bspData();
 
 	rd.facesToDraw.clearAll();

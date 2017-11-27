@@ -391,25 +391,6 @@ public:
 
 };
 
-//Camera
-GM_ALIGNED_16(struct) CameraLookAt
-{
-	glm::vec3 lookAt;
-	glm::vec3 position;
-};
-
-GM_ALIGNED_16(struct) PositionState
-{
-	glm::vec3 position;
-	GMfloat yaw;
-	GMfloat pitch;
-};
-
-inline glm::mat4 getViewMatrix(const CameraLookAt& lookAt)
-{
-	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, glm::vec3(0, 1, 0));
-}
-
 //GMPath: platforms/[os]/path.cpp
 struct GMPath
 {

@@ -71,7 +71,7 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 	GMMovement moveDirection;
 	GMMoveRate moveRate;
 	GMfloat pitchLimitRadius;
-	PositionState state;
+	GMPositionState state;
 	GMCommandVector3 moveCmdArgFB;
 	GMCommandVector3 moveCmdArgLR;
 };
@@ -96,7 +96,7 @@ public:
 	void lookUp(GMfloat degree);
 	void lookRight(GMfloat degree);
 	void setPitchLimitDegree(GMfloat deg);
-	const PositionState& getPositionState();
+	const GMPositionState& getPositionState();
 
 private:
 	void moveForwardOrBackward(bool forward);

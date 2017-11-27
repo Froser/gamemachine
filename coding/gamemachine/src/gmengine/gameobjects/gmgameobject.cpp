@@ -56,11 +56,7 @@ void GMGameObject::draw()
 {
 	GMModel* coreObj = getModel();
 	if (coreObj)
-	{
-		GMfloat transform[16];
-		glm::copyToArray(getTransform(), transform);
-		coreObj->getPainter()->draw(transform);
-	}
+		coreObj->getPainter()->draw(glm::value_ptr(getTransform()));
 }
 
 bool GMGameObject::canDeferredRendering()

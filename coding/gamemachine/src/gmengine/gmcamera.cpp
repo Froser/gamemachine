@@ -200,7 +200,7 @@ void GMCamera::synchronizeLookAt()
 	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix, &d->lookAt);
 }
 
-void GMCamera::lookAt(const CameraLookAt& lookAt)
+void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 {
 	D(d);
 	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix, &lookAt);

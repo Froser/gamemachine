@@ -7,7 +7,6 @@ BEGIN_NS
 class GMGLRenders_2D : public GMGLRenders_3D
 {
 public:
-	virtual void updateVPMatrices(const glm::mat4& projection, const glm::mat4& view, const CameraLookAt& lookAt) override;
 	virtual void beginShader(GMShader& shader, GMDrawMode mode) override;
 };
 

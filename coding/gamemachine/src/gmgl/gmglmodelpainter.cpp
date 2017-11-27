@@ -100,7 +100,7 @@ void GMGLModelPainter::transfer()
 	d->inited = true;
 }
 
-void GMGLModelPainter::draw(GMfloat* modelTransform)
+void GMGLModelPainter::draw(const GMfloat* modelTransform)
 {
 	D(d);
 	GMModel* obj = getModel();
