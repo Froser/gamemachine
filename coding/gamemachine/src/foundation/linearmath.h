@@ -58,17 +58,16 @@ inline GMfloat gmMax(GMfloat x, GMfloat y) { return x > y ? x : y; }
 
 END_NS
 
-#define VEC4(v3, v4) glm::vec4(v3, v4[3])
-
 namespace glm
 {
+	inline vec4 combine_vec4(const vec3& v3, const vec4& v4)
+	{
+		return glm::vec4(v3, v4[3]);
+	}
+
 	// identity
 	template <typename T>
-	inline T identity()
-	{
-		GM_ASSERT(false);
-		return T();
-	}
+	inline T& identity();
 
 	template <>
 	inline mat4& identity()
@@ -94,7 +93,7 @@ namespace glm
 	template <>
 	inline quat& identity()
 	{
-		static quat q(0, 0, 0, 1);
+		static quat q(1, 0, 0, 0);
 		return q;
 	}
 
@@ -106,7 +105,7 @@ namespace glm
 
 	inline mat4 scale(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z)
 	{
-		return  scale(identity<mat4>(), vec3(x, y, z));
+		return scale(identity<mat4>(), vec3(x, y, z));
 	}
 
 	inline mat4 translate(const vec3& v)
@@ -141,9 +140,9 @@ namespace glm
 		return vec4(v3.x, v3.y, v3.z, 1);
 	}
 
-	inline vec3 fromArray(const gm::GMfloat(&v)[3])
+	inline vec3 make_vec3(const gm::GMfloat(&v)[3])
 	{
-		return vec3(v[0], v[1], v[2]);
+		return make_vec3(static_cast<const gm::GMfloat*>(v));
 	}
 
 	template <typename T>

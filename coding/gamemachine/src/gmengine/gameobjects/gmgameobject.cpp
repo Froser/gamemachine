@@ -5,13 +5,6 @@
 #include "foundation/gamemachine.h"
 #include "gmassets.h"
 
-GMGameObject::GMGameObject()
-{
-	D(d);
-	d->scaling = glm::identity<glm::mat4>();
-	d->translation = glm::identity<glm::mat4>();
-}
-
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
@@ -254,8 +247,7 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 	{
 		glm::mat4 transRestore = glm::translate(center);
 		glm::mat4 transMoveToAxisOrigin = glm::translate(-center);
-		//#warning todo
-		glm::mat4 transFinal = transRestore;// *transScale * transMoveToAxisOrigin;
+		glm::mat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
 
 		glm::vec4 pt = glm::vec4(vertices[i], 1) * transFinal;
 		vertices[i] = glm::vec3(pt[0], pt[1], pt[2]);

@@ -263,16 +263,14 @@ void GMFrustum::initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat
 void GMFrustum::update()
 {
 	D(d);
-	glm::mat4 projection = getPerspective();
+	glm::mat4 projection = getProjection();
 	glm::mat4& view = d->viewMatrix;
 	glm::mat4 clipMat;
 
 	if (d->type == GMFrustumType::Perspective)
 	{
 		//Multiply the matrices
-
-		//#warning todo
-		//clipMat = projection * view;
+		clipMat = projection * view;
 
 		GMfloat clip[16];
 		for (GMint i = 0; i < 4; i++)
@@ -374,7 +372,7 @@ bool GMFrustum::isBoundingBoxInside(const glm::vec3 * vertices)
 	return true;
 }
 
-glm::mat4 GMFrustum::getPerspective()
+glm::mat4 GMFrustum::getProjection()
 {
 	D(d);
 	if (d->type == GMFrustumType::Perspective)

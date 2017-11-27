@@ -302,21 +302,15 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 	{
 		if (d->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			//#warning todo
-				/*
 			transform = glm::translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
-				* glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::mat4_cast(glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
 				* glm::scale(glm::vec3(size));
-				*/
 		}
 		else
 		{
-			//#warning todo
-				/*
 			transform = glm::translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
-				* glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::mat4_cast(glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
 				* glm::scale(glm::vec3(size));
-				*/
 		}
 	}
 	else
@@ -540,21 +534,15 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 		
 		if (db->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			//#warning todo
-				/*
 			transform = glm::translate(db->particleProps[index].startupPosition + glm::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
-				* glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::mat4_cast(glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
 				* glm::scale(glm::vec3(size));
-				*/
 		}
 		else
 		{
-			//#warning todo
-				/*
 			transform = glm::translate(db->emitterProps.position + glm::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
-				* glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage).toMatrix()
+				* glm::mat4_cast(glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
 				* glm::scale(glm::vec3(size));
-				*/
 		}
 	}
 	else

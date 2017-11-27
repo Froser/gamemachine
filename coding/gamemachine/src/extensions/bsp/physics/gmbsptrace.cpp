@@ -396,7 +396,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			plane[3] += tw.sphere.radius;
 
 			// find the closest point on the capsule to the plane
-			t = glm::dot(glm::toInhomogeneous(plane), tw.sphere.offset);
+			t = glm::dot(glm::make_vec3(plane), tw.sphere.offset);
 			if (t > 0.0f) {
 				startp = tw.start - tw.sphere.offset;
 				endp = tw.end - tw.sphere.offset;
@@ -408,7 +408,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 		}
 		else
 		{
-			offset = glm::dot(tw.offsets[planes->signbits], glm::toInhomogeneous(plane));
+			offset = glm::dot(tw.offsets[planes->signbits], glm::make_vec3(plane));
 			plane[3] += offset;
 			startp = tw.start;
 			endp = tw.end;
@@ -434,7 +434,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 				plane[3] += tw.sphere.radius;
 
 				// find the closest point on the capsule to the plane
-				t = glm::dot(glm::toInhomogeneous(plane), tw.sphere.offset);
+				t = glm::dot(glm::make_vec3(plane), tw.sphere.offset);
 				if (t > 0.0f) {
 					startp = tw.start - tw.sphere.offset;
 					endp = tw.end - tw.sphere.offset;
@@ -447,7 +447,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			else
 			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
-				offset = glm::dot(tw.offsets[planes->signbits], glm::toInhomogeneous(plane));
+				offset = glm::dot(tw.offsets[planes->signbits], glm::make_vec3(plane));
 				plane[3] -= fabs(offset);
 				startp = tw.start;
 			}
@@ -478,7 +478,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 				}
 
 				tw.trace.fraction = enterFrac;
-				tw.trace.plane.normal = glm::toInhomogeneous(bestplane);
+				tw.trace.plane.normal = glm::make_vec3(bestplane);
 				tw.trace.plane.intercept = bestplane[3];
 			}
 		}
@@ -527,9 +527,9 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 	GMint i = 0;
 	for (const auto& plane : planes)
 	{
-		offset = glm::dot(tw.offsets[plane.signbits], glm::toInhomogeneous(plane.plane));
-		d1 = glm::dot(tw.start, glm::toInhomogeneous(plane.plane)) - plane.plane[3] + offset;
-		d2 = glm::dot(tw.end, glm::toInhomogeneous(plane.plane)) - plane.plane[3] + offset;
+		offset = glm::dot(tw.offsets[plane.signbits], glm::make_vec3(plane.plane));
+		d1 = glm::dot(tw.start, glm::make_vec3(plane.plane)) - plane.plane[3] + offset;
+		d2 = glm::dot(tw.end, glm::make_vec3(plane.plane)) - plane.plane[3] + offset;
 		if (d1 <= 0)
 			frontFacing[i] = 0;
 		else
@@ -581,9 +581,9 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 			const GMBSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
 
 			// calculate intersection with a slight pushoff
-			offset = glm::dot(tw.offsets[planes->signbits], glm::toInhomogeneous(planes->plane));
-			d1 = glm::dot(tw.start, glm::toInhomogeneous(planes->plane)) - planes->plane[3] + offset;
-			d2 = glm::dot(tw.end, glm::toInhomogeneous(planes->plane)) - planes->plane[3] + offset;
+			offset = glm::dot(tw.offsets[planes->signbits], glm::make_vec3(planes->plane));
+			d1 = glm::dot(tw.start, glm::make_vec3(planes->plane)) - planes->plane[3] + offset;
+			d2 = glm::dot(tw.end, glm::make_vec3(planes->plane)) - planes->plane[3] + offset;
 			tw.trace.fraction = (d1 - SURFACE_CLIP_EPSILON) / (d1 - d2);
 
 			if (tw.trace.fraction < 0)
@@ -591,7 +591,7 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 				tw.trace.fraction = 0;
 			}
 
-			tw.trace.plane.normal = glm::toInhomogeneous(planes->plane);
+			tw.trace.plane.normal = glm::make_vec3(planes->plane);
 			tw.trace.plane.intercept = planes->plane[3];
 		}
 	}

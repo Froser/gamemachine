@@ -433,7 +433,7 @@ void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 	D(d);
 	GMCamera& camera = GM.getCamera();
 
-	d->projectionMatrix = camera.getFrustum().getPerspective();
+	d->projectionMatrix = camera.getFrustum().getProjection();
 	d->viewMatrix = getViewMatrix(lookAt);
 
 	camera.getFrustum().updateViewMatrix(d->viewMatrix, d->projectionMatrix);

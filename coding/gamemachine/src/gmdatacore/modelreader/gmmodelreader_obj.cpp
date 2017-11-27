@@ -261,8 +261,8 @@ void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, 
 	shader.setCull(GMS_Cull::NONE);
 
 	GMMaterial& m = shader.getMaterial();
-	m.ka = glm::fromArray(material.ka);
-	m.kd = glm::fromArray(material.kd);
-	m.ks = glm::fromArray(material.ks);
+	m.ka = glm::make_vec3(material.ka);
+	m.kd = glm::make_vec3(material.kd);
+	m.ks = glm::make_vec3(material.ks);
 	m.shininess = material.ns;
 }

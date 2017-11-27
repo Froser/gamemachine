@@ -312,7 +312,7 @@ public:
 	void update();
 	bool isPointInside(const glm::vec3& point);
 	bool isBoundingBoxInside(const glm::vec3* vertices);
-	glm::mat4 getPerspective();
+	glm::mat4 getProjection();
 	void updateViewMatrix(glm::mat4& viewMatrix, glm::mat4& projMatrix);
 };
 

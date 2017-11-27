@@ -35,7 +35,7 @@ class GMGameObject : public GMObject
 	DECLARE_PRIVATE(GMGameObject)
 
 public:
-	GMGameObject();
+	GMGameObject() = default;
 	GMGameObject(GMAsset asset);
 
 public:
@@ -53,9 +53,10 @@ public:
 	virtual bool canDeferredRendering();
 
 private:
-	inline void updateMatrix() { 
-		//D(d); d->transformMatrix = d->translation * d->rotation.toMatrix() * d->scaling; 
-		//#warning todo
+	inline void updateMatrix()
+	{ 
+		D(d);
+		d->transformMatrix = d->translation * glm::mat4_cast(d->rotation) * d->scaling; 
 	}
 
 public:
