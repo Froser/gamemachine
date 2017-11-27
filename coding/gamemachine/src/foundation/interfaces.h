@@ -81,6 +81,12 @@ enum class GMBufferMode
 	NoFramebuffer,
 };
 
+enum class GMUpdateDataType
+{
+	ProjectionMatrix,
+	ViewMatrix,
+};
+
 class GMLight;
 GM_INTERFACE(IGraphicEngine)
 {
@@ -88,7 +94,7 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void newFrame() = 0;
 	virtual bool event(const GameMachineMessage& e) = 0;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode = GMBufferMode::Normal) = 0;
-	virtual void updateCameraView(const CameraLookAt& lookAt) = 0;
+	virtual void update(GMUpdateDataType type, const void* data) = 0;
 	virtual void addLight(const GMLight& light) = 0;
 	virtual void removeLights() = 0;
 	virtual void clearStencil() = 0;

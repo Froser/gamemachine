@@ -4,23 +4,60 @@
 #include <utilities.h>
 BEGIN_NS
 
-class GMSpriteGameObject;
+//Frustum
+enum class GMFrustumType
+{
+	Perspective,
+	Orthographic,
+};
 
+GM_PRIVATE_OBJECT(GMFrustum)
+{
+	GMFrustumType type = GMFrustumType::Perspective;
+	GMPlane planes[6];
+	union
+	{
+		struct
+		{
+			GMfloat fovy;
+			GMfloat aspect;
+		};
+
+		struct
+		{
+			GMfloat left;
+			GMfloat right;
+			GMfloat bottom;
+			GMfloat top;
+		};
+	};
+	GMfloat n;
+	GMfloat f;
+
+	glm::mat4 viewMatrix;
+	glm::mat4 projMatrix;
+};
+
+class GMSpriteGameObject;
 class GMFrustum : public GMObject
 {
 	DECLARE_PRIVATE(GMFrustum)
 
 public:
 	GMFrustum() = default;
-	void initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
-	void initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
+	void setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
+	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
-	void update();
 	bool isPointInside(const glm::vec3& point);
 	bool isBoundingBoxInside(const glm::vec3* vertices);
-	glm::mat4 getProjection();
-	void updateViewMatrix(glm::mat4& viewMatrix, glm::mat4& projMatrix);
+	void updateViewMatrix(glm::mat4& viewMatrix);
+
+public:
+	inline const glm::mat4& getProjection() { D(d); return d->projMatrix; }
+
+private:
+	void update();
 };
 
 GM_PRIVATE_OBJECT(GMCamera)

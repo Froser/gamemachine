@@ -265,40 +265,6 @@ struct GMPlane : public GMObject, public GMAlignmentObject
 	GMfloat intercept;
 };
 
-//Frustum
-enum class GMFrustumType
-{
-	Perspective,
-	Orthographic,
-};
-
-GM_PRIVATE_OBJECT(GMFrustum)
-{
-	GMFrustumType type = GMFrustumType::Perspective;
-	GMPlane planes[6];
-	union
-	{
-		struct
-		{
-			GMfloat fovy;
-			GMfloat aspect;
-		};
-
-		struct
-		{
-			GMfloat left;
-			GMfloat right;
-			GMfloat bottom;
-			GMfloat top;
-		};
-	};
-	GMfloat n;
-	GMfloat f;
-
-	glm::mat4 viewMatrix;
-	glm::mat4 projMatrix;
-};
-
 //Scanner
 typedef bool(*CharPredicate)(char in);
 

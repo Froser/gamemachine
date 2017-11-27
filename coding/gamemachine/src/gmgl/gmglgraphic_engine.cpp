@@ -393,7 +393,29 @@ void GMGLGraphicEngine::viewGBufferFrameBuffer()
 	}
 }
 
-void GMGLGraphicEngine::updateCameraView(const CameraLookAt& lookAt)
+void GMGLGraphicEngine::update(GMUpdateDataType type, const void* _data)
+{
+	D(d);
+	switch (type)
+	{
+	case GMUpdateDataType::ProjectionMatrix:
+	{
+		GMCamera& camera = GM.getCamera();
+		d->projectionMatrix = camera.getFrustum().getProjection();
+		break;
+	}
+	case GMUpdateDataType::ViewMatrix:
+	{
+		updateView(*static_cast<const CameraLookAt*>(_data));
+		break;
+	}
+	default:
+		GM_ASSERT(false);
+		break;
+	}
+}
+
+void GMGLGraphicEngine::updateView(const CameraLookAt& lookAt)
 {
 	D(d);
 	GM_BEGIN_CHECK_GL_ERROR
@@ -436,8 +458,7 @@ void GMGLGraphicEngine::updateMatrices(const CameraLookAt& lookAt)
 	d->projectionMatrix = camera.getFrustum().getProjection();
 	d->viewMatrix = getViewMatrix(lookAt);
 
-	camera.getFrustum().updateViewMatrix(d->viewMatrix, d->projectionMatrix);
-	camera.getFrustum().update();
+	camera.getFrustum().updateViewMatrix(d->viewMatrix);
 }
 
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)

@@ -14,7 +14,7 @@ enum
 	FAR_PLANE
 };
 
-void GMFrustum::initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
+void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
 	d->type = GMFrustumType::Orthographic;
@@ -24,9 +24,11 @@ void GMFrustum::initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat t
 	d->top = top;
 	d->n = n;
 	d->f = f;
+	d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	update();
 }
 
-void GMFrustum::initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
+void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
 {
 	D(d);
 	d->type = GMFrustumType::Perspective;
@@ -34,6 +36,8 @@ void GMFrustum::initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat
 	d->aspect = aspect;
 	d->n = n;
 	d->f = f;
+	d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+	update();
 }
 
 void GMFrustum::update()
@@ -148,26 +152,18 @@ bool GMFrustum::isBoundingBoxInside(const glm::vec3 * vertices)
 	return true;
 }
 
-glm::mat4 GMFrustum::getProjection()
-{
-	D(d);
-	if (d->type == GMFrustumType::Perspective)
-		return glm::perspective(d->fovy, d->aspect, d->n, d->f);
-	return glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
-}
-
-void GMFrustum::updateViewMatrix(glm::mat4& viewMatrix, glm::mat4& projMatrix)
+void GMFrustum::updateViewMatrix(glm::mat4& viewMatrix)
 {
 	D(d);
 	d->viewMatrix = viewMatrix;
-	d->projMatrix = projMatrix;
+	update();
 }
 
 //////////////////////////////////////////////////////////////////////////
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.initPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
+	d->frustum.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
 	d->state.position = glm::vec3(0);
 	d->state.pitch = 0;
 	d->state.yaw = 0;
@@ -176,13 +172,15 @@ GMCamera::GMCamera()
 void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
 {
 	D(d);
-	d->frustum.initPerspective(fovy, aspect, n, f);
+	d->frustum.setPerspective(fovy, aspect, n, f);
+	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix, nullptr);
 }
 
 void GMCamera::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
-	d->frustum.initOrtho(left, right, bottom, top, n, f);
+	d->frustum.setOrtho(left, right, bottom, top, n, f);
+	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix, nullptr);
 }
 
 void GMCamera::synchronize(GMSpriteGameObject* gameObject)
@@ -199,11 +197,11 @@ void GMCamera::synchronize(GMSpriteGameObject* gameObject)
 void GMCamera::synchronizeLookAt()
 {
 	D(d);
-	GM.getGraphicEngine()->updateCameraView(d->lookAt);
+	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix, &d->lookAt);
 }
 
 void GMCamera::lookAt(const CameraLookAt& lookAt)
 {
 	D(d);
-	GM.getGraphicEngine()->updateCameraView(lookAt);
+	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix, &lookAt);
 }
