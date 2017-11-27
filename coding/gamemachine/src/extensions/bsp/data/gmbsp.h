@@ -242,7 +242,7 @@ GM_PRIVATE_OBJECT(GMBSP)
 	GMint numDrawIndexes = 0;
 	GMint numDrawSurfaces = 0;
 	GMint numFogs = 0;
-	GMbyte* buffer = nullptr;
+	const GMBuffer* buffer = nullptr;
 	GMBSPHeader* header = nullptr;
 
 private:

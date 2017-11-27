@@ -223,7 +223,7 @@ void DemostrationWorld::resetProjectionAndEye()
 {
 	// 设置一个默认视角
 	gm::GMCamera& camera = GM.getCamera();
-	camera.initOrtho(-1, 1, -1, 1, .1f, 3200.f);
+	camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
 
 	gm::CameraLookAt lookAt;
 	lookAt.lookAt = { 0, 0, -1 };

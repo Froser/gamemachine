@@ -51,7 +51,7 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 			*(basePositions + offset * 4 + 2),
 			*(basePositions + offset * 4 + 3)
 		);
-		glm::vec4 transformedPosition = basePositionVector * d->transform;
+		glm::vec4 transformedPosition = d->transform * basePositionVector;
 		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
 		glm::copyToArray(transformedPosition, (GMfloat*)(vertexData + offset_position) + offset * 4);
 
@@ -444,7 +444,7 @@ void GMLerpParticleEmitter::create(
 				qEnd = glm::rotate(glm::identity<glm::quat>(), gmAcos(theta), axis);
 
 			glm::quat interpolation = glm::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
-			glm::vec4 transformed = glm::toHomogeneous(normalStart) * glm::mat4_cast(interpolation);
+			glm::vec4 transformed = glm::mat4_cast(interpolation) * glm::toHomogeneous(normalStart);
 			particleProps[i].direction = glm::toInhomogeneous(transformed);
 		}
 
@@ -530,7 +530,7 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 	glm::mat4 transform;
 	if (db->particleProps[index].visible)
 	{
-		glm::vec4 rotatedDirection = glm::toHomogeneous(db->particleProps[index].direction) * glm::mat4_cast(rotation);
+		glm::vec4 rotatedDirection = glm::mat4_cast(rotation) * glm::toHomogeneous(db->particleProps[index].direction);
 		
 		if (db->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{

@@ -299,23 +299,6 @@ GM_PRIVATE_OBJECT(GMFrustum)
 	glm::mat4 projMatrix;
 };
 
-class GMFrustum : public GMObject
-{
-	DECLARE_PRIVATE(GMFrustum)
-
-public:
-	GMFrustum() = default;
-	void initOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
-	void initPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
-
-public:
-	void update();
-	bool isPointInside(const glm::vec3& point);
-	bool isBoundingBoxInside(const glm::vec3* vertices);
-	glm::mat4 getProjection();
-	void updateViewMatrix(glm::mat4& viewMatrix, glm::mat4& projMatrix);
-};
-
 //Scanner
 typedef bool(*CharPredicate)(char in);
 

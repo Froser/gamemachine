@@ -120,8 +120,6 @@ GMBSP::GMBSP()
 GMBSP::~GMBSP()
 {
 	D(d);
-	GM_delete_array(d->buffer);
-
 	for (auto& entity : d->entities)
 	{
 		GM_delete(entity);
@@ -131,8 +129,7 @@ GMBSP::~GMBSP()
 void GMBSP::loadBsp(const GMBuffer& buf)
 {
 	D(d);
-	d->buffer = new GMbyte[buf.size];
-	memcpy(d->buffer, buf.buffer, buf.size);
+	d->buffer = &buf;
 	swapBsp();
 	parseEntities();
 	toGLCoord();
@@ -148,7 +145,7 @@ BSPData& GMBSP::bspData()
 void GMBSP::swapBsp()
 {
 	D(d);
-	d->header = (GMBSPHeader*)d->buffer;
+	d->header = (GMBSPHeader*)d->buffer->buffer;
 
 	if (d->header->ident != BSP_IDENT) {
 		gm_error(_L("Invalid IBSP file"));
@@ -355,7 +352,6 @@ void GMBSP::loadNoAlignData()
 	length = (d->header->lumps[LUMP_LIGHTGRID].filelen) / 1;
 	d->gridData.resize(length + extrasize);
 	d->numGridPoints = copyLump(d->header, LUMP_LIGHTGRID, &d->gridData[0], 8);
-
 }
 
 // 将坐标系转化为xyz(OpenGL)坐标系

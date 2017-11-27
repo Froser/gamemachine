@@ -249,7 +249,7 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 		glm::mat4 transMoveToAxisOrigin = glm::translate(-center);
 		glm::mat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
 
-		glm::vec4 pt = glm::vec4(vertices[i], 1) * transFinal;
+		glm::vec4 pt = transFinal * glm::vec4(vertices[i], 1);
 		vertices[i] = glm::vec3(pt[0], pt[1], pt[2]);
 	}
 

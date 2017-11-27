@@ -27,6 +27,9 @@ void Demo_Quake3_BSP::onDeactivate()
 
 void Demo_Quake3_BSP::setLookAt()
 {
+	// 设置一个默认视角
+	gm::GMCamera& camera = GM.getCamera();
+	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
 	GM.getCamera().synchronizeLookAt();
 }
 
