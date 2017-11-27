@@ -2,6 +2,10 @@
 #define __GM_LINEARMATH_H__
 
 // GLM
+#if !USE_SIMD
+	#define GLM_FORCE_PURE
+#endif
+
 #define GLM_FORCE_INLINE
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
