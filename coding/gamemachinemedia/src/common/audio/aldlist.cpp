@@ -25,8 +25,8 @@
 #include "stdafx.h"
 #include <gamemachine.h>
 #include "aldlist.h"
-#include "alc.h"
-#include "al.h"
+#include <al/alc.h>
+#include <al/al.h>
 
 /*
  * Init call

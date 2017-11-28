@@ -1,4 +1,4 @@
 project (gamemachine)
-init_solution()
+gm_init_solution()
 
 add_subdirectory(src)

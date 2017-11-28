@@ -91,9 +91,9 @@ set(SOURCES
 		transupp.h
 	)
 
-source_group_by_dir(SOURCES)
+gm_source_group_by_dir(SOURCES)
 
 add_library(libjpeg
 		${SOURCES}
 	)
-set_target_properties(libjpeg PROPERTIES FOLDER ${PROJECT_NAME})
+gm_folder(libjpeg)

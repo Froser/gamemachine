@@ -1,5 +1,5 @@
 project (gamemachineui)
-init_solution()
+gm_init_solution()
 
 include_directories(
 		./
@@ -41,10 +41,10 @@ if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
 
-source_group_by_dir(SOURCES)
+gm_source_group_by_dir(SOURCES)
 
 if(WIN32)
-	add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
+	gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 endif(WIN32)
 
 add_library(${PROJECT_NAME}
@@ -58,3 +58,5 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 
 endif(MSVC)
+
+target_link_libraries(${PROJECT_NAME} duilib)

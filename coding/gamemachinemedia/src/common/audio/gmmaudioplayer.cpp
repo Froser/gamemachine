@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioplayer.h"
-#include "al.h"
-#include "alc.h"
+#include <al/al.h>
+#include <al/alc.h>
 #include "decoder.h"
 
 // 大小保持一致

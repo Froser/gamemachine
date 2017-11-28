@@ -154,7 +154,7 @@ if(NOT AWK)
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
   add_custom_target(genfiles) # Dummy
-  set_target_properties(genfiles PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(genfiles)
 else()
   include(CMakeParseArguments)
   # Generate .chk from .out with awk
@@ -329,7 +329,7 @@ else()
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.chk"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/symbols.out"
     "${CMAKE_CURRENT_BINARY_DIR}/scripts/vers.out")
-  set_target_properties(genfiles PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(genfiles)
 endif(NOT AWK)
 
 # OUR SOURCES
@@ -403,7 +403,7 @@ unset(PNG_LIB_TARGETS)
 
 if(PNG_SHARED)
   add_library(png SHARED ${libpng_sources})
-  set_target_properties(png PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(png)
 
   set(PNG_LIB_TARGETS png)
   set_target_properties(png PROPERTIES OUTPUT_NAME ${PNG_LIB_NAME})
@@ -430,7 +430,7 @@ if(PNG_STATIC)
   # does not work without changing name
   set(PNG_LIB_NAME_STATIC png_static)
   add_library(png_static STATIC ${libpng_sources})
-  set_target_properties(png_static PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(png_static)
   add_dependencies(png_static genfiles)
   # MSVC doesn't use a different file extension for shared vs. static
   # libs.  We are able to change OUTPUT_NAME to remove the _static
@@ -455,7 +455,7 @@ endif()
 if(PNG_FRAMEWORK)
   set(PNG_LIB_NAME_FRAMEWORK png_framework)
   add_library(png_framework SHARED ${libpng_sources})
-  set_target_properties(png_framework PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(png_framework)
   add_dependencies(png_framework genfiles)
   list(APPEND PNG_LIB_TARGETS png_framework)
   set_target_properties(png_framework PROPERTIES
@@ -525,13 +525,13 @@ endfunction()
 #  set(PNGTEST_PNG "${CMAKE_CURRENT_SOURCE_DIR}/pngtest.png")
 #
 #  add_executable(pngtest ${pngtest_sources})
-#  set_target_properties(pngtest PROPERTIES FOLDER ${PROJECT_NAME})
+#  gm_folder(pngtest)
 #  target_link_libraries(pngtest png)
 #
 #  png_add_test(NAME pngtest COMMAND pngtest FILES "${PNGTEST_PNG}")
 #
 #  add_executable(pngvalid ${pngvalid_sources})
-#  set_target_properties(pngvalid PROPERTIES FOLDER ${PROJECT_NAME})
+#  gm_folder(pngvalid)
 #  target_link_libraries(pngvalid png)
 #
 #  png_add_test(NAME pngvalid-gamma-16-to-8
@@ -564,7 +564,7 @@ endfunction()
 #               COMMAND pngvalid OPTIONS --transform)
 #
 #  add_executable(pngstest ${pngstest_sources})
-#  set_target_properties(pngstest PROPERTIES FOLDER ${PROJECT_NAME}) 
+#  gm_folder(pngstest)
 #  target_link_libraries(pngstest png)
 #
 #  foreach(gamma_type 1.8 linear none sRGB)
@@ -620,7 +620,7 @@ endfunction()
 #  endforeach()
 #
 #  add_executable(pngunknown ${pngunknown_sources})
-#  set_target_properties(pngunknown PROPERTIES FOLDER ${PROJECT_NAME})
+#  gm_folder(pngunknown)
 #  target_link_libraries(pngunknown png)
 #
 #  png_add_test(NAME pngunknown-discard COMMAND pngunknown OPTIONS --strict default=discard FILES "${PNGTEST_PNG}")
@@ -632,7 +632,7 @@ endfunction()
 #  png_add_test(NAME pngunknown-vpAg COMMAND pngunknown OPTIONS --strict vpAg=if-safe FILES "${PNGTEST_PNG}")
 #
 #  add_executable(pngimage ${pngimage_sources})
-#  set_target_properties(pngimage PROPERTIES FOLDER ${PROJECT_NAME})
+#  gm_folder(pngimage)
 #  target_link_libraries(pngimage png)
 #
 #  png_add_test(NAME pngimage-quick COMMAND pngimage OPTIONS --list-combos --log FILES ${PNGSUITE_PNGS})
@@ -641,12 +641,12 @@ endfunction()
 
 if(PNG_SHARED)
   add_executable(pngfix ${pngfix_sources})
-  set_target_properties(pngfix PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(pngfix)
   target_link_libraries(pngfix png)
   set(PNG_BIN_TARGETS pngfix)
 
   add_executable(png-fix-itxt ${png_fix_itxt_sources})
-  set_target_properties(png-fix-itxt PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(png-fix-itxt)
   target_link_libraries(png-fix-itxt ${ZLIB_LIBRARY} ${M_LIBRARY})
   list(APPEND PNG_BIN_TARGETS png-fix-itxt)
 endif()

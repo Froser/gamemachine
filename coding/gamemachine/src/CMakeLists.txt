@@ -11,7 +11,7 @@ include_directories(
 		../../3rdparty/glm-0.9.9-a2
 	)
 
-init_solution()
+gm_init_solution()
 
 set(SOURCES
 		stdafx.cpp
@@ -177,8 +177,8 @@ if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
 
-source_group_by_dir(SOURCES)
-add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
+gm_source_group_by_dir(SOURCES)
+gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 
 add_library(${PROJECT_NAME}
 		${SOURCES}
@@ -188,3 +188,10 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 
 endif(MSVC)
+
+gm_link_dependencies(${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} lua)
+target_link_libraries(${PROJECT_NAME} png_static)
+target_link_libraries(${PROJECT_NAME} zlibstatic)
+target_link_libraries(${PROJECT_NAME} libjpeg)
+target_link_libraries(${PROJECT_NAME} freetype)

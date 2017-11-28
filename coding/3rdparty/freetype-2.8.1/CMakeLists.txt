@@ -339,7 +339,7 @@ add_library(freetype
   ${PRIVATE_HEADERS}
   ${BASE_SRCS}
 )
-set_target_properties(freetype PROPERTIES FOLDER ${PROJECT_NAME})
+gm_folder(freetype)
 
 if (BUILD_SHARED_LIBS)
   set_target_properties(freetype PROPERTIES
@@ -447,7 +447,7 @@ include(CPack)
 # Add `make dist' target if FREETYPE_DIST is set (which is the default)
 if (NOT DEFINED FREETYPE_NO_DIST)
   add_custom_target(dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
-  set_target_properties(dist PROPERTIES FOLDER ${PROJECT_NAME})
+  gm_folder(dist)
 endif ()
 
 # eof

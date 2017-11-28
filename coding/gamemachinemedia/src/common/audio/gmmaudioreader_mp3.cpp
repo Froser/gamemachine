@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmmaudioreader_mp3.h"
-#include <al.h>
+#include <al/al.h>
 #include "mad.h"
 #include "common/utilities/gmmstream.h"
 #include "gmmaudioreader_stream.h"

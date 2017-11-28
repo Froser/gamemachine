@@ -42,4 +42,4 @@ add_definitions(
 	-DASO_ZEROCHECK
 )
 
-set_target_properties(libmad PROPERTIES FOLDER ${PROJECT_NAME})
+gm_folder(libmad)

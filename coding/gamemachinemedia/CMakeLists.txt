@@ -1,12 +1,12 @@
 project (gamemachinemedia)
-init_solution()
+gm_init_solution()
 
 include_directories(
 		./
 		./include
 		./src
 		../3rdparty/glew/include
-		../3rdparty/openal1.1/include
+		../3rdparty/openal-soft-1.18.2/include
 		../3rdparty/libmad
 		../3rdparty/lua/src
 		../gamemachine/include
@@ -46,10 +46,10 @@ if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
 
-source_group_by_dir(SOURCES)
+gm_source_group_by_dir(SOURCES)
 
 if(WIN32)
-	add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
+	gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
 endif(WIN32)
 
 add_library(${PROJECT_NAME}
@@ -59,7 +59,13 @@ add_library(${PROJECT_NAME}
 add_definitions(-DFPM_DEFAULT)
 add_definitions(-DUNICODE -D_UNICODE)
 
+# Use openal static library
+add_definitions(-DAL_LIBTYPE_STATIC)
+
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 
 endif(MSVC)
+
+target_link_libraries(${PROJECT_NAME} libmad)
+target_link_libraries(${PROJECT_NAME} OpenAL)

@@ -64,7 +64,7 @@ set(SOURCES
 	src/lzio.h
 	)
 
-source_group_by_dir(SOURCES)
+gm_source_group_by_dir(SOURCES)
 
 add_library(lua
 		${SOURCES}
@@ -73,7 +73,7 @@ add_library(lua
 add_definitions(-DFPM_DEFAULT)
 add_definitions(-DUNICODE -D_UNICODE)
 
-set_target_properties(lua PROPERTIES FOLDER ${PROJECT_NAME})
+gm_folder(lua)
 
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 

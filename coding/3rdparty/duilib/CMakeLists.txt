@@ -94,11 +94,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Layout)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/Utils)
 add_definitions(-DUNICODE -D_UNICODE)
 
-source_group_by_dir(SOURCES)
+gm_source_group_by_dir(SOURCES)
 add_library(
 		duilib ${SOURCES}
 	)
-
-set_target_properties(duilib PROPERTIES FOLDER ${PROJECT_NAME})
-
+gm_folder(duilib)
 target_link_libraries(duilib comctl32)

@@ -221,5 +221,5 @@ if(NOT TARGET uninstall)
 		COMMAND ${CMAKE_COMMAND} -P
 		${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
 
-	set_target_properties(uninstall PROPERTIES FOLDER ${PROJECT_NAME})
+	gm_folder(uninstall)
 endif()
