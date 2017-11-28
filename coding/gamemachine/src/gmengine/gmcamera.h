@@ -73,7 +73,8 @@ public:
 	void updateViewMatrix(glm::mat4& viewMatrix);
 
 public:
-	inline const glm::mat4& getProjection() { D(d); return d->projMatrix; }
+	inline const glm::mat4& getProjectionMatrix() { D(d); return d->projMatrix; }
+	inline const glm::mat4& getViewMatrix() { D(d); return d->viewMatrix; }
 
 private:
 	void update();
@@ -101,9 +102,13 @@ public:
 	void synchronizeLookAt();
 
 	void lookAt(const GMCameraLookAt& lookAt);
-
 	GMFrustum& getFrustum() { D(d); return d->frustum; }
-	const GMPositionState& getPositionState() { D(d); return d->state; }
+
+public:
+	inline const GMPositionState& getPositionState() { D(d); return d->state; }
+	inline const glm::mat4& getProjectionMatrix() { D(d); return getFrustum().getProjectionMatrix(); }
+	inline const glm::mat4& getViewMatrix() { D(d); return getFrustum().getViewMatrix(); }
+	inline const GMCameraLookAt& getLookAt() { D(d); return d->lookAt; }
 };
 
 END_NS

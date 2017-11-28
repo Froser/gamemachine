@@ -92,7 +92,7 @@ public:
 	virtual void newFrame() override;
 	virtual bool event(const GameMachineMessage& e) override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;
-	virtual void update(GMUpdateDataType type, const void* data);
+	virtual void update(GMUpdateDataType type) override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights();
 	virtual void clearStencil() override;
@@ -141,8 +141,8 @@ private:
 	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
 	void registerEffectsShader(AUTORELEASE GMGLShaderProgram* effectsShader);
 	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
-	void updateProjection(const glm::mat4& proj);
-	void updateView(const GMCameraLookAt& lookAt);
+	void updateProjection();
+	void updateView();
 	void installShaders();
 	void activateForwardRenderLight(const Vector<GMLight>& lights);
 	void activateLightPassLight(const Vector<GMLight>& lights);

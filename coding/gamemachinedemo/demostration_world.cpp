@@ -91,7 +91,7 @@ void DemoHandler::event(gm::GameMachineEvent evt)
 void DemoHandler::setLookAt()
 {
 	gm::GMCamera& camera = GM.getCamera();
-	gm::CameraLookAt lookAt;
+	gm::GMCameraLookAt lookAt;
 	lookAt.lookAt = { 0, 0, -1 };
 	lookAt.position = { 0, 0, 1 };
 	camera.lookAt(lookAt);
@@ -225,7 +225,7 @@ void DemostrationWorld::resetProjectionAndEye()
 	gm::GMCamera& camera = GM.getCamera();
 	camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
 
-	gm::CameraLookAt lookAt;
+	gm::GMCameraLookAt lookAt;
 	lookAt.lookAt = { 0, 0, -1 };
 	lookAt.position = { 0, 0, 1 };
 	camera.lookAt(lookAt);

@@ -390,22 +390,23 @@ void GMGLGraphicEngine::foreachShaderProgram(const std::function<void(GMGLShader
 	{
 		action(sp.second);
 	}
+
+	action(d->deferredLightPassShader);
 }
 
-void GMGLGraphicEngine::update(GMUpdateDataType type, const void* _data)
+void GMGLGraphicEngine::update(GMUpdateDataType type)
 {
 	D(d);
 	switch (type)
 	{
 	case GMUpdateDataType::ProjectionMatrix:
 	{
-		GMCamera& camera = GM.getCamera();
-		updateProjection(camera.getFrustum().getProjection());
+		updateProjection();
 		break;
 	}
 	case GMUpdateDataType::ViewMatrix:
 	{
-		updateView(*static_cast<const GMCameraLookAt*>(_data));
+		updateView();
 		break;
 	}
 	default:
@@ -414,9 +415,11 @@ void GMGLGraphicEngine::update(GMUpdateDataType type, const void* _data)
 	}
 }
 
-void GMGLGraphicEngine::updateProjection(const glm::mat4& proj)
+void GMGLGraphicEngine::updateProjection()
 {
 	D(d);
+	GMCamera& camera = GM.getCamera();
+	const glm::mat4& proj = camera.getFrustum().getProjectionMatrix();
 	auto update = [&proj](GMGLShaderProgram* shaderProgram) {
 		GM_BEGIN_CHECK_GL_ERROR
 		shaderProgram->useProgram();
@@ -426,10 +429,12 @@ void GMGLGraphicEngine::updateProjection(const glm::mat4& proj)
 	foreachShaderProgram(update);
 }
 
-void GMGLGraphicEngine::updateView(const GMCameraLookAt& lookAt)
+void GMGLGraphicEngine::updateView()
 {
 	D(d);
-	glm::mat4 viewMatrix = getViewMatrix(lookAt);
+	GMCamera& camera = GM.getCamera();
+	const glm::mat4& viewMatrix = camera.getFrustum().getViewMatrix();
+	const GMCameraLookAt& lookAt = camera.getLookAt();
 	auto update = [&lookAt, &viewMatrix](GMGLShaderProgram* shaderProgram) {
 		shaderProgram->useProgram();
 
@@ -445,7 +450,6 @@ void GMGLGraphicEngine::updateView(const GMCameraLookAt& lookAt)
 		GM_END_CHECK_GL_ERROR
 	};
 	foreachShaderProgram(update);
-	GM.getCamera().getFrustum().updateViewMatrix(viewMatrix);
 }
 
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)

@@ -43,7 +43,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 void GMFrustum::update()
 {
 	D(d);
-	glm::mat4 projection = getProjection();
+	glm::mat4 projection = getProjectionMatrix();
 	glm::mat4& view = d->viewMatrix;
 	glm::mat4 clipMat;
 
@@ -173,14 +173,14 @@ void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f
 {
 	D(d);
 	d->frustum.setPerspective(fovy, aspect, n, f);
-	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix, nullptr);
+	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix);
 }
 
 void GMCamera::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
 	d->frustum.setOrtho(left, right, bottom, top, n, f);
-	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix, nullptr);
+	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix);
 }
 
 void GMCamera::synchronize(GMSpriteGameObject* gameObject)
@@ -197,11 +197,14 @@ void GMCamera::synchronize(GMSpriteGameObject* gameObject)
 void GMCamera::synchronizeLookAt()
 {
 	D(d);
-	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix, &d->lookAt);
+	getFrustum().updateViewMatrix(::getViewMatrix(d->lookAt));
+	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix);
 }
 
 void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 {
 	D(d);
-	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix, &lookAt);
+	d->lookAt = lookAt;
+	getFrustum().updateViewMatrix(::getViewMatrix(lookAt));
+	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix);
 }
