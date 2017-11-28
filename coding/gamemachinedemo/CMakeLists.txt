@@ -57,6 +57,8 @@ set(SOURCES
 		demo/literature.cpp
 		demo/button.h
 		demo/button.cpp
+		demo/model.h
+		demo/model.cpp
 	)
 
 source_group_by_dir(SOURCES)

@@ -14,6 +14,7 @@
 #include "demo/sound.h"
 #include "demo/literature.h"
 #include "demo/button.h"
+#include "demo/model.h"
 
 void loadDemostrations(DemostrationWorld* world)
 {
@@ -28,6 +29,7 @@ void loadDemostrations(DemostrationWorld* world)
 	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
 	world->addDemo("Literature: Demostrate render literatures via GMTypoEngine.", new Demo_Literature(world));
 	world->addDemo("Button: Demostrate how to create a button.", new Demo_Button(world));
+	world->addDemo("Model: Load a model.", new Demo_Model(world));
 	world->init();
 }
 
