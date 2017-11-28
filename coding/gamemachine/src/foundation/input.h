@@ -29,6 +29,12 @@ struct GMJoystickState
 #define GMMouseButton_Right		2
 #define GMMouseButton_Middle	4
 
+struct GMWheelState
+{
+	bool wheeled = false;
+	gm::GMshort delta = 0;
+};
+
 struct GMMouseState
 {
 	typedef GMint GMMouseButton;
@@ -39,6 +45,7 @@ struct GMMouseState
 	GMint posY;
 	GMMouseButton down_button;
 	GMMouseButton trigger_button;
+	GMWheelState wheel;
 };
 
 enum class GMCursorType

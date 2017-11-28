@@ -39,6 +39,7 @@ GM_PRIVATE_OBJECT(GMInput)
 
 	// mouse
 	gm::GMMouseState mouseState;
+	gm::GMWheelState wheelState;
 };
 
 class GMInput :
@@ -88,5 +89,8 @@ public:
 	virtual gm::GMMouseState mouseState() override;
 	virtual void setDetectingMode(bool center) override;
 	virtual void setCursor(gm::GMCursorType type) override;
+
+public:
+	void recordWheel(bool wheeled, gm::GMshort delta);
 };
 #endif

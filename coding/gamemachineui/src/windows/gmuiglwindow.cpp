@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmuiglwindow.h"
 #include <gamemachine.h>
+#include "gmuiinput.h"
 
 GMUIGLWindow::GMUIGLWindow()
 {
@@ -112,6 +113,7 @@ void GMUIGLWindow::swapBuffers() const
 LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
 {
 	D(d);
+	D_BASE(db, GMUIWindow);
 	switch (uMsg)
 	{
 	case WM_DESTROY:
@@ -123,6 +125,12 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 			gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
 			return res;
 		}
+	case WM_MOUSEWHEEL:
+	{
+		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
+		break;
+	}
 	default:
 		break;
 	}

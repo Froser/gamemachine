@@ -8,6 +8,7 @@
 GM_PRIVATE_OBJECT(Demo_Model)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
+	gm::GMGameObject* gameObject = nullptr;
 };
 
 class Demo_Model : public DemoHandler
@@ -26,6 +27,9 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
+
+private:
+	void handleMouseEvent();
 };
 
 #endif

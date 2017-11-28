@@ -63,6 +63,8 @@ void GMInput::update()
 {
 	D(d);
 	::GetKeyboardState(d->lastKeyState);
+	// restore wheeled to false
+	d->wheelState.wheeled = false;
 }
 
 void GMInput::setDetectingMode(bool enable)
@@ -157,14 +159,14 @@ gm::IKeyboardState& GMInput::getKeyboardState()
 	GM_PROFILE(getKeyboardState);
 	D(d);
 	GetKeyboardState(d->keyState);
-
 	return *this;
 }
 
 gm::GMMouseState GMInput::mouseState()
 {
 	D(d);
-	gm::GMMouseState state = { 0 };
+	gm::GMMouseState state;
+	state.wheel = d->wheelState;
 
 	POINT pos;
 	::GetCursorPos(&pos);
@@ -207,4 +209,11 @@ gm::GMMouseState GMInput::mouseState()
 		state.deltaX = state.deltaY = 0;
 	}
 	return state;
+}
+
+void GMInput::recordWheel(bool wheeled, gm::GMshort delta)
+{
+	D(d);
+	d->wheelState.wheeled = wheeled;
+	d->wheelState.delta = delta;
 }
