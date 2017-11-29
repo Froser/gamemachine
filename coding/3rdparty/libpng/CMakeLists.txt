@@ -43,7 +43,7 @@ set(PNGLIB_VERSION ${PNGLIB_MAJOR}.${PNGLIB_MINOR}.${PNGLIB_RELEASE})
 # we don't need to found zlib because zlib is already exists
 # find_package(ZLIB REQUIRED)
 set (ZLIB_INCLUDE_DIR ${zlib_SOURCE_DIR})
-set (ZLIB_LIBRARY zlib)
+set (ZLIB_LIBRARY zlibstatic)
 
 include_directories(${ZLIB_INCLUDE_DIR})
 
