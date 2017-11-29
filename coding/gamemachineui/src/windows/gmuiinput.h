@@ -91,6 +91,23 @@ public:
 	virtual void setCursor(gm::GMCursorType type) override;
 
 public:
-	void recordWheel(bool wheeled, gm::GMshort delta);
+	void recordMouseDown(gm::GMMouseState::GMMouseButton button)
+	{
+		D(d);
+		d->mouseState.downButton |= button;
+	}
+
+	void recordMouseUp(gm::GMMouseState::GMMouseButton button)
+	{
+		D(d);
+		d->mouseState.upButton |= button;
+	}
+
+	void recordWheel(bool wheeled, gm::GMshort delta)
+	{
+		D(d);
+		d->wheelState.wheeled = wheeled;
+		d->wheelState.delta = delta;
+	}
 };
 #endif

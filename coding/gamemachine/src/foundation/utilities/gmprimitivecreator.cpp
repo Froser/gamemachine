@@ -155,6 +155,75 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	*obj = coreObj;
 }
 
+void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMfloat(*customUV)[8])
+{
+	static constexpr GMfloat defaultUV[] = {
+		-1, 1,
+		-1, -1,
+		1, -1,
+		1, 1,
+	};
+
+	const GMfloat(*_pos)[12] = (GMfloat(*)[12])(position);
+	const GMfloat(*_uv)[8] = customUV ? customUV : (GMfloat(*)[8])defaultUV;
+	const GMfloat(&uvArr)[8] = *_uv;
+	const GMfloat(&v)[12] = *_pos;
+
+	static constexpr GMint indices[] = {
+		0, 1, 3,
+		2, 3, 1,
+	};
+
+	GMModel* coreObj = new GMModel();
+
+	// 实体
+	GMfloat t[12];
+	for (GMint i = 0; i < 12; i++)
+	{
+		t[i] = extents[i % 3] * v[i];
+	}
+
+	{
+		GMMesh* body = new GMMesh();
+		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+		body->setType(type);
+
+		GMComponent* component = new GMComponent(body);
+		for (GMint i = 0; i < 2; i++)
+		{
+			component->beginFace();
+			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			{
+				GMint idx = i * 3 + j; //顶点的开始
+				GMint idx_next = i * 3 + (j + 1) % 3;
+				GMint idx_prev = i * 3 + (j + 2) % 3;
+				glm::vec2 uv(uvArr[indices[idx] * 2], uvArr[indices[idx] * 2 + 1]);
+				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
+				glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = glm::fastNormalize(normal);
+
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+				if (customUV)
+					component->uv(uv[0], uv[1]);
+				else
+					component->uv((uv[0] + 1) / 2, (uv[1] + 1) / 2);
+				component->color(1.f, 1.f, 1.f);
+			}
+			component->endFace();
+		}
+		if (shaderCallback)
+			shaderCallback->onCreateShader(component->getShader());
+		body->appendComponent(component);
+		coreObj->append(body);
+	}
+
+	*obj = coreObj;
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 void GMPrimitiveUtil::translateModelTo(REF GMModel& model, const GMfloat(&trans)[3])
 {

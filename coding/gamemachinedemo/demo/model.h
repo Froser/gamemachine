@@ -9,6 +9,10 @@ GM_PRIVATE_OBJECT(Demo_Model)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
 	gm::GMGameObject* gameObject = nullptr;
+	gm::GMGameObject* floor = nullptr;
+	gm::GMint mouseDownX;
+	gm::GMint mouseDownY;
+	bool dragging = false;
 };
 
 class Demo_Model : public DemoHandler
@@ -22,14 +26,17 @@ public:
 	~Demo_Model();
 
 public:
-	virtual void setLookAt() override;
-
-public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
 
 private:
+	gm::GMGameObject* createFloor();
 	void handleMouseEvent();
+	void handleDragging();
+
+protected:
+	virtual void setLookAt() override;
+	virtual void setDefaultLights() override;
 };
 
 #endif

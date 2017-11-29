@@ -43,8 +43,9 @@ struct GMMouseState
 	GMint deltaY;
 	GMint posX;
 	GMint posY;
-	GMMouseButton down_button;
-	GMMouseButton trigger_button;
+	GMMouseButton downButton;
+	GMMouseButton upButton;
+	GMMouseButton triggerButton;
 	GMWheelState wheel;
 };
 

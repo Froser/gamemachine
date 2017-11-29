@@ -63,8 +63,9 @@ void GMInput::update()
 {
 	D(d);
 	::GetKeyboardState(d->lastKeyState);
-	// restore wheeled to false
+	// restore
 	d->wheelState.wheeled = false;
+	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
 }
 
 void GMInput::setDetectingMode(bool enable)
@@ -165,7 +166,7 @@ gm::IKeyboardState& GMInput::getKeyboardState()
 gm::GMMouseState GMInput::mouseState()
 {
 	D(d);
-	gm::GMMouseState state;
+	gm::GMMouseState& state = d->mouseState;
 	state.wheel = d->wheelState;
 
 	POINT pos;
@@ -178,21 +179,14 @@ gm::GMMouseState GMInput::mouseState()
 		state.posY = p.y;
 
 		IKeyboardState& ks = getKeyboardState();
-		state.down_button = GMMouseButton_None;
-		if (ks.keydown(VK_LBUTTON))
-			state.down_button |= GMMouseButton_Left;
-		if (ks.keydown(VK_RBUTTON))
-			state.down_button |= GMMouseButton_Right;
-		if (ks.keydown(VK_MBUTTON))
-			state.down_button |= GMMouseButton_Middle;
 
-		state.trigger_button = GMMouseButton_None;
+		state.triggerButton = GMMouseButton_None;
 		if (ks.keyTriggered(VK_LBUTTON))
-			state.trigger_button |= GMMouseButton_Left;
+			state.triggerButton |= GMMouseButton_Left;
 		if (ks.keyTriggered(VK_RBUTTON))
-			state.trigger_button |= GMMouseButton_Right;
+			state.triggerButton |= GMMouseButton_Right;
 		if (ks.keyTriggered(VK_MBUTTON))
-			state.trigger_button |= GMMouseButton_Middle;
+			state.triggerButton |= GMMouseButton_Middle;
 	}
 
 	if (d->detectingMode)
@@ -209,11 +203,4 @@ gm::GMMouseState GMInput::mouseState()
 		state.deltaX = state.deltaY = 0;
 	}
 	return state;
-}
-
-void GMInput::recordWheel(bool wheeled, gm::GMshort delta)
-{
-	D(d);
-	d->wheelState.wheeled = wheeled;
-	d->wheelState.delta = delta;
 }

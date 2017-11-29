@@ -58,7 +58,6 @@ void Demo_NormalMap::init()
 				auto& frames = shader.getTexture().getTextureFrames(gm::GMTextureType::DIFFUSE, 0);
 				frames.addFrame(tex);
 			}
-
 		}
 	} cb(d->demoWorld);
 

@@ -50,3 +50,9 @@ bool GMUIWindow::isWindowActivate()
 {
 	return ::GetForegroundWindow() == getWindowHandle();
 }
+
+LongResult GMUIWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
+{
+
+	return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam);
+}

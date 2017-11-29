@@ -114,8 +114,16 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 {
 	D(d);
 	D_BASE(db, GMUIWindow);
+
+	gm::GMWindowHandle hwnd = getWindowHandle();
 	switch (uMsg)
 	{
+	case WM_SETFOCUS:
+		::SetCapture(hwnd);
+		break;
+	case WM_KILLFOCUS:
+		::ReleaseCapture();
+		break;
 	case WM_DESTROY:
 		::PostQuitMessage(0L);
 		break;
@@ -131,11 +139,34 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 		input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
 		break;
 	}
+	case WM_LBUTTONDOWN:
+	{
+		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		input->recordMouseDown(GMMouseButton_Left);
+		break;
+	}
+	case WM_RBUTTONDOWN:
+	{
+		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		input->recordMouseDown(GMMouseButton_Right);
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		input->recordMouseUp(GMMouseButton_Left);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		input->recordMouseUp(GMMouseButton_Right);
+		break;
+	}
 	default:
 		break;
 	}
 
-	gm::GMWindowHandle hwnd = getWindowHandle();
 	return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 

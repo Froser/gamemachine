@@ -35,7 +35,8 @@ public:
 	virtual gm::GMWindowHandle getWindowHandle() const override { return Base::GetHWND(); }
 	virtual bool handleMessage() override { return DuiLib::CPaintManagerUI::HandleMessage(); }
 	virtual bool event(const gm::GameMachineMessage& msg) { return false; }
-	bool GMUIWindow::isWindowActivate() override;
+	virtual bool GMUIWindow::isWindowActivate() override;
+	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam);
 
 public:
 	virtual gm::GMuint showModal() { return Base::ShowModal(); }
@@ -45,9 +46,6 @@ public:
 private:
 	virtual GMUIStringPtr getWindowClassName() const = 0;
 	virtual gm::GMuint getClassStyle() const { return 0; }
-
-protected:
-	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) { return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam); }
 
 	// From base:
 protected:
