@@ -170,6 +170,7 @@ GM_INTERFACE(IWindow)
 	virtual GMWindowHandle getWindowHandle() const = 0;
 	virtual bool event(const GameMachineMessage& msg) = 0;
 	virtual bool isWindowActivate() = 0;
+	virtual void setLockWindow(bool lock) = 0;
 };
 
 GM_ALIGNED_STRUCT(GMConsoleHandle)

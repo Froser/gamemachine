@@ -115,15 +115,8 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 	D(d);
 	D_BASE(db, GMUIWindow);
 
-	gm::GMWindowHandle hwnd = getWindowHandle();
 	switch (uMsg)
 	{
-	case WM_SETFOCUS:
-		::SetCapture(hwnd);
-		break;
-	case WM_KILLFOCUS:
-		::ReleaseCapture();
-		break;
 	case WM_DESTROY:
 		::PostQuitMessage(0L);
 		break;
@@ -167,6 +160,7 @@ LongResult GMUIGLWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr 
 		break;
 	}
 
+	gm::GMWindowHandle hwnd = getWindowHandle();
 	return ::DefWindowProc(hwnd, uMsg, wParam, lParam);
 }
 

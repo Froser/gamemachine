@@ -34,11 +34,12 @@ public:
 	virtual void centerWindow() override { return Base::CenterWindow(); }
 	virtual gm::GMWindowHandle getWindowHandle() const override { return Base::GetHWND(); }
 	virtual bool handleMessage() override { return DuiLib::CPaintManagerUI::HandleMessage(); }
-	virtual bool event(const gm::GameMachineMessage& msg) { return false; }
-	virtual bool GMUIWindow::isWindowActivate() override;
-	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam);
+	virtual bool event(const gm::GameMachineMessage& msg) override { return false; }
+	virtual bool isWindowActivate() override;
+	virtual void setLockWindow(bool lock) override;
 
 public:
+	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam);
 	virtual gm::GMuint showModal() { return Base::ShowModal(); }
 	virtual void showWindowEx(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
 	virtual void onFinalMessage(gm::GMWindowHandle wndHandle) {}

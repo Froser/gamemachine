@@ -53,6 +53,13 @@ bool GMUIWindow::isWindowActivate()
 
 LongResult GMUIWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
 {
-
 	return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam);
+}
+
+void GMUIWindow::setLockWindow(bool lock)
+{
+	if (lock)
+		::SetCapture(getWindowHandle());
+	else
+		::ReleaseCapture();
 }

@@ -90,10 +90,12 @@ void Demo_Model::handleMouseEvent()
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->dragging = true;
+		GM.getMainWindow()->setLockWindow(true);
 	}
 	else if (state.upButton & GMMouseButton_Left)
 	{
 		d->dragging = false;
+		GM.getMainWindow()->setLockWindow(false);
 	}
 }
 
