@@ -5,7 +5,6 @@
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
-#include "demo/rotation.h"
 #include "demo/particles1.h"
 #include "demo/particles2.h"
 #include "demo/effects.h"
@@ -20,7 +19,6 @@ void loadDemostrations(DemostrationWorld* world)
 {
 	world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
 	world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-	world->addDemo("Rotation: How to rotate an object", new Demo_Rotation(world));
 	world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1(world));
 	world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2(world));
 	world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
@@ -29,7 +27,7 @@ void loadDemostrations(DemostrationWorld* world)
 	world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
 	world->addDemo("Literature: Demostrate render literatures via GMTypoEngine.", new Demo_Literature(world));
 	world->addDemo("Button: Demostrate how to create a button.", new Demo_Button(world));
-	world->addDemo("Model: Load a model.", new Demo_Model(world));
+	world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
 	world->init();
 }
 

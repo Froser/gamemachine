@@ -82,14 +82,26 @@ void Demo_NormalMap::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
+	{
+		if (d->rotate)
+			d->angle += .01f;
 		d->demoWorld->simulateGameWorld();
 		break;
+	}
 	case gm::GameMachineEvent::Render:
+		d->rotation = glm::rotate(glm::identity<glm::quat>(), d->angle, (glm::vec3(0, 0, 1)));
+		d->gameObject->setRotation(d->rotation);
 		d->demoWorld->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
+	{
+		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+		if (kbState.keyTriggered('P'))
+			d->rotate = !d->rotate;
 		d->demoWorld->notifyControls();
 		break;
+	}
 	case gm::GameMachineEvent::Deactivate:
 		break;
 	case gm::GameMachineEvent::Terminate:

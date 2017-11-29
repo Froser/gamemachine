@@ -37,8 +37,6 @@ set(SOURCES
 		demo/texture.cpp
 		demo/normalmap.h
 		demo/normalmap.cpp
-		demo/rotation.h
-		demo/rotation.cpp
 		demo/particles1.h
 		demo/particles1.cpp
 		demo/particles2.h
