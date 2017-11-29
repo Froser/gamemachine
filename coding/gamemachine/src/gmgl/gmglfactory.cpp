@@ -4,7 +4,7 @@
 #include "gmglgraphic_engine.h"
 #include "gmglmodelpainter.h"
 #include "gmglglyphmanager.h"
-#include "gmdatacore/gamepackage/gmgamepackagehandler.h"
+#include "gmdata/gamepackage/gmgamepackagehandler.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {

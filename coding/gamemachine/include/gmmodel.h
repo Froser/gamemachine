@@ -1,1 +1,1 @@
-﻿#include "../src/gmdatacore/gmmodel.h"
+﻿#include "../src/gmdata/gmmodel.h"

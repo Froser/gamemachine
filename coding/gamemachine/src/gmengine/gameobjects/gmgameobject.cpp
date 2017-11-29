@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmgameobject.h"
 #include "gmengine/gmgameworld.h"
-#include "gmdatacore/glyph/gmglyphmanager.h"
+#include "gmdata/glyph/gmglyphmanager.h"
 #include "foundation/gamemachine.h"
 #include "gmassets.h"
 

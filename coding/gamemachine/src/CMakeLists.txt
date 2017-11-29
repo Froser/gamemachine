@@ -18,35 +18,35 @@ set(SOURCES
 		stdafx.h
 		common.h
 
-		gmdatacore/glyph/gmglyphmanager.h
-		gmdatacore/glyph/gmglyphmanager.cpp
-		gmdatacore/imagereader/gmimagereader.h
-		gmdatacore/imagereader/gmimagereader.cpp
-		gmdatacore/imagereader/gmimagereader_bmp.h
-		gmdatacore/imagereader/gmimagereader_bmp.cpp
-		gmdatacore/imagereader/gmimagereader_dds.h
-		gmdatacore/imagereader/gmimagereader_dds.cpp
-		gmdatacore/imagereader/gmimagereader_jpg.h
-		gmdatacore/imagereader/gmimagereader_jpg.cpp
-		gmdatacore/imagereader/gmimagereader_png.h
-		gmdatacore/imagereader/gmimagereader_png.cpp
-		gmdatacore/imagereader/gmimagereader_tga.h
-		gmdatacore/imagereader/gmimagereader_tga.cpp
-		gmdatacore/modelreader/gmmodelreader.h
-		gmdatacore/modelreader/gmmodelreader.cpp
-		gmdatacore/modelreader/gmmodelreader_obj.h
-		gmdatacore/modelreader/gmmodelreader_obj.cpp
-		gmdatacore/gamepackage/gmgamepackage.h
-		gmdatacore/gamepackage/gmgamepackage.cpp
-		gmdatacore/gamepackage/gmgamepackagehandler.h
-		gmdatacore/gamepackage/gmgamepackagehandler.cpp
-		gmdatacore/gmimage.h
-		gmdatacore/gmimage.cpp
-		gmdatacore/imagebuffer.h
-		gmdatacore/imagebuffer.cpp
-		gmdatacore/gmmodel.h
-		gmdatacore/gmmodel.cpp
-		gmdatacore/gmshader.h
+		gmdata/glyph/gmglyphmanager.h
+		gmdata/glyph/gmglyphmanager.cpp
+		gmdata/imagereader/gmimagereader.h
+		gmdata/imagereader/gmimagereader.cpp
+		gmdata/imagereader/gmimagereader_bmp.h
+		gmdata/imagereader/gmimagereader_bmp.cpp
+		gmdata/imagereader/gmimagereader_dds.h
+		gmdata/imagereader/gmimagereader_dds.cpp
+		gmdata/imagereader/gmimagereader_jpg.h
+		gmdata/imagereader/gmimagereader_jpg.cpp
+		gmdata/imagereader/gmimagereader_png.h
+		gmdata/imagereader/gmimagereader_png.cpp
+		gmdata/imagereader/gmimagereader_tga.h
+		gmdata/imagereader/gmimagereader_tga.cpp
+		gmdata/modelreader/gmmodelreader.h
+		gmdata/modelreader/gmmodelreader.cpp
+		gmdata/modelreader/gmmodelreader_obj.h
+		gmdata/modelreader/gmmodelreader_obj.cpp
+		gmdata/gamepackage/gmgamepackage.h
+		gmdata/gamepackage/gmgamepackage.cpp
+		gmdata/gamepackage/gmgamepackagehandler.h
+		gmdata/gamepackage/gmgamepackagehandler.cpp
+		gmdata/gmimage.h
+		gmdata/gmimage.cpp
+		gmdata/imagebuffer.h
+		gmdata/imagebuffer.cpp
+		gmdata/gmmodel.h
+		gmdata/gmmodel.cpp
+		gmdata/gmshader.h
 		gmengine/gmassets.h
 		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h

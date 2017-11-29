@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmbsp_render.h"
-#include "gmdatacore/gmmodel.h"
+#include "gmdata/gmmodel.h"
 
 GMBSPRenderData& GMBSPRender::renderData()
 {

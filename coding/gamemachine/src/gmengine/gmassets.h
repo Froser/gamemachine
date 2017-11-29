@@ -2,7 +2,7 @@
 #define __GMASSETS_H__
 #include <gmcommon.h>
 #include <set>
-#include "../gmdatacore/gmmodel.h"
+#include "../gmdata/gmmodel.h"
 BEGIN_NS
 
 // 默认的一些资产路径

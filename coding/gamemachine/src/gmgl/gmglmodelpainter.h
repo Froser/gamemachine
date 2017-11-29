@@ -1,7 +1,7 @@
 ﻿#ifndef __OBJECT_PAINTER_H__
 #define __OBJECT_PAINTER_H__
 #include <gmcommon.h>
-#include "gmdatacore/gmmodel.h"
+#include "gmdata/gmmodel.h"
 #include "gmglshaderprogram.h"
 BEGIN_NS
 

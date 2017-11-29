@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "bsp_model_loader.h"
 #include "foundation/vector.h"
-#include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "gmdata/gamepackage/gmgamepackage.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "foundation/utilities/utilities.h"

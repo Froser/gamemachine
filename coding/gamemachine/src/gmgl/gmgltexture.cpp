@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmgltexture.h"
-#include "gmdatacore/imagereader/gmimagereader.h"
+#include "gmdata/imagereader/gmimagereader.h"
 #include "shader_constants.h"
-#include "gmdatacore/gmmodel.h"
+#include "gmdata/gmmodel.h"
 
 GMGLTexture::GMGLTexture(const GMImage* image)
 {

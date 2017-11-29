@@ -4,8 +4,8 @@
 #include <utilities.h>
 #include <input.h>
 #include <gmassets.h>
-#include "../gmdatacore/glyph/gmglyphmanager.h"
-#include "../gmdatacore/gamepackage/gmgamepackage.h"
+#include "../gmdata/glyph/gmglyphmanager.h"
+#include "../gmdata/gamepackage/gmgamepackage.h"
 #include "../gmengine/gmcamera.h"
 #include "gmthreads.h"
 

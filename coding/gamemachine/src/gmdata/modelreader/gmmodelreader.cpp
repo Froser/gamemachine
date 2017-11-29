@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader.h"
 #include "gmmodelreader_obj.h"
-#include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "gmdata/gamepackage/gmgamepackage.h"
 
 class GMModelReaderContainer : public GMObject
 {

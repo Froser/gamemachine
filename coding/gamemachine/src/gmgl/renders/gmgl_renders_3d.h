@@ -2,7 +2,7 @@
 #define __GMGL_RENDERS_OBJECT_H__
 #include <gmcommon.h>
 #include <gmenums.h>
-#include "gmdatacore/gmmodel.h"
+#include "gmdata/gmmodel.h"
 #include "gmgl/gmglgraphic_engine.h"
 BEGIN_NS
 

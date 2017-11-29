@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmgameworld.h"
 #include "gameobjects/gmgameobject.h"
-#include "gmdatacore/gmmodel.h"
+#include "gmdata/gmmodel.h"
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"

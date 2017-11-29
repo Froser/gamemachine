@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmmodelreader_obj.h"
-#include "gmdatacore/gmmodel.h"
-#include "gmdatacore/gamepackage/gmgamepackage.h"
+#include "gmdata/gmmodel.h"
+#include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/utilities/utilities.h"
 
 #define RESERVED 4096

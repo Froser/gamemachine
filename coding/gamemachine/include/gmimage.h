@@ -1,2 +1,2 @@
-﻿#include "../src/gmdatacore/gmimage.h"
-#include "../src/gmdatacore/imagereader/gmimagereader.h"
+﻿#include "../src/gmdata/gmimage.h"
+#include "../src/gmdata/imagereader/gmimagereader.h"

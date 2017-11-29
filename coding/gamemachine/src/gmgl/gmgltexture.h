@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 #include <gmimage.h>
 #include "foundation/utilities/utilities.h"
-#include "gmdatacore/gmmodel.h"
+#include "gmdata/gmmodel.h"
 #include <map>
 #include <string>
 #include "shader_constants.h"
