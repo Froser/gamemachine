@@ -67,8 +67,8 @@ void Demo_NormalMap::init()
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
 	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
-	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
-	d->demoWorld->addObject("texture", obj);
+	d->gameObject = new gm::GMGameObject(quadAsset);
+	d->demoWorld->addObject("texture", d->gameObject);
 }
 
 void Demo_NormalMap::event(gm::GameMachineEvent evt)
