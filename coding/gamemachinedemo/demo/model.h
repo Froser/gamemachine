@@ -31,6 +31,7 @@ public:
 
 private:
 	gm::GMGameObject* createFloor();
+	void createCubeMap();
 	void handleMouseEvent();
 	void handleDragging();
 

@@ -3,7 +3,7 @@
 #include "gmengine/gmassets.h"
 #include "gmdata/imagereader/gmimagereader.h"
 #include "foundation/utilities/utilities.h"
-#include "gmdata/imagebuffer.h"
+#include "gmdata/gmimagebuffer.h"
 #include "extensions/bsp/data/gmbsp_shader_loader.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include <algorithm>
@@ -575,7 +575,7 @@ void GMBSPGameWorld::initLightmaps()
 	for (GMint i = 0; i < numLightmaps; i++)
 	{
 		GMbyte* lightmapBytes = bsp.lightBytes.data() + i * BSP_LIGHTMAP_SIZE;
-		ImageBuffer* imgBuf = new ImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
+		GMImageBuffer* imgBuf = new GMImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 		delete imgBuf;
@@ -585,7 +585,7 @@ void GMBSPGameWorld::initLightmaps()
 	{
 		// Create a white lightmap id = -1
 		GMbyte white[3] = { 0xff, 0xff, 0xff };
-		ImageBuffer* whiteBuf = new ImageBuffer(1, 1, 3 * sizeof(GMbyte), white);
+		GMImageBuffer* whiteBuf = new GMImageBuffer(1, 1, 3 * sizeof(GMbyte), white);
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 		delete whiteBuf;

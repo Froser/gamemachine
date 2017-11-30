@@ -46,8 +46,8 @@ public:
 	void flipVertically(GMuint mipId);
 
 public:
-	inline GMint getWidth(GMint mipLevel = 0) { return getData().mip[mipLevel].width; }
-	inline GMint getHeight(GMint mipLevel = 0) { return getData().mip[mipLevel].height; }
+	inline GMint getWidth(GMint mipLevel = 0) const { return getData().mip[mipLevel].width; }
+	inline GMint getHeight(GMint mipLevel = 0) const { return getData().mip[mipLevel].height; }
 };
 
 END_NS

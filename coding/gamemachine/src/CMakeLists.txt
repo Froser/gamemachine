@@ -42,8 +42,8 @@ set(SOURCES
 		gmdata/gamepackage/gmgamepackagehandler.cpp
 		gmdata/gmimage.h
 		gmdata/gmimage.cpp
-		gmdata/imagebuffer.h
-		gmdata/imagebuffer.cpp
+		gmdata/gmimagebuffer.h
+		gmdata/gmimagebuffer.cpp
 		gmdata/gmmodel.h
 		gmdata/gmmodel.cpp
 		gmdata/gmshader.h
