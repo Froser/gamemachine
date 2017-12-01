@@ -101,6 +101,7 @@ private:
 };
 
 // GMSkyObject
+// 一个天空的盒子，用6个面模拟一个天空
 GM_PRIVATE_OBJECT(GMSkyGameObject)
 {
 	glm::vec3 min;
@@ -118,6 +119,17 @@ public:
 
 private:
 	void createSkyBox(OUT GMModel** obj);
+};
+
+// GMCubeMapGameObject
+class GMCubeMapGameObject : public GMGameObject
+{
+public:
+	GMCubeMapGameObject(ITexture* texture);
+	~GMCubeMapGameObject();
+
+private:
+	void createCubeMap(ITexture* texture);
 };
 
 END_NS

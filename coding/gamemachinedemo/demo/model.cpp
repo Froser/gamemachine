@@ -52,11 +52,10 @@ void Demo_Model::init()
 	d->gameObject->setScaling(glm::scale(.005f, .005f, .005f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
 
-	d->floor = createFloor();
-	d->demoWorld->addObject("floor", d->floor);
 	d->demoWorld->addObject("baymax", d->gameObject);
 
-	createCubeMap();
+	d->skyObject = createCubeMap();
+	d->demoWorld->addObject("sky", d->skyObject);
 }
 
 void Demo_Model::handleMouseEvent()
@@ -77,15 +76,6 @@ void Demo_Model::handleMouseEvent()
 			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
 				d->gameObject->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
 		}
-		{
-			glm::getScalingFromMatrix(d->floor->getScaling(), scaling);
-			scaling[0] += delta;
-			scaling[1] += delta;
-			scaling[2] += delta;
-
-			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
-				d->floor->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
-		}
 	}
 
 	if (state.downButton & GMMouseButton_Left)
@@ -102,71 +92,7 @@ void Demo_Model::handleMouseEvent()
 	}
 }
 
-gm::GMGameObject* Demo_Model::createFloor()
-{
-	D(d);
-	// 创建一个纹理
-	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
-	{
-		gm::GMDemoGameWorld* world = nullptr;
-
-		_ShaderCb(gm::GMDemoGameWorld* d) : world(d)
-		{
-		}
-
-		virtual void onCreateShader(gm::GMShader& shader) override
-		{
-			shader.setCull(gm::GMS_Cull::CULL);
-			shader.getMaterial().kd = glm::vec3(.1f, .2f, .6f);
-			shader.getMaterial().ks = glm::vec3(.1f, .2f, .6f);
-			shader.getMaterial().ka = glm::vec3(.8f, .8f, 1);
-			shader.getMaterial().shininess = 20;
-
-			auto pk = gm::GameMachine::instance().getGamePackageManager();
-			auto& container = world->getAssets();
-
-			gm::GMImage* img = nullptr;
-			gm::GMBuffer buf;
-			pk->readFile(gm::GMPackageIndex::Textures, "bnp.png", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &img);
-			GM_ASSERT(img);
-
-			gm::ITexture* tex = nullptr;
-			GM.getFactory()->createTexture(img, &tex);
-			GM_ASSERT(tex);
-			// 不要忘记释放img
-			gm::GM_delete(img);
-
-			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
-			{
-				auto& frames = shader.getTexture().getTextureFrames(gm::GMTextureType::NORMALMAP, 0);
-				frames.addFrame(tex);
-			}
-
-			{
-				auto& frames = shader.getTexture().getTextureFrames(gm::GMTextureType::DIFFUSE, 0);
-				frames.addFrame(tex);
-			}
-		}
-	} cb(d->demoWorld);
-
-	// 创建一个带纹理的对象
-	gm::GMfloat extents[] = { 1, 1, 1 };
-	gm::GMfloat pos[] = { 
-		-100, 0, -100,
-		-100, 0, 100,
-		100, 0, 100,
-		100, 0, -100
-	};
-	gm::GMModel* model;
-	gm::GMPrimitiveCreator::createQuad3D(extents, pos, &model, &cb);
-	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
-	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
-	obj->setScaling(glm::scale(.005f, .005f, .005f));
-	return obj;
-}
-
-void Demo_Model::createCubeMap()
+gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 {
 	gm::GMGamePackage* pk = gm::GameMachine::instance().getGamePackageManager();
 	gm::GMImage* slices[6] = { nullptr };
@@ -215,6 +141,9 @@ void Demo_Model::createCubeMap()
 	{
 		delete slice;
 	}
+
+	gm::GMCubeMapGameObject* skyObject = new gm::GMCubeMapGameObject(cubeMapTex);
+	return skyObject;
 }
 
 void Demo_Model::handleDragging()
@@ -232,12 +161,7 @@ void Demo_Model::handleDragging()
 				glm::vec3(0, 1, 0));
 			d->gameObject->setRotation(q);
 		}
-		{
-			glm::quat q = glm::rotate(d->floor->getRotation(),
-				PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
-				glm::vec3(0, 1, 0));
-			d->floor->setRotation(q);
-		}
+
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 	}

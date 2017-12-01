@@ -9,7 +9,7 @@ GM_PRIVATE_OBJECT(Demo_Model)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
 	gm::GMGameObject* gameObject = nullptr;
-	gm::GMGameObject* floor = nullptr;
+	gm::GMCubeMapGameObject* skyObject = nullptr;
 	gm::GMint mouseDownX;
 	gm::GMint mouseDownY;
 	bool dragging = false;
@@ -30,8 +30,7 @@ public:
 	virtual void event(gm::GameMachineEvent evt) override;
 
 private:
-	gm::GMGameObject* createFloor();
-	void createCubeMap();
+	gm::GMCubeMapGameObject* createCubeMap();
 	void handleMouseEvent();
 	void handleDragging();
 

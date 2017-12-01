@@ -217,6 +217,12 @@ inline void GM_delete(T*& o)
 }
 
 template <typename T>
+inline void GM_delete(T*&& o)
+{
+	delete o;
+}
+
+template <typename T>
 inline void GM_delete_array(T*& o)
 {
 	if (o)

@@ -136,7 +136,6 @@ void GMEntityObject::makePlanes()
 }
 
 // 天空
-
 static glm::vec2 uvs[24] = {
 	glm::vec2(0, 0),
 	glm::vec2(0, 1),
@@ -163,12 +162,10 @@ static glm::vec2 uvs[24] = {
 	glm::vec2(1, 1),
 	glm::vec2(1, 0),
 
-	/*
 	glm::vec2(0, 0),
 	glm::vec2(0, 1),
 	glm::vec2(1, 1),
 	glm::vec2(1, 0),
-	*/
 };
 
 GMSkyGameObject::GMSkyGameObject(const GMShader& shader, const glm::vec3& min, const glm::vec3& max)
@@ -195,7 +192,7 @@ GMSkyGameObject::~GMSkyGameObject()
 void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 {
 	D(d);
-	glm::vec3 vertices[20] = {
+	glm::vec3 vertices[] = {
 		//Front
 		glm::vec3(d->min[0], d->max[1], d->max[2]),
 		glm::vec3(d->min[0], d->min[1], d->max[2]),
@@ -227,12 +224,10 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 		glm::vec3(d->max[0], d->max[1], d->min[2]),
 
 		//Down
-		/*
 		glm::vec3(d->min[0], d->min[1], d->min[2]),
 		glm::vec3(d->min[0], d->min[1], d->max[2]),
 		glm::vec3(d->max[0], d->min[1], d->max[2]),
 		glm::vec3(d->max[0], d->min[1], d->min[2]),
-		*/
 	};
 
 	// Scaling surface
@@ -256,8 +251,7 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 	GMComponent* component = new GMComponent(child);
 	component->setShader(d->shader);
 
-	// We don't draw surface beneath us
-	for (GMuint i = 0; i < 5; i++)
+	for (GMuint i = 0; i < 6; i++)
 	{
 		component->beginFace();
 		component->vertex(vertices[i * 4][0], vertices[i * 4][1], vertices[i * 4][2]);
@@ -272,4 +266,76 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 	}
 	child->appendComponent(component);
 	object->append(child);
+}
+
+//////////////////////////////////////////////////////////////////////////
+GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
+{
+	createCubeMap(texture);
+}
+
+GMCubeMapGameObject::~GMCubeMapGameObject()
+{
+	GM_delete(getModel());
+}
+
+void GMCubeMapGameObject::createCubeMap(ITexture* texture)
+{
+	static GMfloat vertices[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+
+	GMModel* model = new GMModel();
+	GMMesh* child = new GMMesh();
+	GMComponent* component = new GMComponent(child);
+	for (GMuint i = 0; i < 12; i++)
+	{
+		component->beginFace();
+		component->vertex(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
+		component->vertex(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
+		component->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
+		component->endFace();
+	}
+	child->appendComponent(component);
+	model->append(child);
 }
