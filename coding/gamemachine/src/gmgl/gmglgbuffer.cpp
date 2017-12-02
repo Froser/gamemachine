@@ -432,6 +432,7 @@ void GMGLFramebuffer::createQuad()
 			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
 		};
 
+		GM_BEGIN_CHECK_GL_ERROR
 		glGenVertexArrays(1, &d->quadVAO);
 		glBindVertexArray(d->quadVAO);
 		glGenBuffers(1, &d->quadVBO);
@@ -439,8 +440,9 @@ void GMGLFramebuffer::createQuad()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		GM_END_CHECK_GL_ERROR
 	}
 }
 

@@ -37,8 +37,8 @@ GMString::GMString(const char c)
 {
 	D(d);
 	d->type = Data::MuiltBytes;
-	d->wstr = c;
-	d->str.clear();
+	d->str = c;
+	d->wstr.clear();
 }
 
 GMString::GMString(const GMWchar c)

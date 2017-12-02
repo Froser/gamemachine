@@ -1,4 +1,0 @@
-<?xml version="1.0"?>
-<gmmodel>
-	<item classname="info_player_deathmatch" create="0" extents="2 2 2" model="cat"/>
-</gmmodel>

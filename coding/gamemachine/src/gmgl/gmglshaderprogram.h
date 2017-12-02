@@ -20,6 +20,7 @@ GM_PRIVATE_OBJECT(GMGLShaderProgram)
 	GMGLShaderIDList shaders;
 	GLuint shaderProgram = 0;
 	static GLuint lastUsedProgram;
+	Map<GMString, GMString> aliasMap;
 };
 
 class GMGLShaderProgram : public GMObject
@@ -55,8 +56,9 @@ private:
 	void removeShaders();
 	void expandSource(REF GMGLShaderInfo& shaderInfo);
 	GMString expandSource(const GMString& workingDir, const GMString& source);
-	bool matchMarco(const GMString& source, const GMString& marco, REF GMString& result);
+	bool matchMacro(const GMString& source, const GMString& macro, REF GMString& result);
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
+	void expandAlias(const GMString& alias, IN OUT GMString& source);
 };
 
 END_NS

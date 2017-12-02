@@ -203,8 +203,10 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 	while (true)
 	{
 		line = *iter;
-		if (matchMarco(line, "include", n))
+		if (matchMacro(line, "include", n))
 			expandInclude(filename, n, line);
+		else if (matchMacro(line, "alias", n))
+			expandAlias(n, line);
 		expanded += line;
 		if (!iter.hasNextLine())
 			break;
@@ -213,24 +215,35 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 	return expanded;
 }
 
-bool GMGLShaderProgram::matchMarco(const GMString& source, const GMString& marco, REF GMString& result)
+bool GMGLShaderProgram::matchMacro(const GMString& source, const GMString& macro, REF GMString& result)
 {
 	std::string s = source.toStdString();
-	std::string expr = "#(\\s*)" + marco.toStdString() + " \"(.*)\"";
+	std::string expr = "#(\\s*)" + macro.toStdString() + "(\\s+)(.*)";
 	std::smatch match;
 	if (std::regex_search(s, match, std::regex(expr.c_str())))
 	{
-		GM_ASSERT(match.size() >= 3);
-		result = match[2].str();
+		GM_ASSERT(match.size() >= 4);
+		result = match[3].str();
 		return true;
 	}
 	return false;
 }
 
-void GMGLShaderProgram::expandInclude(const GMString& filename, const GMString& fn, IN OUT GMString& source)
+void GMGLShaderProgram::expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source)
 {
-	GMString workingDir = GMPath::directoryName(filename);
-	GMString include = workingDir + fn;
+	std::string f;
+	std::string s = source.toStdString();
+	static std::string expr = "(\\s*)\"(.+)\"";
+	std::smatch match;
+	if (std::regex_search(s, match, std::regex(expr.c_str())))
+	{
+		if (match.size() != 3)
+			return;
+		f = match[2].str();
+	}
+
+	GMString dir = GMPath::directoryName(workingDir);
+	GMString include = dir + f;
 	GMBuffer buf;
 	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
 	{
@@ -241,4 +254,20 @@ void GMGLShaderProgram::expandInclude(const GMString& filename, const GMString& 
 	{
 		gm_warning("GL shader '%s' not found, use empty file instead!", include);
 	}
+}
+
+void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& source)
+{
+	D(d);
+	std::string s = alias.toStdString();
+	static std::string expr = "(\\s*)(.+)(\\s+)(.+)";
+	std::smatch match;
+	if (std::regex_search(s, match, std::regex(expr.c_str())))
+	{
+		GM_ASSERT(match.size() == 5);
+		std::string replacement = match[2].str();
+		std::string a = match[4].str();
+		d->aliasMap.insert({ replacement, a });
+	}
+	source = "";
 }

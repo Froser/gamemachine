@@ -1,5 +1,3 @@
-in vec2 _deferred_light_pass_texCoords;
-
 uniform sampler2D deferred_light_pass_gPosition;
 uniform sampler2D deferred_light_pass_gNormal_eye;
 uniform sampler2D deferred_light_pass_gTexAmbient;
@@ -46,18 +44,18 @@ bool hasFlag(float flag)
 void deferred_light_pass_init()
 {
 	deferred_light_pass_g_ambientLight = deferred_light_pass_g_diffuseLight = deferred_light_pass_g_specularLight = vec3(0);
-	deferred_light_pass_tPosition = texture(deferred_light_pass_gPosition, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tNormal_eye = texture(deferred_light_pass_gNormal_eye, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tTexAmbient = texture(deferred_light_pass_gTexAmbient, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tTexDiffuse = texture(deferred_light_pass_gTexDiffuse, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tTangent_eye = texture(deferred_light_pass_gTangent_eye, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tBitangent_eye = texture(deferred_light_pass_gBitangent_eye, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tNormalMap = texture(deferred_light_pass_gNormalMap, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tKa = texture(deferred_light_pass_gKa, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tKd = texture(deferred_light_pass_gKd, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tKs = texture(deferred_light_pass_gKs, _deferred_light_pass_texCoords).rgb;
-	deferred_light_pass_tShininess = texture(deferred_light_pass_gShininess, _deferred_light_pass_texCoords).r;
-	deferred_light_pass_tHasNormalMap = texture(deferred_light_pass_gHasNormalMap, _deferred_light_pass_texCoords).r;
+	deferred_light_pass_tPosition = texture(deferred_light_pass_gPosition, _uv).rgb;
+	deferred_light_pass_tNormal_eye = texture(deferred_light_pass_gNormal_eye, _uv).rgb;
+	deferred_light_pass_tTexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
+	deferred_light_pass_tTexDiffuse = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
+	deferred_light_pass_tTangent_eye = texture(deferred_light_pass_gTangent_eye, _uv).rgb;
+	deferred_light_pass_tBitangent_eye = texture(deferred_light_pass_gBitangent_eye, _uv).rgb;
+	deferred_light_pass_tNormalMap = texture(deferred_light_pass_gNormalMap, _uv).rgb;
+	deferred_light_pass_tKa = texture(deferred_light_pass_gKa, _uv).rgb;
+	deferred_light_pass_tKd = texture(deferred_light_pass_gKd, _uv).rgb;
+	deferred_light_pass_tKs = texture(deferred_light_pass_gKs, _uv).rgb;
+	deferred_light_pass_tShininess = texture(deferred_light_pass_gShininess, _uv).r;
+	deferred_light_pass_tHasNormalMap = texture(deferred_light_pass_gHasNormalMap, _uv).r;
 }
 
 void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)

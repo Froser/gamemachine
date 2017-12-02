@@ -1,12 +1,12 @@
 in vec4 _deferred_geometry_pass_position_world;
 
-layout (location = 0) out vec3 deferred_geometry_pass_gPosition;
-layout (location = 1) out vec3 deferred_geometry_pass_gNormal_eye;
-layout (location = 2) out vec3 deferred_geometry_pass_gTexAmbient;
-layout (location = 3) out vec3 deferred_geometry_pass_gTexDiffuse;
-layout (location = 4) out vec3 deferred_geometry_pass_gTangent_eye;
-layout (location = 5) out vec3 deferred_geometry_pass_gBitangent_eye;
-layout (location = 6) out vec3 deferred_geometry_pass_gNormalMap;
+#alias deferred_geometry_pass_gPosition deferred_geometry_pass_slot_0
+#alias deferred_geometry_pass_gNormal_eye deferred_geometry_pass_slot_1
+#alias deferred_geometry_pass_gTexAmbient deferred_geometry_pass_slot_2
+#alias deferred_geometry_pass_gTexDiffuse deferred_geometry_pass_slot_3
+#alias deferred_geometry_pass_gTangent_eye deferred_geometry_pass_slot_4
+#alias deferred_geometry_pass_gBitangent_eye deferred_geometry_pass_slot_5
+#alias deferred_geometry_pass_gNormalMap deferred_geometry_pass_slot_6
 
 vec3 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 {
