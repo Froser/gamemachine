@@ -1,14 +1,4 @@
-#version 330 core
-#include "foundation/properties.h"
-
-in vec2 _uv;
-in vec4 _color;
-
-uniform GM_texture_t GM_ambient_texture;
-
-out vec4 frag_color;
-
-vec4 calcTexture(GM_texture_t tex, vec2 uv)
+vec4 particles_calcTexture(GM_texture_t tex, vec2 uv)
 {
 	bool hasTexture = false;
 	vec4 result = vec4(0);
@@ -24,7 +14,7 @@ vec4 calcTexture(GM_texture_t tex, vec2 uv)
 	return result;
 }
 
-void main()
+void particles_main()
 {
-	frag_color = calcTexture(GM_ambient_texture, _uv) * _color;
+	_frag_color = particles_calcTexture(GM_ambient_textures[0], _uv) * _color;
 }

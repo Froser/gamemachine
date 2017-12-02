@@ -87,8 +87,12 @@ void GameMachine::startGameMachine()
 	// 开始渲染
 	d->engine->start();
 
+	// 处理一次消息
+	handleMessages();
+
 	// 初始化gameHandler
-	d->gameHandler->start();
+	if (!d->states.crashDown)
+		d->gameHandler->start();
 
 	// 开始计时器
 	d->clock.begin();
@@ -107,6 +111,15 @@ void GameMachine::startGameMachine()
 
 		if (!handleMessages())
 			break;
+
+		if (d->states.crashDown)
+		{
+			// 宕机的情况下，只更新下面的状态
+			d->mainWindow->update();
+			d->consoleWindow->update();
+			d->clock.update();
+			continue;
+		}
 		
 		d->gameHandler->event(GameMachineEvent::FrameStart);
 		if (d->mainWindow->isWindowActivate())
@@ -158,17 +171,23 @@ bool GameMachine::handleMessages()
 	GameMachineMessage msg;
 	while (d->messageQueue.size() > 0)
 	{
-		msg = d->messageQueue.back();
+		msg = d->messageQueue.front();
 
 		switch (msg.msgType)
 		{
 		case GameMachineMessageType::Quit:
 			return false;
 		case GameMachineMessageType::Console:
-			{
-				if (d->consoleWindow)
-					d->consoleWindow->event(msg);
-			}
+		{
+			if (d->consoleWindow)
+				d->consoleWindow->event(msg);
+			break;
+		}
+		case GameMachineMessageType::CrashDown:
+		{
+			d->states.crashDown = true;
+			break;
+		}
 		default:
 			break;
 		}

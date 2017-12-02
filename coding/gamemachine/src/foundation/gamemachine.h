@@ -19,6 +19,7 @@ struct GMGameMachineRunningStates
 	GMRect clientRect;
 	GMRect windowRect;
 	GMfloat lastFrameElpased = 0;
+	bool crashDown = false;
 };
 
 GM_PRIVATE_OBJECT(GameMachine)

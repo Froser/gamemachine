@@ -155,13 +155,14 @@ enum class GMArrangementMode
 	Lines,
 };
 
+// 和着色器中的GM_shader_type一致
 enum class GMMeshType
 {
 	MeshTypeBegin,
-	Model3D = MeshTypeBegin,
-	Model2D,
-	Glyph,
+	Model2D = MeshTypeBegin,
+	Model3D,
 	Particles,
+	Glyph,
 	MeshTypeEnd,
 };
 

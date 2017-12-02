@@ -1,19 +1,13 @@
-#version 330 core
-#include "foundation/properties.h"
-
-in vec2 _uv;
-out vec4 frag_color;
-
-void main()
+void model2d_main()
 {
 	if (GM_ambient_textures[0].enabled == 1)
 	{
-		frag_color = texture(GM_ambient_textures[0].texture, _uv * vec2(GM_ambient_textures[0].scale_s, GM_ambient_textures[0].scale_t));
-		if (frag_color.a == 0)
+		_frag_color = texture(GM_ambient_textures[0].texture, _uv * vec2(GM_ambient_textures[0].scale_s, GM_ambient_textures[0].scale_t));
+		if (_frag_color.a == 0)
 			discard;
 	}
 	else
 	{
-		frag_color = vec4(0, 0, 0, 0);
+		_frag_color = vec4(0, 0, 0, 0);
 	}
 }

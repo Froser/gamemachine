@@ -85,11 +85,9 @@ public:
 
 	// IShaderLoadCallback
 private:
-	void onLoadForwardShader(const gm::GMMeshType type, gm::GMGLShaderProgram& shader) override;
-	void onLoadDeferredPassShader(gm::GMGLDeferredRenderState state, gm::GMGLShaderProgram& shaderProgram) override;
-	void onLoadDeferredLightPassShader(gm::GMGLShaderProgram& lightPassProgram) override;
 	void onLoadEffectsShader(gm::GMGLShaderProgram& lightPassProgram) override;
-
+	
+	void onLoadShaderProgram(gm::GMGLShaderProgram& shaderProgram) override;
 	// IGameHandler
 private:
 	virtual void init() override;

@@ -19,16 +19,25 @@ extern "C"
 	extern GLenum s_glErrCode;
 }
 
+struct GMShaderProc
+{
+	enum
+	{
+		FORWARD = 0,
+		GEOMETRY_PASS,
+		LIGHT_PASS,
+		MATERIAL_PASS,
+	};
+};
+
 #define GM_CHECK_GL_ERROR() GM_ASSERT((s_glErrCode = glGetError()) == GL_NO_ERROR);
 #define GM_BEGIN_CHECK_GL_ERROR { GM_CHECK_GL_ERROR()
 #define GM_END_CHECK_GL_ERROR GM_CHECK_GL_ERROR() }
 
 GM_INTERFACE(IShaderLoadCallback)
 {
-	virtual void onLoadForwardShader(const GMMeshType type, GMGLShaderProgram& shaderProgram) = 0;
-	virtual void onLoadDeferredPassShader(GMGLDeferredRenderState state, GMGLShaderProgram& shaderProgram) = 0;
-	virtual void onLoadDeferredLightPassShader(GMGLShaderProgram& lightPassProgram) = 0;
 	virtual void onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
+	virtual void onLoadShaderProgram(GMGLShaderProgram& shaderProgram) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
@@ -41,11 +50,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMGLRenders_LightPass* lightPassRender = nullptr;
 
 	// 著色器程序
-	Map<GMMeshType, GMGLShaderProgram* > forwardRenderingShaders;
-	Map<GMGLDeferredRenderState, GMGLShaderProgram* > deferredCommonPassShaders;
-	GMGLShaderProgram* deferredLightPassShader = nullptr;
-	GMGLShaderProgram* effectsShader = nullptr;
-
+	GMGLShaderProgram* shaderProgram = nullptr;
+	GMGLShaderProgram* effectsShaderProgram = nullptr;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
 
@@ -104,14 +110,13 @@ public:
 	virtual void endBlend() override;
 
 public:
-	GMGLShaderProgram* getShaders(GMMeshType objectType);
+	GMGLShaderProgram* getShaderProgram() { D(d); return d->shaderProgram; }
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
 	IRender* getRender(GMMeshType objectType);
 	void setViewport(const GMRect& rect);
 
 public:
-	inline GMGLShaderProgram* getLightPassShader() { D(d); return d->deferredLightPassShader; }
 	inline void setRenderState(GMGLDeferredRenderState state) { D(d); d->renderState = state; }
 	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
 	inline bool isBlending() { D(d); return d->isBlending; }
@@ -137,10 +142,6 @@ private:
 	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();
 	void disposeDeferredRenderQuad();
-	void registerForwardRenderingShader(GMMeshType objectType, AUTORELEASE GMGLShaderProgram* forwardShaderProgram);
-	void registerLightPassShader(AUTORELEASE GMGLShaderProgram* deferredLightPassProgram);
-	void registerEffectsShader(AUTORELEASE GMGLShaderProgram* effectsShader);
-	void registerCommonPassShader(GMGLDeferredRenderState state, AUTORELEASE GMGLShaderProgram* shaderProgram);
 	void updateProjection();
 	void updateView();
 	void installShaders();
@@ -153,7 +154,6 @@ private:
 	void lightPass();
 	void groupGameObjects(GMGameObject *objects[], GMuint count);
 	void viewGBufferFrameBuffer();
-	void foreachShaderProgram(const std::function<void(GMGLShaderProgram*)>& action);
 
 public:
 	static void newFrameOnCurrentFramebuffer();

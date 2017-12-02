@@ -46,6 +46,7 @@ enum class GameMachineMessageType
 {
 	None,
 	Quit,
+	CrashDown,
 	Console,
 	WindowSizeChanged,
 };

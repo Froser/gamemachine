@@ -11,7 +11,6 @@ GM_PRIVATE_OBJECT(GMGLRenders_3D)
 	GMGLGraphicEngine* engine = nullptr;
 	GMMesh* mesh = nullptr;
 	GMShader* shader = nullptr;
-	GMGLShaderProgram* gmglShaderProgram = nullptr;
 	GMMeshType type;
 	GMDrawMode mode;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
@@ -33,7 +32,7 @@ public:
 	virtual void activateLights(const GMLight* lights, GMint count);
 
 protected:
-	GMGLShaderProgram* getShaderProgram();
+	void updateShaderState();
 	void activateMaterial(const GMShader& shader);
 	void drawDebug();
 	void drawTexture(GMTextureType type, GMint index = 0);

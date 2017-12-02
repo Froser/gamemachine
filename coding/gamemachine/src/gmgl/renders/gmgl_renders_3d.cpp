@@ -64,11 +64,10 @@ void GMGLRenders_3D::begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* 
 	D(d);
 	d->mesh = mesh;
 	d->type = mesh->getType();
-	d->shader = nullptr;
 
-	auto shaderProgram = getShaderProgram();
+	updateShaderState();
 	if (modelTransform)
-		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
+		d->engine->getShaderProgram()->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
 }
 
 void GMGLRenders_3D::beginShader(GMShader& shader, GMDrawMode mode)
@@ -161,8 +160,9 @@ void GMGLRenders_3D::activateLights(const GMLight* lights, GMint count)
 	if (!count)
 		return;
 
-	auto shaderProgram = getShaderProgram();
+	updateShaderState();
 
+	auto shaderProgram = d->engine->getShaderProgram();
 	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
 	for (GMint i = 0; i < count; i++)
 	{
@@ -198,19 +198,27 @@ void GMGLRenders_3D::activateLights(const GMLight* lights, GMint count)
 	shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
-GMGLShaderProgram* GMGLRenders_3D::getShaderProgram()
+void GMGLRenders_3D::updateShaderState()
 {
 	D(d);
-	if (!d->gmglShaderProgram ||
-		d->renderMode != GMGetRenderState(RENDER_MODE) ||
-		d->renderState != d->engine->getRenderState())
-	{
-		d->gmglShaderProgram = d->engine->getShaders(d->type);
-	}
-	d->gmglShaderProgram->useProgram();
+	GMGLShaderProgram* shaderProgram = d->engine->getShaderProgram();
 	d->renderMode = GMGetRenderState(RENDER_MODE);
 	d->renderState = d->engine->getRenderState();
-	return d->gmglShaderProgram;
+	if (d->renderMode == GMStates_RenderOptions::FORWARD)
+	{
+		shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint) d->type);
+		shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
+	}
+	else
+	{
+		GM_ASSERT(d->renderMode == GMStates_RenderOptions::DEFERRED);
+		if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
+			shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
+		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
+			shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
+		else
+			GM_ASSERT(false);
+	}
 }
 
 ITexture* GMGLRenders_3D::getTexture(GMTextureFrames& frames)
@@ -233,7 +241,8 @@ void GMGLRenders_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
 	const GMMaterial& material = shader.getMaterial();
-	auto shaderProgram = getShaderProgram();
+	auto shaderProgram = d->engine->getShaderProgram();
+	updateShaderState();
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, &material.ka[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
@@ -243,14 +252,16 @@ void GMGLRenders_3D::activateMaterial(const GMShader& shader)
 void GMGLRenders_3D::drawDebug()
 {
 	D(d);
-	auto shaderProgram = getShaderProgram();
+	auto shaderProgram = d->engine->getShaderProgram();
+	updateShaderState();
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
 }
 
 void GMGLRenders_3D::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
-	auto shaderProgram = getShaderProgram();
+	auto shaderProgram = d->engine->getShaderProgram();
+	updateShaderState();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
@@ -302,7 +313,8 @@ void GMGLRenders_3D::activateTexture(GMTextureType type, GMint index)
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
-	auto shaderProgram = getShaderProgram();
+	auto shaderProgram = d->engine->getShaderProgram();
+	updateShaderState();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, GMSHADER_TEXTURES_TEXTURE);
@@ -321,7 +333,8 @@ void GMGLRenders_3D::deactivateTexture(GMTextureType type, GMint index)
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
-	auto shaderProgram = getShaderProgram();
+	auto shaderProgram = d->engine->getShaderProgram();
+	updateShaderState();
 	GMint idx = (GMint)type;
 	const char* uniform = getTextureUniformName(type, index);
 	char u[GMGL_MAX_UNIFORM_NAME_LEN];

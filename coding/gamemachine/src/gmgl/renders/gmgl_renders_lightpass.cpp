@@ -14,7 +14,7 @@ GMGLRenders_LightPass::GMGLRenders_LightPass()
 void GMGLRenders_LightPass::activateLights(const GMLight* lights, GMint count)
 {
 	D(d);
-	auto shaderProgram = d->engine->getLightPassShader();
+	auto shaderProgram = d->engine->getShaderProgram();
 	shaderProgram->useProgram();
 
 	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
