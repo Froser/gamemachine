@@ -1,26 +1,14 @@
-#version 330 core
-#include "../foundation/properties.h"
+in vec4 _deferred_geometry_pass_position_world;
 
-in vec4 _position_world;
-in vec4 _normal;
-in vec2 _uv;
-in vec4 _tangent;
-in vec4 _bitangent;
-in vec2 _lightmapuv;
-in vec4 _shadowCoord;
+layout (location = 0) out vec3 deferred_geometry_pass_gPosition;
+layout (location = 1) out vec3 deferred_geometry_pass_gNormal_eye;
+layout (location = 2) out vec3 deferred_geometry_pass_gTexAmbient;
+layout (location = 3) out vec3 deferred_geometry_pass_gTexDiffuse;
+layout (location = 4) out vec3 deferred_geometry_pass_gTangent_eye;
+layout (location = 5) out vec3 deferred_geometry_pass_gBitangent_eye;
+layout (location = 6) out vec3 deferred_geometry_pass_gNormalMap;
 
-uniform mat4 GM_view_matrix;
-uniform mat4 GM_model_matrix;
-
-layout (location = 0) out vec3 gPosition;
-layout (location = 1) out vec3 gNormal_eye;
-layout (location = 2) out vec3 gTexAmbient;
-layout (location = 3) out vec3 gTexDiffuse;
-layout (location = 4) out vec3 gTangent_eye;
-layout (location = 5) out vec3 gBitangent_eye;
-layout (location = 6) out vec3 gNormalMap;
-
-vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
+vec3 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 {
 	bool hasTexture = false;
 	vec3 result = vec3(0);
@@ -42,44 +30,33 @@ vec3 calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 	return result;
 }
 
-mat4 removeTranslation(mat4 mat)
-{
-	mat4 r = mat4(
-		vec4(mat[0].xyz, 0),
-		vec4(mat[1].xyz, 0),
-		vec4(mat[2].xyz, 0),
-		vec4(0, 0, 0, 1)
-	);
-	return r;
-}
-
-void calcEyeSpace()
+void deferred_geometry_pass_calcEyeSpace()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 noTranslationMat = removeTranslation(GM_model_matrix);
+	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
 	mat4 normalModelTransform = transpose(inverse(noTranslationMat));
 	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
-	vec4 vertex_eye = GM_view_matrix * _position_world;
+	vec4 vertex_eye = GM_view_matrix * _deferred_geometry_pass_position_world;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
-	gNormal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
+	deferred_geometry_pass_gNormal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
 
 	if (GM_normalmap_textures[0].enabled == 1)
 	{
-		gTangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
-		gBitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
+		deferred_geometry_pass_gTangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
+		deferred_geometry_pass_gBitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
 	}
 	else
 	{
-		gTangent_eye = vec3(0,0,0);
-		gBitangent_eye = vec3(0,0,0);
+		deferred_geometry_pass_gTangent_eye = vec3(0,0,0);
+		deferred_geometry_pass_gBitangent_eye = vec3(0,0,0);
 	}
 }
 
-void main()
+void deferred_geometry_pass_main()
 {
-	gPosition = _position_world.xyz;
-	gTexAmbient = calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * calcTexture(GM_lightmap_textures, _lightmapuv, 1);
-	gTexDiffuse = calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
-	gNormalMap = texture(GM_normalmap_textures[0].texture, _uv).rgb;
-	calcEyeSpace();
+	deferred_geometry_pass_gPosition = _deferred_geometry_pass_position_world.xyz;
+	deferred_geometry_pass_gTexAmbient = deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
+	deferred_geometry_pass_gTexDiffuse = deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
+	deferred_geometry_pass_gNormalMap = texture(GM_normalmap_textures[0].texture, _uv).rgb;
+	deferred_geometry_pass_calcEyeSpace();
 }

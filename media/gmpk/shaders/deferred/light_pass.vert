@@ -1,14 +1,10 @@
-#version 330
+layout (location = 1) in vec2 deferred_light_pass_texCoords;
+out vec2 _deferred_light_pass_texCoords;
+out vec4 _deferred_light_pass_position_world;
 
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec2 texCoords;
-
-out vec4 _position_world;
-out vec2 _texCoords;
-
-void main()
+void deferred_light_pass_main()
 {
-    _position_world = vec4(position, 1.0f);
-    gl_Position = _position_world;
-    _texCoords = texCoords;
+	_deferred_light_pass_position_world = vec4(position.xyz, 1.0f);
+	gl_Position = _deferred_light_pass_position_world;
+	_deferred_light_pass_texCoords = deferred_light_pass_texCoords;
 }

@@ -272,22 +272,19 @@ void GMGLGraphicEngine::geometryPass(Vector<GMGameObject*>& objects)
 	{
 		d->gbuffer.newFrame();
 		d->gbuffer.bindForWriting();
-		GM_CHECK_GL_ERROR();
 
 		for (auto object : objects)
 		{
 			object->draw();
-			GM_CHECK_GL_ERROR();
 		}
 		d->gbuffer.releaseBind();
-		GM_CHECK_GL_ERROR();
 	} while (d->gbuffer.nextPass());
 }
 
 void GMGLGraphicEngine::lightPass()
 {
 	D(d);
-	d->shaderProgram->setInt(GMSHADER_SHADER_TYPE, GMShaderProc::LIGHT_PASS );
+	setRenderState(GMGLDeferredRenderState::PassingLight);
 	activateLightsIfNecessary();
 	d->gbuffer.activateTextures(d->shaderProgram);
 	renderDeferredRenderQuad();
@@ -410,6 +407,8 @@ void GMGLGraphicEngine::updateShader()
 			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
 		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
 			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
+		else if (d->renderState == GMGLDeferredRenderState::PassingLight)
+			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::LIGHT_PASS);
 		else
 			GM_ASSERT(false);
 	}
@@ -454,12 +453,12 @@ void GMGLGraphicEngine::createDeferredRenderQuad()
 void GMGLGraphicEngine::renderDeferredRenderQuad()
 {
 	D(d);
+	GM_BEGIN_CHECK_GL_ERROR
 	glDisable(GL_CULL_FACE);
 	glBindVertexArray(d->quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
-
-	GM_CHECK_GL_ERROR();
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLGraphicEngine::disposeDeferredRenderQuad()

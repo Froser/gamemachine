@@ -19,3 +19,14 @@ uniform int GM_shader_proc;
 #define PROC_GEOMETRY_PASS		1
 #define PROC_LIGHT_PASS			2
 #define PROC_MATERIAL_PASS		3
+
+mat4 gm_removeTranslation(mat4 mat)
+{
+	mat4 r = mat4(
+		vec4(mat[0].xyz, 0),
+		vec4(mat[1].xyz, 0),
+		vec4(mat[2].xyz, 0),
+		vec4(0, 0, 0, 1)
+	);
+	return r;
+}

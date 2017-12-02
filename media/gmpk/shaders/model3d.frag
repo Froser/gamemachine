@@ -56,24 +56,13 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 	}
 }
 
-mat4 model3d_removeTranslation(mat4 mat)
-{
-	mat4 r = mat4(
-		vec4(mat[0].xyz, 0),
-		vec4(mat[1].xyz, 0),
-		vec4(mat[2].xyz, 0),
-		vec4(0, 0, 0, 1)
-	);
-	return r;
-}
-
 void model3d_calcLights()
 {
 	//g_model3d_shadeFactor = model3d_shadeFactorFactor(model3d_calcuateShadeFactor(_shadowCoord));
 	g_model3d_shadeFactor = 1;
 
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 noTranslationMat = model3d_removeTranslation(GM_model_matrix);
+	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
 	mat4 normalModelTransform = transpose(inverse(noTranslationMat));
 	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
 

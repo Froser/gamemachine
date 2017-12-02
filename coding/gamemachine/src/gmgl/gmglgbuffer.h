@@ -33,7 +33,9 @@ enum class GMGLDeferredRenderState
 {
 	PassingGeometry, //正在进行普通渲染或geometry pass
 	PassingMaterial, //正在传递材质
-	EndOfRenderState,
+
+	PassingLight, // 光照计算
+	EndOfRenderState = PassingLight
 };
 
 constexpr GMint GMGLGBuffer_TotalTurn = (GMint) GMGLDeferredRenderState::EndOfRenderState;

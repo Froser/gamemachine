@@ -234,7 +234,7 @@ inline void GM_delete_array(T*& o)
 	}
 }
 
-#define LINE_MAX 10240
+#define LINE_MAX 10240 * 4
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
 #define RAD(deg) deg * (PI / 180)
@@ -259,6 +259,12 @@ inline void GM_delete_array(T*& o)
 
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
 #define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )
+
+#if _WINDOWS
+#	define GM_CRLF "\r\n"
+#else
+#	define GM_CRLF "\n"
+#endif
 
 END_NS
 

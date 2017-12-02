@@ -1,17 +1,14 @@
-#version 330 core
-#include "../foundation/properties.h"
+layout (location = 0) out vec3 deferred_material_pass_gKa;
+layout (location = 1) out vec3 deferred_material_pass_gKd;
+layout (location = 2) out vec3 deferred_material_pass_gKs;
+layout (location = 3) out vec3 deferred_material_pass_gShininess;
+layout (location = 4) out vec3 deferred_material_pass_gHasNormalMap;
 
-layout (location = 0) out vec3 gKa;
-layout (location = 1) out vec3 gKd;
-layout (location = 2) out vec3 gKs;
-layout (location = 3) out vec3 gShininess;
-layout (location = 4) out vec3 gHasNormalMap;
-
-void main()
+void deferred_material_pass_main()
 {
-	gKa = GM_material.ka;
-	gKd = GM_material.kd;
-	gKs = GM_material.ks;
-	gShininess = vec3(GM_material.shininess, 0, 0);
-	gHasNormalMap = GM_normalmap_textures[0].enabled == 0 ? vec3(-1, 0, 0) : vec3(1, 0, 0);
+	deferred_material_pass_gKa = GM_material.ka;
+	deferred_material_pass_gKd = GM_material.kd;
+	deferred_material_pass_gKs = GM_material.ks;
+	deferred_material_pass_gShininess = vec3(GM_material.shininess, 0, 0);
+	deferred_material_pass_gHasNormalMap = GM_normalmap_textures[0].enabled == 0 ? vec3(-1, 0, 0) : vec3(1, 0, 0);
 }

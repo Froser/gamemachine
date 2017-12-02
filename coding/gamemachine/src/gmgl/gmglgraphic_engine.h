@@ -24,8 +24,8 @@ struct GMShaderProc
 	{
 		FORWARD = 0,
 		GEOMETRY_PASS,
-		LIGHT_PASS,
 		MATERIAL_PASS,
+		LIGHT_PASS,
 	};
 };
 
@@ -111,11 +111,17 @@ public:
 	void setViewport(const GMRect& rect);
 
 public:
-	inline void setRenderState(GMGLDeferredRenderState state) { D(d); d->renderState = state; }
 	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
 	inline bool isBlending() { D(d); return d->isBlending; }
 	GMS_BlendFunc blendsfactor() { D(d); return d->blendsfactor; }
 	GMS_BlendFunc blenddfactor() { D(d); return d->blenddfactor; }
+
+	inline void setRenderState(GMGLDeferredRenderState state)
+	{
+		D(d);
+		d->renderState = state; 
+		updateShader();
+	}
 
 	inline void checkDrawingState()
 	{

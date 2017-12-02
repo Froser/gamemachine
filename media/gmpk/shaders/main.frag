@@ -9,6 +9,11 @@
 #include "particles.frag"
 #include "glyph.frag"
 
+// FRAGMENT DEFERRED
+#include "deferred/geometry_pass.frag"
+#include "deferred/material_pass.frag"
+#include "deferred/light_pass.frag"
+
 void main(void)
 {
 	if (GM_shader_proc == PROC_FORWARD)
@@ -28,5 +33,17 @@ void main(void)
 				glyph_main();
 				break;
 		};
+	}
+	else if (GM_shader_proc == PROC_GEOMETRY_PASS)
+	{
+		deferred_geometry_pass_main();
+	}
+	else if (GM_shader_proc == PROC_MATERIAL_PASS)
+	{
+		deferred_material_pass_main();
+	}
+	else if (GM_shader_proc == PROC_LIGHT_PASS)
+	{
+		deferred_light_pass_main();
 	}
 }

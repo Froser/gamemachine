@@ -166,8 +166,11 @@ void GMGLShaderProgram::load()
 
 		GLchar* log = new GLchar[len + 1];
 		glGetProgramInfoLog(program, len, &len, log);
-		printf("%s", log);
-		GM_ASSERT("Shader linking failed: " && FALSE);
+		gm_error("%s", log);
+		GameMachineMessage consoleMsg(GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR);
+		GM.postMessage(consoleMsg);
+		GameMachineMessage crashMsg(GameMachineMessageType::CrashDown);
+		GM.postMessage(crashMsg);
 		delete[] log;
 #endif /* DEBUG */
 
@@ -232,7 +235,7 @@ void GMGLShaderProgram::expandInclude(const GMString& filename, const GMString& 
 	if (GM.getGamePackageManager()->readFileFromPath(include, &buf))
 	{
 		buf.convertToStringBuffer();
-		source = expandSource(include, GMString((char*)buf.buffer));
+		source = expandSource(include, GMString((char*)buf.buffer)) + GM_CRLF;
 	}
 	else
 	{
