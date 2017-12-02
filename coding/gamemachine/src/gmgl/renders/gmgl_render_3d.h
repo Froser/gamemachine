@@ -6,24 +6,23 @@
 #include "gmgl/gmglgraphic_engine.h"
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMGLRenders_3D)
+GM_PRIVATE_OBJECT(GMGLRender_3D)
 {
 	GMGLGraphicEngine* engine = nullptr;
-	GMMesh* mesh = nullptr;
 	GMShader* shader = nullptr;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
 
-class GMGLRenders_3D : public GMObject, public IRender
+class GMGLRender_3D : public GMObject, public IRender
 {
-	DECLARE_PRIVATE(GMGLRenders_3D)
+	DECLARE_PRIVATE(GMGLRender_3D)
 
 public:
-	GMGLRenders_3D();
+	GMGLRender_3D();
 
 public:
-	virtual void begin(GMMesh* mesh, const GMGameObject* parent) override;
+	virtual void begin(GMModel* model, const GMGameObject* parent) override;
 	virtual void beginShader(GMShader& shader) override;
 	virtual void endShader() override;
 	virtual void end() override;

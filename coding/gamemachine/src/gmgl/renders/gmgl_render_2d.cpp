@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
-#include "gmgl_renders_2d.h"
+#include "gmgl_render_2d.h"
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmglshaderprogram.h"
 
-void GMGLRenders_2D::beginShader(GMShader& shader)
+void GMGLRender_2D::beginShader(GMShader& shader)
 {
 	D(d);
 	d->shader = &shader;

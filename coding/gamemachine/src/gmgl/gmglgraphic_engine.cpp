@@ -5,9 +5,8 @@
 #include "gmdata/gmmodel.h"
 #include "gmgltexture.h"
 #include "gmglmodelpainter.h"
-#include "renders/gmgl_renders_3d.h"
-#include "renders/gmgl_renders_2d.h"
-#include "renders/gmgl_renders_particle.h"
+#include "renders/gmgl_render_3d.h"
+#include "renders/gmgl_render_2d.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmstates.h"
 #include "foundation/gmprofile.h"
@@ -55,19 +54,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
 	disposeDeferredRenderQuad();
-
-	for (auto iter : d->allRenders)
-	{
-		if (iter.second)
-			delete iter.second;
-	}
-
-	if (d->lightPassRender)
-		delete d->lightPassRender;
-
-	if (d->effectsShaderProgram)
-		delete d->effectsShaderProgram;
-
+	GM_delete(d->effectsShaderProgram);
 	GM_delete(d->shaderProgram);
 }
 
@@ -188,14 +175,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 void GMGLGraphicEngine::installShaders()
 {
 	D(d);
-	// 按照Object顺序创建renders
-	IRender* renders[] = {
-		new GMGLRenders_2D(),
-		new GMGLRenders_3D(),
-		new GMGLRenders_Particle(),
-		new GMGLRenders_2D(),
-	};
-
 	GMGamePackage* package = GM.getGamePackageManager();
 	if (!d->shaderLoadCallback)
 	{
@@ -204,18 +183,11 @@ void GMGLGraphicEngine::installShaders()
 		return;
 	}
 
-	GM_FOREACH_ENUM_CLASS(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
-	{
-		registerRender(type, renders[(GMint) type]);
-	}
-
 	{
 		d->effectsShaderProgram = new GMGLShaderProgram();
 		d->shaderLoadCallback->onLoadEffectsShader(*d->effectsShaderProgram);
 		d->effectsShaderProgram->load();
 	}
-
-	d->lightPassRender = new GMGLRenders_LightPass();
 
 	{
 		d->shaderProgram = new GMGLShaderProgram();
@@ -508,19 +480,23 @@ void GMGLGraphicEngine::setViewport(const GMRect& rect)
 	GM_END_CHECK_GL_ERROR
 }
 
-void GMGLGraphicEngine::registerRender(GMMeshType objectType, AUTORELEASE IRender* render)
+IRender* GMGLGraphicEngine::getRender(GMModelType objectType)
 {
 	D(d);
-	d->allRenders[objectType] = render;
-}
-
-IRender* GMGLGraphicEngine::getRender(GMMeshType objectType)
-{
-	D(d);
-	if (d->allRenders.find(objectType) == d->allRenders.end())
+	static GMGLRender_2D s_render2d;
+	static GMGLRender_3D s_render3d;
+	switch (objectType)
+	{
+	case GMModelType::Model2D:
+	case GMModelType::Glyph:
+	case GMModelType::Particles:
+		return &s_render2d;
+	case GMModelType::Model3D:
+		return &s_render3d;
+	default:
+		GM_ASSERT(false);
 		return nullptr;
-
-	return d->allRenders[objectType];
+	}
 }
 
 void GMGLGraphicEngine::addLight(const GMLight& light)

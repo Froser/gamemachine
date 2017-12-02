@@ -8,7 +8,7 @@ GMfloat* GMPrimitiveCreator::origin()
 	return o;
 }
 
-void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type)
+void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type)
 {
 	static constexpr GMfloat v[24] = {
 		1, -1, 1,
@@ -45,9 +45,9 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	}
 
 	{
+		model->setType(type);
 		GMMesh* body = model->getMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
-		body->setType(type);
 
 		GMComponent* component = new GMComponent(body);
 
@@ -78,7 +78,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	*obj = model;
 }
 
-void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
+void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
 {
 	static constexpr GMfloat v_anchor_center[] = {
 		-1, 1, 0,
@@ -114,9 +114,9 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	}
 
 	{
+		model->setType(type);
 		GMMesh* body = model->getMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
-		body->setType(type);
 
 		GMComponent* component = new GMComponent(body);
 		for (GMint i = 0; i < 2; i++)
@@ -151,7 +151,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	*obj = model;
 }
 
-void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMfloat(*customUV)[8])
+void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMfloat(*customUV)[8])
 {
 	static constexpr GMfloat defaultUV[] = {
 		-1, 1,
@@ -180,9 +180,9 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	}
 
 	{
+		model->setType(type);
 		GMMesh* body = model->getMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
-		body->setType(type);
 
 		GMComponent* component = new GMComponent(body);
 		for (GMint i = 0; i < 2; i++)

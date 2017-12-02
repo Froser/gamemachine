@@ -273,5 +273,5 @@ void GMControlGameObject::createQuadModel(IPrimitiveCreatorShaderCallback* callb
 		1.f,
 	};
 
-	GMPrimitiveCreator::createQuad(extents, GMPrimitiveCreator::origin(), model, callback, GMMeshType::Model2D, GMPrimitiveCreator::Center);
+	GMPrimitiveCreator::createQuad(extents, GMPrimitiveCreator::origin(), model, callback, GMModelType::Model2D, GMPrimitiveCreator::Center);
 }

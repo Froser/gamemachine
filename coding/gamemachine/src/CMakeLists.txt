@@ -69,14 +69,10 @@ set(SOURCES
 		gmengine/gmtypoengine.cpp
 		gmengine/gmanimation.h
 		gmengine/gmanimation.cpp
-		gmgl/renders/gmgl_renders_2d.h
-		gmgl/renders/gmgl_renders_2d.cpp
-		gmgl/renders/gmgl_renders_3d.h
-		gmgl/renders/gmgl_renders_3d.cpp
-		gmgl/renders/gmgl_renders_particle.h
-		gmgl/renders/gmgl_renders_particle.cpp
-		gmgl/renders/gmgl_renders_lightpass.h
-		gmgl/renders/gmgl_renders_lightpass.cpp
+		gmgl/renders/gmgl_render_2d.h
+		gmgl/renders/gmgl_render_2d.cpp
+		gmgl/renders/gmgl_render_3d.h
+		gmgl/renders/gmgl_render_3d.cpp
 		gmgl/gmglfactory.h
 		gmgl/gmglfactory.cpp
 		gmgl/gmglgbuffer.h

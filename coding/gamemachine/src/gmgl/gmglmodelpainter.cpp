@@ -101,11 +101,11 @@ void GMGLModelPainter::transfer()
 void GMGLModelPainter::draw(const GMGameObject* parent)
 {
 	D(d);
-	GMMesh* mesh = getModel()->getMesh();
+	GMModel* model = getModel();
+	IRender* render = d->engine->getRender(model->getType());
+	render->begin(model, parent);
 
-	IRender* render = d->engine->getRender(mesh->getType());
-	render->begin(mesh, parent);
-
+	GMMesh* mesh = model->getMesh();
 	glBindVertexArray(mesh->getArrayId());
 	for (auto component : mesh->getComponents())
 	{

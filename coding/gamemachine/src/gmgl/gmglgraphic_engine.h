@@ -6,7 +6,6 @@
 #include <gamemachine.h>
 #include <map>
 #include "gmglgbuffer.h"
-#include "renders/gmgl_renders_lightpass.h"
 BEGIN_NS
 
 class Camera;
@@ -44,10 +43,6 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	bool needRefreshLights = true;
 	Vector<GMLight> lights;
-
-	// 渲染器
-	Map<GMMeshType, IRender*> allRenders;
-	GMGLRenders_LightPass* lightPassRender = nullptr;
 
 	// 著色器程序
 	GMGLShaderProgram* shaderProgram = nullptr;
@@ -112,8 +107,7 @@ public:
 public:
 	GMGLShaderProgram* getShaderProgram() { D(d); return d->shaderProgram; }
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
-	void registerRender(GMMeshType objectType, AUTORELEASE IRender* render);
-	IRender* getRender(GMMeshType objectType);
+	IRender* getRender(GMModelType objectType);
 	void setViewport(const GMRect& rect);
 
 public:

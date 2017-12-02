@@ -1,10 +1,10 @@
 ﻿#ifndef __GMGL_RENDERS_GLYPH_H__
 #define __GMGL_RENDERS_GLYPH_H__
 #include <gmcommon.h>
-#include "gmgl_renders_3d.h"
+#include "gmgl_render_3d.h"
 BEGIN_NS
 
-class GMGLRenders_2D : public GMGLRenders_3D
+class GMGLRender_2D : public GMGLRender_3D
 {
 public:
 	virtual void beginShader(GMShader& shader) override;

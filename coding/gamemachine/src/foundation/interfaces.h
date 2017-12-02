@@ -109,7 +109,7 @@ GM_INTERFACE(IGraphicEngine)
 
 GM_INTERFACE(IRender)
 {
-	virtual void begin(GMMesh* mesh, const GMGameObject* parent) = 0;
+	virtual void begin(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void beginShader(GMShader& shader) = 0;
 	virtual void endShader() = 0;
 	virtual void end() = 0;

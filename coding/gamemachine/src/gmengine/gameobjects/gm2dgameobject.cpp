@@ -65,9 +65,9 @@ void GMGlyphObject::constructModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
+	model->setType(GMModelType::Glyph);
 	GMMesh* mesh = model->getMesh();
 	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
-	mesh->setType(GMMeshType::Glyph);
 
 	GMComponent* component = new GMComponent(mesh);
 	onCreateShader(component->getShader());
@@ -384,7 +384,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		GMPrimitiveCreator::createQuad(extents[i], &center[i][0],
 			d->models + i,
 			&_cb,
-			GMMeshType::Model2D,
+			GMModelType::Model2D,
 			GMPrimitiveCreator::Center,
 			&uv[i]);
 

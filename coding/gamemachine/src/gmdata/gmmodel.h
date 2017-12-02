@@ -91,11 +91,23 @@ enum class GMUsageHint
 	DynamicDraw,
 };
 
+// 和着色器中的GM_shader_type一致
+enum class GMModelType
+{
+	ModelTypeBegin,
+	Model2D = ModelTypeBegin,
+	Model3D,
+	Particles,
+	Glyph,
+	ModelTypeEnd,
+};
+
 GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	GMMesh* mesh = nullptr;
 	AutoPtr<GMModelPainter> painter;
+	GMModelType type = GMModelType::Model3D;
 };
 
 // 所有的顶点属性类型
@@ -135,6 +147,8 @@ public:
 	inline void setPainter(AUTORELEASE GMModelPainter* painter) { D(d); d->painter.reset(painter); }
 	inline GMModelPainter* getPainter() { D(d); return d->painter; }
 	inline GMMesh* getMesh() { D(d); return d->mesh; }
+	inline GMModelType getType() { D(d); return d->type; }
+	inline void setType(GMModelType type) { D(d); d->type = type; }
 
 	// 绘制方式
 	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
@@ -149,17 +163,6 @@ enum class GMArrangementMode
 	Triangle_Strip,
 	Triangles,
 	Lines,
-};
-
-// 和着色器中的GM_shader_type一致
-enum class GMMeshType
-{
-	MeshTypeBegin,
-	Model2D = MeshTypeBegin,
-	Model3D,
-	Particles,
-	Glyph,
-	MeshTypeEnd,
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
@@ -186,7 +189,6 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
 	Vector<GMComponent*> components;
-	GMMeshType type = GMMeshType::Model3D;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
 	GMString name = _L("default");
 };
@@ -223,8 +225,6 @@ public:
 	inline void disableData(GMVertexDataType type) { D(d); d->disabledData[gmVertexIndex(type)] = true; }
 	inline bool isDataDisabled(GMVertexDataType type) { D(d); return d->disabledData[gmVertexIndex(type)]; }
 	inline Vector<GMComponent*>& getComponents() { D(d); return d->components; }
-	inline GMMeshType getType() { D(d); return d->type; }
-	inline void setType(GMMeshType type) { D(d); d->type = type; }
 	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }
 	inline GMArrangementMode getArrangementMode() { D(d); return d->mode; }
 	inline void setName(const char* name) { D(d); d->name = name; }
