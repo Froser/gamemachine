@@ -62,35 +62,25 @@ void GMGLRenders_3D::activateShader()
 void GMGLRenders_3D::begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform)
 {
 	D(d);
+	auto shaderProgram = d->engine->getShaderProgram();
+	shaderProgram->useProgram();
 	d->mesh = mesh;
 	d->type = mesh->getType();
 
-	updateShaderState();
+	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)d->type);
 	if (modelTransform)
-		d->engine->getShaderProgram()->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
+	{
+		GM_BEGIN_CHECK_GL_ERROR
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
+		GM_END_CHECK_GL_ERROR
+	}
 }
 
-void GMGLRenders_3D::beginShader(GMShader& shader, GMDrawMode mode)
+void GMGLRenders_3D::beginShader(GMShader& shader)
 {
 	D(d);
 	d->shader = &shader;
-	d->mode = mode;
-
-	if (mode == GMDrawMode::Fill)
-	{
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	}
-	else
-	{
-		d->shader->stash();
-
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glEnable(GL_POLYGON_OFFSET_LINE);
-		glPolygonOffset(0.f, 1.f);
-
-		// 设置边框颜色
-		shader.getMaterial().ka = d->shader->getLineColor();
-	}
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
 	activateMaterial(shader);
@@ -126,9 +116,6 @@ void GMGLRenders_3D::endShader()
 			deactivateTexture((GMTextureType)type, i);
 		}
 	}
-
-	if (d->mode == GMDrawMode::Line)
-		d->shader->pop();
 }
 
 void GMGLRenders_3D::drawTexture(GMTextureType type, GMint index)
@@ -154,73 +141,6 @@ void GMGLRenders_3D::end()
 {
 }
 
-void GMGLRenders_3D::activateLights(const GMLight* lights, GMint count)
-{
-	D(d);
-	if (!count)
-		return;
-
-	updateShaderState();
-
-	auto shaderProgram = d->engine->getShaderProgram();
-	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-	for (GMint i = 0; i < count; i++)
-	{
-		const GMLight& light = lights[i];
-		GMint id = lightId[(GMuint)light.getType()]++;
-
-		switch (light.getType())
-		{
-		case GMLightType::AMBIENT:
-			{
-				const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
-				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-				shaderProgram->setVec3(u_color, light.getLightColor());
-			}
-			break;
-		case GMLightType::SPECULAR:
-			{
-				const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
-				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-				combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
-				shaderProgram->setVec3(u_color, light.getLightColor());
-				shaderProgram->setVec3(u_position, light.getLightPosition());
-			}
-			break;
-		default:
-			break;
-		}
-	}
-
-	shaderProgram->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
-	shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
-}
-
-void GMGLRenders_3D::updateShaderState()
-{
-	D(d);
-	GMGLShaderProgram* shaderProgram = d->engine->getShaderProgram();
-	d->renderMode = GMGetRenderState(RENDER_MODE);
-	d->renderState = d->engine->getRenderState();
-	if (d->renderMode == GMStates_RenderOptions::FORWARD)
-	{
-		shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint) d->type);
-		shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
-	}
-	else
-	{
-		GM_ASSERT(d->renderMode == GMStates_RenderOptions::DEFERRED);
-		if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
-			shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
-		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
-			shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
-		else
-			GM_ASSERT(false);
-	}
-}
-
 ITexture* GMGLRenders_3D::getTexture(GMTextureFrames& frames)
 {
 	D(d);
@@ -242,7 +162,6 @@ void GMGLRenders_3D::activateMaterial(const GMShader& shader)
 	D(d);
 	const GMMaterial& material = shader.getMaterial();
 	auto shaderProgram = d->engine->getShaderProgram();
-	updateShaderState();
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, &material.ka[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
@@ -253,7 +172,6 @@ void GMGLRenders_3D::drawDebug()
 {
 	D(d);
 	auto shaderProgram = d->engine->getShaderProgram();
-	updateShaderState();
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
 }
 
@@ -261,7 +179,6 @@ void GMGLRenders_3D::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
 	auto shaderProgram = d->engine->getShaderProgram();
-	updateShaderState();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
@@ -314,7 +231,6 @@ void GMGLRenders_3D::activateTexture(GMTextureType type, GMint index)
 	getTextureID(type, index, tex, texId);
 
 	auto shaderProgram = d->engine->getShaderProgram();
-	updateShaderState();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, GMSHADER_TEXTURES_TEXTURE);
@@ -334,7 +250,6 @@ void GMGLRenders_3D::deactivateTexture(GMTextureType type, GMint index)
 	getTextureID(type, index, tex, texId);
 
 	auto shaderProgram = d->engine->getShaderProgram();
-	updateShaderState();
 	GMint idx = (GMint)type;
 	const char* uniform = getTextureUniformName(type, index);
 	char u[GMGL_MAX_UNIFORM_NAME_LEN];

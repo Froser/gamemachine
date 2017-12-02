@@ -137,16 +137,15 @@ public:
 
 private:
 	void directDraw(GMGameObject *objects[], GMuint count);
-	void refreshForwardRenderLights();
-	void refreshDeferredRenderLights();
+	void updateShader();
+	void activateLightsIfNecessary();
 	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();
 	void disposeDeferredRenderQuad();
 	void updateProjection();
 	void updateView();
 	void installShaders();
-	void activateForwardRenderLight(const Vector<GMLight>& lights);
-	void activateLightPassLight(const Vector<GMLight>& lights);
+	void activateLights(const Vector<GMLight>& lights);
 	bool refreshGBuffer();
 	bool refreshFramebuffer();
 	void forwardRender(GMGameObject* objects[], GMuint count);

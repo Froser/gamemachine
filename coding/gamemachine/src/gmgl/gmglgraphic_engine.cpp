@@ -150,7 +150,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 
 		if (renderMode == GMStates_RenderOptions::FORWARD)
 		{
-			refreshForwardRenderLights();
+			activateLightsIfNecessary();
 
 			{
 				GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
@@ -190,10 +190,10 @@ void GMGLGraphicEngine::installShaders()
 	D(d);
 	// 按照Object顺序创建renders
 	IRender* renders[] = {
+		new GMGLRenders_2D(),
 		new GMGLRenders_3D(),
-		new GMGLRenders_2D(),
-		new GMGLRenders_2D(),
 		new GMGLRenders_Particle(),
+		new GMGLRenders_2D(),
 	};
 
 	GMGamePackage* package = GM.getGamePackageManager();
@@ -224,31 +224,41 @@ void GMGLGraphicEngine::installShaders()
 	}
 }
 
-void GMGLGraphicEngine::activateForwardRenderLight(const Vector<GMLight>& lights)
+void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 {
 	D(d);
-	static GMMesh dummy;
-	GM_FOREACH_ENUM(type, GMMeshType::MeshTypeBegin, GMMeshType::MeshTypeEnd)
-	{
-		dummy.setType(type);
-
-		IRender* render = getRender(type);
-		render->begin(this, &dummy, nullptr);
-		render->activateLights(lights.data(), lights.size());
-		render->end();
-	}
-}
-
-void GMGLGraphicEngine::activateLightPassLight(const Vector<GMLight>& lights)
-{
-	D(d);
-	IRender* render = d->lightPassRender;
-	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-
+	updateShader();
 	for (auto& light : lights)
 	{
-		GMint id = lightId[(GMuint)light.getType()]++;
-		render->activateLights(lights.data(), lights.size());
+		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+			GMint id = lightId[(GMuint)light.getType()]++;
+
+		switch (light.getType())
+		{
+		case GMLightType::AMBIENT:
+		{
+			const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
+			char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
+			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+			d->shaderProgram->setVec3(u_color, light.getLightColor());
+			break;
+		}
+		case GMLightType::SPECULAR:
+		{
+			const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
+			char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
+			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+			combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
+			d->shaderProgram->setVec3(u_color, light.getLightColor());
+			d->shaderProgram->setVec3(u_position, light.getLightPosition());
+			break;
+		}
+		default:
+			break;
+		}
+
+		d->shaderProgram->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
+		d->shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 	}
 }
 
@@ -307,7 +317,7 @@ void GMGLGraphicEngine::lightPass()
 {
 	D(d);
 	d->shaderProgram->setInt(GMSHADER_SHADER_TYPE, GMShaderProc::LIGHT_PASS );
-	refreshDeferredRenderLights();
+	activateLightsIfNecessary();
 	d->gbuffer.activateTextures(d->shaderProgram);
 	renderDeferredRenderQuad();
 }
@@ -411,25 +421,37 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 	GMSetRenderState(RENDER_MODE, renderMode);
 }
 
-void GMGLGraphicEngine::refreshForwardRenderLights()
+void GMGLGraphicEngine::updateShader()
 {
 	D(d);
-	if (d->needRefreshLights)
+	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
+	GMGLDeferredRenderState state = getRenderState();
+	if (d->renderMode == GMStates_RenderOptions::FORWARD)
 	{
-		d->needRefreshLights = false;
-		IGraphicEngine* engine = GM.getGraphicEngine();
-		activateForwardRenderLight(d->lights);
+		GM_BEGIN_CHECK_GL_ERROR
+			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
+		GM_END_CHECK_GL_ERROR
+	}
+	else
+	{
+		GM_ASSERT(d->renderMode == GMStates_RenderOptions::DEFERRED);
+		if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
+			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
+		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
+			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
+		else
+			GM_ASSERT(false);
 	}
 }
 
-void GMGLGraphicEngine::refreshDeferredRenderLights()
+void GMGLGraphicEngine::activateLightsIfNecessary()
 {
 	D(d);
 	if (d->needRefreshLights)
 	{
 		d->needRefreshLights = false;
 		IGraphicEngine* engine = GM.getGraphicEngine();
-		activateLightPassLight(d->lights);
+		activateLights(d->lights);
 	}
 }
 

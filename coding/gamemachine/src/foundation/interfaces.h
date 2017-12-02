@@ -107,19 +107,12 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void endBlend() = 0;
 };
 
-enum class GMDrawMode
-{
-	Fill,
-	Line,
-};
-
 GM_INTERFACE(IRender)
 {
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) = 0;
-	virtual void beginShader(GMShader& shader, GMDrawMode mode) = 0;
+	virtual void beginShader(GMShader& shader) = 0;
 	virtual void endShader() = 0;
 	virtual void end() = 0;
-	virtual void activateLights(const GMLight* lights, GMint count) = 0;
 };
 
 enum GamePackageType

@@ -407,7 +407,9 @@ void GMGLFramebuffer::bindForReading()
 
 void GMGLFramebuffer::releaseBind()
 {
+	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLFramebuffer::newFrame()

@@ -118,8 +118,6 @@ void GMGLModelPainter::draw(const GMfloat* modelTransform)
 				continue;
 
 			draw(render, shader, component, mesh, true);
-			if (shader.getDrawBorder())
-				draw(render, shader, component, mesh, false);
 		}
 		glBindVertexArray(0);
 
@@ -170,13 +168,14 @@ void GMGLModelPainter::draw(IRender* render, GMShader& shader, GMComponent* comp
 	D(d);
 	d->engine->checkDrawingState();
 
-	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-	if (fill)
-		render->beginShader(shader, GMDrawMode::Fill);
-	else
-		render->beginShader(shader, GMDrawMode::Line);
+	GM_BEGIN_CHECK_GL_ERROR
+	render->beginShader(shader);
+	GM_END_CHECK_GL_ERROR
 
+	GM_BEGIN_CHECK_GL_ERROR
+	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
-	GM_CHECK_GL_ERROR();
+	GM_END_CHECK_GL_ERROR
+
 	render->endShader();
 }

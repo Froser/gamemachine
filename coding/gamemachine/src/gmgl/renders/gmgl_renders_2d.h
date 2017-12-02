@@ -7,7 +7,7 @@ BEGIN_NS
 class GMGLRenders_2D : public GMGLRenders_3D
 {
 public:
-	virtual void beginShader(GMShader& shader, GMDrawMode mode) override;
+	virtual void beginShader(GMShader& shader) override;
 };
 
 END_NS

@@ -294,7 +294,6 @@ public:
 	GM_DECLARE_PROPERTY(Texture, texture, GMTexture);
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	GM_DECLARE_PROPERTY(LineColor, lineColor, glm::vec3);
-	GM_DECLARE_PROPERTY(DrawBorder, drawBorder, bool);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
 
 	inline GMShader& operator=(const GMShader& rhs)
@@ -302,22 +301,6 @@ public:
 		D(d);
 		*d = *rhs.data();
 		return *this;
-	}
-
-	inline void stash()
-	{
-		D(d);
-		GMShader* s = new GMShader();
-		*s = *this;
-		m_stash.reset(s);
-	}
-
-	void pop()
-	{
-		D(d);
-		if (!m_stash)
-			return;
-		*this = *m_stash;
 	}
 
 	AutoPtr<GMShader> m_stash;

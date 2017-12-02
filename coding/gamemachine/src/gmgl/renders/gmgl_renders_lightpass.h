@@ -20,7 +20,7 @@ public:
 
 public:
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) override {}
-	virtual void beginShader(GMShader& shader, GMDrawMode mode) override { GM_ASSERT(false); }
+	virtual void beginShader(GMShader& shader) override { GM_ASSERT(false); }
 	virtual void endShader() { GM_ASSERT(false); }
 	virtual void end() {}
 	virtual void activateLights(const GMLight* lights, GMint count);

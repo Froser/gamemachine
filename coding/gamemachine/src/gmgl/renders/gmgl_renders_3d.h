@@ -12,7 +12,6 @@ GM_PRIVATE_OBJECT(GMGLRenders_3D)
 	GMMesh* mesh = nullptr;
 	GMShader* shader = nullptr;
 	GMMeshType type;
-	GMDrawMode mode;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
@@ -26,13 +25,11 @@ public:
 
 public:
 	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) override;
-	virtual void beginShader(GMShader& shader, GMDrawMode mode) override;
+	virtual void beginShader(GMShader& shader) override;
 	virtual void endShader() override;
 	virtual void end() override;
-	virtual void activateLights(const GMLight* lights, GMint count);
 
 protected:
-	void updateShaderState();
 	void activateMaterial(const GMShader& shader);
 	void drawDebug();
 	void drawTexture(GMTextureType type, GMint index = 0);
