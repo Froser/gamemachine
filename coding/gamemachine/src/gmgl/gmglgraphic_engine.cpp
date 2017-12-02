@@ -228,11 +228,11 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 {
 	D(d);
 	updateShader();
+
+	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
 	for (auto& light : lights)
 	{
-		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-			GMint id = lightId[(GMuint)light.getType()]++;
-
+		GMint id = lightId[(GMuint)light.getType()]++;
 		switch (light.getType())
 		{
 		case GMLightType::AMBIENT:
@@ -256,10 +256,9 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 		default:
 			break;
 		}
-
-		d->shaderProgram->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
-		d->shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 	}
+	d->shaderProgram->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
+	d->shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
 bool GMGLGraphicEngine::refreshGBuffer()

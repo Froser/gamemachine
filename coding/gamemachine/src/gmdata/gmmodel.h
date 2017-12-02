@@ -1,19 +1,15 @@
 ﻿#ifndef __GMMODEL_H__
 #define __GMMODEL_H__
 #include <gmcommon.h>
-#include "../foundation/vector.h"
 #include <utilities.h>
 #include <linearmath.h>
 #include <gmimage.h>
 #include <gmshader.h>
 
-#define BEGIN_FOREACH_MESH(obj, mesh) for (auto iter = (obj)->getAllMeshes().begin(); iter != (obj)->getAllMeshes().end(); iter++) { GMMesh* mesh = *iter;
-#define END_FOREACH_MESH }
-
 BEGIN_NS
 
 class GMModel;
-class GMGLShaderProgram;
+class GMGameObject;
 
 GM_PRIVATE_OBJECT(GMModelPainter)
 {
@@ -34,7 +30,7 @@ public:
 
 public:
 	virtual void transfer() = 0;
-	virtual void draw(const GMfloat* modelTransform) = 0;
+	virtual void draw(const GMGameObject* parent) = 0;
 	virtual void dispose() = 0;
 
 // 提供修改缓存的方法
@@ -98,7 +94,7 @@ enum class GMUsageHint
 GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
-	Vector<GMMesh*> meshes;
+	GMMesh* mesh = nullptr;
 	AutoPtr<GMModelPainter> painter;
 };
 
@@ -132,13 +128,13 @@ public:
 	};
 
 public:
+	GMModel();
 	~GMModel();
 
 public:
 	inline void setPainter(AUTORELEASE GMModelPainter* painter) { D(d); d->painter.reset(painter); }
 	inline GMModelPainter* getPainter() { D(d); return d->painter; }
-	inline Vector<GMMesh*>& getAllMeshes() { D(d); return d->meshes; }
-	inline void append(AUTORELEASE GMMesh* obj) { D(d); d->meshes.push_back(obj); }
+	inline GMMesh* getMesh() { D(d); return d->mesh; }
 
 	// 绘制方式
 	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
@@ -199,16 +195,21 @@ class GMMesh : public GMObject
 {
 	DECLARE_PRIVATE(GMMesh)
 
-	friend class Object_Less;
+	friend class GMModel;
+	friend class GMComponent;
+
+private:
+	GMMesh();
 
 public:
-	GMMesh();
 	~GMMesh();
 
 public:
 	void clone(OUT GMMesh** childObject);
-	void appendComponent(AUTORELEASE GMComponent* component);
 	void calculateTangentSpace();
+
+private:
+	void appendComponent(AUTORELEASE GMComponent* component);
 
 public:
 	GM_DEFINE_VERTEX_PROPERTY(positions);

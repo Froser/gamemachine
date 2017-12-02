@@ -22,7 +22,7 @@ class Scanner;
 class GMComponent;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
-	GMModel* object;
+	GMModel* model = nullptr;
 	AlignedVector<glm::vec3> positions;
 	AlignedVector<glm::vec3> normals;
 	AlignedVector<glm::vec2> textures;

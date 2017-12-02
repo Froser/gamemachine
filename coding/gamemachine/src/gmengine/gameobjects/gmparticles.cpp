@@ -11,19 +11,13 @@ GMParticleGameObject::GMParticleGameObject(AUTORELEASE GMModel* prototype)
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, prototype);
 	setModel(asset);
-
-	if (prototype->getAllMeshes().size() > 1)
-	{
-		GM_ASSERT(false);
-		gm_warning("Only one mesh in particle's prototype is allowed.");
-	}
 }
 
 void GMParticleGameObject::updatePrototype(void* buffer)
 {
 	D(d);
 	GMModel* prototype = getModel();
-	GMMesh* mesh = prototype->getAllMeshes()[0];
+	GMMesh* mesh = prototype->getMesh();
 	GMbyte* vertexData = (GMbyte*)buffer;
 
 	GMint index = getIndexInPrototype();
@@ -95,7 +89,7 @@ void GMParticles::draw()
 	{
 		GMModel* prototype = kv.first;
 		GMModelPainter* painter = prototype->getPainter();
-		painter->beginUpdateBuffer(prototype->getAllMeshes()[0]);
+		painter->beginUpdateBuffer(prototype->getMesh());
 		void* buffer = painter->getBuffer();
 		for (const auto& particle : kv.second)
 		{
@@ -174,7 +168,7 @@ void GMParticles::initPrototype(GMModel* prototype, const Vector<GMParticleGameO
 	D(d);
 	prototype->setUsageHint(GMUsageHint::DynamicDraw);
 
-	auto mesh = prototype->getAllMeshes()[0];
+	auto mesh = prototype->getMesh();
 	mesh->disableData(GMVertexDataType::Normal);
 	mesh->disableData(GMVertexDataType::Tangent);
 	mesh->disableData(GMVertexDataType::Bitangent);

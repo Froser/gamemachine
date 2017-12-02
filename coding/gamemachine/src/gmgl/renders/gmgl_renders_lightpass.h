@@ -19,11 +19,10 @@ public:
 	GMGLRenders_LightPass();
 
 public:
-	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) override {}
+	virtual void begin(GMMesh* mesh, const GMGameObject* parent) override {}
 	virtual void beginShader(GMShader& shader) override { GM_ASSERT(false); }
 	virtual void endShader() { GM_ASSERT(false); }
 	virtual void end() {}
-	virtual void activateLights(const GMLight* lights, GMint count);
 };
 
 END_NS

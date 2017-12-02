@@ -11,7 +11,6 @@ GM_PRIVATE_OBJECT(GMGLRenders_3D)
 	GMGLGraphicEngine* engine = nullptr;
 	GMMesh* mesh = nullptr;
 	GMShader* shader = nullptr;
-	GMMeshType type;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
@@ -24,7 +23,7 @@ public:
 	GMGLRenders_3D();
 
 public:
-	virtual void begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform) override;
+	virtual void begin(GMMesh* mesh, const GMGameObject* parent) override;
 	virtual void beginShader(GMShader& shader) override;
 	virtual void endShader() override;
 	virtual void end() override;

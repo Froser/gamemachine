@@ -21,14 +21,11 @@ void GMGameObject::setModel(GMAsset asset)
 
 	if (d->model)
 	{
-		for (auto& mesh : d->model->getAllMeshes())
+		for (auto& component : d->model->getMesh()->getComponents())
 		{
-			for (auto& component : mesh->getComponents())
-			{
-				GMShader& shader = component->getShader();
-				attachEvent(shader, GM_SET_PROPERTY_EVENT_ENUM(Blend), onShaderSetBlend);
-				shader.emitEvent(GM_SET_PROPERTY_EVENT_ENUM(Blend));
-			}
+			GMShader& shader = component->getShader();
+			attachEvent(shader, GM_SET_PROPERTY_EVENT_ENUM(Blend), onShaderSetBlend);
+			shader.emitEvent(GM_SET_PROPERTY_EVENT_ENUM(Blend));
 		}
 	}
 }
@@ -56,7 +53,7 @@ void GMGameObject::draw()
 {
 	GMModel* coreObj = getModel();
 	if (coreObj)
-		coreObj->getPainter()->draw(glm::value_ptr(getTransform()));
+		coreObj->getPainter()->draw(this);
 }
 
 bool GMGameObject::canDeferredRendering()
@@ -98,20 +95,17 @@ void GMEntityObject::calc()
 	d->mins[0] = d->mins[1] = d->mins[2] = 999999.f;
 	d->maxs[0] = d->maxs[1] = d->maxs[2] = -d->mins[0];
 
-	GMModel* obj = getModel();
-	for (auto mesh : obj->getAllMeshes())
+	GMMesh* mesh = getModel()->getMesh();
+	GMModel::DataType* vertices = mesh->positions().data();
+	GMint sz = mesh->positions().size();
+	for (GMint i = 0; i < sz; i += 4)
 	{
-		GMModel::DataType* vertices = mesh->positions().data();
-		GMint sz = mesh->positions().size();
-		for (GMint i = 0; i < sz; i += 4)
+		for (GMint j = 0; j < 3; j++)
 		{
-			for (GMint j = 0; j < 3; j++)
-			{
-				if (vertices[i + j] < d->mins[j])
-					d->mins[j] = vertices[i + j];
-				if (vertices[i + j] > d->maxs[j])
-					d->maxs[j] = vertices[i + j];
-			}
+			if (vertices[i + j] < d->mins[j])
+				d->mins[j] = vertices[i + j];
+			if (vertices[i + j] > d->maxs[j])
+				d->maxs[j] = vertices[i + j];
 		}
 	}
 
@@ -244,11 +238,10 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 		vertices[i] = glm::vec3(pt[0], pt[1], pt[2]);
 	}
 
-	GMModel* object = new GMModel();
-	*obj = object;
+	GMModel* model = new GMModel();
+	*obj = model;
 
-	GMMesh* child = new GMMesh();
-	GMComponent* component = new GMComponent(child);
+	GMComponent* component = new GMComponent(model->getMesh());
 	component->setShader(d->shader);
 
 	for (GMuint i = 0; i < 6; i++)
@@ -264,8 +257,6 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 		component->uv(uvs[i * 4 + 3][0], uvs[i * 4 + 3][1]);
 		component->endFace();
 	}
-	child->appendComponent(component);
-	object->append(child);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -326,8 +317,8 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 	};
 
 	GMModel* model = new GMModel();
-	GMMesh* child = new GMMesh();
-	GMComponent* component = new GMComponent(child);
+	GMMesh* mesh = model->getMesh();
+	GMComponent* component = new GMComponent(mesh);
 	for (GMuint i = 0; i < 12; i++)
 	{
 		component->beginFace();
@@ -336,6 +327,4 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		component->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
 		component->endFace();
 	}
-	child->appendComponent(component);
-	model->append(child);
 }

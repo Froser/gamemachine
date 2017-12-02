@@ -35,7 +35,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 		3, 7, 5,
 	};
 
-	GMModel* coreObj = new GMModel();
+	GMModel* model = new GMModel();
 
 	// 实体
 	GMfloat t[24];
@@ -45,7 +45,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	}
 
 	{
-		GMMesh* body = new GMMesh();
+		GMMesh* body = model->getMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 		body->setType(type);
 
@@ -73,11 +73,9 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 		}
 		if (shaderCallback)
 			shaderCallback->onCreateShader(component->getShader());
-		body->appendComponent(component);
-		coreObj->append(body);
 	}
 
-	*obj = coreObj;
+	*obj = model;
 }
 
 void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
@@ -106,7 +104,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		2, 3, 1,
 	};
 
-	GMModel* coreObj = new GMModel();
+	GMModel* model = new GMModel();
 
 	// 实体
 	GMfloat t[12];
@@ -116,7 +114,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	}
 
 	{
-		GMMesh* body = new GMMesh();
+		GMMesh* body = model->getMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 		body->setType(type);
 
@@ -148,11 +146,9 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		}
 		if (shaderCallback)
 			shaderCallback->onCreateShader(component->getShader());
-		body->appendComponent(component);
-		coreObj->append(body);
 	}
 
-	*obj = coreObj;
+	*obj = model;
 }
 
 void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMMeshType type, GMfloat(*customUV)[8])
@@ -174,7 +170,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 		2, 3, 1,
 	};
 
-	GMModel* coreObj = new GMModel();
+	GMModel* model = new GMModel();
 
 	// 实体
 	GMfloat t[12];
@@ -184,7 +180,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	}
 
 	{
-		GMMesh* body = new GMMesh();
+		GMMesh* body = model->getMesh();
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 		body->setType(type);
 
@@ -216,60 +212,52 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 		}
 		if (shaderCallback)
 			shaderCallback->onCreateShader(component->getShader());
-		body->appendComponent(component);
-		coreObj->append(body);
 	}
 
-	*obj = coreObj;
+	*obj = model;
 }
 
 
 //////////////////////////////////////////////////////////////////////////
 void GMPrimitiveUtil::translateModelTo(REF GMModel& model, const GMfloat(&trans)[3])
 {
-	auto& meshes = model.getAllMeshes();
 	GMModelPainter* painter = model.getPainter();
-	for (auto& mesh : meshes)
+	GMMesh* mesh = model.getMesh();
+	painter->beginUpdateBuffer(mesh);
+	GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
+	GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
+
+	// 计算首个偏移
+	GMfloat* first = buffer;
+	GMfloat delta[] = {
+		trans[0] - first[0],
+		trans[1] - first[1],
+		trans[2] - first[2]
+	};
+
+	for (GMint v = 0; v < vertexCount; ++v)
 	{
-		painter->beginUpdateBuffer(mesh);
-		GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
-		GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
-
-		// 计算首个偏移
-		GMfloat* first = buffer;
-		GMfloat delta[] = {
-			trans[0] - first[0],
-			trans[1] - first[1],
-			trans[2] - first[2]
-		};
-
-		for (GMint v = 0; v < vertexCount; ++v)
-		{
-			GMfloat* ptr = buffer + v * GMModel::PositionDimension;
-			ptr[0] += delta[0];
-			ptr[1] += delta[1];
-			ptr[2] += delta[2];
-		}
-		painter->endUpdateBuffer();
+		GMfloat* ptr = buffer + v * GMModel::PositionDimension;
+		ptr[0] += delta[0];
+		ptr[1] += delta[1];
+		ptr[2] += delta[2];
 	}
+	painter->endUpdateBuffer();
 }
 
 void GMPrimitiveUtil::scaleModel(REF GMModel& model, const GMfloat (&scaling)[3])
 {
-	auto& meshes = model.getAllMeshes();
 	GMModelPainter* painter = model.getPainter();
-	for (auto& mesh : meshes)
+	GMMesh* mesh = model.getMesh();
+	painter->beginUpdateBuffer(mesh);
+	GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
+	GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
+	for (GMint v = 0; v < vertexCount; ++v)
 	{
-		painter->beginUpdateBuffer(mesh);
-		GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
-		GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
-		for (GMint v = 0; v < vertexCount; ++v)
-		{
-			GMfloat* ptr = buffer + v * GMModel::PositionDimension;
-			ptr[0] *= scaling[0];
-			ptr[1] *= scaling[1];
-			ptr[2] *= scaling[2];
-		}
-		painter->endUpdateBuffer();
+		GMfloat* ptr = buffer + v * GMModel::PositionDimension;
+		ptr[0] *= scaling[0];
+		ptr[1] *= scaling[1];
+		ptr[2] *= scaling[2];
 	}
+	painter->endUpdateBuffer();
 }

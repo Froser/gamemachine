@@ -59,19 +59,18 @@ void GMGLRenders_3D::activateShader()
 	glLineWidth(shader->getLineWidth());
 }
 
-void GMGLRenders_3D::begin(IGraphicEngine* engine, GMMesh* mesh, const GMfloat* modelTransform)
+void GMGLRenders_3D::begin(GMMesh* mesh, const GMGameObject* parent)
 {
 	D(d);
 	auto shaderProgram = d->engine->getShaderProgram();
 	shaderProgram->useProgram();
 	d->mesh = mesh;
-	d->type = mesh->getType();
 
-	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)d->type);
-	if (modelTransform)
+	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)mesh->getType());
+	if (parent)
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, modelTransform);
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(parent->getTransform()));
 		GM_END_CHECK_GL_ERROR
 	}
 }

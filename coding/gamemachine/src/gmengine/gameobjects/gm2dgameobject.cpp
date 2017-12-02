@@ -65,15 +65,13 @@ void GMGlyphObject::constructModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
-	GMMesh* child = new GMMesh();
-	model->append(child);
-	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
-	child->setType(GMMeshType::Glyph);
+	GMMesh* mesh = model->getMesh();
+	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	mesh->setType(GMMeshType::Glyph);
 
-	GMComponent* component = new GMComponent(child);
+	GMComponent* component = new GMComponent(mesh);
 	onCreateShader(component->getShader());
 	createVertices(component);
-	child->appendComponent(component);
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(asset);
@@ -93,7 +91,7 @@ void GMGlyphObject::onCreateShader(GMShader& shader)
 void GMGlyphObject::updateModel()
 {
 	D(d);
-	GMComponent* component = getModel()->getAllMeshes()[0]->getComponents()[0];
+	GMComponent* component = getModel()->getMesh()->getComponents()[0];
 	component->clear();
 	createVertices(component);
 	GMModelPainter* painter = getModel()->getPainter();

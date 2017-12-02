@@ -63,10 +63,10 @@ public:
 	inline virtual void setScaling(const glm::mat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
 	inline virtual void setTranslation(const glm::mat4& translation) { D(d); d->translation = translation; updateMatrix(); }
 	inline virtual void setRotation(const glm::quat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
-	inline const glm::mat4& getTransform() { D(d); return d->transformMatrix; }
-	inline const glm::mat4& getScaling() { D(d); return d->scaling; }
-	inline const glm::mat4& getTranslation() { D(d); return d->translation; }
-	inline const glm::quat& getRotation() { D(d); return d->rotation; }
+	inline const glm::mat4& getTransform() const { D(d); return d->transformMatrix; }
+	inline const glm::mat4& getScaling() const { D(d); return d->scaling; }
+	inline const glm::mat4& getTranslation() const { D(d); return d->translation; }
+	inline const glm::quat& getRotation() const { D(d); return d->rotation; }
 
 	// events
 private:

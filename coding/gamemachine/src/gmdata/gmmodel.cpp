@@ -8,18 +8,18 @@
 #define VERTEX_OFFSET(offset, idx) ((offset * VERTEX_DEMENSION) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
+GMModel::GMModel()
+{
+	D(d);
+	d->mesh = new GMMesh();
+}
+
 GMModel::~GMModel()
 {
 	D(d);
 	if (d->painter)
 		d->painter->dispose();
-
-	BEGIN_FOREACH_MESH(this, meshes)
-	{
-		if (meshes)
-			delete meshes;
-	}
-	END_FOREACH_MESH
+	GM_delete(d->mesh);
 }
 
 GMComponent::GMComponent(GMMesh* parent)
@@ -27,6 +27,7 @@ GMComponent::GMComponent(GMMesh* parent)
 	D(d);
 	d->parentMesh = parent;
 	setVertexOffset(d->parentMesh->positions().size() / VERTEX_DEMENSION);
+	d->parentMesh->appendComponent(this);
 }
 
 void GMComponent::clear()

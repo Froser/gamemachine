@@ -68,7 +68,7 @@ GMModelReader_Obj::~GMModelReader_Obj()
 void GMModelReader_Obj::init()
 {
 	D(d);
-	d->object = nullptr;
+	d->model = nullptr;
 	d->currentComponent = nullptr;
 	d->positions.clear();
 	d->normals.clear();
@@ -85,9 +85,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);
 
-	d->object = new GMModel;
-	GMMesh* child = new GMMesh();
-	d->object->append(child);
+	d->model = new GMModel();
 
 	// 事先分配一些内存，提高效率
 	d->positions.reserve(RESERVED);
@@ -132,8 +130,6 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 			char name[LINE_MAX];
 			s.next(name);
 			d->currentMaterialName = name;
-			if (d->currentComponent)
-				child->appendComponent(d->currentComponent);
 			d->currentComponent = nullptr;
 		}
 		else if (strEqual(token, "f"))
@@ -143,10 +139,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		}
 	}
 
-	if (d->currentComponent)
-		child->appendComponent(d->currentComponent);
-	*object = d->object;
-
+	*object = d->model;
 	return true;
 }
 
@@ -160,7 +153,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
 
-	GMMesh* mesh = d->object->getAllMeshes()[0];
+	GMMesh* mesh = d->model->getMesh();
 	if (!d->currentComponent)
 	{
 		d->currentComponent = new GMComponent(mesh);

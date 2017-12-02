@@ -290,10 +290,10 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 {
 	D(d);
 
-	GMModel* coreObj = new GMModel();
-	GMMesh* child = new GMMesh();
-	child->setArrangementMode(GMArrangementMode::Triangles);
-	GMComponent* component = new GMComponent(child);
+	GMModel* model = new GMModel();
+	GMMesh* mesh = model->getMesh();
+	mesh->setArrangementMode(GMArrangementMode::Triangles);
+	GMComponent* component = new GMComponent(mesh);
 	component->setShader(shader);
 
 	GM_ASSERT(face.numIndices % 3 == 0);
@@ -319,20 +319,16 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 		}
 		component->endFace();
 	}
-
-	child->appendComponent(component);
-	coreObj->append(child);
-
-	*obj = coreObj;
+	*obj = model;
 }
 
 void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModel** obj)
 {
-	GMModel* coreObj = new GMModel();
-	GMMesh* child = new GMMesh();
-	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	GMModel* model = new GMModel();
+	GMMesh* mesh = model->getMesh();
+	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
-	GMComponent* component = new GMComponent(child);
+	GMComponent* component = new GMComponent(mesh);
 	component->setShader(shader);
 
 	GMint numVertices = 2 * (biqp.tesselation + 1);
@@ -364,11 +360,8 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
 		component->endFace();
-
 	}
-	child->appendComponent(component);
-	coreObj->append(child);
-	*obj = coreObj;
+	*obj = model;
 }
 
 void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position, const GMShader& shader, OUT GMModel** obj)
@@ -398,9 +391,9 @@ void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position,
 		3, 7, 5,
 	};
 
-	GMModel* coreObj = new GMModel();
-	GMMesh* child = new GMMesh();
-	child->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	GMModel* model = new GMModel();
+	GMMesh* mesh = model->getMesh();
+	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)
@@ -408,7 +401,7 @@ void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position,
 		t[i] = extents[i % 3] * v[i] + position[i % 3];
 	}
 
-	GMComponent* component = new GMComponent(child);
+	GMComponent* component = new GMComponent(mesh);
 	component->setShader(shader);
 
 	for (GMint i = 0; i < 12; i++)
@@ -433,8 +426,5 @@ void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position,
 		}
 		component->endFace();
 	}
-
-	child->appendComponent(component);
-	coreObj->append(child);
-	*obj = coreObj;
+	*obj = model;
 }
