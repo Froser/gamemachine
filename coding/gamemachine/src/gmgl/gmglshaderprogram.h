@@ -59,6 +59,7 @@ private:
 	bool matchMacro(const GMString& source, const GMString& macro, REF GMString& result);
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
 	void expandAlias(const GMString& alias, IN OUT GMString& source);
+	GMString& replaceLine(IN OUT GMString& line);
 };
 
 END_NS

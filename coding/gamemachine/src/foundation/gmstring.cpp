@@ -283,6 +283,35 @@ void GMString::copyString(GMWchar *dest) const
 	}
 }
 
+GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
+{
+	D(d);
+	if (d->type == GMString::Data::MuiltBytes)
+	{
+		std::string _oldValue = oldValue.toStdString();
+		std::string _newValue = newValue.toStdString();
+		std::string _str = d->str;
+		size_t idx = std::string::npos + 1;
+		while ((idx = _str.find(_oldValue, _oldValue.size())) != std::string::npos)
+		{
+			_str = _str.replace(idx, _oldValue.length(), _newValue);
+		}
+		return _str;
+	}
+	else
+	{
+		std::wstring _oldValue = oldValue.toStdWString();
+		std::wstring _newValue = oldValue.toStdWString();
+		std::wstring _str = d->wstr;
+		size_t idx = std::string::npos + 1;
+		while ((idx = _str.find(_oldValue, _oldValue.size())) != std::string::npos)
+		{
+			_str = _str.replace(idx, _oldValue.length(), _newValue);
+		}
+		return _str;
+	}
+}
+
 GMStringReader::Iterator GMStringReader::lineBegin()
 {
 	return GMStringReader::Iterator(m_string);

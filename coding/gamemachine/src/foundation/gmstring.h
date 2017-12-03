@@ -84,6 +84,7 @@ public:
 	size_t length() const;
 	void copyString(char* dest) const;
 	void copyString(GMWchar* dest) const;
+	GMString replace(const GMString& oldValue, const GMString& newValue);
 };
 
 static inline GMString operator +(const GMString& left, const GMString& right)

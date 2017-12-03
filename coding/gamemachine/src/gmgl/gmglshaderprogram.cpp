@@ -207,7 +207,7 @@ GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMStrin
 			expandInclude(filename, n, line);
 		else if (matchMacro(line, "alias", n))
 			expandAlias(n, line);
-		expanded += line;
+		expanded += replaceLine(line);
 		if (!iter.hasNextLine())
 			break;
 		++iter;
@@ -267,7 +267,17 @@ void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& sour
 		GM_ASSERT(match.size() == 5);
 		std::string replacement = match[2].str();
 		std::string a = match[4].str();
-		d->aliasMap.insert({ replacement, a });
+		d->aliasMap.insert({ "${" + replacement + "}", a });
 	}
 	source = "";
+}
+
+GMString& GMGLShaderProgram::replaceLine(IN OUT GMString& line)
+{
+	D(d);
+	for (auto& alias : d->aliasMap)
+	{
+		line = line.replace(alias.first, alias.second);
+	}
+	return line;
 }
