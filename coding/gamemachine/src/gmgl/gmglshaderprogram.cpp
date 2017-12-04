@@ -260,7 +260,7 @@ void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& sour
 {
 	D(d);
 	std::string s = alias.toStdString();
-	static std::string expr = "(\\s*)(.+)(\\s+)(.+)";
+	static std::string expr = "(\\s*)(\\S+)(\\s+)(.+)";
 	std::smatch match;
 	if (std::regex_search(s, match, std::regex(expr.c_str())))
 	{

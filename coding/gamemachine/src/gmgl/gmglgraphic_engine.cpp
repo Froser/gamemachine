@@ -384,6 +384,9 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 	D(d);
 	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
 	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+	d->renderMode = GMStates_RenderOptions::FORWARD;
+	updateShader();
+
 	d->framebuffer.releaseBind();
 	forwardRender(objects, count);
 	GMSetRenderState(RENDER_MODE, renderMode);
@@ -393,11 +396,10 @@ void GMGLGraphicEngine::updateShader()
 {
 	D(d);
 	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
-	GMGLDeferredRenderState state = getRenderState();
 	if (d->renderMode == GMStates_RenderOptions::FORWARD)
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
+		d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
 		GM_END_CHECK_GL_ERROR
 	}
 	else

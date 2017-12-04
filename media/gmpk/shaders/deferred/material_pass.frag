@@ -1,8 +1,8 @@
-#alias deferred_material_pass_gKa deferred_geometry_pass_slot_0
-#alias deferred_material_pass_gKd deferred_geometry_pass_slot_1
-#alias deferred_material_pass_gKs deferred_geometry_pass_slot_2
-#alias deferred_material_pass_gShininess deferred_geometry_pass_slot_3
-#alias deferred_material_pass_gHasNormalMap deferred_geometry_pass_slot_4
+#alias deferred_material_pass_gKa			deferred_geometry_pass_slot_0
+#alias deferred_material_pass_gKd			deferred_geometry_pass_slot_1
+#alias deferred_material_pass_gKs			deferred_geometry_pass_slot_2
+#alias deferred_material_pass_gShininess	deferred_geometry_pass_slot_3
+#alias deferred_material_pass_gHasNormalMap	deferred_geometry_pass_slot_4
 
 void deferred_material_pass_main()
 {
