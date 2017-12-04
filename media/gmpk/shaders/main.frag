@@ -2,7 +2,6 @@
 #include "foundation/foundation.h"
 #include "foundation/properties.h"
 #include "foundation/frag_header.h"
-#include "foundation/light_pass_frag_header.h"
 
 // FRAGMENT
 #include "model2d.frag"
@@ -11,6 +10,7 @@
 #include "glyph.frag"
 
 // FRAGMENT DEFERRED
+#include "foundation/light_pass_frag_header.h"
 #include "deferred/geometry_pass.frag"
 #include "deferred/material_pass.frag"
 #include "deferred/light_pass.frag"
@@ -35,9 +35,10 @@ void main(void)
 				break;
 		};
 	}
+	/*
 	else if (GM_shader_proc == PROC_GEOMETRY_PASS)
 	{
-		deferred_geometry_pass_main();
+		//deferred_geometry_pass_main();
 	}
 	else if (GM_shader_proc == PROC_MATERIAL_PASS)
 	{
@@ -47,4 +48,5 @@ void main(void)
 	{
 		deferred_light_pass_main();
 	}
+	*/
 }

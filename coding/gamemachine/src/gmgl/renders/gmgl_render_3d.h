@@ -22,10 +22,10 @@ public:
 	GMGLRender_3D();
 
 public:
-	virtual void begin(GMModel* model, const GMGameObject* parent) override;
-	virtual void beginShader(GMShader& shader) override;
-	virtual void endShader() override;
-	virtual void end() override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void endModel() override;
+	virtual void beginComponent(GMComponent* component) override;
+	virtual void endComponent() override;
 
 protected:
 	void activateMaterial(const GMShader& shader);

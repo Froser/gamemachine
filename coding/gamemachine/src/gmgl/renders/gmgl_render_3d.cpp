@@ -48,7 +48,7 @@ void GMGLRender_3D::activateShader()
 	}
 
 	if (shader->getNoDepthTest())
-		glDisable(GL_DEPTH_TEST); //glDepthMask(GL_FALSE);
+		glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
 	else
 		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
 
@@ -59,7 +59,7 @@ void GMGLRender_3D::activateShader()
 	glLineWidth(shader->getLineWidth());
 }
 
-void GMGLRender_3D::begin(GMModel* model, const GMGameObject* parent)
+void GMGLRender_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
 	auto shaderProgram = d->engine->getShaderProgram();
@@ -72,16 +72,22 @@ void GMGLRender_3D::begin(GMModel* model, const GMGameObject* parent)
 		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(parent->getTransform()));
 		GM_END_CHECK_GL_ERROR
 	}
+	else
+	{
+		GM_BEGIN_CHECK_GL_ERROR
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(glm::identity<glm::mat4>()));
+		GM_END_CHECK_GL_ERROR
+	}
 }
 
-void GMGLRender_3D::beginShader(GMShader& shader)
+void GMGLRender_3D::beginComponent(GMComponent* component)
 {
 	D(d);
-	d->shader = &shader;
+	d->shader = &component->getShader();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
-	activateMaterial(shader);
+	activateMaterial(*d->shader);
 
 	// 应用Shader
 	activateShader();
@@ -100,7 +106,7 @@ void GMGLRender_3D::beginShader(GMShader& shader)
 	drawDebug();
 }
 
-void GMGLRender_3D::endShader()
+void GMGLRender_3D::endComponent()
 {
 	D(d);
 	if (d->shader->getBlend())
@@ -135,7 +141,7 @@ void GMGLRender_3D::drawTexture(GMTextureType type, GMint index)
 	}
 }
 
-void GMGLRender_3D::end()
+void GMGLRender_3D::endModel()
 {
 }
 

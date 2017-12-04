@@ -100,20 +100,20 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 		gm::GMBuffer buf;
 		pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posx.jpg", &buf);
 		gm::GMImageReader::load(buf.buffer, buf.size, &slices[0]);
+		GM_ASSERT(slices[0]);
 	}
 	{
 		gm::GMBuffer buf;
-		GM_ASSERT(slices[0]);
 		pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negx.jpg", &buf);
 		gm::GMImageReader::load(buf.buffer, buf.size, &slices[1]);
+		GM_ASSERT(slices[1]);
 	}
-	GM_ASSERT(slices[1]);
 	{
 		gm::GMBuffer buf;
 		pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_posy.jpg", &buf);
 		gm::GMImageReader::load(buf.buffer, buf.size, &slices[2]);
+		GM_ASSERT(slices[2]);
 	}
-	GM_ASSERT(slices[2]);
 	{
 		gm::GMBuffer buf;
 		pk->readFile(gm::GMPackageIndex::Textures, "cubemap/cubemap_negy.jpg", &buf);

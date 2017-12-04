@@ -109,17 +109,26 @@ public:
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 	IRender* getRender(GMModelType objectType);
 	void setViewport(const GMRect& rect);
+	void updateShader();
 
 public:
 	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
 	inline bool isBlending() { D(d); return d->isBlending; }
 	GMS_BlendFunc blendsfactor() { D(d); return d->blendsfactor; }
 	GMS_BlendFunc blenddfactor() { D(d); return d->blenddfactor; }
+	GMRenderMode getCurrentRenderMode() { D(d); return d->renderMode; }
 
 	inline void setRenderState(GMGLDeferredRenderState state)
 	{
 		D(d);
 		d->renderState = state; 
+		updateShader();
+	}
+
+	inline void setCurrentRenderMode(GMRenderMode mode)
+	{
+		D(d);
+		d->renderMode = mode;
 		updateShader();
 	}
 
@@ -137,7 +146,6 @@ public:
 
 private:
 	void directDraw(GMGameObject *objects[], GMuint count);
-	void updateShader();
 	void activateLightsIfNecessary();
 	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();

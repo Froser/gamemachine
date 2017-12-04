@@ -107,12 +107,13 @@ GM_INTERFACE(IGraphicEngine)
 	virtual void endBlend() = 0;
 };
 
+class GMComponent;
 GM_INTERFACE(IRender)
 {
-	virtual void begin(GMModel* model, const GMGameObject* parent) = 0;
-	virtual void beginShader(GMShader& shader) = 0;
-	virtual void endShader() = 0;
-	virtual void end() = 0;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
+	virtual void endModel() = 0;
+	virtual void beginComponent(GMComponent* component) = 0;
+	virtual void endComponent() = 0;
 };
 
 enum GamePackageType

@@ -71,7 +71,7 @@ void GMGLGraphicEngine::start()
 void GMGLGraphicEngine::newFrame()
 {
 	D(d);
-	if (GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::DEFERRED)
+	if (getCurrentRenderMode() == GMStates_RenderOptions::DEFERRED)
 	{
 		d->gbuffer.releaseBind();
 		newFrameOnCurrentFramebuffer();
@@ -122,6 +122,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	++d->drawingLevel;
 #endif
 
+	d->shaderProgram->useProgram();
 	if (bufferMode == GMBufferMode::NoFramebuffer)
 	{
 		directDraw(objects, count);
@@ -132,15 +133,19 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 		if (renderMode != d->renderMode)
 		{
 			d->needRefreshLights = true;
-			d->renderMode = renderMode;
 		}
+		setCurrentRenderMode(renderMode);
 
 		if (renderMode == GMStates_RenderOptions::FORWARD)
 		{
 			activateLightsIfNecessary();
-
+			if (GMGetRenderState(EFFECTS) != GMEffects::None)
 			{
 				GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
+				forwardRender(objects, count);
+			}
+			else
+			{
 				forwardRender(objects, count);
 			}
 		}
@@ -158,9 +163,9 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 
 				lightPass();
 				d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
-				GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+				setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
 				drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), bufferMode);
-				GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::DEFERRED);
+				setCurrentRenderMode(GMStates_RenderOptions::DEFERRED);
 			}
 
 			viewGBufferFrameBuffer();
@@ -382,29 +387,25 @@ void GMGLGraphicEngine::updateView()
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
-	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
-	d->renderMode = GMStates_RenderOptions::FORWARD;
-	updateShader();
-
+	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
 	d->framebuffer.releaseBind();
 	forwardRender(objects, count);
-	GMSetRenderState(RENDER_MODE, renderMode);
 }
 
 void GMGLGraphicEngine::updateShader()
 {
 	D(d);
-	GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
-	if (d->renderMode == GMStates_RenderOptions::FORWARD)
+	GMRenderMode renderMode = getCurrentRenderMode();
+	if (renderMode == GMStates_RenderOptions::FORWARD)
 	{
+		d->shaderProgram->useProgram();
 		GM_BEGIN_CHECK_GL_ERROR
 		d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
 		GM_END_CHECK_GL_ERROR
 	}
 	else
 	{
-		GM_ASSERT(d->renderMode == GMStates_RenderOptions::DEFERRED);
+		GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
 		if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
 			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
 		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
@@ -525,8 +526,8 @@ void GMGLGraphicEngine::beginCreateStencil()
 	D(d);
 	if (!d->createStencilRef)
 	{
-		d->stencilRenderModeCache = GMGetRenderState(RENDER_MODE);
-		GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+		d->stencilRenderModeCache = getCurrentRenderMode();
+		setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
 		glStencilMask(0xFF);
 	}
 	++d->createStencilRef;
@@ -538,7 +539,7 @@ void GMGLGraphicEngine::endCreateStencil()
 	if (!--d->createStencilRef)
 	{
 		glStencilMask(0x00);
-		GMSetRenderState(RENDER_MODE, d->stencilRenderModeCache);
+		setCurrentRenderMode(d->stencilRenderModeCache);
 	}
 }
 
@@ -566,17 +567,17 @@ void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 {
 	D(d);
 	GM_ASSERT(!d->isBlending); // 不能重复进行多次Blend
-	d->renderModeForBlend = GMGetRenderState(RENDER_MODE);
+	d->renderModeForBlend = getCurrentRenderMode();
 	d->isBlending = true;
 	d->blendsfactor = sfactor;
 	d->blenddfactor = dfactor;
-	GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD);
+	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
 }
 
 void GMGLGraphicEngine::endBlend()
 {
 	D(d);
-	GMSetRenderState(RENDER_MODE, d->renderModeForBlend);
+	setCurrentRenderMode(d->renderModeForBlend);
 	d->isBlending = false;
 }
 

@@ -17,8 +17,8 @@ uniform int GM_shader_proc;
 // GM_shader_proc
 #define PROC_FORWARD			0
 #define PROC_GEOMETRY_PASS		1
-#define PROC_LIGHT_PASS			2
-#define PROC_MATERIAL_PASS		3
+#define PROC_MATERIAL_PASS		2
+#define PROC_LIGHT_PASS			3
 
 mat4 gm_removeTranslation(mat4 mat)
 {

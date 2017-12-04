@@ -30,7 +30,7 @@ public:
 	virtual void* getBuffer() override;
 
 private:
-	void draw(IRender* render, GMShader& shader, GMComponent* component, GMMesh* mesh, bool fill);
+	void draw(IRender* render, GMComponent* component, GMMesh* mesh);
 };
 
 END_NS

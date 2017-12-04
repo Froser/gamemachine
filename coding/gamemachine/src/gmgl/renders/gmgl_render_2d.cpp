@@ -3,16 +3,16 @@
 #include "gmgl/shader_constants.h"
 #include "gmgl/gmglshaderprogram.h"
 
-void GMGLRender_2D::beginShader(GMShader& shader)
+void GMGLRender_2D::beginComponent(GMComponent* component)
 {
 	D(d);
-	d->shader = &shader;
+	d->shader = &component->getShader();
 
 	// 应用Shader
 	activateShader();
 
 	// 只选择环境光纹理
-	GMTextureFrames& textures = shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
+	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
 
 	// 获取序列中的这一帧
 	ITexture* texture = getTexture(textures);

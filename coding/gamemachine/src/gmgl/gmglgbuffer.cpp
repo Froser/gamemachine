@@ -332,11 +332,13 @@ bool GMGLFramebuffer::init(const GMRect& clientRect)
 void GMGLFramebuffer::beginDrawEffects()
 {
 	D(d);
+	GM_BEGIN_CHECK_GL_ERROR
 	d->effects = GMGetRenderState(EFFECTS);
 	GMEngine->setViewport(d->viewport);
 	d->hasBegun = true;
 	newFrame();
 	bindForWriting();
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLFramebuffer::endDrawEffects()
@@ -351,8 +353,10 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	D(d);
 	const char* effectUniformName = nullptr;
 	program->useProgram();
+	GM_BEGIN_CHECK_GL_ERROR
 	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->sampleOffsets[0]);
 	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);
+	GM_END_CHECK_GL_ERROR
 
 	bindForWriting();
 	turnOffBlending();
@@ -440,8 +444,8 @@ void GMGLFramebuffer::createQuad()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 		GM_END_CHECK_GL_ERROR
 	}
 }
