@@ -11,22 +11,22 @@ constexpr GMint MATERIAL_NUM = (GMint)GBufferMaterialType::EndOfMaterialType;
 
 Array<const char*, GEOMETRY_NUM> g_GBufferGeometryUniformNames =
 {
-	"gPosition",
-	"gNormal_eye",
-	"gTexAmbient",
-	"gTexDiffuse",
-	"gTangent_eye",
-	"gBitangent_eye",
-	"gNormalMap",
+	"deferred_light_pass_gPosition",
+	"deferred_light_pass_gNormal_eye",
+	"deferred_light_pass_gTexAmbient",
+	"deferred_light_pass_gTexDiffuse",
+	"deferred_light_pass_gTangent_eye",
+	"deferred_light_pass_gBitangent_eye",
+	"deferred_light_pass_gNormalMap",
 };
 
 Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
 {
-	"gKa",
-	"gKd",
-	"gKs",
-	"gShininess",
-	"gHasNormalMap",
+	"deferred_light_pass_gKa",
+	"deferred_light_pass_gKd",
+	"deferred_light_pass_gKs",
+	"deferred_light_pass_gShininess",
+	"deferred_light_pass_gHasNormalMap",
 };
 
 GMGLGBuffer::~GMGLGBuffer()
@@ -44,8 +44,7 @@ void GMGLGBuffer::beginPass()
 {
 	D(d);
 	d->currentTurn = (GMint)GMGLDeferredRenderState::PassingGeometry;
-	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
-	engine->setRenderState((GMGLDeferredRenderState)d->currentTurn);
+	GMEngine->setRenderState((GMGLDeferredRenderState)d->currentTurn);
 }
 
 bool GMGLGBuffer::nextPass()
@@ -148,6 +147,8 @@ void GMGLGBuffer::activateTextures()
 {
 	D(d);
 	GMGLShaderProgram* shaderProgram = GMEngine->getShaderProgram();
+	shaderProgram->useProgram();
+
 	{
 		for (GMuint i = 0; i < GEOMETRY_NUM; i++)
 		{
@@ -175,13 +176,15 @@ void GMGLGBuffer::activateTextures()
 void GMGLGBuffer::copyDepthBuffer(GLuint target)
 {
 	D(d);
+	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
 	glBlitFramebuffer(0, 0, d->renderWidth, d->renderHeight, 0, 0, d->renderWidth, d->renderHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	GM_CHECK_GL_ERROR();
+	GM_END_CHECK_GL_ERROR
 
+	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_FRAMEBUFFER, target);
-	GM_CHECK_GL_ERROR();
+	GM_END_CHECK_GL_ERROR
 }
 
 bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray)

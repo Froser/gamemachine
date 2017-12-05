@@ -154,6 +154,7 @@ public:
 
 private:
 	void directDraw(GMGameObject *objects[], GMuint count);
+	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void activateLightsIfNecessary();
 	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();

@@ -134,19 +134,9 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 			d->needRefreshLights = true;
 		setCurrentRenderMode(renderMode);
 
-		if (renderMode == GMStates_RenderOptions::FORWARD ||
-			getCurrentRenderMode() == GMStates_RenderOptions::FORWARD)
+		if (renderMode == GMStates_RenderOptions::FORWARD)
 		{
-			activateLightsIfNecessary();
-			if (GMGetRenderState(EFFECTS) != GMEffects::None)
-			{
-				GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
-				forwardRender(objects, count);
-			}
-			else
-			{
-				forwardRender(objects, count);
-			}
+			forwardDraw(objects, count);
 		}
 		else
 		{
@@ -154,17 +144,22 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 			// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
 			groupGameObjects(objects, count);
 
-			d->gbuffer.adjustViewport();
-			geometryPass(d->deferredRenderingGameObjects);
-
+			if (d->deferredRenderingGameObjects.empty())
 			{
-				GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
+				forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
+			}
+			else
+			{
+				d->gbuffer.adjustViewport();
+				geometryPass(d->deferredRenderingGameObjects);
 
-				lightPass();
-				d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
-				setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
-				drawObjects(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), bufferMode);
-				setCurrentRenderMode(GMStates_RenderOptions::DEFERRED);
+				{
+					GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
+					lightPass();
+					d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
+					forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
+					setCurrentRenderMode(GMStates_RenderOptions::DEFERRED);
+				}
 			}
 
 			viewGBufferFrameBuffer();
@@ -412,6 +407,22 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
 	d->framebuffer.releaseBind();
 	forwardRender(objects, count);
+}
+
+void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
+	activateLightsIfNecessary();
+	if (GMGetRenderState(EFFECTS) != GMEffects::None)
+	{
+		GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
+		forwardRender(objects, count);
+	}
+	else
+	{
+		forwardRender(objects, count);
+	}
 }
 
 void GMGLGraphicEngine::updateShader()
