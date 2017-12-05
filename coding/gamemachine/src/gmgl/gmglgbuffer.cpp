@@ -144,18 +144,18 @@ void GMGLGBuffer::newFrame()
 	releaseBind();
 }
 
-void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
+void GMGLGBuffer::activateTextures()
 {
 	D(d);
-
+	GMGLShaderProgram* shaderProgram = GMEngine->getShaderProgram();
 	{
 		for (GMuint i = 0; i < GEOMETRY_NUM; i++)
 		{
+			GM_BEGIN_CHECK_GL_ERROR
 			shaderProgram->setInt(g_GBufferGeometryUniformNames[i], i);
-			GM_CHECK_GL_ERROR();
 			glActiveTexture(GL_TEXTURE0 + i);
 			glBindTexture(GL_TEXTURE_2D, d->textures[i]);
-			GM_CHECK_GL_ERROR();
+			GM_END_CHECK_GL_ERROR
 		}
 	}
 
@@ -163,11 +163,11 @@ void GMGLGBuffer::activateTextures(GMGLShaderProgram* shaderProgram)
 	{
 		for (GMuint i = 0; i < MATERIAL_NUM; i++)
 		{
+			GM_BEGIN_CHECK_GL_ERROR
 			shaderProgram->setInt(g_GBufferMaterialUniformNames[i], GEOMETRY_OFFSET + i);
-			GM_CHECK_GL_ERROR();
 			glActiveTexture(GL_TEXTURE0 + GEOMETRY_OFFSET + i);
 			glBindTexture(GL_TEXTURE_2D, d->materials[i]);
-			GM_CHECK_GL_ERROR();
+			GM_END_CHECK_GL_ERROR
 		}
 	}
 }

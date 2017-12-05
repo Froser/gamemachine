@@ -116,6 +116,16 @@ GM_INTERFACE(IRender)
 	virtual void endComponent() = 0;
 };
 
+GM_INTERFACE(IShaderProgram)
+{
+	virtual void setMatrix4(const char* name, const GMfloat value[16]) = 0;
+	virtual void setVec4(const char* name, const GMfloat value[4]) = 0;
+	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
+	virtual void setInt(const char* name, GMint value) = 0;
+	virtual void setFloat(const char* name, GMfloat value) = 0;
+	virtual void setBool(const char* name, bool value) = 0;
+};
+
 enum GamePackageType
 {
 	GPT_DIRECTORY,

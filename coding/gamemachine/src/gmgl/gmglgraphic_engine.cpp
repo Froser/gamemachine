@@ -55,7 +55,8 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	D(d);
 	disposeDeferredRenderQuad();
 	GM_delete(d->effectsShaderProgram);
-	GM_delete(d->shaderProgram);
+	GM_delete(d->forwardShaderProgram);
+	GM_delete(d->deferredShaderProgram);
 }
 
 void GMGLGraphicEngine::start()
@@ -122,7 +123,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	++d->drawingLevel;
 #endif
 
-	d->shaderProgram->useProgram();
 	if (bufferMode == GMBufferMode::NoFramebuffer)
 	{
 		directDraw(objects, count);
@@ -131,12 +131,11 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	{
 		GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
 		if (renderMode != d->renderMode)
-		{
 			d->needRefreshLights = true;
-		}
 		setCurrentRenderMode(renderMode);
 
-		if (renderMode == GMStates_RenderOptions::FORWARD)
+		if (renderMode == GMStates_RenderOptions::FORWARD ||
+			getCurrentRenderMode() == GMStates_RenderOptions::FORWARD)
 		{
 			activateLightsIfNecessary();
 			if (GMGetRenderState(EFFECTS) != GMEffects::None)
@@ -195,9 +194,11 @@ void GMGLGraphicEngine::installShaders()
 	}
 
 	{
-		d->shaderProgram = new GMGLShaderProgram();
-		d->shaderLoadCallback->onLoadShaderProgram(*d->shaderProgram);
-		d->shaderProgram->load();
+		d->forwardShaderProgram = new GMGLShaderProgram();
+		d->deferredShaderProgram = new GMGLShaderProgram();
+		d->shaderLoadCallback->onLoadShaderProgram(*d->forwardShaderProgram, *d->deferredShaderProgram);
+		d->forwardShaderProgram->load();
+		d->deferredShaderProgram->load();
 	}
 }
 
@@ -206,36 +207,49 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 	D(d);
 	updateShader();
 
-	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-	for (auto& light : lights)
+	GMGLShaderProgram* progs[] = {
+		d->forwardShaderProgram,
+		GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::FORWARD ? nullptr : d->deferredShaderProgram
+	};
+
+	for (GMint i = 0; i < GM_array_size(progs); ++i)
 	{
-		GMint id = lightId[(GMuint)light.getType()]++;
-		switch (light.getType())
+		GMGLShaderProgram* prog = progs[i];
+		if (!prog)
+			continue;
+
+		prog->useProgram();
+		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+		for (auto& light : lights)
 		{
-		case GMLightType::AMBIENT:
-		{
-			const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
-			char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-			d->shaderProgram->setVec3(u_color, light.getLightColor());
-			break;
+			GMint id = lightId[(GMuint)light.getType()]++;
+			switch (light.getType())
+			{
+			case GMLightType::AMBIENT:
+			{
+				const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
+				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
+				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+				prog->setVec3(u_color, light.getLightColor());
+				break;
+			}
+			case GMLightType::SPECULAR:
+			{
+				const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
+				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
+				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+				combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
+				prog->setVec3(u_color, light.getLightColor());
+				prog->setVec3(u_position, light.getLightPosition());
+				break;
+			}
+			default:
+				break;
+			}
 		}
-		case GMLightType::SPECULAR:
-		{
-			const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
-			char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-			combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-			combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
-			d->shaderProgram->setVec3(u_color, light.getLightColor());
-			d->shaderProgram->setVec3(u_position, light.getLightPosition());
-			break;
-		}
-		default:
-			break;
-		}
+		prog->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
+		prog->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 	}
-	d->shaderProgram->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
-	d->shaderProgram->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
 bool GMGLGraphicEngine::refreshGBuffer()
@@ -289,9 +303,9 @@ void GMGLGraphicEngine::geometryPass(Vector<GMGameObject*>& objects)
 void GMGLGraphicEngine::lightPass()
 {
 	D(d);
-	setRenderState(GMGLDeferredRenderState::PassingLight);
+	GM_ASSERT(getRenderState() == GMGLDeferredRenderState::PassingLight);
 	activateLightsIfNecessary();
-	d->gbuffer.activateTextures(d->shaderProgram);
+	d->gbuffer.activateTextures();
 	renderDeferredRenderQuad();
 }
 
@@ -359,8 +373,13 @@ void GMGLGraphicEngine::updateProjection()
 	GMCamera& camera = GM.getCamera();
 	const glm::mat4& proj = camera.getFrustum().getProjectionMatrix();
 	GM_BEGIN_CHECK_GL_ERROR
-	d->shaderProgram->useProgram();
-	d->shaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
+	d->forwardShaderProgram->useProgram();
+	d->forwardShaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
+	GM_END_CHECK_GL_ERROR
+
+	GM_BEGIN_CHECK_GL_ERROR
+	d->deferredShaderProgram->useProgram();
+	d->deferredShaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
 	GM_END_CHECK_GL_ERROR
 }
 
@@ -370,17 +389,20 @@ void GMGLGraphicEngine::updateView()
 	GMCamera& camera = GM.getCamera();
 	const glm::mat4& viewMatrix = camera.getFrustum().getViewMatrix();
 	const GMCameraLookAt& lookAt = camera.getLookAt();
-	d->shaderProgram->useProgram();
+	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
 
 	GM_BEGIN_CHECK_GL_ERROR
 	// 视觉位置，用于计算光照
-	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
-	d->shaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->forwardShaderProgram->useProgram();
+	d->forwardShaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->forwardShaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
 	GM_END_CHECK_GL_ERROR
 
 	GM_BEGIN_CHECK_GL_ERROR
-	// V
-	d->shaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
+	// 视觉位置，用于计算光照
+	d->deferredShaderProgram->useProgram();
+	d->deferredShaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->deferredShaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
 	GM_END_CHECK_GL_ERROR
 }
 
@@ -398,20 +420,18 @@ void GMGLGraphicEngine::updateShader()
 	GMRenderMode renderMode = getCurrentRenderMode();
 	if (renderMode == GMStates_RenderOptions::FORWARD)
 	{
-		d->shaderProgram->useProgram();
-		GM_BEGIN_CHECK_GL_ERROR
-		d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::FORWARD);
-		GM_END_CHECK_GL_ERROR
+		d->forwardShaderProgram->useProgram();
 	}
 	else
 	{
+		d->deferredShaderProgram->useProgram();
 		GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
 		if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
-			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
+			d->deferredShaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
 		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
-			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
+			d->deferredShaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
 		else if (d->renderState == GMGLDeferredRenderState::PassingLight)
-			d->shaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::LIGHT_PASS);
+			d->deferredShaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::LIGHT_PASS);
 		else
 			GM_ASSERT(false);
 	}

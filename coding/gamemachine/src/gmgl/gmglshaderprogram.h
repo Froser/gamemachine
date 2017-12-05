@@ -23,7 +23,7 @@ GM_PRIVATE_OBJECT(GMGLShaderProgram)
 	Map<GMString, GMString> aliasMap;
 };
 
-class GMGLShaderProgram : public GMObject
+class GMGLShaderProgram : public GMObject, public IShaderProgram
 {
 	DECLARE_PRIVATE(GMGLShaderProgram);
 

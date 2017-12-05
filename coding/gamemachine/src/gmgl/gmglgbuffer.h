@@ -74,7 +74,7 @@ public:
 	void setReadBuffer(GBufferGeometryType textureType);
 	void setReadBuffer(GBufferMaterialType materialType);
 	void newFrame();
-	void activateTextures(GMGLShaderProgram* shaderProgram);
+	void activateTextures();
 	void copyDepthBuffer(GLuint target);
 
 public:

@@ -22,7 +22,6 @@ struct GMShaderProc
 {
 	enum
 	{
-		FORWARD = 0,
 		GEOMETRY_PASS,
 		MATERIAL_PASS,
 		LIGHT_PASS,
@@ -36,7 +35,7 @@ struct GMShaderProc
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual void onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
-	virtual void onLoadShaderProgram(GMGLShaderProgram& shaderProgram) = 0;
+	virtual void onLoadShaderProgram(GMGLShaderProgram& forwardShaderProgram, GMGLShaderProgram& deferredShaderProgram) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
@@ -45,7 +44,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMLight> lights;
 
 	// 著色器程序
-	GMGLShaderProgram* shaderProgram = nullptr;
+	GMGLShaderProgram* forwardShaderProgram = nullptr;
+	GMGLShaderProgram* deferredShaderProgram = nullptr;
 	GMGLShaderProgram* effectsShaderProgram = nullptr;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
@@ -105,7 +105,6 @@ public:
 	virtual void endBlend() override;
 
 public:
-	GMGLShaderProgram* getShaderProgram() { D(d); return d->shaderProgram; }
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
 	IRender* getRender(GMModelType objectType);
 	void setViewport(const GMRect& rect);
@@ -117,6 +116,15 @@ public:
 	GMS_BlendFunc blendsfactor() { D(d); return d->blendsfactor; }
 	GMS_BlendFunc blenddfactor() { D(d); return d->blenddfactor; }
 	GMRenderMode getCurrentRenderMode() { D(d); return d->renderMode; }
+
+	GMGLShaderProgram* getShaderProgram()
+	{
+		D(d);
+		if (getCurrentRenderMode() == GMStates_RenderOptions::FORWARD)
+			return d->forwardShaderProgram;
+		GM_ASSERT(getCurrentRenderMode() == GMStates_RenderOptions::DEFERRED);
+		return d->deferredShaderProgram;
+	}
 
 	inline void setRenderState(GMGLDeferredRenderState state)
 	{
