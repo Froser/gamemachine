@@ -85,7 +85,7 @@ public:
 
 	// IShaderLoadCallback
 private:
-	void onLoadEffectsShader(gm::GMGLShaderProgram& lightPassProgram) override;
+	void onLoadEffectsShader(gm::GMGLShaderProgram& effectsShaderProgram) override;
 	void onLoadShaderProgram(gm::GMGLShaderProgram& forwardShaderProgram, gm::GMGLShaderProgram* deferredShaderProgram[2]) override;
 
 	// IGameHandler
