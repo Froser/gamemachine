@@ -24,7 +24,6 @@ struct GMShaderProc
 	{
 		GEOMETRY_PASS,
 		MATERIAL_PASS,
-		LIGHT_PASS,
 	};
 };
 
@@ -35,7 +34,13 @@ struct GMShaderProc
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual void onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
-	virtual void onLoadShaderProgram(GMGLShaderProgram& forwardShaderProgram, GMGLShaderProgram& deferredShaderProgram) = 0;
+	virtual void onLoadShaderProgram(GMGLShaderProgram& forwardShaderProgram, GMGLShaderProgram* deferredShaderProgram[2]) = 0;
+};
+
+enum
+{
+	DEFERRED_GEOMETRY_PASS_SHADER,
+	DEFERRED_LIGHT_PASS_SHADER,
 };
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
@@ -45,7 +50,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	// 著色器程序
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
-	GMGLShaderProgram* deferredShaderProgram = nullptr;
+	GMGLShaderProgram* deferredShaderProgram[2] = { nullptr };
 	GMGLShaderProgram* effectsShaderProgram = nullptr;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
@@ -123,7 +128,9 @@ public:
 		if (getCurrentRenderMode() == GMStates_RenderOptions::FORWARD)
 			return d->forwardShaderProgram;
 		GM_ASSERT(getCurrentRenderMode() == GMStates_RenderOptions::DEFERRED);
-		return d->deferredShaderProgram;
+		if (getRenderState() != GMGLDeferredRenderState::PassingLight)
+			return d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER];
+		return d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER];
 	}
 
 	inline void setRenderState(GMGLDeferredRenderState state)

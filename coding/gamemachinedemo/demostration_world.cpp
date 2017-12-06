@@ -349,7 +349,7 @@ void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& lightPassP
 	lightPassProgram.attachShader(shadersInfo[1]);
 }
 
-void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardShaderProgram, gm::GMGLShaderProgram& deferredShaderProgram)
+void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardShaderProgram, gm::GMGLShaderProgram* deferredShaderProgram[2])
 {
 	{
 		gm::GMBuffer vertBuf, fragBuf;
@@ -371,8 +371,8 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 	{
 		gm::GMBuffer vertBuf, fragBuf;
 		gm::GMString vertPath, fragPath;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/main.vert", &vertBuf, &vertPath);
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/main.frag", &fragBuf, &fragPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/geometry_pass_main.vert", &vertBuf, &vertPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/geometry_pass_main.frag", &fragBuf, &fragPath);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -381,7 +381,24 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
-		deferredShaderProgram.attachShader(shadersInfo[0]);
-		deferredShaderProgram.attachShader(shadersInfo[1]);
+		(*deferredShaderProgram[0]).attachShader(shadersInfo[0]);
+		(*deferredShaderProgram[0]).attachShader(shadersInfo[1]);
+	}
+
+	{
+		gm::GMBuffer vertBuf, fragBuf;
+		gm::GMString vertPath, fragPath;
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/light_pass_main.vert", &vertBuf, &vertPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/light_pass_main.frag", &fragBuf, &fragPath);
+		vertBuf.convertToStringBuffer();
+		fragBuf.convertToStringBuffer();
+
+		gm::GMGLShaderInfo shadersInfo[] = {
+			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+		};
+
+		(*deferredShaderProgram[1]).attachShader(shadersInfo[0]);
+		(*deferredShaderProgram[1]).attachShader(shadersInfo[1]);
 	}
 }

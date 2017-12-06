@@ -1,0 +1,2 @@
+#define PROC_GEOMETRY_PASS		0
+#define PROC_MATERIAL_PASS		1

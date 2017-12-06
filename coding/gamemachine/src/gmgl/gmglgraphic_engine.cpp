@@ -56,7 +56,8 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	disposeDeferredRenderQuad();
 	GM_delete(d->effectsShaderProgram);
 	GM_delete(d->forwardShaderProgram);
-	GM_delete(d->deferredShaderProgram);
+	GM_delete(d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]);
+	GM_delete(d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]);
 }
 
 void GMGLGraphicEngine::start()
@@ -190,10 +191,13 @@ void GMGLGraphicEngine::installShaders()
 
 	{
 		d->forwardShaderProgram = new GMGLShaderProgram();
-		d->deferredShaderProgram = new GMGLShaderProgram();
-		d->shaderLoadCallback->onLoadShaderProgram(*d->forwardShaderProgram, *d->deferredShaderProgram);
+		d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER] = new GMGLShaderProgram();
+		d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER] = new GMGLShaderProgram();
+
+		d->shaderLoadCallback->onLoadShaderProgram(*d->forwardShaderProgram, d->deferredShaderProgram);
 		d->forwardShaderProgram->load();
-		d->deferredShaderProgram->load();
+		d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->load();
+		d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->load();
 	}
 }
 
@@ -204,7 +208,8 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 
 	GMGLShaderProgram* progs[] = {
 		d->forwardShaderProgram,
-		GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::FORWARD ? nullptr : d->deferredShaderProgram
+		GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::FORWARD ? nullptr : d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER],
+		GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::FORWARD ? nullptr : d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]
 	};
 
 	for (GMint i = 0; i < GM_array_size(progs); ++i)
@@ -373,8 +378,10 @@ void GMGLGraphicEngine::updateProjection()
 	GM_END_CHECK_GL_ERROR
 
 	GM_BEGIN_CHECK_GL_ERROR
-	d->deferredShaderProgram->useProgram();
-	d->deferredShaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
+	d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
+	d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
+	d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
+	d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
 	GM_END_CHECK_GL_ERROR
 }
 
@@ -395,9 +402,12 @@ void GMGLGraphicEngine::updateView()
 
 	GM_BEGIN_CHECK_GL_ERROR
 	// 视觉位置，用于计算光照
-	d->deferredShaderProgram->useProgram();
-	d->deferredShaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
-	d->deferredShaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
+	d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
+	d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
+	d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
+	d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_VIEW_MATRIX, glm::value_ptr(viewMatrix));
 	GM_END_CHECK_GL_ERROR
 }
 
@@ -435,16 +445,21 @@ void GMGLGraphicEngine::updateShader()
 	}
 	else
 	{
-		d->deferredShaderProgram->useProgram();
-		GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
-		if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
-			d->deferredShaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
-		else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
-			d->deferredShaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
-		else if (d->renderState == GMGLDeferredRenderState::PassingLight)
-			d->deferredShaderProgram->setInt(GMSHADER_SHADER_PROC, GMShaderProc::LIGHT_PASS);
+		if (getRenderState() != GMGLDeferredRenderState::PassingLight)
+		{
+			d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
+			GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
+			if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
+				d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
+			else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
+				d->deferredShaderProgram[DEFERRED_GEOMETRY_PASS_SHADER]->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
+			else
+				GM_ASSERT(false);
+		}
 		else
-			GM_ASSERT(false);
+		{
+			d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
+		}
 	}
 }
 
