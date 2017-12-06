@@ -331,7 +331,7 @@ DemostrationEntrance::~DemostrationEntrance()
 	gm::GM_delete(d->world);
 }
 
-void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& lightPassProgram)
+void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& effectsShaderProgram)
 {
 	gm::GMBuffer vertBuf, fragBuf;
 	gm::GMString vertPath, fragPath;
@@ -345,8 +345,8 @@ void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& lightPassP
 		{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 	};
 
-	lightPassProgram.attachShader(shadersInfo[0]);
-	lightPassProgram.attachShader(shadersInfo[1]);
+	effectsShaderProgram.attachShader(shadersInfo[0]);
+	effectsShaderProgram.attachShader(shadersInfo[1]);
 }
 
 void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardShaderProgram, gm::GMGLShaderProgram* deferredShaderProgram[2])
