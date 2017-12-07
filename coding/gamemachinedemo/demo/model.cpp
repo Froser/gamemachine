@@ -52,7 +52,7 @@ void Demo_Model::init()
 	d->gameObject->setScaling(glm::scale(.005f, .005f, .005f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
 
-	d->demoWorld->addObject("baymax", d->gameObject);
+	//d->demoWorld->addObject("baymax", d->gameObject);
 
 	d->skyObject = createCubeMap();
 	d->demoWorld->addObject("sky", d->skyObject);

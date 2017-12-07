@@ -7,6 +7,7 @@
 #include "model3d.vert"
 #include "particles.vert"
 #include "glyph.vert"
+#include "cubemap.vert"
 
 void main(void)
 {
@@ -23,6 +24,9 @@ void main(void)
 			break;
 		case TYPE_GLYPH:
 			glyph_main();
+			break;
+		case TYPE_CUBEMAP:
+			cubemap_main();
 			break;
 	};
 }

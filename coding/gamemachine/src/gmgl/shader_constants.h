@@ -20,6 +20,7 @@ BEGIN_NS
 #define		GMSHADER_VIEW_POSITION				GMSHADER("view_position")
 
 //纹理
+#define		GMSHADER_CUBEMAP_TEXTURE			GMSHADER("cubemap")
 #define		GMSHADER_AMBIENT_TEXTURES(i)		GMSHADER("ambient_textures") "[" #i "]"
 #define		GMSHADER_DIFFUSE_TEXTURES(i)		GMSHADER("diffuse_textures") "[" #i "]"
 #define		GMSHADER_NORMALMAP_TEXTURES(i)		GMSHADER("normalmap_textures") "[" #i "]"

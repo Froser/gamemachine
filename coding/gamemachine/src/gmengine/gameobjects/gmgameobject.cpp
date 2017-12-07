@@ -317,8 +317,11 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 	};
 
 	GMModel* model = new GMModel();
+	model->setType(GMModelType::CubeMap);
 	GMMesh* mesh = model->getMesh();
 	GMComponent* component = new GMComponent(mesh);
+	component->getShader().setNoDepthTest(true);
+	component->getShader().getTexture().getTextureFrames(GMTextureType::CUBEMAP, 0).addFrame(texture);
 	for (GMuint i = 0; i < 12; i++)
 	{
 		component->beginFace();
@@ -327,4 +330,6 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		component->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
 		component->endFace();
 	}
+
+	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 }

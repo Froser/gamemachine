@@ -11,7 +11,7 @@ BEGIN_NS
 class Camera;
 class GMGameWorld;
 class GameLight;
-struct IRender;
+struct IRenderer;
 
 extern "C"
 {
@@ -111,7 +111,7 @@ public:
 
 public:
 	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
-	IRender* getRender(GMModelType objectType);
+	IRenderer* getRenderer(GMModelType objectType);
 	void setViewport(const GMRect& rect);
 	void updateShader();
 

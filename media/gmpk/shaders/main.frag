@@ -8,6 +8,7 @@
 #include "model3d.frag"
 #include "particles.frag"
 #include "glyph.frag"
+#include "cubemap.frag"
 
 void main(void)
 {
@@ -24,6 +25,9 @@ void main(void)
 			break;
 		case TYPE_GLYPH:
 			glyph_main();
+			break;
+		case TYPE_CUBEMAP:
+			cubemap_main();
 			break;
 	};
 }

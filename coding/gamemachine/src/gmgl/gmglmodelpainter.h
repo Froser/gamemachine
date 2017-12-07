@@ -6,7 +6,7 @@
 BEGIN_NS
 
 class GMGLGraphicEngine;
-struct IRender;
+struct IRenderer;
 GM_PRIVATE_OBJECT(GMGLModelPainter)
 {
 	GMGLGraphicEngine* engine = nullptr;
@@ -30,7 +30,7 @@ public:
 	virtual void* getBuffer() override;
 
 private:
-	void draw(IRender* render, GMComponent* component, GMMesh* mesh);
+	void draw(IRenderer* render, GMComponent* component, GMMesh* mesh);
 };
 
 END_NS

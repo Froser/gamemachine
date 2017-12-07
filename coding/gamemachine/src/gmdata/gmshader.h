@@ -173,6 +173,9 @@ enum class GMTextureType
 	NORMALMAP,
 	LIGHTMAP,
 	END,
+
+	// Special type
+	CUBEMAP,
 };
 
 static constexpr GMint GMMaxTextureCount(GMTextureType type)
@@ -181,7 +184,8 @@ static constexpr GMint GMMaxTextureCount(GMTextureType type)
 		type == GMTextureType::AMBIENT ? 3 :
 		type == GMTextureType::DIFFUSE ? 3 :
 		type == GMTextureType::NORMALMAP ? 1 :
-		type == GMTextureType::LIGHTMAP ? 1 : 0;
+		type == GMTextureType::LIGHTMAP ? 1 :
+		type == GMTextureType::CUBEMAP ? 1 : 0;
 }
 
 GM_PRIVATE_OBJECT(GMTexture)
@@ -215,6 +219,8 @@ public:
 		case GMTextureType::NORMALMAP:
 			return d->normalMap[index];
 		case GMTextureType::LIGHTMAP:
+			return d->lightMap[index];
+		case GMTextureType::CUBEMAP:
 			return d->lightMap[index];
 		default:
 			GM_ASSERT(false);

@@ -108,7 +108,7 @@ GM_INTERFACE(IGraphicEngine)
 };
 
 class GMComponent;
-GM_INTERFACE(IRender)
+GM_INTERFACE(IRenderer)
 {
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;

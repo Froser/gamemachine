@@ -5,8 +5,7 @@
 #include "gmdata/gmmodel.h"
 #include "gmgltexture.h"
 #include "gmglmodelpainter.h"
-#include "renders/gmgl_render_3d.h"
-#include "renders/gmgl_render_2d.h"
+#include "gmglrenderers.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmstates.h"
 #include "foundation/gmprofile.h"
@@ -528,19 +527,22 @@ void GMGLGraphicEngine::setViewport(const GMRect& rect)
 	GM_END_CHECK_GL_ERROR
 }
 
-IRender* GMGLGraphicEngine::getRender(GMModelType objectType)
+IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 {
 	D(d);
-	static GMGLRender_2D s_render2d;
-	static GMGLRender_3D s_render3d;
+	static GMGLRenderer_2D s_renderer2d;
+	static GMGLRenderer_3D s_renderer3d;
+	static GMGLRenderer_CubeMap s_rendererCubeMap;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
 	case GMModelType::Glyph:
 	case GMModelType::Particles:
-		return &s_render2d;
+		return &s_renderer2d;
 	case GMModelType::Model3D:
-		return &s_render3d;
+		return &s_renderer3d;
+	case GMModelType::CubeMap:
+		return &s_rendererCubeMap;
 	default:
 		GM_ASSERT(false);
 		return nullptr;

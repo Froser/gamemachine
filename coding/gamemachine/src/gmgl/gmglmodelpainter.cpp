@@ -102,8 +102,8 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 {
 	D(d);
 	GMModel* model = getModel();
-	IRender* render = d->engine->getRender(model->getType());
-	render->beginModel(model, parent);
+	IRenderer* renderer = d->engine->getRenderer(model->getType());
+	renderer->beginModel(model, parent);
 
 	GMMesh* mesh = model->getMesh();
 	glBindVertexArray(mesh->getArrayId());
@@ -113,11 +113,11 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 		if (shader.getNodraw())
 			continue;
 
-		draw(render, component, mesh);
+		draw(renderer, component, mesh);
 	}
 	glBindVertexArray(0);
 
-	render->endModel();
+	renderer->endModel();
 }
 
 void GMGLModelPainter::dispose()
@@ -152,13 +152,13 @@ void* GMGLModelPainter::getBuffer()
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
-void GMGLModelPainter::draw(IRender* render, GMComponent* component, GMMesh* mesh)
+void GMGLModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh)
 {
 	D(d);
 	d->engine->checkDrawingState();
 
 	GM_BEGIN_CHECK_GL_ERROR
-	render->beginComponent(component);
+	renderer->beginComponent(component);
 	GM_END_CHECK_GL_ERROR
 
 	GM_BEGIN_CHECK_GL_ERROR
@@ -166,5 +166,5 @@ void GMGLModelPainter::draw(IRender* render, GMComponent* component, GMMesh* mes
 	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 	GM_END_CHECK_GL_ERROR
 
-	render->endComponent();
+	renderer->endComponent();
 }

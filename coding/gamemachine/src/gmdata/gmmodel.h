@@ -99,6 +99,7 @@ enum class GMModelType
 	Model3D,
 	Particles,
 	Glyph,
+	CubeMap,
 	ModelTypeEnd,
 };
 
