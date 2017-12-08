@@ -8,6 +8,14 @@
 #define WHEEL_DELTA 120
 #endif
 
+namespace
+{
+	const gm::GMCameraLookAt s_lookAt = {
+		glm::vec3(0, -.3f, -1.f),
+		glm::vec3(0, .4f, .5f),
+	};
+}
+
 Demo_Model::~Demo_Model()
 {
 	D(d);
@@ -16,14 +24,11 @@ Demo_Model::~Demo_Model()
 
 void Demo_Model::setLookAt()
 {
+	D(d);
 	gm::GMCamera& camera = GM.getCamera();
 	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
-
-	static gm::GMCameraLookAt lookAt = {
-		glm::vec3(0, -.3f, -1.f),
-		glm::vec3(0, .4f, .5f),
-	};
-	camera.lookAt(lookAt);
+	camera.lookAt(s_lookAt);
+	d->lookAtRotation = glm::identity<glm::quat>();
 }
 
 void Demo_Model::init()
@@ -52,7 +57,7 @@ void Demo_Model::init()
 	d->gameObject->setScaling(glm::scale(.005f, .005f, .005f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
 
-	//d->demoWorld->addObject("baymax", d->gameObject);
+	d->demoWorld->addObject("baymax", d->gameObject);
 
 	d->skyObject = createCubeMap();
 	d->demoWorld->addObject("sky", d->skyObject);
@@ -82,19 +87,31 @@ void Demo_Model::handleMouseEvent()
 	{
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
-		d->dragging = true;
+		d->draggingL = true;
 		GM.getMainWindow()->setLockWindow(true);
 	}
 	else if (state.upButton & GMMouseButton_Left)
 	{
-		d->dragging = false;
+		d->draggingL = false;
+		GM.getMainWindow()->setLockWindow(false);
+	}
+	if (state.downButton & GMMouseButton_Right)
+	{
+		d->mouseDownX = state.posX;
+		d->mouseDownY = state.posY;
+		d->draggingR = true;
+		GM.getMainWindow()->setLockWindow(true);
+	}
+	else if (state.upButton & GMMouseButton_Right)
+	{
+		d->draggingR = false;
 		GM.getMainWindow()->setLockWindow(false);
 	}
 }
 
 gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 {
-	gm::GMGamePackage* pk = gm::GameMachine::instance().getGamePackageManager();
+	gm::GMGamePackage* pk = GM.getGamePackageManager();
 	gm::GMImage* slices[6] = { nullptr };
 	{
 		gm::GMBuffer buf;
@@ -149,24 +166,45 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 void Demo_Model::handleDragging()
 {
 	D(d);
-	if (d->dragging)
-	{
-		gm::IMouseState& ms = GM.getMainWindow()->getInputMananger()->getMouseState();
-		gm::GMMouseState state = ms.mouseState();
+	gm::IMouseState& ms = GM.getMainWindow()->getInputMananger()->getMouseState();
+	gm::GMMouseState state = ms.mouseState();
 
+	if (d->draggingL)
+	{
 		gm::GMfloat rotateX = state.posX - d->mouseDownX;
-		{
-			glm::quat q = glm::rotate(d->gameObject->getRotation(),
-				PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
-				glm::vec3(0, 1, 0));
-			d->gameObject->setRotation(q);
-		}
+		gm::GMfloat rotateY = state.posY - d->mouseDownY;
+
+		glm::quat q = glm::rotate(d->gameObject->getRotation(),
+			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
+			glm::vec3(0, 1, 0));
+		d->gameObject->setRotation(q);
 
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 	}
+	else if (d->draggingR)
+	{
+		gm::GMfloat rotateX = state.posX - d->mouseDownX;
+		gm::GMfloat rotateY = state.posY - d->mouseDownY;
+		glm::vec3 lookAt3 = glm::normalize(s_lookAt.lookAt);
+		glm::vec4 lookAt = glm::toHomogeneous(lookAt3);
+		glm::quat q = glm::rotate(d->lookAtRotation,
+			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
+			glm::vec3(0, 1, 0));
+		d->lookAtRotation = q;
+		q = glm::rotate(d->lookAtRotation,
+			PI * rotateY / GM.getGameMachineRunningStates().windowRect.width,
+			glm::vec3(1, 0, 0));
+		d->lookAtRotation = q;
+		gm::GMCameraLookAt cameraLookAt = {
+			glm::mat4_cast(q) * glm::toHomogeneous(s_lookAt.lookAt),
+			s_lookAt.position
+		};
+		GM.getCamera().lookAt(cameraLookAt);
+		d->mouseDownX = state.posX;
+		d->mouseDownY = state.posY;
+	}
 }
-
 
 void Demo_Model::setDefaultLights()
 {

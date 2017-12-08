@@ -12,7 +12,9 @@ GM_PRIVATE_OBJECT(Demo_Model)
 	gm::GMCubeMapGameObject* skyObject = nullptr;
 	gm::GMint mouseDownX;
 	gm::GMint mouseDownY;
-	bool dragging = false;
+	bool draggingL = false;
+	bool draggingR = false;
+	glm::quat lookAtRotation;
 };
 
 class Demo_Model : public DemoHandler
