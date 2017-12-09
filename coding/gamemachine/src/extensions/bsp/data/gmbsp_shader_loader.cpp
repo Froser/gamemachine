@@ -51,50 +51,53 @@ struct SurfaceFlags
 	{ "dust", SURF_DUST },
 };
 
-static GMuint parseSurfaceParm(const char* p)
+namespace
 {
-	for (GMuint i = 0; i < GMS_SURFACE_FLAG_MAX; i++)
+	GMuint parseSurfaceParm(const char* p)
 	{
-		if (strEqual(p, _surface_flags[i].name))
-			return _surface_flags[i].flag;
+		for (GMuint i = 0; i < GMS_SURFACE_FLAG_MAX; i++)
+		{
+			if (strEqual(p, _surface_flags[i].name))
+				return _surface_flags[i].flag;
+		}
+
+		GM_ASSERT(false);
+		gm_error("wrong surfaceparm %s", p);
+		return 0;
 	}
 
-	GM_ASSERT(false);
-	gm_error("wrong surfaceparm %s", p);
-	return 0;
-}
-
-static GMS_BlendFunc parseBlendFunc(const char* p)
-{
-	if (strEqual(p, "GMS_ZERO"))
-		return GMS_BlendFunc::ZERO;
-
-	if (strEqual(p, "GMS_ONE"))
-		return GMS_BlendFunc::ONE;
-
-	if (strEqual(p, "GMS_DST_COLOR"))
-		return GMS_BlendFunc::ONE;
-
-	gm_warning("Unknown blendFunc %s treated as GMS_ZERO", p);
-	return GMS_BlendFunc::ZERO;
-}
-
-static void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
-{
-	if (GMImageReader::load(buf->buffer, buf->size, image))
-		gm_info(_L("loaded texture %Ls from shader"), filename.toStdWString().c_str());
-	else
-		gm_error(_L("texture %Ls not found"), filename.toStdWString().c_str());
-}
-
-static void readTernaryFloatsFromString(const char* str, glm::vec3& vec)
-{
-	Scanner s(str);
-	for (GMint i = 0; i < 3; i++)
+	GMS_BlendFunc parseBlendFunc(const char* p)
 	{
-		GMfloat f;
-		s.nextFloat(&f);
-		vec[i] = f;
+		if (strEqual(p, "GMS_ZERO"))
+			return GMS_BlendFunc::ZERO;
+
+		if (strEqual(p, "GMS_ONE"))
+			return GMS_BlendFunc::ONE;
+
+		if (strEqual(p, "GMS_DST_COLOR"))
+			return GMS_BlendFunc::ONE;
+
+		gm_warning("Unknown blendFunc %s treated as GMS_ZERO", p);
+		return GMS_BlendFunc::ZERO;
+	}
+
+	void loadImage(const GMString& filename, const GMBuffer* buf, OUT GMImage** image)
+	{
+		if (GMImageReader::load(buf->buffer, buf->size, image))
+			gm_info(_L("loaded texture %Ls from shader"), filename.toStdWString().c_str());
+		else
+			gm_error(_L("texture %Ls not found"), filename.toStdWString().c_str());
+	}
+
+	void readTernaryFloatsFromString(const char* str, glm::vec3& vec)
+	{
+		Scanner s(str);
+		for (GMint i = 0; i < 3; i++)
+		{
+			GMfloat f;
+			s.nextFloat(&f);
+			vec[i] = f;
+		}
 	}
 }
 

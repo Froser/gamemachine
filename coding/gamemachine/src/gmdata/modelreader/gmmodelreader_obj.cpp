@@ -7,7 +7,7 @@
 #define RESERVED 4096
 #define INVALID -1
 
-static bool slashPredicate(char c)
+inline bool slashPredicate(char c)
 {
 	return c == '/';
 }

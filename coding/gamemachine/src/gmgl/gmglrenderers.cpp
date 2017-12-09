@@ -7,56 +7,60 @@
 #include <linearmath.h>
 #include "foundation/gamemachine.h"
 
+namespace
+{
+	void applyShader(const GMShader& shader)
+	{
+		if (shader.getBlend())
+		{
+			glEnable(GL_BLEND);
+			GMGLUtility::blendFunc(shader.getBlendFactorSource(), shader.getBlendFactorDest());
+
+			GM_BEGIN_CHECK_GL_ERROR
+			glDisable(GL_CULL_FACE);
+			GM_END_CHECK_GL_ERROR
+		}
+		else
+		{
+			GM_BEGIN_CHECK_GL_ERROR
+			glDisable(GL_BLEND);
+
+			if (shader.getCull() == GMS_Cull::NONE)
+			{
+				glDisable(GL_CULL_FACE);
+			}
+			else
+			{
+				if (shader.getFrontFace() == GMS_FrontFace::CLOCKWISE)
+					glFrontFace(GL_CW);
+				else
+					glFrontFace(GL_CCW);
+
+				glEnable(GL_CULL_FACE);
+			}
+			GM_END_CHECK_GL_ERROR
+		}
+
+		GM_BEGIN_CHECK_GL_ERROR
+		if (shader.getNoDepthTest())
+			glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
+		else
+			glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
+		GM_END_CHECK_GL_ERROR
+
+		GM_BEGIN_CHECK_GL_ERROR
+		if (shader.getBlend())
+			glDepthMask(GL_FALSE);
+		GM_END_CHECK_GL_ERROR
+
+		glLineWidth(shader.getLineWidth());
+	}
+}
+
 GMGLRenderer_3D::GMGLRenderer_3D()
 {
 	D(d);
 	d->engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
-}
-
-void GMGLRenderer_3D::activateShader()
-{
-	D(d);
-	GM_ASSERT(d->shader);
-	GMShader* shader = d->shader;
-	if (shader->getBlend())
-	{
-		glEnable(GL_BLEND);
-		GMGLUtility::blendFunc(shader->getBlendFactorSource(), shader->getBlendFactorDest());
-
-		glDisable(GL_CULL_FACE);
-		GM_CHECK_GL_ERROR();
-	}
-	else
-	{
-		glDisable(GL_BLEND);
-		GM_CHECK_GL_ERROR();
-
-		if (shader->getCull() == GMS_Cull::NONE)
-		{
-			glDisable(GL_CULL_FACE);
-		}
-		else
-		{
-			if (shader->getFrontFace() == GMS_FrontFace::CLOCKWISE)
-				glFrontFace(GL_CW);
-			else
-				glFrontFace(GL_CCW);
-			GM_CHECK_GL_ERROR();
-
-			glEnable(GL_CULL_FACE);
-		}
-	}
-
-	if (shader->getNoDepthTest())
-		glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
-	else
-		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
-
-	if (shader->getBlend())
-		glDepthMask(GL_FALSE);
-
-	GM_CHECK_GL_ERROR();
-	glLineWidth(shader->getLineWidth());
 }
 
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
@@ -90,7 +94,7 @@ void GMGLRenderer_3D::beginComponent(GMComponent* component)
 	activateMaterial(*d->shader);
 
 	// 应用Shader
-	activateShader();
+	applyShader(*d->shader);
 
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
@@ -291,7 +295,7 @@ void GMGLRenderer_2D::beginComponent(GMComponent* component)
 	d->shader = &component->getShader();
 
 	// 应用Shader
-	activateShader();
+	applyShader(*d->shader);
 
 	// 只选择环境光纹理
 	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
@@ -310,7 +314,11 @@ void GMGLRenderer_2D::beginComponent(GMComponent* component)
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	IShaderProgram* shaderProgram = ((GMGLGraphicEngine*)GM.getGraphicEngine())->getShaderProgram();
+
+	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
+	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(parent->getTransform()));
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLRenderer_CubeMap::endModel()
@@ -320,6 +328,9 @@ void GMGLRenderer_CubeMap::endModel()
 
 void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 {
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	applyShader(component->getShader());
+
 	GMTexture& texture = component->getShader().getTexture();
 	GMTextureFrames& frames = texture.getTextureFrames(GMTextureType::CUBEMAP, 0);
 	ITexture* glTex = frames.getFrameByIndex(0);
@@ -328,8 +339,14 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 		GM_BEGIN_CHECK_GL_ERROR
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
 		auto shaderProgram = engine->getShaderProgram();
-		shaderProgram->setInt(GMSHADER_CUBEMAP_TEXTURE, 1);
-		glActiveTexture(GL_TEXTURE1);
+		shaderProgram->setInt(GMSHADER_CUBEMAP_TEXTURE, 0);
+		GM_END_CHECK_GL_ERROR
+
+		GM_BEGIN_CHECK_GL_ERROR
+		glActiveTexture(GL_TEXTURE0);
+		GM_END_CHECK_GL_ERROR
+
+		GM_BEGIN_CHECK_GL_ERROR
 		glTex->drawTexture(&frames);
 		GM_END_CHECK_GL_ERROR
 	}

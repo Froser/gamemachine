@@ -51,9 +51,9 @@ GMGameWorld* GMGameObject::getWorld()
 
 void GMGameObject::draw()
 {
-	GMModel* coreObj = getModel();
-	if (coreObj)
-		coreObj->getPainter()->draw(this);
+	GMModel* model = getModel();
+	if (model)
+		model->getPainter()->draw(this);
 }
 
 bool GMGameObject::canDeferredRendering()
@@ -272,10 +272,11 @@ GMCubeMapGameObject::~GMCubeMapGameObject()
 
 void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 {
-	static GMfloat vertices[] = {
+	GMfloat vertices[] = {
 		-1.0f,  1.0f, -1.0f,
 		-1.0f, -1.0f, -1.0f,
 		1.0f, -1.0f, -1.0f,
+
 		1.0f, -1.0f, -1.0f,
 		1.0f,  1.0f, -1.0f,
 		-1.0f,  1.0f, -1.0f,
@@ -283,6 +284,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		-1.0f, -1.0f,  1.0f,
 		-1.0f, -1.0f, -1.0f,
 		-1.0f,  1.0f, -1.0f,
+
 		-1.0f,  1.0f, -1.0f,
 		-1.0f,  1.0f,  1.0f,
 		-1.0f, -1.0f,  1.0f,
@@ -290,6 +292,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		1.0f, -1.0f, -1.0f,
 		1.0f, -1.0f,  1.0f,
 		1.0f,  1.0f,  1.0f,
+
 		1.0f,  1.0f,  1.0f,
 		1.0f,  1.0f, -1.0f,
 		1.0f, -1.0f, -1.0f,
@@ -297,6 +300,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		-1.0f, -1.0f,  1.0f,
 		-1.0f,  1.0f,  1.0f,
 		1.0f,  1.0f,  1.0f,
+
 		1.0f,  1.0f,  1.0f,
 		1.0f, -1.0f,  1.0f,
 		-1.0f, -1.0f,  1.0f,
@@ -304,6 +308,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		-1.0f,  1.0f, -1.0f,
 		1.0f,  1.0f, -1.0f,
 		1.0f,  1.0f,  1.0f,
+
 		1.0f,  1.0f,  1.0f,
 		-1.0f,  1.0f,  1.0f,
 		-1.0f,  1.0f, -1.0f,
@@ -311,9 +316,16 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		-1.0f, -1.0f, -1.0f,
 		-1.0f, -1.0f,  1.0f,
 		1.0f, -1.0f, -1.0f,
+
 		1.0f, -1.0f, -1.0f,
 		-1.0f, -1.0f,  1.0f,
 		1.0f, -1.0f,  1.0f
+	};
+
+	GMfloat v[] = {
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
 	};
 
 	GMModel* model = new GMModel();
@@ -328,6 +340,9 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		component->vertex(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
 		component->vertex(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
 		component->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
+		component->normal(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
+		component->normal(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
+		component->normal(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
 		component->endFace();
 	}
 

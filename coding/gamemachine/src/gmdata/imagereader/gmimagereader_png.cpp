@@ -12,101 +12,105 @@ struct PngImage
 	GMuint offset;
 };
 
-static void pngReadCallback(png_structp png_ptr, png_bytep data, png_size_t length)
+namespace
 {
-	PngImage* isource = (PngImage*)png_get_io_ptr(png_ptr);
-	if (isource->offset + length <= isource->size)
+	void pngReadCallback(png_structp png_ptr, png_bytep data, png_size_t length)
 	{
-		memcpy(data, isource->data + isource->offset, length);
-		isource->offset += length;
-	}
-	else
-		png_error(png_ptr, "pngReaderCallback failed");
-}
-
-static bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuint& bufferSize, bool flip = false)
-{
-	png_structp png_ptr;
-	png_infop  info_ptr;
-
-	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
-	info_ptr = png_create_info_struct(png_ptr);
-	setjmp(png_jmpbuf(png_ptr));
-
-	GMint temp = png_sig_cmp((png_const_bytep)data, (png_size_t)0, PNG_BYTES_TO_CHECK);
-	// 检测是否为png文件
-	GM_ASSERT(temp == 0);
-	PngImage imgsource = { data, dataSize, 0 };
-	png_set_read_fn(png_ptr, &imgsource, pngReadCallback);
-	png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
-
-	int color_type, channels;
-
-	channels = png_get_channels(png_ptr, info_ptr);
-	out->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
-	color_type = png_get_color_type(png_ptr, info_ptr);
-
-	int i, j;
-	int size, pos = -1;
-	
-	png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
-	out->width = png_get_image_width(png_ptr, info_ptr);
-	out->height = png_get_image_height(png_ptr, info_ptr);
-	size = out->width * out->height;
-
-	// 根据flip来决定是否翻转Y轴
-	if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
-	{
-		size *= (4 * sizeof(unsigned char));
-		out->hasAlpha = true;
-		out->rgba = new GMbyte[size];
-
-		temp = (4 * out->width);
-		for (i = 0; i < out->height; i++)
+		PngImage* isource = (PngImage*)png_get_io_ptr(png_ptr);
+		if (isource->offset + length <= isource->size)
 		{
-			int _i = i;
-			if (flip)
-				_i = out->height - i - 1;
+			memcpy(data, isource->data + isource->offset, length);
+			isource->offset += length;
+		}
+		else
+			png_error(png_ptr, "pngReaderCallback failed");
+	}
 
-			for (j = 0; j < temp; j += 4)
+	bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuint& bufferSize, bool flip = false)
+	{
+		png_structp png_ptr;
+		png_infop  info_ptr;
+
+		png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, 0, 0, 0);
+		info_ptr = png_create_info_struct(png_ptr);
+		setjmp(png_jmpbuf(png_ptr));
+
+		GMint temp = png_sig_cmp((png_const_bytep)data, (png_size_t)0, PNG_BYTES_TO_CHECK);
+		// 检测是否为png文件
+		GM_ASSERT(temp == 0);
+		PngImage imgsource = { data, dataSize, 0 };
+		png_set_read_fn(png_ptr, &imgsource, pngReadCallback);
+		png_read_png(png_ptr, info_ptr, PNG_TRANSFORM_EXPAND, 0);
+
+		int color_type, channels;
+
+		channels = png_get_channels(png_ptr, info_ptr);
+		out->bit_depth = png_get_bit_depth(png_ptr, info_ptr);
+		color_type = png_get_color_type(png_ptr, info_ptr);
+
+		int i, j;
+		int size, pos = -1;
+
+		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
+		out->width = png_get_image_width(png_ptr, info_ptr);
+		out->height = png_get_image_height(png_ptr, info_ptr);
+		size = out->width * out->height;
+
+		// 根据flip来决定是否翻转Y轴
+		if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
+		{
+			size *= (4 * sizeof(unsigned char));
+			out->hasAlpha = true;
+			out->rgba = new GMbyte[size];
+
+			temp = (4 * out->width);
+			for (i = 0; i < out->height; i++)
 			{
-				out->rgba[++pos] = row_pointers[_i][j]; // red
-				out->rgba[++pos] = row_pointers[_i][j + 1]; // green
-				out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
-				out->rgba[++pos] = row_pointers[_i][j + 3]; // alpha
+				int _i = i;
+				if (flip)
+					_i = out->height - i - 1;
+
+				for (j = 0; j < temp; j += 4)
+				{
+					out->rgba[++pos] = row_pointers[_i][j]; // red
+					out->rgba[++pos] = row_pointers[_i][j + 1]; // green
+					out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
+					out->rgba[++pos] = row_pointers[_i][j + 3]; // alpha
+				}
 			}
 		}
-	}
-	else if (channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
-	{
-		size *= (3 * sizeof(GMbyte));
-		out->hasAlpha = false;
-		out->rgba = new GMbyte[size];
-
-		temp = (3 * out->width);
-		for (i = 0; i < out->height; i++)
+		else if (channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
 		{
-			int _i = i;
-			if (flip)
-				_i = out->height - i - 1;
+			size *= (3 * sizeof(GMbyte));
+			out->hasAlpha = false;
+			out->rgba = new GMbyte[size];
 
-			for (j = 0; j < temp; j += 3)
+			temp = (3 * out->width);
+			for (i = 0; i < out->height; i++)
 			{
-				out->rgba[++pos] = row_pointers[_i][j]; // red
-				out->rgba[++pos] = row_pointers[_i][j + 1]; // green
-				out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
+				int _i = i;
+				if (flip)
+					_i = out->height - i - 1;
+
+				for (j = 0; j < temp; j += 3)
+				{
+					out->rgba[++pos] = row_pointers[_i][j]; // red
+					out->rgba[++pos] = row_pointers[_i][j + 1]; // green
+					out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
+				}
 			}
 		}
-	}
-	else
-	{
-		return false;
-	}
+		else
+		{
+			return false;
+		}
 
-	png_destroy_read_struct(&png_ptr, &info_ptr, 0);
-	bufferSize = size;
-	return true;
+		png_destroy_read_struct(&png_ptr, &info_ptr, 0);
+		bufferSize = size;
+		return true;
+	}
 }
+
 struct PNGTestHeader
 {
 	DWORD magic1, magic2;

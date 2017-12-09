@@ -9,104 +9,107 @@
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include <linearmath.h>
 
-static inline const char* getValue(const GMBSPEntity* entity, const char* key)
+namespace
 {
-	GMBSPEPair* e = entity->epairs;
-	while (e)
+	inline const char* getValue(const GMBSPEntity* entity, const char* key)
 	{
-		if (e->key ==  key)
-			return e->value.toStdString().c_str();
-		e = e->next;
+		GMBSPEPair* e = entity->epairs;
+		while (e)
+		{
+			if (e->key == key)
+				return e->value.toStdString().c_str();
+			e = e->next;
+		}
+		return nullptr;
 	}
-	return nullptr;
-}
 
-static inline GMint copyLump(GMBSPHeader* header, GMint lump, void *dest, GMint size)
-{
-	GMint length, ofs;
-
-	length = header->lumps[lump].filelen;
-	ofs = header->lumps[lump].fileofs;
-
-	if (length % size)
-		gm_error(_L("LoadBSPFile: odd lump size"));
-
-	memcpy(dest, (GMbyte *)header + ofs, length);
-
-	return length / size;
-}
-
-static inline char* copyString(const char *s)
-{
-	char *b;
-	GMint len = strlen(s) + 1;
-	b = (char*)malloc(len);
-	strcpy_s(b, len, s);
-	return b;
-}
-
-static inline void stripTrailing(GMString& e)
-{
-	for (auto& c : e.toStdString())
+	inline GMint copyLump(GMBSPHeader* header, GMint lump, void *dest, GMint size)
 	{
-		if (c <= 32)
-			c = 0;
+		GMint length, ofs;
+
+		length = header->lumps[lump].filelen;
+		ofs = header->lumps[lump].fileofs;
+
+		if (length % size)
+			gm_error(_L("LoadBSPFile: odd lump size"));
+
+		memcpy(dest, (GMbyte *)header + ofs, length);
+
+		return length / size;
 	}
-}
 
-static inline GMString expandPath(const char *path)
-{
-	GMString strPath = GMPath::getCurrentPath();
-	strPath.append(path);
-	return strPath;
-}
+	inline char* copyString(const char *s)
+	{
+		char *b;
+		GMint len = strlen(s) + 1;
+		b = (char*)malloc(len);
+		strcpy_s(b, len, s);
+		return b;
+	}
 
-static inline void safeRead(FILE *f, void *buffer, GMint count)
-{
-	if (fread(buffer, 1, count, f) != (size_t)count)
-		gm_error(_L("File read failure"));
-}
+	inline void stripTrailing(GMString& e)
+	{
+		for (auto& c : e.toStdString())
+		{
+			if (c <= 32)
+				c = 0;
+		}
+	}
 
-static inline FILE *safeOpenRead(const char *filename)
-{
-	FILE *f = nullptr;
+	inline GMString expandPath(const char *path)
+	{
+		GMString strPath = GMPath::getCurrentPath();
+		strPath.append(path);
+		return strPath;
+	}
 
-	fopen_s(&f, filename, "rb");
+	inline void safeRead(FILE *f, void *buffer, GMint count)
+	{
+		if (fread(buffer, 1, count, f) != (size_t)count)
+			gm_error(_L("File read failure"));
+	}
 
-	if (!f)
-		gm_error("Error opening %Ls.", filename);
+	inline FILE *safeOpenRead(const char *filename)
+	{
+		FILE *f = nullptr;
 
-	return f;
-}
+		fopen_s(&f, filename, "rb");
 
-static inline GMint filelength(FILE *f)
-{
-	GMint pos;
-	GMint end;
+		if (!f)
+			gm_error("Error opening %Ls.", filename);
 
-	pos = ftell(f);
-	fseek(f, 0, SEEK_END);
-	end = ftell(f);
-	fseek(f, pos, SEEK_SET);
+		return f;
+	}
 
-	return end;
-}
+	inline GMint filelength(FILE *f)
+	{
+		GMint pos;
+		GMint end;
 
-static inline GMint loadFile(const char *filename, void **bufferptr)
-{
-	FILE *f;
-	GMint length;
-	void* buffer;
+		pos = ftell(f);
+		fseek(f, 0, SEEK_END);
+		end = ftell(f);
+		fseek(f, pos, SEEK_SET);
 
-	f = safeOpenRead(filename);
-	length = filelength(f);
-	buffer = malloc(length + 1);
-	((char *)buffer)[length] = 0;
-	safeRead(f, buffer, length);
-	fclose(f);
+		return end;
+	}
 
-	*bufferptr = buffer;
-	return length;
+	inline GMint loadFile(const char *filename, void **bufferptr)
+	{
+		FILE *f;
+		GMint length;
+		void* buffer;
+
+		f = safeOpenRead(filename);
+		length = filelength(f);
+		buffer = malloc(length + 1);
+		((char *)buffer)[length] = 0;
+		safeRead(f, buffer, length);
+		fclose(f);
+
+		*bufferptr = buffer;
+		return length;
+	}
 }
 
 #define Copy(dest, src) memcpy(dest, src, sizeof(src))

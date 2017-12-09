@@ -6,21 +6,24 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
-static GLenum getMode(GMMesh* obj)
+namespace
 {
-	switch (obj->getArrangementMode())
+	GLenum getMode(GMMesh* obj)
 	{
-	case GMArrangementMode::Triangle_Fan:
-		return GL_TRIANGLE_FAN;
-	case GMArrangementMode::Triangle_Strip:
-		return GL_TRIANGLE_STRIP;
-	case GMArrangementMode::Triangles:
-		return GL_TRIANGLES;
-	case GMArrangementMode::Lines:
-		return GL_LINE_LOOP;
-	default:
-		GM_ASSERT(false);
-		return GL_TRIANGLE_FAN;
+		switch (obj->getArrangementMode())
+		{
+		case GMArrangementMode::Triangle_Fan:
+			return GL_TRIANGLE_FAN;
+		case GMArrangementMode::Triangle_Strip:
+			return GL_TRIANGLE_STRIP;
+		case GMArrangementMode::Triangles:
+			return GL_TRIANGLES;
+		case GMArrangementMode::Lines:
+			return GL_LINE_LOOP;
+		default:
+			GM_ASSERT(false);
+			return GL_TRIANGLE_FAN;
+		}
 	}
 }
 
@@ -43,12 +46,12 @@ void GMGLModelPainter::transfer()
 
 	mesh->calculateTangentSpace();
 
+	GM_BEGIN_CHECK_GL_ERROR
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	mesh->setArrayId(vao);
 
 	glBindVertexArray(mesh->getArrayId());
-
 	GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(GMModel::DataType) * mesh->positions().size();
 	GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(GMModel::DataType) * mesh->normals().size();
 	GLuint uvSize			= mesh->isDataDisabled(GMVertexDataType::UV)			? 0 : sizeof(GMModel::DataType) * mesh->uvs().size();
@@ -94,6 +97,8 @@ void GMGLModelPainter::transfer()
 	IF_ENABLED(mesh, GMVertexDataType::Bitangent)	mesh->clear_bitangents_and_save_byte_size();
 	IF_ENABLED(mesh, GMVertexDataType::Lightmap)	mesh->clear_lightmaps_and_save_byte_size();
 	IF_ENABLED(mesh, GMVertexDataType::Color)		mesh->clear_colors_and_save_byte_size();
+
+	GM_END_CHECK_GL_ERROR
 
 	d->inited = true;
 }
@@ -141,10 +146,11 @@ void GMGLModelPainter::beginUpdateBuffer(GMMesh* mesh)
 
 void GMGLModelPainter::endUpdateBuffer()
 {
+	GM_BEGIN_CHECK_GL_ERROR
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-	GM_CHECK_GL_ERROR();
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	GM_END_CHECK_GL_ERROR
 }
 
 void* GMGLModelPainter::getBuffer()

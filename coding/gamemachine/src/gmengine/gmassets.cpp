@@ -59,7 +59,7 @@ GMAsset GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAsset
 	return node->asset;
 }
 
-static bool splash(char in)
+inline bool splash(char in)
 {
 	return in == '/' || in == '\\';
 }

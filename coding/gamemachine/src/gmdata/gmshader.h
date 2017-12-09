@@ -194,6 +194,7 @@ GM_PRIVATE_OBJECT(GMTexture)
 	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::DIFFUSE)];
 	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NORMALMAP)];
 	GMTextureFrames lightMap[GMMaxTextureCount(GMTextureType::LIGHTMAP)];
+	GMTextureFrames cubeMap[GMMaxTextureCount(GMTextureType::CUBEMAP)];
 };
 
 class GMTexture : public GMObject
@@ -221,7 +222,7 @@ public:
 		case GMTextureType::LIGHTMAP:
 			return d->lightMap[index];
 		case GMTextureType::CUBEMAP:
-			return d->lightMap[index];
+			return d->cubeMap[index];
 		default:
 			GM_ASSERT(false);
 			return d->ambients[0];
