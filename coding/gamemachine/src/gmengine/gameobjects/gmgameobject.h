@@ -130,6 +130,9 @@ public:
 
 private:
 	void createCubeMap(ITexture* texture);
+
+public:
+	virtual bool canDeferredRendering() override;
 };
 
 END_NS

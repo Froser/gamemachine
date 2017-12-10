@@ -118,6 +118,7 @@ GM_INTERFACE(IRenderer)
 
 GM_INTERFACE(IShaderProgram)
 {
+	virtual void useProgram() = 0;
 	virtual void setMatrix4(const char* name, const GMfloat value[16]) = 0;
 	virtual void setVec4(const char* name, const GMfloat value[4]) = 0;
 	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;

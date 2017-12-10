@@ -32,11 +32,11 @@ public:
 	~GMGLShaderProgram();
 
 	void load();
-	void useProgram();
 	GLuint getProgram() { D(d); return d->shaderProgram; }
 	void attachShader(const GMGLShaderInfo& shaderCfgs);
 
 public:
+	void useProgram();
 	void setMatrix4(const char* name, const GMfloat value[16]);
 	void setVec4(const char* name, const GMfloat value[4]);
 	void setVec3(const char* name, const GMfloat value[3]);

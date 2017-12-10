@@ -348,3 +348,8 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 
 	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 }
+
+bool GMCubeMapGameObject::canDeferredRendering()
+{
+	return false;
+}

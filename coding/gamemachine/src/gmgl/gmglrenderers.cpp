@@ -314,10 +314,11 @@ void GMGLRenderer_2D::beginComponent(GMComponent* component)
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	IShaderProgram* shaderProgram = ((GMGLGraphicEngine*)GM.getGraphicEngine())->getShaderProgram();
+	shaderProgram->useProgram();
 
 	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
-	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(parent->getTransform()));
+	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(glm::mat4(glm::mat3(parent->getTransform()))));
 	GM_END_CHECK_GL_ERROR
 }
 
@@ -354,5 +355,4 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 
 void GMGLRenderer_CubeMap::endComponent()
 {
-
 }
