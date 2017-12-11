@@ -30,6 +30,7 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
+	virtual void onDeactivate() override;
 
 private:
 	gm::GMCubeMapGameObject* createCubeMap();

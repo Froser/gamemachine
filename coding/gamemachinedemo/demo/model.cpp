@@ -22,6 +22,12 @@ Demo_Model::~Demo_Model()
 	gm::GM_delete(d->demoWorld);
 }
 
+
+void Demo_Model::onDeactivate()
+{
+	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+}
+
 void Demo_Model::setLookAt()
 {
 	D(d);

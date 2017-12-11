@@ -339,11 +339,11 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 		GM_BEGIN_CHECK_GL_ERROR
 		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
 		auto shaderProgram = engine->getShaderProgram();
-		shaderProgram->setInt(GMSHADER_CUBEMAP_TEXTURE, 0);
+		shaderProgram->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
-		glActiveTexture(GL_TEXTURE0);
+		glActiveTexture(GL_TEXTURE9);
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
