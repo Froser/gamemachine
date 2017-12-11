@@ -10,6 +10,7 @@
 
 void main(void)
 {
+	init_layouts();
 	if (GM_shader_proc == PROC_GEOMETRY_PASS)
 	{
 		deferred_geometry_pass_main();

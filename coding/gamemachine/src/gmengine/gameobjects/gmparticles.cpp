@@ -40,18 +40,18 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 	for (GMint offset = 0; offset < vertexCountThisTurn; ++offset)
 	{
 		glm::vec4 basePositionVector(
-			*(basePositions + offset * 4 + 0),
-			*(basePositions + offset * 4 + 1),
-			*(basePositions + offset * 4 + 2),
-			*(basePositions + offset * 4 + 3)
+			*(basePositions + offset * GMModel::PositionDimension + 0),
+			*(basePositions + offset * GMModel::PositionDimension + 1),
+			*(basePositions + offset * GMModel::PositionDimension + 2),
+			1.f
 		);
 		glm::vec4 transformedPosition = d->transform * basePositionVector;
-		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * 4 + 3) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
-		glm::copyToArray(transformedPosition, (GMfloat*)(vertexData + offset_position) + offset * 4);
+		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * GMModel::PositionDimension + 2) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
+		glm::copyToArray(glm::vec3(transformedPosition), (GMfloat*)(vertexData + offset_position) + offset * GMModel::PositionDimension);
 
 		//更新颜色
-		GM_ASSERT((GMLargeInteger)(vertexData + color_offset + offset * 4 + 3) <= (GMLargeInteger)(vertexData + totalSize));
-		glm::copyToArray(d->color, (GMfloat*)(vertexData + color_offset) + offset * 4);
+		GM_ASSERT((GMLargeInteger)(vertexData + color_offset + offset * GMModel::TextureDimension + 3) <= (GMLargeInteger)(vertexData + totalSize));
+		glm::copyToArray(d->color, (GMfloat*)(vertexData + color_offset) + offset * GMModel::TextureDimension);
 	}
 }
 

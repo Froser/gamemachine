@@ -11,6 +11,7 @@
 
 void main(void)
 {
+	init_layouts();
 	switch (GM_shader_type)
 	{
 		case TYPE_MODEL2D:

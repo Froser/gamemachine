@@ -65,7 +65,6 @@ void model3d_calcLights()
 	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
 	mat4 normalModelTransform = transpose(inverse(noTranslationMat));
 	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
-
 	vec4 vertex_eye = GM_view_matrix * _model3d_position_world;
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移

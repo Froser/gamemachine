@@ -212,7 +212,7 @@ void Demo_Model::setDefaultLights()
 	{
 		{
 			gm::GMLight light(gm::GMLightType::SPECULAR);
-			gm::GMfloat lightPos[] = { 0, 1.f, -1.f };
+			gm::GMfloat lightPos[] = { .7f, .7f, .7f };
 			light.setLightPosition(lightPos);
 			gm::GMfloat color[] = { .7f, .7f, .7f };
 			light.setLightColor(color);
@@ -245,10 +245,22 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 		d->demoWorld->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
+	{
 		handleMouseEvent();
 		handleDragging();
 		d->demoWorld->notifyControls();
+
+		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+		if (kbState.keyTriggered('0'))
+			GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+		GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)
+		{
+			if (kbState.keyTriggered('1' + (gm::GMint)i))
+				GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, (gm::GMint)i + 1);
+		}
 		break;
+	}
 	case gm::GameMachineEvent::Deactivate:
 		break;
 	case gm::GameMachineEvent::Terminate:

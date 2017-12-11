@@ -36,7 +36,6 @@ void deferred_geometry_pass_calcEyeSpace()
 	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
 	mat4 normalModelTransform = transpose(inverse(noTranslationMat));
 	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
-	vec4 vertex_eye = GM_view_matrix * _deferred_geometry_pass_position_world;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	${deferred_geometry_pass_gNormal_eye} = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
 

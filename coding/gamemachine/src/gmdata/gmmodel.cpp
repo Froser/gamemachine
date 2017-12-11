@@ -4,8 +4,7 @@
 #include <algorithm>
 #include <iterator>
 
-#define VERTEX_DEMENSION 4 //顶点的维度，最高维度是齐次维度，恒为1
-#define VERTEX_OFFSET(offset, idx) ((offset * VERTEX_DEMENSION) + idx)
+#define VERTEX_OFFSET(offset, idx) ((offset * GMModel::PositionDimension) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
 GMModel::GMModel()
@@ -26,7 +25,7 @@ GMComponent::GMComponent(GMMesh* parent)
 {
 	D(d);
 	d->parentMesh = parent;
-	setVertexOffset(d->parentMesh->positions().size() / VERTEX_DEMENSION);
+	setVertexOffset(d->parentMesh->positions().size() / GMModel::PositionDimension);
 	d->parentMesh->appendComponent(this);
 }
 
@@ -57,7 +56,6 @@ void GMComponent::vertex(GMfloat x, GMfloat y, GMfloat z)
 	vertices.push_back(x);
 	vertices.push_back(y);
 	vertices.push_back(z);
-	vertices.push_back(1.0f);
 	d->currentFaceVerticesCount++;
 }
 
@@ -68,7 +66,6 @@ void GMComponent::normal(GMfloat x, GMfloat y, GMfloat z)
 	normals.push_back(x);
 	normals.push_back(y);
 	normals.push_back(z);
-	normals.push_back(1.0f);
 }
 
 void GMComponent::uv(GMfloat u, GMfloat v)
@@ -139,11 +136,11 @@ void GMComponent::expand(GMuint count)
 				beginFace();
 			}
 
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	vertex(d->parentMesh->positions()[d->offset + i * 4 + 0], d->parentMesh->positions()[d->offset + i * 4 + 1], d->parentMesh->positions()[d->offset + i * 4 + 2]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		normal(d->parentMesh->normals()[d->offset + i * 4 + 0], d->parentMesh->normals()[d->offset + i * 4 + 1], d->parentMesh->normals()[d->offset + i * 4 + 2]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			uv(d->parentMesh->uvs()[d->offset + i * 2 + 0], d->parentMesh->uvs()[d->offset + i * 2 + 1]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	lightmap(d->parentMesh->lightmaps()[d->offset + i * 4 + 0], d->parentMesh->lightmaps()[d->offset + i * 4 + 1]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		color(d->parentMesh->colors()[d->offset + i * 4 + 0], d->parentMesh->colors()[d->offset + i * 4 + 1], d->parentMesh->colors()[d->offset + i * 4 + 2]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	vertex(d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 0], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 1], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 2]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		normal(d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 0], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 1], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 2]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			uv(d->parentMesh->uvs()[d->offset + i * GMModel::UVDimension + 0], d->parentMesh->uvs()[d->offset + i * GMModel::UVDimension + 1]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	lightmap(d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 1]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		color(d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 1], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 2]);
 
 			if (i == verticesCount - 1)
 				endFace();
@@ -185,8 +182,8 @@ void GMMesh::calculateTangentSpace()
 			GMint o = component->getOffsetPtr()[i];
 
 			glm::vec3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
-			glm::vec3 e1(d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)], d->positions[VERTEX_OFFSET(o, 6)]);
-			glm::vec3 e2(d->positions[VERTEX_OFFSET(o, 8)], d->positions[VERTEX_OFFSET(o, 9)], d->positions[VERTEX_OFFSET(o, 10)]);
+			glm::vec3 e1(d->positions[VERTEX_OFFSET(o, 3)], d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)]);
+			glm::vec3 e2(d->positions[VERTEX_OFFSET(o, 6)], d->positions[VERTEX_OFFSET(o, 7)], d->positions[VERTEX_OFFSET(o, 8)]);
 
 			glm::vec2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
 			glm::vec2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);
@@ -219,12 +216,10 @@ void GMMesh::calculateTangentSpace()
 				d->tangents.push_back(tangentVector[0]);
 				d->tangents.push_back(tangentVector[1]);
 				d->tangents.push_back(tangentVector[2]);
-				d->tangents.push_back(1.0f);
 
 				d->bitangents.push_back(bitangentVector[0]);
 				d->bitangents.push_back(bitangentVector[1]);
 				d->bitangents.push_back(bitangentVector[2]);
-				d->bitangents.push_back(1.0f);
 			}
 		}
 	}

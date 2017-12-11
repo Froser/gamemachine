@@ -135,9 +135,15 @@ class GMModel : public GMObject
 public:
 	typedef GMfloat DataType;
 
-	enum {
-		// 一个位置坐标的维度
-		PositionDimension = 4,
+	enum Dimensions
+	{
+		PositionDimension = 3,
+		NormalDimension = 3,
+		UVDimension = 2,
+		TextureDimension = 4,
+		LightmapDimension = UVDimension,
+		TangentDimension = NormalDimension,
+		BitangentDimension = NormalDimension,
 	};
 
 public:

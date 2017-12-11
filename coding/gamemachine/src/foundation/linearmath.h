@@ -129,6 +129,12 @@ namespace glm
 		memcpy_s(value, sizeof(gm::GMfloat) * 4, v, sizeof(gm::GMfloat) * 4);
 	}
 
+	inline void copyToArray(const vec3& vec, gm::GMfloat* value)
+	{
+		const auto v = value_ptr(vec);
+		memcpy_s(value, sizeof(gm::GMfloat) * 3, v, sizeof(gm::GMfloat) * 3);
+	}
+
 	inline bool fuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
 	{
 		return (gm::gmFabs(p1 - p2) <= 0.01f);
