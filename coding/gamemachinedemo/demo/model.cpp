@@ -56,11 +56,11 @@ void Demo_Model::init()
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setScaling(glm::scale(.005f, .005f, .005f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
-
-	d->demoWorld->addObject("baymax", d->gameObject);
-
 	d->skyObject = createCubeMap();
+	d->skyObject->setScaling(glm::scale(100, 100, 100));
+
 	d->demoWorld->addObject("sky", d->skyObject);
+	d->demoWorld->addObject("baymax", d->gameObject);
 }
 
 void Demo_Model::handleMouseEvent()
@@ -159,8 +159,7 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 		delete slice;
 	}
 
-	gm::GMCubeMapGameObject* skyObject = new gm::GMCubeMapGameObject(cubeMapTex);
-	return skyObject;
+	return new gm::GMCubeMapGameObject(cubeMapTex);
 }
 
 void Demo_Model::handleDragging()

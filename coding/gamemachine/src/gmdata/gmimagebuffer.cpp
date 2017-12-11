@@ -77,8 +77,8 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	const GMImage* slices[] = {
 		&posX,
 		&negX,
+		&negY, // 由于uv坐标和gl坐标y方向相反，所以我们特意把negY（天空）和posY（地面）颠倒一下
 		&posY,
-		&negY,
 		&posZ,
 		&negZ
 	};

@@ -332,7 +332,6 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 	model->setType(GMModelType::CubeMap);
 	GMMesh* mesh = model->getMesh();
 	GMComponent* component = new GMComponent(mesh);
-	component->getShader().setNoDepthTest(true);
 	component->getShader().getTexture().getTextureFrames(GMTextureType::CUBEMAP, 0).addFrame(texture);
 	for (GMuint i = 0; i < 12; i++)
 	{

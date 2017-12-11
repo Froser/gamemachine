@@ -330,7 +330,6 @@ void GMGLRenderer_CubeMap::endModel()
 void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 {
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	applyShader(component->getShader());
 
 	GMTexture& texture = component->getShader().getTexture();
 	GMTextureFrames& frames = texture.getTextureFrames(GMTextureType::CUBEMAP, 0);
