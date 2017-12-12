@@ -58,7 +58,7 @@ void deferred_light_pass_init()
 {
 	deferred_light_pass_g_ambientLight = deferred_light_pass_g_diffuseLight = deferred_light_pass_g_specularLight = vec3(0);
 	deferred_light_pass_tPosition = texture(deferred_light_pass_gPosition, _uv).rgb;
-	deferred_light_pass_tNormal_eye = (texture(deferred_light_pass_gNormal_eye, _uv).rgb);
+	deferred_light_pass_tNormal_eye = textureToNormal(texture(deferred_light_pass_gNormal_eye, _uv).rgb);
 	deferred_light_pass_tTexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
 	deferred_light_pass_tTexDiffuse = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
 	deferred_light_pass_tTangent_eye = texture(deferred_light_pass_gTangent_eye, _uv).rgb;
@@ -143,7 +143,9 @@ void deferred_light_pass_calcColor()
 	deferred_light_pass_calcLights();
 
 	// 最终结果
-	vec3 color = deferred_light_pass_g_ambientLight * deferred_light_pass_tTexAmbient + deferred_light_pass_g_diffuseLight * deferred_light_pass_tTexDiffuse + deferred_light_pass_g_specularLight;
+	vec3 color = deferred_light_pass_g_ambientLight * deferred_light_pass_tTexAmbient
+		+ deferred_light_pass_g_diffuseLight * deferred_light_pass_tTexDiffuse
+		+ deferred_light_pass_g_specularLight;
 	_frag_color = vec4(color, 1.0f);
 }
 

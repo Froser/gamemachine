@@ -12,6 +12,7 @@
 #include <glm/common.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include "glm/gtc/matrix_inverse.inl"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/compatibility.hpp"
 #include "glm/gtx/fast_square_root.hpp"

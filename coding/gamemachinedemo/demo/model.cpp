@@ -26,6 +26,7 @@ Demo_Model::~Demo_Model()
 void Demo_Model::onDeactivate()
 {
 	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+	DemoHandler::onDeactivate();
 }
 
 void Demo_Model::setLookAt()
@@ -258,6 +259,8 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
+		if (kbState.keyTriggered('N'))
+			GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % gm::GMStates_DebugOptions::DRAW_NORMAL_END);
 		if (kbState.keyTriggered('0'))
 			GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
 		GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)

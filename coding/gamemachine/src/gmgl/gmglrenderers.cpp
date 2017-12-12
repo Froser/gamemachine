@@ -74,12 +74,14 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		GM_BEGIN_CHECK_GL_ERROR
 		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(parent->getTransform()));
+		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, glm::value_ptr(glm::inverseTranspose(parent->getTransform())));
 		GM_END_CHECK_GL_ERROR
 	}
 	else
 	{
 		GM_BEGIN_CHECK_GL_ERROR
 		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(glm::identity<glm::mat4>()));
+		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, glm::value_ptr(glm::identity<glm::mat4>()));
 		GM_END_CHECK_GL_ERROR
 	}
 }
@@ -319,6 +321,7 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
 	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(glm::mat4(glm::mat3(parent->getTransform()))));
+	shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, glm::value_ptr(glm::mat4(glm::mat3(parent->getTransform()))));
 	GM_END_CHECK_GL_ERROR
 }
 

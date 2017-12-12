@@ -34,8 +34,7 @@ void deferred_geometry_pass_calcEyeSpace()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
 	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
-	mat4 normalModelTransform = transpose(inverse(noTranslationMat)); //TODO 这个计算很耗时，应该用uniform传入
-	mat4 normalEyeTransform = GM_view_matrix * normalModelTransform;
+	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	${deferred_geometry_pass_gNormal_eye} = normalToTexture ( normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz ) );
 
@@ -53,7 +52,7 @@ void deferred_geometry_pass_calcEyeSpace()
 
 void deferred_geometry_pass_main()
 {
-	${deferred_geometry_pass_gPosition} = _deferred_geometry_pass_position_world.xyz;
+	${deferred_geometry_pass_gPosition} = (GM_model_matrix * _deferred_geometry_pass_position_world).xyz;
 	${deferred_geometry_pass_gTexAmbient} = deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	${deferred_geometry_pass_gTexDiffuse} = deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
 	${deferred_geometry_pass_gNormalMap} = texture(GM_normalmap_textures[0].texture, _uv).rgb;
