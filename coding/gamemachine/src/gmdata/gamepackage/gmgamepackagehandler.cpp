@@ -6,10 +6,10 @@
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();
 
-class GMGLDefaultGamePackageHandler::GMReadFileThread : public GMThread, public IThreadCallback
+class GMDefaultGamePackageHandler::GMReadFileThread : public GMThread, public IThreadCallback
 {
 public:
-	GMReadFileThread(GMGLDefaultGamePackageHandler* handler, const GMString& path, GMGamePackageAsyncResult* result, GMAsyncCallback callback)
+	GMReadFileThread(GMDefaultGamePackageHandler* handler, const GMString& path, GMGamePackageAsyncResult* result, GMAsyncCallback callback)
 		: m_handler(handler)
 		, m_path(path)
 		, m_result(result)
@@ -39,19 +39,19 @@ public:
 	}
 
 private:
-	GMGLDefaultGamePackageHandler* m_handler;
+	GMDefaultGamePackageHandler* m_handler;
 	GMGamePackageAsyncResult* m_result;
 	GMAsyncCallback m_callback;
 	GMString m_path;
 };
 
-GMGLDefaultGamePackageHandler::GMGLDefaultGamePackageHandler(GMGamePackage* pk)
+GMDefaultGamePackageHandler::GMDefaultGamePackageHandler(GMGamePackage* pk)
 	: m_pk(pk)
 {
 
 }
 
-bool GMGLDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
+bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	std::ifstream file;
 	std::string p = path.toStdString();
@@ -75,7 +75,7 @@ bool GMGLDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF G
 	return false;
 }
 
-void GMGLDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar)
+void GMDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar)
 {
 	GMGamePackageAsyncResult* result = new GMGamePackageAsyncResult();
 	GMReadFileThread* thread = new GMReadFileThread(this, path, result, callback);
@@ -84,11 +84,11 @@ void GMGLDefaultGamePackageHandler::beginReadFileFromPath(const GMString& path, 
 	thread->start();
 }
 
-void GMGLDefaultGamePackageHandler::init()
+void GMDefaultGamePackageHandler::init()
 {
 }
 
-GMString GMGLDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
+GMString GMDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 {
 	PKD(d);
 
@@ -115,25 +115,25 @@ GMString GMGLDefaultGamePackageHandler::pathRoot(GMPackageIndex index)
 	return "";
 }
 
-GMGamePackage* GMGLDefaultGamePackageHandler::gamePackage()
+GMGamePackage* GMDefaultGamePackageHandler::gamePackage()
 {
 	return m_pk;
 }
 
-Vector<GMString> GMGLDefaultGamePackageHandler::getAllFiles(const GMString& directory)
+Vector<GMString> GMDefaultGamePackageHandler::getAllFiles(const GMString& directory)
 {
 	return GMPath::getAllFiles(directory);
 }
 
 #define CHECK(err) if (err != UNZ_OK) return false
 
-GMGLZipGamePackageHandler::GMGLZipGamePackageHandler(GMGamePackage* pk)
-	: GMGLDefaultGamePackageHandler(pk)
+GMZipGamePackageHandler::GMZipGamePackageHandler(GMGamePackage* pk)
+	: GMDefaultGamePackageHandler(pk)
 	, m_uf(nullptr)
 {
 }
 
-void GMGLZipGamePackageHandler::init()
+void GMZipGamePackageHandler::init()
 {
 	PKD(d);
 	if (!loadZip())
@@ -144,13 +144,13 @@ void GMGLZipGamePackageHandler::init()
 	Base::init();
 }
 
-GMGLZipGamePackageHandler::~GMGLZipGamePackageHandler()
+GMZipGamePackageHandler::~GMZipGamePackageHandler()
 {
 	releaseUnzFile();
 	releaseBuffers();
 }
 
-bool GMGLZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
+bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 {
 	if (m_buffers.find(path) != m_buffers.end())
 	{
@@ -175,7 +175,7 @@ bool GMGLZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuf
 	return false;
 }
 
-bool GMGLZipGamePackageHandler::loadZip()
+bool GMZipGamePackageHandler::loadZip()
 {
 	const GMuint bufSize = 4096;
 
@@ -235,7 +235,7 @@ bool GMGLZipGamePackageHandler::loadZip()
 	return true;
 }
 
-void GMGLZipGamePackageHandler::releaseUnzFile()
+void GMZipGamePackageHandler::releaseUnzFile()
 {
 	if (m_uf)
 	{
@@ -244,7 +244,7 @@ void GMGLZipGamePackageHandler::releaseUnzFile()
 	}
 }
 
-void GMGLZipGamePackageHandler::releaseBuffers()
+void GMZipGamePackageHandler::releaseBuffers()
 {
 	for (auto iter = m_buffers.begin(); iter != m_buffers.end(); iter++)
 	{
@@ -252,7 +252,7 @@ void GMGLZipGamePackageHandler::releaseBuffers()
 	}
 }
 
-GMString GMGLZipGamePackageHandler::toRelativePath(const GMString& in)
+GMString GMZipGamePackageHandler::toRelativePath(const GMString& in)
 {
 	Deque<GMString> deque;
 
@@ -289,7 +289,7 @@ GMString GMGLZipGamePackageHandler::toRelativePath(const GMString& in)
 	return result;
 }
 
-Vector<GMString> GMGLZipGamePackageHandler::getAllFiles(const GMString& directory)
+Vector<GMString> GMZipGamePackageHandler::getAllFiles(const GMString& directory)
 {
 	Vector<GMString> result;
 	GMString d = directory;
@@ -303,7 +303,7 @@ Vector<GMString> GMGLZipGamePackageHandler::getAllFiles(const GMString& director
 	return result;
 }
 
-GMString GMGLZipGamePackageHandler::pathRoot(GMPackageIndex index)
+GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 {
 	PKD(d);
 

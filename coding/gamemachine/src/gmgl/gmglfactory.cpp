@@ -25,28 +25,6 @@ void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* obj, OUT GMMode
 	(*painter) = new GMGLModelPainter(gmglEngine, obj);
 }
 
-void GMGLFactory::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)
-{
-	switch (t)
-	{
-	case gm::GPT_DIRECTORY:
-		{
-			GMGLDefaultGamePackageHandler* h = new GMGLDefaultGamePackageHandler(pk);
-			*handler = h;
-		}
-		break;
-	case gm::GPT_ZIP:
-		{
-			GMGLZipGamePackageHandler* h = new GMGLZipGamePackageHandler(pk);
-			*handler = h;
-		}
-		break;
-	default:
-		GM_ASSERT(false);
-		break;
-	}
-}
-
 void GMGLFactory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
 	*glyphManager = new GMGLGlyphManager();

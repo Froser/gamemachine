@@ -19,7 +19,7 @@ void GameMachine::init(
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
 	registerManager(engine, &d->engine);
-	registerManager(new GMGamePackage(factory), &d->gamePackageManager);
+	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMStates(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
 	d->consoleOutput = consoleHandle.dbgoutput;

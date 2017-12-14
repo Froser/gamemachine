@@ -5,10 +5,10 @@
 #include "contrib/minizip/unzip.h"
 BEGIN_NS
 
-class GMGLDefaultGamePackageHandler : public IGamePackageHandler
+class GMDefaultGamePackageHandler : public IGamePackageHandler
 {
 public:
-	GMGLDefaultGamePackageHandler(GMGamePackage* pk);
+	GMDefaultGamePackageHandler(GMGamePackage* pk);
 
 public:
 	virtual void init() override;
@@ -27,9 +27,9 @@ private:
 	GMGamePackage* m_pk;
 };
 
-class GMGLZipGamePackageHandler : public GMGLDefaultGamePackageHandler
+class GMZipGamePackageHandler : public GMDefaultGamePackageHandler
 {
-	typedef GMGLDefaultGamePackageHandler Base;
+	typedef GMDefaultGamePackageHandler Base;
 
 	struct ZipBuffer
 	{
@@ -50,8 +50,8 @@ class GMGLZipGamePackageHandler : public GMGLDefaultGamePackageHandler
 	};
 
 public:
-	GMGLZipGamePackageHandler(GMGamePackage* pk);
-	~GMGLZipGamePackageHandler();
+	GMZipGamePackageHandler(GMGamePackage* pk);
+	~GMZipGamePackageHandler();
 
 public:
 	virtual void init() override;

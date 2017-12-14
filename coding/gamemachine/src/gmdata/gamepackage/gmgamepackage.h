@@ -31,7 +31,6 @@ GM_PRIVATE_OBJECT(GMGamePackage)
 {
 	GMString packagePath;
 	AutoPtr<IGamePackageHandler> handler;
-	IFactory* factory;
 };
 
 class GMBSPGameWorld;
@@ -40,8 +39,6 @@ class GMGamePackage : public GMObject
 	DECLARE_PRIVATE(GMGamePackage)
 
 	friend class GameMachine;
-
-	GMGamePackage(IFactory* factory);
 
 public:
 	Data* gamePackageData();
@@ -55,6 +52,9 @@ public:
 	// 一般情况下，建议用readFile代替readFileFromPath，除非是想指定特殊的路径
 	bool readFileFromPath(const GMString& path, REF GMBuffer* buffer);
 	void beginReadFileFromPath(const GMString& path, GMAsyncCallback& callback, OUT IAsyncResult** ar);
+
+protected:
+	virtual void createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler);
 };
 
 GM_PRIVATE_OBJECT(GMGamePackageAsyncResult)

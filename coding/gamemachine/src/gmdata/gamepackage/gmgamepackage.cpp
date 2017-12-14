@@ -1,12 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmgamepackage.h"
+#include "gmgamepackagehandler.h"
 #include <sys/stat.h>
-
-GMGamePackage::GMGamePackage(IFactory* factory)
-{
-	D(d);
-	d->factory = factory;
-}
 
 GMGamePackage::Data* GMGamePackage::gamePackageData()
 {
@@ -33,12 +28,12 @@ void GMGamePackage::loadPackage(const GMString& path)
 	{
 		// 读取整个目录
 		d->packagePath = std::string(path_temp) + '/';
-		d->factory->createGamePackage(this, GPT_DIRECTORY, &handler);
+		createGamePackage(this, GPT_DIRECTORY, &handler);
 	}
 	else
 	{
 		d->packagePath = std::string(path_temp);
-		d->factory->createGamePackage(this, GPT_ZIP, &handler);
+		createGamePackage(this, GPT_ZIP, &handler);
 	}
 
 	d->handler.reset(handler);
@@ -89,6 +84,28 @@ void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback&
 {
 	D(d);
 	d->handler->beginReadFileFromPath(path, callback, ar);
+}
+
+void GMGamePackage::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)
+{
+	switch (t)
+	{
+	case gm::GPT_DIRECTORY:
+	{
+		GMDefaultGamePackageHandler* h = new GMDefaultGamePackageHandler(pk);
+		*handler = h;
+	}
+	break;
+	case gm::GPT_ZIP:
+	{
+		GMZipGamePackageHandler* h = new GMZipGamePackageHandler(pk);
+		*handler = h;
+	}
+	break;
+	default:
+		GM_ASSERT(false);
+		break;
+	}
 }
 
 GMGamePackageAsyncResult::~GMGamePackageAsyncResult()
