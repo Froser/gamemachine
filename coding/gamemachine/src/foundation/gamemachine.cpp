@@ -85,7 +85,7 @@ void GameMachine::startGameMachine()
 	updateGameMachineRunningStates();
 
 	// 开始渲染
-	d->engine->start();
+	d->engine->init();
 
 	// 处理一次消息
 	handleMessages();
