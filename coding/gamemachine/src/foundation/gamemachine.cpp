@@ -40,7 +40,7 @@ GameMachineMessage GameMachine::peekMessage()
 	return d->lastMessage;
 }
 
-void GameMachine::initObjectPainter(GMModel* model)
+void GameMachine::createModelPainter(GMModel* model)
 {
 	if (model)
 	{

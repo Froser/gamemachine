@@ -119,7 +119,7 @@ void GMParticles::onAppendingObjectToWorld()
 	{
 		GMModel* prototype = kv.first;
 		initPrototype(kv.first, kv.second);
-		GameMachine::instance().initObjectPainter(prototype);
+		GameMachine::instance().createModelPainter(prototype);
 	}
 }
 
