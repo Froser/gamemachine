@@ -59,7 +59,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	GM_delete(d->deferredShaderProgram[DEFERRED_LIGHT_PASS_SHADER]);
 }
 
-void GMGLGraphicEngine::start()
+void GMGLGraphicEngine::init()
 {
 	installShaders();
 	glDepthFunc(GL_LEQUAL);

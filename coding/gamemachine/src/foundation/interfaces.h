@@ -89,9 +89,14 @@ enum class GMUpdateDataType
 };
 
 class GMLight;
+
+//! 图形绘制引擎接口
+/*!
+  提供最基本的绘制功能。
+*/
 GM_INTERFACE(IGraphicEngine)
 {
-	virtual void start() = 0;
+	virtual void init() = 0;
 	virtual void newFrame() = 0;
 	virtual bool event(const GameMachineMessage& e) = 0;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode = GMBufferMode::Normal) = 0;
