@@ -10,7 +10,7 @@ struct ImageMipData
 	GMint width;
 	GMint height;
 	GMint depth;
-	GLsizeiptr mipStride;
+	GMsizeiptr mipStride;
 	GMbyte* data = nullptr;
 };
 

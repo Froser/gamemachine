@@ -21,7 +21,7 @@ GM_PRIVATE_OBJECT(GMParticleGameObject)
 
 class GMParticleGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE(GMParticleGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMParticleGameObject, GMGameObject)
 
 public:
 	GMParticleGameObject(AUTORELEASE GMModel* prototype);
@@ -73,7 +73,8 @@ GM_PRIVATE_OBJECT(GMParticles)
 // 粒子低层设施，用它可以来编写自定义粒子
 class GMParticles : public GMGameObject
 {
-	DECLARE_PRIVATE(GMParticles)
+	DECLARE_PRIVATE_AND_BASE(GMParticles, GMGameObject)
+
 public:
 	GMParticles() = default;
 	~GMParticles();

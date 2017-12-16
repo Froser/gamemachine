@@ -12,9 +12,7 @@ GM_PRIVATE_OBJECT(Demo_Border)
 
 class Demo_Border : public DemoHandler
 {
-	DECLARE_PRIVATE(Demo_Border)
-
-	typedef DemoHandler Base;
+	DECLARE_PRIVATE_AND_BASE(Demo_Border, DemoHandler)
 
 public:
 	using Base::Base;

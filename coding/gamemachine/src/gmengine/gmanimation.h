@@ -99,7 +99,7 @@ GM_PRIVATE_OBJECT(GMControlGameObjectAnimation)
 
 class GMControlGameObjectAnimation : public GMAnimation
 {
-	DECLARE_PRIVATE(GMControlGameObjectAnimation)
+	DECLARE_PRIVATE_AND_BASE(GMControlGameObjectAnimation, GMAnimation)
 
 public:
 	GMControlGameObjectAnimation(GMControlGameObject* object);

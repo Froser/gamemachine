@@ -96,19 +96,112 @@ class GMLight;
 */
 GM_INTERFACE(IGraphicEngine)
 {
+	//! 初始化绘制引擎。
+	/*!
+	  该方法将在GameMachine初始化时被调用。
+	*/
 	virtual void init() = 0;
+
+	//! 刷新帧缓存，新建一帧。
+	/*!
+	  此方法保证默认帧缓存将会被清空，但是并不保证其他帧缓存（如G缓存）被清空。
+	  如果要清空其它帧缓存，应该调用需要清除的帧缓存的响应方法。
+	  此方法将会清除默认帧缓存中的颜色缓存、深度缓存和模板缓存。
+	*/
 	virtual void newFrame() = 0;
+
+	//! 处理GameMachine消息。
+	/*!
+	  当GameMachine在处理完系统消息之后，此方法将会被调用。
+	  通常用此方法处理一些特殊事件，如窗口大小变化时，需要重新分配帧缓存、G缓存等。
+	  \param e GameMachine消息
+	  \return 如果此事件被处理，返回true，否则返回false。
+	  \sa GameMachineMessage
+	*/
 	virtual bool event(const GameMachineMessage& e) = 0;
-	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode = GMBufferMode::Normal) = 0;
+
+	//! 绘制若干个GMGameObject对象
+	/*!
+	  绘制GMGameObject对象。这个方法会将绘制好的图元到目标缓存，目标缓存取决于GMBufferMode的值。
+	  \param objects 待绘制的对象。
+	  \param count 待绘制对象的个数。
+	  \param bufferMode 绘制模式。如果模式为GMBufferMode::Normal，程序将按照正常流程绘制，如果模式为GMBufferMode::NoFramebuffer，
+	         程序会将绘制结果直接保存在默认帧缓存上，而不会保存在其他帧缓存中。
+	*/
+	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode = GMBufferMode::Normal) = 0;
+
+	//! 更新绘制数据。
+	/*!
+	  调用此方法会将数据更新到绘制的着色器程序中。
+	  \param type 需要更新的数据类型。
+	*/
 	virtual void update(GMUpdateDataType type) = 0;
+
+	//! 增加一个光源。
+	/*!
+	  将一个光源添加到全局绘制引擎中。
+	  光源的表现行为与着色器程序有关，有些图元可能不会使用到光源，有些图元则可能会。
+	  \param light 需要添加的光源。
+	*/
 	virtual void addLight(const GMLight& light) = 0;
+
+	//! 移除所有光源。
+	/*!
+	  移除引擎中的所有光源。
+	*/
 	virtual void removeLights() = 0;
+
+	//! 清除当前激活帧缓存下的模板缓存。
+	/*!
+	  如果当前激活缓存是默认帧缓存，则清除默认帧缓存中的模板缓存。
+	  如果当前激活的是其它帧缓存（如G缓存等），则清除它的模板缓存。
+	*/
 	virtual void clearStencil() = 0;
+
+	//! 开始创建模板缓存。
+	/*!
+	  在当前激活帧缓存下创建模板缓存。
+	  在此方法被执行后，所有的绘制将会被写入进被激活的帧缓存的模板缓存中。
+	  \sa endCreateStencil()
+	*/
 	virtual void beginCreateStencil() = 0;
+
+	//! 结束创建模板缓存。
+	/*!
+	  结束模板缓存的创建。
+	  在此方法被执行后，所有的绘制不会被写入到当前激活的帧缓存的模板缓存中。
+	  \sa beginCreateStencil()
+	*/
 	virtual void endCreateStencil() = 0;
+
+	//* 开始使用帧缓存。
+	/*!
+	  在此方法被执行后，绘制图元将会根据当前激活的帧缓存的模板缓存进行绘制。
+	  \param inverse 表示图元是绘制在模板中，还是模板外。
+	  \sa endUseStencil()
+	*/
 	virtual void beginUseStencil(bool inverse) = 0;
+
+	//! 结束使用帧缓存。
+	/*!
+	  在此方法被执行后，图元的绘制将不会依据任何模板缓存。
+	  \sa beginUseStencil()
+	*/
 	virtual void endUseStencil() = 0;
+
+	//! 开始进行融合绘制
+	/*!
+	  决定下一次调用drawObjects时的混合模式。如果在一个绘制流程中多次调用drawObjects，则应该使用此方法，将本帧的画面和当前帧缓存进行
+	  融合，否则本帧将会覆盖当前帧缓存已有的所有值。
+	  \sa drawObjects(), endBlend()
+	*/
 	virtual void beginBlend(GMS_BlendFunc sfactor = GMS_BlendFunc::ONE, GMS_BlendFunc dfactor = GMS_BlendFunc::ONE) = 0;
+
+	//! 结束融合绘制
+	/*!
+	  结束与当前帧缓存的融合。在这种情况下，执行多次drawObjects，会将其输出的帧缓存覆盖多次。
+	  \sa drawObjects(), beginBlend()
+	*/
 	virtual void endBlend() = 0;
 };
 

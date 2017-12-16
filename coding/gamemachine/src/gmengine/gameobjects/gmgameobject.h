@@ -84,7 +84,7 @@ GM_PRIVATE_OBJECT(GMEntityObject)
 
 class GMEntityObject : public GMGameObject
 {
-	DECLARE_PRIVATE(GMEntityObject)
+	DECLARE_PRIVATE_AND_BASE(GMEntityObject, GMGameObject)
 
 public:
 	GMEntityObject(GMAsset asset);
@@ -111,7 +111,7 @@ GM_PRIVATE_OBJECT(GMSkyGameObject)
 
 class GMSkyGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE(GMSkyGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMSkyGameObject, GMGameObject)
 
 public:
 	GMSkyGameObject(const GMShader& shader, const glm::vec3& min, const glm::vec3& max);

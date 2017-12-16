@@ -8,9 +8,7 @@ BEGIN_NS
 
 class GMBSPGameWorld : public GMGameWorld
 {
-	DECLARE_PRIVATE(GMBSPGameWorld);
-
-	typedef GMGameWorld Base;
+	DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
 
 public:
 	GMBSPGameWorld();

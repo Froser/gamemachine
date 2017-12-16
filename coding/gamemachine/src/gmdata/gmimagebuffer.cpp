@@ -17,7 +17,7 @@ void GMImageBuffer::generateData()
 	D(d);
 	GMImage::Data& data = getData();
 
-#if USE_OPENGL
+#if GM_USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
 	data.internalFormat = GL_RGBA8;
@@ -47,7 +47,7 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	D_BASE(d, GMImage);
 	GMImage::Data& data = getData();
 
-#if USE_OPENGL
+#if GM_USE_OPENGL
 	data.target = GL_TEXTURE_CUBE_MAP;
 	data.mipLevels = 1;
 	data.internalFormat = GL_RGBA8;

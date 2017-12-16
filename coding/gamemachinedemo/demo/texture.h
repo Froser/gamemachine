@@ -12,9 +12,7 @@ GM_PRIVATE_OBJECT(Demo_Texture)
 
 class Demo_Texture : public DemoHandler
 {
-	DECLARE_PRIVATE(Demo_Texture)
-
-	typedef DemoHandler Base;
+	DECLARE_PRIVATE_AND_BASE(Demo_Texture, DemoHandler)
 
 public:
 	using Base::Base;

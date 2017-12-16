@@ -93,7 +93,7 @@ GM_PRIVATE_OBJECT(GMControlGameObject)
 
 class GMControlGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE(GMControlGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMControlGameObject, GMGameObject)
 
 	typedef GMGameObject Base;
 

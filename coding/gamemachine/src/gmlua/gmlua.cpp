@@ -48,11 +48,6 @@ GMLua::GMLua(const GMLua& lua)
 	*this = lua;
 }
 
-GMLua::GMLua(GMLua&& lua) noexcept
-{
-	*this = std::move(lua);
-}
-
 GMLua& GMLua::operator= (const GMLua& state)
 {
 	D(d);
@@ -62,13 +57,6 @@ GMLua& GMLua::operator= (const GMLua& state)
 	d->luaState = state_d->luaState;
 	d->ref = state_d->ref;
 	(*d->ref)++;
-	return *this;
-}
-
-GMLua& GMLua::operator= (GMLua&& state) noexcept
-{
-	D_OF(state_d, &state);
-	swap(*this, state);
 	return *this;
 }
 

@@ -18,7 +18,7 @@ GM_PRIVATE_OBJECT(GMGLTexture)
 
 class GMGLTexture : public ITexture
 {
-	DECLARE_PRIVATE(GMGLTexture)
+	DECLARE_PRIVATE_NGO(GMGLTexture)
 
 public:
 	GMGLTexture(const GMImage* image);

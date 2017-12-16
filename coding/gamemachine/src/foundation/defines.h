@@ -61,7 +61,9 @@ using Deque = std::deque<T>;
 #endif
 
 // 使用OpenGL
-#define USE_OPENGL 1
+#ifndef GM_USE_OPENGL
+#	define GM_USE_OPENGL 1
+#endif
 
 // 编译设置：
 #ifndef GM_LIB
@@ -118,7 +120,7 @@ using Deque = std::deque<T>;
 #	error consider dll
 #endif
 
-#if USE_OPENGL
+#if GM_USE_OPENGL
 #	define GLEW_STATIC
 #	include "GL/glew.h"
 #endif
@@ -156,7 +158,7 @@ GM_STATIC_ASSERT_SIZE(DWORD, 4);
 
 BEGIN_NS
 // 基本数据类型
-#if USE_OPENGL
+#if GM_USE_OPENGL
 typedef GLfloat GMfloat;
 typedef GLint GMint;
 typedef GLuint GMuint;
@@ -164,8 +166,11 @@ typedef GLsizei GMsizei;
 typedef GLsizeiptr GMsizeiptr;
 #else
 typedef float GMfloat;
-typedef int GMint
+typedef int GMint;
+typedef unsigned int GMuint;
 typedef short GMshort;
+typedef ptrdiff_t GMsizeiptr;
+typedef int GMsizei;
 #endif
 
 typedef unsigned char GMbyte;
@@ -255,7 +260,7 @@ inline void GM_delete_array(T*& o)
 	if (_str)							\
 		swscanf_s(_str, format, out);	\
 }
-#define SWAP(a, b) { auto t = a; a = b; b = t; }
+#define GM_SWAP(a, b) { auto t = a; a = b; b = t; }
 
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
 #define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )

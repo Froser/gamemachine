@@ -373,7 +373,7 @@ void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 {
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
-#if USE_OPENGL
+#if GM_USE_OPENGL
 	data.target = GL_TEXTURE_2D;
 	data.mipLevels = 1;
 

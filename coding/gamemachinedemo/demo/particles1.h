@@ -13,9 +13,7 @@ GM_PRIVATE_OBJECT(Demo_Particles1)
 
 class Demo_Particles1 : public DemoHandler
 {
-	DECLARE_PRIVATE(Demo_Particles1)
-
-	typedef DemoHandler Base;
+	DECLARE_PRIVATE_AND_BASE(Demo_Particles1, DemoHandler)
 
 public:
 	using Base::Base;

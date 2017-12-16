@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMImageBuffer)
 // 表示一个来自内存的图片
 class GMImageBuffer : public GMImage
 {
-	DECLARE_PRIVATE(GMImageBuffer)
+	DECLARE_PRIVATE_AND_BASE(GMImageBuffer, GMImage)
 
 public:
 	GMImageBuffer(GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer);

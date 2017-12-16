@@ -21,38 +21,20 @@ static size_t removeIf(ContainerType& container, std::function<bool(typename Con
 	return cnt;
 }
 
-GMObject::GMObject(GMObject&& obj) noexcept
-{
-	*this = std::move(obj);
-}
-
 GMObject::~GMObject()
 {
 	releaseEvents();
 }
 
-GMObject& GMObject::operator=(GMObject&& obj) noexcept
+GMObject::GMObject(GMObject&& e) noexcept
 {
-	if (this != &obj)
-	{
-		swap(*this, obj);
-		obj.dataWrapper()->m_data = nullptr;
-	}
+	gmSwap(*this, e);
+}
+
+GMObject& GMObject::operator=(GMObject&& e) noexcept
+{
+	gmSwap(*this, e);
 	return *this;
-}
-
-void GMObject::swap(GMObject& another)
-{
-	swap(*this, another);
-}
-
-void GMObject::swap(GMObject& a, GMObject& b)
-{
-	GMObjectPrivateWrapper<GMObject>* wrapperA = a.dataWrapper(),
-		*wrapperB = b.dataWrapper();
-	if (!wrapperA || !wrapperB)
-		return;
-	wrapperA->swap(wrapperB);
 }
 
 void GMObject::attachEvent(GMObject& sender, GMEventName eventName, const GMEventCallback& callback)

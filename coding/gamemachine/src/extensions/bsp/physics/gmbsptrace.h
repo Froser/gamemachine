@@ -65,7 +65,7 @@ struct GMBSP_Physics_Brush;
 struct GMBSP_Physics_Patch;
 struct GMBSPPatchCollide;
 struct GMBSPTraceWork;
-class GMBSPTrace
+class GMBSPTrace : public GMObject
 {
 	DECLARE_PRIVATE(GMBSPTrace)
 

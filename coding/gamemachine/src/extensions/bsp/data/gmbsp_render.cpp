@@ -348,7 +348,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 				GMint idx_next = *(idxStart + i + 1);
 
 				if (i & 1) //奇数点应该调换一下前后向量，最后再改变法线方向
-					SWAP(idx_prev, idx_next);
+					GM_SWAP(idx_prev, idx_next);
 
 				const glm::vec3& vertex_prev = biqp.vertices[idx_prev].position,
 					&vertex_next = biqp.vertices[idx_next].position;

@@ -78,7 +78,7 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 
 class GMSpriteGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE(GMSpriteGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
 
 public:
 	GMSpriteGameObject(GMfloat radius);

@@ -12,9 +12,7 @@ GM_PRIVATE_OBJECT(Demo_Literature)
 
 class Demo_Literature : public DemoHandler
 {
-	DECLARE_PRIVATE(Demo_Literature)
-
-	typedef DemoHandler Base;
+	DECLARE_PRIVATE_AND_BASE(Demo_Literature, DemoHandler)
 
 public:
 	using Base::Base;

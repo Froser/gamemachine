@@ -23,7 +23,7 @@ GM_PRIVATE_OBJECT(GMGlyphObject)
 
 class GMGlyphObject : public GMControlGameObject
 {
-	DECLARE_PRIVATE(GMGlyphObject)
+	DECLARE_PRIVATE_AND_BASE(GMGlyphObject, GMControlGameObject)
 
 public:
 	GMGlyphObject();
@@ -119,7 +119,7 @@ GM_PRIVATE_OBJECT(GMImage2DGameObject)
 
 class GMImage2DGameObject : public GMControlGameObject, public IPrimitiveCreatorShaderCallback
 {
-	DECLARE_PRIVATE(GMImage2DGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMImage2DGameObject, GMControlGameObject)
 
 	typedef GMControlGameObject Base;
 
@@ -162,9 +162,7 @@ GM_PRIVATE_OBJECT(GMListbox2DGameObject)
 
 class GMListbox2DGameObject : public GMImage2DGameObject
 {
-	DECLARE_PRIVATE(GMListbox2DGameObject);
-
-	typedef GMImage2DGameObject Base;
+	DECLARE_PRIVATE_AND_BASE(GMListbox2DGameObject, GMImage2DGameObject);
 
 public:
 	GMImage2DGameObject* addItem(const GMString& text);
@@ -195,7 +193,7 @@ GM_PRIVATE_OBJECT(GMCursorGameObject)
 
 class GMCursorGameObject : public GMImage2DGameObject
 {
-	DECLARE_PRIVATE(GMCursorGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMCursorGameObject, GMImage2DGameObject)
 
 	typedef GMImage2DGameObject Base;
 

@@ -57,9 +57,7 @@ GM_PRIVATE_OBJECT(GMUIGraph)
 
 class GMUIGraph : public gm::GMObject, public DuiLib::CControlUI, public IUIGraph
 {
-	DECLARE_PRIVATE(GMUIGraph)
-
-	typedef DuiLib::CControlUI Base;
+	DECLARE_PRIVATE_AND_BASE(GMUIGraph, DuiLib::CControlUI)
 
 public:
 	GMUIGraph(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; d->currentPos[0] = d->currentPos[1] = 0; }
@@ -94,7 +92,7 @@ GM_PRIVATE_OBJECT(GMUIDialogBuilder)
 
 class GMUIDialogBuilder : public DuiLib::IDialogBuilderCallback
 {
-	DECLARE_PRIVATE(GMUIDialogBuilder)
+	DECLARE_PRIVATE_AND_BASE(GMUIDialogBuilder, DuiLib::IDialogBuilderCallback)
 
 public:
 	GMUIDialogBuilder(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; }

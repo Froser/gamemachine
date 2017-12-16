@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMDemoGameWorld)
 
 class GMDemoGameWorld : public GMGameWorld
 {
-	DECLARE_PRIVATE(GMDemoGameWorld)
+	DECLARE_PRIVATE_AND_BASE(GMDemoGameWorld, GMGameWorld)
 
 	typedef GMGameWorld Base;
 

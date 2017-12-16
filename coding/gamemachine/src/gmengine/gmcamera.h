@@ -89,7 +89,7 @@ GM_PRIVATE_OBJECT(GMCamera)
 
 class GMCamera
 {
-	DECLARE_PRIVATE(GMCamera)
+	DECLARE_PRIVATE_NGO(GMCamera)
 
 public:
 	GMCamera();

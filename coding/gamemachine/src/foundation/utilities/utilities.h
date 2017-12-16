@@ -426,18 +426,7 @@ class GMEvent : public GMObject
 	DECLARE_PRIVATE(GMEvent)
 	GM_DISABLE_ASSIGN(GMEvent)
 	GM_DISABLE_COPY(GMEvent)
-
-public:
-	GMEvent(GMEvent&& e) noexcept
-	{
-		swap(e);
-	}
-
-	GMEvent& operator=(GMEvent&& e) noexcept
-	{
-		swap(e);
-		return *this;
-	}
+	GM_DEFAULT_MOVE_BEHAVIOR(GMEvent)
 
 protected:
 	GMEvent(bool manualReset, bool initialState);

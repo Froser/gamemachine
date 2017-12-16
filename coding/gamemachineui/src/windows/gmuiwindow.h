@@ -13,9 +13,7 @@ GM_PRIVATE_OBJECT(GMUIWindow)
 
 class GMUIWindow : public gm::GMObject, public gm::IWindow, private GMUIWindowBase
 {
-	DECLARE_PRIVATE(GMUIWindow)
-
-	typedef GMUIWindowBase Base;
+	DECLARE_PRIVATE_AND_BASE(GMUIWindow, GMUIWindowBase)
 
 public:
 	~GMUIWindow();

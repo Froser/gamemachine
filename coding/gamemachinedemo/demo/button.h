@@ -28,9 +28,7 @@ typedef std::function<void(gm::GMControlGameObjectAnimation*)> AnimationAction;
 
 class Demo_Button : public DemoHandler
 {
-	DECLARE_PRIVATE(Demo_Button)
-
-	typedef DemoHandler Base;
+	DECLARE_PRIVATE_AND_BASE(Demo_Button, DemoHandler)
 
 public:
 	using Base::Base;

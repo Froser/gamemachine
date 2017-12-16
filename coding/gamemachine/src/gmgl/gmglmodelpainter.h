@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMGLModelPainter)
 
 class GMGLModelPainter : public GMModelPainter
 {
-	DECLARE_PRIVATE(GMGLModelPainter)
+	DECLARE_PRIVATE_AND_BASE(GMGLModelPainter, GMModelPainter)
 
 public:
 	GMGLModelPainter(IGraphicEngine* engine, GMModel* objs);

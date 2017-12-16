@@ -185,9 +185,9 @@ GM_PRIVATE_OBJECT(GMLua)
 	GMuint* ref = nullptr;
 };
 
-class GMLua : public GMObject
+class GMLua
 {
-	DECLARE_PRIVATE(GMLua)
+	DECLARE_PRIVATE_NGO(GMLua)
 
 public:
 	GMLua();

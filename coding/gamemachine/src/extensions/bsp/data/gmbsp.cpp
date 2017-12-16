@@ -367,7 +367,7 @@ void GMBSP::toGLCoord()
 		//swap y and z and negate z
 		GMfloat &_1 = d->vertices[i].xyz[1],
 				&_2 = d->vertices[i].xyz[2];
-		SWAP(_1, _2);
+		GM_SWAP(_1, _2);
 		_2 = -_2;
 
 
@@ -378,7 +378,7 @@ void GMBSP::toGLCoord()
 	for (GMint i = 0; i < d->numplanes; ++i)
 	{
 		//swap y and z and negate z
-		SWAP(d->planes[i].normal[1], d->planes[i].normal[2]);
+		GM_SWAP(d->planes[i].normal[1], d->planes[i].normal[2]);
 		d->planes[i].normal[2] = -d->planes[i].normal[2];
 		d->planes[i].intercept = -d->planes[i].intercept;
 	}
@@ -484,7 +484,7 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 			s.nextFloat(&result->origin[0]); // x
 			s.nextFloat(&result->origin[1]); // z
 			s.nextFloat(&result->origin[2]); // y
-			SWAP(result->origin[1], result->origin[2]);
+			GM_SWAP(result->origin[1], result->origin[2]);
 			result->origin[2] = -result->origin[2];
 		}
 	} while (true);

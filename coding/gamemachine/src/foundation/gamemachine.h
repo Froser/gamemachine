@@ -54,7 +54,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 
 	GMCamera camera;
 	Queue<GameMachineMessage> messageQueue;
-	Vector<IDispose*> manangerQueue;
+	Vector<IVirtualFunctionObject*> manangerQueue;
 
 	GMGameMachineRunningStates states;
 	GMCursorGameObject* cursor;

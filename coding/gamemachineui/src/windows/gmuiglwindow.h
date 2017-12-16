@@ -14,9 +14,7 @@ GM_PRIVATE_OBJECT(GMUIGLWindow)
 
 class GMUIGLWindow : public GMUIWindow
 {
-	typedef GMUIWindow Base;
-
-	DECLARE_PRIVATE(GMUIGLWindow)
+	DECLARE_PRIVATE_AND_BASE(GMUIGLWindow, GMUIWindow)
 
 public:
 	GMUIGLWindow();

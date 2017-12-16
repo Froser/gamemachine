@@ -14,8 +14,7 @@ GM_PRIVATE_OBJECT(GMUIGUIWindow)
 
 class GMUIGUIWindow : public GMUIWindow
 {
-	DECLARE_PRIVATE(GMUIGUIWindow);
-	typedef GMUIWindow Base;
+	DECLARE_PRIVATE_AND_BASE(GMUIGUIWindow, GMUIWindow);
 
 public:
 	void hideWindow();

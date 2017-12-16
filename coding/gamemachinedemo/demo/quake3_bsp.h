@@ -15,9 +15,7 @@ GM_PRIVATE_OBJECT(Demo_Quake3_BSP)
 
 class Demo_Quake3_BSP : public DemoHandler
 {
-	DECLARE_PRIVATE(Demo_Quake3_BSP)
-
-	typedef DemoHandler Base;
+	DECLARE_PRIVATE_AND_BASE(Demo_Quake3_BSP, DemoHandler)
 
 public:
 	using Base::Base;

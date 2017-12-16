@@ -59,9 +59,7 @@ class GMUIConsole :
 	public gm::IDebugOutput,
 	public gm::IProfileHandler
 {
-	DECLARE_PRIVATE(GMUIConsole)
-
-	typedef GMUIGUIWindow Base;
+	DECLARE_PRIVATE_AND_BASE(GMUIConsole, GMUIGUIWindow)
 
 public:
 	GMUIConsole()
