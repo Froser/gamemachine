@@ -329,7 +329,7 @@ protected:
 #define DECLARE_SINGLETON(className) friend class GMSingleton<className>;
 
 // 缓存类，用于存储缓存数据
-struct GMBuffer : public GMObject
+struct GMBuffer
 {
 	GMBuffer()
 		: buffer(nullptr)
@@ -344,6 +344,17 @@ struct GMBuffer : public GMObject
 		{
 			GM_delete_array(buffer);
 		}
+	}
+
+	GMBuffer(GMBuffer&& rhs) noexcept
+	{
+		swap(rhs);
+	}
+
+	GMBuffer& operator =(GMBuffer&& rhs) noexcept
+	{
+		swap(rhs);
+		return *this;
 	}
 
 	GMBuffer& operator =(const GMBuffer& rhs)
