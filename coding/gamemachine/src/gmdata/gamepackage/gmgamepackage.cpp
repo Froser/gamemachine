@@ -114,7 +114,7 @@ GMGamePackageAsyncResult::~GMGamePackageAsyncResult()
 	delete d->thread;
 }
 
-GMObject* GMGamePackageAsyncResult::state()
+GMBuffer* GMGamePackageAsyncResult::state()
 {
 	D(d);
 	return &d->buffer;

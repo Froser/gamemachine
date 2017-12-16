@@ -72,7 +72,7 @@ public:
 	~GMGamePackageAsyncResult();
 
 public:
-	virtual GMObject* state() override;
+	virtual GMBuffer* state() override;
 	virtual bool isComplete() override;
 	virtual GMEvent& waitHandle() override;
 

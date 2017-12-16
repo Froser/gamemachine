@@ -132,7 +132,7 @@ public:
 // 同步
 GM_INTERFACE(IAsyncResult)
 {
-	virtual GMObject* state() = 0;
+	virtual GMBuffer* state() = 0;
 	virtual bool isComplete() = 0;
 	virtual GMEvent& waitHandle() = 0;
 };
