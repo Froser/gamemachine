@@ -110,6 +110,9 @@ inline void hook(const GMString& hookName, Args... args)
 /*!
   GameMachine提供一套简单但是方便的钩子机制。使用此方法将在全局注册一个钩子回调函数，在被注册的钩子被触发时，此回调函数被调用。
   使用此方法可以为一个钩子绑定任意多个回调函数。
+  编译器一般可以推导出模板参数，如假设回调的类型为void(int, int&)，那么以下两种方式等效：
+  installHook("hook_name", callback);
+  installHook<int, int&>("hook_name", callback);
   \param hookName 钩子的名称。
   \param callback 回调函数。此回调函数的参数可以被编译器自动解析，可以传入返回值为void的任意std::function对象。
   \sa hook()
