@@ -225,12 +225,6 @@ GM_INTERFACE(IShaderProgram)
 	virtual void setBool(const char* name, bool value) = 0;
 };
 
-enum GamePackageType
-{
-	GPT_DIRECTORY,
-	GPT_ZIP,
-};
-
 GM_INTERFACE(IFactory)
 {
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;

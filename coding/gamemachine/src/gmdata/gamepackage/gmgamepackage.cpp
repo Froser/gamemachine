@@ -28,12 +28,12 @@ void GMGamePackage::loadPackage(const GMString& path)
 	{
 		// 读取整个目录
 		d->packagePath = std::string(path_temp) + '/';
-		createGamePackage(this, GPT_DIRECTORY, &handler);
+		createGamePackage(this, GMGamePackageType::Directory, &handler);
 	}
 	else
 	{
 		d->packagePath = std::string(path_temp);
-		createGamePackage(this, GPT_ZIP, &handler);
+		createGamePackage(this, GMGamePackageType::Zip, &handler);
 	}
 
 	d->handler.reset(handler);
@@ -76,6 +76,7 @@ bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 	D(d);
 	GM_ASSERT(d->handler);
 	bool b = d->handler->readFileFromPath(path, buffer);
+	hook<const GMString&, GMBuffer*>("GMGamePackage_readFileFromPath", path, buffer);
 	return b;
 }
 
@@ -85,17 +86,17 @@ void GMGamePackage::beginReadFileFromPath(const GMString& path, GMAsyncCallback&
 	d->handler->beginReadFileFromPath(path, callback, ar);
 }
 
-void GMGamePackage::createGamePackage(GMGamePackage* pk, GamePackageType t, OUT IGamePackageHandler** handler)
+void GMGamePackage::createGamePackage(GMGamePackage* pk, GMGamePackageType t, OUT IGamePackageHandler** handler)
 {
 	switch (t)
 	{
-	case gm::GPT_DIRECTORY:
+	case GMGamePackageType::Directory:
 	{
 		GMDefaultGamePackageHandler* h = new GMDefaultGamePackageHandler(pk);
 		*handler = h;
 	}
 	break;
-	case gm::GPT_ZIP:
+	case GMGamePackageType::Zip:
 	{
 		GMZipGamePackageHandler* h = new GMZipGamePackageHandler(pk);
 		*handler = h;
