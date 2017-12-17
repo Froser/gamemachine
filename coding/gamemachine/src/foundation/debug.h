@@ -87,7 +87,7 @@ using HookMap = Map<GMString, Vector<std::function<void(Args...)> > >;
   调用gm_hook<int&&, int&&>("A hook", 1, 2)表示触发类型为void(int&&, int&&)的回调函数，参数整数1和2将会作为右值引用传入回调函数。
   \param hookName 钩子名称
   \param args 传入钩子回调函数的参数
-  \sa gm_installHook()
+  \sa installHook()
 */
 template <typename... Args>
 inline void hook(const GMString& hookName, Args... args)
@@ -112,7 +112,7 @@ inline void hook(const GMString& hookName, Args... args)
   使用此方法可以为一个钩子绑定任意多个回调函数。
   \param hookName 钩子的名称。
   \param callback 回调函数。此回调函数的参数可以被编译器自动解析，可以传入返回值为void的任意std::function对象。
-  \sa gm_hook()
+  \sa hook()
 */
 template <typename... Args>
 inline void installHook(const GMString& hookName, std::function<void(Args...)> callback)
