@@ -76,7 +76,6 @@ bool GMGamePackage::readFileFromPath(const GMString& path, REF GMBuffer* buffer)
 	D(d);
 	GM_ASSERT(d->handler);
 	bool b = d->handler->readFileFromPath(path, buffer);
-	gm_hook2(GMGamePackage, readFileFromPath, &path, buffer);
 	return b;
 }
 

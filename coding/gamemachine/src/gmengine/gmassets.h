@@ -10,11 +10,15 @@ BEGIN_NS
 #define GM_ASSET_LIGHTMAPS	"/lightmaps"
 #define GM_ASSET_MODELS		"/models"
 
+//! 游戏资产的类型
+/*!
+  表示某资产的类型。
+*/
 enum class GMAssetType
 {
-	None,
-	Texture,
-	Model,
+	None, //!< 无类型，绝对不会用到
+	Texture, //!< 纹理贴图类型
+	Model, //!< 模型类型
 };
 
 struct GMAsset

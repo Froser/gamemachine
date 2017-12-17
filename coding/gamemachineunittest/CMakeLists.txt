@@ -26,11 +26,13 @@ set(SOURCES
 		unittest_def.h
 		unittestcase.h
 		unittestcase.cpp
-
+		static_tests.cpp
 		main.cpp
 
 		cases/objectmove.h
 		cases/objectmove.cpp
+		cases/hook.h
+		cases/hook.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

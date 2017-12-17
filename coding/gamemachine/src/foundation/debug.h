@@ -72,37 +72,71 @@ public:
 #endif
 
 // hooks
-#define gm_install_hook(cls, name, funcPtr) { gm::Hooks::install(#cls"_"#name, funcPtr); }
-#define gm_hook(cls, name) { gm::Hooks::invoke0(#cls"_"#name)}
-#define gm_hook1(cls, name, arg1) { gm::Hooks::invoke1(#cls"_"#name, gm_hook_arg(arg1));}
-#define gm_hook2(cls, name, arg1, arg2) { gm::Hooks::invoke2(#cls"_"#name, gm_hook_arg(arg1), gm_hook_arg(arg2));}
-#define gm_hook_arg(arg) ((void*)arg)
+typedef size_t CallbackType;
+typedef void *HookObject;
 
-typedef void(*Hook0)();
-typedef void(*Hook1)(void*);
-typedef void(*Hook2)(void*, void*);
+template <typename... Args>
+using HookMap = Map<GMString, Vector<std::function<void(Args...)> > >;
 
-class Hooks
+//! 触发一个钩子函数
+/*!
+  触发对应名称的钩子，调用与其绑定的所有钩子回调函数。
+  需要注意的是，拷贝传值、左值引用和右值引用视为不同的回调函数类型，如果绑定的函数类型与触发钩子的参数类型不一致，则会引起错误。
+  例如，当调用gm_hook("A hook", 1, 2)时，对应的回调函数类型为void(int, int)。
+  如果需要使用带引用的回调函数，必须在gm_hook的模板参数中显示指定出来。如：
+  调用gm_hook<int&&, int&&>("A hook", 1, 2)表示触发类型为void(int&&, int&&)的回调函数，参数整数1和2将会作为右值引用传入回调函数。
+  \param hookName 钩子名称
+  \param args 传入钩子回调函数的参数
+  \sa gm_installHook()
+*/
+template <typename... Args>
+inline void hook(const GMString& hookName, Args... args)
 {
-	typedef Set<Hook0> Hook0_t;
-	typedef Set<Hook1> Hook1_t;
-	typedef Set<Hook2> Hook2_t;
+	typedef std::function<void(Args...)> _FnType;
+	typedef Vector<_FnType> _FnListType;
 
-public:
-	static void invoke0(const GMString& identifier);
-	static void invoke1(const GMString& identifier, void* arg1);
-	static void invoke2(const GMString& identifier, void* arg1, void* arg2);
-	static void install(const GMString& identifier, Hook0 hook);
-	static void install(const GMString& identifier, Hook1 hook);
-	static void install(const GMString& identifier, Hook2 hook);
+	size_t hash_code = typeid(_FnListType).hash_code();
+	HookObject hookMap = HookFactory::g_hooks[hash_code];
+	if (!hookMap)
+		return;
 
-private:
-	static Hooks& instance();
+	HookMap<Args...>* hm = static_cast<HookMap<Args...>* >(hookMap);
+	_FnListType& callbacks = (*hm)[hookName];
+	for (auto& callback : callbacks)
+		callback(std::forward<Args>(args)...);
+}
 
-private:
-	std::map<GMString, Hook0_t> m_hooks0;
-	std::map<GMString, Hook1_t> m_hooks1;
-	std::map<GMString, Hook2_t> m_hooks2;
+//! 安装一个钩子回调。
+/*!
+  GameMachine提供一套简单但是方便的钩子机制。使用此方法将在全局注册一个钩子回调函数，在被注册的钩子被触发时，此回调函数被调用。
+  使用此方法可以为一个钩子绑定任意多个回调函数。
+  \param hookName 钩子的名称。
+  \param callback 回调函数。此回调函数的参数可以被编译器自动解析，可以传入返回值为void的任意std::function对象。
+  \sa gm_hook()
+*/
+template <typename... Args>
+inline void installHook(const GMString& hookName, std::function<void(Args...)> callback)
+{
+	typedef Vector<std::function<void(Args...)>> _FnListType;
+
+	size_t hash_code = typeid(_FnListType).hash_code();
+	HookObject hookMap = HookFactory::g_hooks[hash_code];
+	if (hookMap)
+	{
+		HookMap<Args...>* hm = static_cast<HookMap<Args...>* >(hookMap);
+		(*hm)[hookName].push_back(callback);
+	}
+	else
+	{
+		static HookMap<Args...> hm;
+		hm[hookName].push_back(callback);
+		HookFactory::g_hooks[hash_code] = &hm;
+	}
+}
+
+struct HookFactory
+{
+	static Map<CallbackType, HookObject> g_hooks;
 };
 
 END_NS
