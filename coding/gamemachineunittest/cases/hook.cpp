@@ -33,8 +33,8 @@ void cases::Hook::addToUnitTest(UnitTest& ut)
 	};
 
 	// 安装钩子，如果钩子都调用正常，则单元测试成功
-	gm::installHook<int, int, gm::GMString>(g_name1, callback1);
-	gm::installHook<int, int, gm::GMString>(g_name2, callback2);
+	gm::installHook(g_name1, callback1);
+	gm::installHook(g_name2, callback2);
 	gm::installHook<int&&, int&&, gm::GMString&>(g_name3, callback3);
 	gm::installHook<int&&, int&&, gm::GMString&>(g_name3, callback4);
 
