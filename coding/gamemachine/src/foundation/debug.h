@@ -95,7 +95,7 @@ inline void hook(const GMString& hookName, Args... args)
 	typedef std::function<void(Args...)> _FnType;
 	typedef Vector<_FnType> _FnListType;
 
-	size_t hash_code = typeid(_FnListType).hash_code();
+	CallbackType hash_code = typeid(_FnListType).hash_code();
 	HookObject hookMap = HookFactory::g_hooks[hash_code];
 	if (!hookMap)
 		return;
@@ -119,7 +119,7 @@ inline void installHook(const GMString& hookName, std::function<void(Args...)> c
 {
 	typedef Vector<std::function<void(Args...)>> _FnListType;
 
-	size_t hash_code = typeid(_FnListType).hash_code();
+	CallbackType hash_code = typeid(_FnListType).hash_code();
 	HookObject hookMap = HookFactory::g_hooks[hash_code];
 	if (hookMap)
 	{
