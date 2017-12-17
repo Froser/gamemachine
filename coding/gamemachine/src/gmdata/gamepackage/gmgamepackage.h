@@ -11,15 +11,19 @@ enum class GMGamePackageType
 	Zip,
 };
 
+//! 游戏资源类型
+/*!
+  游戏资源类型决定了获取资源文件的路径。
+*/
 enum class GMPackageIndex
 {
-	Maps,
-	Shaders,
-	TexShaders,
-	Textures,
-	Models,
-	Audio,
-	Scripts,
+	Maps, //!< 地图类型，存放在"资源包/maps"下
+	Shaders, //!< 着色器程序类型，如GLSL程序，存放在"资源包/shaders"下
+	TexShaders, //!< 特效类型，存放在"资源包/texshaders"下
+	Textures, //!< 纹理类型，存放在"资源包/textures"下
+	Models, //!< 模型类型，存放在"资源包/models"下
+	Audio, //!< 声音文件类型，存放在"资源包/audio"下
+	Scripts, //!< 脚本类型，存放在"资源包/scripts"下
 };
 
 class GMBSPGameWorld;
@@ -44,7 +48,7 @@ class GMBSPGameWorld;
 //! 游戏资源包管理器。
 /*!
   使用游戏资源包管理器，可以很方便在资源包中读取原始数据。
-  资源包可以是一个文件夹，也可以是一个zip压缩包，也可以自己派生解析资源，取决于游戏资源包的类型GamePackageType。
+  资源包可以是一个文件夹，也可以是一个zip压缩包，取决于读取资源包时传入的资源类型。
 */
 class GMGamePackage : public GMObject
 {
