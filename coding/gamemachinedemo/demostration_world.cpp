@@ -245,7 +245,7 @@ void DemostrationEntrance::init()
 
 	gm::GMGLGraphicEngine* engine = static_cast<gm::GMGLGraphicEngine*> (GM.getGraphicEngine());
 	engine->setShaderLoadCallback(this);
-	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
+	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::FORWARD);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
 	GMSetRenderState(RESOLUTION_X, 800);
 	GMSetRenderState(RESOLUTION_Y, 600);

@@ -46,6 +46,7 @@ BEGIN_NS
 #define		GMSHADER_MATERIAL_KD				GMSHADER("material.kd")
 #define		GMSHADER_MATERIAL_KS				GMSHADER("material.ks")
 #define		GMSHADER_MATERIAL_SHININESS			GMSHADER("material.shininess")
+#define		GMSHADER_MATERIAL_REFRACTIVITY		GMSHADER("material.refractivity")
 
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")

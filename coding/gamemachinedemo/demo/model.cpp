@@ -56,6 +56,11 @@ void Demo_Model::init()
 
 	gm::GMModel* model = new gm::GMModel();
 	gm::GMModelReader::load(loadSettings, &model);
+	auto& components = model->getMesh()->getComponents();
+	for (auto& component : components)
+	{
+		component->getShader().getMaterial().refractivity = 0.658f;
+	}
 
 	// 交给GameWorld管理资源
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);

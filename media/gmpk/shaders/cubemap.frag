@@ -1,5 +1,4 @@
 in vec3 _cubemap_uv;
-uniform samplerCube GM_cubemap;
 
 void cubemap_main()
 {

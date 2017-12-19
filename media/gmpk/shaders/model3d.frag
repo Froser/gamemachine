@@ -4,6 +4,7 @@ float g_model3d_shadeFactor = 0;
 vec3 g_model3d_ambientLight;
 vec3 g_model3d_diffuseLight;
 vec3 g_model3d_specularLight;
+vec3 g_model3d_refractionLight;
 in vec4 _model3d_position_world;
 
 void model3d_init()
@@ -45,14 +46,20 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 	}
 
 	// specular:
+	vec3 V = normalize(eyeDirection);
 	{
-		vec3 V = normalize(eyeDirection);
 		vec3 R = reflect(-L, N);
 		float theta = dot(V, R);
 		float specularFactor = pow(theta, GM_material.shininess);
 		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
 
 		g_model3d_specularLight += specularFactor * GM_material.ks * g_model3d_shadeFactor * light.lightColor;
+	}
+
+	// refraction
+	{
+		vec3 R = refract(L, V, GM_material.refractivity);
+		g_model3d_refractionLight += texture(GM_cubemap, R).rgb;
 	}
 }
 
@@ -150,7 +157,7 @@ void model3d_calcColor()
 		model3d_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 
 	// 最终结果
-	vec3 color = g_model3d_ambientLight * ambientTextureColor + g_model3d_diffuseLight * diffuseTextureColor + g_model3d_specularLight;
+	vec3 color = g_model3d_ambientLight * ambientTextureColor + g_model3d_diffuseLight * diffuseTextureColor + g_model3d_specularLight + g_model3d_refractionLight;
 	_frag_color = vec4(color, 1.0f);
 }
 

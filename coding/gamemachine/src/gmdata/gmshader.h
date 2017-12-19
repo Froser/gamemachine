@@ -256,6 +256,7 @@ public:
 GM_ALIGNED_STRUCT(GMMaterial)
 {
 	GMfloat shininess = 0;
+	GMfloat refractivity = 0;
 	glm::vec3 ka = glm::vec3(1);
 	glm::vec3 ks = glm::vec3(0);
 	glm::vec3 kd = glm::vec3(0);
@@ -281,13 +282,10 @@ GM_PRIVATE_OBJECT(GMShader)
 class GMShader : public GMObject, public GMAlignmentObject
 {
 	DECLARE_PRIVATE(GMShader)
+	GM_ALLOW_COPY_DATA(GMShader)
 
 public:
 	GMShader() = default;
-	GMShader(const GMShader& shader)
-	{
-		*this = shader;
-	}
 
 public:
 	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);
@@ -302,15 +300,6 @@ public:
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	GM_DECLARE_PROPERTY(LineColor, lineColor, glm::vec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
-
-	inline GMShader& operator=(const GMShader& rhs)
-	{
-		D(d);
-		*d = *rhs.data();
-		return *this;
-	}
-
-	AutoPtr<GMShader> m_stash;
 };
 END_NS
 #endif

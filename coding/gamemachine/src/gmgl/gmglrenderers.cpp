@@ -176,6 +176,7 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
 	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.shininess);
+	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY, material.refractivity);
 }
 
 void GMGLRenderer_3D::drawDebug()

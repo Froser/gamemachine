@@ -115,6 +115,11 @@ class GMNotAGMObject {};
 	clsName(clsName&& e) noexcept { gm::gmSwap(*this, e); } \
 	clsName& operator=(clsName&& e) noexcept { gm::gmSwap(*this, e); return *this; }
 
+#define GM_ALLOW_COPY_DATA(clsName) \
+	public: \
+	clsName(const clsName& o) { *this = o; } \
+	inline clsName& operator=(const clsName& o) { D(d); *d = *o.data(); return *this; }
+
 enum class GMMetaMemberType
 {
 	Int,
