@@ -88,6 +88,26 @@ enum class GMUpdateDataType
 	ViewMatrix,
 };
 
+//! 当前装载的着色器类型
+enum class GMShaderProgramType
+{
+	CurrentShaderProgram, //!< 当前激活的着色器程序
+	ForwardShaderProgram, //!< 正向渲染着色器程序
+	DeferredGeometryPassShaderProgram, //!< 延迟渲染Geometry Pass阶段着色器程序
+	DeferredLightPassShaderProgram, //!< 延迟渲染Light Pass阶段着色器程序
+};
+
+GM_INTERFACE(IShaderProgram)
+{
+	virtual void useProgram() = 0;
+	virtual void setMatrix4(const char* name, const GMfloat value[16]) = 0;
+	virtual void setVec4(const char* name, const GMfloat value[4]) = 0;
+	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
+	virtual void setInt(const char* name, GMint value) = 0;
+	virtual void setFloat(const char* name, GMfloat value) = 0;
+	virtual void setBool(const char* name, bool value) = 0;
+};
+
 class GMLight;
 
 //! 图形绘制引擎接口
@@ -203,6 +223,14 @@ GM_INTERFACE(IGraphicEngine)
 	  \sa drawObjects(), beginBlend()
 	*/
 	virtual void endBlend() = 0;
+
+	//! 获取一个着色器程序
+	/*!
+	  一个渲染程序一般会装载多个着色器程序，以满足正向渲染、延迟渲染等需求。根据传入的参数返回对应的着色器程序。
+	  \param type 着色器程序种类。
+	  \return 着色器程序。
+	*/
+	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) = 0;
 };
 
 class GMComponent;
@@ -212,17 +240,6 @@ GM_INTERFACE(IRenderer)
 	virtual void endModel() = 0;
 	virtual void beginComponent(GMComponent* component) = 0;
 	virtual void endComponent() = 0;
-};
-
-GM_INTERFACE(IShaderProgram)
-{
-	virtual void useProgram() = 0;
-	virtual void setMatrix4(const char* name, const GMfloat value[16]) = 0;
-	virtual void setVec4(const char* name, const GMfloat value[4]) = 0;
-	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
-	virtual void setInt(const char* name, GMint value) = 0;
-	virtual void setFloat(const char* name, GMfloat value) = 0;
-	virtual void setBool(const char* name, bool value) = 0;
 };
 
 GM_INTERFACE(IFactory)

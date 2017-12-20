@@ -57,16 +57,10 @@ namespace
 	}
 }
 
-GMGLRenderer_3D::GMGLRenderer_3D()
-{
-	D(d);
-	d->engine = static_cast<GMGLGraphicEngine*>(GameMachine::instance().getGraphicEngine());
-}
-
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	auto shaderProgram = d->engine->getShaderProgram();
+	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
@@ -171,7 +165,7 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
 	const GMMaterial& material = shader.getMaterial();
-	auto shaderProgram = d->engine->getShaderProgram();
+	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, &material.ka[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
@@ -182,14 +176,14 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 void GMGLRenderer_3D::drawDebug()
 {
 	D(d);
-	auto shaderProgram = d->engine->getShaderProgram();
+	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
 }
 
 void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
-	auto shaderProgram = d->engine->getShaderProgram();
+	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
@@ -241,7 +235,7 @@ void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
-	auto shaderProgram = d->engine->getShaderProgram();
+	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, GMSHADER_TEXTURES_TEXTURE);
@@ -260,7 +254,7 @@ void GMGLRenderer_3D::deactivateTexture(GMTextureType type, GMint index)
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
-	auto shaderProgram = d->engine->getShaderProgram();
+	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	GMint idx = (GMint)type;
 	const char* uniform = getTextureUniformName(type, index);
 	char u[GMGL_MAX_UNIFORM_NAME_LEN];
@@ -316,7 +310,7 @@ void GMGLRenderer_2D::beginComponent(GMComponent* component)
 //////////////////////////////////////////////////////////////////////////
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	IShaderProgram* shaderProgram = ((GMGLGraphicEngine*)GM.getGraphicEngine())->getShaderProgram();
+	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 
 	GM_BEGIN_CHECK_GL_ERROR
@@ -341,9 +335,25 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 	if (glTex)
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
-		auto shaderProgram = engine->getShaderProgram();
-		shaderProgram->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+		IGraphicEngine* engine = GM.getGraphicEngine();
+		// 给延迟渲染程序传入CubeMap
+		{
+			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
+			shader->useProgram();
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+		}
+		{
+			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
+			shader->useProgram();
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+		}
+
+		// 给正向渲染程序传入CubeMap，一定要放在最后，因为CubeMap渲染本身是正向渲染
+		{
+			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
+			shader->useProgram();
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+		}
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR

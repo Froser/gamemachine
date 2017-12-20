@@ -2,7 +2,7 @@
 #define PROC_MATERIAL_PASS		1
 
 // [-1, 1] -> [0, 1]
-vec3 normalToTexture(vec3 normal)
+vec4 normalToTexture(vec3 normal)
 {
-	return (normal + 1) * .5f;
+	return vec4((normal + 1) * .5f, 1);
 }

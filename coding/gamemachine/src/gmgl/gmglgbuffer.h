@@ -8,6 +8,7 @@ enum class GBufferGeometryType
 {
 	// 顶点属性
 	Position,
+	Normal,
 	Normal_Eye,
 	AmbientTexture,
 	DiffuseTexture,
@@ -22,9 +23,8 @@ enum class GBufferMaterialType
 	// 材质属性
 	Ka,
 	Kd,
-	Ks,
-	Shininess,
-	HasNormalMap,
+	Ks_Shininess,
+	HasNormalMap_Refractivity,
 	EndOfMaterialType,
 };
 

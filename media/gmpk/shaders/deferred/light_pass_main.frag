@@ -6,20 +6,22 @@ in vec2 _uv;
 out vec4 _frag_color;
 
 uniform sampler2D deferred_light_pass_gPosition;
+uniform sampler2D deferred_light_pass_gNormal;
 uniform sampler2D deferred_light_pass_gNormal_eye;
 uniform sampler2D deferred_light_pass_gTexAmbient;
 uniform sampler2D deferred_light_pass_gTexDiffuse;
 uniform sampler2D deferred_light_pass_gTangent_eye;
 uniform sampler2D deferred_light_pass_gBitangent_eye;
 uniform sampler2D deferred_light_pass_gNormalMap;
-uniform sampler2D deferred_light_pass_gKa;
-uniform sampler2D deferred_light_pass_gKd;
-uniform sampler2D deferred_light_pass_gKs;
-uniform sampler2D deferred_light_pass_gShininess;
-uniform sampler2D deferred_light_pass_gHasNormalMap;
+
+uniform sampler2D deferred_material_pass_gKa;
+uniform sampler2D deferred_material_pass_gKd;
+uniform sampler2D deferred_material_pass_gKs_gShininess;
+uniform sampler2D deferred_material_pass_gHasNormalMap_gRefractivity;
 
 // geometries
 vec3 deferred_light_pass_tPosition;
+vec3 deferred_light_pass_tNormal;
 vec3 deferred_light_pass_tNormal_eye;
 vec3 deferred_light_pass_tTexAmbient;
 vec3 deferred_light_pass_tTexDiffuse;
@@ -28,13 +30,16 @@ vec3 deferred_light_pass_tBitangent_eye;
 vec3 deferred_light_pass_tNormalMap;
 
 // materials
-vec3 deferred_light_pass_tKa;
-vec3 deferred_light_pass_tKd;
-vec3 deferred_light_pass_tKs;
-float deferred_light_pass_tShininess;
+vec3 deferred_material_pass_tKa;
+vec3 deferred_material_pass_tKd;
+vec3 deferred_material_pass_tKs;
+float deferred_material_pass_tShininess;
 
 // flags, -1 or 1
-float deferred_light_pass_tHasNormalMap;
+float deferred_material_pass_tHasNormalMap = -1;
+
+// refractivity
+float deferred_material_pass_tRefractivity = 0;
 
 // 相机视角法向量
 vec3 deferred_light_pass_g_normal_eye;
@@ -42,6 +47,7 @@ vec3 deferred_light_pass_g_normal_eye;
 vec3 deferred_light_pass_g_ambientLight;
 vec3 deferred_light_pass_g_diffuseLight;
 vec3 deferred_light_pass_g_specularLight;
+vec3 deferred_light_pass_g_refractiveLight;
 
 // [0, 1] -> [-1, 1]
 vec3 textureToNormal(vec3 tex)
@@ -56,19 +62,28 @@ bool hasFlag(float flag)
 
 void deferred_light_pass_init()
 {
+	// light pass
 	deferred_light_pass_g_ambientLight = deferred_light_pass_g_diffuseLight = deferred_light_pass_g_specularLight = vec3(0);
 	deferred_light_pass_tPosition = texture(deferred_light_pass_gPosition, _uv).rgb;
+	deferred_light_pass_tNormal = textureToNormal(texture(deferred_light_pass_gNormal, _uv).rgb);
 	deferred_light_pass_tNormal_eye = textureToNormal(texture(deferred_light_pass_gNormal_eye, _uv).rgb);
 	deferred_light_pass_tTexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
 	deferred_light_pass_tTexDiffuse = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
 	deferred_light_pass_tTangent_eye = texture(deferred_light_pass_gTangent_eye, _uv).rgb;
 	deferred_light_pass_tBitangent_eye = texture(deferred_light_pass_gBitangent_eye, _uv).rgb;
 	deferred_light_pass_tNormalMap = texture(deferred_light_pass_gNormalMap, _uv).rgb;
-	deferred_light_pass_tKa = texture(deferred_light_pass_gKa, _uv).rgb;
-	deferred_light_pass_tKd = texture(deferred_light_pass_gKd, _uv).rgb;
-	deferred_light_pass_tKs = texture(deferred_light_pass_gKs, _uv).rgb;
-	deferred_light_pass_tShininess = texture(deferred_light_pass_gShininess, _uv).r;
-	deferred_light_pass_tHasNormalMap = texture(deferred_light_pass_gHasNormalMap, _uv).r;
+
+	// material pass
+	deferred_material_pass_tKa = texture(deferred_material_pass_gKa, _uv).rgb;
+	deferred_material_pass_tKd = texture(deferred_material_pass_gKd, _uv).rgb;
+
+	vec4 tKs_tShininess = texture(deferred_material_pass_gKs_gShininess, _uv);
+	deferred_material_pass_tKs = tKs_tShininess.rgb;
+	deferred_material_pass_tShininess = tKs_tShininess.a;
+
+	vec4 tHasNormalMap_tRefractivity = texture(deferred_material_pass_gHasNormalMap_gRefractivity, _uv);
+	deferred_material_pass_tHasNormalMap = tHasNormalMap_tRefractivity.r;
+	deferred_material_pass_tRefractivity = tHasNormalMap_tRefractivity.g;
 }
 
 void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)
@@ -81,7 +96,7 @@ void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDire
 		float diffuseFactor = dot(L, N);
 		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
 
-		deferred_light_pass_g_diffuseLight += diffuseFactor * deferred_light_pass_tKd * light.lightColor;
+		deferred_light_pass_g_diffuseLight += diffuseFactor * deferred_material_pass_tKd * light.lightColor;
 	}
 
 	// specular:
@@ -89,10 +104,19 @@ void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDire
 		vec3 V = normalize(eyeDirection);
 		vec3 R = reflect(-L, N);
 		float theta = dot(V, R);
-		float specularFactor = pow(theta, deferred_light_pass_tShininess);
+		float specularFactor = pow(theta, deferred_material_pass_tShininess);
 		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
 
-		deferred_light_pass_g_specularLight += specularFactor * deferred_light_pass_tKs * light.lightColor;
+		deferred_light_pass_g_specularLight += specularFactor * deferred_material_pass_tKs * light.lightColor;
+	}
+
+	// refraction
+	{
+		// 使用世界坐标来计算反射
+		vec3 normal_world = deferred_light_pass_tNormal.xyz;
+		vec3 I = normalize(deferred_light_pass_tPosition - GM_view_position.rgb).rgb;
+		vec3 R = refract(I, normal_world, deferred_material_pass_tRefractivity);
+		deferred_light_pass_g_refractiveLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
 	}
 }
 
@@ -103,7 +127,7 @@ void deferred_light_pass_calcLights()
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
 
 	// 计算漫反射和高光部分
-	if (!hasFlag(deferred_light_pass_tHasNormalMap))
+	if (!hasFlag(deferred_material_pass_tHasNormalMap))
 	{
 		for (int i = 0; i < GM_speculars_count; i++)
 		{
@@ -134,7 +158,7 @@ void deferred_light_pass_calcLights()
 	// 计算环境光
 	for (int i = 0; i < GM_ambients_count; i++)
 	{
-		deferred_light_pass_g_ambientLight += deferred_light_pass_tKa * GM_ambients[i].lightColor;
+		deferred_light_pass_g_ambientLight += deferred_material_pass_tKa * GM_ambients[i].lightColor;
 	}
 }
 
@@ -145,7 +169,8 @@ void deferred_light_pass_calcColor()
 	// 最终结果
 	vec3 color = deferred_light_pass_g_ambientLight * deferred_light_pass_tTexAmbient
 		+ deferred_light_pass_g_diffuseLight * deferred_light_pass_tTexDiffuse
-		+ deferred_light_pass_g_specularLight;
+		+ deferred_light_pass_g_specularLight
+		+ deferred_light_pass_g_refractiveLight;
 	_frag_color = vec4(color, 1.0f);
 }
 

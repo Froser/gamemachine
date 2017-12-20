@@ -6,28 +6,31 @@
 
 #define GMEngine static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine())
 
-constexpr GMint GEOMETRY_NUM = (GMint)GBufferGeometryType::EndOfGeometryType;
-constexpr GMint MATERIAL_NUM = (GMint)GBufferMaterialType::EndOfMaterialType;
-
-Array<const char*, GEOMETRY_NUM> g_GBufferGeometryUniformNames =
+namespace
 {
-	"deferred_light_pass_gPosition",
-	"deferred_light_pass_gNormal_eye",
-	"deferred_light_pass_gTexAmbient",
-	"deferred_light_pass_gTexDiffuse",
-	"deferred_light_pass_gTangent_eye",
-	"deferred_light_pass_gBitangent_eye",
-	"deferred_light_pass_gNormalMap",
-};
+	constexpr GMint GEOMETRY_NUM = (GMint)GBufferGeometryType::EndOfGeometryType;
+	constexpr GMint MATERIAL_NUM = (GMint)GBufferMaterialType::EndOfMaterialType;
 
-Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
-{
-	"deferred_light_pass_gKa",
-	"deferred_light_pass_gKd",
-	"deferred_light_pass_gKs",
-	"deferred_light_pass_gShininess",
-	"deferred_light_pass_gHasNormalMap",
-};
+	Array<const char*, GEOMETRY_NUM> g_GBufferGeometryUniformNames =
+	{
+		"deferred_light_pass_gPosition",
+		"deferred_light_pass_gNormal",
+		"deferred_light_pass_gNormal_eye",
+		"deferred_light_pass_gTexAmbient",
+		"deferred_light_pass_gTexDiffuse",
+		"deferred_light_pass_gTangent_eye",
+		"deferred_light_pass_gBitangent_eye",
+		"deferred_light_pass_gNormalMap",
+	};
+
+	Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
+	{
+		"deferred_material_pass_gKa",
+		"deferred_material_pass_gKd",
+		"deferred_material_pass_gKs_gShininess", //gKs: 3, gShininess: 1
+		"deferred_material_pass_gHasNormalMap_gRefractivity", //gHasNormalMap: 1, gRefractivity: 1
+	};
+}
 
 GMGLGBuffer::~GMGLGBuffer()
 {
@@ -146,7 +149,7 @@ void GMGLGBuffer::newFrame()
 void GMGLGBuffer::activateTextures()
 {
 	D(d);
-	GMGLShaderProgram* shaderProgram = GMEngine->getShaderProgram();
+	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 
 	{
@@ -196,7 +199,7 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 	for (GMint i = 0; i < textureCount; i++)
 	{
 		glBindTexture(GL_TEXTURE_2D, textureArray[i]);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureArray[i], 0);

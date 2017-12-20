@@ -46,7 +46,6 @@ GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
 	return ModelType_End;
 }
 
-
 bool GMModelReader::load(const GMModelLoadSettings& settings, OUT GMModel** object)
 {
 	return load(settings, ModelType_AUTO, object);

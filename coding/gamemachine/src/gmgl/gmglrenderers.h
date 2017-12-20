@@ -19,7 +19,7 @@ class GMGLRenderer_3D : public GMObject, public IRenderer
 	DECLARE_PRIVATE(GMGLRenderer_3D)
 
 public:
-	GMGLRenderer_3D();
+	GMGLRenderer_3D() = default;
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
