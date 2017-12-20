@@ -45,8 +45,15 @@ public:
 	virtual void beginComponent(GMComponent* component) override;
 };
 
+GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
+{
+	const GMCubeMapGameObject* cubemap = nullptr;
+};
+
 class GMGLRenderer_CubeMap : public IRenderer
 {
+	DECLARE_PRIVATE(GMGLRenderer_CubeMap)
+
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;

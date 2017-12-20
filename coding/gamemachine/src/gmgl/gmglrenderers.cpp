@@ -9,6 +9,9 @@
 
 namespace
 {
+	// 定义一个足够安全的纹理单元
+	const GMint CubeMap_ActiveTexture = 31;
+
 	void applyShader(const GMShader& shader)
 	{
 		if (shader.getBlend())
@@ -310,6 +313,9 @@ void GMGLRenderer_2D::beginComponent(GMComponent* component)
 //////////////////////////////////////////////////////////////////////////
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
+	D(d);
+	d->cubemap = GMObject::gmobject_cast<const GMCubeMapGameObject*>(parent);
+
 	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 
@@ -322,11 +328,13 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 
 void GMGLRenderer_CubeMap::endModel()
 {
-
+	D(d);
+	d->cubemap = nullptr;
 }
 
 void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 {
+	D(d);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	GMTexture& texture = component->getShader().getTexture();
@@ -340,24 +348,24 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMap_ActiveTexture);
 		}
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMap_ActiveTexture);
 		}
 
 		// 给正向渲染程序传入CubeMap，一定要放在最后，因为CubeMap渲染本身是正向渲染
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, 9);
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMap_ActiveTexture);
 		}
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
-		glActiveTexture(GL_TEXTURE9);
+		glActiveTexture(GL_TEXTURE0 + CubeMap_ActiveTexture);
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR

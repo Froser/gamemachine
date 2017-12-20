@@ -121,8 +121,14 @@ private:
 	void createSkyBox(OUT GMModel** obj);
 };
 
+GM_PRIVATE_OBJECT(GMCubeMapGameObject)
+{
+	bool active = false;
+};
 class GMCubeMapGameObject : public GMGameObject
 {
+	DECLARE_PRIVATE_AND_BASE(GMCubeMapGameObject, GMGameObject)
+
 public:
 	GMCubeMapGameObject(ITexture* texture);
 	~GMCubeMapGameObject();
@@ -134,11 +140,13 @@ public:
 	  在立方体贴图对象被析构的时候，也会先调用此方法清除渲染环境中的立方体贴图。
 	*/
 	void deactivate();
+	bool isActive() const { D(d); return d->active; }
 
 private:
 	void createCubeMap(ITexture* texture);
 
 public:
+	virtual void draw() override;
 	virtual bool canDeferredRendering() override;
 };
 

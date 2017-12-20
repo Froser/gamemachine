@@ -92,7 +92,6 @@ class GMNotAGMObject {};
 #define GM_PRIVATE_OBJECT(name) class name; GM_ALIGNED_16(struct) name##Private : public gm::GMObjectPrivateBase<name>
 #define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
-#define GM_PRIVATE_CONSTRUCT(name) name##Private()
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
 #define GM_DECLARE_GETTER(name, memberName, paramType) \
@@ -290,6 +289,24 @@ public:
 	{
 #if _DEBUG
 		TargetType target = dynamic_cast<TargetType>(obj);
+		GM_ASSERT(target);
+		return target;
+#else
+		return static_cast<TargetType>(obj);
+#endif
+	}
+
+	//! 进行静态转换。
+	/*!
+	  如果是在调试模式下，将会返回dynamic_cast的结果。如果是在release模式下，将会返回静态转换的结果。
+	  \param obj 需要转换的对象。
+	  \return 转换后的对象。
+	*/
+	template <typename TargetType>
+	static const TargetType gmobject_cast(const GMObject* obj)
+	{
+#if _DEBUG
+		const TargetType target = dynamic_cast<TargetType>(obj);
 		GM_ASSERT(target);
 		return target;
 #else
