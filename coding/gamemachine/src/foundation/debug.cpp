@@ -124,6 +124,6 @@ void GMDebugger::debug(const char* format, ...)
 {
 	printA(format, debug);
 }
+#endif
 
 Map<size_t, void*> HookFactory::g_hooks;
-#endif
