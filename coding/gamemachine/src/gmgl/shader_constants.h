@@ -6,7 +6,7 @@
 
 BEGIN_NS
 
-#define		GMSHADER(memberName)			"GM_" memberName
+#define		GMSHADER(memberName)				"GM_" memberName
 
 //状态
 #define		GMSHADER_SHADER_TYPE				GMSHADER("shader_type")

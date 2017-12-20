@@ -3,6 +3,7 @@
 #include "gmdata/gmmodel.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "foundation/utilities/utilities.h"
+#include "foundation/gamemachine.h"
 
 #define RESERVED 4096
 #define INVALID -1
@@ -198,11 +199,20 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename)
 {
 	D(d);
-	GMString mtlPath = settings.modelName;
-	mtlPath.append("/");
-	mtlPath.append(mtlFilename);
+	GMString fn = settings.filename;
+	if (fn[fn.length() - 1] != '\\' &&
+		fn[fn.length() - 1] != '/')
+	{
+		fn.append("/");
+	}
+	fn.append(mtlFilename);
 	GMBuffer buffer;
-	settings.gamePackage.readFile(GMPackageIndex::Models, mtlPath, &buffer);
+
+	if (settings.type == GMModelPathType::Relative)
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, fn, &buffer);
+	else
+		GM.getGamePackageManager()->readFileFromPath(fn, &buffer);
+
 	buffer.convertToStringBuffer();
 	char line[LINE_MAX];
 	StringReader sr((char*)buffer.buffer);

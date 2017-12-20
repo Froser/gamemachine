@@ -695,11 +695,10 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		{
 			GMGamePackage& pk = *GM.getGamePackageManager();
 			GMString path = pk.pathOf(GMPackageIndex::Models, fn);
-			GMModelLoadSettings settings = {
-				pk,
-				path,
+			GMModelLoadSettings settings(
+				fn,
 				m->model
-			};
+			);
 
 			if (!GMModelReader::load(settings, &model))
 			{

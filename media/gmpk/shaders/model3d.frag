@@ -58,8 +58,11 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 
 	// refraction
 	{
-		vec3 R = refract(L, V, GM_material.refractivity);
-		g_model3d_refractionLight += texture(GM_cubemap, R).rgb;
+		// 使用世界坐标来计算反射
+		vec3 normal_world = normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz;
+		vec3 I = normalize(_model3d_position_world - GM_view_position).rgb;
+		vec3 R = refract(I, normal_world, GM_material.refractivity);
+		g_model3d_refractionLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
 	}
 }
 

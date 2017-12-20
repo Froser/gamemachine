@@ -2,6 +2,7 @@
 #include "gmmodelreader.h"
 #include "gmmodelreader_obj.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
+#include "foundation/gamemachine.h"
 
 class GMModelReaderContainer : public GMObject
 {
@@ -54,7 +55,10 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, OUT GMModel** obje
 bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT GMModel** object)
 {
 	GMBuffer buffer;
-	settings.gamePackage.readFileFromPath(settings.path, &buffer);
+	if (settings.type == GMModelPathType::Relative)
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Models, settings.filename, &buffer);
+	else
+		GM.getGamePackageManager()->readFileFromPath(settings.filename, &buffer);
 
 	if (type == ModelType_AUTO)
 		type = test(buffer);

@@ -117,8 +117,10 @@ class GMNotAGMObject {};
 
 #define GM_ALLOW_COPY_DATA(clsName) \
 	public: \
-	clsName(const clsName& o) { *this = o; } \
-	inline clsName& operator=(const clsName& o) { D(d); *d = *o.data(); return *this; }
+	clsName(const clsName& o) { copyData(o); } \
+	inline clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
+	void copyData(const clsName& another) { D(d); D_OF(d_another, &another); *d = *d_another; \
+		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); }
 
 enum class GMMetaMemberType
 {
@@ -267,6 +269,14 @@ public:
 	  \param eventName 需要触发的事件名。
 	*/
 	void emitEvent(GMEventName eventName);
+
+	//! 拷贝GMObject私有数据
+	/*!
+	  GMObject不允许拷贝其私有数据，因此是个空实现。
+	  但是，GMObject的子类可以使用GM_ALLOW_COPY_DATA宏，允许子类调用其copyData虚方法，依次拷贝私有数据。
+	  \param another 拷贝私有数据的目标对象，将目标对象的私有数据拷贝到此对象。
+	*/
+	void copyData(const GMObject& another) {}
 
 public:
 	//! 进行静态转换。

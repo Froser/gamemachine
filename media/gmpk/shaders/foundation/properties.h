@@ -1,3 +1,6 @@
+// 位置
+uniform vec4 GM_view_position;
+
 // 调试变量
 uniform int GM_debug_draw_normal;
 

@@ -48,11 +48,10 @@ void Demo_Model::init()
 	
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 
-	gm::GMModelLoadSettings loadSettings = {
-		pk,
-		pk.pathOf(gm::GMPackageIndex::Models, "baymax/baymax.obj"),
-		"baymax"
-	};
+	gm::GMModelLoadSettings loadSettings(
+		"cat/cat.obj",
+		"cat"
+	);
 
 	gm::GMModel* model = new gm::GMModel();
 	gm::GMModelReader::load(loadSettings, &model);
@@ -60,13 +59,15 @@ void Demo_Model::init()
 	for (auto& component : components)
 	{
 		component->getShader().getMaterial().refractivity = 0.658f;
+		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = glm::vec3(0);
 	}
 
 	// 交给GameWorld管理资源
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 
 	d->gameObject = new gm::GMGameObject(asset);
-	d->gameObject->setScaling(glm::scale(.005f, .005f, .005f));
+	d->gameObject->setTranslation(glm::translate(glm::vec3(0, .25f, 0)));
+	d->gameObject->setScaling(glm::scale(.015f, .015f, .015f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
 	d->skyObject = createCubeMap();
 	d->skyObject->setScaling(glm::scale(100, 100, 100));
