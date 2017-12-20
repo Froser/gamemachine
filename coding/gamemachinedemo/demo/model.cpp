@@ -25,7 +25,9 @@ Demo_Model::~Demo_Model()
 
 void Demo_Model::onDeactivate()
 {
+	D(d);
 	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+	d->skyObject->deactivate();
 	DemoHandler::onDeactivate();
 }
 

@@ -267,7 +267,13 @@ GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
 
 GMCubeMapGameObject::~GMCubeMapGameObject()
 {
+	deactivate();
 	GM_delete(getModel());
+}
+
+void GMCubeMapGameObject::deactivate()
+{
+
 }
 
 void GMCubeMapGameObject::createCubeMap(ITexture* texture)

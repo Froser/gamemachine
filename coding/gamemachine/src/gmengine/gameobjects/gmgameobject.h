@@ -121,12 +121,19 @@ private:
 	void createSkyBox(OUT GMModel** obj);
 };
 
-// GMCubeMapGameObject
 class GMCubeMapGameObject : public GMGameObject
 {
 public:
 	GMCubeMapGameObject(ITexture* texture);
 	~GMCubeMapGameObject();
+
+public:
+	//! 将立方体贴图从渲染中移除
+	/*!
+	  很多渲染效果都需要用到立方体贴图。因此，当不再使用天空盒时，一定要手动调用这个方法，清除渲染中的天空盒。否则基于立方体贴图的绘制将会产生问题。
+	  在立方体贴图对象被析构的时候，也会先调用此方法清除渲染环境中的立方体贴图。
+	*/
+	void deactivate();
 
 private:
 	void createCubeMap(ITexture* texture);
