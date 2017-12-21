@@ -2,7 +2,7 @@
 #define __BSP_H__
 #include <gmcommon.h>
 #include <string>
-#include <utilities.h>
+#include <tools.h>
 #include <linearmath.h>
 #include "gmbsp_surface_flags.h"
 BEGIN_NS

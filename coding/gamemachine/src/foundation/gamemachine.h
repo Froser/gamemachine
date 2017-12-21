@@ -1,7 +1,7 @@
 ﻿#ifndef __GAMEMACHINE_H__
 #define __GAMEMACHINE_H__
 #include <gmcommon.h>
-#include <utilities.h>
+#include <tools.h>
 #include <input.h>
 #include <gmassets.h>
 #include <gmglyphmanager.h>

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmcontrolgameobject.h"
-#include "foundation/utilities/gmprimitivecreator.h"
+#include "foundation/utilities/utilities.h"
 
 //////////////////////////////////////////////////////////////////////////
 GMControlEvent::GMControlEvent(GMControlEventType type, GMEventName eventName)

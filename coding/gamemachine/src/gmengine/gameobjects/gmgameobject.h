@@ -1,7 +1,7 @@
 ﻿#ifndef __GAMEOBJECT_H__
 #define __GAMEOBJECT_H__
 #include <gmcommon.h>
-#include <utilities.h>
+#include <tools.h>
 #include <gmmodel.h>
 #include <linearmath.h>
 

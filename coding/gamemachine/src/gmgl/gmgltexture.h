@@ -2,7 +2,7 @@
 #define __GMGL_TEXTURE_H__
 #include <gmcommon.h>
 #include <gmimage.h>
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "gmdata/gmmodel.h"
 #include <map>
 #include <string>

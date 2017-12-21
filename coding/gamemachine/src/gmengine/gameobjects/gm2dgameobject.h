@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 #include "gmassets.h"
 #include "gmcontrolgameobject.h"
-#include <gmprimitivecreator.h>
+#include <utilities.h>
 #include <input.h>
 BEGIN_NS
 

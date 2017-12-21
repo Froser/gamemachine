@@ -4,7 +4,7 @@
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
 
 BSPModelLoader::BSPModelLoader()

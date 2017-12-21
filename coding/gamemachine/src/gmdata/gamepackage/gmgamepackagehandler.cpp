@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include <fstream>
 #include "gmgamepackagehandler.h"
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
 
 #define PKD(d) GMGamePackage::Data* d = gamePackage()->gamePackageData();

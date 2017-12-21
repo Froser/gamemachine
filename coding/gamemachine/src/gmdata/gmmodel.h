@@ -1,7 +1,7 @@
 ﻿#ifndef __GMMODEL_H__
 #define __GMMODEL_H__
 #include <gmcommon.h>
-#include <utilities.h>
+#include <tools.h>
 #include <linearmath.h>
 #include <gmimage.h>
 #include <gmshader.h>

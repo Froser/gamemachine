@@ -2,7 +2,7 @@
 #include "gmmodelreader_obj.h"
 #include "gmdata/gmmodel.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "foundation/gamemachine.h"
 
 #define RESERVED 4096

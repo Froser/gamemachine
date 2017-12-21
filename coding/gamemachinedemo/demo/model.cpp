@@ -49,7 +49,6 @@ void Demo_Model::init()
 	d->demoWorld = new gm::GMDemoGameWorld();
 	
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
-
 	gm::GMModelLoadSettings loadSettings(
 		"cat/cat.obj",
 		"cat"
@@ -64,18 +63,39 @@ void Demo_Model::init()
 		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = glm::vec3(0);
 	}
 
-	// 交给GameWorld管理资源
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
-
 	d->gameObject = new gm::GMGameObject(asset);
-	d->gameObject->setTranslation(glm::translate(glm::vec3(0, .25f, 0)));
+	d->gameObject->setTranslation(glm::translate(glm::vec3(0.2f, .25f, 0)));
 	d->gameObject->setScaling(glm::scale(.015f, .015f, .015f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+
+	// 创建一个Cube
+	gm::GMModel* cube = nullptr;
+	gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
+	auto& cubeComponents = cube->getMesh()->getComponents();
+	for (auto& component : cubeComponents)
+	{
+		component->getShader().getMaterial().refractivity = 0.658f;
+		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = glm::vec3(0);
+
+		gm::ITexture* texture = nullptr;
+		gm::GMShader& shader = component->getShader();
+		gm::GMTextureUtil::createTexture("bnp.png", &texture);
+		gm::GMTextureUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
+	}
+
+	asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+	d->gameObject2 = new gm::GMGameObject(asset);
+	d->gameObject2->setTranslation(glm::translate(glm::vec3(-0.2f, .25f, 0)));
+	d->gameObject2->setScaling(glm::scale(.1f, .1f, .1f));
+	d->gameObject2->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+
 	d->skyObject = createCubeMap();
 	d->skyObject->setScaling(glm::scale(100, 100, 100));
 
-	d->demoWorld->addObject("sky", d->skyObject);
 	d->demoWorld->addObject("baymax", d->gameObject);
+	d->demoWorld->addObject("cube", d->gameObject2);
+	d->demoWorld->addObject("sky", d->skyObject);
 }
 
 void Demo_Model::handleMouseEvent()
@@ -92,9 +112,16 @@ void Demo_Model::handleMouseEvent()
 			scaling[0] += delta;
 			scaling[1] += delta;
 			scaling[2] += delta;
-
 			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
 				d->gameObject->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+
+			glm::getScalingFromMatrix(d->gameObject2->getScaling(), scaling);
+			d->gameObject2->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+			scaling[0] += delta * 1.2f;
+			scaling[1] += delta * 1.2f;
+			scaling[2] += delta * 1.2f;
+			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
+				d->gameObject2->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
 		}
 	}
 
@@ -192,6 +219,7 @@ void Demo_Model::handleDragging()
 			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
 			glm::vec3(0, 1, 0));
 		d->gameObject->setRotation(q);
+		d->gameObject2->setRotation(q);
 
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;

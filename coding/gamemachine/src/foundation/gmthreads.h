@@ -1,7 +1,7 @@
 ﻿#ifndef __GMTHREADS_H__
 #define __GMTHREADS_H__
 #include <gmcommon.h>
-#include "utilities/utilities.h"
+#include "utilities/tools.h"
 #include <mutex>
 
 #if !_MSC_VER

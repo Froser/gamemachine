@@ -1,7 +1,7 @@
 ﻿#ifndef __GAMEPACKAGE_H__
 #define __GAMEPACKAGE_H__
 #include <gmcommon.h>
-#include <utilities.h>
+#include <tools.h>
 #include <gmthreads.h>
 BEGIN_NS
 

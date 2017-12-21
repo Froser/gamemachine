@@ -2,7 +2,7 @@
 #include "gmparticles.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmthreads.h"
-#include "foundation/utilities/gmprimitivecreator.h"
+#include "foundation/utilities/utilities.h"
 #include "gmengine/gmgameworld.h"
 
 GMParticleGameObject::GMParticleGameObject(AUTORELEASE GMModel* prototype)

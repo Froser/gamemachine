@@ -1,7 +1,7 @@
 ﻿#ifndef __GMCAMERA_H__
 #define __GMCAMERA_H__
 #include <gmcommon.h>
-#include <utilities.h>
+#include <tools.h>
 BEGIN_NS
 
 //Camera

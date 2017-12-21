@@ -2,7 +2,7 @@
 #include "gmbsp_shader_loader.h"
 #include "foundation/vector.h"
 #include <string>
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "foundation/utilities/tinyxml/tinyxml.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include "gmdata/imagereader/gmimagereader.h"

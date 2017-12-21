@@ -1,442 +1,288 @@
 ﻿#include "stdafx.h"
 #include "utilities.h"
-#include <linearmath.h>
-#include "assert.h"
-#include "foundation/vector.h"
+#include "foundation/gamemachine.h"
 
-//GMClock
-GMClock::GMClock()
+GMfloat* GMPrimitiveCreator::unitExtents()
 {
-	D(d);
-	d->fps = 0;
-	d->timeScale = 1.f;
+	static GMfloat o[3] = { 1, 1, 1 };
+	return o;
 }
 
-void GMClock::setTimeScale(GMfloat s)
+GMfloat* GMPrimitiveCreator::origin()
 {
-	D(d);
-	d->timeScale = s;
+	static GMfloat o[3] = { 0 };
+	return o;
 }
 
-void GMClock::setPaused(bool b)
+void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type)
 {
-	D(d);
-	d->paused = b;
-}
+	static constexpr GMfloat v[24] = {
+		1, -1, 1,
+		1, -1, -1,
+		-1, -1, 1,
+		-1, -1, -1,
+		1, 1, 1,
+		1, 1, -1,
+		-1, 1, 1,
+		-1, 1, -1,
+	};
+	static constexpr GMint indices[] = {
+		0, 2, 1,
+		2, 3, 1,
+		4, 5, 6,
+		6, 5, 7,
+		0, 1, 4,
+		1, 5, 4,
+		2, 6, 3,
+		3, 6, 7,
+		0, 4, 2,
+		2, 4, 6,
+		1, 3, 5,
+		3, 7, 5,
+	};
 
-void GMClock::begin()
-{
-	D(d);
-	d->timeCycles = 0;
-	d->paused = false;
-	d->frequency = highResolutionTimerFrequency();
-	d->begin = highResolutionTimer();
-	d->frameCount = 0;
-	d->lastCycle = 0;
-	d->deltaCycles = 0;
-}
+	GMModel* model = new GMModel();
 
-// 每一帧运行一次update
-void GMClock::update()
-{
-	D(d);
-	d->end = highResolutionTimer();
-	GMLargeInteger delta = d->end - d->begin;
-
-	if (!d->paused)
+	// 实体
+	GMfloat t[24];
+	for (GMint i = 0; i < 24; i++)
 	{
-		d->deltaCycles = delta * d->timeScale;
-		d->timeCycles += d->deltaCycles;
-	}
-	else
-	{
-		d->deltaCycles = 0;
+		t[i] = extents[i % 3] * v[i];
 	}
 
-	++d->frameCount;
-	GMLargeInteger deltaFrameCycle = d->end - d->lastCycle;
-	if (deltaFrameCycle > d->frequency)
 	{
-		d->fps = d->frameCount / cycleToSecond(deltaFrameCycle);
-		d->frameCount = 0;
-		d->lastCycle = d->end;
-	}
+		model->setType(type);
+		GMMesh* body = model->getMesh();
+		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
-	d->begin = d->end;
-}
+		GMComponent* component = new GMComponent(body);
 
-GMfloat GMClock::elapsedFromStart()
-{
-	D(d);
-	GMLargeInteger now = highResolutionTimer();
-	return cycleToSecond(now - d->begin);
-}
-
-GMfloat GMClock::getFps()
-{
-	D(d);
-	return d->fps;
-}
-
-GMfloat GMClock::getTime()
-{
-	D(d);
-	return cycleToSecond(d->timeCycles);
-}
-
-GMfloat GMClock::evaluateDeltaTime()
-{
-	D(d);
-	return cycleToSecond(d->deltaCycles);
-}
-
-// platforms/[os]/timer.cpp
-extern "C" GMLargeInteger highResolutionTimerFrequency();
-extern "C" GMLargeInteger highResolutionTimer();
-
-GMLargeInteger GMClock::highResolutionTimerFrequency()
-{
-	return ::highResolutionTimerFrequency();
-}
-
-GMLargeInteger GMClock::highResolutionTimer()
-{
-	return ::highResolutionTimer();
-}
-
-GMfloat GMClock::cycleToSecond(GMLargeInteger cycle)
-{
-	D(d);
-	return cycle / (GMfloat)d->frequency;
-}
-
-//GMStopwatch
-GMStopwatch::GMStopwatch()
-{
-	D(d);
-	d->frequency = GMClock::highResolutionTimerFrequency();
-	d->start = 0;
-	d->end = 0;
-}
-
-void GMStopwatch::start()
-{
-	D(d);
-	d->start = GMClock::highResolutionTimer();
-}
-
-void GMStopwatch::stop()
-{
-	D(d);
-	d->end = GMClock::highResolutionTimer();
-}
-
-GMfloat GMStopwatch::timeInSecond()
-{
-	D(d);
-	return timeInCycle() / (GMfloat)d->frequency;
-}
-
-GMLargeInteger GMStopwatch::timeInCycle()
-{
-	D(d);
-	return d->end - d->start;
-}
-
-GMfloat GMStopwatch::nowInSecond()
-{
-	D(d);
-	return nowInCycle() / (GMfloat)d->frequency;
-}
-
-GMLargeInteger GMStopwatch::nowInCycle()
-{
-	D(d);
-	auto now = GMClock::highResolutionTimer();
-	return now - d->start;
-}
-
-//Plane
-#define EPSILON 0.01f
-
-void GMPlane::setFromPoints(const glm::vec3 & p0, const glm::vec3 & p1, const glm::vec3 & p2)
-{
-	normal = glm::cross((p1 - p0), (p2 - p0));
-	normal = glm::fastNormalize(normal);
-	calculateIntercept(p0);
-}
-
-void GMPlane::normalize()
-{
-	GMfloat normalLength = normal.length();
-	normal /= normalLength;
-	intercept /= normalLength;
-}
-
-bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, glm::vec3 & result)//find point of intersection of 3 planes
-{
-	GMfloat denominator = glm::dot(normal, (glm::cross(p2.normal, p3.normal)));
-	//scalar triple product of normals
-	if (denominator == 0.0f)									//if zero
-		return false;										//no intersection
-
-	glm::vec3 temp1, temp2, temp3;
-	temp1 = (glm::cross(p2.normal, p3.normal))*intercept;
-	temp2 = (glm::cross(p3.normal, normal))*p2.intercept;
-	temp3 = (glm::cross(normal, p2.normal))*p3.intercept;
-
-	result = (temp1 + temp2 + temp3) / (-denominator);
-
-	return true;
-}
-
-GMfloat GMPlane::getDistance(const glm::vec3 & point) const
-{
-	return glm::dot(point, normal) + intercept;
-}
-
-PointPosition GMPlane::classifyPoint(const glm::vec3 & point) const
-{
-	GMfloat distance = getDistance(point);
-
-	if (distance > EPSILON)	//==0.0f is too exact, give a bit of room
-		return POINT_IN_FRONT_OF_PLANE;
-
-	if (distance < -EPSILON)
-		return POINT_BEHIND_PLANE;
-
-	return POINT_ON_PLANE;	//otherwise
-}
-
-GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)
-{
-	GMPlane result;
-	result.normal = normal*(1.0f - factor) + p2.normal*factor;
-	result.normal = glm::fastNormalize(result.normal);
-
-	result.intercept = intercept*(1.0f - factor) + p2.intercept*factor;
-
-	return result;
-}
-
-bool GMPlane::operator ==(const GMPlane & rhs) const
-{
-	if ((normal == rhs.normal) && (intercept == rhs.intercept))
-		return true;
-
-	return false;
-}
-
-//Scanner
-static bool isWhiteSpace(char c)
-{
-	return !!isspace(c);
-}
-
-Scanner::Scanner(const char* line)
-{
-	D(d);
-	d->p = line;
-	d->predicate = isWhiteSpace;
-	d->skipSame = true;
-	d->valid = !!d->p;
-}
-
-Scanner::Scanner(const char* line, CharPredicate predicate)
-{
-	D(d);
-	d->p = line;
-	d->predicate = predicate;
-	d->skipSame = true;
-	d->valid = !!d->p;
-}
-
-Scanner::Scanner(const char* line, bool skipSame, CharPredicate predicate)
-{
-	D(d);
-	d->p = line;
-	d->predicate = predicate;
-	d->skipSame = skipSame;
-	d->valid = !!d->p;
-}
-
-void Scanner::next(char* out)
-{
-	D(d);
-	if (!d->valid)
-	{
-		strcpy_s(out, 1, "");
-		return;
-	}
-
-	char* p = out;
-	bool b = false;
-	if (!d->p)
-	{
-		strcpy_s(out, 1, "");
-		return;
-	}
-
-	while (*d->p && d->predicate(*d->p))
-	{
-		if (b && !d->skipSame)
+		for (GMint i = 0; i < 12; i++)
 		{
-			*p = 0;
-			d->p++;
-			return;
+			component->beginFace();
+			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			{
+				GMint idx = i * 3 + j; //顶点的开始
+				GMint idx_next = i * 3 + (j + 1) % 3;
+				GMint idx_prev = i * 3 + (j + 2) % 3;
+				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
+				glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = glm::fastNormalize(normal);
+
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+				component->color(1.f, 1.f, 1.f);
+			}
+			component->endFace();
 		}
-		d->p++;
-		b = true;
+		if (shaderCallback)
+			shaderCallback->onCreateShader(component->getShader());
 	}
 
-	if (!*d->p)
+	*obj = model;
+}
+
+void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
+{
+	static constexpr GMfloat v_anchor_center[] = {
+		-1, 1, 0,
+		-1, -1, 0,
+		1, -1, 0,
+		1, 1, 0,
+	};
+
+	const GMfloat(*_customUV)[12] = customUV ? customUV : &v_anchor_center;
+	const GMfloat(&uvArr)[12] = *_customUV;
+
+	static constexpr GMfloat v_anchor_top_left[] = {
+		0, 0, 0,
+		0, -2, 0,
+		2, -2, 0,
+		2, 0, 0,
+	};
+
+	const GMfloat(&v)[12] = (anchor == TopLeft) ? v_anchor_top_left : v_anchor_center;
+
+	static constexpr GMint indices[] = {
+		0, 1, 3,
+		2, 3, 1,
+	};
+
+	GMModel* model = new GMModel();
+
+	// 实体
+	GMfloat t[12];
+	for (GMint i = 0; i < 12; i++)
 	{
-		*p = 0;
-		return;
+		t[i] = extents[i % 3] * v[i] + position[i % 3];
 	}
 
-	do
 	{
-		*p = *d->p;
-		p++;
-		d->p++;
-	} while (*d->p && !d->predicate(*d->p));
+		model->setType(type);
+		GMMesh* body = model->getMesh();
+		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
-	*p = 0;
-}
+		GMComponent* component = new GMComponent(body);
+		for (GMint i = 0; i < 2; i++)
+		{
+			component->beginFace();
+			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			{
+				GMint idx = i * 3 + j; //顶点的开始
+				GMint idx_next = i * 3 + (j + 1) % 3;
+				GMint idx_prev = i * 3 + (j + 2) % 3;
+				glm::vec2 uv(uvArr[indices[idx] * 3], uvArr[indices[idx] * 3 + 1]);
+				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
+				glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = glm::fastNormalize(normal);
 
-void Scanner::nextToTheEnd(char* out)
-{
-	D(d);
-	if (!d->valid)
-		return;
-
-	char* p = out;
-	while (*d->p)
-	{
-		d->p++;
-		*p = *d->p;
-		p++;
-	}
-}
-
-bool Scanner::nextFloat(GMfloat* out)
-{
-	D(d);
-	if (!d->valid)
-		return false;
-
-	char command[LINE_MAX];
-	next(command);
-	if (!strlen(command))
-		return false;
-	SAFE_SSCANF(command, "%f", out);
-	return true;
-}
-
-bool Scanner::nextInt(GMint* out)
-{
-	D(d);
-	if (!d->valid)
-		return false;
-
-	char command[LINE_MAX];
-	next(command);
-	if (!strlen(command))
-		return false;
-	SAFE_SSCANF(command, "%i", out);
-	return true;
-}
-
-//MemoryStream
-
-GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMuint size)
-{
-	D(d);
-	d->start = buffer;
-	d->size = size;
-	d->ptr = buffer;
-	d->end = d->start + d->size;
-}
-
-GMuint GMMemoryStream::read(GMbyte* buf, GMuint size)
-{
-	D(d);
-	if (d->ptr >= d->end)
-		return 0;
-
-	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
-	memcpy(buf, d->ptr, realSize);
-	d->ptr += realSize;
-	return realSize;
-}
-
-GMuint GMMemoryStream::peek(GMbyte* buf, GMuint size)
-{
-	D(d);
-	if (d->ptr >= d->end)
-		return 0;
-
-	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
-	memcpy(buf, d->ptr, realSize);
-	return realSize;
-}
-
-void GMMemoryStream::rewind()
-{
-	D(d);
-	d->ptr = d->start;
-}
-
-GMuint GMMemoryStream::size()
-{
-	D(d);
-	return d->size;
-}
-
-GMuint GMMemoryStream::tell()
-{
-	D(d);
-	return d->ptr - d->start;
-}
-
-GMbyte GMMemoryStream::get()
-{
-	GMbyte c;
-	read(&c, 1);
-	return c;
-}
-
-void GMMemoryStream::seek(GMuint cnt, SeekMode mode)
-{
-	D(d);
-	if (mode == GMMemoryStream::FromStart)
-		d->ptr = d->start + cnt;
-	else if (mode == GMMemoryStream::FromNow)
-		d->ptr += cnt;
-	else
-		GM_ASSERT(false);
-}
-
-//Bitset
-bool Bitset::init(GMint numberOfBits)
-{
-	D(d);
-	//Delete any memory allocated to bits
-	GM_delete_array(d->bits);
-
-	//Calculate size
-	d->numBytes = (numberOfBits >> 3) + 1;
-
-	//Create memory
-	d->bits = new unsigned char[d->numBytes];
-	if (!d->bits)
-	{
-		gm_error(_L("Unable to allocate space for a Bitset of %d bits"), numberOfBits);
-		return false;
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+				if (customUV)
+					component->uv(uv[0], uv[1]);
+				else
+					component->uv((uv[0] + 1) / 2, (uv[1] + 1) / 2);
+				component->color(1.f, 1.f, 1.f);
+			}
+			component->endFace();
+		}
+		if (shaderCallback)
+			shaderCallback->onCreateShader(component->getShader());
 	}
 
-	clearAll();
+	*obj = model;
+}
 
-	return true;
+void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMfloat(*customUV)[8])
+{
+	static constexpr GMfloat defaultUV[] = {
+		-1, 1,
+		-1, -1,
+		1, -1,
+		1, 1,
+	};
+
+	const GMfloat(*_pos)[12] = (GMfloat(*)[12])(position);
+	const GMfloat(*_uv)[8] = customUV ? customUV : (GMfloat(*)[8])defaultUV;
+	const GMfloat(&uvArr)[8] = *_uv;
+	const GMfloat(&v)[12] = *_pos;
+
+	static constexpr GMint indices[] = {
+		0, 1, 3,
+		2, 3, 1,
+	};
+
+	GMModel* model = new GMModel();
+
+	// 实体
+	GMfloat t[12];
+	for (GMint i = 0; i < 12; i++)
+	{
+		t[i] = extents[i % 3] * v[i];
+	}
+
+	{
+		model->setType(type);
+		GMMesh* body = model->getMesh();
+		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+
+		GMComponent* component = new GMComponent(body);
+		for (GMint i = 0; i < 2; i++)
+		{
+			component->beginFace();
+			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			{
+				GMint idx = i * 3 + j; //顶点的开始
+				GMint idx_next = i * 3 + (j + 1) % 3;
+				GMint idx_prev = i * 3 + (j + 2) % 3;
+				glm::vec2 uv(uvArr[indices[idx] * 2], uvArr[indices[idx] * 2 + 1]);
+				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
+				glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
+				normal = glm::fastNormalize(normal);
+
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+				if (customUV)
+					component->uv(uv[0], uv[1]);
+				else
+					component->uv((uv[0] + 1) / 2, (uv[1] + 1) / 2);
+				component->color(1.f, 1.f, 1.f);
+			}
+			component->endFace();
+		}
+		if (shaderCallback)
+			shaderCallback->onCreateShader(component->getShader());
+	}
+
+	*obj = model;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+void GMPrimitiveUtil::translateModelTo(REF GMModel& model, const GMfloat(&trans)[3])
+{
+	GMModelPainter* painter = model.getPainter();
+	GMMesh* mesh = model.getMesh();
+	painter->beginUpdateBuffer(mesh);
+	GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
+	GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
+
+	// 计算首个偏移
+	GMfloat* first = buffer;
+	GMfloat delta[] = {
+		trans[0] - first[0],
+		trans[1] - first[1],
+		trans[2] - first[2]
+	};
+
+	for (GMint v = 0; v < vertexCount; ++v)
+	{
+		GMfloat* ptr = buffer + v * GMModel::PositionDimension;
+		ptr[0] += delta[0];
+		ptr[1] += delta[1];
+		ptr[2] += delta[2];
+	}
+	painter->endUpdateBuffer();
+}
+
+void GMPrimitiveUtil::scaleModel(REF GMModel& model, const GMfloat (&scaling)[3])
+{
+	GMModelPainter* painter = model.getPainter();
+	GMMesh* mesh = model.getMesh();
+	painter->beginUpdateBuffer(mesh);
+	GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
+	GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
+	for (GMint v = 0; v < vertexCount; ++v)
+	{
+		GMfloat* ptr = buffer + v * GMModel::PositionDimension;
+		ptr[0] *= scaling[0];
+		ptr[1] *= scaling[1];
+		ptr[2] *= scaling[2];
+	}
+	painter->endUpdateBuffer();
+}
+
+void GMTextureUtil::createTexture(const GMString& filename, ITexture** texture)
+{
+	gm::GMImage* img = nullptr;
+	gm::GMBuffer buf;
+	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, filename, &buf);
+	gm::GMImageReader::load(buf.buffer, buf.size, &img);
+	GM_ASSERT(img);
+
+	GM.getFactory()->createTexture(img, texture);
+	GM_ASSERT(texture);
+	gm::GM_delete(img);
+}
+
+void GMTextureUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type)
+{
+	auto& frames = shader.getTexture().getTextureFrames(type, 0);
+	frames.addFrame(texture);
 }

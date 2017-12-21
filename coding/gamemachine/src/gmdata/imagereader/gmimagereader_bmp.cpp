@@ -2,7 +2,7 @@
 #include "gmimagereader_bmp.h"
 #include <sstream>
 #include <gmimage.h>
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 
 #if _WINDOWS
 #include <wtypes.h>

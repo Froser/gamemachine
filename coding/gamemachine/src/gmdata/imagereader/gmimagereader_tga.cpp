@@ -4,7 +4,7 @@
 #include <time.h>
 #include <math.h>
 #include "gmimagereader_tga.h"
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include <fstream>
 
 bool endsWith(const std::string& str, const std::string& substr)

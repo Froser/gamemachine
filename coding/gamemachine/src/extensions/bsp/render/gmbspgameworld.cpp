@@ -2,7 +2,7 @@
 #include "gmbspgameworld.h"
 #include "gmengine/gmassets.h"
 #include "gmdata/imagereader/gmimagereader.h"
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "gmdata/gmimagebuffer.h"
 #include "extensions/bsp/data/gmbsp_shader_loader.h"
 #include "gmdata/gamepackage/gmgamepackage.h"

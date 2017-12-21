@@ -34,30 +34,11 @@ void Demo_NormalMap::init()
 			shader.getMaterial().shininess = 20;
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
-			auto& container = world->getAssets();
-
-			gm::GMImage* img = nullptr;
-			gm::GMBuffer buf;
-			pk->readFile(gm::GMPackageIndex::Textures, "bnp.png", &buf);
-			gm::GMImageReader::load(buf.buffer, buf.size, &img);
-			GM_ASSERT(img);
-
 			gm::ITexture* tex = nullptr;
-			GM.getFactory()->createTexture(img, &tex);
-			GM_ASSERT(tex);
-			// 不要忘记释放img
-			gm::GM_delete(img);
-
+			gm::GMTextureUtil::createTexture("bnp.png", &tex);
+			gm::GMTextureUtil::addTextureToShader(shader, tex, gm::GMTextureType::NORMALMAP);
+			gm::GMTextureUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
-			{
-				auto& frames = shader.getTexture().getTextureFrames(gm::GMTextureType::NORMALMAP, 0);
-				frames.addFrame(tex);
-			}
-
-			{
-				auto& frames = shader.getTexture().getTextureFrames(gm::GMTextureType::DIFFUSE, 0);
-				frames.addFrame(tex);
-			}
 		}
 	} cb(d->demoWorld);
 

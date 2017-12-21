@@ -5,7 +5,7 @@
 #include "foundation/defines.h"
 #include "gmbsp.h"
 #include <stdio.h>
-#include "foundation/utilities/utilities.h"
+#include "foundation/utilities/tools.h"
 #include "gmdata/gamepackage/gmgamepackage.h"
 #include <linearmath.h>
 
