@@ -360,6 +360,14 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 		updateView();
 		break;
 	}
+	case GMUpdateDataType::TurnOffCubeMap:
+	{
+		GM_BEGIN_CHECK_GL_ERROR
+		glActiveTexture(GL_TEXTURE0 + CubeMapActiveTexture);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+		GM_END_CHECK_GL_ERROR
+		break;
+	}
 	default:
 		GM_ASSERT(false);
 		break;

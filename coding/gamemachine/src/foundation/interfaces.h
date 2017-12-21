@@ -86,6 +86,7 @@ enum class GMUpdateDataType
 {
 	ProjectionMatrix,
 	ViewMatrix,
+	TurnOffCubeMap,
 };
 
 //! 当前装载的着色器类型

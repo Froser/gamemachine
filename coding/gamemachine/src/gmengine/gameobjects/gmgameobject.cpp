@@ -273,8 +273,7 @@ GMCubeMapGameObject::~GMCubeMapGameObject()
 
 void GMCubeMapGameObject::deactivate()
 {
-	D(d);
-	d->active = false;
+	GM.getGraphicEngine()->update(GMUpdateDataType::TurnOffCubeMap);
 }
 
 void GMCubeMapGameObject::createCubeMap(ITexture* texture)
@@ -353,13 +352,6 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 	}
 
 	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
-}
-
-void GMCubeMapGameObject::draw()
-{
-	D(d);
-	d->active = true;
-	GMGameObject::draw();
 }
 
 bool GMCubeMapGameObject::canDeferredRendering()

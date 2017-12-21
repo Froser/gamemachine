@@ -9,9 +9,6 @@
 
 namespace
 {
-	// 定义一个足够安全的纹理单元
-	const GMint CubeMap_ActiveTexture = 31;
-
 	void applyShader(const GMShader& shader)
 	{
 		if (shader.getBlend())
@@ -348,24 +345,24 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMap_ActiveTexture);
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMapActiveTexture);
 		}
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMap_ActiveTexture);
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMapActiveTexture);
 		}
 
 		// 给正向渲染程序传入CubeMap，一定要放在最后，因为CubeMap渲染本身是正向渲染
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMap_ActiveTexture);
+			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMapActiveTexture);
 		}
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
-		glActiveTexture(GL_TEXTURE0 + CubeMap_ActiveTexture);
+		glActiveTexture(GL_TEXTURE0 + CubeMapActiveTexture);
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR

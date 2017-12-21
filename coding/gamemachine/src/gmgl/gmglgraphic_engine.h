@@ -31,6 +31,11 @@ struct GMShaderProc
 #define GM_BEGIN_CHECK_GL_ERROR { GM_CHECK_GL_ERROR()
 #define GM_END_CHECK_GL_ERROR GM_CHECK_GL_ERROR() }
 
+enum
+{
+	CubeMapActiveTexture = 31 //!< 足够安全的纹理单元，用于存放纹理，对应GL_TEXTURE31
+};
+
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual void onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
