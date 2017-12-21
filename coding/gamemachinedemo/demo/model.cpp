@@ -65,36 +65,62 @@ void Demo_Model::init()
 
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	d->gameObject = new gm::GMGameObject(asset);
-	d->gameObject->setTranslation(glm::translate(glm::vec3(0.2f, .25f, 0)));
+	d->gameObject->setTranslation(glm::translate(glm::vec3(0.f, .25f, 0)));
 	d->gameObject->setScaling(glm::scale(.015f, .015f, .015f));
 	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
 
-	// 创建一个Cube
-	gm::GMModel* cube = nullptr;
-	gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
-	auto& cubeComponents = cube->getMesh()->getComponents();
-	for (auto& component : cubeComponents)
+	// 创建2个Cube，一个有NormalMap，一个无
 	{
-		component->getShader().getMaterial().refractivity = 0.658f;
-		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = glm::vec3(0);
-
+		gm::GMModel* cube = nullptr;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
+		auto& cubeComponents = cube->getMesh()->getComponents();
 		gm::ITexture* texture = nullptr;
-		gm::GMShader& shader = component->getShader();
 		gm::GMTextureUtil::createTexture("bnp.png", &texture);
-		gm::GMTextureUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
-	}
+		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
-	asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
-	d->gameObject2 = new gm::GMGameObject(asset);
-	d->gameObject2->setTranslation(glm::translate(glm::vec3(-0.2f, .25f, 0)));
-	d->gameObject2->setScaling(glm::scale(.1f, .1f, .1f));
-	d->gameObject2->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+		for (auto& component : cubeComponents)
+		{
+			gm::GMShader& shader = component->getShader();
+			shader.getMaterial().refractivity = 0.658f;
+			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = glm::vec3(0);
+
+			gm::GMTextureUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
+		}
+
+		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		d->gameObject2 = new gm::GMGameObject(asset);
+		d->gameObject2->setTranslation(glm::translate(glm::vec3(-0.25f, .25f, 0)));
+		d->gameObject2->setScaling(glm::scale(.1f, .1f, .1f));
+		d->gameObject2->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+	}
+	{
+		gm::GMModel* cube = nullptr;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
+		auto& cubeComponents = cube->getMesh()->getComponents();
+		gm::ITexture* texture = nullptr;
+		gm::GMTextureUtil::createTexture("cube_np.png", &texture);
+		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+
+		for (auto& component : cubeComponents)
+		{
+			gm::GMShader& shader = component->getShader();
+			shader.getMaterial().refractivity = 0.658f;
+			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = glm::vec3(0);
+		}
+
+		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		d->gameObject3 = new gm::GMGameObject(asset);
+		d->gameObject3->setTranslation(glm::translate(glm::vec3(0.25f, .25f, 0)));
+		d->gameObject3->setScaling(glm::scale(.1f, .1f, .1f));
+		d->gameObject3->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+	}
 
 	d->skyObject = createCubeMap();
 	d->skyObject->setScaling(glm::scale(100, 100, 100));
 
 	d->demoWorld->addObject("baymax", d->gameObject);
 	d->demoWorld->addObject("cube", d->gameObject2);
+	d->demoWorld->addObject("cube_with_normalmap", d->gameObject3);
 	d->demoWorld->addObject("sky", d->skyObject);
 }
 
@@ -121,7 +147,10 @@ void Demo_Model::handleMouseEvent()
 			scaling[1] += delta * 1.2f;
 			scaling[2] += delta * 1.2f;
 			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
+			{
 				d->gameObject2->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+				d->gameObject3->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+			}
 		}
 	}
 
@@ -220,6 +249,7 @@ void Demo_Model::handleDragging()
 			glm::vec3(0, 1, 0));
 		d->gameObject->setRotation(q);
 		d->gameObject2->setRotation(q);
+		d->gameObject3->setRotation(q);
 
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
@@ -303,6 +333,15 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 		{
 			if (kbState.keyTriggered('1' + (gm::GMint)i))
 				GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, (gm::GMint)i + 1);
+		}
+		if (kbState.keyTriggered('S'))
+		{
+			if (d->gameObject2 && d->gameObject3)
+			{
+				glm::mat4 t = d->gameObject2->getTranslation();
+				d->gameObject2->setTranslation(d->gameObject3->getTranslation());
+				d->gameObject3->setTranslation(t);
+			}
 		}
 		break;
 	}

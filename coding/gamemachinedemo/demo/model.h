@@ -10,6 +10,7 @@ GM_PRIVATE_OBJECT(Demo_Model)
 	gm::GMDemoGameWorld* demoWorld = nullptr;
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
+	gm::GMGameObject* gameObject3 = nullptr;
 	gm::GMCubeMapGameObject* skyObject = nullptr;
 	gm::GMint mouseDownX;
 	gm::GMint mouseDownY;

@@ -125,15 +125,15 @@ GM_INTERFACE(IGraphicEngine)
 
 	//! 刷新帧缓存，新建一帧。
 	/*!
-	  此方法保证默认帧缓存将会被清空，但是并不保证其他帧缓存（如G缓存）被清空。
-	  如果要清空其它帧缓存，应该调用需要清除的帧缓存的响应方法。
+	  此方法保证默认帧缓存将会被清空，但是并不保证其他帧缓存（如G缓存）被清空。<BR>
+	  如果要清空其它帧缓存，应该调用需要清除的帧缓存的响应方法。<BR>
 	  此方法将会清除默认帧缓存中的颜色缓存、深度缓存和模板缓存。
 	*/
 	virtual void newFrame() = 0;
 
 	//! 处理GameMachine消息。
 	/*!
-	  当GameMachine在处理完系统消息之后，此方法将会被调用。
+	  当GameMachine在处理完系统消息之后，此方法将会被调用。<BR>
 	  通常用此方法处理一些特殊事件，如窗口大小变化时，需要重新分配帧缓存、G缓存等。
 	  \param e GameMachine消息
 	  \return 如果此事件被处理，返回true，否则返回false。
@@ -160,7 +160,7 @@ GM_INTERFACE(IGraphicEngine)
 
 	//! 增加一个光源。
 	/*!
-	  将一个光源添加到全局绘制引擎中。
+	  将一个光源添加到全局绘制引擎中。<BR>
 	  光源的表现行为与着色器程序有关，有些图元可能不会使用到光源，有些图元则可能会。
 	  \param light 需要添加的光源。
 	*/
@@ -174,14 +174,14 @@ GM_INTERFACE(IGraphicEngine)
 
 	//! 清除当前激活帧缓存下的模板缓存。
 	/*!
-	  如果当前激活缓存是默认帧缓存，则清除默认帧缓存中的模板缓存。
+	  如果当前激活缓存是默认帧缓存，则清除默认帧缓存中的模板缓存。<BR>
 	  如果当前激活的是其它帧缓存（如G缓存等），则清除它的模板缓存。
 	*/
 	virtual void clearStencil() = 0;
 
 	//! 开始创建模板缓存。
 	/*!
-	  在当前激活帧缓存下创建模板缓存。
+	  在当前激活帧缓存下创建模板缓存。<BR>
 	  在此方法被执行后，所有的绘制将会被写入进被激活的帧缓存的模板缓存中。
 	  \sa endCreateStencil()
 	*/
@@ -189,7 +189,7 @@ GM_INTERFACE(IGraphicEngine)
 
 	//! 结束创建模板缓存。
 	/*!
-	  结束模板缓存的创建。
+	  结束模板缓存的创建。<BR>
 	  在此方法被执行后，所有的绘制不会被写入到当前激活的帧缓存的模板缓存中。
 	  \sa beginCreateStencil()
 	*/
@@ -213,7 +213,7 @@ GM_INTERFACE(IGraphicEngine)
 	//! 开始进行融合绘制
 	/*!
 	  决定下一次调用drawObjects时的混合模式。如果在一个绘制流程中多次调用drawObjects，则应该使用此方法，将本帧的画面和当前帧缓存进行
-	  融合，否则本帧将会覆盖当前帧缓存已有的所有值。
+	融合，否则本帧将会覆盖当前帧缓存已有的所有值。
 	  \sa drawObjects(), endBlend()
 	*/
 	virtual void beginBlend(GMS_BlendFunc sfactor = GMS_BlendFunc::ONE, GMS_BlendFunc dfactor = GMS_BlendFunc::ONE) = 0;

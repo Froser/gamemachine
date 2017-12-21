@@ -18,6 +18,7 @@ BEGIN_NS
 #define		GMSHADER_PROJECTION_MATRIX			GMSHADER("projection_matrix")
 #define		GMSHADER_INV_TRANS_MODEL_MATRIX		GMSHADER("inverse_transpose_model_matrix")
 #define		GMSHADER_VIEW_MATRIX				GMSHADER("view_matrix")
+#define		GMSHADER_INVERSE_VIEW_MATRIX		GMSHADER("inverse_view_matrix")
 #define		GMSHADER_VIEW_POSITION				GMSHADER("view_position")
 
 //纹理
