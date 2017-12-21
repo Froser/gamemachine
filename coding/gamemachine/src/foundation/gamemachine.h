@@ -61,9 +61,9 @@ GM_PRIVATE_OBJECT(GameMachine)
 };
 
 //! GameMachine类负责掌管整个进程的生命周期。
-/*! GameMachine掌控整个进程的生命周期，提供对绘制、IO、内存和资源
-    的管理。不要试图构造GameMachine，因为它是一个单例。
-    请用GM宏来获取GameMachine单例。
+/*!
+  GameMachine掌控整个进程的生命周期，提供对绘制、IO、内存和资源的管理。<BR>
+  不要试图构造GameMachine，因为它是一个单例。请用GM宏来获取GameMachine单例。
 */
 class GameMachine : public GMSingleton<GameMachine>
 {
@@ -103,7 +103,7 @@ public:
 	//! 初始化GameMachine。
 	/*!
 	  开发者应该在程序运行的最开始就初始化GameMachine，给GameMachine赋予绘制环境下的窗体、控制台处理器、
-	  当前环境下的工厂类，以及程序流程处理器。
+	当前环境下的工厂类，以及程序流程处理器。
 	  \param mainWindow 程序运行的主窗口。可以使用gmui::GMUIFactory::createMainWindow创建。此对象生命周期由GameMachine管理。
 	  \param consoleHandle 控制台处理器。当有日志或调试信息来的时候，将会调用到这个控制台处理器。可以使用gmui::GMUIFactory::createConsoleWindow创建。此对象生命周期由GameMachine管理。
 	  \param factory 当前环境下的工厂类，用于创建纹理、字体管理器等绘制相关的对象。如果是在OpenGL下，可以直接创建GMGLFactory对象。此对象生命周期由GameMachine管理。
@@ -179,9 +179,8 @@ public:
 	//! 初始化一个对象画笔。
 	/*!
 	  初始化一个对象画笔。每当新建一个GMModel时，需要调用此方法，为GMModel设置一个画笔。此方法将用工厂类来为
-	  GMModel创建一个GMModelPainter对象。
-	  \param model 需要创建画笔的模型对象。创建好的GMModelPainter会绑定在此对象上。在此对象析构时，GMModelPainter
-	  也会析构，用户不需要关心它的生命周期。
+	GMModel创建一个GMModelPainter对象。
+	  \param model 需要创建画笔的模型对象。创建好的GMModelPainter会绑定在此对象上。在此对象析构时，GMModelPainter也会析构，用户不需要关心它的生命周期。
 	*/
 	void createModelPainter(GMModel* model);
 
@@ -202,7 +201,7 @@ public:
 	//! 获取最后一条GameMachine消息。
 	/*!
 	  获取最后一条GameMachine消息。此方法仅仅是获取GameMachine消息队列中的最后一条消息，并不会移除此消息。如果
-	  在某些对象中，需要处理GameMachine的消息，如当窗口大小改变时处理对象中的一些行为，可以调用此方法获取消息。
+	在某些对象中，需要处理GameMachine的消息，如当窗口大小改变时处理对象中的一些行为，可以调用此方法获取消息。
 	*/
 	GameMachineMessage peekMessage();
 
@@ -220,10 +219,10 @@ public:
 
 	//! 开始运行GameMachine。
 	/*!
-	  当GameMachine实例初始化之后，调用此方法开始程序内的游戏循环。
+	  当GameMachine实例初始化之后，调用此方法开始程序内的游戏循环。<BR>
 	  在游戏循环之前，它首先会新建主窗口和调试窗口，创建内部各种管理器并初始化它们。接下来，触发游戏时钟，程序运行时
-	  间从此刻开始计算。在此之后，程序的消息循环正式开始。循环会先处理来自系统的消息，如窗口、鼠标、键盘消息，接下来
-	  处理GameMachine消息，然后调用游戏流程管理器管理游戏流程，最后再更新此帧的状态。
+	间从此刻开始计算。在此之后，程序的消息循环正式开始。循环会先处理来自系统的消息，如窗口、鼠标、键盘消息，接下来处
+	理GameMachine消息，然后调用游戏流程管理器管理游戏流程，最后再更新此帧的状态。
 	  \sa init()
 	*/
 	void startGameMachine();

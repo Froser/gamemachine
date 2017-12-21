@@ -192,14 +192,14 @@ struct GameMachineMessage;
 //! 所有GameMachine对象的基类。
 /*!
   GMObject类型只有一个指向数据成员的指针，没有其它数据成员。其数据成员指针指向一个堆上分配的数据。由于只保存一个
-  指向数据的指针，因此GMObject及GMObject的所有派生类禁止赋值和拷贝。
-  如果为一个GMObject的直接子类定义其包含的数据，可使用GM_PRIVATE_OBJECT宏来定义数据结构，并在子类中使用
-  DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中。
-  如果某个子类不是GMObject的直接子类，则用DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。
-  虽然GMObject及其子类禁止拷贝构造和赋值，但是移动构造和移动赋值是允许的。默认情况下，GMObject子类没有实现移
-  动构造和移动赋值。如果要实现它，可以直接使用GM_DEFAULT_MOVE_BEHAVIOR宏。此宏会为子类添加一个移动构造和移动
-  复制，它会将子类的数据以及父类的数据依次递归与右值引用中的对象进行交换。
-  另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
+指向数据的指针，因此GMObject及GMObject的所有派生类禁止赋值和拷贝。<BR>
+如果为一个GMObject的直接子类定义其包含的数据，可使用GM_PRIVATE_OBJECT宏来定义数据结构，并在子类中使用
+DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中。<BR>
+如果某个子类不是GMObject的直接子类，则用DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。
+虽然GMObject及其子类禁止拷贝构造和赋值，但是移动构造和移动赋值是允许的。默认情况下，GMObject子类没有实现移
+动构造和移动赋值。如果要实现它，可以直接使用GM_DEFAULT_MOVE_BEHAVIOR宏。此宏会为子类添加一个移动构造和移动
+复制，它会将子类的数据以及父类的数据依次递归与右值引用中的对象进行交换。<BR>
+另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
 */
 class GMObject : public IVirtualFunctionObject
 {
@@ -271,7 +271,7 @@ public:
 
 	//! 拷贝GMObject私有数据
 	/*!
-	  GMObject不允许拷贝其私有数据，因此是个空实现。
+	  GMObject不允许拷贝其私有数据，因此是个空实现。<BR>
 	  但是，GMObject的子类可以使用GM_ALLOW_COPY_DATA宏，允许子类调用其copyData虚方法，依次拷贝私有数据。
 	  \param another 拷贝私有数据的目标对象，将目标对象的私有数据拷贝到此对象。
 	*/
