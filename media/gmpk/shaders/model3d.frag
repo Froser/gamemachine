@@ -5,7 +5,6 @@ vec3 g_model3d_ambientLight;
 vec3 g_model3d_diffuseLight;
 vec3 g_model3d_specularLight;
 vec3 g_model3d_refractionLight;
-mat3 g_model3d_TBN;
 
 in vec4 _model3d_position_world;
 
@@ -57,29 +56,20 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 
 		g_model3d_specularLight += specularFactor * GM_material.ks * g_model3d_shadeFactor * light.lightColor;
 	}
+}
 
-	// refraction
-	{
-		if (GM_normalmap_textures[0].enabled == 0)
-		{
-			vec3 normal_world = normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz;
-			vec3 I = normalize((_model3d_position_world - GM_view_position).rgb);
-			vec3 R = refract(I, normal_world, GM_material.refractivity);
-			g_model3d_refractionLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
-		}
-		else
-		{
-			// 如果有NormalMap，计算会复杂点，像入射光换算到切线空间
+void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
+{
+	vec3 I = normalize((_model3d_position_world - GM_view_position).rgb);
+	vec3 R = refract(I, normal_world, GM_material.refractivity);
+	g_model3d_refractionLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
+}
 
-			// 使用世界坐标来计算反射。TBN乘的空间均为眼睛空间
-			vec3 I_tangent = normalize(g_model3d_TBN * (GM_view_matrix * (_model3d_position_world - GM_view_position)).rgb);
-			vec3 R_tangent = refract(I_tangent, N, GM_material.refractivity);
-
-			// 反射光采用切线坐标，换算回世界坐标
-			vec3 R_world = (GM_inverse_view_matrix * vec4(inverse(g_model3d_TBN) * R_tangent, 0)).xyz;
-			g_model3d_refractionLight += texture(GM_cubemap, vec3(R_world.x, -R_world.y, R_world.z)).rgb;
-		}
-	}
+void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
+{
+	// 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
+	vec3 normal_world = (GM_inverse_view_matrix * vec4(inverse(TBN) * normal_tangent, 0)).rgb;
+	model3d_calculateRefractionByNormalWorld(normal_world);
 }
 
 void model3d_calcLights()
@@ -103,6 +93,7 @@ void model3d_calcLights()
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
 			model3d_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, g_model3d_normal_eye);
+			model3d_calculateRefractionByNormalWorld(normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz);
 		}
 	}
 	else
@@ -115,15 +106,16 @@ void model3d_calcLights()
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
 			// TBN变换矩阵
-			g_model3d_TBN = transpose(mat3(
+			mat3 TBN = transpose(mat3(
 				tangent_eye,
 				bitangent_eye,
 				g_model3d_normal_eye.xyz
 			));
-			vec3 lightDirection_tangent = g_model3d_TBN * lightDirection_eye;
-			vec3 eyeDirection_tangent = g_model3d_TBN * eyeDirection_eye;
+			vec3 lightDirection_tangent = TBN * lightDirection_eye;
+			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
 
 			model3d_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
+			model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
 		}
 	}
 

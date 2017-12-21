@@ -20,27 +20,28 @@ uniform sampler2D deferred_material_pass_gKs_gShininess;
 uniform sampler2D deferred_material_pass_gHasNormalMap_gRefractivity;
 
 // geometries
-vec3 deferred_light_pass_tPosition;
-vec3 deferred_light_pass_tNormal;
-vec3 deferred_light_pass_tNormal_eye;
-vec3 deferred_light_pass_tTexAmbient;
-vec3 deferred_light_pass_tTexDiffuse;
-vec3 deferred_light_pass_tTangent_eye;
-vec3 deferred_light_pass_tBitangent_eye;
-vec3 deferred_light_pass_tNormalMap;
+vec3 deferred_light_pass_fromTexture_Position;
+vec3 deferred_light_pass_fromTexture_Normal;
+vec3 deferred_light_pass_fromTexture_Normal_eye;
+vec3 deferred_light_pass_fromTexture_TexAmbient;
+vec3 deferred_light_pass_fromTexture_TexDiffuse;
+vec3 deferred_light_pass_fromTexture_Tangent_eye;
+vec3 deferred_light_pass_fromTexture_Bitangent_eye;
+vec3 deferred_light_pass_fromTexture_NormalMap;
 
 // materials
-vec3 deferred_material_pass_tKa;
-vec3 deferred_material_pass_tKd;
-vec3 deferred_material_pass_tKs;
-float deferred_material_pass_tShininess;
+vec3 deferred_material_pass_fromTexture_Ka;
+vec3 deferred_material_pass_fromTexture_Kd;
+vec3 deferred_material_pass_fromTexture_Ks;
+float deferred_material_pass_fromTexture_Shininess;
 
 // flags, -1 or 1
-float deferred_material_pass_tHasNormalMap = -1;
+float deferred_material_pass_fromTexture_HasNormalMap = -1;
 
 // refractivity
-float deferred_material_pass_tRefractivity = 0;
+float deferred_material_pass_fromTexture_Refractivity = 0;
 
+// 全局变量：
 // 相机视角法向量
 vec3 deferred_light_pass_g_normal_eye;
 // ShadowMap的阴影系数，如果没有ShadowMap则为1
@@ -64,26 +65,26 @@ void deferred_light_pass_init()
 {
 	// light pass
 	deferred_light_pass_g_ambientLight = deferred_light_pass_g_diffuseLight = deferred_light_pass_g_specularLight = vec3(0);
-	deferred_light_pass_tPosition = texture(deferred_light_pass_gPosition, _uv).rgb;
-	deferred_light_pass_tNormal = textureToNormal(texture(deferred_light_pass_gNormal, _uv).rgb);
-	deferred_light_pass_tNormal_eye = textureToNormal(texture(deferred_light_pass_gNormal_eye, _uv).rgb);
-	deferred_light_pass_tTexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
-	deferred_light_pass_tTexDiffuse = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
-	deferred_light_pass_tTangent_eye = texture(deferred_light_pass_gTangent_eye, _uv).rgb;
-	deferred_light_pass_tBitangent_eye = texture(deferred_light_pass_gBitangent_eye, _uv).rgb;
-	deferred_light_pass_tNormalMap = texture(deferred_light_pass_gNormalMap, _uv).rgb;
+	deferred_light_pass_fromTexture_Position = texture(deferred_light_pass_gPosition, _uv).rgb;
+	deferred_light_pass_fromTexture_Normal = textureToNormal(texture(deferred_light_pass_gNormal, _uv).rgb);
+	deferred_light_pass_fromTexture_Normal_eye = textureToNormal(texture(deferred_light_pass_gNormal_eye, _uv).rgb);
+	deferred_light_pass_fromTexture_TexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
+	deferred_light_pass_fromTexture_TexDiffuse = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
+	deferred_light_pass_fromTexture_Tangent_eye = texture(deferred_light_pass_gTangent_eye, _uv).rgb;
+	deferred_light_pass_fromTexture_Bitangent_eye = texture(deferred_light_pass_gBitangent_eye, _uv).rgb;
+	deferred_light_pass_fromTexture_NormalMap = texture(deferred_light_pass_gNormalMap, _uv).rgb;
 
 	// material pass
-	deferred_material_pass_tKa = texture(deferred_material_pass_gKa, _uv).rgb;
-	deferred_material_pass_tKd = texture(deferred_material_pass_gKd, _uv).rgb;
+	deferred_material_pass_fromTexture_Ka = texture(deferred_material_pass_gKa, _uv).rgb;
+	deferred_material_pass_fromTexture_Kd = texture(deferred_material_pass_gKd, _uv).rgb;
 
 	vec4 tKs_tShininess = texture(deferred_material_pass_gKs_gShininess, _uv);
-	deferred_material_pass_tKs = tKs_tShininess.rgb;
-	deferred_material_pass_tShininess = tKs_tShininess.a;
+	deferred_material_pass_fromTexture_Ks = tKs_tShininess.rgb;
+	deferred_material_pass_fromTexture_Shininess = tKs_tShininess.a;
 
-	vec4 tHasNormalMap_tRefractivity = texture(deferred_material_pass_gHasNormalMap_gRefractivity, _uv);
-	deferred_material_pass_tHasNormalMap = tHasNormalMap_tRefractivity.r;
-	deferred_material_pass_tRefractivity = tHasNormalMap_tRefractivity.g;
+	vec4 fromTexture_HasNormalMap_tRefractivity = texture(deferred_material_pass_gHasNormalMap_gRefractivity, _uv);
+	deferred_material_pass_fromTexture_HasNormalMap = fromTexture_HasNormalMap_tRefractivity.r;
+	deferred_material_pass_fromTexture_Refractivity = fromTexture_HasNormalMap_tRefractivity.g;
 }
 
 void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)
@@ -96,7 +97,7 @@ void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDire
 		float diffuseFactor = dot(L, N);
 		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
 
-		deferred_light_pass_g_diffuseLight += diffuseFactor * deferred_material_pass_tKd * light.lightColor;
+		deferred_light_pass_g_diffuseLight += diffuseFactor * deferred_material_pass_fromTexture_Kd * light.lightColor;
 	}
 
 	// specular:
@@ -104,61 +105,68 @@ void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDire
 		vec3 V = normalize(eyeDirection);
 		vec3 R = reflect(-L, N);
 		float theta = dot(V, R);
-		float specularFactor = pow(theta, deferred_material_pass_tShininess);
+		float specularFactor = pow(theta, deferred_material_pass_fromTexture_Shininess);
 		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
 
-		deferred_light_pass_g_specularLight += specularFactor * deferred_material_pass_tKs * light.lightColor;
+		deferred_light_pass_g_specularLight += specularFactor * deferred_material_pass_fromTexture_Ks * light.lightColor;
 	}
+}
 
-	// refraction
-	{
-		// 使用世界坐标来计算反射
-		vec3 normal_world = deferred_light_pass_tNormal.xyz;
-		vec3 I = normalize(deferred_light_pass_tPosition - GM_view_position.rgb).rgb;
-		vec3 R = refract(I, normal_world, deferred_material_pass_tRefractivity);
-		deferred_light_pass_g_refractiveLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
-	}
+void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
+{
+	vec3 I = normalize(deferred_light_pass_fromTexture_Position - GM_view_position.rgb);
+	vec3 R = refract(I, normal_world, deferred_material_pass_fromTexture_Refractivity);
+	deferred_light_pass_g_refractiveLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
+}
+
+void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
+{
+	// 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
+	vec3 normal_world = (GM_inverse_view_matrix * vec4(inverse(TBN) * normal_tangent, 0)).rgb;
+	model3d_calculateRefractionByNormalWorld(normal_world);
 }
 
 void deferred_light_pass_calcLights()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	vec4 vertex_eye = GM_view_matrix * vec4(deferred_light_pass_tPosition, 1);
+	vec4 vertex_eye = GM_view_matrix * vec4(deferred_light_pass_fromTexture_Position, 1);
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
 
 	// 计算漫反射和高光部分
-	if (!hasFlag(deferred_material_pass_tHasNormalMap))
+	if (!hasFlag(deferred_material_pass_fromTexture_HasNormalMap))
 	{
 		for (int i = 0; i < GM_speculars_count; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
-			deferred_light_pass_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, deferred_light_pass_tNormal_eye);
+			deferred_light_pass_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, deferred_light_pass_fromTexture_Normal_eye);
 		}
+		model3d_calculateRefractionByNormalWorld(deferred_light_pass_fromTexture_Normal.xyz);
 	}
 	else
 	{
-		vec3 normal_tangent = deferred_light_pass_tNormalMap.rgb * 2.0 - 1.0;
+		vec3 normal_tangent = deferred_light_pass_fromTexture_NormalMap.rgb * 2.0 - 1.0;
+		mat3 TBN = transpose(mat3(
+			deferred_light_pass_fromTexture_Tangent_eye,
+			deferred_light_pass_fromTexture_Bitangent_eye,
+			deferred_light_pass_fromTexture_Normal_eye
+		));
 		for (int i = 0; i < GM_speculars_count; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
-			mat3 TBN = transpose(mat3(
-				deferred_light_pass_tTangent_eye,
-				deferred_light_pass_tBitangent_eye,
-				deferred_light_pass_tNormal_eye
-			));
 			vec3 lightDirection_tangent = TBN * lightDirection_eye;
 			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
 
 			deferred_light_pass_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
 		}
+		model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
 	}
 
 	// 计算环境光
 	for (int i = 0; i < GM_ambients_count; i++)
 	{
-		deferred_light_pass_g_ambientLight += deferred_material_pass_tKa * GM_ambients[i].lightColor;
+		deferred_light_pass_g_ambientLight += deferred_material_pass_fromTexture_Ka * GM_ambients[i].lightColor;
 	}
 }
 
@@ -167,8 +175,8 @@ void deferred_light_pass_calcColor()
 	deferred_light_pass_calcLights();
 
 	// 最终结果
-	vec3 color = deferred_light_pass_g_ambientLight * deferred_light_pass_tTexAmbient
-		+ deferred_light_pass_g_diffuseLight * deferred_light_pass_tTexDiffuse
+	vec3 color = deferred_light_pass_g_ambientLight * deferred_light_pass_fromTexture_TexAmbient
+		+ deferred_light_pass_g_diffuseLight * deferred_light_pass_fromTexture_TexDiffuse
 		+ deferred_light_pass_g_specularLight
 		+ deferred_light_pass_g_refractiveLight;
 	_frag_color = vec4(color, 1.0f);
