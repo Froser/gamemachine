@@ -47,7 +47,11 @@ void Demo_Model::init()
 
 	// 创建对象
 	d->demoWorld = new gm::GMDemoGameWorld();
-	
+
+	gm::ITexture* texture = nullptr;
+	gm::GMTextureUtil::createTexture("bnp.png", &texture);
+	d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
 		"cat/cat.obj",
@@ -74,16 +78,12 @@ void Demo_Model::init()
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
 		auto& cubeComponents = cube->getMesh()->getComponents();
-		gm::ITexture* texture = nullptr;
-		gm::GMTextureUtil::createTexture("bnp.png", &texture);
-		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 		for (auto& component : cubeComponents)
 		{
 			gm::GMShader& shader = component->getShader();
 			shader.getMaterial().refractivity = 0.658f;
 			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = glm::vec3(0);
-
 			gm::GMTextureUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
 		}
 
@@ -98,7 +98,6 @@ void Demo_Model::init()
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
 		auto& cubeComponents = cube->getMesh()->getComponents();
 		gm::ITexture* texture = nullptr;
-		gm::GMTextureUtil::createTexture("cube_np.png", &texture);
 		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 		for (auto& component : cubeComponents)
