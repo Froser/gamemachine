@@ -73,7 +73,9 @@ macro(gm_link_dependencies projectName)
 endmacro(gm_link_dependencies)
 
 # Options:
-option(GM_BUILD_DOCS "Build the GameMachine documentation" ON)
+option(GM_BUILD_DOCS "Build GameMachine documentation" ON)
+option(GM_BUILD_DEMO "Build GameMachine Demos" ON)
+option(GM_BUILD_UNITTEST "Build GameMachine Unit Tests" ON)
 
 if (GM_BUILD_DOCS)
 	set (DOXYGEN_SKIP_DOT TRUE)

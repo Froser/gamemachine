@@ -14,5 +14,11 @@ endif(WIN32)
 add_subdirectory(gamemachine gamemachine)
 add_subdirectory(gamemachineui gamemachineui)
 add_subdirectory(gamemachinemedia gamemachinemedia)
-add_subdirectory(gamemachinedemo gamemachinedemo)
-add_subdirectory(gamemachineunittest gamemachineunittest)
+
+if (GM_BUILD_DEMO)
+	add_subdirectory(gamemachinedemo gamemachinedemo)
+endif(GM_BUILD_DEMO)
+
+if (GM_BUILD_UNITTEST)
+	add_subdirectory(gamemachineunittest gamemachineunittest)
+endif(GM_BUILD_UNITTEST)
