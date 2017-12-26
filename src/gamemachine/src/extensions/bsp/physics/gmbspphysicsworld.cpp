@@ -49,31 +49,18 @@ void GMBSPPhysicsWorld::simulate(GMGameObject* obj)
 	D(d);
 	BSPData& bsp = d->world->bspData();
 
-	GMBSPMove* move = getMove(find(obj));
+	GMBSPMove* move = getMove(&obj->getPhysicsObject());
 	move->move();
 }
 
-GMCollisionObject* GMBSPPhysicsWorld::find(GMGameObject* obj)
+void GMBSPPhysicsWorld::applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args)
 {
-	D(d);
-	auto target = d->collisionObjects.find(obj);
-	if (target == d->collisionObjects.end())
-	{
-		auto& constructed = d->collisionObjects[obj];
-		constructed = new GMCollisionObject();
-		*constructed = CollisionObjectFactory::defaultCamera();
-		return constructed;
-	}
-	return d->collisionObjects[obj];
+	GM_ASSERT(false);
 }
 
-void GMBSPPhysicsWorld::sendCommand(GMCollisionObject* obj, const CommandParams& dataParam)
+void GMBSPPhysicsWorld::applyJump(const GMPhysicsObject& phy)
 {
-	D(d);
-	GM_ASSERT(dataParam.size() == 1);
-	GMCommand cmd = (*dataParam.begin()).first;
-	GMBSPMove* move = getMove(obj);
-	move->sendCommand(cmd, dataParam);
+	GM_ASSERT(false);
 }
 
 void GMBSPPhysicsWorld::initBSPPhysicsWorld()
@@ -84,7 +71,7 @@ void GMBSPPhysicsWorld::initBSPPhysicsWorld()
 	generatePhysicsPatches();
 }
 
-GMBSPMove* GMBSPPhysicsWorld::getMove(GMCollisionObject* o)
+GMBSPMove* GMBSPPhysicsWorld::getMove(GMPhysicsObject* o)
 {
 	D(d);
 	GMBSPMove* m = nullptr;

@@ -1,22 +1,15 @@
 ﻿#ifndef __GMSPRITEGAMEOBJECT_H__
 #define __GMSPRITEGAMEOBJECT_H__
 #include <gmcommon.h>
-#include "../../gmphysics/gmphysicsstructs.h"
+#include <gmphysics.h>
 #include "gmgameobject.h"
-
 BEGIN_NS
 
-enum class GMMovement
+GM_ALIGNED_STRUCT(GMSpriteMovement)
 {
-	Move,
-	Jump,
-};
+	GMSpriteMovement() = default;
 
-GM_ALIGNED_STRUCT(GMSpriteSubMovement)
-{
-	GMSpriteSubMovement() = default;
-
-	GMSpriteSubMovement(const glm::vec3& dir, const glm::vec3& rate, GMMovement m)
+	GMSpriteMovement(const glm::vec3& dir, const glm::vec3& rate, GMMovement m)
 		: moveDirection(dir)
 		, moveRate(rate)
 		, movement(m)
@@ -33,7 +26,7 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 
 	GMfloat pitchLimitRadius;
 	GMPositionState state;
-	AlignedVector<GMSpriteSubMovement> movements;
+	AlignedVector<GMSpriteMovement> movements;
 };
 
 class GMSpriteGameObject : public GMGameObject
@@ -67,8 +60,7 @@ public:
 	const GMPositionState& getPositionState();
 
 private:
-	void sendMoveCommand();
-	void clearMoveArgs();
+	void sendMoveCommand(const glm::vec3& direction, const glm::vec3& rate);
 };
 
 

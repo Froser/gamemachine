@@ -54,6 +54,9 @@ using List = std::list<T>;
 template <typename T>
 using Deque = std::deque<T>;
 
+template <typename... T>
+using Tuple = std::tuple<T...>;
+
 /* 工程编译选项 */
 // 使用UNICODE
 #ifndef UNICODE

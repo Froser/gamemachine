@@ -4,11 +4,13 @@
 #include <tools.h>
 #include <gmmodel.h>
 #include <linearmath.h>
+#include <gmphysics.h>
 
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMGameObject)
 {
+	GMPhysicsObject physics;
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
@@ -16,7 +18,6 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	glm::mat4 translation = glm::identity<glm::mat4>();
 	glm::quat rotation = glm::identity<glm::quat>();
 	glm::mat4 transformMatrix = glm::identity<glm::mat4>();
-
 	bool canDeferredRendering = true;
 };
 
@@ -60,13 +61,14 @@ private:
 	}
 
 public:
-	inline virtual void setScaling(const glm::mat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
-	inline virtual void setTranslation(const glm::mat4& translation) { D(d); d->translation = translation; updateMatrix(); }
-	inline virtual void setRotation(const glm::quat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
+	virtual void setScaling(const glm::mat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
+	virtual void setTranslation(const glm::mat4& translation) { D(d); d->translation = translation; updateMatrix(); }
+	virtual void setRotation(const glm::quat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
 	inline const glm::mat4& getTransform() const { D(d); return d->transformMatrix; }
 	inline const glm::mat4& getScaling() const { D(d); return d->scaling; }
 	inline const glm::mat4& getTranslation() const { D(d); return d->translation; }
 	inline const glm::quat& getRotation() const { D(d); return d->rotation; }
+	inline GMPhysicsObject& getPhysicsObject() { D(d); return d->physics; }
 
 	// events
 private:

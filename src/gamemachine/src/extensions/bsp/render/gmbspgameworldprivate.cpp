@@ -58,7 +58,7 @@ namespace
 		sprite->setMoveSpeed(glm::vec3(193));
 		sprite->setJumpSpeed(glm::vec3(0, 150, 0));
 
-		GMMotionProperties& prop = world->physicsWorld()->find(sprite)->motions;
+		GMMotionProperties& prop = sprite->getPhysicsObject().motions;
 		prop.translation = playerStart;
 		created = true;
 	}

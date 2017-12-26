@@ -21,8 +21,8 @@ GM_PRIVATE_OBJECT_FROM(GMBSPPhysicsWorld, GMPhysicsWorld)
 	GMBSPTrace trace;
 	GMBSPPatch patch;
 
-	Map<GMCollisionObject*, GMBSPMove*> objectMoves;
-	Map<GMGameObject*, GMCollisionObject*> collisionObjects;
+	Map<GMPhysicsObject*, GMBSPMove*> objectMoves;
+	Map<GMGameObject*, GMPhysicsObject*> collisionObjects;
 };
 
 class GMBSPPhysicsWorld : public GMPhysicsWorld
@@ -35,15 +35,15 @@ public:
 
 public:
 	virtual void simulate(GMGameObject* obj) override;
-	virtual GMCollisionObject* find(GMGameObject* obj) override;
-	virtual void sendCommand(GMCollisionObject* obj, const CommandParams& dataParam) override;
+	virtual void applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args) override;
+	virtual void applyJump(const GMPhysicsObject& phy) override;
 
 public:
 	GMBSPPhysicsWorld::Data& physicsData();
 	void initBSPPhysicsWorld();
 
 private:
-	GMBSPMove* getMove(GMCollisionObject* o);
+	GMBSPMove* getMove(GMPhysicsObject* o);
 	void generatePhysicsPlaneData();
 	void generatePhysicsBrushSideData();
 	void generatePhysicsBrushData();

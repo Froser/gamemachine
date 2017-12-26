@@ -14,7 +14,7 @@ enum
 static const GMfloat OVERCLIP = 1.f;
 static const GMfloat CLIP_IGNORE = .2f;
 
-GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMCollisionObject* obj)
+GMBSPMove::GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj)
 {
 	D(d);
 	d->inited = false;
@@ -39,6 +39,9 @@ void GMBSPMove::move()
 void GMBSPMove::processCommand()
 {
 	D(d);
+	GM_ASSERT(false);
+	/// TODO
+	/*
 	if (d->moveCommand.command & CMD_MOVE)
 	{
 		processMove();
@@ -57,11 +60,15 @@ void GMBSPMove::processCommand()
 		processJump();
 		d->moveCommand.command &= ~CMD_JUMP;
 	}
+	*/
 }
 
 void GMBSPMove::processMove()
 {
 	D(d);
+	/// TODO
+	GM_ASSERT(false);
+	/*
 	// 空中不允许改变运动状态
 	if (d->movement.freefall)
 		return;
@@ -75,9 +82,6 @@ void GMBSPMove::processMove()
 	bool forward = arg1[0] == 1, left = arg2[0] == 1;
 	GMfloat moveRate_fb = arg1[1], moveRate_lr = arg2[1];
 
-	// TODO
-	GM_ASSERT(false);
-	/*
 	glm::vec3 walkDirectionFB;
 	{
 		GMfloat distance = (forward ? 1 : -1) * d->object->motions.moveSpeed * moveRate_fb;
@@ -117,14 +121,16 @@ void GMBSPMove::processJump()
 	}
 }
 
-void GMBSPMove::sendCommand(GMCommand cmd, const CommandParams& dataParam)
+void GMBSPMove::applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args)
 {
-	D(d);
-	d->moveCommand.command |= cmd;
-	auto iter = dataParam.find(cmd);
-	GM_ASSERT(iter != dataParam.end());
-	d->moveCommand.params[cmd] = (*iter).second;
+	GM_ASSERT(false);
 }
+
+void GMBSPMove::applyJump(const GMPhysicsObject& phy)
+{
+	GM_ASSERT(false);
+}
+
 
 GMfloat GMBSPMove::now()
 {

@@ -7,31 +7,30 @@
 BEGIN_NS
 
 class GMBSPPhysicsWorld;
-struct GMCollisionObject;
+struct GMPhysicsObject;
 class GMBSPTrace;
 
-struct GMBSPMovement
+GM_ALIGNED_STRUCT(GMBSPMovement)
 {
 	GMfloat startTime = 0;
 	BSPTraceResult groundTrace;
 	bool freefall = false;
 	bool walking = false;
-	glm::vec3 velocity{ 0 };
-	glm::vec3 origin{ 0 };
-	glm::vec3 targetPosition{ 0 };
+	glm::vec3 velocity = glm::zero<glm::vec3>();
+	glm::vec3 origin = glm::zero<glm::vec3>();
+	glm::vec3 targetPosition = glm::zero<glm::vec3>();
 };
 
-struct GMBSPMoveCommand
+GM_ALIGNED_STRUCT(GMBSPMoveCommand)
 {
-	GMCommand command;
-	CommandParams params;
+
 };
 
 GM_PRIVATE_OBJECT(GMBSPMove)
 {
 	bool inited;
 	GMBSPPhysicsWorld* world = nullptr;
-	GMCollisionObject* object = nullptr;
+	GMPhysicsObject* object = nullptr;
 	GMBSPTrace* trace = nullptr;
 	GMBSPMovement movement;
 	GMBSPMoveCommand moveCommand;
@@ -42,9 +41,10 @@ class GMBSPMove : public GMObject
 	DECLARE_PRIVATE(GMBSPMove)
 
 public:
-	GMBSPMove(GMBSPPhysicsWorld* world, GMCollisionObject* obj);
+	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);
 	void move();
-	void sendCommand(GMCommand cmd, const CommandParams& dataParam);
+	void applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args);
+	void applyJump(const GMPhysicsObject& phy);
 
 private:
 	GMfloat now();

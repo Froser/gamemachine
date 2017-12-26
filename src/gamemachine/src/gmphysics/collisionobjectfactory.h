@@ -6,7 +6,7 @@ BEGIN_NS
 
 struct CollisionObjectFactory
 {
-	static GMCollisionObject defaultCamera();
+	static GMPhysicsObject defaultCamera();
 };
 
 END_NS

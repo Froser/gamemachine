@@ -5,17 +5,16 @@
 BEGIN_NS
 
 //Camera
-GM_ALIGNED_16(struct) GMCameraLookAt
+GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	glm::vec3 lookAt;
 	glm::vec3 position;
 };
 
-GM_ALIGNED_16(struct) GMPositionState
+GM_ALIGNED_STRUCT(GMPositionState)
 {
 	glm::vec3 position;
-	GMfloat yaw;
-	GMfloat pitch;
+	glm::quat lookAt;
 };
 
 inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)

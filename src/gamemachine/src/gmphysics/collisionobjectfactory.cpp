@@ -1,9 +1,9 @@
 ﻿#include "stdafx.h"
 #include "collisionobjectfactory.h"
 
-GMCollisionObject CollisionObjectFactory::defaultCamera()
+GMPhysicsObject CollisionObjectFactory::defaultCamera()
 {
-	GMCollisionObject o;
+	GMPhysicsObject o;
 	o.shapeProps.bounding[0] = glm::vec3(-15, -35, -15);
 	o.shapeProps.bounding[1] = glm::vec3(15, 35, 15);
 	o.shapeProps.stepHeight = 18.f;

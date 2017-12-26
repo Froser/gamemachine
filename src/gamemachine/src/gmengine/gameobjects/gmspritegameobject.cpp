@@ -8,32 +8,28 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius)
 	D(d);
 	d->radius = radius;
 	d->state.position = glm::vec3(0);
-	d->state.pitch = 0;
-	d->state.yaw = 0;
-	clearMoveArgs();
+	d->state.lookAt = glm::quat(glm::vec3(0, 0, 0));
 	d->pitchLimitRadius = HALF_PI - RAD(3);
 }
 
 
 void GMSpriteGameObject::onAppendingObjectToWorld()
 {
-	sendMoveCommand();
+	/// TODO
+	GM_ASSERT(false);
+	//sendMoveCommand();
 }
 
 void GMSpriteGameObject::setJumpSpeed(const glm::vec3& jumpSpeed)
 {
 	D(d);
-	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
-	if (c)
-		c->motions.jumpSpeed = jumpSpeed;
+	getPhysicsObject().motions.jumpSpeed = jumpSpeed;
 }
 
 void GMSpriteGameObject::setMoveSpeed(const glm::vec3& moveSpeed)
 {
 	D(d);
-	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
-	if (c)
-		c->motions.moveSpeed = moveSpeed;
+	getPhysicsObject().motions.moveSpeed = moveSpeed;
 }
 
 const GMPositionState& GMSpriteGameObject::getPositionState()
@@ -45,24 +41,24 @@ const GMPositionState& GMSpriteGameObject::getPositionState()
 void GMSpriteGameObject::action(GMMovement movement, const glm::vec3& direction, const glm::vec3& rate)
 {
 	D(d);
-	GMSpriteSubMovement subMovement(direction, rate, movement);
+	GMSpriteMovement subMovement(direction, rate, movement);
 	d->movements.push_back(subMovement);
 }
 
 void GMSpriteGameObject::lookRight(GMfloat degree)
 {
 	D(d);
-	d->state.yaw += RAD(degree);
+	//d->state.yaw += RAD(degree);
 }
 
 void GMSpriteGameObject::lookUp(GMfloat degree)
 {
 	D(d);
-	d->state.pitch += RAD(degree);
-	if (d->state.pitch > d->pitchLimitRadius)
-		d->state.pitch = d->pitchLimitRadius;
-	else if (d->state.pitch < -d->pitchLimitRadius)
-		d->state.pitch = -d->pitchLimitRadius;
+	//d->state.pitch += RAD(degree);
+	//if (d->state.pitch > d->pitchLimitRadius)
+	//	d->state.pitch = d->pitchLimitRadius;
+	//else if (d->state.pitch < -d->pitchLimitRadius)
+	//	d->state.pitch = -d->pitchLimitRadius;
 }
 
 void GMSpriteGameObject::setPitchLimitDegree(GMfloat deg)
@@ -74,8 +70,7 @@ void GMSpriteGameObject::setPitchLimitDegree(GMfloat deg)
 void GMSpriteGameObject::simulate()
 {
 	D(d);
-	clearMoveArgs();
-
+	glm::vec3 directions(0), rate(0);
 	bool moved = false, jumped = false;
 	for (auto& movement : d->movements)
 	{
@@ -83,55 +78,33 @@ void GMSpriteGameObject::simulate()
 			moved = true;
 		else if (movement.movement == GMMovement::Jump)
 			jumped = true;
+		directions += movement.moveDirection;
+		rate += movement.moveRate;
 	}
+	directions = glm::fastNormalize(directions);
+	rate = glm::fastNormalize(rate);
 
 	if (moved)
-		sendMoveCommand();
+		sendMoveCommand(directions, rate);
 
 	if (jumped)
 	{
 		GMPhysicsWorld* world = getWorld()->physicsWorld();
-		GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
-		if (c)
-		{
-			CommandParams cmdParams = GMPhysicsWorld::makeCommand(CMD_JUMP, nullptr, 0);
-			world->sendCommand(c, cmdParams);
-		}
-		else
-		{
-			gm_error(_L("cannot found character in physics world"));
-		}
+		world->applyJump(getPhysicsObject());
 	}
 }
 
 void GMSpriteGameObject::updateAfterSimulate()
 {
 	D(d);
-	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
-	if (c)
-		d->state.position = c->motions.translation;
-	else
-		gm_error(_L("cannot found character in physics world"));
-
+	d->state.position = getPhysicsObject().motions.translation;
 	d->movements.clear();
 }
 
-void GMSpriteGameObject::sendMoveCommand()
+void GMSpriteGameObject::sendMoveCommand(const glm::vec3& direction, const glm::vec3& rate)
 {
 	D(d);
-	//GMPhysicsWorld* pw = getWorld()->physicsWorld();
-	//GMCommandVector3 args[] = {
-	//	GMCommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM),
-	//	d->moveCmdArgFB,
-	//	d->moveCmdArgLR,
-	//};
-	//CommandParams params = GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3);
-	//pw->sendCommand(pw->find(this), params);
-}
-
-void GMSpriteGameObject::clearMoveArgs()
-{
-	//D(d);
-	//d->moveCmdArgFB = GMCommandVector3(0, 0, 0);
-	//d->moveCmdArgLR = GMCommandVector3(0, 0, 0);
+	GMPhysicsWorld* world = getWorld()->physicsWorld();
+	GMPhysicsMoveArgs args (d->state.lookAt, direction, rate);
+	world->applyMove(getPhysicsObject(), args);
 }

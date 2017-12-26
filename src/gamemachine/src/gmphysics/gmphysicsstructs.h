@@ -5,33 +5,19 @@
 #include <linearmath.h>
 BEGIN_NS
 
-typedef GMint GMCommand;
-
-struct GMCommandVector3
+GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 {
-	GMCommandVector3() = default;
-	GMCommandVector3(GMfloat x, GMfloat y, GMfloat z)
+	GMPhysicsMoveArgs(const glm::quat& _lookAt, const glm::vec3& _direction, const glm::vec3& _rate)
+		: lookAt(_lookAt)
+		, direction(_direction)
+		, rate(_rate)
 	{
-		p[0] = x;
-		p[1] = y;
-		p[2] = z;
 	}
 
-	GMfloat& operator[](GMint i)
-	{
-		return p[i];
-	}
-
-private:
-	GMfloat p[3];
+	glm::quat lookAt;
+	glm::vec3 direction;
+	glm::vec3 rate;
 };
-
-typedef Map<GMCommand, Vector<GMCommandVector3> > CommandParams;
-
-#define USELESS_PARAM 0
-#define CMD_NONE 0x0000
-#define CMD_MOVE 0x0001
-#define CMD_JUMP 0x0002
 
 GM_ALIGNED_STRUCT(GMShapeProperties)
 {
@@ -47,7 +33,7 @@ GM_ALIGNED_STRUCT(GMMotionProperties)
 	glm::vec3 moveSpeed;
 };
 
-GM_ALIGNED_STRUCT(GMCollisionObject)
+GM_ALIGNED_STRUCT(GMPhysicsObject)
 {
 	GMMotionProperties motions;
 	GMShapeProperties shapeProps;

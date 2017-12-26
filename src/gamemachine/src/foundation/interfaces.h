@@ -98,6 +98,12 @@ enum class GMShaderProgramType
 	DeferredLightPassShaderProgram, //!< 延迟渲染Light Pass阶段着色器程序
 };
 
+enum class GMMovement
+{
+	Move,
+	Jump,
+};
+
 GM_INTERFACE(IShaderProgram)
 {
 	virtual void useProgram() = 0;

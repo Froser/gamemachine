@@ -5,7 +5,7 @@
 BEGIN_NS
 
 class GMGameWorld;
-struct GMCollisionObject;
+struct GMPhysicsObject;
 GM_PRIVATE_OBJECT(GMPhysicsWorld)
 {
 	GMGameWorld* world;
@@ -22,11 +22,8 @@ public:
 
 public:
 	virtual void simulate(GMGameObject* obj) = 0;
-	virtual GMCollisionObject* find(GMGameObject* obj) = 0;
-	virtual void sendCommand(GMCollisionObject* obj, const CommandParams& dataParam) = 0;
-
-public:
-	static CommandParams makeCommand(GMCommand cmd, GMCommandVector3* list, GMuint count);
+	virtual void applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args) {}
+	virtual void applyJump(const GMPhysicsObject& phy) {}
 };
 
 END_NS
