@@ -6,74 +6,34 @@
 
 BEGIN_NS
 
-typedef GMbyte GMMovement;
-
-// Movements
-#define MC_NONE 0
-#define MC_FORWARD 1
-#define MC_BACKWARD 2
-#define MC_LEFT 4
-#define MC_RIGHT 8
-#define MC_MOVEMENT_COUNT 5
-#define MC_JUMP 16
-
-GM_PRIVATE_OBJECT(GMMoveRate)
+enum class GMMovement
 {
-	GMfloat moveRate[MC_MOVEMENT_COUNT];
+	Move,
+	Jump,
 };
 
-class GMMoveRate : public GMObject
+GM_ALIGNED_STRUCT(GMSpriteSubMovement)
 {
-	DECLARE_PRIVATE(GMMoveRate)
+	GMSpriteSubMovement() = default;
 
-public:
-	GMMoveRate()
-	{
-		clear();
-	}
+	GMSpriteSubMovement(const glm::vec3& dir, const glm::vec3& rate, GMMovement m)
+		: moveDirection(dir)
+		, moveRate(rate)
+		, movement(m)
+	{}
 
-	void setMoveRate(GMMovement action, GMfloat rate)
-	{
-		D(d);
-		d->moveRate[(GMint)log((GMfloat)action)] = rate;
-	}
-
-	GMfloat getMoveRate(GMMovement action)
-	{
-		D(d);
-		return d->moveRate[(GMint)log((GMfloat)action)];
-	}
-
-	void clear()
-	{
-		D(d);
-		for (GMuint i = 0; i < MC_MOVEMENT_COUNT; i++)
-		{
-			d->moveRate[i] = 1;
-		}
-	}
-
-	GMMoveRate& operator = (const GMMoveRate& rhs)
-	{
-		D(d);
-		memcpy(d, rhs.data(), sizeof(*rhs.data()));
-		return *this;
-	}
+	glm::vec3 moveDirection;
+	glm::vec3 moveRate;
+	GMMovement movement;
 };
 
-// GMSpriteGameObject
-// GMSpriteGameObject是一个可受玩家控制的角色
-// 它拥有体积、步长、视角等属性
-// 游戏中的主人公是GMSpriteGameObject，GMCamera需要每一帧将自己同步到主人公的位置上来
 GM_PRIVATE_OBJECT(GMSpriteGameObject)
 {
 	GMfloat radius;
-	GMMovement moveDirection;
-	GMMoveRate moveRate;
+
 	GMfloat pitchLimitRadius;
 	GMPositionState state;
-	GMCommandVector3 moveCmdArgFB;
-	GMCommandVector3 moveCmdArgLR;
+	AlignedVector<GMSpriteSubMovement> movements;
 };
 
 class GMSpriteGameObject : public GMGameObject
@@ -91,16 +51,22 @@ public:
 
 public:
 	void setJumpSpeed(const glm::vec3& jumpSpeed);
-	void setMoveSpeed(GMfloat moveSpeed);
-	void action(GMMovement movement, const GMMoveRate& rate);
+	void setMoveSpeed(const glm::vec3& moveSpeed);
+
+	//! 表示精灵对象执行一个动作。
+	/*!
+	  精灵对象执行一个动作。动作的效果由本对象一些物理属性合成。
+	  \param movement 动作的类型，如跳跃、移动等。
+	  \param direction 动作的方向。动作方向所采用的坐标系为精灵朝向的坐标系，并采用右手坐标系。即：精灵面朝z轴正方向，精灵左手为x轴正方向，头顶方向为y轴正方向。
+	  \param rate 比率。在计算移动的时位移的折扣。如用手柄时，手柄摇杆有个范围，此时通过比率来决定要位移原本要位移的多少。如果摇杆打到尽头，则可以认为比率为1。
+	*/
+	void action(GMMovement movement, const glm::vec3& direction = glm::vec3(), const glm::vec3& rate = glm::vec3(1));
 	void lookUp(GMfloat degree);
 	void lookRight(GMfloat degree);
 	void setPitchLimitDegree(GMfloat deg);
 	const GMPositionState& getPositionState();
 
 private:
-	void moveForwardOrBackward(bool forward);
-	void moveLeftOrRight(bool left);
 	void sendMoveCommand();
 	void clearMoveArgs();
 };

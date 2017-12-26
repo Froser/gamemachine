@@ -27,7 +27,7 @@ enum class GMPackageIndex
 };
 
 class GMBSPGameWorld;
-struct IGamePackageHandler
+GM_INTERFACE(IGamePackageHandler)
 {
 	virtual ~IGamePackageHandler() {}
 	virtual void init() = 0;

@@ -10,6 +10,6 @@ GMCollisionObject CollisionObjectFactory::defaultCamera()
 	o.motions.velocity = glm::vec3(0);
 	o.motions.jumpSpeed = glm::vec3(0);
 	o.motions.translation = glm::vec3(0);
-	o.motions.moveSpeed = 100.f;
+	o.motions.moveSpeed = glm::vec3(100.f);
 	return o;
 }

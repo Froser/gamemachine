@@ -75,6 +75,9 @@ void GMBSPMove::processMove()
 	bool forward = arg1[0] == 1, left = arg2[0] == 1;
 	GMfloat moveRate_fb = arg1[1], moveRate_lr = arg2[1];
 
+	// TODO
+	GM_ASSERT(false);
+	/*
 	glm::vec3 walkDirectionFB;
 	{
 		GMfloat distance = (forward ? 1 : -1) * d->object->motions.moveSpeed * moveRate_fb;
@@ -97,6 +100,7 @@ void GMBSPMove::processMove()
 		walkDirectionFB[1] + walkDirectionLR[1],
 		walkDirectionFB[2] + walkDirectionLR[2]
 	);
+	*/
 
 	composeVelocityWithGravity();
 }

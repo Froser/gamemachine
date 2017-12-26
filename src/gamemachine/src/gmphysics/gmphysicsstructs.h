@@ -44,7 +44,7 @@ GM_ALIGNED_STRUCT(GMMotionProperties)
 	glm::vec3 translation;
 	glm::vec3 velocity;
 	glm::vec3 jumpSpeed;
-	GMfloat moveSpeed;
+	glm::vec3 moveSpeed;
 };
 
 GM_ALIGNED_STRUCT(GMCollisionObject)

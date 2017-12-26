@@ -7,11 +7,9 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius)
 {
 	D(d);
 	d->radius = radius;
-	d->moveDirection = MC_NONE;
 	d->state.position = glm::vec3(0);
 	d->state.pitch = 0;
 	d->state.yaw = 0;
-	d->moveRate.clear();
 	clearMoveArgs();
 	d->pitchLimitRadius = HALF_PI - RAD(3);
 }
@@ -22,20 +20,6 @@ void GMSpriteGameObject::onAppendingObjectToWorld()
 	sendMoveCommand();
 }
 
-void GMSpriteGameObject::moveForwardOrBackward(bool forward)
-{
-	D(d);
-	GMfloat moveRate = forward ? d->moveRate.getMoveRate(MC_FORWARD) : d->moveRate.getMoveRate(MC_BACKWARD);
-	d->moveCmdArgFB = GMCommandVector3(forward, moveRate, USELESS_PARAM);
-}
-
-void GMSpriteGameObject::moveLeftOrRight(bool left)
-{
-	D(d);
-	GMfloat moveRate = left ? d->moveRate.getMoveRate(MC_LEFT) : d->moveRate.getMoveRate(MC_RIGHT);
-	d->moveCmdArgLR = GMCommandVector3(left, moveRate, USELESS_PARAM);
-}
-
 void GMSpriteGameObject::setJumpSpeed(const glm::vec3& jumpSpeed)
 {
 	D(d);
@@ -44,7 +28,7 @@ void GMSpriteGameObject::setJumpSpeed(const glm::vec3& jumpSpeed)
 		c->motions.jumpSpeed = jumpSpeed;
 }
 
-void GMSpriteGameObject::setMoveSpeed(GMfloat moveSpeed)
+void GMSpriteGameObject::setMoveSpeed(const glm::vec3& moveSpeed)
 {
 	D(d);
 	GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -58,12 +42,11 @@ const GMPositionState& GMSpriteGameObject::getPositionState()
 	return d->state;
 }
 
-// rate表示移动的速度，如果来自键盘，那么应该为1，如果来自手柄，应该是手柄的delta/delta最大值
-void GMSpriteGameObject::action(GMMovement movement, const GMMoveRate& rate)
+void GMSpriteGameObject::action(GMMovement movement, const glm::vec3& direction, const glm::vec3& rate)
 {
 	D(d);
-	d->moveDirection = movement;
-	d->moveRate = rate;
+	GMSpriteSubMovement subMovement(direction, rate, movement);
+	d->movements.push_back(subMovement);
 }
 
 void GMSpriteGameObject::lookRight(GMfloat degree)
@@ -93,34 +76,19 @@ void GMSpriteGameObject::simulate()
 	D(d);
 	clearMoveArgs();
 
-	// forward has priority
-	bool moved = false;
-	if (d->moveDirection & MC_FORWARD)
+	bool moved = false, jumped = false;
+	for (auto& movement : d->movements)
 	{
-		moveForwardOrBackward(true);
-		moved = true;
-	}
-	else if (d->moveDirection & MC_BACKWARD)
-	{
-		moveForwardOrBackward(false);
-		moved = true;
-	}
-
-	if (d->moveDirection & MC_LEFT)
-	{
-		moveLeftOrRight(true);
-		moved = true;
-	}
-	else if (d->moveDirection & MC_RIGHT)
-	{
-		moveLeftOrRight(false);
-		moved = true;
+		if (movement.movement == GMMovement::Move)
+			moved = true;
+		else if (movement.movement == GMMovement::Jump)
+			jumped = true;
 	}
 
 	if (moved)
 		sendMoveCommand();
 
-	if (d->moveDirection & MC_JUMP)
+	if (jumped)
 	{
 		GMPhysicsWorld* world = getWorld()->physicsWorld();
 		GMCollisionObject* c = getWorld()->physicsWorld()->find(this);
@@ -134,8 +102,6 @@ void GMSpriteGameObject::simulate()
 			gm_error(_L("cannot found character in physics world"));
 		}
 	}
-
-	d->moveDirection = MC_NONE;
 }
 
 void GMSpriteGameObject::updateAfterSimulate()
@@ -146,24 +112,26 @@ void GMSpriteGameObject::updateAfterSimulate()
 		d->state.position = c->motions.translation;
 	else
 		gm_error(_L("cannot found character in physics world"));
+
+	d->movements.clear();
 }
 
 void GMSpriteGameObject::sendMoveCommand()
 {
 	D(d);
-	GMPhysicsWorld* pw = getWorld()->physicsWorld();
-	GMCommandVector3 args[] = {
-		GMCommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM),
-		d->moveCmdArgFB,
-		d->moveCmdArgLR,
-	};
-	CommandParams params = GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3);
-	pw->sendCommand(pw->find(this), params);
+	//GMPhysicsWorld* pw = getWorld()->physicsWorld();
+	//GMCommandVector3 args[] = {
+	//	GMCommandVector3(d->state.pitch, d->state.yaw, USELESS_PARAM),
+	//	d->moveCmdArgFB,
+	//	d->moveCmdArgLR,
+	//};
+	//CommandParams params = GMPhysicsWorld::makeCommand(CMD_MOVE, args, 3);
+	//pw->sendCommand(pw->find(this), params);
 }
 
 void GMSpriteGameObject::clearMoveArgs()
 {
-	D(d);
-	d->moveCmdArgFB = GMCommandVector3(0, 0, 0);
-	d->moveCmdArgLR = GMCommandVector3(0, 0, 0);
+	//D(d);
+	//d->moveCmdArgFB = GMCommandVector3(0, 0, 0);
+	//d->moveCmdArgLR = GMCommandVector3(0, 0, 0);
 }

@@ -101,44 +101,31 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::IJoystickState& joyState = inputManager->getJoystickState();
 		gm::IMouseState& mouseState = inputManager->getMouseState();
 
-		gm::GMMovement moveTag = MC_NONE;
-		gm::GMMoveRate rate;
 		gm::GMJoystickState state = joyState.joystickState();
+		glm::vec3 direction(0);
 
 		if (kbState.keydown('A'))
-			moveTag |= MC_LEFT;
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0));
 		if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-		{
-			moveTag |= MC_LEFT;
-			rate.setMoveRate(MC_LEFT, gm::GMfloat(state.thumbLX) / SHRT_MIN);
-		}
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
 
 		if (kbState.keydown('D'))
-			moveTag |= MC_RIGHT;
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0));
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-		{
-			moveTag |= MC_RIGHT;
-			rate.setMoveRate(MC_RIGHT, gm::GMfloat(state.thumbLX) / SHRT_MAX);
-		}
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
 
 		if (kbState.keydown('S'))
-			moveTag |= MC_BACKWARD;
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, -1));
 		if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-		{
-			moveTag |= MC_BACKWARD;
-			rate.setMoveRate(MC_BACKWARD, gm::GMfloat(state.thumbLY) / SHRT_MIN);
-		}
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, -1), glm::vec3(gm::GMfloat(state.thumbLY) / SHRT_MIN));
 
 		if (kbState.keydown('W'))
-			moveTag |= MC_FORWARD;
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, 1));
 		if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-		{
-			moveTag |= MC_FORWARD;
-			rate.setMoveRate(MC_FORWARD, gm::GMfloat(state.thumbLY) / SHRT_MAX);
-		}
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, 1), glm::vec3(gm::GMfloat(state.thumbLY) / SHRT_MAX));
 
 		if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
-			moveTag |= MC_JUMP;
+			d->sprite->action(gm::GMMovement::Jump);
 
 		if (kbState.keyTriggered('V'))
 			joyState.joystickVibrate(30000, 30000);
@@ -174,8 +161,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::GMMouseState ms = mouseState.mouseState();
 		d->sprite->lookUp(-ms.deltaY * mouseSensitivity);
 		d->sprite->lookRight(ms.deltaX * mouseSensitivity);
-		d->sprite->action(moveTag, rate);
-
+		
 		if (kbState.keyTriggered('P'))
 			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));
 		if (kbState.keyTriggered('O'))

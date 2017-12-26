@@ -1,5 +1,4 @@
-﻿#define GLEW_STATIC
-#include <iostream>
+﻿#include <iostream>
 #include <windows.h>
 
 #include <fstream>

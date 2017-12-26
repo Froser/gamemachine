@@ -153,6 +153,8 @@ set(SOURCES
 		extensions/bsp/physics/gmbsppatch.cpp
 		extensions/bsp/physics/gmbspmove.h
 		extensions/bsp/physics/gmbspmove.cpp
+		extensions/bsp/physics/gmbspspritgameobject.h
+		extensions/bsp/physics/gmbspspritgameobject.cpp
 		extensions/bsp/render/gmbspgameworldprivate.h
 		extensions/bsp/render/gmbspgameworldprivate.cpp
 		extensions/bsp/render/gmbspgameworld.h
