@@ -24,7 +24,7 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 {
 	GMfloat radius;
 
-	GMfloat pitchLimitRadius;
+	GMfloat pitchLimit;
 	GMPositionState state;
 	AlignedVector<GMSpriteMovement> movements;
 };
@@ -39,7 +39,6 @@ public:
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Sprite; }
 	virtual void simulate() override;
-	virtual void onAppendingObjectToWorld() override;
 	virtual void updateAfterSimulate() override;
 
 public:
@@ -54,9 +53,15 @@ public:
 	  \param rate 比率。在计算移动的时位移的折扣。如用手柄时，手柄摇杆有个范围，此时通过比率来决定要位移原本要位移的多少。如果摇杆打到尽头，则可以认为比率为1。
 	*/
 	void action(GMMovement movement, const glm::vec3& direction = glm::vec3(), const glm::vec3& rate = glm::vec3(1));
-	void lookUp(GMfloat degree);
-	void lookRight(GMfloat degree);
-	void setPitchLimitDegree(GMfloat deg);
+
+	//! 表示精灵朝着某个方向变化。
+	/*!
+	  此方法表示一个变化量。它会在原有的朝向上进行叠加，而不是将朝向调整为某一个值。
+	  \param pitchDegree 俯仰角，绕x轴旋转的弧度数。
+	  \param yawDegree 偏航角，绕y轴旋转的弧度数。
+	*/
+	void look(GMfloat pitch, GMfloat yaw);
+	void setPitchLimit(GMfloat deg);
 	const GMPositionState& getPositionState();
 };
 

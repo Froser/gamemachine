@@ -244,8 +244,6 @@ inline void GM_delete_array(T*& o)
 #define LINE_MAX 10240 * 4
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
-#define RAD(deg) deg * (PI / 180)
-#define DEG(rad) rad * (180 / PI)
 #define SQR(a) ((a) * (a))
 #define strEqual(str1, str2) !strcmp(str1, str2)
 #define wstrEqual(str1, str2) !wcscmp(str1, str2)

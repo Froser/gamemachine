@@ -21,7 +21,7 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 GM_ALIGNED_STRUCT(GMPositionState)
 {
 	glm::vec3 position;
-	glm::quat lookAt;
+	glm::vec3 lookAt;
 };
 
 inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)

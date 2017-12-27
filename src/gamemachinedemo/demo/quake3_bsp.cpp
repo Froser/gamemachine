@@ -139,6 +139,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		if (kbState.keyTriggered('I'))
 			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
 
+		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
 		if (state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 		{
 			gm::GMfloat rate = (gm::GMfloat)state.thumbRX / (
@@ -146,7 +147,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 				SHRT_MIN :
 				SHRT_MAX);
 
-			d->sprite->lookRight(state.thumbRX * joystickSensitivity * rate);
+			joystickPitch = state.thumbRX * joystickSensitivity * rate;
 		}
 		if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 		{
@@ -155,12 +156,12 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 				SHRT_MIN :
 				SHRT_MAX);
 
-			d->sprite->lookUp(state.thumbRY * joystickSensitivity * rate);
+			joystickYaw = state.thumbRY * joystickSensitivity * rate;
 		}
+		d->sprite->look(glm::radians(joystickPitch), glm::radians(joystickYaw));
 
 		gm::GMMouseState ms = mouseState.mouseState();
-		d->sprite->lookUp(-ms.deltaY * mouseSensitivity);
-		d->sprite->lookRight(ms.deltaX * mouseSensitivity);
+		d->sprite->look(glm::radians(-ms.deltaY * mouseSensitivity), glm::radians(ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered('P'))
 			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));

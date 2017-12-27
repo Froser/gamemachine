@@ -8,16 +8,8 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius)
 	D(d);
 	d->radius = radius;
 	d->state.position = glm::vec3(0);
-	d->state.lookAt = glm::quat(glm::vec3(0, 0, 0));
-	d->pitchLimitRadius = HALF_PI - RAD(3);
-}
-
-
-void GMSpriteGameObject::onAppendingObjectToWorld()
-{
-	/// TODO
-	GM_ASSERT(false);
-	//sendMoveCommand();
+	d->state.lookAt = glm::vec3(0, 0, 1);
+	d->pitchLimit = HALF_PI - glm::radians(3.f);
 }
 
 void GMSpriteGameObject::setJumpSpeed(const glm::vec3& jumpSpeed)
@@ -45,26 +37,24 @@ void GMSpriteGameObject::action(GMMovement movement, const glm::vec3& direction,
 	d->movements.push_back(subMovement);
 }
 
-void GMSpriteGameObject::lookRight(GMfloat degree)
+void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 {
 	D(d);
-	//d->state.yaw += RAD(degree);
+	glm::vec3 lookAt = d->state.lookAt;
+
+	// 首先，沿着x轴旋转 (pitch)
+	glm::quat x = glm::rotate(glm::identity<glm::quat>(), -pitch, glm::vec3(1, 0, 0));
+	// 再沿着y轴转 (yaw)
+	glm::quat y = glm::rotate(glm::identity<glm::quat>(), -yaw, glm::vec3(0, 1, 0));
+
+	lookAt = y * x * lookAt;
+	d->state.lookAt = glm::fastNormalize(lookAt);
 }
 
-void GMSpriteGameObject::lookUp(GMfloat degree)
+void GMSpriteGameObject::setPitchLimit(GMfloat limit)
 {
 	D(d);
-	//d->state.pitch += RAD(degree);
-	//if (d->state.pitch > d->pitchLimitRadius)
-	//	d->state.pitch = d->pitchLimitRadius;
-	//else if (d->state.pitch < -d->pitchLimitRadius)
-	//	d->state.pitch = -d->pitchLimitRadius;
-}
-
-void GMSpriteGameObject::setPitchLimitDegree(GMfloat deg)
-{
-	D(d);
-	d->pitchLimitRadius = HALF_PI - RAD(deg);
+	d->pitchLimit = HALF_PI - glm::radians(limit);
 }
 
 void GMSpriteGameObject::simulate()

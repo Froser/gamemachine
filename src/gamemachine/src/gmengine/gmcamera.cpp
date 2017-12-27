@@ -165,7 +165,7 @@ GMCamera::GMCamera()
 	D(d);
 	d->frustum.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
 	d->state.position = glm::vec3(0);
-	d->state.lookAt = glm::quat(glm::vec3(0, 0, 0));
+	d->state.lookAt = glm::vec3(0, 0, 1);
 }
 
 void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -186,7 +186,7 @@ void GMCamera::synchronize(GMSpriteGameObject* gameObject)
 {
 	D(d);
 	d->state = gameObject->getPositionState();
-	d->lookAt.lookAt = glm::eulerAngles(d->state.lookAt);
+	d->lookAt.lookAt = d->state.lookAt;
 	d->lookAt.position = d->state.position;
 }
 
