@@ -16,24 +16,36 @@ GM_ALIGNED_STRUCT(GMBSPMovement)
 	BSPTraceResult groundTrace;
 	bool freefall = false;
 	bool walking = false;
-	glm::vec3 velocity = glm::zero<glm::vec3>();
+	glm::vec3 velocity = glm::zero<glm::vec3>(); //!< 移动速度，相对于整个场景世界
 	glm::vec3 origin = glm::zero<glm::vec3>();
 	glm::vec3 targetPosition = glm::zero<glm::vec3>();
 };
 
-GM_ALIGNED_STRUCT(GMBSPMoveCommand)
+GM_ALIGNED_STRUCT(GMBSPJumpArgs)
 {
+	bool jumped = false;
+};
 
+GM_ALIGNED_STRUCT(GMBSPMoveArgs)
+{
+	bool moved = false;
+	GMPhysicsMoveArgs args;
+};
+
+GM_ALIGNED_STRUCT(GMBSPAction)
+{
+	GMBSPMoveArgs move;
+	GMBSPJumpArgs jump;
 };
 
 GM_PRIVATE_OBJECT(GMBSPMove)
 {
-	bool inited;
+	bool inited = false;
 	GMBSPPhysicsWorld* world = nullptr;
 	GMPhysicsObject* object = nullptr;
 	GMBSPTrace* trace = nullptr;
-	GMBSPMovement movement;
-	GMBSPMoveCommand moveCommand;
+	GMBSPMovement movementState;
+	GMBSPAction action;
 };
 
 class GMBSPMove : public GMObject
@@ -43,8 +55,8 @@ class GMBSPMove : public GMObject
 public:
 	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);
 	void move();
-	void applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args);
-	void applyJump(const GMPhysicsObject& phy);
+	void applyMove(const GMPhysicsMoveArgs& args);
+	void applyJump();
 
 private:
 	GMfloat now();

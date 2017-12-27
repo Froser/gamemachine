@@ -35,8 +35,8 @@ public:
 
 public:
 	virtual void simulate(GMGameObject* obj) override;
-	virtual void applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args) override;
-	virtual void applyJump(const GMPhysicsObject& phy) override;
+	virtual void applyMove(GMPhysicsObject& phy, const GMPhysicsMoveArgs& args) override;
+	virtual void applyJump(GMPhysicsObject& phy) override;
 
 public:
 	GMBSPPhysicsWorld::Data& physicsData();

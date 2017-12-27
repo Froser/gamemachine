@@ -58,9 +58,6 @@ public:
 	void lookRight(GMfloat degree);
 	void setPitchLimitDegree(GMfloat deg);
 	const GMPositionState& getPositionState();
-
-private:
-	void sendMoveCommand(const glm::vec3& direction, const glm::vec3& rate);
 };
 
 

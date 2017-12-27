@@ -7,8 +7,15 @@ BEGIN_NS
 //Camera
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
-	glm::vec3 lookAt;
-	glm::vec3 position;
+	GMCameraLookAt() = default;
+	GMCameraLookAt(const glm::vec3& _lookAt, const glm::vec3& _position)
+		: lookAt(_lookAt)
+		, position(_position)
+	{
+	}
+
+	glm::vec3 lookAt = glm::zero<glm::vec3>(); //!< 摄像机朝向，单位向量指示其方向
+	glm::vec3 position = glm::zero<glm::vec3>(); //!< 摄像机位置
 };
 
 GM_ALIGNED_STRUCT(GMPositionState)

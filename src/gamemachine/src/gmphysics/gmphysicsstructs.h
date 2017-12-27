@@ -7,6 +7,7 @@ BEGIN_NS
 
 GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 {
+	GMPhysicsMoveArgs() = default;
 	GMPhysicsMoveArgs(const glm::quat& _lookAt, const glm::vec3& _direction, const glm::vec3& _rate)
 		: lookAt(_lookAt)
 		, direction(_direction)
@@ -14,8 +15,8 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 	{
 	}
 
-	glm::quat lookAt;
-	glm::vec3 direction;
+	glm::quat lookAt; //!< 物体朝向
+	glm::vec3 direction; //!< 物体移动方向，坐标系相对于物体朝向，采用右手坐标系，与朝向坐标系一致。
 	glm::vec3 rate;
 };
 

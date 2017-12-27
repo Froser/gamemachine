@@ -1,5 +1,4 @@
-﻿#define GLEW_STATIC
-#include <stdafx.h>
+﻿#include <stdafx.h>
 #include "cases/objectmove.h"
 
 void static_test()

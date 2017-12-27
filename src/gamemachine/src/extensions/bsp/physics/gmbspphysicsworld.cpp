@@ -53,14 +53,16 @@ void GMBSPPhysicsWorld::simulate(GMGameObject* obj)
 	move->move();
 }
 
-void GMBSPPhysicsWorld::applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args)
+void GMBSPPhysicsWorld::applyMove(GMPhysicsObject& phy, const GMPhysicsMoveArgs& args)
 {
-	GM_ASSERT(false);
+	GMBSPMove* move = getMove(&phy);
+	move->applyMove(args);
 }
 
-void GMBSPPhysicsWorld::applyJump(const GMPhysicsObject& phy)
+void GMBSPPhysicsWorld::applyJump(GMPhysicsObject& phy)
 {
-	GM_ASSERT(false);
+	GMBSPMove* move = getMove(&phy);
+	move->applyJump();
 }
 
 void GMBSPPhysicsWorld::initBSPPhysicsWorld()

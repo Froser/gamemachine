@@ -22,8 +22,8 @@ public:
 
 public:
 	virtual void simulate(GMGameObject* obj) = 0;
-	virtual void applyMove(const GMPhysicsObject& phy, const GMPhysicsMoveArgs& args) {}
-	virtual void applyJump(const GMPhysicsObject& phy) {}
+	virtual void applyMove(GMPhysicsObject& phy, const GMPhysicsMoveArgs& args) {}
+	virtual void applyJump(GMPhysicsObject& phy) {}
 };
 
 END_NS

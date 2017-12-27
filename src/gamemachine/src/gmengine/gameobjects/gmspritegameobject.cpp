@@ -70,7 +70,7 @@ void GMSpriteGameObject::setPitchLimitDegree(GMfloat deg)
 void GMSpriteGameObject::simulate()
 {
 	D(d);
-	glm::vec3 directions(0), rate(0);
+	glm::vec3 direction(0), rate(0);
 	bool moved = false, jumped = false;
 	for (auto& movement : d->movements)
 	{
@@ -78,14 +78,18 @@ void GMSpriteGameObject::simulate()
 			moved = true;
 		else if (movement.movement == GMMovement::Jump)
 			jumped = true;
-		directions += movement.moveDirection;
+		direction += movement.moveDirection;
 		rate += movement.moveRate;
 	}
-	directions = glm::fastNormalize(directions);
+	direction = glm::fastNormalize(direction);
 	rate = glm::fastNormalize(rate);
 
 	if (moved)
-		sendMoveCommand(directions, rate);
+	{
+		GMPhysicsWorld* world = getWorld()->physicsWorld();
+		GMPhysicsMoveArgs args(d->state.lookAt, direction, rate);
+		world->applyMove(getPhysicsObject(), args);
+	}
 
 	if (jumped)
 	{
@@ -99,12 +103,4 @@ void GMSpriteGameObject::updateAfterSimulate()
 	D(d);
 	d->state.position = getPhysicsObject().motions.translation;
 	d->movements.clear();
-}
-
-void GMSpriteGameObject::sendMoveCommand(const glm::vec3& direction, const glm::vec3& rate)
-{
-	D(d);
-	GMPhysicsWorld* world = getWorld()->physicsWorld();
-	GMPhysicsMoveArgs args (d->state.lookAt, direction, rate);
-	world->applyMove(getPhysicsObject(), args);
 }
