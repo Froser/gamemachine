@@ -199,7 +199,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename)
 {
 	D(d);
-	GMString fn = settings.filename;
+	GMString fn = settings.directory;
 	if (fn[fn.length() - 1] != '\\' &&
 		fn[fn.length() - 1] != '/')
 	{
