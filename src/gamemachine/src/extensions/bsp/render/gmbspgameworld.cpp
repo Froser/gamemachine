@@ -63,8 +63,7 @@ GMBSPGameWorld::GMBSPGameWorld()
 GMBSPGameWorld::~GMBSPGameWorld()
 {
 	D(d);
-	if (d->physics)
-		delete d->physics;
+	GM_delete(d->physics);
 }
 
 void GMBSPGameWorld::loadBSP(const GMString& mapName)
@@ -96,7 +95,7 @@ void GMBSPGameWorld::renderScene()
 	drawAll();
 }
 
-GMPhysicsWorld* GMBSPGameWorld::physicsWorld()
+GMPhysicsWorld* GMBSPGameWorld::getPhysicsWorld()
 {
 	D(d);
 	return d->physics;

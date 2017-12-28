@@ -10,7 +10,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMGameObject)
 {
-	GMPhysicsObject physics;
+	GMPhysicsObject* physics = nullptr;
 	GMuint id = 0;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
@@ -38,6 +38,7 @@ class GMGameObject : public GMObject
 public:
 	GMGameObject() = default;
 	GMGameObject(GMAsset asset);
+	~GMGameObject();
 
 public:
 	void setModel(GMAsset asset);
@@ -68,7 +69,8 @@ public:
 	inline const glm::mat4& getScaling() const { D(d); return d->scaling; }
 	inline const glm::mat4& getTranslation() const { D(d); return d->translation; }
 	inline const glm::quat& getRotation() const { D(d); return d->rotation; }
-	inline GMPhysicsObject& getPhysicsObject() { D(d); return d->physics; }
+	inline GMPhysicsObject* getPhysicsObject() { D(d); GM_ASSERT(d->physics); return d->physics; }
+	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj) { D(d); d->physics = phyObj; }
 
 	// events
 private:

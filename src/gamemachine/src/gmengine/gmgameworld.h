@@ -30,7 +30,7 @@ public:
 	virtual ~GMGameWorld();
 
 public:
-	virtual GMPhysicsWorld* physicsWorld() { return nullptr; }
+	virtual GMPhysicsWorld* getPhysicsWorld() { return nullptr; }
 
 public:
 	virtual void renderScene() {}

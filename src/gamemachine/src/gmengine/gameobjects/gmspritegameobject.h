@@ -23,8 +23,7 @@ GM_ALIGNED_STRUCT(GMSpriteMovement)
 GM_PRIVATE_OBJECT(GMSpriteGameObject)
 {
 	GMfloat radius;
-
-	GMfloat pitchLimit;
+	GMfloat limitPitch;
 	GMPositionState state;
 	AlignedVector<GMSpriteMovement> movements;
 };
@@ -34,7 +33,7 @@ class GMSpriteGameObject : public GMGameObject
 	DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
 
 public:
-	GMSpriteGameObject(GMfloat radius);
+	GMSpriteGameObject(GMfloat radius, const glm::vec3& position = glm::zero<glm::vec3>());
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Sprite; }
@@ -57,11 +56,10 @@ public:
 	//! 表示精灵朝着某个方向变化。
 	/*!
 	  此方法表示一个变化量。它会在原有的朝向上进行叠加，而不是将朝向调整为某一个值。
-	  \param pitchDegree 俯仰角，绕x轴旋转的弧度数。
-	  \param yawDegree 偏航角，绕y轴旋转的弧度数。
+	  \param pitchDegree 俯仰角，绕视角坐标系x轴旋转的弧度数。
+	  \param yawDegree 偏航角，绕视角坐标系y轴旋转的弧度数。
 	*/
 	void look(GMfloat pitch, GMfloat yaw);
-	void setPitchLimit(GMfloat deg);
 	const GMPositionState& getPositionState();
 };
 

@@ -12,6 +12,12 @@ GMGameObject::GMGameObject(GMAsset asset)
 	updateMatrix();
 }
 
+GMGameObject::~GMGameObject()
+{
+	D(d);
+	GM_delete(d->physics);
+}
+
 void GMGameObject::setModel(GMAsset asset)
 {
 	D(d);

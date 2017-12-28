@@ -56,7 +56,7 @@ bool GMGameWorld::removeObject(GMGameObject* obj)
 void GMGameWorld::simulateGameWorld()
 {
 	D(d);
-	auto phyw = physicsWorld();
+	auto phyw = getPhysicsWorld();
 	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Entity]);
 	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Sprite]);
 	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Particles]);

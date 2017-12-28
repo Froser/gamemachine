@@ -104,15 +104,15 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::GMJoystickState state = joyState.joystickState();
 		glm::vec3 direction(0);
 
-		if (kbState.keydown('A'))
+		if (kbState.keydown('D'))
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0));
 		if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
 
-		if (kbState.keydown('D'))
+		if (kbState.keydown('A'))
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0));
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
+			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
 
 		if (kbState.keydown('S'))
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, -1));

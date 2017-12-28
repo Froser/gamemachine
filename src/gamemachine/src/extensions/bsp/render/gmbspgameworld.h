@@ -25,7 +25,7 @@ public:
 
 public:
 	virtual void renderScene() override;
-	virtual GMPhysicsWorld* physicsWorld() override;
+	virtual GMPhysicsWorld* getPhysicsWorld() override;
 
 	//renders:
 public:

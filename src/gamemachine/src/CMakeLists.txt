@@ -89,8 +89,6 @@ set(SOURCES
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp
 		gmphysics/gmphysicsstructs.h
-		gmphysics/collisionobjectfactory.h
-		gmphysics/collisionobjectfactory.cpp
 		foundation/utilities/tinyxml/tinystr.cpp
 		foundation/utilities/tinyxml/tinystr.h
 		foundation/utilities/tinyxml/tinyxml.cpp

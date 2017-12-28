@@ -7,7 +7,7 @@
 BEGIN_NS
 
 class GMBSPPhysicsWorld;
-struct GMPhysicsObject;
+class GMPhysicsObject;
 class GMBSPTrace;
 
 GM_ALIGNED_STRUCT(GMBSPMovement)

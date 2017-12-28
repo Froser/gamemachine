@@ -53,13 +53,16 @@ namespace
 
 		glm::vec3 playerStart(origin[0], origin[2], -origin[1]);
 
-		GMSpriteGameObject* sprite = new GMSpriteGameObject(6);
+		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, glm::vec3(0, 10, 0));
+		sprite->setPhysicsObject(world->getPhysicsWorld()->createPhysicsObject());
 		world->addObjectAndInit(sprite);
 		sprite->setMoveSpeed(glm::vec3(193));
 		sprite->setJumpSpeed(glm::vec3(0, 150, 0));
 
-		GMMotionProperties& prop = sprite->getPhysicsObject().motions;
+		GMMotionProperties& prop = sprite->getPhysicsObject()->getMotions();
 		prop.translation = playerStart;
+
+		sprite->getPhysicsObject()->getShapeProperties().stepHeight = 18.f;
 		created = true;
 	}
 }

@@ -12,3 +12,8 @@ GMPhysicsWorld::~GMPhysicsWorld()
 {
 
 }
+
+GMPhysicsObject* GMPhysicsWorld::createPhysicsObject()
+{
+	return new GMPhysicsObject();
+}

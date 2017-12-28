@@ -3,7 +3,6 @@
 #include "gmbspmove.h"
 #include <gmphysics.h>
 #include "extensions/bsp/render/gmbspgameworld.h"
-#include "gmphysics/collisionobjectfactory.h"
 
 //class
 GMBSPPhysicsWorld::GMBSPPhysicsWorld(GMGameWorld* world)
@@ -49,19 +48,19 @@ void GMBSPPhysicsWorld::simulate(GMGameObject* obj)
 	D(d);
 	BSPData& bsp = d->world->bspData();
 
-	GMBSPMove* move = getMove(&obj->getPhysicsObject());
+	GMBSPMove* move = getMove(obj->getPhysicsObject());
 	move->move();
 }
 
-void GMBSPPhysicsWorld::applyMove(GMPhysicsObject& phy, const GMPhysicsMoveArgs& args)
+void GMBSPPhysicsWorld::applyMove(GMPhysicsObject* phy, const GMPhysicsMoveArgs& args)
 {
-	GMBSPMove* move = getMove(&phy);
+	GMBSPMove* move = getMove(phy);
 	move->applyMove(args);
 }
 
-void GMBSPPhysicsWorld::applyJump(GMPhysicsObject& phy)
+void GMBSPPhysicsWorld::applyJump(GMPhysicsObject* phy)
 {
-	GMBSPMove* move = getMove(&phy);
+	GMBSPMove* move = getMove(phy);
 	move->applyJump();
 }
 
