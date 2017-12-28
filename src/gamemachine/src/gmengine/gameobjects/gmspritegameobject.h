@@ -41,9 +41,6 @@ public:
 	virtual void updateAfterSimulate() override;
 
 public:
-	void setJumpSpeed(const glm::vec3& jumpSpeed);
-	void setMoveSpeed(const glm::vec3& moveSpeed);
-
 	//! 表示精灵对象执行一个动作。
 	/*!
 	  精灵对象执行一个动作。动作的效果由本对象一些物理属性合成。

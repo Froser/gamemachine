@@ -12,18 +12,6 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const glm::vec3& position
 	d->limitPitch = glm::radians(85.f);
 }
 
-void GMSpriteGameObject::setJumpSpeed(const glm::vec3& jumpSpeed)
-{
-	D(d);
-	getPhysicsObject()->getMotions().jumpSpeed = jumpSpeed;
-}
-
-void GMSpriteGameObject::setMoveSpeed(const glm::vec3& moveSpeed)
-{
-	D(d);
-	getPhysicsObject()->getMotions().moveSpeed = moveSpeed;
-}
-
 const GMPositionState& GMSpriteGameObject::getPositionState()
 {
 	D(d);
