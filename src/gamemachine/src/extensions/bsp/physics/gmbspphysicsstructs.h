@@ -113,7 +113,7 @@ public:
 	  用户可以直接修改拿到的形状参数。
 	  \return 当前物理对象的形状参数。
 	*/
-	inline GMBSPShapeProperties& shapeProperties() const { D(d); return d->shapeProps; }
+	inline GMBSPShapeProperties& shapeProperties() { D(d); return d->shapeProps; }
 };
 
 END_NS

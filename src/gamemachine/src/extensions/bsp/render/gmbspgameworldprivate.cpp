@@ -52,15 +52,15 @@ namespace
 		}
 
 		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, glm::vec3(0, 10, 0));
+		sprite->setMoveSpeed(glm::vec3(293));
+		sprite->setJumpSpeed(glm::vec3(0, 150, 0));
 		sprite->setPhysicsObject(world->getPhysicsWorld()->createPhysicsObject());
 		world->addObjectAndInit(sprite);
 
 		GMBSPPhysicsObject* physics = gmBSPPhysicsObjectCast(sprite->getPhysicsObject());
 
-		GMMotionProperties& prop = physics->motions();
-		physics->motions().translation = glm::vec3(origin[0], origin[2], -origin[1]);
-		physics->motions().moveSpeed = glm::vec3(293);
-		physics->motions().jumpSpeed = glm::vec3(0, 150, 0);
+		GMMotionStates& prop = physics->motionStates();
+		physics->motionStates().translation = glm::vec3(origin[0], origin[2], -origin[1]);
 		physics->shapeProperties().stepHeight = 18.f;
 		physics->shapeProperties().bounding[0] = glm::vec3(-15, -35, -15);
 		physics->shapeProperties().bounding[1] = glm::vec3(15, 35, 15);

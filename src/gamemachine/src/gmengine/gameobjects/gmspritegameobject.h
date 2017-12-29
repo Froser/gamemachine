@@ -9,14 +9,16 @@ GM_ALIGNED_STRUCT(GMSpriteMovement)
 {
 	GMSpriteMovement() = default;
 
-	GMSpriteMovement(const glm::vec3& dir, const glm::vec3& rate, GMMovement m)
+	GMSpriteMovement(const glm::vec3& dir, const glm::vec3& rate, const glm::vec3& _speed, GMMovement m)
 		: moveDirection(dir)
 		, moveRate(rate)
+		, speed(_speed)
 		, movement(m)
 	{}
 
 	glm::vec3 moveDirection;
 	glm::vec3 moveRate;
+	glm::vec3 speed;
 	GMMovement movement;
 };
 
@@ -26,6 +28,8 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 	GMfloat limitPitch;
 	GMPositionState state;
 	AlignedVector<GMSpriteMovement> movements;
+	glm::vec3 moveSpeed = glm::zero<glm::vec3>();
+	glm::vec3 jumpSpeed = glm::zero<glm::vec3>();
 };
 
 class GMSpriteGameObject : public GMGameObject
@@ -58,6 +62,10 @@ public:
 	*/
 	void look(GMfloat pitch, GMfloat yaw);
 	const GMPositionState& getPositionState();
+
+public:
+	inline void setMoveSpeed(const glm::vec3& speed) { D(d); d->moveSpeed = speed; }
+	inline void setJumpSpeed(const glm::vec3& speed) { D(d); d->jumpSpeed = speed; }
 };
 
 

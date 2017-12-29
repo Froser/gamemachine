@@ -48,7 +48,7 @@ void GMBSPMove::processCommand()
 		//TODO 没有在move的时候，可以考虑摩擦使速度减小
 		//这里我们先清空速度
 		if (!d->movementState.freefall)
-			d->object->motions().velocity = glm::vec3(0);
+			d->initialVelocity = glm::vec3(0);
 	}
 
 	if (d->action.jump.jumped)
@@ -66,11 +66,9 @@ void GMBSPMove::processMove()
 		return;
 
 	const GMPhysicsMoveArgs& moveArgs = d->action.move.args;
-
 	glm::quat q = glm::quat(glm::vec3(0, 0, 1), moveArgs.lookAt);
 
-	d->object->motions().velocity = q * (moveArgs.direction * d->object->motions().moveSpeed * moveArgs.rate);
-
+	d->initialVelocity = q * (moveArgs.direction * moveArgs.speed * moveArgs.rate);
 	composeVelocityWithGravity();
 }
 
@@ -80,9 +78,9 @@ void GMBSPMove::processJump()
 	if (!d->movementState.freefall)
 	{
 		// 能够跳跃的场合
-		d->movementState.velocity[0] += d->object->motions().jumpSpeed[0];
-		d->movementState.velocity[1] = d->object->motions().jumpSpeed[1];
-		d->movementState.velocity[2] += d->object->motions().jumpSpeed[2];
+		d->movementState.velocity[0] += d->action.jump.speed[0];
+		d->movementState.velocity[1] = d->action.jump.speed[1];
+		d->movementState.velocity[2] += d->action.jump.speed[2];
 	}
 }
 
@@ -93,10 +91,11 @@ void GMBSPMove::applyMove(const GMPhysicsMoveArgs& args)
 	d->action.move.args = args;
 }
 
-void GMBSPMove::applyJump()
+void GMBSPMove::applyJump(const glm::vec3& speed)
 {
 	D(d);
 	d->action.jump.jumped = true;
+	d->action.jump.speed = speed;
 }
 
 GMfloat GMBSPMove::now()
@@ -110,7 +109,7 @@ void GMBSPMove::generateMovement()
 	D(d);
 	if (!d->inited)
 	{
-		d->movementState.velocity = decomposeVelocity(d->object->motions().velocity);
+		d->movementState.velocity = decomposeVelocity(d->initialVelocity);
 		d->inited = true;
 	}
 	else
@@ -118,7 +117,7 @@ void GMBSPMove::generateMovement()
 		composeVelocityWithGravity();
 	}
 
-	d->movementState.origin = d->object->motions().translation;
+	d->movementState.origin = d->object->motionStates().translation;
 	d->movementState.startTime = now();
 }
 
@@ -127,7 +126,7 @@ void GMBSPMove::composeVelocityWithGravity()
 	// 获取当前纵向速度，并叠加上加速度
 	D(d);
 	GMfloat accelerationVelocity = d->movementState.velocity[GRAVITY_DIRECTION];
-	d->movementState.velocity = decomposeVelocity(d->object->motions().velocity);
+	d->movementState.velocity = decomposeVelocity(d->initialVelocity);
 	d->movementState.velocity[GRAVITY_DIRECTION] = accelerationVelocity;
 }
 
@@ -186,7 +185,7 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	glm::vec3 startVelocity = d->movementState.velocity;
 	if (!slideMove(hasGravity))
 	{
-		synchronizePosition();
+		synchronizeMotionStates();
 		return;
 	}
 
@@ -203,7 +202,7 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 
 	if (t.allsolid)
 	{
-		synchronizePosition();
+		synchronizeMotionStates();
 		return;
 	}
 
@@ -232,7 +231,7 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 		if (d->movementState.velocity[GRAVITY_DIRECTION] < CLIP_IGNORE)
 			d->movementState.velocity[GRAVITY_DIRECTION] = 0;
 	}
-	synchronizePosition();
+	synchronizeMotionStates();
 }
 
 bool GMBSPMove::slideMove(bool hasGravity)
@@ -385,8 +384,9 @@ void GMBSPMove::clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::
 	}
 }
 
-void GMBSPMove::synchronizePosition()
+void GMBSPMove::synchronizeMotionStates()
 {
 	D(d);
-	d->object->motions().translation = d->movementState.origin;
+	d->object->motionStates().translation = d->movementState.origin;
+	d->object->motionStates().velocity = d->movementState.velocity;
 }

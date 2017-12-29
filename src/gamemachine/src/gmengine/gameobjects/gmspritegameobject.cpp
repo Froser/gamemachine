@@ -21,7 +21,15 @@ const GMPositionState& GMSpriteGameObject::getPositionState()
 void GMSpriteGameObject::action(GMMovement movement, const glm::vec3& direction, const glm::vec3& rate)
 {
 	D(d);
-	GMSpriteMovement subMovement(direction, rate, movement);
+	const glm::vec3* speed;
+	if (movement == GMMovement::Move)
+		speed = &d->moveSpeed;
+	else if (movement == GMMovement::Jump)
+		speed = &d->jumpSpeed;
+	else
+		GM_ASSERT(false);
+
+	GMSpriteMovement subMovement(direction, rate, *speed, movement);
 	d->movements.push_back(subMovement);
 }
 
@@ -31,12 +39,12 @@ void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 	glm::vec3 lookAt = d->state.lookAt;
 	// 不考虑roll，把lookAt投影到世界坐标系平面
 	glm::vec3 lookAt_z = glm::vec3(lookAt[0], 0, lookAt[2]);
-	// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
-	glm::vec3 lookAt_x = glm::quat(glm::vec3(0, 0, 1), lookAt_z) * glm::vec3(1, 0, 0);
 	// 计算pitch是否超出范围，不考虑roll
 	GMfloat calculatedPitch = glm::asin(d->state.lookAt[1]) + pitch;
 	if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
 	{
+		// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
+		glm::vec3 lookAt_x = glm::quat(glm::vec3(0, 0, 1), lookAt_z) * glm::vec3(1, 0, 0);
 		glm::quat qPitch = glm::rotate(glm::identity<glm::quat>(), -pitch, glm::fastNormalize(lookAt_x));
 		lookAt = qPitch * lookAt;
 	}
@@ -48,14 +56,20 @@ void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 void GMSpriteGameObject::simulate()
 {
 	D(d);
-	glm::vec3 direction(0), rate(0);
+	glm::vec3 direction(0), rate(0), moveSpeed(0), jumpSpeed(0);
 	bool moved = false, jumped = false;
 	for (auto& movement : d->movements)
 	{
 		if (movement.movement == GMMovement::Move)
+		{
+			moveSpeed = movement.speed;
 			moved = true;
+		}
 		else if (movement.movement == GMMovement::Jump)
+		{
+			jumpSpeed = movement.speed;
 			jumped = true;
+		}
 		direction += movement.moveDirection;
 		rate += movement.moveRate;
 	}
@@ -64,21 +78,22 @@ void GMSpriteGameObject::simulate()
 
 	if (moved)
 	{
+		GMPhysicsMoveArgs args(d->state.lookAt, direction, moveSpeed, rate);
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
-		GMPhysicsMoveArgs args(d->state.lookAt, direction, rate);
 		world->applyMove(getPhysicsObject(), args);
 	}
 
 	if (jumped)
 	{
+		GMPhysicsMoveArgs args(d->state.lookAt, direction, jumpSpeed, rate);
 		GMPhysicsWorld* world = getWorld()->getPhysicsWorld();
-		world->applyJump(getPhysicsObject());
+		world->applyJump(getPhysicsObject(), args);
 	}
 }
 
 void GMSpriteGameObject::updateAfterSimulate()
 {
 	D(d);
-	d->state.position = getPhysicsObject()->motions().translation;
+	d->state.position = getPhysicsObject()->motionStates().translation;
 	d->movements.clear();
 }

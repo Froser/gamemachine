@@ -58,10 +58,10 @@ void GMBSPPhysicsWorld::applyMove(GMPhysicsObject* phy, const GMPhysicsMoveArgs&
 	move->applyMove(args);
 }
 
-void GMBSPPhysicsWorld::applyJump(GMPhysicsObject* phy)
+void GMBSPPhysicsWorld::applyJump(GMPhysicsObject* phy, const GMPhysicsMoveArgs& args)
 {
 	GMBSPMove* move = getMove(phy);
-	move->applyJump();
+	move->applyJump(args.speed);
 }
 
 GMPhysicsObject* GMBSPPhysicsWorld::createPhysicsObject()

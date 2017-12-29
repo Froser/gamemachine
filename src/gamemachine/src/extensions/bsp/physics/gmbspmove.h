@@ -23,6 +23,7 @@ GM_ALIGNED_STRUCT(GMBSPMovement)
 
 GM_ALIGNED_STRUCT(GMBSPJumpArgs)
 {
+	glm::vec3 speed;
 	bool jumped = false;
 };
 
@@ -46,6 +47,7 @@ GM_PRIVATE_OBJECT(GMBSPMove)
 	GMBSPTrace* trace = nullptr;
 	GMBSPMovement movementState;
 	GMBSPAction action;
+	glm::vec3 initialVelocity = glm::zero<glm::vec3>();
 };
 
 class GMBSPMove : public GMObject
@@ -56,7 +58,7 @@ public:
 	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);
 	void move();
 	void applyMove(const GMPhysicsMoveArgs& args);
-	void applyJump();
+	void applyJump(const glm::vec3& speed);
 
 private:
 	GMfloat now();
@@ -71,7 +73,7 @@ private:
 	void airMove();
 	void stepSlideMove(bool hasGravity);
 	bool slideMove(bool hasGravity);
-	void synchronizePosition();
+	void synchronizeMotionStates();
 	void clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::vec3& out, GMfloat overbounce);
 };
 
