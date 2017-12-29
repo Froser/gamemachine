@@ -33,15 +33,15 @@ void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 	glm::vec3 lookAt_z = glm::vec3(lookAt[0], 0, lookAt[2]);
 	// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
 	glm::vec3 lookAt_x = glm::quat(glm::vec3(0, 0, 1), lookAt_z) * glm::vec3(1, 0, 0);
-	// 沿着视角方向的x轴旋转 (pitch)
-	glm::quat qPitch = glm::rotate(glm::identity<glm::quat>(), -pitch, glm::fastNormalize(lookAt_x));
-	glm::quat qYaw = glm::rotate(glm::identity<glm::quat>(), -yaw, glm::vec3(0, 1, 0));
 	// 计算pitch是否超出范围，不考虑roll
-	GMfloat currentPitch = glm::asin(d->state.lookAt[1]);
-	GMfloat calculatedPitch = currentPitch + pitch;
+	GMfloat calculatedPitch = glm::asin(d->state.lookAt[1]) + pitch;
 	if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
+	{
+		glm::quat qPitch = glm::rotate(glm::identity<glm::quat>(), -pitch, glm::fastNormalize(lookAt_x));
 		lookAt = qPitch * lookAt;
+	}
 
+	glm::quat qYaw = glm::rotate(glm::identity<glm::quat>(), -yaw, glm::vec3(0, 1, 0));
 	d->state.lookAt = glm::fastNormalize(qYaw * lookAt);
 }
 
@@ -79,6 +79,6 @@ void GMSpriteGameObject::simulate()
 void GMSpriteGameObject::updateAfterSimulate()
 {
 	D(d);
-	d->state.position = getPhysicsObject()->getMotions().translation;
+	d->state.position = getPhysicsObject()->motions().translation;
 	d->movements.clear();
 }

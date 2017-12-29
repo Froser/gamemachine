@@ -55,11 +55,15 @@ namespace
 		sprite->setPhysicsObject(world->getPhysicsWorld()->createPhysicsObject());
 		world->addObjectAndInit(sprite);
 
-		GMMotionProperties& prop = sprite->getPhysicsObject()->getMotions();
-		prop.translation = glm::vec3(origin[0], origin[2], -origin[1]);
-		prop.moveSpeed = glm::vec3(193);
-		prop.jumpSpeed = glm::vec3(0, 150, 0);
-		sprite->getPhysicsObject()->getShapeProperties().stepHeight = 18.f;
+		GMBSPPhysicsObject* physics = gmBSPPhysicsObjectCast(sprite->getPhysicsObject());
+
+		GMMotionProperties& prop = physics->motions();
+		physics->motions().translation = glm::vec3(origin[0], origin[2], -origin[1]);
+		physics->motions().moveSpeed = glm::vec3(293);
+		physics->motions().jumpSpeed = glm::vec3(0, 150, 0);
+		physics->shapeProperties().stepHeight = 18.f;
+		physics->shapeProperties().bounding[0] = glm::vec3(-15, -35, -15);
+		physics->shapeProperties().bounding[1] = glm::vec3(15, 35, 15);
 		created = true;
 	}
 }

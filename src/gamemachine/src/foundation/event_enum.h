@@ -42,10 +42,6 @@ enum __ProperyChangedEvents
 	// GMControlGameObject
 	GM_SET_PROPERTY_EVENT_ENUM(Stretch),
 
-	// GMPhysicsObject
-	GM_SET_PROPERTY_EVENT_ENUM(Motions),
-	GM_SET_PROPERTY_EVENT_ENUM(ShapeProperties),
-
 	__LastPropertyEvent,
 };
 

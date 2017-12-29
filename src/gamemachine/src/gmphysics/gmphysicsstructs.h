@@ -20,12 +20,6 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 	glm::vec3 rate;
 };
 
-GM_ALIGNED_STRUCT(GMShapeProperties)
-{
-	glm::vec3 bounding[2]; //最小边界和最大边界
-	GMfloat stepHeight;
-};
-
 GM_ALIGNED_STRUCT(GMMotionProperties)
 {
 	glm::vec3 translation;
@@ -37,7 +31,6 @@ GM_ALIGNED_STRUCT(GMMotionProperties)
 GM_PRIVATE_OBJECT(GMPhysicsObject)
 {
 	GMMotionProperties motions;
-	GMShapeProperties shapeProps;
 };
 
 //! 表示一个物理对象
@@ -50,12 +43,11 @@ class GMPhysicsObject : public GMObject
 	DECLARE_PRIVATE(GMPhysicsObject)
 	friend class GMPhysicsWorld;
 
-private:
+protected:
 	GMPhysicsObject() = default;
 
 public:
-	GM_DECLARE_PROPERTY(Motions, motions, GMMotionProperties);
-	GM_DECLARE_PROPERTY(ShapeProperties, shapeProps, GMShapeProperties);
+	inline GMMotionProperties& motions() const { D(d); return d->motions; }
 };
 
 END_NS

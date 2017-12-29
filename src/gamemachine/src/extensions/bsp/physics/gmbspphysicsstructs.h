@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <linearmath.h>
 #include <gmbsp.h>
+#include <gmphysics.h>
 BEGIN_NS
 
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
@@ -85,6 +86,34 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Patch)
 		if (pc)
 			delete pc;
 	}
+};
+
+GM_ALIGNED_STRUCT(GMBSPShapeProperties)
+{
+	glm::vec3 bounding[2]; //!< 最小边界和最大边界，用于碰撞检测
+	GMfloat stepHeight;
+};
+
+GM_PRIVATE_OBJECT(GMBSPPhysicsObject)
+{
+	GMBSPShapeProperties shapeProps;
+};
+
+class GMBSPPhysicsObject : public GMPhysicsObject
+{
+	DECLARE_PRIVATE_AND_BASE(GMBSPPhysicsObject, GMPhysicsObject)
+	friend class GMBSPPhysicsWorld;
+
+protected:
+	GMBSPPhysicsObject() = default;
+
+public:
+	//! 形状参数
+	/*!
+	  用户可以直接修改拿到的形状参数。
+	  \return 当前物理对象的形状参数。
+	*/
+	inline GMBSPShapeProperties& shapeProperties() const { D(d); return d->shapeProps; }
 };
 
 END_NS

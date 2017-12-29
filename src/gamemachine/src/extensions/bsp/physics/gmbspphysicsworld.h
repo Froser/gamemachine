@@ -37,6 +37,7 @@ public:
 	virtual void simulate(GMGameObject* obj) override;
 	virtual void applyMove(GMPhysicsObject* phy, const GMPhysicsMoveArgs& args) override;
 	virtual void applyJump(GMPhysicsObject* phy) override;
+	virtual GMPhysicsObject* createPhysicsObject() override;
 
 public:
 	GMBSPPhysicsWorld::Data& physicsData();
@@ -49,6 +50,16 @@ private:
 	void generatePhysicsBrushData();
 	void generatePhysicsPatches();
 };
+
+inline GMBSPPhysicsObject* gmBSPPhysicsObjectCast(GMPhysicsObject* obj)
+{
+	return gm_static_cast<GMBSPPhysicsObject*>(obj);
+}
+
+inline GMBSPPhysicsObject& gmBSPPhysicsObjectCast(GMPhysicsObject& obj)
+{
+	return *gm_static_cast<GMBSPPhysicsObject*>(&obj);
+}
 
 END_NS
 #endif

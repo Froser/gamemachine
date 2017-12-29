@@ -64,6 +64,11 @@ void GMBSPPhysicsWorld::applyJump(GMPhysicsObject* phy)
 	move->applyJump();
 }
 
+GMPhysicsObject* GMBSPPhysicsWorld::createPhysicsObject()
+{
+	return new GMBSPPhysicsObject();
+}
+
 void GMBSPPhysicsWorld::initBSPPhysicsWorld()
 {
 	generatePhysicsPlaneData();
