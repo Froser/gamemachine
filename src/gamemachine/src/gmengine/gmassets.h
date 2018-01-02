@@ -6,9 +6,9 @@
 BEGIN_NS
 
 // 默认的一些资产路径
-#define GM_ASSET_TEXTURES	"/textures"
-#define GM_ASSET_LIGHTMAPS	"/lightmaps"
-#define GM_ASSET_MODELS		"/models"
+#define GM_ASSET_TEXTURES	GMString(L"/textures")
+#define GM_ASSET_LIGHTMAPS	GMString(L"/lightmaps")
+#define GM_ASSET_MODELS		GMString(L"/models")
 
 //! 游戏资产的类型
 /*!
@@ -27,46 +27,6 @@ struct GMAsset
 	void* asset = nullptr;
 };
 
-struct GMAssetName
-{
-	enum
-	{
-		NAME_MAX = 128
-	};
-
-	Array<char, 128> name;
-
-	operator const char*() const
-	{
-		return name.data();
-	}
-
-	bool operator ==(const char* n)
-	{
-		return strEqual(name.data(), n);
-	}
-
-	GMAssetName(const char* n)
-	{
-		strcpy_s(name.data(), NAME_MAX, n);
-	}
-
-	GMAssetName() = default;
-
-	GMAssetName(const GMAssetName& rhs)
-	{
-		strcpy_s(name.data(), NAME_MAX, rhs.name.data());
-	}
-};
-
-struct GMAssetNameCmp
-{
-	bool operator ()(const GMAssetName& left, const GMAssetName& right) const
-	{
-		return strcmp(left.name.data(), right.name.data()) < 0;
-	}
-};
-
 // 使用一种（多叉）树状结构，保存游戏中的资产
 // 资产的根节点叫作root
 #define ASSET_GETTER(retType, funcName, predictType)	\
@@ -79,8 +39,8 @@ struct GMAssetNameCmp
 struct GMAssetsNode;
 struct GMAssetsNode
 {
-	GMAssetName name;
-	Multimap<GMAssetName, GMAssetsNode*, GMAssetNameCmp> childs;
+	GMString name;
+	Multimap<GMString, GMAssetsNode*> childs;
 	GMAsset asset;
 };
 
@@ -104,18 +64,18 @@ public:
 
 public:
 	GMAsset insertAsset(GMAssetType type, void* asset);
-	GMAsset insertAsset(const char* path, const GMAssetName& name, GMAssetType type, void* asset);
-	GMAssetsNode* getNodeFromPath(const char* path, bool createIfNotExists = false);
-	void createNodeFromPath(const char* path);
+	GMAsset insertAsset(const GMString& path, const GMString& name, GMAssetType type, void* asset);
+	GMAssetsNode* getNodeFromPath(const GMString& path, bool createIfNotExists = false);
+	void createNodeFromPath(const GMString& path);
 
 public:
 	static GMAsset createIsolatedAsset(GMAssetType type, void* data);
-	static GMAssetsNode* findChild(GMAssetsNode* parentNode, const GMAssetName& name, bool createIfNotExists = false);
-	static GMAssetsNode* makeChild(GMAssetsNode* parentNode, const GMAssetName& name);
-	static GMString combinePath(std::initializer_list<GMString> args, REF char* path = nullptr, REF char* lastPart = nullptr);
+	static GMAssetsNode* findChild(GMAssetsNode* parentNode, const GMString& name, bool createIfNotExists = false);
+	static GMAssetsNode* makeChild(GMAssetsNode* parentNode, const GMString& name);
+	static GMString combinePath(std::initializer_list<GMString> args, REF GMString* path = nullptr, REF GMString* lastPart = nullptr);
 
 private:
-	static GMAssetsNode* getNodeFromPath(GMAssetsNode* node, const char* path, bool createIfNotExists = false);
+	static GMAssetsNode* getNodeFromPath(GMAssetsNode* node, const GMString& path, bool createIfNotExists = false);
 	static void clearChildNode(GMAssetsNode* self);
 	static void deleteAsset(GMAssetsNode* node);
 

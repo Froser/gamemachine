@@ -402,7 +402,7 @@ void GMBSP::parseEntities()
 		const char* gridSize = getValue(entity, "gridsize");
 		if (gridSize)
 		{
-			Scanner s(gridSize);
+			GMScanner s(gridSize);
 			s.nextFloat(&d->lightVols.lightVolSize[0]);
 			s.nextFloat(&d->lightVols.lightVolSize[1]);
 			s.nextFloat(&d->lightVols.lightVolSize[2]);
@@ -482,7 +482,7 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 		if (e->key == "origin")
 		{
 			std::string origin = e->value.toStdString();
-			Scanner s(origin.c_str());
+			GMScanner s(origin.c_str());
 			s.nextFloat(&result->origin[0]); // x
 			s.nextFloat(&result->origin[1]); // z
 			s.nextFloat(&result->origin[2]); // y

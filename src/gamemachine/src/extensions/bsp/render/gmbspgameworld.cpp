@@ -523,7 +523,7 @@ void GMBSPGameWorld::initTextures()
 			ITexture* texture;
 			factory->createTexture(tex, &texture);
 			delete tex;
-			getAssets().insertAsset(GM_ASSET_TEXTURES, shader.shader, GMAssetType::Texture, texture);
+			getAssets().insertAsset(GM_ASSET_TEXTURES, GMString(shader.shader), GMAssetType::Texture, texture);
 		}
 		else
 		{
@@ -578,7 +578,7 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 		delete imgBuf;
-		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, std::to_string(i).c_str(), GMAssetType::Texture, texture);
+		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, GMString(i), GMAssetType::Texture, texture);
 	}
 
 	{
@@ -588,7 +588,7 @@ void GMBSPGameWorld::initLightmaps()
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 		delete whiteBuf;
-		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, std::to_string(-1).c_str(), GMAssetType::Texture, texture);
+		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, GMString(L"-1"), GMAssetType::Texture, texture);
 	}
 }
 
@@ -705,7 +705,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 				return;
 			}
 
-			asset = assets.insertAsset(GM_ASSET_MODELS, fn.toStdString().c_str(), GMAssetType::Model, model);
+			asset = assets.insertAsset(GM_ASSET_MODELS, GMString(fn), GMAssetType::Model, model);
 		}
 		entityObject = new GMEntityObject(asset);
 		entityObject->setTranslation(glm::translate(entity->origin));

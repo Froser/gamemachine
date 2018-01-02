@@ -18,7 +18,7 @@ struct ModelReader_Obj_Material
 
 class GMModel;
 struct GMBuffer;
-class Scanner;
+class GMScanner;
 class GMComponent;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
@@ -46,8 +46,8 @@ public:
 
 private:
 	void init();
-	void appendFace(Scanner& scanner);
-	void loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename);
+	void appendFace(GMScanner& scanner);
+	void loadMaterial(const GMModelLoadSettings& settings, const GMString& mtlFilename);
 	void applyMaterial(const ModelReader_Obj_Material& material, GMShader& shader);
 	ModelReader_Obj_Material* getMaterial(const GMString& materialName);
 };

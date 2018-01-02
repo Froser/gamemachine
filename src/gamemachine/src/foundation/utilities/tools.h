@@ -265,33 +265,6 @@ struct GMPlane : public GMObject, public GMAlignmentObject
 	GMfloat intercept;
 };
 
-//Scanner
-typedef bool(*CharPredicate)(char in);
-
-GM_PRIVATE_OBJECT(Scanner)
-{
-	const char* p;
-	bool skipSame;
-	CharPredicate predicate;
-	bool valid;
-};
-
-class Scanner : public GMObject
-{
-	DECLARE_PRIVATE(Scanner)
-
-public:
-	explicit Scanner(const char* line);
-	explicit Scanner(const char* line, CharPredicate predicate);
-	explicit Scanner(const char* line, bool skipSame, CharPredicate predicate);
-
-public:
-	void next(char* out);
-	void nextToTheEnd(char* out);
-	bool nextFloat(GMfloat* out);
-	bool nextInt(GMint* out);
-};
-
 //GMMemoryStream
 GM_PRIVATE_OBJECT(GMMemoryStream)
 {

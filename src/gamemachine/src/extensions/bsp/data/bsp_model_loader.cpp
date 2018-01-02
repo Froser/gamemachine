@@ -108,7 +108,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 	const char* b;
 	if ( (b = ti->Attribute("create")))
 	{
-		Scanner s(b);
+		GMScanner s(b);
 		GMint value;
 		s.nextInt(&value);
 		m->create = value != 0;
@@ -116,7 +116,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 
 	if ((b = ti->Attribute("extents")))
 	{
-		Scanner s(b);
+		GMScanner s(b);
 		for (GMint i = 0; i < 3; i++)
 		{
 			s.nextFloat(&m->extents[i]);

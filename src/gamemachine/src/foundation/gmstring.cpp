@@ -86,6 +86,21 @@ GMString::GMString(const std::wstring& str)
 	d->data = str;
 }
 
+GMString::GMString(char ch)
+{
+	D(d);
+	char chs[2] = { ch };
+	GMwchar* string = alloc_convertMultiBytesToWideChar(chs);
+	d->data = string;
+	free_wideChar(string);
+}
+
+GMString::GMString(GMwchar ch)
+{
+	D(d);
+	d->data = ch;
+}
+
 GMString::GMString(const GMfloat f)
 {
 	D(d);
@@ -181,12 +196,6 @@ const std::string GMString::toStdString() const
 	return string;
 }
 
-size_t GMString::length() const
-{
-	D(d);
-	return d->data.length();
-}
-
 GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 {
 	D(d);
@@ -222,4 +231,114 @@ void GMStringReader::Iterator::findNextLine()
 			break;
 		}
 	} while (m_src[m_end++] != '\n');
+}
+
+
+//Scanner
+static bool isWhiteSpace(GMwchar c)
+{
+	return !!iswspace(c);
+}
+
+GMScanner::GMScanner(const GMString& line)
+{
+	D(d);
+	d->buf = line;
+	d->p = d->buf.c_str();
+	d->predicate = isWhiteSpace;
+	d->skipSame = true;
+	d->valid = !!d->p;
+}
+
+GMScanner::GMScanner(const GMString& line, CharPredicate predicate)
+{
+	D(d);
+	d->buf = line;
+	d->p = d->buf.c_str();
+	d->predicate = predicate;
+	d->skipSame = true;
+	d->valid = !!d->p;
+}
+
+GMScanner::GMScanner(const GMString& line, bool skipSame, CharPredicate predicate)
+{
+	D(d);
+	d->buf = line;
+	d->p = d->buf.c_str();
+	d->predicate = predicate;
+	d->skipSame = skipSame;
+	d->valid = !!d->p;
+}
+
+void GMScanner::next(GMString& out)
+{
+	D(d);
+	out = L"";
+	if (!d->valid)
+		return;
+
+	bool b = false;
+	if (!d->p)
+		return;
+
+	while (*d->p && d->predicate(*d->p))
+	{
+		if (b && !d->skipSame)
+		{
+			d->p++;
+			return;
+		}
+		d->p++;
+		b = true;
+	}
+
+	if (!*d->p)
+		return;
+
+	do
+	{
+		out += *d->p;
+		d->p++;
+	} while (*d->p && !d->predicate(*d->p));
+}
+
+void GMScanner::nextToTheEnd(GMString& out)
+{
+	D(d);
+	if (!d->valid)
+		return;
+
+	while (*d->p)
+	{
+		d->p++;
+		out += *d->p;
+	}
+}
+
+bool GMScanner::nextFloat(GMfloat* out)
+{
+	D(d);
+	if (!d->valid)
+		return false;
+
+	GMString command;
+	next(command);
+	if (command.isEmpty())
+		return false;
+	SAFE_SWSCANF(command.c_str(), L"%f", out);
+	return true;
+}
+
+bool GMScanner::nextInt(GMint* out)
+{
+	D(d);
+	if (!d->valid)
+		return false;
+
+	GMString command;
+	next(command);
+	if (command.isEmpty())
+		return false;
+	SAFE_SWSCANF(command.c_str(), L"%i", out);
+	return true;
 }

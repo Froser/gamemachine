@@ -44,12 +44,12 @@ GMAsset GMAssets::insertAsset(GMAssetType type, void* asset)
 	return node->asset;
 }
 
-GMAsset GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAssetType type, void* asset)
+GMAsset GMAssets::insertAsset(const GMString& path, const GMString& name, GMAssetType type, void* asset)
 {
 	GMAssetsNode* node = nullptr;
 	// 把(a/b, c/d)字符串类型的参数改写为(a/b/c, d)
-	char newPath[GMAssetName::NAME_MAX], newName[GMAssetName::NAME_MAX];
-	combinePath({ path, name.name.data() }, newPath, newName);
+	GMString newPath, newName;
+	combinePath({ path, name }, &newPath, &newName);
 	node = getNodeFromPath(newPath, true);
 	node = makeChild(node, newName);
 	GM_ASSERT(node);
@@ -59,19 +59,22 @@ GMAsset GMAssets::insertAsset(const char* path, const GMAssetName& name, GMAsset
 	return node->asset;
 }
 
-inline bool splash(char in)
+namespace
 {
-	return in == '/' || in == '\\';
+	inline bool splash(GMwchar in)
+	{
+		return in == L'/' || in == L'\\';
+	}
 }
 
-GMAssetsNode* GMAssets::getNodeFromPath(const char* path, bool createIfNotExists)
+GMAssetsNode* GMAssets::getNodeFromPath(const GMString& path, bool createIfNotExists)
 {
 	D(d);
 	GMAssetsNode* node = d->root;
 	return getNodeFromPath(node, path, createIfNotExists);
 }
 
-void GMAssets::createNodeFromPath(const char* path)
+void GMAssets::createNodeFromPath(const GMString& path)
 {
 	getNodeFromPath(path, true);
 }
@@ -84,7 +87,7 @@ GMAsset GMAssets::createIsolatedAsset(GMAssetType type, void* data)
 	return ret;
 }
 
-GMAssetsNode* GMAssets::findChild(GMAssetsNode* parentNode, const GMAssetName& name, bool createIfNotExists)
+GMAssetsNode* GMAssets::findChild(GMAssetsNode* parentNode, const GMString& name, bool createIfNotExists)
 {
 	if (!parentNode)
 		return nullptr;
@@ -103,7 +106,7 @@ GMAssetsNode* GMAssets::findChild(GMAssetsNode* parentNode, const GMAssetName& n
 	return node;
 }
 
-GMAssetsNode* GMAssets::makeChild(GMAssetsNode* parentNode, const GMAssetName& name)
+GMAssetsNode* GMAssets::makeChild(GMAssetsNode* parentNode, const GMString& name)
 {
 	GMAssetsNode* node = new GMAssetsNode();
 	node->name = name;
@@ -111,21 +114,21 @@ GMAssetsNode* GMAssets::makeChild(GMAssetsNode* parentNode, const GMAssetName& n
 	return node;
 }
 
-GMString GMAssets::combinePath(std::initializer_list<GMString> args, REF char* path, REF char* lastPart)
+GMString GMAssets::combinePath(std::initializer_list<GMString> args, REF GMString* path, REF GMString* lastPart)
 {
 	GMString result;
-	char name[GMAssetName::NAME_MAX];
+	GMString name;
 	for (auto arg : args)
 	{
 		std::string l = arg.toStdString();
-		Scanner s(l.c_str(), splash);
+		GMScanner s(l.c_str(), splash);
 		s.next(name);
-		while (*name)
+		while (!name.isEmpty())
 		{
 			if (lastPart)
-				strcpy_s(lastPart, GMAssetName::NAME_MAX, name);
+				*lastPart = name;
 			if (path)
-				strcpy_s(path, GMAssetName::NAME_MAX, result.toStdString().c_str());
+				*path = result;;
 			
 			result += name;
 			result += "/";
@@ -135,16 +138,16 @@ GMString GMAssets::combinePath(std::initializer_list<GMString> args, REF char* p
 	return result;
 }
 
-GMAssetsNode* GMAssets::getNodeFromPath(GMAssetsNode* beginNode, const char* path, bool createIfNotExists)
+GMAssetsNode* GMAssets::getNodeFromPath(GMAssetsNode* beginNode, const GMString& path, bool createIfNotExists)
 {
-	Scanner s(path, splash);
+	GMScanner s(path, splash);
 	GMAssetsNode* node = beginNode;
 	if (!node)
 		return node;
 
-	char sep[LINE_MAX];
+	GMString sep;
 	s.next(sep);
-	while (*sep)
+	while (!sep.isEmpty())
 	{
 		node = findChild(node, sep, createIfNotExists);
 		if (!node)

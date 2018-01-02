@@ -38,7 +38,7 @@ namespace
 		EACH_PAIR_OF_ENTITY(entity, e)
 		{
 			std::string value = e->value.toStdString();
-			Scanner s(value.c_str());
+			GMScanner s(value.c_str());
 			if (e->key == L"origin")
 			{
 				s.nextFloat(&origin[0]);

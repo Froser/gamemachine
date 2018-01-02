@@ -39,7 +39,7 @@ public:
 
 	// parsers:
 private:
-	ITexture* addTextureToTextureContainer(const char* name);
+	ITexture* addTextureToTextureContainer(const GMString& name);
 	void parse(const char* buffer);
 	void parseItem(TiXmlElement* elem, GMint lightmapId, REF GMShader* shaderPtr);
 	void parseStart();

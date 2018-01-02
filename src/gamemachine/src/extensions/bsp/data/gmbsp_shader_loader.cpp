@@ -66,15 +66,15 @@ namespace
 		return 0;
 	}
 
-	GMS_BlendFunc parseBlendFunc(const char* p)
+	GMS_BlendFunc parseBlendFunc(const GMString& p)
 	{
-		if (strEqual(p, "GMS_ZERO"))
+		if (p == L"GMS_ZERO")
 			return GMS_BlendFunc::ZERO;
 
-		if (strEqual(p, "GMS_ONE"))
+		if (p == L"GMS_ONE")
 			return GMS_BlendFunc::ONE;
 
-		if (strEqual(p, "GMS_DST_COLOR"))
+		if (p == L"GMS_DST_COLOR")
 			return GMS_BlendFunc::ONE;
 
 		gm_warning("Unknown blendFunc %s treated as GMS_ZERO", p);
@@ -91,7 +91,7 @@ namespace
 
 	void readTernaryFloatsFromString(const char* str, glm::vec3& vec)
 	{
-		Scanner s(str);
+		GMScanner s(str);
 		for (GMint i = 0; i < 3; i++)
 		{
 			GMfloat f;
@@ -125,12 +125,9 @@ void GMBSPShaderLoader::init(const GMString& directory, GMBSPGameWorld* world, G
 	d->bspRender = bspRender;
 }
 
-ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
+ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 {
 	D(d);
-	if (!name)
-		return nullptr;
-
 	GMAssets& assets = d->world->getAssets();
 	GMAssetsNode* texNode = assets.getNodeFromPath(GM_ASSET_TEXTURES);
 	GM_ASSERT(texNode);
@@ -156,7 +153,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const char* name)
 			delete img;
 
 			GM_ASSERT(texture);
-			assets.insertAsset(GM_ASSET_TEXTURES, name, GMAssetType::Texture, texture);
+			assets.insertAsset(GM_ASSET_TEXTURES, GMString(name), GMAssetType::Texture, texture);
 			return texture;
 		}
 		return nullptr;
@@ -297,8 +294,8 @@ void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, TiXmlElement* elem)
 	const char* b = elem->GetText();
 	if (b)
 	{
-		Scanner s(b);
-		char blendFunc[LINE_MAX];
+		GMScanner s(b);
+		GMString blendFunc;
 		s.next(blendFunc);
 		shader.setBlendFactorSource(parseBlendFunc(blendFunc));
 		s.next(blendFunc);
@@ -464,7 +461,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 			gm_error(_L("specular light position missing."));
 			return;
 		}
-		Scanner s(color);
+		GMScanner s(color);
 		glm::vec3 vecPosition;
 		readTernaryFloatsFromString(position, vecPosition);
 		light.setLightPosition(&vecPosition[0]);
@@ -525,19 +522,19 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 
 	if (tcMod)
 	{
-		Scanner s(tcMod);
-		char type[LINE_MAX];
+		GMScanner s(tcMod);
+		GMString type;
 		s.next(type);
 
 		while (true)
 		{
-			if (strEqual(type, "scroll"))
+			if (type == L"scroll")
 			{
 				currentMod->type = GMS_TextureModType::SCROLL;
 				s.nextFloat(&currentMod->p1);
 				s.nextFloat(&currentMod->p2);
 			}
-			else if (strEqual(type, "scale"))
+			else if (type == L"scale")
 			{
 				currentMod->type = GMS_TextureModType::SCALE;
 				s.nextFloat(&currentMod->p1);
@@ -545,12 +542,12 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 			}
 			
 			s.next(type);
-			if (!strlen(type))
+			if (type.isEmpty())
 				break;
 			tcModNum++;
 			if (tcModNum == MAX_TEX_MOD)
 			{
-				if (strlen(type))
+				if (!type.isEmpty())
 					gm_warning(_L("warning: you have tcMods more than %d, please increase MAX_TEX_MOD"), MAX_TEX_MOD);
 				break;
 			}

@@ -33,8 +33,10 @@ public:
 	GMString(const GMwchar* c);
 	GMString(const std::string& str);
 	GMString(const std::wstring& str);
-	GMString(const GMfloat f);
-	GMString(const GMint i);
+	GMString(char ch);
+	GMString(GMwchar ch);
+	explicit GMString(const GMfloat f);
+	explicit GMString(const GMint i);
 
 public:
 	bool operator == (const GMString& str) const
@@ -91,7 +93,27 @@ public:
 		D(d);
 		return d->data.c_str();
 	}
-	
+
+	size_t length() const
+	{
+		D(d);
+		return d->data.length();
+	}
+
+	bool isEmpty() const
+	{
+		D(d);
+		return d->data.empty();
+	}
+
+	GMString& append(const GMString& str)
+	{
+		D(d);
+		*this += str;
+		return *this;
+	}
+
+
 public:
 	void copyString(char *s) const;
 	void copyString(GMwchar *s) const;
@@ -102,7 +124,6 @@ public:
 	GMString substr(GMint start, GMint count) const;
 	const std::wstring& toStdWString() const;
 	const std::string toStdString() const;
-	size_t length() const;
 	GMString replace(const GMString& oldValue, const GMString& newValue);
 
 private:
@@ -162,6 +183,34 @@ public:
 
 private:
 	const GMString m_string;
+};
+
+
+//Scanner
+typedef std::function<bool(GMwchar)> CharPredicate;
+GM_PRIVATE_OBJECT(GMScanner)
+{
+	GMString buf;
+	const GMwchar* p = nullptr;
+	bool skipSame;
+	CharPredicate predicate;
+	bool valid;
+};
+
+class GMScanner : public GMObject
+{
+	DECLARE_PRIVATE(GMScanner)
+
+public:
+	explicit GMScanner(const GMString& line);
+	explicit GMScanner(const GMString& line, CharPredicate predicate);
+	explicit GMScanner(const GMString& line, bool skipSame, CharPredicate predicate);
+
+public:
+	void next(GMString& out);
+	void nextToTheEnd(GMString& out);
+	bool nextFloat(GMfloat* out);
+	bool nextInt(GMint* out);
 };
 
 END_NS

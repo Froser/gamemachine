@@ -2,6 +2,7 @@
 #include "cases/objectmove.h"
 #include "cases/hook.h"
 #include "cases/string.h"
+#include "cases/scanner.h"
 
 int main(int argc, char* argv)
 {
@@ -11,6 +12,7 @@ int main(int argc, char* argv)
 		new cases::ObjectMove(),
 		new cases::Hook(),
 		new cases::String(),
+		new cases::Scanner(),
 	};
 
 	for (auto& c : caseArray)

@@ -46,7 +46,7 @@ private:
 };
 
 template <GMint D, typename T>
-static void pushBackData(Scanner& scanner, AlignedVector<T>& container)
+static void pushBackData(GMScanner& scanner, AlignedVector<T>& container)
 {
 	T data;
 	for (GMint i = 0; i < D; i++)
@@ -95,45 +95,45 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 
 	while (sr.readLine(line))
 	{
-		Scanner s(line);
-		char token[LINE_MAX];
+		GMScanner s(line);
+		GMString token;
 		s.next(token);
 
-		if (strEqual(token, "#"))
+		if (token == L"#")
 		{
 			// comment
 		}
-		else if (strEqual(token, "v"))
+		else if (token == L"v")
 		{
 			// vertex
 			pushBackData<3>(s, d->positions);
 		}
-		else if (strEqual(token, "vn"))
+		else if (token == L"vn")
 		{
 			// normal
 			pushBackData<3>(s, d->normals);
 		}
-		else if (strEqual(token, "vt"))
+		else if (token == L"vt")
 		{
 			// texture
 			pushBackData<2>(s, d->textures);
 		}
-		else if (strEqual(token, "mtllib"))
+		else if (token == L"mtllib")
 		{
 			// material
-			char name[LINE_MAX];
+			GMString name;
 			s.next(name);
 			loadMaterial(settings, name);
 		}
-		else if (strEqual(token, "usemtl"))
+		else if (token == L"usemtl")
 		{
 			// use material
-			char name[LINE_MAX];
+			GMString name;
 			s.next(name);
 			d->currentMaterialName = name;
 			d->currentComponent = nullptr;
 		}
-		else if (strEqual(token, "f"))
+		else if (token == L"f")
 		{
 			// face
 			appendFace(s);
@@ -149,7 +149,7 @@ bool GMModelReader_Obj::test(const GMBuffer& buffer)
 	return buffer.buffer && buffer.buffer[0] == '#';
 }
 
-void GMModelReader_Obj::appendFace(Scanner& scanner)
+void GMModelReader_Obj::appendFace(GMScanner& scanner)
 {
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
@@ -161,15 +161,15 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 		applyMaterial(material, d->currentComponent->getShader());
 	}
 
-	char face[LINE_MAX];
+	GMString face;
 	d->currentComponent->beginFace();
 	while (true)
 	{
 		scanner.next(face);
-		if (!strlen(face))
+		if (face.isEmpty())
 			break;
 
-		Scanner faceScanner(face, false, slashPredicate);
+		GMScanner faceScanner(face, false, slashPredicate);
 
 		GMint v = INVALID, t = INVALID, n = INVALID;
 		faceScanner.nextInt(&v);
@@ -196,7 +196,7 @@ void GMModelReader_Obj::appendFace(Scanner& scanner)
 	d->currentComponent->endFace();
 }
 
-void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const char* mtlFilename)
+void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const GMString& mtlFilename)
 {
 	D(d);
 	GMString fn = settings.directory;
@@ -220,36 +220,36 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 	ModelReader_Obj_Material* material = nullptr;
 	while (sr.readLine(line))
 	{
-		Scanner s(line);
-		char token[LINE_MAX];
+		GMScanner s(line);
+		GMString token;
 		s.next(token);
-		if (strEqual(token, "newmtl"))
+		if (token == L"newmtl")
 		{
-			char name[LINE_MAX];
+			GMString name;
 			s.next(name);
 			material = &(d->materials[name]);
 			memset(material, 0, sizeof(*material));
 		}
-		else if (strEqual(token, "Ns"))
+		else if (token == L"Ns")
 		{
 			GM_ASSERT(material);
 			s.nextFloat(&material->ns);
 		}
-		else if (strEqual(token, "Kd"))
+		else if (token == L"Kd")
 		{
 			GM_ASSERT(material);
 			s.nextFloat(&material->kd[0]);
 			s.nextFloat(&material->kd[1]);
 			s.nextFloat(&material->kd[2]);
 		}
-		else if (strEqual(token, "Ka"))
+		else if (token == L"Ka")
 		{
 			GM_ASSERT(material);
 			s.nextFloat(&material->ka[0]);
 			s.nextFloat(&material->ka[1]);
 			s.nextFloat(&material->ka[2]);
 		}
-		else if (strEqual(token, "Ks"))
+		else if (token == L"Ks")
 		{
 			GM_ASSERT(material);
 			s.nextFloat(&material->ks[0]);

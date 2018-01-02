@@ -39,11 +39,11 @@ static TypoLibrary g_lib;
 // 从系统获取字体文件，从上到下遍历，越靠前优先级越高
 struct FontList
 {
-	char fontName[MAX_PATH];
+	GMwchar fontName[MAX_PATH];
 };
 static FontList fontNameList[] = {
-	{ "msyh.ttf" },
-	{ "times.ttf" }
+	{ L"msyh.ttf" },
+	{ L"times.ttf" }
 };
 static GMuint fontNameNum = 2;
 
