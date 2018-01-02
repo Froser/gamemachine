@@ -5,7 +5,7 @@
 #include "debug.h"
 #include <cwchar>
 
-inline void format_timeW(GMWchar* in)
+inline void format_timeW(GMwchar* in)
 {
 #if _WINDOWS
 	SYSTEMTIME time = { 0 };
@@ -37,17 +37,17 @@ inline void format_timeA(char* in)
 #endif
 }
 
-#define f_timeW(t) GMWchar t[LINE_MAX]; format_timeW(t);
+#define f_timeW(t) GMwchar t[LINE_MAX]; format_timeW(t);
 #define f_timeA(t) char t[LINE_MAX]; format_timeA(t);
 
 #define printW(format, tag) \
 	D(d);															\
-	GMWchar out[LINE_MAX];											\
+	GMwchar out[LINE_MAX];											\
 	va_list ap;														\
 	va_start(ap, format);											\
 	if (d && d->debugger)											\
 	{																\
-		GMWchar buf[LINE_MAX];										\
+		GMwchar buf[LINE_MAX];										\
 		vswprintf(buf, format, ap);									\
 		f_timeW(t);													\
 		wsprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
@@ -55,7 +55,7 @@ inline void format_timeA(char* in)
 	}																\
 	else															\
 	{																\
-		GMWchar buf[LINE_MAX];										\
+		GMwchar buf[LINE_MAX];										\
 		vswprintf(buf, format, ap);									\
 		f_timeW(t);													\
 		wprintf(out, _L("[") _L(#tag) _L("]%s: %s"), t, buf);		\
@@ -84,7 +84,7 @@ inline void format_timeA(char* in)
 	}																\
 	va_end(ap);
 
-void GMDebugger::info(const GMWchar *format, ...)
+void GMDebugger::info(const GMwchar *format, ...)
 {
 	printW(format, info);
 }
@@ -94,7 +94,7 @@ void GMDebugger::info(const char* format, ...)
 	printA(format, info);
 }
 
-void GMDebugger::error(const GMWchar *format, ...)
+void GMDebugger::error(const GMwchar *format, ...)
 {
 	printW(format, error);
 }
@@ -104,7 +104,7 @@ void GMDebugger::error(const char* format, ...)
 	printA(format, error);
 }
 
-void GMDebugger::warning(const GMWchar *format, ...)
+void GMDebugger::warning(const GMwchar *format, ...)
 {
 	printW(format, warning);
 }
@@ -115,7 +115,7 @@ void GMDebugger::warning(const char* format, ...)
 }
 
 #ifdef _DEBUG
-void GMDebugger::debug(const GMWchar *format, ...)
+void GMDebugger::debug(const GMwchar *format, ...)
 {
 	printW(format, debug);
 }

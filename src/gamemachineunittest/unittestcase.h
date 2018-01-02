@@ -10,7 +10,7 @@ typedef std::function<bool()> TestPredicate;
 class UnitTest
 {
 public:
-	void addTestCase(const std::string&, TestPredicate&& p);
+	void addTestCase(const std::string&, TestPredicate p);
 	void run();
 
 public:

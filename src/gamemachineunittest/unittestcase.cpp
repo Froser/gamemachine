@@ -11,7 +11,7 @@ void assertTrue(bool ast, const std::string& msg, std::ostream& out = std::cout)
 		out << "Failed!" << std::endl;
 }
 
-void UnitTest::addTestCase(const std::string& msg, TestPredicate&& p)
+void UnitTest::addTestCase(const std::string& msg, TestPredicate p)
 {
 	m_cases.push_back({ msg, p });
 }

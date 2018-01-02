@@ -51,7 +51,7 @@ static FT_Error loadFace(FT_Face* face)
 {
 	FT_Error err = FT_Err_Cannot_Open_Resource;
 #if _WINDOWS
-	GMWchar path[MAX_PATH];
+	GMwchar path[MAX_PATH];
 	SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
 
 	std::string strPath;
@@ -129,7 +129,7 @@ ITexture* GMGLGlyphManager::glyphTexture()
 	return d->texture;
 }
 
-const GMGlyphInfo& GMGLGlyphManager::createChar(GMWchar c, GMint fontSize)
+const GMGlyphInfo& GMGLGlyphManager::createChar(GMwchar c, GMint fontSize)
 {
 	D(d);
 	static GMGlyphInfo errGlyph = { false };

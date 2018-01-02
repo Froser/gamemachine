@@ -55,7 +55,7 @@ GMGlyphObject::~GMGlyphObject()
 		GM_delete(d->typoEngine);
 }
 
-void GMGlyphObject::setText(const GMWchar* text)
+void GMGlyphObject::setText(const GMwchar* text)
 {
 	D(d);
 	d->text = text;

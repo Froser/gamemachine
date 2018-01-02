@@ -197,8 +197,8 @@ void GMGLShaderProgram::expandSource(REF GMGLShaderInfo& shaderInfo)
 GMString GMGLShaderProgram::expandSource(const GMString& filename, const GMString& source)
 {
 	GMStringReader reader(source);
-	GMString n(""), line("");
-	GMString expanded("");
+	GMString n, line;
+	GMString expanded;
 	auto iter = reader.lineBegin();
 	while (true)
 	{
@@ -269,7 +269,7 @@ void GMGLShaderProgram::expandAlias(const GMString& alias, IN OUT GMString& sour
 		std::string a = match[4].str();
 		d->aliasMap.insert({ "${" + replacement + "}", a });
 	}
-	source = "";
+	source = L"";
 }
 
 GMString& GMGLShaderProgram::replaceLine(IN OUT GMString& line)

@@ -1,6 +1,7 @@
 ﻿#include <stdafx.h>
 #include "cases/objectmove.h"
 #include "cases/hook.h"
+#include "cases/string.h"
 
 int main(int argc, char* argv)
 {
@@ -9,6 +10,7 @@ int main(int argc, char* argv)
 	UnitTestCase* caseArray[] = {
 		new cases::ObjectMove(),
 		new cases::Hook(),
+		new cases::String(),
 	};
 
 	for (auto& c : caseArray)

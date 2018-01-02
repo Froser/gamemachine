@@ -31,7 +31,7 @@ public:
 	~GMGlyphObject();
 
 public:
-	void setText(const GMWchar* text);
+	void setText(const GMwchar* text);
 	void update();
 
 public:

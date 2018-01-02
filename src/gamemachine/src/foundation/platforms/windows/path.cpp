@@ -27,7 +27,7 @@ GMString GMPath::filename(const GMString& fullPath)
 GMString GMPath::getCurrentPath()
 {
 	const int MAX = 255;
-	GMWchar fn[MAX];
+	GMwchar fn[MAX];
 	::GetModuleFileName(NULL, fn, MAX);
 	return directoryName(fn);
 }

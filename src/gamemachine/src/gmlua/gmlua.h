@@ -146,7 +146,7 @@ struct GMLuaVariable
 	{
 	}
 
-	GMLuaVariable(const GMWchar* str)
+	GMLuaVariable(const GMwchar* str)
 		: type(GMLuaVariableType::String)
 		, valPtrString(new GMString(str))
 	{

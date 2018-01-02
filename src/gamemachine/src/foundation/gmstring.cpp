@@ -1,26 +1,50 @@
 ﻿#define _CRT_SECURE_NO_WARNINGS
 #define _CRT_NON_CONFORMING_SWPRINTFS
-#undef __STRICT_ANSI__
 #include "stdafx.h"
 #include "stdio.h"
 #include "gmstring.h"
 
 size_t GMString::npos = std::string::npos;
 
+namespace
+{
+	GMwchar* alloc_convertMultiBytesToWideChar(const char* mbs)
+	{
 #if _WINDOWS
-#	define gm_swprintf swprintf
+		GMint sz = ::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, nullptr, 0);
+		GMwchar* data = new GMwchar[sz];
+		::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, data, sz);
+		return data;
 #else
-template <typename... T>
-void gm_swprintf(GMWchar* buffer, const GMWchar* format, T... args)
-{
-	swprintf(buffer, wcslen(buffer), format, args...);
-}
+		return nullptr;
 #endif
+	}
 
-GMString::GMString()
-{
-	D(d);
-	d->type = Data::WideChars;
+	void free_wideChar(GMwchar* c)
+	{
+#if _WINDOWS
+		GM_delete(c);
+#endif
+	}
+
+	char* alloc_convertWideCharToMultiBytes(const GMwchar* wch)
+	{
+#if _WINDOWS
+		GMint sz = ::WideCharToMultiByte(CP_UTF8, 0, wch, -1, nullptr, 0, nullptr, nullptr);
+		char* data = new char[sz];
+		::WideCharToMultiByte(CP_UTF8, 0, wch, -1, data, sz, nullptr, nullptr);
+		return data;
+#else
+		return nullptr;
+#endif
+	}
+
+	void free_multibytes(char* c)
+	{
+#if _WINDOWS
+		GM_delete(c);
+#endif
+	}
 }
 
 GMString::GMString(const GMString& s)
@@ -28,288 +52,153 @@ GMString::GMString(const GMString& s)
 	*this = s;
 }
 
-GMString::GMString(GMString&& s) noexcept
+GMString::GMString(GMString&& str) noexcept
 {
-	*this = std::move(s);
-}
-
-GMString::GMString(const char c)
-{
-	D(d);
-	d->type = Data::MuiltBytes;
-	d->str = c;
-	d->wstr.clear();
-}
-
-GMString::GMString(const GMWchar c)
-{
-	D(d);
-	d->type = Data::WideChars;
-	d->wstr = c;
-	d->str.clear();
+	using namespace std;
+	*this = move(str);
 }
 
 GMString::GMString(const char* c)
 {
 	D(d);
-	d->type = Data::MuiltBytes;
-	d->str = c;
-	d->wstr.clear();
+	GMwchar* string = alloc_convertMultiBytesToWideChar(c);
+	d->data = string;
+	free_wideChar(string);
 }
 
-GMString::GMString(const GMWchar* c)
+GMString::GMString(const GMwchar* c)
 {
 	D(d);
-	d->type = Data::WideChars;
-	d->wstr = c;
-	d->str.clear();
+	d->data = c;
 }
 
-GMString::GMString(const std::string& s)
+GMString::GMString(const std::string& str)
 {
 	D(d);
-	d->type = Data::MuiltBytes;
-	d->str = s;
-	d->wstr.clear();
+	GMwchar* string = alloc_convertMultiBytesToWideChar(str.data());
+	d->data = string;
+	free_wideChar(string);
 }
 
-GMString::GMString(const std::wstring& s)
+GMString::GMString(const std::wstring& str)
 {
 	D(d);
-	d->type = Data::WideChars;
-	d->wstr = s;
-	d->str.clear();
+	d->data = str;
 }
 
 GMString::GMString(const GMfloat f)
 {
 	D(d);
-	d->type = Data::WideChars;
-	GMWchar buffer[128] = { 0 };
-	gm_swprintf(buffer, _L("%f"), f);
-	d->wstr = buffer;
+	d->data = std::to_wstring(f);
 }
 
 GMString::GMString(const GMint i)
 {
 	D(d);
-	d->type = Data::WideChars;
-	GMWchar buffer[128] = { 0 };
-	gm_swprintf(buffer, _L("%i"), i);
-	d->wstr = buffer;
+	d->data = std::to_wstring(i);
 }
 
-bool GMString::operator == (const GMString& str) const
+char GMString::operator[](GMuint i) const
 {
 	D(d);
-	if (d->type == Data::WideChars)
-		return d->wstr == str.toStdWString();
-	return d->str == str.toStdString();
+	GMwchar c = d->data[i];
+	GMwchar arr[2] = { c };
+	char* chs = alloc_convertWideCharToMultiBytes(arr);
+	char t = chs[0];
+	free_multibytes(chs);
+	return t;
 }
 
-bool GMString::operator != (const GMString& str) const
+GMString& GMString::append(const GMwchar* c)
 {
 	D(d);
-	if (d->type == Data::WideChars)
-		return d->wstr != str.toStdWString();
-	return d->str != str.toStdString();
-}
-
-bool GMString::operator < (const GMString& str) const
-{
-	D(d);
-	if (d->type == Data::WideChars)
-		return d->wstr < str.toStdWString();
-	return d->str < str.toStdString();
-}
-
-GMString& GMString::operator = (const GMString& str)
-{
-	D(d);
-	d->type = str.data()->type;
-	if (d->type == Data::WideChars)
-		d->wstr = str.data()->wstr;
-	else
-		d->str = str.data()->str;
+	d->data += c;
 	return *this;
 }
 
-GMString& GMString::operator = (GMString&& str) noexcept
+void GMString::assign(const GMString& s)
 {
 	D(d);
-	d->type = str.data()->type;
-	if (d->type == Data::WideChars)
-		d->wstr.swap(str.data()->wstr);
-	else
-		d->str.swap(str.data()->str);
-	return *this;
+	d->data = s.data()->data;
 }
 
-GMString& GMString::operator = (const char* str)
-{
-	return this->operator=(GMString(str));
-}
-
-GMString& GMString::operator = (const GMWchar* str)
-{
-	return this->operator=(GMString(str));
-}
-
-GMString& GMString::append(const GMWchar* c)
+void GMString::copyString(char *s) const
 {
 	D(d);
-	if (d->type == Data::WideChars)
-	{
-		d->wstr.append(c);
-	}
-	else
-	{
-		GMString temp = toStdWString();
-		(*this) = temp.append(c);
-	}
-	return *this;
+	std::string str = toStdString();
+	strcpy_s(s, str.length() + 1, str.c_str());
+}
+
+void GMString::copyString(GMwchar *s) const
+{
+	D(d);
+	wcscpy_s(s, d->data.length() * sizeof(GMwchar) + 1, d->data.c_str());
 }
 
 GMString& GMString::append(const char* c)
 {
 	D(d);
-	if (d->type == Data::MuiltBytes)
-	{
-		d->str.append(c);
-	}
-	else
-	{
-		GMString temp = toStdString();
-		(*this) = temp.append(c);
-	}
+	GMwchar* wch = alloc_convertMultiBytesToWideChar(c);
+	d->data += wch;
+	free_wideChar(wch);
 	return *this;
 }
 
-std::string GMString::toStdString() const
+size_t GMString::findLastOf(GMwchar c) const
 {
 	D(d);
-	if (d->type == Data::MuiltBytes)
-		return d->str;
-
-	d->bufString.resize(d->wstr.size());
-#if _WINDOWS
-	WideCharToMultiByte(CP_ACP, 0, d->wstr.data(), -1, (char*)d->bufString.data(), d->wstr.size(), 0, FALSE);
-#else
-	GM_ASSERT(false); //TODO
-#endif
-	return d->bufString;
-}
-
-size_t GMString::findLastOf(GMWchar c) const
-{
-	D(d);
-	if (d->type != Data::WideChars)
-	{
-		GMString temp = toStdWString();
-		return temp.data()->wstr.find_last_of(c);
-	}
-	return d->wstr.find_last_of(c);
+	return d->data.find_last_of(c);
 }
 
 size_t GMString::findLastOf(char c) const
 {
 	D(d);
-	if (d->type != Data::MuiltBytes)
-	{
-		GMString temp = toStdString();
-		return temp.data()->str.find_last_of(c);
-	}
-	return d->str.find_last_of(c);
+	char cs[2] = { c };
+	GMwchar* wch = alloc_convertMultiBytesToWideChar(cs);
+	size_t idx = d->data.find_last_of(wch);
+	free_wideChar(wch);
+	return idx;
 }
 
 GMString GMString::substr(GMint start, GMint count) const
 {
 	D(d);
-	if (d->type == Data::MuiltBytes)
-		return d->str.substr(start, count);
-
-	//Wide Char
-	return d->wstr.substr(start, count);
+	return d->data.substr(start, count);
 }
 
-std::wstring GMString::toStdWString() const
+const std::wstring& GMString::toStdWString() const
 {
 	D(d);
-	if (d->type == Data::WideChars)
-		return d->wstr;
+	return d->data;
+}
 
-	d->bufWString.resize(d->str.size());
-#if _WINDOWS
-	MultiByteToWideChar(CP_ACP, 0, d->str.data(), -1, (GMWchar*)d->bufWString.data(), d->str.size());
-#else
-	GM_ASSERT(false); //TODO
-#endif
-	return d->bufWString;
+const std::string GMString::toStdString() const
+{
+	D(d);
+	char* chs = alloc_convertWideCharToMultiBytes(d->data.c_str());
+	std::string string(chs);
+	free_multibytes(chs);
+	return string;
 }
 
 size_t GMString::length() const
 {
 	D(d);
-	if (d->type == Data::WideChars)
-		return d->wstr.length();
-	return d->str.length();
-}
-
-void GMString::copyString(char *dest) const
-{
-	D(d);
-	if (d->type == Data::MuiltBytes)
-	{
-		strcpy_s(dest, length() + 1, d->str.c_str());
-	}
-	else
-	{
-		GMString temp = toStdString();
-		strcpy_s(dest, temp.length() + 1, temp.data()->str.c_str());
-	}
-}
-
-void GMString::copyString(GMWchar *dest) const
-{
-	D(d);
-	if (d->type == Data::WideChars)
-	{
-		wcscpy_s(dest, length() + 1, d->wstr.c_str());
-	}
-	else
-	{
-		GMString temp = toStdString();
-		wcscpy_s(dest, temp.length() + 1, temp.data()->wstr.c_str());
-	}
+	return d->data.length();
 }
 
 GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 {
 	D(d);
-	if (d->type == GMString::Data::MuiltBytes)
+	std::wstring _oldValue = oldValue.toStdWString();
+	std::wstring _newValue = newValue.toStdWString();
+	std::wstring _str = d->data;
+	size_t idx = std::wstring::npos + 1;
+	while ((idx = _str.find(_oldValue, _oldValue.size())) != std::wstring::npos)
 	{
-		std::string _oldValue = oldValue.toStdString();
-		std::string _newValue = newValue.toStdString();
-		std::string _str = d->str;
-		size_t idx = std::string::npos + 1;
-		while ((idx = _str.find(_oldValue, _oldValue.size())) != std::string::npos)
-		{
-			_str = _str.replace(idx, _oldValue.length(), _newValue);
-		}
-		return _str;
+		_str = _str.replace(idx, _oldValue.length(), _newValue);
 	}
-	else
-	{
-		std::wstring _oldValue = oldValue.toStdWString();
-		std::wstring _newValue = oldValue.toStdWString();
-		std::wstring _str = d->wstr;
-		size_t idx = std::string::npos + 1;
-		while ((idx = _str.find(_oldValue, _oldValue.size())) != std::string::npos)
-		{
-			_str = _str.replace(idx, _oldValue.length(), _newValue);
-		}
-		return _str;
-	}
+	return _str;
 }
 
 GMStringReader::Iterator GMStringReader::lineBegin()

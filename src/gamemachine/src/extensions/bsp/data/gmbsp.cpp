@@ -49,11 +49,13 @@ namespace
 
 	inline void stripTrailing(GMString& e)
 	{
-		for (auto& c : e.toStdString())
+		std::wstring wstr = e.toStdWString();
+		for (auto& c : wstr)
 		{
 			if (c <= 32)
 				c = 0;
 		}
+		e = wstr;
 	}
 
 	inline GMString expandPath(const char *path)
@@ -621,7 +623,6 @@ GMBSPEPair* GMBSP::parseEpair()
 	// strip trailing spaces that sometimes get accidentally
 	// added in the editor
 	stripTrailing(e->key);
-	stripTrailing(e->value);
 
 	return e;
 }

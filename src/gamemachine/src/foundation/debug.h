@@ -49,14 +49,14 @@ public:
 	}
 
 public:
-	void info(const GMWchar* format, ...);
+	void info(const GMwchar* format, ...);
 	void info(const char* format, ...);
-	void error(const GMWchar* format, ...);
+	void error(const GMwchar* format, ...);
 	void error(const char* format, ...);
-	void warning(const GMWchar* format, ...);
+	void warning(const GMwchar* format, ...);
 	void warning(const char* format, ...);
 #if _DEBUG
-	void debug(const GMWchar* format, ...);
+	void debug(const GMwchar* format, ...);
 	void debug(const char* format, ...);
 #endif
 };

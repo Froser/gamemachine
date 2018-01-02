@@ -28,6 +28,8 @@ set(SOURCES
 		cases/objectmove.cpp
 		cases/hook.h
 		cases/hook.cpp
+		cases/string.h
+		cases/string.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

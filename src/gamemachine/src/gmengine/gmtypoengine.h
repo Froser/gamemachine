@@ -96,7 +96,7 @@ public:
 	GMTypoStateMachine(GMTypoEngine* engine);
 
 public:
-	virtual ParseResult parse(REF GMWchar& ch);
+	virtual ParseResult parse(REF GMwchar& ch);
 
 protected:
 	GMTypoStateMachine::ParseResult applyAttribute();

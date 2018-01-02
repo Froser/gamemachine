@@ -21,7 +21,7 @@ GM_PRIVATE_OBJECT(GMProfile)
 	GMStopwatch stopwatch;
 	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
 	bool valid = false;
-	GMWchar name[128];
+	GMwchar name[128];
 };
 
 struct GMProfileSessions : public GMObject
@@ -45,7 +45,7 @@ public:
 
 public:
 	GMProfile() = default;
-	GMProfile(const GMWchar* name);
+	GMProfile(const GMwchar* name);
 	~GMProfile();
 
 public:
@@ -54,7 +54,7 @@ public:
 	static void resetTimeline();
 
 private:
-	void startRecord(const GMWchar* name);
+	void startRecord(const GMwchar* name);
 	void stopRecord();
 };
 

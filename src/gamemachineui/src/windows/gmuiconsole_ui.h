@@ -4,7 +4,7 @@ BEGIN_UI_NS
 
 struct GMUIConsole_UI
 {
-	static const gm::GMWchar* UI;
+	static const gm::GMwchar* UI;
 };
 
 #define ID_EDIT_CONSOLE				_L("Edit_Console")
@@ -17,7 +17,7 @@ struct GMUIConsole_UI
 #define	ID_OPTION_FILTER_DEBUG		_L("Option_Debug")
 #define	ID_PROFILE_GRAPH			_L("Option_Profile_Graph")
 
-const gm::GMWchar* GMUIConsole_UI::UI = L""
+const gm::GMwchar* GMUIConsole_UI::UI = L""
 	L"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?> "
 	L"<Window size=\"700,700\"> "
 	L"    <VerticalLayout enabled=\"true\" bkcolor=\"#FFA6CAF0\"> "

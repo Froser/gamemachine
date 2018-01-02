@@ -4,10 +4,6 @@
 #include <gamemachine.h>
 #include "unittestcase.h"
 
-namespace {
-
-}
-
 namespace cases
 {
 	struct Hook : public UnitTestCase

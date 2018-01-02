@@ -6,25 +6,16 @@
 #include "assert.h"
 BEGIN_NS
 
+// 所有的字符，按照UTF-16来处理
+// 如果传入的是一个窄字符，则转换为宽字符
+
 GM_PRIVATE_OBJECT(GMString)
 {
-	enum StringType
-	{
-		WideChars,
-		MuiltBytes,
-	};
-
-	std::string str;
-	std::wstring wstr;
-	std::string bufString;
-	std::wstring bufWString;
-	StringType type;
+	std::wstring data;
 };
 
 static inline GMString operator +(const GMString& left, const GMString& right);
 
-// 字符串类，提供Local8Bits和宽字节的支持
-// 在渲染过程中不允许使用GMString，因为它会严重拖慢渲染的效率
 class GMString
 {
 	DECLARE_PRIVATE_NGO(GMString)
@@ -35,68 +26,92 @@ public:
 	static size_t npos;
 
 public:
-	GMString();
+	GMString() = default;
 	GMString(const GMString&);
 	GMString(GMString&&) noexcept;
-	GMString(const char c);
-	GMString(const GMWchar c);
 	GMString(const char* c);
-	GMString(const GMWchar* c);
-	GMString(const std::string& s);
-	GMString(const std::wstring& s);
+	GMString(const GMwchar* c);
+	GMString(const std::string& str);
+	GMString(const std::wstring& str);
 	GMString(const GMfloat f);
 	GMString(const GMint i);
 
 public:
-	bool operator == (const GMString& str) const;
-	bool operator != (const GMString& str) const;
-	bool operator < (const GMString& str) const;
-	GMString& operator = (const GMString& str);
-	GMString& operator = (GMString&& str) noexcept;
-	GMString& operator = (const char* str);
-	GMString& operator = (const GMWchar* str);
+	bool operator == (const GMString& str) const
+	{
+		D(d);
+		return d->data == str.toStdWString();
+	}
 
-public:
+	bool operator != (const GMString& str) const
+	{
+		return !((*this) == str);
+	}
+
+	bool operator < (const GMString& str) const
+	{
+		D(d);
+		return d->data < str.toStdWString();
+	}
+
+	GMString& operator = (const GMString& str)
+	{
+		assign(str);
+		return *this;
+	}
+
+	GMString& operator = (GMString&& s) noexcept
+	{
+		D(d);
+		using namespace std;
+		swap(d->data, s.data()->data);
+		return *this;
+	}
+
 	GMString& operator += (const GMString& str)
 	{
 		*this = *this + str;
 		return *this;
 	}
 
-	char operator[](GMuint i) const
+	GMString& operator = (const char* str)
+	{
+		return this->operator=(GMString(str));
+	}
+
+	GMString& operator = (const GMwchar* str)
+	{
+		return this->operator=(GMString(str));
+	}
+
+	char operator[](GMuint i) const;
+
+	const GMwchar* c_str() const
 	{
 		D(d);
-		if (d->type == GMString::Data::MuiltBytes)
-			return d->str[i];
-
-		std::string t = toStdString();
-		return t[i];
+		return d->data.c_str();
 	}
-
+	
 public:
-	GMString& append(const GMWchar* c);
+	void copyString(char *s) const;
+	void copyString(GMwchar *s) const;
+	GMString& append(const GMwchar* c);
 	GMString& append(const char* c);
-	size_t findLastOf(GMWchar c) const;
+	size_t findLastOf(GMwchar c) const;
 	size_t findLastOf(char c) const;
 	GMString substr(GMint start, GMint count) const;
-	std::string toStdString() const;
-	std::wstring toStdWString() const;
+	const std::wstring& toStdWString() const;
+	const std::string toStdString() const;
 	size_t length() const;
-	void copyString(char* dest) const;
-	void copyString(GMWchar* dest) const;
 	GMString replace(const GMString& oldValue, const GMString& newValue);
+
+private:
+	void assign(const GMString& s);
 };
 
-static inline GMString operator +(const GMString& left, const GMString& right)
+inline GMString operator +(const GMString& left, const GMString& right)
 {
-	if (left.data()->type == GMString::Data::WideChars)
-	{
-		return left.data()->wstr + right.toStdWString();
-	}
-	else // MultiBytes
-	{
-		return left.data()->str + right.toStdString();
-	}
+	return left.data()->data + right.data()->data;
 }
 
 class GMStringReader
@@ -148,5 +163,6 @@ public:
 private:
 	const GMString m_string;
 };
+
 END_NS
 #endif

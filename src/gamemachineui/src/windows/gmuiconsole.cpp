@@ -23,7 +23,7 @@ GMUIStringPtr GMUIConsole::getWindowClassName() const
 }
 
 template <typename T>
-inline static T* findControl(GMUIPainter* painter, gm::GMWchar* name)
+inline static T* findControl(GMUIPainter* painter, gm::GMwchar* name)
 {
 	T* control = static_cast<T*>(painter->FindControl(name));
 	GM_ASSERT(control);
@@ -276,7 +276,7 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const gm::GMString
 
 	CHARRANGE cr1, cr2;
 	d->consoleEdit->GetSel(cr1);
-	d->consoleEdit->InsertText(0, (msg + _L("\n")).toStdWString().c_str());
+	d->consoleEdit->InsertText(0, (msg + L"\n").toStdWString().c_str());
 	d->consoleEdit->EndRight();
 	d->consoleEdit->GetSel(cr2);
 	d->consoleEdit->SetSel(cr1.cpMin, cr2.cpMax);

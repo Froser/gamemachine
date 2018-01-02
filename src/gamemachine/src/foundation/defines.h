@@ -180,7 +180,7 @@ typedef long GMlong;
 typedef unsigned long GMulong;
 typedef short GMshort;
 typedef unsigned short GMushort;
-typedef wchar_t GMWchar;
+typedef wchar_t GMwchar;
 typedef int64_t GMLargeInteger;
 typedef GMint GMFontSizePt;
 
@@ -256,7 +256,7 @@ inline void GM_delete_array(T*& o)
 
 #define SAFE_SWSCANF(in, format, out)	\
 {										\
-	const GMWchar* _str = in;			\
+	const GMwchar* _str = in;			\
 	if (_str)							\
 		swscanf_s(_str, format, out);	\
 }
@@ -266,9 +266,9 @@ inline void GM_delete_array(T*& o)
 #define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )
 
 #if _WINDOWS
-#	define GM_CRLF "\r\n"
+#	define GM_CRLF L"\r\n"
 #else
-#	define GM_CRLF "\n"
+#	define GM_CRLF L"\n"
 #endif
 
 END_NS
@@ -288,12 +288,12 @@ END_NS
 
 #define _stricmp strcasecmp
 
-inline gm::GMWchar* wcscpy_s(gm::GMWchar* dest,  const gm::GMWchar* source)
+inline gm::GMwchar* wcscpy_s(gm::GMwchar* dest,  const gm::GMwchar* source)
 {
 	return wcscpy(dest, source);
 }
 
-inline gm::GMWchar* wcscpy_s(gm::GMWchar* dest, size_t, const gm::GMWchar* source)
+inline gm::GMwchar* wcscpy_s(gm::GMwchar* dest, size_t, const gm::GMwchar* source)
 {
 	return wcscpy(dest, source);
 }

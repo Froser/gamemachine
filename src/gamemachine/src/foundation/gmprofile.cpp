@@ -29,7 +29,7 @@ GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 	return g_sessions.sessions[GMThread::getCurrentThreadId()];
 }
 
-GMProfile::GMProfile(const GMWchar* name)
+GMProfile::GMProfile(const GMwchar* name)
 {
 	D(d);
 	startRecord(name);
@@ -40,7 +40,7 @@ GMProfile::~GMProfile()
 	stopRecord();
 }
 
-void GMProfile::startRecord(const GMWchar* name)
+void GMProfile::startRecord(const GMwchar* name)
 {
 	D(d);
 	GMMutex m;

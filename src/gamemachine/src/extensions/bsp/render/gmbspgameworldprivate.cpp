@@ -12,7 +12,7 @@ namespace
 		GMBSPEPair* e = entity.epairs;
 		while (e)
 		{
-			if (e->key == "classname")
+			if (e->key == L"classname")
 				return e->value;
 			e = e->next;
 		}
@@ -39,13 +39,13 @@ namespace
 		{
 			std::string value = e->value.toStdString();
 			Scanner s(value.c_str());
-			if (e->key == "origin")
+			if (e->key == L"origin")
 			{
 				s.nextFloat(&origin[0]);
 				s.nextFloat(&origin[1]);
 				s.nextFloat(&origin[2]);
 			}
-			else if (e->key == "angle")
+			else if (e->key == L"angle")
 			{
 				s.nextFloat(&yaw);
 			}

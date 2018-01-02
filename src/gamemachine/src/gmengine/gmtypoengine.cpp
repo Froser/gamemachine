@@ -51,7 +51,7 @@ GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
 	d->typoEngine = engine;
 }
 
-GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMWchar& ch)
+GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMwchar& ch)
 {
 	D(d);
 	switch (d->state)
@@ -197,7 +197,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	// 获取行高
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
 	std::wstring wstr = literature.toStdWString();
-	const GMWchar* p = wstr.c_str();
+	const GMwchar* p = wstr.c_str();
 	while (*p)
 	{
 		const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize);
@@ -219,7 +219,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMint index)
 {
 	D(d);
 	GMTypoResult result;
-	GMWchar ch = d->literature[index];
+	GMwchar ch = d->literature[index];
 	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(ch);
 	if (parseResult == GMTypoStateMachine::Ignore)
 	{
