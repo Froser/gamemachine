@@ -105,13 +105,25 @@ GMString::GMString(GMwchar ch)
 GMString::GMString(const GMfloat f)
 {
 	D(d);
+#if GM_MSVC
 	d->data = std::to_wstring(f);
+#else
+	GMwchar* chs = alloc_convertMultiBytesToWideChar(std::to_string(f).c_str());
+	d->data = chs;
+	free_wideChar(chs);
+#endif
 }
 
 GMString::GMString(const GMint i)
 {
 	D(d);
+#if GM_MSVC
 	d->data = std::to_wstring(i);
+#else
+	GMwchar* chs = alloc_convertMultiBytesToWideChar(std::to_string(i).c_str());
+	d->data = chs;
+	free_wideChar(chs);
+#endif
 }
 
 char GMString::operator[](GMuint i) const
