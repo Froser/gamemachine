@@ -1,6 +1,7 @@
 #ifndef AL_UINTMAP_H
 #define AL_UINTMAP_H
 
+#include <limits.h>
 #include "AL/al.h"
 #include "rwlock.h"
 

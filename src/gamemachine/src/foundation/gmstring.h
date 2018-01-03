@@ -167,6 +167,19 @@ public:
 		return *this;
 	}
 
+	//! 将一个字符串追加到此字符串末尾。
+	/*!
+	\param str 目标字符串。
+	\return 此字符串自身的引用。
+	\sa append()
+	*/
+	GMString& operator += (GMwchar str)
+	{
+		D(d);
+		d->data += str;
+		return *this;
+	}
+
 	//! 将一个C风格字符串拷贝赋值过来。
 	/*!
 	  \param str 目标字符串。
@@ -252,6 +265,20 @@ public:
 	*/
 	GMString& append(const char* c);
 
+	//! 清除一个字符串中的所有字符。
+	void clear()
+	{
+		D(d);
+		d->data.clear();
+	}
+
+	//! 为字符串预先分配空间。
+	void reserve(GMint size)
+	{
+		D(d);
+		d->data.reserve(size);
+	}
+
 public:
 	size_t findLastOf(GMwchar c) const;
 	size_t findLastOf(char c) const;
@@ -265,12 +292,12 @@ private:
 
 	// 提供一些原始的字符串方法
 public:
-	static size_t countOfCharacters(char* str)
+	static size_t countOfCharacters(const char* str)
 	{
 		return strlen(str);
 	}
 
-	static size_t countOfCharacters(GMwchar* str)
+	static size_t countOfCharacters(const GMwchar* str)
 	{
 		return wcslen(str);
 	}
@@ -289,6 +316,16 @@ public:
 	static void stringCat(CharType(&dest)[ArraySize], const CharType* source)
 	{
 		stringCat(dest, ArraySize, source);
+	}
+
+	static bool stringEquals(const char* str1, const char* str2)
+	{
+		return !strcmp(str1, str2);
+	}
+
+	static bool stringEquals(const GMwchar* str1, const GMwchar* str2)
+	{
+		return !wcscmp(str1, str2);
 	}
 };
 

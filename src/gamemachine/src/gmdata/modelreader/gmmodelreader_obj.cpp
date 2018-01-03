@@ -8,41 +8,50 @@
 #define RESERVED 4096
 #define INVALID -1
 
-inline bool slashPredicate(char c)
+namespace
 {
-	return c == '/';
+	inline bool slashPredicate(GMwchar c)
+	{
+		return c == L'/';
+	}
+
+	bool isNotReturn(char p)
+	{
+		return p != '\r' && p != '\n';
+	}
+
+	bool isNotReturn(GMwchar p)
+	{
+		return p != L'\r' && p != L'\n';
+	}
 }
 
+template <typename CharType>
 class StringReader
 {
 public:
-	StringReader(const char* string)
-		: m_string(string)
-		, m_p(string)
+	StringReader(const CharType* string)
+		: m_p(string)
 	{
 	}
 
-	bool readLine(char* line)
+	bool readLine(GMString& line)
 	{
+		line.clear();
 		GMint offset = 0;
-		while (*m_p != '\r' && *m_p != '\n')
+		while (isNotReturn(*m_p))
 		{
 			if (!*m_p)
-			{
-				line[offset] = 0;
 				return false;
-			}
-			line[offset++] = *(m_p++);
+			line += *(m_p++);
 		}
 
 		m_p++;
-		line[offset] = 0;
 		return true;
 	}
 
 private:
-	const char* m_string;
-	const char* m_p;
+	const CharType* m_p;
 };
 
 template <GMint D, typename T>
@@ -83,9 +92,8 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	init();
 
 	buffer.convertToStringBuffer();
-	char line[LINE_MAX];
-	StringReader sr((char*)buffer.buffer);
-
+	GMString text((char*)buffer.buffer);
+	StringReader<GMwchar> sr(text.c_str());
 	d->model = new GMModel();
 
 	// 事先分配一些内存，提高效率
@@ -93,6 +101,8 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	d->textures.reserve(RESERVED);
 	d->normals.reserve(RESERVED);
 
+	GMString line;
+	line.reserve(LINE_MAX);
 	while (sr.readLine(line))
 	{
 		GMScanner s(line);
@@ -214,10 +224,13 @@ void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const 
 		GM.getGamePackageManager()->readFileFromPath(fn, &buffer);
 
 	buffer.convertToStringBuffer();
-	char line[LINE_MAX];
-	StringReader sr((char*)buffer.buffer);
 
+	GMString text((char*)buffer.buffer);
+	StringReader<GMwchar> sr(text.c_str());
 	ModelReader_Obj_Material* material = nullptr;
+
+	GMString line;
+	line.reserve(LINE_MAX);
 	while (sr.readLine(line))
 	{
 		GMScanner s(line);

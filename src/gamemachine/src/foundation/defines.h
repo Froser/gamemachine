@@ -245,8 +245,6 @@ inline void GM_delete_array(T*& o)
 #define PI 3.141592653f
 #define HALF_PI 1.5707963265f
 #define SQR(a) ((a) * (a))
-#define strEqual(str1, str2) !strcmp(str1, str2)
-#define wstrEqual(str1, str2) !wcscmp(str1, str2)
 #define SAFE_SSCANF(in, format, out)	\
 {										\
 	const char* _str = in;				\

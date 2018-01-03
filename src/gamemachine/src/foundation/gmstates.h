@@ -101,7 +101,7 @@ union GMStateItemValueStruct
 	GMint i32;
 	GMfloat f32;
 	void* ptr;
-	char* str;
+	GMwchar* str;
 };
 
 enum GMConfigValueType
@@ -116,11 +116,11 @@ struct GMStateItemValue : public GMAlignmentObject
 {
 	GMStateItemValue() = default;
 
-	GMStateItemValue(const char* str)
+	GMStateItemValue(const GMwchar* str)
 	{
 		type = VT_String;
-		size_t len = strlen(str);
-		value.str = new char[len];
+		size_t len = GMString::countOfCharacters(str);
+		value.str = new GMwchar[len];
 		GMString::stringCopy(value.str, len, str);
 	}
 
@@ -154,7 +154,7 @@ inline bool operator < (const GMStateItemValue& lhs, const GMStateItemValue& rhs
 	switch (lhs.type)
 	{
 	case VT_String:
-		return strEqual(lhs.value.str, rhs.value.str);
+		return GMString::stringEquals(lhs.value.str, rhs.value.str);
 	case VT_Float32:
 		return lhs.value.f32 < rhs.value.f32;
 	case VT_Int32:
@@ -186,8 +186,8 @@ public:
 	GMLargeInteger getInt64(GMint key);
 	void setFloat32(GMint key, GMfloat i);
 	GMfloat getFloat32(GMint key);
-	void setString(GMint key, const char* str);
-	const char* getString(GMint key);
+	void setString(GMint key, const GMwchar* str);
+	const GMwchar* getString(GMint key);
 
 private:
 	void releaseString(const GMStateItemValue& value);

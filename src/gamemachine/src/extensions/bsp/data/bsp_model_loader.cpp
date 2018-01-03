@@ -80,7 +80,7 @@ void BSPModelLoader::parse(const char* buf)
 	for (; it; it = it->NextSiblingElement())
 	{
 		TiXmlElement* elem = it;
-		if (!strEqual(elem->Value(), "item"))
+		if (!GMString::stringEquals(elem->Value(), "item"))
 			gm_warning(_L("First node must be 'item'."));
 
 		const char* name = elem->Attribute("name");

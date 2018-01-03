@@ -45,7 +45,7 @@ Vector<GMString> GMPath::getAllFiles(const GMString& directory)
 		{
 			if ((fd.attrib &  _A_ARCH))
 			{
-				if (!strEqual(fd.name, ".") && !strEqual(fd.name, ".."))
+				if (!GMString::stringEquals(fd.name, ".") && !GMString::stringEquals(fd.name, ".."))
 					res.push_back(GMString(directory).append(fd.name));
 			}
 		} while (_findnext(hFile, &fd) == 0);

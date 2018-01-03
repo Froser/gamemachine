@@ -70,20 +70,20 @@ GMfloat GMStateItem::getFloat32(GMint key)
 	return v.value.f32;
 }
 
-void GMStateItem::setString(GMint key, const char* str)
+void GMStateItem::setString(GMint key, const GMwchar* str)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];
-	size_t len = strlen(str);
+	size_t cch = GMString::countOfCharacters(str);
 	releaseString(v);
 	GMStateItemValue t;
 	t.type = VT_String;
-	t.value.str = new char[len];
-	GMString::stringCopy(t.value.str, len, str);
+	t.value.str = new GMwchar[cch];
+	GMString::stringCopy(t.value.str, cch, str);
 	d->values[key] = t;
 }
 
-const char* GMStateItem::getString(GMint key)
+const GMwchar* GMStateItem::getString(GMint key)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];

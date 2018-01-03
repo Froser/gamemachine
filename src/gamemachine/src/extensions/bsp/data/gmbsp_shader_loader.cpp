@@ -10,8 +10,8 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
 
-#define BEGIN_PARSE(name) if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
-#define PARSE(name) else if ( strEqual(it->Value(), #name) ) parse_##name(shader, it)
+#define BEGIN_PARSE(name) if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
+#define PARSE(name) else if ( GMString::stringEquals(it->Value(), #name) ) parse_##name(shader, it)
 #define END_PARSE
 
 enum
@@ -57,7 +57,7 @@ namespace
 	{
 		for (GMuint i = 0; i < GMS_SURFACE_FLAG_MAX; i++)
 		{
-			if (strEqual(p, _surface_flags[i].name))
+			if (GMString::stringEquals(p, _surface_flags[i].name))
 				return _surface_flags[i].flag;
 		}
 
@@ -209,7 +209,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 	for (; it; it = it->NextSiblingElement())
 	{
 		TiXmlElement* elem = it;
-		if (!strEqual(elem->Value(), "item"))
+		if (!GMString::stringEquals(elem->Value(), "item"))
 			gm_warning(_L("First node must be 'item'."));
 
 		const char* name = elem->Attribute("name");
@@ -219,7 +219,7 @@ void GMBSPShaderLoader::parse(const char* buffer)
 		{
 			for (TiXmlElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
 			{
-				if (strEqual(ref, it->Attribute("name")))
+				if (GMString::stringEquals(ref, it->Attribute("name")))
 				{
 					elem = it;
 					break;
@@ -281,9 +281,9 @@ void GMBSPShaderLoader::parse_surfaceparm(GMShader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_cull(GMShader& shader, TiXmlElement* elem)
 {
 	const char* text = elem->GetText();
-	if (strEqual(text, "none"))
+	if (GMString::stringEquals(text, "none"))
 		shader.setCull(GMS_Cull::NONE);
-	else if (strEqual(text, "cull"))
+	else if (GMString::stringEquals(text, "cull"))
 		shader.setCull(GMS_Cull::CULL);
 	else
 		gm_error("wrong cull param %s", text);
@@ -380,7 +380,7 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* e
 	const char* from = elem->Attribute("from");
 	if (from)
 	{
-		if (strEqual(from, "lightmap"))
+		if (GMString::stringEquals(from, "lightmap"))
 		{
 			GMAssets& assets = d->world->getAssets();
 			GMAssetsNode* lightmapNode = assets.getNodeFromPath(GM_ASSET_LIGHTMAPS);
@@ -448,11 +448,11 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	readTernaryFloatsFromString(color, vecColor);
 	light.setLightColor(&vecColor[0]);
 
-	if (strEqual(type, "ambient"))
+	if (GMString::stringEquals(type, "ambient"))
 	{
 		lightType = GMLightType::AMBIENT;
 	}
-	else if (strEqual(type, "specular"))
+	else if (GMString::stringEquals(type, "specular"))
 	{
 		lightType = GMLightType::SPECULAR;
 		const char* position = elem->Attribute("position");

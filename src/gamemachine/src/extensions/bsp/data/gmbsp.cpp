@@ -461,7 +461,7 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 	if (!getToken(true))
 		return false;
 
-	if (!strEqual(d->token, "{")) {
+	if (!GMString::stringEquals(d->token, "{")) {
 		gm_warning(_L("parseEntity: { not found"));
 	}
 
@@ -472,7 +472,7 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 		if (!getToken(true)) {
 			gm_warning(_L("parseEntity: EOF without closing brace"));
 		}
-		if (strEqual(d->token, "}")) {
+		if (GMString::stringEquals(d->token, "}")) {
 			break;
 		}
 		e = parseEpair();
