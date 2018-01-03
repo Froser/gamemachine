@@ -134,10 +134,11 @@ inline const char* getLightUniformName(GMLightType t, GMint index)
 	return "";
 }
 
-inline void combineUniform(REF char* dest, const char* srcA, const char* srcB)
+template <typename CharType, size_t ArraySize>
+void combineUniform(REF CharType (&dest)[ArraySize], const char* srcA, const char* srcB)
 {
-	strcpy_s(dest, GMGL_MAX_UNIFORM_NAME_LEN, srcA);
-	strcat_s(dest, GMGL_MAX_UNIFORM_NAME_LEN, srcB);
+	GMString::stringCopy(dest, srcA);
+	GMString::stringCat(dest, srcB);
 }
 
 END_NS

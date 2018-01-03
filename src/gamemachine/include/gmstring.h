@@ -1,1 +1,1 @@
-﻿#include "../src/foundation/string/gmstring.h"
+﻿#include "../src/foundation/gmstring.h"

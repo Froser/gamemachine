@@ -56,4 +56,18 @@ void cases::String::addToUnitTest(UnitTest& ut)
 		gm::GMString result = text.replace(L"${project}", L"gamemachine");
 		return result == L"Hello, welcome to gamemachine! gamemachine is very easy.";
 	});
+
+	ut.addTestCase("GMString::stringCopy", []() {
+		gm::GMwchar dest[20];
+		gm::GMwchar* src = L"gamemachine";
+		gm::GMString::stringCopy(dest, src);
+		return gm::GMString(dest) == L"gamemachine";
+	});
+
+	ut.addTestCase("GMString::stringCat", []() {
+		gm::GMwchar dest[20] = { L'g', L'a', L'm', L'e', 0 };
+		gm::GMwchar* src = L"machine";
+		gm::GMString::stringCat(dest, src);
+		return gm::GMString(dest) == L"gamemachine";
+	});
 }

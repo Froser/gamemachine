@@ -286,28 +286,6 @@ END_NS
 	}
 #	endif
 
-#define _stricmp strcasecmp
-
-inline gm::GMwchar* wcscpy_s(gm::GMwchar* dest,  const gm::GMwchar* source)
-{
-	return wcscpy(dest, source);
-}
-
-inline gm::GMwchar* wcscpy_s(gm::GMwchar* dest, size_t, const gm::GMwchar* source)
-{
-	return wcscpy(dest, source);
-}
-
-inline void strcpy_s(char* dest, size_t len, const char* source)
-{
-	strcpy(dest, source);
-}
-
-inline void strcpy_s(char* dest, const char* source)
-{
-	strcpy(dest, source);
-}
-
 inline void fopen_s(FILE** f, const char* filename, const char* mode)
 {
 	*f = fopen(filename, mode);
@@ -316,16 +294,6 @@ inline void fopen_s(FILE** f, const char* filename, const char* mode)
 inline void memcpy_s(void* dest, size_t, const void* src, size_t size)
 {
 	memcpy(dest, src, size);
-}
-
-inline char* strcat_s(char* dest, size_t, const char* src)
-{
-	return strcat(dest, src);
-}
-
-inline char* strncpy_s(char* dest, size_t, const char* src, size_t count)
-{
-	return strncpy(dest, src, count);
 }
 
 #endif

@@ -79,7 +79,7 @@ void GMStateItem::setString(GMint key, const char* str)
 	GMStateItemValue t;
 	t.type = VT_String;
 	t.value.str = new char[len];
-	strcpy_s(t.value.str, len, str);
+	GMString::stringCopy(t.value.str, len, str);
 	d->values[key] = t;
 }
 

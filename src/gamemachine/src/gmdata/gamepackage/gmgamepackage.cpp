@@ -16,7 +16,7 @@ void GMGamePackage::loadPackage(const GMString& path)
 	D(d);
 	size_t len = path.length();
 	char path_temp[FILENAME_MAX];
-	path.copyString(path_temp);
+	GMString::stringCopy(path_temp, path.toStdString().c_str());
 	if (path_temp[len - 1] == '/' || path_temp[len - 1] == '\\')
 		*(path_temp + len - 1) = 0;
 

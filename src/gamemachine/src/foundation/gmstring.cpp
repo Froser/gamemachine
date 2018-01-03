@@ -1,5 +1,9 @@
 ﻿#include "stdafx.h"
-#include "stdio.h"
+#if _WINDOWS
+#	include <strsafe.h>
+#else
+#	include "stdio.h"
+#endif
 #include "gmstring.h"
 
 size_t GMString::npos = std::string::npos;
@@ -135,19 +139,6 @@ void GMString::assign(const GMString& s)
 	d->data = s.data()->data;
 }
 
-void GMString::copyString(char *s) const
-{
-	D(d);
-	std::string str = toStdString();
-	strcpy_s(s, str.length() + 1, str.c_str());
-}
-
-void GMString::copyString(GMwchar *s) const
-{
-	D(d);
-	wcscpy_s(s, d->data.length() * sizeof(GMwchar) + 1, d->data.c_str());
-}
-
 GMString& GMString::append(const char* c)
 {
 	D(d);
@@ -208,6 +199,43 @@ GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 	return _str;
 }
 
+void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
+{
+#if _WINDOWS
+	::StringCchCopyA(dest, cchDest, source);
+#else
+	strcpy(dest, source);
+#endif
+}
+
+void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
+{
+#if _WINDOWS
+	::StringCchCopyW(dest, cchDest, source);
+#else
+	wcscpy(dest, source);
+#endif
+}
+
+void GMString::stringCat(char* dest, size_t cchDest, const char* source)
+{
+#if _WINDOWS
+	::StringCchCatA(dest, cchDest, source);
+#else
+	strcat(dest, source);
+#endif
+}
+
+void GMString::stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source)
+{
+#if _WINDOWS
+	::StringCchCatW(dest, cchDest, source);
+#else
+	wcscat(dest, source);
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////////
 GMStringReader::Iterator GMStringReader::lineBegin()
 {
 	return GMStringReader::Iterator(m_string);
@@ -230,7 +258,6 @@ void GMStringReader::Iterator::findNextLine()
 		}
 	} while (m_src[m_end++] != '\n');
 }
-
 
 //Scanner
 static bool isWhiteSpace(GMwchar c)

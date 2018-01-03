@@ -6,7 +6,6 @@
 #include "assert.h"
 BEGIN_NS
 
-
 GM_PRIVATE_OBJECT(GMString)
 {
 	std::wstring data;
@@ -254,8 +253,6 @@ public:
 	GMString& append(const char* c);
 
 public:
-	void copyString(char *s) const;
-	void copyString(GMwchar *s) const;
 	size_t findLastOf(GMwchar c) const;
 	size_t findLastOf(char c) const;
 	GMString substr(GMint start, GMint count) const;
@@ -265,6 +262,34 @@ public:
 
 private:
 	void assign(const GMString& s);
+
+	// 提供一些原始的字符串方法
+public:
+	static size_t countOfCharacters(char* str)
+	{
+		return strlen(str);
+	}
+
+	static size_t countOfCharacters(GMwchar* str)
+	{
+		return wcslen(str);
+	}
+
+	static void stringCopy(char* dest, size_t cchDest, const char* source);
+	static void stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source);
+	template <typename CharType, size_t ArraySize>
+	static void stringCopy(CharType (&dest)[ArraySize], const CharType* source)
+	{
+		stringCopy(dest, ArraySize, source);
+	}
+
+	static void stringCat(char* dest, size_t cchDest, const char* source);
+	static void stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source);
+	template <typename CharType, size_t ArraySize>
+	static void stringCat(CharType(&dest)[ArraySize], const CharType* source)
+	{
+		stringCat(dest, ArraySize, source);
+	}
 };
 
 inline GMString operator +(const GMString& left, const GMString& right)

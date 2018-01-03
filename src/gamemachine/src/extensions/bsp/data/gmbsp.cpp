@@ -43,7 +43,7 @@ namespace
 		char *b;
 		GMint len = strlen(s) + 1;
 		b = (char*)malloc(len);
-		strcpy_s(b, len, s);
+		GMString::stringCopy(b, len, s);
 		return b;
 	}
 
@@ -443,7 +443,7 @@ void GMBSP::parseFromMemory(char *buffer, int size)
 	d->script++;
 	if (d->script == &d->scriptstack[MAX_INCLUDES])
 		gm_error(_L("script file exceeded MAX_INCLUDES"));
-	strcpy_s(d->script->filename, "memory buffer");
+	GMString::stringCopy(d->script->filename, "memory buffer");
 
 	d->script->buffer = buffer;
 	d->script->line = 1;
@@ -635,7 +635,7 @@ void GMBSP::addScriptToStack(const char *filename)
 	d->script++;
 	if (d->script == &d->scriptstack[MAX_INCLUDES])
 		gm_error(_L("script file exceeded MAX_INCLUDES"));
-	expandPath(filename).copyString(d->script->filename);
+	GMString::stringCopy(d->script->filename, expandPath(filename).toStdString().c_str());
 
 	size = loadFile(d->script->filename, (void **)&d->script->buffer);
 

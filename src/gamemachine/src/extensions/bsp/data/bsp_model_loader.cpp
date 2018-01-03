@@ -103,7 +103,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 
 	Model* m = new Model;
 	m->model[0] = 0;
-	strcpy_s(m->classname, classname);
+	GMString::stringCopy(m->classname, classname);
 
 	const char* b;
 	if ( (b = ti->Attribute("create")))
@@ -125,7 +125,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 
 	if ((b = ti->Attribute("model")))
 	{
-		strcpy_s(m->model, b);
+		GMString::stringCopy(m->model, b);
 	}
 
 	d->items[m->classname] = m;

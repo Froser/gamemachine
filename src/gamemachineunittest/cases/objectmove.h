@@ -27,6 +27,7 @@ namespace {
 	{
 		DECLARE_PRIVATE_AND_BASE(_Derived, _Base)
 		GM_DEFAULT_MOVE_BEHAVIOR(_Derived);
+
 	public:
 		_Derived(int _a, int _b, int _c, int _d)
 		{

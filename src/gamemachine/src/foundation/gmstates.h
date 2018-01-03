@@ -2,6 +2,7 @@
 #define __GMCONFIG_H__
 #include "defines.h"
 #include "gmobject.h"
+#include <gmstring.h>
 BEGIN_NS
 
 #define GMDebugStates (gm::GameMachine::instance().getStatesManager()->getDebugStates())
@@ -120,7 +121,7 @@ struct GMStateItemValue : public GMAlignmentObject
 		type = VT_String;
 		size_t len = strlen(str);
 		value.str = new char[len];
-		strcpy_s(value.str, len, str);
+		GMString::stringCopy(value.str, len, str);
 	}
 
 	GMStateItemValue(GMint i)

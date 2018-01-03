@@ -52,7 +52,7 @@ void GMProfile::startRecord(const GMwchar* name)
 
 	d->valid = true;
 	
-	wcscpy_s(d->name, name);
+	GMString::stringCopy(d->name, name);
 	GMLargeInteger now = GMClock::highResolutionTimer();
 	if (ps.firstProfileTimeInCycle < 0)
 		ps.firstProfileTimeInCycle = now;
