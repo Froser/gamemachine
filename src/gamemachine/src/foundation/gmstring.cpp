@@ -58,15 +58,19 @@ GMString::GMString(GMString&& str) noexcept
 GMString::GMString(const char* c)
 {
 	D(d);
-	GMwchar* string = alloc_convertMultiBytesToWideChar(c);
-	d->data = string;
-	free_wideChar(string);
+	if (c)
+	{
+		GMwchar* string = alloc_convertMultiBytesToWideChar(c);
+		d->data = string;
+		free_wideChar(string);
+	}
 }
 
 GMString::GMString(const GMwchar* c)
 {
 	D(d);
-	d->data = c;
+	if (c)
+		d->data = c;
 }
 
 GMString::GMString(const std::string& str)
