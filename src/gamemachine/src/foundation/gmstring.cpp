@@ -1,9 +1,4 @@
 ﻿#include "stdafx.h"
-#if GM_WINDOWS
-#	include <strsafe.h>
-#else
-#	include "stdio.h"
-#endif
 #include "gmstring.h"
 
 size_t GMString::npos = std::string::npos;
@@ -202,7 +197,7 @@ GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 {
 #if GM_WINDOWS
-	::StringCchCopyA(dest, cchDest, source);
+	::strcpy_s(dest, cchDest, source);
 #else
 	strcpy(dest, source);
 #endif
@@ -211,7 +206,7 @@ void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 {
 #if GM_WINDOWS
-	::StringCchCopyW(dest, cchDest, source);
+	::wcscpy_s(dest, cchDest, source);
 #else
 	wcscpy(dest, source);
 #endif
@@ -220,7 +215,7 @@ void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 {
 #if GM_WINDOWS
-	::StringCchCatA(dest, cchDest, source);
+	::strcat_s(dest, cchDest, source);
 #else
 	strcat(dest, source);
 #endif
@@ -229,7 +224,7 @@ void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 void GMString::stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source)
 {
 #if GM_WINDOWS
-	::StringCchCatW(dest, cchDest, source);
+	::wcscat_s(dest, cchDest, source);
 #else
 	wcscat(dest, source);
 #endif

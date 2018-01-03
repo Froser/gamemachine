@@ -116,7 +116,10 @@ GMThreadHandle::id GMThread::getThreadId()
 {
 	D(d);
 #if GM_USE_PTHREAD
-	return d->handle.p;
+    ///todo pthread
+    GM_ASSERT(false);
+	//return (unsigned long int)d->handle.thread;
+	return 0;
 #else
 	return d->handle.get_id();
 #endif
@@ -125,7 +128,10 @@ GMThreadHandle::id GMThread::getThreadId()
 GMThreadHandle::id GMThread::getCurrentThreadId()
 {
 #if GM_USE_PTHREAD
-	return pthread_self().p;
+    ///todo pthread
+    GM_ASSERT(false);
+	//return (unsigned long int)pthread_self();
+	return 0;
 #else
 	return std::this_thread::get_id();
 #endif
@@ -134,6 +140,7 @@ GMThreadHandle::id GMThread::getCurrentThreadId()
 void GMThread::sleep(GMint milliseconds)
 {
 #if GM_USE_PTHREAD
+	GM_ASSERT(false);
 	//::sleep(milliseconds / 1000.f);
 #else
 	std::chrono::duration<GMint, std::milli> milli(milliseconds);

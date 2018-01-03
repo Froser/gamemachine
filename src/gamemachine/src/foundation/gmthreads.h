@@ -4,11 +4,11 @@
 #include "utilities/tools.h"
 #include <mutex>
 
-#if !_MSC_VER
+#ifndef GM_MSVC
 #	include <pthread.h>
 #	define GM_USE_PTHREAD 1
 #else
-#   include <thread>
+#	include <thread>
 #endif
 
 BEGIN_NS
@@ -16,7 +16,7 @@ BEGIN_NS
 #if GM_USE_PTHREAD
 struct GMThreadHandle
 {
-	typedef void* id;
+	typedef unsigned long int id;
 	pthread_t thread;
 };
 

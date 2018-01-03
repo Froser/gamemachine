@@ -152,7 +152,7 @@ bool GMFrustum::isBoundingBoxInside(const glm::vec3 * vertices)
 	return true;
 }
 
-void GMFrustum::updateViewMatrix(glm::mat4& viewMatrix)
+void GMFrustum::updateViewMatrix(const glm::mat4& viewMatrix)
 {
 	D(d);
 	d->viewMatrix = viewMatrix;

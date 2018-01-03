@@ -2,9 +2,9 @@
 #include "gmimagereader_dds.h"
 #include <gmimage.h>
 
-#ifdef _MSC_VER
+#ifdef GM_MSVC
 #define _CRT_SECURE_NO_WARNINGS
-#endif /* _MSC_VER */
+#endif /* GM_MSVC */
 
 #include <cstdint>
 #include <cstdio>
@@ -178,9 +178,9 @@ enum
 	DDS_DDPF_LUMINANCE = 0x00020000,
 };
 
-#ifdef _MSC_VER
+#ifdef GM_MSVC
 #pragma pack (push, 1)
-#endif /* _MSC_VER */
+#endif /* GM_MSVC */
 
 struct DDS_PIXELFORMAT
 {
@@ -228,9 +228,9 @@ struct DDS_FILE_HEADER
 	DDS_HEADER_DXT10        dxt10_header;
 };
 
-#ifdef _MSC_VER
+#ifdef GM_MSVC
 #pragma pack (pop)
-#endif /* _MSC_VER */
+#endif /* GM_MSVC */
 
 struct DDS_FORMAT_GL_INFO
 {

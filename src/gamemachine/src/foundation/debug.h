@@ -74,6 +74,10 @@ public:
 // hooks
 typedef size_t CallbackType;
 typedef void *HookObject;
+struct HookFactory
+{
+	static Map<CallbackType, HookObject> g_hooks;
+};
 
 template <typename... Args>
 using HookMap = Map<GMString, Vector<std::function<void(Args...)> > >;
@@ -136,11 +140,6 @@ inline void installHook(const GMString& hookName, std::function<void(Args...)> c
 		HookFactory::g_hooks[hash_code] = &hm;
 	}
 }
-
-struct HookFactory
-{
-	static Map<CallbackType, HookObject> g_hooks;
-};
 
 END_NS
 #endif

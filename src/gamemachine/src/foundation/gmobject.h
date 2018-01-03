@@ -33,13 +33,13 @@ GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 	mutable T* __parent = nullptr;
 };
 
-template <typename T, typename... Args>
+template <typename T>
 class GMConstructHelper
 {
 public:
 	GMConstructHelper()
 	{
-		m_ref = new T(Args...);
+		m_ref = new T();
 	}
 
 	~GMConstructHelper()
@@ -330,7 +330,7 @@ template <typename T>
 inline void gmSwap(T& a, T& b)
 {
 	a.swapData(b);
-	gmSwap((T::Base&)a, (T::Base&)b);
+	gmSwap((typename T::Base&)a, (typename T::Base&)b);
 }
 
 template <>

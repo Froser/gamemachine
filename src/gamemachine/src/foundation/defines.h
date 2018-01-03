@@ -2,7 +2,7 @@
 #define __DEFINES_H__
 
 // 容器别名
-#if _MSC_VER
+#if GM_MSVC
 #	include <wtypes.h>
 #else
 #	include <strings.h>
@@ -58,11 +58,6 @@ template <typename... T>
 using Tuple = std::tuple<T...>;
 
 /* 工程编译选项 */
-// 使用UNICODE
-#ifndef UNICODE
-#	define UNICODE 1
-#endif
-
 // 使用OpenGL
 #ifndef GM_USE_OPENGL
 #	define GM_USE_OPENGL 1
@@ -96,13 +91,13 @@ using Tuple = std::tuple<T...>;
 #	endif
 #endif
 
-#if _MSC_VER
+#if GM_MSVC
 #	define GM_NOVTABLE __declspec(novtable)
 #else
 #	define GM_NOVTABLE
 #endif
 
-#if _MSC_VER && GM_SIMD
+#if GM_MSVC && GM_SIMD
 #	define USE_SIMD 1
 #else
 #	define USE_SIMD 0
@@ -151,7 +146,7 @@ using Tuple = std::tuple<T...>;
 #define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint) var < (gm::GMint) end; var = (decltype(var))(((gm::GMint)var)+1) )
 
 // 非WINDOWS下的数据类型
-#if !GM_WINDOWS && !_MSC_VER
+#if !GM_WINDOWS && !GM_MSVC
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 GM_STATIC_ASSERT_SIZE(WORD, 2);
@@ -273,7 +268,7 @@ END_NS
 
 // 全局空间
 // 平台差异
-#if !_MSC_VER
+#if !GM_MSVC
 #	ifdef SAFE_SSCANF
 #		undef SAFE_SSCANF
 #		define SAFE_SSCANF(in, format, out)	\

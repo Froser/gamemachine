@@ -19,14 +19,14 @@
 
 // GM
 #include <defines.h>
-
 #include <math.h>
 
 BEGIN_NS
 
-#if !_MSC_VER
+#ifndef FLT_EPSILON
 #	define FLT_EPSILON 1.192092896e-07F
 #endif
+
 #define GM_SIMD_EPSILON FLT_EPSILON
 
 // 数学函数

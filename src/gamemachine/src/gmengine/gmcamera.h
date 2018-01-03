@@ -76,7 +76,7 @@ public:
 public:
 	bool isPointInside(const glm::vec3& point);
 	bool isBoundingBoxInside(const glm::vec3* vertices);
-	void updateViewMatrix(glm::mat4& viewMatrix);
+	void updateViewMatrix(const glm::mat4& viewMatrix);
 
 public:
 	inline const glm::mat4& getProjectionMatrix() { D(d); return d->projMatrix; }

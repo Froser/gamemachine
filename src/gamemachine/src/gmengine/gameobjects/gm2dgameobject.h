@@ -121,8 +121,6 @@ class GMImage2DGameObject : public GMControlGameObject, public IPrimitiveCreator
 {
 	DECLARE_PRIVATE_AND_BASE(GMImage2DGameObject, GMControlGameObject)
 
-	typedef GMControlGameObject Base;
-
 public:
 	using GMControlGameObject::GMControlGameObject;
 	~GMImage2DGameObject();
@@ -194,8 +192,6 @@ GM_PRIVATE_OBJECT(GMCursorGameObject)
 class GMCursorGameObject : public GMImage2DGameObject
 {
 	DECLARE_PRIVATE_AND_BASE(GMCursorGameObject, GMImage2DGameObject)
-
-	typedef GMImage2DGameObject Base;
 
 public:
 	GMCursorGameObject(GMint width, GMint height);

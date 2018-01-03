@@ -18,7 +18,7 @@ const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize)
 GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMwchar ch, const GMGlyphInfo& glyph)
 {
 	D(d);
-	auto& result = d->chars[fontSize].insert({ ch, glyph });
+	auto result = d->chars[fontSize].insert({ ch, glyph });
 	GM_ASSERT(result.second);
 	return (*(result.first)).second;
 }
