@@ -218,7 +218,7 @@ void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 
 void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 {
-#if GM_WINDOWS
+#if GM_MSVC
 	::strcat_s(dest, cchDest, source);
 #else
 	strcat(dest, source);
@@ -227,7 +227,7 @@ void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 
 void GMString::stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source)
 {
-#if GM_WINDOWS
+#if GM_MSVC
 	::wcscat_s(dest, cchDest, source);
 #else
 	wcscat(dest, source);

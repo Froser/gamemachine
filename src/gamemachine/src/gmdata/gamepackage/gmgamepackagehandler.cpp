@@ -311,22 +311,22 @@ GMString GMZipGamePackageHandler::pathRoot(GMPackageIndex index)
 	switch (index)
 	{
 	case GMPackageIndex::Maps:
-		return "maps/";
+		return L"maps/";
 	case GMPackageIndex::Shaders:
-		return "shaders/";
+		return L"shaders/";
 	case GMPackageIndex::TexShaders:
-		return "texshaders/";
+		return L"texshaders/";
 	case GMPackageIndex::Textures:
-		return "textures/";
+		return L"textures/";
 	case GMPackageIndex::Models:
-		return "models/";
+		return L"models/";
 	case GMPackageIndex::Audio:
-		return "audio/";
+		return L"audio/";
 	case GMPackageIndex::Scripts:
-		return "scripts/";
+		return L"scripts/";
 	default:
 		GM_ASSERT(false);
 		break;
 	}
-	return "";
+	return L"";
 }
