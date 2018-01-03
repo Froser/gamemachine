@@ -254,12 +254,12 @@ void GMZipGamePackageHandler::releaseBuffers()
 
 GMString GMZipGamePackageHandler::toRelativePath(const GMString& in)
 {
-	Deque<GMString> deque;
+	Deque<std::wstring> deque;
 
-	auto pushToStack = [&deque](GMString&& str) {
-		if (str == ".")
+	auto pushToStack = [&deque](std::wstring&& str) {
+		if (str == L".")
 			return;
-		if (str == "..")
+		if (str == L"..")
 		{
 			deque.pop_back();
 			return;
@@ -268,15 +268,16 @@ GMString GMZipGamePackageHandler::toRelativePath(const GMString& in)
 	};
 
 	size_t pos1 = 0, pos2 = 0;
-	for (; in[pos2]; pos2++)
+	const std::wstring& stdIn = in.toStdWString();
+	for (; pos2 < stdIn.length(); pos2++)
 	{
-		if (in[pos2] == '\\' || in[pos2] == '/')
+		if (stdIn[pos2] == L'\\' || stdIn[pos2] == L'/')
 		{
-			pushToStack(in.substr(pos1, pos2 - pos1));
+			pushToStack(stdIn.substr(pos1, pos2 - pos1));
 			pos1 = ++pos2;
 		}
 	}
-	pushToStack(in.substr(pos1, pos2 - pos1));
+	pushToStack(stdIn.substr(pos1, pos2 - pos1));
 
 	GMString result("");
 	while (!deque.empty())
