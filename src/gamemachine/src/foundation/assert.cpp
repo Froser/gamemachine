@@ -8,7 +8,7 @@ void Assert::noop()
 
 void Assert::gm_assert(const char *assertion, const char *file, int line)
 {
-#if defined(_WINDOWS) && defined(_DEBUG)
+#if defined(GM_WINDOWS) && defined(_DEBUG)
 	std::wstringstream buf, wfile;
 	buf << assertion;
 	wfile << file;

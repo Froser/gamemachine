@@ -2,7 +2,7 @@
 #define __GMUI_H__
 #include <gmuicommon.h>
 
-#if _WINDOWS
+#if GM_WINDOWS
 #include "../windows/gmuiwindow.h"
 #include "../windows/gmuiguiwindow.h"
 #include "../windows/gmuiconsole.h"

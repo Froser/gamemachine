@@ -1,7 +1,7 @@
 ﻿#ifndef __GMM_COMMON_H__
 #define __GMM_COMMON_H__
 
-#if _WINDOWS
+#if GM_WINDOWS
 #	include <windows.h>
 #endif
 

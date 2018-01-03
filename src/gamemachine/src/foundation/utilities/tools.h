@@ -382,7 +382,7 @@ struct GMScreen
 };
 
 //GMEvent: platforms/[os]/event.cpp
-#if _WINDOWS
+#if GM_WINDOWS
 typedef HANDLE GMEventHandle;
 #else
 typedef void* GMEventHandle; //TODO

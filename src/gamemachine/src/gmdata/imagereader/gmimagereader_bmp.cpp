@@ -4,11 +4,11 @@
 #include <gmimage.h>
 #include "foundation/utilities/tools.h"
 
-#if _WINDOWS
+#if GM_WINDOWS
 #include <wtypes.h>
 #endif
 
-#if _WINDOWS
+#if GM_WINDOWS
 #include <pshpack2.h>
 #endif
 
@@ -23,7 +23,7 @@ struct BitmapHeader
 	DWORD bfOffBits;
 };
 
-#if _WINDOWS
+#if GM_WINDOWS
 #include <poppack.h>
 #endif
 

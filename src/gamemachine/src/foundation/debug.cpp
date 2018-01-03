@@ -7,7 +7,7 @@
 
 inline void format_timeW(GMwchar* in)
 {
-#if _WINDOWS
+#if GM_WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
 	swprintf(in, L"%d-%02d-%02d %02d:%02d:%02d",
@@ -23,7 +23,7 @@ inline void format_timeW(GMwchar* in)
 
 inline void format_timeA(char* in)
 {
-#if _WINDOWS
+#if GM_WINDOWS
 	SYSTEMTIME time = { 0 };
 	GetLocalTime(&time);
 	sprintf(in, "%d-%02d-%02d %02d:%02d:%02d",

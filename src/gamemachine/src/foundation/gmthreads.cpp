@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmthreads.h"
-#if _WINDOWS
+#if GM_WINDOWS
 #	include <process.h>
 #endif
 #include <mutex>

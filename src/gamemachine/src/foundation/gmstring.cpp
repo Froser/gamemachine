@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#if _WINDOWS
+#if GM_WINDOWS
 #	include <strsafe.h>
 #else
 #	include "stdio.h"
@@ -12,7 +12,7 @@ namespace
 {
 	GMwchar* alloc_convertMultiBytesToWideChar(const char* mbs)
 	{
-#if _WINDOWS
+#if GM_WINDOWS
 		GMint sz = ::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, nullptr, 0);
 		GMwchar* data = new GMwchar[sz];
 		::MultiByteToWideChar(CP_UTF8, 0, mbs, -1, data, sz);
@@ -24,14 +24,14 @@ namespace
 
 	void free_wideChar(GMwchar* c)
 	{
-#if _WINDOWS
+#if GM_WINDOWS
 		GM_delete(c);
 #endif
 	}
 
 	char* alloc_convertWideCharToMultiBytes(const GMwchar* wch)
 	{
-#if _WINDOWS
+#if GM_WINDOWS
 		GMint sz = ::WideCharToMultiByte(CP_UTF8, 0, wch, -1, nullptr, 0, nullptr, nullptr);
 		char* data = new char[sz];
 		::WideCharToMultiByte(CP_UTF8, 0, wch, -1, data, sz, nullptr, nullptr);
@@ -43,7 +43,7 @@ namespace
 
 	void free_multibytes(char* c)
 	{
-#if _WINDOWS
+#if GM_WINDOWS
 		GM_delete(c);
 #endif
 	}
@@ -201,7 +201,7 @@ GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 
 void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 {
-#if _WINDOWS
+#if GM_WINDOWS
 	::StringCchCopyA(dest, cchDest, source);
 #else
 	strcpy(dest, source);
@@ -210,7 +210,7 @@ void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 
 void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 {
-#if _WINDOWS
+#if GM_WINDOWS
 	::StringCchCopyW(dest, cchDest, source);
 #else
 	wcscpy(dest, source);
@@ -219,7 +219,7 @@ void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 
 void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 {
-#if _WINDOWS
+#if GM_WINDOWS
 	::StringCchCatA(dest, cchDest, source);
 #else
 	strcat(dest, source);
@@ -228,7 +228,7 @@ void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 
 void GMString::stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source)
 {
-#if _WINDOWS
+#if GM_WINDOWS
 	::StringCchCatW(dest, cchDest, source);
 #else
 	wcscat(dest, source);

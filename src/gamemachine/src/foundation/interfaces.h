@@ -257,7 +257,7 @@ GM_INTERFACE(IFactory)
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };
 
-#if _WINDOWS
+#if GM_WINDOWS
 typedef HINSTANCE GMInstance;
 typedef HWND GMWindowHandle;
 struct GMWindowAttributes

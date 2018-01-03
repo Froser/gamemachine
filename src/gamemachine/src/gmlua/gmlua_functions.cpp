@@ -48,7 +48,7 @@ extern "C"
 	GM_LUA_API int core_output(lua_State* L)
 	{
 		const char* arg = getString(L, "outputDebug");
-#if _WINDOWS
+#if GM_WINDOWS
 		OutputDebugStringA(arg);
 #else
 		printf("%s", arg.c_str());

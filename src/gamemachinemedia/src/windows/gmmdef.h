@@ -1,6 +1,6 @@
 ﻿#ifndef __WINDOWS_GMMDEF_H__
 #define __WINDOWS_GMMDEF_H__
-#if !_WINDOWS
+#if !GM_WINDOWS
 #error Windows system is required.
 #endif
 

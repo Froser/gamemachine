@@ -199,7 +199,7 @@ bool GMZipGamePackageHandler::loadZip()
 			err = unzOpenCurrentFilePassword(m_uf, nullptr);
 			CHECK(err);
 
-#if _WINDOWS
+#if GM_WINDOWS
 			// 跳过文件夹
 			if (file_info.external_fa & FILE_ATTRIBUTE_DIRECTORY)
 				break;

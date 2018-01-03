@@ -91,7 +91,7 @@ using Tuple = std::tuple<T...>;
 /* 工程编译选项到此结束 */
 
 #if GM_DETECT_MEMORY_LEAK
-#	if _WINDOWS && _DEBUG
+#	if GM_WINDOWS && _DEBUG
 #		include <vld.h> // Windows环境下，确保安装了VLD，否则请将GM_DETECT_MEMORY_LEAK设置为0
 #	endif
 #endif
@@ -150,8 +150,8 @@ using Tuple = std::tuple<T...>;
 
 #define GM_FOREACH_ENUM_CLASS(var, start, end) for (decltype(start) var = start; (gm::GMint) var < (gm::GMint) end; var = (decltype(var))(((gm::GMint)var)+1) )
 
-// 全局数据类型
-#if !_MSC_VER
+// 非WINDOWS下的数据类型
+#if !GM_WINDOWS && !_MSC_VER
 typedef unsigned short WORD;
 typedef unsigned long DWORD;
 GM_STATIC_ASSERT_SIZE(WORD, 2);
@@ -263,7 +263,7 @@ inline void GM_delete_array(T*& o)
 #define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
 #define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )
 
-#if _WINDOWS
+#if GM_WINDOWS
 #	define GM_CRLF L"\r\n"
 #else
 #	define GM_CRLF L"\n"

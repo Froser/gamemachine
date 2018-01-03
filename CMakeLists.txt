@@ -53,15 +53,14 @@ endmacro(gm_apply_runtime_library)
 gm_apply_runtime_library()
 
 macro(gm_init_solution)
+	if (WIN32)
+		add_definitions(-DGM_WINDOWS)
+	endif(WIN32)
 	add_compile_options(-std=c++14)
 	add_definitions(-DFPM_DEFAULT)
 	add_definitions(-DUNICODE -D_UNICODE)
-
 	if(MINGW)
 		add_definitions(-D_GLIBCXX_USE_WCHAR_T)
-		if (WIN32)
-			add_definitions(-D_WINDOWS)
-		endif(WIN32)
 	endif(MINGW)
 endmacro(gm_init_solution)
 
@@ -71,6 +70,11 @@ macro(gm_link_dependencies projectName)
 		target_link_libraries (${projectName} ${CMAKE_THREAD_LIBS_INIT})
 	endif(MINGW)
 endmacro(gm_link_dependencies)
+
+set(GM_USE_DUILIB FALSE)
+if(MSVC)
+	set(GM_USE_DUILIB TRUE)
+endif(MSVC)
 
 # Options:
 option(GM_BUILD_DOCS "Build GameMachine documentation" ON)

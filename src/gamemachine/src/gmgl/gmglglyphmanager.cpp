@@ -50,7 +50,7 @@ static GMuint fontNameNum = 2;
 static FT_Error loadFace(FT_Face* face)
 {
 	FT_Error err = FT_Err_Cannot_Open_Resource;
-#if _WINDOWS
+#if GM_WINDOWS
 	GMwchar path[MAX_PATH];
 	SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
 

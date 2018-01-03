@@ -2,7 +2,7 @@
 #define __GMCOM_H__
 #include <gamemachine.h>
 
-#if _WINDOWS
+#if GM_WINDOWS
 
 #if _MSC_VER
 #   include <Unknwnbase.h>

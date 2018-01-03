@@ -37,9 +37,9 @@ set(WIN32_SOURCES
 		src/windows/gmuiinput.h
 	)
 	
-if(WIN32)
+if(GM_USE_DUILIB)
 	list(APPEND SOURCES ${WIN32_SOURCES})
-endif(WIN32)
+endif(GM_USE_DUILIB)
 
 gm_source_group_by_dir(SOURCES)
 
@@ -59,4 +59,6 @@ if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 
 endif(MSVC)
 
-target_link_libraries(${PROJECT_NAME} duilib)
+if(GM_USE_DUILIB)
+	target_link_libraries(${PROJECT_NAME} duilib)
+endif(GM_USE_DUILIB)
