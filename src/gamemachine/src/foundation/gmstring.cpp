@@ -212,7 +212,7 @@ GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 
 void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 {
-#if GM_WINDOWS
+#if GM_MSVC
 	::strcpy_s(dest, cchDest, source);
 #else
 	strcpy(dest, source);
@@ -221,7 +221,7 @@ void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 
 void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 {
-#if GM_WINDOWS
+#if GM_MSVC
 	::wcscpy_s(dest, cchDest, source);
 #else
 	wcscpy(dest, source);
