@@ -94,3 +94,24 @@ void GMUIWindow::setLockWindow(bool lock)
 	else
 		::ReleaseCapture();
 }
+
+LRESULT CALLBACK GMUIWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+	GMUIWindow* pGMWindow = nullptr;
+	if (uMsg == WM_NCCREATE)
+	{
+		LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
+		pGMWindow = static_cast<GMUIWindow*>(lpcs->lpCreateParams);
+		pGMWindow->setWindowHandle(hWnd);
+		::SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LPARAM>(pGMWindow));
+	}
+
+	bool handled;
+	if (pGMWindow)
+	{
+		LRESULT result = pGMWindow->wndProc(uMsg, wParam, lParam, handled);
+		if (handled)
+			return result;
+	}
+	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
+}

@@ -8,6 +8,7 @@ BEGIN_UI_NS
 
 GM_PRIVATE_OBJECT(GMUIWindow)
 {
+	gm::GMWindowHandle hwnd;
 	gm::IInput* input = nullptr;
 };
 
@@ -23,11 +24,6 @@ public:
 
 	// IWindow
 public:
-	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& attrs) = 0;
-	virtual gm::GMWindowHandle getWindowHandle() const = 0;
-	virtual bool handleMessage() = 0;
-	virtual void showWindow() = 0;
-
 	virtual gm::IInput* getInputMananger() override;
 	virtual void update() override;
 	virtual gm::GMRect getWindowRect() override;
@@ -36,10 +32,17 @@ public:
 	virtual bool isWindowActivate() override;
 	virtual void setLockWindow(bool lock) override;
 	virtual bool event(const gm::GameMachineMessage& msg) override { return false; }
+	virtual gm::GMWindowHandle getWindowHandle() const { D(d); return d->hwnd; }
 
 	// 新虚方法
 protected:
-	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) = 0;
+	virtual LRESULT wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) { bHandled = false; return 0; }
+
+private:
+	void setWindowHandle(gm::GMWindowHandle hwnd) { D(d); d->hwnd = hwnd; }
+
+public:
+	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 END_UI_NS

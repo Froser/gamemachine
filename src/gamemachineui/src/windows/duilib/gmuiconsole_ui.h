@@ -7,15 +7,15 @@ struct GMUIConsole_UI
 	static const gm::GMwchar* UI;
 };
 
-#define ID_EDIT_CONSOLE				_L("Edit_Console")
-#define ID_TABLAYOUT				_L("TabLayout")
-#define ID_OPTION_LOG				_L("Option_Log")
-#define ID_OPTION_PERFORMACE		_L("Option_Performance")
-#define	ID_OPTION_FILTER_INFO		_L("Option_Info")
-#define	ID_OPTION_FILTER_WARNING	_L("Option_Warning")
-#define	ID_OPTION_FILTER_ERROR		_L("Option_Error")
-#define	ID_OPTION_FILTER_DEBUG		_L("Option_Debug")
-#define	ID_PROFILE_GRAPH			_L("Option_Profile_Graph")
+#define ID_EDIT_CONSOLE				L"Edit_Console"
+#define ID_TABLAYOUT				L"TabLayout"
+#define ID_OPTION_LOG				L"Option_Log"
+#define ID_OPTION_PERFORMACE		L"Option_Performance"
+#define	ID_OPTION_FILTER_INFO		L"Option_Info"
+#define	ID_OPTION_FILTER_WARNING	L"Option_Warning"
+#define	ID_OPTION_FILTER_ERROR		L"Option_Error"
+#define	ID_OPTION_FILTER_DEBUG		L"Option_Debug"
+#define	ID_PROFILE_GRAPH			L"Option_Profile_Graph"
 
 const gm::GMwchar* GMUIConsole_UI::UI = L""
 	L"<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\" ?> "

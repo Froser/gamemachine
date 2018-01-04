@@ -18,28 +18,29 @@ void GMUIGUIWindow::refreshWindow()
 	::InvalidateRect(getWindowHandle(), &rc, TRUE);
 }
 
-LongResult GMUIGUIWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
+LRESULT GMUIGUIWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
 {
 	D(d);
 	LRESULT lRes = 0;
-	BOOL bHandled = FALSE;
+	BOOL h = FALSE;
 	switch (uMsg) {
-	case WM_CREATE:        lRes = onCreate(uMsg, wParam, lParam, bHandled); break;
-	case WM_CLOSE:         lRes = onClose(uMsg, wParam, lParam, bHandled); break;
-	case WM_DESTROY:       lRes = onDestroy(uMsg, wParam, lParam, bHandled); break;
-	case WM_NCACTIVATE:    lRes = onNcActivate(uMsg, wParam, lParam, bHandled); break;
-	case WM_NCCALCSIZE:    lRes = onNcCalcSize(uMsg, wParam, lParam, bHandled); break;
-	case WM_NCPAINT:       lRes = onNcPaint(uMsg, wParam, lParam, bHandled); break;
-	case WM_NCHITTEST:     lRes = onNcHitTest(uMsg, wParam, lParam, bHandled); break;
-	case WM_SIZE:          lRes = onSize(uMsg, wParam, lParam, bHandled); break;
-	case WM_GETMINMAXINFO: lRes = onGetMinMaxInfo(uMsg, wParam, lParam, bHandled); break;
-	case WM_SYSCOMMAND:    lRes = onSysCommand(uMsg, wParam, lParam, bHandled); break;
-	case WM_SHOWWINDOW:    lRes = onShowWindow(uMsg, wParam, lParam, bHandled); break;
+	case WM_CREATE:        lRes = onCreate(uMsg, wParam, lParam, h); break;
+	case WM_CLOSE:         lRes = onClose(uMsg, wParam, lParam, h); break;
+	case WM_DESTROY:       lRes = onDestroy(uMsg, wParam, lParam, h); break;
+	case WM_NCACTIVATE:    lRes = onNcActivate(uMsg, wParam, lParam, h); break;
+	case WM_NCCALCSIZE:    lRes = onNcCalcSize(uMsg, wParam, lParam, h); break;
+	case WM_NCPAINT:       lRes = onNcPaint(uMsg, wParam, lParam, h); break;
+	case WM_NCHITTEST:     lRes = onNcHitTest(uMsg, wParam, lParam, h); break;
+	case WM_SIZE:          lRes = onSize(uMsg, wParam, lParam, h); break;
+	case WM_GETMINMAXINFO: lRes = onGetMinMaxInfo(uMsg, wParam, lParam, h); break;
+	case WM_SYSCOMMAND:    lRes = onSysCommand(uMsg, wParam, lParam, h); break;
+	case WM_SHOWWINDOW:    lRes = onShowWindow(uMsg, wParam, lParam, h); break;
 	default:
-		bHandled = FALSE;
+		h = FALSE;
 	}
 
-	if (bHandled)
+	bHandled = !!h;
+	if (h)
 		return lRes;
-	return Base::handleMessage(uMsg, wParam, lParam);
+	return Base::wndProc(uMsg, wParam, lParam, bHandled);
 }

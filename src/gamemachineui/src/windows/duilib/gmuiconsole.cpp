@@ -17,9 +17,9 @@ GMUIConsole::~GMUIConsole()
 	GM_PROFILE_CLEAR_HANDLER();
 }
 
-GMUIStringPtr GMUIConsole::getWindowClassName() const
+LPCTSTR GMUIConsole::getWindowClassName() const
 {
-	return _L("gamemachine_Console_class");
+	return L"gamemachine_Console_class";
 }
 
 template <typename T>
@@ -30,7 +30,7 @@ inline static T* findControl(DuiLib::CPaintManagerUI* painter, gm::GMwchar* name
 	return control;
 }
 
-LongResult GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	D(d);
 	d->painter->Init(getWindowHandle());
@@ -40,21 +40,21 @@ LongResult GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& 
 	GM_ASSERT(pRoot && "Failed to parse XML");
 	d->painter->AttachDialog(pRoot);
 	d->painter->AddNotifier(this);
-	LongResult result = Base::onCreate(uMsg, wParam, lParam, bHandled);
+	LRESULT result = Base::onCreate(uMsg, wParam, lParam, bHandled);
 
 	afterCreated();
 	bHandled = TRUE;
 	return result;
 }
 
-LongResult GMUIConsole::onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT GMUIConsole::onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	hideWindow();
 	bHandled = TRUE;
 	return 0;
 }
 
-LongResult GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
 	D(d);
 	while (!d->msgQueue.empty())
@@ -66,7 +66,7 @@ LongResult GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BO
 	return 0;
 }
 
-void GMUIConsole::onFinalMessage(gm::GMWindowHandle wndHandle)
+void GMUIConsole::onFinalMessage(HWND)
 {
 	delete this;
 }
@@ -143,7 +143,7 @@ void GMUIConsole::onFilterChanged()
 	D(d);
 	refreshOptFilter();
 
-	d->consoleEdit->SetText(_L(""));
+	d->consoleEdit->SetText(L"");
 	for (auto& msg : d->msgBuffer)
 	{
 		insertText(msg.type, msg.message);
@@ -334,7 +334,7 @@ void GMUIConsole::update()
 
 	if (!GMGetDebugState(RUN_PROFILE))
 	{
-		d->profileGraph->drawText(_L("Profile function disabled. "));
+		d->profileGraph->drawText(L"Profile function disabled. ");
 		return;
 	}
 
@@ -357,7 +357,7 @@ void GMUIConsole::update()
 			const gm::GMlong& color = colors[info.level % colorLen];
 			d->profileGraph->drawRect(color, w, h);
 			d->profileGraph->penForward(12, 0);
-			d->profileGraph->drawText(gm::GMString(info.durationInSecond * 1000) + _L("ms"));
+			d->profileGraph->drawText(gm::GMString(info.durationInSecond * 1000) + L"ms");
 			d->profileGraph->penReturn(24);
 			d->profileGraph->penEnter();
 		}

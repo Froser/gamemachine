@@ -35,16 +35,16 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 		gm::GMString message;
 	};
 
-	DuiLib::CRichEditUI* consoleEdit;
-	DuiLib::CTabLayoutUI* tabLayout;
-	DuiLib::COptionUI* optLog;
-	DuiLib::COptionUI* optPerformance;
-	DuiLib::COptionUI* optFltInfo;
-	DuiLib::COptionUI* optFltWarning;
-	DuiLib::COptionUI* optFltError;
-	DuiLib::COptionUI* optFltDebug;
-	IUIGraph* profileGraph;
-	DuiLib::CPaintManagerUI* painter;
+	DuiLib::CRichEditUI* consoleEdit = nullptr;
+	DuiLib::CTabLayoutUI* tabLayout = nullptr;
+	DuiLib::COptionUI* optLog = nullptr;
+	DuiLib::COptionUI* optPerformance = nullptr;
+	DuiLib::COptionUI* optFltInfo = nullptr;
+	DuiLib::COptionUI* optFltWarning = nullptr;
+	DuiLib::COptionUI* optFltError = nullptr;
+	DuiLib::COptionUI* optFltDebug = nullptr;
+	IUIGraph* profileGraph = nullptr;
+	DuiLib::CPaintManagerUI* painter = nullptr;
 	Queue<Message> msgQueue;
 	List<Message> msgBuffer;
 	gm::Bitset filter;
@@ -75,12 +75,13 @@ public:
 	~GMUIConsole();
 
 public:
-	virtual GMUIStringPtr getWindowClassName() const override;
-	virtual gm::GMuint getClassStyle() const override { return CS_DBLCLKS; }
-	virtual LongResult onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-	virtual LongResult onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-	virtual LongResult onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-	virtual void onFinalMessage(gm::GMWindowHandle wndHandle) override;
+	virtual LPCTSTR getWindowClassName() const override;
+	virtual UINT getClassStyle() const override { return CS_DBLCLKS; }
+	virtual void onFinalMessage(HWND wndHandle) override;
+
+	virtual LRESULT onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+	virtual LRESULT onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+	virtual LRESULT onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
 	virtual void update();
 
 public:

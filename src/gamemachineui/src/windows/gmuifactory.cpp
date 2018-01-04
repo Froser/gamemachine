@@ -16,6 +16,9 @@ void GMUIFactory::createConsoleWindow(gm::GMInstance instance, REF gm::GMConsole
 	GMUIConsole* console = new GMUIConsole();
 	handle.window = console;
 	handle.dbgoutput = console;
+
+	handle.window = nullptr;
+	handle.dbgoutput = nullptr;
 #else
 	handle.window = nullptr;
 	handle.dbgoutput = nullptr;

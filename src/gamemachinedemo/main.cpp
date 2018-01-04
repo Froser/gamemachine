@@ -26,6 +26,7 @@ int WINAPI WinMain(
 		0,
 		{ 0, 0, 800, 600 },
 		NULL,
+		hInstance,
 	};
 
 	gm::IWindow* mainWindow = nullptr;

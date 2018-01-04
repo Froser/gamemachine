@@ -240,7 +240,7 @@ void DemostrationEntrance::init()
 #ifdef _DEBUG
 	pk->loadPackage("D:/gmpk");
 #else
-	pk->loadPackage((gm::GMPath::getCurrentPath() + _L("gm.pk0")));
+	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #endif
 
 	gm::GMGLGraphicEngine* engine = static_cast<gm::GMGLGraphicEngine*> (GM.getGraphicEngine());

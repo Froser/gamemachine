@@ -85,10 +85,10 @@ private:
 	void movePenPosition(gm::GMint x, gm::GMint y);
 };
 
-class GMUIGUIWindow;
+class GMUIDuiLibWindow;
 GM_PRIVATE_OBJECT(GMUIDialogBuilder)
 {
-	GMUIGUIWindow* parentWindow;
+	GMUIDuiLibWindow* parentWindow;
 };
 
 class GMUIDialogBuilder : public DuiLib::IDialogBuilderCallback
@@ -96,7 +96,7 @@ class GMUIDialogBuilder : public DuiLib::IDialogBuilderCallback
 	DECLARE_PRIVATE_AND_BASE(GMUIDialogBuilder, DuiLib::IDialogBuilderCallback)
 
 public:
-	GMUIDialogBuilder(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; }
+	GMUIDialogBuilder(GMUIDuiLibWindow* parentWindow) { D(d); d->parentWindow = parentWindow; }
 
 public:
 	virtual DuiLib::CControlUI* CreateControl(LPCTSTR pstrClass);

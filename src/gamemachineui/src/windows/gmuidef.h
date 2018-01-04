@@ -9,10 +9,5 @@
 
 typedef WNDPROC GMUIWindowProc;
 typedef HINSTANCE GMUIInstance;
-typedef LPCTSTR GMUIStringPtr;
-typedef LRESULT LongResult;
-typedef WPARAM UintPtr;
-typedef LPARAM LongPtr;
-
 
 #endif
