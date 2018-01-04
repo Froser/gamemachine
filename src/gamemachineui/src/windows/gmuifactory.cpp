@@ -9,15 +9,22 @@ void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** wi
 	(*window) = new GMUIGLWindow();
 }
 
-void GMUIFactory::createConsoleWindow(gm::GMInstance instance, REF gm::GMConsoleHandle& OUT handle)
+void GMUIFactory::createConsoleWindow(gm::GMInstance instance, REF gm::GMConsoleHandle& handle)
 {
+#if GM_USE_DUILIB
 	initEnvironment(instance);
 	GMUIConsole* console = new GMUIConsole();
 	handle.window = console;
 	handle.dbgoutput = console;
+#else
+	handle.window = nullptr;
+	handle.dbgoutput = nullptr;
+#endif
 }
 
 void GMUIFactory::initEnvironment(gm::GMInstance instance)
 {
-	GMUIPainter::SetInstance(instance);
+#if GM_USE_DUILIB
+	DuiLib::CPaintManagerUI::SetInstance(instance);
+#endif
 }

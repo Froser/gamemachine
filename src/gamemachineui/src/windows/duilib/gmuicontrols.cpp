@@ -151,7 +151,7 @@ void GMUIGraph::penForward(gm::GMint xOffset, gm::GMint yOffset)
 DuiLib::CControlUI* GMUIDialogBuilder::CreateControl(LPCTSTR pstrClass)
 {
 	D(d);
-	if (gm::GMString::stringEquals(pstrClass, _L("GMUIGraph")))
+	if (gm::GMString::stringEquals(pstrClass, L"GMUIGraph"))
 	{
 		return new GMUIGraph(d->parentWindow);
 	}

@@ -67,7 +67,7 @@ bool GMPath::directoryExists(const GMString& dir)
 
 void GMPath::createDirectory(const GMString& dir)
 {
-	if (directoryExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == _L(':')))
+	if (directoryExists(dir) || (dir.length() == 2 && dir.toStdWString()[1] == L':'))
 		return;
 
 	std::wstring stdUp = dir.toStdWString();

@@ -122,8 +122,6 @@ using Tuple = std::tuple<T...>;
 #endif
 
 // 整个GameMachine用到的宏定义
-#define _L(x) L ## x
-
 #define BEGIN_NS namespace gm {
 #define END_NS }
 

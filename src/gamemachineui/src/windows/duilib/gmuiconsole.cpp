@@ -23,7 +23,7 @@ GMUIStringPtr GMUIConsole::getWindowClassName() const
 }
 
 template <typename T>
-inline static T* findControl(GMUIPainter* painter, gm::GMwchar* name)
+inline static T* findControl(DuiLib::CPaintManagerUI* painter, gm::GMwchar* name)
 {
 	T* control = static_cast<T*>(painter->FindControl(name));
 	GM_ASSERT(control);

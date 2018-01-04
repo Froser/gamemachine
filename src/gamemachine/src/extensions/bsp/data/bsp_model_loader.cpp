@@ -81,7 +81,7 @@ void BSPModelLoader::parse(const char* buf)
 	{
 		TiXmlElement* elem = it;
 		if (!GMString::stringEquals(elem->Value(), "item"))
-			gm_warning(_L("First node must be 'item'."));
+			gm_warning(L"First node must be 'item'.");
 
 		const char* name = elem->Attribute("name");
 		for (TiXmlElement* it = root->FirstChildElement(); it; it = it->NextSiblingElement())
@@ -97,7 +97,7 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 	const char* classname = ti->Attribute("classname");
 	if (!classname)
 	{
-		gm_error(_L("model file 'classname' attribute missing:"));
+		gm_error(L"model file 'classname' attribute missing:");
 		return;
 	}
 

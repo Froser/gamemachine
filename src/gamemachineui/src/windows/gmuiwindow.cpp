@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmui.h"
 #include <gamemachine.h>
+#include "gmuiwindow.h"
 #include "gmuiinput.h"
 
 GMUIWindow::~GMUIWindow()
@@ -25,11 +26,6 @@ void GMUIWindow::update()
 		d->input->update();
 }
 
-gm::GMWindowHandle GMUIWindow::create(const gm::GMWindowAttributes& wndAttrs)
-{
-	return Base::Create(wndAttrs.hwndParent, wndAttrs.pstrName, wndAttrs.dwStyle, wndAttrs.dwExStyle, wndAttrs.rc, wndAttrs.hMenu);
-}
-
 gm::GMRect GMUIWindow::getWindowRect()
 {
 	RECT rect;
@@ -46,14 +42,49 @@ gm::GMRect GMUIWindow::getClientRect()
 	return r;
 }
 
+void GMUIWindow::centerWindow() 
+{
+	gm::GMWindowHandle hWnd = getWindowHandle();
+	GM_ASSERT(::IsWindow(hWnd));
+	GM_ASSERT((GetWindowStyle(hWnd)&WS_CHILD) == 0);
+	RECT rcDlg = { 0 };
+	::GetWindowRect(hWnd, &rcDlg);
+	RECT rcArea = { 0 };
+	RECT rcCenter = { 0 };
+	HWND hWndParent = ::GetParent(hWnd);
+	HWND hWndCenter = ::GetWindowOwner(hWnd);
+	if (hWndCenter != NULL)
+		hWnd = hWndCenter;
+
+	// 处理多显示器模式下屏幕居中
+	MONITORINFO oMonitor = {};
+	oMonitor.cbSize = sizeof(oMonitor);
+	::GetMonitorInfo(::MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST), &oMonitor);
+	rcArea = oMonitor.rcWork;
+
+	if (hWndCenter == NULL || IsIconic(hWndCenter))
+		rcCenter = rcArea;
+	else
+		::GetWindowRect(hWndCenter, &rcCenter);
+
+	int DlgWidth = rcDlg.right - rcDlg.left;
+	int DlgHeight = rcDlg.bottom - rcDlg.top;
+
+	// Find dialog's upper left based on rcCenter
+	int xLeft = (rcCenter.left + rcCenter.right) / 2 - DlgWidth / 2;
+	int yTop = (rcCenter.top + rcCenter.bottom) / 2 - DlgHeight / 2;
+
+	// The dialog is outside the screen, move it inside
+	if (xLeft < rcArea.left) xLeft = rcArea.left;
+	else if (xLeft + DlgWidth > rcArea.right) xLeft = rcArea.right - DlgWidth;
+	if (yTop < rcArea.top) yTop = rcArea.top;
+	else if (yTop + DlgHeight > rcArea.bottom) yTop = rcArea.bottom - DlgHeight;
+	::SetWindowPos(hWnd, NULL, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
 bool GMUIWindow::isWindowActivate()
 {
 	return ::GetForegroundWindow() == getWindowHandle();
-}
-
-LongResult GMUIWindow::handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam)
-{
-	return ::CallWindowProc(m_OldWndProc, m_hWnd, uMsg, wParam, lParam);
 }
 
 void GMUIWindow::setLockWindow(bool lock)

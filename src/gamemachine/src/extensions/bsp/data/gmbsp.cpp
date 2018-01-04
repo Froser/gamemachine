@@ -31,7 +31,7 @@ namespace
 		ofs = header->lumps[lump].fileofs;
 
 		if (length % size)
-			gm_error(_L("LoadBSPFile: odd lump size"));
+			gm_error(L"LoadBSPFile: odd lump size");
 
 		memcpy(dest, (GMbyte *)header + ofs, length);
 
@@ -68,7 +68,7 @@ namespace
 	inline void safeRead(FILE *f, void *buffer, GMint count)
 	{
 		if (fread(buffer, 1, count, f) != (size_t)count)
-			gm_error(_L("File read failure"));
+			gm_error(L"File read failure");
 	}
 
 	inline FILE *safeOpenRead(const char *filename)
@@ -153,10 +153,10 @@ void GMBSP::swapBsp()
 	d->header = (GMBSPHeader*)d->buffer->buffer;
 
 	if (d->header->ident != BSP_IDENT) {
-		gm_error(_L("Invalid IBSP file"));
+		gm_error(L"Invalid IBSP file");
 	}
 	if (d->header->version != BSP_VERSION) {
-		gm_error(_L("Bad version of bsp."));
+		gm_error(L"Bad version of bsp.");
 	}
 
 	// 读取无对齐结构
@@ -406,7 +406,7 @@ void GMBSP::parseEntities()
 			s.nextFloat(&d->lightVols.lightVolSize[0]);
 			s.nextFloat(&d->lightVols.lightVolSize[1]);
 			s.nextFloat(&d->lightVols.lightVolSize[2]);
-			gm_info(_L("gridSize reseted to %f, %f, %f"), &d->lightVols.lightVolSize[0], &d->lightVols.lightVolSize[1], &d->lightVols.lightVolSize[2]);
+			gm_info(L"gridSize reseted to %f, %f, %f", &d->lightVols.lightVolSize[0], &d->lightVols.lightVolSize[1], &d->lightVols.lightVolSize[2]);
 		}
 	}
 }
@@ -430,7 +430,7 @@ void GMBSP::generateLightVolumes()
 
 	if (d->header->lumps[LUMP_LIGHTGRID].filelen != numGridPoints * 8)
 	{
-		gm_warning(_L("light volumes mismatch."));
+		gm_warning(L"light volumes mismatch.");
 		d->lightBytes.clear();
 		return;
 	}
@@ -442,7 +442,7 @@ void GMBSP::parseFromMemory(char *buffer, int size)
 	d->script = d->scriptstack;
 	d->script++;
 	if (d->script == &d->scriptstack[MAX_INCLUDES])
-		gm_error(_L("script file exceeded MAX_INCLUDES"));
+		gm_error(L"script file exceeded MAX_INCLUDES");
 	GMString::stringCopy(d->script->filename, "memory buffer");
 
 	d->script->buffer = buffer;
@@ -462,7 +462,7 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 		return false;
 
 	if (!GMString::stringEquals(d->token, "{")) {
-		gm_warning(_L("parseEntity: { not found"));
+		gm_warning(L"parseEntity: { not found");
 	}
 
 	GMBSPEntity* result = new GMBSPEntity();
@@ -470,7 +470,7 @@ bool GMBSP::parseEntity(OUT GMBSPEntity** entity)
 	do
 	{
 		if (!getToken(true)) {
-			gm_warning(_L("parseEntity: EOF without closing brace"));
+			gm_warning(L"parseEntity: EOF without closing brace");
 		}
 		if (GMString::stringEquals(d->token, "}")) {
 			break;
@@ -520,7 +520,7 @@ skipspace:
 		if (*d->script->script_p++ == '\n')
 		{
 			if (!crossline)
-				gm_error(_L("Line %i is incomplete\n"), d->scriptline);
+				gm_error(L"Line %i is incomplete\n", d->scriptline);
 			d->scriptline = d->script->line++;
 		}
 	}
@@ -533,7 +533,7 @@ skipspace:
 		|| (d->script->script_p[0] == '/' && d->script->script_p[1] == '/'))
 	{
 		if (!crossline)
-			gm_error(_L("Line %i is incomplete\n"), d->scriptline);
+			gm_error(L"Line %i is incomplete\n", d->scriptline);
 		while (*d->script->script_p++ != '\n')
 			if (d->script->script_p >= d->script->end_p)
 				return endOfScript(crossline);
@@ -546,7 +546,7 @@ skipspace:
 	{
 		if (!crossline)
 		{
-			gm_error(_L("Line %i is incomplete\n"), d->scriptline);
+			gm_error(L"Line %i is incomplete\n", d->scriptline);
 			GM_ASSERT(false);
 		}
 		d->script->script_p += 2;
@@ -578,7 +578,7 @@ skipspace:
 			if (d->script->script_p == d->script->end_p)
 				break;
 			if (token_p == &d->token[MAXTOKEN])
-				gm_error(_L("Token too large."));
+				gm_error(L"Token too large.");
 		}
 		d->script->script_p++;
 	}
@@ -590,7 +590,7 @@ skipspace:
 			if (d->script->script_p == d->script->end_p)
 				break;
 			if (token_p == &d->token[MAXTOKEN])
-				gm_error(_L("Token too large on line %i\n"), d->scriptline);
+				gm_error(L"Token too large on line %i\n", d->scriptline);
 		}
 	}
 
@@ -634,7 +634,7 @@ void GMBSP::addScriptToStack(const char *filename)
 
 	d->script++;
 	if (d->script == &d->scriptstack[MAX_INCLUDES])
-		gm_error(_L("script file exceeded MAX_INCLUDES"));
+		gm_error(L"script file exceeded MAX_INCLUDES");
 	GMString::stringCopy(d->script->filename, expandPath(filename).toStdString().c_str());
 
 	size = loadFile(d->script->filename, (void **)&d->script->buffer);

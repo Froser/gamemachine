@@ -1,8 +1,8 @@
 ﻿#ifndef __GMUICONTROLS_H__
 #define __GMUICONTROLS_H__
-#include "gmuidef.h"
 #include <gamemachine.h>
-#include "gmuiguiwindow.h"
+#include "../gmuidef.h"
+#include "gmuiduilibwindow.h"
 
 BEGIN_UI_NS
 
@@ -50,7 +50,7 @@ private:
 
 GM_PRIVATE_OBJECT(GMUIGraph)
 {
-	GMUIGUIWindow* parentWindow = nullptr;
+	GMUIDuiLibWindow* parentWindow = nullptr;
 	Vector<GMGraphCommand> drawCmd;
 	gm::GMint currentPos[2];
 };
@@ -60,7 +60,7 @@ class GMUIGraph : public gm::GMObject, public DuiLib::CControlUI, public IUIGrap
 	DECLARE_PRIVATE_AND_BASE(GMUIGraph, DuiLib::CControlUI)
 
 public:
-	GMUIGraph(GMUIGUIWindow* parentWindow) { D(d); d->parentWindow = parentWindow; d->currentPos[0] = d->currentPos[1] = 0; }
+	GMUIGraph(GMUIDuiLibWindow* parentWindow) { D(d); d->parentWindow = parentWindow; d->currentPos[0] = d->currentPos[1] = 0; }
 
 	// DuiLib::CControlUI
 public:
@@ -85,6 +85,7 @@ private:
 	void movePenPosition(gm::GMint x, gm::GMint y);
 };
 
+class GMUIGUIWindow;
 GM_PRIVATE_OBJECT(GMUIDialogBuilder)
 {
 	GMUIGUIWindow* parentWindow;

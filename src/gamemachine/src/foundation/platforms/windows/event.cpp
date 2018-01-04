@@ -5,7 +5,7 @@
 GMEvent::GMEvent(bool manualReset, bool initialState)
 {
 	D(d);
-	d->handle = ::CreateEvent(NULL, manualReset, initialState ? TRUE : FALSE, _L(""));
+	d->handle = ::CreateEvent(NULL, manualReset, initialState ? TRUE : FALSE, L"");
 }
 
 GMEvent::~GMEvent()

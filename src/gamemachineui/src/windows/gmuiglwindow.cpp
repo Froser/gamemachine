@@ -30,7 +30,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	{
 		dispose();
 		DWORD s = GetLastError();
-		gm_error(_L("window created failed: %i"), s);
+		gm_error(L"window created failed: %i", s);
 		return false;
 	}
 
@@ -62,35 +62,35 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	if (!(d->hDC = GetDC(wnd)))
 	{
 		dispose();
-		gm_error(_L("can't Create a GL Device context."));
+		gm_error(L"can't Create a GL Device context.");
 		return false;
 	}
 
 	if (!(pixelFormat = ChoosePixelFormat(d->hDC, &pfd)))	//found a matching pixel format?
 	{														//if not
 		dispose();
-		gm_error(_L("can't find a Suitable PixelFormat."));
+		gm_error(L"can't find a Suitable PixelFormat.");
 		return false;
 	}
 
 	if (!SetPixelFormat(d->hDC, pixelFormat, &pfd))			//are we able to set pixel format?
 	{														//if not
 		dispose();
-		gm_error(_L("can't set the pixelformat."));
+		gm_error(L"can't set the pixelformat.");
 		return false;
 	}
 
 	if (!(d->hRC = wglCreateContext(d->hDC)))
 	{
 		dispose();
-		gm_error(_L("can't create a GL rendering context."));
+		gm_error(L"can't create a GL rendering context.");
 		return false;
 	}
 
 	if (!wglMakeCurrent(d->hDC, d->hRC))
 	{
 		dispose();
-		gm_error(_L("can't activate the GL rendering context."));
+		gm_error(L"can't activate the GL rendering context.");
 		return false;
 	}
 
@@ -101,6 +101,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		return NULL;
 	}
 
+	d->hWnd = wnd;
 	return wnd;
 }
 
@@ -182,23 +183,29 @@ void GMUIGLWindow::dispose()
 	if (d->hRC)
 	{
 		if (!wglMakeCurrent(0, 0))
-			gm_error(_L("release of DC and RC failed."));
+			gm_error(L"release of DC and RC failed.");
 
 		if (!wglDeleteContext(d->hRC))
-			gm_error(_L("release Rendering Context failed."));
+			gm_error(L"release Rendering Context failed.");
 
 		d->hRC = 0;
 	}
 
 	if (d->hDC && !ReleaseDC(wnd, d->hDC))
 	{
-		gm_error(_L("release of Device Context failed."));
+		gm_error(L"release of Device Context failed.");
 		d->hDC = 0;
 	}
 
 	if (wnd && !DestroyWindow(wnd))
 	{
-		gm_error(_L("could not release hWnd"));
+		gm_error(L"could not release hWnd");
 		wnd = 0;
 	}
+}
+
+gm::GMWindowHandle GMUIGLWindow::getWindowHandle() const
+{
+	D(d);
+	return d->hWnd;
 }

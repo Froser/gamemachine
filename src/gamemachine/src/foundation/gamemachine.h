@@ -57,7 +57,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Vector<IVirtualFunctionObject*> manangerQueue;
 
 	GMGameMachineRunningStates states;
-	GMCursorGameObject* cursor;
+	GMCursorGameObject* cursor = nullptr;
 };
 
 //! GameMachine类负责掌管整个进程的生命周期。

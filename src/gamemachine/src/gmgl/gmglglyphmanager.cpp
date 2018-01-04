@@ -58,7 +58,7 @@ static FT_Error loadFace(FT_Face* face)
 	for (GMuint i = 0; i < fontNameNum; i++)
 	{
 		GMString p(path);
-		p.append(_L("/"));
+		p.append(L"/");
 		p.append(fontNameList[i].fontName);
 		strPath = p.toStdString();
 		err = FT_New_Face(g_lib.library, strPath.c_str(), 0, face);
@@ -139,7 +139,7 @@ const GMGlyphInfo& GMGLGlyphManager::createChar(GMwchar c, GMint fontSize)
 	error = loadFace(&face);
 	if (error != FT_Err_Ok)
 	{
-		gm_error(_L("cannot found font file, cannot draw characters."));
+		gm_error(L"cannot found font file, cannot draw characters.");
 		return errGlyph;
 	}
 
@@ -159,7 +159,7 @@ const GMGlyphInfo& GMGLGlyphManager::createChar(GMwchar c, GMint fontSize)
 		d->cursor_u = 0;
 		if (d->cursor_v + bitmapGlyph->bitmap.rows > CANVAS_HEIGHT)
 		{
-			gm_error(_L("no texture space for glyph!"));
+			gm_error(L"no texture space for glyph!");
 			GM_ASSERT(false);
 		}
 	}

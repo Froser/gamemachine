@@ -131,7 +131,8 @@ void GameMachine::startGameMachine()
 
 		// 更新所有管理器
 		d->mainWindow->update();
-		d->consoleWindow->update();
+		if (d->consoleWindow)
+			d->consoleWindow->update();
 		d->clock.update();
 		
 		// 更新状态

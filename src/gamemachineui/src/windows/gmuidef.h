@@ -6,10 +6,7 @@
 #endif
 
 #include <windef.h>
-#include "uilib.h"
 
-typedef DuiLib::CWindowWnd GMUIWindowBase;
-typedef DuiLib::CPaintManagerUI GMUIPainter;
 typedef WNDPROC GMUIWindowProc;
 typedef HINSTANCE GMUIInstance;
 typedef LPCTSTR GMUIStringPtr;

@@ -21,8 +21,8 @@ XInputWrapper::XInputWrapper()
 
 	if (!m_module)
 	{
-		gm_warning(_L("cannot find xinput dll, xinput disabled."));
-		FreeLibrary(m_module);
+		gm_warning(L"cannot find xinput dll, xinput disabled.");
+		::FreeLibrary(m_module);
 		return;
 	}
 
@@ -35,7 +35,7 @@ DWORD XInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 	if (m_xinputGetState)
 		return m_xinputGetState(dwUserIndex, pState);
 	else
-		gm_warning(_L("cannot invoke XInputGetState"));
+		gm_warning(L"cannot invoke XInputGetState");
 	return ERROR_DLL_INIT_FAILED;
 }
 
@@ -44,7 +44,7 @@ DWORD XInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibrat
 	if (m_xinputSetState)
 		return m_xinputSetState(dwUserIndex, pVibration);
 	else
-		gm_warning(_L("cannot invoke XInputGetState"));
+		gm_warning(L"cannot invoke XInputGetState");
 	return ERROR_DLL_INIT_FAILED;
 }
 
@@ -113,7 +113,7 @@ void GMInput::setCursor(gm::GMCursorType type)
 		::ShowCursor(FALSE);
 		return;
 	default:
-		ASSERT(false);
+		GM_ASSERT(false);
 		break;
 	}
 	::ShowCursor(TRUE);

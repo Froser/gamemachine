@@ -44,7 +44,8 @@ int WINAPI WinMain(
 
 	gm::GMConsoleHandle consoleHandle;
 	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);
-	consoleHandle.window->create(consoleAttrs);
+	if (consoleHandle.window)
+		consoleHandle.window->create(consoleAttrs);
 
 	GM.init(
 		mainWindow,

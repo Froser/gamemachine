@@ -3,8 +3,8 @@
 
 #include <gmuicommon.h>
 #include <gamemachine.h>
-#include "gmuidef.h"
-#include "gmuiguiwindow.h"
+#include "../gmuidef.h"
+#include "gmuiduilibwindow.h"
 #include "gmuicontrols.h"
 
 BEGIN_UI_NS
@@ -44,7 +44,7 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	DuiLib::COptionUI* optFltError;
 	DuiLib::COptionUI* optFltDebug;
 	IUIGraph* profileGraph;
-	GMUIPainter* painter;
+	DuiLib::CPaintManagerUI* painter;
 	Queue<Message> msgQueue;
 	List<Message> msgBuffer;
 	gm::Bitset filter;
@@ -54,12 +54,12 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 };
 
 class GMUIConsole :
-	public GMUIGUIWindow,
+	public GMUIDuiLibWindow,
 	public DuiLib::INotifyUI,
 	public gm::IDebugOutput,
 	public gm::IProfileHandler
 {
-	DECLARE_PRIVATE_AND_BASE(GMUIConsole, GMUIGUIWindow)
+	DECLARE_PRIVATE_AND_BASE(GMUIConsole, GMUIDuiLibWindow)
 
 public:
 	GMUIConsole()

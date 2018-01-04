@@ -20,11 +20,6 @@ set(SOURCES
 	)
 
 set(WIN32_SOURCES
-		src/windows/gmuiconsole.cpp
-		src/windows/gmuiconsole.h
-		src/windows/gmuiconsole_ui.h
-		src/windows/gmuicontrols.cpp
-		src/windows/gmuicontrols.h
 		src/windows/gmuidef.h
 		src/windows/gmuifactory.cpp
 		src/windows/gmuiglwindow.cpp
@@ -36,9 +31,22 @@ set(WIN32_SOURCES
 		src/windows/gmuiinput.cpp
 		src/windows/gmuiinput.h
 	)
+
+set(DUILIB_SOURCES
+		src/windows/duilib/gmuiduilibwindow.cpp
+		src/windows/duilib/gmuiduilibwindow.h
+		src/windows/duilib/gmuiconsole.cpp
+		src/windows/duilib/gmuiconsole.h
+		src/windows/duilib/gmuiconsole_ui.h
+		src/windows/duilib/gmuicontrols.cpp
+		src/windows/duilib/gmuicontrols.h
+	)
 	
-if(GM_USE_DUILIB)
+if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
+endif(WIN32)
+if(GM_USE_DUILIB)
+	list(APPEND SOURCES ${DUILIB_SOURCES})
 endif(GM_USE_DUILIB)
 
 gm_source_group_by_dir(SOURCES)

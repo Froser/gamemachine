@@ -71,7 +71,7 @@ bool GMBSP_Render_BiquadraticPatch::tesselate(GMint newTesselation)
 	rowIndexPointers = new GMuint *[tesselation];
 	if (!trianglesPerRow || !rowIndexPointers)
 	{
-		gm_error(_L("Unable to allocate memory for indices for multi_draw_arrays"));
+		gm_error(L"Unable to allocate memory for indices for multi_draw_arrays");
 		return false;
 	}
 

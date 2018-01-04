@@ -197,7 +197,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GMuint bufferId = 0;
 	Vector<GMComponent*> components;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
-	GMString name = _L("default");
+	GMString name = L"default";
 };
 
 class GMMesh : public GMObject

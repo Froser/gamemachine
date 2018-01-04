@@ -11,9 +11,9 @@ GM_PRIVATE_OBJECT(GMUIWindow)
 	gm::IInput* input = nullptr;
 };
 
-class GMUIWindow : public gm::GMObject, public gm::IWindow, private GMUIWindowBase
+class GMUIWindow : public gm::GMObject, public gm::IWindow
 {
-	DECLARE_PRIVATE_AND_BASE(GMUIWindow, GMUIWindowBase)
+	DECLARE_PRIVATE(GMUIWindow)
 
 public:
 	~GMUIWindow();
@@ -23,35 +23,23 @@ public:
 
 	// IWindow
 public:
+	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& attrs) = 0;
+	virtual gm::GMWindowHandle getWindowHandle() const = 0;
+	virtual bool handleMessage() = 0;
+	virtual void showWindow() = 0;
+
 	virtual gm::IInput* getInputMananger() override;
 	virtual void update() override;
-	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& attrs) override;
 	virtual gm::GMRect getWindowRect() override;
 	virtual gm::GMRect getClientRect() override;
-	virtual void showWindow() override { showWindowEx(); }
-	virtual void centerWindow() override { return Base::CenterWindow(); }
-	virtual gm::GMWindowHandle getWindowHandle() const override { return Base::GetHWND(); }
-	virtual bool handleMessage() override { return DuiLib::CPaintManagerUI::HandleMessage(); }
-	virtual bool event(const gm::GameMachineMessage& msg) override { return false; }
+	virtual void centerWindow() override;
 	virtual bool isWindowActivate() override;
 	virtual void setLockWindow(bool lock) override;
+	virtual bool event(const gm::GameMachineMessage& msg) override { return false; }
 
-public:
-	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam);
-	virtual gm::GMuint showModal() { return Base::ShowModal(); }
-	virtual void showWindowEx(bool show = true, bool takeFocus = true) { Base::ShowWindow(show, takeFocus); }
-	virtual void onFinalMessage(gm::GMWindowHandle wndHandle) {}
-
-private:
-	virtual GMUIStringPtr getWindowClassName() const = 0;
-	virtual gm::GMuint getClassStyle() const { return 0; }
-
-	// From base:
+	// 新虚方法
 protected:
-	virtual LPCTSTR GetWindowClassName() const override { return getWindowClassName(); }
-	virtual UINT GetClassStyle() const override { return getClassStyle(); }
-	virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override { return handleMessage(uMsg, wParam, lParam); }
-	virtual void OnFinalMessage(HWND hWnd) override { onFinalMessage(hWnd); }
+	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) = 0;
 };
 
 END_UI_NS

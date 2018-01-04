@@ -77,6 +77,7 @@ endmacro(gm_link_dependencies)
 set(GM_USE_DUILIB FALSE)
 if(MSVC)
 	set(GM_USE_DUILIB TRUE)
+	add_definitions(-DGM_USE_DUILIB)
 endif(MSVC)
 
 # Options:

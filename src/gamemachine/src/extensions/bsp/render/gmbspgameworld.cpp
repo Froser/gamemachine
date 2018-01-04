@@ -269,7 +269,7 @@ void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfa
 
 	if (!setMaterialTexture(polygonFace, shader))
 	{
-		gm_warning(_L("polygon: %d texture missing."), polygonFaceNumber);
+		gm_warning(L"polygon: %d texture missing.", polygonFaceNumber);
 		return;
 	}
 	setMaterialLightmap(polygonFace.lightmapIndex, shader);
@@ -299,7 +299,7 @@ void GMBSPGameWorld::prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceInde
 
 	if (!setMaterialTexture(meshFace, shader))
 	{
-		gm_warning(_L("mesh: %d texture missing."), meshFaceNumber);
+		gm_warning(L"mesh: %d texture missing.", meshFaceNumber);
 		return;
 	}
 	setMaterialLightmap(meshFace.lightmapIndex, shader);
@@ -326,7 +326,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 
 	if (!setMaterialTexture(rd.patches[patchNumber], shader))
 	{
-		gm_warning(_L("patch: %d texture missing."), patchNumber);
+		gm_warning(L"patch: %d texture missing.", patchNumber);
 		return;
 	}
 	setMaterialLightmap(rd.patches[patchNumber].lightmapIndex, shader);
@@ -554,7 +554,7 @@ bool GMBSPGameWorld::findTexture(const GMString& textureFilename, OUT GMImage** 
 
 		if (GMImageReader::load(buf.buffer, buf.size, img))
 		{
-			gm_info(_L("loaded texture %Ls"), fn.toStdWString().c_str());
+			gm_info(L"loaded texture %Ls", fn.toStdWString().c_str());
 			return true;
 		}
 	}
@@ -701,7 +701,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 
 			if (!GMModelReader::load(settings, &model))
 			{
-				gm_warning(_L("parse model file failed."));
+				gm_warning(L"parse model file failed.");
 				return;
 			}
 

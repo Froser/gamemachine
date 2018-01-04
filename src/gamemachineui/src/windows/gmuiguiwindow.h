@@ -7,21 +7,18 @@
 
 BEGIN_UI_NS
 // 一个标准的Windows GUI窗体
-GM_PRIVATE_OBJECT(GMUIGUIWindow)
-{
-	GMUIPainter painter;
-};
 
 class GMUIGUIWindow : public GMUIWindow
 {
-	DECLARE_PRIVATE_AND_BASE(GMUIGUIWindow, GMUIWindow);
+	typedef GMUIWindow Base;
 
 public:
 	void hideWindow();
 	bool isWindowVisible();
 	void refreshWindow();
 
-public:
+	// GMUIWindow
+protected:
 	virtual LongResult handleMessage(gm::GMuint uMsg, UintPtr wParam, LongPtr lParam) override;
 
 protected:

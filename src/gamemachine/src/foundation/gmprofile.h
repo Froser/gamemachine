@@ -5,7 +5,7 @@
 #include <stack>
 BEGIN_NS
 
-#define GM_PROFILE(name) gm::GMProfile __profile(_L(#name))
+#define GM_PROFILE(name) gm::GMProfile __profile(L#name)
 #define GM_PROFILE_HANDLER(ptr) gm::GMProfile::setHandler(ptr)
 #define GM_PROFILE_CLEAR_HANDLER() gm::GMProfile::clearHandler()
 #define GM_PROFILE_RESET_TIMELINE() gm::GMProfile::resetTimeline()
