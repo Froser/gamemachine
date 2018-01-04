@@ -61,7 +61,7 @@ protected:
 protected:
 	static void saveBuffer(Data* d, gm::GMbyte data);
 	static void move(std::atomic_long& ptr, gm::GMuint loop);
-	static gm::GMlong GMMAudioFile_Stream::peek(std::atomic_long& ptr, gm::GMuint loop);
+	static gm::GMlong peek(std::atomic_long& ptr, gm::GMuint loop);
 
 public:
 	static void setStreamReady(Data* d);

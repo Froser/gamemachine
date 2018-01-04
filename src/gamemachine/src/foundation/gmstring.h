@@ -310,6 +310,24 @@ public:
 		stringCopy(dest, ArraySize, source);
 	}
 
+	static void stringCopyN(char* dest, size_t cchDest, const char* source, GMint count)
+	{
+#if GM_MSVC
+		strncpy_s(dest, cchDest, source, count);
+#else
+		strncpy(dest, source, count);
+#endif
+	}
+
+	static void stringCopyN(GMwchar* dest, size_t cchDest, const GMwchar* source, GMint count)
+	{
+#if GM_MSVC
+		wcsncpy_s(dest, cchDest, source, count);
+#else
+		wcsncpy(dest, source, count);
+#endif
+	}
+
 	static void stringCat(char* dest, size_t cchDest, const char* source);
 	static void stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source);
 	template <typename CharType, size_t ArraySize>
@@ -327,6 +345,9 @@ public:
 	{
 		return !wcscmp(str1, str2);
 	}
+
+	static GMfloat parseFloat(const GMString& i, bool* ok = nullptr);
+	static GMint parseInt(const GMString& i, bool* ok = nullptr);
 };
 
 inline GMString operator +(const GMString& left, const GMString& right)

@@ -766,79 +766,79 @@ char *CWaves::GetErrorString(WAVERESULT wr, char *szErrorString, unsigned long n
 	switch (wr)
 	{
 		case WR_OK:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Success\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Success\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_INVALIDFILENAME:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Invalid file name or file does not exist\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Invalid file name or file does not exist\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_BADWAVEFILE:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Invalid Wave file\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Invalid Wave file\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_INVALIDPARAM:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Invalid parameter passed to function\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Invalid parameter passed to function\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_FILEERROR:
-			strncpy_s(szErrorString, nSizeOfErrorString, "File I/O error\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "File I/O error\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_INVALIDWAVEID:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Invalid WAVEID\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Invalid WAVEID\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_NOTSUPPORTEDYET:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Function not supported yet\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Function not supported yet\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_WAVEMUSTBEMONO:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must be mono\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Input wave files must be mono\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_WAVEMUSTBEWAVEFORMATPCM:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must be in Wave Format PCM\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Input wave files must be in Wave Format PCM\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_WAVESMUSTHAVESAMEBITRESOLUTION:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must have the same Bit Resolution\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Input wave files must have the same Bit Resolution\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_WAVESMUSTHAVESAMEFREQUENCY:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must have the same Frequency\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Input wave files must have the same Frequency\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_WAVESMUSTHAVESAMEBITRATE:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must have the same Bit Rate\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Input wave files must have the same Bit Rate\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_WAVESMUSTHAVESAMEBLOCKALIGNMENT:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Input wave files must have the same Block Alignment\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Input wave files must have the same Block Alignment\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_OFFSETOUTOFDATARANGE:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Wave files Offset is not within audio data\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Wave files Offset is not within audio data\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_INVALIDSPEAKERPOS:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Invalid Speaker Destinations\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Invalid Speaker Destinations\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_OUTOFMEMORY:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Out of memory\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Out of memory\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_INVALIDWAVEFILETYPE:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Invalid Wave File Type\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Invalid Wave File Type\n", nSizeOfErrorString-1);
 			break;
 
 		case WR_NOTWAVEFORMATEXTENSIBLEFORMAT:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Wave file is not in WAVEFORMATEXTENSIBLE format\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Wave file is not in WAVEFORMATEXTENSIBLE format\n", nSizeOfErrorString-1);
 			break;
 
 		default:
-			strncpy_s(szErrorString, nSizeOfErrorString, "Undefined error\n", nSizeOfErrorString-1);
+			gm::GMString::stringCopyN(szErrorString, nSizeOfErrorString, "Undefined error\n", nSizeOfErrorString-1);
 	}
 	szErrorString[nSizeOfErrorString-1] = '\0';
 	return szErrorString;

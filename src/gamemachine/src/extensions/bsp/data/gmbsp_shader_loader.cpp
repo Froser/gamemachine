@@ -312,8 +312,7 @@ void GMBSPShaderLoader::parse_animMap(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
 	GMTextureFrames* frame = &shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, d->textureNum);
-	GMint ms;
-	SAFE_SSCANF(elem->Attribute("ms"), "%d", &ms);
+	GMint ms = GMString::parseInt(elem->Attribute("ms"));
 	frame->setAnimationMs(ms);
 
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
@@ -500,7 +499,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		}
 		else
 		{
-			SAFE_SSCANF(k, "%f", &shininess);
+			shininess = GMString::parseFloat(k);
 			material.shininess = shininess;
 		}
 	}

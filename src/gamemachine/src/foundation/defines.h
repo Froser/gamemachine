@@ -19,7 +19,6 @@
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
-#define makePair std::make_pair
 
 template <typename T1, typename T2, typename Cmp = std::less<T1> >
 using Map = std::map<T1, T2, Cmp>;
@@ -237,38 +236,6 @@ inline void GM_delete_array(T*& o)
 }
 
 #define LINE_MAX 10240 * 4
-#define PI 3.141592653f
-#define HALF_PI 1.5707963265f
-#define SQR(a) ((a) * (a))
-#if GM_MSVC
-#define SAFE_SSCANF(in, format, out)	\
-{										\
-	const char* _str = in;				\
-	if (_str)							\
-		sscanf_s(_str, format, out);	\
-}
-
-#define SAFE_SWSCANF(in, format, out)	\
-{										\
-	const GMwchar* _str = in;			\
-	if (_str)							\
-		swscanf_s(_str, format, out);	\
-}
-#else
-#define SAFE_SSCANF(in, format, out)	\
-{										\
-	const char* _str = in;				\
-	if (_str)							\
-		sscanf(_str, format, out);		\
-}
-
-#define SAFE_SWSCANF(in, format, out)	\
-{										\
-	const GMwchar* _str = in;			\
-	if (_str)							\
-		swscanf(_str, format, out);		\
-}
-#endif
 
 #define GM_SWAP(a, b) { auto t = a; a = b; b = t; }
 

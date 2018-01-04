@@ -21,6 +21,8 @@
 #include <defines.h>
 #include <math.h>
 
+constexpr gm::GMfloat PI = 3.141592653f;
+
 BEGIN_NS
 
 #ifndef FLT_EPSILON

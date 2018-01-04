@@ -70,4 +70,26 @@ void cases::String::addToUnitTest(UnitTest& ut)
 		gm::GMString::stringCat(dest, src);
 		return gm::GMString(dest) == L"gamemachine";
 	});
+
+	ut.addTestCase("GMString::parseInt", []() {
+		bool ok;
+		gm::GMString integer("3");
+		bool legalInt = gm::GMString::parseInt(integer, &ok) == 3 && ok;
+
+		gm::GMString notAInteger("abc12abc");
+		gm::GMString::parseInt(notAInteger, &ok);
+		bool illegalInt = !ok;
+		return legalInt && illegalInt;
+	});
+
+	ut.addTestCase("GMString::parseFloat", []() {
+		bool ok;
+		gm::GMString floatNumber("3.14159f");
+		bool legalInt = gm::GMString::parseFloat(floatNumber, &ok) == 3.14159f && ok;
+
+		gm::GMString notAFloat("abc3.14159fabc");
+		gm::GMString::parseFloat(notAFloat, &ok);
+		bool illegalFloat = !ok;
+		return legalInt && illegalFloat;
+	});
 }

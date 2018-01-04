@@ -42,6 +42,26 @@ namespace
 		GM_delete(c);
 #endif
 	}
+
+	template <typename RetType>
+	GMint string_scanf(const char* buf, const char* format, RetType* ret)
+	{
+#if GM_MSVC
+		return sscanf_s(buf, format, ret);
+#else
+		return sscanf(buf, format, ret);
+#endif
+	}
+
+	template <typename RetType>
+	GMint string_scanf(const GMwchar* buf, const GMwchar* format, RetType* ret)
+	{
+#if GM_MSVC
+		return swscanf_s(buf, format, ret);
+#else
+		return swscanf(buf, format, ret);
+#endif
+	}
 }
 
 GMString::GMString(const GMString& s)
@@ -246,6 +266,24 @@ void GMString::stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source)
 #endif
 }
 
+GMfloat GMString::parseFloat(const GMString& i, bool* ok)
+{
+	GMfloat result;
+	GMint c = string_scanf(i.toStdWString().c_str(), L"%f", &result);
+	if (ok)
+		*ok = c > 0;
+	return result;
+}
+
+GMint GMString::parseInt(const GMString& i, bool* ok)
+{
+	GMint result;
+	GMint c = string_scanf(i.toStdWString().c_str(), L"%d", &result);
+	if (ok)
+		*ok = c > 0;
+	return result;
+}
+
 //////////////////////////////////////////////////////////////////////////
 GMStringReader::Iterator GMStringReader::lineBegin()
 {
@@ -361,7 +399,8 @@ bool GMScanner::nextFloat(GMfloat* out)
 	next(command);
 	if (command.isEmpty())
 		return false;
-	SAFE_SWSCANF(command.c_str(), L"%f", out);
+
+	*out = GMString::parseFloat(command);
 	return true;
 }
 
@@ -375,6 +414,6 @@ bool GMScanner::nextInt(GMint* out)
 	next(command);
 	if (command.isEmpty())
 		return false;
-	SAFE_SWSCANF(command.c_str(), L"%i", out);
+	*out = GMString::parseInt(command);
 	return true;
 }

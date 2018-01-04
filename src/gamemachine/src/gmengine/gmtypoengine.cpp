@@ -119,9 +119,7 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::applyAttribute()
 	}
 	else if (parsePair("size", value))
 	{
-		GMint sz;
-		std::string str = value.toStdString();
-		SAFE_SSCANF(str.c_str(), "%d", &sz);
+		GMint sz = GMString::parseInt(value);
 		setFontSize(sz);
 		return Ignore;
 	}
