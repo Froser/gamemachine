@@ -8,10 +8,6 @@
 #include "../windows/gmuiwindow.h"
 #endif
 
-#if GM_USE_DUILIB
-#include "../windows/duilib/gmuiconsole.h"
-#endif
-
 namespace gm
 {
 	struct IWindow;

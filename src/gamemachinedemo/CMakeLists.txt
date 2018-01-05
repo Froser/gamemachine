@@ -7,7 +7,6 @@ include_directories(
 		../3rdparty/glew-2.1.0/include
 		../3rdparty/zlib
 		../3rdparty/glm-0.9.9-a2
-		../3rdparty/duilib
 		../3rdparty/lua/src
 		../gamemachine/include
 		../gamemachineui/include
@@ -52,14 +51,21 @@ set(SOURCES
 	)
 
 gm_source_group_by_dir(SOURCES)
-add_definitions(-DUNICODE -D_UNICODE)
-
 add_executable(${PROJECT_NAME}
 		${SOURCES}
 	)
 
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS" ) 
+else(MSVC)
+	if(WIN32)
+		# We need to link user32.lib manually.
+		set(GM_WINDOWS_SDK "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib")
+		include_directories(${GM_WINDOWS_SDK})
+		link_libraries(
+			user32.lib
+		)
+	endif(WIN32)
 endif(MSVC)
 
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})

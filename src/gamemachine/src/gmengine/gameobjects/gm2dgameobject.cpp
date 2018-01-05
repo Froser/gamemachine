@@ -219,7 +219,7 @@ template <typename T, GMint Size> void GMImage2DBorder::release(T* (&m)[Size])
 	}
 }
 
-void GMImage2DBorder::clone(GMImage2DBorder& b)
+void GMImage2DBorder::clone(const GMImage2DBorder& b)
 {
 	D(d);
 	D_OF(d_b, &b);
@@ -505,7 +505,7 @@ void GMImage2DGameObject::setText(const GMString& text)
 		d->textModel = new GMGlyphObject();
 }
 
-void GMImage2DGameObject::setBorder(GMImage2DBorder& border)
+void GMImage2DGameObject::setBorder(const GMImage2DBorder& border)
 {
 	D(d);
 	d->border.clone(border);

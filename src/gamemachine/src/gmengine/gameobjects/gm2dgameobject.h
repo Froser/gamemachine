@@ -97,7 +97,7 @@ private:
 	template <GMint Size> void drawObjects(GMGameObject* (&)[Size]);
 
 private:
-	virtual void clone(GMImage2DBorder&);
+	virtual void clone(const GMImage2DBorder& border);
 	virtual void createBorder(const GMRect& geometry);
 	virtual void draw();
 	virtual void setScaling(const glm::mat4& scaling);
@@ -130,7 +130,7 @@ public:
 	void setPaddings(GMint left, GMint top, GMint right, GMint bottom);
 	void setImage(GMAsset& asset);
 	void setText(const GMString& text);
-	void setBorder(GMImage2DBorder& border);
+	void setBorder(const GMImage2DBorder& border);
 
 public:
 	virtual void onAppendingObjectToWorld() override;

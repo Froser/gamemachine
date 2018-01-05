@@ -2,6 +2,10 @@
 #include <gmui.h>
 #include "gmuidef.h"
 
+#if GM_USE_DUILIB
+#include "duilib/gmuiconsole.h"
+#endif
+
 // factory
 void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window)
 {

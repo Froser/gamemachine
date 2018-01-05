@@ -67,42 +67,42 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	{
 		dispose();
 		gm_error(L"can't Create a GL Device context.");
-		return false;
+		return 0;
 	}
 
 	if (!(pixelFormat = ChoosePixelFormat(d->hDC, &pfd)))	//found a matching pixel format?
 	{														//if not
 		dispose();
 		gm_error(L"can't find a Suitable PixelFormat.");
-		return false;
+		return 0;
 	}
 
 	if (!SetPixelFormat(d->hDC, pixelFormat, &pfd))			//are we able to set pixel format?
 	{														//if not
 		dispose();
 		gm_error(L"can't set the pixelformat.");
-		return false;
+		return 0;
 	}
 
 	if (!(d->hRC = wglCreateContext(d->hDC)))
 	{
 		dispose();
 		gm_error(L"can't create a GL rendering context.");
-		return false;
+		return 0;
 	}
 
 	if (!wglMakeCurrent(d->hDC, d->hRC))
 	{
 		dispose();
 		gm_error(L"can't activate the GL rendering context.");
-		return false;
+		return 0;
 	}
 
 	GLenum err = glewInit();
 	if (err != GLEW_OK)
 	{
 		GM_ASSERT(!"glew init failed");
-		return NULL;
+		return 0;
 	}
 
 	return wnd;

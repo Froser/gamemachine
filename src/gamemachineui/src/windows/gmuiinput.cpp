@@ -157,7 +157,7 @@ void GMInput::joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMot
 
 gm::IKeyboardState& GMInput::getKeyboardState()
 {
-	GM_PROFILE(getKeyboardState);
+	GM_PROFILE("getKeyboardState");
 	D(d);
 	GetKeyboardState(d->keyState);
 	return *this;

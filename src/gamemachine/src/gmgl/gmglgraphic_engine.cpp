@@ -115,7 +115,7 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode)
 {
 	D(d);
-	GM_PROFILE(drawObjects);
+	GM_PROFILE("drawObjects");
 	if (!count)
 		return;
 

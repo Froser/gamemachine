@@ -29,7 +29,7 @@ GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 	return g_sessions.sessions[GMThread::getCurrentThreadId()];
 }
 
-GMProfile::GMProfile(const GMwchar* name)
+GMProfile::GMProfile(const GMString& name)
 {
 	D(d);
 	startRecord(name);
@@ -40,7 +40,7 @@ GMProfile::~GMProfile()
 	stopRecord();
 }
 
-void GMProfile::startRecord(const GMwchar* name)
+void GMProfile::startRecord(const GMString& name)
 {
 	D(d);
 	GMMutex m;
@@ -51,8 +51,7 @@ void GMProfile::startRecord(const GMwchar* name)
 	GMProfileSessions::GMProfileSession& ps = profileSession();
 
 	d->valid = true;
-	
-	GMString::stringCopy(d->name, name);
+	d->name = name;
 	GMLargeInteger now = GMClock::highResolutionTimer();
 	if (ps.firstProfileTimeInCycle < 0)
 		ps.firstProfileTimeInCycle = now;

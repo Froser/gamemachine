@@ -5,7 +5,7 @@
 #include <stack>
 BEGIN_NS
 
-#define GM_PROFILE(name) gm::GMProfile __profile(L#name)
+#define GM_PROFILE(name) gm::GMProfile __profile(L ## name)
 #define GM_PROFILE_HANDLER(ptr) gm::GMProfile::setHandler(ptr)
 #define GM_PROFILE_CLEAR_HANDLER() gm::GMProfile::clearHandler()
 #define GM_PROFILE_RESET_TIMELINE() gm::GMProfile::resetTimeline()
@@ -21,7 +21,7 @@ GM_PRIVATE_OBJECT(GMProfile)
 	GMStopwatch stopwatch;
 	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
 	bool valid = false;
-	GMwchar name[128];
+	GMString name;
 };
 
 struct GMProfileSessions : public GMObject
@@ -45,7 +45,7 @@ public:
 
 public:
 	GMProfile() = default;
-	GMProfile(const GMwchar* name);
+	GMProfile(const GMString& name);
 	~GMProfile();
 
 public:
@@ -54,7 +54,7 @@ public:
 	static void resetTimeline();
 
 private:
-	void startRecord(const GMwchar* name);
+	void startRecord(const GMString& name);
 	void stopRecord();
 };
 

@@ -90,7 +90,7 @@ GMGameObject* GMBSPGameWorld::getSky()
 
 void GMBSPGameWorld::renderScene()
 {
-	GM_PROFILE(renderScene);
+	GM_PROFILE("renderScene");
 	Base::renderScene();
 	drawAll();
 }
@@ -136,7 +136,7 @@ Map<GMint, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 
 void GMBSPGameWorld::calculateVisibleFaces()
 {
-	GM_PROFILE(calculateVisibleFaces);
+	GM_PROFILE("calculateVisibleFaces");
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
@@ -203,7 +203,7 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 // drawAll将所要需要绘制的对象放入列表
 void GMBSPGameWorld::drawAll()
 {
-	GM_PROFILE(drawAll);
+	GM_PROFILE("drawAll");
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->newFrame();
 	clearBuffer();
@@ -232,7 +232,7 @@ void GMBSPGameWorld::drawSky()
 
 void GMBSPGameWorld::drawFaces()
 {
-	GM_PROFILE(drawFaces);
+	GM_PROFILE("drawFaces");
 	::drawFaces(this, renderData().polygonIndices, &GMBSPGameWorld::drawPolygonFace, MST_PLANAR);
 	::drawFaces(this, renderData().meshFaceIndices, &GMBSPGameWorld::drawMeshFace, MST_TRIANGLE_SOUP);
 	::drawFaces(this, renderData().patchIndices, &GMBSPGameWorld::drawPatch, MST_PATCH);
@@ -247,7 +247,7 @@ void GMBSPGameWorld::clearBuffer()
 
 void GMBSPGameWorld::flushBuffer()
 {
-	GM_PROFILE(flushBuffer);
+	GM_PROFILE("flushBuffer");
 
 	D(d);
 	IGraphicEngine* engine = GM.getGraphicEngine();

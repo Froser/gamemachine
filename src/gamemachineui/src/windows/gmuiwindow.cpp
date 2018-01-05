@@ -4,6 +4,14 @@
 #include "gmuiwindow.h"
 #include "gmuiinput.h"
 
+#ifndef GetWindowOwner
+#	define GetWindowOwner(hwnd) GetWindow(hwnd, GW_OWNER)
+#endif
+
+#ifndef GetWindowStyle
+#	define GetWindowStyle(hwnd) ((DWORD)GetWindowLong(hwnd, GWL_STYLE))
+#endif
+
 namespace
 {
 	bool registerClass(const gm::GMWindowAttributes& wndAttrs, const gm::GMwchar* className)

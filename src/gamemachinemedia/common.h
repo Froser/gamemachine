@@ -14,7 +14,7 @@
 #define GMM_SLEEP_FOR_ONE_FRAME() gm::GMThread::sleep(1000 / 60);
 
 // 常用函数
-inline bool strnEqual(char* a, char* b, int n)
+inline bool strnEqual(const char* a, const char* b, int n)
 {
 	int i = 0;
 	do

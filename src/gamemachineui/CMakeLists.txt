@@ -5,7 +5,6 @@ include_directories(
 		./
 		./include
 		../3rdparty/glew-2.1.0/include
-		../3rdparty/duilib
 		../3rdparty/lua/src
 		../3rdparty/glm-0.9.9-a2
 		../gamemachine/include
@@ -45,8 +44,12 @@ set(DUILIB_SOURCES
 if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
+
 if(GM_USE_DUILIB)
 	list(APPEND SOURCES ${DUILIB_SOURCES})
+	include_directories(
+			../3rdparty/duilib
+		)
 endif(GM_USE_DUILIB)
 
 gm_source_group_by_dir(SOURCES)

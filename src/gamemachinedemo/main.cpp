@@ -1,6 +1,5 @@
 ﻿#include <iostream>
 #include <windows.h>
-
 #include <fstream>
 #include <gamemachine.h>
 #include <gmgl.h>
