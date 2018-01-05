@@ -29,8 +29,8 @@ bool GMUIDuiLibWindow::handleMessage()
 LRESULT GMUIDuiLibWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	D(d);
-	bool bHandled = false;
-	LRESULT lRes = Base::wndProc(uMsg, wParam, lParam, bHandled);
+	LRESULT lRes;
+	bool bHandled = Base::wndProc(uMsg, wParam, lParam, &lRes);
 
 	if (!bHandled)
 	{

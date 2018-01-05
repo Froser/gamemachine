@@ -4,6 +4,27 @@
 #include "gmuiwindow.h"
 #include "gmuiinput.h"
 
+namespace
+{
+	bool registerClass(const gm::GMWindowAttributes& wndAttrs, const gm::GMwchar* className)
+	{
+		WNDCLASS wc = { 0 };
+		wc.style = 0;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hIcon = NULL;
+		wc.lpfnWndProc = GMUIWindow::WndProc;
+		wc.hInstance = wndAttrs.instance;
+		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = NULL;
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = className;
+		ATOM ret = ::RegisterClass(&wc);
+		GM_ASSERT(ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS);
+		return ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
+	}
+}
+
 GMUIWindow::~GMUIWindow()
 {
 	D(d);
@@ -108,6 +129,27 @@ void GMUIWindow::setLockWindow(bool lock)
 		::ReleaseCapture();
 }
 
+bool GMUIWindow::createWindow(const gm::GMWindowAttributes& wndAttrs, const gm::GMwchar* className)
+{
+	D(d);
+	registerClass(wndAttrs, className);
+	gm::GMWindowHandle hwnd = ::CreateWindowEx(
+		wndAttrs.dwExStyle,
+		className,
+		wndAttrs.pstrName,
+		wndAttrs.dwStyle,
+		wndAttrs.rc.left,
+		wndAttrs.rc.top,
+		wndAttrs.rc.right - wndAttrs.rc.left,
+		wndAttrs.rc.bottom - wndAttrs.rc.top,
+		wndAttrs.hwndParent,
+		wndAttrs.hMenu,
+		wndAttrs.instance,
+		this);
+	GM_ASSERT(hwnd);
+	return !!hwnd;
+}
+
 LRESULT CALLBACK GMUIWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	GMUIWindow* pGMWindow = nullptr;
@@ -123,11 +165,10 @@ LRESULT CALLBACK GMUIWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		pGMWindow = reinterpret_cast<GMUIWindow*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	}
 
-	bool handled;
 	if (pGMWindow)
 	{
-		LRESULT result = pGMWindow->wndProc(uMsg, wParam, lParam, handled);
-		if (handled)
+		LRESULT result = 0;
+		if (pGMWindow->wndProc(uMsg, wParam, lParam, &result))
 			return result;
 	}
 	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);

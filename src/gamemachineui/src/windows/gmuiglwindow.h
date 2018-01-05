@@ -21,7 +21,7 @@ public:
 	~GMUIGLWindow();
 
 protected:
-	virtual LRESULT wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) override;
+	virtual bool wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) override;
 
 public:
 	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs) override;
@@ -29,7 +29,6 @@ public:
 	virtual void showWindow() override;
 
 private:
-	bool createWindow(const gm::GMWindowAttributes& wndAttrs);
 	void swapBuffers() const;
 	void dispose();
 };

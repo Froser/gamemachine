@@ -285,6 +285,11 @@ GM_INTERFACE(IWindow)
 	virtual gm::GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
 	virtual void centerWindow() = 0;
 	virtual void showWindow() = 0;
+	//! 处理新一轮消息循环。
+	/*!
+	  此方法由GameMachine调用。处理一轮消息循环。
+	  \return 是否应该继续消息循环。如果返回false，则程序退出。
+	*/
 	virtual bool handleMessage() = 0;
 	virtual GMRect getWindowRect() = 0;
 	virtual GMRect getClientRect() = 0;

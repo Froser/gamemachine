@@ -17,20 +17,20 @@ public:
 	void refreshWindow();
 
 protected:
-	virtual LRESULT wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled) override;
+	virtual bool wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) override;
 
 protected:
-	virtual LRESULT onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onSize(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
-	virtual LRESULT onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) { bHandled = FALSE; return 0; }
+	virtual bool onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onDestroy(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onNcActivate(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onNcCalcSize(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onNcPaint(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onNcHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onSize(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onGetMinMaxInfo(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onSysCommand(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
+	virtual bool onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
 };
 END_UI_NS
 

@@ -6,24 +6,6 @@
 namespace
 {
 	const gm::GMwchar* g_classname = L"gamemachine_MainWindow_class";
-
-	bool registerClass(const gm::GMWindowAttributes& wndAttrs)
-	{
-		WNDCLASS wc = { 0 };
-		wc.style = 0;
-		wc.cbClsExtra = 0;
-		wc.cbWndExtra = 0;
-		wc.hIcon = NULL;
-		wc.lpfnWndProc = GMUIWindow::WndProc;
-		wc.hInstance = wndAttrs.instance;
-		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-		wc.hbrBackground = NULL;
-		wc.lpszMenuName = NULL;
-		wc.lpszClassName = g_classname;
-		ATOM ret = ::RegisterClass(&wc);
-		GM_ASSERT(ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS);
-		return ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
-	}
 }
 
 GMUIGLWindow::GMUIGLWindow()
@@ -48,7 +30,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	// 在非全屏的时候才有效
 	AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
 
-	if (!createWindow(attrs))
+	if (!createWindow(attrs, g_classname))
 	{
 		DWORD s = GetLastError();
 		gm_error(L"window created failed: %i", s);
@@ -132,55 +114,30 @@ void GMUIGLWindow::swapBuffers() const
 	::SwapBuffers(d->hDC);
 }
 
-bool GMUIGLWindow::createWindow(const gm::GMWindowAttributes& wndAttrs)
-{
-	D(d);
-	registerClass(wndAttrs);
-	gm::GMWindowHandle hwnd = ::CreateWindowEx(
-		wndAttrs.dwExStyle,
-		g_classname,
-		wndAttrs.pstrName,
-		wndAttrs.dwStyle,
-		wndAttrs.rc.left,
-		wndAttrs.rc.top,
-		wndAttrs.rc.right - wndAttrs.rc.left,
-		wndAttrs.rc.bottom - wndAttrs.rc.top,
-		wndAttrs.hwndParent,
-		wndAttrs.hMenu,
-		wndAttrs.instance,
-		static_cast<Base*>(this));
-	GM_ASSERT(hwnd);
-	return !!hwnd;
-}
-
-LRESULT GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, bool& bHandled)
+bool GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
 {
 	D(d);
 	D_BASE(db, GMUIWindow);
 
-	LRESULT result = Base::wndProc(uMsg, wParam, lParam, bHandled);
-	if (bHandled)
-		return result;
+	bool handled = Base::wndProc(uMsg, wParam, lParam, lRes);
+	if (handled)
+		return handled;
 
 	switch (uMsg)
 	{
 	case WM_DESTROY:
 		::PostQuitMessage(0L);
-		bHandled = true;
 		break;
 	case WM_SIZE:
-		{
-			auto res = ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
-			gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
-			bHandled = true;
-			return res;
-		}
+	{
+		gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
+		break;
+	}
 	case WM_MOUSEWHEEL:
 	{
 		GMInput* input = gm_static_cast<GMInput*>(db->input);
 		if (input)
 			input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
-		bHandled = true;
 		break;
 	}
 	case WM_LBUTTONDOWN:
@@ -188,7 +145,6 @@ LRESULT GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, boo
 		GMInput* input = gm_static_cast<GMInput*>(db->input);
 		if (input)
 			input->recordMouseDown(GMMouseButton_Left);
-		bHandled = true;
 		break;
 	}
 	case WM_RBUTTONDOWN:
@@ -196,7 +152,6 @@ LRESULT GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, boo
 		GMInput* input = gm_static_cast<GMInput*>(db->input);
 		if (input)
 			input->recordMouseDown(GMMouseButton_Right);
-		bHandled = true;
 		break;
 	}
 	case WM_LBUTTONUP:
@@ -204,7 +159,6 @@ LRESULT GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, boo
 		GMInput* input = gm_static_cast<GMInput*>(db->input);
 		if (input)
 			input->recordMouseUp(GMMouseButton_Left);
-		bHandled = true;
 		break;
 	}
 	case WM_RBUTTONUP:
@@ -212,14 +166,14 @@ LRESULT GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, boo
 		GMInput* input = gm_static_cast<GMInput*>(db->input);
 		if (input)
 			input->recordMouseUp(GMMouseButton_Right);
-		bHandled = true;
 		break;
 	}
 	default:
 		break;
 	}
 
-	return ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
+	*lRes = ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
+	return true;
 }
 
 void GMUIGLWindow::update()

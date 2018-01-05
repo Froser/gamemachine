@@ -79,9 +79,9 @@ public:
 	virtual UINT getClassStyle() const override { return CS_DBLCLKS; }
 	virtual void onFinalMessage(HWND wndHandle) override;
 
-	virtual LRESULT onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-	virtual LRESULT onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
-	virtual LRESULT onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled) override;
+	virtual bool onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) override;
+	virtual bool onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) override;
+	virtual bool onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) override;
 	virtual void update();
 
 public:

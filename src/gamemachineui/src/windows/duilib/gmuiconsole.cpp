@@ -30,7 +30,7 @@ inline static T* findControl(DuiLib::CPaintManagerUI* painter, gm::GMwchar* name
 	return control;
 }
 
-LRESULT GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+bool GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
 {
 	D(d);
 	d->painter->Init(getWindowHandle());
@@ -40,21 +40,18 @@ LRESULT GMUIConsole::onCreate(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHa
 	GM_ASSERT(pRoot && "Failed to parse XML");
 	d->painter->AttachDialog(pRoot);
 	d->painter->AddNotifier(this);
-	LRESULT result = Base::onCreate(uMsg, wParam, lParam, bHandled);
-
+	Base::onCreate(uMsg, wParam, lParam, lRes);
 	afterCreated();
-	bHandled = TRUE;
-	return result;
+	return true;
 }
 
-LRESULT GMUIConsole::onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+bool GMUIConsole::onClose(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
 {
 	hideWindow();
-	bHandled = TRUE;
-	return 0;
+	return true;
 }
 
-LRESULT GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+bool GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
 {
 	D(d);
 	while (!d->msgQueue.empty())
@@ -63,7 +60,7 @@ LRESULT GMUIConsole::onShowWindow(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL&
 		insertTextToRichEdit(str.type, str.message);
 		d->msgQueue.pop();
 	}
-	return 0;
+	return true;
 }
 
 void GMUIConsole::onFinalMessage(HWND)
