@@ -22,7 +22,7 @@ int WINAPI WinMain(
 	{
 		NULL,
 		L"Default",
-		WS_OVERLAPPED,
+		WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME,
 		0,
 		{ 0, 0, 800, 600 },
 		NULL,

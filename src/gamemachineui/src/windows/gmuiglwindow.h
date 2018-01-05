@@ -26,7 +26,6 @@ protected:
 public:
 	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs) override;
 	virtual void update() override;
-	virtual bool handleMessage() override { return true; }
 	virtual void showWindow() override;
 
 private:

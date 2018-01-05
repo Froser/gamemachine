@@ -179,7 +179,6 @@ gm::GMMouseState GMInput::mouseState()
 		state.posY = p.y;
 
 		IKeyboardState& ks = getKeyboardState();
-
 		state.triggerButton = GMMouseButton_None;
 		if (ks.keyTriggered(VK_LBUTTON))
 			state.triggerButton |= GMMouseButton_Left;

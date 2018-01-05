@@ -178,10 +178,10 @@ void GMAssets::deleteAsset(GMAssetsNode* node)
 	case GMAssetType::None:
 		break;
 	case GMAssetType::Texture:
-		delete getTexture(node->asset);
+		GM_delete(getTexture(node->asset));
 		break;
 	case GMAssetType::Model:
-		delete getModel(node->asset);
+		GM_delete(getModel(node->asset));
 		break;
 	default:
 		GM_ASSERT(false);

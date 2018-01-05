@@ -25,6 +25,7 @@ public:
 	// IWindow
 public:
 	virtual gm::IInput* getInputMananger() override;
+	virtual bool handleMessage() override;
 	virtual void update() override;
 	virtual gm::GMRect getWindowRect() override;
 	virtual gm::GMRect getClientRect() override;

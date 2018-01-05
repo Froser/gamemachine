@@ -43,7 +43,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	D(d);
 	gm::GMWindowAttributes attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
-	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION ;
+	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;
 
 	// 在非全屏的时候才有效
 	AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
@@ -148,7 +148,7 @@ bool GMUIGLWindow::createWindow(const gm::GMWindowAttributes& wndAttrs)
 		wndAttrs.hwndParent,
 		wndAttrs.hMenu,
 		wndAttrs.instance,
-		this);
+		static_cast<Base*>(this));
 	GM_ASSERT(hwnd);
 	return !!hwnd;
 }

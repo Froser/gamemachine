@@ -19,6 +19,19 @@ gm::IInput* GMUIWindow::getInputMananger()
 	return d->input;
 }
 
+bool GMUIWindow::handleMessage()
+{
+	MSG msg;
+	while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+	{
+		if (msg.message == WM_QUIT)
+			return false;
+		::TranslateMessage(&msg);
+		::DispatchMessage(&msg);
+	}
+	return true;
+}
+
 void GMUIWindow::update()
 {
 	D(d);
@@ -104,6 +117,10 @@ LRESULT CALLBACK GMUIWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		pGMWindow = static_cast<GMUIWindow*>(lpcs->lpCreateParams);
 		pGMWindow->setWindowHandle(hWnd);
 		::SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LPARAM>(pGMWindow));
+	}
+	else
+	{
+		pGMWindow = reinterpret_cast<GMUIWindow*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
 	}
 
 	bool handled;

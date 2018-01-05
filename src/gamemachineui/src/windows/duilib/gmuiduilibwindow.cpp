@@ -36,8 +36,9 @@ LRESULT GMUIDuiLibWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		if (d->painter.MessageHandler(uMsg, wParam, lParam, lRes))
 			return lRes;
+		return ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);;
 	}
-	return 0;
+	return lRes;
 }
 
 void GMUIDuiLibWindow::OnFinalMessage(HWND hWnd)
