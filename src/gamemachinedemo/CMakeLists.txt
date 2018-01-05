@@ -56,16 +56,7 @@ add_executable(${PROJECT_NAME}
 	)
 
 if(MSVC)
-	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS" ) 
-else(MSVC)
-	if(WIN32)
-		# We need to link user32.lib manually.
-		set(GM_WINDOWS_SDK "C:/Program Files (x86)/Microsoft SDKs/Windows/v7.0A/Lib")
-		include_directories(${GM_WINDOWS_SDK})
-		link_libraries(
-			user32.lib
-		)
-	endif(WIN32)
+	set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS") 
 endif(MSVC)
 
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})
