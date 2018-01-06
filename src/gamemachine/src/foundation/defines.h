@@ -67,11 +67,6 @@ using Tuple = std::tuple<T...>;
 #	define GM_LIB 1
 #endif
 
-// 游戏逻辑的线程模式
-#ifndef GM_MULTI_THREAD
-#	define GM_MULTI_THREAD 1
-#endif
-
 // Debug模式下监控内存泄漏
 #ifndef GM_DETECT_MEMORY_LEAK
 #	define GM_DETECT_MEMORY_LEAK 0
@@ -118,6 +113,9 @@ using Tuple = std::tuple<T...>;
 #endif
 
 #if GM_USE_OPENGL
+#	ifndef GLEW_STATIC
+#		define GLEW_STATIC
+#	endif
 #	include "GL/glew.h"
 #endif
 
