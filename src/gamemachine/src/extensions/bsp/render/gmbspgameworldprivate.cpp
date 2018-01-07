@@ -52,7 +52,7 @@ namespace
 		}
 
 		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, glm::vec3(0, 10, 0));
-		sprite->setMoveSpeed(glm::vec3(293));
+		sprite->setMoveSpeed(glm::vec3(193));
 		sprite->setJumpSpeed(glm::vec3(0, 150, 0));
 		sprite->setPhysicsObject(world->getPhysicsWorld()->createPhysicsObject());
 		world->addObjectAndInit(sprite);

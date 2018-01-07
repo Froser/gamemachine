@@ -57,7 +57,7 @@ void GMSpriteGameObject::simulate()
 {
 	D(d);
 	glm::vec3 direction(0), rate(0), moveSpeed(0), jumpSpeed(0);
-	bool moved = false, jumped = false;
+	bool moved = false, jumped = false, rateAssigned = false;
 	for (auto& movement : d->movements)
 	{
 		if (movement.movement == GMMovement::Move)
@@ -71,10 +71,13 @@ void GMSpriteGameObject::simulate()
 			jumped = true;
 		}
 		direction += movement.moveDirection;
-		rate += movement.moveRate;
+		if (!rateAssigned)
+		{
+			rate = movement.moveRate;
+			rateAssigned = true;
+		}
 	}
 	direction = glm::fastNormalize(direction);
-	rate = glm::fastNormalize(rate);
 
 	if (moved)
 	{
