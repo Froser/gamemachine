@@ -65,7 +65,8 @@ void GMBSPMove::processMove()
 	if (d->movementState.freefall)
 		return;
 
-	const GMPhysicsMoveArgs& moveArgs = d->action.move.args;
+	GMPhysicsMoveArgs moveArgs = d->action.move.args;
+	moveArgs.lookAt[1] = 0.f; // 不考虑roll，始终平视前方
 	glm::quat q = glm::quat(glm::vec3(0, 0, 1), moveArgs.lookAt);
 
 	d->initialVelocity = q * (moveArgs.direction * moveArgs.speed * moveArgs.rate);
