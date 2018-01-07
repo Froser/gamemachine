@@ -2,7 +2,7 @@
 #define __GAMEPACKAGE_H__
 #include <gmcommon.h>
 #include <tools.h>
-#include <gmthreads.h>
+#include <gmthread.h>
 BEGIN_NS
 
 enum class GMGamePackageType

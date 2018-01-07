@@ -3,6 +3,7 @@
 #include "cases/hook.h"
 #include "cases/string.h"
 #include "cases/scanner.h"
+#include "cases/thread.h"
 
 int main(int argc, char* argv)
 {
@@ -13,6 +14,7 @@ int main(int argc, char* argv)
 		new cases::Hook(),
 		new cases::String(),
 		new cases::Scanner(),
+		new cases::Thread(),
 	};
 
 	for (auto& c : caseArray)

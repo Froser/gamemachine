@@ -7,7 +7,7 @@
 #include <gmglyphmanager.h>
 #include <gmgamepackage.h>
 #include <gmcamera.h>
-#include <gmthreads.h>
+#include <gmthread.h>
 
 BEGIN_NS
 

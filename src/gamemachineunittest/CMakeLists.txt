@@ -32,6 +32,8 @@ set(SOURCES
 		cases/string.cpp
 		cases/scanner.h
 		cases/scanner.cpp
+		cases/thread.h
+		cases/thread.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

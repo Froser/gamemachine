@@ -173,7 +173,7 @@ public:
 
 	~GMMAudioStreamPlayThread()
 	{
-		wait();
+		join();
 	}
 
 public:
@@ -252,7 +252,6 @@ public:
 		}
 		delete[] audioData;
 		d_self->started = false;
-		detach();
 	}
 
 public:
@@ -262,7 +261,7 @@ public:
 		return d->started;
 	}
 
-	void terminateThread()
+	void exit()
 	{
 		D(d_self);
 		D_OF(d, d_self->source);
@@ -295,9 +294,8 @@ GMMAudioStreamSource::~GMMAudioStreamSource()
 
 	if (d->thread)
 	{
-		d->thread->detach();
-		d->thread->terminateThread();
-		d->thread->wait();
+		d->thread->exit();
+		d->thread->join();
 		delete d->thread;
 	}
 }
@@ -346,9 +344,8 @@ void GMMAudioStreamSource::rewind()
 	// 停止播放线程
 	if (d->thread->getThreadId() != gm::GMThread::getCurrentThreadId())
 	{
-		d->thread->detach();
-		d->thread->terminateThread();
-		d->thread->wait();
+		d->thread->exit();
+		d->thread->join();
 	}
 
 	// 停止流解码，回退到流最初状态

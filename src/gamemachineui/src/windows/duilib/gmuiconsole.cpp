@@ -283,7 +283,7 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const gm::GMString
 	d->consoleEdit->SetSelectionCharFormat(cf);
 }
 
-void GMUIConsole::beginProfile(const gm::GMString& name, gm::GMfloat durationSinceStartInSecond, gm::GMThreadHandle::id id, gm::GMint level)
+void GMUIConsole::beginProfile(const gm::GMString& name, gm::GMfloat durationSinceStartInSecond, gm::GMThreadId id, gm::GMint level)
 {
 	D(d);
 	gm::GMMutex m;
@@ -294,7 +294,7 @@ void GMUIConsole::beginProfile(const gm::GMString& name, gm::GMfloat durationSin
 	d->profiles[id].push_back(info);
 }
 
-void GMUIConsole::endProfile(const gm::GMString& name, gm::GMfloat elapsedInSecond, gm::GMThreadHandle::id id, gm::GMint level)
+void GMUIConsole::endProfile(const gm::GMString& name, gm::GMfloat elapsedInSecond, gm::GMThreadId id, gm::GMint level)
 {
 	D(d);
 	gm::GMMutex m;

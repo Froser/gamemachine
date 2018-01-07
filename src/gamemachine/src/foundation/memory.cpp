@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "memory.h"
 #include "debug.h"
-#include "gmthreads.h"
+#include <gmthread.h>
 
 GMint gm_s_numAlignedAllocs = 0;
 GMint gm_s_numAlignedFree = 0;

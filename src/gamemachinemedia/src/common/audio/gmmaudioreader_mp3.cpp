@@ -60,10 +60,9 @@ public:
 	~GMMAudioFile_MP3()
 	{
 		D(d);
-		d->decodeThread.detach();
 		d->baseData->blockWriteEvent.set();
 		d->terminateDecode = true;
-		d->decodeThread.wait();
+		d->decodeThread.join();
 	}
 
 public:
@@ -78,9 +77,8 @@ public:
 	{
 		D(d);
 		// 清理解码线程
-		d->decodeThread.detach();
 		d->terminateDecode = true;
-		d->decodeThread.wait();
+		d->decodeThread.join();
 		d->terminateDecode = false;
 
 		Base::rewindDecode();

@@ -1,7 +1,7 @@
 ﻿#ifndef __GMPROFILE_H__
 #define __GMPROFILE_H__
 #include <gmcommon.h>
-#include "gmthreads.h"
+#include <gmthread.h>
 #include <stack>
 BEGIN_NS
 
@@ -12,8 +12,8 @@ BEGIN_NS
 
 GM_INTERFACE(IProfileHandler)
 {
-	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadHandle::id id, GMint level) = 0;
-	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadHandle::id id, GMint level) = 0;
+	virtual void beginProfile(const GMString& name, GMfloat durationSinceStartInSecond, GMThreadId id, GMint level) = 0;
+	virtual void endProfile(const GMString& name, GMfloat elapsedInSecond, GMThreadId id, GMint level) = 0;
 };
 
 GM_PRIVATE_OBJECT(GMProfile)
@@ -33,7 +33,7 @@ struct GMProfileSessions : public GMObject
 		GMLargeInteger firstProfileTimeInCycle = -1;
 	};
 
-	Map<GMThreadHandle::id, GMProfileSession> sessions;
+	Map<GMThreadId, GMProfileSession> sessions;
 };
 
 class GMProfile : public GMObject

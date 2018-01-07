@@ -4,25 +4,10 @@
 #include "utilities/tools.h"
 #include <mutex>
 
-#ifndef GM_MSVC
-#	include <pthread.h>
-#	define GM_USE_PTHREAD 1
-#else
-#	include <thread>
-#endif
-
 BEGIN_NS
 
-#if GM_USE_PTHREAD
-struct GMThreadHandle
-{
-	typedef unsigned long int id;
-	pthread_t thread;
-};
-
-#else
-typedef std::thread GMThreadHandle;
-#endif
+typedef GMlong GMThreadHandle;
+typedef GMlong GMThreadId;
 
 enum ThreadState
 {
@@ -58,12 +43,10 @@ public:
 
 public:
 	void start();
-	void wait(GMuint milliseconds = 0);
 	void setCallback(IThreadCallback* callback);
-	void terminate();
-	void detach();
-	bool join();
-	GMThreadHandle::id getThreadId();
+	void terminateThread(GMint ret = 0);
+	bool join(GMuint milliseconds = 0);
+	GMThreadId getThreadId();
 
 public:
 	GMThread::Data* threadData() { D(d); return data(); }
@@ -74,21 +57,16 @@ public:
 public:
 	virtual void run() = 0;
 
-private:
-	void threadCallback();
+public:
+	GM_PRIVATE_NAME(GMThread)* _thread_private()
+	{
+		D(d);
+		return d;
+	}
 
 public:
-	static GMThreadHandle::id getCurrentThreadId();
+	static GMThreadId getCurrentThreadId();
 	static void sleep(GMint milliseconds);
-};
-
-// GMSustainedThread
-GM_PRIVATE_OBJECT(GMSustainedThread)
-{
-	GMEvent jobFinishedEvent;
-	GMEvent jobStartEvent;
-	GMEvent terminateEvent;
-	bool terminate;
 };
 
 GM_PRIVATE_OBJECT(GMMutex)

@@ -119,8 +119,7 @@ set(SOURCES
 		foundation/interfaces.h
 		foundation/gmstates.h
 		foundation/gmstates.cpp
-		foundation/gmthreads.h
-		foundation/gmthreads.cpp
+		foundation/gmthread.h
 		foundation/gmprofile.h
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
@@ -163,6 +162,7 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/path.cpp
 		foundation/platforms/windows/timer.cpp
 		foundation/platforms/windows/screen.cpp
+		foundation/platforms/windows/thread.cpp
 	)
 
 if(WIN32)

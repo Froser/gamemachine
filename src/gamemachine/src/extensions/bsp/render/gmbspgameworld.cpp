@@ -10,7 +10,7 @@
 #include "gmdata/modelreader/gmmodelreader.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
-#include "foundation/gmthreads.h"
+#include "foundation/gmthread.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "extensions/bsp/physics/gmbspphysicsworld.h"
 
