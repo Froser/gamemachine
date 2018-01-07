@@ -38,12 +38,14 @@ void cases::Thread::addToUnitTest(UnitTest& ut)
 
 	ut.addTestCase("GMThread sleep", []() {
 		TestThread_Join t;
-		t.sleep(1500);
+		t.start();
+		gm::GMThread::sleep(1500);
 		return true;
 	});
 
 	ut.addTestCase("GMThread terminateThread", []() {
 		TestThread_Term t;
+		t.start();
 		gm::GMThread::sleep(2000);
 		t.terminateThread();
 		return true;

@@ -128,7 +128,7 @@ protected:
 
 GM_PRIVATE_OBJECT(GMGamePackageAsyncResult)
 {
-	GMThread* thread;
+	GMThread* thread = nullptr;
 	GMBuffer buffer;
 };
 
@@ -143,7 +143,7 @@ public:
 public:
 	virtual GMBuffer* state() override;
 	virtual bool isComplete() override;
-	virtual GMEvent& waitHandle() override;
+	virtual void wait() override;
 
 public:
 	void setThread(AUTORELEASE GMThread* thread) { D(d); d->thread = thread; }

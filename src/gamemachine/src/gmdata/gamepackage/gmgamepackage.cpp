@@ -120,14 +120,15 @@ GMBuffer* GMGamePackageAsyncResult::state()
 	return &d->buffer;
 }
 
+void GMGamePackageAsyncResult::wait()
+{
+	D(d);
+	if (d->thread)
+		d->thread->join();
+}
+
 bool GMGamePackageAsyncResult::isComplete()
 {
 	D(d);
 	return d->thread->isDone();
-}
-
-GMEvent& GMGamePackageAsyncResult::waitHandle()
-{
-	D(d);
-	return d->thread->waitEvent();
 }
