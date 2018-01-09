@@ -71,3 +71,28 @@ void GMThread::sleep(GMint milliseconds)
 {
 	::Sleep(milliseconds);
 }
+
+GMMutex::GMMutex()
+{
+	D(d);
+	SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, FALSE };
+	d->mutex = ::CreateMutex(&sa, FALSE, L"");
+}
+
+GMMutex::~GMMutex()
+{
+	D(d);
+	::CloseHandle(d->mutex);
+}
+
+void GMMutex::lock()
+{
+	D(d);
+	::WaitForSingleObject(d->mutex, INFINITE);
+}
+
+void GMMutex::unlock()
+{
+	D(d);
+	::ReleaseMutex(d->mutex);
+}

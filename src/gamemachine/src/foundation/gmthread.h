@@ -129,30 +129,8 @@ public:
 
 GM_PRIVATE_OBJECT(GMMutex)
 {
-#if GM_USE_PTHREAD
-	class __MutexLocker
-	{
-	public:
-		__MutexLocker()
-		{
-			pthread_mutex_init(&m_mutex, nullptr);
-		}
-
-		void lock()
-		{
-			pthread_mutex_lock(&m_mutex);
-		}
-
-		void unlock()
-		{
-			pthread_mutex_unlock(&m_mutex);
-		}
-
-	private:
-		pthread_mutex_t m_mutex;
-	} mutex;
-#else
-	std::mutex mutex;
+#if GM_WINDOWS
+	HANDLE mutex;
 #endif
 };
 
@@ -161,8 +139,12 @@ class GMMutex : public GMObject
 	DECLARE_PRIVATE(GMMutex)
 
 public:
-	GMMutex() { D(d); d->mutex.lock(); }
-	~GMMutex() { D(d); d->mutex.unlock(); }
+	GMMutex();
+	~GMMutex();
+
+public:
+	void lock();
+	void unlock();
 };
 
 // 同步

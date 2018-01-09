@@ -43,7 +43,6 @@ GMProfile::~GMProfile()
 void GMProfile::startRecord(const GMString& name)
 {
 	D(d);
-	GMMutex m;
 	static GMLargeInteger frequency = GMClock::highResolutionTimerFrequency();
 	if (!GMGetDebugState(RUN_PROFILE))
 		return;
@@ -65,7 +64,6 @@ void GMProfile::startRecord(const GMString& name)
 
 void GMProfile::stopRecord()
 {
-	GMMutex m;
 	D(d);
 	d->stopwatch.stop();
 	if (!d->valid)

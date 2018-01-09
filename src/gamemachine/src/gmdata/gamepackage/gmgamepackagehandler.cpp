@@ -20,7 +20,6 @@ public:
 
 	virtual void run() override
 	{
-		GMMutex m;
 		GMBuffer* buf = m_result->state();
 		m_handler->readFileFromPath(m_path, buf);
 	}

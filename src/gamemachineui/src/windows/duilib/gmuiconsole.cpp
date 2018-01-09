@@ -286,7 +286,6 @@ void GMUIConsole::insertTextToRichEdit(Data::OutputType type, const gm::GMString
 void GMUIConsole::beginProfile(const gm::GMString& name, gm::GMfloat durationSinceStartInSecond, gm::GMThreadId id, gm::GMint level)
 {
 	D(d);
-	gm::GMMutex m;
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
@@ -297,7 +296,6 @@ void GMUIConsole::beginProfile(const gm::GMString& name, gm::GMfloat durationSin
 void GMUIConsole::endProfile(const gm::GMString& name, gm::GMfloat elapsedInSecond, gm::GMThreadId id, gm::GMint level)
 {
 	D(d);
-	gm::GMMutex m;
 	if (!isWindowVisible() || d->tabIndex != TAB_INDEX_PERFORMANCE)
 		return;
 
