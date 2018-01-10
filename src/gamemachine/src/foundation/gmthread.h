@@ -43,6 +43,11 @@ class GMThread : public GMObject
 
 public:
 	//! 类的构造函数。
+	/*!
+	  注意：请确保在线程运行时，此类不会被析构，否则程序将会崩溃。<br>
+	  使用join()可以确保线程已经结束。
+	  \sa join()
+	*/
 	GMThread();
 
 public:
@@ -134,16 +139,31 @@ GM_PRIVATE_OBJECT(GMMutex)
 #endif
 };
 
+//! 此类表示一个互斥量
 class GMMutex : public GMObject
 {
 	DECLARE_PRIVATE(GMMutex)
 
 public:
+	//! 构造一个互斥量。
 	GMMutex();
+
+	//! 释放一个互斥量。
 	~GMMutex();
 
 public:
+	//! 锁定此互斥量。
+	/*!
+	  锁定互斥量时会进行检查。如果此互斥量已经被其他线程锁定，此方法会阻塞当前线程，直到互斥量被释放。否则，线程继续执行下去，并锁定此互斥量。lock()和unlock()必须要成对出现。
+	  \sa unlock()
+	*/
 	void lock();
+
+	//! 释放此互斥量。
+	/*!
+	  互斥量被释放后，意味着其他被此互斥量阻塞的线程其中一个可以继续执行代码。lock()和unlock()必须要成对出现。
+	  \sa lock()
+	*/
 	void unlock();
 };
 
