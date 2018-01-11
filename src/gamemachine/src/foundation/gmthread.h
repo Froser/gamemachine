@@ -9,11 +9,22 @@ BEGIN_NS
 typedef GMlong GMThreadHandle;
 typedef GMlong GMThreadId;
 
-enum ThreadState
+enum class ThreadState
 {
 	NotRunning,
 	Running,
 	Finished,
+};
+
+enum class ThreadPriority
+{
+	TimeCritial,
+	Highest,
+	AboveNormal,
+	Normal,
+	BelowNormal,
+	Lowest,
+	Idle,
 };
 
 class GMThread;
@@ -30,6 +41,7 @@ GM_PRIVATE_OBJECT(GMThread)
 	IThreadCallback* callback = nullptr;
 	GMThreadHandle handle;
 	ThreadState state;
+	ThreadPriority priority = ThreadPriority::Normal;
 	bool done = false;
 };
 
@@ -50,7 +62,20 @@ public:
 	*/
 	GMThread();
 
+	//! 类的析构函数。
+	/*!
+	  注意：在线程结束前，不要释放此类，否则会引起崩溃。
+	*/
+	~GMThread();
+
 public:
+	//! 设置一个线程优先级。
+	/*!
+	  优先级应该在进程开始运行前设置，否则不会有效果。
+	  \param p 线程优先级。
+	*/
+	void setPriority(ThreadPriority p);
+
 	//! 开始一个线程。
 	/*!
 	  通过调用系统的创建线程函数，创建一个新线程。在新建的线程中，将会调用run()方法。

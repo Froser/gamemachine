@@ -10,23 +10,58 @@ namespace
 	{
 		GMThread* thread = static_cast<GMThread*>(pvParam);
 		GM_PRIVATE_NAME(GMThread)* d = thread->_thread_private();
-		d->state = Running;
+		d->state = ThreadState::Running;
 		if (d->callback)
 			d->callback->beforeRun(thread);
 		thread->run();
 		if (d->callback)
 			d->callback->afterRun(thread);
-		d->state = Finished;
+		d->state = ThreadState::Finished;
 		d->done = true;
 		return 0;
+	}
+
+	DWORD toWin32ThreadPriority(ThreadPriority t)
+	{
+		switch (t)
+		{
+		case ThreadPriority::TimeCritial:
+			return THREAD_PRIORITY_TIME_CRITICAL;
+		case ThreadPriority::Highest:
+			return THREAD_PRIORITY_HIGHEST;
+		case ThreadPriority::AboveNormal:
+			return THREAD_PRIORITY_ABOVE_NORMAL;
+		case ThreadPriority::Normal:
+			return THREAD_PRIORITY_NORMAL;
+		case ThreadPriority::BelowNormal:
+			return THREAD_PRIORITY_BELOW_NORMAL;
+		case ThreadPriority::Lowest:
+			return THREAD_PRIORITY_LOWEST;
+		case ThreadPriority::Idle:
+			return THREAD_PRIORITY_IDLE;
+		default:
+			return THREAD_PRIORITY_NORMAL;
+		}
 	}
 }
 
 GMThread::GMThread()
 {
 	D(d);
-	d->state = NotRunning;
+	d->state = ThreadState::NotRunning;
 	d->callback = nullptr;
+}
+
+GMThread::~GMThread()
+{
+	D(d);
+	::CloseHandle((HANDLE)d->handle);
+}
+
+void GMThread::setPriority(ThreadPriority p)
+{
+	D(d);
+	d->priority = p;
 }
 
 void GMThread::start()
@@ -35,7 +70,9 @@ void GMThread::start()
 	if (d->callback)
 		d->callback->onCreateThread(this);
 	d->done = false;
-	d->handle = (GMlong)_beginthreadex(nullptr, 0, &threadProc, this, 0, nullptr);
+	d->handle = (GMlong)_beginthreadex(nullptr, 0, &threadProc, this, CREATE_SUSPENDED, nullptr);
+	::SetThreadPriority((HANDLE)d->handle, toWin32ThreadPriority(d->priority));
+	::ResumeThread((HANDLE)d->handle);
 }
 
 void GMThread::setCallback(IThreadCallback* callback)
