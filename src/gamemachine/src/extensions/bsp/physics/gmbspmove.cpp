@@ -2,7 +2,7 @@
 #include "gmbspmove.h"
 #include "extensions/bsp/render/gmbspgameworld.h"
 #include <gmbspphysicsworld.h>
-#include "gmphysics/gmphysicsstructs.h"
+#include "gmphysics/gmphysicsobject.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
 

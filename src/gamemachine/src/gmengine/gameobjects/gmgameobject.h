@@ -10,8 +10,8 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMGameObject)
 {
-	GMPhysicsObject* physics = nullptr;
 	GMuint id = 0;
+	GMPhysicsObject* physics = nullptr;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
 	glm::mat4 scaling = glm::identity<glm::mat4>();
@@ -70,7 +70,12 @@ public:
 	inline const glm::mat4& getTranslation() const { D(d); return d->translation; }
 	inline const glm::quat& getRotation() const { D(d); return d->rotation; }
 	inline GMPhysicsObject* getPhysicsObject() { D(d); GM_ASSERT(d->physics); return d->physics; }
-	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj) { D(d); d->physics = phyObj; }
+	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
+	{
+		D(d);
+		d->physics = phyObj;
+		d->physics->setGameObject(this);
+	}
 
 	// events
 private:

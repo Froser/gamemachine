@@ -1,8 +1,9 @@
-﻿#ifndef __PHYSICSSTRUCTS_H__
-#define __PHYSICSSTRUCTS_H__
+﻿#ifndef __PHYSICSOBJECT_H__
+#define __PHYSICSOBJECT_H__
 #include <gmcommon.h>
 #include <map>
 #include <linearmath.h>
+#include "gmbulletforward.h"
 BEGIN_NS
 
 GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
@@ -30,6 +31,7 @@ GM_ALIGNED_STRUCT(GMMotionStates)
 
 GM_PRIVATE_OBJECT(GMPhysicsObject)
 {
+	GMGameObject* gameObject = nullptr;
 	GMMotionStates motionStates;
 };
 
@@ -42,12 +44,50 @@ class GMPhysicsObject : public GMObject
 {
 	DECLARE_PRIVATE(GMPhysicsObject)
 	friend class GMPhysicsWorld;
+	friend class GMGameObject;
 
 protected:
 	GMPhysicsObject() = default;
 
 public:
 	inline GMMotionStates& motionStates() { D(d); return d->motionStates; }
+
+private:
+	inline void setGameObject(GMGameObject* gameObject)
+	{
+		D(d); 
+		GM_ASSERT(!d->gameObject);
+		d->gameObject = gameObject;
+	}
+};
+
+enum class GMShapeType
+{
+	Box,
+};
+
+GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
+{
+	btRigidBody* body = nullptr;
+	btCollisionShape* shape = nullptr;
+	GMfloat mass = 0;
+	GMShapeType type;
+};
+
+class GMRigidPhysicsObject : public GMPhysicsObject
+{
+	DECLARE_PRIVATE_AND_BASE(GMRigidPhysicsObject, GMPhysicsObject)
+
+public:
+	GMRigidPhysicsObject() = default;
+	~GMRigidPhysicsObject();
+
+public:
+	void initAsBoxShape(const glm::vec3& halfExtents);
+	void setMass(GMfloat mass);
+
+private:
+	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);
 };
 
 END_NS

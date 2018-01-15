@@ -7,11 +7,11 @@
 BEGIN_NS
 
 // 此类包含了各种实用工具
-// AutoPtr:
+// GMScopePtr:
 template<class Type>
-struct AutoPtrRef
+struct GMScopePtrRef
 {
-	explicit AutoPtrRef(Type *right)
+	explicit GMScopePtrRef(Type *right)
 		: m_ref(right)
 	{
 	}
@@ -20,23 +20,23 @@ struct AutoPtrRef
 };
 
 template<class Type>
-class AutoPtr
+class GMScopePtr
 {
 public:
-	typedef AutoPtr<Type> MyType;
+	typedef GMScopePtr<Type> MyType;
 	typedef Type ElementType;
 
-	explicit AutoPtr(Type *ptr = nullptr)
+	explicit GMScopePtr(Type *ptr = nullptr)
 		: m_ptr(ptr)
 	{
 	}
 
-	AutoPtr(MyType& right)
+	GMScopePtr(MyType& right)
 		: m_ptr(right.release())
 	{
 	}
 
-	AutoPtr(AutoPtrRef<Type> right)
+	GMScopePtr(GMScopePtrRef<Type> right)
 	{
 		Type *ptr = right.m_ref;
 		right.m_ref = 0;
@@ -44,29 +44,29 @@ public:
 	}
 
 	template<class OtherType>
-	operator AutoPtr<OtherType>()
+	operator GMScopePtr<OtherType>()
 	{
-		return (AutoPtr<OtherType>(*this));
+		return (GMScopePtr<OtherType>(*this));
 	}
 
 	template<class OtherType>
-	operator AutoPtrRef<OtherType>()
+	operator GMScopePtrRef<OtherType>()
 	{
 		OtherType *Cvtptr = m_ptr;
-		AutoPtrRef<OtherType> _Ans(Cvtptr);
+		GMScopePtrRef<OtherType> _Ans(Cvtptr);
 		m_ptr = 0;
 		return (_Ans);
 	}
 
 	template<class OtherType>
-	MyType& operator=(AutoPtr<OtherType>& right)
+	MyType& operator=(GMScopePtr<OtherType>& right)
 	{
 		reset(right.release());
 		return (*this);
 	}
 
 	template<class OtherType>
-	AutoPtr(AutoPtr<OtherType>& right)
+	GMScopePtr(GMScopePtr<OtherType>& right)
 		: m_ptr(right.release())
 	{
 	}
@@ -77,7 +77,7 @@ public:
 		return (*this);
 	}
 
-	MyType& operator=(AutoPtrRef<Type> right)
+	MyType& operator=(GMScopePtrRef<Type> right)
 	{
 		Type *ptr = right.m_ref;
 		right.m_ref = 0;
@@ -85,7 +85,7 @@ public:
 		return (*this);
 	}
 
-	~AutoPtr()
+	~GMScopePtr()
 	{
 		delete m_ptr;
 	}

@@ -12,7 +12,6 @@ class GMBSPGameWorld : public GMGameWorld
 
 public:
 	GMBSPGameWorld();
-	~GMBSPGameWorld();
 
 public:
 	void loadBSP(const GMString& mapName);
@@ -25,7 +24,6 @@ public:
 
 public:
 	virtual void renderScene() override;
-	virtual GMPhysicsWorld* getPhysicsWorld() override;
 
 	//renders:
 public:

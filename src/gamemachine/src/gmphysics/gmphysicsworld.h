@@ -1,7 +1,7 @@
 ﻿#ifndef __PHYSICSWORLD_H__
 #define __PHYSICSWORLD_H__
 #include <gmcommon.h>
-#include "gmphysicsstructs.h"
+#include "gmphysicsobject.h"
 BEGIN_NS
 
 class GMGameWorld;
@@ -24,9 +24,6 @@ public:
 	virtual void simulate(GMGameObject* obj) = 0;
 	virtual void applyMove(GMPhysicsObject* phy, const GMPhysicsMoveArgs& args) {}
 	virtual void applyJump(GMPhysicsObject* phy, const GMPhysicsMoveArgs& args) {}
-
-public:
-	virtual GMPhysicsObject* createPhysicsObject();
 };
 
 END_NS

@@ -48,6 +48,8 @@ set(SOURCES
 		demo/button.cpp
 		demo/model.h
 		demo/model.cpp
+		demo/collision.h
+		demo/collision.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

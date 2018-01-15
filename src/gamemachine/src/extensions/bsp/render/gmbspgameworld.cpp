@@ -60,12 +60,6 @@ GMBSPGameWorld::GMBSPGameWorld()
 	d->physics = new GMBSPPhysicsWorld(this);
 }
 
-GMBSPGameWorld::~GMBSPGameWorld()
-{
-	D(d);
-	GM_delete(d->physics);
-}
-
 void GMBSPGameWorld::loadBSP(const GMString& mapName)
 {
 	D(d);
@@ -93,12 +87,6 @@ void GMBSPGameWorld::renderScene()
 	GM_PROFILE("renderScene");
 	Base::renderScene();
 	drawAll();
-}
-
-GMPhysicsWorld* GMBSPGameWorld::getPhysicsWorld()
-{
-	D(d);
-	return d->physics;
 }
 
 void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)

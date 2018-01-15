@@ -107,7 +107,7 @@ GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	GMMesh* mesh = nullptr;
-	AutoPtr<GMModelPainter> painter;
+	GMScopePtr<GMModelPainter> painter;
 	GMModelType type = GMModelType::Model3D;
 };
 

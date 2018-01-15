@@ -9,6 +9,7 @@ include_directories(
 		../../3rdparty/libmad
 		../../3rdparty/lua/src
 		../../3rdparty/glm-0.9.9-a2
+		../../3rdparty/bullet3-2.87/src
 	)
 
 gm_init_solution()
@@ -88,7 +89,12 @@ set(SOURCES
 		gmgl/shader_constants.h
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp
-		gmphysics/gmphysicsstructs.h
+		gmphysics/gmphysicsobject.h
+		gmphysics/gmphysicsobject.cpp
+		gmphysics/gmdiscretedynamicsworld.h
+		gmphysics/gmdiscretedynamicsworld.cpp
+		gmphysics/gmbulletincludes.h
+		gmphysics/gmbulletforward.h
 		foundation/utilities/tinyxml/tinystr.cpp
 		foundation/utilities/tinyxml/tinystr.h
 		foundation/utilities/tinyxml/tinyxml.cpp
@@ -182,6 +188,7 @@ if(MSVC)
 endif(MSVC)
 
 gm_link_dependencies(${PROJECT_NAME})
+gm_link_bullet3()
 target_link_libraries(${PROJECT_NAME} glew_s)
 target_link_libraries(${PROJECT_NAME} lua)
 target_link_libraries(${PROJECT_NAME} png_static)

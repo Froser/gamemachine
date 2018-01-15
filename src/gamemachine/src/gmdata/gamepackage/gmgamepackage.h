@@ -40,7 +40,7 @@ GM_INTERFACE(IGamePackageHandler)
 GM_PRIVATE_OBJECT(GMGamePackage)
 {
 	GMString packagePath;
-	AutoPtr<IGamePackageHandler> handler;
+	GMScopePtr<IGamePackageHandler> handler;
 };
 
 class GMBSPGameWorld;

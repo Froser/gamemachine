@@ -64,11 +64,6 @@ void GMBSPPhysicsWorld::applyJump(GMPhysicsObject* phy, const GMPhysicsMoveArgs&
 	move->applyJump(args.speed);
 }
 
-GMPhysicsObject* GMBSPPhysicsWorld::createPhysicsObject()
-{
-	return new GMBSPPhysicsObject();
-}
-
 void GMBSPPhysicsWorld::initBSPPhysicsWorld()
 {
 	generatePhysicsPlaneData();

@@ -11,10 +11,9 @@ constexpr GMint DRAW_PIECE_COUNT = 2;
 class GMBSPPhysicsWorld;
 GM_PRIVATE_OBJECT(GMBSPGameWorld)
 {
-	GMBSPPhysicsWorld* physics = nullptr;
 	GMBSP bsp;
 	GMGameObject* sky = nullptr;
-
+	GMBSPPhysicsWorld* physics = nullptr;
 	GMBSPRender render;
 	GMBSPShaderLoader shaderLoader;
 	BSPModelLoader modelLoader;

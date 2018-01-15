@@ -12,8 +12,11 @@ BEGIN_NS
 class GMControlGameObject;
 class GMCharacter;
 class GMModelPainter;
+class GMPhysicsWorld;
+
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
+	GMPhysicsWorld* physicsWorld = nullptr;
 	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
 	Vector<GMControlGameObject*> controls;
 	Vector<GMGameObject*> controls_objectType;
@@ -25,12 +28,14 @@ class GMGameWorld : public GMObject
 {
 	DECLARE_PRIVATE(GMGameWorld)
 
+	friend class GMPhysicsWorld;
+
 public:
 	GMGameWorld();
 	virtual ~GMGameWorld();
 
 public:
-	virtual GMPhysicsWorld* getPhysicsWorld() { return nullptr; }
+	GMPhysicsWorld* getPhysicsWorld() { D(d); return d->physicsWorld; }
 
 public:
 	virtual void renderScene() {}
@@ -52,6 +57,10 @@ public:
 private:
 	GMModelPainter* createPainterForObject(GMGameObject* obj);
 	void simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects);
+
+	// GMPhysicsWorld
+private:
+	void setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w) { D(d); GM_ASSERT(!d->physicsWorld); d->physicsWorld = w; }
 };
 
 END_NS
