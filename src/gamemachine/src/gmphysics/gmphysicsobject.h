@@ -78,6 +78,8 @@ class GMRigidPhysicsObject : public GMPhysicsObject
 {
 	DECLARE_PRIVATE_AND_BASE(GMRigidPhysicsObject, GMPhysicsObject)
 
+	friend class GMDiscreteDynamicsWorld;
+
 public:
 	GMRigidPhysicsObject() = default;
 	~GMRigidPhysicsObject();
@@ -88,6 +90,14 @@ public:
 
 private:
 	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);
+
+//GMDiscreteDynamicsWorld
+	btRigidBody* getRigidBody()
+	{
+		D(d);
+		GM_ASSERT(d->body);
+		return d->body;
+	}
 };
 
 END_NS

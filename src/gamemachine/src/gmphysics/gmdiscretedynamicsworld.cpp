@@ -38,4 +38,5 @@ void GMDiscreteDynamicsWorld::addRigidObjects(AUTORELEASE GMRigidPhysicsObject* 
 {
 	D(d);
 	d->rigidObjs.push_back(rigidObj);
+	d->worldImpl->addRigidBody(rigidObj->getRigidBody());
 }

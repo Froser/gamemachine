@@ -7,6 +7,7 @@ GMRigidPhysicsObject::~GMRigidPhysicsObject()
 {
 	D(d);
 	GM_delete(d->shape);
+	GM_delete(d->body);
 }
 
 void GMRigidPhysicsObject::setMass(GMfloat mass)
