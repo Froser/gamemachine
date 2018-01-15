@@ -59,7 +59,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 
 	// 实体
 	GMfloat t[24];
-	for (GMint i = 0; i < 24; i++)
+	for (GMint i = 0; i < 24; ++i)
 	{
 		t[i] = extents[i % 3] * v[i];
 	}
@@ -70,10 +70,10 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 		GMComponent* component = new GMComponent(body);
-		for (GMint i = 0; i < 12; i++)
+		for (GMint i = 0; i < 12; ++i)
 		{
 			component->beginFace();
-			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
 				GMint idx_next = i * 3 + (j + 1) % 3;
@@ -128,7 +128,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 
 	// 实体
 	GMfloat t[12];
-	for (GMint i = 0; i < 12; i++)
+	for (GMint i = 0; i < 12; ++i)
 	{
 		t[i] = extents[i % 3] * v[i] + position[i % 3];
 	}
@@ -139,10 +139,10 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 		GMComponent* component = new GMComponent(body);
-		for (GMint i = 0; i < 2; i++)
+		for (GMint i = 0; i < 2; ++i)
 		{
 			component->beginFace();
-			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
+			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
 				GMint idx_next = i * 3 + (j + 1) % 3;

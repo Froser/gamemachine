@@ -24,7 +24,11 @@ void Demo_Collision::init()
 	rigidGround->setMass(.0f); //static object
 	rigidGround->initAsBoxShape(glm::vec3(50, 50, 50));
 
+	// add to physics world
 	physicsWorld->addRigidObjects(rigidGround);
+
+	// add to graphic world
+	d->demoWorld->addObject(L"ground", d->ground);
 }
 
 void Demo_Collision::event(gm::GameMachineEvent evt)
@@ -40,6 +44,7 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::Simulate:
 		break;
 	case gm::GameMachineEvent::Render:
+		d->demoWorld->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
 		break;

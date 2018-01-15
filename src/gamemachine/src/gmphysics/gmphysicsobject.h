@@ -55,9 +55,16 @@ public:
 private:
 	inline void setGameObject(GMGameObject* gameObject)
 	{
-		D(d); 
+		D(d);
 		GM_ASSERT(!d->gameObject);
 		d->gameObject = gameObject;
+	}
+
+public:
+	GMGameObject* getGameObject()
+	{
+		D(d);
+		return d->gameObject;
 	}
 };
 
@@ -97,6 +104,13 @@ private:
 		D(d);
 		GM_ASSERT(d->body);
 		return d->body;
+	}
+
+	btCollisionShape* getShape()
+	{
+		D(d);
+		GM_ASSERT(d->shape);
+		return d->shape;
 	}
 };
 
