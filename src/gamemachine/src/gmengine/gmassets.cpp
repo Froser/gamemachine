@@ -42,9 +42,18 @@ GMAsset GMAssets::insertAsset(GMAssetType type, void* asset)
 {
 	D(d);
 	// 使用匿名的asset，意味着它不需要被第二次找到，直接放入vector
+	GMAsset ast;
+	ast.type = type;
+	ast.asset = asset;
+
+	for (auto& node : d->orphans)
+	{
+		if (node->asset == ast)
+			return ast;
+	}
+
 	GMAssetsNode* node = new GMAssetsNode();
-	node->asset.type = type;
-	node->asset.asset = asset;
+	node->asset = ast;
 	d->orphans.push_back(node);
 	return node->asset;
 }

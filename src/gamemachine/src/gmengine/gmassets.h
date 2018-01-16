@@ -29,6 +29,11 @@ struct GMAsset
 	void* asset = nullptr;
 };
 
+inline bool operator ==(const GMAsset& a, const GMAsset& b)
+{
+	return a.type == b.type && a.asset == b.asset;
+}
+
 // 使用一种（多叉）树状结构，保存游戏中的资产
 // 资产的根节点叫作root
 #define ASSET_GETTER(retType, funcName, predictType)	\

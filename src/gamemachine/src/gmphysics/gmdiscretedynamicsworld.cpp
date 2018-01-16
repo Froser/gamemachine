@@ -16,7 +16,7 @@ GMDiscreteDynamicsWorld::GMDiscreteDynamicsWorld(GMGameWorld* world)
 	d->worldImpl = new btDiscreteDynamicsWorld(d->dispatcher, d->overlappingPairCache, d->solver, d->collisionConfiguration);
 }
 
-void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)
+GMDiscreteDynamicsWorld::~GMDiscreteDynamicsWorld()
 {
 	D(d);
 	GM_delete(d->collisionConfiguration);
@@ -29,6 +29,13 @@ void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)
 	{
 		GM_delete(obj);
 	}
+}
+
+void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)
+{
+	D(d);
+	GM_ASSERT(d->worldImpl);
+	d->worldImpl->stepSimulation(GM.getGameMachineRunningStates().lastFrameElpased);
 }
 
 void GMDiscreteDynamicsWorld::setGravity(const glm::vec3& gravity)

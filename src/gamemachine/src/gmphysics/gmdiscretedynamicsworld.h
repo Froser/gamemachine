@@ -22,6 +22,7 @@ class GMDiscreteDynamicsWorld : public GMPhysicsWorld
 
 public:
 	GMDiscreteDynamicsWorld(GMGameWorld* world);
+	~GMDiscreteDynamicsWorld();
 
 public:
 	void setGravity(const glm::vec3& gravity);
