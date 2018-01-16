@@ -3,6 +3,14 @@
 #include <gmdiscretedynamicsworld.h>
 #include <linearmath.h>
 #include <gmphysicsshape.h>
+#include <gmbullethelper.h>
+
+namespace
+{
+	const gm::GMint ARRAY_SIZE_X = 5;
+	const gm::GMint ARRAY_SIZE_Y = 5;
+	const gm::GMint ARRAY_SIZE_Z = 5;
+}
 
 Demo_Collision::~Demo_Collision()
 {
@@ -26,61 +34,50 @@ void Demo_Collision::init()
 
 	gm::GMPhysicsShape* groundShape = nullptr;
 	gm::GMPhysicsShapeCreator::createBoxShape(glm::vec3(50, 50, 50), &groundShape);
-	rigidGround->setShape(groundShape);
+	rigidGround->setShape(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, groundShape));
+
+	gm::GMAsset groundShapeModel = gm::GMBulletHelper::createModelFromShape(groundShape);
+	d->ground->setModel(groundShapeModel);
+	d->demoWorld->getAssets().insertAsset(groundShapeModel);
 
 	// add to physics world
-	physicsWorld->addRigidObjects(rigidGround);
+	physicsWorld->addRigidObject(rigidGround);
 
 	// add to graphic world
 	d->demoWorld->addObject(L"ground", d->ground);
-	/*
+
 	// create box
 	{
-		//create a few dynamic rigidbodies
+		// create a few dynamic rigidbodies
 		// Re-using the same collision is better for memory usage and performance
-		gm::GMRigidPhysicsObject* box = new gm::GMRigidPhysicsObject();
-		
+		gm::GMPhysicsShape* boxShape = nullptr;
+		gm::GMPhysicsShapeCreator::createBoxShape(glm::vec3(.1f, .1f, .1f), &boxShape);
+		gm::GMAsset boxAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, boxShape);
 
-		btBoxShape* colShape = createBoxShape(btVector3(.1, .1, .1));
-
-
-		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-		m_collisionShapes.push_back(colShape);
-
-		/// Create Dynamic Objects
-		btTransform startTransform;
-		startTransform.setIdentity();
-
-		btScalar	mass(1.f);
-
-		//rigidbody is dynamic if and only if mass is non zero, otherwise static
-		bool isDynamic = (mass != 0.f);
-
-		btVector3 localInertia(0, 0, 0);
-		if (isDynamic)
-			colShape->calculateLocalInertia(mass, localInertia);
-
-
-		for (int k = 0; k < ARRAY_SIZE_Y; k++)
+		// create dynamic objects
+		// rigidbody is dynamic if and only if mass is non zero, otherwise static
+		for (gm::GMint k = 0; k < ARRAY_SIZE_Y; k++)
 		{
-			for (int i = 0; i < ARRAY_SIZE_X; i++)
+			for (gm::GMint i = 0; i < ARRAY_SIZE_X; i++)
 			{
-				for (int j = 0; j < ARRAY_SIZE_Z; j++)
+				for (gm::GMint j = 0; j < ARRAY_SIZE_Z; j++)
 				{
-					startTransform.setOrigin(btVector3(
-						btScalar(0.2*i),
-						btScalar(2 + .2*k),
-						btScalar(0.2*j)));
+					gm::GMRigidPhysicsObject* rigidBoxObj = new gm::GMRigidPhysicsObject();
+					rigidBoxObj->setMass(1.f);
 
+					gm::GMGameObject* box = new gm::GMGameObject();
+					box->setTranslation(glm::translate(glm::vec3(.2f * i, 2 + .2f*k, .2f * j)));
+					box->setPhysicsObject(rigidBoxObj);
 
-					createRigidBody(mass, startTransform, colShape);
+					rigidBoxObj->setShape(boxAsset);
+					//TODO rigidBoxObj->createMeshForObject(d->demoWorld);
+					physicsWorld->addRigidObject(rigidBoxObj);
 
-
+					d->demoWorld->addObject(gm::GMString(i), box);
 				}
 			}
 		}
 	}
-	*/
 }
 
 void Demo_Collision::event(gm::GameMachineEvent evt)
@@ -115,7 +112,7 @@ void Demo_Collision::setLookAt()
 	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = glm::normalize(glm::vec3(-50, 30, 40));
+	lookAt.lookAt = glm::normalize(glm::vec3(1, 1, 1));
 	camera.lookAt(lookAt);
 }
 

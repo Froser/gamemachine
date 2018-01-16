@@ -33,6 +33,11 @@ void GMAssets::clearOrphans()
 	}
 }
 
+GMAsset GMAssets::insertAsset(const GMAsset& asset)
+{
+	return insertAsset(asset.type, asset.asset);
+}
+
 GMAsset GMAssets::insertAsset(GMAssetType type, void* asset)
 {
 	D(d);

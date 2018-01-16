@@ -14,8 +14,12 @@ class GMPhysicsShape : public GMObject
 {
 	DECLARE_PRIVATE(GMPhysicsShape);
 
-public:
+	friend struct GMPhysicsShapeCreator;
+
+private:
 	GMPhysicsShape() = default;
+
+public:
 	~GMPhysicsShape();
 
 public:
@@ -27,6 +31,7 @@ public:
 struct GMPhysicsShapeCreator
 {
 	static void createBoxShape(const glm::vec3& halfExtents, OUT GMPhysicsShape** shape);
+	static void createMeshFromShape(GMPhysicsShape* shape, GMGameObject* gameObject, GMGameWorld* world);
 };
 
 END_NS

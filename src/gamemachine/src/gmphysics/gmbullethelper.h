@@ -2,17 +2,14 @@
 #define __GMBULLETHELPER_H__
 #include <gmcommon.h>
 #include "gmbulletforward.h"
-#include "gmbulletincludes.h"
+#include <gmassets.h>
 BEGIN_NS
 
+class GMPhysicsShape;
 struct GMBulletHelper
 {
-	static void collisionShape2TriangleMesh(
-		btCollisionShape* collisionShape,
-		const btTransform& parentTransform,
-		btAlignedObjectArray<btVector3>& vertexPositions,
-		btAlignedObjectArray<btVector3>& vertexNormals,
-		btAlignedObjectArray<int>& indicesOut);
+	static GMAsset createModelFromShape(
+		GMPhysicsShape* shape);
 };
 
 END_NS

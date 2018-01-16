@@ -1,18 +1,23 @@
 ﻿#include "stdafx.h"
 #include "gmbullethelper.h"
 #include "gmbulletincludes.h"
-
-void GMBulletHelper::collisionShape2TriangleMesh(
-	btCollisionShape* collisionShape,
-	const btTransform& parentTransform,
-	btAlignedObjectArray<btVector3>& vertexPositions,
-	btAlignedObjectArray<btVector3>& vertexNormals,
-	btAlignedObjectArray<GMint>& indicesOut)
+#include <gmmodel.h>
+#include <gmassets.h>
+#include <gmgameobject.h>
+#include <gmgameworld.h>
+namespace
 {
-//	switch (collisionShape->getShapeType())
-//	{
-//	default:
-//	{
+	void collisionShape2TriangleMesh(
+		btCollisionShape* collisionShape,
+		const btTransform& parentTransform,
+		btAlignedObjectArray<btVector3>& vertexPositions,
+		btAlignedObjectArray<btVector3>& vertexNormals,
+		btAlignedObjectArray<GMint>& indicesOut)
+	{
+		//	switch (collisionShape->getShapeType())
+		//	{
+		//	default:
+		//	{
 		if (collisionShape->isConvex())
 		{
 			btConvexShape* convex = static_cast<btConvexShape*>(collisionShape);
@@ -41,6 +46,64 @@ void GMBulletHelper::collisionShape2TriangleMesh(
 			}
 			GM_delete(hull);
 		}
-//	}
-//	}
+		//	}
+		//	}
+	}
+
+
+	void createModelFromCollisionShape(
+		btCollisionShape* shape,
+		const glm::vec3& color,
+		OUT GMModel** model)
+	{
+		GMModel* out = *model = new GMModel();
+
+		btTransform origin;
+		origin.setIdentity();
+
+		btAlignedObjectArray<btVector3> vertexPositions;
+		btAlignedObjectArray<btVector3> vertexNormals;
+		btAlignedObjectArray<GMint> indices;
+		collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
+
+		GMMesh* body = out->getMesh();
+		GMComponent* component = new GMComponent(body);
+		component->getShader().getMaterial().ka = color;
+		component->getShader().setCull(GMS_Cull::NONE);
+		GMint faceCount = indices.size() / 3;
+		for (GMint i = 0; i < faceCount; ++i)
+		{
+			component->beginFace();
+			for (GMint j = 0; j < 3; ++j)
+			{
+				GMint idx = i * 3 + j;
+				const btVector3& vertex = vertexPositions[indices[idx]];
+				const btVector3& normal = vertexNormals[indices[idx]];
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+			}
+			component->endFace();
+		}
+	}
+}
+
+GMAsset GMBulletHelper::createModelFromShape(
+	GMPhysicsShape* shape)
+{
+	btCollisionShape* cs = shape->getBulletShape();
+	GMAsset asset;
+	if (cs->getUserPointer())
+	{
+		asset.asset = static_cast<GMModel*>(cs->getUserPointer());
+		asset.type = GMAssetType::Model;
+	}
+	else
+	{
+		GMModel* model = nullptr;
+		createModelFromCollisionShape(cs, glm::vec3(1, 0, 0), &model);
+		asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
+		cs->setUserPointer(asset.asset);
+	}
+	GM_ASSERT(asset.asset);
+	return asset;
 }

@@ -3,6 +3,7 @@
 #include "gmbulletincludes.h"
 #include <gmgameobject.h>
 #include "gmphysicsshape.h"
+#include "gmbullethelper.h"
 
 GMRigidPhysicsObject::~GMRigidPhysicsObject()
 {
@@ -16,11 +17,11 @@ void GMRigidPhysicsObject::setMass(GMfloat mass)
 	d->mass = mass;
 }
 
-void GMRigidPhysicsObject::setShape(GMPhysicsShape* shape)
+void GMRigidPhysicsObject::setShape(GMAsset shape)
 {
 	D(d);
 	D_BASE(db, Base);
-	d->shape = shape;
+	d->shape = GMAssets::getPhysicsShape(shape);
 
 	const glm::mat4& translation = db->gameObject->getTranslation();
 	btTransform trans;

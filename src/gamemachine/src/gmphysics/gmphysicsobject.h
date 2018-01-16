@@ -4,6 +4,8 @@
 #include <map>
 #include <linearmath.h>
 #include "gmbulletforward.h"
+#include <gmassets.h>
+
 BEGIN_NS
 
 GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
@@ -87,7 +89,13 @@ public:
 	~GMRigidPhysicsObject();
 
 public:
-	void setShape(GMPhysicsShape* shape);
+	//! 将一个物理形状与此物理对象相关联。
+	/*!
+	  可以用同一个物理形状关联多个物理对象。此方法将构造出物理对象的所有属性，因此，应该在其调用之前设置好所有的物理参数，并且与一个GMGameObject绑定。
+	  \param shape GMAssetType为PhysicsShape的物理形状资产。
+	  \sa GMAsset, GMGameObject::setPhysicsObject()
+	*/
+	void setShape(GMAsset shape);
 	void setMass(GMfloat mass);
 
 private:

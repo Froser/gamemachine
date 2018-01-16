@@ -66,6 +66,7 @@ public:
 	ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
 
 public:
+	GMAsset insertAsset(const GMAsset& asset);
 	GMAsset insertAsset(GMAssetType type, void* asset);
 	GMAsset insertAsset(const GMString& path, const GMString& name, GMAssetType type, void* asset);
 	GMAssetsNode* getNodeFromPath(const GMString& path, bool createIfNotExists = false);

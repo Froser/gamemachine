@@ -25,7 +25,7 @@ public:
 
 public:
 	void setGravity(const glm::vec3& gravity);
-	void addRigidObjects(AUTORELEASE GMRigidPhysicsObject* rigidObj);
+	void addRigidObject(AUTORELEASE GMRigidPhysicsObject* rigidObj);
 
 public:
 	virtual void simulate(GMGameObject* obj) override;

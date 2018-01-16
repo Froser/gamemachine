@@ -2,6 +2,9 @@
 #include "gmphysicsshape.h"
 #include "gmbulletincludes.h"
 #include <linearmath.h>
+#include <gmmodel.h>
+#include <gmassets.h>
+#include "gmbullethelper.h"
 
 GMPhysicsShape::~GMPhysicsShape()
 {
@@ -26,6 +29,9 @@ const btCollisionShape* GMPhysicsShape::getBulletShape() const
 	D(d);
 	return d->shape;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// Helper
 
 void GMPhysicsShapeCreator::createBoxShape(const glm::vec3& halfExtents, OUT GMPhysicsShape** shape)
 {
