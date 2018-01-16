@@ -4,7 +4,7 @@
 #include <tools.h>
 #include <gmmodel.h>
 #include <linearmath.h>
-#include <gmphysics.h>
+#include <gmphysicsworld.h>
 
 BEGIN_NS
 

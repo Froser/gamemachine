@@ -68,17 +68,12 @@ public:
 	}
 };
 
-enum class GMShapeType
-{
-	Box,
-};
-
+class GMPhysicsShape;
 GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 {
 	btRigidBody* body = nullptr;
-	btCollisionShape* shape = nullptr;
+	GMPhysicsShape* shape = nullptr;
 	GMfloat mass = 0;
-	GMShapeType type;
 };
 
 class GMRigidPhysicsObject : public GMPhysicsObject
@@ -92,7 +87,7 @@ public:
 	~GMRigidPhysicsObject();
 
 public:
-	void initAsBoxShape(const glm::vec3& halfExtents);
+	void setShape(GMPhysicsShape* shape);
 	void setMass(GMfloat mass);
 
 private:
@@ -106,7 +101,7 @@ private:
 		return d->body;
 	}
 
-	btCollisionShape* getShape()
+	GMPhysicsShape* getShape()
 	{
 		D(d);
 		GM_ASSERT(d->shape);

@@ -2,7 +2,8 @@
 #define __GMASSETS_H__
 #include <gmcommon.h>
 #include <set>
-#include "../gmdata/gmmodel.h"
+#include <gmmodel.h>
+#include <gmphysicsshape.h>
 BEGIN_NS
 
 // 默认的一些资产路径
@@ -19,6 +20,7 @@ enum class GMAssetType
 	None, //!< 无类型，绝对不会用到
 	Texture, //!< 纹理贴图类型
 	Model, //!< 模型类型
+	PhysicsShape, //!< 物理形状类型
 };
 
 struct GMAsset
@@ -61,6 +63,7 @@ public:
 public:
 	ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
 	ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
+	ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
 
 public:
 	GMAsset insertAsset(GMAssetType type, void* asset);

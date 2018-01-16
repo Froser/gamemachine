@@ -183,6 +183,9 @@ void GMAssets::deleteAsset(GMAssetsNode* node)
 	case GMAssetType::Model:
 		GM_delete(getModel(node->asset));
 		break;
+	case GMAssetType::PhysicsShape:
+		GM_delete(getPhysicsShape(node->asset));
+		break;
 	default:
 		GM_ASSERT(false);
 		break;

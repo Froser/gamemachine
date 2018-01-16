@@ -1,7 +1,7 @@
 ﻿#ifndef __GMDISCRETEDYNAMICSWORLD_H__
 #define __GMDISCRETEDYNAMICSWORLD_H__
 #include <gmcommon.h>
-#include "gmphysics.h"
+#include "gmphysicsworld.h"
 #include "gmbulletforward.h"
 
 BEGIN_NS

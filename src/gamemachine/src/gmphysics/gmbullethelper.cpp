@@ -9,10 +9,10 @@ void GMBulletHelper::collisionShape2TriangleMesh(
 	btAlignedObjectArray<btVector3>& vertexNormals,
 	btAlignedObjectArray<GMint>& indicesOut)
 {
-	switch (collisionShape->getShapeType())
-	{
-	default:
-	{
+//	switch (collisionShape->getShapeType())
+//	{
+//	default:
+//	{
 		if (collisionShape->isConvex())
 		{
 			btConvexShape* convex = static_cast<btConvexShape*>(collisionShape);
@@ -41,6 +41,6 @@ void GMBulletHelper::collisionShape2TriangleMesh(
 			}
 			GM_delete(hull);
 		}
-	}
-	}
+//	}
+//	}
 }

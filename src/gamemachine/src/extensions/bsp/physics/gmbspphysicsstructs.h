@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 #include <linearmath.h>
 #include <gmbsp.h>
-#include <gmphysics.h>
+#include <gmphysicsworld.h>
 BEGIN_NS
 
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )

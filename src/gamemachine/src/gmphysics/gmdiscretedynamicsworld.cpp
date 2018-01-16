@@ -22,14 +22,19 @@ namespace
 		GMMesh* body = out->getMesh();
 		GMComponent* component = new GMComponent(body);
 		component->getShader().getMaterial().ka = color;
-		GMint vertexCount = indices.size() / 3;
-		for (GMint i = 0; i < vertexCount; ++i)
+		component->getShader().setCull(GMS_Cull::NONE);
+		GMint faceCount = indices.size() / 3;
+		for (GMint i = 0; i < faceCount; ++i)
 		{
 			component->beginFace();
-			const btVector3& vertex = vertexPositions[indices[i]];
-			const btVector3& normal = vertexNormals[indices[i]];
-			component->vertex(vertex[0], vertex[1], vertex[2]);
-			component->normal(normal[0], normal[1], normal[2]);
+			for (GMint j = 0; j < 3; ++j)
+			{
+				GMint idx = i * 3 + j;
+				const btVector3& vertex = vertexPositions[indices[idx]];
+				const btVector3& normal = vertexNormals[indices[idx]];
+				component->vertex(vertex[0], vertex[1], vertex[2]);
+				component->normal(normal[0], normal[1], normal[2]);
+			}
 			component->endFace();
 		}
 	}
@@ -75,7 +80,7 @@ void GMDiscreteDynamicsWorld::addRigidObjects(AUTORELEASE GMRigidPhysicsObject* 
 	d->worldImpl->addRigidBody(rigidObj->getRigidBody());
 
 	// Create mesh
-	btCollisionShape* shape = rigidObj->getShape();
+	btCollisionShape* shape = rigidObj->getShape()->getBulletShape();
 	GMAsset asset;
 	if (shape->getUserPointer())
 	{
@@ -85,7 +90,7 @@ void GMDiscreteDynamicsWorld::addRigidObjects(AUTORELEASE GMRigidPhysicsObject* 
 	else
 	{
 		GMModel* model = nullptr;
-		createModelFromCollisionShape(rigidObj->getShape(), glm::vec3(1, 0, 0), &model);
+		createModelFromCollisionShape(shape, glm::vec3(1, 0, 0), &model);
 		asset = db->world->getAssets().insertAsset(GMAssetType::Model, model);
 		shape->setUserPointer(asset.asset);
 	}

@@ -23,6 +23,10 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineEvent evt) override;
+
+protected:
+	virtual void setLookAt() override;
+	virtual void setDefaultLights() override;
 };
 
 #endif

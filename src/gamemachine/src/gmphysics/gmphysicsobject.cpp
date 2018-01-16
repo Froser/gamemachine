@@ -2,11 +2,11 @@
 #include "gmphysicsobject.h"
 #include "gmbulletincludes.h"
 #include <gmgameobject.h>
+#include "gmphysicsshape.h"
 
 GMRigidPhysicsObject::~GMRigidPhysicsObject()
 {
 	D(d);
-	GM_delete(d->shape);
 	GM_delete(d->body);
 }
 
@@ -16,12 +16,11 @@ void GMRigidPhysicsObject::setMass(GMfloat mass)
 	d->mass = mass;
 }
 
-void GMRigidPhysicsObject::initAsBoxShape(const glm::vec3& halfExtents)
+void GMRigidPhysicsObject::setShape(GMPhysicsShape* shape)
 {
 	D(d);
 	D_BASE(db, Base);
-	d->type = GMShapeType::Box;
-	d->shape = new btBoxShape(btVector3(halfExtents[0], halfExtents[1], halfExtents[2]));
+	d->shape = shape;
 
 	const glm::mat4& translation = db->gameObject->getTranslation();
 	btTransform trans;
@@ -36,15 +35,15 @@ void GMRigidPhysicsObject::initAsBoxShape(const glm::vec3& halfExtents)
 void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color)
 {
 	D(d);
-	GM_ASSERT((!d->shape || d->shape->getShapeType() != INVALID_SHAPE_PROXYTYPE));
+	btCollisionShape* shape = d->shape->getBulletShape();
 	bool isDynamic = (mass != 0.f);
 
 	btVector3 localInertia(0, 0, 0);
 	if (isDynamic)
-		d->shape->calculateLocalInertia(mass, localInertia);
+		shape->calculateLocalInertia(mass, localInertia);
 
 	btDefaultMotionState* motionState = new btDefaultMotionState(startTransform);
-	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, motionState, d->shape, localInertia);
+	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, motionState, shape, localInertia);
 
 	d->body = new btRigidBody(cInfo);
 }

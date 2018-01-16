@@ -8,6 +8,13 @@ BEGIN_NS
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
+	GMCameraLookAt(const glm::vec3& _lookAt, const glm::vec3& _position, const glm::vec3& _up)
+		: lookAt(_lookAt)
+		, position(_position)
+		, up(_up)
+	{
+	}
+
 	GMCameraLookAt(const glm::vec3& _lookAt, const glm::vec3& _position)
 		: lookAt(_lookAt)
 		, position(_position)
@@ -16,6 +23,7 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 
 	glm::vec3 lookAt = glm::zero<glm::vec3>(); //!< 摄像机朝向，单位向量指示其方向
 	glm::vec3 position = glm::zero<glm::vec3>(); //!< 摄像机位置
+	glm::vec3 up = glm::vec3(0, 1, 0);
 };
 
 GM_ALIGNED_STRUCT(GMPositionState)
@@ -26,7 +34,7 @@ GM_ALIGNED_STRUCT(GMPositionState)
 
 inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)
 {
-	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, glm::vec3(0, 1, 0));
+	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
 }
 
 //Frustum

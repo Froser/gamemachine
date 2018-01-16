@@ -1,7 +1,7 @@
 ﻿#ifndef __GMSPRITEGAMEOBJECT_H__
 #define __GMSPRITEGAMEOBJECT_H__
 #include <gmcommon.h>
-#include <gmphysics.h>
+#include <gmphysicsworld.h>
 #include <gmcamera.h>
 #include "gmgameobject.h"
 BEGIN_NS

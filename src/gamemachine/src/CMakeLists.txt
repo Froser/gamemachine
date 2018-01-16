@@ -89,6 +89,8 @@ set(SOURCES
 		gmgl/shader_constants.h
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp
+		gmphysics/gmphysicsshape.h
+		gmphysics/gmphysicsshape.cpp
 		gmphysics/gmphysicsobject.h
 		gmphysics/gmphysicsobject.cpp
 		gmphysics/gmdiscretedynamicsworld.h
