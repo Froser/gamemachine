@@ -157,7 +157,7 @@ GMMesh::~GMMesh()
 	D(d);
 	for (auto component : d->components)
 	{
-		delete component;
+		GM_delete(component);
 	}
 }
 

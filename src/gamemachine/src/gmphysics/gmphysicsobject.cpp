@@ -21,6 +21,7 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 {
 	D(d);
 	D_BASE(db, Base);
+	GM_ASSERT(!d->shape);
 	d->shape = GMAssets::getPhysicsShape(shape);
 
 	const glm::mat4& translation = db->gameObject->getTranslation();

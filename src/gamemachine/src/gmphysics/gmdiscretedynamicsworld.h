@@ -30,6 +30,9 @@ public:
 
 public:
 	virtual void simulate(GMGameObject* obj) override;
+
+private:
+	void syncTransform();
 };
 
 END_NS

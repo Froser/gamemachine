@@ -8,8 +8,9 @@ BEGIN_NS
 class GMPhysicsShape;
 struct GMBulletHelper
 {
-	static GMAsset createModelFromShape(
-		GMPhysicsShape* shape);
+	static void createModelFromShape(
+		GMPhysicsShape* shape,
+		OUT GMModel** model);
 };
 
 END_NS

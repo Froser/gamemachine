@@ -53,7 +53,6 @@ namespace
 
 	void createModelFromCollisionShape(
 		btCollisionShape* shape,
-		const glm::vec3& color,
 		OUT GMModel** model)
 	{
 		GMModel* out = *model = new GMModel();
@@ -68,7 +67,6 @@ namespace
 
 		GMMesh* body = out->getMesh();
 		GMComponent* component = new GMComponent(body);
-		component->getShader().getMaterial().ka = color;
 		component->getShader().setCull(GMS_Cull::NONE);
 		GMint faceCount = indices.size() / 3;
 		for (GMint i = 0; i < faceCount; ++i)
@@ -87,23 +85,10 @@ namespace
 	}
 }
 
-GMAsset GMBulletHelper::createModelFromShape(
-	GMPhysicsShape* shape)
+void GMBulletHelper::createModelFromShape(
+	GMPhysicsShape* shape,
+	OUT GMModel** model)
 {
 	btCollisionShape* cs = shape->getBulletShape();
-	GMAsset asset;
-	if (cs->getUserPointer())
-	{
-		asset.asset = static_cast<GMModel*>(cs->getUserPointer());
-		asset.type = GMAssetType::Model;
-	}
-	else
-	{
-		GMModel* model = nullptr;
-		createModelFromCollisionShape(cs, glm::vec3(1, 0, 0), &model);
-		asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
-		cs->setUserPointer(asset.asset);
-	}
-	GM_ASSERT(asset.asset);
-	return asset;
+	createModelFromCollisionShape(cs, model);
 }

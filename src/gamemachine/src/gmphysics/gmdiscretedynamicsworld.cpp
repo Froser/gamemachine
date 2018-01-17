@@ -34,8 +34,26 @@ GMDiscreteDynamicsWorld::~GMDiscreteDynamicsWorld()
 void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)
 {
 	D(d);
+	D_BASE(db, Base);
 	GM_ASSERT(d->worldImpl);
 	d->worldImpl->stepSimulation(GM.getGameMachineRunningStates().lastFrameElpased);
+	syncTransform();
+}
+
+void GMDiscreteDynamicsWorld::syncTransform()
+{
+	D(d);
+	for (auto& rigid : d->rigidObjs)
+	{
+		btRigidBody* body = rigid->getRigidBody();
+		const btTransform& transform = body->getWorldTransform();
+		btVector3 pos = transform.getOrigin();
+		btQuaternion rotation = transform.getRotation();
+
+		GMGameObject* gameObject = rigid->getGameObject();
+		gameObject->setTranslation(glm::translate(glm::vec3(pos[0], pos[1], pos[2])));
+		gameObject->setRotation(glm::quat(rotation[0], rotation[1], rotation[2], rotation[3]));
+	}
 }
 
 void GMDiscreteDynamicsWorld::setGravity(const glm::vec3& gravity)
