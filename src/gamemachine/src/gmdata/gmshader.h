@@ -66,7 +66,7 @@ public:
 		return d->lightColor;
 	}
 
-	void setLightPosition(GMfloat light[3])
+	void setLightPosition(const GMfloat light[3])
 	{
 		D(d);
 		d->lightPosition[0] = light[0];

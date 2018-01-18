@@ -47,6 +47,15 @@ void Demo_Collision::init()
 	gm::GMModel* groundShapeModel = nullptr;
 	gm::GMBulletHelper::createModelFromShape(groundShape, &groundShapeModel);
 	GM_ASSERT(groundShapeModel);
+
+	auto& components = groundShapeModel->getMesh()->getComponents();
+	for (auto& component : components)
+	{
+		component->getShader().getMaterial().ka = glm::vec3(.8125f / .7f, .644f / .7f, .043f / .7f);
+		component->getShader().getMaterial().kd = glm::vec3(.1f);
+		component->getShader().getMaterial().ks = glm::vec3(.4f);
+		component->getShader().getMaterial().shininess = 9;
+	}
 	d->ground->setModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, groundShapeModel));
 
 	// add to physics world
@@ -84,6 +93,9 @@ void Demo_Collision::init()
 					for (auto& component : components)
 					{
 						component->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
+						component->getShader().getMaterial().kd = glm::vec3(.1f);
+						component->getShader().getMaterial().ks = glm::vec3(.4f);
+						component->getShader().getMaterial().shininess = 99;
 					}
 
 					box->setModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, boxShapeModel));
@@ -129,8 +141,8 @@ void Demo_Collision::setLookAt()
 	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = glm::normalize(glm::vec3(0, 0, 1));
-	lookAt.position = glm::vec3(0, 0, 0);
+	lookAt.lookAt = glm::normalize(glm::vec3(.5f, -.3f, 1));
+	lookAt.position = glm::vec3(-1, 2, -3);
 	camera.lookAt(lookAt);
 }
 
@@ -140,9 +152,15 @@ void Demo_Collision::setDefaultLights()
 	D(d);
 	if (isInited())
 	{
-		gm::GMLight light(gm::GMLightType::AMBIENT);
-		gm::GMfloat color[] = { .7f, .7f, .7f };
-		light.setLightColor(color);
-		GM.getGraphicEngine()->addLight(light);
+		gm::GMLight a(gm::GMLightType::AMBIENT);
+		gm::GMfloat colorA[] = { .7f, .7f, .7f };
+		a.setLightColor(colorA);
+		GM.getGraphicEngine()->addLight(a);
+
+		gm::GMLight d(gm::GMLightType::SPECULAR);
+		gm::GMfloat colorD[] = { .7f, .7f, .7f };
+		d.setLightColor(colorD);
+		d.setLightPosition(glm::value_ptr(glm::vec3(-1.f, .5f, -3.f)));
+		GM.getGraphicEngine()->addLight(d);
 	}
 }
