@@ -55,7 +55,7 @@ GMGlyphObject::~GMGlyphObject()
 		GM_delete(d->typoEngine);
 }
 
-void GMGlyphObject::setText(const GMwchar* text)
+void GMGlyphObject::setText(const GMString& text)
 {
 	D(d);
 	d->text = text;
@@ -500,8 +500,8 @@ void GMImage2DGameObject::setImage(GMAsset& image)
 void GMImage2DGameObject::setText(const GMString& text)
 {
 	D(d);
-	d->text = text.toStdWString();
-	if (!d->text.empty())
+	d->text = text;
+	if (!d->text.isEmpty())
 		d->textModel = new GMGlyphObject();
 }
 
@@ -678,7 +678,7 @@ void GMImage2DGameObject::createGlyphs()
 
 		d->textModel->setGeometry(geometry);
 		d->textModel->setWorld(getWorld());
-		d->textModel->setText(d->text.c_str());
+		d->textModel->setText(d->text);
 		d->textModel->onAppendingObjectToWorld();
 		GM.createModelPainter(d->textModel->getModel());
 		GMAssets::createIsolatedAsset(GMAssetType::Model, d->textModel);

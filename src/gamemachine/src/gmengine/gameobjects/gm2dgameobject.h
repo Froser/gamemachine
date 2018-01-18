@@ -31,7 +31,7 @@ public:
 	~GMGlyphObject();
 
 public:
-	void setText(const GMwchar* text);
+	void setText(const GMString& text);
 	void update();
 
 public:
@@ -112,7 +112,7 @@ GM_PRIVATE_OBJECT(GMImage2DGameObject)
 	AUTORELEASE GMGlyphObject* textModel = nullptr;
 	AUTORELEASE GMControlGameObject* textMask = nullptr;
 	AUTORELEASE GMControlGameObject* background = nullptr;
-	std::wstring text;
+	GMString text;
 	GMImage2DBorder border;
 	GMint paddings[4] = { 0 };
 };
