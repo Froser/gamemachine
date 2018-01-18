@@ -125,15 +125,19 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 	renderer->endModel();
 }
 
-void GMGLModelPainter::dispose()
+void GMGLModelPainter::dispose(GMMeshData* md)
 {
 	D(d);
-	GMMesh* mesh = getModel()->getMesh();
-	GLuint vao[1] = { mesh->getArrayId() },
-		vbo[1] = { mesh->getBufferId() };
+	GLuint vao[1] = { md->getArrayId() },
+		vbo[1] = { md->getBufferId() };
 
+	GM_BEGIN_CHECK_GL_ERROR
 	glDeleteVertexArrays(1, vao);
+	GM_END_CHECK_GL_ERROR
+
+	GM_BEGIN_CHECK_GL_ERROR
 	glDeleteBuffers(1, vbo);
+	GM_END_CHECK_GL_ERROR
 
 	d->inited = false;
 }

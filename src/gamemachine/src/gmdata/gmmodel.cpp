@@ -3,22 +3,47 @@
 #include <linearmath.h>
 #include <algorithm>
 #include <iterator>
+#include "foundation/gamemachine.h"
 
 #define VERTEX_OFFSET(offset, idx) ((offset * GMModel::PositionDimension) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
+namespace
+{
+	GMModelPainter* getMeshDestructor()
+	{
+		static GMModelPainter* destructorPainter = nullptr;
+		if (!destructorPainter)
+		{
+			GM.getFactory()->createPainter(GM.getGraphicEngine(), nullptr, &destructorPainter);
+			GM_ASSERT(destructorPainter);
+		}
+		return destructorPainter;
+	}
+}
+
 GMModel::GMModel()
 {
 	D(d);
+	getMeshDestructor();
 	d->mesh = new GMMesh();
 }
 
 GMModel::~GMModel()
 {
 	D(d);
-	if (d->painter)
-		d->painter->dispose();
 	GM_delete(d->mesh);
+}
+
+void GMModel::releaseMesh()
+{
+	D(d);
+	d->mesh->releaseMeshData();
+}
+
+void GMMeshData::dispose()
+{
+	getMeshDestructor()->dispose(this);
 }
 
 GMComponent::GMComponent(GMMesh* parent)
@@ -150,11 +175,14 @@ void GMComponent::expand(GMuint count)
 
 GMMesh::GMMesh()
 {
+	D(d);
+	d->meshData = new GMMeshData();
 }
 
 GMMesh::~GMMesh()
 {
 	D(d);
+	releaseMeshData();
 	for (auto component : d->components)
 	{
 		GM_delete(component);
@@ -223,4 +251,12 @@ void GMMesh::calculateTangentSpace()
 			}
 		}
 	}
+}
+
+void GMMesh::releaseMeshData()
+{
+	D(d);
+	d->meshData->releaseRef();
+	if (d->meshData->hasNoRef())
+		GM_delete(d->meshData);
 }

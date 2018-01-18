@@ -23,7 +23,7 @@ public:
 public:
 	virtual void transfer() override;
 	virtual void draw(const GMGameObject* parent) override;
-	virtual void dispose() override;
+	virtual void dispose(GMMeshData* md) override;
 
 	virtual void beginUpdateBuffer(GMMesh* mesh) override;
 	virtual void endUpdateBuffer() override;

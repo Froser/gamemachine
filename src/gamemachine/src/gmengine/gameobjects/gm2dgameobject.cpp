@@ -93,9 +93,9 @@ void GMGlyphObject::updateModel()
 	D(d);
 	GMComponent* component = getModel()->getMesh()->getComponents()[0];
 	component->clear();
+	getModel()->releaseMesh();
 	createVertices(component);
 	GMModelPainter* painter = getModel()->getPainter();
-	painter->dispose();
 	painter->transfer();
 }
 

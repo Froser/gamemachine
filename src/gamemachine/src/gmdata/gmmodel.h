@@ -5,6 +5,7 @@
 #include <linearmath.h>
 #include <gmimage.h>
 #include <gmshader.h>
+#include <atomic>
 
 BEGIN_NS
 
@@ -17,6 +18,7 @@ GM_PRIVATE_OBJECT(GMModelPainter)
 };
 
 class GMMesh;
+class GMMeshData;
 class GMModelPainter : public GMObject
 {
 	DECLARE_PRIVATE(GMModelPainter)
@@ -31,7 +33,7 @@ public:
 public:
 	virtual void transfer() = 0;
 	virtual void draw(const GMGameObject* parent) = 0;
-	virtual void dispose() = 0;
+	virtual void dispose(GMMeshData* md) = 0;
 
 // 提供修改缓存的方法
 	virtual void beginUpdateBuffer(GMMesh* mesh) = 0;
@@ -160,6 +162,8 @@ public:
 	// 绘制方式
 	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
 	GMUsageHint getUsageHint() { D(d); return d->hint; }
+
+	void releaseMesh();
 };
 
 // 绘制时候的排列方式
@@ -170,6 +174,72 @@ enum class GMArrangementMode
 	Triangle_Strip,
 	Triangles,
 	Lines,
+};
+
+class GMMesh;
+GM_PRIVATE_OBJECT(GMMeshData)
+{
+	GMuint arrayId = 0;
+	GMuint bufferId = 0;
+	std::atomic<GMint> ref;
+};
+
+class GMMeshData : public GMObject
+{
+	DECLARE_PRIVATE(GMMeshData)
+	friend class GMMesh;
+
+	GMMeshData()
+	{
+		D(d);
+		d->ref = 1;
+	}
+
+	void dispose();
+
+	GMuint getArrayId()
+	{
+		D(d);
+		return d->arrayId;
+	}
+
+	GMuint getBufferId()
+	{
+		D(d);
+		return d->bufferId;
+	}
+
+	void setArrayId(GMuint id)
+	{
+		D(d);
+		d->arrayId = id;
+	}
+
+	void setBufferId(GMuint id)
+	{
+		D(d);
+		d->bufferId = id;
+	}
+
+	void addRef()
+	{
+		D(d);
+		++d->ref;
+	}
+
+	void releaseRef()
+	{
+		D(d);
+		--d->ref;
+		if (hasNoRef())
+			dispose();
+	}
+
+	bool hasNoRef()
+	{
+		D(d);
+		return d->ref == 0;
+	}
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
@@ -193,8 +263,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GM_DEFINE_VERTEX_DATA(colors); //顶点颜色，一般渲染不会用到这个，用于粒子绘制
 
 	bool disabledData[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
-	GMuint arrayId = 0;
-	GMuint bufferId = 0;
+	GMMeshData* meshData = nullptr;
 	Vector<GMComponent*> components;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
 	GMString name = L"default";
@@ -236,10 +305,17 @@ public:
 	inline GMArrangementMode getArrangementMode() { D(d); return d->mode; }
 	inline void setName(const char* name) { D(d); d->name = name; }
 	inline const GMString& getName() { D(d); return d->name; }
-	inline GMuint getBufferId() { D(d); return d->bufferId; }
-	inline GMuint getArrayId() { D(d); return d->arrayId; }
-	inline void setBufferId(GMuint id) { D(d); d->bufferId = id; }
-	inline void setArrayId(GMuint id) { D(d); d->arrayId = id; }
+	inline GMuint getBufferId() { D(d); return d->meshData->getBufferId(); }
+	inline GMuint getArrayId() { D(d); return d->meshData->getArrayId(); }
+	inline void setBufferId(GMuint id) { D(d); d->meshData->setBufferId(id); }
+	inline void setArrayId(GMuint id) { D(d); d->meshData->setArrayId(id); }
+
+public:
+	//! 释放一个网格数据
+	/*!
+	  将网格所绑定的数据的引用计数减一，如果网格数据引用计数为0，则从GPU中删除顶点数据，并析构此网格数据，且将其置为空。
+	*/
+	void releaseMeshData();
 };
 
 #define IF_ENABLED(mesh, type) if (!mesh->isDataDisabled(type))
