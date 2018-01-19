@@ -19,11 +19,9 @@ GMModel::GMModel(GMModel& model)
 	D(d);
 	GMMesh* mesh = model.getMesh();
 
-	// 必须要接受一个已经拥有painter且transfer过的Model
 	if (!model.getPainter())
 		GM.createModelPainterAndTransfer(&model);
-
-	needNotTransferAnymore(); // 不需要再被GMModelPainter传输顶点都显卡了
+	needNotTransferAnymore(); // 不需要再将顶点数据传输到显卡了
 
 	d->mesh = new GMMesh();
 	d->mesh->setMeshData(mesh->getMeshData());

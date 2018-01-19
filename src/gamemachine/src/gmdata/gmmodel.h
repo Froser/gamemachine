@@ -159,7 +159,7 @@ public:
 	//! 通过另外一个GMModel，构造一个GMModel。
 	/*!
 	  被构造的GMModel将与原本的GMModel共享一份顶点缓存，但是，其component和原本的模型的component是分开的副本。
-	  \param model 构造的模型的原型。此模型一定要已将顶点坐标传输到显卡。
+	  \param model 构造的模型的原型。如果此模型顶点处于未传输状态，其顶点数据将会被强行传输。
 	*/
 	GMModel(GMModel& model);
 	~GMModel();
