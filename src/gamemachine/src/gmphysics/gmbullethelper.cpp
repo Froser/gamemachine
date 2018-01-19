@@ -90,5 +90,15 @@ void GMBulletHelper::createModelFromShape(
 	OUT GMModel** model)
 {
 	btCollisionShape* cs = shape->getBulletShape();
-	createModelFromCollisionShape(cs, model);
+	if (!cs->getUserPointer())
+	{
+		createModelFromCollisionShape(cs, model);
+		cs->setUserPointer(*model); // Save the model. DO NOT delete this model object when you need create more
+	}
+	else
+	{
+		// Model already exists
+		GMModel* modelCache = static_cast<GMModel*>(cs->getUserPointer());
+		*model = new GMModel(*modelCache); //use same vertex array
+	}
 }

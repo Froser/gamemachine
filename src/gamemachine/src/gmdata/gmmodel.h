@@ -55,7 +55,7 @@ GM_PRIVATE_OBJECT(GMComponent)
 	// 顶点在ChildObject的偏移
 	Vector<GMint> vertexOffsets;
 
-	GMMesh* parentMesh;
+	GMMesh* parentMesh = nullptr;
 	GMuint currentFaceVerticesCount;
 	GMShader shader;
 };
@@ -63,8 +63,10 @@ GM_PRIVATE_OBJECT(GMComponent)
 class GMComponent : public GMObject
 {
 	DECLARE_PRIVATE(GMComponent)
+	GM_ALLOW_COPY_DATA(GMComponent)
 
 	friend class GMMesh;
+	friend class GMModel;
 
 public:
 	GMComponent(GMMesh* parent);
@@ -85,6 +87,9 @@ public:
 	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
 	void endFace();
 	void expand(GMuint count);
+
+private:
+	void setParentMesh(GMMesh* mesh) { D(d); d->parentMesh = mesh; }
 };
 
 enum class GMUsageHint
@@ -111,6 +116,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMMesh* mesh = nullptr;
 	GMScopePtr<GMModelPainter> painter;
 	GMModelType type = GMModelType::Model3D;
+	bool needTransfer = true;
 };
 
 // 所有的顶点属性类型
@@ -150,14 +156,35 @@ public:
 
 public:
 	GMModel();
+	//! 通过另外一个GMModel，构造一个GMModel。
+	/*!
+	  被构造的GMModel将与原本的GMModel共享一份顶点缓存，但是，其component和原本的模型的component是分开的副本。
+	  \param model 构造的模型的原型。此模型一定要已将顶点坐标传输到显卡。
+	*/
+	GMModel(GMModel& model);
 	~GMModel();
 
 public:
 	inline void setPainter(AUTORELEASE GMModelPainter* painter) { D(d); d->painter.reset(painter); }
 	inline GMModelPainter* getPainter() { D(d); return d->painter; }
 	inline GMMesh* getMesh() { D(d); return d->mesh; }
+	inline const GMMesh* getMesh() const { D(d); return d->mesh; }
 	inline GMModelType getType() { D(d); return d->type; }
 	inline void setType(GMModelType type) { D(d); d->type = type; }
+
+	//! 表示此模型是否需要被GMModelPainter将顶点数据传输到显卡。
+	/*!
+	  如果一个模型第一次建立顶点数据，则需要将这些数据传输到显卡。<br/>
+	  然而，如果此模型如果与其他模型共享一份顶点数据，那么此模型不需要传输顶点数据到显卡，因为数据已经存在。
+	  \sa GMModelPainter()
+	*/
+	inline bool isNeedTransfer() { D(d); return d->needTransfer; }
+
+	//! 表示此模型不再需要将顶点数据传输到显卡了。
+	/*!
+	  当使用了已经传输过的顶点数据，或者顶点数据传输完成时调用此方法。
+	*/
+	inline void needNotTransferAnymore() { D(d); d->needTransfer = false; }
 
 	// 绘制方式
 	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
@@ -250,6 +277,9 @@ class GMMeshData : public GMObject
 	inline GMuint get_transferred_##name##_byte_size() { D(d); return d->transferred_##name##_byte_size; } \
 	inline void set_transferred_##name##_byte_size(GMuint size) { D(d); d->transferred_##name##_byte_size = size; }
 
+#define GM_COPY_VERTEX_PROPERTY(to_ptr, from_ptr, name) \
+	(to_ptr)->set_transferred_##name##_byte_size((from_ptr)->get_transferred_##name##_byte_size());
+
 GM_PRIVATE_OBJECT(GMMesh)
 {
 	GM_DEFINE_VERTEX_DATA(positions);
@@ -299,9 +329,10 @@ public:
 	inline void disableData(GMVertexDataType type) { D(d); d->disabledData[gmVertexIndex(type)] = true; }
 	inline bool isDataDisabled(GMVertexDataType type) { D(d); return d->disabledData[gmVertexIndex(type)]; }
 	inline Vector<GMComponent*>& getComponents() { D(d); return d->components; }
+	inline const Vector<GMComponent*>& getComponents() const { D(d); return d->components; }
 	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }
 	inline GMArrangementMode getArrangementMode() { D(d); return d->mode; }
-	inline void setName(const char* name) { D(d); d->name = name; }
+	inline void setName(const GMString& name) { D(d); d->name = name; }
 	inline const GMString& getName() { D(d); return d->name; }
 	inline GMuint getBufferId() { D(d); return d->meshData->getBufferId(); }
 	inline GMuint getArrayId() { D(d); return d->meshData->getArrayId(); }
@@ -314,6 +345,11 @@ public:
 	  将网格所绑定的数据的引用计数减一，如果网格数据引用计数为0，则从GPU中删除顶点数据，并析构此网格数据，且将其置为空。
 	*/
 	void releaseMeshData();
+
+private:
+	inline GMMeshData* getMeshData() { D(d); return d->meshData; }
+	inline const GMMeshData* getMeshData() const { D(d); return d->meshData; }
+	inline void setMeshData(GMMeshData* md);
 };
 
 #define IF_ENABLED(mesh, type) if (!mesh->isDataDisabled(type))

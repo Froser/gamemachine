@@ -67,11 +67,6 @@ using Tuple = std::tuple<T...>;
 #	define GM_LIB 1
 #endif
 
-// Debug模式下监控内存泄漏
-#ifndef GM_DETECT_MEMORY_LEAK
-#	define GM_DETECT_MEMORY_LEAK 0
-#endif
-
 // SSE指令优化
 #ifndef GM_SIMD
 #	define GM_SIMD 1
@@ -80,8 +75,8 @@ using Tuple = std::tuple<T...>;
 /* 工程编译选项到此结束 */
 
 #if GM_DETECT_MEMORY_LEAK
-#	if GM_WINDOWS && _DEBUG
-#		include <vld.h> // Windows环境下，确保安装了VLD，否则请将GM_DETECT_MEMORY_LEAK设置为0
+#	if GM_WINDOWS
+#		include <vld.h> // Windows环境下，确保安装了VLD，否则请将GM_DETECT_MEMORY_LEAK从CMake中关闭
 #	endif
 #endif
 

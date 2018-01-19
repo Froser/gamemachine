@@ -14,6 +14,45 @@ GMModel::GMModel()
 	d->mesh = new GMMesh();
 }
 
+GMModel::GMModel(GMModel& model)
+{
+	D(d);
+	GMMesh* mesh = model.getMesh();
+
+	// 必须要接受一个已经拥有painter且transfer过的Model
+	if (!model.getPainter())
+		GM.createModelPainterAndTransfer(&model);
+
+	needNotTransferAnymore(); // 不需要再被GMModelPainter传输顶点都显卡了
+
+	d->mesh = new GMMesh();
+	d->mesh->setMeshData(mesh->getMeshData());
+	d->mesh->setArrangementMode(mesh->getArrangementMode());
+	d->mesh->setName(mesh->getName());
+	GM_FOREACH_ENUM_CLASS(dt, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
+	{
+		if (mesh->isDataDisabled(dt))
+			d->mesh->disableData(dt);
+	}
+
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, positions);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, normals);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, uvs);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, tangents);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, bitangents);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, lightmaps);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, colors);
+
+	// 开始拷贝components中的shaders部分
+	auto& srcComponents = model.getMesh()->getComponents();
+	for (auto& components : srcComponents)
+	{
+		GMComponent* c = new GMComponent(d->mesh);
+		*c = *components;
+		c->setParentMesh(d->mesh); //将mesh设置回来
+	}
+}
+
 GMModel::~GMModel()
 {
 	D(d);
@@ -258,4 +297,11 @@ void GMMesh::releaseMeshData()
 	d->meshData->releaseRef();
 	if (d->meshData->hasNoRef())
 		GM_delete(d->meshData);
+}
+
+void GMMesh::setMeshData(GMMeshData* md)
+{
+	D(d);
+	d->meshData = md;
+	md->addRef();
 }

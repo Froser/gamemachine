@@ -404,7 +404,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 				0))
 		);
 		d->objects[i]->onAppendingObjectToWorld();
-		GM.createModelPainter(d->objects[i]->getModel());
+		GM.createModelPainterAndTransfer(d->objects[i]->getModel());
 	}
 }
 
@@ -633,7 +633,7 @@ void GMImage2DGameObject::createBackgroundImage()
 	d->background->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 	d->background->setGeometry(getGeometry());
 	d->background->setWorld(getWorld());
-	GM.createModelPainter(d->background->getModel());
+	GM.createModelPainterAndTransfer(d->background->getModel());
 }
 
 void GMImage2DGameObject::drawBackground()
@@ -674,13 +674,13 @@ void GMImage2DGameObject::createGlyphs()
 		d->textMask->createQuadModel(nullptr, &textMaskModel);
 		GM_ASSERT(textMaskModel);
 		d->textMask->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, textMaskModel));
-		GM.createModelPainter(textMaskModel);
+		GM.createModelPainterAndTransfer(textMaskModel);
 
 		d->textModel->setGeometry(geometry);
 		d->textModel->setWorld(getWorld());
 		d->textModel->setText(d->text);
 		d->textModel->onAppendingObjectToWorld();
-		GM.createModelPainter(d->textModel->getModel());
+		GM.createModelPainterAndTransfer(d->textModel->getModel());
 		GMAssets::createIsolatedAsset(GMAssetType::Model, d->textModel);
 	}
 }
@@ -732,7 +732,7 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 		item->setGeometry(rect);
 		item->setWorld(getWorld());
 		item->onAppendingObjectToWorld();
-		GM.createModelPainter(item->getModel());
+		GM.createModelPainterAndTransfer(item->getModel());
 
 		y += rect.height + d->itemMargins[Top] + d->itemMargins[Bottom];
 	}

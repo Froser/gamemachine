@@ -36,7 +36,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 	d->gameObjects[obj->getType()].insert(obj);
-	GM.createModelPainter(obj->getModel());
+	GM.createModelPainterAndTransfer(obj->getModel());
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
@@ -72,7 +72,7 @@ void GMGameWorld::addControl(GMControlGameObject* control)
 	control->onAppendingObjectToWorld();
 	d->controls.push_back(control);
 	d->controls_objectType.push_back(control);
-	GM.createModelPainter(control->getModel());
+	GM.createModelPainterAndTransfer(control->getModel());
 }
 
 void GMGameWorld::notifyControls()

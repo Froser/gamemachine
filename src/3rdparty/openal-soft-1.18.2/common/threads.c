@@ -445,6 +445,7 @@ int altss_create(altss_t *tss_id, altss_dtor_t callback)
 void altss_delete(altss_t tss_id)
 {
     RemoveUIntMapKey(&TlsDestructors, tss_id);
+    al_free(TlsDestructors.keys);
     TlsFree(tss_id);
 }
 

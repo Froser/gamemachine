@@ -67,7 +67,7 @@ void GMControlGameObject::onAppendingObjectToWorld()
 	d->stencil->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 	d->stencil->setGeometry(getGeometry());
 	d->stencil->setWorld(getWorld());
-	GM.createModelPainter(d->stencil->getModel());
+	GM.createModelPainterAndTransfer(d->stencil->getModel());
 
 	Base::onAppendingObjectToWorld();
 }

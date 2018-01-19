@@ -95,10 +95,15 @@ endif(MSVC)
 option(GM_BUILD_DOCS "Build GameMachine documentation" ON)
 option(GM_BUILD_DEMO "Build GameMachine Demos" ON)
 option(GM_BUILD_UNITTEST "Build GameMachine Unit Tests" ON)
+option(GM_DETECT_MEMORY_LEAK "Detect memory leaking" OFF)
 
 if (GM_BUILD_DOCS)
 	set (DOXYGEN_SKIP_DOT TRUE)
 	find_package(Doxygen)
+endif()
+
+if (GM_DETECT_MEMORY_LEAK)
+	add_definitions(-DGM_DETECT_MEMORY_LEAK)
 endif()
 
 # Projects:

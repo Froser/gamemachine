@@ -279,7 +279,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMMaterial material;
 };
 
-class GMShader : public GMObject, public GMAlignmentObject
+class GMShader : public GMObject
 {
 	DECLARE_PRIVATE(GMShader)
 	GM_ALLOW_COPY_DATA(GMShader)

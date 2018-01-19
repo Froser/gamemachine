@@ -41,6 +41,9 @@ void GMGLModelPainter::transfer()
 		return;
 
 	GMModel* model = getModel();
+	if (!model->isNeedTransfer())
+		return;
+
 	GMMesh* mesh = model->getMesh();
 	GLenum usage = model->getUsageHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
 
@@ -101,6 +104,7 @@ void GMGLModelPainter::transfer()
 	GM_END_CHECK_GL_ERROR
 
 	d->inited = true;
+	model->needNotTransferAnymore();
 }
 
 void GMGLModelPainter::draw(const GMGameObject* parent)
