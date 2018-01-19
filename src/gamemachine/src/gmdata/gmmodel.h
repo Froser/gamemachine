@@ -182,6 +182,7 @@ GM_PRIVATE_OBJECT(GMMeshData)
 	GMuint arrayId = 0;
 	GMuint bufferId = 0;
 	std::atomic<GMint> ref;
+	GMModelPainter* painter = nullptr;
 };
 
 class GMMeshData : public GMObject
@@ -189,11 +190,8 @@ class GMMeshData : public GMObject
 	DECLARE_PRIVATE(GMMeshData)
 	friend class GMMesh;
 
-	GMMeshData()
-	{
-		D(d);
-		d->ref = 1;
-	}
+	GMMeshData();
+	~GMMeshData();
 
 	void dispose();
 

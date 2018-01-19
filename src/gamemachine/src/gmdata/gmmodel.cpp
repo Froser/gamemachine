@@ -8,24 +8,9 @@
 #define VERTEX_OFFSET(offset, idx) ((offset * GMModel::PositionDimension) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
 
-namespace
-{
-	GMModelPainter* getMeshDestructor()
-	{
-		static GMModelPainter* destructorPainter = nullptr;
-		if (!destructorPainter)
-		{
-			GM.getFactory()->createPainter(GM.getGraphicEngine(), nullptr, &destructorPainter);
-			GM_ASSERT(destructorPainter);
-		}
-		return destructorPainter;
-	}
-}
-
 GMModel::GMModel()
 {
 	D(d);
-	getMeshDestructor();
 	d->mesh = new GMMesh();
 }
 
@@ -41,9 +26,23 @@ void GMModel::releaseMesh()
 	d->mesh->releaseMeshData();
 }
 
+GMMeshData::GMMeshData()
+{
+	D(d);
+	d->ref = 1;
+	GM.getFactory()->createPainter(nullptr, nullptr, &d->painter);
+}
+
+GMMeshData::~GMMeshData()
+{
+	D(d);
+	GM_delete(d->painter);
+}
+
 void GMMeshData::dispose()
 {
-	getMeshDestructor()->dispose(this);
+	D(d);
+	d->painter->dispose(this);
 }
 
 GMComponent::GMComponent(GMMesh* parent)

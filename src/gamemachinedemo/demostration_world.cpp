@@ -132,6 +132,7 @@ DemostrationWorld::~DemostrationWorld()
 		GM_ASSERT(demo.second);
 		gm::GM_delete(demo.second);
 	}
+	gm::GM_delete(d->cursor);
 }
 
 void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -146,26 +147,22 @@ void DemostrationWorld::init()
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	//创建光标
-	gm::GMCursorGameObject* cursor = new gm::GMCursorGameObject(32, 32);
-	gm::GMBuffer cursorBuf;
-	bool b = package->readFile(gm::GMPackageIndex::Textures, "cursor.png", &cursorBuf);
-	GM_ASSERT(b);
-	gm::GMImage* cur = nullptr;
-	gm::GMImageReader::load(cursorBuf.buffer, cursorBuf.size, &cur);
+	d->cursor = new gm::GMCursorGameObject(32, 32);
+
 	gm::ITexture* curFrame = nullptr;
-	GM.getFactory()->createTexture(cur, &curFrame);
+	gm::GMTextureUtil::createTexture("cursor.png", &curFrame);
 	GM_ASSERT(curFrame);
-	gm::GMAsset curAsset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Texture, curFrame);
-	cursor->setImage(curAsset);
-	cursor->enableCursor();
-	GM.setCursor(cursor);
-	gm::GM_delete(cur);
+
+	gm::GMAsset curAsset = getAssets().insertAsset(gm::GMAssetType::Texture, curFrame);
+	d->cursor->setImage(curAsset);
+	d->cursor->enableCursor();
+	GM.setCursor(d->cursor);
 
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
 
 	// 读取边框
 	gm::GMBuffer buf;
-	b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
 	GM_ASSERT(b);
 	gm::GMImage* img = nullptr;
 	gm::GMImageReader::load(buf.buffer, buf.size, &img);

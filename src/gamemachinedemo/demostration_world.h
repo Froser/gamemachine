@@ -42,6 +42,7 @@ GM_PRIVATE_OBJECT(DemostrationWorld)
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
+	gm::GMCursorGameObject* cursor = nullptr;
 };
 
 class DemostrationWorld : public gm::GMGameWorld
