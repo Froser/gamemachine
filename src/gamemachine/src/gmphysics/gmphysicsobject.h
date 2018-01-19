@@ -73,7 +73,9 @@ public:
 class GMPhysicsShape;
 GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 {
-	btRigidBody* body = nullptr;
+	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理声明周期
+	bool bodyDetached = false;
+	btDefaultMotionState* motionState = nullptr;
 	GMPhysicsShape* shape = nullptr;
 	GMfloat mass = 0;
 };
@@ -100,6 +102,7 @@ public:
 
 private:
 	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);
+	void detachRigidBody();
 
 //GMDiscreteDynamicsWorld
 	btRigidBody* getRigidBody()

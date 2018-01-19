@@ -14,6 +14,7 @@ GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
 	btBroadphaseInterface* overlappingPairCache = nullptr;
 	btSequentialImpulseConstraintSolver* solver = nullptr;
 	Vector<GMRigidPhysicsObject*> rigidObjs;
+	Vector<AUTORELEASE btRigidBody*> bulletRigidPool;
 };
 
 class GMDiscreteDynamicsWorld : public GMPhysicsWorld

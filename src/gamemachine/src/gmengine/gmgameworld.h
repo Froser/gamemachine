@@ -21,7 +21,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	Vector<GMControlGameObject*> controls;
 	Vector<GMGameObject*> controls_objectType;
 	GMAssets assets;
-	bool start;
+	bool start = false;
 };
 
 class GMGameWorld : public GMObject
@@ -31,7 +31,7 @@ class GMGameWorld : public GMObject
 	friend class GMPhysicsWorld;
 
 public:
-	GMGameWorld();
+	GMGameWorld() = default;
 	virtual ~GMGameWorld();
 
 public:

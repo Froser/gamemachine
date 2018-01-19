@@ -19,15 +19,15 @@ GMDiscreteDynamicsWorld::GMDiscreteDynamicsWorld(GMGameWorld* world)
 GMDiscreteDynamicsWorld::~GMDiscreteDynamicsWorld()
 {
 	D(d);
-	GM_delete(d->collisionConfiguration);
-	GM_delete(d->dispatcher);
-	GM_delete(d->overlappingPairCache);
-	GM_delete(d->solver);
 	GM_delete(d->worldImpl);
+	GM_delete(d->solver);
+	GM_delete(d->overlappingPairCache);
+	GM_delete(d->dispatcher);
+	GM_delete(d->collisionConfiguration);
 
-	for (auto& obj : d->rigidObjs)
+	for (auto& rigid : d->bulletRigidPool)
 	{
-		GM_delete(obj);
+		GM_delete(rigid);
 	}
 }
 
@@ -67,5 +67,8 @@ void GMDiscreteDynamicsWorld::addRigidObject(AUTORELEASE GMRigidPhysicsObject* r
 	D(d);
 	D_BASE(db, Base);
 	d->rigidObjs.push_back(rigidObj);
-	d->worldImpl->addRigidBody(rigidObj->getRigidBody());
+	btRigidBody* btBody = rigidObj->getRigidBody();
+	d->bulletRigidPool.push_back(btBody);
+	rigidObj->detachRigidBody();
+	d->worldImpl->addRigidBody(btBody);
 }

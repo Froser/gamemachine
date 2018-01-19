@@ -7,12 +7,6 @@
 #include "foundation/gamemachine.h"
 #include "gameobjects/gmcontrolgameobject.h"
 
-GMGameWorld::GMGameWorld()
-{
-	D(d);
-	d->start = false;
-}
-
 GMGameWorld::~GMGameWorld()
 {
 	D(d);
@@ -28,6 +22,8 @@ GMGameWorld::~GMGameWorld()
 	{
 		delete control;
 	}
+
+	GM_delete(d->physicsWorld);
 }
 
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)

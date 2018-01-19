@@ -9,5 +9,6 @@ class btSequentialImpulseConstraintSolver;
 class btRigidBody;
 class btCollisionShape;
 class btTransform;
+struct btDefaultMotionState;
 
 #endif

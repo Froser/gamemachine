@@ -300,6 +300,10 @@ void GMMesh::releaseMeshData()
 void GMMesh::setMeshData(GMMeshData* md)
 {
 	D(d);
-	d->meshData = md;
-	md->addRef();
+	if (d->meshData != md)
+	{
+		GM_delete(d->meshData);
+		d->meshData = md;
+		md->addRef();
+	}
 }

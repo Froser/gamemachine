@@ -8,7 +8,9 @@
 GMRigidPhysicsObject::~GMRigidPhysicsObject()
 {
 	D(d);
-	GM_delete(d->body);
+	GM_delete(d->motionState);
+	if (!d->bodyDetached)
+		GM_delete(d->body);
 }
 
 void GMRigidPhysicsObject::setMass(GMfloat mass)
@@ -44,8 +46,14 @@ void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startT
 	if (isDynamic)
 		shape->calculateLocalInertia(mass, localInertia);
 
-	btDefaultMotionState* motionState = new btDefaultMotionState(startTransform);
-	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, motionState, shape, localInertia);
+	d->motionState = new btDefaultMotionState(startTransform);
+	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, d->motionState, shape, localInertia);
 
 	d->body = new btRigidBody(cInfo);
+}
+
+void GMRigidPhysicsObject::detachRigidBody()
+{
+	D(d);
+	d->bodyDetached = true;
 }
