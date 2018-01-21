@@ -67,6 +67,11 @@ public:
 	}
 
 private:
+	//! 将此物理对象与一个GMGameObject绑定起来
+	/*!
+	  在调用GMGameObject::setPhysicsObject时，此方法将会被GMGameObject调用，因此设置为私有。此对象生命周期由所绑定的GMGameObject管理。
+	  \sa GMGameObject::setPhysicsObject()
+	*/
 	inline void setGameObject(GMGameObject* gameObject)
 	{
 		D(d);
@@ -75,6 +80,11 @@ private:
 	}
 
 public:
+	//! 获取所绑定的GMGameObject对象。
+	/*!
+	  本对象的生命周期由所绑定的GMGameObject对象所管理。
+	  \return 本对象所绑定的GMGameObject对象。
+	*/
 	GMGameObject* getGameObject()
 	{
 		D(d);

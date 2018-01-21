@@ -124,7 +124,7 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::Simulate:
 	{
 		d->demoWorld->getPhysicsWorld()->simulate(nullptr);
-		const gm::GMMotionStates& state = d->firstPhyObj->getMotionStates(); // Get current motion state
+		const gm::GMMotionStates& states = d->firstPhyObj->getMotionStates(); // Get current motion states
 		break;
 	}
 	case gm::GameMachineEvent::Render:
