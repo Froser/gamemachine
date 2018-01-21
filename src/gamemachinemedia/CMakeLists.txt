@@ -5,7 +5,6 @@ include_directories(
 		./
 		./include
 		./src
-		../3rdparty/glew-2.1.0/include
 		../3rdparty/openal-soft-1.18.2/include
 		../3rdparty/libmad
 		../3rdparty/lua/src

@@ -111,7 +111,7 @@ using Tuple = std::tuple<T...>;
 #	ifndef GLEW_STATIC
 #		define GLEW_STATIC
 #	endif
-#	include "GL/glew.h"
+#	include <glew.h>
 #endif
 
 // 整个GameMachine用到的宏定义

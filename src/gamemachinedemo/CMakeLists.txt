@@ -4,7 +4,6 @@ project (gamemachinedemo)
 gm_init_solution()
 
 include_directories(
-		../3rdparty/glew-2.1.0/include
 		../3rdparty/zlib
 		../3rdparty/glm-0.9.9-a2
 		../3rdparty/lua/src
