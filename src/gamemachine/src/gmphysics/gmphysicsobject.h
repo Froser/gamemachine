@@ -27,8 +27,8 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 
 GM_ALIGNED_STRUCT(GMMotionStates)
 {
-	glm::vec3 translation = glm::zero<glm::vec3>();
-	glm::vec3 velocity = glm::zero<glm::vec3>();
+	glm::mat4 transform= glm::identity<glm::mat4>();
+	glm::vec3 linearVelocity = glm::zero<glm::vec3>();
 };
 
 GM_PRIVATE_OBJECT(GMPhysicsObject)
@@ -52,7 +52,14 @@ protected:
 	GMPhysicsObject() = default;
 
 public:
-	inline GMMotionStates& motionStates() { D(d); return d->motionStates; }
+	virtual const GMMotionStates& getMotionStates();
+
+public:
+	inline void setMotionStates(const GMMotionStates& motionStates)
+	{
+		D(d);
+		d->motionStates = motionStates;
+	}
 
 private:
 	inline void setGameObject(GMGameObject* gameObject)
@@ -73,6 +80,7 @@ public:
 class GMPhysicsShape;
 GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 {
+	GMint updateRevision = -1;
 	btRigidBody* body = nullptr; // btRigidBody在添加到物理世界后，应该由物理世界管理声明周期
 	bool bodyDetached = false;
 	btDefaultMotionState* motionState = nullptr;
@@ -99,6 +107,9 @@ public:
 	*/
 	void setShape(GMAsset shape);
 	void setMass(GMfloat mass);
+
+public:
+	virtual const GMMotionStates& getMotionStates() override;
 
 private:
 	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);

@@ -41,7 +41,7 @@ else()
         qt4_wrap_cpp(MOCS ${alsoft-config_MOCS})
 
         add_executable(alsoft-config ${alsoft-config_SRCS} ${UIS} ${RSCS} ${TRS} ${MOCS})
-        gm_folder(OpenAL)
+        gm_folder(alsoft-config)
         target_link_libraries(alsoft-config ${QT_LIBRARIES})
         set_property(TARGET alsoft-config APPEND PROPERTY COMPILE_FLAGS ${EXTRA_CFLAGS})
         set_target_properties(alsoft-config PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${OpenAL_BINARY_DIR})

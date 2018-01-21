@@ -9,6 +9,7 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
 	gm::GMGameObject* ground = nullptr;
+	gm::GMPhysicsObject* firstPhyObj = nullptr;
 	Vector<gm::GMGameObject*> cubes;
 };
 

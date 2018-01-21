@@ -118,7 +118,7 @@ void GMBSPMove::generateMovement()
 		composeVelocityWithGravity();
 	}
 
-	d->movementState.origin = d->object->motionStates().translation;
+	glm::getTranslationFromMatrix(d->object->getMotionStates().transform, glm::value_ptr(d->movementState.origin));
 	d->movementState.startTime = now();
 }
 
@@ -388,6 +388,8 @@ void GMBSPMove::clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::
 void GMBSPMove::synchronizeMotionStates()
 {
 	D(d);
-	d->object->motionStates().translation = d->movementState.origin;
-	d->object->motionStates().velocity = d->movementState.velocity;
+	GMMotionStates s = d->object->getMotionStates();
+	s.transform = glm::translate(d->movementState.origin);
+	s.linearVelocity = d->movementState.velocity;
+	d->object->setMotionStates(s);
 }

@@ -97,6 +97,6 @@ void GMSpriteGameObject::simulate()
 void GMSpriteGameObject::updateAfterSimulate()
 {
 	D(d);
-	d->state.position = getPhysicsObject()->motionStates().translation;
+	glm::getTranslationFromMatrix(getPhysicsObject()->getMotionStates().transform, glm::value_ptr(d->state.position));
 	d->movements.clear();
 }

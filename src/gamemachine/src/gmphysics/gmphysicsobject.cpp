@@ -5,6 +5,12 @@
 #include "gmphysicsshape.h"
 #include "gmbullethelper.h"
 
+const GMMotionStates& GMPhysicsObject::getMotionStates()
+{
+	D(d);
+	return d->motionStates;
+}
+
 GMRigidPhysicsObject::~GMRigidPhysicsObject()
 {
 	D(d);
@@ -17,6 +23,21 @@ void GMRigidPhysicsObject::setMass(GMfloat mass)
 {
 	D(d);
 	d->mass = mass;
+}
+
+const GMMotionStates& GMRigidPhysicsObject::getMotionStates()
+{
+	D(d);
+	D_BASE(db, Base);
+	if (d->updateRevision != d->body->getUpdateRevisionInternal())
+	{
+		d->updateRevision = d->body->getUpdateRevisionInternal();
+		d->body->getWorldTransform().getOpenGLMatrix(glm::value_ptr(db->motionStates.transform));
+
+		btVector3 lv = d->body->getLinearVelocity();
+		db->motionStates.linearVelocity = glm::vec3(lv[0], lv[1], lv[2]);
+	}
+	return db->motionStates;
 }
 
 void GMRigidPhysicsObject::setShape(GMAsset shape)

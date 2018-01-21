@@ -78,6 +78,9 @@ void Demo_Collision::init()
 				for (gm::GMint j = 0; j < ARRAY_SIZE_Z; j++, idx++)
 				{
 					gm::GMRigidPhysicsObject* rigidBoxObj = new gm::GMRigidPhysicsObject();
+					if (idx == 0)
+						d->firstPhyObj = rigidBoxObj; //Record one object
+
 					rigidBoxObj->setMass(1.f);
 
 					gm::GMGameObject* box = new gm::GMGameObject();
@@ -119,8 +122,11 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
+	{
 		d->demoWorld->getPhysicsWorld()->simulate(nullptr);
+		const gm::GMMotionStates& state = d->firstPhyObj->getMotionStates(); // Get current motion state
 		break;
+	}
 	case gm::GameMachineEvent::Render:
 		d->demoWorld->renderScene();
 		break;
