@@ -52,6 +52,11 @@ protected:
 	GMPhysicsObject() = default;
 
 public:
+	//! 获取物理对象的运动状态。
+	/*!
+	  物理对象运动状态包括全局变换、线速度等。
+	  \return 物理对象的运动状态。
+	*/
 	virtual const GMMotionStates& getMotionStates();
 
 public:
@@ -109,10 +114,22 @@ public:
 	void setMass(GMfloat mass);
 
 public:
+	//! 获取物理对象的运动状态。
+	/*!
+	  物理对象运动状态包括全局变换、线速度等。在本类的实现中，它先会检查运动状态是否更新，如果有更新，则将更新后的值缓存到类的内部，如果没有更新，则返回原值。
+	  \return 物理对象的运动状态。
+	*/
 	virtual const GMMotionStates& getMotionStates() override;
 
 private:
 	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);
+
+	//! 解除对一个bullet刚体的生命周期管理。
+	/*!
+	  在一个bullet刚体被创建时，它的生命周期由此类的实例管理。此类实例析构时，bullet刚体被释放。<br>
+	  但是，如果这个bullet刚体被添加到了物理世界中，则调用此方法解除对此刚体生命周期的管理，此bullet刚体生命周期由物理世界管理。
+	  \sa GMDiscreteDynamicsWorld::addRigidObject()
+	*/
 	void detachRigidBody();
 
 //GMDiscreteDynamicsWorld
