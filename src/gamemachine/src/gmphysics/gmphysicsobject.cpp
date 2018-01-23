@@ -19,10 +19,32 @@ GMRigidPhysicsObject::~GMRigidPhysicsObject()
 		GM_delete(d->body);
 }
 
-void GMRigidPhysicsObject::setMass(GMfloat mass)
+bool GMRigidPhysicsObject::isStaticObject() const
 {
 	D(d);
-	d->mass = mass;
+	GM_ASSERT(d->body);
+	return d->body->isStaticObject();
+}
+
+bool GMRigidPhysicsObject::isKinematicObject() const
+{
+	D(d);
+	GM_ASSERT(d->body);
+	return d->body->isKinematicObject();
+}
+
+bool GMRigidPhysicsObject::isStaticOrKinematicObject() const
+{
+	D(d);
+	GM_ASSERT(d->body);
+	return d->body->isStaticOrKinematicObject();
+}
+
+bool GMRigidPhysicsObject::hasContactResponse() const
+{
+	D(d);
+	GM_ASSERT(d->body);
+	return d->body->hasContactResponse();
 }
 
 const GMMotionStates& GMRigidPhysicsObject::getMotionStates()

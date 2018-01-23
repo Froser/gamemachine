@@ -132,7 +132,12 @@ public:
 	  \sa GMAsset, GMGameObject::setPhysicsObject()
 	*/
 	void setShape(GMAsset shape);
-	void setMass(GMfloat mass);
+
+	void setMass(GMfloat mass) { D(d); d->mass = mass; }
+	bool isStaticObject() const;
+	bool isKinematicObject() const;
+	bool isStaticOrKinematicObject() const;
+	bool hasContactResponse() const;
 
 public:
 	//! 获取物理对象的运动状态。

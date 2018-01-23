@@ -12,6 +12,8 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 	gm::GMPhysicsObject* firstPhyObj = nullptr;
 	Vector<gm::GMGameObject*> cubes;
 	gm::GMDiscreteDynamicsWorld* discreteWorld = nullptr;
+	gm::GMRigidPhysicsObject* lastSelect = nullptr;
+	glm::vec3 lastColor;
 };
 
 class Demo_Collision : public DemoHandler
