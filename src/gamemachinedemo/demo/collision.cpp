@@ -184,7 +184,7 @@ void Demo_Collision::onWindowActivate()
 		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
 
-		if (!(rayTestResult.hitObject->isStaticObject() || rayTestResult.hitObject->isKinematicObject()))
+		if (rayTestResult.hit && !(rayTestResult.hitObject->isStaticObject() || rayTestResult.hitObject->isKinematicObject()))
 		{
 			if (d->lastSelect)
 				d->lastSelect->getGameObject()->getModel()->getMesh()->getComponents()[0]->getShader().getMaterial().ka = d->lastColor;
