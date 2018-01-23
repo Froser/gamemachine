@@ -28,6 +28,7 @@ public:
 public:
 	void setGravity(const glm::vec3& gravity);
 	void addRigidObject(AUTORELEASE GMRigidPhysicsObject* rigidObj);
+	GMPhysicsRayTestResult rayTest(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
 
 public:
 	virtual void simulate(GMGameObject* obj) override;

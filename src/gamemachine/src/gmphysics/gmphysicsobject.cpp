@@ -71,6 +71,9 @@ void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startT
 	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, d->motionState, shape, localInertia);
 
 	d->body = new btRigidBody(cInfo);
+
+	// 将GM对象与此bullet对象绑定
+	d->body->setUserPointer(this);
 }
 
 void GMRigidPhysicsObject::detachRigidBody()

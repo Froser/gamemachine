@@ -23,6 +23,12 @@ GM_ALIGNED_STRUCT(GMSpriteMovement)
 	GMMovement movement;
 };
 
+GM_ALIGNED_STRUCT(GMPositionState)
+{
+	glm::vec3 position;
+	glm::vec3 lookAt;
+};
+
 GM_PRIVATE_OBJECT(GMSpriteGameObject)
 {
 	GMfloat radius;

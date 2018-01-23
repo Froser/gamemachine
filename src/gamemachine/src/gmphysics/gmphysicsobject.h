@@ -25,6 +25,17 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 	glm::vec3 rate;
 };
 
+class GMRigidPhysicsObject;
+GM_ALIGNED_STRUCT(GMPhysicsRayTestResult)
+{
+	glm::vec3 rayFromWorld = glm::zero<glm::vec3>();
+	glm::vec3 rayToWorld = glm::zero<glm::vec3>();
+	glm::vec3 hitPointWorld = glm::zero<glm::vec3>();
+	glm::vec3 hitNormalWorld = glm::zero<glm::vec3>();
+	GMRigidPhysicsObject* hitObject = nullptr;
+	bool hit = false;
+};
+
 GM_ALIGNED_STRUCT(GMMotionStates)
 {
 	glm::mat4 transform= glm::identity<glm::mat4>();

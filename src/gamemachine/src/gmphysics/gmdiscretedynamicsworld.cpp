@@ -72,3 +72,25 @@ void GMDiscreteDynamicsWorld::addRigidObject(AUTORELEASE GMRigidPhysicsObject* r
 	rigidObj->detachRigidBody();
 	d->worldImpl->addRigidBody(btBody);
 }
+
+GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)
+{
+	D(d);
+	GMPhysicsRayTestResult result;
+	result.rayFromWorld = rayFromWorld;
+	result.rayToWorld = rayToWorld;
+
+	btVector3 rfw(rayFromWorld[0], rayFromWorld[1], rayFromWorld[2]), 
+		rtw(rayToWorld[0], rayToWorld[1], rayToWorld[2]);
+	btCollisionWorld::ClosestRayResultCallback rayCallback(rfw, rtw);
+	d->worldImpl->rayTest(rfw, rtw, rayCallback);
+	if (rayCallback.hasHit())
+	{
+		result.hit = true;
+		result.hitPointWorld = glm::vec3(rayCallback.m_hitPointWorld[0], rayCallback.m_hitPointWorld[1], rayCallback.m_hitPointWorld[2]);
+		result.hitNormalWorld = glm::vec3(rayCallback.m_hitNormalWorld[0], rayCallback.m_hitNormalWorld[1], rayCallback.m_hitNormalWorld[2]);
+		result.hitObject = static_cast<GMRigidPhysicsObject*>(rayCallback.m_collisionObject->getUserPointer());
+	}
+
+	return result;
+}

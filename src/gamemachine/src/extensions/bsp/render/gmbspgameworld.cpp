@@ -129,12 +129,12 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMCamera& camera = GM.getCamera();
-	GMPositionState pos = camera.getPositionState();
+	glm::vec3 pos = camera.getLookAt().position;
 	BSPData& bsp = d->bsp.bspData();
 
 	rd.facesToDraw.clearAll();
 	rd.entitiesToDraw.clearAll();
-	GMint cameraLeaf = calculateLeafNode(pos.position);
+	GMint cameraLeaf = calculateLeafNode(pos);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
 
 	for (GMint i = 0; i < bsp.numleafs; ++i)

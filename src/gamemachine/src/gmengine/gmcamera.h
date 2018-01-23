@@ -26,12 +26,6 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 	glm::vec3 up = glm::vec3(0, 1, 0);
 };
 
-GM_ALIGNED_STRUCT(GMPositionState)
-{
-	glm::vec3 position;
-	glm::vec3 lookAt;
-};
-
 inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)
 {
 	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
@@ -89,6 +83,10 @@ public:
 public:
 	inline const glm::mat4& getProjectionMatrix() { D(d); return d->projMatrix; }
 	inline const glm::mat4& getViewMatrix() { D(d); return d->viewMatrix; }
+	inline GMFrustumType getType() { D(d); return d->type; }
+	inline GMfloat getNear() { D(d); return d->n; }
+	inline GMfloat getFar() { D(d); return d->f; }
+	inline GMfloat getFovy() { D(d); GM_ASSERT(getType() == GMFrustumType::Perspective); return d->fovy; }
 
 private:
 	void update();
@@ -97,7 +95,6 @@ private:
 GM_PRIVATE_OBJECT(GMCamera)
 {
 	GMFrustum frustum;
-	GMPositionState state;
 	GMCameraLookAt lookAt;
 };
 
@@ -118,8 +115,9 @@ public:
 	void lookAt(const GMCameraLookAt& lookAt);
 	GMFrustum& getFrustum() { D(d); return d->frustum; }
 
+	glm::vec3 getRayToWorld(GMint x, GMint y) const;
+
 public:
-	inline const GMPositionState& getPositionState() { D(d); return d->state; }
 	inline const glm::mat4& getProjectionMatrix() { D(d); return getFrustum().getProjectionMatrix(); }
 	inline const glm::mat4& getViewMatrix() { D(d); return getFrustum().getViewMatrix(); }
 	inline const GMCameraLookAt& getLookAt() { D(d); return d->lookAt; }

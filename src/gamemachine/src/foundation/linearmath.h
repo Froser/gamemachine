@@ -16,6 +16,7 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/gtx/compatibility.hpp"
 #include "glm/gtx/fast_square_root.hpp"
+#include "glm/gtx/norm.hpp"
 
 // GM
 #include <defines.h>
@@ -183,5 +184,17 @@ namespace glm
 		return percentage * (end - start) + start;
 	}
 
+	inline glm::vec3 safeNormalize(const glm::vec3& vec, const glm::vec3& n = glm::vec3(1, 0, 0))
+	{
+		gm::GMfloat l2 = glm::length2(vec);
+		if (l2 >= FLT_EPSILON*FLT_EPSILON)
+		{
+			return vec / gm::gmSqrt(l2);
+		}
+		else
+		{
+			return n;
+		}
+	}
 }
 #endif

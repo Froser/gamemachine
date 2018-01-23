@@ -32,7 +32,7 @@ void Demo_Collision::init()
 	Base::init();
 
 	d->demoWorld = new gm::GMDemoGameWorld();
-	gm::GMDiscreteDynamicsWorld* physicsWorld = new gm::GMDiscreteDynamicsWorld(d->demoWorld);
+	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(d->demoWorld);
 	d->ground = new gm::GMGameObject();
 	d->ground->setTranslation(glm::translate(glm::vec3(0, -50, 0)));
 
@@ -131,6 +131,7 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 		d->demoWorld->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
+		onWindowActivate();
 		break;
 	case gm::GameMachineEvent::Deactivate:
 		break;
@@ -168,5 +169,25 @@ void Demo_Collision::setDefaultLights()
 		d.setLightColor(colorD);
 		d.setLightPosition(glm::value_ptr(glm::vec3(-1.f, .5f, -3.f)));
 		GM.getGraphicEngine()->addLight(d);
+	}
+}
+
+void Demo_Collision::onWindowActivate()
+{
+	D(d);
+	gm::IInput* input = GM.getMainWindow()->getInputMananger();
+	auto& ms = input->getMouseState().mouseState();
+	if (ms.downButton & GMMouseButton_Left)
+	{
+		gm::GMCamera& camera = GM.getCamera();
+		glm::vec3 rayFrom = camera.getLookAt().position;
+		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
+		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
+
+		if (rayTestResult.hit)
+		{
+			gm::GMModel* m = rayTestResult.hitObject->getGameObject()->getModel();
+			m->getMesh()->getComponents()[0]->getShader().setNodraw(true);
+		}
 	}
 }

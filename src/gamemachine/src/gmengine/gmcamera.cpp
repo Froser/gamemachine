@@ -164,8 +164,8 @@ GMCamera::GMCamera()
 {
 	D(d);
 	d->frustum.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
-	d->state.position = glm::vec3(0);
-	d->state.lookAt = glm::vec3(0, 0, 1);
+	d->lookAt.position = glm::vec3(0);
+	d->lookAt.lookAt = glm::vec3(0, 0, 1);
 }
 
 void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -185,9 +185,9 @@ void GMCamera::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top
 void GMCamera::synchronize(GMSpriteGameObject* gameObject)
 {
 	D(d);
-	d->state = gameObject->getPositionState();
-	d->lookAt.lookAt = d->state.lookAt;
-	d->lookAt.position = d->state.position;
+	auto& ps = gameObject->getPositionState();
+	d->lookAt.lookAt = ps.lookAt;
+	d->lookAt.position = ps.position;
 }
 
 void GMCamera::synchronizeLookAt()
@@ -203,4 +203,53 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 	d->lookAt = lookAt;
 	getFrustum().updateViewMatrix(::getViewMatrix(lookAt));
 	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix);
+}
+
+glm::vec3 GMCamera::getRayToWorld(GMint x, GMint y) const
+{
+	D(d);
+	if (d->frustum.getType() == GMFrustumType::Perspective)
+	{
+		GMfloat nearPlane = d->frustum.getNear();
+		GMfloat fov = d->frustum.getFovy();
+
+		glm::vec3 rayFrom = d->lookAt.position;
+		glm::vec3 rayForward = d->lookAt.lookAt;
+
+		GMfloat farPlane = d->frustum.getFar();
+		rayForward *= farPlane;
+
+		// 从摄像机向上方向，算出摄像机坐标系 (hor, vertical, rayForward)
+		glm::vec3 cameraUp = d->lookAt.up;
+		glm::vec3 vertical = cameraUp;
+		glm::vec3 hor = glm::cross(rayForward, vertical);
+		hor = glm::safeNormalize(hor);
+		vertical = glm::cross(hor, rayForward);
+		vertical = glm::safeNormalize(vertical);
+
+		GMfloat tanfov = gmTan(0.5f*fov);
+		hor *= 2.f * farPlane * tanfov;
+		vertical *= 2.f * farPlane * tanfov;
+
+		const GMRect& cr = GM.getGameMachineRunningStates().clientRect;
+		GMfloat width = GMfloat(cr.width);
+		GMfloat height = GMfloat(cr.height);
+		GMfloat aspect = width / height;
+		hor *= aspect;
+
+		glm::vec3 rayToCenter = rayFrom + rayForward;
+		glm::vec3 dHor = hor * 1.f / width;
+		glm::vec3 dVert = vertical * 1.f / height;
+
+		glm::vec3 rayTo = rayToCenter - 0.5f * hor + 0.5f * vertical;
+		rayTo += GMfloat(x) * dHor;
+		rayTo -= GMfloat(y) * dVert;
+		return rayTo;
+	}
+	else
+	{
+		// only support GMFrustumType::Perspective
+		GM_ASSERT(false);
+	}
+	return glm::vec3(0);
 }

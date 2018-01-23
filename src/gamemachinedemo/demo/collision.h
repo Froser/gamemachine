@@ -11,6 +11,7 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 	gm::GMGameObject* ground = nullptr;
 	gm::GMPhysicsObject* firstPhyObj = nullptr;
 	Vector<gm::GMGameObject*> cubes;
+	gm::GMDiscreteDynamicsWorld* discreteWorld = nullptr;
 };
 
 class Demo_Collision : public DemoHandler
@@ -28,6 +29,9 @@ public:
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+
+private:
+	void onWindowActivate();
 };
 
 #endif
