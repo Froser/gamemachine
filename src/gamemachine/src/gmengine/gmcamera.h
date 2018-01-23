@@ -115,6 +115,13 @@ public:
 	void lookAt(const GMCameraLookAt& lookAt);
 	GMFrustum& getFrustum() { D(d); return d->frustum; }
 
+	//! 获取从屏幕出发，变换到世界的一条射线
+	/*!
+	  将屏幕上的一点，变换到世界坐标。世界坐标的深度值取远平面的值。此方法目前只对透视投影有效。
+	  \param x 屏幕上的点的x坐标。
+	  \param y 屏幕上的点的y坐标。
+	  \return 世界坐标。
+	*/
 	glm::vec3 getRayToWorld(GMint x, GMint y) const;
 
 public:

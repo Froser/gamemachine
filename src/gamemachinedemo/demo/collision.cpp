@@ -183,11 +183,5 @@ void Demo_Collision::onWindowActivate()
 		glm::vec3 rayFrom = camera.getLookAt().position;
 		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
-
-		if (rayTestResult.hit)
-		{
-			gm::GMModel* m = rayTestResult.hitObject->getGameObject()->getModel();
-			m->getMesh()->getComponents()[0]->getShader().setNodraw(true);
-		}
 	}
 }
