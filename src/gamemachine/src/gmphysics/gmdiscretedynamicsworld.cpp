@@ -4,6 +4,7 @@
 #include "gmbullethelper.h"
 #include "gmdata/gmmodel.h"
 #include "gmengine/gmgameworld.h"
+#include "gmconstraint.h"
 
 GMDiscreteDynamicsWorld::GMDiscreteDynamicsWorld(GMGameWorld* world)
 	: GMPhysicsWorld(world)
@@ -19,6 +20,12 @@ GMDiscreteDynamicsWorld::GMDiscreteDynamicsWorld(GMGameWorld* world)
 GMDiscreteDynamicsWorld::~GMDiscreteDynamicsWorld()
 {
 	D(d);
+	for (auto& constraint : d->constraintObjs)
+	{
+		d->worldImpl->removeConstraint(constraint->getConstraint());
+		GM_delete(constraint);
+	}
+
 	GM_delete(d->worldImpl);
 	GM_delete(d->solver);
 	GM_delete(d->overlappingPairCache);
@@ -71,6 +78,22 @@ void GMDiscreteDynamicsWorld::addRigidObject(AUTORELEASE GMRigidPhysicsObject* r
 	d->bulletRigidPool.push_back(btBody);
 	rigidObj->detachRigidBody();
 	d->worldImpl->addRigidBody(btBody);
+}
+
+void GMDiscreteDynamicsWorld::addConstraint(AUTORELEASE GMConstraint* constraint, bool disableCollisionsBetweenLinkedBodies)
+{
+	D(d);
+	d->constraintObjs.push_back(constraint);
+	d->worldImpl->addConstraint(constraint->getConstraint(), disableCollisionsBetweenLinkedBodies);
+}
+
+void GMDiscreteDynamicsWorld::removeConstraint(GMConstraint* constraint)
+{
+	D(d);
+	auto iter = std::find(d->constraintObjs.begin(), d->constraintObjs.end(), constraint);
+	if (iter != d->constraintObjs.end())
+		d->constraintObjs.erase(iter);
+	d->worldImpl->removeConstraint(constraint->getConstraint());
 }
 
 GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)

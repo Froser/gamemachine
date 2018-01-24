@@ -10,5 +10,6 @@ class btRigidBody;
 class btCollisionShape;
 class btTransform;
 struct btDefaultMotionState;
+class btTypedConstraint;
 
 #endif

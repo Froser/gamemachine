@@ -5,6 +5,12 @@
 #include <gmdemogameworld.h>
 #include "demostration_world.h"
 
+namespace gm
+{
+	class GMDiscreteDynamicsWorld;
+	class GMPoint2PointConstraint;
+}
+
 GM_PRIVATE_OBJECT(Demo_Collision)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
@@ -14,6 +20,14 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 	gm::GMDiscreteDynamicsWorld* discreteWorld = nullptr;
 	gm::GMRigidPhysicsObject* lastSelect = nullptr;
 	glm::vec3 lastColor;
+
+	// Pick states
+	gm::GMRigidPhysicsObject* pickedBody = nullptr;
+	gm::GMPoint2PointConstraint* pickedConstraint = nullptr;
+	gm::GMPhysicsActivationState pickedActivationState = gm::GMPhysicsActivationState::ActiveTag;
+	glm::vec3 oldPickingPos;
+	glm::vec3 hitPos;
+	glm::vec3 oldPickingDist;
 };
 
 class Demo_Collision : public DemoHandler
@@ -34,6 +48,8 @@ protected:
 
 private:
 	void onWindowActivate();
+	void pickUp(const gm::GMPhysicsRayTestResult& rayTestResult);
+	void removePicked();
 };
 
 #endif

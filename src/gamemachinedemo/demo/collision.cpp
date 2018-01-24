@@ -4,6 +4,7 @@
 #include <linearmath.h>
 #include <gmphysicsshape.h>
 #include <gmbullethelper.h>
+#include <gmconstraint.h>
 
 namespace
 {
@@ -193,6 +194,47 @@ void Demo_Collision::onWindowActivate()
 			glm::vec3& ka = rayTestResult.hitObject->getGameObject()->getModel()->getMesh()->getComponents()[0]->getShader().getMaterial().ka;
 			d->lastColor = ka;
 			ka += .3f;
+
+			// pick one
+			pickUp(rayTestResult);
 		}
+	}
+	else if (ms.upButton & GMMouseButton_Left)
+	{
+		removePicked();
+	}
+}
+
+void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
+{
+	D(d);
+	gm::GMRigidPhysicsObject* body = d->pickedBody = rayTestResult.hitObject;
+	d->pickedActivationState = body->getActivationState();
+	body->setActivationState(gm::GMPhysicsActivationState::DisableDeactivation);
+	glm::vec4 localPivot = body->getCenterOfMassTransformInversed() * glm::vec4(rayTestResult.hitPointWorld, 1.f);
+	gm::GMPoint2PointConstraint* p2pc = new gm::GMPoint2PointConstraint(body, glm::vec3(localPivot[0], localPivot[1], localPivot[2]));
+	d->discreteWorld->addConstraint(p2pc, true);
+	d->pickedConstraint = p2pc;
+	auto settings = p2pc->getConstraintSetting();
+	settings.impulseClamp = 30.f;
+	settings.tau = .001f;
+	p2pc->setConstraintSetting(settings);
+	d->oldPickingPos = rayTestResult.rayToWorld;
+	d->hitPos = rayTestResult.hitPointWorld;
+	d->oldPickingDist = rayTestResult.rayFromWorld;
+}
+
+void Demo_Collision::removePicked()
+{
+	D(d);
+	if (d->pickedBody)
+	{
+		GM_ASSERT(d->pickedConstraint);
+
+		d->pickedBody->setActivationState(d->pickedActivationState, true);
+		d->pickedBody->activate();
+		d->discreteWorld->removeConstraint(d->pickedConstraint);
+		GM_delete(d->pickedConstraint);
+		d->pickedBody = nullptr;
 	}
 }

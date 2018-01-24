@@ -103,6 +103,15 @@ public:
 	}
 };
 
+enum class GMPhysicsActivationState
+{
+	ActiveTag = 1,
+	IslandSleeping,
+	WantsDeactivation,
+	DisableDeactivation,
+	DisableSimulation,
+};
+
 class GMPhysicsShape;
 GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 {
@@ -112,6 +121,7 @@ GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 	btDefaultMotionState* motionState = nullptr;
 	GMPhysicsShape* shape = nullptr;
 	GMfloat mass = 0;
+	GMPhysicsActivationState state = GMPhysicsActivationState::ActiveTag;
 };
 
 class GMRigidPhysicsObject : public GMPhysicsObject
@@ -134,31 +144,7 @@ public:
 	void setShape(GMAsset shape);
 
 	void setMass(GMfloat mass) { D(d); d->mass = mass; }
-	bool isStaticObject() const;
-	bool isKinematicObject() const;
-	bool isStaticOrKinematicObject() const;
-	bool hasContactResponse() const;
 
-public:
-	//! 获取物理对象的运动状态。
-	/*!
-	  物理对象运动状态包括全局变换、线速度等。在本类的实现中，它先会检查运动状态是否更新，如果有更新，则将更新后的值缓存到类的内部，如果没有更新，则返回原值。
-	  \return 物理对象的运动状态。
-	*/
-	virtual const GMMotionStates& getMotionStates() override;
-
-private:
-	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);
-
-	//! 解除对一个bullet刚体的生命周期管理。
-	/*!
-	  在一个bullet刚体被创建时，它的生命周期由此类的实例管理。此类实例析构时，bullet刚体被释放。<br>
-	  但是，如果这个bullet刚体被添加到了物理世界中，则调用此方法解除对此刚体生命周期的管理，此bullet刚体生命周期由物理世界管理。
-	  \sa GMDiscreteDynamicsWorld::addRigidObject()
-	*/
-	void detachRigidBody();
-
-//GMDiscreteDynamicsWorld
 	btRigidBody* getRigidBody()
 	{
 		D(d);
@@ -172,6 +158,36 @@ private:
 		GM_ASSERT(d->shape);
 		return d->shape;
 	}
+
+	bool isStaticObject() const;
+	bool isKinematicObject() const;
+	bool isStaticOrKinematicObject() const;
+	bool hasContactResponse() const;
+	GMPhysicsActivationState getActivationState();
+	void setActivationState(GMPhysicsActivationState state, bool force = false);
+	void activate(bool force = false);
+	glm::mat4 getCenterOfMassTransform();
+	glm::mat4 getCenterOfMassTransformInversed();
+
+public:
+	//! 获取物理对象的运动状态。
+	/*!
+	  物理对象运动状态包括全局变换、线速度等。在本类的实现中，它先会检查运动状态是否更新，如果有更新，则将更新后的值缓存到类的内部，如果没有更新，则返回原值。
+	  \return 物理对象的运动状态。
+	*/
+	virtual const GMMotionStates& getMotionStates() override;
+
+private:
+	void initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color);
+
+private:
+	//! 解除对一个bullet刚体的生命周期管理。
+	/*!
+	  在一个bullet刚体被创建时，它的生命周期由此类的实例管理。此类实例析构时，bullet刚体被释放。<br>
+	  但是，如果这个bullet刚体被添加到了物理世界中，则调用此方法解除对此刚体生命周期的管理，此bullet刚体生命周期由物理世界管理。
+	  \sa GMDiscreteDynamicsWorld::addRigidObject()
+	*/
+	void detachRigidBody();
 };
 
 END_NS

@@ -23,7 +23,7 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
-GM_PRIVATE_OBJECT(GMInput)
+GM_PRIVATE_OBJECT(GMUIInput)
 {
 	enum { MAX_KEYS = 256 };
 	bool detectingMode = false;
@@ -42,17 +42,17 @@ GM_PRIVATE_OBJECT(GMInput)
 	gm::GMWheelState wheelState;
 };
 
-class GMInput :
+class GMUIInput :
 	public gm::GMObject,
 	public gm::IInput,
 	public gm::IKeyboardState,
 	public gm::IJoystickState,
 	public gm::IMouseState
 {
-	DECLARE_PRIVATE(GMInput)
+	DECLARE_PRIVATE(GMUIInput)
 
 public:
-	GMInput(gm::IWindow* window);
+	GMUIInput(gm::IWindow* window);
 
 public:
 

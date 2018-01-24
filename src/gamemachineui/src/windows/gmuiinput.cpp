@@ -53,13 +53,13 @@ XInputWrapper::~XInputWrapper()
 	::FreeLibrary(m_module);
 }
 
-GMInput::GMInput(gm::IWindow* window)
+GMUIInput::GMUIInput(gm::IWindow* window)
 {
 	D(d);
 	d->window = window;
 }
 
-void GMInput::update()
+void GMUIInput::update()
 {
 	D(d);
 	::GetKeyboardState(d->lastKeyState);
@@ -68,7 +68,7 @@ void GMInput::update()
 	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
 }
 
-void GMInput::setDetectingMode(bool enable)
+void GMUIInput::setDetectingMode(bool enable)
 {
 	D(d);
 	if (enable)
@@ -85,7 +85,7 @@ void GMInput::setDetectingMode(bool enable)
 	d->detectingMode = enable;
 }
 
-void GMInput::setCursor(gm::GMCursorType type)
+void GMUIInput::setCursor(gm::GMCursorType type)
 {
 	D(d);
 	LPCWSTR cursor = nullptr;
@@ -120,7 +120,7 @@ void GMInput::setCursor(gm::GMCursorType type)
 	::SetClassLong(d->window->getWindowHandle(), GCL_HCURSOR, (LONG)::LoadCursor(NULL, cursor));
 }
 
-gm::GMJoystickState GMInput::joystickState()
+gm::GMJoystickState GMUIInput::joystickState()
 {
 	D(d);
 	XINPUT_STATE state;
@@ -141,21 +141,21 @@ gm::GMJoystickState GMInput::joystickState()
 	return std::move(result);
 }
 
-void GMInput::setIMEState(bool enabled)
+void GMUIInput::setIMEState(bool enabled)
 {
 	D(d);
 	HIMC hImc = ImmGetContext(d->window->getWindowHandle());
 	::ImmSetOpenStatus(hImc, enabled);
 }
 
-void GMInput::joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMotorSpeed)
+void GMUIInput::joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMotorSpeed)
 {
 	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
 	d->xinput.XInputSetState(0, &v);
 }
 
-gm::IKeyboardState& GMInput::getKeyboardState()
+gm::IKeyboardState& GMUIInput::getKeyboardState()
 {
 	GM_PROFILE("getKeyboardState");
 	D(d);
@@ -163,7 +163,7 @@ gm::IKeyboardState& GMInput::getKeyboardState()
 	return *this;
 }
 
-gm::GMMouseState GMInput::mouseState()
+gm::GMMouseState GMUIInput::mouseState()
 {
 	D(d);
 	gm::GMMouseState& state = d->mouseState;

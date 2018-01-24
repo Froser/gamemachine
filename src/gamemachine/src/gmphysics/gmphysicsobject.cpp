@@ -47,6 +47,48 @@ bool GMRigidPhysicsObject::hasContactResponse() const
 	return d->body->hasContactResponse();
 }
 
+GMPhysicsActivationState GMRigidPhysicsObject::getActivationState()
+{
+	D(d);
+	GM_ASSERT(d->body);
+	return (GMPhysicsActivationState)d->body->getActivationState();
+}
+
+void GMRigidPhysicsObject::setActivationState(GMPhysicsActivationState state, bool force)
+{
+	D(d);
+	GM_ASSERT(d->body);
+	if (force)
+		d->body->forceActivationState((GMint)state);
+	else
+		d->body->setActivationState((GMint)state);
+}
+
+void GMRigidPhysicsObject::activate(bool force)
+{
+	D(d);
+	GM_ASSERT(d->body);
+	d->body->activate(force);
+}
+
+glm::mat4 GMRigidPhysicsObject::getCenterOfMassTransform()
+{
+	D(d);
+	GM_ASSERT(d->body);
+	glm::mat4 val;
+	d->body->getCenterOfMassTransform().getOpenGLMatrix(glm::value_ptr(val));
+	return val;
+}
+
+glm::mat4 GMRigidPhysicsObject::getCenterOfMassTransformInversed()
+{
+	D(d);
+	GM_ASSERT(d->body);
+	glm::mat4 val;
+	d->body->getCenterOfMassTransform().inverse().getOpenGLMatrix(glm::value_ptr(val));
+	return val;
+}
+
 const GMMotionStates& GMRigidPhysicsObject::getMotionStates()
 {
 	D(d);

@@ -44,7 +44,7 @@ gm::IInput* GMUIWindow::getInputMananger()
 {
 	D(d);
 	if (!d->input)
-		d->input = new GMInput(this);
+		d->input = new GMUIInput(this);
 	return d->input;
 }
 

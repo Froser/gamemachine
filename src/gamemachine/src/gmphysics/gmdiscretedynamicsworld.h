@@ -5,6 +5,7 @@
 #include "gmbulletforward.h"
 
 BEGIN_NS
+class GMConstraint;
 
 GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
 {
@@ -14,6 +15,7 @@ GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
 	btBroadphaseInterface* overlappingPairCache = nullptr;
 	btSequentialImpulseConstraintSolver* solver = nullptr;
 	Vector<GMRigidPhysicsObject*> rigidObjs;
+	Vector<GMConstraint*> constraintObjs; // 生命周期由GMDiscreteDynamicsWorld管理
 	Vector<AUTORELEASE btRigidBody*> bulletRigidPool;
 };
 
@@ -28,6 +30,14 @@ public:
 public:
 	void setGravity(const glm::vec3& gravity);
 	void addRigidObject(AUTORELEASE GMRigidPhysicsObject* rigidObj);
+	void addConstraint(GMConstraint* constraint, bool disableCollisionsBetweenLinkedBodies = false);
+
+	//! 将一个约束从本物理世界移除。
+	/*!
+	  被移除的约束的生命周期将不再由本物理世界管理。用户需要自己管理此约束的生命周期。
+	  \param constraint 需要移除的约束。
+	*/
+	void removeConstraint(GMConstraint* constraint);
 	GMPhysicsRayTestResult rayTest(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
 
 public:

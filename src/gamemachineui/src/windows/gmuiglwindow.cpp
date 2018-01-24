@@ -135,35 +135,35 @@ bool GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 	}
 	case WM_MOUSEWHEEL:
 	{
-		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
 		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
-		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseDown(GMMouseButton_Left);
 		break;
 	}
 	case WM_RBUTTONDOWN:
 	{
-		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseDown(GMMouseButton_Right);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
-		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseUp(GMMouseButton_Left);
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
-		GMInput* input = gm_static_cast<GMInput*>(db->input);
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseUp(GMMouseButton_Right);
 		break;
