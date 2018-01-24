@@ -7,9 +7,7 @@ BEGIN_NS
 
 extern "C"
 {
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
+#include <lua.h>
 }
 
 #define L (d->luaState)

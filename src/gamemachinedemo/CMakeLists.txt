@@ -4,9 +4,7 @@ project (gamemachinedemo)
 gm_init_solution()
 
 include_directories(
-		../3rdparty/zlib
 		../3rdparty/glm-0.9.9-a2
-		../3rdparty/lua/src
 		../gamemachine/include
 		../gamemachineui/include
 		../gamemachinemedia/include

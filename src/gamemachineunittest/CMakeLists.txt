@@ -4,7 +4,6 @@ project (gamemachineunittest)
 gm_init_solution()
 
 include_directories(
-		../3rdparty/lua/src
 		../3rdparty/glm-0.9.9-a2
 		../gamemachine/include
 		./

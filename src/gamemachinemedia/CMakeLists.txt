@@ -7,7 +7,6 @@ include_directories(
 		./src
 		../3rdparty/openal-soft-1.18.2/include
 		../3rdparty/libmad
-		../3rdparty/lua/src
 		../gamemachine/include
 		../3rdparty/glm-0.9.9-a2
 	)
