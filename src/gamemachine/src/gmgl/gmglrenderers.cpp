@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <GL/glew.h>
 #include "gmglrenderers.h"
 #include "gmgl/gmglgraphic_engine.h"
 #include "gmgl/shader_constants.h"
