@@ -210,7 +210,7 @@ void Demo_Collision::onWindowActivate()
 	{
 		removePicked();
 	}
-	else if (ms.moving)
+	else if (ms.moving && isActivating())
 	{
 		glm::vec3 rayFrom = camera.getLookAt().position;
 		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);

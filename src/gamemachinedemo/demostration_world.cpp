@@ -60,6 +60,7 @@ void DemoHandler::onActivate()
 	D(d);
 	setLookAt();
 	setDefaultLights();
+	d->activating = true;
 }
 
 void DemoHandler::onDeactivate()
@@ -68,6 +69,7 @@ void DemoHandler::onDeactivate()
 	d->demostrationWorld->resetProjectionAndEye();
 	GM.getGraphicEngine()->removeLights();
 	GMSetRenderState(EFFECTS, gm::GMEffects::None);
+	d->activating = false;
 }
 
 void DemoHandler::event(gm::GameMachineEvent evt)
@@ -122,6 +124,12 @@ void DemoHandler::backToEntrance()
 	D(d);
 	d->demostrationWorld->setCurrentDemo(nullptr);
 	onDeactivate();
+}
+
+bool DemoHandler::isActivating()
+{
+	D(d);
+	return d->activating;
 }
 
 DemostrationWorld::~DemostrationWorld()

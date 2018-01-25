@@ -10,6 +10,7 @@ GM_PRIVATE_OBJECT(DemoHandler)
 {
 	DemostrationWorld* demostrationWorld;
 	bool inited = false;
+	bool activating = false;
 };
 
 class DemoHandler : public gm::GMObject
@@ -32,6 +33,7 @@ protected:
 
 protected:
 	void backToEntrance();
+	bool isActivating();
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
