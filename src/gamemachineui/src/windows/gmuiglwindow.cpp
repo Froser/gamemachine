@@ -5,9 +5,46 @@
 #include <GL/glew.h>
 #include <GL/wglew.h>
 
+#define EXIT __exit
+#define RUN_AND_CHECK(i) if (!(i)) { GM_ASSERT(false); goto EXIT; }
+
 namespace
 {
 	const gm::GMwchar* g_classname = L"gamemachine_MainWindow_class";
+
+	HWND createTempWindow()
+	{
+		LPWSTR lpszClassName = L"gamemachine_TempWindow_class";
+		WNDCLASS wc;
+		wc.style = CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc = ::DefWindowProc;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hInstance = NULL;
+		wc.hIcon = ::LoadIcon(0, IDI_APPLICATION);
+		wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground = (HBRUSH)::GetStockObject(WHITE_BRUSH);
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = lpszClassName;
+		BOOL b = ::RegisterClass(&wc);
+		GM_ASSERT(b);
+
+		HWND wnd = CreateWindow(lpszClassName,
+			L"GameMachineTempWindow",
+			WS_OVERLAPPEDWINDOW,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			CW_USEDEFAULT,
+			NULL,
+			NULL,
+			NULL,
+			NULL);
+		GM_ASSERT(wnd);
+		::ShowWindow(wnd, SW_HIDE);
+		::UpdateWindow(wnd);
+		return wnd;
+	}
 }
 
 GMUIGLWindow::GMUIGLWindow()
@@ -25,6 +62,7 @@ GMUIGLWindow::~GMUIGLWindow()
 gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 {
 	D(d);
+
 	gm::GMWindowAttributes attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;
@@ -63,51 +101,22 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		0, 0, 0												//layer masks ignored
 	};
 
-	gm::GMWindowHandle wnd = getWindowHandle();
-	if (!(d->hDC = GetDC(wnd)))
-	{
-		dispose();
-		gm_error(L"can't Create a GL Device context.");
-		return 0;
-	}
-
+	HWND tmpWnd = NULL;
+	HDC tmpDC = NULL;
+	HGLRC tmpRC = NULL;
 	gm::GMint pixelFormat;
-	if (!(pixelFormat = ChoosePixelFormat(d->hDC, &pfd)))	//found a matching pixel format?
-	{														//if not
-		dispose();
-		gm_error(L"can't find a Suitable PixelFormat.");
-		return 0;
-	}
+	RUN_AND_CHECK(tmpWnd = createTempWindow());
+	RUN_AND_CHECK(tmpDC = ::GetDC(tmpWnd));
+	RUN_AND_CHECK(pixelFormat = ChoosePixelFormat(tmpDC, &pfd));
+	RUN_AND_CHECK(SetPixelFormat(tmpDC, pixelFormat, &pfd));
+	RUN_AND_CHECK(tmpRC = wglCreateContext(tmpDC));
+	RUN_AND_CHECK(wglMakeCurrent(tmpDC, tmpRC));
+	RUN_AND_CHECK(GLEW_OK == glewInit());
 
-	if (!SetPixelFormat(d->hDC, pixelFormat, &pfd))			//are we able to set pixel format?
-	{														//if not
-		dispose();
-		gm_error(L"can't set the pixelformat.");
-		return 0;
-	}
-
-	if (!(d->hRC = wglCreateContext(d->hDC)))
-	{
-		dispose();
-		gm_error(L"can't create a GL rendering context.");
-		return 0;
-	}
-
-
-	if (!wglMakeCurrent(d->hDC, d->hRC))
-	{
-		dispose();
-		gm_error(L"can't activate the GL rendering context.");
-		return 0;
-	}
-
-	GLenum err = glewInit();
-	if (err != GLEW_OK)
-	{
-		GM_ASSERT(!"glew init failed");
-		return 0;
-	}
-
+	// 开始创建真正的Window
+	gm::GMWindowHandle wnd = getWindowHandle();
+	RUN_AND_CHECK(d->hDC = GetDC(wnd));
+	
 	gm::GMint pixAttribs[] =
 	{
 		WGL_DRAW_TO_WINDOW_ARB,	GL_TRUE,
@@ -123,18 +132,29 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		0
 	};
 
-	gm::GMint nFormat;
-	gm::GMuint nCount;
-	if (wglChoosePixelFormatARB(d->hDC, &pixAttribs[0], NULL, 1, &nFormat, (UINT*)&nCount))
-	{
-		wglMakeCurrent(NULL, NULL);
-		wglDeleteContext(d->hRC);
-		SetPixelFormat(d->hDC, nFormat, &pfd);   //设置像素格式
-
-		d->hRC = wglCreateContext(d->hDC);
-		wglMakeCurrent(d->hDC, d->hRC);
-	}
+	gm::GMint nFormat = 0;
+	gm::GMuint nCount = 0;
+	RUN_AND_CHECK(wglChoosePixelFormatARB(d->hDC, &pixAttribs[0], NULL, 1, &nFormat, (UINT*)&nCount));
+	RUN_AND_CHECK(wglMakeCurrent(NULL, NULL));
+	RUN_AND_CHECK(wglDeleteContext(tmpRC));
+	RUN_AND_CHECK(::ReleaseDC(tmpWnd, tmpDC));
+	RUN_AND_CHECK(::DestroyWindow(tmpWnd));
+	RUN_AND_CHECK(::SetPixelFormat(d->hDC, nFormat, &pfd));
+	RUN_AND_CHECK(d->hRC = wglCreateContext(d->hDC));
+	RUN_AND_CHECK(wglMakeCurrent(d->hDC, d->hRC));
 	return wnd;
+
+EXIT:
+	// 走到这里来说明流程失败
+	dispose();
+	if (tmpWnd && tmpDC)
+		::ReleaseDC(tmpWnd, tmpDC);
+	if (tmpRC)
+		wglDeleteContext(tmpRC);
+	if (tmpWnd)
+		::DestroyWindow(tmpWnd);
+	wglMakeCurrent(NULL, NULL);
+	return NULL;
 }
 
 void GMUIGLWindow::swapBuffers() const
