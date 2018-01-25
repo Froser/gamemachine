@@ -68,7 +68,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;
 
 	// 在非全屏的时候才有效
-	AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
+	::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
 
 	if (!createWindow(attrs, g_classname))
 	{
@@ -107,15 +107,15 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	gm::GMint pixelFormat;
 	RUN_AND_CHECK(tmpWnd = createTempWindow());
 	RUN_AND_CHECK(tmpDC = ::GetDC(tmpWnd));
-	RUN_AND_CHECK(pixelFormat = ChoosePixelFormat(tmpDC, &pfd));
-	RUN_AND_CHECK(SetPixelFormat(tmpDC, pixelFormat, &pfd));
+	RUN_AND_CHECK(pixelFormat = ::ChoosePixelFormat(tmpDC, &pfd));
+	RUN_AND_CHECK(::SetPixelFormat(tmpDC, pixelFormat, &pfd));
 	RUN_AND_CHECK(tmpRC = wglCreateContext(tmpDC));
 	RUN_AND_CHECK(wglMakeCurrent(tmpDC, tmpRC));
 	RUN_AND_CHECK(GLEW_OK == glewInit());
 
 	// 开始创建真正的Window
 	gm::GMWindowHandle wnd = getWindowHandle();
-	RUN_AND_CHECK(d->hDC = GetDC(wnd));
+	RUN_AND_CHECK(d->hDC = ::GetDC(wnd));
 	
 	gm::GMint pixAttribs[] =
 	{
@@ -253,13 +253,13 @@ void GMUIGLWindow::dispose()
 		d->hRC = 0;
 	}
 
-	if (d->hDC && !ReleaseDC(wnd, d->hDC))
+	if (d->hDC && !::ReleaseDC(wnd, d->hDC))
 	{
 		gm_error(L"release of Device Context failed.");
 		d->hDC = 0;
 	}
 
-	if (wnd && !DestroyWindow(wnd))
+	if (wnd && !::DestroyWindow(wnd))
 	{
 		gm_error(L"could not release hWnd");
 		wnd = 0;
