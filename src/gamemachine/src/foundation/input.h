@@ -47,6 +47,7 @@ struct GMMouseState
 	GMMouseButton upButton;
 	GMMouseButton triggerButton;
 	GMWheelState wheel;
+	bool moving;
 };
 
 enum class GMCursorType

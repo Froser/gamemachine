@@ -11,5 +11,6 @@ class btCollisionShape;
 class btTransform;
 struct btDefaultMotionState;
 class btTypedConstraint;
+class btPoint2PointConstraint;
 
 #endif

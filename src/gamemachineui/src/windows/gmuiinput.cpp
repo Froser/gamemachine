@@ -66,6 +66,7 @@ void GMUIInput::update()
 	// restore
 	d->wheelState.wheeled = false;
 	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
+	d->mouseState.moving = false;
 }
 
 void GMUIInput::setDetectingMode(bool enable)

@@ -45,6 +45,7 @@ struct GMConstraintSetting
 
 GM_PRIVATE_OBJECT(GMPoint2PointConstraint)
 {
+	btPoint2PointConstraint* constraint = nullptr;
 	GMConstraintSetting setting;
 };
 
@@ -54,6 +55,10 @@ class GMPoint2PointConstraint : public GMConstraint
 
 public:
 	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const glm::vec3& pivotA);
+
+public:
+	void setPivotA(const glm::vec3& pivot);
+	void setPivotB(const glm::vec3& pivot);
 
 public:
 	const GMConstraintSetting& getConstraintSetting()

@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 	gm::GMPhysicsActivationState pickedActivationState = gm::GMPhysicsActivationState::ActiveTag;
 	glm::vec3 oldPickingPos;
 	glm::vec3 hitPos;
-	glm::vec3 oldPickingDist;
+	gm::GMfloat oldPickingDist;
 };
 
 class Demo_Collision : public DemoHandler
@@ -45,11 +45,13 @@ public:
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+	virtual void onDeactivate() override;
 
 private:
 	void onWindowActivate();
 	void pickUp(const gm::GMPhysicsRayTestResult& rayTestResult);
 	void removePicked();
+	void movePicked(const gm::GMPhysicsRayTestResult& rayTestResult);
 };
 
 #endif

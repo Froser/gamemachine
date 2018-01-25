@@ -147,6 +147,13 @@ bool GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESUL
 			input->recordMouseDown(GMMouseButton_Left);
 		break;
 	}
+	case WM_MOUSEMOVE:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordMouseMove();
+		break;
+	}
 	case WM_RBUTTONDOWN:
 	{
 		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);

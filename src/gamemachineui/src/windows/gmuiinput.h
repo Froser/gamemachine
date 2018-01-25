@@ -109,5 +109,11 @@ public:
 		d->wheelState.wheeled = wheeled;
 		d->wheelState.delta = delta;
 	}
+
+	void recordMouseMove()
+	{
+		D(d);
+		d->mouseState.moving = true;
+	}
 };
 #endif

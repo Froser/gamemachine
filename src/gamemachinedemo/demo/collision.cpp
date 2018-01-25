@@ -173,14 +173,21 @@ void Demo_Collision::setDefaultLights()
 	}
 }
 
+void Demo_Collision::onDeactivate()
+{
+	removePicked();
+	Base::onDeactivate();
+}
+
 void Demo_Collision::onWindowActivate()
 {
 	D(d);
 	gm::IInput* input = GM.getMainWindow()->getInputMananger();
 	auto& ms = input->getMouseState().mouseState();
+	gm::GMCamera& camera = GM.getCamera();
+
 	if (ms.downButton & GMMouseButton_Left)
 	{
-		gm::GMCamera& camera = GM.getCamera();
 		glm::vec3 rayFrom = camera.getLookAt().position;
 		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
@@ -203,6 +210,13 @@ void Demo_Collision::onWindowActivate()
 	{
 		removePicked();
 	}
+	else if (ms.moving)
+	{
+		glm::vec3 rayFrom = camera.getLookAt().position;
+		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
+		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
+		movePicked(rayTestResult);
+	}
 }
 
 void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
@@ -221,7 +235,7 @@ void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
 	p2pc->setConstraintSetting(settings);
 	d->oldPickingPos = rayTestResult.rayToWorld;
 	d->hitPos = rayTestResult.hitPointWorld;
-	d->oldPickingDist = rayTestResult.rayFromWorld;
+	d->oldPickingDist = glm::fastLength(rayTestResult.hitPointWorld - rayTestResult.rayFromWorld);
 }
 
 void Demo_Collision::removePicked()
@@ -236,5 +250,16 @@ void Demo_Collision::removePicked()
 		d->discreteWorld->removeConstraint(d->pickedConstraint);
 		GM_delete(d->pickedConstraint);
 		d->pickedBody = nullptr;
+	}
+}
+
+void Demo_Collision::movePicked(const gm::GMPhysicsRayTestResult& rayTestResult)
+{
+	D(d);
+	if (d->pickedBody && d->pickedConstraint)
+	{
+		glm::vec3 dir = glm::normalize(rayTestResult.rayToWorld - rayTestResult.rayFromWorld) * d->oldPickingDist;
+		glm::vec3 newPivotB = rayTestResult.rayFromWorld + dir;
+		d->pickedConstraint->setPivotB(newPivotB);
 	}
 }
