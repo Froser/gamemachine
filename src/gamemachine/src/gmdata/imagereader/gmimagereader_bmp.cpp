@@ -3,6 +3,7 @@
 #include <sstream>
 #include <gmimage.h>
 #include "foundation/utilities/tools.h"
+#include <GL/glew.h>
 
 #if GM_WINDOWS
 #include <wtypes.h>

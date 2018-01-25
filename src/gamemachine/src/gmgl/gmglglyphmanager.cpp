@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <GL/glew.h>
 #include "gmglglyphmanager.h"
 #include "ft2build.h"
 #include "freetype/freetype.h"

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader_dds.h"
 #include <gmimage.h>
+#include <GL/glew.h>
 
 #ifdef GM_MSVC
 #define _CRT_SECURE_NO_WARNINGS

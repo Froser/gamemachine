@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <GL/glew.h>
 #include <iostream>
 #include <string.h>
 #include <time.h>

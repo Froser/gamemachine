@@ -15,7 +15,7 @@ struct IRenderer;
 
 extern "C"
 {
-	extern GLenum s_glErrCode;
+	extern GMuint s_glErrCode;
 }
 
 struct GMShaderProc

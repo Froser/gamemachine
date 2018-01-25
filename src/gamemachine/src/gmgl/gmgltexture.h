@@ -12,8 +12,8 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMGLTexture)
 {
 	bool inited = false;
-	GLuint id = 0;
-	GLenum target = 0;
+	GMuint id = 0;
+	GMuint target = 0;
 };
 
 class GMGLTexture : public ITexture

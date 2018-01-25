@@ -2,6 +2,8 @@
 #include "gmuiglwindow.h"
 #include <gamemachine.h>
 #include "gmuiinput.h"
+#include <GL/glew.h>
+#include <GL/wglew.h>
 
 namespace
 {
@@ -39,7 +41,6 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	}
 
 	const gm::GMbyte colorDepth = 32, alphaBits = 8;
-	gm::GMuint pixelFormat;
 	static PIXELFORMATDESCRIPTOR pfd =						//pfd tells windows how we want things to be
 	{
 		sizeof(PIXELFORMATDESCRIPTOR),						//size of Pixel format descriptor
@@ -70,6 +71,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		return 0;
 	}
 
+	gm::GMint pixelFormat;
 	if (!(pixelFormat = ChoosePixelFormat(d->hDC, &pfd)))	//found a matching pixel format?
 	{														//if not
 		dispose();
@@ -91,6 +93,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		return 0;
 	}
 
+
 	if (!wglMakeCurrent(d->hDC, d->hRC))
 	{
 		dispose();
@@ -105,6 +108,32 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		return 0;
 	}
 
+	gm::GMint pixAttribs[] =
+	{
+		WGL_DRAW_TO_WINDOW_ARB,	GL_TRUE,
+		WGL_SUPPORT_OPENGL_ARB,	GL_TRUE,
+		WGL_DOUBLE_BUFFER_ARB,	GL_TRUE,
+		WGL_SAMPLE_BUFFERS_EXT,	GL_TRUE,
+		WGL_ACCELERATION_ARB,	WGL_FULL_ACCELERATION_ARB,
+		WGL_COLOR_BITS_ARB,		24,
+		WGL_ALPHA_BITS_ARB,		8,
+		WGL_DEPTH_BITS_ARB,		24,
+		WGL_STENCIL_BITS_ARB,	0,
+		WGL_SAMPLES_ARB,		8,
+		0
+	};
+
+	gm::GMint nFormat;
+	gm::GMuint nCount;
+	if (wglChoosePixelFormatARB(d->hDC, &pixAttribs[0], NULL, 1, &nFormat, (UINT*)&nCount))
+	{
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(d->hRC);
+		SetPixelFormat(d->hDC, nFormat, &pfd);   //设置像素格式
+
+		d->hRC = wglCreateContext(d->hDC);
+		wglMakeCurrent(d->hDC, d->hRC);
+	}
 	return wnd;
 }
 

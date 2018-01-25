@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <GL/glew.h>
 #include "shader_constants.h"
 #include <algorithm>
 #include "gmglgraphic_engine.h"
@@ -62,6 +63,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 void GMGLGraphicEngine::init()
 {
 	installShaders();
+	glEnable(GL_MULTISAMPLE);
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);

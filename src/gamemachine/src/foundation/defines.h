@@ -111,7 +111,6 @@ using Tuple = std::tuple<T...>;
 #	ifndef GLEW_STATIC
 #		define GLEW_STATIC
 #	endif
-#	include <glew.h>
 #endif
 
 // 整个GameMachine用到的宏定义
@@ -145,21 +144,12 @@ GM_STATIC_ASSERT_SIZE(DWORD, 4);
 
 BEGIN_NS
 // 基本数据类型
-#if GM_USE_OPENGL
-typedef GLfloat GMfloat;
-typedef GLint GMint;
-typedef GLuint GMuint;
-typedef GLsizei GMsizei;
-typedef GLsizeiptr GMsizeiptr;
-#else
 typedef float GMfloat;
 typedef int GMint;
 typedef unsigned int GMuint;
 typedef short GMshort;
 typedef ptrdiff_t GMsizeiptr;
 typedef int GMsizei;
-#endif
-
 typedef unsigned char GMbyte;
 typedef long GMlong;
 typedef unsigned long GMulong;

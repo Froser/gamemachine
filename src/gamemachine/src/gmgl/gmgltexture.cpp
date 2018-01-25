@@ -3,6 +3,7 @@
 #include "gmdata/imagereader/gmimagereader.h"
 #include "shader_constants.h"
 #include "gmdata/gmmodel.h"
+#include <GL/glew.h>
 
 GMGLTexture::GMGLTexture(const GMImage* image)
 {

@@ -351,8 +351,8 @@ void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& effectsSha
 	fragBuf.convertToStringBuffer();
 
 	gm::GMGLShaderInfo shadersInfo[] = {
-		{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-		{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+		{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+		{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 	};
 
 	effectsShaderProgram.attachShader(shadersInfo[0]);
@@ -370,8 +370,8 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 		fragBuf.convertToStringBuffer();
 
 		gm::GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+			{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
 		forwardShaderProgram.attachShader(shadersInfo[0]);
@@ -387,8 +387,8 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 		fragBuf.convertToStringBuffer();
 
 		gm::GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+			{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
 		(*deferredShaderProgram[0]).attachShader(shadersInfo[0]);
@@ -404,8 +404,8 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 		fragBuf.convertToStringBuffer();
 
 		gm::GMGLShaderInfo shadersInfo[] = {
-			{ GL_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-			{ GL_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+			{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
+			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
 		(*deferredShaderProgram[1]).attachShader(shadersInfo[0]);

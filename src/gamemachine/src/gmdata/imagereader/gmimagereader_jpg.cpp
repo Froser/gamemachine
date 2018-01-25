@@ -2,6 +2,7 @@
 #include "gmimagereader_jpg.h"
 #include <iostream>
 #include <fstream>
+#include <GL/glew.h>
 
 extern "C"
 {

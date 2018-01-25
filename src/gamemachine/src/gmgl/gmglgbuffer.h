@@ -42,10 +42,10 @@ constexpr GMint GMGLGBuffer_TotalTurn = (GMint) GMGLDeferredRenderState::EndOfRe
 
 GM_PRIVATE_OBJECT(GMGLGBuffer)
 {
-	GLuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
-	GLuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
-	GLuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
-	GLuint depthBuffers[(GMint)GMGLDeferredRenderState::EndOfRenderState] = { 0 };
+	GMuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
+	GMuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
+	GMuint materials[(GMint)GBufferMaterialType::EndOfMaterialType] = { 0 };
+	GMuint depthBuffers[(GMint)GMGLDeferredRenderState::EndOfRenderState] = { 0 };
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMint currentTurn = 0;
@@ -75,24 +75,24 @@ public:
 	void setReadBuffer(GBufferMaterialType materialType);
 	void newFrame();
 	void activateTextures();
-	void copyDepthBuffer(GLuint target);
+	void copyDepthBuffer(GMuint target);
 
 public:
 	inline const GMint& getWidth() { D(d); return d->renderWidth; }
 	inline const GMint& getHeight() { D(d); return d->renderHeight; }
 
 private:
-	bool createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray);
+	bool createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GMuint* textureArray);
 	bool drawBuffers(GMuint count);
 };
 
 GM_PRIVATE_OBJECT(GMGLFramebuffer)
 {
-	GLuint fbo = 0;
-	GLuint texture = 0;
-	GLuint depthBuffer = 0;
-	GLuint quadVAO = 0;
-	GLuint quadVBO = 0;
+	GMuint fbo = 0;
+	GMuint texture = 0;
+	GMuint depthBuffer = 0;
+	GMuint quadVAO = 0;
+	GMuint quadVBO = 0;
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMfloat sampleOffsets[2] = { 0 };
@@ -116,7 +116,7 @@ public:
 	void beginDrawEffects();
 	void endDrawEffects();
 	void draw(GMGLShaderProgram* program);
-	GLuint framebuffer();
+	GMuint framebuffer();
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();

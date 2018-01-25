@@ -4,22 +4,28 @@
 #include <gamemachine.h>
 BEGIN_NS
 
+enum GMGLShaderType
+{
+	GM_FRAGMENT_SHADER = 0x8B30,
+	GM_VERTEX_SHADER = 0x8B31
+};
+
 struct GMGLShaderInfo
 {
-	GLenum type;
+	GMuint type;
 	GMString source;
 	GMString filename;
 };
 
-typedef AlignedVector<GLuint> GMGLShaderIDList;
+typedef AlignedVector<GMuint> GMGLShaderIDList;
 typedef AlignedVector<GMGLShaderInfo> GMGLShaderInfos;
 
 GM_PRIVATE_OBJECT(GMGLShaderProgram)
 {
 	GMGLShaderInfos shaderInfos;
 	GMGLShaderIDList shaders;
-	GLuint shaderProgram = 0;
-	static GLuint lastUsedProgram;
+	GMuint shaderProgram = 0;
+	static GMuint lastUsedProgram;
 	Map<GMString, GMString> aliasMap;
 };
 
@@ -32,7 +38,7 @@ public:
 	~GMGLShaderProgram();
 
 	void load();
-	GLuint getProgram() { D(d); return d->shaderProgram; }
+	GMuint getProgram() { D(d); return d->shaderProgram; }
 	void attachShader(const GMGLShaderInfo& shaderCfgs);
 
 public:
@@ -52,7 +58,7 @@ public:
 	void setBool(const GMString& name, bool value);
 
 private:
-	void setProgram(GLuint program) { D(d); d->shaderProgram = program; }
+	void setProgram(GMuint program) { D(d); d->shaderProgram = program; }
 	void removeShaders();
 	void expandSource(REF GMGLShaderInfo& shaderInfo);
 	GMString expandSource(const GMString& workingDir, const GMString& source);

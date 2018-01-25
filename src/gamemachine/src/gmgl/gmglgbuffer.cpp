@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <GL/glew.h>
 #include "gmglgbuffer.h"
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"

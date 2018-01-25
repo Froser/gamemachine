@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmimagebuffer.h"
+#include <GL/glew.h>
 
 GMImageBuffer::GMImageBuffer(GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer)
 {
