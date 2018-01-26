@@ -30,6 +30,11 @@ set(WIN32_SOURCES
 		src/windows/gmuiinput.h
 	)
 
+set(WIN32_DX11
+		src/windows/gmuidx11window.cpp
+		src/windows/gmuidx11window.h
+	)
+
 set(DUILIB_SOURCES
 		src/windows/duilib/gmuiduilibwindow.cpp
 		src/windows/duilib/gmuiduilibwindow.h
@@ -43,6 +48,13 @@ set(DUILIB_SOURCES
 if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
+
+if(GM_USE_DX11)
+	list(APPEND SOURCES ${WIN32_DX11})
+	link_libraries(
+		d3d11.lib
+	)
+endif(GM_USE_DX11)
 
 if(GM_USE_DUILIB)
 	list(APPEND SOURCES ${DUILIB_SOURCES})

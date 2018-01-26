@@ -10,11 +10,11 @@
 
 namespace
 {
-	const gm::GMwchar* g_classname = L"gamemachine_MainWindow_class";
+	const gm::GMwchar* g_classname = L"gamemachine_MainWindow_gl_class";
 
 	HWND createTempWindow()
 	{
-		LPWSTR lpszClassName = L"gamemachine_TempWindow_class";
+		LPWSTR lpszClassName = L"gamemachine_TempWindow_gl_class";
 		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = ::DefWindowProc;
@@ -75,7 +75,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		DWORD s = GetLastError();
 		gm_error(L"window created failed: %i", s);
 		dispose();
-		return false;
+		return NULL;
 	}
 
 	const gm::GMbyte colorDepth = 32, alphaBits = 8;
@@ -163,75 +163,6 @@ void GMUIGLWindow::swapBuffers() const
 	::SwapBuffers(d->hDC);
 }
 
-bool GMUIGLWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
-{
-	D(d);
-	D_BASE(db, GMUIWindow);
-
-	bool handled = Base::wndProc(uMsg, wParam, lParam, lRes);
-	if (handled)
-		return handled;
-
-	switch (uMsg)
-	{
-	case WM_DESTROY:
-		::PostQuitMessage(0L);
-		break;
-	case WM_SIZE:
-	{
-		gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
-		break;
-	}
-	case WM_MOUSEWHEEL:
-	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
-		if (input)
-			input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
-		break;
-	}
-	case WM_LBUTTONDOWN:
-	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
-		if (input)
-			input->recordMouseDown(GMMouseButton_Left);
-		break;
-	}
-	case WM_MOUSEMOVE:
-	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
-		if (input)
-			input->recordMouseMove();
-		break;
-	}
-	case WM_RBUTTONDOWN:
-	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
-		if (input)
-			input->recordMouseDown(GMMouseButton_Right);
-		break;
-	}
-	case WM_LBUTTONUP:
-	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
-		if (input)
-			input->recordMouseUp(GMMouseButton_Left);
-		break;
-	}
-	case WM_RBUTTONUP:
-	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
-		if (input)
-			input->recordMouseUp(GMMouseButton_Right);
-		break;
-	}
-	default:
-		break;
-	}
-
-	*lRes = ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
-	return true;
-}
-
 void GMUIGLWindow::update()
 {
 	swapBuffers();
@@ -264,13 +195,4 @@ void GMUIGLWindow::dispose()
 		gm_error(L"could not release hWnd");
 		wnd = 0;
 	}
-}
-
-void GMUIGLWindow::showWindow()
-{
-	D(d);
-	gm::GMWindowHandle hwnd = getWindowHandle();
-	GM_ASSERT(::IsWindow(hwnd));
-	if (!::IsWindow(hwnd)) return;
-	::ShowWindow(hwnd, SW_SHOWNORMAL);
 }

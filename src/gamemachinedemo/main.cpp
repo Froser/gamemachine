@@ -40,7 +40,8 @@ int WINAPI WinMain(
 		mainWindow,
 		consoleHandle,
 		new gm::GMGLFactory(),
-		new DemostrationEntrance()
+		new DemostrationEntrance(),
+		gm::GMRenderEnvironment::OpenGL
 	);
 
 	GM.startGameMachine();

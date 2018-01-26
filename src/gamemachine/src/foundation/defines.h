@@ -57,9 +57,14 @@ template <typename... T>
 using Tuple = std::tuple<T...>;
 
 /* 工程编译选项 */
-// 使用OpenGL
+// 一定会使用使用OpenGL
 #ifndef GM_USE_OPENGL
 #	define GM_USE_OPENGL 1
+#endif
+
+// 是否使用DirectX11
+#ifndef GM_USE_DX11
+#	define GM_USE_DX11 0
 #endif
 
 // 编译设置：

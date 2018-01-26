@@ -11,6 +11,23 @@
 
 BEGIN_NS
 
+extern "C"
+{
+	enum class GMCapability
+	{
+		SupportOpenGL,
+		SupportDirectX11,
+	};
+
+	bool GMQueryCapability(GMCapability);
+}
+
+enum class GMRenderEnvironment
+{
+	OpenGL,
+	DirectX11,
+};
+
 /*! \def GM
     \brief 表示当前GameMachine运行实例。
 
@@ -38,6 +55,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMClock clock;
 
+	GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL;;
 	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	IGraphicEngine* engine = nullptr;
@@ -108,12 +126,14 @@ public:
 	  \param consoleHandle 控制台处理器。当有日志或调试信息来的时候，将会调用到这个控制台处理器。可以使用gmui::GMUIFactory::createConsoleWindow创建。此对象生命周期由GameMachine管理。
 	  \param factory 当前环境下的工厂类，用于创建纹理、字体管理器等绘制相关的对象。如果是在OpenGL下，可以直接创建GMGLFactory对象。此对象生命周期由GameMachine管理。
 	  \param gameHandler 程序流程管理器，处理程序运行时的各个流程。此对象生命周期由GameMachine管理。
+	  \param renderEnv 运行时的渲染环境。可以选择用OpenGL或DirectX11来进行渲染。此后的版本，也可能会增加更多的渲染环境。渲染环境一旦确立，将会影响工厂类返回的环境相关的实例。
 	*/
 	void init(
 		AUTORELEASE IWindow* mainWindow,
 		const GMConsoleHandle& consoleHandle,
 		AUTORELEASE IFactory* factory,
-		AUTORELEASE IGameHandler* gameHandler
+		AUTORELEASE IGameHandler* gameHandler,
+		GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL
 	);
 
 	//! 获取绘制引擎。
@@ -187,6 +207,7 @@ public:
 	//! 获取当前机器的大小端模式。
 	/*!
 	  此方法会将返回值保存起来，下一次调用的时候，直接返回其保存值。
+	  \return 当前机器大小端模式。
 	*/
 	EndiannessMode getMachineEndianness();
 
@@ -202,6 +223,7 @@ public:
 	/*!
 	  获取最后一条GameMachine消息。此方法仅仅是获取GameMachine消息队列中的最后一条消息，并不会移除此消息。如果
 	在某些对象中，需要处理GameMachine的消息，如当窗口大小改变时处理对象中的一些行为，可以调用此方法获取消息。
+	  \return GameMachine消息。
 	*/
 	GameMachineMessage peekMessage();
 
@@ -216,6 +238,14 @@ public:
 	  获取当前鼠标形状。鼠标形状是在渲染窗口中的一个GMGameObject对象，它不会溢出窗口，因此窗口的边框将会遮挡它。
 	*/
 	inline GMCursorGameObject* getCursor() { D(d); return d->cursor; }
+
+	//! 获取当前渲染环境。
+	/*!
+	  渲染环境决定着本程序将用何种图形库来进行绘制。如OpenGL，DirectX等。
+	  \return 当前渲染环境。
+	  \sa init()
+	*/
+	inline GMRenderEnvironment getRenderEnvironment() { D(d); return d->renderEnv; }
 
 	//! 开始运行GameMachine。
 	/*!
@@ -234,6 +264,7 @@ private:
 	void initInner();
 	void updateGameMachineRunningStates();
 	void runLoop();
+	void setRenderEnvironment(GMRenderEnvironment renv);
 };
 
 END_NS

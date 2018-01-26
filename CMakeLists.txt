@@ -97,6 +97,10 @@ option(GM_BUILD_DEMO "Build GameMachine Demos" ON)
 option(GM_BUILD_UNITTEST "Build GameMachine Unit Tests" ON)
 option(GM_DETECT_MEMORY_LEAK "Detect memory leaking" OFF)
 
+if (WIN32)
+	option(GM_USE_DX11 "Use DirectX11 (SDK required)" ON)
+endif(WIN32)
+
 if (GM_BUILD_DOCS)
 	set (DOXYGEN_SKIP_DOT TRUE)
 	find_package(Doxygen)
@@ -105,6 +109,10 @@ endif()
 if (GM_DETECT_MEMORY_LEAK)
 	add_definitions(-DGM_DETECT_MEMORY_LEAK)
 endif()
+
+if (GM_USE_DX11)
+	add_definitions(-DGM_USE_DX11)
+endif(GM_USE_DX11)
 
 # Projects:
 add_subdirectory(src)

@@ -181,3 +181,80 @@ LRESULT CALLBACK GMUIWindow::WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 	}
 	return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
+
+bool GMUIGameMachineWindowBase::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
+{
+	D_BASE(db, GMUIWindow);
+
+	bool handled = Base::wndProc(uMsg, wParam, lParam, lRes);
+	if (handled)
+		return handled;
+
+	switch (uMsg)
+	{
+	case WM_DESTROY:
+		::PostQuitMessage(0L);
+		break;
+	case WM_SIZE:
+	{
+		gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
+		break;
+	}
+	case WM_MOUSEWHEEL:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
+		break;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordMouseDown(GMMouseButton_Left);
+		break;
+	}
+	case WM_MOUSEMOVE:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordMouseMove();
+		break;
+	}
+	case WM_RBUTTONDOWN:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordMouseDown(GMMouseButton_Right);
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordMouseUp(GMMouseButton_Left);
+		break;
+	}
+	case WM_RBUTTONUP:
+	{
+		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		if (input)
+			input->recordMouseUp(GMMouseButton_Right);
+		break;
+	}
+	default:
+		break;
+	}
+
+	*lRes = ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
+	return true;
+}
+
+void GMUIGameMachineWindowBase::showWindow()
+{
+	D(d);
+	gm::GMWindowHandle hwnd = getWindowHandle();
+	GM_ASSERT(::IsWindow(hwnd));
+	if (!::IsWindow(hwnd)) return;
+	::ShowWindow(hwnd, SW_SHOWNORMAL);
+}

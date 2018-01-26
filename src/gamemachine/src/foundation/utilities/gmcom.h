@@ -3,59 +3,46 @@
 #include <gamemachine.h>
 
 #if GM_WINDOWS
-
-#if _MSC_VER
-#   include <Unknwnbase.h>
-#	define __uuid(c) __uuidof(c)
-#	define GM_REGISTER_IUNKNOWN(c)
-#else
-#	define __uuid(c) __uuidof(static_cast<c*>(nullptr))
-#	define GM_REGISTER_IUNKNOWN(T) template <> REFIID __uuidof(T*) { return IID_ ## T; }
-	template <typename T> REFIID __uuidof(T*)
-	{
-		GM_ASSERT(!"You must specialize your interface;");
-		return IID_IUnknown;
-	}
-#endif
+#include <Unknwnbase.h>
 
 BEGIN_NS
 template <class E>
-class ComPtr
+class GMComPtr
 {
 public:
-	ComPtr() { m_ptr = NULL; }
-	ComPtr(E* p)
+	GMComPtr() { m_ptr = NULL; }
+	GMComPtr(E* p)
 	{
 		m_ptr = p;
 		if (m_ptr)
 			m_ptr->AddRef();
 	}
-	ComPtr(const ComPtr<E>& p)
+	GMComPtr(const GMComPtr<E>& p)
 	{
 		m_ptr = p.m_ptr;
 		if (m_ptr)
 			m_ptr->AddRef();
 	}
-	ComPtr(IUnknown* pUnk) : m_ptr(NULL)
+	GMComPtr(IUnknown* pUnk) : m_ptr(NULL)
 	{
 		if (pUnk)
 			pUnk->QueryInterface(__uuid(E), (void**)&m_ptr);
 	}
 
-	ComPtr(IUnknown* pUnk, REFIID iid) : m_ptr(NULL)
+	GMComPtr(IUnknown* pUnk, REFIID iid) : m_ptr(NULL)
 	{
 		if (pUnk)
 			pUnk->QueryInterface(iid, (void**)&m_ptr);
 	}
 
 	template <class Type>
-	ComPtr(const ComPtr<Type>& p) : m_ptr(NULL)
+	GMComPtr(const GMComPtr<Type>& p) : m_ptr(NULL)
 	{
 		if (p)
 			p->QueryInterface(__uuid(E), (void**)&m_ptr);
 	}
 
-	~ComPtr()
+	~GMComPtr()
 	{
 		if (m_ptr)
 			m_ptr->Release();
@@ -95,7 +82,7 @@ public:
 			m_ptr->Release();
 		return m_ptr = p;
 	}
-	E* operator=(const ComPtr<E>& p)
+	E* operator=(const GMComPtr<E>& p)
 	{
 		if (p.m_ptr)
 			p.m_ptr->AddRef();
@@ -134,7 +121,7 @@ public:
 	}
 
 	template <class Type>
-	E* operator=(const ComPtr<Type>& p)
+	E* operator=(const GMComPtr<Type>& p)
 	{
 		E* pTemp = NULL;
 		if (p)

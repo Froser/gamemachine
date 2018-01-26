@@ -10,6 +10,19 @@
 void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window)
 {
 	initEnvironment(instance);
+	if (GM.getRenderEnvironment() == gm::GMRenderEnvironment::DirectX11)
+	{
+#if GM_USE_DX11
+		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))
+		{
+			(*window) = new GMUIDx11Window();
+			return;
+		}
+		GM_ASSERT(!"DirectX11 not support, use opengl instead");
+#else
+		GM_ASSERT(!"DirectX11 not support, use opengl instead");
+#endif
+	}
 	(*window) = new GMUIGLWindow();
 }
 

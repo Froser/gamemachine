@@ -4,14 +4,34 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmstates.h"
 
+extern "C"
+{
+	bool GMQueryCapability(GMCapability cp)
+	{
+		if (cp == GMCapability::SupportOpenGL)
+			return true;
+
+		if (cp == GMCapability::SupportDirectX11)
+#if GM_USE_DX11
+			return true;
+#else
+			return false;
+#endif
+		GM_ASSERT(false);
+		return false;
+	}
+}
+
 void GameMachine::init(
 	AUTORELEASE IWindow* mainWindow,
 	const GMConsoleHandle& consoleHandle,
 	AUTORELEASE IFactory* factory,
-	AUTORELEASE IGameHandler* gameHandler
+	AUTORELEASE IGameHandler* gameHandler,
+	GMRenderEnvironment renderEnv
 )
 {
 	D(d);
+	setRenderEnvironment(renderEnv);
 	registerManager(factory, &d->factory);
 	registerManager(gameHandler, &d->gameHandler);
 	registerManager(mainWindow, &d->mainWindow);
@@ -172,7 +192,31 @@ void GameMachine::runLoop()
 			d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 		}
 	}
+}
 
+void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
+{
+	D(d);
+	switch (renv)
+	{
+	case GMRenderEnvironment::OpenGL:
+		if (GMQueryCapability(GMCapability::SupportOpenGL))
+		{
+			d->renderEnv = renv;
+			return;
+		}
+	case GMRenderEnvironment::DirectX11:
+		if (GMQueryCapability(GMCapability::SupportDirectX11))
+		{
+			d->renderEnv = renv;
+			return;
+		}
+		break;
+	default:
+		break;
+	}
+	GM_ASSERT(!"Wrong render env");
+	d->renderEnv = GMRenderEnvironment::OpenGL;
 }
 
 bool GameMachine::handleMessages()

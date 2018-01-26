@@ -62,6 +62,17 @@ public:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
+class GMUIGameMachineWindowBase : public GMUIWindow
+{
+	typedef GMUIWindow Base;
+
+protected:
+	bool wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes);
+
+public:
+	virtual void showWindow() override;
+};
+
 END_UI_NS
 
 #endif
