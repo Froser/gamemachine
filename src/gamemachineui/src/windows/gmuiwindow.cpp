@@ -144,7 +144,7 @@ bool GMUIWindow::createWindow(const gm::GMWindowAttributes& wndAttrs, const gm::
 	gm::GMWindowHandle hwnd = ::CreateWindowEx(
 		wndAttrs.dwExStyle,
 		className,
-		wndAttrs.pstrName,
+		wndAttrs.windowName.toStdWString().c_str(),
 		wndAttrs.dwStyle,
 		wndAttrs.rc.left,
 		wndAttrs.rc.top,

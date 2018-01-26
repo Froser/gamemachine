@@ -245,6 +245,8 @@ void DemostrationWorld::resetProjectionAndEye()
 void DemostrationEntrance::init()
 {
 	D(d);
+	auto& rc = GM.getGameMachineRunningStates().clientRect;
+
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
 #ifdef _DEBUG
@@ -257,8 +259,8 @@ void DemostrationEntrance::init()
 	engine->setShaderLoadCallback(this);
 	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
-	GMSetRenderState(RESOLUTION_X, 800);
-	GMSetRenderState(RESOLUTION_Y, 600);
+	GMSetRenderState(RESOLUTION_X, rc.width);
+	GMSetRenderState(RESOLUTION_Y, rc.height);
 
 	d->world = new DemostrationWorld();
 }

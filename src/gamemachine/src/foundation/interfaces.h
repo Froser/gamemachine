@@ -262,12 +262,13 @@ typedef HINSTANCE GMInstance;
 typedef HWND GMWindowHandle;
 struct GMWindowAttributes
 {
-	HWND hwndParent;
-	LPCTSTR pstrName;
-	DWORD dwStyle;
-	DWORD dwExStyle;
-	RECT rc;
-	HMENU hMenu;
+	GMWindowHandle hwndParent = NULL;
+	GMString windowName = L"Default GameMachine Main Window";
+	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
+	DWORD dwExStyle = NULL;
+	RECT rc = { 0, 0, 1024, 768 };
+	HMENU hMenu = NULL;
+	GMint samples = 8;
 	GMInstance instance;
 };
 #else

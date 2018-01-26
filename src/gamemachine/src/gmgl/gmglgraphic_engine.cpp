@@ -64,6 +64,7 @@ void GMGLGraphicEngine::init()
 {
 	installShaders();
 	glEnable(GL_MULTISAMPLE);
+
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -341,8 +342,9 @@ void GMGLGraphicEngine::viewGBufferFrameBuffer()
 		d->gbuffer.beginPass();
 		d->gbuffer.bindForReading();
 		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
+		GM_BEGIN_CHECK_GL_ERROR
 		glBlitFramebuffer(0, 0, d->gbuffer.getWidth(), d->gbuffer.getHeight(), x, y, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-		GM_CHECK_GL_ERROR();
+		GM_END_CHECK_GL_ERROR
 		d->gbuffer.releaseBind();
 	}
 }

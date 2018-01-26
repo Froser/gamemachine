@@ -24,6 +24,7 @@ void GameMachine::init(
 	registerManager(consoleHandle.window, &d->consoleWindow);
 	d->consoleOutput = consoleHandle.dbgoutput;
 
+	updateGameMachineRunningStates();
 	initInner();
 	d->gameHandler->init();
 }
@@ -98,6 +99,15 @@ void GameMachine::startGameMachine()
 	d->clock.begin();
 
 	// 消息循环
+	runLoop();
+
+	// 结束
+	terminate();
+}
+
+void GameMachine::runLoop()
+{
+	D(d);
 	GMfloat diff = 0;
 	GMClock frameCounter;
 	while (true)
@@ -120,7 +130,7 @@ void GameMachine::startGameMachine()
 			d->clock.update();
 			continue;
 		}
-		
+
 		d->gameHandler->event(GameMachineEvent::FrameStart);
 		if (d->mainWindow->isWindowActivate())
 			d->gameHandler->event(GameMachineEvent::Activate);
@@ -134,7 +144,7 @@ void GameMachine::startGameMachine()
 		if (d->consoleWindow)
 			d->consoleWindow->update();
 		d->clock.update();
-		
+
 		// 更新状态
 		updateGameMachineRunningStates();
 
@@ -163,7 +173,6 @@ void GameMachine::startGameMachine()
 		}
 	}
 
-	terminate();
 }
 
 bool GameMachine::handleMessages()

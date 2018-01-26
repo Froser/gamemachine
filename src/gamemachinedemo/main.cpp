@@ -17,30 +17,19 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	gm::GMWindowAttributes mainAttrs =
-	{
-		NULL,
-		L"Default",
-		WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME,
-		0,
-		{ 0, 0, 800, 600 },
-		NULL,
-		hInstance,
-	};
+	gm::GMWindowAttributes mainAttrs;
+	mainAttrs.instance = hInstance;
 
 	gm::IWindow* mainWindow = nullptr;
 	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow);
 	mainWindow->create(mainAttrs);
 
-	gm::GMWindowAttributes consoleAttrs =
-	{
-		NULL,
-		L"GameMachineConsoleWindow",
-		WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU,
-		WS_EX_CLIENTEDGE,
-		{ 0, 0, 700, 400 },
-		NULL,
-	};
+	gm::GMWindowAttributes consoleAttrs;
+	consoleAttrs.windowName = L"GameMachineConsoleWindow";
+	consoleAttrs.dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU;
+	consoleAttrs.dwExStyle = WS_EX_CLIENTEDGE;
+	consoleAttrs.rc.right = 700;
+	consoleAttrs.rc.bottom = 400;
 
 	gm::GMConsoleHandle consoleHandle;
 	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);

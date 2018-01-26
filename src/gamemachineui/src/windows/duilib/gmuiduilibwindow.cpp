@@ -3,7 +3,7 @@
 
 gm::GMWindowHandle GMUIDuiLibWindow::create(const gm::GMWindowAttributes& attrs)
 {
-	return Implement::Create(attrs.hwndParent, attrs.pstrName, attrs.dwStyle, attrs.dwExStyle, attrs.rc, attrs.hMenu);
+	return Implement::Create(attrs.hwndParent, attrs.windowName.toStdWString().c_str(), attrs.dwStyle, attrs.dwExStyle, attrs.rc, attrs.hMenu);
 }
 
 gm::GMWindowHandle GMUIDuiLibWindow::getWindowHandle() const

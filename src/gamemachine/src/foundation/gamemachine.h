@@ -233,6 +233,7 @@ private:
 	bool handleMessages();
 	void initInner();
 	void updateGameMachineRunningStates();
+	void runLoop();
 };
 
 END_NS

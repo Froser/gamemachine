@@ -128,7 +128,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 		WGL_ALPHA_BITS_ARB,		8,
 		WGL_DEPTH_BITS_ARB,		24,
 		WGL_STENCIL_BITS_ARB,	0,
-		WGL_SAMPLES_ARB,		8,
+		WGL_SAMPLES_ARB,		wndAttrs.samples,
 		0
 	};
 
