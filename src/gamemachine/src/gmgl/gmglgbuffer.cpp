@@ -232,8 +232,9 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 	}
 
+	GM_BEGIN_CHECK_GL_ERROR
 	glDrawBuffers(count, attachments.data());
-	GM_CHECK_GL_ERROR();
+	GM_END_CHECK_GL_ERROR
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)

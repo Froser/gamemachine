@@ -339,9 +339,19 @@ void GMGLGraphicEngine::viewGBufferFrameBuffer()
 			y = GMGetDebugState(FRAMEBUFFER_VIEWER_Y),
 			width = GMGetDebugState(FRAMEBUFFER_VIEWER_WIDTH),
 			height = GMGetDebugState(FRAMEBUFFER_VIEWER_HEIGHT);
+
+		GM_BEGIN_CHECK_GL_ERROR
 		d->gbuffer.beginPass();
+		GM_END_CHECK_GL_ERROR
+
+		GM_BEGIN_CHECK_GL_ERROR
 		d->gbuffer.bindForReading();
+		GM_END_CHECK_GL_ERROR
+
+		GM_BEGIN_CHECK_GL_ERROR
 		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
+		GM_END_CHECK_GL_ERROR
+
 		GM_BEGIN_CHECK_GL_ERROR
 		glBlitFramebuffer(0, 0, d->gbuffer.getWidth(), d->gbuffer.getHeight(), x, y, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 		GM_END_CHECK_GL_ERROR
