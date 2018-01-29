@@ -22,6 +22,44 @@ gm::GMWindowHandle GMUIDx11Window::create(const gm::GMWindowAttributes& wndAttrs
 	return getWindowHandle();
 }
 
+void GMUIDx11Window::update()
+{
+	D(d);
+	d->swapChain->Present(TRUE, 0);
+	Base::update();
+}
+
+bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
+{
+	D(d);
+	switch (id)
+	{
+	case gm::GameMachineInterfaceID::D3D11Device:
+		d->device->AddRef();
+		(*out) = d->device;
+		break;
+	case gm::GameMachineInterfaceID::D3D11DeviceContext:
+		d->deviceContext->AddRef();
+		(*out) = d->device;
+		break;
+	case gm::GameMachineInterfaceID::DXGISwapChain:
+		d->swapChain->AddRef();
+		(*out) = d->device;
+		break;
+	case gm::GameMachineInterfaceID::D3D11DepthStencilView:
+		d->depthStencilView->AddRef();
+		(*out) = d->device;
+		break;
+	case gm::GameMachineInterfaceID::D3D11RenderTargetView:
+		d->renderTargetView->AddRef();
+		(*out) = d->device;
+		break;
+	default:
+		return false;
+	}
+	return true;
+}
+
 void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 {
 	D(d);
@@ -152,12 +190,8 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	d->deviceContext->RSSetViewports(1, &vp);
 
 	// 发送事件
-	msg.msgType = gm::GameMachineMessageType::Dx11_DeviceReady;
-	msg.objPtr = d->device;
-	GM.postMessage(msg);
-
-	msg.msgType = gm::GameMachineMessageType::Dx11_DeviceContextReady;
-	msg.objPtr = d->deviceContext;
+	msg.msgType = gm::GameMachineMessageType::Dx11Ready;
+	msg.objPtr = static_cast<IQueriable*>(this);
 	GM.postMessage(msg);
 
 EXIT:

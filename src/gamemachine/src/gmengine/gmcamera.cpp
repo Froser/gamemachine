@@ -30,16 +30,18 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
 	{
 		d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+		update();
 	}
 	else
 	{
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
 		D3DXMatrixOrthoLH(&d->dxProjMatrix, d->right - d->left, d->bottom - d->top, d->n, d->f);
+		dxUpdate();
 	}
-	update();
 #else
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
 	d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	update();
 #endif
 		
 }
@@ -57,16 +59,18 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
 	{
 		d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+		update();
 	}
 	else
 	{
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
 		D3DXMatrixPerspectiveFovLH(&d->dxProjMatrix, d->fovy, d->aspect, d->n, d->f);
+		dxUpdate();
 	}
-	update();
 #else
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
 	d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+	update();
 #endif
 }
 
@@ -136,6 +140,11 @@ void GMFrustum::update()
 	//normalize planes
 	for (int i = 0; i < 6; ++i)
 		d->planes[i].normalize();
+}
+
+void GMFrustum::dxUpdate()
+{
+
 }
 
 //is a point in the Frustum?

@@ -26,7 +26,9 @@ public:
 	GMUIDx11Window();
 
 public:
-	gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs);
+	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs) override;
+	virtual void update() override;
+	virtual bool getInterface(gm::GameMachineInterfaceID id, void** out) override;
 
 private:
 	void initD3D(const gm::GMWindowAttributes& wndAttrs);

@@ -29,6 +29,20 @@ GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* mod
 {
 	D(d);
 	d->engine = engine;
+
+	// 初始化一个数组，用于遍历顶点数据
+	if (model)
+	{
+		GMMesh* mesh = model->getMesh();
+		d->vertexData[(size_t)GMVertexDataType::EndOfVertexDataType];
+		d->vertexData[(size_t)GMVertexDataType::Position] = &mesh->positions();
+		d->vertexData[(size_t)GMVertexDataType::Normal] = &mesh->normals();
+		d->vertexData[(size_t)GMVertexDataType::UV] = &mesh->uvs();
+		d->vertexData[(size_t)GMVertexDataType::Tangent] = &mesh->tangents();
+		d->vertexData[(size_t)GMVertexDataType::Bitangent] = &mesh->bitangents();
+		d->vertexData[(size_t)GMVertexDataType::Lightmap] = &mesh->lightmaps();
+		d->vertexData[(size_t)GMVertexDataType::Color] = &mesh->colors();
+	}
 }
 
 void GMDx11ModelPainter::transfer()
@@ -46,20 +60,11 @@ void GMDx11ModelPainter::transfer()
 	
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 
-	Vector<GMModel::DataType>* vertexData[(size_t)GMVertexDataType::EndOfVertexDataType];
-	vertexData[(size_t)GMVertexDataType::Position] = &mesh->positions();
-	vertexData[(size_t)GMVertexDataType::Normal] = &mesh->normals();
-	vertexData[(size_t)GMVertexDataType::UV] = &mesh->uvs();
-	vertexData[(size_t)GMVertexDataType::Tangent] = &mesh->tangents();
-	vertexData[(size_t)GMVertexDataType::Bitangent] = &mesh->bitangents();
-	vertexData[(size_t)GMVertexDataType::Lightmap] = &mesh->lightmaps();
-	vertexData[(size_t)GMVertexDataType::Color] = &mesh->colors();
-
 	HRESULT hr;
 	ID3D11Buffer* buffers[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
-		size_t byteWidth = mesh->isDataDisabled(type) ? 0 : sizeof(GMModel::DataType) * vertexData[(size_t)type]->size();
+		size_t byteWidth = mesh->isDataDisabled(type) ? 0 : sizeof(GMModel::DataType) * d->vertexData[(size_t)type]->size();
 		if (!byteWidth)
 			continue;
 
@@ -73,7 +78,7 @@ void GMDx11ModelPainter::transfer()
 		bufDesc.StructureByteStride = 0;
 
 		D3D11_SUBRESOURCE_DATA bufData;
-		bufData.pSysMem = vertexData[idx]->data();
+		bufData.pSysMem = d->vertexData[idx]->data();
 		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
 		GMComPtr<ID3D11Device> device = d->engine->getDevice();
@@ -83,17 +88,22 @@ void GMDx11ModelPainter::transfer()
 		buffers[idx] = d->buffers[(size_t)type];
 	}
 
-	hr = renderBuffer(buffers, (size_t)GMVertexDataType::EndOfVertexDataType);
-	GM_COM_CHECK(hr);
-
 	d->inited = true;
 	model->needNotTransferAnymore();
 }
 
 void GMDx11ModelPainter::draw(const GMGameObject* parent)
 {
-
-	throw std::logic_error("The method or operation is not implemented.");
+	D(d);
+	ID3D11DeviceContext* context = d->engine->getDeviceContext();
+	GMuint stride = sizeof(gm::GMVertexDataType);
+	GMuint slot = 0;
+	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
+	{
+		context->IASetVertexBuffers(slot, 1, &d->buffers[slot], &stride, 0);
+		++slot;
+	}
+	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
 }
 
 void GMDx11ModelPainter::dispose(GMMeshData* md)
@@ -114,14 +124,4 @@ void GMDx11ModelPainter::endUpdateBuffer()
 void* GMDx11ModelPainter::getBuffer()
 {
 	throw std::logic_error("The method or operation is not implemented.");
-}
-
-HRESULT GMDx11ModelPainter::renderBuffer(ID3D11Buffer** buffer, UINT numBuffers)
-{
-	D(d);
-	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	GMuint stride = sizeof(gm::GMVertexDataType);
-	context->IASetVertexBuffers(0, numBuffers, buffer, &stride, 0);
-	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
-	return S_OK;
 }

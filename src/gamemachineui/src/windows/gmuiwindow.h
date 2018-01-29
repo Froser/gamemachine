@@ -43,6 +43,8 @@ public:
 	virtual void setLockWindow(bool lock) override;
 	virtual bool event(const gm::GameMachineMessage& msg) override { return false; }
 	virtual gm::GMWindowHandle getWindowHandle() const { D(d); return d->hwnd; }
+	virtual bool getInterface(gm::GameMachineInterfaceID id, void** out) { return false; }
+	virtual bool setInterface(gm::GameMachineInterfaceID id, void* in) { return false; }
 
 	// 新虚方法
 protected:

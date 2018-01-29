@@ -105,6 +105,7 @@ public:
 
 private:
 	void update();
+	void dxUpdate();
 };
 
 GM_PRIVATE_OBJECT(GMCamera)

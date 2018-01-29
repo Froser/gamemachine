@@ -49,8 +49,16 @@ enum class GameMachineMessageType
 	CrashDown,
 	Console,
 	WindowSizeChanged,
-	Dx11_DeviceReady,
-	Dx11_DeviceContextReady,
+	Dx11Ready,
+};
+
+enum class GameMachineInterfaceID
+{
+	D3D11Device,
+	D3D11DeviceContext,
+	DXGISwapChain,
+	D3D11DepthStencilView,
+	D3D11RenderTargetView,
 };
 
 struct GameMachineMessage
@@ -77,6 +85,12 @@ GM_INTERFACE(IGameHandler)
 GM_INTERFACE(ITexture)
 {
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
+};
+
+GM_INTERFACE(IQueriable)
+{
+	virtual bool getInterface(GameMachineInterfaceID id, void** out) = 0;
+	virtual bool setInterface(GameMachineInterfaceID id, void* in) = 0;
 };
 
 enum class GMBufferMode
@@ -281,7 +295,7 @@ typedef GMuint GMUIInstance;
 typedef GMuint GMWindowHandle;
 #endif
 
-GM_INTERFACE(IWindow)
+GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
 	virtual void update() = 0;

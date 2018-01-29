@@ -7,6 +7,10 @@ void GMDx11GraphicEngine::init()
 
 void GMDx11GraphicEngine::newFrame()
 {
+	D(d);
+	static const GMfloat clear[4] = { 0 };
+	d->deviceContext->ClearRenderTargetView(d->renderTargetView, clear);
+	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode /*= GMBufferMode::Normal*/)
@@ -95,16 +99,20 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 	switch (e.msgType)
 	{
 	{
-	case GameMachineMessageType::Dx11_DeviceReady:
-		GM_ASSERT(!d->device);
-		d->device = static_cast<ID3D11Device*>(e.objPtr);
-		break;
-	}
-	{
-	case GameMachineMessageType::Dx11_DeviceContextReady:
-		GM_ASSERT(!d->context);
-		d->context = static_cast<ID3D11DeviceContext*>(e.objPtr);
-		break;
+	case GameMachineMessageType::Dx11Ready:
+		IQueriable* queriable = static_cast<IQueriable*>(e.objPtr);
+		bool b = false;
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
+		GM_ASSERT(b);
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+		GM_ASSERT(b);
+		b = queriable->getInterface(GameMachineInterfaceID::DXGISwapChain, (void**)&d->swapChain);
+		GM_ASSERT(b);
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->depthStencilView);
+		GM_ASSERT(b);
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
+		GM_ASSERT(b);
+		return true;
 	}
 	}
 

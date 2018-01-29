@@ -8,7 +8,10 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
-	GMComPtr<ID3D11DeviceContext> context;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMComPtr<IDXGISwapChain> swapChain;
+	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 };
 
 class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
@@ -42,7 +45,25 @@ public:
 	GMComPtr<ID3D11DeviceContext> getDeviceContext()
 	{
 		D(d);
-		return d->context;
+		return d->deviceContext;
+	}
+
+	GMComPtr<IDXGISwapChain> getSwapChain()
+	{
+		D(d);
+		return d->swapChain;
+	}
+
+	GMComPtr<ID3D11DepthStencilView> getDepthStencilView()
+	{
+		D(d);
+		return d->depthStencilView;
+	}
+
+	GMComPtr<ID3D11RenderTargetView> getRenderTargetView()
+	{
+		D(d);
+		return d->renderTargetView;
 	}
 
 private:

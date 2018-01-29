@@ -341,6 +341,7 @@ inline void gmSwap(GMObject& a, GMObject& b)
 
 // 接口统一定义
 #define GM_INTERFACE(name) struct name : public gm::IVirtualFunctionObject
+#define GM_INTERFACE_FROM(name, base) struct name : public base 
 
 template <typename T>
 class GMSingleton : public GMObject

@@ -11,6 +11,7 @@ class GMDx11GraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11ModelPainter)
 {
 	GMDx11GraphicEngine* engine = nullptr;
+	Vector<GMModel::DataType>* vertexData[(size_t)GMVertexDataType::EndOfVertexDataType];
 	GMComPtr<ID3D11Buffer> buffers[(size_t)GMVertexDataType::EndOfVertexDataType];
 	bool inited = false;
 };
@@ -29,9 +30,6 @@ public:
 	virtual void beginUpdateBuffer(GMMesh* mesh) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
-
-private:
-	HRESULT renderBuffer(ID3D11Buffer** buffer, UINT numBuffers);
 };
 
 END_NS
