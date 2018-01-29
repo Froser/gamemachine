@@ -26,6 +26,7 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	d->n = n;
 	d->f = f;
 
+#if GM_USE_DX11
 	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
 	{
 		d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
@@ -35,8 +36,12 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
 		D3DXMatrixOrthoLH(&d->dxProjMatrix, d->right - d->left, d->bottom - d->top, d->n, d->f);
 	}
-		
 	update();
+#else
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
+	d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+#endif
+		
 }
 
 void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -48,6 +53,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	d->n = n;
 	d->f = f;
 
+#if GM_USE_DX11
 	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
 	{
 		d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
@@ -58,6 +64,10 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 		D3DXMatrixPerspectiveFovLH(&d->dxProjMatrix, d->fovy, d->aspect, d->n, d->f);
 	}
 	update();
+#else
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
+	d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+#endif
 }
 
 void GMFrustum::update()
