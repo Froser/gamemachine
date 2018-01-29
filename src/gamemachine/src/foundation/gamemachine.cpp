@@ -32,6 +32,8 @@ void GameMachine::init(
 {
 	D(d);
 	setRenderEnvironment(renderEnv);
+	d->camera.reset(new GMCamera());
+
 	registerManager(factory, &d->factory);
 	registerManager(gameHandler, &d->gameHandler);
 	registerManager(mainWindow, &d->mainWindow);

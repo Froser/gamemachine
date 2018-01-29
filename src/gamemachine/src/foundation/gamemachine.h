@@ -71,7 +71,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IWindow* consoleWindow = nullptr; 
 	IDebugOutput* consoleOutput = nullptr;
 
-	GMCamera camera;
+	GMScopePtr<GMCamera> camera;
 	Queue<GameMachineMessage> messageQueue;
 	Vector<IVirtualFunctionObject*> manangerQueue;
 
@@ -177,7 +177,7 @@ public:
 	/*!
 	  主相机用于主界面的绘制。
 	*/
-	GMCamera& getCamera() { D(d); return d->camera; }
+	GMCamera& getCamera() { D(d); return *d->camera; }
 
 	//! 获取当前帧率。
 	/*!
