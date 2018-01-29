@@ -109,10 +109,8 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 			gm_error("init framebuffer error");
 		break;
 	}
-	default:
-		return false;
 	}
-	return true;
+	return false;
 }
 
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode)

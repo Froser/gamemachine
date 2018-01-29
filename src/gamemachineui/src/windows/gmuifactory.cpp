@@ -7,10 +7,10 @@
 #endif
 
 // factory
-void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window)
+void GMUIFactory::createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window, gm::GMRenderEnvironment env)
 {
 	initEnvironment(instance);
-	if (GM.getRenderEnvironment() == gm::GMRenderEnvironment::DirectX11)
+	if (env == gm::GMRenderEnvironment::DirectX11)
 	{
 #if GM_USE_DX11
 		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))

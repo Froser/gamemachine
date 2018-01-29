@@ -16,6 +16,8 @@
 #include "demo/model.h"
 #include "demo/collision.h"
 
+extern gm::GMRenderEnvironment GetRenderEnv();
+
 namespace
 {
 	void loadDemostrations(DemostrationWorld* world)
@@ -255,8 +257,16 @@ void DemostrationEntrance::init()
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #endif
 
-	gm::GMGLGraphicEngine* engine = static_cast<gm::GMGLGraphicEngine*> (GM.getGraphicEngine());
-	engine->setShaderLoadCallback(this);
+	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
+	{
+		gm::GMGLGraphicEngine* engine = static_cast<gm::GMGLGraphicEngine*> (GM.getGraphicEngine());
+		engine->setShaderLoadCallback(this);
+	}
+	else
+	{
+		// Load HLSL here
+	}
+
 	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
 	GMSetRenderState(RESOLUTION_X, rc.width);

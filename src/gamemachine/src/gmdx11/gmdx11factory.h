@@ -1,12 +1,10 @@
-﻿#ifndef __GMGLFACTORY_H__
-#define __GMGLFACTORY_H__
+﻿#ifndef __GMDX11FACTORY_H__
+#define __GMDX11FACTORY_H__
 #include <gmcommon.h>
-#include "gmglshaderprogram.h"
+
 BEGIN_NS
 
-class GMImage;
-class GMModelPainter;
-class GMGLFactory : public IFactory
+class GMDX11Factory : public IFactory
 {
 public:
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;

@@ -30,6 +30,15 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	D3D11_TEXTURE2D_DESC depthStencilDesc = { 0 };
 	D3D11_VIEWPORT vp = { 0 };
 	HRESULT hr;
+	gm::GameMachineMessage msg;
+
+	// COM objs
+	gm::GMComPtr<IDXGIDevice> dxgiDevice;
+	gm::GMComPtr<IDXGIAdapter> dxgiAdapter;
+	gm::GMComPtr<IDXGIFactory> dxgiFactory;
+	gm::GMComPtr<ID3D11Texture2D> backBuffer;
+	gm::GMComPtr<ID3D11Texture2D> depthStencilBuffer;
+
 	UINT renderWidth = wndAttrs.rc.right - wndAttrs.rc.left;
 	UINT renderHeight = wndAttrs.rc.bottom - wndAttrs.rc.top;
 #if defined(_DEBUG)
@@ -92,34 +101,24 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	sc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	sc.Flags = 0;
 
-	IDXGIDevice *dxgiDevice;
 	hr = d->device->QueryInterface(__uuidof(IDXGIDevice), (void**)(&dxgiDevice));
 	CHECK_HR(hr);
 
-	IDXGIAdapter *dxgiAdapter;
 	hr = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)(&dxgiAdapter));
 	CHECK_HR(hr);
 
-	IDXGIFactory *dxgiFactory(NULL);
 	hr = dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)(&dxgiFactory));
 	CHECK_HR(hr);
 
 	hr = dxgiFactory->CreateSwapChain(d->device, &sc, &d->swapChain);
 	CHECK_HR(hr);
 
-	dxgiFactory->Release();
-	dxgiAdapter->Release();
-	dxgiDevice->Release();
-
 	// 创建目标视图
-	ID3D11Texture2D *backBuffer;
 	hr = d->swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
 	CHECK_HR(hr);
 
 	hr = d->device->CreateRenderTargetView(backBuffer, NULL, &d->renderTargetView);
 	CHECK_HR(hr);
-
-	backBuffer->Release();
 
 	// 创建深度模板缓存
 	depthStencilDesc.Width = renderWidth;
@@ -134,7 +133,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	depthStencilDesc.CPUAccessFlags = 0;
 	depthStencilDesc.MiscFlags = 0;
 
-	ID3D11Texture2D *depthStencilBuffer;
 	hr = d->device->CreateTexture2D(&depthStencilDesc, NULL, &depthStencilBuffer);
 	CHECK_HR(hr);
 
@@ -143,9 +141,8 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 
 	// 将视图绑定到输出合并器阶段
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);
-	depthStencilBuffer->Release();
 
-	// h.设置视口
+	// 设置视口
 	vp.TopLeftX = 0.f;
 	vp.TopLeftY = 0.f;
 	vp.Width = static_cast<float>(renderWidth);
@@ -153,6 +150,15 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	vp.MinDepth = 0.f;
 	vp.MaxDepth = 1.f;
 	d->deviceContext->RSSetViewports(1, &vp);
+
+	// 发送事件
+	msg.msgType = gm::GameMachineMessageType::Dx11_DeviceReady;
+	msg.objPtr = d->device;
+	GM.postMessage(msg);
+
+	msg.msgType = gm::GameMachineMessageType::Dx11_DeviceContextReady;
+	msg.objPtr = d->deviceContext;
+	GM.postMessage(msg);
 
 EXIT:
 	return;

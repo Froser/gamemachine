@@ -51,9 +51,6 @@ endif(WIN32)
 
 if(GM_USE_DX11)
 	list(APPEND SOURCES ${WIN32_DX11})
-	link_libraries(
-		d3d11.lib
-	)
 endif(GM_USE_DX11)
 
 if(GM_USE_DUILIB)

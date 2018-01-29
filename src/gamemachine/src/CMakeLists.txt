@@ -111,7 +111,6 @@ set(SOURCES
 		foundation/utilities/tools.cpp
 		foundation/utilities/utilities.h
 		foundation/utilities/utilities.cpp
-		foundation/utilities/gmcom.h
 		foundation/input.h
 		foundation/defines.h
 		foundation/gmmessages.h
@@ -177,9 +176,23 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/thread.cpp
 	)
 
+set(WIN32_DX11_SOURCES
+		foundation/utilities/gmcom.h
+		gmdx11/gmdx11factory.h
+		gmdx11/gmdx11factory.cpp
+		gmdx11/gmdx11graphic_engine.h
+		gmdx11/gmdx11graphic_engine.cpp
+		gmdx11/gmdx11modelpainter.h
+		gmdx11/gmdx11modelpainter.cpp
+	)
+
 if(WIN32)
 	list(APPEND SOURCES ${WIN32_SOURCES})
 endif(WIN32)
+
+if(GM_USE_DX11)
+	list(APPEND SOURCES ${WIN32_DX11_SOURCES})
+endif(GM_USE_DX11)
 
 gm_source_group_by_dir(SOURCES)
 gm_add_msvc_precompiled_header("stdafx.h" "stdafx.cpp" ${SOURCES})

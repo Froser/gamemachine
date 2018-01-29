@@ -20,7 +20,7 @@ BEGIN_UI_NS
 class GMUIFactory
 {
 public:
-	static void createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window);
+	static void createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window, gm::GMRenderEnvironment env);
 	static void createConsoleWindow(gm::GMInstance instance, REF gm::GMConsoleHandle& handle);
 
 private:

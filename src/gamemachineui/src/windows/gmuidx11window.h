@@ -2,18 +2,19 @@
 #define __GMUIDX11WINDOW_H__
 #include "gmuidef.h"
 #include "gmuiwindow.h"
-#include <d3d11.h>
+#include <gmdxincludes.h>
 #include "gmuiglwindow.h"
+#include <gmcom.h>
 
 BEGIN_UI_NS
 
 GM_PRIVATE_OBJECT(GMUIDx11Window)
 {
-	ID3D11Device* device = nullptr;
-	ID3D11DeviceContext* deviceContext = nullptr;
-	IDXGISwapChain* swapChain = nullptr;
-	ID3D11DepthStencilView* depthStencilView = nullptr;
-	ID3D11RenderTargetView* renderTargetView = nullptr;
+	gm::GMComPtr<ID3D11Device> device;
+	gm::GMComPtr<ID3D11DeviceContext> deviceContext;
+	gm::GMComPtr<IDXGISwapChain> swapChain;
+	gm::GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	gm::GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	D3D_FEATURE_LEVEL d3dFeatureLevel;
 };
 

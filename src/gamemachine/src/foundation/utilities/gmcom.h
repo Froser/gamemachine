@@ -5,6 +5,8 @@
 #if GM_WINDOWS
 #include <Unknwnbase.h>
 
+#define GM_COM_CHECK(hr) if (FAILED(hr)) { GM_ASSERT(false); return; }
+
 BEGIN_NS
 template <class E>
 class GMComPtr
@@ -47,12 +49,14 @@ public:
 		if (m_ptr)
 			m_ptr->Release();
 	}
+
 	void attach(E* p)
 	{
 		if (m_ptr)
 			m_ptr->Release();
 		m_ptr = p;
 	}
+
 	void detach(E** ppv)
 	{
 		GM_ASSERT(0); // 过时的用法!
@@ -60,12 +64,14 @@ public:
 		*ppv = m_ptr;
 		m_ptr = NULL;
 	}
+
 	E* detach()
 	{
 		E* tmp = m_ptr;
 		m_ptr = NULL;
 		return tmp;
 	}
+
 	void clear()
 	{
 		if (m_ptr)
@@ -74,6 +80,7 @@ public:
 			m_ptr = NULL;
 		}
 	}
+
 	E* operator=(E* p)
 	{
 		if (p)
@@ -90,6 +97,7 @@ public:
 			m_ptr->Release();
 		return m_ptr = p.m_ptr;
 	}
+
 	E* operator=(int __nil)
 	{
 		GM_ASSERT(__nil == 0);
@@ -100,6 +108,7 @@ public:
 		}
 		return NULL;
 	}
+
 	E* operator=(long __nil)
 	{
 		GM_ASSERT(__nil == 0);
@@ -146,34 +155,42 @@ public:
 		}
 		return (m_ptr == NULL);
 	}
+
 	E& operator*() const
 	{
 		return *m_ptr;
 	}
+
 	operator E*() const
 	{
 		return m_ptr;
 	}
+
 	E* get() const
 	{
 		return m_ptr;
 	}
-	E** operator&() // The assert on operator& usually indicates a bug.
+
+	E** operator&()
 	{
-		GM_ASSERT(m_ptr == NULL); return &m_ptr;
+		return &m_ptr;
 	}
+
 	E* operator->() const
 	{
 		return m_ptr;
 	}
+
 	BOOL operator!() const
 	{
 		return m_ptr == nullptr;
 	}
+
 	BOOL operator==(E* p) const
 	{
 		return m_ptr == p;
 	}
+
 	BOOL operator!=(E* p) const
 	{
 		return m_ptr != p;

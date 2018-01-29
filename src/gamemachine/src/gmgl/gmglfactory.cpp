@@ -18,11 +18,11 @@ void GMGLFactory::createTexture(GMImage* image, OUT ITexture** texture)
 	(*texture) = new GMGLTexture(image);
 }
 
-void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* obj, OUT GMModelPainter** painter)
+void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter)
 {
 	GM_ASSERT(painter);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
-	(*painter) = new GMGLModelPainter(gmglEngine, obj);
+	(*painter) = new GMGLModelPainter(gmglEngine, model);
 }
 
 void GMGLFactory::createGlyphManager(OUT GMGlyphManager** glyphManager)

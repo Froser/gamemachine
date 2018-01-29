@@ -53,7 +53,7 @@ endmacro(gm_apply_runtime_library)
 gm_apply_runtime_library()
 
 macro(gm_init_solution)
-	if (WIN32)
+	if(WIN32)
 		add_definitions(-DGM_WINDOWS)
 	endif(WIN32)
 	add_compile_options(-std=c++14)
@@ -65,6 +65,25 @@ macro(gm_init_solution)
 		add_definitions(-DGM_GCC)
 		add_definitions(-D_GLIBCXX_USE_WCHAR_T)
 	endif(MSVC)
+	# DirectX Environments:
+	if(GM_USE_DX11)
+		set(GM_DX11_SDK_PATH "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Include")
+		set(GM_DX11_SDK_LIB86_PATH "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x86")
+		set(GM_DX11_SDK_LIB64_PATH "C:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/Lib/x64")
+		include_directories(
+				${GM_DX11_SDK_PATH}
+			)
+		link_directories(
+				${GM_DX11_SDK_LIB86_PATH}
+				${GM_DX11_SDK_LIB64_PATH}
+			)
+		link_libraries(
+				dxgi.lib
+				d3d11.lib
+				d3dx10.lib
+				d3dx11.lib
+			)
+	endif(GM_USE_DX11)
 endmacro(gm_init_solution)
 
 macro(gm_link_dependencies projectName)
@@ -97,20 +116,21 @@ option(GM_BUILD_DEMO "Build GameMachine Demos" ON)
 option(GM_BUILD_UNITTEST "Build GameMachine Unit Tests" ON)
 option(GM_DETECT_MEMORY_LEAK "Detect memory leaking" OFF)
 
-if (WIN32)
+if(WIN32)
 	option(GM_USE_DX11 "Use DirectX11 (SDK required)" ON)
 endif(WIN32)
 
+# Environments:
 if (GM_BUILD_DOCS)
 	set (DOXYGEN_SKIP_DOT TRUE)
 	find_package(Doxygen)
-endif()
+endif(GM_BUILD_DOCS)
 
-if (GM_DETECT_MEMORY_LEAK)
+if(GM_DETECT_MEMORY_LEAK)
 	add_definitions(-DGM_DETECT_MEMORY_LEAK)
-endif()
+endif(GM_DETECT_MEMORY_LEAK)
 
-if (GM_USE_DX11)
+if(GM_USE_DX11)
 	add_definitions(-DGM_USE_DX11)
 endif(GM_USE_DX11)
 
@@ -119,4 +139,4 @@ add_subdirectory(src)
 
 if (DOXYGEN_FOUND AND GM_BUILD_DOCS)
 	add_subdirectory(doc gamemachinedocs)
-endif()
+endif(DOXYGEN_FOUND AND GM_BUILD_DOCS)

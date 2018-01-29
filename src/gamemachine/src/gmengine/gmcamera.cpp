@@ -2,6 +2,7 @@
 #include "gmcamera.h"
 #include "gameobjects/gmspritegameobject.h"
 #include "foundation/gamemachine.h"
+#include <gmdxincludes.h>
 
 //Frustum
 enum
@@ -24,7 +25,17 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	d->top = top;
 	d->n = n;
 	d->f = f;
-	d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+
+	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
+	{
+		d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	}
+	else
+	{
+		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+		D3DXMatrixOrthoLH(&d->dxProjMatrix, d->right - d->left, d->bottom - d->top, d->n, d->f);
+	}
+		
 	update();
 }
 
@@ -36,7 +47,16 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	d->aspect = aspect;
 	d->n = n;
 	d->f = f;
-	d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+
+	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
+	{
+		d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+	}
+	else
+	{
+		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+		D3DXMatrixPerspectiveFovLH(&d->dxProjMatrix, d->fovy, d->aspect, d->n, d->f);
+	}
 	update();
 }
 
@@ -158,6 +178,36 @@ void GMFrustum::updateViewMatrix(const glm::mat4& viewMatrix)
 	d->viewMatrix = viewMatrix;
 	update();
 }
+
+const glm::mat4& GMFrustum::getProjectionMatrix()
+{
+	D(d);
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
+	return d->projMatrix;
+}
+
+const glm::mat4& GMFrustum::getViewMatrix()
+{
+	D(d);
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
+	return d->viewMatrix;
+}
+
+#if GM_USE_DX11
+const D3DXMATRIX& GMFrustum::getDxProjectionMatrix()
+{
+	D(d);
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+	return d->dxProjMatrix;
+}
+
+const D3DXMATRIX& GMFrustum::getDxViewMatrix()
+{
+	D(d);
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+	return d->dxViewMatrix;
+}
+#endif
 
 //////////////////////////////////////////////////////////////////////////
 GMCamera::GMCamera()

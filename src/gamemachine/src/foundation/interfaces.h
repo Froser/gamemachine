@@ -49,11 +49,13 @@ enum class GameMachineMessageType
 	CrashDown,
 	Console,
 	WindowSizeChanged,
+	Dx11_DeviceReady,
+	Dx11_DeviceContextReady,
 };
 
 struct GameMachineMessage
 {
-	GameMachineMessage(GameMachineMessageType t = GameMachineMessageType::None, GMint tp = 0, GMint v = 0)
+	GameMachineMessage(GameMachineMessageType t = GameMachineMessageType::None, GMint tp = 0, GMint v = 0, void* objPtr = nullptr)
 		: msgType(t)
 		, type(tp)
 		, value(v)
@@ -62,6 +64,7 @@ struct GameMachineMessage
 	GameMachineMessageType msgType = GameMachineMessageType::None;
 	GMint type = 0;
 	GMint value = 0;
+	void* objPtr = 0;
 };
 
 GM_INTERFACE(IGameHandler)
@@ -152,8 +155,7 @@ GM_INTERFACE(IGraphicEngine)
 	  绘制GMGameObject对象。这个方法会将绘制好的图元到目标缓存，目标缓存取决于GMBufferMode的值。
 	  \param objects 待绘制的对象。
 	  \param count 待绘制对象的个数。
-	  \param bufferMode 绘制模式。如果模式为GMBufferMode::Normal，程序将按照正常流程绘制，如果模式为GMBufferMode::NoFramebuffer，
-	         程序会将绘制结果直接保存在默认帧缓存上，而不会保存在其他帧缓存中。
+	  \param bufferMode 绘制模式。如果模式为GMBufferMode::Normal，程序将按照正常流程绘制，如果模式为GMBufferMode::NoFramebuffer，程序会将绘制结果直接保存在默认帧缓存上，而不会保存在其他帧缓存中。
 	*/
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode = GMBufferMode::Normal) = 0;
 

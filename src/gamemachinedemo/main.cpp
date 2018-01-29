@@ -3,12 +3,25 @@
 #include <fstream>
 #include <gamemachine.h>
 #include <gmgl.h>
+#include <gmdx11.h>
 #include <gmui.h>
 #include <gmm.h>
 #include "demostration_world.h"
 
+namespace
+{
+	gm::GMRenderEnvironment s_env;
 
-gm::GMGLFactory factory;
+	void SetRenderEnv(gm::GMRenderEnvironment env)
+	{
+		s_env = env;
+	}
+}
+
+gm::GMRenderEnvironment GetRenderEnv()
+{
+	return s_env;
+}
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -17,11 +30,32 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
+	SetRenderEnv(
+#if GM_USE_DX11
+		gm::GMRenderEnvironment::DirectX11
+#else
+		gm::GMRenderEnvironment::OpenGL
+#endif
+	);
+
+	gm::IFactory* factory = nullptr;
+	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
+	{
+		factory = new gm::GMGLFactory();
+	}
+	else
+	{
+		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))
+			factory = new gm::GMDX11Factory();
+		else
+			factory = new gm::GMGLFactory();
+	}
+
 	gm::GMWindowAttributes mainAttrs;
 	mainAttrs.instance = hInstance;
 
 	gm::IWindow* mainWindow = nullptr;
-	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow);
+	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow, GetRenderEnv());
 	mainWindow->create(mainAttrs);
 
 	gm::GMWindowAttributes consoleAttrs;
@@ -39,9 +73,9 @@ int WINAPI WinMain(
 	GM.init(
 		mainWindow,
 		consoleHandle,
-		new gm::GMGLFactory(),
+		factory,
 		new DemostrationEntrance(),
-		gm::GMRenderEnvironment::OpenGL
+		GetRenderEnv()
 	);
 
 	GM.startGameMachine();

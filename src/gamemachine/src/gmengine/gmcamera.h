@@ -2,6 +2,8 @@
 #define __GMCAMERA_H__
 #include <gmcommon.h>
 #include <tools.h>
+#include <gmdxincludes.h>
+
 BEGIN_NS
 
 //Camera
@@ -63,6 +65,12 @@ GM_PRIVATE_OBJECT(GMFrustum)
 
 	glm::mat4 viewMatrix;
 	glm::mat4 projMatrix;
+
+#if GM_USE_DX11
+	//DirectX
+	D3DXMATRIX dxProjMatrix;
+	D3DXMATRIX dxViewMatrix;
+#endif
 };
 
 class GMSpriteGameObject;
@@ -81,12 +89,19 @@ public:
 	void updateViewMatrix(const glm::mat4& viewMatrix);
 
 public:
-	inline const glm::mat4& getProjectionMatrix() { D(d); return d->projMatrix; }
-	inline const glm::mat4& getViewMatrix() { D(d); return d->viewMatrix; }
 	inline GMFrustumType getType() { D(d); return d->type; }
 	inline GMfloat getNear() { D(d); return d->n; }
 	inline GMfloat getFar() { D(d); return d->f; }
 	inline GMfloat getFovy() { D(d); GM_ASSERT(getType() == GMFrustumType::Perspective); return d->fovy; }
+
+public:
+	const glm::mat4& getProjectionMatrix();
+	const glm::mat4& getViewMatrix();
+
+#if GM_USE_DX11
+	const D3DXMATRIX& getDxProjectionMatrix();
+	const D3DXMATRIX& getDxViewMatrix();
+#endif
 
 private:
 	void update();

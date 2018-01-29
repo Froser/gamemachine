@@ -24,6 +24,7 @@ extern "C"
 
 enum class GMRenderEnvironment
 {
+	Invalid,
 	OpenGL,
 	DirectX11,
 };
@@ -55,7 +56,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMClock clock;
 
-	GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL;;
+	GMRenderEnvironment renderEnv = GMRenderEnvironment::Invalid;
 	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	IGraphicEngine* engine = nullptr;
@@ -241,11 +242,16 @@ public:
 
 	//! 获取当前渲染环境。
 	/*!
-	  渲染环境决定着本程序将用何种图形库来进行绘制。如OpenGL，DirectX等。
+	  渲染环境决定着本程序将用何种数据结构、坐标系来进行运算。需要与窗口环境一致。
 	  \return 当前渲染环境。
 	  \sa init()
 	*/
-	inline GMRenderEnvironment getRenderEnvironment() { D(d); return d->renderEnv; }
+	inline GMRenderEnvironment getRenderEnvironment()
+	{
+		D(d); 
+		GM_ASSERT(d->renderEnv != GMRenderEnvironment::Invalid);
+		return d->renderEnv;
+	}
 
 	//! 开始运行GameMachine。
 	/*!
