@@ -5,6 +5,7 @@
 #if GM_WINDOWS
 #include "../windows/gmuiguiwindow.h"
 #include "../windows/gmuiglwindow.h"
+#include "../windows/gmuidx11window.h"
 #include "../windows/gmuiwindow.h"
 #endif
 
