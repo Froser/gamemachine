@@ -46,33 +46,44 @@ void GMDx11ModelPainter::transfer()
 	
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 
-	size_t positionSize = mesh->isDataDisabled(GMVertexDataType::Position) ? 0 : sizeof(GMModel::DataType) * mesh->positions().size();
-	size_t normalSize = mesh->isDataDisabled(GMVertexDataType::Normal) ? 0 : sizeof(GMModel::DataType) * mesh->normals().size();
-	size_t uvSize = mesh->isDataDisabled(GMVertexDataType::UV) ? 0 : sizeof(GMModel::DataType) * mesh->uvs().size();
-	size_t tangentSize = mesh->isDataDisabled(GMVertexDataType::Tangent) ? 0 : sizeof(GMModel::DataType) * mesh->tangents().size();
-	size_t bitangentSize = mesh->isDataDisabled(GMVertexDataType::Bitangent) ? 0 : sizeof(GMModel::DataType) * mesh->bitangents().size();
-	size_t lightmapSize = mesh->isDataDisabled(GMVertexDataType::Lightmap) ? 0 : sizeof(GMModel::DataType) * mesh->lightmaps().size();
-	size_t colorSize = mesh->isDataDisabled(GMVertexDataType::Color) ? 0 : sizeof(GMModel::DataType) * mesh->colors().size();
-
-	D3D11_BUFFER_DESC bufDesc;
-	bufDesc.Usage = D3D11_USAGE_DEFAULT;
-	bufDesc.ByteWidth = positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize;
-	bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	bufDesc.CPUAccessFlags = 0;
-	bufDesc.MiscFlags = 0;
-	bufDesc.StructureByteStride = 0;
-
-	D3D11_SUBRESOURCE_DATA bufData;
-	//TODO 应该放入所有数据
-	bufData.pSysMem = mesh->positions().data();
-	bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
+	Vector<GMModel::DataType>* vertexData[(size_t)GMVertexDataType::EndOfVertexDataType];
+	vertexData[(size_t)GMVertexDataType::Position] = &mesh->positions();
+	vertexData[(size_t)GMVertexDataType::Normal] = &mesh->normals();
+	vertexData[(size_t)GMVertexDataType::UV] = &mesh->uvs();
+	vertexData[(size_t)GMVertexDataType::Tangent] = &mesh->tangents();
+	vertexData[(size_t)GMVertexDataType::Bitangent] = &mesh->bitangents();
+	vertexData[(size_t)GMVertexDataType::Lightmap] = &mesh->lightmaps();
+	vertexData[(size_t)GMVertexDataType::Color] = &mesh->colors();
 
 	HRESULT hr;
-	GMComPtr<ID3D11Device> device = d->engine->getDevice();
-	hr = device->CreateBuffer(&bufDesc, &bufData, &d->buffer);
-	GM_COM_CHECK(hr);
+	ID3D11Buffer* buffers[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
+	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
+	{
+		size_t byteWidth = mesh->isDataDisabled(type) ? 0 : sizeof(GMModel::DataType) * vertexData[(size_t)type]->size();
+		if (!byteWidth)
+			continue;
 
-	hr = renderBuffer();
+		const int& idx = (size_t)type;
+		D3D11_BUFFER_DESC bufDesc;
+		bufDesc.Usage = usage;
+		bufDesc.ByteWidth = byteWidth;
+		bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		bufDesc.CPUAccessFlags = 0;
+		bufDesc.MiscFlags = 0;
+		bufDesc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA bufData;
+		bufData.pSysMem = vertexData[idx]->data();
+		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
+
+		GMComPtr<ID3D11Device> device = d->engine->getDevice();
+		hr = device->CreateBuffer(&bufDesc, &bufData, &d->buffers[idx]);
+		GM_COM_CHECK(hr);
+
+		buffers[idx] = d->buffers[(size_t)type];
+	}
+
+	hr = renderBuffer(buffers, (size_t)GMVertexDataType::EndOfVertexDataType);
 	GM_COM_CHECK(hr);
 
 	d->inited = true;
@@ -105,13 +116,12 @@ void* GMDx11ModelPainter::getBuffer()
 	throw std::logic_error("The method or operation is not implemented.");
 }
 
-HRESULT GMDx11ModelPainter::renderBuffer()
+HRESULT GMDx11ModelPainter::renderBuffer(ID3D11Buffer** buffer, UINT numBuffers)
 {
 	D(d);
-	//TODO 应该放入所有缓存
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
 	GMuint stride = sizeof(gm::GMVertexDataType);
-	context->IASetVertexBuffers(0, 1, &d->buffer, &stride, 0);
+	context->IASetVertexBuffers(0, numBuffers, buffer, &stride, 0);
 	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
 	return S_OK;
 }
