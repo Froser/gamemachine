@@ -12,6 +12,11 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+
+	GMComPtr<ID3D10Blob> vertexShaderBuffer;
+	GMComPtr<ID3D10Blob> pixelShaderBuffer;
+	GMComPtr<ID3D11InputLayout> inputLayout;
+
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 };
 
@@ -77,6 +82,7 @@ public:
 	}
 
 private:
+	void initShaders();
 	void updateProjection();
 	void updateView();
 };

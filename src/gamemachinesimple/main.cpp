@@ -10,12 +10,7 @@
 
 namespace
 {
-	gm::GMRenderEnvironment s_env;
-
-	void SetRenderEnv(gm::GMRenderEnvironment env)
-	{
-		s_env = env;
-	}
+	gm::GMRenderEnvironment s_env = gm::GMRenderEnvironment::DirectX11;
 }
 
 gm::GMRenderEnvironment GetRenderEnv()
@@ -30,14 +25,6 @@ int WINAPI WinMain(
 	int nCmdShow
 )
 {
-	SetRenderEnv(
-#if GM_USE_DX11
-		gm::GMRenderEnvironment::DirectX11
-#else
-		gm::GMRenderEnvironment::OpenGL
-#endif
-	);
-
 	gm::IFactory* factory = nullptr;
 	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
 	{

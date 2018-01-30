@@ -195,7 +195,15 @@ void GMFrustum::updateViewMatrix(const glm::mat4& viewMatrix)
 {
 	D(d);
 	d->viewMatrix = viewMatrix;
-	update();
+	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
+	{
+		update();
+	}
+	else
+	{
+		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+		dxUpdate();
+	}
 }
 
 const glm::mat4& GMFrustum::getProjectionMatrix()

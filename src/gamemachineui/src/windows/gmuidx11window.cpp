@@ -36,23 +36,23 @@ bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
 	{
 	case gm::GameMachineInterfaceID::D3D11Device:
 		d->device->AddRef();
-		(*out) = d->device;
+		(*out) = d->device.get();
 		break;
 	case gm::GameMachineInterfaceID::D3D11DeviceContext:
 		d->deviceContext->AddRef();
-		(*out) = d->device;
+		(*out) = d->deviceContext.get();
 		break;
 	case gm::GameMachineInterfaceID::DXGISwapChain:
 		d->swapChain->AddRef();
-		(*out) = d->device;
+		(*out) = d->swapChain.get();
 		break;
 	case gm::GameMachineInterfaceID::D3D11DepthStencilView:
 		d->depthStencilView->AddRef();
-		(*out) = d->device;
+		(*out) = d->depthStencilView.get();
 		break;
 	case gm::GameMachineInterfaceID::D3D11RenderTargetView:
 		d->renderTargetView->AddRef();
-		(*out) = d->device;
+		(*out) = d->renderTargetView.get();
 		break;
 	default:
 		return false;

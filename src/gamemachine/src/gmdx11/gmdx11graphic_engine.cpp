@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmdx11graphic_engine.h"
+#include "shader_constants.h"
 
 void GMDx11GraphicEngine::init()
 {
@@ -93,8 +94,18 @@ IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /
 	throw std::logic_error("The method or operation is not implemented.");
 }
 
-bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID, void*)
+bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 {
+	D(d);
+	switch (id)
+	{
+	case GameMachineInterfaceID::D3D11VertexShader:
+		d->vertexShaderBuffer = static_cast<ID3D10Blob*>(in);
+		break;
+	case GameMachineInterfaceID::D3D11PixelShader:
+		d->pixelShaderBuffer = static_cast<ID3D10Blob*>(in);
+		break;
+	}
 	return false;
 }
 
@@ -117,11 +128,39 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
 		GM_ASSERT(b);
+
+		// 一切准备就绪才开始初始化
+		initShaders();
 		return true;
 	}
 	}
 
 	return false;
+}
+
+void GMDx11GraphicEngine::initShaders()
+{
+	D(d);
+	// 读取着色器
+	if (!d->shaderLoadCallback)
+	{
+		gm_error("You must specify a IShaderLoadCallback");
+		GM_ASSERT(false);
+		return;
+	}
+
+	d->shaderLoadCallback->onLoadShaders(this);
+
+	// 定义顶点布局
+	HRESULT hr;
+	hr = d->device->CreateInputLayout(
+		GMSHADER_ElementDescriptions,
+		GM_array_size(GMSHADER_ElementDescriptions),
+		d->vertexShaderBuffer->GetBufferPointer(),
+		d->vertexShaderBuffer->GetBufferSize(),
+		&d->inputLayout
+	);
+	GM_COM_CHECK(hr);
 }
 
 void GMDx11GraphicEngine::updateProjection()
@@ -130,5 +169,6 @@ void GMDx11GraphicEngine::updateProjection()
 
 void GMDx11GraphicEngine::updateView()
 {
+
 
 }

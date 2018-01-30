@@ -18,6 +18,7 @@ add_subdirectory(gamemachinemedia gamemachinemedia)
 
 if (GM_BUILD_DEMO)
 	add_subdirectory(gamemachinedemo gamemachinedemo)
+	add_subdirectory(gamemachinesimple gamemachinesimple)
 endif(GM_BUILD_DEMO)
 
 if (GM_BUILD_UNITTEST)

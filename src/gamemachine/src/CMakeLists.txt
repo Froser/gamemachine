@@ -178,12 +178,15 @@ set(WIN32_SOURCES
 
 set(WIN32_DX11_SOURCES
 		foundation/utilities/gmcom.h
+		gmdx11/shader_constants.h
 		gmdx11/gmdx11factory.h
 		gmdx11/gmdx11factory.cpp
 		gmdx11/gmdx11graphic_engine.h
 		gmdx11/gmdx11graphic_engine.cpp
 		gmdx11/gmdx11modelpainter.h
 		gmdx11/gmdx11modelpainter.cpp
+		gmdx11/gmdx11helper.h
+		gmdx11/gmdx11helper.cpp
 	)
 
 if(WIN32)

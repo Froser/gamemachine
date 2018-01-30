@@ -1,5 +1,5 @@
-﻿#ifndef __SHADER_CONSTAINS_H__
-#define __SHADER_CONSTAINS_H__
+﻿#ifndef __GMGL_SHADER_CONSTAINS_H__
+#define __GMGL_SHADER_CONSTAINS_H__
 #include <gmcommon.h>
 #include <gmshader.h>
 #include "foundation/assert.h"

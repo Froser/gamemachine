@@ -175,7 +175,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 void GMGLGraphicEngine::installShaders()
 {
 	D(d);
-	GMGamePackage* package = GM.getGamePackageManager();
 	if (!d->shaderLoadCallback)
 	{
 		gm_error("You must specify a IShaderLoadCallback");

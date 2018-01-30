@@ -5,7 +5,9 @@
 #if GM_WINDOWS
 #include <Unknwnbase.h>
 
+#define GM_EXIT __gmExit
 #define GM_COM_CHECK(hr) if (FAILED(hr)) { GM_ASSERT(false); return; }
+#define GM_COM_CHECK_EXIT(hr) if (FAILED(hr)) { GM_ASSERT(false); return; }
 
 BEGIN_NS
 template <class E>

@@ -54,8 +54,8 @@ enum class GameMachineMessageType
 
 enum class GameMachineInterfaceID
 {
-	GLEffectShaderProgram,
 	GLForwardShaderProgram,
+	GLEffectShaderProgram,
 	GLDeferredShaderGeometryProgram,
 	GLDeferredShaderLightProgram,
 
@@ -64,6 +64,12 @@ enum class GameMachineInterfaceID
 	DXGISwapChain,
 	D3D11DepthStencilView,
 	D3D11RenderTargetView,
+
+	D3D11VertexShader,
+	D3D11PixelShader,
+
+	CustomInterfaceBegin,
+	//用户自定义接口须在此之后
 };
 
 struct GameMachineMessage
