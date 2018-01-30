@@ -360,7 +360,10 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 {
 	D(d);
 	const char* effectUniformName = nullptr;
+	GM_BEGIN_CHECK_GL_ERROR
 	program->useProgram();
+	GM_END_CHECK_GL_ERROR
+
 	GM_BEGIN_CHECK_GL_ERROR
 	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->sampleOffsets[0]);
 	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);

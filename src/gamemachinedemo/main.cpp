@@ -32,7 +32,8 @@ int WINAPI WinMain(
 {
 	SetRenderEnv(
 #if GM_USE_DX11
-		gm::GMRenderEnvironment::DirectX11
+		//gm::GMRenderEnvironment::DirectX11
+		gm::GMRenderEnvironment::OpenGL
 #else
 		gm::GMRenderEnvironment::OpenGL
 #endif

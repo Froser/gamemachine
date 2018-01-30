@@ -54,6 +54,11 @@ enum class GameMachineMessageType
 
 enum class GameMachineInterfaceID
 {
+	GLEffectShaderProgram,
+	GLForwardShaderProgram,
+	GLDeferredShaderGeometryProgram,
+	GLDeferredShaderLightProgram,
+
 	D3D11Device,
 	D3D11DeviceContext,
 	DXGISwapChain,
@@ -133,12 +138,17 @@ GM_INTERFACE(IShaderProgram)
 };
 
 class GMLight;
+struct IGraphicEngine;
+GM_INTERFACE(IShaderLoadCallback)
+{
+	virtual void onLoadShaders(IGraphicEngine* engine) = 0;
+};
 
 //! 图形绘制引擎接口
 /*!
   提供最基本的绘制功能。
 */
-GM_INTERFACE(IGraphicEngine)
+GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 {
 	//! 初始化绘制引擎。
 	/*!
@@ -254,6 +264,14 @@ GM_INTERFACE(IGraphicEngine)
 	  \return 着色器程序。
 	*/
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) = 0;
+
+	//! 设置一个着色器程序读取的回调
+	/*!
+	  当设置引擎准备读取着色器时，此回调接口被调用。一般可以使用setInterface来为引擎添加着色器。
+	  \param cb 着色器读取回调接口。
+	  \sa IQueriable::setInterface()
+	*/
+	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) = 0;
 };
 
 class GMComponent;

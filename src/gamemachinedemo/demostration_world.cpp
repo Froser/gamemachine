@@ -257,15 +257,7 @@ void DemostrationEntrance::init()
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #endif
 
-	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
-	{
-		gm::GMGLGraphicEngine* engine = static_cast<gm::GMGLGraphicEngine*> (GM.getGraphicEngine());
-		engine->setShaderLoadCallback(this);
-	}
-	else
-	{
-		// Load HLSL here
-	}
+	GM.getGraphicEngine()->setShaderLoadCallback(this);
 
 	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
@@ -353,12 +345,34 @@ DemostrationEntrance::~DemostrationEntrance()
 	gm::GM_delete(d->world);
 }
 
-void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& effectsShaderProgram)
+void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
+	bool b;
+	gm::GMGLShaderProgram* effectsShaderProgram = new gm::GMGLShaderProgram();
+	initLoadEffectsShader(effectsShaderProgram);
+	b = engine->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
+	GM_ASSERT(b);
+
+	gm::GMGLShaderProgram* forwardShaderProgram = new gm::GMGLShaderProgram();
+	gm::GMGLShaderProgram* deferredShaderPrograms[2] = { new gm::GMGLShaderProgram(), new gm::GMGLShaderProgram() };
+	initLoadShaderProgram(forwardShaderProgram, deferredShaderPrograms);
+	b = engine->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
+	GM_ASSERT(b);
+
+	b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
+	GM_ASSERT(b);
+
+	b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
+	GM_ASSERT(b);
+}
+
+void DemostrationEntrance::initLoadEffectsShader(gm::GMGLShaderProgram* effectsShaderProgram)
+{
+	GM_ASSERT(effectsShaderProgram);
 	gm::GMBuffer vertBuf, fragBuf;
 	gm::GMString vertPath, fragPath;
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "effects/effects.vert", &vertBuf, &vertPath);
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "effects/effects.frag", &fragBuf, &fragPath);
+	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/effects/effects.vert", &vertBuf, &vertPath);
+	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/effects/effects.frag", &fragBuf, &fragPath);
 	vertBuf.convertToStringBuffer();
 	fragBuf.convertToStringBuffer();
 
@@ -367,17 +381,21 @@ void DemostrationEntrance::onLoadEffectsShader(gm::GMGLShaderProgram& effectsSha
 		{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 	};
 
-	effectsShaderProgram.attachShader(shadersInfo[0]);
-	effectsShaderProgram.attachShader(shadersInfo[1]);
+	effectsShaderProgram->attachShader(shadersInfo[0]);
+	effectsShaderProgram->attachShader(shadersInfo[1]);
 }
 
-void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardShaderProgram, gm::GMGLShaderProgram* deferredShaderProgram[2])
+void DemostrationEntrance::initLoadShaderProgram(gm::GMGLShaderProgram* forwardShaderProgram, gm::GMGLShaderProgram* deferredShaderProgram[2])
 {
+	GM_ASSERT(forwardShaderProgram);
+	GM_ASSERT(deferredShaderProgram[0]);
+	GM_ASSERT(deferredShaderProgram[1]);
+
 	{
 		gm::GMBuffer vertBuf, fragBuf;
 		gm::GMString vertPath, fragPath;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "main.vert", &vertBuf, &vertPath);
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "main.frag", &fragBuf, &fragPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/main.vert", &vertBuf, &vertPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/main.frag", &fragBuf, &fragPath);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -386,15 +404,15 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
 		};
 
-		forwardShaderProgram.attachShader(shadersInfo[0]);
-		forwardShaderProgram.attachShader(shadersInfo[1]);
+		forwardShaderProgram->attachShader(shadersInfo[0]);
+		forwardShaderProgram->attachShader(shadersInfo[1]);
 	}
 
 	{
 		gm::GMBuffer vertBuf, fragBuf;
 		gm::GMString vertPath, fragPath;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/geometry_pass_main.vert", &vertBuf, &vertPath);
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/geometry_pass_main.frag", &fragBuf, &fragPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/deferred/geometry_pass_main.vert", &vertBuf, &vertPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/deferred/geometry_pass_main.frag", &fragBuf, &fragPath);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 
@@ -410,8 +428,8 @@ void DemostrationEntrance::onLoadShaderProgram(gm::GMGLShaderProgram& forwardSha
 	{
 		gm::GMBuffer vertBuf, fragBuf;
 		gm::GMString vertPath, fragPath;
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/light_pass_main.vert", &vertBuf, &vertPath);
-		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "deferred/light_pass_main.frag", &fragBuf, &fragPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/deferred/light_pass_main.vert", &vertBuf, &vertPath);
+		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, "gl/deferred/light_pass_main.frag", &fragBuf, &fragPath);
 		vertBuf.convertToStringBuffer();
 		fragBuf.convertToStringBuffer();
 

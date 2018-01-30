@@ -93,6 +93,11 @@ IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /
 	throw std::logic_error("The method or operation is not implemented.");
 }
 
+bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID, void*)
+{
+	return false;
+}
+
 bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 {
 	D(d);

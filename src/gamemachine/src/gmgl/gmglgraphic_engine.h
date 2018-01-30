@@ -36,12 +36,6 @@ enum
 	CubeMapActiveTexture = 31 //!< 足够安全的纹理单元，用于存放纹理，对应GL_TEXTURE31
 };
 
-GM_INTERFACE(IShaderLoadCallback)
-{
-	virtual void onLoadEffectsShader(GMGLShaderProgram& effectsProgram) = 0;
-	virtual void onLoadShaderProgram(GMGLShaderProgram& forwardShaderProgram, GMGLShaderProgram* deferredShaderPrograms[2]) = 0;
-};
-
 enum
 {
 	DEFERRED_GEOMETRY_PASS_SHADER,
@@ -114,9 +108,17 @@ public:
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
+	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
+	{
+		D(d);
+		d->shaderLoadCallback = cb;
+	}
 
 public:
-	void setShaderLoadCallback(IShaderLoadCallback* cb) { D(d); d->shaderLoadCallback = cb; }
+	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
+	virtual bool setInterface(GameMachineInterfaceID, void*);
+
+public:
 	IRenderer* getRenderer(GMModelType objectType);
 	void setViewport(const GMRect& rect);
 	void updateShader();

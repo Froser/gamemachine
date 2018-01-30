@@ -12,6 +12,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	IShaderLoadCallback* shaderLoadCallback = nullptr;
 };
 
 class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
@@ -34,6 +35,15 @@ public:
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
 	virtual bool event(const GameMachineMessage& e) override;
+	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
+	{
+		D(d);
+		d->shaderLoadCallback = cb;
+	}
+
+public:
+	virtual bool setInterface(GameMachineInterfaceID, void*);
+	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
 
 public:
 	GMComPtr<ID3D11Device> getDevice()

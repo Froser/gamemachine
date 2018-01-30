@@ -183,22 +183,34 @@ void GMGLGraphicEngine::installShaders()
 		return;
 	}
 
+	d->shaderLoadCallback->onLoadShaders(this);
+}
+
+bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
+{
+	D(d);
+	switch (id)
 	{
-		d->effectsShaderProgram = new GMGLShaderProgram();
-		d->shaderLoadCallback->onLoadEffectsShader(*d->effectsShaderProgram);
+	case GameMachineInterfaceID::GLEffectShaderProgram:
+		d->effectsShaderProgram = static_cast<GMGLShaderProgram*>(in);
 		d->effectsShaderProgram->load();
-	}
-
-	{
-		d->forwardShaderProgram = new GMGLShaderProgram();
-		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER] = new GMGLShaderProgram();
-		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER] = new GMGLShaderProgram();
-
-		d->shaderLoadCallback->onLoadShaderProgram(*d->forwardShaderProgram, d->deferredShaderPrograms);
+		break;
+	case GameMachineInterfaceID::GLForwardShaderProgram:
+		d->forwardShaderProgram = static_cast<GMGLShaderProgram*>(in);
 		d->forwardShaderProgram->load();
+		break;
+	case GameMachineInterfaceID::GLDeferredShaderGeometryProgram:
+		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER] = static_cast<GMGLShaderProgram*>(in);
 		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->load();
+		break;
+	case GameMachineInterfaceID::GLDeferredShaderLightProgram:
+		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER] = static_cast<GMGLShaderProgram*>(in);
 		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->load();
+		break;
+	default:
+		return false;
 	}
+	return true;
 }
 
 void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
