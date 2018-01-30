@@ -319,13 +319,8 @@ DemostrationEntrance::~DemostrationEntrance()
 
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
-	gm::GMComPtr<ID3D10Blob> vs;
-	HRESULT hr = gm::GMLoadDx11Shader(L"dx11/color.vs", L"ColorVertexShader", L"vs_5_0", &vs);
+	HRESULT hr = gm::GMLoadDx11Shader(L"dx11/color.vs", L"ColorVertexShader", L"vs_5_0", gm::GM_VERTEX_SHADER);
 	GM_COM_CHECK(hr);
-	engine->setInterface(gm::GameMachineInterfaceID::D3D11VertexShader, vs.get());
-
-	gm::GMComPtr<ID3D10Blob> ps;
-	hr = gm::GMLoadDx11Shader(L"dx11/color.ps", L"ColorPixelShader", L"ps_5_0", &ps);
+	hr = gm::GMLoadDx11Shader(L"dx11/color.ps", L"ColorPixelShader", L"ps_5_0", gm::GM_PIXEL_SHADER);
 	GM_COM_CHECK(hr);
-	engine->setInterface(gm::GameMachineInterfaceID::D3D11PixelShader, ps.get());
 }

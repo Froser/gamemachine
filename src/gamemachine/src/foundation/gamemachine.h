@@ -271,6 +271,9 @@ private:
 	void updateGameMachineRunningStates();
 	void runLoop();
 	void setRenderEnvironment(GMRenderEnvironment renv);
+	bool checkCrashDown();
+	void handlerEvents();
+	void updateManagers();
 };
 
 END_NS

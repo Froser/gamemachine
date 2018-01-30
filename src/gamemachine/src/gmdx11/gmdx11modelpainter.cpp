@@ -103,7 +103,23 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 		context->IASetVertexBuffers(slot, 1, &d->buffers[slot], &stride, 0);
 		++slot;
 	}
+
 	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
+	context->IASetInputLayout(d->engine->getInputLayout());
+
+	// TODO 仿照GL那样，每种renderer创建一个自己的shader，然后按照Object类型选择自己的Shader
+	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
+	context->PSSetShader(d->engine->getPixelShader(), NULL, 0);
+
+	GMMesh* mesh = getModel()->getMesh();
+	for (auto component : mesh->getComponents())
+	{
+		GMShader& shader = component->getShader();
+		if (shader.getNodraw())
+			continue;
+
+		draw(component, mesh);
+	}
 }
 
 void GMDx11ModelPainter::dispose(GMMeshData* md)
@@ -124,4 +140,10 @@ void GMDx11ModelPainter::endUpdateBuffer()
 void* GMDx11ModelPainter::getBuffer()
 {
 	throw std::logic_error("The method or operation is not implemented.");
+}
+
+void GMDx11ModelPainter::draw(GMComponent* component, GMMesh* mesh)
+{
+	D(d);
+	//d->engine->getDeviceContext()->Draw()
 }

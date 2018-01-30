@@ -7,7 +7,7 @@ struct ID3D10Blob;
 BEGIN_NS
 extern "C"
 {
-	//! 从GM的包中读取一个着色器文件到DirectX11
+	//! 从GM的包中读取一个着色器文件，并编译到DirectX11环境。
 	/*!
 	  调用此函数时，确认GMGamePackage已经初始化。如果读取失败，或者着色器文件编译失败，则返回E_FAIL。
 	  \param filename 读取的文件名。此方法会通过GMGamePackage在着色器所在目录读取文件。
@@ -20,7 +20,7 @@ extern "C"
 		const gm::GMString& filename,
 		const gm::GMString& entryPoint,
 		const gm::GMString& profile,
-		ID3D10Blob** out
+		GMShaderType type
 	);
 }
 

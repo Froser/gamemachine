@@ -30,6 +30,9 @@ public:
 	virtual void beginUpdateBuffer(GMMesh* mesh) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
+
+private:
+	void draw(GMComponent* component, GMMesh* mesh);
 };
 
 END_NS

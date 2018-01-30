@@ -22,6 +22,48 @@ extern "C"
 	}
 }
 
+namespace
+{
+	struct GMFrameControl
+	{
+		GMFrameControl(bool needControl, GMClock& frameCounter, GameMachinePrivate* d)
+			: m_needControl(needControl)
+			, m_frameCounter(frameCounter)
+			, m_d(d)
+		{
+			frameCounter.begin();
+		}
+
+		~GMFrameControl()
+		{
+			if (m_needControl)
+			{
+				static const GMfloat ms = 1 / 60.f;
+				GMfloat elapsedFromStart = m_frameCounter.elapsedFromStart();
+				GMfloat diff = (ms - elapsedFromStart) * 1000;
+				if (diff > 0)
+				{
+					GMThread::sleep(diff);
+					m_d->states.lastFrameElpased = ms;
+				}
+				else
+				{
+					m_d->states.lastFrameElpased = m_frameCounter.elapsedFromStart();
+				}
+			}
+			else
+			{
+				m_d->states.lastFrameElpased = m_frameCounter.elapsedFromStart();
+			}
+		}
+
+	private:
+		bool m_needControl;
+		GMClock& m_frameCounter;
+		GameMachinePrivate* m_d = nullptr;
+	};
+}
+
 void GameMachine::init(
 	AUTORELEASE IWindow* mainWindow,
 	const GMConsoleHandle& consoleHandle,
@@ -130,69 +172,35 @@ void GameMachine::startGameMachine()
 void GameMachine::runLoop()
 {
 	D(d);
-	GMfloat diff = 0;
 	GMClock frameCounter;
 	while (true)
 	{
-		GMint bNeedControlFrameRate = GMGetDebugState(FRAMERATE_CONTROL);
-		if (bNeedControlFrameRate)
-			frameCounter.begin();
+		// 控制帧率
+		GMFrameControl fc(!!GMGetDebugState(FRAMERATE_CONTROL), frameCounter, d);
 
+		// 接收窗口消息
 		if (!d->mainWindow->handleMessage())
 			break;
 
+		// 处理GameMachine消息
 		if (!handleMessages())
 			break;
 
-		if (d->states.crashDown)
-		{
-			// 宕机的情况下，只更新下面的状态
-			d->mainWindow->update();
-			d->consoleWindow->update();
-			d->clock.update();
+		// 检查是否崩溃
+		if (checkCrashDown())
 			continue;
-		}
 
-		d->gameHandler->event(GameMachineEvent::FrameStart);
-		if (d->mainWindow->isWindowActivate())
-			d->gameHandler->event(GameMachineEvent::Activate);
-		else
-			d->gameHandler->event(GameMachineEvent::Deactivate);
-		d->gameHandler->event(GameMachineEvent::Simulate);
-		d->gameHandler->event(GameMachineEvent::Render);
+		// 调用Handler
+		handlerEvents();
 
 		// 更新所有管理器
-		d->mainWindow->update();
-		if (d->consoleWindow)
-			d->consoleWindow->update();
-		d->clock.update();
+		updateManagers();
 
 		// 更新状态
 		updateGameMachineRunningStates();
 
 		// 本帧结束
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
-
-		// 控制帧率
-		if (bNeedControlFrameRate)
-		{
-			static const GMfloat ms = 1 / 60.f;
-			GMfloat elapsedFromStart = frameCounter.elapsedFromStart();
-			diff = (ms - elapsedFromStart) * 1000;
-			if (diff > 0)
-			{
-				GMThread::sleep(diff);
-				d->states.lastFrameElpased = ms;
-			}
-			else
-			{
-				d->states.lastFrameElpased = frameCounter.elapsedFromStart();
-			}
-		}
-		else
-		{
-			d->states.lastFrameElpased = frameCounter.elapsedFromStart();
-		}
 	}
 }
 
@@ -219,6 +227,41 @@ void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
 	}
 	GM_ASSERT(!"Wrong render env");
 	d->renderEnv = GMRenderEnvironment::OpenGL;
+}
+
+bool GameMachine::checkCrashDown()
+{
+	D(d);
+	if (d->states.crashDown)
+	{
+		// 宕机的情况下，只更新下面的状态
+		d->mainWindow->update();
+		d->consoleWindow->update();
+		d->clock.update();
+		return true;
+	}
+	return false;
+}
+
+void GameMachine::handlerEvents()
+{
+	D(d);
+	d->gameHandler->event(GameMachineEvent::FrameStart);
+	if (d->mainWindow->isWindowActivate())
+		d->gameHandler->event(GameMachineEvent::Activate);
+	else
+		d->gameHandler->event(GameMachineEvent::Deactivate);
+	d->gameHandler->event(GameMachineEvent::Simulate);
+	d->gameHandler->event(GameMachineEvent::Render);
+}
+
+void GameMachine::updateManagers()
+{
+	D(d);
+	d->mainWindow->update();
+	if (d->consoleWindow)
+		d->consoleWindow->update();
+	d->clock.update();
 }
 
 bool GameMachine::handleMessages()

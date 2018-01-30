@@ -4,12 +4,6 @@
 #include <gamemachine.h>
 BEGIN_NS
 
-enum GMGLShaderType
-{
-	GM_FRAGMENT_SHADER = 0x8B30,
-	GM_VERTEX_SHADER = 0x8B31
-};
-
 struct GMGLShaderInfo
 {
 	GMuint type;

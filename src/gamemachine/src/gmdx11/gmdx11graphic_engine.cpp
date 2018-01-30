@@ -100,9 +100,15 @@ bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	switch (id)
 	{
 	case GameMachineInterfaceID::D3D11VertexShader:
-		d->vertexShaderBuffer = static_cast<ID3D10Blob*>(in);
+		d->vertexShader = static_cast<ID3D11VertexShader*>(in);
 		break;
 	case GameMachineInterfaceID::D3D11PixelShader:
+		d->pixelShader = static_cast<ID3D11PixelShader*>(in);
+		break;
+	case GameMachineInterfaceID::D3D11PixelShaderBuffer:
+		d->vertexShaderBuffer = static_cast<ID3D10Blob*>(in);
+		break;
+	case GameMachineInterfaceID::D3D11VertexShaderBuffer:
 		d->pixelShaderBuffer = static_cast<ID3D10Blob*>(in);
 		break;
 	}

@@ -7,6 +7,7 @@
 
 #define GM_EXIT __gmExit
 #define GM_COM_CHECK(hr) if (FAILED(hr)) { GM_ASSERT(false); return; }
+#define GM_COM_CHECK_RETURN(hr, ret) if (FAILED(hr)) { GM_ASSERT(false); return (ret); }
 #define GM_COM_CHECK_EXIT(hr) if (FAILED(hr)) { GM_ASSERT(false); return; }
 
 BEGIN_NS

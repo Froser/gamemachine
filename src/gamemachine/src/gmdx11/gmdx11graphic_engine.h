@@ -13,8 +13,11 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 
+	GMComPtr<ID3D11VertexShader> vertexShader;
 	GMComPtr<ID3D10Blob> vertexShaderBuffer;
+	GMComPtr<ID3D11PixelShader> pixelShader;
 	GMComPtr<ID3D10Blob> pixelShaderBuffer;
+
 	GMComPtr<ID3D11InputLayout> inputLayout;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
@@ -79,6 +82,24 @@ public:
 	{
 		D(d);
 		return d->renderTargetView;
+	}
+
+	GMComPtr<ID3D11InputLayout> getInputLayout()
+	{
+		D(d);
+		return d->inputLayout;
+	}
+
+	GMComPtr<ID3D11VertexShader> getVertexShader()
+	{
+		D(d);
+		return d->vertexShader;
+	}
+
+	GMComPtr<ID3D11PixelShader> getPixelShader()
+	{
+		D(d);
+		return d->pixelShader;
 	}
 
 private:
