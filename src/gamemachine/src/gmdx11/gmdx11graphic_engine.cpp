@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 #include "shader_constants.h"
 
@@ -81,12 +82,12 @@ void GMDx11GraphicEngine::endUseStencil()
 
 void GMDx11GraphicEngine::beginBlend(GMS_BlendFunc sfactor /*= GMS_BlendFunc::ONE*/, GMS_BlendFunc dfactor /*= GMS_BlendFunc::ONE*/)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	// throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::endBlend()
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	// throw std::logic_error("The method or operation is not implemented.");
 }
 
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /*= GMShaderProgramType::CurrentShaderProgram*/)
@@ -105,14 +106,32 @@ bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	case GameMachineInterfaceID::D3D11PixelShader:
 		d->pixelShader = static_cast<ID3D11PixelShader*>(in);
 		break;
-	case GameMachineInterfaceID::D3D11PixelShaderBuffer:
+	case GameMachineInterfaceID::D3D11VertexShaderBuffer:
 		d->vertexShaderBuffer = static_cast<ID3D10Blob*>(in);
 		break;
-	case GameMachineInterfaceID::D3D11VertexShaderBuffer:
+	case GameMachineInterfaceID::D3D11PixelShaderBuffer:
 		d->pixelShaderBuffer = static_cast<ID3D10Blob*>(in);
 		break;
+	default:
+		return false;
 	}
-	return false;
+	return true;
+}
+
+bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
+{
+	D(d);
+	switch (id)
+	{
+	case GameMachineInterfaceID::D3D11Device:
+		GM_ASSERT(d->device);
+		d->device->AddRef();
+		(*out) = d->device.get();
+		break;
+	default:
+		return false;
+	}
+	return true;
 }
 
 bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
@@ -167,14 +186,66 @@ void GMDx11GraphicEngine::initShaders()
 		&d->inputLayout
 	);
 	GM_COM_CHECK(hr);
+
+	// 定义统一MVP Matrix缓存
+	D3D11_BUFFER_DESC vpBufferDesc;
+	vpBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	vpBufferDesc.ByteWidth = sizeof(GMDxVPMatrix);
+	vpBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	vpBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	vpBufferDesc.MiscFlags = 0;
+	vpBufferDesc.StructureByteStride = 0;
+
+	GMComPtr<ID3D11Buffer> matrixBuf;
+	hr = d->device->CreateBuffer(&vpBufferDesc, NULL, &matrixBuf);
+	GM_COM_CHECK(hr);
+
+	GM.getCamera().getFrustum().setDxMatrixBuffer(matrixBuf);
 }
 
 void GMDx11GraphicEngine::updateProjection()
 {
+	D(d);
+	D3DXMATRIX proj = GM.getCamera().getFrustum().getDxProjectionMatrix();
+
+	GMDxVPMatrix* mvpMatrix = nullptr;
+	beginMapMVPMatrix(&mvpMatrix);
+	GM_ASSERT(mvpMatrix);
+
+	mvpMatrix->dxProjMatrix = proj;
+	endMapMVPMatrix();
 }
 
 void GMDx11GraphicEngine::updateView()
 {
+	D(d);
+	D3DXMATRIX view = GM.getCamera().getFrustum().getDxViewMatrix();
 
+	GMDxVPMatrix* mvpMatrix = nullptr;
+	beginMapMVPMatrix(&mvpMatrix);
+	GM_ASSERT(mvpMatrix);
 
+	mvpMatrix->dxViewMatrix = view;
+	endMapMVPMatrix();
+
+	// TODO 确定eye位置
+}
+
+void GMDx11GraphicEngine::beginMapMVPMatrix(GMDxVPMatrix** mvp)
+{
+	D(d);
+	HRESULT hr;
+	GMComPtr<ID3D11Buffer> mvpBuf = GM.getCamera().getFrustum().getDxMatrixBuffer();
+
+	D3D11_MAPPED_SUBRESOURCE mappedResource;
+	hr = d->deviceContext->Map(mvpBuf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	GM_COM_CHECK(hr);
+
+	(*mvp) = static_cast<GMDxVPMatrix*>(mappedResource.pData);
+}
+
+void GMDx11GraphicEngine::endMapMVPMatrix()
+{
+	D(d);
+	d->deviceContext->Unmap(GM.getCamera().getFrustum().getDxMatrixBuffer(), 0);
 }

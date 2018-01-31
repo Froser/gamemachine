@@ -3,10 +3,20 @@
 #include <gmcommon.h>
 #include <tools.h>
 #include <gmdxincludes.h>
+#include <gmcom.h>
 
 BEGIN_NS
 
 //Camera
+#if GM_USE_DX11
+struct GMDxVPMatrix
+{
+	D3DXMATRIX dxProjMatrix;
+	D3DXMATRIX dxViewMatrix;
+	D3DXMATRIX dxModelMatrix; // 在绘制的时候，将物体的Model transform放到此处
+};
+#endif
+
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
@@ -30,7 +40,20 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 
 inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)
 {
+#if GM_USE_DX11
+	/*
+	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
+	{
+		return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
+	}
+	
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+	GM_ASSERT(false);
+	*/
 	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
+#else
+	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
+#endif
 }
 
 //Frustum
@@ -68,8 +91,8 @@ GM_PRIVATE_OBJECT(GMFrustum)
 
 #if GM_USE_DX11
 	//DirectX
-	D3DXMATRIX dxProjMatrix;
-	D3DXMATRIX dxViewMatrix;
+	GMDxVPMatrix dxMatrix;
+	GMComPtr<ID3D11Buffer> dxMatrixBuffer;
 #endif
 };
 
@@ -99,8 +122,12 @@ public:
 	const glm::mat4& getViewMatrix();
 
 #if GM_USE_DX11
+	const GMDxVPMatrix& getDxVPMatrix();
+	void setDxVPMatrix(const GMDxVPMatrix& m);
 	const D3DXMATRIX& getDxProjectionMatrix();
 	const D3DXMATRIX& getDxViewMatrix();
+	void setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer);
+	GMComPtr<ID3D11Buffer> getDxMatrixBuffer();
 #endif
 
 private:

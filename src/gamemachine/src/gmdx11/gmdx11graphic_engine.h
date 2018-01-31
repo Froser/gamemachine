@@ -5,6 +5,7 @@
 #include <gmdxincludes.h>
 BEGIN_NS
 
+struct GMDxVPMatrix;
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
@@ -51,7 +52,7 @@ public:
 
 public:
 	virtual bool setInterface(GameMachineInterfaceID, void*);
-	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
+	virtual bool getInterface(GameMachineInterfaceID, void**);
 
 public:
 	GMComPtr<ID3D11Device> getDevice()
@@ -106,6 +107,8 @@ private:
 	void initShaders();
 	void updateProjection();
 	void updateView();
+	void beginMapMVPMatrix(GMDxVPMatrix** mvp);
+	void endMapMVPMatrix();
 };
 
 END_NS

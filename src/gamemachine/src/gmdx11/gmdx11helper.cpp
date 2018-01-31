@@ -59,7 +59,7 @@ extern "C"
 			return E_FAIL;
 		}
 
-		ID3D11Device* device = nullptr;
+		GMComPtr<ID3D11Device> device;
 		IGraphicEngine* engine = GM.getGraphicEngine();
 		bool b = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 		if (!b || !device)

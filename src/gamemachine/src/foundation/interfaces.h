@@ -107,9 +107,29 @@ GM_INTERFACE(ITexture)
 	virtual void drawTexture(GMTextureFrames* frames) = 0;
 };
 
+//! 可以获取、设置对象的数据接口。
+/*!
+  如果某类继承此接口，表示此类可以通过getInterface和setInterface来获取、设置接口。
+*/
 GM_INTERFACE(IQueriable)
 {
+	//! 从接口实例中获取某个对象。
+	/*!
+	  如果获取成功（即接口实例识别对象类型和对象），返回true，否则返回false。<br>
+	  需要注意的是，如果获取的是一个COM对象，一定要用GMComPtr来接。否则，用户需要自己释放此COM对象的一个引用计数。
+	  \param id 对象类型。
+	  \param out 获取对象的指针。
+	  \return 是否获取成功。
+	*/
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) = 0;
+
+	//! 将一个对象设置进本接口的实例中。
+	/*!
+	  如果设置成功（即接口实例识别对象类型和对象），返回true，否则返回false。
+	  \param id 对象类型。
+	  \param in 需要设置的对象指针。
+	  \return 是否设置成功。
+	*/
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) = 0;
 };
 

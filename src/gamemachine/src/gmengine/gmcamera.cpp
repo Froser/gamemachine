@@ -35,7 +35,7 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	else
 	{
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		D3DXMatrixOrthoLH(&d->dxProjMatrix, d->right - d->left, d->bottom - d->top, d->n, d->f);
+		D3DXMatrixOrthoOffCenterLH(&d->dxMatrix.dxProjMatrix, d->left, d->right, d->bottom, d->top, d->n, d->f);
 		dxUpdate();
 	}
 #else
@@ -64,7 +64,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	else
 	{
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		D3DXMatrixPerspectiveFovLH(&d->dxProjMatrix, d->fovy, d->aspect, d->n, d->f);
+		D3DXMatrixPerspectiveFovLH(&d->dxMatrix.dxProjMatrix, d->fovy, d->aspect, d->n, d->f);
 		dxUpdate();
 	}
 #else
@@ -221,18 +221,44 @@ const glm::mat4& GMFrustum::getViewMatrix()
 }
 
 #if GM_USE_DX11
+const GMDxVPMatrix& GMFrustum::getDxVPMatrix()
+{
+	D(d);
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+	return d->dxMatrix;
+}
+
+void GMFrustum::setDxVPMatrix(const GMDxVPMatrix& m)
+{
+	D(d);
+	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
+	d->dxMatrix = m;
+}
+
 const D3DXMATRIX& GMFrustum::getDxProjectionMatrix()
 {
 	D(d);
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	return d->dxProjMatrix;
+	return d->dxMatrix.dxProjMatrix;
 }
 
 const D3DXMATRIX& GMFrustum::getDxViewMatrix()
 {
 	D(d);
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	return d->dxViewMatrix;
+	return d->dxMatrix.dxViewMatrix;
+}
+
+void GMFrustum::setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer)
+{
+	D(d);
+	d->dxMatrixBuffer = buffer;
+}
+
+GMComPtr<ID3D11Buffer> GMFrustum::getDxMatrixBuffer()
+{
+	D(d);
+	return d->dxMatrixBuffer;
 }
 #endif
 

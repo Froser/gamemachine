@@ -1,6 +1,5 @@
 ﻿#ifndef __GMCOM_H__
 #define __GMCOM_H__
-#include <gamemachine.h>
 
 #if GM_WINDOWS
 #include <Unknwnbase.h>
