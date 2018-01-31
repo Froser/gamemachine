@@ -101,8 +101,8 @@ void DemoHandler::setLookAt()
 {
 	gm::GMCamera& camera = GM.getCamera();
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = { 0, 0, -1 };
-	lookAt.position = { 0, 0, 1 };
+	lookAt.lookAt = { 0, 0, 1 };
+	lookAt.position = { 0, 0, -1 };
 	camera.lookAt(lookAt);
 }
 
@@ -238,8 +238,8 @@ void DemostrationWorld::resetProjectionAndEye()
 	camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = { 0, 0, -1 };
-	lookAt.position = { 0, 0, 1 };
+	lookAt.lookAt = { 0, 0, 1 };
+	lookAt.position = { 0, 0, -1 };
 	camera.lookAt(lookAt);
 }
 

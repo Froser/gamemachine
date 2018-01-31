@@ -38,7 +38,6 @@ int WINAPI WinMain(
 		else
 			factory = new gm::GMGLFactory();
 #else
-		SetRenderEnv(gm::GMRenderEnvironment::OpenGL);
 		factory = new gm::GMGLFactory();
 #endif
 	}

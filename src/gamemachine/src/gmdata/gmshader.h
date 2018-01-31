@@ -266,7 +266,7 @@ GM_PRIVATE_OBJECT(GMShader)
 {
 	GMuint surfaceFlag = 0;
 	GMS_Cull cull = GMS_Cull::CULL;
-	GMS_FrontFace frontFace = GMS_FrontFace::COUNTER_CLOCKWISE;
+	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
 	GMS_BlendFunc blendFactorSrc = GMS_BlendFunc::ZERO;
 	GMS_BlendFunc blendFactorDest = GMS_BlendFunc::ZERO;
 	bool blend = false;

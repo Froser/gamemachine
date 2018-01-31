@@ -11,6 +11,9 @@
 
 #define GLM_SETUP_INCLUDED GLM_VERSION
 
+// DirectX Coords
+#define GLM_FORCE_LEFT_HANDED
+
 #if defined(GLM_FORCE_SWIZZLE) && defined(GLM_FORCE_UNRESTRICTED_GENTYPE)
 #	error "Both GLM_FORCE_SWIZZLE and GLM_FORCE_UNRESTRICTED_GENTYPE can't be defined at the same time"
 #endif

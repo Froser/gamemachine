@@ -76,8 +76,8 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
-				GMint idx_next = i * 3 + (j + 1) % 3;
-				GMint idx_prev = i * 3 + (j + 2) % 3;
+				GMint idx_prev = i * 3 + (j + 1) % 3;
+				GMint idx_next = i * 3 + (j + 2) % 3;
 				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
@@ -145,8 +145,8 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
-				GMint idx_next = i * 3 + (j + 1) % 3;
-				GMint idx_prev = i * 3 + (j + 2) % 3;
+				GMint idx_prev = i * 3 + (j + 1) % 3;
+				GMint idx_next = i * 3 + (j + 2) % 3;
 				glm::vec2 uv(uvArr[indices[idx] * 3], uvArr[indices[idx] * 3 + 1]);
 				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
@@ -211,8 +211,8 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
-				GMint idx_next = i * 3 + (j + 1) % 3;
-				GMint idx_prev = i * 3 + (j + 2) % 3;
+				GMint idx_prev = i * 3 + (j + 1) % 3;
+				GMint idx_next = i * 3 + (j + 2) % 3;
 				glm::vec2 uv(uvArr[indices[idx] * 2], uvArr[indices[idx] * 2 + 1]);
 				glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
 				glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),

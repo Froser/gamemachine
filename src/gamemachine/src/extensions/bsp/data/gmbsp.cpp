@@ -137,7 +137,7 @@ void GMBSP::loadBsp(const GMBuffer& buf)
 	d->buffer = &buf;
 	swapBsp();
 	parseEntities();
-	toGLCoord();
+	toDxCoord();
 	generateLightVolumes();
 }
 
@@ -359,19 +359,17 @@ void GMBSP::loadNoAlignData()
 	d->numGridPoints = copyLump(d->header, LUMP_LIGHTGRID, &d->gridData[0], 8);
 }
 
-// 将坐标系转化为xyz(OpenGL)坐标系
+// 将坐标系转化为左手坐标系(DirectX)
 // Quake的坐标系为：z正向朝上，y正向朝内，x正向朝右
-void GMBSP::toGLCoord()
+void GMBSP::toDxCoord()
 {
 	D(d);
 	for (GMint i = 0; i < d->numDrawVertices; i++)
 	{
-		//swap y and z and negate z
+		//swap y and z
 		GMfloat &_1 = d->vertices[i].xyz[1],
-				&_2 = d->vertices[i].xyz[2];
+			&_2 = d->vertices[i].xyz[2];
 		GM_SWAP(_1, _2);
-		_2 = -_2;
-
 
 		//Transfer texture coordinates (Invert t)
 		d->vertices[i].st[1] = -d->vertices[i].st[1];
@@ -379,10 +377,9 @@ void GMBSP::toGLCoord()
 
 	for (GMint i = 0; i < d->numplanes; ++i)
 	{
-		//swap y and z and negate z
+		//swap y and z
 		GM_SWAP(d->planes[i].normal[1], d->planes[i].normal[2]);
 		d->planes[i].normal[2] = -d->planes[i].normal[2];
-		d->planes[i].intercept = -d->planes[i].intercept;
 	}
 }
 

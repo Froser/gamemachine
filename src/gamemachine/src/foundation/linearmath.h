@@ -6,6 +6,7 @@
 	#define GLM_FORCE_PURE
 #endif
 
+// 使用和DirectX一样的坐标系
 #define GLM_FORCE_INLINE
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>

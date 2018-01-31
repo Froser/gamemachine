@@ -32,10 +32,11 @@ namespace
 			}
 			else
 			{
+				// 使用左手坐标系，采取和GL相反的旋转方式
 				if (shader.getFrontFace() == GMS_FrontFace::CLOCKWISE)
-					glFrontFace(GL_CW);
-				else
 					glFrontFace(GL_CCW);
+				else
+					glFrontFace(GL_CW);
 
 				glEnable(GL_CULL_FACE);
 			}

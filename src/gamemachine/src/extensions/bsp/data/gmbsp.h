@@ -276,7 +276,7 @@ private:
 
 private:
 	void swapBsp();
-	void toGLCoord();
+	void toDxCoord();
 	void parseFromMemory(char *buffer, GMint size);
 	void generateLightVolumes();
 	void parseEntities();

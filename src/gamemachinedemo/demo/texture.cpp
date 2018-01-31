@@ -42,7 +42,7 @@ void Demo_Texture::init()
 
 	// 创建一个带纹理的对象
 	gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, -1.f };
+	gm::GMfloat pos[] = { 0, 0, 1 };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
 	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
