@@ -60,7 +60,7 @@ namespace
 		GMBSPPhysicsObject* physics = gmBSPPhysicsObjectCast(sprite->getPhysicsObject());
 
 		GMMotionStates prop = physics->getMotionStates();
-		prop.transform = glm::translate(glm::vec3(origin[0], origin[2], -origin[1]));
+		prop.transform = glm::translate(glm::vec3(origin[0], origin[2], origin[1]));
 		physics->setMotionStates(prop);
 		physics->shapeProperties().stepHeight = 18.f;
 		physics->shapeProperties().bounding[0] = glm::vec3(-15, -35, -15);

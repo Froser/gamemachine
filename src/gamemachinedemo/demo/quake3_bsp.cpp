@@ -104,12 +104,12 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::GMJoystickState state = joyState.joystickState();
 		glm::vec3 direction(0);
 
-		if (kbState.keydown('D'))
+		if (kbState.keydown('A'))
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0));
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
 
-		if (kbState.keydown('A'))
+		if (kbState.keydown('D'))
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0));
 		if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
@@ -142,15 +142,6 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
 		if (state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 		{
-			gm::GMfloat rate = (gm::GMfloat)state.thumbRX / (
-				state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
-				SHRT_MIN :
-				SHRT_MAX);
-
-			joystickYaw = state.thumbRX * joystickSensitivity * rate;
-		}
-		if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-		{
 			gm::GMfloat rate = (gm::GMfloat)state.thumbRY / (
 				state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
 				SHRT_MIN :
@@ -158,10 +149,19 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 
 			joystickPitch = state.thumbRY * joystickSensitivity * rate;
 		}
+		if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+		{
+			gm::GMfloat rate = (gm::GMfloat)state.thumbRX / (
+				state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
+				SHRT_MIN :
+				SHRT_MAX);
+
+			joystickYaw = state.thumbRX * joystickSensitivity * rate;
+		}
 		d->sprite->look(glm::radians(joystickPitch), glm::radians(joystickYaw));
 
 		gm::GMMouseState ms = mouseState.mouseState();
-		d->sprite->look(glm::radians(-ms.deltaY * mouseSensitivity), glm::radians(ms.deltaX * mouseSensitivity));
+		d->sprite->look(glm::radians(-ms.deltaY * mouseSensitivity), glm::radians(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered('P'))
 			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));

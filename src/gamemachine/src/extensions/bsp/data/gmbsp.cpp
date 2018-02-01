@@ -379,7 +379,7 @@ void GMBSP::toDxCoord()
 	{
 		//swap y and z
 		GM_SWAP(d->planes[i].normal[1], d->planes[i].normal[2]);
-		d->planes[i].normal[2] = -d->planes[i].normal[2];
+		d->planes[i].intercept = -d->planes[i].intercept;
 	}
 }
 

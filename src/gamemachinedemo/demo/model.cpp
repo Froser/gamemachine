@@ -240,8 +240,7 @@ void Demo_Model::handleDragging()
 
 	if (d->draggingL)
 	{
-		gm::GMfloat rotateX = state.posX - d->mouseDownX;
-		gm::GMfloat rotateY = state.posY - d->mouseDownY;
+		gm::GMfloat rotateX = d->mouseDownX - state.posX;
 
 		glm::quat q = glm::rotate(d->gameObject->getRotation(),
 			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
@@ -255,8 +254,8 @@ void Demo_Model::handleDragging()
 	}
 	else if (d->draggingR)
 	{
-		gm::GMfloat rotateX = state.posX - d->mouseDownX;
-		gm::GMfloat rotateY = state.posY - d->mouseDownY;
+		gm::GMfloat rotateX = d->mouseDownX - state.posX;
+		gm::GMfloat rotateY = d->mouseDownY - state.posY;
 		glm::vec3 lookAt3 = glm::normalize(s_lookAt.lookAt);
 		glm::vec4 lookAt = glm::toHomogeneous(lookAt3);
 		glm::quat q = glm::rotate(d->lookAtRotation,

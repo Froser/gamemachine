@@ -87,14 +87,7 @@ void GMFrustum::update()
 		clipMat = projection * view;
 
 		GMfloat clip[16];
-		for (GMint i = 0; i < 4; i++)
-		{
-			glm::vec4 vec = clipMat[i];
-			for (GMint j = 0; j < 4; j++)
-			{
-				clip[i * 4 + j] = vec[j];
-			}
-		}
+		glm::copyToArray(clipMat, clip);
 
 		//calculate planes
 		d->planes[RIGHT_PLANE].normal = glm::vec3(clip[3] - clip[0], clip[7] - clip[4], clip[11] - clip[8]);
