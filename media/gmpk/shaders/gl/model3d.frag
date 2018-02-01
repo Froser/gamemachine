@@ -155,13 +155,17 @@ void model3d_calcColor()
 	if (GM_debug_draw_normal == 1)
 	{
 		// 画眼睛视角的法向量
+		// 采用左手坐标系，法线z坐标应该反转
+		g_model3d_normal_eye.z = -g_model3d_normal_eye.z;
 		_frag_color = vec4((g_model3d_normal_eye.xyz + 1.f) / 2.f, 1.f);
 		return;
 	}
 	else if (GM_debug_draw_normal == 2)
 	{
 		// 画世界视角的法向量
-		_frag_color = vec4((_normal.xyz + 1.f) / 2.f, 1.f);
+		// 采用左手坐标系，法线z坐标应该反转
+		vec3 normal = vec3(_normal.y, _normal.y, -_normal.z);
+		_frag_color = vec4((normal + 1.f) / 2.f, 1.f);
 		return;
 	}
 	vec3 diffuseTextureColor = model3d_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);

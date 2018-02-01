@@ -157,9 +157,9 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				component->vertex(vertex[0], vertex[1], vertex[2]);
 				component->normal(normal[0], normal[1], normal[2]);
 				if (customUV)
-					component->uv(uv[0], uv[1]);
+					component->uv(uv[0], 1 - uv[1]);
 				else
-					component->uv((uv[0] + 1) / 2, (uv[1] + 1) / 2);
+					component->uv((uv[0] + 1) / 2, 1 - (uv[1] + 1) / 2);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
@@ -223,9 +223,9 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 				component->vertex(vertex[0], vertex[1], vertex[2]);
 				component->normal(normal[0], normal[1], normal[2]);
 				if (customUV)
-					component->uv(uv[0], uv[1]);
+					component->uv(uv[0], 1 - uv[1]);
 				else
-					component->uv((uv[0] + 1) / 2, (uv[1] + 1) / 2);
+					component->uv((uv[0] + 1) / 2, 1 - (uv[1] + 1) / 2);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
