@@ -178,7 +178,7 @@ struct GMFloat16
 	}
 };
 
-GMMATH_BEGIN_STRUCT(GMVec2, glm::vec2, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec2, GMVec2, DirectX::XMVECTOR)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_FLOAT4(glm::make_vec2)
 #if GM_USE_DX11
@@ -204,7 +204,7 @@ GMVec2(gm::GMfloat v0, gm::GMfloat v1)
 #endif
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec3, GMVec3, DirectX::XMVECTOR)
 GMMATH_SET_FLOAT4(glm::make_vec3)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_GET_(X, 0)
@@ -234,7 +234,7 @@ GMVec3(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2)
 #endif
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMVec4, glm::vec4, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec4, GMVec4, DirectX::XMVECTOR)
 GMMATH_SET_FLOAT4(glm::make_vec4)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_GET_(X, 0)
@@ -264,7 +264,7 @@ GMVec4(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2, gm::GMfloat v3)
 #endif
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMMat4, glm::mat4, DirectX::XMMATRIX)
+GMMATH_BEGIN_STRUCT(GMMat4, GMMat4, DirectX::XMMATRIX)
 void loadFloat16(GMFloat16& f16) const
 {
 #if GM_USE_DX11
@@ -279,7 +279,7 @@ void loadFloat16(GMFloat16& f16) const
 }
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMQuat, glm::quat, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMQuat, GMQuat, DirectX::XMVECTOR)
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)

@@ -565,7 +565,7 @@ void GMBSPShaderLoader::createSky(GMShader& shader)
 		skyShader.setNodraw(false);
 		skyShader.setCull(GMS_Cull::NONE);
 
-		GMSkyGameObject* sky = new GMSkyGameObject(skyShader, d->bspRender->boundMin, d->bspRender->boundMax);
+		GMSkyGameObject* sky = new GMSkyGameObject(skyShader, MakeVector3(d->bspRender->boundMin), MakeVector3(d->bspRender->boundMax));
 		d->world->setSky(sky);
 	}
 }

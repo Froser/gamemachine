@@ -166,8 +166,8 @@ public:
 	GMPhysicsActivationState getActivationState();
 	void setActivationState(GMPhysicsActivationState state, bool force = false);
 	void activate(bool force = false);
-	glm::mat4 getCenterOfMassTransform();
-	glm::mat4 getCenterOfMassTransformInversed();
+	GMMat4 getCenterOfMassTransform();
+	GMMat4 getCenterOfMassTransformInversed();
 
 public:
 	//! 获取物理对象的运动状态。

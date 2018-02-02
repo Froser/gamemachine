@@ -58,12 +58,12 @@ void GMDiscreteDynamicsWorld::syncTransform()
 		btQuaternion rotation = transform.getRotation();
 
 		GMGameObject* gameObject = rigid->getGameObject();
-		gameObject->setTranslation(glm::translate(glm::vec3(pos[0], pos[1], pos[2])));
-		gameObject->setRotation(glm::quat(rotation[0], rotation[1], rotation[2], rotation[3]));
+		gameObject->setTranslation(Translate(GMVec3(pos[0], pos[1], pos[2])));
+		gameObject->setRotation(GMQuat(rotation[0], rotation[1], rotation[2], rotation[3]));
 	}
 }
 
-void GMDiscreteDynamicsWorld::setGravity(const glm::vec3& gravity)
+void GMDiscreteDynamicsWorld::setGravity(const GMVec3& gravity)
 {
 	D(d);
 	d->worldImpl->setGravity(btVector3(gravity[0], gravity[1], gravity[2]));
@@ -96,7 +96,7 @@ void GMDiscreteDynamicsWorld::removeConstraint(GMConstraint* constraint)
 	d->worldImpl->removeConstraint(constraint->getConstraint());
 }
 
-GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld)
+GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const GMVec3& rayFromWorld, const GMVec3& rayToWorld)
 {
 	D(d);
 	GMPhysicsRayTestResult result;
@@ -110,8 +110,8 @@ GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const glm::vec3& rayFrom
 	if (rayCallback.hasHit())
 	{
 		result.hit = true;
-		result.hitPointWorld = glm::vec3(rayCallback.m_hitPointWorld[0], rayCallback.m_hitPointWorld[1], rayCallback.m_hitPointWorld[2]);
-		result.hitNormalWorld = glm::vec3(rayCallback.m_hitNormalWorld[0], rayCallback.m_hitNormalWorld[1], rayCallback.m_hitNormalWorld[2]);
+		result.hitPointWorld = GMVec3(rayCallback.m_hitPointWorld[0], rayCallback.m_hitPointWorld[1], rayCallback.m_hitPointWorld[2]);
+		result.hitNormalWorld = GMVec3(rayCallback.m_hitNormalWorld[0], rayCallback.m_hitNormalWorld[1], rayCallback.m_hitNormalWorld[2]);
 		result.hitObject = static_cast<GMRigidPhysicsObject*>(rayCallback.m_collisionObject->getUserPointer());
 	}
 

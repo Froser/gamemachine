@@ -233,14 +233,14 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 	// Scaling surface
 	const GMint SCALING = 2;
 	GMVec3 center = (d->min + d->max) / 2.f;
-	glm::mat4 transScale = glm::scale(GMVec3(SCALING, 1, SCALING));
+	GMMat4 transScale = Scale(GMVec3(SCALING, 1, SCALING));
 	for (GMuint i = 0; i < 20; i++)
 	{
-		glm::mat4 transRestore = glm::translate(center);
-		glm::mat4 transMoveToAxisOrigin = glm::translate(-center);
-		glm::mat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
+		GMMat4 transRestore = Translate(center);
+		GMMat4 transMoveToAxisOrigin = Translate(-center);
+		GMMat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
 
-		glm::vec4 pt = transFinal * glm::vec4(vertices[i], 1);
+		GMVec4 pt = transFinal * GMVec4(vertices[i], 1);
 		vertices[i] = GMVec3(pt[0], pt[1], pt[2]);
 	}
 

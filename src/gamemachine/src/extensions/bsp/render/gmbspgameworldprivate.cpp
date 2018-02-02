@@ -32,7 +32,7 @@ namespace
 		if (created)
 			return;
 
-		BSPVector3 origin = BSPVector3(0);
+		GMFloat4 origin;
 		GMfloat yaw = 0;
 
 		EACH_PAIR_OF_ENTITY(entity, e)
@@ -51,20 +51,22 @@ namespace
 			}
 		}
 
-		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, glm::vec3(0, 10, 0));
-		sprite->setMoveSpeed(glm::vec3(193));
-		sprite->setJumpSpeed(glm::vec3(0, 150, 0));
+		GMSpriteGameObject* sprite = new GMSpriteGameObject(6, GMVec3(0, 10, 0));
+		sprite->setMoveSpeed(GMVec3(193));
+		sprite->setJumpSpeed(GMVec3(0, 150, 0));
 		sprite->setPhysicsObject(new GMBSPPhysicsObject());
 		world->addObjectAndInit(sprite);
 
 		GMBSPPhysicsObject* physics = gmBSPPhysicsObjectCast(sprite->getPhysicsObject());
 
 		GMMotionStates prop = physics->getMotionStates();
-		prop.transform = glm::translate(glm::vec3(origin[0], origin[2], origin[1]));
+		GMVec3 vecOrigin;
+		vecOrigin.setFloat4(origin);
+		prop.transform = Translate(vecOrigin);
 		physics->setMotionStates(prop);
 		physics->shapeProperties().stepHeight = 18.f;
-		physics->shapeProperties().bounding[0] = glm::vec3(-15, -35, -15);
-		physics->shapeProperties().bounding[1] = glm::vec3(15, 35, 15);
+		physics->shapeProperties().bounding[0] = GMVec3(-15, -35, -15);
+		physics->shapeProperties().bounding[1] = GMVec3(15, 35, 15);
 		created = true;
 	}
 }

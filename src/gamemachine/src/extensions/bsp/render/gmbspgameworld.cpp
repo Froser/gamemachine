@@ -129,7 +129,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	GMBSPRenderData& rd = d->render.renderData();
 
 	GMCamera& camera = GM.getCamera();
-	glm::vec3 pos = camera.getLookAt().position;
+	GMVec3 pos = camera.getLookAt().position;
 	BSPData& bsp = d->bsp.bspData();
 
 	rd.facesToDraw.clearAll();
@@ -157,7 +157,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	}
 }
 
-GMint GMBSPGameWorld::calculateLeafNode(const glm::vec3& position)
+GMint GMBSPGameWorld::calculateLeafNode(const GMVec3& position)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -690,8 +690,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 			asset = assets.insertAsset(GM_ASSET_MODELS, GMString(fn), GMAssetType::Model, model);
 		}
 		entityObject = new GMEntityObject(asset);
-		entityObject->setTranslation(glm::translate(entity->origin));
-		entityObject->setScaling(glm::scale(m->extents[0], m->extents[1], m->extents[2]));
+		entityObject->setTranslation(Translate(entity->origin));
+		entityObject->setScaling(Scale(m->extents[0], m->extents[1], m->extents[2]));
 	}
 
 	GM_ASSERT(entityObject);

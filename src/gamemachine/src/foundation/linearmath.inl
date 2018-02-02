@@ -5,7 +5,7 @@ namespace glm
 {
 	inline vec4 combine_vec4(const vec3& v3, const vec4& v4)
 	{
-		return glm::vec4(v3, v4[3]);
+		return GMVec4(v3, v4[3]);
 	}
 
 	// identity
@@ -100,7 +100,7 @@ namespace glm
 		return percentage * (end - start) + start;
 	}
 
-	inline glm::vec3 safeNormalize(const glm::vec3& vec, const glm::vec3& n = glm::vec3(1, 0, 0))
+	inline GMVec3 safeNormalize(const GMVec3& vec, const GMVec3& n = GMVec3(1, 0, 0))
 	{
 		gm::GMfloat l2 = glm::length2(vec);
 		if (l2 >= FLT_EPSILON*FLT_EPSILON)
@@ -122,7 +122,7 @@ GMVec2 Zero()
 #if GM_USE_DX11
 	V.v_ = DirectX::XMVectorZero();
 #else
-	V.v_ = glm::zero<glm::vec2>();
+	V.v_ = glm::zero<GMVec2>();
 #endif
 	return V;
 }
@@ -134,7 +134,7 @@ GMVec3 Zero()
 #if GM_USE_DX11
 	V.v_ = DirectX::XMVectorZero();
 #else
-	V.v_ = glm::zero<glm::vec3>();
+	V.v_ = glm::zero<GMVec3>();
 #endif
 	return V;
 }
@@ -146,7 +146,7 @@ GMVec4 Zero()
 #if GM_USE_DX11
 	V.v_ = DirectX::XMVectorZero();
 #else
-	V.v_ = glm::zero<glm::vec4>();
+	V.v_ = glm::zero<GMVec4>();
 #endif
 	return V;
 }
@@ -157,7 +157,7 @@ inline GMMat4 __getIdentityMat4()
 #if GM_USE_DX11
 	v.v_ = DirectX::XMMatrixIdentity();
 #else
-	v.v_ = glm::identity<glm::mat4>();
+	v.v_ = Identity<GMMat4>();
 #endif
 	return v;
 }
@@ -168,7 +168,7 @@ inline GMQuat __getIdentityQuat()
 #if GM_USE_DX11
 	v.v_ = DirectX::XMQuaternionIdentity();
 #else
-	v.v_ = glm::identity<glm::quat>();
+	v.v_ = Identity<GMQuat>();
 #endif
 	return v;
 }
@@ -348,7 +348,7 @@ inline GMMat4 QuatToMatrix(const GMQuat& quat)
 #if GM_USE_DX11
 	mat.v_ = DirectX::XMMatrixRotationQuaternion(quat.v_);
 #else
-	mat.v_ = glm::mat4_cast(quat.v_);
+	mat.v_ = QuatToMatrix(quat.v_);
 #endif
 	return mat;
 }
@@ -369,7 +369,7 @@ inline gm::GMfloat Dot(const GMVec2& V1, const GMVec2& V2)
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector2Dot(V1.v_, V2.v_));
 #else
-	return glm::dot(V1.v_, V2.v_);
+	return Dot(V1.v_, V2.v_);
 #endif
 }
 
@@ -378,7 +378,7 @@ inline gm::GMfloat Dot(const GMVec3& V1, const GMVec3& V2)
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector3Dot(V1.v_, V2.v_));
 #else
-	return glm::dot(V1.v_, V2.v_);
+	return Dot(V1.v_, V2.v_);
 #endif
 }
 
@@ -387,7 +387,7 @@ inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2)
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector4Dot(V1.v_, V2.v_));
 #else
-	return glm::dot(V1.v_, V2.v_);
+	return Dot(V1.v_, V2.v_);
 #endif
 }
 
@@ -408,7 +408,7 @@ inline GMVec3 FastNormalize(const GMVec3& V)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
-	R.v_ = glm::fastNormalize(R.v_);
+	R.v_ = FastNormalize(R.v_);
 #endif
 	return R;
 }
@@ -467,7 +467,7 @@ inline GMMat4 Translate(const GMVec3& V)
 #if GM_USE_DX11
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
-	M.v_ = glm::translate(R.v_);
+	M.v_ = Translate(R.v_);
 #endif
 	return M;
 }
@@ -478,7 +478,7 @@ inline GMMat4 Translate(const GMVec4& V)
 #if GM_USE_DX11
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
-	M.v_ = glm::translate(R.v_);
+	M.v_ = Translate(R.v_);
 #endif
 	return M;
 }
@@ -489,7 +489,7 @@ inline GMMat4 Scale(const GMVec3& V)
 #if GM_USE_DX11
 	M.v_ = DirectX::XMMatrixScalingFromVector(V.v_);
 #else
-	M.v_ = glm::scale(R.v_);
+	M.v_ = Scale(R.v_);
 #endif
 	return M;
 }
@@ -550,7 +550,7 @@ inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector3Cross(V1.v_, V2.v_);
 #else
-	R.v_ = glm::cross(V1.v_, V2.v_);
+	R.v_ = Cross(V1.v_, V2.v_);
 #endif
 	return R;
 }

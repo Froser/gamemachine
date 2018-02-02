@@ -54,11 +54,11 @@ class GMPoint2PointConstraint : public GMConstraint
 	DECLARE_PRIVATE_AND_BASE(GMPoint2PointConstraint, GMConstraint)
 
 public:
-	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const glm::vec3& pivotA);
+	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA);
 
 public:
-	void setPivotA(const glm::vec3& pivot);
-	void setPivotB(const glm::vec3& pivot);
+	void setPivotA(const GMVec3& pivot);
+	void setPivotB(const GMVec3& pivot);
 
 public:
 	const GMConstraintSetting& getConstraintSetting()

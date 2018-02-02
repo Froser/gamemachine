@@ -16,7 +16,7 @@ GMConstraint::~GMConstraint()
 	GM_delete(d->constraint);
 }
 
-GMPoint2PointConstraint::GMPoint2PointConstraint(GMRigidPhysicsObject* body, const glm::vec3& pivotA)
+GMPoint2PointConstraint::GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA)
 	: GMConstraint(body)
 {
 	D(d);
@@ -26,13 +26,13 @@ GMPoint2PointConstraint::GMPoint2PointConstraint(GMRigidPhysicsObject* body, con
 	db->constraint = d->constraint;
 }
 
-void GMPoint2PointConstraint::setPivotA(const glm::vec3& pivot)
+void GMPoint2PointConstraint::setPivotA(const GMVec3& pivot)
 {
 	D(d);
 	d->constraint->setPivotA(btVector3(pivot[0], pivot[1], pivot[2]));
 }
 
-void GMPoint2PointConstraint::setPivotB(const glm::vec3& pivot)
+void GMPoint2PointConstraint::setPivotB(const GMVec3& pivot)
 {
 	D(d);
 	d->constraint->setPivotB(btVector3(pivot[0], pivot[1], pivot[2]));

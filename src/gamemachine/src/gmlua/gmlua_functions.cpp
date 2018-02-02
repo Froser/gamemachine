@@ -106,7 +106,7 @@ extern "C"
 		GMfloat x = lua_tonumber(L, 1),
 			y = lua_tonumber(L, 2),
 			z = lua_tonumber(L, 3);
-		glm::mat4 mat = glm::translate({ x, y, z });
+		GMMat4 mat = Translate({ x, y, z });
 		GMLua(L).setMatrix(mat);
 		return 1;
 	}
@@ -116,7 +116,7 @@ extern "C"
 		GMfloat x = lua_tonumber(L, 1),
 			y = lua_tonumber(L, 2),
 			z = lua_tonumber(L, 3);
-		glm::mat4 mat = glm::scale(x, y, z);
+		GMMat4 mat = Scale(x, y, z);
 		GMLua(L).setMatrix(mat);
 		return 1;
 	}
@@ -127,8 +127,8 @@ extern "C"
 			y = lua_tonumber(L, 2),
 			z = lua_tonumber(L, 3),
 			r = lua_tonumber(L, 4);
-		glm::quat q = glm::rotate(glm::identity<glm::quat>(), r, glm::vec3(x, y, z));
-		glm::mat4 mat = glm::mat4_cast(q);
+		GMQuat q = glm::rotate(Identity<GMQuat>(), r, GMVec3(x, y, z));
+		GMMat4 mat = QuatToMatrix(q);
 		GMLua(L).setMatrix(mat);
 		return 1;
 	}
@@ -136,7 +136,7 @@ extern "C"
 	GM_LUA_API int math_mxm(lua_State* L)
 	{
 		GMLua lua(L);
-		glm::mat4 mat1, mat2;
+		GMMat4 mat1, mat2;
 		lua.getMatrix(mat1, 1);
 		lua.getMatrix(mat2, 2);
 //#warning todo
@@ -147,8 +147,8 @@ extern "C"
 	GM_LUA_API int math_vxm(lua_State* L)
 	{
 		GMLua lua(L);
-		glm::vec4 v;
-		glm::mat4 m;
+		GMVec4 v;
+		GMMat4 m;
 		lua.getVector(v, 1);
 		lua.getMatrix(m, 2);
 		lua.setVector(v * m);
@@ -158,11 +158,11 @@ extern "C"
 	GM_LUA_API int math_vlerp(lua_State* L)
 	{
 		GMLua lua(L);
-		glm::vec4 v1, v2;
+		GMVec4 v1, v2;
 		lua.getVector(v1, 1);
 		lua.getVector(v2, 2);
 		GMfloat p = lua_tonumber(L, 3);
-		glm::vec4 result = glm::lerp(v1, v2, p);
+		GMVec4 result = glm::lerp(v1, v2, p);
 		lua.setVector(result);
 		return 1;
 	}

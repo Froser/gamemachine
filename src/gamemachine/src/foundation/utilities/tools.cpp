@@ -161,8 +161,8 @@ GMLargeInteger GMStopwatch::nowInCycle()
 
 void GMPlane::setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 & p2)
 {
-	normal = glm::cross((p1 - p0), (p2 - p0));
-	normal = glm::fastNormalize(normal);
+	normal = Cross((p1 - p0), (p2 - p0));
+	normal = FastNormalize(normal);
 	calculateIntercept(p0);
 }
 
@@ -175,15 +175,15 @@ void GMPlane::normalize()
 
 bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result)//find point of intersection of 3 planes
 {
-	GMfloat denominator = Dot(normal, (glm::cross(p2.normal, p3.normal)));
+	GMfloat denominator = Dot(normal, (Cross(p2.normal, p3.normal)));
 	//scalar triple product of normals
 	if (denominator == 0.0f)									//if zero
 		return false;										//no intersection
 
 	GMVec3 temp1, temp2, temp3;
-	temp1 = (glm::cross(p2.normal, p3.normal))*intercept;
-	temp2 = (glm::cross(p3.normal, normal))*p2.intercept;
-	temp3 = (glm::cross(normal, p2.normal))*p3.intercept;
+	temp1 = (Cross(p2.normal, p3.normal))*intercept;
+	temp2 = (Cross(p3.normal, normal))*p2.intercept;
+	temp3 = (Cross(normal, p2.normal))*p3.intercept;
 
 	result = (temp1 + temp2 + temp3) / (-denominator);
 

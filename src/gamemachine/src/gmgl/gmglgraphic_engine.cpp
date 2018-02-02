@@ -402,7 +402,7 @@ void GMGLGraphicEngine::updateProjection()
 {
 	D(d);
 	GMCamera& camera = GM.getCamera();
-	const glm::mat4& proj = camera.getFrustum().getProjectionMatrix();
+	const GMMat4& proj = camera.getFrustum().getProjectionMatrix();
 	GM_BEGIN_CHECK_GL_ERROR
 	d->forwardShaderProgram->useProgram();
 	d->forwardShaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, glm::value_ptr(proj));
@@ -420,7 +420,7 @@ void GMGLGraphicEngine::updateView()
 {
 	D(d);
 	GMCamera& camera = GM.getCamera();
-	const glm::mat4& viewMatrix = camera.getFrustum().getViewMatrix();
+	const GMMat4& viewMatrix = camera.getFrustum().getViewMatrix();
 	const GMCameraLookAt& lookAt = camera.getLookAt();
 	GMfloat vec[4] = { lookAt.position[0], lookAt.position[1], lookAt.position[2], 1.0f };
 

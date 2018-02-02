@@ -28,7 +28,7 @@ public:
 	~GMDiscreteDynamicsWorld();
 
 public:
-	void setGravity(const glm::vec3& gravity);
+	void setGravity(const GMVec3& gravity);
 	void addRigidObject(AUTORELEASE GMRigidPhysicsObject* rigidObj);
 	void addConstraint(GMConstraint* constraint, bool disableCollisionsBetweenLinkedBodies = false);
 
@@ -38,7 +38,7 @@ public:
 	  \param constraint 需要移除的约束。
 	*/
 	void removeConstraint(GMConstraint* constraint);
-	GMPhysicsRayTestResult rayTest(const glm::vec3& rayFromWorld, const glm::vec3& rayToWorld);
+	GMPhysicsRayTestResult rayTest(const GMVec3& rayFromWorld, const GMVec3& rayToWorld);
 
 public:
 	virtual void simulate(GMGameObject* obj) override;

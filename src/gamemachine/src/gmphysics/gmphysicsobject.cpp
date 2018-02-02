@@ -71,20 +71,20 @@ void GMRigidPhysicsObject::activate(bool force)
 	d->body->activate(force);
 }
 
-glm::mat4 GMRigidPhysicsObject::getCenterOfMassTransform()
+GMMat4 GMRigidPhysicsObject::getCenterOfMassTransform()
 {
 	D(d);
 	GM_ASSERT(d->body);
-	glm::mat4 val;
+	GMMat4 val;
 	d->body->getCenterOfMassTransform().getOpenGLMatrix(glm::value_ptr(val));
 	return val;
 }
 
-glm::mat4 GMRigidPhysicsObject::getCenterOfMassTransformInversed()
+GMMat4 GMRigidPhysicsObject::getCenterOfMassTransformInversed()
 {
 	D(d);
 	GM_ASSERT(d->body);
-	glm::mat4 val;
+	GMMat4 val;
 	d->body->getCenterOfMassTransform().inverse().getOpenGLMatrix(glm::value_ptr(val));
 	return val;
 }
@@ -99,7 +99,7 @@ const GMMotionStates& GMRigidPhysicsObject::getMotionStates()
 		d->body->getWorldTransform().getOpenGLMatrix(glm::value_ptr(db->motionStates.transform));
 
 		btVector3 lv = d->body->getLinearVelocity();
-		db->motionStates.linearVelocity = glm::vec3(lv[0], lv[1], lv[2]);
+		db->motionStates.linearVelocity = GMVec3(lv[0], lv[1], lv[2]);
 	}
 	return db->motionStates;
 }
@@ -111,17 +111,17 @@ void GMRigidPhysicsObject::setShape(GMAsset shape)
 	GM_ASSERT(!d->shape);
 	d->shape = GMAssets::getPhysicsShape(shape);
 
-	const glm::mat4& translation = db->gameObject->getTranslation();
+	const GMMat4& translation = db->gameObject->getTranslation();
 	btTransform trans;
 	trans.setFromOpenGLMatrix(glm::value_ptr(translation));
 	initRigidBody(
 		d->mass,
 		trans,
-		glm::vec3(1, 0, 0)
+		GMVec3(1, 0, 0)
 	);
 }
 
-void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startTransform, const glm::vec3& color)
+void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startTransform, const GMVec3& color)
 {
 	D(d);
 	btCollisionShape* shape = d->shape->getBulletShape();

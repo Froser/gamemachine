@@ -342,7 +342,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 			TO_VIEWPORT_Y(-(d->cornerHeight + pos_middle_h) / 2)
 		};
 
-		glm::vec4 center[9] = {
+		GMVec4 center[9] = {
 			{ col[0], row[0], 0, 1 },
 			{ col[0], row[1], 0, 1 },
 			{ col[0], row[2], 0, 1 },
@@ -355,8 +355,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		};
 
 		// 把所有边框坐标移到中心（4）
-		GMMat4 translation = glm::translate(
-			glm::vec3(TO_VIEWPORT_X(-half_border_width), TO_VIEWPORT_Y(half_border_height), 0)
+		GMMat4 translation = Translate(
+			GMVec3(TO_VIEWPORT_X(-half_border_width), TO_VIEWPORT_Y(half_border_height), 0)
 		);
 	END_GEOMETRY_TO_VIEWPORT()
 
@@ -397,8 +397,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 			geometry.y + geometry.height / 2
 		};
 
-		d->objects[i]->setTranslation(glm::translate(
-			glm::vec3(
+		d->objects[i]->setTranslation(Translate(
+			GMVec3(
 				centerPosition[0] * 2 / window.width - 1,
 				1 - centerPosition[1] * 2 / window.height,
 				0))
@@ -824,6 +824,6 @@ void GMCursorGameObject::update()
 		GMMouseState ms = mouseState.mouseState();
 		GMRect rect = { ms.posX + db->geometry.width / 2, ms.posY + db->geometry.height / 2 };
 		GMRectF coord = toViewportCoord(rect);
-		setTranslation(glm::translate(glm::vec3(coord.x, coord.y, 0)));
+		setTranslation(Translate(GMVec3(coord.x, coord.y, 0)));
 	}
 }
