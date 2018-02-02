@@ -11,7 +11,7 @@ BEGIN_NS
 GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 {
 	GMPhysicsMoveArgs() = default;
-	GMPhysicsMoveArgs(const gmmath::GMVec3& _lookAt, const gmmath::GMVec3& _direction, const gmmath::GMVec3& _speed, const gmmath::GMVec3& _rate)
+	GMPhysicsMoveArgs(const GMVec3& _lookAt, const GMVec3& _direction, const GMVec3& _speed, const GMVec3& _rate)
 		: lookAt(_lookAt)
 		, direction(_direction)
 		, speed(_speed)
@@ -19,27 +19,27 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 	{
 	}
 
-	gmmath::GMVec3 lookAt; //!< 物体朝向
-	gmmath::GMVec3 direction; //!< 物体移动方向，坐标系相对于物体朝向，采用右手坐标系，与朝向坐标系一致。
-	gmmath::GMVec3 speed;
-	gmmath::GMVec3 rate;
+	GMVec3 lookAt; //!< 物体朝向
+	GMVec3 direction; //!< 物体移动方向，坐标系相对于物体朝向，采用右手坐标系，与朝向坐标系一致。
+	GMVec3 speed;
+	GMVec3 rate;
 };
 
 class GMRigidPhysicsObject;
 GM_ALIGNED_STRUCT(GMPhysicsRayTestResult)
 {
-	gmmath::GMVec3 rayFromWorld = gmmath::zero<gmmath::GMVec3>();
-	gmmath::GMVec3 rayToWorld = gmmath::zero<gmmath::GMVec3>();
-	gmmath::GMVec3 hitPointWorld = gmmath::zero<gmmath::GMVec3>();
-	gmmath::GMVec3 hitNormalWorld = gmmath::zero<gmmath::GMVec3>();
+	GMVec3 rayFromWorld = zero<GMVec3>();
+	GMVec3 rayToWorld = zero<GMVec3>();
+	GMVec3 hitPointWorld = zero<GMVec3>();
+	GMVec3 hitNormalWorld = zero<GMVec3>();
 	GMRigidPhysicsObject* hitObject = nullptr;
 	bool hit = false;
 };
 
 GM_ALIGNED_STRUCT(GMMotionStates)
 {
-	gmmath::GMMat4 transform = gmmath::identity<gmmath::GMMat4>();
-	gmmath::GMVec3 linearVelocity = gmmath::zero<gmmath::GMVec3>();
+	GMMat4 transform = identity<GMMat4>();
+	GMVec3 linearVelocity = zero<GMVec3>();
 };
 
 GM_PRIVATE_OBJECT(GMPhysicsObject)
@@ -178,7 +178,7 @@ public:
 	virtual const GMMotionStates& getMotionStates() override;
 
 private:
-	void initRigidBody(GMfloat mass, const btTransform& startTransform, const gmmath::GMVec3& color);
+	void initRigidBody(GMfloat mass, const btTransform& startTransform, const GMVec3& color);
 
 private:
 	//! 解除对一个bullet刚体的生命周期管理。

@@ -24,7 +24,7 @@ struct IVirtualFunctionObject
 
 // 定义对齐结构体
 #define GM_ALIGNED_STRUCT_FROM(name, from) GM_ALIGNED_16(struct) name : public from
-#define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, GMAlignmentObject)
+#define GM_ALIGNED_STRUCT(name) GM_ALIGNED_STRUCT_FROM(name, gm::GMAlignmentObject)
 
 // 对象存储
 template <typename T>
@@ -344,7 +344,7 @@ inline void gmSwap(GMObject& a, GMObject& b)
 #define GM_INTERFACE_FROM(name, base) struct name : public base 
 
 template <typename T>
-class GMSingleton : public GMObject
+class GMSingleton
 {
 public:
 	static T& instance()

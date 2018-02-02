@@ -58,10 +58,14 @@ template <GMint D, typename T>
 static void pushBackData(GMScanner& scanner, AlignedVector<T>& container)
 {
 	T data;
+	GMfloat f;
+	GMFloat4 f4;
 	for (GMint i = 0; i < D; i++)
 	{
-		scanner.nextFloat(&(data[i]));
+		scanner.nextFloat(&f);
+		f4[i] = f;
 	}
+	data.setFloat4(f4);
 	container.push_back(data);
 }
 
@@ -180,6 +184,7 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 			break;
 
 		GMScanner faceScanner(face, false, slashPredicate);
+		GMFloat4 f4_vec;
 
 		GMint v = INVALID, t = INVALID, n = INVALID;
 		faceScanner.nextInt(&v);
@@ -189,18 +194,21 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 		GM_ASSERT(v != INVALID);
 		{
 			auto& vec = d->positions[v - 1];
-			d->currentComponent->vertex(vec[0], vec[1], vec[2]);
+			vec.loadFloat4(f4_vec);
+			d->currentComponent->vertex(f4_vec[0], f4_vec[1], f4_vec[2]);
 		}
 
 		{
-			auto&& vec = t != INVALID ? d->textures[t - 1] : glm::vec2(0, 0);
-			d->currentComponent->uv(vec[0], vec[1]);
+			auto&& vec = t != INVALID ? d->textures[t - 1] : GMVec2(0, 0);
+			vec.loadFloat4(f4_vec);
+			d->currentComponent->uv(f4_vec[0], f4_vec[1]);
 		}
 
 		GM_ASSERT(n != INVALID);
 		{
 			auto& vec = d->normals[n - 1];
-			d->currentComponent->normal(vec[0], vec[1], vec[2]);
+			vec.loadFloat4(f4_vec);
+			d->currentComponent->normal(f4_vec[0], f4_vec[1], f4_vec[2]);
 		}
 	};
 	d->currentComponent->endFace();
@@ -277,8 +285,8 @@ void GMModelReader_Obj::applyMaterial(const ModelReader_Obj_Material& material, 
 	shader.setCull(GMS_Cull::NONE);
 
 	GMMaterial& m = shader.getMaterial();
-	m.ka = glm::make_vec3(material.ka);
-	m.kd = glm::make_vec3(material.kd);
-	m.ks = glm::make_vec3(material.ks);
+	m.ka = MakeVector3(material.ka);
+	m.kd = MakeVector3(material.kd);
+	m.ks = MakeVector3(material.ks);
 	m.shininess = material.ns;
 }

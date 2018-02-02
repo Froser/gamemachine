@@ -14,10 +14,10 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMPhysicsObject* physics = nullptr;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
-	gmmath::GMMat4 scaling = gmmath::identity<gmmath::GMMat4>();
-	gmmath::GMMat4 translation = gmmath::identity<gmmath::GMMat4>();
-	glm::quat rotation = gmmath::identity<glm::quat>();
-	gmmath::GMMat4 transformMatrix = gmmath::identity<gmmath::GMMat4>();
+	GMMat4 scaling = identity<GMMat4>();
+	GMMat4 translation = identity<GMMat4>();
+	GMQuat rotation = identity<GMQuat>();
+	GMMat4 transformMatrix = identity<GMMat4>();
 	bool canDeferredRendering = true;
 };
 
@@ -58,17 +58,17 @@ private:
 	inline void updateMatrix()
 	{ 
 		D(d);
-		d->transformMatrix = d->scaling * glm::mat4_cast(d->rotation) * d->translation;
+		d->transformMatrix = d->scaling * QuatToMatrix(d->rotation) * d->translation;
 	}
 
 public:
-	virtual void setScaling(const gmmath::GMMat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
-	virtual void setTranslation(const gmmath::GMMat4& translation) { D(d); d->translation = translation; updateMatrix(); }
-	virtual void setRotation(const glm::quat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
-	inline const gmmath::GMMat4& getTransform() const { D(d); return d->transformMatrix; }
-	inline const gmmath::GMMat4& getScaling() const { D(d); return d->scaling; }
-	inline const gmmath::GMMat4& getTranslation() const { D(d); return d->translation; }
-	inline const glm::quat& getRotation() const { D(d); return d->rotation; }
+	virtual void setScaling(const GMMat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
+	virtual void setTranslation(const GMMat4& translation) { D(d); d->translation = translation; updateMatrix(); }
+	virtual void setRotation(const GMQuat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
+	inline const GMMat4& getTransform() const { D(d); return d->transformMatrix; }
+	inline const GMMat4& getScaling() const { D(d); return d->scaling; }
+	inline const GMMat4& getTranslation() const { D(d); return d->translation; }
+	inline const GMQuat& getRotation() const { D(d); return d->rotation; }
 	inline GMPhysicsObject* getPhysicsObject() { D(d); GM_ASSERT(d->physics); return d->physics; }
 	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
 	{
@@ -87,7 +87,7 @@ enum { EntityPlaneNum = 6 };
 
 GM_PRIVATE_OBJECT(GMEntityObject)
 {
-	glm::vec3 mins, maxs;
+	GMVec3 mins, maxs;
 	GMPlane planes[EntityPlaneNum];
 };
 
@@ -102,7 +102,7 @@ public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
 
 	GMPlane* getPlanes();
-	void getBounds(REF glm::vec3& mins, REF glm::vec3& maxs);
+	void getBounds(REF GMVec3& mins, REF GMVec3& maxs);
 
 private:
 	void calc();
@@ -113,8 +113,8 @@ private:
 // 一个天空的盒子，用6个面模拟一个天空
 GM_PRIVATE_OBJECT(GMSkyGameObject)
 {
-	glm::vec3 min;
-	glm::vec3 max;
+	GMVec3 min;
+	GMVec3 max;
 	GMShader shader;
 };
 
@@ -123,7 +123,7 @@ class GMSkyGameObject : public GMGameObject
 	DECLARE_PRIVATE_AND_BASE(GMSkyGameObject, GMGameObject)
 
 public:
-	GMSkyGameObject(const GMShader& shader, const glm::vec3& min, const glm::vec3& max);
+	GMSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max);
 	~GMSkyGameObject();
 
 private:

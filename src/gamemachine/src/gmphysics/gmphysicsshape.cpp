@@ -33,9 +33,11 @@ const btCollisionShape* GMPhysicsShape::getBulletShape() const
 //////////////////////////////////////////////////////////////////////////
 // Helper
 
-void GMPhysicsShapeCreator::createBoxShape(const glm::vec3& halfExtents, OUT GMPhysicsShape** shape)
+void GMPhysicsShapeCreator::createBoxShape(const GMVec3& halfExtents, OUT GMPhysicsShape** shape)
 {
 	GM_ASSERT(shape);
+	GMFloat4 fs_halfExtents;
+	halfExtents.loadFloat4(fs_halfExtents);
 	*shape = new GMPhysicsShape();
-	(*shape)->setShape(new btBoxShape(btVector3(halfExtents[0], halfExtents[1], halfExtents[2])));
+	(*shape)->setShape(new btBoxShape(btVector3(fs_halfExtents[0], fs_halfExtents[1], fs_halfExtents[2])));
 }

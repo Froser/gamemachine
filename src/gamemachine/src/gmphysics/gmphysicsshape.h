@@ -30,7 +30,7 @@ public:
 
 struct GMPhysicsShapeCreator
 {
-	static void createBoxShape(const glm::vec3& halfExtents, OUT GMPhysicsShape** shape);
+	static void createBoxShape(const GMVec3& halfExtents, OUT GMPhysicsShape** shape);
 	static void createMeshFromShape(GMPhysicsShape* shape, GMGameObject* gameObject, GMGameWorld* world);
 };
 

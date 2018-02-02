@@ -33,7 +33,7 @@ GM_ALIGNED_STRUCT(BSPTraceResult)
 	bool allsolid = false; // if true, plane is not valid
 	bool startsolid = false; // if true, the initial point was in a solid area
 	GMfloat fraction = 0; // time completed, 1.0 = didn't hit anything
-	glm::vec3 endpos{ 0 }; // final position
+	GMVec3 endpos{ 0 }; // final position
 	BSPTracePlane plane; // surface normal at impact, transformed to world space
 	GMint surfaceFlags = 0; // surface hit
 	GMint contents = 0; // contents on other side of surface hit
@@ -44,7 +44,7 @@ GM_ALIGNED_STRUCT(BSPTraceResult)
 
 GM_ALIGNED_STRUCT(BSPSphere)
 {
-	glm::vec3 offset{ 0 };
+	GMVec3 offset{ 0 };
 	GMfloat radius = false;
 	GMfloat halfheight = false;
 	bool use = false;
@@ -71,16 +71,16 @@ class GMBSPTrace : public GMObject
 
 public:
 	void initTrace(BSPData* bsp, Map<GMint, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world);
-	void trace(const glm::vec3& start, const glm::vec3& end, const glm::vec3& origin, const glm::vec3& min, const glm::vec3& max, REF BSPTraceResult& trace);
-	void traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const glm::vec3& p1, const glm::vec3& p2);
+	void trace(const GMVec3& start, const GMVec3& end, const GMVec3& origin, const GMVec3& min, const GMVec3& max, REF BSPTraceResult& trace);
+	void traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GMfloat p2f, const GMVec3& p1, const GMVec3& p2);
 	void traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf);
 	void traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush* brush);
 	void traceThroughPatch(GMBSPTraceWork& tw, GMBSP_Physics_Patch* patch);
 	void traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity*>& entities);
 	void traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide* pc);
 	void tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPatchCollide *pc);
-	GMint checkFacetPlane(const glm::vec4& plane, const glm::vec3& start, const glm::vec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit);
-	bool boundsIntersect(const glm::vec3& mins, const glm::vec3& maxs, const glm::vec3& mins2, const glm::vec3& maxs2);
+	GMint checkFacetPlane(const glm::vec4& plane, const GMVec3& start, const GMVec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit);
+	bool boundsIntersect(const GMVec3& mins, const GMVec3& maxs, const GMVec3& mins2, const GMVec3& maxs2);
 };
 
 END_NS

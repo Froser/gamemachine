@@ -3,12 +3,12 @@
 #include "gmspritegameobject.h"
 #include "gmphysics/gmphysicsworld.h"
 
-GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const glm::vec3& position)
+GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 {
 	D(d);
 	d->radius = radius;
 	d->state.position = position;
-	d->state.lookAt = glm::vec3(0, 0, 1);
+	d->state.lookAt = GMVec3(0, 0, 1);
 	d->limitPitch = glm::radians(85.f);
 }
 
@@ -18,10 +18,10 @@ const GMPositionState& GMSpriteGameObject::getPositionState()
 	return d->state;
 }
 
-void GMSpriteGameObject::action(GMMovement movement, const glm::vec3& direction, const glm::vec3& rate)
+void GMSpriteGameObject::action(GMMovement movement, const GMVec3& direction, const GMVec3& rate)
 {
 	D(d);
-	const glm::vec3* speed;
+	const GMVec3* speed;
 	if (movement == GMMovement::Move)
 		speed = &d->moveSpeed;
 	else if (movement == GMMovement::Jump)
@@ -36,27 +36,27 @@ void GMSpriteGameObject::action(GMMovement movement, const glm::vec3& direction,
 void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 {
 	D(d);
-	glm::vec3 lookAt = d->state.lookAt;
+	GMVec3 lookAt = d->state.lookAt;
 	// 不考虑roll，把lookAt投影到世界坐标系平面
-	glm::vec3 lookAt_z = glm::vec3(lookAt[0], 0, lookAt[2]);
+	GMVec3 lookAt_z = GMVec3(lookAt[0], 0, lookAt[2]);
 	// 计算pitch是否超出范围，不考虑roll
-	GMfloat calculatedPitch = glm::asin(d->state.lookAt[1]) + pitch;
+	GMfloat calculatedPitch = gmAsin(d->state.lookAt[1]) + pitch;
 	if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
 	{
 		// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
-		glm::vec3 lookAt_x = glm::quat(glm::vec3(0, 0, 1), lookAt_z) * glm::vec3(1, 0, 0);
-		glm::quat qPitch = glm::rotate(glm::identity<glm::quat>(), -pitch, glm::fastNormalize(lookAt_x));
+		GMVec3 lookAt_x = GMQuat(GMVec3(0, 0, 1), lookAt_z) * GMVec3(1, 0, 0);
+		GMQuat qPitch = glm::rotate(Identity<GMQuat>(), -pitch, FastNormalize(lookAt_x));
 		lookAt = qPitch * lookAt;
 	}
 
-	glm::quat qYaw = glm::rotate(glm::identity<glm::quat>(), -yaw, glm::vec3(0, 1, 0));
-	d->state.lookAt = glm::fastNormalize(qYaw * lookAt);
+	GMQuat qYaw = glm::rotate(Identity<GMQuat>(), -yaw, GMVec3(0, 1, 0));
+	d->state.lookAt = FastNormalize(qYaw * lookAt);
 }
 
 void GMSpriteGameObject::simulate()
 {
 	D(d);
-	glm::vec3 direction(0), rate(0), moveSpeed(0), jumpSpeed(0);
+	GMVec3 direction(0), rate(0), moveSpeed(0), jumpSpeed(0);
 	bool moved = false, jumped = false, rateAssigned = false;
 	for (auto& movement : d->movements)
 	{
@@ -77,7 +77,7 @@ void GMSpriteGameObject::simulate()
 			rateAssigned = true;
 		}
 	}
-	direction = glm::fastNormalize(direction);
+	direction = FastNormalize(direction);
 
 	if (moved)
 	{
@@ -97,6 +97,8 @@ void GMSpriteGameObject::simulate()
 void GMSpriteGameObject::updateAfterSimulate()
 {
 	D(d);
-	glm::getTranslationFromMatrix(getPhysicsObject()->getMotionStates().transform, glm::value_ptr(d->state.position));
+	GMFloat4 f4_position;
+	GetTranslationFromMatrix(getPhysicsObject()->getMotionStates().transform, f4_position);
+	d->state.position.setFloat4(f4_position);
 	d->movements.clear();
 }

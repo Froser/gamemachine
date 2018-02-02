@@ -355,7 +355,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		};
 
 		// 把所有边框坐标移到中心（4）
-		glm::mat4 translation = glm::translate(
+		GMMat4 translation = glm::translate(
 			glm::vec3(TO_VIEWPORT_X(-half_border_width), TO_VIEWPORT_Y(half_border_height), 0)
 		);
 	END_GEOMETRY_TO_VIEWPORT()
@@ -424,7 +424,7 @@ void GMImage2DBorder::draw()
 	drawObjects(d->objects);
 }
 
-void GMImage2DBorder::setScaling(const glm::mat4& scaling)
+void GMImage2DBorder::setScaling(const GMMat4& scaling)
 {
 	D(d);
 	size_t size = GM_array_size(d->objects);
@@ -435,7 +435,7 @@ void GMImage2DBorder::setScaling(const glm::mat4& scaling)
 	}
 }
 
-void GMImage2DBorder::setTranslation(const glm::mat4& translation)
+void GMImage2DBorder::setTranslation(const GMMat4& translation)
 {
 	D(d);
 	size_t size = GM_array_size(d->objects);
@@ -446,7 +446,7 @@ void GMImage2DBorder::setTranslation(const glm::mat4& translation)
 	}
 }
 
-void GMImage2DBorder::setRotation(const glm::quat& rotation)
+void GMImage2DBorder::setRotation(const GMQuat& rotation)
 {
 	D(d);
 	size_t size = GM_array_size(d->objects);
@@ -567,7 +567,7 @@ void GMImage2DGameObject::draw()
 	}
 }
 
-void GMImage2DGameObject::setScaling(const glm::mat4& scaling)
+void GMImage2DGameObject::setScaling(const GMMat4& scaling)
 {
 	D(d);
 	Base::setScaling(scaling);
@@ -581,7 +581,7 @@ void GMImage2DGameObject::setScaling(const glm::mat4& scaling)
 		d->border.setScaling(scaling);
 }
 
-void GMImage2DGameObject::setTranslation(const glm::mat4& translation)
+void GMImage2DGameObject::setTranslation(const GMMat4& translation)
 {
 	D(d);
 	Base::setTranslation(translation);
@@ -595,7 +595,7 @@ void GMImage2DGameObject::setTranslation(const glm::mat4& translation)
 		d->border.setTranslation(translation);
 }
 
-void GMImage2DGameObject::setRotation(const glm::quat& rotation)
+void GMImage2DGameObject::setRotation(const GMQuat& rotation)
 {
 	D(d);
 	Base::setRotation(rotation);

@@ -62,7 +62,7 @@ GM_ALIGNED_STRUCT(GMBSPFacet)
 
 GM_ALIGNED_STRUCT(GMBSPPatchCollide)
 {
-	glm::vec3 bounds[2];
+	GMVec3 bounds[2];
 	AlignedVector<GMBSPPatchPlane> planes;
 	AlignedVector<GMBSPFacet> facets;
 };

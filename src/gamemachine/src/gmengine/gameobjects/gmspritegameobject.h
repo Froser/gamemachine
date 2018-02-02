@@ -10,23 +10,23 @@ GM_ALIGNED_STRUCT(GMSpriteMovement)
 {
 	GMSpriteMovement() = default;
 
-	GMSpriteMovement(const glm::vec3& dir, const glm::vec3& rate, const glm::vec3& _speed, GMMovement m)
+	GMSpriteMovement(const GMVec3& dir, const GMVec3& rate, const GMVec3& _speed, GMMovement m)
 		: moveDirection(dir)
 		, moveRate(rate)
 		, speed(_speed)
 		, movement(m)
 	{}
 
-	glm::vec3 moveDirection;
-	glm::vec3 moveRate;
-	glm::vec3 speed;
+	GMVec3 moveDirection;
+	GMVec3 moveRate;
+	GMVec3 speed;
 	GMMovement movement;
 };
 
 GM_ALIGNED_STRUCT(GMPositionState)
 {
-	glm::vec3 position;
-	glm::vec3 lookAt;
+	GMVec3 position;
+	GMVec3 lookAt;
 };
 
 GM_PRIVATE_OBJECT(GMSpriteGameObject)
@@ -35,8 +35,8 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 	GMfloat limitPitch;
 	GMPositionState state;
 	AlignedVector<GMSpriteMovement> movements;
-	glm::vec3 moveSpeed = glm::zero<glm::vec3>();
-	glm::vec3 jumpSpeed = glm::zero<glm::vec3>();
+	GMVec3 moveSpeed = Zero<GMVec3>();
+	GMVec3 jumpSpeed = Zero<GMVec3>();
 };
 
 class GMSpriteGameObject : public GMGameObject
@@ -44,7 +44,7 @@ class GMSpriteGameObject : public GMGameObject
 	DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
 
 public:
-	GMSpriteGameObject(GMfloat radius, const glm::vec3& position = glm::zero<glm::vec3>());
+	GMSpriteGameObject(GMfloat radius, const GMVec3& position = Zero<GMVec3>());
 
 public:
 	virtual GMGameObjectType getType() { return GMGameObjectType::Sprite; }
@@ -59,7 +59,7 @@ public:
 	  \param direction 动作的方向。动作方向所采用的坐标系为精灵朝向的坐标系，并采用右手坐标系。即：精灵面朝z轴正方向，精灵左手为x轴正方向，头顶方向为y轴正方向。
 	  \param rate 比率。在计算移动的时位移的折扣。如用手柄时，手柄摇杆有个范围，此时通过比率来决定要位移原本要位移的多少。如果摇杆打到尽头，则可以认为比率为1。
 	*/
-	void action(GMMovement movement, const glm::vec3& direction = glm::vec3(), const glm::vec3& rate = glm::vec3(1));
+	void action(GMMovement movement, const GMVec3& direction = GMVec3(), const GMVec3& rate = GMVec3(1));
 
 	//! 表示精灵朝着某个方向变化。
 	/*!
@@ -71,8 +71,8 @@ public:
 	const GMPositionState& getPositionState();
 
 public:
-	inline void setMoveSpeed(const glm::vec3& speed) { D(d); d->moveSpeed = speed; }
-	inline void setJumpSpeed(const glm::vec3& speed) { D(d); d->jumpSpeed = speed; }
+	inline void setMoveSpeed(const GMVec3& speed) { D(d); d->moveSpeed = speed; }
+	inline void setJumpSpeed(const GMVec3& speed) { D(d); d->jumpSpeed = speed; }
 };
 
 

@@ -190,7 +190,7 @@ void GMDx11GraphicEngine::initShaders()
 	// 定义统一MVP Matrix缓存
 	D3D11_BUFFER_DESC vpBufferDesc;
 	vpBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	vpBufferDesc.ByteWidth = sizeof(GMDxVPMatrix);
+	vpBufferDesc.ByteWidth = sizeof(GMMVPMatrix);
 	vpBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 	vpBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	vpBufferDesc.MiscFlags = 0;
@@ -206,32 +206,32 @@ void GMDx11GraphicEngine::initShaders()
 void GMDx11GraphicEngine::updateProjection()
 {
 	D(d);
-	D3DXMATRIX proj = GM.getCamera().getFrustum().getDxProjectionMatrix();
+	GMMat4 proj = GM.getCamera().getFrustum().getProjectionMatrix();
 
-	GMDxVPMatrix* mvpMatrix = nullptr;
+	GMMVPMatrix* mvpMatrix = nullptr;
 	beginMapMVPMatrix(&mvpMatrix);
 	GM_ASSERT(mvpMatrix);
 
-	mvpMatrix->dxProjMatrix = proj;
+	mvpMatrix->projMatrix = proj;
 	endMapMVPMatrix();
 }
 
 void GMDx11GraphicEngine::updateView()
 {
 	D(d);
-	D3DXMATRIX view = GM.getCamera().getFrustum().getDxViewMatrix();
+	GMMat4 view = GM.getCamera().getFrustum().getViewMatrix();
 
-	GMDxVPMatrix* mvpMatrix = nullptr;
+	GMMVPMatrix* mvpMatrix = nullptr;
 	beginMapMVPMatrix(&mvpMatrix);
 	GM_ASSERT(mvpMatrix);
 
-	mvpMatrix->dxViewMatrix = view;
+	mvpMatrix->viewMatrix = view;
 	endMapMVPMatrix();
 
 	// TODO 确定eye位置
 }
 
-void GMDx11GraphicEngine::beginMapMVPMatrix(GMDxVPMatrix** mvp)
+void GMDx11GraphicEngine::beginMapMVPMatrix(GMMVPMatrix** mvp)
 {
 	D(d);
 	HRESULT hr;
@@ -241,7 +241,7 @@ void GMDx11GraphicEngine::beginMapMVPMatrix(GMDxVPMatrix** mvp)
 	hr = d->deviceContext->Map(mvpBuf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	GM_COM_CHECK(hr);
 
-	(*mvp) = static_cast<GMDxVPMatrix*>(mappedResource.pData);
+	(*mvp) = static_cast<GMMVPMatrix*>(mappedResource.pData);
 }
 
 void GMDx11GraphicEngine::endMapMVPMatrix()

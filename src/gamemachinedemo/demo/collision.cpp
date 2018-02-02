@@ -35,14 +35,14 @@ void Demo_Collision::init()
 	d->demoWorld = new gm::GMDemoGameWorld();
 	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(d->demoWorld);
 	d->ground = new gm::GMGameObject();
-	d->ground->setTranslation(glm::translate(glm::vec3(0, -50, 0)));
+	d->ground->setTranslation(Translate(GMVec3(0, -50, 0)));
 
 	gm::GMRigidPhysicsObject* rigidGround = new gm::GMRigidPhysicsObject();
 	d->ground->setPhysicsObject(rigidGround);
 	rigidGround->setMass(.0f); //static object
 
 	gm::GMPhysicsShape* groundShape = nullptr;
-	gm::GMPhysicsShapeCreator::createBoxShape(glm::vec3(50, 50, 50), &groundShape);
+	gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(50, 50, 50), &groundShape);
 	rigidGround->setShape(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, groundShape));
 
 	gm::GMModel* groundShapeModel = nullptr;
@@ -52,9 +52,9 @@ void Demo_Collision::init()
 	auto& components = groundShapeModel->getMesh()->getComponents();
 	for (auto& component : components)
 	{
-		component->getShader().getMaterial().ka = glm::vec3(.8125f / .7f, .644f / .7f, .043f / .7f);
-		component->getShader().getMaterial().kd = glm::vec3(.1f);
-		component->getShader().getMaterial().ks = glm::vec3(.4f);
+		component->getShader().getMaterial().ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
+		component->getShader().getMaterial().kd = GMVec3(.1f);
+		component->getShader().getMaterial().ks = GMVec3(.4f);
 		component->getShader().getMaterial().shininess = 9;
 	}
 	d->ground->setModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, groundShapeModel));

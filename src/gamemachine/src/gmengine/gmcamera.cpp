@@ -29,13 +29,13 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 #if GM_USE_DX11
 	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
 	{
-		d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+		d->mvpMatrix.projMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
 		update();
 	}
 	else
 	{
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		D3DXMatrixOrthoOffCenterLH(&d->dxMatrix.dxProjMatrix, d->left, d->right, d->bottom, d->top, d->n, d->f);
+		D3DXMatrixOrthoOffCenterLH(&d->mvpMatrix.projMatrix, d->left, d->right, d->bottom, d->top, d->n, d->f);
 		dxUpdate();
 	}
 #else
@@ -64,7 +64,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	else
 	{
 		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		D3DXMatrixPerspectiveFovLH(&d->dxMatrix.dxProjMatrix, d->fovy, d->aspect, d->n, d->f);
+		D3DXMatrixPerspectiveFovLH(&d->mvpMatrix.projMatrix, d->fovy, d->aspect, d->n, d->f);
 		dxUpdate();
 	}
 #else
@@ -77,55 +77,55 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 void GMFrustum::update()
 {
 	D(d);
-	const glm::mat4& projection = getProjectionMatrix();
-	glm::mat4& view = d->viewMatrix;
-	glm::mat4 clipMat;
+	const GMMat4& projection = getProjectionMatrix();
+	GMMat4& view = d->viewMatrix;
+	GMMat4 clipMat;
 
 	if (d->type == GMFrustumType::Perspective)
 	{
 		//Multiply the matrices
-		clipMat = projection * view;
+		clipMat = view * projection;
 
 		GMfloat* clip = glm::value_ptr(clipMat);
 
 		//calculate planes
-		d->planes[RIGHT_PLANE].normal = glm::vec3(clip[3] - clip[0], clip[7] - clip[4], clip[11] - clip[8]);
+		d->planes[RIGHT_PLANE].normal = GMVec3(clip[3] - clip[0], clip[7] - clip[4], clip[11] - clip[8]);
 		d->planes[RIGHT_PLANE].intercept = clip[15] - clip[12];
 
-		d->planes[LEFT_PLANE].normal = glm::vec3(clip[3] + clip[0], clip[7] + clip[4], clip[11] + clip[8]);
+		d->planes[LEFT_PLANE].normal = GMVec3(clip[3] + clip[0], clip[7] + clip[4], clip[11] + clip[8]);
 		d->planes[LEFT_PLANE].intercept = clip[15] + clip[12];
 
-		d->planes[BOTTOM_PLANE].normal = glm::vec3(clip[3] + clip[1], clip[7] + clip[5], clip[11] + clip[9]);
+		d->planes[BOTTOM_PLANE].normal = GMVec3(clip[3] + clip[1], clip[7] + clip[5], clip[11] + clip[9]);
 		d->planes[BOTTOM_PLANE].intercept = clip[15] + clip[13];
 
-		d->planes[TOP_PLANE].normal = glm::vec3(clip[3] - clip[1], clip[7] - clip[5], clip[11] - clip[9]);
+		d->planes[TOP_PLANE].normal = GMVec3(clip[3] - clip[1], clip[7] - clip[5], clip[11] - clip[9]);
 		d->planes[TOP_PLANE].intercept = clip[15] - clip[13];
 
-		d->planes[NEAR_PLANE].normal = glm::vec3(clip[3] - clip[2], clip[7] - clip[6], clip[11] - clip[10]);
+		d->planes[NEAR_PLANE].normal = GMVec3(clip[3] - clip[2], clip[7] - clip[6], clip[11] - clip[10]);
 		d->planes[NEAR_PLANE].intercept = clip[15] - clip[14];
 
-		d->planes[FAR_PLANE].normal = glm::vec3(clip[3] + clip[2], clip[7] + clip[6], clip[11] + clip[10]);
+		d->planes[FAR_PLANE].normal = GMVec3(clip[3] + clip[2], clip[7] + clip[6], clip[11] + clip[10]);
 		d->planes[FAR_PLANE].intercept = clip[15] + clip[14];
 	}
 	else
 	{
 		GM_ASSERT(d->type == GMFrustumType::Orthographic);
-		d->planes[RIGHT_PLANE].normal = glm::vec3(1, 0, 0);
+		d->planes[RIGHT_PLANE].normal = GMVec3(1, 0, 0);
 		d->planes[RIGHT_PLANE].intercept = d->right;
 
-		d->planes[LEFT_PLANE].normal = glm::vec3(-1, 0, 0);
+		d->planes[LEFT_PLANE].normal = GMVec3(-1, 0, 0);
 		d->planes[LEFT_PLANE].intercept = d->left;
 
-		d->planes[BOTTOM_PLANE].normal = glm::vec3(0, -1, 0);
+		d->planes[BOTTOM_PLANE].normal = GMVec3(0, -1, 0);
 		d->planes[BOTTOM_PLANE].intercept = d->bottom;
 
-		d->planes[TOP_PLANE].normal = glm::vec3(0, 1, 0);
+		d->planes[TOP_PLANE].normal = GMVec3(0, 1, 0);
 		d->planes[TOP_PLANE].intercept = d->top;
 
-		d->planes[NEAR_PLANE].normal = glm::vec3(0, 0, 1);
+		d->planes[NEAR_PLANE].normal = GMVec3(0, 0, 1);
 		d->planes[NEAR_PLANE].intercept = d->n;
 
-		d->planes[FAR_PLANE].normal = glm::vec3(0, 0, -1);
+		d->planes[FAR_PLANE].normal = GMVec3(0, 0, -1);
 		d->planes[FAR_PLANE].intercept = d->f;
 	}
 
@@ -140,7 +140,7 @@ void GMFrustum::dxUpdate()
 }
 
 //is a point in the Frustum?
-bool GMFrustum::isPointInside(const glm::vec3 & point)
+bool GMFrustum::isPointInside(const GMVec3 & point)
 {
 	D(d);
 	for (int i = 0; i < 6; ++i)
@@ -153,7 +153,7 @@ bool GMFrustum::isPointInside(const glm::vec3 & point)
 }
 
 //is a bounding box in the Frustum?
-bool GMFrustum::isBoundingBoxInside(const glm::vec3 * vertices)
+bool GMFrustum::isBoundingBoxInside(const GMVec3 * vertices)
 {
 	D(d);
 	for (int i = 0; i < 6; ++i)
@@ -183,7 +183,7 @@ bool GMFrustum::isBoundingBoxInside(const glm::vec3 * vertices)
 	return true;
 }
 
-void GMFrustum::updateViewMatrix(const glm::mat4& viewMatrix)
+void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 {
 	D(d);
 	d->viewMatrix = viewMatrix;
@@ -198,47 +198,33 @@ void GMFrustum::updateViewMatrix(const glm::mat4& viewMatrix)
 	}
 }
 
-const glm::mat4& GMFrustum::getProjectionMatrix()
-{
-	D(d);
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
-	return d->projMatrix;
-}
-
-const glm::mat4& GMFrustum::getViewMatrix()
-{
-	D(d);
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
-	return d->viewMatrix;
-}
-
 #if GM_USE_DX11
-const GMDxVPMatrix& GMFrustum::getDxVPMatrix()
+const GMMVPMatrix& GMFrustum::getDxVPMatrix()
 {
 	D(d);
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	return d->dxMatrix;
+	return d->mvpMatrix;
 }
 
-void GMFrustum::setDxVPMatrix(const GMDxVPMatrix& m)
+void GMFrustum::setDxVPMatrix(const GMMVPMatrix& m)
 {
 	D(d);
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	d->dxMatrix = m;
+	d->mvpMatrix = m;
 }
 
-const D3DXMATRIX& GMFrustum::getDxProjectionMatrix()
+const GMMat4& GMFrustum::getProjectionMatrix()
 {
 	D(d);
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	return d->dxMatrix.dxProjMatrix;
+	return d->mvpMatrix.projMatrix;
 }
 
-const D3DXMATRIX& GMFrustum::getDxViewMatrix()
+const GMMat4& GMFrustum::getViewMatrix()
 {
 	D(d);
 	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	return d->dxMatrix.dxViewMatrix;
+	return d->mvpMatrix.viewMatrix;
 }
 
 void GMFrustum::setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer)
@@ -259,8 +245,8 @@ GMCamera::GMCamera()
 {
 	D(d);
 	d->frustum.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
-	d->lookAt.position = glm::vec3(0);
-	d->lookAt.lookAt = glm::vec3(0, 0, 1);
+	d->lookAt.position = GMVec3(0);
+	d->lookAt.lookAt = GMVec3(0, 0, 1);
 }
 
 void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -300,7 +286,7 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix);
 }
 
-glm::vec3 GMCamera::getRayToWorld(GMint x, GMint y) const
+GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 {
 	D(d);
 	if (d->frustum.getType() == GMFrustumType::Perspective)
@@ -308,16 +294,16 @@ glm::vec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 		GMfloat nearPlane = d->frustum.getNear();
 		GMfloat fov = d->frustum.getFovy();
 
-		glm::vec3 rayFrom = d->lookAt.position;
-		glm::vec3 rayForward = d->lookAt.lookAt;
+		GMVec3 rayFrom = d->lookAt.position;
+		GMVec3 rayForward = d->lookAt.lookAt;
 
 		GMfloat farPlane = d->frustum.getFar();
 		rayForward *= farPlane;
 
 		// 从摄像机向上方向，算出摄像机坐标系 (hor, vertical, rayForward)
-		glm::vec3 cameraUp = d->lookAt.up;
-		glm::vec3 vertical = cameraUp;
-		glm::vec3 hor = glm::cross(rayForward, vertical);
+		GMVec3 cameraUp = d->lookAt.up;
+		GMVec3 vertical = cameraUp;
+		GMVec3 hor = glm::cross(rayForward, vertical);
 		hor = glm::safeNormalize(hor);
 		vertical = glm::cross(hor, rayForward);
 		vertical = glm::safeNormalize(vertical);
@@ -332,11 +318,11 @@ glm::vec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 		GMfloat aspect = width / height;
 		hor *= aspect;
 
-		glm::vec3 rayToCenter = rayFrom + rayForward;
-		glm::vec3 dHor = hor * 1.f / width;
-		glm::vec3 dVert = vertical * 1.f / height;
+		GMVec3 rayToCenter = rayFrom + rayForward;
+		GMVec3 dHor = hor * 1.f / width;
+		GMVec3 dVert = vertical * 1.f / height;
 
-		glm::vec3 rayTo = rayToCenter - 0.5f * hor + 0.5f * vertical;
+		GMVec3 rayTo = rayToCenter - 0.5f * hor + 0.5f * vertical;
 		rayTo += GMfloat(x) * dHor;
 		rayTo -= GMfloat(y) * dVert;
 		return rayTo;
@@ -346,5 +332,5 @@ glm::vec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 		// only support GMFrustumType::Perspective
 		GM_ASSERT(false);
 	}
-	return glm::vec3(0);
+	return GMVec3(0);
 }

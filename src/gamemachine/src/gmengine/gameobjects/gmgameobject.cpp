@@ -88,7 +88,7 @@ GMPlane* GMEntityObject::getPlanes()
 	return d->planes;
 }
 
-void GMEntityObject::getBounds(REF glm::vec3& mins, REF glm::vec3& maxs)
+void GMEntityObject::getBounds(REF GMVec3& mins, REF GMVec3& maxs)
 {
 	D(d);
 	mins = d->mins;
@@ -122,53 +122,53 @@ void GMEntityObject::makePlanes()
 {
 	D(d);
 	// 前
-	d->planes[0] = GMPlane(glm::vec3(0, 0, 1), -d->maxs[2]);
+	d->planes[0] = GMPlane(GMVec3(0, 0, 1), -d->maxs[2]);
 	// 后
-	d->planes[1] = GMPlane(glm::vec3(0, 0, -1), d->mins[2]);
+	d->planes[1] = GMPlane(GMVec3(0, 0, -1), d->mins[2]);
 	// 左
-	d->planes[2] = GMPlane(glm::vec3(-1, 0, 0), d->mins[0]);
+	d->planes[2] = GMPlane(GMVec3(-1, 0, 0), d->mins[0]);
 	// 右
-	d->planes[3] = GMPlane(glm::vec3(1, 0, 0), -d->maxs[0]);
+	d->planes[3] = GMPlane(GMVec3(1, 0, 0), -d->maxs[0]);
 	// 上
-	d->planes[4] = GMPlane(glm::vec3(0, 1, 0), -d->maxs[0]);
+	d->planes[4] = GMPlane(GMVec3(0, 1, 0), -d->maxs[0]);
 	// 下
-	d->planes[5] = GMPlane(glm::vec3(0, -1, 0), d->mins[0]);
+	d->planes[5] = GMPlane(GMVec3(0, -1, 0), d->mins[0]);
 }
 
 // 天空
-static glm::vec2 uvs[24] = {
-	glm::vec2(0, 0),
-	glm::vec2(0, 1),
-	glm::vec2(1, 1),
-	glm::vec2(1, 0),
+static GMVec2 uvs[24] = {
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
 
-	glm::vec2(0, 0),
-	glm::vec2(0, 1),
-	glm::vec2(1, 1),
-	glm::vec2(1, 0),
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
 
-	glm::vec2(0, 0),
-	glm::vec2(0, 1),
-	glm::vec2(1, 1),
-	glm::vec2(1, 0),
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
 
-	glm::vec2(0, 0),
-	glm::vec2(0, 1),
-	glm::vec2(1, 1),
-	glm::vec2(1, 0),
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
 
-	glm::vec2(0, 0),
-	glm::vec2(0, 1),
-	glm::vec2(1, 1),
-	glm::vec2(1, 0),
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
 
-	glm::vec2(0, 0),
-	glm::vec2(0, 1),
-	glm::vec2(1, 1),
-	glm::vec2(1, 0),
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
 };
 
-GMSkyGameObject::GMSkyGameObject(const GMShader& shader, const glm::vec3& min, const glm::vec3& max)
+GMSkyGameObject::GMSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max)
 {
 	D(d);
 	d->shader = shader;
@@ -192,48 +192,48 @@ GMSkyGameObject::~GMSkyGameObject()
 void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 {
 	D(d);
-	glm::vec3 vertices[] = {
+	GMVec3 vertices[] = {
 		//Front
-		glm::vec3(d->min[0], d->max[1], d->max[2]),
-		glm::vec3(d->min[0], d->min[1], d->max[2]),
-		glm::vec3(d->max[0], d->min[1], d->max[2]),
-		glm::vec3(d->max[0], d->max[1], d->max[2]),
+		GMVec3(d->min[0], d->max[1], d->max[2]),
+		GMVec3(d->min[0], d->min[1], d->max[2]),
+		GMVec3(d->max[0], d->min[1], d->max[2]),
+		GMVec3(d->max[0], d->max[1], d->max[2]),
 
 		//Back
-		glm::vec3(d->min[0], d->max[1], d->min[2]),
-		glm::vec3(d->min[0], d->min[1], d->min[2]),
-		glm::vec3(d->max[0], d->min[1], d->min[2]),
-		glm::vec3(d->max[0], d->max[1], d->min[2]),
+		GMVec3(d->min[0], d->max[1], d->min[2]),
+		GMVec3(d->min[0], d->min[1], d->min[2]),
+		GMVec3(d->max[0], d->min[1], d->min[2]),
+		GMVec3(d->max[0], d->max[1], d->min[2]),
 
 		//Left
-		glm::vec3(d->min[0], d->max[1], d->min[2]),
-		glm::vec3(d->min[0], d->max[1], d->max[2]),
-		glm::vec3(d->min[0], d->min[1], d->max[2]),
-		glm::vec3(d->min[0], d->min[1], d->min[2]),
+		GMVec3(d->min[0], d->max[1], d->min[2]),
+		GMVec3(d->min[0], d->max[1], d->max[2]),
+		GMVec3(d->min[0], d->min[1], d->max[2]),
+		GMVec3(d->min[0], d->min[1], d->min[2]),
 
 		//Right
-		glm::vec3(d->max[0], d->max[1], d->min[2]),
-		glm::vec3(d->max[0], d->max[1], d->max[2]),
-		glm::vec3(d->max[0], d->min[1], d->max[2]),
-		glm::vec3(d->max[0], d->min[1], d->min[2]),
+		GMVec3(d->max[0], d->max[1], d->min[2]),
+		GMVec3(d->max[0], d->max[1], d->max[2]),
+		GMVec3(d->max[0], d->min[1], d->max[2]),
+		GMVec3(d->max[0], d->min[1], d->min[2]),
 
 		//Up
-		glm::vec3(d->min[0], d->max[1], d->min[2]),
-		glm::vec3(d->min[0], d->max[1], d->max[2]),
-		glm::vec3(d->max[0], d->max[1], d->max[2]),
-		glm::vec3(d->max[0], d->max[1], d->min[2]),
+		GMVec3(d->min[0], d->max[1], d->min[2]),
+		GMVec3(d->min[0], d->max[1], d->max[2]),
+		GMVec3(d->max[0], d->max[1], d->max[2]),
+		GMVec3(d->max[0], d->max[1], d->min[2]),
 
 		//Down
-		glm::vec3(d->min[0], d->min[1], d->min[2]),
-		glm::vec3(d->min[0], d->min[1], d->max[2]),
-		glm::vec3(d->max[0], d->min[1], d->max[2]),
-		glm::vec3(d->max[0], d->min[1], d->min[2]),
+		GMVec3(d->min[0], d->min[1], d->min[2]),
+		GMVec3(d->min[0], d->min[1], d->max[2]),
+		GMVec3(d->max[0], d->min[1], d->max[2]),
+		GMVec3(d->max[0], d->min[1], d->min[2]),
 	};
 
 	// Scaling surface
 	const GMint SCALING = 2;
-	glm::vec3 center = (d->min + d->max) / 2.f;
-	glm::mat4 transScale = glm::scale(glm::vec3(SCALING, 1, SCALING));
+	GMVec3 center = (d->min + d->max) / 2.f;
+	glm::mat4 transScale = glm::scale(GMVec3(SCALING, 1, SCALING));
 	for (GMuint i = 0; i < 20; i++)
 	{
 		glm::mat4 transRestore = glm::translate(center);
@@ -241,7 +241,7 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 		glm::mat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
 
 		glm::vec4 pt = transFinal * glm::vec4(vertices[i], 1);
-		vertices[i] = glm::vec3(pt[0], pt[1], pt[2]);
+		vertices[i] = GMVec3(pt[0], pt[1], pt[2]);
 	}
 
 	GMModel* model = new GMModel();

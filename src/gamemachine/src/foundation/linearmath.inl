@@ -1,24 +1,6 @@
-﻿#ifdef GM_USE_DX11
-#	define GMMATH_COPY_CONSTRUCTOR(className)		\
-	className::className(const className& rhs)		\
-	{												\
-		if (IS_OPENGL)								\
-		{											\
-			gl_ = rhs.gl_;							\
-		}											\
-		else if (IS_DX)								\
-		{											\
-			dx_ = rhs.dx_;							\
-		}											\
-	}
+﻿#if GM_USE_DX11
+using namespace DirectX;
 #else
-#	define GMMATH_COPY_CONSTRUCTOR(className)		\
-	className::className(const className& rhs)		\
-	{												\
-		gl_ = rhs.gl_;								\
-	}
-#endif
-
 namespace glm
 {
 	inline vec4 combine_vec4(const vec3& v3, const vec4& v4)
@@ -118,20 +100,6 @@ namespace glm
 		return dot(left, left);
 	}
 
-	inline void getScalingFromMatrix(const mat4& mat, gm::GMfloat* out)
-	{
-		out[0] = mat[0][0];
-		out[1] = mat[1][1];
-		out[2] = mat[2][2];
-	}
-
-	inline void getTranslationFromMatrix(const mat4& mat, gm::GMfloat* out)
-	{
-		out[0] = mat[3][0];
-		out[1] = mat[3][1];
-		out[2] = mat[3][2];
-	}
-
 	inline gm::GMfloat lerp(const gm::GMfloat& start, const gm::GMfloat& end, gm::GMfloat percentage)
 	{
 		return percentage * (end - start) + start;
@@ -150,119 +118,274 @@ namespace glm
 		}
 	}
 }
+#endif
 
-namespace gmmath
+template <>
+GMVec2 Zero()
 {
-	GMMATH_COPY_CONSTRUCTOR(GMVec2);
-	GMMATH_COPY_CONSTRUCTOR(GMVec3);
-	GMMATH_COPY_CONSTRUCTOR(GMVec4);
-	GMMATH_COPY_CONSTRUCTOR(GMMat4);
-	GMMATH_COPY_CONSTRUCTOR(GMQuat);
-
-	GMVec2 __getZeroVec2()
-	{
-		GMVec2 v;
+	GMVec2 V;
 #if GM_USE_DX11
-		if (IS_OPENGL)
-		{
-			v.gl_ = glm::zero<glm::vec2>();
-		}
-		else if (IS_DX)
-		{
-		}
+	V.v_ = DirectX::XMVectorZero();
 #else
-		v.gl_ = glm::zero<glm::vec2>();
+	V.v_ = glm::zero<glm::vec2>();
 #endif
-		return v;
-	}
+	return V;
+}
 
-	GMVec3 __getZeroVec3()
-	{
-		GMVec3 v;
+template <>
+GMVec3 Zero()
+{
+	GMVec3 V;
 #if GM_USE_DX11
-		if (IS_OPENGL)
-		{
-			v.gl_ = glm::zero<glm::vec3>();
-		}
-		else if (IS_DX)
-		{
-		}
+	V.v_ = DirectX::XMVectorZero();
 #else
-		v.gl_ = glm::zero<glm::vec3>();
+	V.v_ = glm::zero<glm::vec3>();
 #endif
-		return v;
-	}
+	return V;
+}
 
-	GMVec4 __getZeroVec4()
-	{
-		GMVec4 v;
+template <>
+GMVec4 Zero()
+{
+	GMVec4 V;
 #if GM_USE_DX11
-		if (IS_OPENGL)
-		{
-			v.gl_ = glm::zero<glm::vec4>();
-		}
-		else if (IS_DX)
-		{
-		}
+	V.v_ = DirectX::XMVectorZero();
 #else
-		v.gl_ = glm::zero<glm::vec4>();
+	V.v_ = glm::zero<glm::vec4>();
 #endif
-		return v;
-	}
+	return V;
+}
 
-	GMMat4 __getIdentityMat4()
-	{
-		GMMat4 v;
+inline GMMat4 __getIdentityMat4()
+{
+	GMMat4 v;
 #if GM_USE_DX11
-		if (IS_OPENGL)
-		{
-			v.gl_ = glm::identity<glm::mat4>();
-		}
-		else if (IS_DX)
-		{
-		}
+	v.v_ = DirectX::XMMatrixIdentity();
 #else
-		v.gl_ = glm::identity<glm::mat4>();
+	v.v_ = glm::identity<glm::mat4>();
 #endif
-		return v;
-	}
+	return v;
+}
 
-	GMMat4 __mul(const GMMat4& M1, const GMMat4& M2)
-	{
-		GMMat4 result;
+inline GMQuat __getIdentityQuat()
+{
+	GMQuat v;
 #if GM_USE_DX11
-		if (IS_OPENGL)
-		{
-			// opengl为列优先，为了计算先M1变换，再M2变换，应该用M2 * M1
-			result.gl_ = M2.gl_ * M1.gl_;
-		}
-		else if (IS_DX)
-		{
-			result.dx_ = DirectX::XMMatrixMultiply(M1.dx_, M2.dx_);
-		}
+	v.v_ = DirectX::XMQuaternionIdentity();
 #else
-		result.dx_ = DirectX::XMMatrixMultiply(M1.dx_, M2.dx_);
+	v.v_ = glm::identity<glm::quat>();
 #endif
-		return result;
-	}
+	return v;
+}
 
-	GMVec4 __mul(const GMVec4& V, const GMMat4& M)
-	{
-		GMVec4 result;
+inline GMVec2 operator-(const GMVec2& V)
+{
+	GMVec2 R;
+	R.v_ = -V.v_;
+	return R;
+}
+
+inline GMVec3 operator-(const GMVec3& V)
+{
+	GMVec3 R;
+	R.v_ = -V.v_;
+	return R;
+}
+
+inline GMVec4 operator-(const GMVec4& V)
+{
+	GMVec4 R;
+	R.v_ = -V.v_;
+	return R;
+}
+
+inline GMVec2 operator+(const GMVec2& V1, const GMVec2& V2)
+{
+	GMVec2 V;
+	V.v_ = V1.v_ + V2.v_;
+	return V;
+}
+
+inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2)
+{
+	GMVec2 V;
+	V.v_ = V1.v_ - V2.v_;
+	return V;
+}
+
+inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2)
+{
+	GMVec3 V;
+	V.v_ = V1.v_ + V2.v_;
+	return V;
+}
+
+inline GMVec3 operator-(const GMVec3& V1, const GMVec3& V2)
+{
+	GMVec3 V;
+	V.v_ = V1.v_ - V2.v_;
+	return V;
+}
+
+inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2)
+{
+	GMVec4 V;
+	V.v_ = V1.v_ + V2.v_;
+	return V;
+}
+
+inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2)
+{
+	GMVec4 V;
+	V.v_ = V1.v_ - V2.v_;
+	return V;
+}
+
+inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)
+{
+	GMMat4 result;
 #if GM_USE_DX11
-		if (IS_OPENGL)
-		{
-			// opengl为列优先，为了计算先M1变换，再M2变换，应该用M2 * M1
-			result.gl_ = M.gl_ * V.gl_;
-		}
-		else if (IS_DX)
-		{
-			//D3DXMatrixMultiply(&result.dx_, &M1.dx_, &M2.dx_);
-			result.dx_ = DirectX::XMVector3Transform(V.dx_, M.dx_);
-		}
+	result.v_ = M1.v_ * M2.v_;
 #else
-		result.dx_ = DirectX::XMVector3Transform(V.dx_, M.dx_);
+	// opengl为列优先，为了计算先M1变换，再M2变换，应该用M2 * M1
+	result.v_ = M2.v_ * M1.v_;
 #endif
-		return result;
-	}
+	return result;
+}
+
+inline GMVec4 operator*(const GMVec4& V, const GMMat4& M)
+{
+	GMVec4 result;
+#if GM_USE_DX11
+	result.v_ = DirectX::XMVector3Transform(V.v_, M.v_);
+#else
+	result.v_ = M.v_ * V.v_;
+#endif
+	return result;
+}
+
+inline GMMat4 QuatToMatrix(const GMQuat& quat)
+{
+	GMMat4 mat;
+#if GM_USE_DX11
+	mat.v_ = DirectX::XMMatrixRotationQuaternion(quat.v_);
+#else
+	mat.v_ = glm::mat4_cast(quat.v_);
+#endif
+	return mat;
+}
+
+inline GMMat4 LookAt(const GMVec3& position, const GMVec3& center, const GMVec3& up)
+{
+	GMMat4 mat;
+#if GM_USE_DX11
+	mat.v_ = DirectX::XMMatrixLookAtLH(position.v_, center.v_, up.v_);
+#else
+	mat.v_ = glm::lookAt(position.v_, center.v_, up.v_);
+#endif
+	return mat;
+}
+
+inline gm::GMfloat Dot(const GMVec2& V1, const GMVec2& V2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVectorGetX(DirectX::XMVector2Dot(V1.v_, V2.v_));
+#else
+	return glm::dot(V1.v_, V2.v_);
+#endif
+}
+
+inline gm::GMfloat Dot(const GMVec3& V1, const GMVec3& V2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVectorGetX(DirectX::XMVector3Dot(V1.v_, V2.v_));
+#else
+	return glm::dot(V1.v_, V2.v_);
+#endif
+}
+
+inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVectorGetX(DirectX::XMVector4Dot(V1.v_, V2.v_));
+#else
+	return glm::dot(V1.v_, V2.v_);
+#endif
+}
+
+inline GMVec3 Normalize(const GMVec3& V)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVector3Normalize(V.v_);
+#else
+	R.v_ = glm::normalize(R.v_);
+#endif
+	return R;
+}
+
+inline GMVec3 FastNormalize(const GMVec3& V)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVector3Normalize(V.v_);
+#else
+	R.v_ = glm::fastNormalize(R.v_);
+#endif
+	return R;
+}
+
+inline GMVec3 MakeVector3(const gm::GMfloat* f)
+{
+	return GMVec3(f[0], f[1], f[2]);
+}
+
+inline GMMat4 Translate(const GMVec3& V)
+{
+	GMMat4 M;
+#if GM_USE_DX11
+	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
+#else
+	M.v_ = glm::translate(R.v_);
+#endif
+	return M;
+}
+
+inline GMMat4 Translate(const GMVec4& V)
+{
+	GMMat4 M;
+#if GM_USE_DX11
+	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
+#else
+	M.v_ = glm::translate(R.v_);
+#endif
+	return M;
+}
+
+inline void GetTranslationFromMatrix(const GMMat4& M, OUT GMFloat4& F)
+{
+	GMFloat16 f16;
+	M.loadFloat16(f16);
+	F[0] = f16[3][0];
+	F[1] = f16[3][1];
+	F[2] = f16[3][2];
+}
+
+inline void GetScalingFromMatrix(const GMMat4& M, OUT GMFloat4& F)
+{
+	GMFloat16 f16;
+	M.loadFloat16(f16);
+	F[0] = f16[0][0];
+	F[1] = f16[1][1];
+	F[2] = f16[2][2];
+}
+
+inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat n, gm::GMfloat f)
+{
+	GMMat4 M;
+#if GM_USE_DX11
+	M.v_ = DirectX::XMMatrixOrthographicOffCenterLH(left, right, bottom, top, n, f);
+#else
+	M.v_ = glm::ortho(left, right, bottom, top, n, f);
+#endif
 }

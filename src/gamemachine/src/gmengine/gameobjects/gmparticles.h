@@ -9,8 +9,8 @@ BEGIN_NS
 class GMParticles;
 GM_PRIVATE_OBJECT(GMParticleGameObject)
 {
-	glm::vec4 color = glm::vec4(1);
-	gmmath::GMMat4 transform = gmmath::identity<gmmath::GMMat4>();
+	GMVec4 color = GMVec4(1);
+	GMMat4 transform = identity<GMMat4>();
 	GMfloat currentLife = 0;
 	GMfloat maxLife = 0;
 	GMParticles* parentParticles = nullptr;
@@ -36,8 +36,8 @@ public:
 
 	GM_DECLARE_PROPERTY(CurrentLife, currentLife, GMfloat);
 	GM_DECLARE_PROPERTY(MaxLife, maxLife, GMfloat);
-	GM_DECLARE_PROPERTY(Color, color, glm::vec4);
-	GM_DECLARE_PROPERTY(Transform, transform, gmmath::GMMat4);
+	GM_DECLARE_PROPERTY(Color, color, GMVec4);
+	GM_DECLARE_PROPERTY(Transform, transform, GMMat4);
 
 	inline GMModel* getPrototype() { D_BASE(d, GMGameObject); return d->model; }
 	inline void setParent(GMParticles* parent) { D(d); d->parentParticles = parent; }
@@ -118,7 +118,7 @@ GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 {
 	GMint particleCount = 2;
 	GMParticlePositionType positionType = GMParticlePositionType::Static;
-	glm::vec3 position = glm::vec3(0);
+	GMVec3 position = Zero<GMVec3>();
 	GMfloat emissionRate = .5f;
 	GMfloat speed = .5f;
 	GMint emissionTimes = 0; // 0(GMParticlesEmitter::InfiniteEmitTimes)表示无限次发射
@@ -128,12 +128,12 @@ GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 GM_ALIGNED_STRUCT(GMParticleProperties)
 {
 	GMfloat life = 1;
-	gmmath::GMVec3 startupPosition = gmmath::zero<gmmath::GMVec3>(); // 在Free模式下表示粒子的起始位置
-	glm::vec3 direction = glm::vec3(1, 0, 0);
-	gmmath::GMQuat startAngle;
-	gmmath::GMQuat endAngle;
-	glm::vec4 startColor = glm::vec4(1.f);
-	glm::vec4 endColor = glm::vec4(1.f);
+	GMVec3 startupPosition = Zero<GMVec3>(); // 在Free模式下表示粒子的起始位置
+	GMVec3 direction = GMVec3(1, 0, 0);
+	GMQuat startAngle;
+	GMQuat endAngle;
+	GMVec4 startColor = GMVec4(1.f);
+	GMVec4 endColor = GMVec4(1.f);
 	GMfloat startSize = .1f;
 	GMfloat endSize = .1f;
 	GMint currentEmissionTimes = 0;
@@ -212,11 +212,11 @@ public:
 		GMfloat life,
 		GMfloat startSize,
 		GMfloat endSize,
-		const glm::vec3& emitterPosition,
-		const glm::vec3& startDirectionRange,
-		const glm::vec3& endDirectionRange,
-		const glm::vec4& startColor,
-		const glm::vec4& endColor,
+		const GMVec3& emitterPosition,
+		const GMVec3& startDirectionRange,
+		const GMVec3& endDirectionRange,
+		const GMVec4& startColor,
+		const GMVec4& endColor,
 		const glm::quat& startAngle,
 		const glm::quat& endAngle,
 		GMfloat emissionRate,
@@ -229,7 +229,7 @@ public:
 // 有恒定角速度的半径发射器
 GM_PRIVATE_OBJECT(GMRadiusParticlesEmitter)
 {
-	glm::vec3 rotateAxis;
+	GMVec3 rotateAxis;
 	GMfloat angularVelocity = 0;
 	GMfloat currentAngle = 0;
 	GMfloat* currentAngles = nullptr;
@@ -248,7 +248,7 @@ public:
 
 private:
 	inline void setAngularVelocity(GMfloat angularVelocity) { D(d); d->angularVelocity = angularVelocity; }
-	inline void setRotateAxis(const glm::vec3& axis) { D(d); d->rotateAxis = axis; }
+	inline void setRotateAxis(const GMVec3& axis) { D(d); d->rotateAxis = axis; }
 
 protected:
 	GMRadiusParticlesEmitter() = default;
@@ -260,12 +260,12 @@ public:
 		GMfloat life,
 		GMfloat startSize,
 		GMfloat endSize,
-		const glm::vec3& rotateAxis,
+		const GMVec3& rotateAxis,
 		GMfloat angularVelocity,
-		const glm::vec3& emitterPosition,
-		const glm::vec3& direction,
-		const glm::vec4& startColor,
-		const glm::vec4& endColor,
+		const GMVec3& emitterPosition,
+		const GMVec3& direction,
+		const GMVec4& startColor,
+		const GMVec4& endColor,
 		const glm::quat& startAngle,
 		const glm::quat& endAngle,
 		GMfloat emissionRate,

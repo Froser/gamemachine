@@ -72,7 +72,7 @@ void GMControlGameObject::onAppendingObjectToWorld()
 	Base::onAppendingObjectToWorld();
 }
 
-void GMControlGameObject::setScaling(const glm::mat4& scaling)
+void GMControlGameObject::setScaling(const GMMat4& scaling)
 {
 	D(d);
 	Base::setScaling(scaling);
@@ -86,7 +86,7 @@ void GMControlGameObject::setScaling(const glm::mat4& scaling)
 	}
 }
 
-void GMControlGameObject::setTranslation(const glm::mat4& translation)
+void GMControlGameObject::setTranslation(const GMMat4& translation)
 {
 	D(d);
 	Base::setTranslation(translation);
@@ -100,7 +100,7 @@ void GMControlGameObject::setTranslation(const glm::mat4& translation)
 	}
 }
 
-void GMControlGameObject::setRotation(const glm::quat& rotation)
+void GMControlGameObject::setRotation(const GMQuat& rotation)
 {
 	D(d);
 	Base::setRotation(rotation);
@@ -226,7 +226,7 @@ void GMControlGameObject::updateGeometry()
 	GMRectF coord = toViewportCoord(d->geometry);
 	// coord表示左上角的绘制坐标，平移的时候需要换算到中心处
 	GMfloat x = coord.x + coord.width / 2.f, y = coord.y - coord.height / 2;
-	setTranslation(glm::translate(glm::vec3(x, y, 0)));
+	setTranslation(Translate(GMVec3(x, y, 0)));
 }
 
 void GMControlGameObject::addChild(GMControlGameObject* child)
@@ -236,7 +236,7 @@ void GMControlGameObject::addChild(GMControlGameObject* child)
 	d->children.push_back(child);
 }
 
-void GMControlGameObject::scalingGeometry(const glm::mat4& scaling)
+void GMControlGameObject::scalingGeometry(const GMMat4& scaling)
 {
 	D(d);
 	GM_ASSERT(scaling[0][0] > 0);
@@ -247,7 +247,7 @@ void GMControlGameObject::scalingGeometry(const glm::mat4& scaling)
 	d->geometryScaling[1] = trans[1];
 }
 
-void GMControlGameObject::translateGeometry(const glm::mat4& translation)
+void GMControlGameObject::translateGeometry(const GMMat4& translation)
 {
 	D(d);
 	GMfloat trans[3];

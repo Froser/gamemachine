@@ -16,14 +16,14 @@ GM_ALIGNED_STRUCT(GMBSPMovement)
 	BSPTraceResult groundTrace;
 	bool freefall = false;
 	bool walking = false;
-	glm::vec3 velocity = glm::zero<glm::vec3>(); //!< 移动速度，相对于整个场景世界
-	glm::vec3 origin = glm::zero<glm::vec3>();
-	glm::vec3 targetPosition = glm::zero<glm::vec3>();
+	GMVec3 velocity = Zero<GMVec3>(); //!< 移动速度，相对于整个场景世界
+	GMVec3 origin = Zero<GMVec3>();
+	GMVec3 targetPosition = Zero<GMVec3>();
 };
 
 GM_ALIGNED_STRUCT(GMBSPJumpArgs)
 {
-	glm::vec3 speed;
+	GMVec3 speed;
 	bool jumped = false;
 };
 
@@ -47,7 +47,7 @@ GM_PRIVATE_OBJECT(GMBSPMove)
 	GMBSPTrace* trace = nullptr;
 	GMBSPMovement movementState;
 	GMBSPAction action;
-	glm::vec3 initialVelocity = glm::zero<glm::vec3>();
+	GMVec3 initialVelocity = Zero<GMVec3>();
 };
 
 class GMBSPMove : public GMObject
@@ -58,7 +58,7 @@ public:
 	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);
 	void move();
 	void applyMove(const GMPhysicsMoveArgs& args);
-	void applyJump(const glm::vec3& speed);
+	void applyJump(const GMVec3& speed);
 
 private:
 	GMfloat now();
@@ -68,13 +68,13 @@ private:
 	void processMove();
 	void processJump();
 	void composeVelocityWithGravity();
-	glm::vec3 decomposeVelocity(const glm::vec3& v);
+	GMVec3 decomposeVelocity(const GMVec3& v);
 	void walkMove();
 	void airMove();
 	void stepSlideMove(bool hasGravity);
 	bool slideMove(bool hasGravity);
 	void synchronizeMotionStates();
-	void clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::vec3& out, GMfloat overbounce);
+	void clipVelocity(const GMVec3& in, const GMVec3& normal, GMVec3& out, GMfloat overbounce);
 };
 
 END_NS

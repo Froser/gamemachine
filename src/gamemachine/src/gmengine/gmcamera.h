@@ -9,51 +9,38 @@ BEGIN_NS
 
 //Camera
 #if GM_USE_DX11
-struct GMDxVPMatrix
+struct GMMVPMatrix
 {
-	D3DXMATRIX dxProjMatrix;
-	D3DXMATRIX dxViewMatrix;
-	D3DXMATRIX dxModelMatrix; // 在绘制的时候，将物体的Model transform放到此处
+	GMMat4 projMatrix;
+	GMMat4 viewMatrix;
+	GMMat4 modelMatrix; // 在绘制的时候，将物体的Model transform放到此处
 };
 #endif
 
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
-	GMCameraLookAt(const gmmath::GMVec3& _lookAt, const gmmath::GMVec3& _position, const gmmath::GMVec3& _up)
+	GMCameraLookAt(const GMVec3& _lookAt, const GMVec3& _position, const GMVec3& _up)
 		: lookAt(_lookAt)
 		, position(_position)
 		, up(_up)
 	{
 	}
 
-	GMCameraLookAt(const gmmath::GMVec3& _lookAt, const gmmath::GMVec3& _position)
+	GMCameraLookAt(const GMVec3& _lookAt, const GMVec3& _position)
 		: lookAt(_lookAt)
 		, position(_position)
 	{
 	}
 
-	gmmath::GMVec3 lookAt = gmmath::zero<gmmath::GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
-	gmmath::GMVec3 position = gmmath::zero<gmmath::GMVec3>(); //!< 摄像机位置
-	gmmath::GMVec3 up = gmmath::GMVec3(0, 1, 0);
+	GMVec3 lookAt = zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
+	GMVec3 position = zero<GMVec3>(); //!< 摄像机位置
+	GMVec3 up = GMVec3(0, 1, 0);
 };
 
-inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)
+inline GMMat4 getViewMatrix(const GMCameraLookAt& lookAt)
 {
-#if GM_USE_DX11
-	/*
-	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
-	{
-		return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
-	}
-	
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	GM_ASSERT(false);
-	*/
-	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
-#else
-	return glm::lookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
-#endif
+	return LookAt(lookAt.position, lookAt.lookAt + lookAt.position, lookAt.up);
 }
 
 //Frustum
@@ -86,12 +73,10 @@ GM_PRIVATE_OBJECT(GMFrustum)
 	GMfloat n;
 	GMfloat f;
 
-	glm::mat4 viewMatrix;
-	glm::mat4 projMatrix;
+	GMMVPMatrix mvpMatrix;
 
 #if GM_USE_DX11
 	//DirectX
-	GMDxVPMatrix dxMatrix;
 	GMComPtr<ID3D11Buffer> dxMatrixBuffer;
 #endif
 };
@@ -107,9 +92,9 @@ public:
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
-	bool isPointInside(const gmmath::GMVec3& point);
-	bool isBoundingBoxInside(const gmmath::GMVec3* vertices);
-	void updateViewMatrix(const glm::mat4& viewMatrix);
+	bool isPointInside(const GMVec3& point);
+	bool isBoundingBoxInside(const GMVec3* vertices);
+	void updateViewMatrix(const GMMat4& viewMatrix);
 
 public:
 	inline GMFrustumType getType() { D(d); return d->type; }
@@ -118,14 +103,11 @@ public:
 	inline GMfloat getFovy() { D(d); GM_ASSERT(getType() == GMFrustumType::Perspective); return d->fovy; }
 
 public:
-	const glm::mat4& getProjectionMatrix();
-	const glm::mat4& getViewMatrix();
+	const GMMat4& getProjectionMatrix();
+	const GMMat4& getViewMatrix();
+	const GMMVPMatrix& getDxVPMatrix();
 
 #if GM_USE_DX11
-	const GMDxVPMatrix& getDxVPMatrix();
-	void setDxVPMatrix(const GMDxVPMatrix& m);
-	const D3DXMATRIX& getDxProjectionMatrix();
-	const D3DXMATRIX& getDxViewMatrix();
 	void setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer);
 	GMComPtr<ID3D11Buffer> getDxMatrixBuffer();
 #endif
@@ -165,11 +147,11 @@ public:
 	  \param y 屏幕上的点的y坐标。
 	  \return 世界坐标。
 	*/
-	gmmath::GMVec3 getRayToWorld(GMint x, GMint y) const;
+	GMVec3 getRayToWorld(GMint x, GMint y) const;
 
 public:
-	inline const glm::mat4& getProjectionMatrix() { D(d); return getFrustum().getProjectionMatrix(); }
-	inline const glm::mat4& getViewMatrix() { D(d); return getFrustum().getViewMatrix(); }
+	inline const GMMat4& getProjectionMatrix() { D(d); return getFrustum().getProjectionMatrix(); }
+	inline const GMMat4& getViewMatrix() { D(d); return getFrustum().getViewMatrix(); }
 	inline const GMCameraLookAt& getLookAt() { D(d); return d->lookAt; }
 };
 

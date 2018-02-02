@@ -159,7 +159,7 @@ GMLargeInteger GMStopwatch::nowInCycle()
 //Plane
 #define EPSILON 0.01f
 
-void GMPlane::setFromPoints(const glm::vec3 & p0, const glm::vec3 & p1, const glm::vec3 & p2)
+void GMPlane::setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 & p2)
 {
 	normal = glm::cross((p1 - p0), (p2 - p0));
 	normal = glm::fastNormalize(normal);
@@ -173,14 +173,14 @@ void GMPlane::normalize()
 	intercept /= normalLength;
 }
 
-bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, glm::vec3 & result)//find point of intersection of 3 planes
+bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result)//find point of intersection of 3 planes
 {
-	GMfloat denominator = glm::dot(normal, (glm::cross(p2.normal, p3.normal)));
+	GMfloat denominator = Dot(normal, (glm::cross(p2.normal, p3.normal)));
 	//scalar triple product of normals
 	if (denominator == 0.0f)									//if zero
 		return false;										//no intersection
 
-	glm::vec3 temp1, temp2, temp3;
+	GMVec3 temp1, temp2, temp3;
 	temp1 = (glm::cross(p2.normal, p3.normal))*intercept;
 	temp2 = (glm::cross(p3.normal, normal))*p2.intercept;
 	temp3 = (glm::cross(normal, p2.normal))*p3.intercept;
@@ -190,12 +190,12 @@ bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, glm::vec3 & res
 	return true;
 }
 
-GMfloat GMPlane::getDistance(const glm::vec3 & point) const
+GMfloat GMPlane::getDistance(const GMVec3 & point) const
 {
-	return glm::dot(point, normal) + intercept;
+	return Dot(point, normal) + intercept;
 }
 
-PointPosition GMPlane::classifyPoint(const glm::vec3 & point) const
+PointPosition GMPlane::classifyPoint(const GMVec3 & point) const
 {
 	GMfloat distance = getDistance(point);
 
@@ -211,8 +211,8 @@ PointPosition GMPlane::classifyPoint(const glm::vec3 & point) const
 GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)
 {
 	GMPlane result;
-	result.normal = normal*(1.0f - factor) + p2.normal*factor;
-	result.normal = glm::fastNormalize(result.normal);
+	result.normal = normal * (1.0f - factor) + p2.normal * factor;
+	result.normal = FastNormalize(result.normal);
 
 	result.intercept = intercept*(1.0f - factor) + p2.intercept*factor;
 

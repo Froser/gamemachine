@@ -186,7 +186,7 @@ void GMBSP::loadPlanes()
 		d->planes.resize(length);
 		for (GMint i = 0; i < num; i++)
 		{
-			d->planes[i].normal = glm::vec3(t[i].p[0], t[i].p[1], t[i].p[2]);
+			d->planes[i].normal = GMVec3(t[i].p[0], t[i].p[1], t[i].p[2]);
 			d->planes[i].intercept = t[i].p[3];
 		}
 	}
@@ -218,8 +218,8 @@ void GMBSP::loadVertices()
 		d->vertices.resize(length);
 		for (GMint i = 0; i < num; i++)
 		{
-			d->vertices[i].xyz = glm::vec3(t[i].xyz[0], t[i].xyz[1], t[i].xyz[2]);
-			d->vertices[i].normal = glm::vec3(t[i].normal[0], t[i].normal[1], t[i].normal[2]);
+			d->vertices[i].xyz = GMVec3(t[i].xyz[0], t[i].xyz[1], t[i].xyz[2]);
+			d->vertices[i].normal = GMVec3(t[i].normal[0], t[i].normal[1], t[i].normal[2]);
 			Copy(d->vertices[i].st, t[i].st);
 			Copy(d->vertices[i].color, t[i].color);
 			Copy(d->vertices[i].lightmap, t[i].lightmap);
@@ -267,10 +267,10 @@ void GMBSP::loadDrawSurfaces()
 		d->drawSurfaces.resize(length);
 		for (GMint i = 0; i < num; i++)
 		{
-			d->drawSurfaces[i].lightmapOrigin = glm::vec3(t[i].lightmapOrigin[0], t[i].lightmapOrigin[1], t[i].lightmapOrigin[2]);
+			d->drawSurfaces[i].lightmapOrigin = GMVec3(t[i].lightmapOrigin[0], t[i].lightmapOrigin[1], t[i].lightmapOrigin[2]);
 			for (GMint j = 0; j < 3; j++)
 			{
-				d->drawSurfaces[i].lightmapVecs[j] = glm::vec3(t[i].lightmapVecs[j][0], t[i].lightmapVecs[j][1], t[i].lightmapVecs[j][2]);
+				d->drawSurfaces[i].lightmapVecs[j] = GMVec3(t[i].lightmapVecs[j][0], t[i].lightmapVecs[j][1], t[i].lightmapVecs[j][2]);
 			}
 			CopyMember(d->drawSurfaces[i], t[i], shaderNum);
 			CopyMember(d->drawSurfaces[i], t[i], fogNum);
@@ -414,7 +414,7 @@ void GMBSP::generateLightVolumes()
 	d->lightVols.lightVolInverseSize = 1.f / d->lightVols.lightVolSize;
 	GMfloat* wMins = d->models[0].mins;
 	GMfloat* wMaxs = d->models[0].maxs;
-	glm::vec3 maxs;
+	GMVec3 maxs;
 	GMint numGridPoints = 0;
 
 	for (GMuint i = 0; i < 3; i++)

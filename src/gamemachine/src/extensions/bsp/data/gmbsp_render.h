@@ -9,7 +9,7 @@ BEGIN_NS
 // structs for rendering
 GM_ALIGNED_STRUCT(GMBSP_Render_Vertex)
 {
-	glm::vec3 position;
+	GMVec3 position;
 	GMfloat decalS, decalT;
 	GMfloat lightmapS, lightmapT;
 
@@ -95,7 +95,7 @@ enum
 
 GM_ALIGNED_STRUCT(GMBSP_Render_Leaf)
 {
-	glm::vec3 boundingBoxVertices[8];
+	GMVec3 boundingBoxVertices[8];
 	GMint cluster;	//cluster index for visdata
 	GMint firstLeafFace;	//first index in leafFaces array
 	GMint numFaces;
@@ -146,8 +146,8 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	GMBSP_Render_VisibilityData visibilityData;
 
 	// 用于绘制天空
-	glm::vec3 boundMin = glm::vec3(BOUNDING);
-	glm::vec3 boundMax = glm::vec3(-BOUNDING);
+	GMVec3 boundMin = GMVec3(BOUNDING);
+	GMVec3 boundMax = GMVec3(-BOUNDING);
 };
 
 typedef GMBSPRenderPrivate GMBSPRenderData;
@@ -160,7 +160,7 @@ public:
 	void generateRenderData(BSPData* bsp);
 	void createObject(const GMBSP_Render_Face& face, const GMShader& shader, OUT GMModel** obj);
 	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModel** obj);
-	void createBox(const glm::vec3& extents, const glm::vec3& position, const GMShader& shader, OUT GMModel** obj);
+	void createBox(const GMVec3& extents, const GMVec3& position, const GMShader& shader, OUT GMModel** obj);
 
 private:
 	void generateVertices();

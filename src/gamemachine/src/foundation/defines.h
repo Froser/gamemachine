@@ -86,17 +86,7 @@ using Tuple = std::tuple<T...>;
 #	define GM_NOVTABLE
 #endif
 
-#if GM_MSVC && GM_SIMD
-#	define USE_SIMD 1
-#else
-#	define USE_SIMD 0
-#endif
-
-#if USE_SIMD
-#	define GM_ALIGNED_16(t) t __declspec(align(16))
-#else
-#	define GM_ALIGNED_16(t) t
-#endif
+#define GM_ALIGNED_16(t) t __declspec(align(16))
 
 #if GM_LIB
 #	define GM_API

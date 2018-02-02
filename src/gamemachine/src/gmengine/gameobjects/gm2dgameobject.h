@@ -100,9 +100,9 @@ private:
 	virtual void clone(const GMImage2DBorder& border);
 	virtual void createBorder(const GMRect& geometry);
 	virtual void draw();
-	virtual void setScaling(const glm::mat4& scaling);
-	virtual void setTranslation(const glm::mat4& translation);
-	virtual void setRotation(const glm::quat& rotation);
+	virtual void setScaling(const GMMat4& scaling);
+	virtual void setTranslation(const GMMat4& translation);
+	virtual void setRotation(const GMQuat& rotation);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -135,9 +135,9 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
-	virtual void setScaling(const glm::mat4& scaling) override;
-	virtual void setTranslation(const glm::mat4& translation) override;
-	virtual void setRotation(const glm::quat& rotation) override;
+	virtual void setScaling(const GMMat4& scaling) override;
+	virtual void setTranslation(const GMMat4& translation) override;
+	virtual void setRotation(const GMQuat& rotation) override;
 
 	//IPrimitiveCreatorShaderCallback
 protected:

@@ -257,9 +257,9 @@ GM_ALIGNED_STRUCT(GMMaterial)
 {
 	GMfloat shininess = 0;
 	GMfloat refractivity = 0;
-	glm::vec3 ka = glm::vec3(1);
-	glm::vec3 ks = glm::vec3(0);
-	glm::vec3 kd = glm::vec3(0);
+	GMVec3 ka = GMVec3(1);
+	GMVec3 ks = GMVec3(0);
+	GMVec3 kd = GMVec3(0);
 };
 
 GM_PRIVATE_OBJECT(GMShader)
@@ -274,7 +274,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	bool noDepthTest = false;
 	bool drawBorder = false;
 	GMfloat lineWidth = 1;
-	glm::vec3 lineColor = glm::vec3(0);
+	GMVec3 lineColor = GMVec3(0);
 	GMTexture texture;
 	GMMaterial material;
 };
@@ -298,7 +298,7 @@ public:
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
 	GM_DECLARE_PROPERTY(Texture, texture, GMTexture);
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
-	GM_DECLARE_PROPERTY(LineColor, lineColor, glm::vec3);
+	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
 };
 END_NS

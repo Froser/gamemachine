@@ -207,13 +207,13 @@ enum PointPosition
 	POINT_BEHIND_PLANE,
 };
 
-struct GMPlane : public GMObject, public GMAlignmentObject
+GM_ALIGNED_STRUCT(GMPlane)
 {
-	GMPlane() : normal(glm::vec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
+	GMPlane() : normal(GMVec3(0.0f, 0.0f, 0.0f)), intercept(0.0f)
 	{
 	}
 
-	GMPlane(const glm::vec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
+	GMPlane(const GMVec3& newNormal, GMfloat newIntercept) : normal(newNormal), intercept(newIntercept)
 	{
 	}
 
@@ -230,22 +230,22 @@ struct GMPlane : public GMObject, public GMAlignmentObject
 		return *this;
 	}
 
-	void setNormal(const glm::vec3 & rhs) { normal = rhs; }
+	void setNormal(const GMVec3 & rhs) { normal = rhs; }
 	void setIntercept(GMfloat newIntercept) { intercept = newIntercept; }
-	void setFromPoints(const glm::vec3 & p0, const glm::vec3 & p1, const glm::vec3 & p2);
+	void setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 & p2);
 
-	void calculateIntercept(const glm::vec3 & pointOnPlane) { intercept = -glm::dot(normal, pointOnPlane); }
+	void calculateIntercept(const GMVec3 & pointOnPlane) { intercept = - Dot(normal, pointOnPlane); }
 
 	void normalize(void);
 
-	glm::vec3 getNormal() { return normal; }
+	GMVec3 getNormal() { return normal; }
 	GMfloat getIntercept() { return intercept; }
 
 	//find point of intersection of 3 planes
-	bool intersect3(const GMPlane & p2, const GMPlane & p3, glm::vec3 & result);
+	bool intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result);
 
-	GMfloat getDistance(const glm::vec3 & point) const;
-	PointPosition classifyPoint(const glm::vec3 & point) const;
+	GMfloat getDistance(const GMVec3 & point) const;
+	PointPosition classifyPoint(const GMVec3 & point) const;
 
 	GMPlane lerp(const GMPlane & p2, GMfloat factor);
 
@@ -261,7 +261,7 @@ struct GMPlane : public GMObject, public GMAlignmentObject
 	GMPlane operator+(void) const { return (*this); }
 
 	//member variables
-	glm::vec3 normal;	//X.N+intercept=0
+	GMVec3 normal;	//X.N+intercept=0
 	GMfloat intercept;
 };
 

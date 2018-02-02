@@ -5,7 +5,7 @@
 #include <gmdxincludes.h>
 BEGIN_NS
 
-struct GMDxVPMatrix;
+struct GMMVPMatrix;
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
@@ -107,7 +107,7 @@ private:
 	void initShaders();
 	void updateProjection();
 	void updateView();
-	void beginMapMVPMatrix(GMDxVPMatrix** mvp);
+	void beginMapMVPMatrix(GMMVPMatrix** mvp);
 	void endMapMVPMatrix();
 };
 

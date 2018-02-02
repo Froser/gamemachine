@@ -245,45 +245,54 @@ void GMMesh::calculateTangentSpace()
 			// 每一个多边形拥有一个切线空间，这意味着多于3个点的多边形需要共面，否则切线空间会有问题
 			GMint o = component->getOffsetPtr()[i];
 
-			glm::vec3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
-			glm::vec3 e1(d->positions[VERTEX_OFFSET(o, 3)], d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)]);
-			glm::vec3 e2(d->positions[VERTEX_OFFSET(o, 6)], d->positions[VERTEX_OFFSET(o, 7)], d->positions[VERTEX_OFFSET(o, 8)]);
+			GMVec3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
+			GMVec3 e1(d->positions[VERTEX_OFFSET(o, 3)], d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)]);
+			GMVec3 e2(d->positions[VERTEX_OFFSET(o, 6)], d->positions[VERTEX_OFFSET(o, 7)], d->positions[VERTEX_OFFSET(o, 8)]);
 
-			glm::vec2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
-			glm::vec2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);
-			glm::vec2 uv2(d->uvs[UV_OFFSET(o, 4)], d->uvs[UV_OFFSET(o, 5)]);
+			GMVec2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
+			GMVec2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);
+			GMVec2 uv2(d->uvs[UV_OFFSET(o, 4)], d->uvs[UV_OFFSET(o, 5)]);
 
-			glm::vec3 E1 = e1 - e0;
-			glm::vec3 E2 = e2 - e0;
-			glm::vec2 deltaUV1 = uv1 - uv0;
-			glm::vec2 deltaUV2 = uv2 - uv0;
+			GMVec3 E1 = e1 - e0;
+			GMVec3 E2 = e2 - e0;
+			GMVec2 deltaUV1 = uv1 - uv0;
+			GMVec2 deltaUV2 = uv2 - uv0;
 
-			GMfloat s = 1.0f / (deltaUV1[0] * deltaUV2[1] - deltaUV1[1] * deltaUV2[0]);
+			GMFloat4 f4_deltaUV1, f4_deltaUV2, f4_E1, f4_E2;
+			deltaUV1.loadFloat4(f4_deltaUV1);
+			deltaUV2.loadFloat4(f4_deltaUV2);
+			E1.loadFloat4(f4_E1);
+			E2.loadFloat4(f4_E2);
+
+			GMfloat s = 1.0f / (f4_deltaUV1[0] * f4_deltaUV2[1] - f4_deltaUV1[1] * f4_deltaUV2[0]);
 
 			GMfloat tangents[3] = {
-				s * (deltaUV2[1] * E1[0] - deltaUV1[1] * E2[0]),
-				s * (deltaUV2[1] * E1[1] - deltaUV1[1] * E2[1]),
-				s * (deltaUV2[1] * E1[2] - deltaUV1[1] * E2[2])
+				s * (f4_deltaUV2[1] * f4_E1[0] - f4_deltaUV1[1] * f4_E2[0]),
+				s * (f4_deltaUV2[1] * f4_E1[1] - f4_deltaUV1[1] * f4_E2[1]),
+				s * (f4_deltaUV2[1] * f4_E1[2] - f4_deltaUV1[1] * f4_E2[2])
 			};
 			GMfloat bitangents[3] = {
-				s * (deltaUV1[0] * E2[0] - deltaUV2[0] * E1[0]),
-				s * (deltaUV1[0] * E2[1] - deltaUV2[0] * E1[1]),
-				s * (deltaUV1[0] * E2[2] - deltaUV2[0] * E1[2])
+				s * (f4_deltaUV1[0] * f4_E2[0] - f4_deltaUV2[0] * f4_E1[0]),
+				s * (f4_deltaUV1[0] * f4_E2[1] - f4_deltaUV2[0] * f4_E1[1]),
+				s * (f4_deltaUV1[0] * f4_E2[2] - f4_deltaUV2[0] * f4_E1[2])
 			};
 
-			glm::vec3 tangentVector = glm::fastNormalize(glm::vec3(tangents[0], tangents[1], tangents[2]));
-			glm::vec3 bitangentVector = glm::fastNormalize(glm::vec3(bitangents[0], bitangents[1], bitangents[2]));
+			GMVec3 tangentVector = FastNormalize(GMVec3(tangents[0], tangents[1], tangents[2]));
+			GMVec3 bitangentVector = FastNormalize(GMVec3(bitangents[0], bitangents[1], bitangents[2]));
+			GMFloat4 f4_tangentVector, f4_bitangentVector;
+			tangentVector.loadFloat4(f4_tangentVector);
+			bitangentVector.loadFloat4(f4_bitangentVector);
 
 			GMint verticesCount = component->getPrimitiveVerticesCountPtr()[i];
 			for (GMint j = 0; j < verticesCount; j++)
 			{
-				d->tangents.push_back(tangentVector[0]);
-				d->tangents.push_back(tangentVector[1]);
-				d->tangents.push_back(tangentVector[2]);
+				d->tangents.push_back(f4_tangentVector[0]);
+				d->tangents.push_back(f4_tangentVector[1]);
+				d->tangents.push_back(f4_tangentVector[2]);
 
-				d->bitangents.push_back(bitangentVector[0]);
-				d->bitangents.push_back(bitangentVector[1]);
-				d->bitangents.push_back(bitangentVector[2]);
+				d->bitangents.push_back(f4_bitangentVector[0]);
+				d->bitangents.push_back(f4_bitangentVector[1]);
+				d->bitangents.push_back(f4_bitangentVector[2]);
 			}
 		}
 	}
