@@ -1,12 +1,9 @@
 ﻿#ifndef __GM_LINEARMATH_H__
 #define __GM_LINEARMATH_H__
+#include <defines.h>
+#include <math.h>
+#include <gmdxincludes.h>
 
-// GLM
-#if !USE_SIMD
-	#define GLM_FORCE_PURE
-#endif
-
-// 使用和DirectX一样的坐标系
 #define GLM_FORCE_INLINE
 #define GLM_ENABLE_EXPERIMENTAL
 #include <glm/glm.hpp>
@@ -19,11 +16,12 @@
 #include "glm/gtx/fast_square_root.hpp"
 #include "glm/gtx/norm.hpp"
 
-// GM
-#include <defines.h>
-#include <math.h>
-
 constexpr gm::GMfloat PI = 3.141592653f;
+
+bool s_useDxMath = false;
+
+#define IS_OPENGL (!s_useDxMath)
+#define IS_DX (s_useDxMath)
 
 BEGIN_NS
 
@@ -67,135 +65,130 @@ inline GMfloat gmMax(GMfloat x, GMfloat y) { return x > y ? x : y; }
 
 END_NS
 
-namespace glm
+#if GM_USE_DX11
+#define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
+	struct className					\
+	{									\
+		glStruct gl_;					\
+		dxStruct dx_;					\
+	public:								\
+		className() = default;			\
+		className(const className& rhs);
+#else
+#define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
+	struct className					\
+	{									\
+		glStruct gl_;					\
+										\
+	public:								\
+		className() = default;			\
+		className(const GMVec2& rhs);
+#endif
+#define GMMATH_END_STRUCT };
+
+namespace gmmath
 {
-	inline vec4 combine_vec4(const vec3& v3, const vec4& v4)
+	enum DataFormat
 	{
-		return glm::vec4(v3, v4[3]);
-	}
+		GL,
+		DX,
+	};
 
-	// identity
+	// This is a singleton
+	struct GMMathEnv
+	{
+	public:
+		GMMathEnv();
+		DataFormat format_;
+	};
+
+	extern GMMathEnv* s_math_env_instance;
+
+	GMMATH_BEGIN_STRUCT(GMVec2, glm::vec2, D3DXVECTOR2)
+	GMMATH_END_STRUCT
+
+	GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, D3DXVECTOR3)
+	GMMATH_END_STRUCT
+
+	GMMATH_BEGIN_STRUCT(GMVec4, glm::vec4, DirectX::XMVECTOR)
+	GMMATH_END_STRUCT
+
+	GMMATH_BEGIN_STRUCT(GMMat4, glm::mat4, DirectX::XMMATRIX)
+	GMMATH_END_STRUCT
+
+	GMMATH_BEGIN_STRUCT(GMQuat, glm::quat, DirectX::XMVECTOR)
+	GMMATH_END_STRUCT
+
+	//////////////////////////////////////////////////////////////////////////
+	GMVec2 __getZeroVec2();
+	GMVec3 __getZeroVec3();
+	GMVec4 __getZeroVec4();
+	GMMat4 __getIdentityMat4();
+	GMMat4 __mul(const GMMat4& M1, const GMMat4& M2);
+	GMVec4 __mul(const GMVec4& V, const GMMat4& M);
+
 	template <typename T>
-	inline T& identity();
+	T zero();
 
 	template <>
-	inline mat4& identity()
+	GMVec2 zero()
 	{
-		static mat4 m(1.f);
-		return m;
-	}
-
-	template <>
-	inline mat3& identity()
-	{
-		static mat3 m(1.f);
-		return m;
+		return __getZeroVec2();
 	}
 
 	template <>
-	inline mat2& identity()
+	GMVec3 zero()
 	{
-		static mat2 m(1.f);
-		return m;
+		return __getZeroVec3();
 	}
 
 	template <>
-	inline quat& identity()
+	GMVec4 zero()
 	{
-		static quat q(1, 0, 0, 0);
-		return q;
-	}
-
-	//transform
-	inline mat4 scale(const vec3& v)
-	{
-		return scale(identity<mat4>(), v);
-	}
-
-	inline mat4 scale(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z)
-	{
-		return scale(identity<mat4>(), vec3(x, y, z));
-	}
-
-	inline mat4 translate(const vec3& v)
-	{
-		return translate(identity<mat4>(), v);
-	}
-
-	inline void copyToArray(const mat4& mat, gm::GMfloat* value)
-	{
-		const auto v = value_ptr(mat);
-		memcpy_s(value, sizeof(gm::GMfloat) * 16, v, sizeof(gm::GMfloat) * 16);
-	}
-
-	inline void copyToArray(const vec4& vec, gm::GMfloat* value)
-	{
-		const auto v = value_ptr(vec);
-		memcpy_s(value, sizeof(gm::GMfloat) * 4, v, sizeof(gm::GMfloat) * 4);
-	}
-
-	inline void copyToArray(const vec3& vec, gm::GMfloat* value)
-	{
-		const auto v = value_ptr(vec);
-		memcpy_s(value, sizeof(gm::GMfloat) * 3, v, sizeof(gm::GMfloat) * 3);
-	}
-
-	inline bool fuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
-	{
-		return (gm::gmFabs(p1 - p2) <= 0.01f);
-	}
-
-	inline vec3 toInhomogeneous(const vec4& v4)
-	{
-		return vec3(v4.x / v4.x, v4.y / v4.w, v4.z / v4.w);
-	}
-
-	inline vec4 toHomogeneous(const vec3& v3)
-	{
-		return vec4(v3.x, v3.y, v3.z, 1);
-	}
-
-	inline vec3 make_vec3(const gm::GMfloat(&v)[3])
-	{
-		return make_vec3(static_cast<const gm::GMfloat*>(v));
+		return __getZeroVec4();
 	}
 
 	template <typename T>
-	inline gm::GMfloat lengthSquare(const T& left)
+	T identity();
+
+	template <>
+	GMMat4 identity()
 	{
-		return dot(left, left);
+		return __getIdentityMat4();
 	}
 
-	inline void getScalingFromMatrix(const mat4& mat, gm::GMfloat* out)
+	//! 计算两个矩阵相乘的结果。
+	/*!
+	  表示先进行M1矩阵变换，然后进行M2矩阵变换。
+	  \param M1 先进行变换的矩阵。
+	  \param M2 后进行变换的矩阵。
+	  \return 变换后的矩阵。
+	*/
+	GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)
 	{
-		out[0] = mat[0][0];
-		out[1] = mat[1][1];
-		out[2] = mat[2][2];
+		return __mul(M1, M2);
 	}
 
-	inline void getTranslationFromMatrix(const mat4& mat, gm::GMfloat* out)
+	GMVec4 operator*(const GMVec4& V, const GMMat4& M)
 	{
-		out[0] = mat[3][0];
-		out[1] = mat[3][1];
-		out[2] = mat[3][2];
+		return __mul(V, M);
 	}
 
-	inline gm::GMfloat lerp(const gm::GMfloat& start, const gm::GMfloat& end, gm::GMfloat percentage)
+	GMMat4 QuatToMatrix(const GMQuat& quat)
 	{
-		return percentage * (end - start) + start;
-	}
-
-	inline glm::vec3 safeNormalize(const glm::vec3& vec, const glm::vec3& n = glm::vec3(1, 0, 0))
-	{
-		gm::GMfloat l2 = glm::length2(vec);
-		if (l2 >= FLT_EPSILON*FLT_EPSILON)
-		{
-			return vec / gm::gmSqrt(l2);
-		}
+		GMMat4 mat;
+#if GM_USE_DX11
+		if (1)
+			mat.gl_ = glm::mat4_cast(quat.gl_);
 		else
-		{
-			return n;
-		}
+			mat.dx_ = DirectX::XMMatrixRotationQuaternion(quat.dx_);
+#else
+		mat.gl_ = glm::mat4_cast(quat.gl_);
+#endif
+		return mat;
 	}
 }
+
+#include "linearmath.inl"
+
 #endif

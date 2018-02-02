@@ -14,10 +14,10 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMPhysicsObject* physics = nullptr;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
-	glm::mat4 scaling = glm::identity<glm::mat4>();
-	glm::mat4 translation = glm::identity<glm::mat4>();
-	glm::quat rotation = glm::identity<glm::quat>();
-	glm::mat4 transformMatrix = glm::identity<glm::mat4>();
+	gmmath::GMMat4 scaling = gmmath::identity<gmmath::GMMat4>();
+	gmmath::GMMat4 translation = gmmath::identity<gmmath::GMMat4>();
+	glm::quat rotation = gmmath::identity<glm::quat>();
+	gmmath::GMMat4 transformMatrix = gmmath::identity<gmmath::GMMat4>();
 	bool canDeferredRendering = true;
 };
 
@@ -58,16 +58,16 @@ private:
 	inline void updateMatrix()
 	{ 
 		D(d);
-		d->transformMatrix = d->translation * glm::mat4_cast(d->rotation) * d->scaling; 
+		d->transformMatrix = d->scaling * glm::mat4_cast(d->rotation) * d->translation;
 	}
 
 public:
-	virtual void setScaling(const glm::mat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
-	virtual void setTranslation(const glm::mat4& translation) { D(d); d->translation = translation; updateMatrix(); }
+	virtual void setScaling(const gmmath::GMMat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
+	virtual void setTranslation(const gmmath::GMMat4& translation) { D(d); d->translation = translation; updateMatrix(); }
 	virtual void setRotation(const glm::quat& rotation) { D(d); d->rotation = rotation; updateMatrix(); }
-	inline const glm::mat4& getTransform() const { D(d); return d->transformMatrix; }
-	inline const glm::mat4& getScaling() const { D(d); return d->scaling; }
-	inline const glm::mat4& getTranslation() const { D(d); return d->translation; }
+	inline const gmmath::GMMat4& getTransform() const { D(d); return d->transformMatrix; }
+	inline const gmmath::GMMat4& getScaling() const { D(d); return d->scaling; }
+	inline const gmmath::GMMat4& getTranslation() const { D(d); return d->translation; }
 	inline const glm::quat& getRotation() const { D(d); return d->rotation; }
 	inline GMPhysicsObject* getPhysicsObject() { D(d); GM_ASSERT(d->physics); return d->physics; }
 	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)

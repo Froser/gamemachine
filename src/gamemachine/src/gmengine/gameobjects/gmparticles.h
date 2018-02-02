@@ -10,7 +10,7 @@ class GMParticles;
 GM_PRIVATE_OBJECT(GMParticleGameObject)
 {
 	glm::vec4 color = glm::vec4(1);
-	glm::mat4 transform = glm::identity<glm::mat4>();
+	gmmath::GMMat4 transform = gmmath::identity<gmmath::GMMat4>();
 	GMfloat currentLife = 0;
 	GMfloat maxLife = 0;
 	GMParticles* parentParticles = nullptr;
@@ -37,7 +37,7 @@ public:
 	GM_DECLARE_PROPERTY(CurrentLife, currentLife, GMfloat);
 	GM_DECLARE_PROPERTY(MaxLife, maxLife, GMfloat);
 	GM_DECLARE_PROPERTY(Color, color, glm::vec4);
-	GM_DECLARE_PROPERTY(Transform, transform, glm::mat4);
+	GM_DECLARE_PROPERTY(Transform, transform, gmmath::GMMat4);
 
 	inline GMModel* getPrototype() { D_BASE(d, GMGameObject); return d->model; }
 	inline void setParent(GMParticles* parent) { D(d); d->parentParticles = parent; }
@@ -128,10 +128,10 @@ GM_ALIGNED_STRUCT(GMParticleEmitterProperties)
 GM_ALIGNED_STRUCT(GMParticleProperties)
 {
 	GMfloat life = 1;
-	glm::vec3 startupPosition = glm::vec3(0); // 在Free模式下表示粒子的起始位置
+	gmmath::GMVec3 startupPosition = gmmath::zero<gmmath::GMVec3>(); // 在Free模式下表示粒子的起始位置
 	glm::vec3 direction = glm::vec3(1, 0, 0);
-	glm::quat startAngle;
-	glm::quat endAngle;
+	gmmath::GMQuat startAngle;
+	gmmath::GMQuat endAngle;
 	glm::vec4 startColor = glm::vec4(1.f);
 	glm::vec4 endColor = glm::vec4(1.f);
 	GMfloat startSize = .1f;

@@ -72,11 +72,6 @@ using Tuple = std::tuple<T...>;
 #	define GM_LIB 1
 #endif
 
-// SSE指令优化
-#ifndef GM_SIMD
-#	define GM_SIMD 1
-#endif
-
 /* 工程编译选项到此结束 */
 
 #if GM_DETECT_MEMORY_LEAK

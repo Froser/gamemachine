@@ -77,7 +77,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 void GMFrustum::update()
 {
 	D(d);
-	glm::mat4 projection = getProjectionMatrix();
+	const glm::mat4& projection = getProjectionMatrix();
 	glm::mat4& view = d->viewMatrix;
 	glm::mat4 clipMat;
 
@@ -86,8 +86,7 @@ void GMFrustum::update()
 		//Multiply the matrices
 		clipMat = projection * view;
 
-		GMfloat clip[16];
-		glm::copyToArray(clipMat, clip);
+		GMfloat* clip = glm::value_ptr(clipMat);
 
 		//calculate planes
 		d->planes[RIGHT_PLANE].normal = glm::vec3(clip[3] - clip[0], clip[7] - clip[4], clip[11] - clip[8]);
@@ -102,11 +101,11 @@ void GMFrustum::update()
 		d->planes[TOP_PLANE].normal = glm::vec3(clip[3] - clip[1], clip[7] - clip[5], clip[11] - clip[9]);
 		d->planes[TOP_PLANE].intercept = clip[15] - clip[13];
 
-		d->planes[FAR_PLANE].normal = glm::vec3(clip[3] - clip[2], clip[7] - clip[6], clip[11] - clip[10]);
-		d->planes[FAR_PLANE].intercept = clip[15] - clip[14];
+		d->planes[NEAR_PLANE].normal = glm::vec3(clip[3] - clip[2], clip[7] - clip[6], clip[11] - clip[10]);
+		d->planes[NEAR_PLANE].intercept = clip[15] - clip[14];
 
-		d->planes[NEAR_PLANE].normal = glm::vec3(clip[3] + clip[2], clip[7] + clip[6], clip[11] + clip[10]);
-		d->planes[NEAR_PLANE].intercept = clip[15] + clip[14];
+		d->planes[FAR_PLANE].normal = glm::vec3(clip[3] + clip[2], clip[7] + clip[6], clip[11] + clip[10]);
+		d->planes[FAR_PLANE].intercept = clip[15] + clip[14];
 	}
 	else
 	{

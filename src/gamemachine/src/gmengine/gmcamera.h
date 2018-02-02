@@ -20,22 +20,22 @@ struct GMDxVPMatrix
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
-	GMCameraLookAt(const glm::vec3& _lookAt, const glm::vec3& _position, const glm::vec3& _up)
+	GMCameraLookAt(const gmmath::GMVec3& _lookAt, const gmmath::GMVec3& _position, const gmmath::GMVec3& _up)
 		: lookAt(_lookAt)
 		, position(_position)
 		, up(_up)
 	{
 	}
 
-	GMCameraLookAt(const glm::vec3& _lookAt, const glm::vec3& _position)
+	GMCameraLookAt(const gmmath::GMVec3& _lookAt, const gmmath::GMVec3& _position)
 		: lookAt(_lookAt)
 		, position(_position)
 	{
 	}
 
-	glm::vec3 lookAt = glm::zero<glm::vec3>(); //!< 摄像机朝向，单位向量指示其方向
-	glm::vec3 position = glm::zero<glm::vec3>(); //!< 摄像机位置
-	glm::vec3 up = glm::vec3(0, 1, 0);
+	gmmath::GMVec3 lookAt = gmmath::zero<gmmath::GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
+	gmmath::GMVec3 position = gmmath::zero<gmmath::GMVec3>(); //!< 摄像机位置
+	gmmath::GMVec3 up = gmmath::GMVec3(0, 1, 0);
 };
 
 inline glm::mat4 getViewMatrix(const GMCameraLookAt& lookAt)
@@ -107,8 +107,8 @@ public:
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
-	bool isPointInside(const glm::vec3& point);
-	bool isBoundingBoxInside(const glm::vec3* vertices);
+	bool isPointInside(const gmmath::GMVec3& point);
+	bool isBoundingBoxInside(const gmmath::GMVec3* vertices);
 	void updateViewMatrix(const glm::mat4& viewMatrix);
 
 public:
@@ -165,7 +165,7 @@ public:
 	  \param y 屏幕上的点的y坐标。
 	  \return 世界坐标。
 	*/
-	glm::vec3 getRayToWorld(GMint x, GMint y) const;
+	gmmath::GMVec3 getRayToWorld(GMint x, GMint y) const;
 
 public:
 	inline const glm::mat4& getProjectionMatrix() { D(d); return getFrustum().getProjectionMatrix(); }
