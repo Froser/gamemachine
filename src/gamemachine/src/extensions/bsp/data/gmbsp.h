@@ -193,10 +193,10 @@ struct GMBSPDrawVertices
 
 GM_ALIGNED_STRUCT(BSPLightVolumes)
 {
-	GMVec3 lightVolOrigin;
-	GMVec3 lightVolSize;
-	GMVec3 lightVolInverseSize;
-	GMVec3 lightVolBounds;
+	GMfloat lightVolOrigin[3];
+	GMfloat lightVolSize[3];
+	GMfloat lightVolInverseSize[3];
+	GMfloat lightVolBounds[3];
 	GMbyte* volData;
 };
 

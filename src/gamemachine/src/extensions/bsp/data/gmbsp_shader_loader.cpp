@@ -89,7 +89,7 @@ namespace
 			gm_error(L"texture %Ls not found", filename.toStdWString().c_str());
 	}
 
-	void readTernaryFloatsFromString(const char* str, glm::vec3& vec)
+	void readTernaryFloatsFromString(const char* str, GMfloat vec[3])
 	{
 		GMScanner s(str);
 		for (GMint i = 0; i < 3; i++)
@@ -443,7 +443,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	glm::vec3 vecColor;
+	GMfloat vecColor[3];
 	readTernaryFloatsFromString(color, vecColor);
 	light.setLightColor(&vecColor[0]);
 
@@ -461,34 +461,33 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 			return;
 		}
 		GMScanner s(color);
-		glm::vec3 vecPosition;
+		GMfloat vecPosition[3];
 		readTernaryFloatsFromString(position, vecPosition);
 		light.setLightPosition(&vecPosition[0]);
 
-		glm::vec3 arg;
-
+		GMfloat arg[3];
 		const char* k = elem->Attribute("ks");
 		if (!k)
 		{
 			readTernaryFloatsFromString("1 1 1", arg);
-			material.ks = arg;
+			material.ks = MakeVector3(arg);
 		}
 		else
 		{
 			readTernaryFloatsFromString(k, arg);
-			material.ks = arg;
+			material.ks = MakeVector3(arg);
 		}
 
 		k = elem->Attribute("kd");
 		if (!k)
 		{
 			readTernaryFloatsFromString("1 1 1", arg);
-			material.ks = arg;
+			material.ks = MakeVector3(arg);
 		}
 		else
 		{
 			readTernaryFloatsFromString(k, arg);
-			material.ks = arg;
+			material.ks = MakeVector3(arg);
 		}
 
 		k = elem->Attribute("shininess");

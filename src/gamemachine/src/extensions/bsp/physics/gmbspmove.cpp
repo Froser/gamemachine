@@ -6,11 +6,6 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmprofile.h"
 
-enum
-{
-	GRAVITY_DIRECTION = 1
-};
-
 static const GMfloat OVERCLIP = 1.f;
 static const GMfloat CLIP_IGNORE = .2f;
 
@@ -48,7 +43,7 @@ void GMBSPMove::processCommand()
 		//TODO 没有在move的时候，可以考虑摩擦使速度减小
 		//这里我们先清空速度
 		if (!d->movementState.freefall)
-			d->initialVelocity = glm::vec3(0);
+			d->initialVelocity = GMVec3(0);
 	}
 
 	if (d->action.jump.jumped)
@@ -66,10 +61,9 @@ void GMBSPMove::processMove()
 		return;
 
 	GMPhysicsMoveArgs moveArgs = d->action.move.args;
-	moveArgs.lookAt[1] = 0.f; // 不考虑roll，始终平视前方
-	glm::quat q = glm::quat(glm::vec3(0, 0, 1), moveArgs.lookAt);
-
-	d->initialVelocity = q * (moveArgs.direction * moveArgs.speed * moveArgs.rate);
+	moveArgs.lookAt.setY(0.f); // 不考虑roll，始终平视前方
+	GMQuat q = GMQuat(GMVec3(0, 0, 1), moveArgs.lookAt);
+	d->initialVelocity = (moveArgs.direction * moveArgs.speed * moveArgs.rate) * q;
 	composeVelocityWithGravity();
 }
 
@@ -79,9 +73,15 @@ void GMBSPMove::processJump()
 	if (!d->movementState.freefall)
 	{
 		// 能够跳跃的场合
-		d->movementState.velocity[0] += d->action.jump.speed[0];
-		d->movementState.velocity[1] = d->action.jump.speed[1];
-		d->movementState.velocity[2] += d->action.jump.speed[2];
+		GMFloat4 f4_velocity, f4_speed;
+		d->movementState.velocity.loadFloat4(f4_velocity);
+		d->action.jump.speed.loadFloat4(f4_speed);
+
+		f4_velocity[0] += f4_speed[0];
+		f4_velocity[1] = f4_speed[1];
+		f4_velocity[2] += f4_speed[2];
+
+		d->movementState.velocity.setFloat4(f4_velocity);
 	}
 }
 
@@ -92,7 +92,7 @@ void GMBSPMove::applyMove(const GMPhysicsMoveArgs& args)
 	d->action.move.args = args;
 }
 
-void GMBSPMove::applyJump(const glm::vec3& speed)
+void GMBSPMove::applyJump(const GMVec3& speed)
 {
 	D(d);
 	d->action.jump.jumped = true;
@@ -118,7 +118,9 @@ void GMBSPMove::generateMovement()
 		composeVelocityWithGravity();
 	}
 
-	glm::getTranslationFromMatrix(d->object->getMotionStates().transform, glm::value_ptr(d->movementState.origin));
+	GMFloat4 f4_origin;
+	GetTranslationFromMatrix(d->object->getMotionStates().transform, f4_origin);
+	d->movementState.origin.setFloat4(f4_origin);
 	d->movementState.startTime = now();
 }
 
@@ -126,28 +128,33 @@ void GMBSPMove::composeVelocityWithGravity()
 {
 	// 获取当前纵向速度，并叠加上加速度
 	D(d);
-	GMfloat accelerationVelocity = d->movementState.velocity[GRAVITY_DIRECTION];
+	GMfloat accelerationVelocity = d->movementState.velocity.getY();
 	d->movementState.velocity = decomposeVelocity(d->initialVelocity);
-	d->movementState.velocity[GRAVITY_DIRECTION] = accelerationVelocity;
+	d->movementState.velocity.setY(accelerationVelocity);
 }
 
-glm::vec3 GMBSPMove::decomposeVelocity(const glm::vec3& v)
+GMVec3 GMBSPMove::decomposeVelocity(const GMVec3& v)
 {
 	D(d);
 	// 将速度分解成水平面平行的分量
-	GMfloat len = glm::fastLength(v);
-	glm::vec3 planeDir = glm::vec3(v[0], 0.f, v[2]);
-	glm::vec3 normal = glm::fastNormalize(planeDir);
+	GMfloat len = Length(v);
+	GMFloat4 f4_v;
+	v.loadFloat4(f4_v);
+	f4_v[1] = 0.f;
+	GMVec3 planeDir;
+	planeDir.setFloat4(f4_v);
+
+	GMVec3 normal = FastNormalize(planeDir);
 	return normal * len;
 }
 
 void GMBSPMove::groundTrace()
 {
 	D(d);
-	glm::vec3 p(d->movementState.origin);
-	p[1] -= .25f;
+	GMVec3 p(d->movementState.origin);
+	p.setY(p.getY() - .25f);
 
-	d->trace->trace(d->movementState.origin, p, glm::vec3(0),
+	d->trace->trace(d->movementState.origin, p, GMVec3(0),
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 		d->movementState.groundTrace
@@ -168,7 +175,7 @@ void GMBSPMove::groundTrace()
 void GMBSPMove::walkMove()
 {
 	D(d);
-	if (d->movementState.velocity == glm::vec3(0))
+	if (d->movementState.velocity == GMVec3(0))
 		return;
 
 	stepSlideMove(false);
@@ -182,8 +189,8 @@ void GMBSPMove::airMove()
 void GMBSPMove::stepSlideMove(bool hasGravity)
 {
 	D(d);
-	glm::vec3 startOrigin = d->movementState.origin;
-	glm::vec3 startVelocity = d->movementState.velocity;
+	GMVec3 startOrigin = d->movementState.origin;
+	GMVec3 startVelocity = d->movementState.velocity;
 	if (!slideMove(hasGravity))
 	{
 		synchronizeMotionStates();
@@ -191,12 +198,12 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	}
 
 	BSPTraceResult t;
-	glm::vec3 stepUp = startOrigin;
-	stepUp[GRAVITY_DIRECTION] += gmBSPPhysicsObjectCast(d->object)->shapeProperties().stepHeight;
+	GMVec3 stepUp = startOrigin;
+	stepUp.setY(stepUp.getY() + gmBSPPhysicsObjectCast(d->object)->shapeProperties().stepHeight);
 	d->trace->trace(
 		d->movementState.origin,
 		stepUp,
-		glm::vec3(0),
+		GMVec3(0),
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 		t);
@@ -214,12 +221,12 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	slideMove(hasGravity);
 
 	// 走下来
-	GMfloat stepSize = t.endpos[GRAVITY_DIRECTION] - startOrigin[GRAVITY_DIRECTION];
-	glm::vec3 stepDown = d->movementState.origin;
-	stepDown[GRAVITY_DIRECTION] -= stepSize;
+	GMfloat stepSize = t.endpos.getY() - startOrigin.getY();
+	GMVec3 stepDown = d->movementState.origin;
+	stepDown.setY(stepDown.getY() - stepSize);
 	d->trace->trace(
 		d->movementState.origin,
-		stepDown, glm::vec3(0), 
+		stepDown, GMVec3(0), 
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 		t);
@@ -229,8 +236,8 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	if (t.fraction < 1.f)
 	{
 		clipVelocity(d->movementState.velocity, t.plane.normal, d->movementState.velocity, OVERCLIP);
-		if (d->movementState.velocity[GRAVITY_DIRECTION] < CLIP_IGNORE)
-			d->movementState.velocity[GRAVITY_DIRECTION] = 0;
+		if (d->movementState.velocity.getY() < CLIP_IGNORE)
+			d->movementState.velocity.setY(0);
 	}
 	synchronizeMotionStates();
 }
@@ -240,24 +247,24 @@ bool GMBSPMove::slideMove(bool hasGravity)
 	D(d);
 	GMBSPPhysicsWorld::Data& wd = d->world->physicsData();
 	GMfloat dt = GM.getGameMachineRunningStates().lastFrameElpased;
-	glm::vec3 velocity = d->movementState.velocity;
+	GMVec3 velocity = d->movementState.velocity;
 
 	GMint numbumps = 4, bumpcount;
-	glm::vec3 endVelocity, endClipVelocity;
+	GMVec3 endVelocity, endClipVelocity;
 	if (hasGravity)
 	{
 		endVelocity = velocity;
-		endVelocity[GRAVITY_DIRECTION] += wd.gravity * dt;
-		velocity[GRAVITY_DIRECTION] = (velocity[GRAVITY_DIRECTION] + endVelocity[GRAVITY_DIRECTION]) * .5f;
+		endVelocity.setY(endVelocity.getY() + wd.gravity * dt);
+		velocity.setY((velocity.getY() + endVelocity.getY()) * .5f);
 	}
 
 	velocity *= dt;
 
-	AlignedVector<glm::vec3> planes;
+	AlignedVector<GMVec3> planes;
 	if (!d->movementState.freefall)
 		planes.push_back(d->movementState.groundTrace.plane.normal);
 
-	planes.push_back(glm::fastNormalize(velocity));
+	planes.push_back(FastNormalize(velocity));
 
 	GMfloat t = 1.0f;
 
@@ -266,7 +273,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 		BSPTraceResult moveTrace;
 		d->trace->trace(d->movementState.origin,
 			d->movementState.origin + velocity * t,
-			glm::vec3(0, 0, 0),
+			GMVec3(0, 0, 0),
 			gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 			gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 			moveTrace
@@ -275,7 +282,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 		if (moveTrace.allsolid)
 		{
 			// entity is completely trapped in another solid
-			d->movementState.velocity[2] = 0;	// don't build up falling damage, but allow sideways acceleration
+			d->movementState.velocity.setZ(0);	// don't build up falling damage, but allow sideways acceleration
 			return true;
 		}
 		if (moveTrace.fraction > 0)
@@ -288,7 +295,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 		GMuint i;
 		for (i = 0; i < planes.size(); i++)
 		{
-			if (glm::dot(moveTrace.plane.normal, planes[i]) > 0.99)
+			if (Dot(moveTrace.plane.normal, planes[i]) > 0.99)
 				velocity += moveTrace.plane.normal;
 		}
 		if (i < planes.size())
@@ -301,10 +308,10 @@ bool GMBSPMove::slideMove(bool hasGravity)
 		//
 
 		// find a plane that it enters
-		glm::vec3 cv; //clipVelocity
+		GMVec3 cv; //clipVelocity
 		for (i = 0; i < planes.size(); i++)
 		{
-			if (glm::dot(velocity, planes[i]) >= 0.1)
+			if (Dot(velocity, planes[i]) >= 0.1)
 				continue; // 朝着平面前方移动，不会有交汇
 			clipVelocity(velocity, planes[i], cv, OVERCLIP);
 			clipVelocity(endVelocity, planes[i], endClipVelocity, OVERCLIP);
@@ -313,7 +320,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 			{
 				if (i == j)
 					continue;
-				if (glm::dot(cv, planes[j]) >= 0.1)
+				if (Dot(cv, planes[j]) >= 0.1)
 					continue;
 
 				// try clipping the move to the plane
@@ -321,21 +328,21 @@ bool GMBSPMove::slideMove(bool hasGravity)
 				clipVelocity(endClipVelocity, planes[i], endClipVelocity, OVERCLIP);
 
 				// see if it goes back into the first clip plane
-				if (glm::dot(cv, planes[i]) >= 0)
+				if (Dot(cv, planes[i]) >= 0)
 					continue;
 
 				// slide the original velocity along the crease
 				{
-					glm::vec3 dir = glm::cross(planes[i], planes[j]);
-					dir = glm::fastNormalize(dir);
-					GMfloat s = glm::dot(dir, velocity);
+					GMVec3 dir = Cross(planes[i], planes[j]);
+					dir = FastNormalize(dir);
+					GMfloat s = Dot(dir, velocity);
 					cv = dir * s;
 				}
 
 				{
-					glm::vec3 dir = glm::cross(planes[i], planes[j]);
-					dir = glm::fastNormalize(dir);
-					GMfloat s = glm::dot(dir, endVelocity);
+					GMVec3 dir = Cross(planes[i], planes[j]);
+					dir = FastNormalize(dir);
+					GMfloat s = Dot(dir, endVelocity);
 					endClipVelocity = dir * s;
 				}
 
@@ -344,10 +351,10 @@ bool GMBSPMove::slideMove(bool hasGravity)
 					if (k == i || k == j)
 						continue;
 
-					if (glm::dot(cv, planes[k]) >= 0.1)
+					if (Dot(cv, planes[k]) >= 0.1)
 						continue;
 
-					velocity = glm::vec3(0);
+					velocity = GMVec3(0);
 					return true;
 				}
 			}
@@ -364,13 +371,10 @@ bool GMBSPMove::slideMove(bool hasGravity)
 	return (bumpcount != 0);
 }
 
-void GMBSPMove::clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::vec3& out, GMfloat overbounce)
+void GMBSPMove::clipVelocity(const GMVec3& in, const GMVec3& normal, GMVec3& out, GMfloat overbounce)
 {
 	GMfloat backoff;
-	GMfloat change;
-	GMint i;
-
-	backoff = glm::dot(in, normal);
+	backoff = Dot(in, normal);
 
 	if (backoff < 0) {
 		backoff *= overbounce;
@@ -379,17 +383,14 @@ void GMBSPMove::clipVelocity(const glm::vec3& in, const glm::vec3& normal, glm::
 		backoff /= overbounce;
 	}
 
-	for (i = 0; i < 3; i++) {
-		change = normal[i] * backoff;
-		out[i] = in[i] - change;
-	}
+	out = in - normal * backoff;
 }
 
 void GMBSPMove::synchronizeMotionStates()
 {
 	D(d);
 	GMMotionStates s = d->object->getMotionStates();
-	s.transform = glm::translate(d->movementState.origin);
+	s.transform = Translate(d->movementState.origin);
 	s.linearVelocity = d->movementState.velocity;
 	d->object->setMotionStates(s);
 }

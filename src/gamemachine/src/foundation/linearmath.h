@@ -62,6 +62,18 @@ inline GMfloat gmFloor(GMfloat x) { return floor(x); }
 inline GMfloat gmMin(GMfloat x, GMfloat y) { return x < y ? x : y; }
 inline GMfloat gmMax(GMfloat x, GMfloat y) { return x > y ? x : y; }
 
+template<typename genType>
+constexpr genType gmRadians(genType degrees)
+{
+	GM_STATIC_ASSERT(std::numeric_limits<genType>::is_iec559, "'radians' only accept floating-point input");
+	return degrees * static_cast<genType>(0.01745329251994329576923690768489);
+}
+
+inline bool gmFuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
+{
+	return (gm::gmFabs(p1 - p2) <= 0.01f);
+}
+
 END_NS
 
 #if GM_USE_DX11
@@ -85,6 +97,17 @@ END_NS
 			v_ = DirectX::XMLoadFloat4(&f4.v_);	\
 		}
 
+#define GMMATH_SET_GET_(basis, n)				\
+		void set##basis(gm::GMfloat S)			\
+		{										\
+			v_ =								\
+			DirectX::XMVectorSet##basis(v_, S);	\
+		}										\
+		gm::GMfloat get##basis() const			\
+		{										\
+			return DirectX::XMVectorGet##basis(v_);\
+		}
+
 #else
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
 	GM_ALIGNED_STRUCT(className)				\
@@ -105,6 +128,16 @@ END_NS
 		{										\
 			_v = makeFunc(&f4);					\
 		}
+
+#define GMMATH_SET_GET_(basis, n)				\
+		void set##basis(gm::GMfloat S)			\
+		{										\
+			v_[n] = S;							\
+		}										\
+		gm::GMfloat get##basis() const			\
+		{										\
+			return v_[n];\
+		}
 #endif
 #define GMMATH_END_STRUCT };
 
@@ -122,17 +155,15 @@ struct GMFloat4
 	DirectX::XMFLOAT4 v_;
 	gm::GMfloat& operator[](gm::GMint i)
 	{
-		return i == X ? v_.x :
-			i == Y ? v_.y :
-			i == Z ? v_.z :
-			i == W ? v_.w :
-			(GM_ASSERT(false), v_.x);
+		GM_ASSERT(i < 4);
+		return *(&(v_.x) + i);
 	}
 #else
 	gm::GMfloat v_[4];
 
 	gm::GMfloat& operator[](XYZW i)
 	{
+		GM_ASSERT(i < 4);
 		return v_[i];
 	}
 #endif
@@ -176,6 +207,10 @@ GMMATH_END_STRUCT
 GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, DirectX::XMVECTOR)
 GMMATH_SET_FLOAT4(glm::make_vec3)
 GMMATH_LOAD_FLOAT4
+GMMATH_SET_GET_(X, 0)
+GMMATH_SET_GET_(Y, 1)
+GMMATH_SET_GET_(Z, 2)
+GMMATH_SET_GET_(W, 3)
 #if GM_USE_DX11
 GMVec3(gm::GMfloat v0)
 {
@@ -202,6 +237,10 @@ GMMATH_END_STRUCT
 GMMATH_BEGIN_STRUCT(GMVec4, glm::vec4, DirectX::XMVECTOR)
 GMMATH_SET_FLOAT4(glm::make_vec4)
 GMMATH_LOAD_FLOAT4
+GMMATH_SET_GET_(X, 0)
+GMMATH_SET_GET_(Y, 1)
+GMMATH_SET_GET_(Z, 2)
+GMMATH_SET_GET_(W, 3)
 #if GM_USE_DX11
 GMVec4(gm::GMfloat v0)
 {
@@ -241,6 +280,18 @@ void loadFloat16(GMFloat16& f16) const
 GMMATH_END_STRUCT
 
 GMMATH_BEGIN_STRUCT(GMQuat, glm::quat, DirectX::XMVECTOR)
+GMMATH_SET_GET_(X, 0)
+GMMATH_SET_GET_(Y, 1)
+GMMATH_SET_GET_(Z, 2)
+GMMATH_SET_GET_(W, 3)
+GMQuat(const GMVec3& U, const GMVec3& V)
+#if GM_USE_DX11
+#else
+	:v_(U.v_, V.v_)
+#endif
+{
+	GM_ASSERT(false);
+}
 GMMATH_END_STRUCT
 
 //////////////////////////////////////////////////////////////////////////
@@ -283,11 +334,27 @@ inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2);
 
 inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2);
 
+inline GMVec3 operator+=(GMVec3& V1, const GMVec3& V2);
+
 inline GMVec3 operator-(const GMVec3& V1, const GMVec3& V2);
+
+inline GMVec3 operator-=(GMVec3& V1, const GMVec3& V2);
+
+inline GMVec3 operator*(const GMVec3& V1, gm::GMfloat S);
+
+inline GMVec3 operator/(const GMVec3& V1, gm::GMfloat S);
+
+inline GMVec3& operator*=(GMVec3& V1, gm::GMfloat S);
+
+inline GMVec3& operator/=(GMVec3& V1, gm::GMfloat S);
 
 inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2);
 
 inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2);
+
+inline GMVec4 operator*(const GMVec4& V1, gm::GMfloat S);
+
+inline bool operator==(const GMVec3& V1, const GMVec3& V2);
 
 //! 计算两个矩阵相乘的结果。
 /*!
@@ -299,6 +366,12 @@ inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2);
 inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2);
 
 inline GMVec4 operator*(const GMVec4& V, const GMMat4& M);
+
+inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2);
+
+inline GMVec4 operator*(const GMVec4& V, const GMQuat& Q);
+
+inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q);
 
 inline GMMat4 QuatToMatrix(const GMQuat& quat);
 
@@ -314,17 +387,33 @@ inline GMVec3 Normalize(const GMVec3& V);
 
 inline GMVec3 FastNormalize(const GMVec3& V);
 
+inline GMVec3 SafeNormalize(const GMVec3& V, const GMVec3& Default = GMVec3(1, 0, 0));
+
 inline GMVec3 MakeVector3(const gm::GMfloat* f);
+
+inline GMVec3 MakeVector3(const GMVec4& V);
+
+inline GMVec4 CombineVector4(const GMVec3& V1, const GMVec4& V2);
 
 inline GMMat4 Translate(const GMVec3& V);
 
 inline GMMat4 Translate(const GMVec4& V);
+
+inline GMMat4 Scale(const GMVec3& V);
 
 inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat zNear, gm::GMfloat zFar);
 
 inline void GetTranslationFromMatrix(const GMMat4& M, OUT GMFloat4& F);
 
 inline void GetScalingFromMatrix(const GMMat4& M, OUT GMFloat4& F);
+
+inline gm::GMint Length(const GMVec3& V);
+
+inline gm::GMint Length(const GMVec4& V);
+
+inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2);
+
+inline GMMat4 Perspective(gm::GMfloat fovy, gm::GMfloat aspect, gm::GMfloat n, gm::GMfloat f);
 
 #include "linearmath.inl"
 

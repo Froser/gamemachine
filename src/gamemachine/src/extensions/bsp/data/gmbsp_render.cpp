@@ -103,14 +103,12 @@ void GMBSPRender::generateVertices()
 	D(d);
 	// create vertices for drawing
 	d->vertices.resize(d->bsp->numDrawVertices);
+	GMFloat4 f4_position;
 	for (GMint i = 0; i < d->bsp->numDrawVertices; i++)
 	{
-		d->vertices[i].position[0] = d->bsp->vertices[i].xyz[0];
-		d->vertices[i].position[1] = d->bsp->vertices[i].xyz[1];
-		d->vertices[i].position[2] = d->bsp->vertices[i].xyz[2];
+		d->vertices[i].position = d->bsp->vertices[i].xyz;
 
 		//scale down
-		// d->vertices[i].position /= SCALING_DOWN;
 		d->vertices[i].decalS = d->bsp->vertices[i].st[0];
 		d->vertices[i].decalT = d->bsp->vertices[i].st[1];
 
@@ -118,12 +116,13 @@ void GMBSPRender::generateVertices()
 		d->vertices[i].lightmapS = d->bsp->vertices[i].lightmap[0];
 		d->vertices[i].lightmapT = d->bsp->vertices[i].lightmap[1];
 
+		d->vertices[i].position.loadFloat4(f4_position);
 		for (GMuint j = 0; j < 3; j++)
 		{
-			if (d->vertices[i].position[j] < d->boundMin[j])
-				d->boundMin[j] = d->vertices[i].position[j];
-			if (d->vertices[i].position[j] > d->boundMax[j])
-				d->boundMax[j] = d->vertices[i].position[j];
+			if (f4_position[j] < d->boundMin[j])
+				d->boundMin[j] = f4_position[j];
+			if (f4_position[j] > d->boundMax[j])
+				d->boundMax[j] = f4_position[j];
 		}
 	}
 }
@@ -255,14 +254,14 @@ void GMBSPRender::generateLeafs()
 		d->leafs[i].numFaces = d->bsp->leafs[i].numLeafSurfaces;
 
 		//Create the bounding box
-		d->leafs[i].boundingBoxVertices[0] = glm::vec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[1] = glm::vec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
-		d->leafs[i].boundingBoxVertices[2] = glm::vec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[3] = glm::vec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
-		d->leafs[i].boundingBoxVertices[4] = glm::vec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[5] = glm::vec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
-		d->leafs[i].boundingBoxVertices[6] = glm::vec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[7] = glm::vec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[0] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[1] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[2] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[3] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[4] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[5] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[6] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[7] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
 
 		// for (GMint j = 0; j < 8; ++j)
 		// 	d->leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
@@ -289,13 +288,13 @@ void GMBSPRender::generateVisibilityData()
 void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& shader, OUT GMModel** obj)
 {
 	D(d);
-
 	GMModel* model = new GMModel();
 	GMMesh* mesh = model->getMesh();
 	mesh->setArrangementMode(GMArrangementMode::Triangles);
 	GMComponent* component = new GMComponent(mesh);
 	component->setShader(shader);
 
+	GMFloat4 f4_position, f4_normal;
 	GM_ASSERT(face.numIndices % 3 == 0);
 	for (GMint i = 0; i < face.numIndices / 3; i++)
 	{
@@ -307,13 +306,15 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 			
 			GMint idx_prev = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 1) % 3];
 			GMint idx_next = d->bsp->drawIndexes[face.firstIndex + i * 3 + (j + 2) % 3];
-			glm::vec3& vertex_prev = d->vertices[face.firstVertex + idx_prev].position,
+			GMVec3& vertex_prev = d->vertices[face.firstVertex + idx_prev].position,
 				&vertex_next = d->vertices[face.firstVertex + idx_next].position;
-			glm::vec3 normal = glm::cross(vertex.position - vertex_prev, vertex_next - vertex.position);
-			normal = glm::fastNormalize(normal);
+			GMVec3 normal = Cross(vertex.position - vertex_prev, vertex_next - vertex.position);
+			normal = FastNormalize(normal);
 
-			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
-			component->normal(normal[0], normal[1], normal[2]);
+			vertex.position.loadFloat4(f4_position);
+			normal.loadFloat4(f4_normal);
+			component->vertex(f4_position[0], f4_position[1], f4_position[2]);
+			component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
@@ -332,11 +333,13 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	component->setShader(shader);
 
 	GMint numVertices = 2 * (biqp.tesselation + 1);
+
+	GMFloat4 f4_position, f4_normal;
 	for (GMint row = 0; row < biqp.tesselation; ++row)
 	{
 		component->beginFace();
 		const GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
-		glm::vec3 normal;
+		GMVec3 normal;
 		for (GMint i = 0; i < numVertices; i++)
 		{
 			GMint idx = *(idxStart + i);
@@ -350,12 +353,14 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 				if (i & 1) //奇数点应该调换一下前后向量，最后再改变法线方向
 					GM_SWAP(idx_prev, idx_next);
 
-				const glm::vec3& vertex_prev = biqp.vertices[idx_prev].position,
+				const GMVec3& vertex_prev = biqp.vertices[idx_prev].position,
 					&vertex_next = biqp.vertices[idx_next].position;
-				normal = -glm::fastNormalize(glm::cross(vertex.position - vertex_prev, vertex_next - vertex.position));
+				normal = -FastNormalize(Cross(vertex.position - vertex_prev, vertex_next - vertex.position));
 			}
-			component->vertex(vertex.position[0], vertex.position[1], vertex.position[2]);
-			component->normal(normal[0], normal[1], normal[2]);
+			vertex.position.loadFloat4(f4_position);
+			normal.loadFloat4(f4_normal);
+			component->vertex(f4_position[0], f4_position[1], f4_position[2]);
+			component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 			component->uv(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
@@ -364,7 +369,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	*obj = model;
 }
 
-void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position, const GMShader& shader, OUT GMModel** obj)
+void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const GMShader& shader, OUT GMModel** obj)
 {
 	static GMfloat v[24] = {
 		1, -1, 1,
@@ -395,15 +400,20 @@ void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position,
 	GMMesh* mesh = model->getMesh();
 	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
+	GMFloat4 f4_extents, f4_position;
+	extents.loadFloat4(f4_extents);
+	position.loadFloat4(f4_position);
+
 	GMfloat t[24];
 	for (GMint i = 0; i < 24; i++)
 	{
-		t[i] = extents[i % 3] * v[i] + position[i % 3];
+		t[i] = f4_extents[i % 3] * v[i] + f4_position[i % 3];
 	}
 
 	GMComponent* component = new GMComponent(mesh);
 	component->setShader(shader);
 
+	GMFloat4 f4_vertex, f4_normal;
 	for (GMint i = 0; i < 12; i++)
 	{
 		component->beginFace();
@@ -412,14 +422,16 @@ void GMBSPRender::createBox(const glm::vec3& extents, const glm::vec3& position,
 			GMint idx = i * 3 + j; //顶点的开始
 			GMint idx_next = i * 3 + (j + 1) % 3;
 			GMint idx_prev = i * 3 + (j + 2) % 3;
-			glm::vec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-			glm::vec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
+			GMVec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
+			GMVec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 				vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-			glm::vec3 normal = glm::cross(vertex - vertex_prev, vertex_next - vertex);
-			normal = glm::fastNormalize(normal);
+			GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
+			normal = FastNormalize(normal);
 
-			component->vertex(vertex[0], vertex[1], vertex[2]);
-			component->normal(normal[0], normal[1], normal[2]);
+			vertex.loadFloat4(f4_vertex);
+			normal.loadFloat4(f4_normal);
+			component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+			component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 			//TODO
 			//component->uv(vertex.decalS, vertex.decalT);
 			//component->lightmap(1.f, 1.f);

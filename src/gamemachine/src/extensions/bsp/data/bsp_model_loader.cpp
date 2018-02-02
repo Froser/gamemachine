@@ -117,10 +117,11 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 	if ((b = ti->Attribute("extents")))
 	{
 		GMScanner s(b);
-		for (GMint i = 0; i < 3; i++)
-		{
-			s.nextFloat(&m->extents[i]);
-		}
+		GMFloat4 f4_extents;
+		s.nextFloat(&f4_extents.v_.x);
+		s.nextFloat(&f4_extents.v_.y);
+		s.nextFloat(&f4_extents.v_.z);
+		m->extents.setFloat4(f4_extents);
 	}
 
 	if ((b = ti->Attribute("model")))

@@ -74,11 +74,6 @@ namespace glm
 		memcpy_s(value, sizeof(gm::GMfloat) * 3, v, sizeof(gm::GMfloat) * 3);
 	}
 
-	inline bool fuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
-	{
-		return (gm::gmFabs(p1 - p2) <= 0.01f);
-	}
-
 	inline vec3 toInhomogeneous(const vec4& v4)
 	{
 		return vec3(v4.x / v4.x, v4.y / v4.w, v4.z / v4.w);
@@ -220,11 +215,49 @@ inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2)
 	return V;
 }
 
+inline GMVec3 operator+=(GMVec3& V1, const GMVec3& V2)
+{
+	V1 = V1 + V2;
+	return V1;
+}
+
 inline GMVec3 operator-(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 V;
 	V.v_ = V1.v_ - V2.v_;
 	return V;
+}
+
+inline GMVec3 operator-=(GMVec3& V1, const GMVec3& V2)
+{
+	V1 = V1 - V2;
+	return V1;
+}
+
+inline GMVec3 operator*(const GMVec3& V1, gm::GMfloat S)
+{
+	GMVec3 V;
+	V.v_ = V1.v_ * S;
+	return V;
+}
+
+inline GMVec3& operator*=(GMVec3& V1, gm::GMfloat S)
+{
+	V1 = V1 * S;
+	return V1;
+}
+
+inline GMVec3 operator/(const GMVec3& V1, gm::GMfloat S)
+{
+	GMVec3 V;
+	V.v_ = V1.v_ / S;
+	return V;
+}
+
+inline GMVec3& operator/=(GMVec3& V1, gm::GMfloat S)
+{
+	V1 = V1 / S;
+	return V1;
 }
 
 inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2)
@@ -241,27 +274,72 @@ inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2)
 	return V;
 }
 
+inline GMVec4 operator*(const GMVec4& V, gm::GMfloat S)
+{
+	GMVec4 R;
+	R.v_ = V.v_ * S;
+	return R;
+}
+
+inline bool operator==(const GMVec3& V1, const GMVec3& V2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVector3Equal(V1.v_, V2.v_);
+#else
+	return V1.v_ == V2.v_;
+#endif;
+}
+
 inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)
 {
-	GMMat4 result;
+	GMMat4 R;
 #if GM_USE_DX11
-	result.v_ = M1.v_ * M2.v_;
+	R.v_ = M1.v_ * M2.v_;
 #else
 	// opengl为列优先，为了计算先M1变换，再M2变换，应该用M2 * M1
-	result.v_ = M2.v_ * M1.v_;
+	R.v_ = M2.v_ * M1.v_;
 #endif
-	return result;
+	return R;
+}
+
+inline GMVec3 operator*(const GMVec3& V1, const GMVec3& V2)
+{
+	GMVec3 R;
+	R.v_ = V1.v_ * V2.v_;
+	return R;
 }
 
 inline GMVec4 operator*(const GMVec4& V, const GMMat4& M)
 {
-	GMVec4 result;
+	GMVec4 R;
 #if GM_USE_DX11
-	result.v_ = DirectX::XMVector3Transform(V.v_, M.v_);
+	R.v_ = DirectX::XMVector3Transform(V.v_, M.v_);
 #else
-	result.v_ = M.v_ * V.v_;
+	R.v_ = M.v_ * V.v_;
 #endif
-	return result;
+	return R;
+}
+
+inline GMVec4 operator*(const GMVec4& V, const GMQuat& Q)
+{
+#if GM_USE_DX11
+	return V * QuatToMatrix(Q);
+#else
+	GMVec4 R;
+	R.v_ = Q.v_ * V.v_;
+	return R;
+#endif
+}
+
+inline GMVec3 operator*(const GMVec3& V, const GMQuat& Q)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVector3Transform(V.v_, QuatToMatrix(Q).v_);
+#else
+	R.v_ = Q.v_ * V.v_;
+#endif
+	return R;
 }
 
 inline GMMat4 QuatToMatrix(const GMQuat& quat)
@@ -335,9 +413,52 @@ inline GMVec3 FastNormalize(const GMVec3& V)
 	return R;
 }
 
+inline GMVec3 SafeNormalize(const GMVec3& V, const GMVec3& Default)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	gm::GMfloat len = Length(V);
+	if (len >= FLT_EPSILON * FLT_EPSILON)
+	{
+		gm::GMfloat sl = gm::gmSqrt(len);
+		return V * (1.f / sl);
+	}
+	else
+	{
+		return Default;
+	}
+#else
+	R.v_ = glm::safeNormalize(R.v_);
+#endif
+	return R;
+}
+
 inline GMVec3 MakeVector3(const gm::GMfloat* f)
 {
 	return GMVec3(f[0], f[1], f[2]);
+}
+
+inline GMVec3 MakeVector3(const GMVec4& V)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = V.v_;
+#else
+	R.v_ = glm::make_vec3(f.v_);
+#endif
+	return R;
+}
+
+inline GMVec4 CombineVector4(const GMVec3& V1, const GMVec4& V2)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = V1.v_;
+	R.setW(V2.getW());
+#else
+	return glm::combine_vec4(V1.v_, V2.v_);
+#endif
+	return R;
 }
 
 inline GMMat4 Translate(const GMVec3& V)
@@ -358,6 +479,17 @@ inline GMMat4 Translate(const GMVec4& V)
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
 	M.v_ = glm::translate(R.v_);
+#endif
+	return M;
+}
+
+inline GMMat4 Scale(const GMVec3& V)
+{
+	GMMat4 M;
+#if GM_USE_DX11
+	M.v_ = DirectX::XMMatrixScalingFromVector(V.v_);
+#else
+	M.v_ = glm::scale(R.v_);
 #endif
 	return M;
 }
@@ -388,4 +520,48 @@ inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm:
 #else
 	M.v_ = glm::ortho(left, right, bottom, top, n, f);
 #endif
+}
+
+inline gm::GMint Length(const GMVec3& V)
+{
+#if GM_USE_DX11
+	GMFloat4 f;
+	DirectX::XMStoreFloat4(&f.v_, DirectX::XMVector3Length(V.v_));
+	return f[0];
+#else
+	return glm::length(V.v_);
+#endif
+}
+
+inline gm::GMint Length(const GMVec4& V)
+{
+#if GM_USE_DX11
+	GMFloat4 f;
+	DirectX::XMStoreFloat4(&f.v_, DirectX::XMVector4Length(V.v_));
+	return f[0];
+#else
+	return glm::length(V.v_);
+#endif
+}
+
+inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVector3Cross(V1.v_, V2.v_);
+#else
+	R.v_ = glm::cross(V1.v_, V2.v_);
+#endif
+	return R;
+}
+
+inline GMMat4 Perspective(gm::GMfloat fovy, gm::GMfloat aspect, gm::GMfloat n, gm::GMfloat f)
+{
+	GMMat4 R;
+#if GM_USE_DX11
+	R.v_ = XMMatrixPerspectiveFovLH(fovy, aspect, n, f);
+#else
+	R.v_ = glm::perspective(fovy, aspect, n, f);
+#endif
+	return R;
 }

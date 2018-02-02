@@ -26,24 +26,8 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	d->n = n;
 	d->f = f;
 
-#if GM_USE_DX11
-	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
-	{
-		d->mvpMatrix.projMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
-		update();
-	}
-	else
-	{
-		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		D3DXMatrixOrthoOffCenterLH(&d->mvpMatrix.projMatrix, d->left, d->right, d->bottom, d->top, d->n, d->f);
-		dxUpdate();
-	}
-#else
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
-	d->projMatrix = glm::ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	d->mvpMatrix.projMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
 	update();
-#endif
-		
 }
 
 void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -55,30 +39,15 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	d->n = n;
 	d->f = f;
 
-#if GM_USE_DX11
-	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
-	{
-		d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
-		update();
-	}
-	else
-	{
-		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		D3DXMatrixPerspectiveFovLH(&d->mvpMatrix.projMatrix, d->fovy, d->aspect, d->n, d->f);
-		dxUpdate();
-	}
-#else
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL);
-	d->projMatrix = glm::perspective(d->fovy, d->aspect, d->n, d->f);
+	d->mvpMatrix.projMatrix = Perspective(d->fovy, d->aspect, d->n, d->f);
 	update();
-#endif
 }
 
 void GMFrustum::update()
 {
 	D(d);
 	const GMMat4& projection = getProjectionMatrix();
-	GMMat4& view = d->viewMatrix;
+	GMMat4& view = d->mvpMatrix.viewMatrix;
 	GMMat4 clipMat;
 
 	if (d->type == GMFrustumType::Perspective)
@@ -86,7 +55,9 @@ void GMFrustum::update()
 		//Multiply the matrices
 		clipMat = view * projection;
 
-		GMfloat* clip = glm::value_ptr(clipMat);
+		GMFloat16 f16_clip;
+		clipMat.loadFloat16(f16_clip);
+		GMfloat* clip = reinterpret_cast<GMfloat*>(&f16_clip); //这样转型没有问题吗
 
 		//calculate planes
 		d->planes[RIGHT_PLANE].normal = GMVec3(clip[3] - clip[0], clip[7] - clip[4], clip[11] - clip[8]);
@@ -132,11 +103,6 @@ void GMFrustum::update()
 	//normalize planes
 	for (int i = 0; i < 6; ++i)
 		d->planes[i].normalize();
-}
-
-void GMFrustum::dxUpdate()
-{
-
 }
 
 //is a point in the Frustum?
@@ -186,31 +152,8 @@ bool GMFrustum::isBoundingBoxInside(const GMVec3 * vertices)
 void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 {
 	D(d);
-	d->viewMatrix = viewMatrix;
-	if (GM.getRenderEnvironment() == GMRenderEnvironment::OpenGL)
-	{
-		update();
-	}
-	else
-	{
-		GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-		dxUpdate();
-	}
-}
-
-#if GM_USE_DX11
-const GMMVPMatrix& GMFrustum::getDxVPMatrix()
-{
-	D(d);
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	return d->mvpMatrix;
-}
-
-void GMFrustum::setDxVPMatrix(const GMMVPMatrix& m)
-{
-	D(d);
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
-	d->mvpMatrix = m;
+	d->mvpMatrix.viewMatrix = viewMatrix;
+	update();
 }
 
 const GMMat4& GMFrustum::getProjectionMatrix()
@@ -227,6 +170,7 @@ const GMMat4& GMFrustum::getViewMatrix()
 	return d->mvpMatrix.viewMatrix;
 }
 
+#if GM_USE_DX11
 void GMFrustum::setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer)
 {
 	D(d);
@@ -244,7 +188,7 @@ GMComPtr<ID3D11Buffer> GMFrustum::getDxMatrixBuffer()
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
+	d->frustum.setPerspective(gmRadians(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
 	d->lookAt.lookAt = GMVec3(0, 0, 1);
 }
@@ -303,9 +247,9 @@ GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 		// 从摄像机向上方向，算出摄像机坐标系 (hor, vertical, rayForward)
 		GMVec3 cameraUp = d->lookAt.up;
 		GMVec3 vertical = cameraUp;
-		GMVec3 hor = glm::cross(rayForward, vertical);
+		GMVec3 hor = Cross(rayForward, vertical);
 		hor = glm::safeNormalize(hor);
-		vertical = glm::cross(hor, rayForward);
+		vertical = Cross(hor, rayForward);
 		vertical = glm::safeNormalize(vertical);
 
 		GMfloat tanfov = gmTan(0.5f*fov);

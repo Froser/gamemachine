@@ -10,7 +10,7 @@ class GMParticles;
 GM_PRIVATE_OBJECT(GMParticleGameObject)
 {
 	GMVec4 color = GMVec4(1);
-	GMMat4 transform = identity<GMMat4>();
+	GMMat4 transform = Identity<GMMat4>();
 	GMfloat currentLife = 0;
 	GMfloat maxLife = 0;
 	GMParticles* parentParticles = nullptr;

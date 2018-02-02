@@ -14,10 +14,10 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMPhysicsObject* physics = nullptr;
 	GMGameWorld* world = nullptr;
 	GMModel* model = nullptr;
-	GMMat4 scaling = identity<GMMat4>();
-	GMMat4 translation = identity<GMMat4>();
-	GMQuat rotation = identity<GMQuat>();
-	GMMat4 transformMatrix = identity<GMMat4>();
+	GMMat4 scaling = Identity<GMMat4>();
+	GMMat4 translation = Identity<GMMat4>();
+	GMQuat rotation = Identity<GMQuat>();
+	GMMat4 transformMatrix = Identity<GMMat4>();
 	bool canDeferredRendering = true;
 };
 

@@ -146,8 +146,8 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 	GMBSP_Render_VisibilityData visibilityData;
 
 	// 用于绘制天空
-	GMVec3 boundMin = GMVec3(BOUNDING);
-	GMVec3 boundMax = GMVec3(-BOUNDING);
+	GMfloat boundMin[3] = { BOUNDING, BOUNDING, BOUNDING };
+	GMfloat boundMax[3] = { -BOUNDING, -BOUNDING, -BOUNDING };
 };
 
 typedef GMBSPRenderPrivate GMBSPRenderData;

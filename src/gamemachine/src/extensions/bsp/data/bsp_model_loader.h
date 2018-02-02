@@ -10,7 +10,7 @@ BEGIN_NS
 
 GM_ALIGNED_STRUCT(Model)
 {
-	glm::vec3 extents;
+	GMVec3 extents;
 	char classname[64];
 	char model[64];
 	bool create;

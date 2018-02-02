@@ -17,7 +17,7 @@ enum PlaneType
 
 GM_ALIGNED_STRUCT(GMBSPLeafList)
 {
-	glm::vec3 bounds[2];
+	GMVec3 bounds[2];
 	AlignedVector<GMint> list;
 	GMint lastLeaf;
 };
@@ -39,7 +39,7 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Brush)
 
 	GMBSPBrush* brush;
 	GMint contents;
-	glm::vec3 bounds[2];
+	GMVec3 bounds[2];
 	GMBSP_Physics_BrushSide *sides;
 	GMint checkcount;
 };
@@ -47,7 +47,7 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Brush)
 // Begin patches definitions
 GM_ALIGNED_STRUCT(GMBSPPatchPlane)
 {
-	glm::vec4 plane;
+	GMVec4 plane;
 	GMint signbits;		// signx + (signy<<1) + (signz<<2), used as lookup during collision
 };
 
@@ -90,7 +90,7 @@ GM_ALIGNED_STRUCT(GMBSP_Physics_Patch)
 
 GM_ALIGNED_STRUCT(GMBSPShapeProperties)
 {
-	glm::vec3 bounding[2]; //!< 最小边界和最大边界，用于碰撞检测
+	GMVec3 bounding[2]; //!< 最小边界和最大边界，用于碰撞检测
 	GMfloat stepHeight;
 };
 

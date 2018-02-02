@@ -367,9 +367,9 @@ void GMBSP::toDxCoord()
 	for (GMint i = 0; i < d->numDrawVertices; i++)
 	{
 		//swap y and z
-		GMfloat &_1 = d->vertices[i].xyz[1],
-			&_2 = d->vertices[i].xyz[2];
-		GM_SWAP(_1, _2);
+		GMfloat _y = d->vertices[i].xyz.getY();
+		d->vertices[i].xyz.setY(d->vertices[i].xyz.getZ());
+		d->vertices[i].xyz.setZ(_y);
 
 		//Transfer texture coordinates (Invert t)
 		d->vertices[i].st[1] = -d->vertices[i].st[1];
@@ -378,7 +378,10 @@ void GMBSP::toDxCoord()
 	for (GMint i = 0; i < d->numplanes; ++i)
 	{
 		//swap y and z
-		GM_SWAP(d->planes[i].normal[1], d->planes[i].normal[2]);
+		GMfloat _y = d->planes[i].normal.getY();
+		d->planes[i].normal.setY(d->planes[i].normal.getZ());
+		d->planes[i].normal.setZ(_y);
+
 		d->planes[i].intercept = -d->planes[i].intercept;
 	}
 }
@@ -411,10 +414,13 @@ void GMBSP::parseEntities()
 void GMBSP::generateLightVolumes()
 {
 	D(d);
-	d->lightVols.lightVolInverseSize = 1.f / d->lightVols.lightVolSize;
+	for (GMuint i = 0; i < 3; ++i)
+	{
+		d->lightVols.lightVolInverseSize[i] = 1.f / d->lightVols.lightVolSize[i];
+	}
 	GMfloat* wMins = d->models[0].mins;
 	GMfloat* wMaxs = d->models[0].maxs;
-	GMVec3 maxs;
+	GMfloat maxs[3];
 	GMint numGridPoints = 0;
 
 	for (GMuint i = 0; i < 3; i++)

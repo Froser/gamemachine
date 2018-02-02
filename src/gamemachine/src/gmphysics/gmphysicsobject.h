@@ -28,18 +28,18 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 class GMRigidPhysicsObject;
 GM_ALIGNED_STRUCT(GMPhysicsRayTestResult)
 {
-	GMVec3 rayFromWorld = zero<GMVec3>();
-	GMVec3 rayToWorld = zero<GMVec3>();
-	GMVec3 hitPointWorld = zero<GMVec3>();
-	GMVec3 hitNormalWorld = zero<GMVec3>();
+	GMVec3 rayFromWorld = Zero<GMVec3>();
+	GMVec3 rayToWorld = Zero<GMVec3>();
+	GMVec3 hitPointWorld = Zero<GMVec3>();
+	GMVec3 hitNormalWorld = Zero<GMVec3>();
 	GMRigidPhysicsObject* hitObject = nullptr;
 	bool hit = false;
 };
 
 GM_ALIGNED_STRUCT(GMMotionStates)
 {
-	GMMat4 transform = identity<GMMat4>();
-	GMVec3 linearVelocity = zero<GMVec3>();
+	GMMat4 transform = Identity<GMMat4>();
+	GMVec3 linearVelocity = Zero<GMVec3>();
 };
 
 GM_PRIVATE_OBJECT(GMPhysicsObject)
