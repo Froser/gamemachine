@@ -47,11 +47,11 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 		);
 		GMVec4 transformedPosition = basePositionVector * d->transform;
 		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * GMModel::PositionDimension + 2) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
-		glm::copyToArray(GMVec3(transformedPosition), (GMfloat*)(vertexData + offset_position) + offset * GMModel::PositionDimension);
+		CopyToArray(GMVec3(transformedPosition), (GMfloat*)(vertexData + offset_position) + offset * GMModel::PositionDimension);
 
 		//更新颜色
 		GM_ASSERT((GMLargeInteger)(vertexData + color_offset + offset * GMModel::TextureDimension + 3) <= (GMLargeInteger)(vertexData + totalSize));
-		glm::copyToArray(d->color, (GMfloat*)(vertexData + color_offset) + offset * GMModel::TextureDimension);
+		CopyToArray(d->color, (GMfloat*)(vertexData + color_offset) + offset * GMModel::TextureDimension);
 	}
 }
 
@@ -289,7 +289,7 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
-	GMfloat size = glm::lerp(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
+	GMfloat size = Lerp(d->particleProps[index].startSize, d->particleProps[index].endSize, percentage);
 	
 	GMMat4 transform;
 	if (d->particleProps[index].visible)
@@ -297,13 +297,13 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 		if (d->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
 			transform = Translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
-				* QuatToMatrix(glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
+				* QuatToMatrix(Lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
 				* Scale(GMVec3(size));
 		}
 		else
 		{
 			transform = Translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
-				* QuatToMatrix(glm::lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
+				* QuatToMatrix(Lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
 				* Scale(GMVec3(size));
 		}
 	}
@@ -313,7 +313,7 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 	}
 	particle->setTransform(transform);
 
-	GMVec4 currentColor = glm::lerp(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
+	GMVec4 currentColor = Lerp(d->particleProps[index].startColor, d->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
 
 	reduceLife(particle);
@@ -434,12 +434,12 @@ void GMLerpParticleEmitter::create(
 				normalEnd = FastNormalize(endDirectionRange);
 			GMVec3 axis = FastNormalize(Cross(normalStart, normalEnd));
 			GMfloat theta = Dot(normalStart, normalEnd);
-			GMQuat qStart = glm::rotate(Identity<GMQuat>(), 0.f, axis),
-				qEnd = glm::rotate(Identity<GMQuat>(), gmAcos(theta), axis);
+			GMQuat qStart = Rotate(0.f, axis),
+				qEnd = Rotate(gmAcos(theta), axis);
 
-			GMQuat interpolation = glm::slerp(qStart, qEnd, (GMfloat)i / (count - 1));
-			GMVec4 transformed = QuatToMatrix(interpolation) * glm::toHomogeneous(normalStart);
-			particleProps[i].direction = glm::toInhomogeneous(transformed);
+			GMQuat interpolation = Lerp(qStart, qEnd, (GMfloat)i / (count - 1));
+			GMVec4 transformed = GMVec4(normalStart, 1) * QuatToMatrix(interpolation);
+			particleProps[i].direction = Inhomogeneous(transformed);
 		}
 
 		particleProps[i].life = life;
@@ -518,24 +518,24 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 
 	GMfloat percentage = 1 - particle->getCurrentLife() / particle->getMaxLife();
 	GMfloat diff = particle->getMaxLife() - particle->getCurrentLife();
-	GMfloat size = glm::lerp(db->particleProps[index].startSize, db->particleProps[index].endSize, percentage);
-	GMQuat rotation = glm::rotate(Identity<GMQuat>(), d->currentAngles[index], d->rotateAxis);
+	GMfloat size = Lerp(db->particleProps[index].startSize, db->particleProps[index].endSize, percentage);
+	GMQuat rotation = Rotate(d->currentAngles[index], d->rotateAxis);
 
 	GMMat4 transform;
 	if (db->particleProps[index].visible)
 	{
-		GMVec4 rotatedDirection = QuatToMatrix(rotation) * glm::toHomogeneous(db->particleProps[index].direction);
+		GMVec4 rotatedDirection = GMVec4(db->particleProps[index].direction, 1) * QuatToMatrix(rotation);
 		
 		if (db->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			transform = Translate(db->particleProps[index].startupPosition + glm::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
-				* QuatToMatrix(glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
+			transform = Translate(db->particleProps[index].startupPosition + Inhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				* QuatToMatrix(Lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
 				* Scale(GMVec3(size));
 		}
 		else
 		{
-			transform = Translate(db->emitterProps.position + glm::toInhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
-				* QuatToMatrix(glm::lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
+			transform = Translate(db->emitterProps.position + Inhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				* QuatToMatrix(Lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
 				* Scale(GMVec3(size));
 		}
 	}
@@ -545,7 +545,7 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 	}
 	particle->setTransform(transform);
 
-	GMVec4 currentColor = glm::lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
+	GMVec4 currentColor = Lerp(db->particleProps[index].startColor, db->particleProps[index].endColor, percentage);
 	particle->setColor(currentColor);
 
 	reduceLife(particle);

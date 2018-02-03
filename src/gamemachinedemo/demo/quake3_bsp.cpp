@@ -29,7 +29,7 @@ void Demo_Quake3_BSP::setLookAt()
 {
 	// 设置一个默认视角
 	gm::GMCamera& camera = GM.getCamera();
-	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(gm::gmRadians(75.f), 1.333f, .1f, 3200);
 	GM.getCamera().synchronizeLookAt();
 }
 
@@ -102,27 +102,27 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::IMouseState& mouseState = inputManager->getMouseState();
 
 		gm::GMJoystickState state = joyState.joystickState();
-		glm::vec3 direction(0);
+		GMVec3 direction(0);
 
 		if (kbState.keydown('A'))
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(-1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
 
 		if (kbState.keydown('D'))
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
 		if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(1, 0, 0), glm::vec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
 
 		if (kbState.keydown('S'))
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, -1));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
 		if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, -1), glm::vec3(gm::GMfloat(state.thumbLY) / SHRT_MIN));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MIN));
 
 		if (kbState.keydown('W'))
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, 1));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
 		if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, glm::vec3(0, 0, 1), glm::vec3(gm::GMfloat(state.thumbLY) / SHRT_MAX));
+			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MAX));
 
 		if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 			d->sprite->action(gm::GMMovement::Jump);
@@ -158,10 +158,10 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 
 			joystickYaw = state.thumbRX * joystickSensitivity * rate;
 		}
-		d->sprite->look(glm::radians(joystickPitch), glm::radians(joystickYaw));
+		d->sprite->look(gm::gmRadians(joystickPitch), gm::gmRadians(joystickYaw));
 
 		gm::GMMouseState ms = mouseState.mouseState();
-		d->sprite->look(glm::radians(-ms.deltaY * mouseSensitivity), glm::radians(-ms.deltaX * mouseSensitivity));
+		d->sprite->look(gm::gmRadians(-ms.deltaY * mouseSensitivity), gm::gmRadians(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered('P'))
 			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));

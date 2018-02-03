@@ -67,68 +67,59 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	tw.start = start + offset;
 	tw.end = end + offset;
 
-	tw.maxOffset = tw.size[1][0] + tw.size[1][1] + tw.size[1][2];
+	GMFloat4 f4_size[2];
+	tw.size[0].loadFloat4(f4_size[0]);
+	tw.size[1].loadFloat4(f4_size[1]);
+	tw.maxOffset = f4_size[1][0] + f4_size[1][1] + f4_size[1][2];
 
 	// tw.offsets[signbits] = vector to appropriate corner from origin
 	// 以原点为中心，offsets[8]表示立方体的8个顶点
 	// 使用offsets[signbits]可以找到3个平面相交的那个角
-	tw.offsets[0][0] = tw.size[0][0];
-	tw.offsets[0][1] = tw.size[0][1];
-	tw.offsets[0][2] = tw.size[0][2];
+	tw.offsets[0] = tw.size[0];
+	tw.offsets[1] = tw.size[1];
+	tw.offsets[2] = tw.size[0];
+	tw.offsets[3] = tw.size[1];
+	tw.offsets[4] = tw.size[0];
+	tw.offsets[5] = tw.size[1];
+	tw.offsets[6] = tw.size[0];
+	tw.offsets[7] = tw.size[1];
 
-	tw.offsets[1][0] = tw.size[1][0];
-	tw.offsets[1][1] = tw.size[0][1];
-	tw.offsets[1][2] = tw.size[0][2];
+	GMFloat4 f4_bounds[2], f4_start, f4_end, f4_sphere_offset;
+	tw.start.loadFloat4(f4_start);
+	tw.end.loadFloat4(f4_end);
 
-	tw.offsets[2][0] = tw.size[0][0];
-	tw.offsets[2][1] = tw.size[1][1];
-	tw.offsets[2][2] = tw.size[0][2];
-
-	tw.offsets[3][0] = tw.size[1][0];
-	tw.offsets[3][1] = tw.size[1][1];
-	tw.offsets[3][2] = tw.size[0][2];
-
-	tw.offsets[4][0] = tw.size[0][0];
-	tw.offsets[4][1] = tw.size[0][1];
-	tw.offsets[4][2] = tw.size[1][2];
-
-	tw.offsets[5][0] = tw.size[1][0];
-	tw.offsets[5][1] = tw.size[0][1];
-	tw.offsets[5][2] = tw.size[1][2];
-
-	tw.offsets[6][0] = tw.size[0][0];
-	tw.offsets[6][1] = tw.size[1][1];
-	tw.offsets[6][2] = tw.size[1][2];
-
-	tw.offsets[7][0] = tw.size[1][0];
-	tw.offsets[7][1] = tw.size[1][1];
-	tw.offsets[7][2] = tw.size[1][2];
-
-	if (tw.sphere.use) {
+	if (tw.sphere.use)
+	{
+		tw.sphere.offset.loadFloat4(f4_sphere_offset);
 		for (GMint i = 0; i < 3; i++) {
-			if (tw.start[i] < tw.end[i]) {
-				tw.bounds[0][i] = tw.start[i] - fabs(tw.sphere.offset[i]) - tw.sphere.radius;
-				tw.bounds[1][i] = tw.end[i] + fabs(tw.sphere.offset[i]) + tw.sphere.radius;
+			if (f4_start[i] < f4_end[i]) {
+				f4_bounds[0][i] = f4_start[i] - fabs(f4_sphere_offset[i]) - tw.sphere.radius;
+				f4_bounds[1][i] = f4_end[i] + fabs(f4_sphere_offset[i]) + tw.sphere.radius;
 			}
 			else {
-				tw.bounds[0][i] = tw.end[i] - fabs(tw.sphere.offset[i]) - tw.sphere.radius;
-				tw.bounds[1][i] = tw.start[i] + fabs(tw.sphere.offset[i]) + tw.sphere.radius;
+				f4_bounds[0][i] = f4_end[i] - fabs(f4_sphere_offset[i]) - tw.sphere.radius;
+				f4_bounds[1][i] = f4_start[i] + fabs(f4_sphere_offset[i]) + tw.sphere.radius;
 			}
 		}
 	}
 	else
 	{
-		for (GMint i = 0; i < 3; i++) {
-			if (tw.start[i] < tw.end[i]) {
-				tw.bounds[0][i] = tw.start[i] + tw.size[0][i];
-				tw.bounds[1][i] = tw.end[i] + tw.size[1][i];
+		for (GMint i = 0; i < 3; i++)
+		{
+			if (f4_start[i] < f4_end[i])
+			{
+				f4_bounds[0][i] = f4_start[i] + f4_size[0][i];
+				f4_bounds[1][i] = f4_end[i] + f4_size[1][i];
 			}
-			else {
-				tw.bounds[0][i] = tw.end[i] + tw.size[0][i];
-				tw.bounds[1][i] = tw.start[i] + tw.size[1][i];
+			else
+			{
+				f4_bounds[0][i] = f4_end[i] + f4_size[0][i];
+				f4_bounds[1][i] = f4_start[i] + f4_size[1][i];
 			}
 		}
 	}
+	tw.bounds[0].setFloat4(f4_bounds[0]);
+	tw.bounds[1].setFloat4(f4_bounds[1]);
 
 	if (start == end)
 	{
@@ -152,12 +143,13 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	}
 	else
 	{
-		if (tw.size[0][0] == 0 && tw.size[0][1] == 0 && tw.size[0][2] == 0)
+		if (f4_size[0][0] == 0 && f4_size[0][1] == 0 && f4_size[0][2] == 0)
 		{
 			tw.isPoint = true;
 			tw.extents = GMVec3(0);
 		}
-		else {
+		else
+		{
 			tw.isPoint = false;
 			tw.extents = tw.size[1];
 		}
@@ -180,7 +172,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	// Otherwise, the normal on the plane should have unit length
 	GM_ASSERT(tw.trace.allsolid ||
 		tw.trace.fraction == 1.0 ||
-		glm::lengthSquare(tw.trace.plane.normal) > 0.9999f);
+		LengthSq(tw.trace.plane.normal) > 0.9999f);
 	trace = tw.trace;
 }
 
@@ -217,13 +209,18 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	GMfloat t1, t2, offset;
 
 	GMfloat dist = plane->intercept;
-
-	if (plane->planeType < PLANE_NON_AXIAL) {
-		t1 = p1[plane->planeType] + dist;
-		t2 = p2[plane->planeType] + dist;
-		offset = tw.extents[plane->planeType];
+	GMFloat4 f4_p1, f4_p2, f4_extents;
+	p1.loadFloat4(f4_p1);
+	p2.loadFloat4(f4_p2);
+	tw.extents.loadFloat4(f4_extents);
+	if (plane->planeType < PLANE_NON_AXIAL)
+	{
+		t1 = f4_p1[plane->planeType] + dist;
+		t2 = f4_p2[plane->planeType] + dist;
+		offset = f4_extents[plane->planeType];
 	}
-	else {
+	else
+	{
 		t1 = Dot(plane->normal, p1) + dist;
 		t2 = Dot(plane->normal, p2) + dist;
 		if (tw.isPoint) {
@@ -236,11 +233,14 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	}
 
 	// see which sides we need to consider
-	if (t1 >= offset + 1 && t2 >= offset + 1) {
+	if (t1 >= offset + 1 && t2 >= offset + 1)
+	{
 		traceThroughTree(tw, node->children[0], p1f, p2f, p1, p2); // 在平面前
 		return;
 	}
-	if (t1 < -offset - 1 && t2 < -offset - 1) {
+
+	if (t1 < -offset - 1 && t2 < -offset - 1)
+	{
 		traceThroughTree(tw, node->children[1], p1f, p2f, p1, p2); // 在平面后
 		return;
 	}
@@ -249,29 +249,34 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	GMfloat idist;
 	GMint side;
 	GMfloat frac, frac2;
-	if (t1 < t2) {
+	if (t1 < t2)
+	{
 		idist = 1.0 / (t1 - t2);
 		side = 1;
 		frac2 = (t1 + offset + SURFACE_CLIP_EPSILON)*idist;
 		frac = (t1 - offset + SURFACE_CLIP_EPSILON)*idist;
 	}
-	else if (t1 > t2) {
+	else if (t1 > t2)
+	{
 		idist = 1.0 / (t1 - t2);
 		side = 0;
 		frac2 = (t1 - offset - SURFACE_CLIP_EPSILON)*idist;
 		frac = (t1 + offset + SURFACE_CLIP_EPSILON)*idist;
 	}
-	else {
+	else
+	{
 		side = 0;
 		frac = 1;
 		frac2 = 0;
 	}
 
 	// move up to the node
-	if (frac < 0) {
+	if (frac < 0)
+	{
 		frac = 0;
 	}
-	if (frac > 1) {
+	if (frac > 1)
+	{
 		frac = 1;
 	}
 
@@ -282,7 +287,6 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	mid = p1 + frac * (p2 - p1);
 
 	traceThroughTree(tw, node->children[side], p1f, midf, p1, mid);
-
 
 	// go past the node
 	if (frac2 < 0) {
@@ -391,17 +395,20 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 		//
 		planes = &pc->planes[facet->surfacePlane];
 		plane = planes->plane;
-		if (tw.sphere.use) {
+		if (tw.sphere.use)
+		{
 			// adjust the plane distance apropriately for radius
-			plane[3] += tw.sphere.radius;
+			plane.setW(plane.getW() + tw.sphere.radius);
 
 			// find the closest point on the capsule to the plane
 			t = Dot(MakeVector3(plane), tw.sphere.offset);
-			if (t > 0.0f) {
+			if (t > 0.0f)
+			{
 				startp = tw.start - tw.sphere.offset;
 				endp = tw.end - tw.sphere.offset;
 			}
-			else {
+			else
+			{
 				startp = tw.start + tw.sphere.offset;
 				endp = tw.end + tw.sphere.offset;
 			}
@@ -409,7 +416,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 		else
 		{
 			offset = Dot(tw.offsets[planes->signbits], MakeVector3(plane));
-			plane[3] += offset;
+			plane.setW(plane.getW() + offset);
 			startp = tw.start;
 			endp = tw.end;
 		}
@@ -431,11 +438,12 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			if (tw.sphere.use)
 			{
 				// adjust the plane distance apropriately for radius
-				plane[3] += tw.sphere.radius;
+				plane.setW(plane.getW() + tw.sphere.radius);
 
 				// find the closest point on the capsule to the plane
 				t = Dot(MakeVector3(plane), tw.sphere.offset);
-				if (t > 0.0f) {
+				if (t > 0.0f)
+				{
 					startp = tw.start - tw.sphere.offset;
 					endp = tw.end - tw.sphere.offset;
 				}
@@ -448,7 +456,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
 				offset = Dot(tw.offsets[planes->signbits], MakeVector3(plane));
-				plane[3] -= fabs(offset);
+				plane.setW(plane.getW() - gmFabs(offset));
 				startp = tw.start;
 			}
 
@@ -479,7 +487,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 
 				tw.trace.fraction = enterFrac;
 				tw.trace.plane.normal = MakeVector3(bestplane);
-				tw.trace.plane.intercept = bestplane[3];
+				tw.trace.plane.intercept = bestplane.getW();
 			}
 		}
 	}
@@ -528,8 +536,9 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 	for (const auto& plane : planes)
 	{
 		offset = Dot(tw.offsets[plane.signbits], MakeVector3(plane.plane));
-		d1 = Dot(tw.start, MakeVector3(plane.plane)) - plane.plane[3] + offset;
-		d2 = Dot(tw.end, MakeVector3(plane.plane)) - plane.plane[3] + offset;
+		GMfloat intercept = plane.plane.getW();
+		d1 = Dot(tw.start, MakeVector3(plane.plane)) - intercept + offset;
+		d2 = Dot(tw.end, MakeVector3(plane.plane)) - intercept + offset;
 		if (d1 <= 0)
 			frontFacing[i] = 0;
 		else
@@ -579,11 +588,11 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 		if (j == facet.numBorders)
 		{
 			const GMBSPPatchPlane* planes = &pc->planes[facet.surfacePlane];
-
+			GMfloat intercept = planes->plane.getW();
 			// calculate intersection with a slight pushoff
 			offset = Dot(tw.offsets[planes->signbits], MakeVector3(planes->plane));
-			d1 = Dot(tw.start, MakeVector3(planes->plane)) - planes->plane[3] + offset;
-			d2 = Dot(tw.end, MakeVector3(planes->plane)) - planes->plane[3] + offset;
+			d1 = Dot(tw.start, MakeVector3(planes->plane)) - intercept + offset;
+			d2 = Dot(tw.end, MakeVector3(planes->plane)) - intercept + offset;
 			tw.trace.fraction = (d1 - SURFACE_CLIP_EPSILON) / (d1 - d2);
 
 			if (tw.trace.fraction < 0)
@@ -592,7 +601,7 @@ void GMBSPTrace::tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPa
 			}
 
 			tw.trace.plane.normal = MakeVector3(planes->plane);
-			tw.trace.plane.intercept = planes->plane[3];
+			tw.trace.plane.intercept = intercept;
 		}
 	}
 }
@@ -603,8 +612,9 @@ GMint GMBSPTrace::checkFacetPlane(const GMVec4& plane, const GMVec3& start, cons
 
 	*hit = false;
 
-	d1 = Dot(start, GMVec3(plane[0], plane[1], plane[2])) + plane[3];
-	d2 = Dot(end, GMVec3(plane[0], plane[1], plane[2])) + plane[3];
+	GMfloat intercept = plane.getW();
+	d1 = Dot(start, MakeVector3(plane)) + intercept;
+	d2 = Dot(end, MakeVector3(plane)) + intercept;
 
 	// if completely in front of face, no intersection with the entire facet
 	if (d1 > 0 && (d2 >= SURFACE_CLIP_EPSILON || d2 >= d1)) {
@@ -811,12 +821,18 @@ void GMBSPTrace::traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush *brus
 
 bool GMBSPTrace::boundsIntersect(const GMVec3& mins, const GMVec3& maxs, const GMVec3& mins2, const GMVec3& maxs2)
 {
-	if (maxs[0] < mins2[0] - SURFACE_CLIP_EPSILON ||
-		maxs[1] < mins2[1] - SURFACE_CLIP_EPSILON ||
-		maxs[2] < mins2[2] - SURFACE_CLIP_EPSILON ||
-		mins[0] > maxs2[0] + SURFACE_CLIP_EPSILON ||
-		mins[1] > maxs2[1] + SURFACE_CLIP_EPSILON ||
-		mins[2] > maxs2[2] + SURFACE_CLIP_EPSILON)
+	GMFloat4 f4_mins, f4_maxs, f4_mins2, f4_maxs2;
+	mins.loadFloat4(f4_mins);
+	maxs.loadFloat4(f4_maxs);
+	mins2.loadFloat4(f4_mins2);
+	maxs2.loadFloat4(f4_maxs2);
+
+	if (f4_maxs[0] < f4_mins2[0] - SURFACE_CLIP_EPSILON ||
+		f4_maxs[1] < f4_mins2[1] - SURFACE_CLIP_EPSILON ||
+		f4_maxs[2] < f4_mins2[2] - SURFACE_CLIP_EPSILON ||
+		f4_mins[0] > f4_maxs2[0] + SURFACE_CLIP_EPSILON ||
+		f4_mins[1] > f4_maxs2[1] + SURFACE_CLIP_EPSILON ||
+		f4_mins[2] > f4_maxs2[2] + SURFACE_CLIP_EPSILON)
 	{
 		return false;
 	}

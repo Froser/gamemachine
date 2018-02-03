@@ -239,10 +239,15 @@ void GMControlGameObject::addChild(GMControlGameObject* child)
 void GMControlGameObject::scalingGeometry(const GMMat4& scaling)
 {
 	D(d);
-	GM_ASSERT(scaling[0][0] > 0);
-	GM_ASSERT(scaling[1][1] > 0);
-	GMfloat trans[3];
-	glm::getScalingFromMatrix(scaling, trans);
+#if _DEBUG
+	GMFloat16 f16;
+	scaling.loadFloat16(f16);
+	GM_ASSERT(f16[0][0] > 0);
+	GM_ASSERT(f16[1][1] > 0);
+#endif
+
+	GMFloat4 trans;
+	GetScalingFromMatrix(scaling, trans);
 	d->geometryScaling[0] = trans[0];
 	d->geometryScaling[1] = trans[1];
 }
@@ -250,8 +255,8 @@ void GMControlGameObject::scalingGeometry(const GMMat4& scaling)
 void GMControlGameObject::translateGeometry(const GMMat4& translation)
 {
 	D(d);
-	GMfloat trans[3];
-	glm::getTranslationFromMatrix(translation, trans);
+	GMFloat4 trans;
+	GetTranslationFromMatrix(translation, trans);
 
 	GMRectF transRect = { trans[0], trans[1] };
 	// 得到中间位置坐标

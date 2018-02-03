@@ -248,9 +248,9 @@ GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 		GMVec3 cameraUp = d->lookAt.up;
 		GMVec3 vertical = cameraUp;
 		GMVec3 hor = Cross(rayForward, vertical);
-		hor = glm::safeNormalize(hor);
+		hor = SafeNormalize(hor);
 		vertical = Cross(hor, rayForward);
-		vertical = glm::safeNormalize(vertical);
+		vertical = SafeNormalize(vertical);
 
 		GMfloat tanfov = gmTan(0.5f*fov);
 		hor *= 2.f * farPlane * tanfov;

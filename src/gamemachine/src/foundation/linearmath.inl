@@ -56,32 +56,9 @@ namespace glm
 		return translate(identity<mat4>(), v);
 	}
 
-	inline void copyToArray(const mat4& mat, gm::GMfloat* value)
+	inline vec3 inhomogeneous(const vec4& v4)
 	{
-		const auto v = value_ptr(mat);
-		memcpy_s(value, sizeof(gm::GMfloat) * 16, v, sizeof(gm::GMfloat) * 16);
-	}
-
-	inline void copyToArray(const vec4& vec, gm::GMfloat* value)
-	{
-		const auto v = value_ptr(vec);
-		memcpy_s(value, sizeof(gm::GMfloat) * 4, v, sizeof(gm::GMfloat) * 4);
-	}
-
-	inline void copyToArray(const vec3& vec, gm::GMfloat* value)
-	{
-		const auto v = value_ptr(vec);
-		memcpy_s(value, sizeof(gm::GMfloat) * 3, v, sizeof(gm::GMfloat) * 3);
-	}
-
-	inline vec3 toInhomogeneous(const vec4& v4)
-	{
-		return vec3(v4.x / v4.x, v4.y / v4.w, v4.z / v4.w);
-	}
-
-	inline vec4 toHomogeneous(const vec3& v3)
-	{
-		return vec4(v3.x, v3.y, v3.z, 1);
+		return vec3(v4.x / v4.w, v4.y / v4.w, v4.z / v4.w);
 	}
 
 	inline vec3 make_vec3(const gm::GMfloat(&v)[3])
@@ -90,14 +67,9 @@ namespace glm
 	}
 
 	template <typename T>
-	inline gm::GMfloat lengthSquare(const T& left)
+	inline gm::GMfloat lengthSq(const T& left)
 	{
 		return dot(left, left);
-	}
-
-	inline gm::GMfloat lerp(const gm::GMfloat& start, const gm::GMfloat& end, gm::GMfloat percentage)
-	{
-		return percentage * (end - start) + start;
 	}
 
 	inline GMVec3 safeNormalize(const GMVec3& vec, const GMVec3& n = GMVec3(1, 0, 0))
@@ -115,8 +87,17 @@ namespace glm
 }
 #endif
 
+inline GMVec3::GMVec3(const GMVec4& V)
+{
+#if GM_USE_DX11
+	v_ = V.v_;
+#else
+	v_ = glm::vec3(V.v_[0], V.v_[1], V.v_[2]);
+#endif
+}
+
 template <>
-GMVec2 Zero()
+inline GMVec2 Zero()
 {
 	GMVec2 V;
 #if GM_USE_DX11
@@ -128,7 +109,7 @@ GMVec2 Zero()
 }
 
 template <>
-GMVec3 Zero()
+inline GMVec3 Zero()
 {
 	GMVec3 V;
 #if GM_USE_DX11
@@ -140,7 +121,7 @@ GMVec3 Zero()
 }
 
 template <>
-GMVec4 Zero()
+inline GMVec4 Zero()
 {
 	GMVec4 V;
 #if GM_USE_DX11
@@ -157,7 +138,7 @@ inline GMMat4 __getIdentityMat4()
 #if GM_USE_DX11
 	v.v_ = DirectX::XMMatrixIdentity();
 #else
-	v.v_ = Identity<GMMat4>();
+	v.v_ = glm::identity<GMMat4>();
 #endif
 	return v;
 }
@@ -168,7 +149,7 @@ inline GMQuat __getIdentityQuat()
 #if GM_USE_DX11
 	v.v_ = DirectX::XMQuaternionIdentity();
 #else
-	v.v_ = Identity<GMQuat>();
+	v.v_ = glm::identity<GMQuat>();
 #endif
 	return v;
 }
@@ -378,7 +359,7 @@ inline gm::GMfloat Dot(const GMVec3& V1, const GMVec3& V2)
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector3Dot(V1.v_, V2.v_));
 #else
-	return Dot(V1.v_, V2.v_);
+	return glm::dot(V1.v_, V2.v_);
 #endif
 }
 
@@ -387,7 +368,7 @@ inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2)
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector4Dot(V1.v_, V2.v_));
 #else
-	return Dot(V1.v_, V2.v_);
+	return glm::dot(V1.v_, V2.v_);
 #endif
 }
 
@@ -408,7 +389,7 @@ inline GMVec3 FastNormalize(const GMVec3& V)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
-	R.v_ = FastNormalize(R.v_);
+	R.v_ = glm::fastNormalize(R.v_);
 #endif
 	return R;
 }
@@ -467,7 +448,7 @@ inline GMMat4 Translate(const GMVec3& V)
 #if GM_USE_DX11
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
-	M.v_ = Translate(R.v_);
+	M.v_ = glm::translate(R.v_);
 #endif
 	return M;
 }
@@ -478,7 +459,7 @@ inline GMMat4 Translate(const GMVec4& V)
 #if GM_USE_DX11
 	M.v_ = DirectX::XMMatrixTranslationFromVector(V.v_);
 #else
-	M.v_ = Translate(R.v_);
+	M.v_ = glm::translate((R.v_);
 #endif
 	return M;
 }
@@ -489,9 +470,20 @@ inline GMMat4 Scale(const GMVec3& V)
 #if GM_USE_DX11
 	M.v_ = DirectX::XMMatrixScalingFromVector(V.v_);
 #else
-	M.v_ = Scale(R.v_);
+	M.v_ = glm::scale(R.v_);
 #endif
 	return M;
+}
+
+inline GMQuat Rotate(gm::GMfloat Angle, const GMVec3& Axis)
+{
+	GMQuat Q;
+#if GM_USE_DX11
+	Q.v_ = DirectX::XMQuaternionRotationAxis(Axis.v_, Angle);
+#else
+	Q.v_ = glm::rotate(Identity<glm::quat>(), Angle, Axis.v_);
+#endif
+	return Q;
 }
 
 inline void GetTranslationFromMatrix(const GMMat4& M, OUT GMFloat4& F)
@@ -520,6 +512,7 @@ inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm:
 #else
 	M.v_ = glm::ortho(left, right, bottom, top, n, f);
 #endif
+	return M;
 }
 
 inline gm::GMint Length(const GMVec3& V)
@@ -536,11 +529,18 @@ inline gm::GMint Length(const GMVec3& V)
 inline gm::GMint Length(const GMVec4& V)
 {
 #if GM_USE_DX11
-	GMFloat4 f;
-	DirectX::XMStoreFloat4(&f.v_, DirectX::XMVector4Length(V.v_));
-	return f[0];
+	return DirectX::XMVectorGetX(DirectX::XMVector4Length(V.v_));
 #else
 	return glm::length(V.v_);
+#endif
+}
+
+inline gm::GMint LengthSq(const GMVec3& V)
+{
+#if GM_USE_DX11
+	return DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(V.v_));
+#else
+	return glm::lengthSq(V.v_);
 #endif
 }
 
@@ -559,9 +559,132 @@ inline GMMat4 Perspective(gm::GMfloat fovy, gm::GMfloat aspect, gm::GMfloat n, g
 {
 	GMMat4 R;
 #if GM_USE_DX11
-	R.v_ = XMMatrixPerspectiveFovLH(fovy, aspect, n, f);
+	R.v_ = DirectX::XMMatrixPerspectiveFovLH(fovy, aspect, n, f);
 #else
 	R.v_ = glm::perspective(fovy, aspect, n, f);
 #endif
 	return R;
 }
+
+inline GMMat4 Transpose(const GMMat4& M)
+{
+	GMMat4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMMatrixTranspose(M.v_);
+#else
+	R.v_ = glm::transpose(M.v_);
+#endif
+	return R;
+}
+
+inline GMMat4 Inverse(const GMMat4& M)
+{
+	GMMat4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMMatrixInverse(nullptr, M.v_);
+#else
+	R.v_ = glm::inverse(M.v_);
+#endif
+	return R;
+}
+
+inline GMMat4 InverseTranspose(const GMMat4& M)
+{
+#if GM_USE_DX11
+	return Transpose(Inverse(M));
+#else
+	GMMat4 R;
+	R.v_ = glm::inverseTranspose(M.v_);
+	return R;
+#endif
+}
+
+inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T)
+{
+	GMQuat R;
+#if GM_USE_DX11
+	R.v_ = XMQuaternionSlerp(Q1.v_, Q2.v_, T);
+#else
+	R.v_ = Lerp(Q1.v_, Q2.v_, T);
+#endif
+	return R;
+}
+
+template <typename T>
+inline T Lerp(const T& S, const T& E, gm::GMfloat P)
+{
+	return P * (E - S) + S;
+}
+
+inline GMVec3 Inhomogeneous(const GMVec4& V)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = V.v_;
+	R.v_ /= V.getW();
+#else
+	R.v_ = glm::inhomogeneous(V.v_);
+#endif
+	return R;
+}
+
+inline GMMat4 Inhomogeneous(const GMMat4& M)
+{
+	GMMat4 R(M);
+	GMFloat16 f16;
+	R.loadFloat16(f16);
+	f16[0][3] =
+	f16[1][3] =
+	f16[2][3] =
+	f16[3][0] =
+	f16[3][1] =
+	f16[3][2] = 0.f;
+	f16[3][3] = 1.f;
+	R.setFloat16(f16);
+	return R;
+}
+
+inline void CopyToArray(const GMVec3& V, gm::GMfloat* array)
+{
+	GMFloat4 f4;
+	V.loadFloat4(f4);
+	array[0] = f4[0];
+	array[1] = f4[1];
+	array[2] = f4[2];
+}
+
+inline void CopyToArray(const GMVec4& V, gm::GMfloat* array)
+{
+	GMFloat4 f4;
+	V.loadFloat4(f4);
+	array[0] = f4[0];
+	array[1] = f4[1];
+	array[2] = f4[2];
+	array[3] = f4[3];
+}
+
+#if GM_USE_DX11
+template <typename T>
+inline gm::GMfloat* ValuePointer(T& data)
+{
+	return (gm::GMfloat*)(&data.v_);
+}
+
+template <>
+inline gm::GMfloat* ValuePointer(GMFloat4& data)
+{
+	return (gm::GMfloat*)(&(data[0]));
+}
+
+template <>
+inline gm::GMfloat* ValuePointer(GMMat4& data)
+{
+	return (gm::GMfloat*)(&(data.v_));
+}
+#else
+template <typename T>
+inline gm::GMfloat* ValuePointer(GMVec2& data)
+{
+	return ValuePointer<T>(data);
+}
+#endif

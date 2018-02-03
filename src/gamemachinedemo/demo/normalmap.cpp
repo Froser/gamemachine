@@ -28,9 +28,9 @@ void Demo_NormalMap::init()
 		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.setCull(gm::GMS_Cull::CULL);
-			shader.getMaterial().kd = glm::vec3(.6f, .2f, .3f);
-			shader.getMaterial().ks = glm::vec3(.1f, .2f, .3f);
-			shader.getMaterial().ka = glm::vec3(1, 1, 1);
+			shader.getMaterial().kd = GMVec3(.6f, .2f, .3f);
+			shader.getMaterial().ks = GMVec3(.1f, .2f, .3f);
+			shader.getMaterial().ka = GMVec3(1, 1, 1);
 			shader.getMaterial().shininess = 20;
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
@@ -70,7 +70,7 @@ void Demo_NormalMap::event(gm::GameMachineEvent evt)
 		break;
 	}
 	case gm::GameMachineEvent::Render:
-		d->rotation = glm::rotate(glm::identity<glm::quat>(), d->angle, (glm::vec3(0, 0, 1)));
+		d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
 		d->gameObject->setRotation(d->rotation);
 		d->demoWorld->renderScene();
 		break;

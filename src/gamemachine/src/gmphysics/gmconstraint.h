@@ -3,6 +3,8 @@
 #include <gmcommon.h>
 #include "gmbulletforward.h"
 
+struct GMVec3;
+
 BEGIN_NS
 
 class GMRigidPhysicsObject;

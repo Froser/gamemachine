@@ -16,19 +16,19 @@ void Demo_Particles2::init()
 	// 创建对象
 	d->demoWorld = new gm::GMDemoGameWorld();
 
-	glm::quat start = glm::rotate(glm::identity<glm::quat>(), 0.f, glm::vec3(0, 0, 1)),
-		end = glm::rotate(glm::identity<glm::quat>(), 5.f, glm::vec3(0, 0, 1));
+	GMQuat start = Rotate(Identity<GMQuat>(), 0.f, GMVec3(0, 0, 1)),
+		end = Rotate(Identity<GMQuat>(), 5.f, GMVec3(0, 0, 1));
 	gm::GMLerpParticleEmitter::create(
 		50,
 		gm::GMParticlePositionType::FollowEmitter,
 		1,
 		.01f,
 		.1f,
-		glm::vec3(0, 0, 0),
-		glm::vec3(1, 0, 0),
-		glm::vec3(-1.414f / 2, -1.414f / 2, 0),
-		glm::vec4(1, 0, 0, 1),
-		glm::vec4(0, 1, 0, 0),
+		GMVec3(0, 0, 0),
+		GMVec3(1, 0, 0),
+		GMVec3(-1.414f / 2, -1.414f / 2, 0),
+		GMVec4(1, 0, 0, 1),
+		GMVec4(0, 1, 0, 0),
 		start,
 		end,
 		0.1f,

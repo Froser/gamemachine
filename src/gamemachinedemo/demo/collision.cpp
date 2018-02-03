@@ -12,12 +12,12 @@ namespace
 	const gm::GMint ARRAY_SIZE_Y = 5;
 	const gm::GMint ARRAY_SIZE_Z = 5;
 
-	static glm::vec3 s_colors[4] =
+	static GMVec3 s_colors[4] =
 	{
-		glm::vec3(60.f / 256.f ,186.f / 256.f, 84.f / 256.f),
-		glm::vec3(244.f / 256.f ,194.f / 256.f, 13.f / 256.f),
-		glm::vec3(219.f / 256.f ,50.f / 256.f, 54.f / 256.f),
-		glm::vec3(72.f / 256.f ,133.f / 256.f, 237.f / 256.f),
+		GMVec3(60.f / 256.f ,186.f / 256.f, 84.f / 256.f),
+		GMVec3(244.f / 256.f ,194.f / 256.f, 13.f / 256.f),
+		GMVec3(219.f / 256.f ,50.f / 256.f, 54.f / 256.f),
+		GMVec3(72.f / 256.f ,133.f / 256.f, 237.f / 256.f),
 	};
 }
 
@@ -68,7 +68,7 @@ void Demo_Collision::init()
 	// create box
 	{
 		gm::GMPhysicsShape* boxShape = nullptr;
-		gm::GMPhysicsShapeCreator::createBoxShape(glm::vec3(.1f, .1f, .1f), &boxShape);
+		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), &boxShape);
 		gm::GMAsset boxAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, boxShape);
 
 		gm::GMint idx = 0;
@@ -85,7 +85,7 @@ void Demo_Collision::init()
 					rigidBoxObj->setMass(1.f);
 
 					gm::GMGameObject* box = new gm::GMGameObject();
-					box->setTranslation(glm::translate(glm::vec3(.2f * i, 2 + .2f*k, .2f * j)));
+					box->setTranslation(Translate(GMVec3(.2f * i, 2 + .2f*k, .2f * j)));
 					box->setPhysicsObject(rigidBoxObj);
 					rigidBoxObj->setShape(boxAsset);
 
@@ -97,8 +97,8 @@ void Demo_Collision::init()
 					for (auto& component : components)
 					{
 						component->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
-						component->getShader().getMaterial().kd = glm::vec3(.1f);
-						component->getShader().getMaterial().ks = glm::vec3(.4f);
+						component->getShader().getMaterial().kd = GMVec3(.1f);
+						component->getShader().getMaterial().ks = GMVec3(.4f);
 						component->getShader().getMaterial().shininess = 99;
 					}
 
@@ -146,11 +146,11 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 void Demo_Collision::setLookAt()
 {
 	gm::GMCamera& camera = GM.getCamera();
-	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(gm::gmRadians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = glm::normalize(glm::vec3(.5f, -.3f, 1));
-	lookAt.position = glm::vec3(-1, 2, -3);
+	lookAt.lookAt = Normalize(GMVec3(.5f, -.3f, 1));
+	lookAt.position = GMVec3(-1, 2, -3);
 	camera.lookAt(lookAt);
 }
 
@@ -168,7 +168,9 @@ void Demo_Collision::setDefaultLights()
 		gm::GMLight d(gm::GMLightType::SPECULAR);
 		gm::GMfloat colorD[] = { .7f, .7f, .7f };
 		d.setLightColor(colorD);
-		d.setLightPosition(glm::value_ptr(glm::vec3(-1.f, .5f, -3.f)));
+
+		gm::GMfloat lightPos[] = { -1.f, .5f, -3.f };
+		d.setLightPosition(lightPos);
 		GM.getGraphicEngine()->addLight(d);
 	}
 }
@@ -188,8 +190,8 @@ void Demo_Collision::onWindowActivate()
 
 	if (ms.downButton & GMMouseButton_Left)
 	{
-		glm::vec3 rayFrom = camera.getLookAt().position;
-		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
+		GMVec3 rayFrom = camera.getLookAt().position;
+		GMVec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
 
 		if (rayTestResult.hit && !(rayTestResult.hitObject->isStaticObject() || rayTestResult.hitObject->isKinematicObject()))
@@ -198,7 +200,7 @@ void Demo_Collision::onWindowActivate()
 				d->lastSelect->getGameObject()->getModel()->getMesh()->getComponents()[0]->getShader().getMaterial().ka = d->lastColor;
 
 			d->lastSelect = rayTestResult.hitObject;
-			glm::vec3& ka = rayTestResult.hitObject->getGameObject()->getModel()->getMesh()->getComponents()[0]->getShader().getMaterial().ka;
+			GMVec3& ka = rayTestResult.hitObject->getGameObject()->getModel()->getMesh()->getComponents()[0]->getShader().getMaterial().ka;
 			d->lastColor = ka;
 			ka += .3f;
 
@@ -212,8 +214,8 @@ void Demo_Collision::onWindowActivate()
 	}
 	else if (ms.moving && isActivating())
 	{
-		glm::vec3 rayFrom = camera.getLookAt().position;
-		glm::vec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
+		GMVec3 rayFrom = camera.getLookAt().position;
+		GMVec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
 		movePicked(rayTestResult);
 	}
@@ -225,8 +227,8 @@ void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
 	gm::GMRigidPhysicsObject* body = d->pickedBody = rayTestResult.hitObject;
 	d->pickedActivationState = body->getActivationState();
 	body->setActivationState(gm::GMPhysicsActivationState::DisableDeactivation);
-	glm::vec4 localPivot = body->getCenterOfMassTransformInversed() * glm::vec4(rayTestResult.hitPointWorld, 1.f);
-	gm::GMPoint2PointConstraint* p2pc = new gm::GMPoint2PointConstraint(body, glm::vec3(localPivot[0], localPivot[1], localPivot[2]));
+	GMVec4 localPivot = body->getCenterOfMassTransformInversed() * GMVec4(rayTestResult.hitPointWorld, 1.f);
+	gm::GMPoint2PointConstraint* p2pc = new gm::GMPoint2PointConstraint(body, GMVec3(localPivot[0], localPivot[1], localPivot[2]));
 	d->discreteWorld->addConstraint(p2pc, true);
 	d->pickedConstraint = p2pc;
 	auto settings = p2pc->getConstraintSetting();
@@ -258,8 +260,8 @@ void Demo_Collision::movePicked(const gm::GMPhysicsRayTestResult& rayTestResult)
 	D(d);
 	if (d->pickedBody && d->pickedConstraint)
 	{
-		glm::vec3 dir = glm::normalize(rayTestResult.rayToWorld - rayTestResult.rayFromWorld) * d->oldPickingDist;
-		glm::vec3 newPivotB = rayTestResult.rayFromWorld + dir;
+		GMVec3 dir = Normalize(rayTestResult.rayToWorld - rayTestResult.rayFromWorld) * d->oldPickingDist;
+		GMVec3 newPivotB = rayTestResult.rayFromWorld + dir;
 		d->pickedConstraint->setPivotB(newPivotB);
 	}
 }

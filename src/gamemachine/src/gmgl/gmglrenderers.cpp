@@ -68,15 +68,15 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	if (parent)
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(parent->getTransform()));
-		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, glm::value_ptr(glm::inverseTranspose(parent->getTransform())));
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, ValuePointer(parent->getTransform()));
+		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, ValuePointer(InverseTranspose(parent->getTransform())));
 		GM_END_CHECK_GL_ERROR
 	}
 	else
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(Identity<GMMat4>()));
-		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, glm::value_ptr(Identity<GMMat4>()));
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, ValuePointer(Identity<GMMat4>()));
+		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, ValuePointer(Identity<GMMat4>()));
 		GM_END_CHECK_GL_ERROR
 	}
 }
@@ -167,9 +167,9 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 	D(d);
 	const GMMaterial& material = shader.getMaterial();
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, &material.ka[0]);
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, &material.kd[0]);
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, &material.ks[0]);
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, ValuePointer(material.ka));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, ValuePointer(material.kd));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, ValuePointer(material.ks));
 	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.shininess);
 	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY, material.refractivity);
 }
@@ -319,8 +319,8 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 
 	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
-	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, glm::value_ptr(GMMat4(glm::mat3(parent->getTransform()))));
-	shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, glm::value_ptr(GMMat4(glm::mat3(parent->getTransform()))));
+	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, ValuePointer(GMMat4(Inhomogeneous(parent->getTransform()))));
+	shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, ValuePointer(GMMat4(Inhomogeneous(parent->getTransform()))));
 	GM_END_CHECK_GL_ERROR
 }
 

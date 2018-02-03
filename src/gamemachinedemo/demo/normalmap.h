@@ -8,7 +8,7 @@
 GM_PRIVATE_OBJECT(Demo_NormalMap)
 {
 	gm::GMDemoGameWorld* demoWorld = nullptr;
-	glm::quat rotation;
+	GMQuat rotation;
 	gm::GMfloat angle = 0.f;
 	bool rotate = true;
 	gm::GMGameObject* gameObject = nullptr;

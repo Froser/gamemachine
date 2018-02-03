@@ -98,8 +98,12 @@ void GMEntityObject::getBounds(REF GMVec3& mins, REF GMVec3& maxs)
 void GMEntityObject::calc()
 {
 	D(d);
-	d->mins[0] = d->mins[1] = d->mins[2] = 999999.f;
-	d->maxs[0] = d->maxs[1] = d->maxs[2] = -d->mins[0];
+	d->mins = GMVec3(999999.f);
+	d->maxs = -d->mins;
+
+	GMFloat4 f4_mins, f4_maxs;
+	d->mins.loadFloat4(f4_mins);
+	d->maxs.loadFloat4(f4_maxs);
 
 	GMMesh* mesh = getModel()->getMesh();
 	GMModel::DataType* vertices = mesh->positions().data();
@@ -108,13 +112,14 @@ void GMEntityObject::calc()
 	{
 		for (GMint j = 0; j < 3; j++)
 		{
-			if (vertices[i + j] < d->mins[j])
-				d->mins[j] = vertices[i + j];
-			if (vertices[i + j] > d->maxs[j])
-				d->maxs[j] = vertices[i + j];
+			if (vertices[i + j] < f4_mins[j])
+				f4_mins[j] = vertices[i + j];
+			if (vertices[i + j] > f4_maxs[j])
+				f4_maxs[j] = vertices[i + j];
 		}
 	}
-
+	d->mins.setFloat4(f4_mins);
+	d->maxs.setFloat4(f4_maxs);
 	makePlanes();
 }
 
@@ -122,17 +127,17 @@ void GMEntityObject::makePlanes()
 {
 	D(d);
 	// 前
-	d->planes[0] = GMPlane(GMVec3(0, 0, 1), -d->maxs[2]);
+	d->planes[0] = GMPlane(GMVec3(0, 0, 1), -d->maxs.getZ());
 	// 后
-	d->planes[1] = GMPlane(GMVec3(0, 0, -1), d->mins[2]);
+	d->planes[1] = GMPlane(GMVec3(0, 0, -1), d->mins.getZ());
 	// 左
-	d->planes[2] = GMPlane(GMVec3(-1, 0, 0), d->mins[0]);
+	d->planes[2] = GMPlane(GMVec3(-1, 0, 0), d->mins.getX());
 	// 右
-	d->planes[3] = GMPlane(GMVec3(1, 0, 0), -d->maxs[0]);
+	d->planes[3] = GMPlane(GMVec3(1, 0, 0), -d->maxs.getX());
 	// 上
-	d->planes[4] = GMPlane(GMVec3(0, 1, 0), -d->maxs[0]);
+	d->planes[4] = GMPlane(GMVec3(0, 1, 0), -d->maxs.getY());
 	// 下
-	d->planes[5] = GMPlane(GMVec3(0, -1, 0), d->mins[0]);
+	d->planes[5] = GMPlane(GMVec3(0, -1, 0), d->mins.getY());
 }
 
 // 天空
@@ -192,42 +197,45 @@ GMSkyGameObject::~GMSkyGameObject()
 void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 {
 	D(d);
+	GMFloat4 f4_min, f4_max;
+	d->min.loadFloat4(f4_min);
+	d->max.loadFloat4(f4_max);
 	GMVec3 vertices[] = {
 		//Front
-		GMVec3(d->min[0], d->max[1], d->max[2]),
-		GMVec3(d->min[0], d->min[1], d->max[2]),
-		GMVec3(d->max[0], d->min[1], d->max[2]),
-		GMVec3(d->max[0], d->max[1], d->max[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
 
 		//Back
-		GMVec3(d->min[0], d->max[1], d->min[2]),
-		GMVec3(d->min[0], d->min[1], d->min[2]),
-		GMVec3(d->max[0], d->min[1], d->min[2]),
-		GMVec3(d->max[0], d->max[1], d->min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
 
 		//Left
-		GMVec3(d->min[0], d->max[1], d->min[2]),
-		GMVec3(d->min[0], d->max[1], d->max[2]),
-		GMVec3(d->min[0], d->min[1], d->max[2]),
-		GMVec3(d->min[0], d->min[1], d->min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
 
 		//Right
-		GMVec3(d->max[0], d->max[1], d->min[2]),
-		GMVec3(d->max[0], d->max[1], d->max[2]),
-		GMVec3(d->max[0], d->min[1], d->max[2]),
-		GMVec3(d->max[0], d->min[1], d->min[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
 
 		//Up
-		GMVec3(d->min[0], d->max[1], d->min[2]),
-		GMVec3(d->min[0], d->max[1], d->max[2]),
-		GMVec3(d->max[0], d->max[1], d->max[2]),
-		GMVec3(d->max[0], d->max[1], d->min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
 
 		//Down
-		GMVec3(d->min[0], d->min[1], d->min[2]),
-		GMVec3(d->min[0], d->min[1], d->max[2]),
-		GMVec3(d->max[0], d->min[1], d->max[2]),
-		GMVec3(d->max[0], d->min[1], d->min[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
 	};
 
 	// Scaling surface
@@ -240,8 +248,8 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 		GMMat4 transMoveToAxisOrigin = Translate(-center);
 		GMMat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
 
-		GMVec4 pt = transFinal * GMVec4(vertices[i], 1);
-		vertices[i] = GMVec3(pt[0], pt[1], pt[2]);
+		GMVec4 pt = GMVec4(vertices[i], 1) * transFinal;
+		vertices[i] = GMVec3(pt);
 	}
 
 	GMModel* model = new GMModel();
@@ -253,14 +261,14 @@ void GMSkyGameObject::createSkyBox(OUT GMModel** obj)
 	for (GMuint i = 0; i < 6; i++)
 	{
 		component->beginFace();
-		component->vertex(vertices[i * 4][0], vertices[i * 4][1], vertices[i * 4][2]);
-		component->vertex(vertices[i * 4 + 1][0], vertices[i * 4 + 1][1], vertices[i * 4 + 1][2]);
-		component->vertex(vertices[i * 4 + 2][0], vertices[i * 4 + 2][1], vertices[i * 4 + 2][2]);
-		component->vertex(vertices[i * 4 + 3][0], vertices[i * 4 + 3][1], vertices[i * 4 + 3][2]);
-		component->uv(uvs[i * 4][0], uvs[i * 4][1]);
-		component->uv(uvs[i * 4 + 1][0], uvs[i * 4 + 1][1]);
-		component->uv(uvs[i * 4 + 2][0], uvs[i * 4 + 2][1]);
-		component->uv(uvs[i * 4 + 3][0], uvs[i * 4 + 3][1]);
+		component->vertex(vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ());
+		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
+		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
+		component->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
+		component->uv(uvs[i * 4].getX(), uvs[i * 4].getY());
+		component->uv(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		component->uv(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
+		component->uv(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
 		component->endFace();
 	}
 }

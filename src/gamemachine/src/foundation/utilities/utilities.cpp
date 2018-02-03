@@ -70,6 +70,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 		GMComponent* component = new GMComponent(body);
+		GMFloat4 f4_vertex, f4_normal;
 		for (GMint i = 0; i < 12; ++i)
 		{
 			component->beginFace();
@@ -84,8 +85,10 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 				GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
 				normal = FastNormalize(normal);
 
-				component->vertex(vertex[0], vertex[1], vertex[2]);
-				component->normal(normal[0], normal[1], normal[2]);
+				vertex.loadFloat4(f4_vertex);
+				normal.loadFloat4(f4_normal);
+				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				component->uv(uv[(i % 2) * 6 + (j * 2)], uv[(i % 2) * 6 + (j * 2) + 1]);
 				component->color(1.f, 1.f, 1.f);
 			}
@@ -139,6 +142,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 		GMComponent* component = new GMComponent(body);
+		GMFloat4 f4_vertex, f4_normal, f4_uv;
 		for (GMint i = 0; i < 2; ++i)
 		{
 			component->beginFace();
@@ -154,12 +158,15 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
 				normal = FastNormalize(normal);
 
-				component->vertex(vertex[0], vertex[1], vertex[2]);
-				component->normal(normal[0], normal[1], normal[2]);
+				vertex.loadFloat4(f4_vertex);
+				normal.loadFloat4(f4_normal);
+				uv.loadFloat4(f4_uv);
+				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				if (customUV)
-					component->uv(uv[0], 1 - uv[1]);
+					component->uv(f4_uv[0], 1 - f4_uv[1]);
 				else
-					component->uv((uv[0] + 1) / 2, 1 - (uv[1] + 1) / 2);
+					component->uv((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
@@ -205,6 +212,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
 
 		GMComponent* component = new GMComponent(body);
+		GMFloat4 f4_vertex, f4_normal, f4_uv;
 		for (GMint i = 0; i < 2; i++)
 		{
 			component->beginFace();
@@ -220,12 +228,15 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 				GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
 				normal = FastNormalize(normal);
 
-				component->vertex(vertex[0], vertex[1], vertex[2]);
-				component->normal(normal[0], normal[1], normal[2]);
+				vertex.loadFloat4(f4_vertex);
+				normal.loadFloat4(f4_normal);
+				uv.loadFloat4(f4_uv);
+				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				if (customUV)
-					component->uv(uv[0], 1 - uv[1]);
+					component->uv(f4_uv[0], 1 - f4_uv[1]);
 				else
-					component->uv((uv[0] + 1) / 2, 1 - (uv[1] + 1) / 2);
+					component->uv((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();

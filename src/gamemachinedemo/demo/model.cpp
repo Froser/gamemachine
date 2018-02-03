@@ -11,8 +11,8 @@
 namespace
 {
 	const gm::GMCameraLookAt s_lookAt = gm::GMCameraLookAt(
-		glm::vec3(0, -.3f, 1.f),
-		glm::vec3(0, .4f, -.5f)
+		GMVec3(0, -.3f, 1.f),
+		GMVec3(0, .4f, -.5f)
 	);
 }
 
@@ -35,9 +35,9 @@ void Demo_Model::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = GM.getCamera();
-	camera.setPerspective(glm::radians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(gm::gmRadians(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
-	d->lookAtRotation = glm::identity<glm::quat>();
+	d->lookAtRotation = Identity<GMQuat>();
 }
 
 void Demo_Model::init()
@@ -64,14 +64,14 @@ void Demo_Model::init()
 	for (auto& component : components)
 	{
 		component->getShader().getMaterial().refractivity = 0.658f;
-		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = glm::vec3(0);
+		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = GMVec3(0);
 	}
 
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	d->gameObject = new gm::GMGameObject(asset);
-	d->gameObject->setTranslation(glm::translate(glm::vec3(0.f, .25f, 0)));
-	d->gameObject->setScaling(glm::scale(.015f, .015f, .015f));
-	d->gameObject->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+	d->gameObject->setTranslation(Translate(GMVec3(0.f, .25f, 0)));
+	d->gameObject->setScaling(Scale(GMVec3(.015f, .015f, .015f)));
+	d->gameObject->setRotation(Rotate(Identity<GMQuat>(), PI, GMVec3(0, 1, 0)));
 
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
@@ -83,15 +83,15 @@ void Demo_Model::init()
 		{
 			gm::GMShader& shader = component->getShader();
 			shader.getMaterial().refractivity = 0.658f;
-			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = glm::vec3(0);
+			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 			gm::GMTextureUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
 		}
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject2 = new gm::GMGameObject(asset);
-		d->gameObject2->setTranslation(glm::translate(glm::vec3(-0.25f, .25f, 0)));
-		d->gameObject2->setScaling(glm::scale(.1f, .1f, .1f));
-		d->gameObject2->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
+		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
+		d->gameObject2->setRotation(Rotate(Identity<GMQuat>(), PI, GMVec3(0, 1, 0)));
 	}
 	{
 		gm::GMModel* cube = nullptr;
@@ -104,18 +104,18 @@ void Demo_Model::init()
 		{
 			gm::GMShader& shader = component->getShader();
 			shader.getMaterial().refractivity = 0.658f;
-			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = glm::vec3(0);
+			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 		}
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject3 = new gm::GMGameObject(asset);
-		d->gameObject3->setTranslation(glm::translate(glm::vec3(0.25f, .25f, 0)));
-		d->gameObject3->setScaling(glm::scale(.1f, .1f, .1f));
-		d->gameObject3->setRotation(glm::rotate(glm::identity<glm::quat>(), PI, glm::vec3(0, 1, 0)));
+		d->gameObject3->setTranslation(Translate(GMVec3(0.25f, .25f, 0)));
+		d->gameObject3->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
+		d->gameObject3->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 
 	d->skyObject = createCubeMap();
-	d->skyObject->setScaling(glm::scale(100, 100, 100));
+	d->skyObject->setScaling(Scale(GMVec3(100, 100, 100)));
 
 	d->demoWorld->addObject("baymax", d->gameObject);
 	d->demoWorld->addObject("cube", d->gameObject2);
@@ -131,24 +131,24 @@ void Demo_Model::handleMouseEvent()
 	if (state.wheel.wheeled)
 	{
 		gm::GMfloat delta = .001f * state.wheel.delta / WHEEL_DELTA;
-		gm::GMfloat scaling[4];
+		GMFloat4 scaling;
 		{
-			glm::getScalingFromMatrix(d->gameObject->getScaling(), scaling);
+			GetScalingFromMatrix(d->gameObject->getScaling(), scaling);
 			scaling[0] += delta;
 			scaling[1] += delta;
 			scaling[2] += delta;
 			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
-				d->gameObject->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+				d->gameObject->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
 
-			glm::getScalingFromMatrix(d->gameObject2->getScaling(), scaling);
-			d->gameObject2->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+			GetScalingFromMatrix(d->gameObject2->getScaling(), scaling);
+			d->gameObject2->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
 			scaling[0] += delta * 1.2f;
 			scaling[1] += delta * 1.2f;
 			scaling[2] += delta * 1.2f;
 			if (scaling[0] > 0 && scaling[1] > 0 && scaling[2] > 0)
 			{
-				d->gameObject2->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
-				d->gameObject3->setScaling(glm::scale(scaling[0], scaling[1], scaling[2]));
+				d->gameObject2->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
+				d->gameObject3->setScaling(Scale(GMVec3(scaling[0], scaling[1], scaling[2])));
 			}
 		}
 	}
@@ -242,9 +242,9 @@ void Demo_Model::handleDragging()
 	{
 		gm::GMfloat rotateX = d->mouseDownX - state.posX;
 
-		glm::quat q = glm::rotate(d->gameObject->getRotation(),
+		GMQuat q = Rotate(d->gameObject->getRotation(),
 			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
-			glm::vec3(0, 1, 0));
+			GMVec3(0, 1, 0));
 		d->gameObject->setRotation(q);
 		d->gameObject2->setRotation(q);
 		d->gameObject3->setRotation(q);
@@ -256,18 +256,18 @@ void Demo_Model::handleDragging()
 	{
 		gm::GMfloat rotateX = d->mouseDownX - state.posX;
 		gm::GMfloat rotateY = d->mouseDownY - state.posY;
-		glm::vec3 lookAt3 = glm::normalize(s_lookAt.lookAt);
-		glm::vec4 lookAt = glm::toHomogeneous(lookAt3);
-		glm::quat q = glm::rotate(d->lookAtRotation,
+		GMVec3 lookAt3 = Normalize(s_lookAt.lookAt);
+		GMVec4 lookAt = GMVec4(lookAt3, 1.f);
+		GMQuat q = Rotate(d->lookAtRotation,
 			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
-			glm::vec3(0, 1, 0));
+			GMVec3(0, 1, 0));
 		d->lookAtRotation = q;
-		q = glm::rotate(d->lookAtRotation,
+		q = Rotate(d->lookAtRotation,
 			PI * rotateY / GM.getGameMachineRunningStates().windowRect.width,
-			glm::vec3(1, 0, 0));
+			GMVec3(1, 0, 0));
 		d->lookAtRotation = q;
 		gm::GMCameraLookAt cameraLookAt = {
-			glm::mat4_cast(q) * glm::toHomogeneous(s_lookAt.lookAt),
+			GMVec4(s_lookAt.lookAt, 1.f) * QuatToMatrix(q),
 			s_lookAt.position
 		};
 		GM.getCamera().lookAt(cameraLookAt);
@@ -336,7 +336,7 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 		{
 			if (d->gameObject2 && d->gameObject3)
 			{
-				glm::mat4 t = d->gameObject2->getTranslation();
+				GMMat4 t = d->gameObject2->getTranslation();
 				d->gameObject2->setTranslation(d->gameObject3->getTranslation());
 				d->gameObject3->setTranslation(t);
 			}

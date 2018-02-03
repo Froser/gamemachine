@@ -605,7 +605,7 @@ void GMBSPGameWorld::prepareEntities()
 	for (auto& entity : bsp.entities)
 	{
 		BSPGameWorldEntityReader::import(*entity, this);
-		GMint leaf = calculateLeafNode(entity->origin);
+		GMint leaf = calculateLeafNode(MakeVector3(entity->origin));
 		d->entities[leaf].insert(entity);
 		createEntity(entity);
 	}
@@ -653,7 +653,7 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 		//}
 		//setMaterialLightmap(meshFace.lightmapIndex, shader);
 		gm_warning("No model selected. Create a default cube instead.");
-		d->render.createBox(m->extents, entity->origin, shader, &model);
+		d->render.createBox(m->extents, MakeVector3(entity->origin), shader, &model);
 		GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
 		entityObject = new GMEntityObject(asset);
 	}
@@ -690,8 +690,8 @@ void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
 			asset = assets.insertAsset(GM_ASSET_MODELS, GMString(fn), GMAssetType::Model, model);
 		}
 		entityObject = new GMEntityObject(asset);
-		entityObject->setTranslation(Translate(entity->origin));
-		entityObject->setScaling(Scale(m->extents[0], m->extents[1], m->extents[2]));
+		entityObject->setTranslation(Translate(MakeVector3(entity->origin)));
+		entityObject->setScaling(Scale(m->extents));
 	}
 
 	GM_ASSERT(entityObject);

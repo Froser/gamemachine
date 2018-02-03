@@ -136,10 +136,12 @@ END_NS
 		}										\
 		gm::GMfloat get##basis() const			\
 		{										\
-			return v_[n];\
+			return v_[n];						\
 		}
 #endif
 #define GMMATH_END_STRUCT };
+
+#define GMMATH_LEN(len) static gm::GMint length() { return (len); }
 
 struct GMFloat4
 {
@@ -158,10 +160,22 @@ struct GMFloat4
 		GM_ASSERT(i < 4);
 		return *(&(v_.x) + i);
 	}
+
+	const gm::GMfloat& operator[](gm::GMint i) const
+	{
+		GM_ASSERT(i < 4);
+		return *(&(v_.x) + i);
+	}
 #else
 	gm::GMfloat v_[4];
 
 	gm::GMfloat& operator[](XYZW i)
+	{
+		GM_ASSERT(i < 4);
+		return v_[i];
+	}
+
+	const gm::GMfloat& operator[](XYZW i) const
 	{
 		GM_ASSERT(i < 4);
 		return v_[i];
@@ -178,9 +192,14 @@ struct GMFloat16
 	}
 };
 
-GMMATH_BEGIN_STRUCT(GMVec2, GMVec2, DirectX::XMVECTOR)
+struct GMVec4;
+
+GMMATH_BEGIN_STRUCT(GMVec2, glm::vec2, DirectX::XMVECTOR)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_FLOAT4(glm::make_vec2)
+GMMATH_SET_GET_(X, 0)
+GMMATH_SET_GET_(Y, 1)
+GMMATH_LEN(2)
 #if GM_USE_DX11
 GMVec2(gm::GMfloat v0)
 {
@@ -204,13 +223,14 @@ GMVec2(gm::GMfloat v0, gm::GMfloat v1)
 #endif
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMVec3, GMVec3, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, DirectX::XMVECTOR)
 GMMATH_SET_FLOAT4(glm::make_vec3)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
+GMMATH_LEN(3)
 #if GM_USE_DX11
 GMVec3(gm::GMfloat v0)
 {
@@ -231,16 +251,19 @@ GMVec3(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2)
 	: v_(v0, v1, v2)
 {
 }
+
 #endif
+inline GMVec3(const GMVec4& V);
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMVec4, GMVec4, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMVec4, glm::vec4, DirectX::XMVECTOR)
 GMMATH_SET_FLOAT4(glm::make_vec4)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
+GMMATH_LEN(4)
 #if GM_USE_DX11
 GMVec4(gm::GMfloat v0)
 {
@@ -262,24 +285,55 @@ GMVec4(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2, gm::GMfloat v3)
 {
 }
 #endif
+
+GMVec4(const GMVec3& V, const gm::GMfloat W)
+{
+#if GM_USE_DX11
+	v_ = V.v_;
+	this->setW(W);
+#else
+	v_ = glm::vec4(V.v_[0], V.v_[1], V.v_[2], W);
+#endif
+}
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMMat4, GMMat4, DirectX::XMMATRIX)
+GMMATH_BEGIN_STRUCT(GMMat4, glm::mat4, DirectX::XMMATRIX)
 void loadFloat16(GMFloat16& f16) const
 {
 #if GM_USE_DX11
 	for (gm::GMint i = 0; i < 4; ++i)
 	{
 		GMFloat4& f4 = f16.v_[i];
-		XMStoreFloat4(&(f4.v_), v_.r[i]);
+		DirectX::XMStoreFloat4(&(f4.v_), v_.r[i]);
 	}
 #else
 	GM_ASSERT(false);
 #endif
 }
+
+void setFloat16(const GMFloat16& f16)
+{
+#if GM_USE_DX11
+	for (gm::GMint i = 0; i < 4; ++i)
+	{
+		const GMFloat4& f4 = f16.v_[i];
+		v_.r[i] = DirectX::XMLoadFloat4(&(f4.v_));
+	}
+#else
+
+	for (gm::GMint i = 0; i < 4; ++i)
+	{
+		const GMFloat4& f4 = f16.v_[i];
+		v_[i][0] = f4[0];
+		v_[i][0] = f4[0];
+		v_[i][0] = f4[0];
+		v_[i][0] = f4[0];
+	}
+#endif
+}
 GMMATH_END_STRUCT
 
-GMMATH_BEGIN_STRUCT(GMQuat, GMQuat, DirectX::XMVECTOR)
+GMMATH_BEGIN_STRUCT(GMQuat, glm::quat, DirectX::XMVECTOR)
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
@@ -299,13 +353,13 @@ inline GMMat4 __getIdentityMat4();
 inline GMQuat __getIdentityQuat();
 
 template <typename T>
-T zero()
+inline T zero()
 {
 	return T(0);
 }
 
 template <typename T>
-T Identity();
+inline T Identity();
 
 template <>
 inline GMMat4 Identity()
@@ -320,7 +374,7 @@ inline GMQuat Identity()
 }
 
 template <typename T>
-T Zero();
+inline T Zero();
 
 inline GMVec2 operator-(const GMVec2& V);
 
@@ -401,6 +455,8 @@ inline GMMat4 Translate(const GMVec4& V);
 
 inline GMMat4 Scale(const GMVec3& V);
 
+inline GMQuat Rotate(const GMQuat& Q, gm::GMfloat Angle, const GMVec3& Axis);
+
 inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat zNear, gm::GMfloat zFar);
 
 inline void GetTranslationFromMatrix(const GMMat4& M, OUT GMFloat4& F);
@@ -411,9 +467,33 @@ inline gm::GMint Length(const GMVec3& V);
 
 inline gm::GMint Length(const GMVec4& V);
 
+inline gm::GMint LengthSquared(const GMVec3& V);
+
 inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2);
 
 inline GMMat4 Perspective(gm::GMfloat fovy, gm::GMfloat aspect, gm::GMfloat n, gm::GMfloat f);
+
+inline GMMat4 Transpose(const GMMat4& M);
+
+inline GMMat4 Inverse(const GMMat4& M);
+
+inline GMMat4 InverseTranspose(const GMMat4& M);
+
+inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T);
+
+template <typename T>
+inline T Lerp(const T& S, const T& E, gm::GMfloat P);
+
+inline GMVec3 Inhomogeneous(const GMVec4& V);
+
+inline GMMat4 Inhomogeneous(const GMMat4& M);
+
+inline void CopyToArray(const GMVec3& V, gm::GMfloat* array);
+
+inline void CopyToArray(const GMVec4& V, gm::GMfloat* array);
+
+template <typename T>
+inline gm::GMfloat* ValuePointer(T& data);
 
 #include "linearmath.inl"
 

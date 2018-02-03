@@ -238,10 +238,12 @@ public:
 	{
 		D(d);
 		lua_newtable(L);
+		GMFloat4 f4;
+		v.loadFloat4(f4);
 		for (GMint i = 0; i < T::length(); i++)
 		{
 			lua_pushnumber(L, i);
-			lua_pushnumber(L, v[i]);
+			lua_pushnumber(L, f4[i]);
 			GM_ASSERT(lua_istable(L, -3));
 			lua_settable(L, -3);
 		}

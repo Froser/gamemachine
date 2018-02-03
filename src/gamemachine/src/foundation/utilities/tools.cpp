@@ -168,7 +168,7 @@ void GMPlane::setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 &
 
 void GMPlane::normalize()
 {
-	GMfloat normalLength = normal.length();
+	GMfloat normalLength = Length(normal);
 	normal /= normalLength;
 	intercept /= normalLength;
 }

@@ -411,15 +411,15 @@ namespace
 			if (Dot(MakeVector3(plane), MakeVector3(context.planes[i].plane)) < 0)
 				continue;	// allow backwards planes?
 
-			d = Dot(p1, MakeVector3(context.planes[i].plane)) + context.planes[i].plane[3];
+			d = Dot(p1, MakeVector3(context.planes[i].plane)) + context.planes[i].plane.getW();
 			if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON)
 				continue;
 
-			d = Dot(p2, MakeVector3(context.planes[i].plane)) + context.planes[i].plane[3];
+			d = Dot(p2, MakeVector3(context.planes[i].plane)) + context.planes[i].plane.getW();
 			if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON)
 				continue;
 
-			d = Dot(p3, MakeVector3(context.planes[i].plane)) + context.planes[i].plane[3];
+			d = Dot(p3, MakeVector3(context.planes[i].plane)) + context.planes[i].plane.getW();
 			if (d < -PLANE_TRI_EPSILON || d > PLANE_TRI_EPSILON) {
 				continue;
 			}

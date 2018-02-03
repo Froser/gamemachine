@@ -10,7 +10,7 @@ struct GMInterpolations
 {
 	static GMVec3 linear(const GMVec3& start, const GMVec3& end, GMfloat p)
 	{
-		return glm::lerp(start, end, p);
+		return Lerp(start, end, p);
 	}
 
 	static GMQuat quaternion_linear(const GMQuat& start, const GMQuat& end, GMfloat p)

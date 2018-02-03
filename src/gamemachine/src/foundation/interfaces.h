@@ -4,6 +4,8 @@
 #include <input.h>
 #include <gmenums.h>
 
+struct GMFloat4;
+
 BEGIN_NS
 
 // 前置声明
@@ -165,7 +167,7 @@ GM_INTERFACE(IShaderProgram)
 {
 	virtual void useProgram() = 0;
 	virtual void setMatrix4(const char* name, const GMfloat value[16]) = 0;
-	virtual void setVec4(const char* name, const GMfloat value[4]) = 0;
+	virtual void setVec4(const char* name, const GMFloat4&) = 0;
 	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
 	virtual void setInt(const char* name, GMint value) = 0;
 	virtual void setFloat(const char* name, GMfloat value) = 0;

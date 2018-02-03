@@ -19,14 +19,14 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 	Vector<gm::GMGameObject*> cubes;
 	gm::GMDiscreteDynamicsWorld* discreteWorld = nullptr;
 	gm::GMRigidPhysicsObject* lastSelect = nullptr;
-	glm::vec3 lastColor;
+	GMVec3 lastColor;
 
 	// Pick states
 	gm::GMRigidPhysicsObject* pickedBody = nullptr;
 	gm::GMPoint2PointConstraint* pickedConstraint = nullptr;
 	gm::GMPhysicsActivationState pickedActivationState = gm::GMPhysicsActivationState::ActiveTag;
-	glm::vec3 oldPickingPos;
-	glm::vec3 hitPos;
+	GMVec3 oldPickingPos;
+	GMVec3 hitPos;
 	gm::GMfloat oldPickingDist;
 };
 

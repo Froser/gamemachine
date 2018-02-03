@@ -9,7 +9,7 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 	d->radius = radius;
 	d->state.position = position;
 	d->state.lookAt = GMVec3(0, 0, 1);
-	d->limitPitch = glm::radians(85.f);
+	d->limitPitch = gmRadians(85.f);
 }
 
 const GMPositionState& GMSpriteGameObject::getPositionState()
@@ -37,20 +37,23 @@ void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 {
 	D(d);
 	GMVec3 lookAt = d->state.lookAt;
+	GMFloat4 f4_lookAt;
+	lookAt.loadFloat4(f4_lookAt);
+
 	// 不考虑roll，把lookAt投影到世界坐标系平面
-	GMVec3 lookAt_z = GMVec3(lookAt[0], 0, lookAt[2]);
+	GMVec3 lookAt_z = GMVec3(f4_lookAt[0], 0, f4_lookAt[2]);
 	// 计算pitch是否超出范围，不考虑roll
-	GMfloat calculatedPitch = gmAsin(d->state.lookAt[1]) + pitch;
+	GMfloat calculatedPitch = gmAsin(f4_lookAt[1]) + pitch;
 	if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
 	{
 		// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系
-		GMVec3 lookAt_x = GMQuat(GMVec3(0, 0, 1), lookAt_z) * GMVec3(1, 0, 0);
-		GMQuat qPitch = glm::rotate(Identity<GMQuat>(), -pitch, FastNormalize(lookAt_x));
-		lookAt = qPitch * lookAt;
+		GMVec3 lookAt_x = GMVec3(1, 0, 0) * GMQuat(GMVec3(0, 0, 1), lookAt_z);
+		GMQuat qPitch = Rotate(-pitch, FastNormalize(lookAt_x));
+		lookAt = lookAt * qPitch;
 	}
 
-	GMQuat qYaw = glm::rotate(Identity<GMQuat>(), -yaw, GMVec3(0, 1, 0));
-	d->state.lookAt = FastNormalize(qYaw * lookAt);
+	GMQuat qYaw = Rotate(-yaw, GMVec3(0, 1, 0));
+	d->state.lookAt = FastNormalize(lookAt * qYaw);
 }
 
 void GMSpriteGameObject::simulate()

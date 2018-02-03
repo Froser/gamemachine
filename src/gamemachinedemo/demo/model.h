@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(Demo_Model)
 	gm::GMint mouseDownY;
 	bool draggingL = false;
 	bool draggingR = false;
-	glm::quat lookAtRotation;
+	GMQuat lookAtRotation;
 };
 
 class Demo_Model : public DemoHandler

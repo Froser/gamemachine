@@ -116,7 +116,7 @@ extern "C"
 		GMfloat x = lua_tonumber(L, 1),
 			y = lua_tonumber(L, 2),
 			z = lua_tonumber(L, 3);
-		GMMat4 mat = Scale(x, y, z);
+		GMMat4 mat = Scale(MakeVector3(x, y, z));
 		GMLua(L).setMatrix(mat);
 		return 1;
 	}
@@ -127,7 +127,7 @@ extern "C"
 			y = lua_tonumber(L, 2),
 			z = lua_tonumber(L, 3),
 			r = lua_tonumber(L, 4);
-		GMQuat q = glm::rotate(Identity<GMQuat>(), r, GMVec3(x, y, z));
+		GMQuat q = Rotate(r, GMVec3(x, y, z));
 		GMMat4 mat = QuatToMatrix(q);
 		GMLua(L).setMatrix(mat);
 		return 1;
@@ -162,7 +162,7 @@ extern "C"
 		lua.getVector(v1, 1);
 		lua.getVector(v2, 2);
 		GMfloat p = lua_tonumber(L, 3);
-		GMVec4 result = glm::lerp(v1, v2, p);
+		GMVec4 result = Lerp(v1, v2, p);
 		lua.setVector(result);
 		return 1;
 	}

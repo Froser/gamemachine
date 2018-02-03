@@ -6,6 +6,7 @@
 #include <regex>
 #include "foundation/gamemachine.h"
 #include <gmmessages.h>
+#include <linearmath.h>
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
@@ -36,9 +37,9 @@ void GMGLShaderProgram::setMatrix4(const char* name, const GMfloat value[16])
 	glUniformMatrix4fv(glGetUniformLocation(getProgram(), name), 1, GL_FALSE, value);
 }
 
-void GMGLShaderProgram::setVec4(const char* name, const GMfloat value[4])
+void GMGLShaderProgram::setVec4(const char* name, const GMFloat4& value)
 {
-	glUniform4fv(glGetUniformLocation(getProgram(), name), 1, value);
+	glUniform4fv(glGetUniformLocation(getProgram(), name), 1, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec3(const char* name, const GMfloat value[3])
@@ -67,10 +68,10 @@ void GMGLShaderProgram::setMatrix4(const GMString& name, const GMfloat value[16]
 	glUniformMatrix4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, GL_FALSE, value);
 }
 
-void GMGLShaderProgram::setVec4(const GMString& name, const GMfloat value[4])
+void GMGLShaderProgram::setVec4(const GMString& name, const GMFloat4& value)
 {
 	std::string stdName = name.toStdString();
-	glUniform4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, value);
+	glUniform4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec3(const GMString& name, const GMfloat value[3])

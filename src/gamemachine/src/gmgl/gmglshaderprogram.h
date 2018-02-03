@@ -38,14 +38,14 @@ public:
 public:
 	void useProgram();
 	void setMatrix4(const char* name, const GMfloat value[16]);
-	void setVec4(const char* name, const GMfloat value[4]);
+	void setVec4(const char* name, const GMFloat4& value);
 	void setVec3(const char* name, const GMfloat value[3]);
 	void setInt(const char* name, GMint value);
 	void setFloat(const char* name, GMfloat value);
 	void setBool(const char* name, bool value);
 
 	void setMatrix4(const GMString& name, const GMfloat value[16]);
-	void setVec4(const GMString& name, const GMfloat value[4]);
+	void setVec4(const GMString& name, const GMFloat4& value);
 	void setVec3(const GMString& name, const GMfloat value[3]);
 	void setInt(const GMString& name, GMint value);
 	void setFloat(const GMString& name, GMfloat value);
