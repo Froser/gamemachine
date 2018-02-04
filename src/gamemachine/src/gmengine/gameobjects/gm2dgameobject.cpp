@@ -381,7 +381,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 	for (GMint i = 0; i < GM_array_size(d->models); ++i)
 	{
 		// 创建在中心的边框
-		GMPrimitiveCreator::createQuad(extents[i], &center[i][0],
+		GMPrimitiveCreator::createQuad(extents[i], ValuePointer(center[i]),
 			d->models + i,
 			&_cb,
 			GMModelType::Model2D,

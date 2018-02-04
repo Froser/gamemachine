@@ -15,7 +15,7 @@ struct GMInterpolations
 
 	static GMQuat quaternion_linear(const GMQuat& start, const GMQuat& end, GMfloat p)
 	{
-		return glm::slerp(start, end, p);
+		return Lerp(start, end, p);
 	}
 };
 

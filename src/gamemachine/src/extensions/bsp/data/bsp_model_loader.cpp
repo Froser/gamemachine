@@ -118,9 +118,9 @@ void BSPModelLoader::parseItem(TiXmlElement* ti)
 	{
 		GMScanner s(b);
 		GMFloat4 f4_extents;
-		s.nextFloat(&f4_extents.v_.x);
-		s.nextFloat(&f4_extents.v_.y);
-		s.nextFloat(&f4_extents.v_.z);
+		s.nextFloat(&f4_extents[0]);
+		s.nextFloat(&f4_extents[1]);
+		s.nextFloat(&f4_extents[2]);
 		m->extents.setFloat4(f4_extents);
 	}
 

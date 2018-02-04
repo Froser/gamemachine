@@ -261,6 +261,8 @@ public:
 	bool getVector(T& v, GMint index)
 	{
 		D(d);
+		GMFloat4 f4;
+		v.loadFloat4(f4);
 		GM_ASSERT(lua_istable(L, index));
 		lua_pushnil(L);
 		while (lua_next(L, index))
@@ -273,17 +275,16 @@ public:
 			if (!lua_isnumber(L, -1))
 				return false;
 
-			v[key] = lua_tonumber(L, -1);
+			f4[key] = lua_tonumber(L, -1);
 		}
 		return true;
 	}
 
-	template <typename T>
-	void setMatrix(const T& v)
+	void setMatrix(const GMMat4& v)
 	{
 		D(d);
 		lua_newtable(L);
-		for (GMint i = 0; i < T::length(); i++)
+		for (GMint i = 0; i < GMMat4::length(); i++)
 		{
 			lua_pushnumber(L, i);
 			setVector(v[i]);

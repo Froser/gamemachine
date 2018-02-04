@@ -8,14 +8,12 @@
 BEGIN_NS
 
 //Camera
-#if GM_USE_DX11
 struct GMMVPMatrix
 {
 	GMMat4 projMatrix;
 	GMMat4 viewMatrix;
 	GMMat4 modelMatrix; // 在绘制的时候，将物体的Model transform放到此处
 };
-#endif
 
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {

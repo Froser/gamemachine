@@ -642,7 +642,7 @@ namespace
 		x = -1;
 		for (i = 0; i < 3; i++)
 		{
-			v = gmFabs(f4_normal[i]);
+			v = Fabs(f4_normal[i]);
 			if (v > max)
 			{
 				x = i;
@@ -914,7 +914,7 @@ namespace
 			vec.setFloat4(f4_vec);
 			for (k = 0; k < 3; k++)
 			{
-				if (gm::gmFuzzyCompare(f4_vec[k], -1) || gm::gmFuzzyCompare(f4_vec[k], 1))
+				if (FuzzyCompare(f4_vec[k], -1) || FuzzyCompare(f4_vec[k], 1))
 					break;	// axial
 			}
 			if (k < 3)

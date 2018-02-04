@@ -3,6 +3,8 @@
 #include <gmcommon.h>
 #include "gmbulletforward.h"
 #include "gmphysicsshape.h"
+
+struct GMVec3;
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMPhysicsShape)

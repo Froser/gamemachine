@@ -16,8 +16,8 @@ void Demo_Particles1::init()
 	// 创建对象
 	d->demoWorld = new gm::GMDemoGameWorld();
 
-	GMQuat start = Rotate(Identity<GMQuat>(), 0.f, GMVec3(0, 0, 1)),
-		end = Rotate(Identity<GMQuat>(), 5.f, GMVec3(0, 0, 1));
+	GMQuat start = Rotate(0.f, GMVec3(0, 0, 1)),
+		end = Rotate(5.f, GMVec3(0, 0, 1));
 	gm::GMRadiusParticlesEmitter::create(
 		50,
 		gm::GMParticlePositionType::RespawnAtEmitterPosition,

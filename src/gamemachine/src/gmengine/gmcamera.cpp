@@ -159,14 +159,12 @@ void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 const GMMat4& GMFrustum::getProjectionMatrix()
 {
 	D(d);
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
 	return d->mvpMatrix.projMatrix;
 }
 
 const GMMat4& GMFrustum::getViewMatrix()
 {
 	D(d);
-	GM_ASSERT(GM.getRenderEnvironment() == GMRenderEnvironment::DirectX11);
 	return d->mvpMatrix.viewMatrix;
 }
 
@@ -188,7 +186,7 @@ GMComPtr<ID3D11Buffer> GMFrustum::getDxMatrixBuffer()
 GMCamera::GMCamera()
 {
 	D(d);
-	d->frustum.setPerspective(gmRadians(75.f), 1.333f, .1f, 3200);
+	d->frustum.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	d->lookAt.position = GMVec3(0);
 	d->lookAt.lookAt = GMVec3(0, 0, 1);
 }
@@ -252,7 +250,7 @@ GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 		vertical = Cross(hor, rayForward);
 		vertical = SafeNormalize(vertical);
 
-		GMfloat tanfov = gmTan(0.5f*fov);
+		GMfloat tanfov = Tan(0.5f*fov);
 		hor *= 2.f * farPlane * tanfov;
 		vertical *= 2.f * farPlane * tanfov;
 

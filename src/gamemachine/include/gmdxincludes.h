@@ -5,8 +5,7 @@
 #		pragma warning(disable:4005)
 #		include <d3d11.h>
 #		include <D3DX11async.h>
-#		include <DirectXMath.h>
-#		include <d3dx10math.h>
+#		include "../src/foundation/platforms/windows/dxmath/DirectXMath.h"
 #		pragma warning(pop)
 #	endif
 #endif

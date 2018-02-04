@@ -116,7 +116,7 @@ extern "C"
 		GMfloat x = lua_tonumber(L, 1),
 			y = lua_tonumber(L, 2),
 			z = lua_tonumber(L, 3);
-		GMMat4 mat = Scale(MakeVector3(x, y, z));
+		GMMat4 mat = Scale(GMVec3(x, y, z));
 		GMLua(L).setMatrix(mat);
 		return 1;
 	}

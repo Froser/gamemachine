@@ -20,9 +20,9 @@
 #include "glm/gtx/norm.hpp"
 #endif
 
-constexpr gm::GMfloat PI = 3.141592653f;
+// namespace gmmath {
 
-BEGIN_NS
+constexpr gm::GMfloat PI = 3.141592653f;
 
 #ifndef FLT_EPSILON
 #	define FLT_EPSILON 1.192092896e-07F
@@ -31,50 +31,48 @@ BEGIN_NS
 #define GM_SIMD_EPSILON FLT_EPSILON
 
 // 数学函数
-inline GMfloat gmFabs(GMfloat x) { return fabsf(x); }
-inline GMfloat gmCos(GMfloat x) { return cosf(x); }
-inline GMfloat gmSin(GMfloat x) { return sinf(x); }
-inline GMfloat gmTan(GMfloat x) { return tanf(x); }
-inline GMfloat gmSqrt(GMfloat x) { return sqrtf(x); }
-inline GMfloat gmAcos(GMfloat x)
+inline gm::GMfloat Fabs(gm::GMfloat x) { return fabsf(x); }
+inline gm::GMfloat Cos(gm::GMfloat x) { return cosf(x); }
+inline gm::GMfloat Sin(gm::GMfloat x) { return sinf(x); }
+inline gm::GMfloat Tan(gm::GMfloat x) { return tanf(x); }
+inline gm::GMfloat Sqrt(gm::GMfloat x) { return sqrtf(x); }
+inline gm::GMfloat Acos(gm::GMfloat x)
 {
-	if (x < GMfloat(-1))
-		x = GMfloat(-1);
-	if (x > GMfloat(1))
-		x = GMfloat(1);
+	if (x < gm::GMfloat(-1))
+		x = gm::GMfloat(-1);
+	if (x > gm::GMfloat(1))
+		x = gm::GMfloat(1);
 	return acosf(x);
 }
-inline GMfloat gmAsin(GMfloat x)
+inline gm::GMfloat Asin(gm::GMfloat x)
 {
-	if (x < GMfloat(-1))
-		x = GMfloat(-1);
-	if (x > GMfloat(1))
-		x = GMfloat(1);
+	if (x < gm::GMfloat(-1))
+		x = gm::GMfloat(-1);
+	if (x > gm::GMfloat(1))
+		x = gm::GMfloat(1);
 	return asinf(x);
 }
-inline GMfloat gmAtan(GMfloat x) { return atanf(x); }
-inline GMfloat gmAtan2(GMfloat x, GMfloat y) { return atan2f(x, y); }
-inline GMfloat gmExp(GMfloat x) { return expf(x); }
-inline GMfloat gmLog(GMfloat x) { return logf(x); }
-inline GMfloat gmPow(GMfloat x, GMfloat y) { return powf(x, y); }
-inline GMfloat gmFmod(GMfloat x, GMfloat y) { return fmodf(x, y); }
-inline GMfloat gmFloor(GMfloat x) { return floor(x); }
-inline GMfloat gmMin(GMfloat x, GMfloat y) { return x < y ? x : y; }
-inline GMfloat gmMax(GMfloat x, GMfloat y) { return x > y ? x : y; }
+inline gm::GMfloat Atan(gm::GMfloat x) { return atanf(x); }
+inline gm::GMfloat Atan2(gm::GMfloat x, gm::GMfloat y) { return atan2f(x, y); }
+inline gm::GMfloat Exp(gm::GMfloat x) { return expf(x); }
+inline gm::GMfloat Log(gm::GMfloat x) { return logf(x); }
+inline gm::GMfloat Pow(gm::GMfloat x, gm::GMfloat y) { return powf(x, y); }
+inline gm::GMfloat Fmod(gm::GMfloat x, gm::GMfloat y) { return fmodf(x, y); }
+inline gm::GMfloat Floor(gm::GMfloat x) { return floor(x); }
+inline gm::GMfloat Min(gm::GMfloat x, gm::GMfloat y) { return x < y ? x : y; }
+inline gm::GMfloat Max(gm::GMfloat x, gm::GMfloat y) { return x > y ? x : y; }
 
 template<typename genType>
-constexpr genType gmRadians(genType degrees)
+constexpr genType Radians(genType degrees)
 {
 	GM_STATIC_ASSERT(std::numeric_limits<genType>::is_iec559, "'radians' only accept floating-point input");
 	return degrees * static_cast<genType>(0.01745329251994329576923690768489);
 }
 
-inline bool gmFuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
+inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
 {
-	return (gm::gmFabs(p1 - p2) <= 0.01f);
+	return (Fabs(p1 - p2) <= 0.01f);
 }
-
-END_NS
 
 #if GM_USE_DX11
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
@@ -83,7 +81,7 @@ END_NS
 		dxStruct v_;							\
 	public:										\
 		className() = default;					\
-		className(const className& rhs);
+		className(const className& rhs) { v_ = rhs.v_; }
 
 #define GMMATH_LOAD_FLOAT4						\
 		void loadFloat4(GMFloat4& f4) const		\
@@ -115,18 +113,22 @@ END_NS
 		glStruct v_;							\
 												\
 	public:										\
-		className() = default;
+		className() = default;					\
+		className(const className& rhs) { v_ = rhs.v_; }
 
 #define GMMATH_LOAD_FLOAT4						\
-		void loadFloat4(GMFloat4* f4) const		\
+		void loadFloat4(GMFloat4& f4) const		\
 		{										\
-			GM_ASSERT(false);					\
+			f4.v_[0] = v_[0];					\
+			f4.v_[1] = v_[1];					\
+			f4.v_[2] = v_[2];					\
+			f4.v_[3] = v_[3];					\
 		}
 
 #define GMMATH_SET_FLOAT4(makeFunc)				\
 		void setFloat4(const GMFloat4& f4)		\
 		{										\
-			_v = makeFunc(&f4);					\
+			v_ = makeFunc(&f4[0]);				\
 		}
 
 #define GMMATH_SET_GET_(basis, n)				\
@@ -169,15 +171,17 @@ struct GMFloat4
 #else
 	gm::GMfloat v_[4];
 
-	gm::GMfloat& operator[](XYZW i)
+	gm::GMfloat& operator[](gm::GMint i)
 	{
 		GM_ASSERT(i < 4);
+		GM_ASSERT(v_);
 		return v_[i];
 	}
 
-	const gm::GMfloat& operator[](XYZW i) const
+	const gm::GMfloat& operator[](gm::GMint i) const
 	{
 		GM_ASSERT(i < 4);
+		GM_ASSERT(v_);
 		return v_[i];
 	}
 #endif
@@ -251,7 +255,6 @@ GMVec3(gm::GMfloat v0, gm::GMfloat v1, gm::GMfloat v2)
 	: v_(v0, v1, v2)
 {
 }
-
 #endif
 inline GMVec3(const GMVec4& V);
 GMMATH_END_STRUCT
@@ -298,6 +301,7 @@ GMVec4(const GMVec3& V, const gm::GMfloat W)
 GMMATH_END_STRUCT
 
 GMMATH_BEGIN_STRUCT(GMMat4, glm::mat4, DirectX::XMMATRIX)
+GMMATH_LEN(4)
 void loadFloat16(GMFloat16& f16) const
 {
 #if GM_USE_DX11
@@ -325,11 +329,22 @@ void setFloat16(const GMFloat16& f16)
 	{
 		const GMFloat4& f4 = f16.v_[i];
 		v_[i][0] = f4[0];
-		v_[i][0] = f4[0];
-		v_[i][0] = f4[0];
-		v_[i][0] = f4[0];
+		v_[i][1] = f4[1];
+		v_[i][2] = f4[2];
+		v_[i][3] = f4[3];
 	}
 #endif
+}
+
+GMVec4 operator[](gm::GMint i) const
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = v_.r[i];
+#else
+	R.v_ = v_[i];
+#endif
+	return R;
 }
 GMMATH_END_STRUCT
 
@@ -338,13 +353,25 @@ GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
+GMMATH_LEN(4)
+GMQuat(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
+{
+#if GM_USE_DX11
+	v_ = DirectX::XMVectorSet(x, y, z, w);
+#else
+	v_ = glm::quat(x, y, z, w);
+#endif
+}
+
 GMQuat(const GMVec3& U, const GMVec3& V)
 #if GM_USE_DX11
 #else
 	:v_(U.v_, V.v_)
 #endif
 {
+#if GM_USE_DX11
 	GM_ASSERT(false);
+#endif
 }
 GMMATH_END_STRUCT
 
@@ -388,11 +415,11 @@ inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2);
 
 inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2);
 
-inline GMVec3 operator+=(GMVec3& V1, const GMVec3& V2);
+inline GMVec3& operator+=(GMVec3& V1, const GMVec3& V2);
 
 inline GMVec3 operator-(const GMVec3& V1, const GMVec3& V2);
 
-inline GMVec3 operator-=(GMVec3& V1, const GMVec3& V2);
+inline GMVec3& operator-=(GMVec3& V1, const GMVec3& V2);
 
 inline GMVec3 operator*(const GMVec3& V1, gm::GMfloat S);
 
@@ -455,7 +482,9 @@ inline GMMat4 Translate(const GMVec4& V);
 
 inline GMMat4 Scale(const GMVec3& V);
 
-inline GMQuat Rotate(const GMQuat& Q, gm::GMfloat Angle, const GMVec3& Axis);
+inline GMQuat Rotate(gm::GMfloat Angle, const GMVec3& Axis);
+
+inline GMQuat Rotate(const GMQuat& Start, gm::GMfloat Angle, const GMVec3& Axis);
 
 inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm::GMfloat top, gm::GMfloat zNear, gm::GMfloat zFar);
 
@@ -496,5 +525,7 @@ template <typename T>
 inline gm::GMfloat* ValuePointer(T& data);
 
 #include "linearmath.inl"
+
+// } // End of namespace gmmath
 
 #endif

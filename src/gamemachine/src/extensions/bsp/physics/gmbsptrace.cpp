@@ -456,7 +456,7 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 			{
 				// NOTE: this works even though the plane might be flipped because the bbox is centered
 				offset = Dot(tw.offsets[planes->signbits], MakeVector3(plane));
-				plane.setW(plane.getW() - gmFabs(offset));
+				plane.setW(plane.getW() - Fabs(offset));
 				startp = tw.start;
 			}
 

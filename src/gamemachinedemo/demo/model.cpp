@@ -35,7 +35,7 @@ void Demo_Model::setLookAt()
 {
 	D(d);
 	gm::GMCamera& camera = GM.getCamera();
-	camera.setPerspective(gm::gmRadians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 	d->lookAtRotation = Identity<GMQuat>();
 }
@@ -71,7 +71,7 @@ void Demo_Model::init()
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setTranslation(Translate(GMVec3(0.f, .25f, 0)));
 	d->gameObject->setScaling(Scale(GMVec3(.015f, .015f, .015f)));
-	d->gameObject->setRotation(Rotate(Identity<GMQuat>(), PI, GMVec3(0, 1, 0)));
+	d->gameObject->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
@@ -91,7 +91,7 @@ void Demo_Model::init()
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
-		d->gameObject2->setRotation(Rotate(Identity<GMQuat>(), PI, GMVec3(0, 1, 0)));
+		d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 	{
 		gm::GMModel* cube = nullptr;

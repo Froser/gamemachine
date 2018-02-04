@@ -9,7 +9,7 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 	d->radius = radius;
 	d->state.position = position;
 	d->state.lookAt = GMVec3(0, 0, 1);
-	d->limitPitch = gmRadians(85.f);
+	d->limitPitch = Radians(85.f);
 }
 
 const GMPositionState& GMSpriteGameObject::getPositionState()
@@ -43,7 +43,7 @@ void GMSpriteGameObject::look(GMfloat pitch, GMfloat yaw)
 	// 不考虑roll，把lookAt投影到世界坐标系平面
 	GMVec3 lookAt_z = GMVec3(f4_lookAt[0], 0, f4_lookAt[2]);
 	// 计算pitch是否超出范围，不考虑roll
-	GMfloat calculatedPitch = gmAsin(f4_lookAt[1]) + pitch;
+	GMfloat calculatedPitch = Asin(f4_lookAt[1]) + pitch;
 	if (-d->limitPitch < calculatedPitch && calculatedPitch <= d->limitPitch)
 	{
 		// 找到lookAt_z垂直的一个向量，使用与世界坐标相同的坐标系

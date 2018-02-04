@@ -146,7 +146,7 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 void Demo_Collision::setLookAt()
 {
 	gm::GMCamera& camera = GM.getCamera();
-	camera.setPerspective(gm::gmRadians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookAt = Normalize(GMVec3(.5f, -.3f, 1));
@@ -227,8 +227,10 @@ void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
 	gm::GMRigidPhysicsObject* body = d->pickedBody = rayTestResult.hitObject;
 	d->pickedActivationState = body->getActivationState();
 	body->setActivationState(gm::GMPhysicsActivationState::DisableDeactivation);
-	GMVec4 localPivot = body->getCenterOfMassTransformInversed() * GMVec4(rayTestResult.hitPointWorld, 1.f);
-	gm::GMPoint2PointConstraint* p2pc = new gm::GMPoint2PointConstraint(body, GMVec3(localPivot[0], localPivot[1], localPivot[2]));
+	GMVec4 localPivot = GMVec4(rayTestResult.hitPointWorld, 1.f) * body->getCenterOfMassTransformInversed();
+	GMFloat4 f4_localPivot;
+	localPivot.loadFloat4(f4_localPivot);
+	gm::GMPoint2PointConstraint* p2pc = new gm::GMPoint2PointConstraint(body, GMVec3(f4_localPivot[0], f4_localPivot[1], f4_localPivot[2]));
 	d->discreteWorld->addConstraint(p2pc, true);
 	d->pickedConstraint = p2pc;
 	auto settings = p2pc->getConstraintSetting();
@@ -237,7 +239,7 @@ void Demo_Collision::pickUp(const gm::GMPhysicsRayTestResult& rayTestResult)
 	p2pc->setConstraintSetting(settings);
 	d->oldPickingPos = rayTestResult.rayToWorld;
 	d->hitPos = rayTestResult.hitPointWorld;
-	d->oldPickingDist = glm::fastLength(rayTestResult.hitPointWorld - rayTestResult.rayFromWorld);
+	d->oldPickingDist = Length(rayTestResult.hitPointWorld - rayTestResult.rayFromWorld);
 }
 
 void Demo_Collision::removePicked()

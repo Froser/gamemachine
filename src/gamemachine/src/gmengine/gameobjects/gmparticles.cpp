@@ -368,8 +368,8 @@ void GMLerpParticleEmitter::respawnLife(const GMint index, GMParticleGameObject*
 	GMfloat currentLife = particle->getCurrentLife();
 	if (currentLife < 0)
 	{
-		currentLife = gmFabs(currentLife);
-		GMfloat factor = gmFloor((currentLife - .001f) / particle->getMaxLife());
+		currentLife = Fabs(currentLife);
+		GMfloat factor = Floor((currentLife - .001f) / particle->getMaxLife());
 		if (factor < 0)
 			factor = 0;
 		++factor;
@@ -435,7 +435,7 @@ void GMLerpParticleEmitter::create(
 			GMVec3 axis = FastNormalize(Cross(normalStart, normalEnd));
 			GMfloat theta = Dot(normalStart, normalEnd);
 			GMQuat qStart = Rotate(0.f, axis),
-				qEnd = Rotate(gmAcos(theta), axis);
+				qEnd = Rotate(Acos(theta), axis);
 
 			GMQuat interpolation = Lerp(qStart, qEnd, (GMfloat)i / (count - 1));
 			GMVec4 transformed = GMVec4(normalStart, 1) * QuatToMatrix(interpolation);

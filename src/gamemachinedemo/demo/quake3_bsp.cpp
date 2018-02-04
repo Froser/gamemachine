@@ -29,7 +29,7 @@ void Demo_Quake3_BSP::setLookAt()
 {
 	// 设置一个默认视角
 	gm::GMCamera& camera = GM.getCamera();
-	camera.setPerspective(gm::gmRadians(75.f), 1.333f, .1f, 3200);
+	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	GM.getCamera().synchronizeLookAt();
 }
 
@@ -158,10 +158,10 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 
 			joystickYaw = state.thumbRX * joystickSensitivity * rate;
 		}
-		d->sprite->look(gm::gmRadians(joystickPitch), gm::gmRadians(joystickYaw));
+		d->sprite->look(Radians(joystickPitch), Radians(joystickYaw));
 
 		gm::GMMouseState ms = mouseState.mouseState();
-		d->sprite->look(gm::gmRadians(-ms.deltaY * mouseSensitivity), gm::gmRadians(-ms.deltaX * mouseSensitivity));
+		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered('P'))
 			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));

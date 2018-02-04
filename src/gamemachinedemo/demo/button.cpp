@@ -99,7 +99,7 @@ void Demo_Button::initBorder()
 
 		{
 			gm::GMImage2DGameObject* button = newButton<2>(border, [=](gm::GMControlGameObjectAnimation* animation) {
-				GMQuat q = Rotate(Identity<GMQuat>(), 3.14f / 6.f, GMVec3(1, 1, 1));
+				GMQuat q = Rotate(3.14f / 6.f, GMVec3(1, 1, 1));
 				animation->setRotation(q);
 			}).button;
 			gm::GMRect rect = { 50, 170, 400, 40 };
@@ -110,7 +110,7 @@ void Demo_Button::initBorder()
 
 		{
 			gm::GMImage2DGameObject* button = newButton<3>(border, [=](gm::GMControlGameObjectAnimation* animation) {
-				GMQuat q = Rotate(Identity<GMQuat>(), 3.14f / 6.f, GMVec3(1, 1, 1));
+				GMQuat q = Rotate(3.14f / 6.f, GMVec3(1, 1, 1));
 				animation->setRotation(q);
 				animation->setScaling(GMVec3(1.2f, 1.2f, 1.2f));
 			}).button;

@@ -66,7 +66,9 @@ void GMDiscreteDynamicsWorld::syncTransform()
 void GMDiscreteDynamicsWorld::setGravity(const GMVec3& gravity)
 {
 	D(d);
-	d->worldImpl->setGravity(btVector3(gravity[0], gravity[1], gravity[2]));
+	GMFloat4 f4;
+	gravity.loadFloat4(f4);
+	d->worldImpl->setGravity(btVector3(f4[0], f4[1], f4[2]));
 }
 
 void GMDiscreteDynamicsWorld::addRigidObject(AUTORELEASE GMRigidPhysicsObject* rigidObj)
@@ -103,8 +105,12 @@ GMPhysicsRayTestResult GMDiscreteDynamicsWorld::rayTest(const GMVec3& rayFromWor
 	result.rayFromWorld = rayFromWorld;
 	result.rayToWorld = rayToWorld;
 
-	btVector3 rfw(rayFromWorld[0], rayFromWorld[1], rayFromWorld[2]), 
-		rtw(rayToWorld[0], rayToWorld[1], rayToWorld[2]);
+	GMFloat4 f4_rayFromWorld, f4_rayToWorld;
+	rayFromWorld.loadFloat4(f4_rayFromWorld);
+	rayToWorld.loadFloat4(f4_rayToWorld);
+
+	btVector3 rfw(f4_rayFromWorld[0], f4_rayFromWorld[1], f4_rayFromWorld[2]),
+		rtw(f4_rayToWorld[0], f4_rayToWorld[1], f4_rayToWorld[2]);
 	btCollisionWorld::ClosestRayResultCallback rayCallback(rfw, rtw);
 	d->worldImpl->rayTest(rfw, rtw, rayCallback);
 	if (rayCallback.hasHit())
