@@ -32,9 +32,9 @@ namespace glm
 	}
 
 	template <>
-	inline quat& identity()
+	inline glm::quat& identity()
 	{
-		static quat q(1, 0, 0, 0);
+		static glm::quat q(1, 0, 0, 0);
 		return q;
 	}
 
@@ -571,7 +571,7 @@ inline GMQuat Rotate(const GMQuat& Start, gm::GMfloat Angle, const GMVec3& Axis)
 #if GM_USE_DX11
 	Q.v_ = DirectX::XMQuaternionRotationAxis(Axis.v_, Angle);
 #else
-	Q.v_ = glm::rotate(Identity<glm::quat>(), Angle, Axis.v_);
+	Q.v_ = glm::rotate(glm::identity<glm::quat>(), Angle, Axis.v_);
 #endif
 	return Q;
 }
@@ -695,7 +695,7 @@ inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMQuaternionSlerp(Q1.v_, Q2.v_, T);
 #else
-	R.v_ = Lerp(Q1.v_, Q2.v_, T);
+	R.v_ = glm::lerp(Q1.v_, Q2.v_, T);
 #endif
 	return R;
 }
@@ -755,26 +755,32 @@ inline void CopyToArray(const GMVec4& V, gm::GMfloat* array)
 
 #if GM_USE_DX11
 template <typename T>
-inline gm::GMfloat* ValuePointer(T& data)
+inline gm::GMfloat* ValuePointer(const T& data)
 {
 	return (gm::GMfloat*)(&data.v_);
 }
 
 template <>
-inline gm::GMfloat* ValuePointer(GMFloat4& data)
-{
-	return (gm::GMfloat*)(&(data[0]));
-}
-
-template <>
-inline gm::GMfloat* ValuePointer(GMMat4& data)
+inline gm::GMfloat* ValuePointer(const GMMat4& data)
 {
 	return (gm::GMfloat*)(&(data.v_));
 }
 #else
 template <typename T>
-inline gm::GMfloat* ValuePointer(GMVec2& data)
+inline gm::GMfloat* ValuePointer(const T& data)
 {
-	return ValuePointer<T>(data);
+	return (gm::GMfloat*)(&data.v_.x);
+}
+
+template <>
+inline gm::GMfloat* ValuePointer(const GMMat4& data)
+{
+	return (gm::GMfloat*)(&data.v_[0]);
 }
 #endif
+
+template <>
+inline gm::GMfloat* ValuePointer(const GMFloat4& data)
+{
+	return (gm::GMfloat*)(&(data[0]));
+}

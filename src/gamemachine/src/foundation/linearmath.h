@@ -78,6 +78,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
 	GM_ALIGNED_STRUCT(className)				\
 	{											\
+		typedef dxStruct DataType;				\
 		dxStruct v_;							\
 	public:										\
 		className() = default;					\
@@ -110,6 +111,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
 	GM_ALIGNED_STRUCT(className)				\
 	{											\
+		typedef glStruct DataType;				\
 		glStruct v_;							\
 												\
 	public:										\
@@ -119,10 +121,11 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
 #define GMMATH_LOAD_FLOAT4						\
 		void loadFloat4(GMFloat4& f4) const		\
 		{										\
-			f4.v_[0] = v_[0];					\
-			f4.v_[1] = v_[1];					\
-			f4.v_[2] = v_[2];					\
-			f4.v_[3] = v_[3];					\
+			for (gm::GMint i = 0;				\
+				i < length(); ++i)				\
+			{									\
+				f4.v_[i] = v_[i];				\
+			}									\
 		}
 
 #define GMMATH_SET_FLOAT4(makeFunc)				\
@@ -199,11 +202,11 @@ struct GMFloat16
 struct GMVec4;
 
 GMMATH_BEGIN_STRUCT(GMVec2, glm::vec2, DirectX::XMVECTOR)
+GMMATH_LEN(2)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_FLOAT4(glm::make_vec2)
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
-GMMATH_LEN(2)
 #if GM_USE_DX11
 GMVec2(gm::GMfloat v0)
 {
@@ -228,13 +231,13 @@ GMVec2(gm::GMfloat v0, gm::GMfloat v1)
 GMMATH_END_STRUCT
 
 GMMATH_BEGIN_STRUCT(GMVec3, glm::vec3, DirectX::XMVECTOR)
+GMMATH_LEN(3)
 GMMATH_SET_FLOAT4(glm::make_vec3)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
-GMMATH_LEN(3)
 #if GM_USE_DX11
 GMVec3(gm::GMfloat v0)
 {
@@ -260,13 +263,13 @@ inline GMVec3(const GMVec4& V);
 GMMATH_END_STRUCT
 
 GMMATH_BEGIN_STRUCT(GMVec4, glm::vec4, DirectX::XMVECTOR)
+GMMATH_LEN(4)
 GMMATH_SET_FLOAT4(glm::make_vec4)
 GMMATH_LOAD_FLOAT4
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
-GMMATH_LEN(4)
 #if GM_USE_DX11
 GMVec4(gm::GMfloat v0)
 {
@@ -311,7 +314,11 @@ void loadFloat16(GMFloat16& f16) const
 		DirectX::XMStoreFloat4(&(f4.v_), v_.r[i]);
 	}
 #else
-	GM_ASSERT(false);
+	for (gm::GMint i = 0; i < 4; ++i)
+	{
+		GMFloat4& f4 = f16.v_[i];
+		(*this)[i].loadFloat4(f4);
+	}
 #endif
 }
 
@@ -349,11 +356,11 @@ GMVec4 operator[](gm::GMint i) const
 GMMATH_END_STRUCT
 
 GMMATH_BEGIN_STRUCT(GMQuat, glm::quat, DirectX::XMVECTOR)
+GMMATH_LEN(4)
 GMMATH_SET_GET_(X, 0)
 GMMATH_SET_GET_(Y, 1)
 GMMATH_SET_GET_(Z, 2)
 GMMATH_SET_GET_(W, 3)
-GMMATH_LEN(4)
 GMQuat(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
 {
 #if GM_USE_DX11
@@ -522,7 +529,7 @@ inline void CopyToArray(const GMVec3& V, gm::GMfloat* array);
 inline void CopyToArray(const GMVec4& V, gm::GMfloat* array);
 
 template <typename T>
-inline gm::GMfloat* ValuePointer(T& data);
+inline gm::GMfloat* ValuePointer(const T& data);
 
 #include "linearmath.inl"
 
