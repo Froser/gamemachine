@@ -154,7 +154,7 @@ struct GMFloat4
 
 	GMFloat4(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
 #if GM_USE_DX11
-		v_(x, y, z, w)
+		: v_(x, y, z, w)
 #endif
 	{
 #if !GM_USE_DX11

@@ -206,7 +206,7 @@ inline GMVec2 operator+(const GMVec2& V1, const GMVec2& V2)
 {
 	GMVec2 V;
 #if GM_USE_DX11
-	V.v_ = DirectX::operator+(V1.v_, V1.v_);
+	V.v_ = DirectX::operator+(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ + V2.v_;
 #endif
@@ -217,7 +217,7 @@ inline GMVec2 operator-(const GMVec2& V1, const GMVec2& V2)
 {
 	GMVec2 V;
 #if GM_USE_DX11
-	V.v_ = DirectX::operator-(V1.v_, V1.v_);
+	V.v_ = DirectX::operator-(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ - V2.v_;
 #endif;
@@ -228,7 +228,7 @@ inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2)
 {
 	GMVec3 V;
 #if GM_USE_DX11
-	V.v_ = DirectX::operator+(V1.v_, V1.v_);
+	V.v_ = DirectX::operator+(V1.v_, V2.v_);
 #else
 	V.v_ = V1.v_ + V2.v_;
 #endif
@@ -377,7 +377,7 @@ inline GMVec4 operator*(const GMVec4& V, const GMMat4& M)
 {
 	GMVec4 R;
 #if GM_USE_DX11
-	R.v_ = DirectX::XMVector3Transform(V.v_, M.v_);
+	R.v_ = DirectX::XMVector4Transform(V.v_, M.v_);
 #else
 	R.v_ = M.v_ * V.v_;
 #endif
