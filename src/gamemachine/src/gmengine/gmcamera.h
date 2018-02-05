@@ -31,8 +31,8 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 	{
 	}
 
-	GMVec3 lookAt = zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
-	GMVec3 position = zero<GMVec3>(); //!< 摄像机位置
+	GMVec3 lookAt = Zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
+	GMVec3 position = Zero<GMVec3>(); //!< 摄像机位置
 	GMVec3 up = GMVec3(0, 1, 0);
 };
 

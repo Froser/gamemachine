@@ -33,6 +33,8 @@ set(SOURCES
 		cases/scanner.cpp
 		cases/thread.h
 		cases/thread.cpp
+		cases/linearmath.h
+		cases/linearmath.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

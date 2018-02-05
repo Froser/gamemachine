@@ -4,6 +4,7 @@
 #include "cases/string.h"
 #include "cases/scanner.h"
 #include "cases/thread.h"
+#include "cases/linearmath.h"
 
 int main(int argc, char* argv)
 {
@@ -14,7 +15,8 @@ int main(int argc, char* argv)
 		new cases::Hook(),
 		new cases::String(),
 		new cases::Scanner(),
-		new cases::Thread(),
+		new cases::LinearMath(),
+		// new cases::Thread(),
 	};
 
 	for (auto& c : caseArray)

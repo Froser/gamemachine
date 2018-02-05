@@ -150,6 +150,21 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
 
 struct GMFloat4
 {
+	GMFloat4() = default;
+
+	GMFloat4(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
+#if GM_USE_DX11
+		v_(x, y, z, w)
+#endif
+	{
+#if !GM_USE_DX11
+		v_[0] = x;
+		v_[1] = y;
+		v_[2] = z;
+		v_[3] = w;
+#endif
+	}
+
 #if GM_USE_DX11
 	enum XYZW
 	{
@@ -193,7 +208,7 @@ struct GMFloat4
 struct GMFloat16
 {
 	GMFloat4 v_[4];
-	GMFloat4 operator[](gm::GMint i)
+	GMFloat4& operator[](gm::GMint i)
 	{
 		return v_[i];
 	}
@@ -385,12 +400,6 @@ GMMATH_END_STRUCT
 //////////////////////////////////////////////////////////////////////////
 inline GMMat4 __getIdentityMat4();
 inline GMQuat __getIdentityQuat();
-
-template <typename T>
-inline T zero()
-{
-	return T(0);
-}
 
 template <typename T>
 inline T Identity();
