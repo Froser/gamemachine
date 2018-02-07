@@ -331,4 +331,44 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		GMVec4 R = V * M;
 		return VECTOR4_EQUALS(R, 90, 100, 110, 120);
 	});
+
+	ut.addTestCase("GMVec4 * GMMat4", []() {
+		GMVec4 V(1, 2, 3, 4);
+
+		GMFloat16 f16;
+		f16[0] = GMFloat4(1, 2, 3, 4);
+		f16[1] = GMFloat4(5, 6, 7, 8);
+		f16[2] = GMFloat4(9, 10, 11, 12);
+		f16[3] = GMFloat4(13, 14, 15, 16);
+		GMMat4 M;
+		M.setFloat16(f16);
+		GMVec4 R = V * M;
+		return VECTOR4_EQUALS(R, 90, 100, 110, 120);
+	});
+
+	ut.addTestCase("QuatToMatrix()", []() {
+		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算
+		GMQuat Q(1, 2, 3, 4);
+		GMMat4 M = QuatToMatrix(Q);
+		return
+			VECTOR4_EQUALS(M[0], -25, 28, -10, 0) &&
+			VECTOR4_EQUALS(M[1], -20, -19, 20, 0) &&
+			VECTOR4_EQUALS(M[2], 22, 4, -9, 0) &&
+			VECTOR4_EQUALS(M[3], 0, 0, 0, 1);
+	});
+
+	// TODO LookAt
+	ut.addTestCase("Dot(Vec2)", []() {
+		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算
+		GMVec2 V1(1, 2), V2(3, 4);
+		gm::GMfloat result = Dot(V1, V2);
+		return result == 11;
+	});
+
+	ut.addTestCase("Dot(Vec3)", []() {
+		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算
+		GMVec3 V1(1, 2, 3), V2(4, 5, 6);
+		gm::GMfloat result = Dot(V1, V2);
+		return result == 32;
+	});
 }

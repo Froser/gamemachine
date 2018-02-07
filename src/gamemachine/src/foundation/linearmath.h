@@ -381,7 +381,7 @@ GMQuat(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
 #if GM_USE_DX11
 	v_ = DirectX::XMVectorSet(x, y, z, w);
 #else
-	v_ = glm::quat(x, y, z, w);
+	v_ = glm::quat(w, x, y, z);
 #endif
 }
 

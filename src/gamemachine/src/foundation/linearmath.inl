@@ -565,13 +565,12 @@ inline GMQuat Rotate(gm::GMfloat Angle, const GMVec3& Axis)
 
 inline GMQuat Rotate(const GMQuat& Start, gm::GMfloat Angle, const GMVec3& Axis)
 {
-	GM_ASSERT(false);
-
 	GMQuat Q;
 #if GM_USE_DX11
-	Q.v_ = DirectX::XMQuaternionRotationAxis(Axis.v_, Angle);
+	Q.v_ = DirectX::XMQuaternionMultiply(Start.v_, DirectX::XMQuaternionRotationAxis(Axis.v_, Angle));
+
 #else
-	Q.v_ = glm::rotate(glm::identity<glm::quat>(), Angle, Axis.v_);
+	Q.v_ = glm::rotate(Start.v_, Angle, Axis.v_);
 #endif
 	return Q;
 }
