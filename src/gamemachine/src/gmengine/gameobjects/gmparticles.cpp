@@ -296,15 +296,19 @@ void GMLerpParticleEmitter::update(const GMint index, GMParticleGameObject* part
 	{
 		if (d->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			transform = Translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
+			transform =
+				Scale(GMVec3(size))
 				* QuatToMatrix(Lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
-				* Scale(GMVec3(size));
+				* Translate(d->particleProps[index].startupPosition + d->particleProps[index].direction * d->emitterProps.speed * diff)
+				;
 		}
 		else
 		{
-			transform = Translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
+			transform =
+				Scale(GMVec3(size))
 				* QuatToMatrix(Lerp(d->particleProps[index].startAngle, d->particleProps[index].endAngle, percentage))
-				* Scale(GMVec3(size));
+				* Translate(d->emitterProps.position + d->particleProps[index].direction * d->emitterProps.speed * diff)
+				;
 		}
 	}
 	else
@@ -528,15 +532,19 @@ void GMRadiusParticlesEmitter::update(const GMint index, GMParticleGameObject* p
 		
 		if (db->emitterProps.positionType != GMParticlePositionType::FollowEmitter)
 		{
-			transform = Translate(db->particleProps[index].startupPosition + Inhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+			transform =
+				Scale(GMVec3(size))
 				* QuatToMatrix(Lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
-				* Scale(GMVec3(size));
+				* Translate(db->particleProps[index].startupPosition + Inhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				;
 		}
 		else
 		{
-			transform = Translate(db->emitterProps.position + Inhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+			transform =
+				Scale(GMVec3(size))
 				* QuatToMatrix(Lerp(db->particleProps[index].startAngle, db->particleProps[index].endAngle, percentage))
-				* Scale(GMVec3(size));
+				* Translate(db->emitterProps.position + Inhomogeneous(rotatedDirection) * db->emitterProps.speed * diff)
+				;
 		}
 	}
 	else
