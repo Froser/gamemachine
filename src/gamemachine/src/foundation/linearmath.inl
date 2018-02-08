@@ -461,7 +461,7 @@ inline GMVec3 Normalize(const GMVec3& V)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
-	R.v_ = glm::normalize(R.v_);
+	R.v_ = glm::normalize(V.v_);
 #endif
 	return R;
 }
@@ -472,7 +472,7 @@ inline GMVec3 FastNormalize(const GMVec3& V)
 #if GM_USE_DX11
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
-	R.v_ = glm::fastNormalize(R.v_);
+	R.v_ = glm::fastNormalize(V.v_);
 #endif
 	return R;
 }
@@ -604,7 +604,7 @@ inline GMMat4 Ortho(gm::GMfloat left, gm::GMfloat right, gm::GMfloat bottom, gm:
 	return M;
 }
 
-inline gm::GMint Length(const GMVec3& V)
+inline gm::GMfloat Length(const GMVec3& V)
 {
 #if GM_USE_DX11
 	GMFloat4 f;
@@ -615,7 +615,7 @@ inline gm::GMint Length(const GMVec3& V)
 #endif
 }
 
-inline gm::GMint Length(const GMVec4& V)
+inline gm::GMfloat Length(const GMVec4& V)
 {
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector4Length(V.v_));
@@ -624,7 +624,7 @@ inline gm::GMint Length(const GMVec4& V)
 #endif
 }
 
-inline gm::GMint LengthSq(const GMVec3& V)
+inline gm::GMfloat LengthSq(const GMVec3& V)
 {
 #if GM_USE_DX11
 	return DirectX::XMVectorGetX(DirectX::XMVector3LengthSq(V.v_));

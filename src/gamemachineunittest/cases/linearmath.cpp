@@ -6,6 +6,9 @@
 #define VECTOR3_EQUALS(V, x, y, z)		( V.getX() == (x) && V.getY() == (y) && V.getZ() == (z) )
 #define VECTOR4_EQUALS(V, x, y, z, w)	( V.getX() == (x) && V.getY() == (y) && V.getZ() == (z) && V.getW() == (w) )
 
+#define VECTOR3_FUZZY_EQUALS(V, x, y, z)	(FuzzyCompare(V.getX(), (x)) && FuzzyCompare(V.getY(), (y)) && FuzzyCompare(V.getZ(), (z)) )
+#define VECTOR4_FUZZY_EQUALS(V, x, y, z, w)	(FuzzyCompare(V.getX(), (x)) && FuzzyCompare(V.getY(), (y)) && FuzzyCompare(V.getZ(), (z)) && FuzzyCompare(V.getW(), (w)))
+
 void cases::LinearMath::addToUnitTest(UnitTest& ut)
 {
 	// GMVec2
@@ -273,6 +276,26 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 			VECTOR4_EQUALS(N[3], 0, 0, 0, 1);
 	});
 
+	// Make, Combine
+	ut.addTestCase("MakeVector3", []() {
+		gm::GMfloat A[] = { 1, 2, 3 };
+		GMVec3 V = MakeVector3(A);
+		return VECTOR3_EQUALS(V, 1, 2, 3);
+	});
+
+	ut.addTestCase("MakeVector3(float*)", []() {
+		GMVec4 V(4, 3, 2, 1);
+		GMVec3 R = MakeVector3(V);
+		return VECTOR3_EQUALS(R, 4, 3, 2);
+	});
+
+	ut.addTestCase("MakeVector3(GMVec4)", []() {
+		GMVec3 V1(1, 2, 3);
+		GMVec4 V2(4, 3, 2, 1);
+		GMVec4 R = CombineVector4(V1, V2);
+		return VECTOR4_EQUALS(R, 1, 2, 3, 1);
+	});
+
 	// Calculations
 	ut.addTestCase("Inhomogeneous()", []() {
 		GMVec4 T(2, 4, 8, 2);
@@ -347,7 +370,7 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 	});
 
 	ut.addTestCase("QuatToMatrix()", []() {
-		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算
+		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算。
 		GMQuat Q(1, 2, 3, 4);
 		GMMat4 M = QuatToMatrix(Q);
 		return
@@ -357,18 +380,173 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 			VECTOR4_EQUALS(M[3], 0, 0, 0, 1);
 	});
 
-	// TODO LookAt
-	ut.addTestCase("Dot(Vec2)", []() {
-		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算
+	// TODO LookAt, Ortho, Perspective
+
+
+	ut.addTestCase("Dot(GMVec2)", []() {
 		GMVec2 V1(1, 2), V2(3, 4);
 		gm::GMfloat result = Dot(V1, V2);
 		return result == 11;
 	});
 
-	ut.addTestCase("Dot(Vec3)", []() {
-		// 注意，只有单位四元数才有意义。这里只进行矩阵的计算
+	ut.addTestCase("Dot(GMVec3)", []() {
 		GMVec3 V1(1, 2, 3), V2(4, 5, 6);
 		gm::GMfloat result = Dot(V1, V2);
 		return result == 32;
 	});
+
+	ut.addTestCase("Dot(GMVec4)", []() {
+		GMVec4 V1(1, 2, 3, 4), V2(5, 6, 7, 8);
+		gm::GMfloat result = Dot(V1, V2);
+		return result == 70;
+	});
+
+	ut.addTestCase("Normalize(GMVec3)", []() {
+		GMVec3 V(1, 2, 3);
+		GMVec3 R = Normalize(V);
+		gm::GMfloat len = Sqrt(14);
+		return VECTOR3_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len);
+	});
+
+	ut.addTestCase("FastNormalize(GMVec3)", []() {
+		GMVec3 V(1, 2, 3);
+		GMVec3 R = Normalize(V);
+		gm::GMfloat len = Sqrt(14);
+		return VECTOR3_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len);
+	});
+
+	ut.addTestCase("SafeNormalize(GMVec3)", []() {
+		GMVec3 V(0, 0, 0);
+		GMVec3 R = SafeNormalize(V, GMVec3(0, 1, 0));
+		bool B1 = VECTOR3_EQUALS(R, 0, 1, 0);
+
+		V = GMVec3(1, 2, 3);
+		R = Normalize(V);
+		gm::GMfloat len = Sqrt(14);
+		bool B2 = VECTOR3_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len);
+
+		return B1 && B2;
+	});
+
+	// Affines
+	ut.addTestCase("Translate(GMVec3)", []() {
+		GMMat4 M = Translate(GMVec3(1, 2, 3));
+		return
+			VECTOR4_EQUALS(M[0], 1, 0, 0, 0) &&
+			VECTOR4_EQUALS(M[1], 0, 1, 0, 0) &&
+			VECTOR4_EQUALS(M[2], 0, 0, 1, 0) &&
+			VECTOR4_EQUALS(M[3], 1, 2, 3, 1);
+	});
+
+	ut.addTestCase("Translate(GMVec4)", []() {
+		GMMat4 M = Translate(GMVec4(1, 2, 3, 4));
+		return
+			VECTOR4_EQUALS(M[0], 1, 0, 0, 0) &&
+			VECTOR4_EQUALS(M[1], 0, 1, 0, 0) &&
+			VECTOR4_EQUALS(M[2], 0, 0, 1, 0) &&
+			VECTOR4_EQUALS(M[3], 1, 2, 3, 1);
+	});
+
+	ut.addTestCase("Scale(GMVec3)", []() {
+		GMMat4 M = Scale(GMVec3(1, 2, 3));
+		return
+			VECTOR4_EQUALS(M[0], 1, 0, 0, 0) &&
+			VECTOR4_EQUALS(M[1], 0, 2, 0, 0) &&
+			VECTOR4_EQUALS(M[2], 0, 0, 3, 0) &&
+			VECTOR4_EQUALS(M[3], 0, 0, 0, 1);
+	});
+
+	// TODO Rotation
+
+
+	ut.addTestCase("GetTranslationFromMatrix()", []() {
+		GMFloat4 F;
+		GMMat4 M = Translate(GMVec4(1, 2, 3, 4));
+		GetTranslationFromMatrix(M, F);
+		return F[0] == 1 && F[1] == 2 && F[2] == 3;
+	});
+
+	ut.addTestCase("GetScalingFromMatrix()", []() {
+		GMFloat4 F;
+		GMMat4 M = Scale(GMVec3(1, 2, 3));
+		GetScalingFromMatrix(M, F);
+		return F[0] == 1 && F[1] == 2 && F[2] == 3;
+	});
+
+	ut.addTestCase("Length(GMVec3)", []() {
+		GMVec3 V(1, 2, 3);
+		return FuzzyCompare(Sqrt(14), Length(V));
+	});
+
+	ut.addTestCase("Length(GMVec4)", []() {
+		GMVec4 V(1, 2, 3, 4);
+		return FuzzyCompare(Sqrt(30), Length(V));
+	});
+
+	ut.addTestCase("LengthSq(GMVec3)", []() {
+		GMVec3 V(1, 2, 3);
+		return LengthSq(V) == 14;
+	});
+
+	ut.addTestCase("Cross(GMVec3)", []() {
+		// 注意，只有单位向量叉乘才有意义。这里只进行叉乘的计算。
+		GMVec3 V1(1, 2, 3), V2(4, 5, 6);
+		GMVec3 R = Cross(V1, V2);
+		return VECTOR3_EQUALS(R, -3, 6, -3);
+	});
+
+	ut.addTestCase("Transpose(GMMat4)", []() {
+		GMFloat16 f16;
+		f16[0] = GMFloat4(1, 2, 3, 4);
+		f16[1] = GMFloat4(5, 6, 7, 8);
+		f16[2] = GMFloat4(9, 10, 11, 12);
+		f16[3] = GMFloat4(13, 14, 15, 16);
+		GMMat4 M;
+		M.setFloat16(f16);
+		GMMat4 R = Transpose(M);
+
+		return
+			VECTOR4_EQUALS(R[0], 1, 5, 9, 13) &&
+			VECTOR4_EQUALS(R[1], 2, 6, 10, 14) &&
+			VECTOR4_EQUALS(R[2], 3, 7, 11, 15) &&
+			VECTOR4_EQUALS(R[3], 4, 8, 12, 16);
+	});
+
+	ut.addTestCase("Inverse(GMMat4)", []() {
+		GMFloat16 f16;
+		f16[0] = GMFloat4(4, 0, 0, 0);
+		f16[1] = GMFloat4(0, 8, 0, 0);
+		f16[2] = GMFloat4(0, 0, 16, 0);
+		f16[3] = GMFloat4(1, 2, 4, 1);
+		GMMat4 M;
+		M.setFloat16(f16);
+		GMMat4 R = Inverse(M);
+
+		return
+			VECTOR4_FUZZY_EQUALS(R[0], .25f, 0, 0, 0) &&
+			VECTOR4_FUZZY_EQUALS(R[1], 0, .125f, 0, 0) &&
+			VECTOR4_FUZZY_EQUALS(R[2], 0, 0, 0.0625f, 0) &&
+			VECTOR4_FUZZY_EQUALS(R[3], -.25f, -.25f, -.25f, 1);
+	});
+
+	ut.addTestCase("InverseTranspose(GMMat4)", []() {
+		GMFloat16 f16;
+		f16[0] = GMFloat4(4, 0, 0, 0);
+		f16[1] = GMFloat4(0, 8, 0, 0);
+		f16[2] = GMFloat4(0, 0, 16, 0);
+		f16[3] = GMFloat4(1, 2, 4, 1);
+		GMMat4 M;
+		M.setFloat16(f16);
+		GMMat4 R = InverseTranspose(M);
+
+		return
+			VECTOR4_FUZZY_EQUALS(R[0], .25f, 0, 0, -.25f) &&
+			VECTOR4_FUZZY_EQUALS(R[1], 0, .125f, 0, -.25f) &&
+			VECTOR4_FUZZY_EQUALS(R[2], 0, 0, 0.0625f, -.25f) &&
+			VECTOR4_FUZZY_EQUALS(R[3], 0, 0, 0, 1);
+	});
+
+	//TODO Lerp
+
+
 }

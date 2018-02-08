@@ -914,7 +914,7 @@ namespace
 			vec.setFloat4(f4_vec);
 			for (k = 0; k < 3; k++)
 			{
-				if (FuzzyCompare(f4_vec[k], -1) || FuzzyCompare(f4_vec[k], 1))
+				if (FuzzyCompare(f4_vec[k], -1, .01f) || FuzzyCompare(f4_vec[k], 1, .01f))
 					break;	// axial
 			}
 			if (k < 3)

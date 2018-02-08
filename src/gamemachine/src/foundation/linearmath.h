@@ -69,9 +69,12 @@ constexpr genType Radians(genType degrees)
 	return degrees * static_cast<genType>(0.01745329251994329576923690768489);
 }
 
-inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2)
+inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier = 0)
 {
-	return (Fabs(p1 - p2) <= 0.01f);
+	if (qualifier)
+		return (Fabs(p1 - p2) <= qualifier);
+	
+	return (Fabs(p1 - p2) <= 0.00001f * Min(Fabs(p1), Fabs(p2)));
 }
 
 #if GM_USE_DX11
@@ -508,11 +511,11 @@ inline void GetTranslationFromMatrix(const GMMat4& M, OUT GMFloat4& F);
 
 inline void GetScalingFromMatrix(const GMMat4& M, OUT GMFloat4& F);
 
-inline gm::GMint Length(const GMVec3& V);
+inline gm::GMfloat Length(const GMVec3& V);
 
-inline gm::GMint Length(const GMVec4& V);
+inline gm::GMfloat Length(const GMVec4& V);
 
-inline gm::GMint LengthSquared(const GMVec3& V);
+inline gm::GMfloat LengthSq(const GMVec3& V);
 
 inline GMVec3 Cross(const GMVec3& V1, const GMVec3& V2);
 
