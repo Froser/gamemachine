@@ -11,14 +11,14 @@
 BEGIN_NS
 GM_ALIGNED_STRUCT(GMBSPTraceWork)
 {
-	GMVec3 start = GMVec3(0);
-	GMVec3 end = GMVec3(0);
-	GMVec3 size[2] = { GMVec3(0), GMVec3(0) };	// size of the box being swept through the model
-	GMVec3 offsets[8] = { GMVec3(0), GMVec3(0), GMVec3(0), GMVec3(0), GMVec3(0), GMVec3(0), GMVec3(0), GMVec3(0) };	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
+	GMVec3 start = Zero<GMVec3>();
+	GMVec3 end = Zero<GMVec3>();
+	GMVec3 size[2] = { Zero<GMVec3>(), Zero<GMVec3>() };	// size of the box being swept through the model
+	GMVec3 offsets[8] = { Zero<GMVec3>(), Zero<GMVec3>(), Zero<GMVec3>(), Zero<GMVec3>(), Zero<GMVec3>(), Zero<GMVec3>(), Zero<GMVec3>(), Zero<GMVec3>() };	// 表示一个立方体的8个顶点，[signbits][x] = size[0][x] 或 size[1][x]
 	GMfloat maxOffset = 0;	// longest corner length from origin
 	GMVec3 extents{ 0 };	// greatest of abs(size[0]) and abs(size[1])
-	GMVec3 bounds[2] = { GMVec3(0), GMVec3(0) };	// enclosing box of start and end surrounding by size
-	GMVec3 modelOrigin = GMVec3(0);// origin of the model tracing through
+	GMVec3 bounds[2] = { Zero<GMVec3>(), Zero<GMVec3>() };	// enclosing box of start and end surrounding by size
+	GMVec3 modelOrigin = Zero<GMVec3>();// origin of the model tracing through
 	GMint contents = 0; // ored contents of the model tracing through
 	bool isPoint = false; // optimized case
 	BSPTraceResult trace; // returned from trace call
@@ -146,7 +146,7 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 		if (f4_size[0][0] == 0 && f4_size[0][1] == 0 && f4_size[0][2] == 0)
 		{
 			tw.isPoint = true;
-			tw.extents = GMVec3(0);
+			tw.extents = Zero<GMVec3>();
 		}
 		else
 		{

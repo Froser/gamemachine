@@ -96,6 +96,34 @@ inline GMVec3::GMVec3(const GMVec4& V)
 #endif
 }
 
+inline GMQuat::GMQuat(const GMVec3& U, const GMVec3& V)
+#if !GM_USE_DX11
+	:v_(U.v_, V.v_)
+#endif
+{
+#if GM_USE_DX11
+	gm::GMfloat norm_u_norm_v = Sqrt(Dot(U, U) * Dot(V, V));
+	gm::GMfloat real_part = norm_u_norm_v + Dot(U, V);
+	GMVec3 t;
+	if (real_part < static_cast<gm::GMfloat>(1.e-6f) * norm_u_norm_v)
+	{
+		// If u and v are exactly opposite, rotate 180 degrees
+		// around an arbitrary orthogonal axis. Axis normalisation
+		// can happen later, when we normalise the quaternion.
+		real_part = 0.f;
+		t = Fabs(U.getX()) > Fabs(U.getZ()) ? GMVec3(-U.getY(), U.getX(), 0.f) : GMVec3(0.f, -U.getZ(), U.getY());
+	}
+	else
+	{
+		// Otherwise, build quaternion the standard way.
+		t = Cross(U, V);
+	}
+
+	GMQuat Q = Normalize(GMQuat(t.getX(), t.getY(), t.getZ(), real_part));
+	v_ = Q.v_;
+#endif
+}
+
 template <>
 inline GMVec2 Zero()
 {
@@ -462,6 +490,17 @@ inline GMVec3 Normalize(const GMVec3& V)
 	R.v_ = DirectX::XMVector3Normalize(V.v_);
 #else
 	R.v_ = glm::normalize(V.v_);
+#endif
+	return R;
+}
+
+inline GMQuat Normalize(const GMQuat& Q)
+{
+	GMQuat R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMQuaternionNormalize(Q.v_);
+#else
+	R.v_ = glm::normalize(Q.v_);
 #endif
 	return R;
 }

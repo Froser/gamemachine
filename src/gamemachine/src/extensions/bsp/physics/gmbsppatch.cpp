@@ -97,13 +97,14 @@ namespace
 		GMint i, j;
 		GMfloat d;
 
-		GMFloat4 f4_points;
+		GMFloat4 f4_points_0, f4_points_1;
 		for (i = 0; i < grid->height; i++)
 		{
+			grid->points[0][i].loadFloat4(f4_points_0);
+			grid->points[grid->width - 1][i].loadFloat4(f4_points_1);
 			for (j = 0; j < 3; j++)
 			{
-				grid->points[0][i].loadFloat4(f4_points);
-				d = f4_points[j] - f4_points[j];
+				d = f4_points_0[j] - f4_points_1[j];
 				if (d < -WRAP_POINT_EPSILON || d > WRAP_POINT_EPSILON)
 					break;
 			}
@@ -270,7 +271,7 @@ namespace
 	void transposeGrid(BSPGrid* grid)
 	{
 		GMint i, j, l;
-		GMVec3	temp;
+		GMVec3 temp;
 		bool tempWrap;
 
 		if (grid->width > grid->height)
@@ -653,7 +654,7 @@ namespace
 			gm_error(L"baseWindingForPlane: no axis found");
 
 		// 找到向上轴，openGL、Dx中y坐标轴表示向上
-		vup = GMVec3(0, 0, 0);
+		vup = Zero<GMVec3>();
 		switch (x)
 		{
 		case 0:

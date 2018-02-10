@@ -33,7 +33,7 @@ GM_ALIGNED_STRUCT(BSPTraceResult)
 	bool allsolid = false; // if true, plane is not valid
 	bool startsolid = false; // if true, the initial point was in a solid area
 	GMfloat fraction = 0; // time completed, 1.0 = didn't hit anything
-	GMVec3 endpos{ 0 }; // final position
+	GMVec3 endpos = Zero<GMVec3>(); // final position
 	BSPTracePlane plane; // surface normal at impact, transformed to world space
 	GMint surfaceFlags = 0; // surface hit
 	GMint contents = 0; // contents on other side of surface hit
@@ -44,7 +44,7 @@ GM_ALIGNED_STRUCT(BSPTraceResult)
 
 GM_ALIGNED_STRUCT(BSPSphere)
 {
-	GMVec3 offset{ 0 };
+	GMVec3 offset = Zero<GMVec3>();
 	GMfloat radius = false;
 	GMfloat halfheight = false;
 	bool use = false;

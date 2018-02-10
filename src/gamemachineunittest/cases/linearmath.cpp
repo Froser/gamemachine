@@ -110,6 +110,12 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return V.getX() == 1 && V.getY() == 2 && V.getZ() == 3 && V.getW() == 5;
 	});
 
+	// GMQuat
+	ut.addTestCase("GMQuat::GMQuat(GMVec3, GMVec3)", []() {
+		GMQuat Q(GMVec3(1, 0, 0), GMVec3(0, 1, 0));
+		return VECTOR4_EQUALS(Q, 0, 0, 0.707106769f, 0.707106769f);
+	});
+
 	// Zero
 	ut.addTestCase("GMVec2 Zero", []() {
 		typedef GMVec2 TestType;

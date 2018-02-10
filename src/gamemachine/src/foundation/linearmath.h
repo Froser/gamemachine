@@ -388,16 +388,7 @@ GMQuat(gm::GMfloat x, gm::GMfloat y, gm::GMfloat z, gm::GMfloat w)
 #endif
 }
 
-GMQuat(const GMVec3& U, const GMVec3& V)
-#if GM_USE_DX11
-#else
-	:v_(U.v_, V.v_)
-#endif
-{
-#if GM_USE_DX11
-	GM_ASSERT(false);
-#endif
-}
+GMQuat(const GMVec3& U, const GMVec3& V);
 GMMATH_END_STRUCT
 
 //////////////////////////////////////////////////////////////////////////
@@ -484,6 +475,8 @@ inline gm::GMfloat Dot(const GMVec3& V1, const GMVec3& V2);
 inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2);
 
 inline GMVec3 Normalize(const GMVec3& V);
+
+inline GMQuat Normalize(const GMQuat& Q);
 
 inline GMVec3 FastNormalize(const GMVec3& V);
 

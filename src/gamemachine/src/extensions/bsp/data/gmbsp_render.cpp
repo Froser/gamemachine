@@ -108,7 +108,6 @@ void GMBSPRender::generateVertices()
 	{
 		d->vertices[i].position = d->bsp->vertices[i].xyz;
 
-		//scale down
 		d->vertices[i].decalS = d->bsp->vertices[i].st[0];
 		d->vertices[i].decalT = d->bsp->vertices[i].st[1];
 

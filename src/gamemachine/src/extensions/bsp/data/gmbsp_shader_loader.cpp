@@ -92,9 +92,9 @@ namespace
 	void readTernaryFloatsFromString(const char* str, GMfloat vec[3])
 	{
 		GMScanner s(str);
+		GMfloat f;
 		for (GMint i = 0; i < 3; i++)
 		{
-			GMfloat f;
 			s.nextFloat(&f);
 			vec[i] = f;
 		}

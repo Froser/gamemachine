@@ -43,7 +43,7 @@ void GMBSPMove::processCommand()
 		//TODO 没有在move的时候，可以考虑摩擦使速度减小
 		//这里我们先清空速度
 		if (!d->movementState.freefall)
-			d->initialVelocity = GMVec3(0);
+			d->initialVelocity = Zero<GMVec3>();
 	}
 
 	if (d->action.jump.jumped)
@@ -154,7 +154,7 @@ void GMBSPMove::groundTrace()
 	GMVec3 p(d->movementState.origin);
 	p.setY(p.getY() - .25f);
 
-	d->trace->trace(d->movementState.origin, p, GMVec3(0),
+	d->trace->trace(d->movementState.origin, p, Zero<GMVec3>(),
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 		d->movementState.groundTrace
@@ -175,7 +175,7 @@ void GMBSPMove::groundTrace()
 void GMBSPMove::walkMove()
 {
 	D(d);
-	if (d->movementState.velocity == GMVec3(0))
+	if (d->movementState.velocity == Zero<GMVec3>())
 		return;
 
 	stepSlideMove(false);
@@ -203,7 +203,7 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	d->trace->trace(
 		d->movementState.origin,
 		stepUp,
-		GMVec3(0),
+		Zero<GMVec3>(),
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 		t);
@@ -226,7 +226,7 @@ void GMBSPMove::stepSlideMove(bool hasGravity)
 	stepDown.setY(stepDown.getY() - stepSize);
 	d->trace->trace(
 		d->movementState.origin,
-		stepDown, GMVec3(0), 
+		stepDown, Zero<GMVec3>(), 
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 		gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 		t);
@@ -273,7 +273,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 		BSPTraceResult moveTrace;
 		d->trace->trace(d->movementState.origin,
 			d->movementState.origin + velocity * t,
-			GMVec3(0, 0, 0),
+			Zero<GMVec3>(),
 			gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[0],
 			gmBSPPhysicsObjectCast(d->object)->shapeProperties().bounding[1],
 			moveTrace
@@ -354,7 +354,7 @@ bool GMBSPMove::slideMove(bool hasGravity)
 					if (Dot(cv, planes[k]) >= 0.1)
 						continue;
 
-					velocity = GMVec3(0);
+					velocity = Zero<GMVec3>();
 					return true;
 				}
 			}
