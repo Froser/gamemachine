@@ -111,23 +111,11 @@ private:
 
 // GMSkyObject
 // 一个天空的盒子，用6个面模拟一个天空
-GM_PRIVATE_OBJECT(GMSkyGameObject)
+GM_PRIVATE_OBJECT(GMBSPSkyGameObject)
 {
 	GMVec3 min;
 	GMVec3 max;
 	GMShader shader;
-};
-
-class GMSkyGameObject : public GMGameObject
-{
-	DECLARE_PRIVATE_AND_BASE(GMSkyGameObject, GMGameObject)
-
-public:
-	GMSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max);
-	~GMSkyGameObject();
-
-private:
-	void createSkyBox(OUT GMModel** obj);
 };
 
 class GMCubeMapGameObject : public GMGameObject

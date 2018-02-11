@@ -61,7 +61,8 @@ namespace
 
 		GMMotionStates prop = physics->getMotionStates();
 		GMVec3 vecOrigin;
-		GM_SWAP(origin[1], origin[2])
+		GM_SWAP(origin[1], origin[2]);
+		origin[1] = -origin[1];
 		vecOrigin.setFloat4(origin);
 
 		prop.transform = Translate(vecOrigin);

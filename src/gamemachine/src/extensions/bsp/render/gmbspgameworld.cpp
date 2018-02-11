@@ -16,6 +16,141 @@
 
 BEGIN_NS
 
+// 天空
+static GMVec2 uvs[24] = {
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
+
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
+
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
+
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
+
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
+
+	GMVec2(0, 0),
+	GMVec2(0, 1),
+	GMVec2(1, 1),
+	GMVec2(1, 0),
+};
+
+GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max)
+{
+	D(d);
+	d->shader = shader;
+	d->min = min;
+	d->max = max;
+
+	GMModel* obj = nullptr;
+	createSkyBox(&obj);
+	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, obj);
+	setModel(asset);
+}
+
+GMBSPSkyGameObject::~GMBSPSkyGameObject()
+{
+	D(d);
+	GMModel* m = getModel();
+	if (m)
+		delete m;
+}
+
+void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
+{
+	D(d);
+	GMFloat4 f4_min, f4_max;
+	d->min.loadFloat4(f4_min);
+	d->max.loadFloat4(f4_max);
+	GMVec3 vertices[] = {
+		//Front
+		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
+
+		//Back
+		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
+
+		//Left
+		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
+
+		//Right
+		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
+
+		//Up
+		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
+
+		//Down
+		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
+	};
+
+	// Scaling surface
+	const GMint SCALING = 2;
+	GMVec3 center = (d->min + d->max) / 2.f;
+	GMMat4 transScale = Scale(GMVec3(SCALING, 1, SCALING));
+	for (GMuint i = 0; i < 20; i++)
+	{
+		GMMat4 transRestore = Translate(center);
+		GMMat4 transMoveToAxisOrigin = Translate(-center);
+		GMMat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
+
+		GMVec4 pt = GMVec4(vertices[i], 1) * transFinal;
+		vertices[i] = GMVec3(pt);
+	}
+
+	GMModel* model = new GMModel();
+	*obj = model;
+
+	GMComponent* component = new GMComponent(model->getMesh());
+	component->setShader(d->shader);
+
+	for (GMuint i = 0; i < 6; i++)
+	{
+		component->beginFace();
+		component->vertex(vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ());
+		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
+		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
+		component->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
+		component->uv(uvs[i * 4].getX(), uvs[i * 4].getY());
+		component->uv(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		component->uv(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
+		component->uv(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
+		component->endFace();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////
 typedef void (GMBSPGameWorld::*drawFaceHandler)(GMint);
 
 inline void drawFaces(

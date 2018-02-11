@@ -6,6 +6,18 @@
 #include <gmassets.h>
 BEGIN_NS
 
+class GMBSPSkyGameObject : public GMGameObject
+{
+	DECLARE_PRIVATE_AND_BASE(GMBSPSkyGameObject, GMGameObject)
+
+public:
+	GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max);
+	~GMBSPSkyGameObject();
+
+private:
+	void createSkyBox(OUT GMModel** obj);
+};
+
 class GMBSPGameWorld : public GMGameWorld
 {
 	DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
