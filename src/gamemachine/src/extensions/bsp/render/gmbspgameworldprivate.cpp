@@ -61,7 +61,9 @@ namespace
 
 		GMMotionStates prop = physics->getMotionStates();
 		GMVec3 vecOrigin;
+		GM_SWAP(origin[1], origin[2])
 		vecOrigin.setFloat4(origin);
+
 		prop.transform = Translate(vecOrigin);
 		physics->setMotionStates(prop);
 		physics->shapeProperties().stepHeight = 18.f;

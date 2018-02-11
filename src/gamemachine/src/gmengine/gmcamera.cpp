@@ -231,26 +231,17 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 {
 	D(d);
-	if (d->frustum.getType() == GMFrustumType::Perspective)
-	{
-		const GMRect& cr = GM.getGameMachineRunningStates().clientRect;
-		GMVec3 world = Unproject(
-			GMVec3(x, y, 1),
-			0,
-			0,
-			cr.width,
-			cr.height,
-			d->frustum.getProjectionMatrix(),
-			d->frustum.getViewMatrix(),
-			Identity<GMMat4>()
-		);
+	const GMRect& cr = GM.getGameMachineRunningStates().clientRect;
+	GMVec3 world = Unproject(
+		GMVec3(x, y, 1),
+		0,
+		0,
+		cr.width,
+		cr.height,
+		d->frustum.getProjectionMatrix(),
+		d->frustum.getViewMatrix(),
+		Identity<GMMat4>()
+	);
 
-		return world - d->lookAt.position;
-	}
-	else
-	{
-		// only support GMFrustumType::Perspective
-		GM_ASSERT(false);
-	}
-	return GMVec3(0);
+	return world - d->lookAt.position;
 }
