@@ -69,10 +69,10 @@ GM_ALIGNED_STRUCT(GMBSP_Render_BiquadraticPatch)
 
 	bool tesselate(int newTesselation);
 
-	GMBSP_Render_Vertex controlPoints[9];
-	GMint tesselation = 0;
 	AlignedVector<GMBSP_Render_Vertex> vertices;
 	AlignedVector<GMuint> indices;
+	GMBSP_Render_Vertex controlPoints[9];
+	GMint tesselation = 0;
 	//arrays for multi_draw_arrays
 	GMint* trianglesPerRow = nullptr;
 	GMuint** rowIndexPointers = nullptr;
@@ -153,7 +153,7 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 typedef GMBSPRenderPrivate GMBSPRenderData;
 class GMBSPRender
 {
-	DECLARE_PRIVATE(GMBSPRender);
+	DECLARE_PRIVATE_NGO(GMBSPRender);
 
 public:
 	GMBSPRenderData& renderData();

@@ -5,33 +5,15 @@
 #include "memory.h"
 #include "debug.h"
 
-#if !USE_SIMD
-#	include <algorithm>
-#endif
-
 BEGIN_NS
 
-#if !USE_SIMD
-template <typename T>
-class AlignedVector : public Vector<T>
-{
-	typedef std::vector<T> Base;
-	
-public:
-	typename Base::iterator find(const T& target)
-	{
-		return std::find(Base::begin(), Base::end(), target);
-	}
-};
+#define GM_USE_PLACEMENT_NEW 1
+#define GM_ALLOW_ARRAY_COPY_OP
+#define GM_USE_MEMCPY 0
 
-#else
-#	define GM_USE_PLACEMENT_NEW 1
-#	define GM_ALLOW_ARRAY_COPY_OP
-#	define GM_USE_MEMCPY 0
-
-#	ifdef GM_USE_PLACEMENT_NEW
-#		include <new>
-#	endif
+#ifdef GM_USE_PLACEMENT_NEW
+#	include <new>
+#endif
 
 template <typename T>
 class AlignedVectorIteratorBase
@@ -614,8 +596,6 @@ private:
 	T* m_data;
 	bool m_ownsMemory;
 };
-
-#endif
 
 END_NS
 #endif
