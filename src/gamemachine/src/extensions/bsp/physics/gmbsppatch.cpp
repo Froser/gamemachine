@@ -866,7 +866,7 @@ namespace
 		{
 			for (dir = -1; dir <= 1; dir += 2)
 			{
-				plane = GMVec4(0);
+				plane = Zero<GMVec4>();
 				plane.loadFloat4(f4_plane);
 
 				f4_plane[axis] = dir;
@@ -912,7 +912,7 @@ namespace
 			if (Length(vec) < 0.5)
 				continue;
 			snapVector(vec);
-			vec.setFloat4(f4_vec);
+			vec.loadFloat4(f4_vec);
 			for (k = 0; k < 3; k++)
 			{
 				if (FuzzyCompare(f4_vec[k], -1, .01f) || FuzzyCompare(f4_vec[k], 1, .01f))
@@ -927,7 +927,7 @@ namespace
 				for (dir = -1; dir <= 1; dir += 2)
 				{
 					// construct a plane
-					Vector2 = GMVec3(0);
+					Vector2 = Zero<GMVec3>();
 					Vector2.loadFloat4(f4_Vector2);
 					f4_Vector2[axis] = dir;
 					Vector2.setFloat4(f4_Vector2);

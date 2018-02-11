@@ -233,41 +233,19 @@ GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 	D(d);
 	if (d->frustum.getType() == GMFrustumType::Perspective)
 	{
-		GMfloat nearPlane = d->frustum.getNear();
-		GMfloat fov = d->frustum.getFovy();
-
-		GMVec3 rayFrom = d->lookAt.position;
-		GMVec3 rayForward = d->lookAt.lookAt;
-
-		GMfloat farPlane = d->frustum.getFar();
-		rayForward *= farPlane;
-
-		// 从摄像机向上方向，算出摄像机坐标系 (hor, vertical, rayForward)
-		GMVec3 cameraUp = d->lookAt.up;
-		GMVec3 vertical = cameraUp;
-		GMVec3 hor = Cross(rayForward, vertical);
-		hor = SafeNormalize(hor);
-		vertical = Cross(hor, rayForward);
-		vertical = SafeNormalize(vertical);
-
-		GMfloat tanfov = Tan(0.5f*fov);
-		hor *= 2.f * farPlane * tanfov;
-		vertical *= 2.f * farPlane * tanfov;
-
 		const GMRect& cr = GM.getGameMachineRunningStates().clientRect;
-		GMfloat width = GMfloat(cr.width);
-		GMfloat height = GMfloat(cr.height);
-		GMfloat aspect = width / height;
-		hor *= aspect;
+		GMVec3 world = Unproject(
+			GMVec3(x, y, 1),
+			0,
+			0,
+			cr.width,
+			cr.height,
+			d->frustum.getProjectionMatrix(),
+			d->frustum.getViewMatrix(),
+			Identity<GMMat4>()
+		);
 
-		GMVec3 rayToCenter = rayFrom + rayForward;
-		GMVec3 dHor = hor * 1.f / width;
-		GMVec3 dVert = vertical * 1.f / height;
-
-		GMVec3 rayTo = rayToCenter - 0.5f * hor + 0.5f * vertical;
-		rayTo += GMfloat(x) * dHor;
-		rayTo -= GMfloat(y) * dVert;
-		return rayTo;
+		return world - d->lookAt.position;
 	}
 	else
 	{

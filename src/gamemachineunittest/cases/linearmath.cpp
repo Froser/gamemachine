@@ -387,7 +387,31 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 	});
 
 	// TODO LookAt, Ortho, Perspective
+	ut.addTestCase("LookAt()", []() {
+		GMMat4 V = LookAt(GMVec3(0, 0, 0), GMVec3(1, 1, 1), GMVec3(0, 1, 0));
+		return
+			VECTOR4_FUZZY_EQUALS(V[0], 0.707106769f, -0.408248276f, 0.577350259f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(V[1], 0.000000000f, 0.816496551f, 0.577350259f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(V[2], -0.707106769f, -0.408248276f, 0.577350259f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(V[3], 0.000000000f, 0.000000000f, 0.000000000f, 1.00000000f);
+	});
 
+	ut.addTestCase("Perspective()", []() {
+		GMMat4 P = Perspective(1.3f, 1.3f, 1024, 768);
+		return
+			VECTOR4_FUZZY_EQUALS(P[0], 1.01187372f, 0.000000000f, 0.000000000f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(P[1], 0.000000000f, 1.31543577f, 0.000000000f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(P[2], 0.000000000f, 0.000000000f, -3.00000000f, 1.00000000f) &&
+			VECTOR4_FUZZY_EQUALS(P[3], 0.000000000f, 0.000000000f, 3072.00000f, 0.000000000f);
+	});
+
+	ut.addTestCase("Unproject()", []() {
+		GMMat4 V = LookAt(GMVec3(0, 0, 0), GMVec3(1, 1, 1), GMVec3(0, 1, 0));
+		GMMat4 P = Perspective(1.3f, 1.3f, 1024, 768);
+		GMVec3 Coord(40, 40, 1);
+		GMVec3 W = Normalize(Unproject(Coord, 0, 0, 1024, 768, P, V, Identity<GMMat4>()));
+		return VECTOR3_FUZZY_EQUALS(W, -0.2277193f, 0.7483482f, 0.6229918f);
+	});
 
 	ut.addTestCase("Dot(GMVec2)", []() {
 		GMVec2 V1(1, 2), V2(3, 4);

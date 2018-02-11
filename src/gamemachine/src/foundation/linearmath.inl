@@ -82,6 +82,24 @@ namespace glm
 			return n;
 		}
 	}
+
+	// 以屏幕向下方向为y轴正方向来点来计算unproject，和glm::unproject的y轴方向相反
+	template<typename T, typename U, qualifier Q>
+	GLM_FUNC_QUALIFIER vec<3, T, Q> unprojectScreenCoordDirectionZO(vec<3, T, Q> const& win, mat<4, 4, T, Q> const& model, mat<4, 4, T, Q> const& proj, vec<4, U, Q> const& viewport)
+	{
+		mat<4, 4, T, Q> Inverse = inverse(proj * model);
+
+		vec<4, T, Q> tmp = vec<4, T, Q>(win, T(1));
+		tmp.x = (tmp.x - T(viewport[0])) / T(viewport[2]);
+		tmp.y = -(tmp.y - T(viewport[1])) / T(viewport[3]);
+		tmp.x = tmp.x * static_cast<T>(2) - static_cast<T>(1);
+		tmp.y = tmp.y * static_cast<T>(2) + static_cast<T>(1);
+
+		vec<4, T, Q> obj = Inverse * tmp;
+		obj /= obj.w;
+
+		return vec<3, T, Q>(obj);
+	}
 }
 #endif
 
@@ -734,6 +752,43 @@ inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T)
 	R.v_ = DirectX::XMQuaternionSlerp(Q1.v_, Q2.v_, T);
 #else
 	R.v_ = glm::lerp(Q1.v_, Q2.v_, T);
+#endif
+	return R;
+}
+
+inline GMVec3 Unproject(
+	const GMVec3& V,
+	gm::GMfloat ViewportX,
+	gm::GMfloat ViewportY,
+	gm::GMfloat ViewportWidth,
+	gm::GMfloat ViewportHeight,
+	const GMMat4& Projection,
+	const GMMat4& View,
+	const GMMat4& World
+)
+{
+	GMVec3 R;
+#if GM_USE_DX11
+	R.v_ = XMVector3Unproject(
+		V.v_,
+		ViewportX,
+		ViewportY,
+		ViewportWidth,
+		ViewportHeight,
+		0,
+		1,
+		Projection.v_,
+		View.v_,
+		World.v_
+	);
+#else
+	glm::vec4 viewport(ViewportX, ViewportY, ViewportWidth, ViewportHeight);
+	R.v_ = glm::unprojectScreenCoordDirectionZO(
+		V.v_,
+		(World * View).v_,
+		Projection.v_,
+		viewport
+	);
 #endif
 	return R;
 }

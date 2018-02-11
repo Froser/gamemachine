@@ -522,6 +522,17 @@ inline GMMat4 InverseTranspose(const GMMat4& M);
 
 inline GMQuat Lerp(const GMQuat& Q1, const GMQuat& Q2, gm::GMfloat T);
 
+inline GMVec3 Unproject(
+	const GMVec3& V,
+	gm::GMfloat ViewportX,
+	gm::GMfloat ViewportY,
+	gm::GMfloat ViewportWidth,
+	gm::GMfloat ViewportHeight,
+	const GMMat4& Projection,
+	const GMMat4& View,
+	const GMMat4& World
+);
+
 template <typename T>
 inline T Lerp(const T& S, const T& E, gm::GMfloat P);
 

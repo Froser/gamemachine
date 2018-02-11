@@ -103,7 +103,6 @@ public:
 public:
 	const GMMat4& getProjectionMatrix();
 	const GMMat4& getViewMatrix();
-	const GMMVPMatrix& getDxVPMatrix();
 
 #if GM_USE_DX11
 	void setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer);

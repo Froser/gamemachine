@@ -13,6 +13,7 @@
 
 // DirectX Coords
 #define GLM_FORCE_LEFT_HANDED
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
 
 #if defined(GLM_FORCE_SWIZZLE) && defined(GLM_FORCE_UNRESTRICTED_GENTYPE)
 #	error "Both GLM_FORCE_SWIZZLE and GLM_FORCE_UNRESTRICTED_GENTYPE can't be defined at the same time"
