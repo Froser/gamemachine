@@ -284,7 +284,7 @@ inline GMVec3 operator+(const GMVec3& V1, const GMVec3& V2)
 inline GMVec3& operator+=(GMVec3& V1, const GMVec3& V2)
 {
 #if GM_USE_DX11
-	DirectX::operator+=(V1.v_, V1.v_);
+	DirectX::operator+=(V1.v_, V2.v_);
 #else
 	V1 = V1 + V2;
 #endif
@@ -791,6 +791,56 @@ inline GMVec3 Unproject(
 	);
 #endif
 	return R;
+}
+
+inline void GetFrustumPlanesFromProjectionViewModelMatrix(
+	gm::GMfloat TopLeftX,
+	gm::GMfloat TopLeftY,
+	gm::GMfloat BottomRightX,
+	gm::GMfloat BottomRightY,
+	gm::GMfloat MaxZ,
+	gm::GMfloat MinZ,
+	const GMMat4& ProjectionViewModelMatrix,
+	GMFloat4& FarPlane,
+	GMFloat4& NearPlane,
+	GMFloat4& RightPlane,
+	GMFloat4& LeftPlane,
+	GMFloat4& TopPlane,
+	GMFloat4& BottomPlane
+)
+{
+	GMFloat16 M;
+	ProjectionViewModelMatrix.loadFloat16(M);
+
+	LeftPlane[0] = M[0][0] - TopLeftX * M[0][3];
+	LeftPlane[1] = M[1][0] - TopLeftX * M[1][3];
+	LeftPlane[2] = M[2][0] - TopLeftX * M[2][3];
+	LeftPlane[3] = M[3][0] - TopLeftX * M[3][3];
+
+	RightPlane[0] = BottomRightX * M[0][3] - M[0][0];
+	RightPlane[1] = BottomRightX * M[1][3] - M[1][0];
+	RightPlane[2] = BottomRightX * M[2][3] - M[2][0];
+	RightPlane[3] = BottomRightX * M[3][3] - M[3][0];
+
+	BottomPlane[0] = M[0][1] - BottomRightY * M[0][3];
+	BottomPlane[1] = M[1][1] - BottomRightY * M[1][3];
+	BottomPlane[2] = M[2][1] - BottomRightY * M[2][3];
+	BottomPlane[3] = M[3][1] - BottomRightY * M[3][3];
+
+	TopPlane[0] = TopLeftY * M[0][3] - M[0][1];
+	TopPlane[1] = TopLeftY * M[1][3] - M[1][1];
+	TopPlane[2] = TopLeftY * M[2][3] - M[2][1];
+	TopPlane[3] = TopLeftY * M[3][3] - M[3][1];
+
+	NearPlane[0] = MaxZ * M[0][3] - M[0][1];
+	NearPlane[1] = MaxZ * M[1][3] - M[1][1];
+	NearPlane[2] = MaxZ * M[2][3] - M[2][1];
+	NearPlane[3] = MaxZ * M[3][3] - M[3][1];
+
+	FarPlane[0] = MinZ * M[0][3] - M[0][1];
+	FarPlane[1] = MinZ * M[1][3] - M[1][1];
+	FarPlane[2] = MinZ * M[2][3] - M[2][1];
+	FarPlane[3] = MinZ * M[3][3] - M[3][1];
 }
 
 template <typename T>

@@ -370,9 +370,6 @@ void GMBSP::toDxCoord()
 		GMfloat _y = d->vertices[i].xyz.getY();
 		d->vertices[i].xyz.setY(d->vertices[i].xyz.getZ());
 		d->vertices[i].xyz.setZ(_y);
-
-		//Transfer texture coordinates (Invert t)
-		d->vertices[i].st[1] = -d->vertices[i].st[1];
 	}
 
 	for (GMint i = 0; i < d->numplanes; ++i)

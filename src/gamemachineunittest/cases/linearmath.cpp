@@ -161,6 +161,18 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR3_EQUALS(V, 7, 5, 3);
 	});
 
+	ut.addTestCase("GMVec3 +=", []() {
+		GMVec3 v1(4, 3, 2), v2(3, 2, 1);
+		v1 += v2;
+		return VECTOR3_EQUALS(v1, 7, 5, 3);
+	});
+
+	ut.addTestCase("GMVec3 -=", []() {
+		GMVec3 v1(4, 3, 2), v2(3, 2, 1);
+		v1 -= v2;
+		return VECTOR3_EQUALS(v1, 1, 1, 1);
+	});
+
 	ut.addTestCase("GMVec4 - GMVec4", []() {
 		GMVec4 v1(4, 3, 2, 1), v2(3, 2, 1, 0);
 		GMVec4 V = v1 - v2;

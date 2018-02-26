@@ -20,7 +20,7 @@ GM_ALIGNED_STRUCT(GMPhysicsMoveArgs)
 	}
 
 	GMVec3 lookAt; //!< 物体朝向
-	GMVec3 direction; //!< 物体移动方向，坐标系相对于物体朝向，采用右手坐标系，与朝向坐标系一致。
+	GMVec3 direction; //!< 物体移动方向，坐标系相对于物体朝向，采用左手坐标系，与朝向坐标系一致。
 	GMVec3 speed;
 	GMVec3 rate;
 };

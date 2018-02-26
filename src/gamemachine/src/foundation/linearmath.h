@@ -533,6 +533,22 @@ inline GMVec3 Unproject(
 	const GMMat4& World
 );
 
+inline void GetFrustumPlanesFromProjectionViewModelMatrix(
+	gm::GMfloat TopLeftX,
+	gm::GMfloat TopLeftY,
+	gm::GMfloat ButtomRightX,
+	gm::GMfloat ButtomRightY,
+	gm::GMfloat MaxZ,
+	gm::GMfloat MinZ,
+	const GMMat4& ProjectionViewModelMatrix,
+	GMFloat4& FarPlane,
+	GMFloat4& NearPlane,
+	GMFloat4& RightPlane,
+	GMFloat4& LeftPlane,
+	GMFloat4& TopPlane,
+	GMFloat4& BottomPlane
+);
+
 template <typename T>
 inline T Lerp(const T& S, const T& E, gm::GMfloat P);
 
