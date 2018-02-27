@@ -236,8 +236,6 @@ GM_ALIGNED_STRUCT(GMPlane)
 
 	void calculateIntercept(const GMVec3 & pointOnPlane) { intercept = - Dot(normal, pointOnPlane); }
 
-	void normalize(void);
-
 	GMVec3 getNormal() { return normal; }
 	GMfloat getIntercept() { return intercept; }
 

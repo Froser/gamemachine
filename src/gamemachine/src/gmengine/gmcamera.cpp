@@ -53,16 +53,12 @@ void GMFrustum::update()
 	//Multiply the matrices
 	clipMat = view * projection;
 
-	GMFloat4 f, n, left, right, top, bottom;
+	GMVec4 f, n, left, right, top, bottom;
 	//TODO 按照OpenGL坐标系，左上角为(-1, 1)，右下角为(1, -1), Z范围(-1, 1)
 	//使用DirectX时，应该更改此处
 	GetFrustumPlanesFromProjectionViewModelMatrix(
-		-1,
-		1,
 		1,
 		-1,
-		-1,
-		1,
 		clipMat,
 		f,
 		n,
@@ -72,35 +68,28 @@ void GMFrustum::update()
 		bottom
 	);
 
-	d->planes[RIGHT_PLANE].normal = GMVec3(right[0], right[1], right[2]);
-	d->planes[RIGHT_PLANE].intercept = right[3];
+	d->planes[RIGHT_PLANE].normal = GMVec3(right);
+	d->planes[RIGHT_PLANE].intercept = right.getW();
 
-	d->planes[LEFT_PLANE].normal = GMVec3(left[0], left[1], left[2]);
-	d->planes[LEFT_PLANE].intercept = left[3];
+	d->planes[LEFT_PLANE].normal = GMVec3(left);
+	d->planes[LEFT_PLANE].intercept = left.getW();
 
-	d->planes[TOP_PLANE].normal = GMVec3(top[0], top[1], top[2]);
-	d->planes[TOP_PLANE].intercept = top[3];
+	d->planes[TOP_PLANE].normal = GMVec3(top);
+	d->planes[TOP_PLANE].intercept = top.getW();
 
-	d->planes[BOTTOM_PLANE].normal = GMVec3(bottom[0], bottom[1], bottom[2]);
-	d->planes[BOTTOM_PLANE].intercept = bottom[3];
+	d->planes[BOTTOM_PLANE].normal = GMVec3(bottom);
+	d->planes[BOTTOM_PLANE].intercept = bottom.getW();
 
-	d->planes[NEAR_PLANE].normal = GMVec3(n[0], n[1], n[2]);
-	d->planes[NEAR_PLANE].intercept = n[3];
+	d->planes[NEAR_PLANE].normal = GMVec3(n);
+	d->planes[NEAR_PLANE].intercept = n.getW();
 
-	d->planes[FAR_PLANE].normal = GMVec3(f[0], f[1], f[2]);
-	d->planes[FAR_PLANE].intercept = f[3];
-
-	//normalize planes
-	for (int i = 0; i < 6; ++i)
-		d->planes[i].normalize();
+	d->planes[FAR_PLANE].normal = GMVec3(f);
+	d->planes[FAR_PLANE].intercept = f.getW();
 }
 
 //is a bounding box in the Frustum?
-bool GMFrustum::isBoundingBoxInside(const GMVec3 * vertices)
+bool GMFrustum::isBoundingBoxInside(const GMVec3(&vertices)[8])
 {
-	//TODO
-	return true;
-
 	D(d);
 	for (int i = 0; i < 6; ++i)
 	{

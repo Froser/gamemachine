@@ -476,6 +476,8 @@ inline gm::GMfloat Dot(const GMVec4& V1, const GMVec4& V2);
 
 inline GMVec3 Normalize(const GMVec3& V);
 
+inline GMVec4 Normalize(const GMVec4& V);
+
 inline GMQuat Normalize(const GMQuat& Q);
 
 inline GMVec3 FastNormalize(const GMVec3& V);
@@ -534,19 +536,15 @@ inline GMVec3 Unproject(
 );
 
 inline void GetFrustumPlanesFromProjectionViewModelMatrix(
-	gm::GMfloat TopLeftX,
-	gm::GMfloat TopLeftY,
-	gm::GMfloat ButtomRightX,
-	gm::GMfloat ButtomRightY,
 	gm::GMfloat MaxZ,
 	gm::GMfloat MinZ,
 	const GMMat4& ProjectionViewModelMatrix,
-	GMFloat4& FarPlane,
-	GMFloat4& NearPlane,
-	GMFloat4& RightPlane,
-	GMFloat4& LeftPlane,
-	GMFloat4& TopPlane,
-	GMFloat4& BottomPlane
+	GMVec4& FarPlane,
+	GMVec4& NearPlane,
+	GMVec4& RightPlane,
+	GMVec4& LeftPlane,
+	GMVec4& TopPlane,
+	GMVec4& BottomPlane
 );
 
 template <typename T>

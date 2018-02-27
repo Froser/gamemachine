@@ -90,7 +90,7 @@ public:
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
-	bool isBoundingBoxInside(const GMVec3* vertices);
+	bool isBoundingBoxInside(const GMVec3 (&vertices)[8]);
 	void updateViewMatrix(const GMMat4& viewMatrix);
 
 public:

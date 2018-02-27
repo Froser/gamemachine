@@ -166,13 +166,6 @@ void GMPlane::setFromPoints(const GMVec3 & p0, const GMVec3 & p1, const GMVec3 &
 	calculateIntercept(p0);
 }
 
-void GMPlane::normalize()
-{
-	GMfloat normalLength = Length(normal);
-	normal /= normalLength;
-	intercept /= normalLength;
-}
-
 bool GMPlane::intersect3(const GMPlane & p2, const GMPlane & p3, GMVec3 & result)//find point of intersection of 3 planes
 {
 	GMfloat denominator = Dot(normal, (Cross(p2.normal, p3.normal)));

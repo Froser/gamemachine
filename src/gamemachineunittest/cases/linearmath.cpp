@@ -450,6 +450,13 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR3_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len);
 	});
 
+	ut.addTestCase("Normalize(GMVec4)", []() {
+		GMVec4 V(1, 2, 3, 4);
+		GMVec4 R = Normalize(V);
+		gm::GMfloat len = Sqrt(30);
+		return VECTOR4_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len, 4 / len);
+	});
+
 	ut.addTestCase("FastNormalize(GMVec3)", []() {
 		GMVec3 V(1, 2, 3);
 		GMVec3 R = Normalize(V);

@@ -512,6 +512,17 @@ inline GMVec3 Normalize(const GMVec3& V)
 	return R;
 }
 
+inline GMVec4 Normalize(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMVector4Normalize(V.v_);
+#else
+	R.v_ = glm::normalize(V.v_);
+#endif
+	return R;
+}
+
 inline GMQuat Normalize(const GMQuat& Q)
 {
 	GMQuat R;
@@ -794,53 +805,67 @@ inline GMVec3 Unproject(
 }
 
 inline void GetFrustumPlanesFromProjectionViewModelMatrix(
-	gm::GMfloat TopLeftX,
-	gm::GMfloat TopLeftY,
-	gm::GMfloat BottomRightX,
-	gm::GMfloat BottomRightY,
 	gm::GMfloat MaxZ,
 	gm::GMfloat MinZ,
 	const GMMat4& ProjectionViewModelMatrix,
-	GMFloat4& FarPlane,
-	GMFloat4& NearPlane,
-	GMFloat4& RightPlane,
-	GMFloat4& LeftPlane,
-	GMFloat4& TopPlane,
-	GMFloat4& BottomPlane
+	GMVec4& FarPlane,
+	GMVec4& NearPlane,
+	GMVec4& RightPlane,
+	GMVec4& LeftPlane,
+	GMVec4& TopPlane,
+	GMVec4& BottomPlane
 )
 {
 	GMFloat16 M;
 	ProjectionViewModelMatrix.loadFloat16(M);
 
-	LeftPlane[0] = M[0][0] - TopLeftX * M[0][3];
-	LeftPlane[1] = M[1][0] - TopLeftX * M[1][3];
-	LeftPlane[2] = M[2][0] - TopLeftX * M[2][3];
-	LeftPlane[3] = M[3][0] - TopLeftX * M[3][3];
+	LeftPlane = GMVec4(
+		M[0][3] + M[0][0],
+		M[1][3] + M[1][0],
+		M[2][3] + M[2][0],
+		M[3][3] + M[3][0]
+	);
+	LeftPlane = Normalize(LeftPlane);
 
-	RightPlane[0] = BottomRightX * M[0][3] - M[0][0];
-	RightPlane[1] = BottomRightX * M[1][3] - M[1][0];
-	RightPlane[2] = BottomRightX * M[2][3] - M[2][0];
-	RightPlane[3] = BottomRightX * M[3][3] - M[3][0];
+	RightPlane = GMVec4(
+		M[0][3] - M[0][0],
+		M[1][3] - M[1][0],
+		M[2][3] - M[2][0],
+		M[3][3] - M[3][0]
+	);
+	RightPlane = Normalize(RightPlane);
 
-	BottomPlane[0] = M[0][1] - BottomRightY * M[0][3];
-	BottomPlane[1] = M[1][1] - BottomRightY * M[1][3];
-	BottomPlane[2] = M[2][1] - BottomRightY * M[2][3];
-	BottomPlane[3] = M[3][1] - BottomRightY * M[3][3];
+	BottomPlane = GMVec4(
+		M[0][3] + M[0][1],
+		M[1][3] + M[1][1],
+		M[2][3] + M[2][1],
+		M[3][3] + M[3][1]
+	);
+	BottomPlane = Normalize(BottomPlane);
 
-	TopPlane[0] = TopLeftY * M[0][3] - M[0][1];
-	TopPlane[1] = TopLeftY * M[1][3] - M[1][1];
-	TopPlane[2] = TopLeftY * M[2][3] - M[2][1];
-	TopPlane[3] = TopLeftY * M[3][3] - M[3][1];
+	TopPlane = GMVec4(
+		M[0][3] + M[0][1],
+		M[1][3] + M[1][1],
+		M[2][3] + M[2][1],
+		M[3][3] + M[3][1]
+	);
+	TopPlane = Normalize(TopPlane);
 
-	NearPlane[0] = MaxZ * M[0][3] - M[0][1];
-	NearPlane[1] = MaxZ * M[1][3] - M[1][1];
-	NearPlane[2] = MaxZ * M[2][3] - M[2][1];
-	NearPlane[3] = MaxZ * M[3][3] - M[3][1];
+	NearPlane = GMVec4(
+		-(MinZ * M[0][3] - M[0][2]),
+		-(MinZ * M[1][3] - M[1][2]),
+		-(MinZ * M[2][3] - M[2][2]),
+		-(MinZ * M[3][3] - M[3][2])
+	);
+	NearPlane = Normalize(NearPlane);
 
-	FarPlane[0] = MinZ * M[0][3] - M[0][1];
-	FarPlane[1] = MinZ * M[1][3] - M[1][1];
-	FarPlane[2] = MinZ * M[2][3] - M[2][1];
-	FarPlane[3] = MinZ * M[3][3] - M[3][1];
+	FarPlane = GMVec4(
+		MaxZ * M[0][3] - M[0][2],
+		MaxZ * M[1][3] - M[1][2],
+		MaxZ * M[2][3] - M[2][2],
+		MaxZ * M[3][3] - M[3][2]
+	);
+	FarPlane = Normalize(FarPlane);
 }
 
 template <typename T>
