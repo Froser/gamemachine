@@ -805,8 +805,8 @@ inline GMVec3 Unproject(
 }
 
 inline void GetFrustumPlanesFromProjectionViewModelMatrix(
-	gm::GMfloat MaxZ,
-	gm::GMfloat MinZ,
+	gm::GMfloat FarZ,
+	gm::GMfloat NearZ,
 	const GMMat4& ProjectionViewModelMatrix,
 	GMVec4& FarPlane,
 	GMVec4& NearPlane,
@@ -852,18 +852,18 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 	TopPlane = Normalize(TopPlane);
 
 	NearPlane = GMVec4(
-		-(MinZ * M[0][3] - M[0][2]),
-		-(MinZ * M[1][3] - M[1][2]),
-		-(MinZ * M[2][3] - M[2][2]),
-		-(MinZ * M[3][3] - M[3][2])
+		-(NearZ * M[0][3] - M[0][2]),
+		-(NearZ * M[1][3] - M[1][2]),
+		-(NearZ * M[2][3] - M[2][2]),
+		-(NearZ * M[3][3] - M[3][2])
 	);
 	NearPlane = Normalize(NearPlane);
 
 	FarPlane = GMVec4(
-		MaxZ * M[0][3] - M[0][2],
-		MaxZ * M[1][3] - M[1][2],
-		MaxZ * M[2][3] - M[2][2],
-		MaxZ * M[3][3] - M[3][2]
+		FarZ * M[0][3] - M[0][2],
+		FarZ * M[1][3] - M[1][2],
+		FarZ * M[2][3] - M[2][2],
+		FarZ * M[3][3] - M[3][2]
 	);
 	FarPlane = Normalize(FarPlane);
 }

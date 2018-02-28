@@ -50,6 +50,9 @@ struct GMGameMachineRunningStates
 	GMRect windowRect; //!< 当前窗口的位置和大小。
 	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
 	bool crashDown = false; //!< 程序是否已崩溃。当遇到不可恢复的错误时，此项为true。
+
+	const GMfloat nearZ = 0;
+	const GMfloat farZ = 1;
 };
 
 GM_PRIVATE_OBJECT(GameMachine)

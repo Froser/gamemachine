@@ -40,12 +40,12 @@ void GMFrustum::getPlanes(GMFrustumPlanes& planes)
 	//Multiply the matrices
 	clipMat = view * projection;
 
+	auto& runningState = GM.getGameMachineRunningStates();
 	GMVec4 f, n, left, right, top, bottom;
-	//TODO 按照OpenGL坐标系，左上角为(-1, 1)，右下角为(1, -1), Z范围(-1, 1)
-	//使用DirectX时，应该更改此处
+
 	GetFrustumPlanesFromProjectionViewModelMatrix(
-		1,
-		-1,
+		runningState.farZ,
+		runningState.nearZ,
 		clipMat,
 		f,
 		n,

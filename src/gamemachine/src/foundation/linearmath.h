@@ -536,8 +536,8 @@ inline GMVec3 Unproject(
 );
 
 inline void GetFrustumPlanesFromProjectionViewModelMatrix(
-	gm::GMfloat MaxZ,
-	gm::GMfloat MinZ,
+	gm::GMfloat FarZ,
+	gm::GMfloat NearZ,
 	const GMMat4& ProjectionViewModelMatrix,
 	GMVec4& FarPlane,
 	GMVec4& NearPlane,

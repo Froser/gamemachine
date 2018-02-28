@@ -65,6 +65,9 @@ void GMGLGraphicEngine::init()
 	installShaders();
 	glEnable(GL_MULTISAMPLE);
 
+	auto& runningState = GM.getGameMachineRunningStates();
+	glDepthRange(runningState.nearZ, runningState.farZ);
+	glClearDepth(runningState.farZ);
 	glDepthFunc(GL_LEQUAL);
 
 	glEnable(GL_STENCIL_TEST);
