@@ -192,13 +192,13 @@ PointPosition GMPlane::classifyPoint(const GMVec3 & point) const
 {
 	GMfloat distance = getDistance(point);
 
-	if (distance > EPSILON)	//==0.0f is too exact, give a bit of room
+	if (distance > EPSILON)
 		return POINT_IN_FRONT_OF_PLANE;
 
 	if (distance < -EPSILON)
 		return POINT_BEHIND_PLANE;
 
-	return POINT_ON_PLANE;	//otherwise
+	return POINT_ON_PLANE;
 }
 
 GMPlane GMPlane::lerp(const GMPlane & p2, GMfloat factor)

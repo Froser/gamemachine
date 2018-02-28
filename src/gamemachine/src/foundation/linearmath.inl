@@ -354,6 +354,17 @@ inline GMVec3& operator/=(GMVec3& V1, gm::GMfloat S)
 	return V1;
 }
 
+inline GMVec4 operator/(const GMVec4& V1, gm::GMfloat S)
+{
+	GMVec4 V;
+#if GM_USE_DX11
+	V.v_ = DirectX::operator/(V1.v_, S);
+#else
+	V.v_ = V1.v_ / S;
+#endif
+	return V;
+}
+
 inline GMVec4 operator+(const GMVec4& V1, const GMVec4& V2)
 {
 	GMVec4 V;
@@ -519,6 +530,19 @@ inline GMVec4 Normalize(const GMVec4& V)
 	R.v_ = DirectX::XMVector4Normalize(V.v_);
 #else
 	R.v_ = glm::normalize(V.v_);
+#endif
+	return R;
+}
+
+inline GMVec4 PlaneNormalize(const GMVec4& V)
+{
+	GMVec4 R;
+#if GM_USE_DX11
+	R.v_ = DirectX::XMPlaneNormalize(V.v_);
+#else
+	GMVec3 N = V;
+	gm::GMfloat Len = Length(N);
+	R = V / Len;
 #endif
 	return R;
 }
@@ -825,7 +849,7 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 		M[2][3] + M[2][0],
 		M[3][3] + M[3][0]
 	);
-	LeftPlane = Normalize(LeftPlane);
+	LeftPlane = PlaneNormalize(LeftPlane);
 
 	RightPlane = GMVec4(
 		M[0][3] - M[0][0],
@@ -833,7 +857,7 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 		M[2][3] - M[2][0],
 		M[3][3] - M[3][0]
 	);
-	RightPlane = Normalize(RightPlane);
+	RightPlane = PlaneNormalize(RightPlane);
 
 	BottomPlane = GMVec4(
 		M[0][3] + M[0][1],
@@ -841,7 +865,7 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 		M[2][3] + M[2][1],
 		M[3][3] + M[3][1]
 	);
-	BottomPlane = Normalize(BottomPlane);
+	BottomPlane = PlaneNormalize(BottomPlane);
 
 	TopPlane = GMVec4(
 		M[0][3] + M[0][1],
@@ -849,7 +873,7 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 		M[2][3] + M[2][1],
 		M[3][3] + M[3][1]
 	);
-	TopPlane = Normalize(TopPlane);
+	TopPlane = PlaneNormalize(TopPlane);
 
 	NearPlane = GMVec4(
 		-(NearZ * M[0][3] - M[0][2]),
@@ -857,7 +881,7 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 		-(NearZ * M[2][3] - M[2][2]),
 		-(NearZ * M[3][3] - M[3][2])
 	);
-	NearPlane = Normalize(NearPlane);
+	NearPlane = PlaneNormalize(NearPlane);
 
 	FarPlane = GMVec4(
 		FarZ * M[0][3] - M[0][2],
@@ -865,7 +889,7 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 		FarZ * M[2][3] - M[2][2],
 		FarZ * M[3][3] - M[3][2]
 	);
-	FarPlane = Normalize(FarPlane);
+	FarPlane = PlaneNormalize(FarPlane);
 }
 
 template <typename T>

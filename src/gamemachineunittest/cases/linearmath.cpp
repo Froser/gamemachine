@@ -213,6 +213,13 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR3_EQUALS(V, 4, 2, 1);
 	});
 
+	ut.addTestCase("GMVec4 / float", []() {
+		GMVec4 v1(16, 8, 4, 2);
+		gm::GMfloat m = 2;
+		GMVec4 V = v1 / m;
+		return VECTOR4_EQUALS(V, 8, 4, 2, 1);
+	});
+
 	ut.addTestCase("GMVec4 * float", []() {
 		GMVec4 v1(4, 3, 2, 1);
 		gm::GMfloat m = 3;
@@ -454,6 +461,13 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		GMVec4 V(1, 2, 3, 4);
 		GMVec4 R = Normalize(V);
 		gm::GMfloat len = Sqrt(30);
+		return VECTOR4_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len, 4 / len);
+	});
+
+	ut.addTestCase("PlaneNormalize(GMVec4)", []() {
+		GMVec4 V(1, 2, 3, 4);
+		GMVec4 R = PlaneNormalize(V);
+		gm::GMfloat len = Sqrt(14);
 		return VECTOR4_FUZZY_EQUALS(R, 1 / len, 2 / len, 3 / len, 4 / len);
 	});
 

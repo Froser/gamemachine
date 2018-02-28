@@ -66,7 +66,6 @@ void GMGLGraphicEngine::init()
 	glEnable(GL_MULTISAMPLE);
 
 	auto& runningState = GM.getGameMachineRunningStates();
-	glDepthRange(runningState.nearZ, runningState.farZ);
 	glClearDepth(runningState.farZ);
 	glDepthFunc(GL_LEQUAL);
 
