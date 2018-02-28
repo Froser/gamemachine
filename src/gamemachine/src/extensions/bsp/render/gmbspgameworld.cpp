@@ -259,6 +259,8 @@ Map<GMint, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
 
 void GMBSPGameWorld::calculateVisibleFaces()
 {
+	static GMFrustumPlanes frustumPlanes;
+
 	GM_PROFILE("calculateVisibleFaces");
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -271,6 +273,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	rd.entitiesToDraw.clearAll();
 	GMint cameraLeaf = calculateLeafNode(pos);
 	GMint cameraCluster = bsp.leafs[cameraLeaf].cluster;
+	camera.getFrustum().getPlanes(frustumPlanes);
 
 	for (GMint i = 0; i < bsp.numleafs; ++i)
 	{
@@ -279,7 +282,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 			continue;
 
 		//if this leaf does not lie in the frustum, continue
-		if (!camera.getFrustum().isBoundingBoxInside(rd.leafs[i].boundingBoxVertices))
+		if (!GMFrustum::isBoundingBoxInside(frustumPlanes, rd.leafs[i].boundingBoxVertices))
 			continue;
 
 		//loop through faces in this leaf and mark them to be drawn

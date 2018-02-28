@@ -51,7 +51,7 @@ enum class GMFrustumType
 GM_PRIVATE_OBJECT(GMFrustum)
 {
 	GMFrustumType type = GMFrustumType::Perspective;
-	GMPlane planes[6];
+
 	union
 	{
 		struct
@@ -90,8 +90,14 @@ public:
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
 public:
-	bool isBoundingBoxInside(const GMVec3 (&vertices)[8]);
 	void updateViewMatrix(const GMMat4& viewMatrix);
+
+	//! 获取平截头体的6个平面方程。
+	/*!
+	  获取平截头体的6个平面方程，法线方向朝外。
+	  \param planes 得到的平面方程。
+	*/
+	void getPlanes(GMFrustumPlanes& planes);
 
 public:
 	inline GMFrustumType getType() { D(d); return d->type; }
@@ -108,8 +114,8 @@ public:
 	GMComPtr<ID3D11Buffer> getDxMatrixBuffer();
 #endif
 
-private:
-	void update();
+public:
+	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);
 };
 
 GM_PRIVATE_OBJECT(GMCamera)

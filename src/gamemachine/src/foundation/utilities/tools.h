@@ -263,6 +263,17 @@ GM_ALIGNED_STRUCT(GMPlane)
 	GMfloat intercept;
 };
 
+//GMFrustumPlanes
+GM_ALIGNED_STRUCT(GMFrustumPlanes)
+{
+	GMPlane nearPlane;
+	GMPlane farPlane;
+	GMPlane topPlane;
+	GMPlane bottomPlane;
+	GMPlane leftPlane;
+	GMPlane rightPlane;
+};
+
 //GMMemoryStream
 GM_PRIVATE_OBJECT(GMMemoryStream)
 {

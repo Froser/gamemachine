@@ -4,17 +4,6 @@
 #include "foundation/gamemachine.h"
 #include <gmdxincludes.h>
 
-//Frustum
-enum
-{
-	LEFT_PLANE = 0,
-	RIGHT_PLANE,
-	TOP_PLANE,
-	BOTTOM_PLANE,
-	NEAR_PLANE,
-	FAR_PLANE
-};
-
 void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
@@ -27,7 +16,6 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	d->f = f;
 
 	d->mvpMatrix.projMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
-	update();
 }
 
 void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -40,10 +28,9 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	d->f = f;
 
 	d->mvpMatrix.projMatrix = Perspective(d->fovy, d->aspect, d->n, d->f);
-	update();
 }
 
-void GMFrustum::update()
+void GMFrustum::getPlanes(GMFrustumPlanes& planes)
 {
 	D(d);
 	const GMMat4& projection = getProjectionMatrix();
@@ -68,47 +55,56 @@ void GMFrustum::update()
 		bottom
 	);
 
-	d->planes[RIGHT_PLANE].normal = GMVec3(right);
-	d->planes[RIGHT_PLANE].intercept = right.getW();
+	planes.rightPlane.normal = GMVec3(right);
+	planes.rightPlane.intercept = right.getW();
 
-	d->planes[LEFT_PLANE].normal = GMVec3(left);
-	d->planes[LEFT_PLANE].intercept = left.getW();
+	planes.leftPlane.normal = GMVec3(left);
+	planes.leftPlane.intercept = left.getW();
 
-	d->planes[TOP_PLANE].normal = GMVec3(top);
-	d->planes[TOP_PLANE].intercept = top.getW();
+	planes.topPlane.normal = GMVec3(top);
+	planes.topPlane.intercept = top.getW();
 
-	d->planes[BOTTOM_PLANE].normal = GMVec3(bottom);
-	d->planes[BOTTOM_PLANE].intercept = bottom.getW();
+	planes.bottomPlane.normal = GMVec3(bottom);
+	planes.bottomPlane.intercept = bottom.getW();
 
-	d->planes[NEAR_PLANE].normal = GMVec3(n);
-	d->planes[NEAR_PLANE].intercept = n.getW();
+	planes.nearPlane.normal = GMVec3(n);
+	planes.nearPlane.intercept = n.getW();
 
-	d->planes[FAR_PLANE].normal = GMVec3(f);
-	d->planes[FAR_PLANE].intercept = f.getW();
+	planes.farPlane.normal = GMVec3(f);
+	planes.farPlane.intercept = f.getW();
 }
 
 //is a bounding box in the Frustum?
-bool GMFrustum::isBoundingBoxInside(const GMVec3(&vertices)[8])
+bool GMFrustum::isBoundingBoxInside(const GMFrustumPlanes& frustumPlanes, const GMVec3(&vertices)[8])
 {
-	D(d);
+	const GMPlane (&planes)[] =
+	{
+		frustumPlanes.farPlane,
+		frustumPlanes.nearPlane,
+		frustumPlanes.topPlane,
+		frustumPlanes.bottomPlane,
+		frustumPlanes.leftPlane,
+		frustumPlanes.rightPlane,
+	};
+
 	for (int i = 0; i < 6; ++i)
 	{
 		//if a point is not behind this plane, try next plane
-		if (d->planes[i].classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
 			continue;
-		if (d->planes[i].classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
+		if (planes[i].classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
 			continue;
 
 		//All vertices of the box are behind this plane
@@ -122,7 +118,6 @@ void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 {
 	D(d);
 	d->mvpMatrix.viewMatrix = viewMatrix;
-	update();
 }
 
 const GMMat4& GMFrustum::getProjectionMatrix()
