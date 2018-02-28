@@ -122,7 +122,7 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	{
 		GMMat4 transRestore = Translate(center);
 		GMMat4 transMoveToAxisOrigin = Translate(-center);
-		GMMat4 transFinal = transRestore * transScale * transMoveToAxisOrigin;
+		GMMat4 transFinal = transMoveToAxisOrigin* transScale * transRestore;
 
 		GMVec4 pt = GMVec4(vertices[i], 1) * transFinal;
 		vertices[i] = GMVec3(pt);
