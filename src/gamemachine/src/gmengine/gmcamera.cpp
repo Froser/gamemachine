@@ -74,34 +74,34 @@ void GMFrustum::getPlanes(GMFrustumPlanes& planes)
 //is a bounding box in the Frustum?
 bool GMFrustum::isBoundingBoxInside(const GMFrustumPlanes& frustumPlanes, const GMVec3(&vertices)[8])
 {
-	const GMPlane (&planes)[] =
+	const GMPlane* planes[] =
 	{
-		frustumPlanes.farPlane,
-		frustumPlanes.nearPlane,
-		frustumPlanes.topPlane,
-		frustumPlanes.bottomPlane,
-		frustumPlanes.leftPlane,
-		frustumPlanes.rightPlane,
+		&frustumPlanes.farPlane,
+		&frustumPlanes.nearPlane,
+		&frustumPlanes.topPlane,
+		&frustumPlanes.bottomPlane,
+		&frustumPlanes.leftPlane,
+		&frustumPlanes.rightPlane
 	};
 
 	for (int i = 0; i < 6; ++i)
 	{
 		//if a point is not behind this plane, try next plane
-		if (planes[i].classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[0]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[1]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[2]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[3]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[4]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[5]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[6]) != POINT_BEHIND_PLANE)
 			continue;
-		if (planes[i].classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
+		if (planes[i]->classifyPoint(vertices[7]) != POINT_BEHIND_PLANE)
 			continue;
 
 		//All vertices of the box are behind this plane

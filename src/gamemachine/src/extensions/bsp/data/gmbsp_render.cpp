@@ -308,7 +308,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 			GMVec3& vertex_prev = d->vertices[face.firstVertex + idx_prev].position,
 				&vertex_next = d->vertices[face.firstVertex + idx_next].position;
 			GMVec3 normal = Cross(vertex.position - vertex_prev, vertex_next - vertex.position);
-			normal = FastNormalize(normal);
+			normal = -FastNormalize(normal);
 
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);

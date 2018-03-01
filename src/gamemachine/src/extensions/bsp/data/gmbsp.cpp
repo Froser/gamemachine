@@ -378,7 +378,6 @@ void GMBSP::toDxCoord()
 		GMfloat _y = d->planes[i].normal.getY();
 		d->planes[i].normal.setY(d->planes[i].normal.getZ());
 		d->planes[i].normal.setZ(_y);
-
 		d->planes[i].intercept = -d->planes[i].intercept;
 	}
 }
