@@ -374,10 +374,11 @@ void GMBSP::toDxCoord()
 
 	for (GMint i = 0; i < d->numplanes; ++i)
 	{
-		//swap y and z
 		GMfloat _y = d->planes[i].normal.getY();
 		d->planes[i].normal.setY(d->planes[i].normal.getZ());
 		d->planes[i].normal.setZ(_y);
+		GM_ASSERT(Fabs(Length(d->planes[i].normal) - 1) < 0.01);
+
 		d->planes[i].intercept = -d->planes[i].intercept;
 	}
 }

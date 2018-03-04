@@ -8,7 +8,7 @@ GMSpriteGameObject::GMSpriteGameObject(GMfloat radius, const GMVec3& position)
 	D(d);
 	d->radius = radius;
 	d->state.position = position;
-	d->state.lookAt = GMVec3(0, 0, 1);
+	d->state.lookAt = GMVec3(0, 0, -1);
 	d->limitPitch = Radians(85.f);
 }
 

@@ -309,6 +309,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 				&vertex_next = d->vertices[face.firstVertex + idx_next].position;
 			GMVec3 normal = Cross(vertex.position - vertex_prev, vertex_next - vertex.position);
 			normal = -FastNormalize(normal);
+			GM_ASSERT(LengthSq(normal) > 0);
 
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);
@@ -355,6 +356,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 				const GMVec3& vertex_prev = biqp.vertices[idx_prev].position,
 					&vertex_next = biqp.vertices[idx_next].position;
 				normal = -FastNormalize(Cross(vertex.position - vertex_prev, vertex_next - vertex.position));
+				GM_ASSERT(LengthSq(normal) > 1);
 			}
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);
@@ -425,7 +427,8 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 			GMVec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
 				vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
 			GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
-			normal = FastNormalize(normal);
+			normal = -FastNormalize(normal);
+			GM_ASSERT(LengthSq(normal) > 1);
 
 			vertex.loadFloat4(f4_vertex);
 			normal.loadFloat4(f4_normal);

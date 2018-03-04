@@ -868,10 +868,10 @@ inline void GetFrustumPlanesFromProjectionViewModelMatrix(
 	BottomPlane = PlaneNormalize(BottomPlane);
 
 	TopPlane = GMVec4(
-		M[0][3] + M[0][1],
-		M[1][3] + M[1][1],
-		M[2][3] + M[2][1],
-		M[3][3] + M[3][1]
+		M[0][3] - M[0][1],
+		M[1][3] - M[1][1],
+		M[2][3] - M[2][1],
+		M[3][3] - M[3][1]
 	);
 	TopPlane = PlaneNormalize(TopPlane);
 

@@ -164,7 +164,7 @@ void model3d_calcColor()
 	{
 		// 画世界视角的法向量
 		// 采用左手坐标系，法线z坐标应该反转
-		vec3 normal = vec3(_normal.y, _normal.y, -_normal.z);
+		vec3 normal = vec3(_normal.x, _normal.y, -_normal.z);
 		_frag_color = vec4((normal + 1.f) / 2.f, 1.f);
 		return;
 	}
