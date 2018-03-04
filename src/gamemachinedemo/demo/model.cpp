@@ -11,7 +11,7 @@
 namespace
 {
 	const gm::GMCameraLookAt s_lookAt = gm::GMCameraLookAt(
-		GMVec3(0, -.3f, 1.f),
+		GMVec3(0, -.3f, .5f),
 		GMVec3(0, .4f, -.5f)
 	);
 }

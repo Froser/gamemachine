@@ -27,11 +27,11 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 		1, -1, 1,
 	};
 	static constexpr GMint uv[] = {
-		0, 1,
 		0, 0,
-		1, 0,
-
+		1, 1,
 		0, 1,
+
+		0, 0,
 		1, 0,
 		1, 1,
 	};
