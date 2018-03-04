@@ -253,14 +253,14 @@ void GMBSPRender::generateLeafs()
 		d->leafs[i].numFaces = d->bsp->leafs[i].numLeafSurfaces;
 
 		//Create the bounding box
-		d->leafs[i].boundingBoxVertices[0] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[1] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
-		d->leafs[i].boundingBoxVertices[2] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[3] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
-		d->leafs[i].boundingBoxVertices[4] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[5] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], -d->bsp->leafs[i].maxs[1]);
-		d->leafs[i].boundingBoxVertices[6] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].mins[1]);
-		d->leafs[i].boundingBoxVertices[7] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], -d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[0] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[1] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].mins[2], d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[2] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[3] = GMVec3(d->bsp->leafs[i].mins[0], d->bsp->leafs[i].maxs[2], d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[4] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[5] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].mins[2], d->bsp->leafs[i].maxs[1]);
+		d->leafs[i].boundingBoxVertices[6] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], d->bsp->leafs[i].mins[1]);
+		d->leafs[i].boundingBoxVertices[7] = GMVec3(d->bsp->leafs[i].maxs[0], d->bsp->leafs[i].maxs[2], d->bsp->leafs[i].maxs[1]);
 
 		// for (GMint j = 0; j < 8; ++j)
 		// 	d->leafs[i].boundingBoxVertices[j] /= SCALING_DOWN;
@@ -309,7 +309,6 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 				&vertex_next = d->vertices[face.firstVertex + idx_next].position;
 			GMVec3 normal = Cross(vertex.position - vertex_prev, vertex_next - vertex.position);
 			normal = -FastNormalize(normal);
-			GM_ASSERT(LengthSq(normal) > 0);
 
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);
@@ -356,8 +355,8 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 				const GMVec3& vertex_prev = biqp.vertices[idx_prev].position,
 					&vertex_next = biqp.vertices[idx_next].position;
 				normal = -FastNormalize(Cross(vertex.position - vertex_prev, vertex_next - vertex.position));
-				GM_ASSERT(LengthSq(normal) > 1);
 			}
+
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);
 			component->vertex(f4_position[0], f4_position[1], f4_position[2]);
