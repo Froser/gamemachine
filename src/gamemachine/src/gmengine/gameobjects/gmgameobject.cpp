@@ -65,12 +65,18 @@ void GMGameObject::draw()
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
+	if (d->forceDisableDeferredRendering)
+		return false;
+
 	return d->canDeferredRendering;
 }
 
 void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
 {
 	GMGameObject* gameObject = gmobject_cast<GMGameObject*>(receiver);
+	if (gameObject->data()->forceDisableDeferredRendering)
+		return;
+
 	GMShader* shader = gmobject_cast<GMShader*>(sender);
 	gameObject->data()->canDeferredRendering = !shader->getBlend();
 }

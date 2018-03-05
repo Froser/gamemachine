@@ -19,6 +19,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMQuat rotation = Identity<GMQuat>();
 	GMMat4 transformMatrix = Identity<GMMat4>();
 	bool canDeferredRendering = true;
+	bool forceDisableDeferredRendering = false;
 };
 
 enum class GMGameObjectType
@@ -75,6 +76,12 @@ public:
 		D(d);
 		d->physics = phyObj;
 		d->physics->setGameObject(this);
+	}
+
+	inline void forceDisableDeferredRendering()
+	{
+		D(d);
+		d->forceDisableDeferredRendering = true;
 	}
 
 	// events
