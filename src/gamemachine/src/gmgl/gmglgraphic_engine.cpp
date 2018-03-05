@@ -70,6 +70,7 @@ void GMGLGraphicEngine::init()
 	glDepthFunc(GL_LEQUAL);
 
 	glEnable(GL_STENCIL_TEST);
+	glClearStencil(0);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	createDeferredRenderQuad();
@@ -603,7 +604,6 @@ void GMGLGraphicEngine::removeLights()
 
 void GMGLGraphicEngine::clearStencil()
 {
-	D(d);
 	clearStencilOnCurrentFramebuffer();
 }
 
@@ -696,7 +696,11 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 
 void GMGLGraphicEngine::newFrameOnCurrentFramebuffer()
 {
+	GLint mask;
+	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
+	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glStencilMask(mask);
 }
 
 void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()
