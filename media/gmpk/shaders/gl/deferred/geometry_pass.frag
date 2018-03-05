@@ -34,7 +34,6 @@ vec4 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT]
 void deferred_geometry_pass_calcEyeSpace()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
 	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	${deferred_geometry_pass_gNormal} = normalToTexture ( normalize( GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz );

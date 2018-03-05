@@ -78,7 +78,6 @@ void model3d_calcLights()
 	g_model3d_shadeFactor = 1;
 
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 noTranslationMat = gm_removeTranslation(GM_model_matrix);
 	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
 	vec4 vertex_eye = GM_view_matrix * _model3d_position_world;
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;

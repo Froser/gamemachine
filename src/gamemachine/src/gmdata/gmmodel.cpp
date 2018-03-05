@@ -257,24 +257,26 @@ void GMMesh::calculateTangentSpace()
 			GMVec3 E2 = e2 - e0;
 			GMVec2 deltaUV1 = uv1 - uv0;
 			GMVec2 deltaUV2 = uv2 - uv0;
+			const GMfloat& t1 = deltaUV1.getX();
+			const GMfloat& b1 = deltaUV1.getY();
+			const GMfloat& t2 = deltaUV2.getX();
+			const GMfloat& b2 = deltaUV2.getY();
 
-			GMFloat4 f4_deltaUV1, f4_deltaUV2, f4_E1, f4_E2;
-			deltaUV1.loadFloat4(f4_deltaUV1);
-			deltaUV2.loadFloat4(f4_deltaUV2);
+			GMFloat4 f4_E1, f4_E2;
 			E1.loadFloat4(f4_E1);
 			E2.loadFloat4(f4_E2);
 
-			GMfloat s = 1.0f / (f4_deltaUV1[0] * f4_deltaUV2[1] - f4_deltaUV1[1] * f4_deltaUV2[0]);
+			GMfloat s = 1.0f / (t1*b2 - b1*t2);
 
 			GMfloat tangents[3] = {
-				s * (f4_deltaUV2[1] * f4_E1[0] - f4_deltaUV1[1] * f4_E2[0]),
-				s * (f4_deltaUV2[1] * f4_E1[1] - f4_deltaUV1[1] * f4_E2[1]),
-				s * (f4_deltaUV2[1] * f4_E1[2] - f4_deltaUV1[1] * f4_E2[2])
+				s * (b2 * f4_E1[0] - b1 * f4_E2[0]),
+				s * (b2 * f4_E1[1] - b1 * f4_E2[1]),
+				s * (b2 * f4_E1[2] - b1 * f4_E2[2])
 			};
 			GMfloat bitangents[3] = {
-				s * (f4_deltaUV1[0] * f4_E2[0] - f4_deltaUV2[0] * f4_E1[0]),
-				s * (f4_deltaUV1[0] * f4_E2[1] - f4_deltaUV2[0] * f4_E1[1]),
-				s * (f4_deltaUV1[0] * f4_E2[2] - f4_deltaUV2[0] * f4_E1[2])
+				s * (-t2 * f4_E1[0] + t1 * f4_E2[0]),
+				s * (-t2 * f4_E1[1] + t1 * f4_E2[1]),
+				s * (-t2 * f4_E1[2] + t1 * f4_E2[2])
 			};
 
 			GMVec3 tangentVector = FastNormalize(GMVec3(tangents[0], tangents[1], tangents[2]));

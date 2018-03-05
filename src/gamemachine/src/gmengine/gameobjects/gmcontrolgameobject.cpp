@@ -193,7 +193,7 @@ void GMControlGameObject::updateUI()
 
 GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 {
-	// 得到一个原点在中心，x属于[-1,1],y属于[-1,1]范围的参考系的OpenGL的坐标
+	// 得到一个原点在中心，x属于[-1,1],y属于[-1,1]范围的参考系的坐标
 	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
 	GMRectF out = {
 		in.x * 2.f / client.width - 1.f,
