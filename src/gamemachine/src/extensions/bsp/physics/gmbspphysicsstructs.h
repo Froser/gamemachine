@@ -7,6 +7,19 @@
 BEGIN_NS
 
 #define PlaneTypeForNormal(x) (x[0] == 1.0 ? PLANE_X : (x[1] == 1.0 ? PLANE_Y : (x[2] == 1.0 ? PLANE_Z : PLANE_NON_AXIAL) ) )
+
+inline GMint signbitsForNormal(const GMVec4& normal)
+{
+	GMint bits = 0;
+	if (normal.getX() < 0)
+		bits |= 1 << 0;
+	if (normal.getY() < 0)
+		bits |= 1 << 1;
+	if (normal.getZ() < 0)
+		bits |= 1 << 2;
+	return bits;
+}
+
 enum PlaneType
 {
 	PLANE_X = 0,

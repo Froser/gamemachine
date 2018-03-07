@@ -348,23 +348,6 @@ namespace
 		return true;
 	}
 
-	int signbitsForNormal(const GMVec4& normal)
-	{
-		GMint bits, j;
-		GMFloat4 f4_normal;
-		normal.loadFloat4(f4_normal);
-
-		bits = 0;
-		for (j = 0; j < 3; j++)
-		{
-			if (f4_normal[j] < 0)
-			{
-				bits |= 1 << j;
-			}
-		}
-		return bits;
-	}
-
 	GMint planeEqual(GMBSPPatchPlane* p, const GMVec4& plane, GMint *flipped)
 	{
 		GMVec4 invplane;

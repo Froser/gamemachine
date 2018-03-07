@@ -75,14 +75,37 @@ void GMBSPTrace::trace(const GMVec3& start, const GMVec3& end, const GMVec3& ori
 	// tw.offsets[signbits] = vector to appropriate corner from origin
 	// 以原点为中心，offsets[8]表示立方体的8个顶点
 	// 使用offsets[signbits]可以找到3个平面相交的那个角
-	tw.offsets[0] = tw.size[0];
-	tw.offsets[1] = tw.size[1];
-	tw.offsets[2] = tw.size[0];
-	tw.offsets[3] = tw.size[1];
-	tw.offsets[4] = tw.size[0];
-	tw.offsets[5] = tw.size[1];
-	tw.offsets[6] = tw.size[0];
-	tw.offsets[7] = tw.size[1];
+	tw.offsets[0].setX(tw.size[0].getX());
+	tw.offsets[0].setY(tw.size[0].getY());
+	tw.offsets[0].setZ(tw.size[0].getZ());
+
+	tw.offsets[1].setX(tw.size[1].getX());
+	tw.offsets[1].setY(tw.size[0].getY());
+	tw.offsets[1].setZ(tw.size[0].getZ());
+
+	tw.offsets[2].setX(tw.size[0].getX());
+	tw.offsets[2].setY(tw.size[1].getY());
+	tw.offsets[2].setZ(tw.size[0].getZ());
+
+	tw.offsets[3].setX(tw.size[1].getX());
+	tw.offsets[3].setY(tw.size[1].getY());
+	tw.offsets[3].setZ(tw.size[0].getZ());
+
+	tw.offsets[4].setX(tw.size[0].getX());
+	tw.offsets[4].setY(tw.size[0].getY());
+	tw.offsets[4].setZ(tw.size[1].getZ());
+
+	tw.offsets[5].setX(tw.size[1].getX());
+	tw.offsets[5].setY(tw.size[0].getY());
+	tw.offsets[5].setZ(tw.size[1].getZ());
+
+	tw.offsets[6].setX(tw.size[0].getX());
+	tw.offsets[6].setY(tw.size[1].getY());
+	tw.offsets[6].setZ(tw.size[1].getZ());
+
+	tw.offsets[7].setX(tw.size[1].getX());
+	tw.offsets[7].setY(tw.size[1].getY());
+	tw.offsets[7].setZ(tw.size[1].getZ());
 
 	GMFloat4 f4_bounds[2], f4_start, f4_end, f4_sphere_offset;
 	tw.start.loadFloat4(f4_start);

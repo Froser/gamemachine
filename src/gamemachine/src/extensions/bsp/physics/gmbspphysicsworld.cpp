@@ -101,12 +101,7 @@ void GMBSPPhysicsWorld::generatePhysicsPlaneData()
 		bsp.planes[i].normal.loadFloat4(f4_normal);
 		d->planes[i] = bsp.planes[i];
 		d->planes[i].planeType = PlaneTypeForNormal(f4_normal);
-		d->planes[i].signbits = 0;
-		for (GMint j = 0; j < 3; j++)
-		{
-			if (f4_normal[j] < 0)
-				d->planes[i].signbits |= 1 << j;
-		}
+		d->planes[i].signbits = signbitsForNormal(GMVec4(d->planes[i].normal, 0));
 	}
 }
 
