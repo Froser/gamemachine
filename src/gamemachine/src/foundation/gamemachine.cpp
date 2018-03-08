@@ -75,21 +75,21 @@ void GameMachine::init(
 	D(d);
 	setRenderEnvironment(renderEnv);
 	d->camera.reset(new GMCamera());
-
 	registerManager(factory, &d->factory);
-	registerManager(gameHandler, &d->gameHandler);
 	registerManager(mainWindow, &d->mainWindow);
-
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
 	registerManager(engine, &d->engine);
+	registerManager(gameHandler, &d->gameHandler);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMStates(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
-	d->consoleOutput = consoleHandle.dbgoutput;
-
 	updateGameMachineRunningStates();
-	initInner();
+
+	d->consoleOutput = consoleHandle.dbgoutput;
+	GMDebugger::setDebugOutput(d->consoleOutput);
+
+	handleMessages();
 	d->gameHandler->init();
 }
 
@@ -152,12 +152,11 @@ void GameMachine::startGameMachine()
 	// 开始渲染
 	d->engine->init();
 
-	// 处理一次消息
-	handleMessages();
-
 	// 初始化gameHandler
 	if (!d->states.crashDown)
 		d->gameHandler->start();
+	else
+		terminate();
 
 	// 开始计时器
 	d->clock.begin();
@@ -272,36 +271,39 @@ bool GameMachine::handleMessages()
 	{
 		msg = d->messageQueue.front();
 
-		switch (msg.msgType)
-		{
-		case GameMachineMessageType::Quit:
+		if (!handleMessage(msg))
 			return false;
-		case GameMachineMessageType::Console:
-		{
-			if (d->consoleWindow)
-				d->consoleWindow->event(msg);
-			break;
-		}
-		case GameMachineMessageType::CrashDown:
-		{
-			d->states.crashDown = true;
-			break;
-		}
-		default:
-			break;
-		}
 
-		d->engine->event(msg);
 		d->messageQueue.pop();
 	}
 	d->lastMessage = msg;
 	return true;
 }
 
-void GameMachine::initInner()
+bool GameMachine::handleMessage(const GameMachineMessage& msg)
 {
 	D(d);
-	GMDebugger::setDebugOutput(d->consoleOutput);
+	switch (msg.msgType)
+	{
+	case GameMachineMessageType::Quit:
+		return false;
+	case GameMachineMessageType::Console:
+	{
+		if (d->consoleWindow)
+			d->consoleWindow->event(msg);
+		break;
+	}
+	case GameMachineMessageType::CrashDown:
+	{
+		d->states.crashDown = true;
+		break;
+	}
+	default:
+		break;
+	}
+
+	d->engine->event(msg);
+	return true;
 }
 
 template <typename T, typename U>
@@ -309,16 +311,16 @@ void GameMachine::registerManager(T* newObject, OUT U** manager)
 {
 	D(d);
 	*manager = newObject;
-	d->manangerQueue.push_back(*manager);
+	d->managerQueue.push_back(*manager);
 }
 
 void GameMachine::terminate()
 {
 	D(d);
 	d->gameHandler->event(GameMachineEvent::Terminate);
-	for (auto manager : d->manangerQueue)
+	for (auto iter = d->managerQueue.rbegin(); iter != d->managerQueue.rend(); ++iter)
 	{
-		GM_delete(manager);
+		GM_delete(*iter);
 	}
 }
 

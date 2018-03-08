@@ -76,7 +76,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 
 	GMScopePtr<GMCamera> camera;
 	Queue<GameMachineMessage> messageQueue;
-	Vector<IVirtualFunctionObject*> manangerQueue;
+	Vector<IVirtualFunctionObject*> managerQueue;
 
 	GMGameMachineRunningStates states;
 	GMCursorGameObject* cursor = nullptr;
@@ -270,7 +270,7 @@ private:
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
 	void terminate();
 	bool handleMessages();
-	void initInner();
+	bool handleMessage(const GameMachineMessage& msg);
 	void updateGameMachineRunningStates();
 	void runLoop();
 	void setRenderEnvironment(GMRenderEnvironment renv);

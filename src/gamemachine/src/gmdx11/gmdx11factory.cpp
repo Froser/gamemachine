@@ -12,7 +12,7 @@ void GMDX11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 void GMDX11Factory::createTexture(GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
-	//(*texture) = new GMGLTexture(image);
+	*texture = nullptr;
 }
 
 void GMDX11Factory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter)
@@ -24,5 +24,5 @@ void GMDX11Factory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GM
 
 void GMDX11Factory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
-	//*glyphManager = new GMGLGlyphManager();
+	*glyphManager = nullptr;
 }

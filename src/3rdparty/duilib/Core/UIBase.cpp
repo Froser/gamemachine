@@ -214,6 +214,10 @@ CWindowWnd::CWindowWnd() : m_hWnd(NULL), m_OldWndProc(::DefWindowProc), m_bSubcl
 {
 }
 
+CWindowWnd::~CWindowWnd()
+{
+}
+
 HWND CWindowWnd::GetHWND() const 
 { 
 	return m_hWnd; 

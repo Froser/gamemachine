@@ -109,6 +109,8 @@ private:
 	void updateView();
 	void beginMapMVPMatrix(GMMVPMatrix** mvp);
 	void endMapMVPMatrix();
+	void forwardDraw(GMGameObject *objects[], GMuint count);
+	void forwardRender(GMGameObject *objects[], GMuint count);
 };
 
 END_NS
