@@ -22,6 +22,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11InputLayout> inputLayout;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
+	bool ready = false;
 };
 
 class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
@@ -111,6 +112,7 @@ private:
 	void endMapMVPMatrix();
 	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void forwardRender(GMGameObject *objects[], GMuint count);
+	void directDraw(GMGameObject *objects[], GMuint count);
 };
 
 END_NS

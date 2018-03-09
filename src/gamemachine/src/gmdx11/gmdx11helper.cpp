@@ -17,15 +17,13 @@ extern "C"
 		gm::GMComPtr<ID3D10Blob> shaderBuffer;
 		HRESULT hr;
 
-		gm::GMBuffer buf, pixelBuf;
-		gm::GMString path, pixelPath;
+		gm::GMBuffer buf;
+		gm::GMString path;
 		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, filename, &buf, &path);
 		if (!buf.size)
 			return E_FAIL;
 
 		buf.convertToStringBuffer();
-		pixelBuf.convertToStringBuffer();
-
 		hr = D3DX11CompileFromMemory(
 			(char*)buf.buffer,
 			buf.size,

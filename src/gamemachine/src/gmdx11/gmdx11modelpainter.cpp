@@ -65,12 +65,18 @@ void GMDx11ModelPainter::transfer()
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
 		size_t byteWidth = mesh->isDataDisabled(type) ? 0 : sizeof(GMModel::DataType) * d->vertexData[(size_t)type]->size();
-		if (!byteWidth)
-			continue;
+
+		if (byteWidth == 0)
+		{
+			// 用0填充不存在的数据段 TODO 是否有更好顶点结构？
+			GM_ASSERT(mesh->positions().size() > 0);
+			d->vertexData[(size_t)type]->resize(mesh->positions().size());
+			byteWidth = d->vertexData[(size_t)type]->size();
+		}
 
 		const int& idx = (size_t)type;
 		D3D11_BUFFER_DESC bufDesc;
-		bufDesc.Usage = usage;
+ 		bufDesc.Usage = usage;
 		bufDesc.ByteWidth = byteWidth;
 		bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 		bufDesc.CPUAccessFlags = 0;
@@ -96,16 +102,11 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 {
 	D(d);
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	GMuint stride = sizeof(gm::GMVertexDataType);
-	GMuint slot = 0;
-	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
-	{
-		context->IASetVertexBuffers(slot, 1, &d->buffers[slot], &stride, 0);
-		++slot;
-	}
-
-	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
 	context->IASetInputLayout(d->engine->getInputLayout());
+	GMuint strides[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
+	GMuint offsets[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
+	context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
+	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
 
 	// TODO 仿照GL那样，每种renderer创建一个自己的shader，然后按照Object类型选择自己的Shader
 	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
@@ -145,5 +146,5 @@ void* GMDx11ModelPainter::getBuffer()
 void GMDx11ModelPainter::draw(GMComponent* component, GMMesh* mesh)
 {
 	D(d);
-	//d->engine->getDeviceContext()->Draw()
+	d->engine->getDeviceContext()->Draw(4, 0);
 }

@@ -5,6 +5,11 @@
 
 void GMDx11GraphicEngine::init()
 {
+	D(d);
+	if (d->ready)
+		initShaders();
+	else
+		GM_ASSERT(false);
 }
 
 void GMDx11GraphicEngine::newFrame()
@@ -23,7 +28,7 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 
 	if (bufferMode == GMBufferMode::NoFramebuffer)
 	{
-		//directDraw(objects, count);
+		directDraw(objects, count);
 	}
 	else
 	{
@@ -69,7 +74,8 @@ void GMDx11GraphicEngine::removeLights()
 
 void GMDx11GraphicEngine::clearStencil()
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	D(d);
+	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_STENCIL, 0, 0);
 }
 
 void GMDx11GraphicEngine::beginCreateStencil()
@@ -164,9 +170,7 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
 		GM_ASSERT(b);
-
-		// 一切准备就绪才开始初始化
-		initShaders();
+		d->ready = true;
 		return true;
 	}
 
@@ -257,7 +261,9 @@ void GMDx11GraphicEngine::beginMapMVPMatrix(GMMVPMatrix** mvp)
 void GMDx11GraphicEngine::endMapMVPMatrix()
 {
 	D(d);
-	d->deviceContext->Unmap(GM.getCamera().getFrustum().getDxMatrixBuffer(), 0);
+	GMComPtr<ID3D11Buffer> buffer = GM.getCamera().getFrustum().getDxMatrixBuffer();
+	d->deviceContext->Unmap(buffer, 0);
+	d->deviceContext->VSSetConstantBuffers(0, 1, &buffer);
 }
 
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
@@ -273,4 +279,12 @@ void GMDx11GraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 	{
 		objects[i]->draw();
 	}
+}
+
+void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	//setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
+	//d->framebuffer.releaseBind();
+	forwardRender(objects, count);
 }
