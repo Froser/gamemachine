@@ -104,10 +104,14 @@ public:
 		return d->pixelShader;
 	}
 
+public:
+	void updateModelMatrix();
+
 private:
 	void initShaders();
-	void updateProjection();
-	void updateView();
+	void updateProjectionMatrix();
+	void updateViewMatrix();
+	void updateAllMatrices();
 	void beginMapMVPMatrix(GMMVPMatrix** mvp);
 	void endMapMVPMatrix();
 	void forwardDraw(GMGameObject *objects[], GMuint count);

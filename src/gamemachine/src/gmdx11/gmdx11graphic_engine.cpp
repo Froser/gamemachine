@@ -44,12 +44,12 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	{
 	case GMUpdateDataType::ProjectionMatrix:
 	{
-		updateProjection();
+		updateProjectionMatrix();
 		break;
 	}
 	case GMUpdateDataType::ViewMatrix:
 	{
-		updateView();
+		updateViewMatrix();
 		break;
 	}
 	case GMUpdateDataType::TurnOffCubeMap:
@@ -217,32 +217,31 @@ void GMDx11GraphicEngine::initShaders()
 	GM.getCamera().getFrustum().setDxMatrixBuffer(matrixBuf);
 }
 
-void GMDx11GraphicEngine::updateProjection()
+void GMDx11GraphicEngine::updateProjectionMatrix()
 {
-	D(d);
-	GMMat4 proj = GM.getCamera().getFrustum().getProjectionMatrix();
+	updateAllMatrices();
+}
 
+void GMDx11GraphicEngine::updateViewMatrix()
+{
+	updateAllMatrices();
+	// TODO 确定eye位置
+}
+
+void GMDx11GraphicEngine::updateAllMatrices()
+{
 	GMMVPMatrix* mvpMatrix = nullptr;
 	beginMapMVPMatrix(&mvpMatrix);
 	GM_ASSERT(mvpMatrix);
-
-	mvpMatrix->projMatrix = proj;
+	mvpMatrix->modelMatrix = GM.getCamera().getFrustum().getModelMatrix();
+	mvpMatrix->viewMatrix = GM.getCamera().getFrustum().getViewMatrix();
+	mvpMatrix->projMatrix = GM.getCamera().getFrustum().getProjectionMatrix();
 	endMapMVPMatrix();
 }
 
-void GMDx11GraphicEngine::updateView()
+void GMDx11GraphicEngine::updateModelMatrix()
 {
-	D(d);
-	GMMat4 view = GM.getCamera().getFrustum().getViewMatrix();
-
-	GMMVPMatrix* mvpMatrix = nullptr;
-	beginMapMVPMatrix(&mvpMatrix);
-	GM_ASSERT(mvpMatrix);
-
-	mvpMatrix->viewMatrix = view;
-	endMapMVPMatrix();
-
-	// TODO 确定eye位置
+	updateAllMatrices();
 }
 
 void GMDx11GraphicEngine::beginMapMVPMatrix(GMMVPMatrix** mvp)

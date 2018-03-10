@@ -9,7 +9,7 @@ class DemostrationWorld;
 
 GM_PRIVATE_OBJECT(DemostrationWorld)
 {
-	gm::GMCursorGameObject* cursor = nullptr;
+	gm::GMGameObject* gameObj = nullptr;
 };
 
 class DemostrationWorld : public gm::GMGameWorld

@@ -61,7 +61,6 @@ void GMDx11ModelPainter::transfer()
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 
 	HRESULT hr;
-	ID3D11Buffer* buffers[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
 		size_t byteWidth = mesh->isDataDisabled(type) ? 0 : sizeof(GMModel::DataType) * d->vertexData[(size_t)type]->size();
@@ -90,8 +89,6 @@ void GMDx11ModelPainter::transfer()
 		GMComPtr<ID3D11Device> device = d->engine->getDevice();
 		hr = device->CreateBuffer(&bufDesc, &bufData, &d->buffers[idx]);
 		GM_COM_CHECK(hr);
-
-		buffers[idx] = d->buffers[(size_t)type];
 	}
 
 	d->inited = true;
@@ -103,14 +100,17 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 	D(d);
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
 	context->IASetInputLayout(d->engine->getInputLayout());
-	GMuint strides[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
+	GMuint strides[(size_t)GMVertexDataType::EndOfVertexDataType] = { 3 * sizeof(GMfloat) };
 	GMuint offsets[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
-	context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
+	// context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
+	context->IASetVertexBuffers(0, 1, &d->buffers[0], strides, offsets);
 	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
 
 	// TODO 仿照GL那样，每种renderer创建一个自己的shader，然后按照Object类型选择自己的Shader
 	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
 	context->PSSetShader(d->engine->getPixelShader(), NULL, 0);
+	GM.getCamera().getFrustum().setDxModelMatrix(parent->getTransform());
+	d->engine->updateModelMatrix();
 
 	GMMesh* mesh = getModel()->getMesh();
 	for (auto component : mesh->getComponents())
@@ -146,5 +146,5 @@ void* GMDx11ModelPainter::getBuffer()
 void GMDx11ModelPainter::draw(GMComponent* component, GMMesh* mesh)
 {
 	D(d);
-	d->engine->getDeviceContext()->Draw(4, 0);
+	d->engine->getDeviceContext()->Draw(3, 0);
 }

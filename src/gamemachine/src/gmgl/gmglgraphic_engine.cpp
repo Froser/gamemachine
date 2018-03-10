@@ -379,12 +379,12 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	{
 	case GMUpdateDataType::ProjectionMatrix:
 	{
-		updateProjection();
+		updateProjectionMatrix();
 		break;
 	}
 	case GMUpdateDataType::ViewMatrix:
 	{
-		updateView();
+		updateViewMatrix();
 		break;
 	}
 	case GMUpdateDataType::TurnOffCubeMap:
@@ -401,7 +401,7 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	}
 }
 
-void GMGLGraphicEngine::updateProjection()
+void GMGLGraphicEngine::updateProjectionMatrix()
 {
 	D(d);
 	GMCamera& camera = GM.getCamera();
@@ -419,7 +419,7 @@ void GMGLGraphicEngine::updateProjection()
 	GM_END_CHECK_GL_ERROR
 }
 
-void GMGLGraphicEngine::updateView()
+void GMGLGraphicEngine::updateViewMatrix()
 {
 	D(d);
 	GMCamera& camera = GM.getCamera();

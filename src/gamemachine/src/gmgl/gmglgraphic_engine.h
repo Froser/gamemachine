@@ -163,8 +163,8 @@ private:
 	void createDeferredRenderQuad();
 	void renderDeferredRenderQuad();
 	void disposeDeferredRenderQuad();
-	void updateProjection();
-	void updateView();
+	void updateProjectionMatrix();
+	void updateViewMatrix();
 	void installShaders();
 	void activateLights(const Vector<GMLight>& lights);
 	bool refreshGBuffer();

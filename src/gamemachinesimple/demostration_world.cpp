@@ -9,20 +9,21 @@ extern gm::GMRenderEnvironment GetRenderEnv();
 
 DemostrationWorld::~DemostrationWorld()
 {
-	D(d);
-	gm::GM_delete(d->cursor);
 }
 
 void DemostrationWorld::init()
 {
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
-	//创建光标
-	d->cursor = new gm::GMCursorGameObject(32, 32);
-
-	gm::ITexture* curFrame = nullptr;
-	d->cursor->enableCursor();
-	GM.setCursor(d->cursor);
+	
+	// 创建一个带纹理的对象
+	gm::GMfloat extents[] = { 1.f, .5f, .5f };
+	gm::GMfloat pos[] = { 0, 0, 1 };
+	gm::GMModel* model;
+	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
+	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
+	d->gameObj = new gm::GMGameObject(asset);
+	this->addObjectAndInit(d->gameObj);
 }
 
 void DemostrationWorld::renderScene()
@@ -31,10 +32,7 @@ void DemostrationWorld::renderScene()
 	Base::renderScene();
 
 	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginBlend();
-	auto controls = getControlsGameObject();
-	engine->drawObjects(controls.data(), controls.size());
-	engine->endBlend();
+	engine->drawObjects(&d->gameObj, 1, gm::GMBufferMode::NoFramebuffer);
 }
 
 void DemostrationWorld::resetProjectionAndEye()
@@ -144,8 +142,10 @@ DemostrationEntrance::~DemostrationEntrance()
 
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
+#if GM_USE_DX11
 	HRESULT hr = gm::GMLoadDx11Shader(L"dx11/color.vs", L"ColorVertexShader", L"vs_5_0", gm::GM_VERTEX_SHADER);
 	GM_COM_CHECK(hr);
 	hr = gm::GMLoadDx11Shader(L"dx11/color.ps", L"ColorPixelShader", L"ps_5_0", gm::GM_PIXEL_SHADER);
 	GM_COM_CHECK(hr);
+#endif
 }

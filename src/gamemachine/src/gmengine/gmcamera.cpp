@@ -129,11 +129,23 @@ const GMMat4& GMFrustum::getViewMatrix()
 	return d->mvpMatrix.viewMatrix;
 }
 
+const GMMat4& GMFrustum::getModelMatrix()
+{
+	D(d);
+	return d->mvpMatrix.modelMatrix;
+}
+
 #if GM_USE_DX11
 void GMFrustum::setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer)
 {
 	D(d);
 	d->dxMatrixBuffer = buffer;
+}
+
+void GMFrustum::setDxModelMatrix(const GMMat4& matrix)
+{
+	D(d);
+	d->mvpMatrix.modelMatrix = matrix;
 }
 
 GMComPtr<ID3D11Buffer> GMFrustum::getDxMatrixBuffer()
