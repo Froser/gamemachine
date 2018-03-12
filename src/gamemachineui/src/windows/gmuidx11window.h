@@ -15,7 +15,11 @@ GM_PRIVATE_OBJECT(GMUIDx11Window)
 	gm::GMComPtr<IDXGISwapChain> swapChain;
 	gm::GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	gm::GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	gm::GMComPtr<ID3D11RasterizerState> rasterState;
 	D3D_FEATURE_LEVEL d3dFeatureLevel;
+
+	bool vsync = true;
+	DXGI_MODE_DESC* modes = nullptr;
 };
 
 class GMUIDx11Window : public GMUIGameMachineWindowBase
@@ -24,6 +28,7 @@ class GMUIDx11Window : public GMUIGameMachineWindowBase
 
 public:
 	GMUIDx11Window();
+	~GMUIDx11Window();
 
 public:
 	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& wndAttrs) override;

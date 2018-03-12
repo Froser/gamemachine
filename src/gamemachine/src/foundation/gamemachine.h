@@ -29,6 +29,20 @@ enum class GMRenderEnvironment
 	DirectX11,
 };
 
+//! 机器的大小端模式的枚举值。
+/*!
+表示机器是大端模式或者是小端模式的枚举。
+*/
+enum class GMEndiannessMode
+{
+	// Never returns:
+	Unknown = -1,  //!< 未知的模式，永远都不可能被返回
+
+	// Modes:
+	LittleEndian = 0, //!< 小端模式，数据的高字节保存在内存的高地址
+	BigEndian = 1,    //!< 大端模式，数据的高字节保存在内存的低地址
+};
+
 /*! \def GM
     \brief 表示当前GameMachine运行实例。
 
@@ -46,13 +60,26 @@ class GMCursorGameObject;
 */
 struct GMGameMachineRunningStates
 {
+	// 每一帧更新的内容
 	GMRect clientRect; //!< 当前窗口客户区域的位置和大小。
 	GMRect windowRect; //!< 当前窗口的位置和大小。
 	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
 	bool crashDown = false; //!< 程序是否已崩溃。当遇到不可恢复的错误时，此项为true。
 
-	const GMfloat nearZ = 0; //!< 近平面的深度值
-	const GMfloat farZ = 1; //!< 远平面的深度值
+	// 下面字段由图形引擎生成
+	GMfloat minDepth = 0; //!< 近平面的深度值。
+	GMfloat maxDepth = 1; //!< 远平面的深度值。
+	GMString workingAdapterDesc; //!< 适配器信息。
+	GMint sampleCount; //!< 多重采样数量。
+	GMint sampleQuality; //!< 多重采样质量。
+	bool vsyncEnabled;
+
+	// 以下为常量
+	// 永远不要更改以下2个值，它采用DirectX标准透视矩阵
+	GMfloat farZ = 1.f; //!< 远平面的Z坐标。
+	GMfloat nearZ = 0; //!< 近平面的Z坐标。
+
+	GMEndiannessMode endiannessMode = GMEndiannessMode::Unknown;
 };
 
 GM_PRIVATE_OBJECT(GameMachine)
@@ -99,27 +126,12 @@ class GameMachine : public GMSingleton<GameMachine>
 		MAX_KEY_STATE_BITS = 512,
 	};
 
-public:
-	//! 机器的大小端模式的枚举值。
-	/*!
-	  表示机器是大端模式或者是小端模式的枚举。
-	*/
-	enum EndiannessMode
-	{
-		// Never returns:
-		UNKNOWN_YET = -1,  //!< 未知的模式，永远都不可能被返回
-
-		// Modes:
-		LITTLE_ENDIAN = 0, //!< 小端模式，数据的高字节保存在内存的高地址
-		BIG_ENDIAN = 1,    //!< 大端模式，数据的高字节保存在内存的低地址
-	};
-
 protected:
 	//! GameMachine构造函数
 	/*!
 	  构造一个GameMachine实例。不要试图自己创建一个GameMachine实例，而是使用GM宏来获取它的单例。
 	*/
-	GameMachine() = default;
+	GameMachine();
 
 public:
 	//! 初始化GameMachine。
@@ -213,7 +225,7 @@ public:
 	  此方法会将返回值保存起来，下一次调用的时候，直接返回其保存值。
 	  \return 当前机器大小端模式。
 	*/
-	EndiannessMode getMachineEndianness();
+	GMEndiannessMode getMachineEndianness();
 
 	//! 发送一条GameMachine的消息。
 	/*!
@@ -265,6 +277,19 @@ public:
 	  \sa init()
 	*/
 	void startGameMachine();
+
+	//! 设置当前的运行状态。
+	/*!
+	  用户永远不要调用这个方法来修改运行状态。这个方法将在窗口初始化或者其他特殊场合下被调用，并在每一帧更新。<BR>
+	  一般，只需要调用getGameMachineRunningStates获取状态即可。
+	  \param states 需要更新的运行状态
+	  \sa getGameMachineRunningStates()
+	*/
+	void setGameMachineRunningStates(const GMGameMachineRunningStates& states)
+	{
+		D(d);
+		d->states = states;
+	}
 
 private:
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);

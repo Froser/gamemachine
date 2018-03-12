@@ -170,6 +170,8 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
 		GM_ASSERT(b);
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11RasterState, (void**)&d->rasterState);
+		GM_ASSERT(b);
 		d->ready = true;
 		return true;
 	}

@@ -107,10 +107,10 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
 
 	// TODO 仿照GL那样，每种renderer创建一个自己的shader，然后按照Object类型选择自己的Shader
-	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
-	context->PSSetShader(d->engine->getPixelShader(), NULL, 0);
 	GM.getCamera().getFrustum().setDxModelMatrix(parent->getTransform());
 	d->engine->updateModelMatrix();
+	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
+	context->PSSetShader(d->engine->getPixelShader(), NULL, 0);
 
 	GMMesh* mesh = getModel()->getMesh();
 	for (auto component : mesh->getComponents())
@@ -146,5 +146,5 @@ void* GMDx11ModelPainter::getBuffer()
 void GMDx11ModelPainter::draw(GMComponent* component, GMMesh* mesh)
 {
 	D(d);
-	d->engine->getDeviceContext()->Draw(3, 0);
+	d->engine->getDeviceContext()->Draw(5, 0);
 }

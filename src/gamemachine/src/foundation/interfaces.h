@@ -66,6 +66,7 @@ enum class GameMachineInterfaceID
 	DXGISwapChain,
 	D3D11DepthStencilView,
 	D3D11RenderTargetView,
+	D3D11RasterState,
 
 	D3D11VertexShader,
 	D3D11VertexShaderBuffer,

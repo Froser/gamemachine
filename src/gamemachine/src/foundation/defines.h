@@ -65,6 +65,10 @@ using Tuple = std::tuple<T...>;
 // 是否使用DirectX11
 #ifndef GM_USE_DX11
 #	define GM_USE_DX11 0
+#else
+#	if _DEBUG
+#		define D3D_DEBUG_INFO
+#	endif
 #endif
 
 // 编译设置：

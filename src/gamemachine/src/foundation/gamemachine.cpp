@@ -64,6 +64,12 @@ namespace
 	};
 }
 
+GameMachine::GameMachine()
+{
+	getMachineEndianness();
+	updateGameMachineRunningStates();
+}
+
 void GameMachine::init(
 	AUTORELEASE IWindow* mainWindow,
 	const GMConsoleHandle& consoleHandle,
@@ -84,7 +90,6 @@ void GameMachine::init(
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMStates(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
-	updateGameMachineRunningStates();
 
 	d->consoleOutput = consoleHandle.dbgoutput;
 	GMDebugger::setDebugOutput(d->consoleOutput);
@@ -119,19 +124,19 @@ void GameMachine::createModelPainterAndTransfer(GMModel* model)
 	}
 }
 
-GameMachine::EndiannessMode GameMachine::getMachineEndianness()
+GMEndiannessMode GameMachine::getMachineEndianness()
 {
-	static EndiannessMode ret = UNKNOWN_YET;
-	if (ret == UNKNOWN_YET)
+	D(d);
+	if (d->states.endiannessMode == GMEndiannessMode::Unknown)
 	{
 		long int i = 1;
 		const char *p = (const char *)&i;
 		if (p[0] == 1)
-			ret = LITTLE_ENDIAN;
+			d->states.endiannessMode = GMEndiannessMode::LittleEndian;
 		else
-			ret = BIG_ENDIAN;
+			d->states.endiannessMode = GMEndiannessMode::BigEndian;
 	}
-	return ret;
+	return d->states.endiannessMode;
 }
 
 void GameMachine::startGameMachine()

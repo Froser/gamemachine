@@ -13,6 +13,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	GMComPtr<ID3D11RasterizerState> rasterState;
 
 	GMComPtr<ID3D11VertexShader> vertexShader;
 	GMComPtr<ID3D10Blob> vertexShaderBuffer;
