@@ -332,6 +332,10 @@ void GameMachine::terminate()
 void GameMachine::updateGameMachineRunningStates()
 {
 	D(d);
-	d->states.clientRect = getMainWindow()->getClientRect();
-	d->states.windowRect = getMainWindow()->getWindowRect();
+	gm::IWindow* mainWindow = getMainWindow();
+	if (mainWindow)
+	{
+		d->states.clientRect = mainWindow->getClientRect();
+		d->states.windowRect = mainWindow->getWindowRect();
+	}
 }

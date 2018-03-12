@@ -36,6 +36,7 @@ namespace
 GMUIWindow::~GMUIWindow()
 {
 	D(d);
+	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
 	if (d->input)
 		delete d->input;
 }
