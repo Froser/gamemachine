@@ -31,7 +31,7 @@ gm::GMWindowHandle GMUIDx11Window::create(const gm::GMWindowAttributes& wndAttrs
 void GMUIDx11Window::update()
 {
 	D(d);
-	HRESULT hr = d->swapChain->Present(FALSE, 0);
+	HRESULT hr = d->swapChain->Present(d->vsync ? 1 : 0, 0);
 	GM_COM_CHECK(hr);
 	Base::update();
 }

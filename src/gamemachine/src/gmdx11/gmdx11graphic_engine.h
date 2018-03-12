@@ -113,8 +113,7 @@ private:
 	void updateProjectionMatrix();
 	void updateViewMatrix();
 	void updateAllMatrices();
-	void beginMapMVPMatrix(GMMVPMatrix** mvp);
-	void endMapMVPMatrix();
+	void updateMVPMatrix();
 	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void forwardRender(GMGameObject *objects[], GMuint count);
 	void directDraw(GMGameObject *objects[], GMuint count);

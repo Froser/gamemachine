@@ -146,6 +146,7 @@ enum class GMUpdateDataType
 {
 	ProjectionMatrix,
 	ViewMatrix,
+	ModelMatrix,
 	TurnOffCubeMap,
 };
 

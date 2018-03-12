@@ -111,7 +111,7 @@ public:
 	const GMMat4& getModelMatrix();
 
 #if GM_USE_DX11
-	void setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer);
+	bool createDxMatrixBuffer();
 	void setDxModelMatrix(const GMMat4& matrix);
 	GMComPtr<ID3D11Buffer> getDxMatrixBuffer();
 #endif

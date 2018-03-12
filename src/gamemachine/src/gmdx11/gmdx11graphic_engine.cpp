@@ -43,11 +43,8 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	switch (type)
 	{
 	case GMUpdateDataType::ProjectionMatrix:
-	{
-		updateProjectionMatrix();
-		break;
-	}
 	case GMUpdateDataType::ViewMatrix:
+	case GMUpdateDataType::ModelMatrix:
 	{
 		updateViewMatrix();
 		break;
@@ -203,20 +200,8 @@ void GMDx11GraphicEngine::initShaders()
 	);
 	GM_COM_CHECK(hr);
 
-	// 定义统一MVP Matrix缓存
-	D3D11_BUFFER_DESC vpBufferDesc;
-	vpBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	vpBufferDesc.ByteWidth = sizeof(GMMVPMatrix);
-	vpBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	vpBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	vpBufferDesc.MiscFlags = 0;
-	vpBufferDesc.StructureByteStride = 0;
-
-	GMComPtr<ID3D11Buffer> matrixBuf;
-	hr = d->device->CreateBuffer(&vpBufferDesc, NULL, &matrixBuf);
-	GM_COM_CHECK(hr);
-
-	GM.getCamera().getFrustum().setDxMatrixBuffer(matrixBuf);
+	bool suc = GM.getCamera().getFrustum().createDxMatrixBuffer();
+	GM_ASSERT(suc);
 }
 
 void GMDx11GraphicEngine::updateProjectionMatrix()
@@ -232,39 +217,20 @@ void GMDx11GraphicEngine::updateViewMatrix()
 
 void GMDx11GraphicEngine::updateAllMatrices()
 {
-	GMMVPMatrix* mvpMatrix = nullptr;
-	beginMapMVPMatrix(&mvpMatrix);
-	GM_ASSERT(mvpMatrix);
-	mvpMatrix->modelMatrix = GM.getCamera().getFrustum().getModelMatrix();
-	mvpMatrix->viewMatrix = GM.getCamera().getFrustum().getViewMatrix();
-	mvpMatrix->projMatrix = GM.getCamera().getFrustum().getProjectionMatrix();
-	endMapMVPMatrix();
-}
-
-void GMDx11GraphicEngine::updateModelMatrix()
-{
-	updateAllMatrices();
-}
-
-void GMDx11GraphicEngine::beginMapMVPMatrix(GMMVPMatrix** mvp)
-{
 	D(d);
-	HRESULT hr;
-	GMComPtr<ID3D11Buffer> mvpBuf = GM.getCamera().getFrustum().getDxMatrixBuffer();
+	GMMVPMatrix mvpMatrix;
+	mvpMatrix.modelMatrix = GM.getCamera().getFrustum().getModelMatrix();
+	mvpMatrix.viewMatrix = GM.getCamera().getFrustum().getViewMatrix();
+	mvpMatrix.projMatrix = GM.getCamera().getFrustum().getProjectionMatrix();
 
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	hr = d->deviceContext->Map(mvpBuf, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	GM_COM_CHECK(hr);
-
-	(*mvp) = static_cast<GMMVPMatrix*>(mappedResource.pData);
-}
-
-void GMDx11GraphicEngine::endMapMVPMatrix()
-{
-	D(d);
 	GMComPtr<ID3D11Buffer> buffer = GM.getCamera().getFrustum().getDxMatrixBuffer();
-	d->deviceContext->Unmap(buffer, 0);
+	d->deviceContext->UpdateSubresource(buffer, 0, NULL, &mvpMatrix, 0, 0);
 	d->deviceContext->VSSetConstantBuffers(0, 1, &buffer);
+}
+
+void GMDx11GraphicEngine::updateMVPMatrix()
+{
+	D(d);
 }
 
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)

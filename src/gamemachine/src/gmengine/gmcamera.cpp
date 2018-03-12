@@ -136,16 +136,31 @@ const GMMat4& GMFrustum::getModelMatrix()
 }
 
 #if GM_USE_DX11
-void GMFrustum::setDxMatrixBuffer(GMComPtr<ID3D11Buffer> buffer)
+bool GMFrustum::createDxMatrixBuffer()
 {
 	D(d);
-	d->dxMatrixBuffer = buffer;
+	// 定义统一MVP Matrix缓存
+	D3D11_BUFFER_DESC vpBufferDesc;
+	vpBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	vpBufferDesc.ByteWidth = sizeof(GMMVPMatrix);
+	vpBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	vpBufferDesc.CPUAccessFlags = 0;
+	vpBufferDesc.MiscFlags = 0;
+	vpBufferDesc.StructureByteStride = 0;
+
+	GMComPtr<ID3D11Device> device;
+	bool suc = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
+	GM_ASSERT(suc);
+	HRESULT hr = device->CreateBuffer(&vpBufferDesc, NULL, &d->dxMatrixBuffer);
+	GM_COM_CHECK_RETURN(hr, false);
+	return S_OK == hr;
 }
 
 void GMFrustum::setDxModelMatrix(const GMMat4& matrix)
 {
 	D(d);
 	d->mvpMatrix.modelMatrix = matrix;
+	GM.getGraphicEngine()->update(GMUpdateDataType::ModelMatrix);
 }
 
 GMComPtr<ID3D11Buffer> GMFrustum::getDxMatrixBuffer()

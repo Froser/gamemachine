@@ -143,9 +143,9 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
 #if GM_USE_DX11
-	HRESULT hr = gm::GMLoadDx11Shader(L"dx11/color.vs", L"ColorVertexShader", L"vs_5_0", gm::GM_VERTEX_SHADER);
+	HRESULT hr = gm::GMLoadDx11Shader(L"dx11/color.fx", L"VS", L"vs_4_0", gm::GM_VERTEX_SHADER);
 	GM_COM_CHECK(hr);
-	hr = gm::GMLoadDx11Shader(L"dx11/color.ps", L"ColorPixelShader", L"ps_5_0", gm::GM_PIXEL_SHADER);
+	hr = gm::GMLoadDx11Shader(L"dx11/color.fx", L"PS", L"ps_4_0", gm::GM_PIXEL_SHADER);
 	GM_COM_CHECK(hr);
 #endif
 }

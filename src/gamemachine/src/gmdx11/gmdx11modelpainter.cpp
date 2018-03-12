@@ -82,13 +82,24 @@ void GMDx11ModelPainter::transfer()
 		bufDesc.MiscFlags = 0;
 		bufDesc.StructureByteStride = 0;
 
+		struct
+		{
+			DirectX::XMFLOAT3 pos;
+		} vertices[] =
+		{
+			DirectX::XMFLOAT3(-1, .5f, 1),
+			DirectX::XMFLOAT3(1, .5f, 1),
+			DirectX::XMFLOAT3(-1, -.5f, 1),
+		};
 		D3D11_SUBRESOURCE_DATA bufData;
-		bufData.pSysMem = d->vertexData[idx]->data();
+		bufData.pSysMem = vertices;
 		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
 		GMComPtr<ID3D11Device> device = d->engine->getDevice();
 		hr = device->CreateBuffer(&bufDesc, &bufData, &d->buffers[idx]);
 		GM_COM_CHECK(hr);
+
+		break; //TODO TEST
 	}
 
 	d->inited = true;
@@ -108,7 +119,6 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 
 	// TODO 仿照GL那样，每种renderer创建一个自己的shader，然后按照Object类型选择自己的Shader
 	GM.getCamera().getFrustum().setDxModelMatrix(parent->getTransform());
-	d->engine->updateModelMatrix();
 	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
 	context->PSSetShader(d->engine->getPixelShader(), NULL, 0);
 
@@ -146,5 +156,5 @@ void* GMDx11ModelPainter::getBuffer()
 void GMDx11ModelPainter::draw(GMComponent* component, GMMesh* mesh)
 {
 	D(d);
-	d->engine->getDeviceContext()->Draw(5, 0);
+	d->engine->getDeviceContext()->Draw(3, 0);
 }
