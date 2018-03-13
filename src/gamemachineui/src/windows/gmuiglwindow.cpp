@@ -56,6 +56,7 @@ GMUIGLWindow::GMUIGLWindow()
 
 GMUIGLWindow::~GMUIGLWindow()
 {
+	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
 	dispose();
 }
 

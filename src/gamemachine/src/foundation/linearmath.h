@@ -79,7 +79,7 @@ inline bool FuzzyCompare(gm::GMfloat p1, gm::GMfloat p2, gm::GMfloat qualifier =
 
 #if GM_USE_DX11
 #define GMMATH_BEGIN_STRUCT(className, glStruct, dxStruct)	\
-	GM_ALIGNED_STRUCT(className)				\
+	struct className							\
 	{											\
 		typedef dxStruct DataType;				\
 		dxStruct v_;							\

@@ -111,9 +111,7 @@ public:
 private:
 	void initShaders();
 	void updateProjectionMatrix();
-	void updateViewMatrix();
 	void updateAllMatrices();
-	void updateMVPMatrix();
 	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void forwardRender(GMGameObject *objects[], GMuint count);
 	void directDraw(GMGameObject *objects[], GMuint count);

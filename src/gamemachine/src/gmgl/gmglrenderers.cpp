@@ -64,7 +64,10 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 
+	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
+	GM_END_CHECK_GL_ERROR
+
 	if (parent)
 	{
 		GM_BEGIN_CHECK_GL_ERROR

@@ -415,6 +415,15 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 			VECTOR4_FUZZY_EQUALS(V[3], 0.000000000f, 0.000000000f, 0.000000000f, 1.00000000f);
 	});
 
+	ut.addTestCase("Ortho()", []() {
+		GMMat4 P = Ortho(-1, 1, -1, 1, 1, 3000);
+		return
+			VECTOR4_FUZZY_EQUALS(P[0], 1.000000000f, 0.000000000f, 0.000000000f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(P[1], 0.000000000f, 1.000000000f, 0.000000000f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(P[2], 0.000000000f, 0.000000000f, 0.000333444f, 0.000000000f) &&
+			VECTOR4_FUZZY_EQUALS(P[3], 0.000000000f, 0.000000000f, -0.000333444f, 1.000000000f);
+	});
+
 	ut.addTestCase("Perspective()", []() {
 		GMMat4 P = Perspective(1.3f, 1.3f, 1024, 768);
 		return

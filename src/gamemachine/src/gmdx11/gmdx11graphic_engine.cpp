@@ -43,10 +43,10 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	switch (type)
 	{
 	case GMUpdateDataType::ProjectionMatrix:
-	case GMUpdateDataType::ViewMatrix:
 	case GMUpdateDataType::ModelMatrix:
+	case GMUpdateDataType::ViewMatrix:
 	{
-		updateViewMatrix();
+		updateAllMatrices();
 		break;
 	}
 	case GMUpdateDataType::TurnOffCubeMap:
@@ -209,28 +209,17 @@ void GMDx11GraphicEngine::updateProjectionMatrix()
 	updateAllMatrices();
 }
 
-void GMDx11GraphicEngine::updateViewMatrix()
-{
-	updateAllMatrices();
-	// TODO 确定eye位置
-}
-
 void GMDx11GraphicEngine::updateAllMatrices()
 {
 	D(d);
 	GMMVPMatrix mvpMatrix;
-	mvpMatrix.modelMatrix = GM.getCamera().getFrustum().getModelMatrix();
-	mvpMatrix.viewMatrix = GM.getCamera().getFrustum().getViewMatrix();
-	mvpMatrix.projMatrix = GM.getCamera().getFrustum().getProjectionMatrix();
+	mvpMatrix.modelMatrix = Transpose(GM.getCamera().getFrustum().getModelMatrix());
+	mvpMatrix.viewMatrix = Transpose(GM.getCamera().getFrustum().getViewMatrix());
+	mvpMatrix.projMatrix = Transpose(GM.getCamera().getFrustum().getProjectionMatrix());
 
 	GMComPtr<ID3D11Buffer> buffer = GM.getCamera().getFrustum().getDxMatrixBuffer();
 	d->deviceContext->UpdateSubresource(buffer, 0, NULL, &mvpMatrix, 0, 0);
 	d->deviceContext->VSSetConstantBuffers(0, 1, &buffer);
-}
-
-void GMDx11GraphicEngine::updateMVPMatrix()
-{
-	D(d);
 }
 
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
