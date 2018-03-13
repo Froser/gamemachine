@@ -195,12 +195,6 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual void init() = 0;
 
-	//! 引擎是否已经准备好。
-	/*!
-	  返回引擎是否已经准备好。只有准备好的引擎才可以进行绘制。
-	*/
-	virtual bool isReady() = 0;
-
 	//! 刷新帧缓存，新建一帧。
 	/*!
 	  此方法保证默认帧缓存将会被清空，但是并不保证其他帧缓存（如G缓存）被清空。<BR>

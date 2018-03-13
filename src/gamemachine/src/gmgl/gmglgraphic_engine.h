@@ -95,7 +95,6 @@ public:
 
 public:
 	virtual void init() override;
-	virtual bool isReady() override;
 	virtual void newFrame() override;
 	virtual bool event(const GameMachineMessage& e) override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;

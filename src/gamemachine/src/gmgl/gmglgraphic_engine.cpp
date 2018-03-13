@@ -98,19 +98,6 @@ void GMGLGraphicEngine::init()
 #endif
 }
 
-bool GMGLGraphicEngine::isReady()
-{
-	D(d);
-	if (!d->engineReady)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (GL_FRAMEBUFFER_COMPLETE == status)
-			d->engineReady = true;
-	}
-	return d->engineReady;
-}
-
 void GMGLGraphicEngine::newFrame()
 {
 	D(d);

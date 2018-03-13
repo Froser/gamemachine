@@ -32,7 +32,6 @@ class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
 
 public:
 	virtual void init() override;
-	virtual bool isReady() override;
 	virtual void newFrame() override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;
 	virtual void update(GMUpdateDataType type) override;
