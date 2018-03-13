@@ -204,7 +204,8 @@ void GameMachine::runLoop()
 		updateGameMachineRunningStates();
 
 		// 本帧结束
-		d->gameHandler->event(GameMachineEvent::FrameEnd);
+		if (d->engine->isReady())
+			d->gameHandler->event(GameMachineEvent::FrameEnd);
 	}
 }
 
@@ -250,13 +251,16 @@ bool GameMachine::checkCrashDown()
 void GameMachine::handlerEvents()
 {
 	D(d);
-	d->gameHandler->event(GameMachineEvent::FrameStart);
-	if (d->mainWindow->isWindowActivate())
-		d->gameHandler->event(GameMachineEvent::Activate);
-	else
-		d->gameHandler->event(GameMachineEvent::Deactivate);
-	d->gameHandler->event(GameMachineEvent::Simulate);
-	d->gameHandler->event(GameMachineEvent::Render);
+	if (d->engine->isReady())
+	{
+		d->gameHandler->event(GameMachineEvent::FrameStart);
+		if (d->mainWindow->isWindowActivate())
+			d->gameHandler->event(GameMachineEvent::Activate);
+		else
+			d->gameHandler->event(GameMachineEvent::Deactivate);
+		d->gameHandler->event(GameMachineEvent::Simulate);
+		d->gameHandler->event(GameMachineEvent::Render);
+	}
 }
 
 void GameMachine::updateManagers()

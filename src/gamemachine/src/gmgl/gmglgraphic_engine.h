@@ -46,6 +46,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	bool needRefreshLights = true;
 	Vector<GMLight> lights;
+	bool engineReady = false;
 
 	// 著色器程序
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
@@ -94,6 +95,7 @@ public:
 
 public:
 	virtual void init() override;
+	virtual bool isReady() override;
 	virtual void newFrame() override;
 	virtual bool event(const GameMachineMessage& e) override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;

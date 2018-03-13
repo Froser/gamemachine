@@ -216,6 +216,7 @@ CWindowWnd::CWindowWnd() : m_hWnd(NULL), m_OldWndProc(::DefWindowProc), m_bSubcl
 
 CWindowWnd::~CWindowWnd()
 {
+	::SetWindowLongPtr(GetHWND(), GWLP_USERDATA, NULL);
 }
 
 HWND CWindowWnd::GetHWND() const 

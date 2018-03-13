@@ -12,6 +12,11 @@ void GMDx11GraphicEngine::init()
 		GM_ASSERT(false);
 }
 
+bool GMDx11GraphicEngine::isReady()
+{
+	return true;
+}
+
 void GMDx11GraphicEngine::newFrame()
 {
 	D(d);

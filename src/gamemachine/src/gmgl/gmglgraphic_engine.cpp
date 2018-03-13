@@ -14,6 +14,22 @@
 extern "C"
 {
 	GLenum s_glErrCode;
+
+	namespace
+	{
+		void GL_MessageCallback(GLenum source,
+			GLenum type,
+			GLuint id,
+			GLenum severity,
+			GLsizei length,
+			const GLchar* message,
+			const void* userParam)
+		{
+			gm_error("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+				type, severity, message);
+		}
+	}
 }
 
 class GMEffectRenderer
@@ -69,11 +85,30 @@ void GMGLGraphicEngine::init()
 	glClearDepth(runningState.farZ);
 	glDepthFunc(GL_LEQUAL);
 
+	glClearColor(0, 0, 0, 1);
 	glEnable(GL_STENCIL_TEST);
 	glClearStencil(0);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 	createDeferredRenderQuad();
+
+#if _DEBUG
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback((GLDEBUGPROC)GL_MessageCallback, 0);
+#endif
+}
+
+bool GMGLGraphicEngine::isReady()
+{
+	D(d);
+	if (!d->engineReady)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (GL_FRAMEBUFFER_COMPLETE == status)
+			d->engineReady = true;
+	}
+	return d->engineReady;
 }
 
 void GMGLGraphicEngine::newFrame()
@@ -699,7 +734,9 @@ void GMGLGraphicEngine::newFrameOnCurrentFramebuffer()
 	GLint mask;
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
 	glStencilMask(0xFF);
+	GM_BEGIN_CHECK_GL_ERROR
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	GM_END_CHECK_GL_ERROR
 	glStencilMask(mask);
 }
 

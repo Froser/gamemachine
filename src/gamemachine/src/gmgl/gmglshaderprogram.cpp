@@ -22,7 +22,9 @@ void GMGLShaderProgram::useProgram()
 	if (d->lastUsedProgram == d->shaderProgram)
 		return;
 
+	GM_BEGIN_CHECK_GL_ERROR
 	glUseProgram(d->shaderProgram);
+	GM_END_CHECK_GL_ERROR
 	d->lastUsedProgram = d->shaderProgram;
 }
 
