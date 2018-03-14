@@ -116,8 +116,6 @@ GM_PRIVATE_OBJECT(GameMachine)
 */
 class GameMachine : public GMSingleton<GameMachine>
 {
-	friend class GMSingleton<GameMachine>;
-
 	DECLARE_PRIVATE(GameMachine)
 	DECLARE_SINGLETON(GameMachine)
 

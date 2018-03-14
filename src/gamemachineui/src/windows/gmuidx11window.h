@@ -15,7 +15,6 @@ GM_PRIVATE_OBJECT(GMUIDx11Window)
 	gm::GMComPtr<IDXGISwapChain> swapChain;
 	gm::GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	gm::GMComPtr<ID3D11RenderTargetView> renderTargetView;
-	gm::GMComPtr<ID3D11RasterizerState> rasterState;
 	D3D_FEATURE_LEVEL d3dFeatureLevel;
 
 	bool vsync = true;

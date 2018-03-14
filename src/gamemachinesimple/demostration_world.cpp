@@ -21,6 +21,7 @@ void DemostrationWorld::init()
 	gm::GMfloat pos[] = { 0, 0, 1 };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
+	model->getMesh()->getComponents()[0]->getShader().setCull(gm::GMS_Cull::NONE);
 	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
 	d->gameObj = new gm::GMGameObject(asset);
 	this->addObjectAndInit(d->gameObj);

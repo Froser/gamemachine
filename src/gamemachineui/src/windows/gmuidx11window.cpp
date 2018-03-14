@@ -61,10 +61,6 @@ bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
 		d->renderTargetView->AddRef();
 		(*out) = d->renderTargetView.get();
 		break;
-	case gm::GameMachineInterfaceID::D3D11RasterState:
-		d->rasterState->AddRef();
-		(*out) = d->rasterState.get();
-		break;
 	default:
 		return false;
 	}
@@ -81,7 +77,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	D3D11_VIEWPORT vp = { 0 };
 	DXGI_ADAPTER_DESC adapterDesc = { 0 };
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = { 0 };
-	D3D11_RASTERIZER_DESC rasterDesc;
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	HRESULT hr;
 	gm::GameMachineMessage msg;
@@ -263,22 +258,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	// 6.绑定渲染目标
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);
 
-	// 7.设置光栅状态
-	rasterDesc.AntialiasedLineEnable = false;
-	rasterDesc.CullMode = D3D11_CULL_NONE;
-	rasterDesc.DepthBias = 0;
-	rasterDesc.DepthBiasClamp = 0.0f;
-	rasterDesc.DepthClipEnable = true;
-	rasterDesc.FillMode = D3D11_FILL_SOLID;
-	rasterDesc.FrontCounterClockwise = false;
-	rasterDesc.MultisampleEnable = false;
-	rasterDesc.ScissorEnable = false;
-	rasterDesc.SlopeScaledDepthBias = 0.0f;
-	hr = d->device->CreateRasterizerState(&rasterDesc, &d->rasterState);
-	CHECK_HR(hr);
-	d->deviceContext->RSSetState(d->rasterState);
-
-	// 8.设置视口
+	// 7.设置视口
 	vp.TopLeftX = 0.f;
 	vp.TopLeftY = 0.f;
 	vp.Width = static_cast<gm::GMfloat>(renderWidth);

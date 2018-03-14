@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
-#include "shader_constants.h"
+#include "gmdx11renderers.h"
 
 void GMDx11GraphicEngine::init()
 {
@@ -16,6 +16,7 @@ void GMDx11GraphicEngine::newFrame()
 {
 	D(d);
 	static const GMfloat clear[4] = { 0, 0, 0, 1 };
+	d->deviceContext->RSSetState(NULL);
 	d->deviceContext->ClearRenderTargetView(d->renderTargetView, clear);
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
@@ -143,6 +144,26 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		d->device->AddRef();
 		(*out) = d->device.get();
 		break;
+	case GameMachineInterfaceID::D3D11DeviceContext:
+		GM_ASSERT(d->device);
+		d->deviceContext->AddRef();
+		(*out) = d->device.get();
+		break;
+	case GameMachineInterfaceID::DXGISwapChain:
+		GM_ASSERT(d->device);
+		d->swapChain->AddRef();
+		(*out) = d->device.get();
+		break;
+	case GameMachineInterfaceID::D3D11DepthStencilView:
+		GM_ASSERT(d->device);
+		d->depthStencilView->AddRef();
+		(*out) = d->device.get();
+		break;
+	case GameMachineInterfaceID::D3D11RenderTargetView:
+		GM_ASSERT(d->device);
+		d->renderTargetView->AddRef();
+		(*out) = d->device.get();
+		break;
 	default:
 		return false;
 	}
@@ -167,8 +188,6 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
 		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11RasterState, (void**)&d->rasterState);
-		GM_ASSERT(b);
 		d->ready = true;
 		return true;
 	}
@@ -188,17 +207,6 @@ void GMDx11GraphicEngine::initShaders()
 	}
 
 	d->shaderLoadCallback->onLoadShaders(this);
-
-	// 定义顶点布局
-	HRESULT hr;
-	hr = d->device->CreateInputLayout(
-		GMSHADER_ElementDescriptions,
-		GM_array_size(GMSHADER_ElementDescriptions),
-		d->vertexShaderBuffer->GetBufferPointer(),
-		d->vertexShaderBuffer->GetBufferSize(),
-		&d->inputLayout
-	);
-	GM_COM_CHECK(hr);
 
 	bool suc = GM.getCamera().getFrustum().createDxMatrixBuffer();
 	GM_ASSERT(suc);
@@ -243,4 +251,22 @@ void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 	//setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
 	//d->framebuffer.releaseBind();
 	forwardRender(objects, count);
+}
+
+IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
+{
+	D(d);
+	static GMDx11Renderer s_renderer;
+	switch (objectType)
+	{
+	case GMModelType::Model2D:
+	case GMModelType::Model3D:
+	case GMModelType::Glyph:
+	case GMModelType::Particles:
+	case GMModelType::CubeMap:
+		return &s_renderer;
+	default:
+		GM_ASSERT(false);
+		return nullptr;
+	}
 }

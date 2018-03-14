@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <gmcom.h>
 #include <gmdxincludes.h>
+#include <gmmodel.h>
 BEGIN_NS
 
 struct GMMVPMatrix;
@@ -13,14 +14,11 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
-	GMComPtr<ID3D11RasterizerState> rasterState;
 
 	GMComPtr<ID3D11VertexShader> vertexShader;
 	GMComPtr<ID3D10Blob> vertexShaderBuffer;
 	GMComPtr<ID3D11PixelShader> pixelShader;
 	GMComPtr<ID3D10Blob> pixelShaderBuffer;
-
-	GMComPtr<ID3D11InputLayout> inputLayout;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	bool ready = false;
@@ -87,12 +85,6 @@ public:
 		return d->renderTargetView;
 	}
 
-	GMComPtr<ID3D11InputLayout> getInputLayout()
-	{
-		D(d);
-		return d->inputLayout;
-	}
-
 	GMComPtr<ID3D11VertexShader> getVertexShader()
 	{
 		D(d);
@@ -105,14 +97,15 @@ public:
 		return d->pixelShader;
 	}
 
-	GMComPtr<ID3D11RasterizerState> getRasterState()
+	GMComPtr<ID3D10Blob> getVertexShaderBuffer()
 	{
 		D(d);
-		return d->rasterState;
+		return d->vertexShaderBuffer;
 	}
 
 public:
 	void updateModelMatrix();
+	IRenderer* getRenderer(GMModelType objectType);
 
 private:
 	void initShaders();

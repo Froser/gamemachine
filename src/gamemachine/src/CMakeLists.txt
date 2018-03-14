@@ -188,6 +188,8 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11modelpainter.cpp
 		gmdx11/gmdx11helper.h
 		gmdx11/gmdx11helper.cpp
+		gmdx11/gmdx11renderers.h
+		gmdx11/gmdx11renderers.cpp
 	)
 
 if(WIN32)

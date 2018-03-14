@@ -3,27 +3,6 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
-namespace
-{
-	D3D_PRIMITIVE_TOPOLOGY getMode(GMMesh* obj)
-	{
-		switch (obj->getArrangementMode())
-		{
-		case GMArrangementMode::Triangle_Fan:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		case GMArrangementMode::Triangle_Strip:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-		case GMArrangementMode::Triangles:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-		case GMArrangementMode::Lines:
-			return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-		default:
-			GM_ASSERT(false);
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		}
-	}
-}
-
 GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* model)
 	: GMModelPainter(model)
 {
@@ -109,18 +88,9 @@ void GMDx11ModelPainter::transfer()
 void GMDx11ModelPainter::draw(const GMGameObject* parent)
 {
 	D(d);
-	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	context->IASetInputLayout(d->engine->getInputLayout());
-	GMuint strides[(size_t)GMVertexDataType::EndOfVertexDataType] = { 3 * sizeof(GMfloat) };
-	GMuint offsets[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
-	// context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
-	context->IASetVertexBuffers(0, 1, &d->buffers[0], strides, offsets);
-	context->IASetPrimitiveTopology(getMode(getModel()->getMesh()));
-
-	// TODO 仿照GL那样，每种renderer创建一个自己的shader，然后按照Object类型选择自己的Shader
-	context->VSSetShader(d->engine->getVertexShader(), NULL, 0);
-	context->PSSetShader(d->engine->getPixelShader(), NULL, 0);
-	GM.getCamera().getFrustum().setDxModelMatrix(parent->getTransform());
+	GMModel* model = getModel();
+	IRenderer* renderer = d->engine->getRenderer(model->getType());
+	renderer->beginModel(model, parent);
 
 	GMMesh* mesh = getModel()->getMesh();
 	for (auto component : mesh->getComponents())
@@ -129,8 +99,9 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 		if (shader.getNodraw())
 			continue;
 
-		draw(component, mesh);
+		draw(renderer, component, mesh);
 	}
+	renderer->endModel();
 }
 
 void GMDx11ModelPainter::dispose(GMMeshData* md)
@@ -153,8 +124,16 @@ void* GMDx11ModelPainter::getBuffer()
 	throw std::logic_error("The method or operation is not implemented.");
 }
 
-void GMDx11ModelPainter::draw(GMComponent* component, GMMesh* mesh)
+void GMDx11ModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh)
 {
 	D(d);
+	// TODO 是否在这里设置？应该全部给render来做
+	GMuint strides[(size_t)GMVertexDataType::EndOfVertexDataType] = { 3 * sizeof(GMfloat) };
+	GMuint offsets[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
+	// context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
+	d->engine->getDeviceContext()->IASetVertexBuffers(0, 1, &d->buffers[0], strides, offsets);
+
+	renderer->beginComponent(component);
 	d->engine->getDeviceContext()->Draw(3, 0);
+	renderer->endComponent();
 }
