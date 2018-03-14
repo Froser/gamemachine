@@ -23,6 +23,11 @@ extern "C"
 		if (!buf.size)
 			return E_FAIL;
 
+		UINT flag = D3D10_SHADER_ENABLE_STRICTNESS;
+#if _DEBUG
+		flag |= D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
+#endif
+
 		buf.convertToStringBuffer();
 		hr = D3DX11CompileFromMemory(
 			(char*)buf.buffer,
@@ -32,7 +37,7 @@ extern "C"
 			NULL,
 			entryPoint.toStdString().c_str(),
 			profile.toStdString().c_str(),
-			D3D10_SHADER_ENABLE_STRICTNESS,
+			flag,
 			0,
 			NULL,
 			&shaderBuffer,

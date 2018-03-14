@@ -87,9 +87,9 @@ void GMDx11ModelPainter::transfer()
 			DirectX::XMFLOAT3 pos;
 		} vertices[] =
 		{
-			DirectX::XMFLOAT3(-1, .5f, 1),
-			DirectX::XMFLOAT3(1, .5f, 1),
-			DirectX::XMFLOAT3(-1, -.5f, 1),
+			DirectX::XMFLOAT3(-.5f, .5f, 1.1f),
+			DirectX::XMFLOAT3(1, .5f, 1.1f),
+			DirectX::XMFLOAT3(-1, -.5f, 1.1f),
 		};
 		D3D11_SUBRESOURCE_DATA bufData;
 		bufData.pSysMem = vertices;

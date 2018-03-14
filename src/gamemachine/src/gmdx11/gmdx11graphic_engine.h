@@ -105,6 +105,12 @@ public:
 		return d->pixelShader;
 	}
 
+	GMComPtr<ID3D11RasterizerState> getRasterState()
+	{
+		D(d);
+		return d->rasterState;
+	}
+
 public:
 	void updateModelMatrix();
 
