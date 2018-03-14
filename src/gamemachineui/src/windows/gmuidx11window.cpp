@@ -77,7 +77,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	D3D11_VIEWPORT vp = { 0 };
 	DXGI_ADAPTER_DESC adapterDesc = { 0 };
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = { 0 };
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	HRESULT hr;
 	gm::GameMachineMessage msg;
 
@@ -131,14 +130,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 
 	// 2.创建交换链、设备和上下文
 
-	// UINT msaaQuality = 0;
-	// hr = d->device->CheckMultisampleQualityLevels(
-	// 	g_bufferFormat,
-	// 	wndAttrs.samples,
-	// 	&msaaQuality
-	// 	);
-	// CHECK_HR(hr);
-
 	sc.BufferDesc.Width = renderWidth;
 	sc.BufferDesc.Height = renderHeight;
 	sc.BufferDesc.Format = g_bufferFormat;
@@ -161,42 +152,54 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 		sc.BufferDesc.RefreshRate.Denominator = 1;
 	}
 
-	//if (wndAttrs.samples == 0)
-	if (true)
+	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+	hr = D3D11CreateDevice(
+		NULL,
+		D3D_DRIVER_TYPE_HARDWARE,
+		NULL,
+		0, &featureLevel,
+		1,
+		D3D11_SDK_VERSION,
+		&d->device,
+		NULL,
+		&d->deviceContext);
+	CHECK_HR(hr);
+
+	UINT msaaQuality = 0;
+	hr = d->device->CheckMultisampleQualityLevels(
+		g_bufferFormat,
+		wndAttrs.samples,
+		&msaaQuality
+		);
+	CHECK_HR(hr);
+
+	if (wndAttrs.samples == 0)
 	{
 		// 禁用多重采样
 		gameMachineRunningState.sampleCount = sc.SampleDesc.Count = 1;
 		gameMachineRunningState.sampleQuality = sc.SampleDesc.Quality = 0;
 	}
-	//else
-	//{
-	//	if (!msaaQuality)
-	//	{
-	//		// 不支持指定MSAA质量
-	//		sc.SampleDesc.Count = 4;
-	//		sc.SampleDesc.Quality = msaaQuality - 1;
-	//	}
-	//	else
-	//	{
-	//		sc.SampleDesc.Count = wndAttrs.samples;
-	//		sc.SampleDesc.Quality = msaaQuality - 1;
-	//	}
-	//}
+	else
+	{
+		if (!msaaQuality)
+		{
+			// 不支持指定MSAA质量
+			gameMachineRunningState.sampleCount = sc.SampleDesc.Count = 4;
+			gameMachineRunningState.sampleQuality = sc.SampleDesc.Quality = msaaQuality - 1;
+		}
+		else
+		{
+			gameMachineRunningState.sampleCount = sc.SampleDesc.Count = wndAttrs.samples;
+			gameMachineRunningState.sampleQuality = sc.SampleDesc.Quality = msaaQuality - 1;
+		}
+	}
 
-	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
-	hr = D3D11CreateDeviceAndSwapChain(
-		NULL,
-		D3D_DRIVER_TYPE_HARDWARE,
-		NULL,
-		0,
-		&featureLevel,
-		1,
-		D3D11_SDK_VERSION,
+
+	hr = dxgiFactory->CreateSwapChain(
+		d->device,
 		&sc,
-		&d->swapChain,
-		&d->device,
-		NULL,
-		&d->deviceContext);
+		&d->swapChain
+	);
 	CHECK_HR(hr);
 
 	// 3.创建目标视图
@@ -248,11 +251,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	CHECK_HR(hr);
 	d->deviceContext->OMSetDepthStencilState(depthStencilState, 1);
 
-	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
-	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-	depthStencilViewDesc.Texture2D.MipSlice = 0;
-	hr = d->device->CreateDepthStencilView(depthStencilBuffer, &depthStencilViewDesc, &d->depthStencilView);
+	hr = d->device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView);
 	CHECK_HR(hr);
 
 	// 6.绑定渲染目标

@@ -72,7 +72,7 @@ struct GMGameMachineRunningStates
 	GMString workingAdapterDesc; //!< 适配器信息。
 	GMint sampleCount; //!< 多重采样数量。
 	GMint sampleQuality; //!< 多重采样质量。
-	bool vsyncEnabled;
+	bool vsyncEnabled = false; //!< 是否垂直同步。
 
 	// 以下为常量
 	// 永远不要更改以下2个值，它采用DirectX标准透视矩阵

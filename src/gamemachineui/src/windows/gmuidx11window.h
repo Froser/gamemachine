@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GMUIDx11Window)
 	gm::GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	D3D_FEATURE_LEVEL d3dFeatureLevel;
 
-	bool vsync = true;
+	bool vsync = true; //默认开启垂直同步
 	DXGI_MODE_DESC* modes = nullptr;
 };
 

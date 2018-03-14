@@ -79,8 +79,8 @@ namespace
 			desc.DepthBiasClamp = 0.0f;
 			desc.DepthClipEnable = TRUE;
 			desc.ScissorEnable = FALSE;
-			desc.MultisampleEnable = FALSE; //TODO
-			desc.AntialiasedLineEnable = FALSE; //TODO
+			desc.MultisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
+			desc.AntialiasedLineEnable = desc.MultisampleEnable;
 			return desc;
 		}
 
