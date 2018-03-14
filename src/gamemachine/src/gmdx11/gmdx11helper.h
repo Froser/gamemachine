@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 
 struct ID3D10Blob;
+struct D3D11_RASTERIZER_DESC;
 
 BEGIN_NS
 extern "C"
@@ -21,6 +22,18 @@ extern "C"
 		const gm::GMString& entryPoint,
 		const gm::GMString& profile,
 		GMShaderType type
+	);
+
+	//! 返回一个默认的光栅描述结构体。
+	/*!
+	  GameMachine将使用此结构来初始化默认的DirectX光珊。
+	  \param multisampleEnable 是否开启多重采样。
+	  \param antialiasedLineEnable 是否开启抗锯齿。
+	  \return 默认的光栅描述结构体。
+	*/
+	const D3D11_RASTERIZER_DESC& GMGetDefaultRasterizerDesc(
+		bool multisampleEnable,
+		bool antialiasedLineEnable
 	);
 }
 

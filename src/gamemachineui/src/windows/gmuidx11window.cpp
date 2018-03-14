@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmuidx11window.h"
+#include <gmdx11helper.h>
 
 #define EXIT __exit
 #define CHECK_HR(hr) if(FAILED(hr)) { GM_ASSERT(false); goto EXIT; }
@@ -89,6 +90,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	gm::GMComPtr<ID3D11Texture2D> backBuffer;
 	gm::GMComPtr<ID3D11Texture2D> depthStencilBuffer;
 	gm::GMComPtr<ID3D11DepthStencilState> depthStencilState;
+	gm::GMComPtr<ID3D11RasterizerState> rasterizerState;
 
 	UINT renderWidth = wndAttrs.rc.right - wndAttrs.rc.left;
 	UINT renderHeight = wndAttrs.rc.bottom - wndAttrs.rc.top;
@@ -253,6 +255,12 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 
 	hr = d->device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView);
 	CHECK_HR(hr);
+
+	// 5.创建光栅状态
+	bool multisampleEnable = gameMachineRunningState.sampleCount > 1;
+	hr = d->device->CreateRasterizerState(&gm::GMGetDefaultRasterizerDesc(multisampleEnable, multisampleEnable), &rasterizerState);
+	CHECK_HR(hr);
+	d->deviceContext->RSSetState(rasterizerState);
 
 	// 6.绑定渲染目标
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);

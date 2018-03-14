@@ -3,6 +3,7 @@
 #include "gmdata/gmmodel.h"
 #include <gmgameobject.h>
 #include "shader_constants.h"
+#include <gmdx11helper.h>
 
 namespace
 {
@@ -55,9 +56,10 @@ namespace
 	public:
 		void applyRasterStates(GMS_Cull cullMode, GMS_FrontFace frontFace)
 		{
+			bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
 			if (!states[(GMuint)cullMode][(GMuint)frontFace])
 			{
-				D3D11_RASTERIZER_DESC desc = getDefaultDesc();
+				D3D11_RASTERIZER_DESC desc = GMGetDefaultRasterizerDesc(multisampleEnable, multisampleEnable);
 				desc.CullMode = cullMode == GMS_Cull::CULL ? D3D11_CULL_BACK : D3D11_CULL_NONE;
 				desc.FrontCounterClockwise = frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE;
 				createRasterizerState(desc, &states[(GMuint)cullMode][(GMuint)frontFace]);
@@ -68,22 +70,6 @@ namespace
 		}
 
 	private:
-		D3D11_RASTERIZER_DESC getDefaultDesc()
-		{
-			D3D11_RASTERIZER_DESC desc;
-			desc.FillMode = D3D11_FILL_SOLID;
-			desc.CullMode = D3D11_CULL_BACK;
-			desc.FrontCounterClockwise = FALSE;
-			desc.DepthBias = 0;
-			desc.SlopeScaledDepthBias = 0.0f;
-			desc.DepthBiasClamp = 0.0f;
-			desc.DepthClipEnable = TRUE;
-			desc.ScissorEnable = FALSE;
-			desc.MultisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
-			desc.AntialiasedLineEnable = desc.MultisampleEnable;
-			return desc;
-		}
-
 		bool createRasterizerState(const D3D11_RASTERIZER_DESC& desc, ID3D11RasterizerState** out)
 		{
 			HRESULT hr = engine->getDevice()->CreateRasterizerState(&desc, out);
