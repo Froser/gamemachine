@@ -17,13 +17,15 @@ extern "C"
 
 	namespace
 	{
-		void GL_MessageCallback(GLenum source,
+		void GLAPIENTRY GL_MessageCallback(
+			GLenum source,
 			GLenum type,
 			GLuint id,
 			GLenum severity,
 			GLsizei length,
 			const GLchar* message,
-			const void* userParam)
+			const void* userParam
+			)
 		{
 			gm_error("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
 				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
