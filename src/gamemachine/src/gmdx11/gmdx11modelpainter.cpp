@@ -61,17 +61,8 @@ void GMDx11ModelPainter::transfer()
 		bufDesc.MiscFlags = 0;
 		bufDesc.StructureByteStride = 0;
 
-		struct
-		{
-			DirectX::XMFLOAT3 pos;
-		} vertices[] =
-		{
-			DirectX::XMFLOAT3(-.5f, .5f, 1.1f),
-			DirectX::XMFLOAT3(1, .5f, 1.1f),
-			DirectX::XMFLOAT3(-1, -.5f, 1.1f),
-		};
 		D3D11_SUBRESOURCE_DATA bufData;
-		bufData.pSysMem = vertices;
+		bufData.pSysMem = d->vertexData[(size_t)type]->data();
 		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
 		GMComPtr<ID3D11Device> device = d->engine->getDevice();
@@ -133,7 +124,5 @@ void GMDx11ModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMes
 	// context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
 	d->engine->getDeviceContext()->IASetVertexBuffers(0, 1, &d->buffers[0], strides, offsets);
 
-	renderer->beginComponent(component);
-	d->engine->getDeviceContext()->Draw(3, 0);
-	renderer->endComponent();
+	renderer->draw(component, mesh);
 }

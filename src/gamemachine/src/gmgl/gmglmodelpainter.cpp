@@ -7,27 +7,6 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
-namespace
-{
-	GLenum getMode(GMMesh* obj)
-	{
-		switch (obj->getArrangementMode())
-		{
-		case GMArrangementMode::Triangle_Fan:
-			return GL_TRIANGLE_FAN;
-		case GMArrangementMode::Triangle_Strip:
-			return GL_TRIANGLE_STRIP;
-		case GMArrangementMode::Triangles:
-			return GL_TRIANGLES;
-		case GMArrangementMode::Lines:
-			return GL_LINE_LOOP;
-		default:
-			GM_ASSERT(false);
-			return GL_TRIANGLE_FAN;
-		}
-	}
-}
-
 GMGLModelPainter::GMGLModelPainter(IGraphicEngine* engine, GMModel* objs)
 	: GMModelPainter(objs)
 {
@@ -171,15 +150,5 @@ void GMGLModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMesh*
 {
 	D(d);
 	d->engine->checkDrawingState();
-
-	GM_BEGIN_CHECK_GL_ERROR
-	renderer->beginComponent(component);
-	GM_END_CHECK_GL_ERROR
-
-	GM_BEGIN_CHECK_GL_ERROR
-	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
-	GM_END_CHECK_GL_ERROR
-
-	renderer->endComponent();
+	renderer->draw(component, mesh);
 }

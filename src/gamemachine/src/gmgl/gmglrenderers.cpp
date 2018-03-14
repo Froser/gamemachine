@@ -56,6 +56,33 @@ namespace
 
 		glLineWidth(shader.getLineWidth());
 	}
+
+	inline GLenum getMode(GMMesh* obj)
+	{
+		switch (obj->getArrangementMode())
+		{
+		case GMArrangementMode::Triangle_Fan:
+			return GL_TRIANGLE_FAN;
+		case GMArrangementMode::Triangle_Strip:
+			return GL_TRIANGLE_STRIP;
+		case GMArrangementMode::Triangles:
+			return GL_TRIANGLES;
+		case GMArrangementMode::Lines:
+			return GL_LINE_LOOP;
+		default:
+			GM_ASSERT(false);
+			return GL_TRIANGLE_FAN;
+		}
+	}
+}
+
+
+void GMGLRenderer::draw(GMComponent* component, GMMesh* mesh)
+{
+	beforeDraw(component);
+	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
+	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+	afterDraw();
 }
 
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
@@ -84,7 +111,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 }
 
-void GMGLRenderer_3D::beginComponent(GMComponent* component)
+void GMGLRenderer_3D::beforeDraw(GMComponent* component)
 {
 	D(d);
 	d->shader = &component->getShader();
@@ -110,7 +137,7 @@ void GMGLRenderer_3D::beginComponent(GMComponent* component)
 	drawDebug();
 }
 
-void GMGLRenderer_3D::endComponent()
+void GMGLRenderer_3D::afterDraw()
 {
 	D(d);
 	if (d->shader->getBlend())
@@ -290,7 +317,7 @@ void GMGLRenderer_3D::getTextureID(GMTextureType type, GMint index, REF GLenum& 
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLRenderer_2D::beginComponent(GMComponent* component)
+void GMGLRenderer_2D::beforeDraw(GMComponent* component)
 {
 	D(d);
 	d->shader = &component->getShader();
@@ -333,7 +360,7 @@ void GMGLRenderer_CubeMap::endModel()
 	d->cubemap = nullptr;
 }
 
-void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
+void GMGLRenderer_CubeMap::beforeDraw(GMComponent* component)
 {
 	D(d);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -375,6 +402,6 @@ void GMGLRenderer_CubeMap::beginComponent(GMComponent* component)
 	}
 }
 
-void GMGLRenderer_CubeMap::endComponent()
+void GMGLRenderer_CubeMap::afterDraw()
 {
 }

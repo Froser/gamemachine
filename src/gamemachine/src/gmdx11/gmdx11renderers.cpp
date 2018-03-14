@@ -129,7 +129,7 @@ void GMDx11Renderer::endModel()
 {
 }
 
-void GMDx11Renderer::beginComponent(GMComponent* component)
+void GMDx11Renderer::draw(GMComponent* component, GMMesh* mesh)
 {
 	D(d);
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
@@ -140,9 +140,6 @@ void GMDx11Renderer::beginComponent(GMComponent* component)
 		d->shader->getCull(),
 		d->shader->getFrontFace()
 	);
-}
-
-void GMDx11Renderer::endComponent()
-{
+	getEngine()->getDeviceContext()->Draw(3, 0);
 	//TODO 是否要恢复RasterStates?
 }

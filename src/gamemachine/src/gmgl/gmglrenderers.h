@@ -14,7 +14,17 @@ GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
 
-class GMGLRenderer_3D : public GMObject, public IRenderer
+class GMGLRenderer : public GMObject, public IRenderer
+{
+public:
+	virtual void draw(GMComponent* component, GMMesh* mesh) override;
+
+protected:
+	virtual void beforeDraw(GMComponent* component) = 0;
+	virtual void afterDraw() = 0;
+};
+
+class GMGLRenderer_3D : public GMGLRenderer
 {
 	DECLARE_PRIVATE(GMGLRenderer_3D)
 
@@ -24,8 +34,8 @@ public:
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void beginComponent(GMComponent* component) override;
-	virtual void endComponent() override;
+	virtual void beforeDraw(GMComponent* component) override;
+	virtual void afterDraw() override;
 
 protected:
 	void activateMaterial(const GMShader& shader);
@@ -42,7 +52,7 @@ protected:
 class GMGLRenderer_2D : public GMGLRenderer_3D
 {
 public:
-	virtual void beginComponent(GMComponent* component) override;
+	virtual void beforeDraw(GMComponent* component) override;
 };
 
 GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
@@ -50,15 +60,15 @@ GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
 	const GMCubeMapGameObject* cubemap = nullptr;
 };
 
-class GMGLRenderer_CubeMap : public IRenderer
+class GMGLRenderer_CubeMap : public GMGLRenderer
 {
 	DECLARE_PRIVATE(GMGLRenderer_CubeMap)
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void beginComponent(GMComponent* component) override;
-	virtual void endComponent() override;
+	virtual void beforeDraw(GMComponent* component) override;
+	virtual void afterDraw() override;
 };
 
 END_NS

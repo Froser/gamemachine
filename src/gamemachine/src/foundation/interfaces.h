@@ -317,8 +317,7 @@ GM_INTERFACE(IRenderer)
 {
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;
-	virtual void beginComponent(GMComponent* component) = 0;
-	virtual void endComponent() = 0;
+	virtual void draw(GMComponent* component, GMMesh* mesh) = 0;
 };
 
 GM_INTERFACE(IFactory)
