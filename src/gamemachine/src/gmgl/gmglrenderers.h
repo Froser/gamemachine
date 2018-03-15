@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 class GMGLRenderer : public GMObject, public IRenderer
 {
 public:
-	virtual void draw(GMComponent* component, GMMesh* mesh) override;
+	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) override;
 
 protected:
 	virtual void beforeDraw(GMComponent* component) = 0;

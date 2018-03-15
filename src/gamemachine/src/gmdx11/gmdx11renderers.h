@@ -21,7 +21,7 @@ public:
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void draw(GMComponent* component, GMMesh* mesh) override;
+	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) override;
 
 private:
 	inline GMDx11GraphicEngine* getEngine()

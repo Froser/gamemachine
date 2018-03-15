@@ -35,7 +35,7 @@ GMModel::GMModel(GMModel& model)
 
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, positions);
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, normals);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, uvs);
+	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, texcoords);
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, tangents);
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, bitangents);
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, lightmaps);
@@ -132,9 +132,9 @@ void GMComponent::normal(GMfloat x, GMfloat y, GMfloat z)
 void GMComponent::uv(GMfloat u, GMfloat v)
 {
 	D(d);
-	auto& uvs = d->parentMesh->uvs();
-	uvs.push_back(u);
-	uvs.push_back(v);
+	auto& texcoords = d->parentMesh->texcoords();
+	texcoords.push_back(u);
+	texcoords.push_back(v);
 }
 
 void GMComponent::lightmap(GMfloat u, GMfloat v)
@@ -171,7 +171,7 @@ void GMComponent::expand(GMuint count)
 	D(d);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		d->parentMesh->normals().reserve(d->parentMesh->normals().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			d->parentMesh->uvs().reserve(d->parentMesh->uvs().size() * count);
+	IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			d->parentMesh->texcoords().reserve(d->parentMesh->texcoords().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Tangent)	d->parentMesh->tangents().reserve(d->parentMesh->tangents().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Bitangent)	d->parentMesh->bitangents().reserve(d->parentMesh->bitangents().size() * count);
 	IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	d->parentMesh->lightmaps().reserve(d->parentMesh->lightmaps().size() * count);
@@ -199,7 +199,7 @@ void GMComponent::expand(GMuint count)
 
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	vertex(d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 0], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 1], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 2]);
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		normal(d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 0], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 1], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 2]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			uv(d->parentMesh->uvs()[d->offset + i * GMModel::UVDimension + 0], d->parentMesh->uvs()[d->offset + i * GMModel::UVDimension + 1]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			uv(d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 0], d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 1]);
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	lightmap(d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 1]);
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		color(d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 1], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 2]);
 
@@ -235,7 +235,7 @@ void GMMesh::appendComponent(AUTORELEASE GMComponent* component)
 void GMMesh::calculateTangentSpace()
 {
 	D(d);
-	if (d->uvs.size() == 0)
+	if (d->texcoords.size() == 0)
 		return;
 
 	for (auto component : d->components)
@@ -249,9 +249,9 @@ void GMMesh::calculateTangentSpace()
 			GMVec3 e1(d->positions[VERTEX_OFFSET(o, 3)], d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)]);
 			GMVec3 e2(d->positions[VERTEX_OFFSET(o, 6)], d->positions[VERTEX_OFFSET(o, 7)], d->positions[VERTEX_OFFSET(o, 8)]);
 
-			GMVec2 uv0(d->uvs[UV_OFFSET(o, 0)], d->uvs[UV_OFFSET(o, 1)]);
-			GMVec2 uv1(d->uvs[UV_OFFSET(o, 2)], d->uvs[UV_OFFSET(o, 3)]);
-			GMVec2 uv2(d->uvs[UV_OFFSET(o, 4)], d->uvs[UV_OFFSET(o, 5)]);
+			GMVec2 uv0(d->texcoords[UV_OFFSET(o, 0)], d->texcoords[UV_OFFSET(o, 1)]);
+			GMVec2 uv1(d->texcoords[UV_OFFSET(o, 2)], d->texcoords[UV_OFFSET(o, 3)]);
+			GMVec2 uv2(d->texcoords[UV_OFFSET(o, 4)], d->texcoords[UV_OFFSET(o, 5)]);
 
 			GMVec3 E1 = e1 - e0;
 			GMVec3 E2 = e2 - e0;

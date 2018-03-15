@@ -82,6 +82,7 @@ macro(gm_init_solution)
 				d3d11.lib
 				d3dx10.lib
 				d3dx11.lib
+				dxerr.lib
 			)
 	endif(GM_USE_DX11)
 endmacro(gm_init_solution)

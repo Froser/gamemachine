@@ -179,7 +179,6 @@ set(WIN32_SOURCES
 
 set(WIN32_DX11_SOURCES
 		foundation/utilities/gmcom.h
-		gmdx11/shader_constants.h
 		gmdx11/gmdx11factory.h
 		gmdx11/gmdx11factory.cpp
 		gmdx11/gmdx11graphic_engine.h

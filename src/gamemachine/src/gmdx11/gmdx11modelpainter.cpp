@@ -8,19 +8,51 @@ GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* mod
 {
 	D(d);
 	d->engine = engine;
+}
 
-	// 初始化一个数组，用于遍历顶点数据
-	if (model)
+bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
+{
+	D(d);
+	if (id == GameMachineInterfaceID::D3D11Buffer)
 	{
-		GMMesh* mesh = model->getMesh();
-		d->vertexData[(size_t)GMVertexDataType::EndOfVertexDataType];
-		d->vertexData[(size_t)GMVertexDataType::Position] = &mesh->positions();
-		d->vertexData[(size_t)GMVertexDataType::Normal] = &mesh->normals();
-		d->vertexData[(size_t)GMVertexDataType::UV] = &mesh->uvs();
-		d->vertexData[(size_t)GMVertexDataType::Tangent] = &mesh->tangents();
-		d->vertexData[(size_t)GMVertexDataType::Bitangent] = &mesh->bitangents();
-		d->vertexData[(size_t)GMVertexDataType::Lightmap] = &mesh->lightmaps();
-		d->vertexData[(size_t)GMVertexDataType::Color] = &mesh->colors();
+		d->buffer->AddRef();
+		(*out) = d->buffer;
+		return true;
+	}
+	return false;
+}
+
+void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
+{
+	D(d);
+	GMDx11VertexData vd = { 0 };
+	GMModel* model = getModel();
+	// 按照position的size()/3来分配顶点
+	// 先不考虑崩溃什么的情况
+	GM_ASSERT(model->getMesh()->positions().size() % 3 == 0);
+	for (GMuint i = 0; i < model->getMesh()->positions().size() / 3; ++i)
+	{
+		{
+			auto& data_ref = model->getMesh()->positions();
+			vd.vertices[0] = data_ref[i * 3];
+			vd.vertices[1] = data_ref[i * 3 + 1];
+			vd.vertices[2] = data_ref[i * 3 + 2];
+		}
+
+		{
+			auto& data_ref = model->getMesh()->normals();
+			vd.normal[0] = data_ref[i * 3];
+			vd.normal[1] = data_ref[i * 3 + 1];
+			vd.normal[2] = data_ref[i * 3 + 2];
+		}
+
+		{
+			auto& data_ref = model->getMesh()->texcoords();
+			vd.texcoord[0] = data_ref[i * 2];
+			vd.texcoord[1] = data_ref[i * 2 + 1];
+		}
+
+		packedData.push_back(vd);
 	}
 }
 
@@ -36,41 +68,26 @@ void GMDx11ModelPainter::transfer()
 
 	GMMesh* mesh = model->getMesh();
 	mesh->calculateTangentSpace();
-	
+
+	Vector<GMDx11VertexData> packedData;
+	// 把数据打入顶点数组
+	packData(packedData);
+
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
+	D3D11_BUFFER_DESC bufDesc;
+ 	bufDesc.Usage = usage;
+	bufDesc.ByteWidth = packedData.size() * sizeof(decltype(packedData)::value_type);
+	bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	bufDesc.CPUAccessFlags = 0;
+	bufDesc.MiscFlags = 0;
+	bufDesc.StructureByteStride = 0;
 
-	HRESULT hr;
-	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
-	{
-		size_t byteWidth = mesh->isDataDisabled(type) ? 0 : sizeof(GMModel::DataType) * d->vertexData[(size_t)type]->size();
+	D3D11_SUBRESOURCE_DATA bufData;
+	bufData.pSysMem = packedData.data();
+	bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
-		if (byteWidth == 0)
-		{
-			// 用0填充不存在的数据段 TODO 是否有更好顶点结构？
-			GM_ASSERT(mesh->positions().size() > 0);
-			d->vertexData[(size_t)type]->resize(mesh->positions().size());
-			byteWidth = d->vertexData[(size_t)type]->size();
-		}
-
-		const int& idx = (size_t)type;
-		D3D11_BUFFER_DESC bufDesc;
- 		bufDesc.Usage = usage;
-		bufDesc.ByteWidth = byteWidth;
-		bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bufDesc.CPUAccessFlags = 0;
-		bufDesc.MiscFlags = 0;
-		bufDesc.StructureByteStride = 0;
-
-		D3D11_SUBRESOURCE_DATA bufData;
-		bufData.pSysMem = d->vertexData[(size_t)type]->data();
-		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
-
-		GMComPtr<ID3D11Device> device = d->engine->getDevice();
-		hr = device->CreateBuffer(&bufDesc, &bufData, &d->buffers[idx]);
-		GM_COM_CHECK(hr);
-
-		break; //TODO TEST
-	}
+	GMComPtr<ID3D11Device> device = d->engine->getDevice();
+	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->buffer));
 
 	d->inited = true;
 	model->needNotTransferAnymore();
@@ -117,12 +134,5 @@ void* GMDx11ModelPainter::getBuffer()
 
 void GMDx11ModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh)
 {
-	D(d);
-	// TODO 是否在这里设置？应该全部给render来做
-	GMuint strides[(size_t)GMVertexDataType::EndOfVertexDataType] = { 3 * sizeof(GMfloat) };
-	GMuint offsets[(size_t)GMVertexDataType::EndOfVertexDataType] = { 0 };
-	// context->IASetVertexBuffers(0, (size_t)GMVertexDataType::EndOfVertexDataType, &d->buffers[0], strides, offsets);
-	d->engine->getDeviceContext()->IASetVertexBuffers(0, 1, &d->buffers[0], strides, offsets);
-
-	renderer->draw(component, mesh);
+	renderer->draw(this, component, mesh);
 }

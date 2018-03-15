@@ -24,14 +24,14 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 	GMint particleCount = d->parentParticles->getParticleCount(prototype);
 
 	GMint offset_position = mesh->get_transferred_positions_byte_size() / particleCount * index;
-	GMint color_offset = (mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size())
+	GMint color_offset = (mesh->get_transferred_positions_byte_size() + mesh->get_transferred_texcoords_byte_size())
 		+ mesh->get_transferred_colors_byte_size() / particleCount * index;
 	GMfloat* basePositions = d->parentParticles->getPositionArray(prototype)
 		+ offset_position / sizeof(decltype(basePositions[0] + 0));
 
 #if _DEBUG
 	GMint totalSize = mesh->get_transferred_positions_byte_size()
-		+ mesh->get_transferred_uvs_byte_size()
+		+ mesh->get_transferred_texcoords_byte_size()
 		+ mesh->get_transferred_colors_byte_size();
 #endif
 
@@ -46,7 +46,7 @@ void GMParticleGameObject::updatePrototype(void* buffer)
 			1.f
 		);
 		GMVec4 transformedPosition = basePositionVector * d->transform;
-		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * GMModel::PositionDimension + 2) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_uvs_byte_size()));
+		GM_ASSERT((GMLargeInteger)(vertexData + offset_position + offset * GMModel::PositionDimension + 2) <= (GMLargeInteger)(vertexData + mesh->get_transferred_positions_byte_size() + mesh->get_transferred_texcoords_byte_size()));
 		CopyToArray(GMVec3(transformedPosition), (GMfloat*)(vertexData + offset_position) + offset * GMModel::PositionDimension);
 
 		//更新颜色

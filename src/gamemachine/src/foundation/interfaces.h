@@ -71,6 +71,7 @@ enum class GameMachineInterfaceID
 	D3D11VertexShaderBuffer,
 	D3D11PixelShader,
 	D3D11PixelShaderBuffer,
+	D3D11Buffer,
 
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
@@ -317,7 +318,7 @@ GM_INTERFACE(IRenderer)
 {
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;
-	virtual void draw(GMComponent* component, GMMesh* mesh) = 0;
+	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) = 0;
 };
 
 GM_INTERFACE(IFactory)

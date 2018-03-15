@@ -7,12 +7,19 @@
 
 BEGIN_NS
 
+// Dx11 顶点数据
+struct GMDx11VertexData
+{
+	Array<GMfloat, 3> vertices;
+	Array<GMfloat, 3> normal;
+	Array<GMfloat, 2> texcoord;
+};
+
 class GMDx11GraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11ModelPainter)
 {
 	GMDx11GraphicEngine* engine = nullptr;
-	Vector<GMModel::DataType>* vertexData[(size_t)GMVertexDataType::EndOfVertexDataType];
-	GMComPtr<ID3D11Buffer> buffers[(size_t)GMVertexDataType::EndOfVertexDataType];
+	GMComPtr<ID3D11Buffer> buffer;
 	bool inited = false;
 };
 
@@ -31,7 +38,11 @@ public:
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
 
+// IQueriable
+	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
+
 private:
+	void packData(Vector<GMDx11VertexData>& packedData);
 	void draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh);
 };
 

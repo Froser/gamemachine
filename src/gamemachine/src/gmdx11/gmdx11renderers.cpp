@@ -2,11 +2,31 @@
 #include "gmdx11renderers.h"
 #include "gmdata/gmmodel.h"
 #include <gmgameobject.h>
-#include "shader_constants.h"
 #include <gmdx11helper.h>
+#include "gmdx11modelpainter.h"
+
+#define GMSHADER_LAYOUT_NAME_POSITION "POSITION"
+#define GMSHADER_LAYOUT_NAME_NORMAL "NORMAL"
+#define GMSHADER_LAYOUT_NAME_TEXCOORD "TEXCOORD"
+#define GMSHADER_LAYOUT_NAME_TANGENT "TEXCOORD"
+#define GMSHADER_LAYOUT_NAME_BITANGENT "TEXCOORD"
+#define GMSHADER_LAYOUT_NAME_LIGHTMAP "TEXCOORD"
+#define FLOAT_OFFSET(i) (sizeof(gm::GMfloat) * i)
 
 namespace
 {
+	D3D11_INPUT_ELEMENT_DESC GMSHADER_ElementDescriptions[] =
+	{
+		{ GMSHADER_LAYOUT_NAME_POSITION, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, FLOAT_OFFSET(0), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 3
+
+		{ GMSHADER_LAYOUT_NAME_NORMAL, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, FLOAT_OFFSET(3), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 3
+
+		{ GMSHADER_LAYOUT_NAME_TEXCOORD, 0, DXGI_FORMAT_R32G32_FLOAT, 0, FLOAT_OFFSET(6), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 2
+	};
+
 	D3D_PRIMITIVE_TOPOLOGY getMode(GMMesh* obj)
 	{
 		switch (obj->getArrangementMode())
@@ -72,9 +92,8 @@ namespace
 	private:
 		bool createRasterizerState(const D3D11_RASTERIZER_DESC& desc, ID3D11RasterizerState** out)
 		{
-			HRESULT hr = engine->getDevice()->CreateRasterizerState(&desc, out);
-			GM_COM_CHECK_RETURN(hr, false);
-			return SUCCEEDED(hr);
+			GM_DX_HR(engine->getDevice()->CreateRasterizerState(&desc, out));
+			return !!(*out);
 		}
 
 	private:
@@ -88,15 +107,13 @@ GMDx11Renderer::GMDx11Renderer()
 	D(d);
 	// 定义顶点布局
 	GM_ASSERT(!d->inputLayout);
-	HRESULT hr;
-	hr = getEngine()->getDevice()->CreateInputLayout(
+	GM_DX_HR(getEngine()->getDevice()->CreateInputLayout(
 		GMSHADER_ElementDescriptions,
 		GM_array_size(GMSHADER_ElementDescriptions),
 		getEngine()->getVertexShaderBuffer()->GetBufferPointer(),
 		getEngine()->getVertexShaderBuffer()->GetBufferSize(),
 		&d->inputLayout
-	);
-	GM_COM_CHECK(hr);
+	));
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -115,9 +132,17 @@ void GMDx11Renderer::endModel()
 {
 }
 
-void GMDx11Renderer::draw(GMComponent* component, GMMesh* mesh)
+void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
 {
 	D(d);
+	GMuint stride = sizeof(GMDx11VertexData);
+	GMuint offset = 0;
+	GMComPtr<ID3D11Buffer> buffer;
+	painter->getInterface(GameMachineInterfaceID::D3D11Buffer, (void**)&buffer);
+	GM_ASSERT(buffer);
+
+	getEngine()->getDeviceContext()->IASetVertexBuffers(0, 1, &buffer, &stride, &offset);
+
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
 	GMDx11RasterStates& rasterStates = GMDx11RasterStates::instance();
 

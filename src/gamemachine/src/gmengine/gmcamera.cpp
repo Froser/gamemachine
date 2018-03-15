@@ -151,9 +151,8 @@ bool GMFrustum::createDxMatrixBuffer()
 	GMComPtr<ID3D11Device> device;
 	bool suc = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 	GM_ASSERT(suc);
-	HRESULT hr = device->CreateBuffer(&vpBufferDesc, NULL, &d->dxMatrixBuffer);
-	GM_COM_CHECK_RETURN(hr, false);
-	return S_OK == hr;
+	GM_DX_HR(device->CreateBuffer(&vpBufferDesc, NULL, &d->dxMatrixBuffer));
+	return !!d->dxMatrixBuffer;
 }
 
 void GMFrustum::setDxModelMatrix(const GMMat4& matrix)

@@ -77,7 +77,7 @@ namespace
 }
 
 
-void GMGLRenderer::draw(GMComponent* component, GMMesh* mesh)
+void GMGLRenderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
 {
 	beforeDraw(component);
 	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);

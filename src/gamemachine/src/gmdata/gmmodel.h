@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMModelPainter)
 
 class GMMesh;
 class GMMeshData;
-class GMModelPainter : public GMObject
+class GMModelPainter : public GMObject, public IQueriable
 {
 	DECLARE_PRIVATE(GMModelPainter)
 
@@ -39,6 +39,10 @@ public:
 	virtual void beginUpdateBuffer(GMMesh* mesh) = 0;
 	virtual void endUpdateBuffer() = 0;
 	virtual void* getBuffer() = 0;
+
+// IQueriable
+	virtual bool getInterface(GameMachineInterfaceID id, void** out) { return false; }
+	virtual bool setInterface(GameMachineInterfaceID id, void* in) { return false; }
 
 protected:
 	inline GMModel* getModel() { D(d); return d->model; }
@@ -284,7 +288,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 {
 	GM_DEFINE_VERTEX_DATA(positions);
 	GM_DEFINE_VERTEX_DATA(normals);
-	GM_DEFINE_VERTEX_DATA(uvs);
+	GM_DEFINE_VERTEX_DATA(texcoords);
 	GM_DEFINE_VERTEX_DATA(tangents);
 	GM_DEFINE_VERTEX_DATA(bitangents);
 	GM_DEFINE_VERTEX_DATA(lightmaps);
@@ -320,7 +324,7 @@ private:
 public:
 	GM_DEFINE_VERTEX_PROPERTY(positions);
 	GM_DEFINE_VERTEX_PROPERTY(normals);
-	GM_DEFINE_VERTEX_PROPERTY(uvs);
+	GM_DEFINE_VERTEX_PROPERTY(texcoords);
 	GM_DEFINE_VERTEX_PROPERTY(tangents);
 	GM_DEFINE_VERTEX_PROPERTY(bitangents);
 	GM_DEFINE_VERTEX_PROPERTY(lightmaps);
