@@ -151,6 +151,12 @@ void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* m
 		d->shader->getCull(),
 		d->shader->getFrontFace()
 	);
-	getEngine()->getDeviceContext()->Draw(3, 0);
-	//TODO 是否要恢复RasterStates?
+
+	GMuint primitiveCount = component->getPrimitiveCount();
+	GMuint* offsetPtr = component->getOffsetPtr();
+	GMuint* vertexCountPtr = component->getPrimitiveVerticesCountPtr();
+	for (GMuint i = 0; i < primitiveCount; ++i)
+	{
+		getEngine()->getDeviceContext()->Draw(vertexCountPtr[i], offsetPtr[i]);
+	}
 }

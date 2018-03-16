@@ -81,7 +81,7 @@ void GMGLRenderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mes
 {
 	beforeDraw(component);
 	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-	glMultiDrawArrays(mode, component->getOffsetPtr(), component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+	glMultiDrawArrays(mode, (GLint*)component->getOffsetPtr(), (GLsizei*) component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 	afterDraw();
 }
 

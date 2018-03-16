@@ -5,10 +5,88 @@
 #include "gmdata/gmmodel.h"
 #include <GL/glew.h>
 
+namespace
+{
+	inline GLenum toGLTarget(GMTextureTarget target)
+	{
+		switch (target)
+		{
+		case GMTextureTarget::Texture1D:
+			return GL_TEXTURE_1D;
+		case GMTextureTarget::Texture1DArray:
+			return GL_TEXTURE_1D_ARRAY;
+		case GMTextureTarget::Texture2D:
+			return GL_TEXTURE_2D;
+		case GMTextureTarget::Texture2DArray:
+			return GL_TEXTURE_2D_ARRAY;
+		case GMTextureTarget::Texture3D:
+			return GL_TEXTURE_3D;
+		case GMTextureTarget::CubeMap:
+			return GL_TEXTURE_CUBE_MAP;
+		case GMTextureTarget::CubeMapArray:
+			return GL_TEXTURE_CUBE_MAP_ARRAY;
+		default:
+			GM_ASSERT(false);
+			return GL_NONE;
+		}
+	}
+
+	inline GLenum toGLFormat(GMImageFormat format)
+	{
+		switch (format)
+		{
+		case GMImageFormat::RGB:
+			return GL_RGB;
+		case GMImageFormat::RGB16:
+			return GL_RGB16;
+		case GMImageFormat::RGBA:
+			return GL_RGBA;
+		case GMImageFormat::BGR:
+			return GL_BGR;
+		case GMImageFormat::BGRA:
+			return GL_BGRA;
+		default:
+			GM_ASSERT(false);
+			return GL_NONE;
+		}
+	}
+
+	inline GLenum toGLInternalFormat(GMImageInternalFormat internalFormat)
+	{
+		switch (internalFormat)
+		{
+		case GMImageInternalFormat::RGB8:
+			return GL_RGB8;
+		case GMImageInternalFormat::RGBA8:
+			return GL_RGBA8;
+		default:
+			GM_ASSERT(false);
+			return GL_NONE;
+		}
+	}
+
+	inline GLenum toGLImageDataType(GMImageDataType type)
+	{
+		switch (type)
+		{
+		case GMImageDataType::UnsignedByte:
+			return GL_UNSIGNED_BYTE;
+		case GMImageDataType::Float:
+			return GL_FLOAT;
+		default:
+			GM_ASSERT(false);
+			return GL_NONE;
+		}
+	}
+}
+
 GMGLTexture::GMGLTexture(const GMImage* image)
 {
 	D(d);
-	d->target = image->getData().target;
+	d->target = toGLTarget(image->getData().target);
+	d->format = toGLFormat(image->getData().format);
+	d->dataType = toGLImageDataType(image->getData().type);
+	d->internalFormat = toGLInternalFormat(image->getData().internalFormat);
 	init(image);
 }
 
@@ -29,14 +107,14 @@ void GMGLTexture::init(const GMImage* image)
 	const GMImage::Data& imgData = image->getData();
 
 	glGenTextures(1, &d->id);
-	glBindTexture(imgData.target, d->id);
+	glBindTexture(d->target, d->id);
 
-	switch (imgData.target)
+	switch (d->target)
 	{
 	case GL_TEXTURE_1D:
-		glTexStorage1D(imgData.target,
+		glTexStorage1D(d->target,
 			imgData.mipLevels,
-			imgData.internalFormat,
+			d->internalFormat,
 			imgData.mip[0].width);
 		for (level = 0; level < imgData.mipLevels; ++level)
 		{
@@ -44,14 +122,14 @@ void GMGLTexture::init(const GMImage* image)
 				level,
 				0,
 				imgData.mip[level].width,
-				imgData.format, imgData.type,
+				d->format, d->dataType,
 				imgData.mip[level].data);
 		}
 		break;
 	case GL_TEXTURE_1D_ARRAY:
-		glTexStorage2D(imgData.target,
+		glTexStorage2D(d->target,
 			imgData.mipLevels,
-			imgData.internalFormat,
+			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.slices);
 		for (level = 0; level < imgData.mipLevels; ++level)
@@ -60,14 +138,14 @@ void GMGLTexture::init(const GMImage* image)
 				level,
 				0, 0,
 				imgData.mip[level].width, imgData.slices,
-				imgData.format, imgData.type,
+				d->format, d->dataType,
 				imgData.mip[level].data);
 		}
 		break;
 	case GL_TEXTURE_2D:
-		glTexStorage2D(imgData.target,
+		glTexStorage2D(d->target,
 			imgData.mipLevels,
-			imgData.internalFormat,
+			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.mip[0].height);
 		for (level = 0; level < imgData.mipLevels; ++level)
@@ -76,7 +154,7 @@ void GMGLTexture::init(const GMImage* image)
 				level,
 				0, 0,
 				imgData.mip[level].width, imgData.mip[level].height,
-				imgData.format, imgData.type,
+				d->format, d->dataType,
 				imgData.mip[level].data);
 		}
 		break;
@@ -88,18 +166,18 @@ void GMGLTexture::init(const GMImage* image)
 			{
 				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face,
 					level,
-					imgData.internalFormat,
+					d->internalFormat,
 					imgData.mip[level].width, imgData.mip[level].height,
 					0,
-					imgData.format, imgData.type,
+					d->format, d->dataType,
 					ptr + imgData.sliceStride * face);
 			}
 		}
 		break;
 	case GL_TEXTURE_2D_ARRAY:
-		glTexStorage3D(imgData.target,
+		glTexStorage3D(d->target,
 			imgData.mipLevels,
-			imgData.internalFormat,
+			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.mip[0].height,
 			imgData.slices);
@@ -109,22 +187,22 @@ void GMGLTexture::init(const GMImage* image)
 				level,
 				0, 0, 0,
 				imgData.mip[level].width, imgData.mip[level].height, imgData.slices,
-				imgData.format, imgData.type,
+				d->format, d->dataType,
 				imgData.mip[level].data);
 		}
 		break;
 	case GL_TEXTURE_CUBE_MAP_ARRAY:
-		glTexStorage3D(imgData.target,
+		glTexStorage3D(d->target,
 			imgData.mipLevels,
-			imgData.internalFormat,
+			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.mip[0].height,
 			imgData.slices);
 		break;
 	case GL_TEXTURE_3D:
-		glTexStorage3D(imgData.target,
+		glTexStorage3D(d->target,
 			imgData.mipLevels,
-			imgData.internalFormat,
+			d->internalFormat,
 			imgData.mip[0].width,
 			imgData.mip[0].height,
 			imgData.mip[0].depth);
@@ -134,7 +212,7 @@ void GMGLTexture::init(const GMImage* image)
 				level,
 				0, 0, 0,
 				imgData.mip[level].width, imgData.mip[level].height, imgData.mip[level].depth,
-				imgData.format, imgData.type,
+				d->format, d->dataType,
 				imgData.mip[level].data);
 		}
 		break;
@@ -142,8 +220,8 @@ void GMGLTexture::init(const GMImage* image)
 		break;
 	}
 
-	glTexParameteriv(imgData.target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(imgData.swizzle));
-	glBindTexture(imgData.target, 0);
+	glTexParameteriv(d->target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(imgData.swizzle));
+	glBindTexture(d->target, 0);
 	d->inited = true;
 }
 

@@ -6,12 +6,6 @@ GMImage::~GMImage()
 	dispose();
 }
 
-GMImage::Data& GMImage::getData()
-{
-	D(d);
-	return *d;
-}
-
 const GMImage::Data& GMImage::getData() const
 {
 	D(d);
@@ -44,6 +38,5 @@ void GMImage::flipVertically(GMuint mipId)
 		memcpy(&mip->data[(height - i - 1) * width * mip->depth / 8], tempRow, width * mip->depth / 8);
 	}
 
-	if (tempRow)
-		delete[] tempRow;
+	GM_delete_array(tempRow);
 }

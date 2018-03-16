@@ -34,7 +34,7 @@ int WINAPI WinMain(
 	{
 #if GM_USE_DX11
 		if (gm::GMQueryCapability(gm::GMCapability::SupportDirectX11))
-			factory = new gm::GMDX11Factory();
+			factory = new gm::GMDx11Factory();
 		else
 			factory = new gm::GMGLFactory();
 #else

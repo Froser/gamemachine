@@ -24,7 +24,6 @@ public:
 		ImageType_PNG,
 		ImageType_TGA,
 		ImageType_BMP,
-		ImageType_DDS,
 		ImageType_End,
 	};
 

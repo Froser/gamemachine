@@ -694,7 +694,7 @@ void GMBSPGameWorld::initLightmaps()
 	for (GMint i = 0; i < numLightmaps; i++)
 	{
 		GMbyte* lightmapBytes = bsp.lightBytes.data() + i * BSP_LIGHTMAP_SIZE;
-		GMImageBuffer* imgBuf = new GMImageBuffer(BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
+		GMImageBuffer* imgBuf = new GMImageBuffer(GMImageFormat::RGB, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
 		factory->createTexture(imgBuf, &texture);
 		delete imgBuf;
@@ -704,7 +704,7 @@ void GMBSPGameWorld::initLightmaps()
 	{
 		// Create a white lightmap id = -1
 		GMbyte white[3] = { 0xff, 0xff, 0xff };
-		GMImageBuffer* whiteBuf = new GMImageBuffer(1, 1, 3 * sizeof(GMbyte), white);
+		GMImageBuffer* whiteBuf = new GMImageBuffer(GMImageFormat::RGB, 1, 1, 3 * sizeof(GMbyte), white);
 		ITexture* texture = nullptr;
 		factory->createTexture(whiteBuf, &texture);
 		delete whiteBuf;

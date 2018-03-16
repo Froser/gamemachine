@@ -375,29 +375,30 @@ void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if GM_USE_OPENGL
-	data.target = GL_TEXTURE_2D;
+	data.target = GMTextureTarget::Texture2D;
 	data.mipLevels = 1;
 
 	if (tga.get_bytespp() == 3)
 	{
-		data.internalFormat = GL_RGB8;
-		data.format = GL_BGR;
+		data.internalFormat = GMImageInternalFormat::RGB8;
+		data.format = GMImageFormat::BGR;
 	}
 	else if (tga.get_bytespp() == 4)
 	{
-		data.internalFormat = GL_RGBA8;
-		data.format = GL_BGRA;
+		data.internalFormat = GMImageInternalFormat::RGBA8;
+		data.format = GMImageFormat::BGRA;
 	}
 	else
 	{
 		gm_error(L"不支持16位的tga");
+		GM_ASSERT(false);
 	}
 
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;
 	data.swizzle[2] = GL_BLUE;
 	data.swizzle[3] = GL_ALPHA;
-	data.type = GL_UNSIGNED_BYTE;
+	data.type = GMImageDataType::UnsignedByte;
 	data.size = tga.get_nbytes();
 	data.mip[0].height = tga.get_height();
 	data.mip[0].width = tga.get_width();

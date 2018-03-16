@@ -4,7 +4,7 @@
 
 BEGIN_NS
 
-class GMDX11Factory : public IFactory
+class GMDx11Factory : public IFactory
 {
 public:
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;

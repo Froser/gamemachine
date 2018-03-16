@@ -52,14 +52,14 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** imag
 	*image = img;
 	GMImage::Data& imgData = img->getData();
 	//init image data
-	imgData.target = GL_TEXTURE_2D;
+	imgData.target = GMTextureTarget::Texture2D;
 	imgData.mipLevels = 1;
-	imgData.format = GL_RGB16;
+	imgData.format = GMImageFormat::RGB16;
 	imgData.swizzle[0] = GL_RED;
 	imgData.swizzle[1] = GL_GREEN;
 	imgData.swizzle[2] = GL_BLUE;
 	imgData.swizzle[3] = GL_ALPHA;
-	imgData.type = GL_UNSIGNED_BYTE;
+	imgData.type = GMImageDataType::UnsignedByte;
 
 	//Create struct
 	struct jpeg_decompress_struct cinfo;
@@ -92,13 +92,13 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** imag
 
 	if (imgData.mip[0].depth == 32)
 	{
-		imgData.format = GL_RGBA;
-		imgData.internalFormat = GL_RGBA8;
+		imgData.format = GMImageFormat::RGBA;
+		imgData.internalFormat = GMImageInternalFormat::RGBA8;
 	}
 	else
 	{
-		imgData.format = GL_RGB;
-		imgData.internalFormat = GL_RGB8;
+		imgData.format = GMImageFormat::RGB;
+		imgData.internalFormat = GMImageInternalFormat::RGB8;
 	}
 
 	GMuint bufferSize = imgData.mip[0].width * imgData.mip[0].height * channels;

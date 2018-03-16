@@ -18,7 +18,7 @@ class GMImageBuffer : public GMImage
 	DECLARE_PRIVATE_AND_BASE(GMImageBuffer, GMImage)
 
 public:
-	GMImageBuffer(GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer);
+	GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer);
 
 private:
 	void generateData();
@@ -29,6 +29,7 @@ class GMCubeMapBuffer : public GMImage
 {
 public:
 	GMCubeMapBuffer(
+		GMImageFormat format,
 		const GMImage& posX,
 		const GMImage& negX,
 		const GMImage& posY,

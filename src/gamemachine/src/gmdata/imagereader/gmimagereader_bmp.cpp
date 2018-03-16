@@ -125,15 +125,15 @@ void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuin
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if GM_USE_OPENGL
-	data.target = GL_TEXTURE_2D;
+	data.target = GMTextureTarget::Texture2D;
 	data.mipLevels = 1;
-	data.internalFormat = GL_RGB8;
-	data.format = GL_BGR;
+	data.internalFormat = GMImageInternalFormat::RGB8;
+	data.format = GMImageFormat::BGR;
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;
 	data.swizzle[2] = GL_BLUE;
 	data.swizzle[3] = GL_ALPHA;
-	data.type = GL_UNSIGNED_BYTE;
+	data.type = GMImageDataType::UnsignedByte;
 	data.mip[0].height = bitmap.bitmapInfoHeader.biHeight;
 	data.mip[0].width = bitmap.bitmapInfoHeader.biWidth;
 	// Buffer 移交给 Image 管理

@@ -25,8 +25,6 @@ set(SOURCES
 		gmdata/imagereader/gmimagereader.cpp
 		gmdata/imagereader/gmimagereader_bmp.h
 		gmdata/imagereader/gmimagereader_bmp.cpp
-		gmdata/imagereader/gmimagereader_dds.h
-		gmdata/imagereader/gmimagereader_dds.cpp
 		gmdata/imagereader/gmimagereader_jpg.h
 		gmdata/imagereader/gmimagereader_jpg.cpp
 		gmdata/imagereader/gmimagereader_png.h
@@ -189,6 +187,8 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11helper.cpp
 		gmdx11/gmdx11renderers.h
 		gmdx11/gmdx11renderers.cpp
+		gmdx11/gmdx11texture.h
+		gmdx11/gmdx11texture.cpp
 	)
 
 if(WIN32)

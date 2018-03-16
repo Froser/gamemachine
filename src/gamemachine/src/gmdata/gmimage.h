@@ -5,6 +5,39 @@ BEGIN_NS
 
 #define MAX_MIP_CNT 14
 
+enum class GMTextureTarget
+{
+	Invalid,
+	Texture1D,
+	Texture1DArray,
+	Texture2D,
+	Texture2DArray,
+	Texture3D,
+	CubeMap,
+	CubeMapArray,
+};
+
+enum class GMImageFormat
+{
+	RGB,
+	RGB16,
+	RGBA,
+	BGR,
+	BGRA,
+};
+
+enum class GMImageInternalFormat
+{
+	RGB8,
+	RGBA8,
+};
+
+enum class GMImageDataType
+{
+	UnsignedByte,
+	Float,
+};
+
 struct ImageMipData
 {
 	GMint width;
@@ -14,14 +47,12 @@ struct ImageMipData
 	GMbyte* data = nullptr;
 };
 
-// This is the main image data structure. It contains all the parameters needed
-// to place texture data into a texture object using OpenGL.
 GM_PRIVATE_OBJECT(GMImage)
 {
-	GMuint target;
-	GMuint internalFormat;
-	GMuint format;
-	GMuint type;
+	GMTextureTarget target = GMTextureTarget::Invalid;
+	GMImageInternalFormat internalFormat;
+	GMImageFormat format;
+	GMImageDataType type;
 	GMuint swizzle[4];
 	GMsizei mipLevels;
 	GMsizei slices;
@@ -40,7 +71,7 @@ public:
 	virtual ~GMImage();
 
 public:
-	Data& getData();
+	inline Data& getData() { D(d); return *d; }
 	const Data& getData() const;
 	virtual void dispose();
 	void flipVertically(GMuint mipId);

@@ -55,9 +55,9 @@ GM_PRIVATE_OBJECT(GMComponent)
 	GMuint primitiveCount = 0;
 
 	// 图元顶点数量
-	AlignedVector<GMint> primitiveVertices;
+	AlignedVector<GMuint> primitiveVertices;
 	// 顶点在ChildObject的偏移
-	AlignedVector<GMint> vertexOffsets;
+	AlignedVector<GMuint> vertexOffsets;
 
 	GMMesh* parentMesh = nullptr;
 	GMuint currentFaceVerticesCount;
@@ -77,8 +77,8 @@ public:
 
 	inline GMShader& getShader() { D(d); return d->shader; }
 	inline void setShader(const GMShader& shader) { D(d); d->shader = shader; }
-	inline GMint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
-	inline GMint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
+	inline GMuint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
+	inline GMuint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
 	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }
 
 	void clear();

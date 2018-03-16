@@ -140,24 +140,24 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if GM_USE_OPENGL
-	data.target = GL_TEXTURE_2D;
+	data.target = GMTextureTarget::Texture2D;
 	data.mipLevels = 1;
 	if (png.hasAlpha)
 	{
-		data.internalFormat = GL_RGBA8;
-		data.format = GL_RGBA;
+		data.internalFormat = GMImageInternalFormat::RGBA8;
+		data.format = GMImageFormat::RGBA;
 	}
 	else
 	{
-		data.internalFormat = GL_RGB8;
-		data.format = GL_RGB;
+		data.internalFormat = GMImageInternalFormat::RGB8;
+		data.format = GMImageFormat::RGB;
 	}
 
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;
 	data.swizzle[2] = GL_BLUE;
 	data.swizzle[3] = GL_ALPHA;
-	data.type = GL_UNSIGNED_BYTE;
+	data.type = GMImageDataType::UnsignedByte;
 	data.mip[0].height = png.height;
 	data.mip[0].width = png.width;
 	// Buffer 移交给 Image 管理

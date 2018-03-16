@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmimagereader.h"
 #include "gmimagereader_bmp.h"
-#include "gmimagereader_dds.h"
 #include <map>
 #include "gmimagereader_png.h"
 #include "gmimagereader_tga.h"
@@ -14,7 +13,6 @@ public:
 	GMImageReaderContainer()
 	{
 		m_readers[GMImageReader::ImageType_BMP] = new GMImageReader_BMP();
-		m_readers[GMImageReader::ImageType_DDS] = new GMImageReader_DDS();
 		m_readers[GMImageReader::ImageType_PNG] = new GMImageReader_PNG();
 		m_readers[GMImageReader::ImageType_TGA] = new GMImageReader_TGA();
 		m_readers[GMImageReader::ImageType_JPG] = new GMImageReader_JPG();
