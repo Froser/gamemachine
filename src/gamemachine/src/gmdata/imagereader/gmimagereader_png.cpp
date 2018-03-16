@@ -27,7 +27,7 @@ namespace
 			png_error(png_ptr, "pngReaderCallback failed");
 	}
 
-	bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuint& bufferSize, bool flip = false)
+	bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuint& bufferSize)
 	{
 		png_structp png_ptr;
 		png_infop  info_ptr;
@@ -55,49 +55,39 @@ namespace
 		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
 		out->width = png_get_image_width(png_ptr, info_ptr);
 		out->height = png_get_image_height(png_ptr, info_ptr);
-		size = out->width * out->height;
+		size = out->width * out->height * 4 * sizeof(unsigned char);
 
-		// 根据flip来决定是否翻转Y轴
 		if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 		{
-			size *= (4 * sizeof(unsigned char));
 			out->hasAlpha = true;
 			out->rgba = new GMbyte[size];
 
 			temp = (4 * out->width);
 			for (i = 0; i < out->height; i++)
 			{
-				int _i = i;
-				if (flip)
-					_i = out->height - i - 1;
-
 				for (j = 0; j < temp; j += 4)
 				{
-					out->rgba[++pos] = row_pointers[_i][j]; // red
-					out->rgba[++pos] = row_pointers[_i][j + 1]; // green
-					out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
-					out->rgba[++pos] = row_pointers[_i][j + 3]; // alpha
+					out->rgba[++pos] = row_pointers[i][j]; // red
+					out->rgba[++pos] = row_pointers[i][j + 1]; // green
+					out->rgba[++pos] = row_pointers[i][j + 2];  // blue
+					out->rgba[++pos] = row_pointers[i][j + 3]; // alpha
 				}
 			}
 		}
 		else if (channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
 		{
-			size *= (3 * sizeof(GMbyte));
 			out->hasAlpha = false;
 			out->rgba = new GMbyte[size];
 
 			temp = (3 * out->width);
 			for (i = 0; i < out->height; i++)
 			{
-				int _i = i;
-				if (flip)
-					_i = out->height - i - 1;
-
 				for (j = 0; j < temp; j += 3)
 				{
-					out->rgba[++pos] = row_pointers[_i][j]; // red
-					out->rgba[++pos] = row_pointers[_i][j + 1]; // green
-					out->rgba[++pos] = row_pointers[_i][j + 2];  // blue
+					out->rgba[++pos] = row_pointers[i][j]; // red
+					out->rgba[++pos] = row_pointers[i][j + 1]; // green
+					out->rgba[++pos] = row_pointers[i][j + 2];  // blue
+					out->rgba[++pos] = 0xFF;  // alpha
 				}
 			}
 		}
@@ -124,7 +114,7 @@ bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT GMImage** img)
 
 	PngData png;
 	GMuint bufferSize;
-	bool b = loadPng(data, size, &png, bufferSize, true);
+	bool b = loadPng(data, size, &png, bufferSize);
 	writeDataToImage(png, *img, bufferSize);
 	return b;
 }
@@ -139,20 +129,10 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size
 {
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
-#if GM_USE_OPENGL
-	data.target = GMTextureTarget::Texture2D;
+	data.target = GMImageTarget::Texture2D;
 	data.mipLevels = 1;
-	if (png.hasAlpha)
-	{
-		data.internalFormat = GMImageInternalFormat::RGBA8;
-		data.format = GMImageFormat::RGBA;
-	}
-	else
-	{
-		data.internalFormat = GMImageInternalFormat::RGB8;
-		data.format = GMImageFormat::RGB;
-	}
-
+	data.internalFormat = GMImageInternalFormat::RGBA8;
+	data.format = GMImageFormat::RGBA;
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;
 	data.swizzle[2] = GL_BLUE;
@@ -163,7 +143,4 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size
 	// Buffer 移交给 Image 管理
 	data.mip[0].data = png.rgba;
 	data.size = size;
-#else
-	GM_ASSERT(false);
-#endif
 }

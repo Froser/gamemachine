@@ -125,7 +125,7 @@ void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuin
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if GM_USE_OPENGL
-	data.target = GMTextureTarget::Texture2D;
+	data.target = GMImageTarget::Texture2D;
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGB8;
 	data.format = GMImageFormat::BGR;

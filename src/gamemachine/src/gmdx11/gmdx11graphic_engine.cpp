@@ -145,24 +145,24 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		(*out) = d->device.get();
 		break;
 	case GameMachineInterfaceID::D3D11DeviceContext:
-		GM_ASSERT(d->device);
+		GM_ASSERT(d->deviceContext);
 		d->deviceContext->AddRef();
-		(*out) = d->device.get();
+		(*out) = d->deviceContext.get();
 		break;
 	case GameMachineInterfaceID::DXGISwapChain:
-		GM_ASSERT(d->device);
+		GM_ASSERT(d->swapChain);
 		d->swapChain->AddRef();
-		(*out) = d->device.get();
+		(*out) = d->swapChain.get();
 		break;
 	case GameMachineInterfaceID::D3D11DepthStencilView:
-		GM_ASSERT(d->device);
+		GM_ASSERT(d->depthStencilView);
 		d->depthStencilView->AddRef();
-		(*out) = d->device.get();
+		(*out) = d->depthStencilView.get();
 		break;
 	case GameMachineInterfaceID::D3D11RenderTargetView:
-		GM_ASSERT(d->device);
+		GM_ASSERT(d->renderTargetView);
 		d->renderTargetView->AddRef();
-		(*out) = d->device.get();
+		(*out) = d->renderTargetView.get();
 		break;
 	default:
 		return false;

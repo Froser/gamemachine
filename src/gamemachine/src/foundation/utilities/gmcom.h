@@ -30,7 +30,7 @@ public:
 	GMComPtr(IUnknown* pUnk) : m_ptr(NULL)
 	{
 		if (pUnk)
-			pUnk->QueryInterface(__uuid(E), (void**)&m_ptr);
+			pUnk->QueryInterface(__uuidof(E), (void**)&m_ptr);
 	}
 
 	GMComPtr(IUnknown* pUnk, REFIID iid) : m_ptr(NULL)
@@ -43,7 +43,7 @@ public:
 	GMComPtr(const GMComPtr<Type>& p) : m_ptr(NULL)
 	{
 		if (p)
-			p->QueryInterface(__uuid(E), (void**)&m_ptr);
+			p->QueryInterface(__uuidof(E), (void**)&m_ptr);
 	}
 
 	~GMComPtr()
@@ -125,7 +125,7 @@ public:
 	{
 		E* pTemp = NULL;
 		if (pUnk)
-			pUnk->QueryInterface(__uuid(E), (void**)&pTemp);
+			pUnk->QueryInterface(__uuidof(E), (void**)&pTemp);
 		if (m_ptr)
 			m_ptr->Release();
 		return m_ptr = pTemp;
@@ -136,7 +136,7 @@ public:
 	{
 		E* pTemp = NULL;
 		if (p)
-			p->QueryInterface(__uuid(E), (void**)&pTemp);
+			p->QueryInterface(__uuidof(E), (void**)&pTemp);
 		if (m_ptr)
 			m_ptr->Release();
 		return m_ptr = pTemp;

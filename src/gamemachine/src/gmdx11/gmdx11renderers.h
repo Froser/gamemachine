@@ -29,6 +29,11 @@ private:
 		return gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 	}
 
+private:
+	void prepareTextures();
+	void prepareBuffer(IQueriable* painter);
+	void prepareRasterizer(GMComponent* component);
+	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 };
 
 END_NS

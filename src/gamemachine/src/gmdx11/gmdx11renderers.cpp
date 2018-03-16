@@ -132,25 +132,73 @@ void GMDx11Renderer::endModel()
 {
 }
 
-void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
+void GMDx11Renderer::prepareTextures()
 {
 	D(d);
+	GM_ASSERT(d->shader);
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+	{
+		GMint count = GMMaxTextureCount(type);
+		for (GMint i = 0; i < count; i++)
+		{
+			GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, i);
+
+			// 获取序列中的这一帧
+			ITexture* texture = getTexture(textures);
+			if (texture)
+			{
+				// 激活动画序列
+				texture->drawTexture(&textures);
+			}
+		}
+	}
+}
+
+void GMDx11Renderer::prepareBuffer(IQueriable* painter)
+{
 	GMuint stride = sizeof(GMDx11VertexData);
 	GMuint offset = 0;
 	GMComPtr<ID3D11Buffer> buffer;
 	painter->getInterface(GameMachineInterfaceID::D3D11Buffer, (void**)&buffer);
 	GM_ASSERT(buffer);
-
 	getEngine()->getDeviceContext()->IASetVertexBuffers(0, 1, &buffer, &stride, &offset);
+}
 
+void GMDx11Renderer::prepareRasterizer(GMComponent* component)
+{
+	D(d);
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
 	GMDx11RasterStates& rasterStates = GMDx11RasterStates::instance();
-
-	d->shader = &component->getShader();
 	rasterStates.applyRasterStates(
 		d->shader->getCull(),
 		d->shader->getFrontFace()
 	);
+}
+
+ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
+{
+	D(d);
+	if (frames.getFrameCount() == 0)
+		return nullptr;
+
+	if (frames.getFrameCount() == 1)
+		return frames.getFrameByIndex(0);
+
+	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
+	// TODO
+	GMint elapsed = GM.getGameTimeSeconds() * 1000;
+
+	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
+}
+
+void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
+{
+	D(d);
+	d->shader = &component->getShader();
+
+	prepareTextures();
+	prepareBuffer(painter);
+	prepareRasterizer(component);
 
 	GMuint primitiveCount = component->getPrimitiveCount();
 	GMuint* offsetPtr = component->getOffsetPtr();

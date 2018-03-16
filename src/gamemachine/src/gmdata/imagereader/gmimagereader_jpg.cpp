@@ -52,9 +52,8 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** imag
 	*image = img;
 	GMImage::Data& imgData = img->getData();
 	//init image data
-	imgData.target = GMTextureTarget::Texture2D;
+	imgData.target = GMImageTarget::Texture2D;
 	imgData.mipLevels = 1;
-	imgData.format = GMImageFormat::RGB16;
 	imgData.swizzle[0] = GL_RED;
 	imgData.swizzle[1] = GL_GREEN;
 	imgData.swizzle[2] = GL_BLUE;

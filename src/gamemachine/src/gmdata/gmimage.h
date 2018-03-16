@@ -5,7 +5,7 @@ BEGIN_NS
 
 #define MAX_MIP_CNT 14
 
-enum class GMTextureTarget
+enum class GMImageTarget
 {
 	Invalid,
 	Texture1D,
@@ -20,7 +20,6 @@ enum class GMTextureTarget
 enum class GMImageFormat
 {
 	RGB,
-	RGB16,
 	RGBA,
 	BGR,
 	BGRA,
@@ -49,14 +48,14 @@ struct ImageMipData
 
 GM_PRIVATE_OBJECT(GMImage)
 {
-	GMTextureTarget target = GMTextureTarget::Invalid;
+	GMImageTarget target = GMImageTarget::Invalid;
 	GMImageInternalFormat internalFormat;
 	GMImageFormat format;
 	GMImageDataType type;
 	GMuint swizzle[4];
 	GMsizei mipLevels;
-	GMsizei slices;
-	GMsizeiptr sliceStride;
+	GMsizei slices = 1;
+	GMsizeiptr sliceStride = 0;
 	GMsizeiptr totalDataSize;
 	ImageMipData mip[MAX_MIP_CNT];
 	GMuint size;

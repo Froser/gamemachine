@@ -24,6 +24,11 @@ void DemostrationWorld::init()
 	model->getMesh()->getComponents()[0]->getShader().setCull(gm::GMS_Cull::NONE);
 	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
 	d->gameObj = new gm::GMGameObject(asset);
+	gm::ITexture* tex = nullptr;
+	gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
+	gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
+	getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+
 	this->addObjectAndInit(d->gameObj);
 }
 

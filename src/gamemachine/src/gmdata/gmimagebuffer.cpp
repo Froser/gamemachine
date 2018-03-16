@@ -19,7 +19,7 @@ void GMImageBuffer::generateData()
 	D(d);
 	GMImage::Data& data = getData();
 
-	data.target = GMTextureTarget::Texture2D;
+	data.target = GMImageTarget::Texture2D;
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGBA8;
 	data.swizzle[0] = GL_RED;
@@ -45,7 +45,7 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	D_BASE(d, GMImage);
 	GMImage::Data& data = getData();
 
-	data.target = GMTextureTarget::CubeMap;
+	data.target = GMImageTarget::CubeMap;
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGBA8;
 	data.format = format;

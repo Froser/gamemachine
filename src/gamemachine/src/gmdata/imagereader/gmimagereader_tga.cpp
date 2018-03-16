@@ -375,7 +375,7 @@ void GMImageReader_TGA::writeDataToImage(TGAImage& tga, GMImage* img)
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();
 #if GM_USE_OPENGL
-	data.target = GMTextureTarget::Texture2D;
+	data.target = GMImageTarget::Texture2D;
 	data.mipLevels = 1;
 
 	if (tga.get_bytespp() == 3)

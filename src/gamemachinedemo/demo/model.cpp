@@ -226,7 +226,7 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 
 	for (auto slice : slices)
 	{
-		delete slice;
+		gm::GM_delete(slice);
 	}
 
 	return new gm::GMCubeMapGameObject(cubeMapTex);

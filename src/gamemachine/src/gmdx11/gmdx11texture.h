@@ -9,7 +9,10 @@ GM_PRIVATE_OBJECT(GMDx11Texture)
 {
 	GMImage* image = nullptr;
 	GMComPtr<ID3D11Device> device;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMComPtr<ID3D11Resource> resource;
 	GMComPtr<ID3D11ShaderResourceView> shaderResourceView;
+	GMComPtr<ID3D11SamplerState> samplerState;
 };
 
 class GMDx11Texture : public ITexture
@@ -18,6 +21,7 @@ class GMDx11Texture : public ITexture
 
 public:
 	GMDx11Texture(GMImage* image);
+	~GMDx11Texture();
 
 public:
 	virtual void drawTexture(GMTextureFrames* frames) override;
