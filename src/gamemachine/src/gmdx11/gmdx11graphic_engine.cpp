@@ -228,9 +228,23 @@ void GMDx11GraphicEngine::updateAllMatrices()
 	mvpMatrix.viewMatrix = Transpose(GM.getCamera().getFrustum().getViewMatrix());
 	mvpMatrix.projMatrix = Transpose(GM.getCamera().getFrustum().getProjectionMatrix());
 
-	GMComPtr<ID3D11Buffer> buffer = GM.getCamera().getFrustum().getDxMatrixBuffer();
-	d->deviceContext->UpdateSubresource(buffer, 0, NULL, &mvpMatrix, 0, 0);
-	d->deviceContext->VSSetConstantBuffers(0, 1, &buffer);
+	if (getShaderMode() == GMDx11GraphicEngine::ShaderMode::Custom)
+	{
+		GMComPtr<ID3D11Buffer> buffer = GM.getCamera().getFrustum().getDxMatrixBuffer();
+		d->deviceContext->UpdateSubresource(buffer, 0, NULL, &mvpMatrix, 0, 0);
+		d->deviceContext->VSSetConstantBuffers(0, 1, &buffer);
+	}
+	else
+	{
+		ID3DX11EffectTechnique* tech = d->effect->GetTechniqueByName("BasicTech");
+		ID3DX11EffectMatrixVariable* modelMatrix = d->effect->GetVariableByName("worldMatrix")->AsMatrix();
+		ID3DX11EffectMatrixVariable* viewMatrix = d->effect->GetVariableByName("viewMatrix")->AsMatrix();
+		ID3DX11EffectMatrixVariable* projectionMatrix = d->effect->GetVariableByName("projectionMatrix")->AsMatrix();
+		modelMatrix->SetMatrix(ValuePointer(mvpMatrix.modelMatrix));
+		viewMatrix->SetMatrix(ValuePointer(mvpMatrix.viewMatrix));
+		projectionMatrix->SetMatrix(ValuePointer(mvpMatrix.projMatrix));
+		// TODO 接下来遍历所有pass更新状态
+	}
 }
 
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
@@ -272,4 +286,36 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 		GM_ASSERT(false);
 		return nullptr;
 	}
+}
+
+HRESULT GMDx11GraphicEngine::createInputLayout(const D3D11_INPUT_ELEMENT_DESC* desc, GMuint descCount, OUT ID3D11InputLayout** layout)
+{
+	D(d);
+	HRESULT hr;
+	if (getShaderMode() == GMDx11GraphicEngine::ShaderMode::Effect)
+	{
+		//TODO BasicTech
+		ID3DX11EffectTechnique* tech = d->effect->GetTechniqueByName("BasicTech");
+		D3DX11_PASS_DESC passDesc;
+		tech->GetPassByIndex(0)->GetDesc(&passDesc);
+		hr = (getDevice()->CreateInputLayout(
+			desc,
+			descCount,
+			passDesc.pIAInputSignature,
+			passDesc.IAInputSignatureSize,
+			layout
+		));
+	}
+	else
+	{
+		hr = (getDevice()->CreateInputLayout(
+			desc,
+			descCount,
+			d->vertexShaderBuffer->GetBufferPointer(),
+			d->vertexShaderBuffer->GetBufferSize(),
+			layout
+		));
+	}
+	GM_COM_CHECK_RETURN(hr, hr);
+	return hr;
 }

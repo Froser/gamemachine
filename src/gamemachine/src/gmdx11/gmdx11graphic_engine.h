@@ -29,6 +29,14 @@ class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
 {
 	DECLARE_PRIVATE(GMDx11GraphicEngine)
 
+private:
+	enum class ShaderMode
+	{
+		None,
+		Custom,
+		Effect,
+	};
+
 public:
 	virtual void init() override;
 	virtual void newFrame() override;
@@ -98,15 +106,10 @@ public:
 		return d->pixelShader;
 	}
 
-	GMComPtr<ID3D10Blob> getVertexShaderBuffer()
-	{
-		D(d);
-		return d->vertexShaderBuffer;
-	}
-
 public:
 	void updateModelMatrix();
 	IRenderer* getRenderer(GMModelType objectType);
+	HRESULT createInputLayout(const D3D11_INPUT_ELEMENT_DESC* desc, GMuint descCount, OUT ID3D11InputLayout** layout);
 
 private:
 	void initShaders();
@@ -115,6 +118,15 @@ private:
 	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void forwardRender(GMGameObject *objects[], GMuint count);
 	void directDraw(GMGameObject *objects[], GMuint count);
+
+private:
+	inline ShaderMode getShaderMode()
+	{
+		D(d);
+		if (d->effect)
+			return ShaderMode::Effect;
+		return ShaderMode::Custom;
+	}
 };
 
 END_NS

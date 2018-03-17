@@ -107,13 +107,11 @@ GMDx11Renderer::GMDx11Renderer()
 	D(d);
 	// 定义顶点布局
 	GM_ASSERT(!d->inputLayout);
-	GM_DX_HR(getEngine()->getDevice()->CreateInputLayout(
+	getEngine()->createInputLayout(
 		GMSHADER_ElementDescriptions,
 		GM_array_size(GMSHADER_ElementDescriptions),
-		getEngine()->getVertexShaderBuffer()->GetBufferPointer(),
-		getEngine()->getVertexShaderBuffer()->GetBufferSize(),
 		&d->inputLayout
-	));
+	);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)

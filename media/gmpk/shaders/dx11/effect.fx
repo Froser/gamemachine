@@ -3,29 +3,45 @@
 //--------------------------------------------------------------------------------------
 cbuffer WorldConstantBuffer: register( b0 ) 
 {
-  matrix World;
-  matrix View;
-  matrix Projection;
+  matrix worldMatrix;
+  matrix viewMatrix;
+  matrix projectionMatrix;
 }
 
 //--------------------------------------------------------------------------------------
-struct VS_OUTPUT
+struct VS_INPUT
 {
-    float4 Pos : SV_POSITION;
-    float4 Color : COLOR;
+    float3 position    : POSITION;
+    float3 normal      : NORMAL;
+    float2 texcoord    : TEXCOORD0;
 };
 
+struct VS_OUTPUT
+{
+    float3 normal      : NORMAL;
+    float2 texcoord    : TEXCOORD0;
+    float4 position    : SV_POSITION;
+};
+
+struct PS_INPUT
+{
+    float3 normal      : NORMAL;
+    float2 texcoord    : TEXCOORD0;
+};
 //--------------------------------------------------------------------------------------
 // Vertex Shader
 //--------------------------------------------------------------------------------------
 
-VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : COLOR )
+VS_OUTPUT VS( VS_INPUT input )
 {
-    VS_OUTPUT output = (VS_OUTPUT)0;
-    output.Pos = mul( Pos, World );
-    output.Pos = mul( output.Pos, View );
-    output.Pos = mul( output.Pos, Projection );
-    output.Color = Color;
+    VS_OUTPUT output;
+    output.position = float4(input.position.x, input.position.y, input.position.z, 1);
+    output.position = mul(output.position, worldMatrix);
+    output.position = mul(output.position, viewMatrix);
+    output.position = mul(output.position, projectionMatrix);
+
+    output.normal = input.normal;
+    output.texcoord = input.texcoord;
     return output;
 }
 
@@ -33,9 +49,9 @@ VS_OUTPUT VS( float4 Pos : POSITION, float4 Color : COLOR )
 // Pixel Shader
 //--------------------------------------------------------------------------------------
 
-float4 PS( VS_OUTPUT input ) : SV_Target
+float4 PS( PS_INPUT input ) : SV_Target
 {
-  return input.Color;
+  return float4(1,0,0,1);
 }
 
 technique11 BasicTech
