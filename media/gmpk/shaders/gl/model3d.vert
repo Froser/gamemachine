@@ -8,7 +8,7 @@ void model3d_calcCoords()
 	_normal = normal;
 	_tangent = tangent;
 	_bitangent = bitangent;
-	_uv = gm_toGLTexCoord(uv);
+	_uv = uv;
 	_lightmapuv = lightmapuv;
 }
 

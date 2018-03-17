@@ -27,7 +27,6 @@ void Demo_Texture::init()
 
 		virtual void onCreateShader(gm::GMShader& shader) override
 		{
-			shader.setCull(gm::GMS_Cull::CULL);
 			shader.getMaterial().kd = GMVec3(1, 1, 1);
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
@@ -42,7 +41,7 @@ void Demo_Texture::init()
 
 	// 创建一个带纹理的对象
 	gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, 1 };
+	gm::GMfloat pos[] = { 0, 0, 0 };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
 	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);

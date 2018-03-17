@@ -8,5 +8,5 @@ out vec2 _uv;
 void main()
 {
 	gl_Position = vec4(position.xyz, 1);
-	_uv = gm_toGLTexCoord(uv);
+	_uv = uv;
 }

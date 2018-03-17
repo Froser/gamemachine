@@ -113,7 +113,7 @@ void DemoHandler::setDefaultLights()
 	if (isInited())
 	{
 		gm::GMLight light(gm::GMLightType::SPECULAR);
-		gm::GMfloat lightPos[] = { 0, 0, .2f };
+		gm::GMfloat lightPos[] = { 0, 0, -.2f };
 		light.setLightPosition(lightPos);
 		gm::GMfloat color[] = { .7f, .7f, .7f };
 		light.setLightColor(color);

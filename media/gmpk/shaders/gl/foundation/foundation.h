@@ -27,8 +27,3 @@ mat4 gm_removeTranslation(mat4 mat)
 	);
 	return r;
 }
-
-vec2 gm_toGLTexCoord(vec2 dxTexCoord)
-{
-	return vec2(dxTexCoord.x, 1.f - dxTexCoord.y);
-}
