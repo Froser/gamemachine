@@ -187,6 +187,25 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11renderers.cpp
 		gmdx11/gmdx11texture.h
 		gmdx11/gmdx11texture.cpp
+
+		gmdx11/effects/pchfx.h
+		gmdx11/effects/d3dx11dbg.cpp
+		gmdx11/effects/d3dxGlobal.cpp
+		gmdx11/effects/Effect.h
+		gmdx11/effects/EffectAPI.cpp
+		gmdx11/effects/EffectLoad.cpp
+		gmdx11/effects/EffectLoad.h
+		gmdx11/effects/EffectNonRuntime.cpp
+		gmdx11/effects/EffectReflection.cpp
+		gmdx11/effects/EffectRuntime.cpp
+		gmdx11/effects/EffectVariable.inl
+		gmdx11/effects/inc/d3dx11dbg.h
+		gmdx11/effects/inc/d3dx11effect.h
+		gmdx11/effects/inc/d3dxGlobal.h
+		gmdx11/effects/binary/EffectBinaryFormat.h
+		gmdx11/effects/binary/EffectStateBase11.h
+		gmdx11/effects/binary/EffectStates11.h
+		gmdx11/effects/binary/SOParser.h
 	)
 
 if(WIN32)

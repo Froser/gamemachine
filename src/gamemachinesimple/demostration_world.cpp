@@ -148,7 +148,8 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
 #if GM_USE_DX11
-	GM_DX_HR(gm::GMLoadDx11Shader(L"dx11/forward.vs.hlsl", L"VS", L"vs_4_0", gm::GM_VERTEX_SHADER));
-	GM_DX_HR(gm::GMLoadDx11Shader(L"dx11/forward.ps.hlsl", L"PS", L"ps_4_0", gm::GM_PIXEL_SHADER));
+	//GM_DX_HR(gm::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/forward.vs.hlsl", L"VS", L"vs_4_0", gm::GM_VERTEX_SHADER));
+	//GM_DX_HR(gm::GMLoadDx11Shader(GM.getGraphicEngine(),"dx11/forward.ps.hlsl", L"PS", L"ps_4_0", gm::GM_PIXEL_SHADER));
+	GM_DX_HR(gm::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", L"", L"fx_5_0", gm::GM_EFFECT_SHADER));
 #endif
 }

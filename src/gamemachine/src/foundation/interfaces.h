@@ -72,6 +72,7 @@ enum class GameMachineInterfaceID
 	D3D11PixelShader,
 	D3D11PixelShaderBuffer,
 	D3D11Buffer,
+	D3D11Effect,
 
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
@@ -81,7 +82,8 @@ enum GMShaderType
 {
 	GM_FRAGMENT_SHADER = 0x8B30,
 	GM_PIXEL_SHADER = GM_FRAGMENT_SHADER, // 同义
-	GM_VERTEX_SHADER = 0x8B31
+	GM_VERTEX_SHADER = 0x8B31,
+	GM_EFFECT_SHADER, //DirectX11 Effect
 };
 
 struct GameMachineMessage

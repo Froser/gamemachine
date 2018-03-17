@@ -11,6 +11,7 @@ extern "C"
 	//! 从GM的包中读取一个着色器文件，并编译到DirectX11环境。
 	/*!
 	  调用此函数时，确认GMGamePackage已经初始化。如果读取失败，或者着色器文件编译失败，则返回E_FAIL。
+	  \param engine 需要添加到的绘制引擎
 	  \param filename 读取的文件名。此方法会通过GMGamePackage在着色器所在目录读取文件。
 	  \param entryPoint 着色器程序的入口点。
 	  \param profile 着色器配置。
@@ -18,6 +19,7 @@ extern "C"
 	  \return 操作是否成功。
 	*/
 	HRESULT GMLoadDx11Shader(
+		IGraphicEngine* engine,
 		const gm::GMString& filename,
 		const gm::GMString& entryPoint,
 		const gm::GMString& profile,

@@ -7,6 +7,7 @@
 extern "C"
 {
 	HRESULT GMLoadDx11Shader(
+		IGraphicEngine* engine,
 		const gm::GMString& filename,
 		const gm::GMString& entryPoint,
 		const gm::GMString& profile,
@@ -63,7 +64,6 @@ extern "C"
 		}
 
 		GMComPtr<ID3D11Device> device;
-		IGraphicEngine* engine = GM.getGraphicEngine();
 		bool b = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 		if (!b || !device)
 			return E_FAIL;
@@ -86,14 +86,8 @@ extern "C"
 			if (!b)
 				return E_FAIL;
 		}
-		else
+		else if (type == GM_PIXEL_SHADER)
 		{
-			if (type != GM_PIXEL_SHADER)
-			{
-				GM_ASSERT(false);
-				return E_FAIL;
-			}
-
 			GMComPtr<ID3D11PixelShader> pixelShader;
 			hr = device->CreatePixelShader(
 				shaderBuffer->GetBufferPointer(),
@@ -109,6 +103,24 @@ extern "C"
 			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11PixelShaderBuffer, shaderBuffer.get());
 			if (!b)
 				return E_FAIL;
+		}
+		else if (type == GM_EFFECT_SHADER)
+		{
+			GMComPtr<ID3DX11Effect> effect;
+			GM_DX_HR(D3DX11CreateEffectFromMemory(
+				shaderBuffer->GetBufferPointer(),
+				shaderBuffer->GetBufferSize(),
+				0,
+				device,
+				&effect
+			));
+			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11Effect, effect.get());
+			GM_ASSERT(b);
+			return S_OK;
+		}
+		else
+		{
+			return E_INVALIDARG;
 		}
 
 		return S_OK;

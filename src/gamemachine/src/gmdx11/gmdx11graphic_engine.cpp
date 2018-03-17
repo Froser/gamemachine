@@ -128,6 +128,9 @@ bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	case GameMachineInterfaceID::D3D11PixelShaderBuffer:
 		d->pixelShaderBuffer = static_cast<ID3D10Blob*>(in);
 		break;
+	case GameMachineInterfaceID::D3D11Effect:
+		d->effect = static_cast<ID3DX11Effect*>(in);
+		break;
 	default:
 		return false;
 	}

@@ -19,6 +19,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D10Blob> vertexShaderBuffer;
 	GMComPtr<ID3D11PixelShader> pixelShader;
 	GMComPtr<ID3D10Blob> pixelShaderBuffer;
+	GMComPtr<ID3DX11Effect> effect;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	bool ready = false;

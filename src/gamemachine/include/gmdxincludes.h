@@ -6,6 +6,7 @@
 #		include <d3d11.h>
 #		include <D3DX11async.h>
 #		include <dxerr.h>
+#		include "../src/gmdx11/effects/Inc/d3dx11effect.h"
 #		include "../src/foundation/platforms/windows/dxmath/DirectXMath.h"
 #		pragma warning(pop)
 #		if _DEBUG
