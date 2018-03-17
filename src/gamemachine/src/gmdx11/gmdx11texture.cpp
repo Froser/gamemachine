@@ -5,13 +5,14 @@
 
 namespace
 {
-	inline DXGI_FORMAT toDxgiFormat(GMImageInternalFormat format)
+	inline DXGI_FORMAT toDxgiFormat(GMImageFormat format)
 	{
 		switch (format)
 		{
-		case GMImageInternalFormat::RGB8:
-		case GMImageInternalFormat::RGBA8:
+		case GMImageFormat::RGBA:
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case GMImageFormat::BGRA:
+			return DXGI_FORMAT_B8G8R8A8_UNORM;
 		default:
 			GM_ASSERT(false);
 			return DXGI_FORMAT_UNKNOWN;
@@ -116,7 +117,7 @@ void GMDx11Texture::init()
 		desc.Height = d->image->getHeight();
 		desc.MipLevels = imageData.mipLevels;
 		desc.ArraySize = imageData.slices;
-		desc.Format = toDxgiFormat(imageData.internalFormat);
+		desc.Format = toDxgiFormat(imageData.format);
 		desc.SampleDesc.Count = 1;
 		desc.SampleDesc.Quality = 0;
 		desc.Usage = D3D11_USAGE_DEFAULT;
@@ -129,9 +130,9 @@ void GMDx11Texture::init()
 		{
 			for (GMuint j = 0; j < desc.MipLevels; ++j, ++index)
 			{
-				GMuint pitch = d->image->getWidth(i);
-				resourceData[index].pSysMem = imageData.mip[0].data;
-				resourceData[index].SysMemPitch = pitch * 4;
+				GMuint pitch = d->image->getWidth(j);
+				resourceData[index].pSysMem = imageData.mip[j].data;
+				resourceData[index].SysMemPitch = pitch * d->image->getData().channels;
 			}
 		}
 

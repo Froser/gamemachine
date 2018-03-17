@@ -85,47 +85,68 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** imag
 	//get the number of color channels
 	int channels = cinfo.num_components;
 
-	imgData.mip[0].depth = channels * 8;
 	imgData.mip[0].width = cinfo.image_width;
 	imgData.mip[0].height = cinfo.image_height;
+	imgData.format = GMImageFormat::RGBA;
+	imgData.internalFormat = GMImageInternalFormat::RGBA8;
 
-	if (imgData.mip[0].depth == 32)
-	{
-		imgData.format = GMImageFormat::RGBA;
-		imgData.internalFormat = GMImageInternalFormat::RGBA8;
-	}
-	else
-	{
-		imgData.format = GMImageFormat::RGB;
-		imgData.internalFormat = GMImageInternalFormat::RGB8;
-	}
-
-	GMuint bufferSize = imgData.mip[0].width * imgData.mip[0].height * channels;
+	GMuint bufferSize = cinfo.image_width * cinfo.image_height * GMImageReader::DefaultChannels;
 	imgData.mip[0].data = new GMbyte[bufferSize];
 	imgData.size = bufferSize;
 
-	GMbyte** rowPtr = new GMbyte*[imgData.mip[0].height];
-
-	for (GMint i = 0; i < imgData.mip[0].height; ++i)
-		rowPtr[i] = &(imgData.mip[0].data[i * imgData.mip[0].width * channels]);
-
 	//Extract the pixel data
+	GMbyte** rowPtr = nullptr;
 	int rowsRead = 0;
-	while (cinfo.output_scanline < cinfo.output_height)
+	if (channels == GMImageReader::DefaultChannels)
 	{
-		//read in this row
-		rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
+		rowPtr = new GMbyte*[cinfo.image_height];
+		for (GMuint i = 0; i < cinfo.image_height; ++i)
+			rowPtr[i] = &(imgData.mip[0].data[i * cinfo.image_width * GMImageReader::DefaultChannels]);
+
+		while (cinfo.output_scanline < cinfo.output_height)
+		{
+			//read in this row
+			rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
+		}
+	}
+	else if (channels == 3)
+	{
+		//If channel number is 3, we have to make up a 4-channel image data
+		size_t bytesSize = cinfo.image_width * cinfo.image_height * channels;
+		GMbyte* tempData = new GMbyte[bytesSize];
+		rowPtr = new GMbyte*[cinfo.image_height];
+		for (GMuint i = 0; i < cinfo.image_height; ++i)
+			rowPtr[i] = &(tempData[i * cinfo.image_width * 3]);
+
+		while (cinfo.output_scanline < cinfo.output_height)
+		{
+			//read in this row
+			rowsRead += jpeg_read_scanlines(&cinfo, &rowPtr[rowsRead], cinfo.output_height - rowsRead);
+		}
+
+		GMuint dataPtr = 0;
+		for (GMuint i = 0; i < bytesSize; ++i, ++dataPtr)
+		{
+			imgData.mip[0].data[dataPtr] = tempData[i];
+			if ((i + 1) % 3 == 0)
+			{
+				imgData.mip[0].data[++dataPtr] = 0xFF; //ALPHA
+			}
+		}
+
+		GM_delete_array(tempData);
+	}
+	else
+	{
+		GM_ASSERT(false);
+		return false;
 	}
 
 	//release memory used by jpeg
 	jpeg_destroy_decompress(&cinfo);
 
 	//delete row pointers
-	if (rowPtr)
-		delete[] rowPtr;
-
-	img->flipVertically(0);
-
+	GM_delete_array(rowPtr);
 	return true;
 }
 

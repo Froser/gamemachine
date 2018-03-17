@@ -22,9 +22,13 @@ public:
 		ImageType_Begin = 0,
 		ImageType_JPG = ImageType_Begin,
 		ImageType_PNG,
-		ImageType_TGA,
 		ImageType_BMP,
 		ImageType_End,
+	};
+
+	enum
+	{
+		DefaultChannels = GM_IMAGE_DEFAULT_CHANNELS
 	};
 
 public:

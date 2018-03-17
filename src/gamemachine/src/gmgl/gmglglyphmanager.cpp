@@ -20,6 +20,24 @@ BOOL SHGetSpecialFolderPathW(HWND hwnd, LPWSTR pszPath, int csidl, BOOL fCreate)
 #	define CSIDL_FONTS 0x0014
 #endif
 
+namespace
+{
+	void flipVertically(GMbyte* data, GMuint width, GMuint height)
+	{
+		const GMuint bytePerPixel = 1;
+		GMuint rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;
+		GMbyte* tempRow = new GMbyte[width * bytePerPixel];
+		for (GMuint i = 0; i < rowsToSwap; ++i)
+		{
+			memcpy(tempRow, &data[i * width * bytePerPixel], width * bytePerPixel);
+			memcpy(&data[i * width * bytePerPixel], &data[(height - i - 1) * width * bytePerPixel], width * bytePerPixel);
+			memcpy(&data[(height - i - 1) * width * bytePerPixel], tempRow, width * bytePerPixel);
+		}
+
+		GM_delete_array(tempRow);
+	}
+}
+
 struct TypoLibrary
 {
 	TypoLibrary()
@@ -180,6 +198,13 @@ const GMGlyphInfo& GMGLGlyphManager::createChar(GMwchar c, GMint fontSize)
 	d->cursor_u += bitmapGlyph->bitmap.width + 1;
 
 	// 创建纹理
+	// OpenGL纹理坐标和DirectX不同，颠倒一下
+	flipVertically(
+		bitmapGlyph->bitmap.buffer,
+		bitmapGlyph->bitmap.width,
+		bitmapGlyph->bitmap.rows
+	);
+
 	glBindTexture(GL_TEXTURE_2D, d->texture->getTextureId());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 使用一个字节保存，必须设置对齐为1
 	glTexSubImage2D(GL_TEXTURE_2D,
@@ -191,6 +216,7 @@ const GMGlyphInfo& GMGLGlyphManager::createChar(GMwchar c, GMint fontSize)
 		GL_RED,
 		GL_UNSIGNED_BYTE,
 		bitmapGlyph->bitmap.buffer);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// 释放资源

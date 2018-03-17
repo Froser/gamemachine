@@ -55,7 +55,7 @@ namespace
 		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
 		out->width = png_get_image_width(png_ptr, info_ptr);
 		out->height = png_get_image_height(png_ptr, info_ptr);
-		size = out->width * out->height * 4 * sizeof(unsigned char);
+		size = out->width * out->height * GMImageReader::DefaultChannels * sizeof(unsigned char);
 
 		if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 		{

@@ -39,8 +39,6 @@ namespace
 			return GL_RGB;
 		case GMImageFormat::RGBA:
 			return GL_RGBA;
-		case GMImageFormat::BGR:
-			return GL_BGR;
 		case GMImageFormat::BGRA:
 			return GL_BGRA;
 		default:

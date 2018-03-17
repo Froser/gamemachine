@@ -4,6 +4,7 @@
 BEGIN_NS
 
 #define MAX_MIP_CNT 14
+#define GM_IMAGE_DEFAULT_CHANNELS 4
 
 enum class GMImageTarget
 {
@@ -21,7 +22,6 @@ enum class GMImageFormat
 {
 	RGB,
 	RGBA,
-	BGR,
 	BGRA,
 };
 
@@ -41,7 +41,6 @@ struct ImageMipData
 {
 	GMint width;
 	GMint height;
-	GMint depth;
 	GMsizeiptr mipStride;
 	GMbyte* data = nullptr;
 };
@@ -58,9 +57,15 @@ GM_PRIVATE_OBJECT(GMImage)
 	GMsizeiptr sliceStride = 0;
 	GMsizeiptr totalDataSize;
 	ImageMipData mip[MAX_MIP_CNT];
-	GMuint size;
+	GMuint size = 0;
+	GMuint channels = GM_IMAGE_DEFAULT_CHANNELS;
 };
 
+//! 表示一张或一系列图片。
+/*!
+  图片数据一般为32位形式保存，有RGBA共计4个通道。<BR>
+  一个图片对象中，可能会存有多个MipMap，这通常出现在DDS等格式中。
+*/
 class GMImage : public GMObject
 {
 	DECLARE_PRIVATE(GMImage)
@@ -73,7 +78,6 @@ public:
 	inline Data& getData() { D(d); return *d; }
 	const Data& getData() const;
 	virtual void dispose();
-	void flipVertically(GMuint mipId);
 
 public:
 	inline GMint getWidth(GMint mipLevel = 0) const { return getData().mip[mipLevel].width; }

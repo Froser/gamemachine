@@ -18,10 +18,9 @@ void DemostrationWorld::init()
 	
 	// 创建一个带纹理的对象
 	gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, 1 };
+	gm::GMfloat pos[] = { 0, 0, 0 };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
-	model->getMesh()->getComponents()[0]->getShader().setCull(gm::GMS_Cull::NONE);
 	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
 	d->gameObj = new gm::GMGameObject(asset);
 	gm::ITexture* tex = nullptr;
@@ -48,8 +47,8 @@ void DemostrationWorld::resetProjectionAndEye()
 	camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
 
 	gm::GMCameraLookAt lookAt;
-	lookAt.lookAt = { 0, 0, -1 };
-	lookAt.position = { 0, 0, 1 };
+	lookAt.lookAt = { 0, 0, 1 };
+	lookAt.position = { 0, 0, -1 };
 	camera.lookAt(lookAt);
 }
 

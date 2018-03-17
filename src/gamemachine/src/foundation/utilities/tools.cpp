@@ -237,7 +237,8 @@ GMuint GMMemoryStream::read(GMbyte* buf, GMuint size)
 		return 0;
 
 	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
-	memcpy(buf, d->ptr, realSize);
+	if (buf)
+		memcpy(buf, d->ptr, realSize);
 	d->ptr += realSize;
 	return realSize;
 }

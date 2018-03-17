@@ -15,6 +15,7 @@ public:
 
 private:
 	void writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuint size);
+	void flipVertically(GMbyte* data, GMuint width, GMuint height);
 };
 
 END_NS
