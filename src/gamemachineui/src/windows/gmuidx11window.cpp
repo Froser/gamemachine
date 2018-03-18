@@ -49,7 +49,7 @@ bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
 		d->deviceContext->AddRef();
 		(*out) = d->deviceContext.get();
 		break;
-	case gm::GameMachineInterfaceID::DXGISwapChain:
+	case gm::GameMachineInterfaceID::D3D11SwapChain:
 		d->swapChain->AddRef();
 		(*out) = d->swapChain.get();
 		break;
