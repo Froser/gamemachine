@@ -124,7 +124,7 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		d->deviceContext->AddRef();
 		(*out) = d->deviceContext.get();
 		break;
-	case GameMachineInterfaceID::DXGISwapChain:
+	case GameMachineInterfaceID::D3D11SwapChain:
 		GM_ASSERT(d->swapChain);
 		d->swapChain->AddRef();
 		(*out) = d->swapChain.get();
@@ -157,7 +157,7 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::DXGISwapChain, (void**)&d->swapChain);
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11SwapChain, (void**)&d->swapChain);
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->depthStencilView);
 		GM_ASSERT(b);

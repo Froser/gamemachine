@@ -83,7 +83,6 @@ public:
 	}
 
 public:
-	void updateModelMatrix();
 	IRenderer* getRenderer(GMModelType objectType);
 
 private:

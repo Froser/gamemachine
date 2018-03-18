@@ -64,7 +64,7 @@ enum class GameMachineInterfaceID
 
 	D3D11Device,
 	D3D11DeviceContext,
-	DXGISwapChain,
+	D3D11SwapChain,
 	D3D11DepthStencilView,
 	D3D11RenderTargetView,
 

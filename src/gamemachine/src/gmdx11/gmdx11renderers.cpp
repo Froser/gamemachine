@@ -126,6 +126,8 @@ GMDx11Renderer::GMDx11Renderer()
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	getEngine()->getShaderProgram()->useProgram();
+
 	// Renderer决定自己的顶点Layout
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
 	context->IASetInputLayout(d->inputLayout);
