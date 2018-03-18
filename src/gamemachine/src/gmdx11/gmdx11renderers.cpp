@@ -223,9 +223,9 @@ void GMDx11Renderer::passAllAndDraw(GMComponent* component)
 	{
 		ID3DX11EffectPass* pass = d->mainTechnique->GetPassByIndex(p);
 		pass->Apply(0, getEngine()->getDeviceContext());
+		drawTextures();
 		for (GMuint i = 0; i < primitiveCount; ++i)
 		{
-			drawTextures();
 			getEngine()->getDeviceContext()->Draw(vertexCountPtr[i], offsetPtr[i]);
 		}
 	}

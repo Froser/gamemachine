@@ -34,8 +34,8 @@ private:
 	void prepareBuffer(IQueriable* painter);
 	void prepareRasterizer(GMComponent* component);
 	void passAllAndDraw(GMComponent* component);
-	void drawTextures();
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
+	void drawTextures();
 };
 
 END_NS
