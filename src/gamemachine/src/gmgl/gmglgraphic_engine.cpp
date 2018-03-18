@@ -432,14 +432,14 @@ void GMGLGraphicEngine::updateProjectionMatrix()
 	const GMMat4& proj = camera.getFrustum().getProjectionMatrix();
 	GM_BEGIN_CHECK_GL_ERROR
 	d->forwardShaderProgram->useProgram();
-	d->forwardShaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, ValuePointer(proj));
+	d->forwardShaderProgram->setMatrix4(GMSHADER_PROJECTION_MATRIX, proj);
 	GM_END_CHECK_GL_ERROR
 
 	GM_BEGIN_CHECK_GL_ERROR
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_PROJECTION_MATRIX, ValuePointer(proj));
+	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_PROJECTION_MATRIX, proj);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_PROJECTION_MATRIX, ValuePointer(proj));
+	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_PROJECTION_MATRIX, proj);
 	GM_END_CHECK_GL_ERROR
 }
 
@@ -456,20 +456,20 @@ void GMGLGraphicEngine::updateViewMatrix()
 	// 视觉位置，用于计算光照
 	d->forwardShaderProgram->useProgram();
 	d->forwardShaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
-	d->forwardShaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, ValuePointer(viewMatrix));
-	d->forwardShaderProgram->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, ValuePointer(Inverse(viewMatrix)));
+	d->forwardShaderProgram->setMatrix4(GMSHADER_VIEW_MATRIX, viewMatrix);
+	d->forwardShaderProgram->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, Inverse(viewMatrix));
 	GM_END_CHECK_GL_ERROR
 
 	GM_BEGIN_CHECK_GL_ERROR
 	// 视觉位置，用于计算光照
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(GMSHADER_VIEW_POSITION, vec);
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_VIEW_MATRIX, ValuePointer(viewMatrix));
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, ValuePointer(Inverse(viewMatrix)));
+	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_VIEW_MATRIX, viewMatrix);
+	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, Inverse(viewMatrix));
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setVec4(GMSHADER_VIEW_POSITION, vec);
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_VIEW_MATRIX, ValuePointer(viewMatrix));
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, ValuePointer(Inverse(viewMatrix)));
+	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_VIEW_MATRIX, viewMatrix);
+	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, Inverse(viewMatrix));
 	GM_END_CHECK_GL_ERROR
 }
 

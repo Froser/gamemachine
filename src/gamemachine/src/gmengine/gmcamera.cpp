@@ -15,7 +15,7 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	d->n = n;
 	d->f = f;
 
-	d->mvpMatrix.projMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	d->projectionMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
 }
 
 void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -27,7 +27,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	d->n = n;
 	d->f = f;
 
-	d->mvpMatrix.projMatrix = Perspective(d->fovy, d->aspect, d->n, d->f);
+	d->projectionMatrix = Perspective(d->fovy, d->aspect, d->n, d->f);
 }
 
 void GMFrustum::getPlanes(GMFrustumPlanes& planes)
@@ -114,60 +114,20 @@ bool GMFrustum::isBoundingBoxInside(const GMFrustumPlanes& frustumPlanes, const 
 void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 {
 	D(d);
-	d->mvpMatrix.viewMatrix = viewMatrix;
+	d->viewMatrix = viewMatrix;
 }
 
 const GMMat4& GMFrustum::getProjectionMatrix()
 {
 	D(d);
-	return d->mvpMatrix.projMatrix;
+	return d->projectionMatrix;
 }
 
 const GMMat4& GMFrustum::getViewMatrix()
 {
 	D(d);
-	return d->mvpMatrix.viewMatrix;
+	return d->viewMatrix;
 }
-
-const GMMat4& GMFrustum::getModelMatrix()
-{
-	D(d);
-	return d->mvpMatrix.modelMatrix;
-}
-
-#if GM_USE_DX11
-bool GMFrustum::createDxMatrixBuffer()
-{
-	D(d);
-	// 定义统一MVP Matrix缓存
-	D3D11_BUFFER_DESC vpBufferDesc;
-	vpBufferDesc.Usage = D3D11_USAGE_DEFAULT;
-	vpBufferDesc.ByteWidth = sizeof(GMMVPMatrix);
-	vpBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	vpBufferDesc.CPUAccessFlags = 0;
-	vpBufferDesc.MiscFlags = 0;
-	vpBufferDesc.StructureByteStride = 0;
-
-	GMComPtr<ID3D11Device> device;
-	bool suc = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
-	GM_ASSERT(suc);
-	GM_DX_HR(device->CreateBuffer(&vpBufferDesc, NULL, &d->dxMatrixBuffer));
-	return !!d->dxMatrixBuffer;
-}
-
-void GMFrustum::setDxModelMatrix(const GMMat4& matrix)
-{
-	D(d);
-	d->mvpMatrix.modelMatrix = matrix;
-	GM.getGraphicEngine()->update(GMUpdateDataType::ModelMatrix);
-}
-
-GMComPtr<ID3D11Buffer> GMFrustum::getDxMatrixBuffer()
-{
-	D(d);
-	return d->dxMatrixBuffer;
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////////
 GMCamera::GMCamera()

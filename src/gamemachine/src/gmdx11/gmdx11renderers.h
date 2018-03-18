@@ -9,6 +9,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMShader* shader = nullptr;
+	ID3DX11EffectTechnique* mainTechnique = nullptr;
 };
 
 class GMDx11Renderer : public IRenderer
@@ -30,9 +31,10 @@ private:
 	}
 
 private:
-	void prepareTextures();
 	void prepareBuffer(IQueriable* painter);
 	void prepareRasterizer(GMComponent* component);
+	void passAllAndDraw(GMComponent* component);
+	void drawTextures();
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 };
 

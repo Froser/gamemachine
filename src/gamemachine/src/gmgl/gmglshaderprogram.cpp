@@ -10,6 +10,20 @@
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
+GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
+{
+	switch (type)
+	{
+	case GMShaderType::Pixel:
+		return GL_FRAGMENT_SHADER;
+	case GMShaderType::Vertex:
+		return GL_VERTEX_SHADER;
+	default:
+		GM_ASSERT(false);
+		return GL_NONE;
+	}
+}
+
 GMGLShaderProgram::~GMGLShaderProgram()
 {
 	D(d);
@@ -34,9 +48,9 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 	d->shaderInfos.push_back(shaderCfgs);
 }
 
-void GMGLShaderProgram::setMatrix4(const char* name, const GMfloat value[16])
+void GMGLShaderProgram::setMatrix4(const char* name, const GMMat4& value)
 {
-	glUniformMatrix4fv(glGetUniformLocation(getProgram(), name), 1, GL_FALSE, value);
+	glUniformMatrix4fv(glGetUniformLocation(getProgram(), name), 1, GL_FALSE, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec4(const char* name, const GMFloat4& value)
@@ -64,10 +78,10 @@ void GMGLShaderProgram::setBool(const char* name, bool value)
 	setInt(name, (GMint)value);
 }
 
-void GMGLShaderProgram::setMatrix4(const GMString& name, const GMfloat value[16])
+void GMGLShaderProgram::setMatrix4(const GMString& name, const GMMat4& value)
 {
 	std::string stdName = name.toStdString();
-	glUniformMatrix4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, GL_FALSE, value);
+	glUniformMatrix4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, GL_FALSE, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec4(const GMString& name, const GMFloat4& value)
@@ -284,4 +298,14 @@ GMString& GMGLShaderProgram::replaceLine(IN OUT GMString& line)
 		line = line.replace(alias.first, alias.second);
 	}
 	return line;
+}
+
+bool GMGLShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
+{
+	return false;
+}
+
+bool GMGLShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
+{
+	return false;
 }

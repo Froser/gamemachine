@@ -40,24 +40,7 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 
 void GMDx11GraphicEngine::update(GMUpdateDataType type)
 {
-	D(d);
-	switch (type)
-	{
-	case GMUpdateDataType::ProjectionMatrix:
-	case GMUpdateDataType::ModelMatrix:
-	case GMUpdateDataType::ViewMatrix:
-	{
-		updateAllMatrices();
-		break;
-	}
-	case GMUpdateDataType::TurnOffCubeMap:
-	{
-		GM_ASSERT(false);
-	}
-	default:
-		GM_ASSERT(false);
-		break;
-	}
+	// Nothing to update
 }
 
 void GMDx11GraphicEngine::addLight(const GMLight& light)
@@ -108,7 +91,8 @@ void GMDx11GraphicEngine::endBlend()
 
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /*= GMShaderProgramType::CurrentShaderProgram*/)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	D(d);
+	return d->shaderProgram;
 }
 
 bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
@@ -116,20 +100,8 @@ bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	D(d);
 	switch (id)
 	{
-	case GameMachineInterfaceID::D3D11VertexShader:
-		d->vertexShader = static_cast<ID3D11VertexShader*>(in);
-		break;
-	case GameMachineInterfaceID::D3D11PixelShader:
-		d->pixelShader = static_cast<ID3D11PixelShader*>(in);
-		break;
-	case GameMachineInterfaceID::D3D11VertexShaderBuffer:
-		d->vertexShaderBuffer = static_cast<ID3D10Blob*>(in);
-		break;
-	case GameMachineInterfaceID::D3D11PixelShaderBuffer:
-		d->pixelShaderBuffer = static_cast<ID3D10Blob*>(in);
-		break;
-	case GameMachineInterfaceID::D3D11Effect:
-		d->effect = static_cast<ID3DX11Effect*>(in);
+	case GameMachineInterfaceID::D3D11ShaderProgram:
+		d->shaderProgram.reset(static_cast<IShaderProgram*>(in));
 		break;
 	default:
 		return false;
@@ -210,41 +182,6 @@ void GMDx11GraphicEngine::initShaders()
 	}
 
 	d->shaderLoadCallback->onLoadShaders(this);
-
-	bool suc = GM.getCamera().getFrustum().createDxMatrixBuffer();
-	GM_ASSERT(suc);
-}
-
-void GMDx11GraphicEngine::updateProjectionMatrix()
-{
-	updateAllMatrices();
-}
-
-void GMDx11GraphicEngine::updateAllMatrices()
-{
-	D(d);
-	GMMVPMatrix mvpMatrix;
-	mvpMatrix.modelMatrix = Transpose(GM.getCamera().getFrustum().getModelMatrix());
-	mvpMatrix.viewMatrix = Transpose(GM.getCamera().getFrustum().getViewMatrix());
-	mvpMatrix.projMatrix = Transpose(GM.getCamera().getFrustum().getProjectionMatrix());
-
-	if (getShaderMode() == GMDx11GraphicEngine::ShaderMode::Custom)
-	{
-		GMComPtr<ID3D11Buffer> buffer = GM.getCamera().getFrustum().getDxMatrixBuffer();
-		d->deviceContext->UpdateSubresource(buffer, 0, NULL, &mvpMatrix, 0, 0);
-		d->deviceContext->VSSetConstantBuffers(0, 1, &buffer);
-	}
-	else
-	{
-		ID3DX11EffectTechnique* tech = d->effect->GetTechniqueByName("BasicTech");
-		ID3DX11EffectMatrixVariable* modelMatrix = d->effect->GetVariableByName("worldMatrix")->AsMatrix();
-		ID3DX11EffectMatrixVariable* viewMatrix = d->effect->GetVariableByName("viewMatrix")->AsMatrix();
-		ID3DX11EffectMatrixVariable* projectionMatrix = d->effect->GetVariableByName("projectionMatrix")->AsMatrix();
-		modelMatrix->SetMatrix(ValuePointer(mvpMatrix.modelMatrix));
-		viewMatrix->SetMatrix(ValuePointer(mvpMatrix.viewMatrix));
-		projectionMatrix->SetMatrix(ValuePointer(mvpMatrix.projMatrix));
-		// TODO 接下来遍历所有pass更新状态
-	}
 }
 
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
@@ -286,36 +223,4 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 		GM_ASSERT(false);
 		return nullptr;
 	}
-}
-
-HRESULT GMDx11GraphicEngine::createInputLayout(const D3D11_INPUT_ELEMENT_DESC* desc, GMuint descCount, OUT ID3D11InputLayout** layout)
-{
-	D(d);
-	HRESULT hr;
-	if (getShaderMode() == GMDx11GraphicEngine::ShaderMode::Effect)
-	{
-		//TODO BasicTech
-		ID3DX11EffectTechnique* tech = d->effect->GetTechniqueByName("BasicTech");
-		D3DX11_PASS_DESC passDesc;
-		tech->GetPassByIndex(0)->GetDesc(&passDesc);
-		hr = (getDevice()->CreateInputLayout(
-			desc,
-			descCount,
-			passDesc.pIAInputSignature,
-			passDesc.IAInputSignatureSize,
-			layout
-		));
-	}
-	else
-	{
-		hr = (getDevice()->CreateInputLayout(
-			desc,
-			descCount,
-			d->vertexShaderBuffer->GetBufferPointer(),
-			d->vertexShaderBuffer->GetBufferSize(),
-			layout
-		));
-	}
-	GM_COM_CHECK_RETURN(hr, hr);
-	return hr;
 }

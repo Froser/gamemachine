@@ -107,11 +107,20 @@ GMDx11Renderer::GMDx11Renderer()
 	D(d);
 	// 定义顶点布局
 	GM_ASSERT(!d->inputLayout);
-	getEngine()->createInputLayout(
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	GMComPtr<ID3DX11Effect> effect;
+	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&effect);
+	d->mainTechnique = effect->GetTechniqueByName("BasicTech");
+
+	D3DX11_PASS_DESC passDesc;
+	GM_DX_HR(d->mainTechnique->GetPassByIndex(0)->GetDesc(&passDesc));
+	GM_DX_HR(getEngine()->getDevice()->CreateInputLayout(
 		GMSHADER_ElementDescriptions,
 		GM_array_size(GMSHADER_ElementDescriptions),
+		passDesc.pIAInputSignature,
+		passDesc.IAInputSignatureSize,
 		&d->inputLayout
-	);
+	));
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -121,16 +130,19 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
 	context->IASetInputLayout(d->inputLayout);
 	context->IASetPrimitiveTopology(getMode(model->getMesh()));
-	context->VSSetShader(getEngine()->getVertexShader(), NULL, 0);
-	context->PSSetShader(getEngine()->getPixelShader(), NULL, 0);
-	GM.getCamera().getFrustum().setDxModelMatrix(parent->getTransform());
+	
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	//TODO 不要写死名字
+	shaderProgram->setMatrix4("worldMatrix", Transpose(parent->getTransform()));
+	shaderProgram->setMatrix4("viewMatrix", Transpose(GM.getCamera().getFrustum().getViewMatrix()));
+	shaderProgram->setMatrix4("projectionMatrix", Transpose(GM.getCamera().getFrustum().getProjectionMatrix()));
 }
 
 void GMDx11Renderer::endModel()
 {
 }
 
-void GMDx11Renderer::prepareTextures()
+void GMDx11Renderer::drawTextures()
 {
 	D(d);
 	GM_ASSERT(d->shader);
@@ -193,16 +205,28 @@ void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* m
 {
 	D(d);
 	d->shader = &component->getShader();
-
-	prepareTextures();
 	prepareBuffer(painter);
 	prepareRasterizer(component);
+	passAllAndDraw(component);
+}
+
+void GMDx11Renderer::passAllAndDraw(GMComponent* component)
+{
+	D(d);
+	D3DX11_TECHNIQUE_DESC techDesc;
+	GM_DX_HR(d->mainTechnique->GetDesc(&techDesc));
 
 	GMuint primitiveCount = component->getPrimitiveCount();
 	GMuint* offsetPtr = component->getOffsetPtr();
 	GMuint* vertexCountPtr = component->getPrimitiveVerticesCountPtr();
-	for (GMuint i = 0; i < primitiveCount; ++i)
+	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
-		getEngine()->getDeviceContext()->Draw(vertexCountPtr[i], offsetPtr[i]);
+		ID3DX11EffectPass* pass = d->mainTechnique->GetPassByIndex(p);
+		pass->Apply(0, getEngine()->getDeviceContext());
+		for (GMuint i = 0; i < primitiveCount; ++i)
+		{
+			drawTextures();
+			getEngine()->getDeviceContext()->Draw(vertexCountPtr[i], offsetPtr[i]);
+		}
 	}
 }

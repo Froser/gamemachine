@@ -98,15 +98,15 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	if (parent)
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, ValuePointer(parent->getTransform()));
-		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, ValuePointer(InverseTranspose(parent->getTransform())));
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, parent->getTransform());
+		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, InverseTranspose(parent->getTransform()));
 		GM_END_CHECK_GL_ERROR
 	}
 	else
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, ValuePointer(Identity<GMMat4>()));
-		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, ValuePointer(Identity<GMMat4>()));
+		shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, Identity<GMMat4>());
 		GM_END_CHECK_GL_ERROR
 	}
 }
@@ -349,8 +349,8 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 
 	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
-	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, ValuePointer(GMMat4(Inhomogeneous(parent->getTransform()))));
-	shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, ValuePointer(GMMat4(Inhomogeneous(parent->getTransform()))));
+	shaderProgram->setMatrix4(GMSHADER_MODEL_MATRIX, GMMat4(Inhomogeneous(parent->getTransform())));
+	shaderProgram->setMatrix4(GMSHADER_INV_TRANS_MODEL_MATRIX, GMMat4(Inhomogeneous(parent->getTransform())));
 	GM_END_CHECK_GL_ERROR
 }
 

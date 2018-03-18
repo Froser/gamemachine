@@ -377,8 +377,8 @@ void DemostrationEntrance::initLoadEffectsShader(gm::GMGLShaderProgram* effectsS
 	fragBuf.convertToStringBuffer();
 
 	gm::GMGLShaderInfo shadersInfo[] = {
-		{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-		{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+		{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)vertBuf.buffer, vertPath },
+		{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)fragBuf.buffer, fragPath },
 	};
 
 	effectsShaderProgram->attachShader(shadersInfo[0]);
@@ -400,8 +400,8 @@ void DemostrationEntrance::initLoadShaderProgram(gm::GMGLShaderProgram* forwardS
 		fragBuf.convertToStringBuffer();
 
 		gm::GMGLShaderInfo shadersInfo[] = {
-			{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+			{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)vertBuf.buffer, vertPath },
+			{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)fragBuf.buffer, fragPath },
 		};
 
 		forwardShaderProgram->attachShader(shadersInfo[0]);
@@ -417,8 +417,8 @@ void DemostrationEntrance::initLoadShaderProgram(gm::GMGLShaderProgram* forwardS
 		fragBuf.convertToStringBuffer();
 
 		gm::GMGLShaderInfo shadersInfo[] = {
-			{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+			{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)vertBuf.buffer, vertPath },
+			{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)fragBuf.buffer, fragPath },
 		};
 
 		(*deferredShaderProgram[0]).attachShader(shadersInfo[0]);
@@ -434,8 +434,8 @@ void DemostrationEntrance::initLoadShaderProgram(gm::GMGLShaderProgram* forwardS
 		fragBuf.convertToStringBuffer();
 
 		gm::GMGLShaderInfo shadersInfo[] = {
-			{ gm::GM_VERTEX_SHADER, (const char*)vertBuf.buffer, vertPath },
-			{ gm::GM_FRAGMENT_SHADER, (const char*)fragBuf.buffer, fragPath },
+			{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Vertex), (const char*)vertBuf.buffer, vertPath },
+			{ gm::GMGLShaderInfo::toGLShaderType(gm::GMShaderType::Pixel), (const char*)fragBuf.buffer, fragPath },
 		};
 
 		(*deferredShaderProgram[1]).attachShader(shadersInfo[0]);

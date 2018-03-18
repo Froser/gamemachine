@@ -4,6 +4,7 @@
 #include <gmcom.h>
 #include <gmdxincludes.h>
 #include <gmmodel.h>
+#include <tools.h>
 BEGIN_NS
 
 struct GMMVPMatrix;
@@ -14,12 +15,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
-
-	GMComPtr<ID3D11VertexShader> vertexShader;
-	GMComPtr<ID3D10Blob> vertexShaderBuffer;
-	GMComPtr<ID3D11PixelShader> pixelShader;
-	GMComPtr<ID3D10Blob> pixelShaderBuffer;
-	GMComPtr<ID3DX11Effect> effect;
+	GMScopePtr<IShaderProgram> shaderProgram;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	bool ready = false;
@@ -28,14 +24,6 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
 {
 	DECLARE_PRIVATE(GMDx11GraphicEngine)
-
-private:
-	enum class ShaderMode
-	{
-		None,
-		Custom,
-		Effect,
-	};
 
 public:
 	virtual void init() override;
@@ -51,7 +39,7 @@ public:
 	virtual void endUseStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
-	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
+	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) override;
 	virtual bool event(const GameMachineMessage& e) override;
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
 	{
@@ -94,39 +82,15 @@ public:
 		return d->renderTargetView;
 	}
 
-	GMComPtr<ID3D11VertexShader> getVertexShader()
-	{
-		D(d);
-		return d->vertexShader;
-	}
-
-	GMComPtr<ID3D11PixelShader> getPixelShader()
-	{
-		D(d);
-		return d->pixelShader;
-	}
-
 public:
 	void updateModelMatrix();
 	IRenderer* getRenderer(GMModelType objectType);
-	HRESULT createInputLayout(const D3D11_INPUT_ELEMENT_DESC* desc, GMuint descCount, OUT ID3D11InputLayout** layout);
 
 private:
 	void initShaders();
-	void updateProjectionMatrix();
-	void updateAllMatrices();
 	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void forwardRender(GMGameObject *objects[], GMuint count);
 	void directDraw(GMGameObject *objects[], GMuint count);
-
-private:
-	inline ShaderMode getShaderMode()
-	{
-		D(d);
-		if (d->effect)
-			return ShaderMode::Effect;
-		return ShaderMode::Custom;
-	}
 };
 
 END_NS

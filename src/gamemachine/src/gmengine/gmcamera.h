@@ -8,13 +8,6 @@
 BEGIN_NS
 
 //Camera
-struct GMMVPMatrix
-{
-	GMMat4 projMatrix;
-	GMMat4 viewMatrix;
-	GMMat4 modelMatrix; // 在绘制的时候，将物体的Model transform放到此处
-};
-
 GM_ALIGNED_STRUCT(GMCameraLookAt)
 {
 	GMCameraLookAt() = default;
@@ -71,12 +64,8 @@ GM_PRIVATE_OBJECT(GMFrustum)
 	GMfloat n;
 	GMfloat f;
 
-	GMMVPMatrix mvpMatrix;
-
-#if GM_USE_DX11
-	//DirectX
-	GMComPtr<ID3D11Buffer> dxMatrixBuffer;
-#endif
+	GMMat4 projectionMatrix;
+	GMMat4 viewMatrix;
 };
 
 class GMSpriteGameObject;
@@ -108,13 +97,6 @@ public:
 public:
 	const GMMat4& getProjectionMatrix();
 	const GMMat4& getViewMatrix();
-	const GMMat4& getModelMatrix();
-
-#if GM_USE_DX11
-	bool createDxMatrixBuffer();
-	void setDxModelMatrix(const GMMat4& matrix);
-	GMComPtr<ID3D11Buffer> getDxMatrixBuffer();
-#endif
 
 public:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);

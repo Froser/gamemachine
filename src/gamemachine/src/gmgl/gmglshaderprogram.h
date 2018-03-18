@@ -9,6 +9,8 @@ struct GMGLShaderInfo
 	GMuint type;
 	GMString source;
 	GMString filename;
+
+	static GMuint toGLShaderType(GMShaderType type);
 };
 
 typedef AlignedVector<GMuint> GMGLShaderIDList;
@@ -37,14 +39,14 @@ public:
 
 public:
 	void useProgram();
-	void setMatrix4(const char* name, const GMfloat value[16]);
+	void setMatrix4(const char* name, const GMMat4& value);
 	void setVec4(const char* name, const GMFloat4& value);
 	void setVec3(const char* name, const GMfloat value[3]);
 	void setInt(const char* name, GMint value);
 	void setFloat(const char* name, GMfloat value);
 	void setBool(const char* name, bool value);
 
-	void setMatrix4(const GMString& name, const GMfloat value[16]);
+	void setMatrix4(const GMString& name, const GMMat4& value);
 	void setVec4(const GMString& name, const GMFloat4& value);
 	void setVec3(const GMString& name, const GMfloat value[3]);
 	void setInt(const GMString& name, GMint value);
@@ -60,6 +62,9 @@ private:
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
 	void expandAlias(const GMString& alias, IN OUT GMString& source);
 	GMString& replaceLine(IN OUT GMString& line);
+public:
+	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
+	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
 };
 
 END_NS

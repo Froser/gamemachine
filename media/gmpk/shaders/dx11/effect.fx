@@ -1,3 +1,6 @@
+Texture2D diffuseTex;
+SamplerState samLinear;
+
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -51,7 +54,7 @@ VS_OUTPUT VS( VS_INPUT input )
 
 float4 PS( PS_INPUT input ) : SV_Target
 {
-  return float4(1,0,0,1);
+  return diffuseTex.Sample( samLinear, input.texcoord);
 }
 
 technique11 BasicTech

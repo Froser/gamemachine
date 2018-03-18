@@ -3,15 +3,17 @@
 #include <gmdxincludes.h>
 #include "foundation/gamemachine.h"
 #include <gmcom.h>
+#include "gmdx11shaderprogram.h"
 
 extern "C"
 {
-	HRESULT GMLoadDx11Shader(
+	IShaderProgram* GMLoadDx11Shader(
 		IGraphicEngine* engine,
 		const gm::GMString& filename,
 		const gm::GMString& entryPoint,
 		const gm::GMString& profile,
-		GMShaderType type
+		GMShaderType type,
+		const IShaderProgram* shaderProgram
 	)
 	{
 		gm::GMComPtr<ID3D10Blob> errorMessage;
@@ -22,7 +24,7 @@ extern "C"
 		gm::GMString path;
 		GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Shaders, filename, &buf, &path);
 		if (!buf.size)
-			return E_FAIL;
+			return nullptr;
 
 		UINT flag = D3D10_SHADER_ENABLE_STRICTNESS;
 #if _DEBUG
@@ -60,51 +62,15 @@ extern "C"
 				gm_error(L"Cannot find shader file %s", path.c_str());
 				GM_ASSERT(false);
 			}
-			return E_FAIL;
+			return nullptr;
 		}
 
 		GMComPtr<ID3D11Device> device;
 		bool b = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 		if (!b || !device)
-			return E_FAIL;
+			return nullptr;
 
-		if (type == GM_VERTEX_SHADER)
-		{
-			GMComPtr<ID3D11VertexShader> vertexShader;
-			hr = device->CreateVertexShader(
-				shaderBuffer->GetBufferPointer(),
-				shaderBuffer->GetBufferSize(),
-				NULL,
-				&vertexShader
-			);
-			GM_COM_CHECK_RETURN(hr, hr);
-			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11VertexShader, vertexShader.get());
-			if (!b)
-				return E_FAIL;
-
-			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11VertexShaderBuffer, shaderBuffer.get());
-			if (!b)
-				return E_FAIL;
-		}
-		else if (type == GM_PIXEL_SHADER)
-		{
-			GMComPtr<ID3D11PixelShader> pixelShader;
-			hr = device->CreatePixelShader(
-				shaderBuffer->GetBufferPointer(),
-				shaderBuffer->GetBufferSize(),
-				NULL,
-				&pixelShader
-			);
-			GM_COM_CHECK_RETURN(hr, hr);
-			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11PixelShader, pixelShader.get());
-			if (!b)
-				return E_FAIL;
-
-			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11PixelShaderBuffer, shaderBuffer.get());
-			if (!b)
-				return E_FAIL;
-		}
-		else if (type == GM_EFFECT_SHADER)
+		if (type == GMShaderType::Effect)
 		{
 			GMComPtr<ID3DX11Effect> effect;
 			GM_DX_HR(D3DX11CreateEffectFromMemory(
@@ -114,16 +80,19 @@ extern "C"
 				device,
 				&effect
 			));
-			b = engine->setInterface(gm::GameMachineInterfaceID::D3D11Effect, effect.get());
+
+			GMDx11EffectShaderProgram* shaderProgram = new GMDx11EffectShaderProgram(effect);
+			b = engine->setInterface(GameMachineInterfaceID::D3D11ShaderProgram, shaderProgram);
 			GM_ASSERT(b);
-			return S_OK;
+
+			return shaderProgram;
 		}
 		else
 		{
-			return E_INVALIDARG;
+			return nullptr;
 		}
 
-		return S_OK;
+		return nullptr;
 	}
 
 	const D3D11_RASTERIZER_DESC& GMGetDefaultRasterizerDesc(

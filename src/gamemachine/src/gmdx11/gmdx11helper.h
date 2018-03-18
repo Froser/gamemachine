@@ -15,15 +15,17 @@ extern "C"
 	  \param filename 读取的文件名。此方法会通过GMGamePackage在着色器所在目录读取文件。
 	  \param entryPoint 着色器程序的入口点。
 	  \param profile 着色器配置。
-	  \param out 着色器文件生成的缓存。
+	  \param type 着色器类型，目前只能为GMShaderType::Effect。
+	  \param shaderProgram 用户自己的着色器程序。如果为nullptr，则使用默认着色器程序。
 	  \return 操作是否成功。
 	*/
-	HRESULT GMLoadDx11Shader(
+	IShaderProgram* GMLoadDx11Shader(
 		IGraphicEngine* engine,
 		const gm::GMString& filename,
 		const gm::GMString& entryPoint,
 		const gm::GMString& profile,
-		GMShaderType type
+		GMShaderType type,
+		const IShaderProgram* shaderProgram
 	);
 
 	//! 返回一个默认的光栅描述结构体。

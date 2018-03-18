@@ -5,6 +5,7 @@
 #include <gmenums.h>
 
 struct GMFloat4;
+struct GMMat4;
 
 BEGIN_NS
 
@@ -67,23 +68,19 @@ enum class GameMachineInterfaceID
 	D3D11DepthStencilView,
 	D3D11RenderTargetView,
 
-	D3D11VertexShader,
-	D3D11VertexShaderBuffer,
-	D3D11PixelShader,
-	D3D11PixelShaderBuffer,
 	D3D11Buffer,
+	D3D11ShaderProgram,
 	D3D11Effect,
 
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
 };
 
-enum GMShaderType
+enum class GMShaderType
 {
-	GM_FRAGMENT_SHADER = 0x8B30,
-	GM_PIXEL_SHADER = GM_FRAGMENT_SHADER, // 同义
-	GM_VERTEX_SHADER = 0x8B31,
-	GM_EFFECT_SHADER, //DirectX11 Effect
+	Pixel,
+	Vertex,
+	Effect,
 };
 
 struct GameMachineMessage
@@ -167,10 +164,10 @@ enum class GMMovement
 	Jump,
 };
 
-GM_INTERFACE(IShaderProgram)
+GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 {
 	virtual void useProgram() = 0;
-	virtual void setMatrix4(const char* name, const GMfloat value[16]) = 0;
+	virtual void setMatrix4(const char* name, const GMMat4& value) = 0;
 	virtual void setVec4(const char* name, const GMFloat4&) = 0;
 	virtual void setVec3(const char* name, const GMfloat value[3]) = 0;
 	virtual void setInt(const char* name, GMint value) = 0;
