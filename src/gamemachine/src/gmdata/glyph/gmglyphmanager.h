@@ -2,6 +2,7 @@
 #define __GLYPHMANAGER_H__
 #include <gmcommon.h>
 #include <map>
+
 BEGIN_NS
 
 struct ITexture;
@@ -16,11 +17,20 @@ struct GMGlyphInfo
 	GMfloat advance;
 };
 
+struct GMGlyphBitmap
+{
+	GMbyte* buffer;
+	GMuint width;
+	GMuint rows;
+};
+
 typedef Map<GMint, Map<GMwchar, GMGlyphInfo>> CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
 	CharList chars;
+	GMint cursor_u, cursor_v;
+	GMfloat maxHeight;
 };
 
 class GMGlyphManager : public GMObject
@@ -36,7 +46,7 @@ public:
 	};
 
 public:
-	GMGlyphManager();
+	GMGlyphManager() = default;
 	virtual ~GMGlyphManager() {}
 
 public:
@@ -45,10 +55,11 @@ public:
 public:
 	virtual ITexture* glyphTexture() = 0;
 
-protected:
-	virtual const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize) = 0;
+private:
+	virtual void createTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;
 
-protected:
+private:
+	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize);
 	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMwchar ch, const GMGlyphInfo& glyph);
 	const GMGlyphInfo& getChar(GMFontSizePt fontSize, GMwchar ch);
 };

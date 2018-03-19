@@ -66,6 +66,9 @@ struct GMGameMachineRunningStates
 	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
 	bool crashDown = false; //!< 程序是否已崩溃。当遇到不可恢复的错误时，此项为true。
 
+	// 由GameMachine生成
+	GMRenderEnvironment renderEnvironment = GMRenderEnvironment::Invalid; //!< GameMachine采取的渲染环境。渲染环境决定着本程序将用何种数据结构、坐标系来进行运算。需要与窗口环境一致。
+
 	// 下面字段由图形引擎生成
 	GMfloat minDepth = 0; //!< 近平面的深度值。
 	GMfloat maxDepth = 1; //!< 远平面的深度值。
@@ -86,7 +89,6 @@ GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMClock clock;
 
-	GMRenderEnvironment renderEnv = GMRenderEnvironment::Invalid;
 	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	IGraphicEngine* engine = nullptr;
@@ -252,19 +254,6 @@ public:
 	  获取当前鼠标形状。鼠标形状是在渲染窗口中的一个GMGameObject对象，它不会溢出窗口，因此窗口的边框将会遮挡它。
 	*/
 	inline GMCursorGameObject* getCursor() { D(d); return d->cursor; }
-
-	//! 获取当前渲染环境。
-	/*!
-	  渲染环境决定着本程序将用何种数据结构、坐标系来进行运算。需要与窗口环境一致。
-	  \return 当前渲染环境。
-	  \sa init()
-	*/
-	inline GMRenderEnvironment getRenderEnvironment()
-	{
-		D(d); 
-		GM_ASSERT(d->renderEnv != GMRenderEnvironment::Invalid);
-		return d->renderEnv;
-	}
 
 	//! 开始运行GameMachine。
 	/*!

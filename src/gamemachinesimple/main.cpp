@@ -18,10 +18,10 @@ gm::GMRenderEnvironment GetRenderEnv()
 	return s_env;
 }
 
-int WINAPI WinMain(
+int WINAPI wWinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
-	char * lpCmdLine,
+	LPWSTR lpCmdLine,
 	int nCmdShow
 )
 {

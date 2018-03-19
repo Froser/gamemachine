@@ -25,5 +25,6 @@ void GMDx11Factory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GM
 
 void GMDx11Factory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
+	GM_ASSERT(glyphManager);
 	*glyphManager = nullptr;
 }

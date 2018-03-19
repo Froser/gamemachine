@@ -24,7 +24,7 @@ public:
 	virtual ITexture* glyphTexture() override;
 
 protected:
-	virtual const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize) override;
+	void createTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) override;
 };
 
 END_NS

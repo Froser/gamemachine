@@ -16,6 +16,10 @@
 #include "demo/model.h"
 #include "demo/collision.h"
 
+#if GM_USE_DX11
+#include <gmdx11helper.h>
+#endif
+
 extern gm::GMRenderEnvironment GetRenderEnv();
 
 namespace
@@ -350,23 +354,33 @@ DemostrationEntrance::~DemostrationEntrance()
 
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
-	bool b;
-	gm::GMGLShaderProgram* effectsShaderProgram = new gm::GMGLShaderProgram();
-	initLoadEffectsShader(effectsShaderProgram);
-	b = engine->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
-	GM_ASSERT(b);
+	auto& env = GM.getGameMachineRunningStates().renderEnvironment;
 
-	gm::GMGLShaderProgram* forwardShaderProgram = new gm::GMGLShaderProgram();
-	gm::GMGLShaderProgram* deferredShaderPrograms[2] = { new gm::GMGLShaderProgram(), new gm::GMGLShaderProgram() };
-	initLoadShaderProgram(forwardShaderProgram, deferredShaderPrograms);
-	b = engine->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
-	GM_ASSERT(b);
+	if (env == gm::GMRenderEnvironment::OpenGL)
+	{
+		bool b;
+		gm::GMGLShaderProgram* effectsShaderProgram = new gm::GMGLShaderProgram();
+		initLoadEffectsShader(effectsShaderProgram);
+		b = engine->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
+		GM_ASSERT(b);
 
-	b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
-	GM_ASSERT(b);
+		gm::GMGLShaderProgram* forwardShaderProgram = new gm::GMGLShaderProgram();
+		gm::GMGLShaderProgram* deferredShaderPrograms[2] = { new gm::GMGLShaderProgram(), new gm::GMGLShaderProgram() };
+		initLoadShaderProgram(forwardShaderProgram, deferredShaderPrograms);
+		b = engine->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
+		GM_ASSERT(b);
 
-	b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
-	GM_ASSERT(b);
+		b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
+		GM_ASSERT(b);
+
+		b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
+		GM_ASSERT(b);
+	}
+	else
+	{
+		GM_ASSERT(env == gm::GMRenderEnvironment::DirectX11);
+		gm::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", L"", L"fx_5_0", gm::GMShaderType::Effect, nullptr);
+	}
 }
 
 void DemostrationEntrance::initLoadEffectsShader(gm::GMGLShaderProgram* effectsShaderProgram)

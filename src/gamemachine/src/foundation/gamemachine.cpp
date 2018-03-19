@@ -217,21 +217,21 @@ void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
 	case GMRenderEnvironment::OpenGL:
 		if (GMQueryCapability(GMCapability::SupportOpenGL))
 		{
-			d->renderEnv = renv;
+			d->states.renderEnvironment = renv;
 			return;
 		}
 	case GMRenderEnvironment::DirectX11:
 		if (GMQueryCapability(GMCapability::SupportDirectX11))
 		{
-			d->renderEnv = renv;
+			d->states.renderEnvironment = renv;
 			return;
 		}
 		break;
 	default:
 		break;
 	}
-	GM_ASSERT(!"Wrong render env");
-	d->renderEnv = GMRenderEnvironment::OpenGL;
+	GM_ASSERT(!"Wrong render environment");
+	d->states.renderEnvironment = GMRenderEnvironment::OpenGL;
 }
 
 bool GameMachine::checkCrashDown()

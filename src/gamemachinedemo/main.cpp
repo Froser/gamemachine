@@ -23,21 +23,19 @@ gm::GMRenderEnvironment GetRenderEnv()
 	return s_env;
 }
 
-int WINAPI WinMain(
+int WINAPI wWinMain(
 	HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
-	char * lpCmdLine,
+	LPWSTR lpCmdLine,
 	int nCmdShow
 )
 {
-	SetRenderEnv(
-#if GM_USE_DX11
-		//gm::GMRenderEnvironment::DirectX11
-		gm::GMRenderEnvironment::OpenGL
-#else
-		gm::GMRenderEnvironment::OpenGL
-#endif
-	);
+	LPWSTR cmdLine = GetCommandLineW();
+	gm::GMuint sz = gm::GMString::countOfCharacters(cmdLine);
+	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
+	if (sz > 10 && gm::GMString(cmdLine + sz - 10) == "-directx11")
+		env = gm::GMRenderEnvironment::DirectX11;
+	SetRenderEnv(env);
 
 	gm::IFactory* factory = nullptr;
 	if (GetRenderEnv() == gm::GMRenderEnvironment::OpenGL)
