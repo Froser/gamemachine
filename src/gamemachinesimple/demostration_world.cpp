@@ -87,9 +87,6 @@ void DemostrationEntrance::start()
 void DemostrationEntrance::event(gm::GameMachineEvent evt)
 {
 	D(d);
-	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->newFrame();
-
 	switch (evt)
 	{
 	case gm::GameMachineEvent::FrameStart:
@@ -99,8 +96,12 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::Simulate:
 		break;
 	case gm::GameMachineEvent::Render:
+	{
+		gm::IGraphicEngine* engine = GM.getGraphicEngine();
+		engine->newFrame();
 		getWorld()->renderScene();
 		break;
+	}
 	case gm::GameMachineEvent::Activate:
 	{
 		getWorld()->notifyControls();

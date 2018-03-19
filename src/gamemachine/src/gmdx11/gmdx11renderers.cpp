@@ -134,10 +134,10 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	context->IASetPrimitiveTopology(getMode(model->getMesh()));
 	
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	//TODO 不要写死名字
-	shaderProgram->setMatrix4("worldMatrix", Transpose(parent->getTransform()));
-	shaderProgram->setMatrix4("viewMatrix", Transpose(GM.getCamera().getFrustum().getViewMatrix()));
-	shaderProgram->setMatrix4("projectionMatrix", Transpose(GM.getCamera().getFrustum().getProjectionMatrix()));
+	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
+	shaderProgram->setMatrix4(desc.ModelMatrix, Transpose(parent->getTransform()));
+	shaderProgram->setMatrix4(desc.ViewMatrix, Transpose(GM.getCamera().getFrustum().getViewMatrix()));
+	shaderProgram->setMatrix4(desc.ProjectionMatrix, Transpose(GM.getCamera().getFrustum().getProjectionMatrix()));
 }
 
 void GMDx11Renderer::endModel()

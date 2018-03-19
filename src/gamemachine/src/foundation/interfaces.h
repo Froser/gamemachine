@@ -164,6 +164,14 @@ enum class GMMovement
 	Jump,
 };
 
+struct GMShaderVariablesDesc
+{
+	const char* ModelMatrix;
+	const char* ViewMatrix;
+	const char* ProjectionMatrix;
+	const char* InverseTransposeModelMatrix;
+};
+
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 {
 	virtual void useProgram() = 0;
@@ -173,6 +181,7 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 	virtual void setInt(const char* name, GMint value) = 0;
 	virtual void setFloat(const char* name, GMfloat value) = 0;
 	virtual void setBool(const char* name, bool value) = 0;
+	virtual const GMShaderVariablesDesc& getDesc() = 0;
 };
 
 class GMLight;

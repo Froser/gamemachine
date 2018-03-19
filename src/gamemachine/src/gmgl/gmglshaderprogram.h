@@ -38,13 +38,14 @@ public:
 	void attachShader(const GMGLShaderInfo& shaderCfgs);
 
 public:
-	void useProgram();
-	void setMatrix4(const char* name, const GMMat4& value);
-	void setVec4(const char* name, const GMFloat4& value);
-	void setVec3(const char* name, const GMfloat value[3]);
-	void setInt(const char* name, GMint value);
-	void setFloat(const char* name, GMfloat value);
-	void setBool(const char* name, bool value);
+	virtual void useProgram();
+	virtual void setMatrix4(const char* name, const GMMat4& value);
+	virtual void setVec4(const char* name, const GMFloat4& value);
+	virtual void setVec3(const char* name, const GMfloat value[3]);
+	virtual void setInt(const char* name, GMint value);
+	virtual void setFloat(const char* name, GMfloat value);
+	virtual void setBool(const char* name, bool value);
+	virtual const GMShaderVariablesDesc& getDesc();
 
 	void setMatrix4(const GMString& name, const GMMat4& value);
 	void setVec4(const GMString& name, const GMFloat4& value);

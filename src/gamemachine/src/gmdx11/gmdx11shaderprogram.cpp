@@ -2,6 +2,21 @@
 #include "gmdx11shaderprogram.h"
 #include <linearmath.h>
 
+namespace
+{
+	inline const GMShaderVariablesDesc& GMGetDefaultShaderVariablesDesc()
+	{
+		static GMShaderVariablesDesc desc =
+		{
+			"WorldMatrix",
+			"ViewMatrix",
+			"ProjectionMatrix",
+			"InverseTransposeModelMatrix"
+		};
+		return desc;
+	}
+}
+
 GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect)
 {
 	D(d);
@@ -68,4 +83,9 @@ bool GMDx11EffectShaderProgram::getInterface(GameMachineInterfaceID id, void** o
 		return true;
 	}
 	return false;
+}
+
+const GMShaderVariablesDesc& GMDx11EffectShaderProgram::getDesc()
+{
+	return GMGetDefaultShaderVariablesDesc();
 }

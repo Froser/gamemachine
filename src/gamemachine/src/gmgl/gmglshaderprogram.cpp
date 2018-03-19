@@ -10,6 +10,21 @@
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
+namespace
+{
+	inline const GMShaderVariablesDesc& GMGetDefaultShaderVariablesDesc()
+	{
+		static GMShaderVariablesDesc desc =
+		{
+			"GM_model_matrix",
+			"GM_view_matrix",
+			"GM_projection_matrix",
+			"GM_inverse_transpose_model_matrix"
+		};
+		return desc;
+	}
+}
+
 GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
 {
 	switch (type)
@@ -308,4 +323,9 @@ bool GMGLShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
 bool GMGLShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
 {
 	return false;
+}
+
+const GMShaderVariablesDesc& GMGLShaderProgram::getDesc()
+{
+	return GMGetDefaultShaderVariablesDesc();
 }

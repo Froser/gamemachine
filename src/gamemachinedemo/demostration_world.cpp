@@ -278,8 +278,11 @@ void DemostrationEntrance::start()
 void DemostrationEntrance::event(gm::GameMachineEvent evt)
 {
 	D(d);
-	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->newFrame();
+	if (evt == gm::GameMachineEvent::Render)
+	{
+		gm::IGraphicEngine* engine = GM.getGraphicEngine();
+		engine->newFrame();
+	}
 
 	DemoHandler* currentDemo = getWorld()->getCurrentDemo();
 	if (currentDemo)
