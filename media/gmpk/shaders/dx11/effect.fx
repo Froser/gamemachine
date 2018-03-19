@@ -6,9 +6,9 @@ SamplerState samLinear;
 //--------------------------------------------------------------------------------------
 cbuffer WorldConstantBuffer: register( b0 ) 
 {
-  matrix worldMatrix;
-  matrix viewMatrix;
-  matrix projectionMatrix;
+  matrix WorldMatrix;
+  matrix ViewMatrix;
+  matrix ProjectionMatrix;
 }
 
 //--------------------------------------------------------------------------------------
@@ -39,9 +39,9 @@ VS_OUTPUT VS( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.position = float4(input.position.x, input.position.y, input.position.z, 1);
-    output.position = mul(output.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
+    output.position = mul(output.position, WorldMatrix);
+    output.position = mul(output.position, ViewMatrix);
+    output.position = mul(output.position, ProjectionMatrix);
 
     output.normal = input.normal;
     output.texcoord = input.texcoord;
