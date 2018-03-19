@@ -3,6 +3,8 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
+#define SAFE_ASSIGN(mb, df, pos) ((pos) >= (mb).size()) ? df : (mb[pos])
+
 GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* model)
 	: GMModelPainter(model)
 {
@@ -41,15 +43,15 @@ void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
 
 		{
 			auto& data_ref = model->getMesh()->normals();
-			vd.normal[0] = data_ref[i * 3];
-			vd.normal[1] = data_ref[i * 3 + 1];
-			vd.normal[2] = data_ref[i * 3 + 2];
+			vd.normals[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
+			vd.normals[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
+			vd.normals[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
 		}
 
 		{
 			auto& data_ref = model->getMesh()->texcoords();
-			vd.texcoord[0] = data_ref[i * 2];
-			vd.texcoord[1] = data_ref[i * 2 + 1];
+			vd.texcoords[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
+			vd.texcoords[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
 		}
 
 		packedData.push_back(vd);

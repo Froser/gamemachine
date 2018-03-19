@@ -3,6 +3,7 @@
 #include "gmdx11graphic_engine.h"
 #include "gmdx11modelpainter.h"
 #include "gmdx11texture.h"
+#include "gmdx11glyphmanager.h"
 
 void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -26,5 +27,5 @@ void GMDx11Factory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GM
 void GMDx11Factory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
 	GM_ASSERT(glyphManager);
-	*glyphManager = nullptr;
+	*glyphManager = new GMDx11GlyphManager();
 }

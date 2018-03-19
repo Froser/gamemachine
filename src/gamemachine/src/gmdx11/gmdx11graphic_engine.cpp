@@ -45,12 +45,10 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 
 void GMDx11GraphicEngine::addLight(const GMLight& light)
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::removeLights()
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::clearStencil()
@@ -61,32 +59,26 @@ void GMDx11GraphicEngine::clearStencil()
 
 void GMDx11GraphicEngine::beginCreateStencil()
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::endCreateStencil()
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::beginUseStencil(bool inverse)
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::endUseStencil()
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::beginBlend(GMS_BlendFunc sfactor /*= GMS_BlendFunc::ONE*/, GMS_BlendFunc dfactor /*= GMS_BlendFunc::ONE*/)
 {
-	// throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11GraphicEngine::endBlend()
 {
-	// throw std::logic_error("The method or operation is not implemented.");
 }
 
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /*= GMShaderProgramType::CurrentShaderProgram*/)

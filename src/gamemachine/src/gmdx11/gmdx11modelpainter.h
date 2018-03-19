@@ -11,8 +11,8 @@ BEGIN_NS
 struct GMDx11VertexData
 {
 	Array<GMfloat, 3> vertices;
-	Array<GMfloat, 3> normal;
-	Array<GMfloat, 2> texcoord;
+	Array<GMfloat, 3> normals;
+	Array<GMfloat, 2> texcoords;
 };
 
 class GMDx11GraphicEngine;

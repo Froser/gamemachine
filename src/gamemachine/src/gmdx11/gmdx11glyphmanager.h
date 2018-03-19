@@ -2,15 +2,30 @@
 #define __GMDX11GLYPHMANAGER_H__
 #include <gmcommon.h>
 #include <gmglyphmanager.h>
+#include <gmcom.h>
 BEGIN_NS
 
-class GMDx11GlyphTexture
+GM_PRIVATE_OBJECT(GMDx11GlyphTexture)
 {
+	GMComPtr<ID3D11Device> device;
+	GMComPtr<ID3D11ShaderResourceView> resourceView;
+	GMComPtr<ID3D11Texture2D> texture;
+};
 
+class GMDx11GlyphTexture : public ITexture
+{
+	DECLARE_PRIVATE(GMDx11GlyphTexture)
+
+public:
+	GMDx11GlyphTexture();
+
+public:
+	virtual void drawTexture(GMTextureFrames* frames) override;
 };
 
 GM_PRIVATE_OBJECT(GMDx11GlyphManager)
 {
+	GMScopePtr<ITexture> texture;
 };
 
 class GMDx11GlyphManager : public GMGlyphManager

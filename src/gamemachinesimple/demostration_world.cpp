@@ -22,11 +22,14 @@ void DemostrationWorld::init()
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
 	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
-	d->gameObj = new gm::GMGameObject(asset);
-	gm::ITexture* tex = nullptr;
-	gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
-	gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
-	getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+	gm::GMImage2DGameObject* img2d = new gm::GMImage2DGameObject();
+	d->gameObj = img2d;
+	img2d->setModel(asset);
+	img2d->setText("Hello world");
+	//gm::ITexture* tex = nullptr;
+	//gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
+	//gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
+	//getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 
 	this->addObjectAndInit(d->gameObj);
 }
@@ -72,14 +75,13 @@ void DemostrationEntrance::init()
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
 	GMSetRenderState(RESOLUTION_X, rc.width);
 	GMSetRenderState(RESOLUTION_Y, rc.height);
-
-	d->world = new DemostrationWorld();
-	d->world->init();
 }
 
 void DemostrationEntrance::start()
 {
 	D(d);
+	d->world = new DemostrationWorld();
+	d->world->init();
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	getWorld()->resetProjectionAndEye();
 }
