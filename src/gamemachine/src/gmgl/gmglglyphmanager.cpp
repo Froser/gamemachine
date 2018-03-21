@@ -81,7 +81,7 @@ ITexture* GMGLGlyphManager::glyphTexture()
 	return d->texture;
 }
 
-void GMGLGlyphManager::createTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo)
+void GMGLGlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo)
 {
 	D(d);
 	// 创建纹理

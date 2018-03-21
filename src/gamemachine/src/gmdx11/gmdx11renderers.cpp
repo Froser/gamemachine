@@ -79,7 +79,7 @@ namespace
 			bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
 			if (!states[(GMuint)cullMode][(GMuint)frontFace])
 			{
-				D3D11_RASTERIZER_DESC desc = GMGetDefaultRasterizerDesc(multisampleEnable, multisampleEnable);
+				D3D11_RASTERIZER_DESC desc = GMDx11Helper::GMGetDx11DefaultRasterizerDesc(multisampleEnable, multisampleEnable);
 				desc.CullMode = cullMode == GMS_Cull::CULL ? D3D11_CULL_BACK : D3D11_CULL_NONE;
 				desc.FrontCounterClockwise = frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE;
 				createRasterizerState(desc, &states[(GMuint)cullMode][(GMuint)frontFace]);

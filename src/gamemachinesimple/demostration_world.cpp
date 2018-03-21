@@ -17,15 +17,15 @@ void DemostrationWorld::init()
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	
 	// 创建一个带纹理的对象
-	gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	gm::GMfloat pos[] = { 0, 0, 0 };
-	gm::GMModel* model;
-	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
-	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
 	gm::GMImage2DGameObject* img2d = new gm::GMImage2DGameObject();
-	d->gameObj = img2d;
-	img2d->setModel(asset);
 	img2d->setText("Hello world");
+	d->gameObj = img2d;
+	//gm::GMfloat extents[] = { 1.f, .5f, .5f };
+	//gm::GMfloat pos[] = { 0, 0, 0 };
+	//gm::GMModel* model;
+	//gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
+	//gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
+	//d->gameObj = new gm::GMGameObject(asset);
 	//gm::ITexture* tex = nullptr;
 	//gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
 	//gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
@@ -151,6 +151,6 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
 #if GM_USE_DX11
-	gm::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", L"", L"fx_5_0", gm::GMShaderType::Effect, nullptr);
+	gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", L"", L"fx_5_0", gm::GMShaderType::Effect, nullptr);
 #endif
 }

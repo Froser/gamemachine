@@ -56,7 +56,7 @@ public:
 	virtual ITexture* glyphTexture() = 0;
 
 private:
-	virtual void createTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;
+	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;
 
 private:
 	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize);

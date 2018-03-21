@@ -2,6 +2,7 @@
 #include "gmdx11texture.h"
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
+#include "gmdx11helper.h"
 
 namespace
 {
@@ -17,35 +18,6 @@ namespace
 			GM_ASSERT(false);
 			return DXGI_FORMAT_UNKNOWN;
 		}
-	}
-
-	const D3D11_SAMPLER_DESC& getDefaultSamplerDesc()
-	{
-		static D3D11_SAMPLER_DESC desc = {
-			D3D11_FILTER_MIN_MAG_MIP_LINEAR,
-			D3D11_TEXTURE_ADDRESS_WRAP,
-			D3D11_TEXTURE_ADDRESS_WRAP,
-			D3D11_TEXTURE_ADDRESS_WRAP,
-			0,
-			0,
-			D3D11_COMPARISON_NEVER,
-			0,
-			D3D11_FLOAT32_MAX
-		};
-		return desc;
-	}
-
-	D3D11_FILTER getFilter(GMS_TextureFilter min, GMS_TextureFilter mag)
-	{
-		//TODO 缺少mip过滤
-		if (min == GMS_TextureFilter::LINEAR && mag == GMS_TextureFilter::LINEAR)
-			return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-
-		if (min == GMS_TextureFilter::NEAREST && mag == GMS_TextureFilter::NEAREST)
-			return D3D11_FILTER_MIN_MAG_MIP_POINT;
-
-		//TODO
-		return D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	}
 
 	D3D11_TEXTURE_ADDRESS_MODE getAddressMode(GMS_Wrap wrapMode)
@@ -90,8 +62,8 @@ void GMDx11Texture::drawTexture(GMTextureFrames* frames)
 	if (!d->samplerState)
 	{
 		// 创建采样器
-		D3D11_SAMPLER_DESC desc = getDefaultSamplerDesc();
-		desc.Filter = getFilter(frames->getMinFilter(), frames->getMagFilter());
+		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
+		desc.Filter = GMDx11Helper::GMGetDx11Filter(frames->getMinFilter(), frames->getMagFilter());
 		desc.AddressU = getAddressMode(frames->getWrapS());
 		desc.AddressV = getAddressMode(frames->getWrapT());
 		GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));

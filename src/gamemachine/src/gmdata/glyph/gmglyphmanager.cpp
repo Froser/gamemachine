@@ -152,7 +152,7 @@ const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize)
 		bitmapGlyph->bitmap.width,
 		bitmapGlyph->bitmap.rows
 	};
-	createTexture(bitmap, glyphInfo);
+	updateTexture(bitmap, glyphInfo);
 
 	// 释放资源
 	FT_Done_Glyph(glyph);

@@ -24,9 +24,12 @@ GM_PRIVATE_OBJECT(GMGlyphObject)
 class GMGlyphObject : public GMControlGameObject
 {
 	DECLARE_PRIVATE_AND_BASE(GMGlyphObject, GMControlGameObject)
+	GM_FRIEND_CLASS(GMImage2DGameObject)
+
+private:
+	GMGlyphObject();
 
 public:
-	GMGlyphObject();
 	GMGlyphObject(ITypoEngine* typo);
 	~GMGlyphObject();
 
@@ -72,9 +75,7 @@ GM_PRIVATE_OBJECT(GMImage2DBorder)
 class GMImage2DBorder : public GMObject
 {
 	DECLARE_PRIVATE(GMImage2DBorder)
-
-	friend class GMImage2DGameObject;
-	friend struct GMImage2DGameObjectPrivate;
+	GM_FRIEND_CLASS(GMImage2DGameObject)
 
 private:
 	GMImage2DBorder() = default;

@@ -91,6 +91,14 @@ void GMDx11ModelPainter::transfer()
 	GMComPtr<ID3D11Device> device = d->engine->getDevice();
 	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->buffer));
 
+	IF_ENABLED(mesh, GMVertexDataType::Position)	mesh->clear_positions_and_save_byte_size();
+	IF_ENABLED(mesh, GMVertexDataType::Normal)		mesh->clear_normals_and_save_byte_size();
+	IF_ENABLED(mesh, GMVertexDataType::UV)			mesh->clear_texcoords_and_save_byte_size();
+	IF_ENABLED(mesh, GMVertexDataType::Tangent)		mesh->clear_tangents_and_save_byte_size();
+	IF_ENABLED(mesh, GMVertexDataType::Bitangent)	mesh->clear_bitangents_and_save_byte_size();
+	IF_ENABLED(mesh, GMVertexDataType::Lightmap)	mesh->clear_lightmaps_and_save_byte_size();
+	IF_ENABLED(mesh, GMVertexDataType::Color)		mesh->clear_colors_and_save_byte_size();
+
 	d->inited = true;
 	model->needNotTransferAnymore();
 }
@@ -116,7 +124,6 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 
 void GMDx11ModelPainter::dispose(GMMeshData* md)
 {
-	throw std::logic_error("The method or operation is not implemented.");
 }
 
 void GMDx11ModelPainter::beginUpdateBuffer(GMMesh* mesh)

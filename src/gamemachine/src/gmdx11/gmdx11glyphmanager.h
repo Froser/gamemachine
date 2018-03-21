@@ -7,9 +7,11 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11GlyphTexture)
 {
+	GMComPtr<ID3D11DeviceContext> deviceContext;
 	GMComPtr<ID3D11Device> device;
 	GMComPtr<ID3D11ShaderResourceView> resourceView;
 	GMComPtr<ID3D11Texture2D> texture;
+	GMComPtr<ID3D11SamplerState> samplerState;
 };
 
 class GMDx11GlyphTexture : public ITexture
@@ -21,11 +23,19 @@ public:
 
 public:
 	virtual void drawTexture(GMTextureFrames* frames) override;
+
+public:
+	inline ID3D11Texture2D* getD3D11Texture()
+	{
+		D(d);
+		return d->texture;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMDx11GlyphManager)
 {
-	GMScopePtr<ITexture> texture;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMScopePtr<GMDx11GlyphTexture> texture;
 };
 
 class GMDx11GlyphManager : public GMGlyphManager
@@ -37,7 +47,7 @@ public:
 
 public:
 	virtual ITexture* glyphTexture() override;
-	virtual void createTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) override;
+	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) override;
 };
 
 END_NS

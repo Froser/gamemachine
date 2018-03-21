@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmuidx11window.h"
 #include <gmdx11helper.h>
+#include <d3dcommon.h>
 
 #define EXIT __exit
 #define CHECK_HR(hr) if(FAILED(hr)) { GM_ASSERT(false); goto EXIT; }
@@ -95,10 +96,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	UINT renderHeight = wndAttrs.rc.bottom - wndAttrs.rc.top;
 	gm::GMuint numerator = 0, denominator = 0;
 
-#if defined(_DEBUG)
-	createDeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-#endif
-
 	// 1.枚举设备属性
 	hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
 	CHECK_HR(hr);
@@ -153,13 +150,18 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 		sc.BufferDesc.RefreshRate.Denominator = 1;
 	}
 
-	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL featureLevels[] =
+	{
+		D3D_FEATURE_LEVEL_11_0,
+	};
+
 	hr = D3D11CreateDevice(
 		NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
-		0, &featureLevel,
-		1,
+		0,
+		featureLevels,
+		GM_array_size(featureLevels),
 		D3D11_SDK_VERSION,
 		&d->device,
 		NULL,
@@ -257,7 +259,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 
 	// 5.创建光栅状态
 	bool multisampleEnable = gameMachineRunningState.sampleCount > 1;
-	hr = d->device->CreateRasterizerState(&gm::GMGetDefaultRasterizerDesc(multisampleEnable, multisampleEnable), &rasterizerState);
+	hr = d->device->CreateRasterizerState(&gm::GMDx11Helper::GMGetDx11DefaultRasterizerDesc(multisampleEnable, multisampleEnable), &rasterizerState);
 	CHECK_HR(hr);
 	d->deviceContext->RSSetState(rasterizerState);
 

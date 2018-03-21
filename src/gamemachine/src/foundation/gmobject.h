@@ -121,6 +121,10 @@ class GMNotAGMObject {};
 	void copyData(const clsName& another) { D(d); D_OF(d_another, &another); *d = *d_another; \
 		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); }
 
+#define GM_FRIEND_CLASS(clsName) \
+	friend class clsName; \
+	friend struct GM_PRIVATE_NAME(clsName);
+
 enum class GMMetaMemberType
 {
 	Int,
