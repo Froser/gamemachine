@@ -1,4 +1,4 @@
-Texture2D DiffuseTex;
+Texture2D Tex;
 SamplerState SamLinear;
 
 //--------------------------------------------------------------------------------------
@@ -47,7 +47,7 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 float4 PS_3D( PS_INPUT input ) : SV_Target
 {
-    return DiffuseTex.Sample( SamLinear, input.texcoord);
+    return Tex.Sample( SamLinear, input.texcoord);
 }
 
 VS_OUTPUT VS_2D( VS_INPUT input )
@@ -62,12 +62,12 @@ VS_OUTPUT VS_2D( VS_INPUT input )
 
 float4 PS_2D( PS_INPUT input ) : SV_Target
 {
-    return DiffuseTex.Sample( SamLinear, input.texcoord);
+    return Tex.Sample( SamLinear, input.texcoord);
 }
 
 float4 PS_Glyph( PS_INPUT input ) : SV_Target
 {
-    float4 alpha = DiffuseTex.Sample( SamLinear, input.texcoord);
+    float4 alpha = Tex.Sample( SamLinear, input.texcoord);
     return alpha;
 }
 

@@ -80,7 +80,10 @@ void GMGlyphObject::constructModel()
 void GMGlyphObject::onCreateShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
-	shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).addFrame(glyphManager->glyphTexture());
+	auto& frame = shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
+	frame.setMinFilter(GMS_TextureFilter::LINEAR);
+	frame.setMagFilter(GMS_TextureFilter::LINEAR);
+	frame.addFrame(glyphManager->glyphTexture());
 	shader.setNoDepthTest(true);
 	shader.setCull(GMS_Cull::NONE);
 	shader.setBlend(true);
@@ -141,15 +144,16 @@ void GMGlyphObject::createVertices(GMComponent* component)
 				// 1 3
 				// 让所有字体origin开始的x轴平齐
 
+				// 采用左上角为原点的Texcoord坐标系
 				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
-				component->uv(UV_X(glyph.x), 1.f - UV_Y(glyph.y + glyph.height));
-				component->uv(UV_X(glyph.x), 1.f - UV_Y(glyph.y));
-				component->uv(UV_X(glyph.x + glyph.width), 1.f - UV_Y(glyph.y + glyph.height));
-				component->uv(UV_X(glyph.x + glyph.width), 1.f - UV_Y(glyph.y));
+				component->uv(UV_X(glyph.x), UV_Y(glyph.y));
+				component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
+				component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
+				component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
 
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);

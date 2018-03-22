@@ -23,6 +23,7 @@ void DemostrationWorld::init()
 #if TEST_GLYPH
 	gm::GMImage2DGameObject* img2d = new gm::GMImage2DGameObject();
 	img2d->setText("Hello world");
+	img2d->setWidth(100);
 	d->gameObj = img2d;
 #else
 	gm::GMfloat extents[] = { 1.f, .5f, .5f };

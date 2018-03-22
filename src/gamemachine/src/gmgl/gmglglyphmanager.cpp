@@ -4,24 +4,6 @@
 #include "gmgltexture.h"
 #include "freetype/ftglyph.h"
 
-namespace
-{
-	void flipVertically(GMbyte* data, GMuint width, GMuint height)
-	{
-		const GMuint bytePerPixel = 1;
-		GMuint rowsToSwap = height % 2 == 1 ? (height - 1) / 2 : height / 2;
-		GMbyte* tempRow = new GMbyte[width * bytePerPixel];
-		for (GMuint i = 0; i < rowsToSwap; ++i)
-		{
-			memcpy(tempRow, &data[i * width * bytePerPixel], width * bytePerPixel);
-			memcpy(&data[i * width * bytePerPixel], &data[(height - i - 1) * width * bytePerPixel], width * bytePerPixel);
-			memcpy(&data[(height - i - 1) * width * bytePerPixel], tempRow, width * bytePerPixel);
-		}
-
-		GM_delete_array(tempRow);
-	}
-}
-
 BEGIN_NS
 class GMGLGlyphTexture : public ITexture
 {
@@ -85,13 +67,6 @@ void GMGLGlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMG
 {
 	D(d);
 	// 创建纹理
-	// OpenGL纹理坐标和DirectX不同，颠倒一下
-	flipVertically(
-		bitmapGlyph.buffer,
-		bitmapGlyph.width,
-		bitmapGlyph.rows
-	);
-
 	glBindTexture(GL_TEXTURE_2D, d->texture->getTextureId());
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1); // 使用一个字节保存，必须设置对齐为1
 	glTexSubImage2D(GL_TEXTURE_2D,
