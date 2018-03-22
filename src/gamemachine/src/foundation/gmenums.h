@@ -22,6 +22,7 @@ enum class GMS_BlendFunc
 	ONE_MINUS_SRC_ALPHA, //!< RGBA融混参数为源的(1-Alpha)值，相当于OpenGL中的GL_ONE_MINUS_SRC_ALPHA
 	ONE_MINUS_DST_ALPHA, //!< RGBA融混参数都为目标的(1-Alpha)值，相当于OpenGL中的GL_ONE_MINUS_DST_ALPHA
 	ONE_MINUS_DST_COLOR, //!< RGBA融混参数分别为目标的(1,1,1,1)-(RGBA)值，相当于OpenGL中的GL_ONE_MINUS_DST_ALPHA
+	MAX_OF_BLEND_FUNC,
 };
 
 //! 是否进行面剔除的枚举

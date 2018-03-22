@@ -27,7 +27,7 @@ namespace
 		// 2
 	};
 
-	D3D_PRIMITIVE_TOPOLOGY getMode(GMMesh* obj)
+	inline D3D_PRIMITIVE_TOPOLOGY getMode(GMMesh* obj)
 	{
 		switch (obj->getArrangementMode())
 		{
@@ -45,7 +45,7 @@ namespace
 		}
 	}
 
-	D3D11_RASTERIZER_DESC getRasterizerDesc(
+	inline D3D11_RASTERIZER_DESC getRasterizerDesc(
 		GMS_FrontFace frontFace,
 		GMS_Cull cull,
 		bool multisampleEnable,
@@ -67,7 +67,67 @@ namespace
 		return desc;
 	}
 
-	struct GMDx11RasterStates : public GMSingleton<GMDx11RasterStates>
+	inline D3D11_BLEND toDx11Blend(GMS_BlendFunc blendFunc)
+	{
+		switch (blendFunc)
+		{
+		case (GMS_BlendFunc::ZERO):
+			return D3D11_BLEND_ZERO;
+		case (GMS_BlendFunc::ONE):
+			return D3D11_BLEND_ONE;
+		case (GMS_BlendFunc::SRC_COLOR):
+			return D3D11_BLEND_SRC_COLOR;
+		case (GMS_BlendFunc::DST_COLOR):
+			return D3D11_BLEND_DEST_COLOR;
+		case (GMS_BlendFunc::SRC_ALPHA):
+			return D3D11_BLEND_SRC_ALPHA;
+		case (GMS_BlendFunc::DST_ALPHA):
+			return D3D11_BLEND_DEST_ALPHA;
+		case (GMS_BlendFunc::ONE_MINUS_SRC_ALPHA):
+			return D3D11_BLEND_INV_SRC_ALPHA;
+		case (GMS_BlendFunc::ONE_MINUS_DST_ALPHA):
+			return D3D11_BLEND_INV_DEST_ALPHA;
+		case (GMS_BlendFunc::ONE_MINUS_DST_COLOR):
+			return D3D11_BLEND_INV_DEST_COLOR;
+		default:
+			GM_ASSERT(false);
+			return D3D11_BLEND_ONE;
+		}
+	}
+
+	inline D3D11_BLEND_DESC getBlendDesc(
+		bool enabled,
+		GMS_BlendFunc source,
+		GMS_BlendFunc dest
+	)
+	{
+		D3D11_BLEND_DESC desc = { 0 };
+		for (GMuint i = 0; i < 8; ++i)
+		{
+			desc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		}
+
+		D3D11_RENDER_TARGET_BLEND_DESC& renderTarget = desc.RenderTarget[0];
+		if (!enabled)
+		{
+			renderTarget.BlendEnable = FALSE;
+			return desc;
+		}
+		else
+		{
+			renderTarget.BlendEnable = TRUE;
+			renderTarget.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+			renderTarget.SrcBlend = toDx11Blend(source);
+			renderTarget.SrcBlendAlpha = D3D11_BLEND_ONE;
+			renderTarget.DestBlend = toDx11Blend(dest);
+			renderTarget.DestBlendAlpha = D3D11_BLEND_ZERO;
+			renderTarget.BlendOp = D3D11_BLEND_OP_ADD; //目前不提供其他Blend操作
+			renderTarget.BlendOpAlpha = D3D11_BLEND_OP_ADD; //目前不提供其他Blend操作
+			return desc;
+		}
+	}
+
+	struct GMDx11RasterizerStates : public GMSingleton<GMDx11RasterizerStates>
 	{
 		enum
 		{
@@ -77,12 +137,12 @@ namespace
 
 		//TODO 先不考虑FillMode
 	public:
-		GMDx11RasterStates::GMDx11RasterStates()
+		GMDx11RasterizerStates::GMDx11RasterizerStates()
 		{
 			engine = gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 		}
 
-		~GMDx11RasterStates()
+		~GMDx11RasterizerStates()
 		{
 			for (GMint i = 0; i < Size_Cull; ++i)
 			{
@@ -119,6 +179,60 @@ namespace
 	private:
 		GMDx11GraphicEngine* engine = nullptr;
 		ID3D11RasterizerState* states[Size_Cull][Size_FrontFace] = { 0 };
+	};
+
+	struct GMDx11BlendStates : public GMSingleton<GMDx11BlendStates>
+	{
+	public:
+		GMDx11BlendStates::GMDx11BlendStates()
+		{
+			engine = gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+		}
+
+		~GMDx11BlendStates()
+		{
+			for (GMint b = 0; b < 2; ++b)
+			{
+				for (GMint i = 0; i < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++i)
+				{
+					for (GMint j = 0; j < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++j)
+					{
+						if (states[b][i][j])
+							states[b][i][j]->Release();
+					}
+				}
+			}
+		}
+
+	public:
+		ID3D11BlendState* getBlendState(bool enable, GMS_BlendFunc src, GMS_BlendFunc dest)
+		{
+			ID3D11BlendState*& state = states[enable ? 1 : 0][(GMuint)src][(GMuint)dest];
+			if (!state)
+			{
+				D3D11_BLEND_DESC desc = getBlendDesc(enable, src, dest);
+				createBlendState(desc, &state);
+			}
+
+			GM_ASSERT(state);
+			return state;
+		}
+
+		ID3D11BlendState* getDisabledBlendState()
+		{
+			return getBlendState(false, GMS_BlendFunc::ONE, GMS_BlendFunc::ONE);
+		}
+
+	private:
+		bool createBlendState(const D3D11_BLEND_DESC& desc, ID3D11BlendState** out)
+		{
+			GM_DX_HR(engine->getDevice()->CreateBlendState(&desc, out));
+			return !!(*out);
+		}
+
+	private:
+		GMDx11GraphicEngine* engine = nullptr;
+		ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
 	};
 }
 
@@ -158,9 +272,9 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	context->IASetPrimitiveTopology(getMode(model->getMesh()));
 	
 	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
-	shaderProgram->setMatrix4(desc.ModelMatrix, Transpose(parent->getTransform()));
-	shaderProgram->setMatrix4(desc.ViewMatrix, Transpose(GM.getCamera().getFrustum().getViewMatrix()));
-	shaderProgram->setMatrix4(desc.ProjectionMatrix, Transpose(GM.getCamera().getFrustum().getProjectionMatrix()));
+	shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
+	shaderProgram->setMatrix4(desc.ViewMatrix, GM.getCamera().getFrustum().getViewMatrix());
+	shaderProgram->setMatrix4(desc.ProjectionMatrix, GM.getCamera().getFrustum().getProjectionMatrix());
 }
 
 void GMDx11Renderer::endModel()
@@ -173,6 +287,11 @@ void GMDx11Renderer::drawTextures()
 	GM_ASSERT(d->shader);
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 	{
+		//TODO just record
+		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+		auto hasDiffuseTexture = d->effect->GetVariableByName(svd.HasDiffuseTexture)->AsScalar();
+		GM_DX_HR(hasDiffuseTexture->SetBool(FALSE));
+
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
 		{
@@ -184,6 +303,7 @@ void GMDx11Renderer::drawTextures()
 			{
 				// 激活动画序列
 				texture->drawTexture(&textures);
+				GM_DX_HR(hasDiffuseTexture->SetBool(TRUE));
 			}
 		}
 	}
@@ -210,12 +330,52 @@ void GMDx11Renderer::prepareRasterizer(GMComponent* component)
 		d->rasterizer = d->effect->GetVariableByName(svd.RasterizerState)->AsRasterizer();
 	}
 
-	GMDx11RasterStates& rasterStates = GMDx11RasterStates::instance();
+	GMDx11RasterizerStates& rasterStates = GMDx11RasterizerStates::instance();
 	GM_ASSERT(d->rasterizer);
 	GM_DX_HR(d->rasterizer->SetRasterizerState(
 		0, 
 		rasterStates.getRasterStates(d->shader->getFrontFace(), d->shader->getCull())
 	));
+}
+
+void GMDx11Renderer::prepareBlend(GMComponent* component)
+{
+	D(d);
+	if (!d->blend)
+	{
+		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+		d->blend = d->effect->GetVariableByName(svd.BlendState)->AsBlend();
+	}
+	GM_ASSERT(d->blend);
+
+	const GMDx11GlobalBlendStateDesc& globalBlendState = getEngine()->getGlobalBlendState();
+	GMDx11BlendStates& blendStates = GMDx11BlendStates::instance();
+	if (globalBlendState.enabled)
+	{
+		// 全局blend开启，此时忽略正在绘制的物体的Blend状态
+		GM_DX_HR(d->blend->SetBlendState(
+			0,
+			blendStates.getBlendState(true, globalBlendState.source, globalBlendState.dest)
+		));
+	}
+	else
+	{
+		// 全局blend关闭，此时应该应用正在绘制物体的Blend状态
+		if (d->shader->getBlend())
+		{
+			GM_DX_HR(d->blend->SetBlendState(
+				0,
+				blendStates.getBlendState(true, d->shader->getBlendFactorSource(), d->shader->getBlendFactorDest())
+			));
+		}
+		else
+		{
+			GM_DX_HR(d->blend->SetBlendState(
+				0,
+				blendStates.getDisabledBlendState()
+			));
+		}
+	}
 }
 
 ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
@@ -240,6 +400,7 @@ void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* m
 	d->shader = &component->getShader();
 	prepareBuffer(painter);
 	prepareRasterizer(component);
+	prepareBlend(component);
 	passAllAndDraw(component);
 }
 

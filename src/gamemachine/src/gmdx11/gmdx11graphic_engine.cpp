@@ -75,11 +75,20 @@ void GMDx11GraphicEngine::endUseStencil()
 
 void GMDx11GraphicEngine::beginBlend(GMS_BlendFunc sfactor /*= GMS_BlendFunc::ONE*/, GMS_BlendFunc dfactor /*= GMS_BlendFunc::ONE*/)
 {
-
+	D(d);
+	++d->blendState.blendRefCount;
+	d->blendState.enabled = true;
+	d->blendState.source = sfactor;
+	d->blendState.dest = dfactor;
 }
 
 void GMDx11GraphicEngine::endBlend()
 {
+	D(d);
+	if (--d->blendState.blendRefCount == 0)
+	{
+		d->blendState.enabled = false;
+	}
 }
 
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /*= GMShaderProgramType::CurrentShaderProgram*/)

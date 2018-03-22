@@ -8,10 +8,11 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
-	GMShader* shader = nullptr;
 	GMComPtr<ID3DX11Effect> effect;
+	GMShader* shader = nullptr;
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
+	ID3DX11EffectBlendVariable* blend = nullptr;
 };
 
 class GMDx11Renderer : public IRenderer
@@ -37,6 +38,7 @@ private:
 	ID3DX11EffectTechnique* getTechnique();
 	void prepareBuffer(IQueriable* painter);
 	void prepareRasterizer(GMComponent* component);
+	void prepareBlend(GMComponent* component);
 	void passAllAndDraw(GMComponent* component);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 	void drawTextures();

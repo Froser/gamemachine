@@ -170,7 +170,9 @@ struct GMShaderVariablesDesc
 	const char* ViewMatrix;
 	const char* ProjectionMatrix;
 	const char* InverseTransposeModelMatrix;
+	const char* HasDiffuseTexture;
 	const char* RasterizerState;
+	const char* BlendState;
 };
 
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)

@@ -12,7 +12,9 @@ namespace
 			"ViewMatrix",
 			"ProjectionMatrix",
 			"InverseTransposeModelMatrix",
+			"HasTex",
 			"GMRasterizerState",
+			"GMBlendState",
 		};
 		return desc;
 	}

@@ -8,6 +8,14 @@
 BEGIN_NS
 
 struct GMMVPMatrix;
+struct GMDx11GlobalBlendStateDesc
+{
+	bool enabled = false;
+	GMS_BlendFunc source;
+	GMS_BlendFunc dest;
+	GMint blendRefCount = 0;
+};
+
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
@@ -18,6 +26,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMScopePtr<IShaderProgram> shaderProgram;
 
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
+	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
 };
 
@@ -80,6 +89,12 @@ public:
 	{
 		D(d);
 		return d->renderTargetView;
+	}
+
+	const GMDx11GlobalBlendStateDesc& getGlobalBlendState()
+	{
+		D(d);
+		return d->blendState;
 	}
 
 public:

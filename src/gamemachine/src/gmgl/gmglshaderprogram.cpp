@@ -19,7 +19,7 @@ namespace
 			"GM_model_matrix",
 			"GM_view_matrix",
 			"GM_projection_matrix",
-			"GM_inverse_transpose_model_matrix"
+			"GM_inverse_transpose_model_matrix",
 		};
 		return desc;
 	}

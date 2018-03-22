@@ -1,4 +1,6 @@
+bool HasTex;
 Texture2D Tex;
+
 SamplerState SamLinear;
 
 //--------------------------------------------------------------------------------------
@@ -12,6 +14,7 @@ cbuffer WorldConstantBuffer: register( b0 )
 }
 
 RasterizerState GMRasterizerState {};
+BlendState GMBlendState {};
 
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
@@ -64,13 +67,16 @@ VS_OUTPUT VS_2D( VS_INPUT input )
 
 float4 PS_2D( PS_INPUT input ) : SV_Target
 {
+    if (!HasTex)
+        discard;
+
     return Tex.Sample( SamLinear, input.texcoord);
 }
 
 float4 PS_Glyph( PS_INPUT input ) : SV_Target
 {
     float4 alpha = Tex.Sample( SamLinear, input.texcoord);
-    return alpha;
+    return float4(1, 0, 0, alpha.r);
 }
 
 // Techniques
@@ -79,9 +85,9 @@ technique11 GMTech_3D
     pass P0
     {
         SetRasterizerState(GMRasterizerState);
-        SetVertexShader( CompileShader( vs_4_0,VS_3D() ) );
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader(ps_4_0,PS_3D() ) );
+        SetVertexShader(CompileShader( vs_4_0,VS_3D() ) );
+        SetPixelShader(CompileShader(ps_4_0,PS_3D() ) );
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -90,9 +96,9 @@ technique11 GMTech_2D
     pass P0
     {
         SetRasterizerState(GMRasterizerState);
-        SetVertexShader( CompileShader( vs_4_0,VS_2D() ) );
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader(ps_4_0,PS_2D() ) );
+        SetVertexShader(CompileShader( vs_4_0,VS_2D() ) );
+        SetPixelShader(CompileShader(ps_4_0,PS_2D() ) );
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -101,8 +107,8 @@ technique11 GMTech_Glyph
     pass P0
     {
         SetRasterizerState(GMRasterizerState);
-        SetVertexShader( CompileShader( vs_4_0,VS_2D() ) );
-        SetGeometryShader( NULL );
-        SetPixelShader( CompileShader(ps_4_0,PS_Glyph() ) );
+        SetVertexShader(CompileShader( vs_4_0,VS_2D() ) );
+        SetPixelShader(CompileShader(ps_4_0,PS_Glyph() ) );
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
