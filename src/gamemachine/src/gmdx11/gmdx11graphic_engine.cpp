@@ -202,15 +202,19 @@ void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 {
 	D(d);
-	static GMDx11Renderer s_renderer;
+	static GMDx11Renderer_3D s_renderer_3d;
+	static GMDx11Renderer_2D s_renderer_2d;
+	static GMDx11Renderer_Glyph s_renderer_glyph;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
-	case GMModelType::Model3D:
+		return &s_renderer_2d;
 	case GMModelType::Glyph:
+		return &s_renderer_glyph;
+	case GMModelType::Model3D:
 	case GMModelType::Particles:
 	case GMModelType::CubeMap:
-		return &s_renderer;
+		return &s_renderer_3d;
 	default:
 		GM_ASSERT(false);
 		return nullptr;

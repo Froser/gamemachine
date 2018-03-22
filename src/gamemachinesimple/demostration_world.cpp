@@ -5,6 +5,8 @@
 #include <gmcom.h>
 #include <gmdxincludes.h>
 
+#define TEST_GLYPH 1
+
 extern gm::GMRenderEnvironment GetRenderEnv();
 
 DemostrationWorld::~DemostrationWorld()
@@ -17,19 +19,23 @@ void DemostrationWorld::init()
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	
 	// 创建一个带纹理的对象
+
+#if TEST_GLYPH
 	gm::GMImage2DGameObject* img2d = new gm::GMImage2DGameObject();
 	img2d->setText("Hello world");
 	d->gameObj = img2d;
-	//gm::GMfloat extents[] = { 1.f, .5f, .5f };
-	//gm::GMfloat pos[] = { 0, 0, 0 };
-	//gm::GMModel* model;
-	//gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
-	//gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
-	//d->gameObj = new gm::GMGameObject(asset);
-	//gm::ITexture* tex = nullptr;
-	//gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
-	//gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
-	//getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+#else
+	gm::GMfloat extents[] = { 1.f, .5f, .5f };
+	gm::GMfloat pos[] = { 0, 0, 0 };
+	gm::GMModel* model;
+	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
+	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
+	d->gameObj = new gm::GMGameObject(asset);
+	gm::ITexture* tex = nullptr;
+	gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
+	gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
+	getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+#endif
 
 	this->addObjectAndInit(d->gameObj);
 }

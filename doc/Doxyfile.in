@@ -874,6 +874,8 @@ RECURSIVE              = YES
 # run.
 
 EXCLUDE                = @GM_DOCS_SOURCES@/foundation/utilities/tinyxml
+EXCLUDE               += @GM_DOCS_SOURCES@/foundation/platforms/windows/dxmath
+EXCLUDE               += @GM_DOCS_SOURCES@/gmdx11/effects
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

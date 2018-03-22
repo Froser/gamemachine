@@ -9,6 +9,7 @@
 
 #ifndef __D3DX11_PCHFX_H__
 #define __D3DX11_PCHFX_H__
+#pragma warning(push)
 #pragma warning(disable : 4005)
 
 #include "d3d11.h"
@@ -16,6 +17,7 @@
 #undef DEFINE_GUID
 #include "INITGUID.h"
 #include "inc/d3dx11effect.h"
+#pragma warning(pop)
 
 #define UNUSED -1
 
