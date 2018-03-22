@@ -93,26 +93,6 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	return nullptr;
 }
 
-const D3D11_RASTERIZER_DESC& GMDx11Helper::GMGetDx11DefaultRasterizerDesc(
-	bool multisampleEnable,
-	bool antialiasedLineEnable
-)
-{
-	static D3D11_RASTERIZER_DESC desc = {
-		D3D11_FILL_SOLID,
-		D3D11_CULL_BACK,
-		FALSE,
-		0,
-		0.f,
-		0.f,
-		TRUE,
-		FALSE,
-		multisampleEnable ? TRUE : FALSE,
-		antialiasedLineEnable ? TRUE : FALSE
-	};
-	return desc;
-}
-
 const D3D11_SAMPLER_DESC& GMDx11Helper::GMGetDx11DefaultSamplerDesc()
 {
 	static D3D11_SAMPLER_DESC desc = {

@@ -9,7 +9,9 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMShader* shader = nullptr;
+	GMComPtr<ID3DX11Effect> effect;
 	ID3DX11EffectTechnique* technique = nullptr;
+	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 };
 
 class GMDx11Renderer : public IRenderer
@@ -17,7 +19,7 @@ class GMDx11Renderer : public IRenderer
 	DECLARE_PRIVATE(GMDx11Renderer)
 
 public:
-	GMDx11Renderer() = default;
+	GMDx11Renderer();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;

@@ -170,6 +170,7 @@ struct GMShaderVariablesDesc
 	const char* ViewMatrix;
 	const char* ProjectionMatrix;
 	const char* InverseTransposeModelMatrix;
+	const char* RasterizerState;
 };
 
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)

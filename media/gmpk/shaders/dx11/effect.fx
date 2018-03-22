@@ -11,6 +11,8 @@ cbuffer WorldConstantBuffer: register( b0 )
     matrix ProjectionMatrix;
 }
 
+RasterizerState GMRasterizerState {};
+
 //--------------------------------------------------------------------------------------
 struct VS_INPUT
 {
@@ -76,6 +78,7 @@ technique11 GMTech_3D
 {
     pass P0
     {
+        SetRasterizerState(GMRasterizerState);
         SetVertexShader( CompileShader( vs_4_0,VS_3D() ) );
         SetGeometryShader( NULL );
         SetPixelShader( CompileShader(ps_4_0,PS_3D() ) );
@@ -86,6 +89,7 @@ technique11 GMTech_2D
 {
     pass P0
     {
+        SetRasterizerState(GMRasterizerState);
         SetVertexShader( CompileShader( vs_4_0,VS_2D() ) );
         SetGeometryShader( NULL );
         SetPixelShader( CompileShader(ps_4_0,PS_2D() ) );
@@ -96,6 +100,7 @@ technique11 GMTech_Glyph
 {
     pass P0
     {
+        SetRasterizerState(GMRasterizerState);
         SetVertexShader( CompileShader( vs_4_0,VS_2D() ) );
         SetGeometryShader( NULL );
         SetPixelShader( CompileShader(ps_4_0,PS_Glyph() ) );

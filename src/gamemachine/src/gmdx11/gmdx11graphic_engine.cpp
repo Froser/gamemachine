@@ -75,6 +75,7 @@ void GMDx11GraphicEngine::endUseStencil()
 
 void GMDx11GraphicEngine::beginBlend(GMS_BlendFunc sfactor /*= GMS_BlendFunc::ONE*/, GMS_BlendFunc dfactor /*= GMS_BlendFunc::ONE*/)
 {
+
 }
 
 void GMDx11GraphicEngine::endBlend()

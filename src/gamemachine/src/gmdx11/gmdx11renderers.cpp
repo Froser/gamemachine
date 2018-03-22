@@ -45,6 +45,28 @@ namespace
 		}
 	}
 
+	D3D11_RASTERIZER_DESC getRasterizerDesc(
+		GMS_FrontFace frontFace,
+		GMS_Cull cull,
+		bool multisampleEnable,
+		bool antialiasedLineEnable
+	)
+	{
+		D3D11_RASTERIZER_DESC desc = {
+			D3D11_FILL_SOLID,
+			cull == GMS_Cull::CULL ? D3D11_CULL_BACK : D3D11_CULL_NONE,
+			frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE,
+			0,
+			0.f,
+			0.f,
+			TRUE,
+			FALSE,
+			multisampleEnable ? TRUE : FALSE,
+			antialiasedLineEnable ? TRUE : FALSE
+		};
+		return desc;
+	}
+
 	struct GMDx11RasterStates : public GMSingleton<GMDx11RasterStates>
 	{
 		enum
@@ -74,19 +96,17 @@ namespace
 		}
 
 	public:
-		void applyRasterStates(GMS_Cull cullMode, GMS_FrontFace frontFace)
+		ID3D11RasterizerState* getRasterStates(GMS_FrontFace frontFace, GMS_Cull cullMode)
 		{
 			bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
 			if (!states[(GMuint)cullMode][(GMuint)frontFace])
 			{
-				D3D11_RASTERIZER_DESC desc = GMDx11Helper::GMGetDx11DefaultRasterizerDesc(multisampleEnable, multisampleEnable);
-				desc.CullMode = cullMode == GMS_Cull::CULL ? D3D11_CULL_BACK : D3D11_CULL_NONE;
-				desc.FrontCounterClockwise = frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE;
+				D3D11_RASTERIZER_DESC desc = getRasterizerDesc(frontFace, cullMode, multisampleEnable, multisampleEnable);
 				createRasterizerState(desc, &states[(GMuint)cullMode][(GMuint)frontFace]);
 			}
 
 			GM_ASSERT(states[(GMuint)cullMode][(GMuint)frontFace]);
-			engine->getDeviceContext()->RSSetState(states[(GMuint)cullMode][(GMuint)frontFace]);
+			return states[(GMuint)cullMode][(GMuint)frontFace];
 		}
 
 	private:
@@ -102,10 +122,23 @@ namespace
 	};
 }
 
+GMDx11Renderer::GMDx11Renderer()
+{
+	D(d);
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->useProgram();
+	if (!d->effect)
+	{
+		shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
+		GM_ASSERT(d->effect);
+	}
+}
+
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	getEngine()->getShaderProgram()->useProgram();
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->useProgram();
 	if (!d->inputLayout)
 	{
 		D3DX11_PASS_DESC passDesc;
@@ -124,7 +157,6 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	context->IASetInputLayout(d->inputLayout);
 	context->IASetPrimitiveTopology(getMode(model->getMesh()));
 	
-	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 	shaderProgram->setMatrix4(desc.ModelMatrix, Transpose(parent->getTransform()));
 	shaderProgram->setMatrix4(desc.ViewMatrix, Transpose(GM.getCamera().getFrustum().getViewMatrix()));
@@ -171,11 +203,19 @@ void GMDx11Renderer::prepareRasterizer(GMComponent* component)
 {
 	D(d);
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
+	bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
+	if (!d->rasterizer)
+	{
+		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+		d->rasterizer = d->effect->GetVariableByName(svd.RasterizerState)->AsRasterizer();
+	}
+
 	GMDx11RasterStates& rasterStates = GMDx11RasterStates::instance();
-	rasterStates.applyRasterStates(
-		d->shader->getCull(),
-		d->shader->getFrontFace()
-	);
+	GM_ASSERT(d->rasterizer);
+	GM_DX_HR(d->rasterizer->SetRasterizerState(
+		0, 
+		rasterStates.getRasterStates(d->shader->getFrontFace(), d->shader->getCull())
+	));
 }
 
 ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)

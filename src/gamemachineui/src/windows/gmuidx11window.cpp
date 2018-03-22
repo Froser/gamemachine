@@ -257,16 +257,10 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	hr = d->device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView);
 	CHECK_HR(hr);
 
-	// 5.创建光栅状态
-	bool multisampleEnable = gameMachineRunningState.sampleCount > 1;
-	hr = d->device->CreateRasterizerState(&gm::GMDx11Helper::GMGetDx11DefaultRasterizerDesc(multisampleEnable, multisampleEnable), &rasterizerState);
-	CHECK_HR(hr);
-	d->deviceContext->RSSetState(rasterizerState);
-
-	// 6.绑定渲染目标
+	// 5.绑定渲染目标
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);
 
-	// 7.设置视口
+	// 6.设置视口
 	vp.TopLeftX = 0.f;
 	vp.TopLeftY = 0.f;
 	vp.Width = static_cast<gm::GMfloat>(renderWidth);

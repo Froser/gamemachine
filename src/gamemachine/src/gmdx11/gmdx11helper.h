@@ -30,18 +30,6 @@ struct GMDx11Helper
 		const IShaderProgram* shaderProgram
 	);
 
-	//! 返回一个默认的光栅描述结构体。
-	/*!
-	  GameMachine将使用此结构来初始化默认的DirectX光珊。
-	  \param multisampleEnable 是否开启多重采样。
-	  \param antialiasedLineEnable 是否开启抗锯齿。
-	  \return 默认的光栅描述结构体。
-	*/
-	static const D3D11_RASTERIZER_DESC& GMGetDx11DefaultRasterizerDesc(
-		bool multisampleEnable,
-		bool antialiasedLineEnable
-	);
-
 	//! 返回一个默认的采样器描述。
 	/*!
 	  \return 默认采样器描述。

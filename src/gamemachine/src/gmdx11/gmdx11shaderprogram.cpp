@@ -11,7 +11,8 @@ namespace
 			"WorldMatrix",
 			"ViewMatrix",
 			"ProjectionMatrix",
-			"InverseTransposeModelMatrix"
+			"InverseTransposeModelMatrix",
+			"GMRasterizerState",
 		};
 		return desc;
 	}
