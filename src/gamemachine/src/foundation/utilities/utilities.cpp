@@ -306,8 +306,9 @@ void GMTextureUtil::createTexture(const GMString& filename, ITexture** texture)
 	gm::GM_delete(img);
 }
 
-void GMTextureUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type)
+void GMTextureUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type, GMuint index)
 {
-	auto& frames = shader.getTexture().getTextureFrames(type, 0);
+	GM_ASSERT(index < GMMaxTextureCount(type));
+	auto& frames = shader.getTexture().getTextureFrames(type, index);
 	frames.addFrame(texture);
 }

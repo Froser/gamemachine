@@ -65,7 +65,7 @@ BEGIN_NS
 constexpr GMint GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
 constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
 
-inline const char* getTextureUniformName(GMTextureType t, GMint index)
+inline const char* getTextureUniformName(GMTextureType t, GMuint index)
 {
 	GM_ASSERT(index < GMMaxTextureCount(t));
 	switch (t)

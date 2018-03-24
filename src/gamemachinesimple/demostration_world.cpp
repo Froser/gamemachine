@@ -31,10 +31,18 @@ void DemostrationWorld::init()
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, nullptr);
 	gm::GMAsset asset = gm::GMAssets::createIsolatedAsset(gm::GMAssetType::Model, model);
 	d->gameObj[1] = new gm::GMGameObject(asset);
-	gm::ITexture* tex = nullptr;
-	gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
-	gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
-	getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+	{
+		gm::ITexture* tex = nullptr;
+		gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
+		gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
+		getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+	}
+	{
+		gm::ITexture* tex = nullptr;
+		gm::GMTextureUtil::createTexture("cubemap/cubemap_negz.jpg", &tex);
+		gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE, 1);
+		getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+	}
 
 	this->addObjectAndInit(d->gameObj[0]);
 	this->addObjectAndInit(d->gameObj[1]);

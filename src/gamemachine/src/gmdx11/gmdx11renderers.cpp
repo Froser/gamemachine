@@ -303,10 +303,11 @@ void GMDx11Renderer::drawTextures()
 {
 	D(d);
 	GM_ASSERT(d->shader);
+	GMint registerId = 0;
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 	{
 		GMint count = GMMaxTextureCount(type);
-		for (GMint i = 0; i < count; i++)
+		for (GMint i = 0; i < count; ++i, ++registerId)
 		{
 			GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, i);
 
@@ -315,7 +316,7 @@ void GMDx11Renderer::drawTextures()
 			if (texture)
 			{
 				// 激活动画序列
-				texture->drawTexture(&textures, i);
+				texture->drawTexture(&textures, registerId);
 			}
 		}
 	}

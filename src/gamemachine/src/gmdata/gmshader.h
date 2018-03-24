@@ -205,7 +205,7 @@ enum class GMTextureType
 	CUBEMAP,
 };
 
-static constexpr GMint GMMaxTextureCount(GMTextureType type)
+static constexpr GMuint GMMaxTextureCount(GMTextureType type)
 {
 	return
 		type == GMTextureType::AMBIENT ? 3 :
@@ -233,7 +233,7 @@ public:
 	GMTexture(const GMTexture& texture) = delete;
 
 public:
-	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMint index)
+	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMuint index)
 	{
 		GM_ASSERT(index < GMMaxTextureCount(type));
 
@@ -256,7 +256,7 @@ public:
 		}
 	}
 
-	inline const GMTextureFrames& getTextureFrames(GMTextureType type, GMint index) const
+	inline const GMTextureFrames& getTextureFrames(GMTextureType type, GMuint index) const
 	{
 		return const_cast<GMTexture*>(this)->getTextureFrames(type, index);
 	}
@@ -268,8 +268,8 @@ public:
 
 		GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 		{
-			GMint count = GMMaxTextureCount(type);
-			for (GMint i = 0; i < count; i++)
+			GMuint count = GMMaxTextureCount(type);
+			for (GMuint i = 0; i < count; i++)
 			{
 				getTextureFrames(type, i) = rhs.getTextureFrames(type, i);
 			}

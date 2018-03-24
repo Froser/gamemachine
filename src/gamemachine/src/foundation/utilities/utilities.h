@@ -55,8 +55,9 @@ struct GMTextureUtil
 	  \param shader 目标模型的着色器设置。
 	  \param texture 待添加纹理。
 	  \param type 纹理类型。
+	  \param index 需要添加到第几个纹理。每种类型的纹理有纹理数量的限制。
 	*/
-	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type);
+	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type, GMuint index = 0);
 };
 
 END_NS
