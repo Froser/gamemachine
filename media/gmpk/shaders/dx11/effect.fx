@@ -98,10 +98,14 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 float4 PS_3D(PS_INPUT input) : SV_Target
 {
-	if (needDiscard(DiffuseTextureAttributes))
-		discard;
+    if (needDiscard(DiffuseTextureAttributes) && needDiscard(AmbientTextureAttributes))
+        discard;
 
-    float4 color = Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
+    float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    color += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
+    color += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
+    color += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
+    color += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
     color += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
     color += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
     return color;
@@ -122,10 +126,14 @@ VS_OUTPUT VS_2D( VS_INPUT input )
 
 float4 PS_2D( PS_INPUT input ) : SV_Target
 {
-    if (needDiscard(DiffuseTextureAttributes))
+    if (needDiscard(DiffuseTextureAttributes) && needDiscard(AmbientTextureAttributes))
         discard;
 
-    float4 color = Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
+    float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+    color += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
+    color += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
+    color += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
+    color += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
     color += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
     color += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
     return color;

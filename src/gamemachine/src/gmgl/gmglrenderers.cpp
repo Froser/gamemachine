@@ -214,17 +214,25 @@ void GMGLRenderer_3D::drawDebug()
 void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
 {
 	D(d);
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	GM_ASSERT(desc);
+	static const std::string u_scrolls_affix = (GMString(".") + desc->TextureAttributes.OffsetX).toStdString();
+	static const std::string u_scrollt_affix = (GMString(".") + desc->TextureAttributes.OffsetY).toStdString();
+	static const std::string u_scales_affix = (GMString(".") + desc->TextureAttributes.ScaleX).toStdString();
+	static const std::string u_scalet_affix = (GMString(".") + desc->TextureAttributes.ScaleY).toStdString();
+
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
-	const char* uniform = getTextureUniformName(type, index);
+	const char* uniform = getTextureUniformName(desc, type, index);
+
 	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scales[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scalet[GMGL_MAX_UNIFORM_NAME_LEN];
 
-	combineUniform(u_scrolls, uniform, "." GMSHADER_TEXTURES_SCROLL_S);
-	combineUniform(u_scrollt, uniform, "." GMSHADER_TEXTURES_SCROLL_T);
-	combineUniform(u_scales, uniform, "." GMSHADER_TEXTURES_SCALE_S);
-	combineUniform(u_scalet, uniform, "." GMSHADER_TEXTURES_SCALE_T);
+	combineUniform(u_scrolls, uniform, u_scrolls_affix.c_str());
+	combineUniform(u_scrollt, uniform, u_scrollt_affix.c_str());
+	combineUniform(u_scales, uniform, u_scales_affix.c_str());
+	combineUniform(u_scalet, uniform, u_scalet_affix.c_str());
 	shaderProgram->setFloat(u_scrolls, 0.f);
 	shaderProgram->setFloat(u_scrollt, 0.f);
 	shaderProgram->setFloat(u_scales, 1.f);
@@ -233,13 +241,13 @@ void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
 	auto applyCallback = [&](GMS_TextureModType type, Pair<GMfloat, GMfloat>&& args) {
 		if (type == GMS_TextureModType::SCALE)
 		{
-			shaderProgram->setFloat(u_scrollt, args.first);
-			shaderProgram->setFloat(u_scrolls, args.second);
+			shaderProgram->setFloat(u_scales, args.first);
+			shaderProgram->setFloat(u_scalet, args.second);
 		}
 		else if (type == GMS_TextureModType::SCROLL)
 		{
-			shaderProgram->setFloat(u_scalet, args.first);
-			shaderProgram->setFloat(u_scales, args.second);
+			shaderProgram->setFloat(u_scrolls, args.first);
+			shaderProgram->setFloat(u_scrollt, args.second);
 		}
 		else
 		{
@@ -253,17 +261,21 @@ void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
 void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
 {
 	D(d);
-	GMint idx = (GMint)type;
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	GM_ASSERT(desc);
+	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
+	static const std::string u_tex_texture = (GMString(".") + desc->TextureAttributes.Texture).toStdString();
 
+	GMint idx = (GMint)type;
 	GLenum tex;
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
-	const char* uniform = getTextureUniformName(type, index);
+	const char* uniform = getTextureUniformName(desc, type, index);
 	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
-	combineUniform(u_texture, uniform, "." GMSHADER_TEXTURES_TEXTURE);
-	combineUniform(u_enabled, uniform, "." GMSHADER_TEXTURES_ENABLED);
+	combineUniform(u_texture, uniform, u_tex_texture.c_str());
+	combineUniform(u_enabled, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u_texture, texId);
 	shaderProgram->setInt(u_enabled, 1);
 
@@ -274,15 +286,19 @@ void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
 void GMGLRenderer_3D::deactivateTexture(GMTextureType type, GMint index)
 {
 	D(d);
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	GM_ASSERT(desc);
+	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
+
 	GLenum tex;
 	GMint texId;
 	getTextureID(type, index, tex, texId);
 
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	GMint idx = (GMint)type;
-	const char* uniform = getTextureUniformName(type, index);
+	const char* uniform = getTextureUniformName(desc, type, index);
 	char u[GMGL_MAX_UNIFORM_NAME_LEN];
-	combineUniform(u, uniform, "." GMSHADER_TEXTURES_ENABLED);
+	combineUniform(u, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u, 0);
 }
 

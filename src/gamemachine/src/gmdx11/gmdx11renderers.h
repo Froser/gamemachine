@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
-	const GMShaderVariablesDesc* variableDesc = nullptr;
+	const GMShaderVariablesDesc* variablesDesc = nullptr;
 };
 
 class GMDx11Renderer : public IRenderer
@@ -38,11 +38,11 @@ private:
 	inline const GMShaderVariablesDesc* getVariablesDesc()
 	{
 		D(d);
-		if (!d->variableDesc)
+		if (!d->variablesDesc)
 		{
-			d->variableDesc = &getEngine()->getShaderProgram()->getDesc();
+			d->variablesDesc = &getEngine()->getShaderProgram()->getDesc();
 		}
-		return d->variableDesc;
+		return d->variablesDesc;
 	}
 
 private:

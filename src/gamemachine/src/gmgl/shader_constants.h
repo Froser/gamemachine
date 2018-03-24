@@ -19,16 +19,8 @@ BEGIN_NS
 
 //纹理
 #define		GMSHADER_CUBEMAP_TEXTURE			GMSHADER("cubemap")
-#define		GMSHADER_AMBIENT_TEXTURES(i)		GMSHADER("ambient_textures") "[" #i "]"
-#define		GMSHADER_DIFFUSE_TEXTURES(i)		GMSHADER("diffuse_textures") "[" #i "]"
 #define		GMSHADER_NORMALMAP_TEXTURES(i)		GMSHADER("normalmap_textures") "[" #i "]"
 #define		GMSHADER_LIGHTMAP_TEXTURES(i)		GMSHADER("lightmap_textures") "[" #i "]"
-#define		GMSHADER_TEXTURES_TEXTURE			"texture"
-#define		GMSHADER_TEXTURES_ENABLED			"enabled"
-#define		GMSHADER_TEXTURES_SCROLL_S			"scroll_s"
-#define		GMSHADER_TEXTURES_SCROLL_T			"scroll_t"
-#define		GMSHADER_TEXTURES_SCALE_S			"scale_s"
-#define		GMSHADER_TEXTURES_SCALE_T			"scale_t"
 
 //光照
 #define		GMSHADER_AMBIENT_LIGHTS(i)			GMSHADER("ambients") "[" #i "]"
@@ -65,19 +57,26 @@ BEGIN_NS
 constexpr GMint GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
 constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
 
-inline const char* getTextureUniformName(GMTextureType t, GMuint index)
+inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTextureType t, GMuint index)
 {
 	GM_ASSERT(index < GMMaxTextureCount(t));
+	static const std::string GMSHADER_AMBIENT_TEXTURES_0 = std::string(desc->AmbientTextureName) + "[0]";
+	static const std::string GMSHADER_AMBIENT_TEXTURES_1 = std::string(desc->AmbientTextureName) + "[1]";
+	static const std::string GMSHADER_AMBIENT_TEXTURES_2 = std::string(desc->AmbientTextureName) + "[2]";
+	static const std::string GMSHADER_DIFFUSE_TEXTURES_0 = std::string(desc->DiffuseTextureName) + "[0]";
+	static const std::string GMSHADER_DIFFUSE_TEXTURES_1 = std::string(desc->DiffuseTextureName) + "[1]";
+	static const std::string GMSHADER_DIFFUSE_TEXTURES_2 = std::string(desc->DiffuseTextureName) + "[2]";
+
 	switch (t)
 	{
 	case GMTextureType::AMBIENT:
-		return index == 0 ? GMSHADER_AMBIENT_TEXTURES(0) :
-			index == 1 ? GMSHADER_AMBIENT_TEXTURES(1) :
-			index == 2 ? GMSHADER_AMBIENT_TEXTURES(2) : "";
+		return index == 0 ? GMSHADER_AMBIENT_TEXTURES_0.c_str() :
+			index == 1 ? GMSHADER_AMBIENT_TEXTURES_1.c_str() :
+			index == 2 ? GMSHADER_AMBIENT_TEXTURES_2.c_str() : "";
 	case GMTextureType::DIFFUSE:
-		return index == 0 ? GMSHADER_DIFFUSE_TEXTURES(0) :
-			index == 1 ? GMSHADER_DIFFUSE_TEXTURES(1) :
-			index == 2 ? GMSHADER_DIFFUSE_TEXTURES(2) : "";
+		return index == 0 ? GMSHADER_DIFFUSE_TEXTURES_0.c_str() :
+			index == 1 ? GMSHADER_DIFFUSE_TEXTURES_1.c_str() :
+			index == 2 ? GMSHADER_DIFFUSE_TEXTURES_2.c_str() : "";
 	case GMTextureType::NORMALMAP:
 		return index == 0 ? GMSHADER_NORMALMAP_TEXTURES(0) :
 			index == 1 ? GMSHADER_NORMALMAP_TEXTURES(1) :

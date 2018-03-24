@@ -327,33 +327,34 @@ void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type
 	D(d);
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	ID3DX11EffectVariable* texAttrs = nullptr;
-	const GMShaderVariablesTextureDesc* textureDesc = nullptr;
+	const char* textureName = nullptr;
 	if (type == GMTextureType::AMBIENT)
 	{
-		textureDesc = &desc->AmbientTextureAttributes;
+		textureName = desc->AmbientTextureName;
 	}
 	else if (type == GMTextureType::DIFFUSE)
 	{
-		textureDesc = &desc->DiffuseTextureAttributes;
+		textureName = desc->DiffuseTextureName;
 	}
 	else
 	{
 		return;
 	}
+	GM_ASSERT(textureName);
 
-	texAttrs = d->effect->GetVariableByName(textureDesc->TextureName)->GetElement(index);
+	texAttrs = d->effect->GetVariableByName(textureName)->GetElement(index);
 	CHECK_VAR(texAttrs);
 
 	if (texture)
 	{
-		ID3DX11EffectScalarVariable* enabled = texAttrs->GetMemberByName(textureDesc->Enabled)->AsScalar();
+		ID3DX11EffectScalarVariable* enabled = texAttrs->GetMemberByName(desc->TextureAttributes.Enabled)->AsScalar();
 		CHECK_VAR(enabled);
 		GM_DX_HR(enabled->SetBool(TRUE));
 
-		ID3DX11EffectScalarVariable* offsetX = texAttrs->GetMemberByName(textureDesc->OffsetX)->AsScalar();
-		ID3DX11EffectScalarVariable* offsetY = texAttrs->GetMemberByName(textureDesc->OffsetY)->AsScalar();
-		ID3DX11EffectScalarVariable* scaleX = texAttrs->GetMemberByName(textureDesc->ScaleX)->AsScalar();
-		ID3DX11EffectScalarVariable* scaleY = texAttrs->GetMemberByName(textureDesc->ScaleY)->AsScalar();
+		ID3DX11EffectScalarVariable* offsetX = texAttrs->GetMemberByName(desc->TextureAttributes.OffsetX)->AsScalar();
+		ID3DX11EffectScalarVariable* offsetY = texAttrs->GetMemberByName(desc->TextureAttributes.OffsetY)->AsScalar();
+		ID3DX11EffectScalarVariable* scaleX = texAttrs->GetMemberByName(desc->TextureAttributes.ScaleX)->AsScalar();
+		ID3DX11EffectScalarVariable* scaleY = texAttrs->GetMemberByName(desc->TextureAttributes.ScaleY)->AsScalar();
 		CHECK_VAR(offsetX);
 		CHECK_VAR(offsetY);
 		CHECK_VAR(scaleX);
@@ -385,7 +386,7 @@ void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type
 	else
 	{
 		// 将这个Texture的Enabled设置为false
-		ID3DX11EffectScalarVariable* enabled = texAttrs->GetMemberByName(textureDesc->Enabled)->AsScalar();
+		ID3DX11EffectScalarVariable* enabled = texAttrs->GetMemberByName(desc->TextureAttributes.Enabled)->AsScalar();
 		CHECK_VAR(enabled);
 		enabled->SetBool(FALSE);
 	}

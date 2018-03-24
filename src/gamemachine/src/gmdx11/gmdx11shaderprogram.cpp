@@ -13,8 +13,9 @@ namespace
 			"ProjectionMatrix",
 			"InverseTransposeModelMatrix",
 
-			{ "AmbientTextureAttributes", "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
-			{ "DiffuseTextureAttributes", "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
+			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
+			"AmbientTextureAttributes",
+			"DiffuseTextureAttributes",
 
 			"GMRasterizerState",
 			"GMBlendState",

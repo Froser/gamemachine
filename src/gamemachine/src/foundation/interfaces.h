@@ -166,12 +166,12 @@ enum class GMMovement
 
 struct GMShaderVariablesTextureDesc
 {
-	const char* TextureName;
 	const char* OffsetX;
 	const char* OffsetY;
 	const char* ScaleX;
 	const char* ScaleY;
 	const char* Enabled;
+	const char* Texture;
 };
 
 struct GMShaderVariablesDesc
@@ -183,8 +183,9 @@ struct GMShaderVariablesDesc
 	const char* InverseTransposeModelMatrix;
 
 	// 材质
-	GMShaderVariablesTextureDesc AmbientTextureAttributes;
-	GMShaderVariablesTextureDesc DiffuseTextureAttributes;
+	GMShaderVariablesTextureDesc TextureAttributes;
+	const char* AmbientTextureName;
+	const char* DiffuseTextureName;
 
 	// 状态
 	const char* RasterizerState;
