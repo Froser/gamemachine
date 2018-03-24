@@ -12,7 +12,10 @@ namespace
 			"ViewMatrix",
 			"ProjectionMatrix",
 			"InverseTransposeModelMatrix",
-			"HasTex",
+
+			{ "AmbientTextureAttributes", "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
+			{ "DiffuseTextureAttributes", "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
+
 			"GMRasterizerState",
 			"GMBlendState",
 		};

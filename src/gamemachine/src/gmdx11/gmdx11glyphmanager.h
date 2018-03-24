@@ -22,7 +22,7 @@ public:
 	GMDx11GlyphTexture();
 
 public:
-	virtual void drawTexture(GMTextureFrames* frames) override;
+	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override;
 
 public:
 	inline ID3D11Texture2D* getD3D11Texture()

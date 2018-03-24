@@ -4,6 +4,7 @@
 #include <gmgameobject.h>
 #include <gmdx11helper.h>
 #include "gmdx11modelpainter.h"
+#include "gmdx11texture.h"
 
 #define GMSHADER_LAYOUT_NAME_POSITION "POSITION"
 #define GMSHADER_LAYOUT_NAME_NORMAL "NORMAL"
@@ -12,6 +13,7 @@
 #define GMSHADER_LAYOUT_NAME_BITANGENT "TEXCOORD"
 #define GMSHADER_LAYOUT_NAME_LIGHTMAP "TEXCOORD"
 #define FLOAT_OFFSET(i) (sizeof(gm::GMfloat) * i)
+#define CHECK_VAR(var) if (!var->IsValid()) { GM_ASSERT(false); return; }
 
 namespace
 {
@@ -271,14 +273,30 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	context->IASetInputLayout(d->inputLayout);
 	context->IASetPrimitiveTopology(getMode(model->getMesh()));
 	
-	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
-	shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
-	shaderProgram->setMatrix4(desc.ViewMatrix, GM.getCamera().getFrustum().getViewMatrix());
-	shaderProgram->setMatrix4(desc.ProjectionMatrix, GM.getCamera().getFrustum().getProjectionMatrix());
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+	shaderProgram->setMatrix4(desc->ViewMatrix, GM.getCamera().getFrustum().getViewMatrix());
+	shaderProgram->setMatrix4(desc->ProjectionMatrix, GM.getCamera().getFrustum().getProjectionMatrix());
 }
 
 void GMDx11Renderer::endModel()
 {
+}
+
+void GMDx11Renderer::prepareTextures()
+{
+	D(d);
+	GM_ASSERT(d->shader);
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+	{
+		GMint count = GMMaxTextureCount(type);
+		for (GMint i = 0; i < count; i++)
+		{
+			GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, i);
+			// 写入纹理属性，如是否绘制，偏移等
+			applyTextureAttribute(getTexture(textures), type, i);
+		}
+	}
 }
 
 void GMDx11Renderer::drawTextures()
@@ -287,11 +305,6 @@ void GMDx11Renderer::drawTextures()
 	GM_ASSERT(d->shader);
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 	{
-		//TODO just record
-		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
-		auto hasDiffuseTexture = d->effect->GetVariableByName(svd.HasDiffuseTexture)->AsScalar();
-		GM_DX_HR(hasDiffuseTexture->SetBool(FALSE));
-
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
 		{
@@ -302,10 +315,78 @@ void GMDx11Renderer::drawTextures()
 			if (texture)
 			{
 				// 激活动画序列
-				texture->drawTexture(&textures);
-				GM_DX_HR(hasDiffuseTexture->SetBool(TRUE));
+				texture->drawTexture(&textures, i);
 			}
 		}
+	}
+}
+
+void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type, GMint index)
+{
+	D(d);
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	ID3DX11EffectVariable* texAttrs = nullptr;
+	const GMShaderVariablesTextureDesc* textureDesc = nullptr;
+	if (type == GMTextureType::AMBIENT)
+	{
+		textureDesc = &desc->AmbientTextureAttributes;
+	}
+	else if (type == GMTextureType::DIFFUSE)
+	{
+		textureDesc = &desc->DiffuseTextureAttributes;
+	}
+	else
+	{
+		return;
+	}
+
+	texAttrs = d->effect->GetVariableByName(textureDesc->TextureName)->GetElement(index);
+	CHECK_VAR(texAttrs);
+
+	if (texture)
+	{
+		ID3DX11EffectScalarVariable* enabled = texAttrs->GetMemberByName(textureDesc->Enabled)->AsScalar();
+		CHECK_VAR(enabled);
+		GM_DX_HR(enabled->SetBool(TRUE));
+
+		ID3DX11EffectScalarVariable* offsetX = texAttrs->GetMemberByName(textureDesc->OffsetX)->AsScalar();
+		ID3DX11EffectScalarVariable* offsetY = texAttrs->GetMemberByName(textureDesc->OffsetY)->AsScalar();
+		ID3DX11EffectScalarVariable* scaleX = texAttrs->GetMemberByName(textureDesc->ScaleX)->AsScalar();
+		ID3DX11EffectScalarVariable* scaleY = texAttrs->GetMemberByName(textureDesc->ScaleY)->AsScalar();
+		CHECK_VAR(offsetX);
+		CHECK_VAR(offsetY);
+		CHECK_VAR(scaleX);
+		CHECK_VAR(scaleY);
+		GM_DX_HR(offsetX->SetFloat(1.f));
+		GM_DX_HR(offsetY->SetFloat(1.f));
+		GM_DX_HR(scaleX->SetFloat(1.f));
+		GM_DX_HR(scaleY->SetFloat(1.f));
+
+		auto applyCallback = [&](GMS_TextureModType type, Pair<GMfloat, GMfloat>&& args) {
+			if (type == GMS_TextureModType::SCALE)
+			{
+				GM_DX_HR(offsetX->SetFloat(args.first));
+				GM_DX_HR(offsetY->SetFloat(args.second));
+			}
+			else if (type == GMS_TextureModType::SCROLL)
+			{
+				GM_DX_HR(scaleX->SetFloat(args.first));
+				GM_DX_HR(scaleY->SetFloat(args.second));
+			}
+			else
+			{
+				GM_ASSERT(false);
+			}
+		};
+
+		d->shader->getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+	}
+	else
+	{
+		// 将这个Texture的Enabled设置为false
+		ID3DX11EffectScalarVariable* enabled = texAttrs->GetMemberByName(textureDesc->Enabled)->AsScalar();
+		CHECK_VAR(enabled);
+		enabled->SetBool(FALSE);
 	}
 }
 
@@ -416,6 +497,7 @@ void GMDx11Renderer::passAllAndDraw(GMComponent* component)
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
+		prepareTextures();
 		pass->Apply(0, getEngine()->getDeviceContext());
 		drawTextures();
 		for (GMuint i = 0; i < primitiveCount; ++i)

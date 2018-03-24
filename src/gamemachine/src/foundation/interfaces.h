@@ -106,7 +106,7 @@ GM_INTERFACE(IGameHandler)
 
 GM_INTERFACE(ITexture)
 {
-	virtual void drawTexture(GMTextureFrames* frames) = 0;
+	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) = 0;
 };
 
 //! 可以获取、设置对象的数据接口。
@@ -164,13 +164,29 @@ enum class GMMovement
 	Jump,
 };
 
+struct GMShaderVariablesTextureDesc
+{
+	const char* TextureName;
+	const char* OffsetX;
+	const char* OffsetY;
+	const char* ScaleX;
+	const char* ScaleY;
+	const char* Enabled;
+};
+
 struct GMShaderVariablesDesc
 {
+	// 矩阵
 	const char* ModelMatrix;
 	const char* ViewMatrix;
 	const char* ProjectionMatrix;
 	const char* InverseTransposeModelMatrix;
-	const char* HasDiffuseTexture;
+
+	// 材质
+	GMShaderVariablesTextureDesc AmbientTextureAttributes;
+	GMShaderVariablesTextureDesc DiffuseTextureAttributes;
+
+	// 状态
 	const char* RasterizerState;
 	const char* BlendState;
 };

@@ -148,7 +148,7 @@ void GMGLTexture::init(const GMImage* image)
 	d->inited = true;
 }
 
-void GMGLTexture::drawTexture(GMTextureFrames* frames)
+void GMGLTexture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
 	glBindTexture(d->target, d->id);

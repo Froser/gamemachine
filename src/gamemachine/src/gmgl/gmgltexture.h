@@ -31,7 +31,7 @@ private:
 	void init(const GMImage* image);
 
 public:
-	virtual void drawTexture(GMTextureFrames* frames) override;
+	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override;
 };
 
 END_NS

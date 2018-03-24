@@ -268,7 +268,7 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 			{
 				const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
 				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
+				combineUniform(u_color, uniform, "." GMSHADER_LIGHTS_LIGHTCOLOR);
 				prog->setVec3(u_color, light.getLightColor());
 				break;
 			}
@@ -276,8 +276,8 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 			{
 				const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
 				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, GMSHADER_LIGHTS_LIGHTCOLOR);
-				combineUniform(u_position, uniform, GMSHADER_LIGHTS_LIGHTPOSITION);
+				combineUniform(u_color, uniform, "." GMSHADER_LIGHTS_LIGHTCOLOR);
+				combineUniform(u_position, uniform, "." GMSHADER_LIGHTS_LIGHTPOSITION);
 				prog->setVec3(u_color, light.getLightColor());
 				prog->setVec3(u_position, light.getLightPosition());
 				break;

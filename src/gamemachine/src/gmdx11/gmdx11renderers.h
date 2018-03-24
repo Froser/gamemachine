@@ -13,6 +13,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
+	const GMShaderVariablesDesc* variableDesc = nullptr;
 };
 
 class GMDx11Renderer : public IRenderer
@@ -34,6 +35,16 @@ private:
 		return gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 	}
 
+	inline const GMShaderVariablesDesc* getVariablesDesc()
+	{
+		D(d);
+		if (!d->variableDesc)
+		{
+			d->variableDesc = &getEngine()->getShaderProgram()->getDesc();
+		}
+		return d->variableDesc;
+	}
+
 private:
 	ID3DX11EffectTechnique* getTechnique();
 	void prepareBuffer(IQueriable* painter);
@@ -41,7 +52,9 @@ private:
 	void prepareBlend(GMComponent* component);
 	void passAllAndDraw(GMComponent* component);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
+	void prepareTextures();
 	void drawTextures();
+	void applyTextureAttribute(ITexture* texture, GMTextureType type, GMint index);
 };
 
 class GMDx11Renderer_3D : public GMDx11Renderer

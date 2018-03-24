@@ -56,7 +56,7 @@ GMDx11Texture::~GMDx11Texture()
 {
 }
 
-void GMDx11Texture::drawTexture(GMTextureFrames* frames)
+void GMDx11Texture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
 	if (!d->samplerState)
@@ -70,8 +70,8 @@ void GMDx11Texture::drawTexture(GMTextureFrames* frames)
 	}
 	
 	GM_ASSERT(d->samplerState);
-	d->deviceContext->PSSetShaderResources(0, 1, &d->shaderResourceView);
-	d->deviceContext->PSSetSamplers(0, 1, &d->samplerState);
+	d->deviceContext->PSSetShaderResources(textureIndex, 1, &d->shaderResourceView);
+	d->deviceContext->PSSetSamplers(textureIndex, 1, &d->samplerState);
 }
 
 void GMDx11Texture::init()

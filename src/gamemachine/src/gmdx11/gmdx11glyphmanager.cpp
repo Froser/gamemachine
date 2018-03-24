@@ -85,7 +85,7 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	);
 }
 
-void GMDx11GlyphTexture::drawTexture(GMTextureFrames* frames)
+void GMDx11GlyphTexture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
 	if (!d->samplerState)

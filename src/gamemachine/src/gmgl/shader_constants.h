@@ -23,20 +23,20 @@ BEGIN_NS
 #define		GMSHADER_DIFFUSE_TEXTURES(i)		GMSHADER("diffuse_textures") "[" #i "]"
 #define		GMSHADER_NORMALMAP_TEXTURES(i)		GMSHADER("normalmap_textures") "[" #i "]"
 #define		GMSHADER_LIGHTMAP_TEXTURES(i)		GMSHADER("lightmap_textures") "[" #i "]"
-#define		GMSHADER_TEXTURES_TEXTURE			".texture"
-#define		GMSHADER_TEXTURES_ENABLED			".enabled"
-#define		GMSHADER_TEXTURES_SCROLL_S			".scroll_s"
-#define		GMSHADER_TEXTURES_SCROLL_T			".scroll_t"
-#define		GMSHADER_TEXTURES_SCALE_S			".scale_s"
-#define		GMSHADER_TEXTURES_SCALE_T			".scale_t"
+#define		GMSHADER_TEXTURES_TEXTURE			"texture"
+#define		GMSHADER_TEXTURES_ENABLED			"enabled"
+#define		GMSHADER_TEXTURES_SCROLL_S			"scroll_s"
+#define		GMSHADER_TEXTURES_SCROLL_T			"scroll_t"
+#define		GMSHADER_TEXTURES_SCALE_S			"scale_s"
+#define		GMSHADER_TEXTURES_SCALE_T			"scale_t"
 
 //光照
 #define		GMSHADER_AMBIENT_LIGHTS(i)			GMSHADER("ambients") "[" #i "]"
 #define		GMSHADER_AMBIENTS_COUNT				GMSHADER("ambients_count")
 #define		GMSHADER_SPECULAR_LIGHTS(i)			GMSHADER("speculars") "[" #i "]"
 #define		GMSHADER_SPECULARS_COUNT			GMSHADER("speculars_count")
-#define		GMSHADER_LIGHTS_LIGHTCOLOR			".lightColor"
-#define		GMSHADER_LIGHTS_LIGHTPOSITION		".lightPosition"
+#define		GMSHADER_LIGHTS_LIGHTCOLOR			"lightColor"
+#define		GMSHADER_LIGHTS_LIGHTPOSITION		"lightPosition"
 
 //材质
 #define		GMSHADER_MATERIAL_KA				GMSHADER("material.ka")

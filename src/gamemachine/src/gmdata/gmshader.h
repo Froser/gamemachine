@@ -164,6 +164,33 @@ public:
 		}
 		return *this;
 	}
+
+	inline void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureModType, Pair<GMfloat, GMfloat>&&)> callback)
+	{
+		GMuint n = 0;
+		const GMS_TextureMod& tc = getTexMod(n);
+		while (n < MAX_TEX_MOD && tc.type != GMS_TextureModType::NO_TEXTURE_MOD)
+		{
+			switch (tc.type)
+			{
+			case GMS_TextureModType::SCROLL:
+			{
+				GMfloat s = timeSeconds * tc.p1, t = timeSeconds * tc.p2;
+				callback(tc.type, { s, t });
+			}
+			break;
+			case GMS_TextureModType::SCALE:
+			{
+				GMfloat s = tc.p1, t = tc.p2;
+				callback(tc.type, { s, t });
+				break;
+			}
+			default:
+				break;
+			}
+			n++;
+		}
+	}
 };
 
 enum class GMTextureType

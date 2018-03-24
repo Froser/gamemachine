@@ -168,7 +168,7 @@ void GMGLRenderer_3D::drawTexture(GMTextureType type, GMint index)
 	{
 		// 激活动画序列
 		activateTexture((GMTextureType)type, index);
-		texture->drawTexture(&textures);
+		texture->drawTexture(&textures, index);
 	}
 }
 
@@ -221,40 +221,33 @@ void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
 		u_scales[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scalet[GMGL_MAX_UNIFORM_NAME_LEN];
 
-	combineUniform(u_scrolls, uniform, GMSHADER_TEXTURES_SCROLL_S);
-	combineUniform(u_scrollt, uniform, GMSHADER_TEXTURES_SCROLL_T);
-	combineUniform(u_scales, uniform, GMSHADER_TEXTURES_SCALE_S);
-	combineUniform(u_scalet, uniform, GMSHADER_TEXTURES_SCALE_T);
+	combineUniform(u_scrolls, uniform, "." GMSHADER_TEXTURES_SCROLL_S);
+	combineUniform(u_scrollt, uniform, "." GMSHADER_TEXTURES_SCROLL_T);
+	combineUniform(u_scales, uniform, "." GMSHADER_TEXTURES_SCALE_S);
+	combineUniform(u_scalet, uniform, "." GMSHADER_TEXTURES_SCALE_T);
 	shaderProgram->setFloat(u_scrolls, 0.f);
 	shaderProgram->setFloat(u_scrollt, 0.f);
 	shaderProgram->setFloat(u_scales, 1.f);
 	shaderProgram->setFloat(u_scalet, 1.f);
 
-	GMuint n = 0;
-	const GMS_TextureMod* tc = &d->shader->getTexture().getTextureFrames(type, index).getTexMod(n);
-	while (n < MAX_TEX_MOD && tc->type != GMS_TextureModType::NO_TEXTURE_MOD)
-	{
-		switch (tc->type)
+	auto applyCallback = [&](GMS_TextureModType type, Pair<GMfloat, GMfloat>&& args) {
+		if (type == GMS_TextureModType::SCALE)
 		{
-		case GMS_TextureModType::SCROLL:
+			shaderProgram->setFloat(u_scrollt, args.first);
+			shaderProgram->setFloat(u_scrolls, args.second);
+		}
+		else if (type == GMS_TextureModType::SCROLL)
 		{
-			GMfloat s = GameMachine::instance().getGameTimeSeconds() * tc->p1, t = GameMachine::instance().getGameTimeSeconds() * tc->p2;
-			shaderProgram->setFloat(u_scrollt, t);
-			shaderProgram->setFloat(u_scrollt, s);
+			shaderProgram->setFloat(u_scalet, args.first);
+			shaderProgram->setFloat(u_scales, args.second);
 		}
-		break;
-		case GMS_TextureModType::SCALE:
+		else
 		{
-			GMfloat s = tc->p1, t = tc->p2;
-			shaderProgram->setFloat(u_scales, t);
-			shaderProgram->setFloat(u_scales, s);
-			break;
+			GM_ASSERT(false);
 		}
-		default:
-			break;
-		}
-		n++;
-	}
+	};
+
+	d->shader->getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
 }
 
 void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
@@ -269,8 +262,8 @@ void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	const char* uniform = getTextureUniformName(type, index);
 	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
-	combineUniform(u_texture, uniform, GMSHADER_TEXTURES_TEXTURE);
-	combineUniform(u_enabled, uniform, GMSHADER_TEXTURES_ENABLED);
+	combineUniform(u_texture, uniform, "." GMSHADER_TEXTURES_TEXTURE);
+	combineUniform(u_enabled, uniform, "." GMSHADER_TEXTURES_ENABLED);
 	shaderProgram->setInt(u_texture, texId);
 	shaderProgram->setInt(u_enabled, 1);
 
@@ -289,7 +282,7 @@ void GMGLRenderer_3D::deactivateTexture(GMTextureType type, GMint index)
 	GMint idx = (GMint)type;
 	const char* uniform = getTextureUniformName(type, index);
 	char u[GMGL_MAX_UNIFORM_NAME_LEN];
-	combineUniform(u, uniform, GMSHADER_TEXTURES_ENABLED);
+	combineUniform(u, uniform, "." GMSHADER_TEXTURES_ENABLED);
 	shaderProgram->setInt(u, 0);
 }
 
@@ -334,7 +327,7 @@ void GMGLRenderer_2D::beforeDraw(GMComponent* component)
 	{
 		// 激活动画序列
 		activateTexture(GMTextureType::AMBIENT, 0);
-		texture->drawTexture(&textures);
+		texture->drawTexture(&textures, 0);
 	}
 }
 
@@ -398,7 +391,7 @@ void GMGLRenderer_CubeMap::beforeDraw(GMComponent* component)
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
-		glTex->drawTexture(&frames);
+		glTex->drawTexture(&frames, 0);
 		GM_END_CHECK_GL_ERROR
 	}
 }
