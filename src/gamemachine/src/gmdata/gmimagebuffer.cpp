@@ -34,7 +34,6 @@ void GMImageBuffer::generateData()
 }
 
 GMCubeMapBuffer::GMCubeMapBuffer(
-	GMImageFormat format,
 	const GMImage& posX,
 	const GMImage& negX,
 	const GMImage& posY,
@@ -45,10 +44,18 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	D_BASE(d, GMImage);
 	GMImage::Data& data = getData();
 
+	GM_ASSERT(
+		posX.getData().format == negX.getData().format &&
+		posX.getData().format == posY.getData().format &&
+		posX.getData().format == negY.getData().format &&
+		posX.getData().format == posZ.getData().format &&
+		posX.getData().format == negZ.getData().format
+	);
+
 	data.target = GMImageTarget::CubeMap;
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGBA8;
-	data.format = format;
+	data.format = posX.getData().format;
 	data.swizzle[0] = GL_RED;
 	data.swizzle[1] = GL_GREEN;
 	data.swizzle[2] = GL_BLUE;
@@ -72,8 +79,8 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	const GMImage* slices[] = {
 		&posX,
 		&negX,
-		&negY, // 由于uv坐标和gl坐标y方向相反，所以我们特意把negY（天空）和posY（地面）颠倒一下
 		&posY,
+		&negY,
 		&posZ,
 		&negZ
 	};

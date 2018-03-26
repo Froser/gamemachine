@@ -62,7 +62,7 @@ void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
 {
 	vec3 I = normalize((_model3d_position_world - GM_view_position).rgb);
 	vec3 R = refract(I, normal_world, GM_material.refractivity);
-	g_model3d_refractionLight += texture(GM_cubemap, vec3(R.x, -R.y, R.z)).rgb;
+	g_model3d_refractionLight += texture(GM_cubemap, vec3(R.x, R.y, R.z)).rgb;
 }
 
 void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)

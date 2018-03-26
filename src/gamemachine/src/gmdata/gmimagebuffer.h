@@ -29,7 +29,6 @@ class GMCubeMapBuffer : public GMImage
 {
 public:
 	GMCubeMapBuffer(
-		GMImageFormat format,
 		const GMImage& posX,
 		const GMImage& negX,
 		const GMImage& posY,

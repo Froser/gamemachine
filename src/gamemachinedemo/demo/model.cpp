@@ -220,7 +220,7 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 		GM_ASSERT(slices[5]);
 	}
 
-	gm::GMCubeMapBuffer cubeMap(gm::GMImageFormat::RGB, *slices[0], *slices[1], *slices[2], *slices[3], *slices[4], *slices[5]);
+	gm::GMCubeMapBuffer cubeMap(*slices[0], *slices[1], *slices[2], *slices[3], *slices[4], *slices[5]);
 	gm::ITexture* cubeMapTex = nullptr;
 	GM.getFactory()->createTexture(&cubeMap, &cubeMapTex);
 
