@@ -30,7 +30,6 @@ void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
 	GMDx11VertexData vd = { 0 };
 	GMModel* model = getModel();
 	// 按照position的size()/3来分配顶点
-	// 先不考虑崩溃什么的情况
 	GM_ASSERT(model->getMesh()->positions().size() % 3 == 0);
 	for (GMuint i = 0; i < model->getMesh()->positions().size() / 3; ++i)
 	{
@@ -52,6 +51,18 @@ void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
 			auto& data_ref = model->getMesh()->texcoords();
 			vd.texcoords[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
 			vd.texcoords[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->tangents();
+			vd.tangents[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
+			vd.tangents[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->bitangents();
+			vd.bitangents[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
+			vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
 		}
 
 		packedData.push_back(vd);

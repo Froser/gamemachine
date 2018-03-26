@@ -27,6 +27,12 @@ namespace
 
 		{ GMSHADER_LAYOUT_NAME_TEXCOORD, 0, DXGI_FORMAT_R32G32_FLOAT, 0, FLOAT_OFFSET(6), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		// 2
+
+		{ GMSHADER_LAYOUT_NAME_TANGENT, 1, DXGI_FORMAT_R32G32_FLOAT, 0, FLOAT_OFFSET(8), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 2
+
+		{ GMSHADER_LAYOUT_NAME_BITANGENT, 2, DXGI_FORMAT_R32G32_FLOAT, 0, FLOAT_OFFSET(10), D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		// 2
 	};
 
 	inline D3D_PRIMITIVE_TOPOLOGY getMode(GMMesh* obj)
@@ -127,6 +133,29 @@ namespace
 			renderTarget.BlendOpAlpha = D3D11_BLEND_OP_ADD; //目前不提供其他Blend操作
 			return desc;
 		}
+	}
+
+	inline D3D11_DEPTH_STENCIL_DESC getDepthStencilDesc(
+		bool depthEnabled,
+		bool stencilEnabled
+	)
+	{
+		D3D11_DEPTH_STENCIL_DESC desc = { 0 };
+		desc.DepthEnable = depthEnabled ? TRUE : FALSE;
+		desc.StencilEnable = stencilEnabled ? TRUE : FALSE;
+		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		desc.DepthFunc = D3D11_COMPARISON_LESS;
+		desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+		desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+		desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+		desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		return desc;
 	}
 
 	struct GMDx11RasterizerStates : public GMSingleton<GMDx11RasterizerStates>
@@ -235,6 +264,52 @@ namespace
 	private:
 		GMDx11GraphicEngine* engine = nullptr;
 		ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
+	};
+
+	struct GMDx11DepthStencilStates : public GMSingleton<GMDx11DepthStencilStates>
+	{
+	public:
+		GMDx11DepthStencilStates::GMDx11DepthStencilStates()
+		{
+			engine = gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+		}
+
+		~GMDx11DepthStencilStates()
+		{
+			for (GMint b1 = 0; b1 < 2; ++b1)
+			{
+				for (GMint b2 = 0; b2 < 2; ++b2)
+				{
+					if (states[b1][b2])
+						states[b1][b2]->Release();
+				}
+			}
+		}
+
+	public:
+		ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, bool stencilEnabled)
+		{
+			ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][stencilEnabled ? 1 : 0];
+			if (!state)
+			{
+				D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilEnabled);
+				createDepthStencilState(desc, &state);
+			}
+
+			GM_ASSERT(state);
+			return state;
+		}
+
+	private:
+		bool createDepthStencilState(const D3D11_DEPTH_STENCIL_DESC& desc, ID3D11DepthStencilState** out)
+		{
+			GM_DX_HR(engine->getDevice()->CreateDepthStencilState(&desc, out));
+			return !!(*out);
+		}
+
+	private:
+		GMDx11GraphicEngine* engine = nullptr;
+		ID3D11DepthStencilState* states[2][2] = { 0 };
 	};
 }
 
@@ -435,11 +510,21 @@ void GMDx11Renderer::prepareBlend(GMComponent* component)
 	GMDx11BlendStates& blendStates = GMDx11BlendStates::instance();
 	if (globalBlendState.enabled)
 	{
-		// 全局blend开启，此时忽略正在绘制的物体的Blend状态
-		GM_DX_HR(d->blend->SetBlendState(
-			0,
-			blendStates.getBlendState(true, globalBlendState.source, globalBlendState.dest)
-		));
+		// 全局blend开启时
+		if (d->shader->getBlend())
+		{
+			GM_DX_HR(d->blend->SetBlendState(
+				0,
+				blendStates.getBlendState(true, d->shader->getBlendFactorSource(), d->shader->getBlendFactorDest())
+			));
+		}
+		else
+		{
+			GM_DX_HR(d->blend->SetBlendState(
+				0,
+				blendStates.getBlendState(true, globalBlendState.source, globalBlendState.dest)
+			));
+		}
 	}
 	else
 	{
@@ -459,6 +544,23 @@ void GMDx11Renderer::prepareBlend(GMComponent* component)
 			));
 		}
 	}
+}
+
+void GMDx11Renderer::prepareDepthStencil(GMComponent* component)
+{
+	D(d);
+	if (!d->depthStencil)
+	{
+		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+		d->depthStencil = d->effect->GetVariableByName(svd.DepthStencilState)->AsDepthStencil();
+	}
+	GM_ASSERT(d->depthStencil);
+
+	GMDx11DepthStencilStates& depthStencilStates = GMDx11DepthStencilStates::instance();
+	GM_DX_HR(d->depthStencil->SetDepthStencilState(
+		0,
+		depthStencilStates.getDepthStencilState(!d->shader->getNoDepthTest(), false) //TODO 这个false，应该用stencil当前状态
+	));
 }
 
 ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
@@ -484,6 +586,7 @@ void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* m
 	prepareBuffer(painter);
 	prepareRasterizer(component);
 	prepareBlend(component);
+	prepareDepthStencil(component);
 	passAllAndDraw(component);
 }
 

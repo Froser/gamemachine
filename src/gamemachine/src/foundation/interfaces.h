@@ -190,6 +190,7 @@ struct GMShaderVariablesDesc
 	// 状态
 	const char* RasterizerState;
 	const char* BlendState;
+	const char* DepthStencilState;
 };
 
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)

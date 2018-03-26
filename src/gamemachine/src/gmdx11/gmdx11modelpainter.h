@@ -13,6 +13,8 @@ struct GMDx11VertexData
 	Array<GMfloat, 3> vertices;
 	Array<GMfloat, 3> normals;
 	Array<GMfloat, 2> texcoords;
+	Array<GMfloat, 2> tangents;
+	Array<GMfloat, 2> bitangents;
 };
 
 class GMDx11GraphicEngine;

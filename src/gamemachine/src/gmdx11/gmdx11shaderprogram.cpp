@@ -19,6 +19,7 @@ namespace
 
 			"GMRasterizerState",
 			"GMBlendState",
+			"GMDepthStencilState",
 		};
 		return desc;
 	}

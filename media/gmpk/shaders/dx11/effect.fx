@@ -39,6 +39,7 @@ SamplerState DiffuseSampler_2: register(s5);
 //--------------------------------------------------------------------------------------
 RasterizerState GMRasterizerState {};
 BlendState GMBlendState {};
+DepthStencilState GMDepthStencilState {};
 //--------------------------------------------------------------------------------------
 
 struct VS_INPUT
@@ -46,12 +47,16 @@ struct VS_INPUT
     float3 Position    : POSITION;
     float3 Normal      : NORMAL;
     float2 Texcoord    : TEXCOORD0;
+    float2 Tangent     : TEXCOORD1;
+    float2 Bitangent   : TEXCOORD2;
 };
 
 struct VS_OUTPUT
 {
     float3 Normal      : NORMAL;
     float2 Texcoord    : TEXCOORD0;
+    float2 Tangent     : TEXCOORD1;
+    float2 Bitangent   : TEXCOORD2;
     float4 Position    : SV_POSITION;
 };
 
@@ -59,6 +64,8 @@ struct PS_INPUT
 {
     float3 Normal      : NORMAL;
     float2 Texcoord    : TEXCOORD0;
+    float2 Tangent     : TEXCOORD1;
+    float2 Bitangent   : TEXCOORD2;
 };
 
 float4 Texture_Sample(Texture2D tex, SamplerState ss, float2 texcoord, GMTexture attributes)
@@ -150,10 +157,11 @@ technique11 GMTech_3D
 {
     pass P0
     {
+        SetVertexShader(CompileShader(vs_4_0,VS_3D()));
+        SetPixelShader(CompileShader(ps_4_0,PS_3D()));
         SetRasterizerState(GMRasterizerState);
-        SetVertexShader(CompileShader(vs_4_0,VS_3D() ) );
-        SetPixelShader(CompileShader(ps_4_0,PS_3D() ) );
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetDepthStencilState(GMDepthStencilState, 1);
     }
 }
 
@@ -161,9 +169,10 @@ technique11 GMTech_2D
 {
     pass P0
     {
+        SetVertexShader(CompileShader(vs_4_0,VS_2D()));
+        SetPixelShader(CompileShader(ps_4_0,PS_2D()));
         SetRasterizerState(GMRasterizerState);
-        SetVertexShader(CompileShader(vs_4_0,VS_2D() ) );
-        SetPixelShader(CompileShader(ps_4_0,PS_2D() ) );
+        SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
@@ -172,9 +181,10 @@ technique11 GMTech_Glyph
 {
     pass P0
     {
+        SetVertexShader(CompileShader(vs_4_0,VS_2D()));
+        SetPixelShader(CompileShader(ps_4_0,PS_Glyph()));
         SetRasterizerState(GMRasterizerState);
-        SetVertexShader(CompileShader(vs_4_0,VS_2D() ) );
-        SetPixelShader(CompileShader(ps_4_0,PS_Glyph() ) );
+        SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }

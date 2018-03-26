@@ -20,6 +20,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMMat4 transformMatrix = Identity<GMMat4>();
 	bool canDeferredRendering = true;
 	bool forceDisableDeferredRendering = false;
+	GMString name;
 };
 
 enum class GMGameObjectType

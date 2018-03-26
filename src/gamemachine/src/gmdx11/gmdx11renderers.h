@@ -13,6 +13,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
+	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 };
 
@@ -50,6 +51,7 @@ private:
 	void prepareBuffer(IQueriable* painter);
 	void prepareRasterizer(GMComponent* component);
 	void prepareBlend(GMComponent* component);
+	void prepareDepthStencil(GMComponent* component);
 	void passAllAndDraw(GMComponent* component);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 	void prepareTextures();

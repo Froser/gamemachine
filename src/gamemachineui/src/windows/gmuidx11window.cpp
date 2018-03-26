@@ -230,23 +230,18 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	CHECK_HR(hr);
 
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
-	depthStencilDesc.DepthEnable = true;
+	depthStencilDesc.DepthEnable = TRUE;
 	depthStencilDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 	depthStencilDesc.DepthFunc = D3D11_COMPARISON_LESS;
-
-	depthStencilDesc.StencilEnable = true;
-	depthStencilDesc.StencilReadMask = 0xFF;
-	depthStencilDesc.StencilWriteMask = 0xFF;
-
-	// Stencil operations if pixel is front-facing.
+	depthStencilDesc.StencilEnable = FALSE;
+	depthStencilDesc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+	depthStencilDesc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
 	depthStencilDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-
-	// Stencil operations if pixel is back-facing.
 	depthStencilDesc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
