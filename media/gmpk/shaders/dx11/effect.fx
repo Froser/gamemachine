@@ -100,6 +100,8 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
+    output.Tangent = input.Tangent;
+    output.Bitangent = input.Bitangent;
     return output;
 }
 
@@ -121,17 +123,19 @@ float4 PS_3D(PS_INPUT input) : SV_Target
 //--------------------------------------------------------------------------------------
 // 2D
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS_2D( VS_INPUT input )
+VS_OUTPUT VS_2D(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.Position = mul(output.Position, WorldMatrix);
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
+    output.Tangent = input.Tangent;
+    output.Bitangent = input.Bitangent;
     return output;
 }
 
-float4 PS_2D( PS_INPUT input ) : SV_Target
+float4 PS_2D(PS_INPUT input) : SV_Target
 {
     if (needDiscard(DiffuseTextureAttributes) && needDiscard(AmbientTextureAttributes))
         discard;
@@ -146,7 +150,7 @@ float4 PS_2D( PS_INPUT input ) : SV_Target
     return color;
 }
 
-float4 PS_Glyph( PS_INPUT input ) : SV_Target
+float4 PS_Glyph(PS_INPUT input) : SV_Target
 {
     float4 alpha = DiffuseTexture_0.Sample(DiffuseSampler_0, input.Texcoord);
     return float4(1, 0, 0, alpha.r);

@@ -40,7 +40,7 @@ void DemostrationWorld::init()
 	{
 		gm::ITexture* tex = nullptr;
 		gm::GMTextureUtil::createTexture("cubemap/cubemap_negz.jpg", &tex);
-		gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE, 1);
+		//gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE, 1);
 		getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 	}
 
@@ -54,7 +54,7 @@ void DemostrationWorld::renderScene()
 	Base::renderScene();
 
 	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->drawObjects(&d->gameObj[1], 1, gm::GMBufferMode::NoFramebuffer);
+	//engine->drawObjects(&d->gameObj[1], 1, gm::GMBufferMode::NoFramebuffer);
 	engine->drawObjects(&d->gameObj[0], 1, gm::GMBufferMode::NoFramebuffer);
 }
 
