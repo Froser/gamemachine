@@ -263,7 +263,7 @@ void DemostrationEntrance::init()
 
 	GM.getGraphicEngine()->setShaderLoadCallback(this);
 
-	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::FORWARD);
+	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
 	GMSetRenderState(RESOLUTION_X, rc.width);
 	GMSetRenderState(RESOLUTION_Y, rc.height);
