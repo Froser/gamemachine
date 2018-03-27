@@ -144,9 +144,7 @@ namespace
 
 	inline D3D11_DEPTH_STENCIL_DESC getDepthStencilDesc(
 		bool depthEnabled,
-		bool createStencil,
-		bool useStencil,
-		bool outside
+		const GMStencilOptions& stencilOptions
 	)
 	{
 		D3D11_DEPTH_STENCIL_DESC desc = { 0 };
@@ -156,12 +154,12 @@ namespace
 
 		desc.StencilEnable = TRUE;
 		desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-		desc.StencilWriteMask = useStencil ? D3D11_DEFAULT_STENCIL_WRITE_MASK : (createStencil ? D3D11_DEFAULT_STENCIL_WRITE_MASK : 0U);
+		desc.StencilWriteMask = stencilOptions.writeMask;
 
 		desc.FrontFace.StencilFailOp = desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 		desc.FrontFace.StencilDepthFailOp = desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 		desc.FrontFace.StencilPassOp = desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-		desc.FrontFace.StencilFunc = desc.BackFace.StencilFunc = (useStencil ? (outside ? D3D11_COMPARISON_NOT_EQUAL : D3D11_COMPARISON_EQUAL) : D3D11_COMPARISON_ALWAYS);
+		desc.FrontFace.StencilFunc = desc.BackFace.StencilFunc = stencilOptions.compareOp == GMStencilOptions::Equal ? D3D11_COMPARISON_EQUAL : ( GMStencilOptions::NotEqual ? D3D11_COMPARISON_NOT_EQUAL : D3D11_COMPARISON_ALWAYS);
 		return desc;
 	}
 
@@ -287,25 +285,22 @@ namespace
 			{
 				for (GMint b2 = 0; b2 < 2; ++b2)
 				{
-					for (GMint b3 = 0; b3 < 2; ++b3)
+					for (GMint b3 = 0; b3 < 3; ++b3)
 					{
-						for (GMint b4 = 0; b4 < 2; ++b4)
-						{
-							if (states[b1][b2][b3][b4])
-								states[b1][b2][b3][b4]->Release();
-						}
+						if (states[b1][b2][b3])
+							states[b1][b2][b3]->Release();
 					}
 				}
 			}
 		}
 
 	public:
-		ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, bool createStencil, bool useStencil, bool outside)
+		ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, const GMStencilOptions& stencilOptions)
 		{
-			ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][createStencil ? 1 : 0][useStencil ? 1 : 0][outside ? 1 : 0];
+			ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][stencilOptions.writeMask == GMStencilOptions::Ox00 ? 1 : 0][stencilOptions.compareOp];
 			if (!state)
 			{
-				D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, createStencil, useStencil, outside);
+				D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilOptions);
 				createDepthStencilState(desc, &state);
 			}
 
@@ -322,7 +317,7 @@ namespace
 
 	private:
 		GMDx11GraphicEngine* engine = nullptr;
-		ID3D11DepthStencilState* states[2][2][2][2] = { 0 };
+		ID3D11DepthStencilState* states[2][2][3] = { 0 };
 	};
 }
 
@@ -334,10 +329,6 @@ GMDx11Renderer::GMDx11Renderer()
 	GM_ASSERT(!d->effect);
 	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
 	GM_ASSERT(d->effect);
-
-	GM_ASSERT(!d->stencilState);
-	getEngine()->getInterface(GameMachineInterfaceID::GMD3D11StencilState, (void**)&d->stencilState);
-	GM_ASSERT(d->stencilState);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -576,10 +567,8 @@ void GMDx11Renderer::prepareDepthStencil(GMComponent* component)
 		0,
 		depthStencilStates.getDepthStencilState(
 			!d->shader->getNoDepthTest(),
-			!!d->stencilState->HasBegunCreateStencil(),
-			!!d->stencilState->HasBegunUseStencil(),
-			!!d->stencilState->IsStencilOutside()
-			)
+			getEngine()->getStencilOptions()
+		)
 	));
 }
 

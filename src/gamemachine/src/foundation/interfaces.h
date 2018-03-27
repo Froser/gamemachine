@@ -72,8 +72,6 @@ enum class GameMachineInterfaceID
 	D3D11ShaderProgram,
 	D3D11Effect,
 
-	GMD3D11StencilState,
-
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
 };
@@ -214,6 +212,25 @@ GM_INTERFACE(IShaderLoadCallback)
 	virtual void onLoadShaders(IGraphicEngine* engine) = 0;
 };
 
+struct GMStencilOptions
+{
+	enum GMStencilOp
+	{
+		Equal,
+		NotEqual,
+		Always
+	};
+
+	enum GMStencilWriteMask
+	{
+		Ox00 = 0x00,
+		OxFF = 0xFF,
+	};
+
+	GMStencilWriteMask writeMask;
+	GMStencilOp compareOp;
+};
+
 //! 图形绘制引擎接口
 /*!
   提供最基本的绘制功能。
@@ -244,7 +261,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual bool event(const GameMachineMessage& e) = 0;
 
-	//! 绘制若干个GMGameObject对象
+	//! 绘制若干个GMGameObject对象。
 	/*!
 	  绘制GMGameObject对象。这个方法会将绘制好的图元到目标缓存，目标缓存取决于GMBufferMode的值。
 	  \param objects 待绘制的对象。
@@ -281,38 +298,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual void clearStencil() = 0;
 
-	//! 开始创建模板缓存。
-	/*!
-	  在当前激活帧缓存下创建模板缓存。<BR>
-	  在此方法被执行后，所有的绘制将会被写入进被激活的帧缓存的模板缓存中。
-	  \sa endCreateStencil()
-	*/
-	virtual void beginCreateStencil() = 0;
-
-	//! 结束创建模板缓存。
-	/*!
-	  结束模板缓存的创建。<BR>
-	  在此方法被执行后，所有的绘制不会被写入到当前激活的帧缓存的模板缓存中。
-	  \sa beginCreateStencil()
-	*/
-	virtual void endCreateStencil() = 0;
-
-	//* 开始使用帧缓存。
-	/*!
-	  在此方法被执行后，绘制图元将会根据当前激活的帧缓存的模板缓存进行绘制。
-	  \param outside 表示图元是绘制在模板中，还是模板外。
-	  \sa endUseStencil()
-	*/
-	virtual void beginUseStencil(bool outside) = 0;
-
-	//! 结束使用帧缓存。
-	/*!
-	  在此方法被执行后，图元的绘制将不会依据任何模板缓存。
-	  \sa beginUseStencil()
-	*/
-	virtual void endUseStencil() = 0;
-
-	//! 开始进行融合绘制
+	//! 开始进行融合绘制。
 	/*!
 	  决定下一次调用drawObjects时的混合模式。如果在一个绘制流程中多次调用drawObjects，则应该使用此方法，将本帧的画面和当前帧缓存进行
 	融合，否则本帧将会覆盖当前帧缓存已有的所有值。
@@ -320,14 +306,26 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual void beginBlend(GMS_BlendFunc sfactor = GMS_BlendFunc::ONE, GMS_BlendFunc dfactor = GMS_BlendFunc::ONE) = 0;
 
-	//! 结束融合绘制
+	//! 结束融合绘制。
 	/*!
 	  结束与当前帧缓存的融合。在这种情况下，执行多次drawObjects，会将其输出的帧缓存覆盖多次。
 	  \sa drawObjects(), beginBlend()
 	*/
 	virtual void endBlend() = 0;
 
-	//! 获取一个着色器程序
+	//! 设置模板缓存属性。
+	/*!
+	  设置完的模板属性后，模板属性将会应用到所有图形渲染中。
+	*/
+	virtual void setStencilOptions(const GMStencilOptions& options) = 0;
+
+	//! 获取模板缓存属性。
+	/*!
+	  查看当前正在应用的模板缓存属性。
+	*/
+	virtual const GMStencilOptions& getStencilOptions() = 0;
+
+	//! 获取一个着色器程序。
 	/*!
 	  一个渲染程序一般会装载多个着色器程序，以满足正向渲染、延迟渲染等需求。根据传入的参数返回对应的着色器程序。
 	  \param type 着色器程序种类。
@@ -335,7 +333,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) = 0;
 
-	//! 设置一个着色器程序读取的回调
+	//! 设置一个着色器程序读取的回调。
 	/*!
 	  当设置引擎准备读取着色器时，此回调接口被调用。一般可以使用setInterface来为引擎添加着色器。
 	  \param cb 着色器读取回调接口。

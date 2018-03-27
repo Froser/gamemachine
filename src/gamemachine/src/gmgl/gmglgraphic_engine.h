@@ -68,11 +68,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMGameObject*> deferredRenderingGameObjects;
 	Vector<GMGameObject*> forwardRenderingGameObjects;
 
-	GMint stencilRenderModeCache = GMStates_RenderOptions::FORWARD;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
-	GMint createStencilRef = 0;
-	GMint useStencilRef = 0;
-	bool outsideStencil = false;
+	GMStencilOptions stencilOptions;
 
 	// 混合绘制
 	GMRenderMode renderModeForBlend = GMStates_RenderOptions::FORWARD;
@@ -103,10 +100,6 @@ public:
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights();
 	virtual void clearStencil() override;
-	virtual void beginCreateStencil() override;
-	virtual void endCreateStencil() override;
-	virtual void beginUseStencil(bool outside) override;
-	virtual void endUseStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
@@ -114,6 +107,18 @@ public:
 	{
 		D(d);
 		d->shaderLoadCallback = cb;
+	}
+
+	virtual void setStencilOptions(const GMStencilOptions& options) override
+	{
+		D(d);
+		d->stencilOptions = options;
+	}
+
+	virtual const GMStencilOptions& getStencilOptions() override
+	{
+		D(d);
+		return d->stencilOptions;
 	}
 
 public:
@@ -156,24 +161,6 @@ public:
 			gm_error("GMObject::draw() cannot be called outside IGraphicEngine::drawObjects");
 		}
 #endif
-	}
-
-	inline bool hasBegunCreateStencil()
-	{
-		D(d);
-		return d->createStencilRef > 0;
-	}
-
-	inline bool hasBegunUseStencil()
-	{
-		D(d);
-		return d->useStencilRef > 0;
-	}
-
-	inline bool isOutsideStencil()
-	{
-		D(d);
-		return d->outsideStencil;
 	}
 
 private:

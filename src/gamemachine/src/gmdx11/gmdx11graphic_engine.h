@@ -16,17 +16,6 @@ struct GMDx11GlobalBlendStateDesc
 	GMint blendRefCount = 0;
 };
 
-struct IGMDx11StencilState : public IUnknown
-{
-	STDMETHOD_(BOOL, HasBegunCreateStencil)() PURE;
-	STDMETHOD_(BOOL, HasBegunUseStencil)() PURE;
-	STDMETHOD_(BOOL, IsStencilOutside)() PURE;
-	STDMETHOD(BeginCreateStencil)() PURE;
-	STDMETHOD(BeginUseStencil)(BOOL) PURE;
-	STDMETHOD(EndCreateStencil)() PURE;
-	STDMETHOD(EndUseStencil)() PURE;
-};
-
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
@@ -35,10 +24,9 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMScopePtr<IShaderProgram> shaderProgram;
-	GMComPtr<IGMDx11StencilState> stencilState;
-
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GMDx11GlobalBlendStateDesc blendState;
+	GMStencilOptions stencilOptions;
 	bool ready = false;
 };
 
@@ -54,10 +42,6 @@ public:
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights() override;
 	virtual void clearStencil() override;
-	virtual void beginCreateStencil() override;
-	virtual void endCreateStencil() override;
-	virtual void beginUseStencil(bool outside) override;
-	virtual void endUseStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) override;
@@ -66,6 +50,18 @@ public:
 	{
 		D(d);
 		d->shaderLoadCallback = cb;
+	}
+
+	virtual void setStencilOptions(const GMStencilOptions& options) override
+	{
+		D(d);
+		d->stencilOptions = options;
+	}
+
+	virtual const GMStencilOptions& getStencilOptions() override
+	{
+		D(d);
+		return d->stencilOptions;
 	}
 
 public:

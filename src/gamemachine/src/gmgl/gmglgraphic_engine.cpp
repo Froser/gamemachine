@@ -633,38 +633,6 @@ void GMGLGraphicEngine::clearStencil()
 	clearStencilOnCurrentFramebuffer();
 }
 
-void GMGLGraphicEngine::beginCreateStencil()
-{
-	D(d);
-	d->stencilRenderModeCache = getCurrentRenderMode();
-	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
-	glStencilMask(0xFF);
-	++d->createStencilRef;
-}
-
-void GMGLGraphicEngine::endCreateStencil()
-{
-	D(d);
-	--d->createStencilRef;
-	if (d->createStencilRef < 0)
-		d->createStencilRef = 0;
-	setCurrentRenderMode(d->stencilRenderModeCache);
-}
-
-void GMGLGraphicEngine::beginUseStencil(bool outside)
-{
-	D(d);
-	++d->useStencilRef;
-}
-
-void GMGLGraphicEngine::endUseStencil()
-{
-	D(d);
-	--d->useStencilRef;
-	if (d->useStencilRef < 0)
-		d->useStencilRef = 0;
-}
-
 void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 {
 	D(d);

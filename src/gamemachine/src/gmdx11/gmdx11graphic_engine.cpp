@@ -3,130 +3,6 @@
 #include "gmdx11graphic_engine.h"
 #include "gmdx11renderers.h"
 
-class GMDx11StencilState : public IGMDx11StencilState
-{
-public:
-	STDMETHOD_(BOOL,HasBegunCreateStencil)();
-	STDMETHOD_(BOOL,HasBegunUseStencil)();
-	STDMETHOD_(BOOL, IsStencilOutside)();
-	STDMETHOD(BeginCreateStencil)();
-	STDMETHOD(BeginUseStencil)(BOOL);
-	STDMETHOD(EndCreateStencil)();
-	STDMETHOD(EndUseStencil)();
-
-	STDMETHOD(QueryInterface)(REFIID iid, LPVOID *ppv);
-	STDMETHOD_(ULONG, AddRef)();
-	STDMETHOD_(ULONG, Release)();
-
-private:
-	UINT m_RefCount = 1;
-	INT m_CreateStencilCount = 0;
-	INT m_UseStencilCount = 0;
-	BOOL m_Outside = FALSE;
-};
-
-BOOL GMDx11StencilState::HasBegunCreateStencil()
-{
-	return m_CreateStencilCount > 0 ? TRUE : FALSE;
-}
-
-BOOL GMDx11StencilState::HasBegunUseStencil()
-{
-	return m_UseStencilCount > 0 ? TRUE : FALSE;
-}
-
-BOOL GMDx11StencilState::IsStencilOutside()
-{
-	return m_Outside;
-}
-
-HRESULT GMDx11StencilState::BeginCreateStencil()
-{
-	++m_CreateStencilCount;
-	return S_OK;
-}
-
-HRESULT GMDx11StencilState::BeginUseStencil(BOOL outside)
-{
-	++m_UseStencilCount;
-	m_Outside = outside;
-	return S_OK;
-}
-
-HRESULT GMDx11StencilState::EndCreateStencil()
-{
-	if (m_CreateStencilCount > 0)
-	{
-		--m_CreateStencilCount;
-		return S_OK;
-	}
-	else
-	{
-		m_CreateStencilCount = 0;
-		return S_FALSE;
-	}
-}
-
-HRESULT GMDx11StencilState::EndUseStencil()
-{
-	if (m_UseStencilCount > 0)
-	{
-		--m_UseStencilCount;
-		return S_OK;
-	}
-	else
-	{
-		m_UseStencilCount = 0;
-		return S_FALSE;
-	}
-}
-
-HRESULT GMDx11StencilState::QueryInterface(REFIID iid, LPVOID *ppv)
-{
-	HRESULT hr = S_OK;
-
-	if (NULL == ppv)
-	{
-		hr = E_INVALIDARG;
-		goto EXIT;
-	}
-
-	*ppv = NULL;
-	if (IsEqualIID(iid, IID_ID3DX11Effect))
-	{
-		*ppv = (ID3DX11Effect *) this;
-	}
-	else
-	{
-		return E_NOINTERFACE;
-	}
-
-	AddRef();
-
-EXIT:
-	return hr;
-}
-
-ULONG GMDx11StencilState::AddRef()
-{
-	return ::InterlockedIncrement(&m_RefCount);
-}
-
-ULONG GMDx11StencilState::Release()
-{
-	::InterlockedDecrement(&m_RefCount);
-	if (m_RefCount > 0)
-	{
-		return m_RefCount;
-	}
-	else
-	{
-		delete this;
-	}
-
-	return 0;
-}
-
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -134,8 +10,6 @@ void GMDx11GraphicEngine::init()
 		initShaders();
 	else
 		GM_ASSERT(false);
-
-	d->stencilState = new GMDx11StencilState();
 }
 
 void GMDx11GraphicEngine::newFrame()
@@ -181,30 +55,6 @@ void GMDx11GraphicEngine::clearStencil()
 {
 	D(d);
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_STENCIL, 0, 0U);
-}
-
-void GMDx11GraphicEngine::beginCreateStencil()
-{
-	D(d);
-	d->stencilState->BeginCreateStencil();
-}
-
-void GMDx11GraphicEngine::endCreateStencil()
-{
-	D(d);
-	d->stencilState->EndCreateStencil();
-}
-
-void GMDx11GraphicEngine::beginUseStencil(bool outside)
-{
-	D(d);
-	d->stencilState->BeginUseStencil(outside ? TRUE : FALSE);
-}
-
-void GMDx11GraphicEngine::endUseStencil()
-{
-	D(d);
-	d->stencilState->EndUseStencil();
 }
 
 void GMDx11GraphicEngine::beginBlend(GMS_BlendFunc sfactor /*= GMS_BlendFunc::ONE*/, GMS_BlendFunc dfactor /*= GMS_BlendFunc::ONE*/)
@@ -274,11 +124,6 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		GM_ASSERT(d->renderTargetView);
 		d->renderTargetView->AddRef();
 		(*out) = d->renderTargetView.get();
-		break;
-	case GameMachineInterfaceID::GMD3D11StencilState:
-		GM_ASSERT(d->stencilState);
-		d->stencilState->AddRef();
-		(*out) = d->stencilState.get();
 		break;
 	default:
 		return false;

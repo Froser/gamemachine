@@ -57,22 +57,14 @@ namespace
 		glLineWidth(shader.getLineWidth());
 
 		// 应用模板
-		if (engine.hasBegunUseStencil())
-		{
-			if (engine.isOutsideStencil())
-				glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-			else
-				glStencilFunc(GL_EQUAL, 1, 0xFF);
-			glStencilMask(0xFF);
-		}
-		else
-		{
-			if (engine.hasBegunCreateStencil())
-				glStencilMask(0xFF);
-			else
-				glStencilMask(0x00);
-			glStencilFunc(GL_ALWAYS, 1, 0xFF);
-		}
+		GLenum compareOp = GL_ALWAYS;
+		auto& stencilOptions = engine.getStencilOptions();
+		if (stencilOptions.compareOp == GMStencilOptions::Equal)
+			compareOp = GL_EQUAL;
+		else if (stencilOptions.compareOp == GMStencilOptions::NotEqual)
+			compareOp = GL_NOTEQUAL;
+		glStencilFunc(compareOp, 1, 0xFF);
+		glStencilMask(stencilOptions.writeMask);
 	}
 
 	inline GLenum getMode(GMMesh* obj)
