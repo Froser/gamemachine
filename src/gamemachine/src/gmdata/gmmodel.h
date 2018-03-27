@@ -208,10 +208,23 @@ enum class GMArrangementMode
 };
 
 class GMMesh;
+struct GMMeshBuffer
+{
+	union
+	{
+		struct //OpenGL`
+		{
+			GMuint arrayId;
+			GMuint bufferId;
+		};
+
+		void* buffer; //DirectX
+	};
+};
+
 GM_PRIVATE_OBJECT(GMMeshData)
 {
-	GMuint arrayId = 0;
-	GMuint bufferId = 0;
+	GMMeshBuffer buffer = { 0 };
 	std::atomic<GMint> ref;
 	GMModelPainter* painter = nullptr;
 };
@@ -225,29 +238,16 @@ class GMMeshData : public GMObject
 	~GMMeshData();
 
 	void dispose();
-
-	GMuint getArrayId()
+	void setMeshBuffer(const GMMeshBuffer& meshBuffer)
 	{
 		D(d);
-		return d->arrayId;
+		d->buffer = meshBuffer;
 	}
 
-	GMuint getBufferId()
+	const GMMeshBuffer& getMeshBuffer()
 	{
 		D(d);
-		return d->bufferId;
-	}
-
-	void setArrayId(GMuint id)
-	{
-		D(d);
-		d->arrayId = id;
-	}
-
-	void setBufferId(GMuint id)
-	{
-		D(d);
-		d->bufferId = id;
+		return d->buffer;
 	}
 
 	void addRef()
@@ -338,10 +338,8 @@ public:
 	inline GMArrangementMode getArrangementMode() { D(d); return d->mode; }
 	inline void setName(const GMString& name) { D(d); d->name = name; }
 	inline const GMString& getName() { D(d); return d->name; }
-	inline GMuint getBufferId() { D(d); return d->meshData->getBufferId(); }
-	inline GMuint getArrayId() { D(d); return d->meshData->getArrayId(); }
-	inline void setBufferId(GMuint id) { D(d); d->meshData->setBufferId(id); }
-	inline void setArrayId(GMuint id) { D(d); d->meshData->setArrayId(id); }
+	inline const GMMeshBuffer& getMeshBuffer() { D(d); return d->meshData->getMeshBuffer(); }
+	inline void setMeshBuffer(const GMMeshBuffer& buffer) { D(d); d->meshData->setMeshBuffer(buffer); }
 
 public:
 	//! 释放一个网格数据

@@ -29,12 +29,14 @@ void GMGLModelPainter::transfer()
 
 	mesh->calculateTangentSpace();
 
+	GMMeshBuffer meshBuffer;
+
 	GM_BEGIN_CHECK_GL_ERROR
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
-	mesh->setArrayId(vao);
+	meshBuffer.arrayId = vao;
 
-	glBindVertexArray(mesh->getArrayId());
+	glBindVertexArray(vao);
 	GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(GMModel::DataType) * mesh->positions().size();
 	GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(GMModel::DataType) * mesh->normals().size();
 	GLuint uvSize			= mesh->isDataDisabled(GMVertexDataType::UV)			? 0 : sizeof(GMModel::DataType) * mesh->texcoords().size();
@@ -45,9 +47,9 @@ void GMGLModelPainter::transfer()
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
-	mesh->setBufferId(vbo);
+	meshBuffer.bufferId = vbo;
 
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->getBufferId());
+	glBindBuffer(GL_ARRAY_BUFFER, meshBuffer.bufferId);
 	glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
 	IF_ENABLED(mesh, GMVertexDataType::Position)	glBufferSubData(GL_ARRAY_BUFFER, 0																				, positionSize	, mesh->positions().data());
 	IF_ENABLED(mesh, GMVertexDataType::Normal)		glBufferSubData(GL_ARRAY_BUFFER, positionSize																	, normalSize	, mesh->normals().data());
@@ -83,6 +85,7 @@ void GMGLModelPainter::transfer()
 
 	GM_END_CHECK_GL_ERROR
 
+	mesh->setMeshBuffer(meshBuffer);
 	d->inited = true;
 	model->needNotTransferAnymore();
 }
@@ -95,7 +98,7 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 	renderer->beginModel(model, parent);
 
 	GMMesh* mesh = model->getMesh();
-	glBindVertexArray(mesh->getArrayId());
+	glBindVertexArray(mesh->getMeshBuffer().arrayId);
 	for (auto component : mesh->getComponents())
 	{
 		GMShader& shader = component->getShader();
@@ -112,8 +115,8 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 void GMGLModelPainter::dispose(GMMeshData* md)
 {
 	D(d);
-	GLuint vao[1] = { md->getArrayId() },
-		vbo[1] = { md->getBufferId() };
+	GLuint vao[1] = { md->getMeshBuffer().arrayId },
+		vbo[1] = { md->getMeshBuffer().bufferId };
 
 	GM_BEGIN_CHECK_GL_ERROR
 	glDeleteVertexArrays(1, vao);
@@ -128,8 +131,8 @@ void GMGLModelPainter::dispose(GMMeshData* md)
 
 void GMGLModelPainter::beginUpdateBuffer(GMMesh* mesh)
 {
-	glBindVertexArray(mesh->getArrayId());
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->getBufferId());
+	glBindVertexArray(mesh->getMeshBuffer().arrayId);
+	glBindBuffer(GL_ARRAY_BUFFER, mesh->getMeshBuffer().bufferId);
 }
 
 void GMGLModelPainter::endUpdateBuffer()

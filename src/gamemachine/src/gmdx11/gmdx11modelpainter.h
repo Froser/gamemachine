@@ -15,6 +15,8 @@ struct GMDx11VertexData
 	Array<GMfloat, 2> texcoords;
 	Array<GMfloat, 2> tangents;
 	Array<GMfloat, 2> bitangents;
+	Array<GMfloat, 2> lightmaps;
+	Array<GMfloat, 4> color;
 };
 
 class GMDx11GraphicEngine;

@@ -14,11 +14,22 @@ GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* mod
 
 bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 {
+	D_BASE(db, Base);
 	D(d);
 	if (id == GameMachineInterfaceID::D3D11Buffer)
 	{
-		d->buffer->AddRef();
-		(*out) = d->buffer;
+		if (d->buffer)
+		{
+			d->buffer->AddRef();
+			(*out) = d->buffer;
+		}
+		else
+		{
+			ID3D11Buffer* buffer = reinterpret_cast<ID3D11Buffer*>(db->model->getMesh()->getMeshBuffer().buffer);
+			GM_ASSERT(buffer);
+			buffer->AddRef();
+			(*out) = buffer;
+		}
 		return true;
 	}
 	return false;
@@ -65,6 +76,20 @@ void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
 			vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
 		}
 
+		{
+			auto& data_ref = model->getMesh()->lightmaps();
+			vd.lightmaps[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
+			vd.lightmaps[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->colors();
+			vd.color[0] = SAFE_ASSIGN(data_ref, 0, i * 4);
+			vd.color[1] = SAFE_ASSIGN(data_ref, 0, i * 4 + 1);
+			vd.color[2] = SAFE_ASSIGN(data_ref, 0, i * 4 + 2);
+			vd.color[3] = SAFE_ASSIGN(data_ref, 0, i * 4 + 3);
+		}
+
 		packedData.push_back(vd);
 	}
 }
@@ -101,14 +126,17 @@ void GMDx11ModelPainter::transfer()
 
 	GMComPtr<ID3D11Device> device = d->engine->getDevice();
 	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->buffer));
+	GMMeshBuffer meshBuffer;
+	meshBuffer.buffer = d->buffer;
+	mesh->setMeshBuffer(meshBuffer);
 
-	IF_ENABLED(mesh, GMVertexDataType::Position)	mesh->clear_positions_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Normal)		mesh->clear_normals_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::UV)			mesh->clear_texcoords_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Tangent)		mesh->clear_tangents_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Bitangent)	mesh->clear_bitangents_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Lightmap)	mesh->clear_lightmaps_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Color)		mesh->clear_colors_and_save_byte_size();
+	mesh->clear_positions_and_save_byte_size();
+	mesh->clear_normals_and_save_byte_size();
+	mesh->clear_texcoords_and_save_byte_size();
+	mesh->clear_tangents_and_save_byte_size();
+	mesh->clear_bitangents_and_save_byte_size();
+	mesh->clear_lightmaps_and_save_byte_size();
+	mesh->clear_colors_and_save_byte_size();
 
 	d->inited = true;
 	model->needNotTransferAnymore();

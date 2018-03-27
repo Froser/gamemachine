@@ -49,6 +49,8 @@ struct VS_INPUT
     float2 Texcoord    : TEXCOORD0;
     float2 Tangent     : TEXCOORD1;
     float2 Bitangent   : TEXCOORD2;
+    float2 Lightmap    : TEXCOORD3;
+    float4 Color       : COLOR;
 };
 
 struct VS_OUTPUT
@@ -57,6 +59,8 @@ struct VS_OUTPUT
     float2 Texcoord    : TEXCOORD0;
     float2 Tangent     : TEXCOORD1;
     float2 Bitangent   : TEXCOORD2;
+    float2 Lightmap    : TEXCOORD3;
+    float4 Color       : COLOR;
     float4 Position    : SV_POSITION;
 };
 
@@ -66,6 +70,8 @@ struct PS_INPUT
     float2 Texcoord    : TEXCOORD0;
     float2 Tangent     : TEXCOORD1;
     float2 Bitangent   : TEXCOORD2;
+    float2 Lightmap    : TEXCOORD3;
+    float4 Color       : COLOR;
 };
 
 float4 Texture_Sample(Texture2D tex, SamplerState ss, float2 texcoord, GMTexture attributes)
@@ -102,6 +108,8 @@ VS_OUTPUT VS_3D( VS_INPUT input )
     output.Texcoord = input.Texcoord;
     output.Tangent = input.Tangent;
     output.Bitangent = input.Bitangent;
+    output.Lightmap = input.Lightmap;
+    output.Color = input.Color;
     return output;
 }
 
@@ -132,6 +140,8 @@ VS_OUTPUT VS_2D(VS_INPUT input)
     output.Texcoord = input.Texcoord;
     output.Tangent = input.Tangent;
     output.Bitangent = input.Bitangent;
+    output.Lightmap = input.Lightmap;
+    output.Color = input.Color;
     return output;
 }
 
@@ -152,8 +162,8 @@ float4 PS_2D(PS_INPUT input) : SV_Target
 
 float4 PS_Glyph(PS_INPUT input) : SV_Target
 {
-    float4 alpha = DiffuseTexture_0.Sample(DiffuseSampler_0, input.Texcoord);
-    return float4(1, 0, 0, alpha.r);
+    float4 alpha = AmbientTexture_0.Sample(AmbientSampler_0, input.Texcoord);
+    return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
 }
 
 // Techniques
