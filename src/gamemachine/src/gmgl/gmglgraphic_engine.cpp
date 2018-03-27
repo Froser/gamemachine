@@ -636,51 +636,33 @@ void GMGLGraphicEngine::clearStencil()
 void GMGLGraphicEngine::beginCreateStencil()
 {
 	D(d);
-	if (!d->createStencilRef)
-	{
-		d->stencilRenderModeCache = getCurrentRenderMode();
-		setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
-		glStencilMask(0xFF);
-	}
+	d->stencilRenderModeCache = getCurrentRenderMode();
+	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
+	glStencilMask(0xFF);
 	++d->createStencilRef;
 }
 
 void GMGLGraphicEngine::endCreateStencil()
 {
 	D(d);
-	if (!--d->createStencilRef)
-	{
-		glStencilMask(0x00);
-		setCurrentRenderMode(d->stencilRenderModeCache);
-	}
+	--d->createStencilRef;
+	if (d->createStencilRef < 0)
+		d->createStencilRef = 0;
+	setCurrentRenderMode(d->stencilRenderModeCache);
 }
 
 void GMGLGraphicEngine::beginUseStencil(bool outside)
 {
 	D(d);
-	if (!d->useStencilRef)
-	{
-		glStencilMask(0xFF);
-		if (!outside)
-			glStencilFunc(GL_EQUAL, 1, 0xFF);
-		else
-			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	}
 	++d->useStencilRef;
 }
 
 void GMGLGraphicEngine::endUseStencil()
 {
 	D(d);
-	if (!--d->useStencilRef)
-	{
-		if (d->createStencilRef)
-			glStencilMask(0xFF);
-		else
-			glStencilMask(0x00);
-
-		glStencilFunc(GL_ALWAYS, 1, 0xFF);
-	}
+	--d->useStencilRef;
+	if (d->useStencilRef < 0)
+		d->useStencilRef = 0;
 }
 
 void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)

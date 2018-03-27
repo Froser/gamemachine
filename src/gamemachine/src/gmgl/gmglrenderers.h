@@ -44,10 +44,10 @@ GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 
 class GMGLRenderer_3D : public GMGLRenderer
 {
-	DECLARE_PRIVATE(GMGLRenderer_3D)
+	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_3D, GMGLRenderer)
 
 public:
-	GMGLRenderer_3D() = default;
+	GMGLRenderer_3D();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -80,7 +80,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
 
 class GMGLRenderer_CubeMap : public GMGLRenderer
 {
-	DECLARE_PRIVATE(GMGLRenderer_CubeMap)
+	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_CubeMap, GMGLRenderer)
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;

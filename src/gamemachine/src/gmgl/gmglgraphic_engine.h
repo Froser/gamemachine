@@ -72,6 +72,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMint createStencilRef = 0;
 	GMint useStencilRef = 0;
+	bool outsideStencil = false;
 
 	// 混合绘制
 	GMRenderMode renderModeForBlend = GMStates_RenderOptions::FORWARD;
@@ -155,6 +156,24 @@ public:
 			gm_error("GMObject::draw() cannot be called outside IGraphicEngine::drawObjects");
 		}
 #endif
+	}
+
+	inline bool hasBegunCreateStencil()
+	{
+		D(d);
+		return d->createStencilRef > 0;
+	}
+
+	inline bool hasBegunUseStencil()
+	{
+		D(d);
+		return d->useStencilRef > 0;
+	}
+
+	inline bool isOutsideStencil()
+	{
+		D(d);
+		return d->outsideStencil;
 	}
 
 private:

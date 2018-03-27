@@ -731,10 +731,7 @@ void GMListbox2DGameObject::draw()
 {
 	D(d);
 	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginUseStencil(false);
 	Base::draw();
-	engine->endUseStencil();
-
 	for (auto item : getItems())
 	{
 		engine->beginCreateStencil();
