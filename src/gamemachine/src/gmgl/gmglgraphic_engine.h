@@ -104,7 +104,7 @@ public:
 	virtual void clearStencil() override;
 	virtual void beginCreateStencil() override;
 	virtual void endCreateStencil() override;
-	virtual void beginUseStencil(bool inverse) override;
+	virtual void beginUseStencil(bool outside) override;
 	virtual void endUseStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;

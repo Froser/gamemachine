@@ -148,7 +148,7 @@ VS_OUTPUT VS_2D(VS_INPUT input)
 float4 PS_2D(PS_INPUT input) : SV_Target
 {
     if (needDiscard(DiffuseTextureAttributes) && needDiscard(AmbientTextureAttributes))
-        discard;
+        return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
     color += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);

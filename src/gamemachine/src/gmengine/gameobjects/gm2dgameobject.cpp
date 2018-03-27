@@ -529,42 +529,27 @@ void GMImage2DGameObject::draw()
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
-	Base::draw();
 
 	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->clearStencil();
-
-	if (db->parent)
-	{
-		// 首先创建出一个父亲的裁剪框，绘制不需要裁剪的部分
-		engine->beginCreateStencil();
-		db->parent->getStencil()->draw();
-		engine->endCreateStencil();
-		engine->beginUseStencil(false);
-	}
+	engine->beginUseStencil(false);
+	Base::draw();
+	engine->endUseStencil();
+	engine->beginCreateStencil();
+	Base::draw();
+	engine->endCreateStencil();
 
 	drawBackground();
 	if (d->border.hasBorder())
 		d->border.draw();
-
-	if (db->parent)
-		engine->endUseStencil();
 
 	// 文字
 	if (d->textModel)
 	{
 		// 绘制边框裁剪框
 		GM_ASSERT(d->textMask);
-		if (db->parent)
-			engine->beginUseStencil(false);
-
 		engine->beginCreateStencil();
 		d->textMask->draw();
 		engine->endCreateStencil();
-
-		if (db->parent)
-			engine->endUseStencil();
-
 		engine->beginUseStencil(false);
 		d->textModel->draw();
 		engine->endUseStencil();
@@ -745,9 +730,17 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 void GMListbox2DGameObject::draw()
 {
 	D(d);
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->beginUseStencil(false);
 	Base::draw();
+	engine->endUseStencil();
+
 	for (auto item : getItems())
 	{
+		engine->beginCreateStencil();
+		Base::draw();
+		engine->endCreateStencil();
+
 		item->draw();
 	}
 }

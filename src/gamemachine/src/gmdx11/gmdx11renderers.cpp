@@ -144,24 +144,24 @@ namespace
 
 	inline D3D11_DEPTH_STENCIL_DESC getDepthStencilDesc(
 		bool depthEnabled,
-		bool stencilEnabled
+		bool createStencil,
+		bool useStencil,
+		bool outside
 	)
 	{
 		D3D11_DEPTH_STENCIL_DESC desc = { 0 };
 		desc.DepthEnable = depthEnabled ? TRUE : FALSE;
-		desc.StencilEnable = stencilEnabled ? TRUE : FALSE;
 		desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		desc.DepthFunc = D3D11_COMPARISON_LESS;
+
+		desc.StencilEnable = TRUE;
 		desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-		desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-		desc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		desc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-		desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
-		desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+		desc.StencilWriteMask = useStencil ? D3D11_DEFAULT_STENCIL_WRITE_MASK : (createStencil ? D3D11_DEFAULT_STENCIL_WRITE_MASK : 0U);
+
+		desc.FrontFace.StencilFailOp = desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+		desc.FrontFace.StencilDepthFailOp = desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+		desc.FrontFace.StencilPassOp = desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+		desc.FrontFace.StencilFunc = desc.BackFace.StencilFunc = (useStencil ? (outside ? D3D11_COMPARISON_NOT_EQUAL : D3D11_COMPARISON_EQUAL) : D3D11_COMPARISON_ALWAYS);
 		return desc;
 	}
 
@@ -287,19 +287,25 @@ namespace
 			{
 				for (GMint b2 = 0; b2 < 2; ++b2)
 				{
-					if (states[b1][b2])
-						states[b1][b2]->Release();
+					for (GMint b3 = 0; b3 < 2; ++b3)
+					{
+						for (GMint b4 = 0; b4 < 2; ++b4)
+						{
+							if (states[b1][b2][b3][b4])
+								states[b1][b2][b3][b4]->Release();
+						}
+					}
 				}
 			}
 		}
 
 	public:
-		ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, bool stencilEnabled)
+		ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, bool createStencil, bool useStencil, bool outside)
 		{
-			ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][stencilEnabled ? 1 : 0];
+			ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][createStencil ? 1 : 0][useStencil ? 1 : 0][outside ? 1 : 0];
 			if (!state)
 			{
-				D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilEnabled);
+				D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, createStencil, useStencil, outside);
 				createDepthStencilState(desc, &state);
 			}
 
@@ -316,7 +322,7 @@ namespace
 
 	private:
 		GMDx11GraphicEngine* engine = nullptr;
-		ID3D11DepthStencilState* states[2][2] = { 0 };
+		ID3D11DepthStencilState* states[2][2][2][2] = { 0 };
 	};
 }
 
@@ -325,11 +331,13 @@ GMDx11Renderer::GMDx11Renderer()
 	D(d);
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
-	if (!d->effect)
-	{
-		shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
-		GM_ASSERT(d->effect);
-	}
+	GM_ASSERT(!d->effect);
+	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
+	GM_ASSERT(d->effect);
+
+	GM_ASSERT(!d->stencilState);
+	getEngine()->getInterface(GameMachineInterfaceID::GMD3D11StencilState, (void**)&d->stencilState);
+	GM_ASSERT(d->stencilState);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -566,7 +574,12 @@ void GMDx11Renderer::prepareDepthStencil(GMComponent* component)
 	GMDx11DepthStencilStates& depthStencilStates = GMDx11DepthStencilStates::instance();
 	GM_DX_HR(d->depthStencil->SetDepthStencilState(
 		0,
-		depthStencilStates.getDepthStencilState(!d->shader->getNoDepthTest(), false) //TODO 这个false，应该用stencil当前状态
+		depthStencilStates.getDepthStencilState(
+			!d->shader->getNoDepthTest(),
+			!!d->stencilState->HasBegunCreateStencil(),
+			!!d->stencilState->HasBegunUseStencil(),
+			!!d->stencilState->IsStencilOutside()
+			)
 	));
 }
 

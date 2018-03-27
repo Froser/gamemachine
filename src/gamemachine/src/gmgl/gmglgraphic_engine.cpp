@@ -655,12 +655,13 @@ void GMGLGraphicEngine::endCreateStencil()
 	}
 }
 
-void GMGLGraphicEngine::beginUseStencil(bool inverse)
+void GMGLGraphicEngine::beginUseStencil(bool outside)
 {
 	D(d);
 	if (!d->useStencilRef)
 	{
-		if (!inverse)
+		glStencilMask(0xFF);
+		if (!outside)
 			glStencilFunc(GL_EQUAL, 1, 0xFF);
 		else
 			glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
@@ -672,7 +673,14 @@ void GMGLGraphicEngine::endUseStencil()
 {
 	D(d);
 	if (!--d->useStencilRef)
+	{
+		if (d->createStencilRef)
+			glStencilMask(0xFF);
+		else
+			glStencilMask(0x00);
+
 		glStencilFunc(GL_ALWAYS, 1, 0xFF);
+	}
 }
 
 void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)

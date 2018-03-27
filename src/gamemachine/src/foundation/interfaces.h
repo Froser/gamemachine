@@ -72,6 +72,8 @@ enum class GameMachineInterfaceID
 	D3D11ShaderProgram,
 	D3D11Effect,
 
+	GMD3D11StencilState,
+
 	CustomInterfaceBegin,
 	//用户自定义接口须在此之后
 };
@@ -298,10 +300,10 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	//* 开始使用帧缓存。
 	/*!
 	  在此方法被执行后，绘制图元将会根据当前激活的帧缓存的模板缓存进行绘制。
-	  \param inverse 表示图元是绘制在模板中，还是模板外。
+	  \param outside 表示图元是绘制在模板中，还是模板外。
 	  \sa endUseStencil()
 	*/
-	virtual void beginUseStencil(bool inverse) = 0;
+	virtual void beginUseStencil(bool outside) = 0;
 
 	//! 结束使用帧缓存。
 	/*!
