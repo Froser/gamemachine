@@ -8,6 +8,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMGLRenderer)
 {
+	GMGLGraphicEngine* engine = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 };
 
@@ -16,6 +17,8 @@ class GMGLRenderer : public GMObject, public IRenderer
 	DECLARE_PRIVATE(GMGLRenderer)
 
 public:
+	GMGLRenderer();
+
 	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) override;
 
 protected:
@@ -36,7 +39,6 @@ protected:
 
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 {
-	GMGLGraphicEngine* engine = nullptr;
 	GMShader* shader = nullptr;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
@@ -47,7 +49,7 @@ class GMGLRenderer_3D : public GMGLRenderer
 	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_3D, GMGLRenderer)
 
 public:
-	GMGLRenderer_3D();
+	GMGLRenderer_3D() = default;
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;

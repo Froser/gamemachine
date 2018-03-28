@@ -527,16 +527,15 @@ void GMImage2DGameObject::onAppendingObjectToWorld()
 
 void GMImage2DGameObject::draw()
 {
+	static GMStencilOptions s_default;
+	static GMStencilOptions s_writeMask(GMStencilOptions::OxFF, GMStencilOptions::Always);
+	static GMStencilOptions s_useMask(GMStencilOptions::OxFF, GMStencilOptions::Equal);
+
 	D(d);
 	D_BASE(db, GMControlGameObject);
 
 	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginUseStencil(false);
 	Base::draw();
-	engine->endUseStencil();
-	engine->beginCreateStencil();
-	Base::draw();
-	engine->endCreateStencil();
 
 	drawBackground();
 	if (d->border.hasBorder())
@@ -547,12 +546,11 @@ void GMImage2DGameObject::draw()
 	{
 		// 绘制边框裁剪框
 		GM_ASSERT(d->textMask);
-		engine->beginCreateStencil();
+		engine->setStencilOptions(s_writeMask);
 		d->textMask->draw();
-		engine->endCreateStencil();
-		engine->beginUseStencil(false);
+		engine->setStencilOptions(s_useMask);
 		d->textModel->draw();
-		engine->endUseStencil();
+		engine->setStencilOptions(s_default);
 	}
 }
 
@@ -730,14 +728,9 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 void GMListbox2DGameObject::draw()
 {
 	D(d);
-	IGraphicEngine* engine = GM.getGraphicEngine();
 	Base::draw();
 	for (auto item : getItems())
 	{
-		engine->beginCreateStencil();
-		Base::draw();
-		engine->endCreateStencil();
-
 		item->draw();
 	}
 }

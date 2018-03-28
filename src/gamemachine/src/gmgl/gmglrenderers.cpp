@@ -10,7 +10,7 @@
 
 namespace
 {
-	void applyShaderAndStencil(const GMShader& shader, GMGLGraphicEngine& engine)
+	inline void applyShader(const GMShader& shader)
 	{
 		if (shader.getBlend())
 		{
@@ -55,7 +55,10 @@ namespace
 		GM_END_CHECK_GL_ERROR
 
 		glLineWidth(shader.getLineWidth());
+	}
 
+	inline void applyStencil(GMGLGraphicEngine& engine)
+	{
 		// 应用模板
 		GLenum compareOp = GL_ALWAYS;
 		auto& stencilOptions = engine.getStencilOptions();
@@ -86,18 +89,20 @@ namespace
 	}
 }
 
+GMGLRenderer::GMGLRenderer()
+{
+	D(d);
+	d->engine = gm_static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
+}
+
 void GMGLRenderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
 {
+	D(d);
+	applyStencil(*d->engine);
 	beforeDraw(component);
 	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
 	glMultiDrawArrays(mode, (GLint*)component->getOffsetPtr(), (GLsizei*) component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
 	afterDraw();
-}
-
-GMGLRenderer_3D::GMGLRenderer_3D()
-{
-	D(d);
-	d->engine = gm_static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
 }
 
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
@@ -137,7 +142,7 @@ void GMGLRenderer_3D::beforeDraw(GMComponent* component)
 	activateMaterial(*d->shader);
 
 	// 应用Shader
-	applyShaderAndStencil(*d->shader, *d->engine);
+	applyShader(*d->shader);
 
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
@@ -348,7 +353,7 @@ void GMGLRenderer_2D::beforeDraw(GMComponent* component)
 	d->shader = &component->getShader();
 
 	// 应用Shader
-	applyShaderAndStencil(*d->shader, *d->engine);
+	applyShader(*d->shader);
 
 	// 只选择环境光纹理
 	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);

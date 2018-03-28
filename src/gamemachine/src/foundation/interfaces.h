@@ -227,8 +227,15 @@ struct GMStencilOptions
 		OxFF = 0xFF,
 	};
 
-	GMStencilWriteMask writeMask;
-	GMStencilOp compareOp;
+	GMStencilOptions() = default;
+	GMStencilOptions(GMStencilWriteMask mask, GMStencilOp op)
+		: writeMask(mask)
+		, compareOp(op)
+	{
+	}
+
+	GMStencilWriteMask writeMask = Ox00;
+	GMStencilOp compareOp = Always;
 };
 
 //! 图形绘制引擎接口
