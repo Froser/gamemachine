@@ -135,6 +135,11 @@ GM_INTERFACE(IQueriable)
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) = 0;
 };
 
+GM_INTERFACE(IGMCursor)
+{
+	virtual bool createCursor(void* hinstance, const GMImage& cursorImg) = 0;
+};
+
 enum class GMBufferMode
 {
 	Normal,

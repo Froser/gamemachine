@@ -42,13 +42,7 @@ void Demo_Quake3_BSP::setDefaultLights()
 
 void Demo_Quake3_BSP::setMouseTrace(bool enabled)
 {
-	// 如果开启了鼠标跟踪，将会自动隐藏鼠标
 	D(d);
-	if (enabled)
-		GM.getCursor()->disableCursor();
-	else
-		GM.getCursor()->enableCursor();
-	
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	gm::IMouseState& mouseState = inputManager->getMouseState();
 	d->mouseTrace = enabled;

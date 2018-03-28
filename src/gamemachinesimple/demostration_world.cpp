@@ -147,14 +147,6 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	default:
 		break;
 	}
-
-	if (GM.getCursor())
-	{
-		if (evt == gm::GameMachineEvent::FrameStart)
-			GM.getCursor()->update();
-		else if (evt == gm::GameMachineEvent::Render)
-			GM.getCursor()->drawCursor();
-	}
 }
 
 DemostrationEntrance::~DemostrationEntrance()

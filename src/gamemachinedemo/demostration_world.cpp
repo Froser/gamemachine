@@ -160,17 +160,6 @@ void DemostrationWorld::init()
 {
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
-	//创建光标
-	d->cursor = new gm::GMCursorGameObject(32, 32);
-
-	gm::ITexture* curFrame = nullptr;
-	gm::GMTextureUtil::createTexture("cursor.png", &curFrame);
-	GM_ASSERT(curFrame);
-
-	gm::GMAsset curAsset = getAssets().insertAsset(gm::GMAssetType::Texture, curFrame);
-	d->cursor->setImage(curAsset);
-	d->cursor->enableCursor();
-	GM.setCursor(d->cursor);
 
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
 
@@ -335,14 +324,6 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 		default:
 			break;
 		}
-	}
-
-	if (GM.getCursor())
-	{
-		if (evt == gm::GameMachineEvent::FrameStart)
-			GM.getCursor()->update();
-		else if (evt == gm::GameMachineEvent::Render)
-			GM.getCursor()->drawCursor();
 	}
 }
 

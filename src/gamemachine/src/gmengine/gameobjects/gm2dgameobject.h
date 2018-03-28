@@ -178,34 +178,5 @@ private:
 private:
 	inline const Vector<GMControlGameObject*>& getItems() { D_BASE(db, GMControlGameObject); return db->children; }
 };
-
-//////////////////////////////////////////////////////////////////////////
-typedef std::function<void(GMShader&)> ShaderCallback;
-
-GM_PRIVATE_OBJECT(GMCursorGameObject)
-{
-	ShaderCallback callback;
-	bool inited = false;
-	bool enabled = false;
-	GMGameObject* ptr[1];
-};
-
-class GMCursorGameObject : public GMImage2DGameObject
-{
-	DECLARE_PRIVATE_AND_BASE(GMCursorGameObject, GMImage2DGameObject)
-
-public:
-	GMCursorGameObject(GMint width, GMint height);
-
-public:
-	virtual void onCreateShader(GMShader& shader) override;
-
-public:
-	void drawCursor();
-	void enableCursor();
-	void disableCursor();
-	void update();
-	void setOnShadercCallback(const ShaderCallback& cb);
-};
 END_NS
 #endif

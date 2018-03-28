@@ -108,7 +108,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Vector<IVirtualFunctionObject*> managerQueue;
 
 	GMGameMachineRunningStates states;
-	GMCursorGameObject* cursor = nullptr;
+	IGMCursor* cursor = nullptr;
 };
 
 //! GameMachine类负责掌管整个进程的生命周期。
@@ -247,13 +247,13 @@ public:
 	/*!
 	  设置当前鼠标形状。鼠标形状是在渲染窗口中的一个GMGameObject对象，它不会溢出窗口，因此窗口的边框将会遮挡它。
 	*/
-	inline void setCursor(GMCursorGameObject* cursor) { D(d); d->cursor = cursor; }
+	inline void setCursor(IGMCursor* cursor) { D(d); d->cursor = cursor; }
 
 	//! 获取当前鼠标形状。
 	/*!
 	  获取当前鼠标形状。鼠标形状是在渲染窗口中的一个GMGameObject对象，它不会溢出窗口，因此窗口的边框将会遮挡它。
 	*/
-	inline GMCursorGameObject* getCursor() { D(d); return d->cursor; }
+	inline IGMCursor* getCursor() { D(d); return d->cursor; }
 
 	//! 开始运行GameMachine。
 	/*!
