@@ -49,27 +49,24 @@ HBITMAP GMUICursor::createBitmapFromImage(const gm::GMImage& cursorImg)
 	HBITMAP hOldBitmap = (HBITMAP)::SelectObject(memDC, hBitmap);
 	UINT bytesPerPixel = (cursorImg.getData().format == gm::GMImageFormat::RGB ? 3 : 4);
 
-	COLORREF r;
-	for (gm::GMuint i = 0; i < uWidth; ++i)
+	for (gm::GMuint y = 0; y < uHeight; ++y)
 	{
-		for (gm::GMuint j = 0; j < uHeight; ++j)
+		for (gm::GMuint x = 0; x < uWidth; ++x)
 		{
-			r = ::SetPixel(
+			::SetPixel(
 				memDC,
-				i,
-				j,
+				x,
+				y,
 				bytesPerPixel == 3 ? RGB(
-					cursorImg.getData().mip[0].data[j * uWidth + i * 3],
-					cursorImg.getData().mip[0].data[j * uWidth + i * 3 + 1],
-					cursorImg.getData().mip[0].data[j * uWidth + i * 3 + 2]
+					cursorImg.getData().mip[0].data[y * uWidth + x * 3],
+					cursorImg.getData().mip[0].data[y * uWidth + x * 3 + 1],
+					cursorImg.getData().mip[0].data[y * uWidth + x * 3 + 2]
 					) : RGB(
-						cursorImg.getData().mip[0].data[j * uWidth + i * 4],
-						cursorImg.getData().mip[0].data[j * uWidth + i * 4 + 1],
-						cursorImg.getData().mip[0].data[j * uWidth + i * 4 + 2]
+						cursorImg.getData().mip[0].data[y * uWidth + x * 4],
+						cursorImg.getData().mip[0].data[y * uWidth + x * 4 + 1],
+						cursorImg.getData().mip[0].data[y * uWidth + x * 4 + 2]
 					)
 			);
-			if (r == -1)
-				return NULL; //FAILED
 		}
 	}
 
@@ -97,13 +94,13 @@ void GMUICursor::getMaskBitmaps(HBITMAP hSourceBitmap, COLORREF clrTransparent,
 	HBITMAP hOldAndMaskBitmap = (HBITMAP)::SelectObject(hAndMaskDC, hAndMaskBitmap);
 	HBITMAP hOldXorMaskBitmap = (HBITMAP)::SelectObject(hXorMaskDC, hXorMaskBitmap);
 
-	COLORREF MainBitPixel;
-	for (int x = 0; x < bm.bmWidth; ++x)
+	COLORREF cMainBitPixel;
+	for (int y = 0; y < bm.bmHeight; ++y)
 	{
-		for (int y = 0; y < bm.bmHeight; ++y)
+		for (int x = 0; x < bm.bmWidth; ++x)
 		{
-			MainBitPixel = ::GetPixel(hMainDC, x, y);
-			if (MainBitPixel == clrTransparent)
+			cMainBitPixel = ::GetPixel(hMainDC, x, y);
+			if (cMainBitPixel == clrTransparent)
 			{
 				::SetPixel(hAndMaskDC, x, y, RGB(255, 255, 255));
 				::SetPixel(hXorMaskDC, x, y, RGB(0, 0, 0));
@@ -111,7 +108,7 @@ void GMUICursor::getMaskBitmaps(HBITMAP hSourceBitmap, COLORREF clrTransparent,
 			else
 			{
 				::SetPixel(hAndMaskDC, x, y, RGB(0, 0, 0));
-				::SetPixel(hXorMaskDC, x, y, MainBitPixel);
+				::SetPixel(hXorMaskDC, x, y, cMainBitPixel);
 			}
 		}
 	}

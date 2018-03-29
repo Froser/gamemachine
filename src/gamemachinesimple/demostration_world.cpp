@@ -91,7 +91,7 @@ void DemostrationEntrance::init()
 	gm::ICursor* cursor = nullptr;
 	gmui::GMUIFactory::createCursor(&cursor);
 	gm::GMCursorDesc desc = { 0 };
-	gm::GMToolUtil::createCursor(cursor, desc, "cursor.jpg");
+	gm::GMToolUtil::createCursor(cursor, desc, "cursor.png");
 	GM.getMainWindow()->setCursor(cursor);
 
 	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
