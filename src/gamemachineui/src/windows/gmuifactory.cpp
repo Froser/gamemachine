@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include <gmui.h>
 #include "gmuidef.h"
+#include "gmmcursor.h"
 
 #if GM_USE_DUILIB
 #include "duilib/gmuiconsole.h"
@@ -44,4 +45,10 @@ void GMUIFactory::initEnvironment(gm::GMInstance instance)
 #if GM_USE_DUILIB
 	DuiLib::CPaintManagerUI::SetInstance(instance);
 #endif
+}
+
+void GMUIFactory::createCursor(OUT gm::ICursor** cursor)
+{
+	GM_ASSERT(cursor);
+	(*cursor) = new GMUICursor();
 }

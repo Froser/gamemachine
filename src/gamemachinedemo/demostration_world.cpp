@@ -146,7 +146,6 @@ DemostrationWorld::~DemostrationWorld()
 		GM_ASSERT(demo.second);
 		gm::GM_delete(demo.second);
 	}
-	gm::GM_delete(d->cursor);
 }
 
 void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)

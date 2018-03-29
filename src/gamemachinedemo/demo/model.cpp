@@ -49,7 +49,7 @@ void Demo_Model::init()
 	d->demoWorld = new gm::GMDemoGameWorld();
 
 	gm::ITexture* texture = nullptr;
-	gm::GMTextureUtil::createTexture("bnp.png", &texture);
+	gm::GMToolUtil::createTexture("bnp.png", &texture);
 	d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
@@ -84,7 +84,7 @@ void Demo_Model::init()
 			gm::GMShader& shader = component->getShader();
 			shader.getMaterial().refractivity = 0.658f;
 			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-			gm::GMTextureUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
+			gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
 		}
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);

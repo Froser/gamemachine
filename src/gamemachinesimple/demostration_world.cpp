@@ -4,6 +4,7 @@
 #include <gmdx11helper.h>
 #include <gmcom.h>
 #include <gmdxincludes.h>
+#include <gmui.h>
 
 extern gm::GMRenderEnvironment GetRenderEnv();
 
@@ -33,13 +34,13 @@ void DemostrationWorld::init()
 	d->gameObj[1] = new gm::GMGameObject(asset);
 	{
 		gm::ITexture* tex = nullptr;
-		gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
-		gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
+		gm::GMToolUtil::createTexture("gamemachine.png", &tex);
+		gm::GMToolUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE);
 		getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 	}
 	{
 		gm::ITexture* tex = nullptr;
-		gm::GMTextureUtil::createTexture("cubemap/cubemap_negz.jpg", &tex);
+		gm::GMToolUtil::createTexture("cubemap/cubemap_negz.jpg", &tex);
 		//gm::GMTextureUtil::addTextureToShader(model->getMesh()->getComponents()[0]->getShader(), tex, gm::GMTextureType::DIFFUSE, 1);
 		getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 	}
@@ -54,8 +55,8 @@ void DemostrationWorld::renderScene()
 	Base::renderScene();
 
 	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	//engine->drawObjects(&d->gameObj[1], 1, gm::GMBufferMode::NoFramebuffer);
-	engine->drawObjects(&d->gameObj[0], 1, gm::GMBufferMode::NoFramebuffer);
+	engine->drawObjects(&d->gameObj[1], 1, gm::GMBufferMode::NoFramebuffer);
+	//engine->drawObjects(&d->gameObj[0], 1, gm::GMBufferMode::NoFramebuffer);
 }
 
 void DemostrationWorld::resetProjectionAndEye()
@@ -85,6 +86,13 @@ void DemostrationEntrance::init()
 #endif
 
 	GM.getGraphicEngine()->setShaderLoadCallback(this);
+
+	// 创建光标
+	gm::ICursor* cursor = nullptr;
+	gmui::GMUIFactory::createCursor(&cursor);
+	gm::GMCursorDesc desc = { 0 };
+	gm::GMToolUtil::createCursor(cursor, desc, "cursor.jpg");
+	GM.getMainWindow()->setCursor(cursor);
 
 	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);

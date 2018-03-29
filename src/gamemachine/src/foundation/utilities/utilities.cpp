@@ -293,7 +293,7 @@ void GMPrimitiveUtil::scaleModel(REF GMModel& model, const GMfloat (&scaling)[3]
 	painter->endUpdateBuffer();
 }
 
-void GMTextureUtil::createTexture(const GMString& filename, ITexture** texture)
+void GMToolUtil::createTexture(const GMString& filename, ITexture** texture)
 {
 	gm::GMImage* img = nullptr;
 	gm::GMBuffer buf;
@@ -306,9 +306,22 @@ void GMTextureUtil::createTexture(const GMString& filename, ITexture** texture)
 	gm::GM_delete(img);
 }
 
-void GMTextureUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type, GMuint index)
+void GMToolUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type, GMuint index)
 {
 	GM_ASSERT(index < GMMaxTextureCount(type));
 	auto& frames = shader.getTexture().getTextureFrames(type, index);
 	frames.addFrame(texture);
+}
+
+void GMToolUtil::createCursor(ICursor* cursor, const GMCursorDesc& cursorDesc, const GMString& filename)
+{
+	GM_ASSERT(cursor->isEmpty());
+
+	GMImage* img = nullptr;
+	GMBuffer buf;
+	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, filename, &buf);
+	GMImageReader::load(buf.buffer, buf.size, &img);
+	GM_ASSERT(img);
+	cursor->createCursor(cursorDesc, *img);
+	GM_delete(img);
 }

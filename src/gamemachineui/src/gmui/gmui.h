@@ -26,6 +26,7 @@ class GMUIFactory
 public:
 	static void createMainWindow(gm::GMInstance instance, OUT gm::IWindow** window, gm::GMRenderEnvironment env);
 	static void createConsoleWindow(gm::GMInstance instance, REF gm::GMConsoleHandle& handle);
+	static void createCursor(OUT gm::ICursor** cursor);
 
 private:
 	static void initEnvironment(gm::GMInstance instance);

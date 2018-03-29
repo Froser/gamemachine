@@ -33,8 +33,8 @@ void Demo_Texture::init()
 			auto& container = world->getAssets();
 
 			gm::ITexture* tex = nullptr;
-			gm::GMTextureUtil::createTexture("gamemachine.png", &tex);
-			gm::GMTextureUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
+			gm::GMToolUtil::createTexture("gamemachine.png", &tex);
+			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
 	} cb(d->demoWorld);

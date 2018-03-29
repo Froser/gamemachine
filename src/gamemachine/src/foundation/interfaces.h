@@ -135,9 +135,40 @@ GM_INTERFACE(IQueriable)
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) = 0;
 };
 
-GM_INTERFACE(IGMCursor)
+#if GM_WINDOWS
+typedef HINSTANCE GMInstance;
+typedef HWND GMWindowHandle;
+struct GMWindowAttributes
 {
-	virtual bool createCursor(void* hinstance, const GMImage& cursorImg) = 0;
+	GMWindowHandle hwndParent = NULL;
+	GMString windowName = L"Default GameMachine Main Window";
+	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
+	DWORD dwExStyle = NULL;
+	RECT rc = { 0, 0, 1024, 768 };
+	HMENU hMenu = NULL;
+	GMint samples = 8;
+	GMInstance instance;
+};
+#else
+struct GMWindowAttributes
+{
+};
+typedef GMuint GMUIInstance;
+typedef GMuint GMWindowHandle;
+#endif
+
+struct GMCursorDesc
+{
+	GMuint xHotspot;
+	GMuint yHotspot;
+	GMfloat transparentColor[3];
+};
+
+GM_INTERFACE(ICursor)
+{
+	virtual bool isEmpty() = 0;
+	virtual bool createCursor(const GMCursorDesc& cursorDesc, const GMImage& cursorImg) = 0;
+	virtual bool setCursor(gm::GMWindowHandle handle) = 0;
 };
 
 enum class GMBufferMode
@@ -370,28 +401,6 @@ GM_INTERFACE(IFactory)
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 };
 
-#if GM_WINDOWS
-typedef HINSTANCE GMInstance;
-typedef HWND GMWindowHandle;
-struct GMWindowAttributes
-{
-	GMWindowHandle hwndParent = NULL;
-	GMString windowName = L"Default GameMachine Main Window";
-	DWORD dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME;
-	DWORD dwExStyle = NULL;
-	RECT rc = { 0, 0, 1024, 768 };
-	HMENU hMenu = NULL;
-	GMint samples = 8;
-	GMInstance instance;
-};
-#else
-struct GMWindowAttributes
-{
-};
-typedef GMuint GMUIInstance;
-typedef GMuint GMWindowHandle;
-#endif
-
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
@@ -411,6 +420,7 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual bool event(const GameMachineMessage& msg) = 0;
 	virtual bool isWindowActivate() = 0;
 	virtual void setLockWindow(bool lock) = 0;
+	virtual void setCursor(AUTORELEASE ICursor* cursor) = 0;
 };
 
 GM_ALIGNED_STRUCT(GMConsoleHandle)
