@@ -216,13 +216,20 @@ ITexture* GMGLRenderer_3D::getTexture(GMTextureFrames& frames)
 void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
-	const GMMaterial& material = shader.getMaterial();
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KA, ValuePointer(material.ka));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KD, ValuePointer(material.kd));
-	shaderProgram->setVec3(GMSHADER_MATERIAL_KS, ValuePointer(material.ks));
-	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS, material.shininess);
-	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY, material.refractivity);
+	auto& svd = shaderProgram->getDesc();
+	static const std::string GMSHADER_MATERIAL_KA = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Ka;
+	static const std::string GMSHADER_MATERIAL_KD = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Kd;
+	static const std::string GMSHADER_MATERIAL_KS = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Ks;
+	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Shininess;
+	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Refreactivity;
+
+	const GMMaterial& material = shader.getMaterial();
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.ka));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KD.c_str(), ValuePointer(material.kd));
+	shaderProgram->setVec3(GMSHADER_MATERIAL_KS.c_str(), ValuePointer(material.ks));
+	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS.c_str(), material.shininess);
+	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY.c_str(), material.refractivity);
 }
 
 void GMGLRenderer_3D::drawDebug()

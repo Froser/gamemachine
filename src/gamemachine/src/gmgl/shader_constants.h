@@ -22,13 +22,6 @@ BEGIN_NS
 #define		GMSHADER_NORMALMAP_TEXTURES(i)		GMSHADER("normalmap_textures") "[" #i "]"
 #define		GMSHADER_LIGHTMAP_TEXTURES(i)		GMSHADER("lightmap_textures") "[" #i "]"
 
-//材质
-#define		GMSHADER_MATERIAL_KA				GMSHADER("material.ka")
-#define		GMSHADER_MATERIAL_KD				GMSHADER("material.kd")
-#define		GMSHADER_MATERIAL_KS				GMSHADER("material.ks")
-#define		GMSHADER_MATERIAL_SHININESS			GMSHADER("material.shininess")
-#define		GMSHADER_MATERIAL_REFRACTIVITY		GMSHADER("material.refractivity")
-
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
 

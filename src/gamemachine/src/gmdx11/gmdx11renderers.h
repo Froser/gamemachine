@@ -50,6 +50,7 @@ private:
 	ID3DX11EffectTechnique* getTechnique();
 	void prepareBuffer(IQueriable* painter);
 	void prepareLights();
+	void prepareMaterials(GMComponent* component);
 	void prepareRasterizer(GMComponent* component);
 	void prepareBlend(GMComponent* component);
 	void prepareDepthStencil(GMComponent* component);

@@ -21,6 +21,9 @@ namespace
 			{ "AmbientLights", "AmbientLightCount" },
 			{ "SpecularLights", "SpecularLightCount" },
 
+			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity" },
+			"Material",
+
 			"GMRasterizerState",
 			"GMBlendState",
 			"GMDepthStencilState",

@@ -535,6 +535,21 @@ void GMDx11Renderer::prepareRasterizer(GMComponent* component)
 	));
 }
 
+void GMDx11Renderer::prepareMaterials(GMComponent* component)
+{
+	D(d);
+	const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
+	const GMMaterial& material = component->getShader().getMaterial();
+	ID3DX11EffectVariable* materialVar = d->effect->GetVariableByName(svd.MaterialName);
+	GM_ASSERT(materialVar->IsValid());
+	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Ka)->AsVector()->SetFloatVector(ValuePointer(material.ka)));
+	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Kd)->AsVector()->SetFloatVector(ValuePointer(material.kd)));
+	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Ks)->AsVector()->SetFloatVector(ValuePointer(material.ks)));
+	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Shininess)->AsScalar()->SetFloat(material.shininess));
+	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Refreactivity)->AsScalar()->SetFloat(material.refractivity));
+}
+
 void GMDx11Renderer::prepareBlend(GMComponent* component)
 {
 	D(d);
@@ -627,6 +642,7 @@ void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* m
 	d->shader = &component->getShader();
 	prepareBuffer(painter);
 	prepareLights();
+	prepareMaterials(component);
 	prepareRasterizer(component);
 	prepareBlend(component);
 	prepareDepthStencil(component);

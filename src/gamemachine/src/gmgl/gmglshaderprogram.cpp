@@ -29,6 +29,8 @@ namespace
 			{ "GM_ambients", "GM_ambients_count" },
 			{ "GM_speculars", "GM_speculars_count" },
 
+			{ "ka", "kd", "ks", "shininess", "refractivity" },
+			"GM_material",
 		};
 		return desc;
 	}

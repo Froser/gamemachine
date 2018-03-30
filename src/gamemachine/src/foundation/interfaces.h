@@ -216,6 +216,15 @@ struct GMShaderVariablesLightDesc
 	const char* Count;
 };
 
+struct GMShaderVariablesMaterialDesc
+{
+	const char* Ka;
+	const char* Kd;
+	const char* Ks;
+	const char* Shininess;
+	const char* Refreactivity;
+};
+
 struct GMShaderVariablesDesc
 {
 	// 矩阵
@@ -233,6 +242,10 @@ struct GMShaderVariablesDesc
 	GMShaderVariablesLightAttributeDesc LightAttributes;
 	GMShaderVariablesLightDesc AmbientLight;
 	GMShaderVariablesLightDesc SpecularLight;
+
+	// 材质
+	GMShaderVariablesMaterialDesc MaterialAttributes;
+	const char* MaterialName;
 
 	// 状态
 	const char* RasterizerState;

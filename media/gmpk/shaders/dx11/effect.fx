@@ -9,8 +9,9 @@ cbuffer WorldConstantBuffer: register( b0 )
 }
 
 //--------------------------------------------------------------------------------------
-// Textures
+// Textures, Lights, Materials
 //--------------------------------------------------------------------------------------
+
 struct GMTexture
 {
     float OffsetX;
@@ -19,18 +20,6 @@ struct GMTexture
     float ScaleY;
     bool Enabled;
 };
-
-struct GMLight
-{
-    float3 Position;
-    float3 Color;
-};
-
-GMLight AmbientLights[10];
-int AmbientLightCount;
-
-GMLight SpecularLights[10];
-int SpecularLightCount;
 
 GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
@@ -46,6 +35,30 @@ SamplerState AmbientSampler_2: register(s2);
 SamplerState DiffuseSampler_0: register(s3);
 SamplerState DiffuseSampler_1: register(s4);
 SamplerState DiffuseSampler_2: register(s5);
+
+struct GMLight
+{
+    float3 Position;
+    float3 Color;
+};
+
+GMLight AmbientLights[10];
+int AmbientLightCount;
+
+GMLight SpecularLights[10];
+int SpecularLightCount;
+
+struct GMMaterial
+{
+    float3 Ka;
+    float3 Kd;
+    float3 Ks;
+    float Shininess;
+    float Refractivity;
+};
+
+GMMaterial Material;
+
 //--------------------------------------------------------------------------------------
 // States
 //--------------------------------------------------------------------------------------
