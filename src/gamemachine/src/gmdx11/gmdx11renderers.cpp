@@ -483,6 +483,29 @@ void GMDx11Renderer::prepareBuffer(IQueriable* painter)
 	getEngine()->getDeviceContext()->IASetVertexBuffers(0, 1, &buffer, &stride, &offset);
 }
 
+void GMDx11Renderer::prepareLights()
+{
+	D(d);
+	if (getEngine()->needActivateLight())
+	{
+		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+		const Vector<GMLight>& lights = getEngine()->getLights();
+		GMuint indices[(GMuint)GMLightType::COUNT] = { 0 };
+		const char* lightAttrName[] = { svd.AmbientLightName, svd.SpecularLightName };
+		for (auto& light : lights)
+		{
+			ID3DX11EffectVariable* lightAttribute = d->effect->GetVariableByName(lightAttrName[(GMuint)light.getType()])->GetElement(indices[(GMuint)light.getType()]++);
+			GM_ASSERT(lightAttribute->IsValid());
+			ID3DX11EffectVectorVariable* position = lightAttribute->GetMemberByName(svd.LightAttributes.Position)->AsVector();
+			GM_ASSERT(position->IsValid());
+			ID3DX11EffectVectorVariable* color = lightAttribute->GetMemberByName(svd.LightAttributes.Position)->AsVector();
+			GM_ASSERT(color->IsValid());
+			GM_DX_HR(position->SetFloatVector(light.getLightPosition()));
+			GM_DX_HR(color->SetFloatVector(light.getLightColor()));
+		}
+	}
+}
+
 void GMDx11Renderer::prepareRasterizer(GMComponent* component)
 {
 	D(d);
@@ -593,6 +616,7 @@ void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* m
 	D(d);
 	d->shader = &component->getShader();
 	prepareBuffer(painter);
+	prepareLights();
 	prepareRasterizer(component);
 	prepareBlend(component);
 	prepareDepthStencil(component);

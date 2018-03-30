@@ -28,6 +28,8 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMDx11GlobalBlendStateDesc blendState;
 	GMStencilOptions stencilOptions;
 	bool ready = false;
+	Vector<GMLight> lights;
+	bool needActivateLight = false;
 };
 
 class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
@@ -69,40 +71,52 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID, void**);
 
 public:
-	GMComPtr<ID3D11Device> getDevice()
+	inline GMComPtr<ID3D11Device> getDevice()
 	{
 		D(d);
 		return d->device;
 	}
 
-	GMComPtr<ID3D11DeviceContext> getDeviceContext()
+	inline GMComPtr<ID3D11DeviceContext> getDeviceContext()
 	{
 		D(d);
 		return d->deviceContext;
 	}
 
-	GMComPtr<IDXGISwapChain> getSwapChain()
+	inline GMComPtr<IDXGISwapChain> getSwapChain()
 	{
 		D(d);
 		return d->swapChain;
 	}
 
-	GMComPtr<ID3D11DepthStencilView> getDepthStencilView()
+	inline GMComPtr<ID3D11DepthStencilView> getDepthStencilView()
 	{
 		D(d);
 		return d->depthStencilView;
 	}
 
-	GMComPtr<ID3D11RenderTargetView> getRenderTargetView()
+	inline GMComPtr<ID3D11RenderTargetView> getRenderTargetView()
 	{
 		D(d);
 		return d->renderTargetView;
 	}
 
-	const GMDx11GlobalBlendStateDesc& getGlobalBlendState()
+	inline const GMDx11GlobalBlendStateDesc& getGlobalBlendState()
 	{
 		D(d);
 		return d->blendState;
+	}
+
+	inline const Vector<GMLight>& getLights()
+	{
+		D(d);
+		return d->lights;
+	}
+
+	inline bool needActivateLight()
+	{
+		D(d);
+		return d->needActivateLight;
 	}
 
 public:

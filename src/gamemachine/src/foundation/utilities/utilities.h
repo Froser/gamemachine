@@ -58,16 +58,6 @@ struct GMToolUtil
 	  \param index 需要添加到第几个纹理。每种类型的纹理有纹理数量的限制。
 	*/
 	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type, GMuint index = 0);
-
-	//! 创建一个光标图形。
-	/*!
-	  用户应该先用工厂类创建一个ICursor的实例，然后调用此方法为光标设置一个图形。请在调用前确认GMGamePackage已经初始化。
-	  \param cursor 传入的已经创建好的空光标实例。
-	  \param cursorDesc 光标的描述。
-	  \param filename 需要读取光标的路径。它是一个相对于纹理目录的相对路径。
-	  \sa GMCursorDesc
-	*/
-	static void createCursor(ICursor* cursor, const GMCursorDesc& cursorDesc, const GMString& filename);
 };
 
 END_NS

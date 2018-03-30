@@ -159,16 +159,10 @@ typedef GMuint GMWindowHandle;
 
 struct GMCursorDesc
 {
+	GMWindowHandle hWnd;
 	GMuint xHotspot;
 	GMuint yHotspot;
 	GMfloat transparentColor[3];
-};
-
-GM_INTERFACE(ICursor)
-{
-	virtual bool isEmpty() = 0;
-	virtual bool createCursor(const GMCursorDesc& cursorDesc, const GMImage& cursorImg) = 0;
-	virtual bool setCursor(gm::GMWindowHandle handle) = 0;
 };
 
 enum class GMBufferMode
@@ -210,6 +204,12 @@ struct GMShaderVariablesTextureDesc
 	const char* Texture;
 };
 
+struct GMShaderVariablesLightDesc
+{
+	const char* Position;
+	const char* Color;
+};
+
 struct GMShaderVariablesDesc
 {
 	// 矩阵
@@ -222,6 +222,11 @@ struct GMShaderVariablesDesc
 	GMShaderVariablesTextureDesc TextureAttributes;
 	const char* AmbientTextureName;
 	const char* DiffuseTextureName;
+
+	// 光照
+	GMShaderVariablesLightDesc LightAttributes;
+	const char* AmbientLightName;
+	const char* SpecularLightName;
 
 	// 状态
 	const char* RasterizerState;
@@ -420,7 +425,6 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual bool event(const GameMachineMessage& msg) = 0;
 	virtual bool isWindowActivate() = 0;
 	virtual void setLockWindow(bool lock) = 0;
-	virtual void setCursor(AUTORELEASE ICursor* cursor) = 0;
 };
 
 GM_ALIGNED_STRUCT(GMConsoleHandle)

@@ -10,7 +10,6 @@ GM_PRIVATE_OBJECT(GMUIWindow)
 {
 	gm::GMWindowHandle hwnd;
 	gm::IInput* input = nullptr;
-	gm::GMScopePtr<gm::ICursor> cursor;
 };
 
 class GMUIWindow : public gm::GMObject, public gm::IWindow
@@ -46,11 +45,10 @@ public:
 	virtual gm::GMWindowHandle getWindowHandle() const { D(d); return d->hwnd; }
 	virtual bool getInterface(gm::GameMachineInterfaceID id, void** out) { return false; }
 	virtual bool setInterface(gm::GameMachineInterfaceID id, void* in) { return false; }
-	virtual void setCursor(AUTORELEASE gm::ICursor* cursor) override { D(d); d->cursor.reset(cursor); }
 
 	// 新虚方法
 protected:
-	virtual bool wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes);
+	virtual bool wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes) { return false; }
 	virtual bool createWindow(const gm::GMWindowAttributes& wndAttrs, const gm::GMwchar* className);
 
 private:

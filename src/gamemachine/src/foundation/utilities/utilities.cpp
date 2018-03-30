@@ -312,16 +312,3 @@ void GMToolUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMT
 	auto& frames = shader.getTexture().getTextureFrames(type, index);
 	frames.addFrame(texture);
 }
-
-void GMToolUtil::createCursor(ICursor* cursor, const GMCursorDesc& cursorDesc, const GMString& filename)
-{
-	GM_ASSERT(cursor->isEmpty());
-
-	GMImage* img = nullptr;
-	GMBuffer buf;
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, filename, &buf);
-	GMImageReader::load(buf.buffer, buf.size, &img);
-	GM_ASSERT(img);
-	cursor->createCursor(cursorDesc, *img);
-	GM_delete(img);
-}

@@ -27,6 +27,9 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 	if (!count)
 		return;
 
+	D(d);
+	d->needActivateLight = true;
+
 	if (bufferMode == GMBufferMode::NoFramebuffer)
 	{
 		directDraw(objects, count);
@@ -36,6 +39,8 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 		//TODO 考虑延迟渲染
 		forwardDraw(objects, count);
 	}
+
+	d->needActivateLight = false;
 }
 
 void GMDx11GraphicEngine::update(GMUpdateDataType type)
@@ -45,10 +50,14 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 
 void GMDx11GraphicEngine::addLight(const GMLight& light)
 {
+	D(d);
+	d->lights.push_back(light);
 }
 
 void GMDx11GraphicEngine::removeLights()
 {
+	D(d);
+	d->lights.clear();
 }
 
 void GMDx11GraphicEngine::clearStencil()

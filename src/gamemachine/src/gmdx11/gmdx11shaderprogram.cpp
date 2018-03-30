@@ -17,6 +17,10 @@ namespace
 			"AmbientTextureAttributes",
 			"DiffuseTextureAttributes",
 
+			{ "Position", "Color" },
+			"AmbientLights",
+			"SpecularLights",
+
 			"GMRasterizerState",
 			"GMBlendState",
 			"GMDepthStencilState",

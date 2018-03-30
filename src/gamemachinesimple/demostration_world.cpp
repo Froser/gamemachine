@@ -87,13 +87,6 @@ void DemostrationEntrance::init()
 
 	GM.getGraphicEngine()->setShaderLoadCallback(this);
 
-	// 创建光标
-	gm::ICursor* cursor = nullptr;
-	gmui::GMUIFactory::createCursor(&cursor);
-	gm::GMCursorDesc desc = { 0 };
-	gm::GMToolUtil::createCursor(cursor, desc, "cursor.png");
-	GM.getMainWindow()->setCursor(cursor);
-
 	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::DEFERRED);
 	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
 	GMSetRenderState(RESOLUTION_X, rc.width);

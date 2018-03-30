@@ -28,8 +28,6 @@ set(WIN32_SOURCES
 		src/windows/gmuiwindow.h
 		src/windows/gmuiinput.cpp
 		src/windows/gmuiinput.h
-		src/windows/gmmcursor.h
-		src/windows/gmmcursor.cpp
 	)
 
 set(WIN32_DX11

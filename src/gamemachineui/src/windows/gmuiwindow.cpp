@@ -138,21 +138,6 @@ void GMUIWindow::setLockWindow(bool lock)
 		::ReleaseCapture();
 }
 
-bool GMUIWindow::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM lParam, LRESULT* lRes)
-{
-	D(d);
-	switch (uMsg)
-	{
-		case WM_SETCURSOR:
-		{
-			if (d->cursor && !d->cursor->isEmpty())
-				return d->cursor->setCursor(d->hwnd);
-			break;
-		}
-	}
-	return false;
-}
-
 bool GMUIWindow::createWindow(const gm::GMWindowAttributes& wndAttrs, const gm::GMwchar* className)
 {
 	D(d);
