@@ -155,11 +155,16 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 		D3D_FEATURE_LEVEL_11_0,
 	};
 
+	UINT createFlags = 0;
+#if _DEBUG
+	createFlags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif
+
 	hr = D3D11CreateDevice(
 		NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
-		0,
+		createFlags,
 		featureLevels,
 		GM_array_size(featureLevels),
 		D3D11_SDK_VERSION,

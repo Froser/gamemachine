@@ -1,4 +1,4 @@
-﻿//--------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
 cbuffer WorldConstantBuffer: register( b0 ) 
@@ -100,7 +100,6 @@ struct PS_INPUT
     float2 Lightmap    : TEXCOORD3;
     float4 Color       : COLOR;
     float4 WorldPos    : POSITION;
-    float4 Position    : SV_POSITION;
 };
 
 float4 ToFloat4(float3 v, float w)
@@ -166,8 +165,9 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.Position = ToFloat4(input.Position);
-    output.WorldPos = output.Position;
     output.Position = mul(output.Position, WorldMatrix);
+    output.WorldPos = output.Position;
+    
     output.Position = mul(output.Position, ViewMatrix);
     output.Position = mul(output.Position, ProjectionMatrix);
 

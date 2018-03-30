@@ -1,4 +1,4 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "gmdx11helper.h"
 #include <gmdxincludes.h>
 #include "foundation/gamemachine.h"
@@ -8,8 +8,6 @@
 IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	IGraphicEngine* engine,
 	const gm::GMString& filename,
-	const gm::GMString& entryPoint,
-	const gm::GMString& profile,
 	GMShaderType type,
 	const IShaderProgram* shaderProgram
 )
@@ -26,7 +24,7 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 
 	UINT flag = D3D10_SHADER_ENABLE_STRICTNESS;
 #if _DEBUG
-	flag |= D3D10_SHADER_DEBUG | D3D10_SHADER_SKIP_OPTIMIZATION;
+	flag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif
 
 	buf.convertToStringBuffer();
@@ -36,8 +34,8 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 		path.toStdString().c_str(),
 		NULL,
 		NULL,
-		entryPoint.toStdString().c_str(),
-		profile.toStdString().c_str(),
+		"",
+		"fx_5_0",
 		flag,
 		0,
 		NULL,
