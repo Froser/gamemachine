@@ -1,4 +1,4 @@
-//--------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
 cbuffer WorldConstantBuffer: register( b0 ) 
@@ -6,6 +6,7 @@ cbuffer WorldConstantBuffer: register( b0 )
     matrix WorldMatrix;
     matrix ViewMatrix;
     matrix ProjectionMatrix;
+    matrix InverseTransposeModelMatrix;
 }
 
 //--------------------------------------------------------------------------------------
@@ -86,6 +87,7 @@ struct VS_OUTPUT
     float2 Bitangent   : TEXCOORD2;
     float2 Lightmap    : TEXCOORD3;
     float4 Color       : COLOR;
+    float4 WorldPos    : POSITION;
     float4 Position    : SV_POSITION;
 };
 
@@ -97,7 +99,19 @@ struct PS_INPUT
     float2 Bitangent   : TEXCOORD2;
     float2 Lightmap    : TEXCOORD3;
     float4 Color       : COLOR;
+    float4 WorldPos    : POSITION;
+    float4 Position    : SV_POSITION;
 };
+
+float4 ToFloat4(float3 v, float w)
+{
+    return float4(v.x, v.y, v.z, w);
+}
+
+float4 ToFloat4(float3 v)
+{
+    return ToFloat4(v, 1);
+}
 
 float4 Texture_Sample(Texture2D tex, SamplerState ss, float2 texcoord, GMTexture attributes)
 {
@@ -108,7 +122,7 @@ float4 Texture_Sample(Texture2D tex, SamplerState ss, float2 texcoord, GMTexture
     return tex.Sample(ss, transformedTexcoord);
 }
 
-bool needDiscard(GMTexture attributes[3])
+bool NeedDiscard(GMTexture attributes[3])
 {
     for (int i = 0; i < 3; ++i)
     {
@@ -118,13 +132,41 @@ bool needDiscard(GMTexture attributes[3])
     return true;
 }
 
+struct _LightFactor
+{
+    float3 DiffuseFactor;
+    float3 SpecularFactor;
+};
 //--------------------------------------------------------------------------------------
 // 3D
 //--------------------------------------------------------------------------------------
+
+_LightFactor CalculateLightFactor(GMLight specular, float3 eyeDirection_Eye, float3 normal_Eye)
+{
+    _LightFactor result;
+    float3 lightPosition_Eye = (mul(ToFloat4(specular.Position), ViewMatrix)).xyz;
+    float3 lightDirection_Eye = lightPosition_Eye + eyeDirection_Eye;
+    float3 L = normalize(lightDirection_Eye);
+
+    // Diffuse
+    result.DiffuseFactor = saturate(dot(L, normal_Eye)) * Material.Kd * specular.Color;
+
+    // Specular
+    float3 V = normalize(eyeDirection_Eye);
+    float3 R = reflect(-L, normal_Eye);
+    float theta = dot(V, R);
+    float factor_Specular = pow(abs(theta), Material.Shininess);
+    factor_Specular = saturate(factor_Specular);
+    result.SpecularFactor = factor_Specular * Material.Ks * specular.Color;
+
+    return result;
+}
+
 VS_OUTPUT VS_3D( VS_INPUT input )
 {
     VS_OUTPUT output;
-    output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
+    output.Position = ToFloat4(input.Position);
+    output.WorldPos = output.Position;
     output.Position = mul(output.Position, WorldMatrix);
     output.Position = mul(output.Position, ViewMatrix);
     output.Position = mul(output.Position, ProjectionMatrix);
@@ -140,17 +182,48 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 float4 PS_3D(PS_INPUT input) : SV_Target
 {
-    if (needDiscard(DiffuseTextureAttributes) && needDiscard(AmbientTextureAttributes))
+    //TODO 没有纹理，真的不需要绘制吗？
+    if (NeedDiscard(DiffuseTextureAttributes) && NeedDiscard(AmbientTextureAttributes))
         discard;
 
-    float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    color += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
-    color += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
-    color += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
-    color += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
-    color += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
-    color += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
-    return color;
+    _LightFactor lightFactor;
+    lightFactor.DiffuseFactor = 0;
+    lightFactor.SpecularFactor = 0;
+
+    // 将法线换算到眼睛坐标系
+    matrix transform_Normal_Eye = mul(InverseTransposeModelMatrix, ViewMatrix);
+    float3 normal_Eye = normalize( mul(ToFloat4(input.Normal.xyz, 0), transform_Normal_Eye).xyz);
+    float3 position_Eye = (mul(input.WorldPos, ViewMatrix)).xyz;
+    float3 eyeDirection_Eye = -position_Eye;
+
+    for (int i = 0; i < SpecularLightCount; ++i)
+    {
+        _LightFactor t = CalculateLightFactor(SpecularLights[i], eyeDirection_Eye, normal_Eye);
+        lightFactor.DiffuseFactor += t.DiffuseFactor;
+        lightFactor.SpecularFactor += t.SpecularFactor;
+    }
+
+    // 计算Ambient因子
+    float4 color_Ambient = float4(0, 0, 0, 0);
+    float4 factor_Ambient = float4(0, 0, 0, 0);
+    for (int j = 0; j < AmbientLightCount; ++j)
+    {
+        factor_Ambient += ToFloat4(Material.Ka * AmbientLights[j].Color);
+    }
+    color_Ambient += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
+    color_Ambient += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
+    color_Ambient += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
+    color_Ambient = factor_Ambient * color_Ambient;
+
+    // 计算Diffuse因子
+    float4 color_Diffuse = float4(0, 0, 0, 0);
+    color_Diffuse += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
+    color_Diffuse += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
+    color_Diffuse += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
+    color_Diffuse = ToFloat4(lightFactor.DiffuseFactor) * color_Diffuse;
+    
+    float4 finalColor = color_Ambient + color_Diffuse + ToFloat4(lightFactor.SpecularFactor);
+    return finalColor;
 }
 
 //--------------------------------------------------------------------------------------
@@ -172,7 +245,7 @@ VS_OUTPUT VS_2D(VS_INPUT input)
 
 float4 PS_2D(PS_INPUT input) : SV_Target
 {
-    if (needDiscard(DiffuseTextureAttributes) && needDiscard(AmbientTextureAttributes))
+    if (NeedDiscard(DiffuseTextureAttributes) && NeedDiscard(AmbientTextureAttributes))
         return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);

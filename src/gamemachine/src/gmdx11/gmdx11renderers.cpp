@@ -357,7 +357,16 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	context->IASetPrimitiveTopology(getMode(model->getMesh()));
 	
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+	if (parent)
+	{
+		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+	}
+	else
+	{
+		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
+	}
 	shaderProgram->setMatrix4(desc->ViewMatrix, GM.getCamera().getFrustum().getViewMatrix());
 	shaderProgram->setMatrix4(desc->ProjectionMatrix, GM.getCamera().getFrustum().getProjectionMatrix());
 }
