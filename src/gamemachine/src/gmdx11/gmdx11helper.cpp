@@ -8,8 +8,7 @@
 IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	IGraphicEngine* engine,
 	const gm::GMString& filename,
-	GMShaderType type,
-	const IShaderProgram* shaderProgram
+	GMShaderType type
 )
 {
 	gm::GMComPtr<ID3D10Blob> errorMessage;

@@ -16,14 +16,12 @@ struct GMDx11Helper
 	  \param engine 需要添加到的绘制引擎
 	  \param filename 读取的文件名。此方法会通过GMGamePackage在着色器所在目录读取文件。
 	  \param type 着色器类型，目前只能为GMShaderType::Effect。
-	  \param shaderProgram 用户自己的着色器程序。如果为nullptr，则使用默认着色器程序。
 	  \return 操作是否成功。
 	*/
 	static IShaderProgram* GMLoadDx11Shader(
 		IGraphicEngine* engine,
 		const gm::GMString& filename,
-		GMShaderType type,
-		const IShaderProgram* shaderProgram
+		GMShaderType type
 	);
 
 	//! 返回一个默认的采样器描述。

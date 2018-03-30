@@ -159,6 +159,6 @@ DemostrationEntrance::~DemostrationEntrance()
 void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 {
 #if GM_USE_DX11
-	gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect, nullptr);
+	gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect);
 #endif
 }

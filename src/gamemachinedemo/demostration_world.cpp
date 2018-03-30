@@ -359,7 +359,7 @@ void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 	else
 	{
 		GM_ASSERT(env == gm::GMRenderEnvironment::DirectX11);
-		gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect, nullptr);
+		gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect);
 	}
 }
 
