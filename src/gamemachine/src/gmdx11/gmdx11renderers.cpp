@@ -18,6 +18,8 @@
 
 namespace
 {
+	constexpr GMint GMDX11_MAX_LIGHT_COUNT = 10; //灯光最大数量
+
 	D3D11_INPUT_ELEMENT_DESC GMSHADER_ElementDescriptions[] =
 	{
 		{ GMSHADER_SEMANTIC_NAME_POSITION, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, FLOAT_OFFSET(0), D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -491,10 +493,10 @@ void GMDx11Renderer::prepareLights()
 		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
 		const Vector<GMLight>& lights = getEngine()->getLights();
 		GMuint indices[(GMuint)GMLightType::COUNT] = { 0 };
-		const char* lightAttrName[] = { svd.AmbientLightName, svd.SpecularLightName };
+		const GMShaderVariablesLightDesc* lightAttr[] = { &svd.AmbientLight, &svd.SpecularLight };
 		for (auto& light : lights)
 		{
-			ID3DX11EffectVariable* lightAttribute = d->effect->GetVariableByName(lightAttrName[(GMuint)light.getType()])->GetElement(indices[(GMuint)light.getType()]++);
+			ID3DX11EffectVariable* lightAttribute = d->effect->GetVariableByName(lightAttr[(GMuint)light.getType()]->Name)->GetElement(indices[(GMuint)light.getType()]++);
 			GM_ASSERT(lightAttribute->IsValid());
 			ID3DX11EffectVectorVariable* position = lightAttribute->GetMemberByName(svd.LightAttributes.Position)->AsVector();
 			GM_ASSERT(position->IsValid());
@@ -502,6 +504,14 @@ void GMDx11Renderer::prepareLights()
 			GM_ASSERT(color->IsValid());
 			GM_DX_HR(position->SetFloatVector(light.getLightPosition()));
 			GM_DX_HR(color->SetFloatVector(light.getLightColor()));
+		}
+
+		GM_FOREACH_ENUM_CLASS(type, GMLightType::AMBIENT, GMLightType::COUNT)
+		{
+			ID3DX11EffectScalarVariable* lightCount = d->effect->GetVariableByName(lightAttr[(GMuint)type]->Count)->AsScalar();
+			GM_ASSERT(lightCount->IsValid());
+			GM_ASSERT(indices[(GMuint)type] < GMDX11_MAX_LIGHT_COUNT);
+			GM_DX_HR(lightCount->SetInt(indices[(GMuint)type]));
 		}
 	}
 }

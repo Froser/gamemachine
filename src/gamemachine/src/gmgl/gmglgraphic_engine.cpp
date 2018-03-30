@@ -257,6 +257,8 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 		if (!prog)
 			continue;
 
+		auto& svd = prog->getDesc();
+
 		prog->useProgram();
 		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
 		for (auto& light : lights)
@@ -266,18 +268,18 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 			{
 			case GMLightType::AMBIENT:
 			{
-				const char* uniform = getLightUniformName(GMLightType::AMBIENT, id);
+				const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
 				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, "." GMSHADER_LIGHTS_LIGHTCOLOR);
+				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
 				prog->setVec3(u_color, light.getLightColor());
 				break;
 			}
 			case GMLightType::SPECULAR:
 			{
-				const char* uniform = getLightUniformName(GMLightType::SPECULAR, id);
+				const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
 				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, "." GMSHADER_LIGHTS_LIGHTCOLOR);
-				combineUniform(u_position, uniform, "." GMSHADER_LIGHTS_LIGHTPOSITION);
+				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
+				combineUniform(u_position, uniform, ".", svd.LightAttributes.Position);
 				prog->setVec3(u_color, light.getLightColor());
 				prog->setVec3(u_position, light.getLightPosition());
 				break;
@@ -286,8 +288,8 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 				break;
 			}
 		}
-		prog->setInt(GMSHADER_AMBIENTS_COUNT, lightId[(GMint)GMLightType::AMBIENT]);
-		prog->setInt(GMSHADER_SPECULARS_COUNT, lightId[(GMint)GMLightType::SPECULAR]);
+		prog->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
+		prog->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
 	}
 }
 

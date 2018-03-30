@@ -25,6 +25,10 @@ namespace
 			"GM_ambient_textures",
 			"GM_diffuse_textures",
 
+			{ "lightPosition", "lightColor" },
+			{ "GM_ambients", "GM_ambients_count" },
+			{ "GM_speculars", "GM_speculars_count" },
+
 		};
 		return desc;
 	}

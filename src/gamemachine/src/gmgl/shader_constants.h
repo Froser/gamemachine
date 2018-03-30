@@ -22,14 +22,6 @@ BEGIN_NS
 #define		GMSHADER_NORMALMAP_TEXTURES(i)		GMSHADER("normalmap_textures") "[" #i "]"
 #define		GMSHADER_LIGHTMAP_TEXTURES(i)		GMSHADER("lightmap_textures") "[" #i "]"
 
-//光照
-#define		GMSHADER_AMBIENT_LIGHTS(i)			GMSHADER("ambients") "[" #i "]"
-#define		GMSHADER_AMBIENTS_COUNT				GMSHADER("ambients_count")
-#define		GMSHADER_SPECULAR_LIGHTS(i)			GMSHADER("speculars") "[" #i "]"
-#define		GMSHADER_SPECULARS_COUNT			GMSHADER("speculars_count")
-#define		GMSHADER_LIGHTS_LIGHTCOLOR			"lightColor"
-#define		GMSHADER_LIGHTS_LIGHTPOSITION		"lightPosition"
-
 //材质
 #define		GMSHADER_MATERIAL_KA				GMSHADER("material.ka")
 #define		GMSHADER_MATERIAL_KD				GMSHADER("material.kd")
@@ -93,35 +85,42 @@ inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTe
 	return "";
 }
 
-inline const char* getLightUniformName(GMLightType t, GMint index)
+inline const char* getLightUniformName(const GMShaderVariablesDesc& desc, GMLightType t, GMint index)
 {
 	GM_ASSERT(index < GMGL_MAX_LIGHT_COUNT);
+
+	static const std::string GMSHADER_AMBIENT_LIGHTS[10] = {
+		std::string(desc.AmbientLight.Name) + "[0]",
+		std::string(desc.AmbientLight.Name) + "[1]",
+		std::string(desc.AmbientLight.Name) + "[2]",
+		std::string(desc.AmbientLight.Name) + "[3]",
+		std::string(desc.AmbientLight.Name) + "[4]",
+		std::string(desc.AmbientLight.Name) + "[5]",
+		std::string(desc.AmbientLight.Name) + "[6]",
+		std::string(desc.AmbientLight.Name) + "[7]",
+		std::string(desc.AmbientLight.Name) + "[8]",
+		std::string(desc.AmbientLight.Name) + "[9]",
+	};
+
+	static const std::string GMSHADER_SPECULAR_LIGHTS[10] = {
+		std::string(desc.SpecularLight.Name) + "[0]",
+		std::string(desc.SpecularLight.Name) + "[1]",
+		std::string(desc.SpecularLight.Name) + "[2]",
+		std::string(desc.SpecularLight.Name) + "[3]",
+		std::string(desc.SpecularLight.Name) + "[4]",
+		std::string(desc.SpecularLight.Name) + "[5]",
+		std::string(desc.SpecularLight.Name) + "[6]",
+		std::string(desc.SpecularLight.Name) + "[7]",
+		std::string(desc.SpecularLight.Name) + "[8]",
+		std::string(desc.SpecularLight.Name) + "[9]",
+	};
+
 	switch (t)
 	{
 	case GMLightType::AMBIENT:
-		return index == 0 ? GMSHADER_AMBIENT_LIGHTS(0) :
-			index == 1 ? GMSHADER_AMBIENT_LIGHTS(1) :
-			index == 2 ? GMSHADER_AMBIENT_LIGHTS(2) :
-			index == 3 ? GMSHADER_AMBIENT_LIGHTS(3) :
-			index == 4 ? GMSHADER_AMBIENT_LIGHTS(4) :
-			index == 5 ? GMSHADER_AMBIENT_LIGHTS(5) :
-			index == 6 ? GMSHADER_AMBIENT_LIGHTS(6) :
-			index == 7 ? GMSHADER_AMBIENT_LIGHTS(7) :
-			index == 8 ? GMSHADER_AMBIENT_LIGHTS(8) :
-			index == 9 ? GMSHADER_AMBIENT_LIGHTS(9) :
-			index == 10 ? GMSHADER_AMBIENT_LIGHTS(10) : "";
+		return GMSHADER_AMBIENT_LIGHTS[index].c_str();
 	case GMLightType::SPECULAR:
-		return index == 0 ? GMSHADER_SPECULAR_LIGHTS(0) :
-			index == 1 ? GMSHADER_SPECULAR_LIGHTS(1) :
-			index == 2 ? GMSHADER_SPECULAR_LIGHTS(2) :
-			index == 3 ? GMSHADER_SPECULAR_LIGHTS(3) :
-			index == 4 ? GMSHADER_SPECULAR_LIGHTS(4) :
-			index == 5 ? GMSHADER_SPECULAR_LIGHTS(5) :
-			index == 6 ? GMSHADER_SPECULAR_LIGHTS(6) :
-			index == 7 ? GMSHADER_SPECULAR_LIGHTS(7) :
-			index == 8 ? GMSHADER_SPECULAR_LIGHTS(8) :
-			index == 9 ? GMSHADER_SPECULAR_LIGHTS(9) :
-			index == 10 ? GMSHADER_SPECULAR_LIGHTS(10) : "";
+		return GMSHADER_SPECULAR_LIGHTS[index].c_str();
 	default:
 		GM_ASSERT(false);
 		break;
@@ -134,6 +133,14 @@ void combineUniform(REF CharType (&dest)[ArraySize], const char* srcA, const cha
 {
 	GMString::stringCopy(dest, srcA);
 	GMString::stringCat(dest, srcB);
+}
+
+template <typename CharType, size_t ArraySize>
+void combineUniform(REF CharType(&dest)[ArraySize], const char* srcA, const char* srcB, const char* srcC)
+{
+	GMString::stringCopy(dest, srcA);
+	GMString::stringCat(dest, srcB);
+	GMString::stringCat(dest, srcC);
 }
 
 END_NS

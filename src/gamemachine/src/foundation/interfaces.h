@@ -204,10 +204,16 @@ struct GMShaderVariablesTextureDesc
 	const char* Texture;
 };
 
-struct GMShaderVariablesLightDesc
+struct GMShaderVariablesLightAttributeDesc
 {
 	const char* Position;
 	const char* Color;
+};
+
+struct GMShaderVariablesLightDesc
+{
+	const char* Name;
+	const char* Count;
 };
 
 struct GMShaderVariablesDesc
@@ -224,9 +230,9 @@ struct GMShaderVariablesDesc
 	const char* DiffuseTextureName;
 
 	// 光照
-	GMShaderVariablesLightDesc LightAttributes;
-	const char* AmbientLightName;
-	const char* SpecularLightName;
+	GMShaderVariablesLightAttributeDesc LightAttributes;
+	GMShaderVariablesLightDesc AmbientLight;
+	GMShaderVariablesLightDesc SpecularLight;
 
 	// 状态
 	const char* RasterizerState;

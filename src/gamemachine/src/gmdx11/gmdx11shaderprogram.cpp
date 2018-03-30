@@ -18,8 +18,8 @@ namespace
 			"DiffuseTextureAttributes",
 
 			{ "Position", "Color" },
-			"AmbientLights",
-			"SpecularLights",
+			{ "AmbientLights", "AmbientLightCount" },
+			{ "SpecularLights", "SpecularLightCount" },
 
 			"GMRasterizerState",
 			"GMBlendState",

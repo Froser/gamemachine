@@ -20,6 +20,18 @@ struct GMTexture
     bool Enabled;
 };
 
+struct GMLight
+{
+    float3 Position;
+    float3 Color;
+};
+
+GMLight AmbientLights[10];
+int AmbientLightCount;
+
+GMLight SpecularLights[10];
+int SpecularLightCount;
+
 GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
 Texture2D AmbientTexture_0: register(t0);
