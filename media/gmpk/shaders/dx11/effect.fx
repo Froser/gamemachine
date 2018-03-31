@@ -39,8 +39,8 @@ SamplerState DiffuseSampler_2: register(s5);
 
 struct GMLight
 {
-    float3 Position;
-    float3 Color;
+    float4 Position;
+    float4 Color;
 };
 
 GMLight AmbientLights[10];
@@ -51,9 +51,9 @@ int SpecularLightCount;
 
 struct GMMaterial
 {
-    float3 Ka;
-    float3 Kd;
-    float3 Ks;
+    float4 Ka;
+    float4 Kd;
+    float4 Ks;
     float Shininess;
     float Refractivity;
 };
@@ -148,7 +148,7 @@ _LightFactor CalculateLightFactor(GMLight specular, float3 eyeDirection_Eye, flo
     float3 L = normalize(lightDirection_Eye);
 
     // Diffuse
-    result.DiffuseFactor = saturate(dot(L, normal_Eye)) * Material.Kd * specular.Color;
+    result.DiffuseFactor = (saturate(dot(L, normal_Eye)) * Material.Kd * specular.Color).xyz;
 
     // Specular
     float3 V = normalize(eyeDirection_Eye);
@@ -182,10 +182,6 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 float4 PS_3D(PS_INPUT input) : SV_Target
 {
-    //TODO 没有纹理，真的不需要绘制吗？
-    if (NeedDiscard(DiffuseTextureAttributes) && NeedDiscard(AmbientTextureAttributes))
-        discard;
-
     _LightFactor lightFactor;
     lightFactor.DiffuseFactor = 0;
     lightFactor.SpecularFactor = 0;
@@ -208,7 +204,7 @@ float4 PS_3D(PS_INPUT input) : SV_Target
     float4 factor_Ambient = float4(0, 0, 0, 0);
     for (int j = 0; j < AmbientLightCount; ++j)
     {
-        factor_Ambient += ToFloat4(Material.Ka * AmbientLights[j].Color);
+        factor_Ambient += Material.Ka * AmbientLights[j].Color;
     }
     color_Ambient += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
     color_Ambient += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
@@ -234,6 +230,7 @@ VS_OUTPUT VS_2D(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.Position = mul(output.Position, WorldMatrix);
+    output.Position.z = 0;
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
     output.Tangent = input.Tangent;

@@ -81,7 +81,6 @@ public:
 struct IPrimitiveCreatorShaderCallback;
 GM_PRIVATE_OBJECT(GMControlGameObject)
 {
-	AUTORELEASE GMControlGameObject* stencil = nullptr;
 	GMControlGameObject* parent = nullptr;
 	GMRect geometry{ 0 };
 	GMfloat geometryScaling[2] = { 1, 1 };
@@ -101,7 +100,6 @@ public:
 
 public:
 	inline void setParent(GMControlGameObject* parent) { D(d); d->parent = parent; }
-	inline GMGameObject* getStencil() { D(d); return d->stencil; }
 	inline const GMRect& getGeometry() { D(d); return d->geometry; }
 	inline void setGeometry(const GMRect& rect) { D(d); d->geometry = rect; updateGeometry(); }
 	inline void setWidth(GMint width) { D(d); d->geometry.width = width; updateGeometry();  }

@@ -537,7 +537,8 @@ void GMImage2DGameObject::draw()
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	Base::draw();
 
-	drawBackground();
+	if (d->background)
+		d->background->draw();
 	if (d->border.hasBorder())
 		d->border.draw();
 
@@ -621,13 +622,6 @@ void GMImage2DGameObject::createBackgroundImage()
 	d->background->setGeometry(getGeometry());
 	d->background->setWorld(getWorld());
 	GM.createModelPainterAndTransfer(d->background->getModel());
-}
-
-void GMImage2DGameObject::drawBackground()
-{
-	D(d);
-	if (d->background)
-		d->background->draw();
 }
 
 void GMImage2DGameObject::createBorder()

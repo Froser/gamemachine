@@ -161,7 +161,10 @@ namespace
 		desc.FrontFace.StencilFailOp = desc.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 		desc.FrontFace.StencilDepthFailOp = desc.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
 		desc.FrontFace.StencilPassOp = desc.BackFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
-		desc.FrontFace.StencilFunc = desc.BackFace.StencilFunc = stencilOptions.compareOp == GMStencilOptions::Equal ? D3D11_COMPARISON_EQUAL : ( GMStencilOptions::NotEqual ? D3D11_COMPARISON_NOT_EQUAL : D3D11_COMPARISON_ALWAYS);
+		desc.FrontFace.StencilFunc = desc.BackFace.StencilFunc = 
+			(stencilOptions.compareOp == GMStencilOptions::Equal ? D3D11_COMPARISON_EQUAL :
+			(stencilOptions.compareOp == GMStencilOptions::NotEqual ? D3D11_COMPARISON_NOT_EQUAL : D3D11_COMPARISON_ALWAYS)
+		);
 		return desc;
 	}
 
@@ -502,14 +505,15 @@ void GMDx11Renderer::prepareLights()
 		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
 		const Vector<GMLight>& lights = getEngine()->getLights();
 		GMuint indices[(GMuint)GMLightType::COUNT] = { 0 };
-		const GMShaderVariablesLightDesc* lightAttr[] = { &svd.AmbientLight, &svd.SpecularLight };
+		const GMShaderVariablesLightDesc* lightAttrs[] = { &svd.AmbientLight, &svd.SpecularLight };
 		for (auto& light : lights)
 		{
-			ID3DX11EffectVariable* lightAttribute = d->effect->GetVariableByName(lightAttr[(GMuint)light.getType()]->Name)->GetElement(indices[(GMuint)light.getType()]++);
-			GM_ASSERT(lightAttribute->IsValid());
-			ID3DX11EffectVectorVariable* position = lightAttribute->GetMemberByName(svd.LightAttributes.Position)->AsVector();
+			const GMShaderVariablesLightDesc* lightAttr = lightAttrs[(GMuint)light.getType()];
+			ID3DX11EffectVariable* lightAttributeVar = d->effect->GetVariableByName(lightAttr->Name)->GetElement(indices[(GMuint)light.getType()]++);
+			GM_ASSERT(lightAttributeVar->IsValid());
+			ID3DX11EffectVectorVariable* position = lightAttributeVar->GetMemberByName(svd.LightAttributes.Position)->AsVector();
 			GM_ASSERT(position->IsValid());
-			ID3DX11EffectVectorVariable* color = lightAttribute->GetMemberByName(svd.LightAttributes.Position)->AsVector();
+			ID3DX11EffectVectorVariable* color = lightAttributeVar->GetMemberByName(svd.LightAttributes.Color)->AsVector();
 			GM_ASSERT(color->IsValid());
 			GM_DX_HR(position->SetFloatVector(light.getLightPosition()));
 			GM_DX_HR(color->SetFloatVector(light.getLightColor()));
@@ -517,7 +521,7 @@ void GMDx11Renderer::prepareLights()
 
 		GM_FOREACH_ENUM_CLASS(type, GMLightType::AMBIENT, GMLightType::COUNT)
 		{
-			ID3DX11EffectScalarVariable* lightCount = d->effect->GetVariableByName(lightAttr[(GMuint)type]->Count)->AsScalar();
+			ID3DX11EffectScalarVariable* lightCount = d->effect->GetVariableByName(lightAttrs[(GMuint)type]->Count)->AsScalar();
 			GM_ASSERT(lightCount->IsValid());
 			GM_ASSERT(indices[(GMuint)type] < GMDX11_MAX_LIGHT_COUNT);
 			GM_DX_HR(lightCount->SetInt(indices[(GMuint)type]));

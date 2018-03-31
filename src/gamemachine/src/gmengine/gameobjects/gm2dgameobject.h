@@ -144,9 +144,6 @@ public:
 protected:
 	virtual void onCreateShader(GMShader& shader) override;
 
-protected:
-	void drawBackground();
-
 private:
 	void createBackgroundImage();
 	void createBorder();

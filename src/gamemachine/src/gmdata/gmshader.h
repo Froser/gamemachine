@@ -18,8 +18,8 @@ enum class GMLightType
 GM_PRIVATE_OBJECT(GMLight)
 {
 	GMLightType type = GMLightType::AMBIENT;
-	GMfloat lightPosition[3];
-	GMfloat lightColor[3];
+	GMfloat lightPosition[4];
+	GMfloat lightColor[4];
 };
 
 class GMLight : public GMObject
@@ -58,6 +58,7 @@ public:
 		d->lightColor[0] = light[0];
 		d->lightColor[1] = light[1];
 		d->lightColor[2] = light[2];
+		d->lightColor[3] = 1.0f;
 	}
 
 	const GMfloat* getLightColor() const
@@ -72,6 +73,7 @@ public:
 		d->lightPosition[0] = light[0];
 		d->lightPosition[1] = light[1];
 		d->lightPosition[2] = light[2];
+		d->lightPosition[3] = 1.0f;
 	}
 
 	const GMfloat* getLightPosition() const

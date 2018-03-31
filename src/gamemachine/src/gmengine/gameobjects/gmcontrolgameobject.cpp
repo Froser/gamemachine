@@ -37,13 +37,6 @@ GMControlGameObject::~GMControlGameObject()
 	{
 		delete child;
 	}
-
-	if (d->stencil)
-	{
-		GMModel* model = d->stencil->getModel();
-		GM_delete(model);
-		GM_delete(d->stencil);
-	}
 }
 
 void GMControlGameObject::onAppendingObjectToWorld()
@@ -61,14 +54,6 @@ void GMControlGameObject::onAppendingObjectToWorld()
 		}
 	} _cb;
 
-	GMModel* model = nullptr;
-	createQuadModel(&_cb, &model);
-	d->stencil = new GMControlGameObject();
-	d->stencil->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
-	d->stencil->setGeometry(getGeometry());
-	d->stencil->setWorld(getWorld());
-	GM.createModelPainterAndTransfer(d->stencil->getModel());
-
 	Base::onAppendingObjectToWorld();
 }
 
@@ -78,8 +63,6 @@ void GMControlGameObject::setScaling(const GMMat4& scaling)
 	Base::setScaling(scaling);
 	scalingGeometry(scaling);
 
-	if (d->stencil)
-		d->stencil->setScaling(scaling);
 	for (auto& child : d->children)
 	{
 		child->setScaling(scaling);
@@ -92,8 +75,6 @@ void GMControlGameObject::setTranslation(const GMMat4& translation)
 	Base::setTranslation(translation);
 	translateGeometry(translation);
 
-	if (d->stencil)
-		d->stencil->setTranslation(translation);
 	for (auto& child : d->children)
 	{
 		child->setTranslation(translation);
@@ -106,8 +87,6 @@ void GMControlGameObject::setRotation(const GMQuat& rotation)
 	Base::setRotation(rotation);
 	// TODO translateGeometry(rotation);
 
-	if (d->stencil)
-		d->stencil->setRotation(rotation);
 	for (auto& child : d->children)
 	{
 		child->setRotation(rotation);
@@ -220,9 +199,6 @@ void GMControlGameObject::updateGeometry()
 {
 	D(d);
 	// 更新所有辅助绘制对象位置
-	if (d->stencil)
-		d->stencil->setGeometry(getGeometry());
-
 	GMRectF coord = toViewportCoord(d->geometry);
 	// coord表示左上角的绘制坐标，平移的时候需要换算到中心处
 	GMfloat x = coord.x + coord.width / 2.f, y = coord.y - coord.height / 2;
