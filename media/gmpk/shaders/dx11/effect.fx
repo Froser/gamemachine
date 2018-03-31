@@ -37,10 +37,39 @@ SamplerState DiffuseSampler_0: register(s3);
 SamplerState DiffuseSampler_1: register(s4);
 SamplerState DiffuseSampler_2: register(s5);
 
-struct GMLight
+interface ILight
+{
+    float4 IlluminateAmbient();
+    float4 IlluminateDiffuse(float3 position_Eye, float3 normal_Eye);
+    float4 IlluminateSpecular(float3 position_Eye, float3 normal_Eye_N, float shininess);
+};
+
+class GMLight : ILight
 {
     float4 Position;
     float4 Color;
+
+    float4 IlluminateAmbient()
+    {
+        return Color;
+    }
+
+    float4 IlluminateDiffuse(float3 position_Eye, float3 normal_Eye_N)
+    {
+        float3 lightPosition_Eye = (mul(Position, ViewMatrix)).xyz;
+        float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
+        return (saturate(dot(lightDirection_Eye_N, normal_Eye_N)) * Color);
+    }
+
+    float4 IlluminateSpecular(float3 position_Eye, float3 normal_Eye_N, float shininess)
+    {
+        float3 lightPosition_Eye = (mul(Position, ViewMatrix)).xyz;
+        float3 lightDirection_Eye_N = normalize(lightPosition_Eye + position_Eye);
+        float3 reflection_Eye = reflect(-lightDirection_Eye_N, normal_Eye_N);
+        float theta = dot(normalize(-position_Eye), reflection_Eye);
+        float factor_Specular = saturate(pow(abs(theta), shininess));
+        return factor_Specular * Color;
+    }
 };
 
 GMLight AmbientLights[10];
@@ -131,35 +160,9 @@ bool NeedDiscard(GMTexture attributes[3])
     return true;
 }
 
-struct _LightFactor
-{
-    float3 DiffuseFactor;
-    float3 SpecularFactor;
-};
 //--------------------------------------------------------------------------------------
 // 3D
 //--------------------------------------------------------------------------------------
-
-_LightFactor CalculateLightFactor(GMLight specular, float3 eyeDirection_Eye, float3 normal_Eye)
-{
-    _LightFactor result;
-    float3 lightPosition_Eye = (mul(ToFloat4(specular.Position), ViewMatrix)).xyz;
-    float3 lightDirection_Eye = lightPosition_Eye + eyeDirection_Eye;
-    float3 L = normalize(lightDirection_Eye);
-
-    // Diffuse
-    result.DiffuseFactor = (saturate(dot(L, normal_Eye)) * Material.Kd * specular.Color).xyz;
-
-    // Specular
-    float3 V = normalize(eyeDirection_Eye);
-    float3 R = reflect(-L, normal_Eye);
-    float theta = dot(V, R);
-    float factor_Specular = pow(abs(theta), Material.Shininess);
-    factor_Specular = saturate(factor_Specular);
-    result.SpecularFactor = factor_Specular * Material.Ks * specular.Color;
-
-    return result;
-}
 
 VS_OUTPUT VS_3D( VS_INPUT input )
 {
@@ -182,43 +185,45 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 float4 PS_3D(PS_INPUT input) : SV_Target
 {
-    _LightFactor lightFactor;
-    lightFactor.DiffuseFactor = 0;
-    lightFactor.SpecularFactor = 0;
+    float4 factor_Ambient = float4(0, 0, 0, 0);
+    float4 factor_Diffuse = float4(0, 0, 0, 0);
+    float4 factor_Specular = float4(0, 0, 0, 0);
 
     // 将法线换算到眼睛坐标系
     matrix transform_Normal_Eye = mul(InverseTransposeModelMatrix, ViewMatrix);
-    float3 normal_Eye = normalize( mul(ToFloat4(input.Normal.xyz, 0), transform_Normal_Eye).xyz);
+    float3 normal_Eye_N = normalize( mul(ToFloat4(input.Normal.xyz, 0), transform_Normal_Eye).xyz);
     float3 position_Eye = (mul(input.WorldPos, ViewMatrix)).xyz;
-    float3 eyeDirection_Eye = -position_Eye;
 
-    for (int i = 0; i < SpecularLightCount; ++i)
+    int i = 0;
+    for (i = 0; i < AmbientLightCount; ++i)
     {
-        _LightFactor t = CalculateLightFactor(SpecularLights[i], eyeDirection_Eye, normal_Eye);
-        lightFactor.DiffuseFactor += t.DiffuseFactor;
-        lightFactor.SpecularFactor += t.SpecularFactor;
+        factor_Ambient += AmbientLights[i].IlluminateAmbient();
     }
 
-    // 计算Ambient因子
+    for (i = 0; i < SpecularLightCount; ++i)
+    {
+        factor_Diffuse += SpecularLights[i].IlluminateDiffuse(position_Eye, normal_Eye_N);
+        factor_Specular += SpecularLights[i].IlluminateSpecular(position_Eye, normal_Eye_N, Material.Shininess);
+    }
+
+    // 计算Ambient
     float4 color_Ambient = float4(0, 0, 0, 0);
-    float4 factor_Ambient = float4(0, 0, 0, 0);
-    for (int j = 0; j < AmbientLightCount; ++j)
-    {
-        factor_Ambient += Material.Ka * AmbientLights[j].Color;
-    }
     color_Ambient += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
     color_Ambient += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
     color_Ambient += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
-    color_Ambient = factor_Ambient * color_Ambient;
+    color_Ambient = factor_Ambient * color_Ambient * Material.Ka;
 
-    // 计算Diffuse因子
+    // 计算Diffuse
     float4 color_Diffuse = float4(0, 0, 0, 0);
     color_Diffuse += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
     color_Diffuse += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
     color_Diffuse += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
-    color_Diffuse = ToFloat4(lightFactor.DiffuseFactor) * color_Diffuse;
+    color_Diffuse = factor_Diffuse * color_Diffuse * Material.Kd;
+
+    // 计算Specular
+    float4 color_Specular = factor_Specular * Material.Ks;
     
-    float4 finalColor = color_Ambient + color_Diffuse + ToFloat4(lightFactor.SpecularFactor);
+    float4 finalColor = color_Ambient + color_Diffuse + color_Specular;
     return finalColor;
 }
 
