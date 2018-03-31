@@ -20,6 +20,15 @@ struct GMTexture
     float ScaleX;
     float ScaleY;
     bool Enabled;
+
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        if (!Enabled)
+            return float4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        float2 transformedTexcoord = texcoord * float2(ScaleX, ScaleY) + float2(OffsetX, OffsetY);
+        return tex.Sample(ss, transformedTexcoord);
+    }
 };
 
 GMTexture AmbientTextureAttributes[3];
@@ -141,15 +150,6 @@ float4 ToFloat4(float3 v)
     return ToFloat4(v, 1);
 }
 
-float4 Texture_Sample(Texture2D tex, SamplerState ss, float2 texcoord, GMTexture attributes)
-{
-    if (!attributes.Enabled)
-        return float4(0.0f, 0.0f, 0.0f, 0.0f);
-
-    float2 transformedTexcoord = texcoord * float2(attributes.ScaleX, attributes.ScaleY) + float2(attributes.OffsetX, attributes.OffsetY);
-    return tex.Sample(ss, transformedTexcoord);
-}
-
 bool NeedDiscard(GMTexture attributes[3])
 {
     for (int i = 0; i < 3; ++i)
@@ -208,16 +208,16 @@ float4 PS_3D(PS_INPUT input) : SV_Target
 
     // 计算Ambient
     float4 color_Ambient = float4(0, 0, 0, 0);
-    color_Ambient += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
-    color_Ambient += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
-    color_Ambient += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
+    color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+    color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
+    color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
     color_Ambient = factor_Ambient * color_Ambient * Material.Ka;
 
     // 计算Diffuse
     float4 color_Diffuse = float4(0, 0, 0, 0);
-    color_Diffuse += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
-    color_Diffuse += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
-    color_Diffuse += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
+    color_Diffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
+    color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
+    color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
     color_Diffuse = factor_Diffuse * color_Diffuse * Material.Kd;
 
     // 计算Specular
@@ -251,12 +251,12 @@ float4 PS_2D(PS_INPUT input) : SV_Target
         return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    color += Texture_Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord, AmbientTextureAttributes[0]);
-    color += Texture_Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord, AmbientTextureAttributes[1]);
-    color += Texture_Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord, AmbientTextureAttributes[2]);
-    color += Texture_Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord, DiffuseTextureAttributes[0]);
-    color += Texture_Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord, DiffuseTextureAttributes[1]);
-    color += Texture_Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord, DiffuseTextureAttributes[2]);
+    color += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+    color += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
+    color += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
+    color += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
+    color += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
+    color += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
     return color;
 }
 
