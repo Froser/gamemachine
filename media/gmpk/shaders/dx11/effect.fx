@@ -13,7 +13,7 @@ cbuffer WorldConstantBuffer: register( b0 )
 // Textures, Lights, Materials
 //--------------------------------------------------------------------------------------
 
-struct GMTexture
+class GMTexture
 {
     float OffsetX;
     float OffsetY;
@@ -36,9 +36,22 @@ struct GMTexture
     }
 };
 
+class GMLightmapTexture : GMTexture
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        if (!Enabled)
+            return float4(1.0f, 1.0f, 1.0f, 1.0f);
+
+        float2 transformedTexcoord = texcoord * float2(ScaleX, ScaleY) + float2(OffsetX, OffsetY);
+        return tex.Sample(ss, transformedTexcoord);
+    }
+};
+
 GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
 GMTexture NormalMapTextureAttributes[1];
+GMLightmapTexture LightmapTextureAttributes[1];
 
 Texture2D AmbientTexture_0: register(t0);
 Texture2D AmbientTexture_1: register(t1);
@@ -47,13 +60,15 @@ Texture2D DiffuseTexture_0: register(t3);
 Texture2D DiffuseTexture_1: register(t4);
 Texture2D DiffuseTexture_2: register(t5);
 Texture2D NormalMapTexture: register(t6);
+Texture2D LightmapTexture: register(t7);
 SamplerState AmbientSampler_0: register(s0);
 SamplerState AmbientSampler_1: register(s1);
 SamplerState AmbientSampler_2: register(s2);
 SamplerState DiffuseSampler_0: register(s3);
 SamplerState DiffuseSampler_1: register(s4);
 SamplerState DiffuseSampler_2: register(s5);
-SamplerState NormalMapSampler;
+SamplerState NormalMapSampler: register(s6);
+SamplerState LightmapSampler: register(s7);
 
 interface ILight
 {
@@ -271,6 +286,7 @@ float4 PS_3D(PS_INPUT input) : SV_Target
     color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
     color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
     color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
+    color_Ambient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
     color_Ambient = factor_Ambient * color_Ambient * Material.Ka;
 
     // 计算Diffuse

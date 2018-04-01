@@ -19,7 +19,6 @@ BEGIN_NS
 
 //纹理
 #define		GMSHADER_CUBEMAP_TEXTURE			GMSHADER("cubemap")
-#define		GMSHADER_LIGHTMAP_TEXTURES(i)		GMSHADER("lightmap_textures") "[" #i "]"
 
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
@@ -51,6 +50,7 @@ inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTe
 	static const std::string GMSHADER_DIFFUSE_TEXTURES_1 = std::string(desc->DiffuseTextureName) + "[1]";
 	static const std::string GMSHADER_DIFFUSE_TEXTURES_2 = std::string(desc->DiffuseTextureName) + "[2]";
 	static const std::string GMSHADER_NORMALMAP_TEXTURE_0 = std::string(desc->NormalMapTextureName) + "[0]";
+	static const std::string GMSHADER_LIGHTMAP_TEXTURE_0 = std::string(desc->LightMapTextureName) + "[0]";
 
 	switch (t)
 	{
@@ -65,9 +65,7 @@ inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTe
 	case GMTextureType::NORMALMAP:
 		return index == 0 ? GMSHADER_NORMALMAP_TEXTURE_0.c_str() : "";
 	case GMTextureType::LIGHTMAP:
-		return index == 0 ? GMSHADER_LIGHTMAP_TEXTURES(0) :
-			index == 1 ? GMSHADER_LIGHTMAP_TEXTURES(1) :
-			index == 2 ? GMSHADER_LIGHTMAP_TEXTURES(2) : "";
+		return index == 0 ? GMSHADER_LIGHTMAP_TEXTURE_0.c_str() : "";
 	case GMTextureType::END:
 	default:
 		GM_ASSERT(false);

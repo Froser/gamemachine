@@ -7,9 +7,24 @@ GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, 
 	D(d);
 	d->width = width;
 	d->height = height;
-	d->buffer = new GMbyte[bufferSize];
-	getData().format = format;
-	memcpy(d->buffer, buffer, sizeof(GMbyte) * bufferSize);
+
+	if (format == GMImageFormat::RGB)
+	{
+		d->buffer = new GMbyte[bufferSize / 3 * 4];
+		GMuint writePtr = 0;
+		for (GMuint readPtr = 0; readPtr < bufferSize;)
+		{
+			d->buffer[writePtr++] = buffer[readPtr++];
+			if (readPtr % 3 == 0)
+				d->buffer[writePtr++] = 0xFF; //ALPHA
+		}
+	}
+	else
+	{
+		d->buffer = new GMbyte[bufferSize / 3 * 4];
+		memcpy(d->buffer, buffer, sizeof(GMbyte) * bufferSize);
+	}
+	getData().format = GMImageFormat::RGBA;
 
 	generateData();
 }

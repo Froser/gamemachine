@@ -435,6 +435,10 @@ void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type
 	{
 		textureName = desc->NormalMapTextureName;
 	}
+	else if (type == GMTextureType::LIGHTMAP)
+	{
+		textureName = desc->LightMapTextureName;
+	}
 	else
 	{
 		return;
