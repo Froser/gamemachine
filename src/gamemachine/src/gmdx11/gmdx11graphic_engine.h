@@ -71,31 +71,31 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID, void**);
 
 public:
-	inline GMComPtr<ID3D11Device> getDevice()
+	inline ID3D11Device* getDevice()
 	{
 		D(d);
 		return d->device;
 	}
 
-	inline GMComPtr<ID3D11DeviceContext> getDeviceContext()
+	inline ID3D11DeviceContext* getDeviceContext()
 	{
 		D(d);
 		return d->deviceContext;
 	}
 
-	inline GMComPtr<IDXGISwapChain> getSwapChain()
+	inline IDXGISwapChain* getSwapChain()
 	{
 		D(d);
 		return d->swapChain;
 	}
 
-	inline GMComPtr<ID3D11DepthStencilView> getDepthStencilView()
+	inline ID3D11DepthStencilView* getDepthStencilView()
 	{
 		D(d);
 		return d->depthStencilView;
 	}
 
-	inline GMComPtr<ID3D11RenderTargetView> getRenderTargetView()
+	inline ID3D11RenderTargetView* getRenderTargetView()
 	{
 		D(d);
 		return d->renderTargetView;
