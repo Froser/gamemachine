@@ -141,10 +141,10 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
 		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
 		component->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
-		component->uv(uvs[i * 4].getX(), uvs[i * 4].getY());
-		component->uv(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
-		component->uv(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
-		component->uv(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
+		component->texcoord(uvs[i * 4].getX(), uvs[i * 4].getY());
+		component->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		component->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
+		component->texcoord(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
 		component->endFace();
 	}
 }

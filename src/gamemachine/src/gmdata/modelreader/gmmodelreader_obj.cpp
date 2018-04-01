@@ -169,12 +169,16 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
 
 	GMMesh* mesh = d->model->getMesh();
+	mesh->setArrangementMode(GMArrangementMode::Triangles);
 	if (!d->currentComponent)
 	{
 		d->currentComponent = new GMComponent(mesh);
 		applyMaterial(material, d->currentComponent->getShader());
 	}
 
+	GMint verticesCount = 0;
+	GMFloat4 firstVertex, firstNormal, firstTexcoord;
+	GMFloat4 lastVertex, lastNormal, lastTexcoord;
 	GMString face;
 	d->currentComponent->beginFace();
 	while (true)
@@ -193,24 +197,60 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 
 		GM_ASSERT(v != INVALID);
 		{
+			if (verticesCount >= 3)
+			{
+				// 如果大于三个顶点组成的多边形，需要补入第一个顶点和上一个顶点，形成闭环，下同
+				d->currentComponent->vertex(firstVertex[0], firstVertex[1], firstVertex[2]);
+				d->currentComponent->vertex(lastVertex[0], lastVertex[1], lastVertex[2]);
+			}
+
 			auto& vec = d->positions[v - 1];
 			vec.loadFloat4(f4_vec);
 			d->currentComponent->vertex(f4_vec[0], f4_vec[1], f4_vec[2]);
+
+			if (!verticesCount)
+				firstVertex = f4_vec;
+			lastVertex = f4_vec;
 		}
 
 		{
+			if (verticesCount >= 3)
+			{
+				d->currentComponent->texcoord(firstTexcoord[0], firstTexcoord[1]);
+				d->currentComponent->texcoord(lastTexcoord[0], lastTexcoord[1]);
+			}
+
 			auto&& vec = t != INVALID ? d->textures[t - 1] : GMVec2(0, 0);
 			vec.loadFloat4(f4_vec);
-			d->currentComponent->uv(f4_vec[0], f4_vec[1]);
+			d->currentComponent->texcoord(f4_vec[0], f4_vec[1]);
+
+			if (!verticesCount)
+				firstTexcoord = f4_vec;
+			lastTexcoord = f4_vec;
 		}
 
 		GM_ASSERT(n != INVALID);
 		{
+			if (verticesCount >= 3)
+			{
+				d->currentComponent->normal(firstNormal[0], firstNormal[1], firstNormal[2]);
+				d->currentComponent->normal(lastNormal[0], lastNormal[1], lastNormal[2]);
+			}
+
 			auto& vec = d->normals[n - 1];
 			vec.loadFloat4(f4_vec);
 			d->currentComponent->normal(f4_vec[0], f4_vec[1], f4_vec[2]);
+
+			if (!verticesCount)
+				firstNormal = f4_vec;
+			lastNormal = f4_vec;
 		}
+
+		++verticesCount;
 	};
+	// 这里其实有优化的余地
+	// 如果恰好是4个顶点，可以不采用Triangles(Triangle List)的拓扑，而是使用Triangle Stripe，将第一个顶点插入。
+
 	d->currentComponent->endFace();
 }
 

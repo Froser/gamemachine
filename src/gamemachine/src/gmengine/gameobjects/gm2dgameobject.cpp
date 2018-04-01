@@ -150,10 +150,10 @@ void GMGlyphObject::createVertices(GMComponent* component)
 				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
-				component->uv(UV_X(glyph.x), UV_Y(glyph.y));
-				component->uv(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
-				component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
-				component->uv(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
+				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y));
+				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
+				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
+				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
 
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);

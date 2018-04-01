@@ -89,7 +89,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 				normal.loadFloat4(f4_normal);
 				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
 				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-				component->uv(uv[(i % 2) * 6 + (j * 2)], uv[(i % 2) * 6 + (j * 2) + 1]);
+				component->texcoord(uv[(i % 2) * 6 + (j * 2)], uv[(i % 2) * 6 + (j * 2) + 1]);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
@@ -164,9 +164,9 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
 				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				if (customUV)
-					component->uv(f4_uv[0], 1 - f4_uv[1]);
+					component->texcoord(f4_uv[0], 1 - f4_uv[1]);
 				else
-					component->uv((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
+					component->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();
@@ -234,9 +234,9 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
 				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				if (customUV)
-					component->uv(f4_uv[0], 1 - f4_uv[1]);
+					component->texcoord(f4_uv[0], 1 - f4_uv[1]);
 				else
-					component->uv((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
+					component->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
 				component->color(1.f, 1.f, 1.f);
 			}
 			component->endFace();

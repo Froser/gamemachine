@@ -314,7 +314,7 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 			normal.loadFloat4(f4_normal);
 			component->vertex(f4_position[0], f4_position[1], f4_position[2]);
 			component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-			component->uv(vertex.decalS, vertex.decalT);
+			component->texcoord(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
 		component->endFace();
@@ -361,7 +361,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 			normal.loadFloat4(f4_normal);
 			component->vertex(f4_position[0], f4_position[1], f4_position[2]);
 			component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-			component->uv(vertex.decalS, vertex.decalT);
+			component->texcoord(vertex.decalS, vertex.decalT);
 			component->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
 		component->endFace();

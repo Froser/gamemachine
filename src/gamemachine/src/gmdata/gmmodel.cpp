@@ -129,7 +129,7 @@ void GMComponent::normal(GMfloat x, GMfloat y, GMfloat z)
 	normals.push_back(z);
 }
 
-void GMComponent::uv(GMfloat u, GMfloat v)
+void GMComponent::texcoord(GMfloat u, GMfloat v)
 {
 	D(d);
 	auto& texcoords = d->parentMesh->texcoords();
@@ -199,7 +199,7 @@ void GMComponent::expand(GMuint count)
 
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	vertex(d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 0], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 1], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 2]);
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		normal(d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 0], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 1], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 2]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			uv(d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 0], d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 1]);
+			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			texcoord(d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 0], d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 1]);
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	lightmap(d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 1]);
 			IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		color(d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 1], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 2]);
 
