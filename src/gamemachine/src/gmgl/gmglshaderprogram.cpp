@@ -24,6 +24,7 @@ namespace
 			{ "scroll_s", "scroll_t", "scale_s", "scale_t", "enabled", "texture" },
 			"GM_ambient_textures",
 			"GM_diffuse_textures",
+			"GM_normalmap_textures",
 
 			{ "lightPosition", "lightColor" },
 			{ "GM_ambients", "GM_ambients_count" },

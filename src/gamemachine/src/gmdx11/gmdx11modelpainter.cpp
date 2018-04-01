@@ -66,14 +66,16 @@ void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
 
 		{
 			auto& data_ref = model->getMesh()->tangents();
-			vd.tangents[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
-			vd.tangents[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+			vd.tangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
+			vd.tangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
+			vd.tangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
 		}
 
 		{
 			auto& data_ref = model->getMesh()->bitangents();
-			vd.bitangents[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
-			vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+			vd.bitangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
+			vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
+			vd.bitangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
 		}
 
 		{

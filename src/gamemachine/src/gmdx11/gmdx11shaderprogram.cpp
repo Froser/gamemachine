@@ -16,6 +16,7 @@ namespace
 			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
 			"AmbientTextureAttributes",
 			"DiffuseTextureAttributes",
+			"NormalMapTextureAttributes",
 
 			{ "Position", "Color" },
 			{ "AmbientLights", "AmbientLightCount" },

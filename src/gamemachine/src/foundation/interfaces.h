@@ -237,6 +237,7 @@ struct GMShaderVariablesDesc
 	GMShaderVariablesTextureDesc TextureAttributes;
 	const char* AmbientTextureName;
 	const char* DiffuseTextureName;
+	const char* NormalMapTextureName;
 
 	// 光照
 	GMShaderVariablesLightAttributeDesc LightAttributes;

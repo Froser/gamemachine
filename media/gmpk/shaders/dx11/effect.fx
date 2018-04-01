@@ -29,28 +29,37 @@ struct GMTexture
         float2 transformedTexcoord = texcoord * float2(ScaleX, ScaleY) + float2(OffsetX, OffsetY);
         return tex.Sample(ss, transformedTexcoord);
     }
+
+    float3 RGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        return tex.Sample(ss, texcoord).xyz * 2.0f - 1.0f;
+    }
 };
 
 GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
+GMTexture NormalMapTextureAttributes[1];
+
 Texture2D AmbientTexture_0: register(t0);
 Texture2D AmbientTexture_1: register(t1);
 Texture2D AmbientTexture_2: register(t2);
 Texture2D DiffuseTexture_0: register(t3);
 Texture2D DiffuseTexture_1: register(t4);
 Texture2D DiffuseTexture_2: register(t5);
+Texture2D NormalMapTexture: register(t6);
 SamplerState AmbientSampler_0: register(s0);
 SamplerState AmbientSampler_1: register(s1);
 SamplerState AmbientSampler_2: register(s2);
 SamplerState DiffuseSampler_0: register(s3);
 SamplerState DiffuseSampler_1: register(s4);
 SamplerState DiffuseSampler_2: register(s5);
+SamplerState NormalMapSampler;
 
 interface ILight
 {
     float4 IlluminateAmbient();
-    float4 IlluminateDiffuse(float3 position_Eye, float3 normal_Eye);
-    float4 IlluminateSpecular(float3 position_Eye, float3 normal_Eye_N, float shininess);
+    float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N);
+    float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess);
 };
 
 class GMLight : ILight
@@ -63,21 +72,22 @@ class GMLight : ILight
         return Color;
     }
 
-    float4 IlluminateDiffuse(float3 position_Eye, float3 normal_Eye_N)
+    float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N)
     {
-        float3 lightPosition_Eye = (mul(Position, ViewMatrix)).xyz;
-        float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-        return (saturate(dot(lightDirection_Eye_N, normal_Eye_N)) * Color);
+        return (saturate(dot(lightDirection_N, normal_N)) * Color);
     }
 
-    float4 IlluminateSpecular(float3 position_Eye, float3 normal_Eye_N, float shininess)
+    float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
     {
-        float3 lightPosition_Eye = (mul(Position, ViewMatrix)).xyz;
-        float3 lightDirection_Eye_N = normalize(lightPosition_Eye + position_Eye);
-        float3 reflection_Eye = reflect(-lightDirection_Eye_N, normal_Eye_N);
-        float theta = dot(normalize(-position_Eye), reflection_Eye);
+        float3 reflection_N = reflect(-lightDirection_N, normal_N);
+        float theta = dot(eyeDirection_N, reflection_N);
         float factor_Specular = saturate(pow(abs(theta), shininess));
         return factor_Specular * Color;
+    }
+
+    float3 GetLightPositionInEyeSpace()
+    {
+        return (mul(Position, ViewMatrix)).xyz;
     }
 };
 
@@ -95,7 +105,6 @@ struct GMMaterial
     float Shininess;
     float Refractivity;
 };
-
 GMMaterial Material;
 
 //--------------------------------------------------------------------------------------
@@ -109,21 +118,21 @@ DepthStencilState GMDepthStencilState {};
 struct VS_INPUT
 {
     float3 Position    : POSITION;
-    float3 Normal      : NORMAL;
+    float3 Normal      : NORMAL0;
     float2 Texcoord    : TEXCOORD0;
-    float2 Tangent     : TEXCOORD1;
-    float2 Bitangent   : TEXCOORD2;
-    float2 Lightmap    : TEXCOORD3;
+    float3 Tangent     : NORMAL1;
+    float3 Bitangent   : NORMAL2;
+    float2 Lightmap    : TEXCOORD1;
     float4 Color       : COLOR;
 };
 
 struct VS_OUTPUT
 {
-    float3 Normal      : NORMAL;
+    float3 Normal      : NORMAL0;
     float2 Texcoord    : TEXCOORD0;
-    float2 Tangent     : TEXCOORD1;
-    float2 Bitangent   : TEXCOORD2;
-    float2 Lightmap    : TEXCOORD3;
+    float3 Tangent     : NORMAL1;
+    float3 Bitangent   : NORMAL2;
+    float2 Lightmap    : TEXCOORD1;
     float4 Color       : COLOR;
     float4 WorldPos    : POSITION;
     float4 Position    : SV_POSITION;
@@ -131,11 +140,11 @@ struct VS_OUTPUT
 
 struct PS_INPUT
 {
-    float3 Normal      : NORMAL;
+    float3 Normal      : NORMAL0;
     float2 Texcoord    : TEXCOORD0;
-    float2 Tangent     : TEXCOORD1;
-    float2 Bitangent   : TEXCOORD2;
-    float2 Lightmap    : TEXCOORD3;
+    float3 Tangent     : NORMAL1;
+    float3 Bitangent   : NORMAL2;
+    float2 Lightmap    : TEXCOORD1;
     float4 Color       : COLOR;
     float4 WorldPos    : POSITION;
 };
@@ -160,6 +169,36 @@ bool NeedDiscard(GMTexture attributes[3])
     return true;
 }
 
+bool HasNormalMap()
+{
+    return NormalMapTextureAttributes[0].Enabled;
+}
+
+GMTexture NormalMap()
+{
+    return NormalMapTextureAttributes[0];
+}
+
+class NormapMapArgs
+{
+    float3 normal_Tangent_N;
+    float3x3 TBN;
+
+    void CalculateNormapMapArgsInEyeSpace(float2 texcoord, float3 tangent, float3 bitangent, float3 normal_Eye_N, matrix transform_Normal_Eye)
+    {
+        if (!HasNormalMap())
+            return;
+
+        normal_Tangent_N = NormalMap().RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
+        float3 tangent_Eye_N = normalize(mul(ToFloat4(tangent, 0), transform_Normal_Eye).xyz);
+        float3 bitangent_Eye_N = normalize(mul(ToFloat4(bitangent, 0), transform_Normal_Eye).xyz);
+        TBN = transpose(float3x3(
+            tangent_Eye_N,
+            bitangent_Eye_N,
+            normal_Eye_N
+        ));
+    }
+};
 //--------------------------------------------------------------------------------------
 // 3D
 //--------------------------------------------------------------------------------------
@@ -193,6 +232,7 @@ float4 PS_3D(PS_INPUT input) : SV_Target
     matrix transform_Normal_Eye = mul(InverseTransposeModelMatrix, ViewMatrix);
     float3 normal_Eye_N = normalize( mul(ToFloat4(input.Normal.xyz, 0), transform_Normal_Eye).xyz);
     float3 position_Eye = (mul(input.WorldPos, ViewMatrix)).xyz;
+    float3 position_Eye_N = normalize(position_Eye);
 
     int i = 0;
     for (i = 0; i < AmbientLightCount; ++i)
@@ -200,10 +240,30 @@ float4 PS_3D(PS_INPUT input) : SV_Target
         factor_Ambient += AmbientLights[i].IlluminateAmbient();
     }
 
+    NormapMapArgs normalMapArgs;
+    normalMapArgs.CalculateNormapMapArgsInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye);
+
     for (i = 0; i < SpecularLightCount; ++i)
     {
-        factor_Diffuse += SpecularLights[i].IlluminateDiffuse(position_Eye, normal_Eye_N);
-        factor_Specular += SpecularLights[i].IlluminateSpecular(position_Eye, normal_Eye_N, Material.Shininess);
+        if (!HasNormalMap())
+        {
+            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
+            float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
+            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Eye_N, normal_Eye_N);
+            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Eye_N, -position_Eye_N, normal_Eye_N, Material.Shininess);    
+        }
+        else
+        {
+            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
+            float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
+
+            float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, normalMapArgs.TBN));
+            float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, normalMapArgs.TBN));
+
+            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Tangent_N, normalMapArgs.normal_Tangent_N);
+            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, normalMapArgs.normal_Tangent_N, Material.Shininess); 
+
+        }
     }
 
     // 计算Ambient
