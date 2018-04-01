@@ -74,8 +74,6 @@ namespace
 	{
 		switch (obj->getArrangementMode())
 		{
-		case GMArrangementMode::Triangle_Fan:
-			return GL_TRIANGLE_FAN;
 		case GMArrangementMode::Triangle_Strip:
 			return GL_TRIANGLE_STRIP;
 		case GMArrangementMode::Triangles:
@@ -84,7 +82,7 @@ namespace
 			return GL_LINE_LOOP;
 		default:
 			GM_ASSERT(false);
-			return GL_TRIANGLE_FAN;
+			return GL_TRIANGLE_STRIP;
 		}
 	}
 }

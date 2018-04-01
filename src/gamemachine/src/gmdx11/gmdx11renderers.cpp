@@ -48,17 +48,15 @@ namespace
 	{
 		switch (obj->getArrangementMode())
 		{
-		case GMArrangementMode::Triangle_Fan:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		case GMArrangementMode::Triangle_Strip:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 		case GMArrangementMode::Triangles:
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		case GMArrangementMode::Lines:
 			return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
 		default:
 			GM_ASSERT(false);
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 		}
 	}
 
@@ -470,13 +468,13 @@ void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type
 		auto applyCallback = [&](GMS_TextureModType type, Pair<GMfloat, GMfloat>&& args) {
 			if (type == GMS_TextureModType::SCALE)
 			{
-				GM_DX_HR(offsetX->SetFloat(args.first));
-				GM_DX_HR(offsetY->SetFloat(args.second));
+				GM_DX_HR(scaleX->SetFloat(args.first));
+				GM_DX_HR(scaleY->SetFloat(args.second));
 			}
 			else if (type == GMS_TextureModType::SCROLL)
 			{
-				GM_DX_HR(scaleX->SetFloat(args.first));
-				GM_DX_HR(scaleY->SetFloat(args.second));
+				GM_DX_HR(offsetX->SetFloat(args.first));
+				GM_DX_HR(offsetY->SetFloat(args.second));
 			}
 			else
 			{

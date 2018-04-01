@@ -201,7 +201,6 @@ public:
 enum class GMArrangementMode
 {
 	// 默认排列，按照Components，并按照一个个三角形来画
-	Triangle_Fan,
 	Triangle_Strip,
 	Triangles,
 	Lines,
@@ -297,7 +296,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	bool disabledData[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 	GMMeshData* meshData = nullptr;
 	Vector<GMComponent*> components;
-	GMArrangementMode mode = GMArrangementMode::Triangle_Fan;
+	GMArrangementMode mode = GMArrangementMode::Triangle_Strip;
 	GMString name = L"default";
 };
 

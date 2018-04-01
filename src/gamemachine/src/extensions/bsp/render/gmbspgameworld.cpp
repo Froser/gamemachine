@@ -80,38 +80,38 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 		//Front
 		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
 		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
-		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
 		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
 
 		//Back
 		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
 		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
-		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
 		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
 
 		//Left
 		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
 		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
-		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
 		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
 
 		//Right
 		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
 		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
-		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
 		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
 
 		//Up
 		GMVec3(f4_min[0], f4_max[1], f4_min[2]),
 		GMVec3(f4_min[0], f4_max[1], f4_max[2]),
-		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
 		GMVec3(f4_max[0], f4_max[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_max[1], f4_max[2]),
 
 		//Down
 		GMVec3(f4_min[0], f4_min[1], f4_min[2]),
 		GMVec3(f4_min[0], f4_min[1], f4_max[2]),
-		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
 		GMVec3(f4_max[0], f4_min[1], f4_min[2]),
+		GMVec3(f4_max[0], f4_min[1], f4_max[2]),
 	};
 
 	// Scaling surface
