@@ -66,10 +66,7 @@ void GMGlyphObject::constructModel()
 	D(d);
 	GMModel* model = new GMModel();
 	model->setType(GMModelType::Glyph);
-	GMMesh* mesh = model->getMesh();
-	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
-
-	GMComponent* component = new GMComponent(mesh);
+	GMComponent* component = new GMComponent(model->getMesh());
 	onCreateShader(component->getShader());
 	createVertices(component);
 
@@ -94,7 +91,8 @@ void GMGlyphObject::onCreateShader(GMShader& shader)
 void GMGlyphObject::updateModel()
 {
 	D(d);
-	GMComponent* component = getModel()->getMesh()->getComponents()[0];
+	GMMesh* mesh = getModel()->getMesh();
+	GMComponent* component = mesh->getComponents()[0];
 	component->clear();
 	getModel()->releaseMesh();
 	createVertices(component);
@@ -105,7 +103,6 @@ void GMGlyphObject::updateModel()
 void GMGlyphObject::createVertices(GMComponent* component)
 {
 	D(d);
-
 	D_BASE(db, GMControlGameObject);
 	constexpr GMfloat Z = 0;
 	GMRect rect = d->autoResize && isValidRect(d->lastClientRect) ? d->lastClientRect : GM.getGameMachineRunningStates().clientRect;
@@ -135,22 +132,35 @@ void GMGlyphObject::createVertices(GMComponent* component)
 
 			const GMGlyphInfo& glyph = *typoResult.glyph;
 
-			component->beginFace();
 			if (glyph.width > 0 && glyph.height > 0)
 			{
 				// 如果width和height为0，视为空格，只占用空间而已
-				// 否则：按照条带顺序，创建顶点
+				// 否则：按照TriangleList创建顶点：0 2 1, 1 2 3
 				// 0 2
 				// 1 3
 				// 让所有字体origin开始的x轴平齐
 
 				// 采用左上角为原点的Texcoord坐标系
+
+				component->beginFace();
 				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+
+				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y));
+				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
+				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
+
+				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				component->endFace();
+
+				component->beginFace();
 				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
-				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y));
 				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
 				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
 				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
@@ -158,10 +168,8 @@ void GMGlyphObject::createVertices(GMComponent* component)
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				component->endFace();
 			}
-
-			component->endFace();
 		}
 	END_GLYPH_XY()
 }

@@ -74,7 +74,7 @@ namespace
 	{
 		switch (obj->getArrangementMode())
 		{
-		case GMArrangementMode::Triangle_Strip:
+		case GMArrangementMode::TriangleStrip:
 			return GL_TRIANGLE_STRIP;
 		case GMArrangementMode::Triangles:
 			return GL_TRIANGLES;
@@ -82,7 +82,7 @@ namespace
 			return GL_LINE_LOOP;
 		default:
 			GM_ASSERT(false);
-			return GL_TRIANGLE_STRIP;
+			return GL_TRIANGLES;
 		}
 	}
 }
@@ -99,7 +99,7 @@ void GMGLRenderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mes
 	applyStencil(*d->engine);
 	beforeDraw(component);
 	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-	glMultiDrawArrays(mode, (GLint*)component->getOffsetPtr(), (GLsizei*) component->getPrimitiveVerticesCountPtr(), component->getPrimitiveCount());
+	glDrawArrays(mode, 0, component->getVerticesCount());
 	afterDraw();
 }
 

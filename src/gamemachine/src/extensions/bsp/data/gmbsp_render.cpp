@@ -326,7 +326,7 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 {
 	GMModel* model = new GMModel();
 	GMMesh* mesh = model->getMesh();
-	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	mesh->setArrangementMode(GMArrangementMode::TriangleStrip);
 
 	GMComponent* component = new GMComponent(mesh);
 	component->setShader(shader);
@@ -398,7 +398,7 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 
 	GMModel* model = new GMModel();
 	GMMesh* mesh = model->getMesh();
-	mesh->setArrangementMode(GMArrangementMode::Triangle_Strip);
+	mesh->setArrangementMode(GMArrangementMode::TriangleStrip);
 
 	GMFloat4 f4_extents, f4_position;
 	extents.loadFloat4(f4_extents);

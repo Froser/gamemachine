@@ -151,6 +151,7 @@ void GMComponent::clear()
 {
 	D(d);
 	d->primitiveCount = 0;
+	d->verticesCount = 0;
 	d->primitiveVertices.clear();
 	d->vertexOffsets.clear();
 }
@@ -220,6 +221,7 @@ void GMComponent::endFace()
 	);
 	d->primitiveVertices.push_back(d->currentFaceVerticesCount);
 	d->primitiveCount++;
+	d->verticesCount += d->currentFaceVerticesCount;
 }
 
 GMMesh::GMMesh()

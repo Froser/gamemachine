@@ -118,7 +118,7 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	const GMint SCALING = 2;
 	GMVec3 center = (d->min + d->max) / 2.f;
 	GMMat4 transScale = Scale(GMVec3(SCALING, 1, SCALING));
-	for (GMuint i = 0; i < 20; i++)
+	for (GMuint i = 0; i < 24; i++)
 	{
 		GMMat4 transRestore = Translate(center);
 		GMMat4 transMoveToAxisOrigin = Translate(-center);
@@ -138,10 +138,17 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	{
 		component->beginFace();
 		component->vertex(vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ());
+		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
+		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
+		component->texcoord(uvs[i * 4].getX(), uvs[i * 4].getY());
+		component->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
+		component->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		component->endFace();
+
+		component->beginFace();
 		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
 		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
 		component->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
-		component->texcoord(uvs[i * 4].getX(), uvs[i * 4].getY());
 		component->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
 		component->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
 		component->texcoord(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());

@@ -22,48 +22,6 @@ extern "C"
 	}
 }
 
-namespace
-{
-	struct GMFrameControl
-	{
-		GMFrameControl(bool needControl, GMClock& frameCounter, GameMachinePrivate* d)
-			: m_needControl(needControl)
-			, m_frameCounter(frameCounter)
-			, m_d(d)
-		{
-			frameCounter.begin();
-		}
-
-		~GMFrameControl()
-		{
-			if (m_needControl)
-			{
-				static const GMfloat ms = 1 / 60.f;
-				GMfloat elapsedFromStart = m_frameCounter.elapsedFromStart();
-				GMfloat diff = (ms - elapsedFromStart) * 1000;
-				if (diff > 0)
-				{
-					GMThread::sleep(diff);
-					m_d->states.lastFrameElpased = ms;
-				}
-				else
-				{
-					m_d->states.lastFrameElpased = m_frameCounter.elapsedFromStart();
-				}
-			}
-			else
-			{
-				m_d->states.lastFrameElpased = m_frameCounter.elapsedFromStart();
-			}
-		}
-
-	private:
-		bool m_needControl;
-		GMClock& m_frameCounter;
-		GameMachinePrivate* m_d = nullptr;
-	};
-}
-
 GameMachine::GameMachine()
 {
 	getMachineEndianness();
@@ -180,8 +138,8 @@ void GameMachine::runLoop()
 	GMClock frameCounter;
 	while (true)
 	{
-		// 控制帧率
-		GMFrameControl fc(!!GMGetDebugState(FRAMERATE_CONTROL), frameCounter, d);
+		// 记录帧率
+		frameCounter.begin();
 
 		// 接收窗口消息
 		if (!d->mainWindow->handleMessage())
@@ -206,6 +164,7 @@ void GameMachine::runLoop()
 
 		// 本帧结束
 		d->gameHandler->event(GameMachineEvent::FrameEnd);
+		d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 	}
 }
 

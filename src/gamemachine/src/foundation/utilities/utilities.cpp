@@ -67,7 +67,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	{
 		model->setType(type);
 		GMMesh* body = model->getMesh();
-		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+		body->setArrangementMode(GMArrangementMode::TriangleStrip);
 
 		GMComponent* component = new GMComponent(body);
 		GMFloat4 f4_vertex, f4_normal;
@@ -139,7 +139,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 	{
 		model->setType(type);
 		GMMesh* body = model->getMesh();
-		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+		body->setArrangementMode(GMArrangementMode::TriangleStrip);
 
 		GMComponent* component = new GMComponent(body);
 		GMFloat4 f4_vertex, f4_normal, f4_uv;
@@ -209,7 +209,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	{
 		model->setType(type);
 		GMMesh* body = model->getMesh();
-		body->setArrangementMode(GMArrangementMode::Triangle_Strip);
+		body->setArrangementMode(GMArrangementMode::TriangleStrip);
 
 		GMComponent* component = new GMComponent(body);
 		GMFloat4 f4_vertex, f4_normal, f4_uv;

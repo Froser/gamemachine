@@ -174,7 +174,7 @@ float4 ToFloat4(float3 v)
     return ToFloat4(v, 1);
 }
 
-bool NeedDiscard(GMTexture attributes[3])
+bool HasNoTexture(GMTexture attributes[3])
 {
     for (int i = 0; i < 3; ++i)
     {
@@ -283,17 +283,31 @@ float4 PS_3D(PS_INPUT input) : SV_Target
 
     // 计算Ambient
     float4 color_Ambient = float4(0, 0, 0, 0);
-    color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
-    color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
-    color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
+    if (HasNoTexture(AmbientTextureAttributes))
+    {
+        color_Ambient = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+        color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
+        color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
+    }
     color_Ambient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
     color_Ambient = factor_Ambient * color_Ambient * Material.Ka;
 
     // 计算Diffuse
     float4 color_Diffuse = float4(0, 0, 0, 0);
-    color_Diffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
-    color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
-    color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
+    if (HasNoTexture(DiffuseTextureAttributes))
+    {
+        color_Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        color_Diffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
+        color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
+        color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
+    }
     color_Diffuse = factor_Diffuse * color_Diffuse * Material.Kd;
 
     // 计算Specular
@@ -323,7 +337,7 @@ VS_OUTPUT VS_2D(VS_INPUT input)
 
 float4 PS_2D(PS_INPUT input) : SV_Target
 {
-    if (NeedDiscard(DiffuseTextureAttributes) && NeedDiscard(AmbientTextureAttributes))
+    if (HasNoTexture(DiffuseTextureAttributes) && HasNoTexture(AmbientTextureAttributes))
         return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);

@@ -67,6 +67,7 @@ GM_PRIVATE_OBJECT(GMComponent)
 	GMuint offset = 0;
 	// 绘制图元数量
 	GMuint primitiveCount = 0;
+	GMuint verticesCount = 0;
 
 	// 图元顶点数量
 	AlignedVector<GMuint> primitiveVertices;
@@ -94,6 +95,7 @@ public:
 	inline GMuint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
 	inline GMuint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
 	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }
+	inline GMuint getVerticesCount() { D(d); return d->verticesCount; }
 
 	void clear();
 	void setVertexOffset(GMuint offset);
@@ -214,7 +216,7 @@ public:
 enum class GMArrangementMode
 {
 	// 默认排列，按照Components，并按照一个个三角形来画
-	Triangle_Strip,
+	TriangleStrip,
 	Triangles,
 	Lines,
 };
@@ -224,7 +226,7 @@ struct GMMeshBuffer
 {
 	union
 	{
-		struct //OpenGL`
+		struct //OpenGL
 		{
 			GMuint arrayId;
 			GMuint bufferId;
@@ -308,7 +310,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 
 	GMMeshData* meshData = nullptr;
 	Vector<GMComponent*> components;
-	GMArrangementMode mode = GMArrangementMode::Triangle_Strip;
+	GMArrangementMode mode = GMArrangementMode::Triangles;
 	GMString name = L"default";
 };
 

@@ -48,7 +48,7 @@ namespace
 	{
 		switch (obj->getArrangementMode())
 		{
-		case GMArrangementMode::Triangle_Strip:
+		case GMArrangementMode::TriangleStrip:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
 		case GMArrangementMode::Triangles:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
@@ -56,7 +56,7 @@ namespace
 			return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
 		default:
 			GM_ASSERT(false);
-			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
 		}
 	}
 
@@ -674,19 +674,13 @@ void GMDx11Renderer::passAllAndDraw(GMComponent* component)
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
-	GMuint primitiveCount = component->getPrimitiveCount();
-	GMuint* offsetPtr = component->getOffsetPtr();
-	GMuint* vertexCountPtr = component->getPrimitiveVerticesCountPtr();
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		prepareTextures();
 		pass->Apply(0, getEngine()->getDeviceContext());
 		drawTextures();
-		for (GMuint i = 0; i < primitiveCount; ++i)
-		{
-			getEngine()->getDeviceContext()->Draw(vertexCountPtr[i], offsetPtr[i]);
-		}
+		getEngine()->getDeviceContext()->Draw(component->getVerticesCount(), 0);
 	}
 }
 
