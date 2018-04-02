@@ -7,18 +7,6 @@
 
 BEGIN_NS
 
-// Dx11 顶点数据
-struct GMDx11VertexData
-{
-	Array<GMfloat, 3> vertices;
-	Array<GMfloat, 3> normals;
-	Array<GMfloat, 2> texcoords;
-	Array<GMfloat, 3> tangents;
-	Array<GMfloat, 3> bitangents;
-	Array<GMfloat, 2> lightmaps;
-	Array<GMfloat, 4> color;
-};
-
 class GMDx11GraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11ModelPainter)
 {
@@ -47,7 +35,6 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 
 private:
-	void packData(Vector<GMDx11VertexData>& packedData);
 	void draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh);
 };
 

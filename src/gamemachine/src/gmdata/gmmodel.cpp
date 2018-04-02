@@ -5,8 +5,70 @@
 #include <iterator>
 #include "foundation/gamemachine.h"
 
+#define SAFE_ASSIGN(mb, df, pos) ((pos) >= (mb).size()) ? df : (mb[pos])
 #define VERTEX_OFFSET(offset, idx) ((offset * GMModel::PositionDimension) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
+
+void GMModelPainter::packData(Vector<GMVertex>& packedData)
+{
+	D(d);
+	GMVertex vd = { 0 };
+	GMModel* model = getModel();
+	// 按照position的size()/3来分配顶点
+	GM_ASSERT(model->getMesh()->positions().size() % 3 == 0);
+	for (GMuint i = 0; i < model->getMesh()->positions().size() / 3; ++i)
+	{
+		{
+			auto& data_ref = model->getMesh()->positions();
+			vd.vertices[0] = data_ref[i * 3];
+			vd.vertices[1] = data_ref[i * 3 + 1];
+			vd.vertices[2] = data_ref[i * 3 + 2];
+		}
+
+		{
+			auto& data_ref = model->getMesh()->normals();
+			vd.normals[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
+			vd.normals[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
+			vd.normals[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->texcoords();
+			vd.texcoords[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
+			vd.texcoords[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->tangents();
+			vd.tangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
+			vd.tangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
+			vd.tangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->bitangents();
+			vd.bitangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
+			vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
+			vd.bitangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->lightmaps();
+			vd.lightmaps[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
+			vd.lightmaps[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
+		}
+
+		{
+			auto& data_ref = model->getMesh()->colors();
+			vd.color[0] = SAFE_ASSIGN(data_ref, 0, i * 4);
+			vd.color[1] = SAFE_ASSIGN(data_ref, 0, i * 4 + 1);
+			vd.color[2] = SAFE_ASSIGN(data_ref, 0, i * 4 + 2);
+			vd.color[3] = SAFE_ASSIGN(data_ref, 0, i * 4 + 3);
+		}
+
+		packedData.push_back(vd);
+	}
+}
 
 GMModel::GMModel()
 {
@@ -27,11 +89,6 @@ GMModel::GMModel(GMModel& model)
 	d->mesh->setMeshData(mesh->getMeshData());
 	d->mesh->setArrangementMode(mesh->getArrangementMode());
 	d->mesh->setName(mesh->getName());
-	GM_FOREACH_ENUM_CLASS(dt, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
-	{
-		if (mesh->isDataDisabled(dt))
-			d->mesh->disableData(dt);
-	}
 
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, positions);
 	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, normals);
@@ -169,13 +226,13 @@ void GMComponent::endFace()
 void GMComponent::expand(GMuint count)
 {
 	D(d);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		d->parentMesh->normals().reserve(d->parentMesh->normals().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			d->parentMesh->texcoords().reserve(d->parentMesh->texcoords().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::Tangent)	d->parentMesh->tangents().reserve(d->parentMesh->tangents().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::Bitangent)	d->parentMesh->bitangents().reserve(d->parentMesh->bitangents().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	d->parentMesh->lightmaps().reserve(d->parentMesh->lightmaps().size() * count);
-	IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		d->parentMesh->colors().reserve(d->parentMesh->colors().size() * count);
+	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
+	d->parentMesh->normals().reserve(d->parentMesh->normals().size() * count);
+	d->parentMesh->texcoords().reserve(d->parentMesh->texcoords().size() * count);
+	d->parentMesh->tangents().reserve(d->parentMesh->tangents().size() * count);
+	d->parentMesh->bitangents().reserve(d->parentMesh->bitangents().size() * count);
+	d->parentMesh->lightmaps().reserve(d->parentMesh->lightmaps().size() * count);
+	d->parentMesh->colors().reserve(d->parentMesh->colors().size() * count);
 
 	GMint verticesCount = 0;
 	Vector<GMint> flag;
@@ -197,11 +254,11 @@ void GMComponent::expand(GMuint count)
 				beginFace();
 			}
 
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Position)	vertex(d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 0], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 1], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 2]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Normal)		normal(d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 0], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 1], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 2]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::UV)			texcoord(d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 0], d->parentMesh->texcoords()[d->offset + i * GMModel::UVDimension + 1]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Lightmap)	lightmap(d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 1]);
-			IF_ENABLED(d->parentMesh, GMVertexDataType::Color)		color(d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 1], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 2]);
+			vertex(d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 0], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 1], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 2]);
+			normal(d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 0], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 1], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 2]);
+			texcoord(d->parentMesh->texcoords()[d->offset + i * GMModel::TexcoordDimension + 0], d->parentMesh->texcoords()[d->offset + i * GMModel::TexcoordDimension + 1]);
+			lightmap(d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 1]);
+			color(d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 1], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 2]);
 
 			if (i == verticesCount - 1)
 				endFace();

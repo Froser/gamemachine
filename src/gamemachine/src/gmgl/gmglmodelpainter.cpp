@@ -7,6 +7,8 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 
+#define FLOAT_OFFSET(i) ((void*)(sizeof(gm::GMfloat) * i))
+
 GMGLModelPainter::GMGLModelPainter(IGraphicEngine* engine, GMModel* objs)
 	: GMModelPainter(objs)
 {
@@ -35,53 +37,42 @@ void GMGLModelPainter::transfer()
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	meshBuffer.arrayId = vao;
-
 	glBindVertexArray(vao);
-	GLuint positionSize		= mesh->isDataDisabled(GMVertexDataType::Position)		? 0 : sizeof(GMModel::DataType) * mesh->positions().size();
-	GLuint normalSize		= mesh->isDataDisabled(GMVertexDataType::Normal)		? 0 : sizeof(GMModel::DataType) * mesh->normals().size();
-	GLuint uvSize			= mesh->isDataDisabled(GMVertexDataType::UV)			? 0 : sizeof(GMModel::DataType) * mesh->texcoords().size();
-	GLuint tangentSize		= mesh->isDataDisabled(GMVertexDataType::Tangent)		? 0 : sizeof(GMModel::DataType) * mesh->tangents().size();
-	GLuint bitangentSize	= mesh->isDataDisabled(GMVertexDataType::Bitangent)		? 0 : sizeof(GMModel::DataType) * mesh->bitangents().size();
-	GLuint lightmapSize		= mesh->isDataDisabled(GMVertexDataType::Lightmap)		? 0 : sizeof(GMModel::DataType) * mesh->lightmaps().size();
-	GLuint colorSize		= mesh->isDataDisabled(GMVertexDataType::Color)			? 0 : sizeof(GMModel::DataType) * mesh->colors().size();
+
+	Vector<GMVertex> packedData;
+	// 把数据打入顶点数组
+	packData(packedData);
+	GLuint dataSize = sizeof(GMVertex) * packedData.size();
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	meshBuffer.bufferId = vbo;
 
 	glBindBuffer(GL_ARRAY_BUFFER, meshBuffer.bufferId);
-	glBufferData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize + colorSize, NULL, usage);
-	IF_ENABLED(mesh, GMVertexDataType::Position)	glBufferSubData(GL_ARRAY_BUFFER, 0																				, positionSize	, mesh->positions().data());
-	IF_ENABLED(mesh, GMVertexDataType::Normal)		glBufferSubData(GL_ARRAY_BUFFER, positionSize																	, normalSize	, mesh->normals().data());
-	IF_ENABLED(mesh, GMVertexDataType::UV)			glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize														, uvSize		, mesh->texcoords().data());
-	IF_ENABLED(mesh, GMVertexDataType::Tangent)		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize												, tangentSize	, mesh->tangents().data());
-	IF_ENABLED(mesh, GMVertexDataType::Bitangent)	glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize								, bitangentSize	, mesh->bitangents().data());
-	IF_ENABLED(mesh, GMVertexDataType::Lightmap)	glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize				, lightmapSize	, mesh->lightmaps().data());
-	IF_ENABLED(mesh, GMVertexDataType::Color)		glBufferSubData(GL_ARRAY_BUFFER, positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize, colorSize		, mesh->colors().data());
+	glBufferData(GL_ARRAY_BUFFER, dataSize, packedData.data(), usage);
 
-	IF_ENABLED(mesh, GMVertexDataType::Position)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMModel::PositionDimension,	 GL_FLOAT, GL_FALSE, 0, 0);
-	IF_ENABLED(mesh, GMVertexDataType::Normal)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMModel::NormalDimension,	 GL_FLOAT, GL_TRUE,  0, (void*)positionSize);
-	IF_ENABLED(mesh, GMVertexDataType::UV)			glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			GMModel::UVDimension,		 GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize));
-	IF_ENABLED(mesh, GMVertexDataType::Tangent)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMModel::TangentDimension,	 GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize));
-	IF_ENABLED(mesh, GMVertexDataType::Bitangent)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMModel::BitangentDimension, GL_FLOAT, GL_TRUE,  0, (void*)(positionSize + normalSize + uvSize + tangentSize));
-	IF_ENABLED(mesh, GMVertexDataType::Lightmap)	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMModel::LightmapDimension,	 GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize));
-	IF_ENABLED(mesh, GMVertexDataType::Color)		glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMModel::TextureDimension,	 GL_FLOAT, GL_FALSE, 0, (void*)(positionSize + normalSize + uvSize + tangentSize + bitangentSize + lightmapSize));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMModel::PositionDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMModel::NormalDimension,	 GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(3));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			GMModel::TexcoordDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(6));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMModel::TangentDimension,	 GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(8));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMModel::BitangentDimension, GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(11));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMModel::LightmapDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(14));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMModel::TextureDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(16));
 
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
-		if (!mesh->isDataDisabled(type))
-			glEnableVertexAttribArray(gmVertexIndex(type));
+		glEnableVertexAttribArray(gmVertexIndex(type));
 	}
 
 	glBindVertexArray(0);
 
-	IF_ENABLED(mesh, GMVertexDataType::Position)	mesh->clear_positions_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Normal)		mesh->clear_normals_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::UV)			mesh->clear_texcoords_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Tangent)		mesh->clear_tangents_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Bitangent)	mesh->clear_bitangents_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Lightmap)	mesh->clear_lightmaps_and_save_byte_size();
-	IF_ENABLED(mesh, GMVertexDataType::Color)		mesh->clear_colors_and_save_byte_size();
+	mesh->clear_positions_and_save_byte_size();
+	mesh->clear_normals_and_save_byte_size();
+	mesh->clear_texcoords_and_save_byte_size();
+	mesh->clear_tangents_and_save_byte_size();
+	mesh->clear_bitangents_and_save_byte_size();
+	mesh->clear_lightmaps_and_save_byte_size();
+	mesh->clear_colors_and_save_byte_size();
 
 	GM_END_CHECK_GL_ERROR
 

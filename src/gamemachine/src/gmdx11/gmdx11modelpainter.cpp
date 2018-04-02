@@ -3,8 +3,6 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
-#define SAFE_ASSIGN(mb, df, pos) ((pos) >= (mb).size()) ? df : (mb[pos])
-
 GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* model)
 	: GMModelPainter(model)
 {
@@ -35,67 +33,6 @@ bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 	return false;
 }
 
-void GMDx11ModelPainter::packData(Vector<GMDx11VertexData>& packedData)
-{
-	D(d);
-	GMDx11VertexData vd = { 0 };
-	GMModel* model = getModel();
-	// 按照position的size()/3来分配顶点
-	GM_ASSERT(model->getMesh()->positions().size() % 3 == 0);
-	for (GMuint i = 0; i < model->getMesh()->positions().size() / 3; ++i)
-	{
-		{
-			auto& data_ref = model->getMesh()->positions();
-			vd.vertices[0] = data_ref[i * 3];
-			vd.vertices[1] = data_ref[i * 3 + 1];
-			vd.vertices[2] = data_ref[i * 3 + 2];
-		}
-
-		{
-			auto& data_ref = model->getMesh()->normals();
-			vd.normals[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
-			vd.normals[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
-			vd.normals[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
-		}
-
-		{
-			auto& data_ref = model->getMesh()->texcoords();
-			vd.texcoords[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
-			vd.texcoords[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
-		}
-
-		{
-			auto& data_ref = model->getMesh()->tangents();
-			vd.tangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
-			vd.tangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
-			vd.tangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
-		}
-
-		{
-			auto& data_ref = model->getMesh()->bitangents();
-			vd.bitangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
-			vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
-			vd.bitangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
-		}
-
-		{
-			auto& data_ref = model->getMesh()->lightmaps();
-			vd.lightmaps[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
-			vd.lightmaps[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
-		}
-
-		{
-			auto& data_ref = model->getMesh()->colors();
-			vd.color[0] = SAFE_ASSIGN(data_ref, 0, i * 4);
-			vd.color[1] = SAFE_ASSIGN(data_ref, 0, i * 4 + 1);
-			vd.color[2] = SAFE_ASSIGN(data_ref, 0, i * 4 + 2);
-			vd.color[3] = SAFE_ASSIGN(data_ref, 0, i * 4 + 3);
-		}
-
-		packedData.push_back(vd);
-	}
-}
-
 void GMDx11ModelPainter::transfer()
 {
 	D(d);
@@ -109,7 +46,7 @@ void GMDx11ModelPainter::transfer()
 	GMMesh* mesh = model->getMesh();
 	mesh->calculateTangentSpace();
 
-	Vector<GMDx11VertexData> packedData;
+	Vector<GMVertex> packedData;
 	// 把数据打入顶点数组
 	packData(packedData);
 

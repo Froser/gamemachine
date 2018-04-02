@@ -169,10 +169,6 @@ void GMParticles::initPrototype(GMModel* prototype, const Vector<GMParticleGameO
 	prototype->setUsageHint(GMUsageHint::DynamicDraw);
 
 	auto mesh = prototype->getMesh();
-	mesh->disableData(GMVertexDataType::Normal);
-	mesh->disableData(GMVertexDataType::Tangent);
-	mesh->disableData(GMVertexDataType::Bitangent);
-	mesh->disableData(GMVertexDataType::Lightmap);
 
 	auto size = particles.size();
 	// 创建指针列表

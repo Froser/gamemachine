@@ -495,7 +495,7 @@ void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type
 
 void GMDx11Renderer::prepareBuffer(IQueriable* painter)
 {
-	GMuint stride = sizeof(GMDx11VertexData);
+	GMuint stride = sizeof(GMVertex);
 	GMuint offset = 0;
 	GMComPtr<ID3D11Buffer> buffer;
 	painter->getInterface(GameMachineInterfaceID::D3D11Buffer, (void**)&buffer);

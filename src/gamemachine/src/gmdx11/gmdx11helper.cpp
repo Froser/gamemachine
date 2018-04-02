@@ -21,7 +21,7 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	if (!buf.size)
 		return nullptr;
 
-	UINT flag = D3D10_SHADER_ENABLE_STRICTNESS;
+	UINT flag = D3DCOMPILE_ENABLE_STRICTNESS;
 #if _DEBUG
 	flag |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 #endif

@@ -12,6 +12,17 @@ BEGIN_NS
 class GMModel;
 class GMGameObject;
 
+struct GMVertex
+{
+	Array<GMfloat, 3> vertices;
+	Array<GMfloat, 3> normals;
+	Array<GMfloat, 2> texcoords;
+	Array<GMfloat, 3> tangents;
+	Array<GMfloat, 3> bitangents;
+	Array<GMfloat, 2> lightmaps;
+	Array<GMfloat, 4> color;
+};
+
 GM_PRIVATE_OBJECT(GMModelPainter)
 {
 	GMModel* model = nullptr;
@@ -46,6 +57,9 @@ public:
 
 protected:
 	inline GMModel* getModel() { D(d); return d->model; }
+
+protected:
+	void packData(Vector<GMVertex>& packedData);
 };
 
 GM_PRIVATE_OBJECT(GMComponent)
@@ -151,9 +165,9 @@ public:
 	{
 		PositionDimension = 3,
 		NormalDimension = 3,
-		UVDimension = 2,
+		TexcoordDimension = 2,
 		TextureDimension = 4,
-		LightmapDimension = UVDimension,
+		LightmapDimension = TexcoordDimension,
 		TangentDimension = NormalDimension,
 		BitangentDimension = NormalDimension,
 	};
@@ -293,7 +307,6 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GM_DEFINE_VERTEX_DATA(lightmaps);
 	GM_DEFINE_VERTEX_DATA(colors); //顶点颜色，一般渲染不会用到这个，用于粒子绘制
 
-	bool disabledData[gmVertexIndex(GMVertexDataType::EndOfVertexDataType)] = { 0 };
 	GMMeshData* meshData = nullptr;
 	Vector<GMComponent*> components;
 	GMArrangementMode mode = GMArrangementMode::Triangle_Strip;
@@ -329,8 +342,6 @@ public:
 	GM_DEFINE_VERTEX_PROPERTY(lightmaps);
 	GM_DEFINE_VERTEX_PROPERTY(colors);
 
-	inline void disableData(GMVertexDataType type) { D(d); d->disabledData[gmVertexIndex(type)] = true; }
-	inline bool isDataDisabled(GMVertexDataType type) { D(d); return d->disabledData[gmVertexIndex(type)]; }
 	inline Vector<GMComponent*>& getComponents() { D(d); return d->components; }
 	inline const Vector<GMComponent*>& getComponents() const { D(d); return d->components; }
 	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }
