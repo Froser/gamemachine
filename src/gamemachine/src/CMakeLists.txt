@@ -54,8 +54,6 @@ set(SOURCES
 		gmengine/gmdemogameworld.cpp
 		gmengine/gameobjects/gmgameobject.h
 		gmengine/gameobjects/gmgameobject.cpp
-		gmengine/gameobjects/gmparticles.h
-		gmengine/gameobjects/gmparticles.cpp
 		gmengine/gameobjects/gmspritegameobject.h
 		gmengine/gameobjects/gmspritegameobject.cpp
 		gmengine/gameobjects/gm2dgameobject.h

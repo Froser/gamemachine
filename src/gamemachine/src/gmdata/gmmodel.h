@@ -104,7 +104,6 @@ public:
 	void lightmap(GMfloat u, GMfloat v);
 	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
 	void endFace();
-	void expand(GMuint count);
 
 private:
 	void setParentMesh(GMMesh* mesh) { D(d); d->parentMesh = mesh; }

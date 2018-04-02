@@ -222,50 +222,6 @@ void GMComponent::endFace()
 	d->primitiveCount++;
 }
 
-// 复制count倍当前component
-void GMComponent::expand(GMuint count)
-{
-	D(d);
-	d->parentMesh->positions().reserve(d->parentMesh->positions().size() * count);
-	d->parentMesh->normals().reserve(d->parentMesh->normals().size() * count);
-	d->parentMesh->texcoords().reserve(d->parentMesh->texcoords().size() * count);
-	d->parentMesh->tangents().reserve(d->parentMesh->tangents().size() * count);
-	d->parentMesh->bitangents().reserve(d->parentMesh->bitangents().size() * count);
-	d->parentMesh->lightmaps().reserve(d->parentMesh->lightmaps().size() * count);
-	d->parentMesh->colors().reserve(d->parentMesh->colors().size() * count);
-
-	GMint verticesCount = 0;
-	Vector<GMint> flag;
-	for (auto& c : d->primitiveVertices)
-	{
-		verticesCount += c;
-		flag.push_back(verticesCount);
-	}
-
-	for (GMuint turn = 0; turn < count - 1; turn++)
-	{
-		for (GMint i = 0; i < verticesCount; i++)
-		{
-			if (i == 0)
-				beginFace();
-			if (std::find(flag.begin(), flag.end(), i) != flag.end())
-			{
-				endFace();
-				beginFace();
-			}
-
-			vertex(d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 0], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 1], d->parentMesh->positions()[d->offset + i * GMModel::PositionDimension + 2]);
-			normal(d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 0], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 1], d->parentMesh->normals()[d->offset + i * GMModel::NormalDimension + 2]);
-			texcoord(d->parentMesh->texcoords()[d->offset + i * GMModel::TexcoordDimension + 0], d->parentMesh->texcoords()[d->offset + i * GMModel::TexcoordDimension + 1]);
-			lightmap(d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->lightmaps()[d->offset + i * GMModel::TextureDimension + 1]);
-			color(d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 0], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 1], d->parentMesh->colors()[d->offset + i * GMModel::TextureDimension + 2]);
-
-			if (i == verticesCount - 1)
-				endFace();
-		}
-	}
-}
-
 GMMesh::GMMesh()
 {
 	D(d);

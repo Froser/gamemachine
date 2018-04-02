@@ -5,8 +5,6 @@
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
-#include "demo/particles1.h"
-#include "demo/particles2.h"
 #include "demo/effects.h"
 #include "demo/quake3_bsp.h"
 #include "demo/border.h"
@@ -28,8 +26,6 @@ namespace
 	{
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
 		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-		world->addDemo("Particle1: Create a radius particle emitter.", new Demo_Particles1(world));
-		world->addDemo("Particle2: Create a lerp particle emitter.", new Demo_Particles2(world));
 		world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
 		world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));
 		world->addDemo("Border: Demostrate a border.", new Demo_Border(world));

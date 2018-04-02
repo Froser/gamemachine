@@ -27,10 +27,6 @@ set(SOURCES
 		demo/texture.cpp
 		demo/normalmap.h
 		demo/normalmap.cpp
-		demo/particles1.h
-		demo/particles1.cpp
-		demo/particles2.h
-		demo/particles2.cpp
 		demo/effects.h
 		demo/effects.cpp
 		demo/quake3_bsp.h
