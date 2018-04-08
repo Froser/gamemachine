@@ -26,8 +26,8 @@ public:
 public:
 	virtual void transfer() override;
 	virtual void draw(const GMGameObject* parent) override;
-	virtual void dispose(GMMeshData* md) override;
-	virtual void beginUpdateBuffer(GMMesh* mesh) override;
+	virtual void dispose(GMModelBuffer* md) override;
+	virtual void beginUpdateBuffer(GMModel* model) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
 
@@ -35,7 +35,7 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 
 private:
-	void draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh);
+	void draw(IRenderer* renderer, GMModel* model);
 };
 
 END_NS

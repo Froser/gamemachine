@@ -9,7 +9,6 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
-	GMShader* shader = nullptr;
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
@@ -27,7 +26,7 @@ public:
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) override;
+	virtual void draw(IQueriable* painter, GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
 
 private:
@@ -50,15 +49,15 @@ private:
 	ID3DX11EffectTechnique* getTechnique();
 	void prepareBuffer(IQueriable* painter);
 	void prepareLights();
-	void prepareMaterials(GMComponent* component);
-	void prepareRasterizer(GMComponent* component);
-	void prepareBlend(GMComponent* component);
-	void prepareDepthStencil(GMComponent* component);
-	void passAllAndDraw(GMComponent* component);
+	void prepareMaterials(GMModel* model);
+	void prepareRasterizer(GMModel* model);
+	void prepareBlend(GMModel* model);
+	void prepareDepthStencil(GMModel* model);
+	void passAllAndDraw(GMModel* model);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
-	void prepareTextures();
-	void drawTextures();
-	void applyTextureAttribute(ITexture* texture, GMTextureType type, GMint index);
+	void prepareTextures(GMModel* model);
+	void drawTextures(GMModel* model);
+	void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 };
 
 class GMDx11Renderer_3D : public GMDx11Renderer

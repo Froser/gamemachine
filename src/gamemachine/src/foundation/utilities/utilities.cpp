@@ -66,14 +66,12 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 
 	{
 		model->setType(type);
-		GMMesh* body = model->getMesh();
-		body->setArrangementMode(GMArrangementMode::TriangleStrip);
-
-		GMComponent* component = new GMComponent(body);
+		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+		GMMesh* body = new GMMesh(model);
 		GMFloat4 f4_vertex, f4_normal;
 		for (GMint i = 0; i < 12; ++i)
 		{
-			component->beginFace();
+			body->beginFace();
 			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
@@ -87,15 +85,15 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 
 				vertex.loadFloat4(f4_vertex);
 				normal.loadFloat4(f4_normal);
-				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-				component->texcoord(uv[(i % 2) * 6 + (j * 2)], uv[(i % 2) * 6 + (j * 2) + 1]);
-				component->color(1.f, 1.f, 1.f);
+				body->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+				body->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
+				body->texcoord(uv[(i % 2) * 6 + (j * 2)], uv[(i % 2) * 6 + (j * 2) + 1]);
+				body->color(1.f, 1.f, 1.f);
 			}
-			component->endFace();
+			body->endFace();
 		}
 		if (shaderCallback)
-			shaderCallback->onCreateShader(component->getShader());
+			shaderCallback->onCreateShader(model->getShader());
 	}
 
 	*obj = model;
@@ -138,14 +136,13 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 
 	{
 		model->setType(type);
-		GMMesh* body = model->getMesh();
-		body->setArrangementMode(GMArrangementMode::TriangleStrip);
+		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 
-		GMComponent* component = new GMComponent(body);
+		GMMesh* body = new GMMesh(model);
 		GMFloat4 f4_vertex, f4_normal, f4_uv;
 		for (GMint i = 0; i < 2; ++i)
 		{
-			component->beginFace();
+			body->beginFace();
 			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
@@ -161,18 +158,18 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				vertex.loadFloat4(f4_vertex);
 				normal.loadFloat4(f4_normal);
 				uv.loadFloat4(f4_uv);
-				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
+				body->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+				body->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				if (customUV)
-					component->texcoord(f4_uv[0], 1 - f4_uv[1]);
+					body->texcoord(f4_uv[0], 1 - f4_uv[1]);
 				else
-					component->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
-				component->color(1.f, 1.f, 1.f);
+					body->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
+				body->color(1.f, 1.f, 1.f);
 			}
-			component->endFace();
+			body->endFace();
 		}
 		if (shaderCallback)
-			shaderCallback->onCreateShader(component->getShader());
+			shaderCallback->onCreateShader(model->getShader());
 	}
 
 	*obj = model;
@@ -208,14 +205,13 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 
 	{
 		model->setType(type);
-		GMMesh* body = model->getMesh();
-		body->setArrangementMode(GMArrangementMode::TriangleStrip);
+		GMMesh* body = new GMMesh(model);
+		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 
-		GMComponent* component = new GMComponent(body);
 		GMFloat4 f4_vertex, f4_normal, f4_uv;
 		for (GMint i = 0; i < 2; i++)
 		{
-			component->beginFace();
+			body->beginFace();
 			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
@@ -231,66 +227,21 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 				vertex.loadFloat4(f4_vertex);
 				normal.loadFloat4(f4_normal);
 				uv.loadFloat4(f4_uv);
-				component->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-				component->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
+				body->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
+				body->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
 				if (customUV)
-					component->texcoord(f4_uv[0], 1 - f4_uv[1]);
+					body->texcoord(f4_uv[0], 1 - f4_uv[1]);
 				else
-					component->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
-				component->color(1.f, 1.f, 1.f);
+					body->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
+				body->color(1.f, 1.f, 1.f);
 			}
-			component->endFace();
+			body->endFace();
 		}
 		if (shaderCallback)
-			shaderCallback->onCreateShader(component->getShader());
+			shaderCallback->onCreateShader(model->getShader());
 	}
 
 	*obj = model;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-void GMPrimitiveUtil::translateModelTo(REF GMModel& model, const GMfloat(&trans)[3])
-{
-	GMModelPainter* painter = model.getPainter();
-	GMMesh* mesh = model.getMesh();
-	painter->beginUpdateBuffer(mesh);
-	GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
-	GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
-
-	// 计算首个偏移
-	GMfloat* first = buffer;
-	GMfloat delta[] = {
-		trans[0] - first[0],
-		trans[1] - first[1],
-		trans[2] - first[2]
-	};
-
-	for (GMint v = 0; v < vertexCount; ++v)
-	{
-		GMfloat* ptr = buffer + v * GMModel::PositionDimension;
-		ptr[0] += delta[0];
-		ptr[1] += delta[1];
-		ptr[2] += delta[2];
-	}
-	painter->endUpdateBuffer();
-}
-
-void GMPrimitiveUtil::scaleModel(REF GMModel& model, const GMfloat (&scaling)[3])
-{
-	GMModelPainter* painter = model.getPainter();
-	GMMesh* mesh = model.getMesh();
-	painter->beginUpdateBuffer(mesh);
-	GMfloat* buffer = reinterpret_cast<GMfloat*>(painter->getBuffer());
-	GMint vertexCount = mesh->get_transferred_positions_byte_size() / (sizeof(GMfloat) * GMModel::PositionDimension);
-	for (GMint v = 0; v < vertexCount; ++v)
-	{
-		GMfloat* ptr = buffer + v * GMModel::PositionDimension;
-		ptr[0] *= scaling[0];
-		ptr[1] *= scaling[1];
-		ptr[2] *= scaling[2];
-	}
-	painter->endUpdateBuffer();
 }
 
 void GMToolUtil::createTexture(const GMString& filename, ITexture** texture)

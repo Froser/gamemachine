@@ -70,15 +70,15 @@ namespace
 		glStencilMask(stencilOptions.writeMask);
 	}
 
-	inline GLenum getMode(GMMesh* obj)
+	inline GLenum getMode(GMTopologyMode mode)
 	{
-		switch (obj->getArrangementMode())
+		switch (mode)
 		{
-		case GMArrangementMode::TriangleStrip:
+		case GMTopologyMode::TriangleStrip:
 			return GL_TRIANGLE_STRIP;
-		case GMArrangementMode::Triangles:
+		case GMTopologyMode::Triangles:
 			return GL_TRIANGLES;
-		case GMArrangementMode::Lines:
+		case GMTopologyMode::Lines:
 			return GL_LINE_LOOP;
 		default:
 			GM_ASSERT(false);
@@ -93,14 +93,14 @@ GMGLRenderer::GMGLRenderer()
 	d->engine = gm_static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
 }
 
-void GMGLRenderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
+void GMGLRenderer::draw(IQueriable* painter, GMModel* model)
 {
 	D(d);
 	applyStencil(*d->engine);
-	beforeDraw(component);
-	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(mesh);
-	glDrawArrays(mode, 0, component->getVerticesCount());
-	afterDraw();
+	beforeDraw(model);
+	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
+	glDrawArrays(mode, 0, model->getVerticesCount());
+	afterDraw(model);
 }
 
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
@@ -130,17 +130,16 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 }
 
-void GMGLRenderer_3D::beforeDraw(GMComponent* component)
+void GMGLRenderer_3D::beforeDraw(GMModel* model)
 {
 	D(d);
-	d->shader = &component->getShader();
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
-	activateMaterial(*d->shader);
+	activateMaterial(model->getShader());
 
 	// 应用Shader
-	applyShader(*d->shader);
+	applyShader(model->getShader());
 
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
@@ -148,7 +147,7 @@ void GMGLRenderer_3D::beforeDraw(GMComponent* component)
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
 		{
-			drawTexture((GMTextureType)type, i);
+			drawTexture(model, (GMTextureType)type, i);
 		}
 	}
 
@@ -156,10 +155,10 @@ void GMGLRenderer_3D::beforeDraw(GMComponent* component)
 	drawDebug();
 }
 
-void GMGLRenderer_3D::afterDraw()
+void GMGLRenderer_3D::afterDraw(GMModel* model)
 {
 	D(d);
-	if (d->shader->getBlend())
+	if (model->getShader().getBlend())
 		glDepthMask(GL_TRUE);
 
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
@@ -172,21 +171,21 @@ void GMGLRenderer_3D::afterDraw()
 	}
 }
 
-void GMGLRenderer_3D::drawTexture(GMTextureType type, GMint index)
+void GMGLRenderer_3D::drawTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
 	if (GMGetDebugState(DRAW_LIGHTMAP_ONLY) && type != GMTextureType::LIGHTMAP)
 		return;
 
 	// 按照贴图类型选择纹理动画序列
-	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, index);
+	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, index);
 
 	// 获取序列中的这一帧
 	ITexture* texture = getTexture(textures);
 	if (texture)
 	{
 		// 激活动画序列
-		activateTexture((GMTextureType)type, index);
+		activateTexture(model, (GMTextureType)type, index);
 		texture->drawTexture(&textures, index);
 	}
 }
@@ -237,7 +236,7 @@ void GMGLRenderer_3D::drawDebug()
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
 }
 
-void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
+void GMGLRenderer_3D::activateTextureTransform(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
@@ -281,10 +280,10 @@ void GMGLRenderer_3D::activateTextureTransform(GMTextureType type, GMint index)
 		}
 	};
 
-	d->shader->getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+	model->getShader().getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
 }
 
-void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
+void GMGLRenderer_3D::activateTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
@@ -305,7 +304,7 @@ void GMGLRenderer_3D::activateTexture(GMTextureType type, GMint index)
 	shaderProgram->setInt(u_texture, texId);
 	shaderProgram->setInt(u_enabled, 1);
 
-	activateTextureTransform(type, index);
+	activateTextureTransform(model, type, index);
 	glActiveTexture(tex);
 }
 
@@ -352,23 +351,21 @@ void GMGLRenderer_3D::getTextureID(GMTextureType type, GMint index, REF GLenum& 
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLRenderer_2D::beforeDraw(GMComponent* component)
+void GMGLRenderer_2D::beforeDraw(GMModel* model)
 {
 	D(d);
-	d->shader = &component->getShader();
-
 	// 应用Shader
-	applyShader(*d->shader);
+	applyShader(model->getShader());
 
 	// 只选择环境光纹理
-	GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
+	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
 
 	// 获取序列中的这一帧
 	ITexture* texture = getTexture(textures);
 	if (texture)
 	{
 		// 激活动画序列
-		activateTexture(GMTextureType::AMBIENT, 0);
+		activateTexture(model, GMTextureType::AMBIENT, 0);
 		texture->drawTexture(&textures, 0);
 	}
 }
@@ -396,12 +393,12 @@ void GMGLRenderer_CubeMap::endModel()
 	d->cubemap = nullptr;
 }
 
-void GMGLRenderer_CubeMap::beforeDraw(GMComponent* component)
+void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 {
 	D(d);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	GMTexture& texture = component->getShader().getTexture();
+	GMTexture& texture = model->getShader().getTexture();
 	GMTextureFrames& frames = texture.getTextureFrames(GMTextureType::CUBEMAP, 0);
 	ITexture* glTex = frames.getFrameByIndex(0);
 	if (glTex)
@@ -438,6 +435,6 @@ void GMGLRenderer_CubeMap::beforeDraw(GMComponent* component)
 	}
 }
 
-void GMGLRenderer_CubeMap::afterDraw()
+void GMGLRenderer_CubeMap::afterDraw(GMModel* model)
 {
 }

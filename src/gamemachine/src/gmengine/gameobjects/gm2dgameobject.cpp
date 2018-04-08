@@ -66,9 +66,9 @@ void GMGlyphObject::constructModel()
 	D(d);
 	GMModel* model = new GMModel();
 	model->setType(GMModelType::Glyph);
-	GMComponent* component = new GMComponent(model->getMesh());
-	onCreateShader(component->getShader());
-	createVertices(component);
+	GMMesh* mesh = new GMMesh(model);
+	onCreateShader(model->getShader());
+	createVertices(mesh);
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
 	setModel(asset);
@@ -91,16 +91,15 @@ void GMGlyphObject::onCreateShader(GMShader& shader)
 void GMGlyphObject::updateModel()
 {
 	D(d);
-	GMMesh* mesh = getModel()->getMesh();
-	GMComponent* component = mesh->getComponents()[0];
-	component->clear();
-	getModel()->releaseMesh();
-	createVertices(component);
+	GMMeshes& meshes = getModel()->getMeshes();
+	GMMesh* mesh = meshes[0];
+	getModel()->releaseModelBuffer();
+	createVertices(mesh);
 	GMModelPainter* painter = getModel()->getPainter();
 	painter->transfer();
 }
 
-void GMGlyphObject::createVertices(GMComponent* component)
+void GMGlyphObject::createVertices(GMMesh* mesh)
 {
 	D(d);
 	D_BASE(db, GMControlGameObject);
@@ -142,33 +141,33 @@ void GMGlyphObject::createVertices(GMComponent* component)
 
 				// 采用左上角为原点的Texcoord坐标系
 
-				component->beginFace();
-				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+				mesh->beginFace();
+				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
-				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y));
-				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
-				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
+				mesh->texcoord(UV_X(glyph.x), UV_Y(glyph.y));
+				mesh->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
+				mesh->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
 
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->endFace();
+				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->endFace();
 
-				component->beginFace();
-				component->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
-				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				component->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+				mesh->beginFace();
+				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
+				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 
-				component->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
-				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
-				component->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
+				mesh->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
+				mesh->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
+				mesh->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
 
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				component->endFace();
+				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->endFace();
 			}
 		}
 	END_GLYPH_XY()

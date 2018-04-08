@@ -84,10 +84,6 @@ public:
 		D(d);
 		d->forceDisableDeferredRendering = true;
 	}
-
-	// events
-private:
-	static void onShaderSetBlend(GMObject* sender, GMObject* receiver);
 };
 
 //GMEntityObject

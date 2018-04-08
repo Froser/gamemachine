@@ -416,7 +416,7 @@ GM_INTERFACE(IRenderer)
 {
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;
-	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) = 0;
+	virtual void draw(IQueriable* painter, GMModel* model) = 0;
 };
 
 GM_INTERFACE(IFactory)

@@ -101,7 +101,7 @@ class GMNotAGMObject {};
 
 #define GM_DECLARE_SETTER(name, memberName, paramType) \
 	public: \
-	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; emitEvent(GM_SET_PROPERTY_EVENT_ENUM(name)); }
+	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
 
 #define GM_DECLARE_PROPERTY(name, memberName, paramType) \
 	GM_DECLARE_GETTER(name, memberName, paramType) \

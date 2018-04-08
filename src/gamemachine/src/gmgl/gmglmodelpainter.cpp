@@ -26,38 +26,40 @@ void GMGLModelPainter::transfer()
 	if (!model->isNeedTransfer())
 		return;
 
-	GMMesh* mesh = model->getMesh();
 	GLenum usage = model->getUsageHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
 
-	mesh->calculateTangentSpace();
+	for (auto& mesh : model->getMeshes())
+	{
+		mesh->calculateTangentSpace();
+	}
 
-	GMMeshBuffer meshBuffer;
+	GMModelBufferData bufferData;
+	Vector<GMVertex> packedData;
+	// 把数据打入顶点数组
+	packData(packedData);
 
 	GM_BEGIN_CHECK_GL_ERROR
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
-	meshBuffer.arrayId = vao;
+	bufferData.arrayId = vao;
 	glBindVertexArray(vao);
 
-	Vector<GMVertex> packedData;
-	// 把数据打入顶点数组
-	packData(packedData);
 	GLuint dataSize = sizeof(GMVertex) * packedData.size();
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
-	meshBuffer.bufferId = vbo;
+	bufferData.bufferId = vbo;
 
-	glBindBuffer(GL_ARRAY_BUFFER, meshBuffer.bufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferData.bufferId);
 	glBufferData(GL_ARRAY_BUFFER, dataSize, packedData.data(), usage);
 
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMModel::PositionDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMModel::NormalDimension,	 GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(3));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			GMModel::TexcoordDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(6));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMModel::TangentDimension,	 GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(8));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMModel::BitangentDimension, GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(11));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMModel::LightmapDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(14));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMModel::TextureDimension,	 GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(16));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMVertex::PositionDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMVertex::NormalDimension,		GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(3));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::UV),			GMVertex::TexcoordDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(6));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMVertex::TangentDimension,		GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(8));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(11));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMVertex::LightmapDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(14));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMVertex::TextureDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(16));
 
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
@@ -66,17 +68,18 @@ void GMGLModelPainter::transfer()
 
 	glBindVertexArray(0);
 
-	mesh->clear_positions_and_save_byte_size();
-	mesh->clear_normals_and_save_byte_size();
-	mesh->clear_texcoords_and_save_byte_size();
-	mesh->clear_tangents_and_save_byte_size();
-	mesh->clear_bitangents_and_save_byte_size();
-	mesh->clear_lightmaps_and_save_byte_size();
-	mesh->clear_colors_and_save_byte_size();
+	for (auto& mesh : model->getMeshes())
+	{
+		mesh->clear();
+	}
 
 	GM_END_CHECK_GL_ERROR
 
-	mesh->setMeshBuffer(meshBuffer);
+	GMModelBuffer* modelBuffer = new GMModelBuffer();
+	modelBuffer->setData(bufferData);
+
+	model->setVerticesCount(packedData.size());
+	model->setModelBuffer(modelBuffer);
 	d->inited = true;
 	model->needNotTransferAnymore();
 }
@@ -88,22 +91,17 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 	IRenderer* renderer = d->engine->getRenderer(model->getType());
 	renderer->beginModel(model, parent);
 
-	GMMesh* mesh = model->getMesh();
-	glBindVertexArray(mesh->getMeshBuffer().arrayId);
-	for (auto component : mesh->getComponents())
-	{
-		GMShader& shader = component->getShader();
-		if (shader.getNodraw())
-			continue;
+	if (model->getShader().getDiscard())
+		return;
 
-		draw(renderer, component, mesh);
-	}
+	glBindVertexArray(model->getBuffer()->arrayId);
+	draw(renderer, model);
 	glBindVertexArray(0);
 
 	renderer->endModel();
 }
 
-void GMGLModelPainter::dispose(GMMeshData* md)
+void GMGLModelPainter::dispose(GMModelBuffer* md)
 {
 	D(d);
 	GLuint vao[1] = { md->getMeshBuffer().arrayId },
@@ -120,10 +118,10 @@ void GMGLModelPainter::dispose(GMMeshData* md)
 	d->inited = false;
 }
 
-void GMGLModelPainter::beginUpdateBuffer(GMMesh* mesh)
+void GMGLModelPainter::beginUpdateBuffer(GMModel* model)
 {
-	glBindVertexArray(mesh->getMeshBuffer().arrayId);
-	glBindBuffer(GL_ARRAY_BUFFER, mesh->getMeshBuffer().bufferId);
+	glBindVertexArray(model->getBuffer()->arrayId);
+	glBindBuffer(GL_ARRAY_BUFFER, model->getBuffer()->bufferId);
 }
 
 void GMGLModelPainter::endUpdateBuffer()
@@ -140,9 +138,9 @@ void* GMGLModelPainter::getBuffer()
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 }
 
-void GMGLModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh)
+void GMGLModelPainter::draw(IRenderer* renderer, GMModel* model)
 {
 	D(d);
 	d->engine->checkDrawingState();
-	renderer->draw(this, component, mesh);
+	renderer->draw(this, model);
 }

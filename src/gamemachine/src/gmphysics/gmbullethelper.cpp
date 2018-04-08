@@ -65,22 +65,21 @@ namespace
 		btAlignedObjectArray<GMint> indices;
 		collisionShape2TriangleMesh(shape, origin, vertexPositions, vertexNormals, indices);
 
-		GMMesh* body = out->getMesh();
-		GMComponent* component = new GMComponent(body);
-		component->getShader().setCull(GMS_Cull::NONE);
+		GMMesh* body = new GMMesh(out);
+		out->getShader().setCull(GMS_Cull::NONE);
 		GMint faceCount = indices.size() / 3;
 		for (GMint i = 0; i < faceCount; ++i)
 		{
-			component->beginFace();
+			body->beginFace();
 			for (GMint j = 0; j < 3; ++j)
 			{
 				GMint idx = i * 3 + j;
 				const btVector3& vertex = vertexPositions[indices[idx]];
 				const btVector3& normal = vertexNormals[indices[idx]];
-				component->vertex(vertex[0], vertex[1], vertex[2]);
-				component->normal(normal[0], normal[1], normal[2]);
+				body->vertex(vertex[0], vertex[1], vertex[2]);
+				body->normal(normal[0], normal[1], normal[2]);
 			}
-			component->endFace();
+			body->endFace();
 		}
 	}
 }

@@ -19,11 +19,11 @@ class GMGLRenderer : public GMObject, public IRenderer
 public:
 	GMGLRenderer();
 
-	virtual void draw(IQueriable* painter, GMComponent* component, GMMesh* mesh) override;
+	virtual void draw(IQueriable* painter, GMModel* model) override;
 
 protected:
-	virtual void beforeDraw(GMComponent* component) = 0;
-	virtual void afterDraw() = 0;
+	virtual void beforeDraw(GMModel* model) = 0;
+	virtual void afterDraw(GMModel* model) = 0;
 
 protected:
 	inline const GMShaderVariablesDesc* getVariablesDesc()
@@ -39,7 +39,6 @@ protected:
 
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 {
-	GMShader* shader = nullptr;
 	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
@@ -54,16 +53,16 @@ public:
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void beforeDraw(GMComponent* component) override;
-	virtual void afterDraw() override;
+	virtual void beforeDraw(GMModel* model) override;
+	virtual void afterDraw(GMModel* model) override;
 
 protected:
 	void activateMaterial(const GMShader& shader);
 	void drawDebug();
-	void drawTexture(GMTextureType type, GMint index = 0);
+	void drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
 	ITexture* getTexture(GMTextureFrames& frames);
-	void activateTextureTransform(GMTextureType type, GMint index);
-	void activateTexture(GMTextureType type, GMint index);
+	void activateTextureTransform(GMModel* model, GMTextureType type, GMint index);
+	void activateTexture(GMModel* model, GMTextureType type, GMint index);
 	void deactivateTexture(GMTextureType type, GMint index);
 	void activateShader();
 	void getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId);
@@ -72,7 +71,7 @@ protected:
 class GMGLRenderer_2D : public GMGLRenderer_3D
 {
 public:
-	virtual void beforeDraw(GMComponent* component) override;
+	virtual void beforeDraw(GMModel* model) override;
 };
 
 GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
@@ -87,8 +86,8 @@ class GMGLRenderer_CubeMap : public GMGLRenderer
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void beforeDraw(GMComponent* component) override;
-	virtual void afterDraw() override;
+	virtual void beforeDraw(GMModel* model) override;
+	virtual void afterDraw(GMModel* model) override;
 };
 
 END_NS

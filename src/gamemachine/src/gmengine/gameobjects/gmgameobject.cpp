@@ -24,16 +24,6 @@ void GMGameObject::setModel(GMAsset asset)
 	GMModel* model = GMAssets::getModel(asset);
 	GM_ASSERT(model);
 	d->model = model;
-
-	if (d->model)
-	{
-		for (auto& component : d->model->getMesh()->getComponents())
-		{
-			GMShader& shader = component->getShader();
-			attachEvent(shader, GM_SET_PROPERTY_EVENT_ENUM(Blend), onShaderSetBlend);
-			shader.emitEvent(GM_SET_PROPERTY_EVENT_ENUM(Blend));
-		}
-	}
 }
 
 GMModel* GMGameObject::getModel()
@@ -71,16 +61,6 @@ bool GMGameObject::canDeferredRendering()
 	return d->canDeferredRendering;
 }
 
-void GMGameObject::onShaderSetBlend(GMObject* sender, GMObject* receiver)
-{
-	GMGameObject* gameObject = gmobject_cast<GMGameObject*>(receiver);
-	if (gameObject->data()->forceDisableDeferredRendering)
-		return;
-
-	GMShader* shader = gmobject_cast<GMShader*>(sender);
-	gameObject->data()->canDeferredRendering = !shader->getBlend();
-}
-
 //GMEntityObject
 GMEntityObject::GMEntityObject(GMAsset asset)
 	: GMGameObject(asset)
@@ -111,7 +91,7 @@ void GMEntityObject::calc()
 	d->mins.loadFloat4(f4_mins);
 	d->maxs.loadFloat4(f4_maxs);
 
-	GMMesh* mesh = getModel()->getMesh();
+	GMMesh* mesh = new GMMesh(getModel());
 	GMModel::DataType* vertices = mesh->positions().data();
 	GMint sz = mesh->positions().size();
 	for (GMint i = 0; i < sz; i += 4)
@@ -222,19 +202,18 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 
 	GMModel* model = new GMModel();
 	model->setType(GMModelType::CubeMap);
-	GMMesh* mesh = model->getMesh();
-	GMComponent* component = new GMComponent(mesh);
-	component->getShader().getTexture().getTextureFrames(GMTextureType::CUBEMAP, 0).addFrame(texture);
+	model->getShader().getTexture().getTextureFrames(GMTextureType::CUBEMAP, 0).addFrame(texture);
+	GMMesh* mesh = new GMMesh(model);
 	for (GMuint i = 0; i < 12; i++)
 	{
-		component->beginFace();
-		component->vertex(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
-		component->vertex(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
-		component->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
-		component->normal(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
-		component->normal(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
-		component->normal(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
-		component->endFace();
+		mesh->beginFace();
+		mesh->vertex(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
+		mesh->vertex(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
+		mesh->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
+		mesh->normal(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
+		mesh->normal(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
+		mesh->normal(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
+		mesh->endFace();
 	}
 
 	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));

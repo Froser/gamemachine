@@ -299,7 +299,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMS_BlendFunc blendFactorSrc = GMS_BlendFunc::ZERO;
 	GMS_BlendFunc blendFactorDest = GMS_BlendFunc::ZERO;
 	bool blend = false;
-	bool nodraw = false;
+	bool discard = false;
 	bool noDepthTest = false;
 	bool drawBorder = false;
 	GMfloat lineWidth = 1;
@@ -323,7 +323,7 @@ public:
 	GM_DECLARE_PROPERTY(BlendFactorSource, blendFactorSrc, GMS_BlendFunc);
 	GM_DECLARE_PROPERTY(BlendFactorDest, blendFactorDest, GMS_BlendFunc);
 	GM_DECLARE_PROPERTY(Blend, blend, bool);
-	GM_DECLARE_PROPERTY(Nodraw, nodraw, bool);
+	GM_DECLARE_PROPERTY(Discard, discard, bool);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
 	GM_DECLARE_PROPERTY(Texture, texture, GMTexture);
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);

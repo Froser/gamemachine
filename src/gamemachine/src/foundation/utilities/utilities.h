@@ -28,12 +28,6 @@ struct GMPrimitiveCreator
 	static void createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D, GMfloat(*customUV)[8] = nullptr);
 };
 
-struct GMPrimitiveUtil
-{
-	static void translateModelTo(REF GMModel& model, const GMfloat(&trans)[3]);
-	static void scaleModel(REF GMModel& model, const GMfloat(&scaling)[3]);
-};
-
 //! 引擎提供的各种繁琐操作的工具类。
 /*!
   此工具类其实是对一些固有流程的方法调用进行了封装，和单独调用那些方法效果一样。

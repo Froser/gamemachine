@@ -23,14 +23,14 @@ public:
 public:
 	virtual void transfer() override;
 	virtual void draw(const GMGameObject* parent) override;
-	virtual void dispose(GMMeshData* md) override;
+	virtual void dispose(GMModelBuffer* md) override;
 
-	virtual void beginUpdateBuffer(GMMesh* mesh) override;
+	virtual void beginUpdateBuffer(GMModel* model) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
 
 private:
-	void draw(IRenderer* render, GMComponent* component, GMMesh* mesh);
+	void draw(IRenderer* render, GMModel* model);
 };
 
 END_NS

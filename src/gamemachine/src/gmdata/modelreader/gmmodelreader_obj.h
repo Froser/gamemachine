@@ -19,7 +19,7 @@ struct ModelReader_Obj_Material
 class GMModel;
 struct GMBuffer;
 class GMScanner;
-class GMComponent;
+class GMMesh;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
 	GMModel* model = nullptr;
@@ -28,7 +28,7 @@ GM_PRIVATE_OBJECT(GMModelReader_Obj)
 	AlignedVector<GMVec2> textures;
 	Map<GMString, ModelReader_Obj_Material> materials;
 	GMString currentMaterialName;
-	GMComponent* currentComponent;
+	GMMesh* currentMesh;
 };
 
 // 一个Obj文件只由一个部分组成，不存在骨骼等动画，是刚体静态的

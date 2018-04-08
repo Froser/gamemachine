@@ -23,7 +23,7 @@ bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 		}
 		else
 		{
-			ID3D11Buffer* buffer = reinterpret_cast<ID3D11Buffer*>(db->model->getMesh()->getMeshBuffer().buffer);
+			ID3D11Buffer* buffer = reinterpret_cast<ID3D11Buffer*>(db->model->getBuffer()->buffer);
 			GM_ASSERT(buffer);
 			buffer->AddRef();
 			(*out) = buffer;
@@ -43,8 +43,10 @@ void GMDx11ModelPainter::transfer()
 	if (!model->isNeedTransfer())
 		return;
 
-	GMMesh* mesh = model->getMesh();
-	mesh->calculateTangentSpace();
+	for (auto& mesh : model->getMeshes())
+	{
+		mesh->calculateTangentSpace();
+	}
 
 	Vector<GMVertex> packedData;
 	// 把数据打入顶点数组
@@ -65,17 +67,18 @@ void GMDx11ModelPainter::transfer()
 
 	GMComPtr<ID3D11Device> device = d->engine->getDevice();
 	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->buffer));
-	GMMeshBuffer meshBuffer;
-	meshBuffer.buffer = d->buffer;
-	mesh->setMeshBuffer(meshBuffer);
 
-	mesh->clear_positions_and_save_byte_size();
-	mesh->clear_normals_and_save_byte_size();
-	mesh->clear_texcoords_and_save_byte_size();
-	mesh->clear_tangents_and_save_byte_size();
-	mesh->clear_bitangents_and_save_byte_size();
-	mesh->clear_lightmaps_and_save_byte_size();
-	mesh->clear_colors_and_save_byte_size();
+	GMModelBufferData modelBufferData;
+	modelBufferData.buffer = d->buffer;
+	GMModelBuffer* mb = new GMModelBuffer();
+	mb->setData(modelBufferData);
+	model->setModelBuffer(mb);
+	model->setVerticesCount(packedData.size());
+
+	for (auto& mesh : model->getMeshes())
+	{
+		mesh->clear();
+	}
 
 	d->inited = true;
 	model->needNotTransferAnymore();
@@ -88,23 +91,18 @@ void GMDx11ModelPainter::draw(const GMGameObject* parent)
 	IRenderer* renderer = d->engine->getRenderer(model->getType());
 	renderer->beginModel(model, parent);
 
-	GMMesh* mesh = getModel()->getMesh();
-	for (auto component : mesh->getComponents())
-	{
-		GMShader& shader = component->getShader();
-		if (shader.getNodraw())
-			continue;
+	if (model->getShader().getDiscard())
+		return;
 
-		draw(renderer, component, mesh);
-	}
+	draw(renderer, model);
 	renderer->endModel();
 }
 
-void GMDx11ModelPainter::dispose(GMMeshData* md)
+void GMDx11ModelPainter::dispose(GMModelBuffer* md)
 {
 }
 
-void GMDx11ModelPainter::beginUpdateBuffer(GMMesh* mesh)
+void GMDx11ModelPainter::beginUpdateBuffer(GMModel* model)
 {
 	D(d);
 	// 不能在多线程中，或者嵌套中操作同一个Buffer
@@ -134,7 +132,7 @@ void* GMDx11ModelPainter::getBuffer()
 	return d->mappedSubResource->pData;
 }
 
-void GMDx11ModelPainter::draw(IRenderer* renderer, GMComponent* component, GMMesh* mesh)
+void GMDx11ModelPainter::draw(IRenderer* renderer, GMModel* model)
 {
-	renderer->draw(this, component, mesh);
+	renderer->draw(this, model);
 }

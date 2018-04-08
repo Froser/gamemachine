@@ -44,15 +44,15 @@ namespace
 		// 4
 	};
 
-	inline D3D_PRIMITIVE_TOPOLOGY getMode(GMMesh* obj)
+	inline D3D_PRIMITIVE_TOPOLOGY getMode(GMTopologyMode mode)
 	{
-		switch (obj->getArrangementMode())
+		switch (mode)
 		{
-		case GMArrangementMode::TriangleStrip:
+		case GMTopologyMode::TriangleStrip:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-		case GMArrangementMode::Triangles:
+		case GMTopologyMode::Triangles:
 			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		case GMArrangementMode::Lines:
+		case GMTopologyMode::Lines:
 			return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
 		default:
 			GM_ASSERT(false);
@@ -355,7 +355,7 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	// Renderer决定自己的顶点Layout
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
 	context->IASetInputLayout(d->inputLayout);
-	context->IASetPrimitiveTopology(getMode(model->getMesh()));
+	context->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
 	
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
@@ -376,33 +376,31 @@ void GMDx11Renderer::endModel()
 {
 }
 
-void GMDx11Renderer::prepareTextures()
+void GMDx11Renderer::prepareTextures(GMModel* model)
 {
 	D(d);
-	GM_ASSERT(d->shader);
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
 		{
-			GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, i);
+			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
 			// 写入纹理属性，如是否绘制，偏移等
-			applyTextureAttribute(getTexture(textures), type, i);
+			applyTextureAttribute(model, getTexture(textures), type, i);
 		}
 	}
 }
 
-void GMDx11Renderer::drawTextures()
+void GMDx11Renderer::drawTextures(GMModel* model)
 {
 	D(d);
-	GM_ASSERT(d->shader);
 	GMint registerId = 0;
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; ++i, ++registerId)
 		{
-			GMTextureFrames& textures = d->shader->getTexture().getTextureFrames(type, i);
+			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
 
 			// 获取序列中的这一帧
 			ITexture* texture = getTexture(textures);
@@ -415,7 +413,7 @@ void GMDx11Renderer::drawTextures()
 	}
 }
 
-void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type, GMint index)
+void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index)
 {
 	D(d);
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
@@ -482,7 +480,7 @@ void GMDx11Renderer::applyTextureAttribute(ITexture* texture, GMTextureType type
 			}
 		};
 
-		d->shader->getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+		model->getShader().getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
 	}
 	else
 	{
@@ -535,7 +533,7 @@ void GMDx11Renderer::prepareLights()
 	}
 }
 
-void GMDx11Renderer::prepareRasterizer(GMComponent* component)
+void GMDx11Renderer::prepareRasterizer(GMModel* model)
 {
 	D(d);
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
@@ -550,16 +548,16 @@ void GMDx11Renderer::prepareRasterizer(GMComponent* component)
 	GM_ASSERT(d->rasterizer);
 	GM_DX_HR(d->rasterizer->SetRasterizerState(
 		0, 
-		rasterStates.getRasterStates(d->shader->getFrontFace(), d->shader->getCull())
+		rasterStates.getRasterStates(model->getShader().getFrontFace(), model->getShader().getCull())
 	));
 }
 
-void GMDx11Renderer::prepareMaterials(GMComponent* component)
+void GMDx11Renderer::prepareMaterials(GMModel* model)
 {
 	D(d);
 	const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
 	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
-	const GMMaterial& material = component->getShader().getMaterial();
+	const GMMaterial& material = model->getShader().getMaterial();
 	ID3DX11EffectVariable* materialVar = d->effect->GetVariableByName(svd.MaterialName);
 	GM_ASSERT(materialVar->IsValid());
 	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Ka)->AsVector()->SetFloatVector(ValuePointer(material.ka)));
@@ -569,7 +567,7 @@ void GMDx11Renderer::prepareMaterials(GMComponent* component)
 	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Refreactivity)->AsScalar()->SetFloat(material.refractivity));
 }
 
-void GMDx11Renderer::prepareBlend(GMComponent* component)
+void GMDx11Renderer::prepareBlend(GMModel* model)
 {
 	D(d);
 	if (!d->blend)
@@ -584,11 +582,11 @@ void GMDx11Renderer::prepareBlend(GMComponent* component)
 	if (globalBlendState.enabled)
 	{
 		// 全局blend开启时
-		if (d->shader->getBlend())
+		if (model->getShader().getBlend())
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				blendStates.getBlendState(true, d->shader->getBlendFactorSource(), d->shader->getBlendFactorDest())
+				blendStates.getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
 			));
 		}
 		else
@@ -602,11 +600,11 @@ void GMDx11Renderer::prepareBlend(GMComponent* component)
 	else
 	{
 		// 全局blend关闭，此时应该应用正在绘制物体的Blend状态
-		if (d->shader->getBlend())
+		if (model->getShader().getBlend())
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				blendStates.getBlendState(true, d->shader->getBlendFactorSource(), d->shader->getBlendFactorDest())
+				blendStates.getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
 			));
 		}
 		else
@@ -619,7 +617,7 @@ void GMDx11Renderer::prepareBlend(GMComponent* component)
 	}
 }
 
-void GMDx11Renderer::prepareDepthStencil(GMComponent* component)
+void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 {
 	D(d);
 	if (!d->depthStencil)
@@ -633,7 +631,7 @@ void GMDx11Renderer::prepareDepthStencil(GMComponent* component)
 	GM_DX_HR(d->depthStencil->SetDepthStencilState(
 		0,
 		depthStencilStates.getDepthStencilState(
-			!d->shader->getNoDepthTest(),
+			!model->getShader().getNoDepthTest(),
 			getEngine()->getStencilOptions()
 		)
 	));
@@ -655,20 +653,19 @@ ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
-void GMDx11Renderer::draw(IQueriable* painter, GMComponent* component, GMMesh* mesh)
+void GMDx11Renderer::draw(IQueriable* painter, GMModel* model)
 {
 	D(d);
-	d->shader = &component->getShader();
 	prepareBuffer(painter);
 	prepareLights();
-	prepareMaterials(component);
-	prepareRasterizer(component);
-	prepareBlend(component);
-	prepareDepthStencil(component);
-	passAllAndDraw(component);
+	prepareMaterials(model);
+	prepareRasterizer(model);
+	prepareBlend(model);
+	prepareDepthStencil(model);
+	passAllAndDraw(model);
 }
 
-void GMDx11Renderer::passAllAndDraw(GMComponent* component)
+void GMDx11Renderer::passAllAndDraw(GMModel* model)
 {
 	D(d);
 	D3DX11_TECHNIQUE_DESC techDesc;
@@ -677,10 +674,10 @@ void GMDx11Renderer::passAllAndDraw(GMComponent* component)
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
-		prepareTextures();
+		prepareTextures(model);
 		pass->Apply(0, getEngine()->getDeviceContext());
-		drawTextures();
-		getEngine()->getDeviceContext()->Draw(component->getVerticesCount(), 0);
+		drawTextures(model);
+		getEngine()->getDeviceContext()->Draw(model->getVerticesCount(), 0);
 	}
 }
 

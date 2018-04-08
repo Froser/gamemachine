@@ -558,11 +558,11 @@ void GMBSPShaderLoader::createSky(GMShader& shader)
 {
 	D(d);
 	ITexture* texture = shader.getTexture().getTextureFrames(GMTextureType::AMBIENT, 0).getFrameByIndex(0);
-	shader.setNodraw(true);
+	shader.setDiscard(true);
 	if (!d->world->getSky())
 	{
 		GMShader skyShader = shader;
-		skyShader.setNodraw(false);
+		skyShader.setDiscard(false);
 		skyShader.setCull(GMS_Cull::NONE);
 
 		GMBSPSkyGameObject* sky = new GMBSPSkyGameObject(skyShader, MakeVector3(d->bspRender->boundMin), MakeVector3(d->bspRender->boundMax));

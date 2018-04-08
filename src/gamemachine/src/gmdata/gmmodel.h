@@ -14,14 +14,28 @@ class GMGameObject;
 
 struct GMVertex
 {
-	Array<GMfloat, 3> vertices;
-	Array<GMfloat, 3> normals;
-	Array<GMfloat, 2> texcoords;
-	Array<GMfloat, 3> tangents;
-	Array<GMfloat, 3> bitangents;
-	Array<GMfloat, 2> lightmaps;
-	Array<GMfloat, 4> color;
+	enum Dimensions
+	{
+		PositionDimension = 3,
+		NormalDimension = 3,
+		TexcoordDimension = 2,
+		TextureDimension = 3,
+		LightmapDimension = TexcoordDimension,
+		TangentDimension = NormalDimension,
+		BitangentDimension = NormalDimension,
+		ColorDimension = 4,
+	};
+
+	Array<GMfloat, PositionDimension> vertices;
+	Array<GMfloat, NormalDimension> normals;
+	Array<GMfloat, TexcoordDimension> texcoords;
+	Array<GMfloat, TextureDimension> tangents;
+	Array<GMfloat, BitangentDimension> bitangents;
+	Array<GMfloat, LightmapDimension> lightmaps;
+	Array<GMfloat, ColorDimension> color;
 };
+
+typedef Vector<GMMesh*> GMMeshes;
 
 GM_PRIVATE_OBJECT(GMModelPainter)
 {
@@ -29,7 +43,7 @@ GM_PRIVATE_OBJECT(GMModelPainter)
 };
 
 class GMMesh;
-class GMMeshData;
+class GMModelBuffer;
 class GMModelPainter : public GMObject, public IQueriable
 {
 	DECLARE_PRIVATE(GMModelPainter)
@@ -44,10 +58,10 @@ public:
 public:
 	virtual void transfer() = 0;
 	virtual void draw(const GMGameObject* parent) = 0;
-	virtual void dispose(GMMeshData* md) = 0;
+	virtual void dispose(GMModelBuffer* md) = 0;
 
 // 提供修改缓存的方法
-	virtual void beginUpdateBuffer(GMMesh* mesh) = 0;
+	virtual void beginUpdateBuffer(GMModel* model) = 0;
 	virtual void endUpdateBuffer() = 0;
 	virtual void* getBuffer() = 0;
 
@@ -60,55 +74,6 @@ protected:
 
 protected:
 	void packData(Vector<GMVertex>& packedData);
-};
-
-GM_PRIVATE_OBJECT(GMComponent)
-{
-	GMuint offset = 0;
-	// 绘制图元数量
-	GMuint primitiveCount = 0;
-	GMuint verticesCount = 0;
-
-	// 图元顶点数量
-	AlignedVector<GMuint> primitiveVertices;
-	// 顶点在ChildObject的偏移
-	AlignedVector<GMuint> vertexOffsets;
-
-	GMMesh* parentMesh = nullptr;
-	GMuint currentFaceVerticesCount;
-	GMShader shader;
-};
-
-class GMComponent : public GMObject
-{
-	DECLARE_PRIVATE(GMComponent)
-	GM_ALLOW_COPY_DATA(GMComponent)
-
-	friend class GMMesh;
-	friend class GMModel;
-
-public:
-	GMComponent(GMMesh* parent);
-
-	inline GMShader& getShader() { D(d); return d->shader; }
-	inline void setShader(const GMShader& shader) { D(d); d->shader = shader; }
-	inline GMuint* getOffsetPtr() { D(d); return d->vertexOffsets.data(); }
-	inline GMuint* getPrimitiveVerticesCountPtr() { D(d); return d->primitiveVertices.data(); }
-	inline GMuint getPrimitiveCount() { D(d); return d->primitiveCount; }
-	inline GMuint getVerticesCount() { D(d); return d->verticesCount; }
-
-	void clear();
-	void setVertexOffset(GMuint offset);
-	void beginFace();
-	void vertex(GMfloat x, GMfloat y, GMfloat z);
-	void normal(GMfloat x, GMfloat y, GMfloat z);
-	void texcoord(GMfloat u, GMfloat v);
-	void lightmap(GMfloat u, GMfloat v);
-	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
-	void endFace();
-
-private:
-	void setParentMesh(GMMesh* mesh) { D(d); d->parentMesh = mesh; }
 };
 
 enum class GMUsageHint
@@ -129,12 +94,89 @@ enum class GMModelType
 	ModelTypeEnd,
 };
 
+class GMMesh;
+struct GMModelBufferData
+{
+	union
+	{
+		struct //OpenGL
+		{
+			GMuint arrayId;
+			GMuint bufferId;
+		};
+
+		void* buffer; //DirectX
+	};
+};
+
+GM_PRIVATE_OBJECT(GMModelBuffer)
+{
+	GMModelBufferData buffer = { 0 };
+	std::atomic<GMint> ref;
+	GMModelPainter* painter = nullptr;
+};
+
+//! 用来管理GMModelBuffer生命周期的类，包含引用计数功能。
+class GMModelBuffer : public GMObject
+{
+	DECLARE_PRIVATE(GMModelBuffer)
+
+	GMModelBuffer();
+	~GMModelBuffer();
+
+	void dispose();
+	void setData(const GMModelBufferData& bufferData)
+	{
+		D(d);
+		d->buffer = bufferData;
+	}
+
+	const GMModelBufferData& getMeshBuffer()
+	{
+		D(d);
+		return d->buffer;
+	}
+
+	void addRef()
+	{
+		D(d);
+		++d->ref;
+	}
+
+	void releaseRef()
+	{
+		D(d);
+		--d->ref;
+		if (hasNoRef())
+			dispose();
+	}
+
+	bool hasNoRef()
+	{
+		D(d);
+		return d->ref <= 0;
+	}
+};
+
+// 绘制时候的排列方式
+enum class GMTopologyMode
+{
+	// 默认排列，按照Components，并按照一个个三角形来画
+	TriangleStrip,
+	Triangles,
+	Lines,
+};
+
 GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
-	GMMesh* mesh = nullptr;
+	GMMeshes meshes;
 	GMScopePtr<GMModelPainter> painter;
+	GMShader shader;
+	GMModelBuffer* modelBuffer = nullptr;
 	GMModelType type = GMModelType::Model3D;
+	GMTopologyMode mode = GMTopologyMode::Triangles;
+	GMuint verticesCount = 0;
 	bool needTransfer = true;
 };
 
@@ -162,34 +204,48 @@ class GMModel : public GMObject
 public:
 	typedef GMfloat DataType;
 
-	enum Dimensions
-	{
-		PositionDimension = 3,
-		NormalDimension = 3,
-		TexcoordDimension = 2,
-		TextureDimension = 4,
-		LightmapDimension = TexcoordDimension,
-		TangentDimension = NormalDimension,
-		BitangentDimension = NormalDimension,
-	};
-
 public:
 	GMModel();
-	//! 通过另外一个GMModel，构造一个GMModel。
-	/*!
-	  被构造的GMModel将与原本的GMModel共享一份顶点缓存，但是，其component和原本的模型的component是分开的副本。
-	  \param model 构造的模型的原型。如果此模型顶点处于未传输状态，其顶点数据将会被强行传输。
-	*/
 	GMModel(GMModel& model);
 	~GMModel();
 
+	GM_DECLARE_PROPERTY(PrimitiveTopologyMode, mode, GMTopologyMode);
+	GM_DECLARE_PROPERTY(Type, type, GMModelType);
+	GM_DECLARE_PROPERTY(Shader, shader, GMShader);
+	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMuint);
+
 public:
-	inline void setPainter(AUTORELEASE GMModelPainter* painter) { D(d); d->painter.reset(painter); }
-	inline GMModelPainter* getPainter() { D(d); return d->painter; }
-	inline GMMesh* getMesh() { D(d); return d->mesh; }
-	inline const GMMesh* getMesh() const { D(d); return d->mesh; }
-	inline GMModelType getType() { D(d); return d->type; }
-	inline void setType(GMModelType type) { D(d); d->type = type; }
+	inline void setPainter(AUTORELEASE GMModelPainter* painter)
+	{
+		D(d);
+		d->painter.reset(painter);
+	}
+
+	inline GMModelPainter* getPainter()
+	{
+		D(d);
+		return d->painter;
+	}
+
+	inline void addMesh(GMMesh* mesh)
+	{
+		D(d);
+		d->meshes.push_back(mesh);
+	}
+
+	inline GMMeshes& getMeshes()
+	{
+		D(d);
+		return d->meshes;
+	}
+
+	inline const GMModelBufferData* getBuffer()
+	{
+		D(d);
+		if (!d->modelBuffer)
+			return nullptr;
+		return &d->modelBuffer->getMeshBuffer();
+	}
 
 	//! 表示此模型是否需要被GMModelPainter将顶点数据传输到显卡。
 	/*!
@@ -209,80 +265,9 @@ public:
 	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }
 	GMUsageHint getUsageHint() { D(d); return d->hint; }
 
-	void releaseMesh();
-};
+	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
 
-// 绘制时候的排列方式
-enum class GMArrangementMode
-{
-	// 默认排列，按照Components，并按照一个个三角形来画
-	TriangleStrip,
-	Triangles,
-	Lines,
-};
-
-class GMMesh;
-struct GMMeshBuffer
-{
-	union
-	{
-		struct //OpenGL
-		{
-			GMuint arrayId;
-			GMuint bufferId;
-		};
-
-		void* buffer; //DirectX
-	};
-};
-
-GM_PRIVATE_OBJECT(GMMeshData)
-{
-	GMMeshBuffer buffer = { 0 };
-	std::atomic<GMint> ref;
-	GMModelPainter* painter = nullptr;
-};
-
-class GMMeshData : public GMObject
-{
-	DECLARE_PRIVATE(GMMeshData)
-	friend class GMMesh;
-
-	GMMeshData();
-	~GMMeshData();
-
-	void dispose();
-	void setMeshBuffer(const GMMeshBuffer& meshBuffer)
-	{
-		D(d);
-		d->buffer = meshBuffer;
-	}
-
-	const GMMeshBuffer& getMeshBuffer()
-	{
-		D(d);
-		return d->buffer;
-	}
-
-	void addRef()
-	{
-		D(d);
-		++d->ref;
-	}
-
-	void releaseRef()
-	{
-		D(d);
-		--d->ref;
-		if (hasNoRef())
-			dispose();
-	}
-
-	bool hasNoRef()
-	{
-		D(d);
-		return d->ref == 0;
-	}
+	void releaseModelBuffer();
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
@@ -290,13 +275,7 @@ class GMMeshData : public GMObject
 	GMuint transferred_##name##_byte_size = 0;
 
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
-	inline auto& name() { D(d); return d->name; } \
-	inline void clear_##name##_and_save_byte_size() {D(d); set_transferred_##name##_byte_size(name().size() * sizeof(GMModel::DataType)); name().clear(); } \
-	inline GMuint get_transferred_##name##_byte_size() { D(d); return d->transferred_##name##_byte_size; } \
-	inline void set_transferred_##name##_byte_size(GMuint size) { D(d); d->transferred_##name##_byte_size = size; }
-
-#define GM_COPY_VERTEX_PROPERTY(to_ptr, from_ptr, name) \
-	(to_ptr)->set_transferred_##name##_byte_size((from_ptr)->get_transferred_##name##_byte_size());
+	inline auto& name() { D(d); return d->name; }
 
 GM_PRIVATE_OBJECT(GMMesh)
 {
@@ -308,31 +287,21 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GM_DEFINE_VERTEX_DATA(lightmaps);
 	GM_DEFINE_VERTEX_DATA(colors); //顶点颜色，一般渲染不会用到这个，用于粒子绘制
 
-	GMMeshData* meshData = nullptr;
-	Vector<GMComponent*> components;
-	GMArrangementMode mode = GMArrangementMode::Triangles;
-	GMString name = L"default";
+	bool firstFace = true;
+	GMuint verticesPerFace = 0;
+	GMuint currentFaceVerticesCount = 0;
 };
 
+//! 表示一份网格数据。
+/*!
+  网格数据可能仅仅是模型中的一段数据。
+*/
 class GMMesh : public GMObject
 {
 	DECLARE_PRIVATE(GMMesh)
 
-	friend class GMModel;
-	friend class GMComponent;
-
-private:
-	GMMesh();
-
 public:
-	~GMMesh();
-
-public:
-	void clone(OUT GMMesh** childObject);
-	void calculateTangentSpace();
-
-private:
-	void appendComponent(AUTORELEASE GMComponent* component);
+	GMMesh(GMModel* parent);
 
 public:
 	GM_DEFINE_VERTEX_PROPERTY(positions);
@@ -343,29 +312,23 @@ public:
 	GM_DEFINE_VERTEX_PROPERTY(lightmaps);
 	GM_DEFINE_VERTEX_PROPERTY(colors);
 
-	inline Vector<GMComponent*>& getComponents() { D(d); return d->components; }
-	inline const Vector<GMComponent*>& getComponents() const { D(d); return d->components; }
-	inline void setArrangementMode(GMArrangementMode mode) { D(d); d->mode = mode; }
-	inline GMArrangementMode getArrangementMode() { D(d); return d->mode; }
-	inline void setName(const GMString& name) { D(d); d->name = name; }
-	inline const GMString& getName() { D(d); return d->name; }
-	inline const GMMeshBuffer& getMeshBuffer() { D(d); return d->meshData->getMeshBuffer(); }
-	inline void setMeshBuffer(const GMMeshBuffer& buffer) { D(d); d->meshData->setMeshBuffer(buffer); }
+	void calculateTangentSpace();
+	void clear();
+	void beginFace();
+	void vertex(GMfloat x, GMfloat y, GMfloat z);
+	void normal(GMfloat x, GMfloat y, GMfloat z);
+	void texcoord(GMfloat u, GMfloat v);
+	void lightmap(GMfloat u, GMfloat v);
+	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
+	void endFace();
 
 public:
-	//! 释放一个网格数据
-	/*!
-	  将网格所绑定的数据的引用计数减一，如果网格数据引用计数为0，则从GPU中删除顶点数据，并析构此网格数据，且将其置为空。
-	*/
-	void releaseMeshData();
-
-private:
-	inline GMMeshData* getMeshData() { D(d); return d->meshData; }
-	inline const GMMeshData* getMeshData() const { D(d); return d->meshData; }
-	inline void setMeshData(GMMeshData* md);
+	inline GMuint getVerticesPerFace()
+	{
+		D(d);
+		return d->verticesPerFace;
+	}
 };
-
-#define IF_ENABLED(mesh, type) if (!mesh->isDataDisabled(type))
 
 END_NS
 #endif

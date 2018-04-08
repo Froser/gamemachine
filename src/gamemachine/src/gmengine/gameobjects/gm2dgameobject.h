@@ -47,7 +47,7 @@ public:
 private:
 	void constructModel();
 	void updateModel();
-	void createVertices(GMComponent* component);
+	void createVertices(GMMesh* mesh);
 	void onCreateShader(GMShader& shader);
 
 protected:

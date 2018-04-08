@@ -130,29 +130,28 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 
 	GMModel* model = new GMModel();
 	*obj = model;
+	model->setShader(d->shader);
 
-	GMComponent* component = new GMComponent(model->getMesh());
-	component->setShader(d->shader);
-
+	GMMesh* mesh = new GMMesh(model);
 	for (GMuint i = 0; i < 6; i++)
 	{
-		component->beginFace();
-		component->vertex(vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ());
-		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
-		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
-		component->texcoord(uvs[i * 4].getX(), uvs[i * 4].getY());
-		component->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
-		component->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
-		component->endFace();
+		mesh->beginFace();
+		mesh->vertex(vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ());
+		mesh->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
+		mesh->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
+		mesh->texcoord(uvs[i * 4].getX(), uvs[i * 4].getY());
+		mesh->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
+		mesh->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		mesh->endFace();
 
-		component->beginFace();
-		component->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
-		component->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
-		component->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
-		component->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
-		component->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
-		component->texcoord(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
-		component->endFace();
+		mesh->beginFace();
+		mesh->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
+		mesh->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
+		mesh->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
+		mesh->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		mesh->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
+		mesh->texcoord(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
+		mesh->endFace();
 	}
 }
 
