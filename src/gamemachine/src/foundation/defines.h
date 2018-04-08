@@ -199,6 +199,18 @@ inline void GM_delete(T*&& o)
 }
 
 template <typename T>
+inline void GM_delete(Vector<T*>& o)
+{
+	for (auto& obj : o)
+	{
+		GM_delete(obj);
+	}
+#if _DEBUG
+	o.swap(Vector<T*>());
+#endif
+}
+
+template <typename T>
 inline void GM_delete_array(T*& o)
 {
 	if (o)

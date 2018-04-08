@@ -49,8 +49,7 @@ GMGlyphObject::GMGlyphObject(ITypoEngine* typo)
 GMGlyphObject::~GMGlyphObject()
 {
 	D(d);
-	GMModel* m = getModel();
-	GM_delete(m);
+	GM_delete(getModels());
 	if (d->insetTypoEngine)
 		GM_delete(d->typoEngine);
 }
@@ -71,7 +70,7 @@ void GMGlyphObject::constructModel()
 	createVertices(mesh);
 
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, model);
-	setModel(asset);
+	addModel(asset);
 }
 
 void GMGlyphObject::onCreateShader(GMShader& shader)
@@ -91,11 +90,11 @@ void GMGlyphObject::onCreateShader(GMShader& shader)
 void GMGlyphObject::updateModel()
 {
 	D(d);
-	GMMeshes& meshes = getModel()->getMeshes();
+	GMMeshes& meshes = getModels()[0]->getMeshes();
 	GMMesh* mesh = meshes[0];
-	getModel()->releaseModelBuffer();
+	getModels()[0]->releaseModelBuffer();
 	createVertices(mesh);
-	GMModelPainter* painter = getModel()->getPainter();
+	GMModelPainter* painter = getModels()[0]->getPainter();
 	painter->transfer();
 }
 
@@ -415,7 +414,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 				0))
 		);
 		d->objects[i]->onAppendingObjectToWorld();
-		GM.createModelPainterAndTransfer(d->objects[i]->getModel());
+		GM.createModelPainterAndTransfer(d->objects[i]->getModels()[0]);
 	}
 }
 
@@ -472,20 +471,18 @@ void GMImage2DBorder::setRotation(const GMQuat& rotation)
 GMImage2DGameObject::~GMImage2DGameObject()
 {
 	D(d);
-	GM_ASSERT(!getModel());
-
 	GM_delete(d->textModel);
 
 	if (d->background)
 	{
-		GMModel* backgroundModel = d->background->getModel();
+		GMModel* backgroundModel = d->background->getModels()[0];
 		GM_delete(backgroundModel);
 		GM_delete(d->background);
 	}
 
 	if (d->textMask)
 	{
-		GMModel* maskModel = d->textMask->getModel();
+		GMModel* maskModel = d->textMask->getModels()[0];
 		GM_delete(maskModel);
 		GM_delete(d->textMask);
 	}
@@ -625,10 +622,10 @@ void GMImage2DGameObject::createBackgroundImage()
 	createQuadModel(this, &model);
 
 	d->background = new GMControlGameObject();
-	d->background->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	d->background->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 	d->background->setGeometry(getGeometry());
 	d->background->setWorld(getWorld());
-	GM.createModelPainterAndTransfer(d->background->getModel());
+	GM.createModelPainterAndTransfer(d->background->getModels()[0]);
 }
 
 void GMImage2DGameObject::createBorder()
@@ -661,14 +658,14 @@ void GMImage2DGameObject::createGlyphs()
 		GMModel* textMaskModel = nullptr;
 		d->textMask->createQuadModel(nullptr, &textMaskModel);
 		GM_ASSERT(textMaskModel);
-		d->textMask->setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, textMaskModel));
+		d->textMask->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, textMaskModel));
 		GM.createModelPainterAndTransfer(textMaskModel);
 
 		d->textModel->setGeometry(geometry);
 		d->textModel->setWorld(getWorld());
 		d->textModel->setText(d->text);
 		d->textModel->onAppendingObjectToWorld();
-		GM.createModelPainterAndTransfer(d->textModel->getModel());
+		GM.createModelPainterAndTransfer(d->textModel->getModels()[0]);
 		GMAssets::createIsolatedAsset(GMAssetType::Model, d->textModel);
 	}
 }
@@ -720,8 +717,6 @@ void GMListbox2DGameObject::onAppendingObjectToWorld()
 		item->setGeometry(rect);
 		item->setWorld(getWorld());
 		item->onAppendingObjectToWorld();
-		GM.createModelPainterAndTransfer(item->getModel());
-
 		y += rect.height + d->itemMargins[Top] + d->itemMargins[Bottom];
 	}
 }

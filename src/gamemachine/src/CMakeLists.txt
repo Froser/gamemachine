@@ -145,8 +145,6 @@ set(SOURCES
 		extensions/bsp/data/gmbsp_shader_loader.h
 		extensions/bsp/data/gmbsp_shader_loader.cpp
 		extensions/bsp/data/gmbsp_surface_flags.h
-		extensions/bsp/data/bsp_model_loader.h
-		extensions/bsp/data/bsp_model_loader.cpp
 		extensions/bsp/physics/gmbsptrace.h
 		extensions/bsp/physics/gmbsptrace.cpp
 		extensions/bsp/physics/gmbspphysicsworld.h

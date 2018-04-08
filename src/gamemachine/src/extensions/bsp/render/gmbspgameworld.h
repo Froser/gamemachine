@@ -42,7 +42,6 @@ public:
 	void drawPolygonFace(GMint polygonFaceNumber);
 	void drawMeshFace(GMint meshFaceNumber);
 	void drawPatch(GMint patchNumber);
-	void drawEntity(GMint leafId);
 
 private:
 	void clearBuffer();
@@ -70,7 +69,6 @@ private:
 	void prepareMeshFace(GMint meshFaceNumber, GMint drawSurfaceIndex);
 	void preparePatch(GMint patchNumber, GMint drawSurfaceIndex);
 	void prepareEntities();
-	void createEntity(GMBSPEntity* entity);
 	GMint calculateLeafNode(const GMVec3& position);
 
 	// this is usually used by BSPShaderLoader, BSPGameWorldEntityReader, physics world

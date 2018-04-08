@@ -16,7 +16,6 @@ GM_PRIVATE_OBJECT(GMBSPGameWorld)
 	GMBSPPhysicsWorld* physics = nullptr;
 	GMBSPRender render;
 	GMBSPShaderLoader shaderLoader;
-	BSPModelLoader modelLoader;
 	Map<GMint, Set<GMBSPEntity*> > entities;
 	Vector<GMGameObject*> renderBuffer;
 };

@@ -60,12 +60,14 @@ void Demo_Model::init()
 
 	gm::GMModel* model = new gm::GMModel();
 	gm::GMModelReader::load(loadSettings, &model);
-	auto& components = model->getMesh()->getComponents();
-	for (auto& component : components)
-	{
-		component->getShader().getMaterial().refractivity = 0.658f;
-		component->getShader().getMaterial().ka = component->getShader().getMaterial().kd = component->getShader().getMaterial().ks = GMVec3(0);
-	}
+
+	GM_ASSERT(false);
+	//auto& components = model->getMesh()->getComponents();
+	//for (auto& component : components)
+	//{
+		model->getShader().getMaterial().refractivity = 0.658f;
+		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
+	//}
 
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	d->gameObject = new gm::GMGameObject(asset);
@@ -77,15 +79,14 @@ void Demo_Model::init()
 	{
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
-		auto& cubeComponents = cube->getMesh()->getComponents();
 
-		for (auto& component : cubeComponents)
-		{
-			gm::GMShader& shader = component->getShader();
+		//for (auto& component : cubeComponents)
+		//{
+			gm::GMShader& shader = cube->getShader();
 			shader.getMaterial().refractivity = 0.658f;
 			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 			gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
-		}
+		//}
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject2 = new gm::GMGameObject(asset);
@@ -96,16 +97,16 @@ void Demo_Model::init()
 	{
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
-		auto& cubeComponents = cube->getMesh()->getComponents();
+		gm::GMMesh* mesh = new gm::GMMesh(cube);
 		gm::ITexture* texture = nullptr;
 		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
-		for (auto& component : cubeComponents)
-		{
-			gm::GMShader& shader = component->getShader();
+		//for (auto& component : cubeComponents)
+		//{
+			gm::GMShader& shader = cube->getShader();
 			shader.getMaterial().refractivity = 0.658f;
 			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-		}
+		//}
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject3 = new gm::GMGameObject(asset);

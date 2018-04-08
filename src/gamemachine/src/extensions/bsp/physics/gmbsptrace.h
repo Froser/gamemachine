@@ -76,7 +76,6 @@ public:
 	void traceThroughLeaf(GMBSPTraceWork& tw, GMBSPLeaf* leaf);
 	void traceThroughBrush(GMBSPTraceWork& tw, GMBSP_Physics_Brush* brush);
 	void traceThroughPatch(GMBSPTraceWork& tw, GMBSP_Physics_Patch* patch);
-	void traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity*>& entities);
 	void traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide* pc);
 	void tracePointThroughPatchCollide(GMBSPTraceWork& tw, const GMBSPPatchCollide *pc);
 	GMint checkFacetPlane(const GMVec4& plane, const GMVec3& start, const GMVec3& end, GMfloat *enterFrac, GMfloat *leaveFrac, GMint *hit);

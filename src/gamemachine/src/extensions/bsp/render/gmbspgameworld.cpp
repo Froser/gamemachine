@@ -59,15 +59,13 @@ GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min
 	GMModel* obj = nullptr;
 	createSkyBox(&obj);
 	GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, obj);
-	setModel(asset);
+	addModel(asset);
 }
 
 GMBSPSkyGameObject::~GMBSPSkyGameObject()
 {
 	D(d);
-	GMModel* m = getModel();
-	if (m)
-		delete m;
+	GM_delete(getModels());
 }
 
 void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
@@ -177,18 +175,6 @@ inline void drawFaces(
 			if (renderData.faceDirectory[i].faceType == targetType)
 				(world->*handler)(renderData.faceDirectory[i].typeFaceNumber);
 		}
-	}
-}
-
-inline void drawEntities(GMBSPGameWorld* world)
-{
-	BSPData& bsp = world->bspData();
-	GMBSPRenderData& renderData = world->renderData();
-
-	for (GMint i = 0; i < bsp.numleafs; i++)
-	{
-		if (renderData.entitiesToDraw.isSet(i))
-			world->drawEntity(i);
 	}
 }
 
@@ -368,7 +354,6 @@ void GMBSPGameWorld::drawFaces()
 	::drawFaces(this, renderData().polygonIndices, &GMBSPGameWorld::drawPolygonFace, MST_PLANAR);
 	::drawFaces(this, renderData().meshFaceIndices, &GMBSPGameWorld::drawMeshFace, MST_TRIANGLE_SOUP);
 	::drawFaces(this, renderData().patchIndices, &GMBSPGameWorld::drawPatch, MST_PATCH);
-	::drawEntities(this);
 }
 
 void GMBSPGameWorld::clearBuffer()
@@ -533,20 +518,6 @@ void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 	d->renderBuffer.push_back(obj);
 }
 
-void GMBSPGameWorld::drawEntity(GMint leafId)
-{
-	D(d);
-	GMBSPRenderData& rd = d->render.renderData();
-
-	Set<GMBSPEntity*>& entities = d->entities[leafId];
-	std::for_each(entities.begin(), entities.end(), [&rd, &d](GMBSPEntity* e)
-	{
-		GMGameObject* obj = rd.entitiyObjects[e];
-		if (obj)
-			d->renderBuffer.push_back(obj);
-	});
-}
-
 void GMBSPGameWorld::drawAlwaysVisibleObjects()
 {
 	D(d);
@@ -603,21 +574,12 @@ void GMBSPGameWorld::importBSP()
 {
 	D(d);
 	d->render.generateRenderData(&d->bsp.bspData());
-	initModels();
 	initShaders();
 	initLightmaps();
 	initTextures();
 	prepareFaces();
 	prepareEntities();
 	d->physics->initBSPPhysicsWorld();
-}
-
-void GMBSPGameWorld::initModels()
-{
-	D(d);
-	GMString modelPath = GM.getGamePackageManager()->pathOf(GMPackageIndex::Models, "");
-	d->modelLoader.init(modelPath, this);
-	d->modelLoader.load();
 }
 
 void GMBSPGameWorld::initShaders()
@@ -751,96 +713,7 @@ void GMBSPGameWorld::prepareEntities()
 		BSPGameWorldEntityReader::import(*entity, this);
 		GMint leaf = calculateLeafNode(MakeVector3(entity->origin));
 		d->entities[leaf].insert(entity);
-		createEntity(entity);
 	}
-}
-
-void GMBSPGameWorld::createEntity(GMBSPEntity* entity)
-{
-	D(d);
-	D_BASE(db, GMGameWorld);
-
-	GMBSPEPair* p = entity->epairs;
-	GMString classname;
-	while (p)
-	{
-		if (p->key == "classname")
-			classname = p->value;
-		p = p->next;
-	}
-
-	Model* m = d->modelLoader.find(classname);
-	if (!m)
-	{
-		gm_info("model '%s' is not defined in model list, skipped.", classname.toStdString().c_str());
-		return;
-	}
-
-	// 不创建这个实体
-	if (!m->create)
-		return;
-
-	GMBSPRenderData& rd = d->render.renderData();
-
-	GM_ASSERT(rd.entitiyObjects.find(entity) == rd.entitiyObjects.end());
-	GMAssets& rc = getAssets();
-	GMEntityObject* entityObject = nullptr;
-	GMModel* model = nullptr;
-	if (!strlen(m->model))
-	{
-		// 如果没有指定model，先创建一个默认的立方体model吧
-		GMShader shader;
-		//if (!setMaterialTexture(meshFace, shader))
-		//{
-		//	gm_warning("mesh: %d texture missing.", meshFaceNumber);
-		//	return;
-		//}
-		//setMaterialLightmap(meshFace.lightmapIndex, shader);
-		gm_warning("No model selected. Create a default cube instead.");
-		d->render.createBox(m->extents, MakeVector3(entity->origin), shader, &model);
-		GMAsset asset = getAssets().insertAsset(GMAssetType::Model, model);
-		entityObject = new GMEntityObject(asset);
-	}
-	else
-	{
-		GMBuffer buf;
-		GMString fn(m->model);
-		fn.append("/");
-		fn.append(m->model);
-		fn.append(".obj");
-
-		GMAssets& assets = getAssets();
-		GMAssetsNode* node = assets.getNodeFromPath(GMAssets::combinePath({ GM_ASSET_MODELS, fn }).toStdString().c_str());
-		GMAsset asset;
-		if (node)
-		{
-			asset = node->asset;
-		}
-		else
-		{
-			GMGamePackage& pk = *GM.getGamePackageManager();
-			GMString path = pk.pathOf(GMPackageIndex::Models, fn);
-			GMModelLoadSettings settings(
-				fn,
-				m->model
-			);
-
-			if (!GMModelReader::load(settings, &model))
-			{
-				gm_warning(L"parse model file failed.");
-				return;
-			}
-
-			asset = assets.insertAsset(GM_ASSET_MODELS, GMString(fn), GMAssetType::Model, model);
-		}
-		entityObject = new GMEntityObject(asset);
-		entityObject->setTranslation(Translate(MakeVector3(entity->origin)));
-		entityObject->setScaling(Scale(m->extents));
-	}
-
-	GM_ASSERT(entityObject);
-	rd.entitiyObjects[entity] = entityObject;
-	addObjectAndInit(entityObject);
 }
 
 BSPData& GMBSPGameWorld::bspData()

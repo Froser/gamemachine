@@ -8,7 +8,7 @@
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
-	setModel(asset);
+	addModel(asset);
 	updateMatrix();
 }
 
@@ -18,18 +18,18 @@ GMGameObject::~GMGameObject()
 	GM_delete(d->physics);
 }
 
-void GMGameObject::setModel(GMAsset asset)
+void GMGameObject::addModel(GMAsset asset)
 {
 	D(d);
 	GMModel* model = GMAssets::getModel(asset);
 	GM_ASSERT(model);
-	d->model = model;
+	d->models.push_back(model);
 }
 
-GMModel* GMGameObject::getModel()
+GMModels& GMGameObject::getModels()
 {
 	D(d);
-	return d->model;
+	return d->models;
 }
 
 void GMGameObject::setWorld(GMGameWorld* world)
@@ -47,9 +47,11 @@ GMGameWorld* GMGameObject::getWorld()
 
 void GMGameObject::draw()
 {
-	GMModel* model = getModel();
-	if (model)
+	GMModels models = getModels();
+	for (auto& model : models)
+	{
 		model->getPainter()->draw(this);
+	}
 }
 
 bool GMGameObject::canDeferredRendering()
@@ -61,71 +63,6 @@ bool GMGameObject::canDeferredRendering()
 	return d->canDeferredRendering;
 }
 
-//GMEntityObject
-GMEntityObject::GMEntityObject(GMAsset asset)
-	: GMGameObject(asset)
-{
-	calc();
-}
-
-GMPlane* GMEntityObject::getPlanes()
-{
-	D(d);
-	return d->planes;
-}
-
-void GMEntityObject::getBounds(REF GMVec3& mins, REF GMVec3& maxs)
-{
-	D(d);
-	mins = d->mins;
-	maxs = d->maxs;
-}
-
-void GMEntityObject::calc()
-{
-	D(d);
-	d->mins = GMVec3(999999.f);
-	d->maxs = -d->mins;
-
-	GMFloat4 f4_mins, f4_maxs;
-	d->mins.loadFloat4(f4_mins);
-	d->maxs.loadFloat4(f4_maxs);
-
-	GMMesh* mesh = new GMMesh(getModel());
-	GMModel::DataType* vertices = mesh->positions().data();
-	GMint sz = mesh->positions().size();
-	for (GMint i = 0; i < sz; i += 4)
-	{
-		for (GMint j = 0; j < 3; j++)
-		{
-			if (vertices[i + j] < f4_mins[j])
-				f4_mins[j] = vertices[i + j];
-			if (vertices[i + j] > f4_maxs[j])
-				f4_maxs[j] = vertices[i + j];
-		}
-	}
-	d->mins.setFloat4(f4_mins);
-	d->maxs.setFloat4(f4_maxs);
-	makePlanes();
-}
-
-void GMEntityObject::makePlanes()
-{
-	D(d);
-	// 前
-	d->planes[0] = GMPlane(GMVec3(0, 0, 1), -d->maxs.getZ());
-	// 后
-	d->planes[1] = GMPlane(GMVec3(0, 0, -1), d->mins.getZ());
-	// 左
-	d->planes[2] = GMPlane(GMVec3(-1, 0, 0), d->mins.getX());
-	// 右
-	d->planes[3] = GMPlane(GMVec3(1, 0, 0), -d->maxs.getX());
-	// 上
-	d->planes[4] = GMPlane(GMVec3(0, 1, 0), -d->maxs.getY());
-	// 下
-	d->planes[5] = GMPlane(GMVec3(0, -1, 0), d->mins.getY());
-}
-
 GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
 {
 	createCubeMap(texture);
@@ -134,7 +71,7 @@ GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)
 GMCubeMapGameObject::~GMCubeMapGameObject()
 {
 	deactivate();
-	GM_delete(getModel());
+	GM_delete(getModels());
 }
 
 void GMCubeMapGameObject::deactivate()
@@ -216,7 +153,7 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 		mesh->endFace();
 	}
 
-	setModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
+	addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 }
 
 bool GMCubeMapGameObject::canDeferredRendering()

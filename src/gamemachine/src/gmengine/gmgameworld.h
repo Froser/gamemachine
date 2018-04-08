@@ -27,8 +27,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 class GMGameWorld : public GMObject
 {
 	DECLARE_PRIVATE(GMGameWorld)
-
-	friend class GMPhysicsWorld;
+	GM_FRIEND_CLASS(GMPhysicsWorld)
 
 public:
 	GMGameWorld() = default;
@@ -55,7 +54,6 @@ public:
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 private:
-	GMModelPainter* createPainterForObject(GMGameObject* obj);
 	void simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects);
 
 	// GMPhysicsWorld

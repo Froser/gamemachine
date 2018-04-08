@@ -8,12 +8,14 @@
 
 BEGIN_NS
 
+typedef Vector<GMModel*> GMModels;
+
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
 	GMPhysicsObject* physics = nullptr;
 	GMGameWorld* world = nullptr;
-	GMModel* model = nullptr;
+	GMModels models;
 	GMMat4 scaling = Identity<GMMat4>();
 	GMMat4 translation = Identity<GMMat4>();
 	GMQuat rotation = Identity<GMQuat>();
@@ -43,8 +45,8 @@ public:
 	~GMGameObject();
 
 public:
-	void setModel(GMAsset asset);
-	GMModel* getModel();
+	void addModel(GMAsset asset);
+	GMModels& getModels();
 
 	virtual void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
@@ -84,33 +86,6 @@ public:
 		D(d);
 		d->forceDisableDeferredRendering = true;
 	}
-};
-
-//GMEntityObject
-enum { EntityPlaneNum = 6 };
-
-GM_PRIVATE_OBJECT(GMEntityObject)
-{
-	GMVec3 mins, maxs;
-	GMPlane planes[EntityPlaneNum];
-};
-
-class GMEntityObject : public GMGameObject
-{
-	DECLARE_PRIVATE_AND_BASE(GMEntityObject, GMGameObject)
-
-public:
-	GMEntityObject(GMAsset asset);
-
-public:
-	virtual GMGameObjectType getType() { return GMGameObjectType::Entity; }
-
-	GMPlane* getPlanes();
-	void getBounds(REF GMVec3& mins, REF GMVec3& maxs);
-
-private:
-	void calc();
-	void makePlanes();
 };
 
 // GMSkyObject

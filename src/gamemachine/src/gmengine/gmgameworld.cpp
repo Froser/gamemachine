@@ -14,13 +14,13 @@ GMGameWorld::~GMGameWorld()
 	{
 		for (auto gameObject : types.second)
 		{
-			delete gameObject;
+			GM_delete(gameObject);
 		}
 	}
 
 	for (auto control : d->controls)
 	{
-		delete control;
+		GM_delete(control);
 	}
 
 	GM_delete(d->physicsWorld);
@@ -32,7 +32,11 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
 	d->gameObjects[obj->getType()].insert(obj);
-	GM.createModelPainterAndTransfer(obj->getModel());
+	GMModels& models = obj->getModels();
+	for (auto& model : models)
+	{
+		GM.createModelPainterAndTransfer(model);
+	}
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
@@ -68,7 +72,6 @@ void GMGameWorld::addControl(GMControlGameObject* control)
 	control->onAppendingObjectToWorld();
 	d->controls.push_back(control);
 	d->controls_objectType.push_back(control);
-	GM.createModelPainterAndTransfer(control->getModel());
 }
 
 void GMGameWorld::notifyControls()
@@ -78,18 +81,6 @@ void GMGameWorld::notifyControls()
 	{
 		obj->notifyControl();
 	}
-}
-
-GMModelPainter* GMGameWorld::createPainterForObject(GMGameObject* obj)
-{
-	D(d);
-	IFactory* factory = GM.getFactory();
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	GMModelPainter* painter;
-	factory->createPainter(engine, obj->getModel(), &painter);
-	GM_ASSERT(!obj->getModel()->getPainter());
-	obj->getModel()->setPainter(painter);
-	return painter;
 }
 
 void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects)

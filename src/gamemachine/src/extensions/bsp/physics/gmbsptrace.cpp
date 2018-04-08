@@ -216,7 +216,6 @@ void GMBSPTrace::traceThroughTree(GMBSPTraceWork& tw, GMint num, GMfloat p1f, GM
 	if (num < 0)
 	{
 		traceThroughLeaf(tw, &bsp.leafs[~num]);
-		traceEntityThroughLeaf(tw, (*d->entities)[~num]);
 		return;
 	}
 
@@ -511,31 +510,6 @@ void GMBSPTrace::traceThroughPatchCollide(GMBSPTraceWork& tw, GMBSPPatchCollide*
 				tw.trace.fraction = enterFrac;
 				tw.trace.plane.normal = MakeVector3(bestplane);
 				tw.trace.plane.intercept = bestplane.getW();
-			}
-		}
-	}
-}
-
-void GMBSPTrace::traceEntityThroughLeaf(GMBSPTraceWork& tw, std::set<GMBSPEntity*>& entities)
-{
-	D(d);
-	tw.trace.entityNum = 0;
-	for (auto entity : entities)
-	{
-		auto objIter = (d->entityObjects->find(entity));
-		if (objIter != d->entityObjects->end())
-		{
-			GMEntityObject* obj = objIter->second;
-			if (!obj)
-				continue;
-
-			for (GMint i = 0; i < EntityPlaneNum; i++)
-			{
-				// 首先判断起点和终点是否在AABB中，如果没有，肯定没有接触到entity
-				GMVec3 mins, maxs;
-				obj->getBounds(mins, maxs);
-				if (!boundsIntersect(tw.bounds[0], tw.bounds[1], mins, maxs))
-					continue;
 			}
 		}
 	}
