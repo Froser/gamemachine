@@ -46,12 +46,12 @@ GMModelReader::ModelType GMModelReader::test(const GMBuffer& buffer)
 	return ModelType_End;
 }
 
-bool GMModelReader::load(const GMModelLoadSettings& settings, OUT GMModel** object)
+bool GMModelReader::load(const GMModelLoadSettings& settings, OUT GMModels** models)
 {
-	return load(settings, ModelType_AUTO, object);
+	return load(settings, ModelType_AUTO, models);
 }
 
-bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT GMModel** object)
+bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OUT GMModels** models)
 {
 	GMBuffer buffer;
 	if (settings.type == GMModelPathType::Relative)
@@ -65,5 +65,5 @@ bool GMModelReader::load(const GMModelLoadSettings& settings, ModelType type, OU
 	if (type == ModelType_End)
 		return false;
 
-	return getReader(type)->load(settings, buffer, object);
+	return getReader(type)->load(settings, buffer, models);
 }

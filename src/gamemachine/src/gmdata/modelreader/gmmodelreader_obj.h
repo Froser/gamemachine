@@ -5,6 +5,7 @@
 #include <linearmath.h>
 #include <map>
 #include "foundation/vector.h"
+#include <gmgameobject.h>
 
 BEGIN_NS
 
@@ -22,13 +23,13 @@ class GMScanner;
 class GMMesh;
 GM_PRIVATE_OBJECT(GMModelReader_Obj)
 {
-	GMModel* model = nullptr;
+	GMModels* models = nullptr;
 	AlignedVector<GMVec3> positions;
 	AlignedVector<GMVec3> normals;
 	AlignedVector<GMVec2> textures;
 	Map<GMString, ModelReader_Obj_Material> materials;
 	GMString currentMaterialName;
-	GMMesh* currentMesh;
+	GMModel* currentModel;
 };
 
 // 一个Obj文件只由一个部分组成，不存在骨骼等动画，是刚体静态的
@@ -41,7 +42,7 @@ public:
 	~GMModelReader_Obj();
 
 public:
-	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModel** object) override;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models) override;
 	virtual bool test(const GMBuffer& buffer) override;
 
 private:

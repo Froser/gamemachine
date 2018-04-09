@@ -60,6 +60,9 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 
 void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
 {
+	if (GM_material.refractivity == 0.f)
+		return;
+
 	vec3 I = normalize((_model3d_position_world - GM_view_position).rgb);
 	vec3 R = refract(I, normal_world, GM_material.refractivity);
 	g_model3d_refractionLight += texture(GM_cubemap, vec3(R.x, R.y, R.z)).rgb;
@@ -67,6 +70,9 @@ void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
 
 void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 {
+	if (GM_material.refractivity == 0.f)
+		return;
+	
 	// 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
 	vec3 normal_world = (GM_inverse_view_matrix * vec4(inverse(TBN) * normal_tangent, 0)).rgb;
 	model3d_calculateRefractionByNormalWorld(normal_world);

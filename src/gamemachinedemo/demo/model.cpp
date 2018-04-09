@@ -58,18 +58,16 @@ void Demo_Model::init()
 		"cat"
 	);
 
-	gm::GMModel* model = new gm::GMModel();
-	gm::GMModelReader::load(loadSettings, &model);
+	gm::GMModels* models = new gm::GMModels();
+	gm::GMModelReader::load(loadSettings, &models);
 
-	GM_ASSERT(false);
-	//auto& components = model->getMesh()->getComponents();
-	//for (auto& component : components)
-	//{
+	for (auto& model : *models)
+	{
 		model->getShader().getMaterial().refractivity = 0.658f;
-		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
-	//}
+		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(.7f);
+	}
 
-	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
+	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, models);
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setTranslation(Translate(GMVec3(0.f, .25f, 0)));
 	d->gameObject->setScaling(Scale(GMVec3(.015f, .015f, .015f)));
@@ -80,13 +78,10 @@ void Demo_Model::init()
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
 
-		//for (auto& component : cubeComponents)
-		//{
-			gm::GMShader& shader = cube->getShader();
-			shader.getMaterial().refractivity = 0.658f;
-			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-			gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
-		//}
+		gm::GMShader& shader = cube->getShader();
+		shader.getMaterial().refractivity = 0.658f;
+		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject2 = new gm::GMGameObject(asset);
@@ -101,12 +96,9 @@ void Demo_Model::init()
 		gm::ITexture* texture = nullptr;
 		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
-		//for (auto& component : cubeComponents)
-		//{
-			gm::GMShader& shader = cube->getShader();
-			shader.getMaterial().refractivity = 0.658f;
-			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-		//}
+		gm::GMShader& shader = cube->getShader();
+		shader.getMaterial().refractivity = 0.658f;
+		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject3 = new gm::GMGameObject(asset);
@@ -118,9 +110,9 @@ void Demo_Model::init()
 	d->skyObject = createCubeMap();
 	d->skyObject->setScaling(Scale(GMVec3(100, 100, 100)));
 
-	d->demoWorld->addObject("baymax", d->gameObject);
-	d->demoWorld->addObject("cube", d->gameObject2);
-	d->demoWorld->addObject("cube_with_normalmap", d->gameObject3);
+	//d->demoWorld->addObject("cat", d->gameObject);
+	d->demoWorld->addObject("cube_with_normalmap", d->gameObject2);
+	d->demoWorld->addObject("cube", d->gameObject3);
 	d->demoWorld->addObject("sky", d->skyObject);
 }
 
@@ -284,7 +276,7 @@ void Demo_Model::setDefaultLights()
 	{
 		{
 			gm::GMLight light(gm::GMLightType::SPECULAR);
-			gm::GMfloat lightPos[] = { .7f, .7f, .7f };
+			gm::GMfloat lightPos[] = { .7f, .7f, -.7f };
 			light.setLightPosition(lightPos);
 			gm::GMfloat color[] = { .7f, .7f, .7f };
 			light.setLightColor(color);

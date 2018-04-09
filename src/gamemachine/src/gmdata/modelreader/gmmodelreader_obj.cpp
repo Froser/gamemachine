@@ -82,15 +82,15 @@ GMModelReader_Obj::~GMModelReader_Obj()
 void GMModelReader_Obj::init()
 {
 	D(d);
-	d->model = nullptr;
-	d->currentMesh = nullptr;
+	d->models = nullptr;
+	d->currentModel = nullptr;
 	d->positions.clear();
 	d->normals.clear();
 	d->textures.clear();
 	d->materials.clear();
 }
 
-bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModel** object)
+bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models)
 {
 	D(d);
 	init();
@@ -98,7 +98,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 	buffer.convertToStringBuffer();
 	GMString text((char*)buffer.buffer);
 	StringReader<GMwchar> sr(text.c_str());
-	d->model = new GMModel();
+	d->models = new GMModels();
 
 	// 事先分配一些内存，提高效率
 	d->positions.reserve(RESERVED);
@@ -145,7 +145,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 			GMString name;
 			s.next(name);
 			d->currentMaterialName = name;
-			d->currentMesh = nullptr;
+			d->currentModel = nullptr;
 		}
 		else if (token == L"f")
 		{
@@ -154,7 +154,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		}
 	}
 
-	*object = d->model;
+	*models = d->models;
 	return true;
 }
 
@@ -167,20 +167,24 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 {
 	D(d);
 	const ModelReader_Obj_Material& material = d->materials[d->currentMaterialName];
-	d->model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 
-	if (!d->currentMesh)
+	if (!d->currentModel)
 	{
-		d->currentMesh = new GMMesh(d->model);
-		GM_ASSERT(false); //TODO
-		applyMaterial(material, d->model->getShader());
+		d->currentModel = new GMModel();
+		d->models->push_back(d->currentModel);
+		new GMMesh(d->currentModel);
+
+		d->currentModel->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+		applyMaterial(material, d->currentModel->getShader());
 	}
 
 	GMint verticesCount = 0;
 	GMFloat4 firstVertex, firstNormal, firstTexcoord;
 	GMFloat4 lastVertex, lastNormal, lastTexcoord;
 	GMString face;
-	d->currentMesh->beginFace();
+	GMMesh* currentMesh = d->currentModel->getMeshes().front();
+	GM_ASSERT(currentMesh);
+	currentMesh->beginFace();
 	while (true)
 	{
 		scanner.next(face);
@@ -200,13 +204,13 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 			if (verticesCount >= 3)
 			{
 				// 如果大于三个顶点组成的多边形，需要补入第一个顶点和上一个顶点，形成闭环，下同
-				d->currentMesh->vertex(firstVertex[0], firstVertex[1], firstVertex[2]);
-				d->currentMesh->vertex(lastVertex[0], lastVertex[1], lastVertex[2]);
+				currentMesh->vertex(firstVertex[0], firstVertex[1], firstVertex[2]);
+				currentMesh->vertex(lastVertex[0], lastVertex[1], lastVertex[2]);
 			}
 
 			auto& vec = d->positions[v - 1];
 			vec.loadFloat4(f4_vec);
-			d->currentMesh->vertex(f4_vec[0], f4_vec[1], f4_vec[2]);
+			currentMesh->vertex(f4_vec[0], f4_vec[1], f4_vec[2]);
 
 			if (!verticesCount)
 				firstVertex = f4_vec;
@@ -216,13 +220,13 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 		{
 			if (verticesCount >= 3)
 			{
-				d->currentMesh->texcoord(firstTexcoord[0], firstTexcoord[1]);
-				d->currentMesh->texcoord(lastTexcoord[0], lastTexcoord[1]);
+				currentMesh->texcoord(firstTexcoord[0], firstTexcoord[1]);
+				currentMesh->texcoord(lastTexcoord[0], lastTexcoord[1]);
 			}
 
 			auto&& vec = t != INVALID ? d->textures[t - 1] : GMVec2(0, 0);
 			vec.loadFloat4(f4_vec);
-			d->currentMesh->texcoord(f4_vec[0], f4_vec[1]);
+			currentMesh->texcoord(f4_vec[0], f4_vec[1]);
 
 			if (!verticesCount)
 				firstTexcoord = f4_vec;
@@ -233,13 +237,13 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 		{
 			if (verticesCount >= 3)
 			{
-				d->currentMesh->normal(firstNormal[0], firstNormal[1], firstNormal[2]);
-				d->currentMesh->normal(lastNormal[0], lastNormal[1], lastNormal[2]);
+				currentMesh->normal(firstNormal[0], firstNormal[1], firstNormal[2]);
+				currentMesh->normal(lastNormal[0], lastNormal[1], lastNormal[2]);
 			}
 
 			auto& vec = d->normals[n - 1];
 			vec.loadFloat4(f4_vec);
-			d->currentMesh->normal(f4_vec[0], f4_vec[1], f4_vec[2]);
+			currentMesh->normal(f4_vec[0], f4_vec[1], f4_vec[2]);
 
 			if (!verticesCount)
 				firstNormal = f4_vec;
@@ -251,7 +255,7 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 	// 这里其实有优化的余地
 	// 如果恰好是4个顶点，可以不采用Triangles(Triangle List)的拓扑，而是使用Triangle Stripe，将第一个顶点插入。
 
-	d->currentMesh->endFace();
+	currentMesh->endFace();
 }
 
 void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const GMString& mtlFilename)

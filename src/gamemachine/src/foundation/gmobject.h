@@ -166,7 +166,7 @@ struct GMConnectionTarget
 };
 using GMConnectionTargets = Vector<GMConnectionTarget>;
 
-using GMEvents = UnorderedMap<GMEventName, Vector<GMCallbackTarget>>;
+using GMEvents = HashMap<GMEventName, Vector<GMCallbackTarget>>;
 
 #define GM_BEGIN_META_MAP \
 	protected: \

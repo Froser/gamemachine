@@ -8,8 +8,6 @@
 
 BEGIN_NS
 
-typedef Vector<GMModel*> GMModels;
-
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
@@ -45,7 +43,7 @@ public:
 	~GMGameObject();
 
 public:
-	void addModel(GMAsset asset);
+	void addModel(GMAsset asset, bool replace = false);
 	GMModels& getModels();
 
 	virtual void setWorld(GMGameWorld* world);

@@ -8,7 +8,7 @@
 GMGameObject::GMGameObject(GMAsset asset)
 	: GMGameObject()
 {
-	addModel(asset);
+	addModel(asset, true);
 	updateMatrix();
 }
 
@@ -18,12 +18,30 @@ GMGameObject::~GMGameObject()
 	GM_delete(d->physics);
 }
 
-void GMGameObject::addModel(GMAsset asset)
+void GMGameObject::addModel(GMAsset asset, bool replace)
 {
 	D(d);
-	GMModel* model = GMAssets::getModel(asset);
-	GM_ASSERT(model);
-	d->models.push_back(model);
+	GMModels* models = GMAssets::getModels(asset);
+	if (models)
+	{
+		if (replace)
+		{
+			d->models.swap(*models);
+		}
+		else
+		{
+			for (auto& model : *models)
+			{
+				d->models.push_back(model);
+			}
+		}
+	}
+	else
+	{
+		GMModel* model = GMAssets::getModel(asset);
+		GM_ASSERT(model);
+		d->models.push_back(model);
+	}
 }
 
 GMModels& GMGameObject::getModels()

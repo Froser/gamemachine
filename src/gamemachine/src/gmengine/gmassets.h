@@ -20,6 +20,7 @@ enum class GMAssetType
 	None, //!< 无类型，绝对不会用到
 	Texture, //!< 纹理贴图类型
 	Model, //!< 模型类型
+	Models, //!< 一组模型类型
 	PhysicsShape, //!< 物理形状类型
 };
 
@@ -68,6 +69,7 @@ public:
 public:
 	ASSET_GETTER(ITexture*, getTexture, GMAssetType::Texture);
 	ASSET_GETTER(GMModel*, getModel, GMAssetType::Model);
+	ASSET_GETTER(GMModels*, getModels, GMAssetType::Models);
 	ASSET_GETTER(GMPhysicsShape*, getPhysicsShape, GMAssetType::PhysicsShape);
 
 public:

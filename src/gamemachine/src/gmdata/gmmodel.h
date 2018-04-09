@@ -277,6 +277,8 @@ public:
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
 	inline auto& name() { D(d); return d->name; }
 
+typedef Vector<GMModel*> GMModels;
+
 GM_PRIVATE_OBJECT(GMMesh)
 {
 	GM_DEFINE_VERTEX_DATA(positions);

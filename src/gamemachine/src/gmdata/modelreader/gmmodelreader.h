@@ -2,6 +2,7 @@
 #define __MODELREADER_H__
 #include <gmcommon.h>
 #include <linearmath.h>
+#include <gmgameobject.h>
 BEGIN_NS
 
 class GMModel;
@@ -10,7 +11,7 @@ struct GMModelLoadSettings;
 GM_INTERFACE(IModelReader)
 {
 	virtual ~IModelReader() {}
-	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModel** object) = 0;
+	virtual bool load(const GMModelLoadSettings& settings, GMBuffer& buffer, OUT GMModels** models) = 0;
 	virtual bool test(const GMBuffer& buffer) = 0;
 };
 
@@ -60,8 +61,8 @@ public:
 	};
 
 public:
-	static bool load(const GMModelLoadSettings& settings, OUT GMModel** object);
-	static bool load(const GMModelLoadSettings& settings, ModelType type, OUT GMModel** object);
+	static bool load(const GMModelLoadSettings& settings, OUT GMModels** models);
+	static bool load(const GMModelLoadSettings& settings, ModelType type, OUT GMModels** models);
 	static IModelReader* getReader(ModelType type);
 
 private:

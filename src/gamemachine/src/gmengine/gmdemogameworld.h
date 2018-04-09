@@ -9,7 +9,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDemoGameWorld)
 {
-	Map<GMString, GMGameObject*> renderList;
+	HashMap<GMString, GMGameObject*, GMStringHashFunctor> renderList;
 	Map<const GMGameObject*, GMString> renderListInv;
 	Vector<GMGameObject*> gameObjects;
 };

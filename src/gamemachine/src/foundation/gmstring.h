@@ -350,6 +350,14 @@ public:
 	static GMint parseInt(const GMString& i, bool* ok = nullptr);
 };
 
+struct GMStringHashFunctor
+{
+	size_t operator()(const GMString& str) const
+	{
+		return std::hash_value(str.toStdWString());
+	}
+};
+
 inline GMString operator +(const GMString& left, const GMString& right)
 {
 	return left.data()->data + right.data()->data;

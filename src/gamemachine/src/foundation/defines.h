@@ -41,8 +41,8 @@ using Array = std::array<T, size>;
 template <typename T>
 using Hash = std::hash<T>;
 
-template <typename T1, typename T2>
-using UnorderedMap = std::unordered_map<T1, T2>;
+template <typename T1, typename T2, typename Hasher = Hash<T1>>
+using HashMap = std::unordered_map<T1, T2, Hasher>;
 
 template <typename T>
 using Stack = std::stack<T>;
