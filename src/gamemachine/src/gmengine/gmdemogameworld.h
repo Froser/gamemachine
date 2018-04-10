@@ -20,6 +20,7 @@ class GMDemoGameWorld : public GMGameWorld
 
 public:
 	GMDemoGameWorld();
+	~GMDemoGameWorld();
 
 public:
 	virtual void renderScene() override;

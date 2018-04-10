@@ -64,7 +64,7 @@ void Demo_Model::init()
 	for (auto& model : *models)
 	{
 		model->getShader().getMaterial().refractivity = 0.658f;
-		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(.7f);
+		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
 	}
 
 	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, models);
@@ -75,32 +75,37 @@ void Demo_Model::init()
 
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
-		gm::GMModel* cube = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
+		gm::GMModels* cubes = nullptr;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cubes, nullptr);
 
-		gm::GMShader& shader = cube->getShader();
-		shader.getMaterial().refractivity = 0.658f;
-		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
+		for (auto& cube : *cubes)
+		{
+			gm::GMShader& shader = cube->getShader();
+			shader.getMaterial().refractivity = 0.658f;
+			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+			gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
+		}
 
-		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, cubes);
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
 		d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 	{
-		gm::GMModel* cube = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cube, nullptr);
-		gm::GMMesh* mesh = new gm::GMMesh(cube);
+		gm::GMModels* cubes = nullptr;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cubes, nullptr);
 		gm::ITexture* texture = nullptr;
 		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
-		gm::GMShader& shader = cube->getShader();
-		shader.getMaterial().refractivity = 0.658f;
-		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+		for (auto& cube : *cubes)
+		{
+			gm::GMShader& shader = cube->getShader();
+			shader.getMaterial().refractivity = 0.658f;
+			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+		}
 
-		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, cubes);
 		d->gameObject3 = new gm::GMGameObject(asset);
 		d->gameObject3->setTranslation(Translate(GMVec3(0.25f, .25f, 0)));
 		d->gameObject3->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
@@ -110,7 +115,7 @@ void Demo_Model::init()
 	d->skyObject = createCubeMap();
 	d->skyObject->setScaling(Scale(GMVec3(100, 100, 100)));
 
-	//d->demoWorld->addObject("cat", d->gameObject);
+	d->demoWorld->addObject("cat", d->gameObject);
 	d->demoWorld->addObject("cube_with_normalmap", d->gameObject2);
 	d->demoWorld->addObject("cube", d->gameObject3);
 	d->demoWorld->addObject("sky", d->skyObject);

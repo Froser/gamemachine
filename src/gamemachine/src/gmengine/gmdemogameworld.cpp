@@ -8,6 +8,12 @@ GMDemoGameWorld::GMDemoGameWorld()
 {
 }
 
+GMDemoGameWorld::~GMDemoGameWorld()
+{
+	D(d);
+	GMClearSTLContainer(d->renderList);
+}
+
 void GMDemoGameWorld::renderScene()
 {
 	D(d);

@@ -56,6 +56,14 @@ using Deque = std::deque<T>;
 template <typename... T>
 using Tuple = std::tuple<T...>;
 
+template <typename T>
+void GMClearSTLContainer(T& c)
+{
+	T empty;
+	using std::swap;
+	swap(c, empty);
+}
+
 /* 工程编译选项 */
 // 一定会使用使用OpenGL
 #ifndef GM_USE_OPENGL

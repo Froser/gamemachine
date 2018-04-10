@@ -14,7 +14,7 @@ GMfloat* GMPrimitiveCreator::origin()
 	return o;
 }
 
-void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type)
+void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModels** out, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type)
 {
 	static constexpr GMfloat v[24] = {
 		-1, 1, -1,
@@ -55,7 +55,7 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 		4, 6, 2,
 	};
 
-	GMModel* model = new GMModel();
+	GMModels* models = new GMModels();
 
 	// 实体
 	GMfloat t[24];
@@ -65,12 +65,14 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 	}
 
 	{
-		model->setType(type);
-		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-		GMMesh* body = new GMMesh(model);
 		GMFloat4 f4_vertex, f4_normal;
 		for (GMint i = 0; i < 12; ++i)
 		{
+			GMModel* model = new GMModel();
+			models->push_back(model);
+			GMMesh* body = new GMMesh(model);
+			model->setType(type);
+			model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 			body->beginFace();
 			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
@@ -91,12 +93,12 @@ void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModel** obj, IPrim
 				body->color(1.f, 1.f, 1.f);
 			}
 			body->endFace();
+			if (shaderCallback)
+				shaderCallback->onCreateShader(model->getShader());
 		}
-		if (shaderCallback)
-			shaderCallback->onCreateShader(model->getShader());
 	}
 
-	*obj = model;
+	*out = models;
 }
 
 void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])

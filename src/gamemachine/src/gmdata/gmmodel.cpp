@@ -5,7 +5,6 @@
 #include <iterator>
 #include "foundation/gamemachine.h"
 
-#define CLEAR_VECTOR(v) v.swap(decltype(v)());
 #define SAFE_ASSIGN(mb, df, pos) ((pos) >= (mb).size()) ? df : (mb[pos])
 #define VERTEX_OFFSET(offset, idx) ((offset * GMVertex::PositionDimension) + idx)
 #define UV_OFFSET(offset, idx) ((offset << 1) + idx)
@@ -119,6 +118,7 @@ GMModel::GMModel(GMModel& model)
 GMModel::~GMModel()
 {
 	D(d);
+	releaseModelBuffer();
 	for (auto& mesh : d->meshes)
 	{
 		GM_delete(mesh);
@@ -132,16 +132,18 @@ void GMModel::setModelBuffer(AUTORELEASE GMModelBuffer* mb)
 	{
 		releaseModelBuffer();
 		d->modelBuffer = mb;
-		mb->addRef();
 	}
 }
 
 void GMModel::releaseModelBuffer()
 {
 	D(d);
-	d->modelBuffer->releaseRef();
-	if (d->modelBuffer->hasNoRef())
-		GM_delete(d->modelBuffer);
+	if (d->modelBuffer)
+	{
+		d->modelBuffer->releaseRef();
+		if (d->modelBuffer->hasNoRef())
+			GM_delete(d->modelBuffer);
+	}
 }
 
 GMModelBuffer::GMModelBuffer()
@@ -172,13 +174,13 @@ void GMMesh::clear()
 {
 	D(d);
 	d->currentFaceVerticesCount = 0;
-	CLEAR_VECTOR(d->positions);
-	CLEAR_VECTOR(d->normals);
-	CLEAR_VECTOR(d->texcoords);
-	CLEAR_VECTOR(d->tangents);
-	CLEAR_VECTOR(d->bitangents);
-	CLEAR_VECTOR(d->lightmaps);
-	CLEAR_VECTOR(d->colors);
+	GMClearSTLContainer(d->positions);
+	GMClearSTLContainer(d->normals);
+	GMClearSTLContainer(d->texcoords);
+	GMClearSTLContainer(d->tangents);
+	GMClearSTLContainer(d->bitangents);
+	GMClearSTLContainer(d->lightmaps);
+	GMClearSTLContainer(d->colors);
 }
 
 void GMMesh::beginFace()

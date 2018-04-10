@@ -108,6 +108,8 @@ void GMObject::releaseEvents()
 			conns.host->removeEvent(conns.name, *this);
 		}
 	}
+
+	GMClearSTLContainer(d->events);
 }
 
 void GMObject::addConnection(GMObject* host, GMEventName eventName)
