@@ -9,6 +9,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
+	ID3D11DeviceContext* deviceContext;
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
@@ -47,7 +48,7 @@ private:
 
 private:
 	ID3DX11EffectTechnique* getTechnique();
-	void prepareBuffer(IQueriable* painter);
+	void prepareBuffer(GMModel* model, IQueriable* painter);
 	void prepareLights();
 	void prepareMaterials(GMModel* model);
 	void prepareRasterizer(GMModel* model);

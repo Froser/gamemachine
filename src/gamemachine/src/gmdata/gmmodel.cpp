@@ -19,7 +19,7 @@ void GMModelPainter::packData(Vector<GMVertex>& packedData)
 	for (auto& mesh : meshes)
 	{
 		// 按照position的size()/3来分配顶点
-		GM_ASSERT(mesh->positions().size() % 3 == 0);
+		GM_ASSERT(mesh->positions().size() % GMVertex::PositionDimension == 0);
 		for (GMuint i = 0; i < mesh->positions().size() / 3; ++i)
 		{
 			{
@@ -72,6 +72,23 @@ void GMModelPainter::packData(Vector<GMVertex>& packedData)
 
 			packedData.push_back(vd);
 		}
+	}
+}
+
+void GMModelPainter::packIndices(Vector<GMuint>& indices)
+{
+	GMModel* model = getModel();
+	GMMeshes& meshes = model->getMeshes();
+	GMuint offset = 0;
+	for (auto& mesh : meshes)
+	{
+		for (GMuint index : mesh->indices())
+		{
+			indices.push_back(index + offset);
+		}
+
+		// 每个Mesh按照自己的坐标排序，因此每个Mesh都应该在总缓存里面加上偏移
+		offset = mesh->positions().size() % GMVertex::PositionDimension;
 	}
 }
 
@@ -172,7 +189,6 @@ GMMesh::GMMesh(GMModel* parent)
 void GMMesh::clear()
 {
 	D(d);
-	d->currentFaceVerticesCount = 0;
 	GMClearSTLContainer(d->positions);
 	GMClearSTLContainer(d->normals);
 	GMClearSTLContainer(d->texcoords);
@@ -180,12 +196,17 @@ void GMMesh::clear()
 	GMClearSTLContainer(d->bitangents);
 	GMClearSTLContainer(d->lightmaps);
 	GMClearSTLContainer(d->colors);
+	GMClearSTLContainer(d->indices);
 }
 
-void GMMesh::beginFace()
+void GMMesh::vertex(const GMVertex& v)
 {
 	D(d);
-	d->currentFaceVerticesCount = 0;
+	vertex(v.vertices[0], v.vertices[1], v.vertices[2]);
+	normal(v.normals[0], v.normals[1], v.normals[2]);
+	texcoord(v.texcoords[0], v.texcoords[1]);
+	lightmap(v.lightmaps[0], v.lightmaps[1]);
+	color(v.color[0], v.color[1], v.color[2]);
 }
 
 void GMMesh::vertex(GMfloat x, GMfloat y, GMfloat z)
@@ -195,9 +216,6 @@ void GMMesh::vertex(GMfloat x, GMfloat y, GMfloat z)
 	vertices.push_back(x);
 	vertices.push_back(y);
 	vertices.push_back(z);
-	d->currentFaceVerticesCount++;
-	if (d->firstFace)
-		++d->verticesPerFace;
 }
 
 void GMMesh::normal(GMfloat x, GMfloat y, GMfloat z)
@@ -235,26 +253,28 @@ void GMMesh::color(GMfloat r, GMfloat g, GMfloat b, GMfloat a)
 	colors.push_back(a);
 }
 
-void GMMesh::endFace()
+void GMMesh::addIndex(GMuint index)
 {
 	D(d);
-	GM_ASSERT(d->currentFaceVerticesCount == d->verticesPerFace);
-	d->currentFaceVerticesCount = 0;
-	d->firstFace = false;
+	d->indices.push_back(index);
 }
 
 void GMMesh::calculateTangentSpace()
 {
 	D(d);
+	enum
+	{
+		EdgeCount = 3
+	};
+
 	if (d->texcoords.size() == 0)
 		return;
 
 	GMuint verticesCount = d->positions.size() / GMVertex::PositionDimension;
-	GMuint faceCount = verticesCount / getVerticesPerFace();
+	GMuint faceCount = verticesCount / EdgeCount; // 计算每个三角形
 	for (GMuint i = 0; i < faceCount; i++)
 	{
-		// 每一个多边形拥有一个切线空间，这意味着多于3个点的多边形需要共面，否则切线空间会有问题
-		GMint o = i * getVerticesPerFace();
+		GMint o = i * 3;
 
 		GMVec3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
 		GMVec3 e1(d->positions[VERTEX_OFFSET(o, 3)], d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)]);
@@ -296,8 +316,7 @@ void GMMesh::calculateTangentSpace()
 		tangentVector.loadFloat4(f4_tangentVector);
 		bitangentVector.loadFloat4(f4_bitangentVector);
 
-		GMint verticesCount = getVerticesPerFace();
-		for (GMint j = 0; j < verticesCount; j++)
+		for (GMint j = 0; j < EdgeCount; j++)
 		{
 			d->tangents.push_back(f4_tangentVector[0]);
 			d->tangents.push_back(f4_tangentVector[1]);

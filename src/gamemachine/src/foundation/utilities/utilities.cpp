@@ -2,9 +2,9 @@
 #include "utilities.h"
 #include "foundation/gamemachine.h"
 
-GMfloat* GMPrimitiveCreator::unitExtents()
+const GMVec3& GMPrimitiveCreator::one()
 {
-	static GMfloat o[3] = { 1, 1, 1 };
+	static GMVec3 o (1, 1, 1);
 	return o;
 }
 
@@ -14,91 +14,221 @@ GMfloat* GMPrimitiveCreator::origin()
 	return o;
 }
 
-void GMPrimitiveCreator::createCube(GMfloat extents[3], OUT GMModels** out, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type)
+void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModel** out)
 {
-	static constexpr GMfloat v[24] = {
-		-1, 1, -1,
-		-1, -1, -1,
-		1, 1, -1,
-		1, -1, -1,
-		-1, 1, 1,
-		-1, -1, 1,
-		1, 1, 1,
-		1, -1, 1,
-	};
-	static constexpr GMint uv[] = {
-		0, 0,
-		1, 1,
-		0, 1,
+	static const GMVec3 s_vertices[8] = {
+		GMVec3(-1, -1, -1),
+		GMVec3(-1, 1, -1),
+		GMVec3(1, -1, -1),
+		GMVec3(1, 1, -1),
 
-		0, 0,
-		1, 0,
-		1, 1,
-	};
-	static constexpr GMint indices[] = {
-		0, 3, 1,
-		0, 2, 3,
-
-		6, 5, 7,
-		6, 4, 5,
-
-		4, 1, 5,
-		4, 0, 1,
-
-		2, 7, 3,
-		2, 6, 7,
-
-		1, 7, 5,
-		1, 3, 7,
-
-		4, 2, 0,
-		4, 6, 2,
+		GMVec3(-1, -1, 1),
+		GMVec3(-1, 1, 1),
+		GMVec3(1, -1, 1),
+		GMVec3(1, 1, 1),
 	};
 
-	GMModels* models = new GMModels();
-
-	// 实体
-	GMfloat t[24];
-	for (GMint i = 0; i < 24; ++i)
+	GMVec3 vertices_vec[8];
+	GMFloat4 vertices[8];
+	for (GMint i = 0; i < GM_array_size(vertices); ++i)
 	{
-		t[i] = extents[i % 3] * v[i];
+		vertices_vec[i] = s_vertices[i] * halfExtents;
+		vertices_vec[i].loadFloat4(vertices[i]);
 	}
 
-	{
-		GMFloat4 f4_vertex, f4_normal;
-		for (GMint i = 0; i < 12; ++i)
-		{
-			GMModel* model = new GMModel();
-			models->push_back(model);
-			GMMesh* body = new GMMesh(model);
-			model->setType(type);
-			model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
-			body->beginFace();
-			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
-			{
-				GMint idx = i * 3 + j; //顶点的开始
-				GMint idx_next = i * 3 + (j + 1) % 3;
-				GMint idx_prev = i * 3 + (j + 2) % 3;
-				GMVec3 vertex(t[indices[idx] * 3], t[indices[idx] * 3 + 1], t[indices[idx] * 3 + 2]);
-				GMVec3 vertex_prev(t[indices[idx_prev] * 3], t[indices[idx_prev] * 3 + 1], t[indices[idx_prev] * 3 + 2]),
-					vertex_next(t[indices[idx_next] * 3], t[indices[idx_next] * 3 + 1], t[indices[idx_next] * 3 + 2]);
-				GMVec3 normal = Cross(vertex - vertex_prev, vertex_next - vertex);
-				normal = FastNormalize(normal);
+	/*
+	采用
+	1 3
+	0 2
+	顶点顺序来绘制每一个面
+	*/
 
-				vertex.loadFloat4(f4_vertex);
-				normal.loadFloat4(f4_normal);
-				body->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-				body->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-				body->texcoord(uv[(i % 2) * 6 + (j * 2)], uv[(i % 2) * 6 + (j * 2) + 1]);
-				body->color(1.f, 1.f, 1.f);
-			}
-			body->endFace();
-			if (shaderCallback)
-				shaderCallback->onCreateShader(model->getShader());
-		}
+	GMModel* model = new GMModel();
+	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	model->setType(GMModelType::Model3D);
+	GMMesh* face = new GMMesh(model);
+
+	//Front
+	{
+		GMVertex P0 = {
+			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
+			{ 0, 0, -1.f }, //normal
+			{ 0, 1 }, //texcoord
+		},
+		P1 = {
+			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+			{ 0, 0, -1.f }, //normal
+			{ 0, 0 }, //texcoord
+		},
+		P2 = {
+			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+			{ 0, 0, -1.f }, //normal
+			{ 1, 1 }, //texcoord
+		},
+		P3 = {
+			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
+			{ 0, 0, -1.f }, //normal
+			{ 1, 0 }, //texcoord
+		};
+		face->vertex(P0);
+		face->vertex(P1);
+		face->vertex(P2);
+		face->vertex(P1);
+		face->vertex(P3);
+		face->vertex(P2);
 	}
 
-	*out = models;
+	//Back
+	{
+		GMVertex P0 = {
+			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
+			{ 0, 0, 1.f }, //normal
+			{ 0, 1 }, //texcoord
+		},
+		P1 = {
+			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
+			{ 0, 0, 1.f }, //normal
+			{ 0, 0 }, //texcoord
+		},
+		P2 = {
+			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
+			{ 0, 0, 1.f }, //normal
+			{ 1, 1 }, //texcoord
+		},
+		P3 = {
+			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
+			{ 0, 0, 1.f }, //normal
+			{ 1, 0 }, //texcoord
+		};
+		face->vertex(P0);
+		face->vertex(P1);
+		face->vertex(P2);
+		face->vertex(P1);
+		face->vertex(P3);
+		face->vertex(P2);
+	}
+
+	//Left
+	{
+		GMVertex P0 = {
+			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
+			{ -1.f, 0, 0 }, //normal
+			{ 0, 1 }, //texcoord
+		},
+		P1 = {
+			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
+			{ -1.f, 0, 0 }, //normal
+			{ 0, 0 }, //texcoord
+		},
+		P2 = {
+			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
+			{ -1.f, 0, 0 }, //normal
+			{ 1, 1 }, //texcoord
+		},
+		P3 = {
+			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+			{ -1.f, 0, 0 }, //normal
+			{ 1, 0 }, //texcoord
+		};
+		face->vertex(P0);
+		face->vertex(P1);
+		face->vertex(P2);
+		face->vertex(P1);
+		face->vertex(P3);
+		face->vertex(P2);
+	}
+
+	//Right
+	{
+		GMVertex P0 = {
+			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+			{ 1.f, 0, 0 }, //normal
+			{ 0, 1 }, //texcoord
+		},
+		P1 = {
+			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
+			{ 1.f, 0, 0 }, //normal
+			{ 0, 0 }, //texcoord
+		},
+		P2 = {
+			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
+			{ 1.f, 0, 0 }, //normal
+			{ 1, 1 }, //texcoord
+		},
+		P3 = {
+			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
+			{ 1.f, 0, 0 }, //normal
+			{ 1, 0 }, //texcoord
+		};
+		face->vertex(P0);
+		face->vertex(P1);
+		face->vertex(P2);
+		face->vertex(P1);
+		face->vertex(P3);
+		face->vertex(P2);
+	}
+
+	//Bottom
+	{
+		GMVertex P0 = {
+			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ 0, 1 }, //texcoord
+		},
+		P1 = {
+			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ 0, 0 }, //texcoord
+		},
+		P2 = {
+			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ 1, 1 }, //texcoord
+		},
+		P3 = {
+			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
+			{ 0, -1.f, 0 }, //normal
+			{ 1, 0 }, //texcoord
+		};
+		face->vertex(P0);
+		face->vertex(P1);
+		face->vertex(P2);
+		face->vertex(P1);
+		face->vertex(P3);
+		face->vertex(P2);
+	}
+
+	//Top
+	{
+		GMVertex P0 = {
+			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
+			{ 0, 1.f, 0 }, //normal
+			{ 0, 1 }, //texcoord
+		},
+		P1 = {
+			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
+			{ 0, 1.f, 0 }, //normal
+			{ 0, 0 }, //texcoord
+		},
+		P2 = {
+			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
+			{ 0, 1.f, 0 }, //normal
+			{ 1, 1 }, //texcoord
+		},
+		P3 = {
+			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
+			{ 0, 1.f, 0 }, //normal
+			{ 1, 0 }, //texcoord
+		};
+		face->vertex(P0);
+		face->vertex(P1);
+		face->vertex(P2);
+		face->vertex(P1);
+		face->vertex(P3);
+		face->vertex(P2);
+	}
+
+	*out = model;
 }
 
 void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
@@ -144,7 +274,6 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 		GMFloat4 f4_vertex, f4_normal, f4_uv;
 		for (GMint i = 0; i < 2; ++i)
 		{
-			body->beginFace();
 			for (GMint j = 0; j < 3; ++j) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
@@ -168,7 +297,6 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 					body->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
 				body->color(1.f, 1.f, 1.f);
 			}
-			body->endFace();
 		}
 		if (shaderCallback)
 			shaderCallback->onCreateShader(model->getShader());
@@ -213,7 +341,6 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 		GMFloat4 f4_vertex, f4_normal, f4_uv;
 		for (GMint i = 0; i < 2; i++)
 		{
-			body->beginFace();
 			for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
 			{
 				GMint idx = i * 3 + j; //顶点的开始
@@ -237,35 +364,12 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 					body->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
 				body->color(1.f, 1.f, 1.f);
 			}
-			body->endFace();
 		}
 		if (shaderCallback)
 			shaderCallback->onCreateShader(model->getShader());
 	}
 
 	*obj = model;
-}
-
-void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModels** out)
-{
-	static const GMVec3 s_vertices[8] = {
-		GMVec3(-1, 1, -1),
-		GMVec3(-1, -1, -1),
-		GMVec3(1, 1, -1),
-		GMVec3(1, -1, -1),
-		GMVec3(-1, 1, 1),
-		GMVec3(-1, -1, 1),
-		GMVec3(1, 1, 1),
-		GMVec3(1, -1, 1)
-	};
-	
-	GMVec3 vertices[8];
-	for (GMint i = 0; i < GM_array_size(vertices); ++i)
-	{
-		vertices[8] = s_vertices[i] * halfExtents;
-	}
-
-
 }
 
 void GMToolUtil::createTexture(const GMString& filename, ITexture** texture)

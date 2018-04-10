@@ -64,33 +64,65 @@ void GMDx11ModelPainter::transfer()
 		mesh->calculateTangentSpace();
 	}
 
-	Vector<GMVertex> packedData;
+	Vector<GMVertex> packedVertices;
 	// 把数据打入顶点数组
-	packData(packedData);
+	packData(packedVertices);
+	GMuint verticesCount = 0;
 
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 	D3D11_BUFFER_DESC bufDesc;
  	bufDesc.Usage = usage;
-	bufDesc.ByteWidth = packedData.size() * sizeof(decltype(packedData)::value_type);
+	bufDesc.ByteWidth = packedVertices.size() * sizeof(decltype(packedVertices)::value_type);
 	bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufDesc.CPUAccessFlags = usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 	bufDesc.MiscFlags = 0;
 	bufDesc.StructureByteStride = 0;
 
 	D3D11_SUBRESOURCE_DATA bufData;
-	bufData.pSysMem = packedData.data();
+	bufData.pSysMem = packedVertices.data();
 	bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
 	GMComPtr<ID3D11Device> device = d->engine->getDevice();
 	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->vertexBuffer));
 
+	if (model->getBufferType() == GMModelBufferType::IndexBuffer)
+	{
+		Vector<GMVertex> packedIndices;
+		// 把数据打入顶点数组
+		packData(packedIndices);
+
+		// 如果是索引缓存，需要构建一份索引数据
+		D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
+		D3D11_BUFFER_DESC bufDesc;
+		bufDesc.Usage = usage;
+		bufDesc.ByteWidth = packedIndices.size() * sizeof(decltype(packedIndices)::value_type);
+		bufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
+		bufDesc.CPUAccessFlags = 0;
+		bufDesc.MiscFlags = 0;
+		bufDesc.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA bufData;
+		bufData.pSysMem = packedIndices.data();
+		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
+
+		GMComPtr<ID3D11Device> device = d->engine->getDevice();
+		GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->vertexBuffer));
+
+		verticesCount = packedIndices.size();
+	}
+	else
+	{
+		verticesCount = packedVertices.size();
+	}
+
 	GMModelBufferData modelBufferData;
 	modelBufferData.vertexBuffer = d->vertexBuffer;
+	modelBufferData.indexBuffer = d->indexBuffer;
 	GMModelBuffer* mb = new GMModelBuffer();
 	mb->setData(modelBufferData);
 	model->setModelBuffer(mb);
 	mb->releaseRef();
-	model->setVerticesCount(packedData.size());
+	model->setVerticesCount(verticesCount);
 
 	for (auto& mesh : model->getMeshes())
 	{

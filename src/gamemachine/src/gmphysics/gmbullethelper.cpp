@@ -70,7 +70,6 @@ namespace
 		GMint faceCount = indices.size() / 3;
 		for (GMint i = 0; i < faceCount; ++i)
 		{
-			body->beginFace();
 			for (GMint j = 0; j < 3; ++j)
 			{
 				GMint idx = i * 3 + j;
@@ -79,7 +78,6 @@ namespace
 				body->vertex(vertex[0], vertex[1], vertex[2]);
 				body->normal(normal[0], normal[1], normal[2]);
 			}
-			body->endFace();
 		}
 	}
 }

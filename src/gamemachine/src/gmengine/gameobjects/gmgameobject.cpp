@@ -161,14 +161,12 @@ void GMCubeMapGameObject::createCubeMap(ITexture* texture)
 	GMMesh* mesh = new GMMesh(model);
 	for (GMuint i = 0; i < 12; i++)
 	{
-		mesh->beginFace();
 		mesh->vertex(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
 		mesh->vertex(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
 		mesh->vertex(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
 		mesh->normal(vertices[i * 9 + 0], vertices[i * 9 + 1], vertices[i * 9 + 2]);
 		mesh->normal(vertices[i * 9 + 3], vertices[i * 9 + 4], vertices[i * 9 + 5]);
 		mesh->normal(vertices[i * 9 + 6], vertices[i * 9 + 7], vertices[i * 9 + 8]);
-		mesh->endFace();
 	}
 
 	addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));

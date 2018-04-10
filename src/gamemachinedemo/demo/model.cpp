@@ -75,37 +75,31 @@ void Demo_Model::init()
 
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
-		gm::GMModels* cubes = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cubes, nullptr);
+		gm::GMModel* cube = nullptr;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one(), &cube);
 
-		for (auto& cube : *cubes)
-		{
-			gm::GMShader& shader = cube->getShader();
-			shader.getMaterial().refractivity = 0.658f;
-			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-			gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
-		}
+		gm::GMShader& shader = cube->getShader();
+		shader.getMaterial().refractivity = 0.658f;
+		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
+		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
 
-		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, cubes);
+		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
 		d->gameObject2->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 	{
-		gm::GMModels* cubes = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::unitExtents(), &cubes, nullptr);
+		gm::GMModel* cube = nullptr;
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one(), &cube);
 		gm::ITexture* texture = nullptr;
 		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
-		for (auto& cube : *cubes)
-		{
-			gm::GMShader& shader = cube->getShader();
-			shader.getMaterial().refractivity = 0.658f;
-			shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-		}
+		gm::GMShader& shader = cube->getShader();
+		shader.getMaterial().refractivity = 0.658f;
+		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 
-		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, cubes);
+		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject3 = new gm::GMGameObject(asset);
 		d->gameObject3->setTranslation(Translate(GMVec3(0.25f, .25f, 0)));
 		d->gameObject3->setScaling(Scale(GMVec3(.1f, .1f, .1f)));

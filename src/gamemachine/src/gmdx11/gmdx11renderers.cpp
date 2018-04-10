@@ -332,6 +332,8 @@ GMDx11Renderer::GMDx11Renderer()
 	GM_ASSERT(!d->effect);
 	shaderProgram->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
 	GM_ASSERT(d->effect);
+
+	d->deviceContext = getEngine()->getDeviceContext();
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -353,9 +355,8 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 
 	// Renderer决定自己的顶点Layout
-	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
-	context->IASetInputLayout(d->inputLayout);
-	context->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
+	d->deviceContext->IASetInputLayout(d->inputLayout);
+	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
 	
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
@@ -491,14 +492,22 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	}
 }
 
-void GMDx11Renderer::prepareBuffer(IQueriable* painter)
+void GMDx11Renderer::prepareBuffer(GMModel* model, IQueriable* painter)
 {
+	D(d);
 	GMuint stride = sizeof(GMVertex);
 	GMuint offset = 0;
-	GMComPtr<ID3D11Buffer> buffer;
-	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&buffer);
-	GM_ASSERT(buffer);
-	getEngine()->getDeviceContext()->IASetVertexBuffers(0, 1, &buffer, &stride, &offset);
+	GMComPtr<ID3D11Buffer> vertexBuffer;
+	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
+	GM_ASSERT(vertexBuffer);
+	d->deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	if (model->getBufferType() == GMModelBufferType::IndexBuffer)
+	{
+		GMComPtr<ID3D11Buffer> indexBuffer;
+		painter->getInterface(GameMachineInterfaceID::D3D11IndexBuffer, (void**)&indexBuffer);
+		GM_ASSERT(indexBuffer);
+		d->deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+	}
 }
 
 void GMDx11Renderer::prepareLights()
@@ -536,7 +545,6 @@ void GMDx11Renderer::prepareLights()
 void GMDx11Renderer::prepareRasterizer(GMModel* model)
 {
 	D(d);
-	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
 	bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
 	if (!d->rasterizer)
 	{
@@ -556,7 +564,7 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 {
 	D(d);
 	const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
-	ID3D11DeviceContext* context = getEngine()->getDeviceContext();
+	ID3D11DeviceContext* context = d->deviceContext;
 	const GMMaterial& material = model->getShader().getMaterial();
 	ID3DX11EffectVariable* materialVar = d->effect->GetVariableByName(svd.MaterialName);
 	GM_ASSERT(materialVar->IsValid());
@@ -656,7 +664,7 @@ ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
 void GMDx11Renderer::draw(IQueriable* painter, GMModel* model)
 {
 	D(d);
-	prepareBuffer(painter);
+	prepareBuffer(model, painter);
 	prepareLights();
 	prepareMaterials(model);
 	prepareRasterizer(model);
@@ -675,9 +683,13 @@ void GMDx11Renderer::passAllAndDraw(GMModel* model)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		prepareTextures(model);
-		pass->Apply(0, getEngine()->getDeviceContext());
+		pass->Apply(0, d->deviceContext);
 		drawTextures(model);
-		getEngine()->getDeviceContext()->Draw(model->getVerticesCount(), 0);
+
+		if (model->getBufferType() == GMModelBufferType::VertexBuffer)
+			d->deviceContext->Draw(model->getVerticesCount(), 0);
+		else
+			d->deviceContext->Draw(model->getVerticesCount(), 0);
 	}
 }
 

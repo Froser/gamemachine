@@ -184,7 +184,6 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 	GMString face;
 	GMMesh* currentMesh = d->currentModel->getMeshes().front();
 	GM_ASSERT(currentMesh);
-	currentMesh->beginFace();
 	while (true)
 	{
 		scanner.next(face);
@@ -254,8 +253,6 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 	};
 	// 这里其实有优化的余地
 	// 如果恰好是4个顶点，可以不采用Triangles(Triangle List)的拓扑，而是使用Triangle Stripe，将第一个顶点插入。
-
-	currentMesh->endFace();
 }
 
 void GMModelReader_Obj::loadMaterial(const GMModelLoadSettings& settings, const GMString& mtlFilename)

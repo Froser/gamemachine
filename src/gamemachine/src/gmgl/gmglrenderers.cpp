@@ -99,7 +99,10 @@ void GMGLRenderer::draw(IQueriable* painter, GMModel* model)
 	applyStencil(*d->engine);
 	beforeDraw(model);
 	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
-	glDrawArrays(mode, 0, model->getVerticesCount());
+	if (model->getBufferType() == GMModelBufferType::VertexBuffer)
+		glDrawArrays(mode, 0, model->getVerticesCount());
+	else
+		glDrawElements(mode, model->getVerticesCount(), GL_UNSIGNED_INT, 0);
 	afterDraw(model);
 }
 

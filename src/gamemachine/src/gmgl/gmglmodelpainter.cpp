@@ -34,9 +34,11 @@ void GMGLModelPainter::transfer()
 	}
 
 	GMModelBufferData bufferData;
-	Vector<GMVertex> packedData;
+	Vector<GMVertex> packedVertices;
 	// 把数据打入顶点数组
-	packData(packedData);
+	packData(packedVertices);
+
+	GMuint verticeCount = 0;
 
 	GM_BEGIN_CHECK_GL_ERROR
 	GLuint vao;
@@ -44,14 +46,12 @@ void GMGLModelPainter::transfer()
 	bufferData.arrayId = vao;
 	glBindVertexArray(vao);
 
-	GLuint dataSize = sizeof(GMVertex) * packedData.size();
-
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
 	bufferData.vertexBufferId = vbo;
 
 	glBindBuffer(GL_ARRAY_BUFFER, bufferData.vertexBufferId);
-	glBufferData(GL_ARRAY_BUFFER, dataSize, packedData.data(), usage);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GMVertex) * packedVertices.size(), packedVertices.data(), usage);
 
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMVertex::PositionDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMVertex::NormalDimension,		GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(3));
@@ -64,6 +64,23 @@ void GMGLModelPainter::transfer()
 	GM_FOREACH_ENUM_CLASS(type, GMVertexDataType::Position, GMVertexDataType::EndOfVertexDataType)
 	{
 		glEnableVertexAttribArray(gmVertexIndex(type));
+	}
+	
+	if (model->getBufferType() == GMModelBufferType::IndexBuffer)
+	{
+		Vector<GMVertex> packedIndices;
+		// 把数据打入顶点数组
+		packData(packedIndices);
+
+		glGenBuffers(1, &bufferData.indexBufferId);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferData.indexBufferId);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GMuint) * packedIndices.size(), packedIndices.data(), GL_STATIC_DRAW);
+
+		verticeCount = packedIndices.size();
+	}
+	else
+	{
+		verticeCount = packedVertices.size();
 	}
 
 	glBindVertexArray(0);
@@ -78,7 +95,7 @@ void GMGLModelPainter::transfer()
 	GMModelBuffer* modelBuffer = new GMModelBuffer();
 	modelBuffer->setData(bufferData);
 
-	model->setVerticesCount(packedData.size());
+	model->setVerticesCount(verticeCount);
 	model->setModelBuffer(modelBuffer);
 	modelBuffer->releaseRef();
 	d->inited = true;

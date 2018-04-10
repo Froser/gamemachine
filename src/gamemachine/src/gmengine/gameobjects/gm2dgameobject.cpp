@@ -140,7 +140,6 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 
 				// 采用左上角为原点的Texcoord坐标系
 
-				mesh->beginFace();
 				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
@@ -152,9 +151,7 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				mesh->endFace();
 
-				mesh->beginFace();
 				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
 				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
 				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
@@ -166,7 +163,6 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
 				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				mesh->endFace();
 			}
 		}
 	END_GLYPH_XY()

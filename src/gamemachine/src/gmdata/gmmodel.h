@@ -76,6 +76,7 @@ protected:
 
 protected:
 	void packData(Vector<GMVertex>& packedData);
+	void packIndices(Vector<GMuint>& indices);
 };
 
 enum class GMUsageHint
@@ -190,6 +191,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMScopePtr<GMModelPainter> painter;
 	GMShader shader;
 	GMModelBuffer* modelBuffer = nullptr;
+	GMModelBufferType modelBufferType = GMModelBufferType::VertexBuffer;
 	GMModelType type = GMModelType::Model3D;
 	GMTopologyMode mode = GMTopologyMode::Triangles;
 	GMuint verticesCount = 0;
@@ -229,6 +231,7 @@ public:
 	GM_DECLARE_PROPERTY(Type, type, GMModelType);
 	GM_DECLARE_PROPERTY(Shader, shader, GMShader);
 	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMuint);
+	GM_DECLARE_PROPERTY(BufferType, modelBufferType, GMModelBufferType);
 
 public:
 	inline void setPainter(AUTORELEASE GMModelPainter* painter)
@@ -305,9 +308,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 	GM_DEFINE_VERTEX_DATA(lightmaps);
 	GM_DEFINE_VERTEX_DATA(colors); //顶点颜色，一般渲染不会用到这个，用于粒子绘制
 
-	bool firstFace = true;
-	GMuint verticesPerFace = 0;
-	GMuint currentFaceVerticesCount = 0;
+	GM_DEFINE_VERTEX_DATA(indices); //顶点索引，用于索引模式
 };
 
 //! 表示一份网格数据。
@@ -329,23 +330,17 @@ public:
 	GM_DEFINE_VERTEX_PROPERTY(bitangents);
 	GM_DEFINE_VERTEX_PROPERTY(lightmaps);
 	GM_DEFINE_VERTEX_PROPERTY(colors);
+	GM_DEFINE_VERTEX_PROPERTY(indices);
 
 	void calculateTangentSpace();
 	void clear();
-	void beginFace();
+	void vertex(const GMVertex& vertex);
 	void vertex(GMfloat x, GMfloat y, GMfloat z);
 	void normal(GMfloat x, GMfloat y, GMfloat z);
 	void texcoord(GMfloat u, GMfloat v);
 	void lightmap(GMfloat u, GMfloat v);
 	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
-	void endFace();
-
-public:
-	inline GMuint getVerticesPerFace()
-	{
-		D(d);
-		return d->verticesPerFace;
-	}
+	void addIndex(GMuint index);
 };
 
 END_NS

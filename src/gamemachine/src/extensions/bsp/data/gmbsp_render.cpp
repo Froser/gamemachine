@@ -296,7 +296,6 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 	GM_ASSERT(face.numIndices % 3 == 0);
 	for (GMint i = 0; i < face.numIndices / 3; i++)
 	{
-		mesh->beginFace();
 		for (GMint j = 0; j < 3; j++)
 		{
 			GMint idx = d->bsp->drawIndexes[face.firstIndex + i * 3 + j];
@@ -316,7 +315,6 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 			mesh->texcoord(vertex.decalS, vertex.decalT);
 			mesh->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
-		mesh->endFace();
 	}
 	*obj = model;
 }
@@ -333,7 +331,6 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 	GMFloat4 f4_position, f4_normal;
 	for (GMint row = 0; row < biqp.tesselation; ++row)
 	{
-		mesh->beginFace();
 		const GMuint* idxStart = &biqp.indices[row * 2 * (biqp.tesselation + 1)];
 		GMVec3 normal;
 		for (GMint i = 0; i < numVertices; i++)
@@ -361,7 +358,6 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 			mesh->texcoord(vertex.decalS, vertex.decalT);
 			mesh->lightmap(vertex.lightmapS, vertex.lightmapT);
 		}
-		mesh->endFace();
 	}
 	*obj = model;
 }
@@ -411,7 +407,6 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 	GMFloat4 f4_vertex, f4_normal;
 	for (GMint i = 0; i < 12; i++)
 	{
-		mesh->beginFace();
 		for (GMint j = 0; j < 3; j++) // j表示面的一个顶点
 		{
 			GMint idx = i * 3 + j; //顶点的开始
@@ -432,7 +427,6 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 			//component->uv(vertex.decalS, vertex.decalT);
 			//component->lightmap(1.f, 1.f);
 		}
-		mesh->endFace();
 	}
 	*obj = model;
 }
