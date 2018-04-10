@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "gmuiglwindow.h"
-#include <gamemachine.h>
 #include "gmuiinput.h"
 #include <GL/glew.h>
 #include <GL/wglew.h>

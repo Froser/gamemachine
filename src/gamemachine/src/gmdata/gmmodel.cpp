@@ -132,6 +132,7 @@ void GMModel::setModelBuffer(AUTORELEASE GMModelBuffer* mb)
 	{
 		releaseModelBuffer();
 		d->modelBuffer = mb;
+		d->modelBuffer->addRef();
 	}
 }
 
@@ -141,8 +142,6 @@ void GMModel::releaseModelBuffer()
 	if (d->modelBuffer)
 	{
 		d->modelBuffer->releaseRef();
-		if (d->modelBuffer->hasNoRef())
-			GM_delete(d->modelBuffer);
 	}
 }
 

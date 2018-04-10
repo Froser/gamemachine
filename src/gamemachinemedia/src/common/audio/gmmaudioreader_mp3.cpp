@@ -4,6 +4,7 @@
 #include "mad.h"
 #include "common/utilities/gmmstream.h"
 #include "gmmaudioreader_stream.h"
+#include <gmthread.h>
 
 #define _MAD_CHECK_FLOW(i) if ((i) == MAD_FLOW_STOP) return MAD_FLOW_STOP;
 

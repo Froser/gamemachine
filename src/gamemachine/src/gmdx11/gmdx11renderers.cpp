@@ -496,7 +496,7 @@ void GMDx11Renderer::prepareBuffer(IQueriable* painter)
 	GMuint stride = sizeof(GMVertex);
 	GMuint offset = 0;
 	GMComPtr<ID3D11Buffer> buffer;
-	painter->getInterface(GameMachineInterfaceID::D3D11Buffer, (void**)&buffer);
+	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&buffer);
 	GM_ASSERT(buffer);
 	getEngine()->getDeviceContext()->IASetVertexBuffers(0, 1, &buffer, &stride, &offset);
 }

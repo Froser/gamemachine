@@ -68,7 +68,8 @@ enum class GameMachineInterfaceID
 	D3D11DepthStencilView,
 	D3D11RenderTargetView,
 
-	D3D11Buffer,
+	D3D11VertexBuffer,
+	D3D11IndexBuffer,
 	D3D11ShaderProgram,
 	D3D11Effect,
 
@@ -81,6 +82,13 @@ enum class GMShaderType
 	Pixel,
 	Vertex,
 	Effect,
+};
+
+enum class GMRenderEnvironment
+{
+	Invalid,
+	OpenGL,
+	DirectX11,
 };
 
 struct GameMachineMessage

@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmuiinput.h"
+#include <gamemachine.h>
 
 static gm::GMString xinputDlls[] = {
 	"xinput9_1_0.dll",

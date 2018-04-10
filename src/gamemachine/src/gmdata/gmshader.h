@@ -3,7 +3,7 @@
 #include <gmcommon.h>
 #include <gmenums.h>
 #include <linearmath.h>
-#include <tools.h>
+#include <gmtools.h>
 BEGIN_NS
 
 enum class GMLightType

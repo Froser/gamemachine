@@ -4,7 +4,7 @@
 #include <gmcom.h>
 #include <gmdxincludes.h>
 #include <gmmodel.h>
-#include <tools.h>
+#include <gmtools.h>
 BEGIN_NS
 
 struct GMMVPMatrix;

@@ -26,6 +26,8 @@ struct GMPrimitiveCreator
 	static void createCube(GMfloat extents[3], OUT GMModels** out, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D);
 	static void createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D, GMCreateAnchor anchor = Center, GMfloat (*customUV)[12] = nullptr);
 	static void createQuad3D(GMfloat extents[3], GMfloat position[12], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback = nullptr, GMModelType type = GMModelType::Model3D, GMfloat(*customUV)[8] = nullptr);
+
+	static void createCube(const GMVec3& halfExtents, OUT GMModels** out);
 };
 
 //! 引擎提供的各种繁琐操作的工具类。

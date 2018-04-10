@@ -2,7 +2,7 @@
 #define __GMUIGUIWINDOW_H__
 #include <gmuicommon.h>
 #include "gmuidef.h"
-#include <gamemachine.h>
+#include <gminterfaces.h>
 #include "gmuiwindow.h"
 
 BEGIN_UI_NS

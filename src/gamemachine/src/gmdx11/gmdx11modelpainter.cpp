@@ -14,16 +14,32 @@ bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D_BASE(db, Base);
 	D(d);
-	if (id == GameMachineInterfaceID::D3D11Buffer)
+	if (id == GameMachineInterfaceID::D3D11VertexBuffer)
 	{
-		if (d->buffer)
+		if (d->vertexBuffer)
 		{
-			d->buffer->AddRef();
-			(*out) = d->buffer;
+			d->vertexBuffer->AddRef();
+			(*out) = d->vertexBuffer;
 		}
 		else
 		{
-			ID3D11Buffer* buffer = reinterpret_cast<ID3D11Buffer*>(db->model->getBuffer()->buffer);
+			ID3D11Buffer* buffer = db->model->getBuffer()->vertexBuffer;
+			GM_ASSERT(buffer);
+			buffer->AddRef();
+			(*out) = buffer;
+		}
+		return true;
+	}
+	else if (id == GameMachineInterfaceID::D3D11IndexBuffer)
+	{
+		if (d->indexBuffer)
+		{
+			d->indexBuffer->AddRef();
+			(*out) = d->indexBuffer;
+		}
+		else
+		{
+			ID3D11Buffer* buffer = db->model->getBuffer()->indexBuffer;
 			GM_ASSERT(buffer);
 			buffer->AddRef();
 			(*out) = buffer;
@@ -66,13 +82,14 @@ void GMDx11ModelPainter::transfer()
 	bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
 	GMComPtr<ID3D11Device> device = d->engine->getDevice();
-	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->buffer));
+	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->vertexBuffer));
 
 	GMModelBufferData modelBufferData;
-	modelBufferData.buffer = d->buffer;
+	modelBufferData.vertexBuffer = d->vertexBuffer;
 	GMModelBuffer* mb = new GMModelBuffer();
 	mb->setData(modelBufferData);
 	model->setModelBuffer(mb);
+	mb->releaseRef();
 	model->setVerticesCount(packedData.size());
 
 	for (auto& mesh : model->getMeshes())
@@ -109,7 +126,7 @@ void GMDx11ModelPainter::beginUpdateBuffer(GMModel* model)
 	GM_ASSERT(!d->mappedSubResource);
 	d->mappedSubResource = new D3D11_MAPPED_SUBRESOURCE();
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	GM_DX_HR(context->Map(d->buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, d->mappedSubResource));
+	GM_DX_HR(context->Map(d->vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, d->mappedSubResource));
 }
 
 void GMDx11ModelPainter::endUpdateBuffer()
@@ -117,7 +134,7 @@ void GMDx11ModelPainter::endUpdateBuffer()
 	D(d);
 	GM_ASSERT(d->mappedSubResource);
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	context->Unmap(d->buffer, 0);
+	context->Unmap(d->vertexBuffer, 0);
 
 	GM_delete(d->mappedSubResource);
 	d->mappedSubResource = nullptr;

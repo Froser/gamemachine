@@ -1,7 +1,7 @@
 ﻿#ifndef __GMCAMERA_H__
 #define __GMCAMERA_H__
 #include <gmcommon.h>
-#include <tools.h>
+#include <gmtools.h>
 #include <gmdxincludes.h>
 #include <gmcom.h>
 

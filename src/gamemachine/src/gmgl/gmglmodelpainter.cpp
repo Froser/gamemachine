@@ -48,9 +48,9 @@ void GMGLModelPainter::transfer()
 
 	GLuint vbo;
 	glGenBuffers(1, &vbo);
-	bufferData.bufferId = vbo;
+	bufferData.vertexBufferId = vbo;
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferData.bufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferData.vertexBufferId);
 	glBufferData(GL_ARRAY_BUFFER, dataSize, packedData.data(), usage);
 
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMVertex::PositionDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
@@ -80,6 +80,7 @@ void GMGLModelPainter::transfer()
 
 	model->setVerticesCount(packedData.size());
 	model->setModelBuffer(modelBuffer);
+	modelBuffer->releaseRef();
 	d->inited = true;
 	model->needNotTransferAnymore();
 }
@@ -105,7 +106,7 @@ void GMGLModelPainter::dispose(GMModelBuffer* md)
 {
 	D(d);
 	GLuint vao[1] = { md->getMeshBuffer().arrayId },
-		vbo[1] = { md->getMeshBuffer().bufferId };
+		vbo[1] = { md->getMeshBuffer().vertexBufferId };
 
 	GM_BEGIN_CHECK_GL_ERROR
 	glDeleteVertexArrays(1, vao);
@@ -121,7 +122,7 @@ void GMGLModelPainter::dispose(GMModelBuffer* md)
 void GMGLModelPainter::beginUpdateBuffer(GMModel* model)
 {
 	glBindVertexArray(model->getBuffer()->arrayId);
-	glBindBuffer(GL_ARRAY_BUFFER, model->getBuffer()->bufferId);
+	glBindBuffer(GL_ARRAY_BUFFER, model->getBuffer()->vertexBufferId);
 }
 
 void GMGLModelPainter::endUpdateBuffer()

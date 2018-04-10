@@ -2,7 +2,8 @@
 #define __GMMSTREAM_H__
 
 #include <gmmcommon.h>
-#include <gamemachine.h>
+#include <gmobject.h>
+#include <gmtools.h>
 #include <atomic>
 
 BEGIN_MEDIA_NS

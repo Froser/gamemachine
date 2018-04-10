@@ -2,7 +2,8 @@
 #define __GMINPUT_WIN_H__
 #include <gmuicommon.h>
 #include "gmuidef.h"
-#include <gamemachine.h>
+#include <gminterfaces.h>
+#include <gmobject.h>
 
 class XInputWrapper
 {

@@ -319,7 +319,7 @@ public:
 	}
 
 private:
-	void addEvent(GMEventName eventName, GMObject& receiver, const GMEventCallback& callback);
+	void addEvent(GMEventName eventName, GMObject& receiver, GMEventCallback callback);
 	void removeEventAndConnection(GMEventName eventName, GMObject& receiver);
 	void removeEvent(GMEventName eventName, GMObject& receiver);
 	void releaseEvents();

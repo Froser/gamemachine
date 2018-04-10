@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmuidx11window.h"
 #include <gmdx11helper.h>
+#include <gamemachine.h>
 #include <d3dcommon.h>
 
 #define EXIT __exit

@@ -11,7 +11,8 @@ class GMDx11GraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11ModelPainter)
 {
 	GMDx11GraphicEngine* engine = nullptr;
-	GMComPtr<ID3D11Buffer> buffer;
+	GMComPtr<ID3D11Buffer> vertexBuffer;
+	GMComPtr<ID3D11Buffer> indexBuffer;
 	bool inited = false;
 	D3D11_MAPPED_SUBRESOURCE* mappedSubResource = nullptr;
 };

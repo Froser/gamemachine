@@ -23,7 +23,8 @@
  */
 
 #include <gmmcommon.h>
-#include <gamemachine.h>
+#include <gmtools.h>
+#include <gmstring.h>
 #include "CWaves.h"
 #include <errno.h>
 

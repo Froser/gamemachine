@@ -47,7 +47,7 @@ void GMObject::detachEvent(GMObject& sender, GMEventName eventName)
 	sender.removeEventAndConnection(eventName, *this);
 }
 
-void GMObject::addEvent(GMEventName eventName, GMObject& receiver, const GMEventCallback& callback)
+void GMObject::addEvent(GMEventName eventName, GMObject& receiver, GMEventCallback callback)
 {
 	D(d);
 	GMCallbackTarget target = { &receiver, callback };

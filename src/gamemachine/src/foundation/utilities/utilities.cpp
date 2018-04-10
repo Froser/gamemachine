@@ -246,6 +246,28 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	*obj = model;
 }
 
+void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModels** out)
+{
+	static const GMVec3 s_vertices[8] = {
+		GMVec3(-1, 1, -1),
+		GMVec3(-1, -1, -1),
+		GMVec3(1, 1, -1),
+		GMVec3(1, -1, -1),
+		GMVec3(-1, 1, 1),
+		GMVec3(-1, -1, 1),
+		GMVec3(1, 1, 1),
+		GMVec3(1, -1, 1)
+	};
+	
+	GMVec3 vertices[8];
+	for (GMint i = 0; i < GM_array_size(vertices); ++i)
+	{
+		vertices[8] = s_vertices[i] * halfExtents;
+	}
+
+
+}
+
 void GMToolUtil::createTexture(const GMString& filename, ITexture** texture)
 {
 	gm::GMImage* img = nullptr;

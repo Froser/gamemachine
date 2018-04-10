@@ -2,7 +2,9 @@
 #define __GMMAUDIOREADER_STREAM_H__
 #include <gmmcommon.h>
 #include <atomic>
-#include <gamemachine.h>
+#include <gminterfaces.h>
+#include <gmobject.h>
+#include <gmtools.h>
 BEGIN_MEDIA_NS
 
 // 所有流文件的基类，支持多线程解码，编码写入以及线程同步

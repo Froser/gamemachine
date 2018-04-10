@@ -3,6 +3,7 @@
 #include <al/al.h>
 #include <al/alc.h>
 #include "decoder.h"
+#include <gmthread.h>
 
 // 大小保持一致
 static_assert(sizeof(gm::GMint) == sizeof(ALenum), "Size error");

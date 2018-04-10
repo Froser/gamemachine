@@ -2,7 +2,8 @@
 #define __GMMAUDIOPLAYER_H__
 
 #include <gmmcommon.h>
-#include <gamemachine.h>
+#include <gminterfaces.h>
+#include <gmobject.h>
 #include "aldlist.h"
 
 BEGIN_MEDIA_NS

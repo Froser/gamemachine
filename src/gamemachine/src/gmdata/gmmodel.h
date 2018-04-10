@@ -1,11 +1,13 @@
 ﻿#ifndef __GMMODEL_H__
 #define __GMMODEL_H__
 #include <gmcommon.h>
-#include <tools.h>
+#include <gmtools.h>
 #include <linearmath.h>
 #include <gmimage.h>
 #include <gmshader.h>
 #include <atomic>
+
+struct ID3D11Buffer;
 
 BEGIN_NS
 
@@ -102,10 +104,15 @@ struct GMModelBufferData
 		struct //OpenGL
 		{
 			GMuint arrayId;
-			GMuint bufferId;
+			GMuint vertexBufferId;
+			GMuint indexBufferId;
 		};
 
-		void* buffer; //DirectX
+		struct //DirectX
+		{
+			ID3D11Buffer* vertexBuffer;
+			ID3D11Buffer* indexBuffer;
+		};
 	};
 };
 
@@ -148,7 +155,10 @@ class GMModelBuffer : public GMObject
 		D(d);
 		--d->ref;
 		if (hasNoRef())
+		{
 			dispose();
+			delete this;
+		}
 	}
 
 	bool hasNoRef()
@@ -165,6 +175,12 @@ enum class GMTopologyMode
 	TriangleStrip,
 	Triangles,
 	Lines,
+};
+
+enum class GMModelBufferType
+{
+	VertexBuffer,
+	IndexBuffer,
 };
 
 GM_PRIVATE_OBJECT(GMModel)

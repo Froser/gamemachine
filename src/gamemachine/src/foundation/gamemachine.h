@@ -1,7 +1,7 @@
 ﻿#ifndef __GAMEMACHINE_H__
 #define __GAMEMACHINE_H__
 #include <gmcommon.h>
-#include <tools.h>
+#include <gmtools.h>
 #include <input.h>
 #include <gmassets.h>
 #include <gmglyphmanager.h>
@@ -21,13 +21,6 @@ extern "C"
 
 	bool GMQueryCapability(GMCapability);
 }
-
-enum class GMRenderEnvironment
-{
-	Invalid,
-	OpenGL,
-	DirectX11,
-};
 
 //! 机器的大小端模式的枚举值。
 /*!

@@ -1,7 +1,7 @@
 ﻿#ifndef __SOUNDREADER_MP3_H__
 #define __SOUNDREADER_MP3_H__
 #include <gmmcommon.h>
-#include <gamemachine.h>
+#include <gmobject.h>
 #include "gmmaudioreader.h"
 
 BEGIN_MEDIA_NS
