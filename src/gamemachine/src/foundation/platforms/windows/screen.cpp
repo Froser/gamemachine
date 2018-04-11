@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "check.h"
-#include "gamemachine.h"
+#include <gmtools.h>
 
 GMfloat GMScreen::dpi()
 {

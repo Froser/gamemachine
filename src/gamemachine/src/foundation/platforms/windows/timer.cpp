@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "check.h"
-#include "gamemachine.h"
+#include "defines.h"
+#include "foundation/assert.h"
 
 extern "C"
 {

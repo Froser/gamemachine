@@ -105,13 +105,12 @@ void Demo_Texture_Index::init()
 	mesh->index(2);
 
 	gm::GMMesh* mesh2 = new gm::GMMesh(quad);
-	mesh2->vertex(V1);
-	mesh2->vertex(V2);
 	mesh2->vertex(V3);
+	mesh2->vertex(V2);
 	mesh2->vertex(V4);
-	mesh2->index(2);
+	mesh2->index(0);
 	mesh2->index(1);
-	mesh2->index(3);
+	mesh2->index(2);
 
 	gm::GMShader& shader = quad->getShader();
 	shader.getMaterial().kd = GMVec3(1, 1, 1);
