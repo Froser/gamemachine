@@ -258,14 +258,6 @@ public:
 		return d->meshes;
 	}
 
-	inline const GMModelBufferData* getBuffer()
-	{
-		D(d);
-		if (!d->modelBuffer)
-			return nullptr;
-		return &d->modelBuffer->getMeshBuffer();
-	}
-
 	//! 表示此模型是否需要被GMModelPainter将顶点数据传输到显卡。
 	/*!
 	  如果一个模型第一次建立顶点数据，则需要将这些数据传输到显卡。<br/>
@@ -285,7 +277,7 @@ public:
 	GMUsageHint getUsageHint() { D(d); return d->hint; }
 
 	void setModelBuffer(AUTORELEASE GMModelBuffer* mb);
-
+	GMModelBuffer* getModelBuffer();
 	void releaseModelBuffer();
 };
 

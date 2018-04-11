@@ -47,36 +47,14 @@ GMModel::GMModel()
 
 GMModel::GMModel(GMModel& model)
 {
-	/*
 	D(d);
-	GMMesh* mesh = model.getMesh();
-
+	setModelBuffer(model.getModelBuffer());
+	setPrimitiveTopologyMode(model.getPrimitiveTopologyMode());
+	setShader(model.getShader());
+	setVerticesCount(model.getVerticesCount());
 	if (!model.getPainter())
 		GM.createModelPainterAndTransfer(&model);
-	needNotTransferAnymore(); // 不需要再将顶点数据传输到显卡了
-
-	d->mesh = new GMMesh();
-	d->mesh->setMeshData(mesh->getMeshData());
-	d->mesh->setArrangementMode(mesh->getArrangementMode());
-	d->mesh->setName(mesh->getName());
-
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, positions);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, normals);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, texcoords);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, tangents);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, bitangents);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, lightmaps);
-	GM_COPY_VERTEX_PROPERTY(d->mesh, mesh, colors);
-
-	// 开始拷贝components中的shaders部分
-	auto& srcComponents = model.getMesh()->getComponents();
-	for (auto& components : srcComponents)
-	{
-		GMComponent* c = new GMComponent(d->mesh);
-		*c = *components;
-		c->setParentMesh(d->mesh); //将mesh设置回来
-	}
-	*/
+	needNotTransferAnymore();
 }
 
 GMModel::~GMModel()
@@ -98,6 +76,12 @@ void GMModel::setModelBuffer(AUTORELEASE GMModelBuffer* mb)
 		d->modelBuffer = mb;
 		d->modelBuffer->addRef();
 	}
+}
+
+GMModelBuffer* GMModel::getModelBuffer()
+{
+	D(d);
+	return d->modelBuffer;
 }
 
 void GMModel::releaseModelBuffer()

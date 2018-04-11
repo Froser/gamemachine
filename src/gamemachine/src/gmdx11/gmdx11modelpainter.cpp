@@ -23,7 +23,7 @@ bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 		}
 		else
 		{
-			ID3D11Buffer* buffer = db->model->getBuffer()->vertexBuffer;
+			ID3D11Buffer* buffer = db->model->getModelBuffer()->getMeshBuffer().vertexBuffer;
 			GM_ASSERT(buffer);
 			buffer->AddRef();
 			(*out) = buffer;
@@ -39,7 +39,7 @@ bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 		}
 		else
 		{
-			ID3D11Buffer* buffer = db->model->getBuffer()->indexBuffer;
+			ID3D11Buffer* buffer = db->model->getModelBuffer()->getMeshBuffer().indexBuffer;
 			GM_ASSERT(buffer);
 			buffer->AddRef();
 			(*out) = buffer;
@@ -72,7 +72,7 @@ void GMDx11ModelPainter::transfer()
 
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 	D3D11_BUFFER_DESC bufDesc;
- 	bufDesc.Usage = usage;
+	bufDesc.Usage = usage;
 	bufDesc.ByteWidth = packedVertices.size() * sizeof(decltype(packedVertices)::value_type);
 	bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufDesc.CPUAccessFlags = usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;

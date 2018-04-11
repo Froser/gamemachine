@@ -49,15 +49,10 @@ void Demo_Collision::init()
 	gm::GMBulletHelper::createModelFromShape(groundShape, &groundShapeModel);
 	GM_ASSERT(groundShapeModel);
 
-	//auto& components = groundShapeModel->getMesh()->getComponents();
-	//for (auto& component : components)
-	//{
-	GM_ASSERT(false);
-		groundShapeModel->getShader().getMaterial().ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
-		groundShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
-		groundShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
-		groundShapeModel->getShader().getMaterial().shininess = 9;
-	//}
+	groundShapeModel->getShader().getMaterial().ka = GMVec3(.8125f / .7f, .644f / .7f, .043f / .7f);
+	groundShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
+	groundShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
+	groundShapeModel->getShader().getMaterial().shininess = 9;
 	d->ground->addModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, groundShapeModel));
 
 	// add to physics world
@@ -94,15 +89,10 @@ void Demo_Collision::init()
 					gm::GMBulletHelper::createModelFromShape(boxShape, &boxShapeModel);
 					GM_ASSERT(boxShapeModel);
 					// Set color
-					GM_ASSERT(false);
-					//auto& components = boxShapeModel->getMesh()->getComponents();
-					//for (auto& component : components)
-					//{
-						boxShapeModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
-						boxShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
-						boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
-						boxShapeModel->getShader().getMaterial().shininess = 99;
-					//}
+					boxShapeModel->getShader().getMaterial().ka = s_colors[idx % GM_array_size(s_colors)];
+					boxShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
+					boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
+					boxShapeModel->getShader().getMaterial().shininess = 99;
 
 					box->addModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, boxShapeModel));
 

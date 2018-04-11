@@ -276,7 +276,7 @@ public:
 	//! 拷贝GMObject私有数据
 	/*!
 	  GMObject不允许拷贝其私有数据，因此是个空实现。<BR>
-	  但是，GMObject的子类可以使用GM_ALLOW_COPY_DATA宏，允许子类调用其copyData虚方法，依次拷贝私有数据。
+	  但是，GMObject的子类可以使用GM_ALLOW_COPY_DATA宏，允许子类调用其copyData方法，依次拷贝私有数据。
 	  \param another 拷贝私有数据的目标对象，将目标对象的私有数据拷贝到此对象。
 	*/
 	void copyData(const GMObject& another) {}

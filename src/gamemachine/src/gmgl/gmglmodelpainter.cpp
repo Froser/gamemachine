@@ -113,7 +113,7 @@ void GMGLModelPainter::draw(const GMGameObject* parent)
 	if (model->getShader().getDiscard())
 		return;
 
-	glBindVertexArray(model->getBuffer()->arrayId);
+	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
 	draw(renderer, model);
 	glBindVertexArray(0);
 
@@ -139,8 +139,8 @@ void GMGLModelPainter::dispose(GMModelBuffer* md)
 
 void GMGLModelPainter::beginUpdateBuffer(GMModel* model)
 {
-	glBindVertexArray(model->getBuffer()->arrayId);
-	glBindBuffer(GL_ARRAY_BUFFER, model->getBuffer()->vertexBufferId);
+	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
+	glBindBuffer(GL_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
 }
 
 void GMGLModelPainter::endUpdateBuffer()
