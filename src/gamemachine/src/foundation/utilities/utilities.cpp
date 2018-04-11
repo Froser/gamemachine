@@ -289,13 +289,25 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 				vertex.loadFloat4(f4_vertex);
 				normal.loadFloat4(f4_normal);
 				uv.loadFloat4(f4_uv);
-				body->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-				body->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
+
+				GMVertex v = {
+					{ f4_vertex[0], f4_vertex[1], f4_vertex[2] },
+					{ f4_normal[0], f4_normal[1], f4_normal[2] },
+				};
+
 				if (customUV)
-					body->texcoord(f4_uv[0], 1 - f4_uv[1]);
+				{
+					v.texcoords[0] = f4_uv[0];
+					v.texcoords[1] = 1 - f4_uv[1];
+				}
 				else
-					body->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
-				body->color(1.f, 1.f, 1.f);
+				{
+					v.texcoords[0] = (f4_uv[0] + 1) / 2;
+					v.texcoords[1] = 1 - (f4_uv[1] + 1) / 2;
+				}
+
+				v.color[0] = v.color[1] = v.color[2] = 1.f;
+				body->vertex(v);
 			}
 		}
 		if (shaderCallback)
@@ -356,13 +368,24 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 				vertex.loadFloat4(f4_vertex);
 				normal.loadFloat4(f4_normal);
 				uv.loadFloat4(f4_uv);
-				body->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-				body->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
+
+				GMVertex v = {
+					{ f4_vertex[0], f4_vertex[1], f4_vertex[2] },
+					{ f4_normal[0], f4_normal[1], f4_normal[2] }
+				};
+
 				if (customUV)
-					body->texcoord(f4_uv[0], 1 - f4_uv[1]);
+				{
+					v.texcoords[0] = f4_uv[0];
+					v.texcoords[1] = 1 - f4_uv[1];
+				}
 				else
-					body->texcoord((f4_uv[0] + 1) / 2, 1 - (f4_uv[1] + 1) / 2);
-				body->color(1.f, 1.f, 1.f);
+				{
+					v.texcoords[0] = (f4_uv[0] + 1) / 2;
+					v.texcoords[1] = 1 - (f4_uv[1] + 1) / 2;
+				}
+				v.color[0] = v.color[1] = v.color[2] = v.color[3] = 1.f;
+				body->vertex(v);
 			}
 		}
 		if (shaderCallback)

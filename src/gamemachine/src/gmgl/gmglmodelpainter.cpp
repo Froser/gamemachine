@@ -30,13 +30,13 @@ void GMGLModelPainter::transfer()
 
 	for (auto& mesh : model->getMeshes())
 	{
-		mesh->calculateTangentSpace();
+		mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
 	}
 
 	GMModelBufferData bufferData;
 	Vector<GMVertex> packedVertices;
 	// 把数据打入顶点数组
-	packData(packedVertices);
+	packVertices(packedVertices);
 
 	GMuint verticeCount = 0;
 
@@ -70,7 +70,7 @@ void GMGLModelPainter::transfer()
 	{
 		Vector<GMVertex> packedIndices;
 		// 把数据打入顶点数组
-		packData(packedIndices);
+		packVertices(packedIndices);
 
 		glGenBuffers(1, &bufferData.indexBufferId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferData.indexBufferId);

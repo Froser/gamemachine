@@ -75,8 +75,11 @@ namespace
 				GMint idx = i * 3 + j;
 				const btVector3& vertex = vertexPositions[indices[idx]];
 				const btVector3& normal = vertexNormals[indices[idx]];
-				body->vertex(vertex[0], vertex[1], vertex[2]);
-				body->normal(normal[0], normal[1], normal[2]);
+				GMVertex v = {
+					{ vertex[0], vertex[1], vertex[2] },
+					{ normal[0], normal[1], normal[2] }
+				};
+				body->vertex(v);
 			}
 		}
 	}

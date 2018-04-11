@@ -5,72 +5,19 @@
 #include <iterator>
 #include "foundation/gamemachine.h"
 
-#define SAFE_ASSIGN(mb, df, pos) ((pos) >= (mb).size()) ? df : (mb[pos])
-#define VERTEX_OFFSET(offset, idx) ((offset * GMVertex::PositionDimension) + idx)
-#define UV_OFFSET(offset, idx) ((offset << 1) + idx)
+#define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
+#define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
-void GMModelPainter::packData(Vector<GMVertex>& packedData)
+void GMModelPainter::packVertices(Vector<GMVertex>& vertices)
 {
-	D(d);
-	GMVertex vd = { 0 };
 	GMModel* model = getModel();
 	GMMeshes& meshes = model->getMeshes();
-
+	GMuint offset = 0;
 	for (auto& mesh : meshes)
 	{
-		// 按照position的size()/3来分配顶点
-		GM_ASSERT(mesh->positions().size() % GMVertex::PositionDimension == 0);
-		for (GMuint i = 0; i < mesh->positions().size() / 3; ++i)
+		for (auto& vertex : mesh->vertices())
 		{
-			{
-				auto& data_ref = mesh->positions();
-				vd.vertices[0] = data_ref[i * 3];
-				vd.vertices[1] = data_ref[i * 3 + 1];
-				vd.vertices[2] = data_ref[i * 3 + 2];
-			}
-
-			{
-				auto& data_ref = mesh->normals();
-				vd.normals[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
-				vd.normals[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
-				vd.normals[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
-			}
-
-			{
-				auto& data_ref = mesh->texcoords();
-				vd.texcoords[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
-				vd.texcoords[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
-			}
-
-			{
-				auto& data_ref = mesh->tangents();
-				vd.tangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
-				vd.tangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
-				vd.tangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
-			}
-
-			{
-				auto& data_ref = mesh->bitangents();
-				vd.bitangents[0] = SAFE_ASSIGN(data_ref, 0, i * 3);
-				vd.bitangents[1] = SAFE_ASSIGN(data_ref, 0, i * 3 + 1);
-				vd.bitangents[2] = SAFE_ASSIGN(data_ref, 0, i * 3 + 2);
-			}
-
-			{
-				auto& data_ref = mesh->lightmaps();
-				vd.lightmaps[0] = SAFE_ASSIGN(data_ref, 0, i * 2);
-				vd.lightmaps[1] = SAFE_ASSIGN(data_ref, 0, i * 2 + 1);
-			}
-
-			{
-				auto& data_ref = mesh->colors();
-				vd.color[0] = SAFE_ASSIGN(data_ref, 0, i * 4);
-				vd.color[1] = SAFE_ASSIGN(data_ref, 0, i * 4 + 1);
-				vd.color[2] = SAFE_ASSIGN(data_ref, 0, i * 4 + 2);
-				vd.color[3] = SAFE_ASSIGN(data_ref, 0, i * 4 + 3);
-			}
-
-			packedData.push_back(vd);
+			vertices.push_back(vertex);
 		}
 	}
 }
@@ -88,7 +35,7 @@ void GMModelPainter::packIndices(Vector<GMuint>& indices)
 		}
 
 		// 每个Mesh按照自己的坐标排序，因此每个Mesh都应该在总缓存里面加上偏移
-		offset = mesh->positions().size() % GMVertex::PositionDimension;
+		offset += mesh->vertices().size();
 	}
 }
 
@@ -189,100 +136,74 @@ GMMesh::GMMesh(GMModel* parent)
 void GMMesh::clear()
 {
 	D(d);
-	GMClearSTLContainer(d->positions);
-	GMClearSTLContainer(d->normals);
-	GMClearSTLContainer(d->texcoords);
-	GMClearSTLContainer(d->tangents);
-	GMClearSTLContainer(d->bitangents);
-	GMClearSTLContainer(d->lightmaps);
-	GMClearSTLContainer(d->colors);
+	GMClearSTLContainer(d->vertices);
 	GMClearSTLContainer(d->indices);
 }
 
 void GMMesh::vertex(const GMVertex& v)
 {
 	D(d);
-	vertex(v.vertices[0], v.vertices[1], v.vertices[2]);
-	normal(v.normals[0], v.normals[1], v.normals[2]);
-	texcoord(v.texcoords[0], v.texcoords[1]);
-	lightmap(v.lightmaps[0], v.lightmaps[1]);
-	color(v.color[0], v.color[1], v.color[2]);
+	d->vertices.push_back(v);
+	if (v.texcoords[0] != 0 || v.texcoords[1] != 0)
+		d->noTexcoords = false;
 }
 
-void GMMesh::vertex(GMfloat x, GMfloat y, GMfloat z)
-{
-	D(d);
-	auto& vertices = d->positions;
-	vertices.push_back(x);
-	vertices.push_back(y);
-	vertices.push_back(z);
-}
-
-void GMMesh::normal(GMfloat x, GMfloat y, GMfloat z)
-{
-	D(d);
-	auto& normals = d->normals;
-	normals.push_back(x);
-	normals.push_back(y);
-	normals.push_back(z);
-}
-
-void GMMesh::texcoord(GMfloat u, GMfloat v)
-{
-	D(d);
-	auto& texcoords = d->texcoords;
-	texcoords.push_back(u);
-	texcoords.push_back(v);
-}
-
-void GMMesh::lightmap(GMfloat u, GMfloat v)
-{
-	D(d);
-	auto& lightmaps = d->lightmaps;
-	lightmaps.push_back(u);
-	lightmaps.push_back(v);
-}
-
-void GMMesh::color(GMfloat r, GMfloat g, GMfloat b, GMfloat a)
-{
-	D(d);
-	auto& colors = d->colors;
-	colors.push_back(r);
-	colors.push_back(g);
-	colors.push_back(b);
-	colors.push_back(a);
-}
-
-void GMMesh::addIndex(GMuint index)
+void GMMesh::index(GMuint index)
 {
 	D(d);
 	d->indices.push_back(index);
 }
 
-void GMMesh::calculateTangentSpace()
+void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 {
 	D(d);
-	enum
-	{
-		EdgeCount = 3
-	};
-
-	if (d->texcoords.size() == 0)
+	if (topologyMode == GMTopologyMode::Lines)
 		return;
 
-	GMuint verticesCount = d->positions.size() / GMVertex::PositionDimension;
-	GMuint faceCount = verticesCount / EdgeCount; // 计算每个三角形
-	for (GMuint i = 0; i < faceCount; i++)
+	if (d->noTexcoords)
+		return;
+
+	for (GMuint i = 0; i < d->vertices.size(); i++)
 	{
-		GMint o = i * 3;
-
-		GMVec3 e0(d->positions[VERTEX_OFFSET(o, 0)], d->positions[VERTEX_OFFSET(o, 1)], d->positions[VERTEX_OFFSET(o, 2)]);
-		GMVec3 e1(d->positions[VERTEX_OFFSET(o, 3)], d->positions[VERTEX_OFFSET(o, 4)], d->positions[VERTEX_OFFSET(o, 5)]);
-		GMVec3 e2(d->positions[VERTEX_OFFSET(o, 6)], d->positions[VERTEX_OFFSET(o, 7)], d->positions[VERTEX_OFFSET(o, 8)]);
-
-		GMVec2 uv0(d->texcoords[UV_OFFSET(o, 0)], d->texcoords[UV_OFFSET(o, 1)]);
-		GMVec2 uv1(d->texcoords[UV_OFFSET(o, 2)], d->texcoords[UV_OFFSET(o, 3)]);
-		GMVec2 uv2(d->texcoords[UV_OFFSET(o, 4)], d->texcoords[UV_OFFSET(o, 5)]);
+		GMVec3 e0, e1, e2;
+		GMVec2 uv0, uv1, uv2;
+		GMVertex& currentVertex = d->vertices[i];
+		if (topologyMode == GMTopologyMode::Triangles)
+		{
+			GMuint startIndex = i / 3 * 3;
+			GMuint vertexIndices[3] = { startIndex, startIndex + 1, startIndex + 2 };
+			GMuint indexInTriangle = i % 3;
+			e0 = TO_VEC3(d->vertices[vertexIndices[indexInTriangle % 3]].positions);
+			e1 = TO_VEC3(d->vertices[vertexIndices[(indexInTriangle + 1) % 3]].positions);
+			e2 = TO_VEC3(d->vertices[vertexIndices[(indexInTriangle + 2) % 3]].positions);
+			uv0 = TO_VEC2(d->vertices[vertexIndices[indexInTriangle % 3]].texcoords);
+			uv1 = TO_VEC2(d->vertices[vertexIndices[(indexInTriangle + 1) % 3]].texcoords);
+			uv2 = TO_VEC2(d->vertices[vertexIndices[(indexInTriangle + 2) % 3]].texcoords);
+		}
+		else
+		{
+			GM_ASSERT(topologyMode == GMTopologyMode::TriangleStrip);
+			if (i < 3)
+			{
+				GMuint vertexIndices[3] = { 0, 1, 2 };
+				e0 = TO_VEC3(d->vertices[vertexIndices[i % 3]].positions);
+				e1 = TO_VEC3(d->vertices[vertexIndices[(i + 1) % 3]].positions);
+				e2 = TO_VEC3(d->vertices[vertexIndices[(i + 2) % 3]].positions);
+				uv0 = TO_VEC2(d->vertices[vertexIndices[i % 3]].texcoords);
+				uv1 = TO_VEC2(d->vertices[vertexIndices[(i + 1) % 3]].texcoords);
+				uv2 = TO_VEC2(d->vertices[vertexIndices[(i + 2) % 3]].texcoords);
+			}
+			else
+			{
+				// 使用前2个顶点
+				e0 = TO_VEC3(d->vertices[i].positions);
+				e1 = TO_VEC3(d->vertices[i - 1].positions);
+				e2 = TO_VEC3(d->vertices[i - 2].positions);
+				uv0 = TO_VEC2(d->vertices[i].texcoords);
+				uv1 = TO_VEC2(d->vertices[i - 1].texcoords);
+				uv2 = TO_VEC2(d->vertices[i - 2].texcoords);
+			}
+		}
 
 		GMVec3 E1 = e1 - e0;
 		GMVec3 E2 = e2 - e0;
@@ -316,15 +237,12 @@ void GMMesh::calculateTangentSpace()
 		tangentVector.loadFloat4(f4_tangentVector);
 		bitangentVector.loadFloat4(f4_bitangentVector);
 
-		for (GMint j = 0; j < EdgeCount; j++)
-		{
-			d->tangents.push_back(f4_tangentVector[0]);
-			d->tangents.push_back(f4_tangentVector[1]);
-			d->tangents.push_back(f4_tangentVector[2]);
+		currentVertex.tangents[0] = f4_tangentVector[0];
+		currentVertex.tangents[1] = f4_tangentVector[1];
+		currentVertex.tangents[2] = f4_tangentVector[2];
 
-			d->bitangents.push_back(f4_bitangentVector[0]);
-			d->bitangents.push_back(f4_bitangentVector[1]);
-			d->bitangents.push_back(f4_bitangentVector[2]);
-		}
+		currentVertex.bitangents[0] = f4_bitangentVector[0];
+		currentVertex.bitangents[1] = f4_bitangentVector[1];
+		currentVertex.bitangents[2] = f4_bitangentVector[2];
 	}
 }

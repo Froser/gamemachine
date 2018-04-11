@@ -23,7 +23,6 @@
  */
 
 #include "stdafx.h"
-#include <gamemachine.h>
 #include "aldlist.h"
 #include <al/alc.h>
 #include <al/al.h>

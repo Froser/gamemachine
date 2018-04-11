@@ -86,7 +86,7 @@ void GMModelReader_Obj::init()
 	d->currentModel = nullptr;
 	d->positions.clear();
 	d->normals.clear();
-	d->textures.clear();
+	d->texcoords.clear();
 	d->materials.clear();
 }
 
@@ -102,7 +102,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 
 	// 事先分配一些内存，提高效率
 	d->positions.reserve(RESERVED);
-	d->textures.reserve(RESERVED);
+	d->texcoords.reserve(RESERVED);
 	d->normals.reserve(RESERVED);
 
 	GMString line;
@@ -130,7 +130,7 @@ bool GMModelReader_Obj::load(const GMModelLoadSettings& settings, GMBuffer& buff
 		else if (token == L"vt")
 		{
 			// texture
-			pushBackData<2>(s, d->textures);
+			pushBackData<2>(s, d->texcoords);
 		}
 		else if (token == L"mtllib")
 		{
@@ -190,64 +190,57 @@ void GMModelReader_Obj::appendFace(GMScanner& scanner)
 		if (face.isEmpty())
 			break;
 
-		GMScanner faceScanner(face, false, slashPredicate);
-		GMFloat4 f4_vec;
-
 		GMint v = INVALID, t = INVALID, n = INVALID;
+		GMScanner faceScanner(face, false, slashPredicate);
 		faceScanner.nextInt(&v);
 		faceScanner.nextInt(&t);
 		faceScanner.nextInt(&n);
 
-		GM_ASSERT(v != INVALID);
+		if (verticesCount >= 3)
 		{
-			if (verticesCount >= 3)
-			{
-				// 如果大于三个顶点组成的多边形，需要补入第一个顶点和上一个顶点，形成闭环，下同
-				currentMesh->vertex(firstVertex[0], firstVertex[1], firstVertex[2]);
-				currentMesh->vertex(lastVertex[0], lastVertex[1], lastVertex[2]);
-			}
-
-			auto& vec = d->positions[v - 1];
-			vec.loadFloat4(f4_vec);
-			currentMesh->vertex(f4_vec[0], f4_vec[1], f4_vec[2]);
-
-			if (!verticesCount)
-				firstVertex = f4_vec;
-			lastVertex = f4_vec;
+			// 如果大于三个顶点组成的多边形，需要补入第一个顶点和上一个顶点，形成闭环，下同
+			GMVertex first = {
+				{ firstVertex[0], firstVertex[1], firstVertex[2] },
+				{ firstNormal[0], firstNormal[1], firstNormal[2] },
+				{ firstTexcoord[0], firstTexcoord[1] },
+			};
+			GMVertex last = {
+				{ lastVertex[0], lastVertex[1], lastVertex[2] },
+				{ lastNormal[0], lastNormal[1], lastNormal[2] },
+				{ lastTexcoord[0], lastTexcoord[1] },
+			};
+			currentMesh->vertex(first);
+			currentMesh->vertex(last);
 		}
 
+		GMFloat4 f4_vertice, f4_normal, f4_texcoord;
 		{
-			if (verticesCount >= 3)
-			{
-				currentMesh->texcoord(firstTexcoord[0], firstTexcoord[1]);
-				currentMesh->texcoord(lastTexcoord[0], lastTexcoord[1]);
-			}
-
-			auto&& vec = t != INVALID ? d->textures[t - 1] : GMVec2(0, 0);
-			vec.loadFloat4(f4_vec);
-			currentMesh->texcoord(f4_vec[0], f4_vec[1]);
-
-			if (!verticesCount)
-				firstTexcoord = f4_vec;
-			lastTexcoord = f4_vec;
+			auto& vec = v != INVALID ? d->positions[v - 1] : Zero<GMVec3>();
+			vec.loadFloat4(f4_vertice);
 		}
-
-		GM_ASSERT(n != INVALID);
 		{
-			if (verticesCount >= 3)
-			{
-				currentMesh->normal(firstNormal[0], firstNormal[1], firstNormal[2]);
-				currentMesh->normal(lastNormal[0], lastNormal[1], lastNormal[2]);
-			}
-
-			auto& vec = d->normals[n - 1];
-			vec.loadFloat4(f4_vec);
-			currentMesh->normal(f4_vec[0], f4_vec[1], f4_vec[2]);
-
-			if (!verticesCount)
-				firstNormal = f4_vec;
-			lastNormal = f4_vec;
+			auto& vec = n != INVALID ? d->normals[n - 1] : Zero<GMVec3>();
+			vec.loadFloat4(f4_normal);
 		}
+		{
+			auto& vec = t != INVALID ? d->texcoords[t - 1] : Zero<GMVec2>();
+			vec.loadFloat4(f4_texcoord);
+		}
+		GMVertex vertex = {
+			{ f4_vertice[0], f4_vertice[1], f4_vertice[2] },
+			{ f4_normal[0], f4_normal[1], f4_normal[2] },
+			{ f4_texcoord[0], f4_texcoord[1] },
+		};
+		currentMesh->vertex(vertex);
+		if (!verticesCount)
+		{
+			firstVertex = f4_vertice;
+			firstNormal = f4_normal;
+			firstTexcoord = f4_texcoord;
+		}
+		lastVertex = f4_vertice;
+		lastNormal = f4_normal;
+		lastTexcoord = f4_texcoord;
 
 		++verticesCount;
 	};

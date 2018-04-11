@@ -140,29 +140,49 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 
 				// 采用左上角为原点的Texcoord坐标系
 
-				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
+				GMVertex P0 = {
+					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x), UV_Y(glyph.y) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+				GMVertex P1 = {
+					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+				GMVertex P2 = {
+					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+				GMVertex P3 = {
+					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
 
-				mesh->texcoord(UV_X(glyph.x), UV_Y(glyph.y));
-				mesh->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
-				mesh->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
-
-				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-
-				mesh->vertex(-coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
-				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z);
-				mesh->vertex(-coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z);
-
-				mesh->texcoord(UV_X(glyph.x), UV_Y(glyph.y + glyph.height));
-				mesh->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y));
-				mesh->texcoord(UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height));
-
-				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
-				mesh->color(typoResult.color[0], typoResult.color[1], typoResult.color[2]);
+				mesh->vertex(P0);
+				mesh->vertex(P2);
+				mesh->vertex(P1);
+				mesh->vertex(P1);
+				mesh->vertex(P2);
+				mesh->vertex(P3);
 			}
 		}
 	END_GLYPH_XY()

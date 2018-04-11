@@ -310,10 +310,15 @@ void GMBSPRender::createObject(const GMBSP_Render_Face& face, const GMShader& sh
 
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);
-			mesh->vertex(f4_position[0], f4_position[1], f4_position[2]);
-			mesh->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-			mesh->texcoord(vertex.decalS, vertex.decalT);
-			mesh->lightmap(vertex.lightmapS, vertex.lightmapT);
+			GMVertex v = {
+				{ f4_position[0], f4_position[1], f4_position[2] },
+				{ f4_normal[0], f4_normal[1], f4_normal[2] },
+				{ vertex.decalS, vertex.decalT },
+				{ 0, 0, 0 }, {0, 0, 0},
+				{ vertex.lightmapS, vertex.lightmapT }
+			};
+
+			mesh->vertex(v);
 		}
 	}
 	*obj = model;
@@ -353,10 +358,15 @@ void GMBSPRender::createObject(const GMBSP_Render_BiquadraticPatch& biqp, const 
 
 			vertex.position.loadFloat4(f4_position);
 			normal.loadFloat4(f4_normal);
-			mesh->vertex(f4_position[0], f4_position[1], f4_position[2]);
-			mesh->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
-			mesh->texcoord(vertex.decalS, vertex.decalT);
-			mesh->lightmap(vertex.lightmapS, vertex.lightmapT);
+			GMVertex v = {
+				{ f4_position[0], f4_position[1], f4_position[2] },
+				{ f4_normal[0], f4_normal[1], f4_normal[2] },
+				{ vertex.decalS, vertex.decalT },
+				{ 0, 0, 0 },{ 0, 0, 0 },
+				{ vertex.lightmapS, vertex.lightmapT }
+			};
+
+			mesh->vertex(v);
 		}
 	}
 	*obj = model;
@@ -421,8 +431,13 @@ void GMBSPRender::createBox(const GMVec3& extents, const GMVec3& position, const
 
 			vertex.loadFloat4(f4_vertex);
 			normal.loadFloat4(f4_normal);
-			mesh->vertex(f4_vertex[0], f4_vertex[1], f4_vertex[2]);
-			mesh->normal(f4_normal[0], f4_normal[1], f4_normal[2]);
+
+			GMVertex v = {
+				{ f4_vertex[0], f4_vertex[1], f4_vertex[2] },
+				{ f4_normal[0], f4_normal[1], f4_normal[2] },
+			};
+			mesh->vertex(v);
+
 			//TODO
 			//component->uv(vertex.decalS, vertex.decalT);
 			//component->lightmap(1.f, 1.f);

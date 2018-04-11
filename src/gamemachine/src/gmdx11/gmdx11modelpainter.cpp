@@ -61,12 +61,12 @@ void GMDx11ModelPainter::transfer()
 
 	for (auto& mesh : model->getMeshes())
 	{
-		mesh->calculateTangentSpace();
+		mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
 	}
 
 	Vector<GMVertex> packedVertices;
 	// 把数据打入顶点数组
-	packData(packedVertices);
+	packVertices(packedVertices);
 	GMuint verticesCount = 0;
 
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
@@ -89,7 +89,7 @@ void GMDx11ModelPainter::transfer()
 	{
 		Vector<GMVertex> packedIndices;
 		// 把数据打入顶点数组
-		packData(packedIndices);
+		packVertices(packedIndices);
 
 		// 如果是索引缓存，需要构建一份索引数据
 		D3D11_USAGE usage = D3D11_USAGE_DEFAULT;

@@ -28,7 +28,7 @@ struct GMVertex
 		ColorDimension = 4,
 	};
 
-	Array<GMfloat, PositionDimension> vertices;
+	Array<GMfloat, PositionDimension> positions;
 	Array<GMfloat, NormalDimension> normals;
 	Array<GMfloat, TexcoordDimension> texcoords;
 	Array<GMfloat, TextureDimension> tangents;
@@ -75,7 +75,7 @@ protected:
 	inline GMModel* getModel() { D(d); return d->model; }
 
 protected:
-	void packData(Vector<GMVertex>& packedData);
+	void packVertices(Vector<GMVertex>& vertices);
 	void packIndices(Vector<GMuint>& indices);
 };
 
@@ -290,25 +290,20 @@ public:
 };
 
 #define GM_DEFINE_VERTEX_DATA(name) \
-	Vector<GMModel::DataType> name; \
-	GMuint transferred_##name##_byte_size = 0;
+	Vector<GMModel::DataType> name;
 
 #define GM_DEFINE_VERTEX_PROPERTY(name) \
 	inline auto& name() { D(d); return d->name; }
 
 typedef Vector<GMModel*> GMModels;
+typedef Vector<GMVertex> GMVertices;
+typedef Vector<GMuint> GMIndices;
 
 GM_PRIVATE_OBJECT(GMMesh)
 {
-	GM_DEFINE_VERTEX_DATA(positions);
-	GM_DEFINE_VERTEX_DATA(normals);
-	GM_DEFINE_VERTEX_DATA(texcoords);
-	GM_DEFINE_VERTEX_DATA(tangents);
-	GM_DEFINE_VERTEX_DATA(bitangents);
-	GM_DEFINE_VERTEX_DATA(lightmaps);
-	GM_DEFINE_VERTEX_DATA(colors); //顶点颜色，一般渲染不会用到这个，用于粒子绘制
-
-	GM_DEFINE_VERTEX_DATA(indices); //顶点索引，用于索引模式
+	bool noTexcoords = true;
+	GMVertices vertices;
+	GMIndices indices;
 };
 
 //! 表示一份网格数据。
@@ -323,24 +318,31 @@ public:
 	GMMesh(GMModel* parent);
 
 public:
-	GM_DEFINE_VERTEX_PROPERTY(positions);
-	GM_DEFINE_VERTEX_PROPERTY(normals);
-	GM_DEFINE_VERTEX_PROPERTY(texcoords);
-	GM_DEFINE_VERTEX_PROPERTY(tangents);
-	GM_DEFINE_VERTEX_PROPERTY(bitangents);
-	GM_DEFINE_VERTEX_PROPERTY(lightmaps);
-	GM_DEFINE_VERTEX_PROPERTY(colors);
-	GM_DEFINE_VERTEX_PROPERTY(indices);
-
-	void calculateTangentSpace();
+	//! 计算网格的切线空间。
+	/*!
+	  切线空间的计算和拓扑模式有关。<BR>
+	  如果拓扑模式是GMTopologyMode::TriangleStrip，前3个顶点将相互作为相邻顶点来计算，第4个及以后的顶点将取前2个顶点为相邻顶点。<BR>
+	  如果拓扑模式是GMTopologyMode::Triangles，将采取3个顶点为一组相邻顶点来进行计算。<BR>
+	  如果拓扑模式是GMTopologyMode::Lines，不会计算切线空间。
+	  \param topologyMode 网格拓扑模式。
+	*/
+	void calculateTangentSpace(GMTopologyMode topologyMode);
 	void clear();
 	void vertex(const GMVertex& vertex);
-	void vertex(GMfloat x, GMfloat y, GMfloat z);
-	void normal(GMfloat x, GMfloat y, GMfloat z);
-	void texcoord(GMfloat u, GMfloat v);
-	void lightmap(GMfloat u, GMfloat v);
-	void color(GMfloat r, GMfloat g, GMfloat b, GMfloat a = 1.0f);
-	void addIndex(GMuint index);
+	void index(GMuint index);
+
+public:
+	const GMVertices& vertices()
+	{
+		D(d);
+		return d->vertices;
+	}
+
+	const GMIndices& indices()
+	{
+		D(d);
+		return d->indices;
+	}
 };
 
 END_NS

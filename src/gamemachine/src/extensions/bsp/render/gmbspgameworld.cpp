@@ -17,7 +17,7 @@
 BEGIN_NS
 
 // 天空
-static GMVec2 uvs[24] = {
+static GMVec2 texcoord[24] = {
 	GMVec2(0, 0),
 	GMVec2(0, 1),
 	GMVec2(1, 1),
@@ -133,19 +133,33 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 	GMMesh* mesh = new GMMesh(model);
 	for (GMuint i = 0; i < 6; i++)
 	{
-		mesh->vertex(vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ());
-		mesh->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
-		mesh->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
-		mesh->texcoord(uvs[i * 4].getX(), uvs[i * 4].getY());
-		mesh->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
-		mesh->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
+		GMVertex P0 = {
+			{ vertices[i * 4].getX(), vertices[i * 4].getY(), vertices[i * 4].getZ() },
+			{ 0, 0, 0 },
+			{ texcoord[i * 4].getX(), texcoord[i * 4].getY() },
+		};
+		GMVertex P1 = {
+			{ vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ() },
+			{ 0, 0, 0 },
+			{ texcoord[i * 4 + 1].getX(), texcoord[i * 4 + 1].getY() },
+		};
+		GMVertex P2 = {
+			{ vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ() },
+			{ 0, 0, 0 },
+			{ texcoord[i * 4 + 2].getX(), texcoord[i * 4 + 2].getY() },
+		};
+		GMVertex P3 = {
+			{ vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ() },
+			{ 0, 0, 0 },
+			{ texcoord[i * 4 + 3].getX(), texcoord[i * 4 + 3].getY() },
+		};
 
-		mesh->vertex(vertices[i * 4 + 1].getX(), vertices[i * 4 + 1].getY(), vertices[i * 4 + 1].getZ());
-		mesh->vertex(vertices[i * 4 + 2].getX(), vertices[i * 4 + 2].getY(), vertices[i * 4 + 2].getZ());
-		mesh->vertex(vertices[i * 4 + 3].getX(), vertices[i * 4 + 3].getY(), vertices[i * 4 + 3].getZ());
-		mesh->texcoord(uvs[i * 4 + 1].getX(), uvs[i * 4 + 1].getY());
-		mesh->texcoord(uvs[i * 4 + 2].getX(), uvs[i * 4 + 2].getY());
-		mesh->texcoord(uvs[i * 4 + 3].getX(), uvs[i * 4 + 3].getY());
+		mesh->vertex(P0);
+		mesh->vertex(P2);
+		mesh->vertex(P1);
+		mesh->vertex(P1);
+		mesh->vertex(P2);
+		mesh->vertex(P3);
 	}
 }
 

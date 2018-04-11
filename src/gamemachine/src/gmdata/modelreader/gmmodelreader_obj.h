@@ -26,7 +26,7 @@ GM_PRIVATE_OBJECT(GMModelReader_Obj)
 	GMModels* models = nullptr;
 	AlignedVector<GMVec3> positions;
 	AlignedVector<GMVec3> normals;
-	AlignedVector<GMVec2> textures;
+	AlignedVector<GMVec2> texcoords;
 	Map<GMString, ModelReader_Obj_Material> materials;
 	GMString currentMaterialName;
 	GMModel* currentModel;
