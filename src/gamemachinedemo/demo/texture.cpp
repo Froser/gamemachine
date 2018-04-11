@@ -28,10 +28,6 @@ void Demo_Texture::init()
 		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.getMaterial().kd = GMVec3(1, 1, 1);
-
-			auto pk = gm::GameMachine::instance().getGamePackageManager();
-			auto& container = world->getAssets();
-
 			gm::ITexture* tex = nullptr;
 			gm::GMToolUtil::createTexture("gamemachine.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
@@ -81,4 +77,50 @@ void Demo_Texture::event(gm::GameMachineEvent evt)
 	default:
 		break;
 	}
+}
+
+void Demo_Texture_Index::init()
+{
+	D(d);
+	Base::init();
+
+	// 创建对象
+	d->demoWorld = new gm::GMDemoGameWorld();
+
+	gm::GMModel* quad = new gm::GMModel();
+	quad->setPrimitiveTopologyMode(gm::GMTopologyMode::Triangles);
+	quad->setDrawMode(gm::GMModelDrawMode::Index);
+	gm::GMMesh* mesh = new gm::GMMesh(quad);
+
+	gm::GMVertex V1 = { { -1.f, -.5f, 0 }, { 0, 0, -1 }, { 0, 1 } };
+	gm::GMVertex V2 = { { -1.f, .5f, 0 }, { 0, 0, -1 }, { 0, 0 } };
+	gm::GMVertex V3 = { { 1.f, -.5f, 0 }, { 0, 0, -1 }, { 1, 1 } };
+	gm::GMVertex V4 = { { 1.f, .5f, 0 }, { 0, 0, -1 }, { 1, 0 } };
+	mesh->vertex(V1);
+	mesh->vertex(V2);
+	mesh->vertex(V3);
+	mesh->vertex(V4);
+	mesh->index(0);
+	mesh->index(1);
+	mesh->index(2);
+
+	gm::GMMesh* mesh2 = new gm::GMMesh(quad);
+	mesh2->vertex(V1);
+	mesh2->vertex(V2);
+	mesh2->vertex(V3);
+	mesh2->vertex(V4);
+	mesh2->index(2);
+	mesh2->index(1);
+	mesh2->index(3);
+
+	gm::GMShader& shader = quad->getShader();
+	shader.getMaterial().kd = GMVec3(1, 1, 1);
+
+	gm::ITexture* tex = nullptr;
+	gm::GMToolUtil::createTexture("gamemachine.png", &tex);
+	gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
+	d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+
+	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, quad);
+	d->demoWorld->addObject("texture", new gm::GMGameObject(quadAsset));
 }

@@ -140,7 +140,7 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 
 				// 采用左上角为原点的Texcoord坐标系
 
-				GMVertex P0 = {
+				GMVertex V0 = {
 					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x), UV_Y(glyph.y) },
@@ -149,7 +149,7 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 					{ 0, 0 },
 					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
 				};
-				GMVertex P1 = {
+				GMVertex V1 = {
 					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
@@ -158,7 +158,7 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 					{ 0, 0 },
 					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
 				};
-				GMVertex P2 = {
+				GMVertex V2 = {
 					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
@@ -167,7 +167,7 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 					{ 0, 0 },
 					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
 				};
-				GMVertex P3 = {
+				GMVertex V3 = {
 					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
@@ -177,12 +177,12 @@ void GMGlyphObject::createVertices(GMMesh* mesh)
 					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
 				};
 
-				mesh->vertex(P0);
-				mesh->vertex(P2);
-				mesh->vertex(P1);
-				mesh->vertex(P1);
-				mesh->vertex(P2);
-				mesh->vertex(P3);
+				mesh->vertex(V0);
+				mesh->vertex(V2);
+				mesh->vertex(V1);
+				mesh->vertex(V1);
+				mesh->vertex(V2);
+				mesh->vertex(V3);
 			}
 		}
 	END_GLYPH_XY()

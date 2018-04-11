@@ -61,7 +61,8 @@ void GMDx11ModelPainter::transfer()
 
 	for (auto& mesh : model->getMeshes())
 	{
-		mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
+		if (model->getShader().getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0).getFrameCount() > 0)
+			mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
 	}
 
 	Vector<GMVertex> packedVertices;
@@ -85,11 +86,11 @@ void GMDx11ModelPainter::transfer()
 	GMComPtr<ID3D11Device> device = d->engine->getDevice();
 	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->vertexBuffer));
 
-	if (model->getBufferType() == GMModelBufferType::IndexBuffer)
+	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
-		Vector<GMVertex> packedIndices;
+		Vector<GMuint> packedIndices;
 		// 把数据打入顶点数组
-		packVertices(packedIndices);
+		packIndices(packedIndices);
 
 		// 如果是索引缓存，需要构建一份索引数据
 		D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
@@ -106,7 +107,7 @@ void GMDx11ModelPainter::transfer()
 		bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
 		GMComPtr<ID3D11Device> device = d->engine->getDevice();
-		GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->vertexBuffer));
+		GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->indexBuffer));
 
 		verticesCount = packedIndices.size();
 	}

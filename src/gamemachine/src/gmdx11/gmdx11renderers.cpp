@@ -501,7 +501,7 @@ void GMDx11Renderer::prepareBuffer(GMModel* model, IQueriable* painter)
 	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
 	GM_ASSERT(vertexBuffer);
 	d->deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	if (model->getBufferType() == GMModelBufferType::IndexBuffer)
+	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
 		GMComPtr<ID3D11Buffer> indexBuffer;
 		painter->getInterface(GameMachineInterfaceID::D3D11IndexBuffer, (void**)&indexBuffer);
@@ -686,10 +686,10 @@ void GMDx11Renderer::passAllAndDraw(GMModel* model)
 		pass->Apply(0, d->deviceContext);
 		drawTextures(model);
 
-		if (model->getBufferType() == GMModelBufferType::VertexBuffer)
+		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(model->getVerticesCount(), 0);
 		else
-			d->deviceContext->Draw(model->getVerticesCount(), 0);
+			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
 	}
 }
 

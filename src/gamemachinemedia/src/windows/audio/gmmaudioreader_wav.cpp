@@ -2,6 +2,7 @@
 #include "gmmaudioreader_wav.h"
 #include "alframework/cwaves.h"
 #include <al/al.h>
+#include <gmtools.h>
 
 #pragma pack(push, 4)
 struct WAVEFILEHEADER

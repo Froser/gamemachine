@@ -25,6 +25,7 @@ namespace
 	void loadDemostrations(DemostrationWorld* world)
 	{
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
+		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
 		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
 		world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
 		world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));

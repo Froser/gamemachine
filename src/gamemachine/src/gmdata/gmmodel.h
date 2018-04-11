@@ -178,10 +178,10 @@ enum class GMTopologyMode
 	Lines,
 };
 
-enum class GMModelBufferType
+enum class GMModelDrawMode
 {
-	VertexBuffer,
-	IndexBuffer,
+	Vertex,
+	Index,
 };
 
 GM_PRIVATE_OBJECT(GMModel)
@@ -191,7 +191,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMScopePtr<GMModelPainter> painter;
 	GMShader shader;
 	GMModelBuffer* modelBuffer = nullptr;
-	GMModelBufferType modelBufferType = GMModelBufferType::VertexBuffer;
+	GMModelDrawMode drawMode = GMModelDrawMode::Vertex;
 	GMModelType type = GMModelType::Model3D;
 	GMTopologyMode mode = GMTopologyMode::Triangles;
 	GMuint verticesCount = 0;
@@ -231,7 +231,7 @@ public:
 	GM_DECLARE_PROPERTY(Type, type, GMModelType);
 	GM_DECLARE_PROPERTY(Shader, shader, GMShader);
 	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMuint);
-	GM_DECLARE_PROPERTY(BufferType, modelBufferType, GMModelBufferType);
+	GM_DECLARE_PROPERTY(DrawMode, drawMode, GMModelDrawMode);
 
 public:
 	inline void setPainter(AUTORELEASE GMModelPainter* painter)
@@ -301,7 +301,6 @@ typedef Vector<GMuint> GMIndices;
 
 GM_PRIVATE_OBJECT(GMMesh)
 {
-	bool noTexcoords = true;
 	GMVertices vertices;
 	GMIndices indices;
 };

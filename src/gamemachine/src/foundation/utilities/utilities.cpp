@@ -50,182 +50,182 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModel** out
 
 	//Front
 	{
-		GMVertex P0 = {
+		GMVertex V0 = {
 			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
 			{ 0, 0, -1.f }, //normal
 			{ 0, 1 }, //texcoord
 		},
-		P1 = {
+		V1 = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
 			{ 0, 0, -1.f }, //normal
 			{ 0, 0 }, //texcoord
 		},
-		P2 = {
+		V2 = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 0, 0, -1.f }, //normal
 			{ 1, 1 }, //texcoord
 		},
-		P3 = {
+		V3 = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
 			{ 0, 0, -1.f }, //normal
 			{ 1, 0 }, //texcoord
 		};
-		face->vertex(P0);
-		face->vertex(P1);
-		face->vertex(P2);
-		face->vertex(P1);
-		face->vertex(P3);
-		face->vertex(P2);
+		face->vertex(V0);
+		face->vertex(V1);
+		face->vertex(V2);
+		face->vertex(V1);
+		face->vertex(V3);
+		face->vertex(V2);
 	}
 
 	//Back
 	{
-		GMVertex P0 = {
+		GMVertex V0 = {
 			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
 			{ 0, 0, 1.f }, //normal
 			{ 0, 1 }, //texcoord
 		},
-		P1 = {
+		V1 = {
 			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
 			{ 0, 0, 1.f }, //normal
 			{ 0, 0 }, //texcoord
 		},
-		P2 = {
+		V2 = {
 			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
 			{ 0, 0, 1.f }, //normal
 			{ 1, 1 }, //texcoord
 		},
-		P3 = {
+		V3 = {
 			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
 			{ 0, 0, 1.f }, //normal
 			{ 1, 0 }, //texcoord
 		};
-		face->vertex(P0);
-		face->vertex(P1);
-		face->vertex(P2);
-		face->vertex(P1);
-		face->vertex(P3);
-		face->vertex(P2);
+		face->vertex(V0);
+		face->vertex(V1);
+		face->vertex(V2);
+		face->vertex(V1);
+		face->vertex(V3);
+		face->vertex(V2);
 	}
 
 	//Left
 	{
-		GMVertex P0 = {
+		GMVertex V0 = {
 			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
 			{ -1.f, 0, 0 }, //normal
 			{ 0, 1 }, //texcoord
 		},
-		P1 = {
+		V1 = {
 			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
 			{ -1.f, 0, 0 }, //normal
 			{ 0, 0 }, //texcoord
 		},
-		P2 = {
+		V2 = {
 			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
 			{ -1.f, 0, 0 }, //normal
 			{ 1, 1 }, //texcoord
 		},
-		P3 = {
+		V3 = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
 			{ -1.f, 0, 0 }, //normal
 			{ 1, 0 }, //texcoord
 		};
-		face->vertex(P0);
-		face->vertex(P1);
-		face->vertex(P2);
-		face->vertex(P1);
-		face->vertex(P3);
-		face->vertex(P2);
+		face->vertex(V0);
+		face->vertex(V1);
+		face->vertex(V2);
+		face->vertex(V1);
+		face->vertex(V3);
+		face->vertex(V2);
 	}
 
 	//Right
 	{
-		GMVertex P0 = {
+		GMVertex V0 = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 1.f, 0, 0 }, //normal
 			{ 0, 1 }, //texcoord
 		},
-		P1 = {
+		V1 = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
 			{ 1.f, 0, 0 }, //normal
 			{ 0, 0 }, //texcoord
 		},
-		P2 = {
+		V2 = {
 			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
 			{ 1.f, 0, 0 }, //normal
 			{ 1, 1 }, //texcoord
 		},
-		P3 = {
+		V3 = {
 			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
 			{ 1.f, 0, 0 }, //normal
 			{ 1, 0 }, //texcoord
 		};
-		face->vertex(P0);
-		face->vertex(P1);
-		face->vertex(P2);
-		face->vertex(P1);
-		face->vertex(P3);
-		face->vertex(P2);
+		face->vertex(V0);
+		face->vertex(V1);
+		face->vertex(V2);
+		face->vertex(V1);
+		face->vertex(V3);
+		face->vertex(V2);
 	}
 
 	//Bottom
 	{
-		GMVertex P0 = {
+		GMVertex V0 = {
 			{ vertices[4][0], vertices[4][1], vertices[4][2] }, //position
 			{ 0, -1.f, 0 }, //normal
 			{ 0, 1 }, //texcoord
 		},
-		P1 = {
+		V1 = {
 			{ vertices[0][0], vertices[0][1], vertices[0][2] }, //position
 			{ 0, -1.f, 0 }, //normal
 			{ 0, 0 }, //texcoord
 		},
-		P2 = {
+		V2 = {
 			{ vertices[6][0], vertices[6][1], vertices[6][2] }, //position
 			{ 0, -1.f, 0 }, //normal
 			{ 1, 1 }, //texcoord
 		},
-		P3 = {
+		V3 = {
 			{ vertices[2][0], vertices[2][1], vertices[2][2] }, //position
 			{ 0, -1.f, 0 }, //normal
 			{ 1, 0 }, //texcoord
 		};
-		face->vertex(P0);
-		face->vertex(P1);
-		face->vertex(P2);
-		face->vertex(P1);
-		face->vertex(P3);
-		face->vertex(P2);
+		face->vertex(V0);
+		face->vertex(V1);
+		face->vertex(V2);
+		face->vertex(V1);
+		face->vertex(V3);
+		face->vertex(V2);
 	}
 
 	//Top
 	{
-		GMVertex P0 = {
+		GMVertex V0 = {
 			{ vertices[1][0], vertices[1][1], vertices[1][2] }, //position
 			{ 0, 1.f, 0 }, //normal
 			{ 0, 1 }, //texcoord
 		},
-		P1 = {
+		V1 = {
 			{ vertices[5][0], vertices[5][1], vertices[5][2] }, //position
 			{ 0, 1.f, 0 }, //normal
 			{ 0, 0 }, //texcoord
 		},
-		P2 = {
+		V2 = {
 			{ vertices[3][0], vertices[3][1], vertices[3][2] }, //position
 			{ 0, 1.f, 0 }, //normal
 			{ 1, 1 }, //texcoord
 		},
-		P3 = {
+		V3 = {
 			{ vertices[7][0], vertices[7][1], vertices[7][2] }, //position
 			{ 0, 1.f, 0 }, //normal
 			{ 1, 0 }, //texcoord
 		};
-		face->vertex(P0);
-		face->vertex(P1);
-		face->vertex(P2);
-		face->vertex(P1);
-		face->vertex(P3);
-		face->vertex(P2);
+		face->vertex(V0);
+		face->vertex(V1);
+		face->vertex(V2);
+		face->vertex(V1);
+		face->vertex(V3);
+		face->vertex(V2);
 	}
 
 	*out = model;

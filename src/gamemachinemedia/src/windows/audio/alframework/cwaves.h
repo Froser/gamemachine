@@ -7,6 +7,11 @@
 
 #include <stdio.h>
 
+namespace gm
+{
+	class GMMemoryStream;
+}
+
 #define MAX_NUM_WAVEID			1024
 
 #define WAVE_SUCCEEDED(hr) (((WAVERESULT)(hr)) >= 0)

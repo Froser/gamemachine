@@ -23,4 +23,13 @@ public:
 	virtual void event(gm::GameMachineEvent evt) override;
 };
 
+class Demo_Texture_Index : public Demo_Texture
+{
+public:
+	using Demo_Texture::Demo_Texture;
+
+public:
+	virtual void init() override;
+};
+
 #endif

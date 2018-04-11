@@ -30,7 +30,8 @@ void GMGLModelPainter::transfer()
 
 	for (auto& mesh : model->getMeshes())
 	{
-		mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
+		if (model->getShader().getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0).getFrameCount() > 0)
+			mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
 	}
 
 	GMModelBufferData bufferData;
@@ -66,11 +67,11 @@ void GMGLModelPainter::transfer()
 		glEnableVertexAttribArray(gmVertexIndex(type));
 	}
 	
-	if (model->getBufferType() == GMModelBufferType::IndexBuffer)
+	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
-		Vector<GMVertex> packedIndices;
+		Vector<GMuint> packedIndices;
 		// 把数据打入顶点数组
-		packVertices(packedIndices);
+		packIndices(packedIndices);
 
 		glGenBuffers(1, &bufferData.indexBufferId);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferData.indexBufferId);

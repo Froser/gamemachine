@@ -144,8 +144,6 @@ void GMMesh::vertex(const GMVertex& v)
 {
 	D(d);
 	d->vertices.push_back(v);
-	if (v.texcoords[0] != 0 || v.texcoords[1] != 0)
-		d->noTexcoords = false;
 }
 
 void GMMesh::index(GMuint index)
@@ -158,9 +156,6 @@ void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 {
 	D(d);
 	if (topologyMode == GMTopologyMode::Lines)
-		return;
-
-	if (d->noTexcoords)
 		return;
 
 	for (GMuint i = 0; i < d->vertices.size(); i++)
