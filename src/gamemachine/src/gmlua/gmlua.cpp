@@ -199,7 +199,7 @@ void GMLua::setTable(GMObject& obj)
 	GM_ASSERT(meta);
 	for (const auto& member : *meta)
 	{
-		push(member.first.c_str(), member.second);
+		push(member.first.toStdString().c_str(), member.second);
 	}
 }
 

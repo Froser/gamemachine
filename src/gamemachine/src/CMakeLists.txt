@@ -125,6 +125,8 @@ set(SOURCES
 		foundation/interfaces.h
 		foundation/gmstates.h
 		foundation/gmstates.cpp
+		foundation/gmvariant.h
+		foundation/gmvariant.cpp
 		foundation/gmthread.h
 		foundation/gmprofile.h
 		foundation/gmprofile.cpp

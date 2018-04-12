@@ -5,7 +5,7 @@
 
 extern "C"
 {
-	GMLargeInteger highResolutionTimerFrequency()
+	GMint64 highResolutionTimerFrequency()
 	{
 		LARGE_INTEGER i;
 		BOOL b = QueryPerformanceFrequency(&i);
@@ -13,7 +13,7 @@ extern "C"
 		return i.QuadPart;
 	}
 
-	GMLargeInteger highResolutionTimer()
+	GMint64 highResolutionTimer()
 	{
 		LARGE_INTEGER i;
 		BOOL b = QueryPerformanceCounter(&i);

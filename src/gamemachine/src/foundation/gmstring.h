@@ -1,16 +1,25 @@
 ﻿#ifndef __GMSTRING_H__
 #define __GMSTRING_H__
 #include <defines.h>
-#include <gmobject.h>
 #include <string>
 #include "assert.h"
+#include <functional>
 BEGIN_NS
 
-GM_PRIVATE_OBJECT(GMString)
+#define DECLARE_STRING_PRIVATE(Type) \
+private:					\
+	typedef Type##Private DataType; \
+	DataType m_data; \
+	DataType* data() const { return const_cast<DataType*>(&m_data); }
+
+#define D_STR(d) auto d = data();
+
+struct GMStringPrivate
 {
 	std::wstring data;
 };
 
+class GMString;
 static inline GMString operator +(const GMString& left, const GMString& right);
 
 //! 表示GameMachine中字符的类
@@ -21,7 +30,7 @@ static inline GMString operator +(const GMString& left, const GMString& right);
 */
 class GMString
 {
-	DECLARE_PRIVATE_NGO(GMString)
+	DECLARE_STRING_PRIVATE(GMString)
 
 	friend inline GMString operator +(const GMString& left, const GMString& right);
 
@@ -104,7 +113,7 @@ public:
 	*/
 	bool operator == (const GMString& str) const
 	{
-		D(d);
+		D_STR(d);
 		return d->data == str.toStdWString();
 	}
 
@@ -127,7 +136,7 @@ public:
 	*/
 	bool operator < (const GMString& str) const
 	{
-		D(d);
+		D_STR(d);
 		return d->data < str.toStdWString();
 	}
 
@@ -149,7 +158,7 @@ public:
 	*/
 	GMString& operator = (GMString&& s) noexcept
 	{
-		D(d);
+		D_STR(d);
 		using namespace std;
 		swap(d->data, s.data()->data);
 		return *this;
@@ -175,7 +184,7 @@ public:
 	*/
 	GMString& operator += (GMwchar str)
 	{
-		D(d);
+		D_STR(d);
 		d->data += str;
 		return *this;
 	}
@@ -213,7 +222,7 @@ public:
 	*/
 	const GMwchar* c_str() const
 	{
-		D(d);
+		D_STR(d);
 		return d->data.c_str();
 	}
 
@@ -224,7 +233,7 @@ public:
 	*/
 	GMlong length() const
 	{
-		D(d);
+		D_STR(d);
 		return d->data.length();
 	}
 
@@ -235,7 +244,7 @@ public:
 	*/
 	bool isEmpty() const
 	{
-		D(d);
+		D_STR(d);
 		return d->data.empty();
 	}
 
@@ -246,7 +255,7 @@ public:
 	*/
 	GMString& append(const GMString& str)
 	{
-		D(d);
+		D_STR(d);
 		*this += str;
 		return *this;
 	}
@@ -268,14 +277,14 @@ public:
 	//! 清除一个字符串中的所有字符。
 	void clear()
 	{
-		D(d);
+		D_STR(d);
 		d->data.clear();
 	}
 
 	//! 为字符串预先分配空间。
 	void reserve(GMint size)
 	{
-		D(d);
+		D_STR(d);
 		d->data.reserve(size);
 	}
 
@@ -416,7 +425,7 @@ private:
 
 //Scanner
 typedef std::function<bool(GMwchar)> CharPredicate;
-GM_PRIVATE_OBJECT(GMScanner)
+struct GMScannerPrivate
 {
 	GMString buf;
 	const GMwchar* p = nullptr;
@@ -425,9 +434,9 @@ GM_PRIVATE_OBJECT(GMScanner)
 	bool valid;
 };
 
-class GMScanner : public GMObject
+class GMScanner
 {
-	DECLARE_PRIVATE(GMScanner)
+	DECLARE_STRING_PRIVATE(GMScanner)
 
 public:
 	explicit GMScanner(const GMString& line);

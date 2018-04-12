@@ -158,7 +158,7 @@ typedef unsigned long GMulong;
 typedef short GMshort;
 typedef unsigned short GMushort;
 typedef wchar_t GMwchar;
-typedef int64_t GMLargeInteger;
+typedef int64_t GMint64;
 typedef GMint GMFontSizePt;
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
@@ -168,7 +168,7 @@ GM_STATIC_ASSERT_SIZE(GMbyte, 1);
 GM_STATIC_ASSERT_SIZE(GMint, 4);
 GM_STATIC_ASSERT_SIZE(GMuint, 4);
 GM_STATIC_ASSERT_SIZE(GMfloat, 4);
-GM_STATIC_ASSERT_SIZE(GMLargeInteger, 8);
+GM_STATIC_ASSERT_SIZE(GMint64, 8);
 
 // 常用函数和工具、常量
 struct GMRect

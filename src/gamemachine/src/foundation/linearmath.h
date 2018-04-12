@@ -447,7 +447,11 @@ inline GMVec4 operator-(const GMVec4& V1, const GMVec4& V2);
 
 inline GMVec4 operator*(const GMVec4& V1, gm::GMfloat S);
 
+inline bool operator==(const GMVec2& V1, const GMVec2& V2);
+
 inline bool operator==(const GMVec3& V1, const GMVec3& V2);
+
+inline bool operator==(const GMVec4& V1, const GMVec4& V2);
 
 //! 计算两个矩阵相乘的结果。
 /*!

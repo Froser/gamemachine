@@ -2,6 +2,7 @@
 #define __DEBUG_H__
 #include <gmcommon.h>
 #include "gmstring.h"
+#include <gmobject.h>
 #include <map>
 #include <set>
 

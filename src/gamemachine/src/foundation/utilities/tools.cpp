@@ -41,7 +41,7 @@ void GMClock::update()
 {
 	D(d);
 	d->end = highResolutionTimer();
-	GMLargeInteger delta = d->end - d->begin;
+	GMint64 delta = d->end - d->begin;
 
 	if (!d->paused)
 	{
@@ -54,7 +54,7 @@ void GMClock::update()
 	}
 
 	++d->frameCount;
-	GMLargeInteger deltaFrameCycle = d->end - d->lastCycle;
+	GMint64 deltaFrameCycle = d->end - d->lastCycle;
 	if (deltaFrameCycle > d->frequency)
 	{
 		d->fps = d->frameCount / cycleToSecond(deltaFrameCycle);
@@ -68,7 +68,7 @@ void GMClock::update()
 GMfloat GMClock::elapsedFromStart()
 {
 	D(d);
-	GMLargeInteger now = highResolutionTimer();
+	GMint64 now = highResolutionTimer();
 	return cycleToSecond(now - d->begin);
 }
 
@@ -91,20 +91,20 @@ GMfloat GMClock::evaluateDeltaTime()
 }
 
 // platforms/[os]/timer.cpp
-extern "C" GMLargeInteger highResolutionTimerFrequency();
-extern "C" GMLargeInteger highResolutionTimer();
+extern "C" GMint64 highResolutionTimerFrequency();
+extern "C" GMint64 highResolutionTimer();
 
-GMLargeInteger GMClock::highResolutionTimerFrequency()
+GMint64 GMClock::highResolutionTimerFrequency()
 {
 	return ::highResolutionTimerFrequency();
 }
 
-GMLargeInteger GMClock::highResolutionTimer()
+GMint64 GMClock::highResolutionTimer()
 {
 	return ::highResolutionTimer();
 }
 
-GMfloat GMClock::cycleToSecond(GMLargeInteger cycle)
+GMfloat GMClock::cycleToSecond(GMint64 cycle)
 {
 	D(d);
 	return cycle / (GMfloat)d->frequency;
@@ -137,7 +137,7 @@ GMfloat GMStopwatch::timeInSecond()
 	return timeInCycle() / (GMfloat)d->frequency;
 }
 
-GMLargeInteger GMStopwatch::timeInCycle()
+GMint64 GMStopwatch::timeInCycle()
 {
 	D(d);
 	return d->end - d->start;
@@ -149,7 +149,7 @@ GMfloat GMStopwatch::nowInSecond()
 	return nowInCycle() / (GMfloat)d->frequency;
 }
 
-GMLargeInteger GMStopwatch::nowInCycle()
+GMint64 GMStopwatch::nowInCycle()
 {
 	D(d);
 	auto now = GMClock::highResolutionTimer();

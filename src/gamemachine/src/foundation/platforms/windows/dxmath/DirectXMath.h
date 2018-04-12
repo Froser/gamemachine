@@ -410,7 +410,7 @@ __declspec(align(16)) struct XMMATRIX
     XMVECTOR r[4];
 #endif
 
-    XMMATRIX() {}
+    XMMATRIX() = default;
     XMMATRIX(FXMVECTOR R0, FXMVECTOR R1, FXMVECTOR R2, CXMVECTOR R3) { r[0] = R0; r[1] = R1; r[2] = R2; r[3] = R3; }
     XMMATRIX(float m00, float m01, float m02, float m03,
              float m10, float m11, float m12, float m13,

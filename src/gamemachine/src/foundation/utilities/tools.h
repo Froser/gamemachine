@@ -136,17 +136,17 @@ private:
 //GMClock
 GM_PRIVATE_OBJECT(GMClock)
 {
-	GMLargeInteger frequency;
-	GMLargeInteger timeCycles;
-	GMLargeInteger begin, end;
-	GMLargeInteger deltaCycles;
+	GMint64 frequency;
+	GMint64 timeCycles;
+	GMint64 begin, end;
+	GMint64 deltaCycles;
 	GMfloat timeScale;
 	GMfloat fps;
 	bool paused;
 
 	//以下用于计算帧率
 	GMint frameCount;
-	GMLargeInteger lastCycle;
+	GMint64 lastCycle;
 };
 
 class GMClock : public GMObject
@@ -168,19 +168,19 @@ public:
 	GMfloat evaluateDeltaTime();
 
 public:
-	static GMLargeInteger highResolutionTimerFrequency();
-	static GMLargeInteger highResolutionTimer();
+	static GMint64 highResolutionTimerFrequency();
+	static GMint64 highResolutionTimer();
 
 private:
-	GMfloat cycleToSecond(GMLargeInteger cycle);
+	GMfloat cycleToSecond(GMint64 cycle);
 };
 
 //GMStopwatch
 GM_PRIVATE_OBJECT(GMStopwatch)
 {
-	GMLargeInteger frequency;
-	GMLargeInteger start;
-	GMLargeInteger end;
+	GMint64 frequency;
+	GMint64 start;
+	GMint64 end;
 };
 
 class GMStopwatch : public GMObject
@@ -194,9 +194,9 @@ public:
 	void start();
 	void stop();
 	GMfloat timeInSecond();
-	GMLargeInteger timeInCycle();
+	GMint64 timeInCycle();
 	GMfloat nowInSecond();
-	GMLargeInteger nowInCycle();
+	GMint64 nowInCycle();
 };
 
 //Plane

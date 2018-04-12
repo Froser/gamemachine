@@ -227,7 +227,17 @@ void cases::LinearMath::addToUnitTest(UnitTest& ut)
 		return VECTOR4_EQUALS(V, 12, 9, 6, 3);
 	});
 
+	ut.addTestCase("GMVec2 ==", []() {
+		GMVec2 V1(16, 8), V2(16, 8);
+		return V1 == V2;
+	});
+
 	ut.addTestCase("GMVec3 ==", []() {
+		GMVec3 V1(16, 8, 4), V2(16, 8, 4);
+		return V1 == V2;
+	});
+
+	ut.addTestCase("GMVec4 ==", []() {
 		GMVec4 V1(16, 8, 4, 2), V2(16, 8, 4, 2);
 		return V1 == V2;
 	});

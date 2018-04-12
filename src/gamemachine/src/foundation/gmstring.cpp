@@ -77,7 +77,7 @@ GMString::GMString(GMString&& str) noexcept
 
 GMString::GMString(const char* c)
 {
-	D(d);
+	D_STR(d);
 	if (c)
 	{
 		GMwchar* string = alloc_convertMultiBytesToWideChar(c);
@@ -88,14 +88,14 @@ GMString::GMString(const char* c)
 
 GMString::GMString(const GMwchar* c)
 {
-	D(d);
+	D_STR(d);
 	if (c)
 		d->data = c;
 }
 
 GMString::GMString(const std::string& str)
 {
-	D(d);
+	D_STR(d);
 	GMwchar* string = alloc_convertMultiBytesToWideChar(str.data());
 	d->data = string;
 	free_wideChar(string);
@@ -103,13 +103,13 @@ GMString::GMString(const std::string& str)
 
 GMString::GMString(const std::wstring& str)
 {
-	D(d);
+	D_STR(d);
 	d->data = str;
 }
 
 GMString::GMString(char ch)
 {
-	D(d);
+	D_STR(d);
 	char chs[2] = { ch };
 	GMwchar* string = alloc_convertMultiBytesToWideChar(chs);
 	d->data = string;
@@ -118,13 +118,13 @@ GMString::GMString(char ch)
 
 GMString::GMString(GMwchar ch)
 {
-	D(d);
+	D_STR(d);
 	d->data = ch;
 }
 
 GMString::GMString(const GMfloat f)
 {
-	D(d);
+	D_STR(d);
 #if GM_MSVC
 	d->data = std::to_wstring(f);
 #else
@@ -136,7 +136,7 @@ GMString::GMString(const GMfloat f)
 
 GMString::GMString(const GMint i)
 {
-	D(d);
+	D_STR(d);
 #if GM_MSVC
 	d->data = std::to_wstring(i);
 #else
@@ -148,7 +148,7 @@ GMString::GMString(const GMint i)
 
 char GMString::operator[](GMuint i) const
 {
-	D(d);
+	D_STR(d);
 	GMwchar c = d->data[i];
 	GMwchar arr[2] = { c };
 	char* chs = alloc_convertWideCharToMultiBytes(arr);
@@ -159,20 +159,20 @@ char GMString::operator[](GMuint i) const
 
 GMString& GMString::append(const GMwchar* c)
 {
-	D(d);
+	D_STR(d);
 	d->data += c;
 	return *this;
 }
 
 void GMString::assign(const GMString& s)
 {
-	D(d);
+	D_STR(d);
 	d->data = s.data()->data;
 }
 
 GMString& GMString::append(const char* c)
 {
-	D(d);
+	D_STR(d);
 	GMwchar* wch = alloc_convertMultiBytesToWideChar(c);
 	d->data += wch;
 	free_wideChar(wch);
@@ -181,13 +181,13 @@ GMString& GMString::append(const char* c)
 
 size_t GMString::findLastOf(GMwchar c) const
 {
-	D(d);
+	D_STR(d);
 	return d->data.find_last_of(c);
 }
 
 size_t GMString::findLastOf(char c) const
 {
-	D(d);
+	D_STR(d);
 	char cs[2] = { c };
 	GMwchar* wch = alloc_convertMultiBytesToWideChar(cs);
 	size_t idx = d->data.find_last_of(wch);
@@ -197,19 +197,19 @@ size_t GMString::findLastOf(char c) const
 
 GMString GMString::substr(GMint start, GMint count) const
 {
-	D(d);
+	D_STR(d);
 	return d->data.substr(start, count);
 }
 
 const std::wstring& GMString::toStdWString() const
 {
-	D(d);
+	D_STR(d);
 	return d->data;
 }
 
 const std::string GMString::toStdString() const
 {
-	D(d);
+	D_STR(d);
 	char* chs = alloc_convertWideCharToMultiBytes(d->data.c_str());
 	std::string string(chs);
 	free_multibytes(chs);
@@ -218,7 +218,7 @@ const std::string GMString::toStdString() const
 
 GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 {
-	D(d);
+	D_STR(d);
 	std::wstring _oldValue = oldValue.toStdWString();
 	std::wstring _newValue = newValue.toStdWString();
 	std::wstring _str = d->data;
@@ -316,7 +316,7 @@ static bool isWhiteSpace(GMwchar c)
 
 GMScanner::GMScanner(const GMString& line)
 {
-	D(d);
+	D_STR(d);
 	d->buf = line;
 	d->p = d->buf.c_str();
 	d->predicate = isWhiteSpace;
@@ -326,7 +326,7 @@ GMScanner::GMScanner(const GMString& line)
 
 GMScanner::GMScanner(const GMString& line, CharPredicate predicate)
 {
-	D(d);
+	D_STR(d);
 	d->buf = line;
 	d->p = d->buf.c_str();
 	d->predicate = predicate;
@@ -336,7 +336,7 @@ GMScanner::GMScanner(const GMString& line, CharPredicate predicate)
 
 GMScanner::GMScanner(const GMString& line, bool skipSame, CharPredicate predicate)
 {
-	D(d);
+	D_STR(d);
 	d->buf = line;
 	d->p = d->buf.c_str();
 	d->predicate = predicate;
@@ -346,7 +346,7 @@ GMScanner::GMScanner(const GMString& line, bool skipSame, CharPredicate predicat
 
 void GMScanner::next(GMString& out)
 {
-	D(d);
+	D_STR(d);
 	out = L"";
 	if (!d->valid)
 		return;
@@ -378,7 +378,7 @@ void GMScanner::next(GMString& out)
 
 void GMScanner::nextToTheEnd(GMString& out)
 {
-	D(d);
+	D_STR(d);
 	if (!d->valid)
 		return;
 
@@ -391,7 +391,7 @@ void GMScanner::nextToTheEnd(GMString& out)
 
 bool GMScanner::nextFloat(GMfloat* out)
 {
-	D(d);
+	D_STR(d);
 	if (!d->valid)
 		return false;
 
@@ -406,7 +406,7 @@ bool GMScanner::nextFloat(GMfloat* out)
 
 bool GMScanner::nextInt(GMint* out)
 {
-	D(d);
+	D_STR(d);
 	if (!d->valid)
 		return false;
 

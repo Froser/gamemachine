@@ -398,10 +398,28 @@ inline GMVec4 operator*(const GMVec4& V, gm::GMfloat S)
 	return R;
 }
 
+inline bool operator==(const GMVec2& V1, const GMVec2& V2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVector2Equal(V1.v_, V2.v_);
+#else
+	return V1.v_ == V2.v_;
+#endif;
+}
+
 inline bool operator==(const GMVec3& V1, const GMVec3& V2)
 {
 #if GM_USE_DX11
-	return DirectX::XMVector3Equal(V1.v_, V2.v_);
+	return DirectX::XMVector2Equal(V1.v_, V2.v_);
+#else
+	return V1.v_ == V2.v_;
+#endif;
+}
+
+inline bool operator==(const GMVec4& V1, const GMVec4& V2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVector4Equal(V1.v_, V2.v_);
 #else
 	return V1.v_ == V2.v_;
 #endif;

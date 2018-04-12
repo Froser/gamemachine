@@ -30,7 +30,7 @@ struct GMProfileSessions : public GMObject
 	{
 		GMProfileSession() : level(0) {};
 		GMint level;
-		GMLargeInteger firstProfileTimeInCycle = -1;
+		GMint64 firstProfileTimeInCycle = -1;
 	};
 
 	Map<GMThreadId, GMProfileSession> sessions;

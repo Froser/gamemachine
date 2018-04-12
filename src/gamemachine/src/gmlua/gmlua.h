@@ -50,7 +50,7 @@ struct GMLuaVariable
 	{
 		GMString* valPtrString;
 		GMObject* valPtrObject;
-		GMLargeInteger valInt;
+		GMint64 valInt;
 		bool valBoolean;
 		GMfloat valFloat;
 	};
@@ -114,7 +114,7 @@ struct GMLuaVariable
 	{
 	}
 
-	GMLuaVariable(GMLargeInteger d)
+	GMLuaVariable(GMint64 d)
 		: type(GMLuaVariableType::Int)
 		, valInt(d)
 	{

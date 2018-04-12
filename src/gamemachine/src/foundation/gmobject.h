@@ -4,6 +4,7 @@
 #include "memory.h"
 #include <functional>
 #include "event_enum.h"
+#include <gmstring.h>
 
 #if __APPLE__
 #	include <string>
@@ -145,7 +146,7 @@ struct GMObjectMember
 	void* ptr;
 };
 
-using GMMeta = Map<std::string, GMObjectMember>;
+using GMMeta = HashMap<GMString, GMObjectMember, GMStringHashFunctor>;
 
 // 事件目标，表示一个GMObject被多少事件连接
 class GMObject;

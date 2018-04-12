@@ -43,7 +43,7 @@ GMProfile::~GMProfile()
 void GMProfile::startRecord(const GMString& name)
 {
 	D(d);
-	static GMLargeInteger frequency = GMClock::highResolutionTimerFrequency();
+	static GMint64 frequency = GMClock::highResolutionTimerFrequency();
 	if (!GMGetDebugState(RUN_PROFILE))
 		return;
 
@@ -51,7 +51,7 @@ void GMProfile::startRecord(const GMString& name)
 
 	d->valid = true;
 	d->name = name;
-	GMLargeInteger now = GMClock::highResolutionTimer();
+	GMint64 now = GMClock::highResolutionTimer();
 	if (ps.firstProfileTimeInCycle < 0)
 		ps.firstProfileTimeInCycle = now;
 	GM_ASSERT(now - ps.firstProfileTimeInCycle >= 0);

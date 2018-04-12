@@ -5,6 +5,7 @@
 #include "cases/scanner.h"
 #include "cases/thread.h"
 #include "cases/linearmath.h"
+#include "cases/variant.h"
 
 int main(int argc, char* argv)
 {
@@ -17,6 +18,7 @@ int main(int argc, char* argv)
 		new cases::Scanner(),
 		new cases::LinearMath(),
 		// new cases::Thread(),
+		new cases::Variant(),
 	};
 
 	for (auto& c : caseArray)

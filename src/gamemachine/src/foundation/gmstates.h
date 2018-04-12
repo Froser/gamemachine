@@ -97,7 +97,7 @@ using GMRenderMode = GMint;
 
 union GMStateItemValueStruct
 {
-	GMLargeInteger i64 = 0;
+	GMint64 i64 = 0;
 	GMint i32;
 	GMfloat f32;
 	void* ptr;
@@ -130,7 +130,7 @@ struct GMStateItemValue : public GMAlignmentObject
 		value.i32 = i;
 	}
 
-	GMStateItemValue(GMLargeInteger i)
+	GMStateItemValue(GMint64 i)
 	{
 		type = VT_Int64;
 		value.i64 = i;
@@ -182,8 +182,8 @@ public:
 public:
 	void setInt32(GMint key, GMint i);
 	GMint getInt32(GMint key);
-	void setInt64(GMint key, GMLargeInteger i);
-	GMLargeInteger getInt64(GMint key);
+	void setInt64(GMint key, GMint64 i);
+	GMint64 getInt64(GMint key);
 	void setFloat32(GMint key, GMfloat i);
 	GMfloat getFloat32(GMint key);
 	void setString(GMint key, const GMwchar* str);
@@ -197,6 +197,7 @@ GM_PRIVATE_OBJECT(GMStates)
 {
 	GMStateItem debugStates;
 	GMStateItem renderStates;
+	HashMap<GMString, GMStateItem, GMStringHashFunctor> states;
 };
 
 class GMStates : public GMObject

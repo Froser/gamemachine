@@ -32,7 +32,7 @@ GMint GMStateItem::getInt32(GMint key)
 	return v.value.i32;
 }
 
-void GMStateItem::setInt64(GMint key, GMLargeInteger i)
+void GMStateItem::setInt64(GMint key, GMint64 i)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];
@@ -43,7 +43,7 @@ void GMStateItem::setInt64(GMint key, GMLargeInteger i)
 	d->values[key] = t;
 }
 
-GMLargeInteger GMStateItem::getInt64(GMint key)
+GMint64 GMStateItem::getInt64(GMint key)
 {
 	D(d);
 	GMStateItemValue& v = d->values[key];
