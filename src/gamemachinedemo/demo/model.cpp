@@ -26,7 +26,8 @@ Demo_Model::~Demo_Model()
 void Demo_Model::onDeactivate()
 {
 	D(d);
-	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+	D_BASE(db, Base);
+	db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 	d->skyObject->deactivate();
 	DemoHandler::onDeactivate();
 }
@@ -293,6 +294,7 @@ void Demo_Model::setDefaultLights()
 
 void Demo_Model::event(gm::GameMachineEvent evt)
 {
+	D_BASE(db, Base);
 	D(d);
 	Base::event(evt);
 	switch (evt)
@@ -316,13 +318,14 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered('N'))
-			GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % gm::GMStates_DebugOptions::DRAW_NORMAL_END);
+			switchNormal();
+
 		if (kbState.keyTriggered('0'))
-			GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 		GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)
 		{
 			if (kbState.keyTriggered('1' + (gm::GMint)i))
-				GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, (gm::GMint)i + 1);
+				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
 		}
 		if (kbState.keyTriggered('S'))
 		{

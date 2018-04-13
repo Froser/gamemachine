@@ -87,7 +87,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	IGraphicEngine* engine = nullptr;
 	GMGlyphManager* glyphManager = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
-	GMStates* statesManager = nullptr;
+	GMConfigs* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
 
 	GameMachineMessage lastMessage;
@@ -101,6 +101,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Vector<IVirtualFunctionObject*> managerQueue;
 
 	GMGameMachineRunningStates states;
+	GMConfigs configs;
 };
 
 //! GameMachine类负责掌管整个进程的生命周期。
@@ -147,62 +148,72 @@ public:
 	//! 获取绘制引擎。
 	/*!
 	  绘制引擎由初始化时的工厂类创建，提供最基础的绘制行为。
+	  \return 程序绘制引擎。
 	*/
 	inline IGraphicEngine* getGraphicEngine() { D(d); return d->engine; }
 
 	//! 获取程序主窗口。
 	/*!
 	  获取程序绘制的主窗口。
+	  \return 程序主窗口。
 	*/
 	inline IWindow* getMainWindow() { D(d); return d->mainWindow; }
 
 	//! 获取初始化时的工厂类。
 	/*!
-	  获取程序在初始化时存入的工厂类。
+	  获取程序在初始化时存入的工厂类。工厂类将用于实例化各种引擎相关类型。
+	  \return 程序工厂类。
 	*/
 	inline IFactory* getFactory() { D(d); return d->factory; }
-
-	//! 获取当前的程序配置。
-	/*!
-	  通过设置程序配置，可以激活运行时的一些行为，如绘制调试信息、输出性能表等。
-	*/
-	GMStates* getStatesManager() { D(d); return d->statesManager; }
 
 	//! 获取字形管理器。
 	/*!
 	  获取程序的字形管理器，可以通过字体管理器拿出字符的字形位图。
+	  \return 程序字形管理器。
 	*/
 	GMGlyphManager* getGlyphManager() { D(d); return d->glyphManager; }
 
 	//! 获取资源管理器。
 	/*!
 	  所有程序的资产，如音乐、贴图、字体的原始数据，都可以从资源管理器中获取。
+	  \return 程序资源管理器。
 	*/
 	GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
 
 	//! 获取程序主相机。
 	/*!
 	  主相机用于主界面的绘制。
+	  \return 程序主相机。
 	*/
 	GMCamera& getCamera() { D(d); return *d->camera; }
 
 	//! 获取当前帧率。
 	/*!
 	  帧率等于1秒钟内的绘制次数。在控制最高帧率的情况下，最高帧率被设置为60fps。
+	  \return 程序当前帧数。
 	*/
 	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }
 
 	//! 获取程序运行时间
 	/*!
 	  获取程序第一次消息循环到目前为止的运行时间，以秒为单位。
+	  \return 程序运行时间。
 	*/
 	inline GMfloat getGameTimeSeconds() { D(d); return d->clock.getTime(); }
 
 	//! 获取程序当前的运行时状态。
 	/*!
 	  如当前窗口大小、上一帧执行时间等。
+	  \return 程序当前运行状态。
 	*/
 	inline const GMGameMachineRunningStates& getGameMachineRunningStates() const { D(d); return d->states; }
+
+	//! 获取程序当前的配置。
+	/*!
+	  通过设置程序配置，可以激活运行时的一些行为，如绘制调试信息、输出性能表等。程序所有的配置存在此对象中。用户可以获取此对象并且修改它。
+	  \return 程序当前配置。
+	*/
+	inline GMConfigs& getConfigs() { D(d); return d->configs; }
 
 	//! 初始化一个对象画笔。
 	/*!

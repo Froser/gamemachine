@@ -77,6 +77,12 @@ enum class GameMachineInterfaceID
 	//用户自定义接口须在此之后
 };
 
+enum class GMRenderMode
+{
+	Forward,
+	Deferred,
+};
+
 enum class GMShaderType
 {
 	Pixel,

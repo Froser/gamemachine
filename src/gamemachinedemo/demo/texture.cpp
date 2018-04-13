@@ -47,6 +47,7 @@ void Demo_Texture::init()
 
 void Demo_Texture::event(gm::GameMachineEvent evt)
 {
+	D_BASE(db, Base);
 	D(d);
 	Base::event(evt);
 	switch (evt)
@@ -66,7 +67,8 @@ void Demo_Texture::event(gm::GameMachineEvent evt)
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered('N'))
-			GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % gm::GMStates_DebugOptions::DRAW_NORMAL_END);
+			switchNormal();
+
 		d->demoWorld->notifyControls();
 		break;
 	}

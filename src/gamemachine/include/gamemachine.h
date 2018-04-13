@@ -8,7 +8,7 @@
 #include "../src/foundation/assert.h"
 #include "../src/foundation/debug.h"
 #include "../src/foundation/gmprofile.h"
-#include "../src/foundation/gmstates.h"
+#include "../src/foundation/gmconfigs.h"
 #include "../src/foundation/gamemachine.h"
 #include "../src/foundation/vector.h"
 #include "../src/gmdata/gmmodel.h"

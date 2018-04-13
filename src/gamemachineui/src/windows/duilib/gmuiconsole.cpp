@@ -327,7 +327,10 @@ void GMUIConsole::update()
 	GMUIGraphGuard guard(d->profileGraph);
 	d->profileGraph->clearGraph();
 
-	if (!GMGetDebugState(RUN_PROFILE))
+	if (d->debugConfig.isEmpty())
+		d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
+
+	if (!d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool())
 	{
 		d->profileGraph->drawText(L"Profile function disabled. ");
 		return;

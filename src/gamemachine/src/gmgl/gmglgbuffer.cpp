@@ -93,9 +93,11 @@ void GMGLGBuffer::dispose()
 bool GMGLGBuffer::init(const GMRect& clientRect)
 {
 	D(d);
+	GMRenderConfig renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+
 	d->clientRect = clientRect;
-	d->renderWidth = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.width : GMGetRenderState(RESOLUTION_X);
-	d->renderHeight = GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.height : GMGetRenderState(RESOLUTION_Y);
+	d->renderWidth = clientRect.width;
+	d->renderHeight = clientRect.height;
 	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
 
 	glGenFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
@@ -255,6 +257,12 @@ static const Pair<GMEffects, const char*> s_effects_uniformNames[] =
 	{ GMEffects::EdgeDetect, GMSHADER_EFFECTS_EDGEDETECT },
 };
 
+GMGLFramebuffer::GMGLFramebuffer()
+{
+	D(d);
+	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+}
+
 GMGLFramebuffer::~GMGLFramebuffer()
 {
 	disposeQuad();
@@ -286,15 +294,16 @@ void GMGLFramebuffer::dispose()
 bool GMGLFramebuffer::init(const GMRect& clientRect)
 {
 	D(d);
+	const GMConfigs& configs = GM.getConfigs();
 	createQuad();
 
 	GM_BEGIN_CHECK_GL_ERROR
 	d->clientRect = clientRect;
-	d->renderWidth = GMGetRenderState(RESOLUTION_X) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.width : GMGetRenderState(RESOLUTION_X);
-	d->renderHeight = GMGetRenderState(RESOLUTION_Y) == GMStates_RenderOptions::AUTO_RESOLUTION ? clientRect.height : GMGetRenderState(RESOLUTION_Y);
+	d->renderWidth = clientRect.width;
+	d->renderHeight = clientRect.height;
 	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
-	d->sampleOffsets[0] = (GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET) ? 1.f / d->renderWidth : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_X);
-	d->sampleOffsets[1] = (GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y) == GMStates_RenderOptions::AUTO_SAMPLE_OFFSET) ? 1.f / d->renderHeight : GMGetRenderStateF(BLUR_SAMPLE_OFFSET_Y);
+	d->sampleOffsets[0] = 1.f / d->renderWidth;
+	d->sampleOffsets[1] = 1.f / d->renderHeight;
 
 	// 指定分辨率的framebuffer
 	{
@@ -341,7 +350,7 @@ void GMGLFramebuffer::beginDrawEffects()
 {
 	D(d);
 	GM_BEGIN_CHECK_GL_ERROR
-	d->effects = GMGetRenderState(EFFECTS);
+	d->effects = d->renderConfig.get(GMRenderConfigs::Effects_I32).toInt();
 	GMEngine->setViewport(d->viewport);
 	d->hasBegun = true;
 	newFrame();

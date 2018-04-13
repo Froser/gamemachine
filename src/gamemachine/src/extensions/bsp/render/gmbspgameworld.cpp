@@ -195,6 +195,7 @@ GMBSPGameWorld::GMBSPGameWorld()
 {
 	D(d);
 	d->physics = new GMBSPPhysicsWorld(this);
+	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
 void GMBSPGameWorld::loadBSP(const GMString& mapName)
@@ -331,14 +332,15 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 // drawAll将所要需要绘制的对象放入列表
 void GMBSPGameWorld::drawAll()
 {
+	D(d);
 	GM_PROFILE("drawAll");
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->newFrame();
 	clearBuffer();
 	drawSky();
-	if (!GMGetDebugState(DRAW_ONLY_SKY))
+	if (!d->debugConfig.get(GMDebugConfigs::DrawSkyOnly_Bool).toBool())
 	{
-		if (GMGetDebugState(CALCULATE_BSP_FACE))
+		if (d->debugConfig.get(GMDebugConfigs::CalculateBSPFace_Bool).toBool())
 			calculateVisibleFaces();
 		drawFaces();
 	}

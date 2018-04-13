@@ -1,18 +1,10 @@
 ﻿#ifndef __GMVARIANT_H__
 #define __GMVARIANT_H__
-#include <gmcommon.h>
-
-struct GMVec2;
-struct GMVec3;
-struct GMVec4;
-struct GMQuat;
-struct GMMat4;
-
+#include <defines.h>
+#include <linearmath.h>
 BEGIN_NS
 
 class GMString;
-class GMStates;
-
 struct GMVariant
 {
 public:
@@ -30,7 +22,6 @@ public:
 		Quat,
 		Mat4,
 		String,
-		States,
 		Pointer,
 	};
 
@@ -41,14 +32,17 @@ public:
 		GMfloat f;
 		bool b;
 		void* p;
-		GMint64 i64 = 0;
+		GMint64 i64;
+#if GM_USE_DX11
 		GMVec2 v2;
 		GMVec3 v3;
 		GMVec4 v4;
 		GMQuat q;
 		GMMat4 m;
+#endif
 	};
 
+	GMVariant();
 	GMVariant(GMint);
 	GMVariant(GMint64);
 	GMVariant(GMuint);
@@ -60,29 +54,48 @@ public:
 	GMVariant(const GMQuat&);
 	GMVariant(const GMMat4&);
 	GMVariant(const GMString&);
+	GMVariant(const char*);
+	GMVariant(const GMwchar*);
 	GMVariant(void*);
-	GMVariant(const GMStates&);
+	~GMVariant();
+
 	GMVariant(const GMVariant&);
+	GMVariant(GMVariant&&);
+	GMVariant& operator=(const GMVariant&);
+	GMVariant& operator=(GMVariant&&);
 
 public:
 	GMint toInt() const;
 	GMint64 toInt64() const;
 	GMuint toUInt() const;
 	GMfloat toFloat() const;
-	bool toBool() const;
-	const GMVec2& toVec2() const;
-	const GMVec3& toVec3() const;
-	const GMVec4& toVec4() const;
-	const GMQuat& toQuat() const;
-	const GMMat4& toMat4() const;
 	void* toPointer() const;
+	bool toBool() const;
+
+	const GMVec2& toVec2() const;
+	GMVec2& toVec2();
+	const GMVec3& toVec3() const;
+	GMVec3& toVec3();
+	const GMVec4& toVec4() const;
+	GMVec4& toVec4();
+	const GMQuat& toQuat() const;
+	GMQuat& toQuat();
+	const GMMat4& toMat4() const;
+	GMMat4& toMat4();
 	const GMString& toString() const;
-	const GMStates& toStates() const;
+	GMString& toString();
+
+	template <typename T>
+	T toEnum() const
+	{
+		return (T)toInt();
+	}
 
 private:
 	template <typename T> void makeOwned(const T& obj);
+	template <GMVariant::Type Type> void copyOwned(const GMVariant& rhs);
 	template <typename T> bool deleteOwned();
-	template <typename T, GMVariant::Type Type> const T& get(const void* const data) const;
+	template <typename T> const T& get(const void* const data) const;
 	void clearOwned();
 
 private:

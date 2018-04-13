@@ -20,8 +20,9 @@ void Demo_Quake3_BSP::onActivate()
 void Demo_Quake3_BSP::onDeactivate()
 {
 	D(d);
+	D_BASE(db, Base);
 	Base::onDeactivate();
-	GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+	db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 	setMouseTrace(false);
 }
 
@@ -69,6 +70,7 @@ void Demo_Quake3_BSP::init()
 void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	D_BASE(db, Base);
 	Base::event(evt);
 	switch (evt)
 	{
@@ -127,11 +129,12 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 			joyState.joystickVibrate(0, 0);
 
 		if (kbState.keyTriggered('N'))
-			GMSetDebugState(DRAW_NORMAL, (GMGetDebugState(DRAW_NORMAL) + 1) % gm::GMStates_DebugOptions::DRAW_NORMAL_END);
+			switchNormal();
+
 		if (kbState.keyTriggered('M'))
-			GMSetDebugState(DRAW_LIGHTMAP_ONLY, !GMGetDebugState(DRAW_LIGHTMAP_ONLY));
+			db->debugConfig.set(gm::GMDebugConfigs::DrawLightmapOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawLightmapOnly_Bool).toBool());
 		if (kbState.keyTriggered('I'))
-			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
+			db->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !db->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
 		if (state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
@@ -158,18 +161,21 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered('P'))
-			GMSetDebugState(CALCULATE_BSP_FACE, !GMGetDebugState(CALCULATE_BSP_FACE));
+			db->debugConfig.set(gm::GMDebugConfigs::CalculateBSPFace_Bool, !db->debugConfig.get(gm::GMDebugConfigs::CalculateBSPFace_Bool).toBool());
+
 		if (kbState.keyTriggered('O'))
-			GMSetDebugState(DRAW_ONLY_SKY, !GMGetDebugState(DRAW_ONLY_SKY));
+			db->debugConfig.set(gm::GMDebugConfigs::DrawSkyOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawSkyOnly_Bool).toBool());
+
 		if (kbState.keyTriggered('R'))
 			setMouseTrace(!d->mouseTrace);
 
 		if (kbState.keyTriggered('0'))
-			GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, 0);
+			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
+
 		GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)
 		{
 			if (kbState.keyTriggered('1' + (gm::GMint)i))
-				GMSetDebugState(FRAMEBUFFER_VIEWER_INDEX, (gm::GMint)i + 1);
+				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
 		}
 		break;
 	}

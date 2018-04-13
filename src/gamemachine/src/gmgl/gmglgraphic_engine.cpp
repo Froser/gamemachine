@@ -8,7 +8,7 @@
 #include "gmglmodelpainter.h"
 #include "gmglrenderers.h"
 #include "foundation/gamemachine.h"
-#include "foundation/gmstates.h"
+#include "foundation/gmconfigs.h"
 #include "foundation/gmprofile.h"
 
 extern "C"
@@ -68,6 +68,13 @@ private:
 	bool m_isHost = false;
 };
 
+GMGLGraphicEngine::GMGLGraphicEngine()
+{
+	D(d);
+	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+}
+
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
@@ -103,7 +110,7 @@ void GMGLGraphicEngine::init()
 void GMGLGraphicEngine::newFrame()
 {
 	D(d);
-	if (getCurrentRenderMode() == GMStates_RenderOptions::DEFERRED)
+	if (getCurrentRenderMode() == GMRenderMode::Deferred)
 	{
 		d->gbuffer.releaseBind();
 		newFrameOnCurrentFramebuffer();
@@ -124,12 +131,12 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 		const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
 		setViewport(rect);
 
-		if (GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::DEFERRED)
+		if (d->renderConfig.get(GMRenderConfigs::RenderMode_I32).toEnum<GMRenderMode>() == GMRenderMode::Deferred)
 		{
 			if (!refreshGBuffer())
 			{
 				gm_error("init gbuffer error");
-				GMSetRenderState(RENDER_MODE, GMStates_RenderOptions::FORWARD); // if error occurs, back into forward rendering
+				d->renderConfig.set(GMRenderConfigs::RenderMode_I32, (GMint)GMRenderMode::Forward);
 			}
 		}
 
@@ -158,18 +165,18 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	}
 	else
 	{
-		GMRenderMode renderMode = GMGetRenderState(RENDER_MODE);
+		GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode_I32).toEnum<GMRenderMode>();
 		if (renderMode != d->renderMode)
 			d->needRefreshLights = true;
 		setCurrentRenderMode(renderMode);
 
-		if (renderMode == GMStates_RenderOptions::FORWARD)
+		if (renderMode == GMRenderMode::Forward)
 		{
 			forwardDraw(objects, count);
 		}
 		else
 		{
-			GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
+			GM_ASSERT(renderMode == GMRenderMode::Deferred);
 			// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
 			groupGameObjects(objects, count);
 
@@ -187,7 +194,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 					lightPass();
 					d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
 					forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-					setCurrentRenderMode(GMStates_RenderOptions::DEFERRED);
+					setCurrentRenderMode(GMRenderMode::Deferred);
 				}
 			}
 
@@ -245,10 +252,11 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 	D(d);
 	updateShader();
 
+	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode_I32).toEnum<GMRenderMode>();
 	GMGLShaderProgram* progs[] = {
 		d->forwardShaderProgram,
-		GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::FORWARD ? nullptr : d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER],
-		GMGetRenderState(RENDER_MODE) == GMStates_RenderOptions::FORWARD ? nullptr : d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]
+		renderMode== GMRenderMode::Forward ? nullptr : d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER],
+		renderMode== GMRenderMode::Forward ? nullptr : d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]
 	};
 
 	for (GMint i = 0; i < GM_array_size(progs); ++i)
@@ -370,14 +378,14 @@ void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 void GMGLGraphicEngine::viewGBufferFrameBuffer()
 {
 	D(d);
-	GMint fbIdx = GMGetDebugState(FRAMEBUFFER_VIEWER_INDEX);
+	GMint fbIdx = d->debugConfig.get(GMDebugConfigs::FrameBufferIndex_I32).toInt();
 	if (fbIdx > 0)
 	{
 		glDisable(GL_DEPTH_TEST);
-		GMint x = GMGetDebugState(FRAMEBUFFER_VIEWER_X),
-			y = GMGetDebugState(FRAMEBUFFER_VIEWER_Y),
-			width = GMGetDebugState(FRAMEBUFFER_VIEWER_WIDTH),
-			height = GMGetDebugState(FRAMEBUFFER_VIEWER_HEIGHT);
+		GMint x = d->debugConfig.get(GMDebugConfigs::FrameBufferPositionX_I32).toInt(),
+			y = d->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
+			width = d->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
+			height = d->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt();
 
 		GM_BEGIN_CHECK_GL_ERROR
 		d->gbuffer.beginPass();
@@ -480,7 +488,7 @@ void GMGLGraphicEngine::updateViewMatrix()
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
+	setCurrentRenderMode(GMRenderMode::Forward);
 	d->framebuffer.releaseBind();
 	forwardRender(objects, count);
 }
@@ -488,9 +496,9 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
+	setCurrentRenderMode(GMRenderMode::Forward);
 	activateLightsIfNecessary();
-	if (GMGetRenderState(EFFECTS) != GMEffects::None)
+	if (d->renderConfig.get(GMRenderConfigs::Effects_I32).toEnum<GMEffects>() != GMEffects::None)
 	{
 		GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
 		forwardRender(objects, count);
@@ -505,7 +513,7 @@ void GMGLGraphicEngine::updateShader()
 {
 	D(d);
 	GMRenderMode renderMode = getCurrentRenderMode();
-	if (renderMode == GMStates_RenderOptions::FORWARD)
+	if (renderMode == GMRenderMode::Forward)
 	{
 		d->forwardShaderProgram->useProgram();
 	}
@@ -514,7 +522,7 @@ void GMGLGraphicEngine::updateShader()
 		if (getRenderState() != GMGLDeferredRenderState::PassingLight)
 		{
 			d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-			GM_ASSERT(renderMode == GMStates_RenderOptions::DEFERRED);
+			GM_ASSERT(renderMode == GMRenderMode::Deferred);
 			if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
 				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
 			else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
@@ -643,7 +651,7 @@ void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 	d->isBlending = true;
 	d->blendsfactor = sfactor;
 	d->blenddfactor = dfactor;
-	setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
+	setCurrentRenderMode(GMRenderMode::Forward);
 }
 
 void GMGLGraphicEngine::endBlend()
@@ -658,9 +666,9 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 	D(d);
 	if (type == GMShaderProgramType::CurrentShaderProgram)
 	{
-		if (getCurrentRenderMode() == GMStates_RenderOptions::FORWARD)
+		if (getCurrentRenderMode() == GMRenderMode::Forward)
 			return d->forwardShaderProgram;
-		GM_ASSERT(getCurrentRenderMode() == GMStates_RenderOptions::DEFERRED);
+		GM_ASSERT(getCurrentRenderMode() == GMRenderMode::Deferred);
 		if (getRenderState() != GMGLDeferredRenderState::PassingLight)
 			return d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER];
 		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER];

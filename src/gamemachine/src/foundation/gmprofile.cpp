@@ -29,7 +29,14 @@ GMProfileSessions::GMProfileSession& GMProfile::profileSession()
 	return g_sessions.sessions[GMThread::getCurrentThreadId()];
 }
 
+GMProfile::GMProfile()
+{
+	D(d);
+	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+}
+
 GMProfile::GMProfile(const GMString& name)
+	: GMProfile()
 {
 	D(d);
 	startRecord(name);
@@ -44,7 +51,7 @@ void GMProfile::startRecord(const GMString& name)
 {
 	D(d);
 	static GMint64 frequency = GMClock::highResolutionTimerFrequency();
-	if (!GMGetDebugState(RUN_PROFILE))
+	if (!d->debugConfig.get(GMDebugConfigs::RunProfile_Bool).toBool())
 		return;
 
 	GMProfileSessions::GMProfileSession& ps = profileSession();

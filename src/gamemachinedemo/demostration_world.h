@@ -8,6 +8,8 @@
 class DemostrationWorld;
 GM_PRIVATE_OBJECT(DemoHandler)
 {
+	gm::GMRenderConfig renderConfig;
+	gm::GMDebugConfig debugConfig;
 	DemostrationWorld* demostrationWorld;
 	bool inited = false;
 	bool activating = false;
@@ -34,6 +36,7 @@ protected:
 protected:
 	void backToEntrance();
 	bool isActivating();
+	void switchNormal();
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
@@ -70,6 +73,8 @@ public:
 GM_PRIVATE_OBJECT(DemostrationEntrance)
 {
 	DemostrationWorld* world = nullptr;
+	gm::GMDebugConfig debugConfig;
+	gm::GMRenderConfig renderConfig;
 };
 
 class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCallback

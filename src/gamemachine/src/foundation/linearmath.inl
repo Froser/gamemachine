@@ -425,6 +425,15 @@ inline bool operator==(const GMVec4& V1, const GMVec4& V2)
 #endif;
 }
 
+inline bool operator==(const GMQuat& Q1, const GMQuat& Q2)
+{
+#if GM_USE_DX11
+	return DirectX::XMVector4Equal(Q1.v_, Q2.v_);
+#else
+	return Q1.v_ == Q2.v_;
+#endif;
+}
+
 inline GMMat4 operator*(const GMMat4& M1, const GMMat4& M2)
 {
 	GMMat4 R;

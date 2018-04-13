@@ -10,6 +10,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
+	GMDebugConfig debugConfig;
 };
 
 class GMGLRenderer : public GMObject, public IRenderer
@@ -39,7 +40,7 @@ protected:
 
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 {
-	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
+	GMRenderMode renderMode = GMRenderMode::Forward;
 	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
 

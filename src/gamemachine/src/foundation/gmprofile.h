@@ -18,6 +18,7 @@ GM_INTERFACE(IProfileHandler)
 
 GM_PRIVATE_OBJECT(GMProfile)
 {
+	GMDebugConfig debugConfig;
 	GMStopwatch stopwatch;
 	GMfloat durationSinceLastProfile = 0; // 距离上一次Profile的时间
 	bool valid = false;
@@ -44,7 +45,7 @@ public:
 	static GMProfileSessions::GMProfileSession& profileSession();
 
 public:
-	GMProfile() = default;
+	GMProfile();
 	GMProfile(const GMString& name);
 	~GMProfile();
 

@@ -47,7 +47,8 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	bool needRefreshLights = true;
 	Vector<GMLight> lights;
 	bool engineReady = false;
-
+	GMRenderConfig renderConfig;
+	GMDebugConfig debugConfig;
 	// 著色器程序
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
 	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
@@ -68,11 +69,11 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	Vector<GMGameObject*> deferredRenderingGameObjects;
 	Vector<GMGameObject*> forwardRenderingGameObjects;
 
-	GMRenderMode renderMode = GMStates_RenderOptions::FORWARD;
+	GMRenderMode renderMode = GMRenderMode::Forward;
 	GMStencilOptions stencilOptions;
 
 	// 混合绘制
-	GMRenderMode renderModeForBlend = GMStates_RenderOptions::FORWARD;
+	GMRenderMode renderModeForBlend = GMRenderMode::Forward;
 	GMS_BlendFunc blendsfactor;
 	GMS_BlendFunc blenddfactor;
 	bool isBlending = false;
@@ -88,8 +89,8 @@ class GMGLGraphicEngine : public GMObject, public IGraphicEngine
 	DECLARE_PRIVATE(GMGLGraphicEngine)
 
 public:
-	GMGLGraphicEngine() = default;
-	virtual ~GMGLGraphicEngine();
+	GMGLGraphicEngine();
+	~GMGLGraphicEngine();
 
 public:
 	virtual void init() override;

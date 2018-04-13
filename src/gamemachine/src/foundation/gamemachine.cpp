@@ -2,7 +2,7 @@
 #include "gamemachine.h"
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "gmengine/gameobjects/gmgameobject.h"
-#include "gmstates.h"
+#include "gmconfigs.h"
 
 extern "C"
 {
@@ -46,7 +46,7 @@ void GameMachine::init(
 	registerManager(engine, &d->engine);
 	registerManager(gameHandler, &d->gameHandler);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
-	registerManager(new GMStates(), &d->statesManager);
+	registerManager(new GMConfigs(), &d->statesManager);
 	registerManager(consoleHandle.window, &d->consoleWindow);
 
 	d->consoleOutput = consoleHandle.dbgoutput;

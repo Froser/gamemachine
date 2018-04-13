@@ -51,6 +51,7 @@ GM_PRIVATE_OBJECT(GMUIConsole)
 	gm::GMint tabIndex = 0;
 
 	Map<gm::GMThreadId, Vector<ProfileInfo> > profiles;
+	gm::GMDebugConfig debugConfig;
 };
 
 class GMUIConsole :

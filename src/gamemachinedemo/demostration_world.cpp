@@ -27,7 +27,7 @@ namespace
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
 		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
 		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-		world->addDemo("Effects: Use a blur effect.", new Demo_Effects(world));
+		world->addDemo("Effects: Use a grayscale effect.", new Demo_Effects(world));
 		world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));
 		world->addDemo("Border: Demostrate a border.", new Demo_Border(world));
 		world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
@@ -43,6 +43,8 @@ DemoHandler::DemoHandler(DemostrationWorld* demostrationWorld)
 {
 	D(d);
 	d->demostrationWorld = demostrationWorld;
+	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
 }
 
 void DemoHandler::init()
@@ -71,12 +73,13 @@ void DemoHandler::onDeactivate()
 	D(d);
 	d->demostrationWorld->resetProjectionAndEye();
 	GM.getGraphicEngine()->removeLights();
-	GMSetRenderState(EFFECTS, gm::GMEffects::None);
+	d->renderConfig.set(gm::GMRenderConfigs::Effects_I32, gm::GMEffects::None);
 	d->activating = false;
 }
 
 void DemoHandler::event(gm::GameMachineEvent evt)
 {
+	D(d);
 	switch (evt)
 	{
 	case gm::GameMachineEvent::Activate:
@@ -90,10 +93,10 @@ void DemoHandler::event(gm::GameMachineEvent evt)
 			GM.postMessage({ gm::GameMachineMessageType::Console });
 
 		if (kbState.keyTriggered('L'))
-			GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
+			d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
 
 		if (kbState.keyTriggered('I'))
-			GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
+			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 		break;
 	}
 }
@@ -133,6 +136,15 @@ bool DemoHandler::isActivating()
 {
 	D(d);
 	return d->activating;
+}
+
+void DemoHandler::switchNormal()
+{
+	D(d);
+	d->debugConfig.set(
+		gm::GMDebugConfigs::DrawPolygonNormalMode_I32,
+		(d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode_I32).toInt() + 1) % gm::GMStates_DebugOptions::DRAW_NORMAL_END
+	);
 }
 
 DemostrationWorld::~DemostrationWorld()
@@ -247,12 +259,7 @@ void DemostrationEntrance::init()
 #endif
 
 	GM.getGraphicEngine()->setShaderLoadCallback(this);
-
-	GMSetRenderState(RENDER_MODE, gm::GMStates_RenderOptions::FORWARD);
-	//GMSetRenderState(EFFECTS, GMEffects::Grayscale);
-	GMSetRenderState(RESOLUTION_X, rc.width);
-	GMSetRenderState(RESOLUTION_Y, rc.height);
-
+	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->world = new DemostrationWorld();
 }
 
@@ -260,6 +267,7 @@ void DemostrationEntrance::start()
 {
 	D(d);
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+	d->renderConfig.set(gm::GMRenderConfigs::RenderMode_I32, (gm::GMint) gm::GMRenderMode::Forward);
 	getWorld()->resetProjectionAndEye();
 	loadDemostrations(d->world);
 }
@@ -306,10 +314,10 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 				GM.postMessage({ gm::GameMachineMessageType::Console });
 
 			if (kbState.keyTriggered('L'))
-				GMSetDebugState(POLYGON_LINE_MODE, !GMGetDebugState(POLYGON_LINE_MODE));
+				d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
 
 			if (kbState.keyTriggered('I'))
-				GMSetDebugState(RUN_PROFILE, !GMGetDebugState(RUN_PROFILE));
+				d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 			break;
 		}
@@ -355,8 +363,12 @@ void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
 	}
 	else
 	{
+#if GM_USE_DX11
 		GM_ASSERT(env == gm::GMRenderEnvironment::DirectX11);
 		gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect);
+#else
+		GM_ASSERT(false);
+#endif
 	}
 }
 

@@ -96,10 +96,11 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMfloat sampleOffsets[2] = { 0 };
-	GMuint effects = GMEffects::None;
+	GMint effects = GMEffects::None;
 	bool hasBegun = false;
 	GMRect clientRect = { 0 };
 	GMRect viewport = { 0 };
+	GMRenderConfig renderConfig;
 };
 
 class GMGLFramebuffer : public GMObject
@@ -107,7 +108,7 @@ class GMGLFramebuffer : public GMObject
 	DECLARE_PRIVATE(GMGLFramebuffer)
 
 public:
-	GMGLFramebuffer() = default;
+	GMGLFramebuffer();
 	~GMGLFramebuffer();
 
 public:

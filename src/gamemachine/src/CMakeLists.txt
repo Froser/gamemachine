@@ -123,8 +123,8 @@ set(SOURCES
 		foundation/gamemachine.h
 		foundation/gamemachine.cpp
 		foundation/interfaces.h
-		foundation/gmstates.h
-		foundation/gmstates.cpp
+		foundation/gmconfigs.h
+		foundation/gmconfigs.cpp
 		foundation/gmvariant.h
 		foundation/gmvariant.cpp
 		foundation/gmthread.h

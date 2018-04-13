@@ -91,6 +91,7 @@ GMGLRenderer::GMGLRenderer()
 {
 	D(d);
 	d->engine = gm_static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
+	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
 void GMGLRenderer::draw(IQueriable* painter, GMModel* model)
@@ -98,7 +99,7 @@ void GMGLRenderer::draw(IQueriable* painter, GMModel* model)
 	D(d);
 	applyStencil(*d->engine);
 	beforeDraw(model);
-	GLenum mode = GMGetDebugState(POLYGON_LINE_MODE) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
+	GLenum mode = d->debugConfig.get(GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool() ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
 	if (model->getDrawMode() == GMModelDrawMode::Vertex)
 		glDrawArrays(mode, 0, model->getVerticesCount());
 	else
@@ -177,7 +178,8 @@ void GMGLRenderer_3D::afterDraw(GMModel* model)
 void GMGLRenderer_3D::drawTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
-	if (GMGetDebugState(DRAW_LIGHTMAP_ONLY) && type != GMTextureType::LIGHTMAP)
+	D_BASE(db, Base);
+	if (db->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() && type != GMTextureType::LIGHTMAP)
 		return;
 
 	// 按照贴图类型选择纹理动画序列
@@ -235,8 +237,9 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 void GMGLRenderer_3D::drawDebug()
 {
 	D(d);
+	D_BASE(db, Base);
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
-	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, GMGetDebugState(DRAW_NORMAL));
+	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode_I32).toInt());
 }
 
 void GMGLRenderer_3D::activateTextureTransform(GMModel* model, GMTextureType type, GMint index)
