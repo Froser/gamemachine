@@ -17,37 +17,40 @@
 BEGIN_NS
 
 // 天空
-static GMVec2 texcoord[24] = {
-	GMVec2(0, 0),
-	GMVec2(0, 1),
-	GMVec2(1, 1),
-	GMVec2(1, 0),
+namespace
+{
+	GMVec2 texcoord[24] = {
+		GMVec2(0, 0),
+		GMVec2(0, 1),
+		GMVec2(1, 1),
+		GMVec2(1, 0),
 
-	GMVec2(0, 0),
-	GMVec2(0, 1),
-	GMVec2(1, 1),
-	GMVec2(1, 0),
+		GMVec2(0, 0),
+		GMVec2(0, 1),
+		GMVec2(1, 1),
+		GMVec2(1, 0),
 
-	GMVec2(0, 0),
-	GMVec2(0, 1),
-	GMVec2(1, 1),
-	GMVec2(1, 0),
+		GMVec2(0, 0),
+		GMVec2(0, 1),
+		GMVec2(1, 1),
+		GMVec2(1, 0),
 
-	GMVec2(0, 0),
-	GMVec2(0, 1),
-	GMVec2(1, 1),
-	GMVec2(1, 0),
+		GMVec2(0, 0),
+		GMVec2(0, 1),
+		GMVec2(1, 1),
+		GMVec2(1, 0),
 
-	GMVec2(0, 0),
-	GMVec2(0, 1),
-	GMVec2(1, 1),
-	GMVec2(1, 0),
+		GMVec2(0, 0),
+		GMVec2(0, 1),
+		GMVec2(1, 1),
+		GMVec2(1, 0),
 
-	GMVec2(0, 0),
-	GMVec2(0, 1),
-	GMVec2(1, 1),
-	GMVec2(1, 0),
-};
+		GMVec2(0, 0),
+		GMVec2(0, 1),
+		GMVec2(1, 1),
+		GMVec2(1, 0),
+	};
+}
 
 GMBSPSkyGameObject::GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max)
 {
@@ -196,6 +199,10 @@ GMBSPGameWorld::GMBSPGameWorld()
 	D(d);
 	d->physics = new GMBSPPhysicsWorld(this);
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+
+	d->bspRenderConfigWrapper = d->bspRenderConfig.as<GMBSPRenderConfig>();
+	d->bspRenderConfigWrapper.set(GMBSPRenderConfigs::CalculateFace_Bool, true);
+	d->bspRenderConfigWrapper.set(GMBSPRenderConfigs::DrawSkyOnly_Bool, false);
 }
 
 void GMBSPGameWorld::loadBSP(const GMString& mapName)
@@ -252,6 +259,18 @@ void GMBSPGameWorld::setDefaultLights()
 		specularLight.setLightColor(lightColor);
 		addLight(specularLight);
 	}
+}
+
+void GMBSPGameWorld::setRenderConfig(gm::GMBSPRenderConfigs config, const GMVariant& value)
+{
+	D(d);
+	d->bspRenderConfigWrapper.set(config, value);
+}
+
+const GMVariant& GMBSPGameWorld::getRenderConfig(gm::GMBSPRenderConfigs config)
+{
+	D(d);
+	return d->bspRenderConfigWrapper.get(config);
 }
 
 Map<GMint, Set<GMBSPEntity*> >& GMBSPGameWorld::getEntities()
@@ -338,9 +357,9 @@ void GMBSPGameWorld::drawAll()
 	engine->newFrame();
 	clearBuffer();
 	drawSky();
-	if (!d->debugConfig.get(GMDebugConfigs::DrawSkyOnly_Bool).toBool())
+	if (!d->bspRenderConfigWrapper.get(GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool())
 	{
-		if (d->debugConfig.get(GMDebugConfigs::CalculateBSPFace_Bool).toBool())
+		if (d->bspRenderConfigWrapper.get(GMBSPRenderConfigs::CalculateFace_Bool).toBool())
 			calculateVisibleFaces();
 		drawFaces();
 	}

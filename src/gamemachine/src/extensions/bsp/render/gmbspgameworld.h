@@ -34,6 +34,9 @@ public:
 	void setDefaultLights();
 	using GMGameWorld::addObjectAndInit;
 
+	void setRenderConfig(gm::GMBSPRenderConfigs config, const GMVariant& value);
+	const GMVariant& getRenderConfig(gm::GMBSPRenderConfigs config);
+
 public:
 	virtual void renderScene() override;
 
