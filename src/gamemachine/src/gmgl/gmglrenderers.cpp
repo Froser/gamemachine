@@ -239,7 +239,7 @@ void GMGLRenderer_3D::drawDebug()
 	D(d);
 	D_BASE(db, Base);
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
-	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode_I32).toInt());
+	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
 void GMGLRenderer_3D::activateTextureTransform(GMModel* model, GMTextureType type, GMint index)

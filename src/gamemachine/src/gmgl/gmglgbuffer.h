@@ -96,7 +96,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMfloat sampleOffsets[2] = { 0 };
-	GMint effects = GMEffects::None;
+	GMint effects = GMFilterMode::None;
 	bool hasBegun = false;
 	GMRect clientRect = { 0 };
 	GMRect viewport = { 0 };
@@ -134,7 +134,7 @@ private:
 	void blending();
 	void renderQuad();
 	void disposeQuad();
-	const char* useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMEffects effect);
+	const char* useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMFilterMode::Mode effect);
 };
 
 END_NS

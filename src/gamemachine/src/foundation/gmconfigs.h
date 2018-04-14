@@ -7,38 +7,30 @@
 BEGIN_NS
 
 // 关于内部（如调试）的一些配置
-struct GMStates_DebugOptions
+struct GMDrawPolygonNormalMode
 {
 	enum // DRAW_NORMAL
 	{
-		DRAW_NORMAL_OFF,
-		DRAW_NORMAL_EYESPACE,
-		DRAW_NORMAL_CAMERASPACE,
-		DRAW_NORMAL_END
+		Off,
+		EyeSpace,
+		DrawCameraSpace,
+		EndOfEnum,
 	};
 };
 
-struct GMStates_RenderOptions
+struct GMFilterMode
 {
+	typedef GMint Mode;
+
 	enum
 	{
-		AUTO_SAMPLE_OFFSET = -1,
-	};
-
-	struct GMEffects_ns
-	{
-		enum GMEffects
-		{
-			None = 0x00000000,
-			Inversion = 0x00000001,
-			Sharpen = 0x00000002,
-			Blur = 0x00000004,
-			Grayscale = 0x00000008,
-			EdgeDetect = 0x00000010,
-
-			LastEffectsTag,
-			EndOfEffects = (LastEffectsTag - 1) << 2
-		};
+		None,
+		Inversion,
+		Sharpen,
+		Blur,
+		Grayscale,
+		EdgeDetect,
+		EndOfEnum,
 	};
 };
 
@@ -46,7 +38,7 @@ enum class GMDebugConfigs
 {
 	DrawPolygonsAsLine_Bool,
 	DrawLightmapOnly_Bool,
-	DrawPolygonNormalMode_I32,
+	DrawPolygonNormalMode,
 	RunProfile_Bool,
 
 	FrameBufferPositionX_I32,
@@ -54,25 +46,20 @@ enum class GMDebugConfigs
 	FrameBufferHeight_I32,
 	FrameBufferWidth_I32,
 	FrameBufferIndex_I32,
-	MAX,
+	Max,
 };
 
 enum class GMRenderConfigs
 {
-	RenderMode_I32,
-	Effects_I32,
-	BLUR_SAMPLE_OFFSET_X,
-	BLUR_SAMPLE_OFFSET_Y,
-
-	MAX,
+	RenderMode,
+	FilterMode,
+	Max,
 };
-
-using GMEffects = GMStates_RenderOptions::GMEffects_ns::GMEffects;
 
 // GUIDs
 namespace gm_config_guids
 {
-	const GMString DebugGUIDs[(GMuint)GMDebugConfigs::MAX] = {
+	const GMString DebugGUIDs[(GMuint)GMDebugConfigs::Max] = {
 		L"24D13A91-FB21-446e-A61D-565568586D0F",
 		L"40A50C3C-BD6D-4474-B2CF-64B47079841E",
 		L"FCFDB8C5-5D5D-45e4-B109-CF7B5A6A52A7",
@@ -84,11 +71,9 @@ namespace gm_config_guids
 		L"9D067D16-80E5-442b-B129-2F33AFC9BC9B",
 	};
 
-	const GMString RenderGUIDs[(GMuint)GMRenderConfigs::MAX] = {
+	const GMString RenderGUIDs[(GMuint)GMRenderConfigs::Max] = {
 		L"4ED48523-309E-40e0-87B6-36CEC8E58283",
 		L"12471560-175E-4eff-B3F2-0569CA14E53D",
-		L"3D2D42B5-9622-4a25-8FF0-E997AC1070C9",
-		L"B6B6F7DA-B059-4cde-B317-1462F5EC2DCB",
 	};
 }
 
@@ -108,7 +93,7 @@ struct GMConfigWrapperBase
 		const_cast<GMConfig&>(*m_vm)[m_guids[(GMuint)state]] = variant;
 	}
 
-	bool isEmpty() { return !!m_vm; }
+	bool isEmpty() { return !m_vm; }
 
 private:
 	const GMConfig* m_vm = nullptr;

@@ -168,6 +168,8 @@ void GMString::assign(const GMString& s)
 {
 	D_STR(d);
 	d->data = s.data()->data;
+	d->hash = s.data()->hash;
+	d->rehash = s.data()->rehash;
 }
 
 GMString& GMString::append(const char* c)

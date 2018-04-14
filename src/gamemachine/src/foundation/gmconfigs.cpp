@@ -42,7 +42,7 @@ void GMConfigs::init()
 	D(d);
 	GMDebugConfig debugConfig = getConfig(GMConfigs::Debug).asDebugConfig();
 	debugConfig.set(GMDebugConfigs::DrawPolygonsAsLine_Bool, false);
-	debugConfig.set(GMDebugConfigs::DrawPolygonNormalMode_I32, GMStates_DebugOptions::DRAW_NORMAL_OFF);
+	debugConfig.set(GMDebugConfigs::DrawPolygonNormalMode, GMDrawPolygonNormalMode::Off);
 	debugConfig.set(GMDebugConfigs::DrawLightmapOnly_Bool, false);
 	debugConfig.set(GMDebugConfigs::RunProfile_Bool, false);
 	debugConfig.set(GMDebugConfigs::FrameBufferPositionX_I32, 10);
@@ -52,10 +52,8 @@ void GMConfigs::init()
 	debugConfig.set(GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 	GMRenderConfig renderConfig = getConfig(GMConfigs::Render).asRenderConfig();
-	renderConfig.set(GMRenderConfigs::RenderMode_I32, (GMint) GMRenderMode::Forward);
-	renderConfig.set(GMRenderConfigs::Effects_I32, GMEffects::None);
-	renderConfig.set(GMRenderConfigs::BLUR_SAMPLE_OFFSET_X, GMStates_RenderOptions::AUTO_SAMPLE_OFFSET);
-	renderConfig.set(GMRenderConfigs::BLUR_SAMPLE_OFFSET_Y, GMStates_RenderOptions::AUTO_SAMPLE_OFFSET);
+	renderConfig.set(GMRenderConfigs::RenderMode, (GMint) GMRenderMode::Forward);
+	renderConfig.set(GMRenderConfigs::FilterMode, GMFilterMode::None);
 }
 
 GMConfig& GMConfigs::getConfig(Category state)

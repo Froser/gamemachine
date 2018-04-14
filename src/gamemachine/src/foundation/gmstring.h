@@ -16,6 +16,8 @@ private:					\
 
 struct GMStringPrivate
 {
+	mutable bool rehash = true;
+	mutable size_t hash = 0;
 	std::wstring data;
 };
 
@@ -161,6 +163,8 @@ public:
 		D_STR(d);
 		using namespace std;
 		swap(d->data, s.data()->data);
+		d->hash = s.data()->hash;
+		d->rehash = s.data()->rehash;
 		return *this;
 	}
 
@@ -288,6 +292,31 @@ public:
 		d->data.reserve(size);
 	}
 
+	void rehash()
+	{
+		D_STR(d);
+		d->rehash = true;
+	}
+
+	bool needRehash() const
+	{
+		D_STR(d);
+		return d->rehash;
+	}
+
+	void setHashCode(size_t hash) const
+	{
+		D_STR(d);
+		d->hash = hash;
+		d->rehash = false;
+	}
+
+	size_t getHashCode() const
+	{
+		D_STR(d);
+		return d->hash;
+	}
+
 public:
 	size_t findLastOf(GMwchar c) const;
 	size_t findLastOf(char c) const;
@@ -363,7 +392,16 @@ struct GMStringHashFunctor
 {
 	size_t operator()(const GMString& str) const
 	{
-		return std::hash_value(str.toStdWString());
+		if (str.needRehash())
+		{
+			size_t hashCode = std::hash_value(str.toStdWString());
+			str.setHashCode(hashCode);
+			return hashCode;
+		}
+		else
+		{
+			return str.getHashCode();
+		}
 	}
 };
 

@@ -131,12 +131,12 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 		const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
 		setViewport(rect);
 
-		if (d->renderConfig.get(GMRenderConfigs::RenderMode_I32).toEnum<GMRenderMode>() == GMRenderMode::Deferred)
+		if (d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>() == GMRenderMode::Deferred)
 		{
 			if (!refreshGBuffer())
 			{
 				gm_error("init gbuffer error");
-				d->renderConfig.set(GMRenderConfigs::RenderMode_I32, (GMint)GMRenderMode::Forward);
+				d->renderConfig.set(GMRenderConfigs::RenderMode, (GMint)GMRenderMode::Forward);
 			}
 		}
 
@@ -165,7 +165,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	}
 	else
 	{
-		GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode_I32).toEnum<GMRenderMode>();
+		GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
 		if (renderMode != d->renderMode)
 			d->needRefreshLights = true;
 		setCurrentRenderMode(renderMode);
@@ -252,7 +252,7 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 	D(d);
 	updateShader();
 
-	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode_I32).toEnum<GMRenderMode>();
+	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
 	GMGLShaderProgram* progs[] = {
 		d->forwardShaderProgram,
 		renderMode== GMRenderMode::Forward ? nullptr : d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER],
@@ -498,7 +498,7 @@ void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 	D(d);
 	setCurrentRenderMode(GMRenderMode::Forward);
 	activateLightsIfNecessary();
-	if (d->renderConfig.get(GMRenderConfigs::Effects_I32).toEnum<GMEffects>() != GMEffects::None)
+	if (d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>() != GMFilterMode::None)
 	{
 		GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
 		forwardRender(objects, count);
