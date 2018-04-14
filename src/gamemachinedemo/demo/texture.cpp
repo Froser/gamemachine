@@ -30,7 +30,7 @@ void Demo_Texture::init()
 			shader.getMaterial().kd = GMVec3(1, 1, 1);
 			gm::ITexture* tex = nullptr;
 			gm::GMToolUtil::createTexture("gamemachine.png", &tex);
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
+			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
 	} cb(d->demoWorld);
@@ -119,7 +119,7 @@ void Demo_Texture_Index::init()
 
 	gm::ITexture* tex = nullptr;
 	gm::GMToolUtil::createTexture("gamemachine.png", &tex);
-	gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
+	gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 	d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 
 	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, quad);

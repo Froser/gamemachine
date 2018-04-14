@@ -18,6 +18,7 @@ namespace
 			"DiffuseTextureAttributes",
 			"NormalMapTextureAttributes",
 			"LightmapTextureAttributes",
+			"CubeMapTextureAttributes",
 
 			{ "Position", "Color" },
 			{ "AmbientLights", "AmbientLightCount" },

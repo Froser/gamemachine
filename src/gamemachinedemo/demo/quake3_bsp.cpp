@@ -161,10 +161,10 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
 		if (kbState.keyTriggered('P'))
-			db->debugConfig.set(gm::GMDebugConfigs::CalculateBSPFace_Bool, !db->debugConfig.get(gm::GMDebugConfigs::CalculateBSPFace_Bool).toBool());
+			d->world->setRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool).toBool());
 
 		if (kbState.keyTriggered('O'))
-			db->debugConfig.set(gm::GMDebugConfigs::DrawSkyOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawSkyOnly_Bool).toBool());
+			d->world->setRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool());
 
 		if (kbState.keyTriggered('R'))
 			setMouseTrace(!d->mouseTrace);

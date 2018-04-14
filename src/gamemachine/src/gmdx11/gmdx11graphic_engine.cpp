@@ -208,6 +208,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	static GMDx11Renderer_3D s_renderer_3d;
 	static GMDx11Renderer_2D s_renderer_2d;
 	static GMDx11Renderer_Glyph s_renderer_glyph;
+	static GMDx11Renderer_CubeMap s_renderer_cubemap;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -216,8 +217,9 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 		return &s_renderer_glyph;
 	case GMModelType::Model3D:
 	case GMModelType::Particles:
-	case GMModelType::CubeMap:
 		return &s_renderer_3d;
+	case GMModelType::CubeMap:
+		return &s_renderer_cubemap;
 	default:
 		GM_ASSERT(false);
 		return nullptr;

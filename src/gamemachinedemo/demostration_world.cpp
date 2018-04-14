@@ -73,7 +73,7 @@ void DemoHandler::onDeactivate()
 	D(d);
 	d->demostrationWorld->resetProjectionAndEye();
 	GM.getGraphicEngine()->removeLights();
-	d->renderConfig.set(gm::GMRenderConfigs::Effects_I32, gm::GMEffects::None);
+	d->renderConfig.set(gm::GMRenderConfigs::FilterMode, gm::GMFilterMode::None);
 	d->activating = false;
 }
 
@@ -142,8 +142,8 @@ void DemoHandler::switchNormal()
 {
 	D(d);
 	d->debugConfig.set(
-		gm::GMDebugConfigs::DrawPolygonNormalMode_I32,
-		(d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode_I32).toInt() + 1) % gm::GMStates_DebugOptions::DRAW_NORMAL_END
+		gm::GMDebugConfigs::DrawPolygonNormalMode,
+		(d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt() + 1) % gm::GMDrawPolygonNormalMode::EndOfEnum
 	);
 }
 
@@ -260,6 +260,7 @@ void DemostrationEntrance::init()
 
 	GM.getGraphicEngine()->setShaderLoadCallback(this);
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
 	d->world = new DemostrationWorld();
 }
 
@@ -267,7 +268,7 @@ void DemostrationEntrance::start()
 {
 	D(d);
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-	d->renderConfig.set(gm::GMRenderConfigs::RenderMode_I32, (gm::GMint) gm::GMRenderMode::Forward);
+	d->renderConfig.set(gm::GMRenderConfigs::RenderMode, (gm::GMint) gm::GMRenderMode::Forward);
 	getWorld()->resetProjectionAndEye();
 	loadDemostrations(d->world);
 }

@@ -82,7 +82,7 @@ void Demo_Model::init()
 		gm::GMShader& shader = cube->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
-		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NORMALMAP);
+		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
 
 		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject2 = new gm::GMGameObject(asset);

@@ -33,11 +33,6 @@ struct GMShaderProc
 
 enum
 {
-	CubeMapActiveTexture = 31 //!< 足够安全的纹理单元，用于存放纹理，对应GL_TEXTURE31
-};
-
-enum
-{
 	DEFERRED_GEOMETRY_PASS_SHADER,
 	DEFERRED_LIGHT_PASS_SHADER,
 };

@@ -52,6 +52,7 @@ GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
 GMTexture NormalMapTextureAttributes[1];
 GMLightmapTexture LightmapTextureAttributes[1];
+GMTexture CubeMapTextureAttributes[1];
 
 Texture2D AmbientTexture_0: register(t0);
 Texture2D AmbientTexture_1: register(t1);
@@ -61,6 +62,7 @@ Texture2D DiffuseTexture_1: register(t4);
 Texture2D DiffuseTexture_2: register(t5);
 Texture2D NormalMapTexture: register(t6);
 Texture2D LightmapTexture: register(t7);
+TextureCube CubeMapTexture: register(t8);
 SamplerState AmbientSampler_0: register(s0);
 SamplerState AmbientSampler_1: register(s1);
 SamplerState AmbientSampler_2: register(s2);
@@ -69,6 +71,7 @@ SamplerState DiffuseSampler_1: register(s4);
 SamplerState DiffuseSampler_2: register(s5);
 SamplerState NormalMapSampler: register(s6);
 SamplerState LightmapSampler: register(s7);
+SamplerState CubeMapSampler: register(s8);
 
 interface ILight
 {
@@ -356,6 +359,25 @@ float4 PS_Glyph(PS_INPUT input) : SV_Target
     return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
 }
 
+//--------------------------------------------------------------------------------------
+// CubeMap
+//--------------------------------------------------------------------------------------
+VS_OUTPUT VS_CubeMap(VS_INPUT input)
+{
+    VS_OUTPUT output;
+    output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
+    output.Position = mul(output.Position, WorldMatrix);
+    output.Position = mul(output.Position, ViewMatrix);
+    output.Position = mul(output.Position, ProjectionMatrix);
+    output.Texcoord = input.Texcoord;
+    return output;
+}
+
+float4 PS_CubeMap(PS_INPUT input) : SV_Target
+{
+    return AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+}
+
 // Techniques
 technique11 GMTech_3D
 {
@@ -387,6 +409,18 @@ technique11 GMTech_Glyph
     {
         SetVertexShader(CompileShader(vs_4_0,VS_2D()));
         SetPixelShader(CompileShader(ps_4_0,PS_Glyph()));
+        SetRasterizerState(GMRasterizerState);
+        SetDepthStencilState(GMDepthStencilState, 1);
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+}
+
+technique11 GMTech_CubeMap
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_4_0,VS_CubeMap()));
+        SetPixelShader(CompileShader(ps_4_0,PS_CubeMap()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

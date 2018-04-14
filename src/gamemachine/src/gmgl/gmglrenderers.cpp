@@ -146,7 +146,7 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	applyShader(model->getShader());
 
 	// 纹理
-	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
@@ -165,7 +165,7 @@ void GMGLRenderer_3D::afterDraw(GMModel* model)
 	if (model->getShader().getBlend())
 		glDepthMask(GL_TRUE);
 
-	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
@@ -179,7 +179,7 @@ void GMGLRenderer_3D::drawTexture(GMModel* model, GMTextureType type, GMint inde
 {
 	D(d);
 	D_BASE(db, Base);
-	if (db->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() && type != GMTextureType::LIGHTMAP)
+	if (db->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() && type != GMTextureType::Lightmap)
 		return;
 
 	// 按照贴图类型选择纹理动画序列
@@ -337,18 +337,23 @@ void GMGLRenderer_3D::getTextureID(GMTextureType type, GMint index, REF GLenum& 
 {
 	switch (type)
 	{
-	case GMTextureType::AMBIENT:
-	case GMTextureType::DIFFUSE:
-		texId = (GMint)type * GMMaxTextureCount(type) + index + 1;
-		tex = texId - 1 + GL_TEXTURE1;
+	case GMTextureType::Ambient:
+		texId = GMTextureRegisterQuery<GMTextureType::Ambient>::Value + index;
+		tex = texId + GL_TEXTURE0 + index;
 		break;
-	case GMTextureType::NORMALMAP:
-		texId = 7;
-		tex = GL_TEXTURE7;
+	case GMTextureType::Diffuse:
+		texId = GMTextureRegisterQuery<GMTextureType::Diffuse>::Value + index;
+		tex = texId + GL_TEXTURE0 + index;
 		break;
-	case GMTextureType::LIGHTMAP:
-		texId = 8;
-		tex = GL_TEXTURE8;
+	case GMTextureType::NormalMap:
+		GM_ASSERT(index == 0);
+		texId = GMTextureRegisterQuery<GMTextureType::NormalMap>::Value;
+		tex = texId + GL_TEXTURE0;
+		break;
+	case GMTextureType::Lightmap:
+		GM_ASSERT(index == 0);
+		texId = GMTextureRegisterQuery<GMTextureType::Lightmap>::Value;
+		tex = texId + GL_TEXTURE0;
 		break;
 	default:
 		GM_ASSERT(false);
@@ -364,14 +369,14 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 	applyShader(model->getShader());
 
 	// 只选择环境光纹理
-	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::AMBIENT, 0);
+	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0);
 
 	// 获取序列中的这一帧
 	ITexture* texture = getTexture(textures);
 	if (texture)
 	{
 		// 激活动画序列
-		activateTexture(model, GMTextureType::AMBIENT, 0);
+		activateTexture(model, GMTextureType::Ambient, 0);
 		texture->drawTexture(&textures, 0);
 	}
 }
@@ -405,34 +410,37 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	GMTexture& texture = model->getShader().getTexture();
-	GMTextureFrames& frames = texture.getTextureFrames(GMTextureType::CUBEMAP, 0);
+	GMTextureFrames& frames = texture.getTextureFrames(GMTextureType::CubeMap, 0);
 	ITexture* glTex = frames.getFrameByIndex(0);
 	if (glTex)
 	{
+		IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+		auto& desc = shaderProgram->getDesc();
+
 		GM_BEGIN_CHECK_GL_ERROR
 		IGraphicEngine* engine = GM.getGraphicEngine();
 		// 给延迟渲染程序传入CubeMap
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMapActiveTexture);
+			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		}
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMapActiveTexture);
+			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		}
 
 		// 给正向渲染程序传入CubeMap，一定要放在最后，因为CubeMap渲染本身是正向渲染
 		{
 			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
 			shader->useProgram();
-			shader->setInt(GMSHADER_CUBEMAP_TEXTURE, CubeMapActiveTexture);
+			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		}
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
-		glActiveTexture(GL_TEXTURE0 + CubeMapActiveTexture);
+		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR

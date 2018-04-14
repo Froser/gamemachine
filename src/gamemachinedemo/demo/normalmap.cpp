@@ -36,8 +36,8 @@ void Demo_NormalMap::init()
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
 			gm::ITexture* tex = nullptr;
 			gm::GMToolUtil::createTexture("bnp.png", &tex);
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::NORMALMAP);
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::DIFFUSE);
+			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::NormalMap);
+			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
 	} cb(d->demoWorld);

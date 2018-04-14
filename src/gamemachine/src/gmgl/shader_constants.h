@@ -17,9 +17,6 @@ BEGIN_NS
 #define		GMSHADER_INVERSE_VIEW_MATRIX		GMSHADER("inverse_view_matrix")
 #define		GMSHADER_VIEW_POSITION				GMSHADER("view_position")
 
-//纹理
-#define		GMSHADER_CUBEMAP_TEXTURE			GMSHADER("cubemap")
-
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")
 
@@ -54,19 +51,19 @@ inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTe
 
 	switch (t)
 	{
-	case GMTextureType::AMBIENT:
+	case GMTextureType::Ambient:
 		return index == 0 ? GMSHADER_AMBIENT_TEXTURES_0.c_str() :
 			index == 1 ? GMSHADER_AMBIENT_TEXTURES_1.c_str() :
 			index == 2 ? GMSHADER_AMBIENT_TEXTURES_2.c_str() : "";
-	case GMTextureType::DIFFUSE:
+	case GMTextureType::Diffuse:
 		return index == 0 ? GMSHADER_DIFFUSE_TEXTURES_0.c_str() :
 			index == 1 ? GMSHADER_DIFFUSE_TEXTURES_1.c_str() :
 			index == 2 ? GMSHADER_DIFFUSE_TEXTURES_2.c_str() : "";
-	case GMTextureType::NORMALMAP:
+	case GMTextureType::NormalMap:
 		return index == 0 ? GMSHADER_NORMALMAP_TEXTURE_0.c_str() : "";
-	case GMTextureType::LIGHTMAP:
+	case GMTextureType::Lightmap:
 		return index == 0 ? GMSHADER_LIGHTMAP_TEXTURE_0.c_str() : "";
-	case GMTextureType::END:
+	case GMTextureType::EndOfCommonTexture:
 	default:
 		GM_ASSERT(false);
 		break;

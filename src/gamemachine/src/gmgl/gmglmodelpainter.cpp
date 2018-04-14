@@ -30,7 +30,7 @@ void GMGLModelPainter::transfer()
 
 	for (auto& mesh : model->getMeshes())
 	{
-		if (model->getShader().getTexture().getTextureFrames(GMTextureType::NORMALMAP, 0).getFrameCount() > 0)
+		if (model->getShader().getTexture().getTextureFrames(GMTextureType::NormalMap, 0).getFrameCount() > 0)
 			mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
 	}
 

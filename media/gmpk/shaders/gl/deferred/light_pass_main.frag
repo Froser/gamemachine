@@ -116,7 +116,7 @@ void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
 {
 	vec3 I = normalize(deferred_light_pass_fromTexture_Position - GM_view_position.rgb);
 	vec3 R = refract(I, normal_world, deferred_material_pass_fromTexture_Refractivity);
-	deferred_light_pass_g_refractiveLight += texture(GM_cubemap, vec3(R.x, R.y, R.z)).rgb;
+	deferred_light_pass_g_refractiveLight += texture(GM_cubemap_texture, vec3(R.x, R.y, R.z)).rgb;
 }
 
 void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)

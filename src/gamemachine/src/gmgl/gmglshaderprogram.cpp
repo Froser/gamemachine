@@ -26,6 +26,7 @@ namespace
 			"GM_diffuse_textures",
 			"GM_normalmap_textures",
 			"GM_lightmap_textures",
+			"GM_cubemap_texture",
 
 			{ "lightPosition", "lightColor" },
 			{ "GM_ambients", "GM_ambients_count" },

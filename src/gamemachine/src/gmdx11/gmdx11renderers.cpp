@@ -380,7 +380,7 @@ void GMDx11Renderer::endModel()
 void GMDx11Renderer::prepareTextures(GMModel* model)
 {
 	D(d);
-	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; i++)
@@ -396,7 +396,7 @@ void GMDx11Renderer::drawTextures(GMModel* model)
 {
 	D(d);
 	GMint registerId = 0;
-	GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; ++i, ++registerId)
@@ -420,21 +420,25 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	ID3DX11EffectVariable* texAttrs = nullptr;
 	const char* textureName = nullptr;
-	if (type == GMTextureType::AMBIENT)
+	if (type == GMTextureType::Ambient)
 	{
 		textureName = desc->AmbientTextureName;
 	}
-	else if (type == GMTextureType::DIFFUSE)
+	else if (type == GMTextureType::Diffuse)
 	{
 		textureName = desc->DiffuseTextureName;
 	}
-	else if (type == GMTextureType::NORMALMAP)
+	else if (type == GMTextureType::NormalMap)
 	{
 		textureName = desc->NormalMapTextureName;
 	}
-	else if (type == GMTextureType::LIGHTMAP)
+	else if (type == GMTextureType::Lightmap)
 	{
 		textureName = desc->LightMapTextureName;
+	}
+	else if (type == GMTextureType::CubeMap)
+	{
+		textureName = desc->CubeMapTextureName;
 	}
 	else
 	{
@@ -707,4 +711,28 @@ ID3DX11EffectTechnique* GMDx11Renderer::getTechnique()
 		GM_ASSERT(d->technique);
 	}
 	return d->technique;
+}
+
+void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
+{
+	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::CubeMap, 0);
+	// 写入纹理属性，如是否绘制，偏移等
+	applyTextureAttribute(model, getTexture(textures), GMTextureType::CubeMap, 0);
+}
+
+void GMDx11Renderer_CubeMap::drawTextures(GMModel* model)
+{
+	enum {
+		Register = GMTextureRegisterQuery<GMTextureType::CubeMap>::Value
+	};
+
+	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::CubeMap, 0);
+
+	// 获取序列中的这一帧
+	ITexture* texture = getTexture(textures);
+	if (texture)
+	{
+		// 激活动画序列
+		texture->drawTexture(&textures, Register);
+	}
 }

@@ -424,7 +424,7 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
 		GM_BEGIN_CHECK_GL_ERROR
-		glActiveTexture(GL_TEXTURE0 + CubeMapActiveTexture);
+		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		GM_END_CHECK_GL_ERROR
 		break;

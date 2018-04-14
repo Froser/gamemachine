@@ -197,33 +197,52 @@ public:
 
 enum class GMTextureType
 {
-	AMBIENT,
-	DIFFUSE,
-	NORMALMAP,
-	LIGHTMAP,
-	END,
+	BeginOfEnum,
+
+	Ambient,
+	Diffuse,
+	NormalMap,
+	Lightmap,
+	EndOfCommonTexture, // 一般纹理从这里结束
 
 	// Special type
-	CUBEMAP,
+	CubeMap,
+	EndOfEnum,
 };
 
 static constexpr GMuint GMMaxTextureCount(GMTextureType type)
 {
 	return
-		type == GMTextureType::AMBIENT ? 3 :
-		type == GMTextureType::DIFFUSE ? 3 :
-		type == GMTextureType::NORMALMAP ? 1 :
-		type == GMTextureType::LIGHTMAP ? 1 :
-		type == GMTextureType::CUBEMAP ? 1 : 0;
+		type == GMTextureType::Ambient ? 3 :
+		type == GMTextureType::Diffuse ? 3 :
+		type == GMTextureType::NormalMap ? 1 :
+		type == GMTextureType::Lightmap ? 1 :
+		type == GMTextureType::CubeMap ? 1 : 0;
 }
+
+template <GMTextureType Type>
+struct GMTextureRegisterQuery
+{
+	enum
+	{
+		Value = GMMaxTextureCount((GMTextureType)((GMint)Type - 1)) +
+			GMTextureRegisterQuery<(GMTextureType)((GMint)Type - 1)>::Value
+	};
+};
+
+template <>
+struct GMTextureRegisterQuery<GMTextureType::BeginOfEnum>
+{
+	enum { Value = 0 };
+};
 
 GM_PRIVATE_OBJECT(GMTexture)
 {
-	GMTextureFrames ambients[GMMaxTextureCount(GMTextureType::AMBIENT)];
-	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::DIFFUSE)];
-	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NORMALMAP)];
-	GMTextureFrames lightMap[GMMaxTextureCount(GMTextureType::LIGHTMAP)];
-	GMTextureFrames cubeMap[GMMaxTextureCount(GMTextureType::CUBEMAP)];
+	GMTextureFrames ambients[GMMaxTextureCount(GMTextureType::Ambient)];
+	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::Diffuse)];
+	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NormalMap)];
+	GMTextureFrames lightMap[GMMaxTextureCount(GMTextureType::Lightmap)];
+	GMTextureFrames cubeMap[GMMaxTextureCount(GMTextureType::CubeMap)];
 };
 
 class GMTexture : public GMObject
@@ -242,15 +261,15 @@ public:
 		D(d);
 		switch (type)
 		{
-		case GMTextureType::AMBIENT:
+		case GMTextureType::Ambient:
 			return d->ambients[index];
-		case GMTextureType::DIFFUSE:
+		case GMTextureType::Diffuse:
 			return d->diffuse[index];
-		case GMTextureType::NORMALMAP:
+		case GMTextureType::NormalMap:
 			return d->normalMap[index];
-		case GMTextureType::LIGHTMAP:
+		case GMTextureType::Lightmap:
 			return d->lightMap[index];
-		case GMTextureType::CUBEMAP:
+		case GMTextureType::CubeMap:
 			return d->cubeMap[index];
 		default:
 			GM_ASSERT(false);
@@ -268,7 +287,7 @@ public:
 		D(d);
 		D_OF(rhs_d, &rhs);
 
-		GM_FOREACH_ENUM_CLASS(type, GMTextureType::AMBIENT, GMTextureType::END)
+		GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 		{
 			GMuint count = GMMaxTextureCount(type);
 			for (GMuint i = 0; i < count; i++)

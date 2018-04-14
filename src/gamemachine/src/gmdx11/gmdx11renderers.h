@@ -55,10 +55,12 @@ private:
 	void prepareBlend(GMModel* model);
 	void prepareDepthStencil(GMModel* model);
 	void passAllAndDraw(GMModel* model);
-	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
-	void prepareTextures(GMModel* model);
-	void drawTextures(GMModel* model);
+	virtual void prepareTextures(GMModel* model);
+	virtual void drawTextures(GMModel* model);
+
+protected:
 	void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
+	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 };
 
 class GMDx11Renderer_3D : public GMDx11Renderer
@@ -83,6 +85,17 @@ class GMDx11Renderer_Glyph : public GMDx11Renderer
 	{
 		return "GMTech_Glyph";
 	}
+};
+
+class GMDx11Renderer_CubeMap : public GMDx11Renderer
+{
+	virtual const char* getTechniqueName() override
+	{
+		return "GMTech_CubeMap";
+	}
+
+	virtual void prepareTextures(GMModel* model);
+	virtual void drawTextures(GMModel* model);
 };
 
 END_NS
