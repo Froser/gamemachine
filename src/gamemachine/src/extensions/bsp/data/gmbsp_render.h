@@ -4,6 +4,7 @@
 #include <linearmath.h>
 #include <gmtools.h>
 #include "gmbsp.h"
+#include <gmmodel.h>
 BEGIN_NS
 
 // structs for rendering
@@ -159,7 +160,7 @@ public:
 	GMBSPRenderData& renderData();
 	void generateRenderData(BSPData* bsp);
 	void createObject(const GMBSP_Render_Face& face, const GMShader& shader, OUT GMModel** obj);
-	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModel** obj);
+	void createObject(const GMBSP_Render_BiquadraticPatch& biqp, const GMShader& shader, OUT GMModels** obj);
 	void createBox(const GMVec3& extents, const GMVec3& position, const GMShader& shader, OUT GMModel** obj);
 
 private:
