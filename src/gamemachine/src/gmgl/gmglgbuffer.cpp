@@ -368,7 +368,7 @@ void GMGLFramebuffer::endDrawEffects()
 void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 {
 	D(d);
-	const char* effectUniformName = nullptr;
+	const char* filterUniformName = nullptr;
 	GM_BEGIN_CHECK_GL_ERROR
 	program->useProgram();
 	GM_END_CHECK_GL_ERROR
@@ -382,26 +382,27 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	turnOffBlending();
 	if (d->effects != GMFilterMode::None)
 	{
-		GMFilterMode::Mode eff = GMFilterMode::None + 1;
-		while (eff != GMFilterMode::EndOfEnum)
+		GMFilterMode::Mode filter = GMFilterMode::None + 1;
+		while (filter != GMFilterMode::EndOfEnum)
 		{
-			if (d->effects & eff)
+			if (d->effects == filter)
 			{
-				effectUniformName = useShaderProgramAndApplyEffect(program, eff);
+				filterUniformName = useShaderProgramAndApplyFilter(program, filter);
 				renderQuad();
+				break;
 			}
-			eff <<= 1;
+			++filter;
 		}
 	}
 	else
 	{
-		const char* name = useShaderProgramAndApplyEffect(program, GMFilterMode::None);
+		const char* name = useShaderProgramAndApplyFilter(program, GMFilterMode::None);
 		renderQuad();
 	}
 
 	//Reset effects
-	if (effectUniformName)
-		program->setBool(effectUniformName, false);
+	if (filterUniformName)
+		program->setBool(filterUniformName, false);
 
 	releaseBind();
 	GMEngine->setViewport(d->clientRect);
@@ -512,7 +513,7 @@ void GMGLFramebuffer::disposeQuad()
 		glDeleteBuffers(1, &d->quadVBO);
 }
 
-const char* GMGLFramebuffer::useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMFilterMode::Mode effect)
+const char* GMGLFramebuffer::useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect)
 {
 	D(d);
 	const char* uniformName = nullptr;

@@ -134,7 +134,7 @@ private:
 	void blending();
 	void renderQuad();
 	void disposeQuad();
-	const char* useShaderProgramAndApplyEffect(GMGLShaderProgram* program, GMFilterMode::Mode effect);
+	const char* useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect);
 };
 
 END_NS
