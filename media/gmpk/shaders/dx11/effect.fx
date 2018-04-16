@@ -48,11 +48,21 @@ class GMLightmapTexture : GMTexture
     }
 };
 
+class GMCubeMapTexture : GMTexture
+{
+    float4 Sample(TextureCube tex, SamplerState ss, float3 texcoord)
+    {
+        if (!Enabled)
+            return float4(0.0f, 0.0f, 0.0f, 0.0f);
+        return tex.Sample(ss, texcoord);
+    }
+};
+
 GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
 GMTexture NormalMapTextureAttributes[1];
 GMLightmapTexture LightmapTextureAttributes[1];
-GMTexture CubeMapTextureAttributes[1];
+GMCubeMapTexture CubeMapTextureAttributes[1];
 
 Texture2D AmbientTexture_0: register(t0);
 Texture2D AmbientTexture_1: register(t1);
@@ -366,16 +376,17 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
+    output.WorldPos = output.Position;
     output.Position = mul(output.Position, WorldMatrix);
     output.Position = mul(output.Position, ViewMatrix);
     output.Position = mul(output.Position, ProjectionMatrix);
-    output.Texcoord = input.Texcoord;
     return output;
 }
 
 float4 PS_CubeMap(PS_INPUT input) : SV_Target
 {
-    return AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+    float3 texcoord = input.WorldPos.xyz;
+    return CubeMapTextureAttributes[0].Sample(CubeMapTexture, CubeMapSampler, texcoord);
 }
 
 // Techniques

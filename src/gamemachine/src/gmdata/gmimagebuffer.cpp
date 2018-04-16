@@ -100,8 +100,10 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 		&negZ
 	};
 	GMbyte* ptr = data.mip[0].data;
-	for (GMint i = 0; i < GM_array_size(slices); ++i, ptr+=data.sliceStride)
+	for (GMint i = 0; i < GM_array_size(slices); ++i)
 	{
+		size_t sz = slices[i]->getData().size;
 		memcpy(ptr, slices[i]->getData().mip[0].data, data.sliceStride);
+		ptr += sz;
 	}
 }
