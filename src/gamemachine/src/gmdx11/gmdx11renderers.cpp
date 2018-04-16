@@ -324,6 +324,12 @@ namespace
 	};
 }
 
+GMDx11CubeMapState& GMDx11Renderer::getCubeMapState()
+{
+	static GMDx11CubeMapState cms;
+	return cms;
+}
+
 GMDx11Renderer::GMDx11Renderer()
 {
 	D(d);
@@ -369,8 +375,14 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
 		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
+
 	shaderProgram->setMatrix4(desc->ViewMatrix, GM.getCamera().getFrustum().getViewMatrix());
 	shaderProgram->setMatrix4(desc->ProjectionMatrix, GM.getCamera().getFrustum().getProjectionMatrix());
+
+	const GMCameraLookAt& lookAt = GM.getCamera().getLookAt();
+	GMFloat4 viewPosition;
+	lookAt.position.loadFloat4(viewPosition);
+	shaderProgram->setVec4(desc->ViewPosition, viewPosition);
 }
 
 void GMDx11Renderer::endModel()
@@ -389,6 +401,13 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 			// 写入纹理属性，如是否绘制，偏移等
 			applyTextureAttribute(model, getTexture(textures), type, i);
 		}
+	}
+
+	const GMDx11CubeMapState& cubeMapState = getCubeMapState();
+	if (cubeMapState.hasCubeMap)
+	{
+		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
+		cubeMapState.cubeMapRenderer->prepareTextures(cubeMapState.model);
 	}
 }
 
@@ -411,6 +430,13 @@ void GMDx11Renderer::drawTextures(GMModel* model)
 				texture->drawTexture(&textures, registerId);
 			}
 		}
+	}
+
+	const GMDx11CubeMapState& cubeMapState = getCubeMapState();
+	if (cubeMapState.hasCubeMap)
+	{
+		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
+		cubeMapState.cubeMapRenderer->drawTextures(cubeMapState.model);
 	}
 }
 
@@ -734,5 +760,9 @@ void GMDx11Renderer_CubeMap::drawTextures(GMModel* model)
 	{
 		// 激活动画序列
 		texture->drawTexture(&textures, Register);
+		GMDx11CubeMapState& cubeMapState = getCubeMapState();
+		cubeMapState.hasCubeMap = true;
+		cubeMapState.cubeMapRenderer = this;
+		cubeMapState.model = model;
 	}
 }

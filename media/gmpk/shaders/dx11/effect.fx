@@ -7,11 +7,40 @@ cbuffer WorldConstantBuffer: register( b0 )
     matrix ViewMatrix;
     matrix ProjectionMatrix;
     matrix InverseTransposeModelMatrix;
+    float4 ViewPosition;
 }
 
 //--------------------------------------------------------------------------------------
 // Textures, Lights, Materials
 //--------------------------------------------------------------------------------------
+Texture2D AmbientTexture_0: register(t0);
+Texture2D AmbientTexture_1: register(t1);
+Texture2D AmbientTexture_2: register(t2);
+Texture2D DiffuseTexture_0: register(t3);
+Texture2D DiffuseTexture_1: register(t4);
+Texture2D DiffuseTexture_2: register(t5);
+Texture2D NormalMapTexture: register(t6);
+Texture2D LightmapTexture: register(t7);
+TextureCube CubeMapTexture: register(t8);
+SamplerState AmbientSampler_0: register(s0);
+SamplerState AmbientSampler_1: register(s1);
+SamplerState AmbientSampler_2: register(s2);
+SamplerState DiffuseSampler_0: register(s3);
+SamplerState DiffuseSampler_1: register(s4);
+SamplerState DiffuseSampler_2: register(s5);
+SamplerState NormalMapSampler: register(s6);
+SamplerState LightmapSampler: register(s7);
+SamplerState CubeMapSampler: register(s8);
+
+struct GMMaterial
+{
+    float4 Ka;
+    float4 Kd;
+    float4 Ks;
+    float Shininess;
+    float Refractivity;
+};
+GMMaterial Material;
 
 class GMTexture
 {
@@ -56,6 +85,16 @@ class GMCubeMapTexture : GMTexture
             return float4(0.0f, 0.0f, 0.0f, 0.0f);
         return tex.Sample(ss, texcoord);
     }
+
+    float4 IlluminateRefraction(TextureCube tex, float3 normal_World_N, float4 position_World, float4 viewPosition_World)
+    {
+        if (Material.Refractivity == 0)
+            return float4(0, 0, 0, 0);
+
+        float3 in_N = normalize((position_World - viewPosition_World).xyz);
+        float3 refraction = refract(in_N, normal_World_N, Material.Refractivity);
+        return Sample(tex, CubeMapSampler, refraction.xyz);
+    }
 };
 
 GMTexture AmbientTextureAttributes[3];
@@ -63,25 +102,6 @@ GMTexture DiffuseTextureAttributes[3];
 GMTexture NormalMapTextureAttributes[1];
 GMLightmapTexture LightmapTextureAttributes[1];
 GMCubeMapTexture CubeMapTextureAttributes[1];
-
-Texture2D AmbientTexture_0: register(t0);
-Texture2D AmbientTexture_1: register(t1);
-Texture2D AmbientTexture_2: register(t2);
-Texture2D DiffuseTexture_0: register(t3);
-Texture2D DiffuseTexture_1: register(t4);
-Texture2D DiffuseTexture_2: register(t5);
-Texture2D NormalMapTexture: register(t6);
-Texture2D LightmapTexture: register(t7);
-TextureCube CubeMapTexture: register(t8);
-SamplerState AmbientSampler_0: register(s0);
-SamplerState AmbientSampler_1: register(s1);
-SamplerState AmbientSampler_2: register(s2);
-SamplerState DiffuseSampler_0: register(s3);
-SamplerState DiffuseSampler_1: register(s4);
-SamplerState DiffuseSampler_2: register(s5);
-SamplerState NormalMapSampler: register(s6);
-SamplerState LightmapSampler: register(s7);
-SamplerState CubeMapSampler: register(s8);
 
 interface ILight
 {
@@ -124,16 +144,6 @@ int AmbientLightCount;
 
 GMLight SpecularLights[10];
 int SpecularLightCount;
-
-struct GMMaterial
-{
-    float4 Ka;
-    float4 Kd;
-    float4 Ks;
-    float Shininess;
-    float Refractivity;
-};
-GMMaterial Material;
 
 //--------------------------------------------------------------------------------------
 // States
@@ -326,7 +336,10 @@ float4 PS_3D(PS_INPUT input) : SV_Target
     // 计算Specular
     float4 color_Specular = factor_Specular * Material.Ks;
     
-    float4 finalColor = color_Ambient + color_Diffuse + color_Specular;
+    // 计算折射
+    float4 color_Refractivity = CubeMapTextureAttributes[0].IlluminateRefraction(CubeMapTexture, input.Normal, input.WorldPos, ViewPosition);
+
+    float4 finalColor = color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
     return finalColor;
 }
 

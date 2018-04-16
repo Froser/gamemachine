@@ -467,7 +467,7 @@ void GMGLGraphicEngine::updateViewMatrix()
 	GM_BEGIN_CHECK_GL_ERROR
 	// 视觉位置，用于计算光照
 	d->forwardShaderProgram->useProgram();
-	d->forwardShaderProgram->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->forwardShaderProgram->setVec4(desc.ViewPosition, vec);
 	d->forwardShaderProgram->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->forwardShaderProgram->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, Inverse(viewMatrix));
 	GM_END_CHECK_GL_ERROR
@@ -475,11 +475,11 @@ void GMGLGraphicEngine::updateViewMatrix()
 	GM_BEGIN_CHECK_GL_ERROR
 	// 视觉位置，用于计算光照
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, Inverse(viewMatrix));
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setVec4(GMSHADER_VIEW_POSITION, vec);
+	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(GMSHADER_INVERSE_VIEW_MATRIX, Inverse(viewMatrix));
 	GM_END_CHECK_GL_ERROR

@@ -247,6 +247,9 @@ struct GMShaderVariablesDesc
 	const char* ProjectionMatrix;
 	const char* InverseTransposeModelMatrix;
 
+	// 位置
+	const char* ViewPosition;
+
 	// 材质
 	GMShaderVariablesTextureDesc TextureAttributes;
 	const char* AmbientTextureName;

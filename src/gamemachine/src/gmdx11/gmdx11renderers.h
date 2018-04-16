@@ -5,6 +5,15 @@
 #include "gmdx11graphic_engine.h"
 BEGIN_NS
 
+class GMDx11Renderer_CubeMap;
+class GMModel;
+struct GMDx11CubeMapState
+{
+	bool hasCubeMap = false;
+	GMDx11Renderer_CubeMap* cubeMapRenderer = nullptr;
+	GMModel* model = nullptr;
+};
+
 GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
@@ -61,6 +70,9 @@ private:
 protected:
 	void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
+
+public:
+	static GMDx11CubeMapState& getCubeMapState();
 };
 
 class GMDx11Renderer_3D : public GMDx11Renderer
@@ -94,6 +106,7 @@ class GMDx11Renderer_CubeMap : public GMDx11Renderer
 		return "GMTech_CubeMap";
 	}
 
+public:
 	virtual void prepareTextures(GMModel* model);
 	virtual void drawTextures(GMModel* model);
 };

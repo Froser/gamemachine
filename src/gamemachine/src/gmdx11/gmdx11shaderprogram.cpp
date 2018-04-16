@@ -12,6 +12,7 @@ namespace
 			"ViewMatrix",
 			"ProjectionMatrix",
 			"InverseTransposeModelMatrix",
+			"ViewPosition",
 
 			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
 			"AmbientTextureAttributes",
