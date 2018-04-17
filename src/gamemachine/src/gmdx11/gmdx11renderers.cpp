@@ -376,8 +376,10 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
 
-	shaderProgram->setMatrix4(desc->ViewMatrix, GM.getCamera().getFrustum().getViewMatrix());
+	const GMMat4& viewMatrix = GM.getCamera().getFrustum().getViewMatrix();
+	shaderProgram->setMatrix4(desc->ViewMatrix, viewMatrix);
 	shaderProgram->setMatrix4(desc->ProjectionMatrix, GM.getCamera().getFrustum().getProjectionMatrix());
+	shaderProgram->setMatrix4(desc->InverseViewMatrix, Inverse(viewMatrix));
 
 	const GMCameraLookAt& lookAt = GM.getCamera().getLookAt();
 	GMFloat4 viewPosition;

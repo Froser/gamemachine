@@ -20,6 +20,8 @@ namespace
 			"GM_view_matrix",
 			"GM_projection_matrix",
 			"GM_inverse_transpose_model_matrix",
+			"GM_inverse_view_matrix",
+
 			"GM_view_position",
 
 			{ "scroll_s", "scroll_t", "scale_s", "scale_t", "enabled", "texture" },

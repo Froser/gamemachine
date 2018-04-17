@@ -74,7 +74,7 @@ void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 		return;
 	
 	// 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
-	vec3 normal_world = (GM_inverse_view_matrix * vec4(inverse(TBN) * normal_tangent, 0)).rgb;
+	vec3 normal_world = (GM_inverse_view_matrix * vec4(transpose(TBN) * normal_tangent, 0)).rgb;
 	model3d_calculateRefractionByNormalWorld(normal_world);
 }
 

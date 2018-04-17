@@ -7,6 +7,7 @@ cbuffer WorldConstantBuffer: register( b0 )
     matrix ViewMatrix;
     matrix ProjectionMatrix;
     matrix InverseTransposeModelMatrix;
+    matrix InverseViewMatrix;
     float4 ViewPosition;
 }
 
@@ -84,16 +85,6 @@ class GMCubeMapTexture : GMTexture
         if (!Enabled)
             return float4(0.0f, 0.0f, 0.0f, 0.0f);
         return tex.Sample(ss, texcoord);
-    }
-
-    float4 IlluminateRefraction(TextureCube tex, float3 normal_World_N, float4 position_World, float4 viewPosition_World)
-    {
-        if (Material.Refractivity == 0)
-            return float4(0, 0, 0, 0);
-
-        float3 in_N = normalize((position_World - viewPosition_World).xyz);
-        float3 refraction = refract(in_N, normal_World_N, Material.Refractivity);
-        return Sample(tex, CubeMapSampler, refraction.xyz);
     }
 };
 
@@ -237,6 +228,43 @@ class NormapMapArgs
         ));
     }
 };
+
+float4 IlluminateRefractionByNormalWorldN(
+    GMCubeMapTexture cubeMap,
+    TextureCube tex,
+    float3 normal_World_N,
+    float4 position_World,
+    float4 viewPosition_World
+    )
+{
+    float3 in_N = normalize((position_World - viewPosition_World).xyz);
+    float3 refraction = refract(in_N, normal_World_N, Material.Refractivity);
+    return cubeMap.Sample(tex, CubeMapSampler, refraction.xyz);
+}
+
+float4 IlluminateRefraction(
+    GMCubeMapTexture cubeMap,
+    TextureCube tex,
+    float3 normal_World_N,
+    float4 position_World,
+    float4 viewPosition_World,
+    NormapMapArgs normalMapArgs
+    )
+{
+    if (Material.Refractivity == 0)
+        return float4(0, 0, 0, 0);
+
+    if (HasNormalMap())
+    {
+        // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
+        float4 normal_Eye_N = ToFloat4(mul(normalMapArgs.normal_Tangent_N, transpose(normalMapArgs.TBN)), 0);
+        float3 normalFromTangent_World_N = mul(normal_Eye_N, InverseViewMatrix).xyz;
+        return IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World);
+    }
+
+    return IlluminateRefractionByNormalWorldN(cubeMap, tex, normal_World_N, position_World, viewPosition_World);
+}
+
 //--------------------------------------------------------------------------------------
 // 3D
 //--------------------------------------------------------------------------------------
@@ -300,7 +328,6 @@ float4 PS_3D(PS_INPUT input) : SV_Target
 
             factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Tangent_N, normalMapArgs.normal_Tangent_N);
             factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, normalMapArgs.normal_Tangent_N, Material.Shininess); 
-
         }
     }
 
@@ -337,7 +364,8 @@ float4 PS_3D(PS_INPUT input) : SV_Target
     float4 color_Specular = factor_Specular * Material.Ks;
     
     // 计算折射
-    float4 color_Refractivity = CubeMapTextureAttributes[0].IlluminateRefraction(CubeMapTexture, input.Normal, input.WorldPos, ViewPosition);
+    float3 normal_World_N = normalize(mul(ToFloat4(input.Normal.xyz, 0), InverseTransposeModelMatrix).xyz);
+    float4 color_Refractivity = IlluminateRefraction(CubeMapTextureAttributes[0], CubeMapTexture, normal_World_N, input.WorldPos, ViewPosition, normalMapArgs);
 
     float4 finalColor = color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
     return finalColor;

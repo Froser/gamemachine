@@ -246,6 +246,7 @@ struct GMShaderVariablesDesc
 	const char* ViewMatrix;
 	const char* ProjectionMatrix;
 	const char* InverseTransposeModelMatrix;
+	const char* InverseViewMatrix;
 
 	// 位置
 	const char* ViewPosition;

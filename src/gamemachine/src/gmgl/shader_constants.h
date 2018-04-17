@@ -14,7 +14,6 @@ BEGIN_NS
 
 //位置
 #define		GMSHADER_SHADOW_MATRIX				GMSHADER("shadow_matrix")
-#define		GMSHADER_INVERSE_VIEW_MATRIX		GMSHADER("inverse_view_matrix")
 
 //绘制调试
 #define		GMSHADER_DEBUG_DRAW_NORMAL			GMSHADER("debug_draw_normal")

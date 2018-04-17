@@ -45,7 +45,18 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 
 void GMDx11GraphicEngine::update(GMUpdateDataType type)
 {
-	// Nothing to update
+	D(d);
+	switch (type)
+	{
+	case GMUpdateDataType::TurnOffCubeMap:
+	{
+		GMDx11CubeMapState& state = GMDx11Renderer::getCubeMapState();
+		state.hasCubeMap = false;
+		state.cubeMapRenderer = nullptr;
+		state.model = nullptr;
+		break;
+	}
+	}
 }
 
 void GMDx11GraphicEngine::addLight(const GMLight& light)

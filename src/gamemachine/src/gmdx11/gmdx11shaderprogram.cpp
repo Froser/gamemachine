@@ -12,6 +12,8 @@ namespace
 			"ViewMatrix",
 			"ProjectionMatrix",
 			"InverseTransposeModelMatrix",
+			"InverseViewMatrix",
+
 			"ViewPosition",
 
 			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
