@@ -13,9 +13,8 @@ uniform int GM_shader_proc;
 // GM_shader_type
 #define TYPE_MODEL2D			0
 #define TYPE_MODEL3D			1
-#define TYPE_PARTICLES			2
-#define TYPE_GLYPH				3
-#define TYPE_CUBEMAP			4
+#define TYPE_GLYPH				2
+#define TYPE_CUBEMAP			3
 
 mat4 gm_removeTranslation(mat4 mat)
 {

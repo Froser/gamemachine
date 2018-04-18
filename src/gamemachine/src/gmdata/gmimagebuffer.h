@@ -9,7 +9,7 @@ GM_PRIVATE_OBJECT(GMImageBuffer)
 {
 	GMuint width;
 	GMuint height;
-	GMbyte* buffer;
+	GMbyte* buffer = nullptr;
 };
 
 // 表示一个来自内存的图片

@@ -2,6 +2,16 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 #include "gmdx11renderers.h"
+#include <gmdx11framebuffer.h>
+#include "foundation/utilities/utilities.h"
+#include "gmengine/gameobjects/gmgameobject.h"
+
+GMDx11GraphicEngine::~GMDx11GraphicEngine()
+{
+	D(d);
+	GM_delete(d->filterFramebuffers);
+	GM_delete(d->filterQuad);
+}
 
 void GMDx11GraphicEngine::init()
 {
@@ -10,6 +20,8 @@ void GMDx11GraphicEngine::init()
 		initShaders();
 	else
 		GM_ASSERT(false);
+
+	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 }
 
 void GMDx11GraphicEngine::newFrame()
@@ -28,16 +40,19 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 		return;
 
 	D(d);
-	d->needActivateLight = true;
+	GMFilterMode::Mode filterMode = d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
+	if (filterMode != GMFilterMode::None)
+		createFilterFramebuffer();
 
+	d->needActivateLight = true;
 	if (bufferMode == GMBufferMode::NoFramebuffer)
 	{
-		directDraw(objects, count);
+		directDraw(objects, count, filterMode);
 	}
 	else
 	{
 		//TODO 考虑延迟渲染
-		forwardDraw(objects, count);
+		forwardDraw(objects, count, filterMode);
 	}
 
 	d->needActivateLight = false;
@@ -190,27 +205,68 @@ void GMDx11GraphicEngine::initShaders()
 	d->shaderLoadCallback->onLoadShaders(this);
 }
 
-void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
+void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
 {
-	// 先不考虑效果
+	D(d);
+	if (filter != GMFilterMode::None)
+	{
+		d->filterFramebuffers->clear();
+		d->filterFramebuffers->bind();
+	}
+
 	forwardRender(objects, count);
+
+	if (filter != GMFilterMode::None)
+	{
+		d->filterFramebuffers->unbind();
+		GM_ASSERT(d->filterQuad);
+		d->filterQuad->draw();
+	}
 }
 
 void GMDx11GraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 {
-	D(d);
 	for (GMuint i = 0; i < count; i++)
 	{
 		objects[i]->draw();
 	}
 }
 
-void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
+void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
 {
 	D(d);
-	//setCurrentRenderMode(GMStates_RenderOptions::FORWARD);
-	//d->framebuffer.releaseBind();
 	forwardRender(objects, count);
+}
+
+void GMDx11GraphicEngine::createFilterFramebuffer()
+{
+	D(d);
+	if (!d->filterFramebuffers)
+	{
+		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+		GMDx11FramebufferDesc desc = { 0 };
+		desc.sampleCount = 1;
+		desc.sampleQuality = 0;
+		desc.rect = states.windowRect;
+		d->filterFramebuffers = new GMDx11Framebuffers();
+		d->filterFramebuffers->init(desc);
+		GMDx11Framebuffer* framebuffer = new GMDx11Framebuffer();
+		framebuffer->init(desc);
+		d->filterFramebuffers->addFramebuffer(framebuffer);
+	}
+
+	if (!d->filterQuad)
+	{
+		GMModel* quad = nullptr;
+		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &quad);
+		GM_ASSERT(quad);
+		quad->setType(GMModelType::Filter);
+		quad->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0).addFrame(d->filterFramebuffers->getTexture(0));
+		d->filterQuadModel.reset(quad);
+		GM.createModelPainterAndTransfer(quad);
+		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);
+		d->filterQuad = new GMGameObject(asset);
+	}
 }
 
 IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
@@ -220,6 +276,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	static GMDx11Renderer_2D s_renderer_2d;
 	static GMDx11Renderer_Glyph s_renderer_glyph;
 	static GMDx11Renderer_CubeMap s_renderer_cubemap;
+	static GMDx11Renderer_Filter s_renderer_filter;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -227,10 +284,11 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	case GMModelType::Glyph:
 		return &s_renderer_glyph;
 	case GMModelType::Model3D:
-	case GMModelType::Particles:
 		return &s_renderer_3d;
 	case GMModelType::CubeMap:
 		return &s_renderer_cubemap;
+	case GMModelType::Filter:
+		return &s_renderer_filter;
 	default:
 		GM_ASSERT(false);
 		return nullptr;

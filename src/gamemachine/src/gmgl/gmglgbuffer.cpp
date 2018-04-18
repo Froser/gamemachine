@@ -291,16 +291,16 @@ void GMGLFramebuffer::dispose()
 	}
 }
 
-bool GMGLFramebuffer::init(const GMRect& clientRect)
+bool GMGLFramebuffer::init(const GMRect& renderRect)
 {
 	D(d);
 	const GMConfigs& configs = GM.getConfigs();
 	createQuad();
 
 	GM_BEGIN_CHECK_GL_ERROR
-	d->clientRect = clientRect;
-	d->renderWidth = clientRect.width;
-	d->renderHeight = clientRect.height;
+	d->clientRect = renderRect;
+	d->renderWidth = renderRect.width;
+	d->renderHeight = renderRect.height;
 	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
 	d->sampleOffsets[0] = 1.f / d->renderWidth;
 	d->sampleOffsets[1] = 1.f / d->renderHeight;

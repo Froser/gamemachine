@@ -77,7 +77,7 @@ void Demo_Model::init()
 	// 创建2个Cube，一个有NormalMap，一个无
 	{
 		gm::GMModel* cube = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one(), &cube);
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
 
 		gm::GMShader& shader = cube->getShader();
 		shader.getMaterial().refractivity = 0.658f;
@@ -92,7 +92,7 @@ void Demo_Model::init()
 	}
 	{
 		gm::GMModel* cube = nullptr;
-		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one(), &cube);
+		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
 		gm::ITexture* texture = nullptr;
 		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 

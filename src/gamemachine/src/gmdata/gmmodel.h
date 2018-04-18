@@ -21,7 +21,6 @@ struct GMVertex
 		PositionDimension = 3,
 		NormalDimension = 3,
 		TexcoordDimension = 2,
-		TextureDimension = 3,
 		LightmapDimension = TexcoordDimension,
 		TangentDimension = NormalDimension,
 		BitangentDimension = NormalDimension,
@@ -31,7 +30,7 @@ struct GMVertex
 	Array<GMfloat, PositionDimension> positions;
 	Array<GMfloat, NormalDimension> normals;
 	Array<GMfloat, TexcoordDimension> texcoords;
-	Array<GMfloat, TextureDimension> tangents;
+	Array<GMfloat, TangentDimension> tangents;
 	Array<GMfloat, BitangentDimension> bitangents;
 	Array<GMfloat, LightmapDimension> lightmaps;
 	Array<GMfloat, ColorDimension> color;
@@ -85,16 +84,18 @@ enum class GMUsageHint
 	DynamicDraw,
 };
 
-// 和着色器中的GM_shader_type一致
+//! 模型类型。
+/*!
+  不同的模型类型将采用不同着色器进行处理。自定义的模型类型应当放在CustomStart之后。
+*/
 enum class GMModelType
 {
-	ModelTypeBegin,
-	Model2D = ModelTypeBegin,
-	Model3D,
-	Particles,
-	Glyph,
-	CubeMap,
-	ModelTypeEnd,
+	Model2D, //! 表示一个2D模型，不考虑其深度来绘制。
+	Model3D, //! 表示一个3D模型，是最常见的类型。
+	Glyph, //! 表示一个文字模型，用于绘制文本。
+	CubeMap, //! 表示一个立方体贴图。
+	Filter, //! 表示一个滤镜，通常是一个四边形模型，在帧缓存中获取纹理来绘制。
+	CustomStart, //! 自定义模型类型。将自定义的类型放在此类型后面，匹配自定义的着色器程序。
 };
 
 class GMMesh;
@@ -203,7 +204,7 @@ enum class GMVertexDataType
 {
 	Position = 0,
 	Normal,
-	UV,
+	Texcoord,
 	Tangent,
 	Bitangent,
 	Lightmap,

@@ -48,8 +48,6 @@ GMDx11Texture::GMDx11Texture(GMImage* image)
 
 	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 	GM_ASSERT(d->deviceContext);
-
-	init();
 }
 
 GMDx11Texture::~GMDx11Texture()
@@ -80,10 +78,11 @@ void GMDx11Texture::init()
 	auto& imageData = d->image->getData();
 	D3D11_TEXTURE2D_DESC texDesc = { 0 };
 
+	D3D11_SUBRESOURCE_DATA* resourceData = new D3D11_SUBRESOURCE_DATA[imageData.mipLevels * imageData.slices];
+
 	if (imageData.target == GMImageTarget::Texture2D)
 	{
 		GMComPtr<ID3D11Texture2D> texture;
-		D3D11_SUBRESOURCE_DATA* resourceData = new D3D11_SUBRESOURCE_DATA[imageData.mipLevels * imageData.slices];
 
 		texDesc.Width = d->image->getWidth();
 		texDesc.Height = d->image->getHeight();
@@ -109,8 +108,6 @@ void GMDx11Texture::init()
 		GM_DX_HR(d->device->CreateTexture2D(&texDesc, resourceData, &texture));
 		d->resource = texture;
 
-		GM_delete_array(resourceData);
-
 		GM_ASSERT(d->resource);
 		GM_DX_HR(d->device->CreateShaderResourceView(
 			d->resource,
@@ -121,8 +118,6 @@ void GMDx11Texture::init()
 	else if (imageData.target == GMImageTarget::CubeMap)
 	{
 		GMComPtr<ID3D11Texture2D> texture;
-		D3D11_SUBRESOURCE_DATA* resourceData = new D3D11_SUBRESOURCE_DATA[imageData.mipLevels * imageData.slices];
-
 		texDesc.Width = d->image->getWidth();
 		texDesc.Height = d->image->getHeight();
 		texDesc.MipLevels = imageData.mipLevels;
@@ -172,4 +167,5 @@ void GMDx11Texture::init()
 		GM_ASSERT(false);
 		// 目前先只支持2D吧，之后再加
 	}
+	GM_delete_array(resourceData);
 }

@@ -17,6 +17,7 @@ GM_PRIVATE_OBJECT(GMGLTexture)
 	GMuint format = 0;
 	GMuint internalFormat = 0;
 	GMuint dataType = 0;
+	const GMImage* image = nullptr;
 };
 
 class GMGLTexture : public ITexture
@@ -27,10 +28,8 @@ public:
 	GMGLTexture(const GMImage* image);
 	~GMGLTexture();
 
-private:
-	void init(const GMImage* image);
-
 public:
+	virtual void init() override;
 	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override;
 };
 

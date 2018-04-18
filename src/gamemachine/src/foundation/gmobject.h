@@ -76,7 +76,7 @@ class GMNotAGMObject {};
 	private:																				\
 		gm::GMConstructHelper<Data> m_data;													\
 	public:																					\
-		className##Private* data() const {													\
+		inline className##Private* data() const {											\
 			Data* d = const_cast<Data*>(m_data.data());										\
 			d->__parent = const_cast<className*>(this); return d;}							\
 		void swapData(className& another) noexcept { m_data.swap(another.m_data); }

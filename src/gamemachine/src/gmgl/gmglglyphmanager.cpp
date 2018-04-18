@@ -8,7 +8,14 @@ BEGIN_NS
 class GMGLGlyphTexture : public ITexture
 {
 public:
-	GMGLGlyphTexture()
+	GMGLGlyphTexture() = default;
+	~GMGLGlyphTexture()
+	{
+		glDeleteTextures(1, &m_id);
+	}
+
+public:
+	virtual void init() override
 	{
 		glGenTextures(1, &m_id);
 		glBindTexture(GL_TEXTURE_2D, m_id);
@@ -19,11 +26,6 @@ public:
 			GMGLGlyphManager::CANVAS_HEIGHT
 		);
 		glBindTexture(GL_TEXTURE_2D, 0);
-	}
-
-	~GMGLGlyphTexture()
-	{
-		glDeleteTextures(1, &m_id);
 	}
 
 	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override
@@ -49,6 +51,7 @@ GMGLGlyphManager::GMGLGlyphManager()
 	d->cursor_u = d->cursor_v = 0;
 	d->maxHeight = 0;
 	d->texture = new GMGLGlyphTexture();
+	d->texture->init();
 }
 
 GMGLGlyphManager::~GMGLGlyphManager()

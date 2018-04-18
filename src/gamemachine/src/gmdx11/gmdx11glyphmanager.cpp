@@ -15,35 +15,6 @@ GMDx11GlyphTexture::GMDx11GlyphTexture()
 	GM_ASSERT(d->device);
 	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 	GM_ASSERT(d->deviceContext);
-
-	D3D11_TEXTURE2D_DESC desc = { 0 };
-	desc.Width = GMDx11GlyphManager::CANVAS_WIDTH;
-	desc.Height = GMDx11GlyphManager::CANVAS_HEIGHT;
-	desc.MipLevels = 1;
-	desc.ArraySize = 1;
-	desc.Format = DXGI_FORMAT_R8_UNORM;
-	desc.SampleDesc.Count = 1;
-	desc.SampleDesc.Quality = 0;
-	desc.Usage = D3D11_USAGE_DEFAULT;
-	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	desc.MiscFlags = 0;
-
-	D3D11_SUBRESOURCE_DATA resourceData = { 0 };
-	resourceData.pSysMem = nullptr;
-	resourceData.SysMemPitch = GMDx11GlyphManager::CANVAS_WIDTH; //每个字符占1个字节
-
-	GM_DX_HR(d->device->CreateTexture2D(&desc, 0, &d->texture));
-
-#if _DEBUG
-	D3D_SET_OBJECT_NAME_A(d->texture, "GM_GLYPH_TEXTURE");
-#endif
-
-	GM_DX_HR(d->device->CreateShaderResourceView(
-		d->texture,
-		NULL,
-		&d->resourceView
-	));
 }
 
 GMDx11GlyphManager::GMDx11GlyphManager()
@@ -54,7 +25,10 @@ ITexture* GMDx11GlyphManager::glyphTexture()
 {
 	D(d);
 	if (!d->texture)
+	{
 		d->texture.reset(new GMDx11GlyphTexture());
+		d->texture->init();
+	}
 	return d->texture;
 }
 
@@ -83,6 +57,36 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 		bitmapGlyph.width,
 		0
 	);
+}
+
+void GMDx11GlyphTexture::init()
+{
+	D(d);
+	D3D11_TEXTURE2D_DESC desc = { 0 };
+	desc.Width = GMDx11GlyphManager::CANVAS_WIDTH;
+	desc.Height = GMDx11GlyphManager::CANVAS_HEIGHT;
+	desc.MipLevels = 1;
+	desc.ArraySize = 1;
+	desc.Format = DXGI_FORMAT_R8_UNORM;
+	desc.SampleDesc.Count = 1;
+	desc.SampleDesc.Quality = 0;
+	desc.Usage = D3D11_USAGE_DEFAULT;
+	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	desc.MiscFlags = 0;
+
+	D3D11_SUBRESOURCE_DATA resourceData = { 0 };
+	resourceData.pSysMem = nullptr;
+	resourceData.SysMemPitch = GMDx11GlyphManager::CANVAS_WIDTH; //每个字符占1个字节
+
+	GM_DX_HR(d->device->CreateTexture2D(&desc, 0, &d->texture));
+
+	GM_DX11_SET_OBJECT_NAME_A(d->texture, "GM_GLYPH_TEXTURE");
+	GM_DX_HR(d->device->CreateShaderResourceView(
+		d->texture,
+		NULL,
+		&d->resourceView
+	));
 }
 
 void GMDx11GlyphTexture::drawTexture(GMTextureFrames* frames, GMint textureIndex)

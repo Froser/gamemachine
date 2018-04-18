@@ -83,7 +83,7 @@ void GMDx11ModelPainter::transfer()
 	bufData.pSysMem = packedVertices.data();
 	bufData.SysMemPitch = bufData.SysMemSlicePitch = 0;
 
-	GMComPtr<ID3D11Device> device = d->engine->getDevice();
+	ID3D11Device* device = d->engine->getDevice();
 	GM_DX_HR(device->CreateBuffer(&bufDesc, &bufData, &d->vertexBuffer));
 
 	if (model->getDrawMode() == GMModelDrawMode::Index)

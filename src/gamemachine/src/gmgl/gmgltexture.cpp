@@ -83,7 +83,7 @@ GMGLTexture::GMGLTexture(const GMImage* image)
 	d->format = toGLFormat(image->getData().format);
 	d->dataType = toGLImageDataType(image->getData().type);
 	d->internalFormat = toGLInternalFormat(image->getData().internalFormat);
-	init(image);
+	d->image = image;
 }
 
 GMGLTexture::~GMGLTexture()
@@ -93,14 +93,14 @@ GMGLTexture::~GMGLTexture()
 	d->inited = false;
 }
 
-void GMGLTexture::init(const GMImage* image)
+void GMGLTexture::init()
 {
 	D(d);
 	if (d->inited)
 		return;
 
 	GMint level;
-	const GMImage::Data& imgData = image->getData();
+	const GMImage::Data& imgData = d->image->getData();
 
 	glGenTextures(1, &d->id);
 	glBindTexture(d->target, d->id);

@@ -2,9 +2,15 @@
 #include "utilities.h"
 #include "foundation/gamemachine.h"
 
-const GMVec3& GMPrimitiveCreator::one()
+const GMVec3& GMPrimitiveCreator::one3()
 {
 	static GMVec3 o (1, 1, 1);
+	return o;
+}
+
+const GMVec2& GMPrimitiveCreator::one2()
+{
+	static GMVec2 o(1, 1);
 	return o;
 }
 
@@ -227,6 +233,59 @@ void GMPrimitiveCreator::createCube(const GMVec3& halfExtents, OUT GMModel** out
 		face->vertex(V3);
 		face->vertex(V2);
 	}
+
+	*out = model;
+}
+
+void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, OUT GMModel** out)
+{
+	constexpr GMfloat texcoord[4][2] =
+	{
+		{ 0, 1 },
+		{ 0, 0 },
+		{ 1, 1 },
+		{ 1, 0 },
+	};
+
+	// 排列方式：
+	// 2 4
+	// 1 3
+	const GMfloat x = halfExtents.getX(), y = halfExtents.getY();
+	const GMfloat s_vertices[4][3] = {
+		{ -x, -y, z },
+		{ -x, y, z },
+		{ x, -y, z },
+		{ x, y, z },
+	};
+
+	GMModel* model = new GMModel();
+	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	GMMesh* mesh = new GMMesh(model);
+
+	GMVertex V1 = {
+		{ s_vertices[0][0], s_vertices[0][1], s_vertices[0][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[0][0], texcoord[0][1] }, //texcoord
+	},
+	V2 = {
+		{ s_vertices[1][0], s_vertices[1][1], s_vertices[1][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[1][0], texcoord[1][1] }, //texcoord
+	},
+	V3 = {
+		{ s_vertices[2][0], s_vertices[2][1], s_vertices[2][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[2][0], texcoord[2][1] }, //texcoord
+	},
+	V4 = {
+		{ s_vertices[3][0], s_vertices[3][1], s_vertices[3][2] }, //position
+		{ 0, -1.f, 0 }, //normal
+		{ texcoord[3][0], texcoord[3][1] }, //texcoord
+	};
+	mesh->vertex(V1);
+	mesh->vertex(V2);
+	mesh->vertex(V3);
+	mesh->vertex(V4);
 
 	*out = model;
 }

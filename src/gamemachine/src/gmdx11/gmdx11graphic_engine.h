@@ -16,6 +16,7 @@ struct GMDx11GlobalBlendStateDesc
 	GMint blendRefCount = 0;
 };
 
+class GMDx11Framebuffers;
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
@@ -25,16 +26,25 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMScopePtr<IShaderProgram> shaderProgram;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
+	
+	GMDx11Framebuffers* filterFramebuffers = nullptr;
+	GMGameObject* filterQuad = nullptr;
+	GMScopePtr<GMModel> filterQuadModel;
+
 	GMDx11GlobalBlendStateDesc blendState;
 	GMStencilOptions stencilOptions;
 	bool ready = false;
 	Vector<GMLight> lights;
 	bool needActivateLight = false;
+	GMRenderConfig renderConfig;
 };
 
 class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
 {
 	DECLARE_PRIVATE(GMDx11GraphicEngine)
+
+public:
+	~GMDx11GraphicEngine();
 
 public:
 	virtual void init() override;
@@ -124,9 +134,10 @@ public:
 
 private:
 	void initShaders();
-	void forwardDraw(GMGameObject *objects[], GMuint count);
+	void forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter);
+	void directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter);
 	void forwardRender(GMGameObject *objects[], GMuint count);
-	void directDraw(GMGameObject *objects[], GMuint count);
+	void createFilterFramebuffer();
 };
 
 END_NS

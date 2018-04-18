@@ -14,7 +14,9 @@ void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 void GMDx11Factory::createTexture(GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
-	*texture = new GMDx11Texture(image);
+	GMDx11Texture* t = new GMDx11Texture(image);
+	(*texture) = t;
+	t->init();
 }
 
 void GMDx11Factory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter)

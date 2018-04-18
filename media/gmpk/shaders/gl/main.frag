@@ -6,7 +6,6 @@
 // FRAGMENT
 #include "model2d.frag"
 #include "model3d.frag"
-#include "particles.frag"
 #include "glyph.frag"
 #include "cubemap.frag"
 
@@ -19,9 +18,6 @@ void main(void)
 			break;
 		case TYPE_MODEL3D:
 			model3d_main();
-			break;
-		case TYPE_PARTICLES:
-			particles_main();
 			break;
 		case TYPE_GLYPH:
 			glyph_main();

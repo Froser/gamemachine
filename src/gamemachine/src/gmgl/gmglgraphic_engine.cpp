@@ -612,7 +612,6 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 	{
 	case GMModelType::Model2D:
 	case GMModelType::Glyph:
-	case GMModelType::Particles:
 		return &s_renderer2d;
 	case GMModelType::Model3D:
 		return &s_renderer3d;

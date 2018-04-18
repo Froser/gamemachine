@@ -113,7 +113,7 @@ public:
 
 public:
 	void dispose();
-	bool init(const GMRect& clientRect);
+	bool init(const GMRect& renderRect);
 	void beginDrawEffects();
 	void endDrawEffects();
 	void draw(GMGLShaderProgram* program);

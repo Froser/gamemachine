@@ -21,8 +21,11 @@ GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, 
 	}
 	else
 	{
-		d->buffer = new GMbyte[bufferSize / 3 * 4];
-		memcpy(d->buffer, buffer, sizeof(GMbyte) * bufferSize);
+		if (buffer > 0)
+		{
+			d->buffer = new GMbyte[bufferSize / 3 * 4];
+			memcpy(d->buffer, buffer, sizeof(GMbyte) * bufferSize);
+		}
 	}
 	getData().format = GMImageFormat::RGBA;
 

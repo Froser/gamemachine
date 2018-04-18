@@ -532,6 +532,7 @@ void GMDx11Renderer::prepareBuffer(GMModel* model, IQueriable* painter)
 	GMComPtr<ID3D11Buffer> vertexBuffer;
 	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
 	GM_ASSERT(vertexBuffer);
+	GM_DX11_SET_OBJECT_NAME_A(vertexBuffer, "GM_VERTEX_BUFFER");
 	d->deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
@@ -767,4 +768,39 @@ void GMDx11Renderer_CubeMap::drawTextures(GMModel* model)
 		cubeMapState.cubeMapRenderer = this;
 		cubeMapState.model = model;
 	}
+}
+
+
+void GMDx11Renderer_Filter::draw(IQueriable* painter, GMModel* model)
+{
+	D(d);
+	prepareBuffer(model, painter);
+	prepareRasterizer(model);
+	prepareBlend(model);
+	prepareDepthStencil(model);
+	passAllAndDraw(model);
+}
+
+void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
+{
+	D(d);
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->useProgram();
+	if (!d->inputLayout)
+	{
+		D3DX11_PASS_DESC passDesc;
+		GM_DX_HR(getTechnique()->GetPassByIndex(0)->GetDesc(&passDesc));
+		GM_DX_HR(getEngine()->getDevice()->CreateInputLayout(
+			GMSHADER_ElementDescriptions,
+			GM_array_size(GMSHADER_ElementDescriptions),
+			passDesc.pIAInputSignature,
+			passDesc.IAInputSignatureSize,
+			&d->inputLayout
+		));
+	}
+
+	d->deviceContext->IASetInputLayout(d->inputLayout);
+	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
+	
+	// Filter类不需要更新变换矩阵，因为它用不到
 }

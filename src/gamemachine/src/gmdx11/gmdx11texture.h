@@ -24,10 +24,8 @@ public:
 	~GMDx11Texture();
 
 public:
+	virtual void init() override;
 	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override;
-
-private:
-	void init();
 };
 
 END_NS

@@ -128,7 +128,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	gameMachineRunningState.vsyncEnabled = d->vsync;
 
 	// 2.创建交换链、设备和上下文
-
 	sc.BufferDesc.Width = renderWidth;
 	sc.BufferDesc.Height = renderHeight;
 	sc.BufferDesc.Format = g_bufferFormat;

@@ -189,6 +189,8 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11shaderprogram.cpp
 		gmdx11/gmdx11glyphmanager.h
 		gmdx11/gmdx11glyphmanager.cpp
+		gmdx11/gmdx11framebuffer.cpp
+		gmdx11/gmdx11framebuffer.cpp
 
 		gmdx11/effects/pchfx.h
 		gmdx11/effects/d3dx11dbg.cpp

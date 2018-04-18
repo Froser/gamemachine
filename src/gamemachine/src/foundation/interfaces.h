@@ -120,6 +120,7 @@ GM_INTERFACE(IGameHandler)
 
 GM_INTERFACE(ITexture)
 {
+	virtual void init() = 0;
 	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) = 0;
 };
 

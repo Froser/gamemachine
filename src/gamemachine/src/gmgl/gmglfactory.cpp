@@ -15,7 +15,9 @@ void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 void GMGLFactory::createTexture(GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
-	(*texture) = new GMGLTexture(image);
+	GMGLTexture* t = new GMGLTexture(image);
+	(*texture) = t;
+	t->init();
 }
 
 void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter)

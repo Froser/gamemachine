@@ -167,16 +167,7 @@ struct VS_OUTPUT
     float4 Position    : SV_POSITION;
 };
 
-struct PS_INPUT
-{
-    float3 Normal      : NORMAL0;
-    float2 Texcoord    : TEXCOORD0;
-    float3 Tangent     : NORMAL1;
-    float3 Bitangent   : NORMAL2;
-    float2 Lightmap    : TEXCOORD1;
-    float4 Color       : COLOR;
-    float4 WorldPos    : POSITION;
-};
+typedef VS_OUTPUT PS_INPUT;
 
 float4 ToFloat4(float3 v, float w)
 {
@@ -404,6 +395,14 @@ float4 PS_2D(PS_INPUT input) : SV_Target
     return color;
 }
 
+//--------------------------------------------------------------------------------------
+// Glyph
+//--------------------------------------------------------------------------------------
+VS_OUTPUT VS_Glyph(VS_INPUT input)
+{
+    return VS_2D(input);
+}
+
 float4 PS_Glyph(PS_INPUT input) : SV_Target
 {
     float4 alpha = AmbientTexture_0.Sample(AmbientSampler_0, input.Texcoord);
@@ -430,7 +429,25 @@ float4 PS_CubeMap(PS_INPUT input) : SV_Target
     return CubeMapTextureAttributes[0].Sample(CubeMapTexture, CubeMapSampler, texcoord);
 }
 
+//--------------------------------------------------------------------------------------
+// Filter
+//--------------------------------------------------------------------------------------
+VS_OUTPUT VS_Filter(VS_INPUT input)
+{
+    VS_OUTPUT output;
+    output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
+    output.Texcoord = input.Texcoord;
+    return output;
+}
+
+float4 PS_Filter(PS_INPUT input) : SV_Target
+{
+    return AmbientTexture_0.Sample(AmbientSampler_0, input.Texcoord);
+}
+
+//--------------------------------------------------------------------------------------
 // Techniques
+//--------------------------------------------------------------------------------------
 technique11 GMTech_3D
 {
     pass P0
@@ -459,7 +476,7 @@ technique11 GMTech_Glyph
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0,VS_2D()));
+        SetVertexShader(CompileShader(vs_4_0,VS_Glyph()));
         SetPixelShader(CompileShader(ps_4_0,PS_Glyph()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
@@ -473,6 +490,18 @@ technique11 GMTech_CubeMap
     {
         SetVertexShader(CompileShader(vs_4_0,VS_CubeMap()));
         SetPixelShader(CompileShader(ps_4_0,PS_CubeMap()));
+        SetRasterizerState(GMRasterizerState);
+        SetDepthStencilState(GMDepthStencilState, 1);
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+}
+
+technique11 GMTech_Filter
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_4_0,VS_Filter()));
+        SetPixelShader(CompileShader(ps_4_0,PS_Filter()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

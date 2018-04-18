@@ -39,7 +39,7 @@ public:
 	virtual void draw(IQueriable* painter, GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
 
-private:
+protected:
 	inline GMDx11GraphicEngine* getEngine()
 	{
 		return gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
@@ -55,7 +55,9 @@ private:
 		return d->variablesDesc;
 	}
 
-private:
+protected:
+	virtual void prepareTextures(GMModel* model);
+	virtual void drawTextures(GMModel* model);
 	ID3DX11EffectTechnique* getTechnique();
 	void prepareBuffer(GMModel* model, IQueriable* painter);
 	void prepareLights();
@@ -64,10 +66,6 @@ private:
 	void prepareBlend(GMModel* model);
 	void prepareDepthStencil(GMModel* model);
 	void passAllAndDraw(GMModel* model);
-	virtual void prepareTextures(GMModel* model);
-	virtual void drawTextures(GMModel* model);
-
-protected:
 	void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 
@@ -109,6 +107,17 @@ class GMDx11Renderer_CubeMap : public GMDx11Renderer
 public:
 	virtual void prepareTextures(GMModel* model);
 	virtual void drawTextures(GMModel* model);
+};
+
+class GMDx11Renderer_Filter : public GMDx11Renderer
+{
+	virtual const char* getTechniqueName() override
+	{
+		return "GMTech_Filter";
+	}
+
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void draw(IQueriable* painter, GMModel* model) override;
 };
 
 END_NS
