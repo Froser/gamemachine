@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "utilities.h"
 #include "foundation/gamemachine.h"
+#include "gmengine/gmgameworld.h"
 
 const GMVec3& GMPrimitiveCreator::one3()
 {

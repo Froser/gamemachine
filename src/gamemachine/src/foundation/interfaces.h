@@ -240,6 +240,13 @@ struct GMShaderVariablesMaterialDesc
 	const char* Refreactivity;
 };
 
+struct GMShaderVariablesFilterDesc
+{
+	const char* Filter;
+	const char* KernelDeltaX;
+	const char* KernelDeltaY;
+};
+
 struct GMShaderVariablesDesc
 {
 	// 矩阵
@@ -268,6 +275,9 @@ struct GMShaderVariablesDesc
 	// 材质
 	GMShaderVariablesMaterialDesc MaterialAttributes;
 	const char* MaterialName;
+
+	// 滤镜
+	GMShaderVariablesFilterDesc FilterAttributes;
 
 	// 状态
 	const char* RasterizerState;

@@ -22,6 +22,9 @@ void GMDx11GraphicEngine::init()
 		GM_ASSERT(false);
 
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+
+	const GMRect& renderRect = GM.getGameMachineRunningStates().windowRect;
+	d->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1.f / renderRect.width, 1.f / renderRect.height));
 }
 
 void GMDx11GraphicEngine::newFrame()
@@ -40,7 +43,7 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 		return;
 
 	D(d);
-	GMFilterMode::Mode filterMode = d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
+	GMFilterMode::Mode filterMode = getCurrentFilterMode();
 	if (filterMode != GMFilterMode::None)
 		createFilterFramebuffer();
 

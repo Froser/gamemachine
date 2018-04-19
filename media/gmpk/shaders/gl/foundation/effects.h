@@ -14,15 +14,15 @@ uniform int GM_effects_edgedetect = 0;
 vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 {
 	vec2 offsets[9] = vec2[](
-		vec2(-GM_effects_texture_offset_x, GM_effects_texture_offset_y),
-		vec2( 0.0f, GM_effects_texture_offset_y),
-		vec2( GM_effects_texture_offset_x, GM_effects_texture_offset_y),
-		vec2(-GM_effects_texture_offset_x, 0.0f),  
-		vec2( 0.0f, 0.0f),  
-		vec2( GM_effects_texture_offset_x, 0.0f),  
 		vec2(-GM_effects_texture_offset_x, -GM_effects_texture_offset_y),
 		vec2( 0.0f, -GM_effects_texture_offset_y),
-		vec2( GM_effects_texture_offset_x, -GM_effects_texture_offset_y) 
+		vec2( GM_effects_texture_offset_x, -GM_effects_texture_offset_y),
+		vec2(-GM_effects_texture_offset_x, 0.0f),  
+		vec2( 0.0f, 0.0f),  
+		vec2( GM_effects_texture_offset_x, 0.0f),
+		vec2(-GM_effects_texture_offset_x, GM_effects_texture_offset_y),
+		vec2( 0.0f, GM_effects_texture_offset_y),
+		vec2( GM_effects_texture_offset_x, GM_effects_texture_offset_y)
 	);
 	vec3 sampler[9];
 	for(int i = 0; i < 9; i++)

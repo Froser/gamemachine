@@ -53,6 +53,7 @@ enum class GMRenderConfigs
 {
 	RenderMode,
 	FilterMode,
+	FilterKernelOffset_Vec2,
 	Max,
 };
 

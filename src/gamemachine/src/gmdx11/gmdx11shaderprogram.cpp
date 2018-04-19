@@ -29,6 +29,7 @@ namespace
 
 			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity" },
 			"Material",
+			{"Filter", "KernelDeltaX", "KernelDeltaY"},
 
 			"GMRasterizerState",
 			"GMBlendState",

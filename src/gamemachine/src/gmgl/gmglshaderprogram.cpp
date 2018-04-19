@@ -37,6 +37,8 @@ namespace
 
 			{ "ka", "kd", "ks", "shininess", "refractivity" },
 			"GM_material",
+
+			{ "", "GM_effects_texture_offset_x", "GM_effects_texture_offset_y" }
 		};
 		return desc;
 	}

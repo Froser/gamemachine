@@ -91,6 +91,19 @@ public:
 		return (T)toInt();
 	}
 
+	bool isInt() const { return m_type == I32; }
+	bool isInt64() const { return m_type == I64; }
+	bool isUInt() const { return m_type == UInt; }
+	bool isFloat() const { return m_type == Float; }
+	bool isPointer() const { return m_type == Pointer; }
+	bool isBool() const { return m_type == Boolean; }
+	bool isVec2() const { return m_type == Vec2; }
+	bool isVec3() const { return m_type == Vec3; }
+	bool isVec4() const { return m_type == Vec4; }
+	bool isQuat() const { return m_type == Quat; }
+	bool isMat4() const { return m_type == Mat4; }
+	bool isString() const { return m_type == String; }
+
 private:
 	template <typename T> void makeOwned(const T& obj);
 	template <GMVariant::Type Type> void copyOwned(const GMVariant& rhs);

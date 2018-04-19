@@ -20,7 +20,6 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMMat4 transformMatrix = Identity<GMMat4>();
 	bool canDeferredRendering = true;
 	bool forceDisableDeferredRendering = false;
-	GMString name;
 };
 
 enum class GMGameObjectType
@@ -45,9 +44,10 @@ public:
 public:
 	void addModel(GMAsset asset, bool replace = false);
 	GMModels& getModels();
-
-	virtual void setWorld(GMGameWorld* world);
+	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
+
+public:
 	virtual void onAppendingObjectToWorld() {}
 	virtual void onRemovingObjectFromWorld() {}
 	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }

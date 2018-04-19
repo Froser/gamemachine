@@ -5,6 +5,7 @@
 #include <gmdx11helper.h>
 #include "gmdx11modelpainter.h"
 #include "gmdx11texture.h"
+#include "foundation/utilities/utilities.h"
 
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
@@ -43,6 +44,18 @@ namespace
 		{ GMSHADER_SEMANTIC_NAME_COLOR, 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, FLOAT_OFFSET(16), D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		// 4
 	};
+
+	// 和GMFilterMode::Mode保持一致
+	constexpr const char* GMSHADER_FilterVariablesMap[] = {
+		"DefaultFilter",
+		"InversionFilter",
+		"SharpenFilter",
+		"BlurFilter",
+		"GrayscaleFilter",
+		"EdgeDetectFilter",
+	};
+
+	constexpr const char* GMSHADER_DefaultFilter = "DefaultFilter";
 
 	inline D3D_PRIMITIVE_TOPOLOGY getMode(GMTopologyMode mode)
 	{
@@ -770,7 +783,6 @@ void GMDx11Renderer_CubeMap::drawTextures(GMModel* model)
 	}
 }
 
-
 void GMDx11Renderer_Filter::draw(IQueriable* painter, GMModel* model)
 {
 	D(d);
@@ -784,23 +796,35 @@ void GMDx11Renderer_Filter::draw(IQueriable* painter, GMModel* model)
 void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	shaderProgram->useProgram();
-	if (!d->inputLayout)
-	{
-		D3DX11_PASS_DESC passDesc;
-		GM_DX_HR(getTechnique()->GetPassByIndex(0)->GetDesc(&passDesc));
-		GM_DX_HR(getEngine()->getDevice()->CreateInputLayout(
-			GMSHADER_ElementDescriptions,
-			GM_array_size(GMSHADER_ElementDescriptions),
-			passDesc.pIAInputSignature,
-			passDesc.IAInputSignatureSize,
-			&d->inputLayout
-		));
-	}
+	GMDx11Renderer::beginModel(model, parent);
 
-	d->deviceContext->IASetInputLayout(d->inputLayout);
-	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
-	
-	// Filter类不需要更新变换矩阵，因为它用不到
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+
+	ID3DX11EffectScalarVariable* kernelDeltaX = d->effect->GetVariableByName(desc->FilterAttributes.KernelDeltaX)->AsScalar();
+	ID3DX11EffectScalarVariable* kernelDeltaY = d->effect->GetVariableByName(desc->FilterAttributes.KernelDeltaY)->AsScalar();
+	GM_ASSERT(kernelDeltaX->IsValid() && kernelDeltaY->IsValid());
+	GMFloat4 delta;
+	getEngine()->getCurrentFilterKernelDelta().loadFloat4(delta);
+	GM_DX_HR(kernelDeltaX->SetFloat(delta[0]));
+	GM_DX_HR(kernelDeltaY->SetFloat(delta[1]));
+
+	ID3DX11EffectInterfaceVariable* filterInterface = d->effect->GetVariableByName(desc->FilterAttributes.Filter)->AsInterface();
+	GM_ASSERT(filterInterface->IsValid());
+	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
+	const GMVec2& kernelOffset = getEngine()->getCurrentFilterKernelDelta();
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+
+	const char* filterInstanceVariable = GMSHADER_FilterVariablesMap[filterMode];
+	ID3DX11EffectClassInstanceVariable* filterInstance = d->effect->GetVariableByName(filterInstanceVariable)->AsClassInstance();
+	if (filterInstance->IsValid())
+	{
+		GM_DX_HR(filterInterface->SetClassInstance(filterInstance));
+	}
+	else
+	{
+		gm_error("Filter instance not found, use default instead.");
+		filterInstance = d->effect->GetVariableByName(GMSHADER_DefaultFilter)->AsClassInstance();
+		GM_ASSERT(filterInstance);
+		GM_DX_HR(filterInterface->SetClassInstance(filterInstance));
+	}
 }

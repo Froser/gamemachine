@@ -7,6 +7,7 @@
 #include "gmengine/gmgameworld.h"
 #include <linearmath.h>
 #include "foundation/gamemachine.h"
+#include "foundation/utilities/utilities.h"
 
 namespace
 {
@@ -112,6 +113,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	D(d);
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
+
 	auto& desc = shaderProgram->getDesc();
 
 	GM_BEGIN_CHECK_GL_ERROR
@@ -390,7 +392,6 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	auto& desc = shaderProgram->getDesc();
-
 	GM_BEGIN_CHECK_GL_ERROR
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
 	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));

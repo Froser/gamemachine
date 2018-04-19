@@ -373,9 +373,11 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	program->useProgram();
 	GM_END_CHECK_GL_ERROR
 
+
+	const auto& desc = program->getDesc();
 	GM_BEGIN_CHECK_GL_ERROR
-	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_X, d->sampleOffsets[0]);
-	program->setFloat(GMSHADER_EFFECTS_TEXTURE_OFFSET_Y, d->sampleOffsets[1]);
+	program->setFloat(desc.FilterAttributes.KernelDeltaX, d->sampleOffsets[0]);
+	program->setFloat(desc.FilterAttributes.KernelDeltaY, d->sampleOffsets[1]);
 	GM_END_CHECK_GL_ERROR
 
 	bindForWriting();

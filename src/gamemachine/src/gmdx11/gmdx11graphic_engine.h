@@ -129,6 +129,18 @@ public:
 		return d->needActivateLight;
 	}
 
+	inline const GMFilterMode::Mode getCurrentFilterMode()
+	{
+		D(d);
+		return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
+	}
+
+	inline const GMVec2 getCurrentFilterKernelDelta()
+	{
+		D(d);
+		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
+	}
+
 public:
 	IRenderer* getRenderer(GMModelType objectType);
 

@@ -1,4 +1,17 @@
 //--------------------------------------------------------------------------------------
+// Functions
+//--------------------------------------------------------------------------------------
+float4 ToFloat4(float3 v, float w)
+{
+    return float4(v.x, v.y, v.z, w);
+}
+
+float4 ToFloat4(float3 v)
+{
+    return ToFloat4(v, 1);
+}
+
+//--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
 cbuffer WorldConstantBuffer: register( b0 ) 
@@ -168,16 +181,6 @@ struct VS_OUTPUT
 };
 
 typedef VS_OUTPUT PS_INPUT;
-
-float4 ToFloat4(float3 v, float w)
-{
-    return float4(v.x, v.y, v.z, w);
-}
-
-float4 ToFloat4(float3 v)
-{
-    return ToFloat4(v, 1);
-}
 
 bool HasNoTexture(GMTexture attributes[3])
 {
@@ -432,6 +435,112 @@ float4 PS_CubeMap(PS_INPUT input) : SV_Target
 //--------------------------------------------------------------------------------------
 // Filter
 //--------------------------------------------------------------------------------------
+float KernelDeltaX = 0.f, KernelDeltaY = 0.f;
+typedef float GMKernel[9];
+interface IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord);
+};
+
+float4 Kernel(GMKernel kernel, Texture2D tex, SamplerState ss, float2 texcoord)
+{
+    int offset = 1;
+    float4 sample[9];
+    sample[0] = kernel[0] * tex.Sample(ss, float2(texcoord.x - KernelDeltaX, texcoord.y - KernelDeltaY));
+    sample[1] = kernel[1] * tex.Sample(ss, float2(texcoord.x, texcoord.y - KernelDeltaY));
+    sample[2] = kernel[2] * tex.Sample(ss, float2(texcoord.x + KernelDeltaX, texcoord.y - KernelDeltaY));
+    sample[3] = kernel[3] * tex.Sample(ss, float2(texcoord.x - KernelDeltaX, texcoord.y));
+    sample[4] = kernel[4] * tex.Sample(ss, float2(texcoord.x, texcoord.y));
+    sample[5] = kernel[5] * tex.Sample(ss, float2(texcoord.x + KernelDeltaX, texcoord.y));
+    sample[6] = kernel[6] * tex.Sample(ss, float2(texcoord.x - KernelDeltaX, texcoord.y + KernelDeltaY));
+    sample[7] = kernel[7] * tex.Sample(ss, float2(texcoord.x, texcoord.y + KernelDeltaY));
+    sample[8] = kernel[8] * tex.Sample(ss, float2(texcoord.x + KernelDeltaX, texcoord.y + KernelDeltaY));
+
+    return (sample[0] +
+            sample[1] +
+            sample[2] +
+            sample[3] +
+            sample[4] +
+            sample[5] +
+            sample[6] +
+            sample[7] +
+            sample[8]);
+}
+
+class GMDefaultFilter : IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        return tex.Sample(ss, texcoord);
+    }
+};
+
+class GMInversionFilter : IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        return ToFloat4((float3(1.f, 1.f, 1.f) - tex.Sample(ss, texcoord)).rgb, 1);
+    }
+};
+
+class GMSharpenFilter : IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        GMKernel kernel = {
+            -1, -1, -1,
+            -1,  9, -1,
+            -1, -1, -1
+        };
+        return Kernel(kernel, tex, ss, texcoord);
+    }
+};
+
+class GMBlurFilter : IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        GMKernel kernel = {
+            1.0 / 16, 2.0 / 16, 1.0 / 16,
+            2.0 / 16, 4.0 / 16, 2.0 / 16,
+            1.0 / 16, 2.0 / 16, 1.0 / 16  
+        };
+        return Kernel(kernel, tex, ss, texcoord);
+    }
+};
+
+class GMGrayscaleFilter : IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        float3 fragColor = tex.Sample(ss, texcoord).rgb;
+        float average = 0.2126 * fragColor.r + 0.7152 * fragColor.g + 0.0722 * fragColor.b;
+        return float4(average, average, average, 1);
+    }
+};
+
+class GMEdgeDetectFilter : IFilter
+{
+    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    {
+        GMKernel kernel = {
+            1, 1, 1,
+            1, -8, 1,
+            1, 1, 1
+        };
+        return Kernel(kernel, tex, ss, texcoord);
+    }
+};
+
+GMDefaultFilter DefaultFilter;
+GMInversionFilter InversionFilter;
+GMSharpenFilter SharpenFilter;
+GMBlurFilter BlurFilter;
+GMGrayscaleFilter GrayscaleFilter;
+GMEdgeDetectFilter EdgeDetectFilter;
+
+IFilter Filter;
+
 VS_OUTPUT VS_Filter(VS_INPUT input)
 {
     VS_OUTPUT output;
@@ -442,7 +551,7 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
 
 float4 PS_Filter(PS_INPUT input) : SV_Target
 {
-    return AmbientTexture_0.Sample(AmbientSampler_0, input.Texcoord);
+    return Filter.Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
 }
 
 //--------------------------------------------------------------------------------------
@@ -452,8 +561,8 @@ technique11 GMTech_3D
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0,VS_3D()));
-        SetPixelShader(CompileShader(ps_4_0,PS_3D()));
+        SetVertexShader(CompileShader(vs_5_0,VS_3D()));
+        SetPixelShader(CompileShader(ps_5_0,PS_3D()));
         SetRasterizerState(GMRasterizerState);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
         SetDepthStencilState(GMDepthStencilState, 1);
@@ -464,8 +573,8 @@ technique11 GMTech_2D
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0,VS_2D()));
-        SetPixelShader(CompileShader(ps_4_0,PS_2D()));
+        SetVertexShader(CompileShader(vs_5_0,VS_2D()));
+        SetPixelShader(CompileShader(ps_5_0,PS_2D()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
@@ -476,8 +585,8 @@ technique11 GMTech_Glyph
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0,VS_Glyph()));
-        SetPixelShader(CompileShader(ps_4_0,PS_Glyph()));
+        SetVertexShader(CompileShader(vs_5_0,VS_Glyph()));
+        SetPixelShader(CompileShader(ps_5_0,PS_Glyph()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
@@ -488,8 +597,8 @@ technique11 GMTech_CubeMap
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0,VS_CubeMap()));
-        SetPixelShader(CompileShader(ps_4_0,PS_CubeMap()));
+        SetVertexShader(CompileShader(vs_5_0,VS_CubeMap()));
+        SetPixelShader(CompileShader(ps_5_0,PS_CubeMap()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
@@ -500,8 +609,8 @@ technique11 GMTech_Filter
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_4_0,VS_Filter()));
-        SetPixelShader(CompileShader(ps_4_0,PS_Filter()));
+        SetVertexShader(CompileShader(vs_5_0,VS_Filter()));
+        SetPixelShader(CompileShader(ps_5_0,PS_Filter()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
