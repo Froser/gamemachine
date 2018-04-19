@@ -52,7 +52,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GraphicSettings* settings = nullptr;
 
 	GMGLGBuffer gbuffer;
-	GMGLFramebuffer framebuffer;
+	GMGLFramebufferDep framebuffer;
 
 	// 延迟渲染的四边形
 	GMuint quadVAO = 0;

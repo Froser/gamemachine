@@ -37,7 +37,7 @@ extern "C"
 class GMEffectRenderer
 {
 public:
-	GMEffectRenderer(GMGLFramebuffer& framebuffer, GMGLShaderProgram* program)
+	GMEffectRenderer(GMGLFramebufferDep& framebuffer, GMGLShaderProgram* program)
 		: m_effectBuffer(framebuffer)
 		, m_program(program)
 	{
@@ -63,7 +63,7 @@ public:
 	}
 
 private:
-	GMGLFramebuffer& m_effectBuffer;
+	GMGLFramebufferDep& m_effectBuffer;
 	GMGLShaderProgram* m_program;
 	bool m_isHost = false;
 };

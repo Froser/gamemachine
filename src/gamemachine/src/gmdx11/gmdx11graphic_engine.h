@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMScopePtr<IShaderProgram> shaderProgram;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	
-	GMDx11Framebuffers* filterFramebuffers = nullptr;
+	IFramebuffers* filterFramebuffers = nullptr;
 	GMGameObject* filterQuad = nullptr;
 	GMScopePtr<GMModel> filterQuadModel;
 

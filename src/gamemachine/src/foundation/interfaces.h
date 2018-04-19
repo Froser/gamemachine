@@ -27,12 +27,14 @@ class GMMesh;
 class GMTextureFrames;
 class GMTexture;
 class GMAssets;
+class GMLight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
 struct GMCameraLookAt;
 struct IDebugOutput;
 struct IAudioPlayer;
+struct IGraphicEngine;
 
 enum class GameMachineEvent
 {
@@ -297,8 +299,28 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 	virtual const GMShaderVariablesDesc& getDesc() = 0;
 };
 
-class GMLight;
-struct IGraphicEngine;
+// 帧缓存
+struct GMFramebufferDesc
+{
+	GMRect rect;
+};
+
+GM_INTERFACE(IFramebuffer)
+{
+	virtual bool init(const GMFramebufferDesc& desc) = 0;
+	virtual ITexture* getTexture() = 0;
+};
+
+GM_INTERFACE(IFramebuffers)
+{
+	virtual bool init(const GMFramebufferDesc& desc) = 0;
+	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) = 0;
+	virtual void bind() = 0;
+	virtual void unbind() = 0;
+	virtual void clear() = 0;
+	virtual ITexture* getTexture(GMuint) = 0;
+};
+
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual void onLoadShaders(IGraphicEngine* engine) = 0;
@@ -455,6 +477,8 @@ GM_INTERFACE(IFactory)
 	virtual void createTexture(GMImage*, OUT ITexture**) = 0;
 	virtual void createPainter(IGraphicEngine*, GMModel*, OUT GMModelPainter**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
+	virtual void createFramebuffer(OUT IFramebuffer**) = 0;
+	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
 };
 
 GM_INTERFACE_FROM(IWindow, IQueriable)

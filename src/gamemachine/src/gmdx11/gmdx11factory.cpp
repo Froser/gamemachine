@@ -4,6 +4,7 @@
 #include "gmdx11modelpainter.h"
 #include "gmdx11texture.h"
 #include "gmdx11glyphmanager.h"
+#include "gmdx11framebuffer.h"
 
 void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -30,4 +31,14 @@ void GMDx11Factory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
 	GM_ASSERT(glyphManager);
 	*glyphManager = new GMDx11GlyphManager();
+}
+
+void GMDx11Factory::createFramebuffer(OUT IFramebuffer** fb)
+{
+	*fb = new GMDx11Framebuffer();
+}
+
+void GMDx11Factory::createFramebuffers(OUT IFramebuffers** fbs)
+{
+	*fbs = new GMDx11Framebuffers();
 }

@@ -7,7 +7,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11FramebufferTexture)
 {
-	GMDx11FramebufferDesc desc;
+	GMFramebufferDesc desc;
 };
 
 class GMDx11FramebufferTexture : public GMDx11Texture
@@ -15,7 +15,7 @@ class GMDx11FramebufferTexture : public GMDx11Texture
 	DECLARE_PRIVATE_AND_BASE(GMDx11FramebufferTexture, GMDx11Texture);
 
 public:
-	GMDx11FramebufferTexture(const GMDx11FramebufferDesc& desc);
+	GMDx11FramebufferTexture(const GMFramebufferDesc& desc);
 
 public:
 	virtual void init() override;
@@ -24,7 +24,7 @@ public:
 	ID3D11Resource* getTexture();
 };
 
-GMDx11FramebufferTexture::GMDx11FramebufferTexture(const GMDx11FramebufferDesc& desc)
+GMDx11FramebufferTexture::GMDx11FramebufferTexture(const GMFramebufferDesc& desc)
 	: GMDx11Texture(nullptr)
 {
 	D(d);
@@ -43,8 +43,8 @@ void GMDx11FramebufferTexture::init()
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
 	texDesc.Format = format;
-	texDesc.SampleDesc.Count = d->desc.sampleCount;
-	texDesc.SampleDesc.Quality = d->desc.sampleQuality;
+	texDesc.SampleDesc.Count = 1;
+	texDesc.SampleDesc.Quality = 0;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
@@ -75,7 +75,7 @@ GMDx11Framebuffer::~GMDx11Framebuffer()
 	GM_delete(d->renderTexture);
 }
 
-bool GMDx11Framebuffer::init(const GMDx11FramebufferDesc& desc)
+bool GMDx11Framebuffer::init(const GMFramebufferDesc& desc)
 {
 	D(d);
 	GMComPtr<ID3D11Device> device;
@@ -114,7 +114,7 @@ GMDx11Framebuffers::~GMDx11Framebuffers()
 	}
 }
 
-void GMDx11Framebuffers::init(const GMDx11FramebufferDesc& desc)
+bool GMDx11Framebuffers::init(const GMFramebufferDesc& desc)
 {
 	D(d);
 	GMComPtr<ID3D11Device> device;
@@ -131,8 +131,8 @@ void GMDx11Framebuffers::init(const GMDx11FramebufferDesc& desc)
 	depthStencilTextureDesc.MipLevels = 1;
 	depthStencilTextureDesc.ArraySize = 1;
 	depthStencilTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilTextureDesc.SampleDesc.Count = desc.sampleCount;
-	depthStencilTextureDesc.SampleDesc.Quality = desc.sampleQuality;
+	depthStencilTextureDesc.SampleDesc.Count = 1;
+	depthStencilTextureDesc.SampleDesc.Quality = 0;
 	depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	depthStencilTextureDesc.CPUAccessFlags = 0;
@@ -154,16 +154,19 @@ void GMDx11Framebuffers::init(const GMDx11FramebufferDesc& desc)
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	GM_DX_HR(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
-	GM_DX_HR(device->CreateTexture2D(&depthStencilTextureDesc, NULL, &depthStencilBuffer));
-	GM_DX_HR(device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView));
+	GM_DX_HR_RET(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
+	GM_DX_HR_RET(device->CreateTexture2D(&depthStencilTextureDesc, NULL, &depthStencilBuffer));
+	GM_DX_HR_RET(device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView));
+	return true;
 }
 
-void GMDx11Framebuffers::addFramebuffer(AUTORELEASE GMDx11Framebuffer* framebuffer)
+void GMDx11Framebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
 {
 	D(d);
-	d->framebuffers.push_back(framebuffer);
-	d->renderTargetViews.push_back(framebuffer->getRenderTargetView());
+	GM_ASSERT(dynamic_cast<GMDx11Framebuffer*>(framebuffer));
+	GMDx11Framebuffer* dxFramebuffer = static_cast<GMDx11Framebuffer*>(framebuffer);
+	d->framebuffers.push_back(dxFramebuffer);
+	d->renderTargetViews.push_back(dxFramebuffer->getRenderTargetView());
 }
 
 void GMDx11Framebuffers::bind()

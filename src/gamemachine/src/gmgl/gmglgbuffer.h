@@ -86,7 +86,7 @@ private:
 	bool drawBuffers(GMuint count);
 };
 
-GM_PRIVATE_OBJECT(GMGLFramebuffer)
+GM_PRIVATE_OBJECT(GMGLFramebufferDep)
 {
 	GMuint fbo = 0;
 	GMuint texture = 0;
@@ -96,20 +96,20 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMfloat sampleOffsets[2] = { 0 };
-	GMint effects = GMFilterMode::None;
+	GMFilterMode::Mode effects = GMFilterMode::None;
 	bool hasBegun = false;
 	GMRect clientRect = { 0 };
 	GMRect viewport = { 0 };
 	GMRenderConfig renderConfig;
 };
 
-class GMGLFramebuffer : public GMObject
+class GMGLFramebufferDep : public GMObject
 {
-	DECLARE_PRIVATE(GMGLFramebuffer)
+	DECLARE_PRIVATE(GMGLFramebufferDep)
 
 public:
-	GMGLFramebuffer();
-	~GMGLFramebuffer();
+	GMGLFramebufferDep();
+	~GMGLFramebufferDep();
 
 public:
 	void dispose();
@@ -135,6 +135,54 @@ private:
 	void renderQuad();
 	void disposeQuad();
 	const char* useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect);
+};
+
+GM_PRIVATE_OBJECT(GMGLFramebuffer)
+{
+	ITexture* texture = nullptr;
+};
+
+class GMGLFramebuffer : public GMObject, public IFramebuffer
+{
+	DECLARE_PRIVATE(GMGLFramebuffer);
+
+public:
+	~GMGLFramebuffer();
+
+public:
+	virtual bool init(const GMFramebufferDesc& desc) override;
+	virtual ITexture* getTexture() override;
+
+public:
+	GMuint getTextureId();
+};
+
+GM_PRIVATE_OBJECT(GMGLFramebuffers)
+{
+	GMuint fbo = 0;
+	GMuint depthStencilBuffer = 0;
+	Vector<GMGLFramebuffer*> framebuffers;
+	bool framebuffersCreated = false;
+};
+
+class GMGLFramebuffers : public GMObject, public IFramebuffers
+{
+	DECLARE_PRIVATE(GMGLFramebuffers)
+
+public:
+	GMGLFramebuffers() = default;
+	~GMGLFramebuffers();
+
+	virtual bool init(const GMFramebufferDesc& desc) override;
+	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
+	virtual void bind() override;
+	virtual void unbind() override;
+	virtual void clear() override;
+	virtual ITexture* getTexture(GMuint) override;
+
+private:
+	void createDepthStencilBuffer(const GMFramebufferDesc& desc);
+	bool createFramebuffers();
 };
 
 END_NS

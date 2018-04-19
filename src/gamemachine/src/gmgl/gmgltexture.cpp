@@ -79,11 +79,14 @@ namespace
 GMGLTexture::GMGLTexture(const GMImage* image)
 {
 	D(d);
-	d->target = toGLTarget(image->getData().target);
-	d->format = toGLFormat(image->getData().format);
-	d->dataType = toGLImageDataType(image->getData().type);
-	d->internalFormat = toGLInternalFormat(image->getData().internalFormat);
-	d->image = image;
+	if (image)
+	{
+		d->target = toGLTarget(image->getData().target);
+		d->format = toGLFormat(image->getData().format);
+		d->dataType = toGLImageDataType(image->getData().type);
+		d->internalFormat = toGLInternalFormat(image->getData().internalFormat);
+		d->image = image;
+	}
 }
 
 GMGLTexture::~GMGLTexture()
@@ -98,6 +101,12 @@ void GMGLTexture::init()
 	D(d);
 	if (d->inited)
 		return;
+
+	if (d->image)
+	{
+		GM_ASSERT(false);
+		return;
+	}
 
 	GMint level;
 	const GMImage::Data& imgData = d->image->getData();

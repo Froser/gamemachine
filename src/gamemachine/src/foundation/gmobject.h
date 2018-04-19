@@ -290,7 +290,7 @@ public:
 	  \return 转换后的对象。
 	*/
 	template <typename TargetType>
-	static TargetType gmobject_cast(GMObject* obj)
+	static inline TargetType gmobject_cast(GMObject* obj)
 	{
 #if _DEBUG
 		TargetType target = dynamic_cast<TargetType>(obj);

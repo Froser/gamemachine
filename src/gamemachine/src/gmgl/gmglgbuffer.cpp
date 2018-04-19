@@ -4,6 +4,7 @@
 #include "gmglgraphic_engine.h"
 #include "foundation/gamemachine.h"
 #include "shader_constants.h"
+#include "gmgltexture.h"
 
 #define GMEngine static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine())
 
@@ -30,6 +31,45 @@ namespace
 		"deferred_material_pass_gKd",
 		"deferred_material_pass_gKs_gShininess", //gKs: 3, gShininess: 1
 		"deferred_material_pass_gHasNormalMap_gRefractivity", //gHasNormalMap: 1, gRefractivity: 1
+	};
+
+	GM_PRIVATE_OBJECT(GMGLFramebufferTexture)
+	{
+		GMFramebufferDesc desc;
+	};
+
+	class GMGLFramebufferTexture : public GMGLTexture
+	{
+		DECLARE_PRIVATE_AND_BASE(GMGLFramebufferTexture, GMGLTexture);
+
+	public:
+		GMGLFramebufferTexture(const GMFramebufferDesc& desc)
+			: GMGLTexture(nullptr)
+		{
+			D(d);
+			d->desc = desc;
+		}
+
+		virtual void init() override
+		{
+			D(d);
+			D_BASE(db, Base);
+			GM_BEGIN_CHECK_GL_ERROR
+			glGenTextures(1, &db->id);
+			glBindTexture(GL_TEXTURE_2D, db->id);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			GM_END_CHECK_GL_ERROR
+		}
+
+		GLuint getTextureId()
+		{
+			D_BASE(d, Base);
+			return d->id;
+		}
 	};
 }
 
@@ -257,19 +297,19 @@ static const Pair<GMint, const char*> s_effects_uniformNames[] =
 	{ GMFilterMode::EdgeDetect, GMSHADER_EFFECTS_EDGEDETECT },
 };
 
-GMGLFramebuffer::GMGLFramebuffer()
+GMGLFramebufferDep::GMGLFramebufferDep()
 {
 	D(d);
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 }
 
-GMGLFramebuffer::~GMGLFramebuffer()
+GMGLFramebufferDep::~GMGLFramebufferDep()
 {
 	disposeQuad();
 	dispose();
 }
 
-void GMGLFramebuffer::dispose()
+void GMGLFramebufferDep::dispose()
 {
 	D(d);
 	if (d->fbo)
@@ -291,7 +331,7 @@ void GMGLFramebuffer::dispose()
 	}
 }
 
-bool GMGLFramebuffer::init(const GMRect& renderRect)
+bool GMGLFramebufferDep::init(const GMRect& renderRect)
 {
 	D(d);
 	const GMConfigs& configs = GM.getConfigs();
@@ -346,11 +386,11 @@ bool GMGLFramebuffer::init(const GMRect& renderRect)
 	return true;
 }
 
-void GMGLFramebuffer::beginDrawEffects()
+void GMGLFramebufferDep::beginDrawEffects()
 {
 	D(d);
 	GM_BEGIN_CHECK_GL_ERROR
-	d->effects = d->renderConfig.get(GMRenderConfigs::FilterMode).toInt();
+	d->effects = d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
 	GMEngine->setViewport(d->viewport);
 	d->hasBegun = true;
 	newFrame();
@@ -358,14 +398,14 @@ void GMGLFramebuffer::beginDrawEffects()
 	GM_END_CHECK_GL_ERROR
 }
 
-void GMGLFramebuffer::endDrawEffects()
+void GMGLFramebufferDep::endDrawEffects()
 {
 	D(d);
 	d->hasBegun = false;
 	releaseBind();
 }
 
-void GMGLFramebuffer::draw(GMGLShaderProgram* program)
+void GMGLFramebufferDep::draw(GMGLShaderProgram* program)
 {
 	D(d);
 	const char* filterUniformName = nullptr;
@@ -414,39 +454,39 @@ void GMGLFramebuffer::draw(GMGLShaderProgram* program)
 	renderQuad();
 }
 
-GLuint GMGLFramebuffer::framebuffer()
+GLuint GMGLFramebufferDep::framebuffer()
 {
 	D(d);
 	return d->fbo;
 }
 
-void GMGLFramebuffer::bindForWriting()
+void GMGLFramebufferDep::bindForWriting()
 {
 	D(d);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer());
 }
 
-void GMGLFramebuffer::bindForReading()
+void GMGLFramebufferDep::bindForReading()
 {
 	D(d);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer());
 }
 
-void GMGLFramebuffer::releaseBind()
+void GMGLFramebufferDep::releaseBind()
 {
 	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	GM_END_CHECK_GL_ERROR
 }
 
-void GMGLFramebuffer::newFrame()
+void GMGLFramebufferDep::newFrame()
 {
 	bindForWriting();
 	GMGLGraphicEngine::newFrameOnCurrentFramebuffer();
 	releaseBind();
 }
 
-void GMGLFramebuffer::createQuad()
+void GMGLFramebufferDep::createQuad()
 {
 	D(d);
 	if (d->quadVAO == 0)
@@ -473,12 +513,12 @@ void GMGLFramebuffer::createQuad()
 	}
 }
 
-void GMGLFramebuffer::turnOffBlending()
+void GMGLFramebufferDep::turnOffBlending()
 {
 	glDisable(GL_BLEND);
 }
 
-void GMGLFramebuffer::blending()
+void GMGLFramebufferDep::blending()
 {
 	if (!GMEngine->isBlending())
 	{
@@ -491,7 +531,7 @@ void GMGLFramebuffer::blending()
 	}
 }
 
-void GMGLFramebuffer::renderQuad()
+void GMGLFramebufferDep::renderQuad()
 {
 	D(d);
 	glDisable(GL_DEPTH_TEST);
@@ -504,7 +544,7 @@ void GMGLFramebuffer::renderQuad()
 	GM_CHECK_GL_ERROR();
 }
 
-void GMGLFramebuffer::disposeQuad()
+void GMGLFramebufferDep::disposeQuad()
 {
 	D(d);
 	glBindVertexArray(0);
@@ -515,7 +555,7 @@ void GMGLFramebuffer::disposeQuad()
 		glDeleteBuffers(1, &d->quadVBO);
 }
 
-const char* GMGLFramebuffer::useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect)
+const char* GMGLFramebufferDep::useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect)
 {
 	D(d);
 	const char* uniformName = nullptr;
@@ -538,4 +578,151 @@ const char* GMGLFramebuffer::useShaderProgramAndApplyFilter(GMGLShaderProgram* p
 		}
 	}
 	return uniformName;
+}
+
+GMGLFramebuffer::~GMGLFramebuffer()
+{
+	D(d);
+	GM_delete(d->texture);
+}
+
+bool GMGLFramebuffer::init(const GMFramebufferDesc& desc)
+{
+	D(d);
+	d->texture = new GMGLFramebufferTexture(desc);
+	d->texture->init();
+	return true;
+}
+
+ITexture* GMGLFramebuffer::getTexture()
+{
+	D(d);
+	return d->texture;
+}
+
+GMuint GMGLFramebuffer::getTextureId()
+{
+	D(d);
+	GM_ASSERT(dynamic_cast<GMGLFramebufferTexture*>(d->texture));
+	GMGLFramebufferTexture* texture = static_cast<GMGLFramebufferTexture*>(d->texture);
+	return texture->getTextureId();
+}
+
+GMGLFramebuffers::~GMGLFramebuffers()
+{
+	D(d);
+	for (auto framebuffer : d->framebuffers)
+	{
+		GM_delete(framebuffer);
+	}
+
+	glDeleteFramebuffers(1, &d->fbo);
+	d->fbo = 0;
+
+	glDeleteRenderbuffers(1, &d->depthStencilBuffer);
+	d->depthStencilBuffer = 0;
+}
+
+bool GMGLFramebuffers::init(const GMFramebufferDesc& desc)
+{
+	D(d);
+	glGenFramebuffers(1, &d->fbo);
+	createDepthStencilBuffer(desc);
+	return glGetError() == GL_NO_ERROR;
+}
+
+void GMGLFramebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
+{
+	D(d);
+	GM_ASSERT(dynamic_cast<GMGLFramebuffer*>(framebuffer));
+	GMGLFramebuffer* glFramebuffer = static_cast<GMGLFramebuffer*>(framebuffer);
+	d->framebuffers.push_back(glFramebuffer);
+}
+
+void GMGLFramebuffers::bind()
+{
+	D(d);
+	if (!d->framebuffersCreated)
+	{
+		bool suc = createFramebuffers();
+		GM_ASSERT(suc);
+		d->framebuffersCreated = suc;
+	}
+	
+	if (d->framebuffersCreated)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	}
+}
+
+void GMGLFramebuffers::unbind()
+{
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
+{
+	D(d);
+	// If using STENCIL buffer:
+	// NEVER EVER MAKE A STENCIL buffer. All GPUs and all drivers do not support an independent stencil buffer.
+	// If you need a stencil buffer, then you need to make a Depth=24, Stencil=8 buffer, also called D24S8.
+	// See https://www.khronos.org/opengl/wiki/Framebuffer_Object_Extension_Examples
+
+	GM_BEGIN_CHECK_GL_ERROR
+	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	glGenRenderbuffers(1, &d->depthStencilBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, d->depthStencilBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, desc.rect.width, desc.rect.height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	GM_END_CHECK_GL_ERROR
+}
+
+bool GMGLFramebuffers::createFramebuffers()
+{
+	D(d);
+	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	Vector<GLuint> attachments;
+	GMuint sz = d->framebuffers.size();
+	for (GMuint i = 0; i < sz; i++)
+	{
+		GM_BEGIN_CHECK_GL_ERROR
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->framebuffers[i]->getTextureId(), 0);
+		GM_END_CHECK_GL_ERROR
+	}
+
+	GM_BEGIN_CHECK_GL_ERROR
+	glDrawBuffers(sz, attachments.data());
+	GM_END_CHECK_GL_ERROR
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	if (status != GL_FRAMEBUFFER_COMPLETE)
+	{
+		gm_error("FB incomplete error, status: 0x%x\n", status);
+		return false;
+	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	return true;
+}
+
+void GMGLFramebuffers::clear()
+{
+	D(d);
+	GLint mask;
+	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	GM_BEGIN_CHECK_GL_ERROR
+	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
+	glStencilMask(0xFF);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	GM_END_CHECK_GL_ERROR
+	glStencilMask(mask);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+ITexture* GMGLFramebuffers::getTexture(GMuint index)
+{
+	D(d);
+	GM_ASSERT(index < d->framebuffers.size());
+	return d->framebuffers[index]->getTexture();
 }

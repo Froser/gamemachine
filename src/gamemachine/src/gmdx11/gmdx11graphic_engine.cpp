@@ -246,14 +246,16 @@ void GMDx11GraphicEngine::createFilterFramebuffer()
 	D(d);
 	if (!d->filterFramebuffers)
 	{
+		IFactory* factory = GM.getFactory();
 		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-		GMDx11FramebufferDesc desc = { 0 };
-		desc.sampleCount = 1;
-		desc.sampleQuality = 0;
+		GMFramebufferDesc desc = { 0 };
 		desc.rect = states.windowRect;
-		d->filterFramebuffers = new GMDx11Framebuffers();
+		factory->createFramebuffers(&d->filterFramebuffers);
+		GM_ASSERT(d->filterFramebuffers);
 		d->filterFramebuffers->init(desc);
-		GMDx11Framebuffer* framebuffer = new GMDx11Framebuffer();
+		IFramebuffer* framebuffer = nullptr;
+		factory->createFramebuffer(&framebuffer);
+		GM_ASSERT(framebuffer);
 		framebuffer->init(desc);
 		d->filterFramebuffers->addFramebuffer(framebuffer);
 	}

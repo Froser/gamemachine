@@ -31,3 +31,13 @@ void GMGLFactory::createGlyphManager(OUT GMGlyphManager** glyphManager)
 {
 	*glyphManager = new GMGLGlyphManager();
 }
+
+void GMGLFactory::createFramebuffer(OUT IFramebuffer** fb)
+{
+	*fb = new GMGLFramebuffer();
+}
+
+void GMGLFactory::createFramebuffers(OUT IFramebuffers** fbs)
+{
+	*fbs = new GMGLFramebuffers();
+}

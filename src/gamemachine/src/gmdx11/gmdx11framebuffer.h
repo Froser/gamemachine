@@ -7,20 +7,13 @@
 #include <gmtools.h>
 BEGIN_NS
 
-struct GMDx11FramebufferDesc
-{
-	GMRect rect;
-	UINT sampleCount;
-	UINT sampleQuality;
-};
-
 GM_PRIVATE_OBJECT(GMDx11Framebuffer)
 {
 	ITexture* renderTexture = nullptr;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 };
 
-class GMDx11Framebuffer : public GMObject
+class GMDx11Framebuffer : public GMObject, public IFramebuffer
 {
 	DECLARE_PRIVATE(GMDx11Framebuffer)
 
@@ -29,7 +22,7 @@ public:
 	~GMDx11Framebuffer();
 
 public:
-	bool init(const GMDx11FramebufferDesc& desc);
+	bool init(const GMFramebufferDesc& desc);
 
 public:
 	ID3D11RenderTargetView* getRenderTargetView()
@@ -58,7 +51,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 };
 
-class GMDx11Framebuffers : public GMObject
+class GMDx11Framebuffers : public GMObject, public IFramebuffers
 {
 	DECLARE_PRIVATE(GMDx11Framebuffers)
 
@@ -67,12 +60,12 @@ public:
 	~GMDx11Framebuffers();
 
 public:
-	void init(const GMDx11FramebufferDesc& desc);
-	void addFramebuffer(AUTORELEASE GMDx11Framebuffer* framebuffer);
-	void bind();
-	void unbind();
-	void clear();
-	ITexture* getTexture(GMuint index);
+	virtual bool init(const GMFramebufferDesc& desc) override;
+	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
+	virtual void bind() override;
+	virtual void unbind() override;
+	virtual void clear() override;
+	virtual ITexture* getTexture(GMuint index) override;
 };
 
 END_NS
