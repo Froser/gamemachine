@@ -498,9 +498,13 @@ void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 	D(d);
 	setCurrentRenderMode(GMRenderMode::Forward);
 	activateLightsIfNecessary();
+	GMFilterMode::Mode filterMode = getCurrentFilterMode();
+	if (filterMode != GMFilterMode::None)
+		createFilterFramebuffer();
+
 	if (d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>() != GMFilterMode::None)
 	{
-		GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
+		// GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
 		forwardRender(objects, count);
 	}
 	else

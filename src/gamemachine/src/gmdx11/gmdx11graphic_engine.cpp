@@ -6,13 +6,6 @@
 #include "foundation/utilities/utilities.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 
-GMDx11GraphicEngine::~GMDx11GraphicEngine()
-{
-	D(d);
-	GM_delete(d->filterFramebuffers);
-	GM_delete(d->filterQuad);
-}
-
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -211,19 +204,19 @@ void GMDx11GraphicEngine::initShaders()
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
 {
 	D(d);
+	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 	if (filter != GMFilterMode::None)
 	{
-		d->filterFramebuffers->clear();
-		d->filterFramebuffers->bind();
+		filterFramebuffers->clear();
+		filterFramebuffers->bind();
 	}
 
 	forwardRender(objects, count);
 
 	if (filter != GMFilterMode::None)
 	{
-		d->filterFramebuffers->unbind();
-		GM_ASSERT(d->filterQuad);
-		d->filterQuad->draw();
+		filterFramebuffers->unbind();
+		getFilterQuad()->draw();
 	}
 }
 
@@ -239,39 +232,6 @@ void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count, GMFi
 {
 	D(d);
 	forwardRender(objects, count);
-}
-
-void GMDx11GraphicEngine::createFilterFramebuffer()
-{
-	D(d);
-	if (!d->filterFramebuffers)
-	{
-		IFactory* factory = GM.getFactory();
-		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-		GMFramebufferDesc desc = { 0 };
-		desc.rect = states.windowRect;
-		factory->createFramebuffers(&d->filterFramebuffers);
-		GM_ASSERT(d->filterFramebuffers);
-		d->filterFramebuffers->init(desc);
-		IFramebuffer* framebuffer = nullptr;
-		factory->createFramebuffer(&framebuffer);
-		GM_ASSERT(framebuffer);
-		framebuffer->init(desc);
-		d->filterFramebuffers->addFramebuffer(framebuffer);
-	}
-
-	if (!d->filterQuad)
-	{
-		GMModel* quad = nullptr;
-		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &quad);
-		GM_ASSERT(quad);
-		quad->setType(GMModelType::Filter);
-		quad->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0).addFrame(d->filterFramebuffers->getTexture(0));
-		d->filterQuadModel.reset(quad);
-		GM.createModelPainterAndTransfer(quad);
-		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);
-		d->filterQuad = new GMGameObject(asset);
-	}
 }
 
 IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)

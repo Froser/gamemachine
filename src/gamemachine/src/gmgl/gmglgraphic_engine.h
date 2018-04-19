@@ -5,6 +5,7 @@
 #include "gmglshaderprogram.h"
 #include <gamemachine.h>
 #include <map>
+#include <gmgraphicengine.h>
 #include "gmglgbuffer.h"
 BEGIN_NS
 
@@ -79,7 +80,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 #endif
 };
 
-class GMGLGraphicEngine : public GMObject, public IGraphicEngine
+class GMGLGraphicEngine : public GMGraphicEngine
 {
 	DECLARE_PRIVATE(GMGLGraphicEngine)
 
@@ -115,6 +116,12 @@ public:
 	{
 		D(d);
 		return d->stencilOptions;
+	}
+
+	const GMFilterMode::Mode getCurrentFilterMode()
+	{
+		D(d);
+		return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
 	}
 
 public:

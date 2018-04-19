@@ -5,6 +5,7 @@
 #include <gmdxincludes.h>
 #include <gmmodel.h>
 #include <gmtools.h>
+#include <gmgraphicengine.h>
 BEGIN_NS
 
 struct GMMVPMatrix;
@@ -27,10 +28,6 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMScopePtr<IShaderProgram> shaderProgram;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	
-	IFramebuffers* filterFramebuffers = nullptr;
-	GMGameObject* filterQuad = nullptr;
-	GMScopePtr<GMModel> filterQuadModel;
-
 	GMDx11GlobalBlendStateDesc blendState;
 	GMStencilOptions stencilOptions;
 	bool ready = false;
@@ -39,12 +36,9 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMRenderConfig renderConfig;
 };
 
-class GMDx11GraphicEngine : public GMObject, public IGraphicEngine
+class GMDx11GraphicEngine : public GMGraphicEngine
 {
 	DECLARE_PRIVATE(GMDx11GraphicEngine)
-
-public:
-	~GMDx11GraphicEngine();
 
 public:
 	virtual void init() override;
@@ -129,13 +123,13 @@ public:
 		return d->needActivateLight;
 	}
 
-	inline const GMFilterMode::Mode getCurrentFilterMode()
+	const GMFilterMode::Mode getCurrentFilterMode()
 	{
 		D(d);
 		return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
 	}
 
-	inline const GMVec2 getCurrentFilterKernelDelta()
+	const GMVec2 getCurrentFilterKernelDelta()
 	{
 		D(d);
 		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
@@ -149,7 +143,6 @@ private:
 	void forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter);
 	void directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter);
 	void forwardRender(GMGameObject *objects[], GMuint count);
-	void createFilterFramebuffer();
 };
 
 END_NS

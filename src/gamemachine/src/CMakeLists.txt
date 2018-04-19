@@ -44,6 +44,8 @@ set(SOURCES
 		gmdata/gmmodel.h
 		gmdata/gmmodel.cpp
 		gmdata/gmshader.h
+		gmengine/gmgraphicengine.h
+		gmengine/gmgraphicengine.cpp
 		gmengine/gmassets.h
 		gmengine/gmassets.cpp
 		gmengine/gmgameworld.h
