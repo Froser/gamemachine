@@ -54,6 +54,8 @@ namespace
 		{
 			D(d);
 			D_BASE(db, Base);
+			db->target = GL_TEXTURE_2D;
+
 			GM_BEGIN_CHECK_GL_ERROR
 			glGenTextures(1, &db->id);
 			glBindTexture(GL_TEXTURE_2D, db->id);
@@ -130,15 +132,15 @@ void GMGLGBuffer::dispose()
 	}
 }
 
-bool GMGLGBuffer::init(const GMRect& clientRect)
+bool GMGLGBuffer::init(const GMRect& renderRect)
 {
 	D(d);
 	GMRenderConfig renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 
-	d->clientRect = clientRect;
-	d->renderWidth = clientRect.width;
-	d->renderHeight = clientRect.height;
-	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
+	d->renderRect = renderRect;
+	d->renderWidth = renderRect.width;
+	d->renderHeight = renderRect.height;
+	d->viewport = { d->renderRect.x, d->renderRect.y, d->renderWidth, d->renderHeight };
 
 	glGenFramebuffers(GMGLGBuffer_TotalTurn, d->fbo);
 	if (!createFrameBuffers(GMGLDeferredRenderState::PassingGeometry, GEOMETRY_NUM, d->textures))
@@ -287,299 +289,6 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 	return true;
 }
 
-static const Pair<GMint, const char*> s_effects_uniformNames[] =
-{
-	{ GMFilterMode::None, GMSHADER_EFFECTS_NONE },
-	{ GMFilterMode::Inversion, GMSHADER_EFFECTS_INVERSION },
-	{ GMFilterMode::Sharpen, GMSHADER_EFFECTS_SHARPEN },
-	{ GMFilterMode::Blur, GMSHADER_EFFECTS_BLUR },
-	{ GMFilterMode::Grayscale, GMSHADER_EFFECTS_GRAYSCALE },
-	{ GMFilterMode::EdgeDetect, GMSHADER_EFFECTS_EDGEDETECT },
-};
-
-GMGLFramebufferDep::GMGLFramebufferDep()
-{
-	D(d);
-	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
-}
-
-GMGLFramebufferDep::~GMGLFramebufferDep()
-{
-	disposeQuad();
-	dispose();
-}
-
-void GMGLFramebufferDep::dispose()
-{
-	D(d);
-	if (d->fbo)
-	{
-		glDeleteFramebuffers(1, &d->fbo);
-		d->fbo = 0;
-	}
-
-	if (d->texture)
-	{
-		glDeleteTextures(1, &d->texture);
-		d->texture = 0;
-	}
-
-	if (d->depthBuffer)
-	{
-		glDeleteRenderbuffers(1, &d->depthBuffer);
-		d->depthBuffer = 0;
-	}
-}
-
-bool GMGLFramebufferDep::init(const GMRect& renderRect)
-{
-	D(d);
-	const GMConfigs& configs = GM.getConfigs();
-	createQuad();
-
-	GM_BEGIN_CHECK_GL_ERROR
-	d->clientRect = renderRect;
-	d->renderWidth = renderRect.width;
-	d->renderHeight = renderRect.height;
-	d->viewport = { d->clientRect.x, d->clientRect.y, d->renderWidth, d->renderHeight };
-	d->sampleOffsets[0] = 1.f / d->renderWidth;
-	d->sampleOffsets[1] = 1.f / d->renderHeight;
-
-	// 指定分辨率的framebuffer
-	{
-		glGenFramebuffers(1, &d->fbo);
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo);
-		glGenTextures(1, &d->texture);
-		glBindTexture(GL_TEXTURE_2D, d->texture);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, d->renderWidth, d->renderHeight, 0, GL_RGB, GL_FLOAT, NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, d->texture, 0);
-	
-		GLuint attachments[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, attachments);
-	
-		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
-		{
-			gm_error("FB incomplete error, status: 0x%x\n", status);
-			return false;
-		}
-	
-		glGenRenderbuffers(1, &d->depthBuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffer);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, d->renderWidth, d->renderHeight);
-		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffer);
-		GM_CHECK_GL_ERROR();
-		status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-		if (status != GL_FRAMEBUFFER_COMPLETE)
-		{
-			gm_error("FB incomplete error, status: 0x%x\n", status);
-			return false;
-		}
-		releaseBind();
-	}
-
-	GM_END_CHECK_GL_ERROR
-	return true;
-}
-
-void GMGLFramebufferDep::beginDrawEffects()
-{
-	D(d);
-	GM_BEGIN_CHECK_GL_ERROR
-	d->effects = d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
-	GMEngine->setViewport(d->viewport);
-	d->hasBegun = true;
-	newFrame();
-	bindForWriting();
-	GM_END_CHECK_GL_ERROR
-}
-
-void GMGLFramebufferDep::endDrawEffects()
-{
-	D(d);
-	d->hasBegun = false;
-	releaseBind();
-}
-
-void GMGLFramebufferDep::draw(GMGLShaderProgram* program)
-{
-	D(d);
-	const char* filterUniformName = nullptr;
-	GM_BEGIN_CHECK_GL_ERROR
-	program->useProgram();
-	GM_END_CHECK_GL_ERROR
-
-
-	const auto& desc = program->getDesc();
-	GM_BEGIN_CHECK_GL_ERROR
-	program->setFloat(desc.FilterAttributes.KernelDeltaX, d->sampleOffsets[0]);
-	program->setFloat(desc.FilterAttributes.KernelDeltaY, d->sampleOffsets[1]);
-	GM_END_CHECK_GL_ERROR
-
-	bindForWriting();
-	turnOffBlending();
-	if (d->effects != GMFilterMode::None)
-	{
-		GMFilterMode::Mode filter = GMFilterMode::None + 1;
-		while (filter != GMFilterMode::EndOfEnum)
-		{
-			if (d->effects == filter)
-			{
-				filterUniformName = useShaderProgramAndApplyFilter(program, filter);
-				renderQuad();
-				break;
-			}
-			++filter;
-		}
-	}
-	else
-	{
-		const char* name = useShaderProgramAndApplyFilter(program, GMFilterMode::None);
-		renderQuad();
-	}
-
-	//Reset effects
-	if (filterUniformName)
-		program->setBool(filterUniformName, false);
-
-	releaseBind();
-	GMEngine->setViewport(d->clientRect);
-
-	// 处理融混
-	blending();
-	renderQuad();
-}
-
-GLuint GMGLFramebufferDep::framebuffer()
-{
-	D(d);
-	return d->fbo;
-}
-
-void GMGLFramebufferDep::bindForWriting()
-{
-	D(d);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, framebuffer());
-}
-
-void GMGLFramebufferDep::bindForReading()
-{
-	D(d);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebuffer());
-}
-
-void GMGLFramebufferDep::releaseBind()
-{
-	GM_BEGIN_CHECK_GL_ERROR
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	GM_END_CHECK_GL_ERROR
-}
-
-void GMGLFramebufferDep::newFrame()
-{
-	bindForWriting();
-	GMGLGraphicEngine::newFrameOnCurrentFramebuffer();
-	releaseBind();
-}
-
-void GMGLFramebufferDep::createQuad()
-{
-	D(d);
-	if (d->quadVAO == 0)
-	{
-		static GLfloat quadVertices[] = {
-			// Positions		// Texture Coords
-			-1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-			1.0f, 1.0f, 0.0f, 1.0f, 1.0f,
-			1.0f, -1.0f, 0.0f, 1.0f, 0.0f,
-		};
-
-		GM_BEGIN_CHECK_GL_ERROR
-		glGenVertexArrays(1, &d->quadVAO);
-		glBindVertexArray(d->quadVAO);
-		glGenBuffers(1, &d->quadVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, d->quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-		GM_END_CHECK_GL_ERROR
-	}
-}
-
-void GMGLFramebufferDep::turnOffBlending()
-{
-	glDisable(GL_BLEND);
-}
-
-void GMGLFramebufferDep::blending()
-{
-	if (!GMEngine->isBlending())
-	{
-		glDisable(GL_BLEND);
-	}
-	else
-	{
-		glEnable(GL_BLEND);
-		GMGLUtility::blendFunc(GMEngine->blendsfactor(), GMEngine->blenddfactor());
-	}
-}
-
-void GMGLFramebufferDep::renderQuad()
-{
-	D(d);
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_CULL_FACE);
-
-	glBindVertexArray(d->quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-
-	GM_CHECK_GL_ERROR();
-}
-
-void GMGLFramebufferDep::disposeQuad()
-{
-	D(d);
-	glBindVertexArray(0);
-	if (d->quadVAO)
-		glDeleteVertexArrays(1, &d->quadVAO);
-
-	if (d->quadVBO)
-		glDeleteBuffers(1, &d->quadVBO);
-}
-
-const char* GMGLFramebufferDep::useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect)
-{
-	D(d);
-	const char* uniformName = nullptr;
-	program->setInt(GMSHADER_FRAMEBUFFER, 0);
-	GM_CHECK_GL_ERROR();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, d->texture);
-	GM_CHECK_GL_ERROR();
-
-	for (auto iter = std::begin(s_effects_uniformNames); iter != std::end(s_effects_uniformNames); ++iter)
-	{
-		if (iter->first == effect)
-		{
-			program->setBool(iter->second, true);
-			uniformName = iter->second;
-		}
-		else
-		{
-			program->setBool(iter->second, false);
-		}
-	}
-	return uniformName;
-}
-
 GMGLFramebuffer::~GMGLFramebuffer()
 {
 	D(d);
@@ -651,13 +360,17 @@ void GMGLFramebuffers::bind()
 	
 	if (d->framebuffersCreated)
 	{
+		GM_BEGIN_CHECK_GL_ERROR
 		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+		GM_END_CHECK_GL_ERROR
 	}
 }
 
 void GMGLFramebuffers::unbind()
 {
+	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
@@ -720,9 +433,9 @@ void GMGLFramebuffers::clear()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-ITexture* GMGLFramebuffers::getTexture(GMuint index)
+IFramebuffer* GMGLFramebuffers::getFramebuffer(GMuint index)
 {
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
-	return d->framebuffers[index]->getTexture();
+	return d->framebuffers[index];
 }

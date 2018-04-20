@@ -48,12 +48,11 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	// 著色器程序
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
 	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
-	GMGLShaderProgram* effectsShaderProgram = nullptr;
+	GMGLShaderProgram* filterShaderProgram = nullptr;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
 
 	GMGLGBuffer gbuffer;
-	GMGLFramebufferDep framebuffer;
 
 	// 延迟渲染的四边形
 	GMuint quadVAO = 0;
@@ -178,7 +177,6 @@ private:
 	void installShaders();
 	void activateLights(const Vector<GMLight>& lights);
 	bool refreshGBuffer();
-	bool refreshFramebuffer();
 	void forwardRender(GMGameObject* objects[], GMuint count);
 	void geometryPass(Vector<GMGameObject*>& objects);
 	void lightPass();

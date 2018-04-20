@@ -295,7 +295,6 @@ void GameMachine::updateGameMachineRunningStates()
 	gm::IWindow* mainWindow = getMainWindow();
 	if (mainWindow)
 	{
-		d->states.clientRect = mainWindow->getClientRect();
-		d->states.windowRect = mainWindow->getWindowRect();
+		d->states.renderRect = mainWindow->getRenderRect();
 	}
 }

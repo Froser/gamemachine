@@ -203,6 +203,7 @@ enum class GMShaderProgramType
 	ForwardShaderProgram, //!< 正向渲染着色器程序
 	DeferredGeometryPassShaderProgram, //!< 延迟渲染Geometry Pass阶段着色器程序
 	DeferredLightPassShaderProgram, //!< 延迟渲染Light Pass阶段着色器程序
+	FilterShaderProgram, //!< 滤镜着色器程序
 };
 
 enum class GMMovement
@@ -318,7 +319,7 @@ GM_INTERFACE(IFramebuffers)
 	virtual void bind() = 0;
 	virtual void unbind() = 0;
 	virtual void clear() = 0;
-	virtual ITexture* getTexture(GMuint) = 0;
+	virtual IFramebuffer* getFramebuffer(GMuint) = 0;
 };
 
 GM_INTERFACE(IShaderLoadCallback)
@@ -495,7 +496,7 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	*/
 	virtual bool handleMessage() = 0;
 	virtual GMRect getWindowRect() = 0;
-	virtual GMRect getClientRect() = 0;
+	virtual GMRect getRenderRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
 	virtual bool event(const GameMachineMessage& msg) = 0;
 	virtual bool isWindowActivate() = 0;

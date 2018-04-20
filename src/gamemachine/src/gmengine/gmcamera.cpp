@@ -178,7 +178,7 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 {
 	D(d);
-	const GMRect& cr = GM.getGameMachineRunningStates().clientRect;
+	const GMRect& cr = GM.getGameMachineRunningStates().renderRect;
 	GMVec3 world = Unproject(
 		GMVec3(x, y, 1),
 		0,

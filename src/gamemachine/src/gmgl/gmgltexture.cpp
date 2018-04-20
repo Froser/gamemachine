@@ -102,7 +102,7 @@ void GMGLTexture::init()
 	if (d->inited)
 		return;
 
-	if (d->image)
+	if (!d->image)
 	{
 		GM_ASSERT(false);
 		return;
@@ -160,44 +160,49 @@ void GMGLTexture::init()
 void GMGLTexture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
+	glActiveTexture(GL_TEXTURE0 + textureIndex);
 	glBindTexture(d->target, d->id);
 
-	// Apply params
-	glTexParameteri(d->target, GL_TEXTURE_MIN_FILTER,
-		frames->getMinFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-		frames->getMinFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-		frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-		frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-		frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-		frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
-	);
+	if (!d->texParamsSet)
+	{
+		// Apply params
+		glTexParameteri(d->target, GL_TEXTURE_MIN_FILTER,
+			frames->getMinFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
+			frames->getMinFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
+			frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+			frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+			frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+			frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+		);
 
-	glTexParameteri(d->target, GL_TEXTURE_MAG_FILTER,
-		frames->getMagFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-		frames->getMagFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-		frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-		frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-		frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-		frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
-	);
+		glTexParameteri(d->target, GL_TEXTURE_MAG_FILTER,
+			frames->getMagFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
+			frames->getMagFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
+			frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+			frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+			frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+			frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+		);
 
-	glTexParameteri(d->target, GL_TEXTURE_WRAP_S, 
-		frames->getWrapS() == GMS_Wrap::REPEAT ? GL_REPEAT :
-		frames->getWrapS() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-		frames->getWrapS() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-		frames->getWrapS() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
-	);
-	
-	glTexParameteri(d->target, GL_TEXTURE_WRAP_T,
-		frames->getWrapT() == GMS_Wrap::REPEAT ? GL_REPEAT :
-		frames->getWrapT() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-		frames->getWrapT() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-		frames->getWrapT() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
-	);
+		glTexParameteri(d->target, GL_TEXTURE_WRAP_S,
+			frames->getWrapS() == GMS_Wrap::REPEAT ? GL_REPEAT :
+			frames->getWrapS() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+			frames->getWrapS() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+			frames->getWrapS() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+		);
 
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		glTexParameteri(d->target, GL_TEXTURE_WRAP_T,
+			frames->getWrapT() == GMS_Wrap::REPEAT ? GL_REPEAT :
+			frames->getWrapT() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+			frames->getWrapT() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+			frames->getWrapT() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+		);
+
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+		d->texParamsSet = true;
+	}
 }

@@ -18,6 +18,7 @@ GM_PRIVATE_OBJECT(GMGLTexture)
 	GMuint internalFormat = 0;
 	GMuint dataType = 0;
 	const GMImage* image = nullptr;
+	bool texParamsSet = false;
 };
 
 class GMGLTexture : public ITexture

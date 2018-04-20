@@ -77,7 +77,7 @@ gm::GMRect GMUIWindow::getWindowRect()
 	return r;
 }
 
-gm::GMRect GMUIWindow::getClientRect()
+gm::GMRect GMUIWindow::getRenderRect()
 {
 	RECT rect;
 	GetClientRect(getWindowHandle(), &rect);
@@ -141,19 +141,22 @@ void GMUIWindow::setLockWindow(bool lock)
 bool GMUIWindow::createWindow(const gm::GMWindowAttributes& wndAttrs, const gm::GMwchar* className)
 {
 	D(d);
-	registerClass(wndAttrs, className);
+	// 在非全屏的时候才有效，计算出客户窗口（渲染窗口）大小
+	gm::GMWindowAttributes attrs = wndAttrs;
+	::AdjustWindowRectEx(&attrs.rc, attrs.dwStyle, FALSE, attrs.dwExStyle);
+	registerClass(attrs, className);
 	gm::GMWindowHandle hwnd = ::CreateWindowEx(
-		wndAttrs.dwExStyle,
+		attrs.dwExStyle,
 		className,
-		wndAttrs.windowName.toStdWString().c_str(),
-		wndAttrs.dwStyle,
-		wndAttrs.rc.left,
-		wndAttrs.rc.top,
-		wndAttrs.rc.right - wndAttrs.rc.left,
-		wndAttrs.rc.bottom - wndAttrs.rc.top,
-		wndAttrs.hwndParent,
-		wndAttrs.hMenu,
-		wndAttrs.instance,
+		attrs.windowName.toStdWString().c_str(),
+		attrs.dwStyle,
+		attrs.rc.left,
+		attrs.rc.top,
+		attrs.rc.right - attrs.rc.left,
+		attrs.rc.bottom - attrs.rc.top,
+		attrs.hwndParent,
+		attrs.hMenu,
+		attrs.instance,
 		this);
 	GM_ASSERT(hwnd);
 	return !!hwnd;

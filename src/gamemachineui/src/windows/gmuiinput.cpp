@@ -75,7 +75,7 @@ void GMUIInput::setDetectingMode(bool enable)
 	D(d);
 	if (enable)
 	{
-		const gm::GMRect& rect = GM.getGameMachineRunningStates().windowRect;
+		const gm::GMRect& rect = GM.getGameMachineRunningStates().renderRect;
 		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
 		::ShowCursor(FALSE);
 	}

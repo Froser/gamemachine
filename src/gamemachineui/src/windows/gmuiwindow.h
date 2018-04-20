@@ -37,7 +37,7 @@ public:
 	virtual bool handleMessage() override;
 	virtual void update() override;
 	virtual gm::GMRect getWindowRect() override;
-	virtual gm::GMRect getClientRect() override;
+	virtual gm::GMRect getRenderRect() override;
 	virtual void centerWindow() override;
 	virtual bool isWindowActivate() override;
 	virtual void setLockWindow(bool lock) override;

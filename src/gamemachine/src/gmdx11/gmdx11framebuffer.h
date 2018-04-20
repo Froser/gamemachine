@@ -65,7 +65,7 @@ public:
 	virtual void bind() override;
 	virtual void unbind() override;
 	virtual void clear() override;
-	virtual ITexture* getTexture(GMuint index) override;
+	virtual IFramebuffer* getFramebuffer(GMuint) override;
 };
 
 END_NS

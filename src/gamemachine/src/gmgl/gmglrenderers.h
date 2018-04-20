@@ -36,6 +36,14 @@ protected:
 		}
 		return d->variablesDesc;
 	}
+
+protected:
+	virtual void activateTextureTransform(GMModel* model, GMTextureType type, GMint index);
+	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
+	virtual void deactivateTexture(GMTextureType type, GMint index);
+	virtual void getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId);
+	virtual void drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
+	virtual ITexture* getTexture(GMTextureFrames& frames);
 };
 
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
@@ -60,13 +68,7 @@ public:
 protected:
 	void activateMaterial(const GMShader& shader);
 	void drawDebug();
-	void drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
-	ITexture* getTexture(GMTextureFrames& frames);
-	void activateTextureTransform(GMModel* model, GMTextureType type, GMint index);
-	void activateTexture(GMModel* model, GMTextureType type, GMint index);
-	void deactivateTexture(GMTextureType type, GMint index);
 	void activateShader();
-	void getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId);
 };
 
 class GMGLRenderer_2D : public GMGLRenderer_3D
@@ -89,6 +91,17 @@ public:
 	virtual void endModel() override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
+};
+
+class GMGLRenderer_Filter : public GMGLRenderer
+{
+	virtual void beforeDraw(GMModel* model) override;
+	virtual void afterDraw(GMModel* model) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void endModel() override;
+
+protected:
+	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
 };
 
 END_NS

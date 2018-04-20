@@ -236,7 +236,7 @@ void Demo_Model::handleDragging()
 		gm::GMfloat rotateX = d->mouseDownX - state.posX;
 
 		GMQuat q = Rotate(d->gameObject->getRotation(),
-			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
+			PI * rotateX / GM.getGameMachineRunningStates().renderRect.width,
 			GMVec3(0, 1, 0));
 		d->gameObject->setRotation(q);
 		d->gameObject2->setRotation(q);
@@ -252,11 +252,11 @@ void Demo_Model::handleDragging()
 		GMVec3 lookAt3 = Normalize(s_lookAt.lookAt);
 		GMVec4 lookAt = GMVec4(lookAt3, 1.f);
 		GMQuat q = Rotate(d->lookAtRotation,
-			PI * rotateX / GM.getGameMachineRunningStates().windowRect.width,
+			PI * rotateX / GM.getGameMachineRunningStates().renderRect.width,
 			GMVec3(0, 1, 0));
 		d->lookAtRotation = q;
 		q = Rotate(d->lookAtRotation,
-			PI * rotateY / GM.getGameMachineRunningStates().windowRect.width,
+			PI * rotateY / GM.getGameMachineRunningStates().renderRect.width,
 			GMVec3(1, 0, 0));
 		d->lookAtRotation = q;
 		gm::GMCameraLookAt cameraLookAt = {

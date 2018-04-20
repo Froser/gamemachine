@@ -20,7 +20,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		IFactory* factory = GM.getFactory();
 		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
 		GMFramebufferDesc desc = { 0 };
-		desc.rect = states.windowRect;
+		desc.rect = states.renderRect;
 		factory->createFramebuffers(&d->filterFramebuffers);
 		GM_ASSERT(d->filterFramebuffers);
 		d->filterFramebuffers->init(desc);
@@ -37,7 +37,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &quad);
 		GM_ASSERT(quad);
 		quad->setType(GMModelType::Filter);
-		quad->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0).addFrame(d->filterFramebuffers->getTexture(0));
+		quad->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0).addFrame(d->filterFramebuffers->getFramebuffer(0)->getTexture());
 		d->filterQuadModel.reset(quad);
 		GM.createModelPainterAndTransfer(quad);
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);

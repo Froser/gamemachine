@@ -352,7 +352,7 @@ template <typename T>
 class GMSingleton
 {
 public:
-	static T& instance()
+	static inline T& instance()
 	{
 		static T _instance;
 		return _instance;

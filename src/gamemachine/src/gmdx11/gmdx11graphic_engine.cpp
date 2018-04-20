@@ -16,7 +16,7 @@ void GMDx11GraphicEngine::init()
 
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 
-	const GMRect& renderRect = GM.getGameMachineRunningStates().windowRect;
+	const GMRect& renderRect = GM.getGameMachineRunningStates().renderRect;
 	d->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1.f / renderRect.width, 1.f / renderRect.height));
 }
 

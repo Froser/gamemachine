@@ -26,7 +26,7 @@ GMControlGameObject::GMControlGameObject(GMControlGameObject* parent)
 	if (parent)
 		parent->addChild(this);
 
-	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
+	const GMRect& client = GM.getGameMachineRunningStates().renderRect;
 	d->clientSize = client;
 }
 
@@ -158,7 +158,7 @@ void GMControlGameObject::updateUI()
 	switch (GM.peekMessage().msgType)
 	{
 	case GameMachineMessageType::WindowSizeChanged:
-		const GMRect& nowClient = GM.getGameMachineRunningStates().clientRect;
+		const GMRect& nowClient = GM.getGameMachineRunningStates().renderRect;
 		GMfloat scaleX = (GMfloat)nowClient.width / d->clientSize.width,
 			scaleY = (GMfloat)nowClient.height / d->clientSize.height;
 
@@ -173,7 +173,7 @@ void GMControlGameObject::updateUI()
 GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 {
 	// 得到一个原点在中心，x属于[-1,1],y属于[-1,1]范围的参考系的坐标
-	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
+	const GMRect& client = GM.getGameMachineRunningStates().renderRect;
 	GMRectF out = {
 		in.x * 2.f / client.width - 1.f,
 		1.f - in.y * 2.f / client.height,
@@ -185,7 +185,7 @@ GMRectF GMControlGameObject::toViewportCoord(const GMRect& in)
 
 GMRect GMControlGameObject::toControlCoord(const GMRectF& in)
 {
-	const GMRect& client = GM.getGameMachineRunningStates().clientRect;
+	const GMRect& client = GM.getGameMachineRunningStates().renderRect;
 	GMRect out = {
 		(GMint)((in.x + 1) * client.width * .5f),
 		(GMint)((1 - in.y) * client.height * .5f),

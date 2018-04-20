@@ -1,11 +1,11 @@
 #version 330
-
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec2 texCoords;
+#include "../foundation/vert_header.h"
 
 out vec2 _texCoords;
 void main()
 {
-	gl_Position = vec4(position, 1.0f);
-	_texCoords = texCoords;
+	init_layouts();
+	vec2 uv_gl = vec2(uv.x, 1.f - uv.y);
+	gl_Position = position;
+	_texCoords = uv_gl;
 }

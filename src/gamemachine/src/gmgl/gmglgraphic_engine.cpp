@@ -34,40 +34,6 @@ extern "C"
 	}
 }
 
-class GMEffectRenderer
-{
-public:
-	GMEffectRenderer(GMGLFramebufferDep& framebuffer, GMGLShaderProgram* program)
-		: m_effectBuffer(framebuffer)
-		, m_program(program)
-	{
-		if (!m_effectBuffer.hasBegun()) // 防止绘制嵌套
-		{
-			m_isHost = true;
-			m_effectBuffer.beginDrawEffects();
-		}
-	}
-
-	~GMEffectRenderer()
-	{
-		if (m_isHost || !m_effectBuffer.hasBegun())
-		{
-			m_effectBuffer.endDrawEffects();
-			m_effectBuffer.draw(m_program);
-		}
-	}
-
-	GLuint framebuffer()
-	{
-		return m_effectBuffer.framebuffer();
-	}
-
-private:
-	GMGLFramebufferDep& m_effectBuffer;
-	GMGLShaderProgram* m_program;
-	bool m_isHost = false;
-};
-
 GMGLGraphicEngine::GMGLGraphicEngine()
 {
 	D(d);
@@ -79,7 +45,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
 	disposeDeferredRenderQuad();
-	GM_delete(d->effectsShaderProgram);
+	GM_delete(d->filterShaderProgram);
 	GM_delete(d->forwardShaderProgram);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]);
@@ -128,7 +94,7 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 	{
 	case GameMachineMessageType::WindowSizeChanged:
 	{
-		const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
+		const GMRect& rect = GM.getGameMachineRunningStates().renderRect;
 		setViewport(rect);
 
 		if (d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>() == GMRenderMode::Deferred)
@@ -139,9 +105,6 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 				d->renderConfig.set(GMRenderConfigs::RenderMode, (GMint)GMRenderMode::Forward);
 			}
 		}
-
-		if (!refreshFramebuffer())
-			gm_error("init framebuffer error");
 		break;
 	}
 	}
@@ -154,6 +117,13 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	GM_PROFILE("drawObjects");
 	if (!count)
 		return;
+
+	GMFilterMode::Mode filter = getCurrentFilterMode();
+	if (filter != GMFilterMode::None)
+	{
+		createFilterFramebuffer();
+		getFilterFramebuffers()->clear();
+	}
 
 #if _DEBUG
 	++d->drawingLevel;
@@ -190,9 +160,21 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 				geometryPass(d->deferredRenderingGameObjects);
 
 				{
-					GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
+					if (filter != GMFilterMode::None)
+					{
+						IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+						GM_ASSERT(filterFramebuffers);
+						filterFramebuffers->bind();
+					}
 					lightPass();
-					d->gbuffer.copyDepthBuffer(effectRender.framebuffer());
+					if (filter != GMFilterMode::None)
+					{
+						GMGLFramebuffers* filterBuffers = static_cast<GMGLFramebuffers*>(getFilterFramebuffers());
+						d->gbuffer.copyDepthBuffer(filterBuffers->framebufferId());
+						getFilterFramebuffers()->unbind();
+						getFilterQuad()->draw();
+					}
+
 					forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 					setCurrentRenderMode(GMRenderMode::Deferred);
 				}
@@ -226,8 +208,8 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	switch (id)
 	{
 	case GameMachineInterfaceID::GLEffectShaderProgram:
-		d->effectsShaderProgram = static_cast<GMGLShaderProgram*>(in);
-		d->effectsShaderProgram->load();
+		d->filterShaderProgram = static_cast<GMGLShaderProgram*>(in);
+		d->filterShaderProgram->load();
 		break;
 	case GameMachineInterfaceID::GLForwardShaderProgram:
 		d->forwardShaderProgram = static_cast<GMGLShaderProgram*>(in);
@@ -304,23 +286,12 @@ void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
 bool GMGLGraphicEngine::refreshGBuffer()
 {
 	D(d);
-	const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
+	const GMRect& rect = GM.getGameMachineRunningStates().renderRect;
 	if (rect.width <= 0 || rect.height <= 0)
 		return true;
 
 	d->gbuffer.dispose();
 	return d->gbuffer.init(rect);
-}
-
-bool GMGLGraphicEngine::refreshFramebuffer()
-{
-	D(d);
-	const GMRect& rect = GM.getGameMachineRunningStates().clientRect;
-	if (rect.width <= 0 || rect.height <= 0)
-		return true;
-
-	d->framebuffer.dispose();
-	return d->framebuffer.init(rect);
 }
 
 void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
@@ -489,7 +460,6 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
 	setCurrentRenderMode(GMRenderMode::Forward);
-	d->framebuffer.releaseBind();
 	forwardRender(objects, count);
 }
 
@@ -498,18 +468,22 @@ void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 	D(d);
 	setCurrentRenderMode(GMRenderMode::Forward);
 	activateLightsIfNecessary();
-	GMFilterMode::Mode filterMode = getCurrentFilterMode();
-	if (filterMode != GMFilterMode::None)
-		createFilterFramebuffer();
+	if (!count)
+		return;
 
-	if (d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>() != GMFilterMode::None)
+	GMFilterMode::Mode filter = getCurrentFilterMode();
+	if (filter != GMFilterMode::None)
 	{
-		// GMEffectRenderer effectRender(d->framebuffer, d->effectsShaderProgram);
-		forwardRender(objects, count);
+		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+		GM_ASSERT(filterFramebuffers);
+		filterFramebuffers->bind();
 	}
-	else
+
+	forwardRender(objects, count);
+	if (filter != GMFilterMode::None)
 	{
-		forwardRender(objects, count);
+		getFilterFramebuffers()->unbind();
+		getFilterQuad()->draw();
 	}
 }
 
@@ -612,6 +586,7 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 	static GMGLRenderer_2D s_renderer2d;
 	static GMGLRenderer_3D s_renderer3d;
 	static GMGLRenderer_CubeMap s_rendererCubeMap;
+	static GMGLRenderer_Filter s_rendererFilter;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -621,6 +596,8 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 		return &s_renderer3d;
 	case GMModelType::CubeMap:
 		return &s_rendererCubeMap;
+	case GMModelType::Filter:
+		return &s_rendererFilter;
 	default:
 		GM_ASSERT(false);
 		return nullptr;
@@ -683,6 +660,10 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 	else if (type == GMShaderProgramType::DeferredGeometryPassShaderProgram)
 	{
 		return d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER];
+	}
+	else if (type == GMShaderProgramType::FilterShaderProgram)
+	{
+		return d->filterShaderProgram;
 	}
 	else
 	{

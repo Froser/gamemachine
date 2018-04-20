@@ -192,9 +192,9 @@ void GMDx11Framebuffers::clear()
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
 }
 
-ITexture* GMDx11Framebuffers::getTexture(GMuint index)
+IFramebuffer* GMDx11Framebuffers::getFramebuffer(GMuint index)
 {
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
-	return d->framebuffers[index]->getTexture();
+	return d->framebuffers[index];
 }

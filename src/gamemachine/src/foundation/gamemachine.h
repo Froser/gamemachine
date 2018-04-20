@@ -54,8 +54,7 @@ class GMCursorGameObject;
 struct GMGameMachineRunningStates
 {
 	// 每一帧更新的内容
-	GMRect clientRect; //!< 当前窗口客户区域的位置和大小。
-	GMRect windowRect; //!< 当前窗口的位置和大小。
+	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
 	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
 	bool crashDown = false; //!< 程序是否已崩溃。当遇到不可恢复的错误时，此项为true。
 

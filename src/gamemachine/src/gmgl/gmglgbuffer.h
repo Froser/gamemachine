@@ -49,7 +49,7 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 	GMint renderWidth = 0;
 	GMint renderHeight = 0;
 	GMint currentTurn = 0;
-	GMRect clientRect = { 0 };
+	GMRect renderRect = { 0 };
 	GMRect viewport = { 0 };
 };
 
@@ -67,7 +67,7 @@ public:
 	void beginPass();
 	bool nextPass();
 	void dispose();
-	bool init(const GMRect& clientRect);
+	bool init(const GMRect& renderRect);
 	void bindForWriting();
 	void bindForReading();
 	void releaseBind();
@@ -98,43 +98,9 @@ GM_PRIVATE_OBJECT(GMGLFramebufferDep)
 	GMfloat sampleOffsets[2] = { 0 };
 	GMFilterMode::Mode effects = GMFilterMode::None;
 	bool hasBegun = false;
-	GMRect clientRect = { 0 };
+	GMRect renderRect = { 0 };
 	GMRect viewport = { 0 };
 	GMRenderConfig renderConfig;
-};
-
-class GMGLFramebufferDep : public GMObject
-{
-	DECLARE_PRIVATE(GMGLFramebufferDep)
-
-public:
-	GMGLFramebufferDep();
-	~GMGLFramebufferDep();
-
-public:
-	void dispose();
-	bool init(const GMRect& renderRect);
-	void beginDrawEffects();
-	void endDrawEffects();
-	void draw(GMGLShaderProgram* program);
-	GMuint framebuffer();
-	void bindForWriting();
-	void bindForReading();
-	void releaseBind();
-
-public:
-	inline bool hasBegun() { D(d); return d->hasBegun; }
-	inline GMuint getWidth() { D(d); return d->renderWidth; }
-	inline GMuint getHeight() { D(d); return d->renderHeight; }
-
-private:
-	void newFrame();
-	void createQuad();
-	void turnOffBlending();
-	void blending();
-	void renderQuad();
-	void disposeQuad();
-	const char* useShaderProgramAndApplyFilter(GMGLShaderProgram* program, GMFilterMode::Mode effect);
 };
 
 GM_PRIVATE_OBJECT(GMGLFramebuffer)
@@ -178,7 +144,14 @@ public:
 	virtual void bind() override;
 	virtual void unbind() override;
 	virtual void clear() override;
-	virtual ITexture* getTexture(GMuint) override;
+	virtual IFramebuffer* getFramebuffer(GMuint) override;
+
+public:
+	inline GMuint framebufferId()
+	{
+		D(d);
+		return d->fbo;
+	}
 
 private:
 	void createDepthStencilBuffer(const GMFramebufferDesc& desc);
