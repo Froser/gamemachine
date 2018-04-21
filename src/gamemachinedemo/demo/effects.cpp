@@ -3,7 +3,7 @@
 
 void Demo_Effects::onActivate()
 {
-	D_BASE(d, Base::Base);
+	D_BASE(d, DemoHandler);
 	Base::onActivate();
 	// 使用预设特效非常简单，只需要设置此状态即可
 	// 如果是自定义特效，需要自行修改着色器

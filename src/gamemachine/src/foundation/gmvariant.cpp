@@ -34,10 +34,10 @@ void GMVariant::makeOwned(const T& obj)
 	m_data.p = new T(obj);
 }
 
-template <GMVariant::Type Type>
+template <GMVariant::Type T>
 void GMVariant::copyOwned(const GMVariant& rhs)
 {
-	typedef EnumTypeMap<Type>::StructType RealType;
+	typedef EnumTypeMap<T>::StructType RealType;
 	m_data.p = new RealType(rhs.get<RealType>(rhs.m_data.p));
 }
 
