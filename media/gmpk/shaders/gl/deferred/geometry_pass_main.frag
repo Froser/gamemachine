@@ -1,4 +1,4 @@
-#version 330 core
+#version 410 core
 #include "../foundation/foundation.h"
 #include "../foundation/properties.h"
 #include "../foundation/frag_header.h"

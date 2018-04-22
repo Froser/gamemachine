@@ -38,7 +38,19 @@ namespace
 			{ "ka", "kd", "ks", "shininess", "refractivity" },
 			"GM_material",
 
-			{ "GM_filter", "GM_effects_texture_offset_x", "GM_effects_texture_offset_y" }
+			{
+				"GM_filter",
+				"GM_effects_texture_offset_x",
+				"GM_effects_texture_offset_y",
+				{
+					"DefaultFilter",
+					"InversionFilter",
+					"SharpenFilter",
+					"BlurFilter",
+					"GrayscaleFilter",
+					"EdgeDetectFilter",
+				}
+			}
 		};
 		return desc;
 	}
@@ -145,6 +157,22 @@ void GMGLShaderProgram::setBool(const GMString& name, bool value)
 	setInt(name, (GMint)value);
 }
 
+bool GMGLShaderProgram::setSubrotinue(const char*  funcName, const char*  implement, GMuint shaderType)
+{
+	D(d);
+	GLint subroutineUniform = glGetSubroutineUniformLocation(d->shaderProgram, shaderType, funcName);
+	if (subroutineUniform >= 0)
+	{
+		GLuint subroutineIndex = glGetSubroutineIndex(d->shaderProgram, shaderType, implement);
+		if (subroutineIndex != GL_INVALID_INDEX)
+		{
+			glUniformSubroutinesuiv(shaderType, 1, &subroutineIndex);
+			return true;
+		}
+	}
+	return false;
+}
+
 void GMGLShaderProgram::load()
 {
 	D(d);
@@ -160,7 +188,7 @@ void GMGLShaderProgram::load()
 		d->shaders.push_back(shader);
 
 		expandSource(entry); // 展开glsl
-		std::string src = entry.source.toStdString();
+		const std::string& src = entry.source.toStdString();
 		const GLchar* source = src.c_str();
 		if (!source)
 		{

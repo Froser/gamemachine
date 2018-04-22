@@ -45,18 +45,6 @@ namespace
 		// 4
 	};
 
-	// 和GMFilterMode::Mode保持一致
-	constexpr const char* GMSHADER_FilterVariablesMap[] = {
-		"DefaultFilter",
-		"InversionFilter",
-		"SharpenFilter",
-		"BlurFilter",
-		"GrayscaleFilter",
-		"EdgeDetectFilter",
-	};
-
-	constexpr const char* GMSHADER_DefaultFilter = "DefaultFilter";
-
 	inline D3D_PRIMITIVE_TOPOLOGY getMode(GMTopologyMode mode)
 	{
 		switch (mode)
@@ -814,7 +802,7 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	const GMVec2& kernelOffset = getEngine()->getCurrentFilterKernelDelta();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 
-	const char* filterInstanceVariable = GMSHADER_FilterVariablesMap[filterMode];
+	const char* filterInstanceVariable = desc->FilterAttributes.Types[filterMode];
 	ID3DX11EffectClassInstanceVariable* filterInstance = d->effect->GetVariableByName(filterInstanceVariable)->AsClassInstance();
 	if (filterInstance->IsValid())
 	{
@@ -823,7 +811,7 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	else
 	{
 		gm_error("Filter instance not found, use default instead.");
-		filterInstance = d->effect->GetVariableByName(GMSHADER_DefaultFilter)->AsClassInstance();
+		filterInstance = d->effect->GetVariableByName(desc->FilterAttributes.Types[0])->AsClassInstance();
 		GM_ASSERT(filterInstance);
 		GM_DX_HR(filterInterface->SetClassInstance(filterInstance));
 	}

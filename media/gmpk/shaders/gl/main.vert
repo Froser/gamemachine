@@ -1,4 +1,4 @@
-#version 330
+#version 410
 #include "foundation/foundation.h"
 #include "foundation/vert_header.h"
 

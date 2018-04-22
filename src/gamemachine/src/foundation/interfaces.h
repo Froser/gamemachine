@@ -243,11 +243,13 @@ struct GMShaderVariablesMaterialDesc
 	const char* Refreactivity;
 };
 
+constexpr int GMFilterCount = 6;
 struct GMShaderVariablesFilterDesc
 {
 	const char* Filter;
 	const char* KernelDeltaX;
 	const char* KernelDeltaY;
+	const char* Types[GMFilterCount];
 };
 
 struct GMShaderVariablesDesc

@@ -53,6 +53,7 @@ public:
 	void setInt(const GMString& name, GMint value);
 	void setFloat(const GMString& name, GMfloat value);
 	void setBool(const GMString& name, bool value);
+	bool setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType);
 
 private:
 	void setProgram(GMuint program) { D(d); d->shaderProgram = program; }

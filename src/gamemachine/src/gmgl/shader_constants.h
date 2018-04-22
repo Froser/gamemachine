@@ -20,12 +20,6 @@ BEGIN_NS
 
 //特效
 #define		GMSHADER_FRAMEBUFFER				GMSHADER("framebuffer")
-#define		GMSHADER_EFFECTS_NONE				GMSHADER("effects_none")
-#define		GMSHADER_EFFECTS_INVERSION			GMSHADER("effects_inversion")
-#define		GMSHADER_EFFECTS_SHARPEN			GMSHADER("effects_sharpen")
-#define		GMSHADER_EFFECTS_BLUR				GMSHADER("effects_blur")
-#define		GMSHADER_EFFECTS_GRAYSCALE			GMSHADER("effects_grayscale")
-#define		GMSHADER_EFFECTS_EDGEDETECT			GMSHADER("effects_edgedetect")
 
 // 获取名称辅助函数
 // 字符串拼接太慢，因此采用一些预设的字符串

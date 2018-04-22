@@ -1,4 +1,4 @@
-#version 330
+#version 410
 #include "../foundation/foundation.h"
 
 layout (location = 0) in vec3 position;

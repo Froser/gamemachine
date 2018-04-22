@@ -1,4 +1,4 @@
-#version 330
+#version 410
 #include "../foundation/effects.h"
 
 in vec2 _texCoords;

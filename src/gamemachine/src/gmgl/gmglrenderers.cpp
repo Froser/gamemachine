@@ -449,22 +449,10 @@ void GMGLRenderer_Filter::afterDraw(GMModel* model)
 
 void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	static constexpr const char* s_effects_uniformNames[] =
-	{
-		GMSHADER_EFFECTS_NONE,
-		GMSHADER_EFFECTS_INVERSION,
-		GMSHADER_EFFECTS_SHARPEN,
-		GMSHADER_EFFECTS_BLUR,
-		GMSHADER_EFFECTS_GRAYSCALE,
-		GMSHADER_EFFECTS_EDGEDETECT,
-	};
-
 	D(d);
 	IShaderProgram* shaderProgram = d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
 	GM_ASSERT(shaderProgram);
 	shaderProgram->useProgram();
-	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
-	shaderProgram->setInt(desc.FilterAttributes.Filter, d->engine->getCurrentFilterMode());
 }
 
 void GMGLRenderer_Filter::endModel()
@@ -475,7 +463,10 @@ GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, G
 {
 	D(d);
 	GMint texId = getTextureID(type, index);
-	IShaderProgram* shaderProgram = d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
+	GMGLShaderProgram* shaderProgram = static_cast<GMGLShaderProgram*>(d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram));
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
+
+	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
+	shaderProgram->setSubrotinue(desc.FilterAttributes.Filter, desc.FilterAttributes.Types[d->engine->getCurrentFilterMode()], GL_FRAGMENT_SHADER);
 	return texId;
 }
