@@ -27,9 +27,25 @@ extern "C"
 			const void* userParam
 			)
 		{
-			gm_error("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-				type, severity, message);
+			if (severity == GL_DEBUG_SEVERITY_MEDIUM || severity == GL_DEBUG_SEVERITY_HIGH)
+			{
+				gm_error("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					type, severity, message);
+				GM_ASSERT(false);
+			}
+			else if (severity == GL_DEBUG_SEVERITY_LOW)
+			{
+				gm_warning("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					type, severity, message);
+			}
+			else
+			{
+				gm_info("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					type, severity, message);
+			}
 		}
 	}
 }
@@ -358,21 +374,21 @@ void GMGLGraphicEngine::viewGBufferFrameBuffer()
 			width = d->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
 			height = d->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt();
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		d->gbuffer.beginPass();
-		GM_END_CHECK_GL_ERROR
+		
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		d->gbuffer.bindForReading();
-		GM_END_CHECK_GL_ERROR
+		
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
-		GM_END_CHECK_GL_ERROR
+		
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		glBlitFramebuffer(0, 0, d->gbuffer.getWidth(), d->gbuffer.getHeight(), x, y, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-		GM_END_CHECK_GL_ERROR
+		
 		d->gbuffer.releaseBind();
 	}
 }
@@ -394,10 +410,10 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	}
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		GM_END_CHECK_GL_ERROR
+		
 		break;
 	}
 	default:
@@ -412,17 +428,15 @@ void GMGLGraphicEngine::updateProjectionMatrix()
 	auto& desc = d->forwardShaderProgram->getDesc();
 	GMCamera& camera = GM.getCamera();
 	const GMMat4& proj = camera.getFrustum().getProjectionMatrix();
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	d->forwardShaderProgram->useProgram();
 	d->forwardShaderProgram->setMatrix4(desc.ProjectionMatrix, proj);
-	GM_END_CHECK_GL_ERROR
-
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
-	GM_END_CHECK_GL_ERROR
+	
 }
 
 void GMGLGraphicEngine::updateViewMatrix()
@@ -435,15 +449,14 @@ void GMGLGraphicEngine::updateViewMatrix()
 	GMFloat4 vec;
 	lookAt.position.loadFloat4(vec);
 
-	GM_BEGIN_CHECK_GL_ERROR
 	// 视觉位置，用于计算光照
 	d->forwardShaderProgram->useProgram();
 	d->forwardShaderProgram->setVec4(desc.ViewPosition, vec);
 	d->forwardShaderProgram->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->forwardShaderProgram->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
-	GM_END_CHECK_GL_ERROR
+	
 
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	// 视觉位置，用于计算光照
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
@@ -453,7 +466,6 @@ void GMGLGraphicEngine::updateViewMatrix()
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
-	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
@@ -554,12 +566,12 @@ void GMGLGraphicEngine::createDeferredRenderQuad()
 void GMGLGraphicEngine::renderDeferredRenderQuad()
 {
 	D(d);
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	glDisable(GL_CULL_FACE);
 	glBindVertexArray(d->quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
-	GM_END_CHECK_GL_ERROR
+	
 }
 
 void GMGLGraphicEngine::disposeDeferredRenderQuad()
@@ -575,9 +587,9 @@ void GMGLGraphicEngine::disposeDeferredRenderQuad()
 
 void GMGLGraphicEngine::setViewport(const GMRect& rect)
 {
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	glViewport(rect.x, rect.y, rect.width, rect.height);
-	GM_END_CHECK_GL_ERROR
+	
 }
 
 IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
@@ -677,9 +689,9 @@ void GMGLGraphicEngine::newFrameOnCurrentFramebuffer()
 	GLint mask;
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
 	glStencilMask(0xFF);
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	GM_END_CHECK_GL_ERROR
+	
 	glStencilMask(mask);
 }
 
@@ -695,7 +707,7 @@ void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()
 //////////////////////////////////////////////////////////////////////////
 void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 {
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	GMS_BlendFunc gms_factors[] = {
 		sfactor,
 		dfactor
@@ -739,5 +751,5 @@ void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 		}
 	}
 	glBlendFunc(factors[0], factors[1]);
-	GM_END_CHECK_GL_ERROR
+	
 }

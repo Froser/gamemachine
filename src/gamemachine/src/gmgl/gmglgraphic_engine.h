@@ -28,10 +28,6 @@ struct GMShaderProc
 	};
 };
 
-#define GM_CHECK_GL_ERROR() GM_ASSERT((s_glErrCode = glGetError()) == GL_NO_ERROR);
-#define GM_BEGIN_CHECK_GL_ERROR { GM_CHECK_GL_ERROR()
-#define GM_END_CHECK_GL_ERROR GM_CHECK_GL_ERROR() }
-
 enum
 {
 	DEFERRED_GEOMETRY_PASS_SHADER,

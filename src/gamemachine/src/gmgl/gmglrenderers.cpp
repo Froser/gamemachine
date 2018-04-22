@@ -17,14 +17,11 @@ namespace
 		{
 			glEnable(GL_BLEND);
 			GMGLUtility::blendFunc(shader.getBlendFactorSource(), shader.getBlendFactorDest());
-
-			GM_BEGIN_CHECK_GL_ERROR
+			
 			glDisable(GL_CULL_FACE);
-			GM_END_CHECK_GL_ERROR
 		}
 		else
 		{
-			GM_BEGIN_CHECK_GL_ERROR
 			glDisable(GL_BLEND);
 
 			if (shader.getCull() == GMS_Cull::NONE)
@@ -40,20 +37,20 @@ namespace
 
 				glEnable(GL_CULL_FACE);
 			}
-			GM_END_CHECK_GL_ERROR
+			
 		}
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		if (shader.getNoDepthTest())
 			glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
 		else
 			glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
-		GM_END_CHECK_GL_ERROR
+		
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		if (shader.getBlend())
 			glDepthMask(GL_FALSE);
-		GM_END_CHECK_GL_ERROR
+		
 
 		glLineWidth(shader.getLineWidth());
 	}
@@ -257,23 +254,23 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 
 	auto& desc = shaderProgram->getDesc();
 
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
-	GM_END_CHECK_GL_ERROR
+	
 
 	if (parent)
 	{
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
 		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
-		GM_END_CHECK_GL_ERROR
+		
 	}
 	else
 	{
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		shaderProgram->setMatrix4(desc.ModelMatrix, Identity<GMMat4>());
 		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, Identity<GMMat4>());
-		GM_END_CHECK_GL_ERROR
+		
 	}
 }
 
@@ -378,11 +375,11 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	auto& desc = shaderProgram->getDesc();
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
 	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 	shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
-	GM_END_CHECK_GL_ERROR
+	
 }
 
 void GMGLRenderer_CubeMap::endModel()
@@ -404,7 +401,7 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 		IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 		auto& desc = shaderProgram->getDesc();
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		IGraphicEngine* engine = GM.getGraphicEngine();
 		// 给延迟渲染程序传入CubeMap
 		{
@@ -424,11 +421,11 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 			shader->useProgram();
 			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		}
-		GM_END_CHECK_GL_ERROR
+		
 
-		GM_BEGIN_CHECK_GL_ERROR
+		
 		glTex->drawTexture(&frames, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		GM_END_CHECK_GL_ERROR
+		
 	}
 }
 

@@ -56,7 +56,6 @@ namespace
 			D_BASE(db, Base);
 			db->target = GL_TEXTURE_2D;
 
-			GM_BEGIN_CHECK_GL_ERROR
 			glGenTextures(1, &db->id);
 			glBindTexture(GL_TEXTURE_2D, db->id);
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
@@ -65,7 +64,6 @@ namespace
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 			db->texParamsSet = true;
-			GM_END_CHECK_GL_ERROR
 		}
 
 		GLuint getTextureId()
@@ -201,11 +199,9 @@ void GMGLGBuffer::activateTextures()
 	{
 		for (GMuint i = 0; i < GEOMETRY_NUM; i++)
 		{
-			GM_BEGIN_CHECK_GL_ERROR
 			shaderProgram->setInt(g_GBufferGeometryUniformNames[i], i);
 			glActiveTexture(GL_TEXTURE0 + i);
 			glBindTexture(GL_TEXTURE_2D, d->textures[i]);
-			GM_END_CHECK_GL_ERROR
 		}
 	}
 
@@ -213,11 +209,9 @@ void GMGLGBuffer::activateTextures()
 	{
 		for (GMuint i = 0; i < MATERIAL_NUM; i++)
 		{
-			GM_BEGIN_CHECK_GL_ERROR
 			shaderProgram->setInt(g_GBufferMaterialUniformNames[i], GEOMETRY_OFFSET + i);
 			glActiveTexture(GL_TEXTURE0 + GEOMETRY_OFFSET + i);
 			glBindTexture(GL_TEXTURE_2D, d->materials[i]);
-			GM_END_CHECK_GL_ERROR
 		}
 	}
 }
@@ -225,13 +219,11 @@ void GMGLGBuffer::activateTextures()
 void GMGLGBuffer::copyDepthBuffer(GLuint target)
 {
 	D(d);
-	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
 	glBlitFramebuffer(0, 0, d->renderWidth, d->renderHeight, 0, 0, d->renderWidth, d->renderHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-	GM_END_CHECK_GL_ERROR
 }
 
 bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray)
@@ -247,7 +239,6 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, textureArray[i], 0);
-		GM_CHECK_GL_ERROR();
 	}
 
 	// If using STENCIL buffer:
@@ -259,7 +250,6 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 	glBindRenderbuffer(GL_RENDERBUFFER, d->depthBuffers[s]);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, d->renderWidth, d->renderHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthBuffers[s]);
-	GM_CHECK_GL_ERROR();
 
 	if (!drawBuffers(textureCount))
 		return false;
@@ -275,9 +265,7 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 	}
 
-	GM_BEGIN_CHECK_GL_ERROR
 	glDrawBuffers(count, attachments.data());
-	GM_END_CHECK_GL_ERROR
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -359,17 +347,13 @@ void GMGLFramebuffers::bind()
 	
 	if (d->framebuffersCreated)
 	{
-		GM_BEGIN_CHECK_GL_ERROR
 		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-		GM_END_CHECK_GL_ERROR
 	}
 }
 
 void GMGLFramebuffers::unbind()
 {
-	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	GM_END_CHECK_GL_ERROR
 }
 
 void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
@@ -380,14 +364,12 @@ void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
 	// If you need a stencil buffer, then you need to make a Depth=24, Stencil=8 buffer, also called D24S8.
 	// See https://www.khronos.org/opengl/wiki/Framebuffer_Object_Extension_Examples
 
-	GM_BEGIN_CHECK_GL_ERROR
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
 	glGenRenderbuffers(1, &d->depthStencilBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, d->depthStencilBuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, desc.rect.width, desc.rect.height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	GM_END_CHECK_GL_ERROR
 }
 
 bool GMGLFramebuffers::createFramebuffers()
@@ -398,15 +380,11 @@ bool GMGLFramebuffers::createFramebuffers()
 	GMuint sz = d->framebuffers.size();
 	for (GMuint i = 0; i < sz; i++)
 	{
-		GM_BEGIN_CHECK_GL_ERROR
 		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->framebuffers[i]->getTextureId(), 0);
-		GM_END_CHECK_GL_ERROR
 	}
 
-	GM_BEGIN_CHECK_GL_ERROR
 	glDrawBuffers(sz, attachments.data());
-	GM_END_CHECK_GL_ERROR
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -423,11 +401,10 @@ void GMGLFramebuffers::clear()
 	D(d);
 	GLint mask;
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
 	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	GM_END_CHECK_GL_ERROR
 	glStencilMask(mask);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

@@ -41,7 +41,7 @@ void GMGLModelPainter::transfer()
 
 	GMuint verticeCount = 0;
 
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	bufferData.arrayId = vao;
@@ -91,8 +91,6 @@ void GMGLModelPainter::transfer()
 		mesh->clear();
 	}
 
-	GM_END_CHECK_GL_ERROR
-
 	GMModelBuffer* modelBuffer = new GMModelBuffer();
 	modelBuffer->setData(bufferData);
 
@@ -126,14 +124,8 @@ void GMGLModelPainter::dispose(GMModelBuffer* md)
 	GLuint vao[1] = { md->getMeshBuffer().arrayId },
 		vbo[1] = { md->getMeshBuffer().vertexBufferId };
 
-	GM_BEGIN_CHECK_GL_ERROR
 	glDeleteVertexArrays(1, vao);
-	GM_END_CHECK_GL_ERROR
-
-	GM_BEGIN_CHECK_GL_ERROR
 	glDeleteBuffers(1, vbo);
-	GM_END_CHECK_GL_ERROR
-
 	d->inited = false;
 }
 
@@ -145,11 +137,10 @@ void GMGLModelPainter::beginUpdateBuffer(GMModel* model)
 
 void GMGLModelPainter::endUpdateBuffer()
 {
-	GM_BEGIN_CHECK_GL_ERROR
+	
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
-	GM_END_CHECK_GL_ERROR
 }
 
 void* GMGLModelPainter::getBuffer()
