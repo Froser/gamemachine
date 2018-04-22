@@ -162,9 +162,7 @@ GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type, GMint in
 	static const std::string u_tex_texture = (GMString(".") + desc->TextureAttributes.Texture).toStdString();
 
 	GMint idx = (GMint)type;
-	GLenum tex;
-	GMint texId;
-	getTextureID(type, index, tex, texId);
+	GMint texId = getTextureID(type, index);
 
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	const char* uniform = getTextureUniformName(desc, type, index);
@@ -183,10 +181,7 @@ void GMGLRenderer::deactivateTexture(GMTextureType type, GMint index)
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	GM_ASSERT(desc);
 	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
-
-	GLenum tex;
-	GMint texId;
-	getTextureID(type, index, tex, texId);
+	GMint texId = getTextureID(type, index);
 
 	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 	GMint idx = (GMint)type;
@@ -196,31 +191,26 @@ void GMGLRenderer::deactivateTexture(GMTextureType type, GMint index)
 	shaderProgram->setInt(u, 0);
 }
 
-void GMGLRenderer::getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId)
+GMint GMGLRenderer::getTextureID(GMTextureType type, GMint index)
 {
 	switch (type)
 	{
 	case GMTextureType::Ambient:
-		texId = GMTextureRegisterQuery<GMTextureType::Ambient>::Value + index;
-		tex = texId + GL_TEXTURE0 + index;
+		return GMTextureRegisterQuery<GMTextureType::Ambient>::Value + index;
 		break;
 	case GMTextureType::Diffuse:
-		texId = GMTextureRegisterQuery<GMTextureType::Diffuse>::Value + index;
-		tex = texId + GL_TEXTURE0 + index;
+		return GMTextureRegisterQuery<GMTextureType::Diffuse>::Value + index;
 		break;
 	case GMTextureType::NormalMap:
 		GM_ASSERT(index == 0);
-		texId = GMTextureRegisterQuery<GMTextureType::NormalMap>::Value;
-		tex = texId + GL_TEXTURE0;
+		return GMTextureRegisterQuery<GMTextureType::NormalMap>::Value;
 		break;
 	case GMTextureType::Lightmap:
 		GM_ASSERT(index == 0);
-		texId = GMTextureRegisterQuery<GMTextureType::Lightmap>::Value;
-		tex = texId + GL_TEXTURE0;
-		break;
+		return GMTextureRegisterQuery<GMTextureType::Lightmap>::Value;
 	default:
 		GM_ASSERT(false);
-		return;
+		return -1;
 	}
 }
 
@@ -437,11 +427,7 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 		GM_END_CHECK_GL_ERROR
 
 		GM_BEGIN_CHECK_GL_ERROR
-		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		GM_END_CHECK_GL_ERROR
-
-		GM_BEGIN_CHECK_GL_ERROR
-		glTex->drawTexture(&frames, 0);
+		glTex->drawTexture(&frames, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		GM_END_CHECK_GL_ERROR
 	}
 }
@@ -462,11 +448,6 @@ void GMGLRenderer_Filter::beforeDraw(GMModel* model)
 
 void GMGLRenderer_Filter::afterDraw(GMModel* model)
 {
-	constexpr GMint count = GMMaxTextureCount(GMTextureType::Ambient);
-	for (GMint i = 0; i < count; i++)
-	{
-		deactivateTexture((GMTextureType)GMTextureType::Ambient, i);
-	}
 }
 
 void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
@@ -496,12 +477,7 @@ void GMGLRenderer_Filter::endModel()
 GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
-
-	GMint idx = (GMint)type;
-	GLenum tex;
-	GMint texId;
-	getTextureID(type, index, tex, texId);
-
+	GMint texId = getTextureID(type, index);
 	IShaderProgram* shaderProgram = d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 	return texId;

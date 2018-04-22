@@ -59,11 +59,12 @@ namespace
 			GM_BEGIN_CHECK_GL_ERROR
 			glGenTextures(1, &db->id);
 			glBindTexture(GL_TEXTURE_2D, db->id);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_FLOAT, NULL);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			db->texParamsSet = true;
 			GM_END_CHECK_GL_ERROR
 		}
 
@@ -228,10 +229,8 @@ void GMGLGBuffer::copyDepthBuffer(GLuint target)
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
 	glBlitFramebuffer(0, 0, d->renderWidth, d->renderHeight, 0, 0, d->renderWidth, d->renderHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	GM_END_CHECK_GL_ERROR
-
-	GM_BEGIN_CHECK_GL_ERROR
-	glBindFramebuffer(GL_FRAMEBUFFER, target);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 	GM_END_CHECK_GL_ERROR
 }
 

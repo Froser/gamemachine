@@ -41,7 +41,7 @@ protected:
 	virtual void activateTextureTransform(GMModel* model, GMTextureType type, GMint index);
 	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
 	virtual void deactivateTexture(GMTextureType type, GMint index);
-	virtual void getTextureID(GMTextureType type, GMint index, REF GLenum& tex, REF GMint& texId);
+	virtual GMint getTextureID(GMTextureType type, GMint index);
 	virtual void drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
 	virtual ITexture* getTexture(GMTextureFrames& frames);
 };
