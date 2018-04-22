@@ -193,7 +193,8 @@ void GMGLGBuffer::newFrame()
 void GMGLGBuffer::activateTextures()
 {
 	D(d);
-	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
+	IShaderProgram* shaderProgram = engine->getShaderProgram(GMShaderProgramType::CurrentShaderProgram);
 	shaderProgram->useProgram();
 
 	{
@@ -214,6 +215,12 @@ void GMGLGBuffer::activateTextures()
 			glBindTexture(GL_TEXTURE_2D, d->materials[i]);
 		}
 	}
+
+	shaderProgram->useProgram();
+	ITexture* cubeMap = engine->getCubeMap();
+	if (cubeMap)
+		cubeMap->drawTexture(0, GEOMETRY_OFFSET + MATERIAL_NUM);
+	shaderProgram->setInt(shaderProgram->getDesc().CubeMapTextureName, GEOMETRY_OFFSET + MATERIAL_NUM);
 }
 
 void GMGLGBuffer::copyDepthBuffer(GLuint target)

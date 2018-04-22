@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "demostration_world.h"
+#include "demonstration_world.h"
 #include <gmcontrolgameobject.h>
 #include <gmgl.h>
 
@@ -28,11 +28,11 @@ namespace
 		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
 		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
 		world->addDemo("Effects: Use a grayscale filter.", new Demo_Effects(world));
-		world->addDemo("BSP: Demostrate a Quake3 scene.", new Demo_Quake3_BSP(world));
-		world->addDemo("Border: Demostrate a border.", new Demo_Border(world));
-		world->addDemo("Sound: Demostrate playing music.", new Demo_Sound(world));
-		world->addDemo("Literature: Demostrate render literatures via GMTypoEngine.", new Demo_Literature(world));
-		world->addDemo("Button: Demostrate how to create a button.", new Demo_Button(world));
+		world->addDemo("BSP: Demonstrate a Quake3 scene.", new Demo_Quake3_BSP(world));
+		world->addDemo("Border: Demonstrate a border.", new Demo_Border(world));
+		world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
+		world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
+		world->addDemo("Button: Demonstrate how to create a button.", new Demo_Button(world));
 		world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
 		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
 		world->init();

@@ -253,24 +253,16 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->useProgram();
 
 	auto& desc = shaderProgram->getDesc();
-
-	
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
-	
-
 	if (parent)
 	{
-		
 		shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
 		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
-		
 	}
 	else
 	{
-		
 		shaderProgram->setMatrix4(desc.ModelMatrix, Identity<GMMat4>());
 		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, Identity<GMMat4>());
-		
 	}
 }
 
@@ -370,16 +362,14 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	D_BASE(db, Base);
 	d->cubemap = GMObject::gmobject_cast<const GMCubeMapGameObject*>(parent);
-
-	IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	IShaderProgram* shaderProgram = db->engine->getShaderProgram(GMShaderProgramType::CurrentShaderProgram);
 	shaderProgram->useProgram();
 	auto& desc = shaderProgram->getDesc();
-	
 	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
 	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 	shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
-	
 }
 
 void GMGLRenderer_CubeMap::endModel()
@@ -391,6 +381,7 @@ void GMGLRenderer_CubeMap::endModel()
 void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 {
 	D(d);
+	D_BASE(db, Base);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	GMTexture& texture = model->getShader().getTexture();
@@ -401,7 +392,6 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 		IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
 		auto& desc = shaderProgram->getDesc();
 
-		
 		IGraphicEngine* engine = GM.getGraphicEngine();
 		// 给延迟渲染程序传入CubeMap
 		{
@@ -422,10 +412,9 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		}
 		
-
-		
+		shaderProgram->useProgram();
 		glTex->drawTexture(&frames, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		
+		db->engine->setCubeMap(glTex);
 	}
 }
 

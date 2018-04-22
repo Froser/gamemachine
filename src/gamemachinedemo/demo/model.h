@@ -3,7 +3,7 @@
 
 #include <gamemachine.h>
 #include <gmdemogameworld.h>
-#include "demostration_world.h"
+#include "demonstration_world.h"
 
 GM_PRIVATE_OBJECT(Demo_Model)
 {

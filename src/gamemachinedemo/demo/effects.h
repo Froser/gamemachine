@@ -3,7 +3,7 @@
 
 #include <gamemachine.h>
 #include <gmdemogameworld.h>
-#include "demostration_world.h"
+#include "demonstration_world.h"
 #include "texture.h"
 
 class Demo_Effects : public Demo_Texture

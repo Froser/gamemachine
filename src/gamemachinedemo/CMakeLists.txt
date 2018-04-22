@@ -21,8 +21,8 @@ set(SOURCES
 		stdafx.h
 		main.cpp
 
-		demostration_world.h
-		demostration_world.cpp
+		demonstration_world.h
+		demonstration_world.cpp
 		demo/texture.h
 		demo/texture.cpp
 		demo/normalmap.h

@@ -32,7 +32,6 @@ extern "C"
 				gm_error("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
 					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
 					type, severity, message);
-				GM_ASSERT(false);
 			}
 			else if (severity == GL_DEBUG_SEVERITY_LOW)
 			{
@@ -172,6 +171,9 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 			}
 			else
 			{
+				forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
+				setCurrentRenderMode(GMRenderMode::Deferred);
+
 				d->gbuffer.adjustViewport();
 				geometryPass(d->deferredRenderingGameObjects);
 
@@ -191,8 +193,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 						getFilterQuad()->draw();
 					}
 
-					forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-					setCurrentRenderMode(GMRenderMode::Deferred);
 				}
 			}
 
@@ -410,10 +410,9 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	}
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
-		
 		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
-		
+		d->cubeMap = nullptr;
 		break;
 	}
 	default:
@@ -566,12 +565,10 @@ void GMGLGraphicEngine::createDeferredRenderQuad()
 void GMGLGraphicEngine::renderDeferredRenderQuad()
 {
 	D(d);
-	
 	glDisable(GL_CULL_FACE);
 	glBindVertexArray(d->quadVAO);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
-	
 }
 
 void GMGLGraphicEngine::disposeDeferredRenderQuad()

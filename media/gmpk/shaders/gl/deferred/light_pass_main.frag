@@ -114,6 +114,9 @@ void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDire
 
 void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
 {
+	if (deferred_material_pass_fromTexture_Refractivity == 0.f)
+		return;
+
 	vec3 I = normalize(deferred_light_pass_fromTexture_Position - GM_view_position.rgb);
 	vec3 R = refract(I, normal_world, deferred_material_pass_fromTexture_Refractivity);
 	deferred_light_pass_g_refractiveLight += texture(GM_cubemap_texture, vec3(R.x, R.y, R.z)).rgb;
@@ -179,6 +182,8 @@ void deferred_light_pass_calcColor()
 		+ deferred_light_pass_g_diffuseLight * deferred_light_pass_fromTexture_TexDiffuse
 		+ deferred_light_pass_g_specularLight
 		+ deferred_light_pass_g_refractiveLight;
+	if (color == vec3(0, 0, 0))
+		discard;
 	_frag_color = vec4(color, 1.0f);
 }
 

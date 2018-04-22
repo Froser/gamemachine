@@ -49,6 +49,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GraphicSettings* settings = nullptr;
 
 	GMGLGBuffer gbuffer;
+	ITexture* cubeMap = nullptr;
 
 	// 延迟渲染的四边形
 	GMuint quadVAO = 0;
@@ -159,6 +160,19 @@ public:
 			gm_error("GMObject::draw() cannot be called outside IGraphicEngine::drawObjects");
 		}
 #endif
+	}
+
+	inline void setCubeMap(ITexture* tex)
+	{
+		D(d);
+		if (d->cubeMap != tex)
+			d->cubeMap = tex;
+	}
+
+	inline ITexture* getCubeMap()
+	{
+		D(d);
+		return d->cubeMap;
 	}
 
 private:

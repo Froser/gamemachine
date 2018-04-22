@@ -6,7 +6,7 @@
 #include <gmdx11.h>
 #include <gmui.h>
 #include <gmm.h>
-#include "demostration_world.h"
+#include "demonstration_world.h"
 
 namespace
 {
