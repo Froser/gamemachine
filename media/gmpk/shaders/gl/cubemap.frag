@@ -1,6 +1,6 @@
 in vec3 _cubemap_uv;
 
-void cubemap_main()
+subroutine (GM_TechniqueEntrance) void GM_CubeMap()
 {
 	_frag_color = texture(GM_cubemap_texture, _cubemap_uv);
 }

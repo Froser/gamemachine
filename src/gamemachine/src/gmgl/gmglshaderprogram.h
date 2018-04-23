@@ -45,6 +45,7 @@ public:
 	virtual void setInt(const char* name, GMint value);
 	virtual void setFloat(const char* name, GMfloat value);
 	virtual void setBool(const char* name, bool value);
+	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
 	virtual const GMShaderVariablesDesc& getDesc();
 
 	void setMatrix4(const GMString& name, const GMMat4& value);

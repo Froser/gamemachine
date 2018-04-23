@@ -26,6 +26,7 @@ public:
 	virtual void setInt(const char* name, GMint value) override;
 	virtual void setFloat(const char* name, GMfloat value) override;
 	virtual void setBool(const char* name, bool value) override;
+	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
 	virtual const GMShaderVariablesDesc& getDesc();
 
 public:

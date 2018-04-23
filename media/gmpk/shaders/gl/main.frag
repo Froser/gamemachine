@@ -11,19 +11,5 @@
 
 void main(void)
 {
-	switch (GM_shader_type)
-	{
-		case TYPE_MODEL2D:
-			model2d_main();
-			break;
-		case TYPE_MODEL3D:
-			model3d_main();
-			break;
-		case TYPE_GLYPH:
-			glyph_main();
-			break;
-		case TYPE_CUBEMAP:
-			cubemap_main();
-			break;
-	};
+	GM_techniqueEntrance();
 }

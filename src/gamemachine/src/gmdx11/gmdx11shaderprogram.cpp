@@ -103,6 +103,22 @@ void GMDx11EffectShaderProgram::setBool(const char* name, bool value)
 	GM_DX_HR(var->SetBool(value));
 }
 
+bool GMDx11EffectShaderProgram::setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type)
+{
+	D(d);
+	ID3DX11EffectInterfaceVariable* interfaceVariable = d->effect->GetVariableByName(interfaceName)->AsInterface();
+	ID3DX11EffectClassInstanceVariable* instanceVariable = d->effect->GetVariableByName(instanceName)->AsClassInstance();
+	if (instanceVariable->IsValid())
+	{
+		GM_DX_HR_RET(interfaceVariable->SetClassInstance(instanceVariable));
+	}
+	else
+	{
+		return false;
+	}
+	return true;
+}
+
 bool GMDx11EffectShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
 {
 	return false;

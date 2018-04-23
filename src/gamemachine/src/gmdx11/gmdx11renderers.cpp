@@ -796,23 +796,8 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	GM_DX_HR(kernelDeltaX->SetFloat(delta[0]));
 	GM_DX_HR(kernelDeltaY->SetFloat(delta[1]));
 
-	ID3DX11EffectInterfaceVariable* filterInterface = d->effect->GetVariableByName(desc->FilterAttributes.Filter)->AsInterface();
-	GM_ASSERT(filterInterface->IsValid());
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
-	const GMVec2& kernelOffset = getEngine()->getCurrentFilterKernelDelta();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-
-	const char* filterInstanceVariable = desc->FilterAttributes.Types[filterMode];
-	ID3DX11EffectClassInstanceVariable* filterInstance = d->effect->GetVariableByName(filterInstanceVariable)->AsClassInstance();
-	if (filterInstance->IsValid())
-	{
-		GM_DX_HR(filterInterface->SetClassInstance(filterInstance));
-	}
-	else
-	{
-		gm_error("Filter instance not found, use default instead.");
-		filterInstance = d->effect->GetVariableByName(desc->FilterAttributes.Types[0])->AsClassInstance();
-		GM_ASSERT(filterInstance);
-		GM_DX_HR(filterInterface->SetClassInstance(filterInstance));
-	}
+	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[filterMode], GMShaderType::Effect);
+	GM_ASSERT(b);
 }

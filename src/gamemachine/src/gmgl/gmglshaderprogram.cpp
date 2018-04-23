@@ -122,6 +122,19 @@ void GMGLShaderProgram::setBool(const char* name, bool value)
 	setInt(name, (GMint)value);
 }
 
+bool GMGLShaderProgram::setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type)
+{
+	GLenum shaderType = GL_VERTEX_SHADER;
+	if (type == GMShaderType::Vertex)
+		shaderType = GL_VERTEX_SHADER;
+	else if (type == GMShaderType::Pixel)
+		shaderType = GL_FRAGMENT_SHADER;
+	else
+		GM_ASSERT(false);
+	
+	return setSubrotinue(interfaceName, instanceName, shaderType);
+}
+
 void GMGLShaderProgram::setMatrix4(const GMString& name, const GMMat4& value)
 {
 	std::string stdName = name.toStdString();
@@ -157,7 +170,7 @@ void GMGLShaderProgram::setBool(const GMString& name, bool value)
 	setInt(name, (GMint)value);
 }
 
-bool GMGLShaderProgram::setSubrotinue(const char*  funcName, const char*  implement, GMuint shaderType)
+bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType)
 {
 	D(d);
 	GLint subroutineUniform = glGetSubroutineUniformLocation(d->shaderProgram, shaderType, funcName);

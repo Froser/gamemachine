@@ -83,6 +83,29 @@ namespace
 			return GL_TRIANGLES;
 		}
 	}
+
+	constexpr const char* techniqueName()
+	{
+		return "GM_techniqueEntrance";
+	}
+
+	inline const char* getTechnique(GMModelType type)
+	{
+		switch (type)
+		{
+		case GMModelType::Model2D:
+			return "GM_Model2D";
+		case GMModelType::Model3D:
+			return "GM_Model3D";
+		case GMModelType::Glyph:
+			return "GM_Glyph";
+		case GMModelType::CubeMap:
+			return "GM_CubeMap";
+		default:
+			GM_ASSERT(false);
+			return "GM_Model2D";
+		}
+	}
 }
 
 GMGLRenderer::GMGLRenderer()
@@ -253,7 +276,8 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->useProgram();
 
 	auto& desc = shaderProgram->getDesc();
-	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
+	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
+	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 	if (parent)
 	{
 		shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
@@ -367,7 +391,9 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	IShaderProgram* shaderProgram = db->engine->getShaderProgram(GMShaderProgramType::CurrentShaderProgram);
 	shaderProgram->useProgram();
 	auto& desc = shaderProgram->getDesc();
-	shaderProgram->setInt(GMSHADER_SHADER_TYPE, (GMint)model->getType());
+	GM_ASSERT(model->getType() == GMModelType::CubeMap);
+	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
+	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 	shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }
@@ -452,10 +478,11 @@ GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, G
 {
 	D(d);
 	GMint texId = getTextureID(type, index);
-	GMGLShaderProgram* shaderProgram = static_cast<GMGLShaderProgram*>(d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram));
+	IShaderProgram* shaderProgram = d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
 	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
-	shaderProgram->setSubrotinue(desc.FilterAttributes.Filter, desc.FilterAttributes.Types[d->engine->getCurrentFilterMode()], GL_FRAGMENT_SHADER);
+	bool b = shaderProgram->setInterfaceInstance(desc.FilterAttributes.Filter, desc.FilterAttributes.Types[d->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	GM_ASSERT(b);
 	return texId;
 }

@@ -182,7 +182,7 @@ void model3d_calcColor()
 	_frag_color = vec4(color, 1.0f);
 }
 
-void model3d_main()
+subroutine (GM_TechniqueEntrance) void GM_Model3D()
 {
 	model3d_init();
 	model3d_calcColor();

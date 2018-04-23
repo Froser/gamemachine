@@ -268,7 +268,7 @@ void DemostrationEntrance::start()
 {
 	D(d);
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
-	d->renderConfig.set(gm::GMRenderConfigs::RenderMode, (gm::GMint) gm::GMRenderMode::Deferred);
+	d->renderConfig.set(gm::GMRenderConfigs::RenderMode, (gm::GMint) gm::GMRenderMode::Forward);
 	getWorld()->resetProjectionAndEye();
 	loadDemostrations(d->world);
 }

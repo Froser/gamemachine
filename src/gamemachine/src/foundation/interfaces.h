@@ -299,6 +299,7 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 	virtual void setInt(const char* name, GMint value) = 0;
 	virtual void setFloat(const char* name, GMfloat value) = 0;
 	virtual void setBool(const char* name, bool value) = 0;
+	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) = 0;
 	virtual const GMShaderVariablesDesc& getDesc() = 0;
 };
 
