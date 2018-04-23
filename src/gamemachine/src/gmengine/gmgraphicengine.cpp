@@ -5,6 +5,31 @@
 #include "foundation/gamemachine.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 
+void GMFramebuffersStack::push(IFramebuffers* framebuffers)
+{
+	D(d);
+	d->framebuffers.push(framebuffers);
+}
+
+IFramebuffers* GMFramebuffersStack::pop()
+{
+	D(d);
+	if (d->framebuffers.empty())
+		return nullptr;
+
+	IFramebuffers* framebuffers = d->framebuffers.top();
+	d->framebuffers.pop();
+	return framebuffers;
+}
+
+IFramebuffers* GMFramebuffersStack::peek()
+{
+	D(d);
+	if (d->framebuffers.empty())
+		return nullptr;
+	return d->framebuffers.top();
+}
+
 GMGraphicEngine::~GMGraphicEngine()
 {
 	D(d);

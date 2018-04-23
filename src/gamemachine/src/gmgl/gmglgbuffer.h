@@ -39,7 +39,7 @@ enum class GMGLDeferredRenderState
 };
 
 constexpr GMint GMGLGBuffer_TotalTurn = (GMint) GMGLDeferredRenderState::EndOfRenderState;
-
+class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMGLGBuffer)
 {
 	GMuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
@@ -118,6 +118,7 @@ public:
 public:
 	virtual bool init(const GMFramebufferDesc& desc) override;
 	virtual ITexture* getTexture() override;
+	virtual void setName(const GMString& name) override {}
 
 public:
 	GMuint getTextureId();
@@ -129,6 +130,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffers)
 	GMuint depthStencilBuffer = 0;
 	Vector<GMGLFramebuffer*> framebuffers;
 	bool framebuffersCreated = false;
+	GMGraphicEngine* engine = nullptr;
 };
 
 class GMGLFramebuffers : public GMObject, public IFramebuffers
@@ -136,7 +138,7 @@ class GMGLFramebuffers : public GMObject, public IFramebuffers
 	DECLARE_PRIVATE(GMGLFramebuffers)
 
 public:
-	GMGLFramebuffers() = default;
+	GMGLFramebuffers();
 	~GMGLFramebuffers();
 
 	virtual bool init(const GMFramebufferDesc& desc) override;
@@ -145,6 +147,7 @@ public:
 	virtual void unbind() override;
 	virtual void clear() override;
 	virtual IFramebuffer* getFramebuffer(GMuint) override;
+	virtual GMuint count() override;
 
 public:
 	inline GMuint framebufferId()

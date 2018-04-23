@@ -25,7 +25,7 @@ public:
 
 public:
 	virtual void init() override;
-	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override;
+	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override;
 };
 
 END_NS

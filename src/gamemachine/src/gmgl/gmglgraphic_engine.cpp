@@ -126,7 +126,7 @@ bool GMGLGraphicEngine::event(const GameMachineMessage& e)
 	return false;
 }
 
-void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode)
+void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
 	GM_PROFILE("drawObjects");
@@ -144,60 +144,53 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBuf
 	++d->drawingLevel;
 #endif
 
-	if (bufferMode == GMBufferMode::NoFramebuffer)
+	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
+	if (renderMode != d->renderMode)
+		d->needRefreshLights = true;
+	setCurrentRenderMode(renderMode);
+
+	if (renderMode == GMRenderMode::Forward)
 	{
-		directDraw(objects, count);
+		forwardDraw(objects, count);
 	}
 	else
 	{
-		GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
-		if (renderMode != d->renderMode)
-			d->needRefreshLights = true;
-		setCurrentRenderMode(renderMode);
+		GM_ASSERT(renderMode == GMRenderMode::Deferred);
+		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
+		groupGameObjects(objects, count);
 
-		if (renderMode == GMRenderMode::Forward)
+		if (d->deferredRenderingGameObjects.empty())
 		{
-			forwardDraw(objects, count);
+			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 		}
 		else
 		{
-			GM_ASSERT(renderMode == GMRenderMode::Deferred);
-			// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
-			groupGameObjects(objects, count);
+			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
+			setCurrentRenderMode(GMRenderMode::Deferred);
 
-			if (d->deferredRenderingGameObjects.empty())
+			d->gbuffer.adjustViewport();
+			geometryPass(d->deferredRenderingGameObjects);
+
 			{
-				forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-			}
-			else
-			{
-				forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-				setCurrentRenderMode(GMRenderMode::Deferred);
-
-				d->gbuffer.adjustViewport();
-				geometryPass(d->deferredRenderingGameObjects);
-
+				if (filter != GMFilterMode::None)
 				{
-					if (filter != GMFilterMode::None)
-					{
-						IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-						GM_ASSERT(filterFramebuffers);
-						filterFramebuffers->bind();
-					}
-					lightPass();
-					if (filter != GMFilterMode::None)
-					{
-						GMGLFramebuffers* filterBuffers = static_cast<GMGLFramebuffers*>(getFilterFramebuffers());
-						d->gbuffer.copyDepthBuffer(filterBuffers->framebufferId());
-						getFilterFramebuffers()->unbind();
-						getFilterQuad()->draw();
-					}
-
+					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+					GM_ASSERT(filterFramebuffers);
+					filterFramebuffers->bind();
 				}
-			}
+				lightPass();
+				if (filter != GMFilterMode::None)
+				{
+					GMGLFramebuffers* filterBuffers = static_cast<GMGLFramebuffers*>(getFilterFramebuffers());
+					d->gbuffer.copyDepthBuffer(filterBuffers->framebufferId());
+					getFilterFramebuffers()->unbind();
+					getFilterQuad()->draw();
+				}
 
-			viewGBufferFrameBuffer();
+			}
 		}
+
+		viewGBufferFrameBuffer();
 	}
 
 #if _DEBUG
@@ -724,7 +717,6 @@ void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()
 //////////////////////////////////////////////////////////////////////////
 void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 {
-	
 	GMS_BlendFunc gms_factors[] = {
 		sfactor,
 		dfactor
@@ -768,5 +760,4 @@ void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 		}
 	}
 	glBlendFunc(factors[0], factors[1]);
-	
 }

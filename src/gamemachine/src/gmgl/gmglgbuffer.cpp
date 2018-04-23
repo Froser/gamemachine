@@ -219,7 +219,7 @@ void GMGLGBuffer::activateTextures()
 	shaderProgram->useProgram();
 	ITexture* cubeMap = engine->getCubeMap();
 	if (cubeMap)
-		cubeMap->drawTexture(0, GEOMETRY_OFFSET + MATERIAL_NUM);
+		cubeMap->useTexture(0, GEOMETRY_OFFSET + MATERIAL_NUM);
 	shaderProgram->setInt(shaderProgram->getDesc().CubeMapTextureName, GEOMETRY_OFFSET + MATERIAL_NUM);
 }
 
@@ -311,6 +311,12 @@ GMuint GMGLFramebuffer::getTextureId()
 	return texture->getTextureId();
 }
 
+GMGLFramebuffers::GMGLFramebuffers()
+{
+	D(d);
+	d->engine = gm_cast<GMGraphicEngine*>(GM.getGraphicEngine());
+}
+
 GMGLFramebuffers::~GMGLFramebuffers()
 {
 	D(d);
@@ -355,12 +361,28 @@ void GMGLFramebuffers::bind()
 	if (d->framebuffersCreated)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+		d->engine->getFramebuffersStack().push(this);
 	}
 }
 
 void GMGLFramebuffers::unbind()
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	D(d);
+	GMFramebuffersStack& stack = d->engine->getFramebuffersStack();
+	IFramebuffers* currentFramebuffers = stack.pop();
+	if (currentFramebuffers != this)
+	{
+		GM_ASSERT(false);
+		gm_error("Cannot unbind framebuffer because current framebuffer isn't this framebuffer.");
+	}
+	else
+	{
+		IFramebuffers* lastFramebuffers = stack.peek();
+		if (lastFramebuffers)
+			lastFramebuffers->bind();
+		else
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
 }
 
 void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
@@ -421,4 +443,10 @@ IFramebuffer* GMGLFramebuffers::getFramebuffer(GMuint index)
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
 	return d->framebuffers[index];
+}
+
+GMuint GMGLFramebuffers::count()
+{
+	D(d);
+	return d->framebuffers.size();
 }

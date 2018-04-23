@@ -11,6 +11,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffer)
 {
 	ITexture* renderTexture = nullptr;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	GMString name;
 };
 
 class GMDx11Framebuffer : public GMObject, public IFramebuffer
@@ -22,7 +23,9 @@ public:
 	~GMDx11Framebuffer();
 
 public:
-	bool init(const GMFramebufferDesc& desc);
+	virtual bool init(const GMFramebufferDesc& desc) override;
+	virtual void setName(const GMString& name) override;
+	virtual ITexture* getTexture() override;
 
 public:
 	ID3D11RenderTargetView* getRenderTargetView()
@@ -31,15 +34,9 @@ public:
 		GM_ASSERT(d->renderTargetView);
 		return d->renderTargetView;
 	}
-
-	ITexture* getTexture()
-	{
-		D(d);
-		GM_ASSERT(d->renderTexture);
-		return d->renderTexture;
-	}
 };
 
+class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 {
 	GMComPtr<ID3D11DeviceContext> deviceContext;
@@ -49,6 +46,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 	Vector<GMDx11Framebuffer*> framebuffers;
 	Vector<ID3D11RenderTargetView*> renderTargetViews;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMGraphicEngine* engine = nullptr;
 };
 
 class GMDx11Framebuffers : public GMObject, public IFramebuffers
@@ -66,6 +64,7 @@ public:
 	virtual void unbind() override;
 	virtual void clear() override;
 	virtual IFramebuffer* getFramebuffer(GMuint) override;
+	virtual GMuint count() override;
 };
 
 END_NS

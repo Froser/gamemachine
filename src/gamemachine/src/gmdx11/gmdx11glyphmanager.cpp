@@ -89,7 +89,7 @@ void GMDx11GlyphTexture::init()
 	));
 }
 
-void GMDx11GlyphTexture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
+void GMDx11GlyphTexture::useTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
 	if (!d->samplerState)

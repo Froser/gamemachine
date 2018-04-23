@@ -54,16 +54,19 @@ GMDx11Texture::~GMDx11Texture()
 {
 }
 
-void GMDx11Texture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
+void GMDx11Texture::useTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
 	if (!d->samplerState)
 	{
 		// 创建采样器
 		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
-		desc.Filter = GMDx11Helper::GMGetDx11Filter(frames->getMinFilter(), frames->getMagFilter());
-		desc.AddressU = getAddressMode(frames->getWrapS());
-		desc.AddressV = getAddressMode(frames->getWrapT());
+		if (frames)
+		{
+			desc.Filter = GMDx11Helper::GMGetDx11Filter(frames->getMinFilter(), frames->getMagFilter());
+			desc.AddressU = getAddressMode(frames->getWrapS());
+			desc.AddressV = getAddressMode(frames->getWrapT());
+		}
 		GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));
 	}
 	

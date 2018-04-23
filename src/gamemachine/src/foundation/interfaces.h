@@ -123,7 +123,7 @@ GM_INTERFACE(IGameHandler)
 GM_INTERFACE(ITexture)
 {
 	virtual void init() = 0;
-	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) = 0;
+	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) = 0;
 };
 
 //! 可以获取、设置对象的数据接口。
@@ -180,12 +180,6 @@ struct GMCursorDesc
 	GMuint xHotspot;
 	GMuint yHotspot;
 	GMfloat transparentColor[3];
-};
-
-enum class GMBufferMode
-{
-	Normal,
-	NoFramebuffer,
 };
 
 enum class GMUpdateDataType
@@ -313,12 +307,14 @@ GM_INTERFACE(IFramebuffer)
 {
 	virtual bool init(const GMFramebufferDesc& desc) = 0;
 	virtual ITexture* getTexture() = 0;
+	virtual void setName(const GMString& name) = 0;
 };
 
 GM_INTERFACE(IFramebuffers)
 {
 	virtual bool init(const GMFramebufferDesc& desc) = 0;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) = 0;
+	virtual GMuint count() = 0;
 	virtual void bind() = 0;
 	virtual void unbind() = 0;
 	virtual void clear() = 0;
@@ -391,9 +387,8 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  绘制GMGameObject对象。这个方法会将绘制好的图元到目标缓存，目标缓存取决于GMBufferMode的值。
 	  \param objects 待绘制的对象。
 	  \param count 待绘制对象的个数。
-	  \param bufferMode 绘制模式。如果模式为GMBufferMode::Normal，程序将按照正常流程绘制，如果模式为GMBufferMode::NoFramebuffer，程序会将绘制结果直接保存在默认帧缓存上，而不会保存在其他帧缓存中。
 	*/
-	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode = GMBufferMode::Normal) = 0;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 
 	//! 更新绘制数据。
 	/*!

@@ -18,6 +18,7 @@ struct GMDx11GlobalBlendStateDesc
 };
 
 class GMDx11Framebuffers;
+class GMDx11GBuffer;
 GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 {
 	GMComPtr<ID3D11Device> device;
@@ -34,6 +35,12 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	Vector<GMLight> lights;
 	bool needActivateLight = false;
 	GMRenderConfig renderConfig;
+	bool isDeferredRendering = false;
+	GMDx11GBuffer* gBuffer = nullptr;
+
+	// 延迟渲染分组
+	Vector<GMGameObject*> deferredRenderingGameObjects;
+	Vector<GMGameObject*> forwardRenderingGameObjects;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine
@@ -41,9 +48,12 @@ class GMDx11GraphicEngine : public GMGraphicEngine
 	DECLARE_PRIVATE(GMDx11GraphicEngine)
 
 public:
+	~GMDx11GraphicEngine();
+
+public:
 	virtual void init() override;
 	virtual void newFrame() override;
-	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights() override;
@@ -135,14 +145,27 @@ public:
 		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
 	}
 
+	void setIsDeferredRendering(bool isDeferredRendering)
+	{
+		D(d);
+		d->isDeferredRendering = isDeferredRendering;
+	}
+
+	GMDx11GBuffer* getGBuffer()
+	{
+		D(d);
+		return d->gBuffer;
+	}
+
 public:
 	IRenderer* getRenderer(GMModelType objectType);
+	void draw(GMGameObject *objects[], GMuint count);
 
 private:
 	void initShaders();
 	void forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter);
 	void directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter);
-	void forwardRender(GMGameObject *objects[], GMuint count);
+	void groupGameObjects(GMGameObject *objects[], GMuint count);
 };
 
 END_NS

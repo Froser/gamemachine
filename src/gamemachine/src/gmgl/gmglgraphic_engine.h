@@ -79,7 +79,7 @@ public:
 	virtual void init() override;
 	virtual void newFrame() override;
 	virtual bool event(const GameMachineMessage& e) override;
-	virtual void drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode) override;
+	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights();

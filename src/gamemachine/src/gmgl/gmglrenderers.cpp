@@ -240,7 +240,7 @@ void GMGLRenderer::drawTexture(GMModel* model, GMTextureType type, GMint index)
 	{
 		// 激活动画序列
 		GMint texId = activateTexture(model, (GMTextureType)type, index);
-		texture->drawTexture(&textures, texId);
+		texture->useTexture(&textures, texId);
 	}
 }
 
@@ -369,7 +369,7 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 	{
 		// 激活动画序列
 		GMint texId = activateTexture(model, GMTextureType::Ambient, 0);
-		texture->drawTexture(&textures, texId);
+		texture->useTexture(&textures, texId);
 	}
 }
 
@@ -430,7 +430,7 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 		}
 		
 		shaderProgram->useProgram();
-		glTex->drawTexture(&frames, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
+		glTex->useTexture(&frames, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		db->engine->setCubeMap(glTex);
 	}
 }
@@ -446,7 +446,7 @@ void GMGLRenderer_Filter::beforeDraw(GMModel* model)
 	ITexture* texture = getTexture(textures);
 	GM_ASSERT(texture);
 	GMint texId = activateTexture(model, GMTextureType::Ambient, 0);
-	texture->drawTexture(&textures, texId);
+	texture->useTexture(&textures, texId);
 }
 
 void GMGLRenderer_Filter::afterDraw(GMModel* model)

@@ -5,6 +5,13 @@
 #include <gmdx11framebuffer.h>
 #include "foundation/utilities/utilities.h"
 #include "gmengine/gameobjects/gmgameobject.h"
+#include "gmdx11gbuffer.h"
+
+GMDx11GraphicEngine::~GMDx11GraphicEngine()
+{
+	D(d);
+	GM_delete(d->gBuffer);
+}
 
 void GMDx11GraphicEngine::init()
 {
@@ -29,7 +36,7 @@ void GMDx11GraphicEngine::newFrame()
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
 }
 
-void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMBufferMode bufferMode /*= GMBufferMode::Normal*/)
+void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	GM_PROFILE("drawObjects");
 	if (!count)
@@ -41,13 +48,23 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count, GMB
 		createFilterFramebuffer();
 
 	d->needActivateLight = true;
-	if (bufferMode == GMBufferMode::NoFramebuffer)
+
+	// 假设现在是延迟渲染
+	// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
+	groupGameObjects(objects, count);
+	if (true)
 	{
-		directDraw(objects, count, filterMode);
+		if (!d->gBuffer)
+		{
+			d->gBuffer = new GMDx11GBuffer(this);
+			d->gBuffer->init();
+		}
+
+		d->gBuffer->draw(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
+		forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
 	}
 	else
 	{
-		//TODO 考虑延迟渲染
 		forwardDraw(objects, count, filterMode);
 	}
 
@@ -211,7 +228,7 @@ void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMF
 		filterFramebuffers->bind();
 	}
 
-	forwardRender(objects, count);
+	draw(objects, count);
 
 	if (filter != GMFilterMode::None)
 	{
@@ -220,7 +237,7 @@ void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMF
 	}
 }
 
-void GMDx11GraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
+void GMDx11GraphicEngine::draw(GMGameObject *objects[], GMuint count)
 {
 	for (GMuint i = 0; i < count; i++)
 	{
@@ -231,7 +248,7 @@ void GMDx11GraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
 void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
 {
 	D(d);
-	forwardRender(objects, count);
+	draw(objects, count);
 }
 
 IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
@@ -242,6 +259,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	static GMDx11Renderer_Glyph s_renderer_glyph;
 	static GMDx11Renderer_CubeMap s_renderer_cubemap;
 	static GMDx11Renderer_Filter s_renderer_filter;
+	static GMDx11Renderer_Deferred_3D s_renderer_deferred_3d;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -249,6 +267,8 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	case GMModelType::Glyph:
 		return &s_renderer_glyph;
 	case GMModelType::Model3D:
+		if (d->isDeferredRendering)
+			return &s_renderer_deferred_3d;
 		return &s_renderer_3d;
 	case GMModelType::CubeMap:
 		return &s_renderer_cubemap;
@@ -257,5 +277,22 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	default:
 		GM_ASSERT(false);
 		return nullptr;
+	}
+}
+
+void GMDx11GraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	d->deferredRenderingGameObjects.clear();
+	d->deferredRenderingGameObjects.reserve(count);
+	d->forwardRenderingGameObjects.clear();
+	d->forwardRenderingGameObjects.reserve(count);
+
+	for (GMuint i = 0; i < count; i++)
+	{
+		if (objects[i]->canDeferredRendering())
+			d->deferredRenderingGameObjects.push_back(objects[i]);
+		else
+			d->forwardRenderingGameObjects.push_back(objects[i]);
 	}
 }

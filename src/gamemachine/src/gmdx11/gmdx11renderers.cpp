@@ -6,6 +6,8 @@
 #include "gmdx11modelpainter.h"
 #include "gmdx11texture.h"
 #include "foundation/utilities/utilities.h"
+#include "gmdx11graphic_engine.h"
+#include "gmdx11gbuffer.h"
 
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
@@ -414,7 +416,7 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 	}
 }
 
-void GMDx11Renderer::drawTextures(GMModel* model)
+void GMDx11Renderer::setTextures(GMModel* model)
 {
 	D(d);
 	GMint registerId = 0;
@@ -430,7 +432,7 @@ void GMDx11Renderer::drawTextures(GMModel* model)
 			if (texture)
 			{
 				// 激活动画序列
-				texture->drawTexture(&textures, registerId);
+				texture->useTexture(&textures, registerId);
 			}
 		}
 	}
@@ -439,7 +441,7 @@ void GMDx11Renderer::drawTextures(GMModel* model)
 	if (cubeMapState.hasCubeMap)
 	{
 		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
-		cubeMapState.cubeMapRenderer->drawTextures(cubeMapState.model);
+		cubeMapState.cubeMapRenderer->setTextures(cubeMapState.model);
 	}
 }
 
@@ -718,7 +720,7 @@ void GMDx11Renderer::passAllAndDraw(GMModel* model)
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		prepareTextures(model);
 		pass->Apply(0, d->deviceContext);
-		drawTextures(model);
+		setTextures(model);
 
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(model->getVerticesCount(), 0);
@@ -750,7 +752,7 @@ void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
 	applyTextureAttribute(model, getTexture(textures), GMTextureType::CubeMap, 0);
 }
 
-void GMDx11Renderer_CubeMap::drawTextures(GMModel* model)
+void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
 {
 	enum {
 		Register = GMTextureRegisterQuery<GMTextureType::CubeMap>::Value
@@ -763,7 +765,7 @@ void GMDx11Renderer_CubeMap::drawTextures(GMModel* model)
 	if (texture)
 	{
 		// 激活动画序列
-		texture->drawTexture(&textures, Register);
+		texture->useTexture(&textures, Register);
 		GMDx11CubeMapState& cubeMapState = getCubeMapState();
 		cubeMapState.hasCubeMap = true;
 		cubeMapState.cubeMapRenderer = this;
@@ -800,4 +802,53 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[filterMode], GMShaderType::Effect);
 	GM_ASSERT(b);
+}
+
+void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
+{
+	D(d);
+	D3DX11_TECHNIQUE_DESC techDesc;
+	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
+
+	IFramebuffers* activeFramebuffer = nullptr;
+	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	{
+		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
+		if (p < techDesc.Passes - 1)
+		{
+			activeFramebuffer = getEngine()->getGBuffer()->getGeometryFramebuffer();
+			prepareTextures(model);
+			pass->Apply(0, d->deviceContext);
+			setTextures(model);
+		}
+		else
+		{
+			// 最后一个Pass，是Light pass阶段
+			activeFramebuffer = nullptr;
+			setDeferredTextures();
+			pass->Apply(0, d->deviceContext);
+		}
+
+		if (activeFramebuffer)
+			activeFramebuffer->bind();
+		if (model->getDrawMode() == GMModelDrawMode::Vertex)
+			d->deviceContext->Draw(model->getVerticesCount(), 0);
+		else
+			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+		if (activeFramebuffer)
+			activeFramebuffer->unbind();
+	}
+}
+
+void GMDx11Renderer_Deferred_3D::setDeferredTextures()
+{
+	D(d);
+	GMDx11GBuffer* gbuffer = getEngine()->getGBuffer();
+	IFramebuffers* geometryFramebuffer = gbuffer->getGeometryFramebuffer();
+	GMuint texCount = geometryFramebuffer->count();
+	for (GMuint i = 0; i < texCount; ++i)
+	{
+		ITexture* tex = geometryFramebuffer->getFramebuffer(i)->getTexture();
+		tex->useTexture(0, i);
+	}
 }

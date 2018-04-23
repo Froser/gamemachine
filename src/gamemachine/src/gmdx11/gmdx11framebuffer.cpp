@@ -2,6 +2,7 @@
 #include "gmdx11framebuffer.h"
 #include "foundation/gamemachine.h"
 #include <gmimagebuffer.h>
+#include "gmengine/gmgraphicengine.h"
 
 BEGIN_NS
 
@@ -88,10 +89,26 @@ bool GMDx11Framebuffer::init(const GMFramebufferDesc& desc)
 	d->renderTexture = renderTexture;
 	d->renderTexture->init();
 
-	GM_DX11_SET_OBJECT_NAME_A(renderTexture->getTexture(), "GM_FRAMEBUFFER");
+	if (!d->name.isEmpty())
+		GM_DX11_SET_OBJECT_NAME_A(renderTexture->getTexture(), d->name.toStdString().c_str());
 	GM_DX_HR_RET(device->CreateRenderTargetView(renderTexture->getTexture(), NULL, &d->renderTargetView));
 
 	return true;
+}
+
+void GMDx11Framebuffer::setName(const GMString& name)
+{
+	D(d);
+	d->name = name;
+	if (d->renderTexture)
+		GM_ASSERT(!"Please call setName before init.");
+}
+
+ITexture* GMDx11Framebuffer::getTexture()
+{
+	D(d);
+	GM_ASSERT(d->renderTexture);
+	return d->renderTexture;
 }
 
 GMDx11Framebuffers::GMDx11Framebuffers()
@@ -103,6 +120,7 @@ GMDx11Framebuffers::GMDx11Framebuffers()
 	GM_ASSERT(d->defaultRenderTargetView);
 	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->defaultDepthStencilView);
 	GM_ASSERT(d->defaultDepthStencilView);
+	d->engine = gm_cast<GMGraphicEngine*>(GM.getGraphicEngine());
 }
 
 GMDx11Framebuffers::~GMDx11Framebuffers()
@@ -173,12 +191,28 @@ void GMDx11Framebuffers::bind()
 {
 	D(d);
 	d->deviceContext->OMSetRenderTargets(d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
+	d->engine->getFramebuffersStack().push(this);
 }
 
 void GMDx11Framebuffers::unbind()
 {
 	D(d);
-	d->deviceContext->OMSetRenderTargets(1, &d->defaultRenderTargetView, d->defaultDepthStencilView);
+	GMFramebuffersStack& stack = d->engine->getFramebuffersStack();
+	IFramebuffers* currentFramebuffers = stack.pop();
+	if (currentFramebuffers != this)
+	{
+		GM_ASSERT(false);
+		gm_error("Cannot unbind framebuffer because current framebuffer isn't this framebuffer.");
+	}
+	else
+	{
+		IFramebuffers* lastFramebuffers = stack.peek();
+		if (lastFramebuffers)
+			lastFramebuffers->bind();
+		else
+			d->deviceContext->OMSetRenderTargets(1, &d->defaultRenderTargetView, d->defaultDepthStencilView);
+	}
+
 }
 
 void GMDx11Framebuffers::clear()
@@ -197,4 +231,10 @@ IFramebuffer* GMDx11Framebuffers::getFramebuffer(GMuint index)
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
 	return d->framebuffers[index];
+}
+
+GMuint GMDx11Framebuffers::count()
+{
+	D(d);
+	return d->framebuffers.size();
 }

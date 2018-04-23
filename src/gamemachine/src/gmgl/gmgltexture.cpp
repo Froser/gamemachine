@@ -157,7 +157,7 @@ void GMGLTexture::init()
 	d->inited = true;
 }
 
-void GMGLTexture::drawTexture(GMTextureFrames* frames, GMint textureIndex)
+void GMGLTexture::useTexture(GMTextureFrames* frames, GMint textureIndex)
 {
 	D(d);
 	glActiveTexture(GL_TEXTURE0 + textureIndex);

@@ -23,7 +23,7 @@ public:
 
 public:
 	virtual void init() override;
-	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override;
+	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override;
 
 public:
 	inline ID3D11Texture2D* getD3D11Texture()

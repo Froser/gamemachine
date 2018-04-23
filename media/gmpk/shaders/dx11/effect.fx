@@ -282,7 +282,7 @@ VS_OUTPUT VS_3D( VS_INPUT input )
     return output;
 }
 
-float4 PS_3D(PS_INPUT input) : SV_Target
+float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
     float4 factor_Ambient = float4(0, 0, 0, 0);
     float4 factor_Diffuse = float4(0, 0, 0, 0);
@@ -383,7 +383,7 @@ VS_OUTPUT VS_2D(VS_INPUT input)
     return output;
 }
 
-float4 PS_2D(PS_INPUT input) : SV_Target
+float4 PS_2D(PS_INPUT input) : SV_TARGET
 {
     if (HasNoTexture(DiffuseTextureAttributes) && HasNoTexture(AmbientTextureAttributes))
         return float4(0, 0, 0, 0);
@@ -406,7 +406,7 @@ VS_OUTPUT VS_Glyph(VS_INPUT input)
     return VS_2D(input);
 }
 
-float4 PS_Glyph(PS_INPUT input) : SV_Target
+float4 PS_Glyph(PS_INPUT input) : SV_TARGET
 {
     float4 alpha = AmbientTexture_0.Sample(AmbientSampler_0, input.Texcoord);
     return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
@@ -426,10 +426,117 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
     return output;
 }
 
-float4 PS_CubeMap(PS_INPUT input) : SV_Target
+float4 PS_CubeMap(PS_INPUT input) : SV_TARGET
 {
     float3 texcoord = input.WorldPos.xyz;
     return CubeMapTextureAttributes[0].Sample(CubeMapTexture, CubeMapSampler, texcoord);
+}
+
+//--------------------------------------------------------------------------------------
+// Deferred 3D
+//--------------------------------------------------------------------------------------
+Texture2D DeferredTexPosition : register(t0);
+Texture2D DeferredTexNormal_World : register(t1);
+Texture2D DeferredTexNormal_Eye : register(t2);
+Texture2D DeferredTexAmbient : register(t3);
+Texture2D DeferredTexDiffuse : register(t4);
+Texture2D DeferredTexTangent_Eye : register(t5);
+Texture2D DeferredTexBitangent_Eye : register(t6);
+Texture2D DeferredTexNormalMap : register(t7);
+SamplerState DeferredSamplerPosition : register(s0);
+SamplerState DeferredSamplerNormal_World : register(s1);
+SamplerState DeferredSamplerNormal_Eye : register(s2);
+SamplerState DeferredSamplerAmbient : register(s3);
+SamplerState DeferredSamplerDiffuse : register(s4);
+SamplerState DeferredSamplerTangent_Eye : register(s5);
+SamplerState DeferredSamplerBitangent_Eye : register(s6);
+SamplerState DeferredNormalMap : register(s7);
+
+// [-1, 1] -> [0, 1]
+float4 NormalToTexture(float3 normal)
+{
+    return ToFloat4((normal + 1) * .5f, 1);
+}
+
+struct VS_GEOMETRY_OUTPUT
+{
+    float4 Position                          : SV_TARGET0;
+    float4 Normal_World                      : SV_TARGET1;
+    float4 Normal_Eye                        : SV_TARGET2;
+    float4 TextureAmbient                    : SV_TARGET3;
+    float4 TextureDiffuse                    : SV_TARGET4;
+    float4 Tangent_Eye                       : SV_TARGET5;
+    float4 Bitangent_Eye                     : SV_TARGET6;
+    float4 NormalMap                         : SV_TARGET7;
+    //float3 Ka                                : SV_TARGET8;
+    //float3 Ks                                : SV_TARGET9;
+    //float3 Kd                                : SV_TARGET10;
+    //float3 Shininess_bNormalMap_Refractivity : SV_TARGET11;
+};
+
+VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
+{
+    return VS_3D(input);
+}
+
+VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
+{
+    VS_GEOMETRY_OUTPUT output;
+    output.Position = input.WorldPos;
+
+    float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
+    float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
+    output.Normal_World = NormalToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix)).xyz );
+    output.Normal_Eye = NormalToTexture( normalize(mul(normal_Model, normalEyeTransform )).xyz );
+
+    float4 texAmbient = float4(0, 0, 0, 0);
+    float4 texDiffuse = float4(0, 0, 0, 0);
+    if (HasNoTexture(AmbientTextureAttributes))
+    {
+        texAmbient = float4(1, 1, 1, 1);
+    }
+    else
+    {
+        texAmbient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+        texAmbient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
+        texAmbient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
+        texAmbient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
+    }
+    if (HasNoTexture(DiffuseTextureAttributes))
+    {
+        texDiffuse = float4(1, 1, 1, 1);
+    }
+    else
+    {
+        texDiffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
+        texDiffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
+        texDiffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
+    }
+    output.TextureAmbient = texAmbient;
+    output.TextureDiffuse = texDiffuse;
+    output.NormalMap = NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord);
+
+    if (HasNormalMap())
+    {
+        output.Tangent_Eye = mul(ToFloat4(input.Tangent, 0), normalEyeTransform);
+        output.Bitangent_Eye = mul(ToFloat4(input.Bitangent, 0), normalEyeTransform);
+    }
+    else
+    {
+        output.Tangent_Eye = float4(0, 0, 0, 0);
+        output.Bitangent_Eye = float4(0, 0, 0, 0);
+    }
+    return output;
+}
+
+VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
+{
+    return VS_3D(input);
+}
+
+float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
+{
+    return DeferredTexPosition.Sample(DeferredSamplerPosition, input.Texcoord);
 }
 
 //--------------------------------------------------------------------------------------
@@ -549,7 +656,7 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
     return output;
 }
 
-float4 PS_Filter(PS_INPUT input) : SV_Target
+float4 PS_Filter(PS_INPUT input) : SV_TARGET
 {
     return Filter.Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
 }
@@ -611,6 +718,27 @@ technique11 GMTech_Filter
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Filter()));
         SetPixelShader(CompileShader(ps_5_0,PS_Filter()));
+        SetRasterizerState(GMRasterizerState);
+        SetDepthStencilState(GMDepthStencilState, 1);
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+}
+
+technique11 GMTech_Deferred_3D
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0,VS_3D_GeometryPass()));
+        SetPixelShader(CompileShader(ps_5_0,PS_3D_GeometryPass()));
+        SetRasterizerState(GMRasterizerState);
+        SetDepthStencilState(GMDepthStencilState, 1);
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+
+    pass P1
+    {
+        SetVertexShader(CompileShader(vs_5_0,VS_3D_LightPass()));
+        SetPixelShader(CompileShader(ps_5_0,PS_3D_LightPass()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

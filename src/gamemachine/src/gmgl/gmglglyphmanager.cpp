@@ -28,7 +28,7 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	virtual void drawTexture(GMTextureFrames* frames, GMint textureIndex) override
+	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override
 	{
 		glBindTexture(GL_TEXTURE_2D, m_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

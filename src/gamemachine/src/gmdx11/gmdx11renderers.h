@@ -57,7 +57,8 @@ protected:
 
 protected:
 	virtual void prepareTextures(GMModel* model);
-	virtual void drawTextures(GMModel* model);
+	virtual void setTextures(GMModel* model);
+	virtual void passAllAndDraw(GMModel* model);
 	ID3DX11EffectTechnique* getTechnique();
 	void prepareBuffer(GMModel* model, IQueriable* painter);
 	void prepareLights();
@@ -65,7 +66,6 @@ protected:
 	void prepareRasterizer(GMModel* model);
 	void prepareBlend(GMModel* model);
 	void prepareDepthStencil(GMModel* model);
-	void passAllAndDraw(GMModel* model);
 	void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 
@@ -106,7 +106,7 @@ class GMDx11Renderer_CubeMap : public GMDx11Renderer
 
 public:
 	virtual void prepareTextures(GMModel* model);
-	virtual void drawTextures(GMModel* model);
+	virtual void setTextures(GMModel* model);
 };
 
 class GMDx11Renderer_Filter : public GMDx11Renderer
@@ -118,6 +118,19 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(IQueriable* painter, GMModel* model) override;
+};
+
+class GMDx11Renderer_Deferred_3D: public GMDx11Renderer
+{
+	virtual const char* getTechniqueName() override
+	{
+		return "GMTech_Deferred_3D";
+	}
+
+	virtual void passAllAndDraw(GMModel* model);
+
+private:
+	void setDeferredTextures();
 };
 
 END_NS
