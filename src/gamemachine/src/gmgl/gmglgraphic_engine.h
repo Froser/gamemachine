@@ -19,15 +19,6 @@ extern "C"
 	extern GMuint s_glErrCode;
 }
 
-struct GMShaderProc
-{
-	enum
-	{
-		GEOMETRY_PASS,
-		MATERIAL_PASS,
-	};
-};
-
 enum
 {
 	DEFERRED_GEOMETRY_PASS_SHADER,

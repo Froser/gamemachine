@@ -3,7 +3,7 @@
 #alias deferred_material_pass_gKs_gShininess					deferred_geometry_pass_slot_2
 #alias deferred_material_pass_gHasNormalMap_gRefractivity		deferred_geometry_pass_slot_3
 
-void deferred_material_pass_main()
+subroutine (GM_TechniqueEntrance) void GM_MaterialPass()
 {
 	${deferred_material_pass_gKa} = vec4(GM_material.ka, 0);
 	${deferred_material_pass_gKd} = vec4(GM_material.kd, 0);

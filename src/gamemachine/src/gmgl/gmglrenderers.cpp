@@ -40,17 +40,13 @@ namespace
 			
 		}
 
-		
 		if (shader.getNoDepthTest())
 			glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
 		else
 			glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
-		
 
-		
 		if (shader.getBlend())
 			glDepthMask(GL_FALSE);
-		
 
 		glLineWidth(shader.getLineWidth());
 	}
@@ -82,11 +78,6 @@ namespace
 			GM_ASSERT(false);
 			return GL_TRIANGLES;
 		}
-	}
-
-	constexpr const char* techniqueName()
-	{
-		return "GM_techniqueEntrance";
 	}
 
 	inline const char* getTechnique(GMModelType type)
@@ -276,8 +267,8 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->useProgram();
 
 	auto& desc = shaderProgram->getDesc();
-	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
-	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
+	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
+	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 	if (parent)
 	{
 		shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
@@ -392,8 +383,8 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	shaderProgram->useProgram();
 	auto& desc = shaderProgram->getDesc();
 	GM_ASSERT(model->getType() == GMModelType::CubeMap);
-	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
-	shaderProgram->setInterfaceInstance(techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
+	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
+	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 	shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }

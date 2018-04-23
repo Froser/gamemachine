@@ -14,7 +14,7 @@ void deferred_geometry_pass_calcCoords()
 	_lightmapuv = lightmapuv;
 }
 
-void deferred_geometry_pass_main()
+subroutine (GM_TechniqueEntrance) void GM_GeometryPass()
 {
 	deferred_geometry_pass_calcCoords();
 }

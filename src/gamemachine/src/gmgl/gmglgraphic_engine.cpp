@@ -513,11 +513,31 @@ void GMGLGraphicEngine::updateShader()
 			d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
 			GM_ASSERT(renderMode == GMRenderMode::Deferred);
 			if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
-				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInt(GMSHADER_SHADER_PROC, GMShaderProc::GEOMETRY_PASS);
+			{
+				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
+					GMGLShaderProgram::techniqueName(),
+					GMGLShaderProgram::geometryPassName(),
+					GMShaderType::Vertex);
+				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
+					GMGLShaderProgram::techniqueName(),
+					GMGLShaderProgram::geometryPassName(),
+					GMShaderType::Pixel);
+			}
 			else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
-				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInt(GMSHADER_SHADER_PROC, GMShaderProc::MATERIAL_PASS);
+			{
+				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
+					GMGLShaderProgram::techniqueName(),
+					GMGLShaderProgram::materialPassName(),
+					GMShaderType::Vertex);
+				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
+					GMGLShaderProgram::techniqueName(),
+					GMGLShaderProgram::materialPassName(),
+					GMShaderType::Pixel);
+			}
 			else
+			{
 				GM_ASSERT(false);
+			}
 		}
 		else
 		{

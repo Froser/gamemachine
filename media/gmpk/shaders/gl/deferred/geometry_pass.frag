@@ -51,7 +51,7 @@ void deferred_geometry_pass_calcEyeSpace()
 	}
 }
 
-void deferred_geometry_pass_main()
+subroutine (GM_TechniqueEntrance) void GM_GeometryPass()
 {
 	${deferred_geometry_pass_gPosition} = (GM_model_matrix * _deferred_geometry_pass_position_world);
 	${deferred_geometry_pass_gTexAmbient} = deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);

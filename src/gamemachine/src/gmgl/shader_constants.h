@@ -8,9 +8,6 @@ BEGIN_NS
 
 #define		GMSHADER(memberName)				"GM_" memberName
 
-//状态
-#define		GMSHADER_SHADER_PROC				GMSHADER("shader_proc")
-
 //位置
 #define		GMSHADER_SHADOW_MATRIX				GMSHADER("shadow_matrix")
 

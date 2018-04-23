@@ -54,7 +54,6 @@ public:
 	void setInt(const GMString& name, GMint value);
 	void setFloat(const GMString& name, GMfloat value);
 	void setBool(const GMString& name, bool value);
-	bool setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType);
 
 private:
 	void setProgram(GMuint program) { D(d); d->shaderProgram = program; }
@@ -65,9 +64,27 @@ private:
 	void expandInclude(const GMString& workingDir, const GMString& fn, IN OUT GMString& source);
 	void expandAlias(const GMString& alias, IN OUT GMString& source);
 	GMString& replaceLine(IN OUT GMString& line);
+	bool setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType);
+
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
+
+public:
+	static constexpr const char* techniqueName()
+	{
+		return "GM_techniqueEntrance";
+	}
+
+	static constexpr const char* geometryPassName()
+	{
+		return "GM_GeometryPass";
+	}
+
+	static constexpr const char* materialPassName()
+	{
+		return "GM_MaterialPass";
+	}
 };
 
 END_NS
