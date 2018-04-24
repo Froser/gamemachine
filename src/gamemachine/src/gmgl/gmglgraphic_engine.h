@@ -39,7 +39,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
 
-	GMGLGBuffer gbuffer;
+	GMGLGBufferDep gbuffer;
 	ITexture* cubeMap = nullptr;
 
 	// 延迟渲染的四边形

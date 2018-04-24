@@ -1,6 +1,7 @@
 ﻿#ifndef __GMGLGBUFFER_H__
 #define __GMGLGBUFFER_H__
 #include <gmcommon.h>
+#include <gmgbuffer.h>
 BEGIN_NS
 
 // GBuffer 类型，对应pass着色器layout的顺序
@@ -38,7 +39,7 @@ enum class GMGLDeferredRenderState
 
 constexpr GMint GMGLGBuffer_TotalTurn = (GMint) GMGLDeferredRenderState::EndOfRenderState;
 class GMGraphicEngine;
-GM_PRIVATE_OBJECT(GMGLGBuffer)
+GM_PRIVATE_OBJECT(GMGLGBufferDep)
 {
 	GMuint fbo[GMGLGBuffer_TotalTurn] = { 0 };
 	GMuint textures[(GMint)GBufferGeometryType::EndOfGeometryType] = { 0 };
@@ -52,13 +53,13 @@ GM_PRIVATE_OBJECT(GMGLGBuffer)
 };
 
 class GMGLShaderProgram;
-class GMGLGBuffer : public GMObject
+class GMGLGBufferDep : public GMObject
 {
-	DECLARE_PRIVATE(GMGLGBuffer)
+	DECLARE_PRIVATE(GMGLGBufferDep)
 
 public:
-	GMGLGBuffer() = default;
-	~GMGLGBuffer();
+	GMGLGBufferDep() = default;
+	~GMGLGBufferDep();
 
 public:
 	void adjustViewport();
@@ -84,80 +85,17 @@ private:
 	bool drawBuffers(GMuint count);
 };
 
-GM_PRIVATE_OBJECT(GMGLFramebufferDep)
+class GMGLGBuffer : public GMGBuffer
 {
-	GMuint fbo = 0;
-	GMuint texture = 0;
-	GMuint depthBuffer = 0;
-	GMuint quadVAO = 0;
-	GMuint quadVBO = 0;
-	GMint renderWidth = 0;
-	GMint renderHeight = 0;
-	GMfloat sampleOffsets[2] = { 0 };
-	GMFilterMode::Mode effects = GMFilterMode::None;
-	bool hasBegun = false;
-	GMRect renderRect = { 0 };
-	GMRect viewport = { 0 };
-	GMRenderConfig renderConfig;
-};
-
-GM_PRIVATE_OBJECT(GMGLFramebuffer)
-{
-	ITexture* texture = nullptr;
-};
-
-class GMGLFramebuffer : public GMObject, public IFramebuffer
-{
-	DECLARE_PRIVATE(GMGLFramebuffer);
+protected:
+	virtual IFramebuffers* createGeometryFramebuffers() override;
+	virtual IFramebuffers* createMaterialFramebuffers() override;
 
 public:
-	~GMGLFramebuffer();
-
-public:
-	virtual bool init(const GMFramebufferDesc& desc) override;
-	virtual ITexture* getTexture() override;
-	virtual void setName(const GMString& name) override {}
-
-public:
-	GMuint getTextureId();
+	virtual void geometryPass(GMGameObject *objects[], GMuint count) override;
+	virtual void lightPass() override;
 };
 
-GM_PRIVATE_OBJECT(GMGLFramebuffers)
-{
-	GMuint fbo = 0;
-	GMuint depthStencilBuffer = 0;
-	Vector<GMGLFramebuffer*> framebuffers;
-	bool framebuffersCreated = false;
-	GMGraphicEngine* engine = nullptr;
-};
-
-class GMGLFramebuffers : public GMObject, public IFramebuffers
-{
-	DECLARE_PRIVATE(GMGLFramebuffers)
-
-public:
-	GMGLFramebuffers();
-	~GMGLFramebuffers();
-
-	virtual bool init(const GMFramebufferDesc& desc) override;
-	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
-	virtual void bind() override;
-	virtual void unbind() override;
-	virtual void clear() override;
-	virtual IFramebuffer* getFramebuffer(GMuint) override;
-	virtual GMuint count() override;
-
-public:
-	inline GMuint framebufferId()
-	{
-		D(d);
-		return d->fbo;
-	}
-
-private:
-	void createDepthStencilBuffer(const GMFramebufferDesc& desc);
-	bool createFramebuffers();
-};
 
 END_NS
 #endif

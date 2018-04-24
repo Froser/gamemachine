@@ -298,9 +298,16 @@ GM_INTERFACE_FROM(IShaderProgram, IQueriable)
 };
 
 // 帧缓存
+enum class GMFramebufferFormat
+{
+	R8G8B8A8_UNORM,
+	R32G32B32A32_FLOAT,
+};
+
 struct GMFramebufferDesc
 {
 	GMRect rect;
+	GMFramebufferFormat framebufferFormat;
 };
 
 GM_INTERFACE(IFramebuffer)
@@ -319,6 +326,15 @@ GM_INTERFACE(IFramebuffers)
 	virtual void unbind() = 0;
 	virtual void clear() = 0;
 	virtual IFramebuffer* getFramebuffer(GMuint) = 0;
+};
+
+GM_INTERFACE(IGBuffer)
+{
+	virtual void init() = 0;
+	virtual void geometryPass(GMGameObject *objects[], GMuint count) = 0;
+	virtual void lightPass() = 0;
+	virtual IFramebuffers* getGeometryFramebuffers() = 0;
+	virtual IFramebuffers* getMaterialFramebuffers() = 0;
 };
 
 GM_INTERFACE(IShaderLoadCallback)

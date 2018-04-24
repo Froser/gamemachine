@@ -36,7 +36,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	bool needActivateLight = false;
 	GMRenderConfig renderConfig;
 	bool isDeferredRendering = false;
-	GMDx11GBuffer* gBuffer = nullptr;
+	IGBuffer* gBuffer = nullptr;
 
 	// 延迟渲染分组
 	Vector<GMGameObject*> deferredRenderingGameObjects;
@@ -151,7 +151,7 @@ public:
 		d->isDeferredRendering = isDeferredRendering;
 	}
 
-	GMDx11GBuffer* getGBuffer()
+	IGBuffer* getGBuffer()
 	{
 		D(d);
 		return d->gBuffer;

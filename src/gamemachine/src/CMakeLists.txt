@@ -66,6 +66,8 @@ set(SOURCES
 		gmengine/gmtypoengine.cpp
 		gmengine/gmanimation.h
 		gmengine/gmanimation.cpp
+		gmengine/gmgbuffer.h
+		gmengine/gmgbuffer.cpp
 		gmgl/gmglrenderers.h
 		gmgl/gmglrenderers.cpp
 		gmgl/gmglfactory.h
@@ -82,6 +84,8 @@ set(SOURCES
 		gmgl/gmglshaderprogram.cpp
 		gmgl/gmgltexture.h
 		gmgl/gmgltexture.cpp
+		gmgl/gmglframebuffer.h
+		gmgl/gmglframebuffer.cpp
 		gmgl/shader_constants.h
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp

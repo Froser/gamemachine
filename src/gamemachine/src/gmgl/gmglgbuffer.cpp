@@ -30,67 +30,27 @@ namespace
 		"deferred_material_pass_gKs_gShininess", //gKs: 3, gShininess: 1
 		"deferred_material_pass_gHasNormalMap_gRefractivity", //gHasNormalMap: 1, gRefractivity: 1
 	};
-
-	GM_PRIVATE_OBJECT(GMGLFramebufferTexture)
-	{
-		GMFramebufferDesc desc;
-	};
-
-	class GMGLFramebufferTexture : public GMGLTexture
-	{
-		DECLARE_PRIVATE_AND_BASE(GMGLFramebufferTexture, GMGLTexture);
-
-	public:
-		GMGLFramebufferTexture(const GMFramebufferDesc& desc)
-			: GMGLTexture(nullptr)
-		{
-			D(d);
-			d->desc = desc;
-		}
-
-		virtual void init() override
-		{
-			D(d);
-			D_BASE(db, Base);
-			db->target = GL_TEXTURE_2D;
-
-			glGenTextures(1, &db->id);
-			glBindTexture(GL_TEXTURE_2D, db->id);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			db->texParamsSet = true;
-		}
-
-		GLuint getTextureId()
-		{
-			D_BASE(d, Base);
-			return d->id;
-		}
-	};
 }
 
-GMGLGBuffer::~GMGLGBuffer()
+GMGLGBufferDep::~GMGLGBufferDep()
 {
 	dispose();
 }
 
-void GMGLGBuffer::adjustViewport()
+void GMGLGBufferDep::adjustViewport()
 {
 	D(d);
 	GMEngine->setViewport(d->viewport);
 }
 
-void GMGLGBuffer::beginPass()
+void GMGLGBufferDep::beginPass()
 {
 	D(d);
 	d->currentTurn = (GMint)GMGLDeferredRenderState::PassingGeometry;
 	GMEngine->setRenderState((GMGLDeferredRenderState)d->currentTurn);
 }
 
-bool GMGLGBuffer::nextPass()
+bool GMGLGBufferDep::nextPass()
 {
 	D(d);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
@@ -101,7 +61,7 @@ bool GMGLGBuffer::nextPass()
 	return true;
 }
 
-void GMGLGBuffer::dispose()
+void GMGLGBufferDep::dispose()
 {
 	D(d);
 	if (d->fbo[0])
@@ -129,7 +89,7 @@ void GMGLGBuffer::dispose()
 	}
 }
 
-bool GMGLGBuffer::init(const GMRect& renderRect)
+bool GMGLGBufferDep::init(const GMRect& renderRect)
 {
 	D(d);
 	GMRenderConfig renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
@@ -150,45 +110,45 @@ bool GMGLGBuffer::init(const GMRect& renderRect)
 	return true;
 }
 
-void GMGLGBuffer::bindForWriting()
+void GMGLGBufferDep::bindForWriting()
 {
 	D(d);
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, d->fbo[d->currentTurn]);
 }
 
-void GMGLGBuffer::bindForReading()
+void GMGLGBufferDep::bindForReading()
 {
 	D(d);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[d->currentTurn]);
 }
 
-void GMGLGBuffer::releaseBind()
+void GMGLGBufferDep::releaseBind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GMGLGBuffer::setReadBuffer(GBufferGeometryType textureType)
+void GMGLGBufferDep::setReadBuffer(GBufferGeometryType textureType)
 {
 	D(d);
 	GM_ASSERT(d->currentTurn == 0);
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + (GMuint)textureType);
 }
 
-void GMGLGBuffer::setReadBuffer(GBufferMaterialType materialType)
+void GMGLGBufferDep::setReadBuffer(GBufferMaterialType materialType)
 {
 	D(d);
 	GM_ASSERT(d->currentTurn == 1);
 	glReadBuffer(GL_COLOR_ATTACHMENT0 + (GMuint)materialType);
 }
 
-void GMGLGBuffer::newFrame()
+void GMGLGBufferDep::newFrame()
 {
 	bindForWriting();
 	GMGLGraphicEngine::newFrameOnCurrentFramebuffer();
 	releaseBind();
 }
 
-void GMGLGBuffer::activateTextures()
+void GMGLGBufferDep::activateTextures()
 {
 	D(d);
 	GMGLGraphicEngine* engine = static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
@@ -221,7 +181,7 @@ void GMGLGBuffer::activateTextures()
 	shaderProgram->setInt(shaderProgram->getDesc().CubeMapTextureName, GEOMETRY_OFFSET + MATERIAL_NUM);
 }
 
-void GMGLGBuffer::copyDepthBuffer(GLuint target)
+void GMGLGBufferDep::copyDepthBuffer(GLuint target)
 {
 	D(d);
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
@@ -231,7 +191,7 @@ void GMGLGBuffer::copyDepthBuffer(GLuint target)
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray)
+bool GMGLGBufferDep::createFrameBuffers(GMGLDeferredRenderState state, GMint textureCount, GLuint* textureArray)
 {
 	D(d);
 	GMint s = (GMint)state;
@@ -262,7 +222,7 @@ bool GMGLGBuffer::createFrameBuffers(GMGLDeferredRenderState state, GMint textur
 	return true;
 }
 
-bool GMGLGBuffer::drawBuffers(GMuint count)
+bool GMGLGBufferDep::drawBuffers(GMuint count)
 {
 	Vector<GLuint> attachments;
 	for (GMuint i = 0; i < count; i++)
@@ -281,170 +241,27 @@ bool GMGLGBuffer::drawBuffers(GMuint count)
 	return true;
 }
 
-GMGLFramebuffer::~GMGLFramebuffer()
+IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 {
-	D(d);
-	GM_delete(d->texture);
-}
-
-bool GMGLFramebuffer::init(const GMFramebufferDesc& desc)
-{
-	D(d);
-	d->texture = new GMGLFramebufferTexture(desc);
-	d->texture->init();
-	return true;
-}
-
-ITexture* GMGLFramebuffer::getTexture()
-{
-	D(d);
-	return d->texture;
-}
-
-GMuint GMGLFramebuffer::getTextureId()
-{
-	D(d);
-	GM_ASSERT(dynamic_cast<GMGLFramebufferTexture*>(d->texture));
-	GMGLFramebufferTexture* texture = static_cast<GMGLFramebufferTexture*>(d->texture);
-	return texture->getTextureId();
-}
-
-GMGLFramebuffers::GMGLFramebuffers()
-{
-	D(d);
-	d->engine = gm_cast<GMGraphicEngine*>(GM.getGraphicEngine());
-}
-
-GMGLFramebuffers::~GMGLFramebuffers()
-{
-	D(d);
-	for (auto framebuffer : d->framebuffers)
+	for (GMint i = 0; i < GM_array_size(g_GBufferGeometryUniformNames); ++i)
 	{
-		GM_delete(framebuffer);
+		IFramebuffer* framebuffer = nullptr;
+		GM.getFactory()->createFramebuffer(&framebuffer);
+		GM_ASSERT(framebuffer);
+		/*framebuffer->init(GMFramebufferDesc);*/
 	}
-
-	glDeleteFramebuffers(1, &d->fbo);
-	d->fbo = 0;
-
-	glDeleteRenderbuffers(1, &d->depthStencilBuffer);
-	d->depthStencilBuffer = 0;
+	return nullptr;
 }
 
-bool GMGLFramebuffers::init(const GMFramebufferDesc& desc)
+IFramebuffers* GMGLGBuffer::createMaterialFramebuffers()
 {
-	D(d);
-	glGenFramebuffers(1, &d->fbo);
-	createDepthStencilBuffer(desc);
-	return glGetError() == GL_NO_ERROR;
+	return nullptr;
 }
 
-void GMGLFramebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
+void GMGLGBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 {
-	D(d);
-	GM_ASSERT(dynamic_cast<GMGLFramebuffer*>(framebuffer));
-	GMGLFramebuffer* glFramebuffer = static_cast<GMGLFramebuffer*>(framebuffer);
-	d->framebuffers.push_back(glFramebuffer);
 }
 
-void GMGLFramebuffers::bind()
+void GMGLGBuffer::lightPass()
 {
-	D(d);
-	if (!d->framebuffersCreated)
-	{
-		bool suc = createFramebuffers();
-		GM_ASSERT(suc);
-		d->framebuffersCreated = suc;
-	}
-	
-	if (d->framebuffersCreated)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-		d->engine->getFramebuffersStack().push(this);
-	}
-}
-
-void GMGLFramebuffers::unbind()
-{
-	D(d);
-	GMFramebuffersStack& stack = d->engine->getFramebuffersStack();
-	IFramebuffers* currentFramebuffers = stack.pop();
-	if (currentFramebuffers != this)
-	{
-		GM_ASSERT(false);
-		gm_error("Cannot unbind framebuffer because current framebuffer isn't this framebuffer.");
-	}
-	else
-	{
-		IFramebuffers* lastFramebuffers = stack.peek();
-		if (lastFramebuffers)
-			lastFramebuffers->bind();
-		else
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-}
-
-void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
-{
-	D(d);
-	// If using STENCIL buffer:
-	// NEVER EVER MAKE A STENCIL buffer. All GPUs and all drivers do not support an independent stencil buffer.
-	// If you need a stencil buffer, then you need to make a Depth=24, Stencil=8 buffer, also called D24S8.
-	// See https://www.khronos.org/opengl/wiki/Framebuffer_Object_Extension_Examples
-
-	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-	glGenRenderbuffers(1, &d->depthStencilBuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, d->depthStencilBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, desc.rect.width, desc.rect.height);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-bool GMGLFramebuffers::createFramebuffers()
-{
-	D(d);
-	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-	Vector<GLuint> attachments;
-	GMuint sz = d->framebuffers.size();
-	for (GMuint i = 0; i < sz; i++)
-	{
-		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->framebuffers[i]->getTextureId(), 0);
-	}
-
-	glDrawBuffers(sz, attachments.data());
-
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
-	{
-		gm_error("FB incomplete error, status: 0x%x\n", status);
-		return false;
-	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	return true;
-}
-
-void GMGLFramebuffers::clear()
-{
-	D(d);
-	GLint mask;
-	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-	
-	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
-	glStencilMask(0xFF);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glStencilMask(mask);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-IFramebuffer* GMGLFramebuffers::getFramebuffer(GMuint index)
-{
-	D(d);
-	GM_ASSERT(index < d->framebuffers.size());
-	return d->framebuffers[index];
-}
-
-GMuint GMGLFramebuffers::count()
-{
-	D(d);
-	return d->framebuffers.size();
 }

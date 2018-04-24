@@ -503,20 +503,20 @@ Texture2D GM_DeferredShininess_bNormalMap_Refractivity;
 SamplerState DeferredSampler;
 
 // [-1, 1] -> [0, 1]
-float4 NormalToTexture(float3 normal)
+float4 Float3ToTexture(float3 normal)
 {
     return ToFloat4((normal + 1) * .5f, 1);
 }
 
 struct VS_GEOMETRY_OUTPUT
 {
-    float4 Position                          : SV_TARGET0;
-    float4 Normal_World                      : SV_TARGET1;
-    float4 Normal_Eye                        : SV_TARGET2;
+    float4 Position                          : SV_TARGET0; //需要将区间转化到[0, 1]
+    float4 Normal_World                      : SV_TARGET1; //需要将区间转化到[0, 1]
+    float4 Normal_Eye                        : SV_TARGET2; //需要将区间转化到[0, 1]
     float4 TextureAmbient                    : SV_TARGET3;
     float4 TextureDiffuse                    : SV_TARGET4;
-    float4 Tangent_Eye                       : SV_TARGET5;
-    float4 Bitangent_Eye                     : SV_TARGET6;
+    float4 Tangent_Eye                       : SV_TARGET5; //需要将区间转化到[0, 1]
+    float4 Bitangent_Eye                     : SV_TARGET6; //需要将区间转化到[0, 1]
     float4 NormalMap                         : SV_TARGET7;
 };
 
@@ -534,12 +534,12 @@ VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
 VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 {
     VS_GEOMETRY_OUTPUT output;
-    output.Position = input.WorldPos;
+    output.Position = Float3ToTexture(mul(input.WorldPos, WorldMatrix));
 
     float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
-    output.Normal_World = NormalToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix)).xyz );
-    output.Normal_Eye = NormalToTexture( normalize(mul(normal_Model, normalEyeTransform )).xyz );
+    output.Normal_World = Float3ToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix)).xyz );
+    output.Normal_Eye = Float3ToTexture( normalize(mul(normal_Model, normalEyeTransform )).xyz );
 
     float4 texAmbient = float4(0, 0, 0, 0);
     float4 texDiffuse = float4(0, 0, 0, 0);
@@ -570,13 +570,13 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 
     if (HasNormalMap())
     {
-        output.Tangent_Eye = mul(ToFloat4(input.Tangent, 0), normalEyeTransform);
-        output.Bitangent_Eye = mul(ToFloat4(input.Bitangent, 0), normalEyeTransform);
+        output.Tangent_Eye = Float3ToTexture(mul(ToFloat4(input.Tangent, 0), normalEyeTransform));
+        output.Bitangent_Eye = Float3ToTexture(mul(ToFloat4(input.Bitangent, 0), normalEyeTransform));
     }
     else
     {
-        output.Tangent_Eye = float4(0, 0, 0, 0);
-        output.Bitangent_Eye = float4(0, 0, 0, 0);
+        output.Tangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
+        output.Bitangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
     }
     return output;
 }
@@ -604,12 +604,12 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
-    float3 tangent_Eye_N = GM_DeferredTangent_Eye.Sample(DeferredSampler, input.Texcoord).rgb;
-    float3 bitangent_Eye_N = GM_DeferredBitangent_Eye.Sample(DeferredSampler, input.Texcoord).rgb;
+    float3 tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, DeferredSampler, input.Texcoord).rgb;
+    float3 bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, DeferredSampler, input.Texcoord).rgb;
     float3 normal_Eye_N = TextureRGBToNormal(GM_DeferredNormal_Eye, DeferredSampler, input.Texcoord);
 
     TangentSpace tangentSpace;
-    tangentSpace.Normal_Tangent_N = GM_DeferredNormalMap.Sample(DeferredSampler, input.Texcoord);
+    tangentSpace.Normal_Tangent_N = TextureRGBToNormal(GM_DeferredNormalMap, DeferredSampler, input.Texcoord);
     tangentSpace.TBN = transpose(float3x3(
         tangent_Eye_N,
         bitangent_Eye_N,
@@ -619,7 +619,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
     VS_3D_INPUT commonInput;
     commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, DeferredSampler, input.Texcoord);
     commonInput.Normal_Eye_N = normal_Eye_N;
-    commonInput.WorldPos = GM_DeferredPosition.Sample(DeferredSampler, input.Texcoord);
+    commonInput.WorldPos = TextureRGBToNormal(GM_DeferredPosition, DeferredSampler, input.Texcoord);
     commonInput.TangentSpace = tangentSpace;
 
     commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Sample(DeferredSampler, input.Texcoord)).rgb;

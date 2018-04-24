@@ -32,63 +32,12 @@ GMDx11GBuffer::GMDx11GBuffer(GMDx11GraphicEngine* engine)
 	d->engine = engine;
 }
 
-GMDx11GBuffer::~GMDx11GBuffer()
-{
-	D(d);
-	GM_delete(d->geometryFramebuffers);
-	GM_delete(d->materialFramebuffers);
-	GM_delete(d->quad);
-	GM_delete(d->quadModel);
-}
-
-void GMDx11GBuffer::init()
-{
-	D(d);
-	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-	GMFramebufferDesc desc = { 0 };
-	desc.rect = states.renderRect;
-
-	if (!d->geometryFramebuffers)
-	{
-		GM.getFactory()->createFramebuffers(&d->geometryFramebuffers);
-		d->geometryFramebuffers->init(desc);
-
-		constexpr GMint framebufferCount = GM_array_size(GeometryFramebufferNames); //一共有8个SV_TARGET
-		GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
-		for (GMint i = 0; i < framebufferCount; ++i)
-		{
-			IFramebuffer* framebuffer = nullptr;
-			GM.getFactory()->createFramebuffer(&framebuffer);
-			framebuffer->setName(GeometryFramebufferNames[i]);
-			framebuffer->init(desc);
-			d->geometryFramebuffers->addFramebuffer(framebuffer);
-		}
-	}
-
-	if (!d->materialFramebuffers)
-	{
-		GM.getFactory()->createFramebuffers(&d->materialFramebuffers);
-		d->materialFramebuffers->init(desc);
-
-		constexpr GMint framebufferCount = GM_array_size(MaterialFramebufferNames);
-		GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
-		for (GMint i = 0; i < framebufferCount; ++i)
-		{
-			IFramebuffer* framebuffer = nullptr;
-			GM.getFactory()->createFramebuffer(&framebuffer);
-			framebuffer->setName(MaterialFramebufferNames[i]);
-			framebuffer->init(desc);
-			d->materialFramebuffers->addFramebuffer(framebuffer);
-		}
-	}
-}
-
 void GMDx11GBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
 	d->engine->setIsDeferredRendering(true);
-	d->geometryFramebuffers->clear();
-	d->materialFramebuffers->clear();
+	getGeometryFramebuffers()->clear();
+	getMaterialFramebuffers()->clear();
 	d->engine->draw(objects, count);
 	d->engine->setIsDeferredRendering(false);
 }
@@ -96,26 +45,19 @@ void GMDx11GBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 void GMDx11GBuffer::lightPass()
 {
 	D(d);
-	if (!d->quad)
-	{
-		GM_ASSERT(!d->quadModel);
-		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &d->quadModel);
-		GM_ASSERT(d->quadModel);
-		d->quadModel->setType(GMModelType::LightPassQuad);
-		GM.createModelPainterAndTransfer(d->quadModel);
-		d->quad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->quadModel));
-	}
-	d->quad->draw();
+	GM_ASSERT(getQuad());
+	getQuad()->draw();
 }
 
 void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
 {
 	D(d);
-	GMint cnt = d->geometryFramebuffers->count();
+	IFramebuffers* geometryFramebuffers = getGeometryFramebuffers();
+	GMint cnt = geometryFramebuffers->count();
 	for (GMint i = 0; i < cnt; ++i)
 	{
 		GM_ASSERT(i < GM_array_size(GeometryFramebufferNames));
-		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(d->geometryFramebuffers->getFramebuffer(i)->getTexture());
+		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(geometryFramebuffers->getFramebuffer(i)->getTexture());
 		ID3DX11EffectShaderResourceVariable* shaderResource = effect->GetVariableByName(GeometryFramebufferNames[i])->AsShaderResource();
 		GM_ASSERT(shaderResource->IsValid());
 		GM_DX_HR(shaderResource->SetResource(tex->getResourceView()));
@@ -127,11 +69,12 @@ void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
 void GMDx11GBuffer::useMaterialTextures(ID3DX11Effect* effect)
 {
 	D(d);
-	GMint cnt = d->materialFramebuffers->count();
+	IFramebuffers* materialFramebuffers = getMaterialFramebuffers();
+	GMint cnt = materialFramebuffers->count();
 	for (GMint i = 0; i < cnt; ++i)
 	{
 		GM_ASSERT(i < GM_array_size(MaterialFramebufferNames));
-		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(d->materialFramebuffers->getFramebuffer(i)->getTexture());
+		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(materialFramebuffers->getFramebuffer(i)->getTexture());
 		ID3DX11EffectShaderResourceVariable* shaderResource = effect->GetVariableByName(MaterialFramebufferNames[i])->AsShaderResource();
 		GM_ASSERT(shaderResource->IsValid());
 		GM_DX_HR(shaderResource->SetResource(tex->getResourceView()));
@@ -140,23 +83,60 @@ void GMDx11GBuffer::useMaterialTextures(ID3DX11Effect* effect)
 	}
 }
 
-IFramebuffers* GMDx11GBuffer::getGeometryFramebuffers()
-{
-	D(d);
-	GM_ASSERT(d->geometryFramebuffers);
-	return d->geometryFramebuffers;
-}
-
-IFramebuffers* GMDx11GBuffer::getMaterialFramebuffers()
-{
-	D(d);
-	GM_ASSERT(d->materialFramebuffers);
-	return d->materialFramebuffers;
-}
-
 void GMDx11GBuffer::setSampler(ID3DX11Effect* effect, GMDx11Texture* texture)
 {
 	ID3DX11EffectSamplerVariable* sampler = effect->GetVariableByName("DeferredSampler")->AsSampler();
 	GM_ASSERT(sampler->IsValid());
 	GM_DX_HR(sampler->SetSampler(0, texture->getSamplerState()));
+}
+
+IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
+{
+	IFramebuffers* framebuffers = nullptr;
+	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+	GMFramebufferDesc desc = { 0 };
+	desc.rect = states.renderRect;
+
+	// Geometry Pass的纹理格式为R8G8B8A8_UNORM，意味着所有的输出在着色器中范围是[0,1]，对应着UNORM的[0x00, 0xFF]
+	// 对于[-1, 1]范围的数据，需要在着色器中进行一次转换。
+	desc.framebufferFormat = GMFramebufferFormat::R8G8B8A8_UNORM;
+
+	GM.getFactory()->createFramebuffers(&framebuffers);
+	framebuffers->init(desc);
+
+	constexpr GMint framebufferCount = GM_array_size(GeometryFramebufferNames); //一共有8个SV_TARGET
+	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
+	for (GMint i = 0; i < framebufferCount; ++i)
+	{
+		IFramebuffer* framebuffer = nullptr;
+		GM.getFactory()->createFramebuffer(&framebuffer);
+		framebuffer->setName(GeometryFramebufferNames[i]);
+		framebuffer->init(desc);
+		framebuffers->addFramebuffer(framebuffer);
+	}
+	return framebuffers;
+}
+
+IFramebuffers* GMDx11GBuffer::createMaterialFramebuffers()
+{
+	IFramebuffers* framebuffers = nullptr;
+	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+	GMFramebufferDesc desc = { 0 };
+	desc.rect = states.renderRect;
+	desc.framebufferFormat = GMFramebufferFormat::R32G32B32A32_FLOAT;
+
+	GM.getFactory()->createFramebuffers(&framebuffers);
+	framebuffers->init(desc);
+
+	constexpr GMint framebufferCount = GM_array_size(MaterialFramebufferNames);
+	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
+	for (GMint i = 0; i < framebufferCount; ++i)
+	{
+		IFramebuffer* framebuffer = nullptr;
+		GM.getFactory()->createFramebuffer(&framebuffer);
+		framebuffer->setName(MaterialFramebufferNames[i]);
+		framebuffer->init(desc);
+		framebuffers->addFramebuffer(framebuffer);
+	}
+	return framebuffers;
 }

@@ -10,6 +10,7 @@
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfigs.h"
 #include "foundation/gmprofile.h"
+#include "gmglframebuffer.h"
 
 extern "C"
 {

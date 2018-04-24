@@ -37,7 +37,22 @@ void GMDx11FramebufferTexture::init()
 {
 	D(d);
 	D_BASE(db, Base);
-	constexpr DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	DXGI_FORMAT format;
+	if (d->desc.framebufferFormat == GMFramebufferFormat::R8G8B8A8_UNORM)
+	{
+		format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	}
+	else if (d->desc.framebufferFormat == GMFramebufferFormat::R32G32B32A32_FLOAT)
+	{
+		format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+	}
+	else
+	{
+		format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		GM_ASSERT(!"Unsupported format.");
+		gm_error("Unsupported format.");
+	}
+
 	GMComPtr<ID3D11Texture2D> texture;
 	D3D11_TEXTURE2D_DESC texDesc = { 0 };
 	texDesc.Width = d->desc.rect.width;
