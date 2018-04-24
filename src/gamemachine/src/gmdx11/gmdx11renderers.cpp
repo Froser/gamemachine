@@ -810,17 +810,18 @@ void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
 	IFramebuffers* activeFramebuffer = nullptr;
+	GMDx11GBuffer* gbuffer = getEngine()->getGBuffer();
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		if (p == 0)
 		{
-			activeFramebuffer = getEngine()->getGBuffer()->getGeometryFramebuffers();
+			activeFramebuffer = gbuffer->getGeometryFramebuffers();
 		}
 		else
 		{
 			GM_ASSERT(p == 1); //目前2个pass
-			activeFramebuffer = getEngine()->getGBuffer()->getMaterialFramebuffers();
+			activeFramebuffer = gbuffer->getMaterialFramebuffers();
 		}
 
 		prepareTextures(model);
@@ -846,8 +847,8 @@ void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
+		setDeferredTexturesBeforeApply();
 		pass->Apply(0, d->deviceContext);
-		setDeferredTextures();
 
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(model->getVerticesCount(), 0);
@@ -856,24 +857,10 @@ void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTextures()
+void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTexturesBeforeApply()
 {
 	D(d);
 	GMDx11GBuffer* gbuffer = getEngine()->getGBuffer();
-	IFramebuffers* geometryFramebuffer = gbuffer->getGeometryFramebuffers();
-	IFramebuffers* materialFramebuffer = gbuffer->getMaterialFramebuffers();
-	GMuint geometryTexCount = geometryFramebuffer->count();
-	GMuint materialTexCount = materialFramebuffer->count();
-	for (GMuint i = 0; i < geometryTexCount; ++i)
-	{
-		ITexture* tex = geometryFramebuffer->getFramebuffer(i)->getTexture();
-		tex->useTexture(nullptr, i);
-	}
-	/*
-	for (GMuint i = 0; i < materialTexCount; ++i)
-	{
-		ITexture* tex = materialFramebuffer->getFramebuffer(i)->getTexture();
-		tex->useTexture(nullptr, geometryTexCount + i);
-	}
-	*/
+	gbuffer->useGeometryTextures(d->effect);
+	gbuffer->useMaterialTextures(d->effect);
 }

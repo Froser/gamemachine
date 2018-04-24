@@ -221,7 +221,6 @@ void GMDx11Framebuffers::unbind()
 		else
 			d->deviceContext->OMSetRenderTargets(1, &d->defaultRenderTargetView, d->defaultDepthStencilView);
 	}
-
 }
 
 void GMDx11Framebuffers::clear()

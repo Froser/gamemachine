@@ -26,7 +26,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 };
 
-class GMDx11Renderer : public IRenderer
+class GMDx11Renderer : public GMObject, public IRenderer
 {
 	DECLARE_PRIVATE(GMDx11Renderer)
 
@@ -59,14 +59,15 @@ protected:
 	virtual void prepareTextures(GMModel* model);
 	virtual void setTextures(GMModel* model);
 	virtual void passAllAndDraw(GMModel* model);
+	virtual void prepareBuffer(GMModel* model);
+	virtual void prepareLights();
+	virtual void prepareMaterials(GMModel* model);
+	virtual void prepareRasterizer(GMModel* model);
+	virtual void prepareBlend(GMModel* model);
+	virtual void prepareDepthStencil(GMModel* model);
+	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
+
 	ID3DX11EffectTechnique* getTechnique();
-	void prepareBuffer(GMModel* model);
-	void prepareLights();
-	void prepareMaterials(GMModel* model);
-	void prepareRasterizer(GMModel* model);
-	void prepareBlend(GMModel* model);
-	void prepareDepthStencil(GMModel* model);
-	void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
 
 public:
@@ -137,9 +138,12 @@ class GMDx11Renderer_Deferred_3D_LightPass : public GMDx11Renderer
 		return "GMTech_Deferred_3D_LightPass";
 	}
 
+	virtual void prepareMaterials(GMModel* model) override {}
+	virtual void prepareLights() override {}
+
 private:
 	void passAllAndDraw(GMModel* model);
-	void setDeferredTextures();
+	void setDeferredTexturesBeforeApply();
 };
 
 END_NS

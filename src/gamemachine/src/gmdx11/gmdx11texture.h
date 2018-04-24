@@ -26,6 +26,21 @@ public:
 public:
 	virtual void init() override;
 	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override;
+
+public:
+	ID3D11ShaderResourceView* getResourceView()
+	{
+		D(d);
+		GM_ASSERT(d->shaderResourceView);
+		return d->shaderResourceView;
+	}
+
+	ID3D11SamplerState* getSamplerState()
+	{
+		D(d);
+		GM_ASSERT(d->samplerState);
+		return d->samplerState;
+	}
 };
 
 END_NS
