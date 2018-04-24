@@ -27,8 +27,6 @@ namespace
 
 	Array<const char*, MATERIAL_NUM> g_GBufferMaterialUniformNames =
 	{
-		"deferred_material_pass_gKa",
-		"deferred_material_pass_gKd",
 		"deferred_material_pass_gKs_gShininess", //gKs: 3, gShininess: 1
 		"deferred_material_pass_gHasNormalMap_gRefractivity", //gHasNormalMap: 1, gRefractivity: 1
 	};

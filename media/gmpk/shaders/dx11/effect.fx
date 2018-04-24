@@ -46,6 +46,11 @@ SamplerState NormalMapSampler: register(s6);
 SamplerState LightmapSampler: register(s7);
 SamplerState CubeMapSampler: register(s8);
 
+float3 TextureRGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
+{
+    return tex.Sample(ss, texcoord).xyz * 2.0f - 1.0f;
+}
+
 struct GMMaterial
 {
     float4 Ka;
@@ -75,7 +80,7 @@ class GMTexture
 
     float3 RGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
     {
-        return tex.Sample(ss, texcoord).xyz * 2.0f - 1.0f;
+        return TextureRGBToNormal(tex, ss, texcoord);
     }
 };
 
@@ -202,17 +207,17 @@ GMTexture NormalMap()
     return NormalMapTextureAttributes[0];
 }
 
-class NormapMapArgs
+class NormalMapArgs
 {
-    float3 normal_Tangent_N;
+    float3 Normal_Tangent_N;
     float3x3 TBN;
 
-    void CalculateNormapMapArgsInEyeSpace(float2 texcoord, float3 tangent, float3 bitangent, float3 normal_Eye_N, matrix transform_Normal_Eye)
+    void CalculateNormalMapArgsInEyeSpace(float2 texcoord, float3 tangent, float3 bitangent, float3 normal_Eye_N, matrix transform_Normal_Eye)
     {
         if (!HasNormalMap())
             return;
 
-        normal_Tangent_N = NormalMap().RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
+        Normal_Tangent_N = NormalMap().RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
         float3 tangent_Eye_N = normalize(mul(ToFloat4(tangent, 0), transform_Normal_Eye).xyz);
         float3 bitangent_Eye_N = normalize(mul(ToFloat4(bitangent, 0), transform_Normal_Eye).xyz);
         TBN = transpose(float3x3(
@@ -242,7 +247,7 @@ float4 IlluminateRefraction(
     float3 normal_World_N,
     float4 position_World,
     float4 viewPosition_World,
-    NormapMapArgs normalMapArgs
+    NormalMapArgs normalMapArgs
     )
 {
     if (Material.Refractivity == 0)
@@ -251,7 +256,7 @@ float4 IlluminateRefraction(
     if (HasNormalMap())
     {
         // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
-        float4 normal_Eye_N = ToFloat4(mul(normalMapArgs.normal_Tangent_N, transpose(normalMapArgs.TBN)), 0);
+        float4 normal_Eye_N = ToFloat4(mul(normalMapArgs.Normal_Tangent_N, transpose(normalMapArgs.TBN)), 0);
         float3 normalFromTangent_World_N = mul(normal_Eye_N, InverseViewMatrix).xyz;
         return IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World);
     }
@@ -262,6 +267,68 @@ float4 IlluminateRefraction(
 //--------------------------------------------------------------------------------------
 // 3D
 //--------------------------------------------------------------------------------------
+
+struct VS_3D_INPUT
+{
+    float3 WorldPos;            // 世界坐标
+    float3 Normal_World_N;      // 世界法线
+    float3 Normal_Eye_N;        // 眼睛空间法向量
+    NormalMapArgs NormalMap;    // 法线贴图相关
+    bool HasNormalMap;          // 是否有法线贴图
+    float3 AmbientLightmapTexture;
+    float3 DiffuseTexture;
+};
+
+float4 PS_3D_Common(VS_3D_INPUT input)
+{
+    float4 factor_Ambient = float4(0, 0, 0, 0);
+    float4 factor_Diffuse = float4(0, 0, 0, 0);
+    float4 factor_Specular = float4(0, 0, 0, 0);
+
+    // 将法线换算到眼睛坐标系
+    float3 position_Eye = (mul(ToFloat4(input.WorldPos), ViewMatrix)).xyz;
+    float3 position_Eye_N = normalize(position_Eye);
+
+    int i = 0;
+    for (i = 0; i < AmbientLightCount; ++i)
+    {
+        factor_Ambient += AmbientLights[i].IlluminateAmbient();
+    }
+
+    for (i = 0; i < SpecularLightCount; ++i)
+    {
+        if (!input.HasNormalMap)
+        {
+            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
+            float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
+            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Eye_N, input.Normal_Eye_N);
+            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, Material.Shininess);    
+        }
+        else
+        {
+            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
+            float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
+
+            float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.NormalMap.TBN));
+            float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.NormalMap.TBN));
+
+            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Tangent_N, input.NormalMap.Normal_Tangent_N);
+            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, input.NormalMap.Normal_Tangent_N, Material.Shininess); 
+        }
+    }
+
+    float4 color_Ambient = factor_Ambient * ToFloat4(input.AmbientLightmapTexture);
+    float4 color_Diffuse = factor_Diffuse * ToFloat4(input.DiffuseTexture);
+
+    // 计算Specular
+    float4 color_Specular = factor_Specular * Material.Ks;
+    
+    // 计算折射
+    float4 color_Refractivity = IlluminateRefraction(CubeMapTextureAttributes[0], CubeMapTexture, input.Normal_World_N, ToFloat4(input.WorldPos), ViewPosition, input.NormalMap);
+
+    float4 finalColor = color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
+    return finalColor;
+}
 
 VS_OUTPUT VS_3D( VS_INPUT input )
 {
@@ -284,46 +351,20 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
-    float4 factor_Ambient = float4(0, 0, 0, 0);
-    float4 factor_Diffuse = float4(0, 0, 0, 0);
-    float4 factor_Specular = float4(0, 0, 0, 0);
-
     // 将法线换算到眼睛坐标系
     matrix transform_Normal_Eye = mul(InverseTransposeModelMatrix, ViewMatrix);
     float3 normal_Eye_N = normalize( mul(ToFloat4(input.Normal.xyz, 0), transform_Normal_Eye).xyz);
-    float3 position_Eye = (mul(input.WorldPos, ViewMatrix)).xyz;
-    float3 position_Eye_N = normalize(position_Eye);
 
-    int i = 0;
-    for (i = 0; i < AmbientLightCount; ++i)
-    {
-        factor_Ambient += AmbientLights[i].IlluminateAmbient();
-    }
+    VS_3D_INPUT commonInput;
+    NormalMapArgs normalMapArgs;
+    normalMapArgs.CalculateNormalMapArgsInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye);
 
-    NormapMapArgs normalMapArgs;
-    normalMapArgs.CalculateNormapMapArgsInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye);
+    commonInput.NormalMap = normalMapArgs;
+    commonInput.WorldPos = input.WorldPos;
+    commonInput.HasNormalMap = HasNormalMap();
 
-    for (i = 0; i < SpecularLightCount; ++i)
-    {
-        if (!HasNormalMap())
-        {
-            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
-            float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Eye_N, normal_Eye_N);
-            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Eye_N, -position_Eye_N, normal_Eye_N, Material.Shininess);    
-        }
-        else
-        {
-            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
-            float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
-
-            float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, normalMapArgs.TBN));
-            float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, normalMapArgs.TBN));
-
-            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Tangent_N, normalMapArgs.normal_Tangent_N);
-            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, normalMapArgs.normal_Tangent_N, Material.Shininess); 
-        }
-    }
+    commonInput.Normal_World_N = normalize(mul(ToFloat4(input.Normal.xyz, 0), InverseTransposeModelMatrix).xyz);
+    commonInput.Normal_Eye_N = normal_Eye_N;
 
     // 计算Ambient
     float4 color_Ambient = float4(0, 0, 0, 0);
@@ -338,7 +379,6 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
         color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
     }
     color_Ambient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
-    color_Ambient = factor_Ambient * color_Ambient * Material.Ka;
 
     // 计算Diffuse
     float4 color_Diffuse = float4(0, 0, 0, 0);
@@ -352,23 +392,17 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
         color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
         color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
     }
-    color_Diffuse = factor_Diffuse * color_Diffuse * Material.Kd;
 
-    // 计算Specular
-    float4 color_Specular = factor_Specular * Material.Ks;
-    
-    // 计算折射
-    float3 normal_World_N = normalize(mul(ToFloat4(input.Normal.xyz, 0), InverseTransposeModelMatrix).xyz);
-    float4 color_Refractivity = IlluminateRefraction(CubeMapTextureAttributes[0], CubeMapTexture, normal_World_N, input.WorldPos, ViewPosition, normalMapArgs);
+    commonInput.AmbientLightmapTexture = color_Ambient * Material.Ka;
+    commonInput.DiffuseTexture = color_Diffuse * Material.Kd;
 
-    float4 finalColor = color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
-    return finalColor;
+    return PS_3D_Common(commonInput);
 }
 
 //--------------------------------------------------------------------------------------
 // 2D
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS_2D(VS_INPUT input)
+VS_OUTPUT VS_Flat(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
@@ -381,6 +415,11 @@ VS_OUTPUT VS_2D(VS_INPUT input)
     output.Lightmap = input.Lightmap;
     output.Color = input.Color;
     return output;
+}
+
+VS_OUTPUT VS_2D(VS_INPUT input)
+{
+    return VS_Flat(input);
 }
 
 float4 PS_2D(PS_INPUT input) : SV_TARGET
@@ -403,7 +442,7 @@ float4 PS_2D(PS_INPUT input) : SV_TARGET
 //--------------------------------------------------------------------------------------
 VS_OUTPUT VS_Glyph(VS_INPUT input)
 {
-    return VS_2D(input);
+    return VS_Flat(input);
 }
 
 float4 PS_Glyph(PS_INPUT input) : SV_TARGET
@@ -443,14 +482,7 @@ Texture2D DeferredTexDiffuse : register(t4);
 Texture2D DeferredTexTangent_Eye : register(t5);
 Texture2D DeferredTexBitangent_Eye : register(t6);
 Texture2D DeferredTexNormalMap : register(t7);
-SamplerState DeferredSamplerPosition : register(s0);
-SamplerState DeferredSamplerNormal_World : register(s1);
-SamplerState DeferredSamplerNormal_Eye : register(s2);
-SamplerState DeferredSamplerAmbient : register(s3);
-SamplerState DeferredSamplerDiffuse : register(s4);
-SamplerState DeferredSamplerTangent_Eye : register(s5);
-SamplerState DeferredSamplerBitangent_Eye : register(s6);
-SamplerState DeferredNormalMap : register(s7);
+SamplerState DeferredSampler : register(s0);
 
 // [-1, 1] -> [0, 1]
 float4 NormalToTexture(float3 normal)
@@ -468,10 +500,12 @@ struct VS_GEOMETRY_OUTPUT
     float4 Tangent_Eye                       : SV_TARGET5;
     float4 Bitangent_Eye                     : SV_TARGET6;
     float4 NormalMap                         : SV_TARGET7;
-    //float3 Ka                                : SV_TARGET8;
-    //float3 Ks                                : SV_TARGET9;
-    //float3 Kd                                : SV_TARGET10;
-    //float3 Shininess_bNormalMap_Refractivity : SV_TARGET11;
+};
+
+struct VS_MATERIAL_OUTPUT
+{
+    float3 Ks                                : SV_TARGET1;
+    float3 Shininess_bNormalMap_Refractivity : SV_TARGET3;
 };
 
 VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
@@ -493,7 +527,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     float4 texDiffuse = float4(0, 0, 0, 0);
     if (HasNoTexture(AmbientTextureAttributes))
     {
-        texAmbient = float4(1, 1, 1, 1);
+        texAmbient = float4(0, 0, 0, 0);
     }
     else
     {
@@ -504,7 +538,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     }
     if (HasNoTexture(DiffuseTextureAttributes))
     {
-        texDiffuse = float4(1, 1, 1, 1);
+        texDiffuse = float4(0, 0, 0, 0);
     }
     else
     {
@@ -512,8 +546,8 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
         texDiffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
         texDiffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
     }
-    output.TextureAmbient = texAmbient;
-    output.TextureDiffuse = texDiffuse;
+    output.TextureAmbient = texAmbient * Material.Ka;
+    output.TextureDiffuse = texDiffuse * Material.Kd;
     output.NormalMap = NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord);
 
     if (HasNormalMap())
@@ -529,6 +563,22 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     return output;
 }
 
+VS_OUTPUT VS_3D_MaterialPass(VS_INPUT input)
+{
+    return VS_3D(input);
+}
+
+VS_MATERIAL_OUTPUT PS_3D_MaterialPass(PS_INPUT input)
+{
+    VS_MATERIAL_OUTPUT output;
+    output.Ks = Material.Ks;
+    output.Shininess_bNormalMap_Refractivity.r = Material.Shininess;
+    output.Shininess_bNormalMap_Refractivity.g = HasNormalMap();
+    output.Shininess_bNormalMap_Refractivity.r = Material.Refractivity;
+
+    return output;
+}
+
 VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 {
     return VS_3D(input);
@@ -536,7 +586,29 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
-    return DeferredTexPosition.Sample(DeferredSamplerPosition, input.Texcoord);
+    float3 tangent_Eye_N = DeferredTexTangent_Eye.Sample(DeferredSampler, input.Texcoord).rgb;
+    float3 bitangent_Eye_N = DeferredTexBitangent_Eye.Sample(DeferredSampler, input.Texcoord).rgb;
+    float3 normal_Eye_N = TextureRGBToNormal(DeferredTexNormal_Eye, DeferredSampler, input.Texcoord);
+
+    NormalMapArgs normalMapArgs;
+    normalMapArgs.Normal_Tangent_N = DeferredTexNormalMap.Sample(DeferredSampler, input.Texcoord);
+    normalMapArgs.TBN = transpose(float3x3(
+        tangent_Eye_N,
+        bitangent_Eye_N,
+        normal_Eye_N
+    ));
+
+    VS_3D_INPUT commonInput;
+    commonInput.Normal_World_N = DeferredTexNormal_World.Sample(DeferredSampler, input.Texcoord);
+    commonInput.Normal_Eye_N = normal_Eye_N;
+    commonInput.WorldPos = DeferredTexPosition.Sample(DeferredSampler, input.Texcoord);
+    commonInput.HasNormalMap = false;
+    commonInput.NormalMap = normalMapArgs;
+
+    commonInput.AmbientLightmapTexture = (DeferredTexAmbient.Sample(DeferredSampler, input.Texcoord)).rgb;
+    commonInput.DiffuseTexture = (DeferredTexDiffuse.Sample(DeferredSampler, input.Texcoord)).rgb;
+
+    return PS_3D_Common(commonInput);
 }
 
 //--------------------------------------------------------------------------------------
@@ -736,6 +808,18 @@ technique11 GMTech_Deferred_3D
     }
 
     pass P1
+    {
+        SetVertexShader(CompileShader(vs_5_0,VS_3D_MaterialPass()));
+        SetPixelShader(CompileShader(ps_5_0,PS_3D_MaterialPass()));
+        SetRasterizerState(GMRasterizerState);
+        SetDepthStencilState(GMDepthStencilState, 1);
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+}
+
+technique11 GMTech_Deferred_3D_LightPass
+{
+    pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_LightPass()));
         SetPixelShader(CompileShader(ps_5_0,PS_3D_LightPass()));

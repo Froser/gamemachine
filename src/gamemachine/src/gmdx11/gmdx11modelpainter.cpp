@@ -184,5 +184,5 @@ void* GMDx11ModelPainter::getBuffer()
 
 void GMDx11ModelPainter::draw(IRenderer* renderer, GMModel* model)
 {
-	renderer->draw(this, model);
+	renderer->draw(model);
 }

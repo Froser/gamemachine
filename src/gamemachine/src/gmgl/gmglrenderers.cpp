@@ -106,7 +106,7 @@ GMGLRenderer::GMGLRenderer()
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
-void GMGLRenderer::draw(IQueriable* painter, GMModel* model)
+void GMGLRenderer::draw(GMModel* model)
 {
 	D(d);
 	applyStencil(*d->engine);

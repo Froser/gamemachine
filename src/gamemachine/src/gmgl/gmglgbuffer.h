@@ -21,8 +21,6 @@ enum class GBufferGeometryType
 enum class GBufferMaterialType
 {
 	// 材质属性
-	Ka,
-	Kd,
 	Ks_Shininess,
 	HasNormalMap_Refractivity,
 	EndOfMaterialType,

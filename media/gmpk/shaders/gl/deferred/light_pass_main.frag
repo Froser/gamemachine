@@ -14,8 +14,6 @@ uniform sampler2D deferred_light_pass_gTangent_eye;
 uniform sampler2D deferred_light_pass_gBitangent_eye;
 uniform sampler2D deferred_light_pass_gNormalMap;
 
-uniform sampler2D deferred_material_pass_gKa;
-uniform sampler2D deferred_material_pass_gKd;
 uniform sampler2D deferred_material_pass_gKs_gShininess;
 uniform sampler2D deferred_material_pass_gHasNormalMap_gRefractivity;
 
@@ -30,8 +28,6 @@ vec3 deferred_light_pass_fromTexture_Bitangent_eye;
 vec3 deferred_light_pass_fromTexture_NormalMap;
 
 // materials
-vec3 deferred_material_pass_fromTexture_Ka;
-vec3 deferred_material_pass_fromTexture_Kd;
 vec3 deferred_material_pass_fromTexture_Ks;
 float deferred_material_pass_fromTexture_Shininess;
 
@@ -74,10 +70,6 @@ void deferred_light_pass_init()
 	deferred_light_pass_fromTexture_Bitangent_eye = texture(deferred_light_pass_gBitangent_eye, _uv).rgb;
 	deferred_light_pass_fromTexture_NormalMap = texture(deferred_light_pass_gNormalMap, _uv).rgb;
 
-	// material pass
-	deferred_material_pass_fromTexture_Ka = texture(deferred_material_pass_gKa, _uv).rgb;
-	deferred_material_pass_fromTexture_Kd = texture(deferred_material_pass_gKd, _uv).rgb;
-
 	vec4 tKs_tShininess = texture(deferred_material_pass_gKs_gShininess, _uv);
 	deferred_material_pass_fromTexture_Ks = tKs_tShininess.rgb;
 	deferred_material_pass_fromTexture_Shininess = tKs_tShininess.a;
@@ -97,7 +89,7 @@ void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDire
 		float diffuseFactor = dot(L, N);
 		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
 
-		deferred_light_pass_g_diffuseLight += diffuseFactor * deferred_material_pass_fromTexture_Kd * light.lightColor;
+		deferred_light_pass_g_diffuseLight += diffuseFactor * light.lightColor;
 	}
 
 	// specular:
@@ -169,7 +161,7 @@ void deferred_light_pass_calcLights()
 	// 计算环境光
 	for (int i = 0; i < GM_ambients_count; i++)
 	{
-		deferred_light_pass_g_ambientLight += deferred_material_pass_fromTexture_Ka * GM_ambients[i].lightColor;
+		deferred_light_pass_g_ambientLight += GM_ambients[i].lightColor;
 	}
 }
 

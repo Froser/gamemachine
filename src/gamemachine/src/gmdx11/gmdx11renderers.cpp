@@ -5,7 +5,6 @@
 #include <gmdx11helper.h>
 #include "gmdx11modelpainter.h"
 #include "gmdx11texture.h"
-#include "foundation/utilities/utilities.h"
 #include "gmdx11graphic_engine.h"
 #include "gmdx11gbuffer.h"
 
@@ -527,12 +526,13 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	}
 }
 
-void GMDx11Renderer::prepareBuffer(GMModel* model, IQueriable* painter)
+void GMDx11Renderer::prepareBuffer(GMModel* model)
 {
 	D(d);
 	GMuint stride = sizeof(GMVertex);
 	GMuint offset = 0;
 	GMComPtr<ID3D11Buffer> vertexBuffer;
+	IQueriable* painter = model->getPainter();
 	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
 	GM_ASSERT(vertexBuffer);
 	GM_DX11_SET_OBJECT_NAME_A(vertexBuffer, "GM_VERTEX_BUFFER");
@@ -697,10 +697,10 @@ ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
-void GMDx11Renderer::draw(IQueriable* painter, GMModel* model)
+void GMDx11Renderer::draw(GMModel* model)
 {
 	D(d);
-	prepareBuffer(model, painter);
+	prepareBuffer(model);
 	prepareLights();
 	prepareMaterials(model);
 	prepareRasterizer(model);
@@ -773,10 +773,10 @@ void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_Filter::draw(IQueriable* painter, GMModel* model)
+void GMDx11Renderer_Filter::draw(GMModel* model)
 {
 	D(d);
-	prepareBuffer(model, painter);
+	prepareBuffer(model);
 	prepareRasterizer(model);
 	prepareBlend(model);
 	prepareDepthStencil(model);
@@ -789,7 +789,6 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	GMDx11Renderer::beginModel(model, parent);
 
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
-
 	ID3DX11EffectScalarVariable* kernelDeltaX = d->effect->GetVariableByName(desc->FilterAttributes.KernelDeltaX)->AsScalar();
 	ID3DX11EffectScalarVariable* kernelDeltaY = d->effect->GetVariableByName(desc->FilterAttributes.KernelDeltaY)->AsScalar();
 	GM_ASSERT(kernelDeltaX->IsValid() && kernelDeltaY->IsValid());
@@ -814,41 +813,67 @@ void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
-		if (p < techDesc.Passes - 1)
+		if (p == 0)
 		{
-			activeFramebuffer = getEngine()->getGBuffer()->getGeometryFramebuffer();
-			prepareTextures(model);
-			pass->Apply(0, d->deviceContext);
-			setTextures(model);
+			activeFramebuffer = getEngine()->getGBuffer()->getGeometryFramebuffers();
 		}
 		else
 		{
-			// 最后一个Pass，是Light pass阶段
-			activeFramebuffer = nullptr;
-			setDeferredTextures();
-			pass->Apply(0, d->deviceContext);
+			GM_ASSERT(p == 1); //目前2个pass
+			activeFramebuffer = getEngine()->getGBuffer()->getMaterialFramebuffers();
 		}
 
-		if (activeFramebuffer)
-			activeFramebuffer->bind();
+		prepareTextures(model);
+		pass->Apply(0, d->deviceContext);
+		setTextures(model);
+
+		GM_ASSERT(activeFramebuffer);
+		activeFramebuffer->bind();
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(model->getVerticesCount(), 0);
 		else
 			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
-		if (activeFramebuffer)
-			activeFramebuffer->unbind();
+		activeFramebuffer->unbind();
 	}
 }
 
-void GMDx11Renderer_Deferred_3D::setDeferredTextures()
+void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
+{
+	D(d);
+	D3DX11_TECHNIQUE_DESC techDesc;
+	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
+
+	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	{
+		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
+		pass->Apply(0, d->deviceContext);
+		setDeferredTextures();
+
+		if (model->getDrawMode() == GMModelDrawMode::Vertex)
+			d->deviceContext->Draw(model->getVerticesCount(), 0);
+		else
+			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+	}
+}
+
+void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTextures()
 {
 	D(d);
 	GMDx11GBuffer* gbuffer = getEngine()->getGBuffer();
-	IFramebuffers* geometryFramebuffer = gbuffer->getGeometryFramebuffer();
-	GMuint texCount = geometryFramebuffer->count();
-	for (GMuint i = 0; i < texCount; ++i)
+	IFramebuffers* geometryFramebuffer = gbuffer->getGeometryFramebuffers();
+	IFramebuffers* materialFramebuffer = gbuffer->getMaterialFramebuffers();
+	GMuint geometryTexCount = geometryFramebuffer->count();
+	GMuint materialTexCount = materialFramebuffer->count();
+	for (GMuint i = 0; i < geometryTexCount; ++i)
 	{
 		ITexture* tex = geometryFramebuffer->getFramebuffer(i)->getTexture();
-		tex->useTexture(0, i);
+		tex->useTexture(nullptr, i);
 	}
+	/*
+	for (GMuint i = 0; i < materialTexCount; ++i)
+	{
+		ITexture* tex = materialFramebuffer->getFramebuffer(i)->getTexture();
+		tex->useTexture(nullptr, geometryTexCount + i);
+	}
+	*/
 }

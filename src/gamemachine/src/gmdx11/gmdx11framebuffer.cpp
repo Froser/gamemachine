@@ -3,6 +3,7 @@
 #include "foundation/gamemachine.h"
 #include <gmimagebuffer.h>
 #include "gmengine/gmgraphicengine.h"
+#include "gmdx11helper.h"
 
 BEGIN_NS
 
@@ -61,6 +62,14 @@ void GMDx11FramebufferTexture::init()
 		NULL,
 		&db->shaderResourceView
 	));
+
+	if (!db->samplerState)
+	{
+		// 创建采样器
+		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
+		desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		GM_DX_HR(db->device->CreateSamplerState(&desc, &db->samplerState));
+	}
 }
 
 ID3D11Resource* GMDx11FramebufferTexture::getTexture()

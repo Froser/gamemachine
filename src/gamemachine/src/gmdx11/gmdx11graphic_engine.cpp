@@ -60,7 +60,8 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 			d->gBuffer->init();
 		}
 
-		d->gBuffer->draw(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
+		d->gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
+		d->gBuffer->lightPass();
 		forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
 	}
 	else
@@ -260,6 +261,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	static GMDx11Renderer_CubeMap s_renderer_cubemap;
 	static GMDx11Renderer_Filter s_renderer_filter;
 	static GMDx11Renderer_Deferred_3D s_renderer_deferred_3d;
+	static GMDx11Renderer_Deferred_3D_LightPass s_renderer_deferred_3d_lightpass;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -274,6 +276,8 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 		return &s_renderer_cubemap;
 	case GMModelType::Filter:
 		return &s_renderer_filter;
+	case GMModelType::LightPassQuad:
+		return &s_renderer_deferred_3d_lightpass;
 	default:
 		GM_ASSERT(false);
 		return nullptr;

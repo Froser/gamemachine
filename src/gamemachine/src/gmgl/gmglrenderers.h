@@ -20,7 +20,7 @@ class GMGLRenderer : public GMObject, public IRenderer
 public:
 	GMGLRenderer();
 
-	virtual void draw(IQueriable* painter, GMModel* model) override;
+	virtual void draw(GMModel* model) override;
 
 protected:
 	virtual void beforeDraw(GMModel* model) = 0;

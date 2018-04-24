@@ -137,7 +137,6 @@ void GMGLModelPainter::beginUpdateBuffer(GMModel* model)
 
 void GMGLModelPainter::endUpdateBuffer()
 {
-	
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -152,5 +151,5 @@ void GMGLModelPainter::draw(IRenderer* renderer, GMModel* model)
 {
 	D(d);
 	d->engine->checkDrawingState();
-	renderer->draw(this, model);
+	renderer->draw(model);
 }

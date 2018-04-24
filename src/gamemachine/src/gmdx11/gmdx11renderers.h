@@ -36,7 +36,7 @@ public:
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
-	virtual void draw(IQueriable* painter, GMModel* model) override;
+	virtual void draw(GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
 
 protected:
@@ -60,7 +60,7 @@ protected:
 	virtual void setTextures(GMModel* model);
 	virtual void passAllAndDraw(GMModel* model);
 	ID3DX11EffectTechnique* getTechnique();
-	void prepareBuffer(GMModel* model, IQueriable* painter);
+	void prepareBuffer(GMModel* model);
 	void prepareLights();
 	void prepareMaterials(GMModel* model);
 	void prepareRasterizer(GMModel* model);
@@ -117,7 +117,7 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 	}
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
-	virtual void draw(IQueriable* painter, GMModel* model) override;
+	virtual void draw(GMModel* model) override;
 };
 
 class GMDx11Renderer_Deferred_3D: public GMDx11Renderer
@@ -128,8 +128,17 @@ class GMDx11Renderer_Deferred_3D: public GMDx11Renderer
 	}
 
 	virtual void passAllAndDraw(GMModel* model);
+};
+
+class GMDx11Renderer_Deferred_3D_LightPass : public GMDx11Renderer
+{
+	virtual const char* getTechniqueName() override
+	{
+		return "GMTech_Deferred_3D_LightPass";
+	}
 
 private:
+	void passAllAndDraw(GMModel* model);
 	void setDeferredTextures();
 };
 
