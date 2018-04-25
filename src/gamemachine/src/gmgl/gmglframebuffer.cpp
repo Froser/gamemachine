@@ -46,7 +46,7 @@ public:
 
 		glGenTextures(1, &db->id);
 		glBindTexture(GL_TEXTURE_2D, db->id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D(GL_TEXTURE_2D, 0, format, d->desc.rect.width, d->desc.rect.height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -58,6 +58,51 @@ public:
 	{
 		D_BASE(d, Base);
 		return d->id;
+	}
+};
+
+class GMGLDefaultFramebuffers : public GMGLFramebuffers
+{
+public:
+	virtual bool init(const GMFramebufferDesc& desc) override
+	{
+		return false;
+	}
+
+	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override
+	{
+	}
+
+	virtual void bind() override
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	virtual void unbind() override
+	{
+	}
+
+	virtual GMuint count() override
+	{
+		return 1;
+	}
+
+	virtual IFramebuffer* getFramebuffer(GMuint) override
+	{
+		return nullptr;
+	}
+
+	virtual GMuint framebufferId() override
+	{
+		return 0;
+	}
+
+	virtual void clear() override
+	{
+	}
+
+	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override
+	{
 	}
 };
 
@@ -113,6 +158,7 @@ GMGLFramebuffers::~GMGLFramebuffers()
 bool GMGLFramebuffers::init(const GMFramebufferDesc& desc)
 {
 	D(d);
+	d->desc = desc;
 	glGenFramebuffers(1, &d->fbo);
 	createDepthStencilBuffer(desc);
 	return glGetError() == GL_NO_ERROR;
@@ -158,8 +204,30 @@ void GMGLFramebuffers::unbind()
 		if (lastFramebuffers)
 			lastFramebuffers->bind();
 		else
-			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			getDefaultFramebuffers()->bind();
 	}
+}
+
+void GMGLFramebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
+{
+	D(d);
+	GLint cache;
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cache);
+
+	GMGLFramebuffers* destFramebuffers = gm_cast<GMGLFramebuffers*>(dest);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destFramebuffers->framebufferId());
+	glBlitFramebuffer(
+		0, 0, d->desc.rect.width, d->desc.rect.height,
+		0, 0, d->desc.rect.width, d->desc.rect.height,
+		GL_DEPTH_BUFFER_BIT, GL_LINEAR);
+	glBindFramebuffer(GL_FRAMEBUFFER, cache);
+}
+
+GMuint GMGLFramebuffers::framebufferId()
+{
+	D(d);
+	return d->fbo;
 }
 
 void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
@@ -225,4 +293,10 @@ GMuint GMGLFramebuffers::count()
 {
 	D(d);
 	return d->framebuffers.size();
+}
+
+IFramebuffers* GMGLFramebuffers::getDefaultFramebuffers()
+{
+	static GMGLDefaultFramebuffers s_defaultFramebuffers;
+	return &s_defaultFramebuffers;
 }

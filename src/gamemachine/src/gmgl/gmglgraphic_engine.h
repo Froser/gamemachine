@@ -137,9 +137,6 @@ private:
 	void updateViewMatrix();
 	void installShaders();
 	void groupGameObjects(GMGameObject *objects[], GMuint count);
-
-public:
-	static void clearStencilOnCurrentFramebuffer();
 };
 
 class GMGLUtility

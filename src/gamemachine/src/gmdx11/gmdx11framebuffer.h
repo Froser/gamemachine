@@ -40,9 +40,6 @@ class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 {
 	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMComPtr<ID3D11RenderTargetView> defaultRenderTargetView;
-	GMComPtr<ID3D11DepthStencilView> defaultDepthStencilView;
-
 	Vector<GMDx11Framebuffer*> framebuffers;
 	Vector<ID3D11RenderTargetView*> renderTargetViews;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
@@ -65,6 +62,10 @@ public:
 	virtual void clear() override;
 	virtual IFramebuffer* getFramebuffer(GMuint) override;
 	virtual GMuint count() override;
+	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
+
+public:
+	static IFramebuffers* getDefaultFramebuffers();
 };
 
 END_NS

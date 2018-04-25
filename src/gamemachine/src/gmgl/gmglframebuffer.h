@@ -32,6 +32,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffers)
 	Vector<GMGLFramebuffer*> framebuffers;
 	bool framebuffersCreated = false;
 	GMGraphicEngine* engine = nullptr;
+	GMFramebufferDesc desc;
 };
 
 class GMGLFramebuffers : public GMObject, public IFramebuffers
@@ -49,17 +50,23 @@ public:
 	virtual void clear() override;
 	virtual IFramebuffer* getFramebuffer(GMuint) override;
 	virtual GMuint count() override;
+	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
 
 public:
-	inline GMuint framebufferId()
+	virtual GMuint framebufferId();
+
+	const GMFramebufferDesc& getDesc()
 	{
 		D(d);
-		return d->fbo;
+		return d->desc;
 	}
 
 private:
 	void createDepthStencilBuffer(const GMFramebufferDesc& desc);
 	bool createFramebuffers();
+
+public:
+	static IFramebuffers* getDefaultFramebuffers();
 };
 
 END_NS

@@ -172,11 +172,11 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		if (kbState.keyTriggered('0'))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
-		//GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)
-		//{
-		//	if (kbState.keyTriggered('1' + (gm::GMint)i))
-		//		db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
-		//}
+		for (gm::GMint i = 0; i < 8; ++i)
+		{
+			if (kbState.keyTriggered('1' + (gm::GMint)i))
+				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
+		}
 		break;
 	}
 	}

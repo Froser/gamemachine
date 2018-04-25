@@ -326,6 +326,7 @@ GM_INTERFACE(IFramebuffers)
 	virtual void unbind() = 0;
 	virtual void clear() = 0;
 	virtual IFramebuffer* getFramebuffer(GMuint) = 0;
+	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) = 0;
 };
 
 enum class GMGeometryPassingState

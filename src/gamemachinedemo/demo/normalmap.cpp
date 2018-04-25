@@ -55,6 +55,7 @@ void Demo_NormalMap::init()
 void Demo_NormalMap::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	D_BASE(db, Base);
 	Base::event(evt);
 	switch (evt)
 	{
@@ -73,6 +74,7 @@ void Demo_NormalMap::event(gm::GameMachineEvent evt)
 		d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
 		d->gameObject->setRotation(d->rotation);
 		d->demoWorld->renderScene();
+
 		break;
 	case gm::GameMachineEvent::Activate:
 	{
@@ -80,7 +82,13 @@ void Demo_NormalMap::event(gm::GameMachineEvent evt)
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered('P'))
 			d->rotate = !d->rotate;
+
 		d->demoWorld->notifyControls();
+		for (gm::GMint i = 0; i < 8; ++i)
+		{
+			if (kbState.keyTriggered('1' + (gm::GMint)i))
+				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
+		}
 		break;
 	}
 	case gm::GameMachineEvent::Deactivate:

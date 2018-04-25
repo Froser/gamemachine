@@ -133,6 +133,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 			IGBuffer* gBuffer = getGBuffer();
 			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMGLFramebuffers::getDefaultFramebuffers());
 
 			{
 				if (filter != GMFilterMode::None)
@@ -145,11 +146,25 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 				if (filter != GMFilterMode::None)
 				{
 					GMGLFramebuffers* filterBuffers = static_cast<GMGLFramebuffers*>(getFilterFramebuffers());
-					//d->gbuffer.copyDepthBuffer(filterBuffers->framebufferId());
 					getFilterFramebuffers()->unbind();
 					getFilterQuad()->draw();
 				}
+			}
 
+			{
+				// 预览GBuffer
+				GMint fbIdx = d->debugConfig.get(GMDebugConfigs::FrameBufferIndex_I32).toInt();
+				if (fbIdx > 0)
+				{
+					GMRect rect = {
+						d->debugConfig.get(GMDebugConfigs::FrameBufferPositionX_I32).toInt(),
+						d->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
+						d->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
+						d->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt()
+					};
+					GMGLGBuffer* gmglgBuffer = gm_cast<GMGLGBuffer*>(gBuffer);
+					gmglgBuffer->drawGeometryBuffer(fbIdx - 1, rect);
+				}
 			}
 		}
 	}
@@ -257,27 +272,6 @@ void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 			d->forwardRenderingGameObjects.push_back(objects[i]);
 	}
 }
-
-/*
-void GMGLGraphicEngine::viewGBufferFrameBuffer()
-{
-	D(d);
-	GMint fbIdx = d->debugConfig.get(GMDebugConfigs::FrameBufferIndex_I32).toInt();
-	if (fbIdx > 0)
-	{
-		glDisable(GL_DEPTH_TEST);
-		GMint x = d->debugConfig.get(GMDebugConfigs::FrameBufferPositionX_I32).toInt(),
-			y = d->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
-			width = d->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
-			height = d->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt();
-		d->gbuffer.beginPass();
-		d->gbuffer.bindForReading();
-		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
-		glBlitFramebuffer(0, 0, d->gbuffer.getWidth(), d->gbuffer.getHeight(), x, y, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-		d->gbuffer.releaseBind();
-	}
-}
-*/
 
 void GMGLGraphicEngine::update(GMUpdateDataType type)
 {
@@ -440,7 +434,12 @@ void GMGLGraphicEngine::removeLights()
 
 void GMGLGraphicEngine::clearStencil()
 {
-	clearStencilOnCurrentFramebuffer();
+
+	GLint mask;
+	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
+	glStencilMask(0xFF);
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glStencilMask(mask);
 }
 
 void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
@@ -482,15 +481,6 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 		GM_ASSERT(type == GMShaderProgramType::DeferredLightPassShaderProgram);
 		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER];
 	}
-}
-
-void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()
-{
-	GLint mask;
-	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
-	glStencilMask(0xFF);
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glStencilMask(mask);
 }
 
 //////////////////////////////////////////////////////////////////////////

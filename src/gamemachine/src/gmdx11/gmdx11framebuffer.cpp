@@ -7,6 +7,68 @@
 
 BEGIN_NS
 
+GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)
+{
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMComPtr<ID3D11RenderTargetView> defaultRenderTargetView;
+	GMComPtr<ID3D11DepthStencilView> defaultDepthStencilView;
+};
+
+class GMDx11DefaultFramebuffers : public IFramebuffers
+{
+	DECLARE_PRIVATE(GMDx11DefaultFramebuffers)
+
+public:
+	GMDx11DefaultFramebuffers()
+	{
+		D(d);
+		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->defaultRenderTargetView);
+		GM_ASSERT(d->defaultRenderTargetView);
+		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->defaultDepthStencilView);
+		GM_ASSERT(d->defaultDepthStencilView);
+		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+		GM_ASSERT(d->deviceContext);
+	}
+
+public:
+	virtual bool init(const GMFramebufferDesc& desc) override
+	{
+		return false;
+	}
+
+	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override
+	{
+	}
+
+	virtual void bind() override
+	{
+		D(d);
+		d->deviceContext->OMSetRenderTargets(1, &d->defaultRenderTargetView, d->defaultDepthStencilView);
+	}
+
+	virtual void unbind() override
+	{
+	}
+
+	virtual GMuint count() override
+	{
+		return 1;
+	}
+
+	virtual IFramebuffer* getFramebuffer(GMuint) override
+	{
+		return nullptr;
+	}
+
+	virtual void clear() override
+	{
+	}
+
+	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override
+	{
+	}
+};
+
 GM_PRIVATE_OBJECT(GMDx11FramebufferTexture)
 {
 	GMFramebufferDesc desc;
@@ -140,10 +202,6 @@ GMDx11Framebuffers::GMDx11Framebuffers()
 	D(d);
 	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 	GM_ASSERT(d->deviceContext);
-	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->defaultRenderTargetView);
-	GM_ASSERT(d->defaultRenderTargetView);
-	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->defaultDepthStencilView);
-	GM_ASSERT(d->defaultDepthStencilView);
 	d->engine = gm_cast<GMGraphicEngine*>(GM.getGraphicEngine());
 }
 
@@ -234,7 +292,7 @@ void GMDx11Framebuffers::unbind()
 		if (lastFramebuffers)
 			lastFramebuffers->bind();
 		else
-			d->deviceContext->OMSetRenderTargets(1, &d->defaultRenderTargetView, d->defaultDepthStencilView);
+			getDefaultFramebuffers()->bind();
 	}
 }
 
@@ -260,4 +318,15 @@ GMuint GMDx11Framebuffers::count()
 {
 	D(d);
 	return d->framebuffers.size();
+}
+
+void GMDx11Framebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
+{
+	GM_ASSERT(false);
+}
+
+IFramebuffers* GMDx11Framebuffers::getDefaultFramebuffers()
+{
+	static GMDx11DefaultFramebuffers s_defaultFramebuffers;
+	return &s_defaultFramebuffers;
 }

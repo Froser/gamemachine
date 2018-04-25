@@ -5,6 +5,7 @@
 #include "foundation/gamemachine.h"
 #include "shader_constants.h"
 #include "gmgltexture.h"
+#include "gmglframebuffer.h"
 
 #define GMEngine static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine())
 
@@ -127,6 +128,25 @@ void GMGLGBuffer::lightPass()
 	D(d);
 	GM_ASSERT(getQuad());
 	getQuad()->draw();
+}
+
+void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)
+{
+	D(d);
+	GMGLFramebuffers* source = gm_cast<GMGLFramebuffers*>(getGeometryFramebuffers());
+	glDisable(GL_DEPTH_TEST);
+	GLint dest = 0;
+	const GMFramebufferDesc& desc = source->getDesc();
+
+	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &dest);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, source->framebufferId());
+	glReadBuffer(GL_COLOR_ATTACHMENT0 + index);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, dest);
+	glBlitFramebuffer(
+		0, 0, desc.rect.width, desc.rect.height,
+		rect.x, rect.y, rect.width, rect.height,
+		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+	glBindFramebuffer(GL_FRAMEBUFFER, dest);
 }
 
 const std::string* GMGLGBuffer::GBufferGeometryUniformNames()
