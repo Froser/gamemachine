@@ -23,6 +23,7 @@ public:
 	virtual void draw(GMModel* model) override;
 
 protected:
+	virtual IShaderProgram* getShaderProgram() = 0;
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
 
@@ -49,7 +50,6 @@ protected:
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 {
 	GMRenderMode renderMode = GMRenderMode::Forward;
-	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 };
 
 class GMGLRenderer_3D : public GMGLRenderer
@@ -64,11 +64,11 @@ public:
 	virtual void endModel() override;
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
+	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
 	void activateMaterial(const GMShader& shader);
 	void drawDebug();
-	void activateShader();
 };
 
 class GMGLRenderer_2D : public GMGLRenderer_3D
@@ -82,7 +82,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
 	const GMCubeMapGameObject* cubemap = nullptr;
 };
 
-class GMGLRenderer_CubeMap : public GMGLRenderer
+class GMGLRenderer_CubeMap : public GMGLRenderer_3D
 {
 	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_CubeMap, GMGLRenderer)
 
@@ -99,9 +99,20 @@ class GMGLRenderer_Filter : public GMGLRenderer
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
+	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
 	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
+};
+
+class GMGLRenderer_LightPass : public GMGLRenderer
+{
+protected:
+	virtual IShaderProgram* getShaderProgram() override;
+	virtual void beforeDraw(GMModel* model) override;
+	virtual void afterDraw(GMModel* model) override;
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+	virtual void endModel() override;
 };
 
 END_NS

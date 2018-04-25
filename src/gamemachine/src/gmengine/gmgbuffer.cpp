@@ -38,6 +38,18 @@ void GMGBuffer::init()
 		createQuad();
 }
 
+void GMGBuffer::setGeometryPassingState(GMGeometryPassingState state)
+{
+	D(d);
+	d->state = state;
+}
+
+GMGeometryPassingState GMGBuffer::getGeometryPassingState()
+{
+	D(d);
+	return d->state;
+}
+
 GMGameObject* GMGBuffer::getQuad()
 {
 	D(d);

@@ -26,6 +26,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMGameObject* filterQuad = nullptr;
 	GMScopePtr<GMModel> filterQuadModel;
 	GMFramebuffersStack framebufferStack;
+	IGBuffer* gBuffer = nullptr;
 };
 
 class GMGraphicEngine : public GMObject, public IGraphicEngine
@@ -34,6 +35,9 @@ class GMGraphicEngine : public GMObject, public IGraphicEngine
 
 public:
 	~GMGraphicEngine();
+
+public:
+	IGBuffer* getGBuffer();
 
 public:
 	GMFramebuffersStack& getFramebuffersStack()
@@ -56,6 +60,9 @@ protected:
 		D(d);
 		return d->filterFramebuffers;
 	}
+
+private:
+	IGBuffer* createGBuffer();
 };
 
 END_NS

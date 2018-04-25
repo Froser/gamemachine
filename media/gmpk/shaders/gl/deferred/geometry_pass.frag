@@ -41,19 +41,19 @@ void deferred_geometry_pass_calcEyeSpace()
 
 	if (GM_normalmap_textures[0].enabled == 1)
 	{
-		${deferred_geometry_pass_gTangent_eye} = normalize(normalEyeTransform * vec4(_tangent.xyz, 0));
-		${deferred_geometry_pass_gBitangent_eye} = normalize(normalEyeTransform * vec4(_bitangent.xyz, 0));
+		${deferred_geometry_pass_gTangent_eye} = normalToTexture(normalize(normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
+		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(normalize(normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
 	}
 	else
 	{
-		${deferred_geometry_pass_gTangent_eye} = vec4(0,0,0,0);
-		${deferred_geometry_pass_gBitangent_eye} = vec4(0,0,0,0);
+		${deferred_geometry_pass_gTangent_eye} = normalToTexture(vec3(0,0,0));
+		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(vec3(0,0,0));
 	}
 }
 
 subroutine (GM_TechniqueEntrance) void GM_GeometryPass()
 {
-	${deferred_geometry_pass_gPosition} = (GM_model_matrix * _deferred_geometry_pass_position_world);
+	${deferred_geometry_pass_gPosition} = normalToTexture((GM_model_matrix * _deferred_geometry_pass_position_world).xyz);
 	${deferred_geometry_pass_gTexAmbient} = vec4(GM_material.ka, 1) * deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	${deferred_geometry_pass_gTexDiffuse} = vec4(GM_material.kd, 1) * deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
 	${deferred_geometry_pass_gNormalMap} = texture(GM_normalmap_textures[0].texture, _uv);

@@ -41,7 +41,6 @@ void GMGLModelPainter::transfer()
 
 	GMuint verticeCount = 0;
 
-	
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	bufferData.arrayId = vao;
@@ -150,6 +149,5 @@ void* GMGLModelPainter::getBuffer()
 void GMGLModelPainter::draw(IRenderer* renderer, GMModel* model)
 {
 	D(d);
-	d->engine->checkDrawingState();
 	renderer->draw(model);
 }

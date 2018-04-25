@@ -8,6 +8,7 @@
 #include <linearmath.h>
 #include "foundation/gamemachine.h"
 #include "foundation/utilities/utilities.h"
+#include "gmglgbuffer.h"
 
 namespace
 {
@@ -128,7 +129,7 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, 
 	static const std::string u_scales_affix = (GMString(".") + desc->TextureAttributes.ScaleX).toStdString();
 	static const std::string u_scalet_affix = (GMString(".") + desc->TextureAttributes.ScaleY).toStdString();
 
-	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	auto shaderProgram = getShaderProgram();
 	const char* uniform = getTextureUniformName(desc, type, index);
 
 	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
@@ -175,7 +176,7 @@ GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type, GMint in
 	GMint idx = (GMint)type;
 	GMint texId = getTextureID(type, index);
 
-	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	auto shaderProgram = getShaderProgram();
 	const char* uniform = getTextureUniformName(desc, type, index);
 	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, u_tex_texture.c_str());
@@ -194,7 +195,7 @@ void GMGLRenderer::deactivateTexture(GMTextureType type, GMint index)
 	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
 	GMint texId = getTextureID(type, index);
 
-	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	auto shaderProgram = getShaderProgram();
 	GMint idx = (GMint)type;
 	const char* uniform = getTextureUniformName(desc, type, index);
 	char u[GMGL_MAX_UNIFORM_NAME_LEN];
@@ -263,12 +264,11 @@ ITexture* GMGLRenderer::getTexture(GMTextureFrames& frames)
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	D_BASE(db, GMGLRenderer);
+	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 
 	auto& desc = shaderProgram->getDesc();
-	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
-	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 	if (parent)
 	{
 		shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
@@ -278,6 +278,42 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		shaderProgram->setMatrix4(desc.ModelMatrix, Identity<GMMat4>());
 		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, Identity<GMMat4>());
+	}
+
+	GMGeometryPassingState state = db->engine->getGBuffer()->getGeometryPassingState();
+	if (state == GMGeometryPassingState::PassingGeometry)
+	{
+		shaderProgram->setInterfaceInstance(
+			GMGLShaderProgram::techniqueName(),
+			GMGLShaderProgram::geometryPassName(),
+			GMShaderType::Vertex);
+		shaderProgram->setInterfaceInstance(
+			GMGLShaderProgram::techniqueName(),
+			GMGLShaderProgram::geometryPassName(),
+			GMShaderType::Pixel);
+	}
+	else if (state == GMGeometryPassingState::PassingMaterial)
+	{
+		shaderProgram->setInterfaceInstance(
+			GMGLShaderProgram::techniqueName(),
+			GMGLShaderProgram::materialPassName(),
+			GMShaderType::Vertex);
+		shaderProgram->setInterfaceInstance(
+			GMGLShaderProgram::techniqueName(),
+			GMGLShaderProgram::materialPassName(),
+			GMShaderType::Pixel);
+	}
+	else
+	{
+		shaderProgram->setInterfaceInstance(
+			GMGLShaderProgram::techniqueName(),
+			getTechnique(model->getType()),
+			GMShaderType::Vertex);
+		shaderProgram->setInterfaceInstance(
+			GMGLShaderProgram::techniqueName(),
+			getTechnique(model->getType()),
+			GMShaderType::Pixel);
+		db->engine->activateLights(shaderProgram);
 	}
 }
 
@@ -322,6 +358,17 @@ void GMGLRenderer_3D::afterDraw(GMModel* model)
 	}
 }
 
+IShaderProgram* GMGLRenderer_3D::getShaderProgram()
+{
+	D_BASE(d, Base);
+	GMGeometryPassingState s = d->engine->getGBuffer()->getGeometryPassingState();
+	if (s == GMGeometryPassingState::PassingGeometry ||
+		s == GMGeometryPassingState::PassingMaterial )
+		return d->engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
+
+	return d->engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
+}
+
 void GMGLRenderer_3D::endModel()
 {
 }
@@ -329,7 +376,7 @@ void GMGLRenderer_3D::endModel()
 void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
-	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	auto shaderProgram = getShaderProgram();
 	auto& svd = shaderProgram->getDesc();
 	static const std::string GMSHADER_MATERIAL_KA = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Ka;
 	static const std::string GMSHADER_MATERIAL_KD = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Kd;
@@ -349,7 +396,7 @@ void GMGLRenderer_3D::drawDebug()
 {
 	D(d);
 	D_BASE(db, Base);
-	auto shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+	auto shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
 }
 
@@ -379,7 +426,7 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	D(d);
 	D_BASE(db, Base);
 	d->cubemap = GMObject::gmobject_cast<const GMCubeMapGameObject*>(parent);
-	IShaderProgram* shaderProgram = db->engine->getShaderProgram(GMShaderProgramType::CurrentShaderProgram);
+	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 	auto& desc = shaderProgram->getDesc();
 	GM_ASSERT(model->getType() == GMModelType::CubeMap);
@@ -387,6 +434,7 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 	shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
+	db->engine->activateLights(shaderProgram);
 }
 
 void GMGLRenderer_CubeMap::endModel()
@@ -406,7 +454,7 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 	ITexture* glTex = frames.getFrameByIndex(0);
 	if (glTex)
 	{
-		IShaderProgram* shaderProgram = GM.getGraphicEngine()->getShaderProgram();
+		IShaderProgram* shaderProgram = getShaderProgram();
 		auto& desc = shaderProgram->getDesc();
 
 		IGraphicEngine* engine = GM.getGraphicEngine();
@@ -456,7 +504,7 @@ void GMGLRenderer_Filter::afterDraw(GMModel* model)
 void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	IShaderProgram* shaderProgram = d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
+	IShaderProgram* shaderProgram = getShaderProgram();
 	GM_ASSERT(shaderProgram);
 	shaderProgram->useProgram();
 }
@@ -465,15 +513,67 @@ void GMGLRenderer_Filter::endModel()
 {
 }
 
+IShaderProgram* GMGLRenderer_Filter::getShaderProgram()
+{
+	D_BASE(db, GMGLRenderer);
+	return db->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
+}
+
 GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
 	GMint texId = getTextureID(type, index);
-	IShaderProgram* shaderProgram = d->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
+	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
 	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 	bool b = shaderProgram->setInterfaceInstance(desc.FilterAttributes.Filter, desc.FilterAttributes.Types[d->engine->getCurrentFilterMode()], GMShaderType::Pixel);
 	GM_ASSERT(b);
 	return texId;
+}
+
+IShaderProgram* GMGLRenderer_LightPass::getShaderProgram()
+{
+	D_BASE(db, GMGLRenderer);
+	return db->engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
+}
+
+void GMGLRenderer_LightPass::endModel()
+{
+}
+
+void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* parent)
+{
+	D_BASE(d, GMGLRenderer);
+	IShaderProgram* shaderProgram = getShaderProgram();
+	shaderProgram->useProgram();
+	d->engine->activateLights(shaderProgram);
+}
+
+void GMGLRenderer_LightPass::afterDraw(GMModel* model)
+{
+}
+
+void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
+{
+	D_BASE(db, GMGLRenderer);
+	IShaderProgram* shaderProgram = getShaderProgram();
+	IGBuffer* gBuffer = db->engine->getGBuffer();
+	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
+	GMuint cnt0 = gBufferFramebuffers->count();
+	for (GMuint i = 0; i < cnt0; ++i)
+	{
+		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
+		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), i);
+		texture->useTexture(nullptr, i);
+	}
+
+	gBufferFramebuffers = gBuffer->getMaterialFramebuffers();
+	GMuint cnt1 = gBufferFramebuffers->count();
+	for (GMuint i = 0; i < cnt1; ++i)
+	{
+		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
+		shaderProgram->setInt(GMGLGBuffer::GBufferMaterialUniformNames()[i].c_str(), i + cnt0);
+		texture->useTexture(nullptr, i + cnt0);
+	}
 }

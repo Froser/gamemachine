@@ -7,12 +7,6 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdx11gbuffer.h"
 
-GMDx11GraphicEngine::~GMDx11GraphicEngine()
-{
-	D(d);
-	GM_delete(d->gBuffer);
-}
-
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -43,6 +37,7 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		return;
 
 	D(d);
+	D_BASE(db, Base);
 	GMFilterMode::Mode filterMode = getCurrentFilterMode();
 	if (filterMode != GMFilterMode::None)
 		createFilterFramebuffer();
@@ -54,14 +49,9 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	groupGameObjects(objects, count);
 	if (true)
 	{
-		if (!d->gBuffer)
-		{
-			d->gBuffer = new GMDx11GBuffer(this);
-			d->gBuffer->init();
-		}
-
-		d->gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
-		d->gBuffer->lightPass();
+		IGBuffer* gBuffer = getGBuffer();
+		gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
+		gBuffer->lightPass();
 		forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
 	}
 	else
@@ -269,7 +259,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	case GMModelType::Glyph:
 		return &s_renderer_glyph;
 	case GMModelType::Model3D:
-		if (d->isDeferredRendering)
+		if (getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::Done)
 			return &s_renderer_deferred_3d;
 		return &s_renderer_3d;
 	case GMModelType::CubeMap:

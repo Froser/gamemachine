@@ -12,6 +12,7 @@ GM_PRIVATE_OBJECT(GMGBuffer)
 	IFramebuffers* materialFramebuffers = nullptr;
 	GMGameObject* quad = nullptr;
 	GMModel* quadModel = nullptr;
+	GMGeometryPassingState state = GMGeometryPassingState::Done;
 };
 
 class GMGBuffer : public GMObject, public IGBuffer
@@ -23,6 +24,8 @@ protected:
 
 public:
 	virtual void init() override;
+	virtual void setGeometryPassingState(GMGeometryPassingState);
+	virtual GMGeometryPassingState getGeometryPassingState();
 
 protected:
 	GMGameObject* getQuad();

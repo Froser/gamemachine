@@ -39,37 +39,24 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
 
-	GMGLGBufferDep gbuffer;
+	IGBuffer* gbuffer = nullptr;
 	ITexture* cubeMap = nullptr;
-
-	// 延迟渲染的四边形
-	GMuint quadVAO = 0;
-	GMuint quadVBO = 0;
-	// 渲染状态
-	GMGLDeferredRenderState renderState = GMGLDeferredRenderState::PassingGeometry;
 
 	// 延迟渲染分组
 	Vector<GMGameObject*> deferredRenderingGameObjects;
 	Vector<GMGameObject*> forwardRenderingGameObjects;
 
-	GMRenderMode renderMode = GMRenderMode::Forward;
 	GMStencilOptions stencilOptions;
 
 	// 混合绘制
-	GMRenderMode renderModeForBlend = GMRenderMode::Forward;
 	GMS_BlendFunc blendsfactor;
 	GMS_BlendFunc blenddfactor;
 	bool isBlending = false;
-
-	// 是否进入绘制模式
-#if _DEBUG
-	GMint drawingLevel = 0;
-#endif
 };
 
 class GMGLGraphicEngine : public GMGraphicEngine
 {
-	DECLARE_PRIVATE(GMGLGraphicEngine)
+	DECLARE_PRIVATE_AND_BASE(GMGLGraphicEngine, GMGraphicEngine)
 
 public:
 	GMGLGraphicEngine();
@@ -78,7 +65,6 @@ public:
 public:
 	virtual void init() override;
 	virtual void newFrame() override;
-	virtual bool event(const GameMachineMessage& e) override;
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual void addLight(const GMLight& light) override;
@@ -87,6 +73,8 @@ public:
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
+	virtual bool event(const GameMachineMessage& e) override { return false; }
+
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
 	{
 		D(d);
@@ -118,40 +106,11 @@ public:
 public:
 	IRenderer* getRenderer(GMModelType objectType);
 	void setViewport(const GMRect& rect);
-	void updateShader();
 
 public:
-	inline GMGLDeferredRenderState getRenderState() { D(d); return d->renderState; }
 	inline bool isBlending() { D(d); return d->isBlending; }
 	GMS_BlendFunc blendsfactor() { D(d); return d->blendsfactor; }
 	GMS_BlendFunc blenddfactor() { D(d); return d->blenddfactor; }
-	GMRenderMode getCurrentRenderMode() { D(d); return d->renderMode; }
-
-	inline void setRenderState(GMGLDeferredRenderState state)
-	{
-		D(d);
-		d->renderState = state; 
-		updateShader();
-	}
-
-	inline void setCurrentRenderMode(GMRenderMode mode)
-	{
-		D(d);
-		d->renderMode = mode;
-		updateShader();
-	}
-
-	inline void checkDrawingState()
-	{
-#if _DEBUG
-		D(d);
-		if (!d->drawingLevel)
-		{
-			GM_ASSERT(false);
-			gm_error("GMObject::draw() cannot be called outside IGraphicEngine::drawObjects");
-		}
-#endif
-	}
 
 	inline void setCubeMap(ITexture* tex)
 	{
@@ -166,26 +125,20 @@ public:
 		return d->cubeMap;
 	}
 
+public:
+	void draw(GMGameObject* objects[], GMuint count);
+	void activateLights(IShaderProgram* shaderProgram);
+
 private:
 	void directDraw(GMGameObject *objects[], GMuint count);
 	void forwardDraw(GMGameObject *objects[], GMuint count);
 	void activateLightsIfNecessary();
-	void createDeferredRenderQuad();
-	void renderDeferredRenderQuad();
-	void disposeDeferredRenderQuad();
 	void updateProjectionMatrix();
 	void updateViewMatrix();
 	void installShaders();
-	void activateLights(const Vector<GMLight>& lights);
-	bool refreshGBuffer();
-	void forwardRender(GMGameObject* objects[], GMuint count);
-	void geometryPass(Vector<GMGameObject*>& objects);
-	void lightPass();
 	void groupGameObjects(GMGameObject *objects[], GMuint count);
-	void viewGBufferFrameBuffer();
 
 public:
-	static void newFrameOnCurrentFramebuffer();
 	static void clearStencilOnCurrentFramebuffer();
 };
 

@@ -35,6 +35,18 @@ GMGraphicEngine::~GMGraphicEngine()
 	D(d);
 	GM_delete(d->filterFramebuffers);
 	GM_delete(d->filterQuad);
+	GM_delete(d->gBuffer);
+}
+
+IGBuffer* GMGraphicEngine::getGBuffer()
+{
+	D(d);
+	if (!d->gBuffer)
+	{
+		d->gBuffer = createGBuffer();
+		d->gBuffer->init();
+	}
+	return d->gBuffer;
 }
 
 void GMGraphicEngine::createFilterFramebuffer()
@@ -68,4 +80,13 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);
 		d->filterQuad = new GMGameObject(asset);
 	}
+}
+
+IGBuffer* GMGraphicEngine::createGBuffer()
+{
+	D(d);
+	IGBuffer* gBuffer = nullptr;
+	GM.getFactory()->createGBuffer(this, &gBuffer);
+	GM_ASSERT(gBuffer);
+	return gBuffer;
 }

@@ -60,11 +60,11 @@ GMGLGraphicEngine::GMGLGraphicEngine()
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
-	disposeDeferredRenderQuad();
 	GM_delete(d->filterShaderProgram);
 	GM_delete(d->forwardShaderProgram);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]);
+	GM_delete(d->gbuffer);
 }
 
 void GMGLGraphicEngine::init()
@@ -81,7 +81,6 @@ void GMGLGraphicEngine::init()
 	glClearStencil(0);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-	createDeferredRenderQuad();
 
 #if _DEBUG
 	glEnable(GL_DEBUG_OUTPUT);
@@ -92,39 +91,12 @@ void GMGLGraphicEngine::init()
 void GMGLGraphicEngine::newFrame()
 {
 	D(d);
-	if (getCurrentRenderMode() == GMRenderMode::Deferred)
-	{
-		d->gbuffer.releaseBind();
-		newFrameOnCurrentFramebuffer();
-	}
-	else
-	{
-		newFrameOnCurrentFramebuffer();
-	}
-}
 
-bool GMGLGraphicEngine::event(const GameMachineMessage& e)
-{
-	D(d);
-	switch (e.msgType)
-	{
-	case GameMachineMessageType::WindowSizeChanged:
-	{
-		const GMRect& rect = GM.getGameMachineRunningStates().renderRect;
-		setViewport(rect);
-
-		if (d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>() == GMRenderMode::Deferred)
-		{
-			if (!refreshGBuffer())
-			{
-				gm_error("init gbuffer error");
-				d->renderConfig.set(GMRenderConfigs::RenderMode, (GMint)GMRenderMode::Forward);
-			}
-		}
-		break;
-	}
-	}
-	return false;
+	GLint mask;
+	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
+	glStencilMask(0xFF);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glStencilMask(mask);
 }
 
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
@@ -141,15 +113,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		getFilterFramebuffers()->clear();
 	}
 
-#if _DEBUG
-	++d->drawingLevel;
-#endif
-
 	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
-	if (renderMode != d->renderMode)
-		d->needRefreshLights = true;
-	setCurrentRenderMode(renderMode);
-
 	if (renderMode == GMRenderMode::Forward)
 	{
 		forwardDraw(objects, count);
@@ -166,11 +130,9 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		}
 		else
 		{
+			IGBuffer* gBuffer = getGBuffer();
 			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-			setCurrentRenderMode(GMRenderMode::Deferred);
-
-			d->gbuffer.adjustViewport();
-			geometryPass(d->deferredRenderingGameObjects);
+			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
 
 			{
 				if (filter != GMFilterMode::None)
@@ -179,24 +141,18 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 					GM_ASSERT(filterFramebuffers);
 					filterFramebuffers->bind();
 				}
-				lightPass();
+				gBuffer->lightPass();
 				if (filter != GMFilterMode::None)
 				{
 					GMGLFramebuffers* filterBuffers = static_cast<GMGLFramebuffers*>(getFilterFramebuffers());
-					d->gbuffer.copyDepthBuffer(filterBuffers->framebufferId());
+					//d->gbuffer.copyDepthBuffer(filterBuffers->framebufferId());
 					getFilterFramebuffers()->unbind();
 					getFilterQuad()->draw();
 				}
 
 			}
 		}
-
-		viewGBufferFrameBuffer();
 	}
-
-#if _DEBUG
-	--d->drawingLevel;
-#endif
 }
 
 void GMGLGraphicEngine::installShaders()
@@ -239,104 +195,50 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	return true;
 }
 
-void GMGLGraphicEngine::activateLights(const Vector<GMLight>& lights)
+void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 {
 	D(d);
-	updateShader();
-
-	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
-	GMGLShaderProgram* progs[] = {
-		d->forwardShaderProgram,
-		renderMode== GMRenderMode::Forward ? nullptr : d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER],
-		renderMode== GMRenderMode::Forward ? nullptr : d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]
-	};
-
-	for (GMint i = 0; i < GM_array_size(progs); ++i)
+	auto& svd = shaderProgram->getDesc();
+	shaderProgram->useProgram();
+	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+	for (auto& light : d->lights)
 	{
-		GMGLShaderProgram* prog = progs[i];
-		if (!prog)
-			continue;
-
-		auto& svd = prog->getDesc();
-
-		prog->useProgram();
-		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-		for (auto& light : lights)
+		GMint id = lightId[(GMuint)light.getType()]++;
+		switch (light.getType())
 		{
-			GMint id = lightId[(GMuint)light.getType()]++;
-			switch (light.getType())
-			{
-			case GMLightType::AMBIENT:
-			{
-				const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
-				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
-				prog->setVec3(u_color, light.getLightColor());
-				break;
-			}
-			case GMLightType::SPECULAR:
-			{
-				const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
-				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
-				combineUniform(u_position, uniform, ".", svd.LightAttributes.Position);
-				prog->setVec3(u_color, light.getLightColor());
-				prog->setVec3(u_position, light.getLightPosition());
-				break;
-			}
-			default:
-				break;
-			}
+		case GMLightType::AMBIENT:
+		{
+			const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
+			char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
+			combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
+			shaderProgram->setVec3(u_color, light.getLightColor());
+			break;
 		}
-		prog->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
-		prog->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
+		case GMLightType::SPECULAR:
+		{
+			const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
+			char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
+			combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
+			combineUniform(u_position, uniform, ".", svd.LightAttributes.Position);
+			shaderProgram->setVec3(u_color, light.getLightColor());
+			shaderProgram->setVec3(u_position, light.getLightPosition());
+			break;
+		}
+		default:
+			break;
+		}
 	}
+	shaderProgram->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
+	shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
-bool GMGLGraphicEngine::refreshGBuffer()
-{
-	D(d);
-	const GMRect& rect = GM.getGameMachineRunningStates().renderRect;
-	if (rect.width <= 0 || rect.height <= 0)
-		return true;
-
-	d->gbuffer.dispose();
-	return d->gbuffer.init(rect);
-}
-
-void GMGLGraphicEngine::forwardRender(GMGameObject *objects[], GMuint count)
+void GMGLGraphicEngine::draw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
 	for (GMuint i = 0; i < count; i++)
 	{
 		objects[i]->draw();
 	}
-}
-
-void GMGLGraphicEngine::geometryPass(Vector<GMGameObject*>& objects)
-{
-	D(d);
-	d->gbuffer.beginPass();
-	do
-	{
-		d->gbuffer.newFrame();
-		d->gbuffer.bindForWriting();
-
-		for (auto object : objects)
-		{
-			object->draw();
-		}
-		d->gbuffer.releaseBind();
-	} while (d->gbuffer.nextPass());
-}
-
-void GMGLGraphicEngine::lightPass()
-{
-	D(d);
-	GM_ASSERT(getRenderState() == GMGLDeferredRenderState::PassingLight);
-	activateLightsIfNecessary();
-	d->gbuffer.activateTextures();
-	renderDeferredRenderQuad();
 }
 
 void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
@@ -356,6 +258,7 @@ void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
 	}
 }
 
+/*
 void GMGLGraphicEngine::viewGBufferFrameBuffer()
 {
 	D(d);
@@ -367,25 +270,14 @@ void GMGLGraphicEngine::viewGBufferFrameBuffer()
 			y = d->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
 			width = d->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
 			height = d->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt();
-
-		
 		d->gbuffer.beginPass();
-		
-
-		
 		d->gbuffer.bindForReading();
-		
-
-		
 		d->gbuffer.setReadBuffer((GBufferGeometryType)(fbIdx - 1));
-		
-
-		
 		glBlitFramebuffer(0, 0, d->gbuffer.getWidth(), d->gbuffer.getHeight(), x, y, width, height, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-		
 		d->gbuffer.releaseBind();
 	}
 }
+*/
 
 void GMGLGraphicEngine::update(GMUpdateDataType type)
 {
@@ -447,9 +339,7 @@ void GMGLGraphicEngine::updateViewMatrix()
 	d->forwardShaderProgram->setVec4(desc.ViewPosition, vec);
 	d->forwardShaderProgram->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->forwardShaderProgram->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
-	
 
-	
 	// 视觉位置，用于计算光照
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
@@ -464,14 +354,12 @@ void GMGLGraphicEngine::updateViewMatrix()
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	setCurrentRenderMode(GMRenderMode::Forward);
-	forwardRender(objects, count);
+	draw(objects, count);
 }
 
 void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	setCurrentRenderMode(GMRenderMode::Forward);
 	activateLightsIfNecessary();
 	if (!count)
 		return;
@@ -484,59 +372,11 @@ void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 		filterFramebuffers->bind();
 	}
 
-	forwardRender(objects, count);
+	draw(objects, count);
 	if (filter != GMFilterMode::None)
 	{
 		getFilterFramebuffers()->unbind();
 		getFilterQuad()->draw();
-	}
-}
-
-void GMGLGraphicEngine::updateShader()
-{
-	D(d);
-	GMRenderMode renderMode = getCurrentRenderMode();
-	if (renderMode == GMRenderMode::Forward)
-	{
-		d->forwardShaderProgram->useProgram();
-	}
-	else
-	{
-		if (getRenderState() != GMGLDeferredRenderState::PassingLight)
-		{
-			d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-			GM_ASSERT(renderMode == GMRenderMode::Deferred);
-			if (d->renderState == GMGLDeferredRenderState::PassingGeometry)
-			{
-				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
-					GMGLShaderProgram::techniqueName(),
-					GMGLShaderProgram::geometryPassName(),
-					GMShaderType::Vertex);
-				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
-					GMGLShaderProgram::techniqueName(),
-					GMGLShaderProgram::geometryPassName(),
-					GMShaderType::Pixel);
-			}
-			else if (d->renderState == GMGLDeferredRenderState::PassingMaterial)
-			{
-				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
-					GMGLShaderProgram::techniqueName(),
-					GMGLShaderProgram::materialPassName(),
-					GMShaderType::Vertex);
-				d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setInterfaceInstance(
-					GMGLShaderProgram::techniqueName(),
-					GMGLShaderProgram::materialPassName(),
-					GMShaderType::Pixel);
-			}
-			else
-			{
-				GM_ASSERT(false);
-			}
-		}
-		else
-		{
-			d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
-		}
 	}
 }
 
@@ -547,53 +387,7 @@ void GMGLGraphicEngine::activateLightsIfNecessary()
 	{
 		d->needRefreshLights = false;
 		IGraphicEngine* engine = GM.getGraphicEngine();
-		activateLights(d->lights);
 	}
-}
-
-void GMGLGraphicEngine::createDeferredRenderQuad()
-{
-	D(d);
-	if (d->quadVAO == 0)
-	{
-		static GLfloat quadVertices[] = {
-			// Positions		// Texture Coords
-			-1.0f, 1.0f, 0.0f, 0.0f, 0.0f,
-			-1.0f, -1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-			1.0f, -1.0f, 0.0f, 1.0f, 1.0f,
-		};
-
-		glGenVertexArrays(1, &d->quadVAO);
-		glBindVertexArray(d->quadVAO);
-		glGenBuffers(1, &d->quadVBO);
-		glBindBuffer(GL_ARRAY_BUFFER, d->quadVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW);
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
-	}
-}
-
-void GMGLGraphicEngine::renderDeferredRenderQuad()
-{
-	D(d);
-	glDisable(GL_CULL_FACE);
-	glBindVertexArray(d->quadVAO);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-}
-
-void GMGLGraphicEngine::disposeDeferredRenderQuad()
-{
-	D(d);
-	glBindVertexArray(0);
-	if (d->quadVAO)
-		glDeleteVertexArrays(1, &d->quadVAO);
-
-	if (d->quadVBO)
-		glDeleteBuffers(1, &d->quadVBO);
 }
 
 void GMGLGraphicEngine::setViewport(const GMRect& rect)
@@ -610,6 +404,7 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 	static GMGLRenderer_3D s_renderer3d;
 	static GMGLRenderer_CubeMap s_rendererCubeMap;
 	static GMGLRenderer_Filter s_rendererFilter;
+	static GMGLRenderer_LightPass s_rendererLightPass;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -621,6 +416,8 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 		return &s_rendererCubeMap;
 	case GMModelType::Filter:
 		return &s_rendererFilter;
+	case GMModelType::LightPassQuad:
+		return &s_rendererLightPass;
 	default:
 		GM_ASSERT(false);
 		return nullptr;
@@ -650,31 +447,23 @@ void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 {
 	D(d);
 	GM_ASSERT(!d->isBlending); // 不能重复进行多次Blend
-	d->renderModeForBlend = getCurrentRenderMode();
 	d->isBlending = true;
 	d->blendsfactor = sfactor;
 	d->blenddfactor = dfactor;
-	setCurrentRenderMode(GMRenderMode::Forward);
 }
 
 void GMGLGraphicEngine::endBlend()
 {
 	D(d);
-	setCurrentRenderMode(d->renderModeForBlend);
 	d->isBlending = false;
 }
 
 IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 {
 	D(d);
-	if (type == GMShaderProgramType::CurrentShaderProgram)
+	if (type == GMShaderProgramType::DefaultShaderProgram)
 	{
-		if (getCurrentRenderMode() == GMRenderMode::Forward)
-			return d->forwardShaderProgram;
-		GM_ASSERT(getCurrentRenderMode() == GMRenderMode::Deferred);
-		if (getRenderState() != GMGLDeferredRenderState::PassingLight)
-			return d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER];
-		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER];
+		return d->forwardShaderProgram;
 	}
 	else if (type == GMShaderProgramType::ForwardShaderProgram)
 	{
@@ -693,17 +482,6 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 		GM_ASSERT(type == GMShaderProgramType::DeferredLightPassShaderProgram);
 		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER];
 	}
-}
-
-void GMGLGraphicEngine::newFrameOnCurrentFramebuffer()
-{
-	GLint mask;
-	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
-	glStencilMask(0xFF);
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
-	glStencilMask(mask);
 }
 
 void GMGLGraphicEngine::clearStencilOnCurrentFramebuffer()

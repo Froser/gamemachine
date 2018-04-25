@@ -35,8 +35,6 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	Vector<GMLight> lights;
 	bool needActivateLight = false;
 	GMRenderConfig renderConfig;
-	bool isDeferredRendering = false;
-	IGBuffer* gBuffer = nullptr;
 
 	// 延迟渲染分组
 	Vector<GMGameObject*> deferredRenderingGameObjects;
@@ -45,10 +43,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 
 class GMDx11GraphicEngine : public GMGraphicEngine
 {
-	DECLARE_PRIVATE(GMDx11GraphicEngine)
-
-public:
-	~GMDx11GraphicEngine();
+	DECLARE_PRIVATE_AND_BASE(GMDx11GraphicEngine, GMGraphicEngine)
 
 public:
 	virtual void init() override;
@@ -60,7 +55,7 @@ public:
 	virtual void clearStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
-	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) override;
+	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
 	virtual bool event(const GameMachineMessage& e) override;
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
 	{
@@ -143,18 +138,6 @@ public:
 	{
 		D(d);
 		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
-	}
-
-	void setIsDeferredRendering(bool isDeferredRendering)
-	{
-		D(d);
-		d->isDeferredRendering = isDeferredRendering;
-	}
-
-	IGBuffer* getGBuffer()
-	{
-		D(d);
-		return d->gBuffer;
 	}
 
 public:

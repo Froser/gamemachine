@@ -15,6 +15,7 @@ public:
 	virtual void createGlyphManager(OUT GMGlyphManager**) override;
 	virtual void createFramebuffer(OUT IFramebuffer**) override;
 	virtual void createFramebuffers(OUT IFramebuffers**) override;
+	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) override;
 };
 
 END_NS

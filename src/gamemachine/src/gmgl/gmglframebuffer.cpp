@@ -132,7 +132,6 @@ void GMGLFramebuffers::bind()
 	if (!d->framebuffersCreated)
 	{
 		bool suc = createFramebuffers();
-		GM_ASSERT(suc);
 		d->framebuffersCreated = suc;
 	}
 
@@ -207,13 +206,12 @@ void GMGLFramebuffers::clear()
 {
 	D(d);
 	GLint mask;
-	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-
+	bind();
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
 	glStencilMask(0xFF);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	glStencilMask(mask);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	unbind();
 }
 
 IFramebuffer* GMGLFramebuffers::getFramebuffer(GMuint index)

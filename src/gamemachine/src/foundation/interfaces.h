@@ -193,7 +193,7 @@ enum class GMUpdateDataType
 //! 当前装载的着色器类型
 enum class GMShaderProgramType
 {
-	CurrentShaderProgram, //!< 当前激活的着色器程序
+	DefaultShaderProgram, //!< 当前激活的着色器程序
 	ForwardShaderProgram, //!< 正向渲染着色器程序
 	DeferredGeometryPassShaderProgram, //!< 延迟渲染Geometry Pass阶段着色器程序
 	DeferredLightPassShaderProgram, //!< 延迟渲染Light Pass阶段着色器程序
@@ -328,6 +328,13 @@ GM_INTERFACE(IFramebuffers)
 	virtual IFramebuffer* getFramebuffer(GMuint) = 0;
 };
 
+enum class GMGeometryPassingState
+{
+	PassingGeometry,
+	PassingMaterial,
+	Done,
+};
+
 GM_INTERFACE(IGBuffer)
 {
 	virtual void init() = 0;
@@ -335,6 +342,8 @@ GM_INTERFACE(IGBuffer)
 	virtual void lightPass() = 0;
 	virtual IFramebuffers* getGeometryFramebuffers() = 0;
 	virtual IFramebuffers* getMaterialFramebuffers() = 0;
+	virtual void setGeometryPassingState(GMGeometryPassingState) = 0;
+	virtual GMGeometryPassingState getGeometryPassingState() = 0;
 };
 
 GM_INTERFACE(IShaderLoadCallback)
@@ -467,7 +476,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \param type 着色器程序种类。
 	  \return 着色器程序。
 	*/
-	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::CurrentShaderProgram) = 0;
+	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) = 0;
 
 	//! 设置一个着色器程序读取的回调。
 	/*!
@@ -494,6 +503,7 @@ GM_INTERFACE(IFactory)
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 	virtual void createFramebuffer(OUT IFramebuffer**) = 0;
 	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
+	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) = 0;
 };
 
 GM_INTERFACE_FROM(IWindow, IQueriable)

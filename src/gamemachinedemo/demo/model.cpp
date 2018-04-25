@@ -322,11 +322,11 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 
 		if (kbState.keyTriggered('0'))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
-		GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)
-		{
-			if (kbState.keyTriggered('1' + (gm::GMint)i))
-				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
-		}
+		//GM_FOREACH_ENUM_CLASS(i, gm::GBufferGeometryType::Position, gm::GBufferGeometryType::EndOfGeometryType)
+		//{
+		//	if (kbState.keyTriggered('1' + (gm::GMint)i))
+		//		db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
+		//}
 		if (kbState.keyTriggered('S'))
 		{
 			if (d->gameObject2 && d->gameObject3)

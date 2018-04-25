@@ -5,6 +5,7 @@
 #include "gmdx11texture.h"
 #include "gmdx11glyphmanager.h"
 #include "gmdx11framebuffer.h"
+#include "gmdx11gbuffer.h"
 
 void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -41,4 +42,9 @@ void GMDx11Factory::createFramebuffer(OUT IFramebuffer** fb)
 void GMDx11Factory::createFramebuffers(OUT IFramebuffers** fbs)
 {
 	*fbs = new GMDx11Framebuffers();
+}
+
+void GMDx11Factory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
+{
+	*g = new GMDx11GBuffer(gm_cast<GMDx11GraphicEngine*>(engine));
 }

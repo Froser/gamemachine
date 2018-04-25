@@ -6,6 +6,7 @@
 #include "gmglglyphmanager.h"
 #include "gmdata/gamepackage/gmgamepackagehandler.h"
 #include "gmglframebuffer.h"
+#include "gmglgbuffer.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -41,4 +42,9 @@ void GMGLFactory::createFramebuffer(OUT IFramebuffer** fb)
 void GMGLFactory::createFramebuffers(OUT IFramebuffers** fbs)
 {
 	*fbs = new GMGLFramebuffers();
+}
+
+void GMGLFactory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
+{
+	*g = new GMGLGBuffer(gm_cast<GMGLGraphicEngine*>(engine));
 }

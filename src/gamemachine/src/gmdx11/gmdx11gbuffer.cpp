@@ -35,11 +35,11 @@ GMDx11GBuffer::GMDx11GBuffer(GMDx11GraphicEngine* engine)
 void GMDx11GBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	d->engine->setIsDeferredRendering(true);
+	setGeometryPassingState(GMGeometryPassingState::PassingGeometry); // Dx11的Passes会在一个technique中完成，所以设置为非Done就可以了
 	getGeometryFramebuffers()->clear();
 	getMaterialFramebuffers()->clear();
 	d->engine->draw(objects, count);
-	d->engine->setIsDeferredRendering(false);
+	setGeometryPassingState(GMGeometryPassingState::Done);
 }
 
 void GMDx11GBuffer::lightPass()
