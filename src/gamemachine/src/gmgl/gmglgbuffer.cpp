@@ -30,18 +30,6 @@ namespace
 	};
 }
 
-/*
-void GMGLGBufferDep::copyDepthBuffer(GLuint target)
-{
-	D(d);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo[(GMint)GMGLDeferredRenderState::PassingGeometry]);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, target);
-	glBlitFramebuffer(0, 0, d->renderWidth, d->renderHeight, 0, 0, d->renderWidth, d->renderHeight, GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-*/
-
 GMGLGBuffer::GMGLGBuffer(GMGLGraphicEngine* engine)
 {
 	D(d);
@@ -134,7 +122,6 @@ void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)
 {
 	D(d);
 	GMGLFramebuffers* source = gm_cast<GMGLFramebuffers*>(getGeometryFramebuffers());
-	glDisable(GL_DEPTH_TEST);
 	GLint dest = 0;
 	const GMFramebufferDesc& desc = source->getDesc();
 
@@ -145,7 +132,7 @@ void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)
 	glBlitFramebuffer(
 		0, 0, desc.rect.width, desc.rect.height,
 		rect.x, rect.y, rect.width, rect.height,
-		GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		GL_COLOR_BUFFER_BIT, GL_LINEAR);
 	glBindFramebuffer(GL_FRAMEBUFFER, dest);
 }
 

@@ -77,15 +77,8 @@ public:
 	virtual void beforeDraw(GMModel* model) override;
 };
 
-GM_PRIVATE_OBJECT(GMGLRenderer_CubeMap)
-{
-	const GMCubeMapGameObject* cubemap = nullptr;
-};
-
 class GMGLRenderer_CubeMap : public GMGLRenderer_3D
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_CubeMap, GMGLRenderer)
-
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;

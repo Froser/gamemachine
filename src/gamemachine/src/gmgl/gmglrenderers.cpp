@@ -268,16 +268,16 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 
-	auto& desc = shaderProgram->getDesc();
+	auto desc = getVariablesDesc();
 	if (parent)
 	{
-		shaderProgram->setMatrix4(desc.ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(desc.ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
 
 	GMGeometryPassingState state = db->engine->getGBuffer()->getGeometryPassingState();
@@ -320,6 +320,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 void GMGLRenderer_3D::beforeDraw(GMModel* model)
 {
 	D(d);
+	D_BASE(db, GMGLRenderer);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	// 材质
@@ -377,12 +378,12 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
-	auto& svd = shaderProgram->getDesc();
-	static const std::string GMSHADER_MATERIAL_KA = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Ka;
-	static const std::string GMSHADER_MATERIAL_KD = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Kd;
-	static const std::string GMSHADER_MATERIAL_KS = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Ks;
-	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Shininess;
-	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(svd.MaterialName) + "." + svd.MaterialAttributes.Refreactivity;
+	auto desc = getVariablesDesc();
+	static const std::string GMSHADER_MATERIAL_KA = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Ka;
+	static const std::string GMSHADER_MATERIAL_KD = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Kd;
+	static const std::string GMSHADER_MATERIAL_KS = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Ks;
+	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Shininess;
+	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Refreactivity;
 
 	const GMMaterial& material = shader.getMaterial();
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.ka));
@@ -423,24 +424,14 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 //////////////////////////////////////////////////////////////////////////
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
-	D(d);
-	D_BASE(db, Base);
-	d->cubemap = GMObject::gmobject_cast<const GMCubeMapGameObject*>(parent);
 	IShaderProgram* shaderProgram = getShaderProgram();
+	auto desc = getVariablesDesc();
 	shaderProgram->useProgram();
-	auto& desc = shaderProgram->getDesc();
-	GM_ASSERT(model->getType() == GMModelType::CubeMap);
-	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
-	shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
-	shaderProgram->setMatrix4(desc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
-	shaderProgram->setMatrix4(desc.InverseTransposeModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
-	db->engine->activateLights(shaderProgram);
+	shaderProgram->setMatrix4(desc->ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }
 
 void GMGLRenderer_CubeMap::endModel()
 {
-	D(d);
-	d->cubemap = nullptr;
 }
 
 void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
@@ -455,29 +446,11 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 	if (glTex)
 	{
 		IShaderProgram* shaderProgram = getShaderProgram();
-		auto& desc = shaderProgram->getDesc();
-
-		IGraphicEngine* engine = GM.getGraphicEngine();
-		// 给延迟渲染程序传入CubeMap
-		{
-			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
-			shader->useProgram();
-			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		}
-		{
-			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::DeferredLightPassShaderProgram);
-			shader->useProgram();
-			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		}
-
-		// 给正向渲染程序传入CubeMap，一定要放在最后，因为CubeMap渲染本身是正向渲染
-		{
-			IShaderProgram* shader = engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
-			shader->useProgram();
-			shader->setInt(desc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		}
-		
-		shaderProgram->useProgram();
+		auto desc = getVariablesDesc();
+		GM_ASSERT(model->getType() == GMModelType::CubeMap);
+		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
+		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
+		shaderProgram->setInt(desc->CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glTex->useTexture(&frames, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		db->engine->setCubeMap(glTex);
 	}
@@ -526,8 +499,8 @@ GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, G
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
-	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
-	bool b = shaderProgram->setInterfaceInstance(desc.FilterAttributes.Filter, desc.FilterAttributes.Types[d->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[d->engine->getCurrentFilterMode()], GMShaderType::Pixel);
 	GM_ASSERT(b);
 	return texId;
 }
@@ -547,7 +520,6 @@ void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* pare
 	D_BASE(d, GMGLRenderer);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
-	d->engine->activateLights(shaderProgram);
 }
 
 void GMGLRenderer_LightPass::afterDraw(GMModel* model)
@@ -556,9 +528,10 @@ void GMGLRenderer_LightPass::afterDraw(GMModel* model)
 
 void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 {
-	D_BASE(db, GMGLRenderer);
+	D_BASE(d, GMGLRenderer);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	IGBuffer* gBuffer = db->engine->getGBuffer();
+	d->engine->activateLights(shaderProgram);
+	IGBuffer* gBuffer = d->engine->getGBuffer();
 	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
 	GMuint cnt0 = gBufferFramebuffers->count();
 	for (GMuint i = 0; i < cnt0; ++i)
@@ -575,5 +548,13 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
 		shaderProgram->setInt(GMGLGBuffer::GBufferMaterialUniformNames()[i].c_str(), i + cnt0);
 		texture->useTexture(nullptr, i + cnt0);
+	}
+
+	ITexture* cubeMap = d->engine->getCubeMap();
+	if (cubeMap)
+	{
+		const GMuint id = cnt0 + cnt1 + 1;
+		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, id);
+		cubeMap->useTexture(nullptr, id);
 	}
 }

@@ -84,6 +84,9 @@ void Demo_NormalMap::event(gm::GameMachineEvent evt)
 			d->rotate = !d->rotate;
 
 		d->demoWorld->notifyControls();
+		if (kbState.keyTriggered('0'))
+			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
+
 		for (gm::GMint i = 0; i < 8; ++i)
 		{
 			if (kbState.keyTriggered('1' + (gm::GMint)i))

@@ -131,7 +131,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		else
 		{
 			IGBuffer* gBuffer = getGBuffer();
-			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
 			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMGLFramebuffers::getDefaultFramebuffers());
 
@@ -166,6 +165,8 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 					gmglgBuffer->drawGeometryBuffer(fbIdx - 1, rect);
 				}
 			}
+
+			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 		}
 	}
 }
@@ -354,7 +355,6 @@ void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
 void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	activateLightsIfNecessary();
 	if (!count)
 		return;
 
@@ -371,16 +371,6 @@ void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
 	{
 		getFilterFramebuffers()->unbind();
 		getFilterQuad()->draw();
-	}
-}
-
-void GMGLGraphicEngine::activateLightsIfNecessary()
-{
-	D(d);
-	if (d->needRefreshLights)
-	{
-		d->needRefreshLights = false;
-		IGraphicEngine* engine = GM.getGraphicEngine();
 	}
 }
 

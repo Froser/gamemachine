@@ -475,9 +475,6 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.WorldPos = output.Position;
-    output.Position = mul(output.Position, WorldMatrix);
-    output.Position = mul(output.Position, ViewMatrix);
-    output.Position = mul(output.Position, ProjectionMatrix);
     return output;
 }
 
@@ -566,17 +563,18 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     }
     output.TextureAmbient = texAmbient * Material.Ka;
     output.TextureDiffuse = texDiffuse * Material.Kd;
-    output.NormalMap = NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord);
 
     if (HasNormalMap())
     {
         output.Tangent_Eye = Float3ToTexture(mul(ToFloat4(input.Tangent, 0), normalEyeTransform));
         output.Bitangent_Eye = Float3ToTexture(mul(ToFloat4(input.Bitangent, 0), normalEyeTransform));
+        output.NormalMap = NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord);
     }
     else
     {
         output.Tangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
         output.Bitangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
+        output.NormalMap = float3(0, 0, 0);
     }
     return output;
 }

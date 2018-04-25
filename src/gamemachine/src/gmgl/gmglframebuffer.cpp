@@ -100,10 +100,6 @@ public:
 	virtual void clear() override
 	{
 	}
-
-	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override
-	{
-	}
 };
 
 GMGLFramebuffer::~GMGLFramebuffer()
@@ -215,12 +211,12 @@ void GMGLFramebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 	glGetIntegerv(GL_FRAMEBUFFER_BINDING, &cache);
 
 	GMGLFramebuffers* destFramebuffers = gm_cast<GMGLFramebuffers*>(dest);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, d->fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, framebufferId());
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, destFramebuffers->framebufferId());
 	glBlitFramebuffer(
 		0, 0, d->desc.rect.width, d->desc.rect.height,
 		0, 0, d->desc.rect.width, d->desc.rect.height,
-		GL_DEPTH_BUFFER_BIT, GL_LINEAR);
+		GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT, GL_NEAREST);
 	glBindFramebuffer(GL_FRAMEBUFFER, cache);
 }
 
