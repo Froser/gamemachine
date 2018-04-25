@@ -144,7 +144,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 				gBuffer->lightPass();
 				if (filter != GMFilterMode::None)
 				{
-					GMGLFramebuffers* filterBuffers = static_cast<GMGLFramebuffers*>(getFilterFramebuffers());
 					getFilterFramebuffers()->unbind();
 					getFilterQuad()->draw();
 				}

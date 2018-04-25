@@ -44,21 +44,45 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 
 	d->needActivateLight = true;
 
-	// 假设现在是延迟渲染
-	// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
-	groupGameObjects(objects, count);
-	if (true)
-	{
-		IGBuffer* gBuffer = getGBuffer();
-		gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
-		gBuffer->lightPass();
-		forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
-	}
-	else
+	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
+	if (renderMode == GMRenderMode::Forward)
 	{
 		forwardDraw(objects, count, filterMode);
 	}
+	else
+	{
+		GM_ASSERT(renderMode == GMRenderMode::Deferred);
+		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
+		groupGameObjects(objects, count);
 
+		if (d->deferredRenderingGameObjects.empty())
+		{
+			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
+		}
+		else
+		{
+			IGBuffer* gBuffer = getGBuffer();
+			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMDx11Framebuffers::getDefaultFramebuffers());
+
+			{
+				if (filterMode != GMFilterMode::None)
+				{
+					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+					GM_ASSERT(filterFramebuffers);
+					filterFramebuffers->bind();
+				}
+				gBuffer->lightPass();
+				if (filterMode != GMFilterMode::None)
+				{
+					getFilterFramebuffers()->unbind();
+					getFilterQuad()->draw();
+				}
+			}
+
+			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
+		}
+	}
 	d->needActivateLight = false;
 }
 

@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)
 	GMComPtr<ID3D11DepthStencilView> defaultDepthStencilView;
 };
 
-class GMDx11DefaultFramebuffers : public IFramebuffers
+class GMDx11DefaultFramebuffers : public GMDx11Framebuffers
 {
 	DECLARE_PRIVATE(GMDx11DefaultFramebuffers)
 
@@ -61,10 +61,6 @@ public:
 	}
 
 	virtual void clear() override
-	{
-	}
-
-	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override
 	{
 	}
 };
@@ -322,7 +318,6 @@ GMuint GMDx11Framebuffers::count()
 
 void GMDx11Framebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 {
-	GM_ASSERT(false);
 }
 
 IFramebuffers* GMDx11Framebuffers::getDefaultFramebuffers()

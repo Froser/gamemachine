@@ -475,6 +475,9 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.WorldPos = output.Position;
+    output.Position = mul(output.Position, WorldMatrix);
+    output.Position = mul(output.Position, ViewMatrix);
+    output.Position = mul(output.Position, ProjectionMatrix);
     return output;
 }
 
@@ -574,7 +577,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     {
         output.Tangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
         output.Bitangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
-        output.NormalMap = float3(0, 0, 0);
+        output.NormalMap = float4(0, 0, 0, 0);
     }
     return output;
 }
@@ -591,7 +594,6 @@ VS_MATERIAL_OUTPUT PS_3D_MaterialPass(PS_INPUT input)
     output.Shininess_bNormalMap_Refractivity.r = Material.Shininess;
     output.Shininess_bNormalMap_Refractivity.g = HasNormalMap() ? 1 : 0;
     output.Shininess_bNormalMap_Refractivity.b = Material.Refractivity;
-    output.Shininess_bNormalMap_Refractivity.a = 1; //目前空缺，便于调试，设置成1
     return output;
 }
 
