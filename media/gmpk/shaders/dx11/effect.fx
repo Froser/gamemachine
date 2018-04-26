@@ -53,12 +53,12 @@ float3 TextureRGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
 
 float3 TextureRGBToNormal(Texture2DMS<float4> tex, int3 coord)
 {
-    return tex.Load(coord, 0) * 2.0f - 1.0f;
+    return tex.Load(coord, 0).xyz * 2.0f - 1.0f;
 }
 
 float3 TextureRGBToNormal(Texture2D tex, int3 coord)
 {
-    return tex.Load(coord) * 2.0f - 1.0f;
+    return tex.Load(coord).xyz * 2.0f - 1.0f;
 }
 
 struct GMMaterial
@@ -629,7 +629,10 @@ VS_MATERIAL_OUTPUT PS_3D_MaterialPass(PS_INPUT input)
 
 VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 {
-    return VS_3D(input);
+    VS_OUTPUT output;
+    output.Position = ToFloat4(input.Position);
+    output.Texcoord = input.Texcoord;
+    return output;
 }
 
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET

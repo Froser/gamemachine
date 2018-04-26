@@ -794,9 +794,12 @@ void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
 		// 激活动画序列
 		texture->useTexture(&textures, Register);
 		GMDx11CubeMapState& cubeMapState = getCubeMapState();
-		cubeMapState.hasCubeMap = true;
-		cubeMapState.cubeMapRenderer = this;
-		cubeMapState.model = model;
+		if (cubeMapState.model != model)
+		{
+			cubeMapState.hasCubeMap = true;
+			cubeMapState.cubeMapRenderer = this;
+			cubeMapState.model = model;
+		}
 	}
 }
 
