@@ -61,7 +61,7 @@ void deferred_light_pass_init()
 {
 	// light pass
 	deferred_light_pass_g_ambientLight = deferred_light_pass_g_diffuseLight = deferred_light_pass_g_specularLight = vec3(0);
-	deferred_light_pass_fromTexture_Position = textureToNormal(texture(deferred_light_pass_gPosition, _uv).rgb);
+	deferred_light_pass_fromTexture_Position = texture(deferred_light_pass_gPosition, _uv).rgb;
 	deferred_light_pass_fromTexture_Normal = textureToNormal(texture(deferred_light_pass_gNormal, _uv).rgb);
 	deferred_light_pass_fromTexture_Normal_eye = textureToNormal(texture(deferred_light_pass_gNormal_eye, _uv).rgb);
 	deferred_light_pass_fromTexture_TexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
@@ -72,11 +72,11 @@ void deferred_light_pass_init()
 
 	vec4 tKs_tShininess = texture(deferred_material_pass_gKs_gShininess, _uv);
 	deferred_material_pass_fromTexture_Ks = tKs_tShininess.rgb;
-	deferred_material_pass_fromTexture_Shininess = tKs_tShininess.a;
 
 	vec4 fromTexture_HasNormalMap_tRefractivity = texture(deferred_material_pass_gHasNormalMap_gRefractivity, _uv);
-	deferred_material_pass_fromTexture_HasNormalMap = fromTexture_HasNormalMap_tRefractivity.r;
-	deferred_material_pass_fromTexture_Refractivity = fromTexture_HasNormalMap_tRefractivity.g;
+	deferred_material_pass_fromTexture_Shininess = fromTexture_HasNormalMap_tRefractivity.r;
+	deferred_material_pass_fromTexture_HasNormalMap = fromTexture_HasNormalMap_tRefractivity.g;
+	deferred_material_pass_fromTexture_Refractivity = fromTexture_HasNormalMap_tRefractivity.b;
 }
 
 void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)

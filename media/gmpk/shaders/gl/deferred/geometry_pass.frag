@@ -55,7 +55,7 @@ void deferred_geometry_pass_calcEyeSpace()
 
 subroutine (GM_TechniqueEntrance) void GM_GeometryPass()
 {
-	${deferred_geometry_pass_gPosition} = normalToTexture((GM_model_matrix * _deferred_geometry_pass_position_world).xyz);
+	${deferred_geometry_pass_gPosition} = GM_model_matrix * _deferred_geometry_pass_position_world;
 	${deferred_geometry_pass_gTexAmbient} = vec4(GM_material.ka, 1) * deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	${deferred_geometry_pass_gTexDiffuse} = vec4(GM_material.kd, 1) * deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
 

@@ -132,7 +132,6 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		{
 			IGBuffer* gBuffer = getGBuffer();
 			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
-			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMGLFramebuffers::getDefaultFramebuffers());
 
 			{
 				if (filter != GMFilterMode::None)
@@ -165,6 +164,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 				}
 			}
 
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMGLFramebuffers::getDefaultFramebuffers());
 			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
 		}
 	}

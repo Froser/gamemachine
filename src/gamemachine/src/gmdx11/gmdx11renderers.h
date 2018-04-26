@@ -24,6 +24,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ID3DX11EffectBlendVariable* blend = nullptr;
 	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
+	bool screenInfoPrepared = false;
 };
 
 class GMDx11Renderer : public GMObject, public IRenderer
@@ -56,6 +57,7 @@ protected:
 	}
 
 protected:
+	virtual void prepareScreenInfo();
 	virtual void prepareTextures(GMModel* model);
 	virtual void setTextures(GMModel* model);
 	virtual void passAllAndDraw(GMModel* model);
@@ -119,6 +121,7 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(GMModel* model) override;
+	virtual void passAllAndDraw(GMModel* model) override;
 };
 
 class GMDx11Renderer_Deferred_3D: public GMDx11Renderer

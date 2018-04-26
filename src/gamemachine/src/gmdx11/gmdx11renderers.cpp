@@ -393,6 +393,32 @@ void GMDx11Renderer::endModel()
 {
 }
 
+void GMDx11Renderer::prepareScreenInfo()
+{
+	D(d);
+	// 如果屏幕更改了，需要通知此处重新设置着色器
+	if (!d->screenInfoPrepared)
+	{
+		const GMGameMachineRunningStates& runningStates = GM.getGameMachineRunningStates();
+		const auto& desc = getVariablesDesc();
+		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(desc->ScreenInfoAttributes.ScreenInfo);
+		GM_ASSERT(screenInfo->IsValid());
+
+		ID3DX11EffectScalarVariable* screenWidth = screenInfo->GetMemberByName(desc->ScreenInfoAttributes.ScreenWidth)->AsScalar();
+		GM_ASSERT(screenWidth->IsValid());
+		GM_DX_HR(screenWidth->SetInt(runningStates.renderRect.width));
+
+		ID3DX11EffectScalarVariable* screenHeight = screenInfo->GetMemberByName(desc->ScreenInfoAttributes.ScreenHeight)->AsScalar();
+		GM_ASSERT(screenHeight->IsValid());
+		GM_DX_HR(screenHeight->SetInt(runningStates.renderRect.height));
+
+		ID3DX11EffectScalarVariable* multisampling = screenInfo->GetMemberByName(desc->ScreenInfoAttributes.Multisampling)->AsScalar();
+		GM_ASSERT(multisampling->IsValid());
+		GM_DX_HR(multisampling->SetBool(runningStates.sampleCount > 1));
+		d->screenInfoPrepared = true;
+	}
+}
+
 void GMDx11Renderer::prepareTextures(GMModel* model)
 {
 	D(d);
@@ -700,6 +726,7 @@ ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
 void GMDx11Renderer::draw(GMModel* model)
 {
 	D(d);
+	prepareScreenInfo();
 	prepareBuffer(model);
 	prepareLights();
 	prepareMaterials(model);
@@ -776,11 +803,40 @@ void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
 void GMDx11Renderer_Filter::draw(GMModel* model)
 {
 	D(d);
+	prepareScreenInfo();
 	prepareBuffer(model);
 	prepareRasterizer(model);
 	prepareBlend(model);
 	prepareDepthStencil(model);
 	passAllAndDraw(model);
+}
+
+void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
+{
+	D(d);
+	D3DX11_TECHNIQUE_DESC techDesc;
+	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
+
+	for (GMuint p = 0; p < techDesc.Passes; ++p)
+	{
+		GMDx11Texture* filterTexture = gm_cast<GMDx11Texture*>(model->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0).getFrameByIndex(0));
+		GM_ASSERT(filterTexture);
+		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
+		if (GM.getGameMachineRunningStates().sampleCount == 1)
+		{
+			GM_DX_HR(d->effect->GetVariableByName("FilterTexture")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
+		}
+		else
+		{
+			GM_DX_HR(d->effect->GetVariableByName("FilterTexture_MSAA")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
+		}
+		pass->Apply(0, d->deviceContext);
+
+		if (model->getDrawMode() == GMModelDrawMode::Vertex)
+			d->deviceContext->Draw(model->getVerticesCount(), 0);
+		else
+			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+	}
 }
 
 void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
@@ -794,8 +850,8 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	GM_ASSERT(kernelDeltaX->IsValid() && kernelDeltaY->IsValid());
 	GMFloat4 delta;
 	getEngine()->getCurrentFilterKernelDelta().loadFloat4(delta);
-	GM_DX_HR(kernelDeltaX->SetFloat(delta[0]));
-	GM_DX_HR(kernelDeltaY->SetFloat(delta[1]));
+	GM_DX_HR(kernelDeltaX->SetInt(delta[0]));
+	GM_DX_HR(kernelDeltaY->SetInt(delta[1]));
 
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();

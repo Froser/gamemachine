@@ -43,7 +43,7 @@ public:
 	GMGLFramebuffers();
 	~GMGLFramebuffers();
 
-	virtual bool init(const GMFramebufferDesc& desc) override;
+	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
 	virtual void bind() override;
 	virtual void unbind() override;

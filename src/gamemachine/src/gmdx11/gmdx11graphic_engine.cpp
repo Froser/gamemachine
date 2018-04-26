@@ -18,7 +18,7 @@ void GMDx11GraphicEngine::init()
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 
 	const GMRect& renderRect = GM.getGameMachineRunningStates().renderRect;
-	d->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1.f / renderRect.width, 1.f / renderRect.height));
+	d->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1, 1));
 }
 
 void GMDx11GraphicEngine::newFrame()
@@ -63,7 +63,6 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		{
 			IGBuffer* gBuffer = getGBuffer();
 			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
-			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMDx11Framebuffers::getDefaultFramebuffers());
 
 			{
 				if (filterMode != GMFilterMode::None)
@@ -71,15 +70,19 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 					GM_ASSERT(filterFramebuffers);
 					filterFramebuffers->bind();
+					filterFramebuffers->clear();
 				}
 				gBuffer->lightPass();
 				if (filterMode != GMFilterMode::None)
 				{
-					getFilterFramebuffers()->unbind();
+					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+					filterFramebuffers->unbind();
 					getFilterQuad()->draw();
+					gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(filterFramebuffers);
 				}
 			}
 
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMDx11Framebuffers::getDefaultFramebuffers());
 			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
 		}
 	}
@@ -188,6 +191,11 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 		d->renderTargetView->AddRef();
 		(*out) = d->renderTargetView.get();
 		break;
+	case GameMachineInterfaceID::D3D11DepthStencilTexture:
+		GM_ASSERT(d->depthStencilTexture);
+		d->depthStencilTexture->AddRef();
+		(*out) = d->depthStencilTexture.get();
+		break;
 	default:
 		return false;
 	}
@@ -209,6 +217,8 @@ bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11SwapChain, (void**)&d->swapChain);
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->depthStencilView);
+		GM_ASSERT(b);
+		b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilTexture, (void**)&d->depthStencilTexture);
 		GM_ASSERT(b);
 		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
 		GM_ASSERT(b);
@@ -236,6 +246,9 @@ void GMDx11GraphicEngine::initShaders()
 void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
 {
 	D(d);
+	if (!count)
+		return;
+
 	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 	if (filter != GMFilterMode::None)
 	{

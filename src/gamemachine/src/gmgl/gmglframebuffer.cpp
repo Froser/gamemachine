@@ -64,7 +64,7 @@ public:
 class GMGLDefaultFramebuffers : public GMGLFramebuffers
 {
 public:
-	virtual bool init(const GMFramebufferDesc& desc) override
+	virtual bool init(const GMFramebuffersDesc& desc) override
 	{
 		return false;
 	}
@@ -151,12 +151,12 @@ GMGLFramebuffers::~GMGLFramebuffers()
 	d->depthStencilBuffer = 0;
 }
 
-bool GMGLFramebuffers::init(const GMFramebufferDesc& desc)
+bool GMGLFramebuffers::init(const GMFramebuffersDesc& desc)
 {
 	D(d);
-	d->desc = desc;
+	d->desc.rect = desc.rect;
 	glGenFramebuffers(1, &d->fbo);
-	createDepthStencilBuffer(desc);
+	createDepthStencilBuffer(d->desc);
 	return glGetError() == GL_NO_ERROR;
 }
 

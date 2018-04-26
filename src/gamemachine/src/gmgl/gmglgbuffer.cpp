@@ -45,10 +45,21 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 
 	// Geometry Pass的纹理格式为R8G8B8A8_UNORM，意味着所有的输出在着色器中范围是[0,1]，对应着UNORM的[0x00, 0xFF]
 	// 对于[-1, 1]范围的数据，需要在着色器中进行一次转换。
-	desc.framebufferFormat = GMFramebufferFormat::R8G8B8A8_UNORM;
+	GMFramebufferFormat formats[] = {
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+	};
 
 	GM.getFactory()->createFramebuffers(&framebuffers);
-	framebuffers->init(desc);
+	GMFramebuffersDesc fbDesc = { 0 };
+	fbDesc.rect = states.renderRect;
+	framebuffers->init(fbDesc);
 	GM_ASSERT(framebuffers);
 
 	constexpr GMuint framebufferCount = GM_array_size(s_GBufferGeometryUniformNames);
@@ -58,6 +69,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 		IFramebuffer* framebuffer = nullptr;
 		GM.getFactory()->createFramebuffer(&framebuffer);
 		GM_ASSERT(framebuffer);
+		desc.framebufferFormat = formats[i];
 		framebuffer->init(desc);
 		framebuffers->addFramebuffer(framebuffer);
 	}
@@ -70,10 +82,16 @@ IFramebuffers* GMGLGBuffer::createMaterialFramebuffers()
 	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
 	GMFramebufferDesc desc = { 0 };
 	desc.rect = states.renderRect;
-	desc.framebufferFormat = GMFramebufferFormat::R32G32B32A32_FLOAT;
+
+	GMFramebufferFormat formats[] = {
+		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
+	};
 
 	GM.getFactory()->createFramebuffers(&framebuffers);
-	framebuffers->init(desc);
+	GMFramebuffersDesc fbDesc = { 0 };
+	fbDesc.rect = states.renderRect;
+	framebuffers->init(fbDesc);
 	GM_ASSERT(framebuffers);
 
 	constexpr GMuint framebufferCount = GM_array_size(s_GBufferMaterialUniformNames);
@@ -83,6 +101,7 @@ IFramebuffers* GMGLGBuffer::createMaterialFramebuffers()
 		IFramebuffer* framebuffer = nullptr;
 		GM.getFactory()->createFramebuffer(&framebuffer);
 		GM_ASSERT(framebuffer);
+		desc.framebufferFormat = formats[i];
 		framebuffer->init(desc);
 		framebuffers->addFramebuffer(framebuffer);
 	}

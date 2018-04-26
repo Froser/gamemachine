@@ -68,6 +68,7 @@ enum class GameMachineInterfaceID
 	D3D11DeviceContext,
 	D3D11SwapChain,
 	D3D11DepthStencilView,
+	D3D11DepthStencilTexture,
 	D3D11RenderTargetView,
 
 	D3D11VertexBuffer,
@@ -246,6 +247,14 @@ struct GMShaderVariablesFilterDesc
 	const char* Types[GMFilterCount];
 };
 
+struct GMShaderVariablesScreenInfoDesc
+{
+	const char* ScreenInfo;
+	const char* ScreenWidth;
+	const char* ScreenHeight;
+	const char* Multisampling;
+};
+
 struct GMShaderVariablesDesc
 {
 	// 矩阵
@@ -279,6 +288,7 @@ struct GMShaderVariablesDesc
 	GMShaderVariablesFilterDesc FilterAttributes;
 
 	// 状态
+	GMShaderVariablesScreenInfoDesc ScreenInfoAttributes;
 	const char* RasterizerState;
 	const char* BlendState;
 	const char* DepthStencilState;
@@ -304,6 +314,11 @@ enum class GMFramebufferFormat
 	R32G32B32A32_FLOAT,
 };
 
+struct GMFramebuffersDesc
+{
+	GMRect rect;
+};
+
 struct GMFramebufferDesc
 {
 	GMRect rect;
@@ -319,7 +334,7 @@ GM_INTERFACE(IFramebuffer)
 
 GM_INTERFACE(IFramebuffers)
 {
-	virtual bool init(const GMFramebufferDesc& desc) = 0;
+	virtual bool init(const GMFramebuffersDesc& desc) = 0;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) = 0;
 	virtual GMuint count() = 0;
 	virtual void bind() = 0;

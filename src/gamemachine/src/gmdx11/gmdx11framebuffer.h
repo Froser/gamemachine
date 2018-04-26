@@ -43,6 +43,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 	Vector<GMDx11Framebuffer*> framebuffers;
 	Vector<ID3D11RenderTargetView*> renderTargetViews;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11Texture2D> depthStencilTexture;
 	GMGraphicEngine* engine = nullptr;
 };
 
@@ -55,7 +56,7 @@ public:
 	~GMDx11Framebuffers();
 
 public:
-	virtual bool init(const GMFramebufferDesc& desc) override;
+	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
 	virtual void bind() override;
 	virtual void unbind() override;

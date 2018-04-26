@@ -59,6 +59,10 @@ bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
 		d->depthStencilView->AddRef();
 		(*out) = d->depthStencilView.get();
 		break;
+	case gm::GameMachineInterfaceID::D3D11DepthStencilTexture:
+		d->depthStencilTexture->AddRef();
+		(*out) = d->depthStencilTexture.get();
+		break;
 	case gm::GameMachineInterfaceID::D3D11RenderTargetView:
 		d->renderTargetView->AddRef();
 		(*out) = d->renderTargetView.get();
@@ -89,7 +93,6 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 
 	gm::GMComPtr<IDXGIDevice> dxgiDevice;
 	gm::GMComPtr<ID3D11Texture2D> backBuffer;
-	gm::GMComPtr<ID3D11Texture2D> depthStencilBuffer;
 	gm::GMComPtr<ID3D11DepthStencilState> depthStencilState;
 	gm::GMComPtr<ID3D11RasterizerState> rasterizerState;
 
@@ -216,6 +219,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 
 	hr = d->device->CreateRenderTargetView(backBuffer, NULL, &d->renderTargetView);
 	CHECK_HR(hr);
+	GM_DX11_SET_OBJECT_NAME_A(d->renderTargetView, "GM_DefaultRenderTargetView");
 
 	// 4.创建深度模板缓存
 	ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
@@ -231,8 +235,9 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	depthTextureDesc.CPUAccessFlags = 0;
 	depthTextureDesc.MiscFlags = 0;
 
-	hr = d->device->CreateTexture2D(&depthTextureDesc, NULL, &depthStencilBuffer);
+	hr = d->device->CreateTexture2D(&depthTextureDesc, NULL, &d->depthStencilTexture);
 	CHECK_HR(hr);
+	GM_DX11_SET_OBJECT_NAME_A(d->depthStencilTexture, "GM_DefaultDepthStencilTexture");
 
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 	depthStencilDesc.DepthEnable = TRUE;
@@ -254,7 +259,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	CHECK_HR(hr);
 	d->deviceContext->OMSetDepthStencilState(depthStencilState, 1);
 
-	hr = d->device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView);
+	hr = d->device->CreateDepthStencilView(d->depthStencilTexture, NULL, &d->depthStencilView);
 	CHECK_HR(hr);
 
 	// 5.绑定渲染目标

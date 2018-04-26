@@ -26,12 +26,12 @@ public:
 	void useGeometryTextures(ID3DX11Effect* effect);
 	void useMaterialTextures(ID3DX11Effect* effect);
 
-private:
-	void setSampler(ID3DX11Effect* effect, GMDx11Texture* texture);
-
 protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;
 	virtual IFramebuffers* createMaterialFramebuffers() override;
+
+private:
+	bool isMultisamping();
 };
 
 END_NS

@@ -9,29 +9,29 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)
 {
-	GMComPtr<ID3D11DeviceContext> deviceContext;
 	GMComPtr<ID3D11RenderTargetView> defaultRenderTargetView;
-	GMComPtr<ID3D11DepthStencilView> defaultDepthStencilView;
 };
 
 class GMDx11DefaultFramebuffers : public GMDx11Framebuffers
 {
-	DECLARE_PRIVATE(GMDx11DefaultFramebuffers)
+	DECLARE_PRIVATE_AND_BASE(GMDx11DefaultFramebuffers, GMDx11Framebuffers);
 
 public:
 	GMDx11DefaultFramebuffers()
 	{
 		D(d);
+		D_BASE(db, Base);
+		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&db->depthStencilView);
+		GM_ASSERT(db->depthStencilView);
+		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilTexture, (void**)&db->depthStencilTexture);
+		GM_ASSERT(db->depthStencilTexture);
 		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->defaultRenderTargetView);
 		GM_ASSERT(d->defaultRenderTargetView);
-		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->defaultDepthStencilView);
-		GM_ASSERT(d->defaultDepthStencilView);
-		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
-		GM_ASSERT(d->deviceContext);
+		db->renderTargetViews.push_back(d->defaultRenderTargetView);
 	}
 
 public:
-	virtual bool init(const GMFramebufferDesc& desc) override
+	virtual bool init(const GMFramebuffersDesc& desc) override
 	{
 		return false;
 	}
@@ -40,10 +40,10 @@ public:
 	{
 	}
 
-	virtual void bind() override
+	void bind()
 	{
-		D(d);
-		d->deviceContext->OMSetRenderTargets(1, &d->defaultRenderTargetView, d->defaultDepthStencilView);
+		D_BASE(d, Base);
+		d->deviceContext->OMSetRenderTargets(d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
 	}
 
 	virtual void unbind() override
@@ -111,6 +111,7 @@ void GMDx11FramebufferTexture::init()
 		gm_error("Unsupported format.");
 	}
 
+	const GMGameMachineRunningStates& runningState = GM.getGameMachineRunningStates();
 	GMComPtr<ID3D11Texture2D> texture;
 	D3D11_TEXTURE2D_DESC texDesc = { 0 };
 	texDesc.Width = d->desc.rect.width;
@@ -118,8 +119,8 @@ void GMDx11FramebufferTexture::init()
 	texDesc.MipLevels = 1;
 	texDesc.ArraySize = 1;
 	texDesc.Format = format;
-	texDesc.SampleDesc.Count = 1;
-	texDesc.SampleDesc.Quality = 0;
+	texDesc.SampleDesc.Count = runningState.sampleCount;
+	texDesc.SampleDesc.Quality = runningState.sampleQuality;
 	texDesc.Usage = D3D11_USAGE_DEFAULT;
 	texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
 	texDesc.CPUAccessFlags = 0;
@@ -210,15 +211,15 @@ GMDx11Framebuffers::~GMDx11Framebuffers()
 	}
 }
 
-bool GMDx11Framebuffers::init(const GMFramebufferDesc& desc)
+bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 {
 	D(d);
 	GMComPtr<ID3D11Device> device;
 	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 	GM_ASSERT(device);
 
+	const GMGameMachineRunningStates& runningState = GM.getGameMachineRunningStates();
 	GMComPtr<ID3D11DepthStencilState> depthStencilState;
-	GMComPtr<ID3D11Texture2D> depthStencilBuffer;
 
 	// 创建深度缓存模板
 	D3D11_TEXTURE2D_DESC depthStencilTextureDesc = { 0 };
@@ -227,8 +228,8 @@ bool GMDx11Framebuffers::init(const GMFramebufferDesc& desc)
 	depthStencilTextureDesc.MipLevels = 1;
 	depthStencilTextureDesc.ArraySize = 1;
 	depthStencilTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-	depthStencilTextureDesc.SampleDesc.Count = 1;
-	depthStencilTextureDesc.SampleDesc.Quality = 0;
+	depthStencilTextureDesc.SampleDesc.Count = runningState.sampleCount;
+	depthStencilTextureDesc.SampleDesc.Quality = runningState.sampleQuality;
 	depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	depthStencilTextureDesc.CPUAccessFlags = 0;
@@ -251,8 +252,8 @@ bool GMDx11Framebuffers::init(const GMFramebufferDesc& desc)
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
 	GM_DX_HR_RET(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
-	GM_DX_HR_RET(device->CreateTexture2D(&depthStencilTextureDesc, NULL, &depthStencilBuffer));
-	GM_DX_HR_RET(device->CreateDepthStencilView(depthStencilBuffer, NULL, &d->depthStencilView));
+	GM_DX_HR_RET(device->CreateTexture2D(&depthStencilTextureDesc, NULL, &d->depthStencilTexture));
+	GM_DX_HR_RET(device->CreateDepthStencilView(d->depthStencilTexture, NULL, &d->depthStencilView));
 	return true;
 }
 
@@ -294,7 +295,7 @@ void GMDx11Framebuffers::unbind()
 
 void GMDx11Framebuffers::clear()
 {
-	static const GMfloat clear[4] = { 0, 0, 0, 1 };
+	static constexpr GMfloat clear[4] = { 0, 0, 0, 1 };
 	D(d);
 	for (auto renderTargetView : d->renderTargetViews)
 	{
@@ -318,6 +319,10 @@ GMuint GMDx11Framebuffers::count()
 
 void GMDx11Framebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 {
+	GMDx11Framebuffers* destFramebuffers = gm_cast<GMDx11Framebuffers*>(dest);
+	D(d);
+	D_OF(d_dest, destFramebuffers);
+	d->deviceContext->CopyResource(d_dest->depthStencilTexture, d->depthStencilTexture);
 }
 
 IFramebuffers* GMDx11Framebuffers::getDefaultFramebuffers()

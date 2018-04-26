@@ -51,6 +51,16 @@ float3 TextureRGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
     return tex.Sample(ss, texcoord).xyz * 2.0f - 1.0f;
 }
 
+float3 TextureRGBToNormal(Texture2DMS<float4> tex, int3 coord)
+{
+    return tex.Load(coord, 0) * 2.0f - 1.0f;
+}
+
+float3 TextureRGBToNormal(Texture2D tex, int3 coord)
+{
+    return tex.Load(coord) * 2.0f - 1.0f;
+}
+
 struct GMMaterial
 {
     float4 Ka;
@@ -153,6 +163,15 @@ int AmbientLightCount;
 
 GMLight SpecularLights[10];
 int SpecularLightCount;
+
+struct ScreenInfo
+{
+    int ScreenWidth;
+    int ScreenHeight;
+    bool Multisampling;
+};
+
+ScreenInfo GMScreenInfo;
 
 //--------------------------------------------------------------------------------------
 // States
@@ -500,6 +519,17 @@ Texture2D GM_DeferredBitangent_Eye;
 Texture2D GM_DeferredNormalMap;
 Texture2D GM_DeferredKs;
 Texture2D GM_DeferredShininess_bNormalMap_Refractivity;
+Texture2DMS<float4> GM_DeferredPosition_MSAA;
+Texture2DMS<float4> GM_DeferredNormal_World_MSAA;
+Texture2DMS<float4> GM_DeferredNormal_Eye_MSAA;
+Texture2DMS<float4> GM_DeferredTextureAmbient_MSAA;
+Texture2DMS<float4> GM_DeferredTextureDiffuse_MSAA;
+Texture2DMS<float4> GM_DeferredTangent_Eye_MSAA;
+Texture2DMS<float4> GM_DeferredBitangent_Eye_MSAA;
+Texture2DMS<float4> GM_DeferredNormalMap_MSAA;
+Texture2DMS<float4> GM_DeferredKs_MSAA;
+Texture2DMS<float4> GM_DeferredShininess_bNormalMap_Refractivity_MSAA;
+
 SamplerState DeferredSampler;
 
 // [-1, 1] -> [0, 1]
@@ -510,7 +540,7 @@ float4 Float3ToTexture(float3 normal)
 
 struct VS_GEOMETRY_OUTPUT
 {
-    float4 Position                          : SV_TARGET0; //需要将区间转化到[0, 1]
+    float4 Position                          : SV_TARGET0;
     float4 Normal_World                      : SV_TARGET1; //需要将区间转化到[0, 1]
     float4 Normal_Eye                        : SV_TARGET2; //需要将区间转化到[0, 1]
     float4 TextureAmbient                    : SV_TARGET3;
@@ -534,7 +564,7 @@ VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
 VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 {
     VS_GEOMETRY_OUTPUT output;
-    output.Position = Float3ToTexture(mul(input.WorldPos, WorldMatrix));
+    output.Position = mul(input.WorldPos, WorldMatrix);
 
     float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
@@ -604,32 +634,58 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
-    float3 tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, DeferredSampler, input.Texcoord).rgb;
-    float3 bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, DeferredSampler, input.Texcoord).rgb;
-    float3 normal_Eye_N = TextureRGBToNormal(GM_DeferredNormal_Eye, DeferredSampler, input.Texcoord);
-
-    TangentSpace tangentSpace;
-    tangentSpace.Normal_Tangent_N = TextureRGBToNormal(GM_DeferredNormalMap, DeferredSampler, input.Texcoord);
-    tangentSpace.TBN = transpose(float3x3(
-        tangent_Eye_N,
-        bitangent_Eye_N,
-        normal_Eye_N
-    ));
-
     VS_3D_INPUT commonInput;
-    commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, DeferredSampler, input.Texcoord);
-    commonInput.Normal_Eye_N = normal_Eye_N;
-    commonInput.WorldPos = TextureRGBToNormal(GM_DeferredPosition, DeferredSampler, input.Texcoord);
-    commonInput.TangentSpace = tangentSpace;
+    TangentSpace tangentSpace;
+    int3 coord = int3(input.Texcoord * float2(GMScreenInfo.ScreenWidth, GMScreenInfo.ScreenHeight), 0);
 
-    commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Sample(DeferredSampler, input.Texcoord)).rgb;
-    commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse.Sample(DeferredSampler, input.Texcoord)).rgb;
-    commonInput.Ks = GM_DeferredKs.Sample(DeferredSampler, input.Texcoord).rgb;
+    if (!GMScreenInfo.Multisampling)
+    {
+        float3 tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, coord).rgb;
+        float3 bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, coord).rgb;
+        float3 normal_Eye_N = TextureRGBToNormal(GM_DeferredNormal_Eye, coord);
+        float4 SNR = GM_DeferredShininess_bNormalMap_Refractivity.Load(coord);
+        commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, coord);
+        commonInput.WorldPos = GM_DeferredPosition.Load(coord);
+        commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Load(coord)).rgb;
+        commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
+        commonInput.Ks = GM_DeferredKs.Load(coord).rgb;
+        commonInput.Shininess = SNR.r;
+        commonInput.HasNormalMap = SNR.g != 0;
+        commonInput.Refractivity = SNR.b;
 
-    float4 SNR = GM_DeferredShininess_bNormalMap_Refractivity.Sample(DeferredSampler, input.Texcoord);
-    commonInput.Shininess = SNR.r;
-    commonInput.HasNormalMap = SNR.g != 0;
-    commonInput.Refractivity = SNR.b;
+        commonInput.Normal_Eye_N = normal_Eye_N;
+        tangentSpace.Normal_Tangent_N = TextureRGBToNormal(GM_DeferredNormalMap, coord);
+        tangentSpace.TBN = transpose(float3x3(
+            tangent_Eye_N,
+            bitangent_Eye_N,
+            normal_Eye_N
+        ));
+        commonInput.TangentSpace = tangentSpace;
+    }
+    else
+    {
+        float3 tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye_MSAA, coord).rgb;
+        float3 bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye_MSAA, coord).rgb;
+        float3 normal_Eye_N = TextureRGBToNormal(GM_DeferredNormal_Eye_MSAA, coord);
+        float4 SNR = GM_DeferredShininess_bNormalMap_Refractivity_MSAA.Load(coord, 0);
+        commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_MSAA, coord);
+        commonInput.WorldPos = GM_DeferredPosition_MSAA.Load(coord, 0);
+        commonInput.AmbientLightmapTexture = GM_DeferredTextureAmbient_MSAA.Load(coord, 0).rgb;
+        commonInput.DiffuseTexture = GM_DeferredTextureDiffuse_MSAA.Load(coord, 0).rgb;
+        commonInput.Ks = GM_DeferredKs_MSAA.Load(coord, 0).rgb;
+        commonInput.Shininess = SNR.r;
+        commonInput.HasNormalMap = SNR.g != 0;
+        commonInput.Refractivity = SNR.b;
+
+        commonInput.Normal_Eye_N = normal_Eye_N;
+        tangentSpace.Normal_Tangent_N = TextureRGBToNormal(GM_DeferredNormalMap_MSAA, coord);
+        tangentSpace.TBN = transpose(float3x3(
+            tangent_Eye_N,
+            bitangent_Eye_N,
+            normal_Eye_N
+        ));
+        commonInput.TangentSpace = tangentSpace;
+    }
 
     return PS_3D_Common(commonInput);
 }
@@ -637,26 +693,52 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 //--------------------------------------------------------------------------------------
 // Filter
 //--------------------------------------------------------------------------------------
-float KernelDeltaX = 0.f, KernelDeltaY = 0.f;
+int KernelDeltaX = 0, KernelDeltaY = 0;
 typedef float GMKernel[9];
 interface IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord);
+    float4 Sample(Texture2D tex, int3 coord);
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId);
 };
 
-float4 Kernel(GMKernel kernel, Texture2D tex, SamplerState ss, float2 texcoord)
+float4 Kernel(GMKernel kernel, Texture2D tex, int3 coord)
 {
     int offset = 1;
     float4 sample[9];
-    sample[0] = kernel[0] * tex.Sample(ss, float2(texcoord.x - KernelDeltaX, texcoord.y - KernelDeltaY));
-    sample[1] = kernel[1] * tex.Sample(ss, float2(texcoord.x, texcoord.y - KernelDeltaY));
-    sample[2] = kernel[2] * tex.Sample(ss, float2(texcoord.x + KernelDeltaX, texcoord.y - KernelDeltaY));
-    sample[3] = kernel[3] * tex.Sample(ss, float2(texcoord.x - KernelDeltaX, texcoord.y));
-    sample[4] = kernel[4] * tex.Sample(ss, float2(texcoord.x, texcoord.y));
-    sample[5] = kernel[5] * tex.Sample(ss, float2(texcoord.x + KernelDeltaX, texcoord.y));
-    sample[6] = kernel[6] * tex.Sample(ss, float2(texcoord.x - KernelDeltaX, texcoord.y + KernelDeltaY));
-    sample[7] = kernel[7] * tex.Sample(ss, float2(texcoord.x, texcoord.y + KernelDeltaY));
-    sample[8] = kernel[8] * tex.Sample(ss, float2(texcoord.x + KernelDeltaX, texcoord.y + KernelDeltaY));
+    sample[0] = kernel[0] * tex.Load(int3(coord.x - KernelDeltaX, coord.y - KernelDeltaY, 0));
+    sample[1] = kernel[1] * tex.Load(int3(coord.x, coord.y - KernelDeltaY, 0));
+    sample[2] = kernel[2] * tex.Load(int3(coord.x + KernelDeltaX, coord.y - KernelDeltaY, 0));
+    sample[3] = kernel[3] * tex.Load(int3(coord.x - KernelDeltaX, coord.y, 0));
+    sample[4] = kernel[4] * tex.Load(int3(coord.x, coord.y, 0));
+    sample[5] = kernel[5] * tex.Load(int3(coord.x + KernelDeltaX, coord.y, 0));
+    sample[6] = kernel[6] * tex.Load(int3(coord.x - KernelDeltaX, coord.y + KernelDeltaY, 0));
+    sample[7] = kernel[7] * tex.Load(int3(coord.x, coord.y + KernelDeltaY, 0));
+    sample[8] = kernel[8] * tex.Load(int3(coord.x + KernelDeltaX, coord.y + KernelDeltaY, 0));
+
+    return (sample[0] +
+            sample[1] +
+            sample[2] +
+            sample[3] +
+            sample[4] +
+            sample[5] +
+            sample[6] +
+            sample[7] +
+            sample[8]);
+}
+
+float4 Kernel(GMKernel kernel, Texture2DMS<float4> tex, int3 coord, int samplerId)
+{
+    int offset = 1;
+    float4 sample[9];
+    sample[0] = kernel[0] * tex.Load(int3(coord.x - KernelDeltaX, coord.y - KernelDeltaY, 0), samplerId);
+    sample[1] = kernel[1] * tex.Load(int3(coord.x, coord.y - KernelDeltaY, 0), samplerId);
+    sample[2] = kernel[2] * tex.Load(int3(coord.x + KernelDeltaX, coord.y - KernelDeltaY, 0), samplerId);
+    sample[3] = kernel[3] * tex.Load(int3(coord.x - KernelDeltaX, coord.y, 0), samplerId);
+    sample[4] = kernel[4] * tex.Load(int3(coord.x, coord.y, 0), samplerId);
+    sample[5] = kernel[5] * tex.Load(int3(coord.x + KernelDeltaX, coord.y, 0), samplerId);
+    sample[6] = kernel[6] * tex.Load(int3(coord.x - KernelDeltaX, coord.y + KernelDeltaY, 0), samplerId);
+    sample[7] = kernel[7] * tex.Load(int3(coord.x, coord.y + KernelDeltaY, 0), samplerId);
+    sample[8] = kernel[8] * tex.Load(int3(coord.x + KernelDeltaX, coord.y + KernelDeltaY, 0), samplerId);
 
     return (sample[0] +
             sample[1] +
@@ -671,51 +753,88 @@ float4 Kernel(GMKernel kernel, Texture2D tex, SamplerState ss, float2 texcoord)
 
 class GMDefaultFilter : IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    float4 Sample(Texture2D tex, int3 coord)
     {
-        return tex.Sample(ss, texcoord);
+        return tex.Load(coord);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
+    {
+        return tex.Load(coord, samplerId);
     }
 };
 
 class GMInversionFilter : IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    float4 Sample(Texture2D tex, int3 coord)
     {
-        return ToFloat4((float3(1.f, 1.f, 1.f) - tex.Sample(ss, texcoord)).rgb, 1);
+        return ToFloat4((float3(1.f, 1.f, 1.f) - tex.Load(coord)).rgb, 1);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
+    {
+        return ToFloat4((float3(1.f, 1.f, 1.f) - tex.Load(coord, samplerId)).rgb, 1);
     }
 };
 
 class GMSharpenFilter : IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    float4 Sample(Texture2D tex, int3 coord)
     {
         GMKernel kernel = {
             -1, -1, -1,
             -1,  9, -1,
             -1, -1, -1
         };
-        return Kernel(kernel, tex, ss, texcoord);
+        return Kernel(kernel, tex, coord);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
+    {
+        GMKernel kernel = {
+            -1, -1, -1,
+            -1,  9, -1,
+            -1, -1, -1
+        };
+        return Kernel(kernel, tex, coord, samplerId);
     }
 };
 
 class GMBlurFilter : IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    float4 Sample(Texture2D tex, int3 coord)
     {
         GMKernel kernel = {
             1.0 / 16, 2.0 / 16, 1.0 / 16,
             2.0 / 16, 4.0 / 16, 2.0 / 16,
             1.0 / 16, 2.0 / 16, 1.0 / 16  
         };
-        return Kernel(kernel, tex, ss, texcoord);
+        return Kernel(kernel, tex, coord);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
+    {
+        GMKernel kernel = {
+            1.0 / 16, 2.0 / 16, 1.0 / 16,
+            2.0 / 16, 4.0 / 16, 2.0 / 16,
+            1.0 / 16, 2.0 / 16, 1.0 / 16  
+        };
+        return Kernel(kernel, tex, coord, samplerId);
     }
 };
 
 class GMGrayscaleFilter : IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    float4 Sample(Texture2D tex, int3 coord)
     {
-        float3 fragColor = tex.Sample(ss, texcoord).rgb;
+        float3 fragColor = tex.Load(coord).rgb;
+        float average = 0.2126 * fragColor.r + 0.7152 * fragColor.g + 0.0722 * fragColor.b;
+        return float4(average, average, average, 1);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
+    {
+        float3 fragColor = tex.Load(coord, samplerId).rgb;
         float average = 0.2126 * fragColor.r + 0.7152 * fragColor.g + 0.0722 * fragColor.b;
         return float4(average, average, average, 1);
     }
@@ -723,14 +842,24 @@ class GMGrayscaleFilter : IFilter
 
 class GMEdgeDetectFilter : IFilter
 {
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
+    float4 Sample(Texture2D tex, int3 coord)
     {
         GMKernel kernel = {
             1, 1, 1,
             1, -8, 1,
             1, 1, 1
         };
-        return Kernel(kernel, tex, ss, texcoord);
+        return Kernel(kernel, tex, coord);
+    }
+
+    float4 SampleMSAA(Texture2DMS<float4> tex, int3 coord, int samplerId)
+    {
+        GMKernel kernel = {
+            1, 1, 1,
+            1, -8, 1,
+            1, 1, 1
+        };
+        return Kernel(kernel, tex, coord, samplerId);
     }
 };
 
@@ -742,6 +871,8 @@ GMGrayscaleFilter GrayscaleFilter;
 GMEdgeDetectFilter EdgeDetectFilter;
 
 IFilter Filter;
+Texture2D FilterTexture;
+Texture2DMS<float4> FilterTexture_MSAA;
 
 VS_OUTPUT VS_Filter(VS_INPUT input)
 {
@@ -753,7 +884,11 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
 
 float4 PS_Filter(PS_INPUT input) : SV_TARGET
 {
-    return Filter.Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+    int3 coord = int3(input.Texcoord * float2(GMScreenInfo.ScreenWidth, GMScreenInfo.ScreenHeight), 0);
+    if (GMScreenInfo.Multisampling)
+        return Filter.SampleMSAA(FilterTexture_MSAA, coord, 0);
+
+    return Filter.Sample(FilterTexture, coord);
 }
 
 //--------------------------------------------------------------------------------------

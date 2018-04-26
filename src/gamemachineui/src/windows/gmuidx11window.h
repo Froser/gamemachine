@@ -14,6 +14,7 @@ GM_PRIVATE_OBJECT(GMUIDx11Window)
 	gm::GMComPtr<ID3D11DeviceContext> deviceContext;
 	gm::GMComPtr<IDXGISwapChain> swapChain;
 	gm::GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	gm::GMComPtr<ID3D11Texture2D> depthStencilTexture;
 	gm::GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	D3D_FEATURE_LEVEL d3dFeatureLevel;
 

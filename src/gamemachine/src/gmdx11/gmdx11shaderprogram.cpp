@@ -44,6 +44,13 @@ namespace
 				}
 			},
 
+			{
+				"GMScreenInfo",
+				"ScreenWidth",
+				"ScreenHeight",
+				"Multisampling",
+			},
+
 			"GMRasterizerState",
 			"GMBlendState",
 			"GMDepthStencilState",

@@ -25,6 +25,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11DeviceContext> deviceContext;
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11Texture2D> depthStencilTexture;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMScopePtr<IShaderProgram> shaderProgram;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
