@@ -45,7 +45,7 @@ namespace
 			},
 
 			{
-				"GMScreenInfo",
+				"ScreenInfo",
 				"ScreenWidth",
 				"ScreenHeight",
 				"Multisampling",

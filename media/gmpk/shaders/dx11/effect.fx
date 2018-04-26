@@ -61,6 +61,11 @@ float3 TextureRGBToNormal(Texture2D tex, int3 coord)
     return tex.Load(coord).xyz * 2.0f - 1.0f;
 }
 
+float3 RGBToNormal(float3 rgb)
+{
+    return rgb * 2.0f - 1.0f;
+}
+
 struct GMMaterial
 {
     float4 Ka;
@@ -164,14 +169,14 @@ int AmbientLightCount;
 GMLight SpecularLights[10];
 int SpecularLightCount;
 
-struct ScreenInfo
+struct GMScreenInfo
 {
     int ScreenWidth;
     int ScreenHeight;
     bool Multisampling;
 };
 
-ScreenInfo GMScreenInfo;
+GMScreenInfo ScreenInfo;
 
 //--------------------------------------------------------------------------------------
 // States
@@ -509,28 +514,23 @@ float4 PS_CubeMap(PS_INPUT input) : SV_TARGET
 //--------------------------------------------------------------------------------------
 // Deferred 3D
 //--------------------------------------------------------------------------------------
-Texture2D GM_DeferredPosition;
+Texture2D GM_DeferredPosition_World_Refractivity;
 Texture2D GM_DeferredNormal_World;
-Texture2D GM_DeferredNormal_Eye;
 Texture2D GM_DeferredTextureAmbient;
 Texture2D GM_DeferredTextureDiffuse;
 Texture2D GM_DeferredTangent_Eye;
 Texture2D GM_DeferredBitangent_Eye;
-Texture2D GM_DeferredNormalMap;
-Texture2D GM_DeferredKs;
-Texture2D GM_DeferredShininess_bNormalMap_Refractivity;
-Texture2DMS<float4> GM_DeferredPosition_MSAA;
+Texture2D GM_DeferredNormalMap_bNormalMap;
+Texture2D GM_DeferredKs_Shininess;
+
+Texture2DMS<float4> GM_DeferredPosition_World_Refractivity_MSAA;
 Texture2DMS<float4> GM_DeferredNormal_World_MSAA;
-Texture2DMS<float4> GM_DeferredNormal_Eye_MSAA;
 Texture2DMS<float4> GM_DeferredTextureAmbient_MSAA;
 Texture2DMS<float4> GM_DeferredTextureDiffuse_MSAA;
 Texture2DMS<float4> GM_DeferredTangent_Eye_MSAA;
 Texture2DMS<float4> GM_DeferredBitangent_Eye_MSAA;
-Texture2DMS<float4> GM_DeferredNormalMap_MSAA;
-Texture2DMS<float4> GM_DeferredKs_MSAA;
-Texture2DMS<float4> GM_DeferredShininess_bNormalMap_Refractivity_MSAA;
-
-SamplerState DeferredSampler;
+Texture2DMS<float4> GM_DeferredNormalMap_bNormalMap_MSAA;
+Texture2DMS<float4> GM_DeferredKs_Shininess_MSAA;
 
 // [-1, 1] -> [0, 1]
 float4 Float3ToTexture(float3 normal)
@@ -542,18 +542,12 @@ struct VS_GEOMETRY_OUTPUT
 {
     float4 Position                          : SV_TARGET0;
     float4 Normal_World                      : SV_TARGET1; //需要将区间转化到[0, 1]
-    float4 Normal_Eye                        : SV_TARGET2; //需要将区间转化到[0, 1]
-    float4 TextureAmbient                    : SV_TARGET3;
-    float4 TextureDiffuse                    : SV_TARGET4;
-    float4 Tangent_Eye                       : SV_TARGET5; //需要将区间转化到[0, 1]
-    float4 Bitangent_Eye                     : SV_TARGET6; //需要将区间转化到[0, 1]
-    float4 NormalMap                         : SV_TARGET7;
-};
-
-struct VS_MATERIAL_OUTPUT
-{
-    float4 Ks                                : SV_TARGET0;
-    float4 Shininess_bNormalMap_Refractivity : SV_TARGET1;
+    float4 TextureAmbient                    : SV_TARGET2;
+    float4 TextureDiffuse                    : SV_TARGET3;
+    float4 Tangent_Eye                       : SV_TARGET4; //需要将区间转化到[0, 1]
+    float4 Bitangent_Eye                     : SV_TARGET5; //需要将区间转化到[0, 1]
+    float4 NormalMap_HasNormalMap            : SV_TARGET6;
+    float4 Ks_Shininess                      : SV_TARGET7;
 };
 
 VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
@@ -569,7 +563,6 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
     output.Normal_World = Float3ToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix)).xyz );
-    output.Normal_Eye = Float3ToTexture( normalize(mul(normal_Model, normalEyeTransform )).xyz );
 
     float4 texAmbient = float4(0, 0, 0, 0);
     float4 texDiffuse = float4(0, 0, 0, 0);
@@ -601,29 +594,16 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     {
         output.Tangent_Eye = Float3ToTexture(mul(ToFloat4(input.Tangent, 0), normalEyeTransform));
         output.Bitangent_Eye = Float3ToTexture(mul(ToFloat4(input.Bitangent, 0), normalEyeTransform));
-        output.NormalMap = NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord);
+        output.NormalMap_HasNormalMap = ToFloat4(NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord), 1);
     }
     else
     {
         output.Tangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
         output.Bitangent_Eye = Float3ToTexture(float4(0, 0, 0, 0));
-        output.NormalMap = float4(0, 0, 0, 0);
+        output.NormalMap_HasNormalMap = float4(0, 0, 0, 0);
     }
-    return output;
-}
 
-VS_OUTPUT VS_3D_MaterialPass(VS_INPUT input)
-{
-    return VS_3D(input);
-}
-
-VS_MATERIAL_OUTPUT PS_3D_MaterialPass(PS_INPUT input)
-{
-    VS_MATERIAL_OUTPUT output;
-    output.Ks = Material.Ks;
-    output.Shininess_bNormalMap_Refractivity.r = Material.Shininess;
-    output.Shininess_bNormalMap_Refractivity.g = HasNormalMap() ? 1 : 0;
-    output.Shininess_bNormalMap_Refractivity.b = Material.Refractivity;
+    output.Ks_Shininess = ToFloat4(Material.Ks, Material.Shininess);
     return output;
 }
 
@@ -638,57 +618,49 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
     VS_3D_INPUT commonInput;
+    int3 coord = int3(input.Texcoord * float2(ScreenInfo.ScreenWidth, ScreenInfo.ScreenHeight), 0);
     TangentSpace tangentSpace;
-    int3 coord = int3(input.Texcoord * float2(GMScreenInfo.ScreenWidth, GMScreenInfo.ScreenHeight), 0);
-
-    if (!GMScreenInfo.Multisampling)
+    float3 tangent_Eye_N;
+    float3 bitangent_Eye_N;
+    float4 PosRef;
+    float4 KSS;
+    float4 normalMapFlag;
+    if (!ScreenInfo.Multisampling)
     {
-        float3 tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, coord).rgb;
-        float3 bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, coord).rgb;
-        float3 normal_Eye_N = TextureRGBToNormal(GM_DeferredNormal_Eye, coord);
-        float4 SNR = GM_DeferredShininess_bNormalMap_Refractivity.Load(coord);
+        tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, coord).rgb;
+        bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, coord).rgb;
+        PosRef = GM_DeferredPosition_World_Refractivity.Load(coord);
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, coord);
-        commonInput.WorldPos = GM_DeferredPosition.Load(coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Load(coord)).rgb;
         commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
-        commonInput.Ks = GM_DeferredKs.Load(coord).rgb;
-        commonInput.Shininess = SNR.r;
-        commonInput.HasNormalMap = SNR.g != 0;
-        commonInput.Refractivity = SNR.b;
-
-        commonInput.Normal_Eye_N = normal_Eye_N;
-        tangentSpace.Normal_Tangent_N = TextureRGBToNormal(GM_DeferredNormalMap, coord);
-        tangentSpace.TBN = transpose(float3x3(
-            tangent_Eye_N,
-            bitangent_Eye_N,
-            normal_Eye_N
-        ));
-        commonInput.TangentSpace = tangentSpace;
+        KSS = GM_DeferredKs_Shininess.Load(coord);
+        normalMapFlag = GM_DeferredNormalMap_bNormalMap.Load(coord);
     }
     else
     {
-        float3 tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye_MSAA, coord).rgb;
-        float3 bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye_MSAA, coord).rgb;
-        float3 normal_Eye_N = TextureRGBToNormal(GM_DeferredNormal_Eye_MSAA, coord);
-        float4 SNR = GM_DeferredShininess_bNormalMap_Refractivity_MSAA.Load(coord, 0);
+        tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye_MSAA, coord).rgb;
+        bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye_MSAA, coord).rgb;
+        PosRef = GM_DeferredPosition_World_Refractivity_MSAA.Load(coord, 0);
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_MSAA, coord);
-        commonInput.WorldPos = GM_DeferredPosition_MSAA.Load(coord, 0);
-        commonInput.AmbientLightmapTexture = GM_DeferredTextureAmbient_MSAA.Load(coord, 0).rgb;
-        commonInput.DiffuseTexture = GM_DeferredTextureDiffuse_MSAA.Load(coord, 0).rgb;
-        commonInput.Ks = GM_DeferredKs_MSAA.Load(coord, 0).rgb;
-        commonInput.Shininess = SNR.r;
-        commonInput.HasNormalMap = SNR.g != 0;
-        commonInput.Refractivity = SNR.b;
-
-        commonInput.Normal_Eye_N = normal_Eye_N;
-        tangentSpace.Normal_Tangent_N = TextureRGBToNormal(GM_DeferredNormalMap_MSAA, coord);
-        tangentSpace.TBN = transpose(float3x3(
-            tangent_Eye_N,
-            bitangent_Eye_N,
-            normal_Eye_N
-        ));
-        commonInput.TangentSpace = tangentSpace;
+        commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient_MSAA.Load(coord, 0)).rgb;
+        commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse_MSAA.Load(coord, 0)).rgb;
+        KSS = GM_DeferredKs_Shininess_MSAA.Load(coord, 0);
+        normalMapFlag = GM_DeferredNormalMap_bNormalMap_MSAA.Load(coord, 0);
     }
+
+    commonInput.Ks = KSS.rgb;
+    commonInput.Shininess = KSS.a;
+    commonInput.WorldPos = PosRef.rgb;
+    commonInput.Refractivity = PosRef.a;
+    tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
+    commonInput.HasNormalMap = (normalMapFlag.a != 0);
+    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ViewMatrix);
+    tangentSpace.TBN = transpose(float3x3(
+        tangent_Eye_N,
+        bitangent_Eye_N,
+        commonInput.Normal_Eye_N
+    ));
+    commonInput.TangentSpace = tangentSpace;
 
     return PS_3D_Common(commonInput);
 }
@@ -887,8 +859,8 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
 
 float4 PS_Filter(PS_INPUT input) : SV_TARGET
 {
-    int3 coord = int3(input.Texcoord * float2(GMScreenInfo.ScreenWidth, GMScreenInfo.ScreenHeight), 0);
-    if (GMScreenInfo.Multisampling)
+    int3 coord = int3(input.Texcoord * float2(ScreenInfo.ScreenWidth, ScreenInfo.ScreenHeight), 0);
+    if (ScreenInfo.Multisampling)
         return Filter.SampleMSAA(FilterTexture_MSAA, coord, 0);
 
     return Filter.Sample(FilterTexture, coord);
@@ -963,15 +935,6 @@ technique11 GMTech_Deferred_3D
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_GeometryPass()));
         SetPixelShader(CompileShader(ps_5_0,PS_3D_GeometryPass()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
-    }
-
-    pass P1
-    {
-        SetVertexShader(CompileShader(vs_5_0,VS_3D_MaterialPass()));
-        SetPixelShader(CompileShader(ps_5_0,PS_3D_MaterialPass()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

@@ -10,35 +10,25 @@
 namespace
 {
 	constexpr const char* GeometryFramebufferNames[] = {
-		"GM_DeferredPosition",
+		"GM_DeferredPosition_World_Refractivity",
 		"GM_DeferredNormal_World",
-		"GM_DeferredNormal_Eye",
 		"GM_DeferredTextureAmbient",
 		"GM_DeferredTextureDiffuse",
 		"GM_DeferredTangent_Eye",
 		"GM_DeferredBitangent_Eye",
-		"GM_DeferredNormalMap",
+		"GM_DeferredNormalMap_bNormalMap",
+		"GM_DeferredKs_Shininess",
 	};
 
 	constexpr const char* GeometryMSAAFramebufferNames[] = {
-		"GM_DeferredPosition_MSAA",
+		"GM_DeferredPosition_World_Refractivity_MSAA",
 		"GM_DeferredNormal_World_MSAA",
-		"GM_DeferredNormal_Eye_MSAA",
 		"GM_DeferredTextureAmbient_MSAA",
 		"GM_DeferredTextureDiffuse_MSAA",
 		"GM_DeferredTangent_Eye_MSAA",
 		"GM_DeferredBitangent_Eye_MSAA",
-		"GM_DeferredNormalMap_MSAA",
-	};
-
-	constexpr const char* MaterialFramebufferNames[] = {
-		"GM_DeferredKs",
-		"GM_DeferredShininess_bNormalMap_Refractivity",
-	};
-
-	constexpr const char* MaterialMSAAFramebufferNames[] = {
-		"GM_DeferredKs_MSAA",
-		"GM_DeferredShininess_bNormalMap_Refractivity_MSAA",
+		"GM_DeferredNormalMap_bNormalMap_MSAA",
+		"GM_DeferredKs_Shininess_MSAA",
 	};
 }
 
@@ -51,9 +41,8 @@ GMDx11GBuffer::GMDx11GBuffer(GMDx11GraphicEngine* engine)
 void GMDx11GBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
-	setGeometryPassingState(GMGeometryPassingState::PassingGeometry); // Dx11的Passes会在一个technique中完成，所以设置为非Done就可以了
+	setGeometryPassingState(GMGeometryPassingState::PassingGeometry);
 	getGeometryFramebuffers()->clear();
-	getMaterialFramebuffers()->clear();
 	d->engine->draw(objects, count);
 	setGeometryPassingState(GMGeometryPassingState::Done);
 }
@@ -82,23 +71,6 @@ void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
 	}
 }
 
-void GMDx11GBuffer::useMaterialTextures(ID3DX11Effect* effect)
-{
-	D(d);
-	IFramebuffers* materialFramebuffers = getMaterialFramebuffers();
-	GMint cnt = materialFramebuffers->count();
-	for (GMint i = 0; i < cnt; ++i)
-	{
-		GM_ASSERT(i < GM_array_size(MaterialFramebufferNames));
-		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(materialFramebuffers->getFramebuffer(i)->getTexture());
-		ID3DX11EffectShaderResourceVariable* shaderResource = effect->GetVariableByName(
-			isMultisamping() ? MaterialMSAAFramebufferNames[i] : MaterialFramebufferNames[i]
-		)->AsShaderResource();
-		GM_ASSERT(shaderResource->IsValid());
-		GM_DX_HR(shaderResource->SetResource(tex->getResourceView()));
-	}
-}
-
 IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 {
 	IFramebuffers* framebuffers = nullptr;
@@ -116,7 +88,7 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
 	};
 
 	GM.getFactory()->createFramebuffers(&framebuffers);
@@ -140,33 +112,7 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 
 IFramebuffers* GMDx11GBuffer::createMaterialFramebuffers()
 {
-	IFramebuffers* framebuffers = nullptr;
-	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-	GMFramebufferDesc desc = { 0 };
-	desc.rect = states.renderRect;
-
-	GMFramebufferFormat formats[] = {
-		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R32G32B32A32_FLOAT,
-	};
-
-	GM.getFactory()->createFramebuffers(&framebuffers);
-	GMFramebuffersDesc fbDesc = { 0 };
-	fbDesc.rect = states.renderRect;
-	framebuffers->init(fbDesc);
-
-	constexpr GMint framebufferCount = GM_array_size(MaterialFramebufferNames);
-	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
-	for (GMint i = 0; i < framebufferCount; ++i)
-	{
-		IFramebuffer* framebuffer = nullptr;
-		GM.getFactory()->createFramebuffer(&framebuffer);
-		framebuffer->setName(MaterialFramebufferNames[i]);
-		desc.framebufferFormat = formats[i];
-		framebuffer->init(desc);
-		framebuffers->addFramebuffer(framebuffer);
-	}
-	return framebuffers;
+	return nullptr;
 }
 
 bool GMDx11GBuffer::isMultisamping()

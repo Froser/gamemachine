@@ -868,32 +868,22 @@ void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
-	IFramebuffers* activeFramebuffer = nullptr;
 	IGBuffer* gbuffer = getEngine()->getGBuffer();
+	IFramebuffers* framebuffers = gbuffer->getGeometryFramebuffers();
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
 	{
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
-		if (p == 0)
-		{
-			activeFramebuffer = gbuffer->getGeometryFramebuffers();
-		}
-		else
-		{
-			GM_ASSERT(p == 1); //目前2个pass
-			activeFramebuffer = gbuffer->getMaterialFramebuffers();
-		}
-
 		prepareTextures(model);
 		pass->Apply(0, d->deviceContext);
 		setTextures(model);
 
-		GM_ASSERT(activeFramebuffer);
-		activeFramebuffer->bind();
+		GM_ASSERT(framebuffers);
+		framebuffers->bind();
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(model->getVerticesCount(), 0);
 		else
 			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
-		activeFramebuffer->unbind();
+		framebuffers->unbind();
 	}
 }
 
@@ -927,7 +917,6 @@ void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTexturesBeforeApply()
 	D(d);
 	GMDx11GBuffer* gbuffer = gm_cast<GMDx11GBuffer*>(getEngine()->getGBuffer());
 	gbuffer->useGeometryTextures(d->effect);
-	gbuffer->useMaterialTextures(d->effect);
 
 	const GMDx11CubeMapState& cubeMapState = getCubeMapState();
 	if (cubeMapState.hasCubeMap)

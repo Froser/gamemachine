@@ -24,7 +24,6 @@ public:
 	virtual void lightPass() override;
 
 	void useGeometryTextures(ID3DX11Effect* effect);
-	void useMaterialTextures(ID3DX11Effect* effect);
 
 protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;
