@@ -184,7 +184,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 		);
 	CHECK_HR(hr);
 
-	if (wndAttrs.samples == 0)
+	if (wndAttrs.samples <= 1)
 	{
 		// 禁用多重采样
 		gameMachineRunningState.sampleCount = sc.SampleDesc.Count = 1;

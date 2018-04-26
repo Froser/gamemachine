@@ -905,6 +905,12 @@ void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		setDeferredTexturesBeforeApply();
 		pass->Apply(0, d->deviceContext);
+		const GMDx11CubeMapState& cubeMapState = getCubeMapState();
+		if (cubeMapState.hasCubeMap)
+		{
+			GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
+			cubeMapState.cubeMapRenderer->setTextures(cubeMapState.model);
+		}
 
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
 			d->deviceContext->Draw(model->getVerticesCount(), 0);
@@ -919,4 +925,11 @@ void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTexturesBeforeApply()
 	GMDx11GBuffer* gbuffer = gm_cast<GMDx11GBuffer*>(getEngine()->getGBuffer());
 	gbuffer->useGeometryTextures(d->effect);
 	gbuffer->useMaterialTextures(d->effect);
+
+	const GMDx11CubeMapState& cubeMapState = getCubeMapState();
+	if (cubeMapState.hasCubeMap)
+	{
+		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
+		cubeMapState.cubeMapRenderer->prepareTextures(cubeMapState.model);
+	}
 }

@@ -57,6 +57,7 @@ int WINAPI wWinMain(
 
 	gm::GMWindowAttributes mainAttrs;
 	mainAttrs.instance = hInstance;
+	mainAttrs.samples = 1;
 
 	gm::IWindow* mainWindow = nullptr;
 	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow, GetRenderEnv());
