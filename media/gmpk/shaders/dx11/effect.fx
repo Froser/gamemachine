@@ -540,7 +540,7 @@ float4 Float3ToTexture(float3 normal)
 
 struct VS_GEOMETRY_OUTPUT
 {
-    float4 Position                          : SV_TARGET0;
+    float4 Position_Refractivity             : SV_TARGET0;
     float4 Normal_World                      : SV_TARGET1; //需要将区间转化到[0, 1]
     float4 TextureAmbient                    : SV_TARGET2;
     float4 TextureDiffuse                    : SV_TARGET3;
@@ -558,7 +558,8 @@ VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
 VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 {
     VS_GEOMETRY_OUTPUT output;
-    output.Position = mul(input.WorldPos, WorldMatrix);
+    output.Position_Refractivity.rgb = mul(input.WorldPos, WorldMatrix).xyz;
+    output.Position_Refractivity.a = Material.Refractivity;
 
     float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
@@ -568,7 +569,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     float4 texDiffuse = float4(0, 0, 0, 0);
     if (HasNoTexture(AmbientTextureAttributes))
     {
-        texAmbient = float4(0, 0, 0, 0);
+        texAmbient = float4(1, 1, 1, 1);
     }
     else
     {
@@ -579,7 +580,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     }
     if (HasNoTexture(DiffuseTextureAttributes))
     {
-        texDiffuse = float4(0, 0, 0, 0);
+        texDiffuse = float4(1, 1, 1, 1);
     }
     else
     {
