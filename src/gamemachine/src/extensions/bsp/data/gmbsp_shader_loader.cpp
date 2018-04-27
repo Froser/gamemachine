@@ -503,7 +503,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		}
 	}
 	light.setType(lightType);
-	d->world->addLight(light);
+	GM.getGraphicEngine()->addLight(light);
 }
 
 void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)

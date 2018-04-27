@@ -47,7 +47,6 @@ public:
 	GMSpriteGameObject(GMfloat radius, const GMVec3& position = Zero<GMVec3>());
 
 public:
-	virtual GMGameObjectType getType() { return GMGameObjectType::Sprite; }
 	virtual void simulate() override;
 	virtual void updateAfterSimulate() override;
 

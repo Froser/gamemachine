@@ -56,6 +56,7 @@ namespace
 		sprite->setJumpSpeed(GMVec3(0, 150, 0));
 		sprite->setPhysicsObject(new GMBSPPhysicsObject());
 		world->addObjectAndInit(sprite);
+		world->setSprite(sprite);
 
 		GMBSPPhysicsObject* physics = gmBSPPhysicsObjectCast(sprite->getPhysicsObject());
 

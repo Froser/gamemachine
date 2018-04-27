@@ -221,18 +221,6 @@ void DemostrationWorld::init()
 	GM_delete(img);
 }
 
-void DemostrationWorld::renderScene()
-{
-	D(d);
-	Base::renderScene();
-
-	gm::IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->beginBlend();
-	auto controls = getControlsGameObject();
-	engine->drawObjects(controls.data(), controls.size());
-	engine->endBlend();
-}
-
 void DemostrationWorld::switchDemo()
 {
 	D(d);

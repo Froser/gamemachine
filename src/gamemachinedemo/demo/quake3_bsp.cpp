@@ -56,11 +56,7 @@ void Demo_Quake3_BSP::init()
 
 	gm::GMBSPFactory::createBSPGameWorld("gv.bsp", &d->world);
 	db->demoWorld = d->world;
-	d->sprite = static_cast<gm::GMSpriteGameObject*> (
-		const_cast<gm::GMGameObject*> (
-			*(d->world->getGameObjects(gm::GMGameObjectType::Sprite).begin())
-			)
-		);
+	d->sprite = d->world->getSprite();
 }
 
 void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)

@@ -75,10 +75,12 @@ void GMGameObject::draw()
 bool GMGameObject::canDeferredRendering()
 {
 	D(d);
-	if (d->forceDisableDeferredRendering)
-		return false;
-
-	return d->canDeferredRendering;
+	for (auto model : d->models)
+	{
+		if (model->getShader().getBlend() == true)
+			return false;
+	}
+	return true;
 }
 
 GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)

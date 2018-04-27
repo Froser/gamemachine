@@ -11,8 +11,6 @@ GM_PRIVATE_OBJECT(GMDemoGameWorld)
 {
 	HashMap<GMString, GMGameObject*, GMStringHashFunctor> renderList;
 	Map<const GMGameObject*, GMString> renderListInv;
-	Vector<GMGameObject*> forwardGameObjects;
-	Vector<GMGameObject*> deferredGameObjects;
 	bool sorted = false;
 };
 
@@ -23,9 +21,6 @@ class GMDemoGameWorld : public GMGameWorld
 public:
 	GMDemoGameWorld();
 	~GMDemoGameWorld();
-
-public:
-	virtual void renderScene() override;
 
 public:
 	virtual bool removeObject(GMGameObject* obj) override;

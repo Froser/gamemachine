@@ -14,29 +14,6 @@ GMDemoGameWorld::~GMDemoGameWorld()
 	GMClearSTLContainer(d->renderList);
 }
 
-void GMDemoGameWorld::renderScene()
-{
-	D(d);
-	Base::renderScene();
-
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
-	{
-		engine->draw(d->forwardGameObjects.data(), d->forwardGameObjects.size(), nullptr, 0);
-		engine->draw(d->deferredGameObjects.data(), d->deferredGameObjects.size(), nullptr, 0);
-	}
-	else
-	{
-		engine->draw(d->forwardGameObjects.data(), d->forwardGameObjects.size(), 
-			d->deferredGameObjects.data(), d->deferredGameObjects.size());
-	}
-
-	engine->beginBlend();
-	auto& controls = getControlsGameObject();
-	engine->draw(controls.data(), controls.size(), nullptr, 0);
-	engine->endBlend();
-}
-
 bool GMDemoGameWorld::addObject(const GMString& name, GMGameObject* obj)
 {
 	D(d);
@@ -45,10 +22,7 @@ bool GMDemoGameWorld::addObject(const GMString& name, GMGameObject* obj)
 		return false;
 	d->renderList[name] = obj;
 	d->renderListInv[obj] = name;
-	if (obj->canDeferredRendering())
-		d->deferredGameObjects.push_back(obj);
-	else
-		d->forwardGameObjects.push_back(obj);
+	addToRenderList(obj);
 	addObjectAndInit(obj);
 	return true;
 }
@@ -62,9 +36,9 @@ bool GMDemoGameWorld::removeObject(const GMString& name)
 		d->renderList.erase(name);
 		d->renderListInv.erase(object);
 		if (object->canDeferredRendering())
-			std::remove(d->deferredGameObjects.begin(), d->deferredGameObjects.end(), object);
+			std::remove(getRenderList().deferred.begin(), getRenderList().deferred.end(), object);
 		else
-			std::remove(d->forwardGameObjects.begin(), d->forwardGameObjects.end(), object);
+			std::remove(getRenderList().forward.begin(), getRenderList().forward.end(), object);
 		return GMGameWorld::removeObject(object);
 	}
 	return false;

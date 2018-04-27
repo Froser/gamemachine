@@ -74,7 +74,6 @@ public:
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
 	void init();
-	void renderScene();
 	void switchDemo();
 	void resetProjectionAndEye();
 };

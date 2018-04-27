@@ -47,9 +47,12 @@ void GMBSPPhysicsWorld::simulate(GMGameObject* obj)
 {
 	D(d);
 	BSPData& bsp = d->world->bspData();
-
-	GMBSPMove* move = getMove(obj->getPhysicsObject());
-	move->move();
+	GMPhysicsObject* phy = obj->getPhysicsObject();
+	if (phy)
+	{
+		GMBSPMove* move = getMove(phy);
+		move->move();
+	}
 }
 
 void GMBSPPhysicsWorld::applyMove(GMPhysicsObject* phy, const GMPhysicsMoveArgs& args)

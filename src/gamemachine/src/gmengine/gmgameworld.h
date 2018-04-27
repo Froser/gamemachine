@@ -20,15 +20,21 @@ enum class GMRenderPreference
 	PreferDeferredRendering,
 };
 
+struct GMRenderList
+{
+	Vector<GMGameObject*> forward;
+	Vector<GMGameObject*> deferred;
+};
+
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	GMPhysicsWorld* physicsWorld = nullptr;
-	Map<GMGameObjectType, Set<GMGameObject*> > gameObjects;
 	Vector<GMControlGameObject*> controls;
 	Vector<GMGameObject*> controls_objectType;
 	GMAssets assets;
-	bool start = false;
 	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
+	GMRenderList renderList;
+	Set<GMGameObject*> gameObjects;
 };
 
 class GMGameWorld : public GMObject
@@ -45,7 +51,7 @@ public:
 	GMPhysicsWorld* getPhysicsWorld() { D(d); return d->physicsWorld; }
 
 public:
-	virtual void renderScene() {}
+	virtual void renderScene();
 	virtual bool removeObject(GMGameObject* obj);
 
 public:
@@ -53,17 +59,22 @@ public:
 	void simulateGameWorld();
 	void addControl(AUTORELEASE GMControlGameObject* control);
 	void notifyControls();
+	void clearRenderList();
+	void addToRenderList(GMGameObject* object);
 
 	inline Vector<GMControlGameObject*>& getControls() { D(d); return d->controls; }
 	inline Vector<GMGameObject*>& getControlsGameObject() { D(d); return d->controls_objectType; }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
-	const Set<GMGameObject*>& getGameObjects(GMGameObjectType type);
-	void addLight(const GMLight& light);
-	void removeLights();
+protected:
+	inline GMRenderList& getRenderList()
+	{
+		D(d);
+		return d->renderList;
+	}
 
 private:
-	void simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects);
+	void simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMGameObject*>& gameObjects);
 
 	// GMPhysicsWorld
 private:

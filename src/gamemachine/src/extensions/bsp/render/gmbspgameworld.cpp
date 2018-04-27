@@ -170,23 +170,26 @@ void GMBSPSkyGameObject::createSkyBox(OUT GMModel** obj)
 //////////////////////////////////////////////////////////////////////////
 typedef void (GMBSPGameWorld::*drawFaceHandler)(GMint);
 
-inline void drawFaces(
-	GMBSPGameWorld* world,
-	const Vector<GMint>& indices,
-	drawFaceHandler handler,
-	GMBSPSurfaceType targetType
-)
+namespace
 {
-	GMBSPRenderData& renderData = world->renderData();
-	for (auto i : indices)
+	void drawFacesToRenderList(
+		GMBSPGameWorld* world,
+		const Vector<GMint>& indices,
+		drawFaceHandler handler,
+		GMBSPSurfaceType targetType
+		)
 	{
-		if (renderData.facesToDraw.isSet(i))
+		GMBSPRenderData& renderData = world->renderData();
+		for (auto i : indices)
 		{
-			if (renderData.faceDirectory[i].faceType == 0)
-				continue;
+			if (renderData.facesToDraw.isSet(i))
+			{
+				if (renderData.faceDirectory[i].faceType == 0)
+					continue;
 
-			if (renderData.faceDirectory[i].faceType == targetType)
-				(world->*handler)(renderData.faceDirectory[i].typeFaceNumber);
+				if (renderData.faceDirectory[i].faceType == targetType)
+					(world->*handler)(renderData.faceDirectory[i].typeFaceNumber);
+			}
 		}
 	}
 }
@@ -230,8 +233,8 @@ GMGameObject* GMBSPGameWorld::getSky()
 void GMBSPGameWorld::renderScene()
 {
 	GM_PROFILE("renderScene");
+	prepareAllToRenderList();
 	Base::renderScene();
-	drawAll();
 }
 
 void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible)
@@ -244,21 +247,34 @@ void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool always
 
 void GMBSPGameWorld::setDefaultLights()
 {
-	removeLights();
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	engine->removeLights();
 
 	{
 		GMLight ambientLight(GMLightType::AMBIENT);
 		GMfloat lightColor[] = { .9f, .9f, .9f };
 		ambientLight.setLightColor(lightColor);
-		addLight(ambientLight);
+		engine->addLight(ambientLight);
 	}
 
 	{
 		GMLight specularLight(GMLightType::SPECULAR);
 		GMfloat lightColor[] = { 1, 1, 1 };
 		specularLight.setLightColor(lightColor);
-		addLight(specularLight);
+		engine->addLight(specularLight);
 	}
+}
+
+void GMBSPGameWorld::setSprite(GMSpriteGameObject* sprite)
+{
+	D(d);
+	d->sprite = sprite;
+}
+
+GMSpriteGameObject* GMBSPGameWorld::getSprite()
+{
+	D(d);
+	return d->sprite;
 }
 
 void GMBSPGameWorld::setRenderConfig(gm::GMBSPRenderConfigs config, const GMVariant& value)
@@ -349,57 +365,33 @@ GMint GMBSPGameWorld::isClusterVisible(GMint cameraCluster, GMint testCluster)
 }
 
 // drawAll将所要需要绘制的对象放入列表
-void GMBSPGameWorld::drawAll()
+void GMBSPGameWorld::prepareAllToRenderList()
 {
 	D(d);
 	GM_PROFILE("drawAll");
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->newFrame();
-	clearBuffer();
-	drawSky();
+	clearRenderList();
+	prepareSkyToRenderList();
 	if (!d->bspRenderConfigWrapper.get(GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool())
 	{
 		if (d->bspRenderConfigWrapper.get(GMBSPRenderConfigs::CalculateFace_Bool).toBool())
 			calculateVisibleFaces();
-		drawFaces();
+		prepareFacesToRenderList();
 	}
-	flushBuffer();
-
-	engine->beginBlend();
-	clearBuffer();
-	drawAlwaysVisibleObjects();
-	flushBuffer();
-	engine->endBlend();
+	prepareAlwaysVisibleObjects();
 }
 
-void GMBSPGameWorld::drawSky()
+void GMBSPGameWorld::prepareSkyToRenderList()
 {
 	D(d);
-	if (d->sky)
-		d->renderBuffer.push_back(d->sky);
+	addToRenderList(d->sky);
 }
 
-void GMBSPGameWorld::drawFaces()
+void GMBSPGameWorld::prepareFacesToRenderList()
 {
 	GM_PROFILE("drawFaces");
-	::drawFaces(this, renderData().polygonIndices, &GMBSPGameWorld::drawPolygonFace, MST_PLANAR);
-	::drawFaces(this, renderData().meshFaceIndices, &GMBSPGameWorld::drawMeshFace, MST_TRIANGLE_SOUP);
-	::drawFaces(this, renderData().patchIndices, &GMBSPGameWorld::drawPatch, MST_PATCH);
-}
-
-void GMBSPGameWorld::clearBuffer()
-{
-	D(d);
-	d->renderBuffer.clear();
-}
-
-void GMBSPGameWorld::flushBuffer()
-{
-	GM_PROFILE("flushBuffer");
-
-	D(d);
-	IGraphicEngine* engine = GM.getGraphicEngine();
-	engine->drawObjects(d->renderBuffer.data(), d->renderBuffer.size());
+	::drawFacesToRenderList(this, renderData().polygonIndices, &GMBSPGameWorld::preparePolygonFaceToRenderList, MST_PLANAR);
+	::drawFacesToRenderList(this, renderData().meshFaceIndices, &GMBSPGameWorld::prepareMeshFaceToRenderList, MST_TRIANGLE_SOUP);
+	::drawFacesToRenderList(this, renderData().patchIndices, &GMBSPGameWorld::preparePatchToRenderList, MST_PATCH);
 }
 
 void GMBSPGameWorld::preparePolygonFace(GMint polygonFaceNumber, GMint drawSurfaceIndex)
@@ -487,7 +479,7 @@ void GMBSPGameWorld::preparePatch(GMint patchNumber, GMint drawSurfaceIndex)
 	}
 }
 
-void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
+void GMBSPGameWorld::preparePolygonFaceToRenderList(GMint polygonFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -502,10 +494,10 @@ void GMBSPGameWorld::drawPolygonFace(GMint polygonFaceNumber)
 		return;
 
 	GM_ASSERT(obj);
-	d->renderBuffer.push_back(obj);
+	addToRenderList(obj);
 }
 
-void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
+void GMBSPGameWorld::prepareMeshFaceToRenderList(GMint meshFaceNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
@@ -520,20 +512,20 @@ void GMBSPGameWorld::drawMeshFace(GMint meshFaceNumber)
 		return;
 
 	GM_ASSERT(obj);
-	d->renderBuffer.push_back(obj);
+	addToRenderList(obj);
 }
 
-void GMBSPGameWorld::drawPatch(GMint patchNumber)
+void GMBSPGameWorld::preparePatchToRenderList(GMint patchNumber)
 {
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 	GMBSPRenderData& rd = d->render.renderData();
 
 	for (GMint i = 0; i < rd.patches[patchNumber].numQuadraticPatches; ++i)
-		draw(rd.patches[patchNumber].quadraticPatches[i]);
+		prepareToRenderList(rd.patches[patchNumber].quadraticPatches[i]);
 }
 
-void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
+void GMBSPGameWorld::prepareToRenderList(GMBSP_Render_BiquadraticPatch& biqp)
 {
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
@@ -546,16 +538,16 @@ void GMBSPGameWorld::draw(GMBSP_Render_BiquadraticPatch& biqp)
 		return;
 
 	GM_ASSERT(obj);
-	d->renderBuffer.push_back(obj);
+	addToRenderList(obj);
 }
 
-void GMBSPGameWorld::drawAlwaysVisibleObjects()
+void GMBSPGameWorld::prepareAlwaysVisibleObjects()
 {
 	D(d);
 	AlignedVector<GMGameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
 	for (auto& obj : objs)
 	{
-		d->renderBuffer.push_back(obj);
+		addToRenderList(obj);
 	}
 }
 

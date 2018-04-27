@@ -18,17 +18,6 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMMat4 translation = Identity<GMMat4>();
 	GMQuat rotation = Identity<GMQuat>();
 	GMMat4 transformMatrix = Identity<GMMat4>();
-	bool canDeferredRendering = true;
-	bool forceDisableDeferredRendering = false;
-};
-
-enum class GMGameObjectType
-{
-	Static,
-	Entity, // 可响应实体
-	Sprite, // 精灵
-	Particles, // 粒子
-	Custom,
 };
 
 struct GMAsset;
@@ -50,7 +39,6 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() {}
 	virtual void onRemovingObjectFromWorld() {}
-	virtual GMGameObjectType getType() { return GMGameObjectType::Static; }
 	virtual void draw();
 	virtual void updateAfterSimulate() {}
 	virtual void simulate() {}
@@ -71,18 +59,12 @@ public:
 	inline const GMMat4& getScaling() const { D(d); return d->scaling; }
 	inline const GMMat4& getTranslation() const { D(d); return d->translation; }
 	inline const GMQuat& getRotation() const { D(d); return d->rotation; }
-	inline GMPhysicsObject* getPhysicsObject() { D(d); GM_ASSERT(d->physics); return d->physics; }
+	inline GMPhysicsObject* getPhysicsObject() { D(d); return d->physics; }
 	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
 	{
 		D(d);
 		d->physics = phyObj;
 		d->physics->setGameObject(this);
-	}
-
-	inline void forceDisableDeferredRendering()
-	{
-		D(d);
-		d->forceDisableDeferredRendering = true;
 	}
 };
 

@@ -10,12 +10,9 @@
 GMGameWorld::~GMGameWorld()
 {
 	D(d);
-	for (auto types : d->gameObjects)
+	for (auto gameObject : d->gameObjects)
 	{
-		for (auto gameObject : types.second)
-		{
-			GM_delete(gameObject);
-		}
+		GM_delete(gameObject);
 	}
 
 	for (auto control : d->controls)
@@ -31,7 +28,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	D(d);
 	obj->setWorld(this);
 	obj->onAppendingObjectToWorld();
-	d->gameObjects[obj->getType()].insert(obj);
+	d->gameObjects.insert(obj);
 	GMModels& models = obj->getModels();
 	for (auto& model : models)
 	{
@@ -39,10 +36,31 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	}
 }
 
+void GMGameWorld::renderScene()
+{
+	D(d);
+	IGraphicEngine* engine = GM.getGraphicEngine();
+	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
+	{
+		engine->draw(d->renderList.forward.data(), d->renderList.forward.size(), nullptr, 0);
+		engine->draw(d->renderList.deferred.data(), d->renderList.deferred.size(), nullptr, 0);
+	}
+	else
+	{
+		engine->draw(d->renderList.forward.data(), d->renderList.forward.size(),
+			d->renderList.deferred.data(), d->renderList.deferred.size());
+	}
+
+	engine->beginBlend();
+	auto& controls = getControlsGameObject();
+	engine->draw(controls.data(), controls.size(), nullptr, 0);
+	engine->endBlend();
+}
+
 bool GMGameWorld::removeObject(GMGameObject* obj)
 {
 	D(d);
-	auto& objs = d->gameObjects[obj->getType()];
+	auto& objs = d->gameObjects;
 	auto objIter = objs.find(obj);
 	if (objIter == objs.end())
 		return false;
@@ -57,12 +75,7 @@ void GMGameWorld::simulateGameWorld()
 {
 	D(d);
 	auto phyw = getPhysicsWorld();
-	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Entity]);
-	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Sprite]);
-	simulateGameObjects(phyw, d->gameObjects[GMGameObjectType::Particles]);
-
-	if (!d->start) // 第一次simulate
-		d->start = true;
+	simulateGameObjects(phyw, d->gameObjects);
 }
 
 void GMGameWorld::addControl(GMControlGameObject* control)
@@ -83,7 +96,14 @@ void GMGameWorld::notifyControls()
 	}
 }
 
-void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects)
+void GMGameWorld::clearRenderList()
+{
+	D(d);
+	d->renderList.deferred.clear();
+	d->renderList.forward.clear();
+}
+
+void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMGameObject*>& gameObjects)
 {
 	for (auto& gameObject : gameObjects)
 	{
@@ -94,18 +114,11 @@ void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> g
 	}
 }
 
-const Set<GMGameObject*>& GMGameWorld::getGameObjects(GMGameObjectType type)
+void GMGameWorld::addToRenderList(GMGameObject* object)
 {
 	D(d);
-	return d->gameObjects[type];
-}
-
-void GMGameWorld::addLight(const GMLight& light)
-{
-	GM.getGraphicEngine()->addLight(light);
-}
-
-void GMGameWorld::removeLights()
-{
-	GM.getGraphicEngine()->removeLights();
+	if (object->canDeferredRendering())
+		d->renderList.deferred.push_back(object);
+	else
+		d->renderList.forward.push_back(object);
 }

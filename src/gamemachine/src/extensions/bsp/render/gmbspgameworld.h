@@ -32,6 +32,9 @@ public:
 	Map<GMint, Set<GMBSPEntity*> >& getEntities();
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj, bool alwaysVisible);
 	void setDefaultLights();
+	void setSprite(GMSpriteGameObject* sprite);
+	GMSpriteGameObject* getSprite();
+
 	using GMGameWorld::addObjectAndInit;
 
 	void setRenderConfig(gm::GMBSPRenderConfigs config, const GMVariant& value);
@@ -42,19 +45,17 @@ public:
 
 	//renders:
 public:
-	void drawPolygonFace(GMint polygonFaceNumber);
-	void drawMeshFace(GMint meshFaceNumber);
-	void drawPatch(GMint patchNumber);
+	void preparePolygonFaceToRenderList(GMint polygonFaceNumber);
+	void prepareMeshFaceToRenderList(GMint meshFaceNumber);
+	void preparePatchToRenderList(GMint patchNumber);
 
 private:
-	void clearBuffer();
-	void flushBuffer();
 	void calculateVisibleFaces();
-	void drawAll();
-	void drawSky();
-	void drawFaces();
-	void draw(GMBSP_Render_BiquadraticPatch& biqp);
-	void drawAlwaysVisibleObjects();
+	void prepareAllToRenderList();
+	void prepareSkyToRenderList();
+	void prepareFacesToRenderList();
+	void prepareToRenderList(GMBSP_Render_BiquadraticPatch& biqp);
+	void prepareAlwaysVisibleObjects();
 	template <typename T> bool setMaterialTexture(T& face, REF GMShader& shader);
 	void setMaterialLightmap(GMint lightmapid, REF GMShader& shader);
 	int isClusterVisible(GMint cameraCluster, GMint testCluster);
