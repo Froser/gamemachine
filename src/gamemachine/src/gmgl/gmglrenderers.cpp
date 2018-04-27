@@ -260,6 +260,22 @@ ITexture* GMGLRenderer::getTexture(GMTextureFrames& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
+void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
+{
+	GMCamera& camera = GM.getCamera();
+	GMFrustum& frustum = camera.getFrustum();
+	const GMMat4& viewMatrix = frustum.getViewMatrix();
+	const GMCameraLookAt& lookAt = camera.getLookAt();
+	GMFloat4 vec;
+	lookAt.position.loadFloat4(vec);
+
+	auto& desc = shaderProgram->getDesc();
+	shaderProgram->setVec4(desc.ViewPosition, vec);
+	shaderProgram->setMatrix4(desc.ViewMatrix, frustum.getViewMatrix());
+	shaderProgram->setMatrix4(desc.InverseViewMatrix, frustum.getInverseViewMatrix());
+	shaderProgram->setMatrix4(desc.ProjectionMatrix, frustum.getProjectionMatrix());
+}
+
 //////////////////////////////////////////////////////////////////////////
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
@@ -267,6 +283,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	D_BASE(db, GMGLRenderer);
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
+	updateCameraMatrices(shaderProgram);
 
 	auto desc = getVariablesDesc();
 	if (parent)
@@ -281,29 +298,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 
 	GMGeometryPassingState state = db->engine->getGBuffer()->getGeometryPassingState();
-	if (state == GMGeometryPassingState::PassingGeometry)
-	{
-		shaderProgram->setInterfaceInstance(
-			GMGLShaderProgram::techniqueName(),
-			GMGLShaderProgram::geometryPassName(),
-			GMShaderType::Vertex);
-		shaderProgram->setInterfaceInstance(
-			GMGLShaderProgram::techniqueName(),
-			GMGLShaderProgram::geometryPassName(),
-			GMShaderType::Pixel);
-	}
-	else if (state == GMGeometryPassingState::PassingMaterial)
-	{
-		shaderProgram->setInterfaceInstance(
-			GMGLShaderProgram::techniqueName(),
-			GMGLShaderProgram::materialPassName(),
-			GMShaderType::Vertex);
-		shaderProgram->setInterfaceInstance(
-			GMGLShaderProgram::techniqueName(),
-			GMGLShaderProgram::materialPassName(),
-			GMShaderType::Pixel);
-	}
-	else
+	if (state != GMGeometryPassingState::PassingGeometry)
 	{
 		shaderProgram->setInterfaceInstance(
 			GMGLShaderProgram::techniqueName(),
@@ -363,8 +358,7 @@ IShaderProgram* GMGLRenderer_3D::getShaderProgram()
 {
 	D_BASE(d, Base);
 	GMGeometryPassingState s = d->engine->getGBuffer()->getGeometryPassingState();
-	if (s == GMGeometryPassingState::PassingGeometry ||
-		s == GMGeometryPassingState::PassingMaterial )
+	if (s == GMGeometryPassingState::PassingGeometry)
 		return d->engine->getShaderProgram(GMShaderProgramType::DeferredGeometryPassShaderProgram);
 
 	return d->engine->getShaderProgram(GMShaderProgramType::ForwardShaderProgram);
@@ -425,8 +419,10 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	IShaderProgram* shaderProgram = getShaderProgram();
-	auto desc = getVariablesDesc();
 	shaderProgram->useProgram();
+	updateCameraMatrices(shaderProgram);
+
+	auto desc = getVariablesDesc();
 	shaderProgram->setMatrix4(desc->ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }
 
@@ -520,6 +516,7 @@ void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* pare
 	D_BASE(d, GMGLRenderer);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
+	updateCameraMatrices(shaderProgram);
 }
 
 void GMGLRenderer_LightPass::afterDraw(GMModel* model)
@@ -533,27 +530,18 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 	d->engine->activateLights(shaderProgram);
 	IGBuffer* gBuffer = d->engine->getGBuffer();
 	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
-	GMuint cnt0 = gBufferFramebuffers->count();
-	for (GMuint i = 0; i < cnt0; ++i)
+	GMuint cnt = gBufferFramebuffers->count();
+	for (GMuint i = 0; i < cnt; ++i)
 	{
 		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
 		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), i);
 		texture->useTexture(nullptr, i);
 	}
 
-	gBufferFramebuffers = gBuffer->getMaterialFramebuffers();
-	GMuint cnt1 = gBufferFramebuffers->count();
-	for (GMuint i = 0; i < cnt1; ++i)
-	{
-		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
-		shaderProgram->setInt(GMGLGBuffer::GBufferMaterialUniformNames()[i].c_str(), i + cnt0);
-		texture->useTexture(nullptr, i + cnt0);
-	}
-
 	ITexture* cubeMap = d->engine->getCubeMap();
 	if (cubeMap)
 	{
-		const GMuint id = cnt0 + cnt1 + 1;
+		const GMuint id = cnt + 1;
 		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, id);
 		cubeMap->useTexture(nullptr, id);
 	}

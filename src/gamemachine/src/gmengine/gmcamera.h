@@ -66,6 +66,7 @@ GM_PRIVATE_OBJECT(GMFrustum)
 
 	GMMat4 projectionMatrix;
 	GMMat4 viewMatrix;
+	GMMat4 inverseViewMatrix;
 };
 
 class GMSpriteGameObject;
@@ -97,6 +98,7 @@ public:
 public:
 	const GMMat4& getProjectionMatrix();
 	const GMMat4& getViewMatrix();
+	const GMMat4& getInverseViewMatrix();
 
 public:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);

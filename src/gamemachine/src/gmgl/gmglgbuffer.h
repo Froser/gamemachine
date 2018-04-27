@@ -21,7 +21,6 @@ public:
 
 protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;
-	virtual IFramebuffers* createMaterialFramebuffers() override;
 
 public:
 	virtual void geometryPass(GMGameObject *objects[], GMuint count) override;
@@ -32,7 +31,6 @@ public:
 
 public:
 	static const std::string* GBufferGeometryUniformNames();
-	static const std::string* GBufferMaterialUniformNames();
 };
 
 

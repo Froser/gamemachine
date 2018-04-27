@@ -654,7 +654,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
     commonInput.Refractivity = PosRef.a;
     tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
     commonInput.HasNormalMap = (normalMapFlag.a != 0);
-    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ViewMatrix);
+    commonInput.Normal_Eye_N = mul(ToFloat4(commonInput.Normal_World_N, 0), ViewMatrix);
     tangentSpace.TBN = transpose(float3x3(
         tangent_Eye_N,
         bitangent_Eye_N,

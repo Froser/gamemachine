@@ -13,20 +13,14 @@ namespace
 {
 	Array<std::string, 8> s_GBufferGeometryUniformNames =
 	{
-		"deferred_light_pass_gPosition",
+		"deferred_light_pass_gPosition_Refractivity",
 		"deferred_light_pass_gNormal",
-		"deferred_light_pass_gNormal_eye",
 		"deferred_light_pass_gTexAmbient",
 		"deferred_light_pass_gTexDiffuse",
 		"deferred_light_pass_gTangent_eye",
 		"deferred_light_pass_gBitangent_eye",
-		"deferred_light_pass_gNormalMap",
-	};
-
-	Array<std::string, 2> s_GBufferMaterialUniformNames =
-	{
-		"deferred_material_pass_gKs_gShininess", //gKs: 3, gShininess: 1
-		"deferred_material_pass_gHasNormalMap_gRefractivity", //gHasNormalMap: 1, gRefractivity: 1
+		"deferred_light_pass_gNormalMap_bNormalMap",
+		"deferred_light_pass_gKs_Shininess",
 	};
 }
 
@@ -53,7 +47,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
 	};
 
 	GM.getFactory()->createFramebuffers(&framebuffers);
@@ -76,38 +70,6 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	return framebuffers;
 }
 
-IFramebuffers* GMGLGBuffer::createMaterialFramebuffers()
-{
-	IFramebuffers* framebuffers = nullptr;
-	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-	GMFramebufferDesc desc = { 0 };
-	desc.rect = states.renderRect;
-
-	GMFramebufferFormat formats[] = {
-		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R32G32B32A32_FLOAT,
-	};
-
-	GM.getFactory()->createFramebuffers(&framebuffers);
-	GMFramebuffersDesc fbDesc = { 0 };
-	fbDesc.rect = states.renderRect;
-	framebuffers->init(fbDesc);
-	GM_ASSERT(framebuffers);
-
-	constexpr GMuint framebufferCount = GM_array_size(s_GBufferMaterialUniformNames);
-	GM_STATIC_ASSERT(framebufferCount <= 8, "Too many targets.");
-	for (GMint i = 0; i < framebufferCount; ++i)
-	{
-		IFramebuffer* framebuffer = nullptr;
-		GM.getFactory()->createFramebuffer(&framebuffer);
-		GM_ASSERT(framebuffer);
-		desc.framebufferFormat = formats[i];
-		framebuffer->init(desc);
-		framebuffers->addFramebuffer(framebuffer);
-	}
-	return framebuffers;
-}
-
 void GMGLGBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 {
 	D(d);
@@ -115,13 +77,6 @@ void GMGLGBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 
 	setGeometryPassingState(GMGeometryPassingState::PassingGeometry);
 	activeFramebuffers = getGeometryFramebuffers();
-	activeFramebuffers->clear();
-	activeFramebuffers->bind();
-	d->engine->draw(objects, count);
-	activeFramebuffers->unbind();
-
-	setGeometryPassingState(GMGeometryPassingState::PassingMaterial);
-	activeFramebuffers = getMaterialFramebuffers();
 	activeFramebuffers->clear();
 	activeFramebuffers->bind();
 	d->engine->draw(objects, count);
@@ -158,9 +113,4 @@ void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)
 const std::string* GMGLGBuffer::GBufferGeometryUniformNames()
 {
 	return s_GBufferGeometryUniformNames.data();
-}
-
-const std::string* GMGLGBuffer::GBufferMaterialUniformNames()
-{
-	return s_GBufferMaterialUniformNames.data();
 }

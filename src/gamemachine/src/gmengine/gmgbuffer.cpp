@@ -10,7 +10,6 @@ GMGBuffer::~GMGBuffer()
 	GM_delete(d->quad);
 	GM_delete(d->quadModel);
 	GM_delete(d->geometryFramebuffers);
-	GM_delete(d->materialFramebuffers);
 }
 
 void GMGBuffer::createQuad()
@@ -30,9 +29,6 @@ void GMGBuffer::init()
 	D(d);
 	if (!d->geometryFramebuffers)
 		d->geometryFramebuffers = createGeometryFramebuffers();
-
-	if (!d->materialFramebuffers)
-		d->materialFramebuffers = createMaterialFramebuffers();
 
 	if (!d->quad)
 		createQuad();
@@ -61,11 +57,4 @@ IFramebuffers* GMGBuffer::getGeometryFramebuffers()
 	D(d);
 	GM_ASSERT(d->geometryFramebuffers);
 	return d->geometryFramebuffers;
-}
-
-IFramebuffers* GMGBuffer::getMaterialFramebuffers()
-{
-	D(d);
-	GM_ASSERT(d->materialFramebuffers);
-	return d->materialFramebuffers;
 }

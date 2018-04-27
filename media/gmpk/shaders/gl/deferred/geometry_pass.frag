@@ -1,13 +1,13 @@
 in vec4 _deferred_geometry_pass_position_world;
 
-#alias deferred_geometry_pass_gPosition			deferred_geometry_pass_slot_0
-#alias deferred_geometry_pass_gNormal			deferred_geometry_pass_slot_1
-#alias deferred_geometry_pass_gNormal_eye		deferred_geometry_pass_slot_2
-#alias deferred_geometry_pass_gTexAmbient		deferred_geometry_pass_slot_3
-#alias deferred_geometry_pass_gTexDiffuse		deferred_geometry_pass_slot_4
-#alias deferred_geometry_pass_gTangent_eye		deferred_geometry_pass_slot_5
-#alias deferred_geometry_pass_gBitangent_eye	deferred_geometry_pass_slot_6
-#alias deferred_geometry_pass_gNormalMap		deferred_geometry_pass_slot_7
+#alias deferred_geometry_pass_gPosition_Refractivity				deferred_geometry_pass_slot_0
+#alias deferred_geometry_pass_gNormal								deferred_geometry_pass_slot_1
+#alias deferred_geometry_pass_gTexAmbient							deferred_geometry_pass_slot_2
+#alias deferred_geometry_pass_gTexDiffuse							deferred_geometry_pass_slot_3
+#alias deferred_geometry_pass_gTangent_eye							deferred_geometry_pass_slot_4
+#alias deferred_geometry_pass_gBitangent_eye						deferred_geometry_pass_slot_5
+#alias deferred_geometry_pass_gNormalMap_bNormalMap					deferred_geometry_pass_slot_6
+#alias deferred_geometry_pass_gKs_Shininess							deferred_geometry_pass_slot_7
 
 vec4 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 {
@@ -37,11 +37,11 @@ void deferred_geometry_pass_calcEyeSpace()
 	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	${deferred_geometry_pass_gNormal} = normalToTexture ( normalize( GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz );
-	${deferred_geometry_pass_gNormal_eye} = normalToTexture ( normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz ) );
 
 	if (GM_normalmap_textures[0].enabled == 1)
 	{
-		${deferred_geometry_pass_gNormalMap} = texture(GM_normalmap_textures[0].texture, _uv);
+		${deferred_geometry_pass_gNormalMap_bNormalMap} = texture(GM_normalmap_textures[0].texture, _uv);
+		${deferred_geometry_pass_gNormalMap_bNormalMap}.a = 1;
 		${deferred_geometry_pass_gTangent_eye} = normalToTexture(normalize(normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
 		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(normalize(normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
 	}
@@ -49,15 +49,18 @@ void deferred_geometry_pass_calcEyeSpace()
 	{
 		${deferred_geometry_pass_gTangent_eye} = normalToTexture(vec3(0, 0, 0));
 		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(vec3(0, 0, 0));
-		${deferred_geometry_pass_gNormalMap} = vec4(0, 0, 0, 0);
+		${deferred_geometry_pass_gNormalMap_bNormalMap} = vec4(0, 0, 0, 0);
 	}
 }
 
-subroutine (GM_TechniqueEntrance) void GM_GeometryPass()
+subroutine (GM_TechniqueEntrance)
+void GM_GeometryPass()
 {
-	${deferred_geometry_pass_gPosition} = GM_model_matrix * _deferred_geometry_pass_position_world;
+	${deferred_geometry_pass_gPosition_Refractivity}.rgb = (GM_model_matrix * _deferred_geometry_pass_position_world).rgb;
+	${deferred_geometry_pass_gPosition_Refractivity}.a = GM_material.refractivity;
 	${deferred_geometry_pass_gTexAmbient} = vec4(GM_material.ka, 1) * deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	${deferred_geometry_pass_gTexDiffuse} = vec4(GM_material.kd, 1) * deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
+	${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks, GM_material.shininess);
 
 	deferred_geometry_pass_calcEyeSpace();
 }

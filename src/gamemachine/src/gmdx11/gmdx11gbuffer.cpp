@@ -110,11 +110,6 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 	return framebuffers;
 }
 
-IFramebuffers* GMDx11GBuffer::createMaterialFramebuffers()
-{
-	return nullptr;
-}
-
 bool GMDx11GBuffer::isMultisamping()
 {
 	return GM.getGameMachineRunningStates().sampleCount > 1;

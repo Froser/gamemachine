@@ -115,6 +115,7 @@ void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 {
 	D(d);
 	d->viewMatrix = viewMatrix;
+	d->inverseViewMatrix = Inverse(viewMatrix);
 }
 
 const GMMat4& GMFrustum::getProjectionMatrix()
@@ -127,6 +128,12 @@ const GMMat4& GMFrustum::getViewMatrix()
 {
 	D(d);
 	return d->viewMatrix;
+}
+
+const GMMat4& GMFrustum::getInverseViewMatrix()
+{
+	D(d);
+	return d->inverseViewMatrix;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -142,14 +149,12 @@ void GMCamera::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f
 {
 	D(d);
 	d->frustum.setPerspective(fovy, aspect, n, f);
-	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix);
 }
 
 void GMCamera::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f)
 {
 	D(d);
 	d->frustum.setOrtho(left, right, bottom, top, n, f);
-	GM.getGraphicEngine()->update(GMUpdateDataType::ProjectionMatrix);
 }
 
 void GMCamera::synchronize(GMSpriteGameObject* gameObject)
@@ -164,7 +169,6 @@ void GMCamera::synchronizeLookAt()
 {
 	D(d);
 	getFrustum().updateViewMatrix(::getViewMatrix(d->lookAt));
-	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix);
 }
 
 void GMCamera::lookAt(const GMCameraLookAt& lookAt)
@@ -172,7 +176,6 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 	D(d);
 	d->lookAt = lookAt;
 	getFrustum().updateViewMatrix(::getViewMatrix(lookAt));
-	GM.getGraphicEngine()->update(GMUpdateDataType::ViewMatrix);
 }
 
 GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const

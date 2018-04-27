@@ -8,9 +8,9 @@
 
 // FRAGMENT DEFERRED
 #include "../deferred/geometry_pass.frag"
-#include "../deferred/material_pass.frag"
 
 void main(void)
 {
-	GM_techniqueEntrance();
+	//GM_techniqueEntrance();
+	GM_GeometryPass();
 }

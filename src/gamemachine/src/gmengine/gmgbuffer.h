@@ -9,7 +9,6 @@ class GMModel;
 GM_PRIVATE_OBJECT(GMGBuffer)
 {
 	IFramebuffers* geometryFramebuffers = nullptr;
-	IFramebuffers* materialFramebuffers = nullptr;
 	GMGameObject* quad = nullptr;
 	GMModel* quadModel = nullptr;
 	GMGeometryPassingState state = GMGeometryPassingState::Done;
@@ -32,9 +31,7 @@ protected:
 
 protected:
 	virtual IFramebuffers* getGeometryFramebuffers();
-	virtual IFramebuffers* getMaterialFramebuffers();
 	virtual IFramebuffers* createGeometryFramebuffers() = 0;
-	virtual IFramebuffers* createMaterialFramebuffers() = 0;
 
 private:
 	void createQuad();

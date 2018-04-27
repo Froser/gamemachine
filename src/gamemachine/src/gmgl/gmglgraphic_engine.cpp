@@ -278,16 +278,6 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	D(d);
 	switch (type)
 	{
-	case GMUpdateDataType::ProjectionMatrix:
-	{
-		updateProjectionMatrix();
-		break;
-	}
-	case GMUpdateDataType::ViewMatrix:
-	{
-		updateViewMatrix();
-		break;
-	}
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
 		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
@@ -335,6 +325,7 @@ void GMGLGraphicEngine::updateViewMatrix()
 	d->forwardShaderProgram->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
 
 	// 视觉位置，用于计算光照
+	const GMMat4& proj = camera.getFrustum().getProjectionMatrix();
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
 	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
@@ -343,6 +334,10 @@ void GMGLGraphicEngine::updateViewMatrix()
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
 	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
+	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
+	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
+	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
+	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
 }
 
 void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)

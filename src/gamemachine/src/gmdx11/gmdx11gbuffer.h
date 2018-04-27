@@ -27,7 +27,6 @@ public:
 
 protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;
-	virtual IFramebuffers* createMaterialFramebuffers() override;
 
 private:
 	bool isMultisamping();

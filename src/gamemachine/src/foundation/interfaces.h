@@ -185,9 +185,6 @@ struct GMCursorDesc
 
 enum class GMUpdateDataType
 {
-	ProjectionMatrix,
-	ViewMatrix,
-	ModelMatrix,
 	TurnOffCubeMap,
 };
 
@@ -347,7 +344,6 @@ GM_INTERFACE(IFramebuffers)
 enum class GMGeometryPassingState
 {
 	PassingGeometry,
-	PassingMaterial,
 	Done,
 };
 
@@ -357,7 +353,6 @@ GM_INTERFACE(IGBuffer)
 	virtual void geometryPass(GMGameObject *objects[], GMuint count) = 0;
 	virtual void lightPass() = 0;
 	virtual IFramebuffers* getGeometryFramebuffers() = 0;
-	virtual IFramebuffers* getMaterialFramebuffers() = 0;
 	virtual void setGeometryPassingState(GMGeometryPassingState) = 0;
 	virtual GMGeometryPassingState getGeometryPassingState() = 0;
 };

@@ -4,12 +4,12 @@
 
 // VERTEX DEFERRED
 #include "../deferred/geometry_pass.vert"
-#include "../deferred/material_pass.vert"
 
 #include "geometry_pass_header.h"
 
 void main(void)
 {
 	init_layouts();
-	GM_techniqueEntrance();
+	//GM_techniqueEntrance();
+	GM_GeometryPass();
 }

@@ -75,16 +75,6 @@ public:
 	{
 		return "GM_techniqueEntrance";
 	}
-
-	static constexpr const char* geometryPassName()
-	{
-		return "GM_GeometryPass";
-	}
-
-	static constexpr const char* materialPassName()
-	{
-		return "GM_MaterialPass";
-	}
 };
 
 END_NS
