@@ -206,42 +206,42 @@ bool GMUIGameMachineWindowBase::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM l
 	}
 	case WM_MOUSEWHEEL:
 	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordWheel(true, GET_WHEEL_DELTA_WPARAM(wParam));
 		break;
 	}
 	case WM_LBUTTONDOWN:
 	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseDown(GMMouseButton_Left);
 		break;
 	}
 	case WM_MOUSEMOVE:
 	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseMove();
 		break;
 	}
 	case WM_RBUTTONDOWN:
 	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseDown(GMMouseButton_Right);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseUp(GMMouseButton_Left);
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
-		GMUIInput* input = gm_static_cast<GMUIInput*>(db->input);
+		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
 			input->recordMouseUp(GMMouseButton_Right);
 		break;

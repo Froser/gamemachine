@@ -31,6 +31,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	
 	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
+	bool lightDirty = true;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine
@@ -51,6 +52,9 @@ public:
 public:
 	virtual bool setInterface(GameMachineInterfaceID, void*);
 	virtual bool getInterface(GameMachineInterfaceID, void**);
+
+public:
+	virtual void activateLight(ID3DX11Effect* effect);
 
 public:
 	inline ID3D11Device* getDevice()

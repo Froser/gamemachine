@@ -83,7 +83,6 @@ void GMGLGraphicEngine::init()
 void GMGLGraphicEngine::newFrame()
 {
 	D(d);
-
 	GLint mask;
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
 	glStencilMask(0xFF);
@@ -133,39 +132,48 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 
 void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 {
-	D_BASE(d, Base);
-	auto& svd = shaderProgram->getDesc();
-	shaderProgram->useProgram();
-	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-	for (auto& light : d->lights)
+	D(d);
+	D_BASE(db, Base);
+	// 有2种情况，需要更新着色器。
+	// 1. 使用中的着色器更换时
+	// 2. 使用中的着色器未更换，但是光照信息改变
+	if (shaderProgram != d->lightContext.shaderProgram || d->lightContext.lightDirty)
 	{
-		GMint id = lightId[(GMuint)light.getType()]++;
-		switch (light.getType())
+		auto& svd = shaderProgram->getDesc();
+		shaderProgram->useProgram();
+		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
+		for (auto& light : db->lights)
 		{
-		case GMLightType::AMBIENT:
-		{
-			const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
-			char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-			combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
-			shaderProgram->setVec3(u_color, light.getLightColor());
-			break;
+			GMint id = lightId[(GMuint)light.getType()]++;
+			switch (light.getType())
+			{
+			case GMLightType::AMBIENT:
+			{
+				const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
+				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
+				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
+				shaderProgram->setVec3(u_color, light.getLightColor());
+				break;
+			}
+			case GMLightType::SPECULAR:
+			{
+				const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
+				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
+				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
+				combineUniform(u_position, uniform, ".", svd.LightAttributes.Position);
+				shaderProgram->setVec3(u_color, light.getLightColor());
+				shaderProgram->setVec3(u_position, light.getLightPosition());
+				break;
+			}
+			default:
+				break;
+			}
 		}
-		case GMLightType::SPECULAR:
-		{
-			const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
-			char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-			combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
-			combineUniform(u_position, uniform, ".", svd.LightAttributes.Position);
-			shaderProgram->setVec3(u_color, light.getLightColor());
-			shaderProgram->setVec3(u_position, light.getLightPosition());
-			break;
-		}
-		default:
-			break;
-		}
+		shaderProgram->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
+		shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
+		d->lightContext.shaderProgram = shaderProgram;
+		d->lightContext.lightDirty = false;
 	}
-	shaderProgram->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
-	shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
 void GMGLGraphicEngine::update(GMUpdateDataType type)
@@ -173,6 +181,9 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 	D(d);
 	switch (type)
 	{
+	case GMUpdateDataType::LightChanged:
+		d->lightContext.lightDirty = true;
+		break;
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
 		glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);

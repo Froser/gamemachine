@@ -25,6 +25,12 @@ enum
 	DEFERRED_LIGHT_PASS_SHADER,
 };
 
+struct GMGLLightContext
+{
+	bool lightDirty = true;
+	IShaderProgram* shaderProgram = nullptr;
+};
+
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
 	bool engineReady = false;
@@ -33,8 +39,9 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
 	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
 	GMGLShaderProgram* filterShaderProgram = nullptr;
-	GraphicSettings* settings = nullptr;
+
 	ITexture* cubeMap = nullptr;
+	GMGLLightContext lightContext;
 
 	// 混合绘制
 	GMS_BlendFunc blendsfactor;

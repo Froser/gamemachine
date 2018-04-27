@@ -183,14 +183,15 @@ void GMGraphicEngine::addLight(const GMLight& light)
 {
 	D(d);
 	d->lights.push_back(light);
+	update(GMUpdateDataType::LightChanged);
 }
 
 void GMGraphicEngine::removeLights()
 {
 	D(d);
 	d->lights.clear();
+	update(GMUpdateDataType::LightChanged);
 }
-
 
 void GMGraphicEngine::setStencilOptions(const GMStencilOptions& options)
 {

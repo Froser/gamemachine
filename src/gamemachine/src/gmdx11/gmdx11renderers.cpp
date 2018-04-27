@@ -20,8 +20,6 @@
 
 namespace
 {
-	constexpr GMint GMDX11_MAX_LIGHT_COUNT = 10; //灯光最大数量
-
 	D3D11_INPUT_ELEMENT_DESC GMSHADER_ElementDescriptions[] =
 	{
 		{ GMSHADER_SEMANTIC_NAME_POSITION, 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, FLOAT_OFFSET(0), D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -180,7 +178,7 @@ namespace
 	public:
 		GMDx11RasterizerStates::GMDx11RasterizerStates()
 		{
-			engine = gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+			engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 		}
 
 		~GMDx11RasterizerStates()
@@ -227,7 +225,7 @@ namespace
 	public:
 		GMDx11BlendStates::GMDx11BlendStates()
 		{
-			engine = gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+			engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 		}
 
 		~GMDx11BlendStates()
@@ -281,7 +279,7 @@ namespace
 	public:
 		GMDx11DepthStencilStates::GMDx11DepthStencilStates()
 		{
-			engine = gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+			engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 		}
 
 		~GMDx11DepthStencilStates()
@@ -575,30 +573,7 @@ void GMDx11Renderer::prepareBuffer(GMModel* model)
 void GMDx11Renderer::prepareLights()
 {
 	D(d);
-	const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
-	const Vector<GMLight>& lights = getEngine()->getLights();
-	GMuint indices[(GMuint)GMLightType::COUNT] = { 0 };
-	const GMShaderVariablesLightDesc* lightAttrs[] = { &svd.AmbientLight, &svd.SpecularLight };
-	for (auto& light : lights)
-	{
-		const GMShaderVariablesLightDesc* lightAttr = lightAttrs[(GMuint)light.getType()];
-		ID3DX11EffectVariable* lightAttributeVar = d->effect->GetVariableByName(lightAttr->Name)->GetElement(indices[(GMuint)light.getType()]++);
-		GM_ASSERT(lightAttributeVar->IsValid());
-		ID3DX11EffectVectorVariable* position = lightAttributeVar->GetMemberByName(svd.LightAttributes.Position)->AsVector();
-		GM_ASSERT(position->IsValid());
-		ID3DX11EffectVectorVariable* color = lightAttributeVar->GetMemberByName(svd.LightAttributes.Color)->AsVector();
-		GM_ASSERT(color->IsValid());
-		GM_DX_HR(position->SetFloatVector(light.getLightPosition()));
-		GM_DX_HR(color->SetFloatVector(light.getLightColor()));
-	}
-
-	GM_FOREACH_ENUM_CLASS(type, GMLightType::AMBIENT, GMLightType::COUNT)
-	{
-		ID3DX11EffectScalarVariable* lightCount = d->effect->GetVariableByName(lightAttrs[(GMuint)type]->Count)->AsScalar();
-		GM_ASSERT(lightCount->IsValid());
-		GM_ASSERT(indices[(GMuint)type] < GMDX11_MAX_LIGHT_COUNT);
-		GM_DX_HR(lightCount->SetInt(indices[(GMuint)type]));
-	}
+	getEngine()->activateLight(d->effect);
 }
 
 void GMDx11Renderer::prepareRasterizer(GMModel* model)

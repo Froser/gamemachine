@@ -52,12 +52,12 @@ private:
 
 inline GMBSPPhysicsObject* gmBSPPhysicsObjectCast(GMPhysicsObject* obj)
 {
-	return gm_static_cast<GMBSPPhysicsObject*>(obj);
+	return gm_cast<GMBSPPhysicsObject*>(obj);
 }
 
 inline GMBSPPhysicsObject& gmBSPPhysicsObjectCast(GMPhysicsObject& obj)
 {
-	return *gm_static_cast<GMBSPPhysicsObject*>(&obj);
+	return *gm_cast<GMBSPPhysicsObject*>(&obj);
 }
 
 END_NS

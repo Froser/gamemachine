@@ -43,7 +43,7 @@ public:
 protected:
 	inline GMDx11GraphicEngine* getEngine()
 	{
-		return gm_static_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+		return gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 	}
 
 	inline const GMShaderVariablesDesc* getVariablesDesc()

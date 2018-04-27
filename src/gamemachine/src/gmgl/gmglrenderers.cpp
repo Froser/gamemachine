@@ -103,7 +103,7 @@ namespace
 GMGLRenderer::GMGLRenderer()
 {
 	D(d);
-	d->engine = gm_static_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
+	d->engine = gm_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 

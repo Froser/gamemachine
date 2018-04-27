@@ -20,11 +20,6 @@ public:
 	IFramebuffers* peek();
 };
 
-struct GMLightBlock
-{
-	bool dirty = true;
-};
-
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
 	IFramebuffers* filterFramebuffers = nullptr;
@@ -35,7 +30,6 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMRenderConfig renderConfig;
 	GMDebugConfig debugConfig;
 	GMStencilOptions stencilOptions;
-	GMLightBlock lightBlock;
 	Vector<GMLight> lights;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 };

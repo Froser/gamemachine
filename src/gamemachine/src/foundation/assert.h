@@ -9,19 +9,6 @@
 #define GM_ASSERT(cond)
 #endif
 
-template <typename T, typename U>
-T gm_static_cast(U another)
-{
-#if _DEBUG
-	GM_STATIC_ASSERT(std::is_pointer<T>::value, "T must be a pointer");
-	T ptr = dynamic_cast<T>(another);
-	GM_ASSERT(ptr);
-	return ptr;
-#else
-	return static_cast<T>(another);
-#endif
-}
-
 BEGIN_NS
 class Assert
 {

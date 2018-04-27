@@ -185,6 +185,7 @@ struct GMCursorDesc
 
 enum class GMUpdateDataType
 {
+	LightChanged,
 	TurnOffCubeMap,
 };
 

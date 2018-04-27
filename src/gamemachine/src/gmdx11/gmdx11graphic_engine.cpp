@@ -7,6 +7,11 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdx11gbuffer.h"
 
+namespace
+{
+	constexpr GMint GMDX11_MAX_LIGHT_COUNT = 10; //灯光最大数量
+}
+
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -31,6 +36,9 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	D(d);
 	switch (type)
 	{
+	case GMUpdateDataType::LightChanged:
+		d->lightDirty = true;
+		break;
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
 		GMDx11CubeMapState& state = GMDx11Renderer::getCubeMapState();
@@ -39,6 +47,39 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 		state.model = nullptr;
 		break;
 	}
+	}
+}
+
+void GMDx11GraphicEngine::activateLight(ID3DX11Effect* effect)
+{
+	D(d);
+	if (d->lightDirty)
+	{
+		const GMShaderVariablesDesc& svd = getShaderProgram()->getDesc();
+		const Vector<GMLight>& lights = getLights();
+		GMuint indices[(GMuint)GMLightType::COUNT] = { 0 };
+		const GMShaderVariablesLightDesc* lightAttrs[] = { &svd.AmbientLight, &svd.SpecularLight };
+		for (auto& light : lights)
+		{
+			const GMShaderVariablesLightDesc* lightAttr = lightAttrs[(GMuint)light.getType()];
+			ID3DX11EffectVariable* lightAttributeVar = effect->GetVariableByName(lightAttr->Name)->GetElement(indices[(GMuint)light.getType()]++);
+			GM_ASSERT(lightAttributeVar->IsValid());
+			ID3DX11EffectVectorVariable* position = lightAttributeVar->GetMemberByName(svd.LightAttributes.Position)->AsVector();
+			GM_ASSERT(position->IsValid());
+			ID3DX11EffectVectorVariable* color = lightAttributeVar->GetMemberByName(svd.LightAttributes.Color)->AsVector();
+			GM_ASSERT(color->IsValid());
+			GM_DX_HR(position->SetFloatVector(light.getLightPosition()));
+			GM_DX_HR(color->SetFloatVector(light.getLightColor()));
+		}
+
+		GM_FOREACH_ENUM_CLASS(type, GMLightType::AMBIENT, GMLightType::COUNT)
+		{
+			ID3DX11EffectScalarVariable* lightCount = effect->GetVariableByName(lightAttrs[(GMuint)type]->Count)->AsScalar();
+			GM_ASSERT(lightCount->IsValid());
+			GM_ASSERT(indices[(GMuint)type] < GMDX11_MAX_LIGHT_COUNT);
+			GM_DX_HR(lightCount->SetInt(indices[(GMuint)type]));
+		}
+		d->lightDirty = false;
 	}
 }
 
