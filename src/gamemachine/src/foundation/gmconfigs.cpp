@@ -54,7 +54,7 @@ void GMConfigs::init()
 	GMRenderConfig renderConfig = getConfig(GMConfigs::Render).asRenderConfig();
 	renderConfig.set(GMRenderConfigs::RenderMode, (GMint) GMRenderMode::Forward);
 	renderConfig.set(GMRenderConfigs::FilterMode, GMFilterMode::None);
-	renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(0.f, 0.f));
+	renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1, 1));
 }
 
 GMConfig& GMConfigs::getConfig(Category state)

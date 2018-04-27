@@ -15,9 +15,6 @@ void GMDx11GraphicEngine::init()
 		initShaders();
 	else
 		GM_ASSERT(false);
-
-	const GMRect& renderRect = GM.getGameMachineRunningStates().renderRect;
-	db->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1, 1));
 }
 
 void GMDx11GraphicEngine::newFrame()

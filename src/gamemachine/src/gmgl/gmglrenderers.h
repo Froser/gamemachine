@@ -46,6 +46,7 @@ protected:
 	virtual void drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
 	virtual ITexture* getTexture(GMTextureFrames& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
+	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
 };
 
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)

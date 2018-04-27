@@ -3,21 +3,27 @@ in vec2 _texCoords;
 out vec4 frag_color;
 uniform sampler2D GM_framebuffer;
 
+uniform int GM_multisampling;
+uniform int GM_screenWidth;
+uniform int GM_screenHeight;
 uniform float GM_effects_texture_offset_x;
 uniform float GM_effects_texture_offset_y;
 
 vec3 kernel(float kernels[9], sampler2D t, vec2 uv)
 {
+	float X = GM_effects_texture_offset_x / GM_screenWidth;
+	float Y = GM_effects_texture_offset_y / GM_screenHeight;
+
 	vec2 offsets[9] = vec2[](
-		vec2(-GM_effects_texture_offset_x, -GM_effects_texture_offset_y),
-		vec2( 0.0f, -GM_effects_texture_offset_y),
-		vec2( GM_effects_texture_offset_x, -GM_effects_texture_offset_y),
-		vec2(-GM_effects_texture_offset_x, 0.0f),  
+		vec2(-X, -Y),
+		vec2( 0.0f, -Y),
+		vec2( X, -Y),
+		vec2(-X, 0.0f),  
 		vec2( 0.0f, 0.0f),  
-		vec2( GM_effects_texture_offset_x, 0.0f),
-		vec2(-GM_effects_texture_offset_x, GM_effects_texture_offset_y),
-		vec2( 0.0f, GM_effects_texture_offset_y),
-		vec2( GM_effects_texture_offset_x, GM_effects_texture_offset_y)
+		vec2( X, 0.0f),
+		vec2(-X, Y),
+		vec2( 0.0f, Y),
+		vec2( X, Y)
 	);
 	vec3 sampler[9];
 	for(int i = 0; i < 9; i++)

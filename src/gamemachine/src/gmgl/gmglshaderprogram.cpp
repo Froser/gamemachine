@@ -50,7 +50,13 @@ namespace
 					"GrayscaleFilter",
 					"EdgeDetectFilter",
 				}
-			}
+			},
+			{
+				"GM_screenInfo",
+				"GM_screenWidth",
+				"GM_screenHeight",
+				"GM_multisampling",
+			},
 		};
 		return desc;
 	}
@@ -94,26 +100,31 @@ void GMGLShaderProgram::attachShader(const GMGLShaderInfo& shaderCfgs)
 
 void GMGLShaderProgram::setMatrix4(const char* name, const GMMat4& value)
 {
+	GM_ASSERT(verify());
 	glUniformMatrix4fv(glGetUniformLocation(getProgram(), name), 1, GL_FALSE, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec4(const char* name, const GMFloat4& value)
 {
+	GM_ASSERT(verify());
 	glUniform4fv(glGetUniformLocation(getProgram(), name), 1, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec3(const char* name, const GMfloat value[3])
 {
+	GM_ASSERT(verify());
 	glUniform3fv(glGetUniformLocation(getProgram(), name), 1, value);
 }
 
 void GMGLShaderProgram::setInt(const char* name, GMint value)
 {
+	GM_ASSERT(verify());
 	glUniform1i(glGetUniformLocation(getProgram(), name), value);
 }
 
 void GMGLShaderProgram::setFloat(const char* name, GMfloat value)
 {
+	GM_ASSERT(verify());
 	glUniform1f(glGetUniformLocation(getProgram(), name), value);
 }
 
@@ -137,41 +148,48 @@ bool GMGLShaderProgram::setInterfaceInstance(const char* interfaceName, const ch
 
 void GMGLShaderProgram::setMatrix4(const GMString& name, const GMMat4& value)
 {
+	GM_ASSERT(verify());
 	std::string stdName = name.toStdString();
 	glUniformMatrix4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, GL_FALSE, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec4(const GMString& name, const GMFloat4& value)
 {
+	GM_ASSERT(verify());
 	std::string stdName = name.toStdString();
 	glUniform4fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, ValuePointer(value));
 }
 
 void GMGLShaderProgram::setVec3(const GMString& name, const GMfloat value[3])
 {
+	GM_ASSERT(verify());
 	std::string stdName = name.toStdString();
 	glUniform3fv(glGetUniformLocation(getProgram(), stdName.c_str()), 1, value);
 }
 
 void GMGLShaderProgram::setInt(const GMString& name, GMint value)
 {
+	GM_ASSERT(verify());
 	std::string stdName = name.toStdString();
 	glUniform1i(glGetUniformLocation(getProgram(), stdName.c_str()), value);
 }
 
 void GMGLShaderProgram::setFloat(const GMString& name, GMfloat value)
 {
+	GM_ASSERT(verify());
 	std::string stdName = name.toStdString();
 	glUniform1f(glGetUniformLocation(getProgram(), stdName.c_str()), value);
 }
 
 void GMGLShaderProgram::setBool(const GMString& name, bool value)
 {
+	GM_ASSERT(verify());
 	setInt(name, (GMint)value);
 }
 
 bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType)
 {
+	GM_ASSERT(verify());
 	D(d);
 	GLint subroutineUniform = glGetSubroutineUniformLocation(d->shaderProgram, shaderType, funcName);
 	if (subroutineUniform >= 0)
@@ -184,6 +202,12 @@ bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char*  impleme
 		}
 	}
 	return false;
+}
+
+bool GMGLShaderProgram::verify()
+{
+	D(d);
+	return d->lastUsedProgram == d->shaderProgram;
 }
 
 void GMGLShaderProgram::load()

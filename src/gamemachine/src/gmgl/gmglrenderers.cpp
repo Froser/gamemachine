@@ -276,6 +276,15 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 	shaderProgram->setMatrix4(desc.ProjectionMatrix, frustum.getProjectionMatrix());
 }
 
+void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
+{
+	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+	auto& desc = shaderProgram->getDesc();
+	shaderProgram->setInt(desc.ScreenInfoAttributes.Multisampling, states.sampleCount > 1);
+	shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenWidth, states.renderRect.width);
+	shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenHeight, states.renderRect.height);
+}
+
 //////////////////////////////////////////////////////////////////////////
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {

@@ -65,6 +65,7 @@ private:
 	void expandAlias(const GMString& alias, IN OUT GMString& source);
 	GMString& replaceLine(IN OUT GMString& line);
 	bool setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType);
+	bool verify();
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
