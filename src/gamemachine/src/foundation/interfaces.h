@@ -403,8 +403,9 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	//! 刷新帧缓存，新建一帧。
 	/*!
 	  此方法保证默认帧缓存将会被清空，但是并不保证其他帧缓存（如G缓存）被清空。<BR>
-	  如果要清空其它帧缓存，应该调用需要清除的帧缓存的响应方法。<BR>
+	  如果要清空其它帧缓存，应该调用需要清除的帧缓存的相应方法。<BR>
 	  此方法将会清除默认帧缓存中的颜色缓存、深度缓存和模板缓存。
+	  \sa getGBuffer(), getFilterFramebuffers()
 	*/
 	virtual void newFrame() = 0;
 
@@ -417,14 +418,6 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \sa GameMachineMessage
 	*/
 	virtual bool event(const GameMachineMessage& e) = 0;
-
-	//! 绘制若干个GMGameObject对象。
-	/*!
-	  绘制GMGameObject对象。这个方法会将绘制好的图元到目标缓存，目标缓存取决于GMBufferMode的值。
-	  \param objects 待绘制的对象。
-	  \param count 待绘制对象的个数。
-	*/
-	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 
 	//! 获取引擎G缓存。
 	/*!

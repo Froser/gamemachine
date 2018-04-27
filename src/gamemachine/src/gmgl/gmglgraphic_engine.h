@@ -27,25 +27,14 @@ enum
 
 GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 {
-	bool needRefreshLights = true;
-	Vector<GMLight> lights;
 	bool engineReady = false;
 
 	// 著色器程序
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
 	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
 	GMGLShaderProgram* filterShaderProgram = nullptr;
-	IShaderLoadCallback* shaderLoadCallback = nullptr;
 	GraphicSettings* settings = nullptr;
-
-	IGBuffer* gbuffer = nullptr;
 	ITexture* cubeMap = nullptr;
-
-	// 延迟渲染分组
-	Vector<GMGameObject*> deferredRenderingGameObjects;
-	Vector<GMGameObject*> forwardRenderingGameObjects;
-
-	GMStencilOptions stencilOptions;
 
 	// 混合绘制
 	GMS_BlendFunc blendsfactor;
@@ -63,10 +52,7 @@ public:
 public:
 	virtual void init() override;
 	virtual void newFrame() override;
-	virtual void drawObjects(GMGameObject *objects[], GMuint count) override;
 	virtual void update(GMUpdateDataType type) override;
-	virtual void addLight(const GMLight& light) override;
-	virtual void removeLights();
 	virtual void clearStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
@@ -74,31 +60,12 @@ public:
 	virtual bool event(const GameMachineMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;
 
-	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
-	{
-		D(d);
-		d->shaderLoadCallback = cb;
-	}
-
-	virtual void setStencilOptions(const GMStencilOptions& options) override
-	{
-		D(d);
-		d->stencilOptions = options;
-	}
-
-	virtual const GMStencilOptions& getStencilOptions() override
-	{
-		D(d);
-		return d->stencilOptions;
-	}
-
 public:
 	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
 	virtual bool setInterface(GameMachineInterfaceID, void*);
 
 public:
 	IRenderer* getRenderer(GMModelType objectType);
-	void setViewport(const GMRect& rect);
 
 public:
 	inline bool isBlending() { D(d); return d->isBlending; }
@@ -122,12 +89,7 @@ public:
 	void activateLights(IShaderProgram* shaderProgram);
 
 private:
-	void directDraw(GMGameObject *objects[], GMuint count);
-	void forwardDraw(GMGameObject *objects[], GMuint count);
-	void updateProjectionMatrix();
-	void updateViewMatrix();
 	void installShaders();
-	void groupGameObjects(GMGameObject *objects[], GMuint count);
 };
 
 class GMGLUtility

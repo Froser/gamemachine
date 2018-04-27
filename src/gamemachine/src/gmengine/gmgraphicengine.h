@@ -20,6 +20,11 @@ public:
 	IFramebuffers* peek();
 };
 
+struct GMLightBlock
+{
+	bool dirty = true;
+};
+
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
 	IFramebuffers* filterFramebuffers = nullptr;
@@ -29,6 +34,10 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	IGBuffer* gBuffer = nullptr;
 	GMRenderConfig renderConfig;
 	GMDebugConfig debugConfig;
+	GMStencilOptions stencilOptions;
+	GMLightBlock lightBlock;
+	Vector<GMLight> lights;
+	IShaderLoadCallback* shaderLoadCallback = nullptr;
 };
 
 class GMGraphicEngine : public GMObject, public IGraphicEngine
@@ -47,6 +56,11 @@ public:
 		GMuint forwardRenderingCount,
 		GMGameObject *deferredRenderingObjects[],
 		GMuint deferredRenderingCount) override;
+	virtual void addLight(const GMLight& light) override;
+	virtual void removeLights() override;
+	virtual void setStencilOptions(const GMStencilOptions& options) override;
+	virtual const GMStencilOptions& getStencilOptions() override;
+	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override;
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
@@ -67,6 +81,12 @@ protected:
 	{
 		D(d);
 		return d->filterQuad;
+	}
+
+	inline IShaderLoadCallback* getShaderLoadCallback()
+	{
+		D(d);
+		return d->shaderLoadCallback;
 	}
 
 private:

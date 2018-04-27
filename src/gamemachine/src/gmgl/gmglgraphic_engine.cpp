@@ -57,7 +57,6 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	GM_delete(d->forwardShaderProgram);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]);
-	GM_delete(d->gbuffer);
 }
 
 void GMGLGraphicEngine::init()
@@ -92,89 +91,17 @@ void GMGLGraphicEngine::newFrame()
 	glStencilMask(mask);
 }
 
-void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
-{
-	D(d);
-	D_BASE(db, Base);
-	GM_PROFILE("drawObjects");
-	if (!count)
-		return;
-
-	GMFilterMode::Mode filter = getCurrentFilterMode();
-	if (filter != GMFilterMode::None)
-	{
-		createFilterFramebuffer();
-		getFilterFramebuffers()->clear();
-	}
-
-	GMRenderMode renderMode = db->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
-	if (renderMode == GMRenderMode::Forward)
-	{
-		forwardDraw(objects, count);
-	}
-	else
-	{
-		GM_ASSERT(renderMode == GMRenderMode::Deferred);
-		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
-		groupGameObjects(objects, count);
-
-		if (d->deferredRenderingGameObjects.empty())
-		{
-			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-		}
-		else
-		{
-			IGBuffer* gBuffer = getGBuffer();
-			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
-
-			{
-				if (filter != GMFilterMode::None)
-				{
-					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-					GM_ASSERT(filterFramebuffers);
-					filterFramebuffers->bind();
-				}
-				gBuffer->lightPass();
-				if (filter != GMFilterMode::None)
-				{
-					getFilterFramebuffers()->unbind();
-					getFilterQuad()->draw();
-				}
-			}
-
-			{
-				// 预览GBuffer
-				GMint fbIdx = db->debugConfig.get(GMDebugConfigs::FrameBufferIndex_I32).toInt();
-				if (fbIdx > 0)
-				{
-					GMRect rect = {
-						db->debugConfig.get(GMDebugConfigs::FrameBufferPositionX_I32).toInt(),
-						db->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
-						db->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
-						db->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt()
-					};
-					GMGLGBuffer* gmglgBuffer = gm_cast<GMGLGBuffer*>(gBuffer);
-					gmglgBuffer->drawGeometryBuffer(fbIdx - 1, rect);
-				}
-			}
-
-			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMGLFramebuffers::getDefaultFramebuffers());
-			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size());
-		}
-	}
-}
-
 void GMGLGraphicEngine::installShaders()
 {
 	D(d);
-	if (!d->shaderLoadCallback)
+	if (!getShaderLoadCallback())
 	{
 		gm_error("You must specify a IShaderLoadCallback");
 		GM_ASSERT(false);
 		return;
 	}
 
-	d->shaderLoadCallback->onLoadShaders(this);
+	getShaderLoadCallback()->onLoadShaders(this);
 }
 
 bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
@@ -206,7 +133,7 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 
 void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 {
-	D(d);
+	D_BASE(d, Base);
 	auto& svd = shaderProgram->getDesc();
 	shaderProgram->useProgram();
 	GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
@@ -241,23 +168,6 @@ void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 	shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
 }
 
-void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
-{
-	D(d);
-	d->deferredRenderingGameObjects.clear();
-	d->deferredRenderingGameObjects.reserve(count);
-	d->forwardRenderingGameObjects.clear();
-	d->forwardRenderingGameObjects.reserve(count);
-
-	for (GMuint i = 0; i < count; i++)
-	{
-		if (objects[i]->canDeferredRendering())
-			d->deferredRenderingGameObjects.push_back(objects[i]);
-		else
-			d->forwardRenderingGameObjects.push_back(objects[i]);
-	}
-}
-
 void GMGLGraphicEngine::update(GMUpdateDataType type)
 {
 	D(d);
@@ -274,90 +184,6 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 		GM_ASSERT(false);
 		break;
 	}
-}
-
-void GMGLGraphicEngine::updateProjectionMatrix()
-{
-	D(d);
-	auto& desc = d->forwardShaderProgram->getDesc();
-	GMCamera& camera = GM.getCamera();
-	const GMMat4& proj = camera.getFrustum().getProjectionMatrix();
-	
-	d->forwardShaderProgram->useProgram();
-	d->forwardShaderProgram->setMatrix4(desc.ProjectionMatrix, proj);
-	
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
-	
-}
-
-void GMGLGraphicEngine::updateViewMatrix()
-{
-	D(d);
-	auto& desc = d->forwardShaderProgram->getDesc();
-	GMCamera& camera = GM.getCamera();
-	const GMMat4& viewMatrix = camera.getFrustum().getViewMatrix();
-	const GMCameraLookAt& lookAt = camera.getLookAt();
-	GMFloat4 vec;
-	lookAt.position.loadFloat4(vec);
-
-	// 视觉位置，用于计算光照
-	d->forwardShaderProgram->useProgram();
-	d->forwardShaderProgram->setVec4(desc.ViewPosition, vec);
-	d->forwardShaderProgram->setMatrix4(desc.ViewMatrix, viewMatrix);
-	d->forwardShaderProgram->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
-
-	// 视觉位置，用于计算光照
-	const GMMat4& proj = camera.getFrustum().getProjectionMatrix();
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setVec4(desc.ViewPosition, vec);
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ViewMatrix, viewMatrix);
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.InverseViewMatrix, Inverse(viewMatrix));
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->useProgram();
-	d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->setMatrix4(desc.ProjectionMatrix, proj);
-}
-
-void GMGLGraphicEngine::directDraw(GMGameObject *objects[], GMuint count)
-{
-	D(d);
-	draw(objects, count);
-}
-
-void GMGLGraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count)
-{
-	D(d);
-	if (!count)
-		return;
-
-	GMFilterMode::Mode filter = getCurrentFilterMode();
-	if (filter != GMFilterMode::None)
-	{
-		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-		GM_ASSERT(filterFramebuffers);
-		filterFramebuffers->bind();
-	}
-
-	draw(objects, count);
-	if (filter != GMFilterMode::None)
-	{
-		getFilterFramebuffers()->unbind();
-		getFilterQuad()->draw();
-	}
-}
-
-void GMGLGraphicEngine::setViewport(const GMRect& rect)
-{
-	
-	glViewport(rect.x, rect.y, rect.width, rect.height);
-	
 }
 
 IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
@@ -387,23 +213,8 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 	}
 }
 
-void GMGLGraphicEngine::addLight(const GMLight& light)
-{
-	D(d);
-	d->lights.push_back(light);
-	d->needRefreshLights = true;
-}
-
-void GMGLGraphicEngine::removeLights()
-{
-	D(d);
-	d->lights.clear();
-	d->needRefreshLights = true;
-}
-
 void GMGLGraphicEngine::clearStencil()
 {
-
 	GLint mask;
 	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
 	glStencilMask(0xFF);

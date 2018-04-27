@@ -178,3 +178,34 @@ IGBuffer* GMGraphicEngine::createGBuffer()
 	GM_ASSERT(gBuffer);
 	return gBuffer;
 }
+
+void GMGraphicEngine::addLight(const GMLight& light)
+{
+	D(d);
+	d->lights.push_back(light);
+}
+
+void GMGraphicEngine::removeLights()
+{
+	D(d);
+	d->lights.clear();
+}
+
+
+void GMGraphicEngine::setStencilOptions(const GMStencilOptions& options)
+{
+	D(d);
+	d->stencilOptions = options;
+}
+
+const GMStencilOptions& GMGraphicEngine::getStencilOptions()
+{
+	D(d);
+	return d->stencilOptions;
+}
+
+void GMGraphicEngine::setShaderLoadCallback(IShaderLoadCallback* cb)
+{
+	D(d);
+	d->shaderLoadCallback = cb;
+}

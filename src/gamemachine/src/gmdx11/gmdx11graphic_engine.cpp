@@ -29,62 +29,6 @@ void GMDx11GraphicEngine::newFrame()
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
 }
 
-void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
-{
-	GM_PROFILE("drawObjects");
-	if (!count)
-		return;
-
-	D(d);
-	D_BASE(db, Base);
-	GMFilterMode::Mode filterMode = getCurrentFilterMode();
-	if (filterMode != GMFilterMode::None)
-		createFilterFramebuffer();
-
-	GMRenderMode renderMode = db->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
-	if (renderMode == GMRenderMode::Forward)
-	{
-		forwardDraw(objects, count, filterMode);
-	}
-	else
-	{
-		GM_ASSERT(renderMode == GMRenderMode::Deferred);
-		// 把渲染图形分为两组，可延迟渲染组和不可延迟渲染组，先渲染可延迟渲染的图形
-		groupGameObjects(objects, count);
-
-		if (d->deferredRenderingGameObjects.empty())
-		{
-			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
-		}
-		else
-		{
-			IGBuffer* gBuffer = getGBuffer();
-			gBuffer->geometryPass(d->deferredRenderingGameObjects.data(), d->deferredRenderingGameObjects.size());
-
-			{
-				if (filterMode != GMFilterMode::None)
-				{
-					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-					GM_ASSERT(filterFramebuffers);
-					filterFramebuffers->bind();
-					filterFramebuffers->clear();
-				}
-				gBuffer->lightPass();
-				if (filterMode != GMFilterMode::None)
-				{
-					IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-					filterFramebuffers->unbind();
-					getFilterQuad()->draw();
-					gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(filterFramebuffers);
-				}
-			}
-
-			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(GMDx11Framebuffers::getDefaultFramebuffers());
-			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
-		}
-	}
-}
-
 void GMDx11GraphicEngine::update(GMUpdateDataType type)
 {
 	D(d);
@@ -99,18 +43,6 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 		break;
 	}
 	}
-}
-
-void GMDx11GraphicEngine::addLight(const GMLight& light)
-{
-	D(d);
-	d->lights.push_back(light);
-}
-
-void GMDx11GraphicEngine::removeLights()
-{
-	D(d);
-	d->lights.clear();
 }
 
 void GMDx11GraphicEngine::clearStencil()
@@ -137,7 +69,7 @@ void GMDx11GraphicEngine::endBlend()
 	}
 }
 
-IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /*= GMShaderProgramType::CurrentShaderProgram*/)
+IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type)
 {
 	D(d);
 	return d->shaderProgram;
@@ -234,41 +166,14 @@ void GMDx11GraphicEngine::initShaders()
 {
 	D(d);
 	// 读取着色器
-	if (!d->shaderLoadCallback)
+	if (!getShaderLoadCallback())
 	{
 		gm_error("You must specify a IShaderLoadCallback");
 		GM_ASSERT(false);
 		return;
 	}
 
-	d->shaderLoadCallback->onLoadShaders(this);
-}
-
-void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
-{
-	D(d);
-	if (!count)
-		return;
-
-	IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-	if (filter != GMFilterMode::None)
-	{
-		filterFramebuffers->clear();
-		filterFramebuffers->bind();
-	}
-
-	draw(objects, count);
-
-	if (filter != GMFilterMode::None)
-	{
-		filterFramebuffers->unbind();
-		getFilterQuad()->draw();
-	}
-}
-void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
-{
-	D(d);
-	draw(objects, count);
+	getShaderLoadCallback()->onLoadShaders(this);
 }
 
 IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
@@ -300,22 +205,5 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	default:
 		GM_ASSERT(false);
 		return nullptr;
-	}
-}
-
-void GMDx11GraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
-{
-	D(d);
-	d->deferredRenderingGameObjects.clear();
-	d->deferredRenderingGameObjects.reserve(count);
-	d->forwardRenderingGameObjects.clear();
-	d->forwardRenderingGameObjects.reserve(count);
-
-	for (GMuint i = 0; i < count; i++)
-	{
-		if (objects[i]->canDeferredRendering())
-			d->deferredRenderingGameObjects.push_back(objects[i]);
-		else
-			d->forwardRenderingGameObjects.push_back(objects[i]);
 	}
 }
