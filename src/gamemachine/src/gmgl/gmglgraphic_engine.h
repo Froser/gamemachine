@@ -30,8 +30,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	bool needRefreshLights = true;
 	Vector<GMLight> lights;
 	bool engineReady = false;
-	GMRenderConfig renderConfig;
-	GMDebugConfig debugConfig;
+
 	// 著色器程序
 	GMGLShaderProgram* forwardShaderProgram = nullptr;
 	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
@@ -59,7 +58,6 @@ class GMGLGraphicEngine : public GMGraphicEngine
 	DECLARE_PRIVATE_AND_BASE(GMGLGraphicEngine, GMGraphicEngine)
 
 public:
-	GMGLGraphicEngine();
 	~GMGLGraphicEngine();
 
 public:
@@ -74,6 +72,7 @@ public:
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
 	virtual bool event(const GameMachineMessage& e) override { return false; }
+	virtual IFramebuffers* getDefaultFramebuffers() override;
 
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
 	{
@@ -91,12 +90,6 @@ public:
 	{
 		D(d);
 		return d->stencilOptions;
-	}
-
-	const GMFilterMode::Mode getCurrentFilterMode()
-	{
-		D(d);
-		return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
 	}
 
 public:
@@ -126,7 +119,6 @@ public:
 	}
 
 public:
-	void draw(GMGameObject* objects[], GMuint count);
 	void activateLights(IShaderProgram* shaderProgram);
 
 private:

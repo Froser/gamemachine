@@ -18,7 +18,6 @@ struct Button
 
 GM_PRIVATE_OBJECT(Demo_Button)
 {
-	gm::GMDemoGameWorld* demoWorld = nullptr;
 	gm::GMAsset border;
 	gm::GMRect textureGeo;
 	Button buttons[4];

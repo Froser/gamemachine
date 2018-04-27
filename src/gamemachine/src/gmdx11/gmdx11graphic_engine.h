@@ -34,8 +34,6 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMStencilOptions stencilOptions;
 	bool ready = false;
 	Vector<GMLight> lights;
-	bool needActivateLight = false;
-	GMRenderConfig renderConfig;
 
 	// 延迟渲染分组
 	Vector<GMGameObject*> deferredRenderingGameObjects;
@@ -58,6 +56,8 @@ public:
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
 	virtual bool event(const GameMachineMessage& e) override;
+	virtual IFramebuffers* getDefaultFramebuffers() override;
+
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override
 	{
 		D(d);
@@ -123,27 +123,14 @@ public:
 		return d->lights;
 	}
 
-	inline bool needActivateLight()
-	{
-		D(d);
-		return d->needActivateLight;
-	}
-
-	const GMFilterMode::Mode getCurrentFilterMode()
-	{
-		D(d);
-		return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
-	}
-
 	const GMVec2 getCurrentFilterKernelDelta()
 	{
-		D(d);
+		D_BASE(d, Base);
 		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
 	}
 
 public:
 	IRenderer* getRenderer(GMModelType objectType);
-	void draw(GMGameObject *objects[], GMuint count);
 
 private:
 	void initShaders();

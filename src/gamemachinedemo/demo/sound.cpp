@@ -10,7 +10,6 @@ Demo_Sound::~Demo_Sound()
 	gm::GM_delete(d->mp3Source);
 	gm::GM_delete(d->wavFile);
 	gm::GM_delete(d->mp3File);
-	gm::GM_delete(d->demoWorld);
 }
 
 void Demo_Sound::init()
@@ -18,8 +17,8 @@ void Demo_Sound::init()
 	D(d);
 	Base::init();
 
-	GM_ASSERT(!d->demoWorld);
-	d->demoWorld = new gm::GMDemoGameWorld();
+	GM_ASSERT(!getDemoWorldReference());
+	getDemoWorldReference() = new gm::GMDemoGameWorld();
 
 	// 读取边框
 	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
@@ -33,7 +32,7 @@ void Demo_Sound::init()
 	gm::ITexture* frameTexture = nullptr;
 	GM.getFactory()->createTexture(img, &frameTexture);
 	GM_ASSERT(frameTexture);
-	gm::GMAsset border = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
+	gm::GMAsset border = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 	gm::GMRect rect = { 350, 220, 100, 300 };
@@ -119,7 +118,7 @@ void Demo_Sound::init()
 		}
 	}
 
-	d->demoWorld->addControl(listbox);
+	getDemoWorldReference()->addControl(listbox);
 	GM_delete(img);
 }
 
@@ -134,13 +133,13 @@ void Demo_Sound::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
-		d->demoWorld->simulateGameWorld();
+		getDemoWorldReference()->simulateGameWorld();
 		break;
 	case gm::GameMachineEvent::Render:
-		d->demoWorld->renderScene();
+		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
-		d->demoWorld->notifyControls();
+		getDemoWorldReference()->notifyControls();
 		break;
 	case gm::GameMachineEvent::Deactivate:
 		break;

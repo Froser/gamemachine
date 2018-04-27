@@ -5,18 +5,12 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Texture)
-{
-	gm::GMDemoGameWorld* demoWorld = nullptr;
-};
-
 class Demo_Texture : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_Texture, DemoHandler)
+	typedef DemoHandler Base;
 
 public:
 	using Base::Base;
-	~Demo_Texture();
 
 public:
 	virtual void init() override;
@@ -25,8 +19,10 @@ public:
 
 class Demo_Texture_Index : public Demo_Texture
 {
+	typedef Demo_Texture Base;
+
 public:
-	using Demo_Texture::Demo_Texture;
+	using Base::Base;
 
 public:
 	virtual void init() override;

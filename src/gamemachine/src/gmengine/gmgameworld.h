@@ -14,6 +14,12 @@ class GMCharacter;
 class GMModelPainter;
 class GMPhysicsWorld;
 
+enum class GMRenderPreference
+{
+	PreferForwardRendering,
+	PreferDeferredRendering,
+};
+
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	GMPhysicsWorld* physicsWorld = nullptr;
@@ -22,12 +28,14 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	Vector<GMGameObject*> controls_objectType;
 	GMAssets assets;
 	bool start = false;
+	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
 };
 
 class GMGameWorld : public GMObject
 {
 	DECLARE_PRIVATE(GMGameWorld)
 	GM_FRIEND_CLASS(GMPhysicsWorld)
+	GM_DECLARE_PROPERTY(RenderPreference, renderPreference, GMRenderPreference)
 
 public:
 	GMGameWorld() = default;
@@ -48,10 +56,11 @@ public:
 
 	inline Vector<GMControlGameObject*>& getControls() { D(d); return d->controls; }
 	inline Vector<GMGameObject*>& getControlsGameObject() { D(d); return d->controls_objectType; }
-	inline const Set<GMGameObject*>& getGameObjects(GMGameObjectType type) { D(d); return d->gameObjects[type]; }
-	inline void addLight(const GMLight& light) { GM.getGraphicEngine()->addLight(light); }
-	inline void removeLights() { GM.getGraphicEngine()->removeLights(); }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
+
+	const Set<GMGameObject*>& getGameObjects(GMGameObjectType type);
+	void addLight(const GMLight& light);
+	void removeLights();
 
 private:
 	void simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> gameObjects);

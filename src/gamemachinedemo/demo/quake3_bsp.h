@@ -19,7 +19,6 @@ class Demo_Quake3_BSP : public DemoHandler
 
 public:
 	using Base::Base;
-	~Demo_Quake3_BSP();
 
 public:
 	virtual void init() override;

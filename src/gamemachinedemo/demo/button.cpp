@@ -5,8 +5,6 @@
 Demo_Button::~Demo_Button()
 {
 	D(d);
-	gm::GM_delete(d->demoWorld);
-
 	for (gm::GMint i = 0; i < GM_array_size(d->buttons); ++i)
 	{
 		GM_delete(d->buttons[i].animation);
@@ -16,16 +14,18 @@ Demo_Button::~Demo_Button()
 void Demo_Button::init()
 {
 	D(d);
+	D_BASE(db, Base);
 	Base::init();
 
-	GM_ASSERT(!d->demoWorld);
-	d->demoWorld = new gm::GMDemoGameWorld();
+	GM_ASSERT(!getDemoWorldReference());
+	getDemoWorldReference() = new gm::GMDemoGameWorld();
 	initBorder();
 }
 
 void Demo_Button::event(gm::GameMachineEvent evt)
 {
 	D(d);
+	D_BASE(db, Base);
 	Base::event(evt);
 	switch (evt)
 	{
@@ -34,7 +34,7 @@ void Demo_Button::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
-		d->demoWorld->simulateGameWorld();
+		getDemoWorldReference()->simulateGameWorld();
 		break;
 	case gm::GameMachineEvent::Render:
 	{
@@ -43,11 +43,11 @@ void Demo_Button::event(gm::GameMachineEvent evt)
 			if (d->buttons[i].animation)
 				d->buttons[i].animation->update();
 		}
-		d->demoWorld->renderScene();
+		getDemoWorldReference()->renderScene();
 		break;
 	}
 	case gm::GameMachineEvent::Activate:
-		d->demoWorld->notifyControls();
+		getDemoWorldReference()->notifyControls();
 		break;
 	case gm::GameMachineEvent::Deactivate:
 		break;
@@ -61,6 +61,7 @@ void Demo_Button::event(gm::GameMachineEvent evt)
 void Demo_Button::initBorder()
 {
 	D(d);
+	D_BASE(db, Base);
 	if (!d->border.asset)
 	{
 		// 读取边框
@@ -74,7 +75,7 @@ void Demo_Button::initBorder()
 		gm::ITexture* frameTexture = nullptr;
 		GM.getFactory()->createTexture(border, &frameTexture);
 		GM_ASSERT(frameTexture);
-		d->border = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
+		d->border = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 		d->textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
 		{
@@ -84,7 +85,7 @@ void Demo_Button::initBorder()
 			gm::GMRect rect = { 50, 30, 400, 40 };
 			button->setGeometry(rect);
 			button->setText("This is a scaling button");
-			d->demoWorld->addControl(button);
+			getDemoWorldReference()->addControl(button);
 		}
 
 		{
@@ -94,7 +95,7 @@ void Demo_Button::initBorder()
 			gm::GMRect rect = { 50, 100, 400, 40 };
 			button->setGeometry(rect);
 			button->setText("This is a translation button");
-			d->demoWorld->addControl(button);
+			getDemoWorldReference()->addControl(button);
 		}
 
 		{
@@ -105,7 +106,7 @@ void Demo_Button::initBorder()
 			gm::GMRect rect = { 50, 170, 400, 40 };
 			button->setGeometry(rect);
 			button->setText("This is a rotation button");
-			d->demoWorld->addControl(button);
+			getDemoWorldReference()->addControl(button);
 		}
 
 		{
@@ -117,7 +118,7 @@ void Demo_Button::initBorder()
 			gm::GMRect rect = { 50, 240, 400, 40 };
 			button->setGeometry(rect);
 			button->setText("This is a mixed button");
-			d->demoWorld->addControl(button);
+			getDemoWorldReference()->addControl(button);
 		}
 
 		GM_delete(border);

@@ -5,18 +5,11 @@
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-GM_PRIVATE_OBJECT(Demo_Literature)
-{
-	gm::GMDemoGameWorld* demoWorld = nullptr;
-};
-
 class Demo_Literature : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_Literature, DemoHandler)
-
+	typedef DemoHandler Base;
 public:
-	using Base::Base;
-	~Demo_Literature();
+	using DemoHandler::DemoHandler;
 
 public:
 	virtual void init() override;

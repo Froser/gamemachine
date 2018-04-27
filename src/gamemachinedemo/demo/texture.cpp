@@ -2,19 +2,13 @@
 #include "texture.h"
 #include <linearmath.h>
 
-Demo_Texture::~Demo_Texture()
-{
-	D(d);
-	gm::GM_delete(d->demoWorld);
-}
-
 void Demo_Texture::init()
 {
 	D(d);
 	Base::init();
 
 	// 创建对象
-	d->demoWorld = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld();
 
 	// 创建一个纹理
 	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
@@ -33,16 +27,16 @@ void Demo_Texture::init()
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
-	} cb(d->demoWorld);
+	} cb(asDemoGameWorld(getDemoWorldReference()));
 
 	// 创建一个带纹理的对象
 	gm::GMfloat extents[] = { 1.f, .5f, .5f };
 	gm::GMfloat pos[] = { 0, 0, 0 };
 	gm::GMModel* model;
 	gm::GMPrimitiveCreator::createQuad(extents, pos, &model, &cb);
-	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, model);
+	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
-	d->demoWorld->addObject("texture", obj);
+	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
 }
 
 void Demo_Texture::event(gm::GameMachineEvent evt)
@@ -57,10 +51,10 @@ void Demo_Texture::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
-		d->demoWorld->simulateGameWorld();
+		getDemoWorldReference()->simulateGameWorld();
 		break;
 	case gm::GameMachineEvent::Render:
-		d->demoWorld->renderScene();
+		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
 	{
@@ -69,7 +63,7 @@ void Demo_Texture::event(gm::GameMachineEvent evt)
 		if (kbState.keyTriggered('N'))
 			switchNormal();
 
-		d->demoWorld->notifyControls();
+		getDemoWorldReference()->notifyControls();
 		break;
 	}
 	case gm::GameMachineEvent::Deactivate:
@@ -87,7 +81,7 @@ void Demo_Texture_Index::init()
 	Base::init();
 
 	// 创建对象
-	d->demoWorld = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld();
 
 	gm::GMModel* quad = new gm::GMModel();
 	quad->setPrimitiveTopologyMode(gm::GMTopologyMode::Triangles);
@@ -120,8 +114,8 @@ void Demo_Texture_Index::init()
 	gm::ITexture* tex = nullptr;
 	gm::GMToolUtil::createTexture("gamemachine.png", &tex);
 	gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-	d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+	getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 
-	gm::GMAsset quadAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, quad);
-	d->demoWorld->addObject("texture", new gm::GMGameObject(quadAsset));
+	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, quad);
+	asDemoGameWorld(getDemoWorldReference())->addObject("texture", new gm::GMGameObject(quadAsset));
 }

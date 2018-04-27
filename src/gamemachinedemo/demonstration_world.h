@@ -4,15 +4,17 @@
 #include <gamemachine.h>
 #include <gm2dgameobject.h>
 #include <gmgl.h>
+#include <gmdemogameworld.h>
 
 class DemostrationWorld;
 GM_PRIVATE_OBJECT(DemoHandler)
 {
 	gm::GMRenderConfig renderConfig;
 	gm::GMDebugConfig debugConfig;
-	DemostrationWorld* demostrationWorld;
+	DemostrationWorld* parentDemonstrationWorld = nullptr;
 	bool inited = false;
 	bool activating = false;
+	gm::GMGameWorld* demoWorld = nullptr;
 };
 
 class DemoHandler : public gm::GMObject
@@ -20,7 +22,8 @@ class DemoHandler : public gm::GMObject
 	DECLARE_PRIVATE(DemoHandler)
 
 public:
-	DemoHandler(DemostrationWorld* demostrationWorld);
+	DemoHandler(DemostrationWorld* parentDemonstrationWorld);
+	~DemoHandler();
 
 public:
 	virtual void init();
@@ -37,6 +40,12 @@ protected:
 	void backToEntrance();
 	bool isActivating();
 	void switchNormal();
+
+	inline gm::GMGameWorld*& getDemoWorldReference()
+	{
+		D(d);
+		return d->demoWorld;
+	}
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
@@ -102,5 +111,10 @@ private:
 	virtual void start() override;
 	virtual void event(gm::GameMachineEvent evt) override;
 };
+
+inline gm::GMDemoGameWorld* asDemoGameWorld(gm::GMGameWorld* world)
+{
+	return gm::gm_cast<gm::GMDemoGameWorld*>(world);
+}
 
 #endif

@@ -43,7 +43,10 @@ void GMDx11GBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 	D(d);
 	setGeometryPassingState(GMGeometryPassingState::PassingGeometry);
 	getGeometryFramebuffers()->clear();
-	d->engine->draw(objects, count);
+	for (GMuint i = 0; i < count; ++i)
+	{
+		objects[i]->draw();
+	}
 	setGeometryPassingState(GMGeometryPassingState::Done);
 }
 

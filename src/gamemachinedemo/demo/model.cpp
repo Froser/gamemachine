@@ -16,13 +16,6 @@ namespace
 	);
 }
 
-Demo_Model::~Demo_Model()
-{
-	D(d);
-	gm::GM_delete(d->demoWorld);
-}
-
-
 void Demo_Model::onDeactivate()
 {
 	D(d);
@@ -47,11 +40,11 @@ void Demo_Model::init()
 	Base::init();
 
 	// 创建对象
-	d->demoWorld = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld();
 
 	gm::ITexture* texture = nullptr;
 	gm::GMToolUtil::createTexture("bnp.png", &texture);
-	d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+	getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
 	gm::GMModelLoadSettings loadSettings(
@@ -68,7 +61,7 @@ void Demo_Model::init()
 		model->getShader().getMaterial().ka = model->getShader().getMaterial().kd = model->getShader().getMaterial().ks = GMVec3(0);
 	}
 
-	gm::GMAsset asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Models, models);
+	gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Models, models);
 	d->gameObject = new gm::GMGameObject(asset);
 	d->gameObject->setTranslation(Translate(GMVec3(0.f, .25f, 0)));
 	d->gameObject->setScaling(Scale(GMVec3(.015f, .015f, .015f)));
@@ -84,7 +77,7 @@ void Demo_Model::init()
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
 
-		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject2 = new gm::GMGameObject(asset);
 		d->gameObject2->setTranslation(Translate(GMVec3(-0.25f, .25f, 0)));
 		d->gameObject2->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
@@ -94,13 +87,13 @@ void Demo_Model::init()
 		gm::GMModel* cube = nullptr;
 		gm::GMPrimitiveCreator::createCube(gm::GMPrimitiveCreator::one3(), &cube);
 		gm::ITexture* texture = nullptr;
-		d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 		gm::GMShader& shader = cube->getShader();
 		shader.getMaterial().refractivity = 0.658f;
 		shader.getMaterial().kd = shader.getMaterial().ks = shader.getMaterial().ka = GMVec3(0);
 
-		asset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, cube);
+		asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, cube);
 		d->gameObject3 = new gm::GMGameObject(asset);
 		d->gameObject3->setTranslation(Translate(GMVec3(0.25f, .25f, 0)));
 		d->gameObject3->setScaling(Scale(GMVec3(.1f, .1f, .1f)));
@@ -110,10 +103,10 @@ void Demo_Model::init()
 	d->skyObject = createCubeMap();
 	d->skyObject->setScaling(Scale(GMVec3(100, 100, 100)));
 
-	d->demoWorld->addObject("cat", d->gameObject);
-	d->demoWorld->addObject("cube_with_normalmap", d->gameObject2);
-	d->demoWorld->addObject("cube", d->gameObject3);
-	d->demoWorld->addObject("sky", d->skyObject);
+	asDemoGameWorld(getDemoWorldReference())->addObject("cat", d->gameObject);
+	asDemoGameWorld(getDemoWorldReference())->addObject("cube_with_normalmap", d->gameObject2);
+	asDemoGameWorld(getDemoWorldReference())->addObject("cube", d->gameObject3);
+	asDemoGameWorld(getDemoWorldReference())->addObject("sky", d->skyObject);
 }
 
 void Demo_Model::handleMouseEvent()
@@ -304,16 +297,16 @@ void Demo_Model::event(gm::GameMachineEvent evt)
 	case gm::GameMachineEvent::FrameEnd:
 		break;
 	case gm::GameMachineEvent::Simulate:
-		d->demoWorld->simulateGameWorld();
+		getDemoWorldReference()->simulateGameWorld();
 		break;
 	case gm::GameMachineEvent::Render:
-		d->demoWorld->renderScene();
+		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
 	{
 		handleMouseEvent();
 		handleDragging();
-		d->demoWorld->notifyControls();
+		getDemoWorldReference()->notifyControls();
 
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();

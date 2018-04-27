@@ -21,19 +21,13 @@ namespace
 	};
 }
 
-Demo_Collision::~Demo_Collision()
-{
-	D(d);
-	gm::GM_delete(d->demoWorld);
-}
-
 void Demo_Collision::init()
 {
 	D(d);
 	Base::init();
 
-	d->demoWorld = new gm::GMDemoGameWorld();
-	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(d->demoWorld);
+	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(getDemoWorldReference());
 	d->ground = new gm::GMGameObject();
 	d->ground->setTranslation(Translate(GMVec3(0, -50, 0)));
 
@@ -43,7 +37,7 @@ void Demo_Collision::init()
 
 	gm::GMPhysicsShape* groundShape = nullptr;
 	gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(50, 50, 50), &groundShape);
-	rigidGround->setShape(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, groundShape));
+	rigidGround->setShape(getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, groundShape));
 
 	gm::GMModel* groundShapeModel = nullptr;
 	gm::GMBulletHelper::createModelFromShape(groundShape, &groundShapeModel);
@@ -53,19 +47,19 @@ void Demo_Collision::init()
 	groundShapeModel->getShader().getMaterial().kd = GMVec3(.1f);
 	groundShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
 	groundShapeModel->getShader().getMaterial().shininess = 9;
-	d->ground->addModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, groundShapeModel));
+	d->ground->addModel(getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, groundShapeModel));
 
 	// add to physics world
 	physicsWorld->addRigidObject(rigidGround);
 
 	// add to graphic world
-	d->demoWorld->addObject(L"ground", d->ground);
+	asDemoGameWorld(getDemoWorldReference())->addObject(L"ground", d->ground);
 
 	// create box
 	{
 		gm::GMPhysicsShape* boxShape = nullptr;
 		gm::GMPhysicsShapeCreator::createBoxShape(GMVec3(.1f, .1f, .1f), &boxShape);
-		gm::GMAsset boxAsset = d->demoWorld->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, boxShape);
+		gm::GMAsset boxAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::PhysicsShape, boxShape);
 
 		gm::GMint idx = 0;
 		for (gm::GMint k = 0; k < ARRAY_SIZE_Y; k++)
@@ -94,10 +88,10 @@ void Demo_Collision::init()
 					boxShapeModel->getShader().getMaterial().ks = GMVec3(.4f);
 					boxShapeModel->getShader().getMaterial().shininess = 99;
 
-					box->addModel(d->demoWorld->getAssets().insertAsset(gm::GMAssetType::Model, boxShapeModel));
+					box->addModel(getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, boxShapeModel));
 
 					physicsWorld->addRigidObject(rigidBoxObj);
-					d->demoWorld->addObject(gm::GMString(idx), box);
+					asDemoGameWorld(getDemoWorldReference())->addObject(gm::GMString(idx), box);
 				}
 			}
 		}
@@ -116,12 +110,12 @@ void Demo_Collision::event(gm::GameMachineEvent evt)
 		break;
 	case gm::GameMachineEvent::Simulate:
 	{
-		d->demoWorld->getPhysicsWorld()->simulate(nullptr);
+		getDemoWorldReference()->getPhysicsWorld()->simulate(nullptr);
 		const gm::GMMotionStates& states = d->firstPhyObj->getMotionStates(); // Get current motion states
 		break;
 	}
 	case gm::GameMachineEvent::Render:
-		d->demoWorld->renderScene();
+		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineEvent::Activate:
 		onWindowActivate();

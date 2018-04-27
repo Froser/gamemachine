@@ -79,9 +79,11 @@ void GMGLGBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 	activeFramebuffers = getGeometryFramebuffers();
 	activeFramebuffers->clear();
 	activeFramebuffers->bind();
-	d->engine->draw(objects, count);
+	for (GMuint i = 0; i < count; ++i)
+	{
+		objects[i]->draw();
+	}
 	activeFramebuffers->unbind();
-
 	setGeometryPassingState(GMGeometryPassingState::Done);
 }
 

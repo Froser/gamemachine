@@ -93,3 +93,19 @@ void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, Set<GMGameObject*> g
 		gameObject->updateAfterSimulate();
 	}
 }
+
+const Set<GMGameObject*>& GMGameWorld::getGameObjects(GMGameObjectType type)
+{
+	D(d);
+	return d->gameObjects[type];
+}
+
+void GMGameWorld::addLight(const GMLight& light)
+{
+	GM.getGraphicEngine()->addLight(light);
+}
+
+void GMGameWorld::removeLights()
+{
+	GM.getGraphicEngine()->removeLights();
+}

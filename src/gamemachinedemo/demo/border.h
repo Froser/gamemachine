@@ -16,7 +16,6 @@ class Demo_Border : public DemoHandler
 
 public:
 	using Base::Base;
-	~Demo_Border();
 
 public:
 	virtual void init() override;

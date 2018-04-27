@@ -50,13 +50,6 @@ extern "C"
 	}
 }
 
-GMGLGraphicEngine::GMGLGraphicEngine()
-{
-	D(d);
-	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
-	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
-}
-
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
@@ -102,6 +95,7 @@ void GMGLGraphicEngine::newFrame()
 void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 {
 	D(d);
+	D_BASE(db, Base);
 	GM_PROFILE("drawObjects");
 	if (!count)
 		return;
@@ -113,7 +107,7 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 		getFilterFramebuffers()->clear();
 	}
 
-	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
+	GMRenderMode renderMode = db->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
 	if (renderMode == GMRenderMode::Forward)
 	{
 		forwardDraw(objects, count);
@@ -150,14 +144,14 @@ void GMGLGraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 
 			{
 				// 预览GBuffer
-				GMint fbIdx = d->debugConfig.get(GMDebugConfigs::FrameBufferIndex_I32).toInt();
+				GMint fbIdx = db->debugConfig.get(GMDebugConfigs::FrameBufferIndex_I32).toInt();
 				if (fbIdx > 0)
 				{
 					GMRect rect = {
-						d->debugConfig.get(GMDebugConfigs::FrameBufferPositionX_I32).toInt(),
-						d->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
-						d->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
-						d->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt()
+						db->debugConfig.get(GMDebugConfigs::FrameBufferPositionX_I32).toInt(),
+						db->debugConfig.get(GMDebugConfigs::FrameBufferPositionY_I32).toInt(),
+						db->debugConfig.get(GMDebugConfigs::FrameBufferWidth_I32).toInt(),
+						db->debugConfig.get(GMDebugConfigs::FrameBufferHeight_I32).toInt()
 					};
 					GMGLGBuffer* gmglgBuffer = gm_cast<GMGLGBuffer*>(gBuffer);
 					gmglgBuffer->drawGeometryBuffer(fbIdx - 1, rect);
@@ -245,15 +239,6 @@ void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 	}
 	shaderProgram->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
 	shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
-}
-
-void GMGLGraphicEngine::draw(GMGameObject *objects[], GMuint count)
-{
-	D(d);
-	for (GMuint i = 0; i < count; i++)
-	{
-		objects[i]->draw();
-	}
 }
 
 void GMGLGraphicEngine::groupGameObjects(GMGameObject *objects[], GMuint count)
@@ -465,6 +450,11 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 		GM_ASSERT(type == GMShaderProgramType::DeferredLightPassShaderProgram);
 		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER];
 	}
+}
+
+IFramebuffers* GMGLGraphicEngine::getDefaultFramebuffers()
+{
+	return GMGLFramebuffers::getDefaultFramebuffers();
 }
 
 //////////////////////////////////////////////////////////////////////////

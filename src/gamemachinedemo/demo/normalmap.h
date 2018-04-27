@@ -7,7 +7,6 @@
 
 GM_PRIVATE_OBJECT(Demo_NormalMap)
 {
-	gm::GMDemoGameWorld* demoWorld = nullptr;
 	GMQuat rotation;
 	gm::GMfloat angle = 0.f;
 	bool rotate = true;
@@ -20,7 +19,6 @@ class Demo_NormalMap : public DemoHandler
 
 public:
 	using Base::Base;
-	~Demo_NormalMap();
 
 public:
 	virtual void init() override;

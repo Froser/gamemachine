@@ -27,6 +27,8 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMScopePtr<GMModel> filterQuadModel;
 	GMFramebuffersStack framebufferStack;
 	IGBuffer* gBuffer = nullptr;
+	GMRenderConfig renderConfig;
+	GMDebugConfig debugConfig;
 };
 
 class GMGraphicEngine : public GMObject, public IGraphicEngine
@@ -34,31 +36,37 @@ class GMGraphicEngine : public GMObject, public IGraphicEngine
 	DECLARE_PRIVATE(GMGraphicEngine)
 
 public:
+	GMGraphicEngine();
 	~GMGraphicEngine();
 
 public:
-	IGBuffer* getGBuffer();
+	virtual IGBuffer* getGBuffer() override;
+	virtual IFramebuffers* getFilterFramebuffers() override;
+	virtual void draw(
+		GMGameObject *forwardRenderingObjects[],
+		GMuint forwardRenderingCount,
+		GMGameObject *deferredRenderingObjects[],
+		GMuint deferredRenderingCount) override;
 
 public:
-	GMFramebuffersStack& getFramebuffersStack()
+	const GMFilterMode::Mode getCurrentFilterMode();
+
+protected:
+	void createFilterFramebuffer();
+	void draw(GMGameObject *objects[], GMuint count);
+
+public:
+	inline GMFramebuffersStack& getFramebuffersStack()
 	{
 		D(d);
 		return d->framebufferStack;
 	}
 
 protected:
-	void createFilterFramebuffer();
-
 	inline GMGameObject* getFilterQuad()
 	{
 		D(d);
 		return d->filterQuad;
-	}
-
-	inline IFramebuffers* getFilterFramebuffers()
-	{
-		D(d);
-		return d->filterFramebuffers;
 	}
 
 private:

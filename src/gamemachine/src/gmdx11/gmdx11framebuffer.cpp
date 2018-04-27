@@ -183,8 +183,7 @@ void GMDx11Framebuffer::setName(const GMString& name)
 {
 	D(d);
 	d->name = name;
-	if (d->renderTexture)
-		GM_ASSERT(!"Please call setName before init.");
+	GM_ASSERT(!d->renderTexture && "Please call setName before init.");
 }
 
 ITexture* GMDx11Framebuffer::getTexture()

@@ -39,12 +39,18 @@ namespace
 	}
 }
 
-DemoHandler::DemoHandler(DemostrationWorld* demostrationWorld)
+DemoHandler::DemoHandler(DemostrationWorld* parentDemonstrationWorld)
 {
 	D(d);
-	d->demostrationWorld = demostrationWorld;
+	d->parentDemonstrationWorld = parentDemonstrationWorld;
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
+}
+
+DemoHandler::~DemoHandler()
+{
+	D(d);
+	GM_delete(getDemoWorldReference());
 }
 
 void DemoHandler::init()
@@ -71,7 +77,7 @@ void DemoHandler::onActivate()
 void DemoHandler::onDeactivate()
 {
 	D(d);
-	d->demostrationWorld->resetProjectionAndEye();
+	d->parentDemonstrationWorld->resetProjectionAndEye();
 	GM.getGraphicEngine()->removeLights();
 	d->renderConfig.set(gm::GMRenderConfigs::FilterMode, gm::GMFilterMode::None);
 	d->activating = false;
@@ -97,6 +103,14 @@ void DemoHandler::event(gm::GameMachineEvent evt)
 
 		if (kbState.keyTriggered('I'))
 			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
+
+		if (kbState.keyTriggered('T'))
+		{
+			if (getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferDeferredRendering)
+				getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferForwardRendering);
+			else
+				getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferDeferredRendering);
+		}
 		break;
 	}
 }
@@ -128,7 +142,7 @@ void DemoHandler::setDefaultLights()
 void DemoHandler::backToEntrance()
 {
 	D(d);
-	d->demostrationWorld->setCurrentDemo(nullptr);
+	d->parentDemonstrationWorld->setCurrentDemo(nullptr);
 	onDeactivate();
 }
 

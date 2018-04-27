@@ -4,6 +4,8 @@
 #include "gmassets.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/gameobjects/gmgameobject.h"
+#include "foundation/gmprofile.h"
+#include "foundation/gmconfigs.h"
 
 void GMFramebuffersStack::push(IFramebuffers* framebuffers)
 {
@@ -30,6 +32,13 @@ IFramebuffers* GMFramebuffersStack::peek()
 	return d->framebuffers.top();
 }
 
+GMGraphicEngine::GMGraphicEngine()
+{
+	D(d);
+	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
+	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+}
+
 GMGraphicEngine::~GMGraphicEngine()
 {
 	D(d);
@@ -47,6 +56,83 @@ IGBuffer* GMGraphicEngine::getGBuffer()
 		d->gBuffer->init();
 	}
 	return d->gBuffer;
+}
+
+IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
+{
+	D(d);
+	return d->filterFramebuffers;
+}
+
+void GMGraphicEngine::draw(
+	GMGameObject *forwardRenderingObjects[],
+	GMuint forwardRenderingCount,
+	GMGameObject *deferredRenderingObjects[],
+	GMuint deferredRenderingCount)
+{
+	GM_PROFILE("draw");
+	GMFilterMode::Mode filterMode = getCurrentFilterMode();
+	if (filterMode != GMFilterMode::None)
+	{
+		createFilterFramebuffer();
+		getFilterFramebuffers()->clear();
+	}
+
+	if (deferredRenderingObjects && deferredRenderingCount > 0)
+	{
+		IGBuffer* gBuffer = getGBuffer();
+		gBuffer->geometryPass(deferredRenderingObjects, deferredRenderingCount);
+
+		if (filterMode != GMFilterMode::None)
+		{
+			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+			GM_ASSERT(filterFramebuffers);
+			filterFramebuffers->bind();
+			filterFramebuffers->clear();
+		}
+		gBuffer->lightPass();
+		if (filterMode != GMFilterMode::None)
+		{
+			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+			filterFramebuffers->unbind();
+			getFilterQuad()->draw();
+			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(filterFramebuffers);
+		}
+		gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getDefaultFramebuffers());
+	}
+
+	if (forwardRenderingObjects && forwardRenderingCount > 0)
+	{
+		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
+		if (filterMode != GMFilterMode::None)
+		{
+			filterFramebuffers->clear();
+			filterFramebuffers->bind();
+		}
+
+		draw(forwardRenderingObjects, forwardRenderingCount);
+
+		if (filterMode != GMFilterMode::None)
+		{
+			filterFramebuffers->unbind();
+			getFilterQuad()->draw();
+		}
+	}
+}
+
+void GMGraphicEngine::draw(GMGameObject *objects[], GMuint count)
+{
+	D(d);
+	for (GMuint i = 0; i < count; i++)
+	{
+		objects[i]->draw();
+	}
+}
+
+const GMFilterMode::Mode GMGraphicEngine::getCurrentFilterMode()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
 }
 
 void GMGraphicEngine::createFilterFramebuffer()

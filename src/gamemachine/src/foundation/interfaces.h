@@ -426,9 +426,44 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual void drawObjects(GMGameObject *objects[], GMuint count) = 0;
 
+	//! 获取引擎G缓存。
+	/*!
+	  使用G缓存可以灵活进行延迟渲染。
+	  \return 当前的G缓存。
+	*/
+	virtual IGBuffer* getGBuffer() = 0;
+
+	//! 获取滤镜帧缓存。
+	/*!
+	  使用滤镜帧缓存，可以为画面渲染各种各样的滤镜。
+	  \return 当前滤镜帧缓存。
+	*/
+	virtual IFramebuffers* getFilterFramebuffers() = 0;
+
+	//! 获取系统默认帧缓存。
+	/*!
+	  不得对系统默认帧缓存的属性进行更改，只允许对其数据进行修改，如覆盖深度、模板缓存。
+	  \return 系统默认帧缓存。
+	*/
+	virtual IFramebuffers* getDefaultFramebuffers() = 0;
+
+	//! 使用正向绘制对象。
+	/*!
+	  渲染引擎将先绘制延迟渲染对象，然后再绘制正向渲染对象。
+	  \param forwardRenderingObjects 正向渲染对象数组。
+	  \param forwardRenderingCount 正向渲染对象数量。
+	  \param deferredRenderingObjects 延迟渲染对象数组。
+	  \param deferredRenderingCount 延迟渲染对象数量。
+	*/
+	virtual void draw(
+		GMGameObject *forwardRenderingObjects[],
+		GMuint forwardRenderingCount,
+		GMGameObject *deferredRenderingObjects[],
+		GMuint deferredRenderingCount) = 0;
+
 	//! 更新绘制数据。
 	/*!
-	  调用此方法会将数据更新到绘制的着色器程序中。
+	  通知渲染引擎某些状态发生了变化。
 	  \param type 需要更新的数据类型。
 	*/
 	virtual void update(GMUpdateDataType type) = 0;

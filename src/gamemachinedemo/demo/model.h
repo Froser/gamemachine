@@ -7,7 +7,6 @@
 
 GM_PRIVATE_OBJECT(Demo_Model)
 {
-	gm::GMDemoGameWorld* demoWorld = nullptr;
 	gm::GMGameObject* gameObject = nullptr;
 	gm::GMGameObject* gameObject2 = nullptr;
 	gm::GMGameObject* gameObject3 = nullptr;
@@ -25,7 +24,6 @@ class Demo_Model : public DemoHandler
 
 public:
 	using Base::Base;
-	~Demo_Model();
 
 public:
 	virtual void init() override;

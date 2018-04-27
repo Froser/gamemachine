@@ -10,15 +10,14 @@
 void GMDx11GraphicEngine::init()
 {
 	D(d);
+	D_BASE(db, Base);
 	if (d->ready)
 		initShaders();
 	else
 		GM_ASSERT(false);
 
-	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
-
 	const GMRect& renderRect = GM.getGameMachineRunningStates().renderRect;
-	d->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1, 1));
+	db->renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1, 1));
 }
 
 void GMDx11GraphicEngine::newFrame()
@@ -42,9 +41,7 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 	if (filterMode != GMFilterMode::None)
 		createFilterFramebuffer();
 
-	d->needActivateLight = true;
-
-	GMRenderMode renderMode = d->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
+	GMRenderMode renderMode = db->renderConfig.get(GMRenderConfigs::RenderMode).toEnum<GMRenderMode>();
 	if (renderMode == GMRenderMode::Forward)
 	{
 		forwardDraw(objects, count, filterMode);
@@ -86,7 +83,6 @@ void GMDx11GraphicEngine::drawObjects(GMGameObject *objects[], GMuint count)
 			forwardDraw(d->forwardRenderingGameObjects.data(), d->forwardRenderingGameObjects.size(), filterMode);
 		}
 	}
-	d->needActivateLight = false;
 }
 
 void GMDx11GraphicEngine::update(GMUpdateDataType type)
@@ -145,6 +141,11 @@ IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type /
 {
 	D(d);
 	return d->shaderProgram;
+}
+
+IFramebuffers* GMDx11GraphicEngine::getDefaultFramebuffers()
+{
+	return GMDx11Framebuffers::getDefaultFramebuffers();
 }
 
 bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
@@ -264,15 +265,6 @@ void GMDx11GraphicEngine::forwardDraw(GMGameObject *objects[], GMuint count, GMF
 		getFilterQuad()->draw();
 	}
 }
-
-void GMDx11GraphicEngine::draw(GMGameObject *objects[], GMuint count)
-{
-	for (GMuint i = 0; i < count; i++)
-	{
-		objects[i]->draw();
-	}
-}
-
 void GMDx11GraphicEngine::directDraw(GMGameObject *objects[], GMuint count, GMFilterMode::Mode filter)
 {
 	D(d);

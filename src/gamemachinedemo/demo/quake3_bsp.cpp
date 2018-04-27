@@ -4,12 +4,6 @@
 #include <gmbspgameworld.h>
 #include <gmbspfactory.h>
 
-Demo_Quake3_BSP::~Demo_Quake3_BSP()
-{
-	D(d);
-	gm::GM_delete(d->world);
-}
-
 void Demo_Quake3_BSP::onActivate()
 {
 	D(d);
@@ -55,11 +49,13 @@ void Demo_Quake3_BSP::setMouseTrace(bool enabled)
 void Demo_Quake3_BSP::init()
 {
 	D(d);
+	D_BASE(db, Base);
 	Base::init();
 	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 	inputManager->getKeyboardState().setIMEState(false);
 
 	gm::GMBSPFactory::createBSPGameWorld("gv.bsp", &d->world);
+	db->demoWorld = d->world;
 	d->sprite = static_cast<gm::GMSpriteGameObject*> (
 		const_cast<gm::GMGameObject*> (
 			*(d->world->getGameObjects(gm::GMGameObjectType::Sprite).begin())
