@@ -86,6 +86,8 @@ set(SOURCES
 		gmgl/gmgltexture.cpp
 		gmgl/gmglframebuffer.h
 		gmgl/gmglframebuffer.cpp
+		gmgl/gmgllight.h
+		gmgl/gmgllight.cpp
 		gmgl/shader_constants.h
 		gmphysics/gmphysicsworld.h
 		gmphysics/gmphysicsworld.cpp

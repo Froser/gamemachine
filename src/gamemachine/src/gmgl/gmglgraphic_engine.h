@@ -93,7 +93,7 @@ public:
 	}
 
 public:
-	void activateLights(IShaderProgram* shaderProgram);
+	void activateLights(IRenderer* renderer);
 
 private:
 	void installShaders();

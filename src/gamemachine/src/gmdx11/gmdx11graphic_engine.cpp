@@ -7,11 +7,6 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdx11gbuffer.h"
 
-namespace
-{
-	constexpr GMint GMDX11_MAX_LIGHT_COUNT = 5; //灯光最大数量
-}
-
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -50,14 +45,14 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	}
 }
 
-void GMDx11GraphicEngine::activateLight(IRenderer* renderer)
+void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
 {
 	D(d);
 	if (!d->defaultLightImpl)
 	{
 		GM.getFactory()->createLight(GMLightType::Ambient, &d->defaultLightImpl);
 		d->defaultLightImpl->setLightColor(ValuePointer(Zero<GMVec4>()));
-		for (GMuint i = 0; i < GMDX11_MAX_LIGHT_COUNT; ++i)
+		for (GMuint i = 0; i < getMaxLightCount(); ++i)
 		{
 			d->defaultLightImpl->activateLight(i, renderer);
 		}
@@ -69,7 +64,7 @@ void GMDx11GraphicEngine::activateLight(IRenderer* renderer)
 		const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 		const Vector<ILight*>& lights = getLights();
 		GMuint lightCount = lights.size();
-		GM_ASSERT(lightCount <= GMDX11_MAX_LIGHT_COUNT);
+		GM_ASSERT(lightCount <= getMaxLightCount());
 		shaderProgram->setInt(desc.LightCount, lightCount);
 
 		for (GMuint i = 0; i < lightCount; ++i)

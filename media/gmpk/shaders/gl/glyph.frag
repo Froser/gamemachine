@@ -1,4 +1,5 @@
-subroutine (GM_TechniqueEntrance) void GM_Glyph()
+subroutine (GM_TechniqueEntrance)
+void GM_Glyph()
 {
 	if (GM_ambient_textures[0].enabled == 1)
 	{

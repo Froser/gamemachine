@@ -1,4 +1,5 @@
-subroutine (GM_TechniqueEntrance) void GM_Model2D()
+subroutine (GM_TechniqueEntrance)
+void GM_Model2D()
 {
 	if (GM_ambient_textures[0].enabled == 1)
 	{

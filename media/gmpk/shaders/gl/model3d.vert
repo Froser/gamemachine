@@ -12,7 +12,8 @@ void model3d_calcCoords()
 	_lightmapuv = lightmapuv;
 }
 
-subroutine (GM_TechniqueEntrance) void GM_Model3D()
+subroutine (GM_TechniqueEntrance)
+void GM_Model3D()
 {
 	model3d_calcCoords();
 }

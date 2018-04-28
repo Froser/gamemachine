@@ -12,7 +12,6 @@ uniform int GM_shader_proc;
 
 subroutine void GM_TechniqueEntrance();
 subroutine (GM_TechniqueEntrance) void GM_Noop() {}
-
 subroutine uniform GM_TechniqueEntrance GM_techniqueEntrance;
 
 mat4 gm_removeTranslation(mat4 mat)

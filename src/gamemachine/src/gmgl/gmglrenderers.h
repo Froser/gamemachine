@@ -21,9 +21,9 @@ public:
 	GMGLRenderer();
 
 	virtual void draw(GMModel* model) override;
+	virtual IShaderProgram* getShaderProgram() = 0;
 
 protected:
-	virtual IShaderProgram* getShaderProgram() = 0;
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
 

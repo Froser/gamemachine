@@ -130,52 +130,29 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	return true;
 }
 
-void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
+void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 {
 	D(d);
 	D_BASE(db, Base);
 	// 有2种情况，需要更新着色器。
 	// 1. 使用中的着色器更换时
 	// 2. 使用中的着色器未更换，但是光照信息改变
-
+	GMGLRenderer* glRenderer = gm_cast<GMGLRenderer*>(renderer);
+	IShaderProgram* shaderProgram = glRenderer->getShaderProgram();
 	if (shaderProgram != d->lightContext.shaderProgram || d->lightContext.lightDirty)
 	{
-		/*
-		auto& svd = shaderProgram->getDesc();
-		shaderProgram->useProgram();
-		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
-		for (auto& light : db->lights)
+		const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
+		const Vector<ILight*>& lights = db->lights;
+		GMuint lightCount = lights.size();
+		GM_ASSERT(lightCount <= getMaxLightCount());
+		shaderProgram->setInt(desc.LightCount, lightCount);
+
+		for (GMuint i = 0; i < lightCount; ++i)
 		{
-			GMint id = lightId[(GMuint)light.getType()]++;
-			switch (light.getType())
-			{
-			case GMLightType::AMBIENT:
-			{
-				const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
-				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, ".", svd.LightCount);
-				shaderProgram->setVec3(u_color, light.getLightColor());
-				break;
-			}
-			case GMLightType::SPECULAR:
-			{
-				const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
-				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, ".", svd.LightCount);
-				combineUniform(u_position, uniform, ".", svd.Light);
-				shaderProgram->setVec3(u_color, light.getLightColor());
-				shaderProgram->setVec3(u_position, light.getLightPosition());
-				break;
-			}
-			default:
-				break;
-			}
+			lights[i]->activateLight(i, renderer);
 		}
-		shaderProgram->setInt(svd.AmbientLight.Count, lightId[(GMint)GMLightType::AMBIENT]);
-		shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
 		d->lightContext.shaderProgram = shaderProgram;
 		d->lightContext.lightDirty = false;
-		*/
 	}
 }
 

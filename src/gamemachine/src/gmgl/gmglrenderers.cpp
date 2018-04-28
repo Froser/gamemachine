@@ -132,7 +132,7 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, 
 	auto shaderProgram = getShaderProgram();
 	const char* uniform = getTextureUniformName(desc, type, index);
 
-	char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
+	static char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scales[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scalet[GMGL_MAX_UNIFORM_NAME_LEN];
@@ -178,7 +178,7 @@ GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type, GMint in
 
 	auto shaderProgram = getShaderProgram();
 	const char* uniform = getTextureUniformName(desc, type, index);
-	char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
+	static char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, u_tex_texture.c_str());
 	combineUniform(u_enabled, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u_texture, texId);
@@ -198,7 +198,7 @@ void GMGLRenderer::deactivateTexture(GMTextureType type, GMint index)
 	auto shaderProgram = getShaderProgram();
 	GMint idx = (GMint)type;
 	const char* uniform = getTextureUniformName(desc, type, index);
-	char u[GMGL_MAX_UNIFORM_NAME_LEN];
+	static char u[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u, 0);
 }
@@ -317,7 +317,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 			GMGLShaderProgram::techniqueName(),
 			getTechnique(model->getType()),
 			GMShaderType::Pixel);
-		db->engine->activateLights(shaderProgram);
+		db->engine->activateLights(this);
 	}
 }
 
@@ -536,7 +536,7 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 {
 	D_BASE(d, GMGLRenderer);
 	IShaderProgram* shaderProgram = getShaderProgram();
-	d->engine->activateLights(shaderProgram);
+	d->engine->activateLights(this);
 	IGBuffer* gBuffer = d->engine->getGBuffer();
 	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
 	GMuint cnt = gBufferFramebuffers->count();

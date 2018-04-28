@@ -7,6 +7,7 @@
 #include "gmdata/gamepackage/gmgamepackagehandler.h"
 #include "gmglframebuffer.h"
 #include "gmglgbuffer.h"
+#include "gmgllight.h"
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -49,7 +50,15 @@ void GMGLFactory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
 	*g = new GMGLGBuffer(gm_cast<GMGLGraphicEngine*>(engine));
 }
 
-void GMGLFactory::createLight(GMLightType type, OUT ILight** light)
+void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 {
-
+	if (type == GMLightType::Ambient)
+	{
+		*out = new GMGLAmbientLight();
+	}
+	else
+	{
+		GM_ASSERT(type == GMLightType::Direct);
+		*out = new GMGLAmbientLight();
+	}
 }

@@ -351,15 +351,10 @@ inline void gmSwap(GMObject& a, GMObject& b)
 \return 转换后的对象。
 */
 template <typename TargetType, typename SourceType>
-static TargetType gm_cast(SourceType obj)
+inline TargetType gm_cast(SourceType obj)
 {
-#if _DEBUG
-	TargetType target = dynamic_cast<TargetType>(obj);
-	GM_ASSERT(target);
-	return target;
-#else
+	GM_ASSERT(dynamic_cast<TargetType>(obj));
 	return static_cast<TargetType>(obj);
-#endif
 }
 
 // 接口统一定义

@@ -79,8 +79,20 @@ protected:
 		return d->shaderLoadCallback;
 	}
 
+	inline const Vector<ILight*>& getLights()
+	{
+		D(d);
+		return d->lights;
+	}
+
 private:
 	IGBuffer* createGBuffer();
+
+public:
+	static constexpr const GMuint getMaxLightCount()
+	{
+		return 5;
+	}
 };
 
 END_NS

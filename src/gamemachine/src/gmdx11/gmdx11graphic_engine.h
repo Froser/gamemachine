@@ -56,7 +56,7 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID, void**);
 
 public:
-	virtual void activateLight(IRenderer* renderer);
+	virtual void activateLights(IRenderer* renderer);
 
 public:
 	inline ID3D11Device* getDevice()
@@ -93,12 +93,6 @@ public:
 	{
 		D(d);
 		return d->blendState;
-	}
-
-	inline const Vector<ILight*>& getLights()
-	{
-		D_BASE(d, Base);
-		return d->lights;
 	}
 
 	const GMVec2 getCurrentFilterKernelDelta()

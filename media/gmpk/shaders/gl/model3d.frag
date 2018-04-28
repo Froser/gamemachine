@@ -1,12 +1,36 @@
 // 相机视角法向量
 vec3 g_model3d_normal_eye;
-float g_model3d_shadeFactor = 0;
 vec3 g_model3d_ambientLight;
 vec3 g_model3d_diffuseLight;
 vec3 g_model3d_specularLight;
 vec3 g_model3d_refractionLight;
 
 in vec4 _model3d_position_world;
+
+subroutine (GM_LightAmbient)
+vec3 GM_defaultLightAmbient(GM_light_t light)
+{
+	return light.lightColor;
+}
+
+subroutine (GM_LightDiffuse)
+vec3 GM_defaultLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
+{
+	float diffuseFactor = dot(lightDirection_N, normal_N);
+	diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
+	return diffuseFactor * light.lightColor;
+}
+
+subroutine (GM_LightSpecular)
+vec3 GM_defaultLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
+{
+	vec3 R = reflect(-lightDirection_N, normal_N);
+	float theta = dot(eyeDirection_N, R);
+	float specularFactor = pow(theta, GM_material.shininess);
+	specularFactor = clamp(specularFactor, 0.0f, 1.0f);
+
+	return specularFactor * light.lightColor;
+}
 
 void model3d_init()
 {
@@ -43,7 +67,7 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 		float diffuseFactor = dot(L, N);
 		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
 
-		g_model3d_diffuseLight += diffuseFactor * GM_material.kd * g_model3d_shadeFactor * light.lightColor;
+		g_model3d_diffuseLight += diffuseFactor * GM_material.kd * light.lightColor;
 	}
 
 	// specular:
@@ -54,7 +78,7 @@ void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 
 		float specularFactor = pow(theta, GM_material.shininess);
 		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
 
-		g_model3d_specularLight += specularFactor * GM_material.ks * g_model3d_shadeFactor * light.lightColor;
+		g_model3d_specularLight += specularFactor * GM_material.ks * light.lightColor;
 	}
 }
 
@@ -80,24 +104,24 @@ void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 
 void model3d_calcLights()
 {
-	//g_model3d_shadeFactor = model3d_shadeFactorFactor(model3d_calcuateShadeFactor(_shadowCoord));
-	g_model3d_shadeFactor = 1;
-
 	// 由顶点变换矩阵计算法向量变换矩阵
 	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
 	vec4 vertex_eye = GM_view_matrix * _model3d_position_world;
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
+	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	g_model3d_normal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
 
 	// 计算漫反射和高光部分
 	if (GM_normalmap_textures[0].enabled == 0)
 	{
-		for (int i = 0; i < GM_speculars_count; i++)
+		for (int i = 0; i < GM_lightCount; i++)
 		{
-			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
-			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
-			model3d_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, g_model3d_normal_eye);
+			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].lightPosition, 1)).xyz;
+			vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
+			g_model3d_ambientLight += GM_material.ka * GM_lightAmbient[i](GM_lights[i]);
+			g_model3d_diffuseLight += GM_material.kd * GM_lightDiffuse[i](GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye);
+			g_model3d_specularLight += GM_material.ks * GM_lightSpecular[i](GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye);
 			model3d_calculateRefractionByNormalWorld(normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz);
 		}
 	}
@@ -106,9 +130,9 @@ void model3d_calcLights()
 		vec3 normal_tangent = texture(GM_normalmap_textures[0].texture, _uv).rgb * 2.0 - 1.0;
 		vec3 tangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
 		vec3 bitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
-		for (int i = 0; i < GM_speculars_count; i++)
+		for (int i = 0; i < GM_lightCount; i++)
 		{
-			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
+			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
 			// TBN变换矩阵
 			mat3 TBN = transpose(mat3(
@@ -119,15 +143,9 @@ void model3d_calcLights()
 			vec3 lightDirection_tangent = TBN * lightDirection_eye;
 			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
 
-			model3d_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
+			model3d_calcDiffuseAndSpecular(GM_lights[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
 			model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
 		}
-	}
-
-	// 计算环境光
-	for (int i = 0; i < GM_ambients_count; i++)
-	{
-		g_model3d_ambientLight += GM_material.ka * GM_ambients[i].lightColor * g_model3d_shadeFactor;
 	}
 }
 
@@ -182,7 +200,8 @@ void model3d_calcColor()
 	_frag_color = vec4(color, 1.0f);
 }
 
-subroutine (GM_TechniqueEntrance) void GM_Model3D()
+subroutine (GM_TechniqueEntrance)
+void GM_Model3D()
 {
 	model3d_init();
 	model3d_calcColor();

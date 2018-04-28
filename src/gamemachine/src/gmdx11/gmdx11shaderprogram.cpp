@@ -23,14 +23,7 @@ namespace
 			"LightmapTextureAttributes",
 			"CubeMapTextureAttributes",
 
-			{ "Position", "Color" },
-			"LightAttributes",
-			"Light",
 			"LightCount",
-			"DefaultLight",
-
-			{ "AmbientLights", "AmbientLightCount" },
-			{ "SpecularLights", "SpecularLightCount" },
 
 			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity" },
 			"Material",

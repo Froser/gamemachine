@@ -31,14 +31,7 @@ namespace
 			"GM_lightmap_textures",
 			"GM_cubemap_texture",
 
-			{ "lightPosition", "lightColor" },
-			"LightAttributes",
-			"Light",
-			"LightCount",
-			"DefaultLight",
-
-			{ "GM_ambients", "GM_ambients_count" },
-			{ "GM_speculars", "GM_speculars_count" },
+			"GM_lightCount",
 
 			{ "ka", "kd", "ks", "shininess", "refractivity" },
 			"GM_material",

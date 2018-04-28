@@ -217,12 +217,6 @@ struct GMShaderVariablesTextureDesc
 	const char* Texture;
 };
 
-struct GMShaderVariablesLightAttributeDesc
-{
-	const char* Position;
-	const char* Color;
-};
-
 struct GMShaderVariablesLightDesc
 {
 	const char* Name;
@@ -276,14 +270,7 @@ struct GMShaderVariablesDesc
 	const char* CubeMapTextureName;
 
 	// 光照
-	GMShaderVariablesLightAttributeDesc LightAttributes;
-	const char* LightAttributesName;
-	const char* Light;
 	const char* LightCount;
-	const char* DefaultLight;
-
-	GMShaderVariablesLightDesc AmbientLight;
-	GMShaderVariablesLightDesc SpecularLight;
 
 	// 材质
 	GMShaderVariablesMaterialDesc MaterialAttributes;
