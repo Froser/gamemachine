@@ -137,8 +137,10 @@ void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 	// 有2种情况，需要更新着色器。
 	// 1. 使用中的着色器更换时
 	// 2. 使用中的着色器未更换，但是光照信息改变
+
 	if (shaderProgram != d->lightContext.shaderProgram || d->lightContext.lightDirty)
 	{
+		/*
 		auto& svd = shaderProgram->getDesc();
 		shaderProgram->useProgram();
 		GMint lightId[(GMuint)GMLightType::COUNT] = { 0 };
@@ -151,7 +153,7 @@ void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 			{
 				const char* uniform = getLightUniformName(svd, GMLightType::AMBIENT, id);
 				char u_color[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
+				combineUniform(u_color, uniform, ".", svd.LightCount);
 				shaderProgram->setVec3(u_color, light.getLightColor());
 				break;
 			}
@@ -159,8 +161,8 @@ void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 			{
 				const char* uniform = getLightUniformName(svd, GMLightType::SPECULAR, id);
 				char u_color[GMGL_MAX_UNIFORM_NAME_LEN], u_position[GMGL_MAX_UNIFORM_NAME_LEN];
-				combineUniform(u_color, uniform, ".", svd.LightAttributes.Color);
-				combineUniform(u_position, uniform, ".", svd.LightAttributes.Position);
+				combineUniform(u_color, uniform, ".", svd.LightCount);
+				combineUniform(u_position, uniform, ".", svd.Light);
 				shaderProgram->setVec3(u_color, light.getLightColor());
 				shaderProgram->setVec3(u_position, light.getLightPosition());
 				break;
@@ -173,6 +175,7 @@ void GMGLGraphicEngine::activateLights(IShaderProgram* shaderProgram)
 		shaderProgram->setInt(svd.SpecularLight.Count, lightId[(GMint)GMLightType::SPECULAR]);
 		d->lightContext.shaderProgram = shaderProgram;
 		d->lightContext.lightDirty = false;
+		*/
 	}
 }
 

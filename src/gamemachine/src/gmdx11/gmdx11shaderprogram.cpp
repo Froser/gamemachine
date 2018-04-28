@@ -24,6 +24,11 @@ namespace
 			"CubeMapTextureAttributes",
 
 			{ "Position", "Color" },
+			"LightAttributes",
+			"Light",
+			"LightCount",
+			"DefaultLight",
+
 			{ "AmbientLights", "AmbientLightCount" },
 			{ "SpecularLights", "SpecularLightCount" },
 

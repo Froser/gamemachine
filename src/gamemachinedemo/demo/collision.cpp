@@ -146,18 +146,26 @@ void Demo_Collision::setDefaultLights()
 	D(d);
 	if (isInited())
 	{
-		gm::GMLight a(gm::GMLightType::AMBIENT);
-		gm::GMfloat colorA[] = { .7f, .7f, .7f };
-		a.setLightColor(colorA);
-		GM.getGraphicEngine()->addLight(a);
+		{
+			gm::ILight* light = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
+			GM_ASSERT(light);
+			gm::GMfloat colorA[] = { .7f, .7f, .7f };
+			light->setLightColor(colorA);
+			GM.getGraphicEngine()->addLight(light);
+		}
 
-		gm::GMLight d(gm::GMLightType::SPECULAR);
-		gm::GMfloat colorD[] = { .7f, .7f, .7f };
-		d.setLightColor(colorD);
+		{
+			gm::ILight* light = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+			GM_ASSERT(light);
+			gm::GMfloat colorD[] = { .7f, .7f, .7f };
+			light->setLightColor(colorD);
 
-		gm::GMfloat lightPos[] = { -1.f, .5f, -3.f };
-		d.setLightPosition(lightPos);
-		GM.getGraphicEngine()->addLight(d);
+			gm::GMfloat lightPos[] = { -1.f, .5f, -3.f };
+			light->setLightPosition(lightPos);
+			GM.getGraphicEngine()->addLight(light);
+		}
 	}
 }
 

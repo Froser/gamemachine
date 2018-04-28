@@ -434,8 +434,8 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	}
 
 	GMMaterial& material = shader.getMaterial();
-	GMLight light(GMLightType::AMBIENT);
-	GMLightType lightType;
+	IFactory* factory = GM.getFactory();
+	ILight* light = nullptr;;
 	const char* color = elem->Attribute("color");
 	if (!color)
 	{
@@ -443,17 +443,13 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		return;
 	}
 
-	GMfloat vecColor[3];
-	readTernaryFloatsFromString(color, vecColor);
-	light.setLightColor(&vecColor[0]);
-
 	if (GMString::stringEquals(type, "ambient"))
 	{
-		lightType = GMLightType::AMBIENT;
+		factory->createLight(GMLightType::Ambient, &light);
 	}
 	else if (GMString::stringEquals(type, "specular"))
 	{
-		lightType = GMLightType::SPECULAR;
+		factory->createLight(GMLightType::Direct, &light);
 		const char* position = elem->Attribute("position");
 		if (!position)
 		{
@@ -463,7 +459,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		GMScanner s(color);
 		GMfloat vecPosition[3];
 		readTernaryFloatsFromString(position, vecPosition);
-		light.setLightPosition(&vecPosition[0]);
+		light->setLightPosition(&vecPosition[0]);
 
 		GMfloat arg[3];
 		const char* k = elem->Attribute("ks");
@@ -502,7 +498,12 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 			material.shininess = shininess;
 		}
 	}
-	light.setType(lightType);
+
+	GM_ASSERT(light);
+	GMfloat vecColor[3];
+	readTernaryFloatsFromString(color, vecColor);
+	light->setLightColor(&vecColor[0]);
+
 	GM.getGraphicEngine()->addLight(light);
 }
 

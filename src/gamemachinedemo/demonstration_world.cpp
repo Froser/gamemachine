@@ -130,11 +130,13 @@ void DemoHandler::setDefaultLights()
 	D(d);
 	if (isInited())
 	{
-		gm::GMLight light(gm::GMLightType::SPECULAR);
+		gm::ILight* light = nullptr;
+		GM.getFactory()->createLight(gm::GMLightType::Direct, &light);
+		GM_ASSERT(light);
 		gm::GMfloat lightPos[] = { 0, 0, -.2f };
-		light.setLightPosition(lightPos);
+		light->setLightPosition(lightPos);
 		gm::GMfloat color[] = { .7f, .7f, .7f };
-		light.setLightColor(color);
+		light->setLightColor(color);
 		GM.getGraphicEngine()->addLight(light);
 	}
 }

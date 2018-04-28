@@ -9,7 +9,7 @@
 
 namespace
 {
-	constexpr GMint GMDX11_MAX_LIGHT_COUNT = 10; //灯光最大数量
+	constexpr GMint GMDX11_MAX_LIGHT_COUNT = 5; //灯光最大数量
 }
 
 void GMDx11GraphicEngine::init()
@@ -50,34 +50,31 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 	}
 }
 
-void GMDx11GraphicEngine::activateLight(ID3DX11Effect* effect)
+void GMDx11GraphicEngine::activateLight(IRenderer* renderer)
 {
 	D(d);
+	if (!d->defaultLightImpl)
+	{
+		GM.getFactory()->createLight(GMLightType::Ambient, &d->defaultLightImpl);
+		d->defaultLightImpl->setLightColor(ValuePointer(Zero<GMVec4>()));
+		for (GMuint i = 0; i < GMDX11_MAX_LIGHT_COUNT; ++i)
+		{
+			d->defaultLightImpl->activateLight(i, renderer);
+		}
+	}
+
 	if (d->lightDirty)
 	{
-		const GMShaderVariablesDesc& svd = getShaderProgram()->getDesc();
-		const Vector<GMLight>& lights = getLights();
-		GMuint indices[(GMuint)GMLightType::COUNT] = { 0 };
-		const GMShaderVariablesLightDesc* lightAttrs[] = { &svd.AmbientLight, &svd.SpecularLight };
-		for (auto& light : lights)
-		{
-			const GMShaderVariablesLightDesc* lightAttr = lightAttrs[(GMuint)light.getType()];
-			ID3DX11EffectVariable* lightAttributeVar = effect->GetVariableByName(lightAttr->Name)->GetElement(indices[(GMuint)light.getType()]++);
-			GM_ASSERT(lightAttributeVar->IsValid());
-			ID3DX11EffectVectorVariable* position = lightAttributeVar->GetMemberByName(svd.LightAttributes.Position)->AsVector();
-			GM_ASSERT(position->IsValid());
-			ID3DX11EffectVectorVariable* color = lightAttributeVar->GetMemberByName(svd.LightAttributes.Color)->AsVector();
-			GM_ASSERT(color->IsValid());
-			GM_DX_HR(position->SetFloatVector(light.getLightPosition()));
-			GM_DX_HR(color->SetFloatVector(light.getLightColor()));
-		}
+		IShaderProgram* shaderProgram = getShaderProgram();
+		const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
+		const Vector<ILight*>& lights = getLights();
+		GMuint lightCount = lights.size();
+		GM_ASSERT(lightCount <= GMDX11_MAX_LIGHT_COUNT);
+		shaderProgram->setInt(desc.LightCount, lightCount);
 
-		GM_FOREACH_ENUM_CLASS(type, GMLightType::AMBIENT, GMLightType::COUNT)
+		for (GMuint i = 0; i < lightCount; ++i)
 		{
-			ID3DX11EffectScalarVariable* lightCount = effect->GetVariableByName(lightAttrs[(GMuint)type]->Count)->AsScalar();
-			GM_ASSERT(lightCount->IsValid());
-			GM_ASSERT(indices[(GMuint)type] < GMDX11_MAX_LIGHT_COUNT);
-			GM_DX_HR(lightCount->SetInt(indices[(GMuint)type]));
+			lights[i]->activateLight(i, renderer);
 		}
 		d->lightDirty = false;
 	}

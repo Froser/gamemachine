@@ -247,21 +247,26 @@ void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool always
 
 void GMBSPGameWorld::setDefaultLights()
 {
+	IFactory* factory = GM.getFactory();
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	engine->removeLights();
 
 	{
-		GMLight ambientLight(GMLightType::AMBIENT);
+		ILight* light = nullptr;
+		factory->createLight(GMLightType::Ambient, &light);
+		GM_ASSERT(light);
 		GMfloat lightColor[] = { .9f, .9f, .9f };
-		ambientLight.setLightColor(lightColor);
-		engine->addLight(ambientLight);
+		light->setLightColor(lightColor);
+		engine->addLight(light);
 	}
 
 	{
-		GMLight specularLight(GMLightType::SPECULAR);
+		ILight* light = nullptr;
+		factory->createLight(GMLightType::Direct, &light);
+		GM_ASSERT(light);
 		GMfloat lightColor[] = { 1, 1, 1 };
-		specularLight.setLightColor(lightColor);
-		engine->addLight(specularLight);
+		light->setLightColor(lightColor);
+		engine->addLight(light);
 	}
 }
 

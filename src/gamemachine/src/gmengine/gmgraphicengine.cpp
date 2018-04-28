@@ -175,7 +175,7 @@ IGBuffer* GMGraphicEngine::createGBuffer()
 	return gBuffer;
 }
 
-void GMGraphicEngine::addLight(const GMLight& light)
+void GMGraphicEngine::addLight(AUTORELEASE ILight* light)
 {
 	D(d);
 	d->lights.push_back(light);
@@ -185,6 +185,11 @@ void GMGraphicEngine::addLight(const GMLight& light)
 void GMGraphicEngine::removeLights()
 {
 	D(d);
+	for (auto light : d->lights)
+	{
+		GM_delete(light);
+	}
+
 	d->lights.clear();
 	update(GMUpdateDataType::LightChanged);
 }

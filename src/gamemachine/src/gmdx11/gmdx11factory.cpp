@@ -6,6 +6,7 @@
 #include "gmdx11glyphmanager.h"
 #include "gmdx11framebuffer.h"
 #include "gmdx11gbuffer.h"
+#include "gmdx11light.h"
 
 void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -47,4 +48,17 @@ void GMDx11Factory::createFramebuffers(OUT IFramebuffers** fbs)
 void GMDx11Factory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
 {
 	*g = new GMDx11GBuffer(gm_cast<GMDx11GraphicEngine*>(engine));
+}
+
+void GMDx11Factory::createLight(GMLightType type, OUT ILight** out)
+{
+	if (type == GMLightType::Ambient)
+	{
+		*out = new GMDx11AmbientLight();
+	}
+	else
+	{
+		GM_ASSERT(type == GMLightType::Direct);
+		*out = new GMDx11DirectLight();
+	}
 }

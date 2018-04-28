@@ -48,3 +48,8 @@ void GMGLFactory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
 {
 	*g = new GMGLGBuffer(gm_cast<GMGLGraphicEngine*>(engine));
 }
+
+void GMGLFactory::createLight(GMLightType type, OUT ILight** light)
+{
+
+}

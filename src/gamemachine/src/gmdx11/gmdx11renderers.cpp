@@ -573,7 +573,7 @@ void GMDx11Renderer::prepareBuffer(GMModel* model)
 void GMDx11Renderer::prepareLights()
 {
 	D(d);
-	getEngine()->activateLight(d->effect);
+	getEngine()->activateLight(this);
 }
 
 void GMDx11Renderer::prepareRasterizer(GMModel* model)

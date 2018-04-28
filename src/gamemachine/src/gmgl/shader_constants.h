@@ -87,6 +87,7 @@ inline const char* getLightUniformName(const GMShaderVariablesDesc& desc, GMLigh
 		std::string(desc.SpecularLight.Name) + "[9]",
 	};
 
+	/*
 	switch (t)
 	{
 	case GMLightType::AMBIENT:
@@ -97,6 +98,7 @@ inline const char* getLightUniformName(const GMShaderVariablesDesc& desc, GMLigh
 		GM_ASSERT(false);
 		break;
 	}
+	*/
 	return "";
 }
 

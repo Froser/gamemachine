@@ -40,10 +40,11 @@ public:
 	virtual void draw(GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
 
-protected:
-	inline GMDx11GraphicEngine* getEngine()
+public:
+	inline ID3DX11Effect* getEffect()
 	{
-		return gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+		D(d);
+		return d->effect;
 	}
 
 	inline const GMShaderVariablesDesc* getVariablesDesc()
@@ -54,6 +55,12 @@ protected:
 			d->variablesDesc = &getEngine()->getShaderProgram()->getDesc();
 		}
 		return d->variablesDesc;
+	}
+
+protected:
+	inline GMDx11GraphicEngine* getEngine()
+	{
+		return gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
 	}
 
 protected:

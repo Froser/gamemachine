@@ -27,7 +27,8 @@ class GMMesh;
 class GMTextureFrames;
 class GMTexture;
 class GMAssets;
-class GMLight;
+class GMComponent;
+struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
 struct GraphicSettings;
@@ -35,6 +36,7 @@ struct GMCameraLookAt;
 struct IDebugOutput;
 struct IAudioPlayer;
 struct IGraphicEngine;
+struct IRenderer;
 
 enum class GameMachineEvent
 {
@@ -275,6 +277,11 @@ struct GMShaderVariablesDesc
 
 	// 光照
 	GMShaderVariablesLightAttributeDesc LightAttributes;
+	const char* LightAttributesName;
+	const char* Light;
+	const char* LightCount;
+	const char* DefaultLight;
+
 	GMShaderVariablesLightDesc AmbientLight;
 	GMShaderVariablesLightDesc SpecularLight;
 
@@ -361,6 +368,21 @@ GM_INTERFACE(IGBuffer)
 GM_INTERFACE(IShaderLoadCallback)
 {
 	virtual void onLoadShaders(IGraphicEngine* engine) = 0;
+};
+
+enum class GMLightType
+{
+	Ambient,
+	Direct,
+};
+
+GM_INTERFACE(ILight)
+{
+	virtual void setLightPosition(GMfloat position[4]) = 0;
+	virtual void setLightColor(GMfloat color[4]) = 0;
+	virtual const GMfloat* getLightPosition() const = 0;
+	virtual const GMfloat* getLightColor() const = 0;
+	virtual void activateLight(GMuint, IRenderer*) = 0;
 };
 
 struct GMStencilOptions
@@ -462,7 +484,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  光源的表现行为与着色器程序有关，有些图元可能不会使用到光源，有些图元则可能会。
 	  \param light 需要添加的光源。
 	*/
-	virtual void addLight(const GMLight& light) = 0;
+	virtual void addLight(AUTORELEASE ILight* light) = 0;
 
 	//! 移除所有光源。
 	/*!
@@ -521,7 +543,6 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) = 0;
 };
 
-class GMComponent;
 GM_INTERFACE(IRenderer)
 {
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
@@ -538,6 +559,7 @@ GM_INTERFACE(IFactory)
 	virtual void createFramebuffer(OUT IFramebuffer**) = 0;
 	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) = 0;
+	virtual void createLight(GMLightType, OUT ILight**) = 0;
 };
 
 GM_INTERFACE_FROM(IWindow, IQueriable)

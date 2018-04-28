@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMRenderConfig renderConfig;
 	GMDebugConfig debugConfig;
 	GMStencilOptions stencilOptions;
-	Vector<GMLight> lights;
+	Vector<ILight*> lights;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
 };
 
@@ -46,7 +46,7 @@ public:
 	virtual IGBuffer* getGBuffer() override;
 	virtual IFramebuffers* getFilterFramebuffers() override;
 	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) override;
-	virtual void addLight(const GMLight& light) override;
+	virtual void addLight(AUTORELEASE ILight* light) override;
 	virtual void removeLights() override;
 	virtual void setStencilOptions(const GMStencilOptions& options) override;
 	virtual const GMStencilOptions& getStencilOptions() override;

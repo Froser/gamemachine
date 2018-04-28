@@ -31,6 +31,8 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	
 	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
+
+	ILight* defaultLightImpl = nullptr;
 	bool lightDirty = true;
 };
 
@@ -54,7 +56,7 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID, void**);
 
 public:
-	virtual void activateLight(ID3DX11Effect* effect);
+	virtual void activateLight(IRenderer* renderer);
 
 public:
 	inline ID3D11Device* getDevice()
@@ -93,7 +95,7 @@ public:
 		return d->blendState;
 	}
 
-	inline const Vector<GMLight>& getLights()
+	inline const Vector<ILight*>& getLights()
 	{
 		D_BASE(d, Base);
 		return d->lights;

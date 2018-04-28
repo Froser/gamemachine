@@ -25,7 +25,7 @@ cbuffer WorldConstantBuffer: register( b0 )
 }
 
 //--------------------------------------------------------------------------------------
-// Textures, Lights, Materials
+// Textures, LightAttributes, Materials
 //--------------------------------------------------------------------------------------
 Texture2D AmbientTexture_0: register(t0);
 Texture2D AmbientTexture_1: register(t1);
@@ -134,19 +134,39 @@ interface ILight
     float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess);
 };
 
-class GMLight : ILight
+float3 GetLightPositionInEyeSpace(float4 pos, float4x4 viewMatrix)
 {
-    float4 Position;
-    float4 Color;
+    return (mul(pos, viewMatrix)).xyz;
+}
 
+class GMDefaultAmbientLight : ILight
+{
     float4 IlluminateAmbient()
     {
-        return Color;
+        return 1;
     }
 
     float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N)
     {
-        return (saturate(dot(lightDirection_N, normal_N)) * Color);
+        return 0;
+    }
+
+    float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
+    {
+        return 0;
+    }
+};
+
+class GMDefaultDirectLight : ILight
+{
+    float4 IlluminateAmbient()
+    {
+        return 0;
+    }
+
+    float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N)
+    {
+        return saturate(dot(lightDirection_N, normal_N));
     }
 
     float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
@@ -154,20 +174,21 @@ class GMLight : ILight
         float3 reflection_N = reflect(-lightDirection_N, normal_N);
         float theta = dot(eyeDirection_N, reflection_N);
         float factor_Specular = saturate(pow(abs(theta), shininess));
-        return factor_Specular * Color;
-    }
-
-    float3 GetLightPositionInEyeSpace()
-    {
-        return (mul(Position, ViewMatrix)).xyz;
+        return factor_Specular;
     }
 };
 
-GMLight AmbientLights[10];
-int AmbientLightCount;
-
-GMLight SpecularLights[10];
-int SpecularLightCount;
+//默认的光照实现
+GMDefaultAmbientLight DefaultAmbientLight; 
+GMDefaultDirectLight DefaultDirectLight;
+struct GMLight
+{
+    float4 Position;
+    float4 Color;
+};
+GMLight LightAttributes[5];
+ILight Light[5];
+int LightCount;
 
 struct GMScreenInfo
 {
@@ -318,34 +339,26 @@ float4 PS_3D_Common(VS_3D_INPUT input)
     float3 position_Eye = (mul(ToFloat4(input.WorldPos), ViewMatrix)).xyz;
     float3 position_Eye_N = normalize(position_Eye);
 
-    int i = 0;
-    for (i = 0; i < AmbientLightCount; ++i)
+    for (int i = 0; i < LightCount; ++i)
     {
-        factor_Ambient += AmbientLights[i].IlluminateAmbient();
-    }
+        float3 lightPosition_Eye = GetLightPositionInEyeSpace(LightAttributes[i].Position, ViewMatrix);
+        factor_Ambient += Light[i].IlluminateAmbient() * LightAttributes[i].Color;
 
-    for (i = 0; i < SpecularLightCount; ++i)
-    {
         if (!input.HasNormalMap)
         {
-            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
             float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Eye_N, input.Normal_Eye_N);
-            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess);    
+            factor_Diffuse += Light[i].IlluminateDiffuse(lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
+            factor_Specular += Light[i].IlluminateSpecular(lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;    
         }
         else
         {
-            float3 lightPosition_Eye = SpecularLights[i].GetLightPositionInEyeSpace();
             float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
-
             float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
             float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
-
-            factor_Diffuse += SpecularLights[i].IlluminateDiffuse(lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N);
-            factor_Specular += SpecularLights[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess); 
+            factor_Diffuse += Light[i].IlluminateDiffuse(lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * LightAttributes[i].Color;
+            factor_Specular += Light[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
         }
     }
-
     float4 color_Ambient = factor_Ambient * ToFloat4(input.AmbientLightmapTexture);
     float4 color_Diffuse = factor_Diffuse * ToFloat4(input.DiffuseTexture);
 

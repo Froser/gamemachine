@@ -14,6 +14,7 @@ public:
 	virtual void createFramebuffer(OUT IFramebuffer**) override;
 	virtual void createFramebuffers(OUT IFramebuffers**) override;
 	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) override;
+	virtual void createLight(GMLightType, OUT ILight**) override;
 };
 
 END_NS
