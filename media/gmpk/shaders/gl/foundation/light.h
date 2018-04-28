@@ -1,17 +1,13 @@
 // 光照相关
+#define MAX_LIGHT_COUNT 5
 struct GM_light_t
 {
 	vec3 lightColor;
 	vec3 lightPosition;
 	int lightType; //0表示环境光，1表示直接光
 };
+
 uniform GM_light_t GM_lights[MAX_LIGHT_COUNT];
-
-uniform GM_light_t GM_ambients[MAX_LIGHT_COUNT]; //-
-uniform GM_light_t GM_speculars[MAX_LIGHT_COUNT]; //-
-uniform int GM_ambients_count; //-
-uniform int GM_speculars_count; //-
-
 uniform int GM_lightCount = 0;
 
 // 光源种类

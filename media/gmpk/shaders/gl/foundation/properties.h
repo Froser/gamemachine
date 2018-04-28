@@ -9,7 +9,6 @@ uniform sampler2DShadow GM_shadow_texture;
 uniform int GM_shadow_texture_switch = 0;
 
 #define MAX_TEXTURE_COUNT 3
-#define MAX_LIGHT_COUNT 5
 struct GM_texture_t
 {
 	sampler2D texture;

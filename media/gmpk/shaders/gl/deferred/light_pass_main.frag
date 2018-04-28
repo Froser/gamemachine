@@ -74,32 +74,7 @@ void deferred_light_pass_init()
 	deferred_light_pass_fromTexture_Shininess = ksShininess.a;
 }
 
-void deferred_light_pass_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)
-{
-	vec3 N = normalize(normal);
-	vec3 L = normalize(lightDirection);
-
-	//diffuse:
-	{
-		float diffuseFactor = dot(L, N);
-		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
-
-		deferred_light_pass_g_diffuseLight += diffuseFactor * light.lightColor;
-	}
-
-	// specular:
-	{
-		vec3 V = normalize(eyeDirection);
-		vec3 R = reflect(-L, N);
-		float theta = dot(V, R);
-		float specularFactor = pow(theta, deferred_light_pass_fromTexture_Shininess);
-		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
-
-		deferred_light_pass_g_specularLight += specularFactor * deferred_light_pass_fromTexture_Ks * light.lightColor;
-	}
-}
-
-void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
+void deferred_light_pass_calculateRefractionByNormalWorld(vec3 normal_world)
 {
 	if (deferred_light_pass_fromTexture_Refractivity == 0.f)
 		return;
@@ -113,7 +88,7 @@ void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 {
 	// 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
 	vec3 normal_world = (GM_inverse_view_matrix * vec4(transpose(TBN) * normal_tangent, 0)).rgb;
-	model3d_calculateRefractionByNormalWorld(normal_world);
+	deferred_light_pass_calculateRefractionByNormalWorld(normal_world);
 }
 
 void deferred_light_pass_calcLights()
@@ -121,17 +96,22 @@ void deferred_light_pass_calcLights()
 	// 由顶点变换矩阵计算法向量变换矩阵
 	vec4 vertex_eye = GM_view_matrix * vec4(deferred_light_pass_fromTexture_Position, 1);
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
+	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 
 	// 计算漫反射和高光部分
 	if (!hasFlag(deferred_light_pass_fromTexture_HasNormalMap))
 	{
-		for (int i = 0; i < GM_speculars_count; i++)
+		for (int i = 0; i < GM_lightCount; i++)
 		{
-			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
-			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
-			deferred_light_pass_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_eye, eyeDirection_eye, deferred_light_pass_fromTexture_Normal_eye);
+			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].lightPosition, 1)).xyz;
+			vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
+
+			deferred_light_pass_g_ambientLight += GMLight_Ambient(GM_lights[i]);
+			deferred_light_pass_g_diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, deferred_light_pass_fromTexture_Normal_eye);
+			deferred_light_pass_g_specularLight += deferred_light_pass_fromTexture_Ks * GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, deferred_light_pass_fromTexture_Normal_eye, deferred_light_pass_fromTexture_Shininess);
+			if (GM_lights[i].lightType == GM_AmbientLight)
+				deferred_light_pass_calculateRefractionByNormalWorld(deferred_light_pass_fromTexture_Normal.xyz);
 		}
-		model3d_calculateRefractionByNormalWorld(deferred_light_pass_fromTexture_Normal.xyz);
 	}
 	else
 	{
@@ -141,22 +121,18 @@ void deferred_light_pass_calcLights()
 			deferred_light_pass_fromTexture_Bitangent_eye,
 			deferred_light_pass_fromTexture_Normal_eye
 		));
-		for (int i = 0; i < GM_speculars_count; i++)
+		for (int i = 0; i < GM_lightCount; i++)
 		{
-			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_speculars[i].lightPosition, 1)).xyz;
+			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye = lightPosition_eye + eyeDirection_eye;
-			vec3 lightDirection_tangent = TBN * lightDirection_eye;
-			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
-
-			deferred_light_pass_calcDiffuseAndSpecular(GM_speculars[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
+			vec3 lightDirection_tangent_N = normalize(TBN * lightDirection_eye);
+			vec3 eyeDirection_tangent_N = normalize(TBN * eyeDirection_eye);
+			deferred_light_pass_g_ambientLight += GMLight_Ambient(GM_lights[i]);
+			deferred_light_pass_g_diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, normal_tangent);
+			deferred_light_pass_g_specularLight += deferred_light_pass_fromTexture_Ks * GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, normal_tangent, deferred_light_pass_fromTexture_Shininess);
+			if (GM_lights[i].lightType == GM_AmbientLight)
+				model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
 		}
-		model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
-	}
-
-	// 计算环境光
-	for (int i = 0; i < GM_ambients_count; i++)
-	{
-		deferred_light_pass_g_ambientLight += GM_ambients[i].lightColor;
 	}
 }
 
