@@ -7,31 +7,6 @@ vec3 g_model3d_refractionLight;
 
 in vec4 _model3d_position_world;
 
-subroutine (GM_LightAmbient)
-vec3 GM_defaultLightAmbient(GM_light_t light)
-{
-	return light.lightColor;
-}
-
-subroutine (GM_LightDiffuse)
-vec3 GM_defaultLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
-{
-	float diffuseFactor = dot(lightDirection_N, normal_N);
-	diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
-	return diffuseFactor * light.lightColor;
-}
-
-subroutine (GM_LightSpecular)
-vec3 GM_defaultLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
-{
-	vec3 R = reflect(-lightDirection_N, normal_N);
-	float theta = dot(eyeDirection_N, R);
-	float specularFactor = pow(theta, GM_material.shininess);
-	specularFactor = clamp(specularFactor, 0.0f, 1.0f);
-
-	return specularFactor * light.lightColor;
-}
-
 void model3d_init()
 {
 	g_model3d_ambientLight = g_model3d_diffuseLight = g_model3d_specularLight = vec3(0);
@@ -55,31 +30,6 @@ float model3d_calcuateShadeFactor(vec4 shadowCoord)
 float model3d_shadeFactorFactor(float shadeFactor)
 {
 	return min(shadeFactor + 0.3, 1);
-}
-
-void model3d_calcDiffuseAndSpecular(GM_light_t light, vec3 lightDirection, vec3 eyeDirection, vec3 normal)
-{
-	vec3 N = normalize(normal);
-	vec3 L = normalize(lightDirection);
-
-	//diffuse:
-	{
-		float diffuseFactor = dot(L, N);
-		diffuseFactor = clamp(diffuseFactor, 0.0f, 1.0f);
-
-		g_model3d_diffuseLight += diffuseFactor * GM_material.kd * light.lightColor;
-	}
-
-	// specular:
-	vec3 V = normalize(eyeDirection);
-	{
-		vec3 R = reflect(-L, N);
-		float theta = dot(V, R);
-		float specularFactor = pow(theta, GM_material.shininess);
-		specularFactor = clamp(specularFactor, 0.0f, 1.0f);
-
-		g_model3d_specularLight += specularFactor * GM_material.ks * light.lightColor;
-	}
 }
 
 void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
@@ -119,10 +69,11 @@ void model3d_calcLights()
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].lightPosition, 1)).xyz;
 			vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
-			g_model3d_ambientLight += GM_material.ka * GM_lightAmbient[i](GM_lights[i]);
-			g_model3d_diffuseLight += GM_material.kd * GM_lightDiffuse[i](GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye);
-			g_model3d_specularLight += GM_material.ks * GM_lightSpecular[i](GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye);
-			model3d_calculateRefractionByNormalWorld(normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz);
+			g_model3d_ambientLight += GM_material.ka * GMLight_Ambient(GM_lights[i]);
+			g_model3d_diffuseLight += GM_material.kd * GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye);
+			g_model3d_specularLight += GM_material.ks * GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye, GM_material.shininess);
+			if (GM_lights[i].lightType == GM_AmbientLight)
+				model3d_calculateRefractionByNormalWorld(normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz);
 		}
 	}
 	else
@@ -140,11 +91,14 @@ void model3d_calcLights()
 				bitangent_eye,
 				g_model3d_normal_eye.xyz
 			));
-			vec3 lightDirection_tangent = TBN * lightDirection_eye;
-			vec3 eyeDirection_tangent = TBN * eyeDirection_eye;
+			vec3 lightDirection_tangent_N = normalize(TBN * lightDirection_eye);
+			vec3 eyeDirection_tangent_N = normalize(TBN * eyeDirection_eye);
 
-			model3d_calcDiffuseAndSpecular(GM_lights[i], lightDirection_tangent, eyeDirection_tangent, normal_tangent);
-			model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
+			g_model3d_ambientLight += GM_material.ka * GMLight_Ambient(GM_lights[i]);
+			g_model3d_diffuseLight += GM_material.kd * GMLight_Diffuse(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, normal_tangent);
+			g_model3d_specularLight += GM_material.ks * GMLight_Specular(GM_lights[i], lightDirection_tangent_N, eyeDirection_tangent_N, normal_tangent, GM_material.shininess);
+			if (GM_lights[i].lightType == GM_AmbientLight)
+				model3d_calculateRefractionByNormalTangent(TBN, normal_tangent);
 		}
 	}
 }

@@ -69,29 +69,21 @@ const GMfloat* GMGLLight::getLightColor() const
 
 void GMGLLight::activateLight(GMuint index, IRenderer* renderer)
 {
-	static char lightAmbient[GMGL_MAX_UNIFORM_NAME_LEN];
-	static char lightDiffuse[GMGL_MAX_UNIFORM_NAME_LEN];
-	static char lightSpecular[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Position[GMGL_MAX_UNIFORM_NAME_LEN];
 	static char light_Color[GMGL_MAX_UNIFORM_NAME_LEN];
+	static char light_Type[GMGL_MAX_UNIFORM_NAME_LEN];
 
 	GMGLRenderer* glRenderer = gm_cast<GMGLRenderer*>(renderer);
 	IShaderProgram* shaderProgram = glRenderer->getShaderProgram();
 	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 	const char* strIndex = number(index);
 
-	combineUniform(lightAmbient, "GM_lightAmbient[", strIndex, "]");
-	shaderProgram->setInterfaceInstance(lightAmbient, "GM_defaultLightAmbient", GMShaderType::Pixel);
-
-	combineUniform(lightDiffuse, "GM_lightDiffuse[", strIndex, "]");
-	shaderProgram->setInterfaceInstance(lightDiffuse, "GM_defaultLightDiffuse", GMShaderType::Pixel);
-
-	combineUniform(lightSpecular, "GM_lightSpecular[", strIndex, "]");
-	shaderProgram->setInterfaceInstance(lightSpecular, "GM_defaultLightSpecular", GMShaderType::Pixel);
-
 	combineUniform(light_Position, "GM_lights[", strIndex, "].lightColor");
 	shaderProgram->setVec3(light_Position, getLightColor());
 
 	combineUniform(light_Color, "GM_lights[", strIndex, "].lightPosition");
 	shaderProgram->setVec3(light_Color, getLightPosition());
+
+	combineUniform(light_Type, "GM_lights[", strIndex, "].lightType");
+	shaderProgram->setInt(light_Type, getType());
 }

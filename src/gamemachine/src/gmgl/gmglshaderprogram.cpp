@@ -185,7 +185,7 @@ void GMGLShaderProgram::setBool(const GMString& name, bool value)
 	setInt(name, (GMint)value);
 }
 
-bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char*  implement, GMuint shaderType)
+bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char* implement, GMuint shaderType)
 {
 	GM_ASSERT(verify());
 	D(d);
@@ -195,7 +195,10 @@ bool GMGLShaderProgram::setSubrotinue(const char* funcName, const char*  impleme
 		GLuint subroutineIndex = glGetSubroutineIndex(d->shaderProgram, shaderType, implement);
 		if (subroutineIndex != GL_INVALID_INDEX)
 		{
-			glUniformSubroutinesuiv(shaderType, 1, &subroutineIndex);
+			GLsizei n;
+			glGetProgramStageiv(d->shaderProgram, shaderType, GL_ACTIVE_SUBROUTINE_UNIFORM_LOCATIONS, &n);
+			GM_ASSERT(n == 1); //GM目前只用1个subroutine来决定渲染流程。subroutine这个特性真的是太难用了
+			glUniformSubroutinesuiv(shaderType, n, &subroutineIndex);
 			return true;
 		}
 	}

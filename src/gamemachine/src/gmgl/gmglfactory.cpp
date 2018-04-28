@@ -59,6 +59,6 @@ void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 	else
 	{
 		GM_ASSERT(type == GMLightType::Direct);
-		*out = new GMGLAmbientLight();
+		*out = new GMGLDirectLight();
 	}
 }
