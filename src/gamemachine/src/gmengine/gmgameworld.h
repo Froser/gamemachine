@@ -22,15 +22,14 @@ enum class GMRenderPreference
 
 struct GMRenderList
 {
-	Vector<GMGameObject*> forward;
-	Vector<GMGameObject*> deferred;
+	List<GMGameObject*> forward;
+	List<GMGameObject*> deferred;
 };
 
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	GMPhysicsWorld* physicsWorld = nullptr;
-	Vector<GMControlGameObject*> controls;
-	Vector<GMGameObject*> controls_objectType;
+	List<GMGameObject*> controls;
 	GMAssets assets;
 	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
 	GMRenderList renderList;
@@ -62,8 +61,7 @@ public:
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
 
-	inline Vector<GMControlGameObject*>& getControls() { D(d); return d->controls; }
-	inline Vector<GMGameObject*>& getControlsGameObject() { D(d); return d->controls_objectType; }
+	inline List<GMGameObject*>& getControls() { D(d); return d->controls; }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 protected:

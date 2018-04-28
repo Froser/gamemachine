@@ -51,7 +51,6 @@ enum class GMDebugConfigs
 
 enum class GMRenderConfigs
 {
-	RenderMode,
 	FilterMode,
 	FilterKernelOffset_Vec2,
 	Max,
@@ -73,7 +72,6 @@ namespace gm_config_guids
 	};
 
 	const GMString RenderGUIDs[(GMuint)GMRenderConfigs::Max] = {
-		L"4ED48523-309E-40e0-87B6-36CEC8E58283",
 		L"12471560-175E-4eff-B3F2-0569CA14E53D",
 	};
 }

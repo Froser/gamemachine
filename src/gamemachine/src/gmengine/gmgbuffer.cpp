@@ -3,6 +3,13 @@
 #include "foundation/utilities/utilities.h"
 #include "gameobjects/gmgameobject.h"
 #include "foundation/gamemachine.h"
+#include "gmgraphicengine.h"
+
+GMGBuffer::GMGBuffer(GMGraphicEngine* engine)
+{
+	D(d);
+	d->engine = engine;
+}
 
 GMGBuffer::~GMGBuffer()
 {

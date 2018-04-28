@@ -1,5 +1,6 @@
 ﻿#ifndef __INTERFACES_H__
 #define __INTERFACES_H__
+#include <defines.h>
 #include <glm/fwd.hpp>
 #include <input.h>
 #include <gmenums.h>
@@ -14,7 +15,6 @@ class GameMachine;
 class GMGameWorld;
 class GMCamera;
 class GMGameObject;
-class DrawingList;
 class GMGamePackage;
 class GMImage;
 class GMModel;
@@ -351,7 +351,7 @@ enum class GMGeometryPassingState
 GM_INTERFACE(IGBuffer)
 {
 	virtual void init() = 0;
-	virtual void geometryPass(GMGameObject *objects[], GMuint count) = 0;
+	virtual void geometryPass(const List<GMGameObject*>& objects) = 0;
 	virtual void lightPass() = 0;
 	virtual IFramebuffers* getGeometryFramebuffers() = 0;
 	virtual void setGeometryPassingState(GMGeometryPassingState) = 0;
@@ -444,16 +444,10 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	//! 使用正向绘制对象。
 	/*!
 	  渲染引擎将先绘制延迟渲染对象，然后再绘制正向渲染对象。
-	  \param forwardRenderingObjects 正向渲染对象数组。
-	  \param forwardRenderingCount 正向渲染对象数量。
-	  \param deferredRenderingObjects 延迟渲染对象数组。
-	  \param deferredRenderingCount 延迟渲染对象数量。
+	  \param forwardRenderingObjects 正向渲染对象列表。
+	  \param deferredRenderingObjects 延迟渲染对象列表。
 	*/
-	virtual void draw(
-		GMGameObject *forwardRenderingObjects[],
-		GMuint forwardRenderingCount,
-		GMGameObject *deferredRenderingObjects[],
-		GMuint deferredRenderingCount) = 0;
+	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) = 0;
 
 	//! 更新绘制数据。
 	/*!

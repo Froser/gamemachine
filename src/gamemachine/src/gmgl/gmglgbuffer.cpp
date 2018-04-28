@@ -24,7 +24,8 @@ namespace
 	};
 }
 
-GMGLGBuffer::GMGLGBuffer(GMGLGraphicEngine* engine)
+GMGLGBuffer::GMGLGBuffer(GMGraphicEngine* engine)
+	: GMGBuffer(engine)
 {
 	D(d);
 	d->engine = engine;
@@ -70,7 +71,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	return framebuffers;
 }
 
-void GMGLGBuffer::geometryPass(GMGameObject *objects[], GMuint count)
+void GMGLGBuffer::geometryPass(const List<GMGameObject*>& objects)
 {
 	D(d);
 	IFramebuffers* activeFramebuffers = nullptr;
@@ -79,10 +80,7 @@ void GMGLGBuffer::geometryPass(GMGameObject *objects[], GMuint count)
 	activeFramebuffers = getGeometryFramebuffers();
 	activeFramebuffers->clear();
 	activeFramebuffers->bind();
-	for (GMuint i = 0; i < count; ++i)
-	{
-		objects[i]->draw();
-	}
+	d->engine->draw(objects);
 	activeFramebuffers->unbind();
 	setGeometryPassingState(GMGeometryPassingState::Done);
 }

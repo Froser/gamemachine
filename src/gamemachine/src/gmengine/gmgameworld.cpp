@@ -7,6 +7,20 @@
 #include "foundation/gamemachine.h"
 #include "gameobjects/gmcontrolgameobject.h"
 
+namespace
+{
+	bool needBlend(GMGameObject* object)
+	{
+		GMModels& models = object->getModels();
+		for (auto& model : models)
+		{
+			if (model->getShader().getBlend())
+				return true;
+		}
+		return false;
+	}
+}
+
 GMGameWorld::~GMGameWorld()
 {
 	D(d);
@@ -39,21 +53,21 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 void GMGameWorld::renderScene()
 {
 	D(d);
+	static List<GMGameObject*> s_emptyList;
 	IGraphicEngine* engine = GM.getGraphicEngine();
 	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
 	{
-		engine->draw(d->renderList.forward.data(), d->renderList.forward.size(), nullptr, 0);
-		engine->draw(d->renderList.deferred.data(), d->renderList.deferred.size(), nullptr, 0);
+		engine->draw(d->renderList.deferred, s_emptyList);
+		engine->draw(d->renderList.forward, s_emptyList);
 	}
 	else
 	{
-		engine->draw(d->renderList.forward.data(), d->renderList.forward.size(),
-			d->renderList.deferred.data(), d->renderList.deferred.size());
+		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
 
 	engine->beginBlend();
-	auto& controls = getControlsGameObject();
-	engine->draw(controls.data(), controls.size(), nullptr, 0);
+	auto& controls = getControls();
+	engine->draw(controls, s_emptyList);
 	engine->endBlend();
 }
 
@@ -84,7 +98,6 @@ void GMGameWorld::addControl(GMControlGameObject* control)
 	control->setWorld(this);
 	control->onAppendingObjectToWorld();
 	d->controls.push_back(control);
-	d->controls_objectType.push_back(control);
 }
 
 void GMGameWorld::notifyControls()
@@ -92,7 +105,7 @@ void GMGameWorld::notifyControls()
 	D(d);
 	for (auto& obj : d->controls)
 	{
-		obj->notifyControl();
+		gm_cast<GMControlGameObject*>(obj)->notifyControl();
 	}
 }
 
@@ -118,7 +131,14 @@ void GMGameWorld::addToRenderList(GMGameObject* object)
 {
 	D(d);
 	if (object->canDeferredRendering())
+	{
 		d->renderList.deferred.push_back(object);
+	}
 	else
-		d->renderList.forward.push_back(object);
+	{
+		if (needBlend(object))
+			d->renderList.forward.push_back(object);
+		else
+			d->renderList.forward.push_front(object);
+	}
 }

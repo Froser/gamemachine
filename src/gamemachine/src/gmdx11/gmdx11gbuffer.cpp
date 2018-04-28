@@ -32,21 +32,17 @@ namespace
 	};
 }
 
-GMDx11GBuffer::GMDx11GBuffer(GMDx11GraphicEngine* engine)
+GMDx11GBuffer::GMDx11GBuffer(GMGraphicEngine* engine)
+	: GMGBuffer(engine)
 {
-	D(d);
-	d->engine = engine;
 }
 
-void GMDx11GBuffer::geometryPass(GMGameObject *objects[], GMuint count)
+void GMDx11GBuffer::geometryPass(const List<GMGameObject*>& objects)
 {
 	D(d);
 	setGeometryPassingState(GMGeometryPassingState::PassingGeometry);
 	getGeometryFramebuffers()->clear();
-	for (GMuint i = 0; i < count; ++i)
-	{
-		objects[i]->draw();
-	}
+	d->engine->draw(objects);
 	setGeometryPassingState(GMGeometryPassingState::Done);
 }
 

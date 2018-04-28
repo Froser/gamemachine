@@ -64,11 +64,7 @@ IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
 	return d->filterFramebuffers;
 }
 
-void GMGraphicEngine::draw(
-	GMGameObject *forwardRenderingObjects[],
-	GMuint forwardRenderingCount,
-	GMGameObject *deferredRenderingObjects[],
-	GMuint deferredRenderingCount)
+void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects)
 {
 	GM_PROFILE("draw");
 	GMFilterMode::Mode filterMode = getCurrentFilterMode();
@@ -78,10 +74,10 @@ void GMGraphicEngine::draw(
 		getFilterFramebuffers()->clear();
 	}
 
-	if (deferredRenderingObjects && deferredRenderingCount > 0)
+	if (!deferredRenderingObjects.empty())
 	{
 		IGBuffer* gBuffer = getGBuffer();
-		gBuffer->geometryPass(deferredRenderingObjects, deferredRenderingCount);
+		gBuffer->geometryPass(deferredRenderingObjects);
 
 		if (filterMode != GMFilterMode::None)
 		{
@@ -101,7 +97,7 @@ void GMGraphicEngine::draw(
 		gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getDefaultFramebuffers());
 	}
 
-	if (forwardRenderingObjects && forwardRenderingCount > 0)
+	if (!forwardRenderingObjects.empty())
 	{
 		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 		if (filterMode != GMFilterMode::None)
@@ -110,7 +106,7 @@ void GMGraphicEngine::draw(
 			filterFramebuffers->bind();
 		}
 
-		draw(forwardRenderingObjects, forwardRenderingCount);
+		draw(forwardRenderingObjects);
 
 		if (filterMode != GMFilterMode::None)
 		{
@@ -120,12 +116,12 @@ void GMGraphicEngine::draw(
 	}
 }
 
-void GMGraphicEngine::draw(GMGameObject *objects[], GMuint count)
+void GMGraphicEngine::draw(const List<GMGameObject*>& objects)
 {
 	D(d);
-	for (GMuint i = 0; i < count; i++)
+	for (auto object : objects)
 	{
-		objects[i]->draw();
+		object->draw();
 	}
 }
 

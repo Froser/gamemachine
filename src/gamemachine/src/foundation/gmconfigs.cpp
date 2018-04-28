@@ -52,7 +52,6 @@ void GMConfigs::init()
 	debugConfig.set(GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 	GMRenderConfig renderConfig = getConfig(GMConfigs::Render).asRenderConfig();
-	renderConfig.set(GMRenderConfigs::RenderMode, (GMint) GMRenderMode::Forward);
 	renderConfig.set(GMRenderConfigs::FilterMode, GMFilterMode::None);
 	renderConfig.set(GMRenderConfigs::FilterKernelOffset_Vec2, GMVec2(1, 1));
 }

@@ -45,11 +45,7 @@ public:
 public:
 	virtual IGBuffer* getGBuffer() override;
 	virtual IFramebuffers* getFilterFramebuffers() override;
-	virtual void draw(
-		GMGameObject *forwardRenderingObjects[],
-		GMuint forwardRenderingCount,
-		GMGameObject *deferredRenderingObjects[],
-		GMuint deferredRenderingCount) override;
+	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) override;
 	virtual void addLight(const GMLight& light) override;
 	virtual void removeLights() override;
 	virtual void setStencilOptions(const GMStencilOptions& options) override;
@@ -58,10 +54,10 @@ public:
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
+	void draw(const List<GMGameObject*>& objects);
 
 protected:
 	void createFilterFramebuffer();
-	void draw(GMGameObject *objects[], GMuint count);
 
 public:
 	inline GMFramebuffersStack& getFramebuffersStack()

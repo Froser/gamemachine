@@ -4,26 +4,16 @@
 #include <gmgbuffer.h>
 BEGIN_NS
 
-void copyDepthBuffer(GMuint target);
-
-class GMGLGraphicEngine;
-GM_PRIVATE_OBJECT(GMGLGBuffer)
-{
-	GMGLGraphicEngine* engine = nullptr;
-};
-
 class GMGLGBuffer : public GMGBuffer
 {
-	DECLARE_PRIVATE(GMGLGBuffer)
-
 public:
-	GMGLGBuffer(GMGLGraphicEngine* engine);
+	GMGLGBuffer(GMGraphicEngine* engine);
 
 protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;
 
 public:
-	virtual void geometryPass(GMGameObject *objects[], GMuint count) override;
+	virtual void geometryPass(const List<GMGameObject*>& objects) override;
 	virtual void lightPass() override;
 
 public:

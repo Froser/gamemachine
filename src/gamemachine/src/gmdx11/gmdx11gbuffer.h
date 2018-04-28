@@ -6,21 +6,13 @@ BEGIN_NS
 
 class GMDx11GraphicEngine;
 class GMGameObject;
-class GMDx11Texture;
-GM_PRIVATE_OBJECT(GMDx11GBuffer)
-{
-	GMDx11GraphicEngine* engine = nullptr;
-};
-
 class GMDx11GBuffer : public GMGBuffer
 {
-	DECLARE_PRIVATE(GMDx11GBuffer)
+public:
+	GMDx11GBuffer(GMGraphicEngine* engine);
 
 public:
-	GMDx11GBuffer(GMDx11GraphicEngine* engine);
-
-public:
-	virtual void geometryPass(GMGameObject *objects[], GMuint count) override;
+	virtual void geometryPass(const List<GMGameObject*>& objects) override;
 	virtual void lightPass() override;
 
 	void useGeometryTextures(ID3DX11Effect* effect);
