@@ -94,21 +94,19 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 
 		if (kbState.keydown('A'))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
-		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
-
 		if (kbState.keydown('D'))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
-		if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
-
 		if (kbState.keydown('S'))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
-		if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
-			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MIN));
-
 		if (kbState.keydown('W'))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
+
+		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MAX));
+		if (state.thumbLX < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0), GMVec3(gm::GMfloat(state.thumbLX) / SHRT_MIN));
+		if (state.thumbLY < -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
+			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MIN));
 		if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MAX));
 
@@ -131,21 +129,21 @@ void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
 		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
 		if (state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRX > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
 		{
+			gm::GMfloat rate = (gm::GMfloat)state.thumbRX / (
+				state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
+				SHRT_MIN :
+				SHRT_MAX);
+
+			joystickYaw = -state.thumbRX * joystickSensitivity * rate;
+		}
+		if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
+		{
 			gm::GMfloat rate = (gm::GMfloat)state.thumbRY / (
 				state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
 				SHRT_MIN :
 				SHRT_MAX);
 
 			joystickPitch = state.thumbRY * joystickSensitivity * rate;
-		}
-		if (state.thumbRY < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE || state.thumbRY > XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE)
-		{
-			gm::GMfloat rate = (gm::GMfloat)state.thumbRX / (
-				state.thumbRX < -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE ?
-				SHRT_MIN :
-				SHRT_MAX);
-
-			joystickYaw = state.thumbRX * joystickSensitivity * rate;
 		}
 		d->sprite->look(Radians(joystickPitch), Radians(joystickYaw));
 
