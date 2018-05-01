@@ -282,7 +282,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	if (evt == gm::GameMachineEvent::Render)
 	{
 		gm::IGraphicEngine* engine = GM.getGraphicEngine();
-		engine->newFrame();
+		engine->getDefaultFramebuffers()->clear();
 	}
 
 	DemoHandler* currentDemo = getWorld()->getCurrentDemo();

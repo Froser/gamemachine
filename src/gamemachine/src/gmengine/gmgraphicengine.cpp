@@ -47,6 +47,11 @@ GMGraphicEngine::~GMGraphicEngine()
 	GM_delete(d->gBuffer);
 }
 
+void GMGraphicEngine::init()
+{
+	getDefaultFramebuffers()->bind();
+}
+
 IGBuffer* GMGraphicEngine::getGBuffer()
 {
 	D(d);

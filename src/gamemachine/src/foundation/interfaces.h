@@ -317,6 +317,14 @@ struct GMFramebufferDesc
 	GMFramebufferFormat framebufferFormat;
 };
 
+enum class GMFramebuffersClearType
+{
+	Color = 0x01,
+	Depth = 0x02,
+	Stencil = 0x04,
+	All = Color | Depth | Stencil,
+};
+
 GM_INTERFACE(IFramebuffer)
 {
 	virtual bool init(const GMFramebufferDesc& desc) = 0;
@@ -331,7 +339,7 @@ GM_INTERFACE(IFramebuffers)
 	virtual GMuint count() = 0;
 	virtual void bind() = 0;
 	virtual void unbind() = 0;
-	virtual void clear() = 0;
+	virtual void clear(GMFramebuffersClearType = GMFramebuffersClearType::All) = 0;
 	virtual IFramebuffer* getFramebuffer(GMuint) = 0;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) = 0;
 };
@@ -409,15 +417,6 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  该方法将在GameMachine初始化时被调用。
 	*/
 	virtual void init() = 0;
-
-	//! 刷新帧缓存，新建一帧。
-	/*!
-	  此方法保证默认帧缓存将会被清空，但是并不保证其他帧缓存（如G缓存）被清空。<BR>
-	  如果要清空其它帧缓存，应该调用需要清除的帧缓存的相应方法。<BR>
-	  此方法将会清除默认帧缓存中的颜色缓存、深度缓存和模板缓存。
-	  \sa getGBuffer(), getFilterFramebuffers()
-	*/
-	virtual void newFrame() = 0;
 
 	//! 处理GameMachine消息。
 	/*!

@@ -58,7 +58,6 @@ public:
 
 public:
 	virtual void init() override;
-	virtual void newFrame() override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual void clearStencil() override;
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;

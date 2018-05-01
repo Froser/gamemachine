@@ -40,16 +40,6 @@ public:
 	{
 	}
 
-	void bind()
-	{
-		D_BASE(d, Base);
-		d->deviceContext->OMSetRenderTargets(d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
-	}
-
-	virtual void unbind() override
-	{
-	}
-
 	virtual GMuint count() override
 	{
 		return 1;
@@ -58,10 +48,6 @@ public:
 	virtual IFramebuffer* getFramebuffer(GMuint) override
 	{
 		return nullptr;
-	}
-
-	virtual void clear() override
-	{
 	}
 };
 
@@ -292,13 +278,23 @@ void GMDx11Framebuffers::unbind()
 	}
 }
 
-void GMDx11Framebuffers::clear()
+void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 {
 	static constexpr GMfloat clear[4] = { 0, 0, 0, 1 };
 	D(d);
-	for (auto renderTargetView : d->renderTargetViews)
+	UINT clearFlag;
+	GMuint iType = (GMuint)type;
+	if (iType & (GMuint)GMFramebuffersClearType::Depth)
+		clearFlag |= D3D11_CLEAR_DEPTH;
+	if (iType & (GMuint)GMFramebuffersClearType::Stencil)
+		clearFlag |= D3D11_CLEAR_STENCIL;
+
+	if (iType & (GMuint)GMFramebuffersClearType::Color)
 	{
-		d->deviceContext->ClearRenderTargetView(renderTargetView, clear);
+		for (auto renderTargetView : d->renderTargetViews)
+		{
+			d->deviceContext->ClearRenderTargetView(renderTargetView, clear);
+		}
 	}
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
 }

@@ -118,19 +118,19 @@ void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 	d->inverseViewMatrix = Inverse(viewMatrix);
 }
 
-const GMMat4& GMFrustum::getProjectionMatrix()
+const GMMat4& GMFrustum::getProjectionMatrix() const
 {
 	D(d);
 	return d->projectionMatrix;
 }
 
-const GMMat4& GMFrustum::getViewMatrix()
+const GMMat4& GMFrustum::getViewMatrix() const
 {
 	D(d);
 	return d->viewMatrix;
 }
 
-const GMMat4& GMFrustum::getInverseViewMatrix()
+const GMMat4& GMFrustum::getInverseViewMatrix() const
 {
 	D(d);
 	return d->inverseViewMatrix;

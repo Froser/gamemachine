@@ -60,7 +60,7 @@ public:
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
 	virtual void bind() override;
 	virtual void unbind() override;
-	virtual void clear() override;
+	virtual void clear(GMFramebuffersClearType type) override;
 	virtual IFramebuffer* getFramebuffer(GMuint) override;
 	virtual GMuint count() override;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;

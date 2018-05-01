@@ -11,19 +11,12 @@ void GMDx11GraphicEngine::init()
 {
 	D(d);
 	D_BASE(db, Base);
+	Base::init();
+
 	if (d->ready)
 		initShaders();
 	else
 		GM_ASSERT(false);
-}
-
-void GMDx11GraphicEngine::newFrame()
-{
-	D(d);
-	static const GMfloat clear[4] = { 0, 0, 0, 1 };
-	d->deviceContext->RSSetState(NULL);
-	d->deviceContext->ClearRenderTargetView(d->renderTargetView, clear);
-	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
 }
 
 void GMDx11GraphicEngine::update(GMUpdateDataType type)

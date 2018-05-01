@@ -96,9 +96,9 @@ public:
 	inline GMfloat getFovy() { D(d); GM_ASSERT(getType() == GMFrustumType::Perspective); return d->fovy; }
 
 public:
-	const GMMat4& getProjectionMatrix();
-	const GMMat4& getViewMatrix();
-	const GMMat4& getInverseViewMatrix();
+	const GMMat4& getProjectionMatrix() const;
+	const GMMat4& getViewMatrix() const;
+	const GMMat4& getInverseViewMatrix() const;
 
 public:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);

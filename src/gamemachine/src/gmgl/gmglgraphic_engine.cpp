@@ -61,6 +61,7 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 
 void GMGLGraphicEngine::init()
 {
+	Base::init();
 	installShaders();
 	glEnable(GL_MULTISAMPLE);
 
@@ -78,16 +79,6 @@ void GMGLGraphicEngine::init()
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback((GLDEBUGPROC)GL_MessageCallback, 0);
 #endif
-}
-
-void GMGLGraphicEngine::newFrame()
-{
-	D(d);
-	GLint mask;
-	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
-	glStencilMask(0xFF);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glStencilMask(mask);
 }
 
 void GMGLGraphicEngine::installShaders()

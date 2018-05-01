@@ -64,21 +64,20 @@ public:
 class GMGLDefaultFramebuffers : public GMGLFramebuffers
 {
 public:
+	GMGLDefaultFramebuffers()
+	{
+		D_BASE(d, GMGLFramebuffers);
+		d->fbo = 0;
+		d->framebuffersCreated = true;
+	}
+
+public:
 	virtual bool init(const GMFramebuffersDesc& desc) override
 	{
 		return false;
 	}
 
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override
-	{
-	}
-
-	virtual void bind() override
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
-	virtual void unbind() override
 	{
 	}
 
@@ -95,10 +94,6 @@ public:
 	virtual GMuint framebufferId() override
 	{
 		return 0;
-	}
-
-	virtual void clear() override
-	{
 	}
 };
 
@@ -266,16 +261,35 @@ bool GMGLFramebuffers::createFramebuffers()
 	return true;
 }
 
-void GMGLFramebuffers::clear()
+void GMGLFramebuffers::clear(GMFramebuffersClearType type)
 {
 	D(d);
-	GLint mask;
-	bind();
-	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
-	glStencilMask(0xFF);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	glStencilMask(mask);
-	unbind();
+	GMuint iType = (GMuint)type;
+	GLenum mask = 0x00;
+	if (iType & (GMuint)GMFramebuffersClearType::Color)
+		mask |= GL_COLOR_BUFFER_BIT;
+	if (iType & (GMuint)GMFramebuffersClearType::Depth)
+		mask |= GL_DEPTH_BUFFER_BIT;
+	if (iType & (GMuint)GMFramebuffersClearType::Stencil)
+		mask |= GL_STENCIL_BUFFER_BIT;
+
+	if (mask)
+	{
+		bind();
+		if (mask & GL_STENCIL_BUFFER_BIT)
+		{
+			GLint stencilMask;
+			glGetIntegerv(GL_STENCIL_WRITEMASK, &stencilMask);
+			glStencilMask(0xFF);
+			glClear(mask);
+			glStencilMask(stencilMask);
+		}
+		else
+		{
+			glClear(mask);
+		}
+		unbind();
+	}
 }
 
 IFramebuffer* GMGLFramebuffers::getFramebuffer(GMuint index)

@@ -43,6 +43,7 @@ public:
 	~GMGraphicEngine();
 
 public:
+	virtual void init() override;
 	virtual IGBuffer* getGBuffer() override;
 	virtual IFramebuffers* getFilterFramebuffers() override;
 	virtual void draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects) override;
