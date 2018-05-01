@@ -181,14 +181,46 @@ class GMDefaultDirectLight : ILight
 //默认的光照实现
 GMDefaultAmbientLight DefaultAmbientLight; 
 GMDefaultDirectLight DefaultDirectLight;
+
 struct GMLight
 {
     float4 Position;
     float4 Color;
+    int Type;
 };
-GMLight LightAttributes[5];
-ILight Light[5];
+const int GM_AmbientLight = 0;
+const int GM_DirectLight = 1;
+
+class GMLightProxy
+{
+    float4 IlluminateAmbient(GMLight light)
+    {
+        if (light.Type == GM_AmbientLight)
+            return DefaultAmbientLight.IlluminateAmbient();
+
+        return DefaultDirectLight.IlluminateAmbient();
+    }
+
+    float4 IlluminateDiffuse(GMLight light, float3 lightDirection_N, float3 normal_N)
+    {
+        if (light.Type == GM_AmbientLight)
+            return DefaultAmbientLight.IlluminateDiffuse(lightDirection_N, normal_N);
+
+        return DefaultDirectLight.IlluminateDiffuse(lightDirection_N, normal_N);
+    }
+
+    float4 IlluminateSpecular(GMLight light, float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
+    {
+        if (light.Type == GM_AmbientLight)
+            return DefaultAmbientLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
+
+        return DefaultDirectLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
+    }
+};
+
+GMLight LightAttributes[50];
 int LightCount;
+GMLightProxy LightProxy;
 
 struct GMScreenInfo
 {
@@ -342,21 +374,21 @@ float4 PS_3D_Common(VS_3D_INPUT input)
     for (int i = 0; i < LightCount; ++i)
     {
         float3 lightPosition_Eye = GetLightPositionInEyeSpace(LightAttributes[i].Position, ViewMatrix);
-        factor_Ambient += Light[i].IlluminateAmbient() * LightAttributes[i].Color;
+        factor_Ambient += LightProxy.IlluminateAmbient(LightAttributes[i]) * LightAttributes[i].Color;
 
         if (!input.HasNormalMap)
         {
             float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-            factor_Diffuse += Light[i].IlluminateDiffuse(lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
-            factor_Specular += Light[i].IlluminateSpecular(lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;    
+            factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
+            factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;    
         }
         else
         {
             float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
             float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
             float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
-            factor_Diffuse += Light[i].IlluminateDiffuse(lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * LightAttributes[i].Color;
-            factor_Specular += Light[i].IlluminateSpecular(lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
+            factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * LightAttributes[i].Color;
+            factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
         }
     }
     float4 color_Ambient = factor_Ambient * ToFloat4(input.AmbientLightmapTexture);

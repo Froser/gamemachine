@@ -31,8 +31,6 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	
 	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
-
-	ILight* defaultLightImpl = nullptr;
 	bool lightDirty = true;
 };
 

@@ -48,16 +48,6 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
 {
 	D(d);
-	if (!d->defaultLightImpl)
-	{
-		GM.getFactory()->createLight(GMLightType::Ambient, &d->defaultLightImpl);
-		d->defaultLightImpl->setLightColor(ValuePointer(Zero<GMVec4>()));
-		for (GMuint i = 0; i < getMaxLightCount(); ++i)
-		{
-			d->defaultLightImpl->activateLight(i, renderer);
-		}
-	}
-
 	if (d->lightDirty)
 	{
 		IShaderProgram* shaderProgram = getShaderProgram();

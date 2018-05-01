@@ -21,24 +21,28 @@ public:
 	virtual void activateLight(GMuint, IRenderer*) override;
 
 protected:
-	virtual const char* getImplementName() = 0;
+	virtual int getLightType() = 0;
 };
 
 class GMDx11AmbientLight : public GMDx11Light
 {
+	enum { LightType = 0 };
+
 public:
-	virtual const char* getImplementName() override
+	virtual int getLightType() override
 	{
-		return "DefaultAmbientLight";
+		return LightType;
 	}
 };
 
 class GMDx11DirectLight : public GMDx11Light
 {
+	enum { LightType = 1 };
+
 public:
-	virtual const char* getImplementName() override
+	virtual int getLightType() override
 	{
-		return "DefaultDirectLight";
+		return LightType;
 	}
 };
 

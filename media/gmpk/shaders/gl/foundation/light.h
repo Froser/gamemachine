@@ -1,5 +1,5 @@
 // 光照相关
-#define MAX_LIGHT_COUNT 5
+#define MAX_LIGHT_COUNT 50
 struct GM_light_t
 {
 	vec3 lightColor;

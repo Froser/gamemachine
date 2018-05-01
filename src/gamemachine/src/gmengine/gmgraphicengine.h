@@ -91,7 +91,7 @@ private:
 public:
 	static constexpr const GMuint getMaxLightCount()
 	{
-		return 5;
+		return 50;
 	}
 };
 

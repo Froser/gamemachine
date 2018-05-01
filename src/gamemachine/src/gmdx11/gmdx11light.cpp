@@ -38,14 +38,8 @@ void GMDx11Light::activateLight(GMuint index, IRenderer* renderer)
 	static const GMShaderVariablesDesc desc = *(dxRenderer->getVariablesDesc());
 	ID3DX11Effect* effect = dxRenderer->getEffect();
 
-	ID3DX11EffectClassInstanceVariable* defaultLightImpl = effect->GetVariableByName(getImplementName())->AsClassInstance();
-	GM_ASSERT(defaultLightImpl->IsValid());
 	ID3DX11EffectVariable* lightStruct = effect->GetVariableByName("LightAttributes")->GetElement(index);
 	GM_ASSERT(lightStruct->IsValid());
-
-	ID3DX11EffectInterfaceVariable* light = effect->GetVariableByName("Light")->GetElement(index)->AsInterface();
-	GM_ASSERT(light->IsValid());
-	GM_DX_HR(light->SetClassInstance(defaultLightImpl));
 
 	ID3DX11EffectVectorVariable* position = lightStruct->GetMemberByName("Position")->AsVector();
 	GM_ASSERT(position->IsValid());
@@ -54,4 +48,8 @@ void GMDx11Light::activateLight(GMuint index, IRenderer* renderer)
 	ID3DX11EffectVectorVariable* color = lightStruct->GetMemberByName("Color")->AsVector();
 	GM_ASSERT(color->IsValid());
 	GM_DX_HR(color->SetFloatVector(getLightColor()));
+
+	ID3DX11EffectScalarVariable* type = lightStruct->GetMemberByName("Type")->AsScalar();
+	GM_ASSERT(type->IsValid());
+	GM_DX_HR(type->SetInt(getLightType()));
 }
