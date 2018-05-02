@@ -22,7 +22,7 @@ GM_PRIVATE_OBJECT(GMGLShaderProgram)
 	GMGLShaderIDList shaders;
 	GMuint shaderProgram = 0;
 	static GMuint lastUsedProgram;
-	Map<GMString, GMString> aliasMap;
+	HashMap<GMString, GMString, GMStringHashFunctor> aliasMap;
 };
 
 class GMGLShaderProgram : public GMObject, public IShaderProgram

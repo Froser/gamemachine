@@ -225,7 +225,7 @@ GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
 	std::wstring _newValue = newValue.toStdWString();
 	std::wstring _str = d->data;
 	size_t idx = std::wstring::npos + 1;
-	while ((idx = _str.find(_oldValue, _oldValue.size())) != std::wstring::npos)
+	while ((idx = _str.find(_oldValue)) != std::wstring::npos)
 	{
 		_str = _str.replace(idx, _oldValue.length(), _newValue);
 	}
