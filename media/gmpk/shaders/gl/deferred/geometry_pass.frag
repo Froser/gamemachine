@@ -34,7 +34,7 @@ vec4 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT]
 void deferred_geometry_pass_calcEyeSpace()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
+	mat3 normalEyeTransform = mat3(GM_view_matrix * GM_inverse_transpose_model_matrix);
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	${deferred_geometry_pass_gNormal} = normalToTexture ( normalize( GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz );
 
@@ -42,8 +42,8 @@ void deferred_geometry_pass_calcEyeSpace()
 	{
 		${deferred_geometry_pass_gNormalMap_bNormalMap} = texture(GM_normalmap_textures[0].texture, _uv);
 		${deferred_geometry_pass_gNormalMap_bNormalMap}.a = 1;
-		${deferred_geometry_pass_gTangent_eye} = normalToTexture(normalize(normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
-		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(normalize(normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
+		${deferred_geometry_pass_gTangent_eye} = normalToTexture(normalize(normalEyeTransform * _tangent.xyz).xyz);
+		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(normalize(normalEyeTransform * _bitangent.xyz).xyz);
 	}
 	else
 	{

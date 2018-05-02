@@ -199,6 +199,11 @@ GMDx11Framebuffers::~GMDx11Framebuffers()
 bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 {
 	D(d);
+	d->clearColor[0] = desc.clearColor[0];
+	d->clearColor[1] = desc.clearColor[1];
+	d->clearColor[2] = desc.clearColor[2];
+	d->clearColor[3] = desc.clearColor[3];
+
 	GMComPtr<ID3D11Device> device;
 	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 	GM_ASSERT(device);
@@ -280,7 +285,6 @@ void GMDx11Framebuffers::unbind()
 
 void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 {
-	static constexpr GMfloat clear[4] = { 0, 0, 0, 1 };
 	D(d);
 	UINT clearFlag;
 	GMuint iType = (GMuint)type;
@@ -293,7 +297,7 @@ void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 	{
 		for (auto renderTargetView : d->renderTargetViews)
 		{
-			d->deviceContext->ClearRenderTargetView(renderTargetView, clear);
+			d->deviceContext->ClearRenderTargetView(renderTargetView, d->clearColor);
 		}
 	}
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);

@@ -147,7 +147,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		desc.rect = states.renderRect;
 		factory->createFramebuffers(&d->filterFramebuffers);
 		GM_ASSERT(d->filterFramebuffers);
-		GMFramebuffersDesc fbDesc = { 0 };
+		GMFramebuffersDesc fbDesc;
 		fbDesc.rect = states.renderRect;
 		d->filterFramebuffers->init(fbDesc);
 		IFramebuffer* framebuffer = nullptr;

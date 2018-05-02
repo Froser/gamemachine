@@ -111,6 +111,7 @@ void GMGLRenderer::draw(GMModel* model)
 {
 	D(d);
 	applyStencil(*d->engine);
+	prepareScreenInfo(getShaderProgram());
 	beforeDraw(model);
 	GLenum mode = d->debugConfig.get(GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool() ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
 	if (model->getDrawMode() == GMModelDrawMode::Vertex)
@@ -262,27 +263,38 @@ ITexture* GMGLRenderer::getTexture(GMTextureFrames& frames)
 
 void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 {
-	GMCamera& camera = GM.getCamera();
-	GMFrustum& frustum = camera.getFrustum();
-	const GMMat4& viewMatrix = frustum.getViewMatrix();
-	const GMCameraLookAt& lookAt = camera.getLookAt();
-	GMFloat4 vec;
-	lookAt.position.loadFloat4(vec);
+	static IShaderProgram* s_lastShaderProgram = nullptr;
 
-	auto& desc = shaderProgram->getDesc();
-	shaderProgram->setVec4(desc.ViewPosition, vec);
-	shaderProgram->setMatrix4(desc.ViewMatrix, frustum.getViewMatrix());
-	shaderProgram->setMatrix4(desc.InverseViewMatrix, frustum.getInverseViewMatrix());
-	shaderProgram->setMatrix4(desc.ProjectionMatrix, frustum.getProjectionMatrix());
+	GMCamera& camera = GM.getCamera();
+	if (s_lastShaderProgram != shaderProgram || camera.isDirty())
+	{
+		const GMMat4& viewMatrix = camera.getViewMatrix();
+		const GMCameraLookAt& lookAt = camera.getLookAt();
+		GMFloat4 vec;
+		lookAt.position.loadFloat4(vec);
+
+		auto& desc = shaderProgram->getDesc();
+		shaderProgram->setVec4(desc.ViewPosition, vec);
+		shaderProgram->setMatrix4(desc.ViewMatrix, camera.getViewMatrix());
+		shaderProgram->setMatrix4(desc.InverseViewMatrix, camera.getInverseViewMatrix());
+		shaderProgram->setMatrix4(desc.ProjectionMatrix, camera.getProjectionMatrix());
+		s_lastShaderProgram = shaderProgram;
+		camera.cleanDirty();
+	}
 }
 
 void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
-	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-	auto& desc = shaderProgram->getDesc();
-	shaderProgram->setInt(desc.ScreenInfoAttributes.Multisampling, states.sampleCount > 1);
-	shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenWidth, states.renderRect.width);
-	shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenHeight, states.renderRect.height);
+	static IShaderProgram* s_lastShaderProgram = nullptr;
+	if (s_lastShaderProgram != shaderProgram) //或者窗口属性发生改变
+	{
+		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+		auto& desc = shaderProgram->getDesc();
+		shaderProgram->setInt(desc.ScreenInfoAttributes.Multisampling, states.sampleCount > 1);
+		shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenWidth, states.renderRect.width);
+		shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenHeight, states.renderRect.height);
+		s_lastShaderProgram = shaderProgram;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

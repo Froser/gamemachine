@@ -69,7 +69,6 @@ void GMGLGraphicEngine::init()
 	glClearDepth(runningState.farZ);
 	glDepthFunc(GL_LEQUAL);
 
-	glClearColor(0, 0, 0, 1);
 	glEnable(GL_STENCIL_TEST);
 	glClearStencil(0);
 	glStencilFunc(GL_ALWAYS, 1, 0xFF);

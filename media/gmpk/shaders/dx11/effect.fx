@@ -11,6 +11,15 @@ float4 ToFloat4(float3 v)
     return ToFloat4(v, 1);
 }
 
+float3x3 ToFloat3x3(float4x4 m)
+{
+    return float3x3(
+        m[0].xyz,
+        m[1].xyz,
+        m[2].xyz
+    );
+}
+
 //--------------------------------------------------------------------------------------
 // Constant Buffer Variables
 //--------------------------------------------------------------------------------------
@@ -295,8 +304,8 @@ class TangentSpace
             return;
 
         Normal_Tangent_N = NormalMap().RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
-        float3 tangent_Eye_N = normalize(mul(ToFloat4(tangent, 0), transform_Normal_Eye).xyz);
-        float3 bitangent_Eye_N = normalize(mul(ToFloat4(bitangent, 0), transform_Normal_Eye).xyz);
+        float3 tangent_Eye_N = normalize(mul(tangent, ToFloat3x3(transform_Normal_Eye)).xyz);
+        float3 bitangent_Eye_N = normalize(mul(bitangent, ToFloat3x3(transform_Normal_Eye)).xyz);
         TBN = transpose(float3x3(
             tangent_Eye_N,
             bitangent_Eye_N,
@@ -435,7 +444,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
     // 将法线换算到眼睛坐标系
     matrix transform_Normal_Eye = mul(InverseTransposeModelMatrix, ViewMatrix);
-    float3 normal_Eye_N = normalize( mul(ToFloat4(input.Normal.xyz, 0), transform_Normal_Eye).xyz);
+    float3 normal_Eye_N = normalize(mul(input.Normal, ToFloat3x3(transform_Normal_Eye)).xyz);
 
     VS_3D_INPUT commonInput;
     TangentSpace tangentSpace;
@@ -445,7 +454,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.WorldPos = input.WorldPos;
     commonInput.HasNormalMap = HasNormalMap();
 
-    commonInput.Normal_World_N = normalize(mul(ToFloat4(input.Normal.xyz, 0), InverseTransposeModelMatrix).xyz);
+    commonInput.Normal_World_N = normalize(mul(input.Normal, ToFloat3x3(InverseTransposeModelMatrix)).xyz);
     commonInput.Normal_Eye_N = normal_Eye_N;
 
     // 计算Ambient
@@ -603,12 +612,12 @@ VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
 VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 {
     VS_GEOMETRY_OUTPUT output;
-    output.Position_Refractivity.rgb = mul(input.WorldPos, WorldMatrix).xyz;
+    output.Position_Refractivity.rgb = input.WorldPos;
     output.Position_Refractivity.a = Material.Refractivity;
 
     float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
-    output.Normal_World = Float3ToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix)).xyz );
+    output.Normal_World = Float3ToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix).xyz) );
 
     float4 texAmbient = float4(0, 0, 0, 0);
     float4 texDiffuse = float4(0, 0, 0, 0);
@@ -638,8 +647,8 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 
     if (HasNormalMap())
     {
-        output.Tangent_Eye = Float3ToTexture(mul(ToFloat4(input.Tangent, 0), normalEyeTransform));
-        output.Bitangent_Eye = Float3ToTexture(mul(ToFloat4(input.Bitangent, 0), normalEyeTransform));
+        output.Tangent_Eye = Float3ToTexture(mul(input.Tangent, ToFloat3x3(normalEyeTransform)));
+        output.Bitangent_Eye = Float3ToTexture(mul(input.Bitangent, ToFloat3x3(normalEyeTransform)));
         output.NormalMap_HasNormalMap = ToFloat4(NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord), 1);
     }
     else
@@ -700,7 +709,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
     commonInput.Refractivity = PosRef.a;
     tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
     commonInput.HasNormalMap = (normalMapFlag.a != 0);
-    commonInput.Normal_Eye_N = mul(ToFloat4(commonInput.Normal_World_N, 0), ViewMatrix);
+    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ToFloat3x3(ViewMatrix));
     tangentSpace.TBN = transpose(float3x3(
         tangent_Eye_N,
         bitangent_Eye_N,

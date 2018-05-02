@@ -150,6 +150,11 @@ bool GMGLFramebuffers::init(const GMFramebuffersDesc& desc)
 {
 	D(d);
 	d->desc.rect = desc.rect;
+	d->clearColor[0] = desc.clearColor[0];
+	d->clearColor[1] = desc.clearColor[1];
+	d->clearColor[2] = desc.clearColor[2];
+	d->clearColor[3] = desc.clearColor[3];
+
 	glGenFramebuffers(1, &d->fbo);
 	createDepthStencilBuffer(d->desc);
 	return glGetError() == GL_NO_ERROR;
@@ -276,6 +281,7 @@ void GMGLFramebuffers::clear(GMFramebuffersClearType type)
 	if (mask)
 	{
 		bind();
+		glClearColor(d->clearColor[0], d->clearColor[1], d->clearColor[2], d->clearColor[3]);
 		if (mask & GL_STENCIL_BUFFER_BIT)
 		{
 			GLint stencilMask;

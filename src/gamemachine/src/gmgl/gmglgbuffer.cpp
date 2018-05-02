@@ -52,7 +52,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	};
 
 	GM.getFactory()->createFramebuffers(&framebuffers);
-	GMFramebuffersDesc fbDesc = { 0 };
+	GMFramebuffersDesc fbDesc;
 	fbDesc.rect = states.renderRect;
 	framebuffers->init(fbDesc);
 	GM_ASSERT(framebuffers);

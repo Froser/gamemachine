@@ -12,26 +12,6 @@ void model3d_init()
 	g_model3d_ambientLight = g_model3d_diffuseLight = g_model3d_specularLight = vec3(0);
 }
 
-float model3d_calcuateShadeFactor(vec4 shadowCoord)
-{
-	if (GM_shadow_texture_switch == 0)
-		return 1;
-
-	float shadeFactor = 0.0;
-	shadeFactor += textureProjOffset(GM_shadow_texture, shadowCoord, ivec2(-1, -1));
-	shadeFactor += textureProjOffset(GM_shadow_texture, shadowCoord, ivec2(1, -1));
-	shadeFactor += textureProjOffset(GM_shadow_texture, shadowCoord, ivec2(-1, 1));
-	shadeFactor += textureProjOffset(GM_shadow_texture, shadowCoord, ivec2(1, 1));
-	shadeFactor /= 4;
-
-	return shadeFactor;
-}
-
-float model3d_shadeFactorFactor(float shadeFactor)
-{
-	return min(shadeFactor + 0.3, 1);
-}
-
 void model3d_calculateRefractionByNormalWorld(vec3 normal_world)
 {
 	if (GM_material.refractivity == 0.f)
@@ -55,12 +35,12 @@ void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 void model3d_calcLights()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat4 normalEyeTransform = GM_view_matrix * GM_inverse_transpose_model_matrix;
+	mat3 normalEyeTransform = mat3(GM_view_matrix * GM_inverse_transpose_model_matrix);
 	vec4 vertex_eye = GM_view_matrix * _model3d_position_world;
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
 	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
-	g_model3d_normal_eye = normalize( (normalEyeTransform * vec4(_normal.xyz, 0)).xyz );
+	g_model3d_normal_eye = normalize( (normalEyeTransform * _normal.xyz).xyz );
 
 	// 计算漫反射和高光部分
 	if (GM_normalmap_textures[0].enabled == 0)
@@ -79,8 +59,8 @@ void model3d_calcLights()
 	else
 	{
 		vec3 normal_tangent = texture(GM_normalmap_textures[0].texture, _uv).rgb * 2.0 - 1.0;
-		vec3 tangent_eye = normalize((normalEyeTransform * vec4(_tangent.xyz, 0)).xyz);
-		vec3 bitangent_eye = normalize((normalEyeTransform * vec4(_bitangent.xyz, 0)).xyz);
+		vec3 tangent_eye = normalize((normalEyeTransform * _tangent.xyz).xyz);
+		vec3 bitangent_eye = normalize((normalEyeTransform * _bitangent.xyz).xyz);
 		for (int i = 0; i < GM_lightCount; i++)
 		{
 			vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].lightPosition, 1)).xyz;

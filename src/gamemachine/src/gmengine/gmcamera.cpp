@@ -16,6 +16,7 @@ void GMFrustum::setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat to
 	d->f = f;
 
 	d->projectionMatrix = Ortho(d->left, d->right, d->bottom, d->top, d->n, d->f);
+	d->dirty = true;
 }
 
 void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f)
@@ -28,6 +29,7 @@ void GMFrustum::setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat 
 	d->f = f;
 
 	d->projectionMatrix = Perspective(d->fovy, d->aspect, d->n, d->f);
+	d->dirty = true;
 }
 
 void GMFrustum::getPlanes(GMFrustumPlanes& planes)
@@ -116,6 +118,7 @@ void GMFrustum::updateViewMatrix(const GMMat4& viewMatrix)
 	D(d);
 	d->viewMatrix = viewMatrix;
 	d->inverseViewMatrix = Inverse(viewMatrix);
+	d->dirty = true;
 }
 
 const GMMat4& GMFrustum::getProjectionMatrix() const
@@ -168,14 +171,14 @@ void GMCamera::synchronize(GMSpriteGameObject* gameObject)
 void GMCamera::synchronizeLookAt()
 {
 	D(d);
-	getFrustum().updateViewMatrix(::getViewMatrix(d->lookAt));
+	d->frustum.updateViewMatrix(::getViewMatrix(d->lookAt));
 }
 
 void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 {
 	D(d);
 	d->lookAt = lookAt;
-	getFrustum().updateViewMatrix(::getViewMatrix(lookAt));
+	d->frustum.updateViewMatrix(::getViewMatrix(lookAt));
 }
 
 GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
@@ -194,4 +197,15 @@ GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
 	);
 
 	return world - d->lookAt.position;
+}
+
+void GMCamera::getPlanes(GMFrustumPlanes& planes)
+{
+	D(d);
+	d->frustum.getPlanes(planes);
+}
+
+bool GMCamera::isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3(&vertices)[8])
+{
+	return GMFrustum::isBoundingBoxInside(planes, vertices);
 }

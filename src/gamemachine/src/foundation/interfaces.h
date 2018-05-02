@@ -309,6 +309,7 @@ enum class GMFramebufferFormat
 struct GMFramebuffersDesc
 {
 	GMRect rect;
+	GMfloat clearColor[4] = { 0 };
 };
 
 struct GMFramebufferDesc

@@ -33,6 +33,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffers)
 	bool framebuffersCreated = false;
 	GMGraphicEngine* engine = nullptr;
 	GMFramebufferDesc desc;
+	GMfloat clearColor[4];
 };
 
 class GMGLFramebuffers : public GMObject, public IFramebuffers

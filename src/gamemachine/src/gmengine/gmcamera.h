@@ -67,19 +67,22 @@ GM_PRIVATE_OBJECT(GMFrustum)
 	GMMat4 projectionMatrix;
 	GMMat4 viewMatrix;
 	GMMat4 inverseViewMatrix;
+
+	bool dirty = true;
 };
 
+class GMCamera;
 class GMSpriteGameObject;
 class GMFrustum : public GMObject
 {
 	DECLARE_PRIVATE(GMFrustum)
 
-public:
+	friend class GMCamera;
+
 	GMFrustum() = default;
 	void setOrtho(GMfloat left, GMfloat right, GMfloat bottom, GMfloat top, GMfloat n, GMfloat f);
 	void setPerspective(GMfloat fovy, GMfloat aspect, GMfloat n, GMfloat f);
 
-public:
 	void updateViewMatrix(const GMMat4& viewMatrix);
 
 	//! 获取平截头体的6个平面方程。
@@ -89,18 +92,14 @@ public:
 	*/
 	void getPlanes(GMFrustumPlanes& planes);
 
-public:
-	inline GMFrustumType getType() { D(d); return d->type; }
-	inline GMfloat getNear() { D(d); return d->n; }
-	inline GMfloat getFar() { D(d); return d->f; }
-	inline GMfloat getFovy() { D(d); GM_ASSERT(getType() == GMFrustumType::Perspective); return d->fovy; }
-
-public:
 	const GMMat4& getProjectionMatrix() const;
 	const GMMat4& getViewMatrix() const;
 	const GMMat4& getInverseViewMatrix() const;
 
-public:
+	inline bool isDirty() { D(d); return d->dirty; }
+	inline void cleanDirty() { D(d); d->dirty = false; }
+
+private:
 	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3 (&vertices)[8]);
 };
 
@@ -125,7 +124,6 @@ public:
 	void synchronizeLookAt();
 
 	void lookAt(const GMCameraLookAt& lookAt);
-	GMFrustum& getFrustum() { D(d); return d->frustum; }
 
 	//! 获取从屏幕出发，变换到世界的一条射线
 	/*!
@@ -136,10 +134,23 @@ public:
 	*/
 	GMVec3 getRayToWorld(GMint x, GMint y) const;
 
+	//! 获取平截头体的6个平面方程。
+	/*!
+	获取平截头体的6个平面方程，法线方向朝外。
+	\param planes 得到的平面方程。
+	*/
+	void getPlanes(GMFrustumPlanes& planes);
+
 public:
-	inline const GMMat4& getProjectionMatrix() { D(d); return getFrustum().getProjectionMatrix(); }
-	inline const GMMat4& getViewMatrix() { D(d); return getFrustum().getViewMatrix(); }
-	inline const GMCameraLookAt& getLookAt() { D(d); return d->lookAt; }
+	inline bool isDirty() const { D(d); return d->frustum.isDirty(); }
+	inline void cleanDirty() { D(d); d->frustum.cleanDirty(); }
+	inline const GMMat4& getProjectionMatrix() const { D(d); return d->frustum.getProjectionMatrix(); }
+	inline const GMMat4& getViewMatrix()const { D(d); return d->frustum.getViewMatrix(); }
+	const GMMat4& getInverseViewMatrix() const { D(d); return d->frustum.getInverseViewMatrix(); }
+	inline const GMCameraLookAt& getLookAt() const { D(d); return d->lookAt; }
+
+public:
+	static bool isBoundingBoxInside(const GMFrustumPlanes& planes, const GMVec3(&vertices)[8]);
 };
 
 END_NS
