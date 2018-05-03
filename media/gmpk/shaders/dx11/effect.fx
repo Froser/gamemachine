@@ -298,14 +298,14 @@ class TangentSpace
     float3 Normal_Tangent_N;
     float3x3 TBN;
 
-    void CalculateTangentSpaceInEyeSpace(float2 texcoord, float3 tangent, float3 bitangent, float3 normal_Eye_N, matrix transform_Normal_Eye)
+    void CalculateTangentSpaceInEyeSpace(float2 texcoord, float3 tangent, float3 bitangent, float3 normal_Eye_N, float3x3 transform_Normal_Eye)
     {
         if (!HasNormalMap())
             return;
 
         Normal_Tangent_N = NormalMap().RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
-        float3 tangent_Eye_N = normalize(mul(tangent, ToFloat3x3(transform_Normal_Eye)).xyz);
-        float3 bitangent_Eye_N = normalize(mul(bitangent, ToFloat3x3(transform_Normal_Eye)).xyz);
+        float3 tangent_Eye_N = normalize(mul(tangent, transform_Normal_Eye).xyz);
+        float3 bitangent_Eye_N = normalize(mul(bitangent, transform_Normal_Eye).xyz);
         TBN = transpose(float3x3(
             tangent_Eye_N,
             bitangent_Eye_N,
@@ -344,8 +344,8 @@ float4 IlluminateRefraction(
     if (HasNormalMap())
     {
         // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
-        float4 normal_Eye_N = ToFloat4(mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN)), 0);
-        float3 normalFromTangent_World_N = mul(normal_Eye_N, InverseViewMatrix).xyz;
+        float3 normal_Eye_N = mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN));
+        float3 normalFromTangent_World_N = mul(normal_Eye_N, ToFloat3x3(InverseViewMatrix));
         return IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World, refractivity);
     }
 
@@ -389,7 +389,7 @@ float4 PS_3D_Common(VS_3D_INPUT input)
         {
             float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
             factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
-            factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;    
+            factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;
         }
         else
         {
@@ -400,8 +400,8 @@ float4 PS_3D_Common(VS_3D_INPUT input)
             factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
         }
     }
-    float4 color_Ambient = factor_Ambient * ToFloat4(input.AmbientLightmapTexture);
-    float4 color_Diffuse = factor_Diffuse * ToFloat4(input.DiffuseTexture);
+    float4 color_Ambient = factor_Ambient * saturate(ToFloat4(input.AmbientLightmapTexture));
+    float4 color_Diffuse = factor_Diffuse * saturate(ToFloat4(input.DiffuseTexture));
 
     // 计算Specular
     float4 color_Specular = factor_Specular * ToFloat4(input.Ks);
@@ -417,7 +417,7 @@ float4 PS_3D_Common(VS_3D_INPUT input)
         input.Refractivity
         );
 
-    float4 finalColor = color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
+    float4 finalColor = saturate(color_Ambient + color_Diffuse + color_Specular + color_Refractivity);
     return finalColor;
 }
 
@@ -443,8 +443,9 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
     // 将法线换算到眼睛坐标系
-    matrix transform_Normal_Eye = mul(InverseTransposeModelMatrix, ViewMatrix);
-    float3 normal_Eye_N = normalize(mul(input.Normal, ToFloat3x3(transform_Normal_Eye)).xyz);
+    float3x3 inverseTransposeModelMatrix = ToFloat3x3(InverseTransposeModelMatrix);
+    float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(ViewMatrix));
+    float3 normal_Eye_N = normalize(mul(input.Normal, transform_Normal_Eye));
 
     VS_3D_INPUT commonInput;
     TangentSpace tangentSpace;
@@ -454,7 +455,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.WorldPos = input.WorldPos;
     commonInput.HasNormalMap = HasNormalMap();
 
-    commonInput.Normal_World_N = normalize(mul(input.Normal, ToFloat3x3(InverseTransposeModelMatrix)).xyz);
+    commonInput.Normal_World_N = normalize(mul(input.Normal, inverseTransposeModelMatrix));
     commonInput.Normal_Eye_N = normal_Eye_N;
 
     // 计算Ambient
@@ -615,9 +616,10 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     output.Position_Refractivity.rgb = input.WorldPos;
     output.Position_Refractivity.a = Material.Refractivity;
 
-    float4x4 normalEyeTransform = mul(InverseTransposeModelMatrix, ViewMatrix);
+    float3x3 inverseTransposeModelMatrix = ToFloat3x3(InverseTransposeModelMatrix);
+    float3x3 normalEyeTransform = mul(inverseTransposeModelMatrix, ToFloat3x3(ViewMatrix));
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
-    output.Normal_World = Float3ToTexture( normalize(mul(normal_Model, InverseTransposeModelMatrix).xyz) );
+    output.Normal_World = Float3ToTexture( normalize(mul(input.Normal.xyz, inverseTransposeModelMatrix)) );
 
     float4 texAmbient = float4(0, 0, 0, 0);
     float4 texDiffuse = float4(0, 0, 0, 0);
@@ -647,8 +649,8 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 
     if (HasNormalMap())
     {
-        output.Tangent_Eye = Float3ToTexture(mul(input.Tangent, ToFloat3x3(normalEyeTransform)));
-        output.Bitangent_Eye = Float3ToTexture(mul(input.Bitangent, ToFloat3x3(normalEyeTransform)));
+        output.Tangent_Eye = Float3ToTexture(mul(input.Tangent, normalEyeTransform));
+        output.Bitangent_Eye = Float3ToTexture(mul(input.Bitangent, normalEyeTransform));
         output.NormalMap_HasNormalMap = ToFloat4(NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord), 1);
     }
     else

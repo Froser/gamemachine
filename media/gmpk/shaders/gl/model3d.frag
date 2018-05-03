@@ -7,6 +7,11 @@ vec3 g_model3d_refractionLight;
 
 in vec4 _model3d_position_world;
 
+vec3 saturate(vec3 vector)
+{
+	return clamp(vector, 0.0f, 1.0f);
+}
+
 void model3d_init()
 {
 	g_model3d_ambientLight = g_model3d_diffuseLight = g_model3d_specularLight = vec3(0);
@@ -35,12 +40,13 @@ void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 void model3d_calcLights()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
-	mat3 normalEyeTransform = mat3(GM_view_matrix * GM_inverse_transpose_model_matrix);
+	mat3 inverse_transpose_model_matrix = mat3(GM_inverse_transpose_model_matrix);
+	mat3 normalEyeTransform = mat3(GM_view_matrix) * inverse_transpose_model_matrix;
 	vec4 vertex_eye = GM_view_matrix * _model3d_position_world;
 	vec3 eyeDirection_eye = vec3(0,0,0) - vertex_eye.xyz;
 	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
-	g_model3d_normal_eye = normalize( (normalEyeTransform * _normal.xyz).xyz );
+	g_model3d_normal_eye = normalize( (normalEyeTransform * _normal.xyz) );
 
 	// 计算漫反射和高光部分
 	if (GM_normalmap_textures[0].enabled == 0)
@@ -53,7 +59,7 @@ void model3d_calcLights()
 			g_model3d_diffuseLight += GM_material.kd * GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye);
 			g_model3d_specularLight += GM_material.ks * GMLight_Specular(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, g_model3d_normal_eye, GM_material.shininess);
 			if (GM_lights[i].lightType == GM_AmbientLight)
-				model3d_calculateRefractionByNormalWorld(normalize(GM_inverse_transpose_model_matrix * vec4(_normal.xyz, 0)).xyz);
+				model3d_calculateRefractionByNormalWorld(normalize(inverse_transpose_model_matrix * _normal.xyz).xyz);
 		}
 	}
 	else
@@ -130,7 +136,9 @@ void model3d_calcColor()
 		model3d_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 
 	// 最终结果
-	vec3 color = g_model3d_ambientLight * ambientTextureColor + g_model3d_diffuseLight * diffuseTextureColor + g_model3d_specularLight + g_model3d_refractionLight;
+	vec3 color = saturate(g_model3d_ambientLight) * ambientTextureColor
+	  + saturate(g_model3d_diffuseLight) * diffuseTextureColor
+	  + saturate(g_model3d_specularLight) + saturate(g_model3d_refractionLight);
 	_frag_color = vec4(color, 1.0f);
 }
 

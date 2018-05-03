@@ -48,7 +48,6 @@ vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 e
 	float theta = dot(eyeDirection_N, R);
 	float specularFactor = pow(theta, shininess);
 	specularFactor = clamp(specularFactor, 0.0f, 1.0f);
-
 	return specularFactor * light.lightColor;
 }
 
@@ -70,6 +69,6 @@ vec3 GMLight_Diffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_
 vec3 GMLight_Specular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
 {
 	if (light.lightType == GM_AmbientLight)
-		return GMLight_AmbientLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, GM_material.shininess);
-	return GMLight_DirectLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, GM_material.shininess);
+		return GMLight_AmbientLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, shininess);
+	return GMLight_DirectLightSpecular(light, lightDirection_N, eyeDirection_N, normal_N, shininess);
 }

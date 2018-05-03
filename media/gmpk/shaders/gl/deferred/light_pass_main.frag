@@ -49,6 +49,11 @@ bool hasFlag(float flag)
 	return flag > 0;
 }
 
+vec3 saturate(vec3 vector)
+{
+	return clamp(vector, 0.0f, 1.0f);
+}
+
 void deferred_light_pass_init()
 {
 	// light pass
@@ -59,7 +64,7 @@ void deferred_light_pass_init()
 	deferred_light_pass_fromTexture_Refractivity = positionShininess.a;
 
 	deferred_light_pass_fromTexture_Normal = textureToNormal(texture(deferred_light_pass_gNormal, _uv).rgb);
-	deferred_light_pass_fromTexture_Normal_eye = (GM_view_matrix * vec4(deferred_light_pass_fromTexture_Normal, 0)).rgb;
+	deferred_light_pass_fromTexture_Normal_eye = mat3(GM_view_matrix) * deferred_light_pass_fromTexture_Normal;
 	deferred_light_pass_fromTexture_TexAmbient = texture(deferred_light_pass_gTexAmbient, _uv).rgb;
 	deferred_light_pass_fromTexture_TexDiffuse = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
 	deferred_light_pass_fromTexture_Tangent_eye = textureToNormal(texture(deferred_light_pass_gTangent_eye, _uv).rgb);
@@ -87,7 +92,7 @@ void deferred_light_pass_calculateRefractionByNormalWorld(vec3 normal_world)
 void model3d_calculateRefractionByNormalTangent(mat3 TBN, vec3 normal_tangent)
 {
 	// 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
-	vec3 normal_world = (GM_inverse_view_matrix * vec4(transpose(TBN) * normal_tangent, 0)).rgb;
+	vec3 normal_world = mat3(GM_inverse_view_matrix) * transpose(TBN) * normal_tangent;
 	deferred_light_pass_calculateRefractionByNormalWorld(normal_world);
 }
 
@@ -141,12 +146,10 @@ void deferred_light_pass_calcColor()
 	deferred_light_pass_calcLights();
 
 	// 最终结果
-	vec3 color = deferred_light_pass_g_ambientLight * deferred_light_pass_fromTexture_TexAmbient
-		+ deferred_light_pass_g_diffuseLight * deferred_light_pass_fromTexture_TexDiffuse
-		+ deferred_light_pass_g_specularLight
-		+ deferred_light_pass_g_refractiveLight;
-	if (color == vec3(0, 0, 0))
-		discard;
+	vec3 color = saturate(deferred_light_pass_g_ambientLight) * deferred_light_pass_fromTexture_TexAmbient
+		+ saturate(deferred_light_pass_g_diffuseLight) * deferred_light_pass_fromTexture_TexDiffuse
+		+ saturate(deferred_light_pass_g_specularLight)
+		+ saturate(deferred_light_pass_g_refractiveLight);
 	_frag_color = vec4(color, 1.0f);
 }
 
