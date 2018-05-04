@@ -351,7 +351,7 @@ float4 IlluminateRefraction(
 // 3D
 //--------------------------------------------------------------------------------------
 
-struct VS_3D_INPUT
+struct PS_3D_INPUT
 {
     float3 WorldPos;            // 世界坐标
     float3 Normal_World_N;      // 世界法线
@@ -365,7 +365,7 @@ struct VS_3D_INPUT
     float Refractivity; 
 };
 
-float4 PS_3D_Common(VS_3D_INPUT input)
+float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
     float4 factor_Ambient = float4(0, 0, 0, 0);
     float4 factor_Diffuse = float4(0, 0, 0, 0);
@@ -453,7 +453,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(ViewMatrix));
     float3 normal_Eye_N = normalize(mul(input.Normal, transform_Normal_Eye));
 
-    VS_3D_INPUT commonInput;
+    PS_3D_INPUT commonInput;
     TangentSpace tangentSpace;
     if (PS_3D_HasNormalMap())
         tangentSpace.CalculateTangentSpaceInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye, PS_3D_NormalMap());
@@ -498,7 +498,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.Shininess = Material.Shininess;
     commonInput.Refractivity = Material.Refractivity;
 
-    return PS_3D_Common(commonInput);
+    return PS_3D_CalculateColor(commonInput);
 }
 
 //--------------------------------------------------------------------------------------
@@ -681,7 +681,7 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
-    VS_3D_INPUT commonInput;
+    PS_3D_INPUT commonInput;
     int3 coord = int3(input.Texcoord * float2(ScreenInfo.ScreenWidth, ScreenInfo.ScreenHeight), 0);
     TangentSpace tangentSpace;
     float3 tangent_Eye_N;
@@ -726,7 +726,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
     ));
     commonInput.TangentSpace = tangentSpace;
 
-    return PS_3D_Common(commonInput);
+    return PS_3D_CalculateColor(commonInput);
 }
 
 //--------------------------------------------------------------------------------------

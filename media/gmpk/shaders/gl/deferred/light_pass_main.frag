@@ -49,11 +49,6 @@ bool hasFlag(float flag)
 	return flag > 0;
 }
 
-vec3 saturate(vec3 vector)
-{
-	return clamp(vector, 0.0f, 1.0f);
-}
-
 void deferred_light_pass_init()
 {
 	// light pass
