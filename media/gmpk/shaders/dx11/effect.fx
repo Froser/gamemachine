@@ -283,27 +283,21 @@ bool HasNoTexture(GMTexture attributes[3])
     return true;
 }
 
-bool HasNormalMap()
-{
-    return NormalMapTextureAttributes[0].Enabled;
-}
-
-GMTexture NormalMap()
-{
-    return NormalMapTextureAttributes[0];
-}
-
 class TangentSpace
 {
     float3 Normal_Tangent_N;
     float3x3 TBN;
 
-    void CalculateTangentSpaceInEyeSpace(float2 texcoord, float3 tangent, float3 bitangent, float3 normal_Eye_N, float3x3 transform_Normal_Eye)
+    void CalculateTangentSpaceInEyeSpace(
+        float2 texcoord,
+        float3 tangent,
+        float3 bitangent,
+        float3 normal_Eye_N,
+        float3x3 transform_Normal_Eye,
+        GMTexture normalMap
+        )
     {
-        if (!HasNormalMap())
-            return;
-
-        Normal_Tangent_N = NormalMap().RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
+        Normal_Tangent_N = normalMap.RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
         float3 tangent_Eye_N = normalize(mul(tangent, transform_Normal_Eye).xyz);
         float3 bitangent_Eye_N = normalize(mul(bitangent, transform_Normal_Eye).xyz);
         TBN = transpose(float3x3(
@@ -334,6 +328,7 @@ float4 IlluminateRefraction(
     float3 normal_World_N,
     float4 position_World,
     float4 viewPosition_World,
+    bool hasNormalMap,
     TangentSpace tangentSpace,
     float refractivity
     )
@@ -341,7 +336,7 @@ float4 IlluminateRefraction(
     if (refractivity == 0)
         return float4(0, 0, 0, 0);
 
-    if (HasNormalMap())
+    if (hasNormalMap)
     {
         // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
         float3 normal_Eye_N = mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN));
@@ -413,6 +408,7 @@ float4 PS_3D_Common(VS_3D_INPUT input)
         input.Normal_World_N,
         ToFloat4(input.WorldPos),
         ViewPosition,
+        input.HasNormalMap,
         input.TangentSpace,
         input.Refractivity
         );
@@ -440,6 +436,16 @@ VS_OUTPUT VS_3D( VS_INPUT input )
     return output;
 }
 
+bool PS_3D_HasNormalMap()
+{
+    return NormalMapTextureAttributes[0].Enabled;
+}
+
+GMTexture PS_3D_NormalMap()
+{
+    return NormalMapTextureAttributes[0];
+}
+
 float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
     // 将法线换算到眼睛坐标系
@@ -449,11 +455,12 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 
     VS_3D_INPUT commonInput;
     TangentSpace tangentSpace;
-    tangentSpace.CalculateTangentSpaceInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye);
+    if (PS_3D_HasNormalMap())
+        tangentSpace.CalculateTangentSpaceInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye, PS_3D_NormalMap());
 
     commonInput.TangentSpace = tangentSpace;
     commonInput.WorldPos = input.WorldPos;
-    commonInput.HasNormalMap = HasNormalMap();
+    commonInput.HasNormalMap = PS_3D_HasNormalMap();
 
     commonInput.Normal_World_N = normalize(mul(input.Normal, inverseTransposeModelMatrix));
     commonInput.Normal_Eye_N = normal_Eye_N;
@@ -647,11 +654,11 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     output.TextureAmbient = texAmbient * Material.Ka;
     output.TextureDiffuse = texDiffuse * Material.Kd;
 
-    if (HasNormalMap())
+    if (PS_3D_HasNormalMap())
     {
-        output.Tangent_Eye = Float3ToTexture(mul(input.Tangent, normalEyeTransform));
-        output.Bitangent_Eye = Float3ToTexture(mul(input.Bitangent, normalEyeTransform));
-        output.NormalMap_HasNormalMap = ToFloat4(NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord), 1);
+        output.Tangent_Eye = Float3ToTexture(normalize(mul(input.Tangent, normalEyeTransform)));
+        output.Bitangent_Eye = Float3ToTexture(normalize(mul(input.Bitangent, normalEyeTransform)));
+        output.NormalMap_HasNormalMap = ToFloat4(PS_3D_NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord), 1);
     }
     else
     {
@@ -709,9 +716,9 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
     commonInput.Shininess = KSS.a;
     commonInput.WorldPos = PosRef.rgb;
     commonInput.Refractivity = PosRef.a;
-    tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
     commonInput.HasNormalMap = (normalMapFlag.a != 0);
     commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ToFloat3x3(ViewMatrix));
+    tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
     tangentSpace.TBN = transpose(float3x3(
         tangent_Eye_N,
         bitangent_Eye_N,

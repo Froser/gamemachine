@@ -77,7 +77,7 @@ protected:
 	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 
 	ID3DX11EffectTechnique* getTechnique();
-	ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames);
+	ITexture* getTexture(GMTextureFrames& frames);
 
 public:
 	static GMDx11CubeMapState& getCubeMapState();

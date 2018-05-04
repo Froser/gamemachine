@@ -379,16 +379,14 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	GMCamera& camera = GM.getCamera();
 	if (camera.isDirty())
 	{
+		GMFloat4 viewPosition;
+		camera.getLookAt().position.loadFloat4(viewPosition);
+		shaderProgram->setVec4(desc->ViewPosition, viewPosition);
 		shaderProgram->setMatrix4(desc->ViewMatrix, camera.getViewMatrix());
 		shaderProgram->setMatrix4(desc->ProjectionMatrix, camera.getProjectionMatrix());
 		shaderProgram->setMatrix4(desc->InverseViewMatrix, camera.getInverseViewMatrix());
 		camera.cleanDirty();
 	}
-
-	const GMCameraLookAt& lookAt = GM.getCamera().getLookAt();
-	GMFloat4 viewPosition;
-	lookAt.position.loadFloat4(viewPosition);
-	shaderProgram->setVec4(desc->ViewPosition, viewPosition);
 }
 
 void GMDx11Renderer::endModel()
