@@ -36,7 +36,7 @@ void GM_Model3D()
 	vertex.WorldPos = _model3d_position_world.xyz;
 
 	mat3 inverse_transpose_model_matrix = mat3(GM_inverse_transpose_model_matrix);
-	vertex.Normal_World_N = inverse_transpose_model_matrix * _normal.xyz;
+	vertex.Normal_World_N = normalize(inverse_transpose_model_matrix * _normal.xyz);
 
 	mat3 normalEyeTransform = mat3(GM_view_matrix) * inverse_transpose_model_matrix;
 	vertex.Normal_Eye_N = normalize( (normalEyeTransform * _normal.xyz) );

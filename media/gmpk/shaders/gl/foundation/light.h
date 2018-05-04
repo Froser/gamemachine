@@ -133,8 +133,6 @@ vec3 calculateRefractionByNormalTangent(vec3 worldPos, TangentSpace tangentSpace
 	return calculateRefractionByNormalWorld(worldPos, normal_world_N, refractivity);
 }
 
-vec3 temp;
-
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
 	vec3 ambientLight = vec3(0, 0, 0);
