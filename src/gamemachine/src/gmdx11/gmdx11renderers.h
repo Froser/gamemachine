@@ -25,6 +25,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	bool screenInfoPrepared = false;
+	GMComPtr<ID3D11Resource> shadowMapResource;
 };
 
 class GMDx11Renderer : public GMObject, public IRenderer
@@ -153,6 +154,16 @@ class GMDx11Renderer_Deferred_3D_LightPass : public GMDx11Renderer
 private:
 	void passAllAndDraw(GMModel* model);
 	void setDeferredTexturesBeforeApply();
+};
+
+class GMDx11Renderer_3D_Shadow : public GMDx11Renderer_3D
+{
+	virtual const char* getTechniqueName() override
+	{
+		return "GMTech_3D_Shadow";
+	}
+
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };
 
 END_NS

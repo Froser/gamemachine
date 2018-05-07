@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <gmcom.h>
 #include <gmdxincludes.h>
+#include <gmgraphicengine.h>
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11EffectShaderProgram)

@@ -3,6 +3,7 @@
 #include <gmcommon.h>
 #include <gmshader.h>
 #include "foundation/assert.h"
+#include <gmgraphicengine.h>
 
 BEGIN_NS
 

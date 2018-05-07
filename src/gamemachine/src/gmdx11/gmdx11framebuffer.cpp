@@ -212,18 +212,11 @@ bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 	GMComPtr<ID3D11DepthStencilState> depthStencilState;
 
 	// 创建深度缓存模板
-	D3D11_TEXTURE2D_DESC depthStencilTextureDesc = { 0 };
+	D3D11_TEXTURE2D_DESC depthStencilTextureDesc = getDepthTextureDesc();
 	depthStencilTextureDesc.Width = desc.rect.width;
 	depthStencilTextureDesc.Height = desc.rect.height;
-	depthStencilTextureDesc.MipLevels = 1;
-	depthStencilTextureDesc.ArraySize = 1;
-	depthStencilTextureDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilTextureDesc.SampleDesc.Count = runningState.sampleCount;
 	depthStencilTextureDesc.SampleDesc.Quality = runningState.sampleQuality;
-	depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
-	depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-	depthStencilTextureDesc.CPUAccessFlags = 0;
-	depthStencilTextureDesc.MiscFlags = 0;
 
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = { 0 };
 	depthStencilDesc.DepthEnable = TRUE;
@@ -241,9 +234,20 @@ bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
+	D3D11_DEPTH_STENCIL_VIEW_DESC dsvd =
+	{
+		DXGI_FORMAT_D24_UNORM_S8_UINT,
+		D3D11_DSV_DIMENSION_TEXTURE2D,
+		0
+	};
+	if (GM.getGameMachineRunningStates().sampleCount > 1)
+		dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+	else
+		dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+
 	GM_DX_HR_RET(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
 	GM_DX_HR_RET(device->CreateTexture2D(&depthStencilTextureDesc, NULL, &d->depthStencilTexture));
-	GM_DX_HR_RET(device->CreateDepthStencilView(d->depthStencilTexture, NULL, &d->depthStencilView));
+	GM_DX_HR_RET(device->CreateDepthStencilView(d->depthStencilTexture, &dsvd, &d->depthStencilView));
 	return true;
 }
 
@@ -324,8 +328,56 @@ void GMDx11Framebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 	d->deviceContext->CopyResource(d_dest->depthStencilTexture, d->depthStencilTexture);
 }
 
+D3D11_TEXTURE2D_DESC GMDx11Framebuffers::getDepthTextureDesc()
+{
+	D3D11_TEXTURE2D_DESC depthStencilTextureDesc = { 0 };
+	depthStencilTextureDesc.MipLevels = 1;
+	depthStencilTextureDesc.ArraySize = 1;
+	depthStencilTextureDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
+	depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
+	depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL | D3D11_BIND_SHADER_RESOURCE;
+	depthStencilTextureDesc.CPUAccessFlags = 0;
+	depthStencilTextureDesc.MiscFlags = 0;
+	return depthStencilTextureDesc;
+}
+
 IFramebuffers* GMDx11Framebuffers::getDefaultFramebuffers()
 {
 	static GMDx11DefaultFramebuffers s_defaultFramebuffers;
 	return &s_defaultFramebuffers;
+}
+
+bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
+{
+	bool b = Base::init(desc);
+	if (!b)
+		return false;
+
+	D(d);
+	D_BASE(db, Base);
+	d->width = desc.rect.width;
+	d->height = desc.rect.height;
+
+	GMComPtr<ID3D11Device> device;
+	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
+	GM_ASSERT(device);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC dsrvd =
+	{
+		DXGI_FORMAT_R24_UNORM_X8_TYPELESS,
+		D3D11_SRV_DIMENSION_TEXTURE2D,
+		0,
+		0
+	};
+	dsrvd.Texture2D.MipLevels = 1;
+	GM_DX_HR_RET(device->CreateShaderResourceView(db->depthStencilTexture, &dsrvd, &d->depthShaderResourceView));
+	GM_DX11_SET_OBJECT_NAME_A(db->depthStencilTexture, "GM_ShadowMap");
+	GM_DX11_SET_OBJECT_NAME_A(d->depthShaderResourceView, "GM_ShadowMap_SRV");
+	return true;
+}
+
+ID3D11ShaderResourceView* GMDx11ShadowFramebuffers::getShadowMapShaderResourceView()
+{
+	D(d);
+	return d->depthShaderResourceView;
 }

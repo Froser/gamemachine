@@ -162,9 +162,21 @@ void Demo_Collision::setDefaultLights()
 			gm::GMfloat colorD[] = { .7f, .7f, .7f };
 			light->setLightColor(colorD);
 
-			gm::GMfloat lightPos[] = { -1.f, .5f, -3.f };
+			gm::GMfloat lightPos[] = { -1.f, 3.5f, -3.f };
 			light->setLightPosition(lightPos);
 			GM.getGraphicEngine()->addLight(light);
+		}
+
+		{
+			gm::GMShadowSourceDesc desc;
+			desc.position = GMVec4(-1.f, 3.5f, -3.f, 1);
+			desc.type = gm::GMShadowSourceDesc::DirectShadow;
+			desc.camera = GM.getCamera();
+
+			gm::GMCameraLookAt lookAt;
+			desc.camera.lookAt(gm::GMCameraLookAt::makeLookAt(desc.position, GMVec3(0, 0, 0)));
+
+			GM.getGraphicEngine()->setShadowSource(desc);
 		}
 	}
 }

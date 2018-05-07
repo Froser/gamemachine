@@ -52,6 +52,19 @@ namespace
 			"GMRasterizerState",
 			"GMBlendState",
 			"GMDepthStencilState",
+
+			{
+				"ShadowInfo",
+				"HasShadow",
+				"ShadowProjectionMatrix",
+				"ShadowViewMatrix",
+				"Position",
+				"ShadowMap",
+				"ShadowMapMSAA",
+				"ShadowMapWidth",
+				"ShadowMapHeight",
+				"Bias",
+			}
 		};
 		return desc;
 	}

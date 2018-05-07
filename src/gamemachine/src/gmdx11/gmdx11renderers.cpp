@@ -7,6 +7,7 @@
 #include "gmdx11texture.h"
 #include "gmdx11graphic_engine.h"
 #include "gmdx11gbuffer.h"
+#include "gmdx11framebuffer.h"
 
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
@@ -386,6 +387,38 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 		shaderProgram->setMatrix4(desc->ProjectionMatrix, camera.getProjectionMatrix());
 		shaderProgram->setMatrix4(desc->InverseViewMatrix, camera.getInverseViewMatrix());
 		camera.cleanDirty();
+	}
+
+	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
+	ID3DX11EffectVariable* shadowInfo = d->effect->GetVariableByName(desc->ShadowInfo.ShadowInfo);
+	GM_ASSERT(shadowInfo->IsValid());
+	ID3DX11EffectScalarVariable* hasShadow = shadowInfo->GetMemberByName(desc->ShadowInfo.HasShadow)->AsScalar();
+	GM_ASSERT(hasShadow->IsValid());
+
+	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	{
+		GM_DX_HR(hasShadow->SetBool(true));
+		ID3DX11EffectMatrixVariable* shadowProjectionMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowProjectionMatrix)->AsMatrix();
+		GM_ASSERT(shadowProjectionMatrix->IsValid());
+		GM_DX_HR(shadowProjectionMatrix->SetMatrix(ValuePointer(shadowSourceDesc.camera.getProjectionMatrix() )));
+
+		ID3DX11EffectMatrixVariable* shadowViewMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowViewMatrix)->AsMatrix();
+		GM_ASSERT(shadowViewMatrix->IsValid());
+		GM_DX_HR(shadowViewMatrix->SetMatrix(ValuePointer(shadowSourceDesc.camera.getViewMatrix())));
+
+		ID3DX11EffectVectorVariable* shadowPosition = shadowInfo->GetMemberByName(desc->ShadowInfo.Position)->AsVector();
+		GM_ASSERT(shadowPosition->IsValid());
+		GM_DX_HR(shadowPosition->SetFloatVector(ValuePointer(shadowSourceDesc.position)));
+
+		ID3DX11EffectShaderResourceVariable* shadowMap = d->effect->GetVariableByName(GM.getGameMachineRunningStates().sampleCount > 1 ? desc->ShadowInfo.ShadowMapMSAA : desc->ShadowInfo.ShadowMap)->AsShaderResource();
+		GM_ASSERT(shadowMap->IsValid());
+
+		GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
+		GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
+	}
+	else
+	{
+		GM_DX_HR(hasShadow->SetBool(false));
 	}
 }
 
@@ -898,4 +931,68 @@ void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTexturesBeforeApply()
 		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
 		cubeMapState.cubeMapRenderer->prepareTextures(cubeMapState.model);
 	}
+}
+
+void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
+{
+	D(d);
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->useProgram();
+	if (!d->inputLayout)
+	{
+		D3DX11_PASS_DESC passDesc;
+		GM_DX_HR(getTechnique()->GetPassByIndex(0)->GetDesc(&passDesc));
+		GM_DX_HR(getEngine()->getDevice()->CreateInputLayout(
+			GMSHADER_ElementDescriptions,
+			GM_array_size(GMSHADER_ElementDescriptions),
+			passDesc.pIAInputSignature,
+			passDesc.IAInputSignatureSize,
+			&d->inputLayout
+		));
+	}
+
+	// Renderer决定自己的顶点Layout
+	d->deviceContext->IASetInputLayout(d->inputLayout);
+	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
+
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	if (parent)
+	{
+		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+	}
+	else
+	{
+		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
+	}
+
+	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
+	const GMCamera& camera = shadowSourceDesc.camera;
+	GMFloat4 viewPosition;
+	shadowSourceDesc.position.loadFloat4(viewPosition);
+
+	ID3DX11EffectVariable* shadowInfo = d->effect->GetVariableByName(desc->ShadowInfo.ShadowInfo);
+	GM_ASSERT(shadowInfo->IsValid());
+	ID3DX11EffectVectorVariable* position = shadowInfo->GetMemberByName(desc->ShadowInfo.Position)->AsVector();
+	GM_ASSERT(position->IsValid());
+	ID3DX11EffectMatrixVariable* viewMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowViewMatrix)->AsMatrix();
+	GM_ASSERT(viewMatrix->IsValid());
+	ID3DX11EffectMatrixVariable* projectionMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowProjectionMatrix)->AsMatrix();
+	GM_ASSERT(projectionMatrix->IsValid());
+	ID3DX11EffectScalarVariable* shadowMapWidth = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowMapWidth)->AsScalar();
+	GM_ASSERT(shadowMapWidth->IsValid());
+	ID3DX11EffectScalarVariable* shadowMapHeight = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowMapHeight)->AsScalar();
+	GM_ASSERT(shadowMapHeight->IsValid());
+	ID3DX11EffectScalarVariable* bias = shadowInfo->GetMemberByName(desc->ShadowInfo.Bias)->AsScalar();
+	GM_ASSERT(bias->IsValid());
+
+	GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
+	GM_DX_HR(viewMatrix->SetMatrix(ValuePointer(camera.getViewMatrix())));
+	GM_DX_HR(projectionMatrix->SetMatrix(ValuePointer(camera.getProjectionMatrix())));
+
+	GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
+	GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
+	GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
+	GM_DX_HR(bias->SetFloat(shadowSourceDesc.bias));
 }

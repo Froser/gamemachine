@@ -241,6 +241,23 @@ struct GMScreenInfo
 GMScreenInfo ScreenInfo;
 
 //--------------------------------------------------------------------------------------
+// Shadow
+//--------------------------------------------------------------------------------------
+struct GMShadowInfo
+{
+    bool HasShadow;
+    matrix ShadowProjectionMatrix;
+    matrix ShadowViewMatrix;
+    float4 Position;
+    int ShadowMapWidth;
+    int ShadowMapHeight;
+    float Bias;
+};
+Texture2D ShadowMap;
+Texture2DMS<float4> ShadowMapMSAA;
+
+GMShadowInfo ShadowInfo;
+//--------------------------------------------------------------------------------------
 // States
 //--------------------------------------------------------------------------------------
 RasterizerState GMRasterizerState {};
@@ -365,8 +382,31 @@ struct PS_3D_INPUT
     float Refractivity; 
 };
 
+float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjectionMatrix, float4 worldPos)
+{
+    if (!ShadowInfo.HasShadow)
+        return 1.0f;
+
+    float4 fragPos = mul(mul(worldPos, shadowSourceViewMatrix), shadowSourceProjectionMatrix);
+    float3 projCoords = fragPos.xyz / fragPos.w;
+    projCoords.x = projCoords.x * 0.5f + 0.5f;
+    projCoords.y = projCoords.y * (-0.5f) + 0.5f;
+
+    if (ScreenInfo.Multisampling)
+    {
+        //TODO ShadowMapMSAA.Load();
+    }
+    else
+    {
+    }
+
+    float closestDepth = ShadowMap.Sample(CubeMapSampler, projCoords.xy).r;
+    return projCoords.z - ShadowInfo.Bias > closestDepth ? 0.f : 1.f;
+}
+
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
+    float factor_Shadow = CalculateShadow(ShadowInfo.ShadowViewMatrix, ShadowInfo.ShadowProjectionMatrix, ToFloat4(input.WorldPos));
     float4 factor_Ambient = float4(0, 0, 0, 0);
     float4 factor_Diffuse = float4(0, 0, 0, 0);
     float4 factor_Specular = float4(0, 0, 0, 0);
@@ -396,7 +436,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
         }
     }
     float4 color_Ambient = factor_Ambient * saturate(ToFloat4(input.AmbientLightmapTexture));
-    float4 color_Diffuse = factor_Diffuse * saturate(ToFloat4(input.DiffuseTexture));
+    float4 color_Diffuse = factor_Shadow * factor_Diffuse * saturate(ToFloat4(input.DiffuseTexture));
 
     // 计算Specular
     float4 color_Specular = factor_Specular * ToFloat4(input.Ks);
@@ -730,6 +770,28 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 }
 
 //--------------------------------------------------------------------------------------
+// Shadow
+//--------------------------------------------------------------------------------------
+VS_OUTPUT VS_Shadow( VS_INPUT input )
+{
+    VS_OUTPUT output;
+    output.Position = ToFloat4(input.Position);
+    output.Position = mul(output.Position, WorldMatrix);
+    output.WorldPos = output.Position;
+    
+    output.Position = mul(output.Position, ShadowInfo.ShadowViewMatrix);
+    output.Position = mul(output.Position, ShadowInfo.ShadowProjectionMatrix);
+
+    output.Normal = input.Normal;
+    output.Texcoord = input.Texcoord;
+    output.Tangent = input.Tangent;
+    output.Bitangent = input.Bitangent;
+    output.Lightmap = input.Lightmap;
+    output.Color = input.Color;
+    return output;
+}
+
+//--------------------------------------------------------------------------------------
 // Filter
 //--------------------------------------------------------------------------------------
 int KernelDeltaX = 0, KernelDeltaY = 0;
@@ -1011,6 +1073,17 @@ technique11 GMTech_Deferred_3D_LightPass
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_LightPass()));
         SetPixelShader(CompileShader(ps_5_0,PS_3D_LightPass()));
+        SetRasterizerState(GMRasterizerState);
+        SetDepthStencilState(GMDepthStencilState, 1);
+        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+    }
+}
+
+technique11 GMTech_3D_Shadow
+{
+    pass P0
+    {
+        SetVertexShader(CompileShader(vs_5_0,VS_Shadow()));
         SetRasterizerState(GMRasterizerState);
         SetDepthStencilState(GMDepthStencilState, 1);
         SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

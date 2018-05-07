@@ -27,6 +27,11 @@ GM_ALIGNED_STRUCT(GMCameraLookAt)
 	GMVec3 lookAt = Zero<GMVec3>(); //!< 摄像机朝向，单位向量指示其方向
 	GMVec3 position = Zero<GMVec3>(); //!< 摄像机位置
 	GMVec3 up = GMVec3(0, 1, 0);
+
+	static GMCameraLookAt makeLookAt(const GMVec3& _position, const GMVec3& _focusAt, const GMVec3& _up = GMVec3(1, 1, 1))
+	{
+		return GMCameraLookAt(_focusAt - _position, _position, _up);
+	}
 };
 
 inline GMMat4 getViewMatrix(const GMCameraLookAt& lookAt)
@@ -76,6 +81,7 @@ class GMSpriteGameObject;
 class GMFrustum : public GMObject
 {
 	DECLARE_PRIVATE(GMFrustum)
+	GM_ALLOW_COPY_DATA(GMFrustum)
 
 	friend class GMCamera;
 
@@ -109,9 +115,10 @@ GM_PRIVATE_OBJECT(GMCamera)
 	GMCameraLookAt lookAt;
 };
 
-class GMCamera
+class GMCamera : public GMObject
 {
-	DECLARE_PRIVATE_NGO(GMCamera)
+	DECLARE_PRIVATE(GMCamera)
+	GM_ALLOW_COPY_DATA(GMCamera)
 
 public:
 	GMCamera();

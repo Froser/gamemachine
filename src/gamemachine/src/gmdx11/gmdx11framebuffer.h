@@ -66,8 +66,42 @@ public:
 	virtual GMuint count() override;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
 
+protected:
+	D3D11_TEXTURE2D_DESC getDepthTextureDesc();
+
 public:
 	static IFramebuffers* getDefaultFramebuffers();
+};
+
+GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
+{
+	GMComPtr<ID3D11ShaderResourceView> depthShaderResourceView;
+	GMint width = 0;
+	GMint height = 0;
+};
+
+class GMDx11ShadowFramebuffers : public GMDx11Framebuffers
+{
+	DECLARE_PRIVATE_AND_BASE(GMDx11ShadowFramebuffers, GMDx11Framebuffers)
+
+public:
+	virtual bool init(const GMFramebuffersDesc& desc) override;
+
+public:
+	ID3D11ShaderResourceView* getShadowMapShaderResourceView();
+
+public:
+	inline GMint getShadowMapWidth()
+	{
+		D(d);
+		return d->width;
+	}
+
+	inline GMint getShadowMapHeight()
+	{
+		D(d);
+		return d->height;
+	}
 };
 
 END_NS

@@ -6,6 +6,7 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gmprofile.h"
 #include "foundation/gmconfigs.h"
+#include "gmdx11/gmdx11framebuffer.h"
 
 void GMFramebuffersStack::push(IFramebuffers* framebuffers)
 {
@@ -37,6 +38,7 @@ GMGraphicEngine::GMGraphicEngine()
 	D(d);
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
+	d->shadow.type = GMShadowSourceDesc::NoShadow;
 }
 
 GMGraphicEngine::~GMGraphicEngine()
@@ -45,6 +47,7 @@ GMGraphicEngine::~GMGraphicEngine()
 	GM_delete(d->filterFramebuffers);
 	GM_delete(d->filterQuad);
 	GM_delete(d->gBuffer);
+	GM_delete(d->shadowDepthFramebuffers);
 }
 
 void GMGraphicEngine::init()
@@ -72,6 +75,21 @@ IFramebuffers* GMGraphicEngine::getFilterFramebuffers()
 void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, const List<GMGameObject*>& deferredRenderingObjects)
 {
 	GM_PROFILE("draw");
+	D(d);
+	if (d->shadow.type != GMShadowSourceDesc::NoShadow)
+	{
+		if (!d->shadowDepthFramebuffers)
+			createShadowFramebuffers(&d->shadowDepthFramebuffers);
+		GM_ASSERT(d->shadowDepthFramebuffers);
+		d->shadowDepthFramebuffers->clear(GMFramebuffersClearType::Depth);
+		d->shadowDepthFramebuffers->bind();
+		d->isDrawingShadow = true;
+		draw(forwardRenderingObjects);
+		draw(deferredRenderingObjects);
+		d->shadowDepthFramebuffers->unbind();
+		d->isDrawingShadow = false;
+	}
+
 	GMFilterMode::Mode filterMode = getCurrentFilterMode();
 	if (filterMode != GMFilterMode::None)
 	{
@@ -136,6 +154,12 @@ const GMFilterMode::Mode GMGraphicEngine::getCurrentFilterMode()
 	return d->renderConfig.get(GMRenderConfigs::FilterMode).toEnum<GMFilterMode::Mode>();
 }
 
+IFramebuffers* GMGraphicEngine::getShadowMapFramebuffers()
+{
+	D(d);
+	return d->shadowDepthFramebuffers;
+}
+
 void GMGraphicEngine::createFilterFramebuffer()
 {
 	D(d);
@@ -178,6 +202,12 @@ IGBuffer* GMGraphicEngine::createGBuffer()
 	GM.getFactory()->createGBuffer(this, &gBuffer);
 	GM_ASSERT(gBuffer);
 	return gBuffer;
+}
+
+void GMGraphicEngine::setShadowSource(const GMShadowSourceDesc& desc)
+{
+	D(d);
+	d->shadow = desc;
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

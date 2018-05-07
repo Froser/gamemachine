@@ -148,6 +148,17 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 	return true;
 }
 
+void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
+{
+	GMDx11ShadowFramebuffers* sdframebuffers = new GMDx11ShadowFramebuffers();
+	(*framebuffers) = sdframebuffers;
+
+	GMFramebuffersDesc desc;
+	desc.rect = GM.getGameMachineRunningStates().renderRect;
+	bool succeed = sdframebuffers->init(desc);
+	GM_ASSERT(succeed);
+}
+
 bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
 {
 	D(d);
@@ -199,6 +210,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	static GMDx11Renderer_Filter s_renderer_filter;
 	static GMDx11Renderer_Deferred_3D s_renderer_deferred_3d;
 	static GMDx11Renderer_Deferred_3D_LightPass s_renderer_deferred_3d_lightpass;
+	static GMDx11Renderer_3D_Shadow s_renderer_3d_shadow;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
@@ -206,6 +218,8 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	case GMModelType::Glyph:
 		return &s_renderer_glyph;
 	case GMModelType::Model3D:
+		if (isDrawingShadow())
+			return &s_renderer_3d_shadow;
 		if (getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::Done)
 			return &s_renderer_deferred_3d;
 		return &s_renderer_3d;

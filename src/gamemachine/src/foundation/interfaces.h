@@ -37,6 +37,8 @@ struct IDebugOutput;
 struct IAudioPlayer;
 struct IGraphicEngine;
 struct IRenderer;
+struct GMShaderVariablesDesc;
+struct GMShadowSourceDesc;
 
 enum class GameMachineEvent
 {
@@ -205,85 +207,6 @@ enum class GMMovement
 {
 	Move,
 	Jump,
-};
-
-struct GMShaderVariablesTextureDesc
-{
-	const char* OffsetX;
-	const char* OffsetY;
-	const char* ScaleX;
-	const char* ScaleY;
-	const char* Enabled;
-	const char* Texture;
-};
-
-struct GMShaderVariablesLightDesc
-{
-	const char* Name;
-	const char* Count;
-};
-
-struct GMShaderVariablesMaterialDesc
-{
-	const char* Ka;
-	const char* Kd;
-	const char* Ks;
-	const char* Shininess;
-	const char* Refreactivity;
-};
-
-constexpr int GMFilterCount = 6;
-struct GMShaderVariablesFilterDesc
-{
-	const char* Filter;
-	const char* KernelDeltaX;
-	const char* KernelDeltaY;
-	const char* Types[GMFilterCount];
-};
-
-struct GMShaderVariablesScreenInfoDesc
-{
-	const char* ScreenInfo;
-	const char* ScreenWidth;
-	const char* ScreenHeight;
-	const char* Multisampling;
-};
-
-struct GMShaderVariablesDesc
-{
-	// 矩阵
-	const char* ModelMatrix;
-	const char* ViewMatrix;
-	const char* ProjectionMatrix;
-	const char* InverseTransposeModelMatrix;
-	const char* InverseViewMatrix;
-
-	// 位置
-	const char* ViewPosition;
-
-	// 材质
-	GMShaderVariablesTextureDesc TextureAttributes;
-	const char* AmbientTextureName;
-	const char* DiffuseTextureName;
-	const char* NormalMapTextureName;
-	const char* LightMapTextureName;
-	const char* CubeMapTextureName;
-
-	// 光照
-	const char* LightCount;
-
-	// 材质
-	GMShaderVariablesMaterialDesc MaterialAttributes;
-	const char* MaterialName;
-
-	// 滤镜
-	GMShaderVariablesFilterDesc FilterAttributes;
-
-	// 状态
-	GMShaderVariablesScreenInfoDesc ScreenInfoAttributes;
-	const char* RasterizerState;
-	const char* BlendState;
-	const char* DepthStencilState;
 };
 
 GM_INTERFACE_FROM(IShaderProgram, IQueriable)
@@ -528,6 +451,13 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \sa IQueriable::setInterface()
 	*/
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) = 0;
+
+	//! 设置一个阴影源。
+	/*!
+	  阴影源用于显示物体的阴影。
+	  \param desc 阴影源的属性。
+	*/
+	virtual void setShadowSource(const GMShadowSourceDesc& desc) = 0;
 };
 
 GM_INTERFACE(IRenderer)
