@@ -984,8 +984,10 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 	GM_ASSERT(shadowMapWidth->IsValid());
 	ID3DX11EffectScalarVariable* shadowMapHeight = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowMapHeight)->AsScalar();
 	GM_ASSERT(shadowMapHeight->IsValid());
-	ID3DX11EffectScalarVariable* bias = shadowInfo->GetMemberByName(desc->ShadowInfo.Bias)->AsScalar();
-	GM_ASSERT(bias->IsValid());
+	ID3DX11EffectScalarVariable* biasMin = shadowInfo->GetMemberByName(desc->ShadowInfo.BiasMin)->AsScalar();
+	GM_ASSERT(biasMin->IsValid());
+	ID3DX11EffectScalarVariable* biasMax = shadowInfo->GetMemberByName(desc->ShadowInfo.BiasMax)->AsScalar();
+	GM_ASSERT(biasMax->IsValid());
 
 	GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
 	GM_DX_HR(viewMatrix->SetMatrix(ValuePointer(camera.getViewMatrix())));
@@ -994,5 +996,6 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 	GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
 	GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
 	GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
-	GM_DX_HR(bias->SetFloat(shadowSourceDesc.bias));
+	GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
+	GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
 }

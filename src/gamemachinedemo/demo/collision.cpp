@@ -172,6 +172,7 @@ void Demo_Collision::setDefaultLights()
 			desc.position = GMVec4(-1.f, 3.5f, -3.f, 1);
 			desc.type = gm::GMShadowSourceDesc::DirectShadow;
 			desc.camera = GM.getCamera();
+			desc.biasMax = desc.biasMin = 0.0005f;
 
 			gm::GMCameraLookAt lookAt;
 			desc.camera.lookAt(gm::GMCameraLookAt::makeLookAt(desc.position, GMVec3(0, 0, 0)));

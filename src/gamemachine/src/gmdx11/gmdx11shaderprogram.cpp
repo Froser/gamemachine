@@ -63,7 +63,8 @@ namespace
 				"ShadowMapMSAA",
 				"ShadowMapWidth",
 				"ShadowMapHeight",
-				"Bias",
+				"BiasMin",
+				"BiasMax",
 			}
 		};
 		return desc;

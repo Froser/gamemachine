@@ -370,6 +370,7 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 		0
 	};
 	dsrvd.Texture2D.MipLevels = 1;
+	dsrvd.ViewDimension = GM.getGameMachineRunningStates().sampleCount > 1 ? D3D11_SRV_DIMENSION_TEXTURE2DMS : D3D11_SRV_DIMENSION_TEXTURE2D;
 	GM_DX_HR_RET(device->CreateShaderResourceView(db->depthStencilTexture, &dsrvd, &d->depthShaderResourceView));
 	GM_DX11_SET_OBJECT_NAME_A(db->depthStencilTexture, "GM_ShadowMap");
 	GM_DX11_SET_OBJECT_NAME_A(d->depthShaderResourceView, "GM_ShadowMap_SRV");

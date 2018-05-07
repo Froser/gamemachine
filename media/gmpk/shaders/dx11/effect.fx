@@ -55,6 +55,13 @@ SamplerState NormalMapSampler: register(s6);
 SamplerState LightmapSampler: register(s7);
 SamplerState CubeMapSampler: register(s8);
 
+SamplerState ShadowMapSampler
+{
+    Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = BORDER;
+    BorderColor = float4(1, 1, 1, 1);
+};
+
 float3 TextureRGBToNormal(Texture2D tex, SamplerState ss, float2 texcoord)
 {
     return tex.Sample(ss, texcoord).xyz * 2.0f - 1.0f;
@@ -251,7 +258,8 @@ struct GMShadowInfo
     float4 Position;
     int ShadowMapWidth;
     int ShadowMapHeight;
-    float Bias;
+    float BiasMin;
+    float BiasMax;
 };
 Texture2D ShadowMap;
 Texture2DMS<float4> ShadowMapMSAA;
@@ -382,31 +390,38 @@ struct PS_3D_INPUT
     float Refractivity; 
 };
 
-float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjectionMatrix, float4 worldPos)
+float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjectionMatrix, float4 worldPos, float3 normal_N)
 {
     if (!ShadowInfo.HasShadow)
         return 1.0f;
 
     float4 fragPos = mul(mul(worldPos, shadowSourceViewMatrix), shadowSourceProjectionMatrix);
     float3 projCoords = fragPos.xyz / fragPos.w;
+    if (projCoords.z > 1.0f)
+        return 1.0f;
+
     projCoords.x = projCoords.x * 0.5f + 0.5f;
     projCoords.y = projCoords.y * (-0.5f) + 0.5f;
 
+    float bias = ShadowInfo.BiasMin == ShadowInfo.BiasMax ? ShadowInfo.BiasMin : max(ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - ShadowInfo.Position))), ShadowInfo.BiasMin);
+    float closestDepth = 0;
     if (ScreenInfo.Multisampling)
     {
-        //TODO ShadowMapMSAA.Load();
+        int x = ShadowInfo.ShadowMapWidth * projCoords.x;
+        int y = ShadowInfo.ShadowMapHeight * projCoords.y;
+        closestDepth = ShadowMapMSAA.Load(int3(x, y, 0), 0);
     }
     else
     {
+        closestDepth = ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
     }
 
-    float closestDepth = ShadowMap.Sample(CubeMapSampler, projCoords.xy).r;
-    return projCoords.z - ShadowInfo.Bias > closestDepth ? 0.f : 1.f;
+    return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
-    float factor_Shadow = CalculateShadow(ShadowInfo.ShadowViewMatrix, ShadowInfo.ShadowProjectionMatrix, ToFloat4(input.WorldPos));
+    float factor_Shadow = CalculateShadow(ShadowInfo.ShadowViewMatrix, ShadowInfo.ShadowProjectionMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
     float4 factor_Ambient = float4(0, 0, 0, 0);
     float4 factor_Diffuse = float4(0, 0, 0, 0);
     float4 factor_Specular = float4(0, 0, 0, 0);

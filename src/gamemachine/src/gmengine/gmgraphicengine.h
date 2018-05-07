@@ -59,7 +59,8 @@ struct GMShaderVariableShadowInfo
 	const char* ShadowMapMSAA;
 	const char* ShadowMapWidth;
 	const char* ShadowMapHeight;
-	const char* Bias;
+	const char* BiasMin;
+	const char* BiasMax;
 };
 
 struct GMShaderVariablesDesc
@@ -113,7 +114,8 @@ struct GMShadowSourceDesc
 	Type type;
 	GMCamera camera;
 	GMVec4 position;
-	float bias = 0.005f;
+	float biasMin = 0.0005f;
+	float biasMax = 0.005f;
 };
 
 GM_PRIVATE_OBJECT(GMFramebuffersStack)
