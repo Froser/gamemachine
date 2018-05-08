@@ -10,6 +10,11 @@ GM_PRIVATE_OBJECT(GMDx11EffectShaderProgram)
 {
 	GMComPtr<ID3DX11Effect> effect;
 	GMShaderVariablesDesc desc;
+	HashMap<const char*, ID3DX11EffectVectorVariable*> vectors;
+	HashMap<const char*, ID3DX11EffectMatrixVariable*> matrices;
+	HashMap<const char*, ID3DX11EffectScalarVariable*> scalars;
+	HashMap<const char*, ID3DX11EffectInterfaceVariable*> interfaces;
+	HashMap<const char*, ID3DX11EffectClassInstanceVariable*> instances;
 };
 
 class GMDx11EffectShaderProgram : public IShaderProgram
@@ -33,6 +38,13 @@ public:
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) override;
+
+private:
+	ID3DX11EffectVectorVariable* getVectorVariable(const char* name);
+	ID3DX11EffectMatrixVariable* getMatrixVariable(const char* name);
+	ID3DX11EffectScalarVariable* getScalarVariable(const char* name);
+	ID3DX11EffectInterfaceVariable* getInterfaceVariable(const char* name);
+	ID3DX11EffectClassInstanceVariable* getInstanceVariable(const char* name);
 };
 
 END_NS
