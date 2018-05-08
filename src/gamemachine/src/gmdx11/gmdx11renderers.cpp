@@ -346,6 +346,9 @@ namespace
 #define EFFECT_VARIABLE_AS_SHADER_RESOURCE(funcName, name) \
 	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectShaderResourceVariable, AsShaderResource)
 
+#define EFFECT_VARIABLE_AS_SCALAR(funcName, name) \
+	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectScalarVariable, AsScalar)
+
 #define EFFECT_MEMBER_AS(funcName, effect, name, retType, to) \
 	retType* funcName() {															\
 		static retType* s_ptr = nullptr;											\
@@ -373,14 +376,36 @@ public:
 		m_desc = desc;
 	}
 
-	//Shadow
+	// Shadow
 	EFFECT_VARIABLE(ShadowInfo, m_desc->ShadowInfo.ShadowInfo)
 	EFFECT_MEMBER_AS_SCALAR(HasShadow, ShadowInfo(), m_desc->ShadowInfo.HasShadow)
 	EFFECT_MEMBER_AS_MATRIX(ShadowProjectionMatrix, ShadowInfo(), m_desc->ShadowInfo.ShadowProjectionMatrix)
 	EFFECT_MEMBER_AS_MATRIX(ShadowViewMatrix, ShadowInfo(), m_desc->ShadowInfo.ShadowViewMatrix)
 	EFFECT_MEMBER_AS_VECTOR(ShadowPosition, ShadowInfo(), m_desc->ShadowInfo.Position)
+	EFFECT_MEMBER_AS_SCALAR(ShadowMapWidth, ShadowInfo(), m_desc->ShadowInfo.ShadowMapWidth)
+	EFFECT_MEMBER_AS_SCALAR(ShadowMapHeight, ShadowInfo(), m_desc->ShadowInfo.ShadowMapHeight)
+	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMin, ShadowInfo(), m_desc->ShadowInfo.BiasMin)
+	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMax, ShadowInfo(), m_desc->ShadowInfo.BiasMax)
 	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMap, m_desc->ShadowInfo.ShadowMap)
 	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMapMSAA, m_desc->ShadowInfo.ShadowMapMSAA)
+
+	// ScreenInfo
+	EFFECT_VARIABLE(ScreenInfo, m_desc->ScreenInfoAttributes.ScreenInfo)
+	EFFECT_MEMBER_AS_SCALAR(ScreenWidth, ScreenInfo(), m_desc->ScreenInfoAttributes.ScreenWidth)
+	EFFECT_MEMBER_AS_SCALAR(ScreenHeight, ScreenInfo(), m_desc->ScreenInfoAttributes.ScreenHeight)
+	EFFECT_MEMBER_AS_SCALAR(ScreenMultiSampling, ScreenInfo(), m_desc->ScreenInfoAttributes.Multisampling)
+
+	// Material
+	EFFECT_VARIABLE(Material, m_desc->MaterialName)
+	EFFECT_MEMBER_AS_VECTOR(Ka, Material(), m_desc->MaterialAttributes.Ka)
+	EFFECT_MEMBER_AS_VECTOR(Kd, Material(), m_desc->MaterialAttributes.Kd)
+	EFFECT_MEMBER_AS_VECTOR(Ks, Material(), m_desc->MaterialAttributes.Ks)
+	EFFECT_MEMBER_AS_SCALAR(Shininess, Material(), m_desc->MaterialAttributes.Shininess)
+	EFFECT_MEMBER_AS_SCALAR(Refreactivity, Material(), m_desc->MaterialAttributes.Refreactivity)
+
+	// Filter
+	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaX, m_desc->FilterAttributes.KernelDeltaX)
+	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaY, m_desc->FilterAttributes.KernelDeltaY)
 
 private:
 	ID3DX11Effect* m_effect = nullptr;
@@ -415,8 +440,6 @@ GMDx11Renderer::GMDx11Renderer()
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	GMDx11EffectVariableBank& bank = getVarBank();
-
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	if (!d->inputLayout)
@@ -461,7 +484,7 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
-	ID3DX11EffectVariable* shadowInfo = bank.ShadowInfo();
+	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3DX11EffectScalarVariable* hasShadow = bank.HasShadow();
 
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
@@ -496,21 +519,19 @@ void GMDx11Renderer::prepareScreenInfo()
 	// 如果屏幕更改了，需要通知此处重新设置着色器
 	if (!d->screenInfoPrepared)
 	{
+		GMDx11EffectVariableBank& bank = getVarBank();
 		const GMGameMachineRunningStates& runningStates = GM.getGameMachineRunningStates();
 		const auto& desc = getVariablesDesc();
 		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(desc->ScreenInfoAttributes.ScreenInfo);
 		GM_ASSERT(screenInfo->IsValid());
 
-		ID3DX11EffectScalarVariable* screenWidth = screenInfo->GetMemberByName(desc->ScreenInfoAttributes.ScreenWidth)->AsScalar();
-		GM_ASSERT(screenWidth->IsValid());
+		ID3DX11EffectScalarVariable* screenWidth = bank.ScreenWidth();
 		GM_DX_HR(screenWidth->SetInt(runningStates.renderRect.width));
 
-		ID3DX11EffectScalarVariable* screenHeight = screenInfo->GetMemberByName(desc->ScreenInfoAttributes.ScreenHeight)->AsScalar();
-		GM_ASSERT(screenHeight->IsValid());
+		ID3DX11EffectScalarVariable* screenHeight = bank.ScreenHeight();
 		GM_DX_HR(screenHeight->SetInt(runningStates.renderRect.height));
 
-		ID3DX11EffectScalarVariable* multisampling = screenInfo->GetMemberByName(desc->ScreenInfoAttributes.Multisampling)->AsScalar();
-		GM_ASSERT(multisampling->IsValid());
+		ID3DX11EffectScalarVariable* multisampling = bank.ScreenMultiSampling();
 		GM_DX_HR(multisampling->SetBool(runningStates.sampleCount > 1));
 		d->screenInfoPrepared = true;
 	}
@@ -696,16 +717,14 @@ void GMDx11Renderer::prepareRasterizer(GMModel* model)
 void GMDx11Renderer::prepareMaterials(GMModel* model)
 {
 	D(d);
-	const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
+	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3D11DeviceContext* context = d->deviceContext;
 	const GMMaterial& material = model->getShader().getMaterial();
-	ID3DX11EffectVariable* materialVar = d->effect->GetVariableByName(svd.MaterialName);
-	GM_ASSERT(materialVar->IsValid());
-	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Ka)->AsVector()->SetFloatVector(ValuePointer(material.ka)));
-	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Kd)->AsVector()->SetFloatVector(ValuePointer(material.kd)));
-	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Ks)->AsVector()->SetFloatVector(ValuePointer(material.ks)));
-	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Shininess)->AsScalar()->SetFloat(material.shininess));
-	GM_DX_HR(materialVar->GetMemberByName(svd.MaterialAttributes.Refreactivity)->AsScalar()->SetFloat(material.refractivity));
+	GM_DX_HR(bank.Ka()->SetFloatVector(ValuePointer(material.ka)));
+	GM_DX_HR(bank.Kd()->SetFloatVector(ValuePointer(material.kd)));
+	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.ks)));
+	GM_DX_HR(bank.Shininess()->SetFloat(material.shininess));
+	GM_DX_HR(bank.Refreactivity()->SetFloat(material.refractivity));
 }
 
 void GMDx11Renderer::prepareBlend(GMModel* model)
@@ -918,9 +937,9 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	D(d);
 	GMDx11Renderer::beginModel(model, parent);
 
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	ID3DX11EffectScalarVariable* kernelDeltaX = d->effect->GetVariableByName(desc->FilterAttributes.KernelDeltaX)->AsScalar();
-	ID3DX11EffectScalarVariable* kernelDeltaY = d->effect->GetVariableByName(desc->FilterAttributes.KernelDeltaY)->AsScalar();
+	GMDx11EffectVariableBank& bank = getVarBank();
+	ID3DX11EffectScalarVariable* kernelDeltaX = bank.KernelDeltaX();
+	ID3DX11EffectScalarVariable* kernelDeltaY = bank.KernelDeltaY();
 	GM_ASSERT(kernelDeltaX->IsValid() && kernelDeltaY->IsValid());
 	GMFloat4 delta;
 	getEngine()->getCurrentFilterKernelDelta().loadFloat4(delta);
@@ -929,6 +948,7 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[filterMode], GMShaderType::Effect);
 	GM_ASSERT(b);
 }
@@ -1036,23 +1056,15 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 	GMFloat4 viewPosition;
 	shadowSourceDesc.position.loadFloat4(viewPosition);
 
-	ID3DX11EffectVariable* shadowInfo = d->effect->GetVariableByName(desc->ShadowInfo.ShadowInfo);
-	GM_ASSERT(shadowInfo->IsValid());
-	ID3DX11EffectVectorVariable* position = shadowInfo->GetMemberByName(desc->ShadowInfo.Position)->AsVector();
-	GM_ASSERT(position->IsValid());
-	ID3DX11EffectMatrixVariable* viewMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowViewMatrix)->AsMatrix();
-	GM_ASSERT(viewMatrix->IsValid());
-	ID3DX11EffectMatrixVariable* projectionMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowProjectionMatrix)->AsMatrix();
-	GM_ASSERT(projectionMatrix->IsValid());
-	ID3DX11EffectScalarVariable* shadowMapWidth = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowMapWidth)->AsScalar();
-	GM_ASSERT(shadowMapWidth->IsValid());
-	ID3DX11EffectScalarVariable* shadowMapHeight = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowMapHeight)->AsScalar();
-	GM_ASSERT(shadowMapHeight->IsValid());
-	ID3DX11EffectScalarVariable* biasMin = shadowInfo->GetMemberByName(desc->ShadowInfo.BiasMin)->AsScalar();
-	GM_ASSERT(biasMin->IsValid());
-	ID3DX11EffectScalarVariable* biasMax = shadowInfo->GetMemberByName(desc->ShadowInfo.BiasMax)->AsScalar();
-	GM_ASSERT(biasMax->IsValid());
-
+	GMDx11EffectVariableBank& bank = getVarBank();
+	ID3DX11EffectVariable* shadowInfo = bank.ShadowInfo();
+	ID3DX11EffectVectorVariable* position = bank.ShadowPosition();
+	ID3DX11EffectMatrixVariable* viewMatrix = bank.ShadowViewMatrix();
+	ID3DX11EffectMatrixVariable* projectionMatrix = bank.ShadowProjectionMatrix();
+	ID3DX11EffectScalarVariable* shadowMapWidth = bank.ShadowMapWidth();
+	ID3DX11EffectScalarVariable* shadowMapHeight = bank.ShadowMapHeight();
+	ID3DX11EffectScalarVariable* biasMin = bank.ShadowBiasMin();
+	ID3DX11EffectScalarVariable* biasMax = bank.ShadowBiasMax();
 	GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
 	GM_DX_HR(viewMatrix->SetMatrix(ValuePointer(camera.getViewMatrix())));
 	GM_DX_HR(projectionMatrix->SetMatrix(ValuePointer(camera.getProjectionMatrix())));
