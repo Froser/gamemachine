@@ -1068,10 +1068,10 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 	GM_DX_HR(position->SetFloatVector(ValuePointer(viewPosition)));
 	GM_DX_HR(viewMatrix->SetMatrix(ValuePointer(camera.getViewMatrix())));
 	GM_DX_HR(projectionMatrix->SetMatrix(ValuePointer(camera.getProjectionMatrix())));
+	GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
+	GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
 
 	GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
 	GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
 	GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
-	GM_DX_HR(biasMin->SetFloat(shadowSourceDesc.biasMin));
-	GM_DX_HR(biasMax->SetFloat(shadowSourceDesc.biasMax));
 }

@@ -403,7 +403,7 @@ float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjecti
     projCoords.x = projCoords.x * 0.5f + 0.5f;
     projCoords.y = projCoords.y * (-0.5f) + 0.5f;
 
-    float bias = ShadowInfo.BiasMin == ShadowInfo.BiasMax ? ShadowInfo.BiasMin : max(ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - ShadowInfo.Position))), ShadowInfo.BiasMin);
+    float bias = ShadowInfo.BiasMin == ShadowInfo.BiasMax ? ShadowInfo.BiasMin : max(ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - ShadowInfo.Position.xyz))), ShadowInfo.BiasMin);
     float closestDepth = 0;
     if (ScreenInfo.Multisampling)
     {
@@ -454,7 +454,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
     float4 color_Diffuse = factor_Shadow * factor_Diffuse * saturate(ToFloat4(input.DiffuseTexture));
 
     // 计算Specular
-    float4 color_Specular = factor_Specular * ToFloat4(input.Ks);
+    float4 color_Specular = factor_Shadow * factor_Specular * ToFloat4(input.Ks);
     
     // 计算折射
     float4 color_Refractivity = IlluminateRefraction(

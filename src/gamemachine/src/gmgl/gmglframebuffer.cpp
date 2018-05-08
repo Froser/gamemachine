@@ -237,8 +237,9 @@ void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
 	glGenRenderbuffers(1, &d->depthStencilBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, d->depthStencilBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, desc.rect.width, desc.rect.height);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, desc.rect.width, desc.rect.height);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
@@ -253,7 +254,6 @@ bool GMGLFramebuffers::createFramebuffers()
 		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->framebuffers[i]->getTextureId(), 0);
 	}
-
 	glDrawBuffers(sz, attachments.data());
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -315,4 +315,38 @@ IFramebuffers* GMGLFramebuffers::getDefaultFramebuffers()
 {
 	static GMGLDefaultFramebuffers s_defaultFramebuffers;
 	return &s_defaultFramebuffers;
+}
+
+bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
+{
+	bool b = Base::init(desc);
+	if (!b)
+		return false;
+
+	D(d);
+	D_BASE(db, Base);
+	d->width = desc.rect.width;
+	d->height = desc.rect.height;
+	return true;
+}
+
+void GMGLShadowFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
+{
+	D(d);
+	D_BASE(db, Base);
+	glGenTextures(1, &d->shadowMapTexture);
+	glBindTexture(GL_TEXTURE_2D, d->shadowMapTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, desc.rect.width, desc.rect.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, db->fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d->shadowMapTexture, 0);
+	glReadBuffer(GL_NONE);
+	glDrawBuffer(GL_NONE);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

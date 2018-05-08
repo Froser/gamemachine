@@ -55,6 +55,24 @@ namespace
 				"GM_screenHeight",
 				"GM_multisampling",
 			},
+
+			nullptr,
+			nullptr,
+			nullptr,
+
+			{
+				"GM_shadowInfo",
+				"HasShadow",
+				"ShadowProjectionMatrix",
+				"ShadowViewMatrix",
+				"Position",
+				"ShadowMap",
+				"ShadowMapMSAA",
+				"ShadowMapWidth",
+				"ShadowMapHeight",
+				"BiasMin",
+				"BiasMax",
+			}
 		};
 		return desc;
 	}

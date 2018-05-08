@@ -120,6 +120,17 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	return true;
 }
 
+void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
+{
+	GMGLShadowFramebuffers* sdframebuffers = new GMGLShadowFramebuffers();
+	(*framebuffers) = sdframebuffers;
+
+	GMFramebuffersDesc desc;
+	desc.rect = GM.getGameMachineRunningStates().renderRect;
+	bool succeed = sdframebuffers->init(desc);
+	GM_ASSERT(succeed);
+}
+
 void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 {
 	D(d);
@@ -170,24 +181,28 @@ void GMGLGraphicEngine::update(GMUpdateDataType type)
 IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 {
 	D(d);
-	static GMGLRenderer_2D s_renderer2d;
-	static GMGLRenderer_3D s_renderer3d;
-	static GMGLRenderer_CubeMap s_rendererCubeMap;
-	static GMGLRenderer_Filter s_rendererFilter;
-	static GMGLRenderer_LightPass s_rendererLightPass;
+	D_BASE(db, Base);
+	static GMGLRenderer_2D s_renderer_2d;
+	static GMGLRenderer_3D s_renderer_3d;
+	static GMGLRenderer_CubeMap s_renderer_cubeMap;
+	static GMGLRenderer_Filter s_renderer_filter;
+	static GMGLRenderer_LightPass s_renderer_lightPass;
+	static GMGLRenderer_3D_Shadow s_renderer_3d_shadow;
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
 	case GMModelType::Glyph:
-		return &s_renderer2d;
+		return &s_renderer_2d;
 	case GMModelType::Model3D:
-		return &s_renderer3d;
+		if (db->isDrawingShadow)
+			return &s_renderer_3d_shadow;
+		return &s_renderer_3d;
 	case GMModelType::CubeMap:
-		return &s_rendererCubeMap;
+		return &s_renderer_cubeMap;
 	case GMModelType::Filter:
-		return &s_rendererFilter;
+		return &s_renderer_filter;
 	case GMModelType::LightPassQuad:
-		return &s_rendererLightPass;
+		return &s_renderer_lightPass;
 	default:
 		GM_ASSERT(false);
 		return nullptr;

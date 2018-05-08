@@ -110,5 +110,11 @@ protected:
 	virtual void endModel() override;
 };
 
+class GMGLRenderer_3D_Shadow : public GMGLRenderer_3D
+{
+protected:
+	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
+};
+
 END_NS
 #endif

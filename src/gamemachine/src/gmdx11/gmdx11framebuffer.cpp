@@ -365,7 +365,7 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	D3D11_SHADER_RESOURCE_VIEW_DESC dsrvd =
 	{
 		DXGI_FORMAT_R24_UNORM_X8_TYPELESS,
-		D3D11_SRV_DIMENSION_TEXTURE2D,
+		D3D_SRV_DIMENSION_UNKNOWN,
 		0,
 		0
 	};

@@ -63,11 +63,50 @@ public:
 	}
 
 private:
-	void createDepthStencilBuffer(const GMFramebufferDesc& desc);
 	bool createFramebuffers();
+
+private:
+	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
 
 public:
 	static IFramebuffers* getDefaultFramebuffers();
+};
+
+GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
+{
+	GMint width = 0;
+	GMint height = 0;
+	GMuint shadowMapTexture = 0;
+};
+
+class GMGLShadowFramebuffers : public GMGLFramebuffers
+{
+	DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
+
+public:
+	virtual bool init(const GMFramebuffersDesc& desc) override;
+
+public:
+	inline GMint getShadowMapWidth()
+	{
+		D(d);
+		return d->width;
+	}
+
+	inline GMint getShadowMapHeight()
+	{
+		D(d);
+		return d->height;
+	}
+
+	inline GMuint getShadowMapTexture()
+	{
+		D(d);
+		return d->shadowMapTexture;
+	}
+
+private:
+	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
 };
 
 END_NS

@@ -78,12 +78,12 @@ void GMGLLight::activateLight(GMuint index, IRenderer* renderer)
 	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 	const char* strIndex = number(index);
 
-	combineUniform(light_Position, "GM_lights[", strIndex, "].lightColor");
+	combineUniform(light_Position, "GM_lights[", strIndex, "].LightColor");
 	shaderProgram->setVec3(light_Position, getLightColor());
 
-	combineUniform(light_Color, "GM_lights[", strIndex, "].lightPosition");
+	combineUniform(light_Color, "GM_lights[", strIndex, "].LightPosition");
 	shaderProgram->setVec3(light_Color, getLightPosition());
 
-	combineUniform(light_Type, "GM_lights[", strIndex, "].lightType");
+	combineUniform(light_Type, "GM_lights[", strIndex, "].LightType");
 	shaderProgram->setInt(light_Type, getType());
 }

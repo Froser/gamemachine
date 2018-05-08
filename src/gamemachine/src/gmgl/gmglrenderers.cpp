@@ -9,6 +9,7 @@
 #include "foundation/gamemachine.h"
 #include "foundation/utilities/utilities.h"
 #include "gmglgbuffer.h"
+#include "gmglframebuffer.h"
 
 namespace
 {
@@ -96,6 +97,39 @@ namespace
 		default:
 			GM_ASSERT(false);
 			return "GM_Model2D";
+		}
+	}
+
+	inline void applyShadow(const GMShaderVariablesDesc* desc, const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
+	{
+		static const GMString s_shadowInfo = GMString(desc->ShadowInfo.ShadowInfo) + ".";
+		static std::string s_position = (s_shadowInfo + desc->ShadowInfo.Position).toStdString();
+		static std::string s_viewMatrix = (s_shadowInfo + desc->ShadowInfo.ShadowViewMatrix).toStdString();
+		static std::string s_projectionMatrix = (s_shadowInfo + desc->ShadowInfo.ShadowProjectionMatrix).toStdString();
+		static std::string s_width = (s_shadowInfo + desc->ShadowInfo.ShadowMapWidth).toStdString();
+		static std::string s_height = (s_shadowInfo + desc->ShadowInfo.ShadowMapWidth).toStdString();
+		static std::string s_biasMin = (s_shadowInfo + desc->ShadowInfo.BiasMin).toStdString();
+		static std::string s_biasMax = (s_shadowInfo + desc->ShadowInfo.BiasMax).toStdString();
+		static std::string s_hasShadow = (s_shadowInfo + desc->ShadowInfo.HasShadow).toStdString();
+
+		if (hasShadow)
+		{
+			shaderProgram->setBool(s_hasShadow.c_str(), 1);
+			const GMCamera& camera = shadowSourceDesc->camera;
+			GMFloat4 viewPosition;
+			shadowSourceDesc->position.loadFloat4(viewPosition);
+			shaderProgram->setVec4(s_position.c_str(), viewPosition);
+			shaderProgram->setMatrix4(s_viewMatrix.c_str(), camera.getViewMatrix());
+			shaderProgram->setMatrix4(s_projectionMatrix.c_str(), camera.getProjectionMatrix());
+			shaderProgram->setFloat(s_biasMin.c_str(), shadowSourceDesc->biasMin);
+			shaderProgram->setFloat(s_biasMax.c_str(), shadowSourceDesc->biasMax);
+
+			shaderProgram->setInt(s_width.c_str(), shadowFramebuffers->getShadowMapWidth());
+			shaderProgram->setInt(s_height.c_str(), shadowFramebuffers->getShadowMapHeight());
+		}
+		else
+		{
+			shaderProgram->setBool(s_hasShadow.c_str(), 0);
 		}
 	}
 }
@@ -306,7 +340,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
 
-	auto desc = getVariablesDesc();
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
 	{
 		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
@@ -330,6 +364,17 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 			getTechnique(model->getType()),
 			GMShaderType::Pixel);
 		db->engine->activateLights(this);
+	}
+
+	const GMShadowSourceDesc& shadowSourceDesc = db->engine->getShadowSourceDesc();
+	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	{
+		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(db->engine->getShadowMapFramebuffers());
+		applyShadow(desc, &db->engine->getShadowSourceDesc(), getShaderProgram(), shadowFramebuffers, true);
+	}
+	else
+	{
+		applyShadow(desc, nullptr, getShaderProgram(), nullptr, false);
 	}
 }
 
@@ -566,4 +611,18 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, id);
 		cubeMap->useTexture(nullptr, id);
 	}
+}
+
+void GMGLRenderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
+{
+	D_BASE(d, Base);
+	GMGLRenderer_3D::beginModel(model, parent);
+	getShaderProgram()->setInterfaceInstance(
+		GMGLShaderProgram::techniqueName(),
+		"GM_Shadow",
+		GMShaderType::Vertex);
+
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
+	applyShadow(desc, &d->engine->getShadowSourceDesc(), getShaderProgram(), shadowFramebuffers, true);
 }
