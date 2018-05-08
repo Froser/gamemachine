@@ -325,6 +325,74 @@ namespace
 	};
 }
 
+#define EFFECT_VARIABLE(funcName, name) \
+	ID3DX11EffectVariable* funcName() {												\
+		static ID3DX11EffectVariable* s_ptr = nullptr;								\
+		if (!s_ptr) {																\
+			s_ptr = m_effect->GetVariableByName(name);								\
+			GM_ASSERT(s_ptr->IsValid()); }											\
+		return s_ptr;																\
+	}
+
+#define EFFECT_VARIABLE_AS(funcName, name, retType, to) \
+	retType* funcName() {															\
+		static retType* s_ptr = nullptr;											\
+		if (!s_ptr) {																\
+			s_ptr = m_effect->GetVariableByName(name)->to();						\
+			GM_ASSERT(s_ptr->IsValid()); }											\
+		return s_ptr;																\
+	}
+
+#define EFFECT_VARIABLE_AS_SHADER_RESOURCE(funcName, name) \
+	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectShaderResourceVariable, AsShaderResource)
+
+#define EFFECT_MEMBER_AS(funcName, effect, name, retType, to) \
+	retType* funcName() {															\
+		static retType* s_ptr = nullptr;											\
+		if (!s_ptr) {																\
+			s_ptr = effect->GetMemberByName(name)->to();							\
+			GM_ASSERT(s_ptr->IsValid()); }											\
+		return s_ptr;																\
+	}
+
+#define EFFECT_MEMBER_AS_SCALAR(funcName, effect, name) \
+	EFFECT_MEMBER_AS(funcName, effect, name, ID3DX11EffectScalarVariable, AsScalar)
+
+#define EFFECT_MEMBER_AS_MATRIX(funcName, effect, name) \
+	EFFECT_MEMBER_AS(funcName, effect, name, ID3DX11EffectMatrixVariable, AsMatrix)
+
+#define EFFECT_MEMBER_AS_VECTOR(funcName, effect, name) \
+	EFFECT_MEMBER_AS(funcName, effect, name, ID3DX11EffectVectorVariable, AsVector)
+
+class GMDx11EffectVariableBank
+{
+public:
+	void init(ID3DX11Effect* effect, const GMShaderVariablesDesc* desc)
+	{
+		m_effect = effect;
+		m_desc = desc;
+	}
+
+	//Shadow
+	EFFECT_VARIABLE(ShadowInfo, m_desc->ShadowInfo.ShadowInfo)
+	EFFECT_MEMBER_AS_SCALAR(HasShadow, ShadowInfo(), m_desc->ShadowInfo.HasShadow)
+	EFFECT_MEMBER_AS_MATRIX(ShadowProjectionMatrix, ShadowInfo(), m_desc->ShadowInfo.ShadowProjectionMatrix)
+	EFFECT_MEMBER_AS_MATRIX(ShadowViewMatrix, ShadowInfo(), m_desc->ShadowInfo.ShadowViewMatrix)
+	EFFECT_MEMBER_AS_VECTOR(ShadowPosition, ShadowInfo(), m_desc->ShadowInfo.Position)
+	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMap, m_desc->ShadowInfo.ShadowMap)
+	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMapMSAA, m_desc->ShadowInfo.ShadowMapMSAA)
+
+private:
+	ID3DX11Effect* m_effect = nullptr;
+	const GMShaderVariablesDesc* m_desc = nullptr;
+};
+
+GMDx11EffectVariableBank& getVarBank()
+{
+	static GMDx11EffectVariableBank bank;
+	return bank;
+}
+
 GMDx11CubeMapState& GMDx11Renderer::getCubeMapState()
 {
 	static GMDx11CubeMapState cms;
@@ -341,11 +409,14 @@ GMDx11Renderer::GMDx11Renderer()
 	GM_ASSERT(d->effect);
 
 	d->deviceContext = getEngine()->getDeviceContext();
+	getVarBank().init(d->effect, getVariablesDesc());
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	GMDx11EffectVariableBank& bank = getVarBank();
+
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	if (!d->inputLayout)
@@ -390,29 +461,22 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
-	ID3DX11EffectVariable* shadowInfo = d->effect->GetVariableByName(desc->ShadowInfo.ShadowInfo);
-	GM_ASSERT(shadowInfo->IsValid());
-	ID3DX11EffectScalarVariable* hasShadow = shadowInfo->GetMemberByName(desc->ShadowInfo.HasShadow)->AsScalar();
-	GM_ASSERT(hasShadow->IsValid());
+	ID3DX11EffectVariable* shadowInfo = bank.ShadowInfo();
+	ID3DX11EffectScalarVariable* hasShadow = bank.HasShadow();
 
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
 		GM_DX_HR(hasShadow->SetBool(true));
-		ID3DX11EffectMatrixVariable* shadowProjectionMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowProjectionMatrix)->AsMatrix();
-		GM_ASSERT(shadowProjectionMatrix->IsValid());
+		ID3DX11EffectMatrixVariable* shadowProjectionMatrix = bank.ShadowProjectionMatrix();
 		GM_DX_HR(shadowProjectionMatrix->SetMatrix(ValuePointer(shadowSourceDesc.camera.getProjectionMatrix() )));
 
-		ID3DX11EffectMatrixVariable* shadowViewMatrix = shadowInfo->GetMemberByName(desc->ShadowInfo.ShadowViewMatrix)->AsMatrix();
-		GM_ASSERT(shadowViewMatrix->IsValid());
+		ID3DX11EffectMatrixVariable* shadowViewMatrix = bank.ShadowViewMatrix();
 		GM_DX_HR(shadowViewMatrix->SetMatrix(ValuePointer(shadowSourceDesc.camera.getViewMatrix())));
 
-		ID3DX11EffectVectorVariable* shadowPosition = shadowInfo->GetMemberByName(desc->ShadowInfo.Position)->AsVector();
-		GM_ASSERT(shadowPosition->IsValid());
+		ID3DX11EffectVectorVariable* shadowPosition = bank.ShadowPosition();
 		GM_DX_HR(shadowPosition->SetFloatVector(ValuePointer(shadowSourceDesc.position)));
 
-		ID3DX11EffectShaderResourceVariable* shadowMap = d->effect->GetVariableByName(GM.getGameMachineRunningStates().sampleCount > 1 ? desc->ShadowInfo.ShadowMapMSAA : desc->ShadowInfo.ShadowMap)->AsShaderResource();
-		GM_ASSERT(shadowMap->IsValid());
-
+		ID3DX11EffectShaderResourceVariable* shadowMap = GM.getGameMachineRunningStates().sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
 		GMDx11ShadowFramebuffers* shadowFramebuffers = gm_cast<GMDx11ShadowFramebuffers*>(getEngine()->getShadowMapFramebuffers());
 		GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
 	}
