@@ -23,3 +23,18 @@ mat4 gm_removeTranslation(mat4 mat)
 	);
 	return r;
 }
+
+struct GMShadowInfo
+{
+	int HasShadow;
+	mat4 ShadowProjectionMatrix;
+	mat4 ShadowViewMatrix;
+	vec4 Position;
+	sampler2D ShadowMap;
+	int ShadowMapWidth;
+	int ShadowMapHeight;
+	float BiasMin;
+	float BiasMax;
+};
+
+uniform GMShadowInfo GM_shadowInfo;

@@ -6,7 +6,6 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "foundation/gmprofile.h"
 #include "foundation/gmconfigs.h"
-#include "gmdx11/gmdx11framebuffer.h"
 
 void GMFramebuffersStack::push(IFramebuffers* framebuffers)
 {

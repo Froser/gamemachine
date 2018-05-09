@@ -72,11 +72,28 @@ public:
 	static IFramebuffers* getDefaultFramebuffers();
 };
 
+GM_PRIVATE_OBJECT(GMGLShadowMapTexture)
+{
+	GMuint textureId;
+};
+
+class GMGLShadowMapTexture : public ITexture
+{
+	DECLARE_PRIVATE(GMGLShadowMapTexture)
+
+public:
+	GMGLShadowMapTexture(GMuint textureId);
+	~GMGLShadowMapTexture();
+
+	virtual void init() override;
+	virtual void useTexture(GMTextureFrames*, GMint) override;
+};
+
 GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
 {
 	GMint width = 0;
 	GMint height = 0;
-	GMuint shadowMapTexture = 0;
+	GMGLShadowMapTexture* shadowMapTexture = nullptr;
 };
 
 class GMGLShadowFramebuffers : public GMGLFramebuffers
@@ -84,7 +101,11 @@ class GMGLShadowFramebuffers : public GMGLFramebuffers
 	DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
 
 public:
+	~GMGLShadowFramebuffers();
+
+public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
+	virtual void bind() override;
 
 public:
 	inline GMint getShadowMapWidth()
@@ -99,7 +120,7 @@ public:
 		return d->height;
 	}
 
-	inline GMuint getShadowMapTexture()
+	inline ITexture* getShadowMapTexture()
 	{
 		D(d);
 		return d->shadowMapTexture;

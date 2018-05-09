@@ -130,6 +130,8 @@ enum class GMTextureType
 
 	// Special type
 	CubeMap,
+	ShadowMap,
+	GeometryPasses,
 	EndOfEnum,
 };
 
@@ -140,7 +142,9 @@ static constexpr GMuint GMMaxTextureCount(GMTextureType type)
 		type == GMTextureType::Diffuse ? 3 :
 		type == GMTextureType::NormalMap ? 1 :
 		type == GMTextureType::Lightmap ? 1 :
-		type == GMTextureType::CubeMap ? 1 : 0;
+		type == GMTextureType::CubeMap ? 1 :
+		type == GMTextureType::ShadowMap ? 1 :
+		type == GMTextureType::GeometryPasses ? 8 : 0;
 }
 
 template <GMTextureType Type>

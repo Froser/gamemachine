@@ -7,6 +7,7 @@
 #include "model3d.vert"
 #include "glyph.vert"
 #include "cubemap.vert"
+#include "shadow.vert"
 
 void main(void)
 {

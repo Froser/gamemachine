@@ -317,6 +317,35 @@ IFramebuffers* GMGLFramebuffers::getDefaultFramebuffers()
 	return &s_defaultFramebuffers;
 }
 
+GMGLShadowMapTexture::GMGLShadowMapTexture(GMuint textureId)
+{
+	D(d);
+	d->textureId = textureId;
+}
+
+GMGLShadowMapTexture::~GMGLShadowMapTexture()
+{
+	D(d);
+	glDeleteTextures(1, &d->textureId);
+}
+
+void GMGLShadowMapTexture::useTexture(GMTextureFrames*, GMint)
+{
+	D(d);
+	glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
+	glBindTexture(GL_TEXTURE_2D, d->textureId);
+}
+
+void GMGLShadowMapTexture::init()
+{
+}
+
+GMGLShadowFramebuffers::~GMGLShadowFramebuffers()
+{
+	D(d);
+	GM_delete(d->shadowMapTexture);
+}
+
 bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 {
 	bool b = Base::init(desc);
@@ -330,23 +359,37 @@ bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	return true;
 }
 
+void GMGLShadowFramebuffers::bind()
+{
+	D_BASE(d, Base);
+	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	d->engine->getFramebuffersStack().push(this);
+}
+
 void GMGLShadowFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
 {
 	D(d);
 	D_BASE(db, Base);
-	glGenTextures(1, &d->shadowMapTexture);
-	glBindTexture(GL_TEXTURE_2D, d->shadowMapTexture);
+	GLuint shadowMapTextureId = 0;
+	glGenTextures(1, &shadowMapTextureId);
+	glBindTexture(GL_TEXTURE_2D, shadowMapTextureId);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, desc.rect.width, desc.rect.height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 	GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
 	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, db->fbo);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, d->shadowMapTexture, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, shadowMapTextureId, 0);
 	glReadBuffer(GL_NONE);
 	glDrawBuffer(GL_NONE);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	GM_ASSERT(shadowMapTextureId != 0);
+	d->shadowMapTexture = new GMGLShadowMapTexture(shadowMapTextureId);
+
+	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	GM_ASSERT(status == GL_FRAMEBUFFER_COMPLETE);
 }

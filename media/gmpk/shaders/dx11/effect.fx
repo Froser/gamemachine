@@ -59,6 +59,7 @@ SamplerState ShadowMapSampler
 {
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = BORDER;
+    AddressV = BORDER;
     BorderColor = float4(1, 1, 1, 1);
 };
 
@@ -403,12 +404,18 @@ float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjecti
     projCoords.x = projCoords.x * 0.5f + 0.5f;
     projCoords.y = projCoords.y * (-0.5f) + 0.5f;
 
-    float bias = ShadowInfo.BiasMin == ShadowInfo.BiasMax ? ShadowInfo.BiasMin : max(ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - ShadowInfo.Position.xyz))), ShadowInfo.BiasMin);
+    float bias = (ShadowInfo.BiasMin == ShadowInfo.BiasMax) ? ShadowInfo.BiasMin : max(ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - ShadowInfo.Position.xyz))), ShadowInfo.BiasMin);
     float closestDepth = 0;
     if (ScreenInfo.Multisampling)
     {
         int x = ShadowInfo.ShadowMapWidth * projCoords.x;
         int y = ShadowInfo.ShadowMapHeight * projCoords.y;
+        if (projCoords.x > 1 || projCoords.x < 0 ||
+            projCoords.y > 1 || projCoords.y < 0 )
+        {
+            return 1.f;
+        }
+
         closestDepth = ShadowMapMSAA.Load(int3(x, y, 0), 0);
     }
     else

@@ -92,39 +92,24 @@ vec3 GMLight_Specular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection
 
 /////////////////////////////////////////////////////////////////////
 // 基本光照流程
-struct GMShadowInfo
-{
-	int HasShadow;
-	mat4 ShadowProjectionMatrix;
-	mat4 ShadowViewMatrix;
-	vec4 Position;
-	sampler2D ShadowMap;
-	int ShadowMapWidth;
-	int ShadowMapHeight;
-	float BiasMin;
-	float BiasMax;
-};
-
-uniform GMShadowInfo GM_shadowInfo;
-
 struct TangentSpace
 {
-    vec3 Normal_Tangent_N;
-    mat3 TBN;
+	vec3 Normal_Tangent_N;
+	mat3 TBN;
 };
 
 struct PS_3D_INPUT
 {
-    vec3 WorldPos;            // 世界坐标
-    vec3 Normal_World_N;      // 世界法线
-    vec3 Normal_Eye_N;        // 眼睛空间法向量
-    TangentSpace TangentSpace;  // 切线空间
-    bool HasNormalMap;          // 是否有法线贴图
-    vec3 AmbientLightmapTexture;
-    vec3 DiffuseTexture;
-    vec3 Ks;
-    float Shininess;
-    float Refractivity; 
+	vec3 WorldPos;            // 世界坐标
+	vec3 Normal_World_N;      // 世界法线
+	vec3 Normal_Eye_N;        // 眼睛空间法向量
+	TangentSpace TangentSpace;  // 切线空间
+	bool HasNormalMap;          // 是否有法线贴图
+	vec3 AmbientLightmapTexture;
+	vec3 DiffuseTexture;
+	vec3 Ks;
+	float Shininess;
+	float Refractivity; 
 };
 
 vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float refractivity)
@@ -149,31 +134,32 @@ vec3 calculateRefractionByNormalTangent(vec3 worldPos, TangentSpace tangentSpace
 
 float calculateShadow(mat4 shadowSourceViewMatrix, mat4 shadowSourceProjectionMatrix, vec4 worldPos, vec3 normal_N)
 {
-    if (GM_shadowInfo.HasShadow == 0)
-        return 1.0f;
+	if (GM_shadowInfo.HasShadow == 0)
+		return 1.0f;
 
-    vec4 fragPos = shadowSourceProjectionMatrix * shadowSourceViewMatrix * worldPos;
-    vec3 projCoords = fragPos.xyz / fragPos.w;
-    if (projCoords.z > 1.0f)
-        return 1.0f;
+	vec4 fragPos = shadowSourceProjectionMatrix * shadowSourceViewMatrix * worldPos;
+	vec3 projCoords = fragPos.xyz / fragPos.w;
+	if (projCoords.z > 1.0f)
+		return 1.0f;
 
-    projCoords.xy = projCoords.xy * 0.5f + 0.5f;
+	projCoords.xy = projCoords.xy * 0.5f + 0.5f;
 
-    float bias = GM_shadowInfo.BiasMin == GM_shadowInfo.BiasMax ? GM_shadowInfo.BiasMin : max(GM_shadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_shadowInfo.Position.xyz))), GM_shadowInfo.BiasMin);
-    //float closestDepth = ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
-    //return projCoords.z - bias > closestDepth ? 0.f : 1.f;
-    return 0;
+	float bias = (GM_shadowInfo.BiasMin == GM_shadowInfo.BiasMax) ? GM_shadowInfo.BiasMin : max(GM_shadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_shadowInfo.Position.xyz))), GM_shadowInfo.BiasMin);
+	float closestDepth = texture(GM_shadowInfo.ShadowMap, projCoords.xy).r;
+	//return projCoords.z - bias > closestDepth ? 0.f : 1.f;
+	return projCoords.z;
 }
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
 	float factor_Shadow = calculateShadow(GM_shadowInfo.ShadowViewMatrix, GM_shadowInfo.ShadowProjectionMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
+		return vec4((factor_Shadow - 0.9) * 5,0,0,1);
 	vec3 ambientLight = vec3(0, 0, 0);
 	vec3 diffuseLight = vec3(0, 0, 0);
 	vec3 specularLight = vec3(0, 0, 0);
 	vec3 refractionLight = vec3(0, 0, 0);
 	vec3 eyeDirection_eye = -(GM_view_matrix * vec4(vertex.WorldPos, 1)).xyz;
-	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye) ;
+	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 
 	// 计算漫反射和高光部分
 	if (!vertex.HasNormalMap)

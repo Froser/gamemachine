@@ -111,6 +111,7 @@ namespace
 		static std::string s_biasMin = (s_shadowInfo + desc->ShadowInfo.BiasMin).toStdString();
 		static std::string s_biasMax = (s_shadowInfo + desc->ShadowInfo.BiasMax).toStdString();
 		static std::string s_hasShadow = (s_shadowInfo + desc->ShadowInfo.HasShadow).toStdString();
+		static std::string s_shadowMap = (s_shadowInfo + desc->ShadowInfo.ShadowMap).toStdString();
 
 		if (hasShadow)
 		{
@@ -126,6 +127,7 @@ namespace
 
 			shaderProgram->setInt(s_width.c_str(), shadowFramebuffers->getShadowMapWidth());
 			shaderProgram->setInt(s_height.c_str(), shadowFramebuffers->getShadowMapHeight());
+			shaderProgram->setInt(s_shadowMap.c_str(), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
 		}
 		else
 		{
@@ -370,7 +372,8 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(db->engine->getShadowMapFramebuffers());
-		applyShadow(desc, &db->engine->getShadowSourceDesc(), getShaderProgram(), shadowFramebuffers, true);
+		shadowFramebuffers->getShadowMapTexture()->useTexture(nullptr, 0);
+		applyShadow(desc, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
 	{
@@ -583,6 +586,19 @@ void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* pare
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
+
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	const GMShadowSourceDesc& shadowSourceDesc = d->engine->getShadowSourceDesc();
+	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
+	{
+		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
+		shadowFramebuffers->getShadowMapTexture()->useTexture(nullptr, 0);
+		applyShadow(desc, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+	}
+	else
+	{
+		applyShadow(desc, nullptr, shaderProgram, nullptr, false);
+	}
 }
 
 void GMGLRenderer_LightPass::afterDraw(GMModel* model)
@@ -600,14 +616,14 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 	for (GMuint i = 0; i < cnt; ++i)
 	{
 		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
-		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), i);
-		texture->useTexture(nullptr, i);
+		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
+		texture->useTexture(nullptr, GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
 	}
 
 	ITexture* cubeMap = d->engine->getCubeMap();
 	if (cubeMap)
 	{
-		const GMuint id = cnt + 1;
+		const GMuint id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
 		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, id);
 		cubeMap->useTexture(nullptr, id);
 	}
@@ -616,13 +632,20 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 void GMGLRenderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D_BASE(d, Base);
-	GMGLRenderer_3D::beginModel(model, parent);
-	getShaderProgram()->setInterfaceInstance(
+	IShaderProgram* shaderProgram = getShaderProgram();
+	shaderProgram->useProgram();
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	if (parent)
+		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+	else
+		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
+
+	GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
+	applyShadow(desc, &d->engine->getShadowSourceDesc(), shaderProgram, shadowFramebuffers, true);
+
+	bool b = shaderProgram->setInterfaceInstance(
 		GMGLShaderProgram::techniqueName(),
 		"GM_Shadow",
 		GMShaderType::Vertex);
-
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
-	GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
-	applyShadow(desc, &d->engine->getShadowSourceDesc(), getShaderProgram(), shadowFramebuffers, true);
+	GM_ASSERT(b);
 }

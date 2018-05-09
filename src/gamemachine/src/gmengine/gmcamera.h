@@ -152,7 +152,7 @@ public:
 	inline bool isDirty() const { D(d); return d->frustum.isDirty(); }
 	inline void cleanDirty() { D(d); d->frustum.cleanDirty(); }
 	inline const GMMat4& getProjectionMatrix() const { D(d); return d->frustum.getProjectionMatrix(); }
-	inline const GMMat4& getViewMatrix()const { D(d); return d->frustum.getViewMatrix(); }
+	inline const GMMat4& getViewMatrix() const { D(d); return d->frustum.getViewMatrix(); }
 	const GMMat4& getInverseViewMatrix() const { D(d); return d->frustum.getInverseViewMatrix(); }
 	inline const GMCameraLookAt& getLookAt() const { D(d); return d->lookAt; }
 
