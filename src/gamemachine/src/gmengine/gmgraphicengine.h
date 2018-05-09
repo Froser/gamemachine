@@ -52,8 +52,7 @@ struct GMShaderVariableShadowInfo
 {
 	const char* ShadowInfo;
 	const char* HasShadow;
-	const char* ShadowProjectionMatrix;
-	const char* ShadowViewMatrix;
+	const char* ShadowMatrix;
 	const char* Position;
 	const char* ShadowMap;
 	const char* ShadowMapMSAA;
@@ -116,6 +115,9 @@ struct GMShadowSourceDesc
 	GMVec4 position;
 	float biasMin = 0.0005f;
 	float biasMax = 0.005f;
+	GMint64 currentVersion = 0;
+
+	static GMint64 version;
 };
 
 GM_PRIVATE_OBJECT(GMFramebuffersStack)

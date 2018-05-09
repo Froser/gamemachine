@@ -7,6 +7,8 @@
 #include "foundation/gmprofile.h"
 #include "foundation/gmconfigs.h"
 
+GMint64 GMShadowSourceDesc::version = 0;
+
 void GMFramebuffersStack::push(IFramebuffers* framebuffers)
 {
 	D(d);
@@ -207,6 +209,7 @@ void GMGraphicEngine::setShadowSource(const GMShadowSourceDesc& desc)
 {
 	D(d);
 	d->shadow = desc;
+	d->shadow.version = ++GMShadowSourceDesc::version;
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

@@ -102,10 +102,11 @@ namespace
 
 	inline void applyShadow(const GMShaderVariablesDesc* desc, const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
 	{
+		static IShaderProgram* lastProgram = nullptr;
+		static GMint64 lastShadowVersion = 0;
 		static const GMString s_shadowInfo = GMString(desc->ShadowInfo.ShadowInfo) + ".";
 		static std::string s_position = (s_shadowInfo + desc->ShadowInfo.Position).toStdString();
-		static std::string s_viewMatrix = (s_shadowInfo + desc->ShadowInfo.ShadowViewMatrix).toStdString();
-		static std::string s_projectionMatrix = (s_shadowInfo + desc->ShadowInfo.ShadowProjectionMatrix).toStdString();
+		static std::string s_matrix = (s_shadowInfo + desc->ShadowInfo.ShadowMatrix).toStdString();
 		static std::string s_width = (s_shadowInfo + desc->ShadowInfo.ShadowMapWidth).toStdString();
 		static std::string s_height = (s_shadowInfo + desc->ShadowInfo.ShadowMapWidth).toStdString();
 		static std::string s_biasMin = (s_shadowInfo + desc->ShadowInfo.BiasMin).toStdString();
@@ -115,13 +116,18 @@ namespace
 
 		if (hasShadow)
 		{
+			if (lastProgram == shaderProgram && lastShadowVersion == shadowSourceDesc->currentVersion)
+				return;
+
+			lastProgram = shaderProgram;
+			lastShadowVersion = shadowSourceDesc->currentVersion;
+
 			shaderProgram->setBool(s_hasShadow.c_str(), 1);
 			const GMCamera& camera = shadowSourceDesc->camera;
 			GMFloat4 viewPosition;
 			shadowSourceDesc->position.loadFloat4(viewPosition);
 			shaderProgram->setVec4(s_position.c_str(), viewPosition);
-			shaderProgram->setMatrix4(s_viewMatrix.c_str(), camera.getViewMatrix());
-			shaderProgram->setMatrix4(s_projectionMatrix.c_str(), camera.getProjectionMatrix());
+			shaderProgram->setMatrix4(s_matrix.c_str(), camera.getViewMatrix() * camera.getProjectionMatrix());
 			shaderProgram->setFloat(s_biasMin.c_str(), shadowSourceDesc->biasMin);
 			shaderProgram->setFloat(s_biasMax.c_str(), shadowSourceDesc->biasMax);
 
@@ -377,7 +383,7 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	}
 	else
 	{
-		applyShadow(desc, nullptr, getShaderProgram(), nullptr, false);
+		applyShadow(desc, nullptr, shaderProgram, nullptr, false);
 	}
 }
 
@@ -647,5 +653,10 @@ void GMGLRenderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pare
 		GMGLShaderProgram::techniqueName(),
 		"GM_Shadow",
 		GMShaderType::Vertex);
+	GM_ASSERT(b);
+	b = shaderProgram->setInterfaceInstance(
+		GMGLShaderProgram::techniqueName(),
+		"GM_Shadow",
+		GMShaderType::Pixel);
 	GM_ASSERT(b);
 }

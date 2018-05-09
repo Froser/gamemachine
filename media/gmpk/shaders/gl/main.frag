@@ -9,6 +9,7 @@
 #include "model3d.frag"
 #include "glyph.frag"
 #include "cubemap.frag"
+#include "shadow.frag"
 
 void main(void)
 {

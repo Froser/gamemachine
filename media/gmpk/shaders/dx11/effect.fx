@@ -254,8 +254,7 @@ GMScreenInfo ScreenInfo;
 struct GMShadowInfo
 {
     bool HasShadow;
-    matrix ShadowProjectionMatrix;
-    matrix ShadowViewMatrix;
+    matrix ShadowMatrix;
     float4 Position;
     int ShadowMapWidth;
     int ShadowMapHeight;
@@ -391,12 +390,12 @@ struct PS_3D_INPUT
     float Refractivity; 
 };
 
-float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjectionMatrix, float4 worldPos, float3 normal_N)
+float CalculateShadow(matrix shadowMatrix, float4 worldPos, float3 normal_N)
 {
     if (!ShadowInfo.HasShadow)
         return 1.0f;
 
-    float4 fragPos = mul(mul(worldPos, shadowSourceViewMatrix), shadowSourceProjectionMatrix);
+    float4 fragPos = mul(worldPos, shadowMatrix);
     float3 projCoords = fragPos.xyz / fragPos.w;
     if (projCoords.z > 1.0f)
         return 1.0f;
@@ -428,7 +427,7 @@ float CalculateShadow(matrix shadowSourceViewMatrix, matrix shadowSourceProjecti
 
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
-    float factor_Shadow = CalculateShadow(ShadowInfo.ShadowViewMatrix, ShadowInfo.ShadowProjectionMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
+    float factor_Shadow = CalculateShadow(ShadowInfo.ShadowMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
     float4 factor_Ambient = float4(0, 0, 0, 0);
     float4 factor_Diffuse = float4(0, 0, 0, 0);
     float4 factor_Specular = float4(0, 0, 0, 0);
@@ -801,8 +800,7 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
     output.Position = mul(output.Position, WorldMatrix);
     output.WorldPos = output.Position;
     
-    output.Position = mul(output.Position, ShadowInfo.ShadowViewMatrix);
-    output.Position = mul(output.Position, ShadowInfo.ShadowProjectionMatrix);
+    output.Position = mul(output.Position, ShadowInfo.ShadowMatrix);
 
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;

@@ -132,28 +132,25 @@ vec3 calculateRefractionByNormalTangent(vec3 worldPos, TangentSpace tangentSpace
 	return calculateRefractionByNormalWorld(worldPos, normal_world_N, refractivity);
 }
 
-float calculateShadow(mat4 shadowSourceViewMatrix, mat4 shadowSourceProjectionMatrix, vec4 worldPos, vec3 normal_N)
+float calculateShadow(mat4 shadowMatrix, vec4 worldPos, vec3 normal_N)
 {
 	if (GM_shadowInfo.HasShadow == 0)
 		return 1.0f;
 
-	vec4 fragPos = shadowSourceProjectionMatrix * shadowSourceViewMatrix * worldPos;
+	vec4 fragPos = shadowMatrix * worldPos;
 	vec3 projCoords = fragPos.xyz / fragPos.w;
 	if (projCoords.z > 1.0f)
 		return 1.0f;
-
 	projCoords.xy = projCoords.xy * 0.5f + 0.5f;
 
 	float bias = (GM_shadowInfo.BiasMin == GM_shadowInfo.BiasMax) ? GM_shadowInfo.BiasMin : max(GM_shadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_shadowInfo.Position.xyz))), GM_shadowInfo.BiasMin);
 	float closestDepth = texture(GM_shadowInfo.ShadowMap, projCoords.xy).r;
-	//return projCoords.z - bias > closestDepth ? 0.f : 1.f;
-	return projCoords.z;
+	return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
-	float factor_Shadow = calculateShadow(GM_shadowInfo.ShadowViewMatrix, GM_shadowInfo.ShadowProjectionMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
-		return vec4((factor_Shadow - 0.9) * 5,0,0,1);
+	float factor_Shadow = calculateShadow(GM_shadowInfo.ShadowMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
 	vec3 ambientLight = vec3(0, 0, 0);
 	vec3 diffuseLight = vec3(0, 0, 0);
 	vec3 specularLight = vec3(0, 0, 0);

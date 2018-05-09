@@ -27,8 +27,7 @@ mat4 gm_removeTranslation(mat4 mat)
 struct GMShadowInfo
 {
 	int HasShadow;
-	mat4 ShadowProjectionMatrix;
-	mat4 ShadowViewMatrix;
+	mat4 ShadowMatrix;
 	vec4 Position;
 	sampler2D ShadowMap;
 	int ShadowMapWidth;

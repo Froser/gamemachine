@@ -63,8 +63,7 @@ namespace
 			{
 				"GM_shadowInfo",
 				"HasShadow",
-				"ShadowProjectionMatrix",
-				"ShadowViewMatrix",
+				"ShadowMatrix",
 				"Position",
 				"ShadowMap",
 				"ShadowMapMSAA",

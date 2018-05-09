@@ -56,8 +56,7 @@ namespace
 			{
 				"ShadowInfo",
 				"HasShadow",
-				"ShadowProjectionMatrix",
-				"ShadowViewMatrix",
+				"ShadowMatrix",
 				"Position",
 				"ShadowMap",
 				"ShadowMapMSAA",
