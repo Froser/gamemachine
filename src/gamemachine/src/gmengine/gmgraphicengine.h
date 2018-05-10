@@ -115,8 +115,10 @@ struct GMShadowSourceDesc
 	GMVec4 position;
 	float biasMin = 0.0005f;
 	float biasMax = 0.005f;
-	GMint64 currentVersion = 0;
+	GMint width;
+	GMint height;
 
+	GMint64 currentVersion = 0;
 	static GMint64 version;
 };
 

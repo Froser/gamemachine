@@ -266,8 +266,8 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);
 
 	// 6.设置视口
-	vp.TopLeftX = 0.f;
-	vp.TopLeftY = 0.f;
+	gameMachineRunningState.viewportTopLeftX = vp.TopLeftX = 0.f;
+	gameMachineRunningState.viewportTopLeftY = vp.TopLeftY = 0.f;
 	vp.Width = static_cast<gm::GMfloat>(renderWidth);
 	vp.Height = static_cast<gm::GMfloat>(renderHeight);
 	gameMachineRunningState.minDepth = vp.MinDepth = 0.f;

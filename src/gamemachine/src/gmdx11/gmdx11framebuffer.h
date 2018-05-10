@@ -46,6 +46,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 	GMComPtr<ID3D11Texture2D> depthStencilTexture;
 	GMGraphicEngine* engine = nullptr;
 	GMfloat clearColor[4];
+	D3D11_VIEWPORT viewport;
 };
 
 class GMDx11Framebuffers : public GMObject, public IFramebuffers

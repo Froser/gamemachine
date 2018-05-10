@@ -150,11 +150,15 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 
 void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 {
+	D_BASE(d, Base);
 	GMDx11ShadowFramebuffers* sdframebuffers = new GMDx11ShadowFramebuffers();
 	(*framebuffers) = sdframebuffers;
 
 	GMFramebuffersDesc desc;
-	desc.rect = GM.getGameMachineRunningStates().renderRect;
+	GMRect rect;
+	rect.width = d->shadow.width;
+	rect.height = d->shadow.height;
+	desc.rect = rect;
 	bool succeed = sdframebuffers->init(desc);
 	GM_ASSERT(succeed);
 }

@@ -28,6 +28,14 @@ public:
 		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->defaultRenderTargetView);
 		GM_ASSERT(d->defaultRenderTargetView);
 		db->renderTargetViews.push_back(d->defaultRenderTargetView);
+
+		const GMGameMachineRunningStates& runningState = GM.getGameMachineRunningStates();
+		db->viewport.TopLeftX = runningState.viewportTopLeftX;
+		db->viewport.TopLeftY = runningState.viewportTopLeftY;
+		db->viewport.Width = runningState.renderRect.width;
+		db->viewport.Height = runningState.renderRect.height;
+		db->viewport.MinDepth = runningState.minDepth;
+		db->viewport.MaxDepth = runningState.maxDepth;
 	}
 
 public:
@@ -209,7 +217,12 @@ bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 	GM_ASSERT(device);
 
 	const GMGameMachineRunningStates& runningState = GM.getGameMachineRunningStates();
-	GMComPtr<ID3D11DepthStencilState> depthStencilState;
+	d->viewport.TopLeftX = runningState.viewportTopLeftX;
+	d->viewport.TopLeftY = runningState.viewportTopLeftY;
+	d->viewport.Width = desc.rect.width;
+	d->viewport.Height = desc.rect.height;
+	d->viewport.MinDepth = runningState.minDepth;
+	d->viewport.MaxDepth = runningState.maxDepth;
 
 	// 创建深度缓存模板
 	D3D11_TEXTURE2D_DESC depthStencilTextureDesc = getDepthTextureDesc();
@@ -245,6 +258,7 @@ bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 	else
 		dsvd.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 
+	GMComPtr<ID3D11DepthStencilState> depthStencilState;
 	GM_DX_HR_RET(device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
 	GM_DX_HR_RET(device->CreateTexture2D(&depthStencilTextureDesc, NULL, &d->depthStencilTexture));
 	GM_DX_HR_RET(device->CreateDepthStencilView(d->depthStencilTexture, &dsvd, &d->depthStencilView));
@@ -263,6 +277,7 @@ void GMDx11Framebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
 void GMDx11Framebuffers::bind()
 {
 	D(d);
+	d->deviceContext->RSSetViewports(1, &d->viewport);
 	d->deviceContext->OMSetRenderTargets(d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
 	d->engine->getFramebuffersStack().push(this);
 }

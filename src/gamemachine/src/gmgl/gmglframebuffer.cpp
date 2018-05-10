@@ -95,6 +95,14 @@ public:
 	{
 		return 0;
 	}
+
+private:
+	virtual void setViewport() override
+	{
+		D(d);
+		GMRect rect = GM.getGameMachineRunningStates().renderRect;
+		glViewport(0, 0, rect.width, rect.height);
+	}
 };
 
 GMGLFramebuffer::~GMGLFramebuffer()
@@ -180,6 +188,7 @@ void GMGLFramebuffers::bind()
 	if (d->framebuffersCreated)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+		setViewport();
 		d->engine->getFramebuffersStack().push(this);
 	}
 }
@@ -241,6 +250,12 @@ void GMGLFramebuffers::createDepthStencilBuffer(const GMFramebufferDesc& desc)
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, d->depthStencilBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void GMGLFramebuffers::setViewport()
+{
+	D(d);
+	glViewport(0, 0, d->desc.rect.width, d->desc.rect.height);
 }
 
 bool GMGLFramebuffers::createFramebuffers()
@@ -363,6 +378,7 @@ void GMGLShadowFramebuffers::bind()
 {
 	D_BASE(d, Base);
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	setViewport();
 	d->engine->getFramebuffersStack().push(this);
 }
 

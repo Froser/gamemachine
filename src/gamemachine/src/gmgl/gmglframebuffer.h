@@ -65,8 +65,9 @@ public:
 private:
 	bool createFramebuffers();
 
-private:
+protected:
 	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
+	virtual void setViewport();
 
 public:
 	static IFramebuffers* getDefaultFramebuffers();

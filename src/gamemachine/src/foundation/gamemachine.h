@@ -62,6 +62,8 @@ struct GMGameMachineRunningStates
 	GMRenderEnvironment renderEnvironment = GMRenderEnvironment::Invalid; //!< GameMachine采取的渲染环境。渲染环境决定着本程序将用何种数据结构、坐标系来进行运算。需要与窗口环境一致。
 
 	// 下面字段由图形引擎生成
+	GMfloat viewportTopLeftX = 0; //!< 视口左上角X坐标。
+	GMfloat viewportTopLeftY = 0; //!< 视口左上角Y坐标。
 	GMfloat minDepth = 0; //!< 近平面的深度值。
 	GMfloat maxDepth = 1; //!< 远平面的深度值。
 	GMString workingAdapterDesc; //!< 适配器信息。
