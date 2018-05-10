@@ -65,14 +65,12 @@ public:
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
 	virtual bool event(const GameMachineMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;
+	virtual IRenderer* getRenderer(GMModelType objectType) override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }
 	virtual bool setInterface(GameMachineInterfaceID, void*);
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
-
-public:
-	IRenderer* getRenderer(GMModelType objectType);
 
 public:
 	inline bool isBlending() { D(d); return d->isBlending; }

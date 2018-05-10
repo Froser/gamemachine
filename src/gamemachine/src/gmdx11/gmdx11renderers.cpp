@@ -3,7 +3,7 @@
 #include "gmdata/gmmodel.h"
 #include <gmgameobject.h>
 #include <gmdx11helper.h>
-#include "gmdx11modelpainter.h"
+#include "gmdx11modeldataproxy.h"
 #include "gmdx11texture.h"
 #include "gmdx11graphic_engine.h"
 #include "gmdx11gbuffer.h"
@@ -663,15 +663,15 @@ void GMDx11Renderer::prepareBuffer(GMModel* model)
 	GMuint stride = sizeof(GMVertex);
 	GMuint offset = 0;
 	GMComPtr<ID3D11Buffer> vertexBuffer;
-	IQueriable* painter = model->getPainter();
-	painter->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
+	IQueriable* modelDataProxy = model->getModelDataProxy();
+	modelDataProxy->getInterface(GameMachineInterfaceID::D3D11VertexBuffer, (void**)&vertexBuffer);
 	GM_ASSERT(vertexBuffer);
 	GM_DX11_SET_OBJECT_NAME_A(vertexBuffer, "GM_VERTEX_BUFFER");
 	d->deviceContext->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 	if (model->getDrawMode() == GMModelDrawMode::Index)
 	{
 		GMComPtr<ID3D11Buffer> indexBuffer;
-		painter->getInterface(GameMachineInterfaceID::D3D11IndexBuffer, (void**)&indexBuffer);
+		modelDataProxy->getInterface(GameMachineInterfaceID::D3D11IndexBuffer, (void**)&indexBuffer);
 		GM_ASSERT(indexBuffer);
 		d->deviceContext->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 	}

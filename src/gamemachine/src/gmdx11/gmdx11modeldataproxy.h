@@ -8,7 +8,7 @@
 BEGIN_NS
 
 class GMDx11GraphicEngine;
-GM_PRIVATE_OBJECT(GMDx11ModelPainter)
+GM_PRIVATE_OBJECT(GMDx11ModelDataProxy)
 {
 	GMDx11GraphicEngine* engine = nullptr;
 	GMComPtr<ID3D11Buffer> vertexBuffer;
@@ -17,16 +17,15 @@ GM_PRIVATE_OBJECT(GMDx11ModelPainter)
 	D3D11_MAPPED_SUBRESOURCE* mappedSubResource = nullptr;
 };
 
-class GMDx11ModelPainter : public GMModelPainter
+class GMDx11ModelDataProxy : public GMModelDataProxy
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11ModelPainter, GMModelPainter)
+	DECLARE_PRIVATE_AND_BASE(GMDx11ModelDataProxy, GMModelDataProxy)
 
 public:
-	GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* obj);
+	GMDx11ModelDataProxy(GMDx11GraphicEngine* engine, GMModel* obj);
 
 public:
 	virtual void transfer() override;
-	virtual void draw(const GMGameObject* parent) override;
 	virtual void dispose(GMModelBuffer* md) override;
 	virtual void beginUpdateBuffer(GMModel* model) override;
 	virtual void endUpdateBuffer() override;
@@ -34,9 +33,6 @@ public:
 
 // IQueriable
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
-
-private:
-	void draw(IRenderer* renderer, GMModel* model);
 };
 
 END_NS

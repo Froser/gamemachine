@@ -155,6 +155,7 @@ GMGLRenderer::GMGLRenderer()
 void GMGLRenderer::draw(GMModel* model)
 {
 	D(d);
+	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
 	applyStencil(*d->engine);
 	prepareScreenInfo(getShaderProgram());
 	beforeDraw(model);
@@ -164,6 +165,7 @@ void GMGLRenderer::draw(GMModel* model)
 	else
 		glDrawElements(mode, model->getVerticesCount(), GL_UNSIGNED_INT, 0);
 	afterDraw(model);
+	glBindVertexArray(0);
 }
 
 void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, GMint index)

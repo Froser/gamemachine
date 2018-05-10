@@ -69,17 +69,17 @@ GameMachineMessage GameMachine::peekMessage()
 	return d->lastMessage;
 }
 
-void GameMachine::createModelPainterAndTransfer(GMModel* model)
+void GameMachine::createModelDataProxyAndTransfer(GMModel* model)
 {
 	if (model)
 	{
-		GMModelPainter* painter = model->getPainter();
-		if (!painter)
+		GMModelDataProxy* modelDataProxy = model->getModelDataProxy();
+		if (!modelDataProxy)
 		{
-			getFactory()->createPainter(getGraphicEngine(), model, &painter);
-			model->setPainter(painter);
+			getFactory()->createModelDataProxy(getGraphicEngine(), model, &modelDataProxy);
+			model->setModelDataProxy(modelDataProxy);
 		}
-		painter->transfer();
+		modelDataProxy->transfer();
 	}
 }
 

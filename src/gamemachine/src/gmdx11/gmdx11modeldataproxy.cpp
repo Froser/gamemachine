@@ -1,16 +1,16 @@
 ﻿#include "stdafx.h"
-#include "gmdx11modelpainter.h"
+#include "gmdx11modeldataproxy.h"
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
-GMDx11ModelPainter::GMDx11ModelPainter(GMDx11GraphicEngine* engine, GMModel* model)
-	: GMModelPainter(model)
+GMDx11ModelDataProxy::GMDx11ModelDataProxy(GMDx11GraphicEngine* engine, GMModel* model)
+	: GMModelDataProxy(model)
 {
 	D(d);
 	d->engine = engine;
 }
 
-bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
+bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D_BASE(db, Base);
 	D(d);
@@ -49,7 +49,7 @@ bool GMDx11ModelPainter::getInterface(GameMachineInterfaceID id, void** out)
 	return false;
 }
 
-void GMDx11ModelPainter::transfer()
+void GMDx11ModelDataProxy::transfer()
 {
 	D(d);
 	if (d->inited)
@@ -134,25 +134,11 @@ void GMDx11ModelPainter::transfer()
 	model->needNotTransferAnymore();
 }
 
-void GMDx11ModelPainter::draw(const GMGameObject* parent)
-{
-	D(d);
-	GMModel* model = getModel();
-	IRenderer* renderer = d->engine->getRenderer(model->getType());
-	renderer->beginModel(model, parent);
-
-	if (model->getShader().getDiscard())
-		return;
-
-	draw(renderer, model);
-	renderer->endModel();
-}
-
-void GMDx11ModelPainter::dispose(GMModelBuffer* md)
+void GMDx11ModelDataProxy::dispose(GMModelBuffer* md)
 {
 }
 
-void GMDx11ModelPainter::beginUpdateBuffer(GMModel* model)
+void GMDx11ModelDataProxy::beginUpdateBuffer(GMModel* model)
 {
 	D(d);
 	// 不能在多线程中，或者嵌套中操作同一个Buffer
@@ -162,7 +148,7 @@ void GMDx11ModelPainter::beginUpdateBuffer(GMModel* model)
 	GM_DX_HR(context->Map(d->vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, d->mappedSubResource));
 }
 
-void GMDx11ModelPainter::endUpdateBuffer()
+void GMDx11ModelDataProxy::endUpdateBuffer()
 {
 	D(d);
 	GM_ASSERT(d->mappedSubResource);
@@ -173,16 +159,11 @@ void GMDx11ModelPainter::endUpdateBuffer()
 	d->mappedSubResource = nullptr;
 }
 
-void* GMDx11ModelPainter::getBuffer()
+void* GMDx11ModelDataProxy::getBuffer()
 {
 	D(d);
 	if (!d->mappedSubResource)
 		return nullptr;
 
 	return d->mappedSubResource->pData;
-}
-
-void GMDx11ModelPainter::draw(IRenderer* renderer, GMModel* model)
-{
-	renderer->draw(model);
 }

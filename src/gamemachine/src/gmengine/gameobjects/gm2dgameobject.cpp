@@ -94,8 +94,8 @@ void GMGlyphObject::updateModel()
 	GMMesh* mesh = meshes[0];
 	getModels()[0]->releaseModelBuffer();
 	createVertices(mesh);
-	GMModelPainter* painter = getModels()[0]->getPainter();
-	painter->transfer();
+	GMModelDataProxy* modelDataProxy = getModels()[0]->getModelDataProxy();
+	modelDataProxy->transfer();
 }
 
 void GMGlyphObject::createVertices(GMMesh* mesh)
@@ -430,7 +430,7 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 				0))
 		);
 		d->objects[i]->onAppendingObjectToWorld();
-		GM.createModelPainterAndTransfer(d->objects[i]->getModels()[0]);
+		GM.createModelDataProxyAndTransfer(d->objects[i]->getModels()[0]);
 	}
 }
 
@@ -641,7 +641,7 @@ void GMImage2DGameObject::createBackgroundImage()
 	d->background->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, model));
 	d->background->setGeometry(getGeometry());
 	d->background->setWorld(getWorld());
-	GM.createModelPainterAndTransfer(d->background->getModels()[0]);
+	GM.createModelDataProxyAndTransfer(d->background->getModels()[0]);
 }
 
 void GMImage2DGameObject::createBorder()
@@ -675,13 +675,13 @@ void GMImage2DGameObject::createGlyphs()
 		d->textMask->createQuadModel(nullptr, &textMaskModel);
 		GM_ASSERT(textMaskModel);
 		d->textMask->addModel(GMAssets::createIsolatedAsset(GMAssetType::Model, textMaskModel));
-		GM.createModelPainterAndTransfer(textMaskModel);
+		GM.createModelDataProxyAndTransfer(textMaskModel);
 
 		d->textModel->setGeometry(geometry);
 		d->textModel->setWorld(getWorld());
 		d->textModel->setText(d->text);
 		d->textModel->onAppendingObjectToWorld();
-		GM.createModelPainterAndTransfer(d->textModel->getModels()[0]);
+		GM.createModelDataProxyAndTransfer(d->textModel->getModels()[0]);
 		GMAssets::createIsolatedAsset(GMAssetType::Model, d->textModel);
 	}
 }

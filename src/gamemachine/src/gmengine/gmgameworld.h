@@ -11,7 +11,7 @@ BEGIN_NS
 
 class GMControlGameObject;
 class GMCharacter;
-class GMModelPainter;
+class GMModelDataProxy;
 class GMPhysicsWorld;
 
 enum class GMRenderPreference

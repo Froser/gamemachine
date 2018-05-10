@@ -2,7 +2,7 @@
 #include "gmglfactory.h"
 #include "gmgltexture.h"
 #include "gmglgraphic_engine.h"
-#include "gmglmodelpainter.h"
+#include "gmglmodeldataproxy.h"
 #include "gmglglyphmanager.h"
 #include "gmdata/gamepackage/gmgamepackagehandler.h"
 #include "gmglframebuffer.h"
@@ -23,11 +23,11 @@ void GMGLFactory::createTexture(GMImage* image, OUT ITexture** texture)
 	t->init();
 }
 
-void GMGLFactory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter)
+void GMGLFactory::createModelDataProxy(IGraphicEngine* engine, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
 {
-	GM_ASSERT(painter);
+	GM_ASSERT(modelDataProxy);
 	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
-	(*painter) = new GMGLModelPainter(gmglEngine, model);
+	(*modelDataProxy) = new GMGLModelDataProxy(gmglEngine, model);
 }
 
 void GMGLFactory::createGlyphManager(OUT GMGlyphManager** glyphManager)

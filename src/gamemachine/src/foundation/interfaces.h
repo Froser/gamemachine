@@ -22,7 +22,7 @@ class GMGamePackage;
 class GMGlyphManager;
 class GMUIWindow;
 class GMShader;
-class GMModelPainter;
+class GMModelDataProxy;
 class GMMesh;
 class GMTextureFrames;
 class GMTexture;
@@ -102,6 +102,21 @@ enum class GMRenderEnvironment
 	Invalid,
 	OpenGL,
 	DirectX11,
+};
+
+//! 模型类型。
+/*!
+不同的模型类型将采用不同着色器进行处理。自定义的模型类型应当放在CustomStart之后。
+*/
+enum class GMModelType
+{
+	Model2D, //! 表示一个2D模型，不考虑其深度来绘制。
+	Model3D, //! 表示一个3D模型，是最常见的类型。
+	Glyph, //! 表示一个文字模型，用于绘制文本。
+	CubeMap, //! 表示一个立方体贴图。
+	Filter, //! 表示一个滤镜，通常是一个四边形模型，在帧缓存中获取纹理来绘制。
+	LightPassQuad, //! 表示一个光照传递模型。
+	CustomStart, //! 自定义模型类型。将自定义的类型放在此类型后面，匹配自定义的着色器程序。
 };
 
 struct GameMachineMessage
@@ -458,6 +473,14 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \param desc 阴影源的属性。
 	*/
 	virtual void setShadowSource(const GMShadowSourceDesc& desc) = 0;
+
+	//! 获取某一模型的渲染器。
+	/*!
+	  不同类型的模型有不同类型的渲染流程，通过使用不同的渲染器来实现不同的绘制效果。
+	  \param objectType 模型类型。
+	  \return 模型类型对应的渲染器。
+	*/
+	virtual IRenderer* getRenderer(GMModelType modelType) = 0;
 };
 
 GM_INTERFACE(IRenderer)
@@ -471,7 +494,7 @@ GM_INTERFACE(IFactory)
 {
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(GMImage*, OUT ITexture**) = 0;
-	virtual void createPainter(IGraphicEngine*, GMModel*, OUT GMModelPainter**) = 0;
+	virtual void createModelDataProxy(IGraphicEngine*, GMModel*, OUT GMModelDataProxy**) = 0;
 	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
 	virtual void createFramebuffer(OUT IFramebuffer**) = 0;
 	virtual void createFramebuffers(OUT IFramebuffers**) = 0;

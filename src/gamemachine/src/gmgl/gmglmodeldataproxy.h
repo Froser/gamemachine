@@ -7,30 +7,26 @@ BEGIN_NS
 
 class GMGLGraphicEngine;
 struct IRenderer;
-GM_PRIVATE_OBJECT(GMGLModelPainter)
+GM_PRIVATE_OBJECT(GMGLModelDataProxy)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	bool inited = false;
 };
 
-class GMGLModelPainter : public GMModelPainter
+class GMGLModelDataProxy : public GMModelDataProxy
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLModelPainter, GMModelPainter)
+	DECLARE_PRIVATE_AND_BASE(GMGLModelDataProxy, GMModelDataProxy)
 
 public:
-	GMGLModelPainter(IGraphicEngine* engine, GMModel* objs);
+	GMGLModelDataProxy(IGraphicEngine* engine, GMModel* objs);
 
 public:
 	virtual void transfer() override;
-	virtual void draw(const GMGameObject* parent) override;
 	virtual void dispose(GMModelBuffer* md) override;
 
 	virtual void beginUpdateBuffer(GMModel* model) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
-
-private:
-	void draw(IRenderer* render, GMModel* model);
 };
 
 END_NS

@@ -65,10 +65,17 @@ GMGameWorld* GMGameObject::getWorld()
 
 void GMGameObject::draw()
 {
+	IGraphicEngine* engine = GM.getGraphicEngine();
 	GMModels models = getModels();
-	for (auto& model : models)
+	for (auto model : models)
 	{
-		model->getPainter()->draw(this);
+		if (model->getShader().getDiscard())
+			return;
+
+		IRenderer* renderer = engine->getRenderer(model->getType());
+		renderer->beginModel(model, this);
+		renderer->draw(model);
+		renderer->endModel();
 	}
 }
 

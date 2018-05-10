@@ -27,7 +27,7 @@ void GMGBuffer::createQuad()
 	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &d->quadModel);
 	GM_ASSERT(d->quadModel);
 	d->quadModel->setType(GMModelType::LightPassQuad);
-	GM.createModelPainterAndTransfer(d->quadModel);
+	GM.createModelDataProxyAndTransfer(d->quadModel);
 	d->quad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->quadModel));
 }
 

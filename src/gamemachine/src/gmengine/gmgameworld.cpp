@@ -46,7 +46,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	GMModels& models = obj->getModels();
 	for (auto& model : models)
 	{
-		GM.createModelPainterAndTransfer(model);
+		GM.createModelDataProxyAndTransfer(model);
 	}
 }
 

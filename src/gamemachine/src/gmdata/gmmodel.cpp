@@ -8,7 +8,7 @@
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
-void GMModelPainter::packVertices(Vector<GMVertex>& vertices)
+void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 {
 	GMModel* model = getModel();
 	GMMeshes& meshes = model->getMeshes();
@@ -22,7 +22,7 @@ void GMModelPainter::packVertices(Vector<GMVertex>& vertices)
 	}
 }
 
-void GMModelPainter::packIndices(Vector<GMuint>& indices)
+void GMModelDataProxy::packIndices(Vector<GMuint>& indices)
 {
 	GMModel* model = getModel();
 	GMMeshes& meshes = model->getMeshes();
@@ -52,8 +52,8 @@ GMModel::GMModel(GMModel& model)
 	setPrimitiveTopologyMode(model.getPrimitiveTopologyMode());
 	setShader(model.getShader());
 	setVerticesCount(model.getVerticesCount());
-	if (!model.getPainter())
-		GM.createModelPainterAndTransfer(&model);
+	if (!model.getModelDataProxy())
+		GM.createModelDataProxyAndTransfer(&model);
 	needNotTransferAnymore();
 }
 
@@ -97,19 +97,19 @@ GMModelBuffer::GMModelBuffer()
 {
 	D(d);
 	d->ref = 1;
-	GM.getFactory()->createPainter(nullptr, nullptr, &d->painter);
+	GM.getFactory()->createModelDataProxy(nullptr, nullptr, &d->modelDataProxy);
 }
 
 GMModelBuffer::~GMModelBuffer()
 {
 	D(d);
-	GM_delete(d->painter);
+	GM_delete(d->modelDataProxy);
 }
 
 void GMModelBuffer::dispose()
 {
 	D(d);
-	d->painter->dispose(this);
+	d->modelDataProxy->dispose(this);
 }
 
 GMMesh::GMMesh(GMModel* parent)

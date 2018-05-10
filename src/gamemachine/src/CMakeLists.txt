@@ -78,8 +78,8 @@ set(SOURCES
 		gmgl/gmglglyphmanager.cpp
 		gmgl/gmglgraphic_engine.h
 		gmgl/gmglgraphic_engine.cpp
-		gmgl/gmglmodelpainter.h
-		gmgl/gmglmodelpainter.cpp
+		gmgl/gmglmodeldataproxy.h
+		gmgl/gmglmodeldataproxy.cpp
 		gmgl/gmglshaderprogram.h
 		gmgl/gmglshaderprogram.cpp
 		gmgl/gmgltexture.h
@@ -185,8 +185,8 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11factory.cpp
 		gmdx11/gmdx11graphic_engine.h
 		gmdx11/gmdx11graphic_engine.cpp
-		gmdx11/gmdx11modelpainter.h
-		gmdx11/gmdx11modelpainter.cpp
+		gmdx11/gmdx11modeldataproxy.h
+		gmdx11/gmdx11modeldataproxy.cpp
 		gmdx11/gmdx11helper.h
 		gmdx11/gmdx11helper.cpp
 		gmdx11/gmdx11renderers.h

@@ -38,19 +38,19 @@ struct GMVertex
 
 typedef Vector<GMMesh*> GMMeshes;
 
-GM_PRIVATE_OBJECT(GMModelPainter)
+GM_PRIVATE_OBJECT(GMModelDataProxy)
 {
 	GMModel* model = nullptr;
 };
 
 class GMMesh;
 class GMModelBuffer;
-class GMModelPainter : public GMObject, public IQueriable
+class GMModelDataProxy : public GMObject, public IQueriable
 {
-	DECLARE_PRIVATE(GMModelPainter)
+	DECLARE_PRIVATE(GMModelDataProxy)
 
 public:
-	GMModelPainter(GMModel* obj)
+	GMModelDataProxy(GMModel* obj)
 	{
 		D(d);
 		d->model = obj;
@@ -58,7 +58,6 @@ public:
 
 public:
 	virtual void transfer() = 0;
-	virtual void draw(const GMGameObject* parent) = 0;
 	virtual void dispose(GMModelBuffer* md) = 0;
 
 // 提供修改缓存的方法
@@ -82,21 +81,6 @@ enum class GMUsageHint
 {
 	StaticDraw,
 	DynamicDraw,
-};
-
-//! 模型类型。
-/*!
-  不同的模型类型将采用不同着色器进行处理。自定义的模型类型应当放在CustomStart之后。
-*/
-enum class GMModelType
-{
-	Model2D, //! 表示一个2D模型，不考虑其深度来绘制。
-	Model3D, //! 表示一个3D模型，是最常见的类型。
-	Glyph, //! 表示一个文字模型，用于绘制文本。
-	CubeMap, //! 表示一个立方体贴图。
-	Filter, //! 表示一个滤镜，通常是一个四边形模型，在帧缓存中获取纹理来绘制。
-	LightPassQuad, //! 表示一个光照传递模型。
-	CustomStart, //! 自定义模型类型。将自定义的类型放在此类型后面，匹配自定义的着色器程序。
 };
 
 class GMMesh;
@@ -123,7 +107,7 @@ GM_PRIVATE_OBJECT(GMModelBuffer)
 {
 	GMModelBufferData buffer = { 0 };
 	std::atomic<GMint> ref;
-	GMModelPainter* painter = nullptr;
+	GMModelDataProxy* modelDataProxy = nullptr;
 };
 
 //! 用来管理GMModelBuffer生命周期的类，包含引用计数功能。
@@ -190,7 +174,7 @@ GM_PRIVATE_OBJECT(GMModel)
 {
 	GMUsageHint hint = GMUsageHint::StaticDraw;
 	GMMeshes meshes;
-	GMScopePtr<GMModelPainter> painter;
+	GMScopePtr<GMModelDataProxy> modelDataProxy;
 	GMShader shader;
 	GMModelBuffer* modelBuffer = nullptr;
 	GMModelDrawMode drawMode = GMModelDrawMode::Vertex;
@@ -236,16 +220,16 @@ public:
 	GM_DECLARE_PROPERTY(DrawMode, drawMode, GMModelDrawMode);
 
 public:
-	inline void setPainter(AUTORELEASE GMModelPainter* painter)
+	inline void setModelDataProxy(AUTORELEASE GMModelDataProxy* modelDataProxy)
 	{
 		D(d);
-		d->painter.reset(painter);
+		d->modelDataProxy.reset(modelDataProxy);
 	}
 
-	inline GMModelPainter* getPainter()
+	inline GMModelDataProxy* getModelDataProxy()
 	{
 		D(d);
-		return d->painter;
+		return d->modelDataProxy;
 	}
 
 	inline void addMesh(GMMesh* mesh)
@@ -260,11 +244,11 @@ public:
 		return d->meshes;
 	}
 
-	//! 表示此模型是否需要被GMModelPainter将顶点数据传输到显卡。
+	//! 表示此模型是否需要被GMModelDataProxy将顶点数据传输到显卡。
 	/*!
 	  如果一个模型第一次建立顶点数据，则需要将这些数据传输到显卡。<br/>
 	  然而，如果此模型如果与其他模型共享一份顶点数据，那么此模型不需要传输顶点数据到显卡，因为数据已经存在。
-	  \sa GMModelPainter()
+	  \sa GMModelDataProxy()
 	*/
 	inline bool isNeedTransfer() { D(d); return d->needTransfer; }
 

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmdx11factory.h"
 #include "gmdx11graphic_engine.h"
-#include "gmdx11modelpainter.h"
+#include "gmdx11modeldataproxy.h"
 #include "gmdx11texture.h"
 #include "gmdx11glyphmanager.h"
 #include "gmdx11framebuffer.h"
@@ -22,11 +22,11 @@ void GMDx11Factory::createTexture(GMImage* image, OUT ITexture** texture)
 	t->init();
 }
 
-void GMDx11Factory::createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter)
+void GMDx11Factory::createModelDataProxy(IGraphicEngine* engine, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
 {
-	GM_ASSERT(painter);
+	GM_ASSERT(modelDataProxy);
 	GMDx11GraphicEngine* dx11Engine = static_cast<GMDx11GraphicEngine*>(engine);
-	(*painter) = new GMDx11ModelPainter(dx11Engine, model);
+	(*modelDataProxy) = new GMDx11ModelDataProxy(dx11Engine, model);
 }
 
 void GMDx11Factory::createGlyphManager(OUT GMGlyphManager** glyphManager)

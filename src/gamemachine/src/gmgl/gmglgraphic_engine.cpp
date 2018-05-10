@@ -5,7 +5,7 @@
 #include "gmglgraphic_engine.h"
 #include "gmdata/gmmodel.h"
 #include "gmgltexture.h"
-#include "gmglmodelpainter.h"
+#include "gmglmodeldataproxy.h"
 #include "gmglrenderers.h"
 #include "foundation/gamemachine.h"
 #include "foundation/gmconfigs.h"

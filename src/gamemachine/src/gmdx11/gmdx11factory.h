@@ -9,7 +9,7 @@ class GMDx11Factory : public IFactory
 public:
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;
 	virtual void createTexture(GMImage* image, OUT ITexture** texture) override;
-	virtual void createPainter(IGraphicEngine* engine, GMModel* model, OUT GMModelPainter** painter) override;
+	virtual void createModelDataProxy(IGraphicEngine* engine, GMModel* model, OUT GMModelDataProxy** painter) override;
 	virtual void createGlyphManager(OUT GMGlyphManager**) override;
 	virtual void createFramebuffer(OUT IFramebuffer**) override;
 	virtual void createFramebuffers(OUT IFramebuffers**) override;

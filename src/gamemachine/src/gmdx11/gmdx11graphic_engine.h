@@ -47,6 +47,7 @@ public:
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
 	virtual bool event(const GameMachineMessage& e) override;
 	virtual IFramebuffers* getDefaultFramebuffers() override;
+	virtual IRenderer* getRenderer(GMModelType objectType) override;
 
 public:
 	virtual bool setInterface(GameMachineInterfaceID, void*);
@@ -98,9 +99,6 @@ public:
 		D_BASE(d, Base);
 		return d->renderConfig.get(GMRenderConfigs::FilterKernelOffset_Vec2).toVec2();
 	}
-
-public:
-	IRenderer* getRenderer(GMModelType objectType);
 
 private:
 	void initShaders();

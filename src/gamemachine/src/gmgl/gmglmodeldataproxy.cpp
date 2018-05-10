@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include <GL/glew.h>
-#include "gmglmodelpainter.h"
+#include "gmglmodeldataproxy.h"
 #include "shader_constants.h"
 #include "gmgltexture.h"
 #include "gmengine/gmgameworld.h"
@@ -9,14 +9,14 @@
 
 #define FLOAT_OFFSET(i) ((void*)(sizeof(gm::GMfloat) * i))
 
-GMGLModelPainter::GMGLModelPainter(IGraphicEngine* engine, GMModel* objs)
-	: GMModelPainter(objs)
+GMGLModelDataProxy::GMGLModelDataProxy(IGraphicEngine* engine, GMModel* objs)
+	: GMModelDataProxy(objs)
 {
 	D(d);
 	d->engine = static_cast<GMGLGraphicEngine*>(engine);
 }
 
-void GMGLModelPainter::transfer()
+void GMGLModelDataProxy::transfer()
 {
 	D(d);
 	if (d->inited)
@@ -100,24 +100,7 @@ void GMGLModelPainter::transfer()
 	model->needNotTransferAnymore();
 }
 
-void GMGLModelPainter::draw(const GMGameObject* parent)
-{
-	D(d);
-	GMModel* model = getModel();
-	IRenderer* renderer = d->engine->getRenderer(model->getType());
-	renderer->beginModel(model, parent);
-
-	if (model->getShader().getDiscard())
-		return;
-
-	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
-	draw(renderer, model);
-	glBindVertexArray(0);
-
-	renderer->endModel();
-}
-
-void GMGLModelPainter::dispose(GMModelBuffer* md)
+void GMGLModelDataProxy::dispose(GMModelBuffer* md)
 {
 	D(d);
 	GLuint vao[1] = { md->getMeshBuffer().arrayId },
@@ -128,26 +111,20 @@ void GMGLModelPainter::dispose(GMModelBuffer* md)
 	d->inited = false;
 }
 
-void GMGLModelPainter::beginUpdateBuffer(GMModel* model)
+void GMGLModelDataProxy::beginUpdateBuffer(GMModel* model)
 {
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
 	glBindBuffer(GL_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
 }
 
-void GMGLModelPainter::endUpdateBuffer()
+void GMGLModelDataProxy::endUpdateBuffer()
 {
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
 
-void* GMGLModelPainter::getBuffer()
+void* GMGLModelDataProxy::getBuffer()
 {
 	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-}
-
-void GMGLModelPainter::draw(IRenderer* renderer, GMModel* model)
-{
-	D(d);
-	renderer->draw(model);
 }
