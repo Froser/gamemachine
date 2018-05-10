@@ -157,6 +157,11 @@ void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 	}
 }
 
+void GMGLGraphicEngine::shaderProgramChanged(IShaderProgram* program)
+{
+	GMGLRenderer::dirtyShadowMapAttributes();
+}
+
 void GMGLGraphicEngine::update(GMUpdateDataType type)
 {
 	D(d);

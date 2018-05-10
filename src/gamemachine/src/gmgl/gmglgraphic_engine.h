@@ -94,6 +94,7 @@ public:
 
 public:
 	void activateLights(IRenderer* renderer);
+	void shaderProgramChanged(IShaderProgram* program);
 
 private:
 	void installShaders();

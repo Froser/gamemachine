@@ -13,6 +13,8 @@
 
 namespace
 {
+	bool g_shadowDirty = true;
+
 	inline void applyShader(const GMShader& shader)
 	{
 		if (shader.getBlend())
@@ -116,24 +118,25 @@ namespace
 
 		if (hasShadow)
 		{
-			if (lastProgram == shaderProgram && lastShadowVersion == shadowSourceDesc->currentVersion)
-				return;
+			if (g_shadowDirty || lastShadowVersion != shadowSourceDesc->currentVersion)
+			{
+				lastProgram = shaderProgram;
+				lastShadowVersion = shadowSourceDesc->currentVersion;
 
-			lastProgram = shaderProgram;
-			lastShadowVersion = shadowSourceDesc->currentVersion;
+				shaderProgram->setBool(s_hasShadow.c_str(), 1);
+				const GMCamera& camera = shadowSourceDesc->camera;
+				GMFloat4 viewPosition;
+				shadowSourceDesc->position.loadFloat4(viewPosition);
+				shaderProgram->setVec4(s_position.c_str(), viewPosition);
+				shaderProgram->setMatrix4(s_matrix.c_str(), camera.getViewMatrix() * camera.getProjectionMatrix());
+				shaderProgram->setFloat(s_biasMin.c_str(), shadowSourceDesc->biasMin);
+				shaderProgram->setFloat(s_biasMax.c_str(), shadowSourceDesc->biasMax);
 
-			shaderProgram->setBool(s_hasShadow.c_str(), 1);
-			const GMCamera& camera = shadowSourceDesc->camera;
-			GMFloat4 viewPosition;
-			shadowSourceDesc->position.loadFloat4(viewPosition);
-			shaderProgram->setVec4(s_position.c_str(), viewPosition);
-			shaderProgram->setMatrix4(s_matrix.c_str(), camera.getViewMatrix() * camera.getProjectionMatrix());
-			shaderProgram->setFloat(s_biasMin.c_str(), shadowSourceDesc->biasMin);
-			shaderProgram->setFloat(s_biasMax.c_str(), shadowSourceDesc->biasMax);
-
-			shaderProgram->setInt(s_width.c_str(), shadowFramebuffers->getShadowMapWidth());
-			shaderProgram->setInt(s_height.c_str(), shadowFramebuffers->getShadowMapHeight());
-			shaderProgram->setInt(s_shadowMap.c_str(), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
+				shaderProgram->setInt(s_width.c_str(), shadowFramebuffers->getShadowMapWidth());
+				shaderProgram->setInt(s_height.c_str(), shadowFramebuffers->getShadowMapHeight());
+				shaderProgram->setInt(s_shadowMap.c_str(), GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);
+				g_shadowDirty = false;
+			}
 		}
 		else
 		{
@@ -337,6 +340,11 @@ void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
 		shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenHeight, states.renderRect.height);
 		s_lastShaderProgram = shaderProgram;
 	}
+}
+
+void GMGLRenderer::dirtyShadowMapAttributes()
+{
+	g_shadowDirty = true;
 }
 
 //////////////////////////////////////////////////////////////////////////

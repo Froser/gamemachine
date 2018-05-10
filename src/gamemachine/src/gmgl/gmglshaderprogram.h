@@ -48,13 +48,6 @@ public:
 	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
 	virtual const GMShaderVariablesDesc& getDesc();
 
-	void setMatrix4(const GMString& name, const GMMat4& value);
-	void setVec4(const GMString& name, const GMFloat4& value);
-	void setVec3(const GMString& name, const GMfloat value[3]);
-	void setInt(const GMString& name, GMint value);
-	void setFloat(const GMString& name, GMfloat value);
-	void setBool(const GMString& name, bool value);
-
 private:
 	void setProgram(GMuint program) { D(d); d->shaderProgram = program; }
 	void removeShaders();

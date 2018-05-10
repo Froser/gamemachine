@@ -8,9 +8,9 @@
 
 namespace
 {
-	const gm::GMint ARRAY_SIZE_X = 5;
-	const gm::GMint ARRAY_SIZE_Y = 5;
-	const gm::GMint ARRAY_SIZE_Z = 5;
+	constexpr gm::GMint ARRAY_SIZE_X = 5;
+	constexpr gm::GMint ARRAY_SIZE_Y = 5;
+	constexpr gm::GMint ARRAY_SIZE_Z = 5;
 
 	static GMVec3 s_colors[4] =
 	{
@@ -162,14 +162,14 @@ void Demo_Collision::setDefaultLights()
 			gm::GMfloat colorD[] = { .7f, .7f, .7f };
 			light->setLightColor(colorD);
 
-			gm::GMfloat lightPos[] = { -1.f, 3.5f, -3.f };
+			gm::GMfloat lightPos[] = { -3.f, 3.f, -3.f };
 			light->setLightPosition(lightPos);
 			GM.getGraphicEngine()->addLight(light);
 		}
 
 		{
 			gm::GMShadowSourceDesc desc;
-			desc.position = GMVec4(-1.f, 3.5f, -3.f, 1);
+			desc.position = GMVec4(-3.f, 3.f, -3.f, 1);
 			desc.type = gm::GMShadowSourceDesc::DirectShadow;
 			desc.camera = GM.getCamera();
 			desc.biasMax = desc.biasMin = 0.0005f;

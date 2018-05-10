@@ -141,7 +141,7 @@ float calculateShadow(mat4 shadowMatrix, vec4 worldPos, vec3 normal_N)
 	vec3 projCoords = fragPos.xyz / fragPos.w;
 	if (projCoords.z > 1.0f)
 		return 1.0f;
-	projCoords.xy = projCoords.xy * 0.5f + 0.5f;
+	projCoords = projCoords * 0.5f + 0.5f;
 
 	float bias = (GM_shadowInfo.BiasMin == GM_shadowInfo.BiasMax) ? GM_shadowInfo.BiasMin : max(GM_shadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_shadowInfo.Position.xyz))), GM_shadowInfo.BiasMin);
 	float closestDepth = texture(GM_shadowInfo.ShadowMap, projCoords.xy).r;

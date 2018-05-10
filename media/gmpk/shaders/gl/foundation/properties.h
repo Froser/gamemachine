@@ -1,9 +1,6 @@
 // 位置
 uniform vec4 GM_view_position;
 
-// 调试变量
-uniform int GM_debug_draw_normal;
-
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
 uniform int GM_shadow_texture_switch = 0;

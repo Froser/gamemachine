@@ -47,6 +47,9 @@ protected:
 	virtual ITexture* getTexture(GMTextureFrames& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
+
+public:
+	static void dirtyShadowMapAttributes();
 };
 
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
