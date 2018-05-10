@@ -15,7 +15,7 @@ GMMStream::~GMMStream()
 		delete d->data;
 }
 
-void GMMStream::resize(size_t sz)
+void GMMStream::resize(gm::GMsize_t sz)
 {
 	D(d);
 	d->data = new gm::GMbyte[sz];

@@ -41,7 +41,7 @@ namespace
 	inline char* copyString(const char *s)
 	{
 		char *b;
-		GMint len = strlen(s) + 1;
+		GMsize_t len = strlen(s) + 1;
 		b = (char*)malloc(len);
 		GMString::stringCopy(b, len, s);
 		return b;

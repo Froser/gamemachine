@@ -7,6 +7,10 @@
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdx11gbuffer.h"
 
+#ifdef max
+#undef max
+#endif
+
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -46,11 +50,12 @@ void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
 		IShaderProgram* shaderProgram = getShaderProgram();
 		const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 		const Vector<ILight*>& lights = getLights();
-		GMuint lightCount = lights.size();
+		GMsize_t lightCount = lights.size();
 		GM_ASSERT(lightCount <= getMaxLightCount());
-		shaderProgram->setInt(desc.LightCount, lightCount);
+		GM_ASSERT(lightCount <= std::numeric_limits<GMuint>::max());
+		shaderProgram->setInt(desc.LightCount, (GMuint)lightCount);
 
-		for (GMuint i = 0; i < lightCount; ++i)
+		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
 		{
 			lights[i]->activateLight(i, renderer);
 		}

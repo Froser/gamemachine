@@ -31,7 +31,7 @@ int WINAPI wWinMain(
 )
 {
 	LPWSTR cmdLine = GetCommandLineW();
-	gm::GMuint sz = gm::GMString::countOfCharacters(cmdLine);
+	gm::GMsize_t sz = gm::GMString::countOfCharacters(cmdLine);
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::OpenGL;
 	if (sz > 10 && gm::GMString(cmdLine + sz - 10) == "-directx11")
 		env = gm::GMRenderEnvironment::DirectX11;

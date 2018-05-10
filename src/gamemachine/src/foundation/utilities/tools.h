@@ -280,7 +280,7 @@ GM_PRIVATE_OBJECT(GMMemoryStream)
 	const GMbyte* ptr;
 	const GMbyte* start;
 	const GMbyte* end;
-	GMuint size;
+	GMsize_t size;
 };
 
 class GMMemoryStream : public GMObject
@@ -295,15 +295,15 @@ public:
 	};
 
 public:
-	GMMemoryStream(const GMbyte* buffer, GMuint size);
+	GMMemoryStream(const GMbyte* buffer, GMsize_t size);
 
 public:
-	GMuint read(GMbyte* buf, GMuint size);
-	GMuint peek(GMbyte* buf, GMuint size);
+	GMsize_t read(GMbyte* buf, GMsize_t size);
+	GMsize_t peek(GMbyte* buf, GMsize_t size);
 	void seek(GMuint cnt, SeekMode = FromStart);
 	void rewind();
-	GMuint size();
-	GMuint tell();
+	GMsize_t size();
+	GMsize_t tell();
 	GMbyte get();
 };
 

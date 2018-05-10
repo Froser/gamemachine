@@ -3,6 +3,10 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
+#ifdef max
+#undef max
+#endif
+
 GMDx11ModelDataProxy::GMDx11ModelDataProxy(GMDx11GraphicEngine* engine, GMModel* model)
 	: GMModelDataProxy(model)
 {
@@ -68,12 +72,13 @@ void GMDx11ModelDataProxy::transfer()
 	Vector<GMVertex> packedVertices;
 	// 把数据打入顶点数组
 	packVertices(packedVertices);
-	GMuint verticesCount = 0;
+	GMsize_t verticesCount = 0;
 
 	D3D11_USAGE usage = model->getUsageHint() == GMUsageHint::StaticDraw ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 	D3D11_BUFFER_DESC bufDesc;
 	bufDesc.Usage = usage;
-	bufDesc.ByteWidth = packedVertices.size() * sizeof(decltype(packedVertices)::value_type);
+	GM_ASSERT(packedVertices.size() * sizeof(decltype(packedVertices)::value_type) < std::numeric_limits<UINT>::max());
+	bufDesc.ByteWidth = (UINT)(packedVertices.size() * sizeof(decltype(packedVertices)::value_type));
 	bufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	bufDesc.CPUAccessFlags = usage == D3D11_USAGE_DYNAMIC ? D3D11_CPU_ACCESS_WRITE : 0;
 	bufDesc.MiscFlags = 0;
@@ -96,7 +101,8 @@ void GMDx11ModelDataProxy::transfer()
 		D3D11_USAGE usage = D3D11_USAGE_DEFAULT;
 		D3D11_BUFFER_DESC bufDesc;
 		bufDesc.Usage = usage;
-		bufDesc.ByteWidth = packedIndices.size() * sizeof(decltype(packedIndices)::value_type);
+		GM_ASSERT(packedIndices.size() * sizeof(decltype(packedIndices)::value_type) < std::numeric_limits<UINT>::max());
+		bufDesc.ByteWidth = (UINT) (packedIndices.size() * sizeof(decltype(packedIndices)::value_type));
 		bufDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		bufDesc.CPUAccessFlags = 0;
 		bufDesc.MiscFlags = 0;

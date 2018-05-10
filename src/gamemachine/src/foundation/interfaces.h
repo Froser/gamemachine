@@ -275,11 +275,11 @@ GM_INTERFACE(IFramebuffers)
 {
 	virtual bool init(const GMFramebuffersDesc& desc) = 0;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) = 0;
-	virtual GMuint count() = 0;
+	virtual GMsize_t count() = 0;
 	virtual void bind() = 0;
 	virtual void unbind() = 0;
 	virtual void clear(GMFramebuffersClearType = GMFramebuffersClearType::All) = 0;
-	virtual IFramebuffer* getFramebuffer(GMuint) = 0;
+	virtual IFramebuffer* getFramebuffer(GMsize_t) = 0;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) = 0;
 };
 

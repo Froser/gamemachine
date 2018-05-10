@@ -70,7 +70,7 @@ void GMThread::start()
 	if (d->callback)
 		d->callback->onCreateThread(this);
 	d->done = false;
-	d->handle = (GMlong)_beginthreadex(nullptr, 0, &threadProc, this, CREATE_SUSPENDED, nullptr);
+	d->handle = (GMThreadHandle)_beginthreadex(nullptr, 0, &threadProc, this, CREATE_SUSPENDED, nullptr);
 	::SetThreadPriority((HANDLE)d->handle, toWin32ThreadPriority(d->priority));
 	::ResumeThread((HANDLE)d->handle);
 }

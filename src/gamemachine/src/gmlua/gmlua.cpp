@@ -2,6 +2,10 @@
 #include "gmlua.h"
 #include "gmlua_functions.h"
 
+#ifdef max
+#undef max
+#endif
+
 #define L (d->luaState)
 
 #define POP_GUARD() \
@@ -181,7 +185,8 @@ GMLuaStatus GMLua::callp(const char* functionName, const std::initializer_list<G
 		push(var);
 	}
 
-	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, args.size(), nRet, 0);
+	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
+	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, (GMuint)args.size(), nRet, 0);
 	if (result != GMLuaStatus::OK)
 	{
 		const char* msg = lua_tostring(L, -1);

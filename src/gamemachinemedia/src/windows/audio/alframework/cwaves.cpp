@@ -450,7 +450,7 @@ WAVERESULT CWaves::ParseBuffer(gm::GMMemoryStream& ms, LPWAVEFILEINFO pWaveInfo)
 			else if (strnEqual(riffChunk.szChunkName, "data", 4))
 			{
 				pWaveInfo->ulDataSize = riffChunk.ulChunkSize;
-				pWaveInfo->ulDataOffset = ms.tell();
+				pWaveInfo->ulDataOffset = (unsigned long)ms.tell();
 				ms.seek(riffChunk.ulChunkSize, gm::GMMemoryStream::FromNow);
 			}
 			else

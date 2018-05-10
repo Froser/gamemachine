@@ -17,7 +17,7 @@ private:					\
 struct GMStringPrivate
 {
 	mutable bool rehash = true;
-	mutable size_t hash = 0;
+	mutable GMsize_t hash = 0;
 	std::wstring data;
 };
 
@@ -37,7 +37,7 @@ class GMString
 	friend inline GMString operator +(const GMString& left, const GMString& right);
 
 public:
-	static size_t npos;
+	static GMsize_t npos;
 
 public:
 	//! 初始化一个空白的字符串。
@@ -218,7 +218,7 @@ public:
 	  由于得到的是字符的拷贝，是一个右值，所以不要去修改它。
 	  \return 返回指定位置的字符。
 	*/
-	char operator[](GMuint i) const;
+	char operator[](GMsize_t i) const;
 
 	//! 获取C风格的字符串。
 	/*!
@@ -235,7 +235,7 @@ public:
 	  字符串的长度即字符数，而不是字节数。
 	  \return 字符串长度。
 	*/
-	GMlong length() const
+	GMsize_t length() const
 	{
 		D_STR(d);
 		return d->data.length();
@@ -304,51 +304,51 @@ public:
 		return d->rehash;
 	}
 
-	void setHashCode(size_t hash) const
+	void setHashCode(GMsize_t hash) const
 	{
 		D_STR(d);
 		d->hash = hash;
 		d->rehash = false;
 	}
 
-	size_t getHashCode() const
+	GMsize_t getHashCode() const
 	{
 		D_STR(d);
 		return d->hash;
 	}
 
 public:
-	size_t findLastOf(GMwchar c) const;
-	size_t findLastOf(char c) const;
-	GMString substr(GMint start, GMint count) const;
+	GMsize_t findLastOf(GMwchar c) const;
+	GMsize_t findLastOf(char c) const;
+	GMString substr(GMsize_t start, GMsize_t count) const;
 	const std::wstring& toStdWString() const;
 	const std::string toStdString() const;
-	GMString replace(const GMString& oldValue, const GMString& newValue);
+	GMString replace(const GMString& oldValue, const GMString& newValue) const;
 
 private:
 	void assign(const GMString& s);
 
 	// 提供一些原始的字符串方法
 public:
-	static size_t countOfCharacters(const char* str)
+	static GMsize_t countOfCharacters(const char* str)
 	{
 		return strlen(str);
 	}
 
-	static size_t countOfCharacters(const GMwchar* str)
+	static GMsize_t countOfCharacters(const GMwchar* str)
 	{
 		return wcslen(str);
 	}
 
-	static void stringCopy(char* dest, size_t cchDest, const char* source);
-	static void stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source);
-	template <typename CharType, size_t ArraySize>
+	static void stringCopy(char* dest, GMsize_t cchDest, const char* source);
+	static void stringCopy(GMwchar* dest, GMsize_t cchDest, const GMwchar* source);
+	template <typename CharType, GMsize_t ArraySize>
 	static void stringCopy(CharType (&dest)[ArraySize], const CharType* source)
 	{
 		stringCopy(dest, ArraySize, source);
 	}
 
-	static void stringCopyN(char* dest, size_t cchDest, const char* source, GMint count)
+	static void stringCopyN(char* dest, GMsize_t cchDest, const char* source, GMsize_t count)
 	{
 #if GM_MSVC
 		strncpy_s(dest, cchDest, source, count);
@@ -357,7 +357,7 @@ public:
 #endif
 	}
 
-	static void stringCopyN(GMwchar* dest, size_t cchDest, const GMwchar* source, GMint count)
+	static void stringCopyN(GMwchar* dest, GMsize_t cchDest, const GMwchar* source, GMsize_t count)
 	{
 #if GM_MSVC
 		wcsncpy_s(dest, cchDest, source, count);
@@ -366,9 +366,9 @@ public:
 #endif
 	}
 
-	static void stringCat(char* dest, size_t cchDest, const char* source);
-	static void stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source);
-	template <typename CharType, size_t ArraySize>
+	static void stringCat(char* dest, GMsize_t cchDest, const char* source);
+	static void stringCat(GMwchar* dest, GMsize_t cchDest, const GMwchar* source);
+	template <typename CharType, GMsize_t ArraySize>
 	static void stringCat(CharType(&dest)[ArraySize], const CharType* source)
 	{
 		stringCat(dest, ArraySize, source);
@@ -390,11 +390,11 @@ public:
 
 struct GMStringHashFunctor
 {
-	size_t operator()(const GMString& str) const
+	GMsize_t operator()(const GMString& str) const
 	{
 		if (str.needRehash())
 		{
-			size_t hashCode = std::hash_value(str.toStdWString());
+			GMsize_t hashCode = std::hash_value(str.toStdWString());
 			str.setHashCode(hashCode);
 			return hashCode;
 		}
@@ -446,7 +446,7 @@ class GMStringReader
 
 	private:
 		const GMString& m_src;
-		size_t m_start = 0, m_end = 0;
+		GMsize_t m_start = 0, m_end = 0;
 		bool m_eof = false;
 	};
 

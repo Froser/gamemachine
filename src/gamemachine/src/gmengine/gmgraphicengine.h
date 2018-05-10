@@ -217,7 +217,7 @@ private:
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) = 0;
 
 public:
-	static constexpr const GMuint getMaxLightCount()
+	static constexpr const GMsize_t getMaxLightCount()
 	{
 		return 50;
 	}

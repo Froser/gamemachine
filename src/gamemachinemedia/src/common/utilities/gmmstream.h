@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMMStream)
 	gm::GMbyte* data = nullptr;
 	gm::GMManualResetEvent preventRead;
 	std::atomic_uint ptr;
-	gm::GMuint capacity = 0;
+	gm::GMsize_t capacity = 0;
 	bool writing = false;
 };
 
@@ -26,7 +26,7 @@ public:
 	~GMMStream();
 
 public:
-	void resize(size_t sz);
+	void resize(gm::GMsize_t sz);
 	void beginWrite();
 	void endWrite();
 	void rewind();

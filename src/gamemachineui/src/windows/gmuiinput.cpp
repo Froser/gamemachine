@@ -119,7 +119,7 @@ void GMUIInput::setCursor(gm::GMCursorType type)
 		break;
 	}
 	::ShowCursor(TRUE);
-	::SetClassLong(d->window->getWindowHandle(), GCL_HCURSOR, (LONG)::LoadCursor(NULL, cursor));
+	::SetClassLongPtr(d->window->getWindowHandle(), GCLP_HCURSOR, (LONG_PTR)::LoadCursor(NULL, cursor));
 }
 
 gm::GMJoystickState GMUIInput::joystickState()

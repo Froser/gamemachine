@@ -5,6 +5,10 @@
 #include "gmengine/gmgraphicengine.h"
 #include "foundation/gamemachine.h"
 
+#ifdef max
+#undef max
+#endif
+
 GM_PRIVATE_OBJECT(GMGLFramebufferTexture)
 {
 	GMFramebufferDesc desc;
@@ -81,12 +85,12 @@ public:
 	{
 	}
 
-	virtual GMuint count() override
+	virtual GMsize_t count() override
 	{
 		return 1;
 	}
 
-	virtual IFramebuffer* getFramebuffer(GMuint) override
+	virtual IFramebuffer* getFramebuffer(GMsize_t) override
 	{
 		return nullptr;
 	}
@@ -263,13 +267,15 @@ bool GMGLFramebuffers::createFramebuffers()
 	D(d);
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
 	Vector<GLuint> attachments;
-	GMuint sz = d->framebuffers.size();
-	for (GMuint i = 0; i < sz; i++)
+	GMsize_t sz = d->framebuffers.size();
+	GM_ASSERT(sz < std::numeric_limits<GMuint>::max());
+	for (GMsize_t i = 0; i < sz; i++)
 	{
-		attachments.push_back(GL_COLOR_ATTACHMENT0 + i);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, d->framebuffers[i]->getTextureId(), 0);
+		GMuint _i = (GMuint)i;
+		attachments.push_back(GL_COLOR_ATTACHMENT0 + _i);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, d->framebuffers[_i]->getTextureId(), 0);
 	}
-	glDrawBuffers(sz, attachments.data());
+	glDrawBuffers((GLsizei)sz, attachments.data());
 
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE)
@@ -313,14 +319,14 @@ void GMGLFramebuffers::clear(GMFramebuffersClearType type)
 	}
 }
 
-IFramebuffer* GMGLFramebuffers::getFramebuffer(GMuint index)
+IFramebuffer* GMGLFramebuffers::getFramebuffer(GMsize_t index)
 {
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
 	return d->framebuffers[index];
 }
 
-GMuint GMGLFramebuffers::count()
+GMsize_t GMGLFramebuffers::count()
 {
 	D(d);
 	return d->framebuffers.size();

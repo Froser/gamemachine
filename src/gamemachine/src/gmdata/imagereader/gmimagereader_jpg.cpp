@@ -46,7 +46,7 @@ extern "C"
 	}
 }
 
-bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** image)
+bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** image)
 {
 	GMImage* img = new GMImage();
 	*image = img;
@@ -73,7 +73,7 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMuint size, OUT GMImage** imag
 	jpeg_create_decompress(&cinfo);
 
 	//Specify the data source
-	jpeg_mem_src(&cinfo, (void*)data, size);
+	jpeg_mem_src(&cinfo, (void*)data, (long)size);
 
 	//Decode the jpeg data into the image
 	//Read in the header

@@ -3,7 +3,7 @@
 #include "foundation/gamemachine.h"
 #include <regex>
 
-GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMint index)
+GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
 {
 	D(d);
 	d->typo = typo;
@@ -213,7 +213,7 @@ GMTypoIterator GMTypoEngine::end()
 	return GMTypoIterator(this, d->literature.length());
 }
 
-GMTypoResult GMTypoEngine::getTypoResult(GMint index)
+GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 {
 	D(d);
 	GMTypoResult result;

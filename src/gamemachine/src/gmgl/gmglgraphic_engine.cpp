@@ -12,6 +12,10 @@
 #include "foundation/gmprofile.h"
 #include "gmglframebuffer.h"
 
+#ifdef max
+#undef max
+#endif
+
 extern "C"
 {
 	GLenum s_glErrCode;
@@ -148,11 +152,12 @@ void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 	{
 		const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 		const Vector<ILight*>& lights = db->lights;
-		GMuint lightCount = lights.size();
+		GMsize_t lightCount = lights.size();
 		GM_ASSERT(lightCount <= getMaxLightCount());
-		shaderProgram->setInt(desc.LightCount, lightCount);
+		GM_ASSERT(lightCount <= std::numeric_limits<GMuint>::max());
+		shaderProgram->setInt(desc.LightCount, (GMuint)lightCount);
 
-		for (GMuint i = 0; i < lightCount; ++i)
+		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
 		{
 			lights[i]->activateLight(i, renderer);
 		}

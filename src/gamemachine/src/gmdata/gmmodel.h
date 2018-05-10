@@ -180,7 +180,7 @@ GM_PRIVATE_OBJECT(GMModel)
 	GMModelDrawMode drawMode = GMModelDrawMode::Vertex;
 	GMModelType type = GMModelType::Model3D;
 	GMTopologyMode mode = GMTopologyMode::Triangles;
-	GMuint verticesCount = 0;
+	GMsize_t verticesCount = 0;
 	bool needTransfer = true;
 };
 
@@ -216,7 +216,7 @@ public:
 	GM_DECLARE_PROPERTY(PrimitiveTopologyMode, mode, GMTopologyMode);
 	GM_DECLARE_PROPERTY(Type, type, GMModelType);
 	GM_DECLARE_PROPERTY(Shader, shader, GMShader);
-	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMuint);
+	GM_DECLARE_PROPERTY(VerticesCount, verticesCount, GMsize_t);
 	GM_DECLARE_PROPERTY(DrawMode, drawMode, GMModelDrawMode);
 
 public:

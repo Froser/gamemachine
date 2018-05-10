@@ -8,7 +8,7 @@ class GMImage;
 struct IImageReader
 {
 	virtual ~IImageReader() {};
-	virtual bool load(const GMbyte* data, GMuint size, OUT GMImage** image) = 0;
+	virtual bool load(const GMbyte* data, GMsize_t size, OUT GMImage** image) = 0;
 	virtual bool test(const GMbyte* data) = 0;
 };
 

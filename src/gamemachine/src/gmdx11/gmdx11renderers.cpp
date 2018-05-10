@@ -9,6 +9,10 @@
 #include "gmdx11gbuffer.h"
 #include "gmdx11framebuffer.h"
 
+#ifdef max
+#undef max
+#endif
+
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
 #define GMSHADER_SEMANTIC_NAME_TEXCOORD "TEXCOORD"
@@ -826,10 +830,11 @@ void GMDx11Renderer::passAllAndDraw(GMModel* model)
 		pass->Apply(0, d->deviceContext);
 		setTextures(model);
 
+		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw(model->getVerticesCount(), 0);
+			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
 		else
-			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
 	}
 }
 
@@ -912,10 +917,11 @@ void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 		}
 		pass->Apply(0, d->deviceContext);
 
+		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw(model->getVerticesCount(), 0);
+			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
 		else
-			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
 	}
 }
 
@@ -957,10 +963,11 @@ void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
 
 		GM_ASSERT(framebuffers);
 		framebuffers->bind();
+		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw(model->getVerticesCount(), 0);
+			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
 		else
-			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
 		framebuffers->unbind();
 	}
 }
@@ -983,10 +990,11 @@ void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 			cubeMapState.cubeMapRenderer->setTextures(cubeMapState.model);
 		}
 
+		GM_ASSERT(model->getVerticesCount() < std::numeric_limits<UINT>::max());
 		if (model->getDrawMode() == GMModelDrawMode::Vertex)
-			d->deviceContext->Draw(model->getVerticesCount(), 0);
+			d->deviceContext->Draw((UINT)model->getVerticesCount(), 0);
 		else
-			d->deviceContext->DrawIndexed(model->getVerticesCount(), 0, 0);
+			d->deviceContext->DrawIndexed((UINT)model->getVerticesCount(), 0, 0);
 	}
 }
 

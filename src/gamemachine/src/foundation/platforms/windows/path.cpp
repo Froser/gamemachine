@@ -6,9 +6,8 @@
 
 GMString GMPath::directoryName(const GMString& fileName)
 {
-	GMint pos1 = fileName.findLastOf('\\'),
-		pos2 = fileName.findLastOf('/');
-	GMint pos = pos1 > pos2 ? pos1 : pos2;
+	GMString winFileName = fileName.replace("/", "\\");
+	GMsize_t pos = winFileName.findLastOf('\\');
 	if (pos == GMString::npos)
 		return fileName;
 	return fileName.substr(0, pos + 1);
@@ -16,9 +15,8 @@ GMString GMPath::directoryName(const GMString& fileName)
 
 GMString GMPath::filename(const GMString& fullPath)
 {
-	GMint pos1 = fullPath.findLastOf('\\'),
-		pos2 = fullPath.findLastOf('/');
-	GMint pos = pos1 > pos2 ? pos1 : pos2;
+	GMString winFileName = fullPath.replace("/", "\\");
+	GMsize_t pos = winFileName.findLastOf('\\');
 	if (pos == GMString::npos)
 		return fullPath;
 	return fullPath.substr(pos + 1, fullPath.length());

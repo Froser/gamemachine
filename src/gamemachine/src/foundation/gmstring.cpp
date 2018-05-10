@@ -146,7 +146,7 @@ GMString::GMString(const GMint i)
 #endif
 }
 
-char GMString::operator[](GMuint i) const
+char GMString::operator[](GMsize_t i) const
 {
 	D_STR(d);
 	GMwchar c = d->data[i];
@@ -197,7 +197,7 @@ size_t GMString::findLastOf(char c) const
 	return idx;
 }
 
-GMString GMString::substr(GMint start, GMint count) const
+GMString GMString::substr(GMsize_t start, GMsize_t count) const
 {
 	D_STR(d);
 	return d->data.substr(start, count);
@@ -218,7 +218,7 @@ const std::string GMString::toStdString() const
 	return string;
 }
 
-GMString GMString::replace(const GMString& oldValue, const GMString& newValue)
+GMString GMString::replace(const GMString& oldValue, const GMString& newValue) const
 {
 	D_STR(d);
 	std::wstring _oldValue = oldValue.toStdWString();

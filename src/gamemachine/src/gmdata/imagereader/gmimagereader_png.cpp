@@ -9,8 +9,8 @@
 struct PngImage
 {
 	const GMbyte* data;
-	GMuint size;
-	GMuint offset;
+	GMsize_t size;
+	GMsize_t offset;
 };
 
 namespace
@@ -27,7 +27,7 @@ namespace
 			png_error(png_ptr, "pngReaderCallback failed");
 	}
 
-	bool loadPng(const GMbyte* data, GMuint dataSize, PngData *out, REF GMuint& bufferSize)
+	bool loadPng(const GMbyte* data, GMsize_t dataSize, PngData *out, REF GMsize_t& bufferSize)
 	{
 		png_structp png_ptr;
 		png_infop  info_ptr;
@@ -107,13 +107,13 @@ struct PNGTestHeader
 	DWORD magic1, magic2;
 };
 
-bool GMImageReader_PNG::load(const GMbyte* data, GMuint size, OUT GMImage** img)
+bool GMImageReader_PNG::load(const GMbyte* data, GMsize_t size, OUT GMImage** img)
 {
 	GM_ASSERT(img);
 	*img = new GMImage();
 
 	PngData png;
-	GMuint bufferSize;
+	GMsize_t bufferSize;
 	bool b = loadPng(data, size, &png, bufferSize);
 	writeDataToImage(png, *img, bufferSize);
 	return b;
@@ -125,7 +125,7 @@ bool GMImageReader_PNG::test(const GMbyte* data)
 	return header && header->magic1 == 1196314761 && header->magic2 == 169478669;
 }
 
-void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMuint size)
+void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMsize_t size)
 {
 	GM_ASSERT(img);
 	GMImage::Data& data = img->getData();

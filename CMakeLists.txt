@@ -52,6 +52,18 @@ macro(gm_apply_runtime_library)
 endmacro(gm_apply_runtime_library)
 gm_apply_runtime_library()
 
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(GM_TARGET_X86 TRUE)
+else(CMAKE_SIZEOF_VOID_P EQUAL 4)
+	set(GM_TARGET_X86 FALSE)
+endif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(GM_TARGET_64 TRUE)
+else(CMAKE_SIZEOF_VOID_P EQUAL 8)
+	set(GM_TARGET_64 FALSE)
+endif(CMAKE_SIZEOF_VOID_P EQUAL 8)
+
 macro(gm_init_solution)
 	if(WIN32)
 		add_definitions(-DGM_WINDOWS)
@@ -73,10 +85,19 @@ macro(gm_init_solution)
 		include_directories(
 				${GM_DX11_SDK_PATH}
 			)
-		link_directories(
-				${GM_DX11_SDK_LIB86_PATH}
-				${GM_DX11_SDK_LIB64_PATH}
-			)
+
+		if (GM_TARGET_X86)
+			link_directories(
+					${GM_DX11_SDK_LIB86_PATH}
+				)
+		endif(GM_TARGET_X86)
+
+		if (GM_TARGET_64)
+			link_directories(
+					${GM_DX11_SDK_LIB64_PATH}
+				)
+		endif(GM_TARGET_64)
+
 		link_libraries(
 				dxgi.lib
 				d3d11.lib

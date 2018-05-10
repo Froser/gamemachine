@@ -63,8 +63,8 @@ public:
 	virtual void bind() override;
 	virtual void unbind() override;
 	virtual void clear(GMFramebuffersClearType type) override;
-	virtual IFramebuffer* getFramebuffer(GMuint) override;
-	virtual GMuint count() override;
+	virtual IFramebuffer* getFramebuffer(GMsize_t) override;
+	virtual GMsize_t count() override;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
 
 protected:

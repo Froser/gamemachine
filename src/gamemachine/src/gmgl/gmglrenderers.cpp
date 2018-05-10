@@ -11,6 +11,10 @@
 #include "gmglgbuffer.h"
 #include "gmglframebuffer.h"
 
+#ifdef max
+#undef max
+#endif
+
 namespace
 {
 	bool g_shadowDirty = true;
@@ -160,10 +164,11 @@ void GMGLRenderer::draw(GMModel* model)
 	prepareScreenInfo(getShaderProgram());
 	beforeDraw(model);
 	GLenum mode = d->debugConfig.get(GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool() ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
+	GM_ASSERT(model->getVerticesCount() < std::numeric_limits<GMuint>::max());
 	if (model->getDrawMode() == GMModelDrawMode::Vertex)
-		glDrawArrays(mode, 0, model->getVerticesCount());
+		glDrawArrays(mode, 0, (GLsizei)model->getVerticesCount());
 	else
-		glDrawElements(mode, model->getVerticesCount(), GL_UNSIGNED_INT, 0);
+		glDrawElements(mode, (GLsizei)model->getVerticesCount(), GL_UNSIGNED_INT, 0);
 	afterDraw(model);
 	glBindVertexArray(0);
 }
@@ -628,20 +633,23 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 	d->engine->activateLights(this);
 	IGBuffer* gBuffer = d->engine->getGBuffer();
 	IFramebuffers* gBufferFramebuffers = gBuffer->getGeometryFramebuffers();
-	GMuint cnt = gBufferFramebuffers->count();
-	for (GMuint i = 0; i < cnt; ++i)
+	GMsize_t cnt = gBufferFramebuffers->count();
+	for (GMsize_t i = 0; i < cnt; ++i)
 	{
 		ITexture* texture = gBufferFramebuffers->getFramebuffer(i)->getTexture();
-		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
-		texture->useTexture(nullptr, GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
+		const GMsize_t textureIndex = (GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + i);
+		GM_ASSERT(textureIndex < std::numeric_limits<GMuint>::max());
+		shaderProgram->setInt(GMGLGBuffer::GBufferGeometryUniformNames()[i].c_str(), (GMuint)textureIndex);
+		texture->useTexture(nullptr, (GMuint)textureIndex);
 	}
 
 	ITexture* cubeMap = d->engine->getCubeMap();
 	if (cubeMap)
 	{
-		const GMuint id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
-		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, id);
-		cubeMap->useTexture(nullptr, id);
+		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
+		GM_ASSERT(id < std::numeric_limits<GMuint>::max());
+		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, (GMuint)id);
+		cubeMap->useTexture(nullptr, (GMuint)id);
 	}
 }
 

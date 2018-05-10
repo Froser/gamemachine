@@ -6,7 +6,7 @@
 
 BEGIN_NS
 
-typedef GMlong GMThreadHandle;
+typedef void* GMThreadHandle;
 typedef GMlong GMThreadId;
 
 enum class ThreadState

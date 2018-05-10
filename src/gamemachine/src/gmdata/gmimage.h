@@ -41,7 +41,7 @@ struct ImageMipData
 {
 	GMint width;
 	GMint height;
-	GMsizeiptr mipStride;
+	GMptrdiff mipStride;
 	GMbyte* data = nullptr;
 };
 
@@ -52,12 +52,12 @@ GM_PRIVATE_OBJECT(GMImage)
 	GMImageFormat format;
 	GMImageDataType type;
 	GMuint swizzle[4];
-	GMsizei mipLevels;
-	GMsizei slices = 1;
-	GMsizeiptr sliceStride = 0;
-	GMsizeiptr totalDataSize;
+	GMint mipLevels;
+	GMint slices = 1;
+	GMptrdiff sliceStride = 0;
+	GMptrdiff totalDataSize;
 	ImageMipData mip[MAX_MIP_CNT];
-	GMuint size = 0;
+	GMsize_t size = 0;
 	GMuint channels = GM_IMAGE_DEFAULT_CHANNELS;
 };
 

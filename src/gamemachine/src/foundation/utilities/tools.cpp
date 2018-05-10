@@ -221,7 +221,7 @@ bool GMPlane::operator ==(const GMPlane & rhs) const
 }
 
 //MemoryStream
-GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMuint size)
+GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMsize_t size)
 {
 	D(d);
 	d->start = buffer;
@@ -230,26 +230,26 @@ GMMemoryStream::GMMemoryStream(const GMbyte* buffer, GMuint size)
 	d->end = d->start + d->size;
 }
 
-GMuint GMMemoryStream::read(GMbyte* buf, GMuint size)
+GMsize_t GMMemoryStream::read(GMbyte* buf, GMsize_t size)
 {
 	D(d);
 	if (d->ptr >= d->end)
 		return 0;
 
-	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
+	GMsize_t realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
 	if (buf)
 		memcpy(buf, d->ptr, realSize);
 	d->ptr += realSize;
 	return realSize;
 }
 
-GMuint GMMemoryStream::peek(GMbyte* buf, GMuint size)
+GMsize_t GMMemoryStream::peek(GMbyte* buf, GMsize_t size)
 {
 	D(d);
 	if (d->ptr >= d->end)
 		return 0;
 
-	GMuint realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
+	GMsize_t realSize = d->ptr + size > d->end ? d->end - d->ptr : size;
 	memcpy(buf, d->ptr, realSize);
 	return realSize;
 }
@@ -260,13 +260,13 @@ void GMMemoryStream::rewind()
 	d->ptr = d->start;
 }
 
-GMuint GMMemoryStream::size()
+GMsize_t GMMemoryStream::size()
 {
 	D(d);
 	return d->size;
 }
 
-GMuint GMMemoryStream::tell()
+GMsize_t GMMemoryStream::tell()
 {
 	D(d);
 	return d->ptr - d->start;

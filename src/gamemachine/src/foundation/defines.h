@@ -150,8 +150,7 @@ typedef float GMfloat;
 typedef int GMint;
 typedef unsigned int GMuint;
 typedef short GMshort;
-typedef ptrdiff_t GMsizeiptr;
-typedef int GMsizei;
+typedef ptrdiff_t GMptrdiff;
 typedef unsigned char GMbyte;
 typedef long GMlong;
 typedef unsigned long GMulong;
@@ -160,6 +159,7 @@ typedef unsigned short GMushort;
 typedef wchar_t GMwchar;
 typedef int64_t GMint64;
 typedef GMint GMFontSizePt;
+typedef size_t GMsize_t;
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
 #define GM_STATIC_ASSERT static_assert

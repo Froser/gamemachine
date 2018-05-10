@@ -57,8 +57,8 @@ void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
 {
 	D(d);
 	IFramebuffers* geometryFramebuffers = getGeometryFramebuffers();
-	GMint cnt = geometryFramebuffers->count();
-	for (GMint i = 0; i < cnt; ++i)
+	GMsize_t cnt = geometryFramebuffers->count();
+	for (GMsize_t i = 0; i < cnt; ++i)
 	{
 		GM_ASSERT(i < GM_array_size(GeometryFramebufferNames));
 		GMDx11Texture* tex = gm_cast<GMDx11Texture*>(geometryFramebuffers->getFramebuffer(i)->getTexture());

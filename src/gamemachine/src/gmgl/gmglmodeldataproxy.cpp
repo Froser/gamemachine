@@ -39,7 +39,7 @@ void GMGLModelDataProxy::transfer()
 	// 把数据打入顶点数组
 	packVertices(packedVertices);
 
-	GMuint verticeCount = 0;
+	GMsize_t verticeCount = 0;
 
 	GLuint vao;
 	glGenVertexArrays(1, &vao);

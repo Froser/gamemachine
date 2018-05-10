@@ -5,6 +5,10 @@
 #include "gmengine/gmgraphicengine.h"
 #include "gmdx11helper.h"
 
+#ifdef max
+#undef max
+#endif
+
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)
@@ -48,12 +52,12 @@ public:
 	{
 	}
 
-	virtual GMuint count() override
+	virtual GMsize_t count() override
 	{
 		return 1;
 	}
 
-	virtual IFramebuffer* getFramebuffer(GMuint) override
+	virtual IFramebuffer* getFramebuffer(GMsize_t) override
 	{
 		return nullptr;
 	}
@@ -278,7 +282,8 @@ void GMDx11Framebuffers::bind()
 {
 	D(d);
 	d->deviceContext->RSSetViewports(1, &d->viewport);
-	d->deviceContext->OMSetRenderTargets(d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
+	GM_ASSERT(d->renderTargetViews.size() < std::numeric_limits<UINT>::max());
+	d->deviceContext->OMSetRenderTargets((UINT)d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
 	d->engine->getFramebuffersStack().push(this);
 }
 
@@ -322,14 +327,14 @@ void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0U);
 }
 
-IFramebuffer* GMDx11Framebuffers::getFramebuffer(GMuint index)
+IFramebuffer* GMDx11Framebuffers::getFramebuffer(GMsize_t index)
 {
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
 	return d->framebuffers[index];
 }
 
-GMuint GMDx11Framebuffers::count()
+GMsize_t GMDx11Framebuffers::count()
 {
 	D(d);
 	return d->framebuffers.size();

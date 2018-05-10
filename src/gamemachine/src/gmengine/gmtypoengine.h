@@ -24,7 +24,7 @@ struct ITypoEngine;
 GM_PRIVATE_OBJECT(GMTypoIterator)
 {
 	ITypoEngine* typo = nullptr;
-	GMint index = 0;
+	GMsize_t index = 0;
 	GMTypoResult result;
 	bool invalid = true;
 };
@@ -34,7 +34,7 @@ class GMTypoIterator : public GMObject
 	DECLARE_PRIVATE(GMTypoIterator)
 
 public:
-	GMTypoIterator(ITypoEngine* typo, GMint index);
+	GMTypoIterator(ITypoEngine* typo, GMsize_t index);
 
 public:
 	const GMTypoResult& operator*();
@@ -62,7 +62,7 @@ GM_INTERFACE(ITypoEngine)
 
 private:
 	friend class GMTypoIterator;
-	virtual GMTypoResult getTypoResult(GMint index) = 0;
+	virtual GMTypoResult getTypoResult(GMsize_t index) = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ public:
 	virtual GMTypoIterator end() override;
 
 private:
-	virtual GMTypoResult getTypoResult(GMint index) override;
+	virtual GMTypoResult getTypoResult(GMsize_t index) override;
 
 private:
 	bool isValidTypeFrame();

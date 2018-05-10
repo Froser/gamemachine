@@ -79,7 +79,7 @@ private:
 	BitmapFile m_bitmapFile;
 };
 
-bool GMImageReader_BMP::load(const GMbyte* byte, GMuint size, OUT GMImage** img)
+bool GMImageReader_BMP::load(const GMbyte* byte, GMsize_t size, OUT GMImage** img)
 {
 	ImageBMP* image = nullptr;
 	if (img)
