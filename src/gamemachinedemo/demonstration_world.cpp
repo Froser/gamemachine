@@ -13,6 +13,7 @@
 #include "demo/button.h"
 #include "demo/model.h"
 #include "demo/collision.h"
+#include "demo/specularmap.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -35,6 +36,7 @@ namespace
 		world->addDemo("Button: Demonstrate how to create a button.", new Demo_Button(world));
 		world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
 		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
+		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
 		world->init();
 	}
 }

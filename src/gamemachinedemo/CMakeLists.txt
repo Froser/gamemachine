@@ -43,6 +43,8 @@ set(SOURCES
 		demo/model.cpp
 		demo/collision.h
 		demo/collision.cpp
+		demo/specularmap.h
+		demo/specularmap.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

@@ -22,13 +22,11 @@ void Demo_Texture::init()
 		virtual void onCreateShader(gm::GMShader& shader) override
 		{
 			shader.getMaterial().kd = GMVec3(1, 1, 1);
+			shader.getMaterial().ks = GMVec3(0);
+
 			gm::ITexture* tex = nullptr;
 			gm::GMToolUtil::createTexture("gamemachine.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
-			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
-
-			gm::GMToolUtil::createTexture("specular.jpg", &tex);
-			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Specular);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
 	} cb(asDemoGameWorld(getDemoWorldReference()));
@@ -114,6 +112,7 @@ void Demo_Texture_Index::init()
 
 	gm::GMShader& shader = quad->getShader();
 	shader.getMaterial().kd = GMVec3(1, 1, 1);
+	shader.getMaterial().ks = GMVec3(0);
 
 	gm::ITexture* tex = nullptr;
 	gm::GMToolUtil::createTexture("gamemachine.png", &tex);
