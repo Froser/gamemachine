@@ -41,6 +41,8 @@ namespace
 			return GL_RGBA;
 		case GMImageFormat::BGRA:
 			return GL_BGRA;
+		case GMImageFormat::RED:
+			return GL_RED;
 		default:
 			GM_ASSERT(false);
 			return GL_NONE;
@@ -55,6 +57,8 @@ namespace
 			return GL_RGB8;
 		case GMImageInternalFormat::RGBA8:
 			return GL_RGBA8;
+		case GMImageInternalFormat::RED8:
+			return GL_R8;
 		default:
 			GM_ASSERT(false);
 			return GL_NONE;

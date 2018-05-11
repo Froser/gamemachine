@@ -79,7 +79,7 @@ void GM_GeometryPass()
 	${deferred_geometry_pass_gPosition_Refractivity}.a = GM_material.refractivity;
 	${deferred_geometry_pass_gTexAmbient} = vec4(GM_material.ka, 1) * deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
 	${deferred_geometry_pass_gTexDiffuse} = vec4(GM_material.kd, 1) * deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
-	${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * deferred_geometry_pass_calcTexture(GM_specular_textures, _uv, MAX_TEXTURE_COUNT).rgb, GM_material.shininess);
+	${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * deferred_geometry_pass_calcTexture(GM_specular_textures, _uv, MAX_TEXTURE_COUNT).r, GM_material.shininess);
 
 	deferred_geometry_pass_calcEyeSpace();
 }

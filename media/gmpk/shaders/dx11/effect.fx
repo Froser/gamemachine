@@ -577,16 +577,16 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     }
 
     // 计算Specular(如果有Specular贴图)
-    float4 color_Specular = float4(0, 0, 0, 0);
+    float4 color_Specular = 0;
     if (HasNoTexture(SpecularTextureAttributes))
     {
-        color_Specular = float4(1.0f, 1.0f, 1.0f, 1.0f);
+        color_Specular = 1.f;
     }
     else
     {
-        color_Specular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord);
-        color_Specular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord);
-        color_Specular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord);
+        color_Specular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
+        color_Specular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
+        color_Specular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
     }
 
     commonInput.AmbientLightmapTexture = color_Ambient * Material.Ka;
@@ -751,16 +751,16 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     output.TextureAmbient = texAmbient * Material.Ka;
     output.TextureDiffuse = texDiffuse * Material.Kd;
 
-    float4 texSpecular = float4(0, 0, 0, 0);
+    float texSpecular = 0;
     if (HasNoTexture(SpecularTextureAttributes))
     {
-        texSpecular = float4(1.0f, 1.0f, 1.0f, 1.0f);
+        texSpecular = 1.f;
     }
     else
     {
-        texSpecular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord);
-        texSpecular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord);
-        texSpecular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord);
+        texSpecular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
+        texSpecular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
+        texSpecular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
     }
 
     if (PS_3D_HasNormalMap())
@@ -776,7 +776,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
         output.NormalMap_HasNormalMap = float4(0, 0, 0, 0);
     }
 
-    output.Ks_Shininess = ToFloat4(Material.Ks * texSpecular.rgb, Material.Shininess);
+    output.Ks_Shininess = ToFloat4(Material.Ks * texSpecular, Material.Shininess);
     return output;
 }
 

@@ -23,12 +23,14 @@ enum class GMImageFormat
 	RGB,
 	RGBA,
 	BGRA,
+	RED,
 };
 
 enum class GMImageInternalFormat
 {
 	RGB8,
 	RGBA8,
+	RED8,
 };
 
 enum class GMImageDataType
