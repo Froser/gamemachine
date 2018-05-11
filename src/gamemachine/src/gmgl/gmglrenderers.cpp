@@ -149,6 +149,21 @@ namespace
 	}
 }
 
+void GMGammaHelper::setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
+{
+	bool needGammaCorrection = engine->needGammaCorrection();
+	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, needGammaCorrection);
+	if (needGammaCorrection)
+	{
+		GMfloat gamma = engine->getGammaValue();
+		if (gamma != m_gamma)
+		{
+			shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
+			m_gamma = gamma;
+		}
+	}
+}
+
 GMGLRenderer::GMGLRenderer()
 {
 	D(d);
@@ -400,6 +415,8 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		applyShadow(desc, nullptr, shaderProgram, nullptr, false);
 	}
+
+	db->gammaHelper.setGamma(desc, db->engine, shaderProgram);
 }
 
 void GMGLRenderer_3D::beforeDraw(GMModel* model)
@@ -620,6 +637,8 @@ void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* pare
 	{
 		applyShadow(desc, nullptr, shaderProgram, nullptr, false);
 	}
+
+	d->gammaHelper.setGamma(desc, d->engine, shaderProgram);
 }
 
 void GMGLRenderer_LightPass::afterDraw(GMModel* model)

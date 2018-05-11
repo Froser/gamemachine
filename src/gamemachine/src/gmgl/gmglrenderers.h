@@ -6,11 +6,21 @@
 #include "gmgl/gmglgraphic_engine.h"
 BEGIN_NS
 
+class GMGammaHelper
+{
+public:
+	void setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine* engine, IShaderProgram* shaderProgram);
+
+private:
+	GMfloat m_gamma = 0.f;
+};
+
 GM_PRIVATE_OBJECT(GMGLRenderer)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	GMDebugConfig debugConfig;
+	GMGammaHelper gammaHelper;
 };
 
 class GMGLRenderer : public GMObject, public IRenderer

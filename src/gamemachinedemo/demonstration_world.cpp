@@ -104,6 +104,9 @@ void DemoHandler::event(gm::GameMachineEvent evt)
 		if (kbState.keyTriggered('I'))
 			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
+		if (kbState.keyTriggered(' '))
+			d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
+
 		if (kbState.keyTriggered('T'))
 		{
 			if (getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferDeferredRendering)

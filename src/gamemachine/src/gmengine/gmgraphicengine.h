@@ -48,7 +48,7 @@ struct GMShaderVariablesScreenInfoDesc
 	const char* Multisampling;
 };
 
-struct GMShaderVariableShadowInfo
+struct GMShaderVariableShadowInfoDesc
 {
 	const char* ShadowInfo;
 	const char* HasShadow;
@@ -60,6 +60,12 @@ struct GMShaderVariableShadowInfo
 	const char* ShadowMapHeight;
 	const char* BiasMin;
 	const char* BiasMax;
+};
+
+struct GMShaderVariableGammaDesc
+{
+	const char* GammaCorrection;
+	const char* GammaValue;
 };
 
 struct GMShaderVariablesDesc
@@ -99,7 +105,10 @@ struct GMShaderVariablesDesc
 	const char* DepthStencilState;
 
 	// 阴影
-	GMShaderVariableShadowInfo ShadowInfo;
+	GMShaderVariableShadowInfoDesc ShadowInfo;
+
+	// Gamma校正
+	GMShaderVariableGammaDesc GammaCorrection;
 };
 
 struct GMShadowSourceDesc
@@ -180,6 +189,9 @@ public:
 	const GMFilterMode::Mode getCurrentFilterMode();
 	void draw(const List<GMGameObject*>& objects);
 	IFramebuffers* getShadowMapFramebuffers();
+
+	bool needGammaCorrection();
+	GMfloat getGammaValue();
 
 protected:
 	void createFilterFramebuffer();

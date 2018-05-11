@@ -64,6 +64,11 @@ namespace
 				"ShadowMapHeight",
 				"BiasMin",
 				"BiasMax",
+			},
+
+			{
+				"GammaCorrection",
+				"Gamma",
 			}
 		};
 		return desc;

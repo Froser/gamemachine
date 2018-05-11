@@ -14,8 +14,19 @@ uniform int GM_lightCount = 0;
 const int GM_AmbientLight = 0;
 const int GM_DirectLight = 1;
 
-// 光照实现
+// Gamma校正
+uniform int GM_gammaCorrection;
+uniform float GM_gamma;
+vec3 calculateGammaCorrection(vec3 factor)
+{
+    if (GM_gammaCorrection == 0)
+        return factor;
 
+    float inverseGamma = 1.0f / GM_gamma;
+    return pow(factor, vec3(inverseGamma, inverseGamma, inverseGamma));
+}
+
+// 光照实现
 vec3 saturate(vec3 vector)
 {
 	return clamp(vector, 0.0f, 1.0f);
@@ -188,8 +199,8 @@ vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 				refractionLight += calculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
 		}
 	}
-	vec3 finalColor =	saturate(vertex.AmbientLightmapTexture) * ambientLight +
-						saturate(vertex.DiffuseTexture) * diffuseLight * factor_Shadow +
+	vec3 finalColor =	saturate(vertex.AmbientLightmapTexture) * calculateGammaCorrection(ambientLight) +
+						saturate(vertex.DiffuseTexture) * calculateGammaCorrection(diffuseLight) * factor_Shadow +
 						specularLight * vertex.Ks * factor_Shadow +
 						refractionLight;
 	return vec4(finalColor, 1);

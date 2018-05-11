@@ -161,6 +161,18 @@ IFramebuffers* GMGraphicEngine::getShadowMapFramebuffers()
 	return d->shadowDepthFramebuffers;
 }
 
+bool GMGraphicEngine::needGammaCorrection()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::GammaCorrection_Bool).toBool();
+}
+
+GMfloat GMGraphicEngine::getGammaValue()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::Gamma_Float).toFloat();
+}
+
 void GMGraphicEngine::createFilterFramebuffer()
 {
 	D(d);

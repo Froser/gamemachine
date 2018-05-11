@@ -489,7 +489,6 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();
 	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3DX11EffectScalarVariable* hasShadow = bank.HasShadow();
-
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
 		GM_DX_HR(hasShadow->SetBool(true));
@@ -497,6 +496,18 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	else
 	{
 		GM_DX_HR(hasShadow->SetBool(false));
+	}
+
+	bool needGammaCorrection = getEngine()->needGammaCorrection();
+	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, needGammaCorrection);
+	if (needGammaCorrection)
+	{
+		GMfloat gamma = getEngine()->getGammaValue();
+		if (gamma != d->gamma)
+		{
+			shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
+			d->gamma = gamma;
+		}
 	}
 }
 

@@ -53,6 +53,8 @@ enum class GMRenderConfigs
 {
 	FilterMode,
 	FilterKernelOffset_Vec2,
+	GammaCorrection_Bool,
+	Gamma_Float,
 	Max,
 };
 
@@ -73,6 +75,8 @@ namespace gm_config_guids
 
 	const GMString RenderGUIDs[(GMuint)GMRenderConfigs::Max] = {
 		L"12471560-175E-4eff-B3F2-0569CA14E53D",
+		L"342C6AB2-2830-4338-B30B-167A250558D7",
+		L"49DF237C-5699-49b3-83D9-E2A523C644CB",
 	};
 }
 

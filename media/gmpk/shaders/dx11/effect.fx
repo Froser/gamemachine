@@ -249,6 +249,20 @@ struct GMScreenInfo
 GMScreenInfo ScreenInfo;
 
 //--------------------------------------------------------------------------------------
+// Gamma Correction
+//--------------------------------------------------------------------------------------
+bool GammaCorrection;
+float Gamma;
+float4 CalculateGammaCorrection(float4 factor)
+{
+    if (!GammaCorrection)
+        return factor;
+
+    float inverseGamma = 1.0f / Gamma;
+    return ToFloat4(pow(factor.rgb, float3(inverseGamma, inverseGamma, inverseGamma)));
+}
+
+//--------------------------------------------------------------------------------------
 // Shadow
 //--------------------------------------------------------------------------------------
 struct GMShadowInfo
@@ -456,11 +470,11 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
             factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
         }
     }
-    float4 color_Ambient = factor_Ambient * saturate(ToFloat4(input.AmbientLightmapTexture));
-    float4 color_Diffuse = factor_Shadow * factor_Diffuse * saturate(ToFloat4(input.DiffuseTexture));
+    float4 color_Ambient = CalculateGammaCorrection(factor_Ambient) * saturate(ToFloat4(input.AmbientLightmapTexture));
+    float4 color_Diffuse = factor_Shadow * CalculateGammaCorrection(factor_Diffuse) * saturate(ToFloat4(input.DiffuseTexture));
 
     // 计算Specular
-    float4 color_Specular = factor_Shadow * factor_Specular * ToFloat4(input.Ks);
+    float4 color_Specular = factor_Shadow * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.Ks);
     
     // 计算折射
     float4 color_Refractivity = IlluminateRefraction(
@@ -473,6 +487,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
         input.TangentSpace,
         input.Refractivity
         );
+    color_Refractivity = color_Refractivity;
 
     float4 finalColor = saturate(color_Ambient + color_Diffuse + color_Specular + color_Refractivity);
     return finalColor;

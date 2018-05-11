@@ -26,6 +26,8 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	bool screenInfoPrepared = false;
 	GMComPtr<ID3D11Resource> shadowMapResource;
+	GMDx11GraphicEngine* engine = nullptr;
+	GMfloat gamma = 0;
 };
 
 class GMDx11Renderer : public GMObject, public IRenderer
@@ -61,7 +63,10 @@ public:
 protected:
 	inline GMDx11GraphicEngine* getEngine()
 	{
-		return gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+		D(d);
+		if (!d->engine)
+			d->engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+		return d->engine;
 	}
 
 protected:
