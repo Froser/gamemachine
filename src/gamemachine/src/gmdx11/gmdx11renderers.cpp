@@ -498,17 +498,7 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 		GM_DX_HR(hasShadow->SetBool(false));
 	}
 
-	bool needGammaCorrection = getEngine()->needGammaCorrection();
-	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, needGammaCorrection);
-	if (needGammaCorrection)
-	{
-		GMfloat gamma = getEngine()->getGammaValue();
-		if (gamma != d->gamma)
-		{
-			shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
-			d->gamma = gamma;
-		}
-	}
+	setGamma(shaderProgram);
 }
 
 void GMDx11Renderer::endModel()
@@ -819,6 +809,23 @@ ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }
 
+void GMDx11Renderer::setGamma(IShaderProgram* shaderProgram)
+{
+	D(d);
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	bool needGammaCorrection = getEngine()->needGammaCorrection();
+	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, needGammaCorrection);
+	if (needGammaCorrection)
+	{
+		GMfloat gamma = getEngine()->getGammaValue();
+		if (gamma != d->gamma)
+		{
+			shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
+			d->gamma = gamma;
+		}
+	}
+}
+
 void GMDx11Renderer::draw(GMModel* model)
 {
 	D(d);
@@ -959,6 +966,19 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[filterMode], GMShaderType::Effect);
 	GM_ASSERT(b);
+
+	if (getEngine()->needHDR())
+	{
+		// 其实Filter和3D的着色器是同一个，因此这里本身不需要再次设置Gamma
+		// 不过考虑到之后可能是分开的着色器程序，先设置上，开销也不大
+		setGamma(shaderProgram);
+		setHDR();
+	}
+}
+
+void GMDx11Renderer_Filter::setHDR()
+{
+
 }
 
 void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)

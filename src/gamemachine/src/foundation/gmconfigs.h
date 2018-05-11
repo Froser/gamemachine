@@ -34,6 +34,16 @@ struct GMFilterMode
 	};
 };
 
+struct GMToneMapping
+{
+	typedef GMint Mode;
+
+	enum
+	{
+		Reinhard
+	};
+};
+
 enum class GMDebugConfigs
 {
 	DrawPolygonsAsLine_Bool,
@@ -55,6 +65,8 @@ enum class GMRenderConfigs
 	FilterKernelOffset_Vec2,
 	GammaCorrection_Bool,
 	Gamma_Float,
+	HDR_Bool,
+	ToneMapping,
 	Max,
 };
 
@@ -77,6 +89,8 @@ namespace gm_config_guids
 		L"12471560-175E-4eff-B3F2-0569CA14E53D",
 		L"342C6AB2-2830-4338-B30B-167A250558D7",
 		L"49DF237C-5699-49b3-83D9-E2A523C644CB",
+		L"C2B5725C-55D6-44B5-84EE-67CEC0549C34",
+		L"0A2225BF-2666-491F-B1D9-3C1C8E4627B2",
 	};
 }
 

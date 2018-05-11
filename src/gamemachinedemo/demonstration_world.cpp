@@ -83,6 +83,10 @@ void DemoHandler::onDeactivate()
 	GM.getGraphicEngine()->removeLights();
 	d->renderConfig.set(gm::GMRenderConfigs::FilterMode, gm::GMFilterMode::None);
 	d->activating = false;
+
+	gm::GMShadowSourceDesc noShadow;
+	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
+	GM.getGraphicEngine()->setShadowSource(noShadow);
 }
 
 void DemoHandler::event(gm::GameMachineEvent evt)
@@ -106,7 +110,7 @@ void DemoHandler::event(gm::GameMachineEvent evt)
 		if (kbState.keyTriggered('I'))
 			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
-		if (kbState.keyTriggered(' '))
+		if (kbState.keyTriggered('Z'))
 			d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
 
 		if (kbState.keyTriggered('T'))

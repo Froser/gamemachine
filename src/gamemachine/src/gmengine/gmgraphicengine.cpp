@@ -92,7 +92,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 	}
 
 	GMFilterMode::Mode filterMode = getCurrentFilterMode();
-	if (filterMode != GMFilterMode::None)
+	if (filterMode != GMFilterMode::None || needHDR())
 	{
 		createFilterFramebuffer();
 		getFilterFramebuffers()->clear();
@@ -103,7 +103,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 		IGBuffer* gBuffer = getGBuffer();
 		gBuffer->geometryPass(deferredRenderingObjects);
 
-		if (filterMode != GMFilterMode::None)
+		if (needHDR() || filterMode != GMFilterMode::None)
 		{
 			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 			GM_ASSERT(filterFramebuffers);
@@ -111,7 +111,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 			filterFramebuffers->clear();
 		}
 		gBuffer->lightPass();
-		if (filterMode != GMFilterMode::None)
+		if (needHDR() || filterMode != GMFilterMode::None)
 		{
 			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 			filterFramebuffers->unbind();
@@ -124,7 +124,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 	if (!forwardRenderingObjects.empty())
 	{
 		IFramebuffers* filterFramebuffers = getFilterFramebuffers();
-		if (filterMode != GMFilterMode::None)
+		if (needHDR() || filterMode != GMFilterMode::None)
 		{
 			filterFramebuffers->clear();
 			filterFramebuffers->bind();
@@ -132,7 +132,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 
 		draw(forwardRenderingObjects);
 
-		if (filterMode != GMFilterMode::None)
+		if (needHDR() || filterMode != GMFilterMode::None)
 		{
 			filterFramebuffers->unbind();
 			getFilterQuad()->draw();
@@ -173,6 +173,18 @@ GMfloat GMGraphicEngine::getGammaValue()
 	return d->renderConfig.get(GMRenderConfigs::Gamma_Float).toFloat();
 }
 
+bool GMGraphicEngine::needHDR()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::HDR_Bool).toBool();
+}
+
+GMToneMapping::Mode GMGraphicEngine::getToneMapping()
+{
+	D(d);
+	return d->renderConfig.get(GMRenderConfigs::ToneMapping).toInt();
+}
+
 void GMGraphicEngine::createFilterFramebuffer()
 {
 	D(d);
@@ -182,6 +194,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
 		GMFramebufferDesc desc = { 0 };
 		desc.rect = states.renderRect;
+		desc.framebufferFormat = GMFramebufferFormat::R32G32B32A32_FLOAT;
 		factory->createFramebuffers(&d->filterFramebuffers);
 		GM_ASSERT(d->filterFramebuffers);
 		GMFramebuffersDesc fbDesc;

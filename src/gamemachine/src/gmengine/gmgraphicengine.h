@@ -68,6 +68,12 @@ struct GMShaderVariableGammaDesc
 	const char* GammaValue;
 };
 
+struct GMShaderVariableHDRDesc
+{
+	const char* HDR;
+	const char* ToneMapping;
+};
+
 struct GMShaderVariablesDesc
 {
 	// 矩阵
@@ -110,6 +116,9 @@ struct GMShaderVariablesDesc
 
 	// Gamma校正
 	GMShaderVariableGammaDesc GammaCorrection;
+
+	// HDR
+	GMShaderVariableHDRDesc HDR;
 };
 
 struct GMShadowSourceDesc
@@ -193,6 +202,9 @@ public:
 
 	bool needGammaCorrection();
 	GMfloat getGammaValue();
+
+	bool needHDR();
+	GMToneMapping::Mode getToneMapping();
 
 protected:
 	void createFilterFramebuffer();

@@ -242,6 +242,7 @@ void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF GMSh
 	d->lightmapId = lightmapId;
 
 	GMShader& shader = *shaderPtr;
+	shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
 		BEGIN_PARSE(surfaceparm); // surfaceparm一定要在最先
@@ -465,7 +466,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		const char* k = elem->Attribute("ks");
 		if (!k)
 		{
-			readTernaryFloatsFromString("1 1 1", arg);
+			readTernaryFloatsFromString("0 0 0", arg);
 			material.ks = MakeVector3(arg);
 		}
 		else
@@ -477,7 +478,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 		k = elem->Attribute("kd");
 		if (!k)
 		{
-			readTernaryFloatsFromString("1 1 1", arg);
+			readTernaryFloatsFromString("0 0 0", arg);
 			material.ks = MakeVector3(arg);
 		}
 		else

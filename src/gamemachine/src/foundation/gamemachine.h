@@ -218,7 +218,7 @@ public:
 
 	//! 初始化一个对象数据代理。
 	/*!
-	  初始化一个对象画笔。每当新建一个GMModel时，需要调用此方法，为GMModel设置一个数据代理。此方法将用工厂类来为GMModel创建一个GMModelDataProxy对象。<br>
+	  初始化一个对象数据代理。每当新建一个GMModel时，需要调用此方法，为GMModel设置一个数据代理。此方法将用工厂类来为GMModel创建一个GMModelDataProxy对象。<br>
 	  在创建之后，数据代理马上会将GMModel顶点数据传输到GPU。
 	  \param model 需要创建数据代理的模型对象。创建好的GMModelDataProxy会绑定在此对象上。在此对象析构时，GMModelDataProxy也会析构，用户不需要关心它的生命周期。
 	*/

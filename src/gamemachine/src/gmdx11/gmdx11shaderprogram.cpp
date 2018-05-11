@@ -70,6 +70,11 @@ namespace
 			{
 				"GammaCorrection",
 				"Gamma",
+			},
+
+			{
+				"HDR",
+				"ToneMapping",
 			}
 		};
 		return desc;

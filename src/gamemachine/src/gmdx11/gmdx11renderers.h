@@ -84,6 +84,7 @@ protected:
 
 	ID3DX11EffectTechnique* getTechnique();
 	ITexture* getTexture(GMTextureFrames& frames);
+	void setGamma(IShaderProgram* shaderProgram);
 
 public:
 	static GMDx11CubeMapState& getCubeMapState();
@@ -135,6 +136,8 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void draw(GMModel* model) override;
 	virtual void passAllAndDraw(GMModel* model) override;
+
+	void setHDR();
 };
 
 class GMDx11Renderer_Deferred_3D: public GMDx11Renderer
