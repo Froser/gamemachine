@@ -73,7 +73,7 @@ vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 e
 {
 	vec3 R = reflect(-lightDirection_N, normal_N);
 	float theta = dot(eyeDirection_N, R);
-	float specularFactor = pow(theta, shininess);
+	float specularFactor = pow(max(theta, 0), shininess);
 	specularFactor = saturate(specularFactor);
 	return specularFactor * light.LightColor;
 }

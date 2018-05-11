@@ -198,7 +198,7 @@ class GMDefaultDirectLight : ILight
     {
         float3 reflection_N = reflect(-lightDirection_N, normal_N);
         float theta = dot(eyeDirection_N, reflection_N);
-        float factor_Specular = saturate(pow(abs(theta), shininess));
+        float factor_Specular = saturate(pow(max(theta, 0), shininess));
         return factor_Specular;
     }
 };
