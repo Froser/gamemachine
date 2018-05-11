@@ -604,6 +604,10 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	{
 		textureName = desc->DiffuseTextureName;
 	}
+	else if (type == GMTextureType::Specular)
+	{
+		textureName = desc->SpecularTextureName;
+	}
 	else if (type == GMTextureType::NormalMap)
 	{
 		textureName = desc->NormalMapTextureName;

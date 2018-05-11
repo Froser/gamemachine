@@ -281,6 +281,9 @@ GMint GMGLRenderer::getTextureID(GMTextureType type, GMint index)
 	case GMTextureType::Diffuse:
 		return GMTextureRegisterQuery<GMTextureType::Diffuse>::Value + index;
 		break;
+	case GMTextureType::Specular:
+		return GMTextureRegisterQuery<GMTextureType::Specular>::Value + index;
+		break;
 	case GMTextureType::NormalMap:
 		GM_ASSERT(index == 0);
 		return GMTextureRegisterQuery<GMTextureType::NormalMap>::Value;

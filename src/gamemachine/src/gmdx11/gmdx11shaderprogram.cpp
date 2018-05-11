@@ -19,6 +19,7 @@ namespace
 			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
 			"AmbientTextureAttributes",
 			"DiffuseTextureAttributes",
+			"SpecularTextureAttributes",
 			"NormalMapTextureAttributes",
 			"LightmapTextureAttributes",
 			"CubeMapTextureAttributes",

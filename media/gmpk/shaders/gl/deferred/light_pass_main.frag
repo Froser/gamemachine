@@ -48,7 +48,7 @@ void main()
 	vertex.DiffuseTexture = texture(deferred_light_pass_gTexDiffuse, _uv).rgb;
 
 	vec4 ksShininess = texture(deferred_light_pass_gKs_Shininess, _uv);
-	vertex.Ks = ksShininess.rgb;
+	vertex.SpecularTexture = ksShininess.rgb;
 	vertex.Shininess = ksShininess.a;
 
 	_frag_color = PS_3D_CalculateColor(vertex);

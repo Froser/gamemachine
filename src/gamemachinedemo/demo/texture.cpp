@@ -26,6 +26,10 @@ void Demo_Texture::init()
 			gm::GMToolUtil::createTexture("gamemachine.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
+
+			gm::GMToolUtil::createTexture("specular.jpg", &tex);
+			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Specular);
+			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
 	} cb(asDemoGameWorld(getDemoWorldReference()));
 

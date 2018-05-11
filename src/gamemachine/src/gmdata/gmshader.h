@@ -124,6 +124,7 @@ enum class GMTextureType
 
 	Ambient,
 	Diffuse,
+	Specular,
 	NormalMap,
 	Lightmap,
 	EndOfCommonTexture, // 一般纹理从这里结束
@@ -140,6 +141,7 @@ static constexpr GMuint GMMaxTextureCount(GMTextureType type)
 	return
 		type == GMTextureType::Ambient ? 3 :
 		type == GMTextureType::Diffuse ? 3 :
+		type == GMTextureType::Specular ? 3 :
 		type == GMTextureType::NormalMap ? 1 :
 		type == GMTextureType::Lightmap ? 1 :
 		type == GMTextureType::CubeMap ? 1 :
@@ -169,6 +171,7 @@ GM_PRIVATE_OBJECT(GMTexture)
 	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::Diffuse)];
 	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NormalMap)];
 	GMTextureFrames lightMap[GMMaxTextureCount(GMTextureType::Lightmap)];
+	GMTextureFrames specularMap[GMMaxTextureCount(GMTextureType::Specular)];
 	GMTextureFrames cubeMap[GMMaxTextureCount(GMTextureType::CubeMap)];
 };
 
@@ -196,6 +199,8 @@ public:
 			return d->normalMap[index];
 		case GMTextureType::Lightmap:
 			return d->lightMap[index];
+		case GMTextureType::Specular:
+			return d->specularMap[index];
 		case GMTextureType::CubeMap:
 			return d->cubeMap[index];
 		default:
@@ -233,8 +238,8 @@ GM_ALIGNED_STRUCT(GMMaterial)
 	GMfloat shininess = 0;
 	GMfloat refractivity = 0;
 	GMVec3 ka = GMVec3(1);
-	GMVec3 ks = GMVec3(0);
-	GMVec3 kd = GMVec3(0);
+	GMVec3 ks = GMVec3(1);
+	GMVec3 kd = GMVec3(1);
 };
 
 GM_PRIVATE_OBJECT(GMShader)

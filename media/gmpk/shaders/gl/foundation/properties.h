@@ -17,6 +17,7 @@ struct GM_texture_t
 };
 uniform GM_texture_t GM_ambient_textures[MAX_TEXTURE_COUNT];
 uniform GM_texture_t GM_diffuse_textures[MAX_TEXTURE_COUNT];
+uniform GM_texture_t GM_specular_textures[MAX_TEXTURE_COUNT];
 uniform GM_texture_t GM_lightmap_textures[MAX_TEXTURE_COUNT];  // 用到的只有1个
 uniform GM_texture_t GM_normalmap_textures[1];
 uniform samplerCube GM_cubemap_texture; //CubeMap作为单独一个纹理

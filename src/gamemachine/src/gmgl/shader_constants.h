@@ -33,6 +33,9 @@ inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTe
 	static const std::string GMSHADER_DIFFUSE_TEXTURES_0 = std::string(desc->DiffuseTextureName) + "[0]";
 	static const std::string GMSHADER_DIFFUSE_TEXTURES_1 = std::string(desc->DiffuseTextureName) + "[1]";
 	static const std::string GMSHADER_DIFFUSE_TEXTURES_2 = std::string(desc->DiffuseTextureName) + "[2]";
+	static const std::string GMSHADER_SPECULAR_TEXTURES_0 = std::string(desc->SpecularTextureName) + "[0]";
+	static const std::string GMSHADER_SPECULAR_TEXTURES_1 = std::string(desc->SpecularTextureName) + "[1]";
+	static const std::string GMSHADER_SPECULAR_TEXTURES_2 = std::string(desc->SpecularTextureName) + "[2]";
 	static const std::string GMSHADER_NORMALMAP_TEXTURE_0 = std::string(desc->NormalMapTextureName) + "[0]";
 	static const std::string GMSHADER_LIGHTMAP_TEXTURE_0 = std::string(desc->LightMapTextureName) + "[0]";
 
@@ -46,6 +49,10 @@ inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTe
 		return index == 0 ? GMSHADER_DIFFUSE_TEXTURES_0.c_str() :
 			index == 1 ? GMSHADER_DIFFUSE_TEXTURES_1.c_str() :
 			index == 2 ? GMSHADER_DIFFUSE_TEXTURES_2.c_str() : "";
+	case GMTextureType::Specular:
+		return index == 0 ? GMSHADER_SPECULAR_TEXTURES_0.c_str() :
+			index == 1 ? GMSHADER_SPECULAR_TEXTURES_1.c_str() :
+			index == 2 ? GMSHADER_SPECULAR_TEXTURES_2.c_str() : "";
 	case GMTextureType::NormalMap:
 		return index == 0 ? GMSHADER_NORMALMAP_TEXTURE_0.c_str() : "";
 	case GMTextureType::Lightmap:

@@ -59,7 +59,7 @@ void GM_Model3D()
 		 * GM_material.ka;
 	vertex.DiffuseTexture = model3d_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT) * GM_material.kd;
 
-	vertex.Ks = GM_material.ks;
+	vertex.SpecularTexture = model3d_calcTexture(GM_specular_textures, _uv, MAX_TEXTURE_COUNT) * GM_material.ks;
 	vertex.Shininess = GM_material.shininess;
 	vertex.Refractivity = GM_material.refractivity;
 

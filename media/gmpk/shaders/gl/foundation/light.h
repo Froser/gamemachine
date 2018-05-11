@@ -118,7 +118,7 @@ struct PS_3D_INPUT
 	bool HasNormalMap;          // 是否有法线贴图
 	vec3 AmbientLightmapTexture;
 	vec3 DiffuseTexture;
-	vec3 Ks;
+	vec3 SpecularTexture;
 	float Shininess;
 	float Refractivity; 
 };
@@ -201,7 +201,7 @@ vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 	}
 	vec3 finalColor =	saturate(vertex.AmbientLightmapTexture) * calculateGammaCorrection(ambientLight) +
 						saturate(vertex.DiffuseTexture) * calculateGammaCorrection(diffuseLight) * factor_Shadow +
-						specularLight * vertex.Ks * factor_Shadow +
+						specularLight * calculateGammaCorrection(vertex.SpecularTexture) * factor_Shadow +
 						refractionLight;
 	return vec4(finalColor, 1);
 }

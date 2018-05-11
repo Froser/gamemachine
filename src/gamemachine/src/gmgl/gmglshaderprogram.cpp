@@ -27,6 +27,7 @@ namespace
 			{ "scroll_s", "scroll_t", "scale_s", "scale_t", "enabled", "texture" },
 			"GM_ambient_textures",
 			"GM_diffuse_textures",
+			"GM_specular_textures",
 			"GM_normalmap_textures",
 			"GM_lightmap_textures",
 			"GM_cubemap_texture",

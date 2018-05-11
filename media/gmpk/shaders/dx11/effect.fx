@@ -42,18 +42,25 @@ Texture2D AmbientTexture_2: register(t2);
 Texture2D DiffuseTexture_0: register(t3);
 Texture2D DiffuseTexture_1: register(t4);
 Texture2D DiffuseTexture_2: register(t5);
-Texture2D NormalMapTexture: register(t6);
-Texture2D LightmapTexture: register(t7);
-TextureCube CubeMapTexture: register(t8);
+Texture2D SpecularTexture_0: register(t6);
+Texture2D SpecularTexture_1: register(t7);
+Texture2D SpecularTexture_2: register(t8);
+Texture2D NormalMapTexture: register(t9);
+Texture2D LightmapTexture: register(t10);
+TextureCube CubeMapTexture: register(t11);
+
 SamplerState AmbientSampler_0: register(s0);
 SamplerState AmbientSampler_1: register(s1);
 SamplerState AmbientSampler_2: register(s2);
 SamplerState DiffuseSampler_0: register(s3);
 SamplerState DiffuseSampler_1: register(s4);
 SamplerState DiffuseSampler_2: register(s5);
-SamplerState NormalMapSampler: register(s6);
-SamplerState LightmapSampler: register(s7);
-SamplerState CubeMapSampler: register(s8);
+SamplerState SpecularSampler_0: register(s6);
+SamplerState SpecularSampler_1: register(s7);
+SamplerState SpecularSampler_2: register(s8);
+SamplerState NormalMapSampler: register(s9);
+SamplerState LightmapSampler: register(s10);
+SamplerState CubeMapSampler: register(s11);
 
 SamplerState ShadowMapSampler
 {
@@ -140,6 +147,7 @@ class GMCubeMapTexture : GMTexture
 
 GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
+GMTexture SpecularTextureAttributes[3];
 GMTexture NormalMapTextureAttributes[1];
 GMLightmapTexture LightmapTextureAttributes[1];
 GMCubeMapTexture CubeMapTextureAttributes[1];
@@ -399,7 +407,7 @@ struct PS_3D_INPUT
     bool HasNormalMap;          // 是否有法线贴图
     float3 AmbientLightmapTexture;
     float3 DiffuseTexture;
-    float3 Ks;
+    float3 SpecularTexture;
     float Shininess;
     float Refractivity; 
 };
@@ -474,7 +482,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
     float4 color_Diffuse = factor_Shadow * CalculateGammaCorrection(factor_Diffuse) * saturate(ToFloat4(input.DiffuseTexture));
 
     // 计算Specular
-    float4 color_Specular = factor_Shadow * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.Ks);
+    float4 color_Specular = factor_Shadow * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.SpecularTexture);
     
     // 计算折射
     float4 color_Refractivity = IlluminateRefraction(
@@ -568,9 +576,22 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
         color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
     }
 
+    // 计算Specular(如果有Specular贴图)
+    float4 color_Specular = float4(0, 0, 0, 0);
+    if (HasNoTexture(SpecularTextureAttributes))
+    {
+        color_Specular = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        color_Specular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord);
+        color_Specular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord);
+        color_Specular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord);
+    }
+
     commonInput.AmbientLightmapTexture = color_Ambient * Material.Ka;
     commonInput.DiffuseTexture = color_Diffuse * Material.Kd;
-    commonInput.Ks = Material.Ks;
+    commonInput.SpecularTexture = color_Specular * Material.Ks;
     commonInput.Shininess = Material.Shininess;
     commonInput.Refractivity = Material.Refractivity;
 
@@ -730,6 +751,18 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     output.TextureAmbient = texAmbient * Material.Ka;
     output.TextureDiffuse = texDiffuse * Material.Kd;
 
+    float4 texSpecular = float4(0, 0, 0, 0);
+    if (HasNoTexture(SpecularTextureAttributes))
+    {
+        texSpecular = float4(1.0f, 1.0f, 1.0f, 1.0f);
+    }
+    else
+    {
+        texSpecular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord);
+        texSpecular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord);
+        texSpecular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord);
+    }
+
     if (PS_3D_HasNormalMap())
     {
         output.Tangent_Eye = Float3ToTexture(normalize(mul(input.Tangent, normalEyeTransform)));
@@ -743,7 +776,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
         output.NormalMap_HasNormalMap = float4(0, 0, 0, 0);
     }
 
-    output.Ks_Shininess = ToFloat4(Material.Ks, Material.Shininess);
+    output.Ks_Shininess = ToFloat4(Material.Ks * texSpecular.rgb, Material.Shininess);
     return output;
 }
 
@@ -788,7 +821,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         normalMapFlag = GM_DeferredNormalMap_bNormalMap_MSAA.Load(coord, 0);
     }
 
-    commonInput.Ks = KSS.rgb;
+    commonInput.SpecularTexture = KSS.rgb;
     commonInput.Shininess = KSS.a;
     commonInput.WorldPos = PosRef.rgb;
     commonInput.Refractivity = PosRef.a;

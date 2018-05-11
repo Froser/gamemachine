@@ -84,6 +84,7 @@ struct GMShaderVariablesDesc
 	GMShaderVariablesTextureDesc TextureAttributes;
 	const char* AmbientTextureName;
 	const char* DiffuseTextureName;
+	const char* SpecularTextureName;
 	const char* NormalMapTextureName;
 	const char* LightMapTextureName;
 	const char* CubeMapTextureName;
