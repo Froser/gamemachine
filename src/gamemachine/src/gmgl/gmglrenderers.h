@@ -101,8 +101,20 @@ public:
 	virtual void afterDraw(GMModel* model) override;
 };
 
+GM_PRIVATE_OBJECT(GMGLRenderer_Filter)
+{
+	struct HDRState
+	{
+		GMToneMapping::Mode toneMapping = GMToneMapping::Reinhard;
+		bool HDR = false;
+	};
+	HDRState state;
+};
+
 class GMGLRenderer_Filter : public GMGLRenderer
 {
+	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_Filter, GMGLRenderer)
+
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -111,6 +123,9 @@ class GMGLRenderer_Filter : public GMGLRenderer
 
 protected:
 	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
+
+private:
+	void setHDR(IShaderProgram* shaderProgram);
 };
 
 class GMGLRenderer_LightPass : public GMGLRenderer

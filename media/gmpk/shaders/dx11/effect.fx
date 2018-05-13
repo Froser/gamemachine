@@ -261,14 +261,13 @@ GMScreenInfo ScreenInfo;
 // Gamma Correction
 //--------------------------------------------------------------------------------------
 bool GammaCorrection;
-float Gamma;
+float GammaInv;
 float4 CalculateGammaCorrection(float4 factor)
 {
     if (!GammaCorrection)
         return factor;
 
-    float inverseGamma = 1.0f / Gamma;
-    return ToFloat4(pow(factor.rgb, float3(inverseGamma, inverseGamma, inverseGamma)));
+    return ToFloat4(pow(factor.rgb, float3(GammaInv, GammaInv, GammaInv)));
 }
 
 //--------------------------------------------------------------------------------------
@@ -1091,8 +1090,7 @@ float4 PS_Filter(PS_INPUT input) : SV_TARGET
     else
         color = Filter.Sample(FilterTexture, coord);
 
-    color = max(color, 0);
-    return CalculateWithToneMapping(color);
+    return (CalculateGammaCorrection(CalculateWithToneMapping(max(color, 0))));
 }
 
 //--------------------------------------------------------------------------------------

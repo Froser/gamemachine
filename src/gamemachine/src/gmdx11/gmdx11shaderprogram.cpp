@@ -69,7 +69,7 @@ namespace
 
 			{
 				"GammaCorrection",
-				"Gamma",
+				"GammaInv",
 			},
 
 			{

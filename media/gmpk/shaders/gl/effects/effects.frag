@@ -3,6 +3,23 @@ in vec2 _texCoords;
 out vec4 frag_color;
 uniform sampler2D GM_framebuffer;
 
+uniform int GM_HDR;
+uniform int GM_toneMapping;
+vec4 calculateWithToneMapping(vec4 c)
+{
+	const int ReinhardToneMapping = 0;
+
+    if (GM_HDR > 0)
+    {
+    	if (GM_toneMapping == ReinhardToneMapping)
+    	{
+    		vec3 color = c.rgb;
+    		return vec4(color / (color + vec3(1,1,1)), 1);
+    	}
+    }
+    return c;
+}
+
 uniform int GM_multisampling;
 uniform int GM_screenWidth;
 uniform int GM_screenHeight;
@@ -83,17 +100,13 @@ subroutine (GM_FilterRoutineType) vec3 EdgeDetectFilter(sampler2D t, vec2 uv)
 
 subroutine (GM_FilterRoutineType) vec3 DefaultFilter(sampler2D t, vec2 uv)
 {
-		float kernels[9] = float[](
-		1, 1, 1,
-		1, -8, 1,
-		1, 1, 1
-	);
-	return kernel(kernels, t, uv);
+	return texture(t, uv).rgb;
 }
 
 subroutine uniform GM_FilterRoutineType GM_filter;
 
 void main()
 {
-	frag_color = vec4(GM_filter(GM_framebuffer, _texCoords), 1);
+	frag_color = vec4(max(GM_filter(GM_framebuffer, _texCoords), vec3(0, 0, 0)), 1);
+	frag_color = calculateWithToneMapping(frag_color);
 }

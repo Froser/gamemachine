@@ -16,14 +16,13 @@ const int GM_DirectLight = 1;
 
 // Gamma校正
 uniform int GM_gammaCorrection;
-uniform float GM_gamma;
+uniform float GM_gammaInv;
 vec3 calculateGammaCorrection(vec3 factor)
 {
     if (GM_gammaCorrection == 0)
         return factor;
 
-    float inverseGamma = 1.0f / GM_gamma;
-    return pow(factor, vec3(inverseGamma, inverseGamma, inverseGamma));
+    return pow(factor, vec3(GM_gammaInv, GM_gammaInv, GM_gammaInv));
 }
 
 // 光照实现
@@ -65,8 +64,8 @@ vec3 GMLight_DirectLightAmbient(GM_light_t light)
 vec3 GMLight_DirectLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N)
 {
 	float diffuseFactor = dot(lightDirection_N, normal_N);
-	diffuseFactor = saturate(diffuseFactor);
-	return diffuseFactor * light.LightColor;
+	diffuseFactor = diffuseFactor;
+	return max(diffuseFactor * light.LightColor, 0);
 }
 
 vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
@@ -74,7 +73,7 @@ vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 e
 	vec3 R = normalize(reflect(-lightDirection_N, normal_N));
 	float theta = max(dot(eyeDirection_N, R), 0);
 	float specularFactor = (theta == 0 && shininess == 0) ? 0 : pow(theta, shininess);
-	specularFactor = saturate(specularFactor);
+	specularFactor = specularFactor;
 	return specularFactor * light.LightColor;
 }
 
@@ -165,6 +164,10 @@ vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 	vec3 ambientLight = vec3(0, 0, 0);
 	vec3 diffuseLight = vec3(0, 0, 0);
 	vec3 specularLight = vec3(0, 0, 0);
+	vertex.AmbientLightmapTexture = max(vertex.AmbientLightmapTexture, vec3(0, 0, 0));
+    vertex.DiffuseTexture = max(vertex.DiffuseTexture, vec3(0, 0, 0));
+    vertex.SpecularTexture = max(vertex.SpecularTexture, vec3(0, 0, 0));
+
 	vec3 refractionLight = vec3(0, 0, 0);
 	vec3 eyeDirection_eye = -(GM_view_matrix * vec4(vertex.WorldPos, 1)).xyz;
 	vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
@@ -199,8 +202,8 @@ vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 				refractionLight += calculateRefractionByNormalTangent(vertex.WorldPos, vertex.TangentSpace, vertex.Refractivity);
 		}
 	}
-	vec3 finalColor =	saturate(vertex.AmbientLightmapTexture) * calculateGammaCorrection(ambientLight) +
-						saturate(vertex.DiffuseTexture) * calculateGammaCorrection(diffuseLight) * factor_Shadow +
+	vec3 finalColor =	vertex.AmbientLightmapTexture * calculateGammaCorrection(ambientLight) +
+						vertex.DiffuseTexture * calculateGammaCorrection(diffuseLight) * factor_Shadow +
 						specularLight * calculateGammaCorrection(vertex.SpecularTexture) * factor_Shadow +
 						refractionLight;
 	return vec4(finalColor, 1);

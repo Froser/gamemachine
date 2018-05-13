@@ -158,7 +158,7 @@ void GMGammaHelper::setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine*
 		GMfloat gamma = engine->getGammaValue();
 		if (gamma != m_gamma)
 		{
-			shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
+			shaderProgram->setFloat(desc->GammaCorrection.GammaInvValue, gamma);
 			m_gamma = gamma;
 		}
 	}
@@ -583,9 +583,34 @@ void GMGLRenderer_Filter::afterDraw(GMModel* model)
 void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	D_BASE(db, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	GM_ASSERT(shaderProgram);
 	shaderProgram->useProgram();
+
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	if (d->state.HDR != db->engine->needHDR() || d->state.toneMapping != db->engine->getToneMapping())
+	{
+		d->state.HDR = db->engine->needHDR();
+		d->state.toneMapping = db->engine->getToneMapping();
+		if (d->state.HDR)
+		{
+			db->gammaHelper.setGamma(desc, db->engine, shaderProgram);
+			setHDR(shaderProgram);
+		}
+		else
+		{
+			shaderProgram->setBool(desc->HDR.HDR, false);
+		}
+	}
+}
+
+void GMGLRenderer_Filter::setHDR(IShaderProgram* shaderProgram)
+{
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	D(d);
+	shaderProgram->setBool(desc->HDR.HDR, true);
+	shaderProgram->setInt(desc->HDR.ToneMapping, d->state.toneMapping);
 }
 
 void GMGLRenderer_Filter::endModel()
@@ -601,12 +626,13 @@ IShaderProgram* GMGLRenderer_Filter::getShaderProgram()
 GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
+	D_BASE(db, Base);
 	GMint texId = getTextureID(type, index);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[d->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
 	GM_ASSERT(b);
 	return texId;
 }

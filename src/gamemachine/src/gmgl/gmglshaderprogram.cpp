@@ -76,7 +76,12 @@ namespace
 
 			{
 				"GM_gammaCorrection",
-				"GM_gamma"
+				"GM_gammaInv"
+			},
+
+			{
+				"GM_HDR",
+				"GM_toneMapping",
 			}
 		};
 		return desc;
