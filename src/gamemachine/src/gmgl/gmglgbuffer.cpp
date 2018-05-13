@@ -43,8 +43,8 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	GMFramebufferFormat formats[] = {
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,

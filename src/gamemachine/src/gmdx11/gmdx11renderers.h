@@ -126,8 +126,24 @@ public:
 	virtual void setTextures(GMModel* model);
 };
 
+GM_PRIVATE_OBJECT(GMDx11Renderer_Filter)
+{
+	struct HDRState
+	{
+		GMToneMapping::Mode toneMapping = GMToneMapping::Reinhard;
+		bool HDR = false;
+	};
+	HDRState state;
+};
+
 class GMDx11Renderer_Filter : public GMDx11Renderer
 {
+	DECLARE_PRIVATE_AND_BASE(GMDx11Renderer_Filter, GMDx11Renderer)
+
+public:
+	GMDx11Renderer_Filter();
+
+private:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_Filter";
@@ -137,7 +153,7 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 	virtual void draw(GMModel* model) override;
 	virtual void passAllAndDraw(GMModel* model) override;
 
-	void setHDR();
+	void setHDR(IShaderProgram* shaderProgram);
 };
 
 class GMDx11Renderer_Deferred_3D: public GMDx11Renderer

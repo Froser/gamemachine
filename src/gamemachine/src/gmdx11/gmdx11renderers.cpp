@@ -907,6 +907,11 @@ void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
 	}
 }
 
+GMDx11Renderer_Filter::GMDx11Renderer_Filter()
+{
+	setHDR(getEngine()->getShaderProgram());
+}
+
 void GMDx11Renderer_Filter::draw(GMModel* model)
 {
 	D(d);
@@ -920,7 +925,7 @@ void GMDx11Renderer_Filter::draw(GMModel* model)
 
 void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 {
-	D(d);
+	D_BASE(d, Base);
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
@@ -950,6 +955,7 @@ void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	GMDx11Renderer::beginModel(model, parent);
 
 	GMDx11EffectVariableBank& bank = getVarBank();
@@ -963,22 +969,40 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[filterMode], GMShaderType::Effect);
 	GM_ASSERT(b);
 
-	if (getEngine()->needHDR())
+	if (d->state.HDR != getEngine()->needHDR() || d->state.toneMapping != getEngine()->getToneMapping())
 	{
-		// 其实Filter和3D的着色器是同一个，因此这里本身不需要再次设置Gamma
-		// 不过考虑到之后可能是分开的着色器程序，先设置上，开销也不大
-		setGamma(shaderProgram);
-		setHDR();
+		d->state.HDR = getEngine()->needHDR();
+		d->state.toneMapping = getEngine()->getToneMapping();
+		if (d->state.HDR)
+		{
+			setGamma(shaderProgram);
+			setHDR(shaderProgram);
+		}
+		else
+		{
+			shaderProgram->setBool(desc->HDR.HDR, false);
+		}
 	}
 }
 
-void GMDx11Renderer_Filter::setHDR()
+void GMDx11Renderer_Filter::setHDR(IShaderProgram* shaderProgram)
 {
-
+	static const GMShaderVariablesDesc* desc = getVariablesDesc();
+	D(d);
+	shaderProgram->setBool(desc->HDR.HDR, true);
+	if (d->state.toneMapping == GMToneMapping::Reinhard)
+	{
+		bool b = shaderProgram->setInterfaceInstance(desc->HDR.ToneMapping, "ReinhardToneMapping", GMShaderType::Effect);
+		GM_ASSERT(b);
+	}
+	else
+	{
+		GM_ASSERT(false);
+		gm_warning("Invalid tonemapping.");
+	}
 }
 
 void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)

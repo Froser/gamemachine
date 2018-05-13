@@ -17,7 +17,7 @@ namespace
 		"GM_DeferredTangent_Eye",
 		"GM_DeferredBitangent_Eye",
 		"GM_DeferredNormalMap_bNormalMap",
-		"GM_DeferredKs_Shininess",
+		"GM_DeferredSpecular_Shininess",
 	};
 
 	constexpr const char* GeometryMSAAFramebufferNames[] = {
@@ -28,7 +28,7 @@ namespace
 		"GM_DeferredTangent_Eye_MSAA",
 		"GM_DeferredBitangent_Eye_MSAA",
 		"GM_DeferredNormalMap_bNormalMap_MSAA",
-		"GM_DeferredKs_Shininess_MSAA",
+		"GM_DeferredSpecular_Shininess_MSAA",
 	};
 }
 
@@ -82,8 +82,8 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 	GMFramebufferFormat formats[] = {
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,
 		GMFramebufferFormat::R8G8B8A8_UNORM,

@@ -28,7 +28,6 @@ public:
 	virtual void event(gm::GameMachineEvent evt) override;
 
 private:
-	gm::GMCubeMapGameObject* createCubeMap();
 	void handleMouseEvent();
 	void handleDragging();
 

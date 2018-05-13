@@ -71,9 +71,9 @@ vec3 GMLight_DirectLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 ey
 
 vec3 GMLight_DirectLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
 {
-	vec3 R = reflect(-lightDirection_N, normal_N);
-	float theta = dot(eyeDirection_N, R);
-	float specularFactor = pow(max(theta, 0), shininess);
+	vec3 R = normalize(reflect(-lightDirection_N, normal_N));
+	float theta = max(dot(eyeDirection_N, R), 0);
+	float specularFactor = (theta == 0 && shininess == 0) ? 0 : pow(theta, shininess);
 	specularFactor = saturate(specularFactor);
 	return specularFactor * light.LightColor;
 }

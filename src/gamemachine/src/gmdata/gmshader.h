@@ -235,7 +235,7 @@ public:
 // 光照参数
 GM_ALIGNED_STRUCT(GMMaterial)
 {
-	GMfloat shininess = 0;
+	GMfloat shininess = 1;
 	GMfloat refractivity = 0;
 	GMVec3 ka = GMVec3(1);
 	GMVec3 ks = GMVec3(1);

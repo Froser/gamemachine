@@ -191,14 +191,15 @@ class GMDefaultDirectLight : ILight
 
     float4 IlluminateDiffuse(float3 lightDirection_N, float3 normal_N)
     {
-        return saturate(dot(lightDirection_N, normal_N));
+        return max(dot(lightDirection_N, normal_N), 0);
     }
 
     float4 IlluminateSpecular(float3 lightDirection_N, float3 eyeDirection_N, float3 normal_N, float shininess)
     {
-        float3 reflection_N = reflect(-lightDirection_N, normal_N);
+        float3 reflection_N = normalize(reflect(-lightDirection_N, normal_N));
         float theta = dot(eyeDirection_N, reflection_N);
-        float factor_Specular = saturate(pow(max(theta, 0), shininess));
+        theta = max(theta, 0);
+        float factor_Specular = (theta == 0 && shininess == 0) ? 0 : pow(max(theta, 0), shininess);
         return factor_Specular;
     }
 };
@@ -268,6 +269,34 @@ float4 CalculateGammaCorrection(float4 factor)
 
     float inverseGamma = 1.0f / Gamma;
     return ToFloat4(pow(factor.rgb, float3(inverseGamma, inverseGamma, inverseGamma)));
+}
+
+//--------------------------------------------------------------------------------------
+// HDR
+//--------------------------------------------------------------------------------------
+bool HDR;
+
+interface IToneMapping
+{
+    float3 ToneMapping(float3 c);
+};
+
+class GMReinhardToneMapping : IToneMapping
+{
+    float3 ToneMapping(float3 c)
+    {
+        return c / (c + float3(1, 1, 1));
+    }
+};
+
+IToneMapping ToneMapping;
+GMReinhardToneMapping ReinhardToneMapping;
+
+float4 CalculateWithToneMapping(float4 c)
+{
+    if (HDR)
+        return ToFloat4(ToneMapping.ToneMapping(c.rgb));
+    return c;
 }
 
 //--------------------------------------------------------------------------------------
@@ -453,6 +482,9 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
     float4 factor_Ambient = float4(0, 0, 0, 0);
     float4 factor_Diffuse = float4(0, 0, 0, 0);
     float4 factor_Specular = float4(0, 0, 0, 0);
+    input.AmbientLightmapTexture = max(input.AmbientLightmapTexture, float3(0, 0, 0));
+    input.DiffuseTexture = max(input.DiffuseTexture, float3(0, 0, 0));
+    input.SpecularTexture = max(input.SpecularTexture, float3(0, 0, 0));
 
     // 将法线换算到眼睛坐标系
     float3 position_Eye = (mul(ToFloat4(input.WorldPos), ViewMatrix)).xyz;
@@ -478,8 +510,8 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
             factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
         }
     }
-    float4 color_Ambient = CalculateGammaCorrection(factor_Ambient) * saturate(ToFloat4(input.AmbientLightmapTexture));
-    float4 color_Diffuse = factor_Shadow * CalculateGammaCorrection(factor_Diffuse) * saturate(ToFloat4(input.DiffuseTexture));
+    float4 color_Ambient = CalculateGammaCorrection(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);
+    float4 color_Diffuse = factor_Shadow * CalculateGammaCorrection(factor_Diffuse) * ToFloat4(input.DiffuseTexture);
 
     // 计算Specular
     float4 color_Specular = factor_Shadow * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.SpecularTexture);
@@ -497,8 +529,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
         );
     color_Refractivity = color_Refractivity;
 
-    float4 finalColor = saturate(color_Ambient + color_Diffuse + color_Specular + color_Refractivity);
-    return finalColor;
+    return color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
 }
 
 VS_OUTPUT VS_3D( VS_INPUT input )
@@ -680,7 +711,7 @@ Texture2D GM_DeferredTextureDiffuse;
 Texture2D GM_DeferredTangent_Eye;
 Texture2D GM_DeferredBitangent_Eye;
 Texture2D GM_DeferredNormalMap_bNormalMap;
-Texture2D GM_DeferredKs_Shininess;
+Texture2D GM_DeferredSpecular_Shininess;
 
 Texture2DMS<float4> GM_DeferredPosition_World_Refractivity_MSAA;
 Texture2DMS<float4> GM_DeferredNormal_World_MSAA;
@@ -689,7 +720,7 @@ Texture2DMS<float4> GM_DeferredTextureDiffuse_MSAA;
 Texture2DMS<float4> GM_DeferredTangent_Eye_MSAA;
 Texture2DMS<float4> GM_DeferredBitangent_Eye_MSAA;
 Texture2DMS<float4> GM_DeferredNormalMap_bNormalMap_MSAA;
-Texture2DMS<float4> GM_DeferredKs_Shininess_MSAA;
+Texture2DMS<float4> GM_DeferredSpecular_Shininess_MSAA;
 
 // [-1, 1] -> [0, 1]
 float4 Float3ToTexture(float3 normal)
@@ -706,7 +737,7 @@ struct VS_GEOMETRY_OUTPUT
     float4 Tangent_Eye                       : SV_TARGET4; //需要将区间转化到[0, 1]
     float4 Bitangent_Eye                     : SV_TARGET5; //需要将区间转化到[0, 1]
     float4 NormalMap_HasNormalMap            : SV_TARGET6;
-    float4 Ks_Shininess                      : SV_TARGET7;
+    float4 Specular_Shininess                : SV_TARGET7;
 };
 
 VS_OUTPUT VS_3D_GeometryPass(VS_INPUT input)
@@ -776,7 +807,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
         output.NormalMap_HasNormalMap = float4(0, 0, 0, 0);
     }
 
-    output.Ks_Shininess = ToFloat4(Material.Ks * texSpecular, Material.Shininess);
+    output.Specular_Shininess = ToFloat4(Material.Ks * texSpecular, Material.Shininess);
     return output;
 }
 
@@ -806,7 +837,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Load(coord)).rgb;
         commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
-        KSS = GM_DeferredKs_Shininess.Load(coord);
+        KSS = GM_DeferredSpecular_Shininess.Load(coord);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap.Load(coord);
     }
     else
@@ -817,7 +848,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_MSAA, coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient_MSAA.Load(coord, 0)).rgb;
         commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse_MSAA.Load(coord, 0)).rgb;
-        KSS = GM_DeferredKs_Shininess_MSAA.Load(coord, 0);
+        KSS = GM_DeferredSpecular_Shininess_MSAA.Load(coord, 0);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap_MSAA.Load(coord, 0);
     }
 
@@ -1053,11 +1084,15 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
 
 float4 PS_Filter(PS_INPUT input) : SV_TARGET
 {
+    float4 color;
     int3 coord = int3(input.Texcoord * float2(ScreenInfo.ScreenWidth, ScreenInfo.ScreenHeight), 0);
     if (ScreenInfo.Multisampling)
-        return Filter.SampleMSAA(FilterTexture_MSAA, coord, 0);
+        color = Filter.SampleMSAA(FilterTexture_MSAA, coord, 0);
+    else
+        color = Filter.Sample(FilterTexture, coord);
 
-    return Filter.Sample(FilterTexture, coord);
+    color = max(color, 0);
+    return CalculateWithToneMapping(color);
 }
 
 //--------------------------------------------------------------------------------------
