@@ -327,6 +327,102 @@ namespace
 		GMDx11GraphicEngine* engine = nullptr;
 		ID3D11DepthStencilState* states[2][2][3] = { 0 };
 	};
+
+
+	GM_PRIVATE_OBJECT(GMDx11WhiteTexture)
+	{
+		GMComPtr<ID3D11Device> device;
+		GMComPtr<ID3D11DeviceContext> deviceContext;
+		GMComPtr<ID3D11Resource> resource;
+		GMComPtr<ID3D11ShaderResourceView> shaderResourceView;
+		GMComPtr<ID3D11SamplerState> samplerState;
+	};
+
+	class GMDx11WhiteTexture : public ITexture
+	{
+		DECLARE_PRIVATE(GMDx11WhiteTexture)
+
+	public:
+		GMDx11WhiteTexture::GMDx11WhiteTexture()
+		{
+			D(d);
+			GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
+			GM_ASSERT(d->device);
+
+			GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+			GM_ASSERT(d->deviceContext);
+		}
+
+		virtual void init() override
+		{
+			static GMbyte texData[] = { 0xFF, 0xFF, 0xFF, 0xFF };
+			// 新建一个RGBA白色纹理
+			D(d);
+			D3D11_TEXTURE2D_DESC texDesc = { 0 };
+			D3D11_SUBRESOURCE_DATA resourceData;
+			GMComPtr<ID3D11Texture2D> texture;
+
+			texDesc.Width = 1;
+			texDesc.Height = 1;
+			texDesc.MipLevels = 1;
+			texDesc.ArraySize = 1;
+			texDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			texDesc.SampleDesc.Count = 1;
+			texDesc.SampleDesc.Quality = 0;
+			texDesc.Usage = D3D11_USAGE_DEFAULT;
+			texDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+			texDesc.CPUAccessFlags = 0;
+			texDesc.MiscFlags = 0;
+
+			GMint index = 0;
+			GM_ASSERT(texDesc.ArraySize == 1);
+			GMuint pitch = 1;
+			resourceData.pSysMem = texData;
+			resourceData.SysMemPitch = pitch * 4;
+
+			GM_DX_HR(d->device->CreateTexture2D(&texDesc, &resourceData, &texture));
+			d->resource = texture;
+
+			GM_ASSERT(d->resource);
+			GM_DX_HR(d->device->CreateShaderResourceView(
+				d->resource,
+				NULL,
+				&d->shaderResourceView
+			));
+		}
+
+		virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override
+		{
+			D(d);
+			if (!d->samplerState)
+			{
+				// 创建采样器
+				D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
+				if (frames)
+				{
+					desc.Filter = GMDx11Helper::GMGetDx11Filter(frames->getMinFilter(), frames->getMagFilter());
+					desc.AddressU = desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
+				}
+				GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));
+			}
+
+			GM_ASSERT(d->samplerState);
+			d->deviceContext->PSSetShaderResources(textureIndex, 1, &d->shaderResourceView);
+			d->deviceContext->PSSetSamplers(textureIndex, 1, &d->samplerState);
+		}
+	};
+
+	ITexture* getWhiteTexture()
+	{
+		static bool s_inited = false;
+		static GMDx11WhiteTexture s_texture;
+		if (!s_inited)
+		{
+			s_texture.init();
+			s_inited = true;
+		}
+		return &s_texture;
+	}
 }
 
 #define EFFECT_VARIABLE(funcName, name) \
@@ -535,11 +631,24 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
-		for (GMint i = 0; i < count; i++)
+		GMint missedTextureCount = 0;
+		for (GMint i = 0; i < count; ++i)
 		{
 			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
 			// 写入纹理属性，如是否绘制，偏移等
-			applyTextureAttribute(model, getTexture(textures), type, i);
+			ITexture* texture = getTexture(textures);
+			applyTextureAttribute(model, texture, type, i);
+			if (!texture)
+				++missedTextureCount;
+		}
+
+		if (missedTextureCount == count && (
+			type == GMTextureType::Ambient ||
+			type == GMTextureType::Diffuse ||
+			type == GMTextureType::Specular
+			))
+		{
+			applyTextureAttribute(model, getWhiteTexture(), type, 0);
 		}
 	}
 
@@ -558,6 +667,7 @@ void GMDx11Renderer::setTextures(GMModel* model)
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
+		GMint missedTextureCount = 0;
 		for (GMint i = 0; i < count; ++i, ++registerId)
 		{
 			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
@@ -569,6 +679,19 @@ void GMDx11Renderer::setTextures(GMModel* model)
 				// 激活动画序列
 				texture->useTexture(&textures, registerId);
 			}
+			else
+			{
+				++missedTextureCount;
+			}
+		}
+
+		if (missedTextureCount == count && (
+			type == GMTextureType::Ambient ||
+			type == GMTextureType::Diffuse ||
+			type == GMTextureType::Specular
+			))
+		{
+			getWhiteTexture()->useTexture(nullptr, registerId - count);
 		}
 	}
 
@@ -871,6 +994,22 @@ ID3DX11EffectTechnique* GMDx11Renderer::getTechnique()
 		GM_ASSERT(d->technique);
 	}
 	return d->technique;
+}
+
+void GMDx11Renderer_2D::prepareTextures(GMModel* model)
+{
+	D(d);
+	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
+	{
+		GMint count = GMMaxTextureCount(type);
+		for (GMint i = 0; i < count; ++i)
+		{
+			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
+			// 写入纹理属性，如是否绘制，偏移等
+			ITexture* texture = getTexture(textures);
+			applyTextureAttribute(model, texture, type, i);
+		}
+	}
 }
 
 void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)

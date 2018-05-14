@@ -581,43 +581,22 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 
     // 计算Ambient
     float4 color_Ambient = float4(0, 0, 0, 0);
-    if (HasNoTexture(AmbientTextureAttributes))
-    {
-        color_Ambient = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-    else
-    {
-        color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
-        color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
-        color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
-    }
+    color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+    color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
+    color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
     color_Ambient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
 
     // 计算Diffuse
     float4 color_Diffuse = float4(0, 0, 0, 0);
-    if (HasNoTexture(DiffuseTextureAttributes))
-    {
-        color_Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
-    }
-    else
-    {
-        color_Diffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
-        color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
-        color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
-    }
+    color_Diffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
+    color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
+    color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
 
     // 计算Specular(如果有Specular贴图)
     float4 color_Specular = 0;
-    if (HasNoTexture(SpecularTextureAttributes))
-    {
-        color_Specular = 1.f;
-    }
-    else
-    {
-        color_Specular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
-        color_Specular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
-        color_Specular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
-    }
+    color_Specular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
+    color_Specular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
+    color_Specular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
 
     commonInput.AmbientLightmapTexture = color_Ambient * Material.Ka;
     commonInput.DiffuseTexture = color_Diffuse * Material.Kd;
@@ -757,41 +736,21 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 
     float4 texAmbient = float4(0, 0, 0, 0);
     float4 texDiffuse = float4(0, 0, 0, 0);
-    if (HasNoTexture(AmbientTextureAttributes))
-    {
-        texAmbient = float4(1, 1, 1, 1);
-    }
-    else
-    {
-        texAmbient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
-        texAmbient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
-        texAmbient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
-        texAmbient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
-    }
-    if (HasNoTexture(DiffuseTextureAttributes))
-    {
-        texDiffuse = float4(1, 1, 1, 1);
-    }
-    else
-    {
-        texDiffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
-        texDiffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
-        texDiffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
-    }
+    texAmbient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
+    texAmbient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
+    texAmbient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
+    texAmbient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
+    
+    texDiffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
+    texDiffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
+    texDiffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
     output.TextureAmbient = texAmbient * Material.Ka;
     output.TextureDiffuse = texDiffuse * Material.Kd;
 
     float texSpecular = 0;
-    if (HasNoTexture(SpecularTextureAttributes))
-    {
-        texSpecular = 1.f;
-    }
-    else
-    {
-        texSpecular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
-        texSpecular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
-        texSpecular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
-    }
+    texSpecular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
+    texSpecular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
+    texSpecular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
 
     if (PS_3D_HasNormalMap())
     {

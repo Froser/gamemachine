@@ -104,6 +104,8 @@ class GMDx11Renderer_2D : public GMDx11Renderer
 	{
 		return "GMTech_2D";
 	}
+
+	virtual void prepareTextures(GMModel* model);
 };
 
 class GMDx11Renderer_Glyph : public GMDx11Renderer
