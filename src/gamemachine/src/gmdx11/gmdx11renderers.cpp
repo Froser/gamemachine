@@ -343,7 +343,7 @@ namespace
 		DECLARE_PRIVATE(GMDx11WhiteTexture)
 
 	public:
-		GMDx11WhiteTexture::GMDx11WhiteTexture()
+		GMDx11WhiteTexture()
 		{
 			D(d);
 			GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
@@ -645,7 +645,8 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 		if (missedTextureCount == count && (
 			type == GMTextureType::Ambient ||
 			type == GMTextureType::Diffuse ||
-			type == GMTextureType::Specular
+			type == GMTextureType::Specular ||
+			type == GMTextureType::Lightmap
 			))
 		{
 			applyTextureAttribute(model, getWhiteTexture(), type, 0);
@@ -688,7 +689,8 @@ void GMDx11Renderer::setTextures(GMModel* model)
 		if (missedTextureCount == count && (
 			type == GMTextureType::Ambient ||
 			type == GMTextureType::Diffuse ||
-			type == GMTextureType::Specular
+			type == GMTextureType::Specular ||
+			type == GMTextureType::Lightmap
 			))
 		{
 			getWhiteTexture()->useTexture(nullptr, registerId - count);

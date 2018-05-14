@@ -30,7 +30,6 @@ in vec4 _deferred_geometry_pass_position_world;
 
 vec4 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 {
-	bool hasTexture = false;
 	vec4 result = vec4(0);
 	for (int i = 0; i < size; i++)
 	{
@@ -40,14 +39,8 @@ vec4 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT]
 		result += textures[i].enabled == 1
 			? texture(textures[i].texture, uv * vec2(textures[i].scale_s, textures[i].scale_t) + vec2(textures[i].scroll_s, textures[i].scroll_t))
 			: vec4(0);
-		if (textures[i].enabled == 1)
-			hasTexture = true;
 	}
-
-	if (!hasTexture)
-		return vec4(1);
-
-	return clamp(result, 0.0f, 1.0f);
+	return result;
 }
 
 void deferred_geometry_pass_calcEyeSpace()

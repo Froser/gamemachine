@@ -123,18 +123,6 @@ class GMTexture
     }
 };
 
-class GMLightmapTexture : GMTexture
-{
-    float4 Sample(Texture2D tex, SamplerState ss, float2 texcoord)
-    {
-        if (!Enabled)
-            return float4(1.0f, 1.0f, 1.0f, 1.0f);
-
-        float2 transformedTexcoord = texcoord * float2(ScaleX, ScaleY) + float2(OffsetX, OffsetY);
-        return tex.Sample(ss, transformedTexcoord);
-    }
-};
-
 class GMCubeMapTexture : GMTexture
 {
     float4 Sample(TextureCube tex, SamplerState ss, float3 texcoord)
@@ -149,7 +137,7 @@ GMTexture AmbientTextureAttributes[3];
 GMTexture DiffuseTextureAttributes[3];
 GMTexture SpecularTextureAttributes[3];
 GMTexture NormalMapTextureAttributes[1];
-GMLightmapTexture LightmapTextureAttributes[1];
+GMTexture LightmapTextureAttributes[1];
 GMCubeMapTexture CubeMapTextureAttributes[1];
 
 interface ILight

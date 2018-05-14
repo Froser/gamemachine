@@ -147,6 +147,60 @@ namespace
 			shaderProgram->setBool(s_hasShadow.c_str(), 0);
 		}
 	}
+
+
+	GM_PRIVATE_OBJECT(GMGLWhiteTexture)
+	{
+		GMuint textureId = 0;
+	};
+
+	class GMGLWhiteTexture : public ITexture
+	{
+		DECLARE_PRIVATE(GMGLWhiteTexture)
+
+	public:
+		GMGLWhiteTexture() = default;
+
+		~GMGLWhiteTexture()
+		{
+			D(d);
+			glDeleteTextures(1, &d->textureId);
+		}
+
+		virtual void init() override
+		{
+			D(d);
+			static GMbyte texData[] = { 0xFF, 0xFF, 0xFF, 0xFF };
+			glGenTextures(1, &d->textureId);
+			glBindTexture(GL_TEXTURE_2D, d->textureId);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
+
+		virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override
+		{
+			D(d);
+			glActiveTexture(GL_TEXTURE0 + textureIndex);
+			glBindTexture(GL_TEXTURE_2D, d->textureId);
+		}
+	};
+
+	ITexture* getWhiteTexture()
+	{
+		static bool s_inited = false;
+		static GMGLWhiteTexture s_texture;
+		if (!s_inited)
+		{
+			s_texture.init();
+			s_inited = true;
+		}
+		return &s_texture;
+	}
 }
 
 void GMGammaHelper::setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
@@ -231,7 +285,8 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, 
 		}
 	};
 
-	model->getShader().getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+	if (model)
+		model->getShader().getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
 }
 
 GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type, GMint index)
@@ -297,11 +352,11 @@ GMint GMGLRenderer::getTextureID(GMTextureType type, GMint index)
 	}
 }
 
-void GMGLRenderer::drawTexture(GMModel* model, GMTextureType type, GMint index)
+bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type, GMint index)
 {
 	D(d);
 	if (d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() && type != GMTextureType::Lightmap)
-		return;
+		return true;
 
 	// 按照贴图类型选择纹理动画序列
 	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, index);
@@ -313,7 +368,9 @@ void GMGLRenderer::drawTexture(GMModel* model, GMTextureType type, GMint index)
 		// 激活动画序列
 		GMint texId = activateTexture(model, (GMTextureType)type, index);
 		texture->useTexture(&textures, texId);
+		return true;
 	}
+	return false;
 }
 
 ITexture* GMGLRenderer::getTexture(GMTextureFrames& frames)
@@ -438,9 +495,22 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		GMint count = GMMaxTextureCount(type);
+		GMint missedTextureCount = 0;
 		for (GMint i = 0; i < count; i++)
 		{
-			drawTexture(model, (GMTextureType)type, i);
+			if (!drawTexture(model, (GMTextureType)type, i))
+				++missedTextureCount;
+		}
+
+		if (missedTextureCount == count && (
+			type == GMTextureType::Ambient ||
+			type == GMTextureType::Diffuse ||
+			type == GMTextureType::Specular ||
+			type == GMTextureType::Lightmap
+			))
+		{
+			GMint texId = activateTexture(nullptr, (GMTextureType)type, missedTextureCount - count);
+			getWhiteTexture()->useTexture(nullptr, texId);
 		}
 	}
 

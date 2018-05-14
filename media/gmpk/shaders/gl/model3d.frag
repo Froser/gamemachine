@@ -9,7 +9,6 @@ in vec4 _model3d_position_world;
 
 vec3 model3d_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
 {
-	bool hasTexture = false;
 	vec3 result = vec3(0);
 	for (int i = 0; i < size; i++)
 	{
@@ -19,13 +18,7 @@ vec3 model3d_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int 
 		result += textures[i].enabled == 1
 			? vec3(texture(textures[i].texture, uv * vec2(textures[i].scale_s, textures[i].scale_t) + vec2(textures[i].scroll_s, textures[i].scroll_t)))
 			: vec3(0);
-		if (textures[i].enabled == 1)
-			hasTexture = true;
 	}
-
-	if (!hasTexture)
-		return vec3(1);
-
 	return result;
 }
 
