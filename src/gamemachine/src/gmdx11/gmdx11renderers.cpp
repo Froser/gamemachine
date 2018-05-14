@@ -391,22 +391,26 @@ namespace
 			));
 		}
 
-		virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override
+		virtual void bindSampler(GMTextureSampler* sampler)
 		{
 			D(d);
+			GM_ASSERT(d->samplerState);
 			if (!d->samplerState)
 			{
 				// 创建采样器
 				D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
-				if (frames)
+				if (sampler)
 				{
-					desc.Filter = GMDx11Helper::GMGetDx11Filter(frames->getMinFilter(), frames->getMagFilter());
+					desc.Filter = GMDx11Helper::GMGetDx11Filter(sampler->getMinFilter(), sampler->getMagFilter());
 					desc.AddressU = desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 				}
 				GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));
 			}
+		}
 
-			GM_ASSERT(d->samplerState);
+		virtual void useTexture(GMint textureIndex) override
+		{
+			D(d);
 			d->deviceContext->PSSetShaderResources(textureIndex, 1, &d->shaderResourceView);
 			d->deviceContext->PSSetSamplers(textureIndex, 1, &d->samplerState);
 		}
@@ -634,9 +638,9 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 		GMint missedTextureCount = 0;
 		for (GMint i = 0; i < count; ++i)
 		{
-			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
+			GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(type, i);
 			// 写入纹理属性，如是否绘制，偏移等
-			ITexture* texture = getTexture(textures);
+			ITexture* texture = getTexture(samplers);
 			applyTextureAttribute(model, texture, type, i);
 			if (!texture)
 				++missedTextureCount;
@@ -671,14 +675,15 @@ void GMDx11Renderer::setTextures(GMModel* model)
 		GMint missedTextureCount = 0;
 		for (GMint i = 0; i < count; ++i, ++registerId)
 		{
-			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
+			GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(type, i);
 
 			// 获取序列中的这一帧
-			ITexture* texture = getTexture(textures);
+			ITexture* texture = getTexture(samplers);
 			if (texture)
 			{
 				// 激活动画序列
-				texture->useTexture(&textures, registerId);
+				texture->bindSampler(&samplers);
+				texture->useTexture(registerId);
 			}
 			else
 			{
@@ -693,7 +698,7 @@ void GMDx11Renderer::setTextures(GMModel* model)
 			type == GMTextureType::Lightmap
 			))
 		{
-			getWhiteTexture()->useTexture(nullptr, registerId - count);
+			getWhiteTexture()->useTexture(registerId - count);
 		}
 	}
 
@@ -918,7 +923,7 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 	));
 }
 
-ITexture* GMDx11Renderer::getTexture(GMTextureFrames& frames)
+ITexture* GMDx11Renderer::getTexture(GMTextureSampler& frames)
 {
 	D(d);
 	if (frames.getFrameCount() == 0)
@@ -1006,9 +1011,9 @@ void GMDx11Renderer_2D::prepareTextures(GMModel* model)
 		GMint count = GMMaxTextureCount(type);
 		for (GMint i = 0; i < count; ++i)
 		{
-			GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(type, i);
+			GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(type, i);
 			// 写入纹理属性，如是否绘制，偏移等
-			ITexture* texture = getTexture(textures);
+			ITexture* texture = getTexture(samplers);
 			applyTextureAttribute(model, texture, type, i);
 		}
 	}
@@ -1016,9 +1021,9 @@ void GMDx11Renderer_2D::prepareTextures(GMModel* model)
 
 void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
 {
-	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::CubeMap, 0);
+	GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(GMTextureType::CubeMap, 0);
 	// 写入纹理属性，如是否绘制，偏移等
-	applyTextureAttribute(model, getTexture(textures), GMTextureType::CubeMap, 0);
+	applyTextureAttribute(model, getTexture(samplers), GMTextureType::CubeMap, 0);
 }
 
 void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
@@ -1027,14 +1032,15 @@ void GMDx11Renderer_CubeMap::setTextures(GMModel* model)
 		Register = GMTextureRegisterQuery<GMTextureType::CubeMap>::Value
 	};
 
-	GMTextureFrames& textures = model->getShader().getTexture().getTextureFrames(GMTextureType::CubeMap, 0);
+	GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(GMTextureType::CubeMap, 0);
 
 	// 获取序列中的这一帧
-	ITexture* texture = getTexture(textures);
+	ITexture* texture = getTexture(samplers);
 	if (texture)
 	{
 		// 激活动画序列
-		texture->useTexture(&textures, Register);
+		texture->bindSampler(&samplers);
+		texture->useTexture(Register);
 		GMDx11CubeMapState& cubeMapState = getCubeMapState();
 		if (cubeMapState.model != model)
 		{

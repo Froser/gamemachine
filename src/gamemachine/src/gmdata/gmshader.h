@@ -19,7 +19,7 @@ GM_ALIGNED_STRUCT(GMS_TextureMod)
 	GMfloat p2 = 0;
 };
 
-GM_PRIVATE_OBJECT(GMTextureFrames)
+GM_PRIVATE_OBJECT(GMTextureSampler)
 {
 	ITexture* frames[MAX_ANIMATION_FRAME] = { 0 }; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
 	GMS_TextureMod texMod[MAX_TEX_MOD];
@@ -31,9 +31,9 @@ GM_PRIVATE_OBJECT(GMTextureFrames)
 	GMS_Wrap wrapT = GMS_Wrap::REPEAT;
 };
 
-class GMTextureFrames : public GMObject
+class GMTextureSampler : public GMObject
 {
-	DECLARE_PRIVATE(GMTextureFrames)
+	DECLARE_PRIVATE(GMTextureSampler)
 
 public:
 	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMint);
@@ -44,8 +44,8 @@ public:
 	GM_DECLARE_PROPERTY(WrapT, wrapT, GMS_Wrap);
 
 public:
-	GMTextureFrames() = default;
-	GMTextureFrames(const GMTextureFrames&) = delete;
+	GMTextureSampler() = default;
+	GMTextureSampler(const GMTextureSampler&) = delete;
 
 public:
 	inline GMS_TextureMod& getTexMod(GMint index)
@@ -74,7 +74,7 @@ public:
 		return d->frameCount;
 	}
 
-	inline GMTextureFrames& operator=(const GMTextureFrames& rhs)
+	inline GMTextureSampler& operator=(const GMTextureSampler& rhs)
 	{
 		D(d);
 		D_OF(rhs_d, &rhs);
@@ -165,26 +165,26 @@ struct GMTextureRegisterQuery<GMTextureType::BeginOfEnum>
 	enum { Value = 0 };
 };
 
-GM_PRIVATE_OBJECT(GMTexture)
+GM_PRIVATE_OBJECT(GMTextureList)
 {
-	GMTextureFrames ambients[GMMaxTextureCount(GMTextureType::Ambient)];
-	GMTextureFrames diffuse[GMMaxTextureCount(GMTextureType::Diffuse)];
-	GMTextureFrames normalMap[GMMaxTextureCount(GMTextureType::NormalMap)];
-	GMTextureFrames lightMap[GMMaxTextureCount(GMTextureType::Lightmap)];
-	GMTextureFrames specularMap[GMMaxTextureCount(GMTextureType::Specular)];
-	GMTextureFrames cubeMap[GMMaxTextureCount(GMTextureType::CubeMap)];
+	GMTextureSampler ambients[GMMaxTextureCount(GMTextureType::Ambient)];
+	GMTextureSampler diffuse[GMMaxTextureCount(GMTextureType::Diffuse)];
+	GMTextureSampler normalMap[GMMaxTextureCount(GMTextureType::NormalMap)];
+	GMTextureSampler lightMap[GMMaxTextureCount(GMTextureType::Lightmap)];
+	GMTextureSampler specularMap[GMMaxTextureCount(GMTextureType::Specular)];
+	GMTextureSampler cubeMap[GMMaxTextureCount(GMTextureType::CubeMap)];
 };
 
-class GMTexture : public GMObject
+class GMTextureList : public GMObject
 {
-	DECLARE_PRIVATE(GMTexture)
+	DECLARE_PRIVATE(GMTextureList)
 
 public:
-	GMTexture() = default;
-	GMTexture(const GMTexture& texture) = delete;
+	GMTextureList() = default;
+	GMTextureList(const GMTextureList& texture) = delete;
 
 public:
-	inline GMTextureFrames& getTextureFrames(GMTextureType type, GMuint index)
+	inline GMTextureSampler& getTextureFrames(GMTextureType type, GMuint index)
 	{
 		GM_ASSERT(index < GMMaxTextureCount(type));
 
@@ -209,12 +209,12 @@ public:
 		}
 	}
 
-	inline const GMTextureFrames& getTextureFrames(GMTextureType type, GMuint index) const
+	inline const GMTextureSampler& getTextureFrames(GMTextureType type, GMuint index) const
 	{
-		return const_cast<GMTexture*>(this)->getTextureFrames(type, index);
+		return const_cast<GMTextureList*>(this)->getTextureFrames(type, index);
 	}
 
-	inline GMTexture& operator=(const GMTexture& rhs)
+	inline GMTextureList& operator=(const GMTextureList& rhs)
 	{
 		D(d);
 		D_OF(rhs_d, &rhs);
@@ -255,7 +255,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	bool drawBorder = false;
 	GMfloat lineWidth = 1;
 	GMVec3 lineColor = GMVec3(0);
-	GMTexture texture;
+	GMTextureList texture;
 	GMMaterial material;
 };
 
@@ -276,7 +276,7 @@ public:
 	GM_DECLARE_PROPERTY(Blend, blend, bool);
 	GM_DECLARE_PROPERTY(Discard, discard, bool);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
-	GM_DECLARE_PROPERTY(Texture, texture, GMTexture);
+	GM_DECLARE_PROPERTY(Texture, texture, GMTextureList);
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);

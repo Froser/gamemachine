@@ -28,12 +28,18 @@ public:
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
-	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) override
+	virtual void bindSampler(GMTextureSampler* sampler) override
 	{
-		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, m_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+	virtual void useTexture(GMint textureIndex) override
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, m_id);
 	}
 
 	GMuint getTextureId()

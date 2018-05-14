@@ -87,7 +87,8 @@ public:
 	~GMGLShadowMapTexture();
 
 	virtual void init() override;
-	virtual void useTexture(GMTextureFrames*, GMint) override;
+	virtual void bindSampler(GMTextureSampler* sampler) override {}
+	virtual void useTexture(GMint) override;
 };
 
 GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)

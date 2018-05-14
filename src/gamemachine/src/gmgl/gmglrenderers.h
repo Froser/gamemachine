@@ -54,7 +54,7 @@ protected:
 	virtual void deactivateTexture(GMTextureType type, GMint index);
 	virtual GMint getTextureID(GMTextureType type, GMint index);
 	virtual bool drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
-	virtual ITexture* getTexture(GMTextureFrames& frames);
+	virtual ITexture* getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
 

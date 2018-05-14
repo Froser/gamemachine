@@ -24,8 +24,8 @@ class GMUIWindow;
 class GMShader;
 class GMModelDataProxy;
 class GMMesh;
-class GMTextureFrames;
-class GMTexture;
+class GMTextureSampler;
+class GMTextureList;
 class GMAssets;
 class GMComponent;
 struct ILight;
@@ -143,7 +143,8 @@ GM_INTERFACE(IGameHandler)
 GM_INTERFACE(ITexture)
 {
 	virtual void init() = 0;
-	virtual void useTexture(GMTextureFrames* frames, GMint textureIndex) = 0;
+	virtual void bindSampler(GMTextureSampler* sampler) = 0;
+	virtual void useTexture(GMint textureIndex) = 0;
 };
 
 //! 可以获取、设置对象的数据接口。

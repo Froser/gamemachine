@@ -89,19 +89,23 @@ void GMDx11GlyphTexture::init()
 	));
 }
 
-void GMDx11GlyphTexture::useTexture(GMTextureFrames* frames, GMint textureIndex)
+void GMDx11GlyphTexture::bindSampler(GMTextureSampler* sampler)
 {
 	D(d);
 	if (!d->samplerState)
 	{
 		// 创建采样器
 		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
-		desc.Filter = GMDx11Helper::GMGetDx11Filter(frames->getMinFilter(), frames->getMagFilter());
+		desc.Filter = GMDx11Helper::GMGetDx11Filter(sampler->getMinFilter(), sampler->getMagFilter());
 		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
 		GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));
 	}
+}
 
+void GMDx11GlyphTexture::useTexture(GMint textureIndex)
+{
+	D(d);
 	GM_ASSERT(d->samplerState);
 	d->deviceContext->PSSetShaderResources(0, 1, &d->resourceView);
 	d->deviceContext->PSSetSamplers(0, 1, &d->samplerState);

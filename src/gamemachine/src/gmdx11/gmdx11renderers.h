@@ -83,7 +83,7 @@ protected:
 	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
 
 	ID3DX11EffectTechnique* getTechnique();
-	ITexture* getTexture(GMTextureFrames& frames);
+	ITexture* getTexture(GMTextureSampler& frames);
 	void setGamma(IShaderProgram* shaderProgram);
 
 public:

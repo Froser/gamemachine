@@ -350,7 +350,7 @@ GMGLShadowMapTexture::~GMGLShadowMapTexture()
 	glDeleteTextures(1, &d->textureId);
 }
 
-void GMGLShadowMapTexture::useTexture(GMTextureFrames*, GMint)
+void GMGLShadowMapTexture::useTexture(GMint)
 {
 	D(d);
 	glActiveTexture(GL_TEXTURE0 + GMTextureRegisterQuery<GMTextureType::ShadowMap>::Value);

@@ -161,45 +161,43 @@ void GMGLTexture::init()
 	d->inited = true;
 }
 
-void GMGLTexture::useTexture(GMTextureFrames* frames, GMint textureIndex)
+void GMGLTexture::bindSampler(GMTextureSampler* sampler)
 {
 	D(d);
-	glActiveTexture(GL_TEXTURE0 + textureIndex);
-	glBindTexture(d->target, d->id);
-
 	if (!d->texParamsSet)
 	{
+		glBindTexture(d->target, d->id);
 		// Apply params
 		glTexParameteri(d->target, GL_TEXTURE_MIN_FILTER,
-			frames->getMinFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-			frames->getMinFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-			frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-			frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-			frames->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-			frames->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+			sampler->getMinFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
+			sampler->getMinFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
+			sampler->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+			sampler->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+			sampler->getMinFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+			sampler->getMinFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_MAG_FILTER,
-			frames->getMagFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
-			frames->getMagFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
-			frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
-			frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
-			frames->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
-			frames->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
+			sampler->getMagFilter() == GMS_TextureFilter::LINEAR ? GL_LINEAR :
+			sampler->getMagFilter() == GMS_TextureFilter::NEAREST ? GL_NEAREST :
+			sampler->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_LINEAR ? GL_LINEAR_MIPMAP_LINEAR :
+			sampler->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_LINEAR ? GL_NEAREST_MIPMAP_LINEAR :
+			sampler->getMagFilter() == GMS_TextureFilter::LINEAR_MIPMAP_NEAREST ? GL_LINEAR_MIPMAP_NEAREST :
+			sampler->getMagFilter() == GMS_TextureFilter::NEAREST_MIPMAP_NEAREST ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_WRAP_S,
-			frames->getWrapS() == GMS_Wrap::REPEAT ? GL_REPEAT :
-			frames->getWrapS() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-			frames->getWrapS() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-			frames->getWrapS() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+			sampler->getWrapS() == GMS_Wrap::REPEAT ? GL_REPEAT :
+			sampler->getWrapS() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+			sampler->getWrapS() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+			sampler->getWrapS() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
 		);
 
 		glTexParameteri(d->target, GL_TEXTURE_WRAP_T,
-			frames->getWrapT() == GMS_Wrap::REPEAT ? GL_REPEAT :
-			frames->getWrapT() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
-			frames->getWrapT() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
-			frames->getWrapT() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
+			sampler->getWrapT() == GMS_Wrap::REPEAT ? GL_REPEAT :
+			sampler->getWrapT() == GMS_Wrap::CLAMP_TO_EDGE ? GL_CLAMP_TO_EDGE :
+			sampler->getWrapT() == GMS_Wrap::CLAMP_TO_BORDER ? GL_CLAMP_TO_BORDER :
+			sampler->getWrapT() == GMS_Wrap::MIRRORED_REPEAT ? GL_MIRRORED_REPEAT : GL_REPEAT
 		);
 
 		if (d->target == GL_TEXTURE_CUBE_MAP)
@@ -211,5 +209,13 @@ void GMGLTexture::useTexture(GMTextureFrames* frames, GMint textureIndex)
 			glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 		}
 		d->texParamsSet = true;
+		glBindTexture(d->target, 0);
 	}
+}
+
+void GMGLTexture::useTexture(GMint textureIndex)
+{
+	D(d);
+	glActiveTexture(GL_TEXTURE0 + textureIndex);
+	glBindTexture(d->target, d->id);
 }
