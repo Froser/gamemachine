@@ -46,6 +46,7 @@ public:
 
 	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
+	virtual void use() override;
 	virtual void bind() override;
 	virtual void unbind() override;
 	virtual void clear(GMFramebuffersClearType type) override;
@@ -63,7 +64,7 @@ public:
 	}
 
 private:
-	bool createFramebuffers();
+	void createFramebuffers();
 
 protected:
 	virtual void createDepthStencilBuffer(const GMFramebufferDesc& desc);
@@ -107,6 +108,7 @@ public:
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
+	virtual void use() override;
 	virtual void bind() override;
 
 public:

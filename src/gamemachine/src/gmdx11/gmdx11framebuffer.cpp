@@ -278,12 +278,18 @@ void GMDx11Framebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
 	d->renderTargetViews.push_back(dxFramebuffer->getRenderTargetView());
 }
 
-void GMDx11Framebuffers::bind()
+void GMDx11Framebuffers::use()
 {
 	D(d);
 	d->deviceContext->RSSetViewports(1, &d->viewport);
 	GM_ASSERT(d->renderTargetViews.size() < std::numeric_limits<UINT>::max());
 	d->deviceContext->OMSetRenderTargets((UINT)d->renderTargetViews.size(), d->renderTargetViews.data(), d->depthStencilView);
+}
+
+void GMDx11Framebuffers::bind()
+{
+	D(d);
+	use();
 	d->engine->getFramebuffersStack().push(this);
 }
 
@@ -301,9 +307,9 @@ void GMDx11Framebuffers::unbind()
 	{
 		IFramebuffers* lastFramebuffers = stack.peek();
 		if (lastFramebuffers)
-			lastFramebuffers->bind();
+			lastFramebuffers->use();
 		else
-			getDefaultFramebuffers()->bind();
+			getDefaultFramebuffers()->use();
 	}
 }
 

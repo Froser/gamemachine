@@ -180,19 +180,21 @@ void GMGLFramebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
 	d->framebuffers.push_back(glFramebuffer);
 }
 
+void GMGLFramebuffers::use()
+{
+	D(d);
+	createFramebuffers();
+	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+	setViewport();
+}
+
 void GMGLFramebuffers::bind()
 {
 	D(d);
-	if (!d->framebuffersCreated)
-	{
-		bool suc = createFramebuffers();
-		d->framebuffersCreated = suc;
-	}
-
+	createFramebuffers();
 	if (d->framebuffersCreated)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-		setViewport();
+		use();
 		d->engine->getFramebuffersStack().push(this);
 	}
 }
@@ -211,9 +213,9 @@ void GMGLFramebuffers::unbind()
 	{
 		IFramebuffers* lastFramebuffers = stack.peek();
 		if (lastFramebuffers)
-			lastFramebuffers->bind();
+			lastFramebuffers->use();
 		else
-			getDefaultFramebuffers()->bind();
+			getDefaultFramebuffers()->use();
 	}
 }
 
@@ -262,29 +264,34 @@ void GMGLFramebuffers::setViewport()
 	glViewport(0, 0, d->desc.rect.width, d->desc.rect.height);
 }
 
-bool GMGLFramebuffers::createFramebuffers()
+void GMGLFramebuffers::createFramebuffers()
 {
 	D(d);
-	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
-	Vector<GLuint> attachments;
-	GMsize_t sz = d->framebuffers.size();
-	GM_ASSERT(sz < std::numeric_limits<GMuint>::max());
-	for (GMsize_t i = 0; i < sz; i++)
+	if (!d->framebuffersCreated)
 	{
-		GMuint _i = (GMuint)i;
-		attachments.push_back(GL_COLOR_ATTACHMENT0 + _i);
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, d->framebuffers[_i]->getTextureId(), 0);
-	}
-	glDrawBuffers((GLsizei)sz, attachments.data());
+		glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
+		Vector<GLuint> attachments;
+		GMsize_t sz = d->framebuffers.size();
+		GM_ASSERT(sz < std::numeric_limits<GMuint>::max());
+		for (GMsize_t i = 0; i < sz; i++)
+		{
+			GMuint _i = (GMuint)i;
+			attachments.push_back(GL_COLOR_ATTACHMENT0 + _i);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + _i, GL_TEXTURE_2D, d->framebuffers[_i]->getTextureId(), 0);
+		}
+		glDrawBuffers((GLsizei)sz, attachments.data());
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
-	{
-		gm_error("FB incomplete error, status: 0x%x\n", status);
-		return false;
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+		if (status != GL_FRAMEBUFFER_COMPLETE)
+		{
+			gm_error("FB incomplete error, status: 0x%x\n", status);
+			GM_ASSERT(false);
+			glBindFramebuffer(GL_FRAMEBUFFER, 0);
+			return;
+		}
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	return true;
+	d->framebuffersCreated = true;
 }
 
 void GMGLFramebuffers::clear(GMFramebuffersClearType type)
@@ -380,11 +387,17 @@ bool GMGLShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 	return true;
 }
 
-void GMGLShadowFramebuffers::bind()
+void GMGLShadowFramebuffers::use()
 {
 	D_BASE(d, Base);
 	glBindFramebuffer(GL_FRAMEBUFFER, d->fbo);
 	setViewport();
+}
+
+void GMGLShadowFramebuffers::bind()
+{
+	D_BASE(d, Base);
+	use();
 	d->engine->getFramebuffersStack().push(this);
 }
 

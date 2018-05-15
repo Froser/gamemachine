@@ -60,6 +60,7 @@ public:
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) override;
+	virtual void use() override;
 	virtual void bind() override;
 	virtual void unbind() override;
 	virtual void clear(GMFramebuffersClearType type) override;

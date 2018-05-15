@@ -277,6 +277,7 @@ GM_INTERFACE(IFramebuffers)
 	virtual bool init(const GMFramebuffersDesc& desc) = 0;
 	virtual void addFramebuffer(AUTORELEASE IFramebuffer* framebuffer) = 0;
 	virtual GMsize_t count() = 0;
+	virtual void use() = 0;
 	virtual void bind() = 0;
 	virtual void unbind() = 0;
 	virtual void clear(GMFramebuffersClearType = GMFramebuffersClearType::All) = 0;
