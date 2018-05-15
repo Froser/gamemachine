@@ -76,7 +76,7 @@ void GMGlyphObject::constructModel()
 void GMGlyphObject::onCreateShader(GMShader& shader)
 {
 	GMGlyphManager* glyphManager = GM.getGlyphManager();
-	auto& frame = shader.getTexture().getTextureFrames(GMTextureType::Ambient, 0);
+	auto& frame = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	frame.setMinFilter(GMS_TextureFilter::LINEAR);
 	frame.setMagFilter(GMS_TextureFilter::LINEAR);
 	frame.addFrame(glyphManager->glyphTexture());
@@ -396,8 +396,8 @@ void GMImage2DBorder::createBorder(const GMRect& geometry)
 		void onCreateShader(GMShader& shader)
 		{
 			shader.setNoDepthTest(true);
-			auto& tex = shader.getTexture();
-			auto& frames = tex.getTextureFrames(GMTextureType::Ambient, 0);
+			auto& tex = shader.getTextureList();
+			auto& frames = tex.getTextureSampler(GMTextureType::Ambient);
 			frames.addFrame(GMAssets::getTexture(texture));
 		}
 
@@ -625,8 +625,8 @@ void GMImage2DGameObject::onCreateShader(GMShader& shader)
 
 	if (d->image)
 	{
-		auto& tex = shader.getTexture();
-		auto& frames = tex.getTextureFrames(GMTextureType::Ambient, 0);
+		auto& tex = shader.getTextureList();
+		auto& frames = tex.getTextureSampler(GMTextureType::Ambient);
 		frames.addFrame(d->image);
 	}
 }

@@ -28,21 +28,6 @@ vec4 normalToTexture(vec3 normal)
 }
 in vec4 _deferred_geometry_pass_position_world;
 
-vec4 deferred_geometry_pass_calcTexture(GM_texture_t textures[MAX_TEXTURE_COUNT], vec2 uv, int size)
-{
-	vec4 result = vec4(0);
-	for (int i = 0; i < size; i++)
-	{
-		if (textures[i].enabled == 0)
-			break;
-		
-		result += textures[i].enabled == 1
-			? texture(textures[i].texture, uv * vec2(textures[i].scale_s, textures[i].scale_t) + vec2(textures[i].scroll_s, textures[i].scroll_t))
-			: vec4(0);
-	}
-	return result;
-}
-
 void deferred_geometry_pass_calcEyeSpace()
 {
 	// 由顶点变换矩阵计算法向量变换矩阵
@@ -50,9 +35,9 @@ void deferred_geometry_pass_calcEyeSpace()
 	// normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
 	${deferred_geometry_pass_gNormal} = normalToTexture ( normalize( mat3(GM_inverse_transpose_model_matrix) * _normal.xyz) );
 
-	if (GM_normalmap_textures[0].enabled == 1)
+	if (GM_normalmap_texture.enabled == 1)
 	{
-		${deferred_geometry_pass_gNormalMap_bNormalMap} = texture(GM_normalmap_textures[0].texture, _uv);
+		${deferred_geometry_pass_gNormalMap_bNormalMap} = texture(GM_normalmap_texture.texture, _uv);
 		${deferred_geometry_pass_gNormalMap_bNormalMap}.a = 1;
 		${deferred_geometry_pass_gTangent_eye} = normalToTexture(normalize(normalEyeTransform * _tangent.xyz).xyz);
 		${deferred_geometry_pass_gBitangent_eye} = normalToTexture(normalize(normalEyeTransform * _bitangent.xyz).xyz);
@@ -70,9 +55,9 @@ void GM_GeometryPass()
 {
 	${deferred_geometry_pass_gPosition_Refractivity}.rgb = _deferred_geometry_pass_position_world.rgb;
 	${deferred_geometry_pass_gPosition_Refractivity}.a = GM_material.refractivity;
-	${deferred_geometry_pass_gTexAmbient} = vec4(GM_material.ka, 1) * deferred_geometry_pass_calcTexture(GM_ambient_textures, _uv, MAX_TEXTURE_COUNT) * deferred_geometry_pass_calcTexture(GM_lightmap_textures, _lightmapuv, 1);
-	${deferred_geometry_pass_gTexDiffuse} = vec4(GM_material.kd, 1) * deferred_geometry_pass_calcTexture(GM_diffuse_textures, _uv, MAX_TEXTURE_COUNT);
-	${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * deferred_geometry_pass_calcTexture(GM_specular_textures, _uv, MAX_TEXTURE_COUNT).r, GM_material.shininess);
+	${deferred_geometry_pass_gTexAmbient} = vec4(GM_material.ka, 1) * sampleTextures(GM_ambient_texture, _uv) * sampleTextures(GM_lightmap_texture, _lightmapuv);
+	${deferred_geometry_pass_gTexDiffuse} = vec4(GM_material.kd, 1) * sampleTextures(GM_diffuse_texture, _uv);
+	${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * sampleTextures(GM_specular_texture, _uv).r, GM_material.shininess);
 
 	deferred_geometry_pass_calcEyeSpace();
 }

@@ -21,8 +21,8 @@ GM_ALIGNED_STRUCT(GMS_TextureMod)
 
 GM_PRIVATE_OBJECT(GMTextureSampler)
 {
-	ITexture* frames[MAX_ANIMATION_FRAME] = { 0 }; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
-	GMS_TextureMod texMod[MAX_TEX_MOD];
+	Array<ITexture*, MAX_ANIMATION_FRAME> frames = { 0 }; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
+	Array<GMS_TextureMod, MAX_TEX_MOD> texMod;
 	GMint frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
 	GMS_TextureFilter magFilter = GMS_TextureFilter::LINEAR;
@@ -127,6 +127,8 @@ enum class GMTextureType
 	Specular,
 	NormalMap,
 	Lightmap,
+	Albedo,
+	MetallicRoughnessAO,
 	EndOfCommonTexture, // 一般纹理从这里结束
 
 	// Special type
@@ -138,15 +140,8 @@ enum class GMTextureType
 
 static constexpr GMuint GMMaxTextureCount(GMTextureType type)
 {
-	return
-		type == GMTextureType::Ambient ? 3 :
-		type == GMTextureType::Diffuse ? 3 :
-		type == GMTextureType::Specular ? 3 :
-		type == GMTextureType::NormalMap ? 1 :
-		type == GMTextureType::Lightmap ? 1 :
-		type == GMTextureType::CubeMap ? 1 :
-		type == GMTextureType::ShadowMap ? 1 :
-		type == GMTextureType::GeometryPasses ? 8 : 0;
+	return type == GMTextureType::BeginOfEnum || type == GMTextureType::EndOfCommonTexture || type == GMTextureType::EndOfEnum ? 0 :
+		type == GMTextureType::GeometryPasses ? 8 : 1;
 }
 
 template <GMTextureType Type>
@@ -167,12 +162,14 @@ struct GMTextureRegisterQuery<GMTextureType::BeginOfEnum>
 
 GM_PRIVATE_OBJECT(GMTextureList)
 {
-	GMTextureSampler ambients[GMMaxTextureCount(GMTextureType::Ambient)];
-	GMTextureSampler diffuse[GMMaxTextureCount(GMTextureType::Diffuse)];
-	GMTextureSampler normalMap[GMMaxTextureCount(GMTextureType::NormalMap)];
-	GMTextureSampler lightMap[GMMaxTextureCount(GMTextureType::Lightmap)];
-	GMTextureSampler specularMap[GMMaxTextureCount(GMTextureType::Specular)];
-	GMTextureSampler cubeMap[GMMaxTextureCount(GMTextureType::CubeMap)];
+	GMTextureSampler ambientMap;
+	GMTextureSampler diffuseMap;
+	GMTextureSampler normalMap;
+	GMTextureSampler lightMap;
+	GMTextureSampler specularMap;
+	GMTextureSampler albedoMap;
+	GMTextureSampler metallicRoughnessAOMap;
+	GMTextureSampler cubeMap;
 };
 
 class GMTextureList : public GMObject
@@ -184,34 +181,36 @@ public:
 	GMTextureList(const GMTextureList& texture) = delete;
 
 public:
-	inline GMTextureSampler& getTextureFrames(GMTextureType type, GMuint index)
+	inline GMTextureSampler& getTextureSampler(GMTextureType type)
 	{
-		GM_ASSERT(index < GMMaxTextureCount(type));
-
 		D(d);
 		switch (type)
 		{
 		case GMTextureType::Ambient:
-			return d->ambients[index];
+			return d->ambientMap;
 		case GMTextureType::Diffuse:
-			return d->diffuse[index];
+			return d->diffuseMap;
 		case GMTextureType::NormalMap:
-			return d->normalMap[index];
+			return d->normalMap;
 		case GMTextureType::Lightmap:
-			return d->lightMap[index];
+			return d->lightMap;
 		case GMTextureType::Specular:
-			return d->specularMap[index];
+			return d->specularMap;
+		case GMTextureType::Albedo:
+			return d->albedoMap;
+		case GMTextureType::MetallicRoughnessAO:
+			return d->metallicRoughnessAOMap;
 		case GMTextureType::CubeMap:
-			return d->cubeMap[index];
+			return d->cubeMap;
 		default:
 			GM_ASSERT(false);
-			return d->ambients[0];
+			return d->ambientMap;
 		}
 	}
 
-	inline const GMTextureSampler& getTextureFrames(GMTextureType type, GMuint index) const
+	inline const GMTextureSampler& getTextureSampler(GMTextureType type) const
 	{
-		return const_cast<GMTextureList*>(this)->getTextureFrames(type, index);
+		return const_cast<GMTextureList*>(this)->getTextureSampler(type);
 	}
 
 	inline GMTextureList& operator=(const GMTextureList& rhs)
@@ -221,15 +220,17 @@ public:
 
 		GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 		{
-			GMuint count = GMMaxTextureCount(type);
-			for (GMuint i = 0; i < count; i++)
-			{
-				getTextureFrames(type, i) = rhs.getTextureFrames(type, i);
-			}
+			getTextureSampler(type) = rhs.getTextureSampler(type);
 		}
 
 		return *this;
 	}
+};
+
+enum class GMIlluminationModel
+{
+	Phong,
+	CookTorranceBRDF,
 };
 
 // 光照参数
@@ -240,6 +241,7 @@ GM_ALIGNED_STRUCT(GMMaterial)
 	GMVec3 ka = GMVec3(1);
 	GMVec3 ks = GMVec3(1);
 	GMVec3 kd = GMVec3(1);
+	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
 };
 
 GM_PRIVATE_OBJECT(GMShader)
@@ -255,7 +257,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	bool drawBorder = false;
 	GMfloat lineWidth = 1;
 	GMVec3 lineColor = GMVec3(0);
-	GMTextureList texture;
+	GMTextureList textureList;
 	GMMaterial material;
 };
 
@@ -276,7 +278,7 @@ public:
 	GM_DECLARE_PROPERTY(Blend, blend, bool);
 	GM_DECLARE_PROPERTY(Discard, discard, bool);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
-	GM_DECLARE_PROPERTY(Texture, texture, GMTextureList);
+	GM_DECLARE_PROPERTY(TextureList, textureList, GMTextureList);
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);

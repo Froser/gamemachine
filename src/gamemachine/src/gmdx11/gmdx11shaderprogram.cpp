@@ -17,12 +17,14 @@ namespace
 			"ViewPosition",
 
 			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
-			"AmbientTextureAttributes",
-			"DiffuseTextureAttributes",
-			"SpecularTextureAttributes",
-			"NormalMapTextureAttributes",
-			"LightmapTextureAttributes",
-			"CubeMapTextureAttributes",
+			"AmbientTextureAttribute",
+			"DiffuseTextureAttribute",
+			"SpecularTextureAttribute",
+			"NormalMapTextureAttribute",
+			"LightmapTextureAttribute",
+			"AlbedoTextureAttribute",
+			"MetallicRoughnessAOTextureAttribute",
+			"CubeMapTextureAttribute",
 
 			"LightCount",
 

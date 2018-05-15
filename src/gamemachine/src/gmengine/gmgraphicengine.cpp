@@ -213,7 +213,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &quad);
 		GM_ASSERT(quad);
 		quad->setType(GMModelType::Filter);
-		quad->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0).addFrame(d->filterFramebuffers->getFramebuffer(0)->getTexture());
+		quad->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(d->filterFramebuffers->getFramebuffer(0)->getTexture());
 		d->filterQuadModel.reset(quad);
 		GM.createModelDataProxyAndTransfer(quad);
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);

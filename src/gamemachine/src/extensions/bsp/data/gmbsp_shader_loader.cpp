@@ -264,8 +264,6 @@ void GMBSPShaderLoader::parseItem(TiXmlElement* elem, GMint lightmapId, REF GMSh
 
 void GMBSPShaderLoader::parseStart()
 {
-	D(d);
-	d->textureNum = 0;
 }
 
 void GMBSPShaderLoader::parseEnd()
@@ -312,9 +310,9 @@ void GMBSPShaderLoader::parse_blendFunc(GMShader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_animMap(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureSampler* frame = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum);
+	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	GMint ms = GMString::parseInt(elem->Attribute("ms"));
-	frame->setAnimationMs(ms);
+	sampler->setAnimationMs(ms);
 
 	for (TiXmlElement* it = elem->FirstChildElement(); it; it = it->NextSiblingElement())
 	{
@@ -322,31 +320,29 @@ void GMBSPShaderLoader::parse_animMap(GMShader& shader, TiXmlElement* elem)
 		END_PARSE;
 	}
 	parse_map_tcMod(shader, elem);
-	d->textureNum++;
 }
 
 void GMBSPShaderLoader::parse_src(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureSampler* frame = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum);
+	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
-		frame->addFrame(texture);
+		sampler->addFrame(texture);
 }
 
 void GMBSPShaderLoader::parse_clampmap(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureSampler* frame = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum);
+	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
 		// TODO: GL_CLAMP
-		frame->setWrapS(GMS_Wrap::MIRRORED_REPEAT);
-		frame->setWrapT(GMS_Wrap::MIRRORED_REPEAT);
-		frame->addFrame(texture);
+		sampler->setWrapS(GMS_Wrap::MIRRORED_REPEAT);
+		sampler->setWrapT(GMS_Wrap::MIRRORED_REPEAT);
+		sampler->addFrame(texture);
 		parse_map_tcMod(shader, elem);
-		d->textureNum++;
 	}
 	else
 	{
@@ -357,15 +353,14 @@ void GMBSPShaderLoader::parse_clampmap(GMShader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::parse_map(GMShader& shader, TiXmlElement* elem)
 {
 	D(d);
-	GMTextureSampler* frame = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum);
+	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
-		frame->setWrapS(GMS_Wrap::REPEAT);
-		frame->setWrapT(GMS_Wrap::REPEAT);
-		frame->addFrame(texture);
+		sampler->setWrapS(GMS_Wrap::REPEAT);
+		sampler->setWrapT(GMS_Wrap::REPEAT);
+		sampler->addFrame(texture);
 		parse_map_tcMod(shader, elem);
-		d->textureNum++;
 	}
 	else
 	{
@@ -385,14 +380,14 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* e
 			GMAssets& assets = d->world->getAssets();
 			GMAssetsNode* lightmapNode = assets.getNodeFromPath(GM_ASSET_LIGHTMAPS);
 
-			GMTextureSampler* frame = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum);
+			GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 			GMAssetsNode* node = GMAssets::findChild(lightmapNode, std::to_string(d->lightmapId).c_str());
 			GM_ASSERT(node);
 
 			ITexture* tex = GMAssets::getTexture(node->asset);
 			if (tex)
 			{
-				frame->addFrame(tex);
+				sampler->addFrame(tex);
 				gm_info(L"found map from lightmap %d", d->lightmapId);
 			}
 			else
@@ -405,13 +400,13 @@ void GMBSPShaderLoader::parse_map_fromLightmap(GMShader& shader, TiXmlElement* e
 
 void GMBSPShaderLoader::parse_normalmap(GMShader& shader, TiXmlElement* elem)
 {
-	GMTextureSampler* frame = &shader.getTexture().getTextureFrames(GMTextureType::NormalMap, 0);
+	GMTextureSampler* sampler = &shader.getTextureList().getTextureSampler(GMTextureType::NormalMap);
 	ITexture* texture = addTextureToTextureContainer(elem->GetText());
 	if (texture)
 	{
-		frame->setWrapS(GMS_Wrap::REPEAT);
-		frame->setWrapT(GMS_Wrap::REPEAT);
-		frame->addFrame(texture);
+		sampler->setWrapS(GMS_Wrap::REPEAT);
+		sampler->setWrapT(GMS_Wrap::REPEAT);
+		sampler->addFrame(texture);
 	}
 }
 
@@ -514,11 +509,11 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 	// tcMod <type> <...>
 	const char* tcMod = elem->Attribute("tcMod");
 	GMuint tcModNum = 0;
-	while (tcModNum < MAX_TEX_MOD && shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum).getTexMod(tcModNum).type != GMS_TextureModType::NO_TEXTURE_MOD)
+	while (tcModNum < MAX_TEX_MOD && shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTexMod(tcModNum).type != GMS_TextureModType::NO_TEXTURE_MOD)
 	{
 		tcModNum++;
 	}
-	GMS_TextureMod* currentMod = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum).getTexMod(tcModNum);
+	GMS_TextureMod* currentMod = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTexMod(tcModNum);
 
 	if (tcMod)
 	{
@@ -551,7 +546,7 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 					gm_warning(L"warning: you have tcMods more than %d, please increase MAX_TEX_MOD", MAX_TEX_MOD);
 				break;
 			}
-			currentMod = &shader.getTexture().getTextureFrames(GMTextureType::Ambient, d->textureNum).getTexMod(tcModNum);
+			currentMod = &shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getTexMod(tcModNum);
 		}
 	}
 }
@@ -559,7 +554,7 @@ void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)
 void GMBSPShaderLoader::createSky(GMShader& shader)
 {
 	D(d);
-	ITexture* texture = shader.getTexture().getTextureFrames(GMTextureType::Ambient, 0).getFrameByIndex(0);
+	ITexture* texture = shader.getTextureList().getTextureSampler(GMTextureType::Ambient).getFrameByIndex(0);
 	shader.setDiscard(true);
 	if (!d->world->getSky())
 	{

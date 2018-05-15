@@ -65,7 +65,7 @@ void GMDx11ModelDataProxy::transfer()
 
 	for (auto& mesh : model->getMeshes())
 	{
-		if (model->getShader().getTexture().getTextureFrames(GMTextureType::NormalMap, 0).getFrameCount() > 0)
+		if (model->getShader().getTextureList().getTextureSampler(GMTextureType::NormalMap).getFrameCount() > 0)
 			mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
 	}
 

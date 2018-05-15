@@ -14,6 +14,15 @@ struct GMDx11CubeMapState
 	GMModel* model = nullptr;
 };
 
+struct GMTextureAttributeBank
+{
+	ID3DX11EffectScalarVariable* enabled = nullptr;
+	ID3DX11EffectScalarVariable* offsetX = nullptr;
+	ID3DX11EffectScalarVariable* offsetY = nullptr;
+	ID3DX11EffectScalarVariable* scaleX = nullptr;
+	ID3DX11EffectScalarVariable* scaleY = nullptr;
+};
+
 GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	GMComPtr<ID3D11InputLayout> inputLayout;
@@ -23,6 +32,8 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
 	ID3DX11EffectBlendVariable* blend = nullptr;
 	ID3DX11EffectDepthStencilVariable* depthStencil = nullptr;
+	HashMap<const char*, ID3DX11EffectVariable*> textureAttributes;
+	HashMap<const char*, GMTextureAttributeBank> textureVariables;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	bool screenInfoPrepared = false;
 	GMComPtr<ID3D11Resource> shadowMapResource;
@@ -72,7 +83,6 @@ protected:
 protected:
 	virtual void prepareScreenInfo();
 	virtual void prepareTextures(GMModel* model);
-	virtual void setTextures(GMModel* model);
 	virtual void passAllAndDraw(GMModel* model);
 	virtual void prepareBuffer(GMModel* model);
 	virtual void prepareLights();
@@ -80,10 +90,10 @@ protected:
 	virtual void prepareRasterizer(GMModel* model);
 	virtual void prepareBlend(GMModel* model);
 	virtual void prepareDepthStencil(GMModel* model);
-	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type, GMint index);
+	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type);
 
 	ID3DX11EffectTechnique* getTechnique();
-	ITexture* getTexture(GMTextureSampler& frames);
+	ITexture* getTexture(GMTextureSampler& sampler);
 	void setGamma(IShaderProgram* shaderProgram);
 
 public:
@@ -125,7 +135,6 @@ class GMDx11Renderer_CubeMap : public GMDx11Renderer
 
 public:
 	virtual void prepareTextures(GMModel* model);
-	virtual void setTextures(GMModel* model);
 };
 
 GM_PRIVATE_OBJECT(GMDx11Renderer_Filter)

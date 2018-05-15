@@ -19,7 +19,6 @@ GM_PRIVATE_OBJECT(GMBSPShaderLoader)
 	AlignedVector<TiXmlDocument*> shaderDocs;
 
 	// 纹理编号，从TEXTURE_INDEX_AMBIENT开始
-	GMint textureNum;
 	GMint lightmapId;
 };
 

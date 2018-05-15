@@ -248,7 +248,7 @@ void GMGLRenderer::draw(GMModel* model)
 	glBindVertexArray(0);
 }
 
-void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, GMint index)
+void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
 {
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	GM_ASSERT(desc);
@@ -258,7 +258,7 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, 
 	static const std::string u_scalet_affix = (GMString(".") + desc->TextureAttributes.ScaleY).toStdString();
 
 	auto shaderProgram = getShaderProgram();
-	const char* uniform = getTextureUniformName(desc, type, index);
+	const char* uniform = getTextureUniformName(desc, type);
 
 	static char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
@@ -292,10 +292,10 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type, 
 	};
 
 	if (model)
-		model->getShader().getTexture().getTextureFrames(type, index).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
 }
 
-GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type, GMint index)
+GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
 {
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	GM_ASSERT(desc);
@@ -303,50 +303,52 @@ GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type, GMint in
 	static const std::string u_tex_texture = (GMString(".") + desc->TextureAttributes.Texture).toStdString();
 
 	GMint idx = (GMint)type;
-	GMint texId = getTextureID(type, index);
+	GMint texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
-	const char* uniform = getTextureUniformName(desc, type, index);
+	const char* uniform = getTextureUniformName(desc, type);
 	static char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, u_tex_texture.c_str());
 	combineUniform(u_enabled, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u_texture, texId);
 	shaderProgram->setInt(u_enabled, 1);
 
-	activateTextureTransform(model, type, index);
+	activateTextureTransform(model, type);
 	return texId;
 }
 
-void GMGLRenderer::deactivateTexture(GMTextureType type, GMint index)
+void GMGLRenderer::deactivateTexture(GMTextureType type)
 {
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	GM_ASSERT(desc);
 	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
-	GMint texId = getTextureID(type, index);
+	GMint texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
 	GMint idx = (GMint)type;
-	const char* uniform = getTextureUniformName(desc, type, index);
+	const char* uniform = getTextureUniformName(desc, type);
 	static char u[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u, 0);
 }
 
-GMint GMGLRenderer::getTextureID(GMTextureType type, GMint index)
+GMint GMGLRenderer::getTextureID(GMTextureType type)
 {
 	switch (type)
 	{
 	case GMTextureType::Ambient:
-		return GMTextureRegisterQuery<GMTextureType::Ambient>::Value + index;
+		return GMTextureRegisterQuery<GMTextureType::Ambient>::Value;
 	case GMTextureType::Diffuse:
-		return GMTextureRegisterQuery<GMTextureType::Diffuse>::Value + index;
+		return GMTextureRegisterQuery<GMTextureType::Diffuse>::Value;
 	case GMTextureType::Specular:
-		return GMTextureRegisterQuery<GMTextureType::Specular>::Value + index;
+		return GMTextureRegisterQuery<GMTextureType::Specular>::Value;
 	case GMTextureType::NormalMap:
-		GM_ASSERT(index == 0);
 		return GMTextureRegisterQuery<GMTextureType::NormalMap>::Value;
+	case GMTextureType::Albedo:
+		return GMTextureRegisterQuery<GMTextureType::Albedo>::Value;
+	case GMTextureType::MetallicRoughnessAO:
+		return GMTextureRegisterQuery<GMTextureType::MetallicRoughnessAO>::Value;
 	case GMTextureType::Lightmap:
-		GM_ASSERT(index == 0);
 		return GMTextureRegisterQuery<GMTextureType::Lightmap>::Value;
 	default:
 		GM_ASSERT(false);
@@ -354,22 +356,22 @@ GMint GMGLRenderer::getTextureID(GMTextureType type, GMint index)
 	}
 }
 
-bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type, GMint index)
+bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
 	if (d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() && type != GMTextureType::Lightmap)
 		return true;
 
 	// 按照贴图类型选择纹理动画序列
-	GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(type, index);
+	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(type);
 
 	// 获取序列中的这一帧
-	ITexture* texture = getTexture(samplers);
+	ITexture* texture = getTexture(sampler);
 	if (texture)
 	{
 		// 激活动画序列
-		GMint texId = activateTexture(model, (GMTextureType)type, index);
-		texture->bindSampler(&samplers);
+		GMint texId = activateTexture(model, (GMTextureType)type);
+		texture->bindSampler(&sampler);
 		texture->useTexture(texId);
 		return true;
 	}
@@ -497,23 +499,17 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
-		GMint count = GMMaxTextureCount(type);
-		GMint missedTextureCount = 0;
-		for (GMint i = 0; i < count; i++)
+		if (!drawTexture(model, (GMTextureType)type))
 		{
-			if (!drawTexture(model, (GMTextureType)type, i))
-				++missedTextureCount;
-		}
-
-		if (missedTextureCount == count && (
-			type == GMTextureType::Ambient ||
-			type == GMTextureType::Diffuse ||
-			type == GMTextureType::Specular ||
-			type == GMTextureType::Lightmap
-			))
-		{
-			GMint texId = activateTexture(nullptr, (GMTextureType)type, missedTextureCount - count);
-			getWhiteTexture()->useTexture(texId);
+			if (type == GMTextureType::Ambient ||
+				type == GMTextureType::Diffuse ||
+				type == GMTextureType::Specular ||
+				type == GMTextureType::Lightmap
+				)
+			{
+				GMint texId = activateTexture(nullptr, (GMTextureType)type);
+				getWhiteTexture()->useTexture(texId);
+			}
 		}
 	}
 
@@ -529,11 +525,7 @@ void GMGLRenderer_3D::afterDraw(GMModel* model)
 
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
-		GMint count = GMMaxTextureCount(type);
-		for (GMint i = 0; i < count; i++)
-		{
-			deactivateTexture((GMTextureType)type, i);
-		}
+		deactivateTexture((GMTextureType)type);
 	}
 }
 
@@ -586,15 +578,15 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 	applyShader(model->getShader());
 
 	// 只选择环境光纹理
-	GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0);
+	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
 
 	// 获取序列中的这一帧
-	ITexture* texture = getTexture(samplers);
+	ITexture* texture = getTexture(sampler);
 	if (texture)
 	{
 		// 激活动画序列
-		GMint texId = activateTexture(model, GMTextureType::Ambient, 0);
-		texture->bindSampler(&samplers);
+		GMint texId = activateTexture(model, GMTextureType::Ambient);
+		texture->bindSampler(&sampler);
 		texture->useTexture(texId);
 	}
 }
@@ -620,9 +612,9 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 	D_BASE(db, Base);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	GMTextureList& texture = model->getShader().getTexture();
-	GMTextureSampler& samplers = texture.getTextureFrames(GMTextureType::CubeMap, 0);
-	ITexture* glTex = samplers.getFrameByIndex(0);
+	GMTextureList& texture = model->getShader().getTextureList();
+	GMTextureSampler& sampler = texture.getTextureSampler(GMTextureType::CubeMap);
+	ITexture* glTex = sampler.getFrameByIndex(0);
 	if (glTex)
 	{
 		IShaderProgram* shaderProgram = getShaderProgram();
@@ -631,7 +623,7 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
 		shaderProgram->setInt(desc->CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
-		glTex->bindSampler(&samplers);
+		glTex->bindSampler(&sampler);
 		glTex->useTexture(GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		db->engine->setCubeMap(glTex);
 	}
@@ -644,11 +636,11 @@ void GMGLRenderer_CubeMap::afterDraw(GMModel* model)
 void GMGLRenderer_Filter::beforeDraw(GMModel* model)
 {
 	applyShader(model->getShader());
-	GMTextureSampler& samplers = model->getShader().getTexture().getTextureFrames(GMTextureType::Ambient, 0);
-	ITexture* texture = getTexture(samplers);
+	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
+	ITexture* texture = getTexture(sampler);
 	GM_ASSERT(texture);
-	GMint texId = activateTexture(model, GMTextureType::Ambient, 0);
-	texture->bindSampler(&samplers);
+	GMint texId = activateTexture(model, GMTextureType::Ambient);
+	texture->bindSampler(&sampler);
 	texture->useTexture(texId);
 }
 
@@ -699,11 +691,11 @@ IShaderProgram* GMGLRenderer_Filter::getShaderProgram()
 	return db->engine->getShaderProgram(GMShaderProgramType::FilterShaderProgram);
 }
 
-GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type, GMint index)
+GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
 	D_BASE(db, Base);
-	GMint texId = getTextureID(type, index);
+	GMint texId = getTextureID(type);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 

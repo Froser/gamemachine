@@ -25,11 +25,13 @@ namespace
 			"GM_view_position",
 
 			{ "scroll_s", "scroll_t", "scale_s", "scale_t", "enabled", "texture" },
-			"GM_ambient_textures",
-			"GM_diffuse_textures",
-			"GM_specular_textures",
-			"GM_normalmap_textures",
-			"GM_lightmap_textures",
+			"GM_ambient_texture",
+			"GM_diffuse_texture",
+			"GM_specular_texture",
+			"GM_normalmap_texture",
+			"GM_lightmap_texture",
+			"GM_albedo_texture",
+			"GM_metallic_metallic_roughness_texture",
 			"GM_cubemap_texture",
 
 			"GM_lightCount",

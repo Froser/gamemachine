@@ -39,6 +39,23 @@ namespace
 			return D3D11_TEXTURE_ADDRESS_WRAP;
 		}
 	}
+
+#define BEGIN_TEX_SAMPLER() switch (type) {
+#define TEX_SAMPLER(type, texName, samName) case type: textureName = #texName; samplerName = #samName; break
+#define END_TEX_SAMPLER() }
+	void getTextureAndSamplerName(GMTextureType type, REF const char*& textureName, REF const char*& samplerName)
+	{
+		BEGIN_TEX_SAMPLER()
+			TEX_SAMPLER(GMTextureType::Ambient, AmbientTexture, AmbientSampler);
+			TEX_SAMPLER(GMTextureType::Diffuse, DiffuseTexture, DiffuseSampler);
+			TEX_SAMPLER(GMTextureType::Specular, SpecularTexture, SpecularSampler);
+			TEX_SAMPLER(GMTextureType::NormalMap, NormalMapTexture, NormalMapSampler);
+			TEX_SAMPLER(GMTextureType::Lightmap, LightmapTexture, LightmapSampler);
+			TEX_SAMPLER(GMTextureType::Albedo, AlbedoTexture, AlbedoSampler);
+			TEX_SAMPLER(GMTextureType::MetallicRoughnessAO, MetallicRoughnessAOTexture, MetallicRoughnessAOSampler);
+			TEX_SAMPLER(GMTextureType::CubeMap, CubeMapTexture, CubeMapSampler);
+		END_TEX_SAMPLER()
+	}
 }
 
 GMDx11Texture::GMDx11Texture(GMImage* image)
@@ -73,12 +90,40 @@ void GMDx11Texture::bindSampler(GMTextureSampler* sampler)
 	}
 }
 
-void GMDx11Texture::useTexture(GMint textureIndex)
+void GMDx11Texture::useTexture(GMint textureType)
 {
 	D(d);
-	GM_ASSERT(d->samplerState);
-	d->deviceContext->PSSetShaderResources(textureIndex, 1, &d->shaderResourceView);
-	d->deviceContext->PSSetSamplers(textureIndex, 1, &d->samplerState);
+	if (!d->effect)
+	{
+		bool b = GM.getGraphicEngine()->getShaderProgram()->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
+		GM_ASSERT(b && d->effect);
+	}
+
+	GMTextureType tt = (GMTextureType)textureType;
+	const char* textureName = nullptr;
+	const char* samplerName = nullptr;
+	getTextureAndSamplerName(tt, textureName, samplerName);
+
+	ID3DX11EffectShaderResourceVariable* shaderResourceVariable = nullptr;
+	ID3DX11EffectSamplerVariable* samplerVariable = nullptr;
+	auto iter = d->variables.find(textureName);
+	if (iter != d->variables.end())
+	{
+		shaderResourceVariable = iter->second.shaderResource;
+		samplerVariable = iter->second.sampler;
+	}
+	else
+	{
+		shaderResourceVariable = d->effect->GetVariableByName(textureName)->AsShaderResource();
+		samplerVariable = d->effect->GetVariableByName(samplerName)->AsSampler();
+		GM_ASSERT(shaderResourceVariable->IsValid());
+		GM_ASSERT(samplerVariable->IsValid());
+		GMDx11TextureSamplerVariable variable = { shaderResourceVariable, samplerVariable };
+		d->variables[textureName] = variable;
+	}
+
+	GM_DX_HR(shaderResourceVariable->SetResource(d->shaderResourceView));
+	GM_DX_HR(samplerVariable->SetSampler(0, d->samplerState));
 }
 
 void GMDx11Texture::init()

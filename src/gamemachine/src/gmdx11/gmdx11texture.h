@@ -5,6 +5,12 @@
 #include <gmcom.h>
 BEGIN_NS
 
+struct GMDx11TextureSamplerVariable
+{
+	ID3DX11EffectShaderResourceVariable* shaderResource;
+	ID3DX11EffectSamplerVariable* sampler;
+};
+
 GM_PRIVATE_OBJECT(GMDx11Texture)
 {
 	GMImage* image = nullptr;
@@ -13,6 +19,8 @@ GM_PRIVATE_OBJECT(GMDx11Texture)
 	GMComPtr<ID3D11Resource> resource;
 	GMComPtr<ID3D11ShaderResourceView> shaderResourceView;
 	GMComPtr<ID3D11SamplerState> samplerState;
+	GMComPtr<ID3DX11Effect> effect;
+	HashMap<const char*, GMDx11TextureSamplerVariable> variables;
 };
 
 class GMDx11Texture : public ITexture
@@ -26,7 +34,7 @@ public:
 public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
-	virtual void useTexture(GMint textureIndex) override;
+	virtual void useTexture(GMint textureType) override;
 
 public:
 	ID3D11ShaderResourceView* getResourceView()
@@ -34,13 +42,6 @@ public:
 		D(d);
 		GM_ASSERT(d->shaderResourceView);
 		return d->shaderResourceView;
-	}
-
-	ID3D11SamplerState* getSamplerState()
-	{
-		D(d);
-		GM_ASSERT(d->samplerState);
-		return d->samplerState;
 	}
 };
 

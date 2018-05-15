@@ -36,31 +36,23 @@ cbuffer WorldConstantBuffer: register( b0 )
 //--------------------------------------------------------------------------------------
 // Textures, LightAttributes, Materials
 //--------------------------------------------------------------------------------------
-Texture2D AmbientTexture_0: register(t0);
-Texture2D AmbientTexture_1: register(t1);
-Texture2D AmbientTexture_2: register(t2);
-Texture2D DiffuseTexture_0: register(t3);
-Texture2D DiffuseTexture_1: register(t4);
-Texture2D DiffuseTexture_2: register(t5);
-Texture2D SpecularTexture_0: register(t6);
-Texture2D SpecularTexture_1: register(t7);
-Texture2D SpecularTexture_2: register(t8);
-Texture2D NormalMapTexture: register(t9);
-Texture2D LightmapTexture: register(t10);
-TextureCube CubeMapTexture: register(t11);
+Texture2D AmbientTexture: register(t0);
+Texture2D DiffuseTexture: register(t1);
+Texture2D SpecularTexture: register(t2);
+Texture2D NormalMapTexture: register(t3);
+Texture2D LightmapTexture: register(t4);
+Texture2D AlbedoTexture: register(t5);
+Texture2D MetallicRoughnessAOTexture: register(t6);
+TextureCube CubeMapTexture: register(t7);
 
-SamplerState AmbientSampler_0: register(s0);
-SamplerState AmbientSampler_1: register(s1);
-SamplerState AmbientSampler_2: register(s2);
-SamplerState DiffuseSampler_0: register(s3);
-SamplerState DiffuseSampler_1: register(s4);
-SamplerState DiffuseSampler_2: register(s5);
-SamplerState SpecularSampler_0: register(s6);
-SamplerState SpecularSampler_1: register(s7);
-SamplerState SpecularSampler_2: register(s8);
-SamplerState NormalMapSampler: register(s9);
-SamplerState LightmapSampler: register(s10);
-SamplerState CubeMapSampler: register(s11);
+SamplerState AmbientSampler: register(s0);
+SamplerState DiffuseSampler: register(s1);
+SamplerState SpecularSampler: register(s2);
+SamplerState NormalMapSampler: register(s3);
+SamplerState LightmapSampler: register(s4);
+SamplerState AlbedoSampler: register(s5);
+SamplerState MetallicRoughnessAOSampler: register(s6);
+SamplerState CubeMapSampler: register(s7);
 
 SamplerState ShadowMapSampler
 {
@@ -133,12 +125,14 @@ class GMCubeMapTexture : GMTexture
     }
 };
 
-GMTexture AmbientTextureAttributes[3];
-GMTexture DiffuseTextureAttributes[3];
-GMTexture SpecularTextureAttributes[3];
-GMTexture NormalMapTextureAttributes[1];
-GMTexture LightmapTextureAttributes[1];
-GMCubeMapTexture CubeMapTextureAttributes[1];
+GMTexture AmbientTextureAttribute;
+GMTexture DiffuseTextureAttribute;
+GMTexture SpecularTextureAttribute;
+GMTexture NormalMapTextureAttribute;
+GMTexture LightmapTextureAttribute;
+GMTexture AlbedoTextureAttribute;
+GMTexture MetallicRoughnessAOTextureAttribute;
+GMCubeMapTexture CubeMapTextureAttribute;
 
 interface ILight
 {
@@ -336,16 +330,6 @@ struct VS_OUTPUT
 
 typedef VS_OUTPUT PS_INPUT;
 
-bool HasNoTexture(GMTexture attributes[3])
-{
-    for (int i = 0; i < 3; ++i)
-    {
-        if (attributes[i].Enabled)
-            return false;
-    }
-    return true;
-}
-
 class TangentSpace
 {
     float3 Normal_Tangent_N;
@@ -505,7 +489,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
     
     // 计算折射
     float4 color_Refractivity = IlluminateRefraction(
-        CubeMapTextureAttributes[0],
+        CubeMapTextureAttribute,
         CubeMapTexture,
         input.Normal_World_N,
         ToFloat4(input.WorldPos),
@@ -540,12 +524,12 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 bool PS_3D_HasNormalMap()
 {
-    return NormalMapTextureAttributes[0].Enabled;
+    return NormalMapTextureAttribute.Enabled;
 }
 
 GMTexture PS_3D_NormalMap()
 {
-    return NormalMapTextureAttributes[0];
+    return NormalMapTextureAttribute;
 }
 
 float4 PS_3D(PS_INPUT input) : SV_TARGET
@@ -568,23 +552,14 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.Normal_Eye_N = normal_Eye_N;
 
     // 计算Ambient
-    float4 color_Ambient = float4(0, 0, 0, 0);
-    color_Ambient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
-    color_Ambient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
-    color_Ambient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
-    color_Ambient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
+    float4 color_Ambient = AmbientTextureAttribute.Sample(AmbientTexture, AmbientSampler, input.Texcoord);
+    color_Ambient *= LightmapTextureAttribute.Sample(LightmapTexture, LightmapSampler, input.Lightmap);
 
     // 计算Diffuse
-    float4 color_Diffuse = float4(0, 0, 0, 0);
-    color_Diffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
-    color_Diffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
-    color_Diffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
+    float4 color_Diffuse = DiffuseTextureAttribute.Sample(DiffuseTexture, DiffuseSampler, input.Texcoord);
 
     // 计算Specular(如果有Specular贴图)
-    float4 color_Specular = 0;
-    color_Specular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
-    color_Specular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
-    color_Specular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
+    float4 color_Specular = SpecularTextureAttribute.Sample(SpecularTexture, SpecularSampler, input.Texcoord).r;
 
     commonInput.AmbientLightmapTexture = color_Ambient * Material.Ka;
     commonInput.DiffuseTexture = color_Diffuse * Material.Kd;
@@ -620,16 +595,12 @@ VS_OUTPUT VS_2D(VS_INPUT input)
 
 float4 PS_2D(PS_INPUT input) : SV_TARGET
 {
-    if (HasNoTexture(DiffuseTextureAttributes) && HasNoTexture(AmbientTextureAttributes))
+    if (!DiffuseTextureAttribute.Enabled && !AmbientTextureAttribute.Enabled)
         return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    color += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
-    color += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
-    color += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
-    color += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
-    color += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
-    color += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
+    color += AmbientTextureAttribute.Sample(AmbientTexture, AmbientSampler, input.Texcoord);
+    color += DiffuseTextureAttribute.Sample(DiffuseTexture, DiffuseSampler, input.Texcoord);
     return color;
 }
 
@@ -643,7 +614,7 @@ VS_OUTPUT VS_Glyph(VS_INPUT input)
 
 float4 PS_Glyph(PS_INPUT input) : SV_TARGET
 {
-    float4 alpha = AmbientTexture_0.Sample(AmbientSampler_0, input.Texcoord);
+    float4 alpha = AmbientTexture.Sample(AmbientSampler, input.Texcoord);
     return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
 }
 
@@ -664,7 +635,7 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
 float4 PS_CubeMap(PS_INPUT input) : SV_TARGET
 {
     float3 texcoord = input.WorldPos.xyz;
-    return CubeMapTextureAttributes[0].Sample(CubeMapTexture, CubeMapSampler, texcoord);
+    return CubeMapTextureAttribute.Sample(CubeMapTexture, CubeMapSampler, texcoord);
 }
 
 //--------------------------------------------------------------------------------------
@@ -722,23 +693,14 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
     output.Normal_World = Float3ToTexture( normalize(mul(input.Normal.xyz, inverseTransposeModelMatrix)) );
 
-    float4 texAmbient = float4(0, 0, 0, 0);
-    float4 texDiffuse = float4(0, 0, 0, 0);
-    texAmbient += AmbientTextureAttributes[0].Sample(AmbientTexture_0, AmbientSampler_0, input.Texcoord);
-    texAmbient += AmbientTextureAttributes[1].Sample(AmbientTexture_1, AmbientSampler_1, input.Texcoord);
-    texAmbient += AmbientTextureAttributes[2].Sample(AmbientTexture_2, AmbientSampler_2, input.Texcoord);
-    texAmbient *= LightmapTextureAttributes[0].Sample(LightmapTexture, LightmapSampler, input.Lightmap);
+    float4 texAmbient = AmbientTextureAttribute.Sample(AmbientTexture, AmbientSampler, input.Texcoord);
+    texAmbient *= LightmapTextureAttribute.Sample(LightmapTexture, LightmapSampler, input.Lightmap);
     
-    texDiffuse += DiffuseTextureAttributes[0].Sample(DiffuseTexture_0, DiffuseSampler_0, input.Texcoord);
-    texDiffuse += DiffuseTextureAttributes[1].Sample(DiffuseTexture_1, DiffuseSampler_1, input.Texcoord);
-    texDiffuse += DiffuseTextureAttributes[2].Sample(DiffuseTexture_2, DiffuseSampler_2, input.Texcoord);
+    float4 texDiffuse = DiffuseTextureAttribute.Sample(DiffuseTexture, DiffuseSampler, input.Texcoord);
     output.TextureAmbient = texAmbient * Material.Ka;
     output.TextureDiffuse = texDiffuse * Material.Kd;
 
-    float texSpecular = 0;
-    texSpecular += SpecularTextureAttributes[0].Sample(SpecularTexture_0, SpecularSampler_0, input.Texcoord).r;
-    texSpecular += SpecularTextureAttributes[1].Sample(SpecularTexture_1, SpecularSampler_1, input.Texcoord).r;
-    texSpecular += SpecularTextureAttributes[2].Sample(SpecularTexture_2, SpecularSampler_2, input.Texcoord).r;
+    float texSpecular = SpecularTextureAttribute.Sample(SpecularTexture, SpecularSampler, input.Texcoord).r;
 
     if (PS_3D_HasNormalMap())
     {

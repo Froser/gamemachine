@@ -24,39 +24,32 @@ BEGIN_NS
 constexpr GMint GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
 constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
 
-inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTextureType t, GMuint index)
+inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTextureType t)
 {
-	GM_ASSERT(index < GMMaxTextureCount(t));
-	static const std::string GMSHADER_AMBIENT_TEXTURES_0 = std::string(desc->AmbientTextureName) + "[0]";
-	static const std::string GMSHADER_AMBIENT_TEXTURES_1 = std::string(desc->AmbientTextureName) + "[1]";
-	static const std::string GMSHADER_AMBIENT_TEXTURES_2 = std::string(desc->AmbientTextureName) + "[2]";
-	static const std::string GMSHADER_DIFFUSE_TEXTURES_0 = std::string(desc->DiffuseTextureName) + "[0]";
-	static const std::string GMSHADER_DIFFUSE_TEXTURES_1 = std::string(desc->DiffuseTextureName) + "[1]";
-	static const std::string GMSHADER_DIFFUSE_TEXTURES_2 = std::string(desc->DiffuseTextureName) + "[2]";
-	static const std::string GMSHADER_SPECULAR_TEXTURES_0 = std::string(desc->SpecularTextureName) + "[0]";
-	static const std::string GMSHADER_SPECULAR_TEXTURES_1 = std::string(desc->SpecularTextureName) + "[1]";
-	static const std::string GMSHADER_SPECULAR_TEXTURES_2 = std::string(desc->SpecularTextureName) + "[2]";
-	static const std::string GMSHADER_NORMALMAP_TEXTURE_0 = std::string(desc->NormalMapTextureName) + "[0]";
-	static const std::string GMSHADER_LIGHTMAP_TEXTURE_0 = std::string(desc->LightMapTextureName) + "[0]";
+	static const std::string GMSHADER_AMBIENT_TEXTURES = std::string(desc->AmbientTextureName);
+	static const std::string GMSHADER_DIFFUSE_TEXTURES = std::string(desc->DiffuseTextureName);
+	static const std::string GMSHADER_SPECULAR_TEXTURES = std::string(desc->SpecularTextureName);
+	static const std::string GMSHADER_NORMALMAP_TEXTURE = std::string(desc->NormalMapTextureName);
+	static const std::string GMSHADER_LIGHTMAP_TEXTURE = std::string(desc->LightMapTextureName);
+	static const std::string GMSHADER_ALBEDO_TEXTURE = std::string(desc->AlbedoTextureName);
+	static const std::string GMSHADER_METALLIC_ROUGHNESS_AO_TEXTURE = std::string(desc->MetallicRoughnessAOTextureName);
 
 	switch (t)
 	{
 	case GMTextureType::Ambient:
-		return index == 0 ? GMSHADER_AMBIENT_TEXTURES_0.c_str() :
-			index == 1 ? GMSHADER_AMBIENT_TEXTURES_1.c_str() :
-			index == 2 ? GMSHADER_AMBIENT_TEXTURES_2.c_str() : "";
+		return GMSHADER_AMBIENT_TEXTURES.c_str();
 	case GMTextureType::Diffuse:
-		return index == 0 ? GMSHADER_DIFFUSE_TEXTURES_0.c_str() :
-			index == 1 ? GMSHADER_DIFFUSE_TEXTURES_1.c_str() :
-			index == 2 ? GMSHADER_DIFFUSE_TEXTURES_2.c_str() : "";
+		return GMSHADER_DIFFUSE_TEXTURES.c_str();
 	case GMTextureType::Specular:
-		return index == 0 ? GMSHADER_SPECULAR_TEXTURES_0.c_str() :
-			index == 1 ? GMSHADER_SPECULAR_TEXTURES_1.c_str() :
-			index == 2 ? GMSHADER_SPECULAR_TEXTURES_2.c_str() : "";
+		return GMSHADER_SPECULAR_TEXTURES.c_str();
 	case GMTextureType::NormalMap:
-		return index == 0 ? GMSHADER_NORMALMAP_TEXTURE_0.c_str() : "";
+		return GMSHADER_NORMALMAP_TEXTURE.c_str();
 	case GMTextureType::Lightmap:
-		return index == 0 ? GMSHADER_LIGHTMAP_TEXTURE_0.c_str() : "";
+		return GMSHADER_LIGHTMAP_TEXTURE.c_str();
+	case GMTextureType::Albedo:
+		return GMSHADER_ALBEDO_TEXTURE.c_str();
+	case GMTextureType::MetallicRoughnessAO:
+		return GMSHADER_METALLIC_ROUGHNESS_AO_TEXTURE.c_str();
 	case GMTextureType::EndOfCommonTexture:
 	default:
 		GM_ASSERT(false);

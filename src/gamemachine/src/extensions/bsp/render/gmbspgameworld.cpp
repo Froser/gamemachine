@@ -576,7 +576,7 @@ bool GMBSPGameWorld::setMaterialTexture(T& face, REF GMShader& shader)
 		ITexture* texture = GMAssets::getTexture(node->asset);
 		GM_ASSERT(texture);
 		shader.getMaterial().ks = shader.getMaterial().kd = GMVec3(0);
-		shader.getTexture().getTextureFrames(GMTextureType::Ambient, 0).addFrame(texture);
+		shader.getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(texture);
 	}
 	return true;
 }
@@ -596,7 +596,7 @@ void GMBSPGameWorld::setMaterialLightmap(GMint lightmapid, REF GMShader& shader)
 	GMAssetsNode* node = getAssets().getNodeFromPath(lightmapPath.c_str());
 	GM_ASSERT(node);
 	ITexture* texture = GMAssets::getTexture(node->asset);
-	shader.getTexture().getTextureFrames(GMTextureType::Lightmap, 0).addFrame(texture);
+	shader.getTextureList().getTextureSampler(GMTextureType::Lightmap).addFrame(texture);
 }
 
 void GMBSPGameWorld::importBSP()

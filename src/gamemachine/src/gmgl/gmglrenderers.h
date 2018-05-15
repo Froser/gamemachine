@@ -49,11 +49,11 @@ protected:
 	}
 
 protected:
-	virtual void activateTextureTransform(GMModel* model, GMTextureType type, GMint index);
-	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
-	virtual void deactivateTexture(GMTextureType type, GMint index);
-	virtual GMint getTextureID(GMTextureType type, GMint index);
-	virtual bool drawTexture(GMModel* model, GMTextureType type, GMint index = 0);
+	virtual void activateTextureTransform(GMModel* model, GMTextureType type);
+	virtual GMint activateTexture(GMModel* model, GMTextureType type);
+	virtual void deactivateTexture(GMTextureType type);
+	virtual GMint getTextureID(GMTextureType type);
+	virtual bool drawTexture(GMModel* model, GMTextureType type);
 	virtual ITexture* getTexture(GMTextureSampler& frames);
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
@@ -122,7 +122,7 @@ class GMGLRenderer_Filter : public GMGLRenderer
 	virtual IShaderProgram* getShaderProgram() override;
 
 protected:
-	virtual GMint activateTexture(GMModel* model, GMTextureType type, GMint index);
+	virtual GMint activateTexture(GMModel* model, GMTextureType type);
 
 private:
 	void setHDR(IShaderProgram* shaderProgram);

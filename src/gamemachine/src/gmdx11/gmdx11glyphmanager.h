@@ -3,20 +3,17 @@
 #include <gmcommon.h>
 #include <gmglyphmanager.h>
 #include <gmcom.h>
+#include "gmdx11texture.h"
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11GlyphTexture)
 {
-	GMComPtr<ID3D11DeviceContext> deviceContext;
-	GMComPtr<ID3D11Device> device;
-	GMComPtr<ID3D11ShaderResourceView> resourceView;
 	GMComPtr<ID3D11Texture2D> texture;
-	GMComPtr<ID3D11SamplerState> samplerState;
 };
 
-class GMDx11GlyphTexture : public ITexture
+class GMDx11GlyphTexture : public GMDx11Texture
 {
-	DECLARE_PRIVATE(GMDx11GlyphTexture)
+	DECLARE_PRIVATE_AND_BASE(GMDx11GlyphTexture, GMDx11Texture)
 
 public:
 	GMDx11GlyphTexture();

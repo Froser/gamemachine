@@ -93,6 +93,8 @@ struct GMShaderVariablesDesc
 	const char* SpecularTextureName;
 	const char* NormalMapTextureName;
 	const char* LightMapTextureName;
+	const char* AlbedoTextureName;
+	const char* MetallicRoughnessAOTextureName;
 	const char* CubeMapTextureName;
 
 	// 光照

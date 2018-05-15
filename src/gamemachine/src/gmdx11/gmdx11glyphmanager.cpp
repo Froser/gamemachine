@@ -8,15 +8,6 @@
 #include "gmdxincludes.h"
 #include "gmdx11helper.h"
 
-GMDx11GlyphTexture::GMDx11GlyphTexture()
-{
-	D(d);
-	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
-	GM_ASSERT(d->device);
-	GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
-	GM_ASSERT(d->deviceContext);
-}
-
 GMDx11GlyphManager::GMDx11GlyphManager()
 {
 }
@@ -35,6 +26,7 @@ ITexture* GMDx11GlyphManager::glyphTexture()
 void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo)
 {
 	D(d);
+	D_BASE(db, Base);
 	if (!d->deviceContext)
 	{
 		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
@@ -59,9 +51,15 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	);
 }
 
+GMDx11GlyphTexture::GMDx11GlyphTexture()
+	: GMDx11Texture(nullptr)
+{
+}
+
 void GMDx11GlyphTexture::init()
 {
 	D(d);
+	D_BASE(db, Base);
 	D3D11_TEXTURE2D_DESC desc = { 0 };
 	desc.Width = GMDx11GlyphManager::CANVAS_WIDTH;
 	desc.Height = GMDx11GlyphManager::CANVAS_HEIGHT;
@@ -79,34 +77,33 @@ void GMDx11GlyphTexture::init()
 	resourceData.pSysMem = nullptr;
 	resourceData.SysMemPitch = GMDx11GlyphManager::CANVAS_WIDTH; //每个字符占1个字节
 
-	GM_DX_HR(d->device->CreateTexture2D(&desc, 0, &d->texture));
+	GM_DX_HR(db->device->CreateTexture2D(&desc, 0, &d->texture));
 
 	GM_DX11_SET_OBJECT_NAME_A(d->texture, "GM_GLYPH_TEXTURE");
-	GM_DX_HR(d->device->CreateShaderResourceView(
+	GM_DX_HR(db->device->CreateShaderResourceView(
 		d->texture,
 		NULL,
-		&d->resourceView
+		&db->shaderResourceView
 	));
 }
 
 void GMDx11GlyphTexture::bindSampler(GMTextureSampler* sampler)
 {
 	D(d);
-	if (!d->samplerState)
+	D_BASE(db, Base);
+	if (!db->samplerState)
 	{
 		// 创建采样器
 		D3D11_SAMPLER_DESC desc = GMDx11Helper::GMGetDx11DefaultSamplerDesc();
 		desc.Filter = GMDx11Helper::GMGetDx11Filter(sampler->getMinFilter(), sampler->getMagFilter());
 		desc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
 		desc.AddressV = D3D11_TEXTURE_ADDRESS_CLAMP;
-		GM_DX_HR(d->device->CreateSamplerState(&desc, &d->samplerState));
+		GM_DX_HR(db->device->CreateSamplerState(&desc, &db->samplerState));
 	}
 }
 
-void GMDx11GlyphTexture::useTexture(GMint textureIndex)
+void GMDx11GlyphTexture::useTexture(GMint)
 {
 	D(d);
-	GM_ASSERT(d->samplerState);
-	d->deviceContext->PSSetShaderResources(0, 1, &d->resourceView);
-	d->deviceContext->PSSetSamplers(0, 1, &d->samplerState);
+	Base::useTexture((GMint)GMTextureType::Ambient);
 }
