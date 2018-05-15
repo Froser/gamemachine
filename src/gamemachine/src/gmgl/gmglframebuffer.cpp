@@ -290,8 +290,8 @@ void GMGLFramebuffers::createFramebuffers()
 			return;
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		d->framebuffersCreated = true;
 	}
-	d->framebuffersCreated = true;
 }
 
 void GMGLFramebuffers::clear(GMFramebuffersClearType type)
