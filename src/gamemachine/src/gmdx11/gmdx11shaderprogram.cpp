@@ -77,7 +77,9 @@ namespace
 			{
 				"GM_HDR",
 				"GM_ToneMapping",
-			}
+			},
+
+			"GM_IlluminationModel",
 		};
 		return desc;
 	}

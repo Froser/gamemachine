@@ -1,6 +1,8 @@
 //--------------------------------------------------------------------------------------
 // Functions
 //--------------------------------------------------------------------------------------
+static const float PI = 3.1415927f;
+
 float4 ToFloat4(float3 v, float w)
 {
     return float4(v.x, v.y, v.z, w);
@@ -34,7 +36,7 @@ cbuffer WorldConstantBuffer: register( b0 )
 }
 
 //--------------------------------------------------------------------------------------
-// Textures, LightAttributes, Materials
+// Textures, GM_LightAttributes, Materials
 //--------------------------------------------------------------------------------------
 Texture2D GM_AmbientTexture;
 Texture2D GM_DiffuseTexture;
@@ -196,10 +198,10 @@ struct GMLight
     float4 Color;
     int Type;
 };
-const int GM_AmbientLight = 0;
-const int GM_DirectLight = 1;
+static const int GM_AmbientLight = 0;
+static const int GM_DirectLight = 1;
 
-class GMLightProxy
+class GMPhongLightProxy
 {
     float4 IlluminateAmbient(GMLight light)
     {
@@ -226,9 +228,9 @@ class GMLightProxy
     }
 };
 
-GMLight LightAttributes[50];
+GMLight GM_LightAttributes[50];
 int GM_LightCount;
-GMLightProxy LightProxy;
+GMPhongLightProxy GM_PhoneLightProxy;
 
 struct GMScreenInfo
 {
@@ -333,7 +335,7 @@ typedef VS_OUTPUT PS_INPUT;
 class TangentSpace
 {
     float3 Normal_Tangent_N;
-    float3x3 TBN;
+    float3x3 TBN; //TBN 表示从世界坐标向切线坐标转换的矩阵
 
     void CalculateTangentSpaceInEyeSpace(
         float2 texcoord,
@@ -351,6 +353,30 @@ class TangentSpace
             tangent_Eye_N,
             bitangent_Eye_N,
             normal_Eye_N
+        ));
+    }
+
+    void CalculateTangentSpaceRuntime(
+        float3 worldPos,
+        float2 texcoord,
+        float3 normal_N,
+        GMTexture normalMap
+        )
+    {
+        Normal_Tangent_N = normalMap.RGBToNormal(GM_NormalMapTexture, GM_NormalMapSampler, texcoord);
+
+        float3 Q1 = ddx(worldPos);
+        float3 Q2 = ddy(worldPos);
+        float2 st1 = ddx(texcoord);
+        float2 st2 = ddy(texcoord);
+
+        float3 N = normalize(normal_N);
+        float3 T = normalize(Q1 * st2.y - Q2 * st1.y);
+        float3 B = -normalize(cross(N, T));
+        TBN = transpose(float3x3(
+            T,
+            B,
+            N
         ));
     }
 };
@@ -386,7 +412,7 @@ float4 IlluminateRefraction(
     if (hasNormalMap)
     {
         // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
-        float3 normal_Eye_N = mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN));
+        float3 normal_Eye_N = normalize(mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN)));
         float3 normalFromTangent_World_N = mul(normal_Eye_N, ToFloat3x3(GM_InverseViewMatrix));
         return IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World, refractivity);
     }
@@ -406,8 +432,10 @@ struct PS_3D_INPUT
     TangentSpace TangentSpace;  // 切线空间
     bool HasNormalMap;          // 是否有法线贴图
     float3 AmbientLightmapTexture;
-    float3 GM_DiffuseTexture;
-    float3 GM_SpecularTexture;
+    float3 DiffuseTexture;
+    float3 SpecularTexture;
+    float3 AlbedoTexture;
+    float3 MetallicRoughnessAOTexture;
     float Shininess;
     float Refractivity; 
 };
@@ -461,8 +489,8 @@ class GMPhong : IIlluminationModel
         float4 factor_Diffuse = float4(0, 0, 0, 0);
         float4 factor_Specular = float4(0, 0, 0, 0);
         input.AmbientLightmapTexture = max(input.AmbientLightmapTexture, float3(0, 0, 0));
-        input.GM_DiffuseTexture = max(input.GM_DiffuseTexture, float3(0, 0, 0));
-        input.GM_SpecularTexture = max(input.GM_SpecularTexture, float3(0, 0, 0));
+        input.DiffuseTexture = max(input.DiffuseTexture, float3(0, 0, 0));
+        input.SpecularTexture = max(input.SpecularTexture, float3(0, 0, 0));
 
         // 将法线换算到眼睛坐标系
         float3 position_Eye = (mul(ToFloat4(input.WorldPos), GM_ViewMatrix)).xyz;
@@ -470,29 +498,29 @@ class GMPhong : IIlluminationModel
 
         for (int i = 0; i < GM_LightCount; ++i)
         {
-            float3 lightPosition_Eye = GetLightPositionInEyeSpace(LightAttributes[i].Position, GM_ViewMatrix);
-            factor_Ambient += LightProxy.IlluminateAmbient(LightAttributes[i]) * LightAttributes[i].Color;
+            float3 lightPosition_Eye = GetLightPositionInEyeSpace(GM_LightAttributes[i].Position, GM_ViewMatrix);
+            factor_Ambient += GM_PhoneLightProxy.IlluminateAmbient(GM_LightAttributes[i]) * GM_LightAttributes[i].Color;
 
             if (!input.HasNormalMap)
             {
                 float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-                factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
-                factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;
+                factor_Diffuse += GM_PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * GM_LightAttributes[i].Color;
+                factor_Specular += GM_PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * GM_LightAttributes[i].Color;
             }
             else
             {
                 float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
                 float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
                 float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
-                factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * LightAttributes[i].Color;
-                factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
+                factor_Diffuse += GM_PhoneLightProxy.IlluminateDiffuse(GM_LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * GM_LightAttributes[i].Color;
+                factor_Specular += GM_PhoneLightProxy.IlluminateSpecular(GM_LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * GM_LightAttributes[i].Color; 
             }
         }
         float4 color_Ambient = CalculateGammaCorrection(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);
-        float4 color_Diffuse = shadowFactor * CalculateGammaCorrection(factor_Diffuse) * ToFloat4(input.GM_DiffuseTexture);
+        float4 color_Diffuse = shadowFactor * CalculateGammaCorrection(factor_Diffuse) * ToFloat4(input.DiffuseTexture);
 
         // 计算Specular
-        float4 color_Specular = shadowFactor * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.GM_SpecularTexture);
+        float4 color_Specular = shadowFactor * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.SpecularTexture);
         
         // 计算折射
         float4 color_Refractivity = IlluminateRefraction(
@@ -511,6 +539,106 @@ class GMPhong : IIlluminationModel
     }
 };
 GMPhong GM_Phong;
+
+class GMCookTorranceBRDF : IIlluminationModel
+{
+    float DistributionGGX(float3 N, float3 H, float roughness)
+    {
+        float a = roughness*roughness;
+        float a2 = a*a;
+        float NdotH = max(dot(N, H), 0.0);
+        float NdotH2 = NdotH*NdotH;
+
+        float nom   = a2;
+        float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+        denom = PI * denom * denom;
+
+        return nom / denom;
+    }
+    // ----------------------------------------------------------------------------
+    float GeometrySchlickGGX(float NdotV, float roughness)
+    {
+        float r = (roughness + 1.0);
+        float k = (r*r) / 8.0;
+
+        float nom   = NdotV;
+        float denom = NdotV * (1.0 - k) + k;
+
+        return nom / denom;
+    }
+    // ----------------------------------------------------------------------------
+    float GeometrySmith(float3 N, float3 V, float3 L, float roughness)
+    {
+        float NdotV = max(dot(N, V), 0.0);
+        float NdotL = max(dot(N, L), 0.0);
+        float ggx2 = GeometrySchlickGGX(NdotV, roughness);
+        float ggx1 = GeometrySchlickGGX(NdotL, roughness);
+
+        return ggx1 * ggx2;
+    }
+    // ----------------------------------------------------------------------------
+    float3 FresnelSchlick(float cosTheta, float3 F0)
+    {
+        return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    }
+
+    float4 Calculate(PS_3D_INPUT input, float shadowFactor)
+    {
+        float3 viewDirection_N = normalize(GM_ViewPosition.rgb - input.WorldPos);
+
+        // 换算回世界空间
+        float3 normal_World_N = normalize(mul(input.TangentSpace.Normal_Tangent_N, transpose(input.TangentSpace.TBN)));
+        return ToFloat4(normal_World_N);
+
+        float metallic = input.MetallicRoughnessAOTexture.r;
+        float roughness = input.MetallicRoughnessAOTexture.g;
+        float ao = input.MetallicRoughnessAOTexture.b;
+
+        // 金属的F0为0.04f
+        float3 F0 = float3(.04f, .04f, .04f);
+        F0 = lerp(F0, input.AlbedoTexture, metallic);
+
+        float3 Lo = float3(0, 0, 0);
+        for (int i = 0; i < GM_LightCount; ++i)
+        {
+            // 只考虑直接光源
+            if (GM_LightAttributes[i].Type != GM_DirectLight)
+                continue;
+            
+            // 计算每束光辐射率
+            float3 L_N = normalize(GM_LightAttributes[i].Position - input.WorldPos);
+            float3 H_N = normalize(viewDirection_N + L_N);
+            float attenuation = 1.0f; //先不计算衰减
+            float3 radiance = GM_LightAttributes[i].Color * attenuation;
+
+            // Cook-Torrance BRDF
+            float NDF = DistributionGGX(normal_World_N, H_N, roughness);
+            float G = GeometrySmith(normal_World_N, viewDirection_N, L_N, roughness);
+            float3 F = FresnelSchlick(max(dot(H_N, viewDirection_N), 0.0f), F0);
+            float3 nominator = NDF * G * F;
+            float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
+            float3 specular = nominator / denominator;
+
+            float3 ks = F;
+            float3 kd = float3(1, 1, 1) - ks;
+            kd *= 1.0f - metallic;
+
+            float cosTheta = max(dot(normal_World_N, L_N), 0);
+            Lo += (kd * input.AlbedoTexture / PI + specular) * radiance * cosTheta;
+        }
+
+        float3 ambient = float3(.03f, .03f, .03f) * input.AlbedoTexture * roughness;
+        float3 color = ambient + Lo;
+
+        // HDR tonemapping
+        color = color / (color + float3(1, 1, 1));
+
+        // gamma correct
+        color = pow(color, float3(1.0f/2.2f, 1.0f/2.2f, 1.0f/2.2f)); 
+        return ToFloat4(color);
+    }
+};
+GMCookTorranceBRDF GM_CookTorranceBRDF;
 
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
@@ -542,6 +670,13 @@ bool PS_3D_HasNormalMap()
     return GM_NormalMapTextureAttribute.Enabled;
 }
 
+bool PS_3D_IsTangentSpaceInvalid(PS_INPUT input)
+{
+    // 返回是否有切线空间
+    // 对于Index绘制，会传入一个小于-1的非法值
+    return input.Tangent.x < -1 && input.Bitangent.x < -1;
+}
+
 GMTexture PS_3D_NormalMap()
 {
     return GM_NormalMapTextureAttribute;
@@ -557,7 +692,12 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     PS_3D_INPUT commonInput;
     TangentSpace tangentSpace;
     if (PS_3D_HasNormalMap())
-        tangentSpace.CalculateTangentSpaceInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye, PS_3D_NormalMap());
+    {
+        if (PS_3D_IsTangentSpaceInvalid(input))
+            tangentSpace.CalculateTangentSpaceRuntime(input.WorldPos, input.Texcoord, input.Normal, PS_3D_NormalMap());
+        else
+            tangentSpace.CalculateTangentSpaceInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye, PS_3D_NormalMap());
+    }
 
     commonInput.TangentSpace = tangentSpace;
     commonInput.WorldPos = input.WorldPos;
@@ -577,10 +717,12 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     float4 color_Specular = GM_SpecularTextureAttribute.Sample(GM_SpecularTexture, GM_SpecularSampler, input.Texcoord).r;
 
     commonInput.AmbientLightmapTexture = color_Ambient * GM_Material.Ka;
-    commonInput.GM_DiffuseTexture = color_Diffuse * GM_Material.Kd;
-    commonInput.GM_SpecularTexture = color_Specular * GM_Material.Ks;
+    commonInput.DiffuseTexture = color_Diffuse * GM_Material.Kd;
+    commonInput.SpecularTexture = color_Specular * GM_Material.Ks;
     commonInput.Shininess = GM_Material.Shininess;
     commonInput.Refractivity = GM_Material.Refractivity;
+    commonInput.AlbedoTexture = pow( GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord).rgb, float3(2.2f, 2.2f, 2.2f));
+    commonInput.MetallicRoughnessAOTexture = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord).rgb;
 
     return PS_3D_CalculateColor(commonInput);
 }
@@ -759,7 +901,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         PosRef = GM_DeferredPosition_World_Refractivity.Load(coord);
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Load(coord)).rgb;
-        commonInput.GM_DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
+        commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
         KSS = GM_DeferredSpecular_Shininess.Load(coord);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap.Load(coord);
     }
@@ -770,12 +912,12 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         PosRef = GM_DeferredPosition_World_Refractivity_MSAA.Load(coord, 0);
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_MSAA, coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient_MSAA.Load(coord, 0)).rgb;
-        commonInput.GM_DiffuseTexture = (GM_DeferredTextureDiffuse_MSAA.Load(coord, 0)).rgb;
+        commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse_MSAA.Load(coord, 0)).rgb;
         KSS = GM_DeferredSpecular_Shininess_MSAA.Load(coord, 0);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap_MSAA.Load(coord, 0);
     }
 
-    commonInput.GM_SpecularTexture = KSS.rgb;
+    commonInput.SpecularTexture = KSS.rgb;
     commonInput.Shininess = KSS.a;
     commonInput.WorldPos = PosRef.rgb;
     commonInput.Refractivity = PosRef.a;
@@ -788,6 +930,8 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         commonInput.Normal_Eye_N
     ));
     commonInput.TangentSpace = tangentSpace;
+    commonInput.AlbedoTexture = float3(0,0,0);
+    commonInput.MetallicRoughnessAOTexture = float3(0,0,0);
 
     return PS_3D_CalculateColor(commonInput);
 }

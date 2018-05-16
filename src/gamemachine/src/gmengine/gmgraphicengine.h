@@ -121,6 +121,9 @@ struct GMShaderVariablesDesc
 
 	// HDR
 	GMShaderVariableHDRDesc HDR;
+
+	// 模型
+	const char* IlluminationModel;
 };
 
 struct GMShadowSourceDesc

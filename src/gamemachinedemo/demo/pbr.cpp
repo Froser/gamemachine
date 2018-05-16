@@ -30,18 +30,28 @@ void Demo_PBR::init()
 	getDemoWorldReference() = new gm::GMDemoGameWorld();
 
 	{
-		gm::ITexture* texture = nullptr;
-		gm::GMToolUtil::createTexture("cube_diffuse.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
-
 		gm::GMModel* sphere = nullptr;
 		gm::GMPrimitiveCreator::createSphere(1.0f, 64, 64, &sphere);
 
 		gm::GMShader& shader = sphere->getShader();
+		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
+
 		shader.getMaterial().ks = GMVec3(0.2f);
 		shader.getMaterial().kd = GMVec3(1);
 		shader.getMaterial().shininess = 99;
-		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Diffuse);
+
+		gm::ITexture* texture = nullptr;
+		gm::GMToolUtil::createTexture("pbr/albedo.png", &texture);
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Albedo);
+
+		gm::GMToolUtil::createTexture("pbr/normal.png", &texture);
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
+
+		gm::GMToolUtil::createTexture("pbr/metallic.png", &texture);
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
+		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::MetallicRoughnessAO);
 
 		gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, sphere);
 		d->gameObject = new gm::GMGameObject(asset);
@@ -136,7 +146,7 @@ void Demo_PBR::setDefaultLights()
 		GM_ASSERT(directLight);
 		gm::GMfloat lightPos[] = { 1, 1, -1 };
 		directLight->setLightPosition(lightPos);
-		gm::GMfloat color[] = { 1, 1, 1 };
+		gm::GMfloat color[] = { 20, 20, 20 };
 		directLight->setLightColor(color);
 		GM.getGraphicEngine()->addLight(directLight);
 	}

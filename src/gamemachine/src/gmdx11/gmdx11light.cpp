@@ -47,7 +47,7 @@ void GMDx11Light::activateLight(GMuint index, IRenderer* renderer)
 	GM_ASSERT(s_effect == dxRenderer->getEffect());
 #endif
 
-	static ID3DX11EffectVariable* lightAttributes = s_effect->GetVariableByName("LightAttributes");
+	static ID3DX11EffectVariable* lightAttributes = s_effect->GetVariableByName("GM_LightAttributes");
 	GM_ASSERT(lightAttributes->IsValid());
 
 	ID3DX11EffectVariable* lightStruct = lightAttributes->GetElement(index);

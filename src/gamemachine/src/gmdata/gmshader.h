@@ -241,11 +241,11 @@ GM_ALIGNED_STRUCT(GMMaterial)
 	GMVec3 ka = GMVec3(1);
 	GMVec3 ks = GMVec3(1);
 	GMVec3 kd = GMVec3(1);
-	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
 };
 
 GM_PRIVATE_OBJECT(GMShader)
 {
+	GMIlluminationModel illuminationModel = GMIlluminationModel::Phong;
 	GMuint surfaceFlag = 0;
 	GMS_Cull cull = GMS_Cull::CULL;
 	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
@@ -282,6 +282,7 @@ public:
 	GM_DECLARE_PROPERTY(LineWidth, lineWidth, GMfloat);
 	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
+	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel, GMIlluminationModel);
 };
 END_NS
 #endif

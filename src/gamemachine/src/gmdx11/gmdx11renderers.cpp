@@ -644,32 +644,34 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	D(d);
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	const char* textureName = nullptr;
-	if (type == GMTextureType::Ambient)
+	switch (type)
 	{
+	case GMTextureType::Ambient:
 		textureName = desc->AmbientTextureName;
-	}
-	else if (type == GMTextureType::Diffuse)
-	{
+		break;
+	case GMTextureType::Diffuse:
 		textureName = desc->DiffuseTextureName;
-	}
-	else if (type == GMTextureType::Specular)
-	{
+		break;
+	case GMTextureType::Specular:
 		textureName = desc->SpecularTextureName;
-	}
-	else if (type == GMTextureType::NormalMap)
-	{
+		break;
+	case GMTextureType::NormalMap:
 		textureName = desc->NormalMapTextureName;
-	}
-	else if (type == GMTextureType::Lightmap)
-	{
+		break;
+	case GMTextureType::Lightmap:
 		textureName = desc->LightMapTextureName;
-	}
-	else if (type == GMTextureType::CubeMap)
-	{
+		break;
+	case GMTextureType::CubeMap:
 		textureName = desc->CubeMapTextureName;
-	}
-	else
-	{
+		break;
+	case GMTextureType::Albedo:
+		textureName = desc->AlbedoTextureName;
+		break;
+	case GMTextureType::MetallicRoughnessAO:
+		textureName = desc->MetallicRoughnessAOTextureName;
+		break;
+	default:
+		GM_ASSERT(false);
 		return;
 	}
 	GM_ASSERT(textureName);
@@ -797,16 +799,21 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 	D(d);
 	GMDx11EffectVariableBank& bank = getVarBank();
 	ID3D11DeviceContext* context = d->deviceContext;
-	const GMMaterial& material = model->getShader().getMaterial();
+	const GMShader& shader = model->getShader();
+	const GMMaterial& material = shader.getMaterial();
 	GM_DX_HR(bank.Ka()->SetFloatVector(ValuePointer(material.ka)));
 	GM_DX_HR(bank.Kd()->SetFloatVector(ValuePointer(material.kd)));
 	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.ks)));
 	GM_DX_HR(bank.Shininess()->SetFloat(material.shininess));
 	GM_DX_HR(bank.Refreactivity()->SetFloat(material.refractivity));
 
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	if (material.illuminationModel == GMIlluminationModel::Phong)
-		shaderProgram->setInterfaceInstance("GM_IlluminationModel", "GM_Phong", GMShaderType::Effect);
+	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
+	if (illuminationModel == GMIlluminationModel::Phong)
+		shaderProgram->setInterfaceInstance(desc->IlluminationModel, "GM_Phong", GMShaderType::Effect);
+	else if (illuminationModel == GMIlluminationModel::CookTorranceBRDF)
+		shaderProgram->setInterfaceInstance(desc->IlluminationModel, "GM_CookTorranceBRDF", GMShaderType::Effect);
 	else
 		GM_ASSERT(false);
 }

@@ -307,6 +307,7 @@ public:
 	void clear();
 	void vertex(const GMVertex& vertex);
 	void index(GMuint index);
+	void invalidateTangentSpace();
 
 public:
 	const GMVertices& vertices()
@@ -320,6 +321,12 @@ public:
 		D(d);
 		return d->indices;
 	}
+
+private:
+	enum
+	{
+		InvalidTangentSpace = -2,
+	};
 };
 
 END_NS

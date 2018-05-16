@@ -141,6 +141,15 @@ void GMMesh::index(GMuint index)
 	d->indices.push_back(index);
 }
 
+void GMMesh::invalidateTangentSpace()
+{
+	D(d);
+	for (auto& vertex : d->vertices)
+	{
+		vertex.tangents[0] = vertex.bitangents[0] = InvalidTangentSpace;
+	}
+}
+
 void GMMesh::calculateTangentSpace(GMTopologyMode topologyMode)
 {
 	D(d);
