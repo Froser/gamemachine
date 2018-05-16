@@ -291,6 +291,58 @@ void GMPrimitiveCreator::createQuadrangle(const GMVec2& halfExtents, GMfloat z, 
 	*out = model;
 }
 
+void GMPrimitiveCreator::createSphere(GMfloat radius, GMint segmentsX, GMint segmentsY, OUT GMModel** out)
+{
+	GM_ASSERT(radius > 0 && segmentsX > 1 && segmentsY > 1);
+	GMModel* model = new GMModel();
+
+	model->setDrawMode(GMModelDrawMode::Index);
+	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	GMMesh* mesh = new GMMesh(model);
+
+	for (GMint y = 0; y <= segmentsY; ++y)
+	{
+		for (GMint x = 0; x <= segmentsX; ++x)
+		{
+			GMfloat xSegment = (GMfloat)x / segmentsX;
+			GMfloat ySegment = (GMfloat)y / segmentsY;
+			GMfloat xPos = Cos(xSegment * 2.0f * PI) * Sin(ySegment * PI);
+			GMfloat yPos = Cos(ySegment * PI);
+			GMfloat zPos = -Sin(xSegment * 2.0f * PI) * Sin(ySegment * PI);
+			GMVertex v = {
+				{ xPos * radius, yPos * radius, zPos * radius },
+				{ xPos, yPos, zPos },
+				{ xSegment, ySegment }
+			};
+			mesh->vertex(v);
+		}
+	}
+
+	bool oddRow = false;
+	for (GMint y = 0; y < segmentsY; ++y)
+	{
+		if (!oddRow)
+		{
+			for (GMint x = 0; x <= segmentsX; ++x)
+			{
+				mesh->index(y       * (segmentsX + 1) + x);
+				mesh->index((y + 1) * (segmentsX + 1) + x);
+			}
+		}
+		else
+		{
+			for (GMint x = segmentsX; x >= 0; --x)
+			{
+				mesh->index((y + 1) * (segmentsX + 1) + x);
+				mesh->index(y       * (segmentsX + 1) + x);
+			}
+		}
+		oddRow = !oddRow;
+	}
+
+	*out = model;
+}
+
 void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT GMModel** obj, IPrimitiveCreatorShaderCallback* shaderCallback, GMModelType type, GMCreateAnchor anchor, GMfloat (*customUV)[12])
 {
 	static constexpr GMfloat v_anchor_center[] = {

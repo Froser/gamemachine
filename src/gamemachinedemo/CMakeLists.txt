@@ -47,6 +47,8 @@ set(SOURCES
 		demo/specularmap.cpp
 		demo/hdr.h
 		demo/hdr.cpp
+		demo/pbr.h
+		demo/pbr.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

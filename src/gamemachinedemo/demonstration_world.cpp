@@ -15,6 +15,7 @@
 #include "demo/collision.h"
 #include "demo/specularmap.h"
 #include "demo/hdr.h"
+#include "demo/pbr.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -39,6 +40,7 @@ namespace
 		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
 		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
 		world->addDemo("HDR: Demonstrate a scene with HDR.", new Demo_HDR(world));
+		world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
 		world->init();
 	}
 }

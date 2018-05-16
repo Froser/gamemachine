@@ -25,34 +25,34 @@ float3x3 ToFloat3x3(float4x4 m)
 //--------------------------------------------------------------------------------------
 cbuffer WorldConstantBuffer: register( b0 ) 
 {
-    matrix WorldMatrix;
-    matrix ViewMatrix;
-    matrix ProjectionMatrix;
-    matrix InverseTransposeModelMatrix;
-    matrix InverseViewMatrix;
-    float4 ViewPosition;
+    matrix GM_WorldMatrix;
+    matrix GM_ViewMatrix;
+    matrix GM_ProjectionMatrix;
+    matrix GM_InverseTransposeModelMatrix;
+    matrix GM_InverseViewMatrix;
+    float4 GM_ViewPosition;
 }
 
 //--------------------------------------------------------------------------------------
 // Textures, LightAttributes, Materials
 //--------------------------------------------------------------------------------------
-Texture2D AmbientTexture: register(t0);
-Texture2D DiffuseTexture: register(t1);
-Texture2D SpecularTexture: register(t2);
-Texture2D NormalMapTexture: register(t3);
-Texture2D LightmapTexture: register(t4);
-Texture2D AlbedoTexture: register(t5);
-Texture2D MetallicRoughnessAOTexture: register(t6);
-TextureCube CubeMapTexture: register(t7);
+Texture2D GM_AmbientTexture;
+Texture2D GM_DiffuseTexture;
+Texture2D GM_SpecularTexture;
+Texture2D GM_NormalMapTexture;
+Texture2D GM_LightmapTexture;
+Texture2D GM_AlbedoTexture;
+Texture2D GM_MetallicRoughnessAOTexture;
+TextureCube GM_CubeMapTexture;
 
-SamplerState AmbientSampler: register(s0);
-SamplerState DiffuseSampler: register(s1);
-SamplerState SpecularSampler: register(s2);
-SamplerState NormalMapSampler: register(s3);
-SamplerState LightmapSampler: register(s4);
-SamplerState AlbedoSampler: register(s5);
-SamplerState MetallicRoughnessAOSampler: register(s6);
-SamplerState CubeMapSampler: register(s7);
+SamplerState GM_AmbientSampler;
+SamplerState GM_DiffuseSampler;
+SamplerState GM_SpecularSampler;
+SamplerState GM_NormalMapSampler;
+SamplerState GM_LightmapSampler;
+SamplerState GM_AlbedoSampler;
+SamplerState GM_MetallicRoughnessAOSampler;
+SamplerState GM_CubeMapSampler;
 
 SamplerState ShadowMapSampler
 {
@@ -90,7 +90,7 @@ struct GMMaterial
     float Shininess;
     float Refractivity;
 };
-GMMaterial Material;
+GMMaterial GM_Material;
 
 class GMTexture
 {
@@ -125,14 +125,14 @@ class GMCubeMapTexture : GMTexture
     }
 };
 
-GMTexture AmbientTextureAttribute;
-GMTexture DiffuseTextureAttribute;
-GMTexture SpecularTextureAttribute;
-GMTexture NormalMapTextureAttribute;
-GMTexture LightmapTextureAttribute;
-GMTexture AlbedoTextureAttribute;
-GMTexture MetallicRoughnessAOTextureAttribute;
-GMCubeMapTexture CubeMapTextureAttribute;
+GMTexture GM_AmbientTextureAttribute;
+GMTexture GM_DiffuseTextureAttribute;
+GMTexture GM_SpecularTextureAttribute;
+GMTexture GM_NormalMapTextureAttribute;
+GMTexture GM_LightmapTextureAttribute;
+GMTexture GM_AlbedoTextureAttribute;
+GMTexture GM_MetallicRoughnessAOTextureAttribute;
+GMCubeMapTexture GM_CubeMapTextureAttribute;
 
 interface ILight
 {
@@ -227,7 +227,7 @@ class GMLightProxy
 };
 
 GMLight LightAttributes[50];
-int LightCount;
+int GM_LightCount;
 GMLightProxy LightProxy;
 
 struct GMScreenInfo
@@ -237,25 +237,25 @@ struct GMScreenInfo
     bool Multisampling;
 };
 
-GMScreenInfo ScreenInfo;
+GMScreenInfo GM_ScreenInfo;
 
 //--------------------------------------------------------------------------------------
 // Gamma Correction
 //--------------------------------------------------------------------------------------
-bool GammaCorrection;
-float GammaInv;
+bool GM_GammaCorrection;
+float GM_GammaInv;
 float4 CalculateGammaCorrection(float4 factor)
 {
-    if (!GammaCorrection)
+    if (!GM_GammaCorrection)
         return factor;
 
-    return ToFloat4(pow(factor.rgb, float3(GammaInv, GammaInv, GammaInv)));
+    return ToFloat4(pow(factor.rgb, float3(GM_GammaInv, GM_GammaInv, GM_GammaInv)));
 }
 
 //--------------------------------------------------------------------------------------
 // HDR
 //--------------------------------------------------------------------------------------
-bool HDR;
+bool GM_HDR;
 
 interface IToneMapping
 {
@@ -270,13 +270,13 @@ class GMReinhardToneMapping : IToneMapping
     }
 };
 
-IToneMapping ToneMapping;
+IToneMapping GM_ToneMapping;
 GMReinhardToneMapping ReinhardToneMapping;
 
 float4 CalculateWithToneMapping(float4 c)
 {
-    if (HDR)
-        return ToFloat4(ToneMapping.ToneMapping(c.rgb));
+    if (GM_HDR)
+        return ToFloat4(GM_ToneMapping.ToneMapping(c.rgb));
     return c;
 }
 
@@ -293,16 +293,16 @@ struct GMShadowInfo
     float BiasMin;
     float BiasMax;
 };
-Texture2D ShadowMap;
-Texture2DMS<float4> ShadowMapMSAA;
+Texture2D GM_ShadowMap;
+Texture2DMS<float4> GM_ShadowMapMSAA;
 
-GMShadowInfo ShadowInfo;
+GMShadowInfo GM_ShadowInfo;
 //--------------------------------------------------------------------------------------
 // States
 //--------------------------------------------------------------------------------------
-RasterizerState GMRasterizerState {};
-BlendState GMBlendState {};
-DepthStencilState GMDepthStencilState {};
+RasterizerState GM_RasterizerState {};
+BlendState GM_BlendState {};
+DepthStencilState GM_DepthStencilState {};
 //--------------------------------------------------------------------------------------
 
 struct VS_INPUT
@@ -344,7 +344,7 @@ class TangentSpace
         GMTexture normalMap
         )
     {
-        Normal_Tangent_N = normalMap.RGBToNormal(NormalMapTexture, NormalMapSampler, texcoord);
+        Normal_Tangent_N = normalMap.RGBToNormal(GM_NormalMapTexture, GM_NormalMapSampler, texcoord);
         float3 tangent_Eye_N = normalize(mul(tangent, transform_Normal_Eye).xyz);
         float3 bitangent_Eye_N = normalize(mul(bitangent, transform_Normal_Eye).xyz);
         TBN = transpose(float3x3(
@@ -366,7 +366,7 @@ float4 IlluminateRefractionByNormalWorldN(
 {
     float3 in_N = normalize((position_World - viewPosition_World).xyz);
     float3 refraction = refract(in_N, normal_World_N, refractivity);
-    return cubeMap.Sample(tex, CubeMapSampler, refraction.xyz);
+    return cubeMap.Sample(tex, GM_CubeMapSampler, refraction.xyz);
 }
 
 float4 IlluminateRefraction(
@@ -387,7 +387,7 @@ float4 IlluminateRefraction(
     {
         // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
         float3 normal_Eye_N = mul(tangentSpace.Normal_Tangent_N, transpose(tangentSpace.TBN));
-        float3 normalFromTangent_World_N = mul(normal_Eye_N, ToFloat3x3(InverseViewMatrix));
+        float3 normalFromTangent_World_N = mul(normal_Eye_N, ToFloat3x3(GM_InverseViewMatrix));
         return IlluminateRefractionByNormalWorldN(cubeMap, tex, normalFromTangent_World_N, position_World, viewPosition_World, refractivity);
     }
 
@@ -406,15 +406,21 @@ struct PS_3D_INPUT
     TangentSpace TangentSpace;  // 切线空间
     bool HasNormalMap;          // 是否有法线贴图
     float3 AmbientLightmapTexture;
-    float3 DiffuseTexture;
-    float3 SpecularTexture;
+    float3 GM_DiffuseTexture;
+    float3 GM_SpecularTexture;
     float Shininess;
     float Refractivity; 
 };
 
+interface IIlluminationModel
+{
+    float4 Calculate(PS_3D_INPUT input, float shadowFactor);
+};
+IIlluminationModel GM_IlluminationModel;
+
 float CalculateShadow(matrix shadowMatrix, float4 worldPos, float3 normal_N)
 {
-    if (!ShadowInfo.HasShadow)
+    if (!GM_ShadowInfo.HasShadow)
         return 1.0f;
 
     float4 fragPos = mul(worldPos, shadowMatrix);
@@ -425,93 +431,102 @@ float CalculateShadow(matrix shadowMatrix, float4 worldPos, float3 normal_N)
     projCoords.x = projCoords.x * 0.5f + 0.5f;
     projCoords.y = projCoords.y * (-0.5f) + 0.5f;
 
-    float bias = (ShadowInfo.BiasMin == ShadowInfo.BiasMax) ? ShadowInfo.BiasMin : max(ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - ShadowInfo.Position.xyz))), ShadowInfo.BiasMin);
+    float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
     float closestDepth = 0;
-    if (ScreenInfo.Multisampling)
+    if (GM_ScreenInfo.Multisampling)
     {
-        int x = ShadowInfo.ShadowMapWidth * projCoords.x;
-        int y = ShadowInfo.ShadowMapHeight * projCoords.y;
+        int x = GM_ShadowInfo.ShadowMapWidth * projCoords.x;
+        int y = GM_ShadowInfo.ShadowMapHeight * projCoords.y;
         if (projCoords.x > 1 || projCoords.x < 0 ||
             projCoords.y > 1 || projCoords.y < 0 )
         {
             return 1.f;
         }
 
-        closestDepth = ShadowMapMSAA.Load(int3(x, y, 0), 0);
+        closestDepth = GM_ShadowMapMSAA.Load(int3(x, y, 0), 0);
     }
     else
     {
-        closestDepth = ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
+        closestDepth = GM_ShadowMap.Sample(ShadowMapSampler, projCoords.xy).r;
     }
 
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
+class GMPhong : IIlluminationModel
+{
+    float4 Calculate(PS_3D_INPUT input, float shadowFactor)
+    {
+        float4 factor_Ambient = float4(0, 0, 0, 0);
+        float4 factor_Diffuse = float4(0, 0, 0, 0);
+        float4 factor_Specular = float4(0, 0, 0, 0);
+        input.AmbientLightmapTexture = max(input.AmbientLightmapTexture, float3(0, 0, 0));
+        input.GM_DiffuseTexture = max(input.GM_DiffuseTexture, float3(0, 0, 0));
+        input.GM_SpecularTexture = max(input.GM_SpecularTexture, float3(0, 0, 0));
+
+        // 将法线换算到眼睛坐标系
+        float3 position_Eye = (mul(ToFloat4(input.WorldPos), GM_ViewMatrix)).xyz;
+        float3 position_Eye_N = normalize(position_Eye);
+
+        for (int i = 0; i < GM_LightCount; ++i)
+        {
+            float3 lightPosition_Eye = GetLightPositionInEyeSpace(LightAttributes[i].Position, GM_ViewMatrix);
+            factor_Ambient += LightProxy.IlluminateAmbient(LightAttributes[i]) * LightAttributes[i].Color;
+
+            if (!input.HasNormalMap)
+            {
+                float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
+                factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
+                factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;
+            }
+            else
+            {
+                float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
+                float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
+                float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
+                factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * LightAttributes[i].Color;
+                factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
+            }
+        }
+        float4 color_Ambient = CalculateGammaCorrection(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);
+        float4 color_Diffuse = shadowFactor * CalculateGammaCorrection(factor_Diffuse) * ToFloat4(input.GM_DiffuseTexture);
+
+        // 计算Specular
+        float4 color_Specular = shadowFactor * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.GM_SpecularTexture);
+        
+        // 计算折射
+        float4 color_Refractivity = IlluminateRefraction(
+            GM_CubeMapTextureAttribute,
+            GM_CubeMapTexture,
+            input.Normal_World_N,
+            ToFloat4(input.WorldPos),
+            GM_ViewPosition,
+            input.HasNormalMap,
+            input.TangentSpace,
+            input.Refractivity
+            );
+        color_Refractivity = color_Refractivity;
+
+        return color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
+    }
+};
+GMPhong GM_Phong;
+
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
-    float factor_Shadow = CalculateShadow(ShadowInfo.ShadowMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
-    float4 factor_Ambient = float4(0, 0, 0, 0);
-    float4 factor_Diffuse = float4(0, 0, 0, 0);
-    float4 factor_Specular = float4(0, 0, 0, 0);
-    input.AmbientLightmapTexture = max(input.AmbientLightmapTexture, float3(0, 0, 0));
-    input.DiffuseTexture = max(input.DiffuseTexture, float3(0, 0, 0));
-    input.SpecularTexture = max(input.SpecularTexture, float3(0, 0, 0));
-
-    // 将法线换算到眼睛坐标系
-    float3 position_Eye = (mul(ToFloat4(input.WorldPos), ViewMatrix)).xyz;
-    float3 position_Eye_N = normalize(position_Eye);
-
-    for (int i = 0; i < LightCount; ++i)
-    {
-        float3 lightPosition_Eye = GetLightPositionInEyeSpace(LightAttributes[i].Position, ViewMatrix);
-        factor_Ambient += LightProxy.IlluminateAmbient(LightAttributes[i]) * LightAttributes[i].Color;
-
-        if (!input.HasNormalMap)
-        {
-            float3 lightDirection_Eye_N = normalize(lightPosition_Eye - position_Eye);
-            factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Eye_N, input.Normal_Eye_N) * LightAttributes[i].Color;
-            factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Eye_N, -position_Eye_N, input.Normal_Eye_N, input.Shininess) * LightAttributes[i].Color;
-        }
-        else
-        {
-            float3 lightDirection_Eye = lightPosition_Eye - position_Eye;
-            float3 lightDirection_Tangent_N = normalize(mul(lightDirection_Eye, input.TangentSpace.TBN));
-            float3 eyeDirection_Tangent_N = normalize(mul(-position_Eye, input.TangentSpace.TBN));
-            factor_Diffuse += LightProxy.IlluminateDiffuse(LightAttributes[i], lightDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N) * LightAttributes[i].Color;
-            factor_Specular += LightProxy.IlluminateSpecular(LightAttributes[i], lightDirection_Tangent_N, eyeDirection_Tangent_N, input.TangentSpace.Normal_Tangent_N, input.Shininess) * LightAttributes[i].Color; 
-        }
-    }
-    float4 color_Ambient = CalculateGammaCorrection(factor_Ambient) * ToFloat4(input.AmbientLightmapTexture);
-    float4 color_Diffuse = factor_Shadow * CalculateGammaCorrection(factor_Diffuse) * ToFloat4(input.DiffuseTexture);
-
-    // 计算Specular
-    float4 color_Specular = factor_Shadow * CalculateGammaCorrection(factor_Specular) * ToFloat4(input.SpecularTexture);
-    
-    // 计算折射
-    float4 color_Refractivity = IlluminateRefraction(
-        CubeMapTextureAttribute,
-        CubeMapTexture,
-        input.Normal_World_N,
-        ToFloat4(input.WorldPos),
-        ViewPosition,
-        input.HasNormalMap,
-        input.TangentSpace,
-        input.Refractivity
-        );
-    color_Refractivity = color_Refractivity;
-
-    return color_Ambient + color_Diffuse + color_Specular + color_Refractivity;
+    float factor_Shadow = CalculateShadow(GM_ShadowInfo.ShadowMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
+    return GM_IlluminationModel.Calculate(input, factor_Shadow);
 }
 
 VS_OUTPUT VS_3D( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.Position = ToFloat4(input.Position);
-    output.Position = mul(output.Position, WorldMatrix);
+    output.Position = mul(output.Position, GM_WorldMatrix);
     output.WorldPos = output.Position;
     
-    output.Position = mul(output.Position, ViewMatrix);
-    output.Position = mul(output.Position, ProjectionMatrix);
+    output.Position = mul(output.Position, GM_ViewMatrix);
+    output.Position = mul(output.Position, GM_ProjectionMatrix);
 
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
@@ -524,19 +539,19 @@ VS_OUTPUT VS_3D( VS_INPUT input )
 
 bool PS_3D_HasNormalMap()
 {
-    return NormalMapTextureAttribute.Enabled;
+    return GM_NormalMapTextureAttribute.Enabled;
 }
 
 GMTexture PS_3D_NormalMap()
 {
-    return NormalMapTextureAttribute;
+    return GM_NormalMapTextureAttribute;
 }
 
 float4 PS_3D(PS_INPUT input) : SV_TARGET
 {
     // 将法线换算到眼睛坐标系
-    float3x3 inverseTransposeModelMatrix = ToFloat3x3(InverseTransposeModelMatrix);
-    float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(ViewMatrix));
+    float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
+    float3x3 transform_Normal_Eye = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
     float3 normal_Eye_N = normalize(mul(input.Normal, transform_Normal_Eye));
 
     PS_3D_INPUT commonInput;
@@ -552,20 +567,20 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.Normal_Eye_N = normal_Eye_N;
 
     // 计算Ambient
-    float4 color_Ambient = AmbientTextureAttribute.Sample(AmbientTexture, AmbientSampler, input.Texcoord);
-    color_Ambient *= LightmapTextureAttribute.Sample(LightmapTexture, LightmapSampler, input.Lightmap);
+    float4 color_Ambient = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
+    color_Ambient *= GM_LightmapTextureAttribute.Sample(GM_LightmapTexture, GM_LightmapSampler, input.Lightmap);
 
     // 计算Diffuse
-    float4 color_Diffuse = DiffuseTextureAttribute.Sample(DiffuseTexture, DiffuseSampler, input.Texcoord);
+    float4 color_Diffuse = GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
 
     // 计算Specular(如果有Specular贴图)
-    float4 color_Specular = SpecularTextureAttribute.Sample(SpecularTexture, SpecularSampler, input.Texcoord).r;
+    float4 color_Specular = GM_SpecularTextureAttribute.Sample(GM_SpecularTexture, GM_SpecularSampler, input.Texcoord).r;
 
-    commonInput.AmbientLightmapTexture = color_Ambient * Material.Ka;
-    commonInput.DiffuseTexture = color_Diffuse * Material.Kd;
-    commonInput.SpecularTexture = color_Specular * Material.Ks;
-    commonInput.Shininess = Material.Shininess;
-    commonInput.Refractivity = Material.Refractivity;
+    commonInput.AmbientLightmapTexture = color_Ambient * GM_Material.Ka;
+    commonInput.GM_DiffuseTexture = color_Diffuse * GM_Material.Kd;
+    commonInput.GM_SpecularTexture = color_Specular * GM_Material.Ks;
+    commonInput.Shininess = GM_Material.Shininess;
+    commonInput.Refractivity = GM_Material.Refractivity;
 
     return PS_3D_CalculateColor(commonInput);
 }
@@ -577,7 +592,7 @@ VS_OUTPUT VS_Flat(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
-    output.Position = mul(output.Position, WorldMatrix);
+    output.Position = mul(output.Position, GM_WorldMatrix);
     output.Position.z = 0;
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
@@ -595,12 +610,12 @@ VS_OUTPUT VS_2D(VS_INPUT input)
 
 float4 PS_2D(PS_INPUT input) : SV_TARGET
 {
-    if (!DiffuseTextureAttribute.Enabled && !AmbientTextureAttribute.Enabled)
+    if (!GM_DiffuseTextureAttribute.Enabled && !GM_AmbientTextureAttribute.Enabled)
         return float4(0, 0, 0, 0);
 
     float4 color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-    color += AmbientTextureAttribute.Sample(AmbientTexture, AmbientSampler, input.Texcoord);
-    color += DiffuseTextureAttribute.Sample(DiffuseTexture, DiffuseSampler, input.Texcoord);
+    color += GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
+    color += GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
     return color;
 }
 
@@ -614,7 +629,7 @@ VS_OUTPUT VS_Glyph(VS_INPUT input)
 
 float4 PS_Glyph(PS_INPUT input) : SV_TARGET
 {
-    float4 alpha = AmbientTexture.Sample(AmbientSampler, input.Texcoord);
+    float4 alpha = GM_AmbientTexture.Sample(GM_AmbientSampler, input.Texcoord);
     return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
 }
 
@@ -626,16 +641,16 @@ VS_OUTPUT VS_CubeMap(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.WorldPos = output.Position;
-    output.Position = mul(output.Position, WorldMatrix);
-    output.Position = mul(output.Position, ViewMatrix);
-    output.Position = mul(output.Position, ProjectionMatrix);
+    output.Position = mul(output.Position, GM_WorldMatrix);
+    output.Position = mul(output.Position, GM_ViewMatrix);
+    output.Position = mul(output.Position, GM_ProjectionMatrix);
     return output;
 }
 
 float4 PS_CubeMap(PS_INPUT input) : SV_TARGET
 {
     float3 texcoord = input.WorldPos.xyz;
-    return CubeMapTextureAttribute.Sample(CubeMapTexture, CubeMapSampler, texcoord);
+    return GM_CubeMapTextureAttribute.Sample(GM_CubeMapTexture, GM_CubeMapSampler, texcoord);
 }
 
 //--------------------------------------------------------------------------------------
@@ -686,27 +701,27 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
 {
     VS_GEOMETRY_OUTPUT output;
     output.Position_Refractivity.rgb = input.WorldPos;
-    output.Position_Refractivity.a = Material.Refractivity;
+    output.Position_Refractivity.a = GM_Material.Refractivity;
 
-    float3x3 inverseTransposeModelMatrix = ToFloat3x3(InverseTransposeModelMatrix);
-    float3x3 normalEyeTransform = mul(inverseTransposeModelMatrix, ToFloat3x3(ViewMatrix));
+    float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
+    float3x3 normalEyeTransform = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
     float4 normal_Model = ToFloat4(input.Normal.xyz, 0);
     output.Normal_World = Float3ToTexture( normalize(mul(input.Normal.xyz, inverseTransposeModelMatrix)) );
 
-    float4 texAmbient = AmbientTextureAttribute.Sample(AmbientTexture, AmbientSampler, input.Texcoord);
-    texAmbient *= LightmapTextureAttribute.Sample(LightmapTexture, LightmapSampler, input.Lightmap);
+    float4 texAmbient = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
+    texAmbient *= GM_LightmapTextureAttribute.Sample(GM_LightmapTexture, GM_LightmapSampler, input.Lightmap);
     
-    float4 texDiffuse = DiffuseTextureAttribute.Sample(DiffuseTexture, DiffuseSampler, input.Texcoord);
-    output.TextureAmbient = texAmbient * Material.Ka;
-    output.TextureDiffuse = texDiffuse * Material.Kd;
+    float4 texDiffuse = GM_DiffuseTextureAttribute.Sample(GM_DiffuseTexture, GM_DiffuseSampler, input.Texcoord);
+    output.TextureAmbient = texAmbient * GM_Material.Ka;
+    output.TextureDiffuse = texDiffuse * GM_Material.Kd;
 
-    float texSpecular = SpecularTextureAttribute.Sample(SpecularTexture, SpecularSampler, input.Texcoord).r;
+    float texSpecular = GM_SpecularTextureAttribute.Sample(GM_SpecularTexture, GM_SpecularSampler, input.Texcoord).r;
 
     if (PS_3D_HasNormalMap())
     {
         output.Tangent_Eye = Float3ToTexture(normalize(mul(input.Tangent, normalEyeTransform)));
         output.Bitangent_Eye = Float3ToTexture(normalize(mul(input.Bitangent, normalEyeTransform)));
-        output.NormalMap_HasNormalMap = ToFloat4(PS_3D_NormalMap().Sample(NormalMapTexture, NormalMapSampler, input.Texcoord), 1);
+        output.NormalMap_HasNormalMap = ToFloat4(PS_3D_NormalMap().Sample(GM_NormalMapTexture, GM_NormalMapSampler, input.Texcoord), 1);
     }
     else
     {
@@ -715,7 +730,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
         output.NormalMap_HasNormalMap = float4(0, 0, 0, 0);
     }
 
-    output.Specular_Shininess = ToFloat4(Material.Ks * texSpecular, Material.Shininess);
+    output.Specular_Shininess = ToFloat4(GM_Material.Ks * texSpecular, GM_Material.Shininess);
     return output;
 }
 
@@ -730,21 +745,21 @@ VS_OUTPUT VS_3D_LightPass(VS_INPUT input)
 float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
     PS_3D_INPUT commonInput;
-    int3 coord = int3(input.Texcoord * float2(ScreenInfo.ScreenWidth, ScreenInfo.ScreenHeight), 0);
+    int3 coord = int3(input.Texcoord * float2(GM_ScreenInfo.ScreenWidth, GM_ScreenInfo.ScreenHeight), 0);
     TangentSpace tangentSpace;
     float3 tangent_Eye_N;
     float3 bitangent_Eye_N;
     float4 PosRef;
     float4 KSS;
     float4 normalMapFlag;
-    if (!ScreenInfo.Multisampling)
+    if (!GM_ScreenInfo.Multisampling)
     {
         tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, coord).rgb;
         bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, coord).rgb;
         PosRef = GM_DeferredPosition_World_Refractivity.Load(coord);
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient.Load(coord)).rgb;
-        commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
+        commonInput.GM_DiffuseTexture = (GM_DeferredTextureDiffuse.Load(coord)).rgb;
         KSS = GM_DeferredSpecular_Shininess.Load(coord);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap.Load(coord);
     }
@@ -755,17 +770,17 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         PosRef = GM_DeferredPosition_World_Refractivity_MSAA.Load(coord, 0);
         commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_MSAA, coord);
         commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbient_MSAA.Load(coord, 0)).rgb;
-        commonInput.DiffuseTexture = (GM_DeferredTextureDiffuse_MSAA.Load(coord, 0)).rgb;
+        commonInput.GM_DiffuseTexture = (GM_DeferredTextureDiffuse_MSAA.Load(coord, 0)).rgb;
         KSS = GM_DeferredSpecular_Shininess_MSAA.Load(coord, 0);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap_MSAA.Load(coord, 0);
     }
 
-    commonInput.SpecularTexture = KSS.rgb;
+    commonInput.GM_SpecularTexture = KSS.rgb;
     commonInput.Shininess = KSS.a;
     commonInput.WorldPos = PosRef.rgb;
     commonInput.Refractivity = PosRef.a;
     commonInput.HasNormalMap = (normalMapFlag.a != 0);
-    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ToFloat3x3(ViewMatrix));
+    commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ToFloat3x3(GM_ViewMatrix));
     tangentSpace.Normal_Tangent_N = RGBToNormal(normalMapFlag.rgb);
     tangentSpace.TBN = transpose(float3x3(
         tangent_Eye_N,
@@ -784,10 +799,10 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
 {
     VS_OUTPUT output;
     output.Position = ToFloat4(input.Position);
-    output.Position = mul(output.Position, WorldMatrix);
+    output.Position = mul(output.Position, GM_WorldMatrix);
     output.WorldPos = output.Position;
     
-    output.Position = mul(output.Position, ShadowInfo.ShadowMatrix);
+    output.Position = mul(output.Position, GM_ShadowInfo.ShadowMatrix);
 
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
@@ -801,7 +816,7 @@ VS_OUTPUT VS_Shadow( VS_INPUT input )
 //--------------------------------------------------------------------------------------
 // Filter
 //--------------------------------------------------------------------------------------
-int KernelDeltaX = 0, KernelDeltaY = 0;
+int GM_KernelDeltaX = 0, GM_KernelDeltaY = 0;
 typedef float GMKernel[9];
 interface IFilter
 {
@@ -813,15 +828,15 @@ float4 Kernel(GMKernel kernel, Texture2D tex, int3 coord)
 {
     int offset = 1;
     float4 sample[9];
-    sample[0] = kernel[0] * tex.Load(int3(coord.x - KernelDeltaX, coord.y - KernelDeltaY, 0));
-    sample[1] = kernel[1] * tex.Load(int3(coord.x, coord.y - KernelDeltaY, 0));
-    sample[2] = kernel[2] * tex.Load(int3(coord.x + KernelDeltaX, coord.y - KernelDeltaY, 0));
-    sample[3] = kernel[3] * tex.Load(int3(coord.x - KernelDeltaX, coord.y, 0));
+    sample[0] = kernel[0] * tex.Load(int3(coord.x - GM_KernelDeltaX, coord.y - GM_KernelDeltaY, 0));
+    sample[1] = kernel[1] * tex.Load(int3(coord.x, coord.y - GM_KernelDeltaY, 0));
+    sample[2] = kernel[2] * tex.Load(int3(coord.x + GM_KernelDeltaX, coord.y - GM_KernelDeltaY, 0));
+    sample[3] = kernel[3] * tex.Load(int3(coord.x - GM_KernelDeltaX, coord.y, 0));
     sample[4] = kernel[4] * tex.Load(int3(coord.x, coord.y, 0));
-    sample[5] = kernel[5] * tex.Load(int3(coord.x + KernelDeltaX, coord.y, 0));
-    sample[6] = kernel[6] * tex.Load(int3(coord.x - KernelDeltaX, coord.y + KernelDeltaY, 0));
-    sample[7] = kernel[7] * tex.Load(int3(coord.x, coord.y + KernelDeltaY, 0));
-    sample[8] = kernel[8] * tex.Load(int3(coord.x + KernelDeltaX, coord.y + KernelDeltaY, 0));
+    sample[5] = kernel[5] * tex.Load(int3(coord.x + GM_KernelDeltaX, coord.y, 0));
+    sample[6] = kernel[6] * tex.Load(int3(coord.x - GM_KernelDeltaX, coord.y + GM_KernelDeltaY, 0));
+    sample[7] = kernel[7] * tex.Load(int3(coord.x, coord.y + GM_KernelDeltaY, 0));
+    sample[8] = kernel[8] * tex.Load(int3(coord.x + GM_KernelDeltaX, coord.y + GM_KernelDeltaY, 0));
 
     return (sample[0] +
             sample[1] +
@@ -838,15 +853,15 @@ float4 Kernel(GMKernel kernel, Texture2DMS<float4> tex, int3 coord, int samplerI
 {
     int offset = 1;
     float4 sample[9];
-    sample[0] = kernel[0] * tex.Load(int3(coord.x - KernelDeltaX, coord.y - KernelDeltaY, 0), samplerId);
-    sample[1] = kernel[1] * tex.Load(int3(coord.x, coord.y - KernelDeltaY, 0), samplerId);
-    sample[2] = kernel[2] * tex.Load(int3(coord.x + KernelDeltaX, coord.y - KernelDeltaY, 0), samplerId);
-    sample[3] = kernel[3] * tex.Load(int3(coord.x - KernelDeltaX, coord.y, 0), samplerId);
+    sample[0] = kernel[0] * tex.Load(int3(coord.x - GM_KernelDeltaX, coord.y - GM_KernelDeltaY, 0), samplerId);
+    sample[1] = kernel[1] * tex.Load(int3(coord.x, coord.y - GM_KernelDeltaY, 0), samplerId);
+    sample[2] = kernel[2] * tex.Load(int3(coord.x + GM_KernelDeltaX, coord.y - GM_KernelDeltaY, 0), samplerId);
+    sample[3] = kernel[3] * tex.Load(int3(coord.x - GM_KernelDeltaX, coord.y, 0), samplerId);
     sample[4] = kernel[4] * tex.Load(int3(coord.x, coord.y, 0), samplerId);
-    sample[5] = kernel[5] * tex.Load(int3(coord.x + KernelDeltaX, coord.y, 0), samplerId);
-    sample[6] = kernel[6] * tex.Load(int3(coord.x - KernelDeltaX, coord.y + KernelDeltaY, 0), samplerId);
-    sample[7] = kernel[7] * tex.Load(int3(coord.x, coord.y + KernelDeltaY, 0), samplerId);
-    sample[8] = kernel[8] * tex.Load(int3(coord.x + KernelDeltaX, coord.y + KernelDeltaY, 0), samplerId);
+    sample[5] = kernel[5] * tex.Load(int3(coord.x + GM_KernelDeltaX, coord.y, 0), samplerId);
+    sample[6] = kernel[6] * tex.Load(int3(coord.x - GM_KernelDeltaX, coord.y + GM_KernelDeltaY, 0), samplerId);
+    sample[7] = kernel[7] * tex.Load(int3(coord.x, coord.y + GM_KernelDeltaY, 0), samplerId);
+    sample[8] = kernel[8] * tex.Load(int3(coord.x + GM_KernelDeltaX, coord.y + GM_KernelDeltaY, 0), samplerId);
 
     return (sample[0] +
             sample[1] +
@@ -971,16 +986,16 @@ class GMEdgeDetectFilter : IFilter
     }
 };
 
-GMDefaultFilter DefaultFilter;
-GMInversionFilter InversionFilter;
-GMSharpenFilter SharpenFilter;
-GMBlurFilter BlurFilter;
-GMGrayscaleFilter GrayscaleFilter;
-GMEdgeDetectFilter EdgeDetectFilter;
+GMDefaultFilter GM_DefaultFilter;
+GMInversionFilter GM_InversionFilter;
+GMSharpenFilter GM_SharpenFilter;
+GMBlurFilter GM_BlurFilter;
+GMGrayscaleFilter GM_GrayscaleFilter;
+GMEdgeDetectFilter GM_EdgeDetectFilter;
 
-IFilter Filter;
-Texture2D FilterTexture;
-Texture2DMS<float4> FilterTexture_MSAA;
+IFilter GM_Filter;
+Texture2D GM_FilterTexture;
+Texture2DMS<float4> GM_FilterTexture_MSAA;
 
 VS_OUTPUT VS_Filter(VS_INPUT input)
 {
@@ -993,11 +1008,11 @@ VS_OUTPUT VS_Filter(VS_INPUT input)
 float4 PS_Filter(PS_INPUT input) : SV_TARGET
 {
     float4 color;
-    int3 coord = int3(input.Texcoord * float2(ScreenInfo.ScreenWidth, ScreenInfo.ScreenHeight), 0);
-    if (ScreenInfo.Multisampling)
-        color = Filter.SampleMSAA(FilterTexture_MSAA, coord, 0);
+    int3 coord = int3(input.Texcoord * float2(GM_ScreenInfo.ScreenWidth, GM_ScreenInfo.ScreenHeight), 0);
+    if (GM_ScreenInfo.Multisampling)
+        color = GM_Filter.SampleMSAA(GM_FilterTexture_MSAA, coord, 0);
     else
-        color = Filter.Sample(FilterTexture, coord);
+        color = GM_Filter.Sample(GM_FilterTexture, coord);
 
     return (CalculateGammaCorrection(CalculateWithToneMapping(max(color, 0))));
 }
@@ -1011,9 +1026,9 @@ technique11 GMTech_3D
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D()));
         SetPixelShader(CompileShader(ps_5_0,PS_3D()));
-        SetRasterizerState(GMRasterizerState);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
-        SetDepthStencilState(GMDepthStencilState, 1);
+        SetRasterizerState(GM_RasterizerState);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetDepthStencilState(GM_DepthStencilState, 1);
     }
 }
 
@@ -1023,9 +1038,9 @@ technique11 GMTech_2D
     {
         SetVertexShader(CompileShader(vs_5_0,VS_2D()));
         SetPixelShader(CompileShader(ps_5_0,PS_2D()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -1035,9 +1050,9 @@ technique11 GMTech_Glyph
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Glyph()));
         SetPixelShader(CompileShader(ps_5_0,PS_Glyph()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -1047,9 +1062,9 @@ technique11 GMTech_CubeMap
     {
         SetVertexShader(CompileShader(vs_5_0,VS_CubeMap()));
         SetPixelShader(CompileShader(ps_5_0,PS_CubeMap()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -1059,9 +1074,9 @@ technique11 GMTech_Filter
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Filter()));
         SetPixelShader(CompileShader(ps_5_0,PS_Filter()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -1071,9 +1086,9 @@ technique11 GMTech_Deferred_3D
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_GeometryPass()));
         SetPixelShader(CompileShader(ps_5_0,PS_3D_GeometryPass()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -1083,9 +1098,9 @@ technique11 GMTech_Deferred_3D_LightPass
     {
         SetVertexShader(CompileShader(vs_5_0,VS_3D_LightPass()));
         SetPixelShader(CompileShader(ps_5_0,PS_3D_LightPass()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }
 
@@ -1094,8 +1109,8 @@ technique11 GMTech_3D_Shadow
     pass P0
     {
         SetVertexShader(CompileShader(vs_5_0,VS_Shadow()));
-        SetRasterizerState(GMRasterizerState);
-        SetDepthStencilState(GMDepthStencilState, 1);
-        SetBlendState(GMBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
+        SetRasterizerState(GM_RasterizerState);
+        SetDepthStencilState(GM_DepthStencilState, 1);
+        SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);
     }
 }

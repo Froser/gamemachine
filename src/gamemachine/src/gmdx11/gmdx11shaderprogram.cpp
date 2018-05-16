@@ -8,61 +8,61 @@ namespace
 	{
 		static GMShaderVariablesDesc desc =
 		{
-			"WorldMatrix",
-			"ViewMatrix",
-			"ProjectionMatrix",
-			"InverseTransposeModelMatrix",
-			"InverseViewMatrix",
+			"GM_WorldMatrix",
+			"GM_ViewMatrix",
+			"GM_ProjectionMatrix",
+			"GM_InverseTransposeModelMatrix",
+			"GM_InverseViewMatrix",
 
-			"ViewPosition",
+			"GM_ViewPosition",
 
 			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
-			"AmbientTextureAttribute",
-			"DiffuseTextureAttribute",
-			"SpecularTextureAttribute",
-			"NormalMapTextureAttribute",
-			"LightmapTextureAttribute",
-			"AlbedoTextureAttribute",
-			"MetallicRoughnessAOTextureAttribute",
-			"CubeMapTextureAttribute",
+			"GM_AmbientTextureAttribute",
+			"GM_DiffuseTextureAttribute",
+			"GM_SpecularTextureAttribute",
+			"GM_NormalMapTextureAttribute",
+			"GM_LightmapTextureAttribute",
+			"GM_AlbedoTextureAttribute",
+			"GM_MetallicRoughnessAOTextureAttribute",
+			"GM_CubeMapTextureAttribute",
 
-			"LightCount",
+			"GM_LightCount",
 
 			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity" },
-			"Material",
+			"GM_Material",
 
 			{
-				"Filter",
-				"KernelDeltaX",
-				"KernelDeltaY", 
+				"GM_Filter",
+				"GM_KernelDeltaX",
+				"GM_KernelDeltaY",
 				{
-					"DefaultFilter",
-					"InversionFilter",
-					"SharpenFilter",
-					"BlurFilter",
-					"GrayscaleFilter",
-					"EdgeDetectFilter",
+					"GM_DefaultFilter",
+					"GM_InversionFilter",
+					"GM_SharpenFilter",
+					"GM_BlurFilter",
+					"GM_GrayscaleFilter",
+					"GM_EdgeDetectFilter",
 				}
 			},
 
 			{
-				"ScreenInfo",
+				"GM_ScreenInfo",
 				"ScreenWidth",
 				"ScreenHeight",
 				"Multisampling",
 			},
 
-			"GMRasterizerState",
-			"GMBlendState",
-			"GMDepthStencilState",
+			"GM_RasterizerState",
+			"GM_BlendState",
+			"GM_DepthStencilState",
 
 			{
-				"ShadowInfo",
+				"GM_ShadowInfo",
 				"HasShadow",
 				"ShadowMatrix",
 				"Position",
-				"ShadowMap",
-				"ShadowMapMSAA",
+				"GM_ShadowMap",
+				"GM_ShadowMapMSAA",
 				"ShadowMapWidth",
 				"ShadowMapHeight",
 				"BiasMin",
@@ -70,13 +70,13 @@ namespace
 			},
 
 			{
-				"GammaCorrection",
-				"GammaInv",
+				"GM_GammaCorrection",
+				"GM_GammaInv",
 			},
 
 			{
-				"HDR",
-				"ToneMapping",
+				"GM_HDR",
+				"GM_ToneMapping",
 			}
 		};
 		return desc;

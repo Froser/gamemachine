@@ -803,6 +803,12 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.ks)));
 	GM_DX_HR(bank.Shininess()->SetFloat(material.shininess));
 	GM_DX_HR(bank.Refreactivity()->SetFloat(material.refractivity));
+
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	if (material.illuminationModel == GMIlluminationModel::Phong)
+		shaderProgram->setInterfaceInstance("GM_IlluminationModel", "GM_Phong", GMShaderType::Effect);
+	else
+		GM_ASSERT(false);
 }
 
 void GMDx11Renderer::prepareBlend(GMModel* model)
@@ -810,8 +816,8 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 	D(d);
 	if (!d->blend)
 	{
-		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
-		d->blend = d->effect->GetVariableByName(svd.BlendState)->AsBlend();
+		const GMShaderVariablesDesc* svd = getVariablesDesc();
+		d->blend = d->effect->GetVariableByName(svd->BlendState)->AsBlend();
 	}
 	GM_ASSERT(d->blend);
 
@@ -1019,11 +1025,11 @@ void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
 		if (GM.getGameMachineRunningStates().sampleCount == 1)
 		{
-			GM_DX_HR(d->effect->GetVariableByName("FilterTexture")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
+			GM_DX_HR(d->effect->GetVariableByName("GM_FilterTexture")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
 		}
 		else
 		{
-			GM_DX_HR(d->effect->GetVariableByName("FilterTexture_MSAA")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
+			GM_DX_HR(d->effect->GetVariableByName("GM_FilterTexture_MSAA")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
 		}
 		pass->Apply(0, d->deviceContext);
 

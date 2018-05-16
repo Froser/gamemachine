@@ -46,14 +46,14 @@ namespace
 	void getTextureAndSamplerName(GMTextureType type, REF const char*& textureName, REF const char*& samplerName)
 	{
 		BEGIN_TEX_SAMPLER()
-			TEX_SAMPLER(GMTextureType::Ambient, AmbientTexture, AmbientSampler);
-			TEX_SAMPLER(GMTextureType::Diffuse, DiffuseTexture, DiffuseSampler);
-			TEX_SAMPLER(GMTextureType::Specular, SpecularTexture, SpecularSampler);
-			TEX_SAMPLER(GMTextureType::NormalMap, NormalMapTexture, NormalMapSampler);
-			TEX_SAMPLER(GMTextureType::Lightmap, LightmapTexture, LightmapSampler);
-			TEX_SAMPLER(GMTextureType::Albedo, AlbedoTexture, AlbedoSampler);
-			TEX_SAMPLER(GMTextureType::MetallicRoughnessAO, MetallicRoughnessAOTexture, MetallicRoughnessAOSampler);
-			TEX_SAMPLER(GMTextureType::CubeMap, CubeMapTexture, CubeMapSampler);
+			TEX_SAMPLER(GMTextureType::Ambient, GM_AmbientTexture, GM_AmbientSampler);
+			TEX_SAMPLER(GMTextureType::Diffuse, GM_DiffuseTexture, GM_DiffuseSampler);
+			TEX_SAMPLER(GMTextureType::Specular, GM_SpecularTexture, GM_SpecularSampler);
+			TEX_SAMPLER(GMTextureType::NormalMap, GM_NormalMapTexture, GM_NormalMapSampler);
+			TEX_SAMPLER(GMTextureType::Lightmap, GM_LightmapTexture, GM_LightmapSampler);
+			TEX_SAMPLER(GMTextureType::Albedo, GM_AlbedoTexture, GM_AlbedoSampler);
+			TEX_SAMPLER(GMTextureType::MetallicRoughnessAO, GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler);
+			TEX_SAMPLER(GMTextureType::CubeMap, GM_CubeMapTexture, GM_CubeMapSampler);
 		END_TEX_SAMPLER()
 	}
 }
