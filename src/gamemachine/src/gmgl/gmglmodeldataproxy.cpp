@@ -54,10 +54,10 @@ void GMGLModelDataProxy::transfer()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GMVertex) * packedVertices.size(), packedVertices.data(), usage);
 
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Position),	GMVertex::PositionDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), 0);
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMVertex::NormalDimension,		GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(3));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Normal),		GMVertex::NormalDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(3));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Texcoord),	GMVertex::TexcoordDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(6));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMVertex::TangentDimension,		GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(8));
-	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_TRUE,  sizeof(GMVertex), FLOAT_OFFSET(11));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Tangent),		GMVertex::TangentDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(8));
+	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Bitangent),	GMVertex::BitangentDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(11));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Lightmap),	GMVertex::LightmapDimension,	GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(14));
 	glVertexAttribPointer(gmVertexIndex(GMVertexDataType::Color),		GMVertex::ColorDimension,		GL_FLOAT, GL_FALSE, sizeof(GMVertex), FLOAT_OFFSET(16));
 

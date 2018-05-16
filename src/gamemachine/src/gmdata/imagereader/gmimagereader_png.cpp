@@ -55,15 +55,16 @@ namespace
 		png_bytep* row_pointers = png_get_rows(png_ptr, info_ptr);
 		out->width = png_get_image_width(png_ptr, info_ptr);
 		out->height = png_get_image_height(png_ptr, info_ptr);
-		size = out->width * out->height * GMImageReader::DefaultChannels * sizeof(unsigned char);
+		out->channels = 4;
 
 		if (channels == 4 || color_type == PNG_COLOR_TYPE_RGB_ALPHA)
 		{
+			size = out->width * out->height * GMImageReader::DefaultChannels * sizeof(GMbyte);
 			out->hasAlpha = true;
 			out->rgba = new GMbyte[size];
 
 			temp = (4 * out->width);
-			for (i = 0; i < out->height; i++)
+			for (i = 0; i < out->height; ++i)
 			{
 				for (j = 0; j < temp; j += 4)
 				{
@@ -76,11 +77,12 @@ namespace
 		}
 		else if (channels == 3 || color_type == PNG_COLOR_TYPE_RGB)
 		{
+			size = out->width * out->height * GMImageReader::DefaultChannels * sizeof(GMbyte);
 			out->hasAlpha = false;
 			out->rgba = new GMbyte[size];
 
 			temp = (3 * out->width);
-			for (i = 0; i < out->height; i++)
+			for (i = 0; i < out->height; ++i)
 			{
 				for (j = 0; j < temp; j += 3)
 				{
@@ -88,6 +90,20 @@ namespace
 					out->rgba[++pos] = row_pointers[i][j + 1]; // green
 					out->rgba[++pos] = row_pointers[i][j + 2];  // blue
 					out->rgba[++pos] = 0xFF;  // alpha
+				}
+			}
+		}
+		else if (channels == 1)
+		{
+			out->channels = 1;
+			size = out->width * out->height * channels * sizeof(GMbyte);
+			out->hasAlpha = false;
+			out->rgba = new GMbyte[size];
+			for (i = 0; i < out->height; ++i)
+			{
+				for (j = 0; j < out->width; ++j)
+				{
+					out->rgba[++pos] = row_pointers[i][j];
 				}
 			}
 		}
@@ -131,12 +147,9 @@ void GMImageReader_PNG::writeDataToImage(PngData& png, GMImage* img, GMsize_t si
 	GMImage::Data& data = img->getData();
 	data.target = GMImageTarget::Texture2D;
 	data.mipLevels = 1;
-	data.internalFormat = GMImageInternalFormat::RGBA8;
-	data.format = GMImageFormat::RGBA;
-	data.swizzle[0] = GL_RED;
-	data.swizzle[1] = GL_GREEN;
-	data.swizzle[2] = GL_BLUE;
-	data.swizzle[3] = GL_ALPHA;
+	data.internalFormat = png.channels == 1 ? GMImageInternalFormat::RED8 : GMImageInternalFormat::RGBA8;
+	data.format = png.channels == 1 ? GMImageFormat::RED : GMImageFormat::RGBA;
+	data.channels = png.channels;
 	data.type = GMImageDataType::UnsignedByte;
 	data.mip[0].height = png.height;
 	data.mip[0].width = png.width;

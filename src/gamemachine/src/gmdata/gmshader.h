@@ -241,6 +241,8 @@ GM_ALIGNED_STRUCT(GMMaterial)
 	GMVec3 ka = GMVec3(1);
 	GMVec3 ks = GMVec3(1);
 	GMVec3 kd = GMVec3(1);
+	
+	GMVec3 f0 = GMVec3(0.04f);
 };
 
 GM_PRIVATE_OBJECT(GMShader)

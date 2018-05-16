@@ -13,6 +13,8 @@ GM_PRIVATE_OBJECT(Demo_PBR)
 	bool draggingL = false;
 	bool draggingR = false;
 	GMQuat lookAtRotation;
+	bool stashedGammaCorrection;
+	bool stashedToneMapping;
 };
 
 class Demo_PBR : public DemoHandler

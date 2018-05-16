@@ -28,7 +28,7 @@ namespace
 
 			"GM_LightCount",
 
-			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity" },
+			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity", "F0" },
 			"GM_Material",
 
 			{

@@ -156,7 +156,6 @@ void GMGLTexture::init()
 		break;
 	}
 
-	glTexParameteriv(d->target, GL_TEXTURE_SWIZZLE_RGBA, reinterpret_cast<const GLint *>(imgData.swizzle));
 	glBindTexture(d->target, 0);
 	d->inited = true;
 }

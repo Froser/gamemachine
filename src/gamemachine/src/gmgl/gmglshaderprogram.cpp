@@ -36,7 +36,7 @@ namespace
 
 			"GM_lightCount",
 
-			{ "ka", "kd", "ks", "shininess", "refractivity" },
+			{ "ka", "kd", "ks", "shininess", "refractivity", "f0" },
 			"GM_material",
 
 			{

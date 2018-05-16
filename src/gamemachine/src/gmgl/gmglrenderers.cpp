@@ -501,11 +501,12 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	{
 		if (!drawTexture(model, (GMTextureType)type))
 		{
-			if (type == GMTextureType::Ambient ||
+			if (model->getShader().getIlluminationModel() == GMIlluminationModel::Phong && (
+				type == GMTextureType::Ambient ||
 				type == GMTextureType::Diffuse ||
 				type == GMTextureType::Specular ||
 				type == GMTextureType::Lightmap
-				)
+				))
 			{
 				GMint texId = activateTexture(nullptr, (GMTextureType)type);
 				getWhiteTexture()->useTexture(texId);

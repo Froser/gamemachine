@@ -53,11 +53,9 @@ GM_PRIVATE_OBJECT(GMImage)
 	GMImageInternalFormat internalFormat;
 	GMImageFormat format;
 	GMImageDataType type;
-	GMuint swizzle[4];
 	GMint mipLevels;
 	GMint slices = 1;
 	GMptrdiff sliceStride = 0;
-	GMptrdiff totalDataSize;
 	ImageMipData mip[MAX_MIP_CNT];
 	GMsize_t size = 0;
 	GMuint channels = GM_IMAGE_DEFAULT_CHANNELS;

@@ -46,7 +46,7 @@ struct GMToolUtil
 	  \param texture 得到的纹理将通过此指针返回。
 	  \sa GMGamePackage
 	*/
-	static void createTexture(const GMString& filename, ITexture** texture);
+	static void createTexture(const GMString& filename, OUT ITexture** texture);
 
 	//! 将一个纹理添加到一个模型中。
 	/*!
@@ -56,6 +56,17 @@ struct GMToolUtil
 	  \param type 纹理类型。
 	*/
 	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type);
+
+	static bool createPBRTextures(
+		const GMString& albedoPath,
+		const GMString& metallicPath,
+		const GMString& roughnessPath,
+		const GMString& aoPath,
+		const GMString& normalPath,
+		OUT ITexture** albedoTexture,
+		OUT ITexture** metallicRoughnessAoTexture,
+		OUT ITexture** normalTexture
+	);
 };
 
 END_NS

@@ -40,18 +40,29 @@ void Demo_PBR::init()
 		shader.getMaterial().kd = GMVec3(1);
 		shader.getMaterial().shininess = 99;
 
-		gm::ITexture* texture = nullptr;
-		gm::GMToolUtil::createTexture("pbr/albedo.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
-		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Albedo);
+		gm::ITexture* albedo = nullptr;
+		gm::ITexture* metallicRoughnessAO = nullptr;
+		gm::ITexture* normal = nullptr;
 
-		gm::GMToolUtil::createTexture("pbr/normal.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
-		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::NormalMap);
+		gm::GMToolUtil::createPBRTextures(
+			"pbr/albedo.png",
+			"pbr/metallic.png",
+			"pbr/roughness.png",
+			"",
+			"pbr/normal.png",
+			&albedo,
+			&metallicRoughnessAO,
+			&normal
+		);
 
-		gm::GMToolUtil::createTexture("pbr/metallic.png", &texture);
-		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
-		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::MetallicRoughnessAO);
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, albedo);
+		gm::GMToolUtil::addTextureToShader(shader, albedo, gm::GMTextureType::Albedo);
+
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, normal);
+		gm::GMToolUtil::addTextureToShader(shader, normal, gm::GMTextureType::NormalMap);
+
+		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, metallicRoughnessAO);
+		gm::GMToolUtil::addTextureToShader(shader, metallicRoughnessAO, gm::GMTextureType::MetallicRoughnessAO);
 
 		gm::GMAsset asset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, sphere);
 		d->gameObject = new gm::GMGameObject(asset);
@@ -60,7 +71,7 @@ void Demo_PBR::init()
 		d->gameObject->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 
-	asDemoGameWorld(getDemoWorldReference())->addObject("cube with specular map", d->gameObject);
+	asDemoGameWorld(getDemoWorldReference())->addObject("sphere", d->gameObject);
 }
 
 void Demo_PBR::handleMouseEvent()

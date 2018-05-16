@@ -54,10 +54,6 @@ bool GMImageReader_JPG::load(const GMbyte* data, GMsize_t size, OUT GMImage** im
 	//init image data
 	imgData.target = GMImageTarget::Texture2D;
 	imgData.mipLevels = 1;
-	imgData.swizzle[0] = GL_RED;
-	imgData.swizzle[1] = GL_GREEN;
-	imgData.swizzle[2] = GL_BLUE;
-	imgData.swizzle[3] = GL_ALPHA;
 	imgData.type = GMImageDataType::UnsignedByte;
 
 	//Create struct

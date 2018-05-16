@@ -12,8 +12,8 @@ namespace
 	constexpr const char* GeometryFramebufferNames[] = {
 		"GM_DeferredPosition_World_Refractivity",
 		"GM_DeferredNormal_World",
-		"GM_DeferredTextureAmbient",
-		"GM_DeferredTextureDiffuse",
+		"GM_DeferredTextureAmbientAlbedo",
+		"GM_DeferredTextureDiffuseMetallicRoughnessAO",
 		"GM_DeferredTangent_Eye",
 		"GM_DeferredBitangent_Eye",
 		"GM_DeferredNormalMap_bNormalMap",
@@ -23,8 +23,8 @@ namespace
 	constexpr const char* GeometryMSAAFramebufferNames[] = {
 		"GM_DeferredPosition_World_Refractivity_MSAA",
 		"GM_DeferredNormal_World_MSAA",
-		"GM_DeferredTextureAmbient_MSAA",
-		"GM_DeferredTextureDiffuse_MSAA",
+		"GM_DeferredTextureAmbientAlbedo_MSAA",
+		"GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA",
 		"GM_DeferredTangent_Eye_MSAA",
 		"GM_DeferredBitangent_Eye_MSAA",
 		"GM_DeferredNormalMap_bNormalMap_MSAA",

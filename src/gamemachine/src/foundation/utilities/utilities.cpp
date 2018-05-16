@@ -2,6 +2,7 @@
 #include "utilities.h"
 #include "foundation/gamemachine.h"
 #include "gmengine/gmgameworld.h"
+#include "gmdata/gmimagebuffer.h"
 
 const GMVec3& GMPrimitiveCreator::one3()
 {
@@ -507,21 +508,105 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	*obj = model;
 }
 
-void GMToolUtil::createTexture(const GMString& filename, ITexture** texture)
+void GMToolUtil::createTexture(const GMString& filename, OUT ITexture** texture)
 {
-	gm::GMImage* img = nullptr;
-	gm::GMBuffer buf;
-	GM.getGamePackageManager()->readFile(gm::GMPackageIndex::Textures, filename, &buf);
-	gm::GMImageReader::load(buf.buffer, buf.size, &img);
+	GMImage* img = nullptr;
+	GMBuffer buf;
+	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, filename, &buf);
+	GMImageReader::load(buf.buffer, buf.size, &img);
 	GM_ASSERT(img);
 
 	GM.getFactory()->createTexture(img, texture);
 	GM_ASSERT(texture);
-	gm::GM_delete(img);
+	GM_delete(img);
 }
 
-void GMToolUtil::addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type)
+void GMToolUtil::addTextureToShader(GMShader& shader, ITexture* texture, GMTextureType type)
 {
 	auto& frames = shader.getTextureList().getTextureSampler(type);
 	frames.addFrame(texture);
+}
+
+bool GMToolUtil::createPBRTextures(
+	const GMString& albedoPath,
+	const GMString& metallicPath,
+	const GMString& roughnessPath,
+	const GMString& aoPath,
+	const GMString& normalPath,
+	OUT ITexture** albedoTexture,
+	OUT ITexture** metallicRoughnessAoTexture,
+	OUT ITexture** normalTexture
+)
+{
+	bool useWhiteAO = aoPath.isEmpty();
+
+	GMToolUtil::createTexture(albedoPath, albedoTexture);
+	GMToolUtil::createTexture(normalPath, normalTexture);
+	if (!albedoTexture || !metallicRoughnessAoTexture)
+		return false;
+
+	GMBuffer metallicBuf, roughnessBuf, aoBuf;
+	GMImage* metallicImg = nullptr, *roughnessImg = nullptr, *aoImg = nullptr;
+
+	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, metallicPath, &metallicBuf);
+	if (!GMImageReader::load(metallicBuf.buffer, metallicBuf.size, &metallicImg))
+		goto Failed;
+
+	GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, roughnessPath, &roughnessBuf);
+	if (!GMImageReader::load(roughnessBuf.buffer, roughnessBuf.size, &roughnessImg))
+		goto Failed;
+
+	if (!useWhiteAO)
+	{
+		GM.getGamePackageManager()->readFile(GMPackageIndex::Textures, aoPath, &aoBuf);
+		if (!GMImageReader::load(aoBuf.buffer, aoBuf.size, &aoImg))
+			goto Failed;
+	}
+
+	GMint mw = metallicImg->getWidth(), mh = metallicImg->getHeight();
+	GMint rw = roughnessImg->getWidth(), rh = roughnessImg->getHeight();
+	GMint aow = aoImg ? aoImg->getWidth() : mw, aoh = aoImg ? aoImg->getHeight() : mh;
+
+	if (mw == rw && rw == aow && mh == rh && rh == aoh)
+	{
+		GMint metallicStep = metallicImg->getData().channels;
+		GMint roughnessStep = roughnessImg->getData().channels;
+
+		GMImage combinedImage;
+		GMImage::Data& data = combinedImage.getData();
+		data.target = GMImageTarget::Texture2D;
+		data.mipLevels = 1;
+		data.format = GMImageFormat::RGBA;
+		data.internalFormat = GMImageInternalFormat::RGBA8;
+		data.type = GMImageDataType::UnsignedByte;
+		data.mip[0].height = metallicImg->getHeight();
+		data.mip[0].width = metallicImg->getWidth();
+
+		GMint sz = data.mip[0].width * data.mip[0].height * 4;
+		data.mip[0].data = new GMbyte[sz];
+		GMbyte* metallicPtr = metallicImg->getData().mip[0].data;
+		GMbyte* roughnessPtr = roughnessImg->getData().mip[0].data;
+
+		GMint aoStep = aoImg ? aoImg->getData().channels : 0;
+		GMbyte* aoPtr = aoImg ? aoImg->getData().mip[0].data : nullptr;
+		for (GMint p = 0; p < sz; p+=4, metallicPtr+=metallicStep, roughnessPtr+=roughnessStep, aoPtr+=aoStep)
+		{
+			data.mip[0].data[p] = *metallicPtr;
+			data.mip[0].data[p + 1] = *roughnessPtr;
+			data.mip[0].data[p + 2] = useWhiteAO ? 0xFF : *aoPtr;
+			data.mip[0].data[p + 3] = 0xFF;
+		}
+
+		GM.getFactory()->createTexture(&combinedImage, metallicRoughnessAoTexture);
+		GM_delete(metallicImg);
+		GM_delete(roughnessImg);
+		GM_delete(aoImg);
+		return true;
+	}
+
+Failed:
+	GM_delete(metallicImg);
+	GM_delete(roughnessImg);
+	GM_delete(aoImg);
+	return false;
 }

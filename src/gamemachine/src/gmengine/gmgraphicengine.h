@@ -29,6 +29,7 @@ struct GMShaderVariablesMaterialDesc
 	const char* Ks;
 	const char* Shininess;
 	const char* Refreactivity;
+	const char* F0;
 };
 
 constexpr int GMFilterCount = 6;

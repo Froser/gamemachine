@@ -146,7 +146,9 @@ void GMMesh::invalidateTangentSpace()
 	D(d);
 	for (auto& vertex : d->vertices)
 	{
-		vertex.tangents[0] = vertex.bitangents[0] = InvalidTangentSpace;
+		vertex.tangents[0] = vertex.bitangents[0] = 
+		vertex.tangents[1] = vertex.bitangents[1] = 
+		vertex.tangents[2] = vertex.bitangents[2] = InvalidTangentSpace;
 	}
 }
 

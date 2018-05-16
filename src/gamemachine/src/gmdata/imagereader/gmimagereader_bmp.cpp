@@ -156,10 +156,6 @@ void GMImageReader_BMP::writeDataToImage(BitmapFile& bitmap, GMImage* img, GMuin
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGBA8;
 	data.format = GMImageFormat::BGRA;
-	data.swizzle[0] = GL_RED;
-	data.swizzle[1] = GL_GREEN;
-	data.swizzle[2] = GL_BLUE;
-	data.swizzle[3] = GL_ALPHA;
 	data.type = GMImageDataType::UnsignedByte;
 	data.mip[0].height = Fabs(bitmap.bitmapInfoHeader.biHeight);
 	data.mip[0].width = Fabs(bitmap.bitmapInfoHeader.biWidth);

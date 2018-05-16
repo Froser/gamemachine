@@ -478,6 +478,7 @@ public:
 	EFFECT_MEMBER_AS_VECTOR(Ks, Material(), m_desc->MaterialAttributes.Ks)
 	EFFECT_MEMBER_AS_SCALAR(Shininess, Material(), m_desc->MaterialAttributes.Shininess)
 	EFFECT_MEMBER_AS_SCALAR(Refreactivity, Material(), m_desc->MaterialAttributes.Refreactivity)
+	EFFECT_MEMBER_AS_VECTOR(F0, Material(), m_desc->MaterialAttributes.F0)
 
 	// Filter
 	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaX, m_desc->FilterAttributes.KernelDeltaX)
@@ -617,17 +618,20 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 			texture->bindSampler(&sampler);
 			texture->useTexture((GMint)type);
 		}
-		else if (
-			type == GMTextureType::Ambient ||
-			type == GMTextureType::Diffuse ||
-			type == GMTextureType::Specular ||
-			type == GMTextureType::Lightmap
-			)
+		else
 		{
-			ITexture* whiteTexture = getWhiteTexture();
-			applyTextureAttribute(model, whiteTexture, type);
-			whiteTexture->bindSampler(nullptr);
-			whiteTexture->useTexture((GMint)type);
+			if (model->getShader().getIlluminationModel() == GMIlluminationModel::Phong && (
+				type == GMTextureType::Ambient ||
+				type == GMTextureType::Diffuse ||
+				type == GMTextureType::Specular ||
+				type == GMTextureType::Lightmap
+				))
+			{
+				ITexture* whiteTexture = getWhiteTexture();
+				applyTextureAttribute(model, whiteTexture, type);
+				whiteTexture->bindSampler(nullptr);
+				whiteTexture->useTexture((GMint)type);
+			}
 		}
 	}
 
@@ -806,16 +810,12 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 	GM_DX_HR(bank.Ks()->SetFloatVector(ValuePointer(material.ks)));
 	GM_DX_HR(bank.Shininess()->SetFloat(material.shininess));
 	GM_DX_HR(bank.Refreactivity()->SetFloat(material.refractivity));
+	GM_DX_HR(bank.F0()->SetFloatVector(ValuePointer(material.f0)));
 
 	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	if (illuminationModel == GMIlluminationModel::Phong)
-		shaderProgram->setInterfaceInstance(desc->IlluminationModel, "GM_Phong", GMShaderType::Effect);
-	else if (illuminationModel == GMIlluminationModel::CookTorranceBRDF)
-		shaderProgram->setInterfaceInstance(desc->IlluminationModel, "GM_CookTorranceBRDF", GMShaderType::Effect);
-	else
-		GM_ASSERT(false);
+	shaderProgram->setInt(desc->IlluminationModel, (GMint)illuminationModel);
 }
 
 void GMDx11Renderer::prepareBlend(GMModel* model)

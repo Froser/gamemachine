@@ -2,15 +2,16 @@
 #include "gmimagebuffer.h"
 #include <GL/glew.h>
 
-GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, GMuint bufferSize, GMbyte* buffer)
+GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, GMsize_t bufferSize, GMbyte* buffer)
 {
 	D(d);
 	d->width = width;
 	d->height = height;
+	d->size = bufferSize / 3 * 4;
 
 	if (format == GMImageFormat::RGB)
 	{
-		d->buffer = new GMbyte[bufferSize / 3 * 4];
+		d->buffer = new GMbyte[d->size];
 		GMuint writePtr = 0;
 		for (GMuint readPtr = 0; readPtr < bufferSize;)
 		{
@@ -23,7 +24,7 @@ GMImageBuffer::GMImageBuffer(GMImageFormat format, GMuint width, GMuint height, 
 	{
 		if (buffer > 0)
 		{
-			d->buffer = new GMbyte[bufferSize / 3 * 4];
+			d->buffer = new GMbyte[d->size];
 			memcpy(d->buffer, buffer, sizeof(GMbyte) * bufferSize);
 		}
 	}
@@ -40,15 +41,12 @@ void GMImageBuffer::generateData()
 	data.target = GMImageTarget::Texture2D;
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGBA8;
-	data.swizzle[0] = GL_RED;
-	data.swizzle[1] = GL_GREEN;
-	data.swizzle[2] = GL_BLUE;
-	data.swizzle[3] = GL_ALPHA;
 	data.type = GMImageDataType::UnsignedByte;
 	data.mip[0].height = d->height;
 	data.mip[0].width = d->width;
 	// Buffer 移交给 Image 管理
 	data.mip[0].data = d->buffer;
+	data.size = d->size;
 }
 
 GMCubeMapBuffer::GMCubeMapBuffer(
@@ -74,15 +72,11 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	data.mipLevels = 1;
 	data.internalFormat = GMImageInternalFormat::RGBA8;
 	data.format = posX.getData().format;
-	data.swizzle[0] = GL_RED;
-	data.swizzle[1] = GL_GREEN;
-	data.swizzle[2] = GL_BLUE;
-	data.swizzle[3] = GL_ALPHA;
 	data.type = GMImageDataType::UnsignedByte;
 	data.mip[0].height = posX.getWidth();
 	data.mip[0].width = posY.getHeight();
 
-	size_t totalSize = posX.getData().size +
+	GMsize_t totalSize = posX.getData().size +
 		posY.getData().size +
 		posZ.getData().size +
 		negX.getData().size +
@@ -105,7 +99,7 @@ GMCubeMapBuffer::GMCubeMapBuffer(
 	GMbyte* ptr = data.mip[0].data;
 	for (GMint i = 0; i < GM_array_size(slices); ++i)
 	{
-		size_t sz = slices[i]->getData().size;
+		GMsize_t sz = slices[i]->getData().size;
 		memcpy(ptr, slices[i]->getData().mip[0].data, data.sliceStride);
 		ptr += sz;
 	}
