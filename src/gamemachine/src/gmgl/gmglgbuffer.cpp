@@ -15,8 +15,8 @@ namespace
 	{
 		"deferred_light_pass_gPosition_Refractivity",
 		"deferred_light_pass_gNormal",
-		"deferred_light_pass_gTexAmbient",
-		"deferred_light_pass_gTexDiffuse",
+		"deferred_light_pass_gTexAmbientAlbedo",
+		"deferred_light_pass_gTexDiffuseMetallicRoughnessAO",
 		"deferred_light_pass_gTangent_eye",
 		"deferred_light_pass_gBitangent_eye",
 		"deferred_light_pass_gNormalMap_bNormalMap",

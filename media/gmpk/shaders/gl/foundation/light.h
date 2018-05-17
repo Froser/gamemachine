@@ -103,26 +103,26 @@ vec3 GMLight_Specular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection
 
 /////////////////////////////////////////////////////////////////////
 // 基本光照流程
-struct TangentSpace
+struct GMTangentSpace
 {
     vec3 Normal_Tangent_N;
     mat3 TBN;
 };
 
-bool isTangentSpaceInvalid(vec3 tangent, vec3 bitangent)
+bool GM_IsTangentSpaceInvalid(vec3 tangent, vec3 bitangent)
 {
-    // 返回是否有切线空间
+    // 返回是否无切线空间
     return length(tangent) < 0.01f && length(bitangent) < 0.01f;
 }
 
-TangentSpace calculateTangentSpaceRuntime(
+GMTangentSpace GM_CalculateTangentSpaceRuntime(
         vec3 worldPos,
         vec2 texcoord,
         vec3 normal_World_N,
         sampler2D normalMap
     )
 {
-    TangentSpace tangentSpace;
+    GMTangentSpace tangentSpace;
     tangentSpace.Normal_Tangent_N = texture(normalMap, texcoord).xyz * 2.0 - 1.0;
 
     vec3 Q1  = dFdx(worldPos);
@@ -142,7 +142,7 @@ struct PS_3D_INPUT
     vec3 WorldPos;            // 世界坐标
     vec3 Normal_World_N;      // 世界法线
     vec3 Normal_Eye_N;        // 眼睛空间法向量
-    TangentSpace TangentSpace;  // 切线空间
+    GMTangentSpace TangentSpace;  // 切线空间
     bool HasNormalMap;          // 是否有法线贴图
     vec3 AmbientLightmapTexture;
     vec3 DiffuseTexture;
@@ -163,7 +163,7 @@ vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float 
     return texture(GM_cubemap_texture, vec3(R.x, R.y, R.z)).rgb;
 }
 
-vec3 calculateRefractionByNormalTangent(vec3 worldPos, TangentSpace tangentSpace, float refractivity)
+vec3 calculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float refractivity)
 {
     if (refractivity == 0.f)
         return vec3(0, 0, 0);
@@ -298,7 +298,7 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
         // 只考虑直接光源
         if (GM_lights[i].LightType == GM_AmbientLight)
         {
-            //ambient += GM_lights[i].LightColor * vertex.AlbedoTexture * roughness;
+            ambient += GM_lights[i].LightColor * vertex.AlbedoTexture * roughness;
         }
         else if (GM_lights[i].LightType == GM_DirectLight)
         {

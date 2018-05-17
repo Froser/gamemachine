@@ -12,6 +12,26 @@
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
+void GMModelDataProxy::prepareTangentSpace()
+{
+	GMModel* model = getModel();
+	if (model->getDrawMode() == GMModelDrawMode::Vertex)
+	{
+		for (auto& mesh : model->getMeshes())
+		{
+			if (model->getShader().getTextureList().getTextureSampler(GMTextureType::NormalMap).getFrameCount() > 0)
+				mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
+		}
+	}
+	else
+	{
+		for (auto& mesh : model->getMeshes())
+		{
+			mesh->invalidateTangentSpace();
+		}
+	}
+}
+
 void GMModelDataProxy::packVertices(Vector<GMVertex>& vertices)
 {
 	GMModel* model = getModel();

@@ -63,22 +63,7 @@ void GMDx11ModelDataProxy::transfer()
 	if (!model->isNeedTransfer())
 		return;
 
-	// 顶点模式，提前把TangentSpace计算好才有意义
-	if (model->getDrawMode() == GMModelDrawMode::Vertex)
-	{
-		for (auto& mesh : model->getMeshes())
-		{
-			if (model->getShader().getTextureList().getTextureSampler(GMTextureType::NormalMap).getFrameCount() > 0)
-				mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
-		}
-	}
-	else
-	{
-		for (auto& mesh : model->getMeshes())
-		{
-			mesh->invalidateTangentSpace();
-		}
-	}
+	prepareTangentSpace();
 
 	Vector<GMVertex> packedVertices;
 	// 把数据打入顶点数组

@@ -20,8 +20,12 @@ void GM_Model3D()
     vec3 normal_World_N = normalEyeTransform * _normal.xyz;
     vertex.Normal_Eye_N = normalize( normal_World_N );
 
-    TangentSpace tangentSpace;
-    if (isTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
+    GMTangentSpace tangentSpace;
+    if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
+    {
+        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_normalmap_texture.texture);
+    }
+    else
     {
         vec3 tangent_eye = normalize(normalEyeTransform * _tangent.xyz);
         vec3 bitangent_eye = normalize(normalEyeTransform * _bitangent.xyz);
@@ -32,10 +36,6 @@ void GM_Model3D()
         ));
         tangentSpace.TBN = TBN;
         tangentSpace.Normal_Tangent_N = texture(GM_normalmap_texture.texture, _uv).rgb * 2.0 - 1.0;
-    }
-    else
-    {
-        tangentSpace = calculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_normalmap_texture.texture);
     }
 
     vertex.TangentSpace = tangentSpace;

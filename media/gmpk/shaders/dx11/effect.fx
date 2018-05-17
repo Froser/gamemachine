@@ -343,7 +343,7 @@ struct VS_OUTPUT
 
 typedef VS_OUTPUT PS_INPUT;
 
-class TangentSpace
+class GMTangentSpace
 {
     float3 Normal_Tangent_N;
     float3x3 TBN; //TBN 表示从世界坐标向切线坐标转换的矩阵
@@ -413,7 +413,7 @@ float4 IlluminateRefraction(
     float4 position_World,
     float4 viewPosition_World,
     bool hasNormalMap,
-    TangentSpace tangentSpace,
+    GMTangentSpace tangentSpace,
     float refractivity
     )
 {
@@ -440,7 +440,7 @@ struct PS_3D_INPUT
     float3 WorldPos;            // 世界坐标
     float3 Normal_World_N;      // 世界法线
     float3 Normal_Eye_N;        // 眼睛空间法向量
-    TangentSpace TangentSpace;  // 切线空间
+    GMTangentSpace TangentSpace;  // 切线空间
     bool HasNormalMap;          // 是否有法线贴图
     float3 AmbientLightmapTexture;
     float3 DiffuseTexture;
@@ -688,9 +688,9 @@ bool PS_3D_HasNormalMap()
     return GM_NormalMapTextureAttribute.Enabled;
 }
 
-bool IsTangentSpaceInvalid(float3 tangent, float3 bitangent)
+bool GM_IsTangentSpaceInvalid(float3 tangent, float3 bitangent)
 {
-    // 返回是否有切线空间
+    // 返回是否无切线空间
     return length(tangent) < 0.01f && length(bitangent) < 0.01f;
 }
 
@@ -708,10 +708,10 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 
     PS_3D_INPUT commonInput;
     commonInput.Normal_World_N = normalize(mul(input.Normal, inverseTransposeModelMatrix));
-    TangentSpace tangentSpace;
+    GMTangentSpace tangentSpace;
     if (PS_3D_HasNormalMap())
     {
-        if (IsTangentSpaceInvalid(input.Tangent, input.Bitangent))
+        if (GM_IsTangentSpaceInvalid(input.Tangent, input.Bitangent))
             tangentSpace.CalculateTangentSpaceRuntime(input.WorldPos, input.Texcoord, commonInput.Normal_World_N, PS_3D_NormalMap());
         else
             tangentSpace.CalculateTangentSpaceInEyeSpace(input.Texcoord, input.Tangent, input.Bitangent, normal_Eye_N, transform_Normal_Eye, PS_3D_NormalMap());
@@ -733,14 +733,19 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     // 计算Specular(如果有Specular贴图)
     float4 color_Specular = GM_SpecularTextureAttribute.Sample(GM_SpecularTexture, GM_SpecularSampler, input.Texcoord).r;
 
-    commonInput.AmbientLightmapTexture = color_Ambient * GM_Material.Ka;
-    commonInput.DiffuseTexture = color_Diffuse * GM_Material.Kd;
-    commonInput.SpecularTexture = color_Specular * GM_Material.Ks;
-    commonInput.Shininess = GM_Material.Shininess;
-    commonInput.Refractivity = GM_Material.Refractivity;
-
-    commonInput.AlbedoTexture = pow( GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord).rgb, float3(GM_Gamma, GM_Gamma, GM_Gamma));
-    commonInput.MetallicRoughnessAOTexture = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord).rgb;
+    if (GM_IlluminationModel == GM_IlluminationModel_Phong)
+    {
+        commonInput.AmbientLightmapTexture = color_Ambient * GM_Material.Ka;
+        commonInput.DiffuseTexture = color_Diffuse * GM_Material.Kd;
+        commonInput.SpecularTexture = color_Specular * GM_Material.Ks;
+        commonInput.Shininess = GM_Material.Shininess;
+        commonInput.Refractivity = GM_Material.Refractivity;
+    }
+    else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
+    {
+        commonInput.AlbedoTexture = pow( GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord).rgb, float3(GM_Gamma, GM_Gamma, GM_Gamma));
+        commonInput.MetallicRoughnessAOTexture = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord).rgb;
+    }
 
     return PS_3D_CalculateColor(commonInput);
 }
@@ -880,16 +885,15 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
-
         output.TextureAmbientAlbedo = GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord);
         output.TextureDiffuseMetallicRoughnessAO = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord);
     }
 
     if (PS_3D_HasNormalMap())
     {
-        if (IsTangentSpaceInvalid(input.Tangent, input.Bitangent))
+        if (GM_IsTangentSpaceInvalid(input.Tangent, input.Bitangent))
         {
-            TangentSpace tangentSpace;
+            GMTangentSpace tangentSpace;
             tangentSpace.CalculateTangentSpaceRuntime(input.WorldPos, input.Texcoord, normal_World, PS_3D_NormalMap());
             float3x3 TBN = transpose(tangentSpace.TBN);
             output.Tangent_Eye = Float3ToTexture(normalize(TBN[0]));
@@ -924,14 +928,19 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
 {
     PS_3D_INPUT commonInput;
     int3 coord = int3(input.Texcoord * float2(GM_ScreenInfo.ScreenWidth, GM_ScreenInfo.ScreenHeight), 0);
-    TangentSpace tangentSpace;
+    GMTangentSpace tangentSpace;
     float3 tangent_Eye_N;
     float3 bitangent_Eye_N;
     float4 PosRef;
     float4 KSS;
     float4 normalMapFlag;
 
-    commonInput.AmbientLightmapTexture = commonInput.DiffuseTexture = commonInput.AlbedoTexture = commonInput.MetallicRoughnessAOTexture = float3(0,0,0);
+    commonInput.AmbientLightmapTexture = 
+    commonInput.DiffuseTexture =
+    commonInput.SpecularTexture =
+    commonInput.AlbedoTexture =
+    commonInput.MetallicRoughnessAOTexture = float3(0,0,0);
+    commonInput.Shininess = commonInput.Refractivity = 0;
 
     if (!GM_ScreenInfo.Multisampling)
     {
@@ -944,6 +953,10 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         {
             commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbientAlbedo.Load(coord)).rgb;
             commonInput.DiffuseTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO.Load(coord)).rgb;
+            KSS = GM_DeferredSpecular_Shininess.Load(coord);
+            commonInput.SpecularTexture = KSS.rgb;
+            commonInput.Shininess = KSS.a;
+            commonInput.Refractivity = PosRef.a;
         }
         else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
         {
@@ -951,7 +964,6 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
             commonInput.MetallicRoughnessAOTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO.Load(coord)).rgb;
         }
 
-        KSS = GM_DeferredSpecular_Shininess.Load(coord);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap.Load(coord);
     }
     else
@@ -965,6 +977,10 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         {
             commonInput.AmbientLightmapTexture = (GM_DeferredTextureAmbientAlbedo_MSAA.Load(coord, 0)).rgb;
             commonInput.DiffuseTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA.Load(coord, 0)).rgb;
+            KSS = GM_DeferredSpecular_Shininess_MSAA.Load(coord, 0);
+            commonInput.SpecularTexture = KSS.rgb;
+            commonInput.Shininess = KSS.a;
+            commonInput.Refractivity = PosRef.a;
         }
         else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
         {
@@ -972,14 +988,9 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
             commonInput.MetallicRoughnessAOTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA.Load(coord, 0)).rgb;
         }
 
-        KSS = GM_DeferredSpecular_Shininess_MSAA.Load(coord, 0);
         normalMapFlag = GM_DeferredNormalMap_bNormalMap_MSAA.Load(coord, 0);
     }
-
-    commonInput.SpecularTexture = KSS.rgb;
-    commonInput.Shininess = KSS.a;
     commonInput.WorldPos = PosRef.rgb;
-    commonInput.Refractivity = PosRef.a;
     commonInput.HasNormalMap = (normalMapFlag.a != 0);
     commonInput.Normal_Eye_N = mul(commonInput.Normal_World_N, ToFloat3x3(GM_ViewMatrix));
 

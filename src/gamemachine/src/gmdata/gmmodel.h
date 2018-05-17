@@ -73,6 +73,7 @@ protected:
 	inline GMModel* getModel() { D(d); return d->model; }
 
 protected:
+	void prepareTangentSpace();
 	void packVertices(Vector<GMVertex>& vertices);
 	void packIndices(Vector<GMuint>& indices);
 };

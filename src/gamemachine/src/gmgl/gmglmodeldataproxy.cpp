@@ -26,13 +26,7 @@ void GMGLModelDataProxy::transfer()
 	if (!model->isNeedTransfer())
 		return;
 
-	GLenum usage = model->getUsageHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
-
-	for (auto& mesh : model->getMeshes())
-	{
-		if (model->getShader().getTextureList().getTextureSampler(GMTextureType::NormalMap).getFrameCount() > 0)
-			mesh->calculateTangentSpace(model->getPrimitiveTopologyMode());
-	}
+	prepareTangentSpace();
 
 	GMModelBufferData bufferData;
 	Vector<GMVertex> packedVertices;
@@ -50,6 +44,7 @@ void GMGLModelDataProxy::transfer()
 	glGenBuffers(1, &vbo);
 	bufferData.vertexBufferId = vbo;
 
+	GLenum usage = model->getUsageHint() == GMUsageHint::StaticDraw ? GL_STATIC_DRAW : GL_DYNAMIC_DRAW;
 	glBindBuffer(GL_ARRAY_BUFFER, bufferData.vertexBufferId);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GMVertex) * packedVertices.size(), packedVertices.data(), usage);
 
