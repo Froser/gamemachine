@@ -20,7 +20,7 @@ uniform GM_texture_t GM_specular_texture;
 uniform GM_texture_t GM_lightmap_texture;
 uniform GM_texture_t GM_normalmap_texture;
 uniform GM_texture_t GM_albedo_texture;
-uniform GM_texture_t GM_metallic_metallic_roughness_texture;
+uniform GM_texture_t GM_metallic_roughness_ao_texture;
 uniform samplerCube GM_cubemap_texture; //CubeMap作为单独一个纹理
 
 vec4 sampleTextures(GM_texture_t tex, vec2 uv)

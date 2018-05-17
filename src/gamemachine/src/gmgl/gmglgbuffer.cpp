@@ -14,7 +14,7 @@ namespace
 	Array<std::string, 8> s_GBufferGeometryUniformNames =
 	{
 		"deferred_light_pass_gPosition_Refractivity",
-		"deferred_light_pass_gNormal",
+		"deferred_light_pass_gNormal_IlluminationModel",
 		"deferred_light_pass_gTexAmbientAlbedo",
 		"deferred_light_pass_gTexDiffuseMetallicRoughnessAO",
 		"deferred_light_pass_gTangent_eye",
@@ -42,7 +42,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	// 对于[-1, 1]范围的数据，需要在着色器中进行一次转换。
 	GMFramebufferFormat formats[] = {
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R8G8B8A8_UNORM,

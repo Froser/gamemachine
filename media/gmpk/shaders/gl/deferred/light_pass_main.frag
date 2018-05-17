@@ -7,7 +7,7 @@ in vec2 _uv;
 out vec4 _frag_color;
 
 uniform sampler2D deferred_light_pass_gPosition_Refractivity;
-uniform sampler2D deferred_light_pass_gNormal;
+uniform sampler2D deferred_light_pass_gNormal_IlluminationModel;
 uniform sampler2D deferred_light_pass_gTexAmbientAlbedo;
 uniform sampler2D deferred_light_pass_gTexDiffuseMetallicRoughnessAO;
 uniform sampler2D deferred_light_pass_gTangent_eye;
@@ -27,7 +27,10 @@ void main()
     vec4 positionRefractivity = texture(deferred_light_pass_gPosition_Refractivity, _uv);
     vertex.WorldPos = positionRefractivity.rgb;
     vertex.Refractivity = positionRefractivity.a;
-    vertex.Normal_World_N = textureToNormal(texture(deferred_light_pass_gNormal, _uv).rgb);
+
+    vec4 normalIlluminationModel = texture(deferred_light_pass_gNormal_IlluminationModel, _uv);
+    vertex.Normal_World_N = textureToNormal(normalIlluminationModel.rgb);
+    vertex.IlluminationModel = int(normalIlluminationModel.a);
     vertex.Normal_Eye_N = mat3(GM_view_matrix) * vertex.Normal_World_N;
 
     vec4 normalMapHasNormalMap = texture(deferred_light_pass_gNormalMap_bNormalMap, _uv);
@@ -46,7 +49,7 @@ void main()
 
     vertex.TangentSpace = tangentSpace;
 
-    if (GM_IlluminationModel == GM_IlluminationModel_Phong)
+    if (vertex.IlluminationModel == GM_IlluminationModel_Phong)
     {
         vertex.AmbientLightmapTexture = texture(deferred_light_pass_gTexAmbientAlbedo, _uv).rgb;
         vertex.DiffuseTexture = texture(deferred_light_pass_gTexDiffuseMetallicRoughnessAO, _uv).rgb;
@@ -54,7 +57,7 @@ void main()
         vertex.SpecularTexture = ksShininess.rgb;
         vertex.Shininess = ksShininess.a;
     }
-    else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
+    else if (vertex.IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
         vertex.AlbedoTexture = pow(texture(deferred_light_pass_gTexAmbientAlbedo, _uv).rgb, vec3(GM_Gamma));
         vertex.MetallicRoughnessAOTexture = texture(deferred_light_pass_gTexDiffuseMetallicRoughnessAO, _uv).rgb;

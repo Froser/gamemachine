@@ -41,11 +41,11 @@ void GM_Model3D()
     vertex.TangentSpace = tangentSpace;
 
     vertex.HasNormalMap = GM_normalmap_texture.enabled != 0;
-    vertex.Shininess = GM_material.shininess;
-    vertex.Refractivity = GM_material.refractivity;
-
+    vertex.IlluminationModel = GM_IlluminationModel;
     if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
+        vertex.Shininess = GM_material.shininess;
+        vertex.Refractivity = GM_material.refractivity;
         vertex.AmbientLightmapTexture = sampleTextures(GM_ambient_texture, _uv).rgb
              * sampleTextures(GM_lightmap_texture, _lightmapuv).rgb
              * GM_material.ka;
@@ -55,7 +55,7 @@ void GM_Model3D()
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
         vertex.AlbedoTexture = pow(sampleTextures(GM_albedo_texture, _uv).rgb, vec3(GM_Gamma));
-        vertex.MetallicRoughnessAOTexture = sampleTextures(GM_metallic_metallic_roughness_texture, _uv).rgb;
+        vertex.MetallicRoughnessAOTexture = sampleTextures(GM_metallic_roughness_ao_texture, _uv).rgb;
     }
 
     _frag_color = PS_3D_CalculateColor(vertex);

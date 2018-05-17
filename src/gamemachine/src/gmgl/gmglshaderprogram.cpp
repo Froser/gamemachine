@@ -31,7 +31,7 @@ namespace
 			"GM_normalmap_texture",
 			"GM_lightmap_texture",
 			"GM_albedo_texture",
-			"GM_metallic_metallic_roughness_texture",
+			"GM_metallic_roughness_ao_texture",
 			"GM_cubemap_texture",
 
 			"GM_lightCount",

@@ -15,7 +15,7 @@ layout (location = 6) out vec4 deferred_geometry_pass_slot_6;
 layout (location = 7) out vec4 deferred_geometry_pass_slot_7;
 
 #alias deferred_geometry_pass_gPosition_Refractivity                deferred_geometry_pass_slot_0
-#alias deferred_geometry_pass_gNormal                               deferred_geometry_pass_slot_1
+#alias deferred_geometry_pass_gNormal_IlluminationModel             deferred_geometry_pass_slot_1
 #alias deferred_geometry_pass_gTexAmbientAlbedo                     deferred_geometry_pass_slot_2
 #alias deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO        deferred_geometry_pass_slot_3
 #alias deferred_geometry_pass_gTangent_eye                          deferred_geometry_pass_slot_4
@@ -34,14 +34,24 @@ void GM_GeometryPass()
 {
     ${deferred_geometry_pass_gPosition_Refractivity}.rgb = _deferred_geometry_pass_position_world.rgb;
     ${deferred_geometry_pass_gPosition_Refractivity}.a = GM_material.refractivity;
-    ${deferred_geometry_pass_gTexAmbientAlbedo} = vec4(GM_material.ka, 1) * sampleTextures(GM_ambient_texture, _uv) * sampleTextures(GM_lightmap_texture, _lightmapuv);
-    ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = vec4(GM_material.kd, 1) * sampleTextures(GM_diffuse_texture, _uv);
-    ${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * sampleTextures(GM_specular_texture, _uv).r, GM_material.shininess);
+
+    if (GM_IlluminationModel == GM_IlluminationModel_Phong)
+    {
+        ${deferred_geometry_pass_gTexAmbientAlbedo} = vec4(GM_material.ka, 1) * sampleTextures(GM_ambient_texture, _uv) * sampleTextures(GM_lightmap_texture, _lightmapuv);
+        ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = vec4(GM_material.kd, 1) * sampleTextures(GM_diffuse_texture, _uv);
+        ${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * sampleTextures(GM_specular_texture, _uv).r, GM_material.shininess);
+    }
+    else
+    {
+        ${deferred_geometry_pass_gTexAmbientAlbedo} = sampleTextures(GM_albedo_texture, _uv);
+        ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = sampleTextures(GM_metallic_roughness_ao_texture, _uv);
+    }
 
     // 由顶点变换矩阵计算法向量变换矩阵
     // normal的齐次向量最后一位必须位0，因为法线变换不考虑平移
     vec3 normal_World_N = normalize( mat3(GM_inverse_transpose_model_matrix) * _normal.xyz);
-    ${deferred_geometry_pass_gNormal} = normalToTexture ( normal_World_N );
+    ${deferred_geometry_pass_gNormal_IlluminationModel} = normalToTexture ( normal_World_N );
+    ${deferred_geometry_pass_gNormal_IlluminationModel}.a = GM_IlluminationModel;
 
     if (GM_normalmap_texture.enabled == 1)
     {
@@ -50,7 +60,7 @@ void GM_GeometryPass()
         if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
         {
             GMTangentSpace tangentSpace = GM_CalculateTangentSpaceRuntime(
-                _deferred_geometry_pass_position_world.rgb,
+                _deferred_geometry_pass_position_world.xyz,
                 _uv,
                 normal_World_N,
                 GM_normalmap_texture.texture

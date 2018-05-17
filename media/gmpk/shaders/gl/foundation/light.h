@@ -38,7 +38,7 @@ vec3 GM_CalculateGammaCorrectionIfNecessary(vec3 factor)
 // ToneMapping
 vec3 GM_ReinhardToneMapping(vec3 color)
 {
-    return vec4(color / (color + vec3(1,1,1)), 1);
+    return color / (color + vec3(1,1,1));
 }
 
 // Phong光照实现
@@ -151,6 +151,7 @@ struct PS_3D_INPUT
     vec3 MetallicRoughnessAOTexture;
     float Shininess;
     float Refractivity;
+    int IlluminationModel;
 };
 
 vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float refractivity)
@@ -284,7 +285,6 @@ vec3 GM_FresnelSchlick(float cosTheta, vec3 F0)
 vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 {
     vec3 viewDirection_N = normalize(GM_view_position.rgb - vertex.WorldPos);
-
     // 换算回世界空间
     vec3 normal_World_N = normalize(transpose(vertex.TangentSpace.TBN) * vertex.TangentSpace.Normal_Tangent_N);
     float metallic = vertex.MetallicRoughnessAOTexture.r;
@@ -334,7 +334,7 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
     float factor_Shadow = calculateShadow(GM_shadowInfo.ShadowMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
-    switch (GM_IlluminationModel)
+    switch (vertex.IlluminationModel)
     {
         case GM_IlluminationModel_Phong:
             return GM_Phong_CalculateColor(vertex, factor_Shadow);

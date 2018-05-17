@@ -11,7 +11,7 @@ namespace
 {
 	constexpr const char* GeometryFramebufferNames[] = {
 		"GM_DeferredPosition_World_Refractivity",
-		"GM_DeferredNormal_World",
+		"GM_DeferredNormal_World_IlluminationModel",
 		"GM_DeferredTextureAmbientAlbedo",
 		"GM_DeferredTextureDiffuseMetallicRoughnessAO",
 		"GM_DeferredTangent_Eye",
@@ -22,7 +22,7 @@ namespace
 
 	constexpr const char* GeometryMSAAFramebufferNames[] = {
 		"GM_DeferredPosition_World_Refractivity_MSAA",
-		"GM_DeferredNormal_World_MSAA",
+		"GM_DeferredNormal_World_IlluminationModel_MSAA",
 		"GM_DeferredTextureAmbientAlbedo_MSAA",
 		"GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA",
 		"GM_DeferredTangent_Eye_MSAA",
@@ -81,7 +81,7 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 	// 对于[-1, 1]范围的数据，需要在着色器中进行一次转换。
 	GMFramebufferFormat formats[] = {
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
-		GMFramebufferFormat::R8G8B8A8_UNORM,
+		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 		GMFramebufferFormat::R8G8B8A8_UNORM,

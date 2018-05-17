@@ -448,7 +448,8 @@ struct PS_3D_INPUT
     float3 AlbedoTexture;
     float3 MetallicRoughnessAOTexture;
     float Shininess;
-    float Refractivity; 
+    float Refractivity;
+    int IlluminationModel;
 };
 
 interface IIlluminationModel
@@ -654,7 +655,7 @@ static const int GM_IlluminationModel_CookTorranceBRDF = 1;
 float4 PS_3D_CalculateColor(PS_3D_INPUT input)
 {
     float factor_Shadow = CalculateShadow(GM_ShadowInfo.ShadowMatrix, ToFloat4(input.WorldPos), input.Normal_World_N);
-    switch (GM_IlluminationModel)
+    switch (input.IlluminationModel)
     {
         case GM_IlluminationModel_Phong:
             return GM_Phong.Calculate(input, factor_Shadow);
@@ -722,6 +723,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.HasNormalMap = PS_3D_HasNormalMap();
 
     commonInput.Normal_Eye_N = normal_Eye_N;
+    commonInput.IlluminationModel = GM_IlluminationModel;
 
     // 计算Ambient
     float4 color_Ambient = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);
@@ -822,7 +824,7 @@ float4 PS_CubeMap(PS_INPUT input) : SV_TARGET
 // Deferred 3D
 //--------------------------------------------------------------------------------------
 Texture2D GM_DeferredPosition_World_Refractivity;
-Texture2D GM_DeferredNormal_World;
+Texture2D GM_DeferredNormal_World_IlluminationModel;
 Texture2D GM_DeferredTextureAmbientAlbedo;
 Texture2D GM_DeferredTextureDiffuseMetallicRoughnessAO;
 Texture2D GM_DeferredTangent_Eye;
@@ -831,7 +833,7 @@ Texture2D GM_DeferredNormalMap_bNormalMap;
 Texture2D GM_DeferredSpecular_Shininess;
 
 Texture2DMS<float4> GM_DeferredPosition_World_Refractivity_MSAA;
-Texture2DMS<float4> GM_DeferredNormal_World_MSAA;
+Texture2DMS<float4> GM_DeferredNormal_World_IlluminationModel_MSAA;
 Texture2DMS<float4> GM_DeferredTextureAmbientAlbedo_MSAA;
 Texture2DMS<float4> GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA;
 Texture2DMS<float4> GM_DeferredTangent_Eye_MSAA;
@@ -848,7 +850,7 @@ float4 Float3ToTexture(float3 normal)
 struct VS_GEOMETRY_OUTPUT
 {
     float4 Position_Refractivity             : SV_TARGET0;
-    float4 Normal_World                      : SV_TARGET1; //需要将区间转化到[0, 1]
+    float4 Normal_World_IlluminationModel    : SV_TARGET1;
     float4 TextureAmbientAlbedo              : SV_TARGET2;
     float4 TextureDiffuseMetallicRoughnessAO : SV_TARGET3;
     float4 Tangent_Eye                       : SV_TARGET4; //需要将区间转化到[0, 1]
@@ -871,7 +873,8 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     float3x3 inverseTransposeModelMatrix = ToFloat3x3(GM_InverseTransposeModelMatrix);
     float3x3 normalEyeTransform = mul(inverseTransposeModelMatrix, ToFloat3x3(GM_ViewMatrix));
     float3 normal_World = normalize(mul(input.Normal.xyz, inverseTransposeModelMatrix));
-    output.Normal_World = Float3ToTexture(normal_World);
+    output.Normal_World_IlluminationModel = Float3ToTexture(normal_World);
+    output.Normal_World_IlluminationModel.a = GM_IlluminationModel;
 
     if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
@@ -947,7 +950,8 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye, coord).rgb;
         bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye, coord).rgb;
         PosRef = GM_DeferredPosition_World_Refractivity.Load(coord);
-        commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World, coord);
+        commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_IlluminationModel, coord);
+        commonInput.IlluminationModel = (int)(GM_DeferredNormal_World_IlluminationModel.Load(coord).a);
 
         if (GM_IlluminationModel == GM_IlluminationModel_Phong)
         {
@@ -971,7 +975,8 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         tangent_Eye_N = TextureRGBToNormal(GM_DeferredTangent_Eye_MSAA, coord).rgb;
         bitangent_Eye_N = TextureRGBToNormal(GM_DeferredBitangent_Eye_MSAA, coord).rgb;
         PosRef = GM_DeferredPosition_World_Refractivity_MSAA.Load(coord, 0);
-        commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_MSAA, coord);
+        commonInput.Normal_World_N = TextureRGBToNormal(GM_DeferredNormal_World_IlluminationModel_MSAA, coord);
+        commonInput.IlluminationModel = (int)(GM_DeferredNormal_World_IlluminationModel_MSAA.Load(coord, 0).a);
 
         if (GM_IlluminationModel == GM_IlluminationModel_Phong)
         {
