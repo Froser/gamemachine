@@ -234,7 +234,6 @@ class GMPhongLightProxy
         return GM_PhongDirectLight.IlluminateSpecular(lightDirection_N, eyeDirection_N, normal_N, shininess);
     }
 };
-
 int GM_LightCount;
 
 struct GMScreenInfo
@@ -605,41 +604,44 @@ class GMCookTorranceBRDF : IIlluminationModel
         float metallic = input.MetallicRoughnessAOTexture.r;
         float roughness = input.MetallicRoughnessAOTexture.g;
         float ao = input.MetallicRoughnessAOTexture.b;
-
-        // 金属的F0为0.04f
         float3 F0 = lerp(GM_Material.F0, input.AlbedoTexture, metallic);
 
         float3 Lo = float3(0, 0, 0);
+        float3 ambient = float3(0, 0, 0);
+
         for (int i = 0; i < GM_LightCount; ++i)
         {
             // 只考虑直接光源
-            if (GM_LightAttributes[i].Type != GM_DirectLight)
-                continue;
-            
-            // 计算每束光辐射率
-            float3 L_N = normalize(GM_LightAttributes[i].Position - input.WorldPos);
-            float3 H_N = normalize(viewDirection_N + L_N);
-            float attenuation = 1.0f; //先不计算衰减
-            float3 radiance = GM_LightAttributes[i].Color * attenuation;
+            if (GM_LightAttributes[i].Type == GM_AmbientLight)
+            {
+                ambient += GM_LightAttributes[i].Color * input.AlbedoTexture * roughness;
+            }
+            else if (GM_LightAttributes[i].Type == GM_DirectLight)
+            {
+                // 计算每束光辐射率
+                float3 L_N = normalize(GM_LightAttributes[i].Position - input.WorldPos);
+                float3 H_N = normalize(viewDirection_N + L_N);
+                float attenuation = 1.0f; //先不计算衰减
+                float3 radiance = GM_LightAttributes[i].Color * attenuation;
 
-            // Cook-Torrance BRDF
-            float NDF = DistributionGGX(normal_World_N, H_N, roughness);
-            float G = GeometrySmith(normal_World_N, viewDirection_N, L_N, roughness);
-            float3 F = FresnelSchlick(max(dot(H_N, viewDirection_N), 0.0f), F0);
-            float3 nominator = NDF * G * F;
-            float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
-            float3 specular = nominator / denominator;
+                // Cook-Torrance BRDF
+                float NDF = DistributionGGX(normal_World_N, H_N, roughness);
+                float G = GeometrySmith(normal_World_N, viewDirection_N, L_N, roughness);
+                float3 F = FresnelSchlick(max(dot(H_N, viewDirection_N), 0.0f), F0);
+                float3 nominator = NDF * G * F;
+                float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
+                float3 specular = nominator / denominator;
 
-            float3 ks = F;
-            float3 kd = float3(1, 1, 1) - ks;
-            kd *= 1.0f - metallic;
+                float3 ks = F;
+                float3 kd = float3(1, 1, 1) - ks;
+                kd *= 1.0f - metallic;
 
-            float cosTheta = max(dot(normal_World_N, L_N), 0);
-            Lo += (kd * input.AlbedoTexture / PI + specular) * radiance * cosTheta;
+                float cosTheta = max(dot(normal_World_N, L_N), 0);
+                Lo += (kd * input.AlbedoTexture / PI + specular) * radiance * cosTheta;
+            }
         }
 
-        float3 ambient = float3(.03f, .03f, .03f) * input.AlbedoTexture * roughness;
-        float4 color = ToFloat4(ambient + Lo);
+        float4 color = ToFloat4(ambient + Lo) * shadowFactor;
         color.rgb = ReinhardToneMapping.ToneMapping(color.rgb);
         color = CalculateGammaCorrection(color);
         return color;
@@ -690,7 +692,7 @@ bool PS_3D_HasNormalMap()
 bool IsTangentSpaceInvalid(float3 tangent, float3 bitangent)
 {
     // 返回是否有切线空间
-    return tangent == float3(0, 0, 0) && bitangent == float3(0, 0, 0);
+    return length(tangent) < 0.01f && length(bitangent) < 0.01f;
 }
 
 GMTexture PS_3D_NormalMap()
@@ -880,6 +882,7 @@ VS_GEOMETRY_OUTPUT PS_3D_GeometryPass(PS_INPUT input)
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
+
         output.TextureAmbientAlbedo = GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord);
         output.TextureDiffuseMetallicRoughnessAO = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord);
     }
@@ -946,7 +949,8 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         }
         else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
         {
-            commonInput.AlbedoTexture = (GM_DeferredTextureAmbientAlbedo.Load(coord)).rgb;
+            float gamma = 1.f / GM_GammaInv;
+            commonInput.AlbedoTexture = pow(GM_DeferredTextureAmbientAlbedo.Load(coord).rgb, float3(gamma, gamma, gamma));
             commonInput.MetallicRoughnessAOTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO.Load(coord)).rgb;
         }
 
@@ -967,7 +971,8 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         }
         else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
         {
-            commonInput.AlbedoTexture = (GM_DeferredTextureAmbientAlbedo_MSAA.Load(coord, 0)).rgb;
+            float gamma = 1.f / GM_GammaInv;
+            commonInput.AlbedoTexture = pow((GM_DeferredTextureAmbientAlbedo_MSAA.Load(coord, 0)).rgb, float3(gamma, gamma, gamma));
             commonInput.MetallicRoughnessAOTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA.Load(coord, 0)).rgb;
         }
 

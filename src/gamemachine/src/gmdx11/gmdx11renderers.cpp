@@ -1128,8 +1128,6 @@ void GMDx11Renderer_Deferred_3D::passAllAndDraw(GMModel* model)
 void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 {
 	D(d);
-	setDeferredTexturesBeforeApply();
-
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 	for (GMuint p = 0; p < techDesc.Passes; ++p)
@@ -1144,7 +1142,7 @@ void GMDx11Renderer_Deferred_3D_LightPass::passAllAndDraw(GMModel* model)
 	}
 }
 
-void GMDx11Renderer_Deferred_3D_LightPass::setDeferredTexturesBeforeApply()
+void GMDx11Renderer_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 {
 	D(d);
 	GMDx11GBuffer* gbuffer = gm_cast<GMDx11GBuffer*>(getEngine()->getGBuffer());

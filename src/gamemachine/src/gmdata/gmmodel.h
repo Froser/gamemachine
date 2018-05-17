@@ -325,7 +325,7 @@ public:
 private:
 	enum
 	{
-		InvalidTangentSpace = -2,
+		InvalidTangentSpace = 0,
 	};
 };
 

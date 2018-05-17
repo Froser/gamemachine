@@ -185,10 +185,10 @@ class GMDx11Renderer_Deferred_3D_LightPass : public GMDx11Renderer
 	}
 
 	virtual void prepareMaterials(GMModel* model) override {}
+	virtual void prepareTextures(GMModel* model) override;
 
 private:
 	void passAllAndDraw(GMModel* model);
-	void setDeferredTexturesBeforeApply();
 };
 
 class GMDx11Renderer_3D_Shadow : public GMDx11Renderer_3D

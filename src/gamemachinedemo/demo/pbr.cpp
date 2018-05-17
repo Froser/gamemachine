@@ -152,14 +152,25 @@ void Demo_PBR::setDefaultLights()
 	D(d);
 	if (isInited())
 	{
-		gm::ILight* directLight = nullptr;
-		GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
-		GM_ASSERT(directLight);
-		gm::GMfloat lightPos[] = { 1, 1, -1 };
-		directLight->setLightPosition(lightPos);
-		gm::GMfloat color[] = { 20, 20, 20 };
-		directLight->setLightColor(color);
-		GM.getGraphicEngine()->addLight(directLight);
+		{
+			gm::ILight* directLight = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Direct, &directLight);
+			GM_ASSERT(directLight);
+			gm::GMfloat lightPos[] = { 1, 1, -1 };
+			directLight->setLightPosition(lightPos);
+			gm::GMfloat color[] = { 20, 20, 20 };
+			directLight->setLightColor(color);
+			GM.getGraphicEngine()->addLight(directLight);
+		}
+
+		{
+			gm::ILight* ambientLight = nullptr;
+			GM.getFactory()->createLight(gm::GMLightType::Ambient, &ambientLight);
+			GM_ASSERT(ambientLight);
+			gm::GMfloat color[] = { .05f, .05f, .05f };
+			ambientLight->setLightColor(color);
+			GM.getGraphicEngine()->addLight(ambientLight);
+		}
 	}
 }
 
