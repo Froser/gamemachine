@@ -71,6 +71,7 @@ namespace
 
 			{
 				"GM_GammaCorrection",
+				"GM_Gamma",
 				"GM_GammaInv",
 			},
 

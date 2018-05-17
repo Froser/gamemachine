@@ -77,14 +77,17 @@ namespace
 			},
 
 			{
-				"GM_gammaCorrection",
-				"GM_gammaInv"
+				"GM_GammaCorrection",
+				"GM_Gamma",
+				"GM_GammaInv"
 			},
 
 			{
 				"GM_HDR",
 				"GM_toneMapping",
-			}
+			},
+
+			"GM_IlluminationModel",
 		};
 		return desc;
 	}

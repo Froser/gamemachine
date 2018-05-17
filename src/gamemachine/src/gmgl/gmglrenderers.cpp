@@ -211,16 +211,13 @@ namespace
 
 void GMGammaHelper::setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
 {
-	bool needGammaCorrection = engine->needGammaCorrection();
-	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, needGammaCorrection);
-	if (needGammaCorrection)
+	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, engine->needGammaCorrection());
+	GMfloat gamma = engine->getGammaValue();
+	if (gamma != m_gamma)
 	{
-		GMfloat gamma = engine->getGammaValue();
-		if (gamma != m_gamma)
-		{
-			shaderProgram->setFloat(desc->GammaCorrection.GammaInvValue, gamma);
-			m_gamma = gamma;
-		}
+		shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
+		shaderProgram->setFloat(desc->GammaCorrection.GammaInvValue, 1.f / gamma);
+		m_gamma = gamma;
 	}
 }
 
@@ -495,13 +492,20 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 
 	// 应用Shader
 	applyShader(model->getShader());
+	
+	// 设置光照模型
+	const GMShaderVariablesDesc* desc = getVariablesDesc();
+	IShaderProgram* shaderProgram = getShaderProgram();
+	GMShader& shader = model->getShader();
+	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
+	shaderProgram->setInt(desc->IlluminationModel, (GMint)illuminationModel);
 
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
 	{
 		if (!drawTexture(model, (GMTextureType)type))
 		{
-			if (model->getShader().getIlluminationModel() == GMIlluminationModel::Phong && (
+			if (illuminationModel == GMIlluminationModel::Phong && (
 				type == GMTextureType::Ambient ||
 				type == GMTextureType::Diffuse ||
 				type == GMTextureType::Specular ||
@@ -554,6 +558,7 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 	static const std::string GMSHADER_MATERIAL_KS = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Ks;
 	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Shininess;
 	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Refreactivity;
+	static const std::string GMSHADER_MATERIAL_F0 = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.F0;
 
 	const GMMaterial& material = shader.getMaterial();
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.ka));
@@ -561,6 +566,7 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KS.c_str(), ValuePointer(material.ks));
 	shaderProgram->setFloat(GMSHADER_MATERIAL_SHININESS.c_str(), material.shininess);
 	shaderProgram->setFloat(GMSHADER_MATERIAL_REFRACTIVITY.c_str(), material.refractivity);
+	shaderProgram->setVec3(GMSHADER_MATERIAL_F0.c_str(), ValuePointer(material.f0));
 }
 
 void GMGLRenderer_3D::drawDebug()

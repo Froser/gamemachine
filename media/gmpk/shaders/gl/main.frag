@@ -13,5 +13,5 @@
 
 void main(void)
 {
-	GM_techniqueEntrance();
+    GM_techniqueEntrance();
 }

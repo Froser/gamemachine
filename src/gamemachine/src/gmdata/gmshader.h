@@ -242,7 +242,7 @@ GM_ALIGNED_STRUCT(GMMaterial)
 	GMVec3 ks = GMVec3(1);
 	GMVec3 kd = GMVec3(1);
 	
-	GMVec3 f0 = GMVec3(0.04f);
+	GMVec3 f0 = GMVec3(0.04f); //!< 基础反射率，用于PBR(BRDF)模型的渲染。对于金属，这个值为0.04。
 };
 
 GM_PRIVATE_OBJECT(GMShader)

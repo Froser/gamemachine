@@ -249,6 +249,7 @@ GMScreenInfo GM_ScreenInfo;
 // Gamma Correction
 //--------------------------------------------------------------------------------------
 bool GM_GammaCorrection;
+float GM_Gamma;
 float GM_GammaInv;
 
 float4 CalculateGammaCorrection(float4 factor)
@@ -600,12 +601,10 @@ class GMCookTorranceBRDF : IIlluminationModel
 
         // 换算回世界空间
         float3 normal_World_N = normalize(mul(input.TangentSpace.Normal_Tangent_N, transpose(input.TangentSpace.TBN)));
-
         float metallic = input.MetallicRoughnessAOTexture.r;
         float roughness = input.MetallicRoughnessAOTexture.g;
         float ao = input.MetallicRoughnessAOTexture.b;
         float3 F0 = lerp(GM_Material.F0, input.AlbedoTexture, metallic);
-
         float3 Lo = float3(0, 0, 0);
         float3 ambient = float3(0, 0, 0);
 
@@ -740,8 +739,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     commonInput.Shininess = GM_Material.Shininess;
     commonInput.Refractivity = GM_Material.Refractivity;
 
-    float gamma = 1.f / GM_GammaInv;
-    commonInput.AlbedoTexture = pow( GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord).rgb, float3(gamma, gamma, gamma));
+    commonInput.AlbedoTexture = pow( GM_AlbedoTextureAttribute.Sample(GM_AlbedoTexture, GM_AlbedoSampler, input.Texcoord).rgb, float3(GM_Gamma, GM_Gamma, GM_Gamma));
     commonInput.MetallicRoughnessAOTexture = GM_MetallicRoughnessAOTextureAttribute.Sample(GM_MetallicRoughnessAOTexture, GM_MetallicRoughnessAOSampler, input.Texcoord).rgb;
 
     return PS_3D_CalculateColor(commonInput);
@@ -949,8 +947,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         }
         else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
         {
-            float gamma = 1.f / GM_GammaInv;
-            commonInput.AlbedoTexture = pow(GM_DeferredTextureAmbientAlbedo.Load(coord).rgb, float3(gamma, gamma, gamma));
+            commonInput.AlbedoTexture = pow(GM_DeferredTextureAmbientAlbedo.Load(coord).rgb, float3(GM_Gamma, GM_Gamma, GM_Gamma));
             commonInput.MetallicRoughnessAOTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO.Load(coord)).rgb;
         }
 
@@ -971,8 +968,7 @@ float4 PS_3D_LightPass(PS_INPUT input) : SV_TARGET
         }
         else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
         {
-            float gamma = 1.f / GM_GammaInv;
-            commonInput.AlbedoTexture = pow((GM_DeferredTextureAmbientAlbedo_MSAA.Load(coord, 0)).rgb, float3(gamma, gamma, gamma));
+            commonInput.AlbedoTexture = pow((GM_DeferredTextureAmbientAlbedo_MSAA.Load(coord, 0)).rgb, float3(GM_Gamma, GM_Gamma, GM_Gamma));
             commonInput.MetallicRoughnessAOTexture = (GM_DeferredTextureDiffuseMetallicRoughnessAO_MSAA.Load(coord, 0)).rgb;
         }
 

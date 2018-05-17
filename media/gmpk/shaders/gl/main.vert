@@ -11,6 +11,6 @@
 
 void main(void)
 {
-	init_layouts();
-	GM_techniqueEntrance();
+    init_layouts();
+    GM_techniqueEntrance();
 }

@@ -66,6 +66,7 @@ struct GMShaderVariableShadowInfoDesc
 struct GMShaderVariableGammaDesc
 {
 	const char* GammaCorrection;
+	const char* GammaValue;
 	const char* GammaInvValue;
 };
 

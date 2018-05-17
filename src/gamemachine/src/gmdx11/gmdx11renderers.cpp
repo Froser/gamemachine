@@ -913,6 +913,7 @@ void GMDx11Renderer::setGamma(IShaderProgram* shaderProgram)
 	GMfloat gamma = getEngine()->getGammaValue();
 	if (gamma != d->gamma)
 	{
+		shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
 		shaderProgram->setFloat(desc->GammaCorrection.GammaInvValue, 1.f / gamma);
 		d->gamma = gamma;
 	}
