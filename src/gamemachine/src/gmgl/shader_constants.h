@@ -24,15 +24,15 @@ BEGIN_NS
 constexpr GMint GMGL_MAX_UNIFORM_NAME_LEN = 64; //uniform最长名称
 constexpr GMint GMGL_MAX_LIGHT_COUNT = 10; //灯光最大数量
 
-inline const char* getTextureUniformName(const GMShaderVariablesDesc* desc, GMTextureType t)
+inline const char* getTextureUniformName(GMTextureType t)
 {
-	static const std::string GMSHADER_AMBIENT_TEXTURES = std::string(desc->AmbientTextureName);
-	static const std::string GMSHADER_DIFFUSE_TEXTURES = std::string(desc->DiffuseTextureName);
-	static const std::string GMSHADER_SPECULAR_TEXTURES = std::string(desc->SpecularTextureName);
-	static const std::string GMSHADER_NORMALMAP_TEXTURE = std::string(desc->NormalMapTextureName);
-	static const std::string GMSHADER_LIGHTMAP_TEXTURE = std::string(desc->LightMapTextureName);
-	static const std::string GMSHADER_ALBEDO_TEXTURE = std::string(desc->AlbedoTextureName);
-	static const std::string GMSHADER_METALLIC_ROUGHNESS_AO_TEXTURE = std::string(desc->MetallicRoughnessAOTextureName);
+	static const std::string GMSHADER_AMBIENT_TEXTURES = std::string(GM_VariablesDesc.AmbientTextureName);
+	static const std::string GMSHADER_DIFFUSE_TEXTURES = std::string(GM_VariablesDesc.DiffuseTextureName);
+	static const std::string GMSHADER_SPECULAR_TEXTURES = std::string(GM_VariablesDesc.SpecularTextureName);
+	static const std::string GMSHADER_NORMALMAP_TEXTURE = std::string(GM_VariablesDesc.NormalMapTextureName);
+	static const std::string GMSHADER_LIGHTMAP_TEXTURE = std::string(GM_VariablesDesc.LightMapTextureName);
+	static const std::string GMSHADER_ALBEDO_TEXTURE = std::string(GM_VariablesDesc.AlbedoTextureName);
+	static const std::string GMSHADER_METALLIC_ROUGHNESS_AO_TEXTURE = std::string(GM_VariablesDesc.MetallicRoughnessAOTextureName);
 
 	switch (t)
 	{

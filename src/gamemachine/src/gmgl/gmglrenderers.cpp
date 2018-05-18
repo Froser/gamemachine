@@ -106,19 +106,19 @@ namespace
 		}
 	}
 
-	inline void applyShadow(const GMShaderVariablesDesc* desc, const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
+	inline void applyShadow(const GMShadowSourceDesc* shadowSourceDesc, IShaderProgram* shaderProgram, GMGLShadowFramebuffers* shadowFramebuffers, bool hasShadow)
 	{
 		static IShaderProgram* lastProgram = nullptr;
 		static GMint64 lastShadowVersion = 0;
-		static const GMString s_shadowInfo = GMString(desc->ShadowInfo.ShadowInfo) + ".";
-		static std::string s_position = (s_shadowInfo + desc->ShadowInfo.Position).toStdString();
-		static std::string s_matrix = (s_shadowInfo + desc->ShadowInfo.ShadowMatrix).toStdString();
-		static std::string s_width = (s_shadowInfo + desc->ShadowInfo.ShadowMapWidth).toStdString();
-		static std::string s_height = (s_shadowInfo + desc->ShadowInfo.ShadowMapWidth).toStdString();
-		static std::string s_biasMin = (s_shadowInfo + desc->ShadowInfo.BiasMin).toStdString();
-		static std::string s_biasMax = (s_shadowInfo + desc->ShadowInfo.BiasMax).toStdString();
-		static std::string s_hasShadow = (s_shadowInfo + desc->ShadowInfo.HasShadow).toStdString();
-		static std::string s_shadowMap = (s_shadowInfo + desc->ShadowInfo.ShadowMap).toStdString();
+		static const GMString s_shadowInfo = GMString(GM_VariablesDesc.ShadowInfo.ShadowInfo) + ".";
+		static std::string s_position = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.Position).toStdString();
+		static std::string s_matrix = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMatrix).toStdString();
+		static std::string s_width = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
+		static std::string s_height = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMapWidth).toStdString();
+		static std::string s_biasMin = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMin).toStdString();
+		static std::string s_biasMax = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.BiasMax).toStdString();
+		static std::string s_hasShadow = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.HasShadow).toStdString();
+		static std::string s_shadowMap = (s_shadowInfo + GM_VariablesDesc.ShadowInfo.ShadowMap).toStdString();
 
 		if (hasShadow)
 		{
@@ -209,14 +209,14 @@ namespace
 	}
 }
 
-void GMGammaHelper::setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine* engine, IShaderProgram* shaderProgram)
+void GMGammaHelper::setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProgram)
 {
-	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, engine->needGammaCorrection());
+	shaderProgram->setBool(GM_VariablesDesc.GammaCorrection.GammaCorrection, engine->needGammaCorrection());
 	GMfloat gamma = engine->getGammaValue();
 	if (gamma != m_gamma)
 	{
-		shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
-		shaderProgram->setFloat(desc->GammaCorrection.GammaInvValue, 1.f / gamma);
+		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaValue, gamma);
+		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaInvValue, 1.f / gamma);
 		m_gamma = gamma;
 	}
 }
@@ -247,15 +247,13 @@ void GMGLRenderer::draw(GMModel* model)
 
 void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
 {
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	GM_ASSERT(desc);
-	static const std::string u_scrolls_affix = (GMString(".") + desc->TextureAttributes.OffsetX).toStdString();
-	static const std::string u_scrollt_affix = (GMString(".") + desc->TextureAttributes.OffsetY).toStdString();
-	static const std::string u_scales_affix = (GMString(".") + desc->TextureAttributes.ScaleX).toStdString();
-	static const std::string u_scalet_affix = (GMString(".") + desc->TextureAttributes.ScaleY).toStdString();
+	static const std::string u_scrolls_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetX).toStdString();
+	static const std::string u_scrollt_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.OffsetY).toStdString();
+	static const std::string u_scales_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.ScaleX).toStdString();
+	static const std::string u_scalet_affix = (GMString(".") + GM_VariablesDesc.TextureAttributes.ScaleY).toStdString();
 
 	auto shaderProgram = getShaderProgram();
-	const char* uniform = getTextureUniformName(desc, type);
+	const char* uniform = getTextureUniformName(type);
 
 	static char u_scrolls[GMGL_MAX_UNIFORM_NAME_LEN],
 		u_scrollt[GMGL_MAX_UNIFORM_NAME_LEN],
@@ -294,16 +292,14 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
 
 GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
 {
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	GM_ASSERT(desc);
-	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
-	static const std::string u_tex_texture = (GMString(".") + desc->TextureAttributes.Texture).toStdString();
+	static const std::string u_tex_enabled = std::string(".") + GM_VariablesDesc.TextureAttributes.Enabled;
+	static const std::string u_tex_texture = std::string(".") + GM_VariablesDesc.TextureAttributes.Texture;
 
 	GMint idx = (GMint)type;
 	GMint texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
-	const char* uniform = getTextureUniformName(desc, type);
+	const char* uniform = getTextureUniformName(type);
 	static char u_texture[GMGL_MAX_UNIFORM_NAME_LEN], u_enabled[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u_texture, uniform, u_tex_texture.c_str());
 	combineUniform(u_enabled, uniform, u_tex_enabled.c_str());
@@ -316,14 +312,12 @@ GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
 
 void GMGLRenderer::deactivateTexture(GMTextureType type)
 {
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	GM_ASSERT(desc);
-	static const std::string u_tex_enabled = (GMString(".") + desc->TextureAttributes.Enabled).toStdString();
+	static const std::string u_tex_enabled = (GMString(".") + GM_VariablesDesc.TextureAttributes.Enabled).toStdString();
 	GMint texId = getTextureID(type);
 
 	auto shaderProgram = getShaderProgram();
 	GMint idx = (GMint)type;
-	const char* uniform = getTextureUniformName(desc, type);
+	const char* uniform = getTextureUniformName(type);
 	static char u[GMGL_MAX_UNIFORM_NAME_LEN];
 	combineUniform(u, uniform, u_tex_enabled.c_str());
 	shaderProgram->setInt(u, 0);
@@ -402,11 +396,11 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 		GMFloat4 vec;
 		lookAt.position.loadFloat4(vec);
 
-		auto& desc = shaderProgram->getDesc();
-		shaderProgram->setVec4(desc.ViewPosition, vec);
-		shaderProgram->setMatrix4(desc.ViewMatrix, camera.getViewMatrix());
-		shaderProgram->setMatrix4(desc.InverseViewMatrix, camera.getInverseViewMatrix());
-		shaderProgram->setMatrix4(desc.ProjectionMatrix, camera.getProjectionMatrix());
+		GMGraphicEngine::getDefaultShaderVariablesDesc();
+		shaderProgram->setVec4(GM_VariablesDesc.ViewPosition, vec);
+		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
 		s_lastShaderProgram = shaderProgram;
 		camera.cleanDirty();
 	}
@@ -415,13 +409,15 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
 	static IShaderProgram* s_lastShaderProgram = nullptr;
+	static std::string s_multisampling = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
+	static std::string s_screenWidth = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
+	static std::string s_screenHeight = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
 	if (s_lastShaderProgram != shaderProgram) //或者窗口属性发生改变
 	{
 		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-		auto& desc = shaderProgram->getDesc();
-		shaderProgram->setInt(desc.ScreenInfoAttributes.Multisampling, states.sampleCount > 1);
-		shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenWidth, states.renderRect.width);
-		shaderProgram->setInt(desc.ScreenInfoAttributes.ScreenHeight, states.renderRect.height);
+		shaderProgram->setInt(s_multisampling.c_str(), states.sampleCount > 1);
+		shaderProgram->setInt(s_screenWidth.c_str(), states.renderRect.width);
+		shaderProgram->setInt(s_screenHeight.c_str(), states.renderRect.height);
 		s_lastShaderProgram = shaderProgram;
 	}
 }
@@ -440,16 +436,15 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
 
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
 	{
-		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
 
 	GMGeometryPassingState state = db->engine->getGBuffer()->getGeometryPassingState();
@@ -471,14 +466,14 @@ void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(db->engine->getShadowMapFramebuffers());
 		shadowFramebuffers->getShadowMapTexture()->useTexture(0);
-		applyShadow(desc, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+		applyShadow(&shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
 	{
-		applyShadow(desc, nullptr, shaderProgram, nullptr, false);
+		applyShadow(nullptr, shaderProgram, nullptr, false);
 	}
 
-	db->gammaHelper.setGamma(desc, db->engine, shaderProgram);
+	db->gammaHelper.setGamma(db->engine, shaderProgram);
 }
 
 void GMGLRenderer_3D::beforeDraw(GMModel* model)
@@ -494,11 +489,10 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	applyShader(model->getShader());
 	
 	// 设置光照模型
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	IShaderProgram* shaderProgram = getShaderProgram();
 	GMShader& shader = model->getShader();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(desc->IlluminationModel, (GMint)illuminationModel);
+	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint)illuminationModel);
 
 	// 纹理
 	GM_FOREACH_ENUM_CLASS(type, GMTextureType::Ambient, GMTextureType::EndOfCommonTexture)
@@ -552,13 +546,12 @@ void GMGLRenderer_3D::activateMaterial(const GMShader& shader)
 {
 	D(d);
 	auto shaderProgram = getShaderProgram();
-	auto desc = getVariablesDesc();
-	static const std::string GMSHADER_MATERIAL_KA = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Ka;
-	static const std::string GMSHADER_MATERIAL_KD = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Kd;
-	static const std::string GMSHADER_MATERIAL_KS = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Ks;
-	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Shininess;
-	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.Refreactivity;
-	static const std::string GMSHADER_MATERIAL_F0 = std::string(desc->MaterialName) + "." + desc->MaterialAttributes.F0;
+	static const std::string GMSHADER_MATERIAL_KA = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Ka;
+	static const std::string GMSHADER_MATERIAL_KD = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Kd;
+	static const std::string GMSHADER_MATERIAL_KS = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Ks;
+	static const std::string GMSHADER_MATERIAL_SHININESS = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Shininess;
+	static const std::string GMSHADER_MATERIAL_REFRACTIVITY = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.Refreactivity;
+	static const std::string GMSHADER_MATERIAL_F0 = std::string(GM_VariablesDesc.MaterialName) + "." + GM_VariablesDesc.MaterialAttributes.F0;
 
 	const GMMaterial& material = shader.getMaterial();
 	shaderProgram->setVec3(GMSHADER_MATERIAL_KA.c_str(), ValuePointer(material.ka));
@@ -604,9 +597,7 @@ void GMGLRenderer_CubeMap::beginModel(GMModel* model, const GMGameObject* parent
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
-
-	auto desc = getVariablesDesc();
-	shaderProgram->setMatrix4(desc->ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
+	shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, GMMat4(Inhomogeneous(parent->getTransform())));
 }
 
 void GMGLRenderer_CubeMap::endModel()
@@ -625,11 +616,10 @@ void GMGLRenderer_CubeMap::beforeDraw(GMModel* model)
 	if (glTex)
 	{
 		IShaderProgram* shaderProgram = getShaderProgram();
-		auto desc = getVariablesDesc();
 		GM_ASSERT(model->getType() == GMModelType::CubeMap);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Vertex);
 		shaderProgram->setInterfaceInstance(GMGLShaderProgram::techniqueName(), getTechnique(model->getType()), GMShaderType::Pixel);
-		shaderProgram->setInt(desc->CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
+		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		glTex->bindSampler(&sampler);
 		glTex->useTexture(GMTextureRegisterQuery<GMTextureType::CubeMap>::Value);
 		db->engine->setCubeMap(glTex);
@@ -663,29 +653,27 @@ void GMGLRenderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 	GM_ASSERT(shaderProgram);
 	shaderProgram->useProgram();
 
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (d->state.HDR != db->engine->needHDR() || d->state.toneMapping != db->engine->getToneMapping())
 	{
 		d->state.HDR = db->engine->needHDR();
 		d->state.toneMapping = db->engine->getToneMapping();
 		if (d->state.HDR)
 		{
-			db->gammaHelper.setGamma(desc, db->engine, shaderProgram);
+			db->gammaHelper.setGamma(db->engine, shaderProgram);
 			setHDR(shaderProgram);
 		}
 		else
 		{
-			shaderProgram->setBool(desc->HDR.HDR, false);
+			shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, false);
 		}
 	}
 }
 
 void GMGLRenderer_Filter::setHDR(IShaderProgram* shaderProgram)
 {
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	D(d);
-	shaderProgram->setBool(desc->HDR.HDR, true);
-	shaderProgram->setInt(desc->HDR.ToneMapping, d->state.toneMapping);
+	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
+	shaderProgram->setInt(GM_VariablesDesc.HDR.ToneMapping, d->state.toneMapping);
 }
 
 void GMGLRenderer_Filter::endModel()
@@ -706,8 +694,7 @@ GMint GMGLRenderer_Filter::activateTexture(GMModel* model, GMTextureType type)
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_FRAMEBUFFER, texId);
 
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
-	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
+	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[db->engine->getCurrentFilterMode()], GMShaderType::Pixel);
 	GM_ASSERT(b);
 	return texId;
 }
@@ -729,20 +716,19 @@ void GMGLRenderer_LightPass::beginModel(GMModel* model, const GMGameObject* pare
 	shaderProgram->useProgram();
 	updateCameraMatrices(shaderProgram);
 
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	const GMShadowSourceDesc& shadowSourceDesc = d->engine->getShadowSourceDesc();
 	if (shadowSourceDesc.type != GMShadowSourceDesc::NoShadow)
 	{
 		GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
 		shadowFramebuffers->getShadowMapTexture()->useTexture(0);
-		applyShadow(desc, &shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
+		applyShadow(&shadowSourceDesc, shaderProgram, shadowFramebuffers, true);
 	}
 	else
 	{
-		applyShadow(desc, nullptr, shaderProgram, nullptr, false);
+		applyShadow(nullptr, shaderProgram, nullptr, false);
 	}
 
-	d->gammaHelper.setGamma(desc, d->engine, shaderProgram);
+	d->gammaHelper.setGamma(d->engine, shaderProgram);
 }
 
 void GMGLRenderer_LightPass::afterDraw(GMModel* model)
@@ -771,7 +757,7 @@ void GMGLRenderer_LightPass::beforeDraw(GMModel* model)
 	{
 		const GMsize_t id = GMTextureRegisterQuery<GMTextureType::GeometryPasses>::Value + 1 + cnt;
 		GM_ASSERT(id < std::numeric_limits<GMuint>::max());
-		shaderProgram->setInt(getVariablesDesc()->CubeMapTextureName, (GMuint)id);
+		shaderProgram->setInt(GM_VariablesDesc.CubeMapTextureName, (GMuint)id);
 		cubeMap->useTexture((GMuint)id);
 	}
 }
@@ -781,14 +767,13 @@ void GMGLRenderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pare
 	D_BASE(d, Base);
 	IShaderProgram* shaderProgram = getShaderProgram();
 	shaderProgram->useProgram();
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
-		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
 	else
-		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
 
 	GMGLShadowFramebuffers* shadowFramebuffers = gm_cast<GMGLShadowFramebuffers*>(d->engine->getShadowMapFramebuffers());
-	applyShadow(desc, &d->engine->getShadowSourceDesc(), shaderProgram, shadowFramebuffers, true);
+	applyShadow(&d->engine->getShadowSourceDesc(), shaderProgram, shadowFramebuffers, true);
 
 	bool b = shaderProgram->setInterfaceInstance(
 		GMGLShaderProgram::techniqueName(),

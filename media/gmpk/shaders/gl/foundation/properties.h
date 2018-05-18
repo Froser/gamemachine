@@ -1,42 +1,42 @@
 // 位置
-uniform vec4 GM_view_position;
+uniform vec4 GM_ViewPosition;
 
 // 阴影纹理
 uniform sampler2DShadow GM_shadow_texture;
 uniform int GM_shadow_texture_switch = 0;
 
-struct GM_texture_t
+struct GMTexture
 {
-    sampler2D texture;
-    float scroll_s;
-    float scroll_t;
-    float scale_s;
-    float scale_t;
-    int enabled;
+    sampler2D Texture;
+    float OffsetX;
+    float OffsetY;
+    float ScaleX;
+    float ScaleY;
+    int Enabled;
 };
-uniform GM_texture_t GM_ambient_texture;
-uniform GM_texture_t GM_diffuse_texture;
-uniform GM_texture_t GM_specular_texture;
-uniform GM_texture_t GM_lightmap_texture;
-uniform GM_texture_t GM_normalmap_texture;
-uniform GM_texture_t GM_albedo_texture;
-uniform GM_texture_t GM_metallic_roughness_ao_texture;
-uniform samplerCube GM_cubemap_texture; //CubeMap作为单独一个纹理
+uniform GMTexture GM_AmbientTextureAttribute;
+uniform GMTexture GM_DiffuseTextureAttribute;
+uniform GMTexture GM_SpecularTextureAttribute;
+uniform GMTexture GM_LightmapTextureAttribute;
+uniform GMTexture GM_NormalMapTextureAttribute;
+uniform GMTexture GM_AlbedoTextureAttribute;
+uniform GMTexture GM_MetallicRoughnessAOTextureAttribute;
+uniform samplerCube GM_CubeMapTextureAttribute; //CubeMap作为单独一个纹理
 
-vec4 sampleTextures(GM_texture_t tex, vec2 uv)
+vec4 sampleTextures(GMTexture tex, vec2 uv)
 {
-    return tex.enabled == 1
-            ? vec4(texture(tex.texture, uv * vec2(tex.scale_s, tex.scale_t) + vec2(tex.scroll_s, tex.scroll_t)))
+    return tex.Enabled == 1
+            ? vec4(texture(tex.Texture, uv * vec2(tex.ScaleX, tex.ScaleY) + vec2(tex.OffsetX, tex.OffsetY)))
             : vec4(0);
 }
 
-struct GM_Material_t
+struct GMMaterial
 {
-    vec3 ka;
-    vec3 kd;
-    vec3 ks;
-    float shininess;
-    float refractivity;
-    vec3 f0;
+    vec3 Ka;
+    vec3 Kd;
+    vec3 Ks;
+    float Shininess;
+    float Refractivity;
+    vec3 F0;
 };
-uniform GM_Material_t GM_material;
+uniform GMMaterial GM_Material;

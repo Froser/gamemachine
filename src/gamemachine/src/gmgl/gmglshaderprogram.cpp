@@ -10,89 +10,6 @@
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
 
-namespace
-{
-	inline const GMShaderVariablesDesc& GMGetDefaultShaderVariablesDesc()
-	{
-		static GMShaderVariablesDesc desc =
-		{
-			"GM_model_matrix",
-			"GM_view_matrix",
-			"GM_projection_matrix",
-			"GM_inverse_transpose_model_matrix",
-			"GM_inverse_view_matrix",
-
-			"GM_view_position",
-
-			{ "scroll_s", "scroll_t", "scale_s", "scale_t", "enabled", "texture" },
-			"GM_ambient_texture",
-			"GM_diffuse_texture",
-			"GM_specular_texture",
-			"GM_normalmap_texture",
-			"GM_lightmap_texture",
-			"GM_albedo_texture",
-			"GM_metallic_roughness_ao_texture",
-			"GM_cubemap_texture",
-
-			"GM_lightCount",
-
-			{ "ka", "kd", "ks", "shininess", "refractivity", "f0" },
-			"GM_material",
-
-			{
-				"GM_filter",
-				"GM_effects_texture_offset_x",
-				"GM_effects_texture_offset_y",
-				{
-					"DefaultFilter",
-					"InversionFilter",
-					"SharpenFilter",
-					"BlurFilter",
-					"GrayscaleFilter",
-					"EdgeDetectFilter",
-				}
-			},
-			{
-				"GM_screenInfo",
-				"GM_screenWidth",
-				"GM_screenHeight",
-				"GM_multisampling",
-			},
-
-			nullptr,
-			nullptr,
-			nullptr,
-
-			{
-				"GM_shadowInfo",
-				"HasShadow",
-				"ShadowMatrix",
-				"Position",
-				"ShadowMap",
-				"ShadowMapMSAA",
-				"ShadowMapWidth",
-				"ShadowMapHeight",
-				"BiasMin",
-				"BiasMax",
-			},
-
-			{
-				"GM_GammaCorrection",
-				"GM_Gamma",
-				"GM_GammaInv"
-			},
-
-			{
-				"GM_HDR",
-				"GM_toneMapping",
-			},
-
-			"GM_IlluminationModel",
-		};
-		return desc;
-	}
-}
-
 GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
 {
 	switch (type)
@@ -401,9 +318,4 @@ bool GMGLShaderProgram::setInterface(GameMachineInterfaceID id, void* in)
 bool GMGLShaderProgram::getInterface(GameMachineInterfaceID id, void** out)
 {
 	return false;
-}
-
-const GMShaderVariablesDesc& GMGLShaderProgram::getDesc()
-{
-	return GMGetDefaultShaderVariablesDesc();
 }

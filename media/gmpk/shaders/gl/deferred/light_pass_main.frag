@@ -31,7 +31,7 @@ void main()
     vec4 normalIlluminationModel = texture(deferred_light_pass_gNormal_IlluminationModel, _uv);
     vertex.Normal_World_N = textureToNormal(normalIlluminationModel.rgb);
     vertex.IlluminationModel = int(round(normalIlluminationModel.a));
-    vertex.Normal_Eye_N = mat3(GM_view_matrix) * vertex.Normal_World_N;
+    vertex.Normal_Eye_N = mat3(GM_ViewMatrix) * vertex.Normal_World_N;
 
     vec4 normalMapHasNormalMap = texture(deferred_light_pass_gNormalMap_bNormalMap, _uv);
     vertex.HasNormalMap = normalMapHasNormalMap.a > 0;

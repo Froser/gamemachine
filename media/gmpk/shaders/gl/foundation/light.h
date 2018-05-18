@@ -8,7 +8,7 @@ struct GM_light_t
 };
 
 uniform GM_light_t GM_lights[MAX_LIGHT_COUNT];
-uniform int GM_lightCount = 0;
+uniform int GM_LightCount = 0;
 
 const int GM_IlluminationModel_None = 0;
 const int GM_IlluminationModel_Phong = 1;
@@ -53,7 +53,7 @@ vec3 GMLight_AmbientLightDiffuse(GM_light_t light, vec3 lightDirection_N, vec3 e
     return vec3(0, 0, 0);
 }
 
-vec3 GMLight_AmbientLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float shininess)
+vec3 GMLight_AmbientLightSpecular(GM_light_t light, vec3 lightDirection_N, vec3 eyeDirection_N, vec3 normal_N, float Shininess)
 {
     return vec3(0, 0, 0);
 }
@@ -156,29 +156,29 @@ struct PS_3D_INPUT
     int IlluminationModel;
 };
 
-vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float refractivity)
+vec3 calculateRefractionByNormalWorld(vec3 worldPos, vec3 normal_world_N, float Refractivity)
 {
-    if (refractivity == 0.f)
+    if (Refractivity == 0.f)
         return vec3(0, 0, 0);
 
-    vec3 I = normalize(worldPos - GM_view_position.xyz);
-    vec3 R = refract(I, normal_world_N, refractivity);
-    return texture(GM_cubemap_texture, vec3(R.x, R.y, R.z)).rgb;
+    vec3 I = normalize(worldPos - GM_ViewPosition.xyz);
+    vec3 R = refract(I, normal_world_N, Refractivity);
+    return texture(GM_CubeMapTextureAttribute, vec3(R.x, R.y, R.z)).rgb;
 }
 
-vec3 calculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float refractivity)
+vec3 calculateRefractionByNormalTangent(vec3 worldPos, GMTangentSpace tangentSpace, float Refractivity)
 {
-    if (refractivity == 0.f)
+    if (Refractivity == 0.f)
         return vec3(0, 0, 0);
     
     // 如果是切线空间，计算会复杂点，要将切线空间的法线换算回世界空间
-    vec3 normal_world_N = normalize(mat3(GM_inverse_view_matrix) * transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N);
-    return calculateRefractionByNormalWorld(worldPos, normal_world_N, refractivity);
+    vec3 normal_world_N = normalize(mat3(GM_InverseViewMatrix) * transpose(tangentSpace.TBN) * tangentSpace.Normal_Tangent_N);
+    return calculateRefractionByNormalWorld(worldPos, normal_world_N, Refractivity);
 }
 
 float calculateShadow(mat4 shadowMatrix, vec4 worldPos, vec3 normal_N)
 {
-    if (GM_shadowInfo.HasShadow == 0)
+    if (GM_ShadowInfo.HasShadow == 0)
         return 1.0f;
 
     vec4 fragPos = shadowMatrix * worldPos;
@@ -187,8 +187,8 @@ float calculateShadow(mat4 shadowMatrix, vec4 worldPos, vec3 normal_N)
         return 1.0f;
     projCoords = projCoords * 0.5f + 0.5f;
 
-    float bias = (GM_shadowInfo.BiasMin == GM_shadowInfo.BiasMax) ? GM_shadowInfo.BiasMin : max(GM_shadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_shadowInfo.Position.xyz))), GM_shadowInfo.BiasMin);
-    float closestDepth = texture(GM_shadowInfo.ShadowMap, projCoords.xy).r;
+    float bias = (GM_ShadowInfo.BiasMin == GM_ShadowInfo.BiasMax) ? GM_ShadowInfo.BiasMin : max(GM_ShadowInfo.BiasMax * (1.0 - dot(normal_N, normalize(worldPos.xyz - GM_ShadowInfo.Position.xyz))), GM_ShadowInfo.BiasMin);
+    float closestDepth = texture(GM_ShadowInfo.GM_ShadowMap, projCoords.xy).r;
     return projCoords.z - bias > closestDepth ? 0.f : 1.f;
 }
 
@@ -202,15 +202,15 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     vertex.SpecularTexture = max(vertex.SpecularTexture, vec3(0, 0, 0));
 
     vec3 refractionLight = vec3(0, 0, 0);
-    vec3 eyeDirection_eye = -(GM_view_matrix * vec4(vertex.WorldPos, 1)).xyz;
+    vec3 eyeDirection_eye = -(GM_ViewMatrix * vec4(vertex.WorldPos, 1)).xyz;
     vec3 eyeDirection_eye_N = normalize(eyeDirection_eye);
 
     // 计算漫反射和高光部分
     if (!vertex.HasNormalMap)
     {
-        for (int i = 0; i < GM_lightCount; i++)
+        for (int i = 0; i < GM_LightCount; i++)
         {
-            vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].LightPosition, 1)).xyz;
+            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].LightPosition, 1)).xyz;
             vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
             ambientLight += GMLight_Ambient(GM_lights[i]);
             diffuseLight += GMLight_Diffuse(GM_lights[i], lightDirection_eye_N, eyeDirection_eye_N, vertex.Normal_Eye_N);
@@ -221,9 +221,9 @@ vec4 GM_Phong_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     }
     else
     {
-        for (int i = 0; i < GM_lightCount; i++)
+        for (int i = 0; i < GM_LightCount; i++)
         {
-            vec3 lightPosition_eye = (GM_view_matrix * vec4(GM_lights[i].LightPosition, 1)).xyz;
+            vec3 lightPosition_eye = (GM_ViewMatrix * vec4(GM_lights[i].LightPosition, 1)).xyz;
             vec3 lightDirection_eye_N = normalize(lightPosition_eye + eyeDirection_eye);
             vec3 lightDirection_tangent_N = normalize(vertex.TangentSpace.TBN * lightDirection_eye_N);
             vec3 eyeDirection_tangent_N = normalize(vertex.TangentSpace.TBN * eyeDirection_eye_N);
@@ -286,7 +286,7 @@ vec3 GM_FresnelSchlick(float cosTheta, vec3 F0)
 
 vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 {
-    vec3 viewDirection_N = normalize(GM_view_position.rgb - vertex.WorldPos);
+    vec3 viewDirection_N = normalize(GM_ViewPosition.rgb - vertex.WorldPos);
     // 换算回世界空间
     vec3 normal_World_N = normalize(transpose(vertex.TangentSpace.TBN) * vertex.TangentSpace.Normal_Tangent_N);
     float metallic = vertex.MetallicRoughnessAOTexture.r;
@@ -296,7 +296,7 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     vec3 Lo = vec3(0, 0, 0);
     vec3 ambient = vec3(0, 0, 0);
     
-    for (int i = 0; i < GM_lightCount; ++i)
+    for (int i = 0; i < GM_LightCount; ++i)
     {
         // 只考虑直接光源
         if (GM_lights[i].LightType == GM_AmbientLight)
@@ -319,12 +319,12 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
             float denominator = 4 * max(dot(normal_World_N, viewDirection_N), 0.0) * max(dot(normal_World_N, L_N), 0.0) + 0.001; // 0.001 防止除0
             vec3 specular = nominator / denominator;
 
-            vec3 ks = F;
-            vec3 kd = vec3(1, 1, 1) - ks;
-            kd *= 1.0f - metallic;
+            vec3 Ks = F;
+            vec3 Kd = vec3(1, 1, 1) - Ks;
+            Kd *= 1.0f - metallic;
 
             float cosTheta = max(dot(normal_World_N, L_N), 0);
-            Lo += (kd * vertex.AlbedoTexture / PI + specular) * radiance * cosTheta;
+            Lo += (Kd * vertex.AlbedoTexture / PI + specular) * radiance * cosTheta;
         }
     }
 
@@ -336,7 +336,7 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
 
 vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
 {
-    float factor_Shadow = calculateShadow(GM_shadowInfo.ShadowMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
+    float factor_Shadow = calculateShadow(GM_ShadowInfo.ShadowMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
     switch (vertex.IlluminationModel)
     {
         case GM_IlluminationModel_None:

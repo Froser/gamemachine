@@ -13,17 +13,17 @@ void GM_Model3D()
     PS_3D_INPUT vertex;
     vertex.WorldPos = _model3d_position_world.xyz;
 
-    mat3 inverse_transpose_model_matrix = mat3(GM_inverse_transpose_model_matrix);
+    mat3 inverse_transpose_model_matrix = mat3(GM_InverseTransposeModelMatrix);
     vertex.Normal_World_N = normalize(inverse_transpose_model_matrix * _normal.xyz);
 
-    mat3 normalEyeTransform = mat3(GM_view_matrix) * inverse_transpose_model_matrix;
+    mat3 normalEyeTransform = mat3(GM_ViewMatrix) * inverse_transpose_model_matrix;
     vec3 normal_World_N = normalEyeTransform * _normal.xyz;
     vertex.Normal_Eye_N = normalize( normal_World_N );
 
     GMTangentSpace tangentSpace;
     if (GM_IsTangentSpaceInvalid(_tangent.xyz, _bitangent.xyz))
     {
-        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_normalmap_texture.texture);
+        tangentSpace = GM_CalculateTangentSpaceRuntime(vertex.WorldPos, _uv, normal_World_N, GM_NormalMapTextureAttribute.Texture);
     }
     else
     {
@@ -35,29 +35,28 @@ void GM_Model3D()
             vertex.Normal_Eye_N
         ));
         tangentSpace.TBN = TBN;
-        tangentSpace.Normal_Tangent_N = texture(GM_normalmap_texture.texture, _uv).rgb * 2.0 - 1.0;
+        tangentSpace.Normal_Tangent_N = texture(GM_NormalMapTextureAttribute.Texture, _uv).rgb * 2.0 - 1.0;
     }
 
     vertex.TangentSpace = tangentSpace;
 
-    vertex.HasNormalMap = GM_normalmap_texture.enabled != 0;
+    vertex.HasNormalMap = GM_NormalMapTextureAttribute.Enabled != 0;
     vertex.IlluminationModel = GM_IlluminationModel;
     if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
-        vertex.Shininess = GM_material.shininess;
-        vertex.Refractivity = GM_material.refractivity;
-        vertex.AmbientLightmapTexture = sampleTextures(GM_ambient_texture, _uv).rgb
-             * sampleTextures(GM_lightmap_texture, _lightmapuv).rgb
-             * GM_material.ka;
-        vertex.DiffuseTexture = sampleTextures(GM_diffuse_texture, _uv).rgb * GM_material.kd;
-        vertex.SpecularTexture = sampleTextures(GM_specular_texture, _uv).r * GM_material.ks;
+        vertex.Shininess = GM_Material.Shininess;
+        vertex.Refractivity = GM_Material.Refractivity;
+        vertex.AmbientLightmapTexture = sampleTextures(GM_AmbientTextureAttribute, _uv).rgb
+             * sampleTextures(GM_LightmapTextureAttribute, _lightmapuv).rgb
+             * GM_Material.Ka;
+        vertex.DiffuseTexture = sampleTextures(GM_DiffuseTextureAttribute, _uv).rgb * GM_Material.Kd;
+        vertex.SpecularTexture = sampleTextures(GM_SpecularTextureAttribute, _uv).r * GM_Material.Ks;
     }
     else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
-        vertex.AlbedoTexture = pow(sampleTextures(GM_albedo_texture, _uv).rgb, vec3(GM_Gamma));
-        vertex.MetallicRoughnessAOTexture = sampleTextures(GM_metallic_roughness_ao_texture, _uv).rgb;
-        vertex.F0 = GM_material.f0;
+        vertex.AlbedoTexture = pow(sampleTextures(GM_AlbedoTextureAttribute, _uv).rgb, vec3(GM_Gamma));
+        vertex.MetallicRoughnessAOTexture = sampleTextures(GM_MetallicRoughnessAOTextureAttribute, _uv).rgb;
+        vertex.F0 = GM_Material.F0;
     }
-
     _frag_color = PS_3D_CalculateColor(vertex);
 }

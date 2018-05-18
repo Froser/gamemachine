@@ -75,7 +75,6 @@ void GMGLLight::activateLight(GMuint index, IRenderer* renderer)
 
 	GMGLRenderer* glRenderer = gm_cast<GMGLRenderer*>(renderer);
 	IShaderProgram* shaderProgram = glRenderer->getShaderProgram();
-	const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 	const char* strIndex = number(index);
 
 	combineUniform(light_Position, "GM_lights[", strIndex, "].LightColor");

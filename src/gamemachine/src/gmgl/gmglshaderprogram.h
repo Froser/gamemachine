@@ -39,14 +39,13 @@ public:
 
 public:
 	virtual void useProgram();
-	virtual void setMatrix4(const char* name, const GMMat4& value);
-	virtual void setVec4(const char* name, const GMFloat4& value);
-	virtual void setVec3(const char* name, const GMfloat value[3]);
-	virtual void setInt(const char* name, GMint value);
-	virtual void setFloat(const char* name, GMfloat value);
-	virtual void setBool(const char* name, bool value);
+	virtual void setMatrix4(const char* name, const GMMat4& value) override;
+	virtual void setVec4(const char* name, const GMFloat4& value) override;
+	virtual void setVec3(const char* name, const GMfloat value[3]) override;
+	virtual void setInt(const char* name, GMint value) override;
+	virtual void setFloat(const char* name, GMfloat value) override;
+	virtual void setBool(const char* name, bool value) override;
 	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
-	virtual const GMShaderVariablesDesc& getDesc();
 
 private:
 	void setProgram(GMuint program) { D(d); d->shaderProgram = program; }

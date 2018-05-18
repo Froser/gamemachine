@@ -9,7 +9,7 @@ BEGIN_NS
 class GMGammaHelper
 {
 public:
-	void setGamma(const GMShaderVariablesDesc* desc, GMGraphicEngine* engine, IShaderProgram* shaderProgram);
+	void setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProgram);
 
 private:
 	GMfloat m_gamma = 0.f;
@@ -36,17 +36,6 @@ public:
 protected:
 	virtual void beforeDraw(GMModel* model) = 0;
 	virtual void afterDraw(GMModel* model) = 0;
-
-protected:
-	inline const GMShaderVariablesDesc* getVariablesDesc()
-	{
-		D(d);
-		if (!d->variablesDesc)
-		{
-			d->variablesDesc = &GM.getGraphicEngine()->getShaderProgram()->getDesc();
-		}
-		return d->variablesDesc;
-	}
 
 protected:
 	virtual void activateTextureTransform(GMModel* model, GMTextureType type);

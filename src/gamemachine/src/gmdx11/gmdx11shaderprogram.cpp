@@ -2,90 +2,6 @@
 #include "gmdx11shaderprogram.h"
 #include <linearmath.h>
 
-namespace
-{
-	inline const GMShaderVariablesDesc& GMGetDefaultShaderVariablesDesc()
-	{
-		static GMShaderVariablesDesc desc =
-		{
-			"GM_WorldMatrix",
-			"GM_ViewMatrix",
-			"GM_ProjectionMatrix",
-			"GM_InverseTransposeModelMatrix",
-			"GM_InverseViewMatrix",
-
-			"GM_ViewPosition",
-
-			{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled" },
-			"GM_AmbientTextureAttribute",
-			"GM_DiffuseTextureAttribute",
-			"GM_SpecularTextureAttribute",
-			"GM_NormalMapTextureAttribute",
-			"GM_LightmapTextureAttribute",
-			"GM_AlbedoTextureAttribute",
-			"GM_MetallicRoughnessAOTextureAttribute",
-			"GM_CubeMapTextureAttribute",
-
-			"GM_LightCount",
-
-			{ "Ka", "Kd", "Ks", "Shininess", "Refractivity", "F0" },
-			"GM_Material",
-
-			{
-				"GM_Filter",
-				"GM_KernelDeltaX",
-				"GM_KernelDeltaY",
-				{
-					"GM_DefaultFilter",
-					"GM_InversionFilter",
-					"GM_SharpenFilter",
-					"GM_BlurFilter",
-					"GM_GrayscaleFilter",
-					"GM_EdgeDetectFilter",
-				}
-			},
-
-			{
-				"GM_ScreenInfo",
-				"ScreenWidth",
-				"ScreenHeight",
-				"Multisampling",
-			},
-
-			"GM_RasterizerState",
-			"GM_BlendState",
-			"GM_DepthStencilState",
-
-			{
-				"GM_ShadowInfo",
-				"HasShadow",
-				"ShadowMatrix",
-				"Position",
-				"GM_ShadowMap",
-				"GM_ShadowMapMSAA",
-				"ShadowMapWidth",
-				"ShadowMapHeight",
-				"BiasMin",
-				"BiasMax",
-			},
-
-			{
-				"GM_GammaCorrection",
-				"GM_Gamma",
-				"GM_GammaInv",
-			},
-
-			{
-				"GM_HDR",
-				"GM_ToneMapping",
-			},
-
-			"GM_IlluminationModel",
-		};
-		return desc;
-	}
-}
-
 GMDx11EffectShaderProgram::GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect)
 {
 	D(d);
@@ -168,11 +84,6 @@ bool GMDx11EffectShaderProgram::getInterface(GameMachineInterfaceID id, void** o
 		return true;
 	}
 	return false;
-}
-
-const GMShaderVariablesDesc& GMDx11EffectShaderProgram::getDesc()
-{
-	return GMGetDefaultShaderVariablesDesc();
 }
 
 ID3DX11EffectVectorVariable* GMDx11EffectShaderProgram::getVectorVariable(const char* name)

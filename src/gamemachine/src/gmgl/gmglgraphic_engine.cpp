@@ -150,12 +150,11 @@ void GMGLGraphicEngine::activateLights(IRenderer* renderer)
 	IShaderProgram* shaderProgram = glRenderer->getShaderProgram();
 	if (shaderProgram != d->lightContext.shaderProgram || d->lightContext.lightDirty)
 	{
-		const GMShaderVariablesDesc& desc = shaderProgram->getDesc();
 		const Vector<ILight*>& lights = db->lights;
 		GMsize_t lightCount = lights.size();
 		GM_ASSERT(lightCount <= getMaxLightCount());
 		GM_ASSERT(lightCount <= std::numeric_limits<GMuint>::max());
-		shaderProgram->setInt(desc.LightCount, (GMuint)lightCount);
+		shaderProgram->setInt(GM_VariablesDesc.LightCount, (GMuint)lightCount);
 
 		for (GMuint i = 0; i < (GMuint)lightCount; ++i)
 		{

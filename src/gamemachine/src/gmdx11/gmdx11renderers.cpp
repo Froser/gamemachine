@@ -447,46 +447,44 @@ namespace
 class GMDx11EffectVariableBank
 {
 public:
-	void init(ID3DX11Effect* effect, const GMShaderVariablesDesc* desc)
+	void init(ID3DX11Effect* effect)
 	{
 		m_effect = effect;
-		m_desc = desc;
 	}
 
 	// Shadow
-	EFFECT_VARIABLE(ShadowInfo, m_desc->ShadowInfo.ShadowInfo)
-	EFFECT_MEMBER_AS_SCALAR(HasShadow, ShadowInfo(), m_desc->ShadowInfo.HasShadow)
-	EFFECT_MEMBER_AS_MATRIX(ShadowMatrix, ShadowInfo(), m_desc->ShadowInfo.ShadowMatrix)
-	EFFECT_MEMBER_AS_VECTOR(ShadowPosition, ShadowInfo(), m_desc->ShadowInfo.Position)
-	EFFECT_MEMBER_AS_SCALAR(ShadowMapWidth, ShadowInfo(), m_desc->ShadowInfo.ShadowMapWidth)
-	EFFECT_MEMBER_AS_SCALAR(ShadowMapHeight, ShadowInfo(), m_desc->ShadowInfo.ShadowMapHeight)
-	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMin, ShadowInfo(), m_desc->ShadowInfo.BiasMin)
-	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMax, ShadowInfo(), m_desc->ShadowInfo.BiasMax)
-	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMap, m_desc->ShadowInfo.ShadowMap)
-	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMapMSAA, m_desc->ShadowInfo.ShadowMapMSAA)
+	EFFECT_VARIABLE(ShadowInfo, GM_VariablesDesc.ShadowInfo.ShadowInfo)
+	EFFECT_MEMBER_AS_SCALAR(HasShadow, ShadowInfo(), GM_VariablesDesc.ShadowInfo.HasShadow)
+	EFFECT_MEMBER_AS_MATRIX(ShadowMatrix, ShadowInfo(), GM_VariablesDesc.ShadowInfo.ShadowMatrix)
+	EFFECT_MEMBER_AS_VECTOR(ShadowPosition, ShadowInfo(), GM_VariablesDesc.ShadowInfo.Position)
+	EFFECT_MEMBER_AS_SCALAR(ShadowMapWidth, ShadowInfo(), GM_VariablesDesc.ShadowInfo.ShadowMapWidth)
+	EFFECT_MEMBER_AS_SCALAR(ShadowMapHeight, ShadowInfo(), GM_VariablesDesc.ShadowInfo.ShadowMapHeight)
+	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMin, ShadowInfo(), GM_VariablesDesc.ShadowInfo.BiasMin)
+	EFFECT_MEMBER_AS_SCALAR(ShadowBiasMax, ShadowInfo(), GM_VariablesDesc.ShadowInfo.BiasMax)
+	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMap, GM_VariablesDesc.ShadowInfo.ShadowMap)
+	EFFECT_VARIABLE_AS_SHADER_RESOURCE(ShadowMapMSAA, GM_VariablesDesc.ShadowInfo.ShadowMapMSAA)
 
 	// ScreenInfo
-	EFFECT_VARIABLE(ScreenInfo, m_desc->ScreenInfoAttributes.ScreenInfo)
-	EFFECT_MEMBER_AS_SCALAR(ScreenWidth, ScreenInfo(), m_desc->ScreenInfoAttributes.ScreenWidth)
-	EFFECT_MEMBER_AS_SCALAR(ScreenHeight, ScreenInfo(), m_desc->ScreenInfoAttributes.ScreenHeight)
-	EFFECT_MEMBER_AS_SCALAR(ScreenMultiSampling, ScreenInfo(), m_desc->ScreenInfoAttributes.Multisampling)
+	EFFECT_VARIABLE(ScreenInfo, GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo)
+	EFFECT_MEMBER_AS_SCALAR(ScreenWidth, ScreenInfo(), GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth)
+	EFFECT_MEMBER_AS_SCALAR(ScreenHeight, ScreenInfo(), GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight)
+	EFFECT_MEMBER_AS_SCALAR(ScreenMultiSampling, ScreenInfo(), GM_VariablesDesc.ScreenInfoAttributes.Multisampling)
 
 	// Material
-	EFFECT_VARIABLE(Material, m_desc->MaterialName)
-	EFFECT_MEMBER_AS_VECTOR(Ka, Material(), m_desc->MaterialAttributes.Ka)
-	EFFECT_MEMBER_AS_VECTOR(Kd, Material(), m_desc->MaterialAttributes.Kd)
-	EFFECT_MEMBER_AS_VECTOR(Ks, Material(), m_desc->MaterialAttributes.Ks)
-	EFFECT_MEMBER_AS_SCALAR(Shininess, Material(), m_desc->MaterialAttributes.Shininess)
-	EFFECT_MEMBER_AS_SCALAR(Refreactivity, Material(), m_desc->MaterialAttributes.Refreactivity)
-	EFFECT_MEMBER_AS_VECTOR(F0, Material(), m_desc->MaterialAttributes.F0)
+	EFFECT_VARIABLE(Material, GM_VariablesDesc.MaterialName)
+	EFFECT_MEMBER_AS_VECTOR(Ka, Material(), GM_VariablesDesc.MaterialAttributes.Ka)
+	EFFECT_MEMBER_AS_VECTOR(Kd, Material(), GM_VariablesDesc.MaterialAttributes.Kd)
+	EFFECT_MEMBER_AS_VECTOR(Ks, Material(), GM_VariablesDesc.MaterialAttributes.Ks)
+	EFFECT_MEMBER_AS_SCALAR(Shininess, Material(), GM_VariablesDesc.MaterialAttributes.Shininess)
+	EFFECT_MEMBER_AS_SCALAR(Refreactivity, Material(), GM_VariablesDesc.MaterialAttributes.Refreactivity)
+	EFFECT_MEMBER_AS_VECTOR(F0, Material(), GM_VariablesDesc.MaterialAttributes.F0)
 
 	// Filter
-	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaX, m_desc->FilterAttributes.KernelDeltaX)
-	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaY, m_desc->FilterAttributes.KernelDeltaY)
+	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaX, GM_VariablesDesc.FilterAttributes.KernelDeltaX)
+	EFFECT_VARIABLE_AS_SCALAR(KernelDeltaY, GM_VariablesDesc.FilterAttributes.KernelDeltaY)
 
 private:
 	ID3DX11Effect* m_effect = nullptr;
-	const GMShaderVariablesDesc* m_desc = nullptr;
 };
 
 GMDx11EffectVariableBank& getVarBank()
@@ -511,7 +509,7 @@ GMDx11Renderer::GMDx11Renderer()
 	GM_ASSERT(d->effect);
 
 	d->deviceContext = getEngine()->getDeviceContext();
-	getVarBank().init(d->effect, getVariablesDesc());
+	getVarBank().init(d->effect);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -536,16 +534,15 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	d->deviceContext->IASetInputLayout(d->inputLayout);
 	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
 	
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
 	{
-		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
 
 	GMCamera& camera = GM.getCamera();
@@ -553,10 +550,10 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 	{
 		GMFloat4 viewPosition;
 		camera.getLookAt().position.loadFloat4(viewPosition);
-		shaderProgram->setVec4(desc->ViewPosition, viewPosition);
-		shaderProgram->setMatrix4(desc->ViewMatrix, camera.getViewMatrix());
-		shaderProgram->setMatrix4(desc->ProjectionMatrix, camera.getProjectionMatrix());
-		shaderProgram->setMatrix4(desc->InverseViewMatrix, camera.getInverseViewMatrix());
+		shaderProgram->setVec4(GM_VariablesDesc.ViewPosition, viewPosition);
+		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
 		camera.cleanDirty();
 	}
 
@@ -587,8 +584,7 @@ void GMDx11Renderer::prepareScreenInfo()
 	{
 		GMDx11EffectVariableBank& bank = getVarBank();
 		const GMGameMachineRunningStates& runningStates = GM.getGameMachineRunningStates();
-		const auto& desc = getVariablesDesc();
-		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(desc->ScreenInfoAttributes.ScreenInfo);
+		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo);
 		GM_ASSERT(screenInfo->IsValid());
 
 		ID3DX11EffectScalarVariable* screenWidth = bank.ScreenWidth();
@@ -646,33 +642,32 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type)
 {
 	D(d);
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	const char* textureName = nullptr;
 	switch (type)
 	{
 	case GMTextureType::Ambient:
-		textureName = desc->AmbientTextureName;
+		textureName = GM_VariablesDesc.AmbientTextureName;
 		break;
 	case GMTextureType::Diffuse:
-		textureName = desc->DiffuseTextureName;
+		textureName = GM_VariablesDesc.DiffuseTextureName;
 		break;
 	case GMTextureType::Specular:
-		textureName = desc->SpecularTextureName;
+		textureName = GM_VariablesDesc.SpecularTextureName;
 		break;
 	case GMTextureType::NormalMap:
-		textureName = desc->NormalMapTextureName;
+		textureName = GM_VariablesDesc.NormalMapTextureName;
 		break;
 	case GMTextureType::Lightmap:
-		textureName = desc->LightMapTextureName;
+		textureName = GM_VariablesDesc.LightMapTextureName;
 		break;
 	case GMTextureType::CubeMap:
-		textureName = desc->CubeMapTextureName;
+		textureName = GM_VariablesDesc.CubeMapTextureName;
 		break;
 	case GMTextureType::Albedo:
-		textureName = desc->AlbedoTextureName;
+		textureName = GM_VariablesDesc.AlbedoTextureName;
 		break;
 	case GMTextureType::MetallicRoughnessAO:
-		textureName = desc->MetallicRoughnessAOTextureName;
+		textureName = GM_VariablesDesc.MetallicRoughnessAOTextureName;
 		break;
 	default:
 		GM_ASSERT(false);
@@ -705,11 +700,11 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 		else
 		{
 			GMTextureAttributeBank newBank;
-			newBank.enabled = textureAttribute->GetMemberByName(desc->TextureAttributes.Enabled)->AsScalar();
-			newBank.offsetX = textureAttribute->GetMemberByName(desc->TextureAttributes.OffsetX)->AsScalar();
-			newBank.offsetY = textureAttribute->GetMemberByName(desc->TextureAttributes.OffsetY)->AsScalar();
-			newBank.scaleX = textureAttribute->GetMemberByName(desc->TextureAttributes.ScaleX)->AsScalar();
-			newBank.scaleY = textureAttribute->GetMemberByName(desc->TextureAttributes.ScaleY)->AsScalar();
+			newBank.enabled = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.Enabled)->AsScalar();
+			newBank.offsetX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetX)->AsScalar();
+			newBank.offsetY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.OffsetY)->AsScalar();
+			newBank.scaleX = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleX)->AsScalar();
+			newBank.scaleY = textureAttribute->GetMemberByName(GM_VariablesDesc.TextureAttributes.ScaleY)->AsScalar();
 			CHECK_VAR(newBank.enabled);
 			CHECK_VAR(newBank.offsetX);
 			CHECK_VAR(newBank.offsetY);
@@ -786,8 +781,7 @@ void GMDx11Renderer::prepareRasterizer(GMModel* model)
 	bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
 	if (!d->rasterizer)
 	{
-		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
-		d->rasterizer = d->effect->GetVariableByName(svd.RasterizerState)->AsRasterizer();
+		d->rasterizer = d->effect->GetVariableByName(GM_VariablesDesc.RasterizerState)->AsRasterizer();
 	}
 
 	GMDx11RasterizerStates& rasterStates = GMDx11RasterizerStates::instance();
@@ -812,10 +806,9 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 	GM_DX_HR(bank.Refreactivity()->SetFloat(material.refractivity));
 	GM_DX_HR(bank.F0()->SetFloatVector(ValuePointer(material.f0)));
 
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	GMIlluminationModel illuminationModel = shader.getIlluminationModel();
-	shaderProgram->setInt(desc->IlluminationModel, (GMint)illuminationModel);
+	shaderProgram->setInt(GM_VariablesDesc.IlluminationModel, (GMint)illuminationModel);
 }
 
 void GMDx11Renderer::prepareBlend(GMModel* model)
@@ -823,8 +816,7 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 	D(d);
 	if (!d->blend)
 	{
-		const GMShaderVariablesDesc* svd = getVariablesDesc();
-		d->blend = d->effect->GetVariableByName(svd->BlendState)->AsBlend();
+		d->blend = d->effect->GetVariableByName(GM_VariablesDesc.BlendState)->AsBlend();
 	}
 	GM_ASSERT(d->blend);
 
@@ -873,8 +865,7 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 	D(d);
 	if (!d->depthStencil)
 	{
-		const GMShaderVariablesDesc& svd = getEngine()->getShaderProgram()->getDesc();
-		d->depthStencil = d->effect->GetVariableByName(svd.DepthStencilState)->AsDepthStencil();
+		d->depthStencil = d->effect->GetVariableByName(GM_VariablesDesc.DepthStencilState)->AsDepthStencil();
 	}
 	GM_ASSERT(d->depthStencil);
 
@@ -907,14 +898,13 @@ ITexture* GMDx11Renderer::getTexture(GMTextureSampler& sampler)
 void GMDx11Renderer::setGamma(IShaderProgram* shaderProgram)
 {
 	D(d);
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	bool needGammaCorrection = getEngine()->needGammaCorrection();
-	shaderProgram->setBool(desc->GammaCorrection.GammaCorrection, needGammaCorrection);
+	shaderProgram->setBool(GM_VariablesDesc.GammaCorrection.GammaCorrection, needGammaCorrection);
 	GMfloat gamma = getEngine()->getGammaValue();
 	if (gamma != d->gamma)
 	{
-		shaderProgram->setFloat(desc->GammaCorrection.GammaValue, gamma);
-		shaderProgram->setFloat(desc->GammaCorrection.GammaInvValue, 1.f / gamma);
+		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaValue, gamma);
+		shaderProgram->setFloat(GM_VariablesDesc.GammaCorrection.GammaInvValue, 1.f / gamma);
 		d->gamma = gamma;
 	}
 }
@@ -1052,7 +1042,6 @@ void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	GMDx11Renderer::beginModel(model, parent);
 
 	GMDx11EffectVariableBank& bank = getVarBank();
@@ -1066,7 +1055,7 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 
 	GMFilterMode::Mode filterMode = getEngine()->getCurrentFilterMode();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
-	bool b = shaderProgram->setInterfaceInstance(desc->FilterAttributes.Filter, desc->FilterAttributes.Types[filterMode], GMShaderType::Effect);
+	bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.FilterAttributes.Filter, GM_VariablesDesc.FilterAttributes.Types[filterMode], GMShaderType::Effect);
 	GM_ASSERT(b);
 
 	if (d->state.HDR != getEngine()->needHDR() || d->state.toneMapping != getEngine()->getToneMapping())
@@ -1080,19 +1069,18 @@ void GMDx11Renderer_Filter::beginModel(GMModel* model, const GMGameObject* paren
 		}
 		else
 		{
-			shaderProgram->setBool(desc->HDR.HDR, false);
+			shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, false);
 		}
 	}
 }
 
 void GMDx11Renderer_Filter::setHDR(IShaderProgram* shaderProgram)
 {
-	static const GMShaderVariablesDesc* desc = getVariablesDesc();
 	D(d);
-	shaderProgram->setBool(desc->HDR.HDR, true);
+	shaderProgram->setBool(GM_VariablesDesc.HDR.HDR, true);
 	if (d->state.toneMapping == GMToneMapping::Reinhard)
 	{
-		bool b = shaderProgram->setInterfaceInstance(desc->HDR.ToneMapping, "ReinhardToneMapping", GMShaderType::Effect);
+		bool b = shaderProgram->setInterfaceInstance(GM_VariablesDesc.HDR.ToneMapping, "ReinhardToneMapping", GMShaderType::Effect);
 		GM_ASSERT(b);
 	}
 	else
@@ -1179,16 +1167,15 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 	d->deviceContext->IASetInputLayout(d->inputLayout);
 	d->deviceContext->IASetPrimitiveTopology(getMode(model->getPrimitiveTopologyMode()));
 
-	const GMShaderVariablesDesc* desc = getVariablesDesc();
 	if (parent)
 	{
-		shaderProgram->setMatrix4(desc->ModelMatrix, parent->getTransform());
-		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, parent->getTransform());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, InverseTranspose(parent->getTransform()));
 	}
 	else
 	{
-		shaderProgram->setMatrix4(desc->ModelMatrix, Identity<GMMat4>());
-		shaderProgram->setMatrix4(desc->InverseTransposeModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.ModelMatrix, Identity<GMMat4>());
+		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
 
 	const GMShadowSourceDesc& shadowSourceDesc = getEngine()->getShadowSourceDesc();

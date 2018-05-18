@@ -33,7 +33,6 @@ public:
 	virtual void setFloat(const char* name, GMfloat value) override;
 	virtual void setBool(const char* name, bool value) override;
 	virtual bool setInterfaceInstance(const char* interfaceName, const char* instanceName, GMShaderType type) override;
-	virtual const GMShaderVariablesDesc& getDesc();
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;

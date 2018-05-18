@@ -61,16 +61,6 @@ public:
 		return d->effect;
 	}
 
-	inline const GMShaderVariablesDesc* getVariablesDesc()
-	{
-		D(d);
-		if (!d->variablesDesc)
-		{
-			d->variablesDesc = &getEngine()->getShaderProgram()->getDesc();
-		}
-		return d->variablesDesc;
-	}
-
 protected:
 	inline GMDx11GraphicEngine* getEngine()
 	{

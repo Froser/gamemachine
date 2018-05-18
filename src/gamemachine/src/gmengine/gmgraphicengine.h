@@ -6,6 +6,8 @@
 #include <gmcamera.h>
 BEGIN_NS
 
+#define GM_VariablesDesc (GMGraphicEngine::getDefaultShaderVariablesDesc())
+
 struct GMShaderVariablesTextureDesc
 {
 	const char* OffsetX;
@@ -253,6 +255,7 @@ public:
 	{
 		return 50;
 	}
+	static const GMShaderVariablesDesc& getDefaultShaderVariablesDesc();
 
 	inline const GMShadowSourceDesc& getShadowSourceDesc()
 	{

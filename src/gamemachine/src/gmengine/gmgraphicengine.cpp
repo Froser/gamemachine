@@ -7,6 +7,83 @@
 #include "foundation/gmprofile.h"
 #include "foundation/gmconfigs.h"
 
+static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
+{
+	"GM_WorldMatrix",
+	"GM_ViewMatrix",
+	"GM_ProjectionMatrix",
+	"GM_InverseTransposeModelMatrix",
+	"GM_InverseViewMatrix",
+
+	"GM_ViewPosition",
+
+	{ "OffsetX", "OffsetY", "ScaleX", "ScaleY", "Enabled", "Texture" },
+	"GM_AmbientTextureAttribute",
+	"GM_DiffuseTextureAttribute",
+	"GM_SpecularTextureAttribute",
+	"GM_NormalMapTextureAttribute",
+	"GM_LightmapTextureAttribute",
+	"GM_AlbedoTextureAttribute",
+	"GM_MetallicRoughnessAOTextureAttribute",
+	"GM_CubeMapTextureAttribute",
+
+	"GM_LightCount",
+
+	{ "Ka", "Kd", "Ks", "Shininess", "Refractivity", "F0" },
+	"GM_Material",
+
+	{
+		"GM_Filter",
+		"GM_KernelDeltaX",
+		"GM_KernelDeltaY",
+		{
+			"GM_DefaultFilter",
+			"GM_InversionFilter",
+			"GM_SharpenFilter",
+			"GM_BlurFilter",
+			"GM_GrayscaleFilter",
+			"GM_EdgeDetectFilter",
+		}
+	},
+
+	{
+		"GM_ScreenInfo",
+		"ScreenWidth",
+		"ScreenHeight",
+		"Multisampling",
+	},
+
+	"GM_RasterizerState",
+	"GM_BlendState",
+	"GM_DepthStencilState",
+
+	{
+		"GM_ShadowInfo",
+		"HasShadow",
+		"ShadowMatrix",
+		"Position",
+		"GM_ShadowMap",
+		"GM_ShadowMapMSAA",
+		"ShadowMapWidth",
+		"ShadowMapHeight",
+		"BiasMin",
+		"BiasMax",
+	},
+
+	{
+		"GM_GammaCorrection",
+		"GM_Gamma",
+		"GM_GammaInv",
+	},
+
+	{
+		"GM_HDR",
+		"GM_ToneMapping",
+	},
+
+	"GM_IlluminationModel",
+};
+
 GMint64 GMShadowSourceDesc::version = 0;
 
 void GMFramebuffersStack::push(IFramebuffers* framebuffers)
@@ -272,4 +349,9 @@ void GMGraphicEngine::setShaderLoadCallback(IShaderLoadCallback* cb)
 {
 	D(d);
 	d->shaderLoadCallback = cb;
+}
+
+const GMShaderVariablesDesc& GMGraphicEngine::getDefaultShaderVariablesDesc()
+{
+	return s_defaultShaderVariablesDesc;
 }

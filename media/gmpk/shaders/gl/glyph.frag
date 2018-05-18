@@ -1,9 +1,9 @@
 subroutine (GM_TechniqueEntrance)
 void GM_Glyph()
 {
-    if (GM_ambient_texture.enabled == 1)
+    if (GM_AmbientTextureAttribute.Enabled == 1)
     {
-        _frag_color = texture(GM_ambient_texture.texture, _uv * vec2(GM_ambient_texture.scale_s, GM_ambient_texture.scale_t));
+        _frag_color = texture(GM_AmbientTextureAttribute.Texture, _uv * vec2(GM_AmbientTextureAttribute.ScaleX, GM_AmbientTextureAttribute.ScaleY));
     }
     else
     {
