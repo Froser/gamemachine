@@ -661,6 +661,7 @@ float4 PS_3D_CalculateColor(PS_3D_INPUT input)
     {
         case GM_IlluminationModel_None:
             discard;
+            break;
         case GM_IlluminationModel_Phong:
             return GM_Phong.Calculate(input, factor_Shadow);
         case GM_IlluminationModel_CookTorranceBRDF:

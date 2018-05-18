@@ -49,7 +49,7 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 			void* ptr = errorMessage->GetBufferPointer();
 			size_t sz = errorMessage->GetBufferSize();
 			char* t = ((char*)ptr);
-			gm_error(L"Error in Buf");
+			gm_error(L"Error in Buf: %s", t);
 			GM_ASSERT(false);
 		}
 		else
