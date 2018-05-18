@@ -36,10 +36,6 @@ void Demo_PBR::init()
 		gm::GMShader& shader = sphere->getShader();
 		shader.setIlluminationModel(gm::GMIlluminationModel::CookTorranceBRDF);
 
-		shader.getMaterial().ks = GMVec3(0.2f);
-		shader.getMaterial().kd = GMVec3(1);
-		shader.getMaterial().shininess = 99;
-
 		gm::ITexture* albedo = nullptr;
 		gm::ITexture* metallicRoughnessAO = nullptr;
 		gm::ITexture* normal = nullptr;
@@ -68,7 +64,6 @@ void Demo_PBR::init()
 		d->gameObject = new gm::GMGameObject(asset);
 		d->gameObject->setTranslation(Translate(GMVec3(0, 0, 0)));
 		d->gameObject->setScaling(Scale(GMVec3(.5f, .5f, .5f)));
-		d->gameObject->setRotation(Rotate(PI, GMVec3(0, 1, 0)));
 	}
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("sphere", d->gameObject);

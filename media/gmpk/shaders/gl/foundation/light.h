@@ -10,8 +10,9 @@ struct GM_light_t
 uniform GM_light_t GM_lights[MAX_LIGHT_COUNT];
 uniform int GM_lightCount = 0;
 
-const int GM_IlluminationModel_Phong = 0;
-const int GM_IlluminationModel_CookTorranceBRDF = 1;
+const int GM_IlluminationModel_None = 0;
+const int GM_IlluminationModel_Phong = 1;
+const int GM_IlluminationModel_CookTorranceBRDF = 2;
 uniform int GM_IlluminationModel;
 
 // 光源种类
@@ -147,10 +148,11 @@ struct PS_3D_INPUT
     vec3 AmbientLightmapTexture;
     vec3 DiffuseTexture;
     vec3 SpecularTexture;
-    vec3 AlbedoTexture;
-    vec3 MetallicRoughnessAOTexture;
     float Shininess;
     float Refractivity;
+    vec3 AlbedoTexture;
+    vec3 MetallicRoughnessAOTexture;
+    vec3 F0;
     int IlluminationModel;
 };
 
@@ -290,9 +292,10 @@ vec4 GM_CookTorranceBRDF_CalculateColor(PS_3D_INPUT vertex, float shadowFactor)
     float metallic = vertex.MetallicRoughnessAOTexture.r;
     float roughness = vertex.MetallicRoughnessAOTexture.g;
     float ao = vertex.MetallicRoughnessAOTexture.b;
-    vec3 F0 = mix(GM_material.f0, vertex.AlbedoTexture, metallic);
+    vec3 F0 = mix(vertex.F0, vertex.AlbedoTexture, metallic);
     vec3 Lo = vec3(0, 0, 0);
     vec3 ambient = vec3(0, 0, 0);
+    
     for (int i = 0; i < GM_lightCount; ++i)
     {
         // 只考虑直接光源
@@ -336,6 +339,8 @@ vec4 PS_3D_CalculateColor(PS_3D_INPUT vertex)
     float factor_Shadow = calculateShadow(GM_shadowInfo.ShadowMatrix, vec4(vertex.WorldPos, 1), vertex.Normal_World_N);
     switch (vertex.IlluminationModel)
     {
+        case GM_IlluminationModel_None:
+            discard;
         case GM_IlluminationModel_Phong:
             return GM_Phong_CalculateColor(vertex, factor_Shadow);
         case GM_IlluminationModel_CookTorranceBRDF:

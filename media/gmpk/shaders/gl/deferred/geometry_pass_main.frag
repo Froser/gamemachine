@@ -21,7 +21,7 @@ layout (location = 7) out vec4 deferred_geometry_pass_slot_7;
 #alias deferred_geometry_pass_gTangent_eye                          deferred_geometry_pass_slot_4
 #alias deferred_geometry_pass_gBitangent_eye                        deferred_geometry_pass_slot_5
 #alias deferred_geometry_pass_gNormalMap_bNormalMap                 deferred_geometry_pass_slot_6
-#alias deferred_geometry_pass_gKs_Shininess                         deferred_geometry_pass_slot_7
+#alias deferred_geometry_pass_gKs_Shininess_F0                      deferred_geometry_pass_slot_7
 
 vec4 normalToTexture(vec3 normal)
 {
@@ -35,16 +35,21 @@ void GM_GeometryPass()
     ${deferred_geometry_pass_gPosition_Refractivity}.rgb = _deferred_geometry_pass_position_world.rgb;
     ${deferred_geometry_pass_gPosition_Refractivity}.a = GM_material.refractivity;
 
-    if (GM_IlluminationModel == GM_IlluminationModel_Phong)
+    if (GM_IlluminationModel == GM_IlluminationModel_None)
+    {
+        discard;
+    }
+    else if (GM_IlluminationModel == GM_IlluminationModel_Phong)
     {
         ${deferred_geometry_pass_gTexAmbientAlbedo} = vec4(GM_material.ka, 1) * sampleTextures(GM_ambient_texture, _uv) * sampleTextures(GM_lightmap_texture, _lightmapuv);
         ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = vec4(GM_material.kd, 1) * sampleTextures(GM_diffuse_texture, _uv);
-        ${deferred_geometry_pass_gKs_Shininess} = vec4(GM_material.ks * sampleTextures(GM_specular_texture, _uv).r, GM_material.shininess);
+        ${deferred_geometry_pass_gKs_Shininess_F0} = vec4(GM_material.ks * sampleTextures(GM_specular_texture, _uv).r, GM_material.shininess);
     }
-    else
+    else if (GM_IlluminationModel == GM_IlluminationModel_CookTorranceBRDF)
     {
         ${deferred_geometry_pass_gTexAmbientAlbedo} = sampleTextures(GM_albedo_texture, _uv);
         ${deferred_geometry_pass_gTexDiffuseMetallicRoughnessAO} = sampleTextures(GM_metallic_roughness_ao_texture, _uv);
+        ${deferred_geometry_pass_gKs_Shininess_F0} = vec4(GM_material.f0, 1);
     }
 
     // 由顶点变换矩阵计算法向量变换矩阵

@@ -229,6 +229,7 @@ public:
 
 enum class GMIlluminationModel
 {
+	None = 0,
 	Phong,
 	CookTorranceBRDF,
 };

@@ -56,6 +56,7 @@ void GM_Model3D()
     {
         vertex.AlbedoTexture = pow(sampleTextures(GM_albedo_texture, _uv).rgb, vec3(GM_Gamma));
         vertex.MetallicRoughnessAOTexture = sampleTextures(GM_metallic_roughness_ao_texture, _uv).rgb;
+        vertex.F0 = GM_material.f0;
     }
 
     _frag_color = PS_3D_CalculateColor(vertex);

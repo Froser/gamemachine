@@ -20,7 +20,7 @@ namespace
 		"deferred_light_pass_gTangent_eye",
 		"deferred_light_pass_gBitangent_eye",
 		"deferred_light_pass_gNormalMap_bNormalMap",
-		"deferred_light_pass_gKs_Shininess",
+		"deferred_light_pass_gKs_Shininess_F0",
 	};
 }
 

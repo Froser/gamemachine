@@ -13,7 +13,7 @@ uniform sampler2D deferred_light_pass_gTexDiffuseMetallicRoughnessAO;
 uniform sampler2D deferred_light_pass_gTangent_eye;
 uniform sampler2D deferred_light_pass_gBitangent_eye;
 uniform sampler2D deferred_light_pass_gNormalMap_bNormalMap;
-uniform sampler2D deferred_light_pass_gKs_Shininess;
+uniform sampler2D deferred_light_pass_gKs_Shininess_F0;
 
 // [0, 1] -> [-1, 1]
 vec3 textureToNormal(vec3 tex)
@@ -30,7 +30,7 @@ void main()
 
     vec4 normalIlluminationModel = texture(deferred_light_pass_gNormal_IlluminationModel, _uv);
     vertex.Normal_World_N = textureToNormal(normalIlluminationModel.rgb);
-    vertex.IlluminationModel = int(normalIlluminationModel.a);
+    vertex.IlluminationModel = int(round(normalIlluminationModel.a));
     vertex.Normal_Eye_N = mat3(GM_view_matrix) * vertex.Normal_World_N;
 
     vec4 normalMapHasNormalMap = texture(deferred_light_pass_gNormalMap_bNormalMap, _uv);
@@ -49,11 +49,15 @@ void main()
 
     vertex.TangentSpace = tangentSpace;
 
-    if (vertex.IlluminationModel == GM_IlluminationModel_Phong)
+    if (vertex.IlluminationModel == GM_IlluminationModel_None)
+    {
+        discard;
+    }
+    else if (vertex.IlluminationModel == GM_IlluminationModel_Phong)
     {
         vertex.AmbientLightmapTexture = texture(deferred_light_pass_gTexAmbientAlbedo, _uv).rgb;
         vertex.DiffuseTexture = texture(deferred_light_pass_gTexDiffuseMetallicRoughnessAO, _uv).rgb;
-        vec4 ksShininess = texture(deferred_light_pass_gKs_Shininess, _uv);
+        vec4 ksShininess = texture(deferred_light_pass_gKs_Shininess_F0, _uv);
         vertex.SpecularTexture = ksShininess.rgb;
         vertex.Shininess = ksShininess.a;
     }
@@ -61,6 +65,7 @@ void main()
     {
         vertex.AlbedoTexture = pow(texture(deferred_light_pass_gTexAmbientAlbedo, _uv).rgb, vec3(GM_Gamma));
         vertex.MetallicRoughnessAOTexture = texture(deferred_light_pass_gTexDiffuseMetallicRoughnessAO, _uv).rgb;
+        vertex.F0 = texture(deferred_light_pass_gKs_Shininess_F0, _uv).rgb;
     }
 
     _frag_color = PS_3D_CalculateColor(vertex);
