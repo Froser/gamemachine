@@ -197,7 +197,6 @@ void GMDx11Texture::init()
 		}
 
 		GM_DX_HR(d->device->CreateTexture2D(&texDesc, resourceData, &texture));
-		GM_ASSERT(d->resource);
 		d->resource = texture;
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
