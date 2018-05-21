@@ -40,7 +40,6 @@ protected:
 public:
 	virtual gm::GMWindowHandle create(const gm::GMWindowAttributes& attrs) override;
 	virtual gm::GMWindowHandle getWindowHandle() const override;
-	virtual bool handleMessage() override;
 	virtual void showWindow() override { showWindowEx(); }
 
 protected:

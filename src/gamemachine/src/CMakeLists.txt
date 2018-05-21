@@ -177,6 +177,7 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/timer.cpp
 		foundation/platforms/windows/screen.cpp
 		foundation/platforms/windows/thread.cpp
+		foundation/platforms/windows/gamemachine.cpp
 	)
 
 set(WIN32_DX11_SOURCES

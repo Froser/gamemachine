@@ -126,46 +126,37 @@ void GameMachine::startGameMachine()
 	d->clock.begin();
 
 	// 消息循环
-	runLoop();
-
-	// 结束
-	terminate();
+	runEventLoop();
 }
 
-void GameMachine::runLoop()
+bool GameMachine::renderFrame()
 {
 	D(d);
 	GMClock frameCounter;
-	while (true)
-	{
-		// 记录帧率
-		frameCounter.begin();
+	// 记录帧率
+	frameCounter.begin();
 
-		// 接收窗口消息
-		if (!d->mainWindow->handleMessage())
-			break;
+	// 处理GameMachine消息
+	if (!handleMessages())
+		return false;
 
-		// 处理GameMachine消息
-		if (!handleMessages())
-			break;
+	// 检查是否崩溃
+	if (checkCrashDown())
+		return true;
 
-		// 检查是否崩溃
-		if (checkCrashDown())
-			continue;
+	// 调用Handler
+	handlerEvents();
 
-		// 调用Handler
-		handlerEvents();
+	// 更新所有管理器
+	updateManagers();
 
-		// 更新所有管理器
-		updateManagers();
+	// 更新状态
+	updateGameMachineRunningStates();
 
-		// 更新状态
-		updateGameMachineRunningStates();
-
-		// 本帧结束
-		d->gameHandler->event(GameMachineEvent::FrameEnd);
-		d->states.lastFrameElpased = frameCounter.elapsedFromStart();
-	}
+	// 本帧结束
+	d->gameHandler->event(GameMachineEvent::FrameEnd);
+	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
+	return true;
 }
 
 void GameMachine::setRenderEnvironment(GMRenderEnvironment renv)
@@ -237,8 +228,10 @@ bool GameMachine::handleMessages()
 		msg = d->messageQueue.front();
 
 		if (!handleMessage(msg))
+		{
+			d->messageQueue.pop();
 			return false;
-
+		}
 		d->messageQueue.pop();
 	}
 	d->lastMessage = msg;

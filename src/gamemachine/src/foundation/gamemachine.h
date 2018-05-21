@@ -271,12 +271,13 @@ public:
 	}
 
 private:
+	void runEventLoop();
+	bool renderFrame();
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
 	void terminate();
 	bool handleMessages();
 	bool handleMessage(const GameMachineMessage& msg);
 	void updateGameMachineRunningStates();
-	void runLoop();
 	void setRenderEnvironment(GMRenderEnvironment renv);
 	bool checkCrashDown();
 	void handlerEvents();

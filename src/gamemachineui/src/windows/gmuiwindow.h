@@ -26,15 +26,6 @@ public:
 public:
 	virtual gm::IInput* getInputMananger() override;
 
-	//! 处理新一轮消息循环。
-	/*!
-	  此方法由GameMachine调用。处理一轮消息循环。<br>
-	  在Windows下，消息循环的行为应该是GetMessage（或PeekMessage）、TranslateMessage和DispatchMessage。<br>
-	  消息循环的处理函数为WndProc()，在本方法被调用后，Windows将通过DispatchMessage()调用WndProc()。<br>
-	  \return 是否应该继续消息循环。如果返回false，则程序退出。
-	  \sa WndProc()
-	*/
-	virtual bool handleMessage() override;
 	virtual void update() override;
 	virtual gm::GMRect getWindowRect() override;
 	virtual gm::GMRect getRenderRect() override;

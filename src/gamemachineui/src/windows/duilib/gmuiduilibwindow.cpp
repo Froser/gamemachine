@@ -21,11 +21,6 @@ UINT GMUIDuiLibWindow::GetClassStyle() const
 	return getClassStyle();
 }
 
-bool GMUIDuiLibWindow::handleMessage()
-{
-	return DuiLib::CPaintManagerUI::HandleMessage();
-}
-
 LRESULT GMUIDuiLibWindow::HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	D(d);
