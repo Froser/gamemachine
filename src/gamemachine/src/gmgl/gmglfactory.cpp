@@ -62,3 +62,8 @@ void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 		*out = new GMGLDirectLight();
 	}
 }
+
+void GMGLFactory::createCanvas(OUT GMCanvas**)
+{
+	GM_ASSERT(false);
+}

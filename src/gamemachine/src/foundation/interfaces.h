@@ -28,6 +28,7 @@ class GMTextureSampler;
 class GMTextureList;
 class GMAssets;
 class GMComponent;
+class GMCanvas;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -501,6 +502,7 @@ GM_INTERFACE(IFactory)
 	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
+	virtual void createCanvas(OUT GMCanvas**) = 0;
 };
 
 GM_INTERFACE_FROM(IWindow, IQueriable)
