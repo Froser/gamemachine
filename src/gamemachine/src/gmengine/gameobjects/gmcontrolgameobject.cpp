@@ -148,8 +148,8 @@ bool GMControlGameObject::insideGeometry(GMint x, GMint y)
 	};
 
 	return d->parent ?
-		d->parent->insideGeometry(x, y) && GM_in_rect(scaledRect, x, y) :
-		GM_in_rect(scaledRect, x, y);
+		d->parent->insideGeometry(x, y) && GM_inRect(scaledRect, x, y) :
+		GM_inRect(scaledRect, x, y);
 }
 
 void GMControlGameObject::updateUI()

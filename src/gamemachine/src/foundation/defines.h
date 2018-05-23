@@ -181,11 +181,23 @@ struct GMRectF
 	GMfloat x, y, width, height;
 };
 
+struct GMPoint
+{
+	GMint x;
+	GMint y;
+};
+
 template <typename T>
-inline bool GM_in_rect(const T& rect, const decltype(T().x) x, const decltype(T().y) y)
+inline bool GM_inRect(const T& rect, const decltype(T().x) x, const decltype(T().y) y)
 {
 	return (x > rect.x) && (x < rect.x + rect.width) &&
 		(y > rect.y) && (y < rect.y + rect.height);
+}
+
+inline bool GM_inRect(const GMRect& rect, const GMPoint& pt)
+{
+	return (pt.x > rect.x) && (pt.x < rect.x + rect.width) &&
+		(pt.y > rect.y) && (pt.y < rect.y + rect.height);
 }
 
 template <typename T>

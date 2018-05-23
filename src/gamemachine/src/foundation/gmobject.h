@@ -282,43 +282,6 @@ public:
 	*/
 	void copyData(const GMObject& another) {}
 
-public:
-	//! 进行静态转换。
-	/*!
-	  如果是在调试模式下，将会返回dynamic_cast的结果。如果是在release模式下，将会返回静态转换的结果。
-	  \param obj 需要转换的对象。
-	  \return 转换后的对象。
-	*/
-	template <typename TargetType>
-	static inline TargetType gmobject_cast(GMObject* obj)
-	{
-#if _DEBUG
-		TargetType target = dynamic_cast<TargetType>(obj);
-		GM_ASSERT(target);
-		return target;
-#else
-		return static_cast<TargetType>(obj);
-#endif
-	}
-
-	//! 进行静态转换。
-	/*!
-	  如果是在调试模式下，将会返回dynamic_cast的结果。如果是在release模式下，将会返回静态转换的结果。
-	  \param obj 需要转换的对象。
-	  \return 转换后的对象。
-	*/
-	template <typename TargetType>
-	static const TargetType gmobject_cast(const GMObject* obj)
-	{
-#if _DEBUG
-		const TargetType target = dynamic_cast<TargetType>(obj);
-		GM_ASSERT(target);
-		return target;
-#else
-		return static_cast<TargetType>(obj);
-#endif
-	}
-
 private:
 	void addEvent(GMEventName eventName, GMObject& receiver, GMEventCallback callback);
 	void removeEventAndConnection(GMEventName eventName, GMObject& receiver);

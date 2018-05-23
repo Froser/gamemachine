@@ -27,7 +27,7 @@ public:
 public:
 	virtual void transfer() override;
 	virtual void dispose(GMModelBuffer* md) override;
-	virtual void beginUpdateBuffer(GMModel* model) override;
+	virtual void beginUpdateBuffer() override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
 

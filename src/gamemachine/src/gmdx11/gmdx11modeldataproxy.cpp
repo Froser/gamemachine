@@ -140,7 +140,7 @@ void GMDx11ModelDataProxy::dispose(GMModelBuffer* md)
 {
 }
 
-void GMDx11ModelDataProxy::beginUpdateBuffer(GMModel* model)
+void GMDx11ModelDataProxy::beginUpdateBuffer()
 {
 	D(d);
 	// 不能在多线程中，或者嵌套中操作同一个Buffer

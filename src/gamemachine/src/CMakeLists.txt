@@ -62,8 +62,6 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/gameobjects/gmcontrolgameobject.h
 		gmengine/gameobjects/gmcontrolgameobject.cpp
-		gmengine/ui/gmcanvas.h
-		gmengine/ui/gmcanvas.cpp
 		gmengine/ui/gmcontrols.h
 		gmengine/ui/gmcontrols.cpp
 		gmengine/gmtypoengine.h
@@ -208,8 +206,6 @@ set(WIN32_DX11_SOURCES
 		gmdx11/gmdx11gbuffer.cpp
 		gmdx11/gmdx11light.h
 		gmdx11/gmdx11light.cpp
-		gmdx11/gmdx11canvas.h
-		gmdx11/gmdx11canvas.cpp
 
 		gmdx11/effects/pchfx.h
 		gmdx11/effects/d3dx11dbg.cpp

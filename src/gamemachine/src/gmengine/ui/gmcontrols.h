@@ -5,11 +5,51 @@ BEGIN_NS
 
 class GMCanvas;
 
+enum class GMControlState
+{
+	Normal,
+	Disabled,
+	Hidden,
+	Focus,
+	Mouseover,
+	Pressed,
+
+	EndOfControlState,
+};
+
+GM_PRIVATE_OBJECT(GMElementBlendColor)
+{
+	GMVec4 states[(GMuint)GMControlState::EndOfControlState];
+	GMVec4 current;
+};
+
+class GMElementBlendColor : public GMObject
+{
+	DECLARE_PRIVATE(GMElementBlendColor)
+	GM_ALLOW_COPY_DATA(GMElementBlendColor)
+
+public:
+	GMElementBlendColor() = default;
+
+public:
+	void init(const GMVec4& defaultColor, const GMVec4& disabledColor = GMVec4(.5f, .5f, .5f, .78f), const GMVec4& hiddenColor = GMVec4(0));
+	void blend(GMControlState state, GMfloat elapsedTime, GMfloat rate = .7f);
+
+public:
+	inline const GMVec4& getCurrent()
+	{
+		D(d);
+		return d->current;
+	}
+};
+
 GM_PRIVATE_OBJECT(GMElement)
 {
 	GMuint texture = 0;
 	GMuint font = 0;
 	GMRect rc;
+	GMElementBlendColor textureColor;
+	GMElementBlendColor fontColor;
 };
 
 class GMElement : public GMObject
@@ -24,16 +64,30 @@ public:
 	void setTexture(GMuint texture, const GMRect& rc);
 	void setFont(GMuint font);
 	void refresh();
+
+public:
+	inline GMElementBlendColor& getTextureColor()
+	{
+		D(d);
+		return d->textureColor;
+	}
+
+	inline GMElementBlendColor& getFontColor()
+	{
+		D(d);
+		return d->fontColor;
+	}
 };
 
 enum class GMControlType
 {
-	ControlButton,
+	Button,
+	Static,
 };
 
 GM_PRIVATE_OBJECT(GMControl)
 {
-	GMControlType type = GMControlType::ControlButton;
+	GMControlType type = GMControlType::Button;
 	GMuint id = 0;
 	GMint x = 0;
 	GMint y = 0;
@@ -183,7 +237,32 @@ public:
 		return d->elements[index];
 	}
 
+	virtual void setIsDefault(bool isDefault)
+	{
+		D(d);
+		d->isDefault = isDefault;
+	}
+
 	virtual bool setElement(GMuint index, GMElement* element);
+
+	virtual bool containsPoint(const GMPoint& point)
+	{
+		D(d);
+		return GM_inRect(d->rcBoundingBox, point);
+	}
+
+public:
+	inline bool isDefault()
+	{
+		D(d);
+		return d->isDefault;
+	}
+
+	inline GMCanvas* getParent()
+	{
+		D(d);
+		return d->canvas;
+	}
 
 protected:
 	void updateRect();
@@ -194,6 +273,36 @@ struct GMElementHolder
 	GMControlType type;
 	GMuint index;
 	GMElement element;
+};
+
+GM_PRIVATE_OBJECT(GMControlStatic)
+{
+	GMString text;
+};
+
+class GMControlStatic : public GMControl
+{
+	DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
+
+public:
+	GMControlStatic(GMCanvas* parent);
+
+public:
+	virtual void render(GMfloat elapsed) override;
+
+	virtual bool containsPoint(const GMPoint&) override
+	{
+		return false;
+	}
+
+public:
+	inline const GMString& getText() const
+	{
+		D(d);
+		return d->text;
+	}
+
+	void setText(const GMString& text);
 };
 END_NS
 #endif

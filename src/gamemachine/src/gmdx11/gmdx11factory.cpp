@@ -7,7 +7,6 @@
 #include "gmdx11framebuffer.h"
 #include "gmdx11gbuffer.h"
 #include "gmdx11light.h"
-#include "gmdx11canvas.h"
 
 void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 {
@@ -62,10 +61,4 @@ void GMDx11Factory::createLight(GMLightType type, OUT ILight** out)
 		GM_ASSERT(type == GMLightType::Direct);
 		*out = new GMDx11DirectLight();
 	}
-}
-
-void GMDx11Factory::createCanvas(OUT GMCanvas** canvas)
-{
-	GM_ASSERT(canvas);
-	*canvas = new GMDx11Canvas();
 }

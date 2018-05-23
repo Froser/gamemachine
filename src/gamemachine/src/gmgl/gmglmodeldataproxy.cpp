@@ -106,8 +106,10 @@ void GMGLModelDataProxy::dispose(GMModelBuffer* md)
 	d->inited = false;
 }
 
-void GMGLModelDataProxy::beginUpdateBuffer(GMModel* model)
+void GMGLModelDataProxy::beginUpdateBuffer()
 {
+	GMModel* model = getModel();
+	GM_ASSERT(model);
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
 	glBindBuffer(GL_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
 }
