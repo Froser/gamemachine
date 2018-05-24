@@ -7,8 +7,47 @@
 #include <input.h>
 BEGIN_NS
 
-//GMGlyphObject
 struct ITypoEngine;
+
+GM_PRIVATE_OBJECT(GMTextGameObject)
+{
+	bool dirty = true;
+	GMString text;
+	GMsize_t length = 0;
+	GMRect geometry = { 0 };
+	ITexture* texture = nullptr;
+	ITypoEngine* typoEngine = nullptr;
+	bool insetTypoEngine = true;
+	GMModel* model = nullptr;
+};
+
+class GMTextGameObject : public GMGameObject
+{
+	DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GMGameObject)
+
+public:
+	GMTextGameObject();
+	GMTextGameObject(ITypoEngine* typo);
+	~GMTextGameObject();
+
+public:
+	void setText(const GMString& text);
+	void setGeometry(const GMRect& geometry);
+
+public:
+	virtual void onAppendingObjectToWorld() override;
+	virtual void draw() override;
+
+private:
+	void update();
+	GMModel* createModel();
+	void updateVertices(GMModel* model);
+
+public:
+	static GMRectF toViewportRect(const GMRect& rc);
+};
+
+//GMGlyphObject
 GM_PRIVATE_OBJECT(GMGlyphObject)
 {
 	GMString lastRenderText;

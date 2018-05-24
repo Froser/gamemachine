@@ -41,6 +41,18 @@ public:
 		D(d);
 		return d->current;
 	}
+
+	inline void setCurrent(const GMVec4& current)
+	{
+		D(d);
+		d->current = current;
+	}
+
+	inline GMVec4* getStates()
+	{
+		D(d);
+		return d->states;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMElement)
@@ -62,7 +74,9 @@ public:
 
 public:
 	void setTexture(GMuint texture, const GMRect& rc);
-	void setFont(GMuint font);
+	void setFont(GMuint font, const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
+	void setFontColor(const GMElementBlendColor& color);
+	void setTextureColor(const GMElementBlendColor& color);
 	void refresh();
 
 public:
@@ -165,7 +179,11 @@ public:
 	}
 
 	virtual void refresh();
-	virtual void render(float elapsed);
+
+	virtual void render(float elapsed)
+	{
+
+	}
 
 	virtual void setEnabled(bool enabled)
 	{

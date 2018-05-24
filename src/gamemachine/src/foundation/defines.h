@@ -200,6 +200,16 @@ inline bool GM_inRect(const GMRect& rect, const GMPoint& pt)
 		(pt.y > rect.y) && (pt.y < rect.y + rect.height);
 }
 
+inline bool operator==(const GMRect& lhs, const GMRect& rhs)
+{
+	return lhs.x == rhs.x && lhs.y == rhs.y && lhs.width == rhs.width && lhs.height == rhs.height;
+}
+
+inline bool operator!=(const GMRect& lhs, const GMRect& rhs)
+{
+	return !(lhs == rhs);
+}
+
 template <typename T>
 inline void GM_delete(T*& o)
 {

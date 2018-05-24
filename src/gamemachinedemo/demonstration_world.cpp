@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "demonstration_world.h"
 #include <gmcontrolgameobject.h>
+#include <gmcanvas.h>
 #include <gmgl.h>
 
 #include "demo/texture.h"
@@ -184,6 +185,8 @@ DemostrationWorld::~DemostrationWorld()
 		GM_ASSERT(demo.second);
 		gm::GM_delete(demo.second);
 	}
+
+	GM_delete(d->mainCanvas);
 }
 
 void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -234,6 +237,9 @@ void DemostrationWorld::init()
 	}
 	addControl(listbox);
 	GM_delete(img);
+
+	d->mainCanvas = new gm::GMCanvas(new gm::GMCanvasResourceManager());
+	d->mainCanvas->addStatic(-1, "Hello world", 600, 800, 100, 100, false, nullptr);
 }
 
 void DemostrationWorld::switchDemo()
@@ -316,6 +322,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 			break;
 		case gm::GameMachineEvent::Render:
 			getWorld()->renderScene();
+			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().lastFrameElpased);
 			break;
 		case gm::GameMachineEvent::Activate:
 		{

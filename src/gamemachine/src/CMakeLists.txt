@@ -64,6 +64,8 @@ set(SOURCES
 		gmengine/gameobjects/gmcontrolgameobject.cpp
 		gmengine/ui/gmcontrols.h
 		gmengine/ui/gmcontrols.cpp
+		gmengine/ui/gmcanvas.h
+		gmengine/ui/gmcanvas.cpp
 		gmengine/gmtypoengine.h
 		gmengine/gmtypoengine.cpp
 		gmengine/gmanimation.h

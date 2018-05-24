@@ -6,6 +6,11 @@
 #include <gmgl.h>
 #include <gmdemogameworld.h>
 
+namespace gm
+{
+	class GMCanvas;
+}
+
 class DemostrationWorld;
 GM_PRIVATE_OBJECT(DemoHandler)
 {
@@ -56,6 +61,7 @@ GM_PRIVATE_OBJECT(DemostrationWorld)
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
+	gm::GMCanvas* mainCanvas = nullptr;
 };
 
 class DemostrationWorld : public gm::GMGameWorld
@@ -70,6 +76,7 @@ public:
 	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
 	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
 	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
+	inline gm::GMCanvas* getMainCanvas() { D(d); return d->mainCanvas; }
 
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);

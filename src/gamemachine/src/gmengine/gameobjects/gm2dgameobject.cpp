@@ -33,6 +33,208 @@ inline bool isValidRect(const T& r)
 #define UV_X(i) ((i) / (GMfloat)GMGlyphManager::CANVAS_WIDTH)
 #define UV_Y(i) ((i) / (GMfloat)GMGlyphManager::CANVAS_HEIGHT)
 
+GMTextGameObject::GMTextGameObject()
+{
+	D(d);
+	d->typoEngine = new GMTypoEngine();
+}
+
+GMTextGameObject::GMTextGameObject(ITypoEngine* typo)
+{
+	D(d);
+	d->typoEngine = typo;
+	d->insetTypoEngine = false;
+}
+
+GMTextGameObject::~GMTextGameObject()
+{
+	D(d);
+	GM_delete(d->model);
+	if (d->insetTypoEngine)
+		GM_delete(d->typoEngine);
+}
+
+void GMTextGameObject::setText(const GMString& text)
+{
+	D(d);
+	if (d->text != text)
+	{
+		d->dirty = true;
+		d->text = text;
+	}
+}
+
+void GMTextGameObject::setGeometry(const GMRect& geometry)
+{
+	D(d);
+	if (d->geometry != geometry)
+	{
+		d->dirty = true;
+		d->geometry = geometry;
+	}
+}
+
+void GMTextGameObject::onAppendingObjectToWorld()
+{
+	update();
+	GMGameObject::onAppendingObjectToWorld();
+}
+
+void GMTextGameObject::draw()
+{
+	update();
+	GMGameObject::draw();
+}
+
+void GMTextGameObject::update()
+{
+	D(d);
+	// 如果不存在model，创建一个新model
+	// 如果需要的空间更大，也重新创建一个model
+	if (!d->model || d->length < d->text.length())
+	{
+		GM_delete(d->model);
+		d->model = createModel();
+		d->length = d->text.length();
+		d->dirty = true;
+	}
+
+	// 如果字符被更改，则更新其缓存
+	if (d->dirty)
+	{
+		updateVertices(d->model);
+		d->dirty = false;
+	}
+}
+
+GMModel* GMTextGameObject::createModel()
+{
+	D(d);
+	GMModel* model = new GMModel();
+	model->setType(GMModelType::Model2D);
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+
+	GMMesh* mesh = new GMMesh(model);
+	GMsize_t len = d->text.length() * 6; //每个字符，用6个顶点来渲染
+	for (GMsize_t i = 0; i < len; ++i)
+	{
+		mesh->vertex(GMVertex());
+	}
+	GM.createModelDataProxyAndTransfer(model);
+	return model;
+}
+
+void GMTextGameObject::updateVertices(GMModel* model)
+{
+	D(d);
+	constexpr GMfloat Z = 0;
+	const GMRect& rect = GM.getGameMachineRunningStates().renderRect;
+	GMRectF coord = toViewportRect(d->geometry);
+
+	Vector<GMVertex> vertices;
+	BEGIN_GLYPH_XY(rect.width, rect.height)
+		// 使用排版引擎进行排版
+		ITypoEngine* typoEngine = d->typoEngine;
+		GMTypoOptions options;
+		options.typoArea.width = coord.width * rect.width * .5f;
+		options.typoArea.height = coord.height * rect.height * .5f;
+
+		GM_ASSERT(typoEngine);
+		GMTypoIterator iter = typoEngine->begin(d->text, options);
+		for (; iter != typoEngine->end(); ++iter)
+		{
+			const GMTypoResult& typoResult = *iter;
+			if (!typoResult.valid)
+				continue;
+
+			const GMGlyphInfo& glyph = *typoResult.glyph;
+
+			if (glyph.width > 0 && glyph.height > 0)
+			{
+				// 如果width和height为0，视为空格，只占用空间而已
+				// 否则：按照TriangleList创建顶点：0 2 1, 1 2 3
+				// 0 2
+				// 1 3
+				// 让所有字体origin开始的x轴平齐
+
+				// 采用左上角为原点的Texcoord坐标系
+
+				GMVertex V0 = {
+					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x), UV_Y(glyph.y) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+				GMVertex V1 = {
+					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+				GMVertex V2 = {
+					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+				GMVertex V3 = {
+					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ 0, 0, 0 },
+					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
+					{ 0, 0, 0 },
+					{ 0, 0, 0 },
+					{ 0, 0 },
+					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+				};
+
+				vertices.push_back(V0);
+				vertices.push_back(V2);
+				vertices.push_back(V1);
+				vertices.push_back(V1);
+				vertices.push_back(V2);
+				vertices.push_back(V3);
+			}
+		}
+	END_GLYPH_XY()
+
+	// 已经得到所有顶点，更新到GPU
+	GM_ASSERT(vertices.size() < d->text.length() * 6);
+	size_t vertexCount = vertices.size();
+	model->setVerticesCount(vertexCount);
+
+	size_t sz = vertexCount * sizeof(GMVertex);
+	GMModelDataProxy* proxy = model->getModelDataProxy();
+	proxy->beginUpdateBuffer();
+	void* ptr = proxy->getBuffer();
+	memcpy_s(ptr, sz, vertices.data(), sz);
+	proxy->endUpdateBuffer();
+}
+
+GMRectF GMTextGameObject::toViewportRect(const GMRect& rc)
+{
+	// 得到一个原点在中心，x属于[-1,1],y属于[-1,1]范围的参考系的坐标
+	const GMRect& client = GM.getGameMachineRunningStates().renderRect;
+	GMRectF out = {
+		rc.x * 2.f / client.width - 1.f,
+		1.f - rc.y * 2.f / client.height,
+		rc.width * 2.f / client.width,
+		rc.height * 2.f / client.height
+	};
+	return out;
+
+}
+
+//////////////////////////////////////////////////////////////////////////
 GMGlyphObject::GMGlyphObject()
 {
 	D(d);
@@ -64,6 +266,7 @@ void GMGlyphObject::constructModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
+	model->setUsageHint(GMUsageHint::DynamicDraw);
 	model->setType(GMModelType::Glyph);
 	GMMesh* mesh = new GMMesh(model);
 	onCreateShader(model->getShader());

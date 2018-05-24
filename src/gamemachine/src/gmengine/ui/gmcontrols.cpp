@@ -21,6 +21,32 @@ void GMElementBlendColor::blend(GMControlState state, GMfloat elapsedTime, GMflo
 	d->current = Lerp(d->current, destColor, Pow(rate, 30 * elapsedTime));
 }
 
+void GMElement::setFont(GMuint font, const GMVec4& defaultColor)
+{
+	D(d);
+	d->font = font;
+	d->fontColor.init(defaultColor);
+}
+
+void GMElement::setFontColor(const GMElementBlendColor& color)
+{
+	D(d);
+	d->fontColor = color;
+}
+
+void GMElement::setTextureColor(const GMElementBlendColor& color)
+{
+	D(d);
+	d->textureColor = color;
+}
+
+void GMElement::refresh()
+{
+	D(d);
+	d->textureColor.setCurrent(d->textureColor.getStates()[(GMuint)GMControlState::Hidden]);
+	d->fontColor.setCurrent(d->fontColor.getStates()[(GMuint)GMControlState::Hidden]);
+}
+
 GMControl::GMControl(GMCanvas* canvas)
 {
 	D(d);

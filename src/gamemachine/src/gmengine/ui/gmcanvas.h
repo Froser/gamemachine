@@ -7,9 +7,11 @@ BEGIN_NS
 class GMControl;
 class GMGameObject;
 class GMModel;
+class GMTextGameObject;
 
 GM_PRIVATE_OBJECT(GMCanvasResourceManager)
 {
+	GMTextGameObject* textObject = nullptr;
 	Vector<ITexture*> textureCache;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
@@ -43,6 +45,12 @@ public:
 		return d->backBufferHeight;
 	}
 
+	inline GMTextGameObject* getTextObject()
+	{
+		D(d);
+		return d->textObject;
+	}
+
 	GMModel* getScreenQuadModel();
 	GMGameObject* getScreenQuad();
 };
@@ -52,7 +60,7 @@ GM_PRIVATE_OBJECT(GMCanvas)
 	GMCanvasResourceManager* manager = nullptr;
 	Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
-	Vector<GMElementHolder> defaultElements;
+	Vector<GMElementHolder*> defaultElements;
 	GMfloat timeLastRefresh = 0;
 	GMControl* controlMouseOver = nullptr;
 	bool nonUserEvents = false;
@@ -77,9 +85,7 @@ class GMCanvas : public GMObject
 
 public:
 	GMCanvas(GMCanvasResourceManager* manager);
-
-public:
-	virtual void onRender() = 0;
+	~GMCanvas();
 
 public:
 	void render(GMfloat elpasedTime);
@@ -107,9 +113,11 @@ public:
 
 private:
 	void initDefaultElements();
+	void setDefaultElement(GMControlType type, GMuint index, GMElement* element);
 	bool initControl(GMControl* control);
 	void refresh();
 	void focusDefaultControl();
+	void removeAllControls();
 
 public:
 	static void clearFocus();

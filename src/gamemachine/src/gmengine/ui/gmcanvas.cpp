@@ -3,7 +3,10 @@
 #include "gmcontrols.h"
 #include "foundation/gamemachine.h"
 #include "../gameobjects/gmgameobject.h"
+#include "../gameobjects/gm2dgameobject.h"
+#include "../gmtypoengine.h"
 #include "gmdata/gmmodel.h"
+#include "gmdata/glyph/gmglyphmanager.h"
 
 GMCanvasResourceManager::GMCanvasResourceManager()
 {
@@ -22,6 +25,8 @@ GMCanvasResourceManager::GMCanvasResourceManager()
 
 	d->screenQuad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->screenQuadModel));
 	GM.createModelDataProxyAndTransfer(d->screenQuadModel);
+
+	d->textObject = new GMTextGameObject();
 }
 
 GMCanvasResourceManager::~GMCanvasResourceManager()
@@ -31,7 +36,8 @@ GMCanvasResourceManager::~GMCanvasResourceManager()
 	{
 		GM_delete(texture);
 	}
-	GMClearSTLContainer(d->textureCache);
+	GM_delete(d->textObject);
+
 	GM_delete(d->screenQuad);
 	GM_delete(d->screenQuadModel);
 }
@@ -79,6 +85,16 @@ GMCanvas::GMCanvas(GMCanvasResourceManager* manager)
 	initDefaultElements();
 }
 
+GMCanvas::~GMCanvas()
+{
+	D(d);
+	for (auto elementHolder : d->defaultElements)
+	{
+		GM_delete(elementHolder);
+	}
+	removeAllControls();
+}
+
 void GMCanvas::addControl(GMControl* control)
 {
 	D(d);
@@ -119,12 +135,51 @@ void GMCanvas::drawText(
 	bool bCenter
 )
 {
+	D(d);
+	// 不需要绘制透明元素
+	if (element->getFontColor().getCurrent().getW() == 0)
+		return;
 
+	// TODO 先不考虑阴影什么的
+	const GMVec4& fontColor = element->getFontColor().getCurrent();
+
+	GMTextGameObject* textObject = d->manager->getTextObject();
+	textObject->setText(text);
+	textObject->setGeometry(rcDest);
+	textObject->draw();
 }
 
 void GMCanvas::initDefaultElements()
 {
+	GMElement element;
 
+	// Static
+	element.setFont(0);
+
+	GMElementBlendColor blendColor;
+	blendColor.getStates()[(GMuint)GMControlState::Disabled] = GMVec4(.87f, .87f, .87f, .87f);
+	element.setFontColor(blendColor);
+
+	setDefaultElement(GMControlType::Static, 0, &element);
+}
+
+void GMCanvas::setDefaultElement(GMControlType type, GMuint index, GMElement* element)
+{
+	D(d);
+	for (auto elementHolder : d->defaultElements)
+	{
+		if (elementHolder->type == type && elementHolder->index == index)
+		{
+			elementHolder->element = *element;
+			return;
+		}
+	}
+
+	GMElementHolder* elementHolder = new GMElementHolder();
+	elementHolder->type = type;
+	elementHolder->index = index;
+	elementHolder->element = *element;
+	d->defaultElements.push_back(elementHolder);
 }
 
 bool GMCanvas::initControl(GMControl* control)
@@ -137,8 +192,8 @@ bool GMCanvas::initControl(GMControl* control)
 	control->setIndex(d->controls.size());
 	for (auto& elementHolder : d->defaultElements)
 	{
-		if (elementHolder.type == control->getType())
-			control->setElement(elementHolder.index, &elementHolder.element);
+		if (elementHolder->type == control->getType())
+			control->setElement(elementHolder->index, &elementHolder->element);
 	}
 
 	return control->onInit();
@@ -246,6 +301,22 @@ void GMCanvas::focusDefaultControl()
 			return;
 		}
 	}
+}
+
+void GMCanvas::removeAllControls()
+{
+	D(d);
+	if (s_controlFocus && s_controlFocus->getParent() == this)
+		s_controlFocus = nullptr;
+	if (s_controlPressed && s_controlPressed->getParent() == this)
+		s_controlPressed = nullptr;
+	d->controlMouseOver = nullptr;
+
+	for (auto control : d->controls)
+	{
+		GM_delete(control);
+	}
+	GMClearSTLContainer(d->controls);
 }
 
 void GMCanvas::clearFocus()
