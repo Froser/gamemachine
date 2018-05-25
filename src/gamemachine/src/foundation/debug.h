@@ -8,7 +8,6 @@
 
 BEGIN_NS
 
-struct GameMachineMessage;
 GM_INTERFACE(IDebugOutput)
 {
 	virtual void info(const GMString& msg) = 0;

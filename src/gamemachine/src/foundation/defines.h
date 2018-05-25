@@ -161,6 +161,16 @@ typedef int64_t GMint64;
 typedef GMint GMFontSizePt;
 typedef size_t GMsize_t;
 
+#if GM_WINDOWS
+typedef WPARAM GMWParam;
+typedef LPARAM GMLParam;
+typedef LRESULT GMLResult;
+#else
+typedef GMint GMWParam;
+typedef GMlong GMLParam;
+typedef GMlong GMLResult;
+#endif
+
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
 #define GM_STATIC_ASSERT static_assert
 #define GM_STATIC_ASSERT_SIZE(type, size) GM_STATIC_ASSERT(sizeof(type) == size, "Type '" #type "' size static assert failed. Excepted size is " #size);

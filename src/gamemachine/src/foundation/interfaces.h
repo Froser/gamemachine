@@ -42,7 +42,7 @@ struct IRenderer;
 struct GMShaderVariablesDesc;
 struct GMShadowSourceDesc;
 
-enum class GameMachineEvent
+enum class GameMachineHandlerEvent
 {
 	FrameStart,
 	FrameEnd,
@@ -51,16 +51,6 @@ enum class GameMachineEvent
 	Activate,
 	Deactivate,
 	Terminate,
-};
-
-enum class GameMachineMessageType
-{
-	None,
-	Quit,
-	CrashDown,
-	Console,
-	WindowSizeChanged,
-	Dx11Ready,
 };
 
 enum class GameMachineInterfaceID
@@ -121,25 +111,11 @@ enum class GMModelType
 	CustomStart, //! 自定义模型类型。将自定义的类型放在此类型后面，匹配自定义的着色器程序。
 };
 
-struct GameMachineMessage
-{
-	GameMachineMessage(GameMachineMessageType t = GameMachineMessageType::None, GMint tp = 0, GMint v = 0, void* objPtr = nullptr)
-		: msgType(t)
-		, type(tp)
-		, value(v)
-	{}
-
-	GameMachineMessageType msgType = GameMachineMessageType::None;
-	GMint type = 0;
-	GMint value = 0;
-	void* objPtr = 0;
-};
-
 GM_INTERFACE(IGameHandler)
 {
 	virtual void init() = 0;
 	virtual void start() = 0;
-	virtual void event(GameMachineEvent evt) = 0;
+	virtual void event(GameMachineHandlerEvent evt) = 0;
 };
 
 GM_INTERFACE(ITexture)
@@ -368,7 +344,7 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \return 如果此事件被处理，返回true，否则返回false。
 	  \sa GameMachineMessage
 	*/
-	virtual bool event(const GameMachineMessage& e) = 0;
+	virtual bool event(const GMMessage& e) = 0;
 
 	//! 获取引擎G缓存。
 	/*!
@@ -515,7 +491,7 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual GMRect getWindowRect() = 0;
 	virtual GMRect getRenderRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
-	virtual bool event(const GameMachineMessage& msg) = 0;
+	virtual bool event(const GMMessage& msg) = 0;
 	virtual bool isWindowActivate() = 0;
 	virtual void setLockWindow(bool lock) = 0;
 };

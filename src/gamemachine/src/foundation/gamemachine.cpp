@@ -3,6 +3,8 @@
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmconfigs.h"
+#include "gmengine/ui/gmcanvas.h"
+#include "gmmessage.h"
 
 extern "C"
 {
@@ -58,13 +60,13 @@ void GameMachine::init(
 	d->gameHandler->init();
 }
 
-void GameMachine::postMessage(GameMachineMessage msg)
+void GameMachine::postMessage(GMMessage msg)
 {
 	D(d);
 	d->messageQueue.push(msg);
 }
 
-GameMachineMessage GameMachine::peekMessage()
+GMMessage GameMachine::peekMessage()
 {
 	D(d);
 	return d->lastMessage;
@@ -127,6 +129,28 @@ void GameMachine::startGameMachine()
 	runEventLoop();
 }
 
+void GameMachine::registerCanvas(GMCanvas* canvas)
+{
+	D(d);
+	d->canvases.push_back(canvas);
+}
+
+bool GameMachine::dispatchMessageToCanvases(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes)
+{
+	D(d);
+	GMSystemEvent* sysEvent = nullptr;
+	translateSystemEvent(uMsg, wParam, lParam, lRes, &sysEvent);
+	if (sysEvent)
+	{
+		for (auto canvas : d->canvases)
+		{
+			if (canvas->msgProc(sysEvent))
+				return true;
+		}
+	}
+	return false;
+}
+
 bool GameMachine::renderFrame()
 {
 	D(d);
@@ -152,7 +176,7 @@ bool GameMachine::renderFrame()
 	updateGameMachineRunningStates();
 
 	// 本帧结束
-	d->gameHandler->event(GameMachineEvent::FrameEnd);
+	d->gameHandler->event(GameMachineHandlerEvent::FrameEnd);
 	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 	return true;
 }
@@ -199,13 +223,13 @@ bool GameMachine::checkCrashDown()
 void GameMachine::handlerEvents()
 {
 	D(d);
-	d->gameHandler->event(GameMachineEvent::FrameStart);
+	d->gameHandler->event(GameMachineHandlerEvent::FrameStart);
 	if (d->mainWindow->isWindowActivate())
-		d->gameHandler->event(GameMachineEvent::Activate);
+		d->gameHandler->event(GameMachineHandlerEvent::Activate);
 	else
-		d->gameHandler->event(GameMachineEvent::Deactivate);
-	d->gameHandler->event(GameMachineEvent::Simulate);
-	d->gameHandler->event(GameMachineEvent::Render);
+		d->gameHandler->event(GameMachineHandlerEvent::Deactivate);
+	d->gameHandler->event(GameMachineHandlerEvent::Simulate);
+	d->gameHandler->event(GameMachineHandlerEvent::Render);
 }
 
 void GameMachine::updateManagers()
@@ -220,7 +244,7 @@ void GameMachine::updateManagers()
 bool GameMachine::handleMessages()
 {
 	D(d);
-	GameMachineMessage msg;
+	GMMessage msg;
 	while (d->messageQueue.size() > 0)
 	{
 		msg = d->messageQueue.front();
@@ -236,7 +260,7 @@ bool GameMachine::handleMessages()
 	return true;
 }
 
-bool GameMachine::handleMessage(const GameMachineMessage& msg)
+bool GameMachine::handleMessage(const GMMessage& msg)
 {
 	D(d);
 	switch (msg.msgType)
@@ -252,6 +276,16 @@ bool GameMachine::handleMessage(const GameMachineMessage& msg)
 	case GameMachineMessageType::CrashDown:
 	{
 		d->states.crashDown = true;
+		break;
+	}
+	case GameMachineMessageType::SystemMessage:
+	{
+		GMSystemEvent* event = static_cast<GMSystemEvent*>(msg.objPtr);
+		for (auto canvas : d->canvases)
+		{
+			if (canvas->msgProc(event))
+				break;
+		}
 		break;
 	}
 	default:
@@ -273,7 +307,7 @@ void GameMachine::registerManager(T* newObject, OUT U** manager)
 void GameMachine::terminate()
 {
 	D(d);
-	d->gameHandler->event(GameMachineEvent::Terminate);
+	d->gameHandler->event(GameMachineHandlerEvent::Terminate);
 	for (auto iter = d->managerQueue.rbegin(); iter != d->managerQueue.rend(); ++iter)
 	{
 		GM_delete(*iter);

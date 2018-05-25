@@ -96,12 +96,12 @@ void DemoHandler::onDeactivate()
 	GM.getGraphicEngine()->setShadowSource(noShadow);
 }
 
-void DemoHandler::event(gm::GameMachineEvent evt)
+void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
 	switch (evt)
 	{
-	case gm::GameMachineEvent::Activate:
+	case gm::GameMachineHandlerEvent::Activate:
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
@@ -243,6 +243,7 @@ void DemostrationWorld::init()
 	d->mainCanvas = new gm::GMCanvas(new gm::GMCanvasResourceManager());
 	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
 	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
+	GM.registerCanvas(d->mainCanvas);
 }
 
 void DemostrationWorld::switchDemo()
@@ -298,10 +299,10 @@ void DemostrationEntrance::start()
 	loadDemostrations(d->world);
 }
 
-void DemostrationEntrance::event(gm::GameMachineEvent evt)
+void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
-	if (evt == gm::GameMachineEvent::Render)
+	if (evt == gm::GameMachineHandlerEvent::Render)
 	{
 		gm::IGraphicEngine* engine = GM.getGraphicEngine();
 		engine->getDefaultFramebuffers()->clear();
@@ -316,18 +317,18 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 	{
 		switch (evt)
 		{
-		case gm::GameMachineEvent::FrameStart:
+		case gm::GameMachineHandlerEvent::FrameStart:
 			break;
-		case gm::GameMachineEvent::FrameEnd:
+		case gm::GameMachineHandlerEvent::FrameEnd:
 			getWorld()->switchDemo();
 			break;
-		case gm::GameMachineEvent::Simulate:
+		case gm::GameMachineHandlerEvent::Simulate:
 			break;
-		case gm::GameMachineEvent::Render:
+		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();
 			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().elapsedTime);
 			break;
-		case gm::GameMachineEvent::Activate:
+		case gm::GameMachineHandlerEvent::Activate:
 		{
 			getWorld()->notifyControls();
 
@@ -348,9 +349,9 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 
 			break;
 		}
-		case gm::GameMachineEvent::Deactivate:
+		case gm::GameMachineHandlerEvent::Deactivate:
 			break;
-		case gm::GameMachineEvent::Terminate:
+		case gm::GameMachineHandlerEvent::Terminate:
 			break;
 		default:
 			break;

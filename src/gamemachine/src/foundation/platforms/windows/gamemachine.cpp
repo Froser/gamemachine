@@ -28,3 +28,18 @@ void GameMachine::runEventLoop()
 	}
 	terminate();
 }
+
+void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes, OUT GMSystemEvent** event)
+{
+	GM_ASSERT(event);
+	switch (uMsg)
+	{
+	case WM_KEYDOWN:
+	case WM_SYSKEYDOWN:
+	case WM_KEYUP:
+	case WM_SYSKEYUP:
+	{
+		*event = new GMSystemKeyEvent();
+	}
+	}
+}

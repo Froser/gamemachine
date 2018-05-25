@@ -46,31 +46,31 @@ void Demo_NormalMap::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 }
 
-void Demo_NormalMap::event(gm::GameMachineEvent evt)
+void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
 	D_BASE(db, Base);
 	Base::event(evt);
 	switch (evt)
 	{
-	case gm::GameMachineEvent::FrameStart:
+	case gm::GameMachineHandlerEvent::FrameStart:
 		break;
-	case gm::GameMachineEvent::FrameEnd:
+	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Simulate:
 	{
 		if (d->rotate)
 			d->angle += .01f;
 		getDemoWorldReference()->simulateGameWorld();
 		break;
 	}
-	case gm::GameMachineEvent::Render:
+	case gm::GameMachineHandlerEvent::Render:
 		d->rotation = Rotate(Identity<GMQuat>(), d->angle, (GMVec3(0, 0, 1)));
 		d->gameObject->setRotation(d->rotation);
 		getDemoWorldReference()->renderScene();
 
 		break;
-	case gm::GameMachineEvent::Activate:
+	case gm::GameMachineHandlerEvent::Activate:
 	{
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
@@ -88,9 +88,9 @@ void Demo_NormalMap::event(gm::GameMachineEvent evt)
 		}
 		break;
 	}
-	case gm::GameMachineEvent::Deactivate:
+	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
-	case gm::GameMachineEvent::Terminate:
+	case gm::GameMachineHandlerEvent::Terminate:
 		break;
 	default:
 		break;

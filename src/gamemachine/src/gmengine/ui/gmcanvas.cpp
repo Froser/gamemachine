@@ -7,6 +7,7 @@
 #include "../gmtypoengine.h"
 #include "gmdata/gmmodel.h"
 #include "gmdata/glyph/gmglyphmanager.h"
+#include "foundation/gmmessage.h"
 
 GMCanvasResourceManager::GMCanvasResourceManager()
 {
@@ -197,6 +198,11 @@ bool GMCanvas::initControl(GMControl* control)
 	}
 
 	return control->onInit();
+}
+
+bool GMCanvas::msgProc(GMSystemEvent* event)
+{
+	return false;
 }
 
 void GMCanvas::render(GMfloat elpasedTime)

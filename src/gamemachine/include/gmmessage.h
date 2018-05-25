@@ -1,0 +1,1 @@
+﻿#include "../src/foundation/gmmessage.h"

@@ -19,7 +19,7 @@ public:
 
 public:
 	virtual void init() override;
-	virtual void event(gm::GameMachineEvent evt) override;
+	virtual void event(gm::GameMachineHandlerEvent evt) override;
 };
 
 #endif

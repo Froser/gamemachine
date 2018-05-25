@@ -5,7 +5,6 @@
 #include "gmglgraphic_engine.h"
 #include <regex>
 #include "foundation/gamemachine.h"
-#include <gmmessages.h>
 #include <linearmath.h>
 
 GLuint GMGLShaderProgram::Data::lastUsedProgram = -1;
@@ -171,9 +170,9 @@ void GMGLShaderProgram::load()
 
 			gm_error("Shader source: \n%s", report.c_str());
 			gm_error("Shader compilation failed: %s", log);
-			GameMachineMessage consoleMsg(GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR);
+			GMMessage consoleMsg(GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR);
 			GM.postMessage(consoleMsg);
-			GameMachineMessage crashMsg(GameMachineMessageType::CrashDown);
+			GMMessage crashMsg(GameMachineMessageType::CrashDown);
 			GM.postMessage(crashMsg);
 			delete[] log;
 			return;
@@ -195,9 +194,9 @@ void GMGLShaderProgram::load()
 		GLchar* log = new GLchar[len + 1];
 		glGetProgramInfoLog(program, len, &len, log);
 		gm_error("%s", log);
-		GameMachineMessage consoleMsg(GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR);
+		GMMessage consoleMsg(GameMachineMessageType::Console, GMM_CONSOLE_SELECT_FILTER, GMM_CONSOLE_ERROR);
 		GM.postMessage(consoleMsg);
-		GameMachineMessage crashMsg(GameMachineMessageType::CrashDown);
+		GMMessage crashMsg(GameMachineMessageType::CrashDown);
 		GM.postMessage(crashMsg);
 		delete[] log;
 #endif /* DEBUG */

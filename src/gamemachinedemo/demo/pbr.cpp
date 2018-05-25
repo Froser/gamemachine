@@ -169,24 +169,24 @@ void Demo_PBR::setDefaultLights()
 	}
 }
 
-void Demo_PBR::event(gm::GameMachineEvent evt)
+void Demo_PBR::event(gm::GameMachineHandlerEvent evt)
 {
 	D_BASE(db, Base);
 	D(d);
 	Base::event(evt);
 	switch (evt)
 	{
-	case gm::GameMachineEvent::FrameStart:
+	case gm::GameMachineHandlerEvent::FrameStart:
 		break;
-	case gm::GameMachineEvent::FrameEnd:
+	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Simulate:
 		getDemoWorldReference()->simulateGameWorld();
 		break;
-	case gm::GameMachineEvent::Render:
+	case gm::GameMachineHandlerEvent::Render:
 		getDemoWorldReference()->renderScene();
 		break;
-	case gm::GameMachineEvent::Activate:
+	case gm::GameMachineHandlerEvent::Activate:
 	{
 		handleMouseEvent();
 		handleDragging();
@@ -203,9 +203,9 @@ void Demo_PBR::event(gm::GameMachineEvent evt)
 		}
 		break;
 	}
-	case gm::GameMachineEvent::Deactivate:
+	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
-	case gm::GameMachineEvent::Terminate:
+	case gm::GameMachineHandlerEvent::Terminate:
 		break;
 	default:
 		break;

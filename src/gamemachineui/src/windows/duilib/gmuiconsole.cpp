@@ -2,7 +2,6 @@
 #include "gmuiconsole.h"
 #include <gamemachine.h>
 #include "gmuiconsole_ui.h"
-#include <gmmessages.h>
 
 enum
 {
@@ -220,7 +219,7 @@ void GMUIConsole::debug(const gm::GMString& msg)
 	insertText(Data::OutputType::Debug, msg);
 }
 
-bool GMUIConsole::event(const gm::GameMachineMessage& msg)
+bool GMUIConsole::event(const gm::GMMessage& msg)
 {
 	D(d);
 	centerWindow();

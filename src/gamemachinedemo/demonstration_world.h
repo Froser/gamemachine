@@ -35,7 +35,7 @@ public:
 	virtual bool isInited();
 	virtual void onActivate();
 	virtual void onDeactivate();
-	virtual void event(gm::GameMachineEvent evt);
+	virtual void event(gm::GameMachineHandlerEvent evt);
 
 protected:
 	virtual void setLookAt();
@@ -115,7 +115,7 @@ private:
 private:
 	virtual void init() override;
 	virtual void start() override;
-	virtual void event(gm::GameMachineEvent evt) override;
+	virtual void event(gm::GameMachineHandlerEvent evt) override;
 };
 
 inline gm::GMDemoGameWorld* asDemoGameWorld(gm::GMGameWorld* world)

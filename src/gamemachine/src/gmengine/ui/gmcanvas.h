@@ -8,6 +8,7 @@ class GMControl;
 class GMGameObject;
 class GMModel;
 class GMTextGameObject;
+class GMSystemEvent;
 
 GM_PRIVATE_OBJECT(GMCanvasResourceManager)
 {
@@ -88,6 +89,7 @@ public:
 	~GMCanvas();
 
 public:
+	bool msgProc(GMSystemEvent* event);
 	void render(GMfloat elpasedTime);
 	void addControl(GMControl* control);
 

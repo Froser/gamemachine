@@ -167,7 +167,7 @@ void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuff
 	GM_ASSERT(succeed);
 }
 
-bool GMDx11GraphicEngine::event(const GameMachineMessage& e)
+bool GMDx11GraphicEngine::event(const GMMessage& e)
 {
 	D(d);
 	switch (e.msgType)

@@ -193,7 +193,7 @@ GM_PRIVATE_OBJECT(GMObject)
 	GMConnectionTargets connectionTargets;
 };
 
-struct GameMachineMessage;
+struct GMMessage;
 //! 所有GameMachine对象的基类。
 /*!
   GMObject类型只有一个指向数据成员的指针，没有其它数据成员。其数据成员指针指向一个堆上分配的数据。由于只保存一个

@@ -84,7 +84,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	DXGI_ADAPTER_DESC adapterDesc = { 0 };
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = { 0 };
 	HRESULT hr;
-	gm::GameMachineMessage msg;
+	gm::GMMessage msg;
 
 	// COM objs
 	gm::GMComPtr<IDXGIFactory> dxgiFactory;

@@ -8,6 +8,7 @@
 #include <gmgamepackage.h>
 #include <gmcamera.h>
 #include <gmthread.h>
+#include <gmmessage.h>
 
 BEGIN_NS
 
@@ -44,7 +45,7 @@ enum class GMEndiannessMode
 */
 #define GM gm::GameMachine::instance()
 
-class GMCursorGameObject;
+class GMCanvas;
 
 //! 程序运行时的各种状态。
 /*!
@@ -93,15 +94,16 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMConfigs* statesManager = nullptr;
 	IGameHandler* gameHandler = nullptr;
 
-	GameMachineMessage lastMessage;
+	GMMessage lastMessage;
 
 	// 内置调试窗口，他们本质是同一个对象，所以不能重复释放
 	IWindow* consoleWindow = nullptr; 
 	IDebugOutput* consoleOutput = nullptr;
 
 	GMScopePtr<GMCamera> camera;
-	Queue<GameMachineMessage> messageQueue;
+	Queue<GMMessage> messageQueue;
 	Vector<IVirtualFunctionObject*> managerQueue;
+	Vector<GMCanvas*> canvases;
 
 	GMGameMachineRunningStates states;
 	GMConfigs configs;
@@ -225,7 +227,7 @@ public:
 	  \param msg 需要发送的GameMachine消息。
 	  \sa startGameMachine()
 	*/
-	void postMessage(GameMachineMessage msg);
+	void postMessage(GMMessage msg);
 
 	//! 获取最后一条GameMachine消息。
 	/*!
@@ -233,7 +235,7 @@ public:
 	在某些对象中，需要处理GameMachine的消息，如当窗口大小改变时处理对象中的一些行为，可以调用此方法获取消息。
 	  \return GameMachine消息。
 	*/
-	GameMachineMessage peekMessage();
+	GMMessage peekMessage();
 
 	//! 开始运行GameMachine。
 	/*!
@@ -258,18 +260,34 @@ public:
 		d->states = states;
 	}
 
+	//! 注册一个画布到系统消息循环。
+	/*!
+	  GameMachine不会管理被注册的画布的生命周期，如果画布被析构，一定要记得在合适的时机释放画布。
+	  \param canvas 待注册的画布。
+	*/
+	void registerCanvas(GMCanvas* canvas);
+
+	//! 触发所有被注册的画布的消息处理事件。
+	/*!
+	  通过此方法，使得被注册的画布有了处理系统消息的时机。一般不需要手动调用此方法，因为GMUIGameMachineWindowBase会调用它。
+	  \return 是否已经处理了此消息。如果返回true，则此消息不会再继续传递。
+	*/
+	bool dispatchMessageToCanvases(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes);
+
+
 private:
 	void runEventLoop();
 	bool renderFrame();
 	template <typename T, typename U> void registerManager(T* newObject, OUT U** manager);
 	void terminate();
 	bool handleMessages();
-	bool handleMessage(const GameMachineMessage& msg);
+	bool handleMessage(const GMMessage& msg);
 	void updateGameMachineRunningStates();
 	void setRenderEnvironment(GMRenderEnvironment renv);
 	bool checkCrashDown();
 	void handlerEvents();
 	void updateManagers();
+	void translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes, OUT GMSystemEvent** event);
 };
 
 END_NS

@@ -45,7 +45,7 @@ public:
 	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
 	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
-	virtual bool event(const GameMachineMessage& e) override;
+	virtual bool event(const GMMessage& e) override;
 	virtual IFramebuffers* getDefaultFramebuffers() override;
 	virtual IRenderer* getRenderer(GMModelType objectType) override;
 

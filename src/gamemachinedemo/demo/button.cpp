@@ -22,21 +22,21 @@ void Demo_Button::init()
 	initBorder();
 }
 
-void Demo_Button::event(gm::GameMachineEvent evt)
+void Demo_Button::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
 	D_BASE(db, Base);
 	Base::event(evt);
 	switch (evt)
 	{
-	case gm::GameMachineEvent::FrameStart:
+	case gm::GameMachineHandlerEvent::FrameStart:
 		break;
-	case gm::GameMachineEvent::FrameEnd:
+	case gm::GameMachineHandlerEvent::FrameEnd:
 		break;
-	case gm::GameMachineEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Simulate:
 		getDemoWorldReference()->simulateGameWorld();
 		break;
-	case gm::GameMachineEvent::Render:
+	case gm::GameMachineHandlerEvent::Render:
 	{
 		for (gm::GMint i = 0; i < GM_array_size(d->buttons); ++i)
 		{
@@ -46,12 +46,12 @@ void Demo_Button::event(gm::GameMachineEvent evt)
 		getDemoWorldReference()->renderScene();
 		break;
 	}
-	case gm::GameMachineEvent::Activate:
+	case gm::GameMachineHandlerEvent::Activate:
 		getDemoWorldReference()->notifyControls();
 		break;
-	case gm::GameMachineEvent::Deactivate:
+	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
-	case gm::GameMachineEvent::Terminate:
+	case gm::GameMachineHandlerEvent::Terminate:
 		break;
 	default:
 		break;

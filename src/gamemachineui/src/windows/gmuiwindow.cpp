@@ -188,7 +188,7 @@ bool GMUIGameMachineWindowBase::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM l
 		break;
 	case WM_SIZE:
 	{
-		gm::GameMachine::instance().postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
+		GM.postMessage({ gm::GameMachineMessageType::WindowSizeChanged });
 		break;
 	}
 	case WM_MOUSEWHEEL:
@@ -236,6 +236,9 @@ bool GMUIGameMachineWindowBase::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM l
 	default:
 		break;
 	}
+
+	if (GM.dispatchMessageToCanvases(uMsg, wParam, lParam, lRes))
+		return true;
 
 	*lRes = ::DefWindowProc(getWindowHandle(), uMsg, wParam, lParam);
 	return true;

@@ -32,7 +32,7 @@ public:
 	virtual void centerWindow() override;
 	virtual bool isWindowActivate() override;
 	virtual void setLockWindow(bool lock) override;
-	virtual bool event(const gm::GameMachineMessage& msg) override { return false; }
+	virtual bool event(const gm::GMMessage& msg) override { return false; }
 	virtual gm::GMWindowHandle getWindowHandle() const { D(d); return d->hwnd; }
 	virtual bool getInterface(gm::GameMachineInterfaceID id, void** out) { return false; }
 	virtual bool setInterface(gm::GameMachineInterfaceID id, void* in) { return false; }

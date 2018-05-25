@@ -102,7 +102,7 @@ public:
 
 	// GMObject
 public:
-	virtual bool event(const gm::GameMachineMessage& msg) override;
+	virtual bool event(const gm::GMMessage& msg) override;
 
 private:
 	void insertText(Data::OutputType type, const gm::GMString& msg);

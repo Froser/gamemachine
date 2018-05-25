@@ -59,27 +59,27 @@ void Demo_Quake3_BSP::init()
 	d->sprite = d->world->getSprite();
 }
 
-void Demo_Quake3_BSP::event(gm::GameMachineEvent evt)
+void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
 	D_BASE(db, Base);
 	Base::event(evt);
 	switch (evt)
 	{
-	case gm::GameMachineEvent::Simulate:
+	case gm::GameMachineHandlerEvent::Simulate:
 	{
 		d->world->simulateGameWorld();
 		// 更新Camera
 		GM.getCamera().synchronize(d->sprite);
 		break;
 	}
-	case gm::GameMachineEvent::Render:
+	case gm::GameMachineHandlerEvent::Render:
 	{
 		GM.getCamera().synchronizeLookAt();
 		d->world->renderScene();
 		break;
 	}
-	case gm::GameMachineEvent::Activate:
+	case gm::GameMachineHandlerEvent::Activate:
 	{
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		static gm::GMfloat mouseSensitivity = 0.25f;

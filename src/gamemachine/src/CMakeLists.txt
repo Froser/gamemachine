@@ -119,7 +119,6 @@ set(SOURCES
 		foundation/utilities/utilities.cpp
 		foundation/input.h
 		foundation/defines.h
-		foundation/gmmessages.h
 		foundation/debug.h
 		foundation/debug.cpp
 		foundation/assert.h
@@ -144,6 +143,8 @@ set(SOURCES
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
 		foundation/gmstring.cpp
+		foundation/gmmessage.h
+		foundation/gmmessage.cpp
 		foundation/gmenums.h
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
