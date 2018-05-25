@@ -52,6 +52,7 @@ void GameMachine::init(
 	d->consoleOutput = consoleHandle.dbgoutput;
 	GMDebugger::setDebugOutput(d->consoleOutput);
 
+	d->clock.begin();
 	handleMessages();
 	updateGameMachineRunningStates();
 	d->gameHandler->init();
@@ -121,9 +122,6 @@ void GameMachine::startGameMachine()
 		d->gameHandler->start();
 	else
 		terminate();
-
-	// 开始计时器
-	d->clock.begin();
 
 	// 消息循环
 	runEventLoop();
@@ -289,5 +287,7 @@ void GameMachine::updateGameMachineRunningStates()
 	if (mainWindow)
 	{
 		d->states.renderRect = mainWindow->getRenderRect();
+		d->states.elapsedTime = d->clock.getTime();
+		d->states.fps = d->clock.getFps();
 	}
 }

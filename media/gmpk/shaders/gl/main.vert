@@ -5,7 +5,7 @@
 // VERTEX
 #include "model2d.vert"
 #include "model3d.vert"
-#include "glyph.vert"
+#include "text.vert"
 #include "cubemap.vert"
 #include "shadow.vert"
 

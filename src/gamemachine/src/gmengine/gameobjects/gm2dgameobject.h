@@ -9,6 +9,12 @@ BEGIN_NS
 
 struct ITypoEngine;
 
+enum GMTextColorType
+{
+	Plain,
+	ByScript,
+};
+
 GM_PRIVATE_OBJECT(GMTextGameObject)
 {
 	bool dirty = true;
@@ -19,6 +25,8 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;
 	GMModel* model = nullptr;
+	GMTextColorType colorType = ByScript;
+	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 };
 
 class GMTextGameObject : public GMGameObject
@@ -33,6 +41,8 @@ public:
 public:
 	void setText(const GMString& text);
 	void setGeometry(const GMRect& geometry);
+	void setColorType(GMTextColorType type);
+	void setColor(const GMVec4& color);
 
 public:
 	virtual void onAppendingObjectToWorld() override;
@@ -41,6 +51,7 @@ public:
 private:
 	void update();
 	GMModel* createModel();
+	void setShader(GMShader& shader);
 	void updateVertices(GMModel* model);
 
 public:

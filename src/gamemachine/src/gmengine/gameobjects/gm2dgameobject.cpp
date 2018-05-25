@@ -74,6 +74,37 @@ void GMTextGameObject::setGeometry(const GMRect& geometry)
 	}
 }
 
+void GMTextGameObject::setColorType(GMTextColorType type)
+{
+	D(d);
+	if (d->colorType != type)
+	{
+		d->dirty = true;
+		d->colorType = type;
+	}
+}
+
+void GMTextGameObject::setColor(const GMVec4& color)
+{
+	D(d);
+	if (d->colorType != GMTextColorType::Plain)
+	{
+		gm_error("Please set color type to GMTextColorType::Plain before you set color. Otherwise it won't work.");
+		GM_ASSERT(false);
+	}
+
+	GMFloat4 colorCache;
+	color.loadFloat4(colorCache);
+	if (colorCache[0] != d->color[0] ||
+		colorCache[1] != d->color[1] ||
+		colorCache[2] != d->color[2] || 
+		colorCache[3] != d->color[3])
+	{
+		d->dirty = true;
+		d->color = colorCache;
+	}
+}
+
 void GMTextGameObject::onAppendingObjectToWorld()
 {
 	update();
@@ -82,8 +113,9 @@ void GMTextGameObject::onAppendingObjectToWorld()
 
 void GMTextGameObject::draw()
 {
+	D(d);
 	update();
-	GMGameObject::draw();
+	drawModel(d->model);
 }
 
 void GMTextGameObject::update()
@@ -111,9 +143,10 @@ GMModel* GMTextGameObject::createModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
-	model->setType(GMModelType::Model2D);
+	model->setType(GMModelType::Text);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
-	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	setShader(model->getShader());
 
 	GMMesh* mesh = new GMMesh(model);
 	GMsize_t len = d->text.length() * 6; //每个字符，用6个顶点来渲染
@@ -123,6 +156,20 @@ GMModel* GMTextGameObject::createModel()
 	}
 	GM.createModelDataProxyAndTransfer(model);
 	return model;
+}
+
+void GMTextGameObject::setShader(GMShader& shader)
+{
+	GMGlyphManager* glyphManager = GM.getGlyphManager();
+	auto& frame = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
+	frame.setMinFilter(GMS_TextureFilter::LINEAR);
+	frame.setMagFilter(GMS_TextureFilter::LINEAR);
+	frame.addFrame(glyphManager->glyphTexture());
+	shader.setNoDepthTest(true);
+	shader.setCull(GMS_Cull::NONE);
+	shader.setBlend(true);
+	shader.setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
+	shader.setBlendFactorDest(GMS_BlendFunc::ONE);
 }
 
 void GMTextGameObject::updateVertices(GMModel* model)
@@ -141,6 +188,8 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		options.typoArea.height = coord.height * rect.height * .5f;
 
 		GM_ASSERT(typoEngine);
+		const GMfloat *pResultColor = ValuePointer(d->color);
+
 		GMTypoIterator iter = typoEngine->begin(d->text, options);
 		for (; iter != typoEngine->end(); ++iter)
 		{
@@ -149,6 +198,8 @@ void GMTextGameObject::updateVertices(GMModel* model)
 				continue;
 
 			const GMGlyphInfo& glyph = *typoResult.glyph;
+			if (d->colorType == GMTextColorType::ByScript)
+				pResultColor = typoResult.color;
 
 			if (glyph.width > 0 && glyph.height > 0)
 			{
@@ -161,40 +212,40 @@ void GMTextGameObject::updateVertices(GMModel* model)
 				// 采用左上角为原点的Texcoord坐标系
 
 				GMVertex V0 = {
-					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ coord.x - coord.width * .5f + X(typoResult.x), coord.y + coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x), UV_Y(glyph.y) },
 					{ 0, 0, 0 },
 					{ 0, 0, 0 },
 					{ 0, 0 },
-					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 				GMVertex V1 = {
-					{ -coord.width * .5f + X(typoResult.x), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ coord.x - coord.width * .5f + X(typoResult.x), coord.y + coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
 					{ 0, 0, 0 },
 					{ 0, 0, 0 },
 					{ 0, 0 },
-					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 				GMVertex V2 = {
-					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ coord.x - coord.width * .5f + X(typoResult.x + typoResult.width), coord.y + coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
 					{ 0, 0, 0 },
 					{ 0, 0, 0 },
 					{ 0, 0 },
-					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 				GMVertex V3 = {
-					{ -coord.width * .5f + X(typoResult.x + typoResult.width), coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ coord.x - coord.width * .5f + X(typoResult.x + typoResult.width), coord.y + coord.height * .5f - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
 					{ 0, 0, 0 },
 					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
 					{ 0, 0, 0 },
 					{ 0, 0, 0 },
 					{ 0, 0 },
-					{ typoResult.color[0], typoResult.color[1], typoResult.color[2] }
+					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 
 				vertices.push_back(V0);
@@ -208,7 +259,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 	END_GLYPH_XY()
 
 	// 已经得到所有顶点，更新到GPU
-	GM_ASSERT(vertices.size() < d->text.length() * 6);
+	GM_ASSERT(vertices.size() <= d->text.length() * 6);
 	size_t vertexCount = vertices.size();
 	model->setVerticesCount(vertexCount);
 
@@ -231,7 +282,6 @@ GMRectF GMTextGameObject::toViewportRect(const GMRect& rc)
 		rc.height * 2.f / client.height
 	};
 	return out;
-
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -267,7 +317,7 @@ void GMGlyphObject::constructModel()
 	D(d);
 	GMModel* model = new GMModel();
 	model->setUsageHint(GMUsageHint::DynamicDraw);
-	model->setType(GMModelType::Glyph);
+	model->setType(GMModelType::Text);
 	GMMesh* mesh = new GMMesh(model);
 	onCreateShader(model->getShader());
 	createVertices(mesh);

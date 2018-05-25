@@ -142,8 +142,9 @@ void GMCanvas::drawText(
 
 	// TODO 先不考虑阴影什么的
 	const GMVec4& fontColor = element->getFontColor().getCurrent();
-
 	GMTextGameObject* textObject = d->manager->getTextObject();
+	textObject->setColorType(Plain);
+	textObject->setColor(fontColor);
 	textObject->setText(text);
 	textObject->setGeometry(rcDest);
 	textObject->draw();
@@ -156,9 +157,8 @@ void GMCanvas::initDefaultElements()
 	// Static
 	element.setFont(0);
 
-	GMElementBlendColor blendColor;
-	blendColor.getStates()[(GMuint)GMControlState::Disabled] = GMVec4(.87f, .87f, .87f, .87f);
-	element.setFontColor(blendColor);
+	GMVec4 blendColor = GMVec4(.87f, .87f, .87f, .87f);
+	element.setFontColor(GMControlState::Disabled, blendColor);
 
 	setDefaultElement(GMControlType::Static, 0, &element);
 }
@@ -204,7 +204,7 @@ void GMCanvas::render(GMfloat elpasedTime)
 	D(d);
 	if (d->timeLastRefresh < s_timeRefresh)
 	{
-		d->timeLastRefresh = GM.getGameTimeSeconds();
+		d->timeLastRefresh = GM.getGameMachineRunningStates().elapsedTime;
 		refresh();
 	}
 

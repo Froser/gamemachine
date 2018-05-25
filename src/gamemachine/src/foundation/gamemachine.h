@@ -56,6 +56,8 @@ struct GMGameMachineRunningStates
 	// 每一帧更新的内容
 	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
 	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
+	GMfloat elapsedTime = 0; //!< 程序运行到现在为止的时间，单位是秒。
+	GMfloat fps = 0; //!< 程序当前的帧率。
 	bool crashDown = false; //!< 程序是否已崩溃。当遇到不可恢复的错误时，此项为true。
 
 	// 由GameMachine生成
@@ -187,20 +189,6 @@ public:
 	  \return 程序主相机。
 	*/
 	GMCamera& getCamera() { D(d); return *d->camera; }
-
-	//! 获取当前帧率。
-	/*!
-	  帧率等于1秒钟内的绘制次数。在控制最高帧率的情况下，最高帧率被设置为60fps。
-	  \return 程序当前帧数。
-	*/
-	inline GMfloat getFPS() { D(d); return d->clock.getFps(); }
-
-	//! 获取程序运行时间
-	/*!
-	  获取程序第一次消息循环到目前为止的运行时间，以秒为单位。
-	  \return 程序运行时间。
-	*/
-	inline GMfloat getGameTimeSeconds() { D(d); return d->clock.getTime(); }
 
 	//! 获取程序当前的运行时状态。
 	/*!

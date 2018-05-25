@@ -33,6 +33,9 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 		GM_ASSERT(d->deviceContext);
 	}
 
+	if (!d->texture)
+		glyphTexture();
+
 	D3D11_BOX box = {
 		(UINT)glyphInfo.x, //left
 		(UINT)glyphInfo.y, //top
@@ -41,6 +44,7 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 		(UINT)(glyphInfo.y + glyphInfo.height), //bottom
 		1 //back
 	};
+	
 	d->deviceContext->UpdateSubresource(
 		d->texture->getD3D11Texture(),
 		0,

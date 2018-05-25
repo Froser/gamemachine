@@ -28,6 +28,7 @@ namespace
 {
 	void loadDemostrations(DemostrationWorld* world)
 	{
+		/*
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
 		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
 		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
@@ -42,6 +43,7 @@ namespace
 		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
 		world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
 		world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
+		*/
 		world->init();
 	}
 }
@@ -239,7 +241,8 @@ void DemostrationWorld::init()
 	GM_delete(img);
 
 	d->mainCanvas = new gm::GMCanvas(new gm::GMCanvasResourceManager());
-	d->mainCanvas->addStatic(-1, "Hello world", 600, 800, 100, 100, false, nullptr);
+	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
+	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
 }
 
 void DemostrationWorld::switchDemo()
@@ -322,7 +325,7 @@ void DemostrationEntrance::event(gm::GameMachineEvent evt)
 			break;
 		case gm::GameMachineEvent::Render:
 			getWorld()->renderScene();
-			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().lastFrameElpased);
+			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().elapsedTime);
 			break;
 		case gm::GameMachineEvent::Activate:
 		{

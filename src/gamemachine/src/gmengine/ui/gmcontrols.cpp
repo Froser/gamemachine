@@ -7,17 +7,17 @@ void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disable
 	D(d);
 	GM_FOREACH_ENUM_CLASS(state, GMControlState::Normal, GMControlState::EndOfControlState)
 	{
-		d->states[(GMuint)state] = defaultColor;
+		d->states[state] = defaultColor;
 	};
-	d->states[(GMuint)GMControlState::Disabled] = disabledColor;
-	d->states[(GMuint)GMControlState::Hidden] = hiddenColor;
+	d->states[GMControlState::Disabled] = disabledColor;
+	d->states[GMControlState::Hidden] = hiddenColor;
 	d->current = hiddenColor;
 }
 
-void GMElementBlendColor::blend(GMControlState state, GMfloat elapsedTime, GMfloat rate)
+void GMElementBlendColor::blend(GMControlState::State state, GMfloat elapsedTime, GMfloat rate)
 {
 	D(d);
-	GMVec4 destColor = d->states[(GMuint)state];
+	GMVec4 destColor = d->states[state];
 	d->current = Lerp(d->current, destColor, Pow(rate, 30 * elapsedTime));
 }
 
@@ -28,10 +28,10 @@ void GMElement::setFont(GMuint font, const GMVec4& defaultColor)
 	d->fontColor.init(defaultColor);
 }
 
-void GMElement::setFontColor(const GMElementBlendColor& color)
+void GMElement::setFontColor(GMControlState::State state, const GMVec4& color)
 {
 	D(d);
-	d->fontColor = color;
+	d->fontColor.getStates()[state] = color;
 }
 
 void GMElement::setTextureColor(const GMElementBlendColor& color)
@@ -43,8 +43,8 @@ void GMElement::setTextureColor(const GMElementBlendColor& color)
 void GMElement::refresh()
 {
 	D(d);
-	d->textureColor.setCurrent(d->textureColor.getStates()[(GMuint)GMControlState::Hidden]);
-	d->fontColor.setCurrent(d->fontColor.getStates()[(GMuint)GMControlState::Hidden]);
+	d->textureColor.setCurrent(d->textureColor.getStates()[GMControlState::Hidden]);
+	d->fontColor.setCurrent(d->fontColor.getStates()[GMControlState::Hidden]);
 }
 
 GMControl::GMControl(GMCanvas* canvas)
@@ -120,13 +120,13 @@ void GMControlStatic::render(GMfloat elapsed)
 	if (!db->visible)
 		return;
 
-	GMControlState state = GMControlState::Normal;
+	GMControlState::State state = GMControlState::Normal;
 	if (db->enabled == false)
 		state = GMControlState::Disabled;
 
 	GM_ASSERT(!db->elements.empty());
 	GMElement* element = db->elements[0];
-	element->getTextureColor().blend(state, elapsed);
+	element->getFontColor().blend(state, elapsed);
 	db->canvas->drawText(d->text, element, db->rcBoundingBox, false, -1, false);
 }
 

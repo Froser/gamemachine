@@ -51,6 +51,9 @@ private:
 		d->transformMatrix = d->scaling * QuatToMatrix(d->rotation) * d->translation;
 	}
 
+protected:
+	virtual void drawModel(GMModel* model);
+
 public:
 	virtual void setScaling(const GMMat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }
 	virtual void setTranslation(const GMMat4& translation) { D(d); d->translation = translation; updateMatrix(); }

@@ -96,8 +96,8 @@ namespace
 			return "GM_Model2D";
 		case GMModelType::Model3D:
 			return "GM_Model3D";
-		case GMModelType::Glyph:
-			return "GM_Glyph";
+		case GMModelType::Text:
+			return "GM_Text";
 		case GMModelType::CubeMap:
 			return "GM_CubeMap";
 		default:
@@ -287,7 +287,7 @@ void GMGLRenderer::activateTextureTransform(GMModel* model, GMTextureType type)
 	};
 
 	if (model)
-		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameMachineRunningStates().elapsedTime, applyCallback);
 }
 
 GMint GMGLRenderer::activateTexture(GMModel* model, GMTextureType type)
@@ -379,7 +379,7 @@ ITexture* GMGLRenderer::getTexture(GMTextureSampler& frames)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GM.getGameTimeSeconds() * 1000;
+	GMint elapsed = GM.getGameMachineRunningStates().elapsedTime * 1000;
 
 	return frames.getFrameByIndex((elapsed / frames.getAnimationMs()) % frames.getFrameCount());
 }

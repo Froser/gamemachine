@@ -189,6 +189,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 {
 	D(d);
 	d->options = options;
+	d->current_x = d->current_y = 0;
 	setFontSize(d->options.defaultFontSize);
 	d->literature = literature.toStdWString();
 

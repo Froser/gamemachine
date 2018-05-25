@@ -213,7 +213,7 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	D(d);
 	static GMDx11Renderer_3D s_renderer_3d;
 	static GMDx11Renderer_2D s_renderer_2d;
-	static GMDx11Renderer_Glyph s_renderer_glyph;
+	static GMDx11Renderer_Text s_renderer_text;
 	static GMDx11Renderer_CubeMap s_renderer_cubemap;
 	static GMDx11Renderer_Filter s_renderer_filter;
 	static GMDx11Renderer_Deferred_3D s_renderer_deferred_3d;
@@ -223,8 +223,8 @@ IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 	{
 	case GMModelType::Model2D:
 		return &s_renderer_2d;
-	case GMModelType::Glyph:
-		return &s_renderer_glyph;
+	case GMModelType::Text:
+		return &s_renderer_text;
 	case GMModelType::Model3D:
 		if (isDrawingShadow())
 			return &s_renderer_3d_shadow;

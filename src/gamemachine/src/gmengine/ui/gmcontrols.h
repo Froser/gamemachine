@@ -5,21 +5,24 @@ BEGIN_NS
 
 class GMCanvas;
 
-enum class GMControlState
+struct GMControlState
 {
-	Normal,
-	Disabled,
-	Hidden,
-	Focus,
-	Mouseover,
-	Pressed,
+	enum State
+	{
+		Normal,
+		Disabled,
+		Hidden,
+		Focus,
+		Mouseover,
+		Pressed,
 
-	EndOfControlState,
+		EndOfControlState,
+	};
 };
 
 GM_PRIVATE_OBJECT(GMElementBlendColor)
 {
-	GMVec4 states[(GMuint)GMControlState::EndOfControlState];
+	GMVec4 states[GMControlState::EndOfControlState];
 	GMVec4 current;
 };
 
@@ -33,7 +36,7 @@ public:
 
 public:
 	void init(const GMVec4& defaultColor, const GMVec4& disabledColor = GMVec4(.5f, .5f, .5f, .78f), const GMVec4& hiddenColor = GMVec4(0));
-	void blend(GMControlState state, GMfloat elapsedTime, GMfloat rate = .7f);
+	void blend(GMControlState::State state, GMfloat elapsedTime, GMfloat rate = .7f);
 
 public:
 	inline const GMVec4& getCurrent()
@@ -75,7 +78,7 @@ public:
 public:
 	void setTexture(GMuint texture, const GMRect& rc);
 	void setFont(GMuint font, const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
-	void setFontColor(const GMElementBlendColor& color);
+	void setFontColor(GMControlState::State state, const GMVec4& color);
 	void setTextureColor(const GMElementBlendColor& color);
 	void refresh();
 

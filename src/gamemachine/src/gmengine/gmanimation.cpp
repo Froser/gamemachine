@@ -54,7 +54,7 @@ void GMAnimation::resume()
 void GMAnimation::update()
 {
 	D(d);
-	GMfloat now = GM.getGameTimeSeconds();
+	GMfloat now = GM.getGameMachineRunningStates().elapsedTime;
 
 	decltype(std::mem_fn(&GMGameObject::setScaling)) transformFunSetList[] = {
 		std::mem_fn(&GMGameObject::setScaling),
@@ -177,7 +177,7 @@ void GMAnimation::startAnimation(GMAnimationTypes::Types type)
 {
 	D(d);
 	GMAnimationState& state = d->animationStates[type];
-	state.tick = GM.getGameTimeSeconds();
+	state.tick = GM.getGameMachineRunningStates().elapsedTime;
 	state.direction = 1;
 
 	d->canReverse = d->canResume = true;

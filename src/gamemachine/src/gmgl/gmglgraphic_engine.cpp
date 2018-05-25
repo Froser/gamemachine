@@ -204,7 +204,7 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
-	case GMModelType::Glyph:
+	case GMModelType::Text:
 		return &s_renderer_2d;
 	case GMModelType::Model3D:
 		if (db->isDrawingShadow)

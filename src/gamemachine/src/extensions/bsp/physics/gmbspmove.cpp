@@ -102,7 +102,7 @@ void GMBSPMove::applyJump(const GMVec3& speed)
 GMfloat GMBSPMove::now()
 {
 	D(d);
-	return GameMachine::instance().getGameTimeSeconds();
+	return GM.getGameMachineRunningStates().elapsedTime;
 }
 
 void GMBSPMove::generateMovement()

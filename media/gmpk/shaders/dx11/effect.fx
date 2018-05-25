@@ -761,7 +761,7 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 //--------------------------------------------------------------------------------------
 // 2D
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS_Flat(VS_INPUT input)
+VS_OUTPUT VS_2D(VS_INPUT input)
 {
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
@@ -774,11 +774,6 @@ VS_OUTPUT VS_Flat(VS_INPUT input)
     output.Lightmap = input.Lightmap;
     output.Color = input.Color;
     return output;
-}
-
-VS_OUTPUT VS_2D(VS_INPUT input)
-{
-    return VS_Flat(input);
 }
 
 float4 PS_2D(PS_INPUT input) : SV_TARGET
@@ -795,12 +790,22 @@ float4 PS_2D(PS_INPUT input) : SV_TARGET
 //--------------------------------------------------------------------------------------
 // Glyph
 //--------------------------------------------------------------------------------------
-VS_OUTPUT VS_Glyph(VS_INPUT input)
+VS_OUTPUT VS_Text(VS_INPUT input)
 {
-    return VS_Flat(input);
+    VS_OUTPUT output;
+    output.Position.xy = input.Position.xy;
+    output.Position.z = 0;
+    output.Position.w = 1;
+    output.Normal = input.Normal;
+    output.Texcoord = input.Texcoord;
+    output.Tangent = input.Tangent;
+    output.Bitangent = input.Bitangent;
+    output.Lightmap = input.Lightmap;
+    output.Color = input.Color;
+    return output;
 }
 
-float4 PS_Glyph(PS_INPUT input) : SV_TARGET
+float4 PS_Text(PS_INPUT input) : SV_TARGET
 {
     float4 alpha = GM_AmbientTexture.Sample(GM_AmbientSampler, input.Texcoord);
     return float4(input.Color.r, input.Color.g, input.Color.b, alpha.r);
@@ -1279,12 +1284,12 @@ technique11 GMTech_2D
     }
 }
 
-technique11 GMTech_Glyph
+technique11 GMTech_Text
 {
     pass P0
     {
-        SetVertexShader(CompileShader(vs_5_0,VS_Glyph()));
-        SetPixelShader(CompileShader(ps_5_0,PS_Glyph()));
+        SetVertexShader(CompileShader(vs_5_0,VS_Text()));
+        SetPixelShader(CompileShader(ps_5_0,PS_Text()));
         SetRasterizerState(GM_RasterizerState);
         SetDepthStencilState(GM_DepthStencilState, 1);
         SetBlendState(GM_BlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

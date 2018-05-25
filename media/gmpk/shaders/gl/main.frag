@@ -7,7 +7,7 @@
 // FRAGMENT
 #include "model2d.frag"
 #include "model3d.frag"
-#include "glyph.frag"
+#include "text.frag"
 #include "cubemap.frag"
 #include "shadow.frag"
 

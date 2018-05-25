@@ -108,11 +108,11 @@ class GMDx11Renderer_2D : public GMDx11Renderer
 	virtual void prepareTextures(GMModel* model);
 };
 
-class GMDx11Renderer_Glyph : public GMDx11Renderer
+class GMDx11Renderer_Text : public GMDx11Renderer
 {
 	virtual const char* getTechniqueName() override
 	{
-		return "GMTech_Glyph";
+		return "GMTech_Text";
 	}
 };
 

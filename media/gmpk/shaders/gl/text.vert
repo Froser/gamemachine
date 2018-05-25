@@ -1,7 +1,7 @@
 subroutine (GM_TechniqueEntrance)
-void GM_Glyph(void)
+void GM_Text(void)
 {
-    gl_Position = GM_WorldMatrix * position;
+    gl_Position = position;
     _uv = uv;
     _color = color;
 }

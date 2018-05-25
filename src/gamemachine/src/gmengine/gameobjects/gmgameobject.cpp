@@ -65,17 +65,10 @@ GMGameWorld* GMGameObject::getWorld()
 
 void GMGameObject::draw()
 {
-	IGraphicEngine* engine = GM.getGraphicEngine();
 	GMModels models = getModels();
 	for (auto model : models)
 	{
-		if (model->getShader().getDiscard())
-			return;
-
-		IRenderer* renderer = engine->getRenderer(model->getType());
-		renderer->beginModel(model, this);
-		renderer->draw(model);
-		renderer->endModel();
+		drawModel(model);
 	}
 }
 
@@ -88,6 +81,18 @@ bool GMGameObject::canDeferredRendering()
 			return false;
 	}
 	return true;
+}
+
+void GMGameObject::drawModel(GMModel* model)
+{
+	static IGraphicEngine* engine = GM.getGraphicEngine();
+	if (model->getShader().getDiscard())
+		return;
+
+	IRenderer* renderer = engine->getRenderer(model->getType());
+	renderer->beginModel(model, this);
+	renderer->draw(model);
+	renderer->endModel();
 }
 
 GMCubeMapGameObject::GMCubeMapGameObject(ITexture* texture)

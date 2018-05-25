@@ -718,8 +718,8 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 	if (texture)
 	{
 		GM_DX_HR(bank->enabled->SetBool(TRUE));
-		GM_DX_HR(bank->offsetX->SetFloat(1.f));
-		GM_DX_HR(bank->offsetY->SetFloat(1.f));
+		GM_DX_HR(bank->offsetX->SetFloat(0.f));
+		GM_DX_HR(bank->offsetY->SetFloat(0.f));
 		GM_DX_HR(bank->scaleX->SetFloat(1.f));
 		GM_DX_HR(bank->scaleY->SetFloat(1.f));
 
@@ -740,7 +740,7 @@ void GMDx11Renderer::applyTextureAttribute(GMModel* model, ITexture* texture, GM
 			}
 		};
 
-		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameTimeSeconds(), applyCallback);
+		model->getShader().getTextureList().getTextureSampler(type).applyTexMode(GM.getGameMachineRunningStates().elapsedTime, applyCallback);
 	}
 	else
 	{
@@ -890,7 +890,7 @@ ITexture* GMDx11Renderer::getTexture(GMTextureSampler& sampler)
 
 	// 如果frameCount > 1，说明是个动画，要根据Shader的间隔来选择合适的帧
 	// TODO
-	GMint elapsed = GM.getGameTimeSeconds() * 1000;
+	GMint elapsed = GM.getGameMachineRunningStates().elapsedTime * 1000;
 
 	return sampler.getFrameByIndex((elapsed / sampler.getAnimationMs()) % sampler.getFrameCount());
 }
