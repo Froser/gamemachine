@@ -9,6 +9,48 @@
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "foundation/gmmessage.h"
 
+namespace
+{
+	GMControl* getNextControl(GMControl* control)
+	{
+		GMCanvas* parentCanvas = control->getParent();
+		GMuint index = control->getIndex() + 1;
+
+		// 如果下一个控件不在此画布内，则跳到下一个画布进行查找
+		while (index >= (GMuint)parentCanvas->getControls().size())
+		{
+			parentCanvas = parentCanvas->getNextCanvas();
+			index = 0;
+		}
+
+		return parentCanvas->getControls()[index];
+	}
+
+	GMControl* getPrevControl(GMControl* control)
+	{
+		GMCanvas* parentCanvas = control->getParent();
+		GMuint index = control->getIndex() - 1;
+		while (index < 0)
+		{
+			parentCanvas = parentCanvas->getPrevCanvas();
+			if (!parentCanvas)
+				parentCanvas = control->getParent();
+			index = parentCanvas->getControls().size() - 1;
+		}
+		return parentCanvas->getControls()[index];
+	}
+
+	GMsize_t indexOf(const Vector<GMCanvas*>& canvases, GMCanvas* targetCanvas)
+	{
+		for (GMsize_t i = 0; i < canvases.size(); ++i)
+		{
+			if (canvases[i] == targetCanvas)
+				return i;
+		}
+		return -1;
+	}
+}
+
 GMCanvasResourceManager::GMCanvasResourceManager()
 {
 	D(d);
@@ -61,6 +103,23 @@ void GMCanvasResourceManager::addTexture(ITexture* texture)
 	d->textureCache.push_back(texture);
 }
 
+void GMCanvasResourceManager::registerCanvas(GMCanvas* canvas)
+{
+	D(d);
+	for (auto c : d->canvases)
+	{
+		if (c == canvas)
+			return;
+	}
+
+	// 将Canvas设置成一个还
+	GMsize_t sz = d->canvases.size();
+	d->canvases.push_back(canvas);
+	if (sz > 1)
+		d->canvases[sz - 2]->setNextCanvas(canvas);
+	d->canvases[sz - 1]->setNextCanvas(d->canvases[0]);
+}
+
 ITexture* GMCanvasResourceManager::getTexture(size_t i)
 {
 	D(d);
@@ -83,6 +142,7 @@ GMCanvas::GMCanvas(GMCanvasResourceManager* manager)
 {
 	D(d);
 	d->manager = manager;
+	d->nextCanvas = d->prevCanvas = this;
 	initDefaultElements();
 }
 
@@ -200,8 +260,107 @@ bool GMCanvas::initControl(GMControl* control)
 	return control->onInit();
 }
 
+void GMCanvas::setPrevCanvas(GMCanvas* prevCanvas)
+{
+	D(d);
+	d->prevCanvas = prevCanvas;
+}
+
 bool GMCanvas::msgProc(GMSystemEvent* event)
 {
+	D(d);
+	GMSystemEventType type = event->getType();
+	switch (type)
+	{
+	case GMSystemEventType::KeyDown:
+	case GMSystemEventType::KeyUp:
+	{
+		GMSystemKeyEvent* keyEvent = gm_cast<GMSystemKeyEvent*>(event);
+		if (s_controlFocus &&
+			s_controlFocus->getParent() == this &&
+			s_controlFocus->getEnabled())
+		{
+			if (s_controlFocus->handleKeyboard(keyEvent))
+				return true;
+		}
+
+		if (type == GMSystemEventType::KeyDown)
+		{
+			if (!d->keyboardInput)
+				return false;
+
+			switch (keyEvent->getKey())
+			{
+			case GMKey_Right:
+			case GMKey_Down:
+			{
+				if (s_controlFocus)
+					return onCycleFocus(true);
+				break;
+			}
+			case GMKey_Left:
+			case GMKey_Up:
+			{
+				if (s_controlFocus)
+					return onCycleFocus(false);
+				break;
+			}
+			case GMKey_Tab:
+				bool shiftDown = (keyEvent->getModifier() & GMModifier_Shift) != 0;
+				return onCycleFocus(!shiftDown);
+			}
+		}
+		break;
+	}
+	case GMSystemEventType::MouseDown:
+	case GMSystemEventType::MouseUp:
+	case GMSystemEventType::MouseMove:
+	case GMSystemEventType::MouseDblClick:
+	case GMSystemEventType::MouseWheel:
+	{
+		GMSystemMouseEvent* mouseEvent = gm_cast<GMSystemMouseEvent*>(event);
+		GMSystemMouseEvent cacheEvent = *mouseEvent;
+		GMPoint pt = mouseEvent->getPoint();
+		pt.x -= d->x;
+		pt.y -= d->y;
+		cacheEvent.setPoint(pt);
+		if (s_controlFocus &&
+			s_controlFocus->getParent() == this &&
+			s_controlFocus->getEnabled())
+		{
+			if (s_controlFocus->handleMouse(&cacheEvent))
+				return true;
+		}
+
+		// 点击测试，找到鼠标所在位置的控件
+		GMControl* control = getControlAtPoint(pt);
+		if (control && control->getEnabled())
+		{
+			if (control->handleMouse(mouseEvent))
+				return true;
+		}
+		else
+		{
+			// 如果没有找到任何控件，那么当前的焦点控件失去焦点
+			if (type == GMSystemEventType::KeyDown && 
+				(mouseEvent->getButton() & GMMouseButton_Left) != 0 &&
+				s_controlFocus &&
+				s_controlFocus->getParent() == this)
+			{
+				s_controlFocus->onFocusOut();
+				s_controlFocus = nullptr;
+			}
+		}
+
+		// 仍然没有处理
+		if (type == GMSystemEventType::MouseMove)
+		{
+			onMouseMove(pt);
+			return false;
+		}
+		break;
+	}
+	}
 	return false;
 }
 
@@ -271,6 +430,16 @@ void GMCanvas::render(GMfloat elpasedTime)
 	}
 }
 
+void GMCanvas::setNextCanvas(GMCanvas* nextCanvas)
+{
+	D(d);
+	if (!nextCanvas)
+		nextCanvas = this;
+	d->nextCanvas = nextCanvas;
+	if (nextCanvas)
+		nextCanvas->setPrevCanvas(this);
+}
+
 void GMCanvas::refresh()
 {
 	D(d);
@@ -282,7 +451,7 @@ void GMCanvas::refresh()
 
 	s_controlFocus = nullptr;
 	s_controlPressed = nullptr;
-	d->controlMouseOver = NULL;
+	d->controlMouseOver = nullptr;
 
 	for (auto control : d->controls)
 	{
@@ -323,6 +492,126 @@ void GMCanvas::removeAllControls()
 		GM_delete(control);
 	}
 	GMClearSTLContainer(d->controls);
+}
+
+GMControl* GMCanvas::getControlAtPoint(const GMPoint& pt)
+{
+	D(d);
+	for (auto control : d->controls)
+	{
+		if (!control)
+			continue;
+
+		if (control->getEnabled() && control->getVisible() && control->containsPoint(pt))
+			return control;
+	}
+	return nullptr;
+}
+
+bool GMCanvas::onCycleFocus(bool goForward)
+{
+	D(d);
+	GMControl* control = nullptr;
+	GMCanvas* canvas = nullptr;
+	GMCanvas* lastCanvas = nullptr;
+	const Vector<GMCanvas*>& canvases = d->manager->getCanvases();
+	GMint sz = (GMint)canvases.size();
+
+	if (!s_controlFocus)
+	{
+		if (goForward)
+		{
+			for (GMint i = 0; i < sz; ++i)
+			{
+				canvas = lastCanvas = canvases[i];
+				const Vector<GMControl*> controls = canvas->getControls();
+				if (canvas && controls.size() > 0)
+				{
+					control = controls[0];
+					break;
+				}
+			}
+		}
+		else
+		{
+			for (GMint i = sz - 1; i >= 0; --i)
+			{
+				canvas = lastCanvas = canvases[i];
+				const Vector<GMControl*> controls = canvas->getControls();
+				if (canvas && controls.size() > 0)
+				{
+					control = controls[controls.size() - 1];
+					break;
+				}
+			}
+		}
+
+		if (!canvas || !control)
+			return true;
+	}
+	else if (s_controlFocus->getParent() != this)
+	{
+		// 当前获得焦点的控件属于另外一个canvas，所以要交给它来处理
+		return false;
+	}
+	else
+	{
+		lastCanvas = s_controlFocus->getParent();
+		control = (goForward) ? getNextControl(s_controlFocus) : getNextControl(s_controlFocus);
+		canvas = control->getParent();
+	}
+
+	while (true)
+	{
+		// 如果我们转了一圈回来，那么我们不会设置任何焦点了。
+		const Vector<GMCanvas*> canvases = d->manager->getCanvases();
+		GMsize_t lastCanvasIndex = indexOf(canvases, lastCanvas);
+		GMsize_t canvasIndex = indexOf(canvases, canvas);
+		if ((!goForward && lastCanvasIndex < canvasIndex) ||
+			(goForward && canvasIndex < lastCanvasIndex))
+		{
+			if (s_controlFocus)
+				s_controlFocus->onFocusOut();
+			s_controlFocus = nullptr;
+			return true;
+		}
+
+		if (control == s_controlFocus)
+			return true;
+
+		if (control->getParent()->canKeyboardInput() && control->canHaveFocus())
+		{
+			if (s_controlFocus)
+				s_controlFocus->onFocusOut();
+			s_controlFocus = control;
+			s_controlFocus->onFocusIn();
+			return true;
+		}
+
+		lastCanvas = canvas;
+		control = (goForward) ? getNextControl(control) : getPrevControl(control);
+		canvas = control->getParent();
+	}
+
+	// 永远都不会到这里来，因为canvas是个环，只会在上面return
+	GM_ASSERT(false);
+	return false;
+}
+
+void GMCanvas::onMouseMove(const GMPoint& pt)
+{
+	D(d);
+	GMControl* control = getControlAtPoint(pt);
+	// 停留在相同控件上，不需要触发什么事件
+	if (control == d->controlMouseOver)
+		return;
+
+	if (d->controlMouseOver)
+		d->controlMouseOver->onMouseLeave();
+
+	d->controlMouseOver = control;
+	if (control)
+		control->onMouseEnter();
 }
 
 void GMCanvas::clearFocus()

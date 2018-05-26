@@ -66,7 +66,7 @@ void GMUIInput::update()
 	::GetKeyboardState(d->lastKeyState);
 	// restore
 	d->wheelState.wheeled = false;
-	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
+	d->mouseState.downButton = d->mouseState.upButton = gm::GMMouseButton_None;
 	d->mouseState.moving = false;
 }
 
@@ -181,13 +181,13 @@ gm::GMMouseState GMUIInput::mouseState()
 		state.posY = p.y;
 
 		IKeyboardState& ks = getKeyboardState();
-		state.triggerButton = GMMouseButton_None;
+		state.triggerButton = gm::GMMouseButton_None;
 		if (ks.keyTriggered(VK_LBUTTON))
-			state.triggerButton |= GMMouseButton_Left;
+			state.triggerButton |= gm::GMMouseButton_Left;
 		if (ks.keyTriggered(VK_RBUTTON))
-			state.triggerButton |= GMMouseButton_Right;
+			state.triggerButton |= gm::GMMouseButton_Right;
 		if (ks.keyTriggered(VK_MBUTTON))
-			state.triggerButton |= GMMouseButton_Middle;
+			state.triggerButton |= gm::GMMouseButton_Middle;
 	}
 
 	if (d->detectingMode)

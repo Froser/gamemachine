@@ -202,7 +202,7 @@ bool GMUIGameMachineWindowBase::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM l
 	{
 		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
-			input->recordMouseDown(GMMouseButton_Left);
+			input->recordMouseDown(gm::GMMouseButton_Left);
 		break;
 	}
 	case WM_MOUSEMOVE:
@@ -216,21 +216,21 @@ bool GMUIGameMachineWindowBase::wndProc(gm::GMuint uMsg, WPARAM wParam, LPARAM l
 	{
 		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
-			input->recordMouseDown(GMMouseButton_Right);
+			input->recordMouseDown(gm::GMMouseButton_Right);
 		break;
 	}
 	case WM_LBUTTONUP:
 	{
 		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
-			input->recordMouseUp(GMMouseButton_Left);
+			input->recordMouseUp(gm::GMMouseButton_Left);
 		break;
 	}
 	case WM_RBUTTONUP:
 	{
 		GMUIInput* input = gm::gm_cast<GMUIInput*>(db->input);
 		if (input)
-			input->recordMouseUp(GMMouseButton_Right);
+			input->recordMouseUp(gm::GMMouseButton_Right);
 		break;
 	}
 	default:

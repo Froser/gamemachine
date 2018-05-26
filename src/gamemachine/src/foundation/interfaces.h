@@ -2,7 +2,6 @@
 #define __INTERFACES_H__
 #include <defines.h>
 #include <glm/fwd.hpp>
-#include <input.h>
 #include <gmenums.h>
 
 struct GMFloat4;
@@ -33,12 +32,13 @@ class GMCanvasResourceManager;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
-struct GraphicSettings;
-struct GMCameraLookAt;
 struct IDebugOutput;
 struct IAudioPlayer;
 struct IGraphicEngine;
 struct IRenderer;
+struct IInput;
+struct GraphicSettings;
+struct GMCameraLookAt;
 struct GMShaderVariablesDesc;
 struct GMShadowSourceDesc;
 

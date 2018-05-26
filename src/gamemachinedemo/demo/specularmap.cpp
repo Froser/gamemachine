@@ -105,26 +105,26 @@ void Demo_SpecularMap::handleMouseEvent()
 		}
 	}
 
-	if (state.downButton & GMMouseButton_Left)
+	if (state.downButton & gm::GMMouseButton_Left)
 	{
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->draggingL = true;
 		GM.getMainWindow()->setLockWindow(true);
 	}
-	else if (state.upButton & GMMouseButton_Left)
+	else if (state.upButton & gm::GMMouseButton_Left)
 	{
 		d->draggingL = false;
 		GM.getMainWindow()->setLockWindow(false);
 	}
-	if (state.downButton & GMMouseButton_Right)
+	if (state.downButton & gm::GMMouseButton_Right)
 	{
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->draggingR = true;
 		GM.getMainWindow()->setLockWindow(true);
 	}
-	else if (state.upButton & GMMouseButton_Right)
+	else if (state.upButton & gm::GMMouseButton_Right)
 	{
 		d->draggingR = false;
 		GM.getMainWindow()->setLockWindow(false);

@@ -4,6 +4,7 @@
 #include "gmuidef.h"
 #include <gminterfaces.h>
 #include <gmobject.h>
+#include <gminput.h>
 
 class XInputWrapper
 {
@@ -92,13 +93,13 @@ public:
 	virtual void setCursor(gm::GMCursorType type) override;
 
 public:
-	void recordMouseDown(gm::GMMouseState::GMMouseButton button)
+	void recordMouseDown(gm::GMMouseButton button)
 	{
 		D(d);
 		d->mouseState.downButton |= button;
 	}
 
-	void recordMouseUp(gm::GMMouseState::GMMouseButton button)
+	void recordMouseUp(gm::GMMouseButton button)
 	{
 		D(d);
 		d->mouseState.upButton |= button;

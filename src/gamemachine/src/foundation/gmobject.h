@@ -102,7 +102,7 @@ class GMNotAGMObject {};
 
 #define GM_DECLARE_SETTER(name, memberName, paramType) \
 	public: \
-	inline void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
+	void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
 
 #define GM_DECLARE_PROPERTY(name, memberName, paramType) \
 	GM_DECLARE_GETTER(name, memberName, paramType) \
@@ -118,7 +118,7 @@ class GMNotAGMObject {};
 #define GM_ALLOW_COPY_DATA(clsName) \
 	public: \
 	clsName(const clsName& o) { copyData(o); } \
-	inline clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
+	clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
 	void copyData(const clsName& another) { D(d); D_OF(d_another, &another); *d = *d_another; \
 		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); }
 

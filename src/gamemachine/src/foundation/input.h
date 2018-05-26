@@ -1,6 +1,6 @@
 ﻿#ifndef __GMINPUT_H__
 #define __GMINPUT_H__
-#include <gmcommon.h>
+#include <gmmessage.h>
 
 #if _MSC_VER
 #	include <Xinput.h>
@@ -13,7 +13,7 @@ struct IWindow;
 struct GMJoystickState
 {
 	bool valid;
-	WORD buttons;
+	GMWord buttons;
 	GMbyte leftTrigger;
 	GMbyte rightTrigger;
 	GMshort thumbLX;
@@ -21,13 +21,6 @@ struct GMJoystickState
 	GMshort thumbRX;
 	GMshort thumbRY;
 };
-
-
-// GMMouseButton defines:
-#define GMMouseButton_None		0
-#define GMMouseButton_Left		1
-#define GMMouseButton_Right		2
-#define GMMouseButton_Middle	4
 
 struct GMWheelState
 {
@@ -37,8 +30,6 @@ struct GMWheelState
 
 struct GMMouseState
 {
-	typedef GMint GMMouseButton;
-
 	GMint deltaX;
 	GMint deltaY;
 	GMint posX;

@@ -241,6 +241,7 @@ void DemostrationWorld::init()
 	GM_delete(img);
 
 	d->mainCanvas = new gm::GMCanvas(new gm::GMCanvasResourceManager());
+	d->mainCanvas->setKeyboardInput(true);
 	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
 	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
 	GM.registerCanvas(d->mainCanvas);

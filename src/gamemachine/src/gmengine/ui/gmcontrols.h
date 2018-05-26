@@ -1,6 +1,7 @@
 ﻿#ifndef __GMCONTROL_H__
 #define __GMCONTROL_H__
 #include <gmcommon.h>
+#include <gmmessage.h>
 BEGIN_NS
 
 class GMCanvas;
@@ -133,12 +134,12 @@ public:
 
 public:
 	// Message handler
-	virtual bool handleKeyboard()
+	virtual bool handleKeyboard(GMSystemKeyEvent* event)
 	{
 		return false;
 	}
 
-	virtual bool handleMouse()
+	virtual bool handleMouse(GMSystemMouseEvent* event)
 	{
 		return false;
 	}
@@ -283,6 +284,12 @@ public:
 	{
 		D(d);
 		return d->canvas;
+	}
+
+	inline GMint getIndex()
+	{
+		D(d);
+		return d->index;
 	}
 
 protected:

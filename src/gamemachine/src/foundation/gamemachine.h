@@ -2,7 +2,7 @@
 #define __GAMEMACHINE_H__
 #include <gmcommon.h>
 #include <gmtools.h>
-#include <input.h>
+#include <gminput.h>
 #include <gmassets.h>
 #include <gmglyphmanager.h>
 #include <gmgamepackage.h>

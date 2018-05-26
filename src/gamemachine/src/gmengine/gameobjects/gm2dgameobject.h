@@ -4,7 +4,6 @@
 #include "gmassets.h"
 #include "gmcontrolgameobject.h"
 #include <gmutilities.h>
-#include <input.h>
 BEGIN_NS
 
 struct ITypoEngine;

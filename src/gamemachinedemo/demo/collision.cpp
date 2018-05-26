@@ -197,7 +197,7 @@ void Demo_Collision::onWindowActivate()
 	auto& ms = input->getMouseState().mouseState();
 	gm::GMCamera& camera = GM.getCamera();
 
-	if (ms.downButton & GMMouseButton_Left)
+	if (ms.downButton & gm::GMMouseButton_Left)
 	{
 		GMVec3 rayFrom = camera.getLookAt().position;
 		GMVec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
@@ -217,7 +217,7 @@ void Demo_Collision::onWindowActivate()
 			pickUp(rayTestResult);
 		}
 	}
-	else if (ms.upButton & GMMouseButton_Left)
+	else if (ms.upButton & gm::GMMouseButton_Left)
 	{
 		removePicked();
 	}

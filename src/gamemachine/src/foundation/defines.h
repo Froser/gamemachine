@@ -165,10 +165,12 @@ typedef size_t GMsize_t;
 typedef WPARAM GMWParam;
 typedef LPARAM GMLParam;
 typedef LRESULT GMLResult;
+typedef WORD GMWord;
 #else
 typedef GMint GMWParam;
 typedef GMlong GMLParam;
 typedef GMlong GMLResult;
+typedef short GMWord;
 #endif
 
 // 类型大小静态断言，如果在某些环境下失败，应该同步typedef使得其编译通过
