@@ -14,7 +14,7 @@ struct GMControlState
 		Disabled,
 		Hidden,
 		Focus,
-		Mouseover,
+		MouseOver,
 		Pressed,
 
 		EndOfControlState,
@@ -59,7 +59,7 @@ public:
 	}
 };
 
-GM_PRIVATE_OBJECT(GMElement)
+GM_PRIVATE_OBJECT(GMStyle)
 {
 	GMuint texture = 0;
 	GMuint font = 0;
@@ -68,19 +68,19 @@ GM_PRIVATE_OBJECT(GMElement)
 	GMElementBlendColor fontColor;
 };
 
-class GMElement : public GMObject
+class GMStyle : public GMObject
 {
-	DECLARE_PRIVATE(GMElement)
-	GM_ALLOW_COPY_DATA(GMElement)
+	DECLARE_PRIVATE(GMStyle)
+	GM_ALLOW_COPY_DATA(GMStyle)
 
 public:
-	GMElement() = default;
+	GMStyle() = default;
 
 public:
-	void setTexture(GMuint texture, const GMRect& rc);
+	void setTexture(GMuint texture, const GMRect& rc, const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1));
 	void setFont(GMuint font, const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
 	void setFontColor(GMControlState::State state, const GMVec4& color);
-	void setTextureColor(const GMElementBlendColor& color);
+	void setTextureColor(GMControlState::State state, const GMVec4& color);
 	void refresh();
 
 public:
@@ -94,6 +94,18 @@ public:
 	{
 		D(d);
 		return d->fontColor;
+	}
+
+	inline const GMRect& getTextureRect()
+	{
+		D(d);
+		return d->rc;
+	}
+
+	inline GMuint getTexture()
+	{
+		D(d);
+		return d->texture;
 	}
 };
 
@@ -111,8 +123,8 @@ GM_PRIVATE_OBJECT(GMControl)
 	GMint y = 0;
 	GMint width = 0;
 	GMint height = 0;
-	GMRect rcBoundingBox;
-	Vector<GMElement*> elements;
+	GMRect boundingBox;
+	Vector<GMStyle*> styles;
 	GMCanvas* canvas = nullptr;
 
 	bool enabled = true;
@@ -133,18 +145,78 @@ public:
 	~GMControl();
 
 public:
+	inline void setEnabled(bool enabled)
+	{
+		D(d);
+		d->enabled = enabled;
+	}
+
+	inline bool getEnabled()
+	{
+		D(d);
+		return d->enabled;
+	}
+
+	inline void setVisible(bool visible)
+	{
+		D(d);
+		d->visible = visible;
+	}
+
+	inline bool getVisible()
+	{
+		D(d);
+		return d->visible;
+	}
+
+	inline bool getMouseOver()
+	{
+		D(d);
+		return d->mouseOver;
+	}
+
+	inline bool hasFocus()
+	{
+		D(d);
+		return d->hasFocus;
+	}
+
 	// Message handler
-	virtual bool handleKeyboard(GMSystemKeyEvent* event)
+	virtual bool handleKeyboard(GMSystemKeyEvent* event);
+	virtual bool handleMouse(GMSystemMouseEvent* event);
+
+	// Events
+	virtual bool onKeyDown(GMSystemKeyEvent* event)
 	{
 		return false;
 	}
 
-	virtual bool handleMouse(GMSystemMouseEvent* event)
+	virtual bool onKeyUp(GMSystemKeyEvent* event)
 	{
 		return false;
 	}
 
-	virtual bool canHaveFocus()
+	virtual bool onMouseMove(GMSystemMouseEvent* event)
+	{
+		return false;
+	}
+
+	virtual bool onMousePress(GMSystemMouseEvent* event)
+	{
+		return false;
+	}
+
+	virtual bool onMouseRelease(GMSystemMouseEvent* event)
+	{
+		return false;
+	}
+
+	virtual bool onMouseDblClick(GMSystemMouseEvent* event)
+	{
+		return false;
+	}
+
+	virtual bool onMouseWheel(GMSystemMouseWheelEvent* event)
 	{
 		return false;
 	}
@@ -182,41 +254,16 @@ public:
 		return true;
 	}
 
+	virtual bool canHaveFocus()
+	{
+		return false;
+	}
+
 	virtual void refresh();
 
 	virtual void render(float elapsed)
 	{
 
-	}
-
-	virtual void setEnabled(bool enabled)
-	{
-		D(d);
-		d->enabled = enabled;
-	}
-
-	virtual bool getEnabled()
-	{
-		D(d);
-		return d->enabled;
-	}
-
-	virtual void setVisible(bool visible)
-	{
-		D(d);
-		d->visible = visible;
-	}
-
-	virtual bool getVisible()
-	{
-		D(d);
-		return d->visible;
-	}
-
-	virtual GMControlType getType()
-	{
-		D(d);
-		return d->type;
 	}
 
 	virtual void setId(GMuint id)
@@ -253,10 +300,10 @@ public:
 		updateRect();
 	}
 
-	virtual GMElement* getElement(GMuint index)
+	virtual GMStyle* getStyle(GMuint index)
 	{
 		D(d);
-		return d->elements[index];
+		return d->styles[index];
 	}
 
 	virtual void setIsDefault(bool isDefault)
@@ -265,12 +312,12 @@ public:
 		d->isDefault = isDefault;
 	}
 
-	virtual bool setElement(GMuint index, GMElement* element);
+	virtual bool setStyle(GMuint index, GMStyle* style);
 
 	virtual bool containsPoint(const GMPoint& point)
 	{
 		D(d);
-		return GM_inRect(d->rcBoundingBox, point);
+		return GM_inRect(d->boundingBox, point);
 	}
 
 public:
@@ -292,15 +339,21 @@ public:
 		return d->index;
 	}
 
+	inline GMControlType getType()
+	{
+		D(d);
+		return d->type;
+	}
+
 protected:
 	void updateRect();
 };
 
-struct GMElementHolder
+struct GMStyleHolder
 {
 	GMControlType type;
 	GMuint index;
-	GMElement element;
+	GMStyle style;
 };
 
 GM_PRIVATE_OBJECT(GMControlStatic)
@@ -331,6 +384,32 @@ public:
 	}
 
 	void setText(const GMString& text);
+};
+
+GM_PRIVATE_OBJECT(GMControlButton)
+{
+	bool pressed = false;
+};
+
+class GMControlButton : public GMControlStatic
+{
+	DECLARE_PRIVATE(GMControlButton)
+
+public:
+	GMControlButton(GMCanvas* parent);
+
+public:
+	// virtual void onHotkey
+	virtual bool onMousePress(GMSystemMouseEvent* event) override;
+	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
+	virtual bool onMouseRelease(GMSystemMouseEvent* event) override;
+	virtual bool containsPoint(const GMPoint& pt) override;
+	virtual bool canHaveFocus() override;
+	virtual void render(GMfloat elapsed) override;
+
+private:
+	bool handleMousePressOrDblClick(const GMPoint& pt);
+	bool handleMouseRelease(const GMPoint& pt);
 };
 END_NS
 #endif

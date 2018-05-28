@@ -23,7 +23,7 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 {
 	Array<ITexture*, MAX_ANIMATION_FRAME> frames = { 0 }; // 每个texture由TEXTURE_INDEX_MAX个纹理动画组成。静态纹理的纹理动画数量为1
 	Array<GMS_TextureMod, MAX_TEX_MOD> texMod;
-	GMint frameCount = 0;
+	GMsize_t frameCount = 0;
 	GMint animationMs = 1; //每一帧动画间隔 (ms)
 	GMS_TextureFilter magFilter = GMS_TextureFilter::LINEAR;
 	GMS_TextureFilter minFilter = GMS_TextureFilter::LINEAR_MIPMAP_LINEAR;
@@ -36,7 +36,7 @@ class GMTextureSampler : public GMObject
 	DECLARE_PRIVATE(GMTextureSampler)
 
 public:
-	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMint);
+	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMsize_t);
 	GM_DECLARE_PROPERTY(AnimationMs, animationMs, GMint);
 	GM_DECLARE_PROPERTY(MagFilter, magFilter, GMS_TextureFilter);
 	GM_DECLARE_PROPERTY(MinFilter, minFilter, GMS_TextureFilter);
@@ -48,74 +48,13 @@ public:
 	GMTextureSampler(const GMTextureSampler&) = delete;
 
 public:
-	inline GMS_TextureMod& getTexMod(GMint index)
-	{
-		D(d);
-		return d->texMod[index];
-	}
-
-	inline void setTexMod(GMint index, const GMS_TextureMod& mod)
-	{
-		D(d);
-		d->texMod[index] = mod;
-	}
-
-	inline ITexture* getFrameByIndex(GMint frameIndex)
-	{
-		D(d);
-		return d->frames[frameIndex];
-	}
-
-	inline GMint addFrame(ITexture* oneFrame)
-	{
-		D(d);
-		d->frames[d->frameCount] = oneFrame;
-		++d->frameCount;
-		return d->frameCount;
-	}
-
-	inline GMTextureSampler& operator=(const GMTextureSampler& rhs)
-	{
-		D(d);
-		D_OF(rhs_d, &rhs);
-		*d = *rhs.data();
-		for (GMint i = 0; i < MAX_ANIMATION_FRAME; i++)
-		{
-			d->frames[i] = rhs_d->frames[i];
-		}
-		for (GMint i = 0; i < MAX_TEX_MOD; i++)
-		{
-			d->texMod[i] = rhs_d->texMod[i];
-		}
-		return *this;
-	}
-
-	inline void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureModType, Pair<GMfloat, GMfloat>&&)> callback)
-	{
-		GMuint n = 0;
-		const GMS_TextureMod& tc = getTexMod(n);
-		while (n < MAX_TEX_MOD && tc.type != GMS_TextureModType::NO_TEXTURE_MOD)
-		{
-			switch (tc.type)
-			{
-			case GMS_TextureModType::SCROLL:
-			{
-				GMfloat s = timeSeconds * tc.p1, t = timeSeconds * tc.p2;
-				callback(tc.type, { s, t });
-			}
-			break;
-			case GMS_TextureModType::SCALE:
-			{
-				GMfloat s = tc.p1, t = tc.p2;
-				callback(tc.type, { s, t });
-				break;
-			}
-			default:
-				break;
-			}
-			n++;
-		}
-	}
+	GMS_TextureMod& getTexMod(GMsize_t index);
+	void setTexMod(GMsize_t index, const GMS_TextureMod& mod);
+	ITexture* getFrameByIndex(GMsize_t frameIndex);
+	GMsize_t addFrame(ITexture* oneFrame);
+	bool setTexture(GMsize_t frameIndex, ITexture* texture);
+	void applyTexMode(GMfloat timeSeconds, std::function<void(GMS_TextureModType, Pair<GMfloat, GMfloat>&&)> callback);
+	GMTextureSampler& operator=(const GMTextureSampler& rhs);
 };
 
 enum class GMTextureType

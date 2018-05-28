@@ -8,6 +8,54 @@ BEGIN_NS
 
 struct ITypoEngine;
 
+GM_PRIVATE_OBJECT(GM2DGameObjectBase)
+{
+	bool dirty = true;
+	GMRect geometry = { 0 };
+};
+
+class GM2DGameObjectBase : public GMGameObject
+{
+	DECLARE_PRIVATE_AND_BASE(GM2DGameObjectBase, GMGameObject)
+
+public:
+	using GMGameObject::GMGameObject;
+
+public:
+	void setGeometry(const GMRect& geometry);
+
+public:
+	inline const GMRect& getGeometry()
+	{
+		D(d);
+		return d->geometry;
+	}
+
+protected:
+	void setShader(GMShader& shader);
+
+	inline void markDirty()
+	{
+		D(d);
+		d->dirty = true;
+	}
+
+	inline void cleanDirty()
+	{
+		D(d);
+		d->dirty = false;
+	}
+
+	inline bool isDirty()
+	{
+		D(d);
+		return d->dirty;
+	}
+
+protected:
+	static GMRectF toViewportRect(const GMRect& rc);
+};
+
 enum GMTextColorType
 {
 	Plain,
@@ -16,21 +64,20 @@ enum GMTextColorType
 
 GM_PRIVATE_OBJECT(GMTextGameObject)
 {
-	bool dirty = true;
 	GMString text;
 	GMsize_t length = 0;
-	GMRect geometry = { 0 };
 	ITexture* texture = nullptr;
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;
 	GMModel* model = nullptr;
 	GMTextColorType colorType = ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
+	Vector<GMVertex> vericesCache;
 };
 
-class GMTextGameObject : public GMGameObject
+class GMTextGameObject : public GM2DGameObjectBase
 {
-	DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GMGameObject)
+	DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GM2DGameObjectBase)
 
 public:
 	GMTextGameObject();
@@ -39,7 +86,6 @@ public:
 
 public:
 	void setText(const GMString& text);
-	void setGeometry(const GMRect& geometry);
 	void setColorType(GMTextColorType type);
 	void setColor(const GMVec4& color);
 
@@ -50,11 +96,47 @@ public:
 private:
 	void update();
 	GMModel* createModel();
-	void setShader(GMShader& shader);
 	void updateVertices(GMModel* model);
+};
+
+GM_PRIVATE_OBJECT(GMSprite2DGameObject)
+{
+	GMModel* model = nullptr;
+	ITexture* texture = nullptr;
+	GMRect textureRc;
+	GMint texHeight = 0;
+	GMint texWidth = 0;
+	GMfloat depth = 0;
+	bool needUpdateTexture = true;
+};
+
+class GMSprite2DGameObject : public GM2DGameObjectBase
+{
+	DECLARE_PRIVATE_AND_BASE(GMSprite2DGameObject, GM2DGameObjectBase)
+
+	enum
+	{
+		VerticesCount = 4
+	};
 
 public:
-	static GMRectF toViewportRect(const GMRect& rc);
+	GMSprite2DGameObject() = default;
+	~GMSprite2DGameObject();
+
+public:
+	virtual void draw() override;
+
+public:
+	void setDepth(GMint depth);
+	void setTexture(ITexture* tex);
+	void setTextureSize(GMint width, GMint height);
+	void setTextureRect(const GMRect& rect);
+
+private:
+	void update();
+	GMModel* createModel();
+	void updateVertices(GMModel* model);
+	void updateTexture(GMModel* model);
 };
 
 //GMGlyphObject

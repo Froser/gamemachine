@@ -70,16 +70,18 @@ GMCanvasResourceManager::GMCanvasResourceManager()
 	GM.createModelDataProxyAndTransfer(d->screenQuadModel);
 
 	d->textObject = new GMTextGameObject();
+	d->spriteObject = new GMSprite2DGameObject();
 }
 
 GMCanvasResourceManager::~GMCanvasResourceManager()
 {
 	D(d);
-	for (auto texture : d->textureCache)
+	for (auto textureInfo : d->textureCache)
 	{
-		GM_delete(texture);
+		GM_delete(textureInfo.texture);
 	}
 	GM_delete(d->textObject);
+	GM_delete(d->spriteObject);
 
 	GM_delete(d->screenQuad);
 	GM_delete(d->screenQuadModel);
@@ -97,10 +99,15 @@ GMGameObject* GMCanvasResourceManager::getScreenQuad()
 	return d->screenQuad;
 }
 
-void GMCanvasResourceManager::addTexture(ITexture* texture)
+GMsize_t GMCanvasResourceManager::addTexture(ITexture* texture, GMint width, GMint height)
 {
 	D(d);
-	d->textureCache.push_back(texture);
+	GMCanvasTextureInfo texInfo;
+	texInfo.texture = texture;
+	texInfo.width = width;
+	texInfo.height = height;
+	d->textureCache.push_back(texInfo);
+	return d->textureCache.size() - 1;
 }
 
 void GMCanvasResourceManager::registerCanvas(GMCanvas* canvas)
@@ -112,7 +119,7 @@ void GMCanvasResourceManager::registerCanvas(GMCanvas* canvas)
 			return;
 	}
 
-	// 将Canvas设置成一个还
+	// 将Canvas设置成一个环
 	GMsize_t sz = d->canvases.size();
 	d->canvases.push_back(canvas);
 	if (sz > 1)
@@ -120,10 +127,10 @@ void GMCanvasResourceManager::registerCanvas(GMCanvas* canvas)
 	d->canvases[sz - 1]->setNextCanvas(d->canvases[0]);
 }
 
-ITexture* GMCanvasResourceManager::getTexture(size_t i)
+const GMCanvasTextureInfo& GMCanvasResourceManager::getTexture(GMsize_t index)
 {
 	D(d);
-	return d->textureCache[i];
+	return d->textureCache[index];
 }
 
 void GMCanvasResourceManager::onRenderRectResized()
@@ -143,15 +150,19 @@ GMCanvas::GMCanvas(GMCanvasResourceManager* manager)
 	D(d);
 	d->manager = manager;
 	d->nextCanvas = d->prevCanvas = this;
-	initDefaultElements();
+}
+
+void GMCanvas::init()
+{
+	initDefaultStyles();
 }
 
 GMCanvas::~GMCanvas()
 {
 	D(d);
-	for (auto elementHolder : d->defaultElements)
+	for (auto styleHolder : d->defaultstyles)
 	{
-		GM_delete(elementHolder);
+		GM_delete(styleHolder);
 	}
 	removeAllControls();
 }
@@ -187,60 +198,131 @@ void GMCanvas::addStatic(
 	staticControl->setIsDefault(isDefault);
 }
 
+void GMCanvas::addButton(
+	GMint id,
+	const GMString& text,
+	GMint x,
+	GMint y,
+	GMint width,
+	GMint height,
+	bool isDefault,
+	OUT GMControlButton** out
+)
+{
+	GMControlButton* buttonControl = new GMControlButton(this);
+	if (out)
+		*out = buttonControl;
+
+	addControl(buttonControl);
+	buttonControl->setId(id);
+	buttonControl->setText(text);
+	buttonControl->setPosition(x, y);
+	buttonControl->setSize(width, height);
+	buttonControl->setIsDefault(isDefault);
+}
+
 void GMCanvas::drawText(
 	const GMString& text,
-	GMElement* element,
-	const GMRect& rcDest,
+	GMStyle* style,
+	const GMRect& rc,
 	bool bShadow,
 	GMint nCount,
 	bool bCenter
 )
 {
-	D(d);
 	// 不需要绘制透明元素
-	if (element->getFontColor().getCurrent().getW() == 0)
+	if (style->getFontColor().getCurrent().getW() == 0)
 		return;
 
+	D(d);
 	// TODO 先不考虑阴影什么的
-	const GMVec4& fontColor = element->getFontColor().getCurrent();
+	const GMVec4& fontColor = style->getFontColor().getCurrent();
 	GMTextGameObject* textObject = d->manager->getTextObject();
 	textObject->setColorType(Plain);
 	textObject->setColor(fontColor);
 	textObject->setText(text);
-	textObject->setGeometry(rcDest);
+	textObject->setGeometry(rc);
 	textObject->draw();
 }
 
-void GMCanvas::initDefaultElements()
+void GMCanvas::drawSprite(
+	GMStyle* style,
+	const GMRect& rc,
+	GMfloat depth
+)
 {
-	GMElement element;
+	// 不需要绘制透明元素
+	if (style->getFontColor().getCurrent().getW() == 0)
+		return;
 
-	// Static
-	element.setFont(0);
+	D(d);
+	// TODO Caption
+	const GMRect& textureRc = style->getTextureRect();
+	GMuint texId = style->getTexture();
+	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(texId);
 
-	GMVec4 blendColor = GMVec4(.87f, .87f, .87f, .87f);
-	element.setFontColor(GMControlState::Disabled, blendColor);
-
-	setDefaultElement(GMControlType::Static, 0, &element);
+	const GMVec4& fontColor = style->getFontColor().getCurrent();
+	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
+	spriteObject->setDepth(depth);
+	//spriteObject->setColor
+	spriteObject->setGeometry(rc);
+	spriteObject->setTexture(texInfo.texture);
+	spriteObject->setTextureRect(textureRc);
+	spriteObject->setTextureSize(texInfo.width, texInfo.height);
+	spriteObject->draw();
 }
 
-void GMCanvas::setDefaultElement(GMControlType type, GMuint index, GMElement* element)
+void GMCanvas::requestFocus(GMControl* control)
+{
+	if (s_controlFocus == control)
+		return;
+
+	if (!control->canHaveFocus())
+		return;
+
+	if (s_controlFocus)
+		s_controlFocus->onFocusOut();
+
+	control->onFocusIn();
+	s_controlFocus = control;
+}
+
+void GMCanvas::initDefaultStyles()
 {
 	D(d);
-	for (auto elementHolder : d->defaultElements)
+	GMStyle style;
+
+	// Static
+	style.setFont(0);
+	style.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
+	setDefaultStyle(GMControlType::Static, 0, &style);
+
+	// Button
+	style.setTexture(0, d->areas[GMCanvasControlArea::ButtonArea]);
+	style.setFont(0);
+	style.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
+	style.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
+	style.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
+	setDefaultStyle(GMControlType::Button, 0, &style);
+}
+
+void GMCanvas::setDefaultStyle(GMControlType type, GMuint index, GMStyle* style)
+{
+	D(d);
+	for (auto styleHolder : d->defaultstyles)
 	{
-		if (elementHolder->type == type && elementHolder->index == index)
+		if (styleHolder->type == type && styleHolder->index == index)
 		{
-			elementHolder->element = *element;
+			styleHolder->style = *style;
 			return;
 		}
 	}
 
-	GMElementHolder* elementHolder = new GMElementHolder();
-	elementHolder->type = type;
-	elementHolder->index = index;
-	elementHolder->element = *element;
-	d->defaultElements.push_back(elementHolder);
+	GMStyleHolder* styleHolder = new GMStyleHolder();
+	styleHolder->type = type;
+	styleHolder->index = index;
+	styleHolder->style = *style;
+	d->defaultstyles.push_back(styleHolder);
 }
 
 bool GMCanvas::initControl(GMControl* control)
@@ -251,10 +333,10 @@ bool GMCanvas::initControl(GMControl* control)
 		return false;
 
 	control->setIndex(d->controls.size());
-	for (auto& elementHolder : d->defaultElements)
+	for (auto& styleHolder : d->defaultstyles)
 	{
-		if (elementHolder->type == control->getType())
-			control->setElement(elementHolder->index, &elementHolder->element);
+		if (styleHolder->type == control->getType())
+			control->setStyle(styleHolder->index, &styleHolder->style);
 	}
 
 	return control->onInit();
@@ -264,6 +346,12 @@ void GMCanvas::setPrevCanvas(GMCanvas* prevCanvas)
 {
 	D(d);
 	d->prevCanvas = prevCanvas;
+}
+
+void GMCanvas::addArea(GMCanvasControlArea::Area area, const GMRect& rc)
+{
+	D(d);
+	d->areas[area] = rc;
 }
 
 bool GMCanvas::msgProc(GMSystemEvent* event)
@@ -622,5 +710,5 @@ void GMCanvas::clearFocus()
 		s_controlFocus = nullptr;
 	}
 
-	ReleaseCapture(); //TODO WINAPI
+	// TODO ReleaseCapture()
 }

@@ -508,7 +508,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	*obj = model;
 }
 
-void GMToolUtil::createTexture(const GMString& filename, OUT ITexture** texture)
+void GMToolUtil::createTexture(const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
 {
 	GMImage* img = nullptr;
 	GMBuffer buf;
@@ -518,6 +518,13 @@ void GMToolUtil::createTexture(const GMString& filename, OUT ITexture** texture)
 
 	GM.getFactory()->createTexture(img, texture);
 	GM_ASSERT(texture);
+
+	if (width)
+		*width = img->getWidth();
+
+	if (height)
+		*height = img->getHeight();
+
 	GM_delete(img);
 }
 

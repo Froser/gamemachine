@@ -240,8 +240,19 @@ void DemostrationWorld::init()
 	addControl(listbox);
 	GM_delete(img);
 
-	d->mainCanvas = new gm::GMCanvas(new gm::GMCanvasResourceManager());
+	auto manager = new gm::GMCanvasResourceManager();
+	gm::ITexture* texture = nullptr;
+	gm::GMint width, height;
+	gm::GMToolUtil::createTexture("skin.png", &texture, &width, &height);
+	manager->addTexture(texture, width, height);
+
+	d->mainCanvas = new gm::GMCanvas(manager);
+	gm::GMRect rc = { 0, 0, 136, 54 };
+	d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonArea, rc);
+	d->mainCanvas->init();
+
 	d->mainCanvas->setKeyboardInput(true);
+	d->mainCanvas->addButton(0, "Button", 1024 / 2, 768 / 2, 100, 100, false, nullptr);
 	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
 	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
 	GM.registerCanvas(d->mainCanvas);
@@ -327,7 +338,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();
-			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().elapsedTime);
+			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().lastFrameElpased);
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
 		{

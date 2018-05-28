@@ -8,13 +8,31 @@ class GMControl;
 class GMGameObject;
 class GMModel;
 class GMTextGameObject;
+class GMSprite2DGameObject;
 class GMSystemEvent;
 class GMCanvas;
+
+struct GMCanvasControlArea
+{
+	enum Area
+	{
+		ButtonArea,
+		ButtonFillArea,
+	};
+};
+
+struct GMCanvasTextureInfo
+{
+	ITexture* texture = nullptr;
+	GMint width = 0;
+	GMint height = 0;
+};
 
 GM_PRIVATE_OBJECT(GMCanvasResourceManager)
 {
 	GMTextGameObject* textObject = nullptr;
-	Vector<ITexture*> textureCache;
+	GMSprite2DGameObject* spriteObject = nullptr;
+	Vector<GMCanvasTextureInfo> textureCache;
 	Vector<GMCanvas*> canvases;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
@@ -31,8 +49,8 @@ public:
 	~GMCanvasResourceManager();
 
 public:
-	ITexture* getTexture(size_t);
-	void addTexture(ITexture*);
+	const GMCanvasTextureInfo& getTexture(GMsize_t index);
+	GMsize_t addTexture(ITexture* texture, GMint width, GMint height);
 
 	//! 注册一个画布到资源管理器。
 	/*!
@@ -68,6 +86,12 @@ public:
 		return d->textObject;
 	}
 
+	inline GMSprite2DGameObject* getSpriteObject()
+	{
+		D(d);
+		return d->spriteObject;
+	}
+
 	GMModel* getScreenQuadModel();
 	GMGameObject* getScreenQuad();
 };
@@ -79,7 +103,7 @@ GM_PRIVATE_OBJECT(GMCanvas)
 	GMCanvas* prevCanvas; // 上一个画布默认为自己
 	Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
-	Vector<GMElementHolder*> defaultElements;
+	Vector<GMStyleHolder*> defaultstyles;
 	GMfloat timeLastRefresh = 0;
 	GMControl* controlMouseOver = nullptr;
 	bool nonUserEvents = false;
@@ -96,6 +120,7 @@ GM_PRIVATE_OBJECT(GMCanvas)
 	GMint height = 0;
 	GMint x = 0;
 	GMint y = 0;
+	HashMap<GMCanvasControlArea::Area, GMRect> areas;
 };
 
 class GMCanvas : public GMObject
@@ -107,6 +132,10 @@ public:
 	~GMCanvas();
 
 public:
+	virtual void init();
+
+public:
+	void addArea(GMCanvasControlArea::Area area, const GMRect& rc);
 	bool msgProc(GMSystemEvent* event);
 	void render(GMfloat elpasedTime);
 	void setNextCanvas(GMCanvas* nextCanvas);
@@ -123,18 +152,39 @@ public:
 		OUT GMControlStatic** out
 	);
 
+	void addButton(
+		GMint id,
+		const GMString& text,
+		GMint x,
+		GMint y,
+		GMint width,
+		GMint height,
+		bool isDefault,
+		OUT GMControlButton** out
+	);
+
 	void drawText(
 		const GMString& text,
-		GMElement* element,
-		const GMRect& rcDest,
+		GMStyle* style,
+		const GMRect& rc,
 		bool bShadow = false,
 		GMint nCount = -1,
 		bool bCenter = false
 	);
 
+	void drawSprite(
+		GMStyle* style,
+		const GMRect& rc,
+		GMfloat depth
+	);
+
+	void requestFocus(GMControl* control);
+
+protected:
+	virtual void initDefaultStyles();
+
 private:
-	void initDefaultElements();
-	void setDefaultElement(GMControlType type, GMuint index, GMElement* element);
+	void setDefaultStyle(GMControlType type, GMuint index, GMStyle* style);
 	bool initControl(GMControl* control);
 	void setPrevCanvas(GMCanvas* prevCanvas);
 	void refresh();

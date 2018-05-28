@@ -766,7 +766,6 @@ VS_OUTPUT VS_2D(VS_INPUT input)
     VS_OUTPUT output;
     output.Position = float4(input.Position.x, input.Position.y, input.Position.z, 1);
     output.Position = mul(output.Position, GM_WorldMatrix);
-    output.Position.z = 0;
     output.Normal = input.Normal;
     output.Texcoord = input.Texcoord;
     output.Tangent = input.Tangent;

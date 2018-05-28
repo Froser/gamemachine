@@ -18,29 +18,37 @@ void GMElementBlendColor::blend(GMControlState::State state, GMfloat elapsedTime
 {
 	D(d);
 	GMVec4 destColor = d->states[state];
-	d->current = Lerp(d->current, destColor, Pow(rate, 30 * elapsedTime));
+	d->current = Lerp(d->current, destColor, 1/20.f);
 }
 
-void GMElement::setFont(GMuint font, const GMVec4& defaultColor)
+void GMStyle::setTexture(GMuint texture, const GMRect& rc, const GMVec4& defaultTextureColor)
+{
+	D(d);
+	d->texture = texture;
+	d->rc = rc;
+	d->textureColor.init(defaultTextureColor);
+}
+
+void GMStyle::setFont(GMuint font, const GMVec4& defaultColor)
 {
 	D(d);
 	d->font = font;
 	d->fontColor.init(defaultColor);
 }
 
-void GMElement::setFontColor(GMControlState::State state, const GMVec4& color)
+void GMStyle::setFontColor(GMControlState::State state, const GMVec4& color)
 {
 	D(d);
 	d->fontColor.getStates()[state] = color;
 }
 
-void GMElement::setTextureColor(const GMElementBlendColor& color)
+void GMStyle::setTextureColor(GMControlState::State state, const GMVec4& color)
 {
 	D(d);
-	d->textureColor = color;
+	d->textureColor.getStates()[state] = color;
 }
 
-void GMElement::refresh()
+void GMStyle::refresh()
 {
 	D(d);
 	d->textureColor.setCurrent(d->textureColor.getStates()[GMControlState::Hidden]);
@@ -56,20 +64,59 @@ GMControl::GMControl(GMCanvas* canvas)
 GMControl::~GMControl()
 {
 	D(d);
-	for (auto element : d->elements)
+	for (auto style : d->styles)
 	{
-		GM_delete(element);
+		GM_delete(style);
 	}
-	GMClearSTLContainer(d->elements);
+	GMClearSTLContainer(d->styles);
+}
+
+bool GMControl::handleKeyboard(GMSystemKeyEvent* event)
+{
+	bool handled = false;
+	switch (event->getType())
+	{
+	case GMSystemEventType::KeyDown:
+		handled = onKeyDown(event);
+		break;
+	case GMSystemEventType::KeyUp:
+		handled = onKeyUp(event);
+		break;
+	}
+	return handled;
+}
+
+bool GMControl::handleMouse(GMSystemMouseEvent* event)
+{
+	bool handled = false;
+	switch (event->getType())
+	{
+	case GMSystemEventType::MouseDown:
+		handled = onMousePress(event);
+		break;
+	case GMSystemEventType::MouseUp:
+		handled = onMouseRelease(event);
+		break;
+	case GMSystemEventType::MouseMove:
+		handled = onMouseMove(event);
+		break;
+	case GMSystemEventType::MouseDblClick:
+		handled = onMouseDblClick(event);
+		break;
+	case GMSystemEventType::MouseWheel:
+		handled = onMouseWheel(gm_cast<GMSystemMouseWheelEvent*>(event));
+		break;
+	}
+	return handled;
 }
 
 void GMControl::updateRect()
 {
 	D(d);
-	d->rcBoundingBox.x = d->x;
-	d->rcBoundingBox.y = d->y;
-	d->rcBoundingBox.width = d->width;
-	d->rcBoundingBox.height = d->height;
+	d->boundingBox.x = d->x;
+	d->boundingBox.y = d->y;
+	d->boundingBox.width = d->width;
+	d->boundingBox.height = d->height;
 }
 
 void GMControl::refresh()
@@ -78,38 +125,38 @@ void GMControl::refresh()
 	d->mouseOver = false;
 	d->hasFocus = false;
 
-	for (auto element : d->elements)
+	for (auto style : d->styles)
 	{
-		element->refresh();
+		style->refresh();
 	}
 }
 
-bool GMControl::setElement(GMuint index, GMElement* element)
+bool GMControl::setStyle(GMuint index, GMStyle* style)
 {
 	D(d);
 	bool hr = true;
 
-	if (!element)
+	if (!style)
 		return false;
 
-	for (size_t i = d->elements.size(); i <= index; i++)
+	for (GMsize_t i = d->styles.size(); i <= index; i++)
 	{
-		GMElement* newElement = new GMElement();
+		GMStyle* newElement = new GMStyle();
 		if (!newElement)
 			return false;
 
-		d->elements.push_back(newElement);
+		d->styles.push_back(newElement);
 	}
 
-	GMElement* curElement = d->elements[index];
-	*curElement = *element;
+	GMStyle* curElement = d->styles[index];
+	*curElement = *style;
 	return true;
 }
 
 GMControlStatic::GMControlStatic(GMCanvas* parent)
 	: GMControl(parent)
 {
-	D_BASE(d, Base);
+	D_BASE(d, GMControl);
 	d->type = GMControlType::Static;
 }
 
@@ -121,17 +168,135 @@ void GMControlStatic::render(GMfloat elapsed)
 		return;
 
 	GMControlState::State state = GMControlState::Normal;
-	if (db->enabled == false)
+	if (!getEnabled())
 		state = GMControlState::Disabled;
 
-	GM_ASSERT(!db->elements.empty());
-	GMElement* element = db->elements[0];
-	element->getFontColor().blend(state, elapsed);
-	db->canvas->drawText(d->text, element, db->rcBoundingBox, false, -1, false);
+	GM_ASSERT(!db->styles.empty());
+	GMStyle* style = db->styles[0];
+	style->getFontColor().blend(state, elapsed);
+	getParent()->drawText(getText(), style, db->boundingBox, false, -1, false);
 }
 
 void GMControlStatic::setText(const GMString& text)
 {
 	D(d);
 	d->text = text;
+}
+
+GMControlButton::GMControlButton(GMCanvas* parent)
+	: GMControlStatic(parent)
+{
+	D_BASE(d, GMControl);
+	d->type = GMControlType::Button;
+}
+
+bool GMControlButton::onMousePress(GMSystemMouseEvent* event)
+{
+	return handleMousePressOrDblClick(event->getPoint());
+}
+
+bool GMControlButton::onMouseDblClick(GMSystemMouseEvent* event)
+{
+	return handleMousePressOrDblClick(event->getPoint());
+}
+
+bool GMControlButton::onMouseRelease(GMSystemMouseEvent* event)
+{
+	return handleMouseRelease(event->getPoint());
+}
+
+bool GMControlButton::containsPoint(const GMPoint& pt)
+{
+	D_BASE(d, GMControl);
+	return GM_inRect(d->boundingBox, pt);
+}
+
+bool GMControlButton::canHaveFocus()
+{
+	return getEnabled() && getVisible();
+}
+
+void GMControlButton::render(GMfloat elapsed)
+{
+	if (!getVisible())
+		return;
+
+	D(d);
+	D_BASE(db, GMControl);
+	GMint offsetX = 0, offsetY = 0;
+	GMControlState::State state = GMControlState::Normal;
+	if (!getEnabled())
+	{
+		state = GMControlState::Disabled;
+	}
+	else if (d->pressed)
+	{
+		state = GMControlState::Pressed;
+		offsetX = 1;
+		offsetY = 2;
+	}
+	else if (getMouseOver())
+	{
+		state = GMControlState::MouseOver;
+		offsetX = -1;
+		offsetY = -2;
+	}
+	else if (hasFocus())
+	{
+		state = GMControlState::Focus;
+	}
+
+	GMfloat blendRate = (state == GMControlState::Pressed) ? 0.0f : 0.8f;
+	GMStyle* style = getStyle(0);
+	style->getTextureColor().blend(state, elapsed, blendRate);
+	style->getFontColor().blend(state, elapsed, blendRate);
+	GMCanvas* canvas = getParent();
+	canvas->drawSprite(style, db->boundingBox, .8f);
+	canvas->drawText(getText(), style, db->boundingBox, false, -1, false);
+}
+
+bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)
+{
+	if (!canHaveFocus())
+		return false;
+
+	D(d);
+	D_BASE(db, GMControl);
+	if (containsPoint(pt))
+	{
+		d->pressed = true;
+		// TODO SetCapture
+
+		if (!db->hasFocus)
+			getParent()->requestFocus(this);
+		return true;
+	}
+
+	return false;
+}
+
+bool GMControlButton::handleMouseRelease(const GMPoint& pt)
+{
+	if (!canHaveFocus())
+		return false;
+
+	D(d);
+	D_BASE(db, GMControl);
+	if (d->pressed)
+	{
+		d->pressed = false;
+		// TODO ReleaseCapture
+
+		GMCanvas* canvas = getParent();
+		if (!canvas->canKeyboardInput())
+			canvas->clearFocus();
+
+		if (containsPoint(pt))
+		{
+			// TODO SendEvent
+		}
+
+		return true;
+	}
+	return false;
 }
