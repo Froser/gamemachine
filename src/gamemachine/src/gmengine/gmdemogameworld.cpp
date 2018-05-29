@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmdemogameworld.h"
 #include "foundation/gamemachine.h"
-#include "gameobjects/gmcontrolgameobject.h"
 #include "gameobjects/gm2dgameobject.h"
 
 GMDemoGameWorld::GMDemoGameWorld()

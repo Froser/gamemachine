@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "demonstration_world.h"
-#include <gmcontrolgameobject.h>
 #include <gmcanvas.h>
 #include <gmgl.h>
 
@@ -11,7 +10,6 @@
 #include "demo/border.h"
 #include "demo/sound.h"
 #include "demo/literature.h"
-#include "demo/button.h"
 #include "demo/model.h"
 #include "demo/collision.h"
 #include "demo/specularmap.h"
@@ -28,7 +26,6 @@ namespace
 {
 	void loadDemostrations(DemostrationWorld* world)
 	{
-		/*
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
 		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
 		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
@@ -37,13 +34,11 @@ namespace
 		world->addDemo("Border: Demonstrate a border.", new Demo_Border(world));
 		world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
 		world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
-		world->addDemo("Button: Demonstrate how to create a button.", new Demo_Button(world));
 		world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
 		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
 		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
 		world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
 		world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
-		*/
 		world->init();
 	}
 }
@@ -203,43 +198,7 @@ void DemostrationWorld::init()
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 
-	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
-
-	// 读取边框
-	gm::GMBuffer buf;
-	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
-	GM_ASSERT(b);
-	gm::GMImage* img = nullptr;
-	gm::GMImageReader::load(buf.buffer, buf.size, &img);
-	gm::ITexture* frameTexture = nullptr;
-	GM.getFactory()->createTexture(img, &frameTexture);
-	GM_ASSERT(frameTexture);
-	gm::GMAsset borderAsset = getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
-	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
-
-	gm::GMRect rect = { 10, 10, 600, 500 };
-	listbox->setGeometry(rect);
-	listbox->setItemMargins(0, 5, 0, 0);
-	for (auto& demo : d->demos)
-	{
-		gm::GMImage2DGameObject* item = listbox->addItem(demo.first);
-		item->setBorder(gm::GMImage2DBorder(
-			borderAsset,
-			textureGeo,
-			img->getWidth(),
-			img->getHeight(),
-			14,
-			14
-		));
-		item->setHeight(30);
-		item->setPaddings(10, 8, 10, 8);
-		item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-			d->nextDemo = demo.second;
-		});
-	}
-	addControl(listbox);
-	GM_delete(img);
-
+	// 创建画布
 	auto manager = new gm::GMCanvasResourceManager();
 	gm::ITexture* texture = nullptr;
 	gm::GMint width, height;
@@ -256,9 +215,39 @@ void DemostrationWorld::init()
 		d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonFillArea, rc);
 	}
 	d->mainCanvas->init();
-
 	d->mainCanvas->setKeyboardInput(true);
-	d->mainCanvas->addButton(0, "Button", 1024 / 2, 768 / 2, 100, 30, false, nullptr);
+
+	gm::GMint Y = 10, marginY = 10;
+	for (auto& demo : d->demos)
+	{
+		d->mainCanvas->addButton(
+			0,
+			demo.first,
+			10,
+			Y,
+			600,
+			30,
+			false,
+			nullptr
+		);
+		Y += 30 + marginY;
+
+		//gm::GMControlButton* item = listbox->addItem(demo.first);
+		//item->setBorder(gm::GMImage2DBorder(
+		//	borderAsset,
+		//	textureGeo,
+		//	img->getWidth(),
+		//	img->getHeight(),
+		//	14,
+		//	14
+		//));
+		//item->setHeight(30);
+		//item->setPaddings(10, 8, 10, 8);
+		//item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		//	d->nextDemo = demo.second;
+		//});
+	}
+
 	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
 	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
 	GM.registerCanvas(d->mainCanvas);
@@ -348,8 +337,6 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
 		{
-			getWorld()->notifyControls();
-
 			gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 

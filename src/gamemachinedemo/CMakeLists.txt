@@ -37,8 +37,6 @@ set(SOURCES
 		demo/sound.cpp
 		demo/literature.h
 		demo/literature.cpp
-		demo/button.h
-		demo/button.cpp
 		demo/model.h
 		demo/model.cpp
 		demo/collision.h

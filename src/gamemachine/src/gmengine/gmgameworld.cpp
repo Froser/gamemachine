@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <time.h>
 #include "foundation/gamemachine.h"
-#include "gameobjects/gmcontrolgameobject.h"
 
 namespace
 {
@@ -27,11 +26,6 @@ GMGameWorld::~GMGameWorld()
 	for (auto gameObject : d->gameObjects)
 	{
 		GM_delete(gameObject);
-	}
-
-	for (auto control : d->controls)
-	{
-		GM_delete(control);
 	}
 
 	GM_delete(d->physicsWorld);
@@ -64,11 +58,6 @@ void GMGameWorld::renderScene()
 	{
 		engine->draw(d->renderList.forward, d->renderList.deferred);
 	}
-
-	engine->beginBlend();
-	auto& controls = getControls();
-	engine->draw(controls, s_emptyList);
-	engine->endBlend();
 }
 
 bool GMGameWorld::removeObject(GMGameObject* obj)
@@ -90,23 +79,6 @@ void GMGameWorld::simulateGameWorld()
 	D(d);
 	auto phyw = getPhysicsWorld();
 	simulateGameObjects(phyw, d->gameObjects);
-}
-
-void GMGameWorld::addControl(GMControlGameObject* control)
-{
-	D(d);
-	control->setWorld(this);
-	control->onAppendingObjectToWorld();
-	d->controls.push_back(control);
-}
-
-void GMGameWorld::notifyControls()
-{
-	D(d);
-	for (auto& obj : d->controls)
-	{
-		gm_cast<GMControlGameObject*>(obj)->notifyControl();
-	}
 }
 
 void GMGameWorld::clearRenderList()

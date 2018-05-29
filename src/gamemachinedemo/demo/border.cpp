@@ -6,6 +6,7 @@
 void Demo_Border::init()
 {
 	D(d);
+	/*
 	Base::init();
 
 	GM_ASSERT(!getDemoWorldReference());
@@ -38,6 +39,7 @@ void Demo_Border::init()
 	));
 	getDemoWorldReference()->addControl(borderObject);
 	GM_delete(img);
+	*/
 }
 
 void Demo_Border::event(gm::GameMachineHandlerEvent evt)

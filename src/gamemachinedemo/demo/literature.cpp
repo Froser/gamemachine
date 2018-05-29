@@ -25,7 +25,7 @@ void Demo_Literature::init()
 	gm::GMAsset border = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
 
-	gm::GMImage2DGameObject* literature = new gm::GMImage2DGameObject();
+	gm::GMTextGameObject* literature = new gm::GMTextGameObject();
 	gm::GMRect rect = { 200, 220, 400, 190 };
 	literature->setGeometry(rect);
 	literature->setText(
@@ -40,6 +40,7 @@ void Demo_Literature::init()
 		"[size=25][n]Let's try some 'overflow'"
 	);
 
+	/*
 	literature->setBorder(gm::GMImage2DBorder(
 		border,
 		textureGeo,
@@ -50,6 +51,7 @@ void Demo_Literature::init()
 	));
 	literature->setPaddings(10, 17, 10, 15);
 	getDemoWorldReference()->addControl(literature);
+	*/
 	GM_delete(img);
 }
 

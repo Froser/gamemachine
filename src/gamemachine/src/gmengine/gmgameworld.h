@@ -29,7 +29,6 @@ struct GMRenderList
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	GMPhysicsWorld* physicsWorld = nullptr;
-	List<GMGameObject*> controls;
 	GMAssets assets;
 	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
 	GMRenderList renderList;
@@ -56,12 +55,8 @@ public:
 public:
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj);
 	void simulateGameWorld();
-	void addControl(AUTORELEASE GMControlGameObject* control);
-	void notifyControls();
 	void clearRenderList();
 	void addToRenderList(GMGameObject* object);
-
-	inline List<GMGameObject*>& getControls() { D(d); return d->controls; }
 	inline GMAssets& getAssets() { D(d); return d->assets; }
 
 protected:

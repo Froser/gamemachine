@@ -65,7 +65,6 @@ void Demo_Texture::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered('N'))
 			switchNormal();
 
-		getDemoWorldReference()->notifyControls();
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Deactivate:

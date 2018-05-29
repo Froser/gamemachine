@@ -14,6 +14,7 @@ Demo_Sound::~Demo_Sound()
 
 void Demo_Sound::init()
 {
+	/*
 	D(d);
 	Base::init();
 
@@ -21,7 +22,6 @@ void Demo_Sound::init()
 	getDemoWorldReference() = new gm::GMDemoGameWorld();
 
 	// 读取边框
-	gm::GMListbox2DGameObject* listbox = new gm::GMListbox2DGameObject();
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::GMBuffer buf;
 	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
@@ -120,6 +120,7 @@ void Demo_Sound::init()
 
 	getDemoWorldReference()->addControl(listbox);
 	GM_delete(img);
+	*/
 }
 
 void Demo_Sound::event(gm::GameMachineHandlerEvent evt)
@@ -139,7 +140,6 @@ void Demo_Sound::event(gm::GameMachineHandlerEvent evt)
 		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineHandlerEvent::Activate:
-		getDemoWorldReference()->notifyControls();
 		break;
 	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
@@ -152,6 +152,7 @@ void Demo_Sound::event(gm::GameMachineHandlerEvent evt)
 
 void Demo_Sound::setupItem(gm::GMImage2DGameObject* item, gm::GMAsset border, const gm::GMRect& textureGeo, gm::GMint imgWidth, gm::GMint imgHeight)
 {
+	/*
 	item->setBorder(gm::GMImage2DBorder(
 		border,
 		textureGeo,
@@ -162,4 +163,5 @@ void Demo_Sound::setupItem(gm::GMImage2DGameObject* item, gm::GMAsset border, co
 	));
 	item->setHeight(30);
 	item->setPaddings(10, 5, 10, 5);
+	*/
 }

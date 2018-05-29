@@ -77,7 +77,6 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered('P'))
 			d->rotate = !d->rotate;
 
-		getDemoWorldReference()->notifyControls();
 		if (kbState.keyTriggered('0'))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 

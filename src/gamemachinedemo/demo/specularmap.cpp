@@ -211,7 +211,6 @@ void Demo_SpecularMap::event(gm::GameMachineHandlerEvent evt)
 	{
 		handleMouseEvent();
 		handleDragging();
-		getDemoWorldReference()->notifyControls();
 
 		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
