@@ -152,18 +152,8 @@ GMCanvas::GMCanvas(GMCanvasResourceManager* manager)
 	d->nextCanvas = d->prevCanvas = this;
 }
 
-void GMCanvas::init()
-{
-	initDefaultStyles();
-}
-
 GMCanvas::~GMCanvas()
 {
-	D(d);
-	for (auto styleHolder : d->defaultstyles)
-	{
-		GM_delete(styleHolder);
-	}
 	removeAllControls();
 }
 
@@ -173,6 +163,12 @@ void GMCanvas::addControl(GMControl* control)
 	d->controls.push_back(control);
 	bool b = initControl(control);
 	GM_ASSERT(b);
+}
+
+const GMRect& GMCanvas::getArea(GMCanvasControlArea::Area area)
+{
+	D(d);
+	return d->areas[area];
 }
 
 void GMCanvas::addStatic(
@@ -223,19 +219,19 @@ void GMCanvas::addButton(
 
 void GMCanvas::drawText(
 	const GMString& text,
-	GMStyle* style,
+	GMStyle& style,
 	const GMRect& rc,
 	bool shadow,
 	bool center
 )
 {
 	// 不需要绘制透明元素
-	if (style->getFontColor().getCurrent().getW() == 0)
+	if (style.getFontColor().getCurrent().getW() == 0)
 		return;
 
 	D(d);
 	// TODO 先不考虑阴影什么的
-	const GMVec4& fontColor = style->getFontColor().getCurrent();
+	const GMVec4& fontColor = style.getFontColor().getCurrent();
 	GMTextGameObject* textObject = d->manager->getTextObject();
 	textObject->setColorType(Plain);
 	textObject->setColor(fontColor);
@@ -246,19 +242,19 @@ void GMCanvas::drawText(
 }
 
 void GMCanvas::drawSprite(
-	GMStyle* style,
+	GMStyle& style,
 	const GMRect& rc,
 	GMfloat depth
 )
 {
 	// 不需要绘制透明元素
-	if (style->getFontColor().getCurrent().getW() == 0)
+	if (style.getFontColor().getCurrent().getW() == 0)
 		return;
 
 	D(d);
 	// TODO Caption
-	const GMRect& textureRc = style->getTextureRect();
-	GMuint texId = style->getTexture();
+	const GMRect& textureRc = style.getTextureRect();
+	GMuint texId = style.getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(texId);
 
 	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
@@ -267,7 +263,7 @@ void GMCanvas::drawSprite(
 	spriteObject->setTexture(texInfo.texture);
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
-	spriteObject->setColor(style->getTextureColor().getCurrent());
+	spriteObject->setColor(style.getTextureColor().getCurrent());
 	spriteObject->draw();
 }
 
@@ -286,59 +282,6 @@ void GMCanvas::requestFocus(GMControl* control)
 	s_controlFocus = control;
 }
 
-void GMCanvas::initDefaultStyles()
-{
-	D(d);
-
-	// Static
-	{
-		GMStyle style;
-		style.setFont(0);
-		style.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
-		setDefaultStyle(GMControlType::Static, 0, &style);
-	}
-
-	// Button
-	{
-		GMStyle style;
-		style.setTexture(0, d->areas[GMCanvasControlArea::ButtonArea]);
-		style.setFont(0);
-		style.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 0));
-		style.setTextureColor(GMControlState::Pressed, GMVec4(0, 0, 0, .24f));
-		style.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
-		setDefaultStyle(GMControlType::Button, 0, &style);
-	}
-
-	{
-		GMStyle style;
-		style.setTexture(0, d->areas[GMCanvasControlArea::ButtonFillArea]);
-		style.setFont(0);
-		style.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
-		style.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
-		style.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
-		setDefaultStyle(GMControlType::Button, 1, &style);
-	}
-}
-
-void GMCanvas::setDefaultStyle(GMControlType type, GMuint index, GMStyle* style)
-{
-	D(d);
-	for (auto styleHolder : d->defaultstyles)
-	{
-		if (styleHolder->type == type && styleHolder->index == index)
-		{
-			styleHolder->style = *style;
-			return;
-		}
-	}
-
-	GMStyleHolder* styleHolder = new GMStyleHolder();
-	styleHolder->type = type;
-	styleHolder->index = index;
-	styleHolder->style = *style;
-	d->defaultstyles.push_back(styleHolder);
-}
-
 bool GMCanvas::initControl(GMControl* control)
 {
 	D(d);
@@ -347,12 +290,7 @@ bool GMCanvas::initControl(GMControl* control)
 		return false;
 
 	control->setIndex(d->controls.size());
-	for (auto& styleHolder : d->defaultstyles)
-	{
-		if (styleHolder->type == control->getType())
-			control->setStyle(styleHolder->index, &styleHolder->style);
-	}
-
+	control->initStyles();
 	return control->onInit();
 }
 

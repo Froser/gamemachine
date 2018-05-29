@@ -61,16 +61,6 @@ GMControl::GMControl(GMCanvas* canvas)
 	d->canvas = canvas;
 }
 
-GMControl::~GMControl()
-{
-	D(d);
-	for (auto style : d->styles)
-	{
-		GM_delete(style);
-	}
-	GMClearSTLContainer(d->styles);
-}
-
 bool GMControl::handleKeyboard(GMSystemKeyEvent* event)
 {
 	bool handled = false;
@@ -124,33 +114,6 @@ void GMControl::refresh()
 	D(d);
 	d->mouseOver = false;
 	d->hasFocus = false;
-
-	for (auto style : d->styles)
-	{
-		style->refresh();
-	}
-}
-
-bool GMControl::setStyle(GMuint index, GMStyle* style)
-{
-	D(d);
-	bool hr = true;
-
-	if (!style)
-		return false;
-
-	for (GMsize_t i = d->styles.size(); i <= index; i++)
-	{
-		GMStyle* newElement = new GMStyle();
-		if (!newElement)
-			return false;
-
-		d->styles.push_back(newElement);
-	}
-
-	GMStyle* curElement = d->styles[index];
-	*curElement = *style;
-	return true;
 }
 
 GMControlStatic::GMControlStatic(GMCanvas* parent)
@@ -162,19 +125,32 @@ GMControlStatic::GMControlStatic(GMCanvas* parent)
 
 void GMControlStatic::render(GMfloat elapsed)
 {
+	if (!getVisible())
+		return;
+
 	D(d);
 	D_BASE(db, Base);
-	if (!db->visible)
-		return;
 
 	GMControlState::State state = GMControlState::Normal;
 	if (!getEnabled())
 		state = GMControlState::Disabled;
 
-	GM_ASSERT(!db->styles.empty());
-	GMStyle* style = db->styles[0];
-	style->getFontColor().blend(state, elapsed);
-	getParent()->drawText(getText(), style, db->boundingBox, false, false);
+	d->foreStyle.getFontColor().blend(state, elapsed);
+	getParent()->drawText(getText(), d->foreStyle, db->boundingBox, false, false);
+}
+
+void GMControlStatic::refresh()
+{
+	D(d);
+	Base::refresh();
+	d->foreStyle.refresh();
+}
+
+void GMControlStatic::initStyles()
+{
+	D(d);
+	d->foreStyle.setFont(0);
+	d->foreStyle.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
 }
 
 void GMControlStatic::setText(const GMString& text)
@@ -188,6 +164,13 @@ GMControlButton::GMControlButton(GMCanvas* parent)
 {
 	D_BASE(d, GMControl);
 	d->type = GMControlType::Button;
+}
+
+void GMControlButton::refresh()
+{
+	D(d);
+	Base::refresh();
+	d->fillStyle.refresh();
 }
 
 bool GMControlButton::onMousePress(GMSystemMouseEvent* event)
@@ -222,7 +205,7 @@ void GMControlButton::render(GMfloat elapsed)
 		return;
 
 	D(d);
-	D_BASE(db, GMControl);
+	D_BASE(db, Base);
 	GMint offsetX = 0, offsetY = 0;
 	GMControlState::State state = GMControlState::Normal;
 	if (!getEnabled())
@@ -247,20 +230,17 @@ void GMControlButton::render(GMfloat elapsed)
 	}
 
 	GMCanvas* canvas = getParent();
-
 	GMfloat blendRate = (state == GMControlState::Pressed) ? 0.0f : 0.8f;
 
-	GMStyle* style = getStyle(0);
-	style->getTextureColor().blend(state, elapsed, blendRate);
-	style->getFontColor().blend(state, elapsed, blendRate);
-	canvas->drawSprite(style, db->boundingBox, .8f);
-	canvas->drawText(getText(), style, db->boundingBox, false, true);
+	db->foreStyle.getTextureColor().blend(state, elapsed, blendRate);
+	db->foreStyle.getFontColor().blend(state, elapsed, blendRate);
+	canvas->drawSprite(db->foreStyle, boundingRect(), .8f);
+	canvas->drawText(getText(), db->foreStyle, boundingRect(), false, true);
 
-	style = getStyle(1);
-	style->getTextureColor().blend(state, elapsed, blendRate);
-	style->getFontColor().blend(state, elapsed, blendRate);
-	canvas->drawSprite(style, db->boundingBox, .8f);
-	canvas->drawText(getText(), style, db->boundingBox, false, true);
+	d->fillStyle.getTextureColor().blend(state, elapsed, blendRate);
+	d->fillStyle.getFontColor().blend(state, elapsed, blendRate);
+	canvas->drawSprite(d->fillStyle, boundingRect(), .8f);
+	canvas->drawText(getText(), d->fillStyle, boundingRect(), false, true);
 }
 
 bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)
@@ -307,4 +287,23 @@ bool GMControlButton::handleMouseRelease(const GMPoint& pt)
 		return true;
 	}
 	return false;
+}
+
+void GMControlButton::initStyles()
+{
+	D(d);
+	D_BASE(db, Base);
+
+	GMCanvas* canvas = getParent();
+	db->foreStyle.setTexture(0, canvas->getArea(GMCanvasControlArea::ButtonArea));
+	db->foreStyle.setFont(0);
+	db->foreStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 0));
+	db->foreStyle.setTextureColor(GMControlState::Pressed, GMVec4(0, 0, 0, .24f));
+	db->foreStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
+
+	d->fillStyle.setTexture(0, canvas->getArea(GMCanvasControlArea::ButtonFillArea));
+	d->fillStyle.setFont(0);
+	d->fillStyle.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
+	d->fillStyle.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
+	d->fillStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
 }

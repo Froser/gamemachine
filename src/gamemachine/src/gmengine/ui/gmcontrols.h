@@ -124,9 +124,9 @@ GM_PRIVATE_OBJECT(GMControl)
 	GMint width = 0;
 	GMint height = 0;
 	GMRect boundingBox;
-	Vector<GMStyle*> styles;
 	GMCanvas* canvas = nullptr;
 
+	bool styleInited = false;
 	bool enabled = true;
 	bool visible = true;
 	bool mouseOver = false;
@@ -142,7 +142,6 @@ class GMControl : public GMObject
 
 public:
 	GMControl(GMCanvas* canvas);
-	~GMControl();
 
 public:
 	inline void setEnabled(bool enabled)
@@ -261,10 +260,7 @@ public:
 
 	virtual void refresh();
 
-	virtual void render(float elapsed)
-	{
-
-	}
+	virtual void render(float elapsed) {}
 
 	virtual void setId(GMuint id)
 	{
@@ -300,25 +296,19 @@ public:
 		updateRect();
 	}
 
-	virtual GMStyle* getStyle(GMuint index)
-	{
-		D(d);
-		return d->styles[index];
-	}
-
 	virtual void setIsDefault(bool isDefault)
 	{
 		D(d);
 		d->isDefault = isDefault;
 	}
 
-	virtual bool setStyle(GMuint index, GMStyle* style);
-
 	virtual bool containsPoint(const GMPoint& point)
 	{
 		D(d);
 		return GM_inRect(d->boundingBox, point);
 	}
+
+	virtual void initStyles() {}
 
 public:
 	inline bool isDefault()
@@ -345,20 +335,20 @@ public:
 		return d->type;
 	}
 
+	inline const GMRect& boundingRect()
+	{
+		D(d);
+		return d->boundingBox;
+	}
+
 protected:
 	void updateRect();
-};
-
-struct GMStyleHolder
-{
-	GMControlType type;
-	GMuint index;
-	GMStyle style;
 };
 
 GM_PRIVATE_OBJECT(GMControlStatic)
 {
 	GMString text;
+	GMStyle foreStyle;
 };
 
 class GMControlStatic : public GMControl
@@ -370,11 +360,15 @@ public:
 
 public:
 	virtual void render(GMfloat elapsed) override;
+	virtual void refresh() override;
 
 	virtual bool containsPoint(const GMPoint&) override
 	{
 		return false;
 	}
+
+protected:
+	virtual void initStyles() override;
 
 public:
 	inline const GMString& getText() const
@@ -389,16 +383,19 @@ public:
 GM_PRIVATE_OBJECT(GMControlButton)
 {
 	bool pressed = false;
+	GMStyle fillStyle;
 };
 
 class GMControlButton : public GMControlStatic
 {
-	DECLARE_PRIVATE(GMControlButton)
+	DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlStatic)
 
 public:
 	GMControlButton(GMCanvas* parent);
 
 public:
+	virtual void refresh() override;
+
 	// virtual void onHotkey
 	virtual bool onMousePress(GMSystemMouseEvent* event) override;
 	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
@@ -410,6 +407,9 @@ public:
 private:
 	bool handleMousePressOrDblClick(const GMPoint& pt);
 	bool handleMouseRelease(const GMPoint& pt);
+
+protected:
+	virtual void initStyles() override;
 };
 END_NS
 #endif

@@ -103,7 +103,6 @@ GM_PRIVATE_OBJECT(GMCanvas)
 	GMCanvas* prevCanvas; // 上一个画布默认为自己
 	Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
-	Vector<GMStyleHolder*> defaultstyles;
 	GMfloat timeLastRefresh = 0;
 	GMControl* controlMouseOver = nullptr;
 	bool nonUserEvents = false;
@@ -132,7 +131,7 @@ public:
 	~GMCanvas();
 
 public:
-	virtual void init();
+	virtual void init() {}
 
 public:
 	void addArea(GMCanvasControlArea::Area area, const GMRect& rc);
@@ -140,6 +139,7 @@ public:
 	void render(GMfloat elpasedTime);
 	void setNextCanvas(GMCanvas* nextCanvas);
 	void addControl(GMControl* control);
+	const GMRect& getArea(GMCanvasControlArea::Area area);
 
 	void addStatic(
 		GMint id,
@@ -165,25 +165,21 @@ public:
 
 	void drawText(
 		const GMString& text,
-		GMStyle* style,
+		GMStyle& style,
 		const GMRect& rc,
 		bool shadow = false,
 		bool center = false
 	);
 
 	void drawSprite(
-		GMStyle* style,
+		GMStyle& style,
 		const GMRect& rc,
 		GMfloat depth
 	);
 
 	void requestFocus(GMControl* control);
 
-protected:
-	virtual void initDefaultStyles();
-
 private:
-	void setDefaultStyle(GMControlType type, GMuint index, GMStyle* style);
 	bool initControl(GMControl* control);
 	void setPrevCanvas(GMCanvas* prevCanvas);
 	void refresh();
