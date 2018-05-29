@@ -17,6 +17,7 @@ struct GMTypoResult
 	GMfloat lineHeight = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
+	bool newLineOrEOFSeparator = false;
 };
 
 struct ITypoEngine;
@@ -25,8 +26,6 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 {
 	ITypoEngine* typo = nullptr;
 	GMsize_t index = 0;
-	GMTypoResult result;
-	bool invalid = true;
 };
 
 class GMTypoIterator : public GMObject
@@ -53,6 +52,7 @@ struct GMTypoOptions
 	GMFontSizePt defaultFontSize = 12;
 	GMint lineSpacing = 0;
 	GMRect typoArea = { 0, 0, -1, -1 }; // 排版框，排版引擎将在此框内排版
+	bool center = false;
 };
 
 GM_INTERFACE(ITypoEngine)
@@ -63,6 +63,7 @@ GM_INTERFACE(ITypoEngine)
 private:
 	friend class GMTypoIterator;
 	virtual GMTypoResult getTypoResult(GMsize_t index) = 0;
+	virtual const Vector<GMTypoResult>& getResults() = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,6 +127,8 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 	GMint current_y = 0;
 	GMFontSizePt fontSize = 12;
 	GMfloat color[3] = { 1.f, 1.f, 1.f };
+
+	Vector<GMTypoResult> results;
 };
 
 class GMTypoEngine : public GMObject, public ITypoEngine
@@ -151,6 +154,9 @@ private:
 public:
 	void setColor(GMfloat rgb[3]);
 	void setFontSize(GMint pt);
+
+public:
+	virtual const Vector<GMTypoResult>& getResults() override;
 };
 
 END_NS

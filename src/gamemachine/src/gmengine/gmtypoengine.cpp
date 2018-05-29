@@ -8,26 +8,18 @@ GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
 	D(d);
 	d->typo = typo;
 	d->index = index;
-
-	if (!index)
-	{
-		d->result = d->typo->getTypoResult(index);
-		d->invalid = false;
-	}
 }
 
 const GMTypoResult& GMTypoIterator::operator*()
 {
 	D(d);
-	GM_ASSERT(!d->invalid);
-	return d->result;
+	return d->typo->getResults()[d->index];
 }
 
 GMTypoIterator& GMTypoIterator::operator ++()
 {
 	D(d);
-	GM_ASSERT(!d->invalid);
-	d->result = d->typo->getTypoResult(++d->index);
+	++d->index;
 	return *this;
 }
 
@@ -190,6 +182,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	D(d);
 	d->options = options;
 	d->current_x = d->current_y = 0;
+	d->results.clear();
 	setFontSize(d->options.defaultFontSize);
 	d->literature = literature.toStdWString();
 
@@ -203,6 +196,48 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 		if (d->lineHeight < glyph.height)
 			d->lineHeight = glyph.height;
 		++p;
+	}
+
+	GMint rows = 0;
+	GMsize_t len = wstr.length();
+	for (GMsize_t i = 0; i < len; ++i)
+	{
+		GMTypoResult result = getTypoResult(i);
+		if (result.newLineOrEOFSeparator)
+			++rows;
+		d->results.push_back(result);
+	}
+	GMTypoResult eof;
+	eof.newLineOrEOFSeparator = true;
+	d->results.push_back(eof);
+	++rows;
+
+	GMsize_t sz = d->results.size();
+	if (d->options.center && sz > 0)
+	{
+		GMTypoResult* pStart = const_cast<GMTypoResult*>(d->results.data());
+		GMTypoResult* pCurrent = pStart;
+		const GMTypoResult* pLast = &d->results[sz - 1];
+
+		while (pCurrent != pLast + 1)
+		{
+			if (pCurrent->newLineOrEOFSeparator)
+			{
+				// 如果是一个行分隔符，计算出本行的宽度
+				GMTypoResult* prev = pCurrent - 1;
+				GMint width = prev->x + prev->width - pStart->x;
+				while (pStart != pCurrent)
+				{
+					pStart->x += (d->options.typoArea.width - width) / 2;
+					++pStart;
+				}
+			}
+
+			//调整高度
+			pCurrent->y += (d->options.typoArea.height - rows * d->lineHeight) / 2;
+
+			pCurrent++;
+		}
 	}
 
 	return GMTypoIterator(this, 0);
@@ -269,6 +304,11 @@ void GMTypoEngine::newLine()
 	D(d);
 	d->current_x = 0;
 	d->current_y += d->lineHeight + d->options.lineSpacing;
+
+	GMTypoResult newLineSep;
+	newLineSep.valid = false;
+	newLineSep.newLineOrEOFSeparator = true;
+	d->results.push_back(newLineSep);
 }
 
 bool GMTypoEngine::isValidTypeFrame()
@@ -289,4 +329,10 @@ void GMTypoEngine::setFontSize(GMint pt)
 {
 	D(d);
 	d->fontSize = pt;
+}
+
+const Vector<GMTypoResult>& GMTypoEngine::getResults()
+{
+	D(d);
+	return d->results;
 }

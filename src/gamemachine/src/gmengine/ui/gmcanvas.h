@@ -167,9 +167,8 @@ public:
 		const GMString& text,
 		GMStyle* style,
 		const GMRect& rc,
-		bool bShadow = false,
-		GMint nCount = -1,
-		bool bCenter = false
+		bool shadow = false,
+		bool center = false
 	);
 
 	void drawSprite(

@@ -174,7 +174,7 @@ void GMControlStatic::render(GMfloat elapsed)
 	GM_ASSERT(!db->styles.empty());
 	GMStyle* style = db->styles[0];
 	style->getFontColor().blend(state, elapsed);
-	getParent()->drawText(getText(), style, db->boundingBox, false, -1, false);
+	getParent()->drawText(getText(), style, db->boundingBox, false, false);
 }
 
 void GMControlStatic::setText(const GMString& text)
@@ -246,13 +246,21 @@ void GMControlButton::render(GMfloat elapsed)
 		state = GMControlState::Focus;
 	}
 
+	GMCanvas* canvas = getParent();
+
 	GMfloat blendRate = (state == GMControlState::Pressed) ? 0.0f : 0.8f;
+
 	GMStyle* style = getStyle(0);
 	style->getTextureColor().blend(state, elapsed, blendRate);
 	style->getFontColor().blend(state, elapsed, blendRate);
-	GMCanvas* canvas = getParent();
 	canvas->drawSprite(style, db->boundingBox, .8f);
-	canvas->drawText(getText(), style, db->boundingBox, false, -1, false);
+	canvas->drawText(getText(), style, db->boundingBox, false, true);
+
+	style = getStyle(1);
+	style->getTextureColor().blend(state, elapsed, blendRate);
+	style->getFontColor().blend(state, elapsed, blendRate);
+	canvas->drawSprite(style, db->boundingBox, .8f);
+	canvas->drawText(getText(), style, db->boundingBox, false, true);
 }
 
 bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)

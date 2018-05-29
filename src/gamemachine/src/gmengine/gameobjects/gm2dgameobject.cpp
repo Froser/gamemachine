@@ -67,7 +67,7 @@ void GM2DGameObjectBase::setShader(GMShader& shader)
 	shader.setCull(GMS_Cull::NONE);
 	shader.setBlend(true);
 	shader.setBlendFactorSource(GMS_BlendFunc::SRC_ALPHA);
-	shader.setBlendFactorDest(GMS_BlendFunc::ONE);
+	shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_SRC_ALPHA);
 }
 
 GMTextGameObject::GMTextGameObject()
@@ -129,6 +129,16 @@ void GMTextGameObject::setColor(const GMVec4& color)
 	{
 		markDirty();
 		d->color = colorCache;
+	}
+}
+
+void GMTextGameObject::setCenter(bool center)
+{
+	D(d);
+	if (d->center != center)
+	{
+		d->center = center;
+		markDirty();
 	}
 }
 
@@ -197,6 +207,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		// 使用排版引擎进行排版
 		ITypoEngine* typoEngine = d->typoEngine;
 		GMTypoOptions options;
+		options.center = d->center;
 		options.typoArea.width = coord.width * rect.width * .5f;
 		options.typoArea.height = coord.height * rect.height * .5f;
 
@@ -339,6 +350,21 @@ void GMSprite2DGameObject::setTextureRect(const GMRect& rect)
 	}
 }
 
+void GMSprite2DGameObject::setColor(const GMVec4& color)
+{
+	D(d);
+	GMFloat4 colorCache;
+	color.loadFloat4(colorCache);
+	if (colorCache[0] != d->color[0] ||
+		colorCache[1] != d->color[1] ||
+		colorCache[2] != d->color[2] ||
+		colorCache[3] != d->color[3])
+	{
+		markDirty();
+		d->color = colorCache;
+	}
+}
+
 void GMSprite2DGameObject::update()
 {
 	D(d);
@@ -366,8 +392,9 @@ GMModel* GMSprite2DGameObject::createModel()
 {
 	D(d);
 	GMModel* model = new GMModel();
-	model->setType(GMModelType::Text);
+	model->setType(GMModelType::Model2D);
 	model->setUsageHint(GMUsageHint::DynamicDraw);
+	model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 	setShader(model->getShader());
 	GMMesh* mesh = new GMMesh(model);
 	GMsize_t len = VerticesCount; //每个Sprite，用4个顶点来渲染
@@ -399,7 +426,7 @@ void GMSprite2DGameObject::updateVertices(GMModel* model)
 			{ 0 },
 			{ 0 },
 			{ 0 },
-			{ 0 }
+			{ d->color[0], d->color[1], d->color[2], d->color[3] }
 		},
 		{
 			{ coord.x, coord.y , d->depth },
@@ -408,7 +435,7 @@ void GMSprite2DGameObject::updateVertices(GMModel* model)
 			{ 0 },
 			{ 0 },
 			{ 0 },
-			{ 0 }
+			{ d->color[0], d->color[1], d->color[2], d->color[3] }
 		},
 		{
 			{ coord.x + coord.width, coord.y - coord.height , d->depth },
@@ -417,7 +444,7 @@ void GMSprite2DGameObject::updateVertices(GMModel* model)
 			{ 0 },
 			{ 0 },
 			{ 0 },
-			{ 0 }
+			{ d->color[0], d->color[1], d->color[2], d->color[3] }
 		},
 		{
 			{ coord.x + coord.width, coord.y, d->depth },
@@ -426,7 +453,7 @@ void GMSprite2DGameObject::updateVertices(GMModel* model)
 			{ 0 },
 			{ 0 },
 			{ 0 },
-			{ 0 }
+			{ d->color[0], d->color[1], d->color[2], d->color[3] }
 		}
 	};
 

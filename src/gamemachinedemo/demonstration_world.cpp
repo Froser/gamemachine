@@ -247,12 +247,18 @@ void DemostrationWorld::init()
 	manager->addTexture(texture, width, height);
 
 	d->mainCanvas = new gm::GMCanvas(manager);
-	gm::GMRect rc = { 0, 0, 136, 54 };
-	d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonArea, rc);
+	{
+		gm::GMRect rc = { 0, 0, 136, 54 };
+		d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonArea, rc);
+	}
+	{
+		gm::GMRect rc = { 136, 0, 116, 54 };
+		d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonFillArea, rc);
+	}
 	d->mainCanvas->init();
 
 	d->mainCanvas->setKeyboardInput(true);
-	d->mainCanvas->addButton(0, "Button", 1024 / 2, 768 / 2, 100, 100, false, nullptr);
+	d->mainCanvas->addButton(0, "Button", 1024 / 2, 768 / 2, 100, 30, false, nullptr);
 	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
 	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
 	GM.registerCanvas(d->mainCanvas);

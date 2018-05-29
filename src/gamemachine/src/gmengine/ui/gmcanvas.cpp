@@ -225,9 +225,8 @@ void GMCanvas::drawText(
 	const GMString& text,
 	GMStyle* style,
 	const GMRect& rc,
-	bool bShadow,
-	GMint nCount,
-	bool bCenter
+	bool shadow,
+	bool center
 )
 {
 	// 不需要绘制透明元素
@@ -242,6 +241,7 @@ void GMCanvas::drawText(
 	textObject->setColor(fontColor);
 	textObject->setText(text);
 	textObject->setGeometry(rc);
+	textObject->setCenter(center);
 	textObject->draw();
 }
 
@@ -261,14 +261,13 @@ void GMCanvas::drawSprite(
 	GMuint texId = style->getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(texId);
 
-	const GMVec4& fontColor = style->getFontColor().getCurrent();
 	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
-	//spriteObject->setColor
 	spriteObject->setGeometry(rc);
 	spriteObject->setTexture(texInfo.texture);
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
+	spriteObject->setColor(style->getTextureColor().getCurrent());
 	spriteObject->draw();
 }
 
@@ -290,20 +289,35 @@ void GMCanvas::requestFocus(GMControl* control)
 void GMCanvas::initDefaultStyles()
 {
 	D(d);
-	GMStyle style;
 
 	// Static
-	style.setFont(0);
-	style.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
-	setDefaultStyle(GMControlType::Static, 0, &style);
+	{
+		GMStyle style;
+		style.setFont(0);
+		style.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
+		setDefaultStyle(GMControlType::Static, 0, &style);
+	}
 
 	// Button
-	style.setTexture(0, d->areas[GMCanvasControlArea::ButtonArea]);
-	style.setFont(0);
-	style.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
-	style.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
-	style.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
-	setDefaultStyle(GMControlType::Button, 0, &style);
+	{
+		GMStyle style;
+		style.setTexture(0, d->areas[GMCanvasControlArea::ButtonArea]);
+		style.setFont(0);
+		style.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 0));
+		style.setTextureColor(GMControlState::Pressed, GMVec4(0, 0, 0, .24f));
+		style.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
+		setDefaultStyle(GMControlType::Button, 0, &style);
+	}
+
+	{
+		GMStyle style;
+		style.setTexture(0, d->areas[GMCanvasControlArea::ButtonFillArea]);
+		style.setFont(0);
+		style.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
+		style.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
+		style.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
+		setDefaultStyle(GMControlType::Button, 1, &style);
+	}
 }
 
 void GMCanvas::setDefaultStyle(GMControlType type, GMuint index, GMStyle* style)

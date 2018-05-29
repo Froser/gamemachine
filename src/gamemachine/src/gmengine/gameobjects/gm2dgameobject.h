@@ -65,6 +65,8 @@ enum GMTextColorType
 GM_PRIVATE_OBJECT(GMTextGameObject)
 {
 	GMString text;
+	GMint lineHeight = 0;
+	bool center = false;
 	GMsize_t length = 0;
 	ITexture* texture = nullptr;
 	ITypoEngine* typoEngine = nullptr;
@@ -88,6 +90,7 @@ public:
 	void setText(const GMString& text);
 	void setColorType(GMTextColorType type);
 	void setColor(const GMVec4& color);
+	void setCenter(bool center);
 
 public:
 	virtual void onAppendingObjectToWorld() override;
@@ -108,6 +111,7 @@ GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 	GMint texWidth = 0;
 	GMfloat depth = 0;
 	bool needUpdateTexture = true;
+	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 };
 
 class GMSprite2DGameObject : public GM2DGameObjectBase
@@ -131,6 +135,7 @@ public:
 	void setTexture(ITexture* tex);
 	void setTextureSize(GMint width, GMint height);
 	void setTextureRect(const GMRect& rect);
+	void setColor(const GMVec4& color);
 
 private:
 	void update();
