@@ -1,69 +1,81 @@
 ﻿#include "stdafx.h"
-#include "gmuidx11window.h"
+#include "gmengine/ui/gmwindow.h"
 #include <gmdx11helper.h>
-#include <gamemachine.h>
-#include <d3dcommon.h>
-
-#define EXIT __exit
-#define CHECK_HR(hr) if(FAILED(hr)) { GM_ASSERT(false); goto EXIT; }
+#include "foundation/gamemachine.h"
 
 namespace
 {
-	const gm::GMwchar* g_classname = L"gamemachine_MainWindow_dx11_class";
+	const GMwchar* g_classname = L"gamemachine_MainWindow_dx11_class";
 	const DXGI_FORMAT g_bufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 }
 
-GMUIDx11Window::GMUIDx11Window()
+GM_PRIVATE_OBJECT(GMWindow_Dx11)
 {
+	GMComPtr<ID3D11Device> device;
+	GMComPtr<ID3D11DeviceContext> deviceContext;
+	GMComPtr<IDXGISwapChain> swapChain;
+	GMComPtr<ID3D11DepthStencilView> depthStencilView;
+	GMComPtr<ID3D11Texture2D> depthStencilTexture;
+	GMComPtr<ID3D11RenderTargetView> renderTargetView;
+	D3D_FEATURE_LEVEL d3dFeatureLevel;
 
-}
+	bool vsync = true; //默认开启垂直同步
+	DXGI_MODE_DESC* modes = nullptr;
+};
 
-GMUIDx11Window::~GMUIDx11Window()
+class GMWindow_Dx11 : public GMWindow
+{
+	DECLARE_PRIVATE_AND_BASE(GMWindow_Dx11, GMWindow)
+
+public:
+	GMWindow_Dx11() = default;
+	~GMWindow_Dx11();
+
+public:
+	virtual void update() override;
+	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
+	virtual void onWindowCreated(const GMWindowAttributes& attrs, GMWindowHandle handle) override;
+};
+
+GMWindow_Dx11::~GMWindow_Dx11()
 {
 	D(d);
-	gm::GM_delete(d->modes);
+	GM_delete(d->modes);
 }
 
-gm::GMWindowHandle GMUIDx11Window::create(const gm::GMWindowAttributes& wndAttrs)
-{
-	GMUIGameMachineWindowBase::createWindow(wndAttrs, g_classname);
-	initD3D(wndAttrs);
-	return getWindowHandle();
-}
-
-void GMUIDx11Window::update()
+void GMWindow_Dx11::update()
 {
 	D(d);
 	GM_DX_HR(d->swapChain->Present(d->vsync ? 1 : 0, 0));
 	Base::update();
 }
 
-bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
+bool GMWindow_Dx11::getInterface(GameMachineInterfaceID id, void** out)
 {
 	D(d);
 	switch (id)
 	{
-	case gm::GameMachineInterfaceID::D3D11Device:
+	case GameMachineInterfaceID::D3D11Device:
 		d->device->AddRef();
 		(*out) = d->device.get();
 		break;
-	case gm::GameMachineInterfaceID::D3D11DeviceContext:
+	case GameMachineInterfaceID::D3D11DeviceContext:
 		d->deviceContext->AddRef();
 		(*out) = d->deviceContext.get();
 		break;
-	case gm::GameMachineInterfaceID::D3D11SwapChain:
+	case GameMachineInterfaceID::D3D11SwapChain:
 		d->swapChain->AddRef();
 		(*out) = d->swapChain.get();
 		break;
-	case gm::GameMachineInterfaceID::D3D11DepthStencilView:
+	case GameMachineInterfaceID::D3D11DepthStencilView:
 		d->depthStencilView->AddRef();
 		(*out) = d->depthStencilView.get();
 		break;
-	case gm::GameMachineInterfaceID::D3D11DepthStencilTexture:
+	case GameMachineInterfaceID::D3D11DepthStencilTexture:
 		d->depthStencilTexture->AddRef();
 		(*out) = d->depthStencilTexture.get();
 		break;
-	case gm::GameMachineInterfaceID::D3D11RenderTargetView:
+	case GameMachineInterfaceID::D3D11RenderTargetView:
 		d->renderTargetView->AddRef();
 		(*out) = d->renderTargetView.get();
 		break;
@@ -73,59 +85,54 @@ bool GMUIDx11Window::getInterface(gm::GameMachineInterfaceID id, void** out)
 	return true;
 }
 
-void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
+void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle)
 {
 	D(d);
-	gm::GMGameMachineRunningStates gameMachineRunningState = GM.getGameMachineRunningStates();
+	GM_ASSERT(handle);
+
+	GMGameMachineRunningStates gameMachineRunningState = GM.getGameMachineRunningStates();
 	UINT createDeviceFlags = 0;
 	DXGI_SWAP_CHAIN_DESC sc = { 0 };
 	D3D11_TEXTURE2D_DESC depthTextureDesc;
 	D3D11_VIEWPORT vp = { 0 };
 	DXGI_ADAPTER_DESC adapterDesc = { 0 };
 	D3D11_DEPTH_STENCIL_DESC depthStencilDesc = { 0 };
-	HRESULT hr;
-	gm::GMMessage msg;
+	GMMessage msg;
 
 	// COM objs
-	gm::GMComPtr<IDXGIFactory> dxgiFactory;
-	gm::GMComPtr<IDXGIAdapter> dxgiAdapter;
-	gm::GMComPtr<IDXGIOutput> dxgiAdapterOutput;
+	GMComPtr<IDXGIFactory> dxgiFactory;
+	GMComPtr<IDXGIAdapter> dxgiAdapter;
+	GMComPtr<IDXGIOutput> dxgiAdapterOutput;
 
-	gm::GMComPtr<IDXGIDevice> dxgiDevice;
-	gm::GMComPtr<ID3D11Texture2D> backBuffer;
-	gm::GMComPtr<ID3D11DepthStencilState> depthStencilState;
-	gm::GMComPtr<ID3D11RasterizerState> rasterizerState;
+	GMComPtr<IDXGIDevice> dxgiDevice;
+	GMComPtr<ID3D11Texture2D> backBuffer;
+	GMComPtr<ID3D11DepthStencilState> depthStencilState;
+	GMComPtr<ID3D11RasterizerState> rasterizerState;
 
 	UINT renderWidth = wndAttrs.rc.right - wndAttrs.rc.left;
 	UINT renderHeight = wndAttrs.rc.bottom - wndAttrs.rc.top;
-	gm::GMuint numerator = 0, denominator = 0;
+	GMuint numerator = 0, denominator = 0;
 
 	// 1.枚举设备属性
-	hr = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
-	CHECK_HR(hr);
-	hr = dxgiFactory->EnumAdapters(0, &dxgiAdapter);
-	CHECK_HR(hr);
-	hr = dxgiAdapter->EnumOutputs(0, &dxgiAdapterOutput);
-	CHECK_HR(hr);
-	gm::GMuint numModes;
-	hr = dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
-	CHECK_HR(hr);
+	GM_DX_HR(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
+	GM_DX_HR(dxgiFactory->EnumAdapters(0, &dxgiAdapter));
+	GM_DX_HR(dxgiAdapter->EnumOutputs(0, &dxgiAdapterOutput));
+	GMuint numModes;
+	GM_DX_HR(dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL));
 	d->modes = new DXGI_MODE_DESC[numModes];
-	hr = dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, d->modes);
-	CHECK_HR(hr);
-	for (gm::GMuint i = 0; i < numModes; i++)
+	GM_DX_HR(dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, d->modes));
+	for (GMuint i = 0; i < numModes; i++)
 	{
-		if (d->modes[i].Width == (gm::GMuint)renderWidth)
+		if (d->modes[i].Width == (GMuint)renderWidth)
 		{
-			if (d->modes[i].Height == (gm::GMuint)renderHeight)
+			if (d->modes[i].Height == (GMuint)renderHeight)
 			{
 				numerator = d->modes[i].RefreshRate.Numerator;
 				denominator = d->modes[i].RefreshRate.Denominator;
 			}
 		}
 	}
-	hr = dxgiAdapter->GetDesc(&adapterDesc);
-	CHECK_HR(hr);
+	GM_DX_HR(dxgiAdapter->GetDesc(&adapterDesc));
 
 	gameMachineRunningState.workingAdapterDesc = adapterDesc.Description;
 	gameMachineRunningState.vsyncEnabled = d->vsync;
@@ -163,7 +170,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	createFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	hr = D3D11CreateDevice(
+	GM_DX_HR(D3D11CreateDevice(
 		NULL,
 		D3D_DRIVER_TYPE_HARDWARE,
 		NULL,
@@ -173,16 +180,15 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 		D3D11_SDK_VERSION,
 		&d->device,
 		NULL,
-		&d->deviceContext);
-	CHECK_HR(hr);
+		&d->deviceContext)
+	);
 
 	UINT msaaQuality = 0;
-	hr = d->device->CheckMultisampleQualityLevels(
+	GM_DX_HR(d->device->CheckMultisampleQualityLevels(
 		g_bufferFormat,
 		wndAttrs.samples,
 		&msaaQuality
-		);
-	CHECK_HR(hr);
+	));
 
 	if (wndAttrs.samples <= 1)
 	{
@@ -206,19 +212,16 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	}
 
 
-	hr = dxgiFactory->CreateSwapChain(
+	GM_DX_HR(dxgiFactory->CreateSwapChain(
 		d->device,
 		&sc,
 		&d->swapChain
-	);
-	CHECK_HR(hr);
+	));
 
 	// 3.创建目标视图
-	hr = d->swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer));
-	CHECK_HR(hr);
+	GM_DX_HR(d->swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
 
-	hr = d->device->CreateRenderTargetView(backBuffer, NULL, &d->renderTargetView);
-	CHECK_HR(hr);
+	GM_DX_HR(d->device->CreateRenderTargetView(backBuffer, NULL, &d->renderTargetView));
 	GM_DX11_SET_OBJECT_NAME_A(d->renderTargetView, "GM_DefaultRenderTargetView");
 
 	// 4.创建深度模板缓存
@@ -235,8 +238,7 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	depthTextureDesc.CPUAccessFlags = 0;
 	depthTextureDesc.MiscFlags = 0;
 
-	hr = d->device->CreateTexture2D(&depthTextureDesc, NULL, &d->depthStencilTexture);
-	CHECK_HR(hr);
+	GM_DX_HR(d->device->CreateTexture2D(&depthTextureDesc, NULL, &d->depthStencilTexture));
 	GM_DX11_SET_OBJECT_NAME_A(d->depthStencilTexture, "GM_DefaultDepthStencilTexture");
 
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
@@ -255,12 +257,10 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	hr = d->device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState);
-	CHECK_HR(hr);
+	GM_DX_HR(d->device->CreateDepthStencilState(&depthStencilDesc, &depthStencilState));
 	d->deviceContext->OMSetDepthStencilState(depthStencilState, 1);
 
-	hr = d->device->CreateDepthStencilView(d->depthStencilTexture, NULL, &d->depthStencilView);
-	CHECK_HR(hr);
+	GM_DX_HR(d->device->CreateDepthStencilView(d->depthStencilTexture, NULL, &d->depthStencilView));
 
 	// 5.绑定渲染目标
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);
@@ -268,8 +268,8 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	// 6.设置视口
 	gameMachineRunningState.viewportTopLeftX = vp.TopLeftX = 0.f;
 	gameMachineRunningState.viewportTopLeftY = vp.TopLeftY = 0.f;
-	vp.Width = static_cast<gm::GMfloat>(renderWidth);
-	vp.Height = static_cast<gm::GMfloat>(renderHeight);
+	vp.Width = static_cast<GMfloat>(renderWidth);
+	vp.Height = static_cast<GMfloat>(renderHeight);
 	gameMachineRunningState.minDepth = vp.MinDepth = 0.f;
 	gameMachineRunningState.maxDepth = vp.MaxDepth = 1.f;
 	d->deviceContext->RSSetViewports(1, &vp);
@@ -277,10 +277,15 @@ void GMUIDx11Window::initD3D(const gm::GMWindowAttributes& wndAttrs)
 	// 发送事件，更新状态
 	GM.setGameMachineRunningStates(gameMachineRunningState);
 
-	msg.msgType = gm::GameMachineMessageType::Dx11Ready;
+	msg.msgType = GameMachineMessageType::Dx11Ready;
 	msg.objPtr = static_cast<IQueriable*>(this);
 	GM.postMessage(msg);
+}
 
-EXIT:
-	return;
+bool GMWindowFactory::createWindowWithDx11(GMInstance instance, OUT IWindow** window)
+{
+	(*window) = new GMWindow_Dx11();
+	if (*window)
+		return true;
+	return false;
 }

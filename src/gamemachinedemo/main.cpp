@@ -2,11 +2,10 @@
 #include <windows.h>
 #include <fstream>
 #include <gamemachine.h>
-#include <gmgl.h>
-#include <gmdx11.h>
-#include <gmui.h>
 #include <gmm.h>
 #include "demonstration_world.h"
+#include <gmdx11.h>
+#include <gmgl.h>
 
 namespace
 {
@@ -60,24 +59,16 @@ int WINAPI wWinMain(
 	//mainAttrs.samples = 1;
 
 	gm::IWindow* mainWindow = nullptr;
-	gmui::GMUIFactory::createMainWindow(hInstance, &mainWindow, GetRenderEnv());
+	factory->createWindow(hInstance, &mainWindow);
 	mainWindow->create(mainAttrs);
 
-	gm::GMWindowAttributes consoleAttrs;
-	consoleAttrs.windowName = L"GameMachineConsoleWindow";
-	consoleAttrs.dwStyle = WS_OVERLAPPED | WS_CAPTION | WS_THICKFRAME | WS_SYSMENU;
-	consoleAttrs.dwExStyle = WS_EX_CLIENTEDGE;
-	consoleAttrs.rc.right = 700;
-	consoleAttrs.rc.bottom = 400;
-
-	gm::GMConsoleHandle consoleHandle;
-	gmui::GMUIFactory::createConsoleWindow(hInstance, consoleHandle);
-	if (consoleHandle.window)
-		consoleHandle.window->create(consoleAttrs);
+	gm::GMConsoleHandle console;
+	console.dbgoutput = nullptr;
+	console.window = nullptr;
 
 	GM.init(
 		mainWindow,
-		consoleHandle,
+		console,
 		factory,
 		new DemostrationEntrance(),
 		GetRenderEnv()

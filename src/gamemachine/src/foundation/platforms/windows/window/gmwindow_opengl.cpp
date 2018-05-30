@@ -1,19 +1,17 @@
 ﻿#include "stdafx.h"
-#include "gmuiglwindow.h"
-#include "gmuiinput.h"
 #include <GL/glew.h>
 #include <GL/wglew.h>
+#include "gmengine/ui/gmwindow.h"
+#include "foundation/gamemachine.h"
 
 #define EXIT __exit
 #define RUN_AND_CHECK(i) if (!(i)) { GM_ASSERT(false); goto EXIT; }
 
 namespace
 {
-	const gm::GMwchar* g_classname = L"gamemachine_MainWindow_gl_class";
-
 	HWND createTempWindow()
 	{
-		LPWSTR lpszClassName = L"gamemachine_TempWindow_gl_class";
+		LPWSTR lpszClassName = L"Gamemachine TempWindowClass";
 		WNDCLASS wc;
 		wc.style = CS_HREDRAW | CS_VREDRAW;
 		wc.lpfnWndProc = ::DefWindowProc;
@@ -46,34 +44,53 @@ namespace
 	}
 }
 
-GMUIGLWindow::GMUIGLWindow()
+
+GM_PRIVATE_OBJECT(GMWindow_OpenGL)
+{
+	BYTE depthBits, stencilBits;
+	HDC hDC;
+	HGLRC hRC;
+};
+
+class GMWindow_OpenGL : public GMWindow
+{
+	DECLARE_PRIVATE_AND_BASE(GMWindow_OpenGL, GMWindow)
+
+public:
+	GMWindow_OpenGL();
+	~GMWindow_OpenGL();
+
+public:
+	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle) override;
+	virtual void update() override;
+
+private:
+	void swapBuffers() const;
+	void dispose();
+};
+
+
+GMWindow_OpenGL::GMWindow_OpenGL()
 {
 	D(d);
 	d->depthBits = 24;
 	d->stencilBits = 8;
 }
 
-GMUIGLWindow::~GMUIGLWindow()
+GMWindow_OpenGL::~GMWindow_OpenGL()
 {
 	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
 	dispose();
 }
 
-gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
+void GMWindow_OpenGL::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle)
 {
 	D(d);
+	GM_ASSERT(handle);
 
 	gm::GMWindowAttributes attrs = wndAttrs;
 	attrs.dwExStyle |= WS_EX_CLIENTEDGE;
 	attrs.dwStyle |= WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_SYSMENU | WS_BORDER | WS_CAPTION;
-
-	if (!createWindow(attrs, g_classname))
-	{
-		DWORD s = GetLastError();
-		gm_error(L"window created failed: %i", s);
-		dispose();
-		return NULL;
-	}
 
 	const gm::GMbyte colorDepth = 32, alphaBits = 8;
 	static PIXELFORMATDESCRIPTOR pfd =						//pfd tells windows how we want things to be
@@ -113,7 +130,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	// 开始创建真正的Window
 	gm::GMWindowHandle wnd = getWindowHandle();
 	RUN_AND_CHECK(d->hDC = ::GetDC(wnd));
-	
+
 	gm::GMint pixAttribs[] =
 	{
 		WGL_DRAW_TO_WINDOW_ARB,	GL_TRUE,
@@ -139,7 +156,7 @@ gm::GMWindowHandle GMUIGLWindow::create(const gm::GMWindowAttributes& wndAttrs)
 	RUN_AND_CHECK(::SetPixelFormat(d->hDC, nFormat, &pfd));
 	RUN_AND_CHECK(d->hRC = wglCreateContext(d->hDC));
 	RUN_AND_CHECK(wglMakeCurrent(d->hDC, d->hRC));
-	return wnd;
+	return;
 
 EXIT:
 	// 走到这里来说明流程失败
@@ -151,22 +168,22 @@ EXIT:
 	if (tmpWnd)
 		::DestroyWindow(tmpWnd);
 	wglMakeCurrent(NULL, NULL);
-	return NULL;
+	return;
 }
 
-void GMUIGLWindow::swapBuffers() const
+void GMWindow_OpenGL::swapBuffers() const
 {
 	D(d);
 	::SwapBuffers(d->hDC);
 }
 
-void GMUIGLWindow::update()
+void GMWindow_OpenGL::update()
 {
 	swapBuffers();
 	Base::update();
 }
 
-void GMUIGLWindow::dispose()
+void GMWindow_OpenGL::dispose()
 {
 	D(d);
 	gm::GMWindowHandle wnd = getWindowHandle();
@@ -192,4 +209,12 @@ void GMUIGLWindow::dispose()
 		gm_error(L"could not release hWnd");
 		wnd = 0;
 	}
+}
+
+bool GMWindowFactory::createWindowWithOpenGL(GMInstance instance, OUT IWindow** window)
+{
+	(*window) = new GMWindow_OpenGL();
+	if (*window)
+		return true;
+	return false;
 }

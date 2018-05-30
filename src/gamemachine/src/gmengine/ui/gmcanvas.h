@@ -190,6 +190,30 @@ private:
 	void onMouseMove(const GMPoint& pt);
 
 public:
+	inline void setMinimize(bool minimize)
+	{
+		D(d);
+		d->minimized = minimize;
+	}
+
+	inline bool getMinimize()
+	{
+		D(d);
+		return d->minimized;
+	}
+
+	inline void setVisible(bool visible)
+	{
+		D(d);
+		d->visible = visible;
+	}
+
+	inline bool getVisible()
+	{
+		D(d);
+		return d->visible;
+	}
+
 	inline GMCanvas* getNextCanvas()
 	{
 		D(d);

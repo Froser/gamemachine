@@ -1,7 +1,6 @@
 ﻿#ifndef __GMINPUT_WIN_H__
 #define __GMINPUT_WIN_H__
-#include <gmuicommon.h>
-#include "gmuidef.h"
+#include <gmcommon.h>
 #include <gminterfaces.h>
 #include <gmobject.h>
 #include <gminput.h>
@@ -25,36 +24,36 @@ private:
 	XInputSetState_Delegate m_xinputSetState;
 };
 
-GM_PRIVATE_OBJECT(GMUIInput)
+GM_PRIVATE_OBJECT(GMInput)
 {
 	enum { MAX_KEYS = 256 };
 	bool detectingMode = false;
-	gm::IWindow* window;
+	IWindow* window;
 
 	// joystick (xinput)
 	XInputWrapper xinput;
-	gm::GMJoystickState joystickState;
+	GMJoystickState joystickState;
 
 	// keyboard
-	gm::GMbyte keyState[256];
-	gm::GMbyte lastKeyState[MAX_KEYS];
+	GMbyte keyState[256];
+	GMbyte lastKeyState[MAX_KEYS];
 
 	// mouse
-	gm::GMMouseState mouseState;
-	gm::GMWheelState wheelState;
+	GMMouseState mouseState;
+	GMWheelState wheelState;
 };
 
-class GMUIInput :
-	public gm::GMObject,
-	public gm::IInput,
-	public gm::IKeyboardState,
-	public gm::IJoystickState,
-	public gm::IMouseState
+class GMInput :
+	public GMObject,
+	public IInput,
+	public IKeyboardState,
+	public IJoystickState,
+	public IMouseState
 {
-	DECLARE_PRIVATE(GMUIInput)
+	DECLARE_PRIVATE(GMInput)
 
 public:
-	GMUIInput(gm::IWindow* window);
+	GMInput(IWindow* window);
 
 public:
 
@@ -65,17 +64,18 @@ public:
 	virtual IKeyboardState& getKeyboardState() override;
 	virtual IJoystickState& getJoystickState() override { return *this; }
 	virtual IMouseState& getMouseState() override { return *this; }
+	virtual void msgProc(GMSystemEvent* event) override;
 
 	// IKeyboardState
 public:
-	virtual bool keydown(gm::GMuint key) override
+	virtual bool keydown(GMuint key) override
 	{
 		D(d);
 		return !!(d->keyState[key] & 0x80);
 	}
 
 	// 表示一个键是否按下一次，长按只算是一次
-	virtual bool keyTriggered(gm::GMuint key) override
+	virtual bool keyTriggered(GMuint key) override
 	{
 		D(d);
 		return !(d->lastKeyState[key] & 0x80) && (keydown(key));
@@ -83,29 +83,29 @@ public:
 
 	// IJoystickState
 public:
-	virtual void joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMotorSpeed) override;
-	virtual gm::GMJoystickState joystickState() override;
+	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
+	virtual GMJoystickState joystickState() override;
 	virtual void setIMEState(bool enabled) override;
 
 public:
-	virtual gm::GMMouseState mouseState() override;
+	virtual GMMouseState mouseState() override;
 	virtual void setDetectingMode(bool center) override;
-	virtual void setCursor(gm::GMCursorType type) override;
+	virtual void setCursor(GMCursorType type) override;
 
-public:
-	void recordMouseDown(gm::GMMouseButton button)
+private:
+	void recordMouseDown(GMMouseButton button)
 	{
 		D(d);
 		d->mouseState.downButton |= button;
 	}
 
-	void recordMouseUp(gm::GMMouseButton button)
+	void recordMouseUp(GMMouseButton button)
 	{
 		D(d);
 		d->mouseState.upButton |= button;
 	}
 
-	void recordWheel(bool wheeled, gm::GMshort delta)
+	void recordWheel(bool wheeled, GMshort delta)
 	{
 		D(d);
 		d->wheelState.wheeled = wheeled;

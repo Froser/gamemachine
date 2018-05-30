@@ -8,6 +8,13 @@
 #include "gmglframebuffer.h"
 #include "gmglgbuffer.h"
 #include "gmgllight.h"
+#include "gmengine/ui/gmwindow.h"
+
+void GMGLFactory::createWindow(GMInstance instance, OUT IWindow** window)
+{
+	bool b = GMWindowFactory::createWindowWithOpenGL(instance, window);
+	GM_ASSERT(b);
+}
 
 void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
 {

@@ -3,7 +3,6 @@
 #include "defines.h"
 #include "memory.h"
 #include <functional>
-#include "event_enum.h"
 #include <gmstring.h>
 
 #if __APPLE__
@@ -148,7 +147,7 @@ struct GMObjectMember
 
 using GMMeta = HashMap<GMString, GMObjectMember, GMStringHashFunctor>;
 
-// 事件目标，表示一个GMObject被多少事件连接
+// 信号目标，表示一个GMObject被多少信号连接
 class GMObject;
 using GMEventCallback = std::function<void(GMObject*, GMObject*)>;
 struct GMCallbackTarget
@@ -157,17 +156,21 @@ struct GMCallbackTarget
 	GMEventCallback callback;
 };
 
-typedef GMuint GMEventName;
+typedef GMString GMSignal;
 
-// 连接目标，表示一个GMObject连接了多少个事件
+// 连接目标，表示一个GMObject连接了多少个信号
 struct GMConnectionTarget
 {
 	GMObject* host;
-	GMEventName name;
+	GMSignal name;
 };
 using GMConnectionTargets = Vector<GMConnectionTarget>;
 
-using GMEvents = HashMap<GMEventName, Vector<GMCallbackTarget>>;
+using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>;
+
+#define GM_SIGNAL(signal) signal
+#define GM_DECLARE_SIGNAL(signal) public: static gm::GMString GM_SIGNAL(signal);
+#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = #signal
 
 #define GM_BEGIN_META_MAP \
 	protected: \
@@ -189,7 +192,7 @@ using GMEvents = HashMap<GMEventName, Vector<GMCallbackTarget>>;
 GM_PRIVATE_OBJECT(GMObject)
 {
 	GMMeta meta;
-	GMEvents events;
+	GMSlots slots;
 	GMConnectionTargets connectionTargets;
 };
 
@@ -221,7 +224,7 @@ public:
 
 	//! GMObject析构函数函数。
 	/*!
-	  释放GMObject，以及删除其数据成员指针，释放数据，并解绑所有事件。
+	  释放GMObject，以及删除其数据成员指针，释放数据，并解绑所有信号。
 	  \sa detachEvent()
 	*/
 	~GMObject();
@@ -249,30 +252,30 @@ public:
 	*/
 	const GMMeta* meta() { D(d); if (!registerMeta()) return nullptr; return &d->meta; }
 
-	//! 为此对象绑定一个事件。
+	//! 为此对象绑定一个信号。
 	/*!
-	  为此对象绑定另外一个对象的事件，当被绑定对象的事件被触发时，执行回调函数。
-	  \param sender 对象源。也就是事件的产生方。当事件源的对象的事件被触发时，执行回调函数。
-	  \param eventName 绑定的事件名。
-	  \param callback 事件被触发时执行的回调函数。
+	  为此对象绑定另外一个对象的信号，当被绑定对象的信号被触发时，执行回调函数。
+	  \param sender 信号源。也就是信号的产生方。当信号源的对象的信号被触发时，执行回调函数。
+	  \param signal 绑定的信号。
+	  \param callback 信号被触发时执行的回调函数。
 	  \sa detachEvent()
 	*/
-	void attachEvent(GMObject& sender, GMEventName eventName, const GMEventCallback& callback);
+	void connect(GMObject& sender, GMSignal signal, const GMEventCallback& callback);
 
-	//! 从某对象源中解绑一个时间。
+	//! 从某对象源中解绑一个信号。
 	/*!
-	  当从某对象解除绑定事件后，对象源的事件被触发后将不会通知此对象。
-	  \param sender 对象源。也就是事件的产生方。
-	  \param eventName 需要解除的事件名。
+	  当从某对象解除绑定信号后，对象源的信号被触发后将不会通知此对象。
+	  \param sender 对象源。也就是信号的产生方。
+	  \param signal 需要解除的信号名。
 	*/
-	void detachEvent(GMObject& sender, GMEventName eventName);
+	void disconnect(GMObject& sender, GMSignal signal);
 
-	//! 触发一个事件。
+	//! 触发一个信号。
 	/*!
-	  当一个事件被触发后，将会通知所有绑定了此对象此事件的所有对象，调用它们绑定的回调函数。
-	  \param eventName 需要触发的事件名。
+	  当一个信号被触发后，将会通知所有绑定了此对象此信号的所有对象，调用它们绑定的回调函数。
+	  \param signal 需要触发的信号名。
 	*/
-	void emitEvent(GMEventName eventName);
+	void emit(GMSignal signal);
 
 	//! 拷贝GMObject私有数据
 	/*!
@@ -283,12 +286,12 @@ public:
 	void copyData(const GMObject& another) {}
 
 private:
-	void addEvent(GMEventName eventName, GMObject& receiver, GMEventCallback callback);
-	void removeEventAndConnection(GMEventName eventName, GMObject& receiver);
-	void removeEvent(GMEventName eventName, GMObject& receiver);
-	void releaseEvents();
-	void addConnection(GMObject* host, GMEventName eventName);
-	void removeConnection(GMObject* host, GMEventName eventName);
+	void addConnection(GMSignal signal, GMObject& receiver, GMEventCallback callback);
+	void removeSignalAndConnection(GMSignal signal, GMObject& receiver);
+	void removeSignal(GMSignal signal, GMObject& receiver);
+	void releaseConnections();
+	void addConnection(GMObject* host, GMSignal signal);
+	void removeConnection(GMObject* host, GMSignal signal);
 
 protected:
 	virtual bool registerMeta() { return false; }

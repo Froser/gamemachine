@@ -128,12 +128,6 @@ macro(gm_link_bullet3)
 	target_link_libraries(${PROJECT_NAME} LinearMath)
 endmacro(gm_link_bullet3)
 
-set(GM_USE_DUILIB FALSE)
-if(MSVC)
-	set(GM_USE_DUILIB TRUE)
-	add_definitions(-DGM_USE_DUILIB)
-endif(MSVC)
-
 # Options:
 option(GM_BUILD_DOCS "Build GameMachine documentation" ON)
 option(GM_BUILD_DEMO "Build GameMachine Demos" ON)

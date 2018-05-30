@@ -65,6 +65,8 @@ set(SOURCES
 		gmengine/ui/gmcontrols.cpp
 		gmengine/ui/gmcanvas.h
 		gmengine/ui/gmcanvas.cpp
+		gmengine/ui/gmwindow.h
+		gmengine/ui/gmwindow.cpp
 		gmengine/gmtypoengine.h
 		gmengine/gmtypoengine.cpp
 		gmengine/gmgbuffer.h
@@ -125,7 +127,6 @@ set(SOURCES
 		foundation/memory.cpp
 		foundation/linearmath.h
 		foundation/linearmath.inl
-		foundation/event_enum.h
 		foundation/gmobject.h
 		foundation/gmobject.cpp
 		foundation/gamemachine.h
@@ -180,6 +181,11 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/screen.cpp
 		foundation/platforms/windows/thread.cpp
 		foundation/platforms/windows/gamemachine.cpp
+		foundation/platforms/windows/window/gmwindow.cpp
+		foundation/platforms/windows/window/gmwindow_dx11.cpp
+		foundation/platforms/windows/window/gmwindow_opengl.cpp
+		foundation/platforms/windows/window/gminput.h
+		foundation/platforms/windows/window/gminput.cpp
 	)
 
 set(WIN32_DX11_SOURCES

@@ -267,13 +267,18 @@ public:
 	*/
 	void registerCanvas(GMCanvas* canvas);
 
+	//! 将系统事件翻译成GameMachine事件。
+	/*!
+	  翻译后的事件将是平台无关的。
+	*/
+	void translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event);
+
 	//! 触发所有被注册的画布的消息处理事件。
 	/*!
-	  通过此方法，使得被注册的画布有了处理系统消息的时机。一般不需要手动调用此方法，因为GMUIGameMachineWindowBase会调用它。
-	  \return 是否已经处理了此消息。如果返回true，则此消息不会再继续传递。
+	通过此方法，使得被注册的画布有了处理系统消息的时机。一般不需要手动调用此方法，因为GMUIGameMachineWindowBase会调用它。
+	\return 是否已经处理了此消息。如果返回true，则此消息不会再继续传递。
 	*/
-	bool dispatchMessageToCanvases(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes);
-
+	bool dispatchEventToCanvases(GMSystemEvent* event);
 
 private:
 	void runEventLoop();
@@ -287,7 +292,7 @@ private:
 	bool checkCrashDown();
 	void handlerEvents();
 	void updateManagers();
-	void translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes, OUT GMSystemEvent** event);
+	
 };
 
 END_NS

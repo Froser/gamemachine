@@ -29,7 +29,7 @@ namespace
 	GMControl* getPrevControl(GMControl* control)
 	{
 		GMCanvas* parentCanvas = control->getParent();
-		GMuint index = control->getIndex() - 1;
+		GMint index = (GMint) control->getIndex() - 1;
 		while (index < 0)
 		{
 			parentCanvas = parentCanvas->getPrevCanvas();
@@ -120,8 +120,8 @@ void GMCanvasResourceManager::registerCanvas(GMCanvas* canvas)
 	}
 
 	// 将Canvas设置成一个环
-	GMsize_t sz = d->canvases.size();
 	d->canvases.push_back(canvas);
+	GMsize_t sz = d->canvases.size();
 	if (sz > 1)
 		d->canvases[sz - 2]->setNextCanvas(canvas);
 	d->canvases[sz - 1]->setNextCanvas(d->canvases[0]);
@@ -289,7 +289,7 @@ bool GMCanvas::initControl(GMControl* control)
 	if (!control)
 		return false;
 
-	control->setIndex(d->controls.size());
+	control->setIndex(d->controls.size() - 1);
 	control->initStyles();
 	return control->onInit();
 }
@@ -309,6 +309,9 @@ void GMCanvas::addArea(GMCanvasControlArea::Area area, const GMRect& rc)
 bool GMCanvas::msgProc(GMSystemEvent* event)
 {
 	D(d);
+	if (!getVisible())
+		return false;
+
 	GMSystemEventType type = event->getType();
 	switch (type)
 	{
@@ -597,7 +600,7 @@ bool GMCanvas::onCycleFocus(bool goForward)
 	else
 	{
 		lastCanvas = s_controlFocus->getParent();
-		control = (goForward) ? getNextControl(s_controlFocus) : getNextControl(s_controlFocus);
+		control = (goForward) ? getNextControl(s_controlFocus) : getPrevControl(s_controlFocus);
 		canvas = control->getParent();
 	}
 
@@ -605,6 +608,9 @@ bool GMCanvas::onCycleFocus(bool goForward)
 	{
 		// 如果我们转了一圈回来，那么我们不会设置任何焦点了。
 		const Vector<GMCanvas*> canvases = d->manager->getCanvases();
+		if (canvases.empty())
+			return false;
+
 		GMsize_t lastCanvasIndex = indexOf(canvases, lastCanvas);
 		GMsize_t canvasIndex = indexOf(canvases, canvas);
 		if ((!goForward && lastCanvasIndex < canvasIndex) ||

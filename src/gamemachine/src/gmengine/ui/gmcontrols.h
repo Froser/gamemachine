@@ -391,6 +391,9 @@ class GMControlButton : public GMControlStatic
 	DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlStatic)
 
 public:
+	GM_DECLARE_SIGNAL(click);
+	
+public:
 	GMControlButton(GMCanvas* parent);
 
 public:
@@ -402,6 +405,8 @@ public:
 	virtual bool onMouseRelease(GMSystemMouseEvent* event) override;
 	virtual bool containsPoint(const GMPoint& pt) override;
 	virtual bool canHaveFocus() override;
+	virtual bool onKeyDown(GMSystemKeyEvent* event);
+	virtual bool onKeyUp(GMSystemKeyEvent* event);
 	virtual void render(GMfloat elapsed) override;
 
 private:

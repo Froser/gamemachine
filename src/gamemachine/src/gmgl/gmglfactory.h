@@ -9,6 +9,7 @@ class GMModelDataProxy;
 class GMGLFactory : public IFactory
 {
 public:
+	virtual void createWindow(GMInstance instance, OUT IWindow** window) override;
 	virtual void createGraphicEngine(OUT IGraphicEngine** engine) override;
 	virtual void createTexture(GMImage* image, OUT ITexture** texture) override;
 	virtual void createModelDataProxy(IGraphicEngine* engine, GMModel* model, OUT GMModelDataProxy** modelDataProxy) override;

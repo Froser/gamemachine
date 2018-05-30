@@ -29,6 +29,7 @@ class GMAssets;
 class GMComponent;
 class GMCanvas;
 class GMCanvasResourceManager;
+class GMSystemEvent;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -469,8 +470,23 @@ GM_INTERFACE(IRenderer)
 	virtual void draw(GMModel* model) = 0;
 };
 
+GM_INTERFACE_FROM(IWindow, IQueriable)
+{
+	virtual IInput* getInputMananger() = 0;
+	virtual void update() = 0;
+	virtual GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
+	virtual void centerWindow() = 0;
+	virtual void showWindow() = 0;
+	virtual GMRect getWindowRect() = 0;
+	virtual GMRect getRenderRect() = 0;
+	virtual GMWindowHandle getWindowHandle() const = 0;
+	virtual bool isWindowActivate() = 0;
+	virtual void setLockWindow(bool lock) = 0;
+};
+
 GM_INTERFACE(IFactory)
 {
+	virtual void createWindow(GMInstance instance, OUT IWindow** window) = 0;
 	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
 	virtual void createTexture(GMImage*, OUT ITexture**) = 0;
 	virtual void createModelDataProxy(IGraphicEngine*, GMModel*, OUT GMModelDataProxy**) = 0;
@@ -479,21 +495,6 @@ GM_INTERFACE(IFactory)
 	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
-};
-
-GM_INTERFACE_FROM(IWindow, IQueriable)
-{
-	virtual IInput* getInputMananger() = 0;
-	virtual void update() = 0;
-	virtual gm::GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
-	virtual void centerWindow() = 0;
-	virtual void showWindow() = 0;
-	virtual GMRect getWindowRect() = 0;
-	virtual GMRect getRenderRect() = 0;
-	virtual GMWindowHandle getWindowHandle() const = 0;
-	virtual bool event(const GMMessage& msg) = 0;
-	virtual bool isWindowActivate() = 0;
-	virtual void setLockWindow(bool lock) = 0;
 };
 
 GM_ALIGNED_STRUCT(GMConsoleHandle)

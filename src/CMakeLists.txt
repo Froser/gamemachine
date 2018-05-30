@@ -8,12 +8,8 @@ add_subdirectory(./3rdparty/lua lua)
 add_subdirectory(./3rdparty/glm-0.9.9-a2 glm)
 add_subdirectory(./3rdparty/openal-soft-1.18.2 openal)
 add_subdirectory(./3rdparty/bullet3-2.87 bullet3)
-if(GM_USE_DUILIB)
-	add_subdirectory(./3rdparty/duilib duilib)
-endif(GM_USE_DUILIB)
 
 add_subdirectory(gamemachine gamemachine)
-add_subdirectory(gamemachineui gamemachineui)
 add_subdirectory(gamemachinemedia gamemachinemedia)
 
 if (GM_BUILD_DEMO)

@@ -135,16 +135,14 @@ void GameMachine::registerCanvas(GMCanvas* canvas)
 	d->canvases.push_back(canvas);
 }
 
-bool GameMachine::dispatchMessageToCanvases(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes)
+bool GameMachine::dispatchEventToCanvases(GMSystemEvent* event)
 {
 	D(d);
-	GMSystemEvent* sysEvent = nullptr;
-	translateSystemEvent(uMsg, wParam, lParam, lRes, &sysEvent);
-	if (sysEvent)
+	if (event)
 	{
 		for (auto canvas : d->canvases)
 		{
-			if (canvas->msgProc(sysEvent))
+			if (canvas->msgProc(event))
 				return true;
 		}
 	}
@@ -265,14 +263,8 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 	D(d);
 	switch (msg.msgType)
 	{
-	case GameMachineMessageType::Quit:
+	case GameMachineMessageType::QuitGameMachine:
 		return false;
-	case GameMachineMessageType::Console:
-	{
-		if (d->consoleWindow)
-			d->consoleWindow->event(msg);
-		break;
-	}
 	case GameMachineMessageType::CrashDown:
 	{
 		d->states.crashDown = true;

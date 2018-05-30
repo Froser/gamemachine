@@ -144,6 +144,12 @@ GM_STATIC_ASSERT_SIZE(WORD, 2);
 GM_STATIC_ASSERT_SIZE(DWORD, 4);
 #endif
 
+#if GM_WINDOWS
+#	define GM_SYSTEM_CALLBACK CALLBACK
+#else
+#	define GM_SYSTEM_CALLBACK
+#endif
+
 BEGIN_NS
 // 基本数据类型
 typedef float GMfloat;

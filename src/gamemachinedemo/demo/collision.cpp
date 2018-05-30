@@ -5,6 +5,7 @@
 #include <gmphysicsshape.h>
 #include <gmbullethelper.h>
 #include <gmconstraint.h>
+#include <gmgraphicengine.h>
 
 namespace
 {

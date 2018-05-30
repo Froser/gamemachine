@@ -3,18 +3,11 @@
 #include <gmcommon.h>
 BEGIN_NS
 
-#define GMM_CONSOLE_SELECT_FILTER	0x1000
-#define GMM_CONSOLE_INFO			0x0000
-#define GMM_CONSOLE_WARNING			0x0001
-#define GMM_CONSOLE_ERROR			0x0002
-#define GMM_CONSOLE_DEBUG			0x0003
-
 enum class GameMachineMessageType
 {
 	None,
-	Quit,
+	QuitGameMachine,
 	CrashDown,
-	Console,
 	WindowSizeChanged,
 	Dx11Ready,
 	SystemMessage,
@@ -37,6 +30,8 @@ struct GMMessage
 enum class GMSystemEventType
 {
 	Unknown,
+	Destroy,
+	WindowSizeChanged,
 	KeyDown,
 	KeyUp,
 	MouseMove,
@@ -249,7 +244,8 @@ public:
 GM_PRIVATE_OBJECT(GMSystemMouseEvent)
 {
 	GMPoint point;
-	GMMouseButton button;
+	GMMouseButton buttons; //!< 表示当前事件产生时，鼠标按键的状态。
+	GMMouseButton button; //!< 表示引起当前事件的鼠标按键。
 	GMModifier modifier;
 };
 
@@ -259,16 +255,18 @@ class GMSystemMouseEvent : public GMSystemEvent
 	GM_ALLOW_COPY_DATA(GMSystemMouseEvent)
 	GM_DECLARE_PROPERTY(Point, point, GMPoint)
 	GM_DECLARE_PROPERTY(Button, button, GMMouseButton)
+	GM_DECLARE_PROPERTY(Buttons, buttons, GMMouseButton)
 	GM_DECLARE_PROPERTY(Modifier, modifier, GMModifier)
 	
 public:
 	GMSystemMouseEvent() = default;
-	GMSystemMouseEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMModifier modifier)
+	GMSystemMouseEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier)
 		: Base(type)
 	{
 		D(d);
 		d->point = pt;
 		d->button = button;
+		d->buttons = buttons;
 		d->modifier = modifier;
 	}
 };
@@ -285,8 +283,8 @@ class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 	GM_DECLARE_PROPERTY(Delta, delta, GMshort)
 
 public:
-	GMSystemMouseWheelEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMModifier modifier, GMshort delta)
-		: Base(type, pt, button, modifier)
+	GMSystemMouseWheelEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta)
+		: Base(type, pt, button, buttons, modifier)
 	{
 		D(d);
 		d->delta = delta;

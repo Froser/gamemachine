@@ -7,6 +7,13 @@
 #include "gmdx11framebuffer.h"
 #include "gmdx11gbuffer.h"
 #include "gmdx11light.h"
+#include "gmengine/ui/gmwindow.h"
+
+void GMDx11Factory::createWindow(GMInstance instance, OUT IWindow** window)
+{
+	bool b = GMWindowFactory::createWindowWithDx11(instance, window);
+	GM_ASSERT(b);
+}
 
 void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
 {

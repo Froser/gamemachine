@@ -225,7 +225,7 @@ void GameMachine::runEventLoop()
 	terminate();
 }
 
-void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, GMLResult* lRes, OUT GMSystemEvent** event)
+void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event)
 {
 	GM_ASSERT(event);
 	GMKey key;
@@ -233,6 +233,12 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 
 	switch (uMsg)
 	{
+	case WM_DESTROY:
+		newSystemEvent = new GMSystemEvent(GMSystemEventType::Destroy);
+		break;
+	case WM_SIZE:
+		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowSizeChanged);
+		break;
 	// Keyboard:
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:
@@ -267,6 +273,7 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 		};
 
 		GMSystemEventType type = GMSystemEventType::Unknown;
+		GMMouseButton triggeredButton = GMMouseButton_None;
 		switch (uMsg)
 		{
 		case WM_MOUSEMOVE:
@@ -287,8 +294,28 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 			type = GMSystemEventType::MouseDblClick;
 			break;
 		}
+
+		if (uMsg == WM_LBUTTONDOWN ||
+			uMsg == WM_LBUTTONUP ||
+			uMsg == WM_LBUTTONDBLCLK)
+		{
+			triggeredButton = GMMouseButton_Left;
+		}
+		else if (uMsg == WM_RBUTTONDOWN ||
+			uMsg == WM_RBUTTONUP ||
+			uMsg == WM_RBUTTONDBLCLK)
+		{
+			triggeredButton = GMMouseButton_Right;
+		}
+		else if (uMsg == WM_MBUTTONDOWN ||
+			uMsg == WM_MBUTTONUP ||
+			uMsg == WM_MBUTTONDBLCLK)
+		{
+			triggeredButton = GMMouseButton_Middle;
+		}
+
 		GM_ASSERT(type != GMSystemEventType::Unknown);
-		newSystemEvent = new GMSystemMouseEvent(type, mousePoint, translateButton(wParam), translateModifier(wParam));
+		newSystemEvent = new GMSystemMouseEvent(type, mousePoint, triggeredButton, translateButton(wParam), translateModifier(wParam));
 		break;
 	}
 	case WM_MOUSEWHEEL:
@@ -301,6 +328,7 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 		newSystemEvent = new GMSystemMouseWheelEvent(
 			GMSystemEventType::MouseWheel,
 			mousePoint,
+			GMMouseButton_None,
 			translateWheelButton(wParam),
 			translateModifier(wParam),
 			delta

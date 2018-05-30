@@ -159,6 +159,8 @@ void GMControlStatic::setText(const GMString& text)
 	d->text = text;
 }
 
+GM_DEFINE_SIGNAL(GMControlButton::click);
+
 GMControlButton::GMControlButton(GMCanvas* parent)
 	: GMControlStatic(parent)
 {
@@ -197,6 +199,32 @@ bool GMControlButton::containsPoint(const GMPoint& pt)
 bool GMControlButton::canHaveFocus()
 {
 	return getEnabled() && getVisible();
+}
+
+bool GMControlButton::onKeyDown(GMSystemKeyEvent* event)
+{
+	D(d);
+	if (event->getKey() == GMKey_Space)
+	{
+		d->pressed = true;
+		return true;
+	}
+	return false;
+}
+
+bool GMControlButton::onKeyUp(GMSystemKeyEvent* event)
+{
+	D(d);
+	if (event->getKey() == GMKey_Space)
+	{
+		if (d->pressed)
+		{
+			d->pressed = false;
+			emit(click);
+			return true;
+		}
+	}
+	return false;
 }
 
 void GMControlButton::render(GMfloat elapsed)
@@ -281,7 +309,7 @@ bool GMControlButton::handleMouseRelease(const GMPoint& pt)
 
 		if (containsPoint(pt))
 		{
-			// TODO SendEvent
+			emit(click);
 		}
 
 		return true;

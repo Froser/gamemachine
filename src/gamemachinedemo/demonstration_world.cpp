@@ -2,6 +2,7 @@
 #include "demonstration_world.h"
 #include <gmcanvas.h>
 #include <gmgl.h>
+#include <gmgraphicengine.h>
 
 #include "demo/texture.h"
 #include "demo/normalmap.h"
@@ -89,6 +90,8 @@ void DemoHandler::onDeactivate()
 	gm::GMShadowSourceDesc noShadow;
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
 	GM.getGraphicEngine()->setShadowSource(noShadow);
+
+	d->parentDemonstrationWorld->getMainCanvas()->setVisible(true);
 }
 
 void DemoHandler::event(gm::GameMachineHandlerEvent evt)
@@ -102,9 +105,6 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 
 		if (kbState.keyTriggered(VK_ESCAPE))
 			backToEntrance();
-
-		if (kbState.keyTriggered('B'))
-			GM.postMessage({ gm::GameMachineMessageType::Console });
 
 		if (kbState.keyTriggered('L'))
 			d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
@@ -214,12 +214,15 @@ void DemostrationWorld::init()
 		gm::GMRect rc = { 136, 0, 116, 54 };
 		d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonFillArea, rc);
 	}
+
+	manager->registerCanvas(d->mainCanvas);
 	d->mainCanvas->init();
 	d->mainCanvas->setKeyboardInput(true);
 
 	gm::GMint Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
 	{
+		gm::GMControlButton* button = nullptr;
 		d->mainCanvas->addButton(
 			0,
 			demo.first,
@@ -228,24 +231,14 @@ void DemostrationWorld::init()
 			600,
 			30,
 			false,
-			nullptr
+			&button
 		);
 		Y += 30 + marginY;
-
-		//gm::GMControlButton* item = listbox->addItem(demo.first);
-		//item->setBorder(gm::GMImage2DBorder(
-		//	borderAsset,
-		//	textureGeo,
-		//	img->getWidth(),
-		//	img->getHeight(),
-		//	14,
-		//	14
-		//));
-		//item->setHeight(30);
-		//item->setPaddings(10, 8, 10, 8);
-		//item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-		//	d->nextDemo = demo.second;
-		//});
+		GM_ASSERT(button);
+		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+			d->nextDemo = demo.second;
+			d->mainCanvas->setVisible(false);
+		});
 	}
 
 	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
@@ -341,10 +334,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
 			if (kbState.keyTriggered('Q') || kbState.keyTriggered(VK_ESCAPE))
-				GM.postMessage({ gm::GameMachineMessageType::Quit });
-
-			if (kbState.keyTriggered('B'))
-				GM.postMessage({ gm::GameMachineMessageType::Console });
+				GM.postMessage({ gm::GameMachineMessageType::QuitGameMachine });
 
 			if (kbState.keyTriggered('L'))
 				d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());

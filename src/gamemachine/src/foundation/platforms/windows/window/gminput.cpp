@@ -1,8 +1,8 @@
 ﻿#include "stdafx.h"
-#include "gmuiinput.h"
+#include "gminput.h"
 #include <gamemachine.h>
 
-static gm::GMString xinputDlls[] = {
+static GMString xinputDlls[] = {
 	"xinput9_1_0.dll",
 	"xinput1_4.dll",
 	"xinput1_3.dll",
@@ -13,7 +13,7 @@ XInputWrapper::XInputWrapper()
 	, m_xinputSetState(nullptr)
 	, m_module(0)
 {
-	for (gm::GMint i = 0; i < 3; i++)
+	for (GMint i = 0; i < 3; i++)
 	{
 		m_module = LoadLibrary(xinputDlls[i].toStdWString().c_str());
 		if (m_module)
@@ -54,28 +54,28 @@ XInputWrapper::~XInputWrapper()
 	::FreeLibrary(m_module);
 }
 
-GMUIInput::GMUIInput(gm::IWindow* window)
+GMInput::GMInput(IWindow* window)
 {
 	D(d);
 	d->window = window;
 }
 
-void GMUIInput::update()
+void GMInput::update()
 {
 	D(d);
 	::GetKeyboardState(d->lastKeyState);
 	// restore
 	d->wheelState.wheeled = false;
-	d->mouseState.downButton = d->mouseState.upButton = gm::GMMouseButton_None;
+	d->mouseState.downButton = d->mouseState.upButton = GMMouseButton_None;
 	d->mouseState.moving = false;
 }
 
-void GMUIInput::setDetectingMode(bool enable)
+void GMInput::setDetectingMode(bool enable)
 {
 	D(d);
 	if (enable)
 	{
-		const gm::GMRect& rect = GM.getGameMachineRunningStates().renderRect;
+		const GMRect& rect = GM.getGameMachineRunningStates().renderRect;
 		::SetCursorPos(rect.x + rect.width / 2, rect.y + rect.height / 2);
 		::ShowCursor(FALSE);
 	}
@@ -87,31 +87,31 @@ void GMUIInput::setDetectingMode(bool enable)
 	d->detectingMode = enable;
 }
 
-void GMUIInput::setCursor(gm::GMCursorType type)
+void GMInput::setCursor(GMCursorType type)
 {
 	D(d);
 	LPCWSTR cursor = nullptr;
 	switch (type)
 	{
-	case gm::GMCursorType::Arrow:
+	case GMCursorType::Arrow:
 		cursor = IDC_ARROW;
 		break;
-	case gm::GMCursorType::IBeam:
+	case GMCursorType::IBeam:
 		cursor = IDC_IBEAM;
 		break;
-	case gm::GMCursorType::Wait:
+	case GMCursorType::Wait:
 		cursor = IDC_WAIT;
 		break;
-	case gm::GMCursorType::Cross:
+	case GMCursorType::Cross:
 		cursor = IDC_CROSS;
 		break;
-	case gm::GMCursorType::UpArrow:
+	case GMCursorType::UpArrow:
 		cursor = IDC_UPARROW;
 		break;
-	case gm::GMCursorType::Hand:
+	case GMCursorType::Hand:
 		cursor = IDC_HAND;
 		break;
-	case gm::GMCursorType::Custom:
+	case GMCursorType::Custom:
 		::ShowCursor(FALSE);
 		return;
 	default:
@@ -122,11 +122,11 @@ void GMUIInput::setCursor(gm::GMCursorType type)
 	::SetClassLongPtr(d->window->getWindowHandle(), GCLP_HCURSOR, (LONG_PTR)::LoadCursor(NULL, cursor));
 }
 
-gm::GMJoystickState GMUIInput::joystickState()
+GMJoystickState GMInput::joystickState()
 {
 	D(d);
 	XINPUT_STATE state;
-	gm::GMJoystickState result = { false };
+	GMJoystickState result = { false };
 
 	if (d->xinput.XInputGetState(0, &state) == ERROR_SUCCESS)
 	{
@@ -143,21 +143,19 @@ gm::GMJoystickState GMUIInput::joystickState()
 	return std::move(result);
 }
 
-void GMUIInput::setIMEState(bool enabled)
+void GMInput::setIMEState(bool enabled)
 {
-	D(d);
-	HIMC hImc = ImmGetContext(d->window->getWindowHandle());
-	::ImmSetOpenStatus(hImc, enabled);
+	// TODO
 }
 
-void GMUIInput::joystickVibrate(gm::GMushort leftMotorSpeed, gm::GMushort rightMotorSpeed)
+void GMInput::joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed)
 {
 	D(d);
 	XINPUT_VIBRATION v = { leftMotorSpeed, rightMotorSpeed };
 	d->xinput.XInputSetState(0, &v);
 }
 
-gm::IKeyboardState& GMUIInput::getKeyboardState()
+IKeyboardState& GMInput::getKeyboardState()
 {
 	GM_PROFILE("getKeyboardState");
 	D(d);
@@ -165,10 +163,44 @@ gm::IKeyboardState& GMUIInput::getKeyboardState()
 	return *this;
 }
 
-gm::GMMouseState GMUIInput::mouseState()
+void GMInput::msgProc(GMSystemEvent* event)
+{
+	GMSystemEventType type = event->getType();
+	switch (type)
+	{
+	case GMSystemEventType::MouseWheel:
+	{
+		GMSystemMouseWheelEvent* e = gm_cast<GMSystemMouseWheelEvent*>(event);
+		recordWheel(true, e->getDelta());
+		break;
+	}
+	case GMSystemEventType::MouseMove:
+	case GMSystemEventType::MouseDown:
+	case GMSystemEventType::MouseUp:
+	{
+		GMSystemMouseEvent* e = gm_cast<GMSystemMouseEvent*>(event);
+		if (type == GMSystemEventType::MouseMove)
+		{
+			recordMouseMove();
+		}
+		else if (type == GMSystemEventType::MouseDown)
+		{
+			recordMouseDown(e->getButton());
+		}
+		else
+		{
+			GM_ASSERT(type == GMSystemEventType::MouseUp);
+			recordMouseUp(e->getButton());
+		}
+		break;
+	}
+	}
+}
+
+GMMouseState GMInput::mouseState()
 {
 	D(d);
-	gm::GMMouseState& state = d->mouseState;
+	GMMouseState& state = d->mouseState;
 	state.wheel = d->wheelState;
 
 	POINT pos;
@@ -181,20 +213,20 @@ gm::GMMouseState GMUIInput::mouseState()
 		state.posY = p.y;
 
 		IKeyboardState& ks = getKeyboardState();
-		state.triggerButton = gm::GMMouseButton_None;
+		state.triggerButton = GMMouseButton_None;
 		if (ks.keyTriggered(VK_LBUTTON))
-			state.triggerButton |= gm::GMMouseButton_Left;
+			state.triggerButton |= GMMouseButton_Left;
 		if (ks.keyTriggered(VK_RBUTTON))
-			state.triggerButton |= gm::GMMouseButton_Right;
+			state.triggerButton |= GMMouseButton_Right;
 		if (ks.keyTriggered(VK_MBUTTON))
-			state.triggerButton |= gm::GMMouseButton_Middle;
+			state.triggerButton |= GMMouseButton_Middle;
 	}
 
 	if (d->detectingMode)
 	{
-		gm::GMRect rect = d->window->getWindowRect();
-		const gm::GMint centerX = rect.x + rect.width / 2;
-		const gm::GMint centerY = rect.y + rect.height / 2;
+		GMRect rect = d->window->getWindowRect();
+		const GMint centerX = rect.x + rect.width / 2;
+		const GMint centerY = rect.y + rect.height / 2;
 		::SetCursorPos(centerX, centerY);
 		state.deltaX = pos.x - centerX;
 		state.deltaY = pos.y - centerY;
