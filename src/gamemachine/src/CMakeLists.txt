@@ -182,7 +182,6 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/thread.cpp
 		foundation/platforms/windows/gamemachine.cpp
 		foundation/platforms/windows/window/gmwindow.cpp
-		foundation/platforms/windows/window/gmwindow_dx11.cpp
 		foundation/platforms/windows/window/gmwindow_opengl.cpp
 		foundation/platforms/windows/window/gminput.h
 		foundation/platforms/windows/window/gminput.cpp
@@ -190,6 +189,8 @@ set(WIN32_SOURCES
 
 set(WIN32_DX11_SOURCES
 		foundation/utilities/gmcom.h
+		foundation/platforms/windows/window/gmwindow_dx11.cpp
+
 		gmdx11/gmdx11factory.h
 		gmdx11/gmdx11factory.cpp
 		gmdx11/gmdx11graphic_engine.h
@@ -249,8 +250,11 @@ add_library(${PROJECT_NAME}
 	)
 
 if(MSVC)
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" ) 
-	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" ) 
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" )
+	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" )
+	link_libraries(
+		legacy_stdio_definitions.lib
+	)
 endif(MSVC)
 
 gm_link_dependencies(${PROJECT_NAME})
