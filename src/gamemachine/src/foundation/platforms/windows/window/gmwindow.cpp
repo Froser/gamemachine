@@ -2,6 +2,7 @@
 #include "gmengine/ui/gmwindow.h"
 #include "foundation/platforms/windows/window/gminput.h"
 #include "foundation/gamemachine.h"
+#include "gmengine/ui/gmwidget.h"
 
 #ifndef GetWindowOwner
 #	define GetWindowOwner(hwnd) GetWindow(hwnd, GW_OWNER)
@@ -71,8 +72,9 @@ GMWindow::~GMWindow()
 {
 	D(d);
 	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
-	if (d->input)
-		delete d->input;
+	GM.removeWindow(this);
+	GM_delete(d->input);
+	GM_delete(d->handler);
 }
 
 IInput* GMWindow::getInputMananger()
@@ -83,11 +85,22 @@ IInput* GMWindow::getInputMananger()
 	return d->input;
 }
 
-void GMWindow::update()
+void GMWindow::msgProc(const GMMessage& message)
 {
 	D(d);
-	if (d->input)
-		d->input->update();
+	if (message.msgType == GameMachineMessageType::SystemMessage)
+	{
+		GMSystemEvent* event = static_cast<GMSystemEvent*>(message.objPtr);
+		for (auto widget : d->widgets)
+		{
+			widget->msgProc(event);
+		}
+	}
+	else if (message.msgType == GameMachineMessageType::FrameUpdate)
+	{
+		if (d->input)
+			d->input->update();
+	}
 }
 
 GMRect GMWindow::getWindowRect()
@@ -151,9 +164,9 @@ bool GMWindow::isWindowActivate()
 	return ::GetForegroundWindow() == getWindowHandle();
 }
 
-void GMWindow::setLockWindow(bool lock)
+void GMWindow::setWindowCapture(bool capture)
 {
-	if (lock)
+	if (capture)
 		::SetCapture(getWindowHandle());
 	else
 		::ReleaseCapture();

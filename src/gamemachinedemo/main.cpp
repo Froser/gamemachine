@@ -61,16 +61,21 @@ int WINAPI wWinMain(
 	gm::IWindow* mainWindow = nullptr;
 	factory->createWindow(hInstance, &mainWindow);
 	mainWindow->create(mainAttrs);
+	mainWindow->centerWindow();
+	mainWindow->showWindow();
+	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
 
-	gm::GMConsoleHandle console;
-	console.dbgoutput = nullptr;
-	console.window = nullptr;
+	gm::IWindow* mainWindow2 = nullptr;
+	factory->createWindow(hInstance, &mainWindow2);
+	mainWindow2->create(mainAttrs);
+	mainWindow2->centerWindow();
+	mainWindow2->showWindow();
+	mainWindow2->setHandler(new DemostrationEntrance(mainWindow));
 
+	GM.addWindow(mainWindow2);
 	GM.init(
 		mainWindow,
-		console,
 		factory,
-		new DemostrationEntrance(),
 		GetRenderEnv()
 	);
 

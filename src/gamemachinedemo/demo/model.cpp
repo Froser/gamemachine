@@ -144,24 +144,24 @@ void Demo_Model::handleMouseEvent()
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->draggingL = true;
-		GM.getMainWindow()->setLockWindow(true);
+		GM.getMainWindow()->setWindowCapture(true);
 	}
 	else if (state.upButton & gm::GMMouseButton_Left)
 	{
 		d->draggingL = false;
-		GM.getMainWindow()->setLockWindow(false);
+		GM.getMainWindow()->setWindowCapture(false);
 	}
 	if (state.downButton & gm::GMMouseButton_Right)
 	{
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->draggingR = true;
-		GM.getMainWindow()->setLockWindow(true);
+		GM.getMainWindow()->setWindowCapture(true);
 	}
 	else if (state.upButton & gm::GMMouseButton_Right)
 	{
 		d->draggingR = false;
-		GM.getMainWindow()->setLockWindow(false);
+		GM.getMainWindow()->setWindowCapture(false);
 	}
 }
 

@@ -63,8 +63,8 @@ set(SOURCES
 		gmengine/gameobjects/gm2dgameobject.cpp
 		gmengine/ui/gmcontrols.h
 		gmengine/ui/gmcontrols.cpp
-		gmengine/ui/gmcanvas.h
-		gmengine/ui/gmcanvas.cpp
+		gmengine/ui/gmwidget.h
+		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
 		gmengine/ui/gmwindow.cpp
 		gmengine/gmtypoengine.h
@@ -252,9 +252,6 @@ add_library(${PROJECT_NAME}
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/W3" )
 	set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "/WX" )
-	link_libraries(
-		legacy_stdio_definitions.lib
-	)
 endif(MSVC)
 
 gm_link_dependencies(${PROJECT_NAME})

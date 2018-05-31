@@ -8,6 +8,7 @@ enum class GameMachineMessageType
 	None,
 	QuitGameMachine,
 	CrashDown,
+	FrameUpdate,
 	WindowSizeChanged,
 	Dx11Ready,
 	SystemMessage,

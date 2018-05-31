@@ -32,7 +32,7 @@ public:
 	~GMWindow_Dx11();
 
 public:
-	virtual void update() override;
+	virtual void msgProc(const GMMessage& message) override;
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual void onWindowCreated(const GMWindowAttributes& attrs, GMWindowHandle handle) override;
 };
@@ -43,11 +43,12 @@ GMWindow_Dx11::~GMWindow_Dx11()
 	GM_delete(d->modes);
 }
 
-void GMWindow_Dx11::update()
+void GMWindow_Dx11::msgProc(const GMMessage& message)
 {
 	D(d);
-	GM_DX_HR(d->swapChain->Present(d->vsync ? 1 : 0, 0));
-	Base::update();
+	if (message.msgType == GameMachineMessageType::FrameUpdate)
+		GM_DX_HR(d->swapChain->Present(d->vsync ? 1 : 0, 0));
+	Base::msgProc(message);
 }
 
 bool GMWindow_Dx11::getInterface(GameMachineInterfaceID id, void** out)

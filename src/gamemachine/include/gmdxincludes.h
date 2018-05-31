@@ -3,6 +3,7 @@
 #	if GM_USE_DX11
 #		pragma warning(push)
 #		pragma warning(disable:4005)
+#		pragma comment(lib, "legacy_stdio_definitions.lib")
 #		include <d3d11.h>
 #		include <D3DX11async.h>
 #		include <dxerr.h>

@@ -3,7 +3,7 @@
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmconfigs.h"
-#include "gmengine/ui/gmcanvas.h"
+#include "gmengine/ui/gmwidget.h"
 #include "gmmessage.h"
 
 extern "C"
@@ -24,40 +24,54 @@ extern "C"
 	}
 }
 
+namespace
+{
+	static GMMessage s_frameUpdateMsg(GameMachineMessageType::FrameUpdate);
+}
+
 GameMachine::GameMachine()
 {
 	getMachineEndianness();
 	updateGameMachineRunningStates();
 }
 
+GameMachine::~GameMachine()
+{
+	D(d);
+	while (!d->windows.empty())
+	{
+		auto iter = d->windows.begin();
+		auto window = *iter;
+		GM_delete(window);
+	}
+}
+
 void GameMachine::init(
-	AUTORELEASE IWindow* mainWindow,
-	const GMConsoleHandle& consoleHandle,
+	IWindow* mainWindow,
 	AUTORELEASE IFactory* factory,
-	AUTORELEASE IGameHandler* gameHandler,
 	GMRenderEnvironment renderEnv
 )
 {
 	D(d);
+	addWindow(mainWindow);
+	d->mainWindow = mainWindow;
+
 	setRenderEnvironment(renderEnv);
 	d->camera.reset(new GMCamera());
 	registerManager(factory, &d->factory);
-	registerManager(mainWindow, &d->mainWindow);
 	IGraphicEngine* engine;
 	d->factory->createGraphicEngine(&engine);
 	registerManager(engine, &d->engine);
-	registerManager(gameHandler, &d->gameHandler);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMConfigs(), &d->statesManager);
-	registerManager(consoleHandle.window, &d->consoleWindow);
-
-	d->consoleOutput = consoleHandle.dbgoutput;
-	GMDebugger::setDebugOutput(d->consoleOutput);
 
 	d->clock.begin();
 	handleMessages();
 	updateGameMachineRunningStates();
-	d->gameHandler->init();
+
+	eachHandler([](auto, auto handler) {
+		handler->init();
+	});
 }
 
 void GameMachine::postMessage(GMMessage msg)
@@ -104,10 +118,6 @@ GMEndiannessMode GameMachine::getMachineEndianness()
 void GameMachine::startGameMachine()
 {
 	D(d);
-	// 显示主窗口
-	d->mainWindow->centerWindow();
-	d->mainWindow->showWindow();
-
 	// 创建Glyph管理器，它必须在OpenGL窗口创建以后才可以初始化
 	GMGlyphManager* glyphManager;
 	d->factory->createGlyphManager(&glyphManager);
@@ -121,32 +131,32 @@ void GameMachine::startGameMachine()
 
 	// 初始化gameHandler
 	if (!d->states.crashDown)
-		d->gameHandler->start();
+	{
+		eachHandler([](auto, auto handler)
+		{
+			handler->start();
+		});
+	}
 	else
+	{
 		terminate();
+	}
 
 	// 消息循环
 	runEventLoop();
 }
 
-void GameMachine::registerCanvas(GMCanvas* canvas)
+void GameMachine::addWindow(IWindow* window)
 {
 	D(d);
-	d->canvases.push_back(canvas);
+	d->windows.insert(window);
 }
 
-bool GameMachine::dispatchEventToCanvases(GMSystemEvent* event)
+bool GameMachine::removeWindow(IWindow* window)
 {
 	D(d);
-	if (event)
-	{
-		for (auto canvas : d->canvases)
-		{
-			if (canvas->msgProc(event))
-				return true;
-		}
-	}
-	return false;
+	GMsize_t count = d->windows.erase(window);
+	return count > 0;
 }
 
 bool GameMachine::renderFrame()
@@ -167,14 +177,16 @@ bool GameMachine::renderFrame()
 	// 调用Handler
 	handlerEvents();
 
-	// 更新所有管理器
+	// 更新时钟
 	updateManagers();
 
 	// 更新状态
 	updateGameMachineRunningStates();
 
 	// 本帧结束
-	d->gameHandler->event(GameMachineHandlerEvent::FrameEnd);
+	eachHandler([](auto, auto handler) {
+		handler->event(GameMachineHandlerEvent::FrameEnd);
+	});
 	d->states.lastFrameElpased = frameCounter.elapsedFromStart();
 	return true;
 }
@@ -210,8 +222,7 @@ bool GameMachine::checkCrashDown()
 	if (d->states.crashDown)
 	{
 		// 宕机的情况下，只更新下面的状态
-		d->mainWindow->update();
-		d->consoleWindow->update();
+		handleMessage(s_frameUpdateMsg);
 		d->clock.update();
 		return true;
 	}
@@ -221,21 +232,22 @@ bool GameMachine::checkCrashDown()
 void GameMachine::handlerEvents()
 {
 	D(d);
-	d->gameHandler->event(GameMachineHandlerEvent::FrameStart);
-	if (d->mainWindow->isWindowActivate())
-		d->gameHandler->event(GameMachineHandlerEvent::Activate);
-	else
-		d->gameHandler->event(GameMachineHandlerEvent::Deactivate);
-	d->gameHandler->event(GameMachineHandlerEvent::Simulate);
-	d->gameHandler->event(GameMachineHandlerEvent::Render);
+	eachHandler([](auto window, auto handler) {
+		handler->event(GameMachineHandlerEvent::FrameStart);
+		if (window->isWindowActivate())
+			handler->event(GameMachineHandlerEvent::Activate);
+		else
+			handler->event(GameMachineHandlerEvent::Deactivate);
+
+		handler->event(GameMachineHandlerEvent::Simulate);
+		handler->event(GameMachineHandlerEvent::Render);
+	});
 }
 
 void GameMachine::updateManagers()
 {
 	D(d);
-	d->mainWindow->update();
-	if (d->consoleWindow)
-		d->consoleWindow->update();
+	handleMessage(s_frameUpdateMsg);
 	d->clock.update();
 }
 
@@ -270,13 +282,12 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 		d->states.crashDown = true;
 		break;
 	}
+	case GameMachineMessageType::FrameUpdate:
 	case GameMachineMessageType::SystemMessage:
 	{
-		GMSystemEvent* event = static_cast<GMSystemEvent*>(msg.objPtr);
-		for (auto canvas : d->canvases)
+		for (auto window : d->windows)
 		{
-			if (canvas->msgProc(event))
-				break;
+			window->msgProc(msg);
 		}
 		break;
 	}
@@ -299,7 +310,10 @@ void GameMachine::registerManager(T* newObject, OUT U** manager)
 void GameMachine::terminate()
 {
 	D(d);
-	d->gameHandler->event(GameMachineHandlerEvent::Terminate);
+	eachHandler([](auto, auto handler) {
+		handler->event(GameMachineHandlerEvent::Terminate);
+	});
+
 	for (auto iter = d->managerQueue.rbegin(); iter != d->managerQueue.rend(); ++iter)
 	{
 		GM_delete(*iter);
@@ -309,11 +323,19 @@ void GameMachine::terminate()
 void GameMachine::updateGameMachineRunningStates()
 {
 	D(d);
-	gm::IWindow* mainWindow = getMainWindow();
+	IWindow* mainWindow = getMainWindow();
 	if (mainWindow)
-	{
 		d->states.renderRect = mainWindow->getRenderRect();
-		d->states.elapsedTime = d->clock.getTime();
-		d->states.fps = d->clock.getFps();
+
+	d->states.elapsedTime = d->clock.getTime();
+	d->states.fps = d->clock.getFps();
+}
+
+void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> action)
+{
+	D(d);
+	for (auto window : d->windows)
+	{
+		action(window, window->getHandler());
 	}
 }

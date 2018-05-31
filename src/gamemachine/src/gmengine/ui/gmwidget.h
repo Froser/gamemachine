@@ -10,7 +10,7 @@ class GMModel;
 class GMTextGameObject;
 class GMSprite2DGameObject;
 class GMSystemEvent;
-class GMCanvas;
+class GMWidget;
 
 struct GMCanvasControlArea
 {
@@ -28,25 +28,25 @@ struct GMCanvasTextureInfo
 	GMint height = 0;
 };
 
-GM_PRIVATE_OBJECT(GMCanvasResourceManager)
+GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 {
 	GMTextGameObject* textObject = nullptr;
 	GMSprite2DGameObject* spriteObject = nullptr;
 	Vector<GMCanvasTextureInfo> textureCache;
-	Vector<GMCanvas*> canvases;
+	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
 	GMGameObject* screenQuad = nullptr;
 	GMModel* screenQuadModel = nullptr;
 };
 
-class GMCanvasResourceManager : public GMObject
+class GMWidgetResourceManager : public GMObject
 {
-	DECLARE_PRIVATE(GMCanvasResourceManager)
+	DECLARE_PRIVATE(GMWidgetResourceManager)
 
 public:
-	GMCanvasResourceManager();
-	~GMCanvasResourceManager();
+	GMWidgetResourceManager();
+	~GMWidgetResourceManager();
 
 public:
 	const GMCanvasTextureInfo& getTexture(GMsize_t index);
@@ -56,16 +56,16 @@ public:
 	/*!
 	  注册进来的画布为一个环状链表，用于切换焦点。<BR>
 	  例如，用户切换到下一个或者前一个焦点时，通过此环状画布链表，使相应的画布的某一个控件获得焦点。
-	  \param canvas 待注册的画布。
+	  \param widget 待注册的画布。
 	*/
-	void registerCanvas(GMCanvas* canvas);
+	void registerWidget(GMWidget* widget);
 
 	void onRenderRectResized();
 
-	inline const Vector<GMCanvas*>& getCanvases()
+	inline const Vector<GMWidget*>& getCanvases()
 	{
 		D(d);
-		return d->canvases;
+		return d->widgets;
 	}
 
 	inline GMint getBackBufferWidth()
@@ -96,11 +96,12 @@ public:
 	GMGameObject* getScreenQuad();
 };
 
-GM_PRIVATE_OBJECT(GMCanvas)
+GM_PRIVATE_OBJECT(GMWidget)
 {
-	GMCanvasResourceManager* manager = nullptr;
-	GMCanvas* nextCanvas; // 下一个画布默认为自己
-	GMCanvas* prevCanvas; // 上一个画布默认为自己
+	GMWidgetResourceManager* manager = nullptr;
+	IWindow* parentWindow = nullptr;
+	GMWidget* nextCanvas; // 下一个画布默认为自己
+	GMWidget* prevCanvas; // 上一个画布默认为自己
 	Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
 	GMfloat timeLastRefresh = 0;
@@ -122,13 +123,13 @@ GM_PRIVATE_OBJECT(GMCanvas)
 	HashMap<GMCanvasControlArea::Area, GMRect> areas;
 };
 
-class GMCanvas : public GMObject
+class GMWidget : public GMObject
 {
-	DECLARE_PRIVATE(GMCanvas)
+	DECLARE_PRIVATE(GMWidget)
 
 public:
-	GMCanvas(GMCanvasResourceManager* manager);
-	~GMCanvas();
+	GMWidget(GMWidgetResourceManager* manager);
+	~GMWidget();
 
 public:
 	virtual void init() {}
@@ -137,7 +138,7 @@ public:
 	void addArea(GMCanvasControlArea::Area area, const GMRect& rc);
 	bool msgProc(GMSystemEvent* event);
 	void render(GMfloat elpasedTime);
-	void setNextCanvas(GMCanvas* nextCanvas);
+	void setNextCanvas(GMWidget* nextCanvas);
 	void addControl(GMControl* control);
 	const GMRect& getArea(GMCanvasControlArea::Area area);
 
@@ -181,7 +182,7 @@ public:
 
 private:
 	bool initControl(GMControl* control);
-	void setPrevCanvas(GMCanvas* prevCanvas);
+	void setPrevCanvas(GMWidget* prevCanvas);
 	void refresh();
 	void focusDefaultControl();
 	void removeAllControls();
@@ -190,6 +191,18 @@ private:
 	void onMouseMove(const GMPoint& pt);
 
 public:
+	inline IWindow* getParentWindow()
+	{
+		D(d);
+		return d->parentWindow;
+	}
+
+	inline void setParentWindow(IWindow* window)
+	{
+		D(d);
+		d->parentWindow = window;
+	}
+
 	inline void setMinimize(bool minimize)
 	{
 		D(d);
@@ -214,13 +227,13 @@ public:
 		return d->visible;
 	}
 
-	inline GMCanvas* getNextCanvas()
+	inline GMWidget* getNextCanvas()
 	{
 		D(d);
 		return d->nextCanvas;
 	}
 
-	inline GMCanvas* getPrevCanvas()
+	inline GMWidget* getPrevCanvas()
 	{
 		D(d);
 		return d->prevCanvas;

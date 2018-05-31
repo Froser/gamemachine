@@ -23,8 +23,7 @@ namespace
 		wc.hbrBackground = (HBRUSH)::GetStockObject(WHITE_BRUSH);
 		wc.lpszMenuName = NULL;
 		wc.lpszClassName = lpszClassName;
-		BOOL b = ::RegisterClass(&wc);
-		GM_ASSERT(b);
+		::RegisterClass(&wc);
 
 		HWND wnd = CreateWindow(lpszClassName,
 			L"GameMachineTempWindow",
@@ -61,8 +60,8 @@ public:
 	~GMWindow_OpenGL();
 
 public:
+	virtual void msgProc(const GMMessage& message) override;
 	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle) override;
-	virtual void update() override;
 
 private:
 	void swapBuffers() const;
@@ -177,10 +176,11 @@ void GMWindow_OpenGL::swapBuffers() const
 	::SwapBuffers(d->hDC);
 }
 
-void GMWindow_OpenGL::update()
+void GMWindow_OpenGL::msgProc(const GMMessage& message)
 {
-	swapBuffers();
-	Base::update();
+	if (message.msgType == GameMachineMessageType::FrameUpdate)
+		swapBuffers();
+	Base::msgProc(message);
 }
 
 void GMWindow_OpenGL::dispose()

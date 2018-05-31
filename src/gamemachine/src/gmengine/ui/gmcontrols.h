@@ -4,7 +4,7 @@
 #include <gmmessage.h>
 BEGIN_NS
 
-class GMCanvas;
+class GMWidget;
 
 struct GMControlState
 {
@@ -124,7 +124,7 @@ GM_PRIVATE_OBJECT(GMControl)
 	GMint width = 0;
 	GMint height = 0;
 	GMRect boundingBox;
-	GMCanvas* canvas = nullptr;
+	GMWidget* canvas = nullptr;
 
 	bool styleInited = false;
 	bool enabled = true;
@@ -141,7 +141,7 @@ class GMControl : public GMObject
 	DECLARE_PRIVATE(GMControl)
 
 public:
-	GMControl(GMCanvas* canvas);
+	GMControl(GMWidget* canvas);
 
 public:
 	inline void setEnabled(bool enabled)
@@ -317,7 +317,7 @@ public:
 		return d->isDefault;
 	}
 
-	inline GMCanvas* getParent()
+	inline GMWidget* getParent()
 	{
 		D(d);
 		return d->canvas;
@@ -356,7 +356,7 @@ class GMControlStatic : public GMControl
 	DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
 
 public:
-	GMControlStatic(GMCanvas* parent);
+	GMControlStatic(GMWidget* parent);
 
 public:
 	virtual void render(GMfloat elapsed) override;
@@ -394,7 +394,7 @@ public:
 	GM_DECLARE_SIGNAL(click);
 	
 public:
-	GMControlButton(GMCanvas* parent);
+	GMControlButton(GMWidget* parent);
 
 public:
 	virtual void refresh() override;

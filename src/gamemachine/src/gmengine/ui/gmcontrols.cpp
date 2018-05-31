@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmcontrols.h"
-#include "gmcanvas.h"
+#include "gmwidget.h"
 
 void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disabledColor, const GMVec4& hiddenColor)
 {
@@ -55,7 +55,7 @@ void GMStyle::refresh()
 	d->fontColor.setCurrent(d->fontColor.getStates()[GMControlState::Hidden]);
 }
 
-GMControl::GMControl(GMCanvas* canvas)
+GMControl::GMControl(GMWidget* canvas)
 {
 	D(d);
 	d->canvas = canvas;
@@ -116,7 +116,7 @@ void GMControl::refresh()
 	d->hasFocus = false;
 }
 
-GMControlStatic::GMControlStatic(GMCanvas* parent)
+GMControlStatic::GMControlStatic(GMWidget* parent)
 	: GMControl(parent)
 {
 	D_BASE(d, GMControl);
@@ -161,7 +161,7 @@ void GMControlStatic::setText(const GMString& text)
 
 GM_DEFINE_SIGNAL(GMControlButton::click);
 
-GMControlButton::GMControlButton(GMCanvas* parent)
+GMControlButton::GMControlButton(GMWidget* parent)
 	: GMControlStatic(parent)
 {
 	D_BASE(d, GMControl);
@@ -257,7 +257,7 @@ void GMControlButton::render(GMfloat elapsed)
 		state = GMControlState::Focus;
 	}
 
-	GMCanvas* canvas = getParent();
+	GMWidget* canvas = getParent();
 	GMfloat blendRate = (state == GMControlState::Pressed) ? 0.0f : 0.8f;
 
 	db->foreStyle.getTextureColor().blend(state, elapsed, blendRate);
@@ -281,7 +281,7 @@ bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)
 	if (containsPoint(pt))
 	{
 		d->pressed = true;
-		// TODO SetCapture
+		getParent()->getParentWindow()->setWindowCapture(true);
 
 		if (!db->hasFocus)
 			getParent()->requestFocus(this);
@@ -301,9 +301,9 @@ bool GMControlButton::handleMouseRelease(const GMPoint& pt)
 	if (d->pressed)
 	{
 		d->pressed = false;
-		// TODO ReleaseCapture
+		getParent()->getParentWindow()->setWindowCapture(false);
 
-		GMCanvas* canvas = getParent();
+		GMWidget* canvas = getParent();
 		if (!canvas->canKeyboardInput())
 			canvas->clearFocus();
 
@@ -322,7 +322,7 @@ void GMControlButton::initStyles()
 	D(d);
 	D_BASE(db, Base);
 
-	GMCanvas* canvas = getParent();
+	GMWidget* canvas = getParent();
 	db->foreStyle.setTexture(0, canvas->getArea(GMCanvasControlArea::ButtonArea));
 	db->foreStyle.setFont(0);
 	db->foreStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 0));

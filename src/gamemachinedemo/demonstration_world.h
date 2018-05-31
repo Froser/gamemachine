@@ -8,7 +8,7 @@
 
 namespace gm
 {
-	class GMCanvas;
+	class GMWidget;
 }
 
 class DemostrationWorld;
@@ -61,7 +61,8 @@ GM_PRIVATE_OBJECT(DemostrationWorld)
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
-	gm::GMCanvas* mainCanvas = nullptr;
+	gm::GMWidget* mainWidget = nullptr;
+	gm::IWindow* mainWindow = nullptr;
 };
 
 class DemostrationWorld : public gm::GMGameWorld
@@ -69,14 +70,14 @@ class DemostrationWorld : public gm::GMGameWorld
 	DECLARE_PRIVATE_AND_BASE(DemostrationWorld, gm::GMGameWorld)
 
 public:
-	DemostrationWorld() = default;
+	DemostrationWorld(gm::IWindow*);
 	~DemostrationWorld();
 
 public:
 	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
 	void setCurrentDemo(DemoHandler* demo) { D(d); d->currentDemo = demo; }
 	void setCurrentDemo(gm::GMint index) { D(d); d->currentDemo = d->demos[0].second; }
-	inline gm::GMCanvas* getMainCanvas() { D(d); return d->mainCanvas; }
+	inline gm::GMWidget* getMainWidget() { D(d); return d->mainWidget; }
 
 public:
 	void addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo);
@@ -88,6 +89,7 @@ public:
 GM_PRIVATE_OBJECT(DemostrationEntrance)
 {
 	DemostrationWorld* world = nullptr;
+	gm::IWindow* mainWindow = nullptr;
 	gm::GMDebugConfig debugConfig;
 	gm::GMRenderConfig renderConfig;
 };
@@ -97,7 +99,7 @@ class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCall
 	DECLARE_PRIVATE_NGO(DemostrationEntrance)
 
 public:
-	DemostrationEntrance() = default;
+	DemostrationEntrance(gm::IWindow*);
 	~DemostrationEntrance();
 
 public:

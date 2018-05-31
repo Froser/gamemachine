@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "demonstration_world.h"
-#include <gmcanvas.h>
+#include <gmwidget.h>
 #include <gmgl.h>
 #include <gmgraphicengine.h>
 
@@ -91,7 +91,7 @@ void DemoHandler::onDeactivate()
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
 	GM.getGraphicEngine()->setShadowSource(noShadow);
 
-	d->parentDemonstrationWorld->getMainCanvas()->setVisible(true);
+	d->parentDemonstrationWorld->getMainWidget()->setVisible(true);
 }
 
 void DemoHandler::event(gm::GameMachineHandlerEvent evt)
@@ -174,6 +174,12 @@ void DemoHandler::switchNormal()
 	);
 }
 
+DemostrationWorld::DemostrationWorld(gm::IWindow* window)
+{
+	D(d);
+	d->mainWindow = window;
+}
+
 DemostrationWorld::~DemostrationWorld()
 {
 	D(d);
@@ -183,7 +189,7 @@ DemostrationWorld::~DemostrationWorld()
 		gm::GM_delete(demo.second);
 	}
 
-	GM_delete(d->mainCanvas);
+	GM_delete(d->mainWidget);
 }
 
 void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -199,31 +205,31 @@ void DemostrationWorld::init()
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 
 	// 创建画布
-	auto manager = new gm::GMCanvasResourceManager();
+	auto manager = new gm::GMWidgetResourceManager();
 	gm::ITexture* texture = nullptr;
 	gm::GMint width, height;
 	gm::GMToolUtil::createTexture("skin.png", &texture, &width, &height);
 	manager->addTexture(texture, width, height);
 
-	d->mainCanvas = new gm::GMCanvas(manager);
+	d->mainWidget = new gm::GMWidget(manager);
 	{
 		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonArea, rc);
+		d->mainWidget->addArea(gm::GMCanvasControlArea::ButtonArea, rc);
 	}
 	{
 		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->mainCanvas->addArea(gm::GMCanvasControlArea::ButtonFillArea, rc);
+		d->mainWidget->addArea(gm::GMCanvasControlArea::ButtonFillArea, rc);
 	}
 
-	manager->registerCanvas(d->mainCanvas);
-	d->mainCanvas->init();
-	d->mainCanvas->setKeyboardInput(true);
+	manager->registerWidget(d->mainWidget);
+	d->mainWidget->init();
+	d->mainWidget->setKeyboardInput(true);
 
 	gm::GMint Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
 	{
 		gm::GMControlButton* button = nullptr;
-		d->mainCanvas->addButton(
+		d->mainWidget->addButton(
 			0,
 			demo.first,
 			10,
@@ -237,13 +243,13 @@ void DemostrationWorld::init()
 		GM_ASSERT(button);
 		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 			d->nextDemo = demo.second;
-			d->mainCanvas->setVisible(false);
+			d->mainWidget->setVisible(false);
 		});
 	}
 
-	d->mainCanvas->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
-	d->mainCanvas->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
-	GM.registerCanvas(d->mainCanvas);
+	d->mainWidget->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
+	d->mainWidget->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
+	d->mainWindow->addWidget(d->mainWidget);
 }
 
 void DemostrationWorld::switchDemo()
@@ -288,7 +294,7 @@ void DemostrationEntrance::init()
 	GM.getGraphicEngine()->setShaderLoadCallback(this);
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
-	d->world = new DemostrationWorld();
+	d->world = new DemostrationWorld(d->mainWindow);
 }
 
 void DemostrationEntrance::start()
@@ -326,7 +332,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();
-			d->world->getMainCanvas()->render(GM.getGameMachineRunningStates().lastFrameElpased);
+			d->world->getMainWidget()->render(GM.getGameMachineRunningStates().lastFrameElpased);
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
 		{
@@ -352,6 +358,12 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		}
 	}
+}
+
+DemostrationEntrance::DemostrationEntrance(gm::IWindow* window)
+{
+	D(d);
+	d->mainWindow = window;
 }
 
 DemostrationEntrance::~DemostrationEntrance()

@@ -45,7 +45,7 @@ enum class GMEndiannessMode
 */
 #define GM gm::GameMachine::instance()
 
-class GMCanvas;
+class GMWidget;
 
 //! 程序运行时的各种状态。
 /*!
@@ -86,24 +86,17 @@ GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMClock clock;
 
+	Set<IWindow*> windows;
 	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	IGraphicEngine* engine = nullptr;
 	GMGlyphManager* glyphManager = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
 	GMConfigs* statesManager = nullptr;
-	IGameHandler* gameHandler = nullptr;
-
 	GMMessage lastMessage;
-
-	// 内置调试窗口，他们本质是同一个对象，所以不能重复释放
-	IWindow* consoleWindow = nullptr; 
-	IDebugOutput* consoleOutput = nullptr;
-
 	GMScopePtr<GMCamera> camera;
 	Queue<GMMessage> messageQueue;
 	Vector<IVirtualFunctionObject*> managerQueue;
-	Vector<GMCanvas*> canvases;
 
 	GMGameMachineRunningStates states;
 	GMConfigs configs;
@@ -130,23 +123,20 @@ protected:
 	  构造一个GameMachine实例。不要试图自己创建一个GameMachine实例，而是使用GM宏来获取它的单例。
 	*/
 	GameMachine();
+	~GameMachine();
 
 public:
 	//! 初始化GameMachine。
 	/*!
 	  开发者应该在程序运行的最开始就初始化GameMachine，给GameMachine赋予绘制环境下的窗体、控制台处理器、
 	当前环境下的工厂类，以及程序流程处理器。
-	  \param mainWindow 程序运行的主窗口。可以使用gmui::GMUIFactory::createMainWindow创建。此对象生命周期由GameMachine管理。
-	  \param consoleHandle 控制台处理器。当有日志或调试信息来的时候，将会调用到这个控制台处理器。可以使用gmui::GMUIFactory::createConsoleWindow创建。此对象生命周期由GameMachine管理。
+	  \param mainWindow 程序运行的主窗口。它会自动加入GameMachine管理的窗口列表中。
 	  \param factory 当前环境下的工厂类，用于创建纹理、字体管理器等绘制相关的对象。如果是在OpenGL下，可以直接创建GMGLFactory对象。此对象生命周期由GameMachine管理。
-	  \param gameHandler 程序流程管理器，处理程序运行时的各个流程。此对象生命周期由GameMachine管理。
 	  \param renderEnv 运行时的渲染环境。可以选择用OpenGL或DirectX11来进行渲染。此后的版本，也可能会增加更多的渲染环境。渲染环境一旦确立，将会影响工厂类返回的环境相关的实例。
 	*/
 	void init(
 		AUTORELEASE IWindow* mainWindow,
-		const GMConsoleHandle& consoleHandle,
 		AUTORELEASE IFactory* factory,
-		AUTORELEASE IGameHandler* gameHandler,
 		GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL
 	);
 
@@ -260,25 +250,25 @@ public:
 		d->states = states;
 	}
 
-	//! 注册一个画布到系统消息循环。
-	/*!
-	  GameMachine不会管理被注册的画布的生命周期，如果画布被析构，一定要记得在合适的时机释放画布。
-	  \param canvas 待注册的画布。
-	*/
-	void registerCanvas(GMCanvas* canvas);
-
 	//! 将系统事件翻译成GameMachine事件。
 	/*!
 	  翻译后的事件将是平台无关的。
 	*/
 	void translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lParam, OUT GMSystemEvent** event);
 
-	//! 触发所有被注册的画布的消息处理事件。
+	//! 为GameMachine注册个窗口。
 	/*!
-	通过此方法，使得被注册的画布有了处理系统消息的时机。一般不需要手动调用此方法，因为GMUIGameMachineWindowBase会调用它。
-	\return 是否已经处理了此消息。如果返回true，则此消息不会再继续传递。
+	  添加到GameMachine后的窗口将响应程序的消息循环和各种事件。
+	  \param window 待增加的窗口。
 	*/
-	bool dispatchEventToCanvases(GMSystemEvent* event);
+	void addWindow(AUTORELEASE IWindow* window);
+
+	//! 为GameMachine移除一个窗口。
+	/*!
+	  移除后的窗口不再响应任何事件。
+	  \return 返回移除是否成功。
+	*/
+	bool removeWindow(IWindow* window);
 
 private:
 	void runEventLoop();
@@ -292,7 +282,7 @@ private:
 	bool checkCrashDown();
 	void handlerEvents();
 	void updateManagers();
-	
+	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
 };
 
 END_NS

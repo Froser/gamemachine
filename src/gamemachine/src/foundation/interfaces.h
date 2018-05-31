@@ -19,7 +19,6 @@ class GMImage;
 class GMModel;
 class GMGamePackage;
 class GMGlyphManager;
-class GMUIWindow;
 class GMShader;
 class GMModelDataProxy;
 class GMMesh;
@@ -27,8 +26,8 @@ class GMTextureSampler;
 class GMTextureList;
 class GMAssets;
 class GMComponent;
-class GMCanvas;
-class GMCanvasResourceManager;
+class GMWidget;
+class GMWidgetResourceManager;
 class GMSystemEvent;
 struct ILight;
 struct ISoundPlayer;
@@ -473,7 +472,7 @@ GM_INTERFACE(IRenderer)
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
-	virtual void update() = 0;
+	virtual void msgProc(const GMMessage& message) = 0;
 	virtual GMWindowHandle create(const GMWindowAttributes& attrs) = 0;
 	virtual void centerWindow() = 0;
 	virtual void showWindow() = 0;
@@ -481,7 +480,12 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual GMRect getRenderRect() = 0;
 	virtual GMWindowHandle getWindowHandle() const = 0;
 	virtual bool isWindowActivate() = 0;
-	virtual void setLockWindow(bool lock) = 0;
+	virtual void setWindowCapture(bool capture) = 0;
+
+	virtual bool addWidget(GMWidget* widget) = 0;
+	virtual const Vector<GMWidget*>& getWidgets() = 0;
+	virtual void setHandler(AUTORELEASE IGameHandler* handler) = 0;
+	virtual IGameHandler* getHandler() = 0;
 };
 
 GM_INTERFACE(IFactory)
@@ -495,12 +499,6 @@ GM_INTERFACE(IFactory)
 	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
-};
-
-GM_ALIGNED_STRUCT(GMConsoleHandle)
-{
-	IWindow* window = nullptr;
-	IDebugOutput* dbgoutput;
 };
 
 // Audio

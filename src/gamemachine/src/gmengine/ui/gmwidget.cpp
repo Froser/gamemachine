@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "gmcanvas.h"
+#include "gmwidget.h"
 #include "gmcontrols.h"
 #include "foundation/gamemachine.h"
 #include "../gameobjects/gmgameobject.h"
@@ -13,7 +13,7 @@ namespace
 {
 	GMControl* getNextControl(GMControl* control)
 	{
-		GMCanvas* parentCanvas = control->getParent();
+		GMWidget* parentCanvas = control->getParent();
 		GMuint index = control->getIndex() + 1;
 
 		// 如果下一个控件不在此画布内，则跳到下一个画布进行查找
@@ -28,7 +28,7 @@ namespace
 
 	GMControl* getPrevControl(GMControl* control)
 	{
-		GMCanvas* parentCanvas = control->getParent();
+		GMWidget* parentCanvas = control->getParent();
 		GMint index = (GMint) control->getIndex() - 1;
 		while (index < 0)
 		{
@@ -40,18 +40,18 @@ namespace
 		return parentCanvas->getControls()[index];
 	}
 
-	GMsize_t indexOf(const Vector<GMCanvas*>& canvases, GMCanvas* targetCanvas)
+	GMsize_t indexOf(const Vector<GMWidget*>& widgets, GMWidget* targetCanvas)
 	{
-		for (GMsize_t i = 0; i < canvases.size(); ++i)
+		for (GMsize_t i = 0; i < widgets.size(); ++i)
 		{
-			if (canvases[i] == targetCanvas)
+			if (widgets[i] == targetCanvas)
 				return i;
 		}
 		return -1;
 	}
 }
 
-GMCanvasResourceManager::GMCanvasResourceManager()
+GMWidgetResourceManager::GMWidgetResourceManager()
 {
 	D(d);
 	d->screenQuadModel = new GMModel();
@@ -73,7 +73,7 @@ GMCanvasResourceManager::GMCanvasResourceManager()
 	d->spriteObject = new GMSprite2DGameObject();
 }
 
-GMCanvasResourceManager::~GMCanvasResourceManager()
+GMWidgetResourceManager::~GMWidgetResourceManager()
 {
 	D(d);
 	for (auto textureInfo : d->textureCache)
@@ -87,19 +87,19 @@ GMCanvasResourceManager::~GMCanvasResourceManager()
 	GM_delete(d->screenQuadModel);
 }
 
-GMModel* GMCanvasResourceManager::getScreenQuadModel()
+GMModel* GMWidgetResourceManager::getScreenQuadModel()
 {
 	D(d);
 	return d->screenQuadModel;
 }
 
-GMGameObject* GMCanvasResourceManager::getScreenQuad()
+GMGameObject* GMWidgetResourceManager::getScreenQuad()
 {
 	D(d);
 	return d->screenQuad;
 }
 
-GMsize_t GMCanvasResourceManager::addTexture(ITexture* texture, GMint width, GMint height)
+GMsize_t GMWidgetResourceManager::addTexture(ITexture* texture, GMint width, GMint height)
 {
 	D(d);
 	GMCanvasTextureInfo texInfo;
@@ -110,30 +110,30 @@ GMsize_t GMCanvasResourceManager::addTexture(ITexture* texture, GMint width, GMi
 	return d->textureCache.size() - 1;
 }
 
-void GMCanvasResourceManager::registerCanvas(GMCanvas* canvas)
+void GMWidgetResourceManager::registerWidget(GMWidget* widget)
 {
 	D(d);
-	for (auto c : d->canvases)
+	for (auto c : d->widgets)
 	{
-		if (c == canvas)
+		if (c == widget)
 			return;
 	}
 
 	// 将Canvas设置成一个环
-	d->canvases.push_back(canvas);
-	GMsize_t sz = d->canvases.size();
+	d->widgets.push_back(widget);
+	GMsize_t sz = d->widgets.size();
 	if (sz > 1)
-		d->canvases[sz - 2]->setNextCanvas(canvas);
-	d->canvases[sz - 1]->setNextCanvas(d->canvases[0]);
+		d->widgets[sz - 2]->setNextCanvas(widget);
+	d->widgets[sz - 1]->setNextCanvas(d->widgets[0]);
 }
 
-const GMCanvasTextureInfo& GMCanvasResourceManager::getTexture(GMsize_t index)
+const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(GMsize_t index)
 {
 	D(d);
 	return d->textureCache[index];
 }
 
-void GMCanvasResourceManager::onRenderRectResized()
+void GMWidgetResourceManager::onRenderRectResized()
 {
 	D(d);
 	const GMGameMachineRunningStates& runningStates = GM.getGameMachineRunningStates();
@@ -141,23 +141,23 @@ void GMCanvasResourceManager::onRenderRectResized()
 	d->backBufferHeight = runningStates.renderRect.height;
 }
 
-GMfloat GMCanvas::s_timeRefresh = 0;
-GMControl* GMCanvas::s_controlFocus = nullptr;
-GMControl* GMCanvas::s_controlPressed = nullptr;
+GMfloat GMWidget::s_timeRefresh = 0;
+GMControl* GMWidget::s_controlFocus = nullptr;
+GMControl* GMWidget::s_controlPressed = nullptr;
 
-GMCanvas::GMCanvas(GMCanvasResourceManager* manager)
+GMWidget::GMWidget(GMWidgetResourceManager* manager)
 {
 	D(d);
 	d->manager = manager;
 	d->nextCanvas = d->prevCanvas = this;
 }
 
-GMCanvas::~GMCanvas()
+GMWidget::~GMWidget()
 {
 	removeAllControls();
 }
 
-void GMCanvas::addControl(GMControl* control)
+void GMWidget::addControl(GMControl* control)
 {
 	D(d);
 	d->controls.push_back(control);
@@ -165,13 +165,13 @@ void GMCanvas::addControl(GMControl* control)
 	GM_ASSERT(b);
 }
 
-const GMRect& GMCanvas::getArea(GMCanvasControlArea::Area area)
+const GMRect& GMWidget::getArea(GMCanvasControlArea::Area area)
 {
 	D(d);
 	return d->areas[area];
 }
 
-void GMCanvas::addStatic(
+void GMWidget::addStatic(
 	GMint id,
 	const GMString& text,
 	GMint x,
@@ -194,7 +194,7 @@ void GMCanvas::addStatic(
 	staticControl->setIsDefault(isDefault);
 }
 
-void GMCanvas::addButton(
+void GMWidget::addButton(
 	GMint id,
 	const GMString& text,
 	GMint x,
@@ -217,7 +217,7 @@ void GMCanvas::addButton(
 	buttonControl->setIsDefault(isDefault);
 }
 
-void GMCanvas::drawText(
+void GMWidget::drawText(
 	const GMString& text,
 	GMStyle& style,
 	const GMRect& rc,
@@ -241,7 +241,7 @@ void GMCanvas::drawText(
 	textObject->draw();
 }
 
-void GMCanvas::drawSprite(
+void GMWidget::drawSprite(
 	GMStyle& style,
 	const GMRect& rc,
 	GMfloat depth
@@ -267,7 +267,7 @@ void GMCanvas::drawSprite(
 	spriteObject->draw();
 }
 
-void GMCanvas::requestFocus(GMControl* control)
+void GMWidget::requestFocus(GMControl* control)
 {
 	if (s_controlFocus == control)
 		return;
@@ -282,7 +282,7 @@ void GMCanvas::requestFocus(GMControl* control)
 	s_controlFocus = control;
 }
 
-bool GMCanvas::initControl(GMControl* control)
+bool GMWidget::initControl(GMControl* control)
 {
 	D(d);
 	GM_ASSERT(control);
@@ -294,19 +294,19 @@ bool GMCanvas::initControl(GMControl* control)
 	return control->onInit();
 }
 
-void GMCanvas::setPrevCanvas(GMCanvas* prevCanvas)
+void GMWidget::setPrevCanvas(GMWidget* prevCanvas)
 {
 	D(d);
 	d->prevCanvas = prevCanvas;
 }
 
-void GMCanvas::addArea(GMCanvasControlArea::Area area, const GMRect& rc)
+void GMWidget::addArea(GMCanvasControlArea::Area area, const GMRect& rc)
 {
 	D(d);
 	d->areas[area] = rc;
 }
 
-bool GMCanvas::msgProc(GMSystemEvent* event)
+bool GMWidget::msgProc(GMSystemEvent* event)
 {
 	D(d);
 	if (!getVisible())
@@ -407,7 +407,7 @@ bool GMCanvas::msgProc(GMSystemEvent* event)
 	return false;
 }
 
-void GMCanvas::render(GMfloat elpasedTime)
+void GMWidget::render(GMfloat elpasedTime)
 {
 	D(d);
 	if (d->timeLastRefresh < s_timeRefresh)
@@ -473,7 +473,7 @@ void GMCanvas::render(GMfloat elpasedTime)
 	}
 }
 
-void GMCanvas::setNextCanvas(GMCanvas* nextCanvas)
+void GMWidget::setNextCanvas(GMWidget* nextCanvas)
 {
 	D(d);
 	if (!nextCanvas)
@@ -483,7 +483,7 @@ void GMCanvas::setNextCanvas(GMCanvas* nextCanvas)
 		nextCanvas->setPrevCanvas(this);
 }
 
-void GMCanvas::refresh()
+void GMWidget::refresh()
 {
 	D(d);
 	if (s_controlFocus)
@@ -505,7 +505,7 @@ void GMCanvas::refresh()
 		focusDefaultControl();
 }
 
-void GMCanvas::focusDefaultControl()
+void GMWidget::focusDefaultControl()
 {
 	D(d);
 	for (auto& control : d->controls)
@@ -521,7 +521,7 @@ void GMCanvas::focusDefaultControl()
 	}
 }
 
-void GMCanvas::removeAllControls()
+void GMWidget::removeAllControls()
 {
 	D(d);
 	if (s_controlFocus && s_controlFocus->getParent() == this)
@@ -537,7 +537,7 @@ void GMCanvas::removeAllControls()
 	GMClearSTLContainer(d->controls);
 }
 
-GMControl* GMCanvas::getControlAtPoint(const GMPoint& pt)
+GMControl* GMWidget::getControlAtPoint(const GMPoint& pt)
 {
 	D(d);
 	for (auto control : d->controls)
@@ -551,14 +551,14 @@ GMControl* GMCanvas::getControlAtPoint(const GMPoint& pt)
 	return nullptr;
 }
 
-bool GMCanvas::onCycleFocus(bool goForward)
+bool GMWidget::onCycleFocus(bool goForward)
 {
 	D(d);
 	GMControl* control = nullptr;
-	GMCanvas* canvas = nullptr;
-	GMCanvas* lastCanvas = nullptr;
-	const Vector<GMCanvas*>& canvases = d->manager->getCanvases();
-	GMint sz = (GMint)canvases.size();
+	GMWidget* widget = nullptr;
+	GMWidget* lastCanvas = nullptr;
+	const Vector<GMWidget*>& widgets = d->manager->getCanvases();
+	GMint sz = (GMint)widgets.size();
 
 	if (!s_controlFocus)
 	{
@@ -566,9 +566,9 @@ bool GMCanvas::onCycleFocus(bool goForward)
 		{
 			for (GMint i = 0; i < sz; ++i)
 			{
-				canvas = lastCanvas = canvases[i];
-				const Vector<GMControl*> controls = canvas->getControls();
-				if (canvas && controls.size() > 0)
+				widget = lastCanvas = widgets[i];
+				const Vector<GMControl*> controls = widget->getControls();
+				if (widget && controls.size() > 0)
 				{
 					control = controls[0];
 					break;
@@ -579,9 +579,9 @@ bool GMCanvas::onCycleFocus(bool goForward)
 		{
 			for (GMint i = sz - 1; i >= 0; --i)
 			{
-				canvas = lastCanvas = canvases[i];
-				const Vector<GMControl*> controls = canvas->getControls();
-				if (canvas && controls.size() > 0)
+				widget = lastCanvas = widgets[i];
+				const Vector<GMControl*> controls = widget->getControls();
+				if (widget && controls.size() > 0)
 				{
 					control = controls[controls.size() - 1];
 					break;
@@ -589,30 +589,30 @@ bool GMCanvas::onCycleFocus(bool goForward)
 			}
 		}
 
-		if (!canvas || !control)
+		if (!widget || !control)
 			return true;
 	}
 	else if (s_controlFocus->getParent() != this)
 	{
-		// 当前获得焦点的控件属于另外一个canvas，所以要交给它来处理
+		// 当前获得焦点的控件属于另外一个widget，所以要交给它来处理
 		return false;
 	}
 	else
 	{
 		lastCanvas = s_controlFocus->getParent();
 		control = (goForward) ? getNextControl(s_controlFocus) : getPrevControl(s_controlFocus);
-		canvas = control->getParent();
+		widget = control->getParent();
 	}
 
 	while (true)
 	{
 		// 如果我们转了一圈回来，那么我们不会设置任何焦点了。
-		const Vector<GMCanvas*> canvases = d->manager->getCanvases();
-		if (canvases.empty())
+		const Vector<GMWidget*> widgets = d->manager->getCanvases();
+		if (widgets.empty())
 			return false;
 
-		GMsize_t lastCanvasIndex = indexOf(canvases, lastCanvas);
-		GMsize_t canvasIndex = indexOf(canvases, canvas);
+		GMsize_t lastCanvasIndex = indexOf(widgets, lastCanvas);
+		GMsize_t canvasIndex = indexOf(widgets, widget);
 		if ((!goForward && lastCanvasIndex < canvasIndex) ||
 			(goForward && canvasIndex < lastCanvasIndex))
 		{
@@ -634,17 +634,17 @@ bool GMCanvas::onCycleFocus(bool goForward)
 			return true;
 		}
 
-		lastCanvas = canvas;
+		lastCanvas = widget;
 		control = (goForward) ? getNextControl(control) : getPrevControl(control);
-		canvas = control->getParent();
+		widget = control->getParent();
 	}
 
-	// 永远都不会到这里来，因为canvas是个环，只会在上面return
+	// 永远都不会到这里来，因为widget是个环，只会在上面return
 	GM_ASSERT(false);
 	return false;
 }
 
-void GMCanvas::onMouseMove(const GMPoint& pt)
+void GMWidget::onMouseMove(const GMPoint& pt)
 {
 	D(d);
 	GMControl* control = getControlAtPoint(pt);
@@ -660,7 +660,7 @@ void GMCanvas::onMouseMove(const GMPoint& pt)
 		control->onMouseEnter();
 }
 
-void GMCanvas::clearFocus()
+void GMWidget::clearFocus()
 {
 	if (s_controlFocus)
 	{

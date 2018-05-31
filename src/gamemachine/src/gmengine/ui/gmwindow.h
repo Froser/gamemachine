@@ -9,6 +9,8 @@ GM_PRIVATE_OBJECT(GMWindow)
 {
 	GMWindowHandle handle;
 	IInput* input = nullptr;
+	IGameHandler* handler = nullptr;
+	Vector<GMWidget*> widgets;
 };
 
 class GMWindow : public GMObject, public IWindow
@@ -20,15 +22,19 @@ public:
 
 public:
 	virtual IInput* getInputMananger() override;
-	virtual void update() override;
+	virtual void msgProc(const GMMessage& message) override;
 	virtual GMRect getWindowRect() override;
 	virtual GMRect getRenderRect() override;
 	virtual void centerWindow() override;
 	virtual bool isWindowActivate() override;
-	virtual void setLockWindow(bool lock) override;
+	virtual void setWindowCapture(bool lock) override;
 	virtual void showWindow() override;
-	virtual GMWindowHandle create(const GMWindowAttributes& wndAttrs);
-	virtual GMWindowHandle getWindowHandle() const { D(d); return d->handle; }
+	virtual GMWindowHandle create(const GMWindowAttributes& wndAttrs) override;
+	virtual GMWindowHandle getWindowHandle() const override { D(d); return d->handle; }
+	virtual bool addWidget(GMWidget* widget) override;
+	virtual const Vector<GMWidget*>& getWidgets() override;
+	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
+	virtual IGameHandler* getHandler() override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
