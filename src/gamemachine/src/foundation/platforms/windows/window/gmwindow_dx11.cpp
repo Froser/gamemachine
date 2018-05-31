@@ -46,9 +46,9 @@ GMWindow_Dx11::~GMWindow_Dx11()
 void GMWindow_Dx11::msgProc(const GMMessage& message)
 {
 	D(d);
+	Base::msgProc(message);
 	if (message.msgType == GameMachineMessageType::FrameUpdate)
 		GM_DX_HR(d->swapChain->Present(d->vsync ? 1 : 0, 0));
-	Base::msgProc(message);
 }
 
 bool GMWindow_Dx11::getInterface(GameMachineInterfaceID id, void** out)

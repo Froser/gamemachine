@@ -332,7 +332,6 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		case gm::GameMachineHandlerEvent::Render:
 			getWorld()->renderScene();
-			d->world->getMainWidget()->render(GM.getGameMachineRunningStates().lastFrameElpased);
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
 		{

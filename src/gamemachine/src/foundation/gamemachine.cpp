@@ -178,7 +178,7 @@ bool GameMachine::renderFrame()
 	handlerEvents();
 
 	// 更新时钟
-	updateManagers();
+	d->clock.update();
 
 	// 更新状态
 	updateGameMachineRunningStates();
@@ -241,14 +241,8 @@ void GameMachine::handlerEvents()
 
 		handler->event(GameMachineHandlerEvent::Simulate);
 		handler->event(GameMachineHandlerEvent::Render);
+		window->msgProc(s_frameUpdateMsg);
 	});
-}
-
-void GameMachine::updateManagers()
-{
-	D(d);
-	handleMessage(s_frameUpdateMsg);
-	d->clock.update();
 }
 
 bool GameMachine::handleMessages()

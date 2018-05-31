@@ -14,6 +14,8 @@
 
 namespace
 {
+	Map<HWND, GMWindow*> s_hwndMap;
+
 	LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		GMWindow* pGMWindow = nullptr;
@@ -22,11 +24,13 @@ namespace
 			LPCREATESTRUCT lpcs = reinterpret_cast<LPCREATESTRUCT>(lParam);
 			pGMWindow = static_cast<GMWindow*>(lpcs->lpCreateParams);
 			pGMWindow->setWindowHandle(hWnd);
-			::SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LPARAM>(pGMWindow));
+			s_hwndMap[hWnd] = pGMWindow;
 		}
 		else
 		{
-			pGMWindow = reinterpret_cast<GMWindow*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
+			auto iter = s_hwndMap.find(hWnd);
+			if (iter != s_hwndMap.end())
+				pGMWindow = (*iter).second;
 		}
 
 		if (pGMWindow)
@@ -71,10 +75,11 @@ GMWindowProcHandler GMWindow::getProcHandler()
 GMWindow::~GMWindow()
 {
 	D(d);
-	::SetWindowLongPtr(getWindowHandle(), GWLP_USERDATA, NULL);
+	s_hwndMap.erase(getWindowHandle());
 	GM.removeWindow(this);
 	GM_delete(d->input);
 	GM_delete(d->handler);
+	::DestroyWindow(getWindowHandle());
 }
 
 IInput* GMWindow::getInputMananger()
@@ -100,6 +105,12 @@ void GMWindow::msgProc(const GMMessage& message)
 	{
 		if (d->input)
 			d->input->update();
+
+		GMfloat elapsed = GM.getGameMachineRunningStates().lastFrameElpased;
+		for (auto widget : d->widgets)
+		{
+			widget->render(elapsed);
+		}
 	}
 }
 

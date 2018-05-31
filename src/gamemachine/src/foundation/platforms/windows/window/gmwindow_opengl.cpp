@@ -178,9 +178,9 @@ void GMWindow_OpenGL::swapBuffers() const
 
 void GMWindow_OpenGL::msgProc(const GMMessage& message)
 {
+	Base::msgProc(message);
 	if (message.msgType == GameMachineMessageType::FrameUpdate)
 		swapBuffers();
-	Base::msgProc(message);
 }
 
 void GMWindow_OpenGL::dispose()

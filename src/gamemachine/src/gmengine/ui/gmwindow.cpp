@@ -35,8 +35,8 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 		break;
 	}
 
-	auto& widgets = getWidgets();
-	for (auto& widget : widgets)
+	D(d);
+	for (auto& widget : d->widgets)
 	{
 		if (widget->msgProc(event))
 			return true;
@@ -60,12 +60,6 @@ bool GMWindow::addWidget(GMWidget* widget)
 	widget->setParentWindow(this);
 	d->widgets.push_back(widget);
 	return true;
-}
-
-const Vector<GMWidget*>& GMWindow::getWidgets()
-{
-	D(d);
-	return d->widgets;
 }
 
 void GMWindow::setHandler(IGameHandler* handler)

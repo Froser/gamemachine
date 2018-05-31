@@ -32,7 +32,6 @@ public:
 	virtual GMWindowHandle create(const GMWindowAttributes& wndAttrs) override;
 	virtual GMWindowHandle getWindowHandle() const override { D(d); return d->handle; }
 	virtual bool addWidget(GMWidget* widget) override;
-	virtual const Vector<GMWidget*>& getWidgets() override;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
 	virtual IGameHandler* getHandler() override;
 

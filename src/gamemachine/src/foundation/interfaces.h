@@ -483,7 +483,6 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual void setWindowCapture(bool capture) = 0;
 
 	virtual bool addWidget(GMWidget* widget) = 0;
-	virtual const Vector<GMWidget*>& getWidgets() = 0;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) = 0;
 	virtual IGameHandler* getHandler() = 0;
 };

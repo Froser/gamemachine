@@ -281,7 +281,6 @@ private:
 	void setRenderEnvironment(GMRenderEnvironment renv);
 	bool checkCrashDown();
 	void handlerEvents();
-	void updateManagers();
 	void eachHandler(std::function<void(IWindow*, IGameHandler*)> action);
 };
 
