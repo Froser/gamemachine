@@ -13,6 +13,7 @@ struct GMDx11TextureSamplerVariable
 
 GM_PRIVATE_OBJECT(GMDx11Texture)
 {
+	const GMContext* context = nullptr;
 	GMImage* image = nullptr;
 	GMComPtr<ID3D11Device> device;
 	GMComPtr<ID3D11DeviceContext> deviceContext;
@@ -23,18 +24,20 @@ GM_PRIVATE_OBJECT(GMDx11Texture)
 	HashMap<const char*, GMDx11TextureSamplerVariable> variables;
 };
 
-class GMDx11Texture : public ITexture
+class GMDx11Texture : public ITexture, public IContext
 {
 	DECLARE_PRIVATE(GMDx11Texture)
 
 public:
-	GMDx11Texture(GMImage* image);
+	GMDx11Texture(const GMContext* context, GMImage* image);
 	~GMDx11Texture();
 
 public:
 	virtual void init() override;
 	virtual void bindSampler(GMTextureSampler* sampler) override;
 	virtual void useTexture(GMint textureType) override;
+
+	virtual const GMContext* getContext() override;
 
 public:
 	ID3D11ShaderResourceView* getResourceView()

@@ -112,7 +112,7 @@ void Demo_Model::init()
 void Demo_Model::handleMouseEvent()
 {
 	D(d);
-	gm::IMouseState& ms = GM.getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 	if (state.wheel.wheeled)
 	{
@@ -144,24 +144,24 @@ void Demo_Model::handleMouseEvent()
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->draggingL = true;
-		GM.getMainWindow()->setWindowCapture(true);
+		getDemonstrationWorld()->getMainWindow()->setWindowCapture(true);
 	}
 	else if (state.upButton & gm::GMMouseButton_Left)
 	{
 		d->draggingL = false;
-		GM.getMainWindow()->setWindowCapture(false);
+		getDemonstrationWorld()->getMainWindow()->setWindowCapture(false);
 	}
 	if (state.downButton & gm::GMMouseButton_Right)
 	{
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 		d->draggingR = true;
-		GM.getMainWindow()->setWindowCapture(true);
+		getDemonstrationWorld()->getMainWindow()->setWindowCapture(true);
 	}
 	else if (state.upButton & gm::GMMouseButton_Right)
 	{
 		d->draggingR = false;
-		GM.getMainWindow()->setWindowCapture(false);
+		getDemonstrationWorld()->getMainWindow()->setWindowCapture(false);
 	}
 }
 
@@ -221,15 +221,16 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 void Demo_Model::handleDragging()
 {
 	D(d);
-	gm::IMouseState& ms = GM.getMainWindow()->getInputMananger()->getMouseState();
+	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
+	const gm::GMWindowStates& windowStates = GM.getGraphicEngine()->getCurrentWindow()->getWindowStates();
 
 	if (d->draggingL)
 	{
 		gm::GMfloat rotateX = d->mouseDownX - state.posX;
 
 		GMQuat q = Rotate(d->gameObject->getRotation(),
-			PI * rotateX / GM.getGameMachineRunningStates().renderRect.width,
+			PI * rotateX / windowStates.renderRect.width,
 			GMVec3(0, 1, 0));
 		d->gameObject->setRotation(q);
 		d->gameObject2->setRotation(q);
@@ -245,11 +246,11 @@ void Demo_Model::handleDragging()
 		GMVec3 lookAt3 = Normalize(s_lookAt.lookAt);
 		GMVec4 lookAt = GMVec4(lookAt3, 1.f);
 		GMQuat q = Rotate(d->lookAtRotation,
-			PI * rotateX / GM.getGameMachineRunningStates().renderRect.width,
+			PI * rotateX / windowStates.renderRect.width,
 			GMVec3(0, 1, 0));
 		d->lookAtRotation = q;
 		q = Rotate(d->lookAtRotation,
-			PI * rotateY / GM.getGameMachineRunningStates().renderRect.width,
+			PI * rotateY / windowStates.renderRect.width,
 			GMVec3(1, 0, 0));
 		d->lookAtRotation = q;
 		gm::GMCameraLookAt cameraLookAt = {
@@ -311,7 +312,7 @@ void Demo_Model::event(gm::GameMachineHandlerEvent evt)
 		handleMouseEvent();
 		handleDragging();
 
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered('N'))
 			switchNormal();

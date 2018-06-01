@@ -5,17 +5,16 @@
 #include <gmgraphicengine.h>
 
 #include "demo/texture.h"
-#include "demo/normalmap.h"
-#include "demo/effects.h"
-#include "demo/quake3_bsp.h"
-#include "demo/border.h"
-#include "demo/sound.h"
-#include "demo/literature.h"
-#include "demo/model.h"
-#include "demo/collision.h"
-#include "demo/specularmap.h"
-#include "demo/pbr.h"
-#include "demo/phong_pbr.h"
+//#include "demo/normalmap.h"
+//#include "demo/effects.h"
+//#include "demo/quake3_bsp.h"
+//#include "demo/sound.h"
+//#include "demo/literature.h"
+//#include "demo/model.h"
+//#include "demo/collision.h"
+//#include "demo/specularmap.h"
+//#include "demo/pbr.h"
+//#include "demo/phong_pbr.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -25,31 +24,31 @@ extern gm::GMRenderEnvironment GetRenderEnv();
 
 namespace
 {
-	void loadDemostrations(DemostrationWorld* world)
+	void loadDemostrations(DemonstrationWorld* world)
 	{
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
-		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
-		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-		world->addDemo("Effects: Use a grayscale filter.", new Demo_Effects(world));
-		world->addDemo("BSP: Demonstrate a Quake3 scene.", new Demo_Quake3_BSP(world));
-		world->addDemo("Border: Demonstrate a border.", new Demo_Border(world));
-		world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
-		world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
-		world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
-		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
-		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
-		world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
-		world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
+		//world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
+		//world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
+		//world->addDemo("Effects: Use a grayscale filter.", new Demo_Effects(world));
+		//world->addDemo("BSP: Demonstrate a Quake3 scene.", new Demo_Quake3_BSP(world));
+		//world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
+		//world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
+		//world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
+		//world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
+		//world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
+		//world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
+		//world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
 		world->init();
 	}
 }
 
-DemoHandler::DemoHandler(DemostrationWorld* parentDemonstrationWorld)
+DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 {
 	D(d);
 	d->parentDemonstrationWorld = parentDemonstrationWorld;
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
+	d->engine = parentDemonstrationWorld->getContext()->engine;
 }
 
 DemoHandler::~DemoHandler()
@@ -83,13 +82,13 @@ void DemoHandler::onDeactivate()
 {
 	D(d);
 	d->parentDemonstrationWorld->resetProjectionAndEye();
-	GM.getGraphicEngine()->removeLights();
+	d->engine->removeLights();
 	d->renderConfig.set(gm::GMRenderConfigs::FilterMode, gm::GMFilterMode::None);
 	d->activating = false;
 
 	gm::GMShadowSourceDesc noShadow;
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
-	GM.getGraphicEngine()->setShadowSource(noShadow);
+	d->engine->setShadowSource(noShadow);
 
 	d->parentDemonstrationWorld->getMainWidget()->setVisible(true);
 }
@@ -100,7 +99,7 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 	switch (evt)
 	{
 	case gm::GameMachineHandlerEvent::Activate:
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
 		if (kbState.keyTriggered(VK_ESCAPE))
@@ -148,7 +147,7 @@ void DemoHandler::setDefaultLights()
 		light->setLightPosition(lightPos);
 		gm::GMfloat color[] = { .7f, .7f, .7f };
 		light->setLightColor(color);
-		GM.getGraphicEngine()->addLight(light);
+		d->engine->addLight(light);
 	}
 }
 
@@ -174,13 +173,14 @@ void DemoHandler::switchNormal()
 	);
 }
 
-DemostrationWorld::DemostrationWorld(gm::IWindow* window)
+DemonstrationWorld::DemonstrationWorld(const gm::GMContext* context, gm::IWindow* window)
+	: Base(context)
 {
 	D(d);
 	d->mainWindow = window;
 }
 
-DemostrationWorld::~DemostrationWorld()
+DemonstrationWorld::~DemonstrationWorld()
 {
 	D(d);
 	for (auto& demo : d->demos)
@@ -192,23 +192,23 @@ DemostrationWorld::~DemostrationWorld()
 	GM_delete(d->mainWidget);
 }
 
-void DemostrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
+void DemonstrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
 {
 	D(d);
 	GM_ASSERT(demo);
 	d->demos.push_back(std::make_pair(name, demo));
 }
 
-void DemostrationWorld::init()
+void DemonstrationWorld::init()
 {
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 
 	// 创建画布
-	auto manager = new gm::GMWidgetResourceManager();
+	auto manager = new gm::GMWidgetResourceManager(getContext());
 	gm::ITexture* texture = nullptr;
 	gm::GMint width, height;
-	gm::GMToolUtil::createTexture("skin.png", &texture, &width, &height);
+	gm::GMToolUtil::createTexture(getContext(), "skin.png", &texture, &width, &height);
 	manager->addTexture(texture, width, height);
 
 	d->mainWidget = new gm::GMWidget(manager);
@@ -252,7 +252,7 @@ void DemostrationWorld::init()
 	d->mainWindow->addWidget(d->mainWidget);
 }
 
-void DemostrationWorld::switchDemo()
+void DemonstrationWorld::switchDemo()
 {
 	D(d);
 	if (d->nextDemo)
@@ -265,7 +265,7 @@ void DemostrationWorld::switchDemo()
 	}
 }
 
-void DemostrationWorld::resetProjectionAndEye()
+void DemonstrationWorld::resetProjectionAndEye()
 {
 	// 设置一个默认视角
 	gm::GMCamera& camera = GM.getCamera();
@@ -278,10 +278,10 @@ void DemostrationWorld::resetProjectionAndEye()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void DemostrationEntrance::init()
+void DemostrationEntrance::init(const gm::GMContext* context)
 {
 	D(d);
-	auto& rc = GM.getGameMachineRunningStates().renderRect;
+	auto& rc = context->window->getRenderRect();
 
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
@@ -291,16 +291,16 @@ void DemostrationEntrance::init()
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #endif
 
-	GM.getGraphicEngine()->setShaderLoadCallback(this);
+	context->engine->setShaderLoadCallback(this);
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
-	d->world = new DemostrationWorld(d->mainWindow);
+	d->world = new DemonstrationWorld(context, d->mainWindow);
 }
 
 void DemostrationEntrance::start()
 {
 	D(d);
-	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+	gm::IInput* inputManager = d->mainWindow->getInputMananger();
 	getWorld()->resetProjectionAndEye();
 	loadDemostrations(d->world);
 }
@@ -310,7 +310,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 	D(d);
 	if (evt == gm::GameMachineHandlerEvent::Render)
 	{
-		gm::IGraphicEngine* engine = GM.getGraphicEngine();
+		gm::IGraphicEngine* engine = getWorld()->getContext()->engine;
 		engine->getDefaultFramebuffers()->clear();
 	}
 
@@ -335,7 +335,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
 		{
-			gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+			gm::IInput* inputManager = d->mainWindow->getInputMananger();
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
 			if (kbState.keyTriggered('Q') || kbState.keyTriggered(VK_ESCAPE))
@@ -371,35 +371,36 @@ DemostrationEntrance::~DemostrationEntrance()
 	gm::GM_delete(d->world);
 }
 
-void DemostrationEntrance::onLoadShaders(gm::IGraphicEngine* engine)
+void DemostrationEntrance::onLoadShaders(const gm::GMContext* context)
 {
+	D(d);
 	auto& env = GM.getGameMachineRunningStates().renderEnvironment;
 
 	if (env == gm::GMRenderEnvironment::OpenGL)
 	{
 		bool b;
-		gm::GMGLShaderProgram* effectsShaderProgram = new gm::GMGLShaderProgram();
+		gm::GMGLShaderProgram* effectsShaderProgram = new gm::GMGLShaderProgram(context);
 		initLoadEffectsShader(effectsShaderProgram);
-		b = engine->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
+		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
 		GM_ASSERT(b);
 
-		gm::GMGLShaderProgram* forwardShaderProgram = new gm::GMGLShaderProgram();
-		gm::GMGLShaderProgram* deferredShaderPrograms[2] = { new gm::GMGLShaderProgram(), new gm::GMGLShaderProgram() };
+		gm::GMGLShaderProgram* forwardShaderProgram = new gm::GMGLShaderProgram(context);
+		gm::GMGLShaderProgram* deferredShaderPrograms[2] = { new gm::GMGLShaderProgram(context), new gm::GMGLShaderProgram(context) };
 		initLoadShaderProgram(forwardShaderProgram, deferredShaderPrograms);
-		b = engine->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
+		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
 		GM_ASSERT(b);
 
-		b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
+		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
 		GM_ASSERT(b);
 
-		b = engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
+		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
 		GM_ASSERT(b);
 	}
 	else
 	{
 #if GM_USE_DX11
 		GM_ASSERT(env == gm::GMRenderEnvironment::DirectX11);
-		gm::GMDx11Helper::GMLoadDx11Shader(GM.getGraphicEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect);
+		gm::GMDx11Helper::GMLoadDx11Shader(context->engine, L"dx11/effect.fx", gm::GMShaderType::Effect);
 #else
 		GM_ASSERT(false);
 #endif

@@ -12,6 +12,12 @@
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 
+const GMContext* GMModelDataProxy::getContext()
+{
+	D(d);
+	return d->context;
+}
+
 void GMModelDataProxy::prepareTangentSpace()
 {
 	GMModel* model = getModel();
@@ -78,7 +84,7 @@ GMModel::GMModel(GMModel& model)
 	setShader(model.getShader());
 	setVerticesCount(model.getVerticesCount());
 	if (!model.getModelDataProxy())
-		GM.createModelDataProxyAndTransfer(&model);
+		GM.createModelDataProxyAndTransfer(getModelDataProxy()->getContext(), &model);
 	needNotTransferAnymore();
 }
 

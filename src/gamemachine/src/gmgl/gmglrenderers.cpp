@@ -152,6 +152,7 @@ namespace
 	GM_PRIVATE_OBJECT(GMGLWhiteTexture)
 	{
 		GMuint textureId = 0;
+		const GMContext* context = nullptr;
 	};
 
 	class GMGLWhiteTexture : public ITexture
@@ -159,7 +160,11 @@ namespace
 		DECLARE_PRIVATE(GMGLWhiteTexture)
 
 	public:
-		GMGLWhiteTexture() = default;
+		GMGLWhiteTexture(const GMContext* context)
+		{
+			D(d);
+			d->context = context;
+		}
 
 		~GMGLWhiteTexture()
 		{
@@ -196,16 +201,11 @@ namespace
 		}
 	};
 
-	ITexture* getWhiteTexture()
+	ITexture* createWhiteTexture(const GMContext* context)
 	{
-		static bool s_inited = false;
-		static GMGLWhiteTexture s_texture;
-		if (!s_inited)
-		{
-			s_texture.init();
-			s_inited = true;
-		}
-		return &s_texture;
+		GMGLWhiteTexture* texture = new GMGLWhiteTexture(context);
+		texture->init();
+		return texture;
 	}
 }
 
@@ -221,10 +221,11 @@ void GMGammaHelper::setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProg
 	}
 }
 
-GMGLRenderer::GMGLRenderer()
+GMGLRenderer::GMGLRenderer(const GMContext* context)
 {
 	D(d);
-	d->engine = gm_cast<GMGLGraphicEngine*>(GM.getGraphicEngine());
+	d->context = context;
+	d->engine = gm_cast<GMGLGraphicEngine*>(d->context->engine);
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
@@ -408,16 +409,17 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 
 void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
+	D(d);
 	static IShaderProgram* s_lastShaderProgram = nullptr;
 	static std::string s_multisampling = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
 	static std::string s_screenWidth = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
 	static std::string s_screenHeight = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
 	if (s_lastShaderProgram != shaderProgram) //或者窗口属性发生改变
 	{
-		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
-		shaderProgram->setInt(s_multisampling.c_str(), states.sampleCount > 1);
-		shaderProgram->setInt(s_screenWidth.c_str(), states.renderRect.width);
-		shaderProgram->setInt(s_screenHeight.c_str(), states.renderRect.height);
+		const GMWindowStates& windowStates = d->context->window->getWindowStates();
+		shaderProgram->setInt(s_multisampling.c_str(), windowStates.sampleCount > 1);
+		shaderProgram->setInt(s_screenWidth.c_str(), windowStates.renderRect.width);
+		shaderProgram->setInt(s_screenHeight.c_str(), windowStates.renderRect.height);
 		s_lastShaderProgram = shaderProgram;
 	}
 }
@@ -428,6 +430,12 @@ void GMGLRenderer::dirtyShadowMapAttributes()
 }
 
 //////////////////////////////////////////////////////////////////////////
+GMGLRenderer_3D::~GMGLRenderer_3D()
+{
+	D(d);
+	GM_delete(d->whiteTexture);
+}
+
 void GMGLRenderer_3D::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
@@ -568,6 +576,15 @@ void GMGLRenderer_3D::drawDebug()
 	D_BASE(db, Base);
 	auto shaderProgram = getShaderProgram();
 	shaderProgram->setInt(GMSHADER_DEBUG_DRAW_NORMAL, db->debugConfig.get(GMDebugConfigs::DrawPolygonNormalMode).toInt());
+}
+
+ITexture* GMGLRenderer_3D::getWhiteTexture()
+{
+	D(d);
+	D_BASE(db, Base);
+	if (!d->whiteTexture)
+		d->whiteTexture = createWhiteTexture(db->context);
+	return d->whiteTexture;
 }
 
 //////////////////////////////////////////////////////////////////////////

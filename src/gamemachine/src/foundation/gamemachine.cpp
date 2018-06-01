@@ -59,9 +59,6 @@ void GameMachine::init(
 	setRenderEnvironment(renderEnv);
 	d->camera.reset(new GMCamera());
 	registerManager(factory, &d->factory);
-	IGraphicEngine* engine;
-	d->factory->createGraphicEngine(&engine);
-	registerManager(engine, &d->engine);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMConfigs(), &d->statesManager);
 
@@ -69,8 +66,8 @@ void GameMachine::init(
 	handleMessages();
 	updateGameMachineRunningStates();
 
-	eachHandler([](auto, auto handler) {
-		handler->init();
+	eachHandler([=](auto, auto handler) {
+		handler->init(mainWindow->getContext());
 	});
 }
 
@@ -86,14 +83,14 @@ GMMessage GameMachine::peekMessage()
 	return d->lastMessage;
 }
 
-void GameMachine::createModelDataProxyAndTransfer(GMModel* model)
+void GameMachine::createModelDataProxyAndTransfer(const GMContext* context, GMModel* model)
 {
 	if (model)
 	{
 		GMModelDataProxy* modelDataProxy = model->getModelDataProxy();
 		if (!modelDataProxy)
 		{
-			getFactory()->createModelDataProxy(getGraphicEngine(), model, &modelDataProxy);
+			getFactory()->createModelDataProxy(context, model, &modelDataProxy);
 			model->setModelDataProxy(modelDataProxy);
 		}
 		modelDataProxy->transfer();
@@ -118,16 +115,11 @@ GMEndiannessMode GameMachine::getMachineEndianness()
 void GameMachine::startGameMachine()
 {
 	D(d);
-	// 创建Glyph管理器，它必须在OpenGL窗口创建以后才可以初始化
-	GMGlyphManager* glyphManager;
-	d->factory->createGlyphManager(&glyphManager);
-	registerManager(glyphManager, &d->glyphManager);
-
-	// 更新一次状态
 	updateGameMachineRunningStates();
-
-	// 开始渲染
-	d->engine->init();
+	eachHandler([](auto window, auto)
+	{
+		window->getContext()->engine->init();
+	});
 
 	// 初始化gameHandler
 	if (!d->states.crashDown)
@@ -276,20 +268,15 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 		d->states.crashDown = true;
 		break;
 	}
-	case GameMachineMessageType::FrameUpdate:
-	case GameMachineMessageType::SystemMessage:
-	{
-		for (auto window : d->windows)
-		{
-			window->msgProc(msg);
-		}
-		break;
-	}
 	default:
 		break;
 	}
 
-	d->engine->event(msg);
+	for (auto window : d->windows)
+	{
+		window->msgProc(msg);
+		window->getContext()->engine->event(msg);
+	}
 	return true;
 }
 
@@ -317,10 +304,6 @@ void GameMachine::terminate()
 void GameMachine::updateGameMachineRunningStates()
 {
 	D(d);
-	IWindow* mainWindow = getMainWindow();
-	if (mainWindow)
-		d->states.renderRect = mainWindow->getRenderRect();
-
 	d->states.elapsedTime = d->clock.getTime();
 	d->states.fps = d->clock.getFps();
 }

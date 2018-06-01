@@ -20,6 +20,12 @@ namespace
 	}
 }
 
+GMGameWorld::GMGameWorld(const GMContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
 GMGameWorld::~GMGameWorld()
 {
 	D(d);
@@ -40,7 +46,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 	GMModels& models = obj->getModels();
 	for (auto& model : models)
 	{
-		GM.createModelDataProxyAndTransfer(model);
+		GM.createModelDataProxyAndTransfer(d->context, model);
 	}
 }
 
@@ -48,7 +54,7 @@ void GMGameWorld::renderScene()
 {
 	D(d);
 	static List<GMGameObject*> s_emptyList;
-	IGraphicEngine* engine = GM.getGraphicEngine();
+	IGraphicEngine* engine = d->context->engine;
 	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
 	{
 		engine->draw(d->renderList.deferred, s_emptyList);
@@ -72,6 +78,12 @@ bool GMGameWorld::removeObject(GMGameObject* obj)
 	objs.erase(objIter);
 	delete eraseTarget;
 	return true;
+}
+
+const GMContext* GMGameWorld::getContext()
+{
+	D(d);
+	return d->context;
 }
 
 void GMGameWorld::simulateGameWorld()

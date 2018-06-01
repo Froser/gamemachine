@@ -32,11 +32,23 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
 	bool lightDirty = true;
+
+	IRenderer* renderer_3d;
+	IRenderer* renderer_2d;
+	IRenderer* renderer_text;
+	IRenderer* renderer_cubemap;
+	IRenderer* renderer_filter;
+	IRenderer* renderer_deferred_3d;
+	IRenderer* renderer_deferred_3d_lightpass;
+	IRenderer* renderer_3d_shadow;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine
 {
 	DECLARE_PRIVATE_AND_BASE(GMDx11GraphicEngine, GMGraphicEngine)
+
+public:
+	GMDx11GraphicEngine(const GMContext* context);
 
 public:
 	virtual void init() override;
@@ -48,6 +60,7 @@ public:
 	virtual bool event(const GMMessage& e) override;
 	virtual IFramebuffers* getDefaultFramebuffers() override;
 	virtual IRenderer* getRenderer(GMModelType objectType) override;
+	virtual GMGlyphManager* getGlyphManager() override;
 
 public:
 	virtual bool setInterface(GameMachineInterfaceID, void*);
@@ -101,7 +114,7 @@ public:
 	}
 
 private:
-	void initShaders();
+	void initShaders(const GMContext* context);
 };
 
 END_NS

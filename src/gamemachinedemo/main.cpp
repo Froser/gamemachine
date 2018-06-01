@@ -65,7 +65,6 @@ int WINAPI wWinMain(
 	mainWindow->showWindow();
 	mainWindow->setHandler(new DemostrationEntrance(mainWindow));
 
-	/*
 	gm::IWindow* mainWindow2 = nullptr;
 	factory->createWindow(hInstance, &mainWindow2);
 	mainWindow2->create(mainAttrs);
@@ -73,7 +72,6 @@ int WINAPI wWinMain(
 	mainWindow2->showWindow();
 	mainWindow2->setHandler(new DemostrationEntrance(mainWindow));
 	GM.addWindow(mainWindow2);
-	*/
 
 	GM.init(
 		mainWindow,

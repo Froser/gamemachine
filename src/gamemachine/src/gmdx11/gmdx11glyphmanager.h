@@ -16,7 +16,7 @@ class GMDx11GlyphTexture : public GMDx11Texture
 	DECLARE_PRIVATE_AND_BASE(GMDx11GlyphTexture, GMDx11Texture)
 
 public:
-	GMDx11GlyphTexture();
+	GMDx11GlyphTexture(const GMContext* context);
 
 public:
 	virtual void init() override;
@@ -39,10 +39,10 @@ GM_PRIVATE_OBJECT(GMDx11GlyphManager)
 
 class GMDx11GlyphManager : public GMGlyphManager
 {
-	DECLARE_PRIVATE(GMDx11GlyphManager)
+	DECLARE_PRIVATE_AND_BASE(GMDx11GlyphManager, GMGlyphManager)
 
 public:
-	GMDx11GlyphManager();
+	using GMGlyphManager::GMGlyphManager;
 
 public:
 	virtual ITexture* glyphTexture() override;

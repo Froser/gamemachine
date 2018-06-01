@@ -8,7 +8,7 @@ void Demo_Texture::init()
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
 
 	// 创建一个纹理
 	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
@@ -25,7 +25,7 @@ void Demo_Texture::init()
 			shader.getMaterial().ks = GMVec3(0);
 
 			gm::ITexture* tex = nullptr;
-			gm::GMToolUtil::createTexture("gamemachine.png", &tex);
+			gm::GMToolUtil::createTexture(world->getContext(), "gamemachine.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 		}
@@ -60,7 +60,7 @@ void Demo_Texture::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::Activate:
 	{
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered('N'))
 			switchNormal();
@@ -82,7 +82,7 @@ void Demo_Texture_Index::init()
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
 
 	gm::GMModel* quad = new gm::GMModel();
 	quad->setPrimitiveTopologyMode(gm::GMTopologyMode::Triangles);
@@ -114,7 +114,7 @@ void Demo_Texture_Index::init()
 	shader.getMaterial().ks = GMVec3(0);
 
 	gm::ITexture* tex = nullptr;
-	gm::GMToolUtil::createTexture("gamemachine.png", &tex);
+	gm::GMToolUtil::createTexture(d->demoWorld->getContext(), "gamemachine.png", &tex);
 	gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 	getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
 

@@ -11,15 +11,16 @@ namespace gm
 	class GMWidget;
 }
 
-class DemostrationWorld;
+class DemonstrationWorld;
 GM_PRIVATE_OBJECT(DemoHandler)
 {
 	gm::GMRenderConfig renderConfig;
 	gm::GMDebugConfig debugConfig;
-	DemostrationWorld* parentDemonstrationWorld = nullptr;
+	DemonstrationWorld* parentDemonstrationWorld = nullptr;
 	bool inited = false;
 	bool activating = false;
 	gm::GMGameWorld* demoWorld = nullptr;
+	gm::IGraphicEngine* engine = nullptr;
 };
 
 class DemoHandler : public gm::GMObject
@@ -27,7 +28,7 @@ class DemoHandler : public gm::GMObject
 	DECLARE_PRIVATE(DemoHandler)
 
 public:
-	DemoHandler(DemostrationWorld* parentDemonstrationWorld);
+	DemoHandler(DemonstrationWorld* parentDemonstrationWorld);
 	~DemoHandler();
 
 public:
@@ -51,12 +52,18 @@ protected:
 		D(d);
 		return d->demoWorld;
 	}
+
+	inline DemonstrationWorld* getDemonstrationWorld()
+	{
+		D(d);
+		return d->parentDemonstrationWorld;
+	}
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;
 typedef Vector<GameHandlerItem> DemoHandlers;
 
-GM_PRIVATE_OBJECT(DemostrationWorld)
+GM_PRIVATE_OBJECT(DemonstrationWorld)
 {
 	DemoHandlers demos;
 	DemoHandler* currentDemo = nullptr;
@@ -65,13 +72,13 @@ GM_PRIVATE_OBJECT(DemostrationWorld)
 	gm::IWindow* mainWindow = nullptr;
 };
 
-class DemostrationWorld : public gm::GMGameWorld
+class DemonstrationWorld : public gm::GMGameWorld
 {
-	DECLARE_PRIVATE_AND_BASE(DemostrationWorld, gm::GMGameWorld)
+	DECLARE_PRIVATE_AND_BASE(DemonstrationWorld, gm::GMGameWorld)
 
 public:
-	DemostrationWorld(gm::IWindow*);
-	~DemostrationWorld();
+	DemonstrationWorld(const gm::GMContext*, gm::IWindow*);
+	~DemonstrationWorld();
 
 public:
 	inline DemoHandler* getCurrentDemo() { D(d); return d->currentDemo; }
@@ -84,11 +91,18 @@ public:
 	void init();
 	void switchDemo();
 	void resetProjectionAndEye();
+
+public:
+	gm::IWindow* getMainWindow()
+	{
+		D(d);
+		return d->mainWindow;
+	}
 };
 
 GM_PRIVATE_OBJECT(DemostrationEntrance)
 {
-	DemostrationWorld* world = nullptr;
+	DemonstrationWorld* world = nullptr;
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMDebugConfig debugConfig;
 	gm::GMRenderConfig renderConfig;
@@ -103,11 +117,11 @@ public:
 	~DemostrationEntrance();
 
 public:
-	inline DemostrationWorld* getWorld() { D(d); return d->world; }
+	inline DemonstrationWorld* getWorld() { D(d); return d->world; }
 
 	// IShaderLoadCallback
 private:
-	void onLoadShaders(gm::IGraphicEngine* engine);
+	void onLoadShaders(const gm::GMContext* context);
 
 private:
 	void initLoadEffectsShader(gm::GMGLShaderProgram* effectsShaderProgram);
@@ -115,7 +129,7 @@ private:
 
 	// IGameHandler
 private:
-	virtual void init() override;
+	virtual void init(const gm::GMContext* context) override;
 	virtual void start() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 };

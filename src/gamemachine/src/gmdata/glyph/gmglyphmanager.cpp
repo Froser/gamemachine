@@ -91,6 +91,12 @@ GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMwchar ch, const GMGlyp
 	return (*(result.first)).second;
 }
 
+GMGlyphManager::GMGlyphManager(const GMContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
 const GMGlyphInfo& GMGlyphManager::getChar(GMint fontSize, GMwchar ch)
 {
 	D(d);

@@ -5,10 +5,12 @@
 #include "foundation/gamemachine.h"
 #include "gmgraphicengine.h"
 
-GMGBuffer::GMGBuffer(GMGraphicEngine* engine)
+GMGBuffer::GMGBuffer(const GMContext* context)
 {
 	D(d);
-	d->engine = engine;
+	d->context = context;
+	d->engine = gm_cast<GMGraphicEngine*>(d->context->engine);
+
 }
 
 GMGBuffer::~GMGBuffer()
@@ -27,7 +29,7 @@ void GMGBuffer::createQuad()
 	GMPrimitiveCreator::createQuadrangle(GMPrimitiveCreator::one2(), 0, &d->quadModel);
 	GM_ASSERT(d->quadModel);
 	d->quadModel->setType(GMModelType::LightPassQuad);
-	GM.createModelDataProxyAndTransfer(d->quadModel);
+	GM.createModelDataProxyAndTransfer(d->context, d->quadModel);
 	d->quad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->quadModel));
 }
 
@@ -64,4 +66,10 @@ IFramebuffers* GMGBuffer::getGeometryFramebuffers()
 	D(d);
 	GM_ASSERT(d->geometryFramebuffers);
 	return d->geometryFramebuffers;
+}
+
+const GMContext* GMGBuffer::getContext()
+{
+	D(d);
+	return d->context;
 }

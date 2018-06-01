@@ -32,8 +32,8 @@ namespace
 	};
 }
 
-GMDx11GBuffer::GMDx11GBuffer(GMGraphicEngine* engine)
-	: GMGBuffer(engine)
+GMDx11GBuffer::GMDx11GBuffer(const GMContext* context)
+	: GMGBuffer(context)
 {
 }
 
@@ -50,7 +50,7 @@ void GMDx11GBuffer::lightPass()
 {
 	D(d);
 	GM_ASSERT(getQuad());
-	getQuad()->draw();
+	getQuad()->draw(d->context);
 }
 
 void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
@@ -72,10 +72,11 @@ void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
 
 IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 {
+	D(d);
 	IFramebuffers* framebuffers = nullptr;
-	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+	const GMWindowStates& windowStates = d->context->window->getWindowStates();
 	GMFramebufferDesc desc = { 0 };
-	desc.rect = states.renderRect;
+	desc.rect = windowStates.renderRect;
 
 	// Geometry Pass的纹理格式为R8G8B8A8_UNORM时，意味着所有的输出在着色器中范围是[0,1]，对应着UNORM的[0x00, 0xFF]
 	// 对于[-1, 1]范围的数据，需要在着色器中进行一次转换。
@@ -90,9 +91,9 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 	};
 
-	GM.getFactory()->createFramebuffers(&framebuffers);
+	GM.getFactory()->createFramebuffers(d->context, &framebuffers);
 	GMFramebuffersDesc fbDesc;
-	fbDesc.rect = states.renderRect;
+	fbDesc.rect = windowStates.renderRect;
 	framebuffers->init(fbDesc);
 
 	constexpr GMint framebufferCount = GM_array_size(GeometryFramebufferNames); //一共有8个SV_TARGET
@@ -100,7 +101,7 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 	for (GMint i = 0; i < framebufferCount; ++i)
 	{
 		IFramebuffer* framebuffer = nullptr;
-		GM.getFactory()->createFramebuffer(&framebuffer);
+		GM.getFactory()->createFramebuffer(d->context, &framebuffer);
 		framebuffer->setName(GeometryFramebufferNames[i]);
 		desc.framebufferFormat = formats[i];
 		framebuffer->init(desc);
@@ -111,5 +112,6 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 
 bool GMDx11GBuffer::isMultisamping()
 {
-	return GM.getGameMachineRunningStates().sampleCount > 1;
+	D(d);
+	return d->context->window->getWindowStates().sampleCount > 1;
 }

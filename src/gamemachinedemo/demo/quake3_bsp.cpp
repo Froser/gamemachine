@@ -38,7 +38,7 @@ void Demo_Quake3_BSP::setDefaultLights()
 void Demo_Quake3_BSP::setMouseTrace(bool enabled)
 {
 	D(d);
-	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 	gm::IMouseState& mouseState = inputManager->getMouseState();
 	d->mouseTrace = enabled;
 
@@ -51,7 +51,7 @@ void Demo_Quake3_BSP::init()
 	D(d);
 	D_BASE(db, Base);
 	Base::init();
-	gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 	inputManager->getKeyboardState().setIMEState(false);
 
 	gm::GMBSPFactory::createBSPGameWorld("gv.bsp", &d->world);
@@ -81,7 +81,7 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 	}
 	case gm::GameMachineHandlerEvent::Activate:
 	{
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		static gm::GMfloat mouseSensitivity = 0.25f;
 		static gm::GMfloat joystickSensitivity = 0.0003f;
 

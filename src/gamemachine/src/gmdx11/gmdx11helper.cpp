@@ -61,7 +61,7 @@ IShaderProgram* GMDx11Helper::GMLoadDx11Shader(
 	}
 
 	GMComPtr<ID3D11Device> device;
-	bool b = GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
+	bool b = engine->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 	if (!b || !device)
 		return nullptr;
 

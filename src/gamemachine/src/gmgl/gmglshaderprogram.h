@@ -18,6 +18,7 @@ typedef AlignedVector<GMGLShaderInfo> GMGLShaderInfos;
 
 GM_PRIVATE_OBJECT(GMGLShaderProgram)
 {
+	const GMContext* context = nullptr;
 	GMGLShaderInfos shaderInfos;
 	GMGLShaderIDList shaders;
 	GMuint shaderProgram = 0;
@@ -30,7 +31,7 @@ class GMGLShaderProgram : public GMObject, public IShaderProgram
 	DECLARE_PRIVATE(GMGLShaderProgram);
 
 public:
-	GMGLShaderProgram() = default;
+	GMGLShaderProgram(const GMContext* context);
 	~GMGLShaderProgram();
 
 	void load();

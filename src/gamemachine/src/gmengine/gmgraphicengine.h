@@ -167,6 +167,9 @@ public:
 
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
+	const GMContext* context = nullptr;
+	GMGlyphManager* glyphManager = nullptr;
+	IFramebuffers* defaultFramebuffers = nullptr;
 	IFramebuffers* filterFramebuffers = nullptr;
 	GMGameObject* filterQuad = nullptr;
 	GMScopePtr<GMModel> filterQuadModel;
@@ -189,7 +192,7 @@ class GMGraphicEngine : public GMObject, public IGraphicEngine
 	DECLARE_PRIVATE(GMGraphicEngine)
 
 public:
-	GMGraphicEngine();
+	GMGraphicEngine(const GMContext* context);
 	~GMGraphicEngine();
 
 public:

@@ -6,10 +6,27 @@
 #include "foundation/utilities/utilities.h"
 #include "gmengine/gameobjects/gmgameobject.h"
 #include "gmdx11gbuffer.h"
+#include "gmdx11glyphmanager.h"
 
 #ifdef max
 #undef max
 #endif
+
+namespace
+{
+	template <typename T>
+	IRenderer* newRenderer(IRenderer*& ptr, const GMContext* context)
+	{
+		if (!ptr)
+			ptr = new T(context);
+		return ptr;
+	}
+}
+
+GMDx11GraphicEngine::GMDx11GraphicEngine(const GMContext* context)
+	: GMGraphicEngine(context)
+{
+}
 
 void GMDx11GraphicEngine::init()
 {
@@ -18,7 +35,7 @@ void GMDx11GraphicEngine::init()
 	Base::init();
 
 	if (d->ready)
-		initShaders();
+		initShaders(db->context);
 	else
 		GM_ASSERT(false);
 }
@@ -94,7 +111,10 @@ IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type)
 
 IFramebuffers* GMDx11GraphicEngine::getDefaultFramebuffers()
 {
-	return GMDx11Framebuffers::getDefaultFramebuffers();
+	D_BASE(d, Base);
+	if (!d->defaultFramebuffers)
+		d->defaultFramebuffers = GMDx11Framebuffers::createDefaultFramebuffers(d->context);
+	return d->defaultFramebuffers;
 }
 
 bool GMDx11GraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
@@ -155,7 +175,7 @@ bool GMDx11GraphicEngine::getInterface(GameMachineInterfaceID id, void** out)
 void GMDx11GraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 {
 	D_BASE(d, Base);
-	GMDx11ShadowFramebuffers* sdframebuffers = new GMDx11ShadowFramebuffers();
+	GMDx11ShadowFramebuffers* sdframebuffers = new GMDx11ShadowFramebuffers(d->context);
 	(*framebuffers) = sdframebuffers;
 
 	GMFramebuffersDesc desc;
@@ -194,7 +214,7 @@ bool GMDx11GraphicEngine::event(const GMMessage& e)
 	return false;
 }
 
-void GMDx11GraphicEngine::initShaders()
+void GMDx11GraphicEngine::initShaders(const GMContext* context)
 {
 	D(d);
 	// 读取着色器
@@ -205,40 +225,43 @@ void GMDx11GraphicEngine::initShaders()
 		return;
 	}
 
-	getShaderLoadCallback()->onLoadShaders(this);
+	getShaderLoadCallback()->onLoadShaders(context);
 }
 
 IRenderer* GMDx11GraphicEngine::getRenderer(GMModelType objectType)
 {
 	D(d);
-	static GMDx11Renderer_3D s_renderer_3d;
-	static GMDx11Renderer_2D s_renderer_2d;
-	static GMDx11Renderer_Text s_renderer_text;
-	static GMDx11Renderer_CubeMap s_renderer_cubemap;
-	static GMDx11Renderer_Filter s_renderer_filter;
-	static GMDx11Renderer_Deferred_3D s_renderer_deferred_3d;
-	static GMDx11Renderer_Deferred_3D_LightPass s_renderer_deferred_3d_lightpass;
-	static GMDx11Renderer_3D_Shadow s_renderer_3d_shadow;
+	D_BASE(db, Base);
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
-		return &s_renderer_2d;
+		return newRenderer<GMDx11Renderer_2D>(d->renderer_2d, db->context);
 	case GMModelType::Text:
-		return &s_renderer_text;
+		return newRenderer<GMDx11Renderer_Text>(d->renderer_text, db->context);
 	case GMModelType::Model3D:
 		if (isDrawingShadow())
-			return &s_renderer_3d_shadow;
+			return newRenderer<GMDx11Renderer_3D_Shadow>(d->renderer_3d_shadow, db->context);
 		if (getGBuffer()->getGeometryPassingState() != GMGeometryPassingState::Done)
-			return &s_renderer_deferred_3d;
-		return &s_renderer_3d;
+			return newRenderer<GMDx11Renderer_Deferred_3D>(d->renderer_deferred_3d, db->context);
+		return newRenderer<GMDx11Renderer_3D>(d->renderer_3d, db->context);
 	case GMModelType::CubeMap:
-		return &s_renderer_cubemap;
+		return newRenderer<GMDx11Renderer_CubeMap>(d->renderer_cubemap, db->context);
 	case GMModelType::Filter:
-		return &s_renderer_filter;
+		return newRenderer<GMDx11Renderer_Filter>(d->renderer_filter, db->context);
 	case GMModelType::LightPassQuad:
-		return &s_renderer_deferred_3d_lightpass;
+		return newRenderer<GMDx11Renderer_Deferred_3D_LightPass>(d->renderer_deferred_3d_lightpass, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;
 	}
+}
+
+GMGlyphManager* GMDx11GraphicEngine::getGlyphManager()
+{
+	D_BASE(d, Base);
+	if (!d->glyphManager)
+	{
+		d->glyphManager = new GMDx11GlyphManager(d->context);
+	}
+	return d->glyphManager;
 }

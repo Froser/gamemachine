@@ -55,7 +55,6 @@ class GMWidget;
 struct GMGameMachineRunningStates
 {
 	// 每一帧更新的内容
-	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
 	GMfloat lastFrameElpased = 0; //!< 上一帧渲染锁花费的时间，单位是秒。
 	GMfloat elapsedTime = 0; //!< 程序运行到现在为止的时间，单位是秒。
 	GMfloat fps = 0; //!< 程序当前的帧率。
@@ -63,16 +62,6 @@ struct GMGameMachineRunningStates
 
 	// 由GameMachine生成
 	GMRenderEnvironment renderEnvironment = GMRenderEnvironment::Invalid; //!< GameMachine采取的渲染环境。渲染环境决定着本程序将用何种数据结构、坐标系来进行运算。需要与窗口环境一致。
-
-	// 下面字段由图形引擎生成
-	GMfloat viewportTopLeftX = 0; //!< 视口左上角X坐标。
-	GMfloat viewportTopLeftY = 0; //!< 视口左上角Y坐标。
-	GMfloat minDepth = 0; //!< 近平面的深度值。
-	GMfloat maxDepth = 1; //!< 远平面的深度值。
-	GMString workingAdapterDesc; //!< 适配器信息。
-	GMint sampleCount; //!< 多重采样数量。
-	GMint sampleQuality; //!< 多重采样质量。
-	bool vsyncEnabled = false; //!< 是否垂直同步。
 
 	// 以下为常量
 	// 永远不要更改以下2个值，它采用DirectX标准透视矩阵
@@ -89,8 +78,6 @@ GM_PRIVATE_OBJECT(GameMachine)
 	Set<IWindow*> windows;
 	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
-	IGraphicEngine* engine = nullptr;
-	GMGlyphManager* glyphManager = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
 	GMConfigs* statesManager = nullptr;
 	GMMessage lastMessage;
@@ -140,13 +127,6 @@ public:
 		GMRenderEnvironment renderEnv = GMRenderEnvironment::OpenGL
 	);
 
-	//! 获取绘制引擎。
-	/*!
-	  绘制引擎由初始化时的工厂类创建，提供最基础的绘制行为。
-	  \return 程序绘制引擎。
-	*/
-	inline IGraphicEngine* getGraphicEngine() { D(d); return d->engine; }
-
 	//! 获取程序主窗口。
 	/*!
 	  获取程序绘制的主窗口。
@@ -160,13 +140,6 @@ public:
 	  \return 程序工厂类。
 	*/
 	inline IFactory* getFactory() { D(d); return d->factory; }
-
-	//! 获取字形管理器。
-	/*!
-	  获取程序的字形管理器，可以通过字体管理器拿出字符的字形位图。
-	  \return 程序字形管理器。
-	*/
-	GMGlyphManager* getGlyphManager() { D(d); return d->glyphManager; }
 
 	//! 获取资源管理器。
 	/*!
@@ -202,7 +175,7 @@ public:
 	  在创建之后，数据代理马上会将GMModel顶点数据传输到GPU。
 	  \param model 需要创建数据代理的模型对象。创建好的GMModelDataProxy会绑定在此对象上。在此对象析构时，GMModelDataProxy也会析构，用户不需要关心它的生命周期。
 	*/
-	void createModelDataProxyAndTransfer(GMModel* model);
+	void createModelDataProxyAndTransfer(const GMContext* context, GMModel* model);
 
 	//! 获取当前机器的大小端模式。
 	/*!

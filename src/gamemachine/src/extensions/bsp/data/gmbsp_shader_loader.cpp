@@ -149,7 +149,7 @@ ITexture* GMBSPShaderLoader::addTextureToTextureContainer(const GMString& name)
 		{
 			ITexture* texture = nullptr;
 			IFactory* factory = GameMachine::instance().getFactory();
-			factory->createTexture(img, &texture);
+			factory->createTexture(d->world->getContext(), img, &texture);
 			delete img;
 
 			GM_ASSERT(texture);
@@ -500,7 +500,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	readTernaryFloatsFromString(color, vecColor);
 	light->setLightColor(&vecColor[0]);
 
-	GM.getGraphicEngine()->addLight(light);
+	d->world->getContext()->engine->addLight(light);
 }
 
 void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)

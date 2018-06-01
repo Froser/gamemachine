@@ -51,9 +51,10 @@ namespace
 	}
 }
 
-GMWidgetResourceManager::GMWidgetResourceManager()
+GMWidgetResourceManager::GMWidgetResourceManager(const GMContext* context)
 {
 	D(d);
+	d->context = context;
 	d->screenQuadModel = new GMModel();
 	d->screenQuadModel->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
 	d->screenQuadModel->setUsageHint(GMUsageHint::DynamicDraw);
@@ -67,10 +68,10 @@ GMWidgetResourceManager::GMWidgetResourceManager()
 	mesh->vertex(GMVertex());
 
 	d->screenQuad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->screenQuadModel));
-	GM.createModelDataProxyAndTransfer(d->screenQuadModel);
+	GM.createModelDataProxyAndTransfer(d->context, d->screenQuadModel);
 
-	d->textObject = new GMTextGameObject();
-	d->spriteObject = new GMSprite2DGameObject();
+	d->textObject = new GMTextGameObject(context->window->getRenderRect());
+	d->spriteObject = new GMSprite2DGameObject(context->window->getRenderRect());
 }
 
 GMWidgetResourceManager::~GMWidgetResourceManager()
@@ -136,9 +137,9 @@ const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(GMsize_t index)
 void GMWidgetResourceManager::onRenderRectResized()
 {
 	D(d);
-	const GMGameMachineRunningStates& runningStates = GM.getGameMachineRunningStates();
-	d->backBufferWidth = runningStates.renderRect.width;
-	d->backBufferHeight = runningStates.renderRect.height;
+	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	d->backBufferWidth = windowStates.renderRect.width;
+	d->backBufferHeight = windowStates.renderRect.height;
 }
 
 GMfloat GMWidget::s_timeRefresh = 0;
@@ -238,7 +239,7 @@ void GMWidget::drawText(
 	textObject->setText(text);
 	textObject->setGeometry(rc);
 	textObject->setCenter(center);
-	textObject->draw();
+	textObject->draw(d->manager->getContext());
 }
 
 void GMWidget::drawSprite(
@@ -264,7 +265,7 @@ void GMWidget::drawSprite(
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(style.getTextureColor().getCurrent());
-	spriteObject->draw();
+	spriteObject->draw(d->manager->getContext());
 }
 
 void GMWidget::requestFocus(GMControl* control)
@@ -362,16 +363,31 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	case GMSystemEventType::MouseWheel:
 	{
 		GMSystemMouseEvent* mouseEvent = gm_cast<GMSystemMouseEvent*>(event);
-		GMSystemMouseEvent cacheEvent = *mouseEvent;
 		GMPoint pt = mouseEvent->getPoint();
 		pt.x -= d->x;
 		pt.y -= d->y;
-		cacheEvent.setPoint(pt);
+
+		GMSystemMouseWheelEvent cacheWheelEvent;
+		GMSystemMouseEvent cacheEvent;
+
+		GMSystemMouseEvent* pCacheEvent = nullptr;
+		if (type == GMSystemEventType::MouseWheel)
+		{
+			cacheWheelEvent = *(gm_cast<GMSystemMouseWheelEvent*>(mouseEvent));
+			cacheWheelEvent.setPoint(pt);
+			pCacheEvent = &cacheWheelEvent;
+		}
+		else
+		{
+			cacheEvent = *mouseEvent;
+			cacheEvent.setPoint(pt);
+			pCacheEvent = &cacheEvent;
+		}
 		if (s_controlFocus &&
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
 		{
-			if (s_controlFocus->handleMouse(&cacheEvent))
+			if (s_controlFocus->handleMouse(pCacheEvent))
 				return true;
 		}
 
@@ -451,7 +467,7 @@ void GMWidget::render(GMfloat elpasedTime)
 		proxy->endUpdateBuffer();
 
 		// 开始绘制背景
-		d->manager->getScreenQuad()->draw();
+		d->manager->getScreenQuad()->draw(d->manager->getContext());
 	}
 
 	// TODO getTextureNode

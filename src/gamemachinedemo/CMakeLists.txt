@@ -25,28 +25,26 @@ set(SOURCES
 		demonstration_world.cpp
 		demo/texture.h
 		demo/texture.cpp
-		demo/normalmap.h
-		demo/normalmap.cpp
-		demo/effects.h
-		demo/effects.cpp
-		demo/quake3_bsp.h
-		demo/quake3_bsp.cpp
-		demo/border.h
-		demo/border.cpp
-		demo/sound.h
-		demo/sound.cpp
-		demo/literature.h
-		demo/literature.cpp
-		demo/model.h
-		demo/model.cpp
-		demo/collision.h
-		demo/collision.cpp
-		demo/specularmap.h
-		demo/specularmap.cpp
-		demo/pbr.h
-		demo/pbr.cpp
-		demo/phong_pbr.h
-		demo/phong_pbr.cpp
+		# demo/normalmap.h
+		# demo/normalmap.cpp
+		# demo/effects.h
+		# demo/effects.cpp
+		# demo/quake3_bsp.h
+		# demo/quake3_bsp.cpp
+		# demo/sound.h
+		# demo/sound.cpp
+		# demo/literature.h
+		# demo/literature.cpp
+		# demo/model.h
+		# demo/model.cpp
+		# demo/collision.h
+		# demo/collision.cpp
+		# demo/specularmap.h
+		# demo/specularmap.cpp
+		# demo/pbr.h
+		# demo/pbr.cpp
+		# demo/phong_pbr.h
+		# demo/phong_pbr.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

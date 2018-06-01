@@ -284,6 +284,8 @@ class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 	GM_DECLARE_PROPERTY(Delta, delta, GMshort)
 
 public:
+	GMSystemMouseWheelEvent() = default;
+
 	GMSystemMouseWheelEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta)
 		: Base(type, pt, button, buttons, modifier)
 	{

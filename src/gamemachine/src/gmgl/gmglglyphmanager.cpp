@@ -52,7 +52,8 @@ private:
 };
 END_NS
 
-GMGLGlyphManager::GMGLGlyphManager()
+GMGLGlyphManager::GMGLGlyphManager(const GMContext* context)
+	: GMGlyphManager(context)
 {
 	D(d);
 	d->cursor_u = d->cursor_v = 0;

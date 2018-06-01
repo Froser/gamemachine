@@ -115,9 +115,10 @@ private:
 GM_PRIVATE_OBJECT(GMTypoEngine)
 {
 	GMTypoStateMachine* stateMachine = nullptr;
+	const GMContext* context = nullptr;
 	bool insetStateMachine = false;
 
-	GMGlyphManager* const glyphManager = GM.getGlyphManager();
+	GMGlyphManager* glyphManager = nullptr;
 	std::wstring literature;
 	GMTypoOptions options;
 	GMfloat lineHeight = 0;
@@ -136,8 +137,8 @@ class GMTypoEngine : public GMObject, public ITypoEngine
 	DECLARE_PRIVATE(GMTypoEngine);
 
 public:
-	GMTypoEngine();
-	GMTypoEngine(AUTORELEASE GMTypoStateMachine* stateMachine);
+	GMTypoEngine(const GMContext* context);
+	GMTypoEngine(const GMContext* context, AUTORELEASE GMTypoStateMachine* stateMachine);
 	~GMTypoEngine();
 
 public:

@@ -39,7 +39,7 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() {}
 	virtual void onRemovingObjectFromWorld() {}
-	virtual void draw();
+	virtual void draw(const GMContext* context);
 	virtual void updateAfterSimulate() {}
 	virtual void simulate() {}
 	virtual bool canDeferredRendering();
@@ -52,7 +52,7 @@ private:
 	}
 
 protected:
-	virtual void drawModel(GMModel* model);
+	virtual void drawModel(const GMContext* context, GMModel* model);
 
 public:
 	virtual void setScaling(const GMMat4& scaling) { D(d); d->scaling = scaling; updateMatrix(); }

@@ -9,23 +9,27 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11Framebuffer)
 {
+	const GMContext* context = nullptr;
 	ITexture* renderTexture = nullptr;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMString name;
 };
 
-class GMDx11Framebuffer : public GMObject, public IFramebuffer
+class GMDx11Framebuffer : public GMObject, public IFramebuffer, public IContext
 {
 	DECLARE_PRIVATE(GMDx11Framebuffer)
 
 public:
-	GMDx11Framebuffer() = default;
+	GMDx11Framebuffer(const GMContext* context);
 	~GMDx11Framebuffer();
 
 public:
 	virtual bool init(const GMFramebufferDesc& desc) override;
 	virtual void setName(const GMString& name) override;
 	virtual ITexture* getTexture() override;
+
+public:
+	virtual const GMContext* getContext();
 
 public:
 	ID3D11RenderTargetView* getRenderTargetView()
@@ -39,6 +43,7 @@ public:
 class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 {
+	const GMContext* context = nullptr;
 	GMComPtr<ID3D11DeviceContext> deviceContext;
 	Vector<GMDx11Framebuffer*> framebuffers;
 	Vector<ID3D11RenderTargetView*> renderTargetViews;
@@ -49,12 +54,12 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 	D3D11_VIEWPORT viewport;
 };
 
-class GMDx11Framebuffers : public GMObject, public IFramebuffers
+class GMDx11Framebuffers : public GMObject, public IFramebuffers, public IContext
 {
 	DECLARE_PRIVATE(GMDx11Framebuffers)
 
 public:
-	GMDx11Framebuffers();
+	GMDx11Framebuffers(const GMContext* context);
 	~GMDx11Framebuffers();
 
 public:
@@ -68,11 +73,14 @@ public:
 	virtual GMsize_t count() override;
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
 
+public:
+	virtual const GMContext* getContext();
+
 protected:
 	D3D11_TEXTURE2D_DESC getDepthTextureDesc();
 
 public:
-	static IFramebuffers* getDefaultFramebuffers();
+	static IFramebuffers* createDefaultFramebuffers(const GMContext* context);
 };
 
 GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
@@ -85,6 +93,9 @@ GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers
 {
 	DECLARE_PRIVATE_AND_BASE(GMDx11ShadowFramebuffers, GMDx11Framebuffers)
+
+public:
+	using GMDx11Framebuffers::GMDx11Framebuffers;
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;

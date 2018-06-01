@@ -24,19 +24,20 @@ namespace
 	};
 }
 
-GMGLGBuffer::GMGLGBuffer(GMGraphicEngine* engine)
-	: GMGBuffer(engine)
+GMGLGBuffer::GMGLGBuffer(const GMContext* context)
+	: GMGBuffer(context)
 {
 	D(d);
-	d->engine = engine;
+	d->engine = gm_cast<GMGraphicEngine*>(context->engine);
 }
 
 IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 {
+	D(d);
 	IFramebuffers* framebuffers = nullptr;
-	const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+	const GMWindowStates& windowStates = d->context->window->getWindowStates();
 	GMFramebufferDesc desc = { 0 };
-	desc.rect = states.renderRect;
+	desc.rect = windowStates.renderRect;
 
 	// Geometry Pass的纹理格式为R8G8B8A8_UNORM，意味着所有的输出在着色器中范围是[0,1]，对应着UNORM的[0x00, 0xFF]
 	// 对于[-1, 1]范围的数据，需要在着色器中进行一次转换。
@@ -51,9 +52,9 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 		GMFramebufferFormat::R32G32B32A32_FLOAT,
 	};
 
-	GM.getFactory()->createFramebuffers(&framebuffers);
+	GM.getFactory()->createFramebuffers(d->context, &framebuffers);
 	GMFramebuffersDesc fbDesc;
-	fbDesc.rect = states.renderRect;
+	fbDesc.rect = windowStates.renderRect;
 	framebuffers->init(fbDesc);
 	GM_ASSERT(framebuffers);
 
@@ -62,7 +63,7 @@ IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 	for (GMint i = 0; i < framebufferCount; ++i)
 	{
 		IFramebuffer* framebuffer = nullptr;
-		GM.getFactory()->createFramebuffer(&framebuffer);
+		GM.getFactory()->createFramebuffer(d->context, &framebuffer);
 		GM_ASSERT(framebuffer);
 		desc.framebufferFormat = formats[i];
 		framebuffer->init(desc);
@@ -89,7 +90,7 @@ void GMGLGBuffer::lightPass()
 {
 	D(d);
 	GM_ASSERT(getQuad());
-	getQuad()->draw();
+	getQuad()->draw(d->context);
 }
 
 void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)

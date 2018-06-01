@@ -9,11 +9,11 @@
 
 #define FLOAT_OFFSET(i) ((void*)(sizeof(gm::GMfloat) * i))
 
-GMGLModelDataProxy::GMGLModelDataProxy(IGraphicEngine* engine, GMModel* objs)
-	: GMModelDataProxy(objs)
+GMGLModelDataProxy::GMGLModelDataProxy(const GMContext* context, GMModel* objs)
+	: GMModelDataProxy(context, objs)
 {
 	D(d);
-	d->engine = static_cast<GMGLGraphicEngine*>(engine);
+	d->engine = static_cast<GMGLGraphicEngine*>(context->engine);
 }
 
 void GMGLModelDataProxy::transfer()

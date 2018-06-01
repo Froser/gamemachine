@@ -11,6 +11,7 @@
 #include "foundation/gmconfigs.h"
 #include "foundation/gmprofile.h"
 #include "gmglframebuffer.h"
+#include "gmglglyphmanager.h"
 
 #ifdef max
 #undef max
@@ -54,6 +55,22 @@ extern "C"
 	}
 }
 
+namespace
+{
+	template <typename T>
+	IRenderer* newRenderer(IRenderer*& ptr, const GMContext* context)
+	{
+		if (!ptr)
+			ptr = new T(context);
+		return ptr;
+	}
+}
+
+GMGLGraphicEngine::GMGLGraphicEngine(const GMContext* context)
+	: GMGraphicEngine(context)
+{
+}
+
 GMGLGraphicEngine::~GMGLGraphicEngine()
 {
 	D(d);
@@ -61,6 +78,13 @@ GMGLGraphicEngine::~GMGLGraphicEngine()
 	GM_delete(d->forwardShaderProgram);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]);
 	GM_delete(d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]);
+
+	GM_delete(d->renderer_2d);
+	GM_delete(d->renderer_3d);
+	GM_delete(d->renderer_cubeMap);
+	GM_delete(d->renderer_filter);
+	GM_delete(d->renderer_lightPass);
+	GM_delete(d->renderer_3d_shadow);
 }
 
 void GMGLGraphicEngine::init()
@@ -86,7 +110,7 @@ void GMGLGraphicEngine::init()
 
 void GMGLGraphicEngine::installShaders()
 {
-	D(d);
+	D_BASE(d, Base);
 	if (!getShaderLoadCallback())
 	{
 		gm_error("You must specify a IShaderLoadCallback");
@@ -94,7 +118,7 @@ void GMGLGraphicEngine::installShaders()
 		return;
 	}
 
-	getShaderLoadCallback()->onLoadShaders(this);
+	getShaderLoadCallback()->onLoadShaders(d->context);
 }
 
 bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
@@ -127,7 +151,7 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 void GMGLGraphicEngine::createShadowFramebuffers(OUT IFramebuffers** framebuffers)
 {
 	D_BASE(d, Base);
-	GMGLShadowFramebuffers* sdframebuffers = new GMGLShadowFramebuffers();
+	GMGLShadowFramebuffers* sdframebuffers = new GMGLShadowFramebuffers(d->context);
 	(*framebuffers) = sdframebuffers;
 
 	GMFramebuffersDesc desc;
@@ -195,31 +219,36 @@ IRenderer* GMGLGraphicEngine::getRenderer(GMModelType objectType)
 {
 	D(d);
 	D_BASE(db, Base);
-	static GMGLRenderer_2D s_renderer_2d;
-	static GMGLRenderer_3D s_renderer_3d;
-	static GMGLRenderer_CubeMap s_renderer_cubeMap;
-	static GMGLRenderer_Filter s_renderer_filter;
-	static GMGLRenderer_LightPass s_renderer_lightPass;
-	static GMGLRenderer_3D_Shadow s_renderer_3d_shadow;
+
 	switch (objectType)
 	{
 	case GMModelType::Model2D:
 	case GMModelType::Text:
-		return &s_renderer_2d;
+		return newRenderer<GMGLRenderer_2D>(d->renderer_2d, db->context);
 	case GMModelType::Model3D:
 		if (db->isDrawingShadow)
-			return &s_renderer_3d_shadow;
-		return &s_renderer_3d;
+			return newRenderer<GMGLRenderer_3D_Shadow>(d->renderer_3d_shadow, db->context);
+		return newRenderer<GMGLRenderer_3D>(d->renderer_3d, db->context);
 	case GMModelType::CubeMap:
-		return &s_renderer_cubeMap;
+		return newRenderer<GMGLRenderer_CubeMap>(d->renderer_cubeMap, db->context);
 	case GMModelType::Filter:
-		return &s_renderer_filter;
+		return newRenderer<GMGLRenderer_Filter>(d->renderer_filter, db->context);
 	case GMModelType::LightPassQuad:
-		return &s_renderer_lightPass;
+		return newRenderer<GMGLRenderer_LightPass>(d->renderer_lightPass, db->context);
 	default:
 		GM_ASSERT(false);
 		return nullptr;
 	}
+}
+
+GMGlyphManager* GMGLGraphicEngine::getGlyphManager()
+{
+	D_BASE(d, Base);
+	if (!d->glyphManager)
+	{
+		d->glyphManager = new GMGLGlyphManager(d->context);
+	}
+	return d->glyphManager;
 }
 
 void GMGLGraphicEngine::clearStencil()
@@ -274,7 +303,10 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 
 IFramebuffers* GMGLGraphicEngine::getDefaultFramebuffers()
 {
-	return GMGLFramebuffers::getDefaultFramebuffers();
+	D_BASE(d, Base);
+	if (!d->defaultFramebuffers)
+		d->defaultFramebuffers = GMGLFramebuffers::createDefaultFramebuffers(d->context);
+	return d->defaultFramebuffers;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -72,7 +72,7 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 		break;
 	case gm::GameMachineHandlerEvent::Activate:
 	{
-		gm::IInput* inputManager = GM.getMainWindow()->getInputMananger();
+		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered('P'))
 			d->rotate = !d->rotate;

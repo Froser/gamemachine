@@ -181,16 +181,15 @@ void GMCamera::lookAt(const GMCameraLookAt& lookAt)
 	d->frustum.updateViewMatrix(::getViewMatrix(lookAt));
 }
 
-GMVec3 GMCamera::getRayToWorld(GMint x, GMint y) const
+GMVec3 GMCamera::getRayToWorld(const GMRect& renderRect, GMint x, GMint y) const
 {
 	D(d);
-	const GMRect& cr = GM.getGameMachineRunningStates().renderRect;
 	GMVec3 world = Unproject(
 		GMVec3(x, y, 1),
 		0,
 		0,
-		cr.width,
-		cr.height,
+		renderRect.width,
+		renderRect.height,
 		d->frustum.getProjectionMatrix(),
 		d->frustum.getViewMatrix(),
 		Identity<GMMat4>()

@@ -196,8 +196,8 @@ namespace
 
 END_NS
 
-GMBSPGameWorld::GMBSPGameWorld()
-	: GMGameWorld()
+GMBSPGameWorld::GMBSPGameWorld(const GMContext* context)
+	: GMGameWorld(context)
 {
 	D(d);
 	d->physics = new GMBSPPhysicsWorld(this);
@@ -248,7 +248,7 @@ void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool always
 void GMBSPGameWorld::setDefaultLights()
 {
 	IFactory* factory = GM.getFactory();
-	IGraphicEngine* engine = GM.getGraphicEngine();
+	IGraphicEngine* engine = getContext()->engine;
 	engine->removeLights();
 
 	{
@@ -638,7 +638,7 @@ void GMBSPGameWorld::initTextures()
 		if (findTexture(shader.shader, &tex))
 		{
 			ITexture* texture;
-			factory->createTexture(tex, &texture);
+			factory->createTexture(getContext(), tex, &texture);
 			delete tex;
 			getAssets().insertAsset(GM_ASSET_TEXTURES, GMString(shader.shader), GMAssetType::Texture, texture);
 		}
@@ -693,7 +693,7 @@ void GMBSPGameWorld::initLightmaps()
 		GMbyte* lightmapBytes = bsp.lightBytes.data() + i * BSP_LIGHTMAP_SIZE;
 		GMImageBuffer* imgBuf = new GMImageBuffer(GMImageFormat::RGB, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_EXT, BSP_LIGHTMAP_SIZE, lightmapBytes);
 		ITexture* texture = nullptr;
-		factory->createTexture(imgBuf, &texture);
+		factory->createTexture(getContext(), imgBuf, &texture);
 		delete imgBuf;
 		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, GMString(i), GMAssetType::Texture, texture);
 	}
@@ -703,7 +703,7 @@ void GMBSPGameWorld::initLightmaps()
 		GMbyte white[3] = { 0xff, 0xff, 0xff };
 		GMImageBuffer* whiteBuf = new GMImageBuffer(GMImageFormat::RGB, 1, 1, 3 * sizeof(GMbyte), white);
 		ITexture* texture = nullptr;
-		factory->createTexture(whiteBuf, &texture);
+		factory->createTexture(getContext(), whiteBuf, &texture);
 		delete whiteBuf;
 		getAssets().insertAsset(GM_ASSET_LIGHTMAPS, GMString(L"-1"), GMAssetType::Texture, texture);
 	}

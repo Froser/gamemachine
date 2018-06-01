@@ -19,7 +19,7 @@ class GMDemoGameWorld : public GMGameWorld
 	DECLARE_PRIVATE_AND_BASE(GMDemoGameWorld, GMGameWorld)
 
 public:
-	GMDemoGameWorld();
+	GMDemoGameWorld(const GMContext* context);
 	~GMDemoGameWorld();
 
 public:

@@ -37,6 +37,8 @@ struct IAudioPlayer;
 struct IGraphicEngine;
 struct IRenderer;
 struct IInput;
+struct IWindow;
+struct GMContext;
 struct GraphicSettings;
 struct GMCameraLookAt;
 struct GMShaderVariablesDesc;
@@ -113,7 +115,7 @@ enum class GMModelType
 
 GM_INTERFACE(IGameHandler)
 {
-	virtual void init() = 0;
+	virtual void init(const GMContext* context) = 0;
 	virtual void start() = 0;
 	virtual void event(GameMachineHandlerEvent evt) = 0;
 };
@@ -262,6 +264,11 @@ GM_INTERFACE(IFramebuffers)
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) = 0;
 };
 
+GM_INTERFACE(IContext)
+{
+	const virtual GMContext* getContext() = 0;
+};
+
 enum class GMGeometryPassingState
 {
 	PassingGeometry,
@@ -280,7 +287,7 @@ GM_INTERFACE(IGBuffer)
 
 GM_INTERFACE(IShaderLoadCallback)
 {
-	virtual void onLoadShaders(IGraphicEngine* engine) = 0;
+	virtual void onLoadShaders(const GMContext* context) = 0;
 };
 
 enum class GMLightType
@@ -460,6 +467,8 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	  \return 模型类型对应的渲染器。
 	*/
 	virtual IRenderer* getRenderer(GMModelType modelType) = 0;
+
+	virtual GMGlyphManager* getGlyphManager() = 0;
 };
 
 GM_INTERFACE(IRenderer)
@@ -467,6 +476,25 @@ GM_INTERFACE(IRenderer)
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) = 0;
 	virtual void endModel() = 0;
 	virtual void draw(GMModel* model) = 0;
+};
+
+struct GMWindowStates
+{
+	GMfloat viewportTopLeftX = 0; //!< 视口左上角X坐标。
+	GMfloat viewportTopLeftY = 0; //!< 视口左上角Y坐标。
+	GMfloat minDepth = 0; //!< 近平面的深度值。
+	GMfloat maxDepth = 1; //!< 远平面的深度值。
+	GMString workingAdapterDesc; //!< 适配器信息。
+	GMint sampleCount; //!< 多重采样数量。
+	GMint sampleQuality; //!< 多重采样质量。
+	bool vsyncEnabled = false; //!< 是否垂直同步。
+	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
+};
+
+struct GMContext
+{
+	IWindow* window = nullptr;
+	IGraphicEngine* engine = nullptr;
 };
 
 GM_INTERFACE_FROM(IWindow, IQueriable)
@@ -485,18 +513,20 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual bool addWidget(GMWidget* widget) = 0;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) = 0;
 	virtual IGameHandler* getHandler() = 0;
+	virtual const GMWindowStates& getWindowStates() = 0;
+	virtual IGraphicEngine* getGraphicEngine() = 0;
+	virtual const GMContext* getContext() = 0;
 };
 
 GM_INTERFACE(IFactory)
 {
 	virtual void createWindow(GMInstance instance, OUT IWindow** window) = 0;
-	virtual void createGraphicEngine(OUT IGraphicEngine**) = 0;
-	virtual void createTexture(GMImage*, OUT ITexture**) = 0;
-	virtual void createModelDataProxy(IGraphicEngine*, GMModel*, OUT GMModelDataProxy**) = 0;
-	virtual void createGlyphManager(OUT GMGlyphManager**) = 0;
-	virtual void createFramebuffer(OUT IFramebuffer**) = 0;
-	virtual void createFramebuffers(OUT IFramebuffers**) = 0;
-	virtual void createGBuffer(IGraphicEngine*, OUT IGBuffer**) = 0;
+	virtual void createTexture(const GMContext* context, GMImage*, OUT ITexture**) = 0;
+	virtual void createModelDataProxy(const GMContext*, GMModel*, OUT GMModelDataProxy**) = 0;
+	virtual void createGlyphManager(const GMContext* context, OUT GMGlyphManager**) = 0;
+	virtual void createFramebuffer(const GMContext* context, OUT IFramebuffer**) = 0;
+	virtual void createFramebuffers(const GMContext* context, OUT IFramebuffers**) = 0;
+	virtual void createGBuffer(const GMContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
 };
 

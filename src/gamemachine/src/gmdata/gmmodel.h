@@ -40,19 +40,21 @@ typedef Vector<GMMesh*> GMMeshes;
 
 GM_PRIVATE_OBJECT(GMModelDataProxy)
 {
+	const GMContext* context = nullptr;
 	GMModel* model = nullptr;
 };
 
 class GMMesh;
 class GMModelBuffer;
-class GMModelDataProxy : public GMObject, public IQueriable
+class GMModelDataProxy : public GMObject, public IQueriable, public IContext
 {
 	DECLARE_PRIVATE(GMModelDataProxy)
 
 public:
-	GMModelDataProxy(GMModel* obj)
+	GMModelDataProxy(const GMContext* context, GMModel* obj)
 	{
 		D(d);
+		d->context = context;
 		d->model = obj;
 	}
 
@@ -68,6 +70,8 @@ public:
 // IQueriable
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) { return false; }
 	virtual bool setInterface(GameMachineInterfaceID id, void* in) { return false; }
+
+	virtual const GMContext* getContext() override;
 
 protected:
 	inline GMModel* getModel() { D(d); return d->model; }

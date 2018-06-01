@@ -79,6 +79,8 @@ GMWindow::~GMWindow()
 	GM.removeWindow(this);
 	GM_delete(d->input);
 	GM_delete(d->handler);
+	GM_delete(d->engine);
+	GM_delete(d->context);
 	::DestroyWindow(getWindowHandle());
 }
 
@@ -106,6 +108,7 @@ void GMWindow::msgProc(const GMMessage& message)
 		if (d->input)
 			d->input->update();
 
+		d->windowStates.renderRect = getRenderRect();
 		GMfloat elapsed = GM.getGameMachineRunningStates().lastFrameElpased;
 		for (auto widget : d->widgets)
 		{

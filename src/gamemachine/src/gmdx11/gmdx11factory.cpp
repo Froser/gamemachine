@@ -15,46 +15,39 @@ void GMDx11Factory::createWindow(GMInstance instance, OUT IWindow** window)
 	GM_ASSERT(b);
 }
 
-void GMDx11Factory::createGraphicEngine(OUT IGraphicEngine** engine)
-{
-	GM_ASSERT(engine);
-	*engine = new GMDx11GraphicEngine();
-}
-
-void GMDx11Factory::createTexture(GMImage* image, OUT ITexture** texture)
+void GMDx11Factory::createTexture(const GMContext* context, GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
-	GMDx11Texture* t = new GMDx11Texture(image);
+	GMDx11Texture* t = new GMDx11Texture(context, image);
 	(*texture) = t;
 	t->init();
 }
 
-void GMDx11Factory::createModelDataProxy(IGraphicEngine* engine, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
+void GMDx11Factory::createModelDataProxy(const GMContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
 {
 	GM_ASSERT(modelDataProxy);
-	GMDx11GraphicEngine* dx11Engine = static_cast<GMDx11GraphicEngine*>(engine);
-	(*modelDataProxy) = new GMDx11ModelDataProxy(dx11Engine, model);
+	(*modelDataProxy) = new GMDx11ModelDataProxy(context, model);
 }
 
-void GMDx11Factory::createGlyphManager(OUT GMGlyphManager** glyphManager)
+void GMDx11Factory::createGlyphManager(const GMContext* context, OUT GMGlyphManager** glyphManager)
 {
 	GM_ASSERT(glyphManager);
-	*glyphManager = new GMDx11GlyphManager();
+	*glyphManager = new GMDx11GlyphManager(context);
 }
 
-void GMDx11Factory::createFramebuffer(OUT IFramebuffer** fb)
+void GMDx11Factory::createFramebuffer(const GMContext* context, OUT IFramebuffer** fb)
 {
-	*fb = new GMDx11Framebuffer();
+	*fb = new GMDx11Framebuffer(context);
 }
 
-void GMDx11Factory::createFramebuffers(OUT IFramebuffers** fbs)
+void GMDx11Factory::createFramebuffers(const GMContext* context, OUT IFramebuffers** fbs)
 {
-	*fbs = new GMDx11Framebuffers();
+	*fbs = new GMDx11Framebuffers(context);
 }
 
-void GMDx11Factory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
+void GMDx11Factory::createGBuffer(const GMContext* context, OUT IGBuffer** g)
 {
-	*g = new GMDx11GBuffer(gm_cast<GMDx11GraphicEngine*>(engine));
+	*g = new GMDx11GBuffer(context);
 }
 
 void GMDx11Factory::createLight(GMLightType type, OUT ILight** out)

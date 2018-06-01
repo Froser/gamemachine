@@ -111,9 +111,10 @@ IFramebuffers* GMFramebuffersStack::peek()
 	return d->framebuffers.top();
 }
 
-GMGraphicEngine::GMGraphicEngine()
+GMGraphicEngine::GMGraphicEngine(const GMContext* context)
 {
 	D(d);
+	d->context = context;
 	d->renderConfig = GM.getConfigs().getConfig(GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 	d->shadow.type = GMShadowSourceDesc::NoShadow;
@@ -126,6 +127,8 @@ GMGraphicEngine::~GMGraphicEngine()
 	GM_delete(d->filterQuad);
 	GM_delete(d->gBuffer);
 	GM_delete(d->shadowDepthFramebuffers);
+	GM_delete(d->defaultFramebuffers);
+	GM_delete(d->glyphManager);
 }
 
 void GMGraphicEngine::init()
@@ -192,7 +195,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 		{
 			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 			filterFramebuffers->unbind();
-			getFilterQuad()->draw();
+			getFilterQuad()->draw(d->context);
 			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(filterFramebuffers);
 		}
 		gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getDefaultFramebuffers());
@@ -212,7 +215,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 		if (needHDR() || filterMode != GMFilterMode::None)
 		{
 			filterFramebuffers->unbind();
-			getFilterQuad()->draw();
+			getFilterQuad()->draw(d->context);
 		}
 	}
 }
@@ -222,7 +225,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& objects)
 	D(d);
 	for (auto object : objects)
 	{
-		object->draw();
+		object->draw(d->context);
 	}
 }
 
@@ -268,17 +271,17 @@ void GMGraphicEngine::createFilterFramebuffer()
 	if (!d->filterFramebuffers)
 	{
 		IFactory* factory = GM.getFactory();
-		const GMGameMachineRunningStates& states = GM.getGameMachineRunningStates();
+		const GMWindowStates& windowStates = d->context->window->getWindowStates();
 		GMFramebufferDesc desc = { 0 };
-		desc.rect = states.renderRect;
+		desc.rect = windowStates.renderRect;
 		desc.framebufferFormat = GMFramebufferFormat::R32G32B32A32_FLOAT;
-		factory->createFramebuffers(&d->filterFramebuffers);
+		factory->createFramebuffers(d->context, &d->filterFramebuffers);
 		GM_ASSERT(d->filterFramebuffers);
 		GMFramebuffersDesc fbDesc;
-		fbDesc.rect = states.renderRect;
+		fbDesc.rect = windowStates.renderRect;
 		d->filterFramebuffers->init(fbDesc);
 		IFramebuffer* framebuffer = nullptr;
-		factory->createFramebuffer(&framebuffer);
+		factory->createFramebuffer(d->context, &framebuffer);
 		GM_ASSERT(framebuffer);
 		framebuffer->init(desc);
 		d->filterFramebuffers->addFramebuffer(framebuffer);
@@ -292,7 +295,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		quad->setType(GMModelType::Filter);
 		quad->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).addFrame(d->filterFramebuffers->getFramebuffer(0)->getTexture());
 		d->filterQuadModel.reset(quad);
-		GM.createModelDataProxyAndTransfer(quad);
+		GM.createModelDataProxyAndTransfer(d->context, quad);
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);
 		d->filterQuad = new GMGameObject(asset);
 	}
@@ -302,7 +305,7 @@ IGBuffer* GMGraphicEngine::createGBuffer()
 {
 	D(d);
 	IGBuffer* gBuffer = nullptr;
-	GM.getFactory()->createGBuffer(this, &gBuffer);
+	GM.getFactory()->createGBuffer(d->context, &gBuffer);
 	GM_ASSERT(gBuffer);
 	return gBuffer;
 }

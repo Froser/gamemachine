@@ -16,13 +16,7 @@ void GMGLFactory::createWindow(GMInstance instance, OUT IWindow** window)
 	GM_ASSERT(b);
 }
 
-void GMGLFactory::createGraphicEngine(OUT IGraphicEngine** engine)
-{
-	GM_ASSERT(engine);
-	*engine = new GMGLGraphicEngine();
-}
-
-void GMGLFactory::createTexture(GMImage* image, OUT ITexture** texture)
+void GMGLFactory::createTexture(const GMContext* context, GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
 	GMGLTexture* t = new GMGLTexture(image);
@@ -30,31 +24,30 @@ void GMGLFactory::createTexture(GMImage* image, OUT ITexture** texture)
 	t->init();
 }
 
-void GMGLFactory::createModelDataProxy(IGraphicEngine* engine, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
+void GMGLFactory::createModelDataProxy(const GMContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
 {
 	GM_ASSERT(modelDataProxy);
-	GMGLGraphicEngine* gmglEngine = static_cast<GMGLGraphicEngine*>(engine);
-	(*modelDataProxy) = new GMGLModelDataProxy(gmglEngine, model);
+	(*modelDataProxy) = new GMGLModelDataProxy(context, model);
 }
 
-void GMGLFactory::createGlyphManager(OUT GMGlyphManager** glyphManager)
+void GMGLFactory::createGlyphManager(const GMContext* context, OUT GMGlyphManager** glyphManager)
 {
-	*glyphManager = new GMGLGlyphManager();
+	*glyphManager = new GMGLGlyphManager(context);
 }
 
-void GMGLFactory::createFramebuffer(OUT IFramebuffer** fb)
+void GMGLFactory::createFramebuffer(const GMContext* context, OUT IFramebuffer** fb)
 {
-	*fb = new GMGLFramebuffer();
+	*fb = new GMGLFramebuffer(context);
 }
 
-void GMGLFactory::createFramebuffers(OUT IFramebuffers** fbs)
+void GMGLFactory::createFramebuffers(const GMContext* context, OUT IFramebuffers** fbs)
 {
-	*fbs = new GMGLFramebuffers();
+	*fbs = new GMGLFramebuffers(context);
 }
 
-void GMGLFactory::createGBuffer(IGraphicEngine* engine, OUT IGBuffer** g)
+void GMGLFactory::createGBuffer(const GMContext* context, OUT IGBuffer** g)
 {
-	*g = new GMGLGBuffer(gm_cast<GMGLGraphicEngine*>(engine));
+	*g = new GMGLGBuffer(context);
 }
 
 void GMGLFactory::createLight(GMLightType type, OUT ILight** out)

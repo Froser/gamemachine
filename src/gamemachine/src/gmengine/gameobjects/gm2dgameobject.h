@@ -11,6 +11,7 @@ struct ITypoEngine;
 
 GM_PRIVATE_OBJECT(GM2DGameObjectBase)
 {
+	GMRect renderRc;
 	bool dirty = true;
 	GMRect geometry = { 0 };
 };
@@ -20,7 +21,7 @@ class GM2DGameObjectBase : public GMGameObject
 	DECLARE_PRIVATE_AND_BASE(GM2DGameObjectBase, GMGameObject)
 
 public:
-	using GMGameObject::GMGameObject;
+	GM2DGameObjectBase(const GMRect& renderRc);
 
 public:
 	void setGeometry(const GMRect& geometry);
@@ -34,6 +35,12 @@ public:
 
 protected:
 	void setShader(GMShader& shader);
+
+	inline const GMRect& getRenderRect()
+	{
+		D(d);
+		return d->renderRc;
+	}
 
 	inline void markDirty()
 	{
@@ -54,7 +61,7 @@ protected:
 	}
 
 protected:
-	static GMRectF toViewportRect(const GMRect& rc);
+	static GMRectF toViewportRect(const GMRect& rc, const GMRect& renderRc);
 };
 
 enum GMTextColorType
@@ -83,8 +90,8 @@ class GMTextGameObject : public GM2DGameObjectBase
 	DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GM2DGameObjectBase)
 
 public:
-	GMTextGameObject();
-	GMTextGameObject(ITypoEngine* typo);
+	GMTextGameObject(const GMRect& renderRc);
+	GMTextGameObject(const GMRect& renderRc, ITypoEngine* typo);
 	~GMTextGameObject();
 
 public:
@@ -95,7 +102,7 @@ public:
 
 public:
 	virtual void onAppendingObjectToWorld() override;
-	virtual void draw() override;
+	virtual void draw(const GMContext* context) override;
 
 private:
 	void update();
@@ -125,11 +132,11 @@ class GMSprite2DGameObject : public GM2DGameObjectBase
 	};
 
 public:
-	GMSprite2DGameObject() = default;
+	using Base::Base;
 	~GMSprite2DGameObject();
 
 public:
-	virtual void draw() override;
+	virtual void draw(const GMContext* context) override;
 
 public:
 	void setDepth(GMint depth);
@@ -160,41 +167,6 @@ GM_PRIVATE_OBJECT(GMImage2DBorder)
 	GMfloat height;
 	GMfloat cornerWidth;
 	GMfloat cornerHeight;
-};
-
-// 表示一个2D边框。
-class GMImage2DBorder : public GMObject
-{
-	DECLARE_PRIVATE(GMImage2DBorder)
-	GM_FRIEND_CLASS(GMImage2DGameObject)
-
-private:
-	GMImage2DBorder() = default;
-
-public:
-	GMImage2DBorder(GMAsset texture,
-		const GMRect& borderTextureGeometry,
-		GMfloat textureWidth,
-		GMfloat textureHeight,
-		GMfloat cornerWidth,
-		GMfloat cornerHeight
-	);
-	~GMImage2DBorder();
-
-private:
-	bool hasBorder() { D(d); return !!d->texture.asset; }
-	// 截取的纹理
-	const GMRect& textureGeometry() { D(d); return d->borderTextureGeometry; }
-	template <typename T, GMint Size> void release(T* (&)[Size]);
-	template <GMint Size> void drawObjects(GMGameObject* (&)[Size]);
-
-private:
-	virtual void clone(const GMImage2DBorder& border);
-	virtual void createBorder(const GMRect& geometry);
-	virtual void draw();
-	virtual void setScaling(const GMMat4& scaling);
-	virtual void setTranslation(const GMMat4& translation);
-	virtual void setRotation(const GMQuat& rotation);
 };
 
 END_NS

@@ -9,6 +9,7 @@ class GMModel;
 class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMGBuffer)
 {
+	const GMContext* context = nullptr;
 	IFramebuffers* geometryFramebuffers = nullptr;
 	GMGameObject* quad = nullptr;
 	GMModel* quadModel = nullptr;
@@ -16,18 +17,21 @@ GM_PRIVATE_OBJECT(GMGBuffer)
 	GMGraphicEngine* engine = nullptr;
 };
 
-class GMGBuffer : public GMObject, public IGBuffer
+class GMGBuffer : public GMObject, public IGBuffer, public IContext
 {
 	DECLARE_PRIVATE(GMGBuffer)
 
 protected:
-	GMGBuffer(GMGraphicEngine* engine);
+	GMGBuffer(const GMContext* context);
 	~GMGBuffer();
 
 public:
 	virtual void init() override;
 	virtual void setGeometryPassingState(GMGeometryPassingState);
 	virtual GMGeometryPassingState getGeometryPassingState();
+
+public:
+	virtual const GMContext* getContext() override;
 
 protected:
 	GMGameObject* getQuad();

@@ -2,6 +2,7 @@
 #include "gmengine/ui/gmwindow.h"
 #include <gmdx11helper.h>
 #include "foundation/gamemachine.h"
+#include "gmdx11/gmdx11graphic_engine.h"
 
 namespace
 {
@@ -35,6 +36,7 @@ public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual void onWindowCreated(const GMWindowAttributes& attrs, GMWindowHandle handle) override;
+	virtual IGraphicEngine* getGraphicEngine() override;
 };
 
 GMWindow_Dx11::~GMWindow_Dx11()
@@ -89,9 +91,11 @@ bool GMWindow_Dx11::getInterface(GameMachineInterfaceID id, void** out)
 void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle)
 {
 	D(d);
+	D_BASE(db, GMWindow);
 	GM_ASSERT(handle);
 
-	GMGameMachineRunningStates gameMachineRunningState = GM.getGameMachineRunningStates();
+	GMWindowStates& windowStates = db->windowStates;
+
 	UINT createDeviceFlags = 0;
 	DXGI_SWAP_CHAIN_DESC sc = { 0 };
 	D3D11_TEXTURE2D_DESC depthTextureDesc;
@@ -135,8 +139,8 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	}
 	GM_DX_HR(dxgiAdapter->GetDesc(&adapterDesc));
 
-	gameMachineRunningState.workingAdapterDesc = adapterDesc.Description;
-	gameMachineRunningState.vsyncEnabled = d->vsync;
+	windowStates.workingAdapterDesc = adapterDesc.Description;
+	windowStates.vsyncEnabled = d->vsync;
 
 	// 2.创建交换链、设备和上下文
 	sc.BufferDesc.Width = renderWidth;
@@ -194,21 +198,21 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	if (wndAttrs.samples <= 1)
 	{
 		// 禁用多重采样
-		gameMachineRunningState.sampleCount = sc.SampleDesc.Count = 1;
-		gameMachineRunningState.sampleQuality = sc.SampleDesc.Quality = 0;
+		windowStates.sampleCount = sc.SampleDesc.Count = 1;
+		windowStates.sampleQuality = sc.SampleDesc.Quality = 0;
 	}
 	else
 	{
 		if (!msaaQuality)
 		{
 			// 不支持指定MSAA质量
-			gameMachineRunningState.sampleCount = sc.SampleDesc.Count = 4;
-			gameMachineRunningState.sampleQuality = sc.SampleDesc.Quality = msaaQuality - 1;
+			windowStates.sampleCount = sc.SampleDesc.Count = 4;
+			windowStates.sampleQuality = sc.SampleDesc.Quality = msaaQuality - 1;
 		}
 		else
 		{
-			gameMachineRunningState.sampleCount = sc.SampleDesc.Count = wndAttrs.samples;
-			gameMachineRunningState.sampleQuality = sc.SampleDesc.Quality = msaaQuality - 1;
+			windowStates.sampleCount = sc.SampleDesc.Count = wndAttrs.samples;
+			windowStates.sampleQuality = sc.SampleDesc.Quality = msaaQuality - 1;
 		}
 	}
 
@@ -267,20 +271,28 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	d->deviceContext->OMSetRenderTargets(1, &d->renderTargetView, d->depthStencilView);
 
 	// 6.设置视口
-	gameMachineRunningState.viewportTopLeftX = vp.TopLeftX = 0.f;
-	gameMachineRunningState.viewportTopLeftY = vp.TopLeftY = 0.f;
+	windowStates.viewportTopLeftX = vp.TopLeftX = 0.f;
+	windowStates.viewportTopLeftY = vp.TopLeftY = 0.f;
 	vp.Width = static_cast<GMfloat>(renderWidth);
 	vp.Height = static_cast<GMfloat>(renderHeight);
-	gameMachineRunningState.minDepth = vp.MinDepth = 0.f;
-	gameMachineRunningState.maxDepth = vp.MaxDepth = 1.f;
+	windowStates.minDepth = vp.MinDepth = 0.f;
+	windowStates.maxDepth = vp.MaxDepth = 1.f;
 	d->deviceContext->RSSetViewports(1, &vp);
 
-	// 发送事件，更新状态
-	GM.setGameMachineRunningStates(gameMachineRunningState);
-
+	// 发送事件
 	msg.msgType = GameMachineMessageType::Dx11Ready;
 	msg.objPtr = static_cast<IQueriable*>(this);
 	GM.postMessage(msg);
+}
+
+IGraphicEngine* GMWindow_Dx11::getGraphicEngine()
+{
+	D_BASE(d, Base);
+	if (!d->engine)
+	{
+		d->engine = new GMDx11GraphicEngine(getContext());
+	}
+	return d->engine;
 }
 
 bool GMWindowFactory::createWindowWithDx11(GMInstance instance, OUT IWindow** window)

@@ -17,6 +17,7 @@ private:
 
 GM_PRIVATE_OBJECT(GMGLRenderer)
 {
+	const GMContext* context = nullptr;
 	GMGLGraphicEngine* engine = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	GMDebugConfig debugConfig;
@@ -28,7 +29,7 @@ class GMGLRenderer : public GMObject, public IRenderer
 	DECLARE_PRIVATE(GMGLRenderer)
 
 public:
-	GMGLRenderer();
+	GMGLRenderer(const GMContext* context);
 
 	virtual void draw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() = 0;
@@ -54,6 +55,7 @@ public:
 GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 {
 	GMRenderMode renderMode = GMRenderMode::Forward;
+	ITexture* whiteTexture = nullptr;
 };
 
 class GMGLRenderer_3D : public GMGLRenderer
@@ -61,7 +63,8 @@ class GMGLRenderer_3D : public GMGLRenderer
 	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_3D, GMGLRenderer)
 
 public:
-	GMGLRenderer_3D() = default;
+	using GMGLRenderer::GMGLRenderer;
+	~GMGLRenderer_3D();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -73,16 +76,25 @@ public:
 protected:
 	void activateMaterial(const GMShader& shader);
 	void drawDebug();
+
+private:
+	ITexture* getWhiteTexture();
 };
 
 class GMGLRenderer_2D : public GMGLRenderer_3D
 {
+public:
+	using GMGLRenderer_3D::GMGLRenderer_3D;
+
 public:
 	virtual void beforeDraw(GMModel* model) override;
 };
 
 class GMGLRenderer_CubeMap : public GMGLRenderer_3D
 {
+public:
+	using GMGLRenderer_3D::GMGLRenderer_3D;
+
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
@@ -104,6 +116,10 @@ class GMGLRenderer_Filter : public GMGLRenderer
 {
 	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_Filter, GMGLRenderer)
 
+public:
+	using GMGLRenderer::GMGLRenderer;
+
+private:
 	virtual void beforeDraw(GMModel* model) override;
 	virtual void afterDraw(GMModel* model) override;
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
@@ -119,6 +135,9 @@ private:
 
 class GMGLRenderer_LightPass : public GMGLRenderer
 {
+public:
+	using GMGLRenderer::GMGLRenderer;
+
 protected:
 	virtual IShaderProgram* getShaderProgram() override;
 	virtual void beforeDraw(GMModel* model) override;
@@ -129,6 +148,9 @@ protected:
 
 class GMGLRenderer_3D_Shadow : public GMGLRenderer_3D
 {
+public:
+	using GMGLRenderer_3D::GMGLRenderer_3D;
+
 protected:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 };

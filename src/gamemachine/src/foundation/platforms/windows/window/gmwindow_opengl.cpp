@@ -3,6 +3,7 @@
 #include <GL/wglew.h>
 #include "gmengine/ui/gmwindow.h"
 #include "foundation/gamemachine.h"
+#include "gmgl/gmglgraphic_engine.h"
 
 #define EXIT __exit
 #define RUN_AND_CHECK(i) if (!(i)) { GM_ASSERT(false); goto EXIT; }
@@ -62,6 +63,7 @@ public:
 public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle) override;
+	virtual IGraphicEngine* getGraphicEngine() override;
 
 private:
 	void swapBuffers() const;
@@ -168,6 +170,16 @@ EXIT:
 		::DestroyWindow(tmpWnd);
 	wglMakeCurrent(NULL, NULL);
 	return;
+}
+
+IGraphicEngine* GMWindow_OpenGL::getGraphicEngine()
+{
+	D_BASE(d, Base);
+	if (!d->engine)
+	{
+		d->engine = new GMGLGraphicEngine(getContext());
+	}
+	return d->engine;
 }
 
 void GMWindow_OpenGL::swapBuffers() const

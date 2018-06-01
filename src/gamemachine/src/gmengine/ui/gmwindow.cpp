@@ -73,3 +73,21 @@ IGameHandler* GMWindow::getHandler()
 	D(d);
 	return d->handler;
 }
+
+const GMWindowStates& GMWindow::getWindowStates()
+{
+	D(d);
+	return d->windowStates;
+}
+
+const GMContext* GMWindow::getContext()
+{
+	D(d);
+	if (!d->context)
+	{
+		d->context = new GMContext();
+		d->context->window = this;
+		d->context->engine = getGraphicEngine();
+	}
+	return d->context;
+}

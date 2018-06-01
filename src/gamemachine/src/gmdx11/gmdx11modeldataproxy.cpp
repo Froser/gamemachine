@@ -7,11 +7,11 @@
 #undef max
 #endif
 
-GMDx11ModelDataProxy::GMDx11ModelDataProxy(GMDx11GraphicEngine* engine, GMModel* model)
-	: GMModelDataProxy(model)
+GMDx11ModelDataProxy::GMDx11ModelDataProxy(const GMContext* context, GMModel* model)
+	: GMModelDataProxy(context, model)
 {
 	D(d);
-	d->engine = engine;
+	d->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
 }
 
 bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)

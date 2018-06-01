@@ -28,6 +28,7 @@ struct GMRenderList
 
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
+	const GMContext* context = nullptr;
 	GMPhysicsWorld* physicsWorld = nullptr;
 	GMAssets assets;
 	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
@@ -35,14 +36,14 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 	Set<GMGameObject*> gameObjects;
 };
 
-class GMGameWorld : public GMObject
+class GMGameWorld : public GMObject, public IContext
 {
 	DECLARE_PRIVATE(GMGameWorld)
 	GM_FRIEND_CLASS(GMPhysicsWorld)
 	GM_DECLARE_PROPERTY(RenderPreference, renderPreference, GMRenderPreference)
 
 public:
-	GMGameWorld() = default;
+	GMGameWorld(const GMContext* context);
 	virtual ~GMGameWorld();
 
 public:
@@ -51,6 +52,7 @@ public:
 public:
 	virtual void renderScene();
 	virtual bool removeObject(GMGameObject* obj);
+	virtual const GMContext* getContext();
 
 public:
 	void addObjectAndInit(AUTORELEASE GMGameObject* obj);

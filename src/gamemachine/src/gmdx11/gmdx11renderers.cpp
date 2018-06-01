@@ -171,169 +171,11 @@ namespace
 		return desc;
 	}
 
-	struct GMDx11RasterizerStates : public GMSingleton<GMDx11RasterizerStates>
-	{
-		enum
-		{
-			Size_Cull = 2,
-			Size_FrontFace = 2,
-		};
-
-		//TODO 先不考虑FillMode
-	public:
-		GMDx11RasterizerStates::GMDx11RasterizerStates()
-		{
-			engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
-		}
-
-		~GMDx11RasterizerStates()
-		{
-			for (GMint i = 0; i < Size_Cull; ++i)
-			{
-				for (GMint j = 0; j < Size_FrontFace; ++j)
-				{
-					if (!states[i][j])
-						continue;
-					states[i][j]->Release();
-				}
-			}
-		}
-
-	public:
-		ID3D11RasterizerState* getRasterStates(GMS_FrontFace frontFace, GMS_Cull cullMode)
-		{
-			bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
-			if (!states[(GMuint)cullMode][(GMuint)frontFace])
-			{
-				D3D11_RASTERIZER_DESC desc = getRasterizerDesc(frontFace, cullMode, multisampleEnable, multisampleEnable);
-				createRasterizerState(desc, &states[(GMuint)cullMode][(GMuint)frontFace]);
-			}
-
-			GM_ASSERT(states[(GMuint)cullMode][(GMuint)frontFace]);
-			return states[(GMuint)cullMode][(GMuint)frontFace];
-		}
-
-	private:
-		bool createRasterizerState(const D3D11_RASTERIZER_DESC& desc, ID3D11RasterizerState** out)
-		{
-			GM_DX_HR(engine->getDevice()->CreateRasterizerState(&desc, out));
-			return !!(*out);
-		}
-
-	private:
-		GMDx11GraphicEngine* engine = nullptr;
-		ID3D11RasterizerState* states[Size_Cull][Size_FrontFace] = { 0 };
-	};
-
-	struct GMDx11BlendStates : public GMSingleton<GMDx11BlendStates>
-	{
-	public:
-		GMDx11BlendStates::GMDx11BlendStates()
-		{
-			engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
-		}
-
-		~GMDx11BlendStates()
-		{
-			for (GMint b = 0; b < 2; ++b)
-			{
-				for (GMint i = 0; i < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++i)
-				{
-					for (GMint j = 0; j < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++j)
-					{
-						if (states[b][i][j])
-							states[b][i][j]->Release();
-					}
-				}
-			}
-		}
-
-	public:
-		ID3D11BlendState* getBlendState(bool enable, GMS_BlendFunc src, GMS_BlendFunc dest)
-		{
-			ID3D11BlendState*& state = states[enable ? 1 : 0][(GMuint)src][(GMuint)dest];
-			if (!state)
-			{
-				D3D11_BLEND_DESC desc = getBlendDesc(enable, src, dest);
-				createBlendState(desc, &state);
-			}
-
-			GM_ASSERT(state);
-			return state;
-		}
-
-		ID3D11BlendState* getDisabledBlendState()
-		{
-			return getBlendState(false, GMS_BlendFunc::ONE, GMS_BlendFunc::ONE);
-		}
-
-	private:
-		bool createBlendState(const D3D11_BLEND_DESC& desc, ID3D11BlendState** out)
-		{
-			GM_DX_HR(engine->getDevice()->CreateBlendState(&desc, out));
-			return !!(*out);
-		}
-
-	private:
-		GMDx11GraphicEngine* engine = nullptr;
-		ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
-	};
-
-	struct GMDx11DepthStencilStates : public GMSingleton<GMDx11DepthStencilStates>
-	{
-	public:
-		GMDx11DepthStencilStates::GMDx11DepthStencilStates()
-		{
-			engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
-		}
-
-		~GMDx11DepthStencilStates()
-		{
-			for (GMint b1 = 0; b1 < 2; ++b1)
-			{
-				for (GMint b2 = 0; b2 < 2; ++b2)
-				{
-					for (GMint b3 = 0; b3 < 3; ++b3)
-					{
-						if (states[b1][b2][b3])
-							states[b1][b2][b3]->Release();
-					}
-				}
-			}
-		}
-
-	public:
-		ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, const GMStencilOptions& stencilOptions)
-		{
-			ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][stencilOptions.writeMask == GMStencilOptions::Ox00 ? 1 : 0][stencilOptions.compareOp];
-			if (!state)
-			{
-				D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilOptions);
-				createDepthStencilState(desc, &state);
-			}
-
-			GM_ASSERT(state);
-			return state;
-		}
-
-	private:
-		bool createDepthStencilState(const D3D11_DEPTH_STENCIL_DESC& desc, ID3D11DepthStencilState** out)
-		{
-			GM_DX_HR(engine->getDevice()->CreateDepthStencilState(&desc, out));
-			return !!(*out);
-		}
-
-	private:
-		GMDx11GraphicEngine* engine = nullptr;
-		ID3D11DepthStencilState* states[2][2][3] = { 0 };
-	};
-
 	class GMDx11WhiteTexture : public GMDx11Texture
 	{
-
 	public:
-		GMDx11WhiteTexture()
-			: GMDx11Texture(nullptr)
+		GMDx11WhiteTexture(const GMContext* context)
+			: GMDx11Texture(context, nullptr)
 		{
 		}
 
@@ -389,35 +231,32 @@ namespace
 		}
 	};
 
-	ITexture* getWhiteTexture()
+	ITexture* createWhiteTexture(const GMContext* context)
 	{
-		static bool s_inited = false;
-		static GMDx11WhiteTexture s_texture;
-		if (!s_inited)
-		{
-			s_texture.init();
-			s_inited = true;
-		}
-		return &s_texture;
+		GMDx11WhiteTexture* texture = new GMDx11WhiteTexture(context);
+		texture->init();
+		return texture;
 	}
 }
 
 #define EFFECT_VARIABLE(funcName, name) \
-	ID3DX11EffectVariable* funcName() {												\
-		static ID3DX11EffectVariable* s_ptr = nullptr;								\
-		if (!s_ptr) {																\
-			s_ptr = m_effect->GetVariableByName(name);								\
-			GM_ASSERT(s_ptr->IsValid()); }											\
-		return s_ptr;																\
+	private: ID3DX11EffectVariable* effect_var_##funcName = nullptr;				\
+	public: ID3DX11EffectVariable* funcName() {										\
+		ID3DX11EffectVariable* effect_var_##funcName = nullptr;						\
+		if (!effect_var_##funcName) {												\
+			effect_var_##funcName = m_effect->GetVariableByName(name);				\
+			GM_ASSERT(effect_var_##funcName->IsValid()); }							\
+		return effect_var_##funcName;												\
 	}
 
 #define EFFECT_VARIABLE_AS(funcName, name, retType, to) \
-	retType* funcName() {															\
-		static retType* s_ptr = nullptr;											\
-		if (!s_ptr) {																\
-			s_ptr = m_effect->GetVariableByName(name)->to();						\
-			GM_ASSERT(s_ptr->IsValid()); }											\
-		return s_ptr;																\
+	private: retType* effect_var_##funcName = nullptr;								\
+	public: retType* funcName() {													\
+		retType* effect_var_##funcName = nullptr;									\
+		if (!effect_var_##funcName) {												\
+			effect_var_##funcName = m_effect->GetVariableByName(name)->to();		\
+			GM_ASSERT(effect_var_##funcName->IsValid()); }							\
+		return effect_var_##funcName;												\
 	}
 
 #define EFFECT_VARIABLE_AS_SHADER_RESOURCE(funcName, name) \
@@ -427,12 +266,13 @@ namespace
 	EFFECT_VARIABLE_AS(funcName, name, ID3DX11EffectScalarVariable, AsScalar)
 
 #define EFFECT_MEMBER_AS(funcName, effect, name, retType, to) \
-	retType* funcName() {															\
-		static retType* s_ptr = nullptr;											\
-		if (!s_ptr) {																\
-			s_ptr = effect->GetMemberByName(name)->to();							\
-			GM_ASSERT(s_ptr->IsValid()); }											\
-		return s_ptr;																\
+	private: retType* effect_var_##funcName = nullptr;								\
+	public: retType* funcName() {													\
+		retType* effect_var_##funcName = nullptr;									\
+		if (!effect_var_##funcName) {												\
+			effect_var_##funcName = effect->GetMemberByName(name)->to();			\
+			GM_ASSERT(effect_var_##funcName->IsValid()); }							\
+		return effect_var_##funcName;												\
 	}
 
 #define EFFECT_MEMBER_AS_SCALAR(funcName, effect, name) \
@@ -499,9 +339,187 @@ GMDx11CubeMapState& GMDx11Renderer::getCubeMapState()
 	return cms;
 }
 
-GMDx11Renderer::GMDx11Renderer()
+ITexture* GMDx11Renderer::getWhiteTexture()
 {
 	D(d);
+	D_BASE(db, Base);
+	if (!d->whiteTexture)
+		d->whiteTexture = createWhiteTexture(d->context);
+	return d->whiteTexture;
+}
+
+BEGIN_NS
+struct GMDx11RasterizerStates
+{
+	enum
+	{
+		Size_Cull = 2,
+		Size_FrontFace = 2,
+	};
+
+	//TODO 先不考虑FillMode
+public:
+	GMDx11RasterizerStates::GMDx11RasterizerStates(const GMContext* context)
+	{
+		this->context = context;
+		this->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+	}
+
+	~GMDx11RasterizerStates()
+	{
+		for (GMint i = 0; i < Size_Cull; ++i)
+		{
+			for (GMint j = 0; j < Size_FrontFace; ++j)
+			{
+				if (!states[i][j])
+					continue;
+				states[i][j]->Release();
+			}
+		}
+	}
+
+public:
+	ID3D11RasterizerState* getRasterStates(GMS_FrontFace frontFace, GMS_Cull cullMode)
+	{
+		const GMWindowStates& windowStates = context->window->getWindowStates();
+		bool multisampleEnable = windowStates.sampleCount > 1;
+		if (!states[(GMuint)cullMode][(GMuint)frontFace])
+		{
+			D3D11_RASTERIZER_DESC desc = getRasterizerDesc(frontFace, cullMode, multisampleEnable, multisampleEnable);
+			createRasterizerState(desc, &states[(GMuint)cullMode][(GMuint)frontFace]);
+		}
+
+		GM_ASSERT(states[(GMuint)cullMode][(GMuint)frontFace]);
+		return states[(GMuint)cullMode][(GMuint)frontFace];
+	}
+
+private:
+	bool createRasterizerState(const D3D11_RASTERIZER_DESC& desc, ID3D11RasterizerState** out)
+	{
+		GM_DX_HR(engine->getDevice()->CreateRasterizerState(&desc, out));
+		return !!(*out);
+	}
+
+private:
+	const GMContext* context = nullptr;
+	GMDx11GraphicEngine* engine = nullptr;
+	ID3D11RasterizerState* states[Size_Cull][Size_FrontFace] = { 0 };
+};
+
+struct GMDx11BlendStates
+{
+public:
+	GMDx11BlendStates::GMDx11BlendStates(const GMContext* context)
+	{
+		this->context = context;
+		this->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+	}
+
+	~GMDx11BlendStates()
+	{
+		for (GMint b = 0; b < 2; ++b)
+		{
+			for (GMint i = 0; i < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++i)
+			{
+				for (GMint j = 0; j < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++j)
+				{
+					if (states[b][i][j])
+						states[b][i][j]->Release();
+				}
+			}
+		}
+	}
+
+public:
+	ID3D11BlendState* getBlendState(bool enable, GMS_BlendFunc src, GMS_BlendFunc dest)
+	{
+		ID3D11BlendState*& state = states[enable ? 1 : 0][(GMuint)src][(GMuint)dest];
+		if (!state)
+		{
+			D3D11_BLEND_DESC desc = getBlendDesc(enable, src, dest);
+			createBlendState(desc, &state);
+		}
+
+		GM_ASSERT(state);
+		return state;
+	}
+
+	ID3D11BlendState* getDisabledBlendState()
+	{
+		return getBlendState(false, GMS_BlendFunc::ONE, GMS_BlendFunc::ONE);
+	}
+
+private:
+	bool createBlendState(const D3D11_BLEND_DESC& desc, ID3D11BlendState** out)
+	{
+		GM_DX_HR(engine->getDevice()->CreateBlendState(&desc, out));
+		return !!(*out);
+	}
+
+private:
+	const GMContext* context = nullptr;
+	GMDx11GraphicEngine* engine = nullptr;
+	ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
+};
+
+struct GMDx11DepthStencilStates
+{
+public:
+	GMDx11DepthStencilStates::GMDx11DepthStencilStates(const GMContext* context)
+	{
+		this->context = context;
+		this->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+	}
+
+	~GMDx11DepthStencilStates()
+	{
+		for (GMint b1 = 0; b1 < 2; ++b1)
+		{
+			for (GMint b2 = 0; b2 < 2; ++b2)
+			{
+				for (GMint b3 = 0; b3 < 3; ++b3)
+				{
+					if (states[b1][b2][b3])
+						states[b1][b2][b3]->Release();
+				}
+			}
+		}
+	}
+
+public:
+	ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, const GMStencilOptions& stencilOptions)
+	{
+		ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][stencilOptions.writeMask == GMStencilOptions::Ox00 ? 1 : 0][stencilOptions.compareOp];
+		if (!state)
+		{
+			D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilOptions);
+			createDepthStencilState(desc, &state);
+		}
+
+		GM_ASSERT(state);
+		return state;
+	}
+
+private:
+	bool createDepthStencilState(const D3D11_DEPTH_STENCIL_DESC& desc, ID3D11DepthStencilState** out)
+	{
+		GM_DX_HR(engine->getDevice()->CreateDepthStencilState(&desc, out));
+		return !!(*out);
+	}
+
+private:
+	const GMContext* context = nullptr;
+	GMDx11GraphicEngine* engine = nullptr;
+	ID3D11DepthStencilState* states[2][2][3] = { 0 };
+};
+
+END_NS
+
+GMDx11Renderer::GMDx11Renderer(const GMContext* context)
+{
+	D(d);
+	d->context = context;
+
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	GM_ASSERT(!d->effect);
@@ -510,6 +528,15 @@ GMDx11Renderer::GMDx11Renderer()
 
 	d->deviceContext = getEngine()->getDeviceContext();
 	getVarBank().init(d->effect);
+}
+
+GMDx11Renderer::~GMDx11Renderer()
+{
+	D(d);
+	GM_delete(d->whiteTexture);
+	GM_delete(d->rasterizerStates);
+	GM_delete(d->blendStates);
+	GM_delete(d->depthStencilStates);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -576,6 +603,12 @@ void GMDx11Renderer::endModel()
 {
 }
 
+const GMContext* GMDx11Renderer::getContext()
+{
+	D(d);
+	return d->context;
+}
+
 void GMDx11Renderer::prepareScreenInfo()
 {
 	D(d);
@@ -583,18 +616,18 @@ void GMDx11Renderer::prepareScreenInfo()
 	if (!d->screenInfoPrepared)
 	{
 		GMDx11EffectVariableBank& bank = getVarBank();
-		const GMGameMachineRunningStates& runningStates = GM.getGameMachineRunningStates();
+		const GMWindowStates& windowStates = getContext()->window->getWindowStates();
 		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo);
 		GM_ASSERT(screenInfo->IsValid());
 
 		ID3DX11EffectScalarVariable* screenWidth = bank.ScreenWidth();
-		GM_DX_HR(screenWidth->SetInt(runningStates.renderRect.width));
+		GM_DX_HR(screenWidth->SetInt(windowStates.renderRect.width));
 
 		ID3DX11EffectScalarVariable* screenHeight = bank.ScreenHeight();
-		GM_DX_HR(screenHeight->SetInt(runningStates.renderRect.height));
+		GM_DX_HR(screenHeight->SetInt(windowStates.renderRect.height));
 
 		ID3DX11EffectScalarVariable* multisampling = bank.ScreenMultiSampling();
-		GM_DX_HR(multisampling->SetBool(runningStates.sampleCount > 1));
+		GM_DX_HR(multisampling->SetBool(windowStates.sampleCount > 1));
 		d->screenInfoPrepared = true;
 	}
 }
@@ -778,17 +811,20 @@ void GMDx11Renderer::prepareLights()
 void GMDx11Renderer::prepareRasterizer(GMModel* model)
 {
 	D(d);
-	bool multisampleEnable = GM.getGameMachineRunningStates().sampleCount > 1;
+	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	bool multisampleEnable = windowStates.sampleCount > 1;
 	if (!d->rasterizer)
 	{
 		d->rasterizer = d->effect->GetVariableByName(GM_VariablesDesc.RasterizerState)->AsRasterizer();
 	}
 
-	GMDx11RasterizerStates& rasterStates = GMDx11RasterizerStates::instance();
+	if (!d->rasterizerStates)
+		d->rasterizerStates = new GMDx11RasterizerStates(getContext());
+
 	GM_ASSERT(d->rasterizer);
 	GM_DX_HR(d->rasterizer->SetRasterizerState(
 		0, 
-		rasterStates.getRasterStates(model->getShader().getFrontFace(), model->getShader().getCull())
+		d->rasterizerStates->getRasterStates(model->getShader().getFrontFace(), model->getShader().getCull())
 	));
 }
 
@@ -821,7 +857,9 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 	GM_ASSERT(d->blend);
 
 	const GMDx11GlobalBlendStateDesc& globalBlendState = getEngine()->getGlobalBlendState();
-	GMDx11BlendStates& blendStates = GMDx11BlendStates::instance();
+	if (!d->blendStates)
+		d->blendStates = new GMDx11BlendStates(getContext());
+
 	if (globalBlendState.enabled)
 	{
 		// 全局blend开启时
@@ -829,14 +867,14 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				blendStates.getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
+				d->blendStates->getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
 			));
 		}
 		else
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				blendStates.getBlendState(true, globalBlendState.source, globalBlendState.dest)
+				d->blendStates->getBlendState(true, globalBlendState.source, globalBlendState.dest)
 			));
 		}
 	}
@@ -847,14 +885,14 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				blendStates.getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
+				d->blendStates->getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
 			));
 		}
 		else
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				blendStates.getDisabledBlendState()
+				d->blendStates->getDisabledBlendState()
 			));
 		}
 	}
@@ -869,10 +907,12 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 	}
 	GM_ASSERT(d->depthStencil);
 
-	GMDx11DepthStencilStates& depthStencilStates = GMDx11DepthStencilStates::instance();
+	if (!d->depthStencilStates)
+		d->depthStencilStates = new GMDx11DepthStencilStates(getContext());
+
 	GM_DX_HR(d->depthStencil->SetDepthStencilState(
 		0,
-		depthStencilStates.getDepthStencilState(
+		d->depthStencilStates->getDepthStencilState(
 			!model->getShader().getNoDepthTest(),
 			getEngine()->getStencilOptions()
 		)
@@ -994,7 +1034,8 @@ void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
 	}
 }
 
-GMDx11Renderer_Filter::GMDx11Renderer_Filter()
+GMDx11Renderer_Filter::GMDx11Renderer_Filter(const GMContext* context)
+	: GMDx11Renderer(context)
 {
 	setHDR(getEngine()->getShaderProgram());
 }
@@ -1013,6 +1054,7 @@ void GMDx11Renderer_Filter::draw(GMModel* model)
 void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 {
 	D_BASE(d, Base);
+	const GMWindowStates& windowStates = d->context->window->getWindowStates();
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
@@ -1021,7 +1063,7 @@ void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 		GMDx11Texture* filterTexture = gm_cast<GMDx11Texture*>(model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient).getFrameByIndex(0));
 		GM_ASSERT(filterTexture);
 		ID3DX11EffectPass* pass = getTechnique()->GetPassByIndex(p);
-		if (GM.getGameMachineRunningStates().sampleCount == 1)
+		if (windowStates.sampleCount == 1)
 		{
 			GM_DX_HR(d->effect->GetVariableByName("GM_FilterTexture")->AsShaderResource()->SetResource(filterTexture->getResourceView()));
 		}
@@ -1148,6 +1190,7 @@ void GMDx11Renderer_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
+	const GMWindowStates& windowStates = d->context->window->getWindowStates();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	if (!d->inputLayout)
@@ -1200,6 +1243,6 @@ void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* pa
 	GM_DX_HR(shadowMapWidth->SetInt(shadowFramebuffers->getShadowMapWidth()));
 	GM_DX_HR(shadowMapHeight->SetInt(shadowFramebuffers->getShadowMapHeight()));
 
-	ID3DX11EffectShaderResourceVariable* shadowMap = GM.getGameMachineRunningStates().sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
+	ID3DX11EffectShaderResourceVariable* shadowMap = windowStates.sampleCount > 1 ? bank.ShadowMapMSAA() : bank.ShadowMap();
 	GM_DX_HR(shadowMap->SetResource(shadowFramebuffers->getShadowMapShaderResourceView()));
 }

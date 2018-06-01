@@ -8,16 +8,13 @@
 #include "gmdxincludes.h"
 #include "gmdx11helper.h"
 
-GMDx11GlyphManager::GMDx11GlyphManager()
-{
-}
-
 ITexture* GMDx11GlyphManager::glyphTexture()
 {
 	D(d);
+	D_BASE(db, Base);
 	if (!d->texture)
 	{
-		d->texture.reset(new GMDx11GlyphTexture());
+		d->texture.reset(new GMDx11GlyphTexture(db->context));
 		d->texture->init();
 	}
 	return d->texture;
@@ -29,7 +26,7 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	D_BASE(db, Base);
 	if (!d->deviceContext)
 	{
-		GM.getGraphicEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+		db->context->engine->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 		GM_ASSERT(d->deviceContext);
 	}
 
@@ -55,8 +52,8 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	);
 }
 
-GMDx11GlyphTexture::GMDx11GlyphTexture()
-	: GMDx11Texture(nullptr)
+GMDx11GlyphTexture::GMDx11GlyphTexture(const GMContext* context)
+	: GMDx11Texture(context, nullptr)
 {
 }
 

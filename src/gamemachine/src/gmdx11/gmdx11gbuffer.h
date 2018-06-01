@@ -9,7 +9,7 @@ class GMGameObject;
 class GMDx11GBuffer : public GMGBuffer
 {
 public:
-	GMDx11GBuffer(GMGraphicEngine* engine);
+	GMDx11GBuffer(const GMContext* context);
 
 public:
 	virtual void geometryPass(const List<GMGameObject*>& objects) override;

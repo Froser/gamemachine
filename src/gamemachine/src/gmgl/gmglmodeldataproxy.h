@@ -18,7 +18,7 @@ class GMGLModelDataProxy : public GMModelDataProxy
 	DECLARE_PRIVATE_AND_BASE(GMGLModelDataProxy, GMModelDataProxy)
 
 public:
-	GMGLModelDataProxy(IGraphicEngine* engine, GMModel* objs);
+	GMGLModelDataProxy(const GMContext* context, GMModel* objs);
 
 public:
 	virtual void transfer() override;

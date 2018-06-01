@@ -28,6 +28,7 @@ typedef Map<GMint, Map<GMwchar, GMGlyphInfo>> CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
+	const GMContext* context = nullptr;
 	CharList chars;
 	GMint cursor_u, cursor_v;
 	GMfloat maxHeight;
@@ -46,7 +47,7 @@ public:
 	};
 
 public:
-	GMGlyphManager() = default;
+	GMGlyphManager(const GMContext* context);
 	virtual ~GMGlyphManager() {}
 
 public:

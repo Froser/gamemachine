@@ -42,13 +42,14 @@ struct GMToolUtil
 	//! 创建一个纹理，它来源于某路径。
 	/*!
 	  此方法封装了纹理读取和添加纹理等方法。请在调用前确认GMGamePackage已经初始化。
+	  \param context 当前绘制环境上下文。
 	  \param filename 需要读取纹理的路径。它是一个相对于纹理目录的相对路径。
 	  \param texture 得到的纹理将通过此指针返回。
 	  \param width 纹理首层的宽度。可以为空。
 	  \param height 纹理首层的高度。可以为空。
 	  \sa GMGamePackage
 	*/
-	static void createTexture(const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
+	static void createTexture(const GMContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
 	//! 将一个纹理添加到一个模型中。
 	/*!
@@ -60,6 +61,7 @@ struct GMToolUtil
 	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type);
 
 	static bool createPBRTextures(
+		const GMContext* context,
 		const GMString& albedoPath,
 		const GMString& metallicPath,
 		const GMString& roughnessPath,

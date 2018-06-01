@@ -7,6 +7,10 @@ BEGIN_NS
 
 class GMDx11Renderer_CubeMap;
 class GMModel;
+struct GMDx11RasterizerStates;
+struct GMDx11BlendStates;
+struct GMDx11DepthStencilStates;
+
 struct GMDx11CubeMapState
 {
 	bool hasCubeMap = false;
@@ -25,6 +29,8 @@ struct GMTextureAttributeBank
 
 GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
+	const GMContext* context = nullptr;
+	ITexture* whiteTexture = nullptr;
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
 	ID3D11DeviceContext* deviceContext = nullptr;
@@ -37,22 +43,27 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	bool screenInfoPrepared = false;
 	GMComPtr<ID3D11Resource> shadowMapResource;
+	GMDx11RasterizerStates* rasterizerStates = nullptr;
+	GMDx11BlendStates* blendStates = nullptr;
+	GMDx11DepthStencilStates* depthStencilStates = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMfloat gamma = 0;
 };
 
-class GMDx11Renderer : public GMObject, public IRenderer
+class GMDx11Renderer : public GMObject, public IRenderer, public IContext
 {
 	DECLARE_PRIVATE(GMDx11Renderer)
 
 public:
-	GMDx11Renderer();
+	GMDx11Renderer(const GMContext* context);
+	~GMDx11Renderer();
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;
 	virtual void endModel() override;
 	virtual void draw(GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
+	virtual const GMContext* getContext() override;
 
 public:
 	inline ID3DX11Effect* getEffect()
@@ -66,7 +77,7 @@ protected:
 	{
 		D(d);
 		if (!d->engine)
-			d->engine = gm_cast<GMDx11GraphicEngine*>(GM.getGraphicEngine());
+			d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->engine);
 		return d->engine;
 	}
 
@@ -88,10 +99,17 @@ protected:
 
 public:
 	static GMDx11CubeMapState& getCubeMapState();
+
+private:
+	ITexture* getWhiteTexture();
 };
 
 class GMDx11Renderer_3D : public GMDx11Renderer
 {
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_3D";
@@ -100,6 +118,10 @@ class GMDx11Renderer_3D : public GMDx11Renderer
 
 class GMDx11Renderer_2D : public GMDx11Renderer
 {
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_2D";
@@ -110,6 +132,10 @@ class GMDx11Renderer_2D : public GMDx11Renderer
 
 class GMDx11Renderer_Text : public GMDx11Renderer
 {
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_Text";
@@ -118,6 +144,10 @@ class GMDx11Renderer_Text : public GMDx11Renderer
 
 class GMDx11Renderer_CubeMap : public GMDx11Renderer
 {
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_CubeMap";
@@ -142,7 +172,7 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 	DECLARE_PRIVATE_AND_BASE(GMDx11Renderer_Filter, GMDx11Renderer)
 
 public:
-	GMDx11Renderer_Filter();
+	GMDx11Renderer_Filter(const GMContext* context);
 
 private:
 	virtual const char* getTechniqueName() override
@@ -159,6 +189,10 @@ private:
 
 class GMDx11Renderer_Deferred_3D: public GMDx11Renderer
 {
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_Deferred_3D";
@@ -169,6 +203,10 @@ class GMDx11Renderer_Deferred_3D: public GMDx11Renderer
 
 class GMDx11Renderer_Deferred_3D_LightPass : public GMDx11Renderer
 {
+public:
+	using GMDx11Renderer::GMDx11Renderer;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_Deferred_3D_LightPass";
@@ -183,6 +221,10 @@ private:
 
 class GMDx11Renderer_3D_Shadow : public GMDx11Renderer_3D
 {
+public:
+	using GMDx11Renderer_3D::GMDx11Renderer_3D;
+
+protected:
 	virtual const char* getTechniqueName() override
 	{
 		return "GMTech_3D_Shadow";

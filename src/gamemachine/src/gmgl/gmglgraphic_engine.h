@@ -40,6 +40,14 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
 	GMGLShaderProgram* filterShaderProgram = nullptr;
 
+	// 渲染器
+	IRenderer* renderer_2d;
+	IRenderer* renderer_3d;
+	IRenderer* renderer_cubeMap;
+	IRenderer* renderer_filter;
+	IRenderer* renderer_lightPass;
+	IRenderer* renderer_3d_shadow;
+
 	ITexture* cubeMap = nullptr;
 	GMGLLightContext lightContext;
 
@@ -54,6 +62,7 @@ class GMGLGraphicEngine : public GMGraphicEngine
 	DECLARE_PRIVATE_AND_BASE(GMGLGraphicEngine, GMGraphicEngine)
 
 public:
+	GMGLGraphicEngine(const GMContext* context);
 	~GMGLGraphicEngine();
 
 public:
@@ -66,6 +75,7 @@ public:
 	virtual bool event(const GMMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;
 	virtual IRenderer* getRenderer(GMModelType objectType) override;
+	virtual GMGlyphManager* getGlyphManager() override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID, void**) { return false; }

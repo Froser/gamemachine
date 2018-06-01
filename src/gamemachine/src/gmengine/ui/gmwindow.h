@@ -11,6 +11,9 @@ GM_PRIVATE_OBJECT(GMWindow)
 	IInput* input = nullptr;
 	IGameHandler* handler = nullptr;
 	Vector<GMWidget*> widgets;
+	GMWindowStates windowStates;
+	IGraphicEngine* engine = nullptr;
+	GMContext* context = nullptr;
 };
 
 class GMWindow : public GMObject, public IWindow
@@ -34,6 +37,8 @@ public:
 	virtual bool addWidget(GMWidget* widget) override;
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
 	virtual IGameHandler* getHandler() override;
+	virtual const GMWindowStates& getWindowStates() override;
+	virtual const GMContext* getContext() override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;

@@ -147,6 +147,8 @@ void Demo_Collision::setDefaultLights()
 	D(d);
 	if (isInited())
 	{
+		const gm::GMWindowStates& windowStates = GM.getGraphicEngine()->getCurrentWindow()->getWindowStates();
+
 		{
 			gm::ILight* light = nullptr;
 			GM.getFactory()->createLight(gm::GMLightType::Ambient, &light);
@@ -174,8 +176,8 @@ void Demo_Collision::setDefaultLights()
 			desc.type = gm::GMShadowSourceDesc::DirectShadow;
 			desc.camera = GM.getCamera();
 			desc.biasMax = desc.biasMin = 0.0005f;
-			desc.width = GM.getGameMachineRunningStates().renderRect.width * 2;
-			desc.height = GM.getGameMachineRunningStates().renderRect.height * 2;
+			desc.width = windowStates.renderRect.width * 2;
+			desc.height = windowStates.renderRect.height * 2;
 
 			gm::GMCameraLookAt lookAt;
 			desc.camera.lookAt(gm::GMCameraLookAt::makeLookAt(desc.position, GMVec3(0, 0, 0)));
@@ -194,7 +196,7 @@ void Demo_Collision::onDeactivate()
 void Demo_Collision::onWindowActivate()
 {
 	D(d);
-	gm::IInput* input = GM.getMainWindow()->getInputMananger();
+	gm::IInput* input = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 	auto& ms = input->getMouseState().mouseState();
 	gm::GMCamera& camera = GM.getCamera();
 
