@@ -8,6 +8,7 @@
 #include <gmgraphicengine.h>
 BEGIN_NS
 
+class GMDx11Renderer_CubeMap;
 struct GMMVPMatrix;
 struct GMDx11GlobalBlendStateDesc
 {
@@ -15,6 +16,13 @@ struct GMDx11GlobalBlendStateDesc
 	GMS_BlendFunc source;
 	GMS_BlendFunc dest;
 	GMint blendRefCount = 0;
+};
+
+struct GMDx11CubeMapState
+{
+	bool hasCubeMap = false;
+	GMDx11Renderer_CubeMap* cubeMapRenderer = nullptr;
+	GMModel* model = nullptr;
 };
 
 class GMDx11Framebuffers;
@@ -28,7 +36,8 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMComPtr<ID3D11Texture2D> depthStencilTexture;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMScopePtr<IShaderProgram> shaderProgram;
-	
+	GMDx11CubeMapState cubemapState;
+
 	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
 	bool lightDirty = true;
@@ -49,6 +58,7 @@ class GMDx11GraphicEngine : public GMGraphicEngine
 
 public:
 	GMDx11GraphicEngine(const GMContext* context);
+	~GMDx11GraphicEngine();
 
 public:
 	virtual void init() override;
@@ -71,6 +81,12 @@ public:
 	virtual void activateLights(IRenderer* renderer);
 
 public:
+	inline GMDx11CubeMapState& getCubeMapState()
+	{
+		D(d);
+		return d->cubemapState;
+	}
+
 	inline ID3D11Device* getDevice()
 	{
 		D(d);

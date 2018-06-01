@@ -284,6 +284,7 @@ namespace
 #define EFFECT_MEMBER_AS_VECTOR(funcName, effect, name) \
 	EFFECT_MEMBER_AS(funcName, effect, name, ID3DX11EffectVectorVariable, AsVector)
 
+BEGIN_NS
 class GMDx11EffectVariableBank
 {
 public:
@@ -326,17 +327,14 @@ public:
 private:
 	ID3DX11Effect* m_effect = nullptr;
 };
+END_NS
 
-GMDx11EffectVariableBank& getVarBank()
+GMDx11EffectVariableBank& GMDx11Renderer::getVarBank()
 {
-	static GMDx11EffectVariableBank bank;
-	return bank;
-}
-
-GMDx11CubeMapState& GMDx11Renderer::getCubeMapState()
-{
-	static GMDx11CubeMapState cms;
-	return cms;
+	D(d);
+	if (!d->bank)
+		d->bank = new GMDx11EffectVariableBank();
+	return *d->bank;
 }
 
 ITexture* GMDx11Renderer::getWhiteTexture()
@@ -537,6 +535,7 @@ GMDx11Renderer::~GMDx11Renderer()
 	GM_delete(d->rasterizerStates);
 	GM_delete(d->blendStates);
 	GM_delete(d->depthStencilStates);
+	GM_delete(d->bank);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -664,7 +663,7 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 		}
 	}
 
-	const GMDx11CubeMapState& cubeMapState = getCubeMapState();
+	const GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 	if (cubeMapState.hasCubeMap)
 	{
 		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);
@@ -1024,7 +1023,7 @@ void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
 	{
 		texture->bindSampler(&model->getShader().getTextureList().getTextureSampler(GMTextureType::CubeMap));
 		texture->useTexture((GMint)GMTextureType::CubeMap);
-		GMDx11CubeMapState& cubeMapState = getCubeMapState();
+		GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 		if (cubeMapState.model != model)
 		{
 			cubeMapState.hasCubeMap = true;
@@ -1179,7 +1178,7 @@ void GMDx11Renderer_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 	GMDx11GBuffer* gbuffer = gm_cast<GMDx11GBuffer*>(getEngine()->getGBuffer());
 	gbuffer->useGeometryTextures(d->effect);
 
-	const GMDx11CubeMapState& cubeMapState = getCubeMapState();
+	const GMDx11CubeMapState& cubeMapState = getEngine()->getCubeMapState();
 	if (cubeMapState.hasCubeMap)
 	{
 		GM_ASSERT(cubeMapState.model && cubeMapState.cubeMapRenderer);

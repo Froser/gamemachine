@@ -70,7 +70,7 @@ int WINAPI wWinMain(
 	mainWindow2->create(mainAttrs);
 	mainWindow2->centerWindow();
 	mainWindow2->showWindow();
-	mainWindow2->setHandler(new DemostrationEntrance(mainWindow));
+	mainWindow2->setHandler(new DemostrationEntrance(mainWindow2));
 	GM.addWindow(mainWindow2);
 
 	GM.init(

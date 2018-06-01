@@ -7,16 +7,11 @@ BEGIN_NS
 
 class GMDx11Renderer_CubeMap;
 class GMModel;
+class GMDx11EffectVariableBank;
+struct GMDx11CubeMapState;
 struct GMDx11RasterizerStates;
 struct GMDx11BlendStates;
 struct GMDx11DepthStencilStates;
-
-struct GMDx11CubeMapState
-{
-	bool hasCubeMap = false;
-	GMDx11Renderer_CubeMap* cubeMapRenderer = nullptr;
-	GMModel* model = nullptr;
-};
 
 struct GMTextureAttributeBank
 {
@@ -48,6 +43,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	GMDx11DepthStencilStates* depthStencilStates = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMfloat gamma = 0;
+	GMDx11EffectVariableBank* bank = nullptr;
 };
 
 class GMDx11Renderer : public GMObject, public IRenderer, public IContext
@@ -96,9 +92,7 @@ protected:
 	ID3DX11EffectTechnique* getTechnique();
 	ITexture* getTexture(GMTextureSampler& sampler);
 	void setGamma(IShaderProgram* shaderProgram);
-
-public:
-	static GMDx11CubeMapState& getCubeMapState();
+	GMDx11EffectVariableBank& getVarBank();
 
 private:
 	ITexture* getWhiteTexture();

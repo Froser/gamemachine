@@ -28,6 +28,10 @@ GMDx11GraphicEngine::GMDx11GraphicEngine(const GMContext* context)
 {
 }
 
+GMDx11GraphicEngine::~GMDx11GraphicEngine()
+{
+}
+
 void GMDx11GraphicEngine::init()
 {
 	D(d);
@@ -50,7 +54,7 @@ void GMDx11GraphicEngine::update(GMUpdateDataType type)
 		break;
 	case GMUpdateDataType::TurnOffCubeMap:
 	{
-		GMDx11CubeMapState& state = GMDx11Renderer::getCubeMapState();
+		GMDx11CubeMapState& state = getCubeMapState();
 		state.hasCubeMap = false;
 		state.cubeMapRenderer = nullptr;
 		state.model = nullptr;
