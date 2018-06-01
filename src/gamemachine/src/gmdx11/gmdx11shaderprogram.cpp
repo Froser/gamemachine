@@ -104,7 +104,7 @@ ID3DX11EffectMatrixVariable* GMDx11EffectShaderProgram::getMatrixVariable(const 
 {
 	D(d);
 	auto& container = d->matrices;
-	decltype(container.find("")) iter = container.find(name);
+	auto iter = container.find(name);
 	if (iter == container.end())
 	{
 		ID3DX11EffectMatrixVariable* var = d->effect->GetVariableByName(name)->AsMatrix();

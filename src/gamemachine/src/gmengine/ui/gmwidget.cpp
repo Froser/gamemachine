@@ -68,10 +68,14 @@ GMWidgetResourceManager::GMWidgetResourceManager(const GMContext* context)
 	mesh->vertex(GMVertex());
 
 	d->screenQuad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->screenQuadModel));
+	d->screenQuad->setContext(getContext());
 	GM.createModelDataProxyAndTransfer(d->context, d->screenQuadModel);
 
 	d->textObject = new GMTextGameObject(context->window->getRenderRect());
+	d->textObject->setContext(getContext());
+
 	d->spriteObject = new GMSprite2DGameObject(context->window->getRenderRect());
+	d->spriteObject->setContext(getContext());
 }
 
 GMWidgetResourceManager::~GMWidgetResourceManager()
@@ -239,7 +243,7 @@ void GMWidget::drawText(
 	textObject->setText(text);
 	textObject->setGeometry(rc);
 	textObject->setCenter(center);
-	textObject->draw(d->manager->getContext());
+	textObject->draw();
 }
 
 void GMWidget::drawSprite(
@@ -265,7 +269,7 @@ void GMWidget::drawSprite(
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(style.getTextureColor().getCurrent());
-	spriteObject->draw(d->manager->getContext());
+	spriteObject->draw();
 }
 
 void GMWidget::requestFocus(GMControl* control)
@@ -467,7 +471,7 @@ void GMWidget::render(GMfloat elpasedTime)
 		proxy->endUpdateBuffer();
 
 		// 开始绘制背景
-		d->manager->getScreenQuad()->draw(d->manager->getContext());
+		d->manager->getScreenQuad()->draw();
 	}
 
 	// TODO getTextureNode

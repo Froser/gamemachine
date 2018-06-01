@@ -7,6 +7,7 @@ GM_PRIVATE_OBJECT(GMDx11Light)
 {
 	GMfloat position[4];
 	GMfloat color[4];
+	ID3DX11Effect* effect = nullptr;
 };
 
 class GMDx11Light : public GMObject, public ILight

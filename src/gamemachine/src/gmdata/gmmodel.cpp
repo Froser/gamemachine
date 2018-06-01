@@ -128,6 +128,8 @@ GMModelBuffer::GMModelBuffer()
 {
 	D(d);
 	d->ref = 1;
+	// 创建一个空的proxy，用于dispose
+	// 它本身不会包含任何数据
 	GM.getFactory()->createModelDataProxy(nullptr, nullptr, &d->modelDataProxy);
 }
 

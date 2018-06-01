@@ -63,12 +63,12 @@ GMGameWorld* GMGameObject::getWorld()
 	return d->world;
 }
 
-void GMGameObject::draw(const GMContext* context)
+void GMGameObject::draw()
 {
 	GMModels models = getModels();
 	for (auto model : models)
 	{
-		drawModel(context, model);
+		drawModel(getContext(), model);
 	}
 }
 
@@ -81,6 +81,12 @@ bool GMGameObject::canDeferredRendering()
 			return false;
 	}
 	return true;
+}
+
+const GMContext* GMGameObject::getContext()
+{
+	D(d);
+	return d->context;
 }
 
 void GMGameObject::drawModel(const GMContext* context, GMModel* model)

@@ -102,7 +102,7 @@ public:
 
 public:
 	virtual void onAppendingObjectToWorld() override;
-	virtual void draw(const GMContext* context) override;
+	virtual void draw() override;
 
 private:
 	void update();
@@ -136,7 +136,7 @@ public:
 	~GMSprite2DGameObject();
 
 public:
-	virtual void draw(const GMContext* context) override;
+	virtual void draw() override;
 
 public:
 	void setDepth(GMint depth);

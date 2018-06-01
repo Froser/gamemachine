@@ -210,6 +210,8 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 	GM_ASSERT(hwnd);
 
 	onWindowCreated(wndAttrs, hwnd);
+
+	d->windowStates.renderRect = getRenderRect();
 	return hwnd;
 }
 

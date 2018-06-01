@@ -34,20 +34,20 @@ const GMfloat* GMDx11Light::getLightColor() const
 
 void GMDx11Light::activateLight(GMuint index, IRenderer* renderer)
 {
-	static ID3DX11Effect* s_effect = nullptr;
-	if (!s_effect)
+	D(d);
+	if (!d->effect)
 	{
 		GMDx11Renderer* dxRenderer = gm_cast<GMDx11Renderer*>(renderer);
-		s_effect = dxRenderer->getEffect();
-		GM_ASSERT(s_effect);
+		d->effect = dxRenderer->getEffect();
+		GM_ASSERT(d->effect);
 	}
 
 #if _DEBUG
 	GMDx11Renderer* dxRenderer = gm_cast<GMDx11Renderer*>(renderer);
-	GM_ASSERT(s_effect == dxRenderer->getEffect());
+	GM_ASSERT(d->effect == dxRenderer->getEffect());
 #endif
 
-	static ID3DX11EffectVariable* lightAttributes = s_effect->GetVariableByName("GM_LightAttributes");
+	static ID3DX11EffectVariable* lightAttributes = d->effect->GetVariableByName("GM_LightAttributes");
 	GM_ASSERT(lightAttributes->IsValid());
 
 	ID3DX11EffectVariable* lightStruct = lightAttributes->GetElement(index);

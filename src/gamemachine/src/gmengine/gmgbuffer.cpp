@@ -31,6 +31,7 @@ void GMGBuffer::createQuad()
 	d->quadModel->setType(GMModelType::LightPassQuad);
 	GM.createModelDataProxyAndTransfer(d->context, d->quadModel);
 	d->quad = new GMGameObject(GMAssets::createIsolatedAsset(GMAssetType::Model, d->quadModel));
+	d->quad->setContext(d->context);
 }
 
 void GMGBuffer::init()

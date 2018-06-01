@@ -11,7 +11,8 @@ GMDx11ModelDataProxy::GMDx11ModelDataProxy(const GMContext* context, GMModel* mo
 	: GMModelDataProxy(context, model)
 {
 	D(d);
-	d->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+	if (context)
+		d->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
 }
 
 bool GMDx11ModelDataProxy::getInterface(GameMachineInterfaceID id, void** out)

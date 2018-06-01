@@ -63,7 +63,7 @@ void GM2DGameObjectBase::setGeometry(const GMRect& geometry)
 
 void GM2DGameObjectBase::setShader(GMShader& shader)
 {
-	GMGlyphManager* glyphManager = getWorld()->getContext()->engine->getGlyphManager();
+	GMGlyphManager* glyphManager = getContext()->engine->getGlyphManager();
 	auto& frame = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	frame.setMinFilter(GMS_TextureFilter::LINEAR);
 	frame.setMagFilter(GMS_TextureFilter::LINEAR);
@@ -78,8 +78,6 @@ void GM2DGameObjectBase::setShader(GMShader& shader)
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc)
 	: GM2DGameObjectBase(renderRc)
 {
-	D(d);
-	d->typoEngine = new GMTypoEngine(getWorld()->getContext());
 }
 
 GMTextGameObject::GMTextGameObject(const GMRect& renderRc, ITypoEngine* typo)
@@ -151,15 +149,16 @@ void GMTextGameObject::setCenter(bool center)
 
 void GMTextGameObject::onAppendingObjectToWorld()
 {
+	D(d);
 	update();
 	GMGameObject::onAppendingObjectToWorld();
 }
 
-void GMTextGameObject::draw(const GMContext* context)
+void GMTextGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(context, d->model);
+	drawModel(getContext(), d->model);
 }
 
 void GMTextGameObject::update()
@@ -198,13 +197,16 @@ GMModel* GMTextGameObject::createModel()
 	{
 		mesh->vertex(GMVertex());
 	}
-	GM.createModelDataProxyAndTransfer(getWorld()->getContext(), model);
+	GM.createModelDataProxyAndTransfer(getContext(), model);
 	return model;
 }
 
 void GMTextGameObject::updateVertices(GMModel* model)
 {
 	D(d);
+	if (!d->typoEngine)
+		d->typoEngine = new GMTypoEngine(getContext());
+
 	constexpr GMfloat Z = 0;
 	const GMRect& rect = getRenderRect();
 	GMRectF coord = toViewportRect(getGeometry(), getRenderRect());
@@ -309,11 +311,11 @@ GMSprite2DGameObject::~GMSprite2DGameObject()
 	GM_delete(d->model);
 }
 
-void GMSprite2DGameObject::draw(const GMContext* context)
+void GMSprite2DGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(context, d->model);
+	drawModel(getContext(), d->model);
 }
 
 void GMSprite2DGameObject::setDepth(GMint depth)
@@ -409,7 +411,7 @@ GMModel* GMSprite2DGameObject::createModel()
 	{
 		mesh->vertex(GMVertex());
 	}
-	GM.createModelDataProxyAndTransfer(getWorld()->getContext(), model);
+	GM.createModelDataProxyAndTransfer(getContext(), model);
 	return model;
 }
 

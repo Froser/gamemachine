@@ -66,8 +66,8 @@ void GameMachine::init(
 	handleMessages();
 	updateGameMachineRunningStates();
 
-	eachHandler([=](auto, auto handler) {
-		handler->init(mainWindow->getContext());
+	eachHandler([=](auto window, auto handler) {
+		handler->init(window->getContext());
 	});
 }
 

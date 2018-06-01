@@ -90,7 +90,7 @@ void GMGLGBuffer::lightPass()
 {
 	D(d);
 	GM_ASSERT(getQuad());
-	getQuad()->draw(d->context);
+	getQuad()->draw();
 }
 
 void GMGLGBuffer::drawGeometryBuffer(GMuint index, const GMRect& rect)

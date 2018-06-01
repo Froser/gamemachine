@@ -41,6 +41,7 @@ void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
 	obj->setWorld(this);
+	obj->setContext(getContext());
 	obj->onAppendingObjectToWorld();
 	d->gameObjects.insert(obj);
 	GMModels& models = obj->getModels();

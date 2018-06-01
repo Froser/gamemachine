@@ -12,8 +12,8 @@ namespace
 
 GM_PRIVATE_OBJECT(GMWindow_Dx11)
 {
-	GMComPtr<ID3D11Device> device;
-	GMComPtr<ID3D11DeviceContext> deviceContext;
+	static GMComPtr<ID3D11Device> device;
+	static GMComPtr<ID3D11DeviceContext> deviceContext;
 	GMComPtr<IDXGISwapChain> swapChain;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11Texture2D> depthStencilTexture;
@@ -23,6 +23,9 @@ GM_PRIVATE_OBJECT(GMWindow_Dx11)
 	bool vsync = true; //默认开启垂直同步
 	DXGI_MODE_DESC* modes = nullptr;
 };
+
+GMComPtr<ID3D11Device> GM_PRIVATE_NAME(GMWindow_Dx11)::device;
+GMComPtr<ID3D11DeviceContext> GM_PRIVATE_NAME(GMWindow_Dx11)::deviceContext;
 
 class GMWindow_Dx11 : public GMWindow
 {
@@ -105,11 +108,10 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	GMMessage msg;
 
 	// COM objs
-	GMComPtr<IDXGIFactory> dxgiFactory;
-	GMComPtr<IDXGIAdapter> dxgiAdapter;
-	GMComPtr<IDXGIOutput> dxgiAdapterOutput;
+	static GMComPtr<IDXGIFactory> dxgiFactory;
+	static GMComPtr<IDXGIAdapter> dxgiAdapter;
+	static GMComPtr<IDXGIOutput> dxgiAdapterOutput;
 
-	GMComPtr<IDXGIDevice> dxgiDevice;
 	GMComPtr<ID3D11Texture2D> backBuffer;
 	GMComPtr<ID3D11DepthStencilState> depthStencilState;
 	GMComPtr<ID3D11RasterizerState> rasterizerState;
@@ -119,9 +121,13 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	GMuint numerator = 0, denominator = 0;
 
 	// 1.枚举设备属性
-	GM_DX_HR(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
-	GM_DX_HR(dxgiFactory->EnumAdapters(0, &dxgiAdapter));
-	GM_DX_HR(dxgiAdapter->EnumOutputs(0, &dxgiAdapterOutput));
+	if (!dxgiFactory || !dxgiAdapter || dxgiAdapterOutput)
+	{
+		GM_DX_HR(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dxgiFactory));
+		GM_DX_HR(dxgiFactory->EnumAdapters(0, &dxgiAdapter));
+		GM_DX_HR(dxgiAdapter->EnumOutputs(0, &dxgiAdapterOutput));
+	}
+
 	GMuint numModes;
 	GM_DX_HR(dxgiAdapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL));
 	d->modes = new DXGI_MODE_DESC[numModes];
@@ -175,18 +181,21 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	createFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
-	GM_DX_HR(D3D11CreateDevice(
-		NULL,
-		D3D_DRIVER_TYPE_HARDWARE,
-		NULL,
-		createFlags,
-		featureLevels,
-		GM_array_size(featureLevels),
-		D3D11_SDK_VERSION,
-		&d->device,
-		NULL,
-		&d->deviceContext)
-	);
+	if (!d->device || !d->deviceContext)
+	{
+		GM_DX_HR(D3D11CreateDevice(
+			NULL,
+			D3D_DRIVER_TYPE_HARDWARE,
+			NULL,
+			createFlags,
+			featureLevels,
+			GM_array_size(featureLevels),
+			D3D11_SDK_VERSION,
+			&d->device,
+			NULL,
+			&d->deviceContext)
+		);
+	}
 
 	UINT msaaQuality = 0;
 	GM_DX_HR(d->device->CheckMultisampleQualityLevels(
@@ -216,7 +225,6 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 		}
 	}
 
-
 	GM_DX_HR(dxgiFactory->CreateSwapChain(
 		d->device,
 		&sc,
@@ -226,8 +234,10 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	// 3.创建目标视图
 	GM_DX_HR(d->swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backBuffer)));
 
+	static GMint targetViewId = 0;
 	GM_DX_HR(d->device->CreateRenderTargetView(backBuffer, NULL, &d->renderTargetView));
-	GM_DX11_SET_OBJECT_NAME_A(d->renderTargetView, "GM_DefaultRenderTargetView");
+	GM_DX11_SET_OBJECT_NAME_A(d->renderTargetView, (GMString("GM_DefaultRenderTargetView_") + GMString(targetViewId)).toStdString().c_str());
+	++targetViewId;
 
 	// 4.创建深度模板缓存
 	ZeroMemory(&depthTextureDesc, sizeof(depthTextureDesc));
@@ -280,8 +290,9 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	d->deviceContext->RSSetViewports(1, &vp);
 
 	// 发送事件
+	GMContext* context = const_cast<GMContext*>(getContext());
 	msg.msgType = GameMachineMessageType::Dx11Ready;
-	msg.objPtr = static_cast<IQueriable*>(this);
+	msg.objPtr = static_cast<GMContext*>(context);
 	GM.postMessage(msg);
 }
 

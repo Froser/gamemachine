@@ -195,7 +195,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 		{
 			IFramebuffers* filterFramebuffers = getFilterFramebuffers();
 			filterFramebuffers->unbind();
-			getFilterQuad()->draw(d->context);
+			getFilterQuad()->draw();
 			gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(filterFramebuffers);
 		}
 		gBuffer->getGeometryFramebuffers()->copyDepthStencilFramebuffer(getDefaultFramebuffers());
@@ -215,7 +215,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& forwardRenderingObjects, c
 		if (needHDR() || filterMode != GMFilterMode::None)
 		{
 			filterFramebuffers->unbind();
-			getFilterQuad()->draw(d->context);
+			getFilterQuad()->draw();
 		}
 	}
 }
@@ -225,7 +225,7 @@ void GMGraphicEngine::draw(const List<GMGameObject*>& objects)
 	D(d);
 	for (auto object : objects)
 	{
-		object->draw(d->context);
+		object->draw();
 	}
 }
 
@@ -298,6 +298,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 		GM.createModelDataProxyAndTransfer(d->context, quad);
 		GMAsset asset = GMAssets::createIsolatedAsset(GMAssetType::Model, quad);
 		d->filterQuad = new GMGameObject(asset);
+		d->filterQuad->setContext(d->context);
 	}
 }
 

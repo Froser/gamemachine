@@ -193,22 +193,29 @@ bool GMDx11GraphicEngine::event(const GMMessage& e)
 	switch (e.msgType)
 	{
 	case GameMachineMessageType::Dx11Ready:
-		IQueriable* queriable = static_cast<IQueriable*>(e.objPtr);
-		bool b = false;
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
-		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
-		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11SwapChain, (void**)&d->swapChain);
-		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->depthStencilView);
-		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilTexture, (void**)&d->depthStencilTexture);
-		GM_ASSERT(b);
-		b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
-		GM_ASSERT(b);
-		d->ready = true;
-		return true;
+	{
+		const GMContext* context = static_cast<GMContext*>(e.objPtr);
+		if (context->engine == this)
+		{
+			IWindow* queriable = context->window;
+			bool b = false;
+			b = queriable->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
+			GM_ASSERT(b);
+			b = queriable->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+			GM_ASSERT(b);
+			b = queriable->getInterface(GameMachineInterfaceID::D3D11SwapChain, (void**)&d->swapChain);
+			GM_ASSERT(b);
+			b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&d->depthStencilView);
+			GM_ASSERT(b);
+			b = queriable->getInterface(GameMachineInterfaceID::D3D11DepthStencilTexture, (void**)&d->depthStencilTexture);
+			GM_ASSERT(b);
+			b = queriable->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->renderTargetView);
+			GM_ASSERT(b);
+			d->ready = true;
+			return true;
+		}
+		break;
+	}
 	}
 
 	return false;

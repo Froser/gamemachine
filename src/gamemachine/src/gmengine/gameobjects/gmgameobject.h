@@ -18,10 +18,11 @@ GM_PRIVATE_OBJECT(GMGameObject)
 	GMMat4 translation = Identity<GMMat4>();
 	GMQuat rotation = Identity<GMQuat>();
 	GMMat4 transformMatrix = Identity<GMMat4>();
+	const GMContext* context = nullptr;
 };
 
 struct GMAsset;
-class GMGameObject : public GMObject
+class GMGameObject : public GMObject, public IContext
 {
 	DECLARE_PRIVATE(GMGameObject)
 
@@ -39,10 +40,11 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() {}
 	virtual void onRemovingObjectFromWorld() {}
-	virtual void draw(const GMContext* context);
+	virtual void draw();
 	virtual void updateAfterSimulate() {}
 	virtual void simulate() {}
 	virtual bool canDeferredRendering();
+	virtual const GMContext* getContext();
 
 private:
 	inline void updateMatrix()
@@ -69,6 +71,7 @@ public:
 		d->physics = phyObj;
 		d->physics->setGameObject(this);
 	}
+	inline void setContext(const GMContext* context) { D(d); d->context = context; }
 };
 
 // GMSkyObject

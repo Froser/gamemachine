@@ -50,7 +50,7 @@ void GMDx11GBuffer::lightPass()
 {
 	D(d);
 	GM_ASSERT(getQuad());
-	getQuad()->draw(d->context);
+	getQuad()->draw();
 }
 
 void GMDx11GBuffer::useGeometryTextures(ID3DX11Effect* effect)
