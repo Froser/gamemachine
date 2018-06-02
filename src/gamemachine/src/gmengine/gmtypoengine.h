@@ -115,7 +115,7 @@ private:
 GM_PRIVATE_OBJECT(GMTypoEngine)
 {
 	GMTypoStateMachine* stateMachine = nullptr;
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	bool insetStateMachine = false;
 
 	GMGlyphManager* glyphManager = nullptr;
@@ -137,8 +137,8 @@ class GMTypoEngine : public GMObject, public ITypoEngine
 	DECLARE_PRIVATE(GMTypoEngine);
 
 public:
-	GMTypoEngine(const GMContext* context);
-	GMTypoEngine(const GMContext* context, AUTORELEASE GMTypoStateMachine* stateMachine);
+	GMTypoEngine(const IRenderContext* context);
+	GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStateMachine* stateMachine);
 	~GMTypoEngine();
 
 public:

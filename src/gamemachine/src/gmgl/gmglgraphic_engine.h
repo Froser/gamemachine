@@ -62,7 +62,7 @@ class GMGLGraphicEngine : public GMGraphicEngine
 	DECLARE_PRIVATE_AND_BASE(GMGLGraphicEngine, GMGraphicEngine)
 
 public:
-	GMGLGraphicEngine(const GMContext* context);
+	GMGLGraphicEngine(const IRenderContext* context);
 	~GMGLGraphicEngine();
 
 public:

@@ -16,7 +16,7 @@ class GMDx11GlyphTexture : public GMDx11Texture
 	DECLARE_PRIVATE_AND_BASE(GMDx11GlyphTexture, GMDx11Texture)
 
 public:
-	GMDx11GlyphTexture(const GMContext* context);
+	GMDx11GlyphTexture(const IRenderContext* context);
 
 public:
 	virtual void init() override;

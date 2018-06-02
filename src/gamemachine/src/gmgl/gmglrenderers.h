@@ -17,8 +17,10 @@ private:
 
 GM_PRIVATE_OBJECT(GMGLRenderer)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	GMGLGraphicEngine* engine = nullptr;
+	IShaderProgram* lastShaderProgram_camera = nullptr;
+	IShaderProgram* lastShaderProgram_screenInfo = nullptr;
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	GMDebugConfig debugConfig;
 	GMGammaHelper gammaHelper;
@@ -29,7 +31,7 @@ class GMGLRenderer : public GMObject, public IRenderer
 	DECLARE_PRIVATE(GMGLRenderer)
 
 public:
-	GMGLRenderer(const GMContext* context);
+	GMGLRenderer(const IRenderContext* context);
 
 	virtual void draw(GMModel* model) override;
 	virtual IShaderProgram* getShaderProgram() = 0;

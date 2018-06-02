@@ -500,7 +500,7 @@ void GMBSPShaderLoader::parse_light(GMShader& shader, TiXmlElement* elem)
 	readTernaryFloatsFromString(color, vecColor);
 	light->setLightColor(&vecColor[0]);
 
-	d->world->getContext()->engine->addLight(light);
+	d->world->getContext()->getEngine()->addLight(light);
 }
 
 void GMBSPShaderLoader::parse_map_tcMod(GMShader& shader, TiXmlElement* elem)

@@ -20,7 +20,7 @@ namespace
 	}
 }
 
-GMGameWorld::GMGameWorld(const GMContext* context)
+GMGameWorld::GMGameWorld(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -55,7 +55,7 @@ void GMGameWorld::renderScene()
 {
 	D(d);
 	static List<GMGameObject*> s_emptyList;
-	IGraphicEngine* engine = d->context->engine;
+	IGraphicEngine* engine = d->context->getEngine();
 	if (getRenderPreference() == GMRenderPreference::PreferForwardRendering)
 	{
 		engine->draw(d->renderList.deferred, s_emptyList);
@@ -81,7 +81,7 @@ bool GMGameWorld::removeObject(GMGameObject* obj)
 	return true;
 }
 
-const GMContext* GMGameWorld::getContext()
+const IRenderContext* GMGameWorld::getContext()
 {
 	D(d);
 	return d->context;

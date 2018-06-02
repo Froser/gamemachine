@@ -10,6 +10,14 @@ namespace
 	const DXGI_FORMAT g_bufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 }
 
+class GMDx11RenderContext : public GMRenderContext
+{
+public:
+	virtual void switchToContext() const override
+	{
+	}
+};
+
 GM_PRIVATE_OBJECT(GMWindow_Dx11)
 {
 	static GMComPtr<ID3D11Device> device;
@@ -40,6 +48,7 @@ public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
 	virtual void onWindowCreated(const GMWindowAttributes& attrs, GMWindowHandle handle) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
+	virtual const IRenderContext* getContext() override;
 };
 
 GMWindow_Dx11::~GMWindow_Dx11()
@@ -290,9 +299,9 @@ void GMWindow_Dx11::onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindow
 	d->deviceContext->RSSetViewports(1, &vp);
 
 	// 发送事件
-	GMContext* context = const_cast<GMContext*>(getContext());
+	IRenderContext* context = const_cast<IRenderContext*>(getContext());
 	msg.msgType = GameMachineMessageType::Dx11Ready;
-	msg.objPtr = static_cast<GMContext*>(context);
+	msg.objPtr = static_cast<IRenderContext*>(context);
 	GM.postMessage(msg);
 }
 
@@ -304,6 +313,19 @@ IGraphicEngine* GMWindow_Dx11::getGraphicEngine()
 		d->engine = new GMDx11GraphicEngine(getContext());
 	}
 	return d->engine;
+}
+
+const IRenderContext* GMWindow_Dx11::getContext()
+{
+	D_BASE(d, Base);
+	if (!d->context)
+	{
+		GMDx11RenderContext* context = new GMDx11RenderContext();
+		d->context = context;
+		context->setWindow(this);
+		context->setEngine(getGraphicEngine());
+	}
+	return d->context;
 }
 
 bool GMWindowFactory::createWindowWithDx11(GMInstance instance, OUT IWindow** window)

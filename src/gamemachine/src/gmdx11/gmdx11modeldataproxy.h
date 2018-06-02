@@ -22,7 +22,7 @@ class GMDx11ModelDataProxy : public GMModelDataProxy
 	DECLARE_PRIVATE_AND_BASE(GMDx11ModelDataProxy, GMModelDataProxy)
 
 public:
-	GMDx11ModelDataProxy(const GMContext* context, GMModel* obj);
+	GMDx11ModelDataProxy(const IRenderContext* context, GMModel* obj);
 
 public:
 	virtual void transfer() override;

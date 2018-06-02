@@ -24,18 +24,18 @@ namespace
 	};
 }
 
-GMGLGBuffer::GMGLGBuffer(const GMContext* context)
+GMGLGBuffer::GMGLGBuffer(const IRenderContext* context)
 	: GMGBuffer(context)
 {
 	D(d);
-	d->engine = gm_cast<GMGraphicEngine*>(context->engine);
+	d->engine = gm_cast<GMGraphicEngine*>(context->getEngine());
 }
 
 IFramebuffers* GMGLGBuffer::createGeometryFramebuffers()
 {
 	D(d);
 	IFramebuffers* framebuffers = nullptr;
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	GMFramebufferDesc desc = { 0 };
 	desc.rect = windowStates.renderRect;
 

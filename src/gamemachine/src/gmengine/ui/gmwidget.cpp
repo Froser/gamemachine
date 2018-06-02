@@ -51,7 +51,7 @@ namespace
 	}
 }
 
-GMWidgetResourceManager::GMWidgetResourceManager(const GMContext* context)
+GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -71,10 +71,10 @@ GMWidgetResourceManager::GMWidgetResourceManager(const GMContext* context)
 	d->screenQuad->setContext(getContext());
 	GM.createModelDataProxyAndTransfer(d->context, d->screenQuadModel);
 
-	d->textObject = new GMTextGameObject(context->window->getRenderRect());
+	d->textObject = new GMTextGameObject(context->getWindow()->getRenderRect());
 	d->textObject->setContext(getContext());
 
-	d->spriteObject = new GMSprite2DGameObject(context->window->getRenderRect());
+	d->spriteObject = new GMSprite2DGameObject(context->getWindow()->getRenderRect());
 	d->spriteObject->setContext(getContext());
 }
 
@@ -141,7 +141,7 @@ const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(GMsize_t index)
 void GMWidgetResourceManager::onRenderRectResized()
 {
 	D(d);
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	d->backBufferWidth = windowStates.renderRect.width;
 	d->backBufferHeight = windowStates.renderRect.height;
 }

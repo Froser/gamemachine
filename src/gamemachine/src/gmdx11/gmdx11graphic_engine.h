@@ -57,7 +57,7 @@ class GMDx11GraphicEngine : public GMGraphicEngine
 	DECLARE_PRIVATE_AND_BASE(GMDx11GraphicEngine, GMGraphicEngine)
 
 public:
-	GMDx11GraphicEngine(const GMContext* context);
+	GMDx11GraphicEngine(const IRenderContext* context);
 	~GMDx11GraphicEngine();
 
 public:
@@ -130,7 +130,7 @@ public:
 	}
 
 private:
-	void initShaders(const GMContext* context);
+	void initShaders(const IRenderContext* context);
 };
 
 END_NS

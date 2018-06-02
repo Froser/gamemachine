@@ -15,7 +15,7 @@
 namespace
 {
 	template <typename T>
-	IRenderer* newRenderer(IRenderer*& ptr, const GMContext* context)
+	IRenderer* newRenderer(IRenderer*& ptr, const IRenderContext* context)
 	{
 		if (!ptr)
 			ptr = new T(context);
@@ -23,7 +23,7 @@ namespace
 	}
 }
 
-GMDx11GraphicEngine::GMDx11GraphicEngine(const GMContext* context)
+GMDx11GraphicEngine::GMDx11GraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
 }
@@ -198,10 +198,10 @@ bool GMDx11GraphicEngine::event(const GMMessage& e)
 	{
 	case GameMachineMessageType::Dx11Ready:
 	{
-		const GMContext* context = static_cast<GMContext*>(e.objPtr);
-		if (context->engine == this)
+		const IRenderContext* context = static_cast<IRenderContext*>(e.objPtr);
+		if (context->getEngine() == this)
 		{
-			IWindow* queriable = context->window;
+			IWindow* queriable = context->getWindow();
 			bool b = false;
 			b = queriable->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
 			GM_ASSERT(b);
@@ -225,7 +225,7 @@ bool GMDx11GraphicEngine::event(const GMMessage& e)
 	return false;
 }
 
-void GMDx11GraphicEngine::initShaders(const GMContext* context)
+void GMDx11GraphicEngine::initShaders(const IRenderContext* context)
 {
 	D(d);
 	// 读取着色器

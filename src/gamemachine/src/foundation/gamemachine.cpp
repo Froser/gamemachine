@@ -57,7 +57,6 @@ void GameMachine::init(
 	d->mainWindow = mainWindow;
 
 	setRenderEnvironment(renderEnv);
-	d->camera.reset(new GMCamera());
 	registerManager(factory, &d->factory);
 	registerManager(new GMGamePackage(), &d->gamePackageManager);
 	registerManager(new GMConfigs(), &d->statesManager);
@@ -83,7 +82,7 @@ GMMessage GameMachine::peekMessage()
 	return d->lastMessage;
 }
 
-void GameMachine::createModelDataProxyAndTransfer(const GMContext* context, GMModel* model)
+void GameMachine::createModelDataProxyAndTransfer(const IRenderContext* context, GMModel* model)
 {
 	if (model)
 	{
@@ -118,7 +117,7 @@ void GameMachine::startGameMachine()
 	updateGameMachineRunningStates();
 	eachHandler([](auto window, auto)
 	{
-		window->getContext()->engine->init();
+		window->getContext()->getEngine()->init();
 	});
 
 	// 初始化gameHandler
@@ -225,6 +224,7 @@ void GameMachine::handlerEvents()
 {
 	D(d);
 	eachHandler([](auto window, auto handler) {
+		window->getContext()->switchToContext();
 		handler->event(GameMachineHandlerEvent::FrameStart);
 		if (window->isWindowActivate())
 			handler->event(GameMachineHandlerEvent::Activate);
@@ -275,7 +275,7 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 	for (auto window : d->windows)
 	{
 		window->msgProc(msg);
-		window->getContext()->engine->event(msg);
+		window->getContext()->getEngine()->event(msg);
 	}
 	return true;
 }

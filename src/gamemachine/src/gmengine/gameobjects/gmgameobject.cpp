@@ -83,15 +83,15 @@ bool GMGameObject::canDeferredRendering()
 	return true;
 }
 
-const GMContext* GMGameObject::getContext()
+const IRenderContext* GMGameObject::getContext()
 {
 	D(d);
 	return d->context;
 }
 
-void GMGameObject::drawModel(const GMContext* context, GMModel* model)
+void GMGameObject::drawModel(const IRenderContext* context, GMModel* model)
 {
-	IGraphicEngine* engine = context->engine;
+	IGraphicEngine* engine = context->getEngine();
 	if (model->getShader().getDiscard())
 		return;
 
@@ -117,7 +117,7 @@ void GMCubeMapGameObject::deactivate()
 	D(d);
 	GMGameWorld* world = getWorld();
 	if (world)
-		world->getContext()->engine->update(GMUpdateDataType::TurnOffCubeMap);
+		world->getContext()->getEngine()->update(GMUpdateDataType::TurnOffCubeMap);
 }
 
 void GMCubeMapGameObject::createCubeMap(ITexture* texture)

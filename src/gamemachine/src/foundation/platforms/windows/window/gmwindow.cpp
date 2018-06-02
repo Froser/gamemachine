@@ -67,6 +67,16 @@ namespace
 	}
 }
 
+IWindow* GMRenderContext::getWindow() const
+{
+	return const_cast<IWindow*>(window);
+}
+
+IGraphicEngine* GMRenderContext::getEngine() const
+{
+	return const_cast<IGraphicEngine*>(engine);
+}
+
 GMWindowProcHandler GMWindow::getProcHandler()
 {
 	return &WndProc;

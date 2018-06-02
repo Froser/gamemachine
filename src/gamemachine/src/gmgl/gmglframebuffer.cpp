@@ -69,7 +69,7 @@ BEGIN_NS
 class GMGLDefaultFramebuffers : public GMGLFramebuffers
 {
 public:
-	GMGLDefaultFramebuffers(const GMContext* context)
+	GMGLDefaultFramebuffers(const IRenderContext* context)
 		: GMGLFramebuffers(context)
 	{
 		D_BASE(d, GMGLFramebuffers);
@@ -106,13 +106,13 @@ private:
 	virtual void setViewport() override
 	{
 		D(d);
-		GMRect rect = getContext()->window->getWindowStates().renderRect;
+		GMRect rect = getContext()->getWindow()->getWindowStates().renderRect;
 		glViewport(0, 0, rect.width, rect.height);
 	}
 };
 END_NS
 
-GMGLFramebuffer::GMGLFramebuffer(const GMContext* context)
+GMGLFramebuffer::GMGLFramebuffer(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -138,7 +138,7 @@ ITexture* GMGLFramebuffer::getTexture()
 	return d->texture;
 }
 
-const GMContext* GMGLFramebuffer::getContext()
+const IRenderContext* GMGLFramebuffer::getContext()
 {
 	D(d);
 	return d->context;
@@ -152,11 +152,11 @@ GMuint GMGLFramebuffer::getTextureId()
 	return texture->getTextureId();
 }
 
-GMGLFramebuffers::GMGLFramebuffers(const GMContext* context)
+GMGLFramebuffers::GMGLFramebuffers(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->engine = gm_cast<GMGraphicEngine*>(context->engine);
+	d->engine = gm_cast<GMGraphicEngine*>(context->getEngine());
 }
 
 GMGLFramebuffers::~GMGLFramebuffers()
@@ -231,7 +231,7 @@ void GMGLFramebuffers::unbind()
 		if (lastFramebuffers)
 			lastFramebuffers->use();
 		else
-			d->context->engine->getDefaultFramebuffers()->use();
+			d->context->getEngine()->getDefaultFramebuffers()->use();
 	}
 }
 
@@ -251,7 +251,7 @@ void GMGLFramebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 	glBindFramebuffer(GL_FRAMEBUFFER, cache);
 }
 
-const GMContext* GMGLFramebuffers::getContext()
+const IRenderContext* GMGLFramebuffers::getContext()
 {
 	D(d);
 	return d->context;
@@ -361,7 +361,7 @@ GMsize_t GMGLFramebuffers::count()
 	return d->framebuffers.size();
 }
 
-IFramebuffers* GMGLFramebuffers::createDefaultFramebuffers(const GMContext* context)
+IFramebuffers* GMGLFramebuffers::createDefaultFramebuffers(const IRenderContext* context)
 {
 	return new GMGLDefaultFramebuffers(context);
 }
@@ -389,7 +389,7 @@ void GMGLShadowMapTexture::init()
 {
 }
 
-GMGLShadowFramebuffers::GMGLShadowFramebuffers(const GMContext* context)
+GMGLShadowFramebuffers::GMGLShadowFramebuffers(const IRenderContext* context)
 	: GMGLFramebuffers(context)
 {
 }

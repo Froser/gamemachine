@@ -6,7 +6,6 @@
 #include <gmassets.h>
 #include <gmglyphmanager.h>
 #include <gmgamepackage.h>
-#include <gmcamera.h>
 #include <gmthread.h>
 #include <gmmessage.h>
 
@@ -81,7 +80,6 @@ GM_PRIVATE_OBJECT(GameMachine)
 	GMGamePackage* gamePackageManager = nullptr;
 	GMConfigs* statesManager = nullptr;
 	GMMessage lastMessage;
-	GMScopePtr<GMCamera> camera;
 	Queue<GMMessage> messageQueue;
 	Vector<IVirtualFunctionObject*> managerQueue;
 
@@ -148,13 +146,6 @@ public:
 	*/
 	GMGamePackage* getGamePackageManager() { D(d); return d->gamePackageManager; }
 
-	//! 获取程序主相机。
-	/*!
-	  主相机用于主界面的绘制。
-	  \return 程序主相机。
-	*/
-	GMCamera& getCamera() { D(d); return *d->camera; }
-
 	//! 获取程序当前的运行时状态。
 	/*!
 	  如当前窗口大小、上一帧执行时间等。
@@ -175,7 +166,7 @@ public:
 	  在创建之后，数据代理马上会将GMModel顶点数据传输到GPU。
 	  \param model 需要创建数据代理的模型对象。创建好的GMModelDataProxy会绑定在此对象上。在此对象析构时，GMModelDataProxy也会析构，用户不需要关心它的生命周期。
 	*/
-	void createModelDataProxyAndTransfer(const GMContext* context, GMModel* model);
+	void createModelDataProxyAndTransfer(const IRenderContext* context, GMModel* model);
 
 	//! 获取当前机器的大小端模式。
 	/*!

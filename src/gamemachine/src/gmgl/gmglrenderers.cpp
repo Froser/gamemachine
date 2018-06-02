@@ -152,7 +152,7 @@ namespace
 	GM_PRIVATE_OBJECT(GMGLWhiteTexture)
 	{
 		GMuint textureId = 0;
-		const GMContext* context = nullptr;
+		const IRenderContext* context = nullptr;
 	};
 
 	class GMGLWhiteTexture : public ITexture
@@ -160,7 +160,7 @@ namespace
 		DECLARE_PRIVATE(GMGLWhiteTexture)
 
 	public:
-		GMGLWhiteTexture(const GMContext* context)
+		GMGLWhiteTexture(const IRenderContext* context)
 		{
 			D(d);
 			d->context = context;
@@ -201,7 +201,7 @@ namespace
 		}
 	};
 
-	ITexture* createWhiteTexture(const GMContext* context)
+	ITexture* createWhiteTexture(const IRenderContext* context)
 	{
 		GMGLWhiteTexture* texture = new GMGLWhiteTexture(context);
 		texture->init();
@@ -221,11 +221,11 @@ void GMGammaHelper::setGamma(GMGraphicEngine* engine, IShaderProgram* shaderProg
 	}
 }
 
-GMGLRenderer::GMGLRenderer(const GMContext* context)
+GMGLRenderer::GMGLRenderer(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->engine = gm_cast<GMGLGraphicEngine*>(d->context->engine);
+	d->engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 }
 
@@ -387,10 +387,9 @@ ITexture* GMGLRenderer::getTexture(GMTextureSampler& frames)
 
 void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 {
-	static IShaderProgram* s_lastShaderProgram = nullptr;
-
-	GMCamera& camera = GM.getCamera();
-	if (s_lastShaderProgram != shaderProgram || camera.isDirty())
+	D(d);
+	GMCamera& camera = d->engine->getCamera();
+	if (d->lastShaderProgram_camera != shaderProgram || camera.isDirty())
 	{
 		const GMMat4& viewMatrix = camera.getViewMatrix();
 		const GMCameraLookAt& lookAt = camera.getLookAt();
@@ -402,7 +401,7 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 		shaderProgram->setMatrix4(GM_VariablesDesc.ViewMatrix, camera.getViewMatrix());
 		shaderProgram->setMatrix4(GM_VariablesDesc.InverseViewMatrix, camera.getInverseViewMatrix());
 		shaderProgram->setMatrix4(GM_VariablesDesc.ProjectionMatrix, camera.getProjectionMatrix());
-		s_lastShaderProgram = shaderProgram;
+		d->lastShaderProgram_camera = shaderProgram;
 		camera.cleanDirty();
 	}
 }
@@ -410,17 +409,16 @@ void GMGLRenderer::updateCameraMatrices(IShaderProgram* shaderProgram)
 void GMGLRenderer::prepareScreenInfo(IShaderProgram* shaderProgram)
 {
 	D(d);
-	static IShaderProgram* s_lastShaderProgram = nullptr;
 	static std::string s_multisampling = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.Multisampling;
 	static std::string s_screenWidth = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenWidth;
 	static std::string s_screenHeight = std::string(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo) + "." + GM_VariablesDesc.ScreenInfoAttributes.ScreenHeight;
-	if (s_lastShaderProgram != shaderProgram) //或者窗口属性发生改变
+	if (d->lastShaderProgram_screenInfo != shaderProgram) //或者窗口属性发生改变
 	{
-		const GMWindowStates& windowStates = d->context->window->getWindowStates();
+		const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 		shaderProgram->setInt(s_multisampling.c_str(), windowStates.sampleCount > 1);
 		shaderProgram->setInt(s_screenWidth.c_str(), windowStates.renderRect.width);
 		shaderProgram->setInt(s_screenHeight.c_str(), windowStates.renderRect.height);
-		s_lastShaderProgram = shaderProgram;
+		d->lastShaderProgram_screenInfo = shaderProgram;
 	}
 }
 

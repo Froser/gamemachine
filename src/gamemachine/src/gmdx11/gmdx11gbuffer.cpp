@@ -32,7 +32,7 @@ namespace
 	};
 }
 
-GMDx11GBuffer::GMDx11GBuffer(const GMContext* context)
+GMDx11GBuffer::GMDx11GBuffer(const IRenderContext* context)
 	: GMGBuffer(context)
 {
 }
@@ -74,7 +74,7 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 {
 	D(d);
 	IFramebuffers* framebuffers = nullptr;
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	GMFramebufferDesc desc = { 0 };
 	desc.rect = windowStates.renderRect;
 
@@ -113,5 +113,5 @@ IFramebuffers* GMDx11GBuffer::createGeometryFramebuffers()
 bool GMDx11GBuffer::isMultisamping()
 {
 	D(d);
-	return d->context->window->getWindowStates().sampleCount > 1;
+	return d->context->getWindow()->getWindowStates().sampleCount > 1;
 }

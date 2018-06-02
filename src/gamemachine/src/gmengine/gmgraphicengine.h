@@ -167,7 +167,8 @@ public:
 
 GM_PRIVATE_OBJECT(GMGraphicEngine)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
+	GMCamera camera;
 	GMGlyphManager* glyphManager = nullptr;
 	IFramebuffers* defaultFramebuffers = nullptr;
 	IFramebuffers* filterFramebuffers = nullptr;
@@ -192,7 +193,7 @@ class GMGraphicEngine : public GMObject, public IGraphicEngine
 	DECLARE_PRIVATE(GMGraphicEngine)
 
 public:
-	GMGraphicEngine(const GMContext* context);
+	GMGraphicEngine(const IRenderContext* context);
 	~GMGraphicEngine();
 
 public:
@@ -206,6 +207,7 @@ public:
 	virtual const GMStencilOptions& getStencilOptions() override;
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override;
 	virtual void setShadowSource(const GMShadowSourceDesc& desc) override;
+	virtual GMCamera& getCamera() override;
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();

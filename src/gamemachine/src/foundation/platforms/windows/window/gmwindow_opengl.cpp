@@ -44,7 +44,6 @@ namespace
 	}
 }
 
-
 GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 {
 	BYTE depthBits, stencilBits;
@@ -55,6 +54,7 @@ GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 class GMWindow_OpenGL : public GMWindow
 {
 	DECLARE_PRIVATE_AND_BASE(GMWindow_OpenGL, GMWindow)
+	GM_FRIEND_CLASS(GMGLRenderContext)
 
 public:
 	GMWindow_OpenGL();
@@ -64,12 +64,31 @@ public:
 	virtual void msgProc(const GMMessage& message) override;
 	virtual void onWindowCreated(const GMWindowAttributes& wndAttrs, GMWindowHandle handle) override;
 	virtual IGraphicEngine* getGraphicEngine() override;
+	virtual const IRenderContext* getContext() override;
 
 private:
 	void swapBuffers() const;
 	void dispose();
 };
 
+class GMGLRenderContext : public GMRenderContext
+{
+public:
+	GMGLRenderContext(GMWindow_OpenGL* window)
+	{
+		windowImpl = window;
+	}
+
+	virtual void switchToContext() const override
+	{
+		D_OF(d, windowImpl);
+		BOOL b = wglMakeCurrent(d->hDC, d->hRC);
+		GM_ASSERT(b);
+	}
+
+private:
+	GMWindow_OpenGL* windowImpl;
+};
 
 GMWindow_OpenGL::GMWindow_OpenGL()
 {
@@ -182,6 +201,19 @@ IGraphicEngine* GMWindow_OpenGL::getGraphicEngine()
 	return d->engine;
 }
 
+const IRenderContext* GMWindow_OpenGL::getContext()
+{
+	D_BASE(d, Base);
+	if (!d->context)
+	{
+		GMGLRenderContext* context = new GMGLRenderContext(this);
+		d->context = context;
+		context->setWindow(this);
+		context->setEngine(getGraphicEngine());
+	}
+	return d->context;
+}
+
 void GMWindow_OpenGL::swapBuffers() const
 {
 	D(d);
@@ -201,9 +233,6 @@ void GMWindow_OpenGL::dispose()
 	gm::GMWindowHandle wnd = getWindowHandle();
 	if (d->hRC)
 	{
-		if (!wglMakeCurrent(0, 0))
-			gm_error(L"release of DC and RC failed.");
-
 		if (!wglDeleteContext(d->hRC))
 			gm_error(L"release Rendering Context failed.");
 
@@ -214,12 +243,6 @@ void GMWindow_OpenGL::dispose()
 	{
 		gm_error(L"release of Device Context failed.");
 		d->hDC = 0;
-	}
-
-	if (wnd && !::DestroyWindow(wnd))
-	{
-		gm_error(L"could not release hWnd");
-		wnd = 0;
 	}
 }
 

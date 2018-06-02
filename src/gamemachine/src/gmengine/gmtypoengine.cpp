@@ -159,20 +159,20 @@ bool GMTypoStateMachine::preciseParse(const GMString& name)
 }
 
 //////////////////////////////////////////////////////////////////////////
-GMTypoEngine::GMTypoEngine(const GMContext* context)
+GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 {
 	D(d);
 	d->stateMachine = new GMTypoStateMachine(this);
 	d->context = context;
-	d->glyphManager = d->context->engine->getGlyphManager();
+	d->glyphManager = d->context->getEngine()->getGlyphManager();
 }
 
-GMTypoEngine::GMTypoEngine(const GMContext* context, AUTORELEASE GMTypoStateMachine* stateMachine)
+GMTypoEngine::GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStateMachine* stateMachine)
 {
 	D(d);
 	d->stateMachine = stateMachine;
 	d->context = context;
-	d->glyphManager = d->context->engine->getGlyphManager();
+	d->glyphManager = d->context->getEngine()->getGlyphManager();
 }
 
 GMTypoEngine::~GMTypoEngine()
@@ -191,7 +191,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	d->literature = literature.toStdWString();
 
 	// 获取行高
-	GMGlyphManager* glyphManager = d->context->engine->getGlyphManager();
+	GMGlyphManager* glyphManager = d->context->getEngine()->getGlyphManager();
 	std::wstring wstr = literature.toStdWString();
 	const GMwchar* p = wstr.c_str();
 	while (*p)

@@ -58,15 +58,15 @@ namespace
 	}
 }
 
-GMDx11Texture::GMDx11Texture(const GMContext* context, GMImage* image)
+GMDx11Texture::GMDx11Texture(const IRenderContext* context, GMImage* image)
 {
 	D(d);
 	d->context = context;
 	d->image = image;
-	d->context->engine->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
+	d->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&d->device);
 	GM_ASSERT(d->device);
 
-	d->context->engine->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+	d->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 	GM_ASSERT(d->deviceContext);
 }
 
@@ -96,7 +96,7 @@ void GMDx11Texture::useTexture(GMint textureType)
 	D(d);
 	if (!d->effect)
 	{
-		bool b = d->context->engine->getShaderProgram()->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
+		bool b = d->context->getEngine()->getShaderProgram()->getInterface(GameMachineInterfaceID::D3D11Effect, (void**)&d->effect);
 		GM_ASSERT(b && d->effect);
 	}
 
@@ -127,7 +127,7 @@ void GMDx11Texture::useTexture(GMint textureType)
 	GM_DX_HR(samplerVariable->SetSampler(0, d->samplerState));
 }
 
-const GMContext* GMDx11Texture::getContext()
+const IRenderContext* GMDx11Texture::getContext()
 {
 	D(d);
 	return d->context;

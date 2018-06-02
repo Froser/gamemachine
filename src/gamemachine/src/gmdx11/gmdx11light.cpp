@@ -47,10 +47,13 @@ void GMDx11Light::activateLight(GMuint index, IRenderer* renderer)
 	GM_ASSERT(d->effect == dxRenderer->getEffect());
 #endif
 
-	static ID3DX11EffectVariable* lightAttributes = d->effect->GetVariableByName("GM_LightAttributes");
-	GM_ASSERT(lightAttributes->IsValid());
+	if (!d->lightAttributes)
+	{
+		d->lightAttributes = d->effect->GetVariableByName("GM_LightAttributes");
+		GM_ASSERT(d->lightAttributes->IsValid());
+	}
 
-	ID3DX11EffectVariable* lightStruct = lightAttributes->GetElement(index);
+	ID3DX11EffectVariable* lightStruct = d->lightAttributes->GetElement(index);
 	GM_ASSERT(lightStruct->IsValid());
 
 	ID3DX11EffectVectorVariable* position = lightStruct->GetMemberByName("Position")->AsVector();

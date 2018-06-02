@@ -23,7 +23,7 @@ class GMBSPGameWorld : public GMGameWorld
 	DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
 
 public:
-	GMBSPGameWorld(const GMContext* context);
+	GMBSPGameWorld(const IRenderContext* context);
 
 public:
 	void loadBSP(const GMString& mapName);

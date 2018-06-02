@@ -29,6 +29,7 @@ class GMComponent;
 class GMWidget;
 class GMWidgetResourceManager;
 class GMSystemEvent;
+class GMCamera;
 struct ILight;
 struct ISoundPlayer;
 struct IGamePackageHandler;
@@ -38,7 +39,7 @@ struct IGraphicEngine;
 struct IRenderer;
 struct IInput;
 struct IWindow;
-struct GMContext;
+struct IRenderContext;
 struct GraphicSettings;
 struct GMCameraLookAt;
 struct GMShaderVariablesDesc;
@@ -115,7 +116,7 @@ enum class GMModelType
 
 GM_INTERFACE(IGameHandler)
 {
-	virtual void init(const GMContext* context) = 0;
+	virtual void init(const IRenderContext* context) = 0;
 	virtual void start() = 0;
 	virtual void event(GameMachineHandlerEvent evt) = 0;
 };
@@ -264,11 +265,6 @@ GM_INTERFACE(IFramebuffers)
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) = 0;
 };
 
-GM_INTERFACE(IContext)
-{
-	const virtual GMContext* getContext() = 0;
-};
-
 enum class GMGeometryPassingState
 {
 	PassingGeometry,
@@ -287,7 +283,7 @@ GM_INTERFACE(IGBuffer)
 
 GM_INTERFACE(IShaderLoadCallback)
 {
-	virtual void onLoadShaders(const GMContext* context) = 0;
+	virtual void onLoadShaders(const IRenderContext* context) = 0;
 };
 
 enum class GMLightType
@@ -469,6 +465,8 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	virtual IRenderer* getRenderer(GMModelType modelType) = 0;
 
 	virtual GMGlyphManager* getGlyphManager() = 0;
+
+	virtual GMCamera& getCamera() = 0;
 };
 
 GM_INTERFACE(IRenderer)
@@ -491,10 +489,11 @@ struct GMWindowStates
 	GMRect renderRect; //!< 当前窗口渲染窗口位置信息。
 };
 
-struct GMContext
+struct IRenderContext
 {
-	IWindow* window = nullptr;
-	IGraphicEngine* engine = nullptr;
+	virtual IWindow* getWindow() const = 0;
+	virtual IGraphicEngine* getEngine() const = 0;
+	virtual void switchToContext() const = 0;
 };
 
 GM_INTERFACE_FROM(IWindow, IQueriable)
@@ -515,18 +514,18 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual IGameHandler* getHandler() = 0;
 	virtual const GMWindowStates& getWindowStates() = 0;
 	virtual IGraphicEngine* getGraphicEngine() = 0;
-	virtual const GMContext* getContext() = 0;
+	virtual const IRenderContext* getContext() = 0;
 };
 
 GM_INTERFACE(IFactory)
 {
 	virtual void createWindow(GMInstance instance, OUT IWindow** window) = 0;
-	virtual void createTexture(const GMContext* context, GMImage*, OUT ITexture**) = 0;
-	virtual void createModelDataProxy(const GMContext*, GMModel*, OUT GMModelDataProxy**) = 0;
-	virtual void createGlyphManager(const GMContext* context, OUT GMGlyphManager**) = 0;
-	virtual void createFramebuffer(const GMContext* context, OUT IFramebuffer**) = 0;
-	virtual void createFramebuffers(const GMContext* context, OUT IFramebuffers**) = 0;
-	virtual void createGBuffer(const GMContext* context, OUT IGBuffer**) = 0;
+	virtual void createTexture(const IRenderContext* context, GMImage*, OUT ITexture**) = 0;
+	virtual void createModelDataProxy(const IRenderContext*, GMModel*, OUT GMModelDataProxy**) = 0;
+	virtual void createGlyphManager(const IRenderContext* context, OUT GMGlyphManager**) = 0;
+	virtual void createFramebuffer(const IRenderContext* context, OUT IFramebuffer**) = 0;
+	virtual void createFramebuffers(const IRenderContext* context, OUT IFramebuffers**) = 0;
+	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
 };
 

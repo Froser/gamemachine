@@ -49,7 +49,7 @@ struct GMToolUtil
 	  \param height 纹理首层的高度。可以为空。
 	  \sa GMGamePackage
 	*/
-	static void createTexture(const GMContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
+	static void createTexture(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width = nullptr, REF GMint* height = nullptr);
 
 	//! 将一个纹理添加到一个模型中。
 	/*!
@@ -61,7 +61,7 @@ struct GMToolUtil
 	static void addTextureToShader(gm::GMShader& shader, ITexture* texture, GMTextureType type);
 
 	static bool createPBRTextures(
-		const GMContext* context,
+		const IRenderContext* context,
 		const GMString& albedoPath,
 		const GMString& metallicPath,
 		const GMString& roughnessPath,

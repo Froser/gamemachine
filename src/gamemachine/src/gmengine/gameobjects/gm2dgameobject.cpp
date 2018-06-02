@@ -63,7 +63,7 @@ void GM2DGameObjectBase::setGeometry(const GMRect& geometry)
 
 void GM2DGameObjectBase::setShader(GMShader& shader)
 {
-	GMGlyphManager* glyphManager = getContext()->engine->getGlyphManager();
+	GMGlyphManager* glyphManager = getContext()->getEngine()->getGlyphManager();
 	auto& frame = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	frame.setMinFilter(GMS_TextureFilter::LINEAR);
 	frame.setMagFilter(GMS_TextureFilter::LINEAR);

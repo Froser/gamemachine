@@ -21,20 +21,20 @@ class GMDx11DefaultFramebuffers : public GMDx11Framebuffers
 	DECLARE_PRIVATE_AND_BASE(GMDx11DefaultFramebuffers, GMDx11Framebuffers);
 
 public:
-	GMDx11DefaultFramebuffers(const GMContext* context)
+	GMDx11DefaultFramebuffers(const IRenderContext* context)
 		: Base(context)
 	{
 		D(d);
 		D_BASE(db, Base);
-		db->context->engine->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&db->depthStencilView);
+		db->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilView, (void**)&db->depthStencilView);
 		GM_ASSERT(db->depthStencilView);
-		db->context->engine->getInterface(GameMachineInterfaceID::D3D11DepthStencilTexture, (void**)&db->depthStencilTexture);
+		db->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DepthStencilTexture, (void**)&db->depthStencilTexture);
 		GM_ASSERT(db->depthStencilTexture);
-		db->context->engine->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->defaultRenderTargetView);
+		db->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11RenderTargetView, (void**)&d->defaultRenderTargetView);
 		GM_ASSERT(d->defaultRenderTargetView);
 		db->renderTargetViews.push_back(d->defaultRenderTargetView);
 
-		const GMWindowStates& windowStates = db->context->window->getWindowStates();
+		const GMWindowStates& windowStates = db->context->getWindow()->getWindowStates();
 		db->viewport.TopLeftX = windowStates.viewportTopLeftX;
 		db->viewport.TopLeftY = windowStates.viewportTopLeftY;
 		db->viewport.Width = windowStates.renderRect.width;
@@ -74,7 +74,7 @@ class GMDx11FramebufferTexture : public GMDx11Texture
 	DECLARE_PRIVATE_AND_BASE(GMDx11FramebufferTexture, GMDx11Texture);
 
 public:
-	GMDx11FramebufferTexture(const GMContext* context, const GMFramebufferDesc& desc);
+	GMDx11FramebufferTexture(const IRenderContext* context, const GMFramebufferDesc& desc);
 
 public:
 	virtual void init() override;
@@ -83,7 +83,7 @@ public:
 	ID3D11Resource* getTexture();
 };
 
-GMDx11FramebufferTexture::GMDx11FramebufferTexture(const GMContext* context, const GMFramebufferDesc& desc)
+GMDx11FramebufferTexture::GMDx11FramebufferTexture(const IRenderContext* context, const GMFramebufferDesc& desc)
 	: GMDx11Texture(context, nullptr)
 {
 	D(d);
@@ -110,7 +110,7 @@ void GMDx11FramebufferTexture::init()
 		gm_error("Unsupported format.");
 	}
 
-	const GMWindowStates& windowStates = db->context->window->getWindowStates();
+	const GMWindowStates& windowStates = db->context->getWindow()->getWindowStates();
 	GMComPtr<ID3D11Texture2D> texture;
 	D3D11_TEXTURE2D_DESC texDesc = { 0 };
 	texDesc.Width = d->desc.rect.width;
@@ -152,7 +152,7 @@ ID3D11Resource* GMDx11FramebufferTexture::getTexture()
 }
 END_NS
 
-GMDx11Framebuffer::GMDx11Framebuffer(const GMContext* context)
+GMDx11Framebuffer::GMDx11Framebuffer(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -168,7 +168,7 @@ bool GMDx11Framebuffer::init(const GMFramebufferDesc& desc)
 {
 	D(d);
 	GMComPtr<ID3D11Device> device;
-	d->context->engine->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
+	d->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 	GM_ASSERT(device);
 	GMComPtr<ID3D11Texture2D> depthStencilBuffer;
 
@@ -198,19 +198,19 @@ ITexture* GMDx11Framebuffer::getTexture()
 	return d->renderTexture;
 }
 
-const GMContext* GMDx11Framebuffer::getContext()
+const IRenderContext* GMDx11Framebuffer::getContext()
 {
 	D(d);
 	return d->context;
 }
 
-GMDx11Framebuffers::GMDx11Framebuffers(const GMContext* context)
+GMDx11Framebuffers::GMDx11Framebuffers(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->context->engine->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+	d->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 	GM_ASSERT(d->deviceContext);
-	d->engine = gm_cast<GMGraphicEngine*>(d->context->engine);
+	d->engine = gm_cast<GMGraphicEngine*>(d->context->getEngine());
 }
 
 GMDx11Framebuffers::~GMDx11Framebuffers()
@@ -234,7 +234,7 @@ bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 	d->engine->getInterface(GameMachineInterfaceID::D3D11Device, (void**)&device);
 	GM_ASSERT(device);
 
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	d->viewport.TopLeftX = windowStates.viewportTopLeftX;
 	d->viewport.TopLeftY = windowStates.viewportTopLeftY;
 	d->viewport.Width = desc.rect.width;
@@ -323,7 +323,7 @@ void GMDx11Framebuffers::unbind()
 		if (lastFramebuffers)
 			lastFramebuffers->use();
 		else
-			d->context->engine->getDefaultFramebuffers()->use();
+			d->context->getEngine()->getDefaultFramebuffers()->use();
 	}
 }
 
@@ -368,7 +368,7 @@ void GMDx11Framebuffers::copyDepthStencilFramebuffer(IFramebuffers* dest)
 	d->deviceContext->CopyResource(d_dest->depthStencilTexture, d->depthStencilTexture);
 }
 
-const GMContext* GMDx11Framebuffers::getContext()
+const IRenderContext* GMDx11Framebuffers::getContext()
 {
 	D(d);
 	return d->context;
@@ -387,7 +387,7 @@ D3D11_TEXTURE2D_DESC GMDx11Framebuffers::getDepthTextureDesc()
 	return depthStencilTextureDesc;
 }
 
-IFramebuffers* GMDx11Framebuffers::createDefaultFramebuffers(const GMContext* context)
+IFramebuffers* GMDx11Framebuffers::createDefaultFramebuffers(const IRenderContext* context)
 {
 	return new GMDx11DefaultFramebuffers(context);
 }
@@ -400,7 +400,7 @@ bool GMDx11ShadowFramebuffers::init(const GMFramebuffersDesc& desc)
 
 	D(d);
 	D_BASE(db, Base);
-	const GMWindowStates& windowStates = db->context->window->getWindowStates();
+	const GMWindowStates& windowStates = db->context->getWindow()->getWindowStates();
 	d->width = desc.rect.width;
 	d->height = desc.rect.height;
 

@@ -26,7 +26,7 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	D_BASE(db, Base);
 	if (!d->deviceContext)
 	{
-		db->context->engine->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
+		db->context->getEngine()->getInterface(GameMachineInterfaceID::D3D11DeviceContext, (void**)&d->deviceContext);
 		GM_ASSERT(d->deviceContext);
 	}
 
@@ -52,7 +52,7 @@ void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const G
 	);
 }
 
-GMDx11GlyphTexture::GMDx11GlyphTexture(const GMContext* context)
+GMDx11GlyphTexture::GMDx11GlyphTexture(const IRenderContext* context)
 	: GMDx11Texture(context, nullptr)
 {
 }

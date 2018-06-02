@@ -9,18 +9,18 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11Framebuffer)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	ITexture* renderTexture = nullptr;
 	GMComPtr<ID3D11RenderTargetView> renderTargetView;
 	GMString name;
 };
 
-class GMDx11Framebuffer : public GMObject, public IFramebuffer, public IContext
+class GMDx11Framebuffer : public GMObject, public IFramebuffer
 {
 	DECLARE_PRIVATE(GMDx11Framebuffer)
 
 public:
-	GMDx11Framebuffer(const GMContext* context);
+	GMDx11Framebuffer(const IRenderContext* context);
 	~GMDx11Framebuffer();
 
 public:
@@ -29,7 +29,7 @@ public:
 	virtual ITexture* getTexture() override;
 
 public:
-	virtual const GMContext* getContext();
+	virtual const IRenderContext* getContext();
 
 public:
 	ID3D11RenderTargetView* getRenderTargetView()
@@ -43,7 +43,7 @@ public:
 class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	GMComPtr<ID3D11DeviceContext> deviceContext;
 	Vector<GMDx11Framebuffer*> framebuffers;
 	Vector<ID3D11RenderTargetView*> renderTargetViews;
@@ -54,12 +54,12 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 	D3D11_VIEWPORT viewport;
 };
 
-class GMDx11Framebuffers : public GMObject, public IFramebuffers, public IContext
+class GMDx11Framebuffers : public GMObject, public IFramebuffers
 {
 	DECLARE_PRIVATE(GMDx11Framebuffers)
 
 public:
-	GMDx11Framebuffers(const GMContext* context);
+	GMDx11Framebuffers(const IRenderContext* context);
 	~GMDx11Framebuffers();
 
 public:
@@ -74,13 +74,13 @@ public:
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
 
 public:
-	virtual const GMContext* getContext();
+	virtual const IRenderContext* getContext();
 
 protected:
 	D3D11_TEXTURE2D_DESC getDepthTextureDesc();
 
 public:
-	static IFramebuffers* createDefaultFramebuffers(const GMContext* context);
+	static IFramebuffers* createDefaultFramebuffers(const IRenderContext* context);
 };
 
 GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)

@@ -30,7 +30,7 @@ struct GMCanvasTextureInfo
 
 GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	GMTextGameObject* textObject = nullptr;
 	GMSprite2DGameObject* spriteObject = nullptr;
 	Vector<GMCanvasTextureInfo> textureCache;
@@ -41,19 +41,19 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMModel* screenQuadModel = nullptr;
 };
 
-class GMWidgetResourceManager : public GMObject, public IContext
+class GMWidgetResourceManager : public GMObject
 {
 	DECLARE_PRIVATE(GMWidgetResourceManager)
 
 public:
-	GMWidgetResourceManager(const GMContext* context);
+	GMWidgetResourceManager(const IRenderContext* context);
 	~GMWidgetResourceManager();
 
 public:
 	const GMCanvasTextureInfo& getTexture(GMsize_t index);
 	GMsize_t addTexture(ITexture* texture, GMint width, GMint height);
 
-	virtual const GMContext* getContext()
+	virtual const IRenderContext* getContext()
 	{
 		D(d);
 		return d->context;

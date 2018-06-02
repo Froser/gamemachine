@@ -174,7 +174,7 @@ namespace
 	class GMDx11WhiteTexture : public GMDx11Texture
 	{
 	public:
-		GMDx11WhiteTexture(const GMContext* context)
+		GMDx11WhiteTexture(const IRenderContext* context)
 			: GMDx11Texture(context, nullptr)
 		{
 		}
@@ -231,7 +231,7 @@ namespace
 		}
 	};
 
-	ITexture* createWhiteTexture(const GMContext* context)
+	ITexture* createWhiteTexture(const IRenderContext* context)
 	{
 		GMDx11WhiteTexture* texture = new GMDx11WhiteTexture(context);
 		texture->init();
@@ -357,10 +357,10 @@ struct GMDx11RasterizerStates
 
 	//TODO 先不考虑FillMode
 public:
-	GMDx11RasterizerStates::GMDx11RasterizerStates(const GMContext* context)
+	GMDx11RasterizerStates::GMDx11RasterizerStates(const IRenderContext* context)
 	{
 		this->context = context;
-		this->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+		this->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 	}
 
 	~GMDx11RasterizerStates()
@@ -379,7 +379,7 @@ public:
 public:
 	ID3D11RasterizerState* getRasterStates(GMS_FrontFace frontFace, GMS_Cull cullMode)
 	{
-		const GMWindowStates& windowStates = context->window->getWindowStates();
+		const GMWindowStates& windowStates = context->getWindow()->getWindowStates();
 		bool multisampleEnable = windowStates.sampleCount > 1;
 		if (!states[(GMuint)cullMode][(GMuint)frontFace])
 		{
@@ -399,7 +399,7 @@ private:
 	}
 
 private:
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	ID3D11RasterizerState* states[Size_Cull][Size_FrontFace] = { 0 };
 };
@@ -407,10 +407,10 @@ private:
 struct GMDx11BlendStates
 {
 public:
-	GMDx11BlendStates::GMDx11BlendStates(const GMContext* context)
+	GMDx11BlendStates::GMDx11BlendStates(const IRenderContext* context)
 	{
 		this->context = context;
-		this->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+		this->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 	}
 
 	~GMDx11BlendStates()
@@ -455,7 +455,7 @@ private:
 	}
 
 private:
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
 };
@@ -463,10 +463,10 @@ private:
 struct GMDx11DepthStencilStates
 {
 public:
-	GMDx11DepthStencilStates::GMDx11DepthStencilStates(const GMContext* context)
+	GMDx11DepthStencilStates::GMDx11DepthStencilStates(const IRenderContext* context)
 	{
 		this->context = context;
-		this->engine = gm_cast<GMDx11GraphicEngine*>(context->engine);
+		this->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 	}
 
 	~GMDx11DepthStencilStates()
@@ -506,14 +506,14 @@ private:
 	}
 
 private:
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	ID3D11DepthStencilState* states[2][2][3] = { 0 };
 };
 
 END_NS
 
-GMDx11Renderer::GMDx11Renderer(const GMContext* context)
+GMDx11Renderer::GMDx11Renderer(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -571,7 +571,7 @@ void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
 		shaderProgram->setMatrix4(GM_VariablesDesc.InverseTransposeModelMatrix, Identity<GMMat4>());
 	}
 
-	GMCamera& camera = GM.getCamera();
+	GMCamera& camera = d->engine->getCamera();
 	if (camera.isDirty())
 	{
 		GMFloat4 viewPosition;
@@ -602,7 +602,7 @@ void GMDx11Renderer::endModel()
 {
 }
 
-const GMContext* GMDx11Renderer::getContext()
+const IRenderContext* GMDx11Renderer::getContext()
 {
 	D(d);
 	return d->context;
@@ -615,7 +615,7 @@ void GMDx11Renderer::prepareScreenInfo()
 	if (!d->screenInfoPrepared)
 	{
 		GMDx11EffectVariableBank& bank = getVarBank();
-		const GMWindowStates& windowStates = getContext()->window->getWindowStates();
+		const GMWindowStates& windowStates = getContext()->getWindow()->getWindowStates();
 		ID3DX11EffectVariable* screenInfo = d->effect->GetVariableByName(GM_VariablesDesc.ScreenInfoAttributes.ScreenInfo);
 		GM_ASSERT(screenInfo->IsValid());
 
@@ -810,7 +810,7 @@ void GMDx11Renderer::prepareLights()
 void GMDx11Renderer::prepareRasterizer(GMModel* model)
 {
 	D(d);
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	bool multisampleEnable = windowStates.sampleCount > 1;
 	if (!d->rasterizer)
 	{
@@ -1033,7 +1033,7 @@ void GMDx11Renderer_CubeMap::prepareTextures(GMModel* model)
 	}
 }
 
-GMDx11Renderer_Filter::GMDx11Renderer_Filter(const GMContext* context)
+GMDx11Renderer_Filter::GMDx11Renderer_Filter(const IRenderContext* context)
 	: GMDx11Renderer(context)
 {
 	setHDR(getEngine()->getShaderProgram());
@@ -1053,7 +1053,7 @@ void GMDx11Renderer_Filter::draw(GMModel* model)
 void GMDx11Renderer_Filter::passAllAndDraw(GMModel* model)
 {
 	D_BASE(d, Base);
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	D3DX11_TECHNIQUE_DESC techDesc;
 	GM_DX_HR(getTechnique()->GetDesc(&techDesc));
 
@@ -1189,7 +1189,7 @@ void GMDx11Renderer_Deferred_3D_LightPass::prepareTextures(GMModel* model)
 void GMDx11Renderer_3D_Shadow::beginModel(GMModel* model, const GMGameObject* parent)
 {
 	D(d);
-	const GMWindowStates& windowStates = d->context->window->getWindowStates();
+	const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
 	shaderProgram->useProgram();
 	if (!d->inputLayout)

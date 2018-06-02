@@ -7,7 +7,7 @@ BEGIN_NS
 class GMGLGBuffer : public GMGBuffer
 {
 public:
-	GMGLGBuffer(const GMContext* context);
+	GMGLGBuffer(const IRenderContext* context);
 
 protected:
 	virtual IFramebuffers* createGeometryFramebuffers() override;

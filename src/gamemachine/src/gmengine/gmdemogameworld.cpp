@@ -3,7 +3,7 @@
 #include "foundation/gamemachine.h"
 #include "gameobjects/gm2dgameobject.h"
 
-GMDemoGameWorld::GMDemoGameWorld(const GMContext* context)
+GMDemoGameWorld::GMDemoGameWorld(const IRenderContext* context)
 	: GMGameWorld(context)
 {
 }

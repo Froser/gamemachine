@@ -48,7 +48,7 @@ DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 	d->parentDemonstrationWorld = parentDemonstrationWorld;
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
-	d->engine = parentDemonstrationWorld->getContext()->engine;
+	d->engine = parentDemonstrationWorld->getContext()->getEngine();
 }
 
 DemoHandler::~DemoHandler()
@@ -127,7 +127,7 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 
 void DemoHandler::setLookAt()
 {
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	gm::GMCameraLookAt lookAt;
 	lookAt.lookAt = { 0, 0, 1 };
 	lookAt.position = { 0, 0, -1 };
@@ -173,7 +173,7 @@ void DemoHandler::switchNormal()
 	);
 }
 
-DemonstrationWorld::DemonstrationWorld(const gm::GMContext* context, gm::IWindow* window)
+DemonstrationWorld::DemonstrationWorld(const gm::IRenderContext* context, gm::IWindow* window)
 	: Base(context)
 {
 	D(d);
@@ -268,7 +268,7 @@ void DemonstrationWorld::switchDemo()
 void DemonstrationWorld::resetProjectionAndEye()
 {
 	// 设置一个默认视角
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getContext()->getEngine()->getCamera();
 	camera.setOrtho(-1, 1, -1, 1, .1f, 3200.f);
 
 	gm::GMCameraLookAt lookAt;
@@ -278,10 +278,10 @@ void DemonstrationWorld::resetProjectionAndEye()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void DemostrationEntrance::init(const gm::GMContext* context)
+void DemostrationEntrance::init(const gm::IRenderContext* context)
 {
 	D(d);
-	auto& rc = context->window->getRenderRect();
+	auto& rc = context->getWindow()->getRenderRect();
 
 	gm::GMGamePackage* pk = GM.getGamePackageManager();
 
@@ -291,7 +291,7 @@ void DemostrationEntrance::init(const gm::GMContext* context)
 	pk->loadPackage((gm::GMPath::getCurrentPath() + L"gm.pk0"));
 #endif
 
-	context->engine->setShaderLoadCallback(this);
+	context->getEngine()->setShaderLoadCallback(this);
 	d->renderConfig = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
 	d->debugConfig = GM.getConfigs().getConfig(gm::GMConfigs::Debug).asDebugConfig();
 	d->world = new DemonstrationWorld(context, d->mainWindow);
@@ -310,7 +310,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 	D(d);
 	if (evt == gm::GameMachineHandlerEvent::Render)
 	{
-		gm::IGraphicEngine* engine = getWorld()->getContext()->engine;
+		gm::IGraphicEngine* engine = getWorld()->getContext()->getEngine();
 		engine->getDefaultFramebuffers()->clear();
 		engine->getDefaultFramebuffers()->bind();
 	}
@@ -372,7 +372,7 @@ DemostrationEntrance::~DemostrationEntrance()
 	gm::GM_delete(d->world);
 }
 
-void DemostrationEntrance::onLoadShaders(const gm::GMContext* context)
+void DemostrationEntrance::onLoadShaders(const gm::IRenderContext* context)
 {
 	D(d);
 	auto& env = GM.getGameMachineRunningStates().renderEnvironment;
@@ -382,26 +382,26 @@ void DemostrationEntrance::onLoadShaders(const gm::GMContext* context)
 		bool b;
 		gm::GMGLShaderProgram* effectsShaderProgram = new gm::GMGLShaderProgram(context);
 		initLoadEffectsShader(effectsShaderProgram);
-		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
+		b = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLEffectShaderProgram, effectsShaderProgram);
 		GM_ASSERT(b);
 
 		gm::GMGLShaderProgram* forwardShaderProgram = new gm::GMGLShaderProgram(context);
 		gm::GMGLShaderProgram* deferredShaderPrograms[2] = { new gm::GMGLShaderProgram(context), new gm::GMGLShaderProgram(context) };
 		initLoadShaderProgram(forwardShaderProgram, deferredShaderPrograms);
-		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
+		b = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLForwardShaderProgram, forwardShaderProgram);
 		GM_ASSERT(b);
 
-		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
+		b = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderGeometryProgram, deferredShaderPrograms[0]);
 		GM_ASSERT(b);
 
-		b = context->engine->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
+		b = context->getEngine()->setInterface(gm::GameMachineInterfaceID::GLDeferredShaderLightProgram, deferredShaderPrograms[1]);
 		GM_ASSERT(b);
 	}
 	else
 	{
 #if GM_USE_DX11
 		GM_ASSERT(env == gm::GMRenderEnvironment::DirectX11);
-		gm::GMDx11Helper::GMLoadDx11Shader(context->engine, L"dx11/effect.fx", gm::GMShaderType::Effect);
+		gm::GMDx11Helper::GMLoadDx11Shader(context->getEngine(), L"dx11/effect.fx", gm::GMShaderType::Effect);
 #else
 		GM_ASSERT(false);
 #endif

@@ -15,7 +15,7 @@ void GMDx11Factory::createWindow(GMInstance instance, OUT IWindow** window)
 	GM_ASSERT(b);
 }
 
-void GMDx11Factory::createTexture(const GMContext* context, GMImage* image, OUT ITexture** texture)
+void GMDx11Factory::createTexture(const IRenderContext* context, GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
 	GMDx11Texture* t = new GMDx11Texture(context, image);
@@ -23,29 +23,29 @@ void GMDx11Factory::createTexture(const GMContext* context, GMImage* image, OUT 
 	t->init();
 }
 
-void GMDx11Factory::createModelDataProxy(const GMContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
+void GMDx11Factory::createModelDataProxy(const IRenderContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
 {
 	GM_ASSERT(modelDataProxy);
 	(*modelDataProxy) = new GMDx11ModelDataProxy(context, model);
 }
 
-void GMDx11Factory::createGlyphManager(const GMContext* context, OUT GMGlyphManager** glyphManager)
+void GMDx11Factory::createGlyphManager(const IRenderContext* context, OUT GMGlyphManager** glyphManager)
 {
 	GM_ASSERT(glyphManager);
 	*glyphManager = new GMDx11GlyphManager(context);
 }
 
-void GMDx11Factory::createFramebuffer(const GMContext* context, OUT IFramebuffer** fb)
+void GMDx11Factory::createFramebuffer(const IRenderContext* context, OUT IFramebuffer** fb)
 {
 	*fb = new GMDx11Framebuffer(context);
 }
 
-void GMDx11Factory::createFramebuffers(const GMContext* context, OUT IFramebuffers** fbs)
+void GMDx11Factory::createFramebuffers(const IRenderContext* context, OUT IFramebuffers** fbs)
 {
 	*fbs = new GMDx11Framebuffers(context);
 }
 
-void GMDx11Factory::createGBuffer(const GMContext* context, OUT IGBuffer** g)
+void GMDx11Factory::createGBuffer(const IRenderContext* context, OUT IGBuffer** g)
 {
 	*g = new GMDx11GBuffer(context);
 }

@@ -111,7 +111,7 @@ IFramebuffers* GMFramebuffersStack::peek()
 	return d->framebuffers.top();
 }
 
-GMGraphicEngine::GMGraphicEngine(const GMContext* context)
+GMGraphicEngine::GMGraphicEngine(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -271,7 +271,7 @@ void GMGraphicEngine::createFilterFramebuffer()
 	if (!d->filterFramebuffers)
 	{
 		IFactory* factory = GM.getFactory();
-		const GMWindowStates& windowStates = d->context->window->getWindowStates();
+		const GMWindowStates& windowStates = d->context->getWindow()->getWindowStates();
 		GMFramebufferDesc desc = { 0 };
 		desc.rect = windowStates.renderRect;
 		desc.framebufferFormat = GMFramebufferFormat::R32G32B32A32_FLOAT;
@@ -316,6 +316,12 @@ void GMGraphicEngine::setShadowSource(const GMShadowSourceDesc& desc)
 	D(d);
 	d->shadow = desc;
 	d->shadow.version = ++GMShadowSourceDesc::version;
+}
+
+GMCamera& GMGraphicEngine::getCamera()
+{
+	D(d);
+	return d->camera;
 }
 
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)

@@ -77,7 +77,7 @@ class DemonstrationWorld : public gm::GMGameWorld
 	DECLARE_PRIVATE_AND_BASE(DemonstrationWorld, gm::GMGameWorld)
 
 public:
-	DemonstrationWorld(const gm::GMContext*, gm::IWindow*);
+	DemonstrationWorld(const gm::IRenderContext*, gm::IWindow*);
 	~DemonstrationWorld();
 
 public:
@@ -121,7 +121,7 @@ public:
 
 	// IShaderLoadCallback
 private:
-	void onLoadShaders(const gm::GMContext* context);
+	void onLoadShaders(const gm::IRenderContext* context);
 
 private:
 	void initLoadEffectsShader(gm::GMGLShaderProgram* effectsShaderProgram);
@@ -129,7 +129,7 @@ private:
 
 	// IGameHandler
 private:
-	virtual void init(const gm::GMContext* context) override;
+	virtual void init(const gm::IRenderContext* context) override;
 	virtual void start() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 };

@@ -16,7 +16,7 @@ void GMGLFactory::createWindow(GMInstance instance, OUT IWindow** window)
 	GM_ASSERT(b);
 }
 
-void GMGLFactory::createTexture(const GMContext* context, GMImage* image, OUT ITexture** texture)
+void GMGLFactory::createTexture(const IRenderContext* context, GMImage* image, OUT ITexture** texture)
 {
 	GM_ASSERT(texture);
 	GMGLTexture* t = new GMGLTexture(image);
@@ -24,28 +24,28 @@ void GMGLFactory::createTexture(const GMContext* context, GMImage* image, OUT IT
 	t->init();
 }
 
-void GMGLFactory::createModelDataProxy(const GMContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
+void GMGLFactory::createModelDataProxy(const IRenderContext* context, GMModel* model, OUT GMModelDataProxy** modelDataProxy)
 {
 	GM_ASSERT(modelDataProxy);
 	(*modelDataProxy) = new GMGLModelDataProxy(context, model);
 }
 
-void GMGLFactory::createGlyphManager(const GMContext* context, OUT GMGlyphManager** glyphManager)
+void GMGLFactory::createGlyphManager(const IRenderContext* context, OUT GMGlyphManager** glyphManager)
 {
 	*glyphManager = new GMGLGlyphManager(context);
 }
 
-void GMGLFactory::createFramebuffer(const GMContext* context, OUT IFramebuffer** fb)
+void GMGLFactory::createFramebuffer(const IRenderContext* context, OUT IFramebuffer** fb)
 {
 	*fb = new GMGLFramebuffer(context);
 }
 
-void GMGLFactory::createFramebuffers(const GMContext* context, OUT IFramebuffers** fbs)
+void GMGLFactory::createFramebuffers(const IRenderContext* context, OUT IFramebuffers** fbs)
 {
 	*fbs = new GMGLFramebuffers(context);
 }
 
-void GMGLFactory::createGBuffer(const GMContext* context, OUT IGBuffer** g)
+void GMGLFactory::createGBuffer(const IRenderContext* context, OUT IGBuffer** g)
 {
 	*g = new GMGLGBuffer(context);
 }

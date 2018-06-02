@@ -5,11 +5,11 @@
 #include "foundation/gamemachine.h"
 #include "gmgraphicengine.h"
 
-GMGBuffer::GMGBuffer(const GMContext* context)
+GMGBuffer::GMGBuffer(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->engine = gm_cast<GMGraphicEngine*>(d->context->engine);
+	d->engine = gm_cast<GMGraphicEngine*>(d->context->getEngine());
 
 }
 
@@ -69,7 +69,7 @@ IFramebuffers* GMGBuffer::getGeometryFramebuffers()
 	return d->geometryFramebuffers;
 }
 
-const GMContext* GMGBuffer::getContext()
+const IRenderContext* GMGBuffer::getContext()
 {
 	D(d);
 	return d->context;

@@ -5,6 +5,28 @@ BEGIN_NS
 
 typedef GMLResult (GM_SYSTEM_CALLBACK *GMWindowProcHandler)(GMWindowHandle hWnd, GMuint uMsg, GMWParam wParam, GMLParam lParam);
 
+class GMRenderContext : public IRenderContext
+{
+public:
+	virtual IWindow* getWindow() const override;
+	virtual IGraphicEngine* getEngine() const override;
+
+public:
+	inline void setWindow(IWindow* window)
+	{
+		this->window = window;
+	}
+
+	inline void setEngine(IGraphicEngine* engine)
+	{
+		this->engine = engine;
+	}
+
+private:
+	IWindow* window = nullptr;
+	IGraphicEngine* engine = nullptr;
+};
+
 GM_PRIVATE_OBJECT(GMWindow)
 {
 	GMWindowHandle handle;
@@ -13,7 +35,7 @@ GM_PRIVATE_OBJECT(GMWindow)
 	Vector<GMWidget*> widgets;
 	GMWindowStates windowStates;
 	IGraphicEngine* engine = nullptr;
-	GMContext* context = nullptr;
+	IRenderContext* context = nullptr;
 };
 
 class GMWindow : public GMObject, public IWindow
@@ -38,7 +60,6 @@ public:
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
 	virtual IGameHandler* getHandler() override;
 	virtual const GMWindowStates& getWindowStates() override;
-	virtual const GMContext* getContext() override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;

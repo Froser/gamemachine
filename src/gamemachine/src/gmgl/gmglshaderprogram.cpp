@@ -23,7 +23,7 @@ GMuint GMGLShaderInfo::toGLShaderType(GMShaderType type)
 	}
 }
 
-GMGLShaderProgram::GMGLShaderProgram(const GMContext* context)
+GMGLShaderProgram::GMGLShaderProgram(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
@@ -44,7 +44,7 @@ void GMGLShaderProgram::useProgram()
 	glUseProgram(d->shaderProgram);
 	d->lastUsedProgram = d->shaderProgram;
 	
-	GMGLGraphicEngine* engine = gm_cast<GMGLGraphicEngine*>(d->context->engine);
+	GMGLGraphicEngine* engine = gm_cast<GMGLGraphicEngine*>(d->context->getEngine());
 	engine->shaderProgramChanged(this);
 }
 

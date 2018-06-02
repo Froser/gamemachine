@@ -24,7 +24,7 @@ struct GMTextureAttributeBank
 
 GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	ITexture* whiteTexture = nullptr;
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
@@ -46,12 +46,12 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	GMDx11EffectVariableBank* bank = nullptr;
 };
 
-class GMDx11Renderer : public GMObject, public IRenderer, public IContext
+class GMDx11Renderer : public GMObject, public IRenderer
 {
 	DECLARE_PRIVATE(GMDx11Renderer)
 
 public:
-	GMDx11Renderer(const GMContext* context);
+	GMDx11Renderer(const IRenderContext* context);
 	~GMDx11Renderer();
 
 public:
@@ -59,7 +59,7 @@ public:
 	virtual void endModel() override;
 	virtual void draw(GMModel* model) override;
 	virtual const char* getTechniqueName() = 0;
-	virtual const GMContext* getContext() override;
+	virtual const IRenderContext* getContext();
 
 public:
 	inline ID3DX11Effect* getEffect()
@@ -73,7 +73,7 @@ protected:
 	{
 		D(d);
 		if (!d->engine)
-			d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->engine);
+			d->engine = gm_cast<GMDx11GraphicEngine*>(d->context->getEngine());
 		return d->engine;
 	}
 
@@ -166,7 +166,7 @@ class GMDx11Renderer_Filter : public GMDx11Renderer
 	DECLARE_PRIVATE_AND_BASE(GMDx11Renderer_Filter, GMDx11Renderer)
 
 public:
-	GMDx11Renderer_Filter(const GMContext* context);
+	GMDx11Renderer_Filter(const IRenderContext* context);
 
 private:
 	virtual const char* getTechniqueName() override

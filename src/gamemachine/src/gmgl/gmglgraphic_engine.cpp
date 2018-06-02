@@ -58,7 +58,7 @@ extern "C"
 namespace
 {
 	template <typename T>
-	IRenderer* newRenderer(IRenderer*& ptr, const GMContext* context)
+	IRenderer* newRenderer(IRenderer*& ptr, const IRenderContext* context)
 	{
 		if (!ptr)
 			ptr = new T(context);
@@ -66,7 +66,7 @@ namespace
 	}
 }
 
-GMGLGraphicEngine::GMGLGraphicEngine(const GMContext* context)
+GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
 }

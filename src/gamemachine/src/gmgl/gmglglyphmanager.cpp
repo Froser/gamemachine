@@ -52,7 +52,7 @@ private:
 };
 END_NS
 
-GMGLGlyphManager::GMGLGlyphManager(const GMContext* context)
+GMGLGlyphManager::GMGLGlyphManager(const IRenderContext* context)
 	: GMGlyphManager(context)
 {
 	D(d);

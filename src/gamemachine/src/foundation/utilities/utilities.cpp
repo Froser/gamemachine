@@ -508,7 +508,7 @@ void GMPrimitiveCreator::createQuad3D(GMfloat extents[3], GMfloat position[12], 
 	*obj = model;
 }
 
-void GMToolUtil::createTexture(const GMContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
+void GMToolUtil::createTexture(const IRenderContext* context, const GMString& filename, OUT ITexture** texture, REF GMint* width, REF GMint* height)
 {
 	GMImage* img = nullptr;
 	GMBuffer buf;
@@ -535,7 +535,7 @@ void GMToolUtil::addTextureToShader(GMShader& shader, ITexture* texture, GMTextu
 }
 
 bool GMToolUtil::createPBRTextures(
-	const GMContext* context,
+	const IRenderContext* context,
 	const GMString& albedoPath,
 	const GMString& metallicPath,
 	const GMString& roughnessPath,

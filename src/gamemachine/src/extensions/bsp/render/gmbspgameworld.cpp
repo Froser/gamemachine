@@ -196,7 +196,7 @@ namespace
 
 END_NS
 
-GMBSPGameWorld::GMBSPGameWorld(const GMContext* context)
+GMBSPGameWorld::GMBSPGameWorld(const IRenderContext* context)
 	: GMGameWorld(context)
 {
 	D(d);
@@ -248,7 +248,7 @@ void GMBSPGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj, bool always
 void GMBSPGameWorld::setDefaultLights()
 {
 	IFactory* factory = GM.getFactory();
-	IGraphicEngine* engine = getContext()->engine;
+	IGraphicEngine* engine = getContext()->getEngine();
 	engine->removeLights();
 
 	{
@@ -308,7 +308,7 @@ void GMBSPGameWorld::calculateVisibleFaces()
 	D(d);
 	GMBSPRenderData& rd = d->render.renderData();
 
-	GMCamera& camera = GM.getCamera();
+	GMCamera& camera = getContext()->getEngine()->getCamera();
 	GMVec3 pos = camera.getLookAt().position;
 	BSPData& bsp = d->bsp.bspData();
 

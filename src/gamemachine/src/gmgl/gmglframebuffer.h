@@ -6,23 +6,23 @@ BEGIN_NS
 class GMGraphicEngine;
 GM_PRIVATE_OBJECT(GMGLFramebuffer)
 {
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 	ITexture* texture = nullptr;
 };
 
-class GMGLFramebuffer : public GMObject, public IFramebuffer, public IContext
+class GMGLFramebuffer : public GMObject, public IFramebuffer
 {
 	DECLARE_PRIVATE(GMGLFramebuffer);
 
 public:
-	GMGLFramebuffer(const GMContext* context);
+	GMGLFramebuffer(const IRenderContext* context);
 	~GMGLFramebuffer();
 
 public:
 	virtual bool init(const GMFramebufferDesc& desc) override;
 	virtual ITexture* getTexture() override;
 	virtual void setName(const GMString& name) override {}
-	virtual const GMContext* getContext() override;
+	virtual const IRenderContext* getContext();
 
 public:
 	GMuint getTextureId();
@@ -38,15 +38,15 @@ GM_PRIVATE_OBJECT(GMGLFramebuffers)
 	GMGraphicEngine* engine = nullptr;
 	GMFramebufferDesc desc;
 	GMfloat clearColor[4];
-	const GMContext* context = nullptr;
+	const IRenderContext* context = nullptr;
 };
 
-class GMGLFramebuffers : public GMObject, public IFramebuffers, public IContext
+class GMGLFramebuffers : public GMObject, public IFramebuffers
 {
 	DECLARE_PRIVATE(GMGLFramebuffers)
 
 public:
-	GMGLFramebuffers(const GMContext* context);
+	GMGLFramebuffers(const IRenderContext* context);
 	~GMGLFramebuffers();
 
 	virtual bool init(const GMFramebuffersDesc& desc) override;
@@ -60,7 +60,7 @@ public:
 	virtual void copyDepthStencilFramebuffer(IFramebuffers* dest) override;
 
 public:
-	virtual const GMContext* getContext() override;
+	virtual const IRenderContext* getContext();
 
 public:
 	virtual GMuint framebufferId();
@@ -79,7 +79,7 @@ protected:
 	virtual void setViewport();
 
 public:
-	static IFramebuffers* createDefaultFramebuffers(const GMContext* context);
+	static IFramebuffers* createDefaultFramebuffers(const IRenderContext* context);
 };
 
 GM_PRIVATE_OBJECT(GMGLShadowMapTexture)
@@ -112,7 +112,7 @@ class GMGLShadowFramebuffers : public GMGLFramebuffers
 	DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
 
 public:
-	GMGLShadowFramebuffers(const GMContext* context);
+	GMGLShadowFramebuffers(const IRenderContext* context);
 	~GMGLShadowFramebuffers();
 
 public:
