@@ -19,7 +19,7 @@ namespace
 void Demo_SpecularMap::setLookAt()
 {
 	D(d);
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 	d->lookAtRotation = Identity<GMQuat>();
@@ -28,14 +28,15 @@ void Demo_SpecularMap::setLookAt()
 void Demo_SpecularMap::init()
 {
 	D(d);
+	D_BASE(db, DemoHandler);
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
 
 	{
 		gm::ITexture* texture = nullptr;
-		gm::GMToolUtil::createTexture("cube_diffuse.png", &texture);
+		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_diffuse.png", &texture);
 		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 		gm::GMModel* cube = nullptr;
@@ -47,7 +48,7 @@ void Demo_SpecularMap::init()
 		shader.getMaterial().shininess = 99;
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Diffuse);
 
-		gm::GMToolUtil::createTexture("cube_specular.png", &texture);
+		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_specular.png", &texture);
 		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 		gm::GMToolUtil::addTextureToShader(shader, texture, gm::GMTextureType::Specular);
 
@@ -60,7 +61,7 @@ void Demo_SpecularMap::init()
 
 	{
 		gm::ITexture* texture = nullptr;
-		gm::GMToolUtil::createTexture("cube_diffuse.png", &texture);
+		gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "cube_diffuse.png", &texture);
 		getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 		gm::GMModel* cube = nullptr;
@@ -134,7 +135,7 @@ void Demo_SpecularMap::handleMouseEvent()
 void Demo_SpecularMap::handleDragging()
 {
 	D(d);
-	const gm::GMWindowStates& windowStates = GM.getGraphicEngine()->getCurrentWindow()->getWindowStates();
+	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
 
@@ -169,7 +170,7 @@ void Demo_SpecularMap::handleDragging()
 			GMVec4(s_lookAt.lookAt, 1.f) * QuatToMatrix(q),
 			s_lookAt.position
 		};
-		GM.getCamera().lookAt(cameraLookAt);
+		getDemonstrationWorld()->getContext()->getEngine()->getCamera().lookAt(cameraLookAt);
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 	}
@@ -187,7 +188,7 @@ void Demo_SpecularMap::setDefaultLights()
 		light->setLightPosition(lightPos);
 		gm::GMfloat color[] = { 1, 1, 1 };
 		light->setLightColor(color);
-		GM.getGraphicEngine()->addLight(light);
+		getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 	}
 }
 

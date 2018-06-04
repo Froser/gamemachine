@@ -2,112 +2,10 @@
 #define __GMCONTROL_H__
 #include <gmcommon.h>
 #include <gmmessage.h>
+#include "gmwidget.h"
 BEGIN_NS
 
 class GMWidget;
-
-struct GMControlState
-{
-	enum State
-	{
-		Normal,
-		Disabled,
-		Hidden,
-		Focus,
-		MouseOver,
-		Pressed,
-
-		EndOfControlState,
-	};
-};
-
-GM_PRIVATE_OBJECT(GMElementBlendColor)
-{
-	GMVec4 states[GMControlState::EndOfControlState];
-	GMVec4 current;
-};
-
-class GMElementBlendColor : public GMObject
-{
-	DECLARE_PRIVATE(GMElementBlendColor)
-	GM_ALLOW_COPY_DATA(GMElementBlendColor)
-
-public:
-	GMElementBlendColor() = default;
-
-public:
-	void init(const GMVec4& defaultColor, const GMVec4& disabledColor = GMVec4(.5f, .5f, .5f, .78f), const GMVec4& hiddenColor = GMVec4(0));
-	void blend(GMControlState::State state, GMfloat elapsedTime, GMfloat rate = .7f);
-
-public:
-	inline const GMVec4& getCurrent()
-	{
-		D(d);
-		return d->current;
-	}
-
-	inline void setCurrent(const GMVec4& current)
-	{
-		D(d);
-		d->current = current;
-	}
-
-	inline GMVec4* getStates()
-	{
-		D(d);
-		return d->states;
-	}
-};
-
-GM_PRIVATE_OBJECT(GMStyle)
-{
-	GMuint texture = 0;
-	GMuint font = 0;
-	GMRect rc;
-	GMElementBlendColor textureColor;
-	GMElementBlendColor fontColor;
-};
-
-class GMStyle : public GMObject
-{
-	DECLARE_PRIVATE(GMStyle)
-	GM_ALLOW_COPY_DATA(GMStyle)
-
-public:
-	GMStyle() = default;
-
-public:
-	void setTexture(GMuint texture, const GMRect& rc, const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1));
-	void setFont(GMuint font, const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
-	void setFontColor(GMControlState::State state, const GMVec4& color);
-	void setTextureColor(GMControlState::State state, const GMVec4& color);
-	void refresh();
-
-public:
-	inline GMElementBlendColor& getTextureColor()
-	{
-		D(d);
-		return d->textureColor;
-	}
-
-	inline GMElementBlendColor& getFontColor()
-	{
-		D(d);
-		return d->fontColor;
-	}
-
-	inline const GMRect& getTextureRect()
-	{
-		D(d);
-		return d->rc;
-	}
-
-	inline GMuint getTexture()
-	{
-		D(d);
-		return d->texture;
-	}
-};
 
 enum class GMControlType
 {
@@ -124,7 +22,7 @@ GM_PRIVATE_OBJECT(GMControl)
 	GMint width = 0;
 	GMint height = 0;
 	GMRect boundingBox;
-	GMWidget* canvas = nullptr;
+	GMWidget* widget = nullptr;
 
 	bool styleInited = false;
 	bool enabled = true;
@@ -141,7 +39,7 @@ class GMControl : public GMObject
 	DECLARE_PRIVATE(GMControl)
 
 public:
-	GMControl(GMWidget* canvas);
+	GMControl(GMWidget* widget);
 
 public:
 	inline void setEnabled(bool enabled)
@@ -320,7 +218,7 @@ public:
 	inline GMWidget* getParent()
 	{
 		D(d);
-		return d->canvas;
+		return d->widget;
 	}
 
 	inline GMint getIndex()

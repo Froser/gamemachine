@@ -2,6 +2,8 @@
 #include "sound.h"
 #include <linearmath.h>
 #include <gmm.h>
+#include <gmwidget.h>
+#include <gmcontrols.h>
 
 Demo_Sound::~Demo_Sound()
 {
@@ -10,39 +12,39 @@ Demo_Sound::~Demo_Sound()
 	gm::GM_delete(d->mp3Source);
 	gm::GM_delete(d->wavFile);
 	gm::GM_delete(d->mp3File);
+	gm::GM_delete(d->widget);
+}
+
+void Demo_Sound::onActivate()
+{
+	D(d);
+	Base::onActivate();
+	d->widget->setVisible(true);
+}
+
+void Demo_Sound::onDeactivate()
+{
+	D(d);
+	Base::onDeactivate();
+	d->widget->setVisible(false);
 }
 
 void Demo_Sound::init()
 {
-	/*
 	D(d);
+	D_BASE(db, Base);
 	Base::init();
 
 	GM_ASSERT(!getDemoWorldReference());
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
 
-	// 读取边框
 	gm::GMGamePackage* package = GM.getGamePackageManager();
-	gm::GMBuffer buf;
-	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
-	GM_ASSERT(b);
 
-	gm::GMImage* img = nullptr;
-	gm::GMImageReader::load(buf.buffer, buf.size, &img);
-	gm::ITexture* frameTexture = nullptr;
-	GM.getFactory()->createTexture(img, &frameTexture);
-	GM_ASSERT(frameTexture);
-	gm::GMAsset border = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
-	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
-
-	gm::GMRect rect = { 350, 220, 100, 300 };
-	listbox->setGeometry(rect);
-	listbox->setItemMargins(0, 5, 0, 0);
-
+	// 准备音频
 	{
 		// 获取WAV播放器，播放源
 		gm::GMBuffer mp3Buffer;
-		b = package->readFile(gm::GMPackageIndex::Audio, "iidesuka.wav", &mp3Buffer);
+		bool b = package->readFile(gm::GMPackageIndex::Audio, "iidesuka.wav", &mp3Buffer);
 		GM_ASSERT(b);
 
 		gm::IAudioReader* audioReader = gmm::GMMFactory::getAudioReader();
@@ -52,37 +54,12 @@ void Demo_Sound::init()
 		GM_ASSERT(!d->wavSource);
 		gm::IAudioPlayer* audio = gmm::GMMFactory::getAudioPlayer();
 		audio->createPlayerSource(d->wavFile, &d->wavSource);
-
-		{
-			gm::GMImage2DGameObject* item = listbox->addItem("Play WAV");
-			setupItem(item, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
-			item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-				d->wavSource->play(false);
-			});
-		}
-
-		{
-			gm::GMImage2DGameObject* item = listbox->addItem("Pause WAV");
-			setupItem(item, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
-			item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-				d->wavSource->pause();
-			});
-		}
-
-		{
-			gm::GMImage2DGameObject* item = listbox->addItem("Stop WAV");
-			setupItem(item, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
-			item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-				d->wavSource->stop();
-			});
-		}
 	}
-
 
 	{
 		// 获取MP3播放器，播放源
 		gm::GMBuffer mp3Buffer;
-		b = package->readFile(gm::GMPackageIndex::Audio, "gyakuten.mp3", &mp3Buffer);
+		bool b = package->readFile(gm::GMPackageIndex::Audio, "gyakuten.mp3", &mp3Buffer);
 		GM_ASSERT(b);
 
 		gm::IAudioReader* audioReader = gmm::GMMFactory::getAudioReader();
@@ -92,35 +69,108 @@ void Demo_Sound::init()
 		GM_ASSERT(!d->mp3Source);
 		gm::IAudioPlayer* audio = gmm::GMMFactory::getAudioPlayer();
 		audio->createPlayerSource(d->mp3File, &d->mp3Source);
-
-		{
-			gm::GMImage2DGameObject* item = listbox->addItem("Play MP3");
-			setupItem(item, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
-			item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-				d->mp3Source->play(false);
-			});
-		}
-
-		{
-			gm::GMImage2DGameObject* item = listbox->addItem("Pause MP3");
-			setupItem(item, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
-			item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-				d->mp3Source->pause();
-			});
-		}
-
-		{
-			gm::GMImage2DGameObject* item = listbox->addItem("Stop MP3");
-			setupItem(item, border, textureGeo, img->getData().mip[0].width, img->getData().mip[0].height);
-			item->attachEvent(*item, gm::GM_CONTROL_EVENT_ENUM(MouseDown), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-				d->mp3Source->stop();
-			});
-		}
 	}
 
-	getDemoWorldReference()->addControl(listbox);
-	GM_delete(img);
-	*/
+	d->widget = new gm::GMWidget(getDemonstrationWorld()->getManager());
+	{
+		gm::GMRect rc = { 0, 0, 136, 54 };
+		d->widget->addArea(gm::GMTextureArea::ButtonArea, rc);
+	}
+	{
+		gm::GMRect rc = { 136, 0, 116, 54 };
+		d->widget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
+	}
+
+	d->widget->init();
+	d->widget->setKeyboardInput(true);
+
+	gm::GMControlButton* button = nullptr;
+	d->widget->addButton(
+		0,
+		"Play WAV",
+		10,
+		100,
+		600,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->wavSource->play(false);
+	});
+
+	d->widget->addButton(
+		0,
+		"Pause WAV",
+		10,
+		150,
+		600,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->wavSource->pause();
+	});
+
+	d->widget->addButton(
+		0,
+		"Stop WAV",
+		10,
+		200,
+		600,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->wavSource->stop();
+	});
+
+	d->widget->addButton(
+		0,
+		"Play MP3",
+		10,
+		250,
+		600,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->mp3Source->play(false);
+	});
+
+	d->widget->addButton(
+		0,
+		"Pause MP3",
+		10,
+		300,
+		600,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->mp3Source->stop();
+	});
+
+	d->widget->addButton(
+		0,
+		"Stop MP3",
+		10,
+		350,
+		600,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->mp3Source->stop();
+	});
+
+	d->widget->setVisible(false);
+	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->widget);
 }
 
 void Demo_Sound::event(gm::GameMachineHandlerEvent evt)
@@ -148,20 +198,4 @@ void Demo_Sound::event(gm::GameMachineHandlerEvent evt)
 	default:
 		break;
 	}
-}
-
-void Demo_Sound::setupItem(gm::GMImage2DGameObject* item, gm::GMAsset border, const gm::GMRect& textureGeo, gm::GMint imgWidth, gm::GMint imgHeight)
-{
-	/*
-	item->setBorder(gm::GMImage2DBorder(
-		border,
-		textureGeo,
-		imgWidth,
-		imgHeight,
-		14,
-		14
-	));
-	item->setHeight(30);
-	item->setPaddings(10, 5, 10, 5);
-	*/
 }

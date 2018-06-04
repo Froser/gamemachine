@@ -49,6 +49,64 @@ namespace
 		}
 		return -1;
 	}
+
+	bool operator <(const GMCanvasTextureInfo& lhs, const GMCanvasTextureInfo& rhs)
+	{
+		return lhs.texture < rhs.texture;
+	}
+}
+
+void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disabledColor, const GMVec4& hiddenColor)
+{
+	D(d);
+	GM_FOREACH_ENUM_CLASS(state, GMControlState::Normal, GMControlState::EndOfControlState)
+	{
+		d->states[state] = defaultColor;
+	};
+	d->states[GMControlState::Disabled] = disabledColor;
+	d->states[GMControlState::Hidden] = hiddenColor;
+	d->current = hiddenColor;
+}
+
+void GMElementBlendColor::blend(GMControlState::State state, GMfloat elapsedTime, GMfloat rate)
+{
+	D(d);
+	GMVec4 destColor = d->states[state];
+	d->current = Lerp(d->current, destColor, elapsedTime);
+}
+
+void GMStyle::setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc, const GMVec4& defaultTextureColor)
+{
+	D(d);
+	d->texture = texture;
+	d->rc = rc;
+	d->textureColor.init(defaultTextureColor);
+}
+
+void GMStyle::setFont(GMuint font, const GMVec4& defaultColor)
+{
+	D(d);
+	d->font = font;
+	d->fontColor.init(defaultColor);
+}
+
+void GMStyle::setFontColor(GMControlState::State state, const GMVec4& color)
+{
+	D(d);
+	d->fontColor.getStates()[state] = color;
+}
+
+void GMStyle::setTextureColor(GMControlState::State state, const GMVec4& color)
+{
+	D(d);
+	d->textureColor.getStates()[state] = color;
+}
+
+void GMStyle::refresh()
+{
+	D(d);
+	d->textureColor.setCurrent(d->textureColor.getStates()[GMControlState::Hidden]);
+	d->fontColor.setCurrent(d->fontColor.getStates()[GMControlState::Hidden]);
 }
 
 GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
@@ -81,10 +139,6 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 GMWidgetResourceManager::~GMWidgetResourceManager()
 {
 	D(d);
-	for (auto textureInfo : d->textureCache)
-	{
-		GM_delete(textureInfo.texture);
-	}
 	GM_delete(d->textObject);
 	GM_delete(d->spriteObject);
 
@@ -104,15 +158,15 @@ GMGameObject* GMWidgetResourceManager::getScreenQuad()
 	return d->screenQuad;
 }
 
-GMsize_t GMWidgetResourceManager::addTexture(ITexture* texture, GMint width, GMint height)
+void GMWidgetResourceManager::addTexture(TextureType type, ITexture* texture, GMint width, GMint height)
 {
 	D(d);
 	GMCanvasTextureInfo texInfo;
 	texInfo.texture = texture;
 	texInfo.width = width;
 	texInfo.height = height;
-	d->textureCache.push_back(texInfo);
-	return d->textureCache.size() - 1;
+
+	d->textureResources[type] = texInfo;
 }
 
 void GMWidgetResourceManager::registerWidget(GMWidget* widget)
@@ -132,10 +186,10 @@ void GMWidgetResourceManager::registerWidget(GMWidget* widget)
 	d->widgets[sz - 1]->setNextCanvas(d->widgets[0]);
 }
 
-const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(GMsize_t index)
+const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(TextureType type)
 {
 	D(d);
-	return d->textureCache[index];
+	return d->textureResources[type];
 }
 
 void GMWidgetResourceManager::onRenderRectResized()
@@ -170,10 +224,26 @@ void GMWidget::addControl(GMControl* control)
 	GM_ASSERT(b);
 }
 
-const GMRect& GMWidget::getArea(GMCanvasControlArea::Area area)
+const GMRect& GMWidget::getArea(GMTextureArea::Area area)
 {
 	D(d);
 	return d->areas[area];
+}
+
+void GMWidget::setTitleVisible(
+	bool visible
+)
+{
+	D(d);
+	d->title = visible;
+}
+
+void GMWidget::setTitle(
+	const GMString& text
+)
+{
+	D(d);
+	d->titleText = text;
 }
 
 void GMWidget::addStatic(
@@ -235,13 +305,16 @@ void GMWidget::drawText(
 		return;
 
 	D(d);
+	GMRect targetRc = rc;
+	adjustRect(targetRc);
+
 	// TODO 先不考虑阴影什么的
 	const GMVec4& fontColor = style.getFontColor().getCurrent();
 	GMTextGameObject* textObject = d->manager->getTextObject();
 	textObject->setColorType(Plain);
 	textObject->setColor(fontColor);
 	textObject->setText(text);
-	textObject->setGeometry(rc);
+	textObject->setGeometry(targetRc);
 	textObject->setCenter(center);
 	textObject->draw();
 }
@@ -253,18 +326,20 @@ void GMWidget::drawSprite(
 )
 {
 	// 不需要绘制透明元素
-	if (style.getFontColor().getCurrent().getW() == 0)
+	if (style.getTextureColor().getCurrent().getW() == 0)
 		return;
 
 	D(d);
-	// TODO Caption
+	GMRect targetRc = rc;
+	adjustRect(targetRc);
+
 	const GMRect& textureRc = style.getTextureRect();
 	GMuint texId = style.getTexture();
-	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(texId);
+	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(style.getTexture());
 
 	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
-	spriteObject->setGeometry(rc);
+	spriteObject->setGeometry(targetRc);
 	spriteObject->setTexture(texInfo.texture);
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
@@ -305,7 +380,12 @@ void GMWidget::setPrevCanvas(GMWidget* prevCanvas)
 	d->prevCanvas = prevCanvas;
 }
 
-void GMWidget::addArea(GMCanvasControlArea::Area area, const GMRect& rc)
+void GMWidget::init()
+{
+	initStyles();
+}
+
+void GMWidget::addArea(GMTextureArea::Area area, const GMRect& rc)
 {
 	D(d);
 	d->areas[area] = rc;
@@ -387,6 +467,24 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			cacheEvent.setPoint(pt);
 			pCacheEvent = &cacheEvent;
 		}
+
+		// 判断是否拖拽Widget
+		if (type == GMSystemEventType::MouseDown)
+		{
+			if (onTitleMouseDown(&cacheEvent))
+				return true;
+		}
+		else if (type == GMSystemEventType::MouseMove)
+		{
+			if (onTitleMouseMove(&cacheEvent))
+				return true;
+		}
+		else if (type == GMSystemEventType::MouseUp)
+		{
+			if (onTitleMouseUp(&cacheEvent))
+				return true;
+		}
+
 		if (s_controlFocus &&
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
@@ -427,6 +525,50 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	return false;
 }
 
+bool GMWidget::onTitleMouseDown(GMSystemMouseEvent* event)
+{
+	D(d);
+	if (d->title)
+	{
+		const GMPoint& pt = event->getPoint();
+		GMRect rcBound = { 0, -d->titleHeight, d->width, d->titleHeight };
+		if (GM_inRect(rcBound, pt))
+		{
+			if (!d->movingWidget)
+			{
+				d->movingWidget = true;
+				d->movingStartPt = pt;
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+bool GMWidget::onTitleMouseMove(GMSystemMouseEvent* event)
+{
+	D(d);
+	if (d->title && d->movingWidget)
+	{
+		const GMPoint& pt = event->getPoint();
+		GMPoint deltaDistance = { pt.x - d->movingStartPt.x, pt.y - d->movingStartPt.y };
+		d->x += deltaDistance.x;
+		d->y += deltaDistance.y;
+		return true;
+	}
+	return false;
+}
+
+bool GMWidget::onTitleMouseUp(GMSystemMouseEvent* event)
+{
+	D(d);
+	if (d->title && d->movingWidget)
+	{
+		d->movingWidget = false;
+	}
+	return false;
+}
+
 void GMWidget::render(GMfloat elpasedTime)
 {
 	D(d);
@@ -437,7 +579,7 @@ void GMWidget::render(GMfloat elpasedTime)
 	}
 
 	if (!d->visible ||
-		(d->minimized && !d->caption))
+		(d->minimized && !d->title))
 		return;
 
 	bool backgroundVisible =
@@ -475,7 +617,14 @@ void GMWidget::render(GMfloat elpasedTime)
 	}
 
 	// TODO getTextureNode
-	// TODO caption
+
+	if (d->title)
+	{
+		GMRect rc = { 0, -d->titleHeight, d->width, d->titleHeight };
+		drawSprite(d->titleStyle, rc, .99f);
+		rc.x += 5; // Margin
+		drawText(d->titleText, d->titleStyle, rc);
+	}
 
 	if (!d->minimized)
 	{
@@ -678,6 +827,26 @@ void GMWidget::onMouseMove(const GMPoint& pt)
 	d->controlMouseOver = control;
 	if (control)
 		control->onMouseEnter();
+}
+
+void GMWidget::adjustRect(GMRect& rc)
+{
+	D(d);
+	rc.x += d->x;
+	rc.y += d->y;
+}
+
+void GMWidget::initStyles()
+{
+	D(d);
+	GMStyle titleStyle;
+	titleStyle.setFont(0);
+	titleStyle.setTexture(GMWidgetResourceManager::Skin, getArea(GMTextureArea::CaptionArea) );
+	titleStyle.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
+	titleStyle.setFontColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
+	titleStyle.getTextureColor().blend(GMControlState::Normal, .5f);
+	titleStyle.getFontColor().blend(GMControlState::Normal, .5f);
+	d->titleStyle = titleStyle;
 }
 
 void GMWidget::clearFocus()

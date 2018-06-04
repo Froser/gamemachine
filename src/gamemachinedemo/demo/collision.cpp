@@ -25,9 +25,10 @@ namespace
 void Demo_Collision::init()
 {
 	D(d);
+	D_BASE(db, DemoHandler);
 	Base::init();
 
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
 	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(getDemoWorldReference());
 	d->ground = new gm::GMGameObject();
 	d->ground->setTranslation(Translate(GMVec3(0, -50, 0)));
@@ -132,7 +133,7 @@ void Demo_Collision::event(gm::GameMachineHandlerEvent evt)
 
 void Demo_Collision::setLookAt()
 {
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 
 	gm::GMCameraLookAt lookAt;
@@ -147,7 +148,7 @@ void Demo_Collision::setDefaultLights()
 	D(d);
 	if (isInited())
 	{
-		const gm::GMWindowStates& windowStates = GM.getGraphicEngine()->getCurrentWindow()->getWindowStates();
+		const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 
 		{
 			gm::ILight* light = nullptr;
@@ -155,7 +156,7 @@ void Demo_Collision::setDefaultLights()
 			GM_ASSERT(light);
 			gm::GMfloat colorA[] = { .7f, .7f, .7f };
 			light->setLightColor(colorA);
-			GM.getGraphicEngine()->addLight(light);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 
 		{
@@ -167,14 +168,14 @@ void Demo_Collision::setDefaultLights()
 
 			gm::GMfloat lightPos[] = { -3.f, 3.f, -3.f };
 			light->setLightPosition(lightPos);
-			GM.getGraphicEngine()->addLight(light);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 
 		{
 			gm::GMShadowSourceDesc desc;
 			desc.position = GMVec4(-3.f, 3.f, -3.f, 1);
 			desc.type = gm::GMShadowSourceDesc::DirectShadow;
-			desc.camera = GM.getCamera();
+			desc.camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 			desc.biasMax = desc.biasMin = 0.0005f;
 			desc.width = windowStates.renderRect.width * 2;
 			desc.height = windowStates.renderRect.height * 2;
@@ -182,7 +183,7 @@ void Demo_Collision::setDefaultLights()
 			gm::GMCameraLookAt lookAt;
 			desc.camera.lookAt(gm::GMCameraLookAt::makeLookAt(desc.position, GMVec3(0, 0, 0)));
 
-			GM.getGraphicEngine()->setShadowSource(desc);
+			getDemonstrationWorld()->getContext()->getEngine()->setShadowSource(desc);
 		}
 	}
 }
@@ -198,12 +199,12 @@ void Demo_Collision::onWindowActivate()
 	D(d);
 	gm::IInput* input = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 	auto& ms = input->getMouseState().mouseState();
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 
 	if (ms.downButton & gm::GMMouseButton_Left)
 	{
 		GMVec3 rayFrom = camera.getLookAt().position;
-		GMVec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
+		GMVec3 rayTo = camera.getRayToWorld(getDemonstrationWorld()->getContext()->getWindow()->getRenderRect(), ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
 
 		if (rayTestResult.hit && !(rayTestResult.hitObject->isStaticObject() || rayTestResult.hitObject->isKinematicObject()))
@@ -227,7 +228,7 @@ void Demo_Collision::onWindowActivate()
 	else if (ms.moving && isActivating())
 	{
 		GMVec3 rayFrom = camera.getLookAt().position;
-		GMVec3 rayTo = camera.getRayToWorld(ms.posX, ms.posY);
+		GMVec3 rayTo = camera.getRayToWorld(getDemonstrationWorld()->getContext()->getWindow()->getRenderRect(), ms.posX, ms.posY);
 		gm::GMPhysicsRayTestResult rayTestResult = d->discreteWorld->rayTest(rayFrom, rayTo);
 		movePicked(rayTestResult);
 	}

@@ -28,7 +28,7 @@ void Demo_Model::onDeactivate()
 void Demo_Model::setLookAt()
 {
 	D(d);
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 	d->lookAtRotation = Identity<GMQuat>();
@@ -37,13 +37,14 @@ void Demo_Model::setLookAt()
 void Demo_Model::init()
 {
 	D(d);
+	D_BASE(db, DemoHandler);
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
 
 	gm::ITexture* texture = nullptr;
-	gm::GMToolUtil::createTexture("bnp.png", &texture);
+	gm::GMToolUtil::createTexture(getDemoWorldReference()->getContext(), "bnp.png", &texture);
 	getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, texture);
 
 	gm::GMGamePackage& pk = *GM.getGamePackageManager();
@@ -208,7 +209,7 @@ gm::GMCubeMapGameObject* Demo_Model::createCubeMap()
 
 	gm::GMCubeMapBuffer cubeMap(*slices[0], *slices[1], *slices[2], *slices[3], *slices[4], *slices[5]);
 	gm::ITexture* cubeMapTex = nullptr;
-	GM.getFactory()->createTexture(&cubeMap, &cubeMapTex);
+	GM.getFactory()->createTexture(getDemoWorldReference()->getContext(), &cubeMap, &cubeMapTex);
 
 	for (auto slice : slices)
 	{
@@ -223,7 +224,7 @@ void Demo_Model::handleDragging()
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
-	const gm::GMWindowStates& windowStates = GM.getGraphicEngine()->getCurrentWindow()->getWindowStates();
+	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 
 	if (d->draggingL)
 	{
@@ -257,7 +258,7 @@ void Demo_Model::handleDragging()
 			GMVec4(s_lookAt.lookAt, 1.f) * QuatToMatrix(q),
 			s_lookAt.position
 		};
-		GM.getCamera().lookAt(cameraLookAt);
+		getDemonstrationWorld()->getContext()->getEngine()->getCamera().lookAt(cameraLookAt);
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 	}
@@ -276,7 +277,7 @@ void Demo_Model::setDefaultLights()
 			light->setLightPosition(lightPos);
 			gm::GMfloat color[] = { .7f, .7f, .7f };
 			light->setLightColor(color);
-			GM.getGraphicEngine()->addLight(light);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 
 		{
@@ -285,7 +286,7 @@ void Demo_Model::setDefaultLights()
 			GM_ASSERT(light);
 			gm::GMfloat color[] = { .3f, .3f, .3f };
 			light->setLightColor(color);
-			GM.getGraphicEngine()->addLight(light);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(light);
 		}
 	}
 }

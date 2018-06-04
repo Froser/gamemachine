@@ -15,7 +15,7 @@ namespace
 void Demo_PBR::setLookAt()
 {
 	D(d);
-	gm::GMCamera& camera = GM.getCamera();
+	gm::GMCamera& camera = getDemonstrationWorld()->getContext()->getEngine()->getCamera();
 	camera.setPerspective(Radians(75.f), 1.333f, .1f, 3200);
 	camera.lookAt(s_lookAt);
 	d->lookAtRotation = Identity<GMQuat>();
@@ -24,10 +24,11 @@ void Demo_PBR::setLookAt()
 void Demo_PBR::init()
 {
 	D(d);
+	D_BASE(db, DemoHandler);
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
 
 	{
 		gm::GMModel* sphere = nullptr;
@@ -41,6 +42,7 @@ void Demo_PBR::init()
 		gm::ITexture* normal = nullptr;
 
 		gm::GMToolUtil::createPBRTextures(
+			getDemoWorldReference()->getContext(),
 			"pbr/albedo.png",
 			"pbr/metallic.png",
 			"pbr/roughness.png",
@@ -105,7 +107,7 @@ void Demo_PBR::handleDragging()
 	D(d);
 	gm::IMouseState& ms = getDemonstrationWorld()->getMainWindow()->getInputMananger()->getMouseState();
 	gm::GMMouseState state = ms.mouseState();
-	const gm::GMWindowStates& windowStates = GM.getGraphicEngine()->getCurrentWindow()->getWindowStates();
+	const gm::GMWindowStates& windowStates = getDemonstrationWorld()->getContext()->getWindow()->getWindowStates();
 
 	if (d->draggingL)
 	{
@@ -137,7 +139,7 @@ void Demo_PBR::handleDragging()
 			GMVec4(s_lookAt.lookAt, 1.f) * QuatToMatrix(q),
 			s_lookAt.position
 		};
-		GM.getCamera().lookAt(cameraLookAt);
+		getDemonstrationWorld()->getContext()->getEngine()->getCamera().lookAt(cameraLookAt);
 		d->mouseDownX = state.posX;
 		d->mouseDownY = state.posY;
 	}
@@ -156,7 +158,7 @@ void Demo_PBR::setDefaultLights()
 			directLight->setLightPosition(lightPos);
 			gm::GMfloat color[] = { 20, 20, 20 };
 			directLight->setLightColor(color);
-			GM.getGraphicEngine()->addLight(directLight);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(directLight);
 		}
 
 		{
@@ -165,7 +167,7 @@ void Demo_PBR::setDefaultLights()
 			GM_ASSERT(ambientLight);
 			gm::GMfloat color[] = { .05f, .05f, .05f };
 			ambientLight->setLightColor(color);
-			GM.getGraphicEngine()->addLight(ambientLight);
+			getDemonstrationWorld()->getContext()->getEngine()->addLight(ambientLight);
 		}
 	}
 }

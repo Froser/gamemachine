@@ -1,7 +1,6 @@
 ﻿#ifndef __GMCANVAS_H__
 #define __GMCANVAS_H__
 #include <gmcommon.h>
-#include "gmcontrols.h"
 BEGIN_NS
 
 class GMControl;
@@ -10,12 +9,69 @@ class GMModel;
 class GMTextGameObject;
 class GMSprite2DGameObject;
 class GMSystemEvent;
+class GMSystemMouseEvent;
 class GMWidget;
+class GMControlStatic;
+class GMControlButton;
 
-struct GMCanvasControlArea
+struct GMControlState
+{
+	enum State
+	{
+		Normal,
+		Disabled,
+		Hidden,
+		Focus,
+		MouseOver,
+		Pressed,
+
+		EndOfControlState,
+	};
+};
+
+GM_PRIVATE_OBJECT(GMElementBlendColor)
+{
+	GMVec4 states[GMControlState::EndOfControlState];
+	GMVec4 current;
+};
+
+class GMElementBlendColor : public GMObject
+{
+	DECLARE_PRIVATE(GMElementBlendColor)
+	GM_ALLOW_COPY_DATA(GMElementBlendColor)
+
+public:
+	GMElementBlendColor() = default;
+
+public:
+	void init(const GMVec4& defaultColor, const GMVec4& disabledColor = GMVec4(.5f, .5f, .5f, .78f), const GMVec4& hiddenColor = GMVec4(0));
+	void blend(GMControlState::State state, GMfloat elapsedTime, GMfloat rate = .7f);
+
+public:
+	inline const GMVec4& getCurrent()
+	{
+		D(d);
+		return d->current;
+	}
+
+	inline void setCurrent(const GMVec4& current)
+	{
+		D(d);
+		d->current = current;
+	}
+
+	inline GMVec4* getStates()
+	{
+		D(d);
+		return d->states;
+	}
+};
+
+struct GMTextureArea
 {
 	enum Area
 	{
+		CaptionArea,
 		ButtonArea,
 		ButtonFillArea,
 	};
@@ -33,12 +89,12 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	const IRenderContext* context = nullptr;
 	GMTextGameObject* textObject = nullptr;
 	GMSprite2DGameObject* spriteObject = nullptr;
-	Vector<GMCanvasTextureInfo> textureCache;
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
 	GMGameObject* screenQuad = nullptr;
 	GMModel* screenQuadModel = nullptr;
+	Map<GMint, GMCanvasTextureInfo> textureResources;
 };
 
 class GMWidgetResourceManager : public GMObject
@@ -46,12 +102,19 @@ class GMWidgetResourceManager : public GMObject
 	DECLARE_PRIVATE(GMWidgetResourceManager)
 
 public:
+	enum TextureType
+	{
+		Skin,
+		UserDefine,
+	};
+
+public:
 	GMWidgetResourceManager(const IRenderContext* context);
 	~GMWidgetResourceManager();
 
 public:
-	const GMCanvasTextureInfo& getTexture(GMsize_t index);
-	GMsize_t addTexture(ITexture* texture, GMint width, GMint height);
+	const GMCanvasTextureInfo& getTexture(TextureType type);
+	void addTexture(TextureType type, ITexture* texture, GMint width, GMint height);
 
 	virtual const IRenderContext* getContext()
 	{
@@ -103,6 +166,56 @@ public:
 	GMGameObject* getScreenQuad();
 };
 
+GM_PRIVATE_OBJECT(GMStyle)
+{
+	GMWidgetResourceManager::TextureType texture;
+	GMuint font = 0;
+	GMRect rc;
+	GMElementBlendColor textureColor;
+	GMElementBlendColor fontColor;
+};
+
+class GMStyle : public GMObject
+{
+	DECLARE_PRIVATE(GMStyle)
+	GM_ALLOW_COPY_DATA(GMStyle)
+
+public:
+	GMStyle() = default;
+
+public:
+	void setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc, const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1));
+	void setFont(GMuint font, const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
+	void setFontColor(GMControlState::State state, const GMVec4& color);
+	void setTextureColor(GMControlState::State state, const GMVec4& color);
+	void refresh();
+
+public:
+	inline GMElementBlendColor& getTextureColor()
+	{
+		D(d);
+		return d->textureColor;
+	}
+
+	inline GMElementBlendColor& getFontColor()
+	{
+		D(d);
+		return d->fontColor;
+	}
+
+	inline const GMRect& getTextureRect()
+	{
+		D(d);
+		return d->rc;
+	}
+
+	inline GMWidgetResourceManager::TextureType getTexture()
+	{
+		D(d);
+		return d->texture;
+	}
+};
+
 GM_PRIVATE_OBJECT(GMWidget)
 {
 	GMWidgetResourceManager* manager = nullptr;
@@ -118,7 +231,11 @@ GM_PRIVATE_OBJECT(GMWidget)
 	bool mouseInput = false;
 	bool visible = true;
 	bool minimized = false;
-	bool caption = false;
+	bool title = false;
+	GMint titleHeight = 20;
+	GMString titleText;
+	GMStyle titleStyle;
+
 	GMfloat colorTopLeft[3] = { 0 };
 	GMfloat colorTopRight[3] = { 0 };
 	GMfloat colorBottomLeft[3] = { 0 };
@@ -127,7 +244,10 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMint height = 0;
 	GMint x = 0;
 	GMint y = 0;
-	HashMap<GMCanvasControlArea::Area, GMRect> areas;
+	HashMap<GMTextureArea::Area, GMRect> areas;
+
+	bool movingWidget = false;
+	GMPoint movingStartPt;
 };
 
 class GMWidget : public GMObject
@@ -139,15 +259,20 @@ public:
 	~GMWidget();
 
 public:
-	virtual void init() {}
-
-public:
-	void addArea(GMCanvasControlArea::Area area, const GMRect& rc);
-	bool msgProc(GMSystemEvent* event);
+	void init();
+	void addArea(GMTextureArea::Area area, const GMRect& rc);
 	void render(GMfloat elpasedTime);
 	void setNextCanvas(GMWidget* nextCanvas);
 	void addControl(GMControl* control);
-	const GMRect& getArea(GMCanvasControlArea::Area area);
+	const GMRect& getArea(GMTextureArea::Area area);
+
+	void setTitleVisible(
+		bool visible
+	);
+
+	void setTitle(
+		const GMString& text
+	);
 
 	void addStatic(
 		GMint id,
@@ -187,6 +312,12 @@ public:
 
 	void requestFocus(GMControl* control);
 
+public:
+	virtual bool msgProc(GMSystemEvent* event);
+	virtual bool onTitleMouseDown(GMSystemMouseEvent* event);
+	virtual bool onTitleMouseMove(GMSystemMouseEvent* event);
+	virtual bool onTitleMouseUp(GMSystemMouseEvent* event);
+
 private:
 	bool initControl(GMControl* control);
 	void setPrevCanvas(GMWidget* prevCanvas);
@@ -196,6 +327,10 @@ private:
 	GMControl* getControlAtPoint(const GMPoint& pt);
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
+	void adjustRect(GMRect& rc);
+
+protected:
+	void initStyles();
 
 public:
 	inline IWindow* getParentWindow()
@@ -262,6 +397,20 @@ public:
 	{
 		D(d);
 		d->keyboardInput = keyboardInput;
+	}
+
+	inline void setSize(GMint width, GMint height)
+	{
+		D(d);
+		d->width = width;
+		d->height = height;
+	}
+
+	inline void setPosition(GMint x, GMint y)
+	{
+		D(d);
+		d->x = x;
+		d->y = y;
 	}
 
 public:

@@ -1,20 +1,21 @@
 ﻿#include "stdafx.h"
 #include "demonstration_world.h"
 #include <gmwidget.h>
+#include <gmcontrols.h>
 #include <gmgl.h>
 #include <gmgraphicengine.h>
 
 #include "demo/texture.h"
-//#include "demo/normalmap.h"
-//#include "demo/effects.h"
-//#include "demo/quake3_bsp.h"
-//#include "demo/sound.h"
-//#include "demo/literature.h"
-//#include "demo/model.h"
-//#include "demo/collision.h"
-//#include "demo/specularmap.h"
-//#include "demo/pbr.h"
-//#include "demo/phong_pbr.h"
+#include "demo/normalmap.h"
+#include "demo/effects.h"
+#include "demo/quake3_bsp.h"
+#include "demo/sound.h"
+#include "demo/literature.h"
+#include "demo/model.h"
+#include "demo/collision.h"
+#include "demo/specularmap.h"
+#include "demo/pbr.h"
+#include "demo/phong_pbr.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -27,17 +28,17 @@ namespace
 	void loadDemostrations(DemonstrationWorld* world)
 	{
 		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
-		//world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
-		//world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-		//world->addDemo("Effects: Use a grayscale filter.", new Demo_Effects(world));
-		//world->addDemo("BSP: Demonstrate a Quake3 scene.", new Demo_Quake3_BSP(world));
-		//world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
-		//world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
-		//world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
-		//world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
-		//world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
-		//world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
-		//world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
+		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
+		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
+		world->addDemo("Effects: Use a grayscale filter.", new Demo_Effects(world));
+		world->addDemo("BSP: Demonstrate a Quake3 scene.", new Demo_Quake3_BSP(world));
+		world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
+		world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
+		world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
+		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
+		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
+		world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
+		world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
 		world->init();
 	}
 }
@@ -190,6 +191,7 @@ DemonstrationWorld::~DemonstrationWorld()
 	}
 
 	GM_delete(d->mainWidget);
+	GM_delete(d->manager);
 }
 
 void DemonstrationWorld::addDemo(const gm::GMString& name, AUTORELEASE DemoHandler* demo)
@@ -205,25 +207,29 @@ void DemonstrationWorld::init()
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 
 	// 创建画布
-	auto manager = new gm::GMWidgetResourceManager(getContext());
+	d->manager = new gm::GMWidgetResourceManager(getContext());
 	gm::ITexture* texture = nullptr;
 	gm::GMint width, height;
 	gm::GMToolUtil::createTexture(getContext(), "skin.png", &texture, &width, &height);
-	manager->addTexture(texture, width, height);
+	d->manager->addTexture(gm::GMWidgetResourceManager::Skin, texture, width, height);
 
-	d->mainWidget = new gm::GMWidget(manager);
+	d->mainWidget = new gm::GMWidget(d->manager);
 	{
 		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->mainWidget->addArea(gm::GMCanvasControlArea::ButtonArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, rc);
 	}
 	{
 		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->mainWidget->addArea(gm::GMCanvasControlArea::ButtonFillArea, rc);
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
 	}
 
-	manager->registerWidget(d->mainWidget);
-	d->mainWidget->init();
+	d->manager->registerWidget(d->mainWidget);
+	d->mainWidget->setPosition(10, 30);
+	d->mainWidget->setSize(800, 600);
+	d->mainWidget->setTitle(L"GameMachine Demo Menu");
+	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
+	d->mainWidget->init();
 
 	gm::GMint Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
@@ -247,8 +253,6 @@ void DemonstrationWorld::init()
 		});
 	}
 
-	d->mainWidget->addStatic(-1, "Hello world", 600, 400, 100, 100, false, nullptr);
-	d->mainWidget->addStatic(-1, "GameMachine", 700, 450, 100, 100, false, nullptr);
 	d->mainWindow->addWidget(d->mainWidget);
 }
 

@@ -11,6 +11,7 @@ GM_PRIVATE_OBJECT(Demo_Sound)
 	gm::IAudioFile* mp3File = nullptr;
 	gm::IAudioSource* wavSource = nullptr;
 	gm::IAudioSource* mp3Source = nullptr;
+	gm::GMWidget* widget = nullptr;
 };
 
 class Demo_Sound : public DemoHandler
@@ -21,12 +22,12 @@ public:
 	using Base::Base;
 	~Demo_Sound();
 
+	virtual void onActivate() override;
+	virtual void onDeactivate() override;
+
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
-
-private:
-	void setupItem(gm::GMImage2DGameObject* item, gm::GMAsset border, const gm::GMRect& textureGeo, gm::GMint imgWidth, gm::GMint imgHeight);
 };
 
 #endif

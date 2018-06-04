@@ -151,23 +151,5 @@ private:
 	void updateVertices(GMModel* model);
 	void updateTexture(GMModel* model);
 };
-
-//////////////////////////////////////////////////////////////////////////
-enum {
-	BorderAreaCount = 9,
-};
-
-GM_PRIVATE_OBJECT(GMImage2DBorder)
-{
-	GMAsset texture;
-	GMRect borderTextureGeometry;
-	GMModel *models[BorderAreaCount] = { nullptr };
-	GMGameObject *objects[BorderAreaCount] = { nullptr };
-	GMfloat width;
-	GMfloat height;
-	GMfloat cornerWidth;
-	GMfloat cornerHeight;
-};
-
 END_NS
 #endif

@@ -70,6 +70,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	DemoHandler* nextDemo = nullptr;
 	gm::GMWidget* mainWidget = nullptr;
 	gm::IWindow* mainWindow = nullptr;
+	gm::GMWidgetResourceManager* manager = nullptr;
 };
 
 class DemonstrationWorld : public gm::GMGameWorld
@@ -97,6 +98,12 @@ public:
 	{
 		D(d);
 		return d->mainWindow;
+	}
+
+	gm::GMWidgetResourceManager* getManager()
+	{
+		D(d);
+		return d->manager;
 	}
 };
 

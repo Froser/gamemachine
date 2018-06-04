@@ -5,10 +5,11 @@
 void Demo_NormalMap::init()
 {
 	D(d);
+	D_BASE(db, DemoHandler);
 	Base::init();
-
+	
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld();
+	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
 
 	// 创建一个纹理
 	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
@@ -29,7 +30,7 @@ void Demo_NormalMap::init()
 
 			auto pk = gm::GameMachine::instance().getGamePackageManager();
 			gm::ITexture* tex = nullptr;
-			gm::GMToolUtil::createTexture("bnp.png", &tex);
+			gm::GMToolUtil::createTexture(world->getContext(), "bnp.png", &tex);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::NormalMap);
 			gm::GMToolUtil::addTextureToShader(shader, tex, gm::GMTextureType::Diffuse);
 			world->getAssets().insertAsset(gm::GMAssetType::Texture, tex);
