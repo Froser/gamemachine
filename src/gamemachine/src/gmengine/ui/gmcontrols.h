@@ -98,12 +98,12 @@ public:
 		return false;
 	}
 
-	virtual bool onMousePress(GMSystemMouseEvent* event)
+	virtual bool onMouseDown(GMSystemMouseEvent* event)
 	{
 		return false;
 	}
 
-	virtual bool onMouseRelease(GMSystemMouseEvent* event)
+	virtual bool onMouseUp(GMSystemMouseEvent* event)
 	{
 		return false;
 	}
@@ -298,9 +298,9 @@ public:
 	virtual void refresh() override;
 
 	// virtual void onHotkey
-	virtual bool onMousePress(GMSystemMouseEvent* event) override;
+	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
 	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
-	virtual bool onMouseRelease(GMSystemMouseEvent* event) override;
+	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
 	virtual bool containsPoint(const GMPoint& pt) override;
 	virtual bool canHaveFocus() override;
 	virtual bool onKeyDown(GMSystemKeyEvent* event);

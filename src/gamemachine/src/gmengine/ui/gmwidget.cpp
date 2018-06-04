@@ -454,34 +454,39 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 		GMSystemMouseWheelEvent cacheWheelEvent;
 		GMSystemMouseEvent cacheEvent;
 
-		GMSystemMouseEvent* pCacheEvent = nullptr;
+		GMSystemMouseEvent* pControlEvent = nullptr;
 		if (type == GMSystemEventType::MouseWheel)
 		{
 			cacheWheelEvent = *(gm_cast<GMSystemMouseWheelEvent*>(mouseEvent));
 			cacheWheelEvent.setPoint(pt);
-			pCacheEvent = &cacheWheelEvent;
+			pControlEvent = &cacheWheelEvent;
 		}
 		else
 		{
 			cacheEvent = *mouseEvent;
 			cacheEvent.setPoint(pt);
-			pCacheEvent = &cacheEvent;
+			pControlEvent = &cacheEvent;
 		}
 
 		// 判断是否拖拽Widget
 		if (type == GMSystemEventType::MouseDown)
 		{
-			if (onTitleMouseDown(&cacheEvent))
-				return true;
+			if (d->title)
+			{
+				const GMPoint& pt = cacheEvent.getPoint();
+				GMRect rcBound = { 0, -d->titleHeight, d->width, d->titleHeight };
+				if (GM_inRect(rcBound, pt) && onTitleMouseDown(&cacheEvent))
+					return true;
+			}
 		}
 		else if (type == GMSystemEventType::MouseMove)
 		{
-			if (onTitleMouseMove(&cacheEvent))
+			if (d->title && onTitleMouseMove(&cacheEvent))
 				return true;
 		}
 		else if (type == GMSystemEventType::MouseUp)
 		{
-			if (onTitleMouseUp(&cacheEvent))
+			if (d->title && onTitleMouseUp(&cacheEvent))
 				return true;
 		}
 
@@ -489,7 +494,7 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 			s_controlFocus->getParent() == this &&
 			s_controlFocus->getEnabled())
 		{
-			if (s_controlFocus->handleMouse(pCacheEvent))
+			if (s_controlFocus->handleMouse(pControlEvent))
 				return true;
 		}
 
@@ -497,14 +502,13 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 		GMControl* control = getControlAtPoint(pt);
 		if (control && control->getEnabled())
 		{
-			if (control->handleMouse(mouseEvent))
+			if (control->handleMouse(pControlEvent))
 				return true;
 		}
 		else
 		{
 			// 如果没有找到任何控件，那么当前的焦点控件失去焦点
-			if (type == GMSystemEventType::KeyDown && 
-				(mouseEvent->getButton() & GMMouseButton_Left) != 0 &&
+			if (type == GMSystemEventType::MouseDown && 
 				s_controlFocus &&
 				s_controlFocus->getParent() == this)
 			{
@@ -525,30 +529,22 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	return false;
 }
 
-bool GMWidget::onTitleMouseDown(GMSystemMouseEvent* event)
+bool GMWidget::onTitleMouseDown(const GMSystemMouseEvent* event)
 {
 	D(d);
-	if (d->title)
+	if (!d->movingWidget)
 	{
-		const GMPoint& pt = event->getPoint();
-		GMRect rcBound = { 0, -d->titleHeight, d->width, d->titleHeight };
-		if (GM_inRect(rcBound, pt))
-		{
-			if (!d->movingWidget)
-			{
-				d->movingWidget = true;
-				d->movingStartPt = pt;
-				return true;
-			}
-		}
+		d->movingWidget = true;
+		d->movingStartPt = event->getPoint();
+		return true;
 	}
 	return false;
 }
 
-bool GMWidget::onTitleMouseMove(GMSystemMouseEvent* event)
+bool GMWidget::onTitleMouseMove(const GMSystemMouseEvent* event)
 {
 	D(d);
-	if (d->title && d->movingWidget)
+	if (d->movingWidget)
 	{
 		const GMPoint& pt = event->getPoint();
 		GMPoint deltaDistance = { pt.x - d->movingStartPt.x, pt.y - d->movingStartPt.y };
@@ -559,14 +555,21 @@ bool GMWidget::onTitleMouseMove(GMSystemMouseEvent* event)
 	return false;
 }
 
-bool GMWidget::onTitleMouseUp(GMSystemMouseEvent* event)
+bool GMWidget::onTitleMouseUp(const GMSystemMouseEvent* event)
 {
 	D(d);
-	if (d->title && d->movingWidget)
-	{
+	if (d->movingWidget)
 		d->movingWidget = false;
-	}
 	return false;
+}
+
+void GMWidget::onRenderTitle()
+{
+	D(d);
+	GMRect rc = { 0, -d->titleHeight, d->width, d->titleHeight };
+	drawSprite(d->titleStyle, rc, .99f);
+	rc.x += 5;
+	drawText(d->titleText, d->titleStyle, rc);
 }
 
 void GMWidget::render(GMfloat elpasedTime)
@@ -620,10 +623,7 @@ void GMWidget::render(GMfloat elpasedTime)
 
 	if (d->title)
 	{
-		GMRect rc = { 0, -d->titleHeight, d->width, d->titleHeight };
-		drawSprite(d->titleStyle, rc, .99f);
-		rc.x += 5; // Margin
-		drawText(d->titleText, d->titleStyle, rc);
+		onRenderTitle();
 	}
 
 	if (!d->minimized)

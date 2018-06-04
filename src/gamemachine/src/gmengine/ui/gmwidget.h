@@ -314,9 +314,10 @@ public:
 
 public:
 	virtual bool msgProc(GMSystemEvent* event);
-	virtual bool onTitleMouseDown(GMSystemMouseEvent* event);
-	virtual bool onTitleMouseMove(GMSystemMouseEvent* event);
-	virtual bool onTitleMouseUp(GMSystemMouseEvent* event);
+	virtual bool onTitleMouseDown(const GMSystemMouseEvent* event);
+	virtual bool onTitleMouseMove(const GMSystemMouseEvent* event);
+	virtual bool onTitleMouseUp(const GMSystemMouseEvent* event);
+	virtual void onRenderTitle();
 
 private:
 	bool initControl(GMControl* control);

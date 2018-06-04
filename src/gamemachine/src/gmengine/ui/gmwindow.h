@@ -52,7 +52,7 @@ public:
 	virtual GMRect getRenderRect() override;
 	virtual void centerWindow() override;
 	virtual bool isWindowActivate() override;
-	virtual void setWindowCapture(bool lock) override;
+	virtual void setWindowCapture(bool capture) override;
 	virtual void showWindow() override;
 	virtual GMWindowHandle create(const GMWindowAttributes& wndAttrs) override;
 	virtual GMWindowHandle getWindowHandle() const override { D(d); return d->handle; }

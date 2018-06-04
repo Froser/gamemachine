@@ -29,10 +29,10 @@ bool GMControl::handleMouse(GMSystemMouseEvent* event)
 	switch (event->getType())
 	{
 	case GMSystemEventType::MouseDown:
-		handled = onMousePress(event);
+		handled = onMouseDown(event);
 		break;
 	case GMSystemEventType::MouseUp:
-		handled = onMouseRelease(event);
+		handled = onMouseUp(event);
 		break;
 	case GMSystemEventType::MouseMove:
 		handled = onMouseMove(event);
@@ -122,7 +122,7 @@ void GMControlButton::refresh()
 	d->fillStyle.refresh();
 }
 
-bool GMControlButton::onMousePress(GMSystemMouseEvent* event)
+bool GMControlButton::onMouseDown(GMSystemMouseEvent* event)
 {
 	return handleMousePressOrDblClick(event->getPoint());
 }
@@ -132,7 +132,7 @@ bool GMControlButton::onMouseDblClick(GMSystemMouseEvent* event)
 	return handleMousePressOrDblClick(event->getPoint());
 }
 
-bool GMControlButton::onMouseRelease(GMSystemMouseEvent* event)
+bool GMControlButton::onMouseUp(GMSystemMouseEvent* event)
 {
 	return handleMouseRelease(event->getPoint());
 }
@@ -204,18 +204,24 @@ void GMControlButton::render(GMfloat elapsed)
 		state = GMControlState::Focus;
 	}
 
+	GMRect rc = boundingRect();
+	rc.x += offsetX;
+	rc.width -= offsetX * 2;
+	rc.y += offsetY;
+	rc.height -= offsetY * 2;
+
 	GMWidget* widget = getParent();
 	GMfloat blendRate = (state == GMControlState::Pressed) ? 0.0f : 0.8f;
 
 	db->foreStyle.getTextureColor().blend(state, elapsed, blendRate);
 	db->foreStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(db->foreStyle, boundingRect(), .8f);
-	widget->drawText(getText(), db->foreStyle, boundingRect(), false, true);
+	widget->drawSprite(db->foreStyle, rc, .8f);
+	widget->drawText(getText(), db->foreStyle, rc, false, true);
 
 	d->fillStyle.getTextureColor().blend(state, elapsed, blendRate);
 	d->fillStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(d->fillStyle, boundingRect(), .8f);
-	widget->drawText(getText(), d->fillStyle, boundingRect(), false, true);
+	widget->drawSprite(d->fillStyle, rc, .8f);
+	widget->drawText(getText(), d->fillStyle, rc, false, true);
 }
 
 bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)
