@@ -225,7 +225,7 @@ void DemonstrationWorld::init()
 
 	d->manager->registerWidget(d->mainWidget);
 	d->mainWidget->setPosition(10, 30);
-	d->mainWidget->setSize(800, 600);
+	d->mainWidget->setSize(800, 450);
 	d->mainWidget->setTitle(L"GameMachine Demo Menu");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
@@ -240,7 +240,7 @@ void DemonstrationWorld::init()
 			demo.first,
 			10,
 			Y,
-			600,
+			450,
 			30,
 			false,
 			&button
