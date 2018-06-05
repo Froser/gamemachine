@@ -63,13 +63,6 @@ void GMControl::refresh()
 	d->hasFocus = false;
 }
 
-GMControlStatic::GMControlStatic(GMWidget* parent)
-	: GMControl(parent)
-{
-	D_BASE(d, GMControl);
-	d->type = GMControlType::Static;
-}
-
 void GMControlStatic::render(GMfloat elapsed)
 {
 	if (!getVisible())
@@ -107,13 +100,6 @@ void GMControlStatic::setText(const GMString& text)
 }
 
 GM_DEFINE_SIGNAL(GMControlButton::click);
-
-GMControlButton::GMControlButton(GMWidget* parent)
-	: GMControlStatic(parent)
-{
-	D_BASE(d, GMControl);
-	d->type = GMControlType::Button;
-}
 
 void GMControlButton::refresh()
 {
@@ -287,4 +273,30 @@ void GMControlButton::initStyles()
 	d->fillStyle.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
 	d->fillStyle.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
 	d->fillStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
+}
+
+void GMControlBorder::render(GMfloat elapsed)
+{
+	if (!getVisible())
+		return;
+
+	D(d);
+	D_BASE(db, Base);
+	d->borderStyle.getTextureColor().blend(GMControlState::Normal, elapsed);
+	GMWidget* widget = getParent();
+	widget->drawBorder(d->borderStyle, d->corner, db->boundingBox, .8f);
+}
+
+void GMControlBorder::setCorner(const GMRect& corner)
+{
+	D(d);
+	d->corner = corner;
+}
+
+void GMControlBorder::initStyles()
+{
+	D(d);
+	GMWidget* widget = getParent();
+	d->borderStyle.setTexture(GMWidgetResourceManager::Border, widget->getArea(GMTextureArea::BorderArea));
+	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }

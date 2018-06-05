@@ -11,6 +11,7 @@ GM_PRIVATE_OBJECT(GMGLModelDataProxy)
 {
 	GMGLGraphicEngine* engine = nullptr;
 	bool inited = false;
+	GMModelBufferType lastType;
 };
 
 class GMGLModelDataProxy : public GMModelDataProxy
@@ -24,7 +25,7 @@ public:
 	virtual void transfer() override;
 	virtual void dispose(GMModelBuffer* md) override;
 
-	virtual void beginUpdateBuffer() override;
+	virtual void beginUpdateBuffer(GMModelBufferType type) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
 };

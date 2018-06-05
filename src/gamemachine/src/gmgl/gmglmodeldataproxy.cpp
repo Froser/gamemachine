@@ -107,17 +107,27 @@ void GMGLModelDataProxy::dispose(GMModelBuffer* md)
 	d->inited = false;
 }
 
-void GMGLModelDataProxy::beginUpdateBuffer()
+void GMGLModelDataProxy::beginUpdateBuffer(GMModelBufferType type)
 {
+	D(d);
 	GMModel* model = getModel();
 	GM_ASSERT(model);
+	d->lastType = type;
 	glBindVertexArray(model->getModelBuffer()->getMeshBuffer().arrayId);
-	glBindBuffer(GL_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
+
+	if (type == GMModelBufferType::VertexBuffer)
+		glBindBuffer(GL_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
+	else
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, model->getModelBuffer()->getMeshBuffer().vertexBufferId);
 }
 
 void GMGLModelDataProxy::endUpdateBuffer()
 {
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	D(d);
+	if (d->lastType == GMModelBufferType::VertexBuffer)
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	else
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }

@@ -8,11 +8,13 @@ class GMGameObject;
 class GMModel;
 class GMTextGameObject;
 class GMSprite2DGameObject;
+class GMBorder2DGameObject;
 class GMSystemEvent;
 class GMSystemMouseEvent;
 class GMWidget;
 class GMControlStatic;
 class GMControlButton;
+class GMControlBorder;
 
 struct GMControlState
 {
@@ -74,6 +76,7 @@ struct GMTextureArea
 		CaptionArea,
 		ButtonArea,
 		ButtonFillArea,
+		BorderArea,
 	};
 };
 
@@ -89,6 +92,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	const IRenderContext* context = nullptr;
 	GMTextGameObject* textObject = nullptr;
 	GMSprite2DGameObject* spriteObject = nullptr;
+	GMBorder2DGameObject* borderObject = nullptr;
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
@@ -105,6 +109,7 @@ public:
 	enum TextureType
 	{
 		Skin,
+		Border,
 		UserDefine,
 	};
 
@@ -160,6 +165,12 @@ public:
 	{
 		D(d);
 		return d->spriteObject;
+	}
+
+	inline GMBorder2DGameObject* getBorderObject()
+	{
+		D(d);
+		return d->borderObject;
 	}
 
 	GMModel* getScreenQuadModel();
@@ -275,7 +286,6 @@ public:
 	);
 
 	void addStatic(
-		GMint id,
 		const GMString& text,
 		GMint x,
 		GMint y,
@@ -286,7 +296,6 @@ public:
 	);
 
 	void addButton(
-		GMint id,
 		const GMString& text,
 		GMint x,
 		GMint y,
@@ -294,6 +303,15 @@ public:
 		GMint height,
 		bool isDefault,
 		OUT GMControlButton** out
+	);
+
+	void addBorder(
+		GMint x,
+		GMint y,
+		GMint width,
+		GMint height,
+		const GMRect& cornerRect,
+		OUT GMControlBorder** out
 	);
 
 	void drawText(
@@ -306,6 +324,13 @@ public:
 
 	void drawSprite(
 		GMStyle& style,
+		const GMRect& rc,
+		GMfloat depth
+	);
+
+	void drawBorder(
+		GMStyle& style,
+		const GMRect& cornerRc,
 		const GMRect& rc,
 		GMfloat depth
 	);
@@ -328,7 +353,7 @@ private:
 	GMControl* getControlAtPoint(const GMPoint& pt);
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
-	void adjustRect(GMRect& rc);
+	void mapRect(GMRect& rc);
 
 protected:
 	void initStyles();

@@ -15,6 +15,7 @@ GM_PRIVATE_OBJECT(GMDx11ModelDataProxy)
 	GMComPtr<ID3D11Buffer> indexBuffer;
 	bool inited = false;
 	D3D11_MAPPED_SUBRESOURCE* mappedSubResource = nullptr;
+	GMModelBufferType lastType;
 };
 
 class GMDx11ModelDataProxy : public GMModelDataProxy
@@ -27,7 +28,7 @@ public:
 public:
 	virtual void transfer() override;
 	virtual void dispose(GMModelBuffer* md) override;
-	virtual void beginUpdateBuffer() override;
+	virtual void beginUpdateBuffer(GMModelBufferType type) override;
 	virtual void endUpdateBuffer() override;
 	virtual void* getBuffer() override;
 

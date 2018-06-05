@@ -139,7 +139,7 @@ public:
 	virtual void draw() override;
 
 public:
-	void setDepth(GMint depth);
+	void setDepth(GMfloat depth);
 	void setTexture(ITexture* tex);
 	void setTextureSize(GMint width, GMint height);
 	void setTextureRect(const GMRect& rect);
@@ -147,9 +147,40 @@ public:
 
 private:
 	void update();
-	GMModel* createModel();
-	void updateVertices(GMModel* model);
-	void updateTexture(GMModel* model);
+
+protected:
+	virtual void updateVertices(GMModel* model);
+	virtual void updateTexture(GMModel* model);
+	virtual GMModel* createModel();
 };
+
+GM_PRIVATE_OBJECT(GMBorder2DGameObject)
+{
+	GMModel* model = nullptr;
+	GMRect corner;
+};
+
+class GMBorder2DGameObject : public GMSprite2DGameObject
+{
+	DECLARE_PRIVATE_AND_BASE(GMBorder2DGameObject, GMSprite2DGameObject)
+	GM_FRIEND_CLASS(GMImage2DGameObject)
+
+	enum
+	{
+		VerticesCount = 16
+	};
+
+public:
+	using GMSprite2DGameObject::GMSprite2DGameObject;
+	~GMBorder2DGameObject();
+
+public:
+	void setCornerRect(const GMRect& rc);
+
+protected:
+	virtual GMModel* createModel() override;
+	virtual void updateVertices(GMModel* model) override;
+};
+
 END_NS
 #endif

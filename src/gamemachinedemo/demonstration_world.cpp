@@ -212,6 +212,8 @@ void DemonstrationWorld::init()
 	gm::GMint width, height;
 	gm::GMToolUtil::createTexture(getContext(), "skin.png", &texture, &width, &height);
 	d->manager->addTexture(gm::GMWidgetResourceManager::Skin, texture, width, height);
+	gm::GMToolUtil::createTexture(getContext(), "border.png", &texture, &width, &height);
+	d->manager->addTexture(gm::GMWidgetResourceManager::Border, texture, width, height);
 
 	d->mainWidget = new gm::GMWidget(d->manager);
 	{
@@ -222,10 +224,14 @@ void DemonstrationWorld::init()
 		gm::GMRect rc = { 136, 0, 116, 54 };
 		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
 	}
+	{
+		gm::GMRect rc = { 0, 0, 308, 96 };
+		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
+	}
 
 	d->manager->registerWidget(d->mainWidget);
 	d->mainWidget->setPosition(10, 30);
-	d->mainWidget->setSize(800, 450);
+	d->mainWidget->setSize(500, 600);
 	d->mainWidget->setTitle(L"GameMachine Demo Menu");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
@@ -236,11 +242,10 @@ void DemonstrationWorld::init()
 	{
 		gm::GMControlButton* button = nullptr;
 		d->mainWidget->addButton(
-			0,
 			demo.first,
 			10,
 			Y,
-			450,
+			480,
 			30,
 			false,
 			&button
@@ -252,6 +257,16 @@ void DemonstrationWorld::init()
 			d->mainWidget->setVisible(false);
 		});
 	}
+
+	gm::GMRect corner = { 0,0,24,24 };
+	d->mainWidget->addBorder(
+		0,
+		0,
+		500,
+		600,
+		corner,
+		nullptr
+	);
 
 	d->mainWindow->addWidget(d->mainWidget);
 }

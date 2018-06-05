@@ -10,13 +10,12 @@ class GMWidget;
 enum class GMControlType
 {
 	Button,
+	Border,
 	Static,
 };
 
 GM_PRIVATE_OBJECT(GMControl)
 {
-	GMControlType type = GMControlType::Button;
-	GMuint id = 0;
 	GMint x = 0;
 	GMint y = 0;
 	GMint width = 0;
@@ -160,18 +159,6 @@ public:
 
 	virtual void render(float elapsed) {}
 
-	virtual void setId(GMuint id)
-	{
-		D(d);
-		d->id = id;
-	}
-
-	virtual GMuint getId()
-	{
-		D(d);
-		return d->id;
-	}
-
 	virtual void setIndex(GMuint index)
 	{
 		D(d);
@@ -227,12 +214,6 @@ public:
 		return d->index;
 	}
 
-	inline GMControlType getType()
-	{
-		D(d);
-		return d->type;
-	}
-
 	inline const GMRect& boundingRect()
 	{
 		D(d);
@@ -254,7 +235,7 @@ class GMControlStatic : public GMControl
 	DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
 
 public:
-	GMControlStatic(GMWidget* parent);
+	using GMControl::GMControl;
 
 public:
 	virtual void render(GMfloat elapsed) override;
@@ -292,7 +273,7 @@ public:
 	GM_DECLARE_SIGNAL(click);
 	
 public:
-	GMControlButton(GMWidget* parent);
+	using GMControlStatic::GMControlStatic;
 
 public:
 	virtual void refresh() override;
@@ -310,6 +291,30 @@ public:
 private:
 	bool handleMousePressOrDblClick(const GMPoint& pt);
 	bool handleMouseRelease(const GMPoint& pt);
+
+protected:
+	virtual void initStyles() override;
+};
+
+
+GM_PRIVATE_OBJECT(GMControlBorder)
+{
+	GMStyle borderStyle;
+	GMRect corner;
+};
+
+class GMControlBorder : public GMControl
+{
+	DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
+
+public:
+	using GMControl::GMControl;
+
+public:
+	virtual void render(GMfloat elapsed) override;
+
+public:
+	void setCorner(const GMRect& corner);
 
 protected:
 	virtual void initStyles() override;

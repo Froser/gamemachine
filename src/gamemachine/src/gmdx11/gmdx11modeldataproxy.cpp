@@ -141,14 +141,22 @@ void GMDx11ModelDataProxy::dispose(GMModelBuffer* md)
 {
 }
 
-void GMDx11ModelDataProxy::beginUpdateBuffer()
+void GMDx11ModelDataProxy::beginUpdateBuffer(GMModelBufferType type)
 {
 	D(d);
 	// 不能在多线程中，或者嵌套中操作同一个Buffer
 	GM_ASSERT(!d->mappedSubResource);
 	d->mappedSubResource = new D3D11_MAPPED_SUBRESOURCE();
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	GM_DX_HR(context->Map(d->vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, d->mappedSubResource));
+	d->lastType = type;
+	if (type == GMModelBufferType::VertexBuffer)
+	{
+		GM_DX_HR(context->Map(d->vertexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, d->mappedSubResource));
+	}
+	else
+	{
+		GM_DX_HR(context->Map(d->indexBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, d->mappedSubResource));
+	}
 }
 
 void GMDx11ModelDataProxy::endUpdateBuffer()
@@ -156,7 +164,10 @@ void GMDx11ModelDataProxy::endUpdateBuffer()
 	D(d);
 	GM_ASSERT(d->mappedSubResource);
 	ID3D11DeviceContext* context = d->engine->getDeviceContext();
-	context->Unmap(d->vertexBuffer, 0);
+	if (d->lastType == GMModelBufferType::VertexBuffer)
+		context->Unmap(d->vertexBuffer, 0);
+	else
+		context->Unmap(d->indexBuffer, 0);
 
 	GM_delete(d->mappedSubResource);
 	d->mappedSubResource = nullptr;

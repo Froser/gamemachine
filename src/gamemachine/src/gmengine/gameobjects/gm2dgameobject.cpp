@@ -318,7 +318,7 @@ void GMSprite2DGameObject::draw()
 	drawModel(getContext(), d->model);
 }
 
-void GMSprite2DGameObject::setDepth(GMint depth)
+void GMSprite2DGameObject::setDepth(GMfloat depth)
 {
 	D(d);
 	if (d->depth != depth)
@@ -481,4 +481,294 @@ void GMSprite2DGameObject::updateTexture(GMModel* model)
 	GMShader& shader = d->model->getShader();
 	GMTextureSampler& texSampler = shader.getTextureList().getTextureSampler(GMTextureType::Ambient);
 	texSampler.setTexture(0, d->texture);
+}
+
+//////////////////////////////////////////////////////////////////////////
+// i1 i2
+// i3 i4
+#define INDICES(mesh, i1, i2, i3, i4) \
+	{ mesh->index(i3); mesh->index(i1); mesh->index(i4); } \
+	{ mesh->index(i4); mesh->index(i1); mesh->index(i2); }
+
+GMBorder2DGameObject::~GMBorder2DGameObject()
+{
+	D(d);
+	GM_delete(d->model);
+}
+
+template <typename T, GMint Size> void GMBorder2DGameObject::release(T* (&m)[Size])
+{
+	for (GMint i = 0; i < Size; ++i)
+	{
+		GM_delete(m[i]);
+	}
+}
+
+void GMBorder2DGameObject::setCornerRect(const GMRect& rc)
+{
+	D(d);
+	if (d->corner != rc)
+	{
+		d->corner = rc;
+		markDirty();
+	}
+}
+
+GMModel* GMBorder2DGameObject::createModel()
+{
+	D(d);
+	GMModel* model = new GMModel();
+	model->setType(GMModelType::Model2D);
+	model->setUsageHint(GMUsageHint::DynamicDraw);
+	model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
+	model->setDrawMode(GMModelDrawMode::Index);
+	setShader(model->getShader());
+	GMMesh* mesh = new GMMesh(model);
+	GMsize_t len = VerticesCount; //9个四边形，使用索引绘制，一共16个顶点
+	for (GMsize_t i = 0; i < len; ++i)
+	{
+		mesh->vertex(GMVertex());
+	}
+
+	// 逆时针方向绘制
+	// 第1行
+	INDICES(mesh, 0, 1, 4, 5);
+	INDICES(mesh, 1, 2, 5, 6);
+	INDICES(mesh, 2, 3, 6, 7);
+
+	// 第2行
+	INDICES(mesh, 4, 5, 8, 9);
+	INDICES(mesh, 5, 6, 9, 10);
+	INDICES(mesh, 6, 7, 10, 11);
+
+	// 第3行
+	INDICES(mesh, 8, 9, 12, 13);
+	INDICES(mesh, 9, 10, 13, 14);
+	INDICES(mesh, 10, 11, 14, 15);
+
+	GM.createModelDataProxyAndTransfer(getContext(), model);
+	return model;
+}
+
+void GMBorder2DGameObject::updateVertices(GMModel* model)
+{
+	D(d);
+	D_BASE(db, Base);
+	GM_ASSERT(db->texWidth > 0 && db->texHeight > 0);
+	const GMRect& rc = getGeometry();
+	GMRectF coord = toViewportRect(rc, getRenderRect());
+	GMRectF cornerCoord = toViewportRect(d->corner, getRenderRect());
+
+	/*
+	以下是个纹理，以像素为单位。
+		center
+	 _ ________ _
+	|_|________|_| corner
+	
+	*/
+
+	const GMfloat& cornerWidth = d->corner.width;
+	const GMfloat& cornerWidthX2 = d->corner.width * 2;
+	const GMfloat& cornerHeight = d->corner.height;
+	const GMfloat& cornerHeightX2 = d->corner.height * 2;
+	const GMfloat& centerWidth = db->textureRc.width - cornerWidthX2;
+	const GMfloat& centerHeight = db->textureRc.height - cornerHeightX2;
+
+	const GMfloat& cornerCoordWidth = cornerCoord.width;
+	const GMfloat& cornerCoordHeight = cornerCoord.height;
+	const GMfloat& cornerCoordWidthX2 = cornerCoord.width * 2;
+	const GMfloat& cornerCoordHeightX2 = cornerCoord.height * 2;
+	const GMfloat& centerCoordWidth = coord.width - cornerCoordWidthX2;
+	const GMfloat& centerCoordHeight = coord.height - cornerCoordHeightX2;
+
+	// Arrangement:
+	// 0 1 2 3
+	// 4 5 6 7
+	// 8 9 A B
+	// C D E F
+
+	GMVertex V[] = {
+		// 0
+		{
+			{ coord.x, coord.y, db->depth },
+			{ 0 },
+			{ (db->textureRc.x) / (GMfloat)db->texWidth, (db->textureRc.y) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 1
+		{
+			{ coord.x + cornerCoordWidth, coord.y, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth) / (GMfloat)db->texWidth, (db->textureRc.y) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 2
+		{
+			{ coord.x + cornerCoordWidth + centerCoordWidth, coord.y, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 3
+		{
+			{ coord.x + cornerCoordWidthX2 + centerCoordWidth, coord.y, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidthX2 + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 4
+		{
+			{ coord.x, coord.y - cornerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 5
+		{
+			{ coord.x + cornerCoordWidth, coord.y - cornerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 6
+		{
+			{ coord.x + cornerCoordWidth + centerCoordWidth, coord.y - cornerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 7
+		{
+			{ coord.x + cornerCoordWidthX2 + centerCoordWidth, coord.y - cornerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidthX2 + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 8
+		{
+			{ coord.x, coord.y - cornerCoordHeight - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// 9
+		{
+			{ coord.x + cornerCoordWidth, coord.y - cornerCoordHeight - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// A
+		{
+			{ coord.x + cornerCoordWidth + centerCoordWidth, coord.y - cornerCoordHeight - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// B
+		{
+			{ coord.x + cornerCoordWidthX2 + centerCoordWidth, coord.y - cornerCoordHeight - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidthX2 + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeight + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// C
+		{
+			{ coord.x, coord.y - cornerCoordHeightX2 - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeightX2 + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// D
+		{
+			{ coord.x + cornerCoordWidth, coord.y - cornerCoordHeightX2 - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeightX2 + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// E
+		{
+			{ coord.x + cornerCoordWidth + centerCoordWidth, coord.y - cornerCoordHeightX2 - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidth + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeightX2 + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		},
+
+		// F
+		{
+			{ coord.x + cornerCoordWidthX2 + centerCoordWidth, coord.y - cornerCoordHeightX2 - centerCoordHeight, db->depth },
+			{ 0 },
+			{ (db->textureRc.x + cornerWidthX2 + centerWidth) / (GMfloat)db->texWidth, (db->textureRc.y + cornerHeightX2 + centerHeight) / (GMfloat)db->texHeight },
+			{ 0 },
+			{ 0 },
+			{ 0 },
+			{ db->color[0], db->color[1], db->color[2], db->color[3] }
+		}
+	};
+
+	GMsize_t sz = sizeof(V);
+	GMModelDataProxy* proxy = model->getModelDataProxy();
+	proxy->beginUpdateBuffer();
+	void* ptr = proxy->getBuffer();
+	memcpy_s(ptr, sz, V, sz);
+	proxy->endUpdateBuffer();
 }

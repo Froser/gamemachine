@@ -130,10 +130,13 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	GM.createModelDataProxyAndTransfer(d->context, d->screenQuadModel);
 
 	d->textObject = new GMTextGameObject(context->getWindow()->getRenderRect());
-	d->textObject->setContext(getContext());
+	d->textObject->setContext(context);
 
 	d->spriteObject = new GMSprite2DGameObject(context->getWindow()->getRenderRect());
-	d->spriteObject->setContext(getContext());
+	d->spriteObject->setContext(context);
+
+	d->borderObject = new GMBorder2DGameObject(context->getWindow()->getRenderRect());
+	d->borderObject->setContext(context);
 }
 
 GMWidgetResourceManager::~GMWidgetResourceManager()
@@ -247,7 +250,6 @@ void GMWidget::setTitle(
 }
 
 void GMWidget::addStatic(
-	GMint id,
 	const GMString& text,
 	GMint x,
 	GMint y,
@@ -262,7 +264,6 @@ void GMWidget::addStatic(
 		*out = staticControl;
 
 	addControl(staticControl);
-	staticControl->setId(id);
 	staticControl->setText(text);
 	staticControl->setPosition(x, y);
 	staticControl->setSize(width, height);
@@ -270,7 +271,6 @@ void GMWidget::addStatic(
 }
 
 void GMWidget::addButton(
-	GMint id,
 	const GMString& text,
 	GMint x,
 	GMint y,
@@ -285,11 +285,29 @@ void GMWidget::addButton(
 		*out = buttonControl;
 
 	addControl(buttonControl);
-	buttonControl->setId(id);
 	buttonControl->setText(text);
 	buttonControl->setPosition(x, y);
 	buttonControl->setSize(width, height);
 	buttonControl->setIsDefault(isDefault);
+}
+
+void GMWidget::addBorder(
+	GMint x,
+	GMint y,
+	GMint width,
+	GMint height,
+	const GMRect& cornerRect,
+	OUT GMControlBorder** out
+)
+{
+	GMControlBorder* borderControl = new GMControlBorder(this);
+	if (out)
+		*out = borderControl;
+
+	addControl(borderControl);
+	borderControl->setPosition(x, y);
+	borderControl->setSize(width, height);
+	borderControl->setCorner(cornerRect);
 }
 
 void GMWidget::drawText(
@@ -306,7 +324,7 @@ void GMWidget::drawText(
 
 	D(d);
 	GMRect targetRc = rc;
-	adjustRect(targetRc);
+	mapRect(targetRc);
 
 	// TODO 先不考虑阴影什么的
 	const GMVec4& fontColor = style.getFontColor().getCurrent();
@@ -331,7 +349,7 @@ void GMWidget::drawSprite(
 
 	D(d);
 	GMRect targetRc = rc;
-	adjustRect(targetRc);
+	mapRect(targetRc);
 
 	const GMRect& textureRc = style.getTextureRect();
 	GMuint texId = style.getTexture();
@@ -345,6 +363,35 @@ void GMWidget::drawSprite(
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(style.getTextureColor().getCurrent());
 	spriteObject->draw();
+}
+
+void GMWidget::drawBorder(
+	GMStyle& style,
+	const GMRect& cornerRc,
+	const GMRect& rc,
+	GMfloat depth
+)
+{
+	if (style.getTextureColor().getCurrent().getW() == 0)
+		return;
+
+	D(d);
+	GMRect targetRc = rc;
+	mapRect(targetRc);
+
+	const GMRect& textureRc = style.getTextureRect();
+	GMuint texId = style.getTexture();
+	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(style.getTexture());
+
+	GMBorder2DGameObject* borderObject = d->manager->getBorderObject();
+	borderObject->setDepth(depth);
+	borderObject->setGeometry(targetRc);
+	borderObject->setTexture(texInfo.texture);
+	borderObject->setTextureRect(textureRc);
+	borderObject->setTextureSize(texInfo.width, texInfo.height);
+	borderObject->setColor(style.getTextureColor().getCurrent());
+	borderObject->setCornerRect(cornerRc);
+	borderObject->draw();
 }
 
 void GMWidget::requestFocus(GMControl* control)
@@ -829,7 +876,7 @@ void GMWidget::onMouseMove(const GMPoint& pt)
 		control->onMouseEnter();
 }
 
-void GMWidget::adjustRect(GMRect& rc)
+void GMWidget::mapRect(GMRect& rc)
 {
 	D(d);
 	rc.x += d->x;

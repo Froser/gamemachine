@@ -86,7 +86,6 @@ void Demo_Sound::init()
 
 	gm::GMControlButton* button = nullptr;
 	d->widget->addButton(
-		0,
 		"Play WAV",
 		10,
 		100,
@@ -100,7 +99,6 @@ void Demo_Sound::init()
 	});
 
 	d->widget->addButton(
-		0,
 		"Pause WAV",
 		10,
 		150,
@@ -114,7 +112,6 @@ void Demo_Sound::init()
 	});
 
 	d->widget->addButton(
-		0,
 		"Stop WAV",
 		10,
 		200,
@@ -128,7 +125,6 @@ void Demo_Sound::init()
 	});
 
 	d->widget->addButton(
-		0,
 		"Play MP3",
 		10,
 		250,
@@ -142,7 +138,6 @@ void Demo_Sound::init()
 	});
 
 	d->widget->addButton(
-		0,
 		"Pause MP3",
 		10,
 		300,
@@ -156,7 +151,6 @@ void Demo_Sound::init()
 	});
 
 	d->widget->addButton(
-		0,
 		"Stop MP3",
 		10,
 		350,

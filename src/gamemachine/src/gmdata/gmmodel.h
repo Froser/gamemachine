@@ -38,6 +38,12 @@ struct GMVertex
 
 typedef Vector<GMMesh*> GMMeshes;
 
+enum class GMModelBufferType
+{
+	VertexBuffer,
+	IndexBuffer,
+};
+
 GM_PRIVATE_OBJECT(GMModelDataProxy)
 {
 	const IRenderContext* context = nullptr;
@@ -63,7 +69,7 @@ public:
 	virtual void dispose(GMModelBuffer* md) = 0;
 
 // 提供修改缓存的方法
-	virtual void beginUpdateBuffer() = 0;
+	virtual void beginUpdateBuffer(GMModelBufferType type = GMModelBufferType::VertexBuffer) = 0;
 	virtual void endUpdateBuffer() = 0;
 	virtual void* getBuffer() = 0;
 

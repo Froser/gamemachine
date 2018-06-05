@@ -15,7 +15,7 @@ void Demo_Literature::init()
 	// 读取边框
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 	gm::GMBuffer buf;
-	bool b = package->readFile(gm::GMPackageIndex::Textures, "border.png", &buf);
+	bool b = package->readFile(gm::GMPackageIndex::Textures, "frame.png", &buf);
 	GM_ASSERT(b);
 
 	gm::GMImage* img = nullptr;
@@ -23,8 +23,10 @@ void Demo_Literature::init()
 	gm::ITexture* frameTexture = nullptr;
 	GM.getFactory()->createTexture(db->parentDemonstrationWorld->getContext(), img, &frameTexture);
 	GM_ASSERT(frameTexture);
+
 	gm::GMAsset border = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
 	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
+
 
 	gm::GMTextGameObject* literature = new gm::GMTextGameObject(getDemoWorldReference()->getContext()->getWindow()->getRenderRect());
 	gm::GMRect rect = { 200, 220, 400, 190 };
