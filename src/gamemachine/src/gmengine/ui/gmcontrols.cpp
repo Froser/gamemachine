@@ -302,14 +302,17 @@ void GMControlButton::initStyles()
 	GMWidget* widget = getParent();
 	db->foreStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ButtonArea));
 	db->foreStyle.setFont(0);
-	db->foreStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 0));
-	db->foreStyle.setTextureColor(GMControlState::Pressed, GMVec4(0, 0, 0, .24f));
+	db->foreStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, .58f));
+	db->foreStyle.setTextureColor(GMControlState::Pressed, GMVec4(0, 0, 0, .78f));
+	db->foreStyle.setFontColor(GMControlState::Normal, GMVec4(.3f, .3f, .3f, 1.f));
 	db->foreStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
 
 	d->fillStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ButtonFillArea));
 	d->fillStyle.setFont(0);
-	d->fillStyle.setTextureColor(GMControlState::Normal, GMVec4(.59f, 1.f, 1.f, 1.f));
-	d->fillStyle.setTextureColor(GMControlState::Pressed, GMVec4(.78f, 1.f, 1.f, 1.f));
+	d->fillStyle.setTextureColor(GMControlState::MouseOver, GMVec4(1.f, 1.f, 1.f, .63f));
+	d->fillStyle.setTextureColor(GMControlState::Pressed, GMVec4(1.f, 1.f, 1.f, .24f));
+	d->fillStyle.setTextureColor(GMControlState::Focus, GMVec4(1.f, 1.f, 1.f, .18f));
+	d->fillStyle.setFontColor(GMControlState::Normal, GMVec4(.3f, .3f, .3f, 1.f));
 	d->fillStyle.setFontColor(GMControlState::MouseOver, GMVec4(0, 0, 0, 1.f));
 }
 

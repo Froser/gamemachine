@@ -261,6 +261,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	bool title = false;
 	GMint titleHeight = 20;
 	GMString titleText;
+	GMPoint titleOffset;
 	GMStyle titleStyle;
 	GMStyle shadowStyle;
 
@@ -300,7 +301,8 @@ public:
 	);
 
 	void setTitle(
-		const GMString& text
+		const GMString& text,
+		const GMPoint& offset = { 10, 0 }
 	);
 
 	void addStatic(
@@ -455,6 +457,12 @@ public:
 		D(d);
 		d->x = x;
 		d->y = y;
+	}
+
+	inline GMint getTitleHeight()
+	{
+		D(d);
+		return d->titleHeight;
 	}
 
 public:

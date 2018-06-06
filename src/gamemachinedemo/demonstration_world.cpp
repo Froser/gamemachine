@@ -225,12 +225,12 @@ void DemonstrationWorld::init()
 		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
 	}
 	{
-		gm::GMRect rc = { 0, 0, 308, 96 };
+		gm::GMRect rc = { 0, 0, 280, 287 };
 		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
 	}
 
 	d->manager->registerWidget(d->mainWidget);
-	d->mainWidget->setPosition(10, 30);
+	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(500, 600);
 	d->mainWidget->setTitle(L"GameMachine Demo Menu");
 	d->mainWidget->setTitleVisible(true);
@@ -258,12 +258,12 @@ void DemonstrationWorld::init()
 		});
 	}
 
-	gm::GMRect corner = { 0,0,24,24 };
+	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(
-		0,
-		0,
-		500,
-		600,
+		-10,
+		-30 - d->mainWidget->getTitleHeight(),
+		520,
+		660 + d->mainWidget->getTitleHeight() * 2,
 		corner,
 		nullptr
 	);

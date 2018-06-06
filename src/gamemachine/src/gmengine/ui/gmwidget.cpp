@@ -72,7 +72,7 @@ void GMElementBlendColor::blend(GMControlState::State state, GMfloat elapsedTime
 {
 	D(d);
 	GMVec4 destColor = d->states[state];
-	d->current = Lerp(d->current, destColor, elapsedTime);
+	d->current = Lerp(d->current, destColor, 1 - Pow(rate, 60.f * elapsedTime));
 }
 
 void GMStyle::setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc, const GMVec4& defaultTextureColor)
@@ -150,7 +150,7 @@ void GMWidgetResourceManager::registerWidget(GMWidget* widget)
 			return;
 	}
 
-	// 将Canvas设置成一个环
+	// 将widget设置成一个环
 	d->widgets.push_back(widget);
 	GMsize_t sz = d->widgets.size();
 	if (sz > 1)
@@ -211,11 +211,13 @@ void GMWidget::setTitleVisible(
 }
 
 void GMWidget::setTitle(
-	const GMString& text
+	const GMString& text,
+	const GMPoint& offset
 )
 {
 	D(d);
 	d->titleText = text;
+	d->titleOffset = offset;
 }
 
 void GMWidget::addStatic(
@@ -596,7 +598,8 @@ void GMWidget::onRenderTitle()
 	D(d);
 	GMRect rc = { 0, -d->titleHeight, d->width, d->titleHeight };
 	drawSprite(d->titleStyle, rc, .99f);
-	rc.x += 5;
+	rc.x += d->titleOffset.x;
+	rc.y += d->titleOffset.y;
 	drawText(d->titleText, d->titleStyle, rc);
 }
 
