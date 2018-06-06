@@ -137,13 +137,13 @@ public:
 
 public:
 	virtual void draw() override;
+	virtual void setColor(const GMVec4& color);
 
 public:
 	void setDepth(GMfloat depth);
 	void setTexture(ITexture* tex);
 	void setTextureSize(GMint width, GMint height);
 	void setTextureRect(const GMRect& rect);
-	void setColor(const GMVec4& color);
 
 private:
 	void update();

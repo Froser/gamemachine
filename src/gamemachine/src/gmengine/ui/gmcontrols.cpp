@@ -63,6 +63,12 @@ void GMControl::refresh()
 	d->hasFocus = false;
 }
 
+GMStyle& GMControl::getStyle(StyleType style)
+{
+	static GMStyle s_style;
+	return s_style;
+}
+
 void GMControlStatic::render(GMfloat elapsed)
 {
 	if (!getVisible())
@@ -75,8 +81,9 @@ void GMControlStatic::render(GMfloat elapsed)
 	if (!getEnabled())
 		state = GMControlState::Disabled;
 
-	d->foreStyle.getFontColor().blend(state, elapsed);
-	getParent()->drawText(getText(), d->foreStyle, db->boundingBox, false, false);
+	GMStyle& foreStyle = getStyle((GMControl::StyleType)ForeStyle);
+	foreStyle.getFontColor().blend(state, elapsed);
+	getParent()->drawText(getText(), foreStyle, db->boundingBox, foreStyle.getShadowStyle().hasShadow, false);
 }
 
 void GMControlStatic::refresh()
@@ -84,6 +91,19 @@ void GMControlStatic::refresh()
 	D(d);
 	Base::refresh();
 	d->foreStyle.refresh();
+}
+
+GMStyle& GMControlStatic::getStyle(Base::StyleType style)
+{
+	D(d);
+	Base::StyleType s = (Base::StyleType)style;
+	switch (s)
+	{
+	case GMControlStatic::ForeStyle:
+		return d->foreStyle;
+	default:
+		return Base::getStyle(style);
+	}
 }
 
 void GMControlStatic::initStyles()
@@ -106,6 +126,22 @@ void GMControlButton::refresh()
 	D(d);
 	Base::refresh();
 	d->fillStyle.refresh();
+}
+
+GMStyle& GMControlButton::getStyle(GMControl::StyleType style)
+{
+	D(d);
+	D_BASE(db, Base);
+	GMControl::StyleType s = (GMControl::StyleType)style;
+	switch (s)
+	{
+	case GMControlButton::ForeStyle:
+		return db->foreStyle;
+	case GMControlButton::FillStyle:
+		return d->fillStyle;
+	default:
+		return Base::getStyle(style);
+	}
 }
 
 bool GMControlButton::onMouseDown(GMSystemMouseEvent* event)
@@ -199,15 +235,17 @@ void GMControlButton::render(GMfloat elapsed)
 	GMWidget* widget = getParent();
 	GMfloat blendRate = (state == GMControlState::Pressed) ? 0.0f : 0.8f;
 
-	db->foreStyle.getTextureColor().blend(state, elapsed, blendRate);
-	db->foreStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(db->foreStyle, rc, .8f);
-	widget->drawText(getText(), db->foreStyle, rc, false, true);
+	GMStyle& foreStyle = getStyle((GMControl::StyleType)ForeStyle);
+	foreStyle.getTextureColor().blend(state, elapsed, blendRate);
+	foreStyle.getFontColor().blend(state, elapsed, blendRate);
+	widget->drawSprite(foreStyle, rc, .8f);
+	widget->drawText(getText(), foreStyle, rc, foreStyle.getShadowStyle().hasShadow, true);
 
-	d->fillStyle.getTextureColor().blend(state, elapsed, blendRate);
-	d->fillStyle.getFontColor().blend(state, elapsed, blendRate);
-	widget->drawSprite(d->fillStyle, rc, .8f);
-	widget->drawText(getText(), d->fillStyle, rc, false, true);
+	GMStyle& fillStyle = getStyle((GMControl::StyleType)FillStyle);
+	fillStyle.getTextureColor().blend(state, elapsed, blendRate);
+	fillStyle.getFontColor().blend(state, elapsed, blendRate);
+	widget->drawSprite(fillStyle, rc, .8f);
+	widget->drawText(getText(), fillStyle, rc, fillStyle.getShadowStyle().hasShadow, true);
 }
 
 bool GMControlButton::handleMousePressOrDblClick(const GMPoint& pt)

@@ -38,6 +38,12 @@ class GMControl : public GMObject
 	DECLARE_PRIVATE(GMControl)
 
 public:
+	enum StyleType
+	{
+		StyleBegin = 1,
+	};
+
+public:
 	GMControl(GMWidget* widget);
 
 public:
@@ -159,6 +165,8 @@ public:
 
 	virtual void render(float elapsed) {}
 
+	virtual GMStyle& getStyle(StyleType style);
+
 	virtual void setIndex(GMuint index)
 	{
 		D(d);
@@ -235,11 +243,18 @@ class GMControlStatic : public GMControl
 	DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
 
 public:
+	enum StyleType
+	{
+		ForeStyle = Base::StyleBegin,
+	};
+
+public:
 	using GMControl::GMControl;
 
 public:
 	virtual void render(GMfloat elapsed) override;
 	virtual void refresh() override;
+	virtual GMStyle& getStyle(Base::StyleType style) override;
 
 	virtual bool containsPoint(const GMPoint&) override
 	{
@@ -270,6 +285,13 @@ class GMControlButton : public GMControlStatic
 	DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlStatic)
 
 public:
+	enum StyleType
+	{
+		ForeStyle = Base::StyleBegin,
+		FillStyle,
+	};
+
+public:
 	GM_DECLARE_SIGNAL(click);
 	
 public:
@@ -277,6 +299,7 @@ public:
 
 public:
 	virtual void refresh() override;
+	virtual GMStyle& getStyle(GMControl::StyleType style) override;
 
 	// virtual void onHotkey
 	virtual bool onMouseDown(GMSystemMouseEvent* event) override;

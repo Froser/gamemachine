@@ -96,8 +96,6 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
-	GMGameObject* screenQuad = nullptr;
-	GMModel* screenQuadModel = nullptr;
 	Map<GMint, GMCanvasTextureInfo> textureResources;
 };
 
@@ -172,9 +170,14 @@ public:
 		D(d);
 		return d->borderObject;
 	}
+};
 
-	GMModel* getScreenQuadModel();
-	GMGameObject* getScreenQuad();
+struct GMShadowStyle
+{
+	bool hasShadow = false;
+	GMint offsetX = 1;
+	GMint offsetY = 1;
+	GMVec4 color = GMVec4(0, 0, 0, 1);
 };
 
 GM_PRIVATE_OBJECT(GMStyle)
@@ -184,6 +187,7 @@ GM_PRIVATE_OBJECT(GMStyle)
 	GMRect rc;
 	GMElementBlendColor textureColor;
 	GMElementBlendColor fontColor;
+	GMShadowStyle shadowStyle;
 };
 
 class GMStyle : public GMObject
@@ -225,6 +229,18 @@ public:
 		D(d);
 		return d->texture;
 	}
+
+	inline void setShadowStyle(const GMShadowStyle& shadowStyle)
+	{
+		D(d);
+		d->shadowStyle = shadowStyle;
+	}
+
+	inline const GMShadowStyle& getShadowStyle()
+	{
+		D(d);
+		return d->shadowStyle;
+	}
 };
 
 GM_PRIVATE_OBJECT(GMWidget)
@@ -246,11 +262,13 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMint titleHeight = 20;
 	GMString titleText;
 	GMStyle titleStyle;
+	GMStyle shadowStyle;
 
-	GMfloat colorTopLeft[3] = { 0 };
-	GMfloat colorTopRight[3] = { 0 };
-	GMfloat colorBottomLeft[3] = { 0 };
-	GMfloat colorBottomRight[3] = { 0 };
+	GMFloat4 colorTopLeft = GMFloat4(0, 0, 0, 0);
+	GMFloat4 colorTopRight = GMFloat4(0, 0, 0, 0);
+	GMFloat4 colorBottomLeft = GMFloat4(0, 0, 0, 0);
+	GMFloat4 colorBottomRight = GMFloat4(0, 0, 0, 0);
+
 	GMint width = 0;
 	GMint height = 0;
 	GMint x = 0;
@@ -273,7 +291,7 @@ public:
 	void init();
 	void addArea(GMTextureArea::Area area, const GMRect& rc);
 	void render(GMfloat elpasedTime);
-	void setNextCanvas(GMWidget* nextCanvas);
+	void setNextWidget(GMWidget* nextWidget);
 	void addControl(GMControl* control);
 	const GMRect& getArea(GMTextureArea::Area area);
 
