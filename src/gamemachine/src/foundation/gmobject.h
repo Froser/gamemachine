@@ -170,7 +170,7 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 
 #define GM_SIGNAL(signal) signal
 #define GM_DECLARE_SIGNAL(signal) public: static gm::GMString GM_SIGNAL(signal);
-#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = #signal
+#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = L#signal
 
 #define GM_BEGIN_META_MAP \
 	protected: \
