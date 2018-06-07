@@ -20,7 +20,7 @@ GM_PRIVATE_OBJECT(Demo_Phong_PBR)
 
 class Demo_Phong_PBR : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_Phong_PBR, DemoHandler)
+	GM_DECLARE_PRIVATE_AND_BASE(Demo_Phong_PBR, DemoHandler)
 
 public:
 	using Base::Base;

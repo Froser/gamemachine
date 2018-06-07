@@ -212,6 +212,7 @@ void DemonstrationWorld::init()
 	gm::GMint width, height;
 	gm::GMToolUtil::createTexture(getContext(), "skin.png", &texture, &width, &height);
 	d->manager->addTexture(gm::GMWidgetResourceManager::Skin, texture, width, height);
+
 	gm::GMToolUtil::createTexture(getContext(), "border.png", &texture, &width, &height);
 	d->manager->addTexture(gm::GMWidgetResourceManager::Border, texture, width, height);
 

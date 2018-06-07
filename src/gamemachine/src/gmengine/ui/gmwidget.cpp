@@ -128,6 +128,12 @@ GMWidgetResourceManager::~GMWidgetResourceManager()
 	D(d);
 	GM_delete(d->textObject);
 	GM_delete(d->spriteObject);
+	GM_delete(d->borderObject);
+
+	for (auto& resource : d->textureResources)
+	{
+		GM_delete(resource.second.texture);
+	}
 }
 
 void GMWidgetResourceManager::addTexture(TextureType type, ITexture* texture, GMint width, GMint height)

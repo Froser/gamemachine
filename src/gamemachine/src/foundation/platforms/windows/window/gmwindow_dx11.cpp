@@ -37,7 +37,7 @@ GMComPtr<ID3D11DeviceContext> GM_PRIVATE_NAME(GMWindow_Dx11)::deviceContext;
 
 class GMWindow_Dx11 : public GMWindow
 {
-	DECLARE_PRIVATE_AND_BASE(GMWindow_Dx11, GMWindow)
+	GM_DECLARE_PRIVATE_AND_BASE(GMWindow_Dx11, GMWindow)
 
 public:
 	GMWindow_Dx11() = default;

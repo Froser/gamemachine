@@ -109,7 +109,7 @@ GM_PRIVATE_OBJECT(GMGLShadowFramebuffers)
 
 class GMGLShadowFramebuffers : public GMGLFramebuffers
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLShadowFramebuffers, GMGLFramebuffers)
 
 public:
 	GMGLShadowFramebuffers(const IRenderContext* context);

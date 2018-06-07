@@ -54,7 +54,7 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 
 class GMDx11GraphicEngine : public GMGraphicEngine
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11GraphicEngine, GMGraphicEngine)
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11GraphicEngine, GMGraphicEngine)
 
 public:
 	GMDx11GraphicEngine(const IRenderContext* context);

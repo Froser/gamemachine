@@ -21,7 +21,7 @@ GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
 
 class GMDiscreteDynamicsWorld : public GMPhysicsWorld
 {
-	DECLARE_PRIVATE_AND_BASE(GMDiscreteDynamicsWorld, GMPhysicsWorld);
+	GM_DECLARE_PRIVATE_AND_BASE(GMDiscreteDynamicsWorld, GMPhysicsWorld);
 
 public:
 	GMDiscreteDynamicsWorld(GMGameWorld* world);

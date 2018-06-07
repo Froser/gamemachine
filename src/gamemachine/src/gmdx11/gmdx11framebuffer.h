@@ -92,7 +92,7 @@ GM_PRIVATE_OBJECT(GMDx11ShadowFramebuffers)
 
 class GMDx11ShadowFramebuffers : public GMDx11Framebuffers
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11ShadowFramebuffers, GMDx11Framebuffers)
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11ShadowFramebuffers, GMDx11Framebuffers)
 
 public:
 	using GMDx11Framebuffers::GMDx11Framebuffers;

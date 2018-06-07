@@ -62,7 +62,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer_3D)
 
 class GMGLRenderer_3D : public GMGLRenderer
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_3D, GMGLRenderer)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLRenderer_3D, GMGLRenderer)
 
 public:
 	using GMGLRenderer::GMGLRenderer;
@@ -116,7 +116,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer_Filter)
 
 class GMGLRenderer_Filter : public GMGLRenderer
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLRenderer_Filter, GMGLRenderer)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLRenderer_Filter, GMGLRenderer)
 
 public:
 	using GMGLRenderer::GMGLRenderer;

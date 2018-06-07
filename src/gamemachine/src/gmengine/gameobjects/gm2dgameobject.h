@@ -18,7 +18,7 @@ GM_PRIVATE_OBJECT(GM2DGameObjectBase)
 
 class GM2DGameObjectBase : public GMGameObject
 {
-	DECLARE_PRIVATE_AND_BASE(GM2DGameObjectBase, GMGameObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GM2DGameObjectBase, GMGameObject)
 
 public:
 	GM2DGameObjectBase(const GMRect& renderRc);
@@ -87,7 +87,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 
 class GMTextGameObject : public GM2DGameObjectBase
 {
-	DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GM2DGameObjectBase)
+	GM_DECLARE_PRIVATE_AND_BASE(GMTextGameObject, GM2DGameObjectBase)
 
 public:
 	GMTextGameObject(const GMRect& renderRc);
@@ -124,7 +124,7 @@ GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 
 class GMSprite2DGameObject : public GM2DGameObjectBase
 {
-	DECLARE_PRIVATE_AND_BASE(GMSprite2DGameObject, GM2DGameObjectBase)
+	GM_DECLARE_PRIVATE_AND_BASE(GMSprite2DGameObject, GM2DGameObjectBase)
 
 	enum
 	{
@@ -162,7 +162,7 @@ GM_PRIVATE_OBJECT(GMBorder2DGameObject)
 
 class GMBorder2DGameObject : public GMSprite2DGameObject
 {
-	DECLARE_PRIVATE_AND_BASE(GMBorder2DGameObject, GMSprite2DGameObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMBorder2DGameObject, GMSprite2DGameObject)
 	GM_FRIEND_CLASS(GMImage2DGameObject)
 
 	enum

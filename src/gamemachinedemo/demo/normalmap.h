@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(Demo_NormalMap)
 
 class Demo_NormalMap : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_NormalMap, DemoHandler)
+	GM_DECLARE_PRIVATE_AND_BASE(Demo_NormalMap, DemoHandler)
 
 public:
 	using Base::Base;

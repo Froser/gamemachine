@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMGLFramebufferTexture)
 
 class GMGLFramebufferTexture : public GMGLTexture
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLFramebufferTexture, GMGLTexture);
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLFramebufferTexture, GMGLTexture);
 
 public:
 	GMGLFramebufferTexture(const GMFramebufferDesc& desc)

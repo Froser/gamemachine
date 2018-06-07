@@ -75,7 +75,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 
 class DemonstrationWorld : public gm::GMGameWorld
 {
-	DECLARE_PRIVATE_AND_BASE(DemonstrationWorld, gm::GMGameWorld)
+	GM_DECLARE_PRIVATE_AND_BASE(DemonstrationWorld, gm::GMGameWorld)
 
 public:
 	DemonstrationWorld(const gm::IRenderContext*, gm::IWindow*);
@@ -117,7 +117,7 @@ GM_PRIVATE_OBJECT(DemostrationEntrance)
 
 class DemostrationEntrance : public gm::IGameHandler, public gm::IShaderLoadCallback
 {
-	DECLARE_PRIVATE_NGO(DemostrationEntrance)
+	GM_DECLARE_PRIVATE_NGO(DemostrationEntrance)
 
 public:
 	DemostrationEntrance(gm::IWindow*);

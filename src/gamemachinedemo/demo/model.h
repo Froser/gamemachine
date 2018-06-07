@@ -20,7 +20,7 @@ GM_PRIVATE_OBJECT(Demo_Model)
 
 class Demo_Model : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_Model, DemoHandler)
+	GM_DECLARE_PRIVATE_AND_BASE(Demo_Model, DemoHandler)
 
 public:
 	using Base::Base;

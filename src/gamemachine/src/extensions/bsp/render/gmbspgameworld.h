@@ -8,7 +8,7 @@ BEGIN_NS
 
 class GMBSPSkyGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE_AND_BASE(GMBSPSkyGameObject, GMGameObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMBSPSkyGameObject, GMGameObject)
 
 public:
 	GMBSPSkyGameObject(const GMShader& shader, const GMVec3& min, const GMVec3& max);
@@ -20,7 +20,7 @@ private:
 
 class GMBSPGameWorld : public GMGameWorld
 {
-	DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
+	GM_DECLARE_PRIVATE_AND_BASE(GMBSPGameWorld, GMGameWorld);
 
 public:
 	GMBSPGameWorld(const IRenderContext* context);

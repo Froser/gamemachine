@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMDemoGameWorld)
 
 class GMDemoGameWorld : public GMGameWorld
 {
-	DECLARE_PRIVATE_AND_BASE(GMDemoGameWorld, GMGameWorld)
+	GM_DECLARE_PRIVATE_AND_BASE(GMDemoGameWorld, GMGameWorld)
 
 public:
 	GMDemoGameWorld(const IRenderContext* context);

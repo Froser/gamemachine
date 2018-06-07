@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT(GMWindow_OpenGL)
 
 class GMWindow_OpenGL : public GMWindow
 {
-	DECLARE_PRIVATE_AND_BASE(GMWindow_OpenGL, GMWindow)
+	GM_DECLARE_PRIVATE_AND_BASE(GMWindow_OpenGL, GMWindow)
 	GM_FRIEND_CLASS(GMGLRenderContext)
 
 public:

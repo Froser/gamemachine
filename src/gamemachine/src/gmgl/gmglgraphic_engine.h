@@ -59,7 +59,7 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 class GMGLGraphicEngine : public GMGraphicEngine
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLGraphicEngine, GMGraphicEngine)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLGraphicEngine, GMGraphicEngine)
 
 public:
 	GMGLGraphicEngine(const IRenderContext* context);

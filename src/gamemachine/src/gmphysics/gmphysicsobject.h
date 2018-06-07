@@ -126,7 +126,7 @@ GM_PRIVATE_OBJECT(GMRigidPhysicsObject)
 
 class GMRigidPhysicsObject : public GMPhysicsObject
 {
-	DECLARE_PRIVATE_AND_BASE(GMRigidPhysicsObject, GMPhysicsObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMRigidPhysicsObject, GMPhysicsObject)
 
 	friend class GMDiscreteDynamicsWorld;
 

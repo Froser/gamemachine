@@ -49,7 +49,7 @@ GM_PRIVATE_OBJECT(GMMAudioFile_MP3)
 
 class GMMAudioFile_MP3 : public GMMAudioFile_Stream
 {
-	DECLARE_PRIVATE_AND_BASE(GMMAudioFile_MP3, GMMAudioFile_Stream)
+	GM_DECLARE_PRIVATE_AND_BASE(GMMAudioFile_MP3, GMMAudioFile_Stream)
 
 public:
 	GMMAudioFile_MP3()

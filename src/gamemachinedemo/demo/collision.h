@@ -31,7 +31,7 @@ GM_PRIVATE_OBJECT(Demo_Collision)
 
 class Demo_Collision : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_Collision, DemoHandler)
+	GM_DECLARE_PRIVATE_AND_BASE(Demo_Collision, DemoHandler)
 
 public:
 	using Base::Base;

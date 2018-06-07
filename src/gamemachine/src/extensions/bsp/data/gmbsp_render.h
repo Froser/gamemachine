@@ -154,7 +154,7 @@ GM_PRIVATE_OBJECT(GMBSPRender)
 typedef GMBSPRenderPrivate GMBSPRenderData;
 class GMBSPRender
 {
-	DECLARE_PRIVATE_NGO(GMBSPRender);
+	GM_DECLARE_PRIVATE_NGO(GMBSPRender);
 
 public:
 	GMBSPRenderData& renderData();

@@ -18,7 +18,7 @@ GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)
 
 class GMDx11DefaultFramebuffers : public GMDx11Framebuffers
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11DefaultFramebuffers, GMDx11Framebuffers);
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11DefaultFramebuffers, GMDx11Framebuffers);
 
 public:
 	GMDx11DefaultFramebuffers(const IRenderContext* context)
@@ -71,7 +71,7 @@ GM_PRIVATE_OBJECT(GMDx11FramebufferTexture)
 
 class GMDx11FramebufferTexture : public GMDx11Texture
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11FramebufferTexture, GMDx11Texture);
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11FramebufferTexture, GMDx11Texture);
 
 public:
 	GMDx11FramebufferTexture(const IRenderContext* context, const GMFramebufferDesc& desc);

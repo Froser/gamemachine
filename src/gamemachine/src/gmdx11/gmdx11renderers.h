@@ -163,7 +163,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer_Filter)
 
 class GMDx11Renderer_Filter : public GMDx11Renderer
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11Renderer_Filter, GMDx11Renderer)
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11Renderer_Filter, GMDx11Renderer)
 
 public:
 	GMDx11Renderer_Filter(const IRenderContext* context);

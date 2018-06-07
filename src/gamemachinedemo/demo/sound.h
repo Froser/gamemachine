@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(Demo_Sound)
 
 class Demo_Sound : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_Sound, DemoHandler)
+	GM_DECLARE_PRIVATE_AND_BASE(Demo_Sound, DemoHandler)
 
 public:
 	using Base::Base;

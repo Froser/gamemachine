@@ -18,7 +18,7 @@ GM_PRIVATE_OBJECT(Demo_SpecularMap)
 
 class Demo_SpecularMap : public DemoHandler
 {
-	DECLARE_PRIVATE_AND_BASE(Demo_SpecularMap, DemoHandler)
+	GM_DECLARE_PRIVATE_AND_BASE(Demo_SpecularMap, DemoHandler)
 
 public:
 	using Base::Base;

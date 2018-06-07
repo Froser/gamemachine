@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT(GMMAudioFile_Wav)
 
 class GMMAudioFile_Wav : public gm::IAudioFile
 {
-	DECLARE_PRIVATE_NGO(GMMAudioFile_Wav)
+	GM_DECLARE_PRIVATE_NGO(GMMAudioFile_Wav)
 
 public:
 	GMMAudioFile_Wav()

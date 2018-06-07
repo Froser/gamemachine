@@ -41,7 +41,7 @@ GM_PRIVATE_OBJECT(GMSpriteGameObject)
 
 class GMSpriteGameObject : public GMGameObject
 {
-	DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMSpriteGameObject, GMGameObject)
 
 public:
 	GMSpriteGameObject(GMfloat radius, const GMVec3& position = Zero<GMVec3>());

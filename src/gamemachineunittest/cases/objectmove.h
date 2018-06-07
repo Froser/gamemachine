@@ -14,7 +14,7 @@ namespace {
 	class _Base : public gm::GMObject
 	{
 	public:
-		DECLARE_PRIVATE(_Base)
+		GM_DECLARE_PRIVATE(_Base)
 	};
 
 	GM_PRIVATE_OBJECT(_Derived)
@@ -25,7 +25,7 @@ namespace {
 
 	class _Derived : public _Base
 	{
-		DECLARE_PRIVATE_AND_BASE(_Derived, _Base)
+		GM_DECLARE_PRIVATE_AND_BASE(_Derived, _Base)
 		GM_DEFAULT_MOVE_BEHAVIOR(_Derived);
 
 	public:

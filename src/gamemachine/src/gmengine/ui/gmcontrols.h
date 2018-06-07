@@ -240,7 +240,7 @@ GM_PRIVATE_OBJECT(GMControlStatic)
 
 class GMControlStatic : public GMControl
 {
-	DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
 
 public:
 	enum StyleType
@@ -282,7 +282,7 @@ GM_PRIVATE_OBJECT(GMControlButton)
 
 class GMControlButton : public GMControlStatic
 {
-	DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlStatic)
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlStatic)
 
 public:
 	enum StyleType
@@ -328,7 +328,7 @@ GM_PRIVATE_OBJECT(GMControlBorder)
 
 class GMControlBorder : public GMControl
 {
-	DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
 
 public:
 	using GMControl::GMControl;

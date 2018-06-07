@@ -13,7 +13,7 @@ GM_PRIVATE_OBJECT(GMDx11GlyphTexture)
 
 class GMDx11GlyphTexture : public GMDx11Texture
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11GlyphTexture, GMDx11Texture)
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11GlyphTexture, GMDx11Texture)
 
 public:
 	GMDx11GlyphTexture(const IRenderContext* context);
@@ -39,7 +39,7 @@ GM_PRIVATE_OBJECT(GMDx11GlyphManager)
 
 class GMDx11GlyphManager : public GMGlyphManager
 {
-	DECLARE_PRIVATE_AND_BASE(GMDx11GlyphManager, GMGlyphManager)
+	GM_DECLARE_PRIVATE_AND_BASE(GMDx11GlyphManager, GMGlyphManager)
 
 public:
 	using GMGlyphManager::GMGlyphManager;

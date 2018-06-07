@@ -27,7 +27,7 @@ GM_PRIVATE_OBJECT_FROM(GMBSPPhysicsWorld, GMPhysicsWorld)
 
 class GMBSPPhysicsWorld : public GMPhysicsWorld
 {
-	DECLARE_PRIVATE_AND_BASE(GMBSPPhysicsWorld, GMPhysicsWorld)
+	GM_DECLARE_PRIVATE_AND_BASE(GMBSPPhysicsWorld, GMPhysicsWorld)
 
 public:
 	GMBSPPhysicsWorld(GMGameWorld* world);

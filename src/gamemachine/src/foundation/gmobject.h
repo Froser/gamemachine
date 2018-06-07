@@ -68,7 +68,7 @@ private:
 
 class GMNotAGMObject {};
 
-#define DECLARE_PRIVATE_AND_BASE(className, base)											\
+#define GM_DECLARE_PRIVATE_AND_BASE(className, base)											\
 	public:																					\
 		typedef base Base;																	\
 		typedef className##Private Data;													\
@@ -80,8 +80,8 @@ class GMNotAGMObject {};
 			d->__parent = const_cast<className*>(this); return d;}							\
 		void swapData(className& another) noexcept { m_data.swap(another.m_data); }
 
-#define GM_DECLARE_PRIVATE(className) DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
-#define DECLARE_PRIVATE_NGO(className) DECLARE_PRIVATE_AND_BASE(className, gm::GMNotAGMObject)
+#define GM_DECLARE_PRIVATE(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
+#define GM_DECLARE_PRIVATE_NGO(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMNotAGMObject)
 
 // 获取私有成员
 #define D(d) auto d = data()
@@ -203,7 +203,7 @@ struct GMMessage;
 指向数据的指针，因此GMObject及GMObject的所有派生类禁止赋值和拷贝。<BR>
 如果为一个GMObject的直接子类定义其包含的数据，可使用GM_PRIVATE_OBJECT宏来定义数据结构，并在子类中使用
 GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中。<BR>
-如果某个子类不是GMObject的直接子类，则用DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。
+如果某个子类不是GMObject的直接子类，则用GM_DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。
 虽然GMObject及其子类禁止拷贝构造和赋值，但是移动构造和移动赋值是允许的。默认情况下，GMObject子类没有实现移
 动构造和移动赋值。如果要实现它，可以直接使用GM_DEFAULT_MOVE_BEHAVIOR宏。此宏会为子类添加一个移动构造和移动
 复制，它会将子类的数据以及父类的数据依次递归与右值引用中的对象进行交换。<BR>
@@ -211,7 +211,7 @@ GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中
 */
 class GMObject : public IVirtualFunctionObject
 {
-	DECLARE_PRIVATE_AND_BASE(GMObject, IVirtualFunctionObject)
+	GM_DECLARE_PRIVATE_AND_BASE(GMObject, IVirtualFunctionObject)
 	GM_DISABLE_COPY(GMObject)
 	GM_DISABLE_ASSIGN(GMObject)
 

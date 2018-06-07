@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMGLModelDataProxy)
 
 class GMGLModelDataProxy : public GMModelDataProxy
 {
-	DECLARE_PRIVATE_AND_BASE(GMGLModelDataProxy, GMModelDataProxy)
+	GM_DECLARE_PRIVATE_AND_BASE(GMGLModelDataProxy, GMModelDataProxy)
 
 public:
 	GMGLModelDataProxy(const IRenderContext* context, GMModel* objs);

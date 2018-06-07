@@ -53,7 +53,7 @@ GM_PRIVATE_OBJECT(GMPoint2PointConstraint)
 
 class GMPoint2PointConstraint : public GMConstraint
 {
-	DECLARE_PRIVATE_AND_BASE(GMPoint2PointConstraint, GMConstraint)
+	GM_DECLARE_PRIVATE_AND_BASE(GMPoint2PointConstraint, GMConstraint)
 
 public:
 	GMPoint2PointConstraint(GMRigidPhysicsObject* body, const GMVec3& pivotA);

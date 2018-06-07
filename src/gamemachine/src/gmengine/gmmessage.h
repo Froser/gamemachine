@@ -227,7 +227,7 @@ GM_PRIVATE_OBJECT(GMSystemKeyEvent)
 
 class GMSystemKeyEvent : public GMSystemEvent
 {
-	DECLARE_PRIVATE_AND_BASE(GMSystemKeyEvent, GMSystemEvent);
+	GM_DECLARE_PRIVATE_AND_BASE(GMSystemKeyEvent, GMSystemEvent);
 	GM_ALLOW_COPY_DATA(GMSystemKeyEvent)
 	GM_DECLARE_PROPERTY(Key, key, GMKey)
 	GM_DECLARE_PROPERTY(Modifier, modifier, GMModifier)
@@ -252,7 +252,7 @@ GM_PRIVATE_OBJECT(GMSystemMouseEvent)
 
 class GMSystemMouseEvent : public GMSystemEvent
 {
-	DECLARE_PRIVATE_AND_BASE(GMSystemMouseEvent, GMSystemEvent);
+	GM_DECLARE_PRIVATE_AND_BASE(GMSystemMouseEvent, GMSystemEvent);
 	GM_ALLOW_COPY_DATA(GMSystemMouseEvent)
 	GM_DECLARE_PROPERTY(Point, point, GMPoint)
 	GM_DECLARE_PROPERTY(Button, button, GMMouseButton)
@@ -279,7 +279,7 @@ GM_PRIVATE_OBJECT(GMSystemMouseWheelEvent)
 
 class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 {
-	DECLARE_PRIVATE_AND_BASE(GMSystemMouseWheelEvent, GMSystemMouseEvent)
+	GM_DECLARE_PRIVATE_AND_BASE(GMSystemMouseWheelEvent, GMSystemMouseEvent)
 	GM_ALLOW_COPY_DATA(GMSystemMouseWheelEvent)
 	GM_DECLARE_PROPERTY(Delta, delta, GMshort)
 
