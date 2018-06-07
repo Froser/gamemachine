@@ -67,7 +67,7 @@ struct GMBSPPatchCollide;
 struct GMBSPTraceWork;
 class GMBSPTrace : public GMObject
 {
-	DECLARE_PRIVATE(GMBSPTrace)
+	GM_DECLARE_PRIVATE(GMBSPTrace)
 
 public:
 	void initTrace(BSPData* bsp, Map<GMint, Set<GMBSPEntity*> >* entities, Map<GMBSPEntity*, GMEntityObject*>* entityObjects, GMBSPPhysicsWorld* world);

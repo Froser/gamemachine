@@ -33,7 +33,7 @@ GM_PRIVATE_OBJECT(GMTextureSampler)
 
 class GMTextureSampler : public GMObject
 {
-	DECLARE_PRIVATE(GMTextureSampler)
+	GM_DECLARE_PRIVATE(GMTextureSampler)
 
 public:
 	GM_DECLARE_PROPERTY(FrameCount, frameCount, GMsize_t);
@@ -113,7 +113,7 @@ GM_PRIVATE_OBJECT(GMTextureList)
 
 class GMTextureList : public GMObject
 {
-	DECLARE_PRIVATE(GMTextureList)
+	GM_DECLARE_PRIVATE(GMTextureList)
 
 public:
 	GMTextureList() = default;
@@ -205,7 +205,7 @@ GM_PRIVATE_OBJECT(GMShader)
 
 class GMShader : public GMObject
 {
-	DECLARE_PRIVATE(GMShader)
+	GM_DECLARE_PRIVATE(GMShader)
 	GM_ALLOW_COPY_DATA(GMShader)
 
 public:

@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMMAudioFile_Stream)
 
 class GMMAudioFile_Stream : public gm::IAudioFile, public gm::IAudioStream
 {
-	DECLARE_PRIVATE(GMMAudioFile_Stream)
+	GM_DECLARE_PRIVATE(GMMAudioFile_Stream)
 
 public:
 	GMMAudioFile_Stream();

@@ -41,7 +41,7 @@ GM_PRIVATE_OBJECT(GMMAudioStaticSource)
 
 class GMMAudioStaticSource : public gm::GMObject, public gm::IAudioSource
 {
-	DECLARE_PRIVATE(GMMAudioStaticSource)
+	GM_DECLARE_PRIVATE(GMMAudioStaticSource)
 
 public:
 	GMMAudioStaticSource(gm::IAudioFile* f);
@@ -146,7 +146,7 @@ GM_PRIVATE_OBJECT(GMMAudioStreamPlayThread)
 
 class GMMAudioStreamSource : public gm::GMObject, public gm::IAudioSource
 {
-	DECLARE_PRIVATE(GMMAudioStreamSource)
+	GM_DECLARE_PRIVATE(GMMAudioStreamSource)
 
 	friend class GMMAudioStreamPlayThread;
 
@@ -163,7 +163,7 @@ public:
 
 class GMMAudioStreamPlayThread : public gm::GMThread
 {
-	DECLARE_PRIVATE(GMMAudioStreamPlayThread)
+	GM_DECLARE_PRIVATE(GMMAudioStreamPlayThread)
 
 public:
 	GMMAudioStreamPlayThread(GMMAudioStreamSource* src)

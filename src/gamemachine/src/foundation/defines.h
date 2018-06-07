@@ -274,7 +274,17 @@ inline void GM_delete_array(T*& o)
 
 #define GM_SWAP(a, b) { auto t = a; a = b; b = t; }
 
-#define GM_ZeroMemory(dest) memset((dest), 0, sizeof(dest));
+template <typename T, GMsize_t S>
+inline void GM_ZeroMemory(T(&dest)[S])
+{
+	memset(dest, 0, S);
+}
+
+inline void GM_ZeroMemory(void* dest, GMsize_t size)
+{
+	memset(dest, 0, size);
+}
+
 #define GM_array_size(i) ( sizeof((i)) / sizeof((i)[0]) )
 
 #if GM_WINDOWS

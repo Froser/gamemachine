@@ -52,7 +52,7 @@ class GMBSPGameWorld;
 */
 class GMGamePackage : public GMObject
 {
-	DECLARE_PRIVATE(GMGamePackage)
+	GM_DECLARE_PRIVATE(GMGamePackage)
 
 	friend class GameMachine;
 
@@ -134,7 +134,7 @@ GM_PRIVATE_OBJECT(GMGamePackageAsyncResult)
 
 class GMGamePackageAsyncResult : public IAsyncResult
 {
-	DECLARE_PRIVATE(GMGamePackageAsyncResult);
+	GM_DECLARE_PRIVATE(GMGamePackageAsyncResult);
 
 public:
 	GMGamePackageAsyncResult() = default;

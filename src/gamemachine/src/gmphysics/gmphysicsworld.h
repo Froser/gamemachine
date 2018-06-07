@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMPhysicsWorld)
 
 class GMPhysicsWorld : public GMObject
 {
-	DECLARE_PRIVATE(GMPhysicsWorld)
+	GM_DECLARE_PRIVATE(GMPhysicsWorld)
 
 public:
 	GMPhysicsWorld(GMGameWorld* world);

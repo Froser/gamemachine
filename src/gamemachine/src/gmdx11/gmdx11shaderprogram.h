@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMDx11EffectShaderProgram)
 
 class GMDx11EffectShaderProgram : public IShaderProgram
 {
-	DECLARE_PRIVATE(GMDx11EffectShaderProgram)
+	GM_DECLARE_PRIVATE(GMDx11EffectShaderProgram)
 
 public:
 	GMDx11EffectShaderProgram(GMComPtr<ID3DX11Effect> effect);

@@ -151,7 +151,7 @@ GM_PRIVATE_OBJECT(GMClock)
 
 class GMClock : public GMObject
 {
-	DECLARE_PRIVATE(GMClock)
+	GM_DECLARE_PRIVATE(GMClock)
 
 public:
 	GMClock();
@@ -185,7 +185,7 @@ GM_PRIVATE_OBJECT(GMStopwatch)
 
 class GMStopwatch : public GMObject
 {
-	DECLARE_PRIVATE(GMStopwatch);
+	GM_DECLARE_PRIVATE(GMStopwatch);
 
 public:
 	GMStopwatch();
@@ -285,7 +285,7 @@ GM_PRIVATE_OBJECT(GMMemoryStream)
 
 class GMMemoryStream : public GMObject
 {
-	DECLARE_PRIVATE(GMMemoryStream)
+	GM_DECLARE_PRIVATE(GMMemoryStream)
 
 public:
 	enum SeekMode
@@ -316,7 +316,7 @@ GM_PRIVATE_OBJECT(Bitset)
 
 class Bitset : public GMObject
 {
-	DECLARE_PRIVATE(Bitset)
+	GM_DECLARE_PRIVATE(Bitset)
 
 public:
 	Bitset()
@@ -405,7 +405,7 @@ GM_PRIVATE_OBJECT(GMEvent)
 // 表示一个Wait之后能够自动Set的事件
 class GMEvent : public GMObject
 {
-	DECLARE_PRIVATE(GMEvent)
+	GM_DECLARE_PRIVATE(GMEvent)
 	GM_DISABLE_ASSIGN(GMEvent)
 	GM_DISABLE_COPY(GMEvent)
 	GM_DEFAULT_MOVE_BEHAVIOR(GMEvent)

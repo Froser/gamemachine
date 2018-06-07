@@ -157,7 +157,7 @@ namespace
 
 	class GMGLWhiteTexture : public ITexture
 	{
-		DECLARE_PRIVATE(GMGLWhiteTexture)
+		GM_DECLARE_PRIVATE(GMGLWhiteTexture)
 
 	public:
 		GMGLWhiteTexture(const IRenderContext* context)

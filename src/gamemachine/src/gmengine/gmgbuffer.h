@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMGBuffer)
 
 class GMGBuffer : public GMObject, public IGBuffer
 {
-	DECLARE_PRIVATE(GMGBuffer)
+	GM_DECLARE_PRIVATE(GMGBuffer)
 
 protected:
 	GMGBuffer(const IRenderContext* context);

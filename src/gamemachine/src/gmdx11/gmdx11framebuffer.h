@@ -17,7 +17,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffer)
 
 class GMDx11Framebuffer : public GMObject, public IFramebuffer
 {
-	DECLARE_PRIVATE(GMDx11Framebuffer)
+	GM_DECLARE_PRIVATE(GMDx11Framebuffer)
 
 public:
 	GMDx11Framebuffer(const IRenderContext* context);
@@ -56,7 +56,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 
 class GMDx11Framebuffers : public GMObject, public IFramebuffers
 {
-	DECLARE_PRIVATE(GMDx11Framebuffers)
+	GM_DECLARE_PRIVATE(GMDx11Framebuffers)
 
 public:
 	GMDx11Framebuffers(const IRenderContext* context);

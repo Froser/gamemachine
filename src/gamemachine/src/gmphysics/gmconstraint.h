@@ -16,7 +16,7 @@ GM_PRIVATE_OBJECT(GMConstraint)
 
 class GMConstraint : public GMObject
 {
-	DECLARE_PRIVATE(GMConstraint)
+	GM_DECLARE_PRIVATE(GMConstraint)
 
 public:
 	GMConstraint(GMRigidPhysicsObject* body);

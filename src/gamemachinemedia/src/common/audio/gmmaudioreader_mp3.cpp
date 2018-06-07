@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMMDecodeThread)
 
 class GMMDecodeThread : public gm::GMThread
 {
-	DECLARE_PRIVATE(GMMDecodeThread)
+	GM_DECLARE_PRIVATE(GMMDecodeThread)
 
 public:
 	void setData(void* dt, DecodeCallback callback)

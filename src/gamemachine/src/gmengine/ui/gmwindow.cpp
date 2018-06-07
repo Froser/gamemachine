@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "gmwindow.h"
-#include "foundation/gmmessage.h"
+#include "gmengine/gmmessage.h"
 #include "foundation/gamemachine.h"
 #include "gmwidget.h"
 

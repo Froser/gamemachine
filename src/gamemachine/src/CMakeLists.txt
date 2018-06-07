@@ -61,16 +61,21 @@ set(SOURCES
 		gmengine/gameobjects/gmspritegameobject.cpp
 		gmengine/gameobjects/gm2dgameobject.h
 		gmengine/gameobjects/gm2dgameobject.cpp
-		gmengine/ui/gmcontrols.h
-		gmengine/ui/gmcontrols.cpp
 		gmengine/ui/gmwidget.h
 		gmengine/ui/gmwidget.cpp
 		gmengine/ui/gmwindow.h
 		gmengine/ui/gmwindow.cpp
+		gmengine/ui/gmcontrols.h
+		gmengine/ui/gmcontrols.cpp
+		gmengine/ui/gmcontroltextedit.h
+		gmengine/ui/gmcontroltextedit.cpp
 		gmengine/gmtypoengine.h
 		gmengine/gmtypoengine.cpp
 		gmengine/gmgbuffer.h
 		gmengine/gmgbuffer.cpp
+		gmengine/gmmessage.h
+		gmengine/gmmessage.cpp
+		gmengine/gmenums.h
 		gmgl/gmglrenderers.h
 		gmgl/gmglrenderers.cpp
 		gmgl/gmglfactory.h
@@ -122,6 +127,8 @@ set(SOURCES
 		foundation/debug.cpp
 		foundation/assert.h
 		foundation/assert.cpp
+		foundation/gmconfigs.h
+		foundation/gmconfigs.cpp
 		foundation/vector.h
 		foundation/memory.h
 		foundation/memory.cpp
@@ -132,8 +139,6 @@ set(SOURCES
 		foundation/gamemachine.h
 		foundation/gamemachine.cpp
 		foundation/interfaces.h
-		foundation/gmconfigs.h
-		foundation/gmconfigs.cpp
 		foundation/gmvariant.h
 		foundation/gmvariant.cpp
 		foundation/gmthread.h
@@ -141,9 +146,8 @@ set(SOURCES
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
 		foundation/gmstring.cpp
-		foundation/gmmessage.h
-		foundation/gmmessage.cpp
-		foundation/gmenums.h
+		foundation/gmunibuffer.h
+		foundation/gmunibuffer.cpp
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h
@@ -181,6 +185,7 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/screen.cpp
 		foundation/platforms/windows/thread.cpp
 		foundation/platforms/windows/gamemachine.cpp
+		foundation/platforms/windows/uniproxy.cpp
 		foundation/platforms/windows/window/gmwindow.cpp
 		foundation/platforms/windows/window/gmwindow_opengl.cpp
 		foundation/platforms/windows/window/gminput.h

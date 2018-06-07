@@ -54,7 +54,7 @@ class GMMesh;
 class GMModelBuffer;
 class GMModelDataProxy : public GMObject, public IQueriable
 {
-	DECLARE_PRIVATE(GMModelDataProxy)
+	GM_DECLARE_PRIVATE(GMModelDataProxy)
 
 public:
 	GMModelDataProxy(const IRenderContext* context, GMModel* obj)
@@ -124,7 +124,7 @@ GM_PRIVATE_OBJECT(GMModelBuffer)
 //! 用来管理GMModelBuffer生命周期的类，包含引用计数功能。
 class GMModelBuffer : public GMObject
 {
-	DECLARE_PRIVATE(GMModelBuffer)
+	GM_DECLARE_PRIVATE(GMModelBuffer)
 
 	GMModelBuffer();
 	~GMModelBuffer();
@@ -214,7 +214,7 @@ enum class GMVertexDataType
 
 class GMModel : public GMObject
 {
-	DECLARE_PRIVATE(GMModel)
+	GM_DECLARE_PRIVATE(GMModel)
 
 public:
 	typedef GMfloat DataType;
@@ -300,7 +300,7 @@ GM_PRIVATE_OBJECT(GMMesh)
 */
 class GMMesh : public GMObject
 {
-	DECLARE_PRIVATE(GMMesh)
+	GM_DECLARE_PRIVATE(GMMesh)
 
 public:
 	GMMesh(GMModel* parent);

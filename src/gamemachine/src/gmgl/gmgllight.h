@@ -11,7 +11,7 @@ GM_PRIVATE_OBJECT(GMGLLight)
 
 class GMGLLight : public GMObject, public ILight
 {
-	DECLARE_PRIVATE(GMGLLight)
+	GM_DECLARE_PRIVATE(GMGLLight)
 
 public:
 	virtual void setLightPosition(GMfloat position[4]) override;

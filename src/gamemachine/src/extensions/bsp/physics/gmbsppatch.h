@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMBSPPatch)
 struct GMBSPPatchCollide;
 class GMBSPPatch : public GMObject
 {
-	DECLARE_PRIVATE(GMBSPPatch)
+	GM_DECLARE_PRIVATE(GMBSPPatch)
 
 public:
 	void alloc(GMint num);

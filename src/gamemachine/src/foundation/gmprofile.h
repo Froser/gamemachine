@@ -39,7 +39,7 @@ struct GMProfileSessions : public GMObject
 
 class GMProfile : public GMObject
 {
-	DECLARE_PRIVATE(GMProfile)
+	GM_DECLARE_PRIVATE(GMProfile)
 
 public:
 	static GMProfileSessions::GMProfileSession& profileSession();

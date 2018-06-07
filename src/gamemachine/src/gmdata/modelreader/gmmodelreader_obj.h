@@ -35,7 +35,7 @@ GM_PRIVATE_OBJECT(GMModelReader_Obj)
 // 一个Obj文件只由一个部分组成，不存在骨骼等动画，是刚体静态的
 class GMModelReader_Obj : public GMObject, public IModelReader
 {
-	DECLARE_PRIVATE(GMModelReader_Obj);
+	GM_DECLARE_PRIVATE(GMModelReader_Obj);
 
 public:
 	GMModelReader_Obj();

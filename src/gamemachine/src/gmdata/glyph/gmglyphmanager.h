@@ -36,7 +36,7 @@ GM_PRIVATE_OBJECT(GMGlyphManager)
 
 class GMGlyphManager : public GMObject
 {
-	DECLARE_PRIVATE(GMGlyphManager);
+	GM_DECLARE_PRIVATE(GMGlyphManager);
 
 public:
 	// 文字纹理的大小

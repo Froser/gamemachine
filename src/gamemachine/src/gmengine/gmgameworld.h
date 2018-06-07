@@ -38,7 +38,7 @@ GM_PRIVATE_OBJECT(GMGameWorld)
 
 class GMGameWorld : public GMObject
 {
-	DECLARE_PRIVATE(GMGameWorld)
+	GM_DECLARE_PRIVATE(GMGameWorld)
 	GM_FRIEND_CLASS(GMPhysicsWorld)
 	GM_DECLARE_PROPERTY(RenderPreference, renderPreference, GMRenderPreference)
 

@@ -26,7 +26,7 @@ GM_PRIVATE_OBJECT(GMDx11Texture)
 
 class GMDx11Texture : public ITexture
 {
-	DECLARE_PRIVATE(GMDx11Texture)
+	GM_DECLARE_PRIVATE(GMDx11Texture)
 
 public:
 	GMDx11Texture(const IRenderContext* context, GMImage* image);

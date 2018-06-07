@@ -55,7 +55,7 @@ GM_PRIVATE_OBJECT(GMPhysicsObject)
 */
 class GMPhysicsObject : public GMObject
 {
-	DECLARE_PRIVATE(GMPhysicsObject)
+	GM_DECLARE_PRIVATE(GMPhysicsObject)
 	friend class GMPhysicsWorld;
 	friend class GMGameObject;
 

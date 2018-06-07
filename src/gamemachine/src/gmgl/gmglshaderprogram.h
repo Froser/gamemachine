@@ -28,7 +28,7 @@ GM_PRIVATE_OBJECT(GMGLShaderProgram)
 
 class GMGLShaderProgram : public GMObject, public IShaderProgram
 {
-	DECLARE_PRIVATE(GMGLShaderProgram);
+	GM_DECLARE_PRIVATE(GMGLShaderProgram);
 
 public:
 	GMGLShaderProgram(const IRenderContext* context);

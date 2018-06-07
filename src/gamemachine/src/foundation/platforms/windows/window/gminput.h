@@ -50,7 +50,7 @@ class GMInput :
 	public IJoystickState,
 	public IMouseState
 {
-	DECLARE_PRIVATE(GMInput)
+	GM_DECLARE_PRIVATE(GMInput)
 
 public:
 	GMInput(IWindow* window);

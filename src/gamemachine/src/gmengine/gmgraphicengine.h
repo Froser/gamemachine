@@ -157,7 +157,7 @@ GM_PRIVATE_OBJECT(GMFramebuffersStack)
 
 class GMFramebuffersStack : public GMObject
 {
-	DECLARE_PRIVATE(GMFramebuffersStack);
+	GM_DECLARE_PRIVATE(GMFramebuffersStack);
 
 public:
 	void push(IFramebuffers* framebuffers);
@@ -190,7 +190,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 
 class GMGraphicEngine : public GMObject, public IGraphicEngine
 {
-	DECLARE_PRIVATE(GMGraphicEngine)
+	GM_DECLARE_PRIVATE(GMGraphicEngine)
 
 public:
 	GMGraphicEngine(const IRenderContext* context);

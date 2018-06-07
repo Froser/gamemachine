@@ -52,7 +52,7 @@ GM_PRIVATE_OBJECT(GMBSPMove)
 
 class GMBSPMove : public GMObject
 {
-	DECLARE_PRIVATE(GMBSPMove)
+	GM_DECLARE_PRIVATE(GMBSPMove)
 
 public:
 	GMBSPMove(GMBSPPhysicsWorld* world, GMPhysicsObject* obj);

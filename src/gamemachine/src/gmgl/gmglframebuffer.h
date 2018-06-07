@@ -12,7 +12,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffer)
 
 class GMGLFramebuffer : public GMObject, public IFramebuffer
 {
-	DECLARE_PRIVATE(GMGLFramebuffer);
+	GM_DECLARE_PRIVATE(GMGLFramebuffer);
 
 public:
 	GMGLFramebuffer(const IRenderContext* context);
@@ -43,7 +43,7 @@ GM_PRIVATE_OBJECT(GMGLFramebuffers)
 
 class GMGLFramebuffers : public GMObject, public IFramebuffers
 {
-	DECLARE_PRIVATE(GMGLFramebuffers)
+	GM_DECLARE_PRIVATE(GMGLFramebuffers)
 
 public:
 	GMGLFramebuffers(const IRenderContext* context);
@@ -89,7 +89,7 @@ GM_PRIVATE_OBJECT(GMGLShadowMapTexture)
 
 class GMGLShadowMapTexture : public ITexture
 {
-	DECLARE_PRIVATE(GMGLShadowMapTexture)
+	GM_DECLARE_PRIVATE(GMGLShadowMapTexture)
 
 public:
 	GMGLShadowMapTexture(GMuint textureId);

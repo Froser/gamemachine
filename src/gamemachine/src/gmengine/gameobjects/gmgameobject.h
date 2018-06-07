@@ -24,7 +24,7 @@ GM_PRIVATE_OBJECT(GMGameObject)
 struct GMAsset;
 class GMGameObject : public GMObject
 {
-	DECLARE_PRIVATE(GMGameObject)
+	GM_DECLARE_PRIVATE(GMGameObject)
 
 public:
 	GMGameObject() = default;

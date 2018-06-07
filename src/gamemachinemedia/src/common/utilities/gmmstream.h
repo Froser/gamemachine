@@ -19,7 +19,7 @@ GM_PRIVATE_OBJECT(GMMStream)
 
 class GMMStream : public gm::GMObject
 {
-	DECLARE_PRIVATE(GMMStream)
+	GM_DECLARE_PRIVATE(GMMStream)
 
 public:
 	GMMStream();

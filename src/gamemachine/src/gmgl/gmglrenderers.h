@@ -28,7 +28,7 @@ GM_PRIVATE_OBJECT(GMGLRenderer)
 
 class GMGLRenderer : public GMObject, public IRenderer
 {
-	DECLARE_PRIVATE(GMGLRenderer)
+	GM_DECLARE_PRIVATE(GMGLRenderer)
 
 public:
 	GMGLRenderer(const IRenderContext* context);

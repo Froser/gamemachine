@@ -51,7 +51,7 @@ GM_PRIVATE_OBJECT(GMThread)
 */
 class GMThread : public GMObject
 {
-	DECLARE_PRIVATE(GMThread)
+	GM_DECLARE_PRIVATE(GMThread)
 
 public:
 	//! 类的构造函数。
@@ -167,7 +167,7 @@ GM_PRIVATE_OBJECT(GMMutex)
 //! 此类表示一个互斥量
 class GMMutex : public GMObject
 {
-	DECLARE_PRIVATE(GMMutex)
+	GM_DECLARE_PRIVATE(GMMutex)
 
 public:
 	//! 构造一个互斥量。

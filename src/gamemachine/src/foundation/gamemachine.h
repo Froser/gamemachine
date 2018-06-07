@@ -94,7 +94,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 */
 class GameMachine : public GMSingleton<GameMachine>
 {
-	DECLARE_PRIVATE(GameMachine)
+	GM_DECLARE_PRIVATE(GameMachine)
 	DECLARE_SINGLETON(GameMachine)
 
 	enum

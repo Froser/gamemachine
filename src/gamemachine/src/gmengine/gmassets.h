@@ -60,7 +60,7 @@ GM_PRIVATE_OBJECT(GMAssets)
 
 class GMAssets : public GMObject
 {
-	DECLARE_PRIVATE(GMAssets)
+	GM_DECLARE_PRIVATE(GMAssets)
 
 public:
 	GMAssets();

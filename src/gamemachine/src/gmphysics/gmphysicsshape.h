@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMPhysicsShape)
 
 class GMPhysicsShape : public GMObject
 {
-	DECLARE_PRIVATE(GMPhysicsShape);
+	GM_DECLARE_PRIVATE(GMPhysicsShape);
 
 	friend struct GMPhysicsShapeCreator;
 

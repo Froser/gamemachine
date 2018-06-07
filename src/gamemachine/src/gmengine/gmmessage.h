@@ -210,7 +210,7 @@ GM_PRIVATE_OBJECT(GMSystemEvent)
 
 class GMSystemEvent : public GMObject
 {
-	DECLARE_PRIVATE(GMSystemEvent)
+	GM_DECLARE_PRIVATE(GMSystemEvent)
 	GM_ALLOW_COPY_DATA(GMSystemEvent)
 	GM_DECLARE_PROPERTY(Type, type, GMSystemEventType);
 

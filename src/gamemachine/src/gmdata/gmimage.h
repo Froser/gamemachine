@@ -68,7 +68,7 @@ GM_PRIVATE_OBJECT(GMImage)
 */
 class GMImage : public GMObject
 {
-	DECLARE_PRIVATE(GMImage)
+	GM_DECLARE_PRIVATE(GMImage)
 
 public:
 	GMImage() = default;

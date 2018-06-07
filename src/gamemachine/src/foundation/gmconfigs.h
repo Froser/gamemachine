@@ -161,7 +161,7 @@ GM_PRIVATE_OBJECT(GMConfigs)
 
 class GMConfigs : public GMObject
 {
-	DECLARE_PRIVATE(GMConfigs)
+	GM_DECLARE_PRIVATE(GMConfigs)
 
 	enum Category
 	{

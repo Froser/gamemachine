@@ -25,7 +25,7 @@ GM_PRIVATE_OBJECT(DemoHandler)
 
 class DemoHandler : public gm::GMObject
 {
-	DECLARE_PRIVATE(DemoHandler)
+	GM_DECLARE_PRIVATE(DemoHandler)
 
 public:
 	DemoHandler(DemonstrationWorld* parentDemonstrationWorld);

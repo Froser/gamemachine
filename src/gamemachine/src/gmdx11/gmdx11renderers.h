@@ -48,7 +48,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 
 class GMDx11Renderer : public GMObject, public IRenderer
 {
-	DECLARE_PRIVATE(GMDx11Renderer)
+	GM_DECLARE_PRIVATE(GMDx11Renderer)
 
 public:
 	GMDx11Renderer(const IRenderContext* context);

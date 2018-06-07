@@ -1,1 +1,1 @@
-﻿#include "../src/foundation/gmmessage.h"
+﻿#include "../src/gmengine/gmmessage.h"

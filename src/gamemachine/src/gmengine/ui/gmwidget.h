@@ -39,7 +39,7 @@ GM_PRIVATE_OBJECT(GMElementBlendColor)
 
 class GMElementBlendColor : public GMObject
 {
-	DECLARE_PRIVATE(GMElementBlendColor)
+	GM_DECLARE_PRIVATE(GMElementBlendColor)
 	GM_ALLOW_COPY_DATA(GMElementBlendColor)
 
 public:
@@ -101,7 +101,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 
 class GMWidgetResourceManager : public GMObject
 {
-	DECLARE_PRIVATE(GMWidgetResourceManager)
+	GM_DECLARE_PRIVATE(GMWidgetResourceManager)
 
 public:
 	enum TextureType
@@ -192,7 +192,7 @@ GM_PRIVATE_OBJECT(GMStyle)
 
 class GMStyle : public GMObject
 {
-	DECLARE_PRIVATE(GMStyle)
+	GM_DECLARE_PRIVATE(GMStyle)
 	GM_ALLOW_COPY_DATA(GMStyle)
 
 public:
@@ -282,7 +282,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 
 class GMWidget : public GMObject
 {
-	DECLARE_PRIVATE(GMWidget)
+	GM_DECLARE_PRIVATE(GMWidget)
 
 public:
 	GMWidget(GMWidgetResourceManager* manager);

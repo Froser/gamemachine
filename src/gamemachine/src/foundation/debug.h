@@ -23,7 +23,7 @@ GM_PRIVATE_OBJECT(GMDebugger)
 
 class GMDebugger : public GMSingleton<GMDebugger>
 {
-	DECLARE_PRIVATE(GMDebugger)
+	GM_DECLARE_PRIVATE(GMDebugger)
 	DECLARE_SINGLETON(GMDebugger)
 
 private:

@@ -35,7 +35,7 @@ GM_PRIVATE_OBJECT(GMControl)
 
 class GMControl : public GMObject
 {
-	DECLARE_PRIVATE(GMControl)
+	GM_DECLARE_PRIVATE(GMControl)
 
 public:
 	enum StyleType

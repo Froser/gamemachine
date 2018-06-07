@@ -15,7 +15,7 @@ GM_PRIVATE_OBJECT(GMMAudioPlayer)
 
 class GMMAudioPlayer : public gm::GMObject, public gm::IAudioPlayer
 {
-	DECLARE_PRIVATE(GMMAudioPlayer)
+	GM_DECLARE_PRIVATE(GMMAudioPlayer)
 
 public:
 	GMMAudioPlayer();

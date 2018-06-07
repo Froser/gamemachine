@@ -40,7 +40,7 @@ GM_PRIVATE_OBJECT(GMWindow)
 
 class GMWindow : public GMObject, public IWindow
 {
-	DECLARE_PRIVATE(GMWindow)
+	GM_DECLARE_PRIVATE(GMWindow)
 
 public:
 	~GMWindow();

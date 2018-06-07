@@ -14,7 +14,7 @@ GM_PRIVATE_OBJECT(GMGLGlyphManager)
 
 class GMGLGlyphManager : public GMGlyphManager
 {
-	DECLARE_PRIVATE(GMGLGlyphManager);
+	GM_DECLARE_PRIVATE(GMGLGlyphManager);
 
 public:
 	GMGLGlyphManager(const IRenderContext* context);

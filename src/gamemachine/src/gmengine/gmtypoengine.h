@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 
 class GMTypoIterator : public GMObject
 {
-	DECLARE_PRIVATE(GMTypoIterator)
+	GM_DECLARE_PRIVATE(GMTypoIterator)
 
 public:
 	GMTypoIterator(ITypoEngine* typo, GMsize_t index);
@@ -84,7 +84,7 @@ GM_PRIVATE_OBJECT(GMTypoStateMachine)
 
 class GMTypoStateMachine : public GMObject
 {
-	DECLARE_PRIVATE(GMTypoStateMachine)
+	GM_DECLARE_PRIVATE(GMTypoStateMachine)
 
 public:
 	enum ParseResult
@@ -134,7 +134,7 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 
 class GMTypoEngine : public GMObject, public ITypoEngine
 {
-	DECLARE_PRIVATE(GMTypoEngine);
+	GM_DECLARE_PRIVATE(GMTypoEngine);
 
 public:
 	GMTypoEngine(const IRenderContext* context);

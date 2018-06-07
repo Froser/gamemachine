@@ -7,7 +7,7 @@
 #include "../gmtypoengine.h"
 #include "gmdata/gmmodel.h"
 #include "gmdata/glyph/gmglyphmanager.h"
-#include "foundation/gmmessage.h"
+#include "gmengine/gmmessage.h"
 
 namespace
 {
