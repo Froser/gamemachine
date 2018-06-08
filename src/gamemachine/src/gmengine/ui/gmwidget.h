@@ -15,6 +15,7 @@ class GMWidget;
 class GMControlStatic;
 class GMControlButton;
 class GMControlBorder;
+class GMControlTextEdit;
 
 struct GMControlState
 {
@@ -77,6 +78,7 @@ struct GMTextureArea
 		ButtonArea,
 		ButtonFillArea,
 		BorderArea,
+		TextEditBorderArea,
 	};
 };
 
@@ -332,6 +334,17 @@ public:
 		GMint height,
 		const GMRect& cornerRect,
 		OUT GMControlBorder** out
+	);
+
+	void addTextEdit(
+		const GMString& text,
+		GMint x,
+		GMint y,
+		GMint width,
+		GMint height,
+		bool isDefault,
+		const GMRect& cornerRect,
+		OUT GMControlTextEdit** out
 	);
 
 	void drawText(

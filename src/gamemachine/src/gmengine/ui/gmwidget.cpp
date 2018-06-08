@@ -8,6 +8,7 @@
 #include "gmdata/gmmodel.h"
 #include "gmdata/glyph/gmglyphmanager.h"
 #include "gmengine/gmmessage.h"
+#include "gmcontroltextedit.h"
 
 namespace
 {
@@ -285,6 +286,31 @@ void GMWidget::addBorder(
 	borderControl->setPosition(x, y);
 	borderControl->setSize(width, height);
 	borderControl->setCorner(cornerRect);
+}
+
+void GMWidget::addTextEdit(
+	const GMString& text,
+	GMint x,
+	GMint y,
+	GMint width,
+	GMint height,
+	bool isDefault,
+	const GMRect& cornerRect,
+	OUT GMControlTextEdit** out
+)
+{
+	GMControlTextEdit* textEdit= new GMControlTextEdit(this);
+	if (out)
+		*out = textEdit;
+
+	addControl(textEdit);
+	textEdit->setText(text);
+	textEdit->setPosition(x, y);
+	textEdit->setSize(width, height);
+	textEdit->setIsDefault(isDefault);
+
+	GMControlBorder* border = textEdit->getBorder();
+	border->setCorner(cornerRect);
 }
 
 void GMWidget::drawText(

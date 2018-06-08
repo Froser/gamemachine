@@ -226,6 +226,10 @@ void DemonstrationWorld::init()
 		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
 	}
 	{
+		gm::GMRect rc = { 8, 82, 238, 39 };
+		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, rc);
+	}
+	{
 		gm::GMRect rc = { 0, 0, 280, 287 };
 		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
 	}
@@ -258,6 +262,18 @@ void DemonstrationWorld::init()
 			d->mainWidget->setVisible(false);
 		});
 	}
+
+	gm::GMRect txtCorner = { 0, 0, 6, 8 };
+	d->mainWidget->addTextEdit(
+		L"Hello, TextEdit.",
+		10,
+		Y,
+		480,
+		60,
+		false,
+		txtCorner,
+		nullptr
+	);
 
 	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(

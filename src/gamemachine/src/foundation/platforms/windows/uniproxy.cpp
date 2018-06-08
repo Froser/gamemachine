@@ -7,6 +7,7 @@ GM_PRIVATE_OBJECT(GMUniProxy_Windows)
 	SCRIPT_STRING_ANALYSIS analysis = 0;
 	bool analyseRequired = true;
 	GMUniBuffer* unibuffer = nullptr;
+	const IRenderContext* context = nullptr;
 };
 
 class GMUniProxy_Windows : public IUniProxy
@@ -18,6 +19,7 @@ public:
 	~GMUniProxy_Windows();
 
 public:
+	virtual void setContext(const IRenderContext* context) override;
 	virtual bool analyze() override;
 	virtual bool CPtoX(GMint cp, bool trail, GMint* x) override;
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) override;
@@ -215,6 +217,12 @@ void GMUniProxy_Windows::uninitialize()
 	}
 }
 
+void GMUniProxy_Windows::setContext(const IRenderContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
 bool GMUniProxy_Windows::analyze()
 {
 	D(d);
@@ -228,9 +236,10 @@ bool GMUniProxy_Windows::analyze()
 	if (FAILED(GM_ScriptApplyDigitSubstitution(NULL, &scriptControl, &scriptState)))
 		return false;
 
+	HDC hDC = GetDC(d->context->getWindow()->getWindowHandle());
 	const GMString& buffer = d->unibuffer->getBuffer();
 	HRESULT hr = GM_ScriptStringAnalyse(
-		NULL,
+		hDC,
 		buffer.toStdWString().c_str(),
 		buffer.length() + 1, //将NULL计算在内
 		buffer.length() * 3 / 2 + 16, //MSDN推荐大小

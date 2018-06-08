@@ -228,6 +228,18 @@ public:
 		return d->boundingBox;
 	}
 
+	inline GMint getWidth()
+	{
+		D(d);
+		return d->width;
+	}
+
+	inline GMint getHeight()
+	{
+		D(d);
+		return d->height;
+	}
+
 protected:
 	void updateRect();
 };
@@ -335,12 +347,10 @@ public:
 
 public:
 	virtual void render(GMfloat elapsed) override;
+	virtual void initStyles() override;
 
 public:
 	void setCorner(const GMRect& corner);
-
-protected:
-	virtual void initStyles() override;
 };
 END_NS
 #endif
