@@ -218,3 +218,43 @@ void GMGLTexture::useTexture(GMint textureIndex)
 	glActiveTexture(GL_TEXTURE0 + textureIndex);
 	glBindTexture(d->target, d->id);
 }
+
+GMGLWhiteTexture::GMGLWhiteTexture(const IRenderContext* context)
+{
+	D(d);
+	d->context = context;
+}
+
+GMGLWhiteTexture::~GMGLWhiteTexture()
+{
+	D(d);
+	glDeleteTextures(1, &d->textureId);
+}
+
+void GMGLWhiteTexture::init()
+{
+	D(d);
+	static GMbyte texData[] = { 0xFF, 0xFF, 0xFF, 0xFF };
+	glGenTextures(1, &d->textureId);
+	glBindTexture(GL_TEXTURE_2D, d->textureId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GMGLWhiteTexture::bindSampler(GMTextureSampler* sampler)
+{
+	D(d);
+	glBindTexture(GL_TEXTURE_2D, d->textureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void GMGLWhiteTexture::useTexture(GMint textureIndex)
+{
+	D(d);
+	glActiveTexture(GL_TEXTURE0 + textureIndex);
+	glBindTexture(GL_TEXTURE_2D, d->textureId);
+}

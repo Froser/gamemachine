@@ -14,17 +14,17 @@ namespace
 {
 	GMControl* getNextControl(GMControl* control)
 	{
-		GMWidget* parentCanvas = control->getParent();
+		GMWidget* parentWidget = control->getParent();
 		GMuint index = control->getIndex() + 1;
 
 		// 如果下一个控件不在此画布内，则跳到下一个画布进行查找
-		while (index >= (GMuint)parentCanvas->getControls().size())
+		while (index >= (GMuint)parentWidget->getControls().size())
 		{
-			parentCanvas = parentCanvas->getNextCanvas();
+			parentWidget = parentWidget->getNextCanvas();
 			index = 0;
 		}
 
-		return parentCanvas->getControls()[index];
+		return parentWidget->getControls()[index];
 	}
 
 	GMControl* getPrevControl(GMControl* control)
@@ -122,6 +122,9 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 
 	d->borderObject = new GMBorder2DGameObject(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
+
+	GM.getFactory()->createWhiteTexture(context, &d->whiteTexture);
+	addTexture(GMWidgetResourceManager::WhiteTexture, d->whiteTexture, 1, 1);
 }
 
 GMWidgetResourceManager::~GMWidgetResourceManager()
@@ -140,6 +143,10 @@ GMWidgetResourceManager::~GMWidgetResourceManager()
 void GMWidgetResourceManager::addTexture(TextureType type, ITexture* texture, GMint width, GMint height)
 {
 	D(d);
+	auto iter = d->textureResources.find(type);
+	if (iter != d->textureResources.end() && (*iter).second.texture != texture)
+		GM_delete((*iter).second.texture);
+
 	GMCanvasTextureInfo texInfo;
 	texInfo.texture = texture;
 	texInfo.width = width;
@@ -187,7 +194,7 @@ GMWidget::GMWidget(GMWidgetResourceManager* manager)
 {
 	D(d);
 	d->manager = manager;
-	d->nextCanvas = d->prevCanvas = this;
+	d->nextWidget = d->prevWidget = this;
 }
 
 GMWidget::~GMWidget()
@@ -380,6 +387,34 @@ void GMWidget::drawSprite(
 	spriteObject->draw();
 }
 
+void GMWidget::drawRect(
+	const GMVec4& bkColor,
+	const GMRect& rc,
+	GMfloat depth
+)
+{
+	// 不需要绘制透明元素
+	if (bkColor.getW() == 0)
+		return;
+
+	D(d);
+	GMRect targetRc = rc;
+	mapRect(targetRc);
+
+	const GMRect& textureRc = d->whiteTextureStyle.getTextureRect();
+	GMuint texId = d->whiteTextureStyle.getTexture();
+	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(d->whiteTextureStyle.getTexture());
+
+	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
+	spriteObject->setDepth(depth);
+	spriteObject->setGeometry(targetRc);
+	spriteObject->setTexture(texInfo.texture);
+	spriteObject->setTextureRect(textureRc);
+	spriteObject->setTextureSize(texInfo.width, texInfo.height);
+	spriteObject->setColor(bkColor);
+	spriteObject->draw();
+}
+
 void GMWidget::drawBorder(
 	GMStyle& style,
 	const GMRect& cornerRc,
@@ -436,10 +471,10 @@ bool GMWidget::initControl(GMControl* control)
 	return control->onInit();
 }
 
-void GMWidget::setPrevCanvas(GMWidget* prevCanvas)
+void GMWidget::setPrevCanvas(GMWidget* prevWidget)
 {
 	D(d);
-	d->prevCanvas = prevCanvas;
+	d->prevWidget= prevWidget;
 }
 
 void GMWidget::init()
@@ -676,7 +711,7 @@ void GMWidget::setNextWidget(GMWidget* nextWidget)
 	D(d);
 	if (!nextWidget)
 		nextWidget = this;
-	d->nextCanvas = nextWidget;
+	d->nextWidget = nextWidget;
 	if (nextWidget)
 		nextWidget->setPrevCanvas(this);
 }
@@ -880,6 +915,11 @@ void GMWidget::initStyles()
 	GMStyle shadowStyle;
 	shadowStyle.getFontColor().setCurrent(GMVec4(0, 0, 0, 1));
 	d->shadowStyle = shadowStyle;
+
+	GMStyle whiteTextureStyle;
+	GMRect rc = { 0, 0, 1, 1 };
+	whiteTextureStyle.setTexture(GMWidgetResourceManager::WhiteTexture, rc);
+	d->whiteTextureStyle = whiteTextureStyle;
 }
 
 void GMWidget::clearFocus()

@@ -148,62 +148,10 @@ namespace
 		}
 	}
 
-
-	GM_PRIVATE_OBJECT(GMGLWhiteTexture)
-	{
-		GMuint textureId = 0;
-		const IRenderContext* context = nullptr;
-	};
-
-	class GMGLWhiteTexture : public ITexture
-	{
-		GM_DECLARE_PRIVATE(GMGLWhiteTexture)
-
-	public:
-		GMGLWhiteTexture(const IRenderContext* context)
-		{
-			D(d);
-			d->context = context;
-		}
-
-		~GMGLWhiteTexture()
-		{
-			D(d);
-			glDeleteTextures(1, &d->textureId);
-		}
-
-		virtual void init() override
-		{
-			D(d);
-			static GMbyte texData[] = { 0xFF, 0xFF, 0xFF, 0xFF };
-			glGenTextures(1, &d->textureId);
-			glBindTexture(GL_TEXTURE_2D, d->textureId);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 1, 1, 0, GL_RGBA, GL_UNSIGNED_BYTE, texData);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		virtual void bindSampler(GMTextureSampler* sampler)
-		{
-			D(d);
-			glBindTexture(GL_TEXTURE_2D, d->textureId);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-			glBindTexture(GL_TEXTURE_2D, 0);
-		}
-
-		virtual void useTexture(GMint textureIndex) override
-		{
-			D(d);
-			glActiveTexture(GL_TEXTURE0 + textureIndex);
-			glBindTexture(GL_TEXTURE_2D, d->textureId);
-		}
-	};
-
 	ITexture* createWhiteTexture(const IRenderContext* context)
 	{
-		GMGLWhiteTexture* texture = new GMGLWhiteTexture(context);
+		ITexture* texture = nullptr;
+		GM.getFactory()->createWhiteTexture(context, &texture);
 		texture->init();
 		return texture;
 	}

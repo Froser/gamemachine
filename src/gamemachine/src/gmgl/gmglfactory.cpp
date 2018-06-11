@@ -62,3 +62,10 @@ void GMGLFactory::createLight(GMLightType type, OUT ILight** out)
 		*out = new GMGLDirectLight();
 	}
 }
+
+void GMGLFactory::createWhiteTexture(const IRenderContext* context, OUT ITexture** out)
+{
+	GM_ASSERT(out);
+	*out = new GMGLWhiteTexture(context);
+	(*out)->init();
+}

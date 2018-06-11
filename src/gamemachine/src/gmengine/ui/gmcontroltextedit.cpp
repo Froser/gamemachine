@@ -15,15 +15,15 @@ GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 	: GMControl(widget)
 {
 	D(d);
-	d->border = new GMControlTextEditBorder(widget);
-	d->border->initStyles();
+	d->borderControl = new GMControlTextEditBorder(widget);
+	d->borderControl->initStyles();
 	d->buffer = new GMUniBuffer();
 }
 
 GMControlTextEdit::~GMControlTextEdit()
 {
 	D(d);
-	GM_delete(d->border);
+	GM_delete(d->borderControl);
 	GM_delete(d->buffer);
 }
 
@@ -44,18 +44,52 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	if (!d->buffer->getContext())
 		d->buffer->setContext(getParent()->getParentWindow()->getContext());
 
-	GMint selectionStart = 0;
+	GMint selectionStartX = 0;
 	GMint caretX = 0;
 	placeCaret(caretX);
 
-	d->border->render(elapsed);
+	d->borderControl->render(elapsed);
+
+	// 计算首个能显示的字符
+	GMint firstX;
+	d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
+
+	// 计算选区
+	d->buffer->CPtoX(d->cp, false, &caretX);
+	if (d->cp != d->selectionStartCP)
+		d->buffer->CPtoX(d->selectionStartCP, false, &selectionStartX);
+	else
+		selectionStartX = caretX;
+
+	GMWidget* widget = getParent();
+	GMRect rcSelection;
+	if (d->cp != d->selectionStartCP)
+	{
+		// 如果当前位置不等于选定开始的位置，则确定一个选区
+		GMint selectionLeftX = caretX, selectionRightX = selectionStartX;
+		if (selectionLeftX > selectionRightX)
+		{
+			GM_SWAP(selectionLeftX, selectionRightX);
+		}
+
+		rcSelection.x = selectionLeftX + (d->rcText.x - firstX);
+		rcSelection.y = d->rcText.y;
+		rcSelection.width = selectionRightX - selectionRightX;
+		rcSelection.height = d->rcText.height;
+		GMRect rc = GM_intersectRect(rcSelection, d->rcText);
+		widget->drawRect(d->selectionBackColor, rc, .99f);
+	}
+
+	//TODO
+	d->textStyle.getFontColor().setCurrent(d->textColor);
+	widget->drawText(d->buffer->getBuffer(), d->textStyle, d->rcText);
 }
 
 void GMControlTextEdit::setSize(GMint width, GMint height)
 {
 	D(d);
 	GMControl::setSize(width, height);
-	d->border->setSize(width, height);
+	d->borderControl->setSize(width, height);
 }
 
 void GMControlTextEdit::setPosition(GMint x, GMint y)
@@ -64,7 +98,7 @@ void GMControlTextEdit::setPosition(GMint x, GMint y)
 	GMControl::setPosition(x, y);
 
 	// border是以widget为参照，而不是以本控件为参照，所以要调整一次
-	d->border->setPosition(x, y);
+	d->borderControl->setPosition(x, y);
 }
 
 void GMControlTextEdit::setText(const GMString& text)
@@ -110,5 +144,19 @@ void GMControlTextEdit::placeCaret(GMint cp)
 void GMControlTextEdit::initStyles()
 {
 	D(d);
-	d->border->initStyles();
+	GMStyle textStyle;
+	textStyle.setFont(0, GMVec4(0, 0, 0, 1));
+	d->borderControl->initStyles();
+}
+
+void GMControlTextEdit::updateRect()
+{
+	GMControl::updateRect();
+	
+	D(d);
+	d->rcText = boundingRect();
+	d->rcText.x += d->borderWidth;
+	d->rcText.width -= d->borderWidth * 2;
+	d->rcText.y += d->borderWidth;
+	d->rcText.height -= d->borderWidth * 2;
 }

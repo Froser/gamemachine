@@ -8,15 +8,18 @@ class GMUniBuffer;
 
 GM_PRIVATE_OBJECT(GMControlTextEdit)
 {
-	GMVec4 textColor;
-	GMVec4 selectionTextColor;
-	GMVec4 selectionBackColor;
-	GMVec4 caretColor;
+	GMVec4 textColor = GMVec4(0, 0, 0, 1);
+	GMVec4 selectionTextColor = GMVec4(0, 0, 0, 1);
+	GMVec4 selectionBackColor = GMVec4(0, 0, 0, 1);
+	GMVec4 caretColor = GMVec4(0, 0, 0, 1);
 	GMint cp = 0;
 	GMint firstVisibleCP = 0;
+	GMint selectionStartCP = 0;
 	GMUniBuffer* buffer = nullptr;
 	GMRect rcText;
-	GMControlBorder* border = nullptr;
+	GMStyle textStyle;
+	GMControlBorder* borderControl = nullptr;
+	GMint borderWidth = 5;
 };
 
 class GMControlTextEdit : public GMControl
@@ -44,11 +47,18 @@ public:
 	inline GMControlBorder* getBorder()
 	{
 		D(d);
-		return d->border;
+		return d->borderControl;
+	}
+
+	inline void setBorderWidth(GMint width)
+	{
+		D(d);
+		d->borderWidth = width;
 	}
 
 protected:
 	virtual void initStyles() override;
+	virtual void updateRect() override;
 };
 
 END_NS

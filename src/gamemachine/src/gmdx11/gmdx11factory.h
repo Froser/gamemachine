@@ -15,6 +15,7 @@ public:
 	virtual void createFramebuffers(const IRenderContext* context, OUT IFramebuffers**) override;
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) override;
 	virtual void createLight(GMLightType, OUT ILight**) override;
+	virtual void createWhiteTexture(const IRenderContext* context, OUT ITexture**) override;
 };
 
 END_NS

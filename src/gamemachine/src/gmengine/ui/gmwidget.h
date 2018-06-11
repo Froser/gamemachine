@@ -99,6 +99,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
 	Map<GMint, GMCanvasTextureInfo> textureResources;
+	ITexture* whiteTexture = nullptr;
 };
 
 class GMWidgetResourceManager : public GMObject
@@ -108,6 +109,7 @@ class GMWidgetResourceManager : public GMObject
 public:
 	enum TextureType
 	{
+		WhiteTexture,
 		Skin,
 		Border,
 		UserDefine,
@@ -249,8 +251,8 @@ GM_PRIVATE_OBJECT(GMWidget)
 {
 	GMWidgetResourceManager* manager = nullptr;
 	IWindow* parentWindow = nullptr;
-	GMWidget* nextCanvas; // 下一个画布默认为自己
-	GMWidget* prevCanvas; // 上一个画布默认为自己
+	GMWidget* nextWidget; // 下一个Widget默认为自己
+	GMWidget* prevWidget; // 上一个Widget默认为自己
 	Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
 	GMfloat timeLastRefresh = 0;
@@ -266,6 +268,8 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMPoint titleOffset;
 	GMStyle titleStyle;
 	GMStyle shadowStyle;
+
+	GMStyle whiteTextureStyle;
 
 	GMFloat4 colorTopLeft = GMFloat4(0, 0, 0, 0);
 	GMFloat4 colorTopRight = GMFloat4(0, 0, 0, 0);
@@ -361,6 +365,12 @@ public:
 		GMfloat depth
 	);
 
+	void drawRect(
+		const GMVec4& bkColor,
+		const GMRect& rc,
+		GMfloat depth
+	);
+
 	void drawBorder(
 		GMStyle& style,
 		const GMRect& cornerRc,
@@ -431,13 +441,13 @@ public:
 	inline GMWidget* getNextCanvas()
 	{
 		D(d);
-		return d->nextCanvas;
+		return d->nextWidget;
 	}
 
 	inline GMWidget* getPrevCanvas()
 	{
 		D(d);
-		return d->prevCanvas;
+		return d->prevWidget;
 	}
 
 	inline const Vector<GMControl*>& getControls()

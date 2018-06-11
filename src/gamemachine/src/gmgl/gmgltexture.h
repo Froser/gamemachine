@@ -35,5 +35,25 @@ public:
 	virtual void useTexture(GMint textureIndex) override;
 };
 
+GM_PRIVATE_OBJECT(GMGLWhiteTexture)
+{
+	GMuint textureId = 0;
+	const IRenderContext* context = nullptr;
+};
+
+class GMGLWhiteTexture : public ITexture
+{
+	GM_DECLARE_PRIVATE(GMGLWhiteTexture)
+
+public:
+	GMGLWhiteTexture(const IRenderContext* context);
+	~GMGLWhiteTexture();
+
+public:
+	virtual void init() override;
+	virtual void bindSampler(GMTextureSampler* sampler) override;
+	virtual void useTexture(GMint textureIndex) override;
+};
+
 END_NS
 #endif

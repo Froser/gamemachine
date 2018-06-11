@@ -241,7 +241,7 @@ public:
 	}
 
 protected:
-	void updateRect();
+	virtual void updateRect();
 };
 
 GM_PRIVATE_OBJECT(GMControlStatic)

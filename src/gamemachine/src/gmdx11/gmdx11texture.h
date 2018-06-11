@@ -48,5 +48,18 @@ public:
 	}
 };
 
+class GMDx11WhiteTexture : public GMDx11Texture
+{
+public:
+	GMDx11WhiteTexture(const IRenderContext* context)
+		: GMDx11Texture(context, nullptr)
+	{
+	}
+
+	virtual void init() override;
+	virtual void bindSampler(GMTextureSampler*) override;
+};
+
+
 END_NS
 #endif

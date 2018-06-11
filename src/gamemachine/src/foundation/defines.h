@@ -218,6 +218,23 @@ inline bool GM_inRect(const GMRect& rect, const GMPoint& pt)
 		(pt.y > rect.y) && (pt.y < rect.y + rect.height);
 }
 
+inline GMRect GM_intersectRect(const GMRect& rect1, const GMRect& rect2)
+{
+	GMRect rc;
+
+	rc.x = rect1.x > rect2.x ? rect1.x : rect2.x;
+	rc.y = rect1.y > rect2.y ? rect1.y : rect2.y;
+	GMint right = (rect1.x + rect1.width) < (rect2.x + rect2.width) ? (rect1.x + rect1.width) : (rect2.x + rect2.width);
+	GMint bottom = (rect1.y + rect1.height) < (rect2.y + rect2.height) ? (rect1.y + rect1.height) : (rect2.y + rect2.height);
+	rc.width = right - rc.x;
+	rc.height = bottom - rc.y;
+	if (rc.width < 0)
+		rc.width = 0;
+	if (rc.height < 0)
+		rc.height = 0;
+	return rc;
+}
+
 inline bool operator==(const GMRect& lhs, const GMRect& rhs)
 {
 	return lhs.x == rhs.x && lhs.y == rhs.y && lhs.width == rhs.width && lhs.height == rhs.height;

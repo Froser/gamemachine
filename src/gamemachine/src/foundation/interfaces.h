@@ -527,6 +527,7 @@ GM_INTERFACE(IFactory)
 	virtual void createFramebuffers(const IRenderContext* context, OUT IFramebuffers**) = 0;
 	virtual void createGBuffer(const IRenderContext* context, OUT IGBuffer**) = 0;
 	virtual void createLight(GMLightType, OUT ILight**) = 0;
+	virtual void createWhiteTexture(const IRenderContext* context, OUT ITexture**) = 0;
 };
 
 // Audio
