@@ -13,10 +13,6 @@
 #include "gmglframebuffer.h"
 #include "gmglglyphmanager.h"
 
-#ifdef max
-#undef max
-#endif
-
 extern "C"
 {
 	GLenum s_glErrCode;

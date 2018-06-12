@@ -25,6 +25,7 @@ public:
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) override;
 	virtual void getPriorItemPos(GMint cP, GMint* prior) override;
 	virtual void getNextItemPos(GMint cP, GMint* prior) override;
+	virtual void setDirty() override;
 
 	// Dll Handle
 private:
@@ -269,7 +270,10 @@ bool GMUniProxy_Windows::CPtoX(GMint cp, bool trail, GMint* x)
 		succeed = analyze();
 
 	if (succeed)
-		return SUCCEEDED(GM_ScriptStringCPtoX(d->analysis, cp, trail ? TRUE : FALSE, x));
+	{
+		HRESULT hr = GM_ScriptStringCPtoX(d->analysis, cp, trail ? TRUE : FALSE, x);
+		return SUCCEEDED(hr);
+	}
 
 	return succeed;
 }
@@ -372,6 +376,12 @@ void GMUniProxy_Windows::getNextItemPos(GMint cp, GMint* prior)
 		++i;
 	}
 	*prior = *pInitial - 1;
+}
+
+void GMUniProxy_Windows::setDirty()
+{
+	D(d);
+	d->analyseRequired = true;
 }
 
 void GMUniProxyFactory::createUniProxy(GMUniBuffer* buffer, OUT IUniProxy** proxy)

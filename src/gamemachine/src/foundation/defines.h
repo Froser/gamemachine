@@ -115,6 +115,14 @@ void GMClearSTLContainer(T& c)
 #	endif
 #endif
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 // 整个GameMachine用到的宏定义
 #define BEGIN_NS namespace gm {
 #define END_NS }

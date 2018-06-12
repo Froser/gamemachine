@@ -295,7 +295,6 @@ public:
 	~GMWidget();
 
 public:
-	void init();
 	void addArea(GMTextureArea::Area area, const GMRect& rc);
 	void render(GMfloat elpasedTime);
 	void setNextWidget(GMWidget* nextWidget);
@@ -329,6 +328,12 @@ public:
 		GMint height,
 		bool isDefault,
 		OUT GMControlButton** out
+	);
+
+	void addBorder(
+		const GMRect& corner,
+		const GMint marginLeft = 10,
+		const GMint marginTop = 30
 	);
 
 	void addBorder(
@@ -382,6 +387,7 @@ public:
 
 public:
 	virtual bool msgProc(GMSystemEvent* event);
+	virtual void onInit();
 	virtual bool onTitleMouseDown(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseMove(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseUp(const GMSystemMouseEvent* event);

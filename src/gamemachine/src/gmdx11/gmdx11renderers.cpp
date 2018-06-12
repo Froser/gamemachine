@@ -9,10 +9,6 @@
 #include "gmdx11gbuffer.h"
 #include "gmdx11framebuffer.h"
 
-#ifdef max
-#undef max
-#endif
-
 #define GMSHADER_SEMANTIC_NAME_POSITION "POSITION"
 #define GMSHADER_SEMANTIC_NAME_NORMAL "NORMAL"
 #define GMSHADER_SEMANTIC_NAME_TEXCOORD "TEXCOORD"

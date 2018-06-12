@@ -123,6 +123,11 @@ public:
 		return false;
 	}
 
+	virtual bool onChar(GMSystemCharEvent* event)
+	{
+		return false;
+	}
+
 	virtual void onFocusIn()
 	{
 		D(d);

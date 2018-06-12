@@ -2,10 +2,6 @@
 #include "gmlua.h"
 #include "gmlua_functions.h"
 
-#ifdef max
-#undef max
-#endif
-
 #define L (d->luaState)
 
 #define POP_GUARD() \

@@ -20,11 +20,19 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	GMStyle textStyle;
 	GMControlBorder* borderControl = nullptr;
 	GMint borderWidth = 5;
+	GMfloat lastBlink = 0;
+	GMfloat deltaBlink = .5f;
+	bool caretOn = true;
+	bool showCaret = true;
+	bool insertMode = true;
 };
 
 class GMControlTextEdit : public GMControl
 {
 	GM_DECLARE_PRIVATE(GMControlTextEdit)
+
+public:
+	GM_DECLARE_SIGNAL(textChanged);
 
 public:
 	GMControlTextEdit(GMWidget* widget);
@@ -34,10 +42,17 @@ public:
 	virtual void render(GMfloat elapsed) override;
 	virtual void setSize(GMint width, GMint height) override;
 	virtual void setPosition(GMint x, GMint y) override;
+	virtual bool onKeyDown(GMSystemKeyEvent* event) override;
+	virtual bool onChar(GMSystemCharEvent* event) override;
+	virtual bool canHaveFocus() override;
 	virtual void setText(const GMString& text);
 
 protected:
+	virtual void renderCaret(GMint firstX, GMint caretX);
+
+protected:
 	void placeCaret(GMint cP);
+	void moveCaret(bool next, bool newItem, bool select);
 	void deleteSelectionText();
 	void resetCaretBlink();
 	void copyToClipboard();
@@ -54,6 +69,18 @@ public:
 	{
 		D(d);
 		d->borderWidth = width;
+	}
+
+	inline void setShowCaret(bool showCaret)
+	{
+		D(d);
+		d->showCaret = showCaret;
+	}
+
+	inline void setCaretBlinkSpeed(GMfloat blinkSpeedSecond)
+	{
+		D(d);
+		d->deltaBlink = blinkSpeedSecond;
 	}
 
 protected:

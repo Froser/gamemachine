@@ -8,10 +8,6 @@
 #include "gmdx11gbuffer.h"
 #include "gmdx11glyphmanager.h"
 
-#ifdef max
-#undef max
-#endif
-
 namespace
 {
 	template <typename T>

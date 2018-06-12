@@ -5,10 +5,6 @@
 #include "gmengine/gmgraphicengine.h"
 #include "foundation/gamemachine.h"
 
-#ifdef max
-#undef max
-#endif
-
 GM_PRIVATE_OBJECT(GMGLFramebufferTexture)
 {
 	GMFramebufferDesc desc;

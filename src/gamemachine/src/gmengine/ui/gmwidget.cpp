@@ -199,6 +199,7 @@ GMWidget::GMWidget(GMWidgetResourceManager* manager)
 
 GMWidget::~GMWidget()
 {
+	D(d);
 	removeAllControls();
 }
 
@@ -274,6 +275,23 @@ void GMWidget::addButton(
 	buttonControl->setPosition(x, y);
 	buttonControl->setSize(width, height);
 	buttonControl->setIsDefault(isDefault);
+}
+
+void GMWidget::addBorder(
+	const GMRect& corner,
+	const GMint marginLeft,
+	const GMint marginTop
+)
+{
+	D(d);
+	addBorder(
+		-marginLeft,
+		-marginTop - getTitleHeight(),
+		d->width + 2 * marginLeft,
+		d->height + 2 * (getTitleHeight() + marginTop),
+		corner,
+		nullptr
+	);
 }
 
 void GMWidget::addBorder(
@@ -477,11 +495,6 @@ void GMWidget::setPrevCanvas(GMWidget* prevWidget)
 	d->prevWidget= prevWidget;
 }
 
-void GMWidget::init()
-{
-	initStyles();
-}
-
 void GMWidget::addArea(GMTextureArea::Area area, const GMRect& rc)
 {
 	D(d);
@@ -534,6 +547,18 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 				bool shiftDown = (keyEvent->getModifier() & GMModifier_Shift) != 0;
 				return onCycleFocus(!shiftDown);
 			}
+		}
+		break;
+	}
+	case GMSystemEventType::Char:
+	{
+		GMSystemCharEvent* keyEvent = gm_cast<GMSystemCharEvent*>(event);
+		if (s_controlFocus &&
+			s_controlFocus->getParent() == this &&
+			s_controlFocus->getEnabled())
+		{
+			if (s_controlFocus->handleKeyboard(keyEvent))
+				return true;
 		}
 		break;
 	}
@@ -626,6 +651,11 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	return false;
 }
 
+void GMWidget::onInit()
+{
+	initStyles();
+}
+
 bool GMWidget::onTitleMouseDown(const GMSystemMouseEvent* event)
 {
 	D(d);
@@ -683,12 +713,8 @@ void GMWidget::render(GMfloat elpasedTime)
 		(d->minimized && !d->title))
 		return;
 
-	// TODO drawTexture
-
 	if (d->title)
-	{
 		onRenderTitle();
-	}
 
 	if (!d->minimized)
 	{

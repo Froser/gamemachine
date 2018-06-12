@@ -3,10 +3,6 @@
 #include <gamemachine.h>
 #include "gmdx11graphic_engine.h"
 
-#ifdef max
-#undef max
-#endif
-
 GMDx11ModelDataProxy::GMDx11ModelDataProxy(const IRenderContext* context, GMModel* model)
 	: GMModelDataProxy(context, model)
 {

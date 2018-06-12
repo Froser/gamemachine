@@ -11,6 +11,7 @@ GM_INTERFACE(IUniProxy)
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) = 0;
 	virtual void getPriorItemPos(GMint cp, GMint* prior) = 0;
 	virtual void getNextItemPos(GMint cp, GMint* prior) = 0;
+	virtual void setDirty() = 0;
 };
 
 GM_PRIVATE_OBJECT(GMUniBuffer)
@@ -38,6 +39,10 @@ public:
 public:
 	void setContext(const IRenderContext* context);
 	void setBuffer(const GMString& buffer);
+	void setChar(GMsize_t pos, GMwchar ch);
+	bool insertChar(GMsize_t pos, GMwchar ch);
+	bool removeChar(GMsize_t pos);
+	bool removeChars(GMsize_t startPos, GMsize_t endPos);
 	GMint getLength();
 	bool CPtoX(GMint cp, bool trail, GMint* x);
 	bool XtoCP(GMint x, GMint* cp, bool* trail);

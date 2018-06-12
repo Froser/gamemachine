@@ -19,6 +19,9 @@ bool GMControl::handleKeyboard(GMSystemKeyEvent* event)
 	case GMSystemEventType::KeyUp:
 		handled = onKeyUp(event);
 		break;
+	case GMSystemEventType::Char:
+		handled = onChar(gm_cast<GMSystemCharEvent*>(event));
+		break;
 	}
 	return handled;
 }

@@ -5,10 +5,6 @@
 #include "gmengine/gmgraphicengine.h"
 #include "gmdx11helper.h"
 
-#ifdef max
-#undef max
-#endif
-
 BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMDx11DefaultFramebuffers)

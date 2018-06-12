@@ -35,6 +35,7 @@ enum class GMSystemEventType
 	WindowSizeChanged,
 	KeyDown,
 	KeyUp,
+	Char,
 	MouseMove,
 	MouseDown,
 	MouseUp,
@@ -180,7 +181,7 @@ enum GMKey
 	GMKey_Zoom,
 	GMKey_Noname,
 	GMKey_Pa1,
-	GMKey_Oem_clear,
+	GMKey_Oem_Clear,
 };
 
 enum GMMouseButtonType
@@ -233,12 +234,33 @@ class GMSystemKeyEvent : public GMSystemEvent
 	GM_DECLARE_PROPERTY(Modifier, modifier, GMModifier)
 
 public:
+	GMSystemKeyEvent() = default;
 	GMSystemKeyEvent(GMSystemEventType type, GMKey key, GMModifier modifier)
 		: Base(type)
 	{
 		D(d);
 		d->key = key;
 		d->modifier = modifier;
+	}
+};
+
+GM_PRIVATE_OBJECT(GMSystemCharEvent)
+{
+	GMwchar character;
+};
+
+class GMSystemCharEvent : public GMSystemKeyEvent
+{
+	GM_DECLARE_PRIVATE_AND_BASE(GMSystemCharEvent, GMSystemKeyEvent);
+	GM_ALLOW_COPY_DATA(GMSystemCharEvent)
+	GM_DECLARE_PROPERTY(Character, character, GMwchar)
+
+public:
+	GMSystemCharEvent(GMSystemEventType type, GMKey key, GMwchar character, GMModifier modifier)
+	: Base(type, key, modifier)
+	{
+		D(d);
+		d->character = character;
 	}
 };
 

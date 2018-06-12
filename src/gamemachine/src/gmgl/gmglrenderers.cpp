@@ -11,10 +11,6 @@
 #include "gmglgbuffer.h"
 #include "gmglframebuffer.h"
 
-#ifdef max
-#undef max
-#endif
-
 namespace
 {
 	bool g_shadowDirty = true;

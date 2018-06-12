@@ -5,10 +5,6 @@
 #include <iterator>
 #include "foundation/gamemachine.h"
 
-#ifdef max
-#undef max
-#endif
-
 #define TO_VEC3(i) GMVec3((i)[0], (i)[1], (i)[2])
 #define TO_VEC2(i) GMVec2((i)[0], (i)[1])
 

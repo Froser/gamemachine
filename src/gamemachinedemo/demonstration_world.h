@@ -69,6 +69,7 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
 	gm::GMWidget* mainWidget = nullptr;
+	gm::GMWidget* systemWidget = nullptr;
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
 };

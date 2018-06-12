@@ -81,7 +81,6 @@ void Demo_Sound::init()
 		d->widget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
 	}
 
-	d->widget->init();
 	d->widget->setKeyboardInput(true);
 
 	gm::GMControlButton* button = nullptr;

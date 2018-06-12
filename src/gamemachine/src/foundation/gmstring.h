@@ -220,6 +220,12 @@ public:
 	*/
 	char operator[](GMsize_t i) const;
 
+	//! 取字符串的第i个，返回字符的引用。
+	/*!
+	\return 返回指定位置的字符。
+	*/
+	GMwchar& operator[](GMsize_t i);
+
 	//! 获取C风格的字符串。
 	/*!
 	  \return C风格字符串。

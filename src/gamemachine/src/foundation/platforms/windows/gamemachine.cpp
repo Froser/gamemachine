@@ -145,7 +145,7 @@ namespace
 			s_keyMap[VK_ZOOM] = GMKey_Zoom;
 			s_keyMap[VK_NONAME] = GMKey_Noname;
 			s_keyMap[VK_PA1] = GMKey_Pa1;
-			s_keyMap[VK_OEM_CLEAR] = GMKey_Oem_clear;
+			s_keyMap[VK_OEM_CLEAR] = GMKey_Oem_Clear;
 		}
 
 		auto iter = s_keyMap.find(wParam);
@@ -252,6 +252,12 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 	{
 		key = translateKey(wParam);
 		newSystemEvent = new GMSystemKeyEvent(GMSystemEventType::KeyUp, key, getModifierState());
+		break;
+	}
+	case WM_CHAR:
+	{
+		key = translateKey(wParam);
+		newSystemEvent = new GMSystemCharEvent(GMSystemEventType::Char, key, (GMwchar)wParam, getModifierState());
 		break;
 	}
 	// Mouse:

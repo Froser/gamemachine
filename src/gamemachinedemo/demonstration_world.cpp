@@ -191,6 +191,7 @@ DemonstrationWorld::~DemonstrationWorld()
 	}
 
 	GM_delete(d->mainWidget);
+	GM_delete(d->systemWidget);
 	GM_delete(d->manager);
 }
 
@@ -240,7 +241,6 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitle(L"GameMachine Demo Menu");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
-	d->mainWidget->init();
 
 	gm::GMint Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
@@ -265,27 +265,64 @@ void DemonstrationWorld::init()
 
 	gm::GMRect txtCorner = { 0, 0, 6, 8 };
 	d->mainWidget->addTextEdit(
-		L"Hello, TextEdit.",
+		L"A",
 		10,
 		Y,
 		480,
-		60,
+		50,
 		false,
 		txtCorner,
 		nullptr
 	);
 
 	gm::GMRect corner = { 0,0,75,42 };
-	d->mainWidget->addBorder(
-		-10,
-		-30 - d->mainWidget->getTitleHeight(),
-		520,
-		660 + d->mainWidget->getTitleHeight() * 2,
-		corner,
-		nullptr
-	);
-
+	d->mainWidget->addBorder(corner);
 	d->mainWindow->addWidget(d->mainWidget);
+
+	d->systemWidget = new gm::GMWidget(d->manager);
+	{
+		gm::GMRect rc = { 0, 0, 136, 54 };
+		d->systemWidget->addArea(gm::GMTextureArea::ButtonArea, rc);
+	}
+	{
+		gm::GMRect rc = { 136, 0, 116, 54 };
+		d->systemWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
+	}
+	{
+		gm::GMRect rc = { 8, 82, 238, 39 };
+		d->systemWidget->addArea(gm::GMTextureArea::TextEditBorderArea, rc);
+	}
+	{
+		gm::GMRect rc = { 0, 0, 280, 287 };
+		d->systemWidget->addArea(gm::GMTextureArea::BorderArea, rc);
+	}
+
+	d->manager->registerWidget(d->mainWidget);
+	d->systemWidget->setPosition(600, 60);
+	d->systemWidget->setSize(150, 50);
+	d->systemWidget->setTitle(L"System Menu");
+	d->systemWidget->setTitleVisible(true);
+	d->systemWidget->setKeyboardInput(true);
+
+	{
+		gm::GMControlButton* button = nullptr;
+		d->systemWidget->addButton(
+			L"Quit",
+			10,
+			10,
+			130,
+			30,
+			false,
+			&button
+		);
+		Y += 30 + marginY;
+		GM_ASSERT(button);
+		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+			GM.postMessage({ gm::GameMachineMessageType::QuitGameMachine });
+		});
+	}
+	d->systemWidget->addBorder(corner);
+	d->mainWindow->addWidget(d->systemWidget);
 }
 
 void DemonstrationWorld::switchDemo()
@@ -372,11 +409,9 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			break;
 		case gm::GameMachineHandlerEvent::Activate:
 		{
+			/*
 			gm::IInput* inputManager = d->mainWindow->getInputMananger();
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-
-			if (kbState.keyTriggered('Q') || kbState.keyTriggered(VK_ESCAPE))
-				GM.postMessage({ gm::GameMachineMessageType::QuitGameMachine });
 
 			if (kbState.keyTriggered('L'))
 				d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
@@ -385,6 +420,7 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 				d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 			break;
+			*/
 		}
 		case gm::GameMachineHandlerEvent::Deactivate:
 			break;

@@ -157,6 +157,12 @@ char GMString::operator[](GMsize_t i) const
 	return t;
 }
 
+GMwchar& GMString::operator[](GMsize_t i)
+{
+	D_STR(d);
+	return d->data[i];
+}
+
 GMString& GMString::append(const GMwchar* c)
 {
 	D_STR(d);
