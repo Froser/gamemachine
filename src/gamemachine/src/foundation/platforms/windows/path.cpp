@@ -4,6 +4,20 @@
 #include <io.h>
 #include <direct.h>
 
+#if _MSC_VER
+#	include <shlobj.h>
+#else
+//TODO 这里在其他系统下存在问题
+BOOL SHGetSpecialFolderPathA(HWND hwnd, LPSTR pszPath, int csidl, BOOL fCreate);
+BOOL SHGetSpecialFolderPathW(HWND hwnd, LPWSTR pszPath, int csidl, BOOL fCreate);
+#	ifdef UNICODE
+#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathW
+#	else
+#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathA
+#	endif // !UNICODE
+#	define CSIDL_FONTS 0x0014
+#endif
+
 GMString GMPath::directoryName(const GMString& fileName)
 {
 	GMString winFileName = fileName.replace("/", "\\");
@@ -20,6 +34,15 @@ GMString GMPath::filename(const GMString& fullPath)
 	if (pos == GMString::npos)
 		return fullPath;
 	return fullPath.substr(pos + 1, fullPath.length());
+}
+
+GMString GMPath::fullname(const GMString& dirName, const GMString& fullPath)
+{
+	GMString winDirName = dirName.replace("/", "\\");
+	GMsize_t pos = winDirName.findLastOf('\\');
+	if (!winDirName.isEmpty() && winDirName[winDirName.length() - 1] != L'\\')
+		return dirName + "\\" + fullPath;
+	return dirName + fullPath;
 }
 
 GMString GMPath::getCurrentPath()
@@ -83,4 +106,19 @@ void GMPath::createDirectory(const GMString& dir)
 	createDirectory(stdUp);
 	std::string strDir = GMString(dir).toStdString();
 	_mkdir(strDir.c_str());
+}
+
+GMString GMPath::getSpecialFolderPath(SpecialFolder sf)
+{
+	switch (sf)
+	{
+	case GMPath::Fonts:
+	{
+		GMwchar path[MAX_PATH];
+		SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
+		return GMString(path);
+	}
+	default:
+		return GMString();
+	}
 }

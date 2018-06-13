@@ -165,6 +165,7 @@ GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 	d->stateMachine = new GMTypoStateMachine(this);
 	d->context = context;
 	d->glyphManager = d->context->getEngine()->getGlyphManager();
+	d->font = d->glyphManager->getTimesNewRoman();
 }
 
 GMTypoEngine::GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStateMachine* stateMachine)
@@ -173,6 +174,7 @@ GMTypoEngine::GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStat
 	d->stateMachine = stateMachine;
 	d->context = context;
 	d->glyphManager = d->context->getEngine()->getGlyphManager();
+	d->font = d->glyphManager->getTimesNewRoman();
 }
 
 GMTypoEngine::~GMTypoEngine()
@@ -196,7 +198,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	const GMwchar* p = wstr.c_str();
 	while (*p)
 	{
-		const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize);
+		const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize, d->font);
 		if (d->lineHeight < glyph.height)
 			d->lineHeight = glyph.height;
 		++p;
@@ -272,7 +274,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 		return result;
 	}
 
-	const GMGlyphInfo& glyph = d->glyphManager->getChar(ch, d->fontSize);
+	const GMGlyphInfo& glyph = d->glyphManager->getChar(ch, d->fontSize, d->font);
 	result.glyph = &glyph;
 
 	result.lineHeight = d->lineHeight;
@@ -319,6 +321,13 @@ bool GMTypoEngine::isValidTypeFrame()
 {
 	D(d);
 	return !(d->options.typoArea.width < 0 || d->options.typoArea.height < 0);
+}
+
+void GMTypoEngine::setFont(GMFontHandle font)
+{
+	// 设置首选字体
+	D(d);
+	d->font = font;
 }
 
 void GMTypoEngine::setColor(GMfloat rgb[3])

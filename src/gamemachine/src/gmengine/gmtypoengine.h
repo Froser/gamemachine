@@ -114,6 +114,8 @@ private:
 // 一个默认排版类
 GM_PRIVATE_OBJECT(GMTypoEngine)
 {
+	GMFontHandle font = GMGlyphManager::InvalidHandle;
+
 	GMTypoStateMachine* stateMachine = nullptr;
 	const IRenderContext* context = nullptr;
 	bool insetStateMachine = false;
@@ -153,6 +155,7 @@ private:
 	void newLine();
 
 public:
+	void setFont(GMFontHandle font);
 	void setColor(GMfloat rgb[3]);
 	void setFontSize(GMint pt);
 

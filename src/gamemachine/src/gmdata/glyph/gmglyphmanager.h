@@ -24,7 +24,16 @@ struct GMGlyphBitmap
 	GMuint rows;
 };
 
-typedef Map<GMint, Map<GMwchar, GMGlyphInfo>> CharList;
+typedef void* GMFontFace;
+typedef GMsize_t GMFontHandle;
+
+struct GMFont
+{
+	GMString fontPath;
+	GMFontFace face;
+};
+
+typedef HashMap<GMFontHandle, HashMap<GMint, HashMap<GMwchar, GMGlyphInfo> > > CharList;
 
 GM_PRIVATE_OBJECT(GMGlyphManager)
 {
@@ -32,6 +41,10 @@ GM_PRIVATE_OBJECT(GMGlyphManager)
 	CharList chars;
 	GMint cursor_u, cursor_v;
 	GMfloat maxHeight;
+	Vector<GMFont> fonts;
+
+	GMFontHandle defaultFontSun;
+	GMFontHandle defaultFontTimesNewRoman;
 };
 
 class GMGlyphManager : public GMObject
@@ -46,23 +59,42 @@ public:
 		CANVAS_HEIGHT = 1024,
 	};
 
-public:
-	GMGlyphManager(const IRenderContext* context);
-	virtual ~GMGlyphManager() {}
+	static const GMsize_t InvalidHandle;
 
 public:
-	const GMGlyphInfo& getChar(GMwchar c, GMFontSizePt fontSize);
+	GMGlyphManager(const IRenderContext* context);
+	virtual ~GMGlyphManager();
+
+public:
+	const GMGlyphInfo& getChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font);
+	GMFontHandle addFontByFileName(const GMString& fontFileName);
+	GMFontHandle addFontByFullName(const GMString& fontFullName);
 
 public:
 	virtual ITexture* glyphTexture() = 0;
+
+public:
+	inline GMFontHandle getSimSun()
+	{
+		D(d);
+		return d->defaultFontSun;
+	}
+
+	inline GMFontHandle getTimesNewRoman()
+	{
+		D(d);
+		return d->defaultFontTimesNewRoman;
+	}
 
 private:
 	virtual void updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo) = 0;
 
 private:
-	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize);
-	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMwchar ch, const GMGlyphInfo& glyph);
-	const GMGlyphInfo& getChar(GMFontSizePt fontSize, GMwchar ch);
+	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font);
+	GMFont* getFont(GMFontHandle);
+	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph);
+	const GMGlyphInfo& getChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch);
+	const GMGlyphInfo& getCharRecursively(GMFontHandle fontStart, GMFontHandle fontSkip, GMFontSizePt fontSize, GMwchar ch);
 };
 
 END_NS

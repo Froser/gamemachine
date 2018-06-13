@@ -376,12 +376,19 @@ public:
 //GMPath: platforms/[os]/path.cpp
 struct GMPath
 {
+	enum SpecialFolder
+	{
+		Fonts,
+	};
+
 	static GMString directoryName(const GMString& fileName);
 	static GMString filename(const GMString& fullPath);
+	static GMString fullname(const GMString& dirName, const GMString& fullPath);
 	static GMString getCurrentPath();
 	static Vector<GMString> getAllFiles(const GMString& directory);
 	static bool directoryExists(const GMString& dir);
 	static void createDirectory(const GMString& dir);
+	static GMString getSpecialFolderPath(SpecialFolder);
 };
 
 //GMPath: platforms/[os]/screen.cpp

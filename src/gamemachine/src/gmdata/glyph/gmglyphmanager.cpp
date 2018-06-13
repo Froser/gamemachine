@@ -5,20 +5,6 @@
 #include "freetype/freetype.h"
 #include "freetype/ftglyph.h"
 
-#if _MSC_VER
-#	include <shlobj.h>
-#else
-	//TODO 这里在其他系统下存在问题
-	BOOL SHGetSpecialFolderPathA(HWND hwnd, LPSTR pszPath, int csidl, BOOL fCreate);
-	BOOL SHGetSpecialFolderPathW(HWND hwnd, LPWSTR pszPath, int csidl, BOOL fCreate);
-#	ifdef UNICODE
-#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathW
-#	else
-#		define SHGetSpecialFolderPath  SHGetSpecialFolderPathA
-#	endif // !UNICODE
-#	define CSIDL_FONTS 0x0014
-#endif
-
 namespace
 {
 	struct TypoLibrary
@@ -44,49 +30,77 @@ namespace
 		GMwchar fontName[MAX_PATH];
 	};
 
-	FontList fontNameList[] = {
-		{ L"msyh.ttf" },
-		{ L"times.ttf" }
-	};
-	GMuint fontNameNum = 2;
-
-	FT_Error loadFace(FT_Face* face)
+	FT_Error loadFace(const GMString& fontFullPath, FT_Face* face)
 	{
-		FT_Error err = FT_Err_Cannot_Open_Resource;
-#if GM_WINDOWS
-		GMwchar path[MAX_PATH];
-		SHGetSpecialFolderPath(NULL, path, CSIDL_FONTS, FALSE);
-
-		std::string strPath;
-		for (GMuint i = 0; i < fontNameNum; i++)
-		{
-			GMString p(path);
-			p.append(L"/");
-			p.append(fontNameList[i].fontName);
-			strPath = p.toStdString();
-			err = FT_New_Face(g_lib.library, strPath.c_str(), 0, face);
-			if (err == FT_Err_Ok)
-				break;
-		}
-#endif
+		FT_Error err = FT_New_Face(g_lib.library, fontFullPath.toStdString().c_str(), 0, face);
 		return err;
 	}
 }
 
-const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize)
+const GMsize_t GMGlyphManager::InvalidHandle = -1;
+
+const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize, GMFontHandle font)
 {
 	D(d);
-	CharList::mapped_type::iterator iter;
-	auto& charsWithSize = d->chars[fontSize];
-	if ((iter = charsWithSize.find(c)) != charsWithSize.end())
+	auto& charsWithSize = d->chars[font][fontSize];
+	auto iter = charsWithSize.find(c);
+	if (iter != charsWithSize.end())
 		return (*iter).second;
-	return createChar(c, fontSize);
+
+	const GMGlyphInfo& glyph = createChar(c, fontSize, font);
+	if (!glyph.valid)
+	{
+		//如果没有拿到当前的字形，需要换一种默认字体匹配
+		return getCharRecursively(0, font, fontSize, c);
+	}
+	return glyph;
 }
 
-GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMwchar ch, const GMGlyphInfo& glyph)
+const GMGlyphInfo& GMGlyphManager::getCharRecursively(GMFontHandle fontStart, GMFontHandle fontSkip, GMFontSizePt fontSize, GMwchar ch)
 {
 	D(d);
-	auto result = d->chars[fontSize].insert({ ch, glyph });
+	static const GMGlyphInfo err = { false };
+	if (fontStart >= d->fonts.size())
+		return err;
+
+	if (fontStart != fontSkip)
+	{
+		const GMGlyphInfo& candidate = getChar(ch, fontSize, fontStart);
+		if (candidate.valid)
+			return candidate;
+	}
+
+	return getCharRecursively(fontStart + 1, fontSkip, fontSize, ch);
+}
+
+GMFontHandle GMGlyphManager::addFontByFileName(const GMString& fontFileName)
+{
+	static GMString fontPath = GMPath::getSpecialFolderPath(GMPath::Fonts);
+	return addFontByFullName(GMPath::fullname(fontPath, fontFileName));
+}
+
+GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
+{
+	D(d);
+	// 这是一个非线程安全的方法
+	GMFont font;
+	FT_Face face;
+	FT_Error err = loadFace(fontFullName, &face);
+	if (err == FT_Err_Ok)
+	{
+		font.fontPath = fontFullName;
+		font.face = face;
+		d->fonts.push_back(font);
+		return d->fonts.size() - 1;
+	}
+	gm_error(L"warning: load font failed.");
+	return InvalidHandle;
+}
+
+GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
+{
+	D(d);
+	auto result = d->chars[font][fontSize].insert({ ch, glyph });
 	GM_ASSERT(result.second);
 	return (*(result.first)).second;
 }
@@ -95,31 +109,50 @@ GMGlyphManager::GMGlyphManager(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
+	d->defaultFontSun = addFontByFileName("simhei.ttf");
+	d->defaultFontTimesNewRoman = addFontByFileName("times.ttf");
+
+	if (d->defaultFontSun == InvalidHandle)
+		d->defaultFontSun = 0;
+	if (d->defaultFontTimesNewRoman == InvalidHandle)
+		d->defaultFontTimesNewRoman = 0;
 }
 
-const GMGlyphInfo& GMGlyphManager::getChar(GMint fontSize, GMwchar ch)
+GMGlyphManager::~GMGlyphManager()
 {
 	D(d);
-	return d->chars[fontSize][ch];
+	for (auto& font : d->fonts)
+	{
+		FT_Done_Face((FT_Face) font.face);
+		font.face = nullptr;
+	}
 }
 
-const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize)
+const GMGlyphInfo& GMGlyphManager::getChar(GMint fontSize, GMFontHandle font, GMwchar ch)
+{
+	D(d);
+	return d->chars[font][fontSize][ch];
+}
+
+const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font)
 {
 	D(d);
 	static GMGlyphInfo errGlyph = { false };
-	FT_Error error;
-	FT_Face face;
 	FT_Glyph glyph;
-	error = loadFace(&face);
-	if (error != FT_Err_Ok)
-	{
-		gm_error(L"cannot found font file, cannot draw characters.");
+	FT_Error error;
+	FT_UInt charIndex;
+	GMFont* f = getFont(font);
+	if (!f)
 		return errGlyph;
-	}
 
+	FT_Face face = (FT_Face) f->face;
 	error = FT_Select_Charmap(face, FT_ENCODING_UNICODE);
 	error = FT_Set_Char_Size(face, 0, fontSize << 6, GMScreen::dpi(), GMScreen::dpi());
-	error = FT_Load_Glyph(face, FT_Get_Char_Index(face, c), FT_LOAD_DEFAULT);
+	charIndex = FT_Get_Char_Index(face, c);
+	if (charIndex == 0)
+		return errGlyph;
+
+	error = FT_Load_Glyph(face, charIndex, FT_LOAD_DEFAULT);
 	error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
 	error = FT_Get_Glyph(face->glyph, &glyph);
 	error = FT_Glyph_To_Bitmap(&glyph, FT_RENDER_MODE_NORMAL, 0, 1);
@@ -135,6 +168,9 @@ const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize)
 		{
 			gm_error(L"no texture space for glyph!");
 			GM_ASSERT(false);
+			// 释放资源
+			FT_Done_Glyph(glyph);
+			return errGlyph;
 		}
 	}
 
@@ -163,5 +199,13 @@ const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize)
 	// 释放资源
 	FT_Done_Glyph(glyph);
 
-	return insertChar(fontSize, c, glyphInfo);
+	return insertChar(fontSize, font, c, glyphInfo);
+}
+
+GMFont* GMGlyphManager::getFont(GMFontHandle handle)
+{
+	D(d);
+	if (handle >= d->fonts.size())
+		return nullptr;
+	return &d->fonts[handle];
 }

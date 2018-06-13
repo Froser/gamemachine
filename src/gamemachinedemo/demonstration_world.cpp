@@ -238,7 +238,7 @@ void DemonstrationWorld::init()
 	d->manager->registerWidget(d->mainWidget);
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(500, 600);
-	d->mainWidget->setTitle(L"GameMachine Demo Menu");
+	d->mainWidget->setTitle(L"GameMachine - 展示菜单");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
 
@@ -265,7 +265,7 @@ void DemonstrationWorld::init()
 
 	gm::GMRect txtCorner = { 0, 0, 6, 8 };
 	d->mainWidget->addTextEdit(
-		L"A",
+		L"你好，GameWorld",
 		10,
 		Y,
 		480,
