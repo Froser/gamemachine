@@ -84,10 +84,15 @@ void GMStyle::setTexture(GMWidgetResourceManager::TextureType texture, const GMR
 	d->textureColor.init(defaultTextureColor);
 }
 
-void GMStyle::setFont(GMuint font, const GMVec4& defaultColor)
+void GMStyle::setFont(GMFontHandle font)
 {
 	D(d);
 	d->font = font;
+}
+
+void GMStyle::setFontColor(const GMVec4& defaultColor)
+{
+	D(d);
 	d->fontColor.init(defaultColor);
 }
 
@@ -195,6 +200,7 @@ GMWidget::GMWidget(GMWidgetResourceManager* manager)
 	D(d);
 	d->manager = manager;
 	d->nextWidget = d->prevWidget = this;
+	initTitleStyle();
 }
 
 GMWidget::~GMWidget()
@@ -215,6 +221,18 @@ const GMRect& GMWidget::getArea(GMTextureArea::Area area)
 {
 	D(d);
 	return d->areas[area];
+}
+
+GMStyle GMWidget::getTitleStyle()
+{
+	D(d);
+	return d->titleStyle;
+}
+
+void GMWidget::setTitleStyle(const GMStyle& titleStyle)
+{
+	D(d);
+	d->titleStyle = titleStyle;
 }
 
 void GMWidget::setTitleVisible(
@@ -374,6 +392,7 @@ void GMWidget::drawText(
 	textObject->setText(text);
 	textObject->setGeometry(targetRc);
 	textObject->setCenter(center);
+	textObject->setFont(style.getFont());
 	textObject->draw();
 }
 
@@ -926,18 +945,22 @@ void GMWidget::mapRect(GMRect& rc)
 	rc.y += d->y;
 }
 
-void GMWidget::initStyles()
+void GMWidget::initTitleStyle()
 {
 	D(d);
 	GMStyle titleStyle;
 	titleStyle.setFont(0);
-	titleStyle.setTexture(GMWidgetResourceManager::Skin, getArea(GMTextureArea::CaptionArea) );
+	titleStyle.setTexture(GMWidgetResourceManager::Skin, getArea(GMTextureArea::CaptionArea));
 	titleStyle.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.setFontColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.getTextureColor().blend(GMControlState::Normal, .5f);
-	titleStyle.getFontColor().blend(GMControlState::Normal, .5f);
+	titleStyle.getFontColor().blend(GMControlState::Normal, 1.f);
 	d->titleStyle = titleStyle;
+}
 
+void GMWidget::initStyles()
+{
+	D(d);
 	GMStyle shadowStyle;
 	shadowStyle.getFontColor().setCurrent(GMVec4(0, 0, 0, 1));
 	d->shadowStyle = shadowStyle;

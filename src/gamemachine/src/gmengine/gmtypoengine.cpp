@@ -165,7 +165,6 @@ GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 	d->stateMachine = new GMTypoStateMachine(this);
 	d->context = context;
 	d->glyphManager = d->context->getEngine()->getGlyphManager();
-	d->font = d->glyphManager->getTimesNewRoman();
 }
 
 GMTypoEngine::GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStateMachine* stateMachine)
@@ -174,7 +173,6 @@ GMTypoEngine::GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStat
 	d->stateMachine = stateMachine;
 	d->context = context;
 	d->glyphManager = d->context->getEngine()->getGlyphManager();
-	d->font = d->glyphManager->getTimesNewRoman();
 }
 
 GMTypoEngine::~GMTypoEngine()
@@ -255,6 +253,12 @@ GMTypoIterator GMTypoEngine::end()
 	return GMTypoIterator(this, d->literature.length());
 }
 
+void GMTypoEngine::setFont(GMFontHandle font)
+{
+	D(d);
+	d->font = font;
+}
+
 GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 {
 	D(d);
@@ -323,13 +327,6 @@ bool GMTypoEngine::isValidTypeFrame()
 	return !(d->options.typoArea.width < 0 || d->options.typoArea.height < 0);
 }
 
-void GMTypoEngine::setFont(GMFontHandle font)
-{
-	// 设置首选字体
-	D(d);
-	d->font = font;
-}
-
 void GMTypoEngine::setColor(GMfloat rgb[3])
 {
 	D(d);
@@ -348,4 +345,83 @@ const Vector<GMTypoResult>& GMTypoEngine::getResults()
 {
 	D(d);
 	return d->results;
+}
+
+void GMTypoTextBuffer::setBuffer(const GMString& buffer)
+{
+	D(d);
+	d->buffer = buffer;
+}
+
+void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
+{
+	D(d);
+	d->buffer[pos] = ch;
+	setDirty();
+}
+
+bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
+{
+	D(d);
+	if (pos < 0)
+		return false;
+
+	if (pos == d->buffer.length())
+	{
+		d->buffer.append(ch);
+	}
+	else
+	{
+		GMString newStr = d->buffer.substr(0, pos);
+		newStr.append(ch);
+		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
+		d->buffer = std::move(newStr);
+	}
+	setDirty();
+	return true;
+}
+
+bool GMTypoTextBuffer::removeChar(GMsize_t pos)
+{
+	D(d);
+	if (pos < 0 || pos >= d->buffer.length())
+		return false;
+
+	GMString newStr = d->buffer.substr(0, pos);
+	if (pos + 1 < d->buffer.length())
+		newStr += d->buffer.substr(pos + 1, d->buffer.length() - pos - 1);
+	d->buffer = std::move(newStr);
+	setDirty();
+	return true;
+}
+
+bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
+{
+	D(d);
+	if (startPos > endPos)
+	{
+		GM_SWAP(startPos, endPos);
+	}
+
+	if (startPos < 0 || startPos > d->buffer.length())
+		return false;
+
+	if (endPos < 0 || endPos > d->buffer.length())
+		return false;
+
+	if (startPos == endPos)
+		return false;
+
+	GMString newStrA = d->buffer.substr(0, startPos);
+	if (endPos < d->buffer.length())
+		newStrA.append(d->buffer.substr(endPos, d->buffer.length() - endPos));
+	d->buffer = std::move(newStrA);
+	setDirty();
+	return true;
+}
+
+GMsize_t GMTypoTextBuffer::getLength()
+{
+	D(d);
+	return d->buffer.length();
 }

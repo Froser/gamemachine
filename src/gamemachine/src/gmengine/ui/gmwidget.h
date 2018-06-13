@@ -187,7 +187,7 @@ struct GMShadowStyle
 GM_PRIVATE_OBJECT(GMStyle)
 {
 	GMWidgetResourceManager::TextureType texture;
-	GMuint font = 0;
+	GMFontHandle font = 0;
 	GMRect rc;
 	GMElementBlendColor textureColor;
 	GMElementBlendColor fontColor;
@@ -204,7 +204,8 @@ public:
 
 public:
 	void setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc, const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1));
-	void setFont(GMuint font, const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
+	void setFont(GMFontHandle font);
+	void setFontColor(const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
 	void setFontColor(GMControlState::State state, const GMVec4& color);
 	void setTextureColor(GMControlState::State state, const GMVec4& color);
 	void refresh();
@@ -220,6 +221,12 @@ public:
 	{
 		D(d);
 		return d->fontColor;
+	}
+
+	inline GMFontHandle getFont()
+	{
+		D(d);
+		return d->font;
 	}
 
 	inline const GMRect& getTextureRect()
@@ -300,6 +307,9 @@ public:
 	void setNextWidget(GMWidget* nextWidget);
 	void addControl(GMControl* control);
 	const GMRect& getArea(GMTextureArea::Area area);
+
+	GMStyle getTitleStyle();
+	void setTitleStyle(const GMStyle& titleStyle);
 
 	void setTitleVisible(
 		bool visible
@@ -403,9 +413,10 @@ private:
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
 	void mapRect(GMRect& rc);
+	void initTitleStyle();
 
 protected:
-	void initStyles();
+	virtual void initStyles();
 
 public:
 	inline IWindow* getParentWindow()

@@ -79,6 +79,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	ITexture* texture = nullptr;
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;
+	GMFontHandle font = 0;
 	GMModel* model = nullptr;
 	GMTextColorType colorType = ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
@@ -99,6 +100,7 @@ public:
 	void setColorType(GMTextColorType type);
 	void setColor(const GMVec4& color);
 	void setCenter(bool center);
+	void setFont(GMFontHandle font);
 
 public:
 	virtual void onAppendingObjectToWorld() override;

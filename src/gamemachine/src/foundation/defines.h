@@ -197,6 +197,9 @@ GM_STATIC_ASSERT_SIZE(GMfloat, 4);
 GM_STATIC_ASSERT_SIZE(GMint64, 8);
 
 // 常用函数和工具、常量
+typedef GMsize_t GMFontHandle;
+constexpr GMsize_t GMInvalidFontHandle = -1;
+
 struct GMRect
 {
 	GMint x, y, width, height;

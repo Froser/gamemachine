@@ -206,6 +206,8 @@ void DemonstrationWorld::init()
 {
 	D(d);
 	gm::GMGamePackage* package = GM.getGamePackageManager();
+	gm::IGraphicEngine* engine = getContext()->getEngine();
+	gm::GMFontHandle stxingka = engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
 
 	// 创建画布
 	d->manager = new gm::GMWidgetResourceManager(getContext());
@@ -241,6 +243,13 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitle(L"GameMachine - 展示菜单");
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
+
+	if (stxingka != gm::GMInvalidFontHandle)
+	{
+		gm::GMStyle style = d->mainWidget->getTitleStyle();
+		style.setFont(stxingka);
+		d->mainWidget->setTitleStyle(style);
+	}
 
 	gm::GMint Y = 10, marginY = 10;
 	for (auto& demo : d->demos)

@@ -57,8 +57,8 @@ bool GMWindow::addWidget(GMWidget* widget)
 		return false;
 	}
 
-	widget->onInit();
 	widget->setParentWindow(this);
+	widget->onInit();
 	d->widgets.push_back(widget);
 	return true;
 }

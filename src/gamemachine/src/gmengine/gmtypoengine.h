@@ -59,6 +59,7 @@ GM_INTERFACE(ITypoEngine)
 {
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) = 0;
 	virtual GMTypoIterator end() = 0;
+	virtual void setFont(GMFontHandle) = 0;
 
 private:
 	friend class GMTypoIterator;
@@ -114,7 +115,7 @@ private:
 // 一个默认排版类
 GM_PRIVATE_OBJECT(GMTypoEngine)
 {
-	GMFontHandle font = GMGlyphManager::InvalidHandle;
+	GMFontHandle font = 0;
 
 	GMTypoStateMachine* stateMachine = nullptr;
 	const IRenderContext* context = nullptr;
@@ -146,6 +147,7 @@ public:
 public:
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) override;
 	virtual GMTypoIterator end() override;
+	virtual void setFont(GMFontHandle font) override;
 
 private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) override;
@@ -155,12 +157,57 @@ private:
 	void newLine();
 
 public:
-	void setFont(GMFontHandle font);
 	void setColor(GMfloat rgb[3]);
 	void setFontSize(GMint pt);
 
 public:
 	virtual const Vector<GMTypoResult>& getResults() override;
+};
+
+GM_PRIVATE_OBJECT(GMTypoTextBuffer)
+{
+	ITypoEngine* engine = nullptr;
+	GMString buffer;
+	bool dirty = false;
+};
+
+class GMTypoTextBuffer : public GMObject
+{
+	GM_DECLARE_PRIVATE(GMTypoTextBuffer);
+
+public:
+	GMTypoTextBuffer() = default;
+
+public:
+	inline void setTypoEngine(ITypoEngine* engine)
+	{
+		D(d);
+		d->engine = engine;
+	}
+
+	void setBuffer(const GMString& string);
+
+public:
+	void setChar(GMsize_t pos, GMwchar ch);
+	bool insertChar(GMsize_t pos, GMwchar ch);
+	bool removeChar(GMsize_t pos);
+	bool removeChars(GMsize_t startPos, GMsize_t endPos);
+	GMsize_t getLength();
+
+	// 排版相关
+public:
+	virtual void analyze();
+	virtual bool CPtoX(GMint cp, bool trail, GMint* x);
+	virtual bool XtoCP(GMint x, GMint* cp, bool* trail);
+	virtual void getPriorItemPos(GMint cp, GMint* prior);
+	virtual void getNextItemPos(GMint cp, GMint* next);
+
+protected:
+	inline void setDirty()
+	{
+		D(d);
+		d->dirty = true;
+	}
 };
 
 END_NS

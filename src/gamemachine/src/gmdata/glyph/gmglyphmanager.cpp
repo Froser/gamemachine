@@ -37,8 +37,6 @@ namespace
 	}
 }
 
-const GMsize_t GMGlyphManager::InvalidHandle = -1;
-
 const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize, GMFontHandle font)
 {
 	D(d);
@@ -94,7 +92,7 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 		return d->fonts.size() - 1;
 	}
 	gm_error(L"warning: load font failed.");
-	return InvalidHandle;
+	return GMInvalidFontHandle;
 }
 
 GMGlyphInfo& GMGlyphManager::insertChar(GMint fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph)
@@ -112,9 +110,9 @@ GMGlyphManager::GMGlyphManager(const IRenderContext* context)
 	d->defaultFontSun = addFontByFileName("simhei.ttf");
 	d->defaultFontTimesNewRoman = addFontByFileName("times.ttf");
 
-	if (d->defaultFontSun == InvalidHandle)
+	if (d->defaultFontSun == GMInvalidFontHandle)
 		d->defaultFontSun = 0;
-	if (d->defaultFontTimesNewRoman == InvalidHandle)
+	if (d->defaultFontTimesNewRoman == GMInvalidFontHandle)
 		d->defaultFontTimesNewRoman = 0;
 }
 

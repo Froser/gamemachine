@@ -287,7 +287,8 @@ void GMControlTextEdit::initStyles()
 {
 	D(d);
 	GMStyle textStyle;
-	textStyle.setFont(0, GMVec4(0, 0, 0, 1));
+	textStyle.setFont(0);
+	textStyle.setFontColor(GMVec4(0, 0, 0, 1));
 	d->borderControl->initStyles();
 }
 

@@ -147,6 +147,16 @@ void GMTextGameObject::setCenter(bool center)
 	}
 }
 
+void GMTextGameObject::setFont(GMFontHandle font)
+{
+	D(d);
+	if (d->font != font)
+	{
+		d->font = font;
+		markDirty();
+	}
+}
+
 void GMTextGameObject::onAppendingObjectToWorld()
 {
 	D(d);
@@ -215,6 +225,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 	BEGIN_GLYPH_XY(rect.width, rect.height)
 		// 使用排版引擎进行排版
 		ITypoEngine* typoEngine = d->typoEngine;
+		typoEngine->setFont(d->font);
 		GMTypoOptions options;
 		options.center = d->center;
 		options.typoArea.width = coord.width * rect.width * .5f;

@@ -25,7 +25,6 @@ struct GMGlyphBitmap
 };
 
 typedef void* GMFontFace;
-typedef GMsize_t GMFontHandle;
 
 struct GMFont
 {
@@ -59,8 +58,6 @@ public:
 		CANVAS_HEIGHT = 1024,
 	};
 
-	static const GMsize_t InvalidHandle;
-
 public:
 	GMGlyphManager(const IRenderContext* context);
 	virtual ~GMGlyphManager();
@@ -74,7 +71,7 @@ public:
 	virtual ITexture* glyphTexture() = 0;
 
 public:
-	inline GMFontHandle getSimSun()
+	inline GMFontHandle getSimHei()
 	{
 		D(d);
 		return d->defaultFontSun;
