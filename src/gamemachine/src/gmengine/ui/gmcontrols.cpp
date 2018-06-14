@@ -109,7 +109,7 @@ GMStyle& GMControlStatic::getStyle(Base::StyleType style)
 	}
 }
 
-void GMControlStatic::initStyles()
+void GMControlStatic::initStyles(GMWidget* widget)
 {
 	D(d);
 	d->foreStyle.setFont(0);
@@ -297,12 +297,11 @@ bool GMControlButton::handleMouseRelease(const GMPoint& pt)
 	return false;
 }
 
-void GMControlButton::initStyles()
+void GMControlButton::initStyles(GMWidget* widget)
 {
 	D(d);
 	D_BASE(db, Base);
 
-	GMWidget* widget = getParent();
 	db->foreStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ButtonArea));
 	db->foreStyle.setFont(0);
 	db->foreStyle.setFontColor(GMVec4(1, 1, 1, 1));
@@ -339,10 +338,9 @@ void GMControlBorder::setCorner(const GMRect& corner)
 	d->corner = corner;
 }
 
-void GMControlBorder::initStyles()
+void GMControlBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	GMWidget* widget = getParent();
 	d->borderStyle.setTexture(GMWidgetResourceManager::Border, widget->getArea(GMTextureArea::BorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }

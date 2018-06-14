@@ -26,17 +26,6 @@ GMObject::~GMObject()
 	releaseConnections();
 }
 
-GMObject::GMObject(GMObject&& e) noexcept
-{
-	gmSwap(*this, e);
-}
-
-GMObject& GMObject::operator=(GMObject&& e) noexcept
-{
-	gmSwap(*this, e);
-	return *this;
-}
-
 void GMObject::connect(GMObject& sender, GMSignal signal, const GMEventCallback& callback)
 {
 	sender.addConnection(signal, *this, callback);

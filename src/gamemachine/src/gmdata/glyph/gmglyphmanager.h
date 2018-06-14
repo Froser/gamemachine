@@ -90,8 +90,7 @@ private:
 	const GMGlyphInfo& createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font);
 	GMFont* getFont(GMFontHandle);
 	GMGlyphInfo& insertChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch, const GMGlyphInfo& glyph);
-	const GMGlyphInfo& getChar(GMFontSizePt fontSize, GMFontHandle font, GMwchar ch);
-	const GMGlyphInfo& getCharRecursively(GMFontHandle fontStart, GMFontHandle fontSkip, GMFontSizePt fontSize, GMwchar ch);
+	const GMGlyphInfo& getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate);
 };
 
 END_NS

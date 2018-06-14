@@ -84,8 +84,10 @@ public:
 	}
 
 protected:
-	virtual void initStyles() override;
 	virtual void updateRect() override;
+
+private:
+	void initStyles(GMWidget* widget);
 };
 
 END_NS

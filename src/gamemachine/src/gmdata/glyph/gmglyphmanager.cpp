@@ -39,7 +39,16 @@ namespace
 
 const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize, GMFontHandle font)
 {
+	return getCharInner(c, fontSize, font, 0);
+}
+
+const GMGlyphInfo& GMGlyphManager::getCharInner(GMwchar c, GMFontSizePt fontSize, GMFontHandle font, GMFontHandle candidate)
+{
 	D(d);
+	static const GMGlyphInfo err = { false };
+	if (font >= d->fonts.size())
+		return err;
+
 	auto& charsWithSize = d->chars[font][fontSize];
 	auto iter = charsWithSize.find(c);
 	if (iter != charsWithSize.end())
@@ -49,26 +58,9 @@ const GMGlyphInfo& GMGlyphManager::getChar(GMwchar c, GMint fontSize, GMFontHand
 	if (!glyph.valid)
 	{
 		//如果没有拿到当前的字形，需要换一种默认字体匹配
-		return getCharRecursively(0, font, fontSize, c);
+		return getCharInner(c, fontSize, candidate, candidate + 1);
 	}
 	return glyph;
-}
-
-const GMGlyphInfo& GMGlyphManager::getCharRecursively(GMFontHandle fontStart, GMFontHandle fontSkip, GMFontSizePt fontSize, GMwchar ch)
-{
-	D(d);
-	static const GMGlyphInfo err = { false };
-	if (fontStart >= d->fonts.size())
-		return err;
-
-	if (fontStart != fontSkip)
-	{
-		const GMGlyphInfo& candidate = getChar(ch, fontSize, fontStart);
-		if (candidate.valid)
-			return candidate;
-	}
-
-	return getCharRecursively(fontStart + 1, fontSkip, fontSize, ch);
 }
 
 GMFontHandle GMGlyphManager::addFontByFileName(const GMString& fontFileName)
@@ -124,12 +116,6 @@ GMGlyphManager::~GMGlyphManager()
 		FT_Done_Face((FT_Face) font.face);
 		font.face = nullptr;
 	}
-}
-
-const GMGlyphInfo& GMGlyphManager::getChar(GMint fontSize, GMFontHandle font, GMwchar ch)
-{
-	D(d);
-	return d->chars[font][fontSize][ch];
 }
 
 const GMGlyphInfo& GMGlyphManager::createChar(GMwchar c, GMFontSizePt fontSize, GMFontHandle font)

@@ -8,10 +8,10 @@ GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged);
 class GMControlTextEditBorder : public GMControlBorder
 {
 public:
-	using GMControlBorder::GMControlBorder;
+	GMControlTextEditBorder(GMWidget* widget) : GMControlBorder(widget) { initStyles(widget); }
 
-protected:
-	virtual void initStyles();
+private:
+	void initStyles(GMWidget* widget);
 };
 
 GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
@@ -19,8 +19,8 @@ GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 {
 	D(d);
 	d->borderControl = new GMControlTextEditBorder(widget);
-	d->borderControl->initStyles();
 	d->buffer = new GMUniBuffer();
+	initStyles(widget);
 }
 
 GMControlTextEdit::~GMControlTextEdit()
@@ -30,10 +30,9 @@ GMControlTextEdit::~GMControlTextEdit()
 	GM_delete(d->buffer);
 }
 
-void GMControlTextEditBorder::initStyles()
+void GMControlTextEditBorder::initStyles(GMWidget* widget)
 {
 	D(d);
-	GMWidget* widget = getParent();
 	d->borderStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::TextEditBorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
 }
@@ -283,13 +282,13 @@ void GMControlTextEdit::resetCaretBlink()
 	d->caretOn = true;
 }
 
-void GMControlTextEdit::initStyles()
+void GMControlTextEdit::initStyles(GMWidget* widget)
 {
 	D(d);
 	GMStyle textStyle;
 	textStyle.setFont(0);
 	textStyle.setFontColor(GMVec4(0, 0, 0, 1));
-	d->borderControl->initStyles();
+	d->textStyle = textStyle;
 }
 
 void GMControlTextEdit::updateRect()

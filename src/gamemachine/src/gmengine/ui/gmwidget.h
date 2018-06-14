@@ -413,10 +413,7 @@ private:
 	bool onCycleFocus(bool goForward);
 	void onMouseMove(const GMPoint& pt);
 	void mapRect(GMRect& rc);
-	void initTitleStyle();
-
-protected:
-	virtual void initStyles();
+	void initStyles();
 
 public:
 	inline IWindow* getParentWindow()

@@ -68,7 +68,7 @@ private:
 
 class GMNotAGMObject {};
 
-#define GM_DECLARE_PRIVATE_AND_BASE(className, base)											\
+#define GM_DECLARE_PRIVATE_AND_BASE(className, base)										\
 	public:																					\
 		typedef base Base;																	\
 		typedef className##Private Data;													\
@@ -78,7 +78,6 @@ class GMNotAGMObject {};
 		inline className##Private* data() const {											\
 			Data* d = const_cast<Data*>(m_data.data());										\
 			d->__parent = const_cast<className*>(this); return d;}							\
-		void swapData(className& another) noexcept { m_data.swap(another.m_data); }
 
 #define GM_DECLARE_PRIVATE(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
 #define GM_DECLARE_PRIVATE_NGO(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMNotAGMObject)
@@ -107,19 +106,19 @@ class GMNotAGMObject {};
 	GM_DECLARE_GETTER(name, memberName, paramType) \
 	GM_DECLARE_SETTER(name, memberName, paramType)
 
-#define GM_DISABLE_COPY(clsName) public: clsName(clsName&) = delete;
-#define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete;
-#define GM_DEFAULT_MOVE_BEHAVIOR(clsName) \
-	public: \
-	clsName(clsName&& e) noexcept { gm::gmSwap(*this, e); } \
-	clsName& operator=(clsName&& e) noexcept { gm::gmSwap(*this, e); return *this; }
+#define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) noexcept = delete;
+#define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) noexcept = delete;
 
 #define GM_ALLOW_COPY_DATA(clsName) \
 	public: \
 	clsName(const clsName& o) { copyData(o); } \
 	clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
 	void copyData(const clsName& another) { D(d); D_OF(d_another, &another); *d = *d_another; \
-		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); }
+		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); } \
+	clsName(clsName&& o) noexcept { swapData(std::move(o)); } \
+	clsName& operator=(clsName&& o) noexcept { D(d); swapData(std::move(o)); return *this; } \
+	void swapData(clsName&& another) noexcept { m_data.swap(another.m_data); \
+		(static_cast<Base*>(this))->swapData(std::move(static_cast<Base&>(another))); }
 
 #define GM_FRIEND_CLASS(clsName) \
 	friend class clsName; \
@@ -203,10 +202,8 @@ struct GMMessage;
 指向数据的指针，因此GMObject及GMObject的所有派生类禁止赋值和拷贝。<BR>
 如果为一个GMObject的直接子类定义其包含的数据，可使用GM_PRIVATE_OBJECT宏来定义数据结构，并在子类中使用
 GM_DECLARE_PRIVATE(子类名)来将子类的数据指针成员添加到子类中。<BR>
-如果某个子类不是GMObject的直接子类，则用GM_DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。
-虽然GMObject及其子类禁止拷贝构造和赋值，但是移动构造和移动赋值是允许的。默认情况下，GMObject子类没有实现移
-动构造和移动赋值。如果要实现它，可以直接使用GM_DEFAULT_MOVE_BEHAVIOR宏。此宏会为子类添加一个移动构造和移动
-复制，它会将子类的数据以及父类的数据依次递归与右值引用中的对象进行交换。<BR>
+如果某个子类不是GMObject的直接子类，则用GM_DECLARE_PRIVATE_AND_BASE(子类名，父类名)来将数据指针添加到子类中。<BR>
+使用GM_ALLOW_COPY_DATA宏来允许对象之间相互拷贝，它会生成一套左值和右值拷贝、赋值函数。<BR>
 另外，GMObject的数据将会在GMObject构造时被新建，在GMObject析构时被释放。
 */
 class GMObject : public IVirtualFunctionObject
@@ -228,21 +225,6 @@ public:
 	  \sa detachEvent()
 	*/
 	~GMObject();
-
-	//! GMObject移动构造函数。
-	/*!
-	  移动构造时，参数中的数据指针将会和本实例的数据指针进行交换。
-	  \param e 需要被交换的对象。
-	*/
-	GMObject(GMObject&& e) noexcept;
-
-	//! GMObject移动赋值函数。
-	/*!
-	  移动赋值时，参数中的数据指针将会和本实例的数据指针进行交换。
-	  \param e 需要被交换的对象。
-	  \return 此对象的引用。
-	*/
-	GMObject& operator=(GMObject&& e) noexcept;
 
 public:
 	//! 返回对象的元数据。
@@ -279,11 +261,21 @@ public:
 
 	//! 拷贝GMObject私有数据
 	/*!
-	  GMObject不允许拷贝其私有数据，因此是个空实现。<BR>
+	  GMObject不允许拷贝GMObject基类私有数据，因此是个空实现。<BR>
 	  但是，GMObject的子类可以使用GM_ALLOW_COPY_DATA宏，允许子类调用其copyData方法，依次拷贝私有数据。
 	  \param another 拷贝私有数据的目标对象，将目标对象的私有数据拷贝到此对象。
 	*/
 	void copyData(const GMObject& another) {}
+
+	//! 交换GMObject私有数据
+	/*!
+	GMObject允许交换其私有数据。<BR>
+	\param another 交换私有数据的目标对象，将目标对象的私有数据交换到此对象。
+	*/
+	void swapData(GMObject&& another) noexcept
+	{
+		m_data.swap(another.m_data);
+	}
 
 private:
 	void addConnection(GMSignal signal, GMObject& receiver, GMEventCallback callback);
@@ -296,19 +288,6 @@ private:
 protected:
 	virtual bool registerMeta() { return false; }
 };
-
-template <typename T>
-inline void gmSwap(T& a, T& b)
-{
-	a.swapData(b);
-	gmSwap((typename T::Base&)a, (typename T::Base&)b);
-}
-
-template <>
-inline void gmSwap(GMObject& a, GMObject& b)
-{
-	a.swapData(b);
-}
 
 //! 进行静态转换。
 /*!

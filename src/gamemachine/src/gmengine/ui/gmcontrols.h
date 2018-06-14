@@ -206,8 +206,6 @@ public:
 		return GM_inRect(d->boundingBox, point);
 	}
 
-	virtual void initStyles() {}
-
 public:
 	inline bool isDefault()
 	{
@@ -266,7 +264,7 @@ public:
 	};
 
 public:
-	using GMControl::GMControl;
+	GMControlStatic(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
 	virtual void render(GMfloat elapsed) override;
@@ -278,8 +276,8 @@ public:
 		return false;
 	}
 
-protected:
-	virtual void initStyles() override;
+private:
+	void initStyles(GMWidget* widget);
 
 public:
 	inline const GMString& getText() const
@@ -312,7 +310,7 @@ public:
 	GM_DECLARE_SIGNAL(click);
 	
 public:
-	using GMControlStatic::GMControlStatic;
+	GMControlButton(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
 	virtual void refresh() override;
@@ -331,9 +329,7 @@ public:
 private:
 	bool handleMousePressOrDblClick(const GMPoint& pt);
 	bool handleMouseRelease(const GMPoint& pt);
-
-protected:
-	virtual void initStyles() override;
+	void initStyles(GMWidget* widget);
 };
 
 
@@ -348,14 +344,16 @@ class GMControlBorder : public GMControl
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
 
 public:
-	using GMControl::GMControl;
+	GMControlBorder(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
 	virtual void render(GMfloat elapsed) override;
-	virtual void initStyles() override;
 
 public:
 	void setCorner(const GMRect& corner);
+
+private:
+	void initStyles(GMWidget* widget);
 };
 END_NS
 #endif

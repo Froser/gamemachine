@@ -413,9 +413,6 @@ GM_PRIVATE_OBJECT(GMEvent)
 class GMEvent : public GMObject
 {
 	GM_DECLARE_PRIVATE(GMEvent)
-	GM_DISABLE_ASSIGN(GMEvent)
-	GM_DISABLE_COPY(GMEvent)
-	GM_DEFAULT_MOVE_BEHAVIOR(GMEvent)
 
 protected:
 	GMEvent(bool manualReset, bool initialState);

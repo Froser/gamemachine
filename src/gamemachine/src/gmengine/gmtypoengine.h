@@ -28,9 +28,9 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 	GMsize_t index = 0;
 };
 
-class GMTypoIterator : public GMObject
+class GMTypoIterator
 {
-	GM_DECLARE_PRIVATE(GMTypoIterator)
+	GM_DECLARE_PRIVATE_NGO(GMTypoIterator)
 
 public:
 	GMTypoIterator(ITypoEngine* typo, GMsize_t index);

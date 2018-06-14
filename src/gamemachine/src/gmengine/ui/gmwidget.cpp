@@ -200,7 +200,7 @@ GMWidget::GMWidget(GMWidgetResourceManager* manager)
 	D(d);
 	d->manager = manager;
 	d->nextWidget = d->prevWidget = this;
-	initTitleStyle();
+	initStyles();
 }
 
 GMWidget::~GMWidget()
@@ -504,7 +504,6 @@ bool GMWidget::initControl(GMControl* control)
 		return false;
 
 	control->setIndex(d->controls.size() - 1);
-	control->initStyles();
 	return control->onInit();
 }
 
@@ -945,7 +944,7 @@ void GMWidget::mapRect(GMRect& rc)
 	rc.y += d->y;
 }
 
-void GMWidget::initTitleStyle()
+void GMWidget::initStyles()
 {
 	D(d);
 	GMStyle titleStyle;
@@ -955,12 +954,8 @@ void GMWidget::initTitleStyle()
 	titleStyle.setFontColor(GMControlState::Normal, GMVec4(1, 1, 1, 1));
 	titleStyle.getTextureColor().blend(GMControlState::Normal, .5f);
 	titleStyle.getFontColor().blend(GMControlState::Normal, 1.f);
-	d->titleStyle = titleStyle;
-}
+	d->titleStyle = std::move(titleStyle);
 
-void GMWidget::initStyles()
-{
-	D(d);
 	GMStyle shadowStyle;
 	shadowStyle.getFontColor().setCurrent(GMVec4(0, 0, 0, 1));
 	d->shadowStyle = shadowStyle;
