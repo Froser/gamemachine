@@ -146,8 +146,6 @@ set(SOURCES
 		foundation/gmprofile.cpp
 		foundation/gmstring.h
 		foundation/gmstring.cpp
-		foundation/gmunibuffer.h
-		foundation/gmunibuffer.cpp
 		gmlua/gmlua.h
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h
@@ -185,7 +183,6 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/screen.cpp
 		foundation/platforms/windows/thread.cpp
 		foundation/platforms/windows/gamemachine.cpp
-		foundation/platforms/windows/uniproxy.cpp
 		foundation/platforms/windows/window/gmwindow.cpp
 		foundation/platforms/windows/window/gmwindow_opengl.cpp
 		foundation/platforms/windows/window/gminput.h

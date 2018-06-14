@@ -16,6 +16,7 @@ class GMControlStatic;
 class GMControlButton;
 class GMControlBorder;
 class GMControlTextEdit;
+struct ITypoEngine;
 
 struct GMControlState
 {
@@ -94,6 +95,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	const IRenderContext* context = nullptr;
 	GMTextGameObject* textObject = nullptr;
 	GMSprite2DGameObject* spriteObject = nullptr;
+	GMSprite2DGameObject* inverseSpriteObject = nullptr;
 	GMBorder2DGameObject* borderObject = nullptr;
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
@@ -120,6 +122,7 @@ public:
 	~GMWidgetResourceManager();
 
 public:
+	ITypoEngine* getTypoEngine();
 	const GMCanvasTextureInfo& getTexture(TextureType type);
 	void addTexture(TextureType type, ITexture* texture, GMint width, GMint height);
 
@@ -167,6 +170,12 @@ public:
 	{
 		D(d);
 		return d->spriteObject;
+	}
+
+	inline GMSprite2DGameObject* getInverseSpriteObject()
+	{
+		D(d);
+		return d->inverseSpriteObject;
 	}
 
 	inline GMBorder2DGameObject* getBorderObject()
@@ -383,6 +392,7 @@ public:
 	void drawRect(
 		const GMVec4& bkColor,
 		const GMRect& rc,
+		bool inverseBackgroundColor,
 		GMfloat depth
 	);
 
@@ -397,7 +407,7 @@ public:
 
 public:
 	virtual bool msgProc(GMSystemEvent* event);
-	virtual void onInit();
+	virtual void onInit() {}
 	virtual bool onTitleMouseDown(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseMove(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseUp(const GMSystemMouseEvent* event);
@@ -500,6 +510,12 @@ public:
 	{
 		D(d);
 		return d->titleHeight;
+	}
+
+	inline GMWidgetResourceManager* getManager()
+	{
+		D(d);
+		return d->manager;
 	}
 
 public:

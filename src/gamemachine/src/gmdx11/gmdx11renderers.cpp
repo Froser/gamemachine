@@ -114,13 +114,33 @@ namespace
 	inline D3D11_BLEND_DESC getBlendDesc(
 		bool enabled,
 		GMS_BlendFunc source,
-		GMS_BlendFunc dest
+		GMS_BlendFunc dest,
+		GMS_BlendOp op
 	)
 	{
 		D3D11_BLEND_DESC desc = { 0 };
 		for (GMuint i = 0; i < 8; ++i)
 		{
 			desc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		}
+
+		D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD;
+		if (op == GMS_BlendOp::ADD)
+		{
+			blendOp = D3D11_BLEND_OP_ADD;
+		}
+		else if (op == GMS_BlendOp::SUBSTRACT)
+		{
+			blendOp = D3D11_BLEND_OP_SUBTRACT;
+		}
+		else if (op == GMS_BlendOp::REVERSE_SUBSTRACT)
+		{
+			blendOp = D3D11_BLEND_OP_REV_SUBTRACT;
+		}
+		else
+		{
+			GM_ASSERT(false);
+			gm_error(L"Invalid blend op");
 		}
 
 		D3D11_RENDER_TARGET_BLEND_DESC& renderTarget = desc.RenderTarget[0];
@@ -137,8 +157,8 @@ namespace
 			renderTarget.SrcBlendAlpha = D3D11_BLEND_ONE;
 			renderTarget.DestBlend = toDx11Blend(dest);
 			renderTarget.DestBlendAlpha = D3D11_BLEND_ZERO;
-			renderTarget.BlendOp = D3D11_BLEND_OP_ADD; //目前不提供其他Blend操作
-			renderTarget.BlendOpAlpha = D3D11_BLEND_OP_ADD; //目前不提供其他Blend操作
+			renderTarget.BlendOp = blendOp;
+			renderTarget.BlendOpAlpha = blendOp;
 			return desc;
 		}
 	}
@@ -358,20 +378,23 @@ public:
 			{
 				for (GMint j = 0; j < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++j)
 				{
-					if (states[b][i][j])
-						states[b][i][j]->Release();
+					for (GMint k = 0; k < (GMuint)GMS_BlendOp::MAX_OF_BLEND_OP; ++j)
+					{
+						if (states[b][i][j][k])
+							states[b][i][j][k]->Release();
+					}
 				}
 			}
 		}
 	}
 
 public:
-	ID3D11BlendState* getBlendState(bool enable, GMS_BlendFunc src, GMS_BlendFunc dest)
+	ID3D11BlendState* getBlendState(bool enable, GMS_BlendFunc src, GMS_BlendFunc dest, GMS_BlendOp op)
 	{
-		ID3D11BlendState*& state = states[enable ? 1 : 0][(GMuint)src][(GMuint)dest];
+		ID3D11BlendState*& state = states[enable ? 1 : 0][(GMuint)src][(GMuint)dest][(GMuint)op];
 		if (!state)
 		{
-			D3D11_BLEND_DESC desc = getBlendDesc(enable, src, dest);
+			D3D11_BLEND_DESC desc = getBlendDesc(enable, src, dest, op);
 			createBlendState(desc, &state);
 		}
 
@@ -381,7 +404,7 @@ public:
 
 	ID3D11BlendState* getDisabledBlendState()
 	{
-		return getBlendState(false, GMS_BlendFunc::ONE, GMS_BlendFunc::ONE);
+		return getBlendState(false, GMS_BlendFunc::ONE, GMS_BlendFunc::ONE, GMS_BlendOp::ADD);
 	}
 
 private:
@@ -394,7 +417,7 @@ private:
 private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
-	ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
+	ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
 };
 
 struct GMDx11DepthStencilStates
@@ -796,6 +819,7 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 	if (!d->blendStates)
 		d->blendStates = new GMDx11BlendStates(getContext());
 
+	const GMShader& shader = model->getShader();
 	if (globalBlendState.enabled)
 	{
 		// 全局blend开启时
@@ -803,25 +827,25 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				d->blendStates->getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
+				d->blendStates->getBlendState(true, shader.getBlendFactorSource(), shader.getBlendFactorDest(), shader.getBlendOp())
 			));
 		}
 		else
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				d->blendStates->getBlendState(true, globalBlendState.source, globalBlendState.dest)
+				d->blendStates->getBlendState(true, globalBlendState.source, globalBlendState.dest, globalBlendState.op)
 			));
 		}
 	}
 	else
 	{
 		// 全局blend关闭，此时应该应用正在绘制物体的Blend状态
-		if (model->getShader().getBlend())
+		if (shader.getBlend())
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				d->blendStates->getBlendState(true, model->getShader().getBlendFactorSource(), model->getShader().getBlendFactorDest())
+				d->blendStates->getBlendState(true, shader.getBlendFactorSource(), shader.getBlendFactorDest(), shader.getBlendOp())
 			));
 		}
 		else

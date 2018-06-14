@@ -550,7 +550,7 @@ void GMBSPGameWorld::prepareAlwaysVisibleObjects()
 {
 	D(d);
 	AlignedVector<GMGameObject*>& objs = d->render.renderData().alwaysVisibleObjects;
-	for (auto& obj : objs)
+	for (auto obj : objs)
 	{
 		addToRenderList(obj);
 	}
@@ -737,7 +737,7 @@ void GMBSPGameWorld::prepareEntities()
 	D(d);
 	BSPData& bsp = d->bsp.bspData();
 
-	for (auto& entity : bsp.entities)
+	for (auto entity : bsp.entities)
 	{
 		BSPGameWorldEntityReader::import(*entity, this);
 		GMint leaf = calculateLeafNode(MakeVector3(entity->origin));

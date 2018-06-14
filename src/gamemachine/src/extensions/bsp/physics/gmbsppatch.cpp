@@ -692,8 +692,7 @@ namespace
 		counts[0] = counts[1] = counts[2] = 0;
 
 		// determine sides for each point
-		//for (auto iter = in.p.begin(); iter != in.p.end(); iter++)
-		for (auto& p : in.p)
+		for (auto p : in.p)
 		{
 			dot = Dot(p, normal);
 			dot += dist;
@@ -1187,7 +1186,7 @@ GM_PRIVATE_NAME(GMBSPPatch)::GM_PRIVATE_DESTRUCT(GMBSPPatch)
 {
 	for (auto patch : patches)
 	{
-		delete patch;
+		GM_delete(patch);
 	}
 }
 

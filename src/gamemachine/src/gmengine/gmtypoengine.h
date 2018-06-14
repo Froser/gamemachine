@@ -15,6 +15,7 @@ struct GMTypoResult
 	GMfloat width = 0;
 	GMfloat height = 0;
 	GMfloat lineHeight = 0;
+	GMfloat advance = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
 	bool newLineOrEOFSeparator = false;
@@ -60,9 +61,11 @@ GM_INTERFACE(ITypoEngine)
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
+	virtual void createInstance(OUT ITypoEngine**) = 0;
 
 private:
 	friend class GMTypoIterator;
+	GM_FRIEND_CLASS(GMTypoTextBuffer);
 	virtual GMTypoResult getTypoResult(GMsize_t index) = 0;
 	virtual const Vector<GMTypoResult>& getResults() = 0;
 };
@@ -99,6 +102,7 @@ public:
 
 public:
 	virtual ParseResult parse(REF GMwchar& ch);
+	virtual void createInstance(GMTypoEngine* engine, OUT GMTypoStateMachine**);
 
 protected:
 	GMTypoStateMachine::ParseResult applyAttribute();
@@ -141,13 +145,13 @@ class GMTypoEngine : public GMObject, public ITypoEngine
 
 public:
 	GMTypoEngine(const IRenderContext* context);
-	GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStateMachine* stateMachine);
 	~GMTypoEngine();
 
 public:
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) override;
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
+	virtual void createInstance(OUT ITypoEngine**) override;
 
 private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) override;
@@ -168,6 +172,7 @@ GM_PRIVATE_OBJECT(GMTypoTextBuffer)
 {
 	ITypoEngine* engine = nullptr;
 	GMString buffer;
+	GMRect rc;
 	bool dirty = false;
 };
 
@@ -177,22 +182,36 @@ class GMTypoTextBuffer : public GMObject
 
 public:
 	GMTypoTextBuffer() = default;
+	~GMTypoTextBuffer();
 
 public:
-	inline void setTypoEngine(ITypoEngine* engine)
+	inline void setTypoEngine(AUTORELEASE ITypoEngine* engine)
 	{
 		D(d);
 		d->engine = engine;
 	}
 
+	inline const ITypoEngine* getTypoEngine() const
+	{
+		D(d);
+		return d->engine;
+	}
+
+	inline const GMString& getBuffer() const
+	{
+		D(d);
+		return d->buffer;
+	}
+
 	void setBuffer(const GMString& string);
+	void setSize(const GMRect& rc);
 
 public:
 	void setChar(GMsize_t pos, GMwchar ch);
 	bool insertChar(GMsize_t pos, GMwchar ch);
 	bool removeChar(GMsize_t pos);
 	bool removeChars(GMsize_t startPos, GMsize_t endPos);
-	GMsize_t getLength();
+	GMint getLength();
 
 	// 排版相关
 public:

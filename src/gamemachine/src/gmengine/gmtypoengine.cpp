@@ -97,6 +97,13 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMwchar& ch)
 	return Okay;
 }
 
+void GMTypoStateMachine::createInstance(GMTypoEngine* engine, OUT GMTypoStateMachine** stateMachine)
+{
+	D(d);
+	GM_ASSERT(stateMachine);
+	*stateMachine = new GMTypoStateMachine(engine);
+}
+
 GMTypoStateMachine::ParseResult GMTypoStateMachine::applyAttribute()
 {
 	D(d);
@@ -167,14 +174,6 @@ GMTypoEngine::GMTypoEngine(const IRenderContext* context)
 	d->glyphManager = d->context->getEngine()->getGlyphManager();
 }
 
-GMTypoEngine::GMTypoEngine(const IRenderContext* context, AUTORELEASE GMTypoStateMachine* stateMachine)
-{
-	D(d);
-	d->stateMachine = stateMachine;
-	d->context = context;
-	d->glyphManager = d->context->getEngine()->getGlyphManager();
-}
-
 GMTypoEngine::~GMTypoEngine()
 {
 	D(d);
@@ -192,7 +191,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 
 	// 获取行高
 	GMGlyphManager* glyphManager = d->context->getEngine()->getGlyphManager();
-	std::wstring wstr = literature.toStdWString();
+	const std::wstring& wstr = literature.toStdWString();
 	const GMwchar* p = wstr.c_str();
 	while (*p)
 	{
@@ -259,6 +258,14 @@ void GMTypoEngine::setFont(GMFontHandle font)
 	d->font = font;
 }
 
+void GMTypoEngine::createInstance(OUT ITypoEngine** engine)
+{
+	D(d);
+	GM_ASSERT(engine);
+	GMTypoStateMachine* stateMachine = nullptr;
+	*engine = new GMTypoEngine(d->context);
+}
+
 GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 {
 	D(d);
@@ -299,6 +306,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 		}
 	}
 	d->current_x += glyph.advance;
+	result.advance = glyph.advance;
 
 	// 拷贝状态
 	result.color[0] = d->color[0];
@@ -347,10 +355,25 @@ const Vector<GMTypoResult>& GMTypoEngine::getResults()
 	return d->results;
 }
 
+GMTypoTextBuffer::~GMTypoTextBuffer()
+{
+	D(d);
+	GM_delete(d->engine);
+}
+
 void GMTypoTextBuffer::setBuffer(const GMString& buffer)
 {
 	D(d);
 	d->buffer = buffer;
+	setDirty();
+}
+
+void GMTypoTextBuffer::setSize(const GMRect& rc)
+{
+	D(d);
+	d->rc = rc;
+	d->rc.x = d->rc.y = 0;
+	setDirty();
 }
 
 void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
@@ -420,8 +443,81 @@ bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
 	return true;
 }
 
-GMsize_t GMTypoTextBuffer::getLength()
+GMint GMTypoTextBuffer::getLength()
 {
 	D(d);
+	GM_ASSERT((GMuint) std::numeric_limits<GMint>::max() > d->buffer.length());
 	return d->buffer.length();
+}
+
+void GMTypoTextBuffer::analyze()
+{
+	D(d);
+	GMTypoOptions options;
+	options.typoArea = d->rc;
+	d->engine->begin(d->buffer, options);
+	d->dirty = false;
+}
+
+bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
+{
+	D(d);
+	if (d->dirty)
+		analyze();
+
+	if (!x)
+		return false;
+	
+	if (cp < 0)
+	{
+		*x = 0;
+		return true;
+	}
+
+	auto& r = d->engine->getResults();
+	if (cp >= getLength())
+		return CPtoX(cp - 1, true, x);
+
+	if (trail)
+		*x = r[cp].x + r[cp].advance;
+	else
+		*x = r[cp].x;
+	return true;
+}
+
+bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
+{
+	D(d);
+	if (d->dirty)
+		analyze();
+
+	if (trail)
+		*trail = false;
+
+	auto& r = d->engine->getResults();
+	for (GMsize_t i = 0; i < r.size() - 1; ++i)
+	{
+		if (r[i].x <= x && r[i + 1].x > x)
+		{
+			if (cp)
+				*cp = i;
+
+			return true;
+		}
+	}
+	
+	if (cp)
+		*cp = r.size() - 1;
+
+	return true;
+}
+
+void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
+{
+	*prior = cp;
+}
+
+void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
+{
+	*next = cp;
 }

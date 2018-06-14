@@ -193,6 +193,7 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
 	GMS_BlendFunc blendFactorSrc = GMS_BlendFunc::ZERO;
 	GMS_BlendFunc blendFactorDest = GMS_BlendFunc::ZERO;
+	GMS_BlendOp blendOp = GMS_BlendOp::ADD;
 	bool blend = false;
 	bool discard = false;
 	bool noDepthTest = false;
@@ -217,6 +218,7 @@ public:
 	GM_DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
 	GM_DECLARE_PROPERTY(BlendFactorSource, blendFactorSrc, GMS_BlendFunc);
 	GM_DECLARE_PROPERTY(BlendFactorDest, blendFactorDest, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(BlendOp, blendOp, GMS_BlendOp);
 	GM_DECLARE_PROPERTY(Blend, blend, bool);
 	GM_DECLARE_PROPERTY(Discard, discard, bool);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);

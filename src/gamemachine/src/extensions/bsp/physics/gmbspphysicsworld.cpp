@@ -26,7 +26,7 @@ GMBSPPhysicsWorld::~GMBSPPhysicsWorld()
 	D(d);
 	for (auto& kv : d->objectMoves)
 	{
-		delete kv.second;
+		GM_delete(kv.second);
 	}
 
 	for (auto& kv : d->collisionObjects)

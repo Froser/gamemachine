@@ -25,6 +25,18 @@ enum class GMS_BlendFunc
 	MAX_OF_BLEND_FUNC,
 };
 
+//! 融混运算
+/*!
+  使用何种运算来计算融混结果。
+*/
+enum class GMS_BlendOp
+{
+	ADD,
+	SUBSTRACT,
+	REVERSE_SUBSTRACT,
+	MAX_OF_BLEND_OP,
+};
+
 //! 是否进行面剔除的枚举
 /*!
   通过设置GMS_Cull，可以设置一个图元在绘制的时候是否要进行面剔除。

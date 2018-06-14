@@ -4,8 +4,7 @@
 #include <gmcontrols.h>
 BEGIN_NS
 
-class GMUniBuffer;
-
+class GMTypoTextBuffer;
 GM_PRIVATE_OBJECT(GMControlTextEdit)
 {
 	GMVec4 textColor = GMVec4(0, 0, 0, 1);
@@ -15,7 +14,7 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	GMint cp = 0;
 	GMint firstVisibleCP = 0;
 	GMint selectionStartCP = 0;
-	GMUniBuffer* buffer = nullptr;
+	GMTypoTextBuffer* buffer = nullptr;
 	GMRect rcText;
 	GMStyle textStyle;
 	GMControlBorder* borderControl = nullptr;

@@ -20,7 +20,7 @@ namespace
 		if (shader.getBlend())
 		{
 			glEnable(GL_BLEND);
-			GMGLUtility::blendFunc(shader.getBlendFactorSource(), shader.getBlendFactorDest());
+			GMGLUtility::blendFunc(shader.getBlendFactorSource(), shader.getBlendFactorDest(), shader.getBlendOp());
 			
 			glDisable(GL_CULL_FACE);
 		}

@@ -57,6 +57,22 @@ namespace
 	}
 }
 
+class GMInverseSprite2DGameObject : public GMSprite2DGameObject
+{
+public:
+	using GMSprite2DGameObject::GMSprite2DGameObject;
+
+protected:
+	virtual void setShader(GMShader& shader) override
+	{
+		GMSprite2DGameObject::setShader(shader);
+		shader.setBlend(true);
+		shader.setBlendFactorSource(GMS_BlendFunc::ONE);
+		shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_DST_ALPHA);
+		shader.setBlendOp(GMS_BlendOp::REVERSE_SUBSTRACT);
+	}
+};
+
 void GMElementBlendColor::init(const GMVec4& defaultColor, const GMVec4& disabledColor, const GMVec4& hiddenColor)
 {
 	D(d);
@@ -125,6 +141,9 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->spriteObject = new GMSprite2DGameObject(context->getWindow()->getRenderRect());
 	d->spriteObject->setContext(context);
 
+	d->inverseSpriteObject = new GMInverseSprite2DGameObject(context->getWindow()->getRenderRect());
+	d->inverseSpriteObject->setContext(context);
+
 	d->borderObject = new GMBorder2DGameObject(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
 
@@ -175,6 +194,12 @@ void GMWidgetResourceManager::registerWidget(GMWidget* widget)
 	if (sz > 1)
 		d->widgets[sz - 2]->setNextWidget(widget);
 	d->widgets[sz - 1]->setNextWidget(d->widgets[0]);
+}
+
+ITypoEngine* GMWidgetResourceManager::getTypoEngine()
+{
+	D(d);
+	return d->textObject->getTypoEngine();
 }
 
 const GMCanvasTextureInfo& GMWidgetResourceManager::getTexture(TextureType type)
@@ -427,6 +452,7 @@ void GMWidget::drawSprite(
 void GMWidget::drawRect(
 	const GMVec4& bkColor,
 	const GMRect& rc,
+	bool inverseBackgroundColor,
 	GMfloat depth
 )
 {
@@ -442,7 +468,7 @@ void GMWidget::drawRect(
 	GMuint texId = d->whiteTextureStyle.getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(d->whiteTextureStyle.getTexture());
 
-	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
+	GMSprite2DGameObject* spriteObject = inverseBackgroundColor ? d->manager->getInverseSpriteObject() : d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
 	spriteObject->setGeometry(targetRc);
 	spriteObject->setTexture(texInfo.texture);
@@ -667,11 +693,6 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	}
 	}
 	return false;
-}
-
-void GMWidget::onInit()
-{
-	initStyles();
 }
 
 bool GMWidget::onTitleMouseDown(const GMSystemMouseEvent* event)

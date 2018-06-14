@@ -34,7 +34,7 @@ public:
 	}
 
 protected:
-	void setShader(GMShader& shader);
+	virtual void setShader(GMShader& shader);
 
 	inline const GMRect& getRenderRect()
 	{
@@ -105,6 +105,13 @@ public:
 public:
 	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
+
+public:
+	inline ITypoEngine* getTypoEngine()
+	{
+		D(d);
+		return d->typoEngine;
+	}
 
 private:
 	void update();

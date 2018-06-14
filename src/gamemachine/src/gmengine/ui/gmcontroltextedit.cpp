@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include <gmunibuffer.h>
+#include <gmtypoengine.h>
 #include "gmcontroltextedit.h"
 #include "foundation/gamemachine.h"
 
@@ -19,7 +19,15 @@ GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 {
 	D(d);
 	d->borderControl = new GMControlTextEditBorder(widget);
-	d->buffer = new GMUniBuffer();
+	d->buffer = new GMTypoTextBuffer();
+
+	ITypoEngine* typoEngine = widget->getManager()->getTypoEngine();
+	if (typoEngine)
+	{
+		ITypoEngine* newInstance = nullptr;
+		typoEngine->createInstance(&newInstance);
+		d->buffer->setTypoEngine(newInstance);
+	}
 	initStyles(widget);
 }
 
@@ -43,8 +51,14 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	if (!getVisible())
 		return;
 
-	if (!d->buffer->getContext())
-		d->buffer->setContext(getParent()->getParentWindow()->getContext());
+	if (!d->buffer->getTypoEngine())
+	{
+		ITypoEngine* typoEngine = getParent()->getManager()->getTypoEngine();
+		ITypoEngine* newInstance = nullptr;
+		typoEngine->createInstance(&newInstance);
+		d->buffer->setTypoEngine(newInstance);
+	}
+	GM_ASSERT(d->buffer->getTypoEngine());
 
 	placeCaret(d->cp);
 	d->borderControl->render(elapsed);
@@ -78,7 +92,7 @@ void GMControlTextEdit::render(GMfloat elapsed)
 		rcSelection.width = selectionRightX - selectionLeftX;
 		rcSelection.height = d->rcText.height;
 		GMRect rc = GM_intersectRect(rcSelection, d->rcText);
-		widget->drawRect(d->selectionBackColor, rc, .99f);
+		widget->drawRect(d->selectionBackColor, rc, true, .99f);
 	}
 
 	//TODO
@@ -118,6 +132,7 @@ bool GMControlTextEdit::onKeyDown(GMSystemKeyEvent* event)
 	if (!getVisible() || !getEnabled())
 		return false;
 
+	D(d);
 	bool handled = false;
 
 	GMKey key = event->getKey();
@@ -138,6 +153,44 @@ bool GMControlTextEdit::onKeyDown(GMSystemKeyEvent* event)
 		// 上下不会切换焦点
 		handled = true;
 		break;
+	}
+	case GMKey_Home:
+	{
+		placeCaret(0);
+		if (!(event->getModifier() & GMModifier_Shift))
+		{
+			// 如果没有按住Shift，更新选区范围
+			d->selectionStartCP = d->cp;
+		}
+		resetCaretBlink();
+		return true;
+	}
+	case GMKey_End:
+	{
+		placeCaret(d->buffer->getLength());
+		if (!(event->getModifier() & GMModifier_Shift))
+		{
+			// 如果没有按住Shift，更新选区范围
+			d->selectionStartCP = d->cp;
+		}
+		resetCaretBlink();
+		return true;
+	}
+	case GMKey_Delete:
+	{
+		if (d->cp != d->selectionStartCP)
+		{
+			// 删除一个选区
+			deleteSelectionText();
+			emit(textChanged);
+		}
+		else
+		{
+			if (d->buffer->removeChar(d->cp))
+				emit(textChanged);
+		}
+		resetCaretBlink();
+		return true;
 	}
 	}
 
@@ -165,6 +218,9 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 		}
 		return true;
 	}
+	case GMKey_Escape:
+		// 不处理ESC
+		return true;
 	}
 
 	if (d->selectionStartCP != d->cp)
@@ -295,12 +351,14 @@ void GMControlTextEdit::updateRect()
 {
 	GMControl::updateRect();
 	
+	// 更新文本框绘制文本位置，并且同步到排版buffer
 	D(d);
 	d->rcText = boundingRect();
 	d->rcText.x += d->borderWidth;
 	d->rcText.width -= d->borderWidth * 2;
 	d->rcText.y += d->borderWidth;
 	d->rcText.height -= d->borderWidth * 2;
+	d->buffer->setSize(d->rcText);
 }
 
 void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
@@ -321,5 +379,5 @@ void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 	}
 
 	GMWidget* widget = getParent();
-	widget->drawRect(d->caretColor, rc, .99f);
+	widget->drawRect(d->caretColor, rc, true, .99f);
 }

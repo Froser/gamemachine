@@ -306,7 +306,7 @@ IFramebuffers* GMGLGraphicEngine::getDefaultFramebuffers()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
+void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor, GMS_BlendOp op)
 {
 	GMS_BlendFunc gms_factors[] = {
 		sfactor,
@@ -351,4 +351,19 @@ void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
 		}
 	}
 	glBlendFunc(factors[0], factors[1]);
+
+	switch (op)
+	{
+	case GMS_BlendOp::ADD:
+		glBlendEquation(GL_FUNC_ADD);
+		break;
+	case GMS_BlendOp::SUBSTRACT:
+		glBlendEquation(GL_FUNC_SUBTRACT);
+		break;
+	case GMS_BlendOp::REVERSE_SUBSTRACT:
+		glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
+		break;
+	default:
+		gm_error(L"Invalid blend op.");
+	}
 }

@@ -113,7 +113,7 @@ GMBSPShaderLoader::~GMBSPShaderLoader()
 	D(d);
 	for (auto iter = d->shaderDocs.begin(); iter != d->shaderDocs.end(); iter++)
 	{
-		delete *iter;
+		GM_delete(*iter);
 	}
 }
 

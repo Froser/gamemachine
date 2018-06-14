@@ -111,7 +111,7 @@ private:
 class GMGLUtility
 {
 public:
-	static void blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor);
+	static void blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor, GMS_BlendOp op);
 };
 
 END_NS

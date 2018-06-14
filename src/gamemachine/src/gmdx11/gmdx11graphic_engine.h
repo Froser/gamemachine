@@ -15,6 +15,7 @@ struct GMDx11GlobalBlendStateDesc
 	bool enabled = false;
 	GMS_BlendFunc source;
 	GMS_BlendFunc dest;
+	GMS_BlendOp op;
 	GMint blendRefCount = 0;
 };
 
