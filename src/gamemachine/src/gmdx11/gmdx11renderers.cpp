@@ -111,19 +111,8 @@ namespace
 		}
 	}
 
-	inline D3D11_BLEND_DESC getBlendDesc(
-		bool enabled,
-		GMS_BlendFunc source,
-		GMS_BlendFunc dest,
-		GMS_BlendOp op
-	)
+	inline D3D11_BLEND_OP toDx11BlendOp(GMS_BlendOp op)
 	{
-		D3D11_BLEND_DESC desc = { 0 };
-		for (GMuint i = 0; i < 8; ++i)
-		{
-			desc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-		}
-
 		D3D11_BLEND_OP blendOp = D3D11_BLEND_OP_ADD;
 		if (op == GMS_BlendOp::ADD)
 		{
@@ -141,6 +130,25 @@ namespace
 		{
 			GM_ASSERT(false);
 			gm_error(L"Invalid blend op");
+			blendOp = D3D11_BLEND_OP_ADD;
+		}
+		return blendOp;
+	}
+
+	D3D11_BLEND_DESC getBlendDesc(
+		bool enabled,
+		GMS_BlendFunc sourceRGB,
+		GMS_BlendFunc destRGB,
+		GMS_BlendOp opRGB,
+		GMS_BlendFunc sourceAlpha,
+		GMS_BlendFunc destAlpha,
+		GMS_BlendOp opAlpha
+	)
+	{
+		D3D11_BLEND_DESC desc = { 0 };
+		for (GMuint i = 0; i < 8; ++i)
+		{
+			desc.RenderTarget[i].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		}
 
 		D3D11_RENDER_TARGET_BLEND_DESC& renderTarget = desc.RenderTarget[0];
@@ -153,12 +161,12 @@ namespace
 		{
 			renderTarget.BlendEnable = TRUE;
 			renderTarget.RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
-			renderTarget.SrcBlend = toDx11Blend(source);
-			renderTarget.SrcBlendAlpha = D3D11_BLEND_ONE;
-			renderTarget.DestBlend = toDx11Blend(dest);
-			renderTarget.DestBlendAlpha = D3D11_BLEND_ZERO;
-			renderTarget.BlendOp = blendOp;
-			renderTarget.BlendOpAlpha = blendOp;
+			renderTarget.SrcBlend = toDx11Blend(sourceRGB);
+			renderTarget.SrcBlendAlpha = toDx11Blend(sourceAlpha);
+			renderTarget.DestBlend = toDx11Blend(destRGB);
+			renderTarget.DestBlendAlpha = toDx11Blend(destAlpha);
+			renderTarget.BlendOp = toDx11BlendOp(opRGB);
+			renderTarget.BlendOpAlpha = toDx11BlendOp(opAlpha);
 			return desc;
 		}
 	}
@@ -320,32 +328,20 @@ public:
 		this->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 	}
 
-	~GMDx11RasterizerStates()
-	{
-		for (GMint i = 0; i < Size_Cull; ++i)
-		{
-			for (GMint j = 0; j < Size_FrontFace; ++j)
-			{
-				if (!states[i][j])
-					continue;
-				states[i][j]->Release();
-			}
-		}
-	}
-
 public:
 	ID3D11RasterizerState* getRasterStates(GMS_FrontFace frontFace, GMS_Cull cullMode)
 	{
 		const GMWindowStates& windowStates = context->getWindow()->getWindowStates();
 		bool multisampleEnable = windowStates.sampleCount > 1;
-		if (!states[(GMuint)cullMode][(GMuint)frontFace])
+		GMComPtr<ID3D11RasterizerState>& state = states[(GMuint)cullMode][(GMuint)frontFace];
+		if (!state)
 		{
 			D3D11_RASTERIZER_DESC desc = getRasterizerDesc(frontFace, cullMode, multisampleEnable, multisampleEnable);
-			createRasterizerState(desc, &states[(GMuint)cullMode][(GMuint)frontFace]);
+			createRasterizerState(desc, &state);
 		}
 
-		GM_ASSERT(states[(GMuint)cullMode][(GMuint)frontFace]);
-		return states[(GMuint)cullMode][(GMuint)frontFace];
+		GM_ASSERT(state);
+		return state;
 	}
 
 private:
@@ -358,7 +354,7 @@ private:
 private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
-	ID3D11RasterizerState* states[Size_Cull][Size_FrontFace] = { 0 };
+	GMComPtr<ID3D11RasterizerState> states[Size_Cull][Size_FrontFace];
 };
 
 struct GMDx11BlendStates
@@ -370,31 +366,21 @@ public:
 		this->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 	}
 
-	~GMDx11BlendStates()
-	{
-		for (GMint b = 0; b < 2; ++b)
-		{
-			for (GMint i = 0; i < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++i)
-			{
-				for (GMint j = 0; j < (GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC; ++j)
-				{
-					for (GMint k = 0; k < (GMuint)GMS_BlendOp::MAX_OF_BLEND_OP; ++j)
-					{
-						if (states[b][i][j][k])
-							states[b][i][j][k]->Release();
-					}
-				}
-			}
-		}
-	}
-
 public:
-	ID3D11BlendState* getBlendState(bool enable, GMS_BlendFunc src, GMS_BlendFunc dest, GMS_BlendOp op)
+	ID3D11BlendState* getBlendState(
+		bool enable,
+		GMS_BlendFunc srcRGB,
+		GMS_BlendFunc destRGB,
+		GMS_BlendOp opRGB,
+		GMS_BlendFunc srcAlpha,
+		GMS_BlendFunc destAlpha,
+		GMS_BlendOp opAlpha
+	)
 	{
-		ID3D11BlendState*& state = states[enable ? 1 : 0][(GMuint)src][(GMuint)dest][(GMuint)op];
+		GMComPtr<ID3D11BlendState>& state = states[enable ? 1 : 0][(GMuint)srcRGB][(GMuint)destRGB][(GMuint)opRGB][(GMuint)srcAlpha][(GMuint)destAlpha][(GMuint)opAlpha];
 		if (!state)
 		{
-			D3D11_BLEND_DESC desc = getBlendDesc(enable, src, dest, op);
+			D3D11_BLEND_DESC desc = getBlendDesc(enable, srcRGB, destRGB, opRGB, srcAlpha, destAlpha, opAlpha);
 			createBlendState(desc, &state);
 		}
 
@@ -404,7 +390,15 @@ public:
 
 	ID3D11BlendState* getDisabledBlendState()
 	{
-		return getBlendState(false, GMS_BlendFunc::ONE, GMS_BlendFunc::ONE, GMS_BlendOp::ADD);
+		return getBlendState(
+			false,
+			GMS_BlendFunc::ONE,
+			GMS_BlendFunc::ONE,
+			GMS_BlendOp::ADD,
+			GMS_BlendFunc::ONE,
+			GMS_BlendFunc::ONE,
+			GMS_BlendOp::ADD
+		);
 	}
 
 private:
@@ -417,7 +411,14 @@ private:
 private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
-	ID3D11BlendState* states[2][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC][(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC] = { 0 };
+	GMComPtr<ID3D11BlendState> states[2]
+		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Source RGB
+		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Dest RGB
+		[(GMuint)GMS_BlendOp::MAX_OF_BLEND_OP]		// Op RGB
+		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Source Alpha
+		[(GMuint)GMS_BlendFunc::MAX_OF_BLEND_FUNC]	// Dest Alpha
+		[(GMuint)GMS_BlendOp::MAX_OF_BLEND_OP]		// Op Alpha
+	;
 };
 
 struct GMDx11DepthStencilStates
@@ -429,25 +430,10 @@ public:
 		this->engine = gm_cast<GMDx11GraphicEngine*>(context->getEngine());
 	}
 
-	~GMDx11DepthStencilStates()
-	{
-		for (GMint b1 = 0; b1 < 2; ++b1)
-		{
-			for (GMint b2 = 0; b2 < 2; ++b2)
-			{
-				for (GMint b3 = 0; b3 < 3; ++b3)
-				{
-					if (states[b1][b2][b3])
-						states[b1][b2][b3]->Release();
-				}
-			}
-		}
-	}
-
 public:
 	ID3D11DepthStencilState* getDepthStencilState(bool depthEnabled, const GMStencilOptions& stencilOptions)
 	{
-		ID3D11DepthStencilState*& state = states[depthEnabled ? 1 : 0][stencilOptions.writeMask == GMStencilOptions::Ox00 ? 1 : 0][stencilOptions.compareOp];
+		GMComPtr<ID3D11DepthStencilState>& state = states[depthEnabled ? 1 : 0][stencilOptions.writeMask == GMStencilOptions::Ox00 ? 1 : 0][stencilOptions.compareOp];
 		if (!state)
 		{
 			D3D11_DEPTH_STENCIL_DESC desc = getDepthStencilDesc(depthEnabled, stencilOptions);
@@ -468,7 +454,7 @@ private:
 private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
-	ID3D11DepthStencilState* states[2][2][3] = { 0 };
+	GMComPtr<ID3D11DepthStencilState> states[2][2][3];
 };
 
 END_NS
@@ -815,7 +801,7 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 	}
 	GM_ASSERT(d->blend);
 
-	const GMDx11GlobalBlendStateDesc& globalBlendState = getEngine()->getGlobalBlendState();
+	const GMGlobalBlendStateDesc& globalBlendState = getEngine()->getGlobalBlendState();
 	if (!d->blendStates)
 		d->blendStates = new GMDx11BlendStates(getContext());
 
@@ -827,14 +813,30 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				d->blendStates->getBlendState(true, shader.getBlendFactorSource(), shader.getBlendFactorDest(), shader.getBlendOp())
+				d->blendStates->getBlendState(
+					true, 
+					shader.getBlendFactorSourceRGB(),
+					shader.getBlendFactorDestRGB(),
+					shader.getBlendOpRGB(),
+					shader.getBlendFactorSourceAlpha(),
+					shader.getBlendFactorDestAlpha(),
+					shader.getBlendOpAlpha()
+				)
 			));
 		}
 		else
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				d->blendStates->getBlendState(true, globalBlendState.source, globalBlendState.dest, globalBlendState.op)
+				d->blendStates->getBlendState(
+					true,
+					globalBlendState.sourceRGB,
+					globalBlendState.destRGB,
+					globalBlendState.opRGB,
+					globalBlendState.sourceAlpha,
+					globalBlendState.destAlpha,
+					globalBlendState.opAlpha
+				)
 			));
 		}
 	}
@@ -845,7 +847,15 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 		{
 			GM_DX_HR(d->blend->SetBlendState(
 				0,
-				d->blendStates->getBlendState(true, shader.getBlendFactorSource(), shader.getBlendFactorDest(), shader.getBlendOp())
+				d->blendStates->getBlendState(
+					true,
+					shader.getBlendFactorSourceRGB(),
+					shader.getBlendFactorDestRGB(),
+					shader.getBlendOpRGB(),
+					shader.getBlendFactorSourceAlpha(),
+					shader.getBlendFactorDestAlpha(),
+					shader.getBlendOpAlpha()
+				)
 			));
 		}
 		else

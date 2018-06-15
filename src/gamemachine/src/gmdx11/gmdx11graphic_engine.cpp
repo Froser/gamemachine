@@ -26,6 +26,15 @@ GMDx11GraphicEngine::GMDx11GraphicEngine(const IRenderContext* context)
 
 GMDx11GraphicEngine::~GMDx11GraphicEngine()
 {
+	D(d);
+	GM_delete(d->renderer_3d);
+	GM_delete(d->renderer_2d);
+	GM_delete(d->renderer_text);
+	GM_delete(d->renderer_cubemap);
+	GM_delete(d->renderer_filter);
+	GM_delete(d->renderer_deferred_3d);
+	GM_delete(d->renderer_deferred_3d_lightpass);
+	GM_delete(d->renderer_3d_shadow);
 }
 
 void GMDx11GraphicEngine::init()
@@ -83,24 +92,6 @@ void GMDx11GraphicEngine::clearStencil()
 {
 	D(d);
 	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_STENCIL, 0, 0U);
-}
-
-void GMDx11GraphicEngine::beginBlend(GMS_BlendFunc sfactor /*= GMS_BlendFunc::ONE*/, GMS_BlendFunc dfactor /*= GMS_BlendFunc::ONE*/)
-{
-	D(d);
-	++d->blendState.blendRefCount;
-	d->blendState.enabled = true;
-	d->blendState.source = sfactor;
-	d->blendState.dest = dfactor;
-}
-
-void GMDx11GraphicEngine::endBlend()
-{
-	D(d);
-	if (--d->blendState.blendRefCount == 0)
-	{
-		d->blendState.enabled = false;
-	}
 }
 
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type)

@@ -256,21 +256,6 @@ void GMGLGraphicEngine::clearStencil()
 	glStencilMask(mask);
 }
 
-void GMGLGraphicEngine::beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor)
-{
-	D(d);
-	GM_ASSERT(!d->isBlending); // 不能重复进行多次Blend
-	d->isBlending = true;
-	d->blendsfactor = sfactor;
-	d->blenddfactor = dfactor;
-}
-
-void GMGLGraphicEngine::endBlend()
-{
-	D(d);
-	d->isBlending = false;
-}
-
 IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 {
 	D(d);
@@ -306,14 +291,27 @@ IFramebuffers* GMGLGraphicEngine::getDefaultFramebuffers()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor, GMS_BlendOp op)
+void GMGLUtility::blendFunc(
+	GMS_BlendFunc sfactorRGB,
+	GMS_BlendFunc dfactorRGB,
+	GMS_BlendOp opRGB,
+	GMS_BlendFunc sfactorAlpha,
+	GMS_BlendFunc dfactorAlpha,
+	GMS_BlendOp opAlpha
+)
 {
 	GMS_BlendFunc gms_factors[] = {
-		sfactor,
-		dfactor
+		sfactorRGB,
+		dfactorRGB,
+		sfactorAlpha,
+		dfactorAlpha
 	};
-	GLenum factors[2];
+	GMS_BlendOp gms_ops[] = {
+		opRGB,
+		opAlpha
+	};
 
+	GLenum factors[4];
 	for (GMint i = 0; i < GM_array_size(gms_factors); i++)
 	{
 		switch (gms_factors[i])
@@ -350,20 +348,26 @@ void GMGLUtility::blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor, GMS_Bl
 			break;
 		}
 	}
-	glBlendFunc(factors[0], factors[1]);
+	glBlendFuncSeparate(factors[0], factors[1], factors[2], factors[3]);
 
-	switch (op)
+	GLenum ops[2];
+	for (GMint i = 0; i < GM_array_size(gms_ops); i++)
 	{
-	case GMS_BlendOp::ADD:
-		glBlendEquation(GL_FUNC_ADD);
-		break;
-	case GMS_BlendOp::SUBSTRACT:
-		glBlendEquation(GL_FUNC_SUBTRACT);
-		break;
-	case GMS_BlendOp::REVERSE_SUBSTRACT:
-		glBlendEquation(GL_FUNC_REVERSE_SUBTRACT);
-		break;
-	default:
-		gm_error(L"Invalid blend op.");
+		switch (gms_ops[i])
+		{
+		case GMS_BlendOp::ADD:
+			ops[i] = GL_FUNC_ADD;
+			break;
+		case GMS_BlendOp::SUBSTRACT:
+			ops[i] = GL_FUNC_SUBTRACT;
+			break;
+		case GMS_BlendOp::REVERSE_SUBSTRACT:
+			ops[i] = GL_FUNC_REVERSE_SUBTRACT;
+			break;
+		default:
+			ops[i] = GL_FUNC_ADD;
+			gm_error(L"Invalid blend op.");
+		}
 	}
+	glBlendEquationSeparate(ops[0], ops[1]);
 }

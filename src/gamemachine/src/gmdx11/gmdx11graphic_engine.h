@@ -10,14 +10,6 @@ BEGIN_NS
 
 class GMDx11Renderer_CubeMap;
 struct GMMVPMatrix;
-struct GMDx11GlobalBlendStateDesc
-{
-	bool enabled = false;
-	GMS_BlendFunc source;
-	GMS_BlendFunc dest;
-	GMS_BlendOp op;
-	GMint blendRefCount = 0;
-};
 
 struct GMDx11CubeMapState
 {
@@ -39,7 +31,6 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	GMScopePtr<IShaderProgram> shaderProgram;
 	GMDx11CubeMapState cubemapState;
 
-	GMDx11GlobalBlendStateDesc blendState;
 	bool ready = false;
 	bool lightDirty = true;
 
@@ -65,8 +56,6 @@ public:
 	virtual void init() override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual void clearStencil() override;
-	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
-	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type = GMShaderProgramType::DefaultShaderProgram) override;
 	virtual bool event(const GMMessage& e) override;
 	virtual IFramebuffers* getDefaultFramebuffers() override;
@@ -116,12 +105,6 @@ public:
 	{
 		D(d);
 		return d->renderTargetView;
-	}
-
-	inline const GMDx11GlobalBlendStateDesc& getGlobalBlendState()
-	{
-		D(d);
-		return d->blendState;
 	}
 
 	const GMVec2 getCurrentFilterKernelDelta()

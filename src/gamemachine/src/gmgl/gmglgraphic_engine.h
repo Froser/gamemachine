@@ -50,11 +50,6 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 
 	ITexture* cubeMap = nullptr;
 	GMGLLightContext lightContext;
-
-	// 混合绘制
-	GMS_BlendFunc blendsfactor;
-	GMS_BlendFunc blenddfactor;
-	bool isBlending = false;
 };
 
 class GMGLGraphicEngine : public GMGraphicEngine
@@ -69,8 +64,6 @@ public:
 	virtual void init() override;
 	virtual void update(GMUpdateDataType type) override;
 	virtual void clearStencil() override;
-	virtual void beginBlend(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor) override;
-	virtual void endBlend() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
 	virtual bool event(const GMMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;
@@ -83,10 +76,6 @@ public:
 	virtual void createShadowFramebuffers(OUT IFramebuffers** framebuffers) override;
 
 public:
-	inline bool isBlending() { D(d); return d->isBlending; }
-	GMS_BlendFunc blendsfactor() { D(d); return d->blendsfactor; }
-	GMS_BlendFunc blenddfactor() { D(d); return d->blenddfactor; }
-
 	inline void setCubeMap(ITexture* tex)
 	{
 		D(d);
@@ -111,7 +100,14 @@ private:
 class GMGLUtility
 {
 public:
-	static void blendFunc(GMS_BlendFunc sfactor, GMS_BlendFunc dfactor, GMS_BlendOp op);
+	static void blendFunc(
+		GMS_BlendFunc sfactorRGB,
+		GMS_BlendFunc dfactorRGB,
+		GMS_BlendOp opRGB,
+		GMS_BlendFunc sfactorAlpha,
+		GMS_BlendFunc dfactorAlpha,
+		GMS_BlendOp opAlpha
+	);
 };
 
 END_NS

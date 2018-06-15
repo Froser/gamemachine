@@ -324,6 +324,35 @@ GMCamera& GMGraphicEngine::getCamera()
 	return d->camera;
 }
 
+void GMGraphicEngine::beginBlend(
+	GMS_BlendFunc sfactorRGB,
+	GMS_BlendFunc dfactorRGB,
+	GMS_BlendOp opRGB,
+	GMS_BlendFunc sfactorAlpha,
+	GMS_BlendFunc dfactorAlpha,
+	GMS_BlendOp opAlpha
+)
+{
+	D(d);
+	++d->blendState.blendRefCount;
+	d->blendState.enabled = true;
+	d->blendState.sourceRGB = sfactorRGB;
+	d->blendState.destRGB = dfactorRGB;
+	d->blendState.opRGB = opRGB;
+	d->blendState.sourceAlpha = sfactorAlpha;
+	d->blendState.destAlpha = dfactorAlpha;
+	d->blendState.opAlpha = opAlpha;
+}
+
+void GMGraphicEngine::endBlend()
+{
+	D(d);
+	if (--d->blendState.blendRefCount == 0)
+	{
+		d->blendState.enabled = false;
+	}
+}
+
 void GMGraphicEngine::addLight(AUTORELEASE ILight* light)
 {
 	D(d);

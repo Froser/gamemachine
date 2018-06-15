@@ -191,9 +191,12 @@ GM_PRIVATE_OBJECT(GMShader)
 	GMuint surfaceFlag = 0;
 	GMS_Cull cull = GMS_Cull::CULL;
 	GMS_FrontFace frontFace = GMS_FrontFace::CLOCKWISE;
-	GMS_BlendFunc blendFactorSrc = GMS_BlendFunc::ZERO;
-	GMS_BlendFunc blendFactorDest = GMS_BlendFunc::ZERO;
-	GMS_BlendOp blendOp = GMS_BlendOp::ADD;
+	GMS_BlendFunc blendFactorSrcRGB = GMS_BlendFunc::ZERO;
+	GMS_BlendFunc blendFactorDestRGB = GMS_BlendFunc::ZERO;
+	GMS_BlendFunc blendFactorSrcAlpha = GMS_BlendFunc::ZERO;
+	GMS_BlendFunc blendFactorDestAlpha = GMS_BlendFunc::ZERO;
+	GMS_BlendOp blendOpRGB = GMS_BlendOp::ADD;
+	GMS_BlendOp blendOpAlpha = GMS_BlendOp::ADD;
 	bool blend = false;
 	bool discard = false;
 	bool noDepthTest = false;
@@ -216,9 +219,12 @@ public:
 	GM_DECLARE_PROPERTY(SurfaceFlag, surfaceFlag, GMuint);
 	GM_DECLARE_PROPERTY(Cull, cull, GMS_Cull);
 	GM_DECLARE_PROPERTY(FrontFace, frontFace, GMS_FrontFace);
-	GM_DECLARE_PROPERTY(BlendFactorSource, blendFactorSrc, GMS_BlendFunc);
-	GM_DECLARE_PROPERTY(BlendFactorDest, blendFactorDest, GMS_BlendFunc);
-	GM_DECLARE_PROPERTY(BlendOp, blendOp, GMS_BlendOp);
+	GM_DECLARE_PROPERTY(BlendFactorSourceRGB, blendFactorSrcRGB, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(BlendFactorDestRGB, blendFactorDestRGB, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(BlendOpRGB, blendOpRGB, GMS_BlendOp);
+	GM_DECLARE_PROPERTY(BlendFactorSourceAlpha, blendFactorSrcAlpha, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(BlendFactorDestAlpha, blendFactorDestAlpha, GMS_BlendFunc);
+	GM_DECLARE_PROPERTY(BlendOpAlpha, blendOpAlpha, GMS_BlendOp);
 	GM_DECLARE_PROPERTY(Blend, blend, bool);
 	GM_DECLARE_PROPERTY(Discard, discard, bool);
 	GM_DECLARE_PROPERTY(NoDepthTest, noDepthTest, bool);
@@ -227,6 +233,25 @@ public:
 	GM_DECLARE_PROPERTY(LineColor, lineColor, GMVec3);
 	GM_DECLARE_PROPERTY(Material, material, GMMaterial);
 	GM_DECLARE_PROPERTY(IlluminationModel, illuminationModel, GMIlluminationModel);
+
+public:
+	inline void setBlendFactorSource(GMS_BlendFunc func)
+	{
+		setBlendFactorSourceRGB(func);
+		setBlendFactorSourceAlpha(func);
+	}
+
+	inline void setBlendFactorDest(GMS_BlendFunc func)
+	{
+		setBlendFactorDestRGB(func);
+		setBlendFactorDestAlpha(func);
+	}
+
+	inline void setBlendOp(GMS_BlendOp op)
+	{
+		setBlendOpRGB(op);
+		setBlendOpAlpha(op);
+	}
 };
 END_NS
 #endif

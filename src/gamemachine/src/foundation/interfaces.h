@@ -412,7 +412,14 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	融合，否则本帧将会覆盖当前帧缓存已有的所有值。
 	  \sa drawObjects(), endBlend()
 	*/
-	virtual void beginBlend(GMS_BlendFunc sfactor = GMS_BlendFunc::ONE, GMS_BlendFunc dfactor = GMS_BlendFunc::ONE) = 0;
+	virtual void beginBlend(
+		GMS_BlendFunc sfactorRGB = GMS_BlendFunc::ONE,
+		GMS_BlendFunc dfactorRGB = GMS_BlendFunc::ONE,
+		GMS_BlendOp opRGB = GMS_BlendOp::ADD,
+		GMS_BlendFunc sfactorAlpha = GMS_BlendFunc::ONE,
+		GMS_BlendFunc dfactorAlpha = GMS_BlendFunc::ONE,
+		GMS_BlendOp opAlpha = GMS_BlendOp::ADD
+	) = 0;
 
 	//! 结束融合绘制。
 	/*!

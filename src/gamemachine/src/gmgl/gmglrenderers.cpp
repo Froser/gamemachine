@@ -20,7 +20,14 @@ namespace
 		if (shader.getBlend())
 		{
 			glEnable(GL_BLEND);
-			GMGLUtility::blendFunc(shader.getBlendFactorSource(), shader.getBlendFactorDest(), shader.getBlendOp());
+			GMGLUtility::blendFunc(
+				shader.getBlendFactorSourceRGB(),
+				shader.getBlendFactorDestRGB(),
+				shader.getBlendOpRGB(),
+				shader.getBlendFactorSourceAlpha(),
+				shader.getBlendFactorDestAlpha(),
+				shader.getBlendOpAlpha()
+			);
 			
 			glDisable(GL_CULL_FACE);
 		}

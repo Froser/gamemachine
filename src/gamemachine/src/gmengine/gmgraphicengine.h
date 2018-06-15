@@ -150,6 +150,18 @@ struct GMShadowSourceDesc
 	static GMint64 version;
 };
 
+struct GMGlobalBlendStateDesc
+{
+	bool enabled = false;
+	GMS_BlendFunc sourceRGB;
+	GMS_BlendFunc destRGB;
+	GMS_BlendOp opRGB;
+	GMS_BlendFunc sourceAlpha;
+	GMS_BlendFunc destAlpha;
+	GMS_BlendOp opAlpha;
+	GMint blendRefCount = 0;
+};
+
 GM_PRIVATE_OBJECT(GMFramebuffersStack)
 {
 	Stack<IFramebuffers*> framebuffers;
@@ -181,6 +193,7 @@ GM_PRIVATE_OBJECT(GMGraphicEngine)
 	GMStencilOptions stencilOptions;
 	Vector<ILight*> lights;
 	IShaderLoadCallback* shaderLoadCallback = nullptr;
+	GMGlobalBlendStateDesc blendState;
 
 	// Shadow
 	GMShadowSourceDesc shadow;
@@ -208,6 +221,15 @@ public:
 	virtual void setShaderLoadCallback(IShaderLoadCallback* cb) override;
 	virtual void setShadowSource(const GMShadowSourceDesc& desc) override;
 	virtual GMCamera& getCamera() override;
+	virtual void beginBlend(
+		GMS_BlendFunc sfactorRGB,
+		GMS_BlendFunc dfactorRGB,
+		GMS_BlendOp opRGB,
+		GMS_BlendFunc sfactorAlpha,
+		GMS_BlendFunc dfactorAlpha,
+		GMS_BlendOp opAlpha
+	) override;
+	virtual void endBlend() override;
 
 public:
 	const GMFilterMode::Mode getCurrentFilterMode();
@@ -272,6 +294,12 @@ public:
 	{
 		D(d);
 		return d->isDrawingShadow;
+	}
+
+	inline const GMGlobalBlendStateDesc& getGlobalBlendState()
+	{
+		D(d);
+		return d->blendState;
 	}
 };
 
