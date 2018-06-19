@@ -33,13 +33,20 @@ public:
 		return d->geometry;
 	}
 
-protected:
-	virtual void setShader(GMShader& shader);
-
 	inline const GMRect& getRenderRect()
 	{
 		D(d);
 		return d->renderRc;
+	}
+
+protected:
+	virtual void setShader(GMShader& shader);
+
+	inline void setRenderRect(const GMRect& rc)
+	{
+		D(d);
+		markDirty();
+		d->renderRc = rc;
 	}
 
 	inline void markDirty()

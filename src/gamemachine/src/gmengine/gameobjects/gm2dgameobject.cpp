@@ -219,7 +219,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 
 	constexpr GMfloat Z = 0;
 	const GMRect& rect = getRenderRect();
-	GMRectF coord = toViewportRect(getGeometry(), getRenderRect());
+	GMRectF coord = toViewportRect(getGeometry(), rect);
 
 	Vector<GMVertex>& vertices = d->vericesCache;
 	BEGIN_GLYPH_XY(rect.width, rect.height)

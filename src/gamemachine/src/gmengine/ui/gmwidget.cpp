@@ -416,6 +416,7 @@ void GMWidget::drawText(
 	textObject->setColor(fontColor);
 	textObject->setText(text);
 	textObject->setGeometry(targetRc);
+	textObject->setRenderRect(targetRc);
 	textObject->setCenter(center);
 	textObject->setFont(style.getFont());
 	textObject->draw();
