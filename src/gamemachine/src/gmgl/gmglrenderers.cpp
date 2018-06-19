@@ -15,53 +15,6 @@ namespace
 {
 	bool g_shadowDirty = true;
 
-	inline void applyShader(const GMShader& shader)
-	{
-		if (shader.getBlend())
-		{
-			glEnable(GL_BLEND);
-			GMGLUtility::blendFunc(
-				shader.getBlendFactorSourceRGB(),
-				shader.getBlendFactorDestRGB(),
-				shader.getBlendOpRGB(),
-				shader.getBlendFactorSourceAlpha(),
-				shader.getBlendFactorDestAlpha(),
-				shader.getBlendOpAlpha()
-			);
-			
-			glDisable(GL_CULL_FACE);
-		}
-		else
-		{
-			glDisable(GL_BLEND);
-
-			if (shader.getCull() == GMS_Cull::NONE)
-			{
-				glDisable(GL_CULL_FACE);
-			}
-			else
-			{
-				if (shader.getFrontFace() == GMS_FrontFace::CLOCKWISE)
-					glFrontFace(GL_CW);
-				else
-					glFrontFace(GL_CCW);
-
-				glEnable(GL_CULL_FACE);
-			}
-			
-		}
-
-		if (shader.getNoDepthTest())
-			glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
-		else
-			glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
-
-		if (shader.getBlend())
-			glDepthMask(GL_FALSE);
-
-		glLineWidth(shader.getLineWidth());
-	}
-
 	inline void applyStencil(GMGLGraphicEngine& engine)
 	{
 		// 应用模板
@@ -378,6 +331,99 @@ void GMGLRenderer::dirtyShadowMapAttributes()
 	g_shadowDirty = true;
 }
 
+void GMGLRenderer::applyShader(GMModel* model)
+{
+	prepareBlend(model);
+	prepareFrontFace(model);
+	prepareDepth(model);
+	prepareLine(model);
+}
+
+void GMGLRenderer::prepareFrontFace(GMModel* model)
+{
+	const GMShader& shader = model->getShader();
+	if (shader.getFrontFace() == GMS_FrontFace::CLOCKWISE)
+		glFrontFace(GL_CW);
+	else
+		glFrontFace(GL_CCW);
+}
+
+void GMGLRenderer::prepareBlend(GMModel* model)
+{
+	D(d);
+	bool blend = false;
+	const GMShader& shader = model->getShader();
+	const GMGlobalBlendStateDesc& globalBlendState = d->engine->getGlobalBlendState();
+	if (globalBlendState.enabled)
+	{
+		blend = true;
+		if (shader.getBlend())
+		{
+			blend = true;
+			glEnable(GL_BLEND);
+			GMGLUtility::blendFunc(
+				shader.getBlendFactorSourceRGB(),
+				shader.getBlendFactorDestRGB(),
+				shader.getBlendOpRGB(),
+				shader.getBlendFactorSourceAlpha(),
+				shader.getBlendFactorDestAlpha(),
+				shader.getBlendOpAlpha()
+			);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+			GMGLUtility::blendFunc(
+				globalBlendState.sourceRGB,
+				globalBlendState.destRGB,
+				globalBlendState.opRGB,
+				globalBlendState.sourceAlpha,
+				globalBlendState.destAlpha,
+				globalBlendState.opAlpha
+			);
+		}
+	}
+	else
+	{
+		if (shader.getBlend())
+		{
+			blend = true;
+			glEnable(GL_BLEND);
+			GMGLUtility::blendFunc(
+				shader.getBlendFactorSourceRGB(),
+				shader.getBlendFactorDestRGB(),
+				shader.getBlendOpRGB(),
+				shader.getBlendFactorSourceAlpha(),
+				shader.getBlendFactorDestAlpha(),
+				shader.getBlendOpAlpha()
+			);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+		}
+	}
+
+	if (shader.getBlend())
+		glDepthMask(GL_FALSE);
+}
+
+void GMGLRenderer::prepareDepth(GMModel* model)
+{
+	const GMShader& shader = model->getShader();
+	if (shader.getNoDepthTest())
+		glDisable(GL_DEPTH_TEST); // glDepthMask(GL_FALSE);
+	else
+		glEnable(GL_DEPTH_TEST); // glDepthMask(GL_TRUE);
+}
+
+void GMGLRenderer::prepareLine(GMModel* model)
+{
+	const GMShader& shader = model->getShader();
+	glLineWidth(shader.getLineWidth());
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 GMGLRenderer_3D::~GMGLRenderer_3D()
 {
@@ -443,7 +489,7 @@ void GMGLRenderer_3D::beforeDraw(GMModel* model)
 	activateMaterial(model->getShader());
 
 	// 应用Shader
-	applyShader(model->getShader());
+	applyShader(model);
 	
 	// 设置光照模型
 	IShaderProgram* shaderProgram = getShaderProgram();
@@ -541,7 +587,7 @@ void GMGLRenderer_2D::beforeDraw(GMModel* model)
 {
 	D(d);
 	// 应用Shader
-	applyShader(model->getShader());
+	applyShader(model);
 
 	// 只选择环境光纹理
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
@@ -598,7 +644,7 @@ void GMGLRenderer_CubeMap::afterDraw(GMModel* model)
 
 void GMGLRenderer_Filter::beforeDraw(GMModel* model)
 {
-	applyShader(model->getShader());
+	applyShader(model);
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(GMTextureType::Ambient);
 	ITexture* texture = getTexture(sampler);
 	GM_ASSERT(texture);

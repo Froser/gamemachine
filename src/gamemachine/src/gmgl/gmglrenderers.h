@@ -50,6 +50,13 @@ protected:
 	virtual void updateCameraMatrices(IShaderProgram* shaderProgram);
 	virtual void prepareScreenInfo(IShaderProgram* shaderProgram);
 
+protected:
+	void applyShader(GMModel* model);
+	void prepareBlend(GMModel* model);
+	void prepareFrontFace(GMModel* model);
+	void prepareDepth(GMModel* model);
+	void prepareLine(GMModel* model);
+
 public:
 	static void dirtyShadowMapAttributes();
 };
