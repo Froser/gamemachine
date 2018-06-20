@@ -278,7 +278,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 		return result;
 	}
 
-	if (parseResult == GMTypoStateMachine::Newline)
+	if (d->options.newline && parseResult == GMTypoStateMachine::Newline)
 	{
 		newLine();
 		result.valid = false;
@@ -298,7 +298,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	if (isValidTypeFrame())
 	{
 		// 如果给定了一个合法的绘制区域，且出现超出绘制区域的情况
-		if (result.x + result.width > d->options.typoArea.width)
+		if (d->options.newline && result.x + result.width > d->options.typoArea.width)
 		{
 			newLine();
 			result.x = d->current_x + glyph.bearingX;
@@ -374,6 +374,16 @@ void GMTypoTextBuffer::setSize(const GMRect& rc)
 	d->rc = rc;
 	d->rc.x = d->rc.y = 0;
 	setDirty();
+}
+
+void GMTypoTextBuffer::setNewline(bool newline)
+{
+	D(d);
+	if (d->newline != newline)
+	{
+		d->newline = newline;
+		setDirty();
+	}
 }
 
 void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
@@ -455,6 +465,7 @@ void GMTypoTextBuffer::analyze()
 	D(d);
 	GMTypoOptions options;
 	options.typoArea = d->rc;
+	options.newline = d->newline;
 	d->engine->begin(d->buffer, options);
 	d->dirty = false;
 }

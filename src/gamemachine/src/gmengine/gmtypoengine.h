@@ -54,6 +54,7 @@ struct GMTypoOptions
 	GMint lineSpacing = 0;
 	GMRect typoArea = { 0, 0, -1, -1 }; // 排版框，排版引擎将在此框内排版
 	bool center = false;
+	bool newline = true;
 };
 
 GM_INTERFACE(ITypoEngine)
@@ -173,6 +174,7 @@ GM_PRIVATE_OBJECT(GMTypoTextBuffer)
 	ITypoEngine* engine = nullptr;
 	GMString buffer;
 	GMRect rc;
+	bool newline = true;
 	bool dirty = false;
 };
 
@@ -205,6 +207,7 @@ public:
 
 	void setBuffer(const GMString& string);
 	void setSize(const GMRect& rc);
+	void setNewline(bool newline);
 
 public:
 	void setChar(GMsize_t pos, GMwchar ch);

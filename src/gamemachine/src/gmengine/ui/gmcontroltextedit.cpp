@@ -20,6 +20,7 @@ GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 	D(d);
 	d->borderControl = new GMControlTextEditBorder(widget);
 	d->buffer = new GMTypoTextBuffer();
+	d->buffer->setNewline(false); //不允许换行
 
 	ITypoEngine* typoEngine = widget->getManager()->getTypoEngine();
 	if (typoEngine)
@@ -95,9 +96,12 @@ void GMControlTextEdit::render(GMfloat elapsed)
 		widget->drawRect(d->selectionBackColor, rc, true, .99f);
 	}
 
-	//TODO
 	d->textStyle.getFontColor().setCurrent(d->textColor);
-	widget->drawText(d->buffer->getBuffer(), d->textStyle, d->rcText);
+
+	const GMString& text = d->buffer->getBuffer();
+	d->renderText = text.substr(d->firstVisibleCP, text.length() - d->firstVisibleCP);
+	// 不允许换行
+	widget->drawText(d->renderText, d->textStyle, d->rcText, false, false, false);
 
 	// 闪烁光标
 	GMfloat time = GM.getGameMachineRunningStates().elapsedTime;
@@ -125,6 +129,16 @@ void GMControlTextEdit::setPosition(GMint x, GMint y)
 
 	// border是以widget为参照，而不是以本控件为参照，所以要调整一次
 	d->borderControl->setPosition(x, y);
+}
+
+bool GMControlTextEdit::onMouseDown(GMSystemMouseEvent* event)
+{
+
+}
+
+bool GMControlTextEdit::onMouseDblClick(GMSystemMouseEvent* event)
+{
+
 }
 
 bool GMControlTextEdit::onKeyDown(GMSystemKeyEvent* event)
@@ -275,7 +289,7 @@ void GMControlTextEdit::placeCaret(GMint cp)
 	if (x < firstX)
 	{
 		// 此时字符所在的位置比可见位置小，我们需要调整滚动条到其可见
-		d->firstVisibleCP = x;
+		d->firstVisibleCP = cp;
 	}
 	else if (x2 > firstX + d->rcText.width)
 	{

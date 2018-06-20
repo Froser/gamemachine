@@ -386,7 +386,8 @@ void GMWidget::drawText(
 	GMStyle& style,
 	const GMRect& rc,
 	bool shadow,
-	bool center
+	bool center,
+	bool newLine
 )
 {
 	// 不需要绘制透明元素
@@ -406,7 +407,8 @@ void GMWidget::drawText(
 			d->shadowStyle,
 			shadowRc,
 			false,
-			center
+			center,
+			newLine
 		);
 	}
 
@@ -418,6 +420,7 @@ void GMWidget::drawText(
 	textObject->setGeometry(targetRc);
 	textObject->setCenter(center);
 	textObject->setFont(style.getFont());
+	textObject->setNewline(newLine);
 	textObject->draw();
 }
 

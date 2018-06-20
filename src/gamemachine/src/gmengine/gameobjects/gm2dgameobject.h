@@ -75,6 +75,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	GMString text;
 	GMint lineHeight = 0;
 	bool center = false;
+	bool newline = true;
 	GMsize_t length = 0;
 	ITexture* texture = nullptr;
 	ITypoEngine* typoEngine = nullptr;
@@ -101,6 +102,7 @@ public:
 	void setColor(const GMVec4& color);
 	void setCenter(bool center);
 	void setFont(GMFontHandle font);
+	void setNewline(bool newline);
 
 public:
 	virtual void onAppendingObjectToWorld() override;

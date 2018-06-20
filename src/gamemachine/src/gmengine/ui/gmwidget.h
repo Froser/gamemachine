@@ -380,7 +380,8 @@ public:
 		GMStyle& style,
 		const GMRect& rc,
 		bool shadow = false,
-		bool center = false
+		bool center = false,
+		bool newLine = true
 	);
 
 	void drawSprite(

@@ -157,6 +157,16 @@ void GMTextGameObject::setFont(GMFontHandle font)
 	}
 }
 
+void GMTextGameObject::setNewline(bool newline)
+{
+	D(d);
+	if (d->newline != newline)
+	{
+		d->newline = newline;
+		markDirty();
+	}
+}
+
 void GMTextGameObject::onAppendingObjectToWorld()
 {
 	D(d);
@@ -227,6 +237,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		ITypoEngine* typoEngine = d->typoEngine;
 		typoEngine->setFont(d->font);
 		GMTypoOptions options;
+		options.newline = d->newline;
 		options.center = d->center;
 		options.typoArea.width = coord.width * rect.width * .5f;
 		options.typoArea.height = coord.height * rect.height * .5f;

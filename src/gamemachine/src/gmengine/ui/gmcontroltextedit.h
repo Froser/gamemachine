@@ -24,6 +24,7 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	bool caretOn = true;
 	bool showCaret = true;
 	bool insertMode = true;
+	GMString renderText;
 };
 
 class GMControlTextEdit : public GMControl
@@ -42,6 +43,8 @@ public:
 	virtual void setSize(GMint width, GMint height) override;
 	virtual void setPosition(GMint x, GMint y) override;
 	virtual bool onKeyDown(GMSystemKeyEvent* event) override;
+	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
+	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
 	virtual bool onChar(GMSystemCharEvent* event) override;
 	virtual bool canHaveFocus() override;
 	virtual void setText(const GMString& text);
