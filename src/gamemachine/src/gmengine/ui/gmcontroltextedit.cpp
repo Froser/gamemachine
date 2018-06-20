@@ -89,9 +89,9 @@ void GMControlTextEdit::render(GMfloat elapsed)
 		}
 
 		rcSelection.x = selectionLeftX + (d->rcText.x - firstX);
-		rcSelection.y = d->rcText.y;
+		rcSelection.y = getCaretTop();
 		rcSelection.width = selectionRightX - selectionLeftX;
-		rcSelection.height = d->rcText.height;
+		rcSelection.height = getCaretHeight();
 		GMRect rc = GM_intersectRect(rcSelection, d->rcText);
 		widget->drawRect(d->selectionBackColor, rc, true, .99f);
 	}
@@ -133,12 +133,43 @@ void GMControlTextEdit::setPosition(GMint x, GMint y)
 
 bool GMControlTextEdit::onMouseDown(GMSystemMouseEvent* event)
 {
+	if (!hasFocus())
+		getParent()->requestFocus(this);
 
+	const GMPoint& pt = event->getPoint();
+	if (!containsPoint(pt))
+		return false;
+
+	handleMouseSelect(event, true);
+	return true;
 }
 
 bool GMControlTextEdit::onMouseDblClick(GMSystemMouseEvent* event)
 {
+	if (!hasFocus())
+		getParent()->requestFocus(this);
 
+	const GMPoint& pt = event->getPoint();
+	if (!containsPoint(pt))
+		return false;
+
+	handleMouseSelect(event, true);
+	return true;
+}
+
+bool GMControlTextEdit::onMouseUp(GMSystemMouseEvent* event)
+{
+	D(d);
+	d->mouseDragging = false;
+	return false;
+}
+
+bool GMControlTextEdit::onMouseMove(GMSystemMouseEvent* event)
+{
+	D(d);
+	if (d->mouseDragging)
+		handleMouseSelect(event, false);
+	return false;
 }
 
 bool GMControlTextEdit::onKeyDown(GMSystemKeyEvent* event)
@@ -272,6 +303,14 @@ void GMControlTextEdit::setText(const GMString& text)
 	d->buffer->setBuffer(text);
 }
 
+void GMControlTextEdit::setPadding(GMint x, GMint y)
+{
+	D(d);
+	d->padding[0] = x;
+	d->padding[1] = y;
+	updateRect();
+}
+
 void GMControlTextEdit::placeCaret(GMint cp)
 {
 	D(d);
@@ -352,6 +391,14 @@ void GMControlTextEdit::resetCaretBlink()
 	d->caretOn = true;
 }
 
+void GMControlTextEdit::handleMouseSelect(GMSystemMouseEvent* event, bool selectStart)
+{
+	D(d);
+	d->mouseDragging = true;
+	getParent()->getParentWindow()->setWindowCapture(true);
+	handleMouseCaret(event->getPoint(), selectStart);
+}
+
 void GMControlTextEdit::initStyles(GMWidget* widget)
 {
 	D(d);
@@ -361,6 +408,27 @@ void GMControlTextEdit::initStyles(GMWidget* widget)
 	d->textStyle = textStyle;
 }
 
+void GMControlTextEdit::handleMouseCaret(const GMPoint& pt, bool selectStart)
+{
+	D(d);
+	GMint xFirst;
+	d->buffer->CPtoX(d->firstVisibleCP, false, &xFirst);
+
+	GMint cp;
+	bool trail;
+	if (d->buffer->XtoCP(pt.x - d->rcText.x + xFirst, &cp, &trail))
+	{
+		if (trail && cp < d->buffer->getLength())
+			placeCaret(cp + 1);
+		else
+			placeCaret(cp);
+
+		if (selectStart)
+			d->selectionStartCP = d->cp;
+		resetCaretBlink();
+	}
+}
+
 void GMControlTextEdit::updateRect()
 {
 	GMControl::updateRect();
@@ -368,10 +436,10 @@ void GMControlTextEdit::updateRect()
 	// 更新文本框绘制文本位置，并且同步到排版buffer
 	D(d);
 	d->rcText = boundingRect();
-	d->rcText.x += d->borderWidth;
-	d->rcText.width -= d->borderWidth * 2;
-	d->rcText.y += d->borderWidth;
-	d->rcText.height -= d->borderWidth * 2;
+	d->rcText.x += d->borderWidth + d->padding[0];
+	d->rcText.width -= (d->borderWidth + d->padding[0]) * 2;
+	d->rcText.y += d->borderWidth + d->padding[1];
+	d->rcText.height -= (d->borderWidth + d->padding[1]) * 2;
 	d->buffer->setSize(d->rcText);
 }
 
@@ -380,9 +448,9 @@ void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 	D(d);
 	GMRect rc = {
 		d->rcText.x - firstX + caretX - 1,
-		d->rcText.y,
+		getCaretTop(),
 		2,
-		d->rcText.height
+		getCaretHeight()
 	};
 	if (!d->insertMode)
 	{
@@ -394,4 +462,16 @@ void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 
 	GMWidget* widget = getParent();
 	widget->drawRect(d->caretColor, rc, true, .99f);
+}
+
+GMint GMControlTextEdit::getCaretHeight()
+{
+	D(d);
+	return d->buffer->getLineHeight() + 3;
+}
+
+GMint GMControlTextEdit::getCaretTop()
+{
+	D(d);
+	return d->rcText.y;
 }

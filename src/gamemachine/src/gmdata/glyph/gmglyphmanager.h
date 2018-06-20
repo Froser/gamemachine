@@ -11,10 +11,10 @@ struct ITexture;
 struct GMGlyphInfo
 {
 	bool valid;
-	GMfloat x, y; // 字形在纹理中的位置
-	GMfloat width, height; // 字形在纹理中的大小
-	GMfloat bearingX, bearingY;
-	GMfloat advance;
+	GMint x, y; // 字形在纹理中的位置
+	GMint width, height; // 字形在纹理中的大小
+	GMint bearingX, bearingY;
+	GMint advance;
 };
 
 struct GMGlyphBitmap

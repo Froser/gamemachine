@@ -266,6 +266,12 @@ void GMTypoEngine::createInstance(OUT ITypoEngine** engine)
 	*engine = new GMTypoEngine(d->context);
 }
 
+GMint GMTypoEngine::getLineHeight()
+{
+	D(d);
+	return d->lineHeight;
+}
+
 GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 {
 	D(d);
@@ -460,6 +466,15 @@ GMint GMTypoTextBuffer::getLength()
 	return d->buffer.length();
 }
 
+GMint GMTypoTextBuffer::getLineHeight()
+{
+	D(d);
+	if (d->dirty)
+		analyze();
+
+	return d->engine->getLineHeight();
+}
+
 void GMTypoTextBuffer::analyze()
 {
 	D(d);
@@ -504,6 +519,9 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 
 	if (trail)
 		*trail = false;
+
+	if (x < 0)
+		return 0;
 
 	auto& r = d->engine->getResults();
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)

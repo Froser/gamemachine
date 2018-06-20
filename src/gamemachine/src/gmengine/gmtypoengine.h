@@ -14,8 +14,8 @@ struct GMTypoResult
 	GMfloat y = 0;
 	GMfloat width = 0;
 	GMfloat height = 0;
-	GMfloat lineHeight = 0;
 	GMfloat advance = 0;
+	GMint lineHeight = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
 	bool newLineOrEOFSeparator = false;
@@ -62,6 +62,7 @@ GM_INTERFACE(ITypoEngine)
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
+	virtual GMint getLineHeight() = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
 
 private:
@@ -153,6 +154,7 @@ public:
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
 	virtual void createInstance(OUT ITypoEngine**) override;
+	virtual GMint getLineHeight() override;
 
 private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) override;
@@ -215,6 +217,7 @@ public:
 	bool removeChar(GMsize_t pos);
 	bool removeChars(GMsize_t startPos, GMsize_t endPos);
 	GMint getLength();
+	GMint getLineHeight();
 
 	// 排版相关
 public:

@@ -25,6 +25,8 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	bool showCaret = true;
 	bool insertMode = true;
 	GMString renderText;
+	bool mouseDragging = false;
+	GMint padding[2] = { 5, 10 };
 };
 
 class GMControlTextEdit : public GMControl
@@ -45,9 +47,12 @@ public:
 	virtual bool onKeyDown(GMSystemKeyEvent* event) override;
 	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
 	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
+	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
+	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
 	virtual bool onChar(GMSystemCharEvent* event) override;
 	virtual bool canHaveFocus() override;
 	virtual void setText(const GMString& text);
+	virtual void setPadding(GMint x, GMint y);
 
 protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
@@ -59,6 +64,7 @@ protected:
 	void resetCaretBlink();
 	void copyToClipboard();
 	void pasteFromClipboard();
+	void handleMouseSelect(GMSystemMouseEvent* event, bool selectStart);
 
 public:
 	inline GMControlBorder* getBorder()
@@ -90,6 +96,9 @@ protected:
 
 private:
 	void initStyles(GMWidget* widget);
+	void handleMouseCaret(const GMPoint& pt, bool selectStart);
+	GMint getCaretHeight();
+	GMint getCaretTop();
 };
 
 END_NS
