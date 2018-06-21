@@ -99,7 +99,16 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	d->textStyle.getFontColor().setCurrent(d->textColor);
 
 	const GMString& text = d->buffer->getBuffer();
-	d->renderText = text.substr(d->firstVisibleCP, text.length() - d->firstVisibleCP);
+
+	// 获取能够显示的文本长度
+	GMint lastCP;
+	bool lastTrail;
+	d->buffer->XtoCP(firstX + d->rcText.width, &lastCP, &lastTrail);
+	if (lastTrail)
+		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP + 1);
+	else if (!lastTrail)
+		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP);
+
 	// 不允许换行
 	widget->drawText(d->renderText, d->textStyle, d->rcText, false, false, false);
 

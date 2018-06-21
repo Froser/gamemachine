@@ -2,6 +2,7 @@
 #include "demonstration_world.h"
 #include <gmwidget.h>
 #include <gmcontrols.h>
+#include <gmcontroltextedit.h>
 #include <gmgl.h>
 #include <gmgraphicengine.h>
 
@@ -27,18 +28,18 @@ namespace
 {
 	void loadDemostrations(DemonstrationWorld* world)
 	{
-		world->addDemo("Hello World: Load a texture", new Demo_Texture(world));
-		world->addDemo("Hello World: Load a texture with indices buffer", new Demo_Texture_Index(world));
-		world->addDemo("Texture advance: Load texture with normal map", new Demo_NormalMap(world));
-		world->addDemo("Effects: Use a grayscale filter.", new Demo_Effects(world));
-		world->addDemo("BSP: Demonstrate a Quake3 scene.", new Demo_Quake3_BSP(world));
-		world->addDemo("Sound: Demonstrate playing music.", new Demo_Sound(world));
-		world->addDemo("Literature: Demonstrate render literatures via GMTypoEngine.", new Demo_Literature(world));
-		world->addDemo("Model: Load a model. Adjust model by dragging or wheeling.", new Demo_Model(world));
-		world->addDemo("Physics: Demonstrate collision objects.", new Demo_Collision(world));
-		world->addDemo("SpecularMap: Demonstrate a cube with specular map.", new Demo_SpecularMap(world));
-		world->addDemo("PBR: Demonstrate a scene with PBR.", new Demo_PBR(world));
-		world->addDemo("PBR: Demonstrate a scene with both Phong and PBR.", new Demo_Phong_PBR(world));
+		world->addDemo(L"入门: 读取一个纹理。", new Demo_Texture(world));
+		world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
+		world->addDemo(L"高级纹理：使用法线贴图。", new Demo_NormalMap(world));
+		world->addDemo(L"效果：使用一个灰度滤镜。", new Demo_Effects(world));
+		world->addDemo(L"BSP: 渲染一个雷神之锤3的场景。", new Demo_Quake3_BSP(world));
+		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
+		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
+		world->addDemo(L"模型: 读取模型文件。", new Demo_Model(world));
+		world->addDemo(L"物理: 演示相互碰撞的物体。", new Demo_Collision(world));
+		world->addDemo(L"高光贴图: 演示一个带有高光贴图的立方体。", new Demo_SpecularMap(world));
+		world->addDemo(L"PBR: 演示PBR渲染。", new Demo_PBR(world));
+		world->addDemo(L"PBR: 演示同时通过Phong模型和PBR模型渲染。", new Demo_Phong_PBR(world));
 		world->init();
 	}
 }
@@ -244,13 +245,6 @@ void DemonstrationWorld::init()
 	d->mainWidget->setTitleVisible(true);
 	d->mainWidget->setKeyboardInput(true);
 
-	if (stxingka != gm::GMInvalidFontHandle)
-	{
-		gm::GMStyle style = d->mainWidget->getTitleStyle();
-		style.setFont(stxingka);
-		d->mainWidget->setTitleStyle(style);
-	}
-
 	gm::GMint Y = 10, marginY = 10;
 	for (auto& demo : d->demos)
 	{
@@ -273,16 +267,18 @@ void DemonstrationWorld::init()
 	}
 
 	gm::GMRect txtCorner = { 0, 0, 6, 8 };
+	gm::GMControlTextEdit* textEdit;
 	d->mainWidget->addTextEdit(
 		L"你好，GameWorld",
 		10,
 		Y,
-		480,
+		100,
 		50,
 		false,
 		txtCorner,
-		nullptr
+		&textEdit
 	);
+	textEdit->setPadding(5, 10);
 
 	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(corner);
@@ -309,14 +305,14 @@ void DemonstrationWorld::init()
 	d->manager->registerWidget(d->mainWidget);
 	d->systemWidget->setPosition(600, 60);
 	d->systemWidget->setSize(150, 50);
-	d->systemWidget->setTitle(L"System Menu");
+	d->systemWidget->setTitle(L"系统菜单");
 	d->systemWidget->setTitleVisible(true);
 	d->systemWidget->setKeyboardInput(true);
 
 	{
 		gm::GMControlButton* button = nullptr;
 		d->systemWidget->addButton(
-			L"Quit",
+			L"退出",
 			10,
 			10,
 			130,
@@ -331,6 +327,18 @@ void DemonstrationWorld::init()
 		});
 	}
 	d->systemWidget->addBorder(corner);
+
+	if (stxingka != gm::GMInvalidFontHandle)
+	{
+		gm::GMStyle style = d->mainWidget->getTitleStyle();
+		style.setFont(stxingka);
+		d->mainWidget->setTitleStyle(style);
+
+		style = d->systemWidget->getTitleStyle();
+		style.setFont(stxingka);
+		d->systemWidget->setTitleStyle(style);
+	}
+
 	d->mainWindow->addWidget(d->systemWidget);
 }
 

@@ -340,6 +340,9 @@ void GMGLUtility::blendFunc(
 		case GMS_BlendFunc::ONE_MINUS_DST_COLOR:
 			factors[i] = GL_ONE_MINUS_DST_COLOR;
 			break;
+		case GMS_BlendFunc::ONE_MINUS_SRC_COLOR:
+			factors[i] = GL_ONE_MINUS_SRC_COLOR;
+			break;
 		case GMS_BlendFunc::ONE_MINUS_DST_ALPHA:
 			factors[i] = GL_ONE_MINUS_DST_ALPHA;
 			break;

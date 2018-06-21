@@ -212,6 +212,8 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	}
 	GMTypoResult eof;
 	eof.newLineOrEOFSeparator = true;
+	if (!d->results.empty())
+		eof.x = d->results[d->results.size() - 1].x;
 	d->results.push_back(eof);
 	++rows;
 
@@ -517,19 +519,29 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 	if (d->dirty)
 		analyze();
 
-	if (trail)
-		*trail = false;
-
 	if (x < 0)
 		return 0;
 
 	auto& r = d->engine->getResults();
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)
 	{
-		if (r[i].x <= x && r[i + 1].x > x)
+		if (r[i].x == x)
+		{
+			if (cp)
+				*cp = i - 1;
+
+			if (trail)
+				*trail = true;
+
+			return true;
+		}
+		else if (r[i].x < x && r[i + 1].x > x)
 		{
 			if (cp)
 				*cp = i;
+
+			if (trail)
+				*trail = false;
 
 			return true;
 		}
@@ -537,6 +549,8 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 	
 	if (cp)
 		*cp = r.size() - 1;
+	if (trail)
+		*trail = false;
 
 	return true;
 }

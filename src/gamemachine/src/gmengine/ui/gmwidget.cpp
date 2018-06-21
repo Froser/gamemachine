@@ -57,7 +57,7 @@ namespace
 	}
 }
 
-class GMInverseSprite2DGameObject : public GMSprite2DGameObject
+class GMOpaqueSprite2DGameObject : public GMSprite2DGameObject
 {
 public:
 	using GMSprite2DGameObject::GMSprite2DGameObject;
@@ -66,10 +66,7 @@ protected:
 	virtual void setShader(GMShader& shader) override
 	{
 		GMSprite2DGameObject::setShader(shader);
-		shader.setBlend(true);
-		shader.setBlendFactorSource(GMS_BlendFunc::ONE);
-		shader.setBlendFactorDest(GMS_BlendFunc::ONE_MINUS_DST_ALPHA);
-		shader.setBlendOp(GMS_BlendOp::REVERSE_SUBSTRACT);
+		shader.setBlend(false);
 	}
 };
 
@@ -141,8 +138,8 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 	d->spriteObject = new GMSprite2DGameObject(context->getWindow()->getRenderRect());
 	d->spriteObject->setContext(context);
 
-	d->inverseSpriteObject = new GMInverseSprite2DGameObject(context->getWindow()->getRenderRect());
-	d->inverseSpriteObject->setContext(context);
+	d->opaqueSpriteObject = new GMOpaqueSprite2DGameObject(context->getWindow()->getRenderRect());
+	d->opaqueSpriteObject->setContext(context);
 
 	d->borderObject = new GMBorder2DGameObject(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
@@ -455,7 +452,7 @@ void GMWidget::drawSprite(
 void GMWidget::drawRect(
 	const GMVec4& bkColor,
 	const GMRect& rc,
-	bool inverseBackgroundColor,
+	bool isOpaque,
 	GMfloat depth
 )
 {
@@ -471,7 +468,7 @@ void GMWidget::drawRect(
 	GMuint texId = d->whiteTextureStyle.getTexture();
 	const GMCanvasTextureInfo& texInfo = d->manager->getTexture(d->whiteTextureStyle.getTexture());
 
-	GMSprite2DGameObject* spriteObject = inverseBackgroundColor ? d->manager->getInverseSpriteObject() : d->manager->getSpriteObject();
+	GMSprite2DGameObject* spriteObject = isOpaque ? d->manager->getOpaqueSpriteObject() : d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
 	spriteObject->setGeometry(targetRc);
 	spriteObject->setTexture(texInfo.texture);

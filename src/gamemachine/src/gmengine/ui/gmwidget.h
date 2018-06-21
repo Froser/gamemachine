@@ -95,7 +95,7 @@ GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 	const IRenderContext* context = nullptr;
 	GMTextGameObject* textObject = nullptr;
 	GMSprite2DGameObject* spriteObject = nullptr;
-	GMSprite2DGameObject* inverseSpriteObject = nullptr;
+	GMSprite2DGameObject* opaqueSpriteObject = nullptr;
 	GMBorder2DGameObject* borderObject = nullptr;
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
@@ -172,10 +172,10 @@ public:
 		return d->spriteObject;
 	}
 
-	inline GMSprite2DGameObject* getInverseSpriteObject()
+	inline GMSprite2DGameObject* getOpaqueSpriteObject()
 	{
 		D(d);
-		return d->inverseSpriteObject;
+		return d->opaqueSpriteObject;
 	}
 
 	inline GMBorder2DGameObject* getBorderObject()
@@ -393,7 +393,7 @@ public:
 	void drawRect(
 		const GMVec4& bkColor,
 		const GMRect& rc,
-		bool inverseBackgroundColor,
+		bool isOpaque,
 		GMfloat depth
 	);
 

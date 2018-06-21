@@ -103,6 +103,8 @@ namespace
 			return D3D11_BLEND_INV_SRC_ALPHA;
 		case (GMS_BlendFunc::ONE_MINUS_DST_ALPHA):
 			return D3D11_BLEND_INV_DEST_ALPHA;
+		case (GMS_BlendFunc::ONE_MINUS_SRC_COLOR):
+			return D3D11_BLEND_INV_SRC_COLOR;
 		case (GMS_BlendFunc::ONE_MINUS_DST_COLOR):
 			return D3D11_BLEND_INV_DEST_COLOR;
 		default:
