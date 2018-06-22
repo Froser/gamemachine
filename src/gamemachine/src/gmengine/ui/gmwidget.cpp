@@ -551,6 +551,14 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	if (!getVisible())
 		return false;
 
+	if (s_controlFocus &&
+		s_controlFocus->getParent() == this &&
+		s_controlFocus->getEnabled())
+	{
+		if (s_controlFocus->msgProc(event))
+			return true;
+	}
+
 	GMSystemEventType type = event->getType();
 	switch (type)
 	{

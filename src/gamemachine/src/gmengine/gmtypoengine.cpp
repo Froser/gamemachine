@@ -43,14 +43,14 @@ GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
 	d->typoEngine = engine;
 }
 
-GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMwchar& ch)
+GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(bool isPlainText, REF GMwchar& ch)
 {
 	D(d);
 	switch (d->state)
 	{
 	case GMTypoStateMachineParseState::Literature:
 	{
-		if (ch == '[')
+		if (!isPlainText && ch == '[')
 		{
 			d->state = GMTypoStateMachineParseState::WaitingForCommand;
 			return Ignore;
@@ -59,12 +59,12 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMwchar& ch)
 	}
 	case GMTypoStateMachineParseState::WaitingForCommand:
 	{
-		if (ch == '[')
+		if (!isPlainText && ch == '[')
 		{
 			d->state = GMTypoStateMachineParseState::Literature;
 			return Okay;
 		}
-		else if (ch == ']')
+		else if (!isPlainText && ch == ']')
 		{
 			d->state = GMTypoStateMachineParseState::Literature;
 			return Ignore;
@@ -73,13 +73,13 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(REF GMwchar& ch)
 		{
 			d->state = GMTypoStateMachineParseState::ParsingSymbol;
 			d->parsedSymbol = "";
-			return parse(ch);
+			return parse(isPlainText, ch);
 		}
 		break;
 	}
 	case GMTypoStateMachineParseState::ParsingSymbol:
 	{
-		if (ch == ']')
+		if (!isPlainText && ch == ']')
 		{
 			d->state = GMTypoStateMachineParseState::Literature;
 			return applyAttribute();
@@ -279,7 +279,8 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	D(d);
 	GMTypoResult result;
 	GMwchar ch = d->literature[index];
-	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(ch);
+	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(d->options.plainText, ch);
+
 	if (parseResult == GMTypoStateMachine::Ignore)
 	{
 		result.valid = false;
@@ -295,6 +296,9 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 
 	const GMGlyphInfo& glyph = d->glyphManager->getChar(ch, d->fontSize, d->font);
 	result.glyph = &glyph;
+
+	if (std::isspace(ch, std::locale()))
+		result.isSpace = true;
 
 	result.lineHeight = d->lineHeight;
 	result.fontSize = d->fontSize;
@@ -422,6 +426,27 @@ bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 	return true;
 }
 
+bool GMTypoTextBuffer::insertString(GMsize_t pos, const GMString& str)
+{
+	D(d);
+	if (pos < 0)
+		return false;
+
+	if (pos == d->buffer.length())
+	{
+		d->buffer.append(str);
+	}
+	else
+	{
+		GMString newStr = d->buffer.substr(0, pos);
+		newStr.append(str);
+		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
+		d->buffer = std::move(newStr);
+	}
+	setDirty();
+	return true;
+}
+
 bool GMTypoTextBuffer::removeChar(GMsize_t pos)
 {
 	D(d);
@@ -483,6 +508,7 @@ void GMTypoTextBuffer::analyze()
 	GMTypoOptions options;
 	options.typoArea = d->rc;
 	options.newline = d->newline;
+	options.plainText = true;
 	d->engine->begin(d->buffer, options);
 	d->dirty = false;
 }
@@ -557,10 +583,32 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 
 void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
 {
-	*prior = cp;
+	D(d);
+	auto& r = d->engine->getResults();
+	for (GMsize_t i = cp - 1; i > 0; --i)
+	{
+		if (!r[i].isSpace && r[i - 1].isSpace)
+		{
+			*prior = i;
+			return;
+		}
+	}
+
+	*prior = 0;
 }
 
 void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 {
-	*next = cp;
+	D(d);
+	auto& r = d->engine->getResults();
+	for (GMsize_t i = cp; i < r.size() - 2; ++i)
+	{
+		if (r[i].isSpace && !r[i + 1].isSpace)
+		{
+			*next = i + 1;
+			return;
+		}
+	}
+
+	*next = r.size() - 1;
 }

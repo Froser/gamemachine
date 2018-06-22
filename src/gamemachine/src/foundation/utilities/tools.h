@@ -446,5 +446,19 @@ struct GMConvertion
 	static bool hexToRGB(const GMString& hex, GMfloat rgb[3]);
 };
 
+enum class GMClipboardMIME
+{
+	Text,
+	Bitmap,
+	Riff,
+	Wave,
+	UnicodeText,
+};
+
+struct GMClipboard
+{
+	static void setData(GMClipboardMIME mime, const GMBuffer& buffer);
+	static GMBuffer getData(GMClipboardMIME mime);
+};
 END_NS
 #endif

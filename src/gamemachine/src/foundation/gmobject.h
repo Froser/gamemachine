@@ -327,63 +327,20 @@ protected:
 // 缓存类，用于存储缓存数据
 struct GMBuffer
 {
-	GMBuffer()
-		: buffer(nullptr)
-		, size(0)
-		, needRelease(false)
-	{
-	}
+	GMBuffer() = default;
+	~GMBuffer();
 
-	~GMBuffer()
-	{
-		if (needRelease)
-		{
-			GM_delete_array(buffer);
-		}
-	}
+	GMBuffer(GMBuffer&& rhs) noexcept;
+	GMBuffer& operator =(GMBuffer&& rhs) noexcept;
+	GMBuffer& operator =(const GMBuffer& rhs);
 
-	GMBuffer(GMBuffer&& rhs) noexcept
-	{
-		swap(rhs);
-	}
+	void convertToStringBuffer();
+	void convertToStringBufferW();
+	void swap(GMBuffer& rhs);
 
-	GMBuffer& operator =(GMBuffer&& rhs) noexcept
-	{
-		swap(rhs);
-		return *this;
-	}
-
-	GMBuffer& operator =(const GMBuffer& rhs)
-	{
-		this->needRelease = rhs.needRelease;
-		this->size = rhs.size;
-		buffer = new GMbyte[this->size];
-		memcpy(buffer, rhs.buffer, this->size);
-		return *this;
-	}
-
-	void convertToStringBuffer()
-	{
-		GMbyte* newBuffer = new GMbyte[size + 1];
-		memcpy(newBuffer, buffer, size);
-		newBuffer[size] = 0;
-		size++;
-		if (needRelease && buffer)
-			GM_delete_array(buffer);
-		needRelease = true;
-		buffer = newBuffer;
-	}
-
-	void swap(GMBuffer& rhs)
-	{
-		GM_SWAP(buffer, rhs.buffer);
-		GM_SWAP(size, rhs.size);
-		GM_SWAP(needRelease, rhs.needRelease);
-	}
-
-	GMbyte* buffer;
-	GMuint size;
-	bool needRelease; // 表示是否需要手动释放
+	GMbyte* buffer = nullptr;
+	GMuint size = 0;
+	bool needRelease = false; // 表示是否需要手动释放
 };
 
 END_NS

@@ -60,6 +60,7 @@ protected:
 	void placeCaret(GMint cP);
 	void moveCaret(bool next, bool newItem, bool select);
 	void deleteSelectionText();
+	void selectAll();
 	void resetCaretBlink();
 	void copyToClipboard();
 	void pasteFromClipboard();
@@ -98,6 +99,7 @@ private:
 	void handleMouseCaret(const GMPoint& pt, bool selectStart);
 	GMint getCaretHeight();
 	GMint getCaretTop();
+	void moveFirstVisibleCp(GMint distance);
 };
 
 END_NS

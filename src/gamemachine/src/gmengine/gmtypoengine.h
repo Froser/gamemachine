@@ -19,6 +19,7 @@ struct GMTypoResult
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
 	bool newLineOrEOFSeparator = false;
+	bool isSpace = false;
 };
 
 struct ITypoEngine;
@@ -55,6 +56,7 @@ struct GMTypoOptions
 	GMRect typoArea = { 0, 0, -1, -1 }; // 排版框，排版引擎将在此框内排版
 	bool center = false;
 	bool newline = true;
+	bool plainText = false;
 };
 
 GM_INTERFACE(ITypoEngine)
@@ -103,7 +105,7 @@ public:
 	GMTypoStateMachine(GMTypoEngine* engine);
 
 public:
-	virtual ParseResult parse(REF GMwchar& ch);
+	virtual ParseResult parse(bool isPlainText, REF GMwchar& ch);
 	virtual void createInstance(GMTypoEngine* engine, OUT GMTypoStateMachine**);
 
 protected:
@@ -214,6 +216,7 @@ public:
 public:
 	void setChar(GMsize_t pos, GMwchar ch);
 	bool insertChar(GMsize_t pos, GMwchar ch);
+	bool insertString(GMsize_t pos, const GMString& str);
 	bool removeChar(GMsize_t pos);
 	bool removeChars(GMsize_t startPos, GMsize_t endPos);
 	GMint getLength();

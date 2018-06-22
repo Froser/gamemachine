@@ -8,6 +8,11 @@ GMControl::GMControl(GMWidget* widget)
 	d->widget = widget;
 }
 
+bool GMControl::msgProc(GMSystemEvent* event)
+{
+	return false;
+}
+
 bool GMControl::handleKeyboard(GMSystemKeyEvent* event)
 {
 	bool handled = false;

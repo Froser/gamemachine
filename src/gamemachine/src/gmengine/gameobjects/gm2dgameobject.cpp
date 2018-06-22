@@ -241,6 +241,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		options.center = d->center;
 		options.typoArea.width = coord.width * rect.width * .5f;
 		options.typoArea.height = coord.height * rect.height * .5f;
+		options.plainText = d->colorType == GMTextColorType::Plain;
 
 		GM_ASSERT(typoEngine);
 		const GMfloat *pResultColor = ValuePointer(d->color);
@@ -253,8 +254,11 @@ void GMTextGameObject::updateVertices(GMModel* model)
 				continue;
 
 			const GMGlyphInfo& glyph = *typoResult.glyph;
-			if (d->colorType == GMTextColorType::ByScript)
+			if (!options.plainText)
+			{
+				//富文本的情况，使用推导出来的颜色
 				pResultColor = typoResult.color;
+			}
 
 			if (glyph.width > 0 && glyph.height > 0)
 			{

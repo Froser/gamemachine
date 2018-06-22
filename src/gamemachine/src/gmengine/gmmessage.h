@@ -184,6 +184,44 @@ enum GMKey
 	GMKey_Oem_Clear,
 };
 
+enum GMFunctionCharacter
+{
+	GMFunctionCharacter_Ctrl_At,			//NUL
+	GMFunctionCharacter_Ctrl_A,				//SOL
+	GMFunctionCharacter_Ctrl_B,				//STX
+	GMFunctionCharacter_Ctrl_C,				//ETX
+	GMFunctionCharacter_Ctrl_D,				//EOT
+	GMFunctionCharacter_Ctrl_E,				//ENQ
+	GMFunctionCharacter_Ctrl_F,				//ACK
+	GMFunctionCharacter_Ctrl_G,				//BEL
+	GMFunctionCharacter_Ctrl_H,				//BS
+	GMFunctionCharacter_Ctrl_I,				//HT
+	GMFunctionCharacter_Ctrl_J,				//LF
+	GMFunctionCharacter_Ctrl_K,				//VT
+	GMFunctionCharacter_Ctrl_L,				//FF
+	GMFunctionCharacter_Ctrl_M,				//CR
+	GMFunctionCharacter_Ctrl_N,				//SO
+	GMFunctionCharacter_Ctrl_O,				//SI
+	GMFunctionCharacter_Ctrl_P,				//DLE
+	GMFunctionCharacter_Ctrl_Q,				//DC1
+	GMFunctionCharacter_Ctrl_R,				//DC2
+	GMFunctionCharacter_Ctrl_S,				//DC3
+	GMFunctionCharacter_Ctrl_T,				//DC4
+	GMFunctionCharacter_Ctrl_U,				//NAK
+	GMFunctionCharacter_Ctrl_V,				//SYN
+	GMFunctionCharacter_Ctrl_W,				//ETB
+	GMFunctionCharacter_Ctrl_X,				//CAN
+	GMFunctionCharacter_Ctrl_Y,				//EM
+	GMFunctionCharacter_Ctrl_Z,				//SUB
+	GMFunctionCharacter_Ctrl_LeftBracket,	//ESC
+	GMFunctionCharacter_Ctrl_RightBracket,	//FS
+	GMFunctionCharacter_Ctrl_Separator,		//GS
+	GMFunctionCharacter_Ctrl_Caret	,		//RS
+	GMFunctionCharacter_Ctrl_Underline,		//US
+	GMFunctionCharacter_Space,				//SP
+	GMFunctionCharacter_Ctrl_Delete = 127,	//DEL
+};
+
 enum GMMouseButtonType
 {
 	GMMouseButton_None = 0x00,

@@ -83,9 +83,16 @@ public:
 		return d->hasFocus;
 	}
 
-	// Message handler
-	virtual bool handleKeyboard(GMSystemKeyEvent* event);
-	virtual bool handleMouse(GMSystemMouseEvent* event);
+	bool handleKeyboard(GMSystemKeyEvent* event);
+	bool handleMouse(GMSystemMouseEvent* event);
+
+	//! 控件第一次处理消息的方法。
+	/*!
+	  当一个系统消息发送到此控件后，此方法会比处理键盘、鼠标消息函数更早调用。<BR>
+	  如果返回true，表示此消息已经被处理，之后的消息函数将不会被调用。
+	  \return 是否已经处理此消息。
+	*/
+	virtual bool msgProc(GMSystemEvent* event);
 
 	// Events
 	virtual bool onKeyDown(GMSystemKeyEvent* event)
