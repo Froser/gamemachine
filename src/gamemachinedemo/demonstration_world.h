@@ -21,6 +21,7 @@ GM_PRIVATE_OBJECT(DemoHandler)
 	bool activating = false;
 	gm::GMGameWorld* demoWorld = nullptr;
 	gm::IGraphicEngine* engine = nullptr;
+	gm::GMWidget* mainWidget = nullptr;
 };
 
 class DemoHandler : public gm::GMObject
@@ -37,6 +38,7 @@ public:
 	virtual void onActivate();
 	virtual void onDeactivate();
 	virtual void event(gm::GameMachineHandlerEvent evt);
+	virtual gm::GMWidget* getWidget();
 
 protected:
 	virtual void setLookAt();
@@ -46,6 +48,7 @@ protected:
 	void backToEntrance();
 	bool isActivating();
 	void switchNormal();
+	void createDefaultWidget();
 
 	inline gm::GMGameWorld*& getDemoWorldReference()
 	{

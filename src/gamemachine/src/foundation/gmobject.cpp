@@ -130,6 +130,11 @@ GMBuffer::~GMBuffer()
 	}
 }
 
+GMBuffer::GMBuffer(const GMBuffer& rhs)
+{
+	*this = rhs;
+}
+
 GMBuffer::GMBuffer(GMBuffer&& rhs) noexcept
 {
 	swap(rhs);

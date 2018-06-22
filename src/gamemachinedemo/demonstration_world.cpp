@@ -57,6 +57,7 @@ DemoHandler::~DemoHandler()
 {
 	D(d);
 	GM_delete(getDemoWorldReference());
+	GM_delete(d->mainWidget);
 }
 
 void DemoHandler::init()
@@ -78,6 +79,10 @@ void DemoHandler::onActivate()
 	setLookAt();
 	setDefaultLights();
 	d->activating = true;
+
+	gm::GMWidget* widget = getWidget();
+	if (widget)
+		widget->setVisible(true);
 }
 
 void DemoHandler::onDeactivate()
@@ -87,6 +92,10 @@ void DemoHandler::onDeactivate()
 	d->engine->removeLights();
 	d->renderConfig.set(gm::GMRenderConfigs::FilterMode, gm::GMFilterMode::None);
 	d->activating = false;
+
+	gm::GMWidget* widget = getWidget();
+	if (widget)
+		widget->setVisible(false);
 
 	gm::GMShadowSourceDesc noShadow;
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
@@ -125,6 +134,12 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 		}
 		break;
 	}
+}
+
+gm::GMWidget* DemoHandler::getWidget()
+{
+	D(d);
+	return d->mainWidget;
 }
 
 void DemoHandler::setLookAt()
@@ -173,6 +188,50 @@ void DemoHandler::switchNormal()
 		gm::GMDebugConfigs::DrawPolygonNormalMode,
 		(d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt() + 1) % gm::GMDrawPolygonNormalMode::EndOfEnum
 	);
+}
+
+void DemoHandler::createDefaultWidget()
+{
+	D(d);
+	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
+	d->mainWidget = new gm::GMWidget(getDemonstrationWorld()->getManager());
+	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget);
+
+	{
+		gm::GMRect rc = { 0, 0, 136, 54 };
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonArea, rc);
+	}
+	{
+		gm::GMRect rc = { 136, 0, 116, 54 };
+		d->mainWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
+	}
+	{
+		gm::GMRect rc = { 8, 82, 238, 39 };
+		d->mainWidget->addArea(gm::GMTextureArea::TextEditBorderArea, rc);
+	}
+	{
+		gm::GMRect rc = { 0, 0, 280, 287 };
+		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
+	}
+
+	d->mainWidget->setTitle(L"选项菜单");
+	d->mainWidget->setTitleVisible(true);
+
+	if (stxingka != gm::GMInvalidFontHandle)
+	{
+		gm::GMStyle style = d->mainWidget->getTitleStyle();
+		style.setFont(stxingka);
+		d->mainWidget->setTitleStyle(style);
+	}
+
+	d->mainWidget->setKeyboardInput(true);
+	d->mainWidget->setVisible(false);
+
+	gm::GMRect corner = { 0,0,75,42 };
+	d->mainWidget->addBorder(corner);
+	d->mainWidget->setPosition(10, 60);
+	d->mainWidget->setSize(300, 500);
+	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget);
 }
 
 DemonstrationWorld::DemonstrationWorld(const gm::IRenderContext* context, gm::IWindow* window)

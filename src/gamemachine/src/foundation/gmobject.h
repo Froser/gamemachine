@@ -330,6 +330,7 @@ struct GMBuffer
 	GMBuffer() = default;
 	~GMBuffer();
 
+	GMBuffer(const GMBuffer& rhs);
 	GMBuffer(GMBuffer&& rhs) noexcept;
 	GMBuffer& operator =(GMBuffer&& rhs) noexcept;
 	GMBuffer& operator =(const GMBuffer& rhs);

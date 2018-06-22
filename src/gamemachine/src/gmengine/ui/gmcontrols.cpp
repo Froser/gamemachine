@@ -337,6 +337,11 @@ void GMControlBorder::render(GMfloat elapsed)
 	widget->drawBorder(d->borderStyle, d->corner, db->boundingBox, .8f);
 }
 
+bool GMControlBorder::containsPoint(const GMPoint& point)
+{
+	return false;
+}
+
 void GMControlBorder::setCorner(const GMRect& corner)
 {
 	D(d);

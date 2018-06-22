@@ -324,13 +324,16 @@ void GMWidget::addBorder(
 )
 {
 	D(d);
+	d->borderMarginLeft = marginLeft;
+	d->borderMarginTop = marginTop;
+
 	addBorder(
 		-marginLeft,
 		-marginTop - getTitleHeight(),
 		d->width + 2 * marginLeft,
 		d->height + 2 * (getTitleHeight() + marginTop),
 		corner,
-		nullptr
+		&d->borderControl
 	);
 }
 
@@ -343,6 +346,7 @@ void GMWidget::addBorder(
 	OUT GMControlBorder** out
 )
 {
+	D(d);
 	GMControlBorder* borderControl = new GMControlBorder(this);
 	if (out)
 		*out = borderControl;
@@ -520,6 +524,14 @@ void GMWidget::requestFocus(GMControl* control)
 
 	control->onFocusIn();
 	s_controlFocus = control;
+}
+
+void GMWidget::setSize(GMint width, GMint height)
+{
+	D(d);
+	d->width = width;
+	d->height = height;
+	onUpdateSize();
 }
 
 bool GMWidget::initControl(GMControl* control)
@@ -745,6 +757,16 @@ void GMWidget::onRenderTitle()
 	rc.x += d->titleOffset.x;
 	rc.y += d->titleOffset.y;
 	drawText(d->titleText, d->titleStyle, rc);
+}
+
+void GMWidget::onUpdateSize()
+{
+	D(d);
+	if (d->borderControl)
+	{
+		d->borderControl->setPosition(-d->borderMarginLeft, -d->borderMarginTop - getTitleHeight());
+		d->borderControl->setSize(d->width + 2 * d->borderMarginLeft, d->height + 2 * (getTitleHeight() + d->borderMarginTop));
+	}
 }
 
 void GMWidget::render(GMfloat elpasedTime)

@@ -73,6 +73,12 @@ GMFontHandle GMGlyphManager::addFontByFullName(const GMString& fontFullName)
 {
 	D(d);
 	// 这是一个非线程安全的方法
+	for (GMsize_t i = 0; i < d->fonts.size(); ++i)
+	{
+		if (d->fonts[i].fontPath == fontFullName)
+			return i;
+	}
+
 	GMFont font;
 	FT_Face face;
 	FT_Error err = loadFace(fontFullName, &face);

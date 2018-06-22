@@ -11,7 +11,6 @@ GM_PRIVATE_OBJECT(Demo_Sound)
 	gm::IAudioFile* mp3File = nullptr;
 	gm::IAudioSource* wavSource = nullptr;
 	gm::IAudioSource* mp3Source = nullptr;
-	gm::GMWidget* widget = nullptr;
 };
 
 class Demo_Sound : public DemoHandler

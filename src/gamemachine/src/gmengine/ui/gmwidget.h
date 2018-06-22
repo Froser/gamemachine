@@ -271,6 +271,9 @@ GM_PRIVATE_OBJECT(GMWidget)
 	GMWidget* prevWidget; // 上一个Widget默认为自己
 	Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
+	GMControlBorder* borderControl = nullptr;
+	GMint borderMarginLeft = 10;
+	GMint borderMarginTop = 30;
 	GMfloat timeLastRefresh = 0;
 	GMControl* controlMouseOver = nullptr;
 	bool nonUserEvents = false;
@@ -405,6 +408,7 @@ public:
 	);
 
 	void requestFocus(GMControl* control);
+	void setSize(GMint width, GMint height);
 
 public:
 	virtual bool msgProc(GMSystemEvent* event);
@@ -413,6 +417,7 @@ public:
 	virtual bool onTitleMouseMove(const GMSystemMouseEvent* event);
 	virtual bool onTitleMouseUp(const GMSystemMouseEvent* event);
 	virtual void onRenderTitle();
+	virtual void onUpdateSize();
 
 private:
 	bool initControl(GMControl* control);
@@ -493,18 +498,18 @@ public:
 		d->keyboardInput = keyboardInput;
 	}
 
-	inline void setSize(GMint width, GMint height)
-	{
-		D(d);
-		d->width = width;
-		d->height = height;
-	}
-
 	inline void setPosition(GMint x, GMint y)
 	{
 		D(d);
 		d->x = x;
 		d->y = y;
+	}
+
+	inline void setBorderMargin(GMint left, GMint top)
+	{
+		D(d);
+		d->borderMarginLeft = left;
+		d->borderMarginTop = top;
 	}
 
 	inline GMint getTitleHeight()

@@ -355,6 +355,7 @@ public:
 
 public:
 	virtual void render(GMfloat elapsed) override;
+	virtual bool containsPoint(const GMPoint& point) override;
 
 public:
 	void setCorner(const GMRect& corner);
