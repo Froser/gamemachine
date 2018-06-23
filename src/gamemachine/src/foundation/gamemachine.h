@@ -234,6 +234,9 @@ public:
 	*/
 	bool removeWindow(IWindow* window);
 
+	//! 退出程序。
+	void exit();
+
 private:
 	void runEventLoop();
 	bool renderFrame();

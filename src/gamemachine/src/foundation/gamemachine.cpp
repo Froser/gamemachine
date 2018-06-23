@@ -150,6 +150,11 @@ bool GameMachine::removeWindow(IWindow* window)
 	return count > 0;
 }
 
+void GameMachine::exit()
+{
+	postMessage({ gm::GameMachineMessageType::QuitGameMachine });
+}
+
 bool GameMachine::renderFrame()
 {
 	D(d);

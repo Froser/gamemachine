@@ -358,15 +358,6 @@ public:
 		const GMint marginTop = 30
 	);
 
-	void addBorder(
-		GMint x,
-		GMint y,
-		GMint width,
-		GMint height,
-		const GMRect& cornerRect,
-		OUT GMControlBorder** out
-	);
-
 	void addTextEdit(
 		const GMString& text,
 		GMint x,
@@ -418,6 +409,16 @@ public:
 	virtual bool onTitleMouseUp(const GMSystemMouseEvent* event);
 	virtual void onRenderTitle();
 	virtual void onUpdateSize();
+
+protected:
+	void addBorder(
+		GMint x,
+		GMint y,
+		GMint width,
+		GMint height,
+		const GMRect& cornerRect,
+		OUT GMControlBorder** out
+	);
 
 private:
 	bool initControl(GMControl* control);
@@ -522,6 +523,13 @@ public:
 	{
 		D(d);
 		return d->manager;
+	}
+
+	inline GMRect getSize()
+	{
+		D(d);
+		GMRect rc = { 0, 0, d->width, d->height };
+		return rc;
 	}
 
 public:
