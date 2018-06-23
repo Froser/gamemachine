@@ -9,6 +9,7 @@
 namespace gm
 {
 	class GMWidget;
+	class GMControlLabel;
 }
 
 class DemonstrationWorld;
@@ -22,11 +23,17 @@ GM_PRIVATE_OBJECT(DemoHandler)
 	gm::GMGameWorld* demoWorld = nullptr;
 	gm::IGraphicEngine* engine = nullptr;
 	gm::GMWidget* mainWidget = nullptr;
+	gm::GMControlLabel* lbFPS = nullptr;
+	gm::GMControlLabel* lbRendering = nullptr;
+	gm::GMControlLabel* lbGammaCorrection = nullptr;
 };
 
 class DemoHandler : public gm::GMObject
 {
 	GM_DECLARE_PRIVATE(DemoHandler)
+
+	GM_DECLARE_SIGNAL(renderingChanged);
+	GM_DECLARE_SIGNAL(gammaCorrectionChanged);
 
 public:
 	DemoHandler(DemonstrationWorld* parentDemonstrationWorld);
@@ -48,7 +55,8 @@ protected:
 	void backToEntrance();
 	bool isActivating();
 	void switchNormal();
-	void createDefaultWidget();
+	gm::GMWidget* createDefaultWidget();
+	gm::GMint getClientAreaTop();
 
 	inline gm::GMGameWorld*& getDemoWorldReference()
 	{
@@ -72,7 +80,6 @@ GM_PRIVATE_OBJECT(DemonstrationWorld)
 	DemoHandler* currentDemo = nullptr;
 	DemoHandler* nextDemo = nullptr;
 	gm::GMWidget* mainWidget = nullptr;
-	gm::GMWidget* systemWidget = nullptr;
 	gm::IWindow* mainWindow = nullptr;
 	gm::GMWidgetResourceManager* manager = nullptr;
 };

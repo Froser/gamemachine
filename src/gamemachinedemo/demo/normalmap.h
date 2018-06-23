@@ -17,6 +17,8 @@ class Demo_NormalMap : public DemoHandler
 {
 	GM_DECLARE_PRIVATE_AND_BASE(Demo_NormalMap, DemoHandler)
 
+	GM_DECLARE_SIGNAL(rotateStateChanged);
+
 public:
 	using Base::Base;
 

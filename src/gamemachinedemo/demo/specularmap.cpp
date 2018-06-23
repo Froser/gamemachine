@@ -216,7 +216,7 @@ void Demo_SpecularMap::event(gm::GameMachineHandlerEvent evt)
 
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered('N'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
 			switchNormal();
 
 		break;

@@ -68,15 +68,12 @@ void Demo_Sound::init()
 		audio->createPlayerSource(d->mp3File, &d->mp3Source);
 	}
 
-	createDefaultWidget();
-	gm::GMWidget* widget = getWidget();
-	widget->setSize(300, 300);
-
+	gm::GMWidget* widget = createDefaultWidget();
 	gm::GMControlButton* button = nullptr;
 	widget->addButton(
-		"Play WAV",
+		L"播放Wav音频",
 		10,
-		40,
+		getClientAreaTop(),
 		250,
 		30,
 		false,
@@ -87,9 +84,9 @@ void Demo_Sound::init()
 	});
 
 	widget->addButton(
-		"Pause WAV",
+		L"暂停播放Wav音频",
 		10,
-		80,
+		getClientAreaTop() + 40,
 		250,
 		30,
 		false,
@@ -100,9 +97,9 @@ void Demo_Sound::init()
 	});
 
 	widget->addButton(
-		"Stop WAV",
+		L"停止播放Wav音频",
 		10,
-		120,
+		getClientAreaTop() + 80,
 		250,
 		30,
 		false,
@@ -113,9 +110,9 @@ void Demo_Sound::init()
 	});
 
 	widget->addButton(
-		"Play MP3",
+		L"播放MP3音频",
 		10,
-		160,
+		getClientAreaTop() + 120,
 		250,
 		30,
 		false,
@@ -126,9 +123,9 @@ void Demo_Sound::init()
 	});
 
 	widget->addButton(
-		"Pause MP3",
+		L"暂停播放MP3音频",
 		10,
-		200,
+		getClientAreaTop() + 160,
 		250,
 		30,
 		false,
@@ -139,9 +136,9 @@ void Demo_Sound::init()
 	});
 
 	widget->addButton(
-		"Stop MP3",
+		L"停止播放MP3音频",
 		10,
-		240,
+		getClientAreaTop() + 200,
 		250,
 		30,
 		false,

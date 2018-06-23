@@ -254,15 +254,15 @@ protected:
 	virtual void updateRect();
 };
 
-GM_PRIVATE_OBJECT(GMControlStatic)
+GM_PRIVATE_OBJECT(GMControlLabel)
 {
 	GMString text;
 	GMStyle foreStyle;
 };
 
-class GMControlStatic : public GMControl
+class GMControlLabel : public GMControl
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlStatic, GMControl)
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlLabel, GMControl)
 
 public:
 	enum StyleType
@@ -271,7 +271,7 @@ public:
 	};
 
 public:
-	GMControlStatic(GMWidget* widget) : Base(widget) { initStyles(widget); }
+	GMControlLabel(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 public:
 	virtual void render(GMfloat elapsed) override;
@@ -294,6 +294,7 @@ public:
 	}
 
 	void setText(const GMString& text);
+	void setFontColor(const GMVec4& color);
 };
 
 GM_PRIVATE_OBJECT(GMControlButton)
@@ -302,9 +303,9 @@ GM_PRIVATE_OBJECT(GMControlButton)
 	GMStyle fillStyle;
 };
 
-class GMControlButton : public GMControlStatic
+class GMControlButton : public GMControlLabel
 {
-	GM_DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlStatic)
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlButton, GMControlLabel)
 
 public:
 	enum StyleType
@@ -313,7 +314,6 @@ public:
 		FillStyle,
 	};
 
-public:
 	GM_DECLARE_SIGNAL(click);
 	
 public:

@@ -52,7 +52,6 @@ void Demo_Quake3_BSP::init()
 	D_BASE(db, Base);
 	Base::init();
 	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
-	inputManager->getKeyboardState().setIMEState(false);
 
 	gm::GMBSPFactory::createBSPGameWorld(db->parentDemonstrationWorld->getContext(), "gv.bsp", &d->world);
 	db->demoWorld = d->world;
@@ -92,13 +91,13 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMJoystickState state = joyState.joystickState();
 		GMVec3 direction(0);
 
-		if (kbState.keydown('A'))
+		if (kbState.keydown(gm::GM_keyFromASCII('A')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(-1, 0, 0));
-		if (kbState.keydown('D'))
+		if (kbState.keydown(gm::GM_keyFromASCII('D')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(1, 0, 0));
-		if (kbState.keydown('S'))
+		if (kbState.keydown(gm::GM_keyFromASCII('S')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, -1));
-		if (kbState.keydown('W'))
+		if (kbState.keydown(gm::GM_keyFromASCII('W')))
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1));
 
 		if (state.thumbLX > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
@@ -110,20 +109,20 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		if (state.thumbLY > XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE)
 			d->sprite->action(gm::GMMovement::Move, GMVec3(0, 0, 1), GMVec3(gm::GMfloat(state.thumbLY) / SHRT_MAX));
 
-		if (kbState.keyTriggered(VK_SPACE) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
+		if (kbState.keyTriggered(gm::GMKey_Space) || state.buttons & XINPUT_GAMEPAD_RIGHT_SHOULDER || state.buttons & XINPUT_GAMEPAD_LEFT_SHOULDER)
 			d->sprite->action(gm::GMMovement::Jump);
 
-		if (kbState.keyTriggered('V'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('V')))
 			joyState.joystickVibrate(30000, 30000);
-		else if (kbState.keydown('C'))
+		else if (kbState.keydown(gm::GM_keyFromASCII('C')))
 			joyState.joystickVibrate(0, 0);
 
-		if (kbState.keyTriggered('N'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
 			switchNormal();
 
-		if (kbState.keyTriggered('M'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('M')))
 			db->debugConfig.set(gm::GMDebugConfigs::DrawLightmapOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawLightmapOnly_Bool).toBool());
-		if (kbState.keyTriggered('I'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('I')))
 			db->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !db->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
 		gm::GMfloat joystickPitch = 0, joystickYaw = 0;
@@ -150,21 +149,21 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMMouseState ms = mouseState.mouseState();
 		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
-		if (kbState.keyTriggered('P'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('P')))
 			d->world->setRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool).toBool());
 
-		if (kbState.keyTriggered('O'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('O')))
 			d->world->setRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool());
 
-		if (kbState.keyTriggered('R'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('R')))
 			setMouseTrace(!d->mouseTrace);
 
-		if (kbState.keyTriggered('0'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 		for (gm::GMint i = 0; i < 8; ++i)
 		{
-			if (kbState.keyTriggered('1' + (gm::GMint)i))
+			if (kbState.keyTriggered(gm::GM_keyFromASCII('1' + (gm::GMint)i)))
 				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
 		}
 		break;

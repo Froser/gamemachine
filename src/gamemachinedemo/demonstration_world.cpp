@@ -44,6 +44,9 @@ namespace
 	}
 }
 
+GM_DEFINE_SIGNAL(DemoHandler::renderingChanged);
+GM_DEFINE_SIGNAL(DemoHandler::gammaCorrectionChanged);
+
 DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 {
 	D(d);
@@ -107,31 +110,42 @@ void DemoHandler::onDeactivate()
 void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 {
 	D(d);
+	static const gm::GMString s_fwd = L"渲染模式: 正向渲染";
+	static const gm::GMString s_dfr = L"渲染模式: 优先延迟渲染";
+	static const gm::GMString s_gammaOn = L"Gamma校正: 开";
+	static const gm::GMString s_gammaOff = L"Gamma校正: 关";
+
 	switch (evt)
 	{
+	case gm::GameMachineHandlerEvent::Render:
+	{
+		if (d->lbFPS)
+			d->lbFPS->setText(gm::GMString(L"当前FPS: ") + gm::GMString(GM.getGameMachineRunningStates().fps));
+
+		if (d->lbRendering)
+			d->lbRendering->setText(
+				(getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferForwardRendering ? s_fwd : s_dfr)
+			);
+
+		if (d->lbGammaCorrection)
+			d->lbGammaCorrection->setText(
+				(d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool() ? s_gammaOn : s_gammaOff)
+			);
+		break;
+	}
 	case gm::GameMachineHandlerEvent::Activate:
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 
-		if (kbState.keyTriggered(VK_ESCAPE))
+		if (kbState.keyTriggered(gm::GMKey_Escape))
 			backToEntrance();
 
-		if (kbState.keyTriggered('L'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('L')))
 			d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
 
-		if (kbState.keyTriggered('I'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('I')))
 			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
-		if (kbState.keyTriggered('Z'))
-			d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
-
-		if (kbState.keyTriggered('T'))
-		{
-			if (getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferDeferredRendering)
-				getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferForwardRendering);
-			else
-				getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferDeferredRendering);
-		}
 		break;
 	}
 }
@@ -190,7 +204,7 @@ void DemoHandler::switchNormal()
 	);
 }
 
-void DemoHandler::createDefaultWidget()
+gm::GMWidget* DemoHandler::createDefaultWidget()
 {
 	D(d);
 	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
@@ -232,6 +246,100 @@ void DemoHandler::createDefaultWidget()
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(300, 500);
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget);
+
+	gm::GMControlButton* button = nullptr;
+	d->mainWidget->addButton(
+		L"返回主菜单",
+		10,
+		10,
+		250,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		backToEntrance();
+	});
+
+	d->mainWidget->addLabel(
+		L"当前状态:",
+		GMVec4(1, 1, 1, 1),
+		10,
+		50,
+		250,
+		20,
+		false,
+		nullptr
+	);
+
+	d->mainWidget->addLabel(
+		L"",
+		GMVec4(1, 1, 1, 1),
+		10,
+		80,
+		250,
+		20,
+		false,
+		&d->lbFPS
+	);
+	d->mainWidget->addLabel(
+		L"",
+		GMVec4(1, 1, 1, 1),
+		10,
+		110,
+		250,
+		20,
+		false,
+		&d->lbRendering
+	);
+	d->mainWidget->addLabel(
+		L"",
+		GMVec4(1, 1, 1, 1),
+		10,
+		140,
+		250,
+		20,
+		false,
+		&d->lbGammaCorrection
+	);
+
+	d->mainWidget->addButton(
+		L"开启/关闭延迟渲染",
+		10,
+		180,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (getDemoWorldReference()->getRenderPreference() == gm::GMRenderPreference::PreferDeferredRendering)
+			getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferForwardRendering);
+		else
+			getDemoWorldReference()->setRenderPreference(gm::GMRenderPreference::PreferDeferredRendering);
+	});
+
+	d->mainWidget->addButton(
+		L"开启/关闭Gamma校正",
+		10,
+		220,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
+	});
+
+	return d->mainWidget;
+}
+
+gm::GMint DemoHandler::getClientAreaTop()
+{
+	return 260;
 }
 
 DemonstrationWorld::DemonstrationWorld(const gm::IRenderContext* context, gm::IWindow* window)
@@ -251,7 +359,6 @@ DemonstrationWorld::~DemonstrationWorld()
 	}
 
 	GM_delete(d->mainWidget);
-	GM_delete(d->systemWidget);
 	GM_delete(d->manager);
 }
 
@@ -325,6 +432,22 @@ void DemonstrationWorld::init()
 		});
 	}
 
+	gm::GMControlButton* exitButton = nullptr;
+	d->mainWidget->addButton(
+		L"退出程序",
+		10,
+		Y,
+		480,
+		30,
+		false,
+		&exitButton
+	);
+	Y += 30 + marginY;
+	GM_ASSERT(exitButton);
+	exitButton->connect(*exitButton, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		GM.exit();
+	});
+
 	gm::GMRect txtCorner = { 0, 0, 6, 8 };
 	gm::GMControlTextEdit* textEdit;
 	d->mainWidget->addTextEdit(
@@ -342,63 +465,6 @@ void DemonstrationWorld::init()
 	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(corner);
 	d->mainWindow->addWidget(d->mainWidget);
-
-	d->systemWidget = new gm::GMWidget(d->manager);
-	{
-		gm::GMRect rc = { 0, 0, 136, 54 };
-		d->systemWidget->addArea(gm::GMTextureArea::ButtonArea, rc);
-	}
-	{
-		gm::GMRect rc = { 136, 0, 116, 54 };
-		d->systemWidget->addArea(gm::GMTextureArea::ButtonFillArea, rc);
-	}
-	{
-		gm::GMRect rc = { 8, 82, 238, 39 };
-		d->systemWidget->addArea(gm::GMTextureArea::TextEditBorderArea, rc);
-	}
-	{
-		gm::GMRect rc = { 0, 0, 280, 287 };
-		d->systemWidget->addArea(gm::GMTextureArea::BorderArea, rc);
-	}
-
-	d->manager->registerWidget(d->mainWidget);
-	d->systemWidget->setPosition(600, 60);
-	d->systemWidget->setSize(150, 50);
-	d->systemWidget->setTitle(L"系统菜单");
-	d->systemWidget->setTitleVisible(true);
-	d->systemWidget->setKeyboardInput(true);
-
-	{
-		gm::GMControlButton* button = nullptr;
-		d->systemWidget->addButton(
-			L"退出",
-			10,
-			10,
-			130,
-			30,
-			false,
-			&button
-		);
-		Y += 30 + marginY;
-		GM_ASSERT(button);
-		button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
-			GM.postMessage({ gm::GameMachineMessageType::QuitGameMachine });
-		});
-	}
-	d->systemWidget->addBorder(corner);
-
-	if (stxingka != gm::GMInvalidFontHandle)
-	{
-		gm::GMStyle style = d->mainWidget->getTitleStyle();
-		style.setFont(stxingka);
-		d->mainWidget->setTitleStyle(style);
-
-		style = d->systemWidget->getTitleStyle();
-		style.setFont(stxingka);
-		d->systemWidget->setTitleStyle(style);
-	}
-
-	d->mainWindow->addWidget(d->systemWidget);
 }
 
 void DemonstrationWorld::switchDemo()

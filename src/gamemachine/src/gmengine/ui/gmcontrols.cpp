@@ -77,7 +77,7 @@ GMStyle& GMControl::getStyle(StyleType style)
 	return s_style;
 }
 
-void GMControlStatic::render(GMfloat elapsed)
+void GMControlLabel::render(GMfloat elapsed)
 {
 	if (!getVisible())
 		return;
@@ -94,37 +94,43 @@ void GMControlStatic::render(GMfloat elapsed)
 	getParent()->drawText(getText(), foreStyle, db->boundingBox, foreStyle.getShadowStyle().hasShadow, false);
 }
 
-void GMControlStatic::refresh()
+void GMControlLabel::refresh()
 {
 	D(d);
 	Base::refresh();
 	d->foreStyle.refresh();
 }
 
-GMStyle& GMControlStatic::getStyle(Base::StyleType style)
+GMStyle& GMControlLabel::getStyle(Base::StyleType style)
 {
 	D(d);
 	Base::StyleType s = (Base::StyleType)style;
 	switch (s)
 	{
-	case GMControlStatic::ForeStyle:
+	case GMControlLabel::ForeStyle:
 		return d->foreStyle;
 	default:
 		return Base::getStyle(style);
 	}
 }
 
-void GMControlStatic::initStyles(GMWidget* widget)
+void GMControlLabel::initStyles(GMWidget* widget)
 {
 	D(d);
 	d->foreStyle.setFont(0);
 	d->foreStyle.setFontColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, .87f));
 }
 
-void GMControlStatic::setText(const GMString& text)
+void GMControlLabel::setText(const GMString& text)
 {
 	D(d);
 	d->text = text;
+}
+
+void GMControlLabel::setFontColor(const GMVec4& color)
+{
+	GMStyle& style = getStyle((GMControl::StyleType) ForeStyle);
+	style.getFontColor().init(color);
 }
 
 GM_DEFINE_SIGNAL(GMControlButton::click);

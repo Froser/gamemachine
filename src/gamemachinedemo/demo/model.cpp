@@ -315,10 +315,10 @@ void Demo_Model::event(gm::GameMachineHandlerEvent evt)
 
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered('N'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
 			switchNormal();
 
-		if (kbState.keyTriggered('S'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('S')))
 		{
 			if (d->gameObject2 && d->gameObject3)
 			{

@@ -275,25 +275,27 @@ void GMWidget::setTitle(
 	d->titleOffset = offset;
 }
 
-void GMWidget::addStatic(
+void GMWidget::addLabel(
 	const GMString& text,
+	const GMVec4& fontColor,
 	GMint x,
 	GMint y,
 	GMint width,
 	GMint height,
 	bool isDefault,
-	OUT GMControlStatic** out
+	OUT GMControlLabel** out
 )
 {
-	GMControlStatic* staticControl = new GMControlStatic(this);
+	GMControlLabel* labelControl = new GMControlLabel(this);
 	if (out)
-		*out = staticControl;
+		*out = labelControl;
 
-	addControl(staticControl);
-	staticControl->setText(text);
-	staticControl->setPosition(x, y);
-	staticControl->setSize(width, height);
-	staticControl->setIsDefault(isDefault);
+	addControl(labelControl);
+	labelControl->setText(text);
+	labelControl->setPosition(x, y);
+	labelControl->setSize(width, height);
+	labelControl->setFontColor(fontColor);
+	labelControl->setIsDefault(isDefault);
 }
 
 void GMWidget::addButton(

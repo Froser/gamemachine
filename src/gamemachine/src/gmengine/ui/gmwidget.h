@@ -12,7 +12,7 @@ class GMBorder2DGameObject;
 class GMSystemEvent;
 class GMSystemMouseEvent;
 class GMWidget;
-class GMControlStatic;
+class GMControlLabel;
 class GMControlButton;
 class GMControlBorder;
 class GMControlTextEdit;
@@ -332,14 +332,15 @@ public:
 		const GMPoint& offset = { 10, 0 }
 	);
 
-	void addStatic(
+	void addLabel(
 		const GMString& text,
+		const GMVec4& fontColor,
 		GMint x,
 		GMint y,
 		GMint width,
 		GMint height,
 		bool isDefault,
-		OUT GMControlStatic** out
+		OUT GMControlLabel** out
 	);
 
 	void addButton(

@@ -1,6 +1,9 @@
 ﻿#include "stdafx.h"
 #include "normalmap.h"
 #include <linearmath.h>
+#include <gmcontrols.h>
+
+GM_DEFINE_SIGNAL(Demo_NormalMap::rotateStateChanged);
 
 void Demo_NormalMap::init()
 {
@@ -45,6 +48,42 @@ void Demo_NormalMap::init()
 	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	d->gameObject = new gm::GMGameObject(quadAsset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
+
+	gm::GMWidget* widget = createDefaultWidget();
+
+	gm::GMControlLabel* stateLabel = nullptr;
+	widget->addLabel(
+		L"状态：旋转中",
+		GMVec4(1, 1, 1, 1),
+		10,
+		getClientAreaTop() + 10,
+		250,
+		30,
+		false,
+		&stateLabel
+	);
+	gm::GMControlButton* button = nullptr;
+	widget->addButton(
+		L"暂停/继续旋转",
+		10,
+		getClientAreaTop() + 40,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->rotate = !d->rotate;
+		emit(rotateStateChanged);
+	});
+
+	connect(*this, GM_SIGNAL(rotateStateChanged), [=](auto, auto) {
+		if (d->rotate)
+			stateLabel->setText(L"状态：旋转中");
+		else
+			stateLabel->setText(L"状态：已停止");
+	});
 }
 
 void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
@@ -75,15 +114,12 @@ void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)
 	{
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered('P'))
-			d->rotate = !d->rotate;
-
-		if (kbState.keyTriggered('0'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('0')))
 			db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, 0);
 
 		for (gm::GMint i = 0; i < 8; ++i)
 		{
-			if (kbState.keyTriggered('1' + (gm::GMint)i))
+			if (kbState.keyTriggered(gm::GM_keyFromASCII('1' + (gm::GMint)i)))
 				db->debugConfig.set(gm::GMDebugConfigs::FrameBufferIndex_I32, (gm::GMint)i + 1);
 		}
 		break;

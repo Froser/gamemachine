@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "texture.h"
 #include <linearmath.h>
+#include <gmwidget.h>
 
 void Demo_Texture::init()
 {
@@ -39,6 +40,9 @@ void Demo_Texture::init()
 	gm::GMAsset quadAsset = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Model, model);
 	gm::GMGameObject* obj = new gm::GMGameObject(quadAsset);
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", obj);
+
+	gm::GMWidget* widget = createDefaultWidget();
+	widget->setSize(widget->getSize().width, getClientAreaTop() + 40);
 }
 
 void Demo_Texture::event(gm::GameMachineHandlerEvent evt)
@@ -62,7 +66,7 @@ void Demo_Texture::event(gm::GameMachineHandlerEvent evt)
 	{
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered('N'))
+		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
 			switchNormal();
 
 		break;
