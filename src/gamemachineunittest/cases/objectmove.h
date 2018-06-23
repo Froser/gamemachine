@@ -13,8 +13,11 @@ namespace {
 
 	class _Base : public gm::GMObject
 	{
-	public:
 		GM_DECLARE_PRIVATE(_Base)
+		GM_ALLOW_COPY_DATA(_Base)
+
+	public:
+		_Base() = default;
 	};
 
 	GM_PRIVATE_OBJECT(_Derived)
@@ -26,9 +29,11 @@ namespace {
 	class _Derived : public _Base
 	{
 		GM_DECLARE_PRIVATE_AND_BASE(_Derived, _Base)
-		GM_DEFAULT_MOVE_BEHAVIOR(_Derived);
+		GM_ALLOW_COPY_DATA(_Derived)
 
 	public:
+		_Derived() = default;
+
 		_Derived(int _a, int _b, int _c, int _d)
 		{
 			D(d);
