@@ -503,6 +503,17 @@ struct IRenderContext
 	virtual void switchToContext() const = 0;
 };
 
+enum class GMCursorType
+{
+	Arrow,
+	IBeam,
+	Wait,
+	Cross,
+	UpArrow,
+	Hand,
+	EndOfEnum,
+};
+
 GM_INTERFACE_FROM(IWindow, IQueriable)
 {
 	virtual IInput* getInputMananger() = 0;
@@ -522,6 +533,7 @@ GM_INTERFACE_FROM(IWindow, IQueriable)
 	virtual const GMWindowStates& getWindowStates() = 0;
 	virtual IGraphicEngine* getGraphicEngine() = 0;
 	virtual const IRenderContext* getContext() = 0;
+	virtual void setCursor(GMCursorType type) = 0;
 };
 
 GM_INTERFACE(IFactory)

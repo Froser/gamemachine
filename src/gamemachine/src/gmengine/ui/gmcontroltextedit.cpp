@@ -280,6 +280,9 @@ bool GMControlTextEdit::onMouseUp(GMSystemMouseEvent* event)
 {
 	D(d);
 	d->mouseDragging = false;
+	GMWidget* parent = getParent();
+	if (parent)
+		parent->getParentWindow()->setWindowCapture(false);
 	return false;
 }
 
@@ -371,6 +374,24 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	emit(textChanged);
 
 	return true;
+}
+
+void GMControlTextEdit::onMouseEnter()
+{
+	D(d);
+	Base::onMouseEnter();
+	GMWidget* widget = getParent();
+	if (widget)
+		widget->getParentWindow()->setCursor(GMCursorType::IBeam);
+}
+
+void GMControlTextEdit::onMouseLeave()
+{
+	D(d);
+	Base::onMouseEnter();
+	GMWidget* widget = getParent();
+	if (widget)
+		widget->getParentWindow()->setCursor(GMCursorType::Arrow);
 }
 
 bool GMControlTextEdit::canHaveFocus()
@@ -514,7 +535,9 @@ void GMControlTextEdit::handleMouseSelect(GMSystemMouseEvent* event, bool select
 {
 	D(d);
 	d->mouseDragging = true;
-	getParent()->getParentWindow()->setWindowCapture(true);
+	GMWidget* parent = getParent();
+	if (parent)
+		parent->getParentWindow()->setWindowCapture(true);
 	handleMouseCaret(event->getPoint(), selectStart);
 }
 

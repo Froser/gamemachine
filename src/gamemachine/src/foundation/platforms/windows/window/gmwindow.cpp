@@ -45,25 +45,59 @@ namespace
 		return ::DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 
-	namespace
+	bool registerClass(const GMWindowAttributes& wndAttrs, GMWindow* window, const GMwchar* className)
 	{
-		bool registerClass(const GMWindowAttributes& wndAttrs, GMWindow* window, const GMwchar* className)
+		WNDCLASS wc = { 0 };
+		wc.style = 0;
+		wc.cbClsExtra = 0;
+		wc.cbWndExtra = 0;
+		wc.hIcon = NULL;
+		wc.lpfnWndProc = window->getProcHandler();
+		wc.hInstance = wndAttrs.instance;
+		wc.hCursor = NULL;
+		wc.hbrBackground = NULL;
+		wc.lpszMenuName = NULL;
+		wc.lpszClassName = className;
+		ATOM ret = ::RegisterClass(&wc);
+		GM_ASSERT(ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS);
+		return ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
+	}
+
+	HCURSOR getCursor(GMCursorType cursorType)
+	{
+		constexpr GMuint sz = (GMuint)GMCursorType::EndOfEnum;
+		static HCURSOR cursors[sz] = { NULL };
+		if (!cursors[(GMuint)cursorType])
 		{
-			WNDCLASS wc = { 0 };
-			wc.style = 0;
-			wc.cbClsExtra = 0;
-			wc.cbWndExtra = 0;
-			wc.hIcon = NULL;
-			wc.lpfnWndProc = window->getProcHandler();
-			wc.hInstance = wndAttrs.instance;
-			wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-			wc.hbrBackground = NULL;
-			wc.lpszMenuName = NULL;
-			wc.lpszClassName = className;
-			ATOM ret = ::RegisterClass(&wc);
-			GM_ASSERT(ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS);
-			return ret != NULL || ::GetLastError() == ERROR_CLASS_ALREADY_EXISTS;
+			LPCWSTR cursor = NULL;
+			switch (cursorType)
+			{
+			case GMCursorType::Arrow:
+				cursor = IDC_ARROW;
+				break;
+			case GMCursorType::IBeam:
+				cursor = IDC_IBEAM;
+				break;
+			case GMCursorType::Wait:
+				cursor = IDC_WAIT;
+				break;
+			case GMCursorType::Cross:
+				cursor = IDC_CROSS;
+				break;
+			case GMCursorType::UpArrow:
+				cursor = IDC_UPARROW;
+				break;
+			case GMCursorType::Hand:
+				cursor = IDC_HAND;
+				break;
+			default:
+				GM_ASSERT(false);
+				break;
+			}
+
+			cursors[(GMuint)cursorType] = ::LoadCursor(NULL, cursor);
 		}
+		return cursors[(GMuint)cursorType];
 	}
 }
 
@@ -228,6 +262,12 @@ GMWindowHandle GMWindow::create(const GMWindowAttributes& wndAttrs)
 void GMWindow::destroyWindow()
 {
 	PostQuitMessage(0L);
+}
+
+void GMWindow::changeCursor()
+{
+	D(d);
+	::SetCursor(getCursor(d->cursor));
 }
 
 void GMWindow::showWindow()

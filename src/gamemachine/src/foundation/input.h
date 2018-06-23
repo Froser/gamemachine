@@ -41,17 +41,6 @@ struct GMMouseState
 	bool moving;
 };
 
-enum class GMCursorType
-{
-	Arrow,
-	IBeam,
-	Wait,
-	Cross,
-	UpArrow,
-	Hand,
-	Custom,
-};
-
 GM_INTERFACE(IJoystickState)
 {
 	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) = 0;
@@ -60,16 +49,14 @@ GM_INTERFACE(IJoystickState)
 
 GM_INTERFACE(IKeyboardState)
 {
-	virtual bool keydown(GMuint key) = 0;
-	virtual bool keyTriggered(GMuint key) = 0;
-	virtual void setIMEState(bool enabled) = 0;
+	virtual bool keydown(GMKey key) = 0;
+	virtual bool keyTriggered(GMKey key) = 0;
 };
 
 GM_INTERFACE(IMouseState)
 {
 	virtual GMMouseState mouseState() = 0;
 	virtual void setDetectingMode(bool enable) = 0;
-	virtual void setCursor(GMCursorType type) = 0;
 };
 
 GM_INTERFACE(IInput)

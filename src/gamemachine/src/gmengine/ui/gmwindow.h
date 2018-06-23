@@ -36,6 +36,7 @@ GM_PRIVATE_OBJECT(GMWindow)
 	GMWindowStates windowStates;
 	IGraphicEngine* engine = nullptr;
 	IRenderContext* context = nullptr;
+	GMCursorType cursor = GMCursorType::Arrow;
 };
 
 class GMWindow : public GMObject, public IWindow
@@ -60,6 +61,7 @@ public:
 	virtual void setHandler(AUTORELEASE IGameHandler* handler) override;
 	virtual IGameHandler* getHandler() override;
 	virtual const GMWindowStates& getWindowStates() override;
+	virtual void setCursor(GMCursorType cursorType) override;
 
 public:
 	virtual bool getInterface(GameMachineInterfaceID id, void** out) override;
@@ -81,6 +83,7 @@ public:
 
 private:
 	void destroyWindow();
+	void changeCursor();
 };
 
 class GMWindowFactory

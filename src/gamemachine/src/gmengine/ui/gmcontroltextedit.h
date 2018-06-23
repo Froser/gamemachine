@@ -30,7 +30,7 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 
 class GMControlTextEdit : public GMControl
 {
-	GM_DECLARE_PRIVATE(GMControlTextEdit)
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextEdit, GMControl)
 
 public:
 	GM_DECLARE_SIGNAL(textChanged);
@@ -49,6 +49,8 @@ public:
 	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
 	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
 	virtual bool onChar(GMSystemCharEvent* event) override;
+	virtual void onMouseEnter() override;
+	virtual void onMouseLeave() override;
 	virtual bool canHaveFocus() override;
 	virtual void setText(const GMString& text);
 	virtual void setPadding(GMint x, GMint y);

@@ -41,6 +41,7 @@ enum class GMSystemEventType
 	MouseUp,
 	MouseDblClick,
 	MouseWheel,
+	SetCursor,
 };
 
 enum GMKey
@@ -182,7 +183,14 @@ enum GMKey
 	GMKey_Noname,
 	GMKey_Pa1,
 	GMKey_Oem_Clear,
+
+	GMKey_ASCII, // 键盘上的KeyCode从此开始，如'A'就是 GMKey_ASCII + 'A'
 };
+
+inline GMKey GM_keyFromASCII(GMbyte key)
+{
+	return static_cast<GMKey>(GMKey_ASCII + key);
+}
 
 enum GMFunctionCharacter
 {

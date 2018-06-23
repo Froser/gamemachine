@@ -533,7 +533,7 @@ public:
 	}
 
 public:
-	static void clearFocus();
+	static void clearFocus(GMWidget* sender);
 
 	// 一些全局的状态
 	static GMfloat s_timeRefresh;

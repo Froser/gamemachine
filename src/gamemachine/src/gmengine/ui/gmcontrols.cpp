@@ -290,7 +290,7 @@ bool GMControlButton::handleMouseRelease(const GMPoint& pt)
 
 		GMWidget* widget = getParent();
 		if (!widget->canKeyboardInput())
-			widget->clearFocus();
+			widget->clearFocus(widget);
 
 		if (containsPoint(pt))
 		{

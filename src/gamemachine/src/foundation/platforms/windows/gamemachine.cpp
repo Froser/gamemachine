@@ -239,6 +239,9 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 	case WM_SIZE:
 		newSystemEvent = new GMSystemEvent(GMSystemEventType::WindowSizeChanged);
 		break;
+	case WM_SETCURSOR:
+		newSystemEvent = new GMSystemEvent(GMSystemEventType::SetCursor);
+		break;
 	// Keyboard:
 	case WM_KEYDOWN:
 	case WM_SYSKEYDOWN:

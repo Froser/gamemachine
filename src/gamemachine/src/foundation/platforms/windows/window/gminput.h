@@ -68,29 +68,28 @@ public:
 
 	// IKeyboardState
 public:
-	virtual bool keydown(GMuint key) override
-	{
-		D(d);
-		return !!(d->keyState[key] & 0x80);
-	}
+	//! 返回某个键是否此时被按下。
+	/*!
+	  \param key 待测试的键。
+	  \return 返回是否此键被按下。
+	*/
+	virtual bool keydown(GMKey key) override;
 
-	// 表示一个键是否按下一次，长按只算是一次
-	virtual bool keyTriggered(GMuint key) override
-	{
-		D(d);
-		return !(d->lastKeyState[key] & 0x80) && (keydown(key));
-	}
+	//! 表示一个键是否按下一次，长按只算是一次
+	/*!
+	  \param key 按下的键。
+	  \return 返回是否此键被按下一次。
+	*/
+	virtual bool keyTriggered(GMKey key) override;
 
 	// IJoystickState
 public:
 	virtual void joystickVibrate(GMushort leftMotorSpeed, GMushort rightMotorSpeed) override;
 	virtual GMJoystickState joystickState() override;
-	virtual void setIMEState(bool enabled) override;
 
 public:
 	virtual GMMouseState mouseState() override;
 	virtual void setDetectingMode(bool center) override;
-	virtual void setCursor(GMCursorType type) override;
 
 private:
 	void recordMouseDown(GMMouseButton button)

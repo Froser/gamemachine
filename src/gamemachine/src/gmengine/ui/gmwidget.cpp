@@ -840,7 +840,7 @@ void GMWidget::focusDefaultControl()
 	{
 		if (control->isDefault())
 		{
-			clearFocus();
+			clearFocus(this);
 
 			s_controlFocus = control;
 			s_controlFocus->onFocusIn();
@@ -1017,7 +1017,7 @@ void GMWidget::initStyles()
 	d->whiteTextureStyle = whiteTextureStyle;
 }
 
-void GMWidget::clearFocus()
+void GMWidget::clearFocus(GMWidget* sender)
 {
 	if (s_controlFocus)
 	{
@@ -1025,5 +1025,7 @@ void GMWidget::clearFocus()
 		s_controlFocus = nullptr;
 	}
 
-	// TODO ReleaseCapture()
+	IWindow* window = sender->getParentWindow();
+	if (window)
+		window->setWindowCapture(false);
 }

@@ -33,6 +33,9 @@ bool GMWindow::handleSystemEvent(GMSystemEvent* event, REF GMLResult& result)
 	case GMSystemEventType::MouseUp:
 		getInputMananger()->msgProc(event);
 		break;
+	case GMSystemEventType::SetCursor:
+		changeCursor();
+		break;
 	}
 
 	D(d);
@@ -79,4 +82,10 @@ const GMWindowStates& GMWindow::getWindowStates()
 {
 	D(d);
 	return d->windowStates;
+}
+
+void GMWindow::setCursor(GMCursorType cursorType)
+{
+	D(d);
+	d->cursor = cursorType;
 }
