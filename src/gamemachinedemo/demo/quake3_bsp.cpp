@@ -116,9 +116,21 @@ void Demo_Quake3_BSP::init()
 		false,
 		&button
 	);
-
 	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->world->setRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool());
+	});
+
+	widget->addButton(
+		L"开启/关闭只绘制Lightmap",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		db->debugConfig.set(gm::GMDebugConfigs::DrawLightmapOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawLightmapOnly_Bool).toBool());
 	});
 
 	widget->setSize(widget->getSize().width, top + 40);
@@ -183,11 +195,6 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		else if (kbState.keydown(gm::GM_keyFromASCII('C')))
 			joyState.joystickVibrate(0, 0);
 
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
-			switchNormal();
-
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('M')))
-			db->debugConfig.set(gm::GMDebugConfigs::DrawLightmapOnly_Bool, !db->debugConfig.get(gm::GMDebugConfigs::DrawLightmapOnly_Bool).toBool());
 		if (kbState.keyTriggered(gm::GM_keyFromASCII('I')))
 			db->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !db->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 

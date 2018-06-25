@@ -243,13 +243,6 @@ void Demo_Phong_PBR::event(gm::GameMachineHandlerEvent evt)
 
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
-			switchNormal();
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('X')))
-		{
-			gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-			config.set(gm::GMRenderConfigs::HDR_Bool, !config.get(gm::GMRenderConfigs::HDR_Bool).toBool());
-		}
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Deactivate:

@@ -26,6 +26,7 @@ GM_PRIVATE_OBJECT(DemoHandler)
 	gm::GMControlLabel* lbFPS = nullptr;
 	gm::GMControlLabel* lbRendering = nullptr;
 	gm::GMControlLabel* lbGammaCorrection = nullptr;
+	gm::GMControlLabel* lbDebugNormal = nullptr;
 	gm::GMint nextControlTop = 0;
 };
 
@@ -57,7 +58,6 @@ protected:
 protected:
 	void backToEntrance();
 	bool isActivating();
-	void switchNormal();
 	gm::GMint getClientAreaTop();
 
 	inline gm::GMGameWorld*& getDemoWorldReference()
@@ -77,6 +77,9 @@ protected:
 		static GMVec4 c(1, 1, 1, 1);
 		return c;
 	}
+
+private:
+	void switchNormal();
 };
 
 typedef Pair<gm::GMString, DemoHandler*> GameHandlerItem;

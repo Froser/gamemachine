@@ -337,6 +337,7 @@ void GMGLRenderer::applyShader(GMModel* model)
 	prepareFrontFace(model);
 	prepareDepth(model);
 	prepareLine(model);
+	prepareDebug(model);
 }
 
 void GMGLRenderer::prepareFrontFace(GMModel* model)
@@ -423,6 +424,12 @@ void GMGLRenderer::prepareLine(GMModel* model)
 	glLineWidth(shader.getLineWidth());
 }
 
+void GMGLRenderer::prepareDebug(GMModel* model)
+{
+	D(d);
+	GMint mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+	getShaderProgram()->setInt(GM_VariablesDesc.Debug.Normal, mode);
+}
 
 //////////////////////////////////////////////////////////////////////////
 GMGLRenderer_3D::~GMGLRenderer_3D()

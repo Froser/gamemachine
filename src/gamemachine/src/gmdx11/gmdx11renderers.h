@@ -28,6 +28,7 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	ITexture* whiteTexture = nullptr;
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
+	GMDebugConfig debugConfig;
 	ID3D11DeviceContext* deviceContext = nullptr;
 	ID3DX11EffectTechnique* technique = nullptr;
 	ID3DX11EffectRasterizerVariable* rasterizer = nullptr;
@@ -87,6 +88,7 @@ protected:
 	virtual void prepareRasterizer(GMModel* model);
 	virtual void prepareBlend(GMModel* model);
 	virtual void prepareDepthStencil(GMModel* model);
+	virtual void prepareDebug(GMModel* model);
 	virtual void applyTextureAttribute(GMModel* model, ITexture* texture, GMTextureType type);
 
 	ID3DX11EffectTechnique* getTechnique();

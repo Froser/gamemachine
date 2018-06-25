@@ -78,6 +78,11 @@ struct GMShaderVariableHDRDesc
 	const char* ToneMapping;
 };
 
+struct GMShaderVariableDebugDesc
+{
+	const char* Normal;
+};
+
 struct GMShaderVariablesDesc
 {
 	// 矩阵
@@ -128,6 +133,9 @@ struct GMShaderVariablesDesc
 
 	// 模型
 	const char* IlluminationModel;
+
+	// 调试
+	const GMShaderVariableDebugDesc Debug;
 };
 
 struct GMShadowSourceDesc

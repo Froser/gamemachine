@@ -12,8 +12,8 @@ struct GMDrawPolygonNormalMode
 	enum // DRAW_NORMAL
 	{
 		Off,
+		WorldSpace,
 		EyeSpace,
-		DrawCameraSpace,
 		EndOfEnum,
 	};
 };

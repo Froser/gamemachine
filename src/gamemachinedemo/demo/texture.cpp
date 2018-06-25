@@ -63,14 +63,7 @@ void Demo_Texture::event(gm::GameMachineHandlerEvent evt)
 		getDemoWorldReference()->renderScene();
 		break;
 	case gm::GameMachineHandlerEvent::Activate:
-	{
-		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
-		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
-			switchNormal();
-
 		break;
-	}
 	case gm::GameMachineHandlerEvent::Deactivate:
 		break;
 	case gm::GameMachineHandlerEvent::Terminate:

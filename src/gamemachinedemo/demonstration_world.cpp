@@ -360,9 +360,32 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		false,
 		&button
 	);
-
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
+	});
+
+	d->mainWidget->addLabel(
+		"",
+		getLabelFontColor(),
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&d->lbDebugNormal
+	);
+
+	d->mainWidget->addButton(
+		L"查看法向量",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		switchNormal();
 	});
 
 	d->nextControlTop = top + 40;

@@ -82,6 +82,10 @@ static GMShaderVariablesDesc s_defaultShaderVariablesDesc =
 	},
 
 	"GM_IlluminationModel",
+
+	{
+		"GM_Debug_Normal",
+	}
 };
 
 GMint64 GMShadowSourceDesc::version = 0;

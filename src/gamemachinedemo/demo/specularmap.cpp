@@ -215,12 +215,6 @@ void Demo_SpecularMap::event(gm::GameMachineHandlerEvent evt)
 	{
 		handleMouseEvent();
 		handleDragging();
-
-		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
-		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
-			switchNormal();
-
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Deactivate:

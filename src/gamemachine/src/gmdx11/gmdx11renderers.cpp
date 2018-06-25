@@ -473,6 +473,7 @@ GMDx11Renderer::GMDx11Renderer(const IRenderContext* context)
 	GM_ASSERT(d->effect);
 
 	d->deviceContext = getEngine()->getDeviceContext();
+	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 	getVarBank().init(d->effect);
 }
 
@@ -890,6 +891,15 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 	));
 }
 
+void GMDx11Renderer::prepareDebug(GMModel* model)
+{
+	D(d);
+	GMint mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+	
+	IShaderProgram* shaderProgram = getEngine()->getShaderProgram();
+	shaderProgram->setInt(GM_VariablesDesc.Debug.Normal, mode);
+}
+
 ITexture* GMDx11Renderer::getTexture(GMTextureSampler& sampler)
 {
 	D(d);
@@ -931,6 +941,7 @@ void GMDx11Renderer::draw(GMModel* model)
 	prepareBlend(model);
 	prepareDepthStencil(model);
 	prepareTextures(model);
+	prepareDebug(model);
 	passAllAndDraw(model);
 }
 

@@ -56,6 +56,7 @@ protected:
 	void prepareFrontFace(GMModel* model);
 	void prepareDepth(GMModel* model);
 	void prepareLine(GMModel* model);
+	void prepareDebug(GMModel* model);
 
 public:
 	static void dirtyShadowMapAttributes();
