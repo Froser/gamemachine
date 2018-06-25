@@ -63,6 +63,7 @@ DemoHandler::~DemoHandler()
 	D(d);
 	GM_delete(getDemoWorldReference());
 	GM_delete(d->mainWidget);
+	GM_delete(d->demoWorld);
 }
 
 void DemoHandler::init()

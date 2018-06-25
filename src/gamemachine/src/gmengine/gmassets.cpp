@@ -29,7 +29,7 @@ void GMAssets::clearOrphans()
 	for (auto& node : d->orphans)
 	{
 		deleteAsset(node);
-		delete node;
+		GM_delete(node);
 	}
 }
 
@@ -182,7 +182,7 @@ void GMAssets::clearChildNode(GMAssetsNode* self)
 
 	// 清理自身
 	deleteAsset(self);
-	delete self;
+	GM_delete(self);
 }
 
 void GMAssets::deleteAsset(GMAssetsNode* node)

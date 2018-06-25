@@ -381,7 +381,7 @@ void GMPrimitiveCreator::createQuad(GMfloat extents[3], GMfloat position[3], OUT
 
 	{
 		model->setType(type);
-		model->setPrimitiveTopologyMode(GMTopologyMode::TriangleStrip);
+		model->setPrimitiveTopologyMode(GMTopologyMode::Triangles);
 
 		GMMesh* body = new GMMesh(model);
 		GMFloat4 f4_vertex, f4_normal, f4_uv;

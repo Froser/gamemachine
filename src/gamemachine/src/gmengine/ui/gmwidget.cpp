@@ -153,6 +153,7 @@ GMWidgetResourceManager::~GMWidgetResourceManager()
 	D(d);
 	GM_delete(d->textObject);
 	GM_delete(d->spriteObject);
+	GM_delete(d->opaqueSpriteObject);
 	GM_delete(d->borderObject);
 
 	for (auto& resource : d->textureResources)
