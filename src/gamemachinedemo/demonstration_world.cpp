@@ -17,6 +17,7 @@
 #include "demo/specularmap.h"
 #include "demo/pbr.h"
 #include "demo/phong_pbr.h"
+#include "demo/controls.h"
 
 #if GM_USE_DX11
 #include <gmdx11helper.h>
@@ -40,6 +41,7 @@ namespace
 		world->addDemo(L"高光贴图: 演示一个带有高光贴图的立方体。", new Demo_SpecularMap(world));
 		world->addDemo(L"PBR: 演示PBR渲染。", new Demo_PBR(world));
 		world->addDemo(L"PBR: 演示同时通过Phong模型和PBR模型渲染。", new Demo_Phong_PBR(world));
+		world->addDemo(L"UI控件: 演示使用GameMachine提供的UI控件。", new Demo_Controls(world));
 		world->init();
 	}
 }
@@ -103,6 +105,9 @@ void DemoHandler::onDeactivate()
 	gm::GMShadowSourceDesc noShadow;
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
 	d->engine->setShadowSource(noShadow);
+
+	gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+	config.set(gm::GMRenderConfigs::HDR_Bool, false);
 
 	d->parentDemonstrationWorld->getMainWidget()->setVisible(true);
 }
@@ -259,7 +264,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	{
 		d->mainWidget->addLabel(
 			getDescription(),
-			GMVec4(1, 1, 1, 1),
+			getLabelFontColor(),
 			10,
 			top,
 			250,
@@ -286,7 +291,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	d->mainWidget->addLabel(
 		L"当前状态:",
-		GMVec4(1, 1, 1, 1),
+		getLabelFontColor(),
 		10,
 		top += 40,
 		250,
@@ -297,7 +302,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	d->mainWidget->addLabel(
 		L"",
-		GMVec4(1, 1, 1, 1),
+		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
@@ -308,7 +313,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	d->mainWidget->addLabel(
 		L"",
-		GMVec4(1, 1, 1, 1),
+		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
@@ -319,7 +324,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 
 	d->mainWidget->addLabel(
 		L"",
-		GMVec4(1, 1, 1, 1),
+		getLabelFontColor(),
 		10,
 		top += 20,
 		250,
@@ -360,7 +365,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	});
 
 	d->nextControlTop = top + 40;
-	d->mainWidget->setSize(d->mainWidget->getSize().width, top);
+	d->mainWidget->setSize(d->mainWidget->getSize().width, d->nextControlTop);
 
 	return d->mainWidget;
 }
@@ -476,20 +481,6 @@ void DemonstrationWorld::init()
 	exitButton->connect(*exitButton, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		GM.exit();
 	});
-
-	gm::GMRect txtCorner = { 0, 0, 6, 8 };
-	gm::GMControlTextEdit* textEdit;
-	d->mainWidget->addTextEdit(
-		L"你好，GameWorld",
-		10,
-		Y,
-		100,
-		50,
-		false,
-		txtCorner,
-		&textEdit
-	);
-	textEdit->setPadding(5, 10);
 
 	gm::GMRect corner = { 0,0,75,42 };
 	d->mainWidget->addBorder(corner);

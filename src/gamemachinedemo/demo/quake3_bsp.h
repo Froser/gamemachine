@@ -32,6 +32,13 @@ protected:
 
 private:
 	void setMouseTrace(bool enabled);
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"渲染一个雷神之锤3的游戏场景。";
+		return desc;
+	}
 };
 
 #endif

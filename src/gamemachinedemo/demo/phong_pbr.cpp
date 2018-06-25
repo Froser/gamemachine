@@ -3,6 +3,7 @@
 #include <linearmath.h>
 #include <gmmodelreader.h>
 #include <gmimagebuffer.h>
+#include <gmcontrols.h>
 
 namespace
 {
@@ -93,6 +94,27 @@ void Demo_Phong_PBR::init()
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("pbr", d->gameObject);
 	asDemoGameWorld(getDemoWorldReference())->addObject("phong", d->gameObject_Phong);
+
+	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+
+	gm::GMControlButton* button = nullptr;
+	widget->addButton(
+		L"开/关HDR",
+		10,
+		top,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		config.set(gm::GMRenderConfigs::HDR_Bool, !config.get(gm::GMRenderConfigs::HDR_Bool).toBool());
+	});
+
+	widget->setSize(widget->getSize().width, top + 40);
 }
 
 void Demo_Phong_PBR::handleMouseEvent()
@@ -237,11 +259,4 @@ void Demo_Phong_PBR::event(gm::GameMachineHandlerEvent evt)
 	default:
 		break;
 	}
-}
-
-void Demo_Phong_PBR::onDeactivate()
-{
-	Base::onDeactivate();
-	gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-	config.set(gm::GMRenderConfigs::HDR_Bool, false);
 }

@@ -51,6 +51,9 @@ void GMProfile::startRecord(const GMString& name)
 {
 	D(d);
 	static GMint64 frequency = GMClock::highResolutionTimerFrequency();
+	if (!g_handler)
+		return;
+
 	if (!d->debugConfig.get(GMDebugConfigs::RunProfile_Bool).toBool())
 		return;
 

@@ -344,7 +344,7 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	case GMFunctionCharacter_Ctrl_Z:
 	case GMFunctionCharacter_Ctrl_LeftBracket:
 	case GMFunctionCharacter_Ctrl_RightBracket:
-	case GMFunctionCharacter_Ctrl_Separator:
+	case GMFunctionCharacter_Ctrl_Dash:
 	case GMFunctionCharacter_Ctrl_Caret:
 	case GMFunctionCharacter_Ctrl_Underline:
 	case GMFunctionCharacter_Ctrl_Delete:

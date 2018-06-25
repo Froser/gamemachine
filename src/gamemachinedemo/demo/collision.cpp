@@ -98,6 +98,8 @@ void Demo_Collision::init()
 			}
 		}
 	}
+
+	createDefaultWidget();
 }
 
 void Demo_Collision::event(gm::GameMachineHandlerEvent evt)

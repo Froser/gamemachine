@@ -223,7 +223,7 @@ enum GMFunctionCharacter
 	GMFunctionCharacter_Ctrl_Z,				//SUB
 	GMFunctionCharacter_Ctrl_LeftBracket,	//ESC
 	GMFunctionCharacter_Ctrl_RightBracket,	//FS
-	GMFunctionCharacter_Ctrl_Separator,		//GS
+	GMFunctionCharacter_Ctrl_Dash,			//GS
 	GMFunctionCharacter_Ctrl_Caret	,		//RS
 	GMFunctionCharacter_Ctrl_Underline,		//US
 	GMFunctionCharacter_Space,				//SP

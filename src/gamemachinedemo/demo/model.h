@@ -38,6 +38,13 @@ private:
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"加载一个模型。按住旋转，滚轮调整大小。按住右键调整视野。";
+		return desc;
+	}
 };
 
 #endif

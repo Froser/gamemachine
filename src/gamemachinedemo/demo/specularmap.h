@@ -34,6 +34,13 @@ private:
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"渲染带有和不带有高光贴图的对象。按住鼠标旋转对象。";
+		return desc;
+	}
 };
 
 #endif

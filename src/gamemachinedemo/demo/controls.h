@@ -1,24 +1,31 @@
-﻿#ifndef __DEMO_LITERATURE_H__
-#define __DEMO_LITERATURE_H__
+﻿#ifndef __DEMO_CONTROLS_H__
+#define __DEMO_CONTROLS_H__
 
 #include <gamemachine.h>
 #include <gmdemogameworld.h>
 #include "demonstration_world.h"
 
-class Demo_Literature : public DemoHandler
+namespace gm
+{
+	class GMWidget;
+}
+
+class Demo_Controls : public DemoHandler
 {
 	typedef DemoHandler Base;
+
 public:
-	using DemoHandler::DemoHandler;
+	using Base::Base;
 
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
+	virtual gm::GMWidget* createDefaultWidget();
 
 protected:
 	const gm::GMString& getDescription() const
 	{
-		static gm::GMString desc = L"使用GameMachine渲染一段富文本。";
+		static gm::GMString desc = L"";
 		return desc;
 	}
 };

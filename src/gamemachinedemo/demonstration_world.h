@@ -52,12 +52,12 @@ protected:
 	virtual void setLookAt();
 	virtual void setDefaultLights();
 	virtual const gm::GMString& getDescription() const;
+	virtual gm::GMWidget* createDefaultWidget();
 
 protected:
 	void backToEntrance();
 	bool isActivating();
 	void switchNormal();
-	gm::GMWidget* createDefaultWidget();
 	gm::GMint getClientAreaTop();
 
 	inline gm::GMGameWorld*& getDemoWorldReference()
@@ -70,6 +70,12 @@ protected:
 	{
 		D(d);
 		return d->parentDemonstrationWorld;
+	}
+
+	inline const GMVec4& getLabelFontColor()
+	{
+		static GMVec4 c(1, 1, 1, 1);
+		return c;
 	}
 };
 

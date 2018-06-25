@@ -3,6 +3,8 @@
 #include <linearmath.h>
 #include <gmmodelreader.h>
 #include <gmimagebuffer.h>
+#include <gmcontrols.h>
+#include <gmwidget.h>
 
 namespace
 {
@@ -70,7 +72,25 @@ void Demo_PBR::init()
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("sphere", d->gameObject);
 
-	createDefaultWidget();
+	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+	
+	gm::GMControlButton* button = nullptr;
+	widget->addButton(
+		L"开/关HDR",
+		10,
+		top,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
+		config.set(gm::GMRenderConfigs::HDR_Bool, !config.get(gm::GMRenderConfigs::HDR_Bool).toBool());
+	});
+	widget->setSize(widget->getSize().width, top + 40);
 }
 
 void Demo_PBR::handleMouseEvent()
@@ -198,13 +218,6 @@ void Demo_PBR::event(gm::GameMachineHandlerEvent evt)
 
 		gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
-			switchNormal();
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('X')))
-		{
-			gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-			config.set(gm::GMRenderConfigs::HDR_Bool, !config.get(gm::GMRenderConfigs::HDR_Bool).toBool());
-		}
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Deactivate:
@@ -214,11 +227,4 @@ void Demo_PBR::event(gm::GameMachineHandlerEvent evt)
 	default:
 		break;
 	}
-}
-
-void Demo_PBR::onDeactivate()
-{
-	Base::onDeactivate();
-	gm::GMRenderConfig& config = GM.getConfigs().getConfig(gm::GMConfigs::Render).asRenderConfig();
-	config.set(gm::GMRenderConfigs::HDR_Bool, false);
 }

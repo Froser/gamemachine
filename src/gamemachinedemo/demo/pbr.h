@@ -27,7 +27,6 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
-	virtual void onDeactivate() override;
 
 private:
 	void handleMouseEvent();
@@ -36,6 +35,13 @@ private:
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"使用PBR技术渲染球体。按住鼠标左键来旋转球体。";
+		return desc;
+	}
 };
 
 #endif

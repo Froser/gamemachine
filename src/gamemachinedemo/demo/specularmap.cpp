@@ -82,6 +82,8 @@ void Demo_SpecularMap::init()
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("cube with specular map", d->gameObject);
 	asDemoGameWorld(getDemoWorldReference())->addObject("cube without specular map", d->gameObject2);
+
+	createDefaultWidget();
 }
 
 void Demo_SpecularMap::handleMouseEvent()

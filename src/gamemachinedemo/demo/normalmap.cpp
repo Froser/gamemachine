@@ -55,7 +55,7 @@ void Demo_NormalMap::init()
 	gm::GMControlLabel* stateLabel = nullptr;
 	widget->addLabel(
 		L"状态：旋转中",
-		GMVec4(1, 1, 1, 1),
+		getLabelFontColor(),
 		10,
 		top,
 		250,

@@ -45,6 +45,8 @@ set(SOURCES
 		demo/pbr.cpp
 		demo/phong_pbr.h
 		demo/phong_pbr.cpp
+		demo/controls.h
+		demo/controls.cpp
 	)
 
 gm_source_group_by_dir(SOURCES)

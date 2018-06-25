@@ -50,6 +50,13 @@ private:
 	void pickUp(const gm::GMPhysicsRayTestResult& rayTestResult);
 	void removePicked();
 	void movePicked(const gm::GMPhysicsRayTestResult& rayTestResult);
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"左键选中物体。按住左键移动物体。";
+		return desc;
+	}
 };
 
 #endif

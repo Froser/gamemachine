@@ -12,22 +12,6 @@ void Demo_Literature::init()
 	GM_ASSERT(!getDemoWorldReference());
 	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
 
-	// 读取边框
-	gm::GMGamePackage* package = GM.getGamePackageManager();
-	gm::GMBuffer buf;
-	bool b = package->readFile(gm::GMPackageIndex::Textures, "frame.png", &buf);
-	GM_ASSERT(b);
-
-	gm::GMImage* img = nullptr;
-	gm::GMImageReader::load(buf.buffer, buf.size, &img);
-	gm::ITexture* frameTexture = nullptr;
-	GM.getFactory()->createTexture(db->parentDemonstrationWorld->getContext(), img, &frameTexture);
-	GM_ASSERT(frameTexture);
-
-	gm::GMAsset border = getDemoWorldReference()->getAssets().insertAsset(gm::GMAssetType::Texture, frameTexture);
-	gm::GMRect textureGeo = { 0, 0, 308, 94 }; //截取的纹理位置
-
-
 	gm::GMTextGameObject* literature = new gm::GMTextGameObject(getDemoWorldReference()->getContext()->getWindow()->getRenderRect());
 	gm::GMRect rect = { 200, 220, 400, 190 };
 	literature->setGeometry(rect);
@@ -46,7 +30,7 @@ void Demo_Literature::init()
 	gm::GMDemoGameWorld* world = gm::gm_cast<gm::GMDemoGameWorld*>(getDemoWorldReference());
 	world->addObject("text", literature);
 
-	GM_delete(img);
+	createDefaultWidget();
 }
 
 void Demo_Literature::event(gm::GameMachineHandlerEvent evt)

@@ -28,7 +28,6 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
-	virtual void onDeactivate() override;
 
 private:
 	void handleMouseEvent();
@@ -37,6 +36,13 @@ private:
 protected:
 	virtual void setLookAt() override;
 	virtual void setDefaultLights() override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"使用PBR和Phong来渲染。按住鼠标旋转球体。";
+		return desc;
+	}
 };
 
 #endif

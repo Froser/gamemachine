@@ -3,6 +3,8 @@
 #include <linearmath.h>
 #include <gmbspgameworld.h>
 #include <gmbspfactory.h>
+#include <gmwidget.h>
+#include <gmcontrols.h>
 
 void Demo_Quake3_BSP::onActivate()
 {
@@ -56,6 +58,70 @@ void Demo_Quake3_BSP::init()
 	gm::GMBSPFactory::createBSPGameWorld(db->parentDemonstrationWorld->getContext(), "gv.bsp", &d->world);
 	db->demoWorld = d->world;
 	d->sprite = d->world->getSprite();
+
+	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+	widget->addLabel(
+		L"W、S、A、D或XBOX手柄移动",
+		getLabelFontColor(),
+		10,
+		top,
+		250,
+		30,
+		false,
+		nullptr
+	);
+	widget->addLabel(
+		L"Space跳跃",
+		getLabelFontColor(),
+		10,
+		top += 20,
+		250,
+		30,
+		false,
+		nullptr
+	);
+	widget->addLabel(
+		L"R显示/隐藏鼠标",
+		getLabelFontColor(),
+		10,
+		top += 20,
+		250,
+		30,
+		false,
+		nullptr
+	);
+
+	gm::GMControlButton* button = nullptr;
+	widget->addButton(
+		L"开启/关闭计算BSP面",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->world->setRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool).toBool());
+	});
+
+	widget->addButton(
+		L"开启/关闭只绘制天空",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->world->setRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool());
+	});
+
+	widget->setSize(widget->getSize().width, top + 40);
 }
 
 void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
@@ -149,12 +215,6 @@ void Demo_Quake3_BSP::event(gm::GameMachineHandlerEvent evt)
 		gm::GMMouseState ms = mouseState.mouseState();
 		d->sprite->look(Radians(-ms.deltaY * mouseSensitivity), Radians(-ms.deltaX * mouseSensitivity));
 		
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('P')))
-			d->world->setRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::CalculateFace_Bool).toBool());
-
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('O')))
-			d->world->setRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool, !d->world->getRenderConfig(gm::GMBSPRenderConfigs::DrawSkyOnly_Bool).toBool());
-
 		if (kbState.keyTriggered(gm::GM_keyFromASCII('R')))
 			setMouseTrace(!d->mouseTrace);
 

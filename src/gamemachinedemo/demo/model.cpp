@@ -3,6 +3,8 @@
 #include <linearmath.h>
 #include <gmmodelreader.h>
 #include <gmimagebuffer.h>
+#include <gmwidget.h>
+#include <gmcontrols.h>
 
 #ifndef WHEEL_DELTA
 #define WHEEL_DELTA 120
@@ -108,6 +110,30 @@ void Demo_Model::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject("cube_with_normalmap", d->gameObject2);
 	asDemoGameWorld(getDemoWorldReference())->addObject("cube", d->gameObject3);
 	asDemoGameWorld(getDemoWorldReference())->addObject("sky", d->skyObject);
+
+	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+	gm::GMControlButton* button = nullptr;
+	widget->addButton(
+		L"交换物体位置",
+		10,
+		top,
+		250,
+		30,
+		false,
+		&button
+	);
+
+	connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		if (d->gameObject2 && d->gameObject3)
+		{
+			GMMat4 t = d->gameObject2->getTranslation();
+			d->gameObject2->setTranslation(d->gameObject3->getTranslation());
+			d->gameObject3->setTranslation(t);
+		}
+	});
+
+	widget->setSize(widget->getSize().width, top + 40);
 }
 
 void Demo_Model::handleMouseEvent()
@@ -317,16 +343,6 @@ void Demo_Model::event(gm::GameMachineHandlerEvent evt)
 		gm::IKeyboardState& kbState = inputManager->getKeyboardState();
 		if (kbState.keyTriggered(gm::GM_keyFromASCII('N')))
 			switchNormal();
-
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('S')))
-		{
-			if (d->gameObject2 && d->gameObject3)
-			{
-				GMMat4 t = d->gameObject2->getTranslation();
-				d->gameObject2->setTranslation(d->gameObject3->getTranslation());
-				d->gameObject3->setTranslation(t);
-			}
-		}
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Deactivate:
