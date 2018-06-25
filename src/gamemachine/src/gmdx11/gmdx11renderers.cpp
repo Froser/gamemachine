@@ -779,7 +779,6 @@ void GMDx11Renderer::prepareMaterials(GMModel* model)
 {
 	D(d);
 	GMDx11EffectVariableBank& bank = getVarBank();
-	ID3D11DeviceContext* context = d->deviceContext;
 	const GMShader& shader = model->getShader();
 	const GMMaterial& material = shader.getMaterial();
 	GM_DX_HR(bank.Ka()->SetFloatVector(ValuePointer(material.ka)));
