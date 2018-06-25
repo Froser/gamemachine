@@ -25,5 +25,12 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"使用法线贴图渲染一个对象。";
+		return desc;
+	}
 };
 #endif

@@ -27,6 +27,13 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"播放一段Wave音频或者MP3音频。";
+		return desc;
+	}
 };
 
 #endif

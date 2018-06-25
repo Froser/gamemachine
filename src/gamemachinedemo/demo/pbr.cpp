@@ -69,6 +69,8 @@ void Demo_PBR::init()
 	}
 
 	asDemoGameWorld(getDemoWorldReference())->addObject("sphere", d->gameObject);
+
+	createDefaultWidget();
 }
 
 void Demo_PBR::handleMouseEvent()

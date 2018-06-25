@@ -50,13 +50,14 @@ void Demo_NormalMap::init()
 	asDemoGameWorld(getDemoWorldReference())->addObject("texture", d->gameObject);
 
 	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
 
 	gm::GMControlLabel* stateLabel = nullptr;
 	widget->addLabel(
 		L"状态：旋转中",
 		GMVec4(1, 1, 1, 1),
 		10,
-		getClientAreaTop() + 10,
+		top,
 		250,
 		30,
 		false,
@@ -66,7 +67,7 @@ void Demo_NormalMap::init()
 	widget->addButton(
 		L"暂停/继续旋转",
 		10,
-		getClientAreaTop() + 40,
+		top += 40,
 		250,
 		30,
 		false,
@@ -84,6 +85,8 @@ void Demo_NormalMap::init()
 		else
 			stateLabel->setText(L"状态：已停止");
 	});
+
+	widget->setSize(widget->getSize().width, top + 40);
 }
 
 void Demo_NormalMap::event(gm::GameMachineHandlerEvent evt)

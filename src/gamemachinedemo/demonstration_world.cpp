@@ -31,7 +31,7 @@ namespace
 		world->addDemo(L"入门: 读取一个纹理。", new Demo_Texture(world));
 		world->addDemo(L"入门: 使用索引缓存读取一个纹理。", new Demo_Texture_Index(world));
 		world->addDemo(L"高级纹理：使用法线贴图。", new Demo_NormalMap(world));
-		world->addDemo(L"效果：使用一个灰度滤镜。", new Demo_Effects(world));
+		world->addDemo(L"效果：使用自带的各种滤镜。", new Demo_Effects(world));
 		world->addDemo(L"BSP: 渲染一个雷神之锤3的场景。", new Demo_Quake3_BSP(world));
 		world->addDemo(L"声音: 演示播放音乐。", new Demo_Sound(world));
 		world->addDemo(L"文字: 使用排版引擎实现排版。", new Demo_Literature(world));
@@ -182,6 +182,12 @@ void DemoHandler::setDefaultLights()
 	}
 }
 
+const gm::GMString& DemoHandler::getDescription() const
+{
+	static gm::GMString empty;
+	return empty;
+}
+
 void DemoHandler::backToEntrance()
 {
 	D(d);
@@ -247,11 +253,28 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->setSize(300, 500);
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget);
 
+	gm::GMint top = 10;
+
+	if (!getDescription().isEmpty())
+	{
+		d->mainWidget->addLabel(
+			getDescription(),
+			GMVec4(1, 1, 1, 1),
+			10,
+			top,
+			250,
+			30,
+			false,
+			nullptr
+		);
+		top += 40;
+	}
+
 	gm::GMControlButton* button = nullptr;
 	d->mainWidget->addButton(
 		L"返回主菜单",
 		10,
-		10,
+		top,
 		250,
 		30,
 		false,
@@ -265,7 +288,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		L"当前状态:",
 		GMVec4(1, 1, 1, 1),
 		10,
-		50,
+		top += 40,
 		250,
 		20,
 		false,
@@ -276,27 +299,29 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		L"",
 		GMVec4(1, 1, 1, 1),
 		10,
-		80,
+		top += 20,
 		250,
 		20,
 		false,
 		&d->lbFPS
 	);
+
 	d->mainWidget->addLabel(
 		L"",
 		GMVec4(1, 1, 1, 1),
 		10,
-		110,
+		top += 20,
 		250,
 		20,
 		false,
 		&d->lbRendering
 	);
+
 	d->mainWidget->addLabel(
 		L"",
 		GMVec4(1, 1, 1, 1),
 		10,
-		140,
+		top += 20,
 		250,
 		20,
 		false,
@@ -306,7 +331,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->addButton(
 		L"开启/关闭延迟渲染",
 		10,
-		180,
+		top += 40,
 		250,
 		30,
 		false,
@@ -323,7 +348,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->addButton(
 		L"开启/关闭Gamma校正",
 		10,
-		220,
+		top += 40,
 		250,
 		30,
 		false,
@@ -334,12 +359,16 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		d->renderConfig.set(gm::GMRenderConfigs::GammaCorrection_Bool, !d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool());
 	});
 
+	d->nextControlTop = top + 40;
+	d->mainWidget->setSize(d->mainWidget->getSize().width, top);
+
 	return d->mainWidget;
 }
 
 gm::GMint DemoHandler::getClientAreaTop()
 {
-	return 260;
+	D(d);
+	return d->nextControlTop;
 }
 
 DemonstrationWorld::DemonstrationWorld(const gm::IRenderContext* context, gm::IWindow* window)

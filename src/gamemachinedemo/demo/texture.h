@@ -15,6 +15,13 @@ public:
 public:
 	virtual void init() override;
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"使用顶点缓存来渲染一个纹理。";
+		return desc;
+	}
 };
 
 class Demo_Texture_Index : public Demo_Texture
@@ -26,6 +33,13 @@ public:
 
 public:
 	virtual void init() override;
+
+protected:
+	const gm::GMString& getDescription() const
+	{
+		static gm::GMString desc = L"使用索引缓存来渲染一个纹理。";
+		return desc;
+	}
 };
 
 #endif

@@ -26,6 +26,7 @@ GM_PRIVATE_OBJECT(DemoHandler)
 	gm::GMControlLabel* lbFPS = nullptr;
 	gm::GMControlLabel* lbRendering = nullptr;
 	gm::GMControlLabel* lbGammaCorrection = nullptr;
+	gm::GMint nextControlTop = 0;
 };
 
 class DemoHandler : public gm::GMObject
@@ -50,6 +51,7 @@ public:
 protected:
 	virtual void setLookAt();
 	virtual void setDefaultLights();
+	virtual const gm::GMString& getDescription() const;
 
 protected:
 	void backToEntrance();

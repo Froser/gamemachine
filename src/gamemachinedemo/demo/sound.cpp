@@ -69,11 +69,13 @@ void Demo_Sound::init()
 	}
 
 	gm::GMWidget* widget = createDefaultWidget();
+	auto top = getClientAreaTop();
+
 	gm::GMControlButton* button = nullptr;
 	widget->addButton(
 		L"播放Wav音频",
 		10,
-		getClientAreaTop(),
+		top,
 		250,
 		30,
 		false,
@@ -86,7 +88,7 @@ void Demo_Sound::init()
 	widget->addButton(
 		L"暂停播放Wav音频",
 		10,
-		getClientAreaTop() + 40,
+		top += 40,
 		250,
 		30,
 		false,
@@ -99,7 +101,7 @@ void Demo_Sound::init()
 	widget->addButton(
 		L"停止播放Wav音频",
 		10,
-		getClientAreaTop() + 80,
+		top += 40,
 		250,
 		30,
 		false,
@@ -112,7 +114,7 @@ void Demo_Sound::init()
 	widget->addButton(
 		L"播放MP3音频",
 		10,
-		getClientAreaTop() + 120,
+		top += 40,
 		250,
 		30,
 		false,
@@ -125,7 +127,7 @@ void Demo_Sound::init()
 	widget->addButton(
 		L"暂停播放MP3音频",
 		10,
-		getClientAreaTop() + 160,
+		top += 40,
 		250,
 		30,
 		false,
@@ -138,7 +140,7 @@ void Demo_Sound::init()
 	widget->addButton(
 		L"停止播放MP3音频",
 		10,
-		getClientAreaTop() + 200,
+		top += 40,
 		250,
 		30,
 		false,
@@ -147,6 +149,8 @@ void Demo_Sound::init()
 	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
 		d->mp3Source->stop();
 	});
+
+	widget->setSize(widget->getSize().width, top += 40);
 }
 
 void Demo_Sound::event(gm::GameMachineHandlerEvent evt)
