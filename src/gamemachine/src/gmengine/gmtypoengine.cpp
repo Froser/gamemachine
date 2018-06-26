@@ -43,9 +43,12 @@ GMTypoStateMachine::GMTypoStateMachine(GMTypoEngine* engine)
 	d->typoEngine = engine;
 }
 
-GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(bool isPlainText, REF GMwchar& ch)
+GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(const GMTypoOptions& options, REF GMwchar& ch)
 {
 	D(d);
+	bool isPlainText = options.plainText;
+	bool newline = options.newline;
+
 	switch (d->state)
 	{
 	case GMTypoStateMachineParseState::Literature:
@@ -55,6 +58,10 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(bool isPlainText, REF 
 			d->state = GMTypoStateMachineParseState::WaitingForCommand;
 			return Ignore;
 		}
+
+		if (ch == '\n' && newline)
+			return Newline;
+
 		return Okay;
 	}
 	case GMTypoStateMachineParseState::WaitingForCommand:
@@ -73,7 +80,7 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(bool isPlainText, REF 
 		{
 			d->state = GMTypoStateMachineParseState::ParsingSymbol;
 			d->parsedSymbol = "";
-			return parse(isPlainText, ch);
+			return parse(options, ch);
 		}
 		break;
 	}
@@ -279,7 +286,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	D(d);
 	GMTypoResult result;
 	GMwchar ch = d->literature[index];
-	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(d->options.plainText, ch);
+	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(d->options, ch);
 
 	if (parseResult == GMTypoStateMachine::Ignore)
 	{

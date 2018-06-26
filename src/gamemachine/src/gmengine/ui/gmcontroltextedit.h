@@ -57,16 +57,23 @@ public:
 
 protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
+	virtual void pasteFromClipboard();
 
 protected:
+	void createBufferTypoEngineIfNotExist();
+	void blinkCaret(GMint firstX, GMint caretX);
 	void placeCaret(GMint cP);
 	void moveCaret(bool next, bool newItem, bool select);
 	void deleteSelectionText();
 	void selectAll();
 	void resetCaretBlink();
 	void copyToClipboard();
-	void pasteFromClipboard();
 	void handleMouseSelect(GMSystemMouseEvent* event, bool selectStart);
+	void initStyles(GMWidget* widget);
+	void handleMouseCaret(const GMPoint& pt, bool selectStart);
+	GMint getCaretHeight();
+	GMint getCaretTop();
+	void moveFirstVisibleCp(GMint distance);
 
 public:
 	inline GMControlBorder* getBorder()
@@ -93,15 +100,34 @@ public:
 		d->deltaBlink = blinkSpeedSecond;
 	}
 
+	inline const GMString& getRenderText()
+	{
+		D(d);
+		return d->renderText;
+	}
+
 protected:
 	virtual void updateRect() override;
+	virtual void calculateRenderText(GMint firstX);
+	virtual void insertCharacter(GMwchar ch);
+};
 
-private:
-	void initStyles(GMWidget* widget);
-	void handleMouseCaret(const GMPoint& pt, bool selectStart);
-	GMint getCaretHeight();
-	GMint getCaretTop();
-	void moveFirstVisibleCp(GMint distance);
+GM_PRIVATE_OBJECT(GMControlTextArea)
+{
+};
+
+class GMControlTextArea : public GMControlTextEdit
+{
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextArea, GMControlTextEdit)
+
+public:
+	GMControlTextArea(GMWidget* widget);
+
+public:
+	virtual void render(GMfloat elapsed) override;
+	virtual void pasteFromClipboard() override;
+	virtual void insertCharacter(GMwchar ch) override;
+	virtual void setSize(GMint width, GMint height) override;
 };
 
 END_NS

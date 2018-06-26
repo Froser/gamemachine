@@ -16,6 +16,7 @@ class GMControlLabel;
 class GMControlButton;
 class GMControlBorder;
 class GMControlTextEdit;
+class GMControlTextArea;
 struct ITypoEngine;
 
 struct GMControlState
@@ -368,6 +369,17 @@ public:
 		bool isDefault,
 		const GMRect& cornerRect,
 		OUT GMControlTextEdit** out
+	);
+
+	void addTextArea(
+		const GMString& text,
+		GMint x,
+		GMint y,
+		GMint width,
+		GMint height,
+		bool isDefault,
+		const GMRect& cornerRect,
+		OUT GMControlTextArea** out
 	);
 
 	void drawText(

@@ -124,7 +124,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	gm::GMRect txtCorner = { 0, 0, 6, 8 };
 	gm::GMControlTextEdit* textEdit = nullptr;
 	d->mainWidget->addTextEdit(
-		L"这是一个TextEdit控件，可以编辑、演示单行文字",
+		L"这是一个TextEdit控件，可以编辑、显示单行文字",
 		10,
 		top += 40,
 		500,
@@ -132,6 +132,19 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		false,
 		txtCorner,
 		&textEdit
+	);
+	textEdit->setPadding(5, 10);
+
+	gm::GMControlTextArea* textArea = nullptr;
+	d->mainWidget->addTextArea(
+		L"这是一个TextArea控件，可以编辑、显示多行文字\n这里是第二行",
+		10,
+		top += 60,
+		500,
+		250,
+		false,
+		txtCorner,
+		&textArea
 	);
 	textEdit->setPadding(5, 10);
 

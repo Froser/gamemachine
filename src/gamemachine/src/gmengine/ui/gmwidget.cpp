@@ -385,6 +385,31 @@ void GMWidget::addTextEdit(
 	border->setCorner(cornerRect);
 }
 
+void GMWidget::addTextArea(
+	const GMString& text,
+	GMint x,
+	GMint y,
+	GMint width,
+	GMint height,
+	bool isDefault,
+	const GMRect& cornerRect,
+	OUT GMControlTextArea** out
+)
+{
+	GMControlTextArea* textArea = new GMControlTextArea(this);
+	if (out)
+		*out = textArea;
+
+	addControl(textArea);
+	textArea->setText(text);
+	textArea->setPosition(x, y);
+	textArea->setSize(width, height);
+	textArea->setIsDefault(isDefault);
+
+	GMControlBorder* border = textArea->getBorder();
+	border->setCorner(cornerRect);
+}
+
 void GMWidget::drawText(
 	const GMString& text,
 	GMStyle& style,

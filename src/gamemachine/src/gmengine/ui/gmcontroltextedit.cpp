@@ -52,14 +52,7 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	if (!getVisible())
 		return;
 
-	if (!d->buffer->getTypoEngine())
-	{
-		ITypoEngine* typoEngine = getParent()->getManager()->getTypoEngine();
-		ITypoEngine* newInstance = nullptr;
-		typoEngine->createInstance(&newInstance);
-		d->buffer->setTypoEngine(newInstance);
-	}
-	GM_ASSERT(d->buffer->getTypoEngine());
+	createBufferTypoEngineIfNotExist();
 
 	placeCaret(d->cp);
 	d->borderControl->render(elapsed);
@@ -99,29 +92,13 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	d->textStyle.getFontColor().setCurrent(d->textColor);
 
 	// 闪烁光标
-	GMfloat time = GM.getGameMachineRunningStates().elapsedTime;
-	if (time - d->lastBlink >= d->deltaBlink)
-	{
-		d->caretOn = !d->caretOn;
-		d->lastBlink = time;
-	}
-
-	if (hasFocus() && d->caretOn && d->showCaret)
-		renderCaret(firstX, caretX);
+	blinkCaret(firstX, caretX);
 
 	// 获取能够显示的文本长度
-	const GMString& text = d->buffer->getBuffer();
-	GMint lastCP;
-	bool lastTrail;
-	d->buffer->XtoCP(firstX + d->rcText.width, &lastCP, &lastTrail);
-	if (lastTrail)
-		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP + 1);
-	else if (!lastTrail)
-		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP);
+	calculateRenderText(firstX);
 
 	// 不允许换行
-	widget->drawText(d->renderText, d->textStyle, d->rcText, false, false, false);
-
+	widget->drawText(getRenderText(), d->textStyle, d->rcText, false, false, false);
 }
 
 void GMControlTextEdit::setSize(GMint width, GMint height)
@@ -330,7 +307,6 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	case GMFunctionCharacter_Ctrl_J:
 	case GMFunctionCharacter_Ctrl_K:
 	case GMFunctionCharacter_Ctrl_L:
-	case GMFunctionCharacter_Ctrl_M:
 	case GMFunctionCharacter_Ctrl_N:
 	case GMFunctionCharacter_Ctrl_O:
 	case GMFunctionCharacter_Ctrl_P:
@@ -351,25 +327,25 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	{
 		return true;
 	}
+	case GMFunctionCharacter_Ctrl_M:
+	{
+		// 按下Ctrl，说明按下了Ctrl+M，而不是按下Enter
+		if (event->getModifier() & GMModifier_Ctrl)
+			return true;
+	}
 	}
 
-	if (d->selectionStartCP != d->cp)
-		deleteSelectionText();
-
-	if (!d->insertMode && d->cp < d->buffer->getLength())
+	GMwchar ch = event->getCharacter();
+	if (ch == '\r')
 	{
-		d->buffer->setChar(d->cp, event->getCharacter());
-		placeCaret(d->cp + 1);
-		d->selectionStartCP = d->cp;
+		insertCharacter(ch);
+		insertCharacter('\n');
 	}
 	else
 	{
-		if (d->buffer->insertChar(d->cp, event->getCharacter()))
-		{
-			placeCaret(d->cp + 1);
-			d->selectionStartCP = d->cp;
-		}
+		insertCharacter(ch);
 	}
+
 	resetCaretBlink();
 	emit(textChanged);
 
@@ -412,6 +388,33 @@ void GMControlTextEdit::setPadding(GMint x, GMint y)
 	d->padding[0] = x;
 	d->padding[1] = y;
 	updateRect();
+}
+
+void GMControlTextEdit::createBufferTypoEngineIfNotExist()
+{
+	D(d);
+	if (!d->buffer->getTypoEngine())
+	{
+		ITypoEngine* typoEngine = getParent()->getManager()->getTypoEngine();
+		ITypoEngine* newInstance = nullptr;
+		typoEngine->createInstance(&newInstance);
+		d->buffer->setTypoEngine(newInstance);
+	}
+	GM_ASSERT(d->buffer->getTypoEngine());
+}
+
+void GMControlTextEdit::blinkCaret(GMint firstX, GMint caretX)
+{
+	D(d);
+	GMfloat time = GM.getGameMachineRunningStates().elapsedTime;
+	if (time - d->lastBlink >= d->deltaBlink)
+	{
+		d->caretOn = !d->caretOn;
+		d->lastBlink = time;
+	}
+
+	if (hasFocus() && d->caretOn && d->showCaret)
+		renderCaret(firstX, caretX);
 }
 
 void GMControlTextEdit::placeCaret(GMint cp)
@@ -585,6 +588,45 @@ void GMControlTextEdit::updateRect()
 	d->buffer->setSize(d->rcText);
 }
 
+void GMControlTextEdit::calculateRenderText(GMint firstX)
+{
+	D(d);
+	// 获取能够显示的文本长度
+	const GMString& text = d->buffer->getBuffer();
+	GMint lastCP;
+	bool lastTrail;
+	d->buffer->XtoCP(firstX + d->rcText.width, &lastCP, &lastTrail);
+	if (lastTrail)
+		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP + 1);
+	else if (!lastTrail)
+		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP);
+}
+
+void GMControlTextEdit::insertCharacter(GMwchar ch)
+{
+	D(d);
+	if (ch == '\r' || ch == '\n') //吞掉换行
+		return;
+
+	if (d->selectionStartCP != d->cp)
+		deleteSelectionText();
+
+	if (!d->insertMode && d->cp < d->buffer->getLength())
+	{
+		d->buffer->setChar(d->cp, ch);
+		placeCaret(d->cp + 1);
+		d->selectionStartCP = d->cp;
+	}
+	else
+	{
+		if (d->buffer->insertChar(d->cp, ch))
+		{
+			placeCaret(d->cp + 1);
+			d->selectionStartCP = d->cp;
+		}
+	}
+}
+
 void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 {
 	D(d);
@@ -635,4 +677,107 @@ void GMControlTextEdit::moveFirstVisibleCp(GMint distance)
 		d->firstVisibleCP -= distance;
 	else
 		d->firstVisibleCP = 0;
+}
+
+GMControlTextArea::GMControlTextArea(GMWidget* widget)
+	: Base(widget)
+{
+	D_BASE(db, Base);
+	db->buffer->setNewline(true);
+}
+
+void GMControlTextArea::render(GMfloat elapsed)
+{
+	D_BASE(d, Base);
+	if (!getVisible())
+		return;
+
+	createBufferTypoEngineIfNotExist();
+
+	placeCaret(d->cp);
+	d->borderControl->render(elapsed);
+
+	// 计算首个能显示的字符
+	GMint firstX;
+	d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
+
+	// 计算选区
+	GMint caretX;
+	GMint selectionStartX = 0;
+	d->buffer->CPtoX(d->cp, false, &caretX);
+	if (d->cp != d->selectionStartCP)
+		d->buffer->CPtoX(d->selectionStartCP, false, &selectionStartX);
+	else
+		selectionStartX = caretX;
+
+	GMWidget* widget = getParent();
+	GMRect rcSelection;
+	if (d->cp != d->selectionStartCP)
+	{
+		// 如果当前位置不等于选定开始的位置，则确定一个选区
+		GMint selectionLeftX = caretX, selectionRightX = selectionStartX;
+		if (selectionLeftX > selectionRightX)
+		{
+			GM_SWAP(selectionLeftX, selectionRightX);
+		}
+
+		rcSelection.x = selectionLeftX + (d->rcText.x - firstX);
+		rcSelection.y = getCaretTop();
+		rcSelection.width = selectionRightX - selectionLeftX;
+		rcSelection.height = getCaretHeight();
+		GMRect rc = GM_intersectRect(rcSelection, d->rcText);
+		widget->drawRect(d->selectionBackColor, rc, true, .99f);
+	}
+
+	d->textStyle.getFontColor().setCurrent(d->textColor);
+
+	// 闪烁光标
+	blinkCaret(firstX, caretX);
+
+	// 获取能够显示的文本长度
+	calculateRenderText(firstX);
+	widget->drawText(getRenderText(), d->textStyle, d->rcText, false, false, true);
+}
+
+void GMControlTextArea::pasteFromClipboard()
+{
+	D_BASE(d, Base);
+	deleteSelectionText();
+	GMBuffer clipboardBuffer = GMClipboard::getData(GMClipboardMIME::UnicodeText);
+	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.buffer));
+	if (d->buffer->insertString(d->cp, string))
+	{
+		placeCaret(d->cp + string.length());
+		d->selectionStartCP = d->cp;
+	}
+}
+
+void GMControlTextArea::insertCharacter(GMwchar ch)
+{
+	D_BASE(d, Base);
+	if (d->selectionStartCP != d->cp)
+		deleteSelectionText();
+
+	if (!d->insertMode && d->cp < d->buffer->getLength())
+	{
+		d->buffer->setChar(d->cp, ch);
+		placeCaret(d->cp + 1);
+		d->selectionStartCP = d->cp;
+	}
+	else
+	{
+		if (d->buffer->insertChar(d->cp, ch))
+		{
+			placeCaret(d->cp + 1);
+			d->selectionStartCP = d->cp;
+		}
+	}
+}
+
+void GMControlTextArea::setSize(GMint width, GMint height)
+{
+	D_BASE(d, Base);
+	Base::setSize(width, height);
+	GMRect rc = { 0, 0, width, height };
+	d->buffer->setSize(rc);
 }

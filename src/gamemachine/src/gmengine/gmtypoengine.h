@@ -105,7 +105,7 @@ public:
 	GMTypoStateMachine(GMTypoEngine* engine);
 
 public:
-	virtual ParseResult parse(bool isPlainText, REF GMwchar& ch);
+	virtual ParseResult parse(const GMTypoOptions& options, REF GMwchar& ch);
 	virtual void createInstance(GMTypoEngine* engine, OUT GMTypoStateMachine**);
 
 protected:
