@@ -255,8 +255,8 @@ GMint GMGLRenderer::getTextureID(GMTextureType type)
 bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
-	if (d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() && type != GMTextureType::Lightmap)
-		return true;
+	if (type != GMTextureType::Lightmap && d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool())
+		return false;
 
 	// 按照贴图类型选择纹理动画序列
 	GMTextureSampler& sampler = model->getShader().getTextureList().getTextureSampler(type);

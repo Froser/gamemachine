@@ -120,6 +120,9 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 	static const gm::GMString s_dfr = L"渲染模式: 优先延迟渲染";
 	static const gm::GMString s_gammaOn = L"Gamma校正: 开";
 	static const gm::GMString s_gammaOff = L"Gamma校正: 关";
+	static const gm::GMString s_normalOff = L"查看法向量：无";
+	static const gm::GMString s_normalWorldSpace = L"查看法向量：世界空间";
+	static const gm::GMString s_normalEyeSpace = L"查看法向量：眼睛空间";
 
 	switch (evt)
 	{
@@ -137,6 +140,18 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 			d->lbGammaCorrection->setText(
 				(d->renderConfig.get(gm::GMRenderConfigs::GammaCorrection_Bool).toBool() ? s_gammaOn : s_gammaOff)
 			);
+
+		if (d->lbDebugNormal)
+		{
+			auto mode = d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonNormalMode).toInt();
+			if (mode == gm::GMDrawPolygonNormalMode::Off)
+				d->lbDebugNormal->setText(s_normalOff);
+			else if (mode == gm::GMDrawPolygonNormalMode::WorldSpace)
+				d->lbDebugNormal->setText(s_normalWorldSpace);
+			else if (mode == gm::GMDrawPolygonNormalMode::EyeSpace)
+				d->lbDebugNormal->setText(s_normalEyeSpace);
+		}
+
 		break;
 	}
 	case gm::GameMachineHandlerEvent::Activate:

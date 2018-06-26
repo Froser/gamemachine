@@ -7,6 +7,13 @@ vec3 g_model3d_refractionLight;
 
 in vec4 _model3d_position_world;
 
+vec4 normalToTexture(vec3 normal_N)
+{
+    // 先反转z，按照大家的习惯来展现法线颜色
+    normal_N = vec3(normal_N.xy, -normal_N.z);
+    return vec4( (normal_N + 1) * .5f, 1);
+}
+
 subroutine (GM_TechniqueEntrance)
 void GM_Model3D()
 {
@@ -37,6 +44,19 @@ void GM_Model3D()
         tangentSpace.TBN = TBN;
         tangentSpace.Normal_Tangent_N = texture(GM_NormalMapTextureAttribute.Texture, _uv).rgb * 2.0 - 1.0;
     }
+
+    /// Start Debug Option
+    if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
+    {
+        _frag_color = normalToTexture(vertex.Normal_World_N.xyz);
+        return;
+    }
+    else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
+    {
+        _frag_color = normalToTexture(vertex.Normal_Eye_N.xyz);
+        return;
+    }
+    /// End Debug Option
 
     vertex.TangentSpace = tangentSpace;
 

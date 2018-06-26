@@ -34,6 +34,13 @@ cbuffer WorldConstantBuffer: register( b0 )
     matrix GM_InverseViewMatrix;
     float4 GM_ViewPosition;
 }
+//--------------------------------------------------------------------------------------
+// Debug Options
+//--------------------------------------------------------------------------------------
+int GM_Debug_Normal = 0;
+const int GM_Debug_Normal_Off = 0;
+const int GM_Debug_Normal_WorldSpace = 1;
+const int GM_Debug_Normal_EyeSpace = 2;
 
 //--------------------------------------------------------------------------------------
 // Textures, GM_LightAttributes, Materials
@@ -700,6 +707,13 @@ bool GM_IsTangentSpaceInvalid(float3 tangent, float3 bitangent)
     return length(tangent) < 0.01f && length(bitangent) < 0.01f;
 }
 
+vec4 GM_NormalToTexture(vec3 normal_N)
+{
+    // 先反转z，按照大家的习惯来展现法线颜色
+    normal_N = vec3(normal_N.xy, -normal_N.z);
+    return vec4( (normal_N + 1) * .5f, 1);
+}
+
 GMTexture PS_3D_NormalMap()
 {
     return GM_NormalMapTextureAttribute;
@@ -729,6 +743,19 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
 
     commonInput.Normal_Eye_N = normal_Eye_N;
     commonInput.IlluminationModel = GM_IlluminationModel;
+
+    /// Start Debug Option
+    if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
+    {
+        _frag_color = GM_NormalToTexture(commonInput.Normal_World_N.xyz);
+        return;
+    }
+    else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
+    {
+        _frag_color = GM_NormalToTexture(commonInput.Normal_Eye_N.xyz);
+        return;
+    }
+    /// End Debug Option
 
     // 计算Ambient
     float4 color_Ambient = GM_AmbientTextureAttribute.Sample(GM_AmbientTexture, GM_AmbientSampler, input.Texcoord);

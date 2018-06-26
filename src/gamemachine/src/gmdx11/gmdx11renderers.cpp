@@ -589,7 +589,7 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 		// 写入纹理属性，如是否绘制，偏移等
 		ITexture* texture = getTexture(sampler);
 		applyTextureAttribute(model, texture, type);
-		if (texture)
+		if (texture && !(type != GMTextureType::Lightmap && d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool()))
 		{
 			// 激活动画序列
 			texture->bindSampler(&sampler);
