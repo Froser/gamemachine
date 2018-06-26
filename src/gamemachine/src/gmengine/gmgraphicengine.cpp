@@ -269,6 +269,29 @@ GMToneMapping::Mode GMGraphicEngine::getToneMapping()
 	return d->renderConfig.get(GMRenderConfigs::ToneMapping).toInt();
 }
 
+bool GMGraphicEngine::isWireFrameMode(GMModel* model)
+{
+	D(d);
+	// 有几种类型的Model不会绘制线框图
+	auto type = model->getType();
+	if (type == GMModelType::Model2D ||
+		type == GMModelType::Text)
+	{
+		return false;
+	}
+
+	return d->debugConfig.get(GMDebugConfigs::WireFrameMode_Bool).toBool();
+}
+
+bool GMGraphicEngine::isNeedDiscardTexture(GMModel* model, GMTextureType type)
+{
+	D(d);
+	return type != GMTextureType::Lightmap &&
+		d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool() &&
+		model->getType() != GMModelType::Model2D &&
+		model->getType() != GMModelType::Text;
+}
+
 void GMGraphicEngine::createFilterFramebuffer()
 {
 	D(d);

@@ -46,7 +46,7 @@ struct GMToneMapping
 
 enum class GMDebugConfigs
 {
-	DrawPolygonsAsLine_Bool,
+	WireFrameMode_Bool,
 	DrawLightmapOnly_Bool,
 	DrawPolygonNormalMode,
 	RunProfile_Bool,

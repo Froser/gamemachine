@@ -62,6 +62,7 @@ namespace
 	}
 
 	inline D3D11_RASTERIZER_DESC getRasterizerDesc(
+		bool isSolid,
 		GMS_FrontFace frontFace,
 		GMS_Cull cull,
 		bool multisampleEnable,
@@ -69,7 +70,7 @@ namespace
 	)
 	{
 		D3D11_RASTERIZER_DESC desc = {
-			D3D11_FILL_SOLID,
+			isSolid ? D3D11_FILL_SOLID : D3D11_FILL_WIREFRAME,
 			cull == GMS_Cull::CULL ? D3D11_CULL_BACK : D3D11_CULL_NONE,
 			frontFace == GMS_FrontFace::CLOCKWISE ? FALSE : TRUE,
 			0,
@@ -318,11 +319,17 @@ struct GMDx11RasterizerStates
 {
 	enum
 	{
+		Size_FillMode = 2,
 		Size_Cull = 2,
 		Size_FrontFace = 2,
 	};
 
-	//TODO 先不考虑FillMode
+	enum
+	{
+		WireFrame,
+		Solid,
+	};
+
 public:
 	GMDx11RasterizerStates::GMDx11RasterizerStates(const IRenderContext* context)
 	{
@@ -331,14 +338,19 @@ public:
 	}
 
 public:
-	ID3D11RasterizerState* getRasterStates(GMS_FrontFace frontFace, GMS_Cull cullMode)
+	ID3D11RasterizerState* getRasterStates(GMModel* model)
 	{
 		const GMWindowStates& windowStates = context->getWindow()->getWindowStates();
 		bool multisampleEnable = windowStates.sampleCount > 1;
-		GMComPtr<ID3D11RasterizerState>& state = states[(GMuint)cullMode][(GMuint)frontFace];
+
+		GMS_FrontFace frontFace = model->getShader().getFrontFace();
+		GMS_Cull cullMode = model->getShader().getCull();
+		GMuint fillMode = engine->isWireFrameMode(model) ? WireFrame : Solid;
+
+		GMComPtr<ID3D11RasterizerState>& state = states[fillMode][(GMuint)cullMode][(GMuint)frontFace];
 		if (!state)
 		{
-			D3D11_RASTERIZER_DESC desc = getRasterizerDesc(frontFace, cullMode, multisampleEnable, multisampleEnable);
+			D3D11_RASTERIZER_DESC desc = getRasterizerDesc(fillMode != WireFrame, frontFace, cullMode, multisampleEnable, multisampleEnable);
 			createRasterizerState(desc, &state);
 		}
 
@@ -356,7 +368,7 @@ private:
 private:
 	const IRenderContext* context = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
-	GMComPtr<ID3D11RasterizerState> states[Size_Cull][Size_FrontFace];
+	GMComPtr<ID3D11RasterizerState> states[Size_FillMode][Size_Cull][Size_FrontFace];
 };
 
 struct GMDx11BlendStates
@@ -589,7 +601,8 @@ void GMDx11Renderer::prepareTextures(GMModel* model)
 		// 写入纹理属性，如是否绘制，偏移等
 		ITexture* texture = getTexture(sampler);
 		applyTextureAttribute(model, texture, type);
-		if (texture && !(type != GMTextureType::Lightmap && d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool()))
+
+		if (texture && !d->engine->isNeedDiscardTexture(model, type))
 		{
 			// 激活动画序列
 			texture->bindSampler(&sampler);
@@ -772,7 +785,7 @@ void GMDx11Renderer::prepareRasterizer(GMModel* model)
 	GM_ASSERT(d->rasterizer);
 	GM_DX_HR(d->rasterizer->SetRasterizerState(
 		0, 
-		d->rasterizerStates->getRasterStates(model->getShader().getFrontFace(), model->getShader().getCull())
+		d->rasterizerStates->getRasterStates(model)
 	));
 }
 

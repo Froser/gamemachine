@@ -38,9 +38,9 @@ cbuffer WorldConstantBuffer: register( b0 )
 // Debug Options
 //--------------------------------------------------------------------------------------
 int GM_Debug_Normal = 0;
-const int GM_Debug_Normal_Off = 0;
-const int GM_Debug_Normal_WorldSpace = 1;
-const int GM_Debug_Normal_EyeSpace = 2;
+static const int GM_Debug_Normal_Off = 0;
+static const int GM_Debug_Normal_WorldSpace = 1;
+static const int GM_Debug_Normal_EyeSpace = 2;
 
 //--------------------------------------------------------------------------------------
 // Textures, GM_LightAttributes, Materials
@@ -707,11 +707,11 @@ bool GM_IsTangentSpaceInvalid(float3 tangent, float3 bitangent)
     return length(tangent) < 0.01f && length(bitangent) < 0.01f;
 }
 
-vec4 GM_NormalToTexture(vec3 normal_N)
+float4 GM_NormalToTexture(float3 normal_N)
 {
     // 先反转z，按照大家的习惯来展现法线颜色
-    normal_N = vec3(normal_N.xy, -normal_N.z);
-    return vec4( (normal_N + 1) * .5f, 1);
+    normal_N = float3(normal_N.xy, -normal_N.z);
+    return float4( (normal_N + 1) * .5f, 1);
 }
 
 GMTexture PS_3D_NormalMap()
@@ -747,13 +747,11 @@ float4 PS_3D(PS_INPUT input) : SV_TARGET
     /// Start Debug Option
     if (GM_Debug_Normal == GM_Debug_Normal_WorldSpace)
     {
-        _frag_color = GM_NormalToTexture(commonInput.Normal_World_N.xyz);
-        return;
+        return GM_NormalToTexture(commonInput.Normal_World_N.xyz);
     }
     else if (GM_Debug_Normal == GM_Debug_Normal_EyeSpace)
     {
-        _frag_color = GM_NormalToTexture(commonInput.Normal_Eye_N.xyz);
-        return;
+        return GM_NormalToTexture(commonInput.Normal_Eye_N.xyz);
     }
     /// End Debug Option
 

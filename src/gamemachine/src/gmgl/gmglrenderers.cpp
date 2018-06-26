@@ -140,7 +140,7 @@ void GMGLRenderer::draw(GMModel* model)
 	applyStencil(*d->engine);
 	prepareScreenInfo(getShaderProgram());
 	beforeDraw(model);
-	GLenum mode = d->debugConfig.get(GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool() ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
+	GLenum mode = (d->engine->isWireFrameMode(model)) ? GL_LINE_LOOP : getMode(model->getPrimitiveTopologyMode());
 	GM_ASSERT(model->getVerticesCount() < std::numeric_limits<GMuint>::max());
 	if (model->getDrawMode() == GMModelDrawMode::Vertex)
 		glDrawArrays(mode, 0, (GLsizei)model->getVerticesCount());
@@ -255,7 +255,7 @@ GMint GMGLRenderer::getTextureID(GMTextureType type)
 bool GMGLRenderer::drawTexture(GMModel* model, GMTextureType type)
 {
 	D(d);
-	if (type != GMTextureType::Lightmap && d->debugConfig.get(GMDebugConfigs::DrawLightmapOnly_Bool).toBool())
+	if (d->engine->isNeedDiscardTexture(model, type))
 		return false;
 
 	// 按照贴图类型选择纹理动画序列

@@ -250,6 +250,9 @@ public:
 	bool needHDR();
 	GMToneMapping::Mode getToneMapping();
 
+	bool isWireFrameMode(GMModel* model);
+	bool isNeedDiscardTexture(GMModel* model, GMTextureType type);
+
 protected:
 	void createFilterFramebuffer();
 

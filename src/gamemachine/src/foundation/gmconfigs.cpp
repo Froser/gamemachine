@@ -41,7 +41,7 @@ void GMConfigs::init()
 {
 	D(d);
 	GMDebugConfig debugConfig = getConfig(GMConfigs::Debug).asDebugConfig();
-	debugConfig.set(GMDebugConfigs::DrawPolygonsAsLine_Bool, false);
+	debugConfig.set(GMDebugConfigs::WireFrameMode_Bool, false);
 	debugConfig.set(GMDebugConfigs::DrawPolygonNormalMode, GMDrawPolygonNormalMode::Off);
 	debugConfig.set(GMDebugConfigs::DrawLightmapOnly_Bool, false);
 	debugConfig.set(GMDebugConfigs::RunProfile_Bool, false);

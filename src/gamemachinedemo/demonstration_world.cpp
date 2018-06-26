@@ -161,9 +161,6 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 		if (kbState.keyTriggered(gm::GMKey_Escape))
 			backToEntrance();
 
-		if (kbState.keyTriggered(gm::GM_keyFromASCII('L')))
-			d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
-
 		if (kbState.keyTriggered(gm::GM_keyFromASCII('I')))
 			d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
 
@@ -403,6 +400,19 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 		switchNormal();
 	});
 
+	d->mainWidget->addButton(
+		L"切换线框模式",
+		10,
+		top += 40,
+		250,
+		30,
+		false,
+		&button
+	);
+	button->connect(*button, GM_SIGNAL(gm::GMControlButton::click), [=](gm::GMObject* sender, gm::GMObject* receiver) {
+		d->debugConfig.set(gm::GMDebugConfigs::WireFrameMode_Bool, !d->debugConfig.get(gm::GMDebugConfigs::WireFrameMode_Bool).toBool());
+	});
+
 	d->nextControlTop = top + 40;
 	d->mainWidget->setSize(d->mainWidget->getSize().width, d->nextControlTop);
 
@@ -613,9 +623,6 @@ void DemostrationEntrance::event(gm::GameMachineHandlerEvent evt)
 			/*
 			gm::IInput* inputManager = d->mainWindow->getInputMananger();
 			gm::IKeyboardState& kbState = inputManager->getKeyboardState();
-
-			if (kbState.keyTriggered('L'))
-				d->debugConfig.set(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool, !d->debugConfig.get(gm::GMDebugConfigs::DrawPolygonsAsLine_Bool).toBool());
 
 			if (kbState.keyTriggered('I'))
 				d->debugConfig.set(gm::GMDebugConfigs::RunProfile_Bool, !d->debugConfig.get(gm::GMDebugConfigs::RunProfile_Bool).toBool());
