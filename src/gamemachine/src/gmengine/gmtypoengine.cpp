@@ -213,10 +213,21 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 		if (!d->results.empty())
 		{
 			decltype(auto) last = d->results[d->results.size() - 1];
-			target.x = last.x + last.advance;
-			target.y = last.y;
-			if (copyLineNo)
-				target.lineNo = last.lineNo;
+			// 换行符没有size，跟随它的前一个字符，但是如果前一个字符也是换行符，那么它的y坐标将新起一行
+			if (!last.newLineOrEOFSeparator)
+			{
+				target.x = last.x + last.advance;
+				target.y = last.y;
+				target.lineHeight = d->lineHeight;
+				if (copyLineNo)
+					target.lineNo = last.lineNo;
+			}
+			else
+			{
+				target.lineNo = d->currentLineNo;
+				target.y = d->current_y;
+				target.lineHeight = d->lineHeight;
+			}
 		}
 	};
 

@@ -388,7 +388,8 @@ public:
 		const GMRect& rc,
 		bool shadow = false,
 		bool center = false,
-		bool newLine = true
+		bool newLine = true,
+		GMint lineSpacing = 0
 	);
 
 	void drawSprite(

@@ -106,7 +106,7 @@ void GMTextGameObject::setText(const GMString& text)
 	}
 }
 
-void GMTextGameObject::setColorType(GMTextColorType type)
+void GMTextGameObject::setColorType(GMTextColorType type) GM_NOEXCEPT
 {
 	D(d);
 	if (d->colorType != type)
@@ -137,7 +137,7 @@ void GMTextGameObject::setColor(const GMVec4& color)
 	}
 }
 
-void GMTextGameObject::setCenter(bool center)
+void GMTextGameObject::setCenter(bool center) GM_NOEXCEPT
 {
 	D(d);
 	if (d->center != center)
@@ -147,7 +147,7 @@ void GMTextGameObject::setCenter(bool center)
 	}
 }
 
-void GMTextGameObject::setFont(GMFontHandle font)
+void GMTextGameObject::setFont(GMFontHandle font) GM_NOEXCEPT
 {
 	D(d);
 	if (d->font != font)
@@ -157,12 +157,22 @@ void GMTextGameObject::setFont(GMFontHandle font)
 	}
 }
 
-void GMTextGameObject::setNewline(bool newline)
+void GMTextGameObject::setNewline(bool newline) GM_NOEXCEPT
 {
 	D(d);
 	if (d->newline != newline)
 	{
 		d->newline = newline;
+		markDirty();
+	}
+}
+
+void GMTextGameObject::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
+{
+	D(d);
+	if (d->lineSpacing != lineSpacing)
+	{
+		d->lineSpacing = lineSpacing;
 		markDirty();
 	}
 }
@@ -239,6 +249,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		GMTypoOptions options;
 		options.newline = d->newline;
 		options.center = d->center;
+		options.lineSpacing = d->lineSpacing;
 		options.typoArea.width = coord.width * rect.width * .5f;
 		options.typoArea.height = coord.height * rect.height * .5f;
 		options.plainText = d->colorType == GMTextColorType::Plain;

@@ -6,8 +6,16 @@
 GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged);
 
 BEGIN_NS
+
+GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
+{
+	GMint lineSpacing = 5;
+};
+
 class GMMultiLineTypoTextBuffer : public GMTypoTextBuffer
 {
+	GM_DECLARE_PRIVATE_AND_BASE(GMMultiLineTypoTextBuffer, GMTypoTextBuffer)
+
 public:
 	GMMultiLineTypoTextBuffer() = default;
 
@@ -22,22 +30,37 @@ public:
 	GMint CPToLineNumber(GMint cp);
 	GMint findFirstCPInOneLine(GMint cp);
 	GMint findLastCPInOneLine(GMint cp);
+
+public:
+	inline void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
+	{
+		D(d);
+		d->lineSpacing = lineSpacing;
+	}
+
+	inline GMint getLineSpacing() GM_NOEXCEPT
+	{
+		D(d);
+		return d->lineSpacing;
+	}
 };
 
 void GMMultiLineTypoTextBuffer::analyze()
 {
 	D(d);
+	D_BASE(db, Base);
 	GMTypoOptions options;
-	options.typoArea = d->rc;
+	options.typoArea = db->rc;
 	options.newline = true;
 	options.plainText = true;
-	d->engine->begin(d->buffer, options);
-	d->dirty = false;
+	options.lineSpacing = d->lineSpacing;
+	db->engine->begin(db->buffer, options);
+	db->dirty = false;
 }
 
 bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 {
-	D(d);
+	D_BASE(d, Base);
 	if (!x || !y)
 		return false;
 
@@ -66,7 +89,7 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 
 bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 {
-	D(d);
+	D_BASE(d, Base);
 	if (x < 0 || y < 0)
 		return false;
 
@@ -77,6 +100,14 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 		analyze();
 
 	decltype(auto) r = d->engine->getResults();
+	if (r.empty())
+	{
+		*cp = 0;
+		return true;
+	}
+
+	// r表示排版结果，最后为一个eof符号
+	const GMPoint pt = { x, y };
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)
 	{
 		GMRect glyphRc = {
@@ -86,7 +117,6 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 			static_cast<GMint>(r[i].lineHeight)
 		};
 
-		GMPoint pt = { x, y };
 		if (GM_inRect(glyphRc, pt))
 		{
 			*cp = i;
@@ -94,6 +124,32 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 		}
 	}
 
+	// 如果没有选中某个字符，那么选择这一行末尾
+	constexpr GMint s_range = 100000; //一个足够大的值，表示一行的范围
+	GMint currentLine = 0;
+	GMint rowX, rowY;
+	for (GMsize_t i = 0; i < r.size() - 1; ++i)
+	{
+		if (currentLine == r[i].lineNo)
+			continue;
+
+		currentLine = r[i].lineNo;
+		CPtoXY(i, true, &rowX, &rowY);
+
+		GMRect rowRc = {
+			static_cast<GMint>(-s_range),
+			static_cast<GMint>(r[i].y),
+			static_cast<GMint>(s_range * 2),
+			static_cast<GMint>(r[i].lineHeight)
+		};
+		if (GM_inRect(rowRc, pt))
+		{
+			*cp = findLastCPInOneLine(i);
+			return true;
+		}
+	}
+
+	// 还没有的话，选中最后的CP
 	if (cp)
 		*cp = r.size() - 1;
 
@@ -102,7 +158,7 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 
 GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
 {
-	D(d);
+	D_BASE(d, Base);
 	if (cp < 0)
 		return 1;
 
@@ -118,7 +174,7 @@ GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
 
 GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
 {
-	D(d);
+	D_BASE(d, Base);
 	if (d->dirty)
 		analyze();
 
@@ -137,7 +193,7 @@ GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
 
 GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
 {
-	D(d);
+	D_BASE(d, Base);
 	if (d->dirty)
 		analyze();
 
@@ -980,7 +1036,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 
 	// 获取能够显示的文本长度
 	calculateRenderText(firstX);
-	widget->drawText(getRenderText(), db->textStyle, db->rcText, false, false, true);
+	widget->drawText(getRenderText(), db->textStyle, db->rcText, false, false, true, d->buffer->getLineSpacing());
 }
 
 void GMControlTextArea::pasteFromClipboard()
@@ -1049,4 +1105,10 @@ void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
 			db->selectionStartCP = db->cp;
 		resetCaretBlink();
 	}
+}
+
+void GMControlTextArea::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
+{
+	D(d);
+	d->buffer->setLineSpacing(lineSpacing);
 }

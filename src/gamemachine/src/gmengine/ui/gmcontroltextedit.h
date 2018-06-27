@@ -135,12 +135,16 @@ public:
 	virtual GMint getCaretTop() override;
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
 
+public:
+	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
+
 private:
 	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
 	{
 		D(d);
 		d->caretTopRelative = caretTopRelative;
 	}
+
 };
 
 END_NS

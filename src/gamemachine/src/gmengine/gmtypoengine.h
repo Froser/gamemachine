@@ -195,13 +195,13 @@ public:
 		d->engine = engine;
 	}
 
-	inline const ITypoEngine* getTypoEngine() const
+	inline const ITypoEngine* getTypoEngine() const GM_NOEXCEPT
 	{
 		D(d);
 		return d->engine;
 	}
 
-	inline const GMString& getBuffer() const
+	inline const GMString& getBuffer() const GM_NOEXCEPT
 	{
 		D(d);
 		return d->buffer;

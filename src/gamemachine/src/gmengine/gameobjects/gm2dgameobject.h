@@ -36,25 +36,25 @@ public:
 protected:
 	virtual void setShader(GMShader& shader);
 
-	inline const GMRect& getRenderRect()
+	inline const GMRect& getRenderRect() GM_NOEXCEPT
 	{
 		D(d);
 		return d->renderRc;
 	}
 
-	inline void markDirty()
+	inline void markDirty() GM_NOEXCEPT
 	{
 		D(d);
 		d->dirty = true;
 	}
 
-	inline void cleanDirty()
+	inline void cleanDirty() GM_NOEXCEPT
 	{
 		D(d);
 		d->dirty = false;
 	}
 
-	inline bool isDirty()
+	inline bool isDirty() GM_NOEXCEPT
 	{
 		D(d);
 		return d->dirty;
@@ -74,6 +74,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 {
 	GMString text;
 	GMint lineHeight = 0;
+	GMint lineSpacing = 0;
 	bool center = false;
 	bool newline = true;
 	GMsize_t length = 0;
@@ -98,11 +99,12 @@ public:
 
 public:
 	void setText(const GMString& text);
-	void setColorType(GMTextColorType type);
+	void setColorType(GMTextColorType type) GM_NOEXCEPT;
 	void setColor(const GMVec4& color);
-	void setCenter(bool center);
-	void setFont(GMFontHandle font);
-	void setNewline(bool newline);
+	void setCenter(bool center) GM_NOEXCEPT;
+	void setFont(GMFontHandle font) GM_NOEXCEPT;
+	void setNewline(bool newline) GM_NOEXCEPT;
+	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 
 public:
 	virtual void onAppendingObjectToWorld() override;
