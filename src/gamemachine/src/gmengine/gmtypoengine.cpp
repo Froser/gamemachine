@@ -192,6 +192,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	D(d);
 	d->options = options;
 	d->current_x = d->current_y = 0;
+	d->currentLineNo = 1;
 	d->results.clear();
 	setFontSize(d->options.defaultFontSize);
 	d->literature = literature.toStdWString();
@@ -208,21 +209,32 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 		++p;
 	}
 
+	auto _adjustNewLineSepResult = [=](auto& target, bool copyLineNo) {
+		if (!d->results.empty())
+		{
+			decltype(auto) last = d->results[d->results.size() - 1];
+			target.x = last.x + last.advance;
+			target.y = last.y;
+			if (copyLineNo)
+				target.lineNo = last.lineNo;
+		}
+	};
+
 	GMint rows = 0;
 	GMsize_t len = wstr.length();
 	for (GMsize_t i = 0; i < len; ++i)
 	{
 		GMTypoResult result = getTypoResult(i);
 		if (result.newLineOrEOFSeparator)
-			++rows;
+			_adjustNewLineSepResult(result, false);
 		d->results.push_back(result);
 	}
+
 	GMTypoResult eof;
+	eof.lineNo = d->currentLineNo;
 	eof.newLineOrEOFSeparator = true;
-	if (!d->results.empty())
-		eof.x = d->results[d->results.size() - 1].x;
+	_adjustNewLineSepResult(eof, true);
 	d->results.push_back(eof);
-	++rows;
 
 	GMsize_t sz = d->results.size();
 	if (d->options.center && sz > 0)
@@ -246,7 +258,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 			}
 
 			//调整高度
-			pCurrent->y += (d->options.typoArea.height - rows * d->lineHeight) / 2;
+			pCurrent->y += (d->options.typoArea.height - eof.lineNo * d->lineHeight) / 2;
 
 			pCurrent++;
 		}
@@ -285,6 +297,8 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 {
 	D(d);
 	GMTypoResult result;
+	result.lineNo = d->currentLineNo;
+
 	GMwchar ch = d->literature[index];
 	GMTypoStateMachine::ParseResult parseResult = d->stateMachine->parse(d->options, ch);
 
@@ -296,8 +310,10 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 
 	if (d->options.newline && parseResult == GMTypoStateMachine::Newline)
 	{
-		newLine();
+		result.lineNo = d->currentLineNo;
+		result.newLineOrEOFSeparator = true;
 		result.valid = false;
+		newLine();
 		return result;
 	}
 
@@ -319,9 +335,10 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 		// 如果给定了一个合法的绘制区域，且出现超出绘制区域的情况
 		if (d->options.newline && result.x + result.width > d->options.typoArea.width)
 		{
-			newLine();
 			result.x = d->current_x + glyph.bearingX;
 			result.y = d->current_y;
+			result.lineNo = d->currentLineNo;
+			newLine();
 		}
 	}
 	d->current_x += glyph.advance;
@@ -341,11 +358,7 @@ void GMTypoEngine::newLine()
 	D(d);
 	d->current_x = 0;
 	d->current_y += d->lineHeight + d->options.lineSpacing;
-
-	GMTypoResult newLineSep;
-	newLineSep.valid = false;
-	newLineSep.newLineOrEOFSeparator = true;
-	d->results.push_back(newLineSep);
+	++d->currentLineNo;
 }
 
 bool GMTypoEngine::isValidTypeFrame()
@@ -393,16 +406,6 @@ void GMTypoTextBuffer::setSize(const GMRect& rc)
 	d->rc = rc;
 	d->rc.x = d->rc.y = 0;
 	setDirty();
-}
-
-void GMTypoTextBuffer::setNewline(bool newline)
-{
-	D(d);
-	if (d->newline != newline)
-	{
-		d->newline = newline;
-		setDirty();
-	}
 }
 
 void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
@@ -514,7 +517,7 @@ void GMTypoTextBuffer::analyze()
 	D(d);
 	GMTypoOptions options;
 	options.typoArea = d->rc;
-	options.newline = d->newline;
+	options.newline = false;
 	options.plainText = true;
 	d->engine->begin(d->buffer, options);
 	d->dirty = false;
@@ -523,9 +526,6 @@ void GMTypoTextBuffer::analyze()
 bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
 {
 	D(d);
-	if (d->dirty)
-		analyze();
-
 	if (!x)
 		return false;
 	
@@ -534,6 +534,9 @@ bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
 		*x = 0;
 		return true;
 	}
+
+	if (d->dirty)
+		analyze();
 
 	auto& r = d->engine->getResults();
 	if (cp >= getLength())
@@ -549,11 +552,18 @@ bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
 bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 {
 	D(d);
+	if (x < 0)
+	{
+		if (cp)
+			*cp = 0;
+
+		if (trail)
+			*trail = false;
+		return false;
+	}
+
 	if (d->dirty)
 		analyze();
-
-	if (x < 0)
-		return 0;
 
 	auto& r = d->engine->getResults();
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)

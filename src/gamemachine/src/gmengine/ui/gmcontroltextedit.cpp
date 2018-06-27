@@ -5,6 +5,157 @@
 
 GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged);
 
+BEGIN_NS
+class GMMultiLineTypoTextBuffer : public GMTypoTextBuffer
+{
+public:
+	GMMultiLineTypoTextBuffer() = default;
+
+public:
+	virtual void analyze() override;
+	virtual bool CPtoX(GMint cp, bool trail, GMint* x) { return false; }
+	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) { return false; }
+	virtual bool CPtoXY(GMint cp, bool trail, GMint* x, GMint* y);
+	virtual bool XYtoCP(GMint x, GMint y, GMint* cp);
+	
+public:
+	GMint CPToLineNumber(GMint cp);
+	GMint findFirstCPInOneLine(GMint cp);
+	GMint findLastCPInOneLine(GMint cp);
+};
+
+void GMMultiLineTypoTextBuffer::analyze()
+{
+	D(d);
+	GMTypoOptions options;
+	options.typoArea = d->rc;
+	options.newline = true;
+	options.plainText = true;
+	d->engine->begin(d->buffer, options);
+	d->dirty = false;
+}
+
+bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
+{
+	D(d);
+	if (!x || !y)
+		return false;
+
+	if (cp < 0)
+	{
+		*x = 0;
+		*y = 0;
+		return true;
+	}
+
+	if (d->dirty)
+		analyze();
+
+	decltype(auto) r = d->engine->getResults();
+	if (cp >= getLength())
+		return CPtoXY(cp - 1, true, x, y);
+
+	if (trail)
+		*x = r[cp].x + r[cp].advance;
+	else
+		*x = r[cp].x;
+
+	*y = r[cp].y;
+	return true;
+}
+
+bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
+{
+	D(d);
+	if (x < 0 || y < 0)
+		return false;
+
+	if (!cp)
+		return false;
+
+	if (d->dirty)
+		analyze();
+
+	decltype(auto) r = d->engine->getResults();
+	for (GMsize_t i = 0; i < r.size() - 1; ++i)
+	{
+		GMRect glyphRc = {
+			static_cast<GMint>(r[i].x),
+			static_cast<GMint>(r[i].y),
+			static_cast<GMint>(r[i].advance),
+			static_cast<GMint>(r[i].lineHeight)
+		};
+
+		GMPoint pt = { x, y };
+		if (GM_inRect(glyphRc, pt))
+		{
+			*cp = i;
+			return true;
+		}
+	}
+
+	if (cp)
+		*cp = r.size() - 1;
+
+	return true;
+}
+
+GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
+{
+	D(d);
+	if (cp < 0)
+		return 1;
+
+	if (d->dirty)
+		analyze();
+
+	decltype(auto) r = d->engine->getResults();
+	if (cp > static_cast<GMint>(r.size()))
+		return r[r.size() - 1].lineNo;
+
+	return r[cp].lineNo;
+}
+
+GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
+{
+	D(d);
+	if (d->dirty)
+		analyze();
+
+	decltype(auto) r = d->engine->getResults();
+	if (cp >= static_cast<GMint>(r.size()))
+		cp = static_cast<GMint>(r.size() - 1);
+
+	auto lineNo = r[cp].lineNo;
+	for (auto i = static_cast<GMint>(cp); i >= 0; --i)
+	{
+		if (r[i].lineNo < lineNo)
+			return i + 1;
+	}
+	return 0;
+}
+
+GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
+{
+	D(d);
+	if (d->dirty)
+		analyze();
+
+	decltype(auto) r = d->engine->getResults();
+	if (cp >= static_cast<GMint>(r.size()))
+		cp = static_cast<GMint>(r.size() - 1);
+
+	auto lineNo = r[cp].lineNo;
+	for (GMsize_t i = cp; i < r.size(); ++i)
+	{
+		if (r[i].lineNo > lineNo)
+			return i - 1;
+	}
+	return r.size() - 1;
+}
+END_NS
+//////////////////////////////////////////////////////////////////////////
+
 class GMControlTextEditBorder : public GMControlBorder
 {
 public:
@@ -20,15 +171,7 @@ GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 	D(d);
 	d->borderControl = new GMControlTextEditBorder(widget);
 	d->buffer = new GMTypoTextBuffer();
-	d->buffer->setNewline(false); //不允许换行
-
-	ITypoEngine* typoEngine = widget->getManager()->getTypoEngine();
-	if (typoEngine)
-	{
-		ITypoEngine* newInstance = nullptr;
-		typoEngine->createInstance(&newInstance);
-		d->buffer->setTypoEngine(newInstance);
-	}
+	createBufferTypoEngineIfNotExist();
 	initStyles(widget);
 }
 
@@ -420,7 +563,9 @@ void GMControlTextEdit::blinkCaret(GMint firstX, GMint caretX)
 void GMControlTextEdit::placeCaret(GMint cp)
 {
 	D(d);
-	GM_ASSERT(cp >= 0 && cp <= d->buffer->getLength());
+	GM_ASSERT(cp >= 0);
+	if (cp > d->buffer->getLength())
+		cp = d->buffer->getLength();
 	d->cp = cp;
 
 	GMint firstX, x, x2;
@@ -682,61 +827,160 @@ void GMControlTextEdit::moveFirstVisibleCp(GMint distance)
 GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	: Base(widget)
 {
+	D(d);
 	D_BASE(db, Base);
-	db->buffer->setNewline(true);
+	GM_delete(db->buffer);
+	db->buffer = d->buffer = new GMMultiLineTypoTextBuffer();
+	createBufferTypoEngineIfNotExist();
 }
 
 void GMControlTextArea::render(GMfloat elapsed)
 {
-	D_BASE(d, Base);
+	D(d);
+	D_BASE(db, Base);
 	if (!getVisible())
 		return;
 
 	createBufferTypoEngineIfNotExist();
 
-	placeCaret(d->cp);
-	d->borderControl->render(elapsed);
+	placeCaret(db->cp);
+	db->borderControl->render(elapsed);
 
 	// 计算首个能显示的字符
-	GMint firstX;
-	d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
+	GMint firstX, firstY;
+	d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
 
 	// 计算选区
 	GMint caretX;
-	GMint selectionStartX = 0;
-	d->buffer->CPtoX(d->cp, false, &caretX);
-	if (d->cp != d->selectionStartCP)
-		d->buffer->CPtoX(d->selectionStartCP, false, &selectionStartX);
+	GMint caretY;
+	GMint caretSelectionX = 0;
+	GMint caretSelectionY = 0;
+
+	d->buffer->CPtoXY(db->cp, false, &caretX, &caretY);
+	if (db->cp != db->selectionStartCP)
+	{
+		d->buffer->CPtoXY(db->selectionStartCP, false, &caretSelectionX, &caretSelectionY);
+	}
 	else
-		selectionStartX = caretX;
+	{
+		caretSelectionX = caretX;
+		caretSelectionY = caretY;
+	}
 
 	GMWidget* widget = getParent();
 	GMRect rcSelection;
-	if (d->cp != d->selectionStartCP)
-	{
-		// 如果当前位置不等于选定开始的位置，则确定一个选区
-		GMint selectionLeftX = caretX, selectionRightX = selectionStartX;
-		if (selectionLeftX > selectionRightX)
-		{
-			GM_SWAP(selectionLeftX, selectionRightX);
-		}
+	GMint selectionLeftLineNo = d->buffer->CPToLineNumber(db->selectionStartCP);
+	GMint selectionRightLineNo = d->buffer->CPToLineNumber(db->cp);
+	if (selectionLeftLineNo > selectionRightLineNo)
+		GM_SWAP(selectionLeftLineNo, selectionRightLineNo);
 
-		rcSelection.x = selectionLeftX + (d->rcText.x - firstX);
-		rcSelection.y = getCaretTop();
-		rcSelection.width = selectionRightX - selectionLeftX;
-		rcSelection.height = getCaretHeight();
-		GMRect rc = GM_intersectRect(rcSelection, d->rcText);
-		widget->drawRect(d->selectionBackColor, rc, true, .99f);
+	if (db->cp != db->selectionStartCP)
+	{
+		if (selectionLeftLineNo == selectionRightLineNo)
+		{
+			GMint selectionStartX = caretX, selectionEndX = caretSelectionX;
+			if (selectionStartX > selectionEndX)
+				GM_SWAP(selectionStartX, selectionEndX);
+
+			// 被选中的块位于同一行
+			rcSelection.x = selectionStartX + (db->rcText.x - firstX);
+			rcSelection.y = getCaretTop();
+			rcSelection.width = selectionEndX - selectionStartX;
+			rcSelection.height = getCaretHeight();
+			GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+			widget->drawRect(db->selectionBackColor, rc, true, .99f);
+		}
+		else
+		{
+			// 跨行的情况，需要绘制2~3个矩形
+			GM_ASSERT(selectionRightLineNo > selectionLeftLineNo);
+			auto selectionStartCP = db->selectionStartCP, // 选区开始的CP
+				selectionEndCP = db->cp; //选区结束的CP
+
+			if (selectionStartCP > selectionEndCP)
+				GM_SWAP(selectionStartCP, selectionEndCP);
+
+			GMint selectionStartX, selectionEndX;
+			GMint selectionStartY, selectionEndY;
+			d->buffer->CPtoXY(selectionStartCP, false, &selectionStartX, &selectionStartY);
+			d->buffer->CPtoXY(selectionEndCP, false, &selectionEndX, &selectionEndY);
+
+			// 绘制最上面的矩形
+			GMint firstLineLastCp = d->buffer->findLastCPInOneLine(selectionStartCP);
+			{
+				// 获取选择的首行的最后一个CP
+
+				// 获取CP的X和Y
+				GMint selStartLastX, selStartLastY;
+				d->buffer->CPtoXY(firstLineLastCp, true, &selStartLastX, &selStartLastY);
+
+				setCaretTopRelative(selStartLastY);
+				rcSelection.x = selectionStartX + (db->rcText.x - firstX);
+				rcSelection.y = getCaretTop();
+				rcSelection.width = selStartLastX - selectionStartX;
+				rcSelection.height = getCaretHeight();
+				GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+				widget->drawRect(db->selectionBackColor, rc, true, .99f);
+			}
+
+			// 绘制最下方的矩形
+			GMint lastLineFirstCp = 0;
+			{
+				// 获取选择的尾行的首个CP
+				lastLineFirstCp = d->buffer->findFirstCPInOneLine(selectionEndCP);
+
+				// 获取CP的X和Y
+				GMint selEndFirstX, selEndFirstY;
+				d->buffer->CPtoXY(lastLineFirstCp, false, &selEndFirstX, &selEndFirstY);
+
+				setCaretTopRelative(selEndFirstY);
+				rcSelection.x = selEndFirstX + (db->rcText.x - firstX);
+				rcSelection.y = getCaretTop();
+				rcSelection.width = selectionEndX - selEndFirstX;
+				rcSelection.height = getCaretHeight();
+				GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+				widget->drawRect(db->selectionBackColor, rc, true, .99f);
+			}
+
+			if (selectionRightLineNo - selectionLeftLineNo > 1)
+			{
+				// 如果中间还有内容，中间全选内容
+				GMint nextLineFirstCp = firstLineLastCp + 1;
+				GMint currentLineLastCp = 0;
+				while (nextLineFirstCp <= lastLineFirstCp - 1) //lastLineFirstCp - 1表示倒数第二行的最后一个CP
+				{
+					currentLineLastCp = d->buffer->findLastCPInOneLine(nextLineFirstCp);
+					// 现在获取了这一行的CP范围，可以开始绘制选区了
+					GMint leftX, leftY, rightX, rightY;
+					d->buffer->CPtoXY(nextLineFirstCp, false, &leftX, &leftY);
+					d->buffer->CPtoXY(currentLineLastCp, false, &rightX, &rightY);
+
+					setCaretTopRelative(leftY);
+					rcSelection.x = leftX + (db->rcText.x - firstX);
+					rcSelection.y = getCaretTop();
+					rcSelection.width = rightX - leftX;
+					rcSelection.height = getCaretHeight();
+					// 如果是个空行导致选区宽度小于一个值，我们将它设置一个最小宽度
+					if (rcSelection.width < 5)
+						rcSelection.width = 10;
+					GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+					widget->drawRect(db->selectionBackColor, rc, true, .99f);
+
+					nextLineFirstCp = currentLineLastCp + 1;
+				}
+			}
+		}
 	}
 
-	d->textStyle.getFontColor().setCurrent(d->textColor);
+	setCaretTopRelative(caretY);
+	db->textStyle.getFontColor().setCurrent(db->textColor);
 
 	// 闪烁光标
 	blinkCaret(firstX, caretX);
 
 	// 获取能够显示的文本长度
 	calculateRenderText(firstX);
-	widget->drawText(getRenderText(), d->textStyle, d->rcText, false, false, true);
+	widget->drawText(getRenderText(), db->textStyle, db->rcText, false, false, true);
 }
 
 void GMControlTextArea::pasteFromClipboard()
@@ -780,4 +1024,29 @@ void GMControlTextArea::setSize(GMint width, GMint height)
 	Base::setSize(width, height);
 	GMRect rc = { 0, 0, width, height };
 	d->buffer->setSize(rc);
+}
+
+GMint GMControlTextArea::getCaretTop()
+{
+	D(d);
+	D_BASE(db, Base);
+	return d->caretTopRelative + db->rcText.y;
+}
+
+void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
+{
+	D(d);
+	D_BASE(db, Base);
+	GMint xFirst, yFirst;
+	d->buffer->CPtoXY(db->firstVisibleCP, false, &xFirst, &yFirst);
+
+	GMint cp;
+	if (d->buffer->XYtoCP(pt.x - db->rcText.x + xFirst, pt.y - db->rcText.y + yFirst, &cp))
+	{
+		placeCaret(cp);
+
+		if (selectStart)
+			db->selectionStartCP = db->cp;
+		resetCaretBlink();
+	}
 }

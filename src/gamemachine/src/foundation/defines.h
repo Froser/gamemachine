@@ -158,6 +158,8 @@ GM_STATIC_ASSERT_SIZE(DWORD, 4);
 #	define GM_SYSTEM_CALLBACK
 #endif
 
+#define GM_NOEXCEPT noexcept
+
 BEGIN_NS
 // 基本数据类型
 typedef float GMfloat;
@@ -219,14 +221,14 @@ struct GMPoint
 template <typename T>
 inline bool GM_inRect(const T& rect, const decltype(T().x) x, const decltype(T().y) y)
 {
-	return (x > rect.x) && (x < rect.x + rect.width) &&
-		(y > rect.y) && (y < rect.y + rect.height);
+	return (x >= rect.x) && (x <= rect.x + rect.width) &&
+		(y >= rect.y) && (y <= rect.y + rect.height);
 }
 
 inline bool GM_inRect(const GMRect& rect, const GMPoint& pt)
 {
-	return (pt.x > rect.x) && (pt.x < rect.x + rect.width) &&
-		(pt.y > rect.y) && (pt.y < rect.y + rect.height);
+	return (pt.x >= rect.x) && (pt.x <= rect.x + rect.width) &&
+		(pt.y >= rect.y) && (pt.y <= rect.y + rect.height);
 }
 
 inline GMRect GM_intersectRect(const GMRect& rect1, const GMRect& rect2)

@@ -16,6 +16,7 @@ struct GMTypoResult
 	GMfloat height = 0;
 	GMfloat advance = 0;
 	GMint lineHeight = 0;
+	GMint lineNo = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
 	bool newLineOrEOFSeparator = false;
@@ -66,10 +67,6 @@ GM_INTERFACE(ITypoEngine)
 	virtual void setFont(GMFontHandle) = 0;
 	virtual GMint getLineHeight() = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
-
-private:
-	friend class GMTypoIterator;
-	GM_FRIEND_CLASS(GMTypoTextBuffer);
 	virtual GMTypoResult getTypoResult(GMsize_t index) = 0;
 	virtual const Vector<GMTypoResult>& getResults() = 0;
 };
@@ -137,6 +134,7 @@ GM_PRIVATE_OBJECT(GMTypoEngine)
 	// 绘制状态
 	GMint current_x = 0;
 	GMint current_y = 0;
+	GMint currentLineNo = 1;
 	GMFontSizePt fontSize = 12;
 	GMfloat color[3] = { 1.f, 1.f, 1.f };
 
@@ -211,7 +209,6 @@ public:
 
 	void setBuffer(const GMString& string);
 	void setSize(const GMRect& rc);
-	void setNewline(bool newline);
 
 public:
 	void setChar(GMsize_t pos, GMwchar ch);

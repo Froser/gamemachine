@@ -5,6 +5,8 @@
 BEGIN_NS
 
 class GMTypoTextBuffer;
+class GMMultiLineTypoTextBuffer;
+
 GM_PRIVATE_OBJECT(GMControlTextEdit)
 {
 	GMVec4 textColor = GMVec4(0, 0, 0, 1);
@@ -58,6 +60,8 @@ public:
 protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
 	virtual void pasteFromClipboard();
+	virtual GMint getCaretTop();
+	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
 
 protected:
 	void createBufferTypoEngineIfNotExist();
@@ -70,37 +74,35 @@ protected:
 	void copyToClipboard();
 	void handleMouseSelect(GMSystemMouseEvent* event, bool selectStart);
 	void initStyles(GMWidget* widget);
-	void handleMouseCaret(const GMPoint& pt, bool selectStart);
 	GMint getCaretHeight();
-	GMint getCaretTop();
 	void moveFirstVisibleCp(GMint distance);
 
 public:
-	inline GMControlBorder* getBorder()
+	inline GMControlBorder* getBorder() GM_NOEXCEPT
 	{
 		D(d);
 		return d->borderControl;
 	}
 
-	inline void setBorderWidth(GMint width)
+	inline void setBorderWidth(GMint width) GM_NOEXCEPT
 	{
 		D(d);
 		d->borderWidth = width;
 	}
 
-	inline void setShowCaret(bool showCaret)
+	inline void setShowCaret(bool showCaret) GM_NOEXCEPT
 	{
 		D(d);
 		d->showCaret = showCaret;
 	}
 
-	inline void setCaretBlinkSpeed(GMfloat blinkSpeedSecond)
+	inline void setCaretBlinkSpeed(GMfloat blinkSpeedSecond) GM_NOEXCEPT
 	{
 		D(d);
 		d->deltaBlink = blinkSpeedSecond;
 	}
 
-	inline const GMString& getRenderText()
+	inline const GMString& getRenderText() GM_NOEXCEPT
 	{
 		D(d);
 		return d->renderText;
@@ -114,6 +116,8 @@ protected:
 
 GM_PRIVATE_OBJECT(GMControlTextArea)
 {
+	GMint caretTopRelative = 0;
+	GMMultiLineTypoTextBuffer* buffer = nullptr;
 };
 
 class GMControlTextArea : public GMControlTextEdit
@@ -128,6 +132,15 @@ public:
 	virtual void pasteFromClipboard() override;
 	virtual void insertCharacter(GMwchar ch) override;
 	virtual void setSize(GMint width, GMint height) override;
+	virtual GMint getCaretTop() override;
+	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
+
+private:
+	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
+	{
+		D(d);
+		d->caretTopRelative = caretTopRelative;
+	}
 };
 
 END_NS
