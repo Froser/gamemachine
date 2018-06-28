@@ -137,7 +137,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 
 	gm::GMControlTextArea* textArea = nullptr;
 	d->mainWidget->addTextArea(
-		L"这是一个TextArea控件，可以编辑、显示多行文字\n这里是第二行",
+		L"这是一个TextArea控件，可以编辑、显示多行文字\n这里是第二行\n\nWelcome To GameMachine",
 		10,
 		top += 60,
 		500,

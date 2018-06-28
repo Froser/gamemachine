@@ -73,7 +73,6 @@ enum GMTextColorType
 GM_PRIVATE_OBJECT(GMTextGameObject)
 {
 	GMString text;
-	GMint lineHeight = 0;
 	GMint lineSpacing = 0;
 	bool center = false;
 	bool newline = true;

@@ -258,6 +258,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		const GMfloat *pResultColor = ValuePointer(d->color);
 
 		GMTypoIterator iter = typoEngine->begin(d->text, options);
+		auto lineHeight = typoEngine->getResults().lineHeight;
 		for (; iter != typoEngine->end(); ++iter)
 		{
 			const GMTypoResult& typoResult = *iter;
@@ -282,7 +283,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 				// 采用左上角为原点的Texcoord坐标系
 
 				GMVertex V0 = {
-					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
 					{ 0 },
 					{ UV_X(glyph.x), UV_Y(glyph.y) },
 					{ 0 },
@@ -291,7 +292,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 				GMVertex V1 = {
-					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ coord.x + X(typoResult.x), coord.y  - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
 					{ 0 },
 					{ UV_X(glyph.x), UV_Y(glyph.y + glyph.height) },
 					{ 0 },
@@ -300,7 +301,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 				GMVertex V2 = {
-					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + typoResult.lineHeight - glyph.bearingY), Z },
+					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - glyph.bearingY), Z },
 					{ 0 },
 					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y) },
 					{ 0 },
@@ -309,7 +310,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 					{ pResultColor[0], pResultColor[1], pResultColor[2] }
 				};
 				GMVertex V3 = {
-					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + typoResult.lineHeight - (glyph.bearingY - glyph.height)), Z },
+					{ coord.x + X(typoResult.x + typoResult.width), coord.y - Y(typoResult.y + lineHeight - (glyph.bearingY - glyph.height)), Z },
 					{ 0 },
 					{ UV_X(glyph.x + glyph.width), UV_Y(glyph.y + glyph.height) },
 					{ 0 },

@@ -15,7 +15,6 @@ struct GMTypoResult
 	GMfloat width = 0;
 	GMfloat height = 0;
 	GMfloat advance = 0;
-	GMint lineHeight = 0;
 	GMint lineNo = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;
@@ -60,15 +59,23 @@ struct GMTypoOptions
 	bool plainText = false;
 };
 
+struct GMTypoResultInfo
+{
+	const Vector<GMTypoResult>& results;
+	GMint lineHeight;
+	GMint lineSpacing;
+};
+
 GM_INTERFACE(ITypoEngine)
 {
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
-	virtual GMint getLineHeight() = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
+	virtual GMTypoResultInfo getResults() = 0;
+
+private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) = 0;
-	virtual const Vector<GMTypoResult>& getResults() = 0;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -154,7 +161,7 @@ public:
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
 	virtual void createInstance(OUT ITypoEngine**) override;
-	virtual GMint getLineHeight() override;
+	virtual GMTypoResultInfo getResults() override;
 
 private:
 	virtual GMTypoResult getTypoResult(GMsize_t index) override;
@@ -166,9 +173,6 @@ private:
 public:
 	void setColor(GMfloat rgb[3]);
 	void setFontSize(GMint pt);
-
-public:
-	virtual const Vector<GMTypoResult>& getResults() override;
 };
 
 GM_PRIVATE_OBJECT(GMTypoTextBuffer)

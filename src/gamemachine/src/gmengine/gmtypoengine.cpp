@@ -13,7 +13,7 @@ GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
 const GMTypoResult& GMTypoIterator::operator*()
 {
 	D(d);
-	return d->typo->getResults()[d->index];
+	return d->typo->getResults().results[d->index];
 }
 
 GMTypoIterator& GMTypoIterator::operator ++()
@@ -204,9 +204,8 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	while (*p)
 	{
 		const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize, d->font);
-		if (d->lineHeight < glyph.height)
-			d->lineHeight = glyph.height;
-		++p;
+		d->lineHeight = glyph.height;
+		break;
 	}
 
 	auto _adjustNewLineSepResult = [=](auto& target, bool copyLineNo) {
@@ -216,17 +215,10 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 			// 换行符没有size，跟随它的前一个字符，但是如果前一个字符也是换行符，那么它的y坐标将新起一行
 			if (!last.newLineOrEOFSeparator)
 			{
-				target.x = last.x + last.advance;
 				target.y = last.y;
-				target.lineHeight = d->lineHeight;
+				target.x = last.x + last.advance;
 				if (copyLineNo)
 					target.lineNo = last.lineNo;
-			}
-			else
-			{
-				target.lineNo = d->currentLineNo;
-				target.y = d->current_y;
-				target.lineHeight = d->lineHeight;
 			}
 		}
 	};
@@ -298,12 +290,6 @@ void GMTypoEngine::createInstance(OUT ITypoEngine** engine)
 	*engine = new GMTypoEngine(d->context);
 }
 
-GMint GMTypoEngine::getLineHeight()
-{
-	D(d);
-	return d->lineHeight;
-}
-
 GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 {
 	D(d);
@@ -324,6 +310,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 		result.lineNo = d->currentLineNo;
 		result.newLineOrEOFSeparator = true;
 		result.valid = false;
+		result.y = d->current_y;
 		newLine();
 		return result;
 	}
@@ -334,9 +321,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	if (std::isspace(ch, std::locale()))
 		result.isSpace = true;
 
-	result.lineHeight = d->lineHeight;
 	result.fontSize = d->fontSize;
-
 	result.x = d->current_x + glyph.bearingX;
 	result.y = d->current_y;
 	result.width = glyph.width;
@@ -392,10 +377,15 @@ void GMTypoEngine::setFontSize(GMint pt)
 	d->fontSize = pt;
 }
 
-const Vector<GMTypoResult>& GMTypoEngine::getResults()
+GMTypoResultInfo GMTypoEngine::getResults()
 {
 	D(d);
-	return d->results;
+	GMTypoResultInfo r = {
+		d->results,
+		static_cast<GMint>(d->lineHeight),
+		d->options.lineSpacing
+	};
+	return r;
 }
 
 GMTypoTextBuffer::~GMTypoTextBuffer()
@@ -520,7 +510,7 @@ GMint GMTypoTextBuffer::getLineHeight()
 	if (d->dirty)
 		analyze();
 
-	return d->engine->getLineHeight();
+	return d->engine->getResults().lineHeight;
 }
 
 void GMTypoTextBuffer::analyze()
@@ -549,7 +539,7 @@ bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
 	if (d->dirty)
 		analyze();
 
-	auto& r = d->engine->getResults();
+	auto& r = d->engine->getResults().results;
 	if (cp >= getLength())
 		return CPtoX(cp - 1, true, x);
 
@@ -576,7 +566,7 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 	if (d->dirty)
 		analyze();
 
-	auto& r = d->engine->getResults();
+	auto& r = d->engine->getResults().results;
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)
 	{
 		if (r[i].x == x)
@@ -612,7 +602,7 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
 {
 	D(d);
-	auto& r = d->engine->getResults();
+	auto& r = d->engine->getResults().results;
 	for (GMsize_t i = cp - 1; i > 0; --i)
 	{
 		if (!r[i].isSpace && r[i - 1].isSpace)
@@ -628,7 +618,7 @@ void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
 void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 {
 	D(d);
-	auto& r = d->engine->getResults();
+	auto& r = d->engine->getResults().results;
 	for (GMsize_t i = cp; i < r.size() - 2; ++i)
 	{
 		if (r[i].isSpace && !r[i + 1].isSpace)
