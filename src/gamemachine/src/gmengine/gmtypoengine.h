@@ -226,6 +226,7 @@ public:
 	bool removeChars(GMsize_t startPos, GMsize_t endPos);
 	GMint getLength();
 	GMint getLineHeight();
+	GMwchar getChar(GMsize_t pos);
 
 	// 排版相关
 public:

@@ -57,6 +57,15 @@ public:
 	virtual void setText(const GMString& text);
 	virtual void setPadding(GMint x, GMint y);
 
+// 处理特殊按键
+	virtual bool onKey_Tab(GMSystemKeyEvent* event);
+	virtual bool onKey_LeftRight(GMSystemKeyEvent* event);
+	virtual bool onKey_UpDown(GMSystemKeyEvent* event);
+	virtual bool onKey_HomeEnd(GMSystemKeyEvent* event);
+	virtual bool onKey_Delete(GMSystemKeyEvent* event);
+	virtual bool onKey_Back(GMSystemKeyEvent* event);
+	virtual bool onKey_Insert(GMSystemKeyEvent* event);
+
 protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
 	virtual void pasteFromClipboard();

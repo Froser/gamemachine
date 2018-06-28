@@ -537,6 +537,12 @@ bool GMTypoTextBuffer::isPlainText() GM_NOEXCEPT
 	return true;
 }
 
+GMwchar GMTypoTextBuffer::getChar(GMsize_t pos)
+{
+	D(d);
+	return d->buffer[pos];
+}
+
 void GMTypoTextBuffer::analyze()
 {
 	D(d);

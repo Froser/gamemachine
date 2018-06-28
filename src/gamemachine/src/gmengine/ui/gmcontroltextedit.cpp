@@ -21,8 +21,8 @@ public:
 
 public:
 	virtual void analyze() override;
-	virtual bool CPtoX(GMint cp, bool trail, GMint* x) { return false; }
-	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) { return false; }
+	virtual bool CPtoX(GMint cp, bool trail, GMint* x) { GM_ASSERT(false); return false; }
+	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) { GM_ASSERT(false); return false; }
 	virtual bool CPtoXY(GMint cp, bool trail, GMint* x, GMint* y);
 	virtual bool XYtoCP(GMint x, GMint y, GMint* cp);
 	
@@ -321,87 +321,40 @@ bool GMControlTextEdit::onKeyDown(GMSystemKeyEvent* event)
 	switch (key)
 	{
 	case GMKey_Tab:
+		handled = onKey_Tab(event);
 		break;
 	case GMKey_Left:
 	case GMKey_Right:
 	{
-		moveCaret(key == GMKey_Right, !!(event->getModifier() & GMModifier_Ctrl), !!(event->getModifier() & GMModifier_Shift));
-		handled = true;
+		handled = onKey_LeftRight(event);
 		break;
 	}
 	case GMKey_Up:
 	case GMKey_Down:
 	{
-		// 上下不会切换焦点
-		handled = true;
+		handled = onKey_UpDown(event);
 		break;
 	}
 	case GMKey_Home:
-	{
-		placeCaret(0);
-		if (!(event->getModifier() & GMModifier_Shift))
-		{
-			// 如果没有按住Shift，更新选区范围
-			d->selectionStartCP = d->cp;
-		}
-		resetCaretBlink();
-		return true;
-	}
 	case GMKey_End:
 	{
-		placeCaret(d->buffer->getLength());
-		if (!(event->getModifier() & GMModifier_Shift))
-		{
-			// 如果没有按住Shift，更新选区范围
-			d->selectionStartCP = d->cp;
-		}
-		resetCaretBlink();
-		return true;
+		handled = onKey_HomeEnd(event);
+		break;
 	}
 	case GMKey_Delete:
 	{
-		if (d->cp != d->selectionStartCP)
-		{
-			// 删除一个选区
-			deleteSelectionText();
-			emit(textChanged);
-		}
-		else
-		{
-			if (d->buffer->removeChar(d->cp))
-			{
-				emit(textChanged);
-			}
-		}
-		resetCaretBlink();
-		return true;
+		handled = onKey_Delete(event);
+		break;
 	}
 	case GMKey_Back:
 	{
-		if (d->selectionStartCP != d->cp)
-		{
-			deleteSelectionText();
-		}
-		else if (d->cp > 0)
-		{
-			placeCaret(d->cp - 1);
-			d->selectionStartCP = d->cp;
-			moveFirstVisibleCp(1);
-			d->buffer->removeChar(d->cp);
-			emit(textChanged);
-			resetCaretBlink();
-		}
-		return true;
+		handled = onKey_Back(event);
+		break;
 	}
 	case GMKey_Insert:
 	{
-		if (event->getModifier() & GMModifier_Ctrl)
-			copyToClipboard();
-		else if (event->getModifier() & GMModifier_Shift)
-			pasteFromClipboard();
-		else
-			d->insertMode = !d->insertMode;
-		return true;
+		handled = onKey_Insert(event);
+		break;
 	}
 	case GMKey_Escape:
 		// 把ESC吞了，它和Ctrl+V的控制字符一样，而Ctrl+V表示粘贴。
@@ -580,6 +533,114 @@ void GMControlTextEdit::setPadding(GMint x, GMint y)
 	d->padding[0] = x;
 	d->padding[1] = y;
 	updateRect();
+}
+
+bool GMControlTextEdit::onKey_Tab(GMSystemKeyEvent* event)
+{
+	return true;
+}
+
+bool GMControlTextEdit::onKey_LeftRight(GMSystemKeyEvent* event)
+{
+	GMKey key = event->getKey();
+	moveCaret(key == GMKey_Right, !!(event->getModifier() & GMModifier_Ctrl), !!(event->getModifier() & GMModifier_Shift));
+	return true;
+}
+
+bool GMControlTextEdit::onKey_UpDown(GMSystemKeyEvent* event)
+{
+	// 上下不会切换焦点
+	return true;
+}
+
+bool GMControlTextEdit::onKey_HomeEnd(GMSystemKeyEvent* event)
+{
+	D(d);
+	GMKey key = event->getKey();
+	if (key == GMKey_Home)
+	{
+		placeCaret(0);
+	}
+	else
+	{
+		GM_ASSERT(key == GMKey_End);
+		placeCaret(d->buffer->getLength());
+	}
+
+	if (!(event->getModifier() & GMModifier_Shift))
+	{
+		// 如果没有按住Shift，更新选区范围
+		d->selectionStartCP = d->cp;
+	}
+	resetCaretBlink();
+	return true;
+}
+
+bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
+{
+	D(d);
+	if (d->cp != d->selectionStartCP)
+	{
+		// 删除一个选区
+		deleteSelectionText();
+		emit(textChanged);
+	}
+	else
+	{
+		// 要考虑删除\r\n的情况，如果删除的是\r，且之后为\n，则一并删除
+
+		if (d->buffer->removeChar(d->cp))
+		{
+			emit(textChanged);
+		}
+	}
+	resetCaretBlink();
+	return true;
+}
+
+bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
+{
+	D(d);
+	if (d->selectionStartCP != d->cp)
+	{
+		deleteSelectionText();
+	}
+	else if (d->cp > 0)
+	{
+		placeCaret(d->cp - 1);
+		d->selectionStartCP = d->cp;
+		moveFirstVisibleCp(1);
+		
+		// 要考虑删除\r\n的情况，如果删除的是\n，且之前为\r，则一并删除
+		if (d->cp - 1 > 0 &&
+			d->buffer->getChar(d->cp) == L'\n' &&
+			d->buffer->getChar(d->cp - 1) == L'\r')
+		{
+			d->buffer->removeChars(d->cp - 1, d->cp);
+			placeCaret(d->cp - 1);
+		}
+		else
+		{
+			d->buffer->removeChar(d->cp);
+		}
+
+
+		emit(textChanged);
+		resetCaretBlink();
+	}
+	return true;
+}
+
+bool GMControlTextEdit::onKey_Insert(GMSystemKeyEvent* event)
+{
+	D(d);
+	if (event->getModifier() & GMModifier_Ctrl)
+		copyToClipboard();
+	else if (event->getModifier() & GMModifier_Shift)
+		pasteFromClipboard();
+	else
+		d->insertMode = !d->insertMode;
+	return true;
 }
 
 void GMControlTextEdit::createBufferTypoEngineIfNotExist()

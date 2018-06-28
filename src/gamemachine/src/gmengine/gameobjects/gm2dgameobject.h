@@ -114,7 +114,7 @@ public:
 	void setNewline(bool newline) GM_NOEXCEPT;
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 
-	//! 设置文本缓存
+	//! 设置文本缓存。
 	/*!
 	  文本缓存是指一段已经排版好的文本。当此方法被调用时，setDrawMode被设置成GMTextDrawMode::UseBuffer，并且setText被设置成文本缓存的内容。<BR>
 	  如果不想使用文本缓存，而是每次解析setText()传入的文本来渲染排版，请将setDrawMode设置为GMTextDrawMode::Immediate。
@@ -122,7 +122,7 @@ public:
 	*/
 	void setTextBuffer(GMTypoTextBuffer* textBuffer) GM_NOEXCEPT;
 
-	//! 设置渲染方式
+	//! 设置渲染方式。
 	/*!
 	  指定文本的渲染方式。
 	  \param mode 渲染方式。如果是GMTextDrawMode::Immediate，引擎每次都会解析调用者通过setText()传入的文本。
