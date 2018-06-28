@@ -52,7 +52,7 @@ void GMMultiLineTypoTextBuffer::analyze()
 	GMTypoOptions options;
 	options.typoArea = db->rc;
 	options.newline = true;
-	options.plainText = true;
+	options.plainText = isPlainText();
 	options.lineSpacing = d->lineSpacing;
 	db->engine->begin(db->buffer, options);
 	db->dirty = false;
@@ -290,7 +290,7 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	calculateRenderText(firstX);
 
 	// 不允许换行
-	widget->drawText(getRenderText(), d->textStyle, d->rcText, false, false, false);
+	widget->drawText(d->buffer, d->textStyle, d->rcText, false);
 }
 
 void GMControlTextEdit::setSize(GMint width, GMint height)
@@ -1029,7 +1029,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 
 	// 获取能够显示的文本长度
 	calculateRenderText(firstX);
-	widget->drawText(getRenderText(), db->textStyle, db->rcText, false, false, true, d->buffer->getLineSpacing());
+	widget->drawText(d->buffer, db->textStyle, db->rcText, false);
 }
 
 void GMControlTextArea::pasteFromClipboard()

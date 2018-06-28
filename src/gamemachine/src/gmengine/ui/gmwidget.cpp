@@ -445,7 +445,8 @@ void GMWidget::drawText(
 
 	const GMVec4& fontColor = style.getFontColor().getCurrent();
 	GMTextGameObject* textObject = d->manager->getTextObject();
-	textObject->setColorType(Plain);
+	textObject->setDrawMode(GMTextDrawMode::Immediate);
+	textObject->setColorType(GMTextColorType::Plain);
 	textObject->setColor(fontColor);
 	textObject->setText(text);
 	textObject->setGeometry(targetRc);
@@ -453,6 +454,43 @@ void GMWidget::drawText(
 	textObject->setFont(style.getFont());
 	textObject->setNewline(newLine);
 	textObject->setLineSpacing(lineSpacing);
+	textObject->draw();
+}
+
+void GMWidget::drawText(
+	GMTypoTextBuffer* textBuffer,
+	GMStyle& style,
+	const GMRect& rc,
+	bool shadow
+)
+{
+	// 不需要绘制透明元素
+	if (style.getFontColor().getCurrent().getW() == 0)
+		return;
+
+	D(d);
+	GMRect targetRc = rc;
+	mapRect(targetRc);
+
+	if (shadow)
+	{
+		const GMShadowStyle& shadowStyle = style.getShadowStyle();
+		GMRect shadowRc = { rc.x + shadowStyle.offsetX, rc.y + shadowStyle.offsetY, rc.width, rc.height };
+		drawText(
+			textBuffer,
+			d->shadowStyle,
+			shadowRc,
+			false
+		);
+	}
+
+	const GMVec4& fontColor = style.getFontColor().getCurrent();
+	GMTextGameObject* textObject = d->manager->getTextObject();
+	textObject->setTextBuffer(textBuffer);
+	textObject->setColorType(GMTextColorType::Plain);
+	textObject->setColor(fontColor);
+	textObject->setGeometry(targetRc);
+	textObject->setFont(style.getFont());
 	textObject->draw();
 }
 

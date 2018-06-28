@@ -10,6 +10,19 @@ GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
 	d->index = index;
 }
 
+GMTypoIterator::GMTypoIterator(const GMTypoIterator& rhs)
+{
+	*this = rhs;
+}
+
+GMTypoIterator& GMTypoIterator::operator = (const GMTypoIterator& rhs) GM_NOEXCEPT
+{
+	D(d);
+	D_OF(d_rhs, &rhs);
+	*d = *d_rhs;
+	return *this;
+}
+
 const GMTypoResult& GMTypoIterator::operator*()
 {
 	D(d);
@@ -190,12 +203,18 @@ GMTypoEngine::~GMTypoEngine()
 GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptions& options)
 {
 	D(d);
+	d->literature = literature.toStdWString();
+
+	// 如果使用缓存且非空，直接返回
+	// 否则还是会尝试解析一下
+	if (options.useCache && !d->results.empty())
+		return GMTypoIterator(this, 0);
+
 	d->options = options;
 	d->current_x = d->current_y = 0;
 	d->currentLineNo = 1;
 	d->results.clear();
 	setFontSize(d->options.defaultFontSize);
-	d->literature = literature.toStdWString();
 
 	// 获取行高
 	GMGlyphManager* glyphManager = d->context->getEngine()->getGlyphManager();
@@ -273,7 +292,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 GMTypoIterator GMTypoEngine::end()
 {
 	D(d);
-	return GMTypoIterator(this, d->literature.length());
+	return GMTypoIterator(this, d->results.size() - 1);
 }
 
 void GMTypoEngine::setFont(GMFontHandle font)
@@ -513,13 +532,18 @@ GMint GMTypoTextBuffer::getLineHeight()
 	return d->engine->getResults().lineHeight;
 }
 
+bool GMTypoTextBuffer::isPlainText() GM_NOEXCEPT
+{
+	return true;
+}
+
 void GMTypoTextBuffer::analyze()
 {
 	D(d);
 	GMTypoOptions options;
 	options.typoArea = d->rc;
 	options.newline = false;
-	options.plainText = true;
+	options.plainText = isPlainText();
 	d->engine->begin(d->buffer, options);
 	d->dirty = false;
 }

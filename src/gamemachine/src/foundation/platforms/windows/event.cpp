@@ -121,3 +121,12 @@ bool GMConvertion::hexToRGB(const GMString& hex, GMfloat rgb[3])
 		return false;
 	}
 }
+
+GMVec4 GMConvertion::hexToRGB(const GMString& hex)
+{
+	GMfloat rgb[3];
+	if (hexToRGB(hex, rgb))
+		return GMVec4(rgb[0], rgb[1], rgb[2], 1.f);
+
+	return GMVec4(0, 0, 0, 0);
+}

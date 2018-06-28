@@ -10,7 +10,7 @@ class GMMultiLineTypoTextBuffer;
 GM_PRIVATE_OBJECT(GMControlTextEdit)
 {
 	GMVec4 textColor = GMVec4(0, 0, 0, 1);
-	GMVec4 selectionBackColor = GMVec4(.15f, .31f, .47f, 1);
+	GMVec4 selectionBackColor = GMConvertion::hexToRGB(L"#A3CEF1");
 	GMVec4 caretColor = GMVec4(0, 0, 0, 1);
 	GMint cp = 0;
 	GMint firstVisibleCP = 0;

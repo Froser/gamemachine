@@ -8,6 +8,7 @@
 BEGIN_NS
 
 struct ITypoEngine;
+class GMTypoTextBuffer;
 
 GM_PRIVATE_OBJECT(GM2DGameObjectBase)
 {
@@ -64,10 +65,16 @@ protected:
 	static GMRectF toViewportRect(const GMRect& rc, const GMRect& renderRc);
 };
 
-enum GMTextColorType
+enum class GMTextColorType
 {
 	Plain,
 	ByScript,
+};
+
+enum class GMTextDrawMode
+{
+	Immediate,
+	UseBuffer,
 };
 
 GM_PRIVATE_OBJECT(GMTextGameObject)
@@ -82,9 +89,11 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	bool insetTypoEngine = true;
 	GMFontHandle font = 0;
 	GMModel* model = nullptr;
-	GMTextColorType colorType = ByScript;
+	GMTextColorType colorType = GMTextColorType::ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 	Vector<GMVertex> vericesCache;
+	GMTypoTextBuffer* textBuffer = nullptr;
+	GMTextDrawMode drawMode = GMTextDrawMode::Immediate;
 };
 
 class GMTextGameObject : public GM2DGameObjectBase
@@ -105,12 +114,29 @@ public:
 	void setNewline(bool newline) GM_NOEXCEPT;
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 
+	//! 设置文本缓存
+	/*!
+	  文本缓存是指一段已经排版好的文本。当此方法被调用时，setDrawMode被设置成GMTextDrawMode::UseBuffer，并且setText被设置成文本缓存的内容。<BR>
+	  如果不想使用文本缓存，而是每次解析setText()传入的文本来渲染排版，请将setDrawMode设置为GMTextDrawMode::Immediate。
+	  \param textBuffer 传入的文本缓存。
+	*/
+	void setTextBuffer(GMTypoTextBuffer* textBuffer) GM_NOEXCEPT;
+
+	//! 设置渲染方式
+	/*!
+	  指定文本的渲染方式。
+	  \param mode 渲染方式。如果是GMTextDrawMode::Immediate，引擎每次都会解析调用者通过setText()传入的文本。
+	  如果是GMTextDrawMode::UseBuffer，调用者需要通过setTextBuffer()传入一个GMTypoTextBuffer。绘制时，引擎不会重新解析文本，而是使用GMTypoTextBuffer已经解析好的内容。
+	  \sa setTextBuffer()
+	*/
+	void setDrawMode(GMTextDrawMode mode) GM_NOEXCEPT;
+
 public:
 	virtual void onAppendingObjectToWorld() override;
 	virtual void draw() override;
 
 public:
-	inline ITypoEngine* getTypoEngine()
+	inline ITypoEngine* getTypoEngine() GM_NOEXCEPT
 	{
 		D(d);
 		return d->typoEngine;

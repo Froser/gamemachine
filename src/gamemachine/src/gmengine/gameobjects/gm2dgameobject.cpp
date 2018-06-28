@@ -177,6 +177,30 @@ void GMTextGameObject::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
 	}
 }
 
+void GMTextGameObject::setTextBuffer(GMTypoTextBuffer* textBuffer) GM_NOEXCEPT
+{
+	D(d);
+	if (d->textBuffer != textBuffer)
+	{
+		d->textBuffer = textBuffer;
+		markDirty();
+		setDrawMode(GMTextDrawMode::UseBuffer);
+
+		// 一定要调用setText，因为在更新顶点的时候会计算Buffer是否够空间，否则会造成缓存区溢出
+		setText(textBuffer->getBuffer());
+	}
+}
+
+void GMTextGameObject::setDrawMode(GMTextDrawMode mode) GM_NOEXCEPT
+{
+	D(d);
+	if (d->drawMode != mode)
+	{
+		d->drawMode = mode;
+		markDirty();
+	}
+}
+
 void GMTextGameObject::onAppendingObjectToWorld()
 {
 	D(d);
@@ -243,23 +267,41 @@ void GMTextGameObject::updateVertices(GMModel* model)
 
 	Vector<GMVertex>& vertices = d->vericesCache;
 	BEGIN_GLYPH_XY(rect.width, rect.height)
-		// 使用排版引擎进行排版
-		ITypoEngine* typoEngine = d->typoEngine;
-		typoEngine->setFont(d->font);
+		ITypoEngine* typoEngine = nullptr;
+		GMTypoIterator iter;
+
 		GMTypoOptions options;
-		options.newline = d->newline;
-		options.center = d->center;
-		options.lineSpacing = d->lineSpacing;
-		options.typoArea.width = coord.width * rect.width * .5f;
-		options.typoArea.height = coord.height * rect.height * .5f;
-		options.plainText = d->colorType == GMTextColorType::Plain;
+		if (d->drawMode == GMTextDrawMode::Immediate)
+		{
+			// 使用排版引擎进行排版
+			options.useCache = false;
+			options.newline = d->newline;
+			options.center = d->center;
+			options.lineSpacing = d->lineSpacing;
+			options.typoArea.width = coord.width * rect.width * .5f;
+			options.typoArea.height = coord.height * rect.height * .5f;
+			options.plainText = d->colorType == GMTextColorType::Plain;
+
+			typoEngine = d->typoEngine;
+			typoEngine->setFont(d->font);
+			iter = typoEngine->begin(d->text, options);
+		}
+		else
+		{
+			// 使用已有的typoEngine来排版，这样就不用调用begin了
+			// 我们不会更改typoEngine的值，但是还是要const_cast一下，不然编译器会不高兴
+			typoEngine = const_cast<ITypoEngine*>(d->textBuffer->getTypoEngine());
+			options.plainText = d->textBuffer->isPlainText();
+			options.useCache = true;
+			iter = typoEngine->begin(d->text, options);
+		}
 
 		GM_ASSERT(typoEngine);
 		const GMfloat *pResultColor = ValuePointer(d->color);
 
-		GMTypoIterator iter = typoEngine->begin(d->text, options);
 		auto lineHeight = typoEngine->getResults().lineHeight;
-		for (; iter != typoEngine->end(); ++iter)
+		auto end = typoEngine->end();
+		for (; iter != end; ++iter)
 		{
 			const GMTypoResult& typoResult = *iter;
 			if (!typoResult.valid)

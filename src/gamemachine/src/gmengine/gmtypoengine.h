@@ -35,7 +35,10 @@ class GMTypoIterator
 	GM_DECLARE_PRIVATE_NGO(GMTypoIterator)
 
 public:
+	GMTypoIterator() = default;
 	GMTypoIterator(ITypoEngine* typo, GMsize_t index);
+	GMTypoIterator(const GMTypoIterator& rhs);
+	GMTypoIterator& operator = (const GMTypoIterator& rhs) GM_NOEXCEPT;
 
 public:
 	const GMTypoResult& operator*();
@@ -57,6 +60,7 @@ struct GMTypoOptions
 	bool center = false;
 	bool newline = true;
 	bool plainText = false;
+	bool useCache = false;
 };
 
 struct GMTypoResultInfo
@@ -225,6 +229,7 @@ public:
 
 	// 排版相关
 public:
+	virtual bool isPlainText() GM_NOEXCEPT;
 	virtual void analyze();
 	virtual bool CPtoX(GMint cp, bool trail, GMint* x);
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail);

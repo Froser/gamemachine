@@ -17,6 +17,7 @@ class GMControlButton;
 class GMControlBorder;
 class GMControlTextEdit;
 class GMControlTextArea;
+class GMTypoTextBuffer;
 struct ITypoEngine;
 
 struct GMControlState
@@ -390,6 +391,13 @@ public:
 		bool center = false,
 		bool newLine = true,
 		GMint lineSpacing = 0
+	);
+
+	void drawText(
+		GMTypoTextBuffer* textBuffer,
+		GMStyle& style,
+		const GMRect& rc,
+		bool shadow = false
 	);
 
 	void drawSprite(
