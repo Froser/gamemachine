@@ -326,7 +326,7 @@ void GMDx11Framebuffers::unbind()
 void GMDx11Framebuffers::clear(GMFramebuffersClearType type)
 {
 	D(d);
-	UINT clearFlag;
+	UINT clearFlag = 0;
 	GMuint iType = (GMuint)type;
 	if (iType & (GMuint)GMFramebuffersClearType::Depth)
 		clearFlag |= D3D11_CLEAR_DEPTH;

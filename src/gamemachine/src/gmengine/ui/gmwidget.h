@@ -420,6 +420,17 @@ public:
 		GMfloat depth
 	);
 
+	void drawStencil(
+		const GMRect& rc,
+		GMfloat depth
+	);
+
+	void useStencil(
+		bool inside
+	);
+
+	void endStencil();
+
 	void requestFocus(GMControl* control);
 	void setSize(GMint width, GMint height);
 

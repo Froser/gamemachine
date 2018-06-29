@@ -918,13 +918,13 @@ void GMControlTextEdit::moveFirstVisibleCp(GMint distance)
 		d->firstVisibleCP = 0;
 }
 
-void GMControlTextEdit::setBufferRenderRange(GMint x)
+void GMControlTextEdit::setBufferRenderRange(GMint xFirst)
 {
 	D(d);
 	// 获取能够显示的文本长度
 	GMint lastCP;
 	bool lastTrail;
-	d->buffer->XtoCP(x + d->rcText.width, &lastCP, &lastTrail);
+	d->buffer->XtoCP(xFirst + d->rcText.width, &lastCP, &lastTrail);
 	if (lastTrail)
 		d->buffer->setRenderRange(d->firstVisibleCP, lastCP + 1);
 	else
@@ -974,7 +974,13 @@ void GMControlTextArea::render(GMfloat elapsed)
 		caretSelectionY = caretY;
 	}
 
+
+	// 绘制一个模板区域，防止光标、选中区域和文字超出渲染区域
 	GMWidget* widget = getParent();
+	GMRect expandedRcText = expandStencilRect(db->rcText); // 稍微扩大一下渲染区域，不然看起来很丑
+	widget->drawStencil(expandedRcText, .99f);
+	widget->useStencil(true);
+
 	GMRect rcSelection;
 	GMint selectionLeftLineNo = d->buffer->CPToLineNumber(db->selectionStartCP);
 	GMint selectionRightLineNo = d->buffer->CPToLineNumber(db->cp);
@@ -994,7 +1000,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 			rcSelection.y = getCaretTop();
 			rcSelection.width = selectionEndX - selectionStartX;
 			rcSelection.height = getCaretHeight();
-			GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+			GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 			widget->drawRect(db->selectionBackColor, rc, true, .99f);
 		}
 		else
@@ -1026,7 +1032,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 				rcSelection.y = getCaretTop();
 				rcSelection.width = selStartLastX - selectionStartX;
 				rcSelection.height = getCaretHeight();
-				GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 				widget->drawRect(db->selectionBackColor, rc, true, .99f);
 			}
 
@@ -1045,7 +1051,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 				rcSelection.y = getCaretTop();
 				rcSelection.width = selectionEndX - selEndFirstX;
 				rcSelection.height = getCaretHeight();
-				GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 				widget->drawRect(db->selectionBackColor, rc, true, .99f);
 			}
 
@@ -1070,7 +1076,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 					// 如果是个空行导致选区宽度小于一个值，我们将它设置一个最小宽度
 					if (rcSelection.width < 5)
 						rcSelection.width = 10;
-					GMRect rc = GM_intersectRect(rcSelection, db->rcText);
+					GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 					widget->drawRect(db->selectionBackColor, rc, true, .99f);
 
 					nextLineFirstCp = currentLineLastCp + 1;
@@ -1086,7 +1092,11 @@ void GMControlTextArea::render(GMfloat elapsed)
 	blinkCaret(firstX, caretX);
 	setBufferRenderRange(firstX, firstY);
 
+	// 绘制文本
 	widget->drawText(d->buffer, db->textStyle, db->rcText, false);
+
+	// 结束模板区域
+	widget->endStencil();
 }
 
 void GMControlTextArea::pasteFromClipboard()
@@ -1208,13 +1218,12 @@ void GMControlTextArea::placeCaret(GMint cp)
 	}
 }
 
-void GMControlTextArea::setBufferRenderRange(GMint x, GMint y)
+void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
 {
 	D(d);
 	D_BASE(db, Base);
 	// 获取能够显示的文本长度
 	GMint lastCP;
-	d->buffer->XYtoCP(x + db->rcText.width, y + db->rcText.height, &lastCP);
-	GMint lastCPInThisLine = d->buffer->findLastCPInOneLine(lastCP);
-	d->buffer->setRenderRange(db->firstVisibleCP, lastCPInThisLine);
+	d->buffer->XYtoCP(xFirst + db->rcText.width, yFirst + db->rcText.height, &lastCP);
+	d->buffer->setRenderRange(db->firstVisibleCP, lastCP);
 }

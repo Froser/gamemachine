@@ -399,13 +399,6 @@ GM_INTERFACE_FROM(IGraphicEngine, IQueriable)
 	*/
 	virtual void removeLights() = 0;
 
-	//! 清除当前激活帧缓存下的模板缓存。
-	/*!
-	  如果当前激活缓存是默认帧缓存，则清除默认帧缓存中的模板缓存。<BR>
-	  如果当前激活的是其它帧缓存（如G缓存等），则清除它的模板缓存。
-	*/
-	virtual void clearStencil() = 0;
-
 	//! 开始进行融合绘制。
 	/*!
 	  决定下一次调用drawObjects时的混合模式。如果在一个绘制流程中多次调用drawObjects，则应该使用此方法，将本帧的画面和当前帧缓存进行

@@ -207,6 +207,10 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	// 否则还是会尝试解析一下
 	if (options.useCache && !d->results.empty())
 	{
+		d->options.useCache = options.useCache;
+		d->options.renderStart = options.renderStart;
+		d->options.renderEnd = options.renderEnd;
+
 		// 如果没有指定renderEnd，默认为0，很可能是调用者忘记设置了，在此处ASSERT一下
 		GM_ASSERT(literature.isEmpty() || (literature.length() > 0 && options.renderEnd > 0));
 

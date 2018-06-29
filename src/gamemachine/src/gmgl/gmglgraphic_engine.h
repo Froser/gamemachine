@@ -63,7 +63,6 @@ public:
 public:
 	virtual void init() override;
 	virtual void update(GMUpdateDataType type) override;
-	virtual void clearStencil() override;
 	virtual IShaderProgram* getShaderProgram(GMShaderProgramType type) override;
 	virtual bool event(const GMMessage& e) override { return false; }
 	virtual IFramebuffers* getDefaultFramebuffers() override;

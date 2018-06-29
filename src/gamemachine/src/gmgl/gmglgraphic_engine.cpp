@@ -247,15 +247,6 @@ GMGlyphManager* GMGLGraphicEngine::getGlyphManager()
 	return d->glyphManager;
 }
 
-void GMGLGraphicEngine::clearStencil()
-{
-	GLint mask;
-	glGetIntegerv(GL_STENCIL_WRITEMASK, &mask);
-	glStencilMask(0xFF);
-	glClear(GL_STENCIL_BUFFER_BIT);
-	glStencilMask(mask);
-}
-
 IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 {
 	D(d);

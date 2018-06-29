@@ -580,6 +580,40 @@ void GMWidget::drawBorder(
 	borderObject->draw();
 }
 
+void GMWidget::drawStencil(
+	const GMRect& rc,
+	GMfloat depth
+)
+{
+	D(d);
+	static GMVec4 one = GMVec4(1, 1, 1, 1);
+	static GMStencilOptions s_stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Always);
+	auto engine = d->parentWindow->getGraphicEngine();
+	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	engine->setStencilOptions(s_stencilOptions);
+	drawRect(one, rc, true, depth);
+}
+
+void GMWidget::useStencil(
+	bool inside
+)
+{
+	D(d);
+	static GMStencilOptions s_inside(GMStencilOptions::OxFF, GMStencilOptions::Equal);
+	static GMStencilOptions s_outside(GMStencilOptions::OxFF, GMStencilOptions::NotEqual);
+	auto engine = d->parentWindow->getGraphicEngine();
+	engine->setStencilOptions(inside ? s_inside : s_outside);
+}
+
+void GMWidget::endStencil()
+{
+	D(d);
+	static GMStencilOptions s_stencilOptions(GMStencilOptions::Ox00, GMStencilOptions::Always);
+	auto engine = d->parentWindow->getGraphicEngine();
+	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	engine->setStencilOptions(s_stencilOptions);
+}
+
 void GMWidget::requestFocus(GMControl* control)
 {
 	if (s_controlFocus == control)

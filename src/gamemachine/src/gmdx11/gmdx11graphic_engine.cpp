@@ -88,12 +88,6 @@ void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
 	}
 }
 
-void GMDx11GraphicEngine::clearStencil()
-{
-	D(d);
-	d->deviceContext->ClearDepthStencilView(d->depthStencilView, D3D11_CLEAR_STENCIL, 0, 0U);
-}
-
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type)
 {
 	D(d);

@@ -84,7 +84,7 @@ protected:
 	void initStyles(GMWidget* widget);
 	GMint getCaretHeight();
 	void moveFirstVisibleCp(GMint distance);
-	void setBufferRenderRange(GMint x);
+	void setBufferRenderRange(GMint xFirst);
 
 public:
 	inline GMControlBorder* getBorder() GM_NOEXCEPT
@@ -109,6 +109,17 @@ public:
 	{
 		D(d);
 		d->deltaBlink = blinkSpeedSecond;
+	}
+
+	inline GMRect expandStencilRect(const GMRect& rc)
+	{
+		GMRect r = {
+			rc.x - 2,
+			rc.y - 2,
+			rc.width + 4,
+			rc.height + 4
+		};
+		return r;
 	}
 
 protected:
@@ -142,7 +153,7 @@ public:
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 
 protected:
-	void setBufferRenderRange(GMint x, GMint y);
+	void setBufferRenderRange(GMint xFirst, GMint yFirst);
 
 private:
 	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
