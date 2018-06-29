@@ -10,23 +10,13 @@ GMTypoIterator::GMTypoIterator(ITypoEngine* typo, GMsize_t index)
 	d->index = index;
 }
 
-GMTypoIterator::GMTypoIterator(const GMTypoIterator& rhs)
-{
-	*this = rhs;
-}
-
-GMTypoIterator& GMTypoIterator::operator = (const GMTypoIterator& rhs) GM_NOEXCEPT
+GMTypoResult GMTypoIterator::operator*()
 {
 	D(d);
-	D_OF(d_rhs, &rhs);
-	*d = *d_rhs;
-	return *this;
-}
-
-const GMTypoResult& GMTypoIterator::operator*()
-{
-	D(d);
-	return d->typo->getResults().results[d->index];
+	GMTypoResult r = d->typo->getResults().results[d->index];
+	r.x -= d->offset[0];
+	r.y -= d->offset[1];
+	return r;
 }
 
 GMTypoIterator& GMTypoIterator::operator ++()
@@ -46,6 +36,14 @@ bool GMTypoIterator::operator==(const GMTypoIterator& rhs)
 bool GMTypoIterator::operator!=(const GMTypoIterator& rhs)
 {
 	return !(*this == rhs);
+}
+
+void GMTypoIterator::setOffset(GMsize_t cp)
+{
+	D(d);
+	decltype(auto) result = d->typo->getResults().results[cp];
+	d->offset[0] = result.x;
+	d->offset[1] = result.y;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -208,7 +206,15 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	// 如果使用缓存且非空，直接返回
 	// 否则还是会尝试解析一下
 	if (options.useCache && !d->results.empty())
-		return GMTypoIterator(this, 0);
+	{
+		// 如果没有指定renderEnd，默认为0，很可能是调用者忘记设置了，在此处ASSERT一下
+		GM_ASSERT(literature.isEmpty() || (literature.length() > 0 && options.renderEnd > 0));
+
+		// 在使用缓存绘制时，我们一般通过renderStart和renderEnd指定了一块区域，因此绘制出来后需要做一个偏移
+		GMTypoIterator iter = GMTypoIterator(this, options.renderStart);
+		iter.setOffset(options.renderStart);
+		return std::move(iter);
+	}
 
 	d->options = options;
 	d->current_x = d->current_y = 0;
@@ -292,6 +298,9 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 GMTypoIterator GMTypoEngine::end()
 {
 	D(d);
+	if (d->options.useCache)
+		return GMTypoIterator(this, d->options.renderEnd);
+
 	return GMTypoIterator(this, d->results.size() - 1);
 }
 

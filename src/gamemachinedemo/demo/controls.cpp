@@ -141,7 +141,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		10,
 		top += 60,
 		500,
-		250,
+		100,
 		false,
 		txtCorner,
 		&textArea

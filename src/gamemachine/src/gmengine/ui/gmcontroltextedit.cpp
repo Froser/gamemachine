@@ -285,9 +285,7 @@ void GMControlTextEdit::render(GMfloat elapsed)
 
 	// 闪烁光标
 	blinkCaret(firstX, caretX);
-
-	// 获取能够显示的文本长度
-	calculateRenderText(firstX);
+	setBufferRenderRange(firstX);
 
 	// 不允许换行
 	widget->drawText(d->buffer, d->textStyle, d->rcText, false);
@@ -843,20 +841,6 @@ void GMControlTextEdit::updateRect()
 	d->buffer->setSize(d->rcText);
 }
 
-void GMControlTextEdit::calculateRenderText(GMint firstX)
-{
-	D(d);
-	// 获取能够显示的文本长度
-	const GMString& text = d->buffer->getBuffer();
-	GMint lastCP;
-	bool lastTrail;
-	d->buffer->XtoCP(firstX + d->rcText.width, &lastCP, &lastTrail);
-	if (lastTrail)
-		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP + 1);
-	else if (!lastTrail)
-		d->renderText = text.substr(d->firstVisibleCP, lastCP - d->firstVisibleCP);
-}
-
 void GMControlTextEdit::insertCharacter(GMwchar ch)
 {
 	D(d);
@@ -932,6 +916,19 @@ void GMControlTextEdit::moveFirstVisibleCp(GMint distance)
 		d->firstVisibleCP -= distance;
 	else
 		d->firstVisibleCP = 0;
+}
+
+void GMControlTextEdit::setBufferRenderRange(GMint x)
+{
+	D(d);
+	// 获取能够显示的文本长度
+	GMint lastCP;
+	bool lastTrail;
+	d->buffer->XtoCP(x + d->rcText.width, &lastCP, &lastTrail);
+	if (lastTrail)
+		d->buffer->setRenderRange(d->firstVisibleCP, lastCP + 1);
+	else
+		d->buffer->setRenderRange(d->firstVisibleCP, lastCP);
 }
 
 GMControlTextArea::GMControlTextArea(GMWidget* widget)
@@ -1087,9 +1084,8 @@ void GMControlTextArea::render(GMfloat elapsed)
 
 	// 闪烁光标
 	blinkCaret(firstX, caretX);
+	setBufferRenderRange(firstX, firstY);
 
-	// 获取能够显示的文本长度
-	calculateRenderText(firstX);
 	widget->drawText(d->buffer, db->textStyle, db->rcText, false);
 }
 
@@ -1165,4 +1161,60 @@ void GMControlTextArea::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
 {
 	D(d);
 	d->buffer->setLineSpacing(lineSpacing);
+}
+
+void GMControlTextArea::placeCaret(GMint cp)
+{
+	D(d);
+	D_BASE(db, Base);
+	GM_ASSERT(cp >= 0);
+	if (cp > d->buffer->getLength())
+		cp = d->buffer->getLength();
+	db->cp = cp;
+
+	GMint firstX, firstY, x, y, x2, y2;
+	d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
+	d->buffer->CPtoXY(cp, false, &x, &y);
+
+	if (cp == d->buffer->getLength())
+	{
+		x2 = x;
+		y2 = y;
+	}
+	else
+	{
+		d->buffer->CPtoXY(cp, true, &x2, &y2); //trail
+	}
+
+	if (y < firstY)
+	{
+		// 此时字符所在的位置比可见位置小
+		db->firstVisibleCP = d->buffer->findFirstCPInOneLine(cp);
+	}
+	else if (y2 > firstY + db->rcText.height)
+	{
+		// 向下翻页的情况
+		GMint yNewTop = y2 - db->rcText.height;
+		GMint cpNewFirst;
+		d->buffer->XYtoCP(x, yNewTop, &cpNewFirst);
+
+		GMint xNewFirst, yNewFirst;
+		d->buffer->CPtoXY(cpNewFirst, false, &xNewFirst, &yNewFirst);
+
+		if (yNewFirst < yNewTop)
+			++cpNewFirst;
+
+		db->firstVisibleCP = cpNewFirst;
+	}
+}
+
+void GMControlTextArea::setBufferRenderRange(GMint x, GMint y)
+{
+	D(d);
+	D_BASE(db, Base);
+	// 获取能够显示的文本长度
+	GMint lastCP;
+	d->buffer->XYtoCP(x + db->rcText.width, y + db->rcText.height, &lastCP);
+	GMint lastCPInThisLine = d->buffer->findLastCPInOneLine(lastCP);
+	d->buffer->setRenderRange(db->firstVisibleCP, lastCPInThisLine);
 }

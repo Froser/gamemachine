@@ -25,7 +25,6 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	bool caretOn = true;
 	bool showCaret = true;
 	bool insertMode = true;
-	GMString renderText;
 	bool mouseDragging = false;
 	GMint padding[2] = { 5, 10 };
 };
@@ -71,11 +70,11 @@ protected:
 	virtual void pasteFromClipboard();
 	virtual GMint getCaretTop();
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
+	virtual void placeCaret(GMint cP);
 
 protected:
 	void createBufferTypoEngineIfNotExist();
 	void blinkCaret(GMint firstX, GMint caretX);
-	void placeCaret(GMint cP);
 	void moveCaret(bool next, bool newItem, bool select);
 	void deleteSelectionText();
 	void selectAll();
@@ -85,6 +84,7 @@ protected:
 	void initStyles(GMWidget* widget);
 	GMint getCaretHeight();
 	void moveFirstVisibleCp(GMint distance);
+	void setBufferRenderRange(GMint x);
 
 public:
 	inline GMControlBorder* getBorder() GM_NOEXCEPT
@@ -111,15 +111,8 @@ public:
 		d->deltaBlink = blinkSpeedSecond;
 	}
 
-	inline const GMString& getRenderText() GM_NOEXCEPT
-	{
-		D(d);
-		return d->renderText;
-	}
-
 protected:
 	virtual void updateRect() override;
-	virtual void calculateRenderText(GMint firstX);
 	virtual void insertCharacter(GMwchar ch);
 };
 
@@ -143,9 +136,13 @@ public:
 	virtual void setSize(GMint width, GMint height) override;
 	virtual GMint getCaretTop() override;
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
+	virtual void placeCaret(GMint cp) override;
 
 public:
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
+
+protected:
+	void setBufferRenderRange(GMint x, GMint y);
 
 private:
 	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
@@ -153,7 +150,6 @@ private:
 		D(d);
 		d->caretTopRelative = caretTopRelative;
 	}
-
 };
 
 END_NS

@@ -293,6 +293,8 @@ void GMTextGameObject::updateVertices(GMModel* model)
 			typoEngine = const_cast<ITypoEngine*>(d->textBuffer->getTypoEngine());
 			options.plainText = d->textBuffer->isPlainText();
 			options.useCache = true;
+			options.renderStart = d->textBuffer->getRenderStart();
+			options.renderEnd = d->textBuffer->getRenderEnd();
 			iter = typoEngine->begin(d->text, options);
 		}
 

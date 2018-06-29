@@ -28,20 +28,20 @@ GM_PRIVATE_OBJECT(GMTypoIterator)
 {
 	ITypoEngine* typo = nullptr;
 	GMsize_t index = 0;
+	GMint offset[2] = { 0 };
 };
 
-class GMTypoIterator
+class GMTypoIterator : public GMObject
 {
-	GM_DECLARE_PRIVATE_NGO(GMTypoIterator)
+	GM_DECLARE_PRIVATE(GMTypoIterator)
+	GM_ALLOW_COPY_DATA(GMTypoIterator)
 
 public:
 	GMTypoIterator() = default;
 	GMTypoIterator(ITypoEngine* typo, GMsize_t index);
-	GMTypoIterator(const GMTypoIterator& rhs);
-	GMTypoIterator& operator = (const GMTypoIterator& rhs) GM_NOEXCEPT;
 
 public:
-	const GMTypoResult& operator*();
+	GMTypoResult operator*();
 	bool operator==(const GMTypoIterator& rhs);
 	bool operator!=(const GMTypoIterator& rhs);
 
@@ -50,6 +50,8 @@ public:
 		return ++(*this);
 	}
 	GMTypoIterator& operator ++();
+
+	void setOffset(GMsize_t cp);
 };
 
 struct GMTypoOptions
@@ -60,7 +62,10 @@ struct GMTypoOptions
 	bool center = false;
 	bool newline = true;
 	bool plainText = false;
+
 	bool useCache = false;
+	GMsize_t renderStart = 0;
+	GMsize_t renderEnd = 0;
 };
 
 struct GMTypoResultInfo
@@ -186,6 +191,8 @@ GM_PRIVATE_OBJECT(GMTypoTextBuffer)
 	GMRect rc;
 	bool newline = true;
 	bool dirty = false;
+	GMsize_t renderStart = 0;
+	GMsize_t renderEnd = 0;
 };
 
 class GMTypoTextBuffer : public GMObject
@@ -243,6 +250,27 @@ protected:
 		D(d);
 		d->dirty = true;
 	}
+
+public:
+	void setRenderRange(GMsize_t cpStart, GMsize_t cpEnd) GM_NOEXCEPT
+	{
+		D(d);
+		d->renderStart = cpStart;
+		d->renderEnd = cpEnd;
+	}
+
+	GMsize_t getRenderStart() GM_NOEXCEPT
+	{
+		D(d);
+		return d->renderStart;
+	}
+
+	GMsize_t getRenderEnd() GM_NOEXCEPT
+	{
+		D(d);
+		return d->renderEnd;
+	}
+
 };
 
 END_NS
