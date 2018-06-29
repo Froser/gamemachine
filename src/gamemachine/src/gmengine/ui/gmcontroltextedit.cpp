@@ -977,7 +977,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 
 	// 绘制一个模板区域，防止光标、选中区域和文字超出渲染区域
 	GMWidget* widget = getParent();
-	GMRect expandedRcText = expandStencilRect(db->rcText); // 稍微扩大一下渲染区域，不然看起来很丑
+	GMRect expandedRcText = expandStencilRect(db->rcText); // 稍微扩大一下渲染区域，不然看起来很丑。
 	widget->drawStencil(expandedRcText, .99f);
 	widget->useStencil(true);
 
@@ -1093,7 +1093,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 	setBufferRenderRange(firstX, firstY);
 
 	// 绘制文本
-	widget->drawText(d->buffer, db->textStyle, db->rcText, false);
+	widget->drawText(d->buffer, db->textStyle, adjustRectByScrollOffset(db->rcText), false);
 
 	// 结束模板区域
 	widget->endStencil();
@@ -1146,7 +1146,7 @@ GMint GMControlTextArea::getCaretTop()
 {
 	D(d);
 	D_BASE(db, Base);
-	return d->caretTopRelative + db->rcText.y;
+	return d->caretTopRelative + db->rcText.y + d->scrollOffset;
 }
 
 void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
@@ -1157,7 +1157,12 @@ void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
 	d->buffer->CPtoXY(db->firstVisibleCP, false, &xFirst, &yFirst);
 
 	GMint cp;
-	if (d->buffer->XYtoCP(pt.x - db->rcText.x + xFirst, pt.y - db->rcText.y + yFirst, &cp))
+	GMPoint adjustedPt = {
+		pt.x,
+		pt.y - d->scrollOffset
+	};
+
+	if (d->buffer->XYtoCP(adjustedPt.x - db->rcText.x + xFirst, adjustedPt.y - db->rcText.y + yFirst, &cp))
 	{
 		placeCaret(cp);
 
@@ -1215,6 +1220,17 @@ void GMControlTextArea::placeCaret(GMint cp)
 			++cpNewFirst;
 
 		db->firstVisibleCP = cpNewFirst;
+	}
+
+	auto scrollOffset = (firstY + db->rcText.height) - (y + d->buffer->getLineHeight() + d->buffer->getLineSpacing());
+	if (scrollOffset < 0)
+	{
+		// 光标越界了，需要偏移一个负值
+		d->scrollOffset = scrollOffset;
+	}
+	else
+	{
+		d->scrollOffset = 0;
 	}
 }
 

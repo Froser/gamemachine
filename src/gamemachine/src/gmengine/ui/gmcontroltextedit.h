@@ -131,6 +131,7 @@ GM_PRIVATE_OBJECT(GMControlTextArea)
 {
 	GMint caretTopRelative = 0;
 	GMMultiLineTypoTextBuffer* buffer = nullptr;
+	GMint scrollOffset = 0;
 };
 
 class GMControlTextArea : public GMControlTextEdit
@@ -160,6 +161,18 @@ private:
 	{
 		D(d);
 		d->caretTopRelative = caretTopRelative;
+	}
+
+	inline GMRect adjustRectByScrollOffset(const GMRect& rc) GM_NOEXCEPT
+	{
+		D(d);
+		GMRect r = {
+			rc.x,
+			rc.y + d->scrollOffset,
+			rc.width,
+			rc.height
+		};
+		return r;
 	}
 };
 
