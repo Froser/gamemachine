@@ -229,15 +229,19 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	d->results.clear();
 	setFontSize(d->options.defaultFontSize);
 
-	// 获取行高
-	GMGlyphManager* glyphManager = d->context->getEngine()->getGlyphManager();
 	const std::wstring& wstr = literature.toStdWString();
-	const GMwchar* p = wstr.c_str();
-	while (*p)
+
+	// lineHeight为0表示自动获取行高，获取第1个字符的高度
+	if (d->lineHeight == 0)
 	{
-		const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize, d->font);
-		d->lineHeight = glyph.height;
-		break;
+		GMGlyphManager* glyphManager = d->context->getEngine()->getGlyphManager();
+		const GMwchar* p = wstr.c_str();
+		while (*p)
+		{
+			const GMGlyphInfo& glyph = glyphManager->getChar(*p, d->fontSize, d->font);
+			d->lineHeight = glyph.height;
+			break;
+		}
 	}
 
 	auto _adjustNewLineSepResult = [=](auto& target, bool copyLineNo) {
@@ -260,6 +264,9 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	for (GMsize_t i = 0; i < len; ++i)
 	{
 		GMTypoResult result = getTypoResult(i);
+		if (!result.valid)
+			continue;
+
 		if (result.newLineOrEOFSeparator)
 			_adjustNewLineSepResult(result, false);
 		d->results.push_back(result);
@@ -317,6 +324,12 @@ void GMTypoEngine::setFont(GMFontHandle font)
 	d->font = font;
 }
 
+void GMTypoEngine::setLineHeight(GMint lineHeight)
+{
+	D(d);
+	d->lineHeight = lineHeight;
+}
+
 void GMTypoEngine::createInstance(OUT ITypoEngine** engine)
 {
 	D(d);
@@ -344,7 +357,6 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	{
 		result.lineNo = d->currentLineNo;
 		result.newLineOrEOFSeparator = true;
-		result.valid = false;
 		result.y = d->current_y;
 		result.height = d->lineHeight;
 		newLine();

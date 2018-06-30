@@ -69,6 +69,7 @@ protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
 	virtual void pasteFromClipboard();
 	virtual GMint getCaretTop();
+	virtual GMint getCaretHeight();
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
 	virtual void placeCaret(GMint cP);
 
@@ -82,7 +83,6 @@ protected:
 	void copyToClipboard();
 	void handleMouseSelect(GMSystemMouseEvent* event, bool selectStart);
 	void initStyles(GMWidget* widget);
-	GMint getCaretHeight();
 	void moveFirstVisibleCp(GMint distance);
 	void setBufferRenderRange(GMint xFirst);
 
@@ -122,6 +122,12 @@ public:
 		return r;
 	}
 
+	inline const GMString& getText() GM_NOEXCEPT
+	{
+		D(d);
+		return d->buffer->getBuffer();
+	}
+
 protected:
 	virtual void updateRect() override;
 	virtual void insertCharacter(GMwchar ch);
@@ -147,15 +153,18 @@ public:
 	virtual void insertCharacter(GMwchar ch) override;
 	virtual void setSize(GMint width, GMint height) override;
 	virtual GMint getCaretTop() override;
+	virtual GMint getCaretHeight() override;
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
 	virtual void placeCaret(GMint cp) override;
 
 // 处理按键
 	virtual bool onKey_UpDown(GMSystemKeyEvent* event) override;
 	virtual bool onKey_HomeEnd(GMSystemKeyEvent* event) override;
+	virtual bool onKey_Back(GMSystemKeyEvent* event) override;
 
 public:
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
+	void setLineHeight(GMint lineHeight) GM_NOEXCEPT;
 
 protected:
 	void setBufferRenderRange(GMint xFirst, GMint yFirst);

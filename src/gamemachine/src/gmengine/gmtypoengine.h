@@ -80,6 +80,7 @@ GM_INTERFACE(ITypoEngine)
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
+	virtual void setLineHeight(GMint) = 0;
 	virtual void createInstance(OUT ITypoEngine**) = 0;
 	virtual GMTypoResultInfo getResults() = 0;
 
@@ -169,6 +170,7 @@ public:
 	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) override;
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
+	virtual void setLineHeight(GMint lineHeight) override;
 	virtual void createInstance(OUT ITypoEngine**) override;
 	virtual GMTypoResultInfo getResults() override;
 

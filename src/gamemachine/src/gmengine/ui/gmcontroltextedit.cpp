@@ -10,6 +10,7 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
 {
 	GMint lineSpacing = 5;
+	GMint lineHeight = 0;
 };
 
 class GMMultiLineTypoTextBuffer : public GMTypoTextBuffer
@@ -45,6 +46,12 @@ public:
 		D(d);
 		return d->lineSpacing;
 	}
+
+	inline void setLineHeight(GMint lineHeight) GM_NOEXCEPT
+	{
+		D(d);
+		d->lineHeight = lineHeight;
+	}
 };
 
 void GMMultiLineTypoTextBuffer::analyze()
@@ -56,6 +63,7 @@ void GMMultiLineTypoTextBuffer::analyze()
 	options.newline = true;
 	options.plainText = isPlainText();
 	options.lineSpacing = d->lineSpacing;
+	db->engine->setLineHeight(d->lineHeight);
 	db->engine->begin(db->buffer, options);
 	db->dirty = false;
 }
@@ -63,13 +71,13 @@ void GMMultiLineTypoTextBuffer::analyze()
 bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 {
 	D_BASE(d, Base);
-	if (!x || !y)
-		return false;
-
 	if (cp < 0)
 	{
-		*x = 0;
-		*y = 0;
+		if (x)
+			*x = 0;
+
+		if (y)
+			*y = 0;
 		return true;
 	}
 
@@ -80,12 +88,17 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 	if (cp >= getLength())
 		return CPtoXY(cp - 1, true, x, y);
 
-	if (trail)
-		*x = r[cp].x + r[cp].advance;
-	else
-		*x = r[cp].x;
+	if (x)
+	{
+		if (trail)
+			*x = r[cp].x + r[cp].advance;
+		else
+			*x = r[cp].x;
+	}
 
-	*y = r[cp].y;
+	if (y)
+		*y = r[cp].y;
+
 	return true;
 }
 
@@ -961,6 +974,7 @@ GMControlTextArea::GMControlTextArea(GMWidget* widget)
 	D_BASE(db, Base);
 	GM_delete(db->buffer);
 	db->buffer = d->buffer = new GMMultiLineTypoTextBuffer();
+	setLineHeight(16);
 	createBufferTypoEngineIfNotExist();
 }
 
@@ -1061,7 +1075,8 @@ void GMControlTextArea::render(GMfloat elapsed)
 				rcSelection.y = getCaretTop();
 				rcSelection.width = selStartLastX - selectionStartX;
 				rcSelection.height = getCaretHeight();
-				minSelectionRect(rcSelection);
+				if (firstLineLastCp == d->buffer->findLastCPInOneLine(firstLineLastCp))
+					minSelectionRect(rcSelection);
 				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 				widget->drawRect(db->selectionBackColor, rc, true, .99f);
 			}
@@ -1081,7 +1096,8 @@ void GMControlTextArea::render(GMfloat elapsed)
 				rcSelection.y = getCaretTop();
 				rcSelection.width = selectionEndX - selEndFirstX;
 				rcSelection.height = getCaretHeight();
-				minSelectionRect(rcSelection);
+				if (lastLineFirstCp == d->buffer->findLastCPInOneLine(lastLineFirstCp))
+					minSelectionRect(rcSelection);
 				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 				widget->drawRect(db->selectionBackColor, rc, true, .99f);
 			}
@@ -1104,7 +1120,8 @@ void GMControlTextArea::render(GMfloat elapsed)
 					rcSelection.y = getCaretTop();
 					rcSelection.width = rightX - leftX;
 					rcSelection.height = getCaretHeight();
-					minSelectionRect(rcSelection);
+					if (currentLineLastCp == d->buffer->findLastCPInOneLine(currentLineLastCp))
+						minSelectionRect(rcSelection);
 					GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 					widget->drawRect(db->selectionBackColor, rc, true, .99f);
 
@@ -1175,7 +1192,15 @@ GMint GMControlTextArea::getCaretTop()
 {
 	D(d);
 	D_BASE(db, Base);
-	return d->caretTopRelative + db->rcText.y + d->scrollOffset;
+	GMint yFirst = 0;
+	d->buffer->CPtoXY(db->firstVisibleCP, false, nullptr, &yFirst);
+	return d->caretTopRelative + db->rcText.y + d->scrollOffset - yFirst;
+}
+
+GMint GMControlTextArea::getCaretHeight()
+{
+	D(d);
+	return d->buffer->getLineHeight() + d->buffer->getLineSpacing();
 }
 
 void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
@@ -1207,6 +1232,12 @@ void GMControlTextArea::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
 	d->buffer->setLineSpacing(lineSpacing);
 }
 
+void GMControlTextArea::setLineHeight(GMint lineHeight) GM_NOEXCEPT
+{
+	D(d);
+	d->buffer->setLineHeight(lineHeight);
+}
+
 void GMControlTextArea::placeCaret(GMint cp)
 {
 	D(d);
@@ -1214,7 +1245,6 @@ void GMControlTextArea::placeCaret(GMint cp)
 	GM_ASSERT(cp >= 0);
 	if (cp > d->buffer->getLength())
 		cp = d->buffer->getLength();
-	db->cp = cp;
 
 	GMint firstX, firstY, x, y, x2, y2;
 	d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
@@ -1239,16 +1269,24 @@ void GMControlTextArea::placeCaret(GMint cp)
 	{
 		// 向下翻页的情况
 		GMint yNewTop = y2 - db->rcText.height;
-		GMint cpNewFirst;
-		d->buffer->XYtoCP(x, yNewTop, &cpNewFirst);
+		GMint cpNew;
+		d->buffer->XYtoCP(x, yNewTop, &cpNew);
 
+		auto cpDiff = d->buffer->CPToLineNumber(db->cp) - d->buffer->CPToLineNumber(cp);
 		GMint xNewFirst, yNewFirst;
-		d->buffer->CPtoXY(cpNewFirst, false, &xNewFirst, &yNewFirst);
+		d->buffer->CPtoXY(cpNew, false, &xNewFirst, &yNewFirst);
 
 		if (yNewFirst < yNewTop)
-			++cpNewFirst;
+			++cpDiff;
 
-		db->firstVisibleCP = cpNewFirst;
+		for (GMint i = 0; i < cpDiff; ++i)
+		{
+			db->firstVisibleCP = d->buffer->findLastCPInOneLine(db->firstVisibleCP) + 1;
+		}
+
+		//重置滚动偏移，重新计算firstX, firstY
+		d->scrollOffset = 0;
+		d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
 	}
 
 	if (d->scrollOffset == 0)
@@ -1261,9 +1299,11 @@ void GMControlTextArea::placeCaret(GMint cp)
 	else
 	{
 		GM_ASSERT(d->scrollOffset < 0);
-		if (y + d->scrollOffset < 0)
+		if (y - firstY + d->scrollOffset < 0)
 			d->scrollOffset = 0;
 	}
+
+	db->cp = cp;
 }
 
 bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
@@ -1332,6 +1372,26 @@ bool GMControlTextArea::onKey_HomeEnd(GMSystemKeyEvent* event)
 	return true;
 }
 
+bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
+{
+	D_BASE(d, Base);
+	if (d->selectionStartCP != d->cp)
+	{
+		deleteSelectionText();
+		emit(textChanged);
+	}
+	else if (d->cp > 0)
+	{
+		placeCaret(d->cp - 1);
+		d->selectionStartCP = d->cp;
+		if (d->buffer->removeChar(d->cp))
+			emit(textChanged);
+
+		resetCaretBlink();
+	}
+	return true;
+}
+
 void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
 {
 	D(d);
@@ -1339,5 +1399,6 @@ void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
 	// 获取能够显示的文本长度
 	GMint lastCP;
 	d->buffer->XYtoCP(xFirst + db->rcText.width, yFirst + db->rcText.height, &lastCP);
+	GM_ASSERT(d->buffer->findFirstCPInOneLine(db->firstVisibleCP) == db->firstVisibleCP);
 	d->buffer->setRenderRange(db->firstVisibleCP, lastCP);
 }

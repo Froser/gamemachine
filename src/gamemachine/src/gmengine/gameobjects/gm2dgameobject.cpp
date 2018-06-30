@@ -306,7 +306,7 @@ void GMTextGameObject::updateVertices(GMModel* model)
 		for (; iter != end; ++iter)
 		{
 			const GMTypoResult& typoResult = *iter;
-			if (!typoResult.valid)
+			if (!typoResult.valid || typoResult.newLineOrEOFSeparator)
 				continue;
 
 			const GMGlyphInfo& glyph = *typoResult.glyph;
