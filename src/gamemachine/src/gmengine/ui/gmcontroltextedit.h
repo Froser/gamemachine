@@ -150,6 +150,10 @@ public:
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
 	virtual void placeCaret(GMint cp) override;
 
+// 处理按键
+	virtual bool onKey_UpDown(GMSystemKeyEvent* event) override;
+	virtual bool onKey_HomeEnd(GMSystemKeyEvent* event) override;
+
 public:
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 

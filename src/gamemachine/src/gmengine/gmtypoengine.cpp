@@ -60,6 +60,9 @@ GMTypoStateMachine::ParseResult GMTypoStateMachine::parse(const GMTypoOptions& o
 	bool isPlainText = options.plainText;
 	bool newline = options.newline;
 
+	if (ch == '\r')
+		return Ignore;
+
 	switch (d->state)
 	{
 	case GMTypoStateMachineParseState::Literature:
@@ -343,6 +346,7 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 		result.newLineOrEOFSeparator = true;
 		result.valid = false;
 		result.y = d->current_y;
+		result.height = d->lineHeight;
 		newLine();
 		return result;
 	}
@@ -429,7 +433,7 @@ GMTypoTextBuffer::~GMTypoTextBuffer()
 void GMTypoTextBuffer::setBuffer(const GMString& buffer)
 {
 	D(d);
-	d->buffer = buffer;
+	d->buffer = buffer.replace(L"\r", L""); //去掉\r
 	setDirty();
 }
 
@@ -445,12 +449,18 @@ void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
 {
 	D(d);
 	d->buffer[pos] = ch;
+	if (ch == '\r')
+		return;
+
 	setDirty();
 }
 
 bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 {
 	D(d);
+	if (ch == '\r')
+		return false;
+
 	if (pos < 0)
 		return false;
 
@@ -477,12 +487,12 @@ bool GMTypoTextBuffer::insertString(GMsize_t pos, const GMString& str)
 
 	if (pos == d->buffer.length())
 	{
-		d->buffer.append(str);
+		d->buffer.append(str.replace(L"\r", L""));
 	}
 	else
 	{
 		GMString newStr = d->buffer.substr(0, pos);
-		newStr.append(str);
+		newStr.append(str.replace(L"\r", L""));
 		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
 		d->buffer = std::move(newStr);
 	}
@@ -646,7 +656,7 @@ void GMTypoTextBuffer::getPriorItemPos(GMint cp, GMint* prior)
 {
 	D(d);
 	auto& r = d->engine->getResults().results;
-	for (GMsize_t i = cp - 1; i > 0; --i)
+	for (GMint i = cp - 1; i > 0; --i)
 	{
 		if (!r[i].isSpace && r[i - 1].isSpace)
 		{
@@ -662,7 +672,7 @@ void GMTypoTextBuffer::getNextItemPos(GMint cp, GMint* next)
 {
 	D(d);
 	auto& r = d->engine->getResults().results;
-	for (GMsize_t i = cp; i < r.size() - 2; ++i)
+	for (GMint i = cp; i < static_cast<GMint>(r.size() - 2); ++i)
 	{
 		if (r[i].isSpace && !r[i + 1].isSpace)
 		{

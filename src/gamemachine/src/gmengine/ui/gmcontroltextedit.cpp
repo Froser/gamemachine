@@ -24,12 +24,14 @@ public:
 	virtual bool CPtoX(GMint cp, bool trail, GMint* x) { GM_ASSERT(false); return false; }
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) { GM_ASSERT(false); return false; }
 	virtual bool CPtoXY(GMint cp, bool trail, GMint* x, GMint* y);
+	virtual bool CPtoMidXY(GMint cp, GMint* x, GMint* y);
 	virtual bool XYtoCP(GMint x, GMint y, GMint* cp);
 	
 public:
 	GMint CPToLineNumber(GMint cp);
 	GMint findFirstCPInOneLine(GMint cp);
 	GMint findLastCPInOneLine(GMint cp);
+	bool isNewLine(GMint cp);
 
 public:
 	inline void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
@@ -84,6 +86,31 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 		*x = r[cp].x;
 
 	*y = r[cp].y;
+	return true;
+}
+
+bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint cp, GMint* x, GMint* y)
+{
+	D_BASE(d, Base);
+	if (!x || !y)
+		return false;
+
+	if (cp < 0)
+	{
+		*x = 0;
+		*y = 0;
+		return true;
+	}
+
+	if (d->dirty)
+		analyze();
+
+	decltype(auto) r = d->engine->getResults().results;
+	if (cp >= getLength())
+		return CPtoMidXY(cp - 1, x, y);
+
+	*x = r[cp].x + r[cp].advance * .5f;
+	*y = r[cp].y + r[cp].height * .5f;
 	return true;
 }
 
@@ -202,6 +229,15 @@ GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
 	}
 	return r.size() - 1;
 }
+
+bool GMMultiLineTypoTextBuffer::isNewLine(GMint cp)
+{
+	D_BASE(d, Base);
+	decltype(auto) r = d->engine->getResults().results;
+	GM_ASSERT(cp < static_cast<GMint>(r.size()));
+	return r[cp].newLineOrEOFSeparator;
+}
+
 END_NS
 //////////////////////////////////////////////////////////////////////////
 
@@ -481,7 +517,6 @@ bool GMControlTextEdit::onChar(GMSystemCharEvent* event)
 	GMwchar ch = event->getCharacter();
 	if (ch == '\r')
 	{
-		insertCharacter(ch);
 		insertCharacter('\n');
 	}
 	else
@@ -602,28 +637,16 @@ bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
 	if (d->selectionStartCP != d->cp)
 	{
 		deleteSelectionText();
+		emit(textChanged);
 	}
 	else if (d->cp > 0)
 	{
 		placeCaret(d->cp - 1);
 		d->selectionStartCP = d->cp;
 		moveFirstVisibleCp(1);
-		
-		// 要考虑删除\r\n的情况，如果删除的是\n，且之前为\r，则一并删除
-		if (d->cp - 1 > 0 &&
-			d->buffer->getChar(d->cp) == L'\n' &&
-			d->buffer->getChar(d->cp - 1) == L'\r')
-		{
-			d->buffer->removeChars(d->cp - 1, d->cp);
-			placeCaret(d->cp - 1);
-		}
-		else
-		{
-			d->buffer->removeChar(d->cp);
-		}
+		if (d->buffer->removeChar(d->cp))
+			emit(textChanged);
 
-
-		emit(textChanged);
 		resetCaretBlink();
 	}
 	return true;
@@ -1018,6 +1041,12 @@ void GMControlTextArea::render(GMfloat elapsed)
 			d->buffer->CPtoXY(selectionStartCP, false, &selectionStartX, &selectionStartY);
 			d->buffer->CPtoXY(selectionEndCP, false, &selectionEndX, &selectionEndY);
 
+			// 如果是个空行导致选区宽度小于一个值，我们将它设置一个最小宽度
+			auto minSelectionRect = [](GMRect& selection) {
+				if (selection.width < 5)
+					selection.width = 10;
+			};
+
 			// 绘制最上面的矩形
 			GMint firstLineLastCp = d->buffer->findLastCPInOneLine(selectionStartCP);
 			{
@@ -1032,6 +1061,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 				rcSelection.y = getCaretTop();
 				rcSelection.width = selStartLastX - selectionStartX;
 				rcSelection.height = getCaretHeight();
+				minSelectionRect(rcSelection);
 				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 				widget->drawRect(db->selectionBackColor, rc, true, .99f);
 			}
@@ -1051,6 +1081,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 				rcSelection.y = getCaretTop();
 				rcSelection.width = selectionEndX - selEndFirstX;
 				rcSelection.height = getCaretHeight();
+				minSelectionRect(rcSelection);
 				GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 				widget->drawRect(db->selectionBackColor, rc, true, .99f);
 			}
@@ -1073,9 +1104,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 					rcSelection.y = getCaretTop();
 					rcSelection.width = rightX - leftX;
 					rcSelection.height = getCaretHeight();
-					// 如果是个空行导致选区宽度小于一个值，我们将它设置一个最小宽度
-					if (rcSelection.width < 5)
-						rcSelection.width = 10;
+					minSelectionRect(rcSelection);
 					GMRect rc = GM_intersectRect(rcSelection, expandedRcText);
 					widget->drawRect(db->selectionBackColor, rc, true, .99f);
 
@@ -1222,16 +1251,85 @@ void GMControlTextArea::placeCaret(GMint cp)
 		db->firstVisibleCP = cpNewFirst;
 	}
 
-	auto scrollOffset = (firstY + db->rcText.height) - (y + d->buffer->getLineHeight() + d->buffer->getLineSpacing());
-	if (scrollOffset < 0)
+	if (d->scrollOffset == 0)
 	{
-		// 光标越界了，需要偏移一个负值
-		d->scrollOffset = scrollOffset;
+		// 在没有滚动偏移的情况下，光标越界了，需要偏移一个负值
+		auto scrollOffset = (firstY + db->rcText.height) - (y + d->buffer->getLineHeight() + d->buffer->getLineSpacing());
+		if (scrollOffset < 0)
+			d->scrollOffset = scrollOffset;
 	}
 	else
 	{
-		d->scrollOffset = 0;
+		GM_ASSERT(d->scrollOffset < 0);
+		if (y + d->scrollOffset < 0)
+			d->scrollOffset = 0;
 	}
+}
+
+bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
+{
+	D(d);
+	D_BASE(db, Base);
+	GMKey key = event->getKey();
+	GMint cp = 0;
+	GMint x = 0, y = 0;
+	d->buffer->CPtoMidXY(db->cp, &x, &y);
+	GMint lh = d->buffer->getLineHeight() + d->buffer->getLineSpacing();
+	if (key == GMKey_Up)
+	{
+		if (y - lh > 0)
+		{
+			d->buffer->XYtoCP(x, y - lh, &cp);
+			// 对于换行符，由于宽度为0，上一行对应的CP计算出来会少一个字符（因为是闭区间计算位置），所以要加回来
+			if (d->buffer->isNewLine(db->cp) && x > 0)
+				placeCaret(Min(cp + 1, d->buffer->findLastCPInOneLine(cp)));
+			else
+				placeCaret(cp);
+
+			if (!(event->getModifier() & GMModifier_Shift))
+				db->selectionStartCP = db->cp;
+		}
+	}
+	else if (key == GMKey_Down)
+	{
+		d->buffer->XYtoCP(x, y + lh + d->buffer->getLineSpacing(), &cp);
+		if (cp != d->buffer->findLastCPInOneLine(db->cp))
+		{
+			// 对于换行符，由于宽度为0，上一行对应的CP计算出来会少一个字符（因为是闭区间计算位置），所以要加回来
+			if (d->buffer->isNewLine(db->cp) && x > 0)
+				placeCaret(Min(cp + 1, d->buffer->findLastCPInOneLine(cp)));
+			else
+				placeCaret(cp);
+		}
+
+		if (!(event->getModifier() & GMModifier_Shift))
+			db->selectionStartCP = db->cp;
+	}
+	return true;
+}
+
+bool GMControlTextArea::onKey_HomeEnd(GMSystemKeyEvent* event)
+{
+	D(d);
+	D_BASE(db, Base);
+	GMKey key = event->getKey();
+	if (key == GMKey_Home)
+	{
+		placeCaret(d->buffer->findFirstCPInOneLine(db->cp));
+	}
+	else
+	{
+		GM_ASSERT(key == GMKey_End);
+		placeCaret(d->buffer->findLastCPInOneLine(db->cp));
+	}
+
+	if (!(event->getModifier() & GMModifier_Shift))
+	{
+		// 如果没有按住Shift，更新选区范围
+		db->selectionStartCP = db->cp;
+	}
+	resetCaretBlink();
+	return true;
 }
 
 void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
