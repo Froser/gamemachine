@@ -183,6 +183,7 @@ set(WIN32_SOURCES
 		foundation/platforms/windows/screen.cpp
 		foundation/platforms/windows/thread.cpp
 		foundation/platforms/windows/clipboard.cpp
+		foundation/platforms/windows/utils.cpp
 		foundation/platforms/windows/gamemachine.cpp
 		foundation/platforms/windows/window/gmwindow.cpp
 		foundation/platforms/windows/window/gmwindow_opengl.cpp

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmstring.h"
 
-size_t GMString::npos = std::string::npos;
+GMsize_t GMString::npos = std::string::npos;
 
 namespace
 {
@@ -187,18 +187,18 @@ GMString& GMString::append(const char* c)
 	return *this;
 }
 
-size_t GMString::findLastOf(GMwchar c) const
+GMsize_t GMString::findLastOf(GMwchar c) const
 {
 	D_STR(d);
 	return d->data.find_last_of(c);
 }
 
-size_t GMString::findLastOf(char c) const
+GMsize_t GMString::findLastOf(char c) const
 {
 	D_STR(d);
 	char cs[2] = { c };
 	GMwchar* wch = alloc_convertMultiBytesToWideChar(cs);
-	size_t idx = d->data.find_last_of(wch);
+	GMsize_t idx = d->data.find_last_of(wch);
 	free_wideChar(wch);
 	return idx;
 }
@@ -230,15 +230,16 @@ GMString GMString::replace(const GMString& oldValue, const GMString& newValue) c
 	std::wstring _oldValue = oldValue.toStdWString();
 	std::wstring _newValue = newValue.toStdWString();
 	std::wstring _str = d->data;
-	size_t idx = std::wstring::npos + 1;
-	while ((idx = _str.find(_oldValue)) != std::wstring::npos)
+	GMsize_t idx = 0;
+	while ((idx = _str.find(_oldValue, idx)) != std::wstring::npos)
 	{
 		_str = _str.replace(idx, _oldValue.length(), _newValue);
+		idx += newValue.length();
 	}
 	return _str;
 }
 
-void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
+void GMString::stringCopy(char* dest, GMsize_t cchDest, const char* source)
 {
 #if GM_MSVC
 	::strcpy_s(dest, cchDest, source);
@@ -247,7 +248,7 @@ void GMString::stringCopy(char* dest, size_t cchDest, const char* source)
 #endif
 }
 
-void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
+void GMString::stringCopy(GMwchar* dest, GMsize_t cchDest, const GMwchar* source)
 {
 #if GM_MSVC
 	::wcscpy_s(dest, cchDest, source);
@@ -256,7 +257,7 @@ void GMString::stringCopy(GMwchar* dest, size_t cchDest, const GMwchar* source)
 #endif
 }
 
-void GMString::stringCat(char* dest, size_t cchDest, const char* source)
+void GMString::stringCat(char* dest, GMsize_t cchDest, const char* source)
 {
 #if GM_MSVC
 	::strcat_s(dest, cchDest, source);
@@ -265,7 +266,7 @@ void GMString::stringCat(char* dest, size_t cchDest, const char* source)
 #endif
 }
 
-void GMString::stringCat(GMwchar* dest, size_t cchDest, const GMwchar* source)
+void GMString::stringCat(GMwchar* dest, GMsize_t cchDest, const GMwchar* source)
 {
 #if GM_MSVC
 	::wcscat_s(dest, cchDest, source);

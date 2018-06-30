@@ -86,7 +86,23 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp >= getLength())
-		return CPtoXY(cp - 1, true, x, y);
+	{
+		// 越界分两种情况。如果最后一个字符是换行或仅有一个回车符，那么获取的坐标为下一行，否则获取最后一个字符的位置
+		// 由于缓存最末尾有个EOF，因此要getLength() - 1
+		if ( (getLength() > 1 && r[getLength() - 1].newLineOrEOFSeparator) ||
+			 (getLength() == 1 && r[0].newLineOrEOFSeparator)
+		)
+		{
+			CPtoXY(getLength() - 1, true, nullptr, y);
+			if (x)
+				*x = 0;
+			if (y)
+				*y = *y + getLineHeight() + getLineSpacing();
+			return true;
+		}
+
+		return CPtoXY(getLength() - 1, true, x, y);
+	}
 
 	if (x)
 	{
@@ -677,6 +693,12 @@ bool GMControlTextEdit::onKey_Insert(GMSystemKeyEvent* event)
 	return true;
 }
 
+const GMString& GMControlTextEdit::getText() GM_NOEXCEPT
+{
+	D(d);
+	return d->buffer->getBuffer();
+}
+
 void GMControlTextEdit::createBufferTypoEngineIfNotExist()
 {
 	D(d);
@@ -802,7 +824,7 @@ void GMControlTextEdit::copyToClipboard()
 	if (selectionStart > selectionEnd)
 		GM_SWAP(selectionStart, selectionEnd);
 
-	GMString subString = d->buffer->getBuffer().substr(selectionStart, selectionEnd - selectionStart);
+	GMString subString = GMConvertion::toCurrentEnvironmentString(d->buffer->getBuffer().substr(selectionStart, selectionEnd - selectionStart));
 	clipboardBuffer.size = (subString.length() + 1) * sizeof(decltype(subString.c_str()[0])); //不能忘记\0
 	clipboardBuffer.buffer = const_cast<GMbyte*>(reinterpret_cast<const GMbyte*>(subString.c_str()));
 	clipboardBuffer.needRelease = false;
@@ -1151,6 +1173,7 @@ void GMControlTextArea::pasteFromClipboard()
 	deleteSelectionText();
 	GMBuffer clipboardBuffer = GMClipboard::getData(GMClipboardMIME::UnicodeText);
 	GMString string(reinterpret_cast<GMwchar*>(clipboardBuffer.buffer));
+	string = GMConvertion::toCurrentEnvironmentString(string).replace("\t", " ");
 	if (d->buffer->insertString(d->cp, string))
 	{
 		placeCaret(d->cp + string.length());

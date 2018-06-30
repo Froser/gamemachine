@@ -57,6 +57,7 @@ public:
 	virtual void setPadding(GMint x, GMint y);
 
 // 处理特殊按键
+protected:
 	virtual bool onKey_Tab(GMSystemKeyEvent* event);
 	virtual bool onKey_LeftRight(GMSystemKeyEvent* event);
 	virtual bool onKey_UpDown(GMSystemKeyEvent* event);
@@ -64,6 +65,9 @@ public:
 	virtual bool onKey_Delete(GMSystemKeyEvent* event);
 	virtual bool onKey_Back(GMSystemKeyEvent* event);
 	virtual bool onKey_Insert(GMSystemKeyEvent* event);
+
+public:
+	const GMString& getText() GM_NOEXCEPT;
 
 protected:
 	virtual void renderCaret(GMint firstX, GMint caretX);
@@ -120,12 +124,6 @@ public:
 			rc.height + 4
 		};
 		return r;
-	}
-
-	inline const GMString& getText() GM_NOEXCEPT
-	{
-		D(d);
-		return d->buffer->getBuffer();
 	}
 
 protected:

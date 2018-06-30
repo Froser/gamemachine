@@ -445,6 +445,9 @@ struct GMConvertion
 	static GMfloat pointToPixel(GMint pt);
 	static bool hexToRGB(const GMString& hex, GMfloat rgb[3]);
 	static GMVec4 hexToRGB(const GMString& hex);
+	static GMString toUnixString(const GMString& string);
+	static GMString toWin32String(const GMString& string);
+	static GMString toCurrentEnvironmentString(const GMString& string);
 };
 
 enum class GMClipboardMIME
