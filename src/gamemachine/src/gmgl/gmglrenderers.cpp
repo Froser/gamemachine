@@ -374,14 +374,6 @@ void GMGLRenderer::prepareBlend(GMModel* model)
 		else
 		{
 			glDisable(GL_BLEND);
-			GMGLUtility::blendFunc(
-				globalBlendState.sourceRGB,
-				globalBlendState.destRGB,
-				globalBlendState.opRGB,
-				globalBlendState.sourceAlpha,
-				globalBlendState.destAlpha,
-				globalBlendState.opAlpha
-			);
 		}
 	}
 	else

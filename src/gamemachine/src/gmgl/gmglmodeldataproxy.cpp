@@ -134,5 +134,9 @@ void GMGLModelDataProxy::endUpdateBuffer()
 
 void* GMGLModelDataProxy::getBuffer()
 {
-	return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	D(d);
+	if (d->lastType == GMModelBufferType::VertexBuffer)
+		return glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+	else
+		return glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
 }
