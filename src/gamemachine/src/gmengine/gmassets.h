@@ -48,14 +48,14 @@ struct GMAssetsNode;
 struct GMAssetsNode
 {
 	GMString name;
-	Multimap<GMString, GMAssetsNode*> childs;
+	HashMap<GMString, GMAssetsNode*, GMStringHashFunctor> childs;
 	GMAsset asset;
 };
 
 GM_PRIVATE_OBJECT(GMAssets)
 {
-	GMAssetsNode* root = nullptr;
-	Vector<GMAssetsNode*> orphans;
+	GM_OWNED GMAssetsNode* root = nullptr;
+	GM_OWNED Vector<GMAssetsNode*> orphans;
 };
 
 class GMAssets : public GMObject

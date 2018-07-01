@@ -45,7 +45,7 @@ GM_PRIVATE_OBJECT(GMDx11Framebuffers)
 {
 	const IRenderContext* context = nullptr;
 	GMComPtr<ID3D11DeviceContext> deviceContext;
-	Vector<GMDx11Framebuffer*> framebuffers;
+	Vector<GMOwnedPtr<GMDx11Framebuffer>> framebuffers;
 	Vector<ID3D11RenderTargetView*> renderTargetViews;
 	GMComPtr<ID3D11DepthStencilView> depthStencilView;
 	GMComPtr<ID3D11Texture2D> depthStencilTexture;
@@ -60,7 +60,7 @@ class GMDx11Framebuffers : public GMObject, public IFramebuffers
 
 public:
 	GMDx11Framebuffers(const IRenderContext* context);
-	~GMDx11Framebuffers();
+	~GMDx11Framebuffers() = default;
 
 public:
 	virtual bool init(const GMFramebuffersDesc& desc) override;

@@ -16,6 +16,7 @@
 #include <unordered_map>
 #include <stack>
 #include <list>
+#include <memory>
 
 template <typename T1, typename T2>
 using Pair = std::pair<T1, T2>;
@@ -199,6 +200,12 @@ GM_STATIC_ASSERT_SIZE(GMfloat, 4);
 GM_STATIC_ASSERT_SIZE(GMint64, 8);
 
 // 常用函数和工具、常量
+template <typename T, typename DeleteFunc = std::default_delete<T>>
+using GMOwnedPtr = std::unique_ptr<T, DeleteFunc>;
+
+#define GM_OWNED
+#define gm_makeOwnedPtr std::make_unique
+
 typedef GMsize_t GMFontHandle;
 constexpr GMsize_t GMInvalidFontHandle = -1;
 
@@ -283,9 +290,7 @@ inline void GM_delete(Vector<T*>& o)
 	{
 		GM_delete(obj);
 	}
-#if _DEBUG
-	o.swap(Vector<T*>());
-#endif
+	GMClearSTLContainer(o);
 }
 
 template <typename T>

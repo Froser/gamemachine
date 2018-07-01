@@ -310,9 +310,9 @@ IGraphicEngine* GMWindow_Dx11::getGraphicEngine()
 	D_BASE(d, Base);
 	if (!d->engine)
 	{
-		d->engine = new GMDx11GraphicEngine(getContext());
+		d->engine = gm_makeOwnedPtr<GMDx11GraphicEngine>(getContext());
 	}
-	return d->engine;
+	return d->engine.get();
 }
 
 const IRenderContext* GMWindow_Dx11::getContext()
@@ -320,12 +320,12 @@ const IRenderContext* GMWindow_Dx11::getContext()
 	D_BASE(d, Base);
 	if (!d->context)
 	{
-		GMDx11RenderContext* context = new GMDx11RenderContext();
-		d->context = context;
+		auto context = new GMDx11RenderContext();
+		d->context.reset(context);
 		context->setWindow(this);
 		context->setEngine(getGraphicEngine());
 	}
-	return d->context;
+	return d->context.get();
 }
 
 bool GMWindowFactory::createWindowWithDx11(GMInstance instance, OUT IWindow** window)

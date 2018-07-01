@@ -34,14 +34,14 @@ GM_PRIVATE_OBJECT(GMDx11GraphicEngine)
 	bool ready = false;
 	bool lightDirty = true;
 
-	IRenderer* renderer_3d;
-	IRenderer* renderer_2d;
-	IRenderer* renderer_text;
-	IRenderer* renderer_cubemap;
-	IRenderer* renderer_filter;
-	IRenderer* renderer_deferred_3d;
-	IRenderer* renderer_deferred_3d_lightpass;
-	IRenderer* renderer_3d_shadow;
+	GMOwnedPtr<IRenderer> renderer_3d;
+	GMOwnedPtr<IRenderer> renderer_2d;
+	GMOwnedPtr<IRenderer> renderer_text;
+	GMOwnedPtr<IRenderer> renderer_cubemap;
+	GMOwnedPtr<IRenderer> renderer_filter;
+	GMOwnedPtr<IRenderer> renderer_deferred_3d;
+	GMOwnedPtr<IRenderer> renderer_deferred_3d_lightpass;
+	GMOwnedPtr<IRenderer> renderer_3d_shadow;
 };
 
 class GMDx11GraphicEngine : public GMGraphicEngine
@@ -50,7 +50,7 @@ class GMDx11GraphicEngine : public GMGraphicEngine
 
 public:
 	GMDx11GraphicEngine(const IRenderContext* context);
-	~GMDx11GraphicEngine();
+	~GMDx11GraphicEngine() = default;
 
 public:
 	virtual void init() override;

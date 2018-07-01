@@ -81,17 +81,14 @@ GMModel::GMModel(GMModel& model)
 	setVerticesCount(model.getVerticesCount());
 	if (!model.getModelDataProxy())
 		GM.createModelDataProxyAndTransfer(getModelDataProxy()->getContext(), &model);
-	needNotTransferAnymore();
+	doNotTransferAnymore();
 }
 
 GMModel::~GMModel()
 {
 	D(d);
 	releaseModelBuffer();
-	for (auto& mesh : d->meshes)
-	{
-		GM_delete(mesh);
-	}
+	GM_delete(d->meshes);
 }
 
 void GMModel::setModelBuffer(AUTORELEASE GMModelBuffer* mb)

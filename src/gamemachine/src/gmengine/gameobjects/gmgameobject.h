@@ -11,7 +11,7 @@ BEGIN_NS
 GM_PRIVATE_OBJECT(GMGameObject)
 {
 	GMuint id = 0;
-	GMPhysicsObject* physics = nullptr;
+	GMOwnedPtr<GMPhysicsObject> physics;
 	GMGameWorld* world = nullptr;
 	GMModels models;
 	GMMat4 scaling = Identity<GMMat4>();
@@ -29,13 +29,14 @@ class GMGameObject : public GMObject
 public:
 	GMGameObject() = default;
 	GMGameObject(GMAsset asset);
-	~GMGameObject();
+	~GMGameObject() = default;
 
 public:
 	void addModel(GMAsset asset, bool replace = false);
 	GMModels& getModels();
 	void setWorld(GMGameWorld* world);
 	GMGameWorld* getWorld();
+	void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj);
 
 public:
 	virtual void onAppendingObjectToWorld() {}
@@ -64,13 +65,7 @@ public:
 	inline const GMMat4& getScaling() const { D(d); return d->scaling; }
 	inline const GMMat4& getTranslation() const { D(d); return d->translation; }
 	inline const GMQuat& getRotation() const { D(d); return d->rotation; }
-	inline GMPhysicsObject* getPhysicsObject() { D(d); return d->physics; }
-	inline void setPhysicsObject(AUTORELEASE GMPhysicsObject* phyObj)
-	{
-		D(d);
-		d->physics = phyObj;
-		d->physics->setGameObject(this);
-	}
+	inline GMPhysicsObject* getPhysicsObject() { D(d); return d->physics.get(); }
 	inline void setContext(const IRenderContext* context) { D(d); d->context = context; }
 };
 

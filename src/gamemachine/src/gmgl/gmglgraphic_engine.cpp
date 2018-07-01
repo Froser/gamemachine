@@ -51,36 +51,9 @@ extern "C"
 	}
 }
 
-namespace
-{
-	template <typename T>
-	IRenderer* newRenderer(IRenderer*& ptr, const IRenderContext* context)
-	{
-		if (!ptr)
-			ptr = new T(context);
-		return ptr;
-	}
-}
-
 GMGLGraphicEngine::GMGLGraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
-}
-
-GMGLGraphicEngine::~GMGLGraphicEngine()
-{
-	D(d);
-	GM_delete(d->filterShaderProgram);
-	GM_delete(d->forwardShaderProgram);
-	GM_delete(d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]);
-	GM_delete(d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]);
-
-	GM_delete(d->renderer_2d);
-	GM_delete(d->renderer_3d);
-	GM_delete(d->renderer_cubeMap);
-	GM_delete(d->renderer_filter);
-	GM_delete(d->renderer_lightPass);
-	GM_delete(d->renderer_3d_shadow);
 }
 
 void GMGLGraphicEngine::init()
@@ -123,19 +96,19 @@ bool GMGLGraphicEngine::setInterface(GameMachineInterfaceID id, void* in)
 	switch (id)
 	{
 	case GameMachineInterfaceID::GLEffectShaderProgram:
-		d->filterShaderProgram = static_cast<GMGLShaderProgram*>(in);
+		d->filterShaderProgram.reset(static_cast<GMGLShaderProgram*>(in));
 		d->filterShaderProgram->load();
 		break;
 	case GameMachineInterfaceID::GLForwardShaderProgram:
-		d->forwardShaderProgram = static_cast<GMGLShaderProgram*>(in);
+		d->forwardShaderProgram.reset(static_cast<GMGLShaderProgram*>(in));
 		d->forwardShaderProgram->load();
 		break;
 	case GameMachineInterfaceID::GLDeferredShaderGeometryProgram:
-		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER] = static_cast<GMGLShaderProgram*>(in);
+		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER].reset(static_cast<GMGLShaderProgram*>(in));
 		d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER]->load();
 		break;
 	case GameMachineInterfaceID::GLDeferredShaderLightProgram:
-		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER] = static_cast<GMGLShaderProgram*>(in);
+		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER].reset(static_cast<GMGLShaderProgram*>(in));
 		d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER]->load();
 		break;
 	default:
@@ -252,24 +225,24 @@ IShaderProgram* GMGLGraphicEngine::getShaderProgram(GMShaderProgramType type)
 	D(d);
 	if (type == GMShaderProgramType::DefaultShaderProgram)
 	{
-		return d->forwardShaderProgram;
+		return d->forwardShaderProgram.get();
 	}
 	else if (type == GMShaderProgramType::ForwardShaderProgram)
 	{
-		return d->forwardShaderProgram;
+		return d->forwardShaderProgram.get();
 	}
 	else if (type == GMShaderProgramType::DeferredGeometryPassShaderProgram)
 	{
-		return d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER];
+		return d->deferredShaderPrograms[DEFERRED_GEOMETRY_PASS_SHADER].get();
 	}
 	else if (type == GMShaderProgramType::FilterShaderProgram)
 	{
-		return d->filterShaderProgram;
+		return d->filterShaderProgram.get();
 	}
 	else
 	{
 		GM_ASSERT(type == GMShaderProgramType::DeferredLightPassShaderProgram);
-		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER];
+		return d->deferredShaderPrograms[DEFERRED_LIGHT_PASS_SHADER].get();
 	}
 }
 

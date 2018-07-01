@@ -12,7 +12,7 @@ void Demo_NormalMap::init()
 	Base::init();
 	
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	// 创建一个纹理
 	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback

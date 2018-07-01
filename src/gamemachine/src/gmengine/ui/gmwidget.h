@@ -87,7 +87,7 @@ struct GMTextureArea
 
 struct GMCanvasTextureInfo
 {
-	ITexture* texture = nullptr;
+	GMOwnedPtr<ITexture> texture;
 	GMint width = 0;
 	GMint height = 0;
 };
@@ -95,10 +95,10 @@ struct GMCanvasTextureInfo
 GM_PRIVATE_OBJECT(GMWidgetResourceManager)
 {
 	const IRenderContext* context = nullptr;
-	GMTextGameObject* textObject = nullptr;
-	GMSprite2DGameObject* spriteObject = nullptr;
-	GMSprite2DGameObject* opaqueSpriteObject = nullptr;
-	GMBorder2DGameObject* borderObject = nullptr;
+	GMOwnedPtr<GMTextGameObject> textObject;
+	GMOwnedPtr<GMSprite2DGameObject> spriteObject;
+	GMOwnedPtr<GMSprite2DGameObject> opaqueSpriteObject;
+	GMOwnedPtr<GMBorder2DGameObject> borderObject;
 	Vector<GMWidget*> widgets;
 	GMint backBufferWidth = 0;
 	GMint backBufferHeight = 0;
@@ -121,7 +121,7 @@ public:
 
 public:
 	GMWidgetResourceManager(const IRenderContext* context);
-	~GMWidgetResourceManager();
+	~GMWidgetResourceManager() = default;
 
 public:
 	ITypoEngine* getTypoEngine();
@@ -165,25 +165,25 @@ public:
 	inline GMTextGameObject* getTextObject()
 	{
 		D(d);
-		return d->textObject;
+		return d->textObject.get();
 	}
 
 	inline GMSprite2DGameObject* getSpriteObject()
 	{
 		D(d);
-		return d->spriteObject;
+		return d->spriteObject.get();
 	}
 
 	inline GMSprite2DGameObject* getOpaqueSpriteObject()
 	{
 		D(d);
-		return d->opaqueSpriteObject;
+		return d->opaqueSpriteObject.get();
 	}
 
 	inline GMBorder2DGameObject* getBorderObject()
 	{
 		D(d);
-		return d->borderObject;
+		return d->borderObject.get();
 	}
 };
 

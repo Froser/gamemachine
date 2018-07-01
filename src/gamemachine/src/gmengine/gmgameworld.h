@@ -29,11 +29,11 @@ struct GMRenderList
 GM_PRIVATE_OBJECT(GMGameWorld)
 {
 	const IRenderContext* context = nullptr;
-	GMPhysicsWorld* physicsWorld = nullptr;
+	GMOwnedPtr<GMPhysicsWorld> physicsWorld = nullptr;
+	Set<GMOwnedPtr<GMGameObject>> gameObjects;
 	GMAssets assets;
 	GMRenderPreference renderPreference = GMRenderPreference::PreferForwardRendering;
 	GMRenderList renderList;
-	Set<GMGameObject*> gameObjects;
 };
 
 class GMGameWorld : public GMObject
@@ -44,10 +44,10 @@ class GMGameWorld : public GMObject
 
 public:
 	GMGameWorld(const IRenderContext* context);
-	virtual ~GMGameWorld();
+	~GMGameWorld() = default;
 
 public:
-	GMPhysicsWorld* getPhysicsWorld() { D(d); return d->physicsWorld; }
+	GMPhysicsWorld* getPhysicsWorld() { D(d); return d->physicsWorld.get(); }
 
 public:
 	virtual void renderScene();
@@ -69,11 +69,11 @@ protected:
 	}
 
 private:
-	void simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMGameObject*>& gameObjects);
+	void simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects);
 
 	// GMPhysicsWorld
 private:
-	void setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w) { D(d); GM_ASSERT(!d->physicsWorld); d->physicsWorld = w; }
+	void setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w);
 };
 
 END_NS

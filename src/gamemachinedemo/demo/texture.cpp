@@ -9,7 +9,7 @@ void Demo_Texture::init()
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext()));
 
 	// 创建一个纹理
 	struct _ShaderCb : public gm::IPrimitiveCreatorShaderCallback
@@ -79,7 +79,7 @@ void Demo_Texture_Index::init()
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext()));
 
 	gm::GMModel* quad = new gm::GMModel();
 	quad->setPrimitiveTopologyMode(gm::GMTopologyMode::Triangles);

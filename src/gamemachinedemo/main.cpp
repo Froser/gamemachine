@@ -32,7 +32,7 @@ int WINAPI wWinMain(
 	LPWSTR cmdLine = GetCommandLineW();
 	gm::GMsize_t sz = gm::GMString::countOfCharacters(cmdLine);
 	gm::GMRenderEnvironment env = gm::GMRenderEnvironment::DirectX11;
-	if (sz > 10 && gm::GMString(cmdLine + sz - 10) == "-opengl")
+	if (sz > 7 && gm::GMString(cmdLine + sz - 7) == "-opengl")
 		env = gm::GMRenderEnvironment::OpenGL;
 	SetRenderEnv(env);
 

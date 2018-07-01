@@ -132,49 +132,31 @@ GMWidgetResourceManager::GMWidgetResourceManager(const IRenderContext* context)
 {
 	D(d);
 	d->context = context;
-	d->textObject = new GMTextGameObject(context->getWindow()->getRenderRect());
+	d->textObject = gm_makeOwnedPtr<GMTextGameObject>(context->getWindow()->getRenderRect());
 	d->textObject->setContext(context);
 
-	d->spriteObject = new GMSprite2DGameObject(context->getWindow()->getRenderRect());
+	d->spriteObject = gm_makeOwnedPtr<GMSprite2DGameObject>(context->getWindow()->getRenderRect());
 	d->spriteObject->setContext(context);
 
-	d->opaqueSpriteObject = new GMOpaqueSprite2DGameObject(context->getWindow()->getRenderRect());
+	d->opaqueSpriteObject = gm_makeOwnedPtr<GMOpaqueSprite2DGameObject>(context->getWindow()->getRenderRect());
 	d->opaqueSpriteObject->setContext(context);
 
-	d->borderObject = new GMBorder2DGameObject(context->getWindow()->getRenderRect());
+	d->borderObject = gm_makeOwnedPtr<GMBorder2DGameObject>(context->getWindow()->getRenderRect());
 	d->borderObject->setContext(context);
 
 	GM.getFactory()->createWhiteTexture(context, &d->whiteTexture);
 	addTexture(GMWidgetResourceManager::WhiteTexture, d->whiteTexture, 1, 1);
 }
 
-GMWidgetResourceManager::~GMWidgetResourceManager()
-{
-	D(d);
-	GM_delete(d->textObject);
-	GM_delete(d->spriteObject);
-	GM_delete(d->opaqueSpriteObject);
-	GM_delete(d->borderObject);
-
-	for (auto& resource : d->textureResources)
-	{
-		GM_delete(resource.second.texture);
-	}
-}
-
 void GMWidgetResourceManager::addTexture(TextureType type, ITexture* texture, GMint width, GMint height)
 {
 	D(d);
-	auto iter = d->textureResources.find(type);
-	if (iter != d->textureResources.end() && (*iter).second.texture != texture)
-		GM_delete((*iter).second.texture);
-
 	GMCanvasTextureInfo texInfo;
-	texInfo.texture = texture;
+	texInfo.texture.reset(texture);
 	texInfo.width = width;
 	texInfo.height = height;
 
-	d->textureResources[type] = texInfo;
+	d->textureResources[type] = std::move(texInfo);
 }
 
 void GMWidgetResourceManager::registerWidget(GMWidget* widget)
@@ -515,7 +497,7 @@ void GMWidget::drawSprite(
 	GMSprite2DGameObject* spriteObject = d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
 	spriteObject->setGeometry(targetRc);
-	spriteObject->setTexture(texInfo.texture);
+	spriteObject->setTexture(texInfo.texture.get());
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(style.getTextureColor().getCurrent());
@@ -544,7 +526,7 @@ void GMWidget::drawRect(
 	GMSprite2DGameObject* spriteObject = isOpaque ? d->manager->getOpaqueSpriteObject() : d->manager->getSpriteObject();
 	spriteObject->setDepth(depth);
 	spriteObject->setGeometry(targetRc);
-	spriteObject->setTexture(texInfo.texture);
+	spriteObject->setTexture(texInfo.texture.get());
 	spriteObject->setTextureRect(textureRc);
 	spriteObject->setTextureSize(texInfo.width, texInfo.height);
 	spriteObject->setColor(bkColor);
@@ -572,7 +554,7 @@ void GMWidget::drawBorder(
 	GMBorder2DGameObject* borderObject = d->manager->getBorderObject();
 	borderObject->setDepth(depth);
 	borderObject->setGeometry(targetRc);
-	borderObject->setTexture(texInfo.texture);
+	borderObject->setTexture(texInfo.texture.get());
 	borderObject->setTextureRect(textureRc);
 	borderObject->setTextureSize(texInfo.width, texInfo.height);
 	borderObject->setColor(style.getTextureColor().getCurrent());

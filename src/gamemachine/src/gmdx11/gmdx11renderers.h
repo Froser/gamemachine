@@ -25,7 +25,12 @@ struct GMTextureAttributeBank
 GM_PRIVATE_OBJECT(GMDx11Renderer)
 {
 	const IRenderContext* context = nullptr;
-	ITexture* whiteTexture = nullptr;
+	GMOwnedPtr<ITexture> whiteTexture;
+	GMOwnedPtr<GMDx11RasterizerStates> rasterizerStates;
+	GMOwnedPtr<GMDx11BlendStates> blendStates;
+	GMOwnedPtr<GMDx11DepthStencilStates> depthStencilStates;
+	GMOwnedPtr<GMDx11EffectVariableBank> bank;
+
 	GMComPtr<ID3D11InputLayout> inputLayout;
 	GMComPtr<ID3DX11Effect> effect;
 	GMDebugConfig debugConfig;
@@ -39,12 +44,8 @@ GM_PRIVATE_OBJECT(GMDx11Renderer)
 	const GMShaderVariablesDesc* variablesDesc = nullptr;
 	bool screenInfoPrepared = false;
 	GMComPtr<ID3D11Resource> shadowMapResource;
-	GMDx11RasterizerStates* rasterizerStates = nullptr;
-	GMDx11BlendStates* blendStates = nullptr;
-	GMDx11DepthStencilStates* depthStencilStates = nullptr;
 	GMDx11GraphicEngine* engine = nullptr;
 	GMfloat gamma = 0;
-	GMDx11EffectVariableBank* bank = nullptr;
 };
 
 class GMDx11Renderer : public GMObject, public IRenderer
@@ -53,7 +54,7 @@ class GMDx11Renderer : public GMObject, public IRenderer
 
 public:
 	GMDx11Renderer(const IRenderContext* context);
-	~GMDx11Renderer();
+	~GMDx11Renderer() = default;
 
 public:
 	virtual void beginModel(GMModel* model, const GMGameObject* parent) override;

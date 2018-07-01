@@ -66,16 +66,16 @@ bool GMWindow::addWidget(GMWidget* widget)
 	return true;
 }
 
-void GMWindow::setHandler(IGameHandler* handler)
+void GMWindow::setHandler(AUTORELEASE IGameHandler* handler)
 {
 	D(d);
-	d->handler = handler;
+	d->handler.reset(handler);
 }
 
 IGameHandler* GMWindow::getHandler()
 {
 	D(d);
-	return d->handler;
+	return d->handler.get();
 }
 
 const GMWindowStates& GMWindow::getWindowStates()

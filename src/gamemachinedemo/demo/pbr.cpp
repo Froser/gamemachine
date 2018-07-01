@@ -30,7 +30,7 @@ void Demo_PBR::init()
 	Base::init();
 
 	// 创建对象
-	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	{
 		gm::GMModel* sphere = nullptr;

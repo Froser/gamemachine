@@ -9,7 +9,7 @@ BEGIN_NS
 
 GM_PRIVATE_OBJECT(GMPhysicsShape)
 {
-	btCollisionShape* shape = nullptr;
+	GMOwnedPtr<btCollisionShape> shape;
 };
 
 class GMPhysicsShape : public GMObject
@@ -22,7 +22,7 @@ private:
 	GMPhysicsShape() = default;
 
 public:
-	~GMPhysicsShape();
+	~GMPhysicsShape() = default;
 
 public:
 	void setShape(btCollisionShape* shape);

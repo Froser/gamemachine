@@ -209,15 +209,6 @@ GMDx11Framebuffers::GMDx11Framebuffers(const IRenderContext* context)
 	d->engine = gm_cast<GMGraphicEngine*>(d->context->getEngine());
 }
 
-GMDx11Framebuffers::~GMDx11Framebuffers()
-{
-	D(d);
-	for (auto& framebuffer : d->framebuffers)
-	{
-		GM_delete(framebuffer);
-	}
-}
-
 bool GMDx11Framebuffers::init(const GMFramebuffersDesc& desc)
 {
 	D(d);
@@ -284,7 +275,7 @@ void GMDx11Framebuffers::addFramebuffer(AUTORELEASE IFramebuffer* framebuffer)
 	D(d);
 	GM_ASSERT(dynamic_cast<GMDx11Framebuffer*>(framebuffer));
 	GMDx11Framebuffer* dxFramebuffer = static_cast<GMDx11Framebuffer*>(framebuffer);
-	d->framebuffers.push_back(dxFramebuffer);
+	d->framebuffers.push_back(GMOwnedPtr<GMDx11Framebuffer>(dxFramebuffer));
 	d->renderTargetViews.push_back(dxFramebuffer->getRenderTargetView());
 }
 
@@ -347,7 +338,7 @@ IFramebuffer* GMDx11Framebuffers::getFramebuffer(GMsize_t index)
 {
 	D(d);
 	GM_ASSERT(index < d->framebuffers.size());
-	return d->framebuffers[index];
+	return d->framebuffers[index].get();
 }
 
 GMsize_t GMDx11Framebuffers::count()

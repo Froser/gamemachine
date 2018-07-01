@@ -9,7 +9,7 @@ void Demo_Controls::init()
 {
 	D(d);
 	Base::init();
-	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext()));
 	createDefaultWidget();
 }
 
@@ -45,8 +45,8 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 {
 	D(d);
 	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
-	d->mainWidget = new gm::GMWidget(getDemonstrationWorld()->getManager());
-	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget);
+	d->mainWidget = gm_makeOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager());
+	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget.get());
 
 	{
 		gm::GMRect rc = { 0, 0, 136, 54 };
@@ -82,7 +82,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	d->mainWidget->addBorder(corner);
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(300, 500);
-	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget);
+	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
 	gm::GMint top = 10;
 
@@ -151,5 +151,5 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	d->nextControlTop = top + 40;
 	d->mainWidget->setSize(800, 600);
 
-	return d->mainWidget;
+	return d->mainWidget.get();
 }

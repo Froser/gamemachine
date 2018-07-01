@@ -6,6 +6,14 @@
 #include <gmcamera.h>
 BEGIN_NS
 
+template <typename T>
+IRenderer* newRenderer(GMOwnedPtr<IRenderer>& ptr, const IRenderContext* context)
+{
+	if (!ptr)
+		ptr = gm_makeOwnedPtr<T>(context);
+	return ptr.get();
+}
+
 #define GM_VariablesDesc (GMGraphicEngine::getDefaultShaderVariablesDesc())
 
 struct GMShaderVariablesTextureDesc

@@ -19,7 +19,7 @@ BEGIN_NS
 */
 struct IVirtualFunctionObject
 {
-	virtual ~IVirtualFunctionObject() {}
+	virtual ~IVirtualFunctionObject() = default;
 };
 
 // 定义对齐结构体

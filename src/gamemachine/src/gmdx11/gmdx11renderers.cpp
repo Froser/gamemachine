@@ -301,7 +301,7 @@ GMDx11EffectVariableBank& GMDx11Renderer::getVarBank()
 {
 	D(d);
 	if (!d->bank)
-		d->bank = new GMDx11EffectVariableBank();
+		d->bank = gm_makeOwnedPtr<GMDx11EffectVariableBank>();
 	return *d->bank;
 }
 
@@ -310,8 +310,8 @@ ITexture* GMDx11Renderer::getWhiteTexture()
 	D(d);
 	D_BASE(db, Base);
 	if (!d->whiteTexture)
-		d->whiteTexture = createWhiteTexture(d->context);
-	return d->whiteTexture;
+		d->whiteTexture.reset(createWhiteTexture(d->context));
+	return d->whiteTexture.get();
 }
 
 BEGIN_NS
@@ -487,16 +487,6 @@ GMDx11Renderer::GMDx11Renderer(const IRenderContext* context)
 	d->deviceContext = getEngine()->getDeviceContext();
 	d->debugConfig = GM.getConfigs().getConfig(GMConfigs::Debug).asDebugConfig();
 	getVarBank().init(d->effect);
-}
-
-GMDx11Renderer::~GMDx11Renderer()
-{
-	D(d);
-	GM_delete(d->whiteTexture);
-	GM_delete(d->rasterizerStates);
-	GM_delete(d->blendStates);
-	GM_delete(d->depthStencilStates);
-	GM_delete(d->bank);
 }
 
 void GMDx11Renderer::beginModel(GMModel* model, const GMGameObject* parent)
@@ -780,7 +770,7 @@ void GMDx11Renderer::prepareRasterizer(GMModel* model)
 	}
 
 	if (!d->rasterizerStates)
-		d->rasterizerStates = new GMDx11RasterizerStates(getContext());
+		d->rasterizerStates = gm_makeOwnedPtr<GMDx11RasterizerStates>(getContext());
 
 	GM_ASSERT(d->rasterizer);
 	GM_DX_HR(d->rasterizer->SetRasterizerState(
@@ -818,7 +808,7 @@ void GMDx11Renderer::prepareBlend(GMModel* model)
 
 	const GMGlobalBlendStateDesc& globalBlendState = getEngine()->getGlobalBlendState();
 	if (!d->blendStates)
-		d->blendStates = new GMDx11BlendStates(getContext());
+		d->blendStates = gm_makeOwnedPtr<GMDx11BlendStates>(getContext());
 
 	const GMShader& shader = model->getShader();
 	if (globalBlendState.enabled)
@@ -893,7 +883,7 @@ void GMDx11Renderer::prepareDepthStencil(GMModel* model)
 	GM_ASSERT(d->depthStencil);
 
 	if (!d->depthStencilStates)
-		d->depthStencilStates = new GMDx11DepthStencilStates(getContext());
+		d->depthStencilStates = gm_makeOwnedPtr<GMDx11DepthStencilStates>(getContext());
 
 	GM_DX_HR(d->depthStencil->SetDepthStencilState(
 		0,

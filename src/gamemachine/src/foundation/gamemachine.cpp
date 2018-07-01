@@ -35,17 +35,6 @@ GameMachine::GameMachine()
 	updateGameMachineRunningStates();
 }
 
-GameMachine::~GameMachine()
-{
-	D(d);
-	while (!d->windows.empty())
-	{
-		auto iter = d->windows.begin();
-		auto window = *iter;
-		GM_delete(window);
-	}
-}
-
 void GameMachine::init(
 	IWindow* mainWindow,
 	AUTORELEASE IFactory* factory,
@@ -137,16 +126,16 @@ void GameMachine::startGameMachine()
 	runEventLoop();
 }
 
-void GameMachine::addWindow(IWindow* window)
+void GameMachine::addWindow(AUTORELEASE IWindow* window)
 {
 	D(d);
-	d->windows.insert(window);
+	d->windows.insert(GMOwnedPtr<IWindow>(window));
 }
 
 bool GameMachine::removeWindow(IWindow* window)
 {
 	D(d);
-	GMsize_t count = d->windows.erase(window);
+	GMsize_t count = d->windows.erase(GMOwnedPtr<IWindow>(window));
 	return count > 0;
 }
 
@@ -277,7 +266,7 @@ bool GameMachine::handleMessage(const GMMessage& msg)
 		break;
 	}
 
-	for (auto window : d->windows)
+	for (decltype(auto) window : d->windows)
 	{
 		window->msgProc(msg);
 		window->getContext()->getEngine()->event(msg);
@@ -316,8 +305,8 @@ void GameMachine::updateGameMachineRunningStates()
 void GameMachine::eachHandler(std::function<void(IWindow*, IGameHandler*)> action)
 {
 	D(d);
-	for (auto window : d->windows)
+	for (decltype(auto) window : d->windows)
 	{
-		action(window, window->getHandler());
+		action(window.get(), window->getHandler());
 	}
 }

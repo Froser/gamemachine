@@ -196,9 +196,9 @@ IGraphicEngine* GMWindow_OpenGL::getGraphicEngine()
 	D_BASE(d, Base);
 	if (!d->engine)
 	{
-		d->engine = new GMGLGraphicEngine(getContext());
+		d->engine = gm_makeOwnedPtr<GMGLGraphicEngine>(getContext());
 	}
-	return d->engine;
+	return d->engine.get();
 }
 
 const IRenderContext* GMWindow_OpenGL::getContext()
@@ -207,11 +207,11 @@ const IRenderContext* GMWindow_OpenGL::getContext()
 	if (!d->context)
 	{
 		GMGLRenderContext* context = new GMGLRenderContext(this);
-		d->context = context;
+		d->context.reset(context);
 		context->setWindow(this);
 		context->setEngine(getGraphicEngine());
 	}
-	return d->context;
+	return d->context.get();
 }
 
 void GMWindow_OpenGL::swapBuffers() const

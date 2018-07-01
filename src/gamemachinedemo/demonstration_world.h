@@ -20,9 +20,9 @@ GM_PRIVATE_OBJECT(DemoHandler)
 	DemonstrationWorld* parentDemonstrationWorld = nullptr;
 	bool inited = false;
 	bool activating = false;
-	gm::GMGameWorld* demoWorld = nullptr;
+	gm::GMOwnedPtr<gm::GMGameWorld> demoWorld;
 	gm::IGraphicEngine* engine = nullptr;
-	gm::GMWidget* mainWidget = nullptr;
+	gm::GMOwnedPtr<gm::GMWidget> mainWidget;
 	gm::GMControlLabel* lbFPS = nullptr;
 	gm::GMControlLabel* lbRendering = nullptr;
 	gm::GMControlLabel* lbGammaCorrection = nullptr;
@@ -39,7 +39,7 @@ class DemoHandler : public gm::GMObject
 
 public:
 	DemoHandler(DemonstrationWorld* parentDemonstrationWorld);
-	~DemoHandler();
+	~DemoHandler() = default;
 
 public:
 	virtual void init();
@@ -60,7 +60,7 @@ protected:
 	bool isActivating();
 	gm::GMint getClientAreaTop();
 
-	inline gm::GMGameWorld*& getDemoWorldReference()
+	inline gm::GMOwnedPtr<gm::GMGameWorld>& getDemoWorldReference()
 	{
 		D(d);
 		return d->demoWorld;
@@ -163,9 +163,9 @@ private:
 	virtual void event(gm::GameMachineHandlerEvent evt) override;
 };
 
-inline gm::GMDemoGameWorld* asDemoGameWorld(gm::GMGameWorld* world)
+inline gm::GMDemoGameWorld* asDemoGameWorld(const gm::GMOwnedPtr<gm::GMGameWorld>& world)
 {
-	return gm::gm_cast<gm::GMDemoGameWorld*>(world);
+	return gm::gm_cast<gm::GMDemoGameWorld*>(world.get());
 }
 
 #endif

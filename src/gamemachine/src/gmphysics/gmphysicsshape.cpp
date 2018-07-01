@@ -6,28 +6,22 @@
 #include <gmassets.h>
 #include "gmbullethelper.h"
 
-GMPhysicsShape::~GMPhysicsShape()
+void GMPhysicsShape::setShape(AUTORELEASE btCollisionShape* shape)
 {
 	D(d);
-	GM_delete(d->shape);
-}
-
-void GMPhysicsShape::setShape(btCollisionShape* shape)
-{
-	D(d);
-	d->shape = shape;
+	d->shape.reset(shape);
 }
 
 btCollisionShape* GMPhysicsShape::getBulletShape()
 {
 	D(d);
-	return d->shape;
+	return d->shape.get();
 }
 
 const btCollisionShape* GMPhysicsShape::getBulletShape() const
 {
 	D(d);
-	return d->shape;
+	return d->shape.get();
 }
 
 //////////////////////////////////////////////////////////////////////////

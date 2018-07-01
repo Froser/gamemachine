@@ -33,7 +33,7 @@ void Demo_Sound::init()
 	Base::init();
 
 	GM_ASSERT(!getDemoWorldReference());
-	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
 
 	gm::GMGamePackage* package = GM.getGamePackageManager();
 

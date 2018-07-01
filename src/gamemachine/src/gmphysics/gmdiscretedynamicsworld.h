@@ -9,14 +9,14 @@ class GMConstraint;
 
 GM_PRIVATE_OBJECT(GMDiscreteDynamicsWorld)
 {
-	btDiscreteDynamicsWorld* worldImpl = nullptr;
-	btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
-	btCollisionDispatcher* dispatcher = nullptr;
-	btBroadphaseInterface* overlappingPairCache = nullptr;
-	btSequentialImpulseConstraintSolver* solver = nullptr;
+	GM_OWNED btDiscreteDynamicsWorld* worldImpl = nullptr;
+	GM_OWNED btDefaultCollisionConfiguration* collisionConfiguration = nullptr;
+	GM_OWNED btCollisionDispatcher* dispatcher = nullptr;
+	GM_OWNED btBroadphaseInterface* overlappingPairCache = nullptr;
+	GM_OWNED btSequentialImpulseConstraintSolver* solver = nullptr;
 	Vector<GMRigidPhysicsObject*> rigidObjs;
 	Vector<GMConstraint*> constraintObjs; // 生命周期由GMDiscreteDynamicsWorld管理
-	Vector<AUTORELEASE btRigidBody*> bulletRigidPool;
+	GM_OWNED Vector<btRigidBody*> bulletRigidPool;
 };
 
 class GMDiscreteDynamicsWorld : public GMPhysicsWorld

@@ -28,8 +28,8 @@ void Demo_Collision::init()
 	D_BASE(db, DemoHandler);
 	Base::init();
 
-	getDemoWorldReference() = new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext());
-	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(getDemoWorldReference());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(db->parentDemonstrationWorld->getContext()));
+	gm::GMDiscreteDynamicsWorld* physicsWorld = d->discreteWorld = new gm::GMDiscreteDynamicsWorld(getDemoWorldReference().get());
 	d->ground = new gm::GMGameObject();
 	d->ground->setTranslation(Translate(GMVec3(0, -50, 0)));
 

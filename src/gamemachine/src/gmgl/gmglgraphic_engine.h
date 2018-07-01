@@ -36,17 +36,17 @@ GM_PRIVATE_OBJECT(GMGLGraphicEngine)
 	bool engineReady = false;
 
 	// 著色器程序
-	GMGLShaderProgram* forwardShaderProgram = nullptr;
-	GMGLShaderProgram* deferredShaderPrograms[2] = { nullptr };
-	GMGLShaderProgram* filterShaderProgram = nullptr;
+	GMOwnedPtr<GMGLShaderProgram> forwardShaderProgram;
+	GMOwnedPtr<GMGLShaderProgram> deferredShaderPrograms[2];
+	GMOwnedPtr<GMGLShaderProgram> filterShaderProgram;
 
 	// 渲染器
-	IRenderer* renderer_2d;
-	IRenderer* renderer_3d;
-	IRenderer* renderer_cubeMap;
-	IRenderer* renderer_filter;
-	IRenderer* renderer_lightPass;
-	IRenderer* renderer_3d_shadow;
+	GMOwnedPtr<IRenderer> renderer_2d;
+	GMOwnedPtr<IRenderer> renderer_3d;
+	GMOwnedPtr<IRenderer> renderer_cubeMap;
+	GMOwnedPtr<IRenderer> renderer_filter;
+	GMOwnedPtr<IRenderer> renderer_lightPass;
+	GMOwnedPtr<IRenderer> renderer_3d_shadow;
 
 	ITexture* cubeMap = nullptr;
 	GMGLLightContext lightContext;
@@ -58,7 +58,7 @@ class GMGLGraphicEngine : public GMGraphicEngine
 
 public:
 	GMGLGraphicEngine(const IRenderContext* context);
-	~GMGLGraphicEngine();
+	~GMGLGraphicEngine() = default;
 
 public:
 	virtual void init() override;

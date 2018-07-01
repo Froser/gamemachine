@@ -10,7 +10,7 @@ void Demo_Literature::init()
 	Base::init();
 
 	GM_ASSERT(!getDemoWorldReference());
-	getDemoWorldReference() = new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext());
+	getDemoWorldReference().reset(new gm::GMDemoGameWorld(d->parentDemonstrationWorld->getContext()));
 
 	gm::GMTextGameObject* literature = new gm::GMTextGameObject(getDemoWorldReference()->getContext()->getWindow()->getRenderRect());
 	gm::GMRect rect = { 200, 220, 400, 190 };
@@ -27,7 +27,7 @@ void Demo_Literature::init()
 		"[size=25][n]Let's try some 'overflow'"
 	);
 
-	gm::GMDemoGameWorld* world = gm::gm_cast<gm::GMDemoGameWorld*>(getDemoWorldReference());
+	gm::GMDemoGameWorld* world = gm::gm_cast<gm::GMDemoGameWorld*>(getDemoWorldReference().get());
 	world->addObject("text", literature);
 
 	createDefaultWidget();

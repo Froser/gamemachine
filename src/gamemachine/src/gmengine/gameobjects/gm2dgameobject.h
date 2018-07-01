@@ -88,7 +88,7 @@ GM_PRIVATE_OBJECT(GMTextGameObject)
 	ITypoEngine* typoEngine = nullptr;
 	bool insetTypoEngine = true;
 	GMFontHandle font = 0;
-	GMModel* model = nullptr;
+	GMOwnedPtr<GMModel> model;
 	GMTextColorType colorType = GMTextColorType::ByScript;
 	GMFloat4 color = GMFloat4(1, 1, 1, 1);
 	Vector<GMVertex> vericesCache;
@@ -150,7 +150,7 @@ private:
 
 GM_PRIVATE_OBJECT(GMSprite2DGameObject)
 {
-	GMModel* model = nullptr;
+	GMOwnedPtr<GMModel> model;
 	ITexture* texture = nullptr;
 	GMRect textureRc;
 	GMint texHeight = 0;
@@ -171,7 +171,7 @@ class GMSprite2DGameObject : public GM2DGameObjectBase
 
 public:
 	using Base::Base;
-	~GMSprite2DGameObject();
+	~GMSprite2DGameObject() = default;
 
 public:
 	virtual void draw() override;
@@ -194,7 +194,7 @@ protected:
 
 GM_PRIVATE_OBJECT(GMBorder2DGameObject)
 {
-	GMModel* model = nullptr;
+	GMOwnedPtr<GMModel> model;
 	GMRect corner;
 };
 
@@ -210,7 +210,7 @@ class GMBorder2DGameObject : public GMSprite2DGameObject
 
 public:
 	using GMSprite2DGameObject::GMSprite2DGameObject;
-	~GMBorder2DGameObject();
+	~GMBorder2DGameObject() = default;
 
 public:
 	void setCornerRect(const GMRect& rc);

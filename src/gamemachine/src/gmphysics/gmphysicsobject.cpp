@@ -131,6 +131,8 @@ void GMRigidPhysicsObject::initRigidBody(GMfloat mass, const btTransform& startT
 	if (isDynamic)
 		shape->calculateLocalInertia(mass, localInertia);
 
+	if (d->motionState)
+		GM_delete(d->motionState);
 	d->motionState = new btDefaultMotionState(startTransform);
 	btRigidBody::btRigidBodyConstructionInfo cInfo(mass, d->motionState, shape, localInertia);
 

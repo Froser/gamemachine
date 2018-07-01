@@ -93,7 +93,7 @@ void GMGLModelDataProxy::transfer()
 	model->setModelBuffer(modelBuffer);
 	modelBuffer->releaseRef();
 	d->inited = true;
-	model->needNotTransferAnymore();
+	model->doNotTransferAnymore();
 }
 
 void GMGLModelDataProxy::dispose(GMModelBuffer* md)

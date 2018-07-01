@@ -267,7 +267,7 @@ public:
 	/*!
 	  当使用了已经传输过的顶点数据，或者顶点数据传输完成时调用此方法。
 	*/
-	inline void needNotTransferAnymore() { D(d); d->needTransfer = false; }
+	inline void doNotTransferAnymore() { D(d); d->needTransfer = false; }
 
 	// 绘制方式
 	void setUsageHint(GMUsageHint hint) { D(d); d->hint = hint; }

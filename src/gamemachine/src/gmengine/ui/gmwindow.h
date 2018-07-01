@@ -29,13 +29,14 @@ private:
 
 GM_PRIVATE_OBJECT(GMWindow)
 {
-	GMWindowHandle handle;
-	IInput* input = nullptr;
-	IGameHandler* handler = nullptr;
+	GMOwnedPtr<IInput> input;
+	GMOwnedPtr<IGameHandler> handler;
+	GMOwnedPtr<IGraphicEngine> engine;
+	GMOwnedPtr<IRenderContext> context;
+
+	GMWindowHandle handle = 0;
 	Vector<GMWidget*> widgets;
 	GMWindowStates windowStates;
-	IGraphicEngine* engine = nullptr;
-	IRenderContext* context = nullptr;
 	GMCursorType cursor = GMCursorType::Arrow;
 };
 

@@ -31,11 +31,7 @@ GMDiscreteDynamicsWorld::~GMDiscreteDynamicsWorld()
 	GM_delete(d->overlappingPairCache);
 	GM_delete(d->dispatcher);
 	GM_delete(d->collisionConfiguration);
-
-	for (auto& rigid : d->bulletRigidPool)
-	{
-		GM_delete(rigid);
-	}
+	GM_delete(d->bulletRigidPool);
 }
 
 void GMDiscreteDynamicsWorld::simulate(GMGameObject* obj)

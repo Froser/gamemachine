@@ -58,14 +58,6 @@ DemoHandler::DemoHandler(DemonstrationWorld* parentDemonstrationWorld)
 	d->engine = parentDemonstrationWorld->getContext()->getEngine();
 }
 
-DemoHandler::~DemoHandler()
-{
-	D(d);
-	GM_delete(getDemoWorldReference());
-	GM_delete(d->mainWidget);
-	GM_delete(d->demoWorld);
-}
-
 void DemoHandler::init()
 {
 	D(d);
@@ -171,7 +163,7 @@ void DemoHandler::event(gm::GameMachineHandlerEvent evt)
 gm::GMWidget* DemoHandler::getWidget()
 {
 	D(d);
-	return d->mainWidget;
+	return d->mainWidget.get();
 }
 
 void DemoHandler::setLookAt()
@@ -232,8 +224,8 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 {
 	D(d);
 	gm::GMFontHandle stxingka = d->engine->getGlyphManager()->addFontByFileName("STXINGKA.TTF");
-	d->mainWidget = new gm::GMWidget(getDemonstrationWorld()->getManager());
-	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget);
+	d->mainWidget = gm_makeOwnedPtr<gm::GMWidget>(getDemonstrationWorld()->getManager());
+	getDemonstrationWorld()->getManager()->registerWidget(d->mainWidget.get());
 
 	{
 		gm::GMRect rc = { 0, 0, 136, 54 };
@@ -269,7 +261,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->mainWidget->addBorder(corner);
 	d->mainWidget->setPosition(10, 60);
 	d->mainWidget->setSize(300, 500);
-	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget);
+	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
 	gm::GMint top = 10;
 
@@ -416,7 +408,7 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	d->nextControlTop = top + 40;
 	d->mainWidget->setSize(d->mainWidget->getSize().width, d->nextControlTop);
 
-	return d->mainWidget;
+	return d->mainWidget.get();
 }
 
 gm::GMint DemoHandler::getClientAreaTop()

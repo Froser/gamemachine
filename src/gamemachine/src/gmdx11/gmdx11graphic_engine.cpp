@@ -8,33 +8,9 @@
 #include "gmdx11gbuffer.h"
 #include "gmdx11glyphmanager.h"
 
-namespace
-{
-	template <typename T>
-	IRenderer* newRenderer(IRenderer*& ptr, const IRenderContext* context)
-	{
-		if (!ptr)
-			ptr = new T(context);
-		return ptr;
-	}
-}
-
 GMDx11GraphicEngine::GMDx11GraphicEngine(const IRenderContext* context)
 	: GMGraphicEngine(context)
 {
-}
-
-GMDx11GraphicEngine::~GMDx11GraphicEngine()
-{
-	D(d);
-	GM_delete(d->renderer_3d);
-	GM_delete(d->renderer_2d);
-	GM_delete(d->renderer_text);
-	GM_delete(d->renderer_cubemap);
-	GM_delete(d->renderer_filter);
-	GM_delete(d->renderer_deferred_3d);
-	GM_delete(d->renderer_deferred_3d_lightpass);
-	GM_delete(d->renderer_3d_shadow);
 }
 
 void GMDx11GraphicEngine::init()

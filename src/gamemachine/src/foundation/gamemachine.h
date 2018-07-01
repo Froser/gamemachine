@@ -74,7 +74,7 @@ GM_PRIVATE_OBJECT(GameMachine)
 {
 	GMClock clock;
 
-	Set<IWindow*> windows;
+	Set<GMOwnedPtr<IWindow>> windows;
 	IWindow* mainWindow = nullptr;
 	IFactory* factory = nullptr;
 	GMGamePackage* gamePackageManager = nullptr;
@@ -108,7 +108,7 @@ protected:
 	  构造一个GameMachine实例。不要试图自己创建一个GameMachine实例，而是使用GM宏来获取它的单例。
 	*/
 	GameMachine();
-	~GameMachine();
+	~GameMachine() = default;
 
 public:
 	//! 初始化GameMachine。

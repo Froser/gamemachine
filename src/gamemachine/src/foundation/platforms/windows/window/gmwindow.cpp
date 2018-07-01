@@ -120,11 +120,6 @@ GMWindow::~GMWindow()
 {
 	D(d);
 	s_hwndMap.erase(getWindowHandle());
-	GM.removeWindow(this);
-	GM_delete(d->input);
-	GM_delete(d->handler);
-	GM_delete(d->engine);
-	GM_delete(d->context);
 	::DestroyWindow(getWindowHandle());
 }
 
@@ -132,8 +127,8 @@ IInput* GMWindow::getInputMananger()
 {
 	D(d);
 	if (!d->input)
-		d->input = new GMInput(this);
-	return d->input;
+		d->input = gm_makeOwnedPtr<GMInput>(this);
+	return d->input.get();
 }
 
 void GMWindow::msgProc(const GMMessage& message)

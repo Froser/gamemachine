@@ -56,7 +56,7 @@ void Demo_Quake3_BSP::init()
 	gm::IInput* inputManager = getDemonstrationWorld()->getMainWindow()->getInputMananger();
 
 	gm::GMBSPFactory::createBSPGameWorld(db->parentDemonstrationWorld->getContext(), "gv.bsp", &d->world);
-	db->demoWorld = d->world;
+	db->demoWorld.reset(d->world);
 	d->sprite = d->world->getSprite();
 
 	gm::GMWidget* widget = createDefaultWidget();

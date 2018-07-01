@@ -91,7 +91,6 @@ GMTextGameObject::GMTextGameObject(const GMRect& renderRc, ITypoEngine* typo)
 GMTextGameObject::~GMTextGameObject()
 {
 	D(d);
-	GM_delete(d->model);
 	if (d->insetTypoEngine)
 		GM_delete(d->typoEngine);
 }
@@ -212,7 +211,7 @@ void GMTextGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(getContext(), d->model);
+	drawModel(getContext(), d->model.get());
 }
 
 void GMTextGameObject::update()
@@ -222,8 +221,7 @@ void GMTextGameObject::update()
 	// 如果需要的空间更大，也重新创建一个model
 	if (!d->model || d->length < d->text.length())
 	{
-		GM_delete(d->model);
-		d->model = createModel();
+		d->model.reset(createModel());
 		d->length = d->text.length();
 		markDirty();
 	}
@@ -231,7 +229,7 @@ void GMTextGameObject::update()
 	// 如果字符被更改，则更新其缓存
 	if (isDirty())
 	{
-		updateVertices(d->model);
+		updateVertices(d->model.get());
 		cleanDirty();
 	}
 }
@@ -387,17 +385,11 @@ void GMTextGameObject::updateVertices(GMModel* model)
 	vertices.clear();
 }
 
-GMSprite2DGameObject::~GMSprite2DGameObject()
-{
-	D(d);
-	GM_delete(d->model);
-}
-
 void GMSprite2DGameObject::draw()
 {
 	D(d);
 	update();
-	drawModel(getContext(), d->model);
+	drawModel(getContext(), d->model.get());
 }
 
 void GMSprite2DGameObject::setDepth(GMfloat depth)
@@ -461,20 +453,19 @@ void GMSprite2DGameObject::update()
 	D(d);
 	if (!d->model)
 	{
-		GM_delete(d->model);
-		d->model = createModel();
+		d->model.reset(createModel());
 		markDirty();
 	}
 
 	if (d->needUpdateTexture)
 	{
-		updateTexture(d->model);
+		updateTexture(d->model.get());
 		d->needUpdateTexture = false;
 	}
 
 	if (isDirty())
 	{
-		updateVertices(d->model);
+		updateVertices(d->model.get());
 		cleanDirty();
 	}
 }
@@ -571,20 +562,6 @@ void GMSprite2DGameObject::updateTexture(GMModel* model)
 #define INDICES(mesh, i1, i2, i3, i4) \
 	{ mesh->index(i3); mesh->index(i1); mesh->index(i4); } \
 	{ mesh->index(i4); mesh->index(i1); mesh->index(i2); }
-
-GMBorder2DGameObject::~GMBorder2DGameObject()
-{
-	D(d);
-	GM_delete(d->model);
-}
-
-template <typename T, GMint Size> void GMBorder2DGameObject::release(T* (&m)[Size])
-{
-	for (GMint i = 0; i < Size; ++i)
-	{
-		GM_delete(m[i]);
-	}
-}
 
 void GMBorder2DGameObject::setCornerRect(const GMRect& rc)
 {

@@ -26,24 +26,13 @@ GMGameWorld::GMGameWorld(const IRenderContext* context)
 	d->context = context;
 }
 
-GMGameWorld::~GMGameWorld()
-{
-	D(d);
-	for (auto gameObject : d->gameObjects)
-	{
-		GM_delete(gameObject);
-	}
-
-	GM_delete(d->physicsWorld);
-}
-
 void GMGameWorld::addObjectAndInit(AUTORELEASE GMGameObject* obj)
 {
 	D(d);
 	obj->setWorld(this);
 	obj->setContext(getContext());
 	obj->onAppendingObjectToWorld();
-	d->gameObjects.insert(obj);
+	d->gameObjects.insert(GMOwnedPtr<GMGameObject>(obj));
 	GMModels& models = obj->getModels();
 	for (auto& model : models)
 	{
@@ -71,13 +60,12 @@ bool GMGameWorld::removeObject(GMGameObject* obj)
 {
 	D(d);
 	auto& objs = d->gameObjects;
-	auto objIter = objs.find(obj);
+	auto objIter = objs.find(GMOwnedPtr<GMGameObject>(obj));
 	if (objIter == objs.end())
 		return false;
-	GMGameObject* eraseTarget = *objIter;
+	GMGameObject* eraseTarget = (*objIter).get();
 	obj->onRemovingObjectFromWorld();
 	objs.erase(objIter);
-	delete eraseTarget;
 	return true;
 }
 
@@ -101,13 +89,13 @@ void GMGameWorld::clearRenderList()
 	d->renderList.forward.clear();
 }
 
-void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMGameObject*>& gameObjects)
+void GMGameWorld::simulateGameObjects(GMPhysicsWorld* phyw, const Set<GMOwnedPtr<GMGameObject>>& gameObjects)
 {
-	for (auto& gameObject : gameObjects)
+	for (decltype(auto) gameObject : gameObjects)
 	{
 		gameObject->simulate();
 		if (phyw)
-			phyw->simulate(gameObject);
+			phyw->simulate(gameObject.get());
 		gameObject->updateAfterSimulate();
 	}
 }
@@ -126,4 +114,11 @@ void GMGameWorld::addToRenderList(GMGameObject* object)
 		else
 			d->renderList.forward.push_front(object);
 	}
+}
+
+void GMGameWorld::setPhysicsWorld(AUTORELEASE GMPhysicsWorld* w)
+{
+	D(d);
+	GM_ASSERT(!d->physicsWorld);
+	d->physicsWorld.reset(w);
 }

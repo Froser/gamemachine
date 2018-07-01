@@ -130,7 +130,7 @@ void GMDx11ModelDataProxy::transfer()
 	}
 
 	d->inited = true;
-	model->needNotTransferAnymore();
+	model->doNotTransferAnymore();
 }
 
 void GMDx11ModelDataProxy::dispose(GMModelBuffer* md)
