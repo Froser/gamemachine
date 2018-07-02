@@ -216,13 +216,22 @@ class GMStyle : public GMObject
 	GM_ALLOW_COPY_DATA(GMStyle)
 
 public:
-	GMStyle() = default;
+	GMStyle(
+		const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1),
+		const GMVec4& disabledTextureColor = GMVec4(.5f, .5f, .5f, .78f),
+		const GMVec4& hiddenTextureColor = GMVec4(0)
+	);
 
 public:
-	void setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc, const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1));
+	void setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc);
 	void setFont(GMFontHandle font);
 	void setFontColor(const GMVec4& defaultColor = GMVec4(1, 1, 1, 1));
 	void setFontColor(GMControlState::State state, const GMVec4& color);
+	void resetTextureColor(
+		const GMVec4& defaultTextureColor = GMVec4(1, 1, 1, 1),
+		const GMVec4& disabledColor = GMVec4(.5f, .5f, .5f, .78f),
+		const GMVec4& hiddenColor = GMVec4(0)
+	);
 	void setTextureColor(GMControlState::State state, const GMVec4& color);
 	void refresh();
 

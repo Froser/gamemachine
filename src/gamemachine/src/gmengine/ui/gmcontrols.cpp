@@ -418,21 +418,30 @@ void GMControlScrollBar::render(GMfloat elapsed)
 void GMControlScrollBar::initStyles(GMWidget* widget)
 {
 	D(d);
+	GMStyle styleTemplate;
+	styleTemplate.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, .58f));
+	styleTemplate.setTextureColor(GMControlState::Focus, GMVec4(1, 1, 1, .78f));
+	styleTemplate.setTextureColor(GMControlState::Disabled, GMVec4(1, 1, 1, .27f));
+	styleTemplate.setTextureColor(GMControlState::MouseOver, GMVec4(1, 1, 1, .63f));
+
 	GMStyle& styleUp = d->styleUp;
+	styleUp = styleTemplate;
 	styleUp.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarUp));
-	styleUp.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+	styleUp.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 
 	GMStyle& styleDown = d->styleDown;
+	styleDown = styleTemplate;
 	styleDown.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarDown));
-	styleDown.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+	styleDown.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 
 	GMStyle& styleThumb = d->styleThumb;
+	styleThumb = styleTemplate;
 	styleThumb.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarThumb));
-	styleThumb.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
 
 	GMStyle& styleTrack = d->styleTrack;
+	styleTrack = styleTemplate;
 	styleTrack.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarTrack));
-	styleTrack.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+	styleTrack.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 }
 
 void GMControlScrollBar::updateRect()

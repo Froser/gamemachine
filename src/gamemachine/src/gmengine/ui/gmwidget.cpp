@@ -89,12 +89,21 @@ void GMElementBlendColor::blend(GMControlState::State state, GMfloat elapsedTime
 	d->current = Lerp(d->current, destColor, 1 - Pow(rate, 60.f * elapsedTime));
 }
 
-void GMStyle::setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc, const GMVec4& defaultTextureColor)
+GMStyle::GMStyle(
+	const GMVec4& defaultTextureColor,
+	const GMVec4& disabledTextureColor,
+	const GMVec4& hiddenTextureColor
+)
+{
+	D(d);
+	resetTextureColor(defaultTextureColor, disabledTextureColor, hiddenTextureColor);
+}
+
+void GMStyle::setTexture(GMWidgetResourceManager::TextureType texture, const GMRect& rc)
 {
 	D(d);
 	d->texture = texture;
 	d->rc = rc;
-	d->textureColor.init(defaultTextureColor);
 }
 
 void GMStyle::setFont(GMFontHandle font)
@@ -113,6 +122,16 @@ void GMStyle::setFontColor(GMControlState::State state, const GMVec4& color)
 {
 	D(d);
 	d->fontColor.getStates()[state] = color;
+}
+
+void GMStyle::resetTextureColor(
+	const GMVec4& defaultTextureColor,
+	const GMVec4& disabledColor,
+	const GMVec4& hiddenColor
+)
+{
+	D(d);
+	d->textureColor.init(defaultTextureColor, disabledColor, hiddenColor);
 }
 
 void GMStyle::setTextureColor(GMControlState::State state, const GMVec4& color)
