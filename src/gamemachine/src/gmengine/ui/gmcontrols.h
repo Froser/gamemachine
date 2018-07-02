@@ -83,8 +83,9 @@ public:
 		return d->hasFocus;
 	}
 
-	bool handleKeyboard(GMSystemKeyEvent* event);
-	bool handleMouse(GMSystemMouseEvent* event);
+	virtual bool handleKeyboard(GMSystemKeyEvent* event);
+
+	virtual bool handleMouse(GMSystemMouseEvent* event);
 
 	//! 控件第一次处理消息的方法。
 	/*!
@@ -214,40 +215,47 @@ public:
 	}
 
 public:
-	inline bool isDefault()
+	inline bool isDefault() GM_NOEXCEPT
 	{
 		D(d);
 		return d->isDefault;
 	}
 
-	inline GMWidget* getParent()
+	inline GMWidget* getParent() GM_NOEXCEPT
 	{
 		D(d);
 		return d->widget;
 	}
 
-	inline GMint getIndex()
+	inline GMint getIndex() GM_NOEXCEPT
 	{
 		D(d);
 		return d->index;
 	}
 
-	inline const GMRect& boundingRect()
+	inline const GMRect& boundingRect() GM_NOEXCEPT
 	{
 		D(d);
 		return d->boundingBox;
 	}
 
-	inline GMint getWidth()
+	inline GMint getWidth() GM_NOEXCEPT
 	{
 		D(d);
 		return d->width;
 	}
 
-	inline GMint getHeight()
+	inline GMint getHeight() GM_NOEXCEPT
 	{
 		D(d);
 		return d->height;
+	}
+
+	GMPoint toControlSpace(const GMPoint& rc) GM_NOEXCEPT
+	{
+		D(d);
+		GMPoint r = { rc.x - d->boundingBox.x, rc.y - d->boundingBox.y };
+		return r;
 	}
 
 protected:
@@ -363,5 +371,68 @@ public:
 private:
 	void initStyles(GMWidget* widget);
 };
+
+enum class GMControlScrollBarArrowState
+{
+	Clear,
+	ClickedUp,
+	ClickedDown,
+	HeldUp,
+	HeldDown,
+};
+
+GM_PRIVATE_OBJECT(GMControlScrollBar)
+{
+	bool draggingThumb = false;
+	bool showThumb = true;
+	GMint maximum = 10;
+	GMint minimum = 0;
+	GMint pageStep = 1;
+	GMint value = 0;
+
+	GMPoint mousePt; //!< 相对于GMControlScrollBar本身的坐标
+	GMRect rcUp;
+	GMRect rcDown;
+	GMRect rcThumb;
+	GMRect rcTrack;
+	GMControlScrollBarArrowState arrowState = GMControlScrollBarArrowState::Clear;
+	GMfloat arrowTime = 0;
+
+	GMStyle styleUp;
+	GMStyle styleDown;
+	GMStyle styleThumb;
+	GMStyle styleTrack;
+
+	GMfloat allowClickDelay = .33f;
+	GMfloat allowClickRepeat = .05f;
+};
+
+class GMControlScrollBar : public GMControl
+{
+	GM_DECLARE_PRIVATE_AND_BASE(GMControlScrollBar, GMControl)
+	GM_DECLARE_PROPERTY(PageStep, pageStep, GMint)
+	GM_DECLARE_PROPERTY(Value, value, GMint)
+	GM_DECLARE_PROPERTY(Maximum, maximum, GMint)
+	GM_DECLARE_PROPERTY(Minimum, minimum, GMint)
+
+public:
+	GMControlScrollBar(GMWidget* widget) : Base(widget) { initStyles(widget); }
+
+protected:
+	virtual bool handleMouse(GMSystemMouseEvent* event) override;
+	virtual void render(GMfloat elapsed) override;
+	virtual void updateRect() override;
+
+// Events
+	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
+	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
+	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
+
+private:
+	void initStyles(GMWidget* widget);
+	void updateThumbRect();
+	bool handleMouseClick(GMSystemMouseEvent* event);
+};
+
 END_NS
 #endif

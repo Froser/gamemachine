@@ -18,6 +18,7 @@ class GMControlBorder;
 class GMControlTextEdit;
 class GMControlTextArea;
 class GMTypoTextBuffer;
+class GMControlScrollBar;
 struct ITypoEngine;
 
 struct GMControlState
@@ -81,6 +82,10 @@ struct GMTextureArea
 		ButtonArea,
 		ButtonFillArea,
 		BorderArea,
+		ScrollBarUp,
+		ScrollBarDown,
+		ScrollBarThumb,
+		ScrollBarTrack,
 		TextEditBorderArea,
 	};
 };
@@ -271,7 +276,7 @@ GM_PRIVATE_OBJECT(GMWidget)
 	IWindow* parentWindow = nullptr;
 	GMWidget* nextWidget; // 下一个Widget默认为自己
 	GMWidget* prevWidget; // 上一个Widget默认为自己
-	Vector<GMControl*> controls;
+	GM_OWNED Vector<GMControl*> controls;
 	GMControl* focusControl = nullptr;
 	GMControlBorder* borderControl = nullptr;
 	GMint borderMarginLeft = 10;
@@ -383,6 +388,15 @@ public:
 		OUT GMControlTextArea** out
 	);
 
+	void addScrollBar(
+		GMint x,
+		GMint y,
+		GMint width,
+		GMint height,
+		bool isDefault,
+		OUT GMControlScrollBar** out
+	);
+
 	void drawText(
 		const GMString& text,
 		GMStyle& style,
@@ -422,7 +436,8 @@ public:
 
 	void drawStencil(
 		const GMRect& rc,
-		GMfloat depth
+		GMfloat depth,
+		bool clear = true
 	);
 
 	void useStencil(

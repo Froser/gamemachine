@@ -390,6 +390,31 @@ void GMWidget::addTextArea(
 
 	GMControlBorder* border = textArea->getBorder();
 	border->setCorner(cornerRect);
+
+	if (out)
+		*out = textArea;
+}
+
+void GMWidget::addScrollBar(
+	GMint x,
+	GMint y,
+	GMint width,
+	GMint height,
+	bool isDefault,
+	OUT GMControlScrollBar** out
+)
+{
+	GMControlScrollBar* scrollBar = new GMControlScrollBar(this);
+	if (out)
+		*out = scrollBar;
+
+	addControl(scrollBar);
+	scrollBar->setPosition(x, y);
+	scrollBar->setSize(width, height);
+	scrollBar->setIsDefault(isDefault);
+
+	if (out)
+		*out = scrollBar;
 }
 
 void GMWidget::drawText(
@@ -564,14 +589,16 @@ void GMWidget::drawBorder(
 
 void GMWidget::drawStencil(
 	const GMRect& rc,
-	GMfloat depth
+	GMfloat depth,
+	bool clear
 )
 {
 	D(d);
 	static GMVec4 one = GMVec4(1, 1, 1, 1);
 	static GMStencilOptions s_stencilOptions(GMStencilOptions::OxFF, GMStencilOptions::Always);
 	auto engine = d->parentWindow->getGraphicEngine();
-	engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
+	if (clear)
+		engine->getDefaultFramebuffers()->clear(GMFramebuffersClearType::Stencil);
 	engine->setStencilOptions(s_stencilOptions);
 	drawRect(one, rc, true, depth);
 }

@@ -95,8 +95,8 @@ class GMNotAGMObject {};
 
 #define GM_DECLARE_GETTER(name, memberName, paramType) \
 	public: \
-	inline paramType& get##name() { D(d); return d-> memberName; } \
-	inline const paramType& get##name() const { D(d); return d-> memberName; }
+	inline paramType& get##name() GM_NOEXCEPT { D(d); return d-> memberName; } \
+	inline const paramType& get##name() const GM_NOEXCEPT { D(d); return d-> memberName; }
 
 #define GM_DECLARE_SETTER(name, memberName, paramType) \
 	public: \

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "gmcontrols.h"
 #include "gmwidget.h"
+#include "foundation/gamemachine.h"
 
 GMControl::GMControl(GMWidget* widget)
 {
@@ -359,4 +360,204 @@ void GMControlBorder::initStyles(GMWidget* widget)
 	D(d);
 	d->borderStyle.setTexture(GMWidgetResourceManager::Border, widget->getArea(GMTextureArea::BorderArea));
 	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1.f, 1.f, 1.f, 1.f));
+}
+
+bool GMControlScrollBar::handleMouse(GMSystemMouseEvent* event)
+{
+	D(d);
+	d->mousePt = event->getPoint();
+	return Base::handleMouse(event);
+}
+
+void GMControlScrollBar::render(GMfloat elapsed)
+{
+	D(d);
+	if (d->arrowState != GMControlScrollBarArrowState::Clear)
+	{
+		if (GM_inRect(d->rcUp, d->mousePt))
+		{
+
+		}
+		else if (GM_inRect(d->rcDown, d->mousePt))
+		{
+
+		}
+	}
+
+	GMControlState::State state = GMControlState::Normal;
+	if (!getEnabled() || !d->showThumb)
+	{
+		state = GMControlState::Disabled;
+	}
+	else if (getMouseOver())
+	{
+		state = GMControlState::MouseOver;
+	}
+	else if (hasFocus())
+	{
+		state = GMControlState::Focus;
+	}
+	else if (!getVisible())
+	{
+		state = GMControlState::Hidden;
+	}
+
+	d->styleUp.getTextureColor().blend(state, elapsed);
+	d->styleDown.getTextureColor().blend(state, elapsed);
+	d->styleThumb.getTextureColor().blend(state, elapsed);
+	d->styleTrack.getTextureColor().blend(state, elapsed);
+
+	GMWidget* widget = getParent();
+	GM_ASSERT(widget);
+	widget->drawSprite(d->styleUp, d->rcUp, .99f);
+	widget->drawSprite(d->styleDown, d->rcDown, .99f);
+	widget->drawSprite(d->styleTrack, d->rcTrack, .99f);
+	widget->drawSprite(d->styleThumb, d->rcThumb, .99f);
+}
+
+void GMControlScrollBar::initStyles(GMWidget* widget)
+{
+	D(d);
+	GMStyle& styleUp = d->styleUp;
+	styleUp.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarUp));
+	styleUp.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+
+	GMStyle& styleDown = d->styleDown;
+	styleDown.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarDown));
+	styleDown.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+
+	GMStyle& styleThumb = d->styleThumb;
+	styleThumb.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarThumb));
+	styleThumb.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+
+	GMStyle& styleTrack = d->styleTrack;
+	styleTrack.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarTrack));
+	styleTrack.setTextureColor(GMControlState::Disabled, GMVec4(1.f, .87f, .87f, .87f));
+}
+
+void GMControlScrollBar::updateRect()
+{
+	Base::updateRect();
+
+	// 调整部件大小
+	D(d);
+	D_BASE(db, Base);
+	d->rcUp = db->boundingBox;
+	d->rcUp.height = db->boundingBox.width;
+
+	d->rcDown = db->boundingBox;
+	d->rcDown.height = db->boundingBox.width;
+	d->rcDown.y = db->boundingBox.y + db->boundingBox.height - db->boundingBox.width;
+
+	d->rcTrack = d->rcUp;
+	d->rcTrack.y = d->rcUp.y + d->rcUp.height;
+	d->rcTrack.height = d->rcDown.y - d->rcTrack.y;
+
+	d->rcThumb.x = db->boundingBox.x;
+	d->rcThumb.width = db->boundingBox.width;
+
+	updateThumbRect();
+}
+
+bool GMControlScrollBar::onMouseDown(GMSystemMouseEvent* event)
+{
+	return handleMouseClick(event);
+}
+
+bool GMControlScrollBar::onMouseDblClick(GMSystemMouseEvent* event)
+{
+	return handleMouseClick(event);
+}
+
+bool GMControlScrollBar::onMouseUp(GMSystemMouseEvent* event)
+{
+	D(d);
+	GMWidget* widget = getParent();
+	GM_ASSERT(widget);
+	IWindow* window = widget->getParentWindow();
+	GM_ASSERT(window);
+	window->setWindowCapture(false);
+	d->draggingThumb = false;
+	d->arrowState = GMControlScrollBarArrowState::Clear;
+	updateThumbRect();
+	return false;
+}
+
+void GMControlScrollBar::updateThumbRect()
+{
+	D(d);
+	if (getMinimum() <= getValue() && getValue() <= getMaximum())
+	{
+		GMint pageSize = getMaximum() - getMinimum() + getPageStep();
+		if (pageSize <= 0)
+			pageSize = 1;
+		d->rcThumb.y = d->rcTrack.y + getValue() * d->rcTrack.height / pageSize;
+		d->rcThumb.height = getPageStep() * d->rcTrack.height / pageSize;
+	}
+	else
+	{
+		d->showThumb = false;
+	}
+}
+
+bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
+{
+	D(d);
+	GMWidget* widget = getParent();
+	GM_ASSERT(widget);
+	IWindow* window = widget->getParentWindow();
+	GM_ASSERT(window);
+
+	GMfloat nowElapsed = GM.getGameMachineRunningStates().elapsedTime;
+
+	if (GM_inRect(d->rcUp, d->mousePt))
+	{
+		if (window)
+			window->setWindowCapture(true);
+
+		d->value -= d->pageStep;
+		if (d->value < d->minimum)
+			d->value = d->minimum;
+		updateThumbRect();
+		d->arrowState = GMControlScrollBarArrowState::ClickedUp;
+		d->arrowTime = nowElapsed;
+
+		return true;
+	}
+	
+	if (GM_inRect(d->rcDown, d->mousePt))
+	{
+		if (window)
+			window->setWindowCapture(true);
+
+		d->value += d->pageStep;
+		if (d->value > d->maximum)
+			d->value = d->maximum;
+		updateThumbRect();
+		d->arrowState = GMControlScrollBarArrowState::ClickedDown;
+		d->arrowTime = nowElapsed;
+
+		return true;
+	}
+
+	if (GM_inRect(d->rcThumb, d->mousePt))
+	{
+		if (window)
+			window->setWindowCapture(true);
+
+		d->draggingThumb = true;
+		return true;
+	}
+
+	if (GM_inRect(d->rcThumb, d->mousePt))
+	{
+		if (window)
+			window->setWindowCapture(true);
+
+		// 区分一下是点在了滑块上侧还是下侧
+
+		return true;
+	}
+
+	return false;
 }
