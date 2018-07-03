@@ -374,13 +374,109 @@ void GMControlScrollBar::render(GMfloat elapsed)
 	D(d);
 	if (d->arrowState != GMControlScrollBarArrowState::Clear)
 	{
+		GMfloat now = GM.getGameMachineRunningStates().elapsedTime;
 		if (GM_inRect(d->rcUp, d->mousePt))
 		{
-
+			switch (d->arrowState)
+			{
+			case GMControlScrollBarArrowState::ClickedUp:
+			{
+				if (d->allowClickDelay < now - d->arrowTime)
+				{
+					scroll(-1);
+					d->arrowState = GMControlScrollBarArrowState::HeldUp;
+					d->arrowTime = now;
+				}
+				break;
+			}
+			case GMControlScrollBarArrowState::HeldUp:
+			{
+				if (d->allowClickRepeat < now - d->arrowTime)
+				{
+					scroll(-1);
+					d->arrowTime = now;
+				}
+				break;
+			}
+			}
 		}
 		else if (GM_inRect(d->rcDown, d->mousePt))
 		{
-
+			switch (d->arrowState)
+			{
+			case GMControlScrollBarArrowState::ClickedDown:
+			{
+				if (d->allowClickDelay < now - d->arrowTime)
+				{
+					scroll(1);
+					d->arrowState = GMControlScrollBarArrowState::HeldDown;
+					d->arrowTime = now;
+				}
+				break;
+			}
+			case GMControlScrollBarArrowState::HeldDown:
+			{
+				if (d->allowClickRepeat < now - d->arrowTime)
+				{
+					scroll(1);
+					d->arrowTime = now;
+				}
+				break;
+			}
+			}
+		}
+		else if (GM_inRect(d->rcTrack, d->mousePt) && !(GM_inRect(d->rcThumb, d->mousePt)))
+		{
+			if (d->mousePt.y < d->rcThumb.y)
+			{
+				switch (d->arrowState)
+				{
+				case GMControlScrollBarArrowState::TrackUp:
+				{
+					if (d->allowClickDelay < now - d->arrowTime)
+					{
+						scroll(-d->pageStep);
+						d->arrowState = GMControlScrollBarArrowState::TrackHeldUp;
+						d->arrowTime = now;
+					}
+					break;
+				}
+				case GMControlScrollBarArrowState::TrackHeldUp:
+				{
+					if (d->allowClickRepeat < now - d->arrowTime)
+					{
+						scroll(-d->pageStep);
+						d->arrowTime = now;
+					}
+					break;
+				}
+				}
+			}
+			else if (d->mousePt.y > d->rcThumb.y + d->rcThumb.height)
+			{
+				switch (d->arrowState)
+				{
+				case GMControlScrollBarArrowState::TrackDown:
+				{
+					if (d->allowClickDelay < now - d->arrowTime)
+					{
+						scroll(d->pageStep);
+						d->arrowState = GMControlScrollBarArrowState::TrackHeldDown;
+						d->arrowTime = now;
+					}
+					break;
+				}
+				case GMControlScrollBarArrowState::TrackHeldDown:
+				{
+					if (d->allowClickRepeat < now - d->arrowTime)
+					{
+						scroll(d->pageStep);
+						d->arrowTime = now;
+					}
+					break;
+				}
+			}
+			}
 		}
 	}
 
@@ -422,7 +518,6 @@ void GMControlScrollBar::initStyles(GMWidget* widget)
 	styleTemplate.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, .58f));
 	styleTemplate.setTextureColor(GMControlState::Focus, GMVec4(1, 1, 1, .78f));
 	styleTemplate.setTextureColor(GMControlState::Disabled, GMVec4(1, 1, 1, .27f));
-	styleTemplate.setTextureColor(GMControlState::MouseOver, GMVec4(1, 1, 1, .63f));
 
 	GMStyle& styleUp = d->styleUp;
 	styleUp = styleTemplate;
@@ -468,6 +563,11 @@ void GMControlScrollBar::updateRect()
 	updateThumbRect();
 }
 
+bool GMControlScrollBar::canHaveFocus()
+{
+	return getCanRequestFocus();
+}
+
 bool GMControlScrollBar::onMouseDown(GMSystemMouseEvent* event)
 {
 	return handleMouseClick(event);
@@ -489,6 +589,39 @@ bool GMControlScrollBar::onMouseUp(GMSystemMouseEvent* event)
 	d->draggingThumb = false;
 	d->arrowState = GMControlScrollBarArrowState::Clear;
 	updateThumbRect();
+	return false;
+}
+
+bool GMControlScrollBar::onMouseMove(GMSystemMouseEvent* event)
+{
+	D(d);
+	if (d->draggingThumb)
+	{
+		d->rcThumb.y = d->mousePt.y - d->thumbOffset;
+		GMint maximum = d->rcTrack.y + d->rcTrack.height - d->rcThumb.height;
+		if (d->rcThumb.y > maximum)
+			d->rcThumb.y = maximum;
+
+		GMint minimum = d->rcTrack.y;
+		if (d->rcThumb.y < minimum)
+			d->rcThumb.y = minimum;
+
+		// 计算出一个最接近的值
+		GMint value = Round(static_cast<GMfloat>(d->rcThumb.y - minimum) * getMaximum() / (maximum - minimum)) + getMinimum();
+		setValue(value);
+
+		return true;
+	}
+	return false;
+}
+
+bool GMControlScrollBar::onCaptureChanged(GMSystemCaptureChangedEvent* event)
+{
+	D(d);
+	if (getParent()->getParentWindow()->getWindowHandle() != event->getCapturedWindow())
+	{
+		d->draggingThumb = false;
+	}
 	return false;
 }
 
@@ -517,8 +650,10 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 	IWindow* window = widget->getParentWindow();
 	GM_ASSERT(window);
 
-	GMfloat nowElapsed = GM.getGameMachineRunningStates().elapsedTime;
+	if (!hasFocus())
+		widget->requestFocus(this);
 
+	GMfloat nowElapsed = GM.getGameMachineRunningStates().elapsedTime;
 	if (GM_inRect(d->rcUp, d->mousePt))
 	{
 		if (window)
@@ -554,19 +689,50 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 		if (window)
 			window->setWindowCapture(true);
 
+		d->thumbOffset = d->mousePt.y - d->rcThumb.y;
 		d->draggingThumb = true;
 		return true;
 	}
 
-	if (GM_inRect(d->rcThumb, d->mousePt))
+	if (GM_inRect(d->rcTrack, d->mousePt))
 	{
 		if (window)
 			window->setWindowCapture(true);
 
 		// 区分一下是点在了滑块上侧还是下侧
-
-		return true;
+		if (d->mousePt.y < d->rcThumb.y)
+		{
+			scroll(-d->pageStep);
+			d->arrowState = GMControlScrollBarArrowState::TrackUp;
+			d->arrowTime = nowElapsed;
+			return true;
+		}
+		else if (d->mousePt.y > d->rcThumb.y + d->rcThumb.height)
+		{
+			scroll(d->pageStep);
+			d->arrowState = GMControlScrollBarArrowState::TrackDown;
+			d->arrowTime = nowElapsed;
+			return true;
+		}
 	}
 
 	return false;
+}
+
+void GMControlScrollBar::clampValue()
+{
+	D(d);
+	if (d->value > getMaximum())
+		setValue(getMaximum());
+
+	if (d->value < getMinimum())
+		setValue(getMinimum());
+}
+
+void GMControlScrollBar::scroll(GMint value)
+{
+	D(d);
+	d->value += value;
+	clampValue();
+	updateThumbRect();
 }

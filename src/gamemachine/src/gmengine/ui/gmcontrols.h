@@ -136,6 +136,11 @@ public:
 		return false;
 	}
 
+	virtual bool onCaptureChanged(GMSystemCaptureChangedEvent* event)
+	{
+		return false;
+	}
+
 	virtual void onFocusIn()
 	{
 		D(d);
@@ -379,12 +384,17 @@ enum class GMControlScrollBarArrowState
 	ClickedDown,
 	HeldUp,
 	HeldDown,
+	TrackUp,
+	TrackDown,
+	TrackHeldUp,
+	TrackHeldDown,
 };
 
 GM_PRIVATE_OBJECT(GMControlScrollBar)
 {
 	bool draggingThumb = false;
 	bool showThumb = true;
+	bool canRequestFocus = true;
 	GMint maximum = 10;
 	GMint minimum = 0;
 	GMint pageStep = 1;
@@ -395,6 +405,7 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 	GMRect rcDown;
 	GMRect rcThumb;
 	GMRect rcTrack;
+	GMfloat thumbOffset = 0;
 	GMControlScrollBarArrowState arrowState = GMControlScrollBarArrowState::Clear;
 	GMfloat arrowTime = 0;
 
@@ -414,6 +425,7 @@ class GMControlScrollBar : public GMControl
 	GM_DECLARE_PROPERTY(Value, value, GMint)
 	GM_DECLARE_PROPERTY(Maximum, maximum, GMint)
 	GM_DECLARE_PROPERTY(Minimum, minimum, GMint)
+	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus, bool)
 
 public:
 	GMControlScrollBar(GMWidget* widget) : Base(widget) { initStyles(widget); }
@@ -422,16 +434,23 @@ protected:
 	virtual bool handleMouse(GMSystemMouseEvent* event) override;
 	virtual void render(GMfloat elapsed) override;
 	virtual void updateRect() override;
+	virtual bool canHaveFocus() override;
 
 // Events
 	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
 	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
 	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
+	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
+	virtual bool onCaptureChanged(GMSystemCaptureChangedEvent* event) override;
 
 private:
 	void initStyles(GMWidget* widget);
 	void updateThumbRect();
 	bool handleMouseClick(GMSystemMouseEvent* event);
+
+protected:
+	void clampValue();
+	void scroll(GMint value);
 };
 
 END_NS

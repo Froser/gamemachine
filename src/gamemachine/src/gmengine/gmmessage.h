@@ -42,6 +42,7 @@ enum class GMSystemEventType
 	MouseDblClick,
 	MouseWheel,
 	SetCursor,
+	CaptureChanged,
 };
 
 enum GMKey
@@ -354,11 +355,29 @@ class GMSystemMouseWheelEvent : public GMSystemMouseEvent
 public:
 	GMSystemMouseWheelEvent() = default;
 
-	GMSystemMouseWheelEvent(GMSystemEventType type, const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta)
-		: Base(type, pt, button, buttons, modifier)
+	GMSystemMouseWheelEvent(const GMPoint& pt, GMMouseButton button, GMMouseButton buttons, GMModifier modifier, GMshort delta)
+		: Base(GMSystemEventType::MouseWheel, pt, button, buttons, modifier)
 	{
 		D(d);
 		d->delta = delta;
+	}
+};
+
+GM_PRIVATE_OBJECT(GMSystemCaptureChangedEvent)
+{
+	GMWindowHandle capturedWnd = 0;
+};
+
+class GMSystemCaptureChangedEvent : public GMSystemEvent
+{
+	GM_DECLARE_PRIVATE_AND_BASE(GMSystemCaptureChangedEvent, GMSystemEvent)
+	GM_DECLARE_PROPERTY(CapturedWindow, capturedWnd, GMWindowHandle)
+
+public:
+	GMSystemCaptureChangedEvent(GMWindowHandle capturedWnd)
+		: Base(GMSystemEventType::CaptureChanged)
+	{
+		setCapturedWindow(capturedWnd);
 	}
 };
 

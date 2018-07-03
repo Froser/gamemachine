@@ -61,6 +61,10 @@ inline gm::GMfloat Fmod(gm::GMfloat x, gm::GMfloat y) { return fmodf(x, y); }
 inline gm::GMfloat Floor(gm::GMfloat x) { return floor(x); }
 inline gm::GMfloat Min(gm::GMfloat x, gm::GMfloat y) { return x < y ? x : y; }
 inline gm::GMfloat Max(gm::GMfloat x, gm::GMfloat y) { return x > y ? x : y; }
+inline gm::GMint Round(gm::GMfloat d)
+{
+	return d >= 0.0 ? static_cast<gm::GMint>(d + 0.5) : static_cast<gm::GMint>(d - static_cast<gm::GMint>(d - 1) + 0.5) + static_cast<gm::GMint>(d - 1);
+}
 
 template<typename genType>
 constexpr genType Radians(genType degrees)

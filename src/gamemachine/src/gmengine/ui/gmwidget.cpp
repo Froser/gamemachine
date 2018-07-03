@@ -705,6 +705,17 @@ bool GMWidget::msgProc(GMSystemEvent* event)
 	GMSystemEventType type = event->getType();
 	switch (type)
 	{
+	case GMSystemEventType::CaptureChanged:
+	{
+		if (s_controlFocus &&
+			s_controlFocus->getParent() == this &&
+			s_controlFocus->getEnabled())
+		{
+			if (s_controlFocus->onCaptureChanged(gm_cast<GMSystemCaptureChangedEvent*>(event)))
+				return true;
+		}
+		break;
+	}
 	case GMSystemEventType::KeyDown:
 	case GMSystemEventType::KeyUp:
 	{

@@ -335,13 +335,17 @@ void GameMachine::translateSystemEvent(GMuint uMsg, GMWParam wParam, GMLParam lP
 		};
 		GMshort delta = GET_WHEEL_DELTA_WPARAM(wParam);
 		newSystemEvent = new GMSystemMouseWheelEvent(
-			GMSystemEventType::MouseWheel,
 			mousePoint,
 			GMMouseButton_None,
 			translateWheelButton(wParam),
 			translateModifier(wParam),
 			delta
 		);
+		break;
+	}
+	case WM_CAPTURECHANGED:
+	{
+		newSystemEvent = new GMSystemCaptureChangedEvent((GMWindowHandle)lParam);
 		break;
 	}
 	}
