@@ -241,7 +241,7 @@ void GMControlButton::render(GMfloat elapsed)
 		state = GMControlState::Focus;
 	}
 
-	GMRect rc = boundingRect();
+	GMRect rc = getBoundingRect();
 	rc.x += offsetX;
 	rc.width -= offsetX * 2;
 	rc.y += offsetY;
@@ -566,6 +566,27 @@ void GMControlScrollBar::updateRect()
 bool GMControlScrollBar::canHaveFocus()
 {
 	return getCanRequestFocus();
+}
+
+GMStyle& GMControlScrollBar::getStyle(GMControl::StyleType style)
+{
+	D(d);
+	D_BASE(db, Base);
+	StyleType s = (StyleType)style;
+	switch (s)
+	{
+	case GMControlScrollBar::ArrowUp:
+		return d->styleUp;
+	case GMControlScrollBar::ArrowDown:
+		return d->styleDown;
+	case GMControlScrollBar::Track:
+		return d->styleTrack;
+	case GMControlScrollBar::Thumb:
+		return d->styleThumb;
+	default:
+		GM_ASSERT(false);
+		return Base::getStyle(style);
+	}
 }
 
 bool GMControlScrollBar::onMouseDown(GMSystemMouseEvent* event)

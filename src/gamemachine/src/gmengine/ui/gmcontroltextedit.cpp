@@ -372,6 +372,28 @@ void GMControlTextEdit::setPosition(GMint x, GMint y)
 	d->borderControl->setPosition(x, y);
 }
 
+GMStyle& GMControlTextEdit::getStyle(GMControl::StyleType style)
+{
+	D(d);
+	switch (style)
+	{
+	case GMControlTextEdit::TextStyle:
+		break;
+	default:
+		GM_ASSERT(false);
+		break;
+	}
+	return Base::getStyle(style);
+}
+
+void GMControlTextEdit::onFocusOut()
+{
+	D(d);
+	GMWidget* widget = getParent();
+	if (widget)
+		widget->getParentWindow()->setCursor(GMCursorType::Arrow);
+}
+
 bool GMControlTextEdit::onKeyDown(GMSystemKeyEvent* event)
 {
 	if (!getVisible() || !getEnabled())
@@ -440,7 +462,7 @@ bool GMControlTextEdit::onMouseDown(GMSystemMouseEvent* event)
 		handleMouseSelect(event, false);
 	else
 		handleMouseSelect(event, true);
-
+	
 	return true;
 }
 
@@ -474,6 +496,13 @@ bool GMControlTextEdit::onMouseUp(GMSystemMouseEvent* event)
 bool GMControlTextEdit::onMouseMove(GMSystemMouseEvent* event)
 {
 	D(d);
+	if (GM_inRect(d->rcText, event->getPoint()))
+	{
+		GMWidget* widget = getParent();
+		if (widget)
+			widget->getParentWindow()->setCursor(GMCursorType::IBeam);
+	}
+
 	if (d->mouseDragging)
 		handleMouseSelect(event, false);
 	return false;
@@ -571,7 +600,7 @@ void GMControlTextEdit::onMouseEnter()
 void GMControlTextEdit::onMouseLeave()
 {
 	D(d);
-	Base::onMouseEnter();
+	Base::onMouseLeave();
 	GMWidget* widget = getParent();
 	if (widget)
 		widget->getParentWindow()->setCursor(GMCursorType::Arrow);
@@ -891,7 +920,7 @@ void GMControlTextEdit::updateRect()
 	
 	// 更新文本框绘制文本位置，并且同步到排版buffer
 	D(d);
-	d->rcText = boundingRect();
+	d->rcText = getBoundingRect();
 	d->rcText.x += d->borderWidth + d->padding[0];
 	d->rcText.width -= (d->borderWidth + d->padding[0]) * 2;
 	d->rcText.y += d->borderWidth + d->padding[1];
@@ -1165,6 +1194,11 @@ void GMControlTextArea::render(GMfloat elapsed)
 
 	// 结束模板区域
 	widget->endStencil();
+
+	if (d->hasScrollBar && d->scrollBar)
+	{
+		d->scrollBar->render(elapsed);
+	}
 }
 
 void GMControlTextArea::pasteFromClipboard()
@@ -1249,6 +1283,16 @@ void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
 	}
 }
 
+void GMControlTextArea::setScrollBar(bool scrollBar)
+{
+	D(d);
+	if (d->hasScrollBar != scrollBar)
+	{
+		d->hasScrollBar = scrollBar;
+		updateScrollBar();
+	}
+}
+
 void GMControlTextArea::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
 {
 	D(d);
@@ -1327,6 +1371,93 @@ void GMControlTextArea::placeCaret(GMint cp)
 	}
 
 	db->cp = cp;
+}
+
+bool GMControlTextArea::handleMouse(GMSystemMouseEvent* event)
+{
+	D(d);
+	if (hasScrollBarAndPointInScrollBarRect(event->getPoint()))
+	{
+		d->scrollBar->handleMouse(event);
+	}
+	return Base::handleMouse(event);
+}
+
+bool GMControlTextArea::onMouseMove(GMSystemMouseEvent* event)
+{
+	D(d);
+	D_BASE(db, Base);
+	if (d->hasScrollBar && d->scrollBar)
+	{
+		const GMPoint& pt = event->getPoint();
+		if (hasScrollBarAndPointInScrollBarRect(pt))
+		{
+			GMWidget* widget = getParent();
+			if (widget)
+				widget->getParentWindow()->setCursor(GMCursorType::Arrow);
+		}
+		else if (GM_inRect(db->rcText, pt))
+		{
+			GMWidget* widget = getParent();
+			if (widget)
+				widget->getParentWindow()->setCursor(GMCursorType::IBeam);
+		}
+	}
+	return Base::onMouseMove(event);
+}
+
+bool GMControlTextArea::onMouseDown(GMSystemMouseEvent* event)
+{
+	D(d);
+	D_BASE(db, Base);
+	if (!hasFocus())
+		getParent()->requestFocus(this);
+
+	const GMPoint& pt = event->getPoint();
+	if (!containsPoint(pt))
+		return false;
+
+	if (GM_inRect(db->rcText, pt))
+	{
+		if (event->getModifier() & GMModifier_Shift)
+			handleMouseSelect(event, false);
+		else
+			handleMouseSelect(event, true);
+	}
+
+	return true;
+}
+
+void GMControlTextArea::onFocusIn()
+{
+	D(d);
+	Base::onFocusIn();
+	if (d->hasScrollBar && d->scrollBar)
+		d->scrollBar->onFocusIn();
+}
+
+void GMControlTextArea::onFocusOut()
+{
+	D(d);
+	Base::onFocusOut();
+	if (d->hasScrollBar && d->scrollBar)
+		d->scrollBar->onFocusOut();
+}
+
+void GMControlTextArea::onMouseEnter()
+{
+	D(d);
+	Base::onMouseEnter();
+	if (d->hasScrollBar && d->scrollBar)
+		d->scrollBar->onMouseEnter();
+}
+
+void GMControlTextArea::onMouseLeave()
+{
+	D(d);
+	Base::onMouseLeave();
+	if (d->hasScrollBar && d->scrollBar)
+		d->scrollBar->onMouseLeave();
 }
 
 bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
@@ -1424,4 +1555,46 @@ void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
 	d->buffer->XYtoCP(xFirst + db->rcText.width, yFirst + db->rcText.height, &lastCP);
 	GM_ASSERT(d->buffer->findFirstCPInOneLine(db->firstVisibleCP) == db->firstVisibleCP);
 	d->buffer->setRenderRange(db->firstVisibleCP, lastCP);
+}
+
+void GMControlTextArea::updateScrollBar()
+{
+	D(d);
+	D_BASE(db, Base);
+	if (d->hasScrollBar)
+	{
+		GMWidget* widget = getParent();
+		if (!d->scrollBar)
+		{
+			d->scrollBar = gm_makeOwnedPtr<GMControlScrollBar>(widget);
+			d->scrollBar->setPosition(db->rcText.x + db->rcText.width - d->scrollBarSize, db->rcText.y - 1);
+			d->scrollBar->setSize(d->scrollBarSize, db->rcText.height + 2);
+			d->scrollBar->setIsDefault(false);
+			d->scrollBar->setCanRequestFocus(false);
+		}
+	}
+	updateRect();
+}
+
+bool GMControlTextArea::hasScrollBarAndPointInScrollBarRect(const GMPoint& pt)
+{
+	D(d);
+	if (!d->hasScrollBar || !d->scrollBar)
+		return false;
+
+	return GM_inRect(d->scrollBar->getBoundingRect(), pt);
+}
+
+void GMControlTextArea::updateRect()
+{
+	Base::updateRect();
+
+	D(d);
+	D_BASE(db, Base);
+	if (d->hasScrollBar)
+	{
+		// 如果拥有滚动条，渲染区域要缩小
+		db->rcText.width -= d->scrollBarSize;
+		d->buffer->setSize(db->rcText);
+	}
 }

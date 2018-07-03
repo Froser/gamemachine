@@ -64,6 +64,22 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		gm::GMRect rc = { 0, 0, 280, 287 };
 		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
 	}
+	{
+		gm::GMRect rc = { 196, 192, 22, 20 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarUp, rc);
+	}
+	{
+		gm::GMRect rc = { 196, 223, 22, 20 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarDown, rc);
+	}
+	{
+		gm::GMRect rc = { 220, 192, 18, 42 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarThumb, rc);
+	}
+	{
+		gm::GMRect rc = { 196, 212, 22, 11 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarTrack, rc);
+	}
 
 	d->mainWidget->setTitle(L"选项菜单");
 	d->mainWidget->setTitleVisible(true);
@@ -85,6 +101,15 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
 	gm::GMint top = 10;
+
+	d->mainWidget->addScrollBar(
+		700,
+		20,
+		20,
+		200,
+		false,
+		nullptr
+	);
 
 	gm::GMControlButton* button = nullptr;
 	d->mainWidget->addButton(
@@ -137,7 +162,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 
 	gm::GMControlTextArea* textArea = nullptr;
 	d->mainWidget->addTextArea(
-		L"这是一个TextArea控件，可以编辑、显示多行文字\r\n这里是第二行\r\n\r\nWelcome To GameMachine",
+		L"这是一个带滚动条的TextArea控件，可以编辑、显示多行文字\r\n这里是第二行\r\n\r\nWelcome To GameMachine",
 		10,
 		top += 60,
 		500,
@@ -146,7 +171,21 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		txtCorner,
 		&textArea
 	);
-	textEdit->setPadding(5, 10);
+	textArea->setPadding(5, 10);
+	textArea->setScrollBar(true);
+
+	gm::GMControlTextArea* textArea2 = nullptr;
+	d->mainWidget->addTextArea(
+		L"这是一个不带滚动条的TextArea控件，可以编辑、显示多行文字\r\n这里是第二行\r\n\r\nWelcome To GameMachine",
+		10,
+		top += 140,
+		500,
+		100,
+		false,
+		txtCorner,
+		&textArea2
+	);
+	textArea2->setPadding(5, 10);
 
 	d->nextControlTop = top + 40;
 	d->mainWidget->setSize(800, 600);

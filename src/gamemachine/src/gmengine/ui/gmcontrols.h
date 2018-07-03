@@ -238,7 +238,7 @@ public:
 		return d->index;
 	}
 
-	inline const GMRect& boundingRect() GM_NOEXCEPT
+	inline const GMRect& getBoundingRect() GM_NOEXCEPT
 	{
 		D(d);
 		return d->boundingBox;
@@ -428,20 +428,32 @@ class GMControlScrollBar : public GMControl
 	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus, bool)
 
 public:
+	enum StyleType
+	{
+		ArrowUp = Base::StyleBegin,
+		ArrowDown,
+		Track,
+		Thumb,
+	};
+
+public:
 	GMControlScrollBar(GMWidget* widget) : Base(widget) { initStyles(widget); }
 
 protected:
-	virtual bool handleMouse(GMSystemMouseEvent* event) override;
-	virtual void render(GMfloat elapsed) override;
 	virtual void updateRect() override;
 	virtual bool canHaveFocus() override;
+	virtual GMStyle& getStyle(GMControl::StyleType style) override;
+	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
+	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
+	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
+	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
 
 // Events
-	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
-	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
-	virtual bool onMouseUp(GMSystemMouseEvent* event) override;
-	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
 	virtual bool onCaptureChanged(GMSystemCaptureChangedEvent* event) override;
+
+public:
+	virtual void render(GMfloat elapsed) override;
+	virtual bool handleMouse(GMSystemMouseEvent* event) override;
 
 private:
 	void initStyles(GMWidget* widget);

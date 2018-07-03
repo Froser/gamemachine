@@ -93,7 +93,10 @@ void DemoHandler::onDeactivate()
 
 	gm::GMWidget* widget = getWidget();
 	if (widget)
+	{
 		widget->setVisible(false);
+		gm::GMWidget::clearFocus(widget);
+	}
 
 	gm::GMShadowSourceDesc noShadow;
 	noShadow.type = gm::GMShadowSourceDesc::NoShadow;
@@ -242,6 +245,22 @@ gm::GMWidget* DemoHandler::createDefaultWidget()
 	{
 		gm::GMRect rc = { 0, 0, 280, 287 };
 		d->mainWidget->addArea(gm::GMTextureArea::BorderArea, rc);
+	}
+	{
+		gm::GMRect rc = { 196, 192, 22, 20 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarUp, rc);
+	}
+	{
+		gm::GMRect rc = { 196, 223, 22, 20 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarDown, rc);
+	}
+	{
+		gm::GMRect rc = { 220, 192, 18, 42 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarThumb, rc);
+	}
+	{
+		gm::GMRect rc = { 196, 212, 22, 11 };
+		d->mainWidget->addArea(gm::GMTextureArea::ScrollBarTrack, rc);
 	}
 
 	d->mainWidget->setTitle(L"选项菜单");

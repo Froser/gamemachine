@@ -34,6 +34,12 @@ class GMControlTextEdit : public GMControl
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextEdit, GMControl)
 
 public:
+	enum StyleType
+	{
+		TextStyle = GMControl::StyleBegin,
+	};
+
+public:
 	GM_DECLARE_SIGNAL(textChanged);
 
 public:
@@ -44,6 +50,8 @@ public:
 	virtual void render(GMfloat elapsed) override;
 	virtual void setSize(GMint width, GMint height) override;
 	virtual void setPosition(GMint x, GMint y) override;
+	virtual GMStyle& getStyle(GMControl::StyleType style) override;
+	virtual void onFocusOut() override;
 	virtual bool onKeyDown(GMSystemKeyEvent* event) override;
 	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
 	virtual bool onMouseDblClick(GMSystemMouseEvent* event) override;
@@ -136,11 +144,15 @@ GM_PRIVATE_OBJECT(GMControlTextArea)
 	GMint caretTopRelative = 0;
 	GMMultiLineTypoTextBuffer* buffer = nullptr;
 	GMint scrollOffset = 0;
+	bool hasScrollBar = false;
+	GMint scrollBarSize = 20;
+	GMOwnedPtr<GMControlScrollBar> scrollBar;
 };
 
 class GMControlTextArea : public GMControlTextEdit
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlTextArea, GMControlTextEdit)
+	GM_DECLARE_PROPERTY(ScrollBarSize, scrollBarSize, GMint)
 
 public:
 	GMControlTextArea(GMWidget* widget);
@@ -154,6 +166,14 @@ public:
 	virtual GMint getCaretHeight() override;
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
 	virtual void placeCaret(GMint cp) override;
+	virtual void updateRect() override;
+	virtual bool handleMouse(GMSystemMouseEvent* event) override;
+	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
+	virtual bool onMouseDown(GMSystemMouseEvent* event) override;
+	virtual void onFocusIn() override;
+	virtual void onFocusOut() override;
+	virtual void onMouseEnter() override;
+	virtual void onMouseLeave() override;
 
 // 处理按键
 	virtual bool onKey_UpDown(GMSystemKeyEvent* event) override;
@@ -161,11 +181,16 @@ public:
 	virtual bool onKey_Back(GMSystemKeyEvent* event) override;
 
 public:
+	void setScrollBar(bool scrollBar);
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 	void setLineHeight(GMint lineHeight) GM_NOEXCEPT;
 
 protected:
 	void setBufferRenderRange(GMint xFirst, GMint yFirst);
+
+private:
+	void updateScrollBar();
+	bool hasScrollBarAndPointInScrollBarRect(const GMPoint& pt);
 
 private:
 	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
@@ -185,6 +210,7 @@ private:
 		};
 		return r;
 	}
+
 };
 
 END_NS
