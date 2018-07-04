@@ -398,6 +398,7 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 	GMint maximum = 10;
 	GMint minimum = 0;
 	GMint pageStep = 1;
+	GMint singleStep = 1;
 	GMint value = 0;
 
 	GMPoint mousePt; //!< 相对于GMControlScrollBar本身的坐标
@@ -422,10 +423,15 @@ class GMControlScrollBar : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlScrollBar, GMControl)
 	GM_DECLARE_PROPERTY(PageStep, pageStep, GMint)
-	GM_DECLARE_PROPERTY(Value, value, GMint)
-	GM_DECLARE_PROPERTY(Maximum, maximum, GMint)
-	GM_DECLARE_PROPERTY(Minimum, minimum, GMint)
+	GM_DECLARE_PROPERTY(SingleStep, singleStep, GMint)
+	GM_DECLARE_GETTER(Value, value, GMint)
+	GM_DECLARE_GETTER(Maximum, maximum, GMint)
+	GM_DECLARE_GETTER(Minimum, minimum, GMint)
 	GM_DECLARE_PROPERTY(CanRequestFocus, canRequestFocus, bool)
+
+	GM_DECLARE_SIGNAL(valueChanged)
+	GM_DECLARE_SIGNAL(startDragThumb)
+	GM_DECLARE_SIGNAL(endDragThumb)
 
 public:
 	enum StyleType
@@ -438,6 +444,11 @@ public:
 
 public:
 	GMControlScrollBar(GMWidget* widget) : Base(widget) { initStyles(widget); }
+
+public:
+	void setMaximum(GMint maximum);
+	void setMinimum(GMint minimum);
+	void setValue(GMint value);
 
 protected:
 	virtual void updateRect() override;

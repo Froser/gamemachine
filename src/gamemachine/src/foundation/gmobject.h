@@ -93,22 +93,25 @@ class GMNotAGMObject {};
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
 
-#define GM_DECLARE_GETTER(name, memberName, paramType, accessor) \
+#define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor) \
 	accessor: \
 	inline paramType& get##name() GM_NOEXCEPT { D(d); return d-> memberName; } \
 	inline const paramType& get##name() const GM_NOEXCEPT { D(d); return d-> memberName; }
 
-#define GM_DECLARE_SETTER(name, memberName, paramType, accessor) \
+#define GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, accessor) \
 	accessor: \
 	void set##name(const paramType & arg) { D(d); d-> memberName = arg; }
 
+#define GM_DECLARE_GETTER(name, memberName, paramType) GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public) 
+#define GM_DECLARE_SETTER(name, memberName, paramType) GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public) 
+
 #define GM_DECLARE_PROPERTY(name, memberName, paramType) \
-	GM_DECLARE_GETTER(name, memberName, paramType, public) \
-	GM_DECLARE_SETTER(name, memberName, paramType, public)
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, public) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, public)
 
 #define GM_DECLARE_PROTECTED_PROPERTY(name, memberName, paramType) \
-	GM_DECLARE_GETTER(name, memberName, paramType, protected) \
-	GM_DECLARE_SETTER(name, memberName, paramType, protected)
+	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, protected) \
+	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, protected)
 
 #define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) noexcept = delete;
 #define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) noexcept = delete;
@@ -173,7 +176,7 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 
 #define GM_SIGNAL(signal) signal
 #define GM_DECLARE_SIGNAL(signal) public: static gm::GMString GM_SIGNAL(signal);
-#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = L#signal
+#define GM_DEFINE_SIGNAL(signal) gm::GMString GM_SIGNAL(signal) = L#signal ;
 
 #define GM_BEGIN_META_MAP \
 	protected: \

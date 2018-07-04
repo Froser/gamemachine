@@ -3,10 +3,15 @@
 #include "gmcontroltextedit.h"
 #include "foundation/gamemachine.h"
 
-GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged);
+#ifndef WHEEL_DELTA
+#define WHEEL_DELTA 120
+#endif
+
+#define GM_WHEEL_DELTA WHEEL_DELTA
 
 BEGIN_NS
 
+GM_DEFINE_SIGNAL(GMControlTextEdit::textChanged)
 GM_PRIVATE_OBJECT(GMMultiLineTypoTextBuffer)
 {
 	GMint lineSpacing = 5;
@@ -389,6 +394,7 @@ GMStyle& GMControlTextEdit::getStyle(GMControl::StyleType style)
 void GMControlTextEdit::onFocusOut()
 {
 	D(d);
+	Base::onFocusOut();
 	GMWidget* widget = getParent();
 	if (widget)
 		widget->getParentWindow()->setCursor(GMCursorType::Arrow);
@@ -755,7 +761,7 @@ void GMControlTextEdit::blinkCaret(GMint firstX, GMint caretX)
 		renderCaret(firstX, caretX);
 }
 
-void GMControlTextEdit::placeCaret(GMint cp)
+void GMControlTextEdit::placeCaret(GMint cp, bool adjustVisibleCP)
 {
 	D(d);
 	GM_ASSERT(cp >= 0);
@@ -763,32 +769,47 @@ void GMControlTextEdit::placeCaret(GMint cp)
 		cp = d->buffer->getLength();
 	d->cp = cp;
 
-	GMint firstX, x, x2;
-	d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
-	d->buffer->CPtoX(cp, false, &x); //lead
-	if (cp == d->buffer->getLength())
-		x2 = x;
-	else
-		d->buffer->CPtoX(cp, true, &x2); //trail
-
-	if (x < firstX)
+	if (adjustVisibleCP)
 	{
-		// 此时字符所在的位置比可见位置小，我们需要调整滚动条到其可见
-		d->firstVisibleCP = cp;
-	}
-	else if (x2 > firstX + d->rcText.width)
-	{
-		GMint xNewLeft = x2 - d->rcText.width;
-		GMint cpNewFirst;
-		bool newTrail;
-		d->buffer->XtoCP(xNewLeft, &cpNewFirst, &newTrail);
-		GMint xNewFirst;
-		d->buffer->CPtoX(cpNewFirst, false, &xNewFirst);
-		if (xNewFirst < xNewLeft)
-			++cpNewFirst;
+		GMint firstX, x, x2;
+		d->buffer->CPtoX(d->firstVisibleCP, false, &firstX);
+		d->buffer->CPtoX(cp, false, &x); //lead
+		if (cp == d->buffer->getLength())
+			x2 = x;
+		else
+			d->buffer->CPtoX(cp, true, &x2); //trail
 
-		d->firstVisibleCP = cpNewFirst;
+		if (x < firstX)
+		{
+			// 此时字符所在的位置比可见位置小，我们需要调整滚动条到其可见
+			d->firstVisibleCP = cp;
+		}
+		else if (x2 > firstX + d->rcText.width)
+		{
+			GMint xNewLeft = x2 - d->rcText.width;
+			GMint cpNewFirst;
+			bool newTrail;
+			d->buffer->XtoCP(xNewLeft, &cpNewFirst, &newTrail);
+			GMint xNewFirst;
+			d->buffer->CPtoX(cpNewFirst, false, &xNewFirst);
+			if (xNewFirst < xNewLeft)
+				++cpNewFirst;
+
+			d->firstVisibleCP = cpNewFirst;
+		}
 	}
+}
+
+void GMControlTextEdit::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
+{
+	D(d);
+	GMint rightEdgeX;
+	d->buffer->CPtoX(d->cp, true, &rightEdgeX);
+	caretRc.width = rightEdgeX - caretX;
+	if (caretRc.width <= 0)
+		caretRc.width = 8; //给一个最小的光标宽度
+	caretRc.height = 2;
+	caretRc.y = getCaretTop() + getCaretHeight() - 2;
 }
 
 void GMControlTextEdit::moveCaret(bool next, bool newItem, bool select)
@@ -934,6 +955,9 @@ void GMControlTextEdit::insertCharacter(GMwchar ch)
 	if (ch == '\r' || ch == '\n') //吞掉换行
 		return;
 
+	// 使光标出现在视线范围
+	placeCaret(d->cp, true);
+
 	if (d->selectionStartCP != d->cp)
 		deleteSelectionText();
 
@@ -964,22 +988,10 @@ void GMControlTextEdit::renderCaret(GMint firstX, GMint caretX)
 	};
 	GMVec4* caretColor = nullptr;
 	if (!d->insertMode)
-	{
 		// 改写模式
-		GMint rightEdgeX;
-		d->buffer->CPtoX(d->cp, true, &rightEdgeX);
-		rc.width = rightEdgeX - caretX;
-		if (rc.width <= 0)
-			rc.width = 8; //给一个最小的光标宽度
-		rc.height = 2;
-		rc.y = getCaretTop() + getCaretHeight() - 2;
-		caretColor = &d->selectionBackColor;
-	}
-	else
-	{
-		caretColor = &d->caretColor;
-	}
+		adjustInsertModeRect(rc, caretX);
 
+	caretColor = &d->caretColor;
 	GMWidget* widget = getParent();
 	widget->drawRect(*caretColor, rc, true, .99f);
 }
@@ -1038,7 +1050,7 @@ void GMControlTextArea::render(GMfloat elapsed)
 
 	createBufferTypoEngineIfNotExist();
 
-	placeCaret(db->cp);
+	placeCaret(db->cp, false);
 	db->borderControl->render(elapsed);
 
 	// 计算首个能显示的字符
@@ -1210,7 +1222,7 @@ void GMControlTextArea::pasteFromClipboard()
 	string = GMConvertion::toCurrentEnvironmentString(string).replace("\t", " ");
 	if (d->buffer->insertString(d->cp, string))
 	{
-		placeCaret(d->cp + string.length());
+		placeCaret(d->cp + string.length(), false);
 		d->selectionStartCP = d->cp;
 	}
 }
@@ -1218,20 +1230,23 @@ void GMControlTextArea::pasteFromClipboard()
 void GMControlTextArea::insertCharacter(GMwchar ch)
 {
 	D_BASE(d, Base);
+	// 使光标出现在视线范围
+	placeCaret(d->cp, true);
+
 	if (d->selectionStartCP != d->cp)
 		deleteSelectionText();
 
 	if (!d->insertMode && d->cp < d->buffer->getLength())
 	{
 		d->buffer->setChar(d->cp, ch);
-		placeCaret(d->cp + 1);
+		placeCaret(d->cp + 1, false);
 		d->selectionStartCP = d->cp;
 	}
 	else
 	{
 		if (d->buffer->insertChar(d->cp, ch))
 		{
-			placeCaret(d->cp + 1);
+			placeCaret(d->cp + 1, false);
 			d->selectionStartCP = d->cp;
 		}
 	}
@@ -1275,7 +1290,7 @@ void GMControlTextArea::handleMouseCaret(const GMPoint& pt, bool selectStart)
 
 	if (d->buffer->XYtoCP(adjustedPt.x - db->rcText.x + xFirst, adjustedPt.y - db->rcText.y + yFirst, &cp))
 	{
-		placeCaret(cp);
+		placeCaret(cp, true);
 
 		if (selectStart)
 			db->selectionStartCP = db->cp;
@@ -1305,7 +1320,7 @@ void GMControlTextArea::setLineHeight(GMint lineHeight) GM_NOEXCEPT
 	d->buffer->setLineHeight(lineHeight);
 }
 
-void GMControlTextArea::placeCaret(GMint cp)
+void GMControlTextArea::placeCaret(GMint cp, bool adjustVisibleCP)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -1327,33 +1342,36 @@ void GMControlTextArea::placeCaret(GMint cp)
 		d->buffer->CPtoXY(cp, true, &x2, &y2); //trail
 	}
 
-	if (y < firstY)
+	if (adjustVisibleCP)
 	{
-		// 此时字符所在的位置比可见位置小
-		db->firstVisibleCP = d->buffer->findFirstCPInOneLine(cp);
-	}
-	else if (y2 > firstY + db->rcText.height)
-	{
-		// 向下翻页的情况
-		GMint yNewTop = y2 - db->rcText.height;
-		GMint cpNew;
-		d->buffer->XYtoCP(x, yNewTop, &cpNew);
-
-		auto cpDiff = d->buffer->CPToLineNumber(db->cp) - d->buffer->CPToLineNumber(cp);
-		GMint xNewFirst, yNewFirst;
-		d->buffer->CPtoXY(cpNew, false, &xNewFirst, &yNewFirst);
-
-		if (yNewFirst < yNewTop)
-			++cpDiff;
-
-		for (GMint i = 0; i < cpDiff; ++i)
+		if (y < firstY)
 		{
-			db->firstVisibleCP = d->buffer->findLastCPInOneLine(db->firstVisibleCP) + 1;
+			// 此时字符所在的位置比可见位置小
+			db->firstVisibleCP = d->buffer->findFirstCPInOneLine(cp);
 		}
+		else if (y2 > firstY + db->rcText.height)
+		{
+			// 向下翻页的情况
+			GMint yNewTop = y2 - db->rcText.height;
+			GMint cpNew;
+			d->buffer->XYtoCP(x, yNewTop, &cpNew);
 
-		//重置滚动偏移，重新计算firstX, firstY
-		d->scrollOffset = 0;
-		d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
+			auto cpDiff = d->buffer->CPToLineNumber(db->cp) - d->buffer->CPToLineNumber(cp);
+			GMint xNewFirst, yNewFirst;
+			d->buffer->CPtoXY(cpNew, false, &xNewFirst, &yNewFirst);
+
+			if (yNewFirst < yNewTop)
+				++cpDiff;
+
+			for (GMint i = 0; i < cpDiff; ++i)
+			{
+				db->firstVisibleCP = d->buffer->findLastCPInOneLine(db->firstVisibleCP) + 1;
+			}
+
+			//重置滚动偏移，重新计算firstX, firstY
+			d->scrollOffset = 0;
+			d->buffer->CPtoXY(db->firstVisibleCP, false, &firstX, &firstY);
+		}
 	}
 
 	if (d->scrollOffset == 0)
@@ -1460,6 +1478,27 @@ void GMControlTextArea::onMouseLeave()
 		d->scrollBar->onMouseLeave();
 }
 
+bool GMControlTextArea::onMouseWheel(GMSystemMouseWheelEvent* event)
+{
+	D(d);
+	GMint detents = event->getDelta() / GM_WHEEL_DELTA;
+	moveToLine(getCurrentVisibleLineNo() - detents);
+	return true;
+}
+
+void GMControlTextArea::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
+{
+	D(d);
+	D_BASE(db, Base);
+	GMint rightEdgeX;
+	d->buffer->CPtoXY(db->cp, true, &rightEdgeX, nullptr);
+	caretRc.width = rightEdgeX - caretX;
+	if (caretRc.width <= 0)
+		caretRc.width = 8; //给一个最小的光标宽度
+	caretRc.height = 2;
+	caretRc.y = getCaretTop() + getCaretHeight() - 2;
+}
+
 bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
 {
 	D(d);
@@ -1469,35 +1508,45 @@ bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
 	GMint x = 0, y = 0;
 	d->buffer->CPtoMidXY(db->cp, &x, &y);
 	GMint lh = d->buffer->getLineHeight() + d->buffer->getLineSpacing();
-	if (key == GMKey_Up)
+	if (event->getModifier() & GMModifier_Ctrl)
 	{
-		if (y - lh > 0)
+		if (key == GMKey_Up)
+			moveToLine(getCurrentVisibleLineNo() - 1);
+		else if (key == GMKey_Down)
+			moveToLine(getCurrentVisibleLineNo() + 1);
+	}
+	else
+	{
+		if (key == GMKey_Up)
 		{
-			d->buffer->XYtoCP(x, y - lh, &cp);
-			// 对于换行符，由于宽度为0，上一行对应的CP计算出来会少一个字符（因为是闭区间计算位置），所以要加回来
-			if (d->buffer->isNewLine(db->cp) && x > 0)
-				placeCaret(Min(cp + 1, d->buffer->findLastCPInOneLine(cp)));
-			else
-				placeCaret(cp);
+			if (y - lh > 0)
+			{
+				d->buffer->XYtoCP(x, y - lh, &cp);
+				// 对于换行符，由于宽度为0，上一行对应的CP计算出来会少一个字符（因为是闭区间计算位置），所以要加回来
+				if (d->buffer->isNewLine(db->cp) && x > 0)
+					placeCaret(Min(cp + 1, d->buffer->findLastCPInOneLine(cp)), true);
+				else
+					placeCaret(cp, true);
+
+				if (!(event->getModifier() & GMModifier_Shift))
+					db->selectionStartCP = db->cp;
+			}
+		}
+		else if (key == GMKey_Down)
+		{
+			d->buffer->XYtoCP(x, y + lh + d->buffer->getLineSpacing(), &cp);
+			if (cp != d->buffer->findLastCPInOneLine(db->cp))
+			{
+				// 对于换行符，由于宽度为0，上一行对应的CP计算出来会少一个字符（因为是闭区间计算位置），所以要加回来
+				if (d->buffer->isNewLine(db->cp) && x > 0)
+					placeCaret(Min(cp + 1, d->buffer->findLastCPInOneLine(cp)), true);
+				else
+					placeCaret(cp, true);
+			}
 
 			if (!(event->getModifier() & GMModifier_Shift))
 				db->selectionStartCP = db->cp;
 		}
-	}
-	else if (key == GMKey_Down)
-	{
-		d->buffer->XYtoCP(x, y + lh + d->buffer->getLineSpacing(), &cp);
-		if (cp != d->buffer->findLastCPInOneLine(db->cp))
-		{
-			// 对于换行符，由于宽度为0，上一行对应的CP计算出来会少一个字符（因为是闭区间计算位置），所以要加回来
-			if (d->buffer->isNewLine(db->cp) && x > 0)
-				placeCaret(Min(cp + 1, d->buffer->findLastCPInOneLine(cp)));
-			else
-				placeCaret(cp);
-		}
-
-		if (!(event->getModifier() & GMModifier_Shift))
-			db->selectionStartCP = db->cp;
 	}
 	return true;
 }
@@ -1509,12 +1558,12 @@ bool GMControlTextArea::onKey_HomeEnd(GMSystemKeyEvent* event)
 	GMKey key = event->getKey();
 	if (key == GMKey_Home)
 	{
-		placeCaret(d->buffer->findFirstCPInOneLine(db->cp));
+		placeCaret(d->buffer->findFirstCPInOneLine(db->cp), true);
 	}
 	else
 	{
 		GM_ASSERT(key == GMKey_End);
-		placeCaret(d->buffer->findLastCPInOneLine(db->cp));
+		placeCaret(d->buffer->findLastCPInOneLine(db->cp), true);
 	}
 
 	if (!(event->getModifier() & GMModifier_Shift))
@@ -1536,7 +1585,7 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 	}
 	else if (d->cp > 0)
 	{
-		placeCaret(d->cp - 1);
+		placeCaret(d->cp - 1, true);
 		d->selectionStartCP = d->cp;
 		if (d->buffer->removeChar(d->cp))
 			emit(textChanged);
@@ -1555,6 +1604,18 @@ void GMControlTextArea::setBufferRenderRange(GMint xFirst, GMint yFirst)
 	d->buffer->XYtoCP(xFirst + db->rcText.width, yFirst + db->rcText.height, &lastCP);
 	GM_ASSERT(d->buffer->findFirstCPInOneLine(db->firstVisibleCP) == db->firstVisibleCP);
 	d->buffer->setRenderRange(db->firstVisibleCP, lastCP);
+
+	// 同时设置滚动条(如果有的话)
+	if (d->hasScrollBar && d->scrollBar)
+	{
+		if (!isScrollBarLocked())
+		{
+			// 获取能显示多最大行数，并设置页步长
+			d->scrollBar->setMinimum(1);
+			d->scrollBar->setMaximum(d->buffer->CPToLineNumber(d->buffer->getLength()));
+			d->scrollBar->setValue(d->buffer->CPToLineNumber(db->firstVisibleCP));
+		}
+	}
 }
 
 void GMControlTextArea::updateScrollBar()
@@ -1571,9 +1632,30 @@ void GMControlTextArea::updateScrollBar()
 			d->scrollBar->setSize(d->scrollBarSize, db->rcText.height + 2);
 			d->scrollBar->setIsDefault(false);
 			d->scrollBar->setCanRequestFocus(false);
+			updateScrollBarPageStep();
+			connect(*d->scrollBar, GMControlScrollBar::valueChanged, [](auto sender, auto receiver) {
+				gm_cast<GMControlTextArea*>(receiver)->onScrollBarValueChanged(gm_cast<GMControlScrollBar*>(sender));
+			});
+			connect(*d->scrollBar, GMControlScrollBar::startDragThumb, [](auto sender, auto receiver) {
+				gm_cast<GMControlTextArea*>(receiver)->lockScrollBar();
+			});
+			connect(*d->scrollBar, GMControlScrollBar::endDragThumb, [](auto sender, auto receiver) {
+				gm_cast<GMControlTextArea*>(receiver)->unlockScrollBar();
+			});
 		}
 	}
 	updateRect();
+}
+
+void GMControlTextArea::updateScrollBarPageStep()
+{
+	D(d);
+	D_BASE(db, Base);
+	if (d->hasScrollBar && d->scrollBar)
+	{
+		auto lines = Round(db->rcText.height / (d->buffer->getLineHeight() + d->buffer->getLineSpacing()));
+		d->scrollBar->setPageStep(lines - 1);
+	}
 }
 
 bool GMControlTextArea::hasScrollBarAndPointInScrollBarRect(const GMPoint& pt)
@@ -1583,6 +1665,50 @@ bool GMControlTextArea::hasScrollBarAndPointInScrollBarRect(const GMPoint& pt)
 		return false;
 
 	return GM_inRect(d->scrollBar->getBoundingRect(), pt);
+}
+
+void GMControlTextArea::moveToLine(GMint lineNo)
+{
+	D(d);
+	D_BASE(db, Base);
+	GMint visibleLineNo = d->buffer->CPToLineNumber(db->firstVisibleCP);
+	// 从当前的行数来遍历
+	if (lineNo < visibleLineNo)
+	{
+		// 向上翻
+		for (GMint i = db->firstVisibleCP; i >= 0; --i)
+		{
+			if (d->buffer->CPToLineNumber(i) == lineNo)
+			{
+				db->firstVisibleCP = d->buffer->findFirstCPInOneLine(i);
+				break;
+			}
+		}
+	}
+	else if (lineNo > visibleLineNo)
+	{
+		// 向下翻
+		for (GMint i = db->firstVisibleCP; i <= d->buffer->getLength(); ++i)
+		{
+			if (d->buffer->CPToLineNumber(i) == lineNo)
+			{
+				db->firstVisibleCP = i;
+				break;
+			}
+		}
+	}
+}
+
+GMint GMControlTextArea::getCurrentVisibleLineNo()
+{
+	D(d);
+	D_BASE(db, Base);
+	return d->buffer->CPToLineNumber(db->firstVisibleCP);
+}
+
+void GMControlTextArea::onScrollBarValueChanged(const GMControlScrollBar* sb)
+{
+	moveToLine(sb->getValue());
 }
 
 void GMControlTextArea::updateRect()
@@ -1596,5 +1722,6 @@ void GMControlTextArea::updateRect()
 		// 如果拥有滚动条，渲染区域要缩小
 		db->rcText.width -= d->scrollBarSize;
 		d->buffer->setSize(db->rcText);
+		updateScrollBarPageStep();
 	}
 }

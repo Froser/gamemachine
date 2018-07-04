@@ -134,7 +134,7 @@ void GMControlLabel::setFontColor(const GMVec4& color)
 	style.getFontColor().init(color);
 }
 
-GM_DEFINE_SIGNAL(GMControlButton::click);
+GM_DEFINE_SIGNAL(GMControlButton::click)
 
 void GMControlButton::refresh()
 {
@@ -508,7 +508,8 @@ void GMControlScrollBar::render(GMfloat elapsed)
 	widget->drawSprite(d->styleUp, d->rcUp, .99f);
 	widget->drawSprite(d->styleDown, d->rcDown, .99f);
 	widget->drawSprite(d->styleTrack, d->rcTrack, .99f);
-	widget->drawSprite(d->styleThumb, d->rcThumb, .99f);
+	if (d->showThumb)
+		widget->drawSprite(d->styleThumb, d->rcThumb, .99f);
 }
 
 void GMControlScrollBar::initStyles(GMWidget* widget)
@@ -537,6 +538,41 @@ void GMControlScrollBar::initStyles(GMWidget* widget)
 	styleTrack = styleTemplate;
 	styleTrack.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarTrack));
 	styleTrack.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
+}
+
+GM_DEFINE_SIGNAL(GMControlScrollBar::valueChanged)
+GM_DEFINE_SIGNAL(GMControlScrollBar::startDragThumb)
+GM_DEFINE_SIGNAL(GMControlScrollBar::endDragThumb)
+
+void GMControlScrollBar::setMaximum(GMint maximum)
+{
+	D(d);
+	if (d->maximum != maximum)
+	{
+		d->maximum = maximum;
+		updateThumbRect();
+	}
+}
+
+void GMControlScrollBar::setMinimum(GMint minimum)
+{
+	D(d);
+	if (d->minimum != minimum)
+	{
+		d->minimum = minimum;
+		updateThumbRect();
+	}
+}
+
+void GMControlScrollBar::setValue(GMint value)
+{
+	D(d);
+	if (d->value != value)
+	{
+		d->value = value;
+	}
+
+	updateThumbRect();
 }
 
 void GMControlScrollBar::updateRect()
@@ -610,6 +646,7 @@ bool GMControlScrollBar::onMouseUp(GMSystemMouseEvent* event)
 	d->draggingThumb = false;
 	d->arrowState = GMControlScrollBarArrowState::Clear;
 	updateThumbRect();
+	emit(endDragThumb);
 	return false;
 }
 
@@ -629,7 +666,10 @@ bool GMControlScrollBar::onMouseMove(GMSystemMouseEvent* event)
 
 		// 计算出一个最接近的值
 		GMint value = Round(static_cast<GMfloat>(d->rcThumb.y - minimum) * getMaximum() / (maximum - minimum)) + getMinimum();
+		if (value > getMaximum())
+			value = getMaximum();
 		setValue(value);
+		emit(valueChanged);
 
 		return true;
 	}
@@ -642,6 +682,7 @@ bool GMControlScrollBar::onCaptureChanged(GMSystemCaptureChangedEvent* event)
 	if (getParent()->getParentWindow()->getWindowHandle() != event->getCapturedWindow())
 	{
 		d->draggingThumb = false;
+		emit(endDragThumb);
 	}
 	return false;
 }
@@ -649,13 +690,15 @@ bool GMControlScrollBar::onCaptureChanged(GMSystemCaptureChangedEvent* event)
 void GMControlScrollBar::updateThumbRect()
 {
 	D(d);
-	if (getMinimum() <= getValue() && getValue() <= getMaximum())
+	if (getMinimum() < getMaximum() &&
+		getMinimum() <= getValue() && getValue() <= getMaximum())
 	{
+		d->showThumb = true;
 		GMint pageSize = getMaximum() - getMinimum() + getPageStep();
 		if (pageSize <= 0)
 			pageSize = 1;
-		d->rcThumb.y = d->rcTrack.y + getValue() * d->rcTrack.height / pageSize;
 		d->rcThumb.height = getPageStep() * d->rcTrack.height / pageSize;
+		d->rcThumb.y = d->rcTrack.y + (getValue() - getMinimum()) * (d->rcTrack.height - d->rcThumb.height) / (getMaximum() - getMinimum());
 	}
 	else
 	{
@@ -680,13 +723,13 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 		if (window)
 			window->setWindowCapture(true);
 
-		d->value -= d->pageStep;
+		d->value -= d->singleStep;
 		if (d->value < d->minimum)
 			d->value = d->minimum;
 		updateThumbRect();
+		emit(valueChanged);
 		d->arrowState = GMControlScrollBarArrowState::ClickedUp;
 		d->arrowTime = nowElapsed;
-
 		return true;
 	}
 	
@@ -695,13 +738,13 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 		if (window)
 			window->setWindowCapture(true);
 
-		d->value += d->pageStep;
+		d->value += d->singleStep;
 		if (d->value > d->maximum)
 			d->value = d->maximum;
 		updateThumbRect();
+		emit(valueChanged);
 		d->arrowState = GMControlScrollBarArrowState::ClickedDown;
 		d->arrowTime = nowElapsed;
-
 		return true;
 	}
 
@@ -712,6 +755,7 @@ bool GMControlScrollBar::handleMouseClick(GMSystemMouseEvent* event)
 
 		d->thumbOffset = d->mousePt.y - d->rcThumb.y;
 		d->draggingThumb = true;
+		emit(startDragThumb);
 		return true;
 	}
 
@@ -756,4 +800,5 @@ void GMControlScrollBar::scroll(GMint value)
 	d->value += value;
 	clampValue();
 	updateThumbRect();
+	emit(valueChanged);
 }

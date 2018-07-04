@@ -374,19 +374,19 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	result.y = d->current_y;
 	result.width = glyph.width;
 	result.height = glyph.height;
+	result.advance = glyph.advance;
 	if (isValidTypeFrame())
 	{
 		// 如果给定了一个合法的绘制区域，且出现超出绘制区域的情况
-		if (d->options.newline && result.x + result.width > d->options.typoArea.width)
+		if (d->options.newline && result.x + result.advance > d->options.typoArea.width)
 		{
+			newLine();
 			result.x = d->current_x + glyph.bearingX;
 			result.y = d->current_y;
 			result.lineNo = d->currentLineNo;
-			newLine();
 		}
 	}
 	d->current_x += glyph.advance;
-	result.advance = glyph.advance;
 
 	// 拷贝状态
 	result.color[0] = d->color[0];

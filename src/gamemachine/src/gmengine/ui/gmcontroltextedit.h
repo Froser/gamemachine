@@ -83,7 +83,8 @@ protected:
 	virtual GMint getCaretTop();
 	virtual GMint getCaretHeight();
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
-	virtual void placeCaret(GMint cP);
+	virtual void placeCaret(GMint cP, bool adjustVisibleCP = true);
+	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
 
 protected:
 	void createBufferTypoEngineIfNotExist();
@@ -146,6 +147,7 @@ GM_PRIVATE_OBJECT(GMControlTextArea)
 	GMint scrollOffset = 0;
 	bool hasScrollBar = false;
 	GMint scrollBarSize = 20;
+	bool scrollBarLocked = false;
 	GMOwnedPtr<GMControlScrollBar> scrollBar;
 };
 
@@ -165,7 +167,7 @@ public:
 	virtual GMint getCaretTop() override;
 	virtual GMint getCaretHeight() override;
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart) override;
-	virtual void placeCaret(GMint cp) override;
+	virtual void placeCaret(GMint cp, bool adjustVisibleCP) override;
 	virtual void updateRect() override;
 	virtual bool handleMouse(GMSystemMouseEvent* event) override;
 	virtual bool onMouseMove(GMSystemMouseEvent* event) override;
@@ -174,6 +176,8 @@ public:
 	virtual void onFocusOut() override;
 	virtual void onMouseEnter() override;
 	virtual void onMouseLeave() override;
+	virtual bool onMouseWheel(GMSystemMouseWheelEvent* event) override;
+	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
 
 // 处理按键
 	virtual bool onKey_UpDown(GMSystemKeyEvent* event) override;
@@ -190,7 +194,11 @@ protected:
 
 private:
 	void updateScrollBar();
+	void updateScrollBarPageStep();
 	bool hasScrollBarAndPointInScrollBarRect(const GMPoint& pt);
+	void moveToLine(GMint lineNo);
+	GMint getCurrentVisibleLineNo();
+	void onScrollBarValueChanged(const GMControlScrollBar* sb);
 
 private:
 	inline void setCaretTopRelative(GMint caretTopRelative) GM_NOEXCEPT
@@ -211,6 +219,23 @@ private:
 		return r;
 	}
 
+	void lockScrollBar() GM_NOEXCEPT
+	{
+		D(d);
+		d->scrollBarLocked = true;
+	}
+
+	void unlockScrollBar() GM_NOEXCEPT
+	{
+		D(d);
+		d->scrollBarLocked = false;
+	}
+
+	bool isScrollBarLocked() GM_NOEXCEPT
+	{
+		D(d);
+		return d->scrollBarLocked;
+	}
 };
 
 END_NS
