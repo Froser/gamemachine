@@ -30,7 +30,6 @@ struct IVirtualFunctionObject
 template <typename T>
 GM_ALIGNED_STRUCT(GMObjectPrivateBase)
 {
-	mutable T* __parent = nullptr;
 };
 
 template <typename T>
@@ -76,8 +75,7 @@ class GMNotAGMObject {};
 		gm::GMConstructHelper<Data> m_data;													\
 	public:																					\
 		inline className##Private* data() const {											\
-			Data* d = const_cast<Data*>(m_data.data());										\
-			d->__parent = const_cast<className*>(this); return d;}							\
+			return const_cast<Data*>(m_data.data()); }
 
 #define GM_DECLARE_PRIVATE(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
 #define GM_DECLARE_PRIVATE_NGO(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMNotAGMObject)
