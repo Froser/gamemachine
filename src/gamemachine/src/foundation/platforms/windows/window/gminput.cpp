@@ -162,7 +162,7 @@ static GMString xinputDlls[] = {
 	"xinput1_3.dll",
 };
 
-XInputWrapper::XInputWrapper()
+GMXInputWrapper::GMXInputWrapper()
 	: m_xinputGetState(nullptr)
 	, m_xinputSetState(nullptr)
 	, m_module(0)
@@ -185,7 +185,7 @@ XInputWrapper::XInputWrapper()
 	m_xinputSetState = (XInputSetState_Delegate)GetProcAddress(m_module, "XInputSetState");
 }
 
-DWORD XInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
+DWORD GMXInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 {
 	if (m_xinputGetState)
 		return m_xinputGetState(dwUserIndex, pState);
@@ -194,7 +194,7 @@ DWORD XInputWrapper::XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState)
 	return ERROR_DLL_INIT_FAILED;
 }
 
-DWORD XInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
+DWORD GMXInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration)
 {
 	if (m_xinputSetState)
 		return m_xinputSetState(dwUserIndex, pVibration);
@@ -203,7 +203,7 @@ DWORD XInputWrapper::XInputSetState(DWORD dwUserIndex, XINPUT_VIBRATION* pVibrat
 	return ERROR_DLL_INIT_FAILED;
 }
 
-XInputWrapper::~XInputWrapper()
+GMXInputWrapper::~GMXInputWrapper()
 {
 	::FreeLibrary(m_module);
 }

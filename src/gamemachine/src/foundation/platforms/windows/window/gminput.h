@@ -5,14 +5,16 @@
 #include <gmobject.h>
 #include <gminput.h>
 
-class XInputWrapper
+BEGIN_NS
+
+class GMXInputWrapper
 {
 	typedef DWORD(WINAPI *XInputGetState_Delegate)(DWORD dwUserIndex, XINPUT_STATE* pState);
 	typedef DWORD(WINAPI *XInputSetState_Delegate)(DWORD dwUserIndex, XINPUT_VIBRATION* pVibration);
 
 public:
-	XInputWrapper();
-	~XInputWrapper();
+	GMXInputWrapper();
+	~GMXInputWrapper();
 
 public:
 	DWORD XInputGetState(DWORD dwUserIndex, XINPUT_STATE* pState);
@@ -31,7 +33,7 @@ GM_PRIVATE_OBJECT(GMInput)
 	IWindow* window;
 
 	// joystick (xinput)
-	XInputWrapper xinput;
+	GMXInputWrapper xinput;
 	GMJoystickState joystickState;
 
 	// keyboard
@@ -117,4 +119,7 @@ private:
 		d->mouseState.moving = true;
 	}
 };
+
+END_NS
+
 #endif
