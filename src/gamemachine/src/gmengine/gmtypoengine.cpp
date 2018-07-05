@@ -233,13 +233,22 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	else
 	{
 		// 从某一个点开始局部排版
-		// 我们不知道此时的排版结果，所以我们只能拿上一个非换行字符的结果，并且从上一个非换行字符开始排版
-		--start;
-		decltype(auto) last = d->results[start];
-		d->current_x = last.x;
-		d->current_y = last.y;
-		d->currentLineNo = last.lineNo;
-		d->results.erase(d->results.begin() + start, d->results.end());
+		// 我们不知道此时的排版结果，所以我们只能拿上一个字符的结果，并且从上一个字符开始排版
+		decltype(auto) last = &d->results[--start];
+		if (start == 0)
+		{
+			d->results.clear();
+			d->current_x = d->current_y = 0;
+			d->currentLineNo = 1;
+		}
+		else
+		{
+			last = &d->results[start];
+			d->current_x = last->x;
+			d->current_y = last->y;
+			d->currentLineNo = last->lineNo;
+			d->results.erase(d->results.begin() + start, d->results.end());
+		}
 	}
 
 	setFontSize(d->options.defaultFontSize);

@@ -85,6 +85,7 @@ protected:
 	virtual void handleMouseCaret(const GMPoint& pt, bool selectStart);
 	virtual void placeCaret(GMint cP, bool adjustVisibleCP = true);
 	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
+	virtual void moveFirstVisibleCp(GMint distance);
 
 protected:
 	void createBufferTypoEngineIfNotExist();
@@ -96,7 +97,6 @@ protected:
 	void copyToClipboard();
 	void handleMouseSelect(GMSystemMouseEvent* event, bool selectStart);
 	void initStyles(GMWidget* widget);
-	void moveFirstVisibleCp(GMint distance);
 	void setBufferRenderRange(GMint xFirst);
 
 public:
@@ -178,6 +178,7 @@ public:
 	virtual void onMouseLeave() override;
 	virtual bool onMouseWheel(GMSystemMouseWheelEvent* event) override;
 	virtual void adjustInsertModeRect(REF GMRect& caretRc, GMint caretX);
+	virtual void moveFirstVisibleCp(GMint distance) override;
 
 // 处理按键
 	virtual bool onKey_UpDown(GMSystemKeyEvent* event) override;

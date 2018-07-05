@@ -103,7 +103,7 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	gm::GMint top = 10;
 
 	d->mainWidget->addScrollBar(
-		700,
+		550,
 		20,
 		20,
 		200,

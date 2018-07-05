@@ -688,6 +688,7 @@ bool GMControlTextEdit::onKey_Delete(GMSystemKeyEvent* event)
 
 		if (d->buffer->removeChar(d->cp))
 		{
+			d->buffer->analyze(d->cp);
 			emit(textChanged);
 		}
 	}
@@ -709,7 +710,10 @@ bool GMControlTextEdit::onKey_Back(GMSystemKeyEvent* event)
 		d->selectionStartCP = d->cp;
 		moveFirstVisibleCp(1);
 		if (d->buffer->removeChar(d->cp))
+		{
+			d->buffer->analyze(d->cp);
 			emit(textChanged);
+		}
 
 		resetCaretBlink();
 	}
@@ -847,8 +851,11 @@ void GMControlTextEdit::deleteSelectionText()
 	GMint lastCp = Max(d->cp, d->selectionStartCP);
 	placeCaret(firstCp);
 	d->selectionStartCP = d->cp;
-	d->buffer->removeChars(firstCp, lastCp);
-	moveFirstVisibleCp(lastCp - firstCp);
+	if (d->buffer->removeChars(firstCp, lastCp))
+	{
+		moveFirstVisibleCp(lastCp - firstCp);
+		d->buffer->analyze(firstCp);
+	}
 }
 
 void GMControlTextEdit::selectAll()
@@ -1499,6 +1506,21 @@ void GMControlTextArea::adjustInsertModeRect(REF GMRect& caretRc, GMint caretX)
 	caretRc.y = getCaretTop() + getCaretHeight() - 2;
 }
 
+void GMControlTextArea::moveFirstVisibleCp(GMint distance)
+{
+	D(d);
+	D_BASE(db, Base);
+	if (db->firstVisibleCP > distance)
+	{
+		db->firstVisibleCP -= distance;
+		db->firstVisibleCP = d->buffer->findFirstCPInOneLine(db->firstVisibleCP);
+	}
+	else
+	{
+		db->firstVisibleCP = 0;
+	}
+}
+
 bool GMControlTextArea::onKey_UpDown(GMSystemKeyEvent* event)
 {
 	D(d);
@@ -1588,7 +1610,10 @@ bool GMControlTextArea::onKey_Back(GMSystemKeyEvent* event)
 		placeCaret(d->cp - 1, true);
 		d->selectionStartCP = d->cp;
 		if (d->buffer->removeChar(d->cp))
+		{
+			d->buffer->analyze(d->cp);
 			emit(textChanged);
+		}
 
 		resetCaretBlink();
 	}
