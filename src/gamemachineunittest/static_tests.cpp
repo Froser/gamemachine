@@ -14,9 +14,4 @@ void static_test()
 		Derived a, b;
 		// a = b; gm::GMObject派生类不允许拷贝
 	}
-
-	{
-		gm::GMLua a, b;
-		a = b; // 不是派生于gm::GMObject的类，是否可以拷贝取决于其实现
-	}
 }

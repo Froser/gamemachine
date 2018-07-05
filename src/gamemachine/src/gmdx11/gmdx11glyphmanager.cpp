@@ -17,7 +17,7 @@ ITexture* GMDx11GlyphManager::glyphTexture()
 		d->texture.reset(new GMDx11GlyphTexture(db->context));
 		d->texture->init();
 	}
-	return d->texture;
+	return d->texture.get();
 }
 
 void GMDx11GlyphManager::updateTexture(const GMGlyphBitmap& bitmapGlyph, const GMGlyphInfo& glyphInfo)

@@ -67,7 +67,7 @@ void GMDx11GraphicEngine::activateLights(IRenderer* renderer)
 IShaderProgram* GMDx11GraphicEngine::getShaderProgram(GMShaderProgramType type)
 {
 	D(d);
-	return d->shaderProgram;
+	return d->shaderProgram.get();
 }
 
 IFramebuffers* GMDx11GraphicEngine::getDefaultFramebuffers()

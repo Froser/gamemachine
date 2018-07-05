@@ -13,10 +13,12 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
+GM_PRIVATE_DESTRUCT_DEFAULT_IMPLEMENT(GMLua)
+
 GMLua::GMLua()
 {
 	D(d);
-	d->luaState.reset(luaL_newstate());
+	d->luaState = GMOwnedPtr<lua_State, GMLuaStatusDeleter>(luaL_newstate(), GMLuaStatusDeleter());
 }
 
 GMLuaStatus GMLua::loadFile(const char* file)

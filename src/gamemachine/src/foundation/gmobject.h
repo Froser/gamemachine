@@ -90,6 +90,7 @@ class GMNotAGMObject {};
 #define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
+#define GM_PRIVATE_DESTRUCT_DEFAULT_IMPLEMENT(name) GM_PRIVATE_NAME(name) :: GM_PRIVATE_DESTRUCT(name) = default;
 
 #define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor) \
 	accessor: \

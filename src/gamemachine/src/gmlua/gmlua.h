@@ -19,6 +19,14 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
+struct GMLuaStatusDeleter
+{
+	void operator()(lua_State* l)
+	{
+		lua_close(l);
+	}
+};
+
 enum class GMLuaStatus
 {
 	WrongType = -1,
@@ -178,7 +186,8 @@ struct GMLuaVariable
 
 GM_PRIVATE_OBJECT(GMLua)
 {
-	GMOwnedPtr<lua_State> luaState = nullptr;
+	GM_PRIVATE_DESTRUCT(GMLua);
+	GMOwnedPtr<lua_State, GMLuaStatusDeleter> luaState = nullptr;
 	GMLuaExceptionHandler* exceptionHandler = nullptr;
 };
 
@@ -189,8 +198,6 @@ class GMLua
 public:
 	GMLua();
 	~GMLua() = default;
-	GMLua(GMLua&& lua) GM_NOEXCEPT = default;
-	GMLua& operator= (GMLua&& state) GM_NOEXCEPT = default;
 
 public:
 	GMLuaStatus loadFile(const char* file);
