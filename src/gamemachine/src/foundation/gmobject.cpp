@@ -28,12 +28,12 @@ GMObject::~GMObject()
 
 void GMObject::connect(GMObject& sender, GMSignal signal, const GMEventCallback& callback)
 {
-	sender.addConnection(signal, *this, callback);
+	sender.addConnection(std::move(signal), *this, callback);
 }
 
 void GMObject::disconnect(GMObject& sender, GMSignal signal)
 {
-	sender.removeSignalAndConnection(signal, *this);
+	sender.removeSignalAndConnection(std::move(signal), *this);
 }
 
 void GMObject::addConnection(GMSignal signal, GMObject& receiver, GMEventCallback callback)
@@ -41,7 +41,7 @@ void GMObject::addConnection(GMSignal signal, GMObject& receiver, GMEventCallbac
 	D(d);
 	GMCallbackTarget target = { &receiver, callback };
 	d->slots[signal].push_back(target);
-	receiver.addConnection(this, signal);
+	receiver.addConnection(this, std::move(signal));
 }
 
 void GMObject::removeSignalAndConnection(GMSignal signal, GMObject& receiver)
@@ -51,7 +51,7 @@ void GMObject::removeSignalAndConnection(GMSignal signal, GMObject& receiver)
 	removeSignal(signal, receiver);
 
 	// 移除自己连接到的信号
-	receiver.removeConnection(this, signal);
+	receiver.removeConnection(this, std::move(signal));
 }
 
 void GMObject::emit(GMSignal signal)
@@ -60,7 +60,7 @@ void GMObject::emit(GMSignal signal)
 	if (d->slots.empty())
 		return;
 
-	auto& targets = d->slots[signal];
+	auto& targets = d->slots[std::move(signal)];
 	for (auto& target : targets)
 	{
 		target.callback(this, target.receiver);
@@ -70,7 +70,7 @@ void GMObject::emit(GMSignal signal)
 void GMObject::removeSignal(GMSignal signal, GMObject& receiver)
 {
 	D(d);
-	auto& targets = d->slots[signal];
+	auto& targets = d->slots[std::move(signal)];
 	removeIf(targets, [&](auto iter) {
 		return iter->receiver == &receiver;
 	});
@@ -109,8 +109,8 @@ void GMObject::addConnection(GMObject* host, GMSignal signal)
 	D(d);
 	GMConnectionTarget c;
 	c.host = host;
-	c.name = signal;
-	d->connectionTargets.push_back(c);
+	c.name = std::move(signal);
+	d->connectionTargets.push_back(std::move(c));
 }
 
 void GMObject::removeConnection(GMObject* host, GMSignal signal)
