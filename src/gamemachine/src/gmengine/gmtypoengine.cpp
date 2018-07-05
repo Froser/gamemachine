@@ -201,7 +201,7 @@ GMTypoEngine::~GMTypoEngine()
 	GM_delete(d->stateMachine);
 }
 
-GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptions& options)
+GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start)
 {
 	D(d);
 	d->literature = literature.toStdWString();
@@ -224,9 +224,24 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 	}
 
 	d->options = options;
-	d->current_x = d->current_y = 0;
-	d->currentLineNo = 1;
-	d->results.clear();
+	if (start == 0)
+	{
+		d->results.clear();
+		d->current_x = d->current_y = 0;
+		d->currentLineNo = 1;
+	}
+	else
+	{
+		// 从某一个点开始局部排版
+		// 我们不知道此时的排版结果，所以我们只能拿上一个非换行字符的结果，并且从上一个非换行字符开始排版
+		--start;
+		decltype(auto) last = d->results[start];
+		d->current_x = last.x;
+		d->current_y = last.y;
+		d->currentLineNo = last.lineNo;
+		d->results.erase(d->results.begin() + start, d->results.end());
+	}
+
 	setFontSize(d->options.defaultFontSize);
 
 	const std::wstring& wstr = literature.toStdWString();
@@ -261,7 +276,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 
 	GMint rows = 0;
 	GMsize_t len = wstr.length();
-	for (GMsize_t i = 0; i < len; ++i)
+	for (GMsize_t i = start; i < len; ++i)
 	{
 		GMTypoResult result = getTypoResult(i);
 		if (!result.valid)
@@ -446,7 +461,7 @@ void GMTypoTextBuffer::setBuffer(const GMString& buffer)
 {
 	D(d);
 	d->buffer = buffer.replace(L"\r", L""); //去掉\r
-	setDirty();
+	markDirty();
 }
 
 void GMTypoTextBuffer::setSize(const GMRect& rc)
@@ -454,7 +469,7 @@ void GMTypoTextBuffer::setSize(const GMRect& rc)
 	D(d);
 	d->rc = rc;
 	d->rc.x = d->rc.y = 0;
-	setDirty();
+	markDirty();
 }
 
 void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
@@ -464,7 +479,7 @@ void GMTypoTextBuffer::setChar(GMsize_t pos, GMwchar ch)
 	if (ch == '\r')
 		return;
 
-	setDirty();
+	markDirty();
 }
 
 bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
@@ -487,7 +502,7 @@ bool GMTypoTextBuffer::insertChar(GMsize_t pos, GMwchar ch)
 		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
 		d->buffer = std::move(newStr);
 	}
-	setDirty();
+	markDirty();
 	return true;
 }
 
@@ -508,7 +523,7 @@ bool GMTypoTextBuffer::insertString(GMsize_t pos, const GMString& str)
 		newStr.append(d->buffer.substr(pos, d->buffer.length() - pos));
 		d->buffer = std::move(newStr);
 	}
-	setDirty();
+	markDirty();
 	return true;
 }
 
@@ -522,7 +537,7 @@ bool GMTypoTextBuffer::removeChar(GMsize_t pos)
 	if (pos + 1 < d->buffer.length())
 		newStr += d->buffer.substr(pos + 1, d->buffer.length() - pos - 1);
 	d->buffer = std::move(newStr);
-	setDirty();
+	markDirty();
 	return true;
 }
 
@@ -547,7 +562,7 @@ bool GMTypoTextBuffer::removeChars(GMsize_t startPos, GMsize_t endPos)
 	if (endPos < d->buffer.length())
 		newStrA.append(d->buffer.substr(endPos, d->buffer.length() - endPos));
 	d->buffer = std::move(newStrA);
-	setDirty();
+	markDirty();
 	return true;
 }
 
@@ -562,7 +577,7 @@ GMint GMTypoTextBuffer::getLineHeight()
 {
 	D(d);
 	if (d->dirty)
-		analyze();
+		analyze(0);
 
 	return d->engine->getResults().lineHeight;
 }
@@ -578,14 +593,14 @@ GMwchar GMTypoTextBuffer::getChar(GMsize_t pos)
 	return d->buffer[pos];
 }
 
-void GMTypoTextBuffer::analyze()
+void GMTypoTextBuffer::analyze(GMint start)
 {
 	D(d);
 	GMTypoOptions options;
 	options.typoArea = d->rc;
 	options.newline = false;
 	options.plainText = isPlainText();
-	d->engine->begin(d->buffer, options);
+	d->engine->begin(d->buffer, options, start);
 	d->dirty = false;
 }
 
@@ -602,7 +617,7 @@ bool GMTypoTextBuffer::CPtoX(GMint cp, bool trail, GMint* x)
 	}
 
 	if (d->dirty)
-		analyze();
+		analyze(cp);
 
 	auto& r = d->engine->getResults().results;
 	if (cp >= getLength())
@@ -629,7 +644,7 @@ bool GMTypoTextBuffer::XtoCP(GMint x, GMint* cp, bool* trail)
 	}
 
 	if (d->dirty)
-		analyze();
+		analyze(0);
 
 	auto& r = d->engine->getResults().results;
 	for (GMsize_t i = 0; i < r.size() - 1; ++i)

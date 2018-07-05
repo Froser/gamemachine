@@ -77,7 +77,7 @@ struct GMTypoResultInfo
 
 GM_INTERFACE(ITypoEngine)
 {
-	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) = 0;
+	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start = 0) = 0;
 	virtual GMTypoIterator end() = 0;
 	virtual void setFont(GMFontHandle) = 0;
 	virtual void setLineHeight(GMint) = 0;
@@ -167,7 +167,7 @@ public:
 	~GMTypoEngine();
 
 public:
-	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options) override;
+	virtual GMTypoIterator begin(const GMString& literature, const GMTypoOptions& options, GMsize_t start) override;
 	virtual GMTypoIterator end() override;
 	virtual void setFont(GMFontHandle font) override;
 	virtual void setLineHeight(GMint lineHeight) override;
@@ -240,14 +240,14 @@ public:
 	// 排版相关
 public:
 	virtual bool isPlainText() GM_NOEXCEPT;
-	virtual void analyze();
+	virtual void analyze(GMint start);
 	virtual bool CPtoX(GMint cp, bool trail, GMint* x);
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail);
 	virtual void getPriorItemPos(GMint cp, GMint* prior);
 	virtual void getNextItemPos(GMint cp, GMint* next);
 
 protected:
-	inline void setDirty()
+	inline void markDirty()
 	{
 		D(d);
 		d->dirty = true;

@@ -26,7 +26,7 @@ public:
 	GMMultiLineTypoTextBuffer() = default;
 
 public:
-	virtual void analyze() override;
+	virtual void analyze(GMint start) override;
 	virtual bool CPtoX(GMint cp, bool trail, GMint* x) { GM_ASSERT(false); return false; }
 	virtual bool XtoCP(GMint x, GMint* cp, bool* trail) { GM_ASSERT(false); return false; }
 	virtual bool CPtoXY(GMint cp, bool trail, GMint* x, GMint* y);
@@ -59,7 +59,7 @@ public:
 	}
 };
 
-void GMMultiLineTypoTextBuffer::analyze()
+void GMMultiLineTypoTextBuffer::analyze(GMint start)
 {
 	D(d);
 	D_BASE(db, Base);
@@ -69,7 +69,7 @@ void GMMultiLineTypoTextBuffer::analyze()
 	options.plainText = isPlainText();
 	options.lineSpacing = d->lineSpacing;
 	db->engine->setLineHeight(d->lineHeight);
-	db->engine->begin(db->buffer, options);
+	db->engine->begin(db->buffer, options, start);
 	db->dirty = false;
 }
 
@@ -87,7 +87,7 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 	}
 
 	if (d->dirty)
-		analyze();
+		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp >= getLength())
@@ -137,7 +137,7 @@ bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint cp, GMint* x, GMint* y)
 	}
 
 	if (d->dirty)
-		analyze();
+		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp >= getLength())
@@ -158,7 +158,7 @@ bool GMMultiLineTypoTextBuffer::XYtoCP(GMint x, GMint y, GMint* cp)
 		return false;
 
 	if (d->dirty)
-		analyze();
+		analyze(0);
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (r.empty())
@@ -217,7 +217,7 @@ GMint GMMultiLineTypoTextBuffer::CPToLineNumber(GMint cp)
 		return 1;
 
 	if (d->dirty)
-		analyze();
+		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp > static_cast<GMint>(r.size()))
@@ -230,7 +230,7 @@ GMint GMMultiLineTypoTextBuffer::findFirstCPInOneLine(GMint cp)
 {
 	D_BASE(d, Base);
 	if (d->dirty)
-		analyze();
+		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp >= static_cast<GMint>(r.size()))
@@ -249,7 +249,7 @@ GMint GMMultiLineTypoTextBuffer::findLastCPInOneLine(GMint cp)
 {
 	D_BASE(d, Base);
 	if (d->dirty)
-		analyze();
+		analyze(cp);
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp >= static_cast<GMint>(r.size()))
