@@ -69,7 +69,7 @@ GMString::GMString(const GMString& s)
 	*this = s;
 }
 
-GMString::GMString(GMString&& str) noexcept
+GMString::GMString(GMString&& str) GM_NOEXCEPT
 {
 	using namespace std;
 	*this = move(str);

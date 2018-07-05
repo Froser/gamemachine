@@ -1,8 +1,9 @@
 ﻿#include "stdafx.h"
 #include "gmlua.h"
 #include "gmlua_functions.h"
+#include "foundation/utilities/tools.h"
 
-#define L (d->luaState)
+#define L (d->luaState.get())
 
 #define POP_GUARD() \
 struct __PopGuard							\
@@ -15,49 +16,7 @@ struct __PopGuard							\
 GMLua::GMLua()
 {
 	D(d);
-	L = luaL_newstate();
-	d->ref = new GMuint(1);
-}
-
-GMLua::GMLua(lua_State* l)
-{
-	D(d);
-	d->weakRef = true;
-	L = l;
-}
-
-GMLua::~GMLua()
-{
-	D(d);
-	if (!d->weakRef && d->ref)
-	{
-		(*d->ref)--;
-		if (*d->ref == 0)
-		{
-			if (L)
-				lua_close(L);
-			delete d->ref;
-			d->ref = nullptr;
-			L = nullptr;
-		}
-	}
-}
-
-GMLua::GMLua(const GMLua& lua)
-{
-	*this = lua;
-}
-
-GMLua& GMLua::operator= (const GMLua& state)
-{
-	D(d);
-	if (&state == this)
-		return *this;
-	D_OF(state_d, &state);
-	d->luaState = state_d->luaState;
-	d->ref = state_d->ref;
-	(*d->ref)++;
-	return *this;
+	d->luaState.reset(luaL_newstate());
 }
 
 GMLuaStatus GMLua::loadFile(const char* file)
@@ -73,7 +32,10 @@ GMLuaStatus GMLua::loadBuffer(const GMBuffer& buffer)
 	D(d);
 	GM_ASSERT(L);
 	loadLibrary();
-	return (GMLuaStatus)(luaL_loadbuffer(L, (const char*) buffer.buffer, buffer.size, 0) || lua_pcall(L, 0, LUA_MULTRET, 0));
+	GMLuaStatus s = static_cast<GMLuaStatus>(luaL_loadbuffer(L, (const char*)buffer.buffer, buffer.size, 0));
+	if (s != GMLuaStatus::Ok)
+		return s;
+	return static_cast<GMLuaStatus>(lua_pcall(L, 0, LUA_MULTRET, 0));
 }
 
 void GMLua::setGlobal(const char* name, const GMLuaVariable& var)
@@ -125,7 +87,7 @@ GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GM
 GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
 {
 	GMLuaStatus result = callp(functionName, args, nRet);
-	if (result == GMLuaStatus::OK)
+	if (result == GMLuaStatus::Ok)
 	{
 		for (GMint i = 0; i < nRet; i++)
 		{
@@ -138,13 +100,13 @@ GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GM
 GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet)
 {
 	GMLuaStatus result = callp(functionName, args, nRet);
-	if (result == GMLuaStatus::OK)
+	if (result == GMLuaStatus::Ok)
 	{
 		for (GMint i = 0; i < nRet; i++)
 		{
 			POP_GUARD();
 			if (!getTable(returns[i]))
-				return GMLuaStatus::WRONG_TYPE;
+				return GMLuaStatus::WrongType;
 		}
 	}
 	return result;
@@ -183,7 +145,7 @@ GMLuaStatus GMLua::callp(const char* functionName, const std::initializer_list<G
 
 	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
 	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, (GMuint)args.size(), nRet, 0);
-	if (result != GMLuaStatus::OK)
+	if (result != GMLuaStatus::Ok)
 	{
 		const char* msg = lua_tostring(L, -1);
 		callExceptionHandler(result, msg);

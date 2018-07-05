@@ -53,7 +53,7 @@ public:
 	/*!
 	  \param str 字符串源。
 	*/
-	GMString(GMString&& str) noexcept;
+	GMString(GMString&& str) GM_NOEXCEPT;
 
 	//! 从一个C风格字符串中构造一个字符串。
 	/*!
@@ -158,7 +158,7 @@ public:
 	  \param str 目标字符串。
 	  \return 此字符串自身的引用。
 	*/
-	GMString& operator = (GMString&& s) noexcept
+	GMString& operator = (GMString&& s) GM_NOEXCEPT
 	{
 		D_STR(d);
 		using namespace std;

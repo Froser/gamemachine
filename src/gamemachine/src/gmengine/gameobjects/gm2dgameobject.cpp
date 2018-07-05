@@ -179,7 +179,7 @@ void GMTextGameObject::setLineSpacing(GMint lineSpacing) GM_NOEXCEPT
 void GMTextGameObject::setTextBuffer(GMTypoTextBuffer* textBuffer) GM_NOEXCEPT
 {
 	D(d);
-	if (d->textBuffer != textBuffer)
+	if (d->textBuffer != textBuffer || d->drawMode != GMTextDrawMode::UseBuffer)
 	{
 		d->textBuffer = textBuffer;
 		markDirty();

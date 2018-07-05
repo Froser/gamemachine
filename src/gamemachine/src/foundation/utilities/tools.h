@@ -8,130 +8,8 @@ BEGIN_NS
 
 // 此类包含了各种实用工具
 // GMScopePtr:
-template<class Type>
-struct GMScopePtrRef
-{
-	explicit GMScopePtrRef(Type *right)
-		: m_ref(right)
-	{
-	}
-
-	Type *m_ref;
-};
-
-template<class Type>
-class GMScopePtr
-{
-public:
-	typedef GMScopePtr<Type> MyType;
-	typedef Type ElementType;
-
-	explicit GMScopePtr(Type *ptr = nullptr)
-		: m_ptr(ptr)
-	{
-	}
-
-	GMScopePtr(MyType& right)
-		: m_ptr(right.release())
-	{
-	}
-
-	GMScopePtr(GMScopePtrRef<Type> right)
-	{
-		Type *ptr = right.m_ref;
-		right.m_ref = 0;
-		m_ptr = ptr;
-	}
-
-	template<class OtherType>
-	operator GMScopePtr<OtherType>()
-	{
-		return (GMScopePtr<OtherType>(*this));
-	}
-
-	template<class OtherType>
-	operator GMScopePtrRef<OtherType>()
-	{
-		OtherType *Cvtptr = m_ptr;
-		GMScopePtrRef<OtherType> _Ans(Cvtptr);
-		m_ptr = 0;
-		return (_Ans);
-	}
-
-	template<class OtherType>
-	MyType& operator=(GMScopePtr<OtherType>& right)
-	{
-		reset(right.release());
-		return (*this);
-	}
-
-	template<class OtherType>
-	GMScopePtr(GMScopePtr<OtherType>& right)
-		: m_ptr(right.release())
-	{
-	}
-
-	MyType& operator=(MyType& right)
-	{
-		reset(right.release());
-		return (*this);
-	}
-
-	MyType& operator=(GMScopePtrRef<Type> right)
-	{
-		Type *ptr = right.m_ref;
-		right.m_ref = 0;
-		reset(ptr);
-		return (*this);
-	}
-
-	~GMScopePtr()
-	{
-		delete m_ptr;
-	}
-
-	Type& operator*() const
-	{
-		return (*get());
-	}
-
-	Type *operator->() const
-	{
-		return (get());
-	}
-
-	Type *get() const
-	{
-		return (m_ptr);
-	}
-
-	Type *release()
-	{
-		Type *_Tmp = m_ptr;
-		m_ptr = 0;
-		return (_Tmp);
-	}
-
-	operator Type *()
-	{
-		return (m_ptr);
-	}
-
-	operator bool()
-	{
-		return !!m_ptr;
-	}
-
-	void reset(Type *ptr = nullptr)
-	{
-		if (m_ptr && ptr != m_ptr)
-			delete m_ptr;
-		m_ptr = ptr;
-	}
-
-private:
-	Type *m_ptr;
-};
+template <typename T, typename DeleteFunc = std::default_delete<T>>
+using GMScopePtr = GMOwnedPtr<T, DeleteFunc>;
 
 //GMClock
 GM_PRIVATE_OBJECT(GMClock)
@@ -436,6 +314,13 @@ class GMManualResetEvent : public GMEvent
 {
 public:
 	GMManualResetEvent(bool initialState = false);
+};
+
+// Atomic
+struct GMAtomic
+{
+	static void increase(GMuint* n);
+	static void decrease(GMuint* n);
 };
 
 // Unit conversion

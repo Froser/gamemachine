@@ -56,7 +56,7 @@ public:
 		return m_ref;
 	}
 
-	void swap(GMConstructHelper<T>& another) noexcept
+	void swap(GMConstructHelper<T>& another) GM_NOEXCEPT
 	{
 		GM_SWAP(m_ref, another.m_ref);
 	}
@@ -111,8 +111,8 @@ class GMNotAGMObject {};
 	GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, protected) \
 	GM_DECLARE_SETTER_ACCESSOR(name, memberName, paramType, protected)
 
-#define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) noexcept = delete;
-#define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) noexcept = delete;
+#define GM_DISABLE_COPY(clsName) public: clsName(const clsName&) = delete; clsName(clsName&&) GM_NOEXCEPT = delete;
+#define GM_DISABLE_ASSIGN(clsName) public: clsName& operator =(const clsName&) = delete; clsName& operator =(clsName&&) GM_NOEXCEPT = delete;
 
 #define GM_ALLOW_COPY_DATA(clsName) \
 	public: \
@@ -120,9 +120,9 @@ class GMNotAGMObject {};
 	clsName& operator=(const clsName& o) { D(d); copyData(o); return *this; } \
 	void copyData(const clsName& another) { D(d); D_OF(d_another, &another); *d = *d_another; \
 		(static_cast<Base*>(this))->copyData(static_cast<const Base&>(another)); } \
-	clsName(clsName&& o) noexcept { swapData(std::move(o)); } \
-	clsName& operator=(clsName&& o) noexcept { D(d); swapData(std::move(o)); return *this; } \
-	void swapData(clsName&& another) noexcept { m_data.swap(another.m_data); \
+	clsName(clsName&& o) GM_NOEXCEPT { swapData(std::move(o)); } \
+	clsName& operator=(clsName&& o) GM_NOEXCEPT { D(d); swapData(std::move(o)); return *this; } \
+	void swapData(clsName&& another) GM_NOEXCEPT { m_data.swap(another.m_data); \
 		(static_cast<Base*>(this))->swapData(std::move(static_cast<Base&>(another))); }
 
 #define GM_FRIEND_CLASS(clsName) \
@@ -277,7 +277,7 @@ public:
 	GMObject允许交换其私有数据。<BR>
 	\param another 交换私有数据的目标对象，将目标对象的私有数据交换到此对象。
 	*/
-	void swapData(GMObject&& another) noexcept
+	void swapData(GMObject&& another) GM_NOEXCEPT
 	{
 		m_data.swap(another.m_data);
 	}
@@ -336,8 +336,8 @@ struct GMBuffer
 	~GMBuffer();
 
 	GMBuffer(const GMBuffer& rhs);
-	GMBuffer(GMBuffer&& rhs) noexcept;
-	GMBuffer& operator =(GMBuffer&& rhs) noexcept;
+	GMBuffer(GMBuffer&& rhs) GM_NOEXCEPT;
+	GMBuffer& operator =(GMBuffer&& rhs) GM_NOEXCEPT;
 	GMBuffer& operator =(const GMBuffer& rhs);
 
 	void convertToStringBuffer();

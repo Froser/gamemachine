@@ -135,12 +135,12 @@ GMBuffer::GMBuffer(const GMBuffer& rhs)
 	*this = rhs;
 }
 
-GMBuffer::GMBuffer(GMBuffer&& rhs) noexcept
+GMBuffer::GMBuffer(GMBuffer&& rhs) GM_NOEXCEPT
 {
 	swap(rhs);
 }
 
-GMBuffer& GMBuffer::operator =(GMBuffer&& rhs) noexcept
+GMBuffer& GMBuffer::operator =(GMBuffer&& rhs) GM_NOEXCEPT
 {
 	swap(rhs);
 	return *this;

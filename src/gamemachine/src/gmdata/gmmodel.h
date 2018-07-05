@@ -240,7 +240,7 @@ public:
 	inline GMModelDataProxy* getModelDataProxy()
 	{
 		D(d);
-		return d->modelDataProxy;
+		return d->modelDataProxy.get();
 	}
 
 	inline void addMesh(GMMesh* mesh)

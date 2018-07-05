@@ -3,14 +3,14 @@
 #include <gmcommon.h>
 #include <linearmath.h>
 
-BEGIN_NS
-
 extern "C"
 {
 #include <lua.h>
 }
 
-#define L (d->luaState)
+BEGIN_NS
+
+#define L (d->luaState.get())
 #define POP_GUARD() \
 struct __PopGuard							\
 {											\
@@ -21,12 +21,13 @@ struct __PopGuard							\
 
 enum class GMLuaStatus
 {
-	WRONG_TYPE = -1,
-	OK = LUA_OK,
-	ERRRUN = LUA_ERRRUN,
-	ERRMEM = LUA_ERRMEM,
-	ERRERR = LUA_ERRERR,
-	ERRGCMM = LUA_ERRGCMM,
+	WrongType = -1,
+	Ok = LUA_OK,
+	RuntimeError = LUA_ERRRUN,
+	SyntaxError = LUA_ERRSYNTAX,
+	MemoryError = LUA_ERRMEM,
+	ErrorHandlerError = LUA_ERRERR,
+	GCError = LUA_ERRGCMM,
 };
 
 GM_INTERFACE(GMLuaExceptionHandler)
@@ -77,12 +78,12 @@ struct GMLuaVariable
 		return *this;
 	}
 
-	GMLuaVariable(GMLuaVariable&& v) noexcept
+	GMLuaVariable(GMLuaVariable&& v) GM_NOEXCEPT
 	{
 		*this = std::move(v);
 	}
 
-	GMLuaVariable& operator=(GMLuaVariable&& v) noexcept
+	GMLuaVariable& operator=(GMLuaVariable&& v) GM_NOEXCEPT
 	{
 		if (&v == this)
 			return *this;
@@ -177,10 +178,8 @@ struct GMLuaVariable
 
 GM_PRIVATE_OBJECT(GMLua)
 {
-	bool weakRef = false;
-	lua_State* luaState = nullptr;
+	GMOwnedPtr<lua_State> luaState = nullptr;
 	GMLuaExceptionHandler* exceptionHandler = nullptr;
-	GMuint* ref = nullptr;
 };
 
 class GMLua
@@ -189,12 +188,9 @@ class GMLua
 
 public:
 	GMLua();
-	~GMLua();
-	GMLua(lua_State* l);
-	GMLua(const GMLua& lua);
-	GMLua(GMLua&& lua) noexcept;
-	GMLua& operator= (const GMLua& state);
-	GMLua& operator= (GMLua&& state) noexcept;
+	~GMLua() = default;
+	GMLua(GMLua&& lua) GM_NOEXCEPT = default;
+	GMLua& operator= (GMLua&& state) GM_NOEXCEPT = default;
 
 public:
 	GMLuaStatus loadFile(const char* file);
@@ -216,7 +212,7 @@ public:
 	template <size_t _size> GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
 	{
 		GMLuaStatus result = callp(functionName, args, _size);
-		if (result == GMLuaStatus::OK)
+		if (result == GMLuaStatus::Ok)
 		{
 			for (GMint i = 0; i < _size; i++)
 			{
@@ -229,7 +225,7 @@ public:
 	operator lua_State*()
 	{
 		D(d);
-		return d->luaState;
+		return d->luaState.get();
 	}
 
 
