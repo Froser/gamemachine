@@ -393,7 +393,9 @@ void GMWidget::addTextArea(
 	GMint width,
 	GMint height,
 	bool isDefault,
-	const GMRect& cornerRect,
+	bool hasScrollBar,
+	const GMRect& textAreaCornerRect,
+	const GMRect& scrollBarThumbCornerRect,
 	OUT GMControlTextArea** out
 )
 {
@@ -406,9 +408,12 @@ void GMWidget::addTextArea(
 	textArea->setPosition(x, y);
 	textArea->setSize(width, height);
 	textArea->setIsDefault(isDefault);
+	textArea->setScrollBar(hasScrollBar);
+	if (hasScrollBar)
+		textArea->getScrollBar()->setThumbCorner(scrollBarThumbCornerRect);
 
 	GMControlBorder* border = textArea->getBorder();
-	border->setCorner(cornerRect);
+	border->setCorner(textAreaCornerRect);
 
 	if (out)
 		*out = textArea;
@@ -420,6 +425,7 @@ void GMWidget::addScrollBar(
 	GMint width,
 	GMint height,
 	bool isDefault,
+	const GMRect& scrollBarThumbCornerRect,
 	OUT GMControlScrollBar** out
 )
 {
@@ -431,6 +437,7 @@ void GMWidget::addScrollBar(
 	scrollBar->setPosition(x, y);
 	scrollBar->setSize(width, height);
 	scrollBar->setIsDefault(isDefault);
+	scrollBar->setThumbCorner(scrollBarThumbCornerRect);
 
 	if (out)
 		*out = scrollBar;

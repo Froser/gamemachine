@@ -288,18 +288,13 @@ GMControlTextEdit::GMControlTextEdit(GMWidget* widget)
 	: GMControl(widget)
 {
 	D(d);
-	d->borderControl = new GMControlTextEditBorder(widget);
-	d->buffer = new GMTypoTextBuffer();
+	d->borderControl = gm_makeOwnedPtr<GMControlTextEditBorder>(widget);
+	d->buffer = gm_makeOwnedPtr<GMTypoTextBuffer>();
 	createBufferTypoEngineIfNotExist();
 	initStyles(widget);
 }
 
-GMControlTextEdit::~GMControlTextEdit()
-{
-	D(d);
-	GM_delete(d->borderControl);
-	GM_delete(d->buffer);
-}
+GMControlTextEdit::~GMControlTextEdit() = default;
 
 void GMControlTextEditBorder::initStyles(GMWidget* widget)
 {
@@ -358,7 +353,7 @@ void GMControlTextEdit::render(GMfloat elapsed)
 	setBufferRenderRange(firstX);
 
 	// 不允许换行
-	widget->drawText(d->buffer, d->textStyle, d->rcText, false);
+	widget->drawText(d->buffer.get(), d->textStyle, d->rcText, false);
 }
 
 void GMControlTextEdit::setSize(GMint width, GMint height)
@@ -1042,8 +1037,8 @@ GMControlTextArea::GMControlTextArea(GMWidget* widget)
 {
 	D(d);
 	D_BASE(db, Base);
-	GM_delete(db->buffer);
-	db->buffer = d->buffer = new GMMultiLineTypoTextBuffer();
+	d->buffer = new GMMultiLineTypoTextBuffer();
+	db->buffer.reset(d->buffer);
 	setLineHeight(16);
 	createBufferTypoEngineIfNotExist();
 }

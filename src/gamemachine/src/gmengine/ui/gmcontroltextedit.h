@@ -15,10 +15,10 @@ GM_PRIVATE_OBJECT(GMControlTextEdit)
 	GMint cp = 0;
 	GMint firstVisibleCP = 0;
 	GMint selectionStartCP = 0;
-	GMTypoTextBuffer* buffer = nullptr;
 	GMRect rcText;
 	GMStyle textStyle;
-	GMControlBorder* borderControl = nullptr;
+	GMOwnedPtr<GMTypoTextBuffer> buffer;
+	GMOwnedPtr<GMControlBorder> borderControl;
 	GMint borderWidth = 5;
 	GMfloat lastBlink = 0;
 	GMfloat deltaBlink = .5f;
@@ -103,7 +103,7 @@ public:
 	inline GMControlBorder* getBorder() GM_NOEXCEPT
 	{
 		D(d);
-		return d->borderControl;
+		return d->borderControl.get();
 	}
 
 	inline void setBorderWidth(GMint width) GM_NOEXCEPT
@@ -189,6 +189,13 @@ public:
 	void setScrollBar(bool scrollBar);
 	void setLineSpacing(GMint lineSpacing) GM_NOEXCEPT;
 	void setLineHeight(GMint lineHeight) GM_NOEXCEPT;
+
+public:
+	inline GMControlScrollBar* getScrollBar() GM_NOEXCEPT
+	{
+		D(d);
+		return d->scrollBar.get();
+	}
 
 protected:
 	void setBufferRenderRange(GMint xFirst, GMint yFirst);

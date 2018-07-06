@@ -349,12 +349,6 @@ bool GMControlBorder::containsPoint(const GMPoint& point)
 	return false;
 }
 
-void GMControlBorder::setCorner(const GMRect& corner)
-{
-	D(d);
-	d->corner = corner;
-}
-
 void GMControlBorder::initStyles(GMWidget* widget)
 {
 	D(d);
@@ -500,7 +494,6 @@ void GMControlScrollBar::render(GMfloat elapsed)
 
 	d->styleUp.getTextureColor().blend(state, elapsed);
 	d->styleDown.getTextureColor().blend(state, elapsed);
-	d->styleThumb.getTextureColor().blend(state, elapsed);
 	d->styleTrack.getTextureColor().blend(state, elapsed);
 
 	GMWidget* widget = getParent();
@@ -509,7 +502,22 @@ void GMControlScrollBar::render(GMfloat elapsed)
 	widget->drawSprite(d->styleDown, d->rcDown, .99f);
 	widget->drawSprite(d->styleTrack, d->rcTrack, .99f);
 	if (d->showThumb)
-		widget->drawSprite(d->styleThumb, d->rcThumb, .99f);
+	{
+		const GMRect& thumbCorner = d->thumb->getCorner();
+		if (thumbCorner.width * 2 < d->rcThumb.width && thumbCorner.height * 2 < d->rcThumb.height)
+		{
+			d->thumb->setPosition(d->rcThumb.x, d->rcThumb.y);
+			d->thumb->setSize(d->rcThumb.width, d->rcThumb.height);
+			d->thumb->render(elapsed);
+		}
+		else
+		{
+			// 绘制空间不足，使用整个素材来绘制
+			GMStyle& thumbStyle = getStyle((GMControl::StyleType) Thumb);
+			thumbStyle.getTextureColor().blend(GMControlState::Normal, elapsed);
+			widget->drawSprite(thumbStyle, d->rcThumb, .99f);
+		}
+	}
 }
 
 void GMControlScrollBar::initStyles(GMWidget* widget)
@@ -530,19 +538,58 @@ void GMControlScrollBar::initStyles(GMWidget* widget)
 	styleDown.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarDown));
 	styleDown.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 
-	GMStyle& styleThumb = d->styleThumb;
-	styleThumb = styleTemplate;
-	styleThumb.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarThumb));
-
 	GMStyle& styleTrack = d->styleTrack;
 	styleTrack = styleTemplate;
 	styleTrack.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarTrack));
 	styleTrack.setTextureColor(GMControlState::Disabled, GMVec4(.87f, .87f, .87f, 1));
 }
 
+class GMControlScrollBarThumb : public GMControlBorder
+{
+public:
+	enum StyleType
+	{
+		Thumb
+	};
+
+public:
+	GMControlScrollBarThumb(GMWidget* widget) : GMControlBorder(widget) { initStyles(widget); }
+
+public:
+	virtual GMStyle& getStyle(GMControl::StyleType style) override;
+
+private:
+	void initStyles(GMWidget* widget);
+};
+
+void GMControlScrollBarThumb::initStyles(GMWidget* widget)
+{
+	D(d);
+	d->borderStyle.setTextureColor(GMControlState::Normal, GMVec4(1, 1, 1, .58f));
+	d->borderStyle.setTextureColor(GMControlState::Focus, GMVec4(1, 1, 1, .78f));
+	d->borderStyle.setTextureColor(GMControlState::Disabled, GMVec4(1, 1, 1, .27f));
+	d->borderStyle.setTexture(GMWidgetResourceManager::Skin, widget->getArea(GMTextureArea::ScrollBarThumb));
+}
+
+GMStyle& GMControlScrollBarThumb::getStyle(GMControl::StyleType style)
+{
+	D(d);
+	if (style == (GMControl::StyleType)Thumb)
+		return d->borderStyle;
+	return GMControl::getStyle(style);
+}
+
 GM_DEFINE_SIGNAL(GMControlScrollBar::valueChanged)
 GM_DEFINE_SIGNAL(GMControlScrollBar::startDragThumb)
 GM_DEFINE_SIGNAL(GMControlScrollBar::endDragThumb)
+
+GMControlScrollBar::GMControlScrollBar(GMWidget* widget)
+	: Base(widget) 
+{
+	D(d);
+	initStyles(widget);
+	d->thumb = gm_makeOwnedPtr<GMControlScrollBarThumb>(widget);
+}
 
 void GMControlScrollBar::setMaximum(GMint maximum)
 {
@@ -573,6 +620,12 @@ void GMControlScrollBar::setValue(GMint value)
 	}
 
 	updateThumbRect();
+}
+
+void GMControlScrollBar::setThumbCorner(const GMRect& corner)
+{
+	D(d);
+	d->thumb->setCorner(corner);
 }
 
 void GMControlScrollBar::updateRect()
@@ -618,7 +671,7 @@ GMStyle& GMControlScrollBar::getStyle(GMControl::StyleType style)
 	case GMControlScrollBar::Track:
 		return d->styleTrack;
 	case GMControlScrollBar::Thumb:
-		return d->styleThumb;
+		return d->thumb->getStyle((GMControl::StyleType) GMControlScrollBarThumb::Thumb);
 	default:
 		GM_ASSERT(false);
 		return Base::getStyle(style);

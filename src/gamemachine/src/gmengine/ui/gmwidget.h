@@ -393,7 +393,9 @@ public:
 		GMint width,
 		GMint height,
 		bool isDefault,
-		const GMRect& cornerRect,
+		bool hasScrollBar,
+		const GMRect& textAreaCornerRect,
+		const GMRect& scrollBarThumbCornerRect,
 		OUT GMControlTextArea** out
 	);
 
@@ -403,6 +405,7 @@ public:
 		GMint width,
 		GMint height,
 		bool isDefault,
+		const GMRect& scrollBarThumbCornerRect,
 		OUT GMControlScrollBar** out
 	);
 

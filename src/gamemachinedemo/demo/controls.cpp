@@ -101,13 +101,14 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 	getDemoWorldReference()->getContext()->getWindow()->addWidget(d->mainWidget.get());
 
 	gm::GMint top = 10;
-
+	gm::GMRect thumbCorner = { 0, 0, 7, 15 };
 	d->mainWidget->addScrollBar(
 		550,
 		20,
 		20,
 		200,
 		false,
+		thumbCorner,
 		nullptr
 	);
 
@@ -168,11 +169,12 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		500,
 		100,
 		false,
+		true,
 		txtCorner,
+		thumbCorner,
 		&textArea
 	);
 	textArea->setPadding(5, 10);
-	textArea->setScrollBar(true);
 
 	gm::GMControlTextArea* textArea2 = nullptr;
 	d->mainWidget->addTextArea(
@@ -182,7 +184,9 @@ gm::GMWidget* Demo_Controls::createDefaultWidget()
 		500,
 		100,
 		false,
+		false,
 		txtCorner,
+		thumbCorner,
 		&textArea2
 	);
 	textArea2->setPadding(5, 10);

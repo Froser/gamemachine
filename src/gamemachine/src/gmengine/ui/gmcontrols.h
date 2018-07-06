@@ -194,17 +194,23 @@ public:
 	virtual void setPosition(GMint x, GMint y)
 	{
 		D(d);
-		d->x = x;
-		d->y = y;
-		updateRect();
+		if (d->x != x || d->y != y)
+		{
+			d->x = x;
+			d->y = y;
+			updateRect();
+		}
 	}
 
 	virtual void setSize(GMint width, GMint height)
 	{
 		D(d);
-		d->width = width;
-		d->height = height;
-		updateRect();
+		if (d->width != width || d->height != height)
+		{
+			d->width = width;
+			d->height = height;
+			updateRect();
+		}
 	}
 
 	virtual void setIsDefault(bool isDefault)
@@ -362,6 +368,7 @@ GM_PRIVATE_OBJECT(GMControlBorder)
 class GMControlBorder : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
+	GM_DECLARE_PROPERTY(Corner, corner, GMRect);
 
 public:
 	GMControlBorder(GMWidget* widget) : Base(widget) { initStyles(widget); }
@@ -369,9 +376,6 @@ public:
 public:
 	virtual void render(GMfloat elapsed) override;
 	virtual bool containsPoint(const GMPoint& point) override;
-
-public:
-	void setCorner(const GMRect& corner);
 
 private:
 	void initStyles(GMWidget* widget);
@@ -412,11 +416,12 @@ GM_PRIVATE_OBJECT(GMControlScrollBar)
 
 	GMStyle styleUp;
 	GMStyle styleDown;
-	GMStyle styleThumb;
+	GMOwnedPtr<GMControlBorder> thumb;
 	GMStyle styleTrack;
 
 	GMfloat allowClickDelay = .33f;
 	GMfloat allowClickRepeat = .05f;
+
 };
 
 class GMControlScrollBar : public GMControl
@@ -443,12 +448,13 @@ public:
 	};
 
 public:
-	GMControlScrollBar(GMWidget* widget) : Base(widget) { initStyles(widget); }
+	GMControlScrollBar(GMWidget* widget);
 
 public:
 	void setMaximum(GMint maximum);
 	void setMinimum(GMint minimum);
 	void setValue(GMint value);
+	void setThumbCorner(const GMRect& corner);
 
 protected:
 	virtual void updateRect() override;
