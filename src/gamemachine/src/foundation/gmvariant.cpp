@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "assert.h"
+#include "gmstring.h"
 #include "gmvariant.h"
 
 #define BEGIN_DEFINE_TYPE_ENUM_MAP() \

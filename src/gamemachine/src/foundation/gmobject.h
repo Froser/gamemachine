@@ -4,6 +4,7 @@
 #include "memory.h"
 #include <functional>
 #include <gmstring.h>
+#include <linearmath.h>
 
 #if __APPLE__
 #	include <string>
@@ -80,6 +81,16 @@ class GMNotAGMObject {};
 #define GM_DECLARE_PRIVATE(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMObject)
 #define GM_DECLARE_PRIVATE_NGO(className) GM_DECLARE_PRIVATE_AND_BASE(className, gm::GMNotAGMObject)
 
+/*! \def GM
+  \brief 。
+
+  表示当前GameMachine运行实例。任何时候都推荐用GM来获取GameMachine实例。由于GameMachine实例为单例，因此
+  不要尝试创建一个新的GameMachine实例。
+*/
+#define GM_DECLARE_PRIVATE_FROM_STRUCT(name, anotherStruct) \
+	typedef anotherStruct GM_PRIVATE_NAME(name); \
+	GM_DECLARE_PRIVATE(name)
+
 // 获取私有成员
 #define D(d) auto d = data()
 #define D_BASE(d, base) auto d = base::data()
@@ -90,7 +101,6 @@ class GMNotAGMObject {};
 #define GM_PRIVATE_OBJECT_FROM(name, extends) class name; GM_ALIGNED_16(struct) name##Private : public extends##Private
 #define GM_PRIVATE_NAME(name) name##Private
 #define GM_PRIVATE_DESTRUCT(name) ~name##Private()
-#define GM_PRIVATE_DESTRUCT_DEFAULT_IMPLEMENT(name) GM_PRIVATE_NAME(name) :: GM_PRIVATE_DESTRUCT(name) = default;
 
 #define GM_DECLARE_GETTER_ACCESSOR(name, memberName, paramType, accessor) \
 	accessor: \
@@ -130,15 +140,18 @@ class GMNotAGMObject {};
 	friend class clsName; \
 	friend struct GM_PRIVATE_NAME(clsName);
 
+class GMObject;
+
 enum class GMMetaMemberType
 {
+	Invalid,
 	Int,
 	Float,
 	Vector2,
 	Vector3,
 	Vector4,
 	Matrix4x4,
-	GMString,
+	String,
 	Boolean,
 	Object,
 };
@@ -152,8 +165,67 @@ struct GMObjectMember
 
 using GMMeta = HashMap<GMString, GMObjectMember, GMStringHashFunctor>;
 
+template <typename T>
+struct GMMetaMemberTypeGetter
+{
+	enum { Type = GMMetaMemberType::Invalid };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMint>
+{
+	enum { Type = GMMetaMemberType::Int };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMfloat>
+{
+	enum { Type = GMMetaMemberType::Float };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMVec2>
+{
+	enum { Type = GMMetaMemberType::Vector2 };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMVec3>
+{
+	enum { Type = GMMetaMemberType::Vector3 };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMVec4>
+{
+	enum { Type = GMMetaMemberType::Vector4 };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMMat4>
+{
+	enum { Type = GMMetaMemberType::Matrix4x4 };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMString>
+{
+	enum { Type = GMMetaMemberType::String };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<bool>
+{
+	enum { Type = GMMetaMemberType::Boolean };
+};
+
+template <>
+struct GMMetaMemberTypeGetter<GMObject*>
+{
+	enum { Type = GMMetaMemberType::Object };
+};
+
 // 信号目标，表示一个GMObject被多少信号连接
-class GMObject;
 using GMEventCallback = std::function<void(GMObject*, GMObject*)>;
 struct GMCallbackTarget
 {
@@ -187,8 +259,14 @@ using GMSlots = HashMap<GMSignal, Vector<GMCallbackTarget>, GMStringHashFunctor>
 	if (db->meta.size() > 0) return true; \
 	base::registerMeta();
 
-#define GM_META(memberName, type) \
-	db->meta[#memberName] = { type, sizeof(d-> memberName), &d->memberName };
+#define GM_META(memberName) \
+{ \
+	GM_STATIC_ASSERT(static_cast<GMMetaMemberType>( GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ) != GMMetaMemberType::Invalid, "Invalid Meta type"); \
+	GMObject::data()->meta[#memberName] = { static_cast<GMMetaMemberType>( GMMetaMemberTypeGetter<decltype(data()-> memberName)>::Type ), sizeof(data()-> memberName), &data()->memberName }; \
+}
+
+#define GM_META_WITH_TYPE(memberName, type) \
+	GMObject::data()->meta[#memberName] = { type, sizeof(data()-> memberName), &data()->memberName };
 
 #define GM_END_META_MAP \
 	return true; }
@@ -238,7 +316,7 @@ public:
 	  对象的元数据将会在第一次返回前构造。元数据反应了此对象的数据成员中的数据类型，提供一种反射机制。
 	  \return 此对象的元数据。
 	*/
-	const GMMeta* meta() { D(d); if (!registerMeta()) return nullptr; return &d->meta; }
+	const GMMeta* meta() const { D(d); if (!const_cast<GMObject*>(this)->registerMeta()) return nullptr; return &d->meta; }
 
 	//! 为此对象绑定一个信号。
 	/*!

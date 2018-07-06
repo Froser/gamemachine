@@ -185,13 +185,9 @@ gm::GMWidget* Demo_Lua::createDefaultWidget()
 void Demo_Lua::runScript()
 {
 	D(d);
-	gm::GMBuffer buf;
-	auto code = d->textCode->getText().toStdString();
-	buf.buffer = const_cast<gm::GMbyte*>(reinterpret_cast<const gm::GMbyte*>(code.data()));
-	buf.size = code.size() + 1;
-	gm::GMLuaStatus state = d->lua.loadBuffer(buf);
-	if (state == gm::GMLuaStatus::SyntaxError)
-		d->lbState->setText(L"Lua脚本出现语法错误。");
+	gm::GMLuaResult lr = d->lua.runString(d->textCode->getText());
+	if (lr.state == gm::GMLuaStates::SyntaxError)
+		d->lbState->setText(L"Lua脚本出现语法错误: " + lr.message);
 	else
 		d->lbState->setText(L"Lua执行成功。");
 }

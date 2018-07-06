@@ -140,6 +140,9 @@ void GMClearSTLContainer(T& c)
 // 表示作为数据输入
 #define IN
 
+// 表示一个方法是个元方法个
+#define GM_META_METHOD
+
 // 用于枚举的宏
 #define GM_FOREACH_ENUM(var, start, end) for (auto var = start; var < end; var = (decltype(var))(((gm::GMint)var)+1) )
 
@@ -203,8 +206,12 @@ GM_STATIC_ASSERT_SIZE(GMint64, 8);
 template <typename T, typename DeleteFunc = std::default_delete<T>>
 using GMOwnedPtr = std::unique_ptr<T, DeleteFunc>;
 
+template <typename T>
+using GMSharedPtr = std::shared_ptr<T>;
+
 #define GM_OWNED
 #define gm_makeOwnedPtr std::make_unique
+#define gm_makeSharedPtr std::make_shared
 
 typedef GMsize_t GMFontHandle;
 constexpr GMsize_t GMInvalidFontHandle = -1;

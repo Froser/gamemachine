@@ -10,7 +10,7 @@ extern "C"
 
 BEGIN_NS
 
-#define L (d->luaState.get())
+#define L (d->luaState)
 #define POP_GUARD() \
 struct __PopGuard							\
 {											\
@@ -19,15 +19,12 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
-struct GMLuaStatusDeleter
+GM_INTERFACE(ILuaFunctionRegister)
 {
-	void operator()(lua_State* l)
-	{
-		lua_close(l);
-	}
+	virtual void registerFunctions(lua_State*) = 0;
 };
 
-enum class GMLuaStatus
+enum class GMLuaStates
 {
 	WrongType = -1,
 	Ok = LUA_OK,
@@ -38,9 +35,15 @@ enum class GMLuaStatus
 	GCError = LUA_ERRGCMM,
 };
 
-GM_INTERFACE(GMLuaExceptionHandler)
+struct GMLuaResult
 {
-	virtual void onException(GMLuaStatus state, const char* msg) = 0;
+	GMLuaStates state;
+	GMString message;
+};
+
+GM_INTERFACE(ILuaExceptionHandler)
+{
+	virtual void onException(GMLuaStates state, const char* msg) = 0;
 };
 
 enum class GMLuaVariableType
@@ -186,40 +189,67 @@ struct GMLuaVariable
 
 GM_PRIVATE_OBJECT(GMLua)
 {
-	GM_PRIVATE_DESTRUCT(GMLua);
-	GMOwnedPtr<lua_State, GMLuaStatusDeleter> luaState = nullptr;
-	GMLuaExceptionHandler* exceptionHandler = nullptr;
+	lua_State* luaState = nullptr;
+	bool isWeakLuaStatePtr = false;
+	ILuaExceptionHandler* exceptionHandler = nullptr;
+	bool libraryLoaded = false;
 };
 
-class GMLua
+class GMLua : public GMObject
 {
-	GM_DECLARE_PRIVATE_NGO(GMLua)
+	GM_DECLARE_PRIVATE(GMLua)
 
 public:
 	GMLua();
-	~GMLua() = default;
+	GMLua(lua_State*);
+	~GMLua();
 
 public:
-	GMLuaStatus loadFile(const char* file);
-	GMLuaStatus loadBuffer(const GMBuffer& buffer);
+	GMLuaResult runFile(const char* file);
+	GMLuaResult runBuffer(const GMBuffer& buffer);
+	GMLuaResult runString(const GMString& string);
 
 	void setGlobal(const char* name, const GMLuaVariable& var);
 	bool setGlobal(const char* name, GMObject& obj);
 	GMLuaVariable getGlobal(const char* name);
 	bool getGlobal(const char* name, GMObject& obj);
-	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
-	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
-	GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
+	GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args);
+	GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet);
+	GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet);
 	bool invoke(const char* expr);
-	void setTable(GMObject& obj);
+
+	//! 将一个对象的成员压入Lua的虚拟堆栈。
+	/*!
+	  在Lua C函数被调用时，使用此方法，将返回一个Lua table。
+	  \param obj 待传入的对象。此对象必须要注册元对象。
+	  \sa GMObject::registerMeta()
+	*/
+	void setTable(const GMObject& obj);
+
+	//! 从Lua虚拟堆栈中取出一个Table，并赋值给指定对象。
+	/*!
+	  在Lua C函数被调用时，使用此方法，将从Lua虚拟堆栈中取出一个Table赋值给指定对象。如果操作的对象不是Table，则操作失败。
+	  \param obj 待接收的对象。此对象必须要注册元对象。
+	  \return 操作是否成功。
+	  \sa GMObject::registerMeta()
+	*/
 	bool getTable(GMObject& obj);
+
+	//! 从Lua虚拟堆栈的指定某一层堆栈中取出一个Table，并赋值给指定对象。
+	/*!
+	  在Lua C函数被调用时，使用此方法，将从Lua虚拟堆栈中取出一个Table赋值给指定对象。如果操作的对象不是Table，则操作失败。
+	  \param obj 待接收的对象。此对象必须要注册元对象。
+	  \param index 指定的堆栈索引。
+	  \return 操作是否成功。
+	  \sa GMObject::registerMeta()
+	*/
 	bool getTable(GMObject& obj, GMint index);
 
 public:
-	template <size_t _size> GMLuaStatus call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
+	template <size_t _size> GMLuaStates call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable(&returns)[_size])
 	{
-		GMLuaStatus result = callp(functionName, args, _size);
-		if (result == GMLuaStatus::Ok)
+		GMLuaStates result = callp(functionName, args, _size);
+		if (result == GMLuaStates::Ok)
 		{
 			for (GMint i = 0; i < _size; i++)
 			{
@@ -232,9 +262,8 @@ public:
 	operator lua_State*()
 	{
 		D(d);
-		return d->luaState.get();
+		return d->luaState;
 	}
-
 
 	template <typename T>
 	void setVector(const T& v)
@@ -326,8 +355,9 @@ public:
 
 private:
 	void loadLibrary();
-	void callExceptionHandler(GMLuaStatus state, const char* msg);
-	GMLuaStatus callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet);
+	void registerLibraries();
+	void callExceptionHandler(GMLuaStates state, const char* msg);
+	GMLuaStates callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet);
 	void push(const GMLuaVariable& var);
 	void push(const char* name, const GMObjectMember& member);
 	GMLuaVariable pop();

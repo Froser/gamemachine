@@ -150,6 +150,9 @@ set(SOURCES
 		gmlua/gmlua.cpp
 		gmlua/gmlua_functions.h
 		gmlua/gmlua_functions.cpp
+		gmlua/gmluameta.h
+		gmlua/meta/gamemachine_meta.h
+		gmlua/meta/gamemachine_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

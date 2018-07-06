@@ -1,9 +1,8 @@
 ﻿#include "stdafx.h"
 #include "gmlua.h"
-#include "gmlua_functions.h"
+#include "gmluameta.h"
 #include "foundation/utilities/tools.h"
-
-#define L (d->luaState.get())
+#define L (d->luaState)
 
 #define POP_GUARD() \
 struct __PopGuard							\
@@ -13,31 +12,74 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
-GM_PRIVATE_DESTRUCT_DEFAULT_IMPLEMENT(GMLua)
-
 GMLua::GMLua()
 {
 	D(d);
-	d->luaState = GMOwnedPtr<lua_State, GMLuaStatusDeleter>(luaL_newstate(), GMLuaStatusDeleter());
+	d->luaState = luaL_newstate();
+	d->isWeakLuaStatePtr = false;
 }
 
-GMLuaStatus GMLua::loadFile(const char* file)
+GMLua::GMLua(lua_State* l)
+{
+	D(d);
+	d->luaState = luaL_newstate();
+	d->isWeakLuaStatePtr = true;
+}
+
+GMLua::~GMLua()
+{
+	D(d);
+	if (!d->isWeakLuaStatePtr && d->luaState)
+		lua_close(d->luaState);
+}
+
+GMLuaResult GMLua::runFile(const char* file)
 {
 	D(d);
 	GM_ASSERT(L);
 	loadLibrary();
-	return (GMLuaStatus)(luaL_loadfile(L, file) || lua_pcall(L, 0, LUA_MULTRET, 0));
+	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadfile(L, file));
+	if (s != GMLuaStates::Ok)
+	{
+		GMLuaResult lr = { s };
+		lr.message = lua_tostring(L, -1);
+		return lr;
+	}
+	GMLuaResult lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	return lr;
 }
 
-GMLuaStatus GMLua::loadBuffer(const GMBuffer& buffer)
+GMLuaResult GMLua::runBuffer(const GMBuffer& buffer)
 {
 	D(d);
 	GM_ASSERT(L);
 	loadLibrary();
-	GMLuaStatus s = static_cast<GMLuaStatus>(luaL_loadbuffer(L, (const char*)buffer.buffer, buffer.size, 0));
-	if (s != GMLuaStatus::Ok)
-		return s;
-	return static_cast<GMLuaStatus>(lua_pcall(L, 0, LUA_MULTRET, 0));
+	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadbuffer(L, (const char*)buffer.buffer, buffer.size, 0));
+	if (s != GMLuaStates::Ok)
+	{
+		GMLuaResult lr = { s };
+		lr.message = lua_tostring(L, -1);
+		return lr;
+	}
+	GMLuaResult lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	return lr;
+}
+
+GMLuaResult GMLua::runString(const GMString& string)
+{
+	D(d);
+	GM_ASSERT(L);
+	loadLibrary();
+	std::string stdstr = string.toStdString();
+	GMLuaStates s = static_cast<GMLuaStates>(luaL_loadstring(L, stdstr.c_str()));
+	if (s != GMLuaStates::Ok)
+	{
+		GMLuaResult lr = { s };
+		lr.message = lua_tostring(L, -1);
+		return lr;
+	}
+	GMLuaResult lr = { static_cast<GMLuaStates>(lua_pcall(L, 0, LUA_MULTRET, 0)) };
+	return lr;
 }
 
 void GMLua::setGlobal(const char* name, const GMLuaVariable& var)
@@ -81,15 +123,15 @@ bool GMLua::getGlobal(const char* name, GMObject& obj)
 	return getTable(obj);
 }
 
-GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
+GMLuaStates GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args)
 {
 	return callp(functionName, args, 0);
 }
 
-GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
+GMLuaStates GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMLuaVariable* returns, GMint nRet)
 {
-	GMLuaStatus result = callp(functionName, args, nRet);
-	if (result == GMLuaStatus::Ok)
+	GMLuaStates result = callp(functionName, args, nRet);
+	if (result == GMLuaStates::Ok)
 	{
 		for (GMint i = 0; i < nRet; i++)
 		{
@@ -99,16 +141,16 @@ GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GM
 	return result;
 }
 
-GMLuaStatus GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet)
+GMLuaStates GMLua::call(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMObject* returns, GMint nRet)
 {
-	GMLuaStatus result = callp(functionName, args, nRet);
-	if (result == GMLuaStatus::Ok)
+	GMLuaStates result = callp(functionName, args, nRet);
+	if (result == GMLuaStates::Ok)
 	{
 		for (GMint i = 0; i < nRet; i++)
 		{
 			POP_GUARD();
 			if (!getTable(returns[i]))
-				return GMLuaStatus::WrongType;
+				return GMLuaStates::WrongType;
 		}
 	}
 	return result;
@@ -123,11 +165,21 @@ bool GMLua::invoke(const char* expr)
 void GMLua::loadLibrary()
 {
 	D(d);
-	luaL_openlibs(L);
-	luaapi::register_functions(L);
+	if (!d->libraryLoaded)
+	{
+		luaL_openlibs(L);
+		registerLibraries();
+		d->libraryLoaded = true;
+	}
 }
 
-void GMLua::callExceptionHandler(GMLuaStatus state, const char* msg)
+void GMLua::registerLibraries()
+{
+	D(d);
+	luaapi::registerLib(L);
+}
+
+void GMLua::callExceptionHandler(GMLuaStates state, const char* msg)
 {
 	D(d);
 	if (d->exceptionHandler)
@@ -136,7 +188,7 @@ void GMLua::callExceptionHandler(GMLuaStatus state, const char* msg)
 		gm_error("LUA error: %d, %s", (GMint)state, msg);
 }
 
-GMLuaStatus GMLua::callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet)
+GMLuaStates GMLua::callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet)
 {
 	D(d);
 	lua_getglobal(L, functionName);
@@ -146,8 +198,8 @@ GMLuaStatus GMLua::callp(const char* functionName, const std::initializer_list<G
 	}
 
 	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
-	GMLuaStatus result = (GMLuaStatus)lua_pcall(L, (GMuint)args.size(), nRet, 0);
-	if (result != GMLuaStatus::Ok)
+	GMLuaStates result = (GMLuaStates)lua_pcall(L, (GMuint)args.size(), nRet, 0);
+	if (result != GMLuaStates::Ok)
 	{
 		const char* msg = lua_tostring(L, -1);
 		callExceptionHandler(result, msg);
@@ -156,7 +208,7 @@ GMLuaStatus GMLua::callp(const char* functionName, const std::initializer_list<G
 	return result;
 }
 
-void GMLua::setTable(GMObject& obj)
+void GMLua::setTable(const GMObject& obj)
 {
 	D(d);
 	lua_newtable(L);
@@ -195,7 +247,7 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 			{
 				switch (member.second.type)
 				{
-				case GMMetaMemberType::GMString:
+				case GMMetaMemberType::String:
 					*(static_cast<GMString*>(member.second.ptr)) = lua_tostring(L, -1);
 					break;
 				case GMMetaMemberType::Float:
@@ -298,7 +350,7 @@ void GMLua::push(const char* name, const GMObjectMember& member)
 	case GMMetaMemberType::Boolean:
 		lua_pushboolean(L, *static_cast<bool*>(member.ptr));
 		break;
-	case GMMetaMemberType::GMString:
+	case GMMetaMemberType::String:
 		{
 			std::string value = (static_cast<GMString*>(member.ptr))->toStdString();
 			lua_pushstring(L, value.c_str());

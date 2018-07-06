@@ -3,7 +3,6 @@
 #include <defines.h>
 #include <math.h>
 #include <gmdxincludes.h>
-#include <gmobject.h>
 
 #if !GM_USE_DX11
 // 如果使用DirectX，则不使用glm

@@ -6,16 +6,10 @@ BEGIN_NS
 
 namespace luaapi
 {
-	extern "C"
+	struct GMArgumentHelper
 	{
-		GM_LUA_API void register_functions(lua_State *L);
-		GM_LUA_API int register_core(lua_State *L);
-		GM_LUA_API int core_output(lua_State *L);
-		GM_LUA_API int core_debug(lua_State *L);
-		GM_LUA_API int core_warning(lua_State *L);
-		GM_LUA_API int core_info(lua_State *L);
-		GM_LUA_API int core_error(lua_State *L);
-	}
+		static const char* getArgumentAsString(lua_State* L, const char* caller);
+	};
 }
 
 END_NS
