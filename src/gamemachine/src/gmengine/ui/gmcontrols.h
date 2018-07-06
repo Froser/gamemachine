@@ -369,6 +369,7 @@ class GMControlBorder : public GMControl
 {
 	GM_DECLARE_PRIVATE_AND_BASE(GMControlBorder, GMControl);
 	GM_DECLARE_PROPERTY(Corner, corner, GMRect);
+	GM_DECLARE_PROPERTY(BorderStyle, borderStyle, GMStyle);
 
 public:
 	GMControlBorder(GMWidget* widget) : Base(widget) { initStyles(widget); }

@@ -126,13 +126,13 @@ bool GMMultiLineTypoTextBuffer::CPtoXY(GMint cp, bool trail, GMint* x, GMint* y)
 bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint cp, GMint* x, GMint* y)
 {
 	D_BASE(d, Base);
-	if (!x || !y)
-		return false;
-
 	if (cp < 0)
 	{
-		*x = 0;
-		*y = 0;
+		if (x)
+			*x = 0;
+
+		if (y)
+			*y = 0;
 		return true;
 	}
 
@@ -141,10 +141,28 @@ bool GMMultiLineTypoTextBuffer::CPtoMidXY(GMint cp, GMint* x, GMint* y)
 
 	decltype(auto) r = d->engine->getResults().results;
 	if (cp >= getLength())
-		return CPtoMidXY(cp - 1, x, y);
+	{
+		// 越界分两种情况。如果最后一个字符是换行或仅有一个回车符，那么获取的坐标为下一行，否则获取最后一个字符的位置
+		// 由于缓存最末尾有个EOF，因此要getLength() - 1
+		if ((getLength() > 1 && r[getLength() - 1].newLineOrEOFSeparator) ||
+			(getLength() == 1 && r[0].newLineOrEOFSeparator)
+			)
+		{
+			CPtoMidXY(getLength() - 1, nullptr, y);
+			if (x)
+				*x = 0;
+			if (y)
+				*y = *y + getLineHeight() + getLineSpacing();
+			return true;
+		}
 
-	*x = r[cp].x + r[cp].advance * .5f;
-	*y = r[cp].y + r[cp].height * .5f;
+		return CPtoMidXY(getLength() - 1, x, y);
+	}
+
+	if (x)
+		*x = r[cp].x + r[cp].advance * .5f;
+	if (y)
+		*y = r[cp].y + r[cp].height * .5f;
 	return true;
 }
 
