@@ -3,19 +3,17 @@
 #include <gmcommon.h>
 #include <gmlua.h>
 
-#define GM_LUA_DECLARATIONS(name) { #name, name }
-
 BEGIN_NS
 
 namespace luaapi
 {
-	class GameMachine_Meta : public ILuaFunctionRegister
+	class GameMachine_Meta : public GMLuaFunctionRegister
 	{
 	public:
-		virtual void registerFunctions(lua_State* L) override;
+		virtual void registerFunctions(GMLuaCoreState* L) override;
 
 	private:
-		static int registerFunction(lua_State *L);
+		static int regCallback(GMLuaCoreState *L);
 		static const char* Name;
 	};
 }

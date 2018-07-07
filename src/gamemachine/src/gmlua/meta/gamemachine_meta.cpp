@@ -7,7 +7,6 @@ using namespace gm::luaapi;
 
 namespace
 {
-
 	class GMGameMachineRunningStatesProxy : public GMObject
 	{
 		GM_DECLARE_PRIVATE_FROM_STRUCT(GMGameMachineRunningStatesProxy, GMGameMachineRunningStates)
@@ -35,13 +34,13 @@ namespace
 	};
 
 	// {{BEGIN META FUNCTION}}
-	int exit(lua_State* L)
+	LUA_API int exit(GMLuaCoreState* L)
 	{
 		GM.exit();
 		return 0;
 	}
 
-	int getGameMachineRunningStates(lua_State* L)
+	LUA_API int getGameMachineRunningStates(GMLuaCoreState* L)
 	{
 		GMGameMachineRunningStatesProxy r;
 		GMLua(L).setTable(r);
@@ -49,7 +48,7 @@ namespace
 	}
 	// {{END META FUNCTION}}
 
-	luaL_Reg g_meta[] = {
+	GMLuaReg g_meta[] = {
 		// {{BEGIN META DECLARATIONS}}
 		GM_LUA_DECLARATIONS(exit),
 		GM_LUA_DECLARATIONS(getGameMachineRunningStates),
@@ -60,14 +59,13 @@ namespace
 
 const char* GameMachine_Meta::Name = "GM";
 
-void GameMachine_Meta::registerFunctions(lua_State* L)
+void GameMachine_Meta::registerFunctions(GMLuaCoreState* L)
 {
-	luaL_requiref(L, Name, registerFunction, 1);
-	lua_pop(L, 1);
+	setRegisterFunction(L, Name, regCallback, true);
 }
 
-int GameMachine_Meta::registerFunction(lua_State *L)
+int GameMachine_Meta::regCallback(GMLuaCoreState *L)
 {
-	luaL_newlib(L, g_meta);
+	newLibrary(L, g_meta);
 	return 1;
 }

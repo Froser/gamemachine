@@ -12,6 +12,18 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
+void GMLuaFunctionRegister::setRegisterFunction(GMLuaCoreState *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal)
+{
+	auto m = modname.toStdString();
+	luaL_requiref(l, m.data(), openf, isGlobal ? 1 : 0);
+	lua_pop(l, 1);
+}
+
+void GMLuaFunctionRegister::newLibrary(GMLuaCoreState *l, const GMLuaReg* functions)
+{
+	luaL_newlib(l, functions);
+}
+
 GMLua::GMLua()
 {
 	D(d);

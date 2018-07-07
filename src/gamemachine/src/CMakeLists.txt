@@ -153,6 +153,8 @@ set(SOURCES
 		gmlua/gmluameta.h
 		gmlua/meta/gamemachine_meta.h
 		gmlua/meta/gamemachine_meta.cpp
+		gmlua/meta/gmdebugger_meta.h
+		gmlua/meta/gmdebugger_meta.cpp
 
 		extensions/bsp/bsp_factory.h
 		extensions/bsp/bsp_factory.cpp

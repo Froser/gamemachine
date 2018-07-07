@@ -19,9 +19,21 @@ struct __PopGuard							\
 	lua_State* m_L;							\
 } __guard(*this);
 
-GM_INTERFACE(ILuaFunctionRegister)
+#define GM_LUA_DECLARATIONS(name) { #name, name }
+
+typedef luaL_Reg GMLuaReg;
+typedef lua_State GMLuaCoreState;
+typedef lua_CFunction GMLuaCFunction;
+
+struct GMLuaFunctionRegister
 {
-	virtual void registerFunctions(lua_State*) = 0;
+	virtual void registerFunctions(GMLuaCoreState*) = 0;
+
+protected:
+	void setRegisterFunction(GMLuaCoreState *l, const GMString& modname, GMLuaCFunction openf, bool isGlobal);
+	
+protected:
+	static void newLibrary(GMLuaCoreState *l, const GMLuaReg* functions);
 };
 
 enum class GMLuaStates

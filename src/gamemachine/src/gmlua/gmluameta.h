@@ -3,6 +3,7 @@
 
 // {{BEGIN META INCLUDES}}
 #include "meta/gamemachine_meta.h"
+#include "meta/gmdebugger_meta.h"
 // {{END META INCLUDES}}
 
 BEGIN_NS
@@ -12,6 +13,7 @@ namespace luaapi
 	{
 		// {{BEGIN META REGISTER}}
 		GameMachine_Meta().registerFunctions(L);
+		GMDebugger_Meta().registerFunctions(L);
 		// {{END META REGISTER}}
 	}
 }
