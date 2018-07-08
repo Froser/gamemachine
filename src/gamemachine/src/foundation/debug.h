@@ -10,6 +10,8 @@ BEGIN_NS
 
 GM_INTERFACE(IDebugOutput)
 {
+	typedef void (IDebugOutput::*Method)(const GMString& msg);
+
 	virtual void info(const GMString& msg) = 0;
 	virtual void warning(const GMString& msg) = 0;
 	virtual void error(const GMString& msg) = 0;
@@ -49,30 +51,28 @@ public:
 	}
 
 public:
-	void info(const GMwchar* format, ...);
-	void info(const char* format, ...);
-	void error(const GMwchar* format, ...);
-	void error(const char* format, ...);
-	void warning(const GMwchar* format, ...);
-	void warning(const char* format, ...);
-#if _DEBUG
-	void debug(const GMwchar* format, ...);
-	void debug(const char* format, ...);
-#endif
+	void info(const GMString& string, const std::initializer_list<GMString>& arguments = {});
+	void warning(const GMString& string, const std::initializer_list<GMString>& arguments = {});
+	void debug(const GMString& string, const std::initializer_list<GMString>& arguments = {});
+	void error(const GMString& string, const std::initializer_list<GMString>& arguments = {});
+
+private:
+	void print(
+		GMString string,
+		const GMString& prefix,
+		IDebugOutput::Method method,
+		const std::initializer_list<GMString>& arguments
+	);
 };
 
 // debug macros:
 #define gm_info gm::GMDebugger::instance().info
 #define gm_error gm::GMDebugger::instance().error
 #define gm_warning gm::GMDebugger::instance().warning
-#if _DEBUG
-#	define gm_debug gm::GMDebugger::instance().debug
-#else
-#	define gm_debug(i)
-#endif
+#define gm_debug gm::GMDebugger::instance().debug
 
 // hooks
-typedef size_t CallbackType;
+typedef GMsize_t CallbackType;
 typedef void *HookObject;
 struct HookFactory
 {

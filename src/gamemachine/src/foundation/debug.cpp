@@ -4,126 +4,68 @@
 #include "stdafx.h"
 #include "debug.h"
 #include <cwchar>
+#include <chrono>
+#include <ctime>
 
-inline void format_timeW(GMwchar* in)
+namespace
 {
+	GMString getFormattedTime()
+	{
+		auto now = std::chrono::system_clock::now();
+		std::time_t std_now = std::chrono::system_clock::to_time_t(now);
+		std::tm* localTime = std::localtime(&std_now);
+		std::string r = std::asctime(localTime);
+		return r.substr(0, r.length() - 1);
+	}
+}
+
+void GMDebugger::info(const GMString& string, const std::initializer_list<GMString>& arguments)
+{
+	print(string, L"info", &(IDebugOutput::info), arguments);
+}
+
+void GMDebugger::warning(const GMString& string, const std::initializer_list<GMString>& arguments)
+{
+	print(string, L"warning", &(IDebugOutput::warning), arguments);
+}
+
+void GMDebugger::debug(const GMString& string, const std::initializer_list<GMString>& arguments)
+{
+#if _DEBUG
+	print(string, L"debug", &(IDebugOutput::debug), arguments);
+#endif
+}
+
+void GMDebugger::error(const GMString& string, const std::initializer_list<GMString>& arguments)
+{
+	print(string, L"error", &(IDebugOutput::error), arguments);
+}
+
+void GMDebugger::print(
+	GMString string,
+	const GMString& prefix,
+	IDebugOutput::Method method,
+	const std::initializer_list<GMString>& arguments)
+{
+	D(d);
+	GMint i = 0;
+	for (decltype(auto) argument : arguments)
+	{
+		string = string.replace(L"{" + GMString(i++) + L"}", argument);
+	}
+	GMString s = getFormattedTime() + L": [" + prefix + L"] " + std::move(string);
+	s += "\n";
+
+	if (d->debugger)
+	{
+		(d->debugger->*method)(s);
+	}
+	else
+	{
 #if GM_WINDOWS
-	SYSTEMTIME time = { 0 };
-	GetLocalTime(&time);
-	swprintf(in, L"%d-%02d-%02d %02d:%02d:%02d",
-		time.wYear,
-		time.wMonth,
-		time.wDay,
-		time.wHour,
-		time.wMinute,
-		time.wSecond
-	);
+		OutputDebugStringW(s.toStdWString().c_str());
 #endif
+	}
 }
 
-inline void format_timeA(char* in)
-{
-#if GM_WINDOWS
-	SYSTEMTIME time = { 0 };
-	GetLocalTime(&time);
-	sprintf(in, "%d-%02d-%02d %02d:%02d:%02d",
-		time.wYear,
-		time.wMonth,
-		time.wDay,
-		time.wHour,
-		time.wMinute,
-		time.wSecond
-	);
-#endif
-}
-
-#define f_timeW(t) GMwchar t[LINE_MAX]; format_timeW(t);
-#define f_timeA(t) char t[LINE_MAX]; format_timeA(t);
-
-#define printW(format, tag) \
-	D(d);															\
-	GMwchar out[LINE_MAX];											\
-	va_list ap;														\
-	va_start(ap, format);											\
-	if (d && d->debugger)											\
-	{																\
-		GMwchar buf[LINE_MAX];										\
-		vswprintf(buf, format, ap);									\
-		f_timeW(t);													\
-		wsprintf(out, L"[" L ## #tag L"]%s: %s", t, buf);			\
-		d->debugger->tag(out);										\
-	}																\
-	else															\
-	{																\
-		GMwchar buf[LINE_MAX];										\
-		vswprintf(buf, format, ap);									\
-		f_timeW(t);													\
-		wprintf(out, L"[" L ## #tag L"]%s: %s", t, buf);			\
-	}																\
-	va_end(ap);
-
-#define printA(format, tag) \
-	D(d);															\
-	char out[LINE_MAX];												\
-	va_list ap;														\
-	va_start(ap, format);											\
-	if (d && d->debugger)											\
-	{																\
-		char buf[LINE_MAX];											\
-		vsprintf(buf, format, ap);									\
-		f_timeA(t);													\
-		sprintf(out, "[" #tag "]%s: %s", t, buf);					\
-		d->debugger->tag(out);										\
-	}																\
-	else															\
-	{																\
-		char buf[LINE_MAX];											\
-		vsprintf(buf, format, ap);									\
-		f_timeA(t);													\
-		printf(out, "[" #tag "]%s: %s", t, buf);					\
-	}																\
-	va_end(ap);
-
-void GMDebugger::info(const GMwchar *format, ...)
-{
-	printW(format, info);
-}
-
-void GMDebugger::info(const char* format, ...)
-{
-	printA(format, info);
-}
-
-void GMDebugger::error(const GMwchar *format, ...)
-{
-	printW(format, error);
-}
-
-void GMDebugger::error(const char* format, ...)
-{
-	printA(format, error);
-}
-
-void GMDebugger::warning(const GMwchar *format, ...)
-{
-	printW(format, warning);
-}
-
-void GMDebugger::warning(const char* format, ...)
-{
-	printA(format, warning);
-}
-
-#ifdef _DEBUG
-void GMDebugger::debug(const GMwchar *format, ...)
-{
-	printW(format, debug);
-}
-
-void GMDebugger::debug(const char* format, ...)
-{
-	printA(format, debug);
-}
-#endif
-
-Map<size_t, void*> HookFactory::g_hooks;
+Map<GMsize_t, void*> HookFactory::g_hooks;

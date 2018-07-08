@@ -78,7 +78,7 @@ namespace
 		fopen_s(&f, filename, "rb");
 
 		if (!f)
-			gm_error("Error opening %Ls.", filename);
+			gm_error("Error opening {0}.", { filename } );
 
 		return f;
 	}
@@ -403,7 +403,7 @@ void GMBSP::parseEntities()
 			s.nextFloat(&d->lightVols.lightVolSize[0]);
 			s.nextFloat(&d->lightVols.lightVolSize[1]);
 			s.nextFloat(&d->lightVols.lightVolSize[2]);
-			gm_info(L"gridSize reseted to %f, %f, %f", &d->lightVols.lightVolSize[0], &d->lightVols.lightVolSize[1], &d->lightVols.lightVolSize[2]);
+			gm_info(L"gridSize reseted to {0}, {1}, {2}",{ GMString(d->lightVols.lightVolSize[0]), GMString(d->lightVols.lightVolSize[1]), GMString(d->lightVols.lightVolSize[2]) });
 		}
 	}
 }
@@ -520,7 +520,7 @@ skipspace:
 		if (*d->script->script_p++ == '\n')
 		{
 			if (!crossline)
-				gm_error(L"Line %i is incomplete\n", d->scriptline);
+				gm_error(L"Line {0} is incomplete\n", { GMString(d->scriptline) } );
 			d->scriptline = d->script->line++;
 		}
 	}
@@ -533,7 +533,7 @@ skipspace:
 		|| (d->script->script_p[0] == '/' && d->script->script_p[1] == '/'))
 	{
 		if (!crossline)
-			gm_error(L"Line %i is incomplete\n", d->scriptline);
+			gm_error(L"Line {0} is incomplete\n", { GMString(d->scriptline) } );
 		while (*d->script->script_p++ != '\n')
 			if (d->script->script_p >= d->script->end_p)
 				return endOfScript(crossline);
@@ -546,7 +546,7 @@ skipspace:
 	{
 		if (!crossline)
 		{
-			gm_error(L"Line %i is incomplete\n", d->scriptline);
+			gm_error(L"Line {0} is incomplete\n", { GMString(d->scriptline) } );
 			GM_ASSERT(false);
 		}
 		d->script->script_p += 2;
@@ -590,7 +590,7 @@ skipspace:
 			if (d->script->script_p == d->script->end_p)
 				break;
 			if (token_p == &d->token[MAXTOKEN])
-				gm_error(L"Token too large on line %i\n", d->scriptline);
+				gm_error(L"Token too large on line {0}\n", { GMString(d->scriptline) }) ;
 		}
 	}
 
@@ -639,7 +639,7 @@ void GMBSP::addScriptToStack(const char *filename)
 
 	size = loadFile(d->script->filename, (void **)&d->script->buffer);
 
-	gm_info("entering %s\n", d->script->filename);
+	gm_info("entering {0}\n", { d->script->filename } );
 
 	d->script->line = 1;
 
@@ -653,7 +653,7 @@ bool GMBSP::endOfScript(bool crossline)
 	D(d);
 	if (!crossline)
 	{
-		gm_warning("Line %i is incomplete\n", d->scriptline);
+		gm_warning("Line {0} is incomplete\n", { GMString(d->scriptline) });
 	}
 
 	if (!strcmp(d->script->filename, "memory buffer"))
@@ -670,6 +670,6 @@ bool GMBSP::endOfScript(bool crossline)
 	}
 	d->script--;
 	d->scriptline = d->script->line;
-	gm_info("returning to %s\n", d->script->filename);
+	gm_info("returning to {0}\n", { d->script->filename } );
 	return getToken(crossline);
 }

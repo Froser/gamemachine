@@ -197,7 +197,7 @@ void GMLua::callExceptionHandler(GMLuaStates state, const char* msg)
 	if (d->exceptionHandler)
 		d->exceptionHandler->onException(state, msg);
 	else
-		gm_error("LUA error: %d, %s", (GMint)state, msg);
+		gm_error("LUA error: {0}, {1}", { GMString(static_cast<GMint>(state)), msg });
 }
 
 GMLuaStates GMLua::callp(const char* functionName, const std::initializer_list<GMLuaVariable>& args, GMint nRet)

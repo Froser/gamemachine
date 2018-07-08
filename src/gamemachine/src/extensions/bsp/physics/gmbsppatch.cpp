@@ -1211,8 +1211,7 @@ void GMBSPPatch::generatePatchCollide(GMint index, GMint width, GMint height, co
 
 	if (width <= 2 || height <= 2 || !points)
 	{
-		gm_error(L"generatePatchFacets: bad parameters: (%i, %i, %p)",
-			width, height, points);
+		gm_error(L"generatePatchFacets: bad parameters.");
 	}
 
 	if (!(width & 1) || !(height & 1))

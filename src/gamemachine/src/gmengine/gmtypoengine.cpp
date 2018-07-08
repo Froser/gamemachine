@@ -244,7 +244,7 @@ GMTypoIterator GMTypoEngine::begin(const GMString& literature, const GMTypoOptio
 		else
 		{
 			last = &d->results[start];
-			d->current_x = last->x;
+			d->current_x = last->x - last->bearingX; // 横向排版，计算x坐标的时候，current_x加上了bearingX，所以要减去它，见getTypoResult()
 			d->current_y = last->y;
 			d->currentLineNo = last->lineNo;
 			d->results.erase(d->results.begin() + start, d->results.end());
@@ -399,6 +399,8 @@ GMTypoResult GMTypoEngine::getTypoResult(GMsize_t index)
 	result.width = glyph.width;
 	result.height = glyph.height;
 	result.advance = glyph.advance;
+	result.bearingX = glyph.bearingX;
+	result.bearingY = glyph.bearingY;
 	if (isValidTypeFrame())
 	{
 		// 如果给定了一个合法的绘制区域，且出现超出绘制区域的情况

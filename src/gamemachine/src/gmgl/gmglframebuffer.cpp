@@ -302,7 +302,7 @@ void GMGLFramebuffers::createFramebuffers()
 		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
-			gm_error("FB incomplete error, status: 0x%x\n", status);
+			gm_error("FB incomplete error, status: {0}\n", { GMString(static_cast<GMint>(status)) });
 			GM_ASSERT(false);
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 			return;

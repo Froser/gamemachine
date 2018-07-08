@@ -31,21 +31,15 @@ extern "C"
 		{
 			if (severity == GL_DEBUG_SEVERITY_MEDIUM || severity == GL_DEBUG_SEVERITY_HIGH)
 			{
-				gm_error("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					type, severity, message);
+				gm_error("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n",
+					{ (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message });
 			}
 			else if (severity == GL_DEBUG_SEVERITY_LOW)
 			{
-				gm_warning("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					type, severity, message);
-			}
-			else
-			{
-				gm_info("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-					(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-					type, severity, message);
+				gm_warning("GL CALLBACK: {0} type = {1}, severity = {2}, message = {3}\n",
+				{ (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+					GMString(static_cast<GMint>(type)), GMString(static_cast<GMint>(severity)), message });
 			}
 		}
 	}

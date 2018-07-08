@@ -69,7 +69,7 @@ bool GMDefaultGamePackageHandler::readFileFromPath(const GMString& path, REF GMB
 	}
 	else
 	{
-		gm_warning(L"cannot read file from path: %Ls", path.toStdWString().c_str());
+		gm_warning(L"cannot read file from path: {0}", { path });
 	}
 	return false;
 }
@@ -137,7 +137,7 @@ void GMZipGamePackageHandler::init()
 	PKD(d);
 	if (!loadZip())
 	{
-		gm_error(L"invalid package file %Ls", d->packagePath.toStdWString().c_str());
+		gm_error(L"invalid package file {0}", { d->packagePath });
 		return;
 	}
 	Base::init();
@@ -170,7 +170,7 @@ bool GMZipGamePackageHandler::readFileFromPath(const GMString& path, REF GMBuffe
 		return true;
 	}
 
-	gm_warning(L"cannot find path %Ls", path.toStdWString().c_str());
+	gm_warning(L"cannot find path {0} ", { GMString(path) });
 	return false;
 }
 

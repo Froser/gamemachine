@@ -15,6 +15,8 @@ struct GMTypoResult
 	GMfloat width = 0;
 	GMfloat height = 0;
 	GMfloat advance = 0;
+	GMint bearingX = 0;
+	GMint bearingY = 0;
 	GMint lineNo = 0;
 	const GMGlyphInfo* glyph = nullptr;
 	bool valid = true;

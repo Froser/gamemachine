@@ -375,7 +375,7 @@ bool GMMAudioPlayer::openDevice(gm::GMint idx)
 		context = alcCreateContext(device, NULL);
 		if (context)
 		{
-			gm_info("\nOpened %s Device\n", alcGetString(device, ALC_DEVICE_SPECIFIER));
+			gm_info("\nOpened {0} Device\n", { alcGetString(device, ALC_DEVICE_SPECIFIER) } );
 			alcMakeContextCurrent(context);
 			bRet = AL_TRUE;
 		}
