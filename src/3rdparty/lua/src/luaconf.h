@@ -691,6 +691,9 @@
 /* #define LUA_NOCVTN2S */
 /* #define LUA_NOCVTS2N */
 
+#if _DEBUG
+#define LUA_USE_APICHECK
+#endif
 
 /*
 @@ LUA_USE_APICHECK turns on several consistency checks on the C API.

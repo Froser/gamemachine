@@ -4,11 +4,22 @@
 BEGIN_NS
 using namespace luaapi;
 
-const char* GMArgumentHelper::getArgumentAsString(lua_State* L, const char* caller)
+GMint GMArgumentHelper::getArgumentsCount(GMLuaCoreState* L)
+{
+	return lua_gettop(L);
+}
+
+const char* GMArgumentHelper::getArgumentAsString(GMLuaCoreState* L, const char* invoker)
 {
 	if (!lua_isstring(L, -1))
-		gm_error("[LUA] {0}: argument is not a string.", { caller });
+		gm_error("GMLua (getArgumentAsString): {0}: argument is not a string.", { invoker });
 	return luaL_optstring(L, -1, "");
+}
+
+void GMArgumentHelper::getArgumentAsObject(GMLuaCoreState* L, REF GMObject& obj, const char* invoker)
+{
+	if (!GMLua(L).getTable(obj))
+		gm_error("GMLua (getArgumentAsObject): {0}: argument is not an object.", { invoker });
 }
 
 END_NS

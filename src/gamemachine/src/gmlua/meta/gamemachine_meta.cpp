@@ -2,8 +2,11 @@
 #include "gamemachine_meta.h"
 #include <gamemachine.h>
 #include <gmlua.h>
+#include "../gmlua_functions.h"
 
 using namespace gm::luaapi;
+
+#define NAME "GM"
 
 namespace
 {
@@ -36,12 +39,14 @@ namespace
 	// {{BEGIN META FUNCTION}}
 	LUA_API int exit(GMLuaCoreState* L)
 	{
+		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".exit");
 		GM.exit();
 		return 0;
 	}
 
 	LUA_API int getRunningStates(GMLuaCoreState* L)
 	{
+		GM_LUA_CHECK_ARG_COUNT(L, 0, NAME ".getRunningStates");
 		GMGameMachineRunningStatesProxy r;
 		GMLua(L).setTable(r);
 		return 1;
@@ -57,7 +62,7 @@ namespace
 	};
 }
 
-const char* GameMachine_Meta::Name = "GM";
+const char* GameMachine_Meta::Name = NAME;
 
 void GameMachine_Meta::registerFunctions(GMLuaCoreState* L)
 {

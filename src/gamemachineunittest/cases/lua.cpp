@@ -71,6 +71,21 @@ namespace
 		"  return prefix .. dummy;\n"
 		"end"
 		;
+
+	const char* s_invoke2 =
+		"function dummy_function2(i)"
+		"  local tb = {};"
+		"  tb.i = 256;"
+		"  tb.v4 = {6, 7, 8, 9 + i};"
+		"  return tb;"
+		"end";
+
+	const char* s_invoke3 =
+		"function dummy_function3(i)"
+		"  local tb = {};"
+		"  tb.str = i.str;"
+		"  return tb;"
+		"end";
 }
 
 cases::Lua::Lua()
@@ -123,7 +138,7 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 		return bScalar && bV2 && bV3 && bV4 && bM;
 	});
 
-	ut.addTestCase("C/C++调用语句，调用Lua方法", [&]() {
+	ut.addTestCase("C/C++调用语句，调用Lua方法，传入标量，获取标量", [&]() {
 		gm::GMLuaResult lr = m_lua.runString(s_invoke);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
@@ -133,9 +148,35 @@ void cases::Lua::addToUnitTest(UnitTest& ut)
 			return false;
 
 		gm::GMVariant ret;
-		lr = m_lua.callProtected("dummy_function", {"hello "}, &ret, 1);
+		lr = m_lua.protectedCall("dummy_function", {"hello "}, &ret, 1);
 		if (lr.state != gm::GMLuaStates::Ok)
 			return false;
 		return ret.toString() == "hello gamemachine";
+	});
+
+	ut.addTestCase("C/C++调用语句，调用Lua方法，传入标量，获取对象", [&]() {
+		gm::GMLuaResult lr = m_lua.runString(s_invoke2);
+		if (lr.state != gm::GMLuaStates::Ok)
+			return false;
+
+		LuaObject ret;
+		lr = m_lua.protectedCall("dummy_function2", { 5 }, &ret, 1);
+		if (lr.state != gm::GMLuaStates::Ok)
+			return false;
+		return VECTOR4_EQUALS(ret.getv4(), 6, 7, 8, 14) && ret.geti() == 256;
+	});
+
+	ut.addTestCase("C/C++调用语句，调用Lua方法，传入对象，获取对象", [&]() {
+		gm::GMLuaResult lr = m_lua.runString(s_invoke3);
+		if (lr.state != gm::GMLuaStates::Ok)
+			return false;
+
+		LuaObject arg;
+		arg.setstr("Howdy!");
+		LuaObject ret;
+		lr = m_lua.protectedCall("dummy_function3", { &arg }, &ret, 1);
+		if (lr.state != gm::GMLuaStates::Ok)
+			return false;
+		return ret.getstr() == "Howdy!" && ret.geti() == 0 && ret.getb() == false; //...未赋值的部分为默认值
 	});
 }

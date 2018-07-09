@@ -27,6 +27,10 @@ struct __PopGuard							\
 		return lr;							\
 	}
 
+// 检查栈是否平衡
+#define BEGIN_CHECK_STACK() auto __stack = lua_gettop(L);
+#define END_CHECK_STACK(offset) GM_ASSERT(lua_gettop(L) == __stack + offset)
+
 namespace
 {
 	template <typename T>
@@ -235,28 +239,31 @@ bool GMLua::getGlobal(const char* name, GMObject& obj)
 	return getTable(obj);
 }
 
-GMLuaResult GMLua::callProtected(const char* functionName, const std::initializer_list<GMVariant>& args)
+GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args)
 {
 	D(d);
-	return callp(functionName, args, 0);
+	return pcall(functionName, args, 0);
 }
 
-GMLuaResult GMLua::callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint nRet)
+GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns, GMint nRet)
 {
 	D(d);
-	GMLuaResult lr = callp(functionName, args, nRet);
+	BEGIN_CHECK_STACK();
+	GMLuaResult lr = pcall(functionName, args, nRet);
 	CHECK(lr);
 	for (GMint i = 0; i < nRet; i++)
 	{
 		returns[i] = pop();
 	}
+	END_CHECK_STACK(0);
 	return lr;
 }
 
-GMLuaResult GMLua::callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns, GMint nRet)
+GMLuaResult GMLua::protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns, GMint nRet)
 {
 	D(d);
-	GMLuaResult lr = callp(functionName, args, nRet);
+	BEGIN_CHECK_STACK();
+	GMLuaResult lr = pcall(functionName, args, nRet);
 	CHECK(lr);
 	for (GMint i = 0; i < nRet; i++)
 	{
@@ -266,9 +273,10 @@ GMLuaResult GMLua::callProtected(const char* functionName, const std::initialize
 			lr.state = GMLuaStates::WrongType;
 			const char* errmsg = "cannot convert to GMObject";
 			lr.message = errmsg;
-			gm_error(L"GMLua (callProcted): " + GMString(errmsg));
+			gm_error(L"GMLua (protectedCall): " + GMString(errmsg));
 		}
 	}
+	END_CHECK_STACK(0);
 	return lr;
 }
 
@@ -289,9 +297,10 @@ void GMLua::registerLibraries()
 	luaapi::registerLib(L);
 }
 
-GMLuaResult GMLua::callp(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
+GMLuaResult GMLua::pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet)
 {
 	D(d);
+	BEGIN_CHECK_STACK();
 	lua_getglobal(L, functionName);
 	for (const auto& var : args)
 	{
@@ -301,6 +310,7 @@ GMLuaResult GMLua::callp(const char* functionName, const std::initializer_list<G
 	GM_ASSERT(args.size() < std::numeric_limits<GMuint>::max());
 	GMLuaResult lr = { (GMLuaStates)lua_pcall(L, (GMuint)args.size(), nRet, 0) };
 	CHECK(lr);
+	END_CHECK_STACK(nRet);
 	return lr;
 }
 
@@ -319,8 +329,7 @@ void GMLua::setTable(const GMObject& obj)
 bool GMLua::getTable(GMObject& obj)
 {
 	D(d);
-	GMint index = lua_gettop(L);
-	return getTable(obj, index);
+	return getTable(obj, lua_gettop(L));
 }
 
 bool GMLua::getTable(GMObject& obj, GMint index)
@@ -330,7 +339,12 @@ bool GMLua::getTable(GMObject& obj, GMint index)
 	if (!meta)
 		return false;
 
-	GM_ASSERT(lua_istable(L, index));
+	if (!lua_istable(L, index))
+	{
+		gm_error("GMLua (getTable): lua object type is {0}. Table is expected.", { lua_typename(L, lua_type(L, index)) });
+		return false;
+	}
+
 	lua_pushnil(L);
 	while (lua_next(L, index))
 	{

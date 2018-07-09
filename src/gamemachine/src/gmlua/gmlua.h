@@ -107,9 +107,9 @@ public:
 	*/
 	bool getGlobal(const char* name, GMObject& obj);
 
-	GMLuaResult callProtected(const char* functionName, const std::initializer_list<GMVariant>& args);
-	GMLuaResult callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
-	GMLuaResult callProtected(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns = nullptr, GMint nRet = 0);
+	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args);
+	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMVariant* returns = nullptr, GMint nRet = 0);
+	GMLuaResult protectedCall(const char* functionName, const std::initializer_list<GMVariant>& args, GMObject* returns = nullptr, GMint nRet = 0);
 
 	//! 将一个对象的成员压入Lua的虚拟堆栈。
 	/*!
@@ -154,7 +154,7 @@ public:
 private:
 	void loadLibrary();
 	void registerLibraries();
-	GMLuaResult callp(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet);
+	GMLuaResult pcall(const char* functionName, const std::initializer_list<GMVariant>& args, GMint nRet);
 	void push(const GMVariant& var);
 	void push(const char* name, const GMObjectMember& member);
 

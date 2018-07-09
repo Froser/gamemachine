@@ -6,11 +6,14 @@
 
 using namespace gm::luaapi;
 
+#define NAME "GMDebugger"
+
 namespace
 {
 	// {{BEGIN META FUNCTION}}
 	LUA_API int info(GMLuaCoreState* L)
 	{
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".info");
 		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "info");
 		GMDebugger::instance().info(arg0);
 		return 0;
@@ -18,6 +21,7 @@ namespace
 
 	LUA_API int error(GMLuaCoreState* L)
 	{
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".error");
 		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "error");
 		GMDebugger::instance().error(arg0);
 		return 0;
@@ -25,6 +29,7 @@ namespace
 
 	LUA_API int warning(GMLuaCoreState* L)
 	{
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".warning");
 		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "warning");
 		GMDebugger::instance().warning(arg0);
 		return 0;
@@ -32,6 +37,7 @@ namespace
 
 	LUA_API int debug(GMLuaCoreState* L)
 	{
+		GM_LUA_CHECK_ARG_COUNT(L, 1, NAME ".debug");
 		const char* arg0 = GMArgumentHelper::getArgumentAsString(L, "debug");
 		GMDebugger::instance().debug(arg0);
 		return 0;
@@ -49,7 +55,7 @@ namespace
 	};
 }
 
-const char* GMDebugger_Meta::Name = "GMDebugger";
+const char* GMDebugger_Meta::Name = NAME;
 
 void GMDebugger_Meta::registerFunctions(GMLuaCoreState* L)
 {
